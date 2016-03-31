@@ -608,13 +608,18 @@ engine/gnu_ac_build/.libs/libmarpa$(LIB_EXT): engine/read_only/stamp-h1
 engine/perl_ac_build/libmarpa$(LIB_EXT): engine/read_only/stamp-h1
 	cd engine/perl_ac_build && $(MAKE)
 
-xs/R3.o: xs/marpa.h
+xs/R3.o: xs/libmarpa$(LIB_EXT) \
+    xs/marpa.h \
+    xs/marpa_codes.h
 
 END_OF_POSTAMBLE
 
     if ($use_perl_autoconf) {
         $postamble .= <<'EOT';
 xs/marpa.h: engine/perl_ac_build/marpa.h
+	cp $? $@
+
+xs/marpa_codes.h: engine/perl_ac_build/marpa_codes.h
 	cp $? $@
 
 xs/libmarpa$(LIB_EXT): engine/perl_ac_build/libmarpa$(LIB_EXT)
@@ -625,6 +630,9 @@ EOT
     else {
         $postamble .= <<'EOT';
 xs/marpa.h: engine/gnu_ac_build/marpa.h
+	cp $? $@
+
+xs/marpa_codes.h: engine/gnu_ac_build/marpa_codes.h
 	cp $? $@
 
 xs/libmarpa$(LIB_EXT): engine/gnu_ac_build/.libs/libmarpa$(LIB_EXT)
