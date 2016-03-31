@@ -1,16 +1,16 @@
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
 # LC_ALL=C sort
@@ -105,14 +105,14 @@ etc/pod_links.pl
 etc/reserved_check.sh
 g/config/default.txt
 html/.gitignore
-html/lib/Marpa/R2/HTML.pm
-html/lib/Marpa/R2/HTML/.gitignore
-html/lib/Marpa/R2/HTML/Callback.pm
-html/lib/Marpa/R2/HTML/Config.pm
-html/lib/Marpa/R2/HTML/Config/Compile.pm
-html/lib/Marpa/R2/HTML/Config/Core.pm
-html/lib/Marpa/R2/HTML/Config/Default.pm
-html/lib/Marpa/R2/HTML/Internal.pm
+html/lib/Marpa/R3/HTML.pm
+html/lib/Marpa/R3/HTML/.gitignore
+html/lib/Marpa/R3/HTML/Callback.pm
+html/lib/Marpa/R3/HTML/Config.pm
+html/lib/Marpa/R3/HTML/Config/Compile.pm
+html/lib/Marpa/R3/HTML/Config/Core.pm
+html/lib/Marpa/R3/HTML/Config/Default.pm
+html/lib/Marpa/R3/HTML/Internal.pm
 html/meta/Makefile
 html/meta/make_internal_pm.pl
 html/pod/HTML.pod
@@ -139,31 +139,31 @@ html/t/score.t
 html/t/synopsis.t
 html/t/tang.t
 html/t/test.html
-html/tool/lib/Marpa/R2/HTML/Test/Util.pm
-inc/Marpa/R2/Build_Me.pm
-inc/Marpa/R2/Config.pm
-inc/Marpa/R2/Display.pm
-inc/Marpa/R2/License.pm
-inc/Marpa/R2/Test.pm
-inc/Marpa/R2/legal.pl
+html/tool/lib/Marpa/R3/HTML/Test/Util.pm
+inc/Marpa/R3/Build_Me.pm
+inc/Marpa/R3/Config.pm
+inc/Marpa/R3/Display.pm
+inc/Marpa/R3/License.pm
+inc/Marpa/R3/Test.pm
+inc/Marpa/R3/legal.pl
 inc/drafts/undocumented.list
 lib/Marpa/.gitignore
-lib/Marpa/R2.pm
-lib/Marpa/R2/.gitignore
-lib/Marpa/R2/ASF.pm
-lib/Marpa/R2/Grammar.pm
-lib/Marpa/R2/Internal.pm
-lib/Marpa/R2/MetaAST.pm
-lib/Marpa/R2/MetaG.pm
-lib/Marpa/R2/Recognizer.pm
-lib/Marpa/R2/SLG.pm
-lib/Marpa/R2/SLR.pm
-lib/Marpa/R2/Stuifzand.pm
-lib/Marpa/R2/Thin/Trace.pm
-lib/Marpa/R2/Value.pm
-lib/Marpa/R2/meta/Makefile
-lib/Marpa/R2/meta/metag.bnf
-lib/Marpa/R2/meta/sl_to_hash.pl
+lib/Marpa/R3.pm
+lib/Marpa/R3/.gitignore
+lib/Marpa/R3/ASF.pm
+lib/Marpa/R3/Grammar.pm
+lib/Marpa/R3/Internal.pm
+lib/Marpa/R3/MetaAST.pm
+lib/Marpa/R3/MetaG.pm
+lib/Marpa/R3/Recognizer.pm
+lib/Marpa/R3/SLG.pm
+lib/Marpa/R3/SLR.pm
+lib/Marpa/R3/Stuifzand.pm
+lib/Marpa/R3/Thin/Trace.pm
+lib/Marpa/R3/Value.pm
+lib/Marpa/R3/meta/Makefile
+lib/Marpa/R3/meta/metag.bnf
+lib/Marpa/R3/meta/sl_to_hash.pl
 meta/Makefile
 meta/make_internal_pm.pl
 pod/ASF.pod
@@ -176,7 +176,7 @@ pod/Changes.pod
 pod/Event.pod
 pod/Exhaustion.pod
 pod/Glade.pod
-pod/Marpa_R2.pod
+pod/Marpa_R3.pod
 pod/NAIF.pod
 pod/NAIF/Grammar.pod
 pod/NAIF/Progress.pod
@@ -200,8 +200,8 @@ pod/Support.pod
 pod/Tracing.pod
 pod/Tutorial2.pod
 pod/Vocabulary.pod
-pperl/Marpa/R2/Perl.pm
-pperl/Marpa/R2/Perl/.gitignore
+pperl/Marpa/R3/Perl.pm
+pperl/Marpa/R3/Perl/.gitignore
 t/.gitignore
 t/00-load.t
 t/ah2.t
@@ -317,7 +317,7 @@ t/use.t
 typemap
 xs/.gitignore
 xs/Makefile
-xs/R2.xs
+xs/R3.xs
 xs/create_ops.pl
 xs/general_pattern.xsh
 xs/gp_generate.pl

@@ -1,16 +1,16 @@
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
 # Temporary
@@ -47,8 +47,8 @@
 ^MYMETA.json$
 ^MYMETA.yml$
 ^Makefile$
-^Marpa-R2-\d+.\d{3}_\d{3}/
-^Marpa-R2-\d+.\d{6}/
+^Marpa-R3-\d+.\d{3}_\d{3}/
+^Marpa-R3-\d+.\d{6}/
 ^TOUCH$
 ^[.]gdb_history$
 ^[.]gdbinit$
@@ -88,12 +88,12 @@
 ^inc/proof/.*[.]lyx[~]$
 ^junk$
 ^lib/Marpa/.*\.xsh
-^lib/Marpa/R2/Installed.pm$
-^lib/Marpa/R2/Version.pm$
-^lib/Marpa/R2/meta/metag[-]g[123456789][.]pl
-^lib/Marpa/R2/meta/metag[.]pl
-^lib/Marpa/R2\.c
-^lib/Marpa/R2\.xs
+^lib/Marpa/R3/Installed.pm$
+^lib/Marpa/R3/Version.pm$
+^lib/Marpa/R3/meta/metag[-]g[123456789][.]pl
+^lib/Marpa/R3/meta/metag[.]pl
+^lib/Marpa/R3\.c
+^lib/Marpa/R3\.xs
 ^libmarpa_build/
 ^nogit
 ^nogit/
@@ -102,5 +102,5 @@
 ^pod/Semantics/Order[.]pod[.]save$
 ^pod2htmd.tmp
 ^pod2htmi.tmp
-^pperl/Marpa/R2/Perl/Installed[.]pm$
-^pperl/Marpa/R2/Perl/Version[.]pm$
+^pperl/Marpa/R3/Perl/Installed[.]pm$
+^pperl/Marpa/R3/Perl/Version[.]pm$
