@@ -216,6 +216,24 @@ sub Marpa::R3::Grammar::set {
             Marpa::R3::exception(
                 'rules option not allowed after grammar is precomputed')
                 if $grammar_c->is_precomputed();
+
+                if (    ref $value eq 'ARRAY'
+                    and scalar @{$value} == 1
+                    and not ref $value->[0] )
+                {
+                    $value = $value->[0];
+                } ## end if ( ref $value eq 'ARRAY' and scalar @{$value} == 1...)
+                if ( not ref $value ) {
+                    Marpa::R2::exception(
+                        qq{Attempt to specify BNF as string -- no longer allowed!\n}
+                        )
+                }
+                Marpa::R2::exception(
+                    q{"rules" named argument must be ref to ARRAY}
+                ) if ref $value ne 'ARRAY';
+
+                add_user_rules( $grammar, $value );
+
         } ## end if ( defined( my $value = $args->{'rules'} ) )
 
         if ( exists $args->{'default_empty_action'} ) {
@@ -1476,6 +1494,7 @@ sub set_start_symbol {
     my $default_start_id = $tracer->symbol_by_name($default_start_name);
     my $start_id;
     VALIDATE_START_NAME: {
+        $DB::single = 1;
         my $named_arg_start_name =
             $grammar->[Marpa::R3::Internal::Grammar::START_NAME];
         if ( defined $named_arg_start_name and defined $start_id ) {
