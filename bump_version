@@ -42,11 +42,11 @@ my $perlish_version = sprintf '%d%s%.3d%s%.3d', $major, q{.}, $minor,
     $underscore, $micro;
 
 my @versioned_files = split /\n/xms, <<'END_OF_LIST';
-cpan/html/lib/Marpa/R3/HTML.pm
-cpan/html/lib/Marpa/R3/HTML.pm
 cpan/html/lib/Marpa/R3/HTML/Callback.pm
-cpan/html/lib/Marpa/R3/HTML/Config.pm
 cpan/html/lib/Marpa/R3/HTML/Config/Compile.pm
+cpan/html/lib/Marpa/R3/HTML/Config.pm
+cpan/html/lib/Marpa/R3/HTML.pm
+cpan/html/lib/Marpa/R3/HTML.pm
 cpan/html/meta/make_internal_pm.pl
 cpan/html/tool/lib/Marpa/R3/HTML/Test/Util.pm
 cpan/lib/Marpa/R3/ASF.pm
@@ -57,9 +57,9 @@ cpan/lib/Marpa/R3.pm
 cpan/lib/Marpa/R3/Recognizer.pm
 cpan/lib/Marpa/R3/SLG.pm
 cpan/lib/Marpa/R3/SLR.pm
-cpan/lib/Marpa/R3/Stuifzand.pm
 cpan/lib/Marpa/R3/Thin/Trace.pm
 cpan/lib/Marpa/R3/Value.pm
+cpan/Makefile.PL
 cpan/meta/make_internal_pm.pl
 END_OF_LIST
 
