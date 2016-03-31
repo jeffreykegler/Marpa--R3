@@ -1,5 +1,9 @@
-general_pattern.xsh
-libmarpa[.]a
-libmarpa_la-marpa[.]o
-libmarpa_la-marpa_obs[.]o
-marpa_slifop.h
+/general_pattern.xsh
+/libmarpa[.]a
+/libmarpa_la-marpa[.]o
+/libmarpa_la-marpa_obs[.]o
+/marpa_slifop.h
+/marpa_codes.h
+/Makefile
+/R3[.]o
+/R3[.]c
