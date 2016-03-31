@@ -1,19 +1,19 @@
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-package Marpa::R2::MetaAST;
+package Marpa::R3::MetaAST;
 
 use 5.010;
 use strict;
@@ -26,42 +26,42 @@ $STRING_VERSION = $VERSION;
 $VERSION = eval $VERSION;
 ## use critic
 
-package Marpa::R2::Internal::MetaAST;
+package Marpa::R3::Internal::MetaAST;
 
 use English qw( -no_match_vars );
 
 sub new {
     my ( $class, $p_rules_source ) = @_;
-    my $meta_recce = Marpa::R2::Internal::Scanless::meta_recce();
+    my $meta_recce = Marpa::R3::Internal::Scanless::meta_recce();
     eval { $meta_recce->read($p_rules_source) }
-        or Marpa::R2::exception( "Parse of BNF/Scanless source failed\n",
+        or Marpa::R3::exception( "Parse of BNF/Scanless source failed\n",
         $EVAL_ERROR );
     if ( my $ambiguity_status = $meta_recce->ambiguous() ) {
-        Marpa::R2::exception( "Parse of BNF/Scanless source failed:\n",
+        Marpa::R3::exception( "Parse of BNF/Scanless source failed:\n",
             $ambiguity_status );
     }
     my $value_ref = $meta_recce->value();
-    Marpa::R2::exception('Parse of BNF/Scanless source failed')
+    Marpa::R3::exception('Parse of BNF/Scanless source failed')
         if not defined $value_ref;
     my $ast = { meta_recce => $meta_recce, top_node => ${$value_ref} };
     return bless $ast, $class;
 } ## end sub new
 
-sub Marpa::R2::Internal::MetaAST::Parse::substring {
+sub Marpa::R3::Internal::MetaAST::Parse::substring {
     my ( $parse, $start, $length ) = @_;
     my $meta_slr      = $parse->{meta_recce};
-    my $thin_meta_slr = $meta_slr->[Marpa::R2::Internal::Scanless::R::C];
+    my $thin_meta_slr = $meta_slr->[Marpa::R3::Internal::Scanless::R::C];
     my $string        = $thin_meta_slr->substring( $start, $length );
     chomp $string;
     return $string;
-} ## end sub Marpa::R2::Internal::MetaAST::Parse::substring
+} ## end sub Marpa::R3::Internal::MetaAST::Parse::substring
 
 sub ast_to_hash {
     my ($ast) = @_;
     my $hashed_ast = {};
 
     $hashed_ast->{meta_recce} = $ast->{meta_recce};
-    bless $hashed_ast, 'Marpa::R2::Internal::MetaAST::Parse';
+    bless $hashed_ast, 'Marpa::R3::Internal::MetaAST::Parse';
 
     $hashed_ast->{current_lexer} = 'L0';
     $hashed_ast->{rules}->{G1} = [];
@@ -79,11 +79,11 @@ sub ast_to_hash {
     # re-throw it is caught here and passed to
     # Carp.
     my $eval_ok = eval {
-        local $Marpa::R2::JUST_DIE = 1;
+        local $Marpa::R3::JUST_DIE = 1;
         $_->evaluate($hashed_ast) for @statements;
         1;
     };
-    Marpa::R2::exception($EVAL_ERROR) if not $eval_ok;
+    Marpa::R3::exception($EVAL_ERROR) if not $eval_ok;
 
     my %grammars = ();
     $grammars{$_} = 1 for keys %{ $hashed_ast->{rules} };
@@ -115,19 +115,19 @@ sub ast_to_hash {
     return $hashed_ast;
 } ## end sub ast_to_hash
 
-sub Marpa::R2::Internal::MetaAST::Parse::start_rule_setup {
+sub Marpa::R3::Internal::MetaAST::Parse::start_rule_setup {
     my ($ast) = @_;
     my $start_lhs = $ast->{'start_lhs'} // $ast->{'first_lhs'};
-    Marpa::R2::exception('No rules in SLIF grammar')
+    Marpa::R3::exception('No rules in SLIF grammar')
         if not defined $start_lhs;
-    Marpa::R2::Internal::MetaAST::start_rule_create( $ast, $start_lhs );
-} ## end sub Marpa::R2::Internal::MetaAST::Parse::start_rule_setup
+    Marpa::R3::Internal::MetaAST::start_rule_create( $ast, $start_lhs );
+} ## end sub Marpa::R3::Internal::MetaAST::Parse::start_rule_setup
 
 # This class is for pieces of RHS alternatives, as they are
 # being constructed
-my $PROTO_ALTERNATIVE = 'Marpa::R2::Internal::MetaAST::Proto_Alternative';
+my $PROTO_ALTERNATIVE = 'Marpa::R3::Internal::MetaAST::Proto_Alternative';
 
-sub Marpa::R2::Internal::MetaAST::Proto_Alternative::combine {
+sub Marpa::R3::Internal::MetaAST::Proto_Alternative::combine {
     my ( $class, @hashes ) = @_;
     my $self = bless {}, $class;
     for my $hash_to_add (@hashes) {
@@ -140,11 +140,11 @@ sub Marpa::R2::Internal::MetaAST::Proto_Alternative::combine {
         } ## end for my $key ( keys %{$hash_to_add} )
     } ## end for my $hash_to_add (@hashes)
     return $self;
-} ## end sub Marpa::R2::Internal::MetaAST::Proto_Alternative::combine
+} ## end sub Marpa::R3::Internal::MetaAST::Proto_Alternative::combine
 
-sub Marpa::R2::Internal::MetaAST::Parse::bless_hash_rule {
+sub Marpa::R3::Internal::MetaAST::Parse::bless_hash_rule {
     my ( $parse, $hash_rule, $blessing, $naming, $original_lhs ) = @_;
-    return if (substr $Marpa::R2::Internal::SUBGRAMMAR, 0, 1) eq 'L';
+    return if (substr $Marpa::R3::Internal::SUBGRAMMAR, 0, 1) eq 'L';
 
     $naming //= $original_lhs;
     $hash_rule->{name} = $naming;
@@ -158,7 +158,7 @@ sub Marpa::R2::Internal::MetaAST::Parse::bless_hash_rule {
         if ( $blessing eq '::lhs' ) {
             $blessing = $original_lhs;
             if ( $blessing =~ / [^ [:alnum:]] /xms ) {
-                Marpa::R2::exception(
+                Marpa::R3::exception(
                     qq{"::lhs" blessing only allowed if LHS is whitespace and alphanumerics\n},
                     qq{   LHS was <$original_lhs>\n}
                 );
@@ -166,100 +166,100 @@ sub Marpa::R2::Internal::MetaAST::Parse::bless_hash_rule {
             $blessing =~ s/[ ]/_/gxms;
             last FIND_BLESSING;
         } ## end if ( $blessing eq '::lhs' )
-        Marpa::R2::exception( qq{Unknown blessing "$blessing"\n} );
+        Marpa::R3::exception( qq{Unknown blessing "$blessing"\n} );
     } ## end FIND_BLESSING:
     $hash_rule->{bless} = $blessing;
     return 1;
-} ## end sub Marpa::R2::Internal::MetaAST::Parse::bless_hash_rule
+} ## end sub Marpa::R3::Internal::MetaAST::Parse::bless_hash_rule
 
-sub Marpa::R2::Internal::MetaAST_Nodes::bare_name::name { return $_[0]->[2] }
+sub Marpa::R3::Internal::MetaAST_Nodes::bare_name::name { return $_[0]->[2] }
 
-sub Marpa::R2::Internal::MetaAST_Nodes::reserved_action_name::name {
+sub Marpa::R3::Internal::MetaAST_Nodes::reserved_action_name::name {
     my ( $self, $parse ) = @_;
     return $self->[2];
 }
 
-sub Marpa::R2::Internal::MetaAST_Nodes::reserved_event_name::name {
+sub Marpa::R3::Internal::MetaAST_Nodes::reserved_event_name::name {
     my ( $self, $parse ) = @_;
     my $name = $self->[2];
     $name =~ s/\A : /'/xms;
     return $name;
 }
 
-sub Marpa::R2::Internal::MetaAST_Nodes::action_name::name {
+sub Marpa::R3::Internal::MetaAST_Nodes::action_name::name {
     my ( $self, $parse ) = @_;
     return $self->[2]->name($parse);
 }
 
-sub Marpa::R2::Internal::MetaAST_Nodes::alternative_name::name {
+sub Marpa::R3::Internal::MetaAST_Nodes::alternative_name::name {
     my ( $self, $parse ) = @_;
     return $self->[2]->name($parse);
 }
 
-sub Marpa::R2::Internal::MetaAST_Nodes::event_name::name {
+sub Marpa::R3::Internal::MetaAST_Nodes::event_name::name {
     my ( $self, $parse ) = @_;
     return $self->[2]->name($parse);
 }
 
-sub Marpa::R2::Internal::MetaAST_Nodes::lexer_name::name {
+sub Marpa::R3::Internal::MetaAST_Nodes::lexer_name::name {
     my ( $self, $parse ) = @_;
     return $self->[2]->name($parse);
 }
 
-sub Marpa::R2::Internal::MetaAST_Nodes::array_descriptor::name {
+sub Marpa::R3::Internal::MetaAST_Nodes::array_descriptor::name {
     return $_[0]->[2];
 }
 
-sub Marpa::R2::Internal::MetaAST_Nodes::reserved_blessing_name::name {
+sub Marpa::R3::Internal::MetaAST_Nodes::reserved_blessing_name::name {
     return $_[0]->[2];
 }
 
-sub Marpa::R2::Internal::MetaAST_Nodes::blessing_name::name {
+sub Marpa::R3::Internal::MetaAST_Nodes::blessing_name::name {
     my ( $self, $parse ) = @_;
     return $self->[2]->name($parse);
 }
 
-sub Marpa::R2::Internal::MetaAST_Nodes::standard_name::name {
+sub Marpa::R3::Internal::MetaAST_Nodes::standard_name::name {
     return $_[0]->[2];
 }
 
-sub Marpa::R2::Internal::MetaAST_Nodes::Perl_name::name {
+sub Marpa::R3::Internal::MetaAST_Nodes::Perl_name::name {
     return $_[0]->[2];
 }
 
-sub Marpa::R2::Internal::MetaAST_Nodes::lhs::name {
+sub Marpa::R3::Internal::MetaAST_Nodes::lhs::name {
     my ( $values, $parse ) = @_;
     my ( undef, undef, $symbol ) = @{$values};
     return $symbol->name($parse);
 }
 
 # After development, delete this
-sub Marpa::R2::Internal::MetaAST_Nodes::lhs::evaluate {
+sub Marpa::R3::Internal::MetaAST_Nodes::lhs::evaluate {
     my ( $values, $parse ) = @_;
     return $values->name($parse);
 }
 
-sub Marpa::R2::Internal::MetaAST_Nodes::quantifier::evaluate {
+sub Marpa::R3::Internal::MetaAST_Nodes::quantifier::evaluate {
     my ($data) = @_;
     return $data->[2];
 }
 
-sub Marpa::R2::Internal::MetaAST_Nodes::op_declare::op {
+sub Marpa::R3::Internal::MetaAST_Nodes::op_declare::op {
     my ($values) = @_;
     return $values->[2]->op();
 }
 
-sub Marpa::R2::Internal::MetaAST_Nodes::op_declare_match::op {
+sub Marpa::R3::Internal::MetaAST_Nodes::op_declare_match::op {
     my ($values) = @_;
     return $values->[2];
 }
 
-sub Marpa::R2::Internal::MetaAST_Nodes::op_declare_bnf::op {
+sub Marpa::R3::Internal::MetaAST_Nodes::op_declare_bnf::op {
     my ($values) = @_;
     return $values->[2];
 }
 
-sub Marpa::R2::Internal::MetaAST_Nodes::bracketed_name::name {
+sub Marpa::R3::Internal::MetaAST_Nodes::bracketed_name::name {
     my ($values) = @_;
     my ( undef, undef, $bracketed_name ) = @{$values};
 
@@ -268,9 +268,9 @@ sub Marpa::R2::Internal::MetaAST_Nodes::bracketed_name::name {
     $bracketed_name =~ s/ \s* [>] \z//xms;
     $bracketed_name =~ s/ \s+ / /gxms;
     return $bracketed_name;
-} ## end sub Marpa::R2::Internal::MetaAST_Nodes::bracketed_name::name
+} ## end sub Marpa::R3::Internal::MetaAST_Nodes::bracketed_name::name
 
-sub Marpa::R2::Internal::MetaAST_Nodes::single_quoted_name::name {
+sub Marpa::R3::Internal::MetaAST_Nodes::single_quoted_name::name {
     my ($values) = @_;
     my ( undef, undef, $single_quoted_name ) = @{$values};
 
@@ -279,26 +279,26 @@ sub Marpa::R2::Internal::MetaAST_Nodes::single_quoted_name::name {
     $single_quoted_name =~ s/ \s* ['] \z//xms;
     $single_quoted_name =~ s/ \s+ / /gxms;
     return $single_quoted_name;
-} ## end sub Marpa::R2::Internal::MetaAST_Nodes::single_quoted_name::name
+} ## end sub Marpa::R3::Internal::MetaAST_Nodes::single_quoted_name::name
 
-sub Marpa::R2::Internal::MetaAST_Nodes::parenthesized_rhs_primary_list::evaluate
+sub Marpa::R3::Internal::MetaAST_Nodes::parenthesized_rhs_primary_list::evaluate
 {
     my ( $data, $parse ) = @_;
     my ( undef, undef, @values ) = @{$data};
     my @symbol_lists = map { $_->evaluate($parse); } @values;
     my $flattened_list =
-        Marpa::R2::Internal::MetaAST::Symbol_List->combine(@symbol_lists);
+        Marpa::R3::Internal::MetaAST::Symbol_List->combine(@symbol_lists);
     $flattened_list->mask_set(0);
     return $flattened_list;
-} ## end sub Marpa::R2::Internal::MetaAST_Nodes::parenthesized_rhs_primary_list::evaluate
+} ## end sub Marpa::R3::Internal::MetaAST_Nodes::parenthesized_rhs_primary_list::evaluate
 
-sub Marpa::R2::Internal::MetaAST_Nodes::rhs::evaluate {
+sub Marpa::R3::Internal::MetaAST_Nodes::rhs::evaluate {
     my ( $data, $parse ) = @_;
     my ( $start, $length, @values ) = @{$data};
     my $rhs = eval {
         my @symbol_lists = map { $_->evaluate($parse) } @values;
         my $flattened_list =
-            Marpa::R2::Internal::MetaAST::Symbol_List->combine(@symbol_lists);
+            Marpa::R3::Internal::MetaAST::Symbol_List->combine(@symbol_lists);
         bless {
             rhs  => $flattened_list->names($parse),
             mask => $flattened_list->mask()
@@ -308,119 +308,119 @@ sub Marpa::R2::Internal::MetaAST_Nodes::rhs::evaluate {
     if ( not $rhs ) {
         my $eval_error = $EVAL_ERROR;
         chomp $eval_error;
-        Marpa::R2::exception(
+        Marpa::R3::exception(
             qq{$eval_error\n},
             q{  RHS involved was },
             $parse->substring( $start, $length )
         );
     } ## end if ( not $rhs )
     return $rhs;
-} ## end sub Marpa::R2::Internal::MetaAST_Nodes::rhs::evaluate
+} ## end sub Marpa::R3::Internal::MetaAST_Nodes::rhs::evaluate
 
-sub Marpa::R2::Internal::MetaAST_Nodes::rhs_primary::evaluate {
+sub Marpa::R3::Internal::MetaAST_Nodes::rhs_primary::evaluate {
     my ( $data, $parse ) = @_;
     my ( undef, undef, @values ) = @{$data};
     my @symbol_lists = map { $_->evaluate($parse) } @values;
-    return Marpa::R2::Internal::MetaAST::Symbol_List->combine(@symbol_lists);
-} ## end sub Marpa::R2::Internal::MetaAST_Nodes::rhs_primary::evaluate
+    return Marpa::R3::Internal::MetaAST::Symbol_List->combine(@symbol_lists);
+} ## end sub Marpa::R3::Internal::MetaAST_Nodes::rhs_primary::evaluate
 
-sub Marpa::R2::Internal::MetaAST_Nodes::rhs_primary_list::evaluate {
+sub Marpa::R3::Internal::MetaAST_Nodes::rhs_primary_list::evaluate {
     my ( $data, $parse ) = @_;
     my ( undef, undef, @values ) = @{$data};
     my @symbol_lists = map { $_->evaluate($parse) } @values;
-    return Marpa::R2::Internal::MetaAST::Symbol_List->combine(@symbol_lists);
-} ## end sub Marpa::R2::Internal::MetaAST_Nodes::rhs_primary_list::evaluate
+    return Marpa::R3::Internal::MetaAST::Symbol_List->combine(@symbol_lists);
+} ## end sub Marpa::R3::Internal::MetaAST_Nodes::rhs_primary_list::evaluate
 
-sub Marpa::R2::Internal::MetaAST_Nodes::action::evaluate {
+sub Marpa::R3::Internal::MetaAST_Nodes::action::evaluate {
     my ( $values, $parse ) = @_;
     my ( undef, undef, $child ) = @{$values};
     return bless { action => $child->name($parse) }, $PROTO_ALTERNATIVE;
 }
 
-sub Marpa::R2::Internal::MetaAST_Nodes::blessing::evaluate {
+sub Marpa::R3::Internal::MetaAST_Nodes::blessing::evaluate {
     my ( $values, $parse ) = @_;
     my ( undef, undef, $child ) = @{$values};
     return bless { bless => $child->name($parse) }, $PROTO_ALTERNATIVE;
 }
 
-sub Marpa::R2::Internal::MetaAST_Nodes::naming::evaluate {
+sub Marpa::R3::Internal::MetaAST_Nodes::naming::evaluate {
     my ( $values, $parse ) = @_;
     my ( undef, undef, $child ) = @{$values};
     return bless { name => $child->name($parse) }, $PROTO_ALTERNATIVE;
 }
 
-sub Marpa::R2::Internal::MetaAST_Nodes::right_association::evaluate {
+sub Marpa::R3::Internal::MetaAST_Nodes::right_association::evaluate {
     my ($values) = @_;
     return bless { assoc => 'R' }, $PROTO_ALTERNATIVE;
 }
 
-sub Marpa::R2::Internal::MetaAST_Nodes::left_association::evaluate {
+sub Marpa::R3::Internal::MetaAST_Nodes::left_association::evaluate {
     my ($values) = @_;
     return bless { assoc => 'L' }, $PROTO_ALTERNATIVE;
 }
 
-sub Marpa::R2::Internal::MetaAST_Nodes::group_association::evaluate {
+sub Marpa::R3::Internal::MetaAST_Nodes::group_association::evaluate {
     my ($values) = @_;
     return bless { assoc => 'G' }, $PROTO_ALTERNATIVE;
 }
 
-sub Marpa::R2::Internal::MetaAST_Nodes::event_specification::evaluate {
+sub Marpa::R3::Internal::MetaAST_Nodes::event_specification::evaluate {
     my ($values) = @_;
     return bless { event => ( $values->[2]->event() ) }, $PROTO_ALTERNATIVE;
 }
 
-sub Marpa::R2::Internal::MetaAST_Nodes::event_initialization::event {
+sub Marpa::R3::Internal::MetaAST_Nodes::event_initialization::event {
     my ($values)         = @_;
     my $event_name       = $values->[2];
     my $event_initializer = $values->[3];
     return [$event_name->name(), $event_initializer->on_or_off()],
-} ## end sub Marpa::R2::Internal::MetaAST_Nodes::event_specification::evaluate
+} ## end sub Marpa::R3::Internal::MetaAST_Nodes::event_specification::evaluate
 
-sub Marpa::R2::Internal::MetaAST_Nodes::proper_specification::evaluate {
+sub Marpa::R3::Internal::MetaAST_Nodes::proper_specification::evaluate {
     my ($values) = @_;
     my $child = $values->[2];
     return bless { proper => $child->value() }, $PROTO_ALTERNATIVE;
 }
 
-sub Marpa::R2::Internal::MetaAST_Nodes::latm_specification::evaluate {
+sub Marpa::R3::Internal::MetaAST_Nodes::latm_specification::evaluate {
     my ($values) = @_;
     my $child = $values->[2];
     return bless { latm => $child->value() }, $PROTO_ALTERNATIVE;
 }
 
-sub Marpa::R2::Internal::MetaAST_Nodes::pause_specification::evaluate {
+sub Marpa::R3::Internal::MetaAST_Nodes::pause_specification::evaluate {
     my ($values) = @_;
     my $child = $values->[2];
     return bless { pause => $child->value() }, $PROTO_ALTERNATIVE;
 }
 
-sub Marpa::R2::Internal::MetaAST_Nodes::priority_specification::evaluate {
+sub Marpa::R3::Internal::MetaAST_Nodes::priority_specification::evaluate {
     my ($values) = @_;
     my $child = $values->[2];
     return bless { priority => $child->value() }, $PROTO_ALTERNATIVE;
 }
 
-sub Marpa::R2::Internal::MetaAST_Nodes::rank_specification::evaluate {
+sub Marpa::R3::Internal::MetaAST_Nodes::rank_specification::evaluate {
     my ($values) = @_;
     my $child = $values->[2];
     return bless { rank => $child->value() }, $PROTO_ALTERNATIVE;
 }
 
-sub Marpa::R2::Internal::MetaAST_Nodes::null_ranking_specification::evaluate {
+sub Marpa::R3::Internal::MetaAST_Nodes::null_ranking_specification::evaluate {
     my ($values) = @_;
     my $child = $values->[2];
     return bless { null_ranking => $child->value() }, $PROTO_ALTERNATIVE;
 }
 
-sub Marpa::R2::Internal::MetaAST_Nodes::null_ranking_constant::value {
+sub Marpa::R3::Internal::MetaAST_Nodes::null_ranking_constant::value {
     return $_[0]->[2];
 }
 
-sub Marpa::R2::Internal::MetaAST_Nodes::before_or_after::value {
+sub Marpa::R3::Internal::MetaAST_Nodes::before_or_after::value {
     return $_[0]->[2];
 }
 
-sub Marpa::R2::Internal::MetaAST_Nodes::event_initializer::on_or_off
+sub Marpa::R3::Internal::MetaAST_Nodes::event_initializer::on_or_off
 {
     # die Data::Dumper::Dumper(\@_);
     my ($values) = @_;
@@ -429,31 +429,31 @@ sub Marpa::R2::Internal::MetaAST_Nodes::event_initializer::on_or_off
     return $is_activated->value();
 }
 
-sub Marpa::R2::Internal::MetaAST_Nodes::on_or_off::value {
+sub Marpa::R3::Internal::MetaAST_Nodes::on_or_off::value {
     return $_[0]->[2] eq 'off' ? 0 : 1;
 }
 
-sub Marpa::R2::Internal::MetaAST_Nodes::boolean::value {
+sub Marpa::R3::Internal::MetaAST_Nodes::boolean::value {
     return $_[0]->[2];
 }
 
-sub Marpa::R2::Internal::MetaAST_Nodes::signed_integer::value {
+sub Marpa::R3::Internal::MetaAST_Nodes::signed_integer::value {
     return $_[0]->[2];
 }
 
-sub Marpa::R2::Internal::MetaAST_Nodes::separator_specification::evaluate {
+sub Marpa::R3::Internal::MetaAST_Nodes::separator_specification::evaluate {
     my ( $values, $parse ) = @_;
     my $child = $values->[2];
     return bless { separator => $child->name($parse) }, $PROTO_ALTERNATIVE;
 }
 
-sub Marpa::R2::Internal::MetaAST_Nodes::adverb_item::evaluate {
+sub Marpa::R3::Internal::MetaAST_Nodes::adverb_item::evaluate {
     my ( $values, $parse ) = @_;
     my $child = $values->[2]->evaluate($parse);
     return bless $child, $PROTO_ALTERNATIVE;
 }
 
-sub Marpa::R2::Internal::MetaAST_Nodes::default_rule::evaluate {
+sub Marpa::R3::Internal::MetaAST_Nodes::default_rule::evaluate {
     my ( $values, $parse ) = @_;
     my ( $start, $length, undef, $op_declare, $raw_adverb_list ) = @{$values};
     my $subgrammar = $op_declare->op() eq q{::=} ? 'G1' : $parse->{current_lexer};
@@ -478,17 +478,17 @@ sub Marpa::R2::Internal::MetaAST_Nodes::default_rule::evaluate {
     } ## end ADVERB: for my $key ( keys %{$adverb_list} )
     ## no critic(Subroutines::ProhibitExplicitReturnUndef)
     return undef;
-} ## end sub Marpa::R2::Internal::MetaAST_Nodes::default_rule::evaluate
+} ## end sub Marpa::R3::Internal::MetaAST_Nodes::default_rule::evaluate
 
-sub Marpa::R2::Internal::MetaAST_Nodes::discard_default_statement::evaluate {
+sub Marpa::R3::Internal::MetaAST_Nodes::discard_default_statement::evaluate {
     my ( $data, $parse ) = @_;
     my ( $start, $length, $raw_adverb_list ) = @{$data};
-    local $Marpa::R2::Internal::SUBGRAMMAR = 'G1';
+    local $Marpa::R3::Internal::SUBGRAMMAR = 'G1';
 
     my $adverb_list = $raw_adverb_list->evaluate($parse);
     if ( exists $parse->{discard_default_adverbs} ) {
         my $problem_rule = $parse->substring( $start, $length );
-        Marpa::R2::exception(
+        Marpa::R3::exception(
             qq{More than one discard default statement is not allowed\n},
             qq{  This was the rule that caused the problem:\n},
             qq{  $problem_rule\n}
@@ -501,22 +501,22 @@ sub Marpa::R2::Internal::MetaAST_Nodes::discard_default_statement::evaluate {
             $parse->{discard_default_adverbs}->{$key} = $value;
             next ADVERB;
         }
-        Marpa::R2::exception(
+        Marpa::R3::exception(
             qq{"$key" adverb not allowed as discard default"});
     } ## end ADVERB: for my $key ( keys %{$adverb_list} )
     ## no critic(Subroutines::ProhibitExplicitReturnUndef)
     return undef;
-} ## end sub Marpa::R2::Internal::MetaAST_Nodes::discard_default_statement::evaluate
+} ## end sub Marpa::R3::Internal::MetaAST_Nodes::discard_default_statement::evaluate
 
-sub Marpa::R2::Internal::MetaAST_Nodes::lexeme_default_statement::evaluate {
+sub Marpa::R3::Internal::MetaAST_Nodes::lexeme_default_statement::evaluate {
     my ( $data, $parse ) = @_;
     my ( $start, $length, $raw_adverb_list ) = @{$data};
-    local $Marpa::R2::Internal::SUBGRAMMAR = 'G1';
+    local $Marpa::R3::Internal::SUBGRAMMAR = 'G1';
 
     my $adverb_list = $raw_adverb_list->evaluate($parse);
     if ( exists $parse->{lexeme_default_adverbs} ) {
         my $problem_rule = $parse->substring( $start, $length );
-        Marpa::R2::exception(
+        Marpa::R3::exception(
             qq{More than one lexeme default statement is not allowed\n},
             qq{  This was the rule that caused the problem:\n},
             qq{  $problem_rule\n}
@@ -537,21 +537,21 @@ sub Marpa::R2::Internal::MetaAST_Nodes::lexeme_default_statement::evaluate {
             $parse->{lexeme_default_adverbs}->{$key} = $value;
             next ADVERB;
         }
-        Marpa::R2::exception(
+        Marpa::R3::exception(
             qq{"$key" adverb not allowed as lexeme default"});
     } ## end ADVERB: for my $key ( keys %{$adverb_list} )
     ## no critic(Subroutines::ProhibitExplicitReturnUndef)
     return undef;
-} ## end sub Marpa::R2::Internal::MetaAST_Nodes::lexeme_default_statement::evaluate
+} ## end sub Marpa::R3::Internal::MetaAST_Nodes::lexeme_default_statement::evaluate
 
-sub Marpa::R2::Internal::MetaAST_Nodes::inaccessible_statement::evaluate {
+sub Marpa::R3::Internal::MetaAST_Nodes::inaccessible_statement::evaluate {
     my ( $data, $parse ) = @_;
     my ( $start, $length, $inaccessible_treatment ) = @{$data};
-    local $Marpa::R2::Internal::SUBGRAMMAR = 'G1';
+    local $Marpa::R3::Internal::SUBGRAMMAR = 'G1';
 
     if ( exists $parse->{defaults}->{if_inaccessible} ) {
         my $problem_rule = $parse->substring( $start, $length );
-        Marpa::R2::exception(
+        Marpa::R3::exception(
             qq{More than one inaccessible default statement is not allowed\n},
             qq{  This was the rule that caused the problem:\n},
             qq{  $problem_rule\n}
@@ -561,11 +561,11 @@ sub Marpa::R2::Internal::MetaAST_Nodes::inaccessible_statement::evaluate {
     return undef;
 }
 
-sub Marpa::R2::Internal::MetaAST_Nodes::inaccessible_treatment::value {
+sub Marpa::R3::Internal::MetaAST_Nodes::inaccessible_treatment::value {
     return $_[0]->[2];
 }
 
-sub Marpa::R2::Internal::MetaAST_Nodes::priority_rule::evaluate {
+sub Marpa::R3::Internal::MetaAST_Nodes::priority_rule::evaluate {
     my ( $values, $parse ) = @_;
     my ( $start, $length, $raw_lhs, $op_declare, $raw_priorities ) =
         @{$values};
@@ -588,7 +588,7 @@ sub Marpa::R2::Internal::MetaAST_Nodes::priority_rule::evaluate {
 
     my $lhs = $raw_lhs->name($parse);
     $parse->{'first_lhs'} //= $lhs if $subgrammar eq 'G1';
-    local $Marpa::R2::Internal::SUBGRAMMAR = $subgrammar;
+    local $Marpa::R3::Internal::SUBGRAMMAR = $subgrammar;
 
     my ( undef, undef, @priorities ) = @{$raw_priorities};
     my $priority_count = scalar @priorities;
@@ -615,7 +615,7 @@ sub Marpa::R2::Internal::MetaAST_Nodes::priority_rule::evaluate {
             if ( not $eval_ok ) {
                 my $eval_error = $EVAL_ERROR;
                 chomp $eval_error;
-                Marpa::R2::exception(
+                Marpa::R3::exception(
                     qq{$eval_error\n},
                     qq{  The problem was in this RHS alternative:\n},
                     q{  },
@@ -628,7 +628,7 @@ sub Marpa::R2::Internal::MetaAST_Nodes::priority_rule::evaluate {
             if ( ( substr $subgrammar, 0, 1 ) eq 'L'
                 and grep { !$_ } @mask )
             {
-                Marpa::R2::exception(
+                Marpa::R3::exception(
                     qq{hidden symbols are not allowed in lexical rules (rule's LHS was "$lhs")}
                 );
             }
@@ -675,7 +675,7 @@ sub Marpa::R2::Internal::MetaAST_Nodes::priority_rule::evaluate {
 
             $action //= $default_adverbs->{action};
             if ( defined $action ) {
-                Marpa::R2::exception(
+                Marpa::R3::exception(
                     qq{actions not allowed in lexical rules (rule's LHS was "$lhs")}
                 ) if  ( substr $subgrammar, 0, 1 ) eq 'L';
                 $hash_rule{action} = $action;
@@ -683,7 +683,7 @@ sub Marpa::R2::Internal::MetaAST_Nodes::priority_rule::evaluate {
 
             $rank //= $default_adverbs->{rank};
             if ( defined $rank ) {
-                Marpa::R2::exception(
+                Marpa::R3::exception(
                     qq{ranks not allowed in lexical rules (rule's LHS was "$lhs")}
                 ) if  ( substr $subgrammar, 0, 1 ) eq 'L';
                 $hash_rule{rank} = $rank;
@@ -691,7 +691,7 @@ sub Marpa::R2::Internal::MetaAST_Nodes::priority_rule::evaluate {
 
             $null_ranking //= $default_adverbs->{null_ranking};
             if ( defined $null_ranking ) {
-                Marpa::R2::exception(
+                Marpa::R3::exception(
                     qq{null-ranking allowed in lexical rules (rule's LHS was "$lhs")}
                 ) if  ( substr $subgrammar, 0, 1 ) eq 'L';
                 $hash_rule{null_ranking} = $null_ranking;
@@ -703,7 +703,7 @@ sub Marpa::R2::Internal::MetaAST_Nodes::priority_rule::evaluate {
                  ( substr $subgrammar, 0, 1 ) eq 'L' 
                 )
             {
-                Marpa::R2::exception(
+                Marpa::R3::exception(
                     'bless option not allowed in lexical rules (rules LHS was "',
                     $lhs, '")'
                 );
@@ -733,7 +733,7 @@ sub Marpa::R2::Internal::MetaAST_Nodes::priority_rule::evaluate {
             if ( not $eval_ok ) {
                 my $eval_error = $EVAL_ERROR;
                 chomp $eval_error;
-                Marpa::R2::exception(
+                Marpa::R3::exception(
                     qq{$eval_error\n},
                     qq{  The problem was in this RHS alternative:\n},
                     q{  },
@@ -779,7 +779,7 @@ sub Marpa::R2::Internal::MetaAST_Nodes::priority_rule::evaluate {
         my @mask = @{ $rhs->{mask} };
         if ( (  substr $subgrammar, 0, 1 ) eq 'L' and grep { !$_ } @mask )
         {
-            Marpa::R2::exception(
+            Marpa::R3::exception(
                 'hidden symbols are not allowed in lexical rules (rules LHS was "',
                 $lhs, '")'
             );
@@ -828,7 +828,7 @@ sub Marpa::R2::Internal::MetaAST_Nodes::priority_rule::evaluate {
 
         $action //= $default_adverbs->{action};
         if ( defined $action ) {
-            Marpa::R2::exception(
+            Marpa::R3::exception(
                 qq{actions not allowed in lexical rules (rule's LHS was "$lhs")}
             ) if  ( substr $subgrammar, 0, 1 ) eq 'L';
             $new_xs_rule{action} = $action;
@@ -836,7 +836,7 @@ sub Marpa::R2::Internal::MetaAST_Nodes::priority_rule::evaluate {
 
         $null_ranking //= $default_adverbs->{null_ranking};
         if ( defined $null_ranking ) {
-            Marpa::R2::exception(
+            Marpa::R3::exception(
                 qq{null-ranking not allowed in lexical rules (rule's LHS was "$lhs")}
             ) if  ( substr $subgrammar, 0, 1 ) eq 'L';
             $new_xs_rule{null_ranking} = $null_ranking;
@@ -844,7 +844,7 @@ sub Marpa::R2::Internal::MetaAST_Nodes::priority_rule::evaluate {
 
         $rank //= $default_adverbs->{rank};
         if ( defined $rank ) {
-            Marpa::R2::exception(
+            Marpa::R3::exception(
                 qq{ranks not allowed in lexical rules (rule's LHS was "$lhs")}
             ) if  ( substr $subgrammar, 0, 1 ) eq 'L';
             $new_xs_rule{rank} = $rank;
@@ -854,7 +854,7 @@ sub Marpa::R2::Internal::MetaAST_Nodes::priority_rule::evaluate {
         if ( defined $blessing
             and ( substr $subgrammar, 0, 1 ) eq 'L' )
         {
-            Marpa::R2::exception(
+            Marpa::R3::exception(
                 'bless option not allowed in lexical rules (rules LHS was "',
                 $lhs, '")'
             );
@@ -911,9 +911,9 @@ sub Marpa::R2::Internal::MetaAST_Nodes::priority_rule::evaluate {
     } ## end RULE: for my $working_rule (@working_rules)
     ## no critic(Subroutines::ProhibitExplicitReturnUndef)
     return undef;
-} ## end sub Marpa::R2::Internal::MetaAST_Nodes::priority_rule::evaluate
+} ## end sub Marpa::R3::Internal::MetaAST_Nodes::priority_rule::evaluate
 
-sub Marpa::R2::Internal::MetaAST_Nodes::empty_rule::evaluate {
+sub Marpa::R3::Internal::MetaAST_Nodes::empty_rule::evaluate {
     my ( $values, $parse ) = @_;
     my ( $start, $length, $raw_lhs, $op_declare, $raw_adverb_list ) =
         @{$values};
@@ -936,7 +936,7 @@ sub Marpa::R2::Internal::MetaAST_Nodes::empty_rule::evaluate {
 
     my $lhs = $raw_lhs->name($parse);
     $parse->{'first_lhs'} //= $lhs if $subgrammar eq 'G1';
-    local $Marpa::R2::Internal::SUBGRAMMAR = $subgrammar;
+    local $Marpa::R3::Internal::SUBGRAMMAR = $subgrammar;
 
     my %rule = ( lhs => $lhs,
     description => qq{Empty rule for <$lhs>},
@@ -979,7 +979,7 @@ sub Marpa::R2::Internal::MetaAST_Nodes::empty_rule::evaluate {
 
     $action //= $default_adverbs->{action};
     if ( defined $action ) {
-        Marpa::R2::exception(
+        Marpa::R3::exception(
             qq{actions not allowed in lexical rules (rule's LHS was "$lhs")}
         ) if  ( substr $subgrammar, 0, 1 ) eq 'L';
         $rule{action} = $action;
@@ -987,7 +987,7 @@ sub Marpa::R2::Internal::MetaAST_Nodes::empty_rule::evaluate {
 
     $null_ranking //= $default_adverbs->{null_ranking};
     if ( defined $null_ranking ) {
-        Marpa::R2::exception(
+        Marpa::R3::exception(
             qq{null-ranking not allowed in lexical rules (rule's LHS was "$lhs")}
         ) if  ( substr $subgrammar, 0, 1 ) eq 'L';
         $rule{null_ranking} = $null_ranking;
@@ -995,7 +995,7 @@ sub Marpa::R2::Internal::MetaAST_Nodes::empty_rule::evaluate {
 
     $rank //= $default_adverbs->{rank};
     if ( defined $rank ) {
-        Marpa::R2::exception(
+        Marpa::R3::exception(
             qq{ranks not allowed in lexical rules (rule's LHS was "$lhs")}
         ) if  ( substr $subgrammar, 0, 1 ) eq 'L';
         $rule{rank} = $rank;
@@ -1005,7 +1005,7 @@ sub Marpa::R2::Internal::MetaAST_Nodes::empty_rule::evaluate {
     if ( defined $blessing
         and ( substr $subgrammar, 0, 1 ) eq 'L' )
     {
-        Marpa::R2::exception(
+        Marpa::R3::exception(
             qq{bless option not allowed in lexical rules (rule's LHS was "$lhs")}
         );
     }
@@ -1016,9 +1016,9 @@ sub Marpa::R2::Internal::MetaAST_Nodes::empty_rule::evaluate {
 
     ## no critic(Subroutines::ProhibitExplicitReturnUndef)
     return undef;
-} ## end sub Marpa::R2::Internal::MetaAST_Nodes::empty_rule::evaluate
+} ## end sub Marpa::R3::Internal::MetaAST_Nodes::empty_rule::evaluate
 
-sub Marpa::R2::Internal::MetaAST_Nodes::lexeme_rule::evaluate {
+sub Marpa::R3::Internal::MetaAST_Nodes::lexeme_rule::evaluate {
     my ( $values, $parse ) = @_;
     my ( $start, $length, $symbol, $unevaluated_adverb_list ) = @{$values};
 
@@ -1078,28 +1078,28 @@ sub Marpa::R2::Internal::MetaAST_Nodes::lexeme_rule::evaluate {
     $parse->{lexeme_declarations}->{$symbol_name} = \%declarations;
     ## no critic(Subroutines::ProhibitExplicitReturnUndef)
     return undef;
-} ## end sub Marpa::R2::Internal::MetaAST_Nodes::lexeme_rule::evaluate
+} ## end sub Marpa::R3::Internal::MetaAST_Nodes::lexeme_rule::evaluate
 
-sub Marpa::R2::Internal::MetaAST_Nodes::statements::evaluate {
+sub Marpa::R3::Internal::MetaAST_Nodes::statements::evaluate {
     my ( $data, $parse ) = @_;
     my ( undef, undef, @statement_list ) = @{$data};
     map { $_->evaluate($parse) } @statement_list;
     return undef;
-} ## end sub Marpa::R2::Internal::MetaAST_Nodes::statements::evaluate
+} ## end sub Marpa::R3::Internal::MetaAST_Nodes::statements::evaluate
 
-sub Marpa::R2::Internal::MetaAST_Nodes::statement::evaluate {
+sub Marpa::R3::Internal::MetaAST_Nodes::statement::evaluate {
     my ( $data, $parse ) = @_;
     my ( undef, undef, $child ) = @{$data};
     $child->evaluate($parse);
     ## no critic(Subroutines::ProhibitExplicitReturnUndef)
     return undef;
-} ## end sub Marpa::R2::Internal::MetaAST_Nodes::statement::evaluate
+} ## end sub Marpa::R3::Internal::MetaAST_Nodes::statement::evaluate
 
-sub Marpa::R2::Internal::MetaAST_Nodes::null_statement::evaluate {
+sub Marpa::R3::Internal::MetaAST_Nodes::null_statement::evaluate {
     return undef;
 }
 
-sub Marpa::R2::Internal::MetaAST_Nodes::statement_group::evaluate {
+sub Marpa::R3::Internal::MetaAST_Nodes::statement_group::evaluate {
     my ( $data, $parse ) = @_;
     my ( undef, undef, $statements ) = @{$data};
     $statements->evaluate($parse);
@@ -1107,7 +1107,7 @@ sub Marpa::R2::Internal::MetaAST_Nodes::statement_group::evaluate {
     return undef;
 }
 
-sub Marpa::R2::Internal::MetaAST::start_rule_create {
+sub Marpa::R3::Internal::MetaAST::start_rule_create {
     my ( $parse, $symbol_name ) = @_;
     my $start_lhs = '[:start]';
     $parse->{'default_g1_start_action'} =
@@ -1122,9 +1122,9 @@ sub Marpa::R2::Internal::MetaAST::start_rule_create {
         rhs    => [$symbol_name],
         action => '::first'
         };
-} ## end sub Marpa::R2::Internal::MetaAST::start_rule_create
+} ## end sub Marpa::R3::Internal::MetaAST::start_rule_create
 
-sub Marpa::R2::Internal::MetaAST_Nodes::start_rule::evaluate {
+sub Marpa::R3::Internal::MetaAST_Nodes::start_rule::evaluate {
     my ( $values, $parse ) = @_;
     my ( $start, $length, $symbol ) = @{$values};
     if ( defined $parse->{'start_lhs'} ) {
@@ -1139,14 +1139,14 @@ sub Marpa::R2::Internal::MetaAST_Nodes::start_rule::evaluate {
     $parse->{'start_lhs'} = $symbol->name($parse);
     ## no critic(Subroutines::ProhibitExplicitReturnUndef)
     return undef;
-} ## end sub Marpa::R2::Internal::MetaAST_Nodes::start_rule::evaluate
+} ## end sub Marpa::R3::Internal::MetaAST_Nodes::start_rule::evaluate
 
-sub Marpa::R2::Internal::MetaAST_Nodes::discard_rule::evaluate {
+sub Marpa::R3::Internal::MetaAST_Nodes::discard_rule::evaluate {
     my ( $values, $parse ) = @_;
     my ( $start, $length, $symbol, $raw_adverb_list ) = @{$values};
 
     my $lexer_name = $parse->{current_lexer};
-    local $Marpa::R2::Internal::SUBGRAMMAR = $lexer_name;
+    local $Marpa::R3::Internal::SUBGRAMMAR = $lexer_name;
     my $discard_lhs = '[:discard]';
     $parse->symbol_names_set(
         $discard_lhs,
@@ -1165,7 +1165,7 @@ sub Marpa::R2::Internal::MetaAST_Nodes::discard_rule::evaluate {
             $event = $value;
             next ADVERB;
         }
-        Marpa::R2::exception(
+        Marpa::R3::exception(
             qq{"$key" adverb not allowed as discard default"});
     } ## end ADVERB: for my $key ( keys %{$adverb_list} )
     my %rule_hash = (
@@ -1181,9 +1181,9 @@ sub Marpa::R2::Internal::MetaAST_Nodes::discard_rule::evaluate {
     push @{ $parse->{rules}->{$lexer_name} }, \%rule_hash;
     ## no critic(Subroutines::ProhibitExplicitReturnUndef)
     return undef;
-} ## end sub Marpa::R2::Internal::MetaAST_Nodes::discard_rule::evaluate
+} ## end sub Marpa::R3::Internal::MetaAST_Nodes::discard_rule::evaluate
 
-sub Marpa::R2::Internal::MetaAST_Nodes::quantified_rule::evaluate {
+sub Marpa::R3::Internal::MetaAST_Nodes::quantified_rule::evaluate {
     my ( $values, $parse ) = @_;
     my ( $start, $length, $lhs, $op_declare, $rhs, $quantifier,
         $proto_adverb_list )
@@ -1207,7 +1207,7 @@ sub Marpa::R2::Internal::MetaAST_Nodes::quantified_rule::evaluate {
 
     my $lhs_name = $lhs->name($parse);
     $parse->{'first_lhs'} //= $lhs_name if $subgrammar eq 'G1';
-    local $Marpa::R2::Internal::SUBGRAMMAR = $subgrammar;
+    local $Marpa::R3::Internal::SUBGRAMMAR = $subgrammar;
 
     my $adverb_list     = $proto_adverb_list->evaluate($parse);
     my $default_adverbs = $parse->{default_adverbs}->{$subgrammar};
@@ -1272,7 +1272,7 @@ sub Marpa::R2::Internal::MetaAST_Nodes::quantified_rule::evaluate {
 
     $action //= $default_adverbs->{action};
     if ( defined $action ) {
-        Marpa::R2::exception(
+        Marpa::R3::exception(
             qq{actions not allowed in lexical rules (rule's LHS was "$lhs")}
         ) if  ( substr $subgrammar, 0, 1 ) eq 'L';
         $sequence_rule{action} = $action;
@@ -1280,7 +1280,7 @@ sub Marpa::R2::Internal::MetaAST_Nodes::quantified_rule::evaluate {
 
     $null_ranking //= $default_adverbs->{null_ranking};
     if ( defined $null_ranking ) {
-        Marpa::R2::exception(
+        Marpa::R3::exception(
             qq{null-ranking not allowed in lexical rules (rule's LHS was "$lhs")}
         ) if  ( substr $subgrammar, 0, 1 ) eq 'L';
         $sequence_rule{null_ranking} = $null_ranking;
@@ -1288,7 +1288,7 @@ sub Marpa::R2::Internal::MetaAST_Nodes::quantified_rule::evaluate {
 
     $rank //= $default_adverbs->{rank};
     if ( defined $rank ) {
-        Marpa::R2::exception(
+        Marpa::R3::exception(
             qq{ranks not allowed in lexical rules (rule's LHS was "$lhs")}
         ) if  ( substr $subgrammar, 0, 1 ) eq 'L';
         $sequence_rule{rank} = $rank;
@@ -1297,7 +1297,7 @@ sub Marpa::R2::Internal::MetaAST_Nodes::quantified_rule::evaluate {
     $blessing //= $default_adverbs->{bless};
     if ( defined $blessing and ( substr $subgrammar, 0, 1 ) eq 'L' )
     {
-        Marpa::R2::exception(
+        Marpa::R3::exception(
             qq{bless option not allowed in lexical rules (rule's LHS was "$lhs")}
         );
     }
@@ -1307,9 +1307,9 @@ sub Marpa::R2::Internal::MetaAST_Nodes::quantified_rule::evaluate {
     ## no critic(Subroutines::ProhibitExplicitReturnUndef)
     return undef;
 
-} ## end sub Marpa::R2::Internal::MetaAST_Nodes::quantified_rule::evaluate
+} ## end sub Marpa::R3::Internal::MetaAST_Nodes::quantified_rule::evaluate
 
-sub Marpa::R2::Internal::MetaAST_Nodes::completion_event_declaration::evaluate
+sub Marpa::R3::Internal::MetaAST_Nodes::completion_event_declaration::evaluate
 {
     my ( $values, $parse ) = @_;
     my ( $start, $length, $raw_event, $raw_symbol_name ) = @{$values};
@@ -1326,9 +1326,9 @@ sub Marpa::R2::Internal::MetaAST_Nodes::completion_event_declaration::evaluate
     $completion_events->{$symbol_name} = $raw_event->event();
     ## no critic(Subroutines::ProhibitExplicitReturnUndef)
     return undef;
-} ## end sub Marpa::R2::Internal::MetaAST_Nodes::completion_event_declaration::evaluate
+} ## end sub Marpa::R3::Internal::MetaAST_Nodes::completion_event_declaration::evaluate
 
-sub Marpa::R2::Internal::MetaAST_Nodes::nulled_event_declaration::evaluate {
+sub Marpa::R3::Internal::MetaAST_Nodes::nulled_event_declaration::evaluate {
     my ( $values, $parse ) = @_;
     my ( $start, $length, $raw_event, $raw_symbol_name ) = @{$values};
     my $symbol_name   = $raw_symbol_name->name();
@@ -1344,9 +1344,9 @@ sub Marpa::R2::Internal::MetaAST_Nodes::nulled_event_declaration::evaluate {
     $nulled_events->{$symbol_name} = $raw_event->event();
     ## no critic(Subroutines::ProhibitExplicitReturnUndef)
     return undef;
-} ## end sub Marpa::R2::Internal::MetaAST_Nodes::nulled_event_declaration::evaluate
+} ## end sub Marpa::R3::Internal::MetaAST_Nodes::nulled_event_declaration::evaluate
 
-sub Marpa::R2::Internal::MetaAST_Nodes::prediction_event_declaration::evaluate
+sub Marpa::R3::Internal::MetaAST_Nodes::prediction_event_declaration::evaluate
 {
     my ( $values, $parse ) = @_;
     my ( $start, $length, $raw_event, $raw_symbol_name ) = @{$values};
@@ -1363,9 +1363,9 @@ sub Marpa::R2::Internal::MetaAST_Nodes::prediction_event_declaration::evaluate
     $prediction_events->{$symbol_name} = $raw_event->event();
     ## no critic(Subroutines::ProhibitExplicitReturnUndef)
     return undef;
-} ## end sub Marpa::R2::Internal::MetaAST_Nodes::prediction_event_declaration::evaluate
+} ## end sub Marpa::R3::Internal::MetaAST_Nodes::prediction_event_declaration::evaluate
 
-sub Marpa::R2::Internal::MetaAST_Nodes::current_lexer_statement::evaluate
+sub Marpa::R3::Internal::MetaAST_Nodes::current_lexer_statement::evaluate
 {
     my ( $values, $parse ) = @_;
     my ( $start, $length, $lexer_name_object ) = @{$values};
@@ -1388,144 +1388,144 @@ sub Marpa::R2::Internal::MetaAST_Nodes::current_lexer_statement::evaluate
     return undef;
 }
 
-sub Marpa::R2::Internal::MetaAST_Nodes::alternatives::evaluate {
+sub Marpa::R3::Internal::MetaAST_Nodes::alternatives::evaluate {
     my ( $values, $parse ) = @_;
     return bless [ map { $_->evaluate( $_, $parse ) } @{$values} ],
         ref $values;
 }
 
-sub Marpa::R2::Internal::MetaAST_Nodes::alternative::evaluate {
+sub Marpa::R3::Internal::MetaAST_Nodes::alternative::evaluate {
     my ( $values, $parse ) = @_;
     my ( $start, $length, $rhs, $adverbs ) = @{$values};
     my $alternative = eval {
-        Marpa::R2::Internal::MetaAST::Proto_Alternative->combine(
+        Marpa::R3::Internal::MetaAST::Proto_Alternative->combine(
             map { $_->evaluate($parse) } $rhs, $adverbs );
     };
     if ( not $alternative ) {
-        Marpa::R2::exception(
+        Marpa::R3::exception(
             $EVAL_ERROR, "\n",
             q{  Alternative involved was },
             $parse->substring( $start, $length )
         );
     } ## end if ( not $alternative )
     return $alternative;
-} ## end sub Marpa::R2::Internal::MetaAST_Nodes::alternative::evaluate
+} ## end sub Marpa::R3::Internal::MetaAST_Nodes::alternative::evaluate
 
-sub Marpa::R2::Internal::MetaAST_Nodes::single_symbol::names {
+sub Marpa::R3::Internal::MetaAST_Nodes::single_symbol::names {
     my ( $values, $parse ) = @_;
     my ( undef, undef, $symbol ) = @{$values};
     return $symbol->names($parse);
 }
 
-sub Marpa::R2::Internal::MetaAST_Nodes::single_symbol::name {
+sub Marpa::R3::Internal::MetaAST_Nodes::single_symbol::name {
     my ( $values, $parse ) = @_;
     my ( undef, undef, $symbol ) = @{$values};
     return $symbol->name($parse);
 }
 
-sub Marpa::R2::Internal::MetaAST_Nodes::single_symbol::event_name {
+sub Marpa::R3::Internal::MetaAST_Nodes::single_symbol::event_name {
     my ( $values, $parse ) = @_;
     my ( undef, undef, $symbol ) = @{$values};
     return $symbol->event_name($parse);
 }
 
-sub Marpa::R2::Internal::MetaAST_Nodes::single_symbol::literal {
+sub Marpa::R3::Internal::MetaAST_Nodes::single_symbol::literal {
     my ( $values, $parse ) = @_;
     my ( $start, $length ) = @{$values};
     return $parse->substring($start, $length);
 }
 
-sub Marpa::R2::Internal::MetaAST_Nodes::single_symbol::evaluate {
+sub Marpa::R3::Internal::MetaAST_Nodes::single_symbol::evaluate {
     my ( $values, $parse ) = @_;
     my ( undef, undef, $symbol ) = @{$values};
-    return Marpa::R2::Internal::MetaAST::Symbol_List->new(
+    return Marpa::R3::Internal::MetaAST::Symbol_List->new(
         $symbol->name($parse) );
-} ## end sub Marpa::R2::Internal::MetaAST_Nodes::single_symbol::evaluate
+} ## end sub Marpa::R3::Internal::MetaAST_Nodes::single_symbol::evaluate
 
-sub Marpa::R2::Internal::MetaAST_Nodes::Symbol::evaluate {
+sub Marpa::R3::Internal::MetaAST_Nodes::Symbol::evaluate {
     my ( $values, $parse ) = @_;
     my ( undef, undef, $symbol ) = @{$values};
     return $symbol->evaluate($parse);
 }
 
-sub Marpa::R2::Internal::MetaAST_Nodes::symbol::name {
+sub Marpa::R3::Internal::MetaAST_Nodes::symbol::name {
     my ( $self, $parse ) = @_;
     return $self->[2]->name($parse);
 }
 
-sub Marpa::R2::Internal::MetaAST_Nodes::symbol::event_name {
+sub Marpa::R3::Internal::MetaAST_Nodes::symbol::event_name {
     my ( $self, $parse ) = @_;
     return $self->[2]->name($parse);
 }
 
-sub Marpa::R2::Internal::MetaAST_Nodes::symbol::names {
+sub Marpa::R3::Internal::MetaAST_Nodes::symbol::names {
     my ( $self, $parse ) = @_;
     return $self->[2]->names($parse);
 }
 
-sub Marpa::R2::Internal::MetaAST_Nodes::symbol_name::evaluate {
+sub Marpa::R3::Internal::MetaAST_Nodes::symbol_name::evaluate {
     my ($self) = @_;
     return $self->[2];
 }
 
-sub Marpa::R2::Internal::MetaAST_Nodes::symbol_name::name {
+sub Marpa::R3::Internal::MetaAST_Nodes::symbol_name::name {
     my ( $self, $parse ) = @_;
     return $self->evaluate($parse)->name($parse);
 }
 
-sub Marpa::R2::Internal::MetaAST_Nodes::symbol_name::names {
+sub Marpa::R3::Internal::MetaAST_Nodes::symbol_name::names {
     my ( $self, $parse ) = @_;
     return [ $self->name($parse) ];
 }
 
-sub Marpa::R2::Internal::MetaAST_Nodes::adverb_list::evaluate {
+sub Marpa::R3::Internal::MetaAST_Nodes::adverb_list::evaluate {
     my ( $data, $parse ) = @_;
     my ( undef, undef, $adverb_list_items ) = @{$data};
     return undef if not defined $adverb_list_items;
     return $adverb_list_items->evaluate($parse);
-} ## end sub Marpa::R2::Internal::MetaAST_Nodes::adverb_list::evaluate
+} ## end sub Marpa::R3::Internal::MetaAST_Nodes::adverb_list::evaluate
 
-sub Marpa::R2::Internal::MetaAST_Nodes::null_adverb::evaluate {
+sub Marpa::R3::Internal::MetaAST_Nodes::null_adverb::evaluate {
     return {};
 }
 
-sub Marpa::R2::Internal::MetaAST_Nodes::adverb_list_items::evaluate {
+sub Marpa::R3::Internal::MetaAST_Nodes::adverb_list_items::evaluate {
     my ( $data, $parse ) = @_;
     my ( undef, undef, @raw_items ) = @{$data};
     my (@adverb_items) = map { $_->evaluate($parse) } @raw_items;
-    return Marpa::R2::Internal::MetaAST::Proto_Alternative->combine(
+    return Marpa::R3::Internal::MetaAST::Proto_Alternative->combine(
         @adverb_items);
-} ## end sub Marpa::R2::Internal::MetaAST_Nodes::adverb_list::evaluate
+} ## end sub Marpa::R3::Internal::MetaAST_Nodes::adverb_list::evaluate
 
-sub Marpa::R2::Internal::MetaAST_Nodes::character_class::event_name {
+sub Marpa::R3::Internal::MetaAST_Nodes::character_class::event_name {
     my ( $data,  $parse )  = @_;
     my ( $start, $length ) = @{$data};
     return $parse->substring( $start, $length );
 }
 
-sub Marpa::R2::Internal::MetaAST_Nodes::character_class::names {
+sub Marpa::R3::Internal::MetaAST_Nodes::character_class::names {
     my ( $self, $parse ) = @_;
     return [ $self->name($parse) ];
 }
 
-sub Marpa::R2::Internal::MetaAST_Nodes::character_class::name {
+sub Marpa::R3::Internal::MetaAST_Nodes::character_class::name {
     my ( $self, $parse ) = @_;
     return $self->evaluate($parse)->name($parse);
 }
 
-sub Marpa::R2::Internal::MetaAST_Nodes::character_class::evaluate {
+sub Marpa::R3::Internal::MetaAST_Nodes::character_class::evaluate {
     my ( $values, $parse ) = @_;
     my $character_class = $values->[2];
-    my $subgrammar = $Marpa::R2::Internal::SUBGRAMMAR;
+    my $subgrammar = $Marpa::R3::Internal::SUBGRAMMAR;
     if  (( substr $subgrammar, 0, 1 ) eq 'L') {
-        return Marpa::R2::Internal::MetaAST::Symbol_List->char_class_to_symbol(
+        return Marpa::R3::Internal::MetaAST::Symbol_List->char_class_to_symbol(
             $parse, $character_class );
     }
     # If here, in G1
     # Character classes and strings always go into L0, for now
     my $lexer_symbol = do {
-        local $Marpa::R2::Internal::SUBGRAMMAR = 'L0';
-        Marpa::R2::Internal::MetaAST::Symbol_List->char_class_to_symbol(
+        local $Marpa::R3::Internal::SUBGRAMMAR = 'L0';
+        Marpa::R3::Internal::MetaAST::Symbol_List->char_class_to_symbol(
             $parse, $character_class );
     };
     my $lexical_lhs       = $parse->internal_lexeme($character_class);
@@ -1537,11 +1537,11 @@ sub Marpa::R2::Internal::MetaAST_Nodes::character_class::evaluate {
     );
     push @{ $parse->{rules}->{L0} }, \%lexical_rule;
     my $g1_symbol =
-        Marpa::R2::Internal::MetaAST::Symbol_List->new($lexical_lhs);
+        Marpa::R3::Internal::MetaAST::Symbol_List->new($lexical_lhs);
     return $g1_symbol;
-} ## end sub Marpa::R2::Internal::MetaAST_Nodes::character_class::evaluate
+} ## end sub Marpa::R3::Internal::MetaAST_Nodes::character_class::evaluate
 
-sub Marpa::R2::Internal::MetaAST_Nodes::single_quoted_string::evaluate {
+sub Marpa::R3::Internal::MetaAST_Nodes::single_quoted_string::evaluate {
     my ( $values, $parse ) = @_;
     my ( undef, undef, $string ) = @{$values};
     my @symbols = ();
@@ -1549,8 +1549,8 @@ sub Marpa::R2::Internal::MetaAST_Nodes::single_quoted_string::evaluate {
     my $end_of_string = rindex $string, q{'};
       my $unmodified_string = substr $string, 0, $end_of_string+1;
       my $raw_flags = substr $string, $end_of_string+1;
-    my $flags = Marpa::R2::Internal::MetaAST::flag_string_to_flags($raw_flags);
-    my $subgrammar = $Marpa::R2::Internal::SUBGRAMMAR;
+    my $flags = Marpa::R3::Internal::MetaAST::flag_string_to_flags($raw_flags);
+    my $subgrammar = $Marpa::R3::Internal::SUBGRAMMAR;
 
     # If we are currently in a lexical grammar, the strings go there
     # If we are currently in G1, the strings always go into L0
@@ -1562,14 +1562,14 @@ sub Marpa::R2::Internal::MetaAST_Nodes::single_quoted_string::evaluate {
         1, -1
         )
     {
-        local $Marpa::R2::Internal::SUBGRAMMAR = $lexical_grammar;
+        local $Marpa::R3::Internal::SUBGRAMMAR = $lexical_grammar;
         my $symbol =
-            Marpa::R2::Internal::MetaAST::Symbol_List->char_class_to_symbol(
+            Marpa::R3::Internal::MetaAST::Symbol_List->char_class_to_symbol(
             $parse, $char_class );
         push @symbols, $symbol;
     } ## end for my $char_class ( map { '[' . ( quotemeta $_ ) . ']'...})
-    my $list = Marpa::R2::Internal::MetaAST::Symbol_List->combine(@symbols);
-    return $list if $Marpa::R2::Internal::SUBGRAMMAR ne 'G1';
+    my $list = Marpa::R3::Internal::MetaAST::Symbol_List->combine(@symbols);
+    return $list if $Marpa::R3::Internal::SUBGRAMMAR ne 'G1';
     my $lexical_lhs       = $parse->internal_lexeme($string);
     my $lexical_rhs       = $list->names($parse);
     my %lexical_rule      = (
@@ -1580,11 +1580,11 @@ sub Marpa::R2::Internal::MetaAST_Nodes::single_quoted_string::evaluate {
     );
     push @{ $parse->{rules}->{$lexical_grammar} }, \%lexical_rule;
     my $g1_symbol =
-        Marpa::R2::Internal::MetaAST::Symbol_List->new($lexical_lhs);
+        Marpa::R3::Internal::MetaAST::Symbol_List->new($lexical_lhs);
     return $g1_symbol;
-} ## end sub Marpa::R2::Internal::MetaAST_Nodes::single_quoted_string::evaluate
+} ## end sub Marpa::R3::Internal::MetaAST_Nodes::single_quoted_string::evaluate
 
-package Marpa::R2::Internal::MetaAST::Symbol_List;
+package Marpa::R3::Internal::MetaAST::Symbol_List;
 
 use English qw( -no_match_vars );
 
@@ -1601,7 +1601,7 @@ sub combine {
     return bless $self, $class;
 } ## end sub combine
 
-sub Marpa::R2::Internal::MetaAST::char_class_to_re {
+sub Marpa::R3::Internal::MetaAST::char_class_to_re {
     my ($cc_components) = @_;
     die if ref $cc_components ne 'ARRAY';
     my ( $char_class, $flags ) = @{$cc_components};
@@ -1616,7 +1616,7 @@ sub Marpa::R2::Internal::MetaAST::char_class_to_re {
     return $regex, $error;
 }
 
-sub Marpa::R2::Internal::MetaAST::flag_string_to_flags {
+sub Marpa::R3::Internal::MetaAST::flag_string_to_flags {
     my ($raw_flag_string) = @_;
     return q{} if not $raw_flag_string;
     my @raw_flags = split m/:/xms, $raw_flag_string;
@@ -1649,8 +1649,8 @@ sub char_class_to_symbol {
     my $end_of_char_class = rindex $char_class, q{]};
       my $unmodified_char_class = substr $char_class, 0, $end_of_char_class+1;
       my $raw_flags = substr $char_class, $end_of_char_class+1;
-    my $flags = Marpa::R2::Internal::MetaAST::flag_string_to_flags($raw_flags);
-    my $subgrammar = $Marpa::R2::Internal::SUBGRAMMAR;
+    my $flags = Marpa::R3::Internal::MetaAST::flag_string_to_flags($raw_flags);
+    my $subgrammar = $Marpa::R3::Internal::SUBGRAMMAR;
 
     # character class symbol name always start with TWO left square brackets
     my $symbol_name = '[' . $unmodified_char_class . $flags . ']';
@@ -1664,13 +1664,13 @@ sub char_class_to_symbol {
         # Fast fail on badly formed char_class -- we re-evaluate the regex just in time
         # before we register characters.
         my ( $regex, $eval_error ) =
-            Marpa::R2::Internal::MetaAST::char_class_to_re($cc_components);
+            Marpa::R3::Internal::MetaAST::char_class_to_re($cc_components);
         Carp::croak( 'Bad Character class: ',
             $char_class, "\n", 'Perl said ', $eval_error )
             if not $regex;
 
         $symbol =
-            Marpa::R2::Internal::MetaAST::Symbol_List->new($symbol_name);
+            Marpa::R3::Internal::MetaAST::Symbol_List->new($symbol_name);
         $cc_hash->{$symbol_name} = [ $cc_components, $symbol ];
         $parse->symbol_names_set(
             $symbol_name,
@@ -1684,7 +1684,7 @@ sub char_class_to_symbol {
     return $symbol;
 } ## end sub char_class_to_symbol
 
-sub Marpa::R2::Internal::MetaAST::Parse::symbol_names_set {
+sub Marpa::R3::Internal::MetaAST::Parse::symbol_names_set {
     my ( $parse, $symbol, $subgrammar, $args ) = @_;
     my $symbol_type = $subgrammar eq 'G1' ? 'G1' : 'L';
     for my $arg_type (keys %{$args}) {
@@ -1695,19 +1695,19 @@ sub Marpa::R2::Internal::MetaAST::Parse::symbol_names_set {
 
 # Return the priotized symbol name,
 # after ensuring everything is set up properly
-sub Marpa::R2::Internal::MetaAST::Parse::prioritized_symbol {
+sub Marpa::R3::Internal::MetaAST::Parse::prioritized_symbol {
     my ( $parse, $base_symbol, $priority ) = @_;
 
     # character class symbol name always start with TWO left square brackets
     my $symbol_name = $base_symbol . '[' . $priority . ']';
     my $symbol_data =
-        $parse->{symbols}->{$Marpa::R2::Internal::SUBGRAMMAR eq 'G1' ? 'G1' : 'L'}->{$symbol_name};
+        $parse->{symbols}->{$Marpa::R3::Internal::SUBGRAMMAR eq 'G1' ? 'G1' : 'L'}->{$symbol_name};
     return $symbol_name if defined $symbol_data;
     my $display_form =
         ( $base_symbol =~ m/\s/xms ) ? "<$base_symbol>" : $base_symbol;
     $parse->symbol_names_set(
         $symbol_name,
-        $Marpa::R2::Internal::SUBGRAMMAR,
+        $Marpa::R3::Internal::SUBGRAMMAR,
         {   legacy_name  => $base_symbol,
             dsl_form     => $base_symbol,
             display_form => $display_form,
@@ -1715,11 +1715,11 @@ sub Marpa::R2::Internal::MetaAST::Parse::prioritized_symbol {
         }
     );
     return $symbol_name;
-} ## end sub Marpa::R2::Internal::MetaAST::Parse::prioritized_symbol
+} ## end sub Marpa::R3::Internal::MetaAST::Parse::prioritized_symbol
 
 # Return the prioritized symbol name,
 # after ensuring everything is set up properly
-sub Marpa::R2::Internal::MetaAST::Parse::internal_lexeme {
+sub Marpa::R3::Internal::MetaAST::Parse::internal_lexeme {
     my ( $parse, $dsl_form, @grammars ) = @_;
 
     # character class symbol name always start with TWO left square brackets
@@ -1732,12 +1732,12 @@ sub Marpa::R2::Internal::MetaAST::Parse::internal_lexeme {
     );
     $parse->symbol_names_set( $lexical_symbol, $_, \%names ) for qw(G1 L);
     return $lexical_symbol;
-} ## end sub Marpa::R2::Internal::MetaAST::Parse::internal_lexeme
+} ## end sub Marpa::R3::Internal::MetaAST::Parse::internal_lexeme
 
 sub name {
     my ($self) = @_;
     my $names = $self->{names};
-    Marpa::R2::exception( 'list->name() on symbol list of length ',
+    Marpa::R3::exception( 'list->name() on symbol list of length ',
         scalar @{$names} )
         if scalar @{$names} != 1;
     return $self->{names}->[0];

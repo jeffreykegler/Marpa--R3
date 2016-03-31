@@ -1,19 +1,19 @@
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-package Marpa::R2::Thin::Trace;
+package Marpa::R3::Thin::Trace;
 
 use 5.010;
 use warnings;
@@ -149,7 +149,7 @@ sub progress_report {
 
 sub lexer_progress_report {
     my ( $self, $slr, $ordinal ) = @_;
-    my $thin_slr = $slr->[Marpa::R2::Internal::Scanless::R::C];
+    my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::C];
     my $result = q{};
     $ordinal //= $thin_slr->lexer_latest_earley_set();
     $thin_slr->lexer_progress_report_start($ordinal);

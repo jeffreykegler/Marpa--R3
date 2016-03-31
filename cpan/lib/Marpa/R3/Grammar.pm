@@ -1,19 +1,19 @@
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-package Marpa::R2::Grammar;
+package Marpa::R3::Grammar;
 
 use 5.010;
 
@@ -32,89 +32,89 @@ $STRING_VERSION = $VERSION;
 $VERSION = eval $VERSION;
 ## use critic
 
-package Marpa::R2::Internal::Grammar;
+package Marpa::R3::Internal::Grammar;
 
 use English qw( -no_match_vars );
 
-use Marpa::R2::Thin::Trace;
+use Marpa::R3::Thin::Trace;
 
 our %DEFAULT_SYMBOLS_RESERVED;
 %DEFAULT_SYMBOLS_RESERVED = map { ($_, 1) } split //xms, '}]>)';
 
-sub Marpa::R2::uncaught_error {
+sub Marpa::R3::uncaught_error {
     my ($error) = @_;
 
     # This would be Carp::confess, but in the testing
     # the stack trace includes the hoped for error
     # message, which causes spurious success reports.
-    Carp::croak( "libmarpa reported an error which Marpa::R2 did not catch\n",
+    Carp::croak( "libmarpa reported an error which Marpa::R3 did not catch\n",
         $error );
-} ## end sub Marpa::R2::uncaught_error
+} ## end sub Marpa::R3::uncaught_error
 
-package Marpa::R2::Internal::Grammar;
+package Marpa::R3::Internal::Grammar;
 
-sub Marpa::R2::Grammar::new {
+sub Marpa::R3::Grammar::new {
     my ( $class, @arg_hashes ) = @_;
 
     my $grammar = [];
     bless $grammar, $class;
 
     # set the defaults and the default defaults
-    $grammar->[Marpa::R2::Internal::Grammar::TRACE_FILE_HANDLE] = *STDERR;
+    $grammar->[Marpa::R3::Internal::Grammar::TRACE_FILE_HANDLE] = *STDERR;
 
-    $grammar->[Marpa::R2::Internal::Grammar::TRACE_RULES]     = 0;
-    $grammar->[Marpa::R2::Internal::Grammar::WARNINGS]        = 1;
-    $grammar->[Marpa::R2::Internal::Grammar::INACCESSIBLE_OK] = {};
-    $grammar->[Marpa::R2::Internal::Grammar::UNPRODUCTIVE_OK] = {};
-    $grammar->[Marpa::R2::Internal::Grammar::INFINITE_ACTION] = 'fatal';
+    $grammar->[Marpa::R3::Internal::Grammar::TRACE_RULES]     = 0;
+    $grammar->[Marpa::R3::Internal::Grammar::WARNINGS]        = 1;
+    $grammar->[Marpa::R3::Internal::Grammar::INACCESSIBLE_OK] = {};
+    $grammar->[Marpa::R3::Internal::Grammar::UNPRODUCTIVE_OK] = {};
+    $grammar->[Marpa::R3::Internal::Grammar::INFINITE_ACTION] = 'fatal';
 
-    $grammar->[Marpa::R2::Internal::Grammar::SYMBOLS]            = [];
-    $grammar->[Marpa::R2::Internal::Grammar::RULES]              = [];
-    $grammar->[Marpa::R2::Internal::Grammar::RULE_ID_BY_TAG]     = {};
+    $grammar->[Marpa::R3::Internal::Grammar::SYMBOLS]            = [];
+    $grammar->[Marpa::R3::Internal::Grammar::RULES]              = [];
+    $grammar->[Marpa::R3::Internal::Grammar::RULE_ID_BY_TAG]     = {};
 
-    my $grammar_c = $grammar->[Marpa::R2::Internal::Grammar::C] =
-        Marpa::R2::Thin::G->new( { if => 1 } );
-    $grammar->[Marpa::R2::Internal::Grammar::TRACER] =
-        Marpa::R2::Thin::Trace->new($grammar_c);
+    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C] =
+        Marpa::R3::Thin::G->new( { if => 1 } );
+    $grammar->[Marpa::R3::Internal::Grammar::TRACER] =
+        Marpa::R3::Thin::Trace->new($grammar_c);
 
     $grammar->set(@arg_hashes);
 
     return $grammar;
-} ## end sub Marpa::R2::Grammar::new
+} ## end sub Marpa::R3::Grammar::new
 
-sub Marpa::R2::Grammar::tracer {
-    return $_[0]->[Marpa::R2::Internal::Grammar::TRACER];
+sub Marpa::R3::Grammar::tracer {
+    return $_[0]->[Marpa::R3::Internal::Grammar::TRACER];
 }
 
-sub Marpa::R2::Grammar::thin {
-    return $_[0]->[Marpa::R2::Internal::Grammar::C];
+sub Marpa::R3::Grammar::thin {
+    return $_[0]->[Marpa::R3::Internal::Grammar::C];
 }
 
-sub Marpa::R2::Grammar::thin_symbol {
+sub Marpa::R3::Grammar::thin_symbol {
     my ( $grammar, $symbol_name ) = @_;
-    return $grammar->[Marpa::R2::Internal::Grammar::TRACER]
+    return $grammar->[Marpa::R3::Internal::Grammar::TRACER]
         ->symbol_by_name($symbol_name);
 }
 
-sub Marpa::R2::Grammar::set {
+sub Marpa::R3::Grammar::set {
     my ( $grammar, @arg_hashes ) = @_;
 
     # set trace_fh even if no tracing, because we may turn it on in this method
     my $trace_fh =
-        $grammar->[Marpa::R2::Internal::Grammar::TRACE_FILE_HANDLE];
-    my $grammar_c = $grammar->[Marpa::R2::Internal::Grammar::C];
+        $grammar->[Marpa::R3::Internal::Grammar::TRACE_FILE_HANDLE];
+    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
 
     for my $args (@arg_hashes) {
 
         my $ref_type = ref $args;
         if ( not $ref_type ) {
             Carp::croak(
-                'Marpa::R2::Grammar expects args as ref to HASH; arg was non-reference'
+                'Marpa::R3::Grammar expects args as ref to HASH; arg was non-reference'
             );
         }
         if ( $ref_type ne 'HASH' ) {
             Carp::croak(
-                "Marpa::R2::Grammar expects args as ref to HASH, got ref to $ref_type instead"
+                "Marpa::R3::Grammar expects args as ref to HASH, got ref to $ref_type instead"
             );
         }
 
@@ -145,7 +145,7 @@ sub Marpa::R2::Grammar::set {
             keys %{$args}
             )
         {
-            Carp::croak( 'Unknown option(s) for Marpa::R2::Grammar: ',
+            Carp::croak( 'Unknown option(s) for Marpa::R3::Grammar: ',
                 join q{ }, @bad_options );
         } ## end if ( my @bad_options = grep { not exists $grammar_options...})
 
@@ -154,17 +154,17 @@ sub Marpa::R2::Grammar::set {
         # options, even if specified afterwards
 
         if ( defined( my $value = $args->{'_internal_'} ) ) {
-            $grammar->[Marpa::R2::Internal::Grammar::INTERNAL] =  $value;
+            $grammar->[Marpa::R3::Internal::Grammar::INTERNAL] =  $value;
         }
 
         if ( defined( my $value = $args->{'trace_file_handle'} ) ) {
             $trace_fh =
-                $grammar->[Marpa::R2::Internal::Grammar::TRACE_FILE_HANDLE] =
+                $grammar->[Marpa::R3::Internal::Grammar::TRACE_FILE_HANDLE] =
                 $value;
         }
 
         if ( defined( my $value = $args->{'default_rank'} ) ) {
-            Marpa::R2::exception(
+            Marpa::R3::exception(
                 'default_rank option not allowed after grammar is precomputed'
             ) if $grammar_c->is_precomputed();
             $grammar_c->default_rank_set($value);
@@ -174,10 +174,10 @@ sub Marpa::R2::Grammar::set {
         # Second pass options
 
         if ( defined( my $value = $args->{'symbols'} ) ) {
-            Marpa::R2::exception(
+            Marpa::R3::exception(
                 'symbols option not allowed after grammar is precomputed')
                 if $grammar_c->is_precomputed();
-            Marpa::R2::exception('symbols value must be REF to HASH')
+            Marpa::R3::exception('symbols value must be REF to HASH')
                 if ref $value ne 'HASH';
             for my $symbol ( sort keys %{$value} ) {
                 my $properties = $value->{$symbol};
@@ -186,10 +186,10 @@ sub Marpa::R2::Grammar::set {
         } ## end if ( defined( my $value = $args->{'symbols'} ) )
 
         if ( defined( my $value = $args->{'terminals'} ) ) {
-            Marpa::R2::exception(
+            Marpa::R3::exception(
                 'terminals option not allowed after grammar is precomputed')
                 if $grammar_c->is_precomputed();
-            Marpa::R2::exception('terminals value must be REF to ARRAY')
+            Marpa::R3::exception('terminals value must be REF to ARRAY')
                 if ref $value ne 'ARRAY';
             for my $symbol ( @{$value} ) {
                 assign_user_symbol( $grammar, $symbol, { terminal => 1 } );
@@ -197,118 +197,61 @@ sub Marpa::R2::Grammar::set {
         } ## end if ( defined( my $value = $args->{'terminals'} ) )
 
         if ( defined( my $value = $args->{'start'} ) ) {
-            Marpa::R2::exception(
+            Marpa::R3::exception(
                 'start option not allowed after grammar is precomputed')
                 if $grammar_c->is_precomputed();
-            $grammar->[Marpa::R2::Internal::Grammar::START_NAME] = $value;
+            $grammar->[Marpa::R3::Internal::Grammar::START_NAME] = $value;
         } ## end if ( defined( my $value = $args->{'start'} ) )
 
-        my $stuifzand_source;
-        my $deprecated_source;
-
         if ( defined( my $value = $args->{'source'} ) ) {
-            Marpa::R2::exception(
+            Marpa::R3::exception(
                 'source option not allowed after grammar is precomputed')
                 if $grammar_c->is_precomputed();
-            Marpa::R2::exception(
+            Marpa::R3::exception(
                 q{"source" named argument must be string or ref to SCALAR}
             ) if ref $value ne 'SCALAR';
-            $stuifzand_source = $value;
         }
 
         if ( defined( my $value = $args->{'rules'} ) ) {
-            Marpa::R2::exception(
+            Marpa::R3::exception(
                 'rules option not allowed after grammar is precomputed')
                 if $grammar_c->is_precomputed();
-            DO_RULES: {
-                ## These hacks are for previous method of specifying Stuifzand
-                ## grammars.  They are now deprecated and undocumented.
-                ## Eventually they may be eliminated.
-                if (    ref $value eq 'ARRAY'
-                    and scalar @{$value} == 1
-                    and not ref $value->[0] )
-                {
-                    $value = $value->[0];
-                } ## end if ( ref $value eq 'ARRAY' and scalar @{$value} == 1...)
-                if ( not ref $value ) {
-                   $deprecated_source = \$value;
-                }
-                if (defined $deprecated_source and defined $stuifzand_source) {
-                    Marpa::R2::exception(
-                        qq{Attempt to specify BNF via both 'rules' and 'source' named arguments\n},
-                        q{  You must use one or the other},
-                        )
-                }
-                if (defined $deprecated_source) {
-                    $stuifzand_source = $deprecated_source;
-                    last DO_RULES;
-                }
-                Marpa::R2::exception(
-                    q{"rules" named argument must be string or ref to ARRAY}
-                ) if ref $value ne 'ARRAY';
-                $grammar->[Marpa::R2::Internal::Grammar::INTERFACE] //=
-                    'standard';
-                Marpa::R2::exception(
-                    qq{Attempt to use the standard interface with a grammar that is already using the BNF interface\n},
-                    q{  Mixing the BNF and standard interface is not allowed}
-                    )
-                    if $grammar->[Marpa::R2::Internal::Grammar::INTERFACE] ne
-                        'standard';
-                add_user_rules( $grammar, $value );
-            } ## end DO_RULES:
         } ## end if ( defined( my $value = $args->{'rules'} ) )
-
-        if ( defined $stuifzand_source ) {
-            $grammar->[Marpa::R2::Internal::Grammar::INTERFACE] //=
-                'stuifzand';
-            Marpa::R2::exception(
-                qq{Attempt to use the standard interface with a grammar that is already using the BNF interface\n},
-                q{  Mixing the BNF and standard interface is not allowed}
-                )
-                if $grammar->[Marpa::R2::Internal::Grammar::INTERFACE] ne
-                    'stuifzand';
-            my $parse_result =
-                Marpa::R2::Internal::Stuifzand::parse_rules( 
-                $stuifzand_source );
-            for my $rule ( @{ $parse_result->{rules} } ) {
-                add_user_rule( $grammar, $rule );
-            }
-        } ## end if ( defined $stuifzand_source )
 
         if ( exists $args->{'default_empty_action'} ) {
             my $value = $args->{'default_empty_action'};
-            $grammar->[Marpa::R2::Internal::Grammar::DEFAULT_EMPTY_ACTION] =
+            $grammar->[Marpa::R3::Internal::Grammar::DEFAULT_EMPTY_ACTION] =
                 $value;
         }
 
         if ( defined( my $value = $args->{'actions'} ) ) {
-            $grammar->[Marpa::R2::Internal::Grammar::ACTIONS] = $value;
+            $grammar->[Marpa::R3::Internal::Grammar::ACTIONS] = $value;
         }
 
         if ( defined( my $value = $args->{'bless_package'} ) ) {
-            $grammar->[Marpa::R2::Internal::Grammar::BLESS_PACKAGE] = $value;
+            $grammar->[Marpa::R3::Internal::Grammar::BLESS_PACKAGE] = $value;
         }
 
         if ( defined( my $value = $args->{'action_object'} ) ) {
-            $grammar->[Marpa::R2::Internal::Grammar::ACTION_OBJECT] = $value;
+            $grammar->[Marpa::R3::Internal::Grammar::ACTION_OBJECT] = $value;
         }
 
         if ( defined( my $value = $args->{'default_action'} ) ) {
-            $grammar->[Marpa::R2::Internal::Grammar::DEFAULT_ACTION] = $value;
+            $grammar->[Marpa::R3::Internal::Grammar::DEFAULT_ACTION] = $value;
         }
 
         if ( defined( my $value = $args->{'infinite_action'} ) ) {
             if ( $value && $grammar_c->is_precomputed() ) {
                 say {$trace_fh}
                     '"infinite_action" option is useless after grammar is precomputed'
-                    or Marpa::R2::exception("Could not print: $ERRNO");
+                    or Marpa::R3::exception("Could not print: $ERRNO");
             }
             state $allowed_values =
                 { map { ( $_, 1 ) } qw(warn quiet fatal) };
-            Marpa::R2::exception(
+            Marpa::R3::exception(
                 q{infinite_action must be 'warn', 'quiet' or 'fatal'})
                 if not exists $allowed_values->{$value};
-            $grammar->[Marpa::R2::Internal::Grammar::INFINITE_ACTION] =
+            $grammar->[Marpa::R3::Internal::Grammar::INFINITE_ACTION] =
                 $value;
         } ## end if ( defined( my $value = $args->{'infinite_action'}...))
 
@@ -316,16 +259,16 @@ sub Marpa::R2::Grammar::set {
             if ( $value && $grammar_c->is_precomputed() ) {
                 say {$trace_fh}
                     q{"warnings" option is useless after grammar is precomputed}
-                    or Marpa::R2::exception("Could not print: $ERRNO");
+                    or Marpa::R3::exception("Could not print: $ERRNO");
             }
-            $grammar->[Marpa::R2::Internal::Grammar::WARNINGS] = $value;
+            $grammar->[Marpa::R3::Internal::Grammar::WARNINGS] = $value;
         } ## end if ( defined( my $value = $args->{'warnings'} ) )
 
         if ( defined( my $value = $args->{'inaccessible_ok'} ) ) {
             if ( $value && $grammar_c->is_precomputed() ) {
                 say {$trace_fh}
                     q{"inaccessible_ok" option is useless after grammar is precomputed}
-                    or Marpa::R2::exception("Could not print: $ERRNO");
+                    or Marpa::R3::exception("Could not print: $ERRNO");
 
             } ## end if ( $value && $grammar_c->is_precomputed() )
             GIVEN_REF_VALUE: {
@@ -338,11 +281,11 @@ sub Marpa::R2::Grammar::set {
                     $value = { map { ( $_, 1 ) } @{$value} };
                     last GIVEN_REF_VALUE;
                 }
-                Marpa::R2::exception(
+                Marpa::R3::exception(
                     'value of inaccessible_ok option must be boolean or an array ref'
                 );
             } ## end GIVEN_REF_VALUE:
-            $grammar->[Marpa::R2::Internal::Grammar::INACCESSIBLE_OK] =
+            $grammar->[Marpa::R3::Internal::Grammar::INACCESSIBLE_OK] =
                 $value;
         } ## end if ( defined( my $value = $args->{'inaccessible_ok'}...))
 
@@ -350,7 +293,7 @@ sub Marpa::R2::Grammar::set {
             if ( $value && $grammar_c->is_precomputed() ) {
                 say {$trace_fh}
                     q{"unproductive_ok" option is useless after grammar is precomputed}
-                    or Marpa::R2::exception("Could not print: $ERRNO");
+                    or Marpa::R3::exception("Could not print: $ERRNO");
             }
             GIVEN_REF_VALUE: {
                 my $ref_value = ref $value;
@@ -362,54 +305,54 @@ sub Marpa::R2::Grammar::set {
                     $value = { map { ( $_, 1 ) } @{$value} };
                     last GIVEN_REF_VALUE;
                 }
-                Marpa::R2::exception(
+                Marpa::R3::exception(
                         'value of unproductive_ok option must be boolean or an array ref'
                 );
             } ## end GIVEN_REF_VALUE:
-            $grammar->[Marpa::R2::Internal::Grammar::UNPRODUCTIVE_OK] =
+            $grammar->[Marpa::R3::Internal::Grammar::UNPRODUCTIVE_OK] =
                 $value;
         } ## end if ( defined( my $value = $args->{'unproductive_ok'}...))
 
     } ## end for my $args (@arg_hashes)
 
     return 1;
-} ## end sub Marpa::R2::Grammar::set
+} ## end sub Marpa::R3::Grammar::set
 
-sub Marpa::R2::Grammar::symbol_reserved_set {
+sub Marpa::R3::Grammar::symbol_reserved_set {
     my ( $grammar, $final_character, $boolean ) = @_;
     if ( length $final_character != 1 ) {
-        Marpa::R2::exception( 'symbol_reserved_set(): "',
+        Marpa::R3::exception( 'symbol_reserved_set(): "',
             $final_character, '" is not a symbol' );
     }
     if ( $final_character eq ']' ) {
         return if $boolean;
-        Marpa::R2::exception(
+        Marpa::R3::exception(
             q{symbol_reserved_set(): Attempt to unreserve ']'; this is not allowed}
         );
     } ## end if ( $final_character eq ']' ) ([)
     if ( not exists $DEFAULT_SYMBOLS_RESERVED{$final_character} ) {
-        Marpa::R2::exception(
+        Marpa::R3::exception(
             qq{symbol_reserved_set(): "$final_character" is not a reservable symbol}
         );
     }
     # Return a value to make perlcritic happy
     return $DEFAULT_SYMBOLS_RESERVED{$final_character} = $boolean ? 1 : 0;
-} ## end sub Marpa::R2::Grammar::symbol_reserved_set
+} ## end sub Marpa::R3::Grammar::symbol_reserved_set
 
-sub Marpa::R2::Grammar::precompute {
+sub Marpa::R3::Grammar::precompute {
     my $grammar = shift;
 
-    my $rules     = $grammar->[Marpa::R2::Internal::Grammar::RULES];
-    my $grammar_c = $grammar->[Marpa::R2::Internal::Grammar::C];
+    my $rules     = $grammar->[Marpa::R3::Internal::Grammar::RULES];
+    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
     my $trace_fh =
-        $grammar->[Marpa::R2::Internal::Grammar::TRACE_FILE_HANDLE];
+        $grammar->[Marpa::R3::Internal::Grammar::TRACE_FILE_HANDLE];
 
-    my $problems = $grammar->[Marpa::R2::Internal::Grammar::PROBLEMS];
+    my $problems = $grammar->[Marpa::R3::Internal::Grammar::PROBLEMS];
     if ($problems) {
-        Marpa::R2::exception(
-            Marpa::R2::Grammar::show_problems($grammar),
+        Marpa::R3::exception(
+            Marpa::R3::Grammar::show_problems($grammar),
             "Second attempt to precompute grammar with fatal problems\n",
-            'Marpa::R2 cannot proceed'
+            'Marpa::R3 cannot proceed'
         );
     } ## end if ($problems)
 
@@ -418,7 +361,7 @@ sub Marpa::R2::Grammar::precompute {
     set_start_symbol($grammar);
 
     # Catch errors in precomputation
-    my $precompute_error_code = $Marpa::R2::Error::NONE;
+    my $precompute_error_code = $Marpa::R3::Error::NONE;
     $grammar_c->throw_set(0);
     my $precompute_result = $grammar_c->precompute();
     $grammar_c->throw_set(1);
@@ -426,30 +369,30 @@ sub Marpa::R2::Grammar::precompute {
     if ( $precompute_result < 0 ) {
         ($precompute_error_code) = $grammar_c->error();
         if ( not defined $precompute_error_code ) {
-            Marpa::R2::exception(
+            Marpa::R3::exception(
                 'libmarpa error, but no error code returned');
         }
 
         # If already precomputed, just return success
         return $grammar
-            if $precompute_error_code == $Marpa::R2::Error::PRECOMPUTED;
+            if $precompute_error_code == $Marpa::R3::Error::PRECOMPUTED;
 
         # Cycles are not necessarily errors,
         # and get special handling
-        $precompute_error_code = $Marpa::R2::Error::NONE
-            if $precompute_error_code == $Marpa::R2::Error::GRAMMAR_HAS_CYCLE;
+        $precompute_error_code = $Marpa::R3::Error::NONE
+            if $precompute_error_code == $Marpa::R3::Error::GRAMMAR_HAS_CYCLE;
 
     } ## end if ( $precompute_result < 0 )
 
-    if ( $precompute_error_code != $Marpa::R2::Error::NONE ) {
+    if ( $precompute_error_code != $Marpa::R3::Error::NONE ) {
 
         # Report the errors, then return failure
 
-        if ( $precompute_error_code == $Marpa::R2::Error::NO_RULES ) {
-            Marpa::R2::exception(
+        if ( $precompute_error_code == $Marpa::R3::Error::NO_RULES ) {
+            Marpa::R3::exception(
                 'Attempted to precompute grammar with no rules');
         }
-        if ( $precompute_error_code == $Marpa::R2::Error::NULLING_TERMINAL ) {
+        if ( $precompute_error_code == $Marpa::R3::Error::NULLING_TERMINAL ) {
             my @nulling_terminals = ();
             my $event_count       = $grammar_c->event_count();
             EVENT:
@@ -462,10 +405,10 @@ sub Marpa::R2::Grammar::precompute {
             my @nulling_terminal_messages =
                 map {qq{Nulling symbol "$_" is also a terminal\n}}
                 @nulling_terminals;
-            Marpa::R2::exception( @nulling_terminal_messages,
+            Marpa::R3::exception( @nulling_terminal_messages,
                 'A terminal symbol cannot also be a nulling symbol' );
         } ## end if ( $precompute_error_code == ...)
-        if ( $precompute_error_code == $Marpa::R2::Error::COUNTED_NULLABLE ) {
+        if ( $precompute_error_code == $Marpa::R3::Error::COUNTED_NULLABLE ) {
             my @counted_nullables = ();
             my $event_count       = $grammar_c->event_count();
             EVENT:
@@ -480,28 +423,28 @@ sub Marpa::R2::Grammar::precompute {
                     . $_
                     . qq{" is on rhs of counted rule\n}
             } @counted_nullables;
-            Marpa::R2::exception( @counted_nullable_messages,
+            Marpa::R3::exception( @counted_nullable_messages,
                 'Counted nullables confuse Marpa -- please rewrite the grammar'
             );
         } ## end if ( $precompute_error_code == ...)
 
-        if ( $precompute_error_code == $Marpa::R2::Error::NO_START_SYMBOL ) {
-            Marpa::R2::exception('No start symbol');
+        if ( $precompute_error_code == $Marpa::R3::Error::NO_START_SYMBOL ) {
+            Marpa::R3::exception('No start symbol');
         }
-        if ( $precompute_error_code == $Marpa::R2::Error::START_NOT_LHS ) {
-            my $name = $grammar->[Marpa::R2::Internal::Grammar::START_NAME];
-            Marpa::R2::exception(
+        if ( $precompute_error_code == $Marpa::R3::Error::START_NOT_LHS ) {
+            my $name = $grammar->[Marpa::R3::Internal::Grammar::START_NAME];
+            Marpa::R3::exception(
                 qq{Start symbol "$name" not on LHS of any rule});
         }
-        if ( $precompute_error_code == $Marpa::R2::Error::UNPRODUCTIVE_START )
+        if ( $precompute_error_code == $Marpa::R3::Error::UNPRODUCTIVE_START )
         {
-            my $name = $grammar->[Marpa::R2::Internal::Grammar::START_NAME];
-            Marpa::R2::exception(qq{Unproductive start symbol: "$name"});
+            my $name = $grammar->[Marpa::R3::Internal::Grammar::START_NAME];
+            Marpa::R3::exception(qq{Unproductive start symbol: "$name"});
         }
 
-        Marpa::R2::uncaught_error( scalar $grammar_c->error() );
+        Marpa::R3::uncaught_error( scalar $grammar_c->error() );
 
-    } ## end if ( $precompute_error_code != $Marpa::R2::Error::NONE)
+    } ## end if ( $precompute_error_code != $Marpa::R3::Error::NONE)
 
     # Shadow all the new rules
     {
@@ -510,7 +453,7 @@ sub Marpa::R2::Grammar::precompute {
         for ( my $rule_id = 0; $rule_id <= $highest_rule_id; $rule_id++ ) {
             next RULE if defined $rules->[$rule_id];
 
-            # The Marpa::R2 logic assumes no "gaps" in the rule numbering,
+            # The Marpa::R3 logic assumes no "gaps" in the rule numbering,
             # which is currently the case for Libmarpa,
             # but not guaranteed.
             shadow_rule( $grammar, $rule_id );
@@ -518,7 +461,7 @@ sub Marpa::R2::Grammar::precompute {
     }
 
     my $infinite_action =
-        $grammar->[Marpa::R2::Internal::Grammar::INFINITE_ACTION];
+        $grammar->[Marpa::R3::Internal::Grammar::INFINITE_ACTION];
 
     # Above I went through the error events
     # Here I go through the events for situations where there was no
@@ -530,7 +473,7 @@ sub Marpa::R2::Grammar::precompute {
         for ( my $event_ix = 0; $event_ix < $event_count; $event_ix++ ) {
             my ( $event_type, $value ) = $grammar_c->event($event_ix);
             if ( $event_type ne 'MARPA_EVENT_LOOP_RULES' ) {
-                Marpa::R2::exception(
+                Marpa::R3::exception(
                     qq{Unknown grammar precomputation event; type="$event_type"}
                 );
             }
@@ -545,24 +488,24 @@ sub Marpa::R2::Grammar::precompute {
             print {$trace_fh}
                 'Cycle found involving rule: ',
                 $grammar->brief_rule($rule_id), "\n"
-                or Marpa::R2::exception("Could not print: $ERRNO");
+                or Marpa::R3::exception("Could not print: $ERRNO");
         } ## end for my $rule_id (@loop_rules)
-        Marpa::R2::exception('Cycles in grammar, fatal error')
+        Marpa::R3::exception('Cycles in grammar, fatal error')
             if $infinite_action eq 'fatal';
     } ## end if ( $loop_rule_count and $infinite_action ne 'quiet')
 
     # A bit hackish here: INACCESSIBLE_OK is not a HASH ref iff
     # it is a Boolean TRUE indicating that all inaccessibles are OK.
     # A Boolean FALSE will have been replaced with an empty hash.
-    if ($grammar->[Marpa::R2::Internal::Grammar::WARNINGS]
+    if ($grammar->[Marpa::R3::Internal::Grammar::WARNINGS]
         and ref(
-            my $ok = $grammar->[Marpa::R2::Internal::Grammar::INACCESSIBLE_OK]
+            my $ok = $grammar->[Marpa::R3::Internal::Grammar::INACCESSIBLE_OK]
         ) eq 'HASH'
         )
     {
         SYMBOL:
         for my $symbol (
-            @{ Marpa::R2::Grammar::inaccessible_symbols($grammar) } )
+            @{ Marpa::R3::Grammar::inaccessible_symbols($grammar) } )
         {
 
             # Inaccessible internal symbols may be created
@@ -574,22 +517,22 @@ sub Marpa::R2::Grammar::precompute {
             next SYMBOL if $symbol =~ /\]/xms;
             next SYMBOL if $ok->{$symbol};
             say {$trace_fh} "Inaccessible symbol: $symbol"
-                or Marpa::R2::exception("Could not print: $ERRNO");
+                or Marpa::R3::exception("Could not print: $ERRNO");
         } ## end SYMBOL: for my $symbol ( @{ ...})
-    } ## end if ( $grammar->[Marpa::R2::Internal::Grammar::WARNINGS...])
+    } ## end if ( $grammar->[Marpa::R3::Internal::Grammar::WARNINGS...])
 
     # A bit hackish here: UNPRODUCTIVE_OK is not a HASH ref iff
     # it is a Boolean TRUE indicating that all inaccessibles are OK.
     # A Boolean FALSE will have been replaced with an empty hash.
-    if ($grammar->[Marpa::R2::Internal::Grammar::WARNINGS]
+    if ($grammar->[Marpa::R3::Internal::Grammar::WARNINGS]
         and ref(
-            my $ok = $grammar->[Marpa::R2::Internal::Grammar::UNPRODUCTIVE_OK]
+            my $ok = $grammar->[Marpa::R3::Internal::Grammar::UNPRODUCTIVE_OK]
         ) eq 'HASH'
         )
     {
         SYMBOL:
         for my $symbol (
-            @{ Marpa::R2::Grammar::unproductive_symbols($grammar) } )
+            @{ Marpa::R3::Grammar::unproductive_symbols($grammar) } )
         {
 
             # Unproductive internal symbols may be created
@@ -601,46 +544,46 @@ sub Marpa::R2::Grammar::precompute {
             next SYMBOL if $symbol =~ /\]/xms;
             next SYMBOL if $ok->{$symbol};
             say {$trace_fh} "Unproductive symbol: $symbol"
-                or Marpa::R2::exception("Could not print: $ERRNO");
+                or Marpa::R3::exception("Could not print: $ERRNO");
         } ## end SYMBOL: for my $symbol ( @{ ...})
-    } ## end if ( $grammar->[Marpa::R2::Internal::Grammar::WARNINGS...])
+    } ## end if ( $grammar->[Marpa::R3::Internal::Grammar::WARNINGS...])
 
     # If we are using scannerless parsing, set that up
-    Marpa::R2::exception("Internal error; precompute called for SLIF grammar")
-        if $grammar->[Marpa::R2::Internal::Grammar::CHARACTER_CLASSES];
+    Marpa::R3::exception("Internal error; precompute called for SLIF grammar")
+        if $grammar->[Marpa::R3::Internal::Grammar::CHARACTER_CLASSES];
 
     return $grammar;
 
-} ## end sub Marpa::R2::Grammar::precompute
+} ## end sub Marpa::R3::Grammar::precompute
 
 # A custom precompute for SLIF grammars
-sub Marpa::R2::Internal::Grammar::slif_precompute {
+sub Marpa::R3::Internal::Grammar::slif_precompute {
     my $grammar = shift;
 
-    my $rules     = $grammar->[Marpa::R2::Internal::Grammar::RULES];
-    my $symbols     = $grammar->[Marpa::R2::Internal::Grammar::SYMBOLS];
-    my $grammar_c = $grammar->[Marpa::R2::Internal::Grammar::C];
+    my $rules     = $grammar->[Marpa::R3::Internal::Grammar::RULES];
+    my $symbols     = $grammar->[Marpa::R3::Internal::Grammar::SYMBOLS];
+    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
     my $trace_fh =
-        $grammar->[Marpa::R2::Internal::Grammar::TRACE_FILE_HANDLE];
+        $grammar->[Marpa::R3::Internal::Grammar::TRACE_FILE_HANDLE];
 
-    my $problems = $grammar->[Marpa::R2::Internal::Grammar::PROBLEMS];
+    my $problems = $grammar->[Marpa::R3::Internal::Grammar::PROBLEMS];
     if ($problems) {
-        Marpa::R2::exception(
-            Marpa::R2::Grammar::show_problems($grammar),
+        Marpa::R3::exception(
+            Marpa::R3::Grammar::show_problems($grammar),
             "Second attempt to precompute grammar with fatal problems\n",
-            'Marpa::R2 cannot proceed'
+            'Marpa::R3 cannot proceed'
         );
     } ## end if ($problems)
 
     return if $grammar_c->is_precomputed();
     if ($grammar_c->force_valued() < 0) {
-        Marpa::R2::uncaught_error( scalar $grammar_c->error() );
+        Marpa::R3::uncaught_error( scalar $grammar_c->error() );
     }
 
     set_start_symbol($grammar);
 
     # Catch errors in precomputation
-    my $precompute_error_code = $Marpa::R2::Error::NONE;
+    my $precompute_error_code = $Marpa::R3::Error::NONE;
     $grammar_c->throw_set(0);
     my $precompute_result = $grammar_c->precompute();
     $grammar_c->throw_set(1);
@@ -648,30 +591,30 @@ sub Marpa::R2::Internal::Grammar::slif_precompute {
     if ( $precompute_result < 0 ) {
         ($precompute_error_code) = $grammar_c->error();
         if ( not defined $precompute_error_code ) {
-            Marpa::R2::exception(
+            Marpa::R3::exception(
                 'libmarpa error, but no error code returned');
         }
 
         # If already precomputed, let higher level know
         return $precompute_error_code
-            if $precompute_error_code == $Marpa::R2::Error::PRECOMPUTED;
+            if $precompute_error_code == $Marpa::R3::Error::PRECOMPUTED;
 
         # Cycles are not necessarily errors,
         # and get special handling
-        $precompute_error_code = $Marpa::R2::Error::NONE
-            if $precompute_error_code == $Marpa::R2::Error::GRAMMAR_HAS_CYCLE;
+        $precompute_error_code = $Marpa::R3::Error::NONE
+            if $precompute_error_code == $Marpa::R3::Error::GRAMMAR_HAS_CYCLE;
 
     } ## end if ( $precompute_result < 0 )
 
-    if ( $precompute_error_code != $Marpa::R2::Error::NONE ) {
+    if ( $precompute_error_code != $Marpa::R3::Error::NONE ) {
 
         # Report the errors, then return failure
 
-        if ( $precompute_error_code == $Marpa::R2::Error::NO_RULES ) {
-            Marpa::R2::exception(
+        if ( $precompute_error_code == $Marpa::R3::Error::NO_RULES ) {
+            Marpa::R3::exception(
                 'Attempted to precompute grammar with no rules');
         }
-        if ( $precompute_error_code == $Marpa::R2::Error::NULLING_TERMINAL ) {
+        if ( $precompute_error_code == $Marpa::R3::Error::NULLING_TERMINAL ) {
             my @nulling_terminals = ();
             my $event_count       = $grammar_c->event_count();
             EVENT:
@@ -684,10 +627,10 @@ sub Marpa::R2::Internal::Grammar::slif_precompute {
             my @nulling_terminal_messages =
                 map {qq{Nulling symbol "$_" is also a terminal\n}}
                 @nulling_terminals;
-            Marpa::R2::exception( @nulling_terminal_messages,
+            Marpa::R3::exception( @nulling_terminal_messages,
                 'A terminal symbol cannot also be a nulling symbol' );
         } ## end if ( $precompute_error_code == ...)
-        if ( $precompute_error_code == $Marpa::R2::Error::COUNTED_NULLABLE ) {
+        if ( $precompute_error_code == $Marpa::R3::Error::COUNTED_NULLABLE ) {
             my @counted_nullables = ();
             my $event_count       = $grammar_c->event_count();
             EVENT:
@@ -702,27 +645,27 @@ sub Marpa::R2::Internal::Grammar::slif_precompute {
                     . $_
                     . qq{" is on rhs of counted rule\n}
             } @counted_nullables;
-            Marpa::R2::exception( @counted_nullable_messages,
+            Marpa::R3::exception( @counted_nullable_messages,
                 'Counted nullables confuse Marpa -- please rewrite the grammar'
             );
         } ## end if ( $precompute_error_code == ...)
 
-        if ( $precompute_error_code == $Marpa::R2::Error::NO_START_SYMBOL ) {
-            Marpa::R2::exception('No start symbol');
+        if ( $precompute_error_code == $Marpa::R3::Error::NO_START_SYMBOL ) {
+            Marpa::R3::exception('No start symbol');
         }
-        if ( $precompute_error_code == $Marpa::R2::Error::START_NOT_LHS ) {
-            my $name = $grammar->[Marpa::R2::Internal::Grammar::START_NAME];
-            Marpa::R2::exception(
+        if ( $precompute_error_code == $Marpa::R3::Error::START_NOT_LHS ) {
+            my $name = $grammar->[Marpa::R3::Internal::Grammar::START_NAME];
+            Marpa::R3::exception(
                 qq{Start symbol "$name" not on LHS of any rule});
         }
 
         return $precompute_error_code
             if $precompute_error_code
-            == $Marpa::R2::Error::UNPRODUCTIVE_START;
+            == $Marpa::R3::Error::UNPRODUCTIVE_START;
 
-        Marpa::R2::uncaught_error( scalar $grammar_c->error() );
+        Marpa::R3::uncaught_error( scalar $grammar_c->error() );
 
-    } ## end if ( $precompute_error_code != $Marpa::R2::Error::NONE)
+    } ## end if ( $precompute_error_code != $Marpa::R3::Error::NONE)
 
     # Shadow all the new rules
     {
@@ -731,7 +674,7 @@ sub Marpa::R2::Internal::Grammar::slif_precompute {
         for ( my $rule_id = 0; $rule_id <= $highest_rule_id; $rule_id++ ) {
             next RULE if defined $rules->[$rule_id];
 
-            # The Marpa::R2 logic assumes no "gaps" in the rule numbering,
+            # The Marpa::R3 logic assumes no "gaps" in the rule numbering,
             # which is currently the case for Libmarpa,
             # but not guaranteed.
             shadow_rule( $grammar, $rule_id );
@@ -739,7 +682,7 @@ sub Marpa::R2::Internal::Grammar::slif_precompute {
     }
 
     my $infinite_action =
-        $grammar->[Marpa::R2::Internal::Grammar::INFINITE_ACTION];
+        $grammar->[Marpa::R3::Internal::Grammar::INFINITE_ACTION];
 
     # Above I went through the error events
     # Here I go through the events for situations where there was no
@@ -751,7 +694,7 @@ sub Marpa::R2::Internal::Grammar::slif_precompute {
         for ( my $event_ix = 0; $event_ix < $event_count; $event_ix++ ) {
             my ( $event_type, $value ) = $grammar_c->event($event_ix);
             if ( $event_type ne 'MARPA_EVENT_LOOP_RULES' ) {
-                Marpa::R2::exception(
+                Marpa::R3::exception(
                     qq{Unknown grammar precomputation event; type="$event_type"}
                 );
             }
@@ -766,14 +709,14 @@ sub Marpa::R2::Internal::Grammar::slif_precompute {
             print {$trace_fh}
                 'Cycle found involving rule: ',
                 $grammar->brief_rule($rule_id), "\n"
-                or Marpa::R2::exception("Could not print: $ERRNO");
+                or Marpa::R3::exception("Could not print: $ERRNO");
         } ## end for my $rule_id (@loop_rules)
-        Marpa::R2::exception('Cycles in grammar, fatal error')
+        Marpa::R3::exception('Cycles in grammar, fatal error')
             if $infinite_action eq 'fatal';
     } ## end if ( $loop_rule_count and $infinite_action ne 'quiet')
 
     my $default_if_inaccessible =
-        $grammar->[Marpa::R2::Internal::Grammar::INTERNAL]->{if_inaccessible}
+        $grammar->[Marpa::R3::Internal::Grammar::INTERNAL]->{if_inaccessible}
         // 'warn';
     SYMBOL:
     for my $symbol_id ( grep { !$grammar_c->symbol_is_accessible($_) }
@@ -791,27 +734,27 @@ sub Marpa::R2::Internal::Grammar::slif_precompute {
         # accessible ones.
         next SYMBOL if $symbol_name =~ /\]/xms;
         my $treatment =
-            $symbol->[Marpa::R2::Internal::Symbol::IF_INACCESSIBLE] //
+            $symbol->[Marpa::R3::Internal::Symbol::IF_INACCESSIBLE] //
             $default_if_inaccessible;
         next SYMBOL if $treatment eq 'ok';
         my $message = "Inaccessible symbol: $symbol_name";
-        Marpa::R2::exception($message) if $treatment eq 'fatal';
+        Marpa::R3::exception($message) if $treatment eq 'fatal';
         say {$trace_fh} $message
-            or Marpa::R2::exception("Could not print: $ERRNO");
+            or Marpa::R3::exception("Could not print: $ERRNO");
     } ## end for my $symbol_id ( grep { !$grammar_c->...})
 
     # A bit hackish here: UNPRODUCTIVE_OK is not a HASH ref iff
     # it is a Boolean TRUE indicating that all inaccessibles are OK.
     # A Boolean FALSE will have been replaced with an empty hash.
-    if ($grammar->[Marpa::R2::Internal::Grammar::WARNINGS]
+    if ($grammar->[Marpa::R3::Internal::Grammar::WARNINGS]
         and ref(
-            my $ok = $grammar->[Marpa::R2::Internal::Grammar::UNPRODUCTIVE_OK]
+            my $ok = $grammar->[Marpa::R3::Internal::Grammar::UNPRODUCTIVE_OK]
         ) eq 'HASH'
         )
     {
         SYMBOL:
         for my $symbol (
-            @{ Marpa::R2::Grammar::unproductive_symbols($grammar) } )
+            @{ Marpa::R3::Grammar::unproductive_symbols($grammar) } )
         {
 
             # Unproductive internal symbols may be created
@@ -823,14 +766,14 @@ sub Marpa::R2::Internal::Grammar::slif_precompute {
             next SYMBOL if $symbol =~ /\]/xms;
             next SYMBOL if $ok->{$symbol};
             say {$trace_fh} "Unproductive symbol: $symbol"
-                or Marpa::R2::exception("Could not print: $ERRNO");
+                or Marpa::R3::exception("Could not print: $ERRNO");
         } ## end SYMBOL: for my $symbol ( @{ ...})
-    } ## end if ( $grammar->[Marpa::R2::Internal::Grammar::WARNINGS...])
+    } ## end if ( $grammar->[Marpa::R3::Internal::Grammar::WARNINGS...])
 
-    my $cc_hash = $grammar->[Marpa::R2::Internal::Grammar::CHARACTER_CLASSES];
+    my $cc_hash = $grammar->[Marpa::R3::Internal::Grammar::CHARACTER_CLASSES];
     if ( defined $cc_hash ) {
         my $class_table =
-            $grammar->[Marpa::R2::Internal::Grammar::CHARACTER_CLASS_TABLE] =
+            $grammar->[Marpa::R3::Internal::Grammar::CHARACTER_CLASS_TABLE] =
             [];
         for my $cc_symbol ( sort keys %{$cc_hash} ) {
             my $cc_components = $cc_hash->{$cc_symbol};
@@ -840,16 +783,16 @@ sub Marpa::R2::Internal::Grammar::slif_precompute {
     } ## end if ( defined $cc_hash )
 
     # Save some memory
-    $grammar->[Marpa::R2::Internal::Grammar::CHARACTER_CLASSES] = undef;
+    $grammar->[Marpa::R3::Internal::Grammar::CHARACTER_CLASSES] = undef;
 
     return ;
 
-} ## end sub Marpa::R2::Grammar::slif_precompute
+} ## end sub Marpa::R3::Grammar::slif_precompute
 
-sub Marpa::R2::Grammar::show_problems {
+sub Marpa::R3::Grammar::show_problems {
     my ($grammar) = @_;
 
-    my $problems = $grammar->[Marpa::R2::Internal::Grammar::PROBLEMS];
+    my $problems = $grammar->[Marpa::R3::Internal::Grammar::PROBLEMS];
     if ($problems) {
         my $problem_count = scalar @{$problems};
         return
@@ -857,45 +800,45 @@ sub Marpa::R2::Grammar::show_problems {
             . ( join "\n", @{$problems} ) . "\n";
     } ## end if ($problems)
     return "Grammar has no problems\n";
-} ## end sub Marpa::R2::Grammar::show_problems
+} ## end sub Marpa::R3::Grammar::show_problems
 
 # Return DSL form of symbol
 # Does no checking
-sub Marpa::R2::Grammar::symbol_dsl_form {
+sub Marpa::R3::Grammar::symbol_dsl_form {
     my ( $grammar, $symbol_id ) = @_;
-    my $symbols   = $grammar->[Marpa::R2::Internal::Grammar::SYMBOLS];
+    my $symbols   = $grammar->[Marpa::R3::Internal::Grammar::SYMBOLS];
     my $symbol = $symbols->[$symbol_id];
-    return $symbol->[Marpa::R2::Internal::Symbol::DSL_FORM];
+    return $symbol->[Marpa::R3::Internal::Symbol::DSL_FORM];
 }
 
 # Return description of symbol
 # Does no checking
-sub Marpa::R2::Grammar::symbol_description {
+sub Marpa::R3::Grammar::symbol_description {
     my ( $grammar, $symbol_id ) = @_;
-    my $symbols   = $grammar->[Marpa::R2::Internal::Grammar::SYMBOLS];
+    my $symbols   = $grammar->[Marpa::R3::Internal::Grammar::SYMBOLS];
     my $symbol = $symbols->[$symbol_id];
-    return $symbol->[Marpa::R2::Internal::Symbol::DESCRIPTION];
+    return $symbol->[Marpa::R3::Internal::Symbol::DESCRIPTION];
 }
 
 # Return display form of symbol
 # Does lots of checking and makes use of alternatives.
-sub Marpa::R2::Grammar::symbol_in_display_form {
+sub Marpa::R3::Grammar::symbol_in_display_form {
     my ( $grammar, $symbol_id ) = @_;
-    my $symbols   = $grammar->[Marpa::R2::Internal::Grammar::SYMBOLS];
+    my $symbols   = $grammar->[Marpa::R3::Internal::Grammar::SYMBOLS];
     my $symbol = $symbols->[$symbol_id];
     return "<!No symbol with ID $symbol_id!>" if not defined $symbol;
-    my $text = $symbol->[Marpa::R2::Internal::Symbol::DISPLAY_FORM];
+    my $text = $symbol->[Marpa::R3::Internal::Symbol::DISPLAY_FORM];
     return $text if defined $text;
-    $text = $symbol->[Marpa::R2::Internal::Symbol::DSL_FORM] //
+    $text = $symbol->[Marpa::R3::Internal::Symbol::DSL_FORM] //
      $grammar->symbol_name($symbol_id);
     return ($text =~ m/\s/xms) ? "<$text>" : $text;
 }
 
-sub Marpa::R2::Grammar::show_symbol {
+sub Marpa::R3::Grammar::show_symbol {
     my ( $grammar, $symbol ) = @_;
-    my $grammar_c = $grammar->[Marpa::R2::Internal::Grammar::C];
+    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
     my $text      = q{};
-    my $symbol_id = $symbol->[Marpa::R2::Internal::Symbol::ID];
+    my $symbol_id = $symbol->[Marpa::R3::Internal::Symbol::ID];
 
     my $name = $grammar->symbol_name($symbol_id);
     $text .= "$symbol_id: $name";
@@ -912,112 +855,112 @@ sub Marpa::R2::Grammar::show_symbol {
     $text .= "\n";
     return $text;
 
-} ## end sub Marpa::R2::Grammar::show_symbol
+} ## end sub Marpa::R3::Grammar::show_symbol
 
-sub Marpa::R2::Grammar::show_symbols {
+sub Marpa::R3::Grammar::show_symbols {
     my ($grammar) = @_;
-    my $symbols   = $grammar->[Marpa::R2::Internal::Grammar::SYMBOLS];
+    my $symbols   = $grammar->[Marpa::R3::Internal::Grammar::SYMBOLS];
     my $text      = q{};
     for my $symbol_ref ( @{$symbols} ) {
         $text .= $grammar->show_symbol($symbol_ref);
     }
     return $text;
-} ## end sub Marpa::R2::Grammar::show_symbols
+} ## end sub Marpa::R3::Grammar::show_symbols
 
-sub Marpa::R2::Grammar::show_nulling_symbols {
+sub Marpa::R3::Grammar::show_nulling_symbols {
     my ($grammar) = @_;
-    my $grammar_c = $grammar->[Marpa::R2::Internal::Grammar::C];
-    my $symbols   = $grammar->[Marpa::R2::Internal::Grammar::SYMBOLS];
+    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
+    my $symbols   = $grammar->[Marpa::R3::Internal::Grammar::SYMBOLS];
     return join q{ }, sort map { $grammar->symbol_name($_) }
         grep { $grammar_c->symbol_is_nulling($_) } ( 0 .. $#{$symbols} );
-} ## end sub Marpa::R2::Grammar::show_nulling_symbols
+} ## end sub Marpa::R3::Grammar::show_nulling_symbols
 
-sub Marpa::R2::Grammar::show_productive_symbols {
+sub Marpa::R3::Grammar::show_productive_symbols {
     my ($grammar) = @_;
-    my $grammar_c = $grammar->[Marpa::R2::Internal::Grammar::C];
-    my $symbols   = $grammar->[Marpa::R2::Internal::Grammar::SYMBOLS];
+    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
+    my $symbols   = $grammar->[Marpa::R3::Internal::Grammar::SYMBOLS];
     return join q{ }, sort map { $grammar->symbol_name($_) }
         grep { $grammar_c->symbol_is_productive($_) } ( 0 .. $#{$symbols} );
-} ## end sub Marpa::R2::Grammar::show_productive_symbols
+} ## end sub Marpa::R3::Grammar::show_productive_symbols
 
-sub Marpa::R2::Grammar::show_accessible_symbols {
+sub Marpa::R3::Grammar::show_accessible_symbols {
     my ($grammar) = @_;
-    my $grammar_c = $grammar->[Marpa::R2::Internal::Grammar::C];
-    my $symbols   = $grammar->[Marpa::R2::Internal::Grammar::SYMBOLS];
+    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
+    my $symbols   = $grammar->[Marpa::R3::Internal::Grammar::SYMBOLS];
     return join q{ }, sort map { $grammar->symbol_name($_) }
         grep { $grammar_c->symbol_is_accessible($_) } ( 0 .. $#{$symbols} );
-} ## end sub Marpa::R2::Grammar::show_accessible_symbols
+} ## end sub Marpa::R3::Grammar::show_accessible_symbols
 
-sub Marpa::R2::Grammar::inaccessible_symbols {
+sub Marpa::R3::Grammar::inaccessible_symbols {
     my ($grammar) = @_;
-    my $grammar_c = $grammar->[Marpa::R2::Internal::Grammar::C];
-    my $symbols   = $grammar->[Marpa::R2::Internal::Grammar::SYMBOLS];
+    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
+    my $symbols   = $grammar->[Marpa::R3::Internal::Grammar::SYMBOLS];
     return [
         sort map { $grammar->symbol_name($_) }
             grep { !$grammar_c->symbol_is_accessible($_) }
             ( 0 .. $#{$symbols} )
     ];
-} ## end sub Marpa::R2::Grammar::inaccessible_symbols
+} ## end sub Marpa::R3::Grammar::inaccessible_symbols
 
-sub Marpa::R2::Grammar::unproductive_symbols {
+sub Marpa::R3::Grammar::unproductive_symbols {
     my ($grammar) = @_;
-    my $grammar_c = $grammar->[Marpa::R2::Internal::Grammar::C];
-    my $symbols   = $grammar->[Marpa::R2::Internal::Grammar::SYMBOLS];
+    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
+    my $symbols   = $grammar->[Marpa::R3::Internal::Grammar::SYMBOLS];
     return [
         sort map { $grammar->symbol_name($_) }
             grep { !$grammar_c->symbol_is_productive($_) }
             ( 0 .. $#{$symbols} )
     ];
-} ## end sub Marpa::R2::Grammar::unproductive_symbols
+} ## end sub Marpa::R3::Grammar::unproductive_symbols
 
-sub Marpa::R2::Grammar::start_symbol {
+sub Marpa::R3::Grammar::start_symbol {
     my ( $grammar ) = @_;
-    my $grammar_c = $grammar->[Marpa::R2::Internal::Grammar::C];
+    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
     return $grammar_c->start_symbol();
 }
 
-sub Marpa::R2::Grammar::rule_name {
+sub Marpa::R3::Grammar::rule_name {
     my ( $grammar, $rule_id ) = @_;
-    my $rules = $grammar->[Marpa::R2::Internal::Grammar::RULES];
+    my $rules = $grammar->[Marpa::R3::Internal::Grammar::RULES];
     my $rule  = $rules->[$rule_id];
     return "Non-existent rule $rule_id" if not defined $rule;
-    my $name = $rule->[Marpa::R2::Internal::Rule::NAME];
+    my $name = $rule->[Marpa::R3::Internal::Rule::NAME];
     return $name if defined $name;
-    my $tracer    = $grammar->[Marpa::R2::Internal::Grammar::TRACER];
+    my $tracer    = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
     my ( $lhs_id ) = $tracer->rule_expand($rule_id);
     return $grammar->symbol_name($lhs_id);
-} ## end sub Marpa::R2::Grammar::rule_name
+} ## end sub Marpa::R3::Grammar::rule_name
 
 # Undocumented -- assumes it is called internally,
 # by the SLIF
-sub Marpa::R2::Grammar::tag {
+sub Marpa::R3::Grammar::tag {
     my ( $grammar, $rule_id ) = @_;
-    my $rules = $grammar->[Marpa::R2::Internal::Grammar::RULES];
+    my $rules = $grammar->[Marpa::R3::Internal::Grammar::RULES];
     my $rule  = $rules->[$rule_id];
-    return $rule->[Marpa::R2::Internal::Rule::SLIF_TAG];
-} ## end sub Marpa::R2::Grammar::rule_name
+    return $rule->[Marpa::R3::Internal::Rule::SLIF_TAG];
+} ## end sub Marpa::R3::Grammar::rule_name
 
-sub Marpa::R2::Grammar::brief_rule {
+sub Marpa::R3::Grammar::brief_rule {
     my ( $grammar, $rule_id ) = @_;
-    my $grammar_c = $grammar->[Marpa::R2::Internal::Grammar::C];
+    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
     my ( $lhs, @rhs ) = $grammar->rule($rule_id);
     my $minimum = $grammar_c->sequence_min($rule_id);
     my $quantifier = defined $minimum ? $minimum <= 0 ? q{*} : q{+} : q{};
     return ( join q{ }, "$rule_id:", $lhs, '->', @rhs ) . $quantifier;
-} ## end sub Marpa::R2::Grammar::brief_rule
+} ## end sub Marpa::R3::Grammar::brief_rule
 
-sub Marpa::R2::Grammar::show_rule {
+sub Marpa::R3::Grammar::show_rule {
     my ( $grammar, $rule ) = @_;
 
-    my $grammar_c = $grammar->[Marpa::R2::Internal::Grammar::C];
-    my $rule_id   = $rule->[Marpa::R2::Internal::Rule::ID];
+    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
+    my $rule_id   = $rule->[Marpa::R3::Internal::Rule::ID];
     my @comment   = ();
 
     $grammar_c->rule_length($rule_id) == 0 and push @comment, 'empty';
     $grammar->rule_is_used($rule_id)         or push @comment, '!used';
     $grammar_c->rule_is_productive($rule_id) or push @comment, 'unproductive';
     $grammar_c->rule_is_accessible($rule_id) or push @comment, 'inaccessible';
-    $rule->[Marpa::R2::Internal::Rule::DISCARD_SEPARATION]
+    $rule->[Marpa::R3::Internal::Rule::DISCARD_SEPARATION]
         and push @comment, 'discard_sep';
 
     my $text = $grammar->brief_rule($rule_id);
@@ -1030,73 +973,73 @@ sub Marpa::R2::Grammar::show_rule {
 
 }    # sub show_rule
 
-sub Marpa::R2::Grammar::show_rules {
+sub Marpa::R3::Grammar::show_rules {
     my ($grammar) = @_;
-    my $rules = $grammar->[Marpa::R2::Internal::Grammar::RULES];
+    my $rules = $grammar->[Marpa::R3::Internal::Grammar::RULES];
     my $text;
 
     for my $rule ( @{$rules} ) {
         $text .= $grammar->show_rule($rule);
     }
     return $text;
-} ## end sub Marpa::R2::Grammar::show_rules
+} ## end sub Marpa::R3::Grammar::show_rules
 
 # This logic deals with gaps in the rule numbering.
 # Currently there are none, but Libmarpa does not
 # guarantee this.
-sub Marpa::R2::Grammar::rule_ids {
+sub Marpa::R3::Grammar::rule_ids {
     my ($grammar) = @_;
-    my $grammar_c = $grammar->[Marpa::R2::Internal::Grammar::C];
+    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
     return 0 .. $grammar_c->highest_rule_id();
-} ## end sub Marpa::R2::Grammar::rule_ids
+} ## end sub Marpa::R3::Grammar::rule_ids
 
 # This logic deals with gaps in the symbol numbering.
 # Currently there are none, but Libmarpa does not
 # guarantee this.
-sub Marpa::R2::Grammar::symbol_ids {
+sub Marpa::R3::Grammar::symbol_ids {
     my ($grammar) = @_;
-    my $grammar_c = $grammar->[Marpa::R2::Internal::Grammar::C];
+    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
     return 0 .. $grammar_c->highest_symbol_id();
-} ## end sub Marpa::R2::Grammar::rule_ids
+} ## end sub Marpa::R3::Grammar::rule_ids
 
 # Returns empty array if not such rule
-sub Marpa::R2::Grammar::rule {
+sub Marpa::R3::Grammar::rule {
     my ( $grammar, $rule_id ) = @_;
-    my $symbols     = $grammar->[Marpa::R2::Internal::Grammar::SYMBOLS];
-    my $tracer    = $grammar->[Marpa::R2::Internal::Grammar::TRACER];
+    my $symbols     = $grammar->[Marpa::R3::Internal::Grammar::SYMBOLS];
+    my $tracer    = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
     my @symbol_names = ();
 
     my @symbols = $tracer->rule_expand($rule_id);
     SYMBOL_ID: for my $symbol_id (@symbols) {
         ## The name of the symbols, before the BNF rewrites
         my $name =
-            $symbols->[$symbol_id]->[Marpa::R2::Internal::Symbol::LEGACY_NAME]
+            $symbols->[$symbol_id]->[Marpa::R3::Internal::Symbol::LEGACY_NAME]
             // $grammar->symbol_name($symbol_id);
         push @symbol_names, $name;
     } ## end SYMBOL_ID: for my $symbol_id (@symbol_ids)
     return @symbol_names;
-} ## end sub Marpa::R2::Grammar::rule
+} ## end sub Marpa::R3::Grammar::rule
 
 # Internal, for use with in coordinating thin and thick
 # interfaces.  NOT DOCUMENTED.
-sub Marpa::R2::Grammar::_rule_mask {
+sub Marpa::R3::Grammar::_rule_mask {
     my ( $grammar, $rule_id ) = @_;
-    my $rules = $grammar->[Marpa::R2::Internal::Grammar::RULES];
+    my $rules = $grammar->[Marpa::R3::Internal::Grammar::RULES];
     my $rule = $rules->[$rule_id];
-    return $rule->[Marpa::R2::Internal::Rule::MASK];
-} ## end sub Marpa::R2::Grammar::rule
+    return $rule->[Marpa::R3::Internal::Rule::MASK];
+} ## end sub Marpa::R3::Grammar::rule
 
 # Deprecated and for removal
 # Used in blog post, and part of
 # CPAN version 2.023_008 but
 # never documented in any CPAN version
-sub Marpa::R2::Grammar::bnf_rule {
-    goto &Marpa::R2::Grammar::rule;
-} ## end sub Marpa::R2::Grammar::bnf_rule
+sub Marpa::R3::Grammar::bnf_rule {
+    goto &Marpa::R3::Grammar::rule;
+} ## end sub Marpa::R3::Grammar::bnf_rule
 
-sub Marpa::R2::Grammar::show_dotted_rule {
+sub Marpa::R3::Grammar::show_dotted_rule {
     my ( $grammar, $rule_id, $dot_position ) = @_;
-    my $grammar_c = $grammar->[Marpa::R2::Internal::Grammar::C];
+    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
     my ( $lhs, @rhs ) = $grammar->rule($rule_id);
 
     my $minimum = $grammar_c->sequence_min($rule_id);
@@ -1107,54 +1050,54 @@ sub Marpa::R2::Grammar::show_dotted_rule {
     $dot_position = 0 if $dot_position < 0;
     splice @rhs, $dot_position, 0, q{.};
     return join q{ }, $lhs, q{->}, @rhs;
-} ## end sub Marpa::R2::Grammar::show_dotted_rule
+} ## end sub Marpa::R3::Grammar::show_dotted_rule
 
 # Used by lexers to check that symbol is a terminal
-sub Marpa::R2::Grammar::check_terminal {
+sub Marpa::R3::Grammar::check_terminal {
     my ( $grammar, $name ) = @_;
     return 0 if not defined $name;
-    my $grammar_c = $grammar->[Marpa::R2::Internal::Grammar::C];
+    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
     my $symbol_id =
-        $grammar->[Marpa::R2::Internal::Grammar::TRACER]
+        $grammar->[Marpa::R3::Internal::Grammar::TRACER]
         ->symbol_by_name($name);
     return 0 if not defined $symbol_id;
-    my $symbols = $grammar->[Marpa::R2::Internal::Grammar::SYMBOLS];
+    my $symbols = $grammar->[Marpa::R3::Internal::Grammar::SYMBOLS];
     my $symbol  = $symbols->[$symbol_id];
     return $grammar_c->symbol_is_terminal($symbol_id) ? 1 : 0;
-} ## end sub Marpa::R2::Grammar::check_terminal
+} ## end sub Marpa::R3::Grammar::check_terminal
 
-sub Marpa::R2::Grammar::symbol_name {
+sub Marpa::R3::Grammar::symbol_name {
     my ( $grammar, $id ) = @_;
     my $symbol_name =
-        $grammar->[Marpa::R2::Internal::Grammar::TRACER]->symbol_name($id);
+        $grammar->[Marpa::R3::Internal::Grammar::TRACER]->symbol_name($id);
     return defined $symbol_name ? $symbol_name : '[SYMBOL#' . $id . ']';
-} ## end sub Marpa::R2::Grammar::symbol_name
+} ## end sub Marpa::R3::Grammar::symbol_name
 
 sub shadow_symbol {
     my ( $grammar, $symbol_id ) = @_;
-    my $symbols = $grammar->[Marpa::R2::Internal::Grammar::SYMBOLS];
+    my $symbols = $grammar->[Marpa::R3::Internal::Grammar::SYMBOLS];
     my $symbol = $symbols->[$symbol_id] = [];
-    $symbol->[Marpa::R2::Internal::Symbol::ID] = $symbol_id;
+    $symbol->[Marpa::R3::Internal::Symbol::ID] = $symbol_id;
     return $symbol;
 } ## end sub shadow_symbol
 
 # Create the structure which "shadows" the libmarpa rule
 sub shadow_rule {
     my ( $grammar, $rule_id ) = @_;
-    my $rules = $grammar->[Marpa::R2::Internal::Grammar::RULES];
+    my $rules = $grammar->[Marpa::R3::Internal::Grammar::RULES];
     my $new_rule = $rules->[$rule_id] = [];
-    $new_rule->[Marpa::R2::Internal::Rule::ID] = $rule_id;
+    $new_rule->[Marpa::R3::Internal::Rule::ID] = $rule_id;
     return $new_rule;
 } ## end sub shadow_rule
 
 sub assign_symbol {
     my ( $grammar, $name, $options ) = @_;
 
-    my $grammar_c = $grammar->[Marpa::R2::Internal::Grammar::C];
-    my $tracer    = $grammar->[Marpa::R2::Internal::Grammar::TRACER];
+    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
+    my $tracer    = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
     my $symbol_id = $tracer->symbol_by_name($name);
     if ( defined $symbol_id ) {
-        my $symbols = $grammar->[Marpa::R2::Internal::Grammar::SYMBOLS];
+        my $symbols = $grammar->[Marpa::R3::Internal::Grammar::SYMBOLS];
         return $symbols->[$symbol_id];
     }
     $symbol_id = $tracer->symbol_new($name);
@@ -1163,12 +1106,12 @@ sub assign_symbol {
     PROPERTY: for my $property ( sort keys %{$options} ) {
         if ( $property eq 'semantics' ) {
             my $value = $options->{$property};
-            $symbol->[Marpa::R2::Internal::Symbol::LEXEME_SEMANTICS] = $value;
+            $symbol->[Marpa::R3::Internal::Symbol::LEXEME_SEMANTICS] = $value;
             next PROPERTY;
         }
         if ( $property eq 'bless' ) {
             my $value = $options->{$property};
-            $symbol->[Marpa::R2::Internal::Symbol::BLESSING] = $value;
+            $symbol->[Marpa::R3::Internal::Symbol::BLESSING] = $value;
             next PROPERTY;
         }
         if ( $property eq 'terminal' ) {
@@ -1178,7 +1121,7 @@ sub assign_symbol {
         }
         if ( $property eq 'rank' ) {
             my $value = $options->{$property};
-            Marpa::R2::exception(qq{Symbol "$name": rank must be an integer})
+            Marpa::R3::exception(qq{Symbol "$name": rank must be an integer})
                 if not Scalar::Util::looks_like_number($value)
                     or int($value) != $value;
             $grammar_c->symbol_rank_set($symbol_id) = $value;
@@ -1186,30 +1129,30 @@ sub assign_symbol {
         } ## end if ( $property eq 'rank' )
         if ( $property eq 'description' ) {
             my $value = $options->{$property};
-            $symbol->[Marpa::R2::Internal::Symbol::DESCRIPTION] = $value;
+            $symbol->[Marpa::R3::Internal::Symbol::DESCRIPTION] = $value;
             next PROPERTY;
         }
         if ( $property eq 'dsl_form' ) {
             my $value = $options->{$property};
-            $symbol->[Marpa::R2::Internal::Symbol::DSL_FORM] = $value;
+            $symbol->[Marpa::R3::Internal::Symbol::DSL_FORM] = $value;
             next PROPERTY;
         }
         if ( $property eq 'legacy_name' ) {
             my $value = $options->{$property};
-            $symbol->[Marpa::R2::Internal::Symbol::LEGACY_NAME] = $value;
+            $symbol->[Marpa::R3::Internal::Symbol::LEGACY_NAME] = $value;
             next PROPERTY;
         }
         if ( $property eq 'display_form' ) {
             my $value = $options->{$property};
-            $symbol->[Marpa::R2::Internal::Symbol::DISPLAY_FORM] = $value;
+            $symbol->[Marpa::R3::Internal::Symbol::DISPLAY_FORM] = $value;
             next PROPERTY;
         }
         if ( $property eq 'if_inaccessible' ) {
             my $value = $options->{$property};
-            $symbol->[Marpa::R2::Internal::Symbol::IF_INACCESSIBLE] = $value;
+            $symbol->[Marpa::R3::Internal::Symbol::IF_INACCESSIBLE] = $value;
             next PROPERTY;
         }
-        Marpa::R2::exception(qq{Unknown symbol property "$property"});
+        Marpa::R3::exception(qq{Unknown symbol property "$property"});
     } ## end PROPERTY: for my $property ( keys %{$options} )
 
     return $symbol;
@@ -1220,20 +1163,20 @@ sub assign_user_symbol {
     my $grammar   = shift;
     my $name      = shift;
     my $options   = shift;
-    my $grammar_c = $grammar->[Marpa::R2::Internal::Grammar::C];
+    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
 
     if ( my $type = ref $name ) {
-        Marpa::R2::exception(
+        Marpa::R3::exception(
             "Symbol name was ref to $type; it must be a scalar string");
     }
-    if ( not $grammar->[Marpa::R2::Internal::Grammar::INTERNAL] ) {
+    if ( not $grammar->[Marpa::R3::Internal::Grammar::INTERNAL] ) {
         my $final_symbol = substr $name, -1;
         if ( $DEFAULT_SYMBOLS_RESERVED{$final_symbol} ) {
-            Marpa::R2::exception(
+            Marpa::R3::exception(
                 qq{Symbol name $name ends in "$final_symbol": that's not allowed}
             );
         }
-    } ## end if ( not $grammar->[Marpa::R2::Internal::Grammar::INTERNAL...])
+    } ## end if ( not $grammar->[Marpa::R3::Internal::Grammar::INTERNAL...])
     my $symbol = assign_symbol( $grammar, $name, $options );
 
     return $symbol;
@@ -1257,7 +1200,7 @@ sub add_user_rules {
             my $arg_count = @{$rule};
 
             if ( $arg_count > 4 or $arg_count < 1 ) {
-                Marpa::R2::exception(
+                Marpa::R3::exception(
                     "Rule has $arg_count arguments: "
                         . join( ', ',
                         map { defined $_ ? $_ : 'undef' } @{$rule} )
@@ -1274,7 +1217,7 @@ sub add_user_rules {
                 };
             next RULE;
         } ## end if ( $ref_rule eq 'ARRAY' )
-        Marpa::R2::exception(
+        Marpa::R3::exception(
             'Invalid rule: ',
             Data::Dumper->new( [$rule], ['Invalid_Rule'] )->Indent(2)
                 ->Terse(1)->Maxdepth(2)->Dump,
@@ -1294,13 +1237,13 @@ sub add_user_rules {
 sub add_user_rule {
     my ( $grammar, $options ) = @_;
 
-    Marpa::R2::exception('Missing argument to add_user_rule')
+    Marpa::R3::exception('Missing argument to add_user_rule')
         if not defined $grammar
         or not defined $options;
 
-    my $grammar_c    = $grammar->[Marpa::R2::Internal::Grammar::C];
-    my $tracer       = $grammar->[Marpa::R2::Internal::Grammar::TRACER];
-    my $rules        = $grammar->[Marpa::R2::Internal::Grammar::RULES];
+    my $grammar_c    = $grammar->[Marpa::R3::Internal::Grammar::C];
+    my $tracer       = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $rules        = $grammar->[Marpa::R3::Internal::Grammar::RULES];
     my $default_rank = $grammar_c->default_rank();
 
     my ( $lhs_name, $rhs_names, $action, $blessing );
@@ -1339,18 +1282,14 @@ sub add_user_rule {
         if ( $option eq 'keep' ) { $keep_separation = $value; next OPTION }
         if ( $option eq 'mask' ) { $mask            = $value; next OPTION }
         if ( $option eq 'description' ) { $description = $value; next OPTION }
-        Marpa::R2::exception("Unknown user rule option: $option");
+        Marpa::R3::exception("Unknown user rule option: $option");
     } ## end OPTION: for my $option ( keys %{$options} )
 
     if ( defined $min and not Scalar::Util::looks_like_number($min) ) {
-        Marpa::R2::exception(
+        Marpa::R3::exception(
             q{"min" must be undefined or a valid Perl number});
     }
-    my $stuifzand_interface =
-        $grammar->[Marpa::R2::Internal::Grammar::INTERFACE] eq 'stuifzand';
-
-    my $grammar_is_internal = $stuifzand_interface
-        || $grammar->[Marpa::R2::Internal::Grammar::INTERNAL];
+    my $grammar_is_internal = $grammar->[Marpa::R3::Internal::Grammar::INTERNAL];
 
     my $lhs =
         $grammar_is_internal
@@ -1402,7 +1341,7 @@ sub add_user_rule {
                 . ( $problem_number + 1 ) . q{: }
                 . $rule_problems[$problem_number] . "\n";
         } ## end for my $problem_number ( 0 .. $#rule_problems )
-        Marpa::R2::exception($msg);
+        Marpa::R3::exception($msg);
     } ## end if ( scalar @rule_problems )
 
     my $rhs = [
@@ -1417,13 +1356,13 @@ sub add_user_rule {
     my $is_ordinary_rule = scalar @{$rhs_names} == 0 || !defined $min;
     if ( defined $separator_name and $is_ordinary_rule ) {
         if ( defined $separator_name ) {
-            Marpa::R2::exception(
+            Marpa::R3::exception(
                 'separator defined for rule without repetitions');
         }
     } ## end if ( defined $separator_name and $is_ordinary_rule )
 
-    my @rhs_ids = map { $_->[Marpa::R2::Internal::Symbol::ID] } @{$rhs};
-    my $lhs_id = $lhs->[Marpa::R2::Internal::Symbol::ID];
+    my @rhs_ids = map { $_->[Marpa::R3::Internal::Symbol::ID] } @{$rhs};
+    my $lhs_id = $lhs->[Marpa::R3::Internal::Symbol::ID];
 
     my $base_rule_id;
     my $separator_id = -1;
@@ -1437,7 +1376,7 @@ sub add_user_rule {
 
     } ## end if ($is_ordinary_rule)
     else {
-        Marpa::R2::exception('Only one rhs symbol allowed for counted rule')
+        Marpa::R3::exception('Only one rhs symbol allowed for counted rule')
             if scalar @{$rhs_names} != 1;
 
         # create the separator symbol, if we're using one
@@ -1446,7 +1385,7 @@ sub add_user_rule {
                 $grammar_is_internal
                 ? assign_symbol( $grammar, $separator_name )
                 : assign_user_symbol( $grammar, $separator_name );
-            $separator_id = $separator->[Marpa::R2::Internal::Symbol::ID];
+            $separator_id = $separator->[Marpa::R3::Internal::Symbol::ID];
         } ## end if ( defined $separator_name )
 
         $grammar_c->throw_set(0);
@@ -1472,10 +1411,10 @@ sub add_user_rule {
         my ( $error_code, $error_string ) = $grammar_c->error();
         $error_code //= -1;
         my $problem_description =
-            $error_code == $Marpa::R2::Error::DUPLICATE_RULE
+            $error_code == $Marpa::R3::Error::DUPLICATE_RULE
             ? 'Duplicate rule'
             : $error_string;
-        Marpa::R2::exception("$problem_description: $rule_description");
+        Marpa::R3::exception("$problem_description: $rule_description");
     } ## end if ( not defined $base_rule_id or $base_rule_id < 0 )
 
     my $base_rule = shadow_rule( $grammar, $base_rule_id );
@@ -1486,35 +1425,35 @@ sub add_user_rule {
         if ( not defined $mask or not $grammar_is_internal ) {
             $mask = [ (1) x scalar @rhs_ids ];
         }
-        $base_rule->[Marpa::R2::Internal::Rule::MASK] = $mask;
+        $base_rule->[Marpa::R3::Internal::Rule::MASK] = $mask;
     } ## end if ($is_ordinary_rule)
 
-    $base_rule->[Marpa::R2::Internal::Rule::DISCARD_SEPARATION] =
+    $base_rule->[Marpa::R3::Internal::Rule::DISCARD_SEPARATION] =
         $separator_id >= 0 && !$keep_separation;
 
-    $base_rule->[Marpa::R2::Internal::Rule::ACTION_NAME] = $action;
+    $base_rule->[Marpa::R3::Internal::Rule::ACTION_NAME] = $action;
     $grammar_c->rule_null_high_set( $base_rule_id,
         ( $null_ranking eq 'high' ? 1 : 0 ) );
     $grammar_c->rule_rank_set( $base_rule_id, $rank );
 
     if ( defined $rule_name ) {
-        $base_rule->[Marpa::R2::Internal::Rule::NAME] = $rule_name;
+        $base_rule->[Marpa::R3::Internal::Rule::NAME] = $rule_name;
     }
     if ( defined $slif_tag ) {
-        $base_rule->[Marpa::R2::Internal::Rule::SLIF_TAG] = $slif_tag;
+        $base_rule->[Marpa::R3::Internal::Rule::SLIF_TAG] = $slif_tag;
         my $rule_id_by_tag =
-            $grammar->[Marpa::R2::Internal::Grammar::RULE_ID_BY_TAG];
+            $grammar->[Marpa::R3::Internal::Grammar::RULE_ID_BY_TAG];
         if ( $rule_id_by_tag->{$slif_tag} ) {
-            Marpa::R2::exception(
+            Marpa::R3::exception(
                 qq{Duplicate tag in SLIF rule, tag was "$slif_tag"});
         }
         $rule_id_by_tag->{$slif_tag} = $base_rule_id;
     } ## end if ( defined $slif_tag )
     if ( defined $blessing ) {
-        $base_rule->[Marpa::R2::Internal::Rule::BLESSING] = $blessing;
+        $base_rule->[Marpa::R3::Internal::Rule::BLESSING] = $blessing;
     }
     if ( defined $description ) {
-        $base_rule->[Marpa::R2::Internal::Rule::DESCRIPTION] = $description;
+        $base_rule->[Marpa::R3::Internal::Rule::DESCRIPTION] = $description;
     }
 
     return;
@@ -1531,54 +1470,54 @@ sub rule_describe {
 sub set_start_symbol {
     my $grammar = shift;
 
-    my $grammar_c = $grammar->[Marpa::R2::Internal::Grammar::C];
+    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
     state $default_start_name = '[:start]';
-    my $tracer           = $grammar->[Marpa::R2::Internal::Grammar::TRACER];
+    my $tracer           = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
     my $default_start_id = $tracer->symbol_by_name($default_start_name);
     my $start_id;
     VALIDATE_START_NAME: {
         my $named_arg_start_name =
-            $grammar->[Marpa::R2::Internal::Grammar::START_NAME];
+            $grammar->[Marpa::R3::Internal::Grammar::START_NAME];
         if ( defined $named_arg_start_name and defined $start_id ) {
-            Marpa::R2::exception(
+            Marpa::R3::exception(
                 qq{Start symbol specified as '[:start]', but also with named argument\n},
                 qq{   You must use one or the other\n}
             );
         } ## end if ( defined $named_arg_start_name and defined $start_id)
         if ( defined $named_arg_start_name ) {
             $start_id = $tracer->symbol_by_name($named_arg_start_name);
-            Marpa::R2::exception(
+            Marpa::R3::exception(
                 qq{Start symbol "$named_arg_start_name" not in grammar})
                 if not defined $start_id;
             last VALIDATE_START_NAME;
         } ## end if ( defined $named_arg_start_name )
         if ( defined $default_start_id ) {
             $start_id = $default_start_id;
-            $grammar->[Marpa::R2::Internal::Grammar::START_NAME] =
+            $grammar->[Marpa::R3::Internal::Grammar::START_NAME] =
                 $named_arg_start_name;
             last VALIDATE_START_NAME;
         } ## end if ( defined $default_start_id )
-        Marpa::R2::exception(qq{No start symbol specified in grammar\n});
+        Marpa::R3::exception(qq{No start symbol specified in grammar\n});
     } ## end VALIDATE_START_NAME:
 
     if ( not defined $grammar_c->start_symbol_set($start_id) ) {
-        Marpa::R2::uncaught_error( $grammar_c->error() );
+        Marpa::R3::uncaught_error( $grammar_c->error() );
     }
     return 1;
 } ## end sub set_start_symbol
 
-sub Marpa::R2::Grammar::error {
+sub Marpa::R3::Grammar::error {
     my ($grammar) = @_;
-    my $grammar_c = $grammar->[Marpa::R2::Internal::Grammar::C];
+    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
     return $grammar_c->error();
 }
 
 # INTERNAL OK AFTER HERE _marpa_
 
-sub Marpa::R2::Grammar::show_isy {
+sub Marpa::R3::Grammar::show_isy {
     my ( $grammar, $isy_id ) = @_;
-    my $grammar_c = $grammar->[Marpa::R2::Internal::Grammar::C];
-    my $tracer    = $grammar->[Marpa::R2::Internal::Grammar::TRACER];
+    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
+    my $tracer    = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
     my $text      = q{};
 
     my $name = $tracer->isy_name($isy_id);
@@ -1593,22 +1532,22 @@ sub Marpa::R2::Grammar::show_isy {
 
     return $text;
 
-} ## end sub Marpa::R2::Grammar::show_isy
+} ## end sub Marpa::R3::Grammar::show_isy
 
-sub Marpa::R2::Grammar::show_isys {
+sub Marpa::R3::Grammar::show_isys {
     my ($grammar) = @_;
-    my $grammar_c = $grammar->[Marpa::R2::Internal::Grammar::C];
+    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
     my $text      = q{};
     for my $isy_id ( 0 .. $grammar_c->_marpa_g_nsy_count() - 1 ) {
         $text .= $grammar->show_isy($isy_id);
     }
     return $text;
-} ## end sub Marpa::R2::Grammar::show_isys
+} ## end sub Marpa::R3::Grammar::show_isys
 
-sub Marpa::R2::Grammar::brief_irl {
+sub Marpa::R3::Grammar::brief_irl {
     my ( $grammar, $irl_id ) = @_;
-    my $grammar_c = $grammar->[Marpa::R2::Internal::Grammar::C];
-    my $tracer    = $grammar->[Marpa::R2::Internal::Grammar::TRACER];
+    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
+    my $tracer    = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
     my $lhs_id    = $grammar_c->_marpa_g_irl_lhs($irl_id);
     my $text = $irl_id . ': ' . $tracer->isy_name($lhs_id) . ' ->';
     if ( my $rh_length = $grammar_c->_marpa_g_irl_length($irl_id) ) {
@@ -1619,27 +1558,27 @@ sub Marpa::R2::Grammar::brief_irl {
         $text .= q{ } . ( join q{ }, map { $tracer->isy_name($_) } @rhs_ids );
     } ## end if ( my $rh_length = $grammar_c->_marpa_g_irl_length...)
     return $text;
-} ## end sub Marpa::R2::Grammar::brief_irl
+} ## end sub Marpa::R3::Grammar::brief_irl
 
-sub Marpa::R2::Grammar::show_irls {
+sub Marpa::R3::Grammar::show_irls {
     my ($grammar) = @_;
-    my $grammar_c = $grammar->[Marpa::R2::Internal::Grammar::C];
+    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
     my $text      = q{};
     for my $irl_id ( 0 .. $grammar_c->_marpa_g_irl_count() - 1 ) {
         $text .= $grammar->brief_irl($irl_id) . "\n";
     }
     return $text;
-} ## end sub Marpa::R2::Grammar::show_irls
+} ## end sub Marpa::R3::Grammar::show_irls
 
-sub Marpa::R2::Grammar::rule_is_used {
+sub Marpa::R3::Grammar::rule_is_used {
     my ( $grammar, $rule_id ) = @_;
-    my $grammar_c = $grammar->[Marpa::R2::Internal::Grammar::C];
+    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
     return $grammar_c->_marpa_g_rule_is_used($rule_id);
 }
 
-sub Marpa::R2::Grammar::show_ahms {
+sub Marpa::R3::Grammar::show_ahms {
     my ( $grammar, $verbose ) = @_;
-    return $grammar->[Marpa::R2::Internal::Grammar::TRACER]
+    return $grammar->[Marpa::R3::Internal::Grammar::TRACER]
         ->show_ahms($verbose);
 }
 
