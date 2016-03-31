@@ -711,7 +711,7 @@ xs_g_error (G_Wrapper * g_wrapper)
 }
 
 /* Wrapper to use vwarn with libmarpa */
-static int marpa_r2_warn(const char* format, ...)
+static int marpa_r3_warn(const char* format, ...)
 {
   dTHX;
    va_list args;
@@ -2797,7 +2797,7 @@ PPCODE:
 {
   const int old_level = marpa_debug_level_set (new_level);
   if (old_level || new_level)
-    marpa_r2_warn ("libmarpa debug level set to %d, was %d", new_level,
+    marpa_r3_warn ("libmarpa debug level set to %d, was %d", new_level,
 		   old_level);
   XSRETURN_YES;
 }
@@ -7071,6 +7071,6 @@ PPCODE:
 INCLUDE: general_pattern.xsh
 
 BOOT:
-    marpa_debug_handler_set(marpa_r2_warn);
+    marpa_debug_handler_set(marpa_r3_warn);
 
     /* vim: set expandtab shiftwidth=2: */

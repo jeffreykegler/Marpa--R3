@@ -1,17 +1,17 @@
 #!perl
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2106 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
 use 5.010;
@@ -129,19 +129,19 @@ sub gp_generate {
 } ## end sub gp_generate
 
 print ${out} <<'END_OF_PREAMBLE';
- # Copyright 2015 Jeffrey Kegler
- # This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+ # Copyright 2016 Jeffrey Kegler
+ # This file is part of Marpa::R3.  Marpa::R3 is free software: you can
  # redistribute it and/or modify it under the terms of the GNU Lesser
  # General Public License as published by the Free Software Foundation,
  # either version 3 of the License, or (at your option) any later version.
  #
- # Marpa::R2 is distributed in the hope that it will be useful,
+ # Marpa::R3 is distributed in the hope that it will be useful,
  # but WITHOUT ANY WARRANTY; without even the implied warranty of
  # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  # Lesser General Public License for more details.
  #
  # You should have received a copy of the GNU Lesser
- # General Public License along with Marpa::R2.  If not, see
+ # General Public License along with Marpa::R3.  If not, see
  # http://www.gnu.org/licenses/.
 
 END_OF_PREAMBLE
@@ -154,7 +154,7 @@ END_OF_PREAMBLE
 
 $main::CLASS_LETTER   = 'g';
 $main::LIBMARPA_CLASS = 'Marpa_Grammar';
-print {$out} 'MODULE = Marpa::R2        PACKAGE = Marpa::R2::Thin::G', "\n\n";
+print {$out} 'MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::G', "\n\n";
 
 say {$out} gp_generate(qw(completion_symbol_activate Marpa_Symbol_ID sym_id int activate));
 say {$out} gp_generate(qw(error_clear));
@@ -203,7 +203,7 @@ say {$out} gp_generate(qw(zwa_new int default_value));
 say {$out} gp_generate(qw(zwa_place Marpa_Assertion_ID zwaid Marpa_Rule_ID xrl_id int rhs_ix));
 $main::CLASS_LETTER   = 'r';
 $main::LIBMARPA_CLASS = 'Marpa_Recognizer';
-print {$out} 'MODULE = Marpa::R2        PACKAGE = Marpa::R2::Thin::R', "\n\n";
+print {$out} 'MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::R', "\n\n";
 
 say {$out} gp_generate(qw(completion_symbol_activate Marpa_Symbol_ID sym_id int reactivate));
 say {$out} gp_generate(qw(current_earleme));
@@ -227,14 +227,14 @@ say {$out} gp_generate(qw(zwa_default_set Marpa_Assertion_ID zwaid int default_v
 
 $main::CLASS_LETTER   = 'b';
 $main::LIBMARPA_CLASS = 'Marpa_Bocage';
-print {$out} 'MODULE = Marpa::R2        PACKAGE = Marpa::R2::Thin::B', "\n\n";
+print {$out} 'MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::B', "\n\n";
 
 say {$out} gp_generate(qw(ambiguity_metric));
 say {$out} gp_generate(qw(is_null));
 
 $main::CLASS_LETTER   = 'o';
 $main::LIBMARPA_CLASS = 'Marpa_Order';
-print {$out} 'MODULE = Marpa::R2        PACKAGE = Marpa::R2::Thin::O', "\n\n";
+print {$out} 'MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::O', "\n\n";
 
 say {$out} gp_generate(qw(ambiguity_metric));
 say {$out} gp_generate(qw(high_rank_only_set int flag));
@@ -244,14 +244,14 @@ say {$out} gp_generate(qw(rank));
 
 $main::CLASS_LETTER   = 't';
 $main::LIBMARPA_CLASS = 'Marpa_Tree';
-print {$out} 'MODULE = Marpa::R2        PACKAGE = Marpa::R2::Thin::T', "\n\n";
+print {$out} 'MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::T', "\n\n";
 
 say {$out} gp_generate(qw(next));
 say {$out} gp_generate(qw(parse_count));
 
 $main::CLASS_LETTER   = 'v';
 $main::LIBMARPA_CLASS = 'Marpa_Value';
-print {$out} 'MODULE = Marpa::R2        PACKAGE = Marpa::R2::Thin::V', "\n\n";
+print {$out} 'MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::V', "\n\n";
 
 say {$out} gp_generate(qw(valued_force));
 say {$out} gp_generate(qw(rule_is_valued_set Marpa_Rule_ID symbol_id int value));
@@ -259,7 +259,7 @@ say {$out} gp_generate(qw(symbol_is_valued_set Marpa_Symbol_ID symbol_id int val
 
 $main::CLASS_LETTER   = 'g';
 $main::LIBMARPA_CLASS = 'Marpa_Grammar';
-print {$out} 'MODULE = Marpa::R2        PACKAGE = Marpa::R2::Thin::G', "\n\n";
+print {$out} 'MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::G', "\n\n";
 
 say {$out} gp_generate(qw(_marpa_g_rule_is_keep_separation Marpa_Rule_ID rule_id));
 say {$out} gp_generate(qw(_marpa_g_irl_lhs Marpa_IRL_ID rule_id));
@@ -271,7 +271,7 @@ say {$out} gp_generate(qw(_marpa_g_nsy_is_semantic Marpa_NSY_ID nsy_id));
 
 $main::CLASS_LETTER   = 'b';
 $main::LIBMARPA_CLASS = 'Marpa_Bocage';
-print {$out} 'MODULE = Marpa::R2        PACKAGE = Marpa::R2::Thin::B', "\n\n";
+print {$out} 'MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::B', "\n\n";
 
 say {$out} gp_generate(qw(_marpa_b_and_node_cause Marpa_And_Node_ID ordinal));
 say {$out} gp_generate(qw(_marpa_b_and_node_count));
