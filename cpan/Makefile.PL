@@ -372,6 +372,7 @@ WriteMakefile(
     CONFIGURE_REQUIRES => \%configure_requires,
     PM                 => \%pm_files,
     # OBJECT => 'xs/R3.o',
+    TYPEMAPS => ['xs/typemap'],
     DIR => ['xs'],
     EXE_FILES          => [
         'html/script/marpa_r3_html_fmt',
