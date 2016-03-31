@@ -1,17 +1,17 @@
 #!perl
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2106 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
 # the example grammar in Aycock/Horspool "Practical Earley Parsing",
@@ -24,8 +24,8 @@ use warnings;
 
 use Test::More tests => 26;
 use lib 'inc';
-use Marpa::R2::Test;
-use Marpa::R2;
+use Marpa::R3::Test;
+use Marpa::R3;
 
 ## no critic (Subroutines::RequireArgUnpacking)
 
@@ -47,8 +47,8 @@ A ::=
 A ::= 'a'
 END_OF_DSL
 
-my $grammar = Marpa::R2::Scanless::G->new( {   source => \$dsl });
-my $recce = Marpa::R2::Scanless::R->new( {   grammar => $grammar });
+my $grammar = Marpa::R3::Scanless::G->new( {   source => \$dsl });
+my $recce = Marpa::R3::Scanless::R->new( {   grammar => $grammar });
 my $input_length = 4;
 my $input = ('a' x $input_length);
 $recce->read( \$input );
@@ -99,12 +99,12 @@ for my $i ( 0 .. $input_length ) {
     $recce->series_restart( { end => $i } );
     my $expected = $expected[$i];
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: Scanless ambiguity_metric() synopsis
 
     my $ambiguity_metric = $recce->ambiguity_metric();
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
     $ambiguity_metric = 2 if $ambiguity_metric > 2; # cap at 2 -- higher numbers not defined
     my $expected_metric = (scalar keys %{$expected} > 1 ? 2 : 1);
@@ -130,18 +130,18 @@ for my $i ( 0 .. $input_length ) {
     if ($ambiguity_metric > 1) {
 
         $recce->series_restart( { end => $i } );
-        my $asf = Marpa::R2::ASF->new( { slr => $recce } );
+        my $asf = Marpa::R3::ASF->new( { slr => $recce } );
         die 'No ASF' if not defined $asf;
-        my $ambiguities = Marpa::R2::Internal::ASF::ambiguities($asf);
+        my $ambiguities = Marpa::R3::Internal::ASF::ambiguities($asf);
 
         # Only report the first two
         my @ambiguities = grep {defined} @{$ambiguities}[ 0 .. 1 ];
 
         $ambiguity_desc =
-            Marpa::R2::Internal::ASF::ambiguities_show( $asf, \@ambiguities );
+            Marpa::R3::Internal::ASF::ambiguities_show( $asf, \@ambiguities );
     }
 
-    Marpa::R2::Test::is($ambiguity_desc, $ambiguity_expected[$i], "Ambiguity description for length $i");
+    Marpa::R3::Test::is($ambiguity_desc, $ambiguity_expected[$i], "Ambiguity description for length $i");
 
 } ## end for my $i ( 0 .. $input_length )
 

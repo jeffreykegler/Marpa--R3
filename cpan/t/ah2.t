@@ -1,17 +1,17 @@
 #!perl
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2106 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
 # the example grammar in Aycock/Horspool "Practical Earley Parsing",
@@ -24,8 +24,8 @@ use warnings;
 
 use Test::More tests => 25;
 use lib 'inc';
-use Marpa::R2::Test;
-use Marpa::R2;
+use Marpa::R3::Test;
+use Marpa::R3;
 
 ## no critic (Subroutines::RequireArgUnpacking)
 
@@ -39,7 +39,7 @@ sub default_action {
 
 ## use critic
 
-my $grammar = Marpa::R2::Grammar->new(
+my $grammar = Marpa::R3::Grammar->new(
     {   start => 'S',
         rules => [
             [ 'S', [qw/A A A A/] ],
@@ -55,14 +55,14 @@ $grammar->set( { terminals => ['a'], } );
 
 $grammar->precompute();
 
-Marpa::R2::Test::is( $grammar->show_rules, <<'EOS', 'Aycock/Horspool Rules' );
+Marpa::R3::Test::is( $grammar->show_rules, <<'EOS', 'Aycock/Horspool Rules' );
 0: S -> A A A A
 1: A -> a
 2: A -> E /* !used */
 3: E -> /* empty !used */
 EOS
 
-Marpa::R2::Test::is( $grammar->show_symbols,
+Marpa::R3::Test::is( $grammar->show_symbols,
     <<'EOS', 'Aycock/Horspool Symbols' );
 0: S
 1: A
@@ -70,7 +70,7 @@ Marpa::R2::Test::is( $grammar->show_symbols,
 3: E, nulling
 EOS
 
-Marpa::R2::Test::is( $grammar->show_isys,
+Marpa::R3::Test::is( $grammar->show_isys,
     <<'EOS', 'Aycock/Horspool ISYs' );
 0: S
 1: S[], nulling
@@ -83,7 +83,7 @@ Marpa::R2::Test::is( $grammar->show_isys,
 8: S[']
 EOS
 
-Marpa::R2::Test::is( $grammar->show_irls,
+Marpa::R3::Test::is( $grammar->show_irls,
     <<'EOS', 'Aycock/Horspool IRLs' );
 0: S -> A S[R0:1]
 1: S -> A A[] A[] A[]
@@ -98,23 +98,23 @@ Marpa::R2::Test::is( $grammar->show_irls,
 10: S['] -> S
 EOS
 
-Marpa::R2::Test::is(
+Marpa::R3::Test::is(
     $grammar->show_nulling_symbols,
     q{E},
     'Aycock/Horspool Nulling Symbols'
 );
-Marpa::R2::Test::is(
+Marpa::R3::Test::is(
     $grammar->show_productive_symbols,
     q{A E S a},
     'Aycock/Horspool Productive Symbols'
 );
-Marpa::R2::Test::is(
+Marpa::R3::Test::is(
     $grammar->show_accessible_symbols,
     q{A E S a},
     'Aycock/Horspool Accessible Symbols'
 );
 
-Marpa::R2::Test::is( $grammar->show_ahms(),
+Marpa::R3::Test::is( $grammar->show_ahms(),
     <<'EOS', 'Aycock/Horspool AHMs' );
 AHM 0: postdot = "A"
     S ::= . A S[R0:1]
@@ -168,7 +168,7 @@ AHM 24: completion
     S['] ::= S .
 EOS
 
-my $recce = Marpa::R2::Recognizer->new( { grammar => $grammar } );
+my $recce = Marpa::R3::Recognizer->new( { grammar => $grammar } );
 
 my $expected_earley_sets = <<'END_OF_SETS';
 Last Completed: 4; Furthest: 4
@@ -350,7 +350,7 @@ for (my $i = 0; $i < $input_length; $i++) {
     $recce->read( 'a', 'a' );
 }
 
-Marpa::R2::Test::is(
+Marpa::R3::Test::is(
     $recce->show_earley_sets(2),
     $expected_earley_sets,
     'Aycock/Horspool Earley sets'
