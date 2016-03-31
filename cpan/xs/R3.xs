@@ -1,17 +1,17 @@
 /*
- * Copyright 2015 Jeffrey Kegler
- * This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+ * Copyright 2016 Jeffrey Kegler
+ * This file is part of Marpa::R3.  Marpa::R3 is free software: you can
  * redistribute it and/or modify it under the terms of the GNU Lesser
  * General Public License as published by the Free Software Foundation,
  * either version 3 of the License, or (at your option) any later version.
  *
- * Marpa::R2 is distributed in the hope that it will be useful,
+ * Marpa::R3 is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser
- * General Public License along with Marpa::R2.  If not, see
+ * General Public License along with Marpa::R3.  If not, see
  * http://www.gnu.org/licenses/.
  */
 
@@ -595,14 +595,14 @@ typedef struct
 #define MARPA_XS_V_MODE_IS_RAW 1
 #define MARPA_XS_V_MODE_IS_STACK 2
 
-static const char grammar_c_class_name[] = "Marpa::R2::Thin::G";
-static const char recce_c_class_name[] = "Marpa::R2::Thin::R";
-static const char bocage_c_class_name[] = "Marpa::R2::Thin::B";
-static const char order_c_class_name[] = "Marpa::R2::Thin::O";
-static const char tree_c_class_name[] = "Marpa::R2::Thin::T";
-static const char value_c_class_name[] = "Marpa::R2::Thin::V";
-static const char scanless_g_class_name[] = "Marpa::R2::Thin::SLG";
-static const char scanless_r_class_name[] = "Marpa::R2::Thin::SLR";
+static const char grammar_c_class_name[] = "Marpa::R3::Thin::G";
+static const char recce_c_class_name[] = "Marpa::R3::Thin::R";
+static const char bocage_c_class_name[] = "Marpa::R3::Thin::B";
+static const char order_c_class_name[] = "Marpa::R3::Thin::O";
+static const char tree_c_class_name[] = "Marpa::R3::Thin::T";
+static const char value_c_class_name[] = "Marpa::R3::Thin::V";
+static const char scanless_g_class_name[] = "Marpa::R3::Thin::SLG";
+static const char scanless_r_class_name[] = "Marpa::R3::Thin::SLR";
 
 static const char *
 event_type_to_string (Marpa_Event_Type event_code)
@@ -2786,7 +2786,7 @@ slr_es_span_to_literal_sv (Scanless_R * slr,
 #define EXPECTED_LIBMARPA_MINOR 3
 #define EXPECTED_LIBMARPA_MICRO 0
 
-MODULE = Marpa::R2        PACKAGE = Marpa::R2::Thin
+MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin
 
 PROTOTYPES: DISABLE
 
@@ -2828,7 +2828,7 @@ PPCODE:
     {
       XSRETURN_IV ((IV) op_id);
     }
-  croak ("Problem with Marpa::R2::Thin->op('%s'): No such op", op_name);
+  croak ("Problem with Marpa::R3::Thin->op('%s'): No such op", op_name);
 }
 
  # This search is not optimized.  This list is short
@@ -2862,7 +2862,7 @@ PPCODE:
    XSRETURN_PV(tag);
 }
 
-MODULE = Marpa::R2        PACKAGE = Marpa::R2::Thin::G
+MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::G
 
 void
 new( ... )
@@ -2882,7 +2882,7 @@ PPCODE:
 	/* If we are using the (deprecated) interface 0,
 	 * get the throw setting from a (deprecated) global variable
 	 */
-	SV *throw_sv = get_sv ("Marpa::R2::Thin::C::THROW", 0);
+	SV *throw_sv = get_sv ("Marpa::R3::Thin::C::THROW", 0);
 	throw = throw_sv && SvTRUE (throw_sv);
       }
       break;
@@ -2976,7 +2976,7 @@ PPCODE:
 	  error_description = marpa_error_description[error_code].name;
 	}
       if (throw)
-	croak ("Problem in Marpa::R2->new(): %s", error_description);
+	croak ("Problem in Marpa::R3->new(): %s", error_description);
       if (GIMME != G_ARRAY)
 	{
 	  XSRETURN_UNDEF;
@@ -3340,7 +3340,7 @@ PPCODE:
   XPUSHs (sv_2mortal (newSVpv (error_message, 0)));
 }
 
-MODULE = Marpa::R2        PACKAGE = Marpa::R2::Thin::R
+MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::R
 
 void
 new( class, g_sv )
@@ -3354,10 +3354,10 @@ PPCODE:
   Marpa_Grammar g;
   PERL_UNUSED_ARG(class);
 
-  if (!sv_isa (g_sv, "Marpa::R2::Thin::G"))
+  if (!sv_isa (g_sv, "Marpa::R3::Thin::G"))
     {
       croak
-        ("Problem in Marpa::R2->new(): arg is not of type Marpa::R2::Thin::G");
+        ("Problem in Marpa::R3->new(): arg is not of type Marpa::R3::Thin::G");
     }
   SET_G_WRAPPER_FROM_G_SV (g_wrapper, g_sv);
   g = g_wrapper->g;
@@ -3483,7 +3483,7 @@ PPCODE:
   XPUSHs (sv_2mortal (newSViv (origin)));
 }
 
-MODULE = Marpa::R2        PACKAGE = Marpa::R2::Thin::B
+MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::B
 
 void
 new( class, r_wrapper, ordinal )
@@ -3527,7 +3527,7 @@ PPCODE:
     Safefree( b_wrapper );
 }
 
-MODULE = Marpa::R2        PACKAGE = Marpa::R2::Thin::O
+MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::O
 
 void
 new( class, b_wrapper )
@@ -3570,7 +3570,7 @@ PPCODE:
     Safefree( o_wrapper );
 }
 
-MODULE = Marpa::R2        PACKAGE = Marpa::R2::Thin::T
+MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::T
 
 void
 new( class, o_wrapper )
@@ -3613,7 +3613,7 @@ PPCODE:
     Safefree( t_wrapper );
 }
 
-MODULE = Marpa::R2        PACKAGE = Marpa::R2::Thin::V
+MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::V
 
 void
 new( class, t_wrapper )
@@ -4032,8 +4032,8 @@ PPCODE:
     }
   if (SvTAINTED(sv)) {
       croak
-        ("Problem in v->constant_register(): Attempt to register a tainted constant with Marpa::R2\n"
-        "Marpa::R2 is insecure for use with tainted data\n");
+        ("Problem in v->constant_register(): Attempt to register a tainted constant with Marpa::R3\n"
+        "Marpa::R3 is insecure for use with tainted data\n");
   }
 
   av_push (constants, SvREFCNT_inc_simple_NN (sv));
@@ -4220,7 +4220,7 @@ PPCODE:
   XSRETURN_EMPTY;
 }
 
-MODULE = Marpa::R2        PACKAGE = Marpa::R2::Thin::G
+MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::G
 
 void
 _marpa_g_nsy_is_nulling( g_wrapper, nsy_id )
@@ -4572,7 +4572,7 @@ PPCODE:
       XPUSHs (sv_2mortal (newSViv (result)));
 }
 
-MODULE = Marpa::R2        PACKAGE = Marpa::R2::Thin::R
+MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::R
 
 void
 _marpa_r_is_use_leo_set( r_wrapper, boolean )
@@ -4882,7 +4882,7 @@ PPCODE:
       XPUSHs (sv_2mortal (newSViv (leo_predecessor_symbol)));
     }
 
-MODULE = Marpa::R2        PACKAGE = Marpa::R2::Thin::B
+MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::B
 
  # Move of bocage modules to gp_generate.pl is now complete
 
@@ -4908,7 +4908,7 @@ PPCODE:
   XPUSHs (sv_2mortal (newSViv (value)));
 }
 
-MODULE = Marpa::R2        PACKAGE = Marpa::R2::Thin::O
+MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::O
 
 # int
 void
@@ -4964,7 +4964,7 @@ PPCODE:
     }
 }
 
-MODULE = Marpa::R2        PACKAGE = Marpa::R2::Thin::T
+MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::T
 
 # int
 void
@@ -5135,7 +5135,7 @@ PPCODE:
   XPUSHs (sv_2mortal (newSViv (result)));
 }
 
-MODULE = Marpa::R2        PACKAGE = Marpa::R2::Thin::V
+MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::V
 
 void
 _marpa_v_trace( v_wrapper, flag )
@@ -5176,7 +5176,7 @@ PPCODE:
   XPUSHs (sv_2mortal (newSViv (status)));
 }
 
-MODULE = Marpa::R2        PACKAGE = Marpa::R2::Thin::SLG
+MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::SLG
 
 void
 new( class, l0_sv, g1_sv )
@@ -5189,13 +5189,13 @@ PPCODE:
   Scanless_G *slg;
   PERL_UNUSED_ARG(class);
 
-  if (!sv_isa (l0_sv, "Marpa::R2::Thin::G"))
+  if (!sv_isa (l0_sv, "Marpa::R3::Thin::G"))
     {
-      croak ("Problem in u->new(): L0 arg is not of type Marpa::R2::Thin::G");
+      croak ("Problem in u->new(): L0 arg is not of type Marpa::R3::Thin::G");
     }
-  if (!sv_isa (g1_sv, "Marpa::R2::Thin::G"))
+  if (!sv_isa (g1_sv, "Marpa::R3::Thin::G"))
     {
-      croak ("Problem in u->new(): G1 arg is not of type Marpa::R2::Thin::G");
+      croak ("Problem in u->new(): G1 arg is not of type Marpa::R3::Thin::G");
     }
   Newx (slg, 1, Scanless_G);
 
@@ -5708,7 +5708,7 @@ PPCODE:
   XSRETURN_IV (1);
 }
 
-MODULE = Marpa::R2        PACKAGE = Marpa::R2::Thin::SLR
+MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::SLR
 
 void
 new( class, slg_sv, r1_sv )
@@ -5722,14 +5722,14 @@ PPCODE:
   Scanless_G *slg;
   PERL_UNUSED_ARG(class);
 
-  if (!sv_isa (slg_sv, "Marpa::R2::Thin::SLG"))
+  if (!sv_isa (slg_sv, "Marpa::R3::Thin::SLG"))
     {
       croak
-        ("Problem in u->new(): slg arg is not of type Marpa::R2::Thin::SLG");
+        ("Problem in u->new(): slg arg is not of type Marpa::R3::Thin::SLG");
     }
-  if (!sv_isa (r1_sv, "Marpa::R2::Thin::R"))
+  if (!sv_isa (r1_sv, "Marpa::R3::Thin::R"))
     {
-      croak ("Problem in u->new(): r1 arg is not of type Marpa::R2::Thin::R");
+      croak ("Problem in u->new(): r1 arg is not of type Marpa::R3::Thin::R");
     }
   Newx (slr, 1, Scanless_R);
 
@@ -6534,8 +6534,8 @@ PPCODE:
         /* Fail fast with a tainted input token value */
         if (SvTAINTED(token_value)) {
             croak
-              ("Problem in Marpa::R2: Attempt to use a tainted token value\n"
-              "Marpa::R2 is insecure for use with tainted data\n");
+              ("Problem in Marpa::R3: Attempt to use a tainted token value\n"
+              "Marpa::R3 is insecure for use with tainted data\n");
         }
         av_push (slr->token_values, newSVsv (token_value));
         token_ix = av_len (slr->token_values);
@@ -6543,7 +6543,7 @@ PPCODE:
       break;
     default:
       croak
-        ("Usage: Marpa::R2::Thin::SLR::g1_alternative(slr, symbol_id, [value])");
+        ("Usage: Marpa::R3::Thin::SLR::g1_alternative(slr, symbol_id, [value])");
     }
 
   result = marpa_r_alternative (slr->r1, symbol_id, token_ix, 1);
@@ -6840,8 +6840,8 @@ PPCODE:
   if (SvTAINTED (string))
     {
       croak
-	("Problem in v->string_set(): Attempt to use a tainted input string with Marpa::R2\n"
-	 "Marpa::R2 is insecure for use with tainted data\n");
+	("Problem in v->string_set(): Attempt to use a tainted input string with Marpa::R3\n"
+	 "Marpa::R3 is insecure for use with tainted data\n");
     }
 
   /* Get our own copy and coerce it to a PV.
