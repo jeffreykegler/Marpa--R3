@@ -1,17 +1,17 @@
 #!perl
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
 # Synopsis tests
@@ -27,8 +27,8 @@ use warnings;
 use Test::More tests => 10;
 use English qw( -no_match_vars );
 use lib 'inc';
-use Marpa::R2::Test;
-use Marpa::R2;
+use Marpa::R3::Test;
+use Marpa::R3;
 
 my $rules = <<'END_OF_GRAMMAR';
 :start ::= sequence
@@ -43,7 +43,7 @@ C ::= # empty
 D ::= 'd'
 D ::= # empty
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: SLIF predicted event statement synopsis
 
 event '^a' = predicted A
@@ -51,9 +51,9 @@ event '^b'=off = predicted B
 event '^c'=on = predicted C
 event '^d' = predicted D
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: SLIF completed event statement synopsis
 
 event 'a' = completed A
@@ -61,9 +61,9 @@ event 'b'=off = completed B
 event 'c'=on = completed C
 event 'd' = completed D
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: SLIF nulled event statement synopsis
 
 event '!a' = nulled A
@@ -71,7 +71,7 @@ event '!b'=off = nulled B
 event '!c'=on = nulled C
 event '!d' = nulled D
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
 END_OF_GRAMMAR
 
@@ -86,7 +86,7 @@ my $after_0_events = <<'END_OF_EVENTS';
 4 d
 END_OF_EVENTS
 
-my $grammar = Marpa::R2::Scanless::G->new( { source => \$rules } );
+my $grammar = Marpa::R3::Scanless::G->new( { source => \$rules } );
 
 my @events = map { ( '!' . $_, '^' . $_, $_ ) } qw(a b c d);
 
@@ -127,16 +127,16 @@ sub show_last_subtext {
 sub do_test {
     my ( $test, $slg, $string, $expected_events, $reactivate_events, $recce_args ) = @_;
     $recce_args //= {};
-    my $recce = Marpa::R2::Scanless::R->new(
+    my $recce = Marpa::R3::Scanless::R->new(
         { grammar => $grammar, semantics_package => 'My_Actions' }, $recce_args );
     if (defined $reactivate_events) {
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: SLIF activate() method synopsis
 
         $recce->activate($_, 0) for @events;
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
         $recce->activate($_) for @{$reactivate_events};
 
@@ -169,7 +169,7 @@ sub do_test {
         $actual_events .= "\n";
     }
     Test::More::is( $actual_value, q{1792}, qq{Value for $test} );
-    Marpa::R2::Test::is( $actual_events, $expected_events,
+    Marpa::R3::Test::is( $actual_events, $expected_events,
         qq{Events for $test} );
 } ## end sub do_test
 

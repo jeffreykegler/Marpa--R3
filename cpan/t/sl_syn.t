@@ -1,17 +1,17 @@
 #!perl
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
 # Synopsis for scannerless parsing, main POD page
@@ -23,13 +23,13 @@ use warnings;
 use Test::More tests => 21;
 use English qw( -no_match_vars );
 use lib 'inc';
-use Marpa::R2::Test;
-use Marpa::R2;
+use Marpa::R3::Test;
+use Marpa::R3;
 
-my $grammar = Marpa::R2::Scanless::G->new(
+my $grammar = Marpa::R3::Scanless::G->new(
     {
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: Scanless concept example
 
         source => \(<<'END_OF_SOURCE'),
@@ -41,7 +41,7 @@ digit ~ [0-9]
 whitespace ~ [\s]+
 END_OF_SOURCE
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
     }
 );
@@ -68,7 +68,7 @@ sub my_parser {
 
     my $parse_arg = bless { grammar => $grammar }, 'My_Actions';
 
-    my $recce = Marpa::R2::Scanless::R->new( { grammar => $grammar } );
+    my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
     $parse_arg->{recce} = $recce;
     my ( $parse_value, $parse_status, $sequence_so_far );
 

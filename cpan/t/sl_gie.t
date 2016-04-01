@@ -1,17 +1,17 @@
 #!/usr/bin/perl
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
 # Tests requiring a grammar, an input and the expected events --
@@ -24,11 +24,11 @@ use English qw( -no_match_vars );
 use Test::More tests => 8;
 
 use lib 'inc';
-use Marpa::R2::Test;
+use Marpa::R3::Test;
 
 ## no critic (ErrorHandling::RequireCarping);
 
-use Marpa::R2;
+use Marpa::R3;
 
 my $DEBUG = 0;
 my @tests_data = ();
@@ -65,7 +65,7 @@ EVENTS
 } ## end foreach ( qw/Script/, ( map {"digits$_"} ( 1 .. 2 ) ), ( ...))
 
 my $loc0_input = '    1 2';
-my $loc0_grammar = Marpa::R2::Scanless::G->new( { source  => \$loc0_dsl } );
+my $loc0_grammar = Marpa::R3::Scanless::G->new( { source  => \$loc0_dsl } );
 my $loc0_events = <<'END_OF_EXPECTED_EVENTS';
 ^Script ^digits1 null1[] null2[]
 ^digits2 digits1$ null3[] null4[]
@@ -90,7 +90,7 @@ DUP  ~ _S_ANY _S
 :discard ~ _S_MANY
 END_OF_DSL
     my $reject_dup_grammar =
-        Marpa::R2::Scanless::G->new( { source => \$reject_dup_dsl } );
+        Marpa::R3::Scanless::G->new( { source => \$reject_dup_dsl } );
     my $reject_dup_input = " x y\n\n";
     my $reject_dup_events = join "\n", 'DUP$', q{}, q{};
     push @tests_data,
@@ -103,7 +103,7 @@ END_OF_DSL
 {
     # Example for synopsis of discard events
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: SLIF discard event statement synopsis 2
 
     my $dsl = <<'END_OF_DSL';
@@ -121,10 +121,10 @@ ws ~ [\s]+
 
 END_OF_DSL
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
     my $grammar =
-        Marpa::R2::Scanless::G->new( { source => \$dsl } );
+        Marpa::R3::Scanless::G->new( { source => \$dsl } );
     my $input = "1,2; 3,42.  1729,8675309; 8675311,711.";
     my $events = $input;
     $events =~ s/ \s+ /!/gxms;
@@ -146,7 +146,7 @@ for my $default (qw(on off))
 {
     # Test of ':symbol' reserved event value
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: SLIF default discard event statement synopsis 1
 
     my $dsl = <<'END_OF_DSL';
@@ -168,9 +168,9 @@ END_OF_DSL
 
     $dsl =~ s/:symbol=on/:symbol=$default/xmsg;
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
-    my $grammar = Marpa::R2::Scanless::G->new( { source => \$dsl } );
+    my $grammar = Marpa::R3::Scanless::G->new( { source => \$dsl } );
     my $input   = "1,2; 3,42.  1729,8675309; 8675311,711.";
     my $events  = "\n";
     if ( $default eq 'on' ) {
@@ -208,7 +208,7 @@ period ~ [.]
 END_OF_DSL
 
     my $grammar =
-        Marpa::R2::Scanless::G->new( { source => \$dsl } );
+        Marpa::R3::Scanless::G->new( { source => \$dsl } );
     my $input = "1,2; 3,42.  1729,8675309; 8675311,711.";
     my $events = $input;
     $events =~ s/ \s+ /!/gxms;
@@ -244,7 +244,7 @@ ws ~ [\s]+
 END_OF_DSL
 
     my $grammar =
-        Marpa::R2::Scanless::G->new( { source => \$dsl } );
+        Marpa::R3::Scanless::G->new( { source => \$dsl } );
     my $input = "1,2; 3,42.  1729,8675309; 8675311,711.";
     my $events = $input;
     $events =~ s/ \s+ /!/gxms;
@@ -266,7 +266,7 @@ END_OF_DSL
     # Test of ':symbol' reserved event value
     # in discard default statement
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: SLIF default discard event statement synopsis 2
 
     my $dsl = <<'END_OF_DSL';
@@ -283,10 +283,10 @@ ws ~ [\s]+
 
 END_OF_DSL
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
     my $grammar =
-        Marpa::R2::Scanless::G->new( { source => \$dsl } );
+        Marpa::R3::Scanless::G->new( { source => \$dsl } );
     my $input = "1,2; 3,42.  1729,8675309; 8675311,711.";
     my $events = $input;
     $events =~ s/ \s+ /!/gxms;
@@ -308,7 +308,7 @@ TEST:
 for my $test_data (@tests_data) {
     my ( $grammar, $test_string, $expected_events, $test_name ) =
         @{$test_data};
-    my $recce = Marpa::R2::Scanless::R->new( { grammar => $grammar } );
+    my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
 
     my $pos           = -1;
     my $length        = length $test_string;

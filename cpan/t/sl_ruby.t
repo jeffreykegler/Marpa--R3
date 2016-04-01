@@ -1,23 +1,23 @@
 #!/usr/bin/env perl
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
 use 5.010;
 use strict;
 use warnings;
-use Marpa::R2 2.097_002;
+use Marpa::R3 2.097_002;
 use Data::Dumper;
 use Test::More tests => 3;
 use Getopt::Long ();
@@ -44,7 +44,7 @@ semi ~ ';'
 
 === GRAMMAR ===
 
-my $g = Marpa::R2::Scanless::G->new( { source => \($grammar) } );
+my $g = Marpa::R3::Scanless::G->new( { source => \($grammar) } );
 
 my @tests = (
     [ '1+2+3*4',                '15' ],
@@ -72,10 +72,10 @@ sub test {
     # state $recce_debug_args = { trace_terminals => 1, trace_values => 1 };
     state $recce_debug_args = {};
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: SLIF rejection recognizer setting synopsis
 
-    my $recce = Marpa::R2::Scanless::R->new(
+    my $recce = Marpa::R3::Scanless::R->new(
         {   grammar   => $g,
             rejection => 'event',
         },
@@ -105,7 +105,7 @@ sub test {
         $recce->resume( $pos, $original_length - $pos );
     } ## end READ_LOOP: while (1)
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
     my $ref_value = $recce->value();
     return 'No parse' if not $ref_value;

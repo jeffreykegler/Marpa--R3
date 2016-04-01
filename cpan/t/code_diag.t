@@ -1,17 +1,17 @@
 #!perl
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 # Ensure various coding errors are caught
 
@@ -22,10 +22,10 @@ use warnings;
 use Test::More tests => 7;
 
 use lib 'inc';
-use Marpa::R2::Test;
+use Marpa::R3::Test;
 use Fatal qw( open close );
 use English qw( -no_match_vars );
-use Marpa::R2;
+use Marpa::R3;
 
 our $DEFAULT_NULL_DESC = '[default null]';
 our $NULL_DESC         = '[null]';
@@ -105,7 +105,7 @@ Computing value for rule: 3: F -> F MultOp F
 Test Warning 1 at <LOCATION>
 * WARNING MESSAGE NUMBER 1:
 Test Warning 2 at <LOCATION>
-Marpa::R2 exception at <LOCATION>
+Marpa::R3 exception at <LOCATION>
 __END__
 
 | expected default_action run phase warning
@@ -118,7 +118,7 @@ Computing value for rule: 8: trailer -> Text
 Test Warning 1 at <LOCATION>
 * WARNING MESSAGE NUMBER 1:
 Test Warning 2 at <LOCATION>
-Marpa::R2 exception at <LOCATION>
+Marpa::R3 exception at <LOCATION>
 __END__
 
 | bad code run phase error
@@ -136,7 +136,7 @@ __END__
 Computing value for rule: 3: F -> F MultOp F
 * THIS WAS THE FATAL ERROR MESSAGE:
 Illegal division by zero at <LOCATION>
-Marpa::R2 exception at <LOCATION>
+Marpa::R3 exception at <LOCATION>
 __END__
 
 | expected default_action run phase error
@@ -146,7 +146,7 @@ __END__
 Computing value for rule: 8: trailer -> Text
 * THIS WAS THE FATAL ERROR MESSAGE:
 Illegal division by zero at <LOCATION>
-Marpa::R2 exception at <LOCATION>
+Marpa::R3 exception at <LOCATION>
 __END__
 
 | bad code run phase die
@@ -164,7 +164,7 @@ __END__
 Computing value for rule: 3: F -> F MultOp F
 * THIS WAS THE FATAL ERROR MESSAGE:
 test call to die at <LOCATION>
-Marpa::R2 exception at <LOCATION>
+Marpa::R3 exception at <LOCATION>
 __END__
 
 | expected default_action run phase die
@@ -174,7 +174,7 @@ __END__
 Computing value for rule: 8: trailer -> Text
 * THIS WAS THE FATAL ERROR MESSAGE:
 test call to die at <LOCATION>
-Marpa::R2 exception at <LOCATION>
+Marpa::R3 exception at <LOCATION>
 __END__
 
 END_OF_TEST_DATA
@@ -272,7 +272,7 @@ sub run_test {
     ### e_op_action: $e_op_action
     ### e_number_action: $e_number_action
 
-    my $grammar = Marpa::R2::Grammar->new(
+    my $grammar = Marpa::R3::Grammar->new(
         {   start => 'S',
             rules => [
                 [ 'S', [qw/T trailer optional_trailer1 optional_trailer2/], ],
@@ -292,7 +292,7 @@ sub run_test {
     );
     $grammar->precompute();
 
-    my $recce = Marpa::R2::Recognizer->new( { grammar => $grammar } );
+    my $recce = Marpa::R3::Recognizer->new( { grammar => $grammar } );
 
     $recce->read( Number => 2 );
     $recce->read( MultOp => q{*} );
@@ -308,7 +308,7 @@ sub run_test {
     my $expected  = '(((2*3)+(4*1))==10;trailer;[default null];[null])';
     my $value_ref = $recce->value();
     my $value     = $value_ref ? ${$value_ref} : 'No parse';
-    Marpa::R2::Test::is( $value, $expected, 'Ambiguous Equation Value' );
+    Marpa::R3::Test::is( $value, $expected, 'Ambiguous Equation Value' );
 
     return 1;
 
@@ -328,7 +328,7 @@ for my $test (@tests) {
         } ## end if ( eval { run_test( { $feature => $test_arg{$test}...})})
         else {
             my $eval_error = $EVAL_ERROR;
-            Marpa::R2::Test::is( canonical($eval_error),
+            Marpa::R3::Test::is( canonical($eval_error),
                 $expected{$test}{$feature}, $test_name );
         }
     } ## end FEATURE: for my $feature (@features)

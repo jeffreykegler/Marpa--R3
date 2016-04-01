@@ -1,17 +1,17 @@
 #!perl
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
 # Based on Github issue #254 -- constructor invoked
@@ -27,8 +27,8 @@ use warnings;
 use English qw( -no_match_vars );
 use Test::More tests => 12;
 use lib 'inc';
-use Marpa::R2::Test;
-use Marpa::R2;
+use Marpa::R3::Test;
+use Marpa::R3;
 use Data::Dumper;
 
 package Class_Actions;
@@ -60,7 +60,7 @@ sub do_A {
 package main;
 
 my $grammar =
-    Marpa::R2::Scanless::G->new( { source => \q(A ::= 'a' action => do_A) } );
+    Marpa::R3::Scanless::G->new( { source => \q(A ::= 'a' action => do_A) } );
 
 my @tests = ();
 for my $recce_arg_desc ( 'semantics_package', 'no semantics_package' ) {
@@ -122,7 +122,7 @@ for my $test_data (@tests) {
 sub my_parser {
     my ( $grammar, $recce_arg, $ppo ) = @_;
 
-    my $recce = Marpa::R2::Scanless::R->new( { grammar => $grammar }, $recce_arg );
+    my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar }, $recce_arg );
 
     if ( not defined eval { $recce->read( \'a' ); 1 } ) {
         # say $EVAL_ERROR

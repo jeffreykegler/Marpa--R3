@@ -1,17 +1,17 @@
 #!/usr/bin/perl
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
 # This example parses ambiguous English sentences.  The target annotation
@@ -49,13 +49,13 @@ use English qw( -no_match_vars );
 
 use Test::More tests => 1;
 use lib 'inc';
-use Marpa::R2::Test;
-use Marpa::R2;
+use Marpa::R3::Test;
+use Marpa::R3;
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: SLIF "time flies" DSL synopsis
 
-my $grammar = Marpa::R2::Scanless::G->new(
+my $grammar = Marpa::R3::Scanless::G->new(
     {   source => \(<<'END_OF_SOURCE'),
         
 :default     ::= action => [ name, values ]
@@ -93,7 +93,7 @@ END_OF_SOURCE
     }
 );
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
 my $expected = <<'EOS';
 (S 
@@ -131,7 +131,7 @@ my %s_tags = map { $_ => undef } qw{ NP VP PP period };
 my @actual = ();
 for my $sentence (split /\n/, $paragraph){
 
-    my $recce = Marpa::R2::Scanless::R->new( { grammar => $grammar  } );
+    my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar  } );
     $recce->read( \$sentence );
 
     while ( defined( my $value_ref = $recce->value() ) ) {
@@ -159,7 +159,7 @@ sub bracket   {
     return $bracketed;
 }
 
-Marpa::R2::Test::is( ( join "\n", @actual ) . "\n",
+Marpa::R3::Test::is( ( join "\n", @actual ) . "\n",
     $expected, 'Ambiguous English sentences' );
 
 1;    # In case used as "do" file

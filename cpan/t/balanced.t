@@ -1,17 +1,17 @@
 #!perl
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
 use 5.010;
@@ -22,8 +22,8 @@ use English qw( -no_match_vars );
 use List::Util qw(min);
 use Test::More tests => 7;
 use lib 'inc';
-use Marpa::R2::Test;
-use Marpa::R2;
+use Marpa::R3::Test;
+use Marpa::R3;
 
 sub find_match {
     my ($s) = @_;
@@ -53,7 +53,7 @@ sub find_match {
         ],
     };
 
-    my $grammar = Marpa::R2::Grammar->new($grammar_args);
+    my $grammar = Marpa::R3::Grammar->new($grammar_args);
 
     $grammar->precompute();
 
@@ -61,14 +61,14 @@ sub find_match {
         grep { ( $grammar->rule($_) )[0] eq 'first_balanced' }
         $grammar->rule_ids();
 
-    my $recce = Marpa::R2::Recognizer->new( { grammar => $grammar } );
+    my $recce = Marpa::R3::Recognizer->new( { grammar => $grammar } );
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: Recognizer expected_symbol_event_set() Synopsis
 
     $recce->expected_symbol_event_set( 'endmark', 1 );
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
     my $location      = 0;
     my $string_length = length $s;
@@ -146,8 +146,8 @@ for my $pos (
         $expected_end   = $pos + 40 + length $target;
     }
     my $expected = $expected_start . q{-} . $expected_end;
-    Marpa::R2::Test::is( find_match($test_string),
+    Marpa::R3::Test::is( find_match($test_string),
         $expected, "target at pos $pos" );
 } ## end for my $pos ( 0, 1, 2, -( 2 + length $target ), -( 1 ...))
 my $test_string = '(' x 20 . ')' x 20;
-Marpa::R2::Test::is( find_match($test_string), '0-40', 'Middle target' );
+Marpa::R3::Test::is( find_match($test_string), '0-40', 'Middle target' );

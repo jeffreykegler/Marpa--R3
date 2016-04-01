@@ -1,17 +1,17 @@
 #!/usr/bin/perl
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
 # This example parses ambiguous English sentences.  The target annotation
@@ -25,8 +25,8 @@ use English qw( -no_match_vars );
 
 use Test::More tests => 3;
 use lib 'inc';
-use Marpa::R2::Test;
-use Marpa::R2;
+use Marpa::R3::Test;
+use Marpa::R3;
 
 my $dsl = <<'END_OF_SOURCE';
 
@@ -57,7 +57,7 @@ VBZ ~ 'eats' | 'shoots' | 'leaves'
 
 END_OF_SOURCE
 
-my $grammar = Marpa::R2::Scanless::G->new(
+my $grammar = Marpa::R3::Scanless::G->new(
     { source => \$dsl } );
 
 my $full_expected = <<'END_OF_OUTPUT';
@@ -76,7 +76,7 @@ my $sentence = 'a panda eats shoots and leaves.';
 
 my @actual = ();
 
-my $recce = Marpa::R2::Scanless::R->new( {
+my $recce = Marpa::R3::Scanless::R->new( {
     grammar => $grammar,
     semantics_package => 'PennTags'
 } );
@@ -88,16 +88,16 @@ while ( defined( my $value_ref = $recce->value() ) ) {
     push @actual, $value;
 }
 
-Marpa::R2::Test::is( ( join "\n", sort @actual ) . "\n",
+Marpa::R3::Test::is( ( join "\n", sort @actual ) . "\n",
     $full_expected, 'Ambiguous English sentence using value()' );
 
-my $panda_grammar = Marpa::R2::Scanless::G->new(
+my $panda_grammar = Marpa::R3::Scanless::G->new(
     { source => \$dsl } );
-my $panda_recce = Marpa::R2::Scanless::R->new(
+my $panda_recce = Marpa::R3::Scanless::R->new(
     { grammar => $panda_grammar,
       semantics_package => 'PennTags' } );
 $panda_recce->read( \$sentence );
-my $asf = Marpa::R2::ASF->new( { slr=>$panda_recce } );
+my $asf = Marpa::R3::ASF->new( { slr=>$panda_recce } );
 my $full_result = $asf->traverse( {}, \&full_traverser );
 my $pruned_result = $asf->traverse( {}, \&pruning_traverser );
 
@@ -126,12 +126,12 @@ sub full_traverser {
         # to produce a new result list, we need to take a Cartesian
         # product of all the choices
 
-# Marpa::R2::Display::Start
+# Marpa::R3::Display::Start
 # name: ASF all_choices() traverser method example
 
         my @results = $glade->all_choices();
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
         # Special case for the start rule: just collapse one level of lists
         if ( $symbol_name eq '[:start]' ) {
@@ -174,7 +174,7 @@ sub full_traverser {
 } ## end sub full_traverser
 
 my $cooked_result =  join "\n", (sort @{$full_result}), q{};
-Marpa::R2::Test::is( $cooked_result, $full_expected,
+Marpa::R3::Test::is( $cooked_result, $full_expected,
     'Ambiguous English sentence using ASF' );
 
 sub pruning_traverser {
@@ -190,12 +190,12 @@ sub pruning_traverser {
         return $glade->literal(); # wrap for the closure call
     }
 
-# Marpa::R2::Display::Start
+# Marpa::R3::Display::Start
 # name: ASF rh_values() traverser method example
 
     my @return_value = $glade->rh_values();
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
     if ($symbol_name eq '[:start]'){
         # Special case for the start rule
@@ -215,7 +215,7 @@ my $pruned_expected = <<'END_OF_OUTPUT';
    (. .))
 END_OF_OUTPUT
 
-Marpa::R2::Test::is( $pruned_result, $pruned_expected,
+Marpa::R3::Test::is( $pruned_result, $pruned_expected,
     'Ambiguous English sentence using ASF: pruned' );
 
 sub PennTags::do_S  { "(S $_[1]\n   $_[2]\n   (. .))" }

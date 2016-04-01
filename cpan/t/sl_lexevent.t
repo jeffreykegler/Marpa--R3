@@ -1,17 +1,17 @@
 #!perl
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
 # Test of scannerless parsing -- named lexeme events
@@ -24,8 +24,8 @@ use warnings;
 use Test::More tests => 12;
 use English qw( -no_match_vars );
 use lib 'inc';
-use Marpa::R2::Test;
-use Marpa::R2;
+use Marpa::R3::Test;
+use Marpa::R3;
 
 my $base_rules = <<'END_OF_GRAMMAR';
 :start ::= sequence
@@ -36,7 +36,7 @@ b ~ 'b'
 c ~ 'c'
 d ~ 'd'
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: SLIF named lexeme event synopsis
 
 :lexeme ~ <a> pause => before event => 'before a'
@@ -44,7 +44,7 @@ d ~ 'd'
 :lexeme ~ <c> pause => before event => 'before c'=off
 :lexeme ~ <d> pause => after event => 'after d'
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
 END_OF_GRAMMAR
 
@@ -57,7 +57,7 @@ $rules =~ s/=off$//gxms;
 my $events_expected = <<'END_OF_EVENTS';
 END_OF_EVENTS
 
-my $grammar = Marpa::R2::Scanless::G->new( { source => \$rules } );
+my $grammar = Marpa::R3::Scanless::G->new( { source => \$rules } );
 
 my %base_expected_events;
 $base_expected_events{'all'} = <<'END_OF_EVENTS';
@@ -158,49 +158,49 @@ sub do_test {
     my $actual_value = ${$value_ref};
     Test::More::is( $actual_value, q{1792}, qq{Value for test "$test"} );
     my $expected_events = q{};
-    Marpa::R2::Test::is( $actual_events, $expected_events{$test},
+    Marpa::R3::Test::is( $actual_events, $expected_events{$test},
         qq{Events for test "$test"} );
 } ## end sub do_test
 
-my $slr = Marpa::R2::Scanless::R->new( { grammar => $grammar, semantics_package => 'My_Actions' } );
+my $slr = Marpa::R3::Scanless::R->new( { grammar => $grammar, semantics_package => 'My_Actions' } );
 do_test($slr, 'all');
-$slr = Marpa::R2::Scanless::R->new( { grammar => $grammar, semantics_package => 'My_Actions' } );
+$slr = Marpa::R3::Scanless::R->new( { grammar => $grammar, semantics_package => 'My_Actions' } );
 do_test($slr, 'once');
-$slr = Marpa::R2::Scanless::R->new( { grammar => $grammar, semantics_package => 'My_Actions' } );
+$slr = Marpa::R3::Scanless::R->new( { grammar => $grammar, semantics_package => 'My_Actions' } );
 do_test($slr, 'seq');
 
 # Once again, but with unnamed events
 $expected_events{'all'} =~ s/^ [^\n]+ $/unnamed/gxms;
 $rules =~ s/^ ([:] lexeme \s [^\n]* ) \s+ event \s* [=][>] [^\n]* $/$1/gxms;
-$grammar = Marpa::R2::Scanless::G->new( { source => \$rules } );
-$slr = Marpa::R2::Scanless::R->new( { grammar => $grammar, semantics_package => 'My_Actions' } );
+$grammar = Marpa::R3::Scanless::G->new( { source => \$rules } );
+$slr = Marpa::R3::Scanless::R->new( { grammar => $grammar, semantics_package => 'My_Actions' } );
 do_test($slr, 'all');
 
 # Yet another time, with initializers
 %expected_events = %base_expected_events;
 $expected_events{'all'} =~ s/^\d+ \s before \s c \n//gxms;
 $rules = $base_rules;
-$grammar = Marpa::R2::Scanless::G->new( { source => \$rules } );
-$slr = Marpa::R2::Scanless::R->new( { grammar => $grammar, semantics_package => 'My_Actions' } );
+$grammar = Marpa::R3::Scanless::G->new( { source => \$rules } );
+$slr = Marpa::R3::Scanless::R->new( { grammar => $grammar, semantics_package => 'My_Actions' } );
 do_test($slr, 'all');
 
 # Yet another time, with initializers
 %expected_events = %base_expected_events;
 $expected_events{'all'} =~ s/^\d+ \s after \s b \n//gxms;
 $rules = $base_rules;
-$grammar = Marpa::R2::Scanless::G->new( { source => \$rules } );
+$grammar = Marpa::R3::Scanless::G->new( { source => \$rules } );
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: SLIF recce event_is_active named arg example
 
-$slr = Marpa::R2::Scanless::R->new(
+$slr = Marpa::R3::Scanless::R->new(
     {   grammar           => $grammar,
         semantics_package => 'My_Actions',
         event_is_active   => { 'before c' => 1, 'after b' => 0 }
     }
 );
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
 do_test($slr, 'all');
 

@@ -1,17 +1,17 @@
 #!perl
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
 # Tests that include a grammar, an input, and an resolution
@@ -27,8 +27,8 @@ use warnings;
 use Test::More tests => 6;
 use English qw( -no_match_vars );
 use lib 'inc';
-use Marpa::R2::Test;
-use Marpa::R2;
+use Marpa::R3::Test;
+use Marpa::R3;
 use Data::Dumper;
 
 our $DEBUG = 0;
@@ -74,7 +74,7 @@ END_OF_SOURCE
 
 {
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: inaccessible is fatal statement
 # start-after-line: END_OF_SOURCE
 # end-before-line: '^END_OF_SOURCE$'
@@ -92,7 +92,7 @@ END_OF_SOURCE
     x ::= 'x'
 END_OF_SOURCE
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
     my $input           = 'xxx';
     my $expected_value = 'SLIF grammar failed';
@@ -115,7 +115,7 @@ for my $test_data (@tests_data) {
         my $grammar;
         if (not defined eval {
                 $grammar =
-                    Marpa::R2::Scanless::G->new( { source => $source } );
+                    Marpa::R3::Scanless::G->new( { source => $source } );
                 1;
             }
             )
@@ -128,8 +128,8 @@ for my $test_data (@tests_data) {
             $actual_value  = 'SLIF grammar failed';
             $actual_result = $abbreviated_error;
             last PROCESSING;
-        } ## end if ( not defined eval { $grammar = Marpa::R2::Scanless::G...})
-        my $recce = Marpa::R2::Scanless::R->new(
+        } ## end if ( not defined eval { $grammar = Marpa::R3::Scanless::G...})
+        my $recce = Marpa::R3::Scanless::R->new(
             { grammar => $grammar, semantics_package => 'My_Semantics' } );
 
         if ( not defined eval { $recce->read( \$input ); 1 } ) {
@@ -161,12 +161,12 @@ for my $test_data (@tests_data) {
         last PROCESSING;
     } ## end PROCESSING:
 
-    Marpa::R2::Test::is(
+    Marpa::R3::Test::is(
         Data::Dumper::Dumper( \$actual_value ),
         Data::Dumper::Dumper( \$expected_value ),
         qq{Value of $test_name}
     );
-    Marpa::R2::Test::is( $actual_result, $expected_result,
+    Marpa::R3::Test::is( $actual_result, $expected_result,
         qq{Result of $test_name} );
 } ## end for my $test_data (@tests_data)
 

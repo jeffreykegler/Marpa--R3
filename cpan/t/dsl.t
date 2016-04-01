@@ -1,17 +1,17 @@
 #!perl
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
 # the example grammar in Aycock/Horspool "Practical Earley Parsing",
@@ -25,8 +25,8 @@ use warnings;
 use English qw( -no_match_vars );
 use Test::More tests => 6;
 use lib 'inc';
-use Marpa::R2::Test;
-use Marpa::R2;
+use Marpa::R3::Test;
+use Marpa::R3;
 
 my $source = <<'END_OF_GRAMMAR';
 :start ::= script
@@ -52,7 +52,7 @@ e ::=
   || VAR op_assign e action => do_set_var
 END_OF_GRAMMAR
 
-my $grammar = Marpa::R2::Grammar->new(
+my $grammar = Marpa::R3::Grammar->new(
     {   
         actions        => __PACKAGE__,
         source          => \$source,
@@ -162,7 +162,7 @@ sub calculate {
 
     %symbol_table = ();
 
-    my $recce = Marpa::R2::Recognizer->new( { grammar => $grammar } );
+    my $recce = Marpa::R3::Recognizer->new( { grammar => $grammar } );
 
     my $length = length $string;
     my $last_position = 0;
@@ -256,7 +256,7 @@ END_OF_OUTPUT
 for my $test (@tests) {
     my ( $input, $expected_output ) = @{$test};
     my $actual_output = report_calculation($input);
-    Marpa::R2::Test::is( $actual_output, $expected_output,
+    Marpa::R3::Test::is( $actual_output, $expected_output,
         qq{Parsing "$input"} );
 } ## end for my $test (@tests)
 

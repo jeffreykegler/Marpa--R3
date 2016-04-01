@@ -1,17 +1,17 @@
 #!perl
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
 use 5.010;
@@ -43,10 +43,10 @@ BEGIN {
     }
 } ## end BEGIN
 
-use Marpa::R2;
-use Marpa::R2::Perl;
+use Marpa::R3;
+use Marpa::R3::Perl;
 use lib 'inc';
-use Marpa::R2::Test;
+use Marpa::R3::Test;
 
 # Run in utility mode?
 my $utility = 0;
@@ -86,7 +86,7 @@ END_OF_RESULT
     );
 } ## end else [ if ($utility) ]
 
-my $parser = Marpa::R2::Perl->new( { closures => {} } );
+my $parser = Marpa::R3::Perl->new( { closures => {} } );
 
 TEST: for my $test (@tests) {
 
@@ -94,9 +94,9 @@ TEST: for my $test (@tests) {
     $parser = $parser->read( \$string );
     my @values    = $parser->eval();
     my $recce     = $parser->{recce};
-    my $grammar   = $recce->[Marpa::R2::Internal::Recognizer::GRAMMAR];
-    my $grammar_c = $grammar->[Marpa::R2::Internal::Grammar::C];
-    my $rules     = $grammar->[Marpa::R2::Internal::Grammar::RULES];
+    my $grammar   = $recce->[Marpa::R3::Internal::Recognizer::GRAMMAR];
+    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
+    my $rules     = $grammar->[Marpa::R3::Internal::Grammar::RULES];
     for my $earley_set_id ( 0 .. $recce->latest_earley_set() ) {
         my $progress_report = $recce->progress($earley_set_id);
         ITEM: for my $progress_item ( @{$progress_report} ) {
@@ -105,15 +105,15 @@ TEST: for my $test (@tests) {
             next ITEM if $position >= 0;
             $position = $grammar_c->rule_length($rule_id);
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: earleme() Synopsis
 
             my $origin_earleme = $recce->earleme($origin_earley_set_id);
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
             my $rule      = $rules->[$rule_id];
-            my $rule_name = $rule->[Marpa::R2::Internal::Rule::NAME];
+            my $rule_name = $rule->[Marpa::R3::Internal::Rule::NAME];
             next ITEM if not defined $rule_name;
             my $blocktype =
                   $rule_name eq 'anon_hash' ? 'hash'
@@ -132,7 +132,7 @@ TEST: for my $test (@tests) {
             $codeblock{$location}++ if $blocktype eq 'code';
         } ## end for my $progress_item ( @{$progress_report} )
     } ## end for my $earley_set_id ( 0 .. $recce->latest_earley_set...)
-    Marpa::R2::Test::is(
+    Marpa::R3::Test::is(
         ( scalar @values ),
         $expected_parse_count,
         'Count of values'
@@ -149,7 +149,7 @@ TEST: for my $test (@tests) {
         say $result or die 'say builtin failed';
     }
     else {
-        Marpa::R2::Test::is( $result, $expected, qq{Test of "$string"} );
+        Marpa::R3::Test::is( $result, $expected, qq{Test of "$string"} );
     }
     %hash      = ();
     %codeblock = ();

@@ -1,17 +1,17 @@
 #!perl
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
 # Test grammar exceptions -- make sure problems actually
@@ -26,8 +26,8 @@ use Test::More tests => 7;
 use Fatal qw(open close);
 
 use lib 'inc';
-use Marpa::R2::Test;
-use Marpa::R2;
+use Marpa::R3::Test;
+use Marpa::R3;
 
 ## no critic (Subroutines::RequireArgUnpacking)
 
@@ -54,7 +54,7 @@ sub test_grammar {
         $added_args = { trace_file_handle => $memory };
     } ## end if ($trace_result)
     my $eval_ok = eval {
-        my $grammar = Marpa::R2::Grammar->new( $grammar_args, $added_args );
+        my $grammar = Marpa::R3::Grammar->new( $grammar_args, $added_args );
         $grammar->precompute();
         1;
     };
@@ -65,7 +65,7 @@ sub test_grammar {
             Test::More::fail("Failed to catch problem: $test_name");
             last DETERMINE_TEST_RESULT;
         }
-        $eval_error =~ s/ ^ Marpa::R2 \s+ exception \s+ at \s+ .* \z //xms;
+        $eval_error =~ s/ ^ Marpa::R3 \s+ exception \s+ at \s+ .* \z //xms;
         if ( $eval_error eq $expected_error ) {
             Test::More::pass("Successfully caught problem: $test_name");
             last DETERMINE_TEST_RESULT;
@@ -83,7 +83,7 @@ sub test_grammar {
         chomp $temp;
         $diag_message .= "$temp\n";
 
-        # $diag_message =~ s/^Marpa::R2 \s+ exception \s+ at .* $//xms;
+        # $diag_message =~ s/^Marpa::R3 \s+ exception \s+ at .* $//xms;
         Test::More::diag($diag_message);
         Test::More::fail("Unexpected message: $test_name");
     } ## end DETERMINE_TEST_RESULT:

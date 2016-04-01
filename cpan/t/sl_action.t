@@ -1,17 +1,17 @@
 #!/usr/bin/perl
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
 # SLIF semantics examples
@@ -25,49 +25,49 @@ use Test::More tests => 6;
 use English qw( -no_match_vars );
 use Fatal qw( open close );
 use lib 'inc';
-use Marpa::R2::Test;
-use Marpa::R2;
+use Marpa::R3::Test;
+use Marpa::R3;
 
 my $trace_rules = q{};
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: SLIF action context synopsis
 
 sub do_S {
     my ($action_object) = @_;
-    my $rule_id         = $Marpa::R2::Context::rule;
-    my $slg             = $Marpa::R2::Context::slg;
+    my $rule_id         = $Marpa::R3::Context::rule;
+    my $slg             = $Marpa::R3::Context::slg;
     my ( $lhs, @rhs ) =
         map { $slg->symbol_display_form($_) } $slg->rule_expand($rule_id);
     $action_object->{text} =
           "rule $rule_id: $lhs ::= "
         . ( join q{ }, @rhs ) . "\n"
         . "locations: "
-        . ( join q{-}, Marpa::R2::Context::location() ) . "\n";
+        . ( join q{-}, Marpa::R3::Context::location() ) . "\n";
     return $action_object;
 } ## end sub do_S
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: SLIF bail synopsis
 
 my $bail_message = "This is a bail out message!";
 
 sub do_bail_with_message_if_A {
     my ($action_object, $terminal) = @_;
-    Marpa::R2::Context::bail($bail_message) if $terminal eq 'A';
+    Marpa::R3::Context::bail($bail_message) if $terminal eq 'A';
 }
 
 sub do_bail_with_object_if_A {
     my ($action_object, $terminal) = @_;
-    Marpa::R2::Context::bail([$bail_message]) if $terminal eq 'A';
+    Marpa::R3::Context::bail([$bail_message]) if $terminal eq 'A';
 }
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
 my @terminals = qw/A B C D/;
-my $grammar   = Marpa::R2::Scanless::G->new(
+my $grammar   = Marpa::R3::Scanless::G->new(
     {   source => \<<'END_OF_SOURCE',
 :start ::= S
 S ::= A B C D action => main::do_S
@@ -79,7 +79,7 @@ END_OF_SOURCE
 });
 
 sub do_parse {
-    my $slr = Marpa::R2::Scanless::R->new( { grammar => $grammar } );
+    my $slr = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
     $slr->read( \'ABCD' );
     return $slr->value();
 } ## end sub do_parse

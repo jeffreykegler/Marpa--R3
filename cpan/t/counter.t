@@ -1,17 +1,17 @@
 #!perl
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
 # This uses an ambiguous grammar to implement a binary
@@ -25,8 +25,8 @@ use warnings;
 use Test::More tests => 32;
 use English qw( -no_match_vars );
 use lib 'inc';
-use Marpa::R2::Test;
-use Marpa::R2;
+use Marpa::R3::Test;
+use Marpa::R3;
 
 sub zero { return '0' }
 sub one  { return '1' }
@@ -40,7 +40,7 @@ sub start_rule_action {
 
 sub gen_grammar {
     my ($is_count_up) = @_;
-    my $grammar = Marpa::R2::Grammar->new(
+    my $grammar = Marpa::R3::Grammar->new(
         {   start => 'S',
             rules => [
                 {   lhs    => 'S',
@@ -77,7 +77,7 @@ my @counting_down = reverse @counting_up;
 for my $is_count_up ( 1, 0 ) {
     my $count = $is_count_up ? ( \@counting_up ) : ( \@counting_down );
     my $direction_desc = $is_count_up ? 'up' : 'down';
-    my $recce = Marpa::R2::Recognizer->new(
+    my $recce = Marpa::R3::Recognizer->new(
         { grammar => gen_grammar($is_count_up), ranking_method => 'rule' } );
 
     my $input_length = 4;

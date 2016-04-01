@@ -1,17 +1,17 @@
 #!/usr/bin/perl
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
 # This example parses ambiguous English sentences.  The target annotation
@@ -25,10 +25,10 @@ use English qw( -no_match_vars );
 
 use Test::More tests => 4;
 use lib 'inc';
-use Marpa::R2::Test;
-use Marpa::R2;
+use Marpa::R3::Test;
+use Marpa::R3;
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: ASF synopsis grammar
 # start-after-line: END_OF_SOURCE
 # end-before-line: '^END_OF_SOURCE$'
@@ -65,12 +65,12 @@ VBZ ~ 'eats' | 'shoots' | 'leaves'
 
 END_OF_SOURCE
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
-my $grammar = Marpa::R2::Scanless::G->new(
+my $grammar = Marpa::R3::Scanless::G->new(
     { bless_package => 'PennTags', source => \$dsl, } );
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: ASF synopsis output
 # start-after-line: END_OF_OUTPUT
 # end-before-line: '^END_OF_OUTPUT$'
@@ -87,18 +87,18 @@ my $full_expected = <<'END_OF_OUTPUT';
    (. .))
 END_OF_OUTPUT
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: ASF synopsis input
 
 my $sentence = 'a panda eats shoots and leaves.';
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
 my @actual = ();
 
-my $recce = Marpa::R2::Scanless::R->new( { grammar => $grammar } );
+my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
 
 $recce->read( \$sentence );
 
@@ -107,23 +107,23 @@ while ( defined( my $value_ref = $recce->value() ) ) {
     push @actual, $value;
 }
 
-Marpa::R2::Test::is( ( join "\n", sort @actual ) . "\n",
+Marpa::R3::Test::is( ( join "\n", sort @actual ) . "\n",
     $full_expected, 'Ambiguous English sentence using value()' );
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: ASF synopsis code
 
-my $panda_grammar = Marpa::R2::Scanless::G->new(
+my $panda_grammar = Marpa::R3::Scanless::G->new(
     { source => \$dsl, bless_package => 'PennTags', } );
-my $panda_recce = Marpa::R2::Scanless::R->new( { grammar => $panda_grammar } );
+my $panda_recce = Marpa::R3::Scanless::R->new( { grammar => $panda_grammar } );
 $panda_recce->read( \$sentence );
-my $asf = Marpa::R2::ASF->new( { slr=>$panda_recce } );
+my $asf = Marpa::R3::ASF->new( { slr=>$panda_recce } );
 my $full_result = $asf->traverse( {}, \&full_traverser );
 my $pruned_result = $asf->traverse( {}, \&pruning_traverser );
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: ASF synopsis full traverser code
 
 sub full_traverser {
@@ -188,13 +188,13 @@ sub full_traverser {
     return \@return_value;
 } ## end sub full_traverser
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
 my $cooked_result =  join "\n", (sort @{$full_result}), q{};
-Marpa::R2::Test::is( $cooked_result, $full_expected,
+Marpa::R3::Test::is( $cooked_result, $full_expected,
     'Ambiguous English sentence using ASF' );
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: ASF synopsis pruning traverser code
 
 sub penn_tag {
@@ -231,9 +231,9 @@ sub pruning_traverser {
 
 }
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: ASF pruned synopsis output
 # start-after-line: END_OF_OUTPUT
 # end-before-line: '^END_OF_OUTPUT$'
@@ -244,9 +244,9 @@ my $pruned_expected = <<'END_OF_OUTPUT';
    (. .))
 END_OF_OUTPUT
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
-Marpa::R2::Test::is( $pruned_result, $pruned_expected,
+Marpa::R3::Test::is( $pruned_result, $pruned_expected,
     'Ambiguous English sentence using ASF: pruned' );
 
 my $located_actual = $asf->traverse( {}, \&located_traverser );
@@ -272,13 +272,13 @@ sub located_traverser {
     # Special case for the start rule
     return (join q{ }, @return_value) . "\n" if  $symbol_name eq '[:start]' ;
 
-# Marpa::R2::Display::Start
+# Marpa::R3::Display::Start
 # name: ASF span() traverser method example
 
     my ( $start, $length ) = $glade->span();
     my $end = $start + $length - 1;
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
     my $location = q{@};
     $location .= $start >= $end ? $start : "$start-$end";
@@ -300,9 +300,9 @@ my $located_expected = <<'END_OF_OUTPUT';
    (. .))
 END_OF_OUTPUT
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
-Marpa::R2::Test::is(  $located_actual, $located_expected, 'Located Penn tag example' );
+Marpa::R3::Test::is(  $located_actual, $located_expected, 'Located Penn tag example' );
 
 package PennTags;
 

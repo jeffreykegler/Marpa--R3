@@ -1,17 +1,17 @@
 #!/usr/bin/perl
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
 # Test of SLIF external interface
@@ -22,13 +22,13 @@ use warnings;
 use Test::More tests => 1;
 
 use lib 'inc';
-use Marpa::R2::Test;
+use Marpa::R3::Test;
 
 ## no critic (ErrorHandling::RequireCarping);
 
-use Marpa::R2;
+use Marpa::R3;
 
-my $grammar = Marpa::R2::Scanless::G->new(
+my $grammar = Marpa::R3::Scanless::G->new(
     {   bless_package => 'My_Nodes',
         source          => \(<<'END_OF_SOURCE'),
 :default ::= action => ::array
@@ -71,14 +71,14 @@ my @terminals = (
 
 sub my_parser {
     my ( $grammar, $string ) = @_;
-    my $recce = Marpa::R2::Scanless::R->new( { grammar => $grammar } );
+    my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: SLIF external read example
 
     $recce->read( \$string, 0, 0 );
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
     my $length = length $string;
     pos $string = 0;
@@ -91,7 +91,7 @@ sub my_parser {
             next TOKEN_TYPE if not $string =~ m/\G($regex)/gcxms;
             my $lexeme = $1;
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: SLIF lexeme_alternative() example
 
             if ( not defined $recce->lexeme_alternative($token_name) ) {
@@ -103,7 +103,7 @@ sub my_parser {
                 if $recce->lexeme_complete( $start_of_lexeme,
                         ( length $lexeme ) );
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
         } ## end TOKEN_TYPE: for my $t (@terminals)
         die qq{No token found at position $start_of_lexeme, before "},

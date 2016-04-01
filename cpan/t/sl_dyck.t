@@ -1,17 +1,17 @@
 #!perl
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
 # A test using the Dyck-Hollerith language
@@ -23,8 +23,8 @@ use warnings;
 use Test::More tests => 1;
 use English qw( -no_match_vars );
 use lib 'inc';
-use Marpa::R2::Test;
-use Marpa::R2;
+use Marpa::R3::Test;
+use Marpa::R3;
 use Data::Dumper;
 
 my $dsl = <<'END_OF_DSL';
@@ -52,8 +52,8 @@ event 'expecting text' = predicted <text>
 text ~ [\d\D]
 END_OF_DSL
 
-my $grammar = Marpa::R2::Scanless::G->new( { source => \$dsl } );
-my $recce = Marpa::R2::Scanless::R->new(
+my $grammar = Marpa::R3::Scanless::G->new( { source => \$dsl } );
+my $recce = Marpa::R3::Scanless::R->new(
     { grammar => $grammar, semantics_package => 'My_Actions' } );
 
 my $input = 'A2(A2(S3(Hey)S13(Hello, World!))S5(Ciao!))';

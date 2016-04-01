@@ -1,17 +1,17 @@
 #!/usr/bin/perl
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
 # Various that share a calculator semantics
@@ -24,13 +24,13 @@ use English qw( -no_match_vars );
 use Scalar::Util qw(blessed);
 
 use lib 'inc';
-use Marpa::R2::Test;
+use Marpa::R3::Test;
 
 ## no critic (ErrorHandling::RequireCarping);
 
-use Marpa::R2;
+use Marpa::R3;
 
-my $calculator_grammar = Marpa::R2::Scanless::G->new(
+my $calculator_grammar = Marpa::R3::Scanless::G->new(
     {   bless_package => 'My_Nodes',
         source        => \(<<'END_OF_SOURCE'),
 :default ::= action => ::array bless => ::lhs
@@ -65,7 +65,7 @@ END_OF_SOURCE
 my $show_rules_output = $calculator_grammar->show_rules();
 $show_rules_output .= $calculator_grammar->show_rules(1, 'L0');
 
-Marpa::R2::Test::is( $show_rules_output,
+Marpa::R3::Test::is( $show_rules_output,
     <<'END_OF_SHOW_RULES_OUTPUT', 'Scanless show_rules()' );
 G1 R0 Script ::= Expression +
 G1 R1 Expression ::= Expression
@@ -133,12 +133,12 @@ number ~ [\d]+
 variable ~ [[:alpha:]] <optional word characters>
 <optional word characters> ~ [[:alnum:]]*
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: SLIF lexeme rule synopsis
 
 :lexeme ~ <say keyword> priority => 1
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
 <say keyword> ~ 'say'
 sign ~ [+-]
@@ -148,7 +148,7 @@ END_OF_GRAMMAR
 
 do_test(
     'Priority test 1',
-    Marpa::R2::Scanless::G->new(
+    Marpa::R3::Scanless::G->new(
         {   bless_package => 'My_Nodes',
             source        => \$priority_grammar,
         }
@@ -159,7 +159,7 @@ do_test(
 (my $priority_grammar2 = $priority_grammar) =~ s/priority \s+ => \s+ 1$/priority => -1/xms;
 do_test(
     'Priority test 2',
-    Marpa::R2::Scanless::G->new(
+    Marpa::R3::Scanless::G->new(
         {   bless_package => 'My_Nodes',
             source        => \$priority_grammar2,
         }
@@ -169,7 +169,7 @@ do_test(
 
 sub do_test {
     my ( $name, $grammar, $input, $output_re, $args ) = @_;
-    my $recce = Marpa::R2::Scanless::R->new( { grammar => $grammar } );
+    my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
 
     $recce->read(\$input);
     my $value_ref = $recce->value();
@@ -224,7 +224,7 @@ sub My_Nodes::unary_sign::doit {
 sub My_Nodes::variable::doit {
     my ( $self, $parse ) = @_;
     my $name = $self->[0];
-    Marpa::R2::Context::bail(qq{variable "$name" does not exist})
+    Marpa::R3::Context::bail(qq{variable "$name" does not exist})
         if not exists $parse->{variables}->{$name};
     return $parse->{variables}->{$name};
 } ## end sub My_Nodes::variable::doit

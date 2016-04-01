@@ -1,17 +1,17 @@
 #!perl
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
 # Tests of scannerless parsing -- some corner cases,
@@ -24,8 +24,8 @@ use warnings;
 use Test::More tests => 72;
 use English qw( -no_match_vars );
 use lib 'inc';
-use Marpa::R2::Test;
-use Marpa::R2;
+use Marpa::R3::Test;
+use Marpa::R3;
 
 my $source_template = <<'END_OF_SOURCE';
 :default ::= action => do_list
@@ -41,9 +41,9 @@ END_OF_SOURCE
 (my $source_plus = $source_template) =~ s/ %QUANTIFIER% / + /xms;
 (my $source_star = $source_template) =~ s/ %QUANTIFIER% / * /xms;
 
-my $grammar_bare = Marpa::R2::Scanless::G->new( { source => \$source_bare } );
-my $grammar_plus = Marpa::R2::Scanless::G->new( { source => \$source_plus } );
-my $grammar_star = Marpa::R2::Scanless::G->new( { source => \$source_star } );
+my $grammar_bare = Marpa::R3::Scanless::G->new( { source => \$source_bare } );
+my $grammar_plus = Marpa::R3::Scanless::G->new( { source => \$source_plus } );
+my $grammar_star = Marpa::R3::Scanless::G->new( { source => \$source_star } );
 
 package My_Actions;
 sub do_list {
@@ -67,19 +67,19 @@ sub my_parser {
 
     my $self = bless { grammar => $grammar }, 'My_Actions';
 
-    my $recce = Marpa::R2::Scanless::R->new( { grammar => $grammar } );
+    my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
     $self->{slr} = $recce;
     my ( $parse_value, $parse_status, $last_expression );
 
     my $eval_ok = eval { $recce->read( \$string ); 1; };
     my $eval_error = $EVAL_ERROR;
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: $recce->exhausted example
 
     my $exhausted_status = $recce->exhausted();
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
     if ( not $eval_ok ) {
         chomp $eval_error;

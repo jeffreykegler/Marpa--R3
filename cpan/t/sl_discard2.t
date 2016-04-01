@@ -1,17 +1,17 @@
 #!/usr/bin/perl
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
 # Tests of the SLIF's discard events
@@ -24,13 +24,13 @@ use English qw( -no_match_vars );
 use Scalar::Util;
 
 use lib 'inc';
-use Marpa::R2::Test;
+use Marpa::R3::Test;
 
 ## no critic (ErrorHandling::RequireCarping);
 
-use Marpa::R2;
+use Marpa::R3;
 
-my $null_grammar = Marpa::R2::Scanless::G->new(
+my $null_grammar = Marpa::R3::Scanless::G->new(
     {   bless_package => 'My_Nodes',
         source        => \(<<'END_OF_SOURCE'),
 :default ::= action => [g1start,g1length,name,values]
@@ -46,7 +46,7 @@ END_OF_SOURCE
 );
 
 for my $input ( q{}, ' ', '  ', '   ' ) {
-    my $recce = Marpa::R2::Scanless::R->new(
+    my $recce = Marpa::R3::Scanless::R->new(
         { grammar => $null_grammar },
     );
 
@@ -67,7 +67,7 @@ for my $input ( q{}, ' ', '  ', '   ' ) {
 } ## end for my $input ( q{}, ' ', '  ', '   ' )
 
 # Test of 2 types of events
-my $grammar2 = Marpa::R2::Scanless::G->new(
+my $grammar2 = Marpa::R3::Scanless::G->new(
     {   bless_package => 'My_Nodes',
         source        => \(<<'END_OF_SOURCE'),
 :default ::= action => [g1start,g1length,name,values]
@@ -88,7 +88,7 @@ END_OF_SOURCE
 
 for my $input ( q{ (x) }, q{(x) }, q{ (x)})
 {
-    my $recce = Marpa::R2::Scanless::R->new( { grammar => $grammar2 }, );
+    my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar2 }, );
 
     my $length = length $input;
     my $pos = $recce->read( \$input );
@@ -110,7 +110,7 @@ for my $input ( q{ (x) }, q{(x) }, q{ (x)})
 
 # Discards with a non-trivial grammar
 
-my $non_trivial_grammar = Marpa::R2::Scanless::G->new(
+my $non_trivial_grammar = Marpa::R3::Scanless::G->new(
     {   bless_package => 'My_Nodes',
         source        => \(<<'END_OF_SOURCE'),
 :default ::= action => [g1start,g1length,name,values]
@@ -149,7 +149,7 @@ for my $pattern (0 .. 15)
     # say join q{}, '^', @input, '$';
     my $input = join q{}, @input;
 
-    my $recce = Marpa::R2::Scanless::R->new( { grammar => $non_trivial_grammar }, );
+    my $recce = Marpa::R3::Scanless::R->new( { grammar => $non_trivial_grammar }, );
 
     my $length = length $input;
     my $pos = $recce->read( \$input );

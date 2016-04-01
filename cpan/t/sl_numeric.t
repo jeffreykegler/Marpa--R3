@@ -1,17 +1,17 @@
 #!perl
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
 # Test of null ranking
@@ -22,8 +22,8 @@ use warnings;
 
 use Test::More tests => 10;
 use lib 'inc';
-use Marpa::R2::Test;
-use Marpa::R2;
+use Marpa::R3::Test;
+use Marpa::R3;
 
 ## no critic (Subroutines::RequireArgUnpacking)
 
@@ -37,7 +37,7 @@ sub default_action {
 
 ## use critic
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: null-ranking adverb example
 
 my $high_dsl = <<'END_OF_DSL';
@@ -49,7 +49,7 @@ empty ::=
 S ::= A A A A null-ranking => high
 END_OF_DSL
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
 my $low_dsl = $high_dsl;
 $low_dsl =~ s/\s+ [=][>] \s+ high \Z/ => low/xms;
@@ -60,8 +60,8 @@ my @minimal = ( q{}, qw[(;;;a) (;;a;a) (;a;a;a) (a;a;a;a)] );
 
 for my $maximal ( 0, 1 ) {
     my $dsl = $dsl{ $maximal ? 'low' : 'high' };
-    my $grammar = Marpa::R2::Scanless::G->new( { source => $dsl } );
-    my $recce = Marpa::R2::Scanless::R->new(
+    my $grammar = Marpa::R3::Scanless::G->new( { source => $dsl } );
+    my $recce = Marpa::R3::Scanless::R->new(
         {   grammar        => $grammar,
             ranking_method => 'high_rule_only'
         }
@@ -75,19 +75,19 @@ for my $maximal ( 0, 1 ) {
         my $expected = $maximal ? \@maximal : \@minimal;
         my $name     = $maximal ? 'maximal' : 'minimal';
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: SLIF recognizer series_restart() synopsis
 
         $recce->series_restart( { end => $i } );
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: SLIF recognizer set() synopsis
 
         $recce->set( { max_parses => 42 } );
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
         my $result = $recce->value();
         die "No parse" if not defined $result;

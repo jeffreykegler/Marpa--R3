@@ -1,17 +1,17 @@
 #!perl
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
 # Test of scannerless parsing -- diagnostics
@@ -23,8 +23,8 @@ use warnings;
 use Test::More tests => 12;
 use English qw( -no_match_vars );
 use lib 'inc';
-use Marpa::R2::Test;
-use Marpa::R2;
+use Marpa::R3::Test;
+use Marpa::R3;
 
 my $dsl = <<'END_OF_RULES';
 :start ::= Script
@@ -47,7 +47,7 @@ whitespace ~ [\s]+
 <hash comment char> ~ [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
 END_OF_RULES
 
-my $grammar = Marpa::R2::Scanless::G->new(
+my $grammar = Marpa::R3::Scanless::G->new(
     {   action_object  => 'My_Actions',
         default_action => 'do_arg0',
         source => \$dsl,
@@ -56,7 +56,7 @@ my $grammar = Marpa::R2::Scanless::G->new(
 
 my $g0_rules_description;
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: Scanless g0_rule() synopsis
 
     my @g0_rule_ids = $grammar->g0_rule_ids();
@@ -65,9 +65,9 @@ my $g0_rules_description;
             . ( join q{ }, map {"<$_>"} $grammar->g0_rule($g0_rule_id) ) . "\n";
     }
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
-Marpa::R2::Test::is(
+Marpa::R3::Test::is(
     $g0_rules_description,
     <<'END_OF_DESCRIPTION',
 0 <[Lex-0]> <[[s]]> <[[a]]> <[[y]]>
@@ -93,7 +93,7 @@ END_OF_DESCRIPTION
 
 my $g1_rules_description;
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: Scanless rule() synopsis
 
     my @g1_rule_ids = $grammar->g1_rule_ids();
@@ -102,9 +102,9 @@ my $g1_rules_description;
             . ( join q{ }, map {"<$_>"} $grammar->rule($g1_rule_id) ) . "\n";
     }
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
-Marpa::R2::Test::is(
+Marpa::R3::Test::is(
     $g1_rules_description,
     <<'END_OF_DESCRIPTION',
 0 <Script> <Calculation>
@@ -152,7 +152,7 @@ sub my_parser {
 
     my $trace_output = q{};
     open my $trace_fh, q{>}, \$trace_output;
-    my $recce = Marpa::R2::Scanless::R->new(
+    my $recce = Marpa::R3::Scanless::R->new(
         {   grammar               => $grammar,
             trace_terminals       => 2,
             trace_file_handle     => $trace_fh,
@@ -192,27 +192,27 @@ for my $test_data (@tests_data) {
     my ( $recce, $actual_value, $trace_output ) =
         my_parser( $grammar, $test_string );
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: Scanless terminals_expected() synopsis
 
     my @terminals_expected = @{$recce->terminals_expected()};
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
-    Marpa::R2::Test::is(
+    Marpa::R3::Test::is(
         ( join q{ }, sort @terminals_expected ),
         'Number [Lex-0] [Lex-1]',
         qq{SLIF terminals_expected()}
     );
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: Scanless show_progress() synopsis
 
     my $show_progress_output = $recce->show_progress();
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
-    Marpa::R2::Test::is( $show_progress_output,
+    Marpa::R3::Test::is( $show_progress_output,
         <<'END_OF_EXPECTED_OUTPUT', qq{Scanless show_progess()} );
 P0 @0-11 L1c1-19 Script -> . Calculation *
 F0 @0-11 L1c1-19 Script -> Calculation * .
@@ -226,9 +226,9 @@ F4 x2 @0,6-11 L1c1-19 Expression -> '+' Expression Expression .
 F5 @0-11 L1c1-19 :start -> Script .
 END_OF_EXPECTED_OUTPUT
 
-    Marpa::R2::Test::is( $actual_value, $expected_value,
+    Marpa::R3::Test::is( $actual_value, $expected_value,
         qq{Value of "$test_string"} );
-    Marpa::R2::Test::is( $trace_output,
+    Marpa::R3::Test::is( $trace_output,
         <<'END_OF_OUTPUT', qq{Trace output for "$test_string"} );
 Setting trace_terminals option
 Expecting "Number" at earleme 0
@@ -281,14 +281,14 @@ END_OF_OUTPUT
         [ 4, 0,  11 ],
     ];
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: Scanless progress() synopsis
 
     my $progress_output = $recce->progress();
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
-    Marpa::R2::Test::is(
+    Marpa::R3::Test::is(
         Data::Dumper::Dumper($progress_output),
         Data::Dumper::Dumper($expected_progress_output),
         qq{Scanless progress()}
@@ -297,30 +297,30 @@ END_OF_OUTPUT
     my $latest_g1_location = $recce->latest_g1_location();
     Test::More::is( $latest_g1_location, 11, qq{Scanless latest_g1_location()} );
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: Scanless current_g1_location() synopsis
 
     my $current_g1_location = $recce->current_g1_location();
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
     Test::More::is( $current_g1_location, 11, qq{Scanless current_g1_location()} );
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: SLIF pos() example
 
     my $pos = $recce->pos();
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
     Test::More::is( $pos, 19, qq{Scanless pos()} );
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: SLIF input_length() example
 
     my $input_length = $recce->input_length();
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
     Test::More::is( $input_length, 19, qq{Scanless input_length()} );
 
@@ -333,13 +333,13 @@ END_OF_OUTPUT
         )
     {
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: Scanless g1_location_to_span() synopsis
 
         my ( $span_start, $span_length ) =
             $recce->g1_location_to_span($g1_location);
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
         push @spans, [ $g1_location, $span_start, $span_length ];
     } ## end for my $g1_location ( sort { $a <=> $b } grep { !$location_seen...})

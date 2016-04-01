@@ -1,17 +1,17 @@
 #!/usr/bin/perl
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
 # A grammar with cycles
@@ -25,8 +25,8 @@ use Fatal qw(open close chdir);
 
 use Test::More tests => 4;
 use lib 'inc';
-use Marpa::R2::Test;
-use Marpa::R2;
+use Marpa::R3::Test;
+use Marpa::R3;
 
 sub make_rule {
     my ( $lhs_symbol_name, $rhs_symbol_name ) = @_;
@@ -122,13 +122,13 @@ for my $test_data ( $plex1_test, $plex2_test ) {
         infinite_action   => 'warn',
         trace_file_handle => $MEMORY,
     );
-    my $grammar = Marpa::R2::Grammar->new( \%args );
+    my $grammar = Marpa::R3::Grammar->new( \%args );
     $grammar->precompute();
 
     close $MEMORY;
-    Marpa::R2::Test::is( $trace, $expected_trace, "$test_name trace" );
+    Marpa::R3::Test::is( $trace, $expected_trace, "$test_name trace" );
 
-    my $recce = Marpa::R2::Recognizer->new(
+    my $recce = Marpa::R3::Recognizer->new(
         { grammar => $grammar, trace_file_handle => \*STDERR } );
 
     $recce->read( 't', 't' );
@@ -139,7 +139,7 @@ for my $test_data ( $plex1_test, $plex2_test ) {
     }
 
     my $values = join "\n", sort @values;
-    Marpa::R2::Test::is( "$values\n", $expected_values, $test_name );
+    Marpa::R3::Test::is( "$values\n", $expected_values, $test_name );
 
 } ## end for my $test_data ( $plex1_test, $plex2_test )
 

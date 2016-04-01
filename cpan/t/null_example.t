@@ -1,17 +1,17 @@
 #!perl
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 # An ambiguous equation
 
@@ -22,10 +22,10 @@ use warnings;
 use Test::More tests => 1;
 
 use lib 'inc';
-use Marpa::R2::Test;
+use Marpa::R3::Test;
 use English qw( -no_match_vars );
 use Fatal qw(open close);
-use Marpa::R2;
+use Marpa::R3;
 
 ## no critic (InputOutput::RequireBriefOpen)
 open my $original_stdout, q{>&STDOUT};
@@ -45,7 +45,7 @@ sub restore_stdout {
     return 1;
 }
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: Null Value Example
 
 sub do_L {
@@ -74,7 +74,7 @@ our $null_X = 'null X';
 our $null_Y = 'null Y';
 ## use critic
 
-my $grammar = Marpa::R2::Grammar->new(
+my $grammar = Marpa::R3::Grammar->new(
     {   start   => 'S',
         actions => 'main',
         rules   => [
@@ -95,15 +95,15 @@ my $grammar = Marpa::R2::Grammar->new(
 
 $grammar->precompute();
 
-my $recce = Marpa::R2::Recognizer->new( { grammar => $grammar } );
+my $recce = Marpa::R3::Recognizer->new( { grammar => $grammar } );
 
 $recce->read( 'x', 'x' );
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
 ## use critic
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: Null Value Example Output
 # start-after-line: END_OF_OUTPUT
 # end-before-line: '^END_OF_OUTPUT$'
@@ -112,10 +112,10 @@ chomp( my $expected = <<'END_OF_OUTPUT');
 S(L(null A;null B;X(x));null R)
 END_OF_OUTPUT
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
 my $value = $recce->value();
-Marpa::R2::Test::is( ${$value}, $expected, 'Null example' );
+Marpa::R3::Test::is( ${$value}, $expected, 'Null example' );
 
 1;    # In case used as "do" file
 

@@ -1,17 +1,17 @@
 #!perl
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 # The example from p. 166 of Leo's paper,
 # augmented to test Leo prediction items.
@@ -24,8 +24,8 @@ use warnings;
 use Test::More tests => 9;
 
 use lib 'inc';
-use Marpa::R2::Test;
-use Marpa::R2;
+use Marpa::R3::Test;
+use Marpa::R3;
 
 ## no critic (Subroutines::RequireArgUnpacking)
 
@@ -36,7 +36,7 @@ sub main::default_action {
 
 ## use critic
 
-my $grammar = Marpa::R2::Scanless::G->new(
+my $grammar = Marpa::R3::Scanless::G->new(
     { 
         default_action => 'main::default_action',
         source => \(<<'END_OF_DSL'),
@@ -120,7 +120,7 @@ END_OF_HISTORY
 
 my $show_progress_output = $test_slr->show_progress();
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: SLIF Leo show_progress() example
 # start-after-line: END_OF_OUTPUT
 # end-before-line: '^END_OF_OUTPUT$'
@@ -146,9 +146,9 @@ F11 x12 @0...38-41 L1c1-L2c40 <plain assignment> -> 'x' '=' expression .
 F12 @0-41 L1c1-L2c40 :start -> expression .
 END_OF_OUTPUT
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
-Marpa::R2::Test::is(
+Marpa::R3::Test::is(
     $show_progress_output,
     $expected_show_progress_output,
     "SLIF Leo show_progress() example"
@@ -168,7 +168,7 @@ END_OF_HISTORY
 
 sub do_test {
     my ( $grammar, $input, $expected_history ) = @_;
-    my $slr = Marpa::R2::Scanless::R->new( { grammar => $grammar } );
+    my $slr = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
     my $event_history;
     my $pos = $slr->read( \$input );
     READ: while (1) {
@@ -184,8 +184,8 @@ sub do_test {
     my $value_ref = $slr->value();
     my $value = $value_ref ? ${$value_ref} : 'No parse';
     ( my $expected = $input ) =~ s/\s//gxms;
-    Marpa::R2::Test::is( $value, $expected, "Leo SLIF parse of $expected" );
-    Marpa::R2::Test::is( $event_history, $expected_history, "Event history of $expected" );
+    Marpa::R3::Test::is( $value, $expected, "Leo SLIF parse of $expected" );
+    Marpa::R3::Test::is( $event_history, $expected_history, "Event history of $expected" );
     return $slr;
 } ## end sub do_test
 

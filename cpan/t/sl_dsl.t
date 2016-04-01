@@ -1,17 +1,17 @@
 #!perl
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
 # Test of scannerless parsing -- a DSL
@@ -27,8 +27,8 @@ binmode $builder->failure_output, ":utf8";
 binmode $builder->todo_output,    ":utf8";
 use English qw( -no_match_vars );
 use lib 'inc';
-use Marpa::R2::Test;
-use Marpa::R2;
+use Marpa::R3::Test;
+use Marpa::R3;
 
 my $rules = <<'END_OF_GRAMMAR';
 :default ::= action => do_arg0
@@ -66,7 +66,7 @@ whitespace ~ [\s]+
 <hash comment char> ~ [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
 END_OF_GRAMMAR
 
-my $grammar = Marpa::R2::Scanless::G->new(
+my $grammar = Marpa::R3::Scanless::G->new(
     {   
         source          => \$rules,
     }
@@ -75,7 +75,7 @@ my $grammar = Marpa::R2::Scanless::G->new(
 my %binop_closure = (
     '*' => sub { $_[0] * $_[1] },
     '/' => sub {
-        Marpa::R2::Context::bail('Division by zero') if not $_[1];
+        Marpa::R3::Context::bail('Division by zero') if not $_[1];
         $_[0] / $_[1];
     },
     '+' => sub { $_[0] + $_[1] },
@@ -100,7 +100,7 @@ sub calculate {
 
     %symbol_table = ();
 
-    my $recce = Marpa::R2::Scanless::R->new( { grammar => $grammar } );
+    my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
 
     my $self = bless { grammar => $grammar }, 'My_Actions';
     $self->{slr} = $recce;
@@ -161,7 +161,7 @@ package My_Actions;
 sub do_is_var {
     my ( undef, $var ) = @_;
     my $value = $symbol_table{$var};
-    Marpa::R2::Context::bail(qq{Undefined variable "$var"})
+    Marpa::R3::Context::bail(qq{Undefined variable "$var"})
         if not defined $value;
     return $value;
 } ## end sub do_is_var
@@ -184,7 +184,7 @@ sub do_array {
     my @value = ();
     my $ref;
     if ( $ref = ref $left ) {
-        Marpa::R2::Context::bail("Bad ref type for array operand: $ref")
+        Marpa::R3::Context::bail("Bad ref type for array operand: $ref")
             if $ref ne 'ARRAY';
         push @value, @{$left};
     }
@@ -192,7 +192,7 @@ sub do_array {
         push @value, $left;
     }
     if ( $ref = ref $right ) {
-        Marpa::R2::Context::bail("Bad ref type for array operand: $ref")
+        Marpa::R3::Context::bail("Bad ref type for array operand: $ref")
             if $ref ne 'ARRAY';
         push @value, @{$right};
     }
@@ -205,7 +205,7 @@ sub do_array {
 sub do_binop {
     my ( $op, $left, $right ) = @_;
     my $closure = $binop_closure{$op};
-    Marpa::R2::Context::bail(
+    Marpa::R3::Context::bail(
         qq{Do not know how to perform binary operation "$op"})
         if not defined $closure;
     return $closure->( $left, $right );
@@ -239,7 +239,7 @@ sub do_minus {
 sub do_reduce {
     my ( undef, $op, undef, $args ) = @_;
     my $closure = $binop_closure{$op};
-    Marpa::R2::Context::bail(
+    Marpa::R3::Context::bail(
         qq{Do not know how to perform binary operation "$op"})
         if not defined $closure;
     $args = [$args] if ref $args eq '';
@@ -249,7 +249,7 @@ sub do_reduce {
         my $result = $closure->( $stack[-2], $stack[-1] );
         splice @stack, -2, 2, $result;
     }
-    Marpa::R2::Context::bail('Should not get here');
+    Marpa::R3::Context::bail('Should not get here');
 } ## end sub do_reduce
 
 sub show_last_expression {

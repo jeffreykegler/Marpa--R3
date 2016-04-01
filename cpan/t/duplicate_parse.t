@@ -1,17 +1,17 @@
 #!/usr/bin/perl
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
 # Test of deletion of duplicate parses.
@@ -23,8 +23,8 @@ use warnings;
 use Test::More tests => 5;
 
 use lib 'inc';
-use Marpa::R2::Test;
-use Marpa::R2;
+use Marpa::R3::Test;
+use Marpa::R3;
 
 ## no critic (Subroutines::RequireArgUnpacking)
 
@@ -39,7 +39,7 @@ sub default_action {
 
 ## use critic
 
-my $grammar = Marpa::R2::Grammar->new(
+my $grammar = Marpa::R3::Grammar->new(
     {   start => 'S',
 
         rules => [
@@ -56,7 +56,7 @@ my $grammar = Marpa::R2::Grammar->new(
 
 $grammar->precompute();
 
-Marpa::R2::Test::is( $grammar->show_rules,
+Marpa::R3::Test::is( $grammar->show_rules,
     <<'END_OF_STRING', 'duplicate parse Rules' );
 0: S -> p p p n
 1: p -> a
@@ -64,7 +64,7 @@ Marpa::R2::Test::is( $grammar->show_rules,
 3: n -> a
 END_OF_STRING
 
-Marpa::R2::Test::is( $grammar->show_ahms,
+Marpa::R3::Test::is( $grammar->show_ahms,
     <<'END_OF_STRING', 'duplicate parse AHMs' );
 AHM 0: postdot = "p"
     S ::= . p p S[R0:2]
@@ -116,7 +116,7 @@ END_OF_STRING
 
 use constant SPACE => 0x60;
 
-my $recce = Marpa::R2::Recognizer->new( { grammar => $grammar } );
+my $recce = Marpa::R3::Recognizer->new( { grammar => $grammar } );
 my $input_length = 3;
 for my $input_ix ( 1 .. $input_length ) {
     $recce->read( 'a', chr( SPACE + $input_ix ) );

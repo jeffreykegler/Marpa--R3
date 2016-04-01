@@ -1,17 +1,17 @@
 #!perl
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
 use 5.010;
@@ -42,10 +42,10 @@ BEGIN {
     }
 } ## end BEGIN
 
-use Marpa::R2;
-use Marpa::R2::Perl;
+use Marpa::R3;
+use Marpa::R3::Perl;
 use lib 'inc';
-use Marpa::R2::Test;
+use Marpa::R3::Test;
 
 my $input_string = <<'END_OF_INPUT';
 Note: line:column figures include preceding whitepace
@@ -68,8 +68,8 @@ Hash from 16:6 to 16:14
 Code block from 15:33 to 16:15
 END_OF_INPUT
 
-my $finder = Marpa::R2::Perl->new( { embedded => 1, closures => {} } );
-my $main_parser = Marpa::R2::Perl->new( { closures => {} } );
+my $finder = Marpa::R3::Perl->new( { embedded => 1, closures => {} } );
+my $main_parser = Marpa::R3::Perl->new( { closures => {} } );
 
 sub linecol {
     my ($token) = @_;
@@ -104,7 +104,7 @@ PERL_CODE: while (1) {
 $main_result .= sprintf "perl tokens = %d; all tokens=%d; %.2f%%\n", $perl_found,
     $count_of_tokens, ( $perl_found / $count_of_tokens ) * 100;
 
-Marpa::R2::Test::is( $main_result, <<'END_OF_OUTPUT', 'Output' );
+Marpa::R3::Test::is( $main_result, <<'END_OF_OUTPUT', 'Output' );
 Perl fragment: {42;{1,2,3;4}}
 Code block at 3:5 3:13 {1,2,3;4}
 Code block at 2:33 3:14 {42;{1,2,3;4}}
@@ -130,9 +130,9 @@ sub find_curly {
     my $recce            = $parser->{recce};
     my $earleme_to_token = $parser->{earleme_to_PPI_token};
     my $PPI_tokens       = $parser->{PPI_tokens};
-    my $grammar          = $recce->[Marpa::R2::Internal::Recognizer::GRAMMAR];
-    my $grammar_c        = $grammar->[Marpa::R2::Internal::Grammar::C];
-    my $rules            = $grammar->[Marpa::R2::Internal::Grammar::RULES];
+    my $grammar          = $recce->[Marpa::R3::Internal::Recognizer::GRAMMAR];
+    my $grammar_c        = $grammar->[Marpa::R3::Internal::Grammar::C];
+    my $rules            = $grammar->[Marpa::R3::Internal::Grammar::RULES];
     for my $earley_set_id ( 0 .. $recce->latest_earley_set() ) {
         my @hash_locations  = ();
         my @code_locations  = ();
@@ -147,7 +147,7 @@ sub find_curly {
             my $origin_earleme = $recce->earleme($origin_earley_set_id);
 
             my $rule      = $rules->[$rule_id];
-            my $rule_name = $rule->[Marpa::R2::Internal::Rule::NAME];
+            my $rule_name = $rule->[Marpa::R3::Internal::Rule::NAME];
             next ITEM if not defined $rule_name;
             my $blocktype =
                   $rule_name eq 'anon_hash' ? 'hash'

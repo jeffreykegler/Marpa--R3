@@ -1,17 +1,17 @@
 #!perl
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
 # Tests of ambiguity detection in the target grammar
@@ -24,8 +24,8 @@ use warnings;
 use Test::More tests => 11;
 use English qw( -no_match_vars );
 use lib 'inc';
-use Marpa::R2::Test;
-use Marpa::R2;
+use Marpa::R3::Test;
+use Marpa::R3;
 use Data::Dumper;
 
 our $DEBUG = 0;
@@ -51,8 +51,8 @@ Ambiguous symch at Glade=2, Symbol=<pair>:
 END_OF_MESSAGE
 my $test_name = 'Symch ambiguity';
 
-my $grammar = Marpa::R2::Scanless::G->new( { source  => $source } );
-my $recce   = Marpa::R2::Scanless::R->new( { grammar => $grammar } );
+my $grammar = Marpa::R3::Scanless::G->new( { source  => $source } );
+my $recce   = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
 my $is_ambiguous_parse = 1;
 
 my ( $actual_value, $actual_result );
@@ -69,24 +69,24 @@ PROCESSING: {
         last PROCESSING;
     } ## end if ( not defined eval { $recce->read( \$input ); 1 })
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: ASF ambiguity reporting
 
     if ( $recce->ambiguity_metric() > 1 ) {
-        my $asf = Marpa::R2::ASF->new( { slr => $recce } );
+        my $asf = Marpa::R3::ASF->new( { slr => $recce } );
         die 'No ASF' if not defined $asf;
-        my $ambiguities = Marpa::R2::Internal::ASF::ambiguities($asf);
+        my $ambiguities = Marpa::R3::Internal::ASF::ambiguities($asf);
 
         # Only report the first two
         my @ambiguities = grep {defined} @{$ambiguities}[ 0 .. 1 ];
 
         $actual_value = 'Application grammar is ambiguous';
         $actual_result =
-            Marpa::R2::Internal::ASF::ambiguities_show( $asf, \@ambiguities );
+            Marpa::R3::Internal::ASF::ambiguities_show( $asf, \@ambiguities );
         last PROCESSING;
     } ## end if ( $recce->ambiguity_metric() > 1 )
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
     $is_ambiguous_parse = 0;
 
@@ -115,15 +115,15 @@ if ( !$is_ambiguous_parse ) {
 }
 else {
     $recce->series_restart();
-    my $asf = Marpa::R2::ASF->new( { slr => $recce } );
+    my $asf = Marpa::R3::ASF->new( { slr => $recce } );
     my $glade_id = $asf->peak;
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: glade_span() example
 
     my ( $glade_start, $glade_length ) = $asf->glade_span($glade_id);
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
     Test::More::is( $glade_start,  0, qq{glade_span() start} );
     Test::More::is( $glade_length, 2, qq{glade_span() length} );
@@ -149,13 +149,13 @@ B2 ~ 'b'
 ws ~ [\s]+
 END_OF_SOURCE
 
-$grammar = Marpa::R2::Scanless::G->new({ source => $source });
+$grammar = Marpa::R3::Scanless::G->new({ source => $source });
 
 $input = q{a b};
 
 for my $ranking_method ('none', 'rule', 'high_rule_only'){
 
-    $recce = Marpa::R2::Scanless::R->new({
+    $recce = Marpa::R3::Scanless::R->new({
         grammar => $grammar,
         ranking_method => $ranking_method,
     } );

@@ -1,17 +1,17 @@
 #!perl
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
 use 5.010;
@@ -25,13 +25,13 @@ use warnings;
 
 use Test::More tests => 7;
 use lib 'inc';
-use Marpa::R2::Test;
-use Marpa::R2;
+use Marpa::R3::Test;
+use Marpa::R3;
 
 sub ah_extended {
     my $n = shift;
 
-    my $g = Marpa::R2::Grammar->new(
+    my $g = Marpa::R3::Grammar->new(
         {   start => 'S',
 
             rules => [
@@ -48,7 +48,7 @@ sub ah_extended {
     );
     $g->precompute();
 
-    my $recce = Marpa::R2::Recognizer->new( { grammar => $g } );
+    my $recce = Marpa::R3::Recognizer->new( { grammar => $g } );
 
     for my $token_ix ( 1 .. $n ) {
         $recce->read( 'a' );
@@ -61,13 +61,13 @@ sub ah_extended {
         # An arbitrary maximum is put on the number of parses -- this is for
         # debugging, and infinite loops happen.
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: reset_evaluation Synopsis
 
         $recce->reset_evaluation();
         $recce->set( { end => $loc, max_parses => 999, } );
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
         while ( $recce->value() ) { $parse_counts[$loc]++ }
     } ## end for my $loc ( 0 .. $n )
@@ -92,7 +92,7 @@ my @answers = (
 for my $a ( ( 0 .. 5 ), 10 ) {
 ## use critic
 
-    Marpa::R2::Test::is( ah_extended($a), $answers[$a],
+    Marpa::R3::Test::is( ah_extended($a), $answers[$a],
         "Row $a of Pascal's triangle matches parse counts" );
 
 } ## end for my $a ( ( 0 .. 5 ), 10 )

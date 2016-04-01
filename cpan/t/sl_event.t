@@ -1,17 +1,17 @@
 #!perl
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
 # Test of scannerless parsing -- predicted, nulled and completed events with 
@@ -24,8 +24,8 @@ use warnings;
 use Test::More tests => 44;
 use English qw( -no_match_vars );
 use lib 'inc';
-use Marpa::R2::Test;
-use Marpa::R2;
+use Marpa::R3::Test;
+use Marpa::R3;
 
 my $rules = <<'END_OF_GRAMMAR';
 :start ::= sequence
@@ -107,7 +107,7 @@ for my $pos_events  (split /\n/xms, $all_events_expected)
     push @events, @pos_events;
 }
 
-my $grammar = Marpa::R2::Scanless::G->new( { source => \$rules } );
+my $grammar = Marpa::R3::Scanless::G->new( { source => \$rules } );
 
 my $location_0_event = qq{0 ^a\n} ;
 
@@ -134,22 +134,22 @@ sub show_last_subtext {
 sub do_test {
     my ( $test, $slg, $string, $expected_events, $reactivate_events ) = @_;
     my $actual_events = q{};
-    my $recce = Marpa::R2::Scanless::R->new(
+    my $recce = Marpa::R3::Scanless::R->new(
         { grammar => $grammar, semantics_package => 'My_Actions' } );
     if (defined $reactivate_events) {
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: SLIF activate() method synopsis
 
         $recce->activate($_, 0) for @events;
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
         $recce->activate($_) for @{$reactivate_events};
 
     }
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: SLIF events() method synopsis
 
     my $length = length $string;
@@ -172,7 +172,7 @@ sub do_test {
         $pos = $recce->resume($pos);
     } ## end READ: while (1)
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
     my $value_ref = $recce->value();
     if ( not defined $value_ref ) {
@@ -180,7 +180,7 @@ sub do_test {
     }
     my $actual_value = ${$value_ref};
     Test::More::is( $actual_value, q{1792}, qq{Value for $test} );
-    Marpa::R2::Test::is( $actual_events, $expected_events,
+    Marpa::R3::Test::is( $actual_events, $expected_events,
         qq{Events for $test} );
 } ## end sub do_test
 

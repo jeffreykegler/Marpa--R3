@@ -1,17 +1,17 @@
 #!perl
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 # An ambiguous equation
 
@@ -22,12 +22,12 @@ use warnings;
 use Test::More tests => 7;
 
 use lib 'inc';
-use Marpa::R2::Test;
+use Marpa::R3::Test;
 
 use Data::Dumper;
 use English qw( -no_match_vars );
 use Fatal qw( close open );
-use Marpa::R2;
+use Marpa::R3;
 
 # Regression test for bug originally found and documented
 # by Tomas Jirotka
@@ -46,7 +46,7 @@ my $tokens = [
 
 my @terminals =
     qw/AS BY CREATE FALSE FOR METRIC PF SELECT TRUE WHERE WITH ID_METRIC SEPARATOR NUMBER/;
-my $grammar = Marpa::R2::Grammar->new(
+my $grammar = Marpa::R3::Grammar->new(
     {   start          => 'Input',
         action_object  => 'Maql_Actions',
         default_action => 'tisk',
@@ -111,7 +111,7 @@ my $grammar = Marpa::R2::Grammar->new(
 
 $grammar->precompute();
 
-Marpa::R2::Test::is(
+Marpa::R3::Test::is(
     $grammar->show_symbols(),
     <<'END_OF_SYMBOLS', 'Symbols' );
 0: AS, terminal
@@ -140,7 +140,7 @@ Marpa::R2::Test::is(
 23: FilterExpr
 END_OF_SYMBOLS
 
-Marpa::R2::Test::is( $grammar->show_rules(),
+Marpa::R3::Test::is( $grammar->show_rules(),
 <<'END_OF_RULES', 'Rules' );
 0: Input -> Statement+ /* discard_sep */
 1: Statement -> CREATE TypeDef
@@ -159,7 +159,7 @@ Marpa::R2::Test::is( $grammar->show_rules(),
 14: WithPf -> WITH PF
 END_OF_RULES
 
-Marpa::R2::Test::is( $grammar->show_ahms(),
+Marpa::R3::Test::is( $grammar->show_ahms(),
     <<'END_OF_AHMS', 'AHMs' );
 AHM 0: postdot = "Input[Seq]"
     Input ::= . Input[Seq]
@@ -297,11 +297,11 @@ AHM 66: completion
     Input['] ::= Input .
 END_OF_AHMS
 
-my $recog = Marpa::R2::Recognizer->new( { grammar => $grammar } );
+my $recog = Marpa::R3::Recognizer->new( { grammar => $grammar } );
 for my $token ( @{$tokens} ) { $recog->read( @{$token} ); }
 my @result = $recog->value();
 
-Marpa::R2::Test::is( $recog->show_earley_sets(),
+Marpa::R3::Test::is( $recog->show_earley_sets(),
     <<'END_OF_EARLEY_SETS', 'Earley Sets' );
 Last Completed: 8; Furthest: 8
 Earley Set 0
@@ -467,7 +467,7 @@ ahm62: R22:0@8-8
   R22:0: WithPf ::= . WITH PF
 END_OF_EARLEY_SETS
 
-Marpa::R2::Test::is( $recog->show_and_nodes(),
+Marpa::R3::Test::is( $recog->show_and_nodes(),
     <<'END_OF_AND_NODES', 'And Nodes' );
 And-node #0: R4:1@0-1S2@0
 And-node #19: R0:1@0-8C2@0
@@ -492,7 +492,7 @@ And-node #11: R19:2@6-8C20@7
 And-node #10: R20:1@7-8S8@7
 END_OF_AND_NODES
 
-Marpa::R2::Test::is( $recog->show_or_nodes(),
+Marpa::R3::Test::is( $recog->show_or_nodes(),
     <<'END_OF_OR_NODES', 'Or Nodes' );
 R4:1@0-1
 R0:1@0-8
@@ -517,7 +517,7 @@ R19:2@6-8
 R20:1@7-8
 END_OF_OR_NODES
 
-Marpa::R2::Test::is( Dumper( \@result ), <<'END_OF_STRING', 'Result' );
+Marpa::R3::Test::is( Dumper( \@result ), <<'END_OF_STRING', 'Result' );
 $VAR1 = [
           \[
               [

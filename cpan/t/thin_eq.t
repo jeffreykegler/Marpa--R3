@@ -1,17 +1,17 @@
 #!perl
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
 # Testing an ambiguous equation
@@ -24,15 +24,15 @@ use warnings;
 use Test::More tests => 12;
 
 use lib 'inc';
-use Marpa::R2::Test;
+use Marpa::R3::Test;
 use English qw( -no_match_vars );
 use Fatal qw( close open );
-use Marpa::R2;
+use Marpa::R3;
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: Thin example
 
-my $grammar = Marpa::R2::Thin::G->new( { if => 1 } );
+my $grammar = Marpa::R3::Thin::G->new( { if => 1 } );
 $grammar->force_valued();
 my $symbol_S = $grammar->symbol_new();
 my $symbol_E = $grammar->symbol_new();
@@ -45,7 +45,7 @@ my $op_rule_id =
 my $number_rule_id = $grammar->rule_new( $symbol_E, [$symbol_number] );
 $grammar->precompute();
 
-my $recce = Marpa::R2::Thin::R->new($grammar);
+my $recce = Marpa::R3::Thin::R->new($grammar);
 $recce->start_input();
 
 # The numbers from 1 to 3 are themselves --
@@ -74,12 +74,12 @@ $recce->alternative( $symbol_number, 1, 1 );
 $recce->earleme_complete();
 
 my $latest_earley_set_ID = $recce->latest_earley_set();
-my $bocage        = Marpa::R2::Thin::B->new( $recce, $latest_earley_set_ID );
-my $order         = Marpa::R2::Thin::O->new($bocage);
-my $tree          = Marpa::R2::Thin::T->new($order);
+my $bocage        = Marpa::R3::Thin::B->new( $recce, $latest_earley_set_ID );
+my $order         = Marpa::R3::Thin::O->new($bocage);
+my $tree          = Marpa::R3::Thin::T->new($order);
 my @actual_values = ();
 while ( $tree->next() ) {
-    my $valuator = Marpa::R2::Thin::V->new($tree);
+    my $valuator = Marpa::R3::Thin::V->new($tree);
     my @stack = ();
     STEP: while ( 1 ) {
         my ( $type, @step_data ) = $valuator->step();
@@ -128,7 +128,7 @@ while ( $tree->next() ) {
     push @actual_values, $stack[0];
 } ## end while ( $tree->next() )
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
 my %expected_value = (
     '(2-(0*(3+1))) == 2' => 1,
@@ -153,27 +153,27 @@ for my $actual_value (@actual_values) {
 # For the error methods, start clean,
 # with a new, trivial grammar
 $grammar = $recce = $bocage = $order = $tree = undef;
-$grammar = Marpa::R2::Thin::G->new( { if => 1 } );
+$grammar = Marpa::R3::Thin::G->new( { if => 1 } );
 $grammar->force_valued();
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: Thin throw_set() example
 
 $grammar->throw_set(0);
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
 # Turn it right back on, for safety's sake
 $grammar->throw_set(1);
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: Thin grammar error methods
 
 my ( $error_code, $error_description ) = $grammar->error();
-my @error_names = Marpa::R2::Thin::error_names();
+my @error_names = Marpa::R3::Thin::error_names();
 my $error_name = $error_names[$error_code];
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
 Test::More::is( $error_code, 0, 'Grammar error code' );
 Test::More::is( $error_name, 'MARPA_ERR_NONE', 'Grammar error name' );
@@ -184,7 +184,7 @@ my $symbol_a = $grammar->symbol_new();
 my $symbol_sep = $grammar->symbol_new();
 $grammar->start_symbol_set($symbol_S);
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: Thin sequence_new() example
 
 my $sequence_rule_id = $grammar->sequence_new(
@@ -196,48 +196,48 @@ my $sequence_rule_id = $grammar->sequence_new(
         }
     );
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
 $grammar->precompute();
 my @events;
 my $event_ix = $grammar->event_count();
 while ( $event_ix-- ) {
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: Thin event() example
 
     my ( $event_type, $value ) = $grammar->event( $event_ix++ );
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
 }
 
-$recce = Marpa::R2::Thin::R->new($grammar);
+$recce = Marpa::R3::Thin::R->new($grammar);
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: Thin ruby_slippers_set() example
 
 $recce->ruby_slippers_set(1);
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
 $recce->start_input();
 $recce->alternative( $symbol_a, 1, 1 );
 $recce->earleme_complete();
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: Thin terminals_expected() example
 
    my @terminals = $recce->terminals_expected();
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
 Test::More::is( (scalar @terminals), 1, 'count of terminals expected' );
 Test::More::is( $terminals[0], $symbol_sep, 'expected terminal' );
 
 my $report;
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: Thin progress_item() example
 
     my $ordinal = $recce->latest_earley_set();
@@ -249,7 +249,7 @@ my $report;
     }
     $recce->progress_report_finish();
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
 Test::More::is( ( join q{ }, map { @{$_} } @{$report} ),
     '0 -1 0 0 0 0', 'progress report' );
@@ -263,17 +263,17 @@ $recce->earleme_complete();
 $recce->alternative( $symbol_a, 1, 1 );
 $recce->earleme_complete();
 $latest_earley_set_ID = $recce->latest_earley_set();
-$bocage        = Marpa::R2::Thin::B->new( $recce, $latest_earley_set_ID );
-$order         = Marpa::R2::Thin::O->new($bocage);
-$tree          = Marpa::R2::Thin::T->new($order);
+$bocage        = Marpa::R3::Thin::B->new( $recce, $latest_earley_set_ID );
+$order         = Marpa::R3::Thin::O->new($bocage);
+$tree          = Marpa::R3::Thin::T->new($order);
 $tree->next();
-my $valuator = Marpa::R2::Thin::V->new($tree);
+my $valuator = Marpa::R3::Thin::V->new($tree);
 my $locations_report = q{};
 STEP: for ( ;; ) {
     my ( $type, @step_data ) = $valuator->step();
     last STEP if not defined $type;
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: Thin location() example
 
     $type = $valuator->step_type();
@@ -292,7 +292,7 @@ STEP: for ( ;; ) {
             .= "Nulling symbol $symbol_id is from $start to $end\n";
     }
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
 } ## end STEP: for ( ;; )
 

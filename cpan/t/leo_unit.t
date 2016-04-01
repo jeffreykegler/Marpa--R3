@@ -1,17 +1,17 @@
 #!perl
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
 # Test of Leo logic for unit rule.
@@ -24,8 +24,8 @@ use List::Util;
 use Test::More tests => 7;
 
 use lib 'inc';
-use Marpa::R2::Test;
-use Marpa::R2;
+use Marpa::R3::Test;
+use Marpa::R3;
 
 ## no critic (Subroutines::RequireArgUnpacking)
 
@@ -36,7 +36,7 @@ sub main::default_action {
 
 ## use critic
 
-my $grammar = Marpa::R2::Grammar->new(
+my $grammar = Marpa::R3::Grammar->new(
     {   start => 'A',
         rules => [
             [ 'A', [qw/a B/] ],
@@ -51,7 +51,7 @@ my $grammar = Marpa::R2::Grammar->new(
 
 $grammar->precompute();
 
-Marpa::R2::Test::is( $grammar->show_symbols(),
+Marpa::R3::Test::is( $grammar->show_symbols(),
     <<'END_OF_STRING', 'Leo166 Symbols' );
 0: a, terminal
 1: c, terminal
@@ -60,7 +60,7 @@ Marpa::R2::Test::is( $grammar->show_symbols(),
 4: C
 END_OF_STRING
 
-Marpa::R2::Test::is( $grammar->show_rules,
+Marpa::R3::Test::is( $grammar->show_rules,
     <<'END_OF_STRING', 'Leo166 Rules' );
 0: A -> a B
 1: B -> C
@@ -69,7 +69,7 @@ Marpa::R2::Test::is( $grammar->show_rules,
 END_OF_STRING
 
 
-Marpa::R2::Test::is( $grammar->show_ahms, <<'END_OF_STRING', 'Leo166 AHMs' );
+Marpa::R3::Test::is( $grammar->show_ahms, <<'END_OF_STRING', 'Leo166 AHMs' );
 AHM 0: postdot = "a"
     A ::= . a B
 AHM 1: postdot = "B"
@@ -100,7 +100,7 @@ my $input = 'acacac';
 my $length_of_input = length $input;
 
 LEO_FLAG: for my $leo_flag ( 0, 1 ) {
-    my $recce = Marpa::R2::Recognizer->new(
+    my $recce = Marpa::R3::Recognizer->new(
         { grammar => $grammar, leo => $leo_flag } );
 
     my $i                 = 0;
@@ -118,12 +118,12 @@ LEO_FLAG: for my $leo_flag ( 0, 1 ) {
 
     my $max_size = List::Util::max(@sizes);
     my $expected_size = $leo_flag ? 5 : ( $length_of_input / 2 ) * 3 + 3;
-    Marpa::R2::Test::is( $max_size, $expected_size,
+    Marpa::R3::Test::is( $max_size, $expected_size,
         "Leo flag $leo_flag, size was $max_size but $expected_size was expected" );
 
     my $value_ref = $recce->value();
     my $value = $value_ref ? ${$value_ref} : 'No parse';
-    Marpa::R2::Test::is( $value, 'acacac', 'Leo unit rule parse' );
+    Marpa::R3::Test::is( $value, 'acacac', 'Leo unit rule parse' );
 
 } ## end LEO_FLAG: for my $leo_flag ( 0, 1 )
 

@@ -1,17 +1,17 @@
 #!perl
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
 # !!! WARNING !!!
@@ -26,14 +26,14 @@ use warnings;
 use Test::More tests => 2;
 
 use lib 'inc';
-use Marpa::R2::Test;
+use Marpa::R3::Test;
 use English qw( -no_match_vars );
 use Fatal qw( close open );
-use Marpa::R2;
+use Marpa::R3;
 
 # Test the deprecated, zero-argument form
 # of the thin grammar constructor.
-my $grammar = Marpa::R2::Thin::G->new();
+my $grammar = Marpa::R3::Thin::G->new();
 
 # Carry on with it a little ways,
 # just to show that the recognizer starts out
@@ -47,7 +47,7 @@ $grammar->rule_new( $symbol_S, [ $symbol_a, $symbol_a ] );
 
 $grammar->precompute();
 
-my $recce = Marpa::R2::Thin::R->new($grammar);
+my $recce = Marpa::R3::Thin::R->new($grammar);
 $recce->start_input();
 $recce->alternative( $symbol_a, 1, 1 );
 $recce->earleme_complete();

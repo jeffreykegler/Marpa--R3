@@ -1,17 +1,17 @@
 #!/usr/bin/perl
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
 use 5.010;
@@ -22,10 +22,10 @@ use Fatal qw(open close);
 use Test::More tests => 8;
 
 use lib 'inc';
-use Marpa::R2::Test;
-use Marpa::R2;
+use Marpa::R3::Test;
+use Marpa::R3;
 
-my $grammar = Marpa::R2::Grammar->new(
+my $grammar = Marpa::R3::Grammar->new(
     {   start          => 'Expression',
         actions        => 'My_Actions',
         default_action => 'first_arg',
@@ -44,7 +44,7 @@ my $grammar = Marpa::R2::Grammar->new(
 
 $grammar->precompute();
 
-my $recce = Marpa::R2::Recognizer->new( { grammar => $grammar } );
+my $recce = Marpa::R3::Recognizer->new( { grammar => $grammar } );
 
 my @tokens = (
     [ 'Number',   42 ],
@@ -73,13 +73,13 @@ sub My_Actions::first_arg { shift; return shift; }
 my $value_ref = $recce->value();
 my $value = $value_ref ? ${$value_ref} : 'No Parse';
 
-Marpa::R2::Test::is( 49, $value, 'Implementation Example Value 1' );
+Marpa::R3::Test::is( 49, $value, 'Implementation Example Value 1' );
 
 $recce->reset_evaluation();
 
 my $show_symbols_output = $grammar->show_symbols();
 
-Marpa::R2::Test::is( $show_symbols_output,
+Marpa::R3::Test::is( $show_symbols_output,
     <<'END_SYMBOLS', 'Implementation Example Symbols' );
 0: Expression
 1: Term
@@ -91,7 +91,7 @@ END_SYMBOLS
 
 my $show_rules_output = $grammar->show_rules();
 
-Marpa::R2::Test::is( $show_rules_output,
+Marpa::R3::Test::is( $show_rules_output,
     <<'END_RULES', 'Implementation Example Rules' );
 0: Expression -> Term
 1: Term -> Factor
@@ -102,7 +102,7 @@ END_RULES
 
 my $show_ahms_output = $grammar->show_ahms();
 
-Marpa::R2::Test::is( $show_ahms_output,
+Marpa::R3::Test::is( $show_ahms_output,
     <<'END_AHM', 'Implementation Example AHMs' );
 AHM 0: postdot = "Term"
     Expression ::= . Term
@@ -246,7 +246,7 @@ ahm15: R5$@0-5
   [p=R5:0@0-0; c=R0$@0-5]
 END_EARLEY_SETS
 
-Marpa::R2::Test::is( $show_earley_sets_output, $expected_earley_sets,
+Marpa::R3::Test::is( $show_earley_sets_output, $expected_earley_sets,
     'Implementation Example Earley Sets' );
 
 my $trace_output;
@@ -257,7 +257,7 @@ $recce->set( { trace_fh => \*STDOUT, trace_values => 0 } );
 close $trace_fh;
 
 $value = $value_ref ? ${$value_ref} : 'No Parse';
-Marpa::R2::Test::is( 49, $value, 'Implementation Example Value 2' );
+Marpa::R3::Test::is( 49, $value, 'Implementation Example Value 2' );
 
 my $expected_trace_output = <<'END_TRACE_OUTPUT';
 Setting trace_values option
@@ -286,14 +286,14 @@ New Virtual Rule: R5:1@0-5C0@0, rule: 5: Expression['] -> Expression
 Real symbol count is 1
 END_TRACE_OUTPUT
 
-Marpa::R2::Test::is( $trace_output, $expected_trace_output,
+Marpa::R3::Test::is( $trace_output, $expected_trace_output,
     'Implementation Example Trace Output' );
 
 $recce->reset_evaluation();
 
 $value_ref = $recce->value();
 $value = $value_ref ? ${$value_ref} : 'No Parse';
-Marpa::R2::Test::is( 49, $value, 'Implementation Example Value 3' );
+Marpa::R3::Test::is( 49, $value, 'Implementation Example Value 3' );
 
 1;    # In case used as "do" file
 

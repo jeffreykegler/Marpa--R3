@@ -1,17 +1,17 @@
 #!/usr/bin/perl
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
 # NAIF semantics examples
@@ -25,48 +25,48 @@ use Test::More tests => 7;
 use English qw( -no_match_vars );
 use Fatal qw( open close );
 use lib 'inc';
-use Marpa::R2::Test;
-use Marpa::R2;
+use Marpa::R3::Test;
+use Marpa::R3;
 
 my $trace_rules = q{};
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: Action context synopsis
 
 sub do_S {
     my ($action_object) = @_;
-    my $rule_id = $Marpa::R2::Context::rule;
-    my $grammar = $Marpa::R2::Context::grammar;
+    my $rule_id = $Marpa::R3::Context::rule;
+    my $grammar = $Marpa::R3::Context::grammar;
     my ( $lhs, @rhs ) = $grammar->rule($rule_id);
     $action_object->{text} =
           "rule $rule_id: $lhs ::= "
         . ( join q{ }, @rhs ) . "\n"
         . "locations: "
-        . ( join q{-}, Marpa::R2::Context::location() ) . "\n";
+        . ( join q{-}, Marpa::R3::Context::location() ) . "\n";
     return $action_object;
 } ## end sub do_S
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: Semantics bail synopsis
 
 my $bail_message = "This is a bail out message!";
 
 sub do_bail_with_message_if_A {
     my ($action_object, $terminal) = @_;
-    Marpa::R2::Context::bail($bail_message) if $terminal eq 'A';
+    Marpa::R3::Context::bail($bail_message) if $terminal eq 'A';
 }
 
 sub do_bail_with_object_if_A {
     my ($action_object, $terminal) = @_;
-    Marpa::R2::Context::bail([$bail_message]) if $terminal eq 'A';
+    Marpa::R3::Context::bail([$bail_message]) if $terminal eq 'A';
 }
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
 my @terminals = qw/A B C D/;
-my $grammar   = Marpa::R2::Grammar->new(
+my $grammar   = Marpa::R3::Grammar->new(
     {   start => 'S',
         rules =>
             [ { lhs => 'S', rhs => \@terminals, action => 'main::do_S' }, ],
@@ -76,17 +76,17 @@ my $grammar   = Marpa::R2::Grammar->new(
 
 $grammar->precompute();
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: rule_ids() Synopsis
 
 my @rule_ids = $grammar->rule_ids();
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
 Test::More::is( ( join q{ }, @rule_ids ), '0', '$g->rule_ids() ok?' );
 
 sub do_parse {
-    my $recce = Marpa::R2::Recognizer->new( { grammar => $grammar } );
+    my $recce = Marpa::R3::Recognizer->new( { grammar => $grammar } );
     for my $terminal (@terminals) {
         $recce->read( $terminal, $terminal );
     }

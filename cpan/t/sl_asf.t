@@ -1,17 +1,17 @@
 #!perl
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
 # Tests of glade traversal from rns
@@ -24,11 +24,11 @@ use warnings;
 use Test::More tests => 3;
 use English qw( -no_match_vars );
 use lib 'inc';
-use Marpa::R2::Test;
-use Marpa::R2;
+use Marpa::R3::Test;
+use Marpa::R3;
 use Data::Dumper;
 
-my $g = Marpa::R2::Scanless::G->new(
+my $g = Marpa::R3::Scanless::G->new(
     {   source => \(<<'END_OF_SOURCE'),
 
     :default ::= action => [ name, value]
@@ -52,7 +52,7 @@ my $input = <<EOI;
 2**7-3**10
 EOI
 
-my $r = Marpa::R2::Scanless::R->new( { grammar => $g } );
+my $r = Marpa::R3::Scanless::R->new( { grammar => $g } );
 $r->read( \$input );
 
 {
@@ -65,13 +65,13 @@ Ambiguous symch at Glade=2, Symbol=<Expr>:
   Symch 0 is a rule: Expr ::= Expr '**' Expr
   Symch 1 is a rule: Expr ::= Expr '-' Expr
 EOS
-Marpa::R2::Test::is($ambiguous_status, $expected, 'ambiguous_status()');
+Marpa::R3::Test::is($ambiguous_status, $expected, 'ambiguous_status()');
 Test::More::ok( ( $r->ambiguity_metric() > 1 ), 'ambiguity_metric()');
 }
 
 {
     $r->series_restart();
-    my $asf = Marpa::R2::ASF->new( { slr => $r } );
+    my $asf = Marpa::R3::ASF->new( { slr => $r } );
     my $full_result = $asf->traverse( {}, \&full_traverser );
     my $actual = join "\n", @{$full_result}, q{};
     my $expected = <<'EOS';
@@ -81,7 +81,7 @@ Test::More::ok( ( $r->ambiguity_metric() > 1 ), 'ambiguity_metric()');
 (Expr (Expr (2)) (**) (Expr (Expr (7)) (-) (Expr (Expr (3)) (**) (Expr (10)))))
 (Expr (Expr (Expr (2)) (**) (Expr (7))) (-) (Expr (Expr (3)) (**) (Expr (10))))
 EOS
-    Marpa::R2::Test::is( $actual, $expected, 'Result of ASF traversal' );
+    Marpa::R3::Test::is( $actual, $expected, 'Result of ASF traversal' );
 }
 
 sub full_traverser {

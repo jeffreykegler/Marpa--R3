@@ -1,17 +1,17 @@
 #!perl
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
 use 5.010;
@@ -20,8 +20,8 @@ use warnings;
 
 use Test::More tests => 1;
 use lib 'inc';
-use Marpa::R2::Test;
-use Marpa::R2;
+use Marpa::R3::Test;
+use Marpa::R3;
 
 package Test;
 
@@ -83,13 +83,13 @@ $Test_Grammar::MARPA_OPTIONS = [
 
 package main;
 
-my $g = Marpa::R2::Grammar->new( @{$Test_Grammar::MARPA_OPTIONS} );
+my $g = Marpa::R3::Grammar->new( @{$Test_Grammar::MARPA_OPTIONS} );
 $g->precompute();
-my $recce = Marpa::R2::Recognizer->new( { grammar => $g } );
+my $recce = Marpa::R3::Recognizer->new( { grammar => $g } );
 $recce->read( 'Z', 'Z' );
 my $ref_value = $recce->value();
 my $value = $ref_value ? ${$ref_value} : 'No parse';
-Marpa::R2::Test::is(
+Marpa::R3::Test::is(
     $value,
     'A is missing, but Zorro was here',
     'null value example'

@@ -1,17 +1,17 @@
 #!perl
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
 # Tests which require only grammar, input, and an output with no
@@ -24,8 +24,8 @@ use warnings;
 use Test::More tests => 34;
 use English qw( -no_match_vars );
 use lib 'inc';
-use Marpa::R2::Test;
-use Marpa::R2;
+use Marpa::R3::Test;
+use Marpa::R3;
 use Data::Dumper;
 
 my @tests_data = ();
@@ -34,7 +34,7 @@ our $DEBUG = 0;
 
 # In crediting test, JDD = Jean-Damien Durand
 if (1) {
-    my $glenn_grammar = Marpa::R2::Scanless::G->new(
+    my $glenn_grammar = Marpa::R3::Scanless::G->new(
         {   source => \(<<'END_OF_SOURCE'),
             :default ::= action => ::array
 
@@ -63,13 +63,13 @@ END_OF_SOURCE
         ];
 } ## end if (0)
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: Case-insensitive characters examples
 # start-after-line: END_OF_SOURCE
 # end-before-line: '^END_OF_SOURCE$'
 
 if (1) {
-    my $ic_grammar = Marpa::R2::Scanless::G->new(
+    my $ic_grammar = Marpa::R3::Scanless::G->new(
         {   source => \(<<'END_OF_SOURCE'),
             :default ::= action => ::array
 
@@ -86,7 +86,7 @@ END_OF_SOURCE
         }
     );
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
     push @tests_data,
         [
@@ -99,7 +99,7 @@ END_OF_SOURCE
 } ## end if (0)
 
 if (1) {
-    my $durand_grammar1 = Marpa::R2::Scanless::G->new(
+    my $durand_grammar1 = Marpa::R3::Scanless::G->new(
         {   source => \(<<'END_OF_SOURCE'),
 :default ::= action => ::array
 start symbol is test
@@ -135,7 +135,7 @@ INPUT
 # ===============
 
 if (1) {
-    my $durand_grammar2 = Marpa::R2::Scanless::G->new(
+    my $durand_grammar2 = Marpa::R3::Scanless::G->new(
         {   source => \(<<'END_OF_SOURCE'),
 :default ::= action => ::array
 test ::= 'test input' NEWLINE
@@ -169,7 +169,7 @@ INPUT
 # ===============
 
 if (1) {
-    my $durand_grammar3 = Marpa::R2::Scanless::G->new(
+    my $durand_grammar3 = Marpa::R3::Scanless::G->new(
         {   source => \(<<'END_OF_SOURCE'),
 :default ::= action => ::array
 
@@ -211,7 +211,7 @@ INPUT
 # Regression test of grammar without lexers --
 # based on one from Jean-Damien
 if (1) {
-    my $grammar = Marpa::R2::Scanless::G->new(
+    my $grammar = Marpa::R3::Scanless::G->new(
         {   source => \(<<'END_OF_SOURCE'),
 :start ::= null
 null ::=
@@ -231,7 +231,7 @@ END_OF_SOURCE
 # Test of forgiving token from Peter Stuifzand
 if (1) {
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: forgiving adverb example
 # start-after-line: END_OF_SOURCE
 # end-before-line: '^END_OF_SOURCE$'
@@ -255,7 +255,7 @@ name      ~ [^\n]+
 
 END_OF_SOURCE
 
-# Marpa::R2::Display::END
+# Marpa::R3::Display::END
 
     my $input = <<'INPUT';
 130.12312
@@ -263,7 +263,7 @@ Descriptive line
 1,10 1,10 1,30
 INPUT
 
-    my $grammar = Marpa::R2::Scanless::G->new( { source => \$source } );
+    my $grammar = Marpa::R3::Scanless::G->new( { source => \$source } );
     push @tests_data,
         [
         $grammar, $input,
@@ -275,7 +275,7 @@ INPUT
 # Test of LATM token from Ruslan Zakirov
 if (1) {
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: latm adverb example
 # start-after-line: END_OF_SOURCE
 # end-before-line: '^END_OF_SOURCE$'
@@ -289,13 +289,13 @@ value ~ [A-Za-z0-9:-]+
 :lexeme ~ value latm => 1
 END_OF_SOURCE
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 
     my $input = 'UID:urn:uuid:4fbe8971-0bc3-424c-9c26-36c3e1eff6b1';
     my $expected_output =
         [ 'UID', ':', 'urn:uuid:4fbe8971-0bc3-424c-9c26-36c3e1eff6b1' ];
 
-    my $grammar = Marpa::R2::Scanless::G->new( { source => \$source } );
+    my $grammar = Marpa::R3::Scanless::G->new( { source => \$source } );
     push @tests_data,
         [
         $grammar, $input, $expected_output,
@@ -320,7 +320,7 @@ END_OF_SOURCE
     my $expected_output =
         [ 'UID', ':', 'urn:uuid:4fbe8971-0bc3-424c-9c26-36c3e1eff6b1' ];
 
-    my $grammar = Marpa::R2::Scanless::G->new( { source => \$source } );
+    my $grammar = Marpa::R3::Scanless::G->new( { source => \$source } );
     push @tests_data,
         [
         $grammar, $input, $expected_output,
@@ -331,7 +331,7 @@ END_OF_SOURCE
 # Test of rank adverb
 if (1) {
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: rank adverb example
 # start-after-line: END_OF_SOURCE
 # end-before-line: '^END_OF_SOURCE$'
@@ -357,7 +357,7 @@ I am special so very special -- NOT!;
 I am special and nothing is going to change that;
 END_OF_INPUT
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 
     my $expected_output = [
         [ 'unspecial', [qw(so very special)] ],
@@ -366,7 +366,7 @@ END_OF_INPUT
         ]
     ];
 
-    my $grammar = Marpa::R2::Scanless::G->new( { source => \$source } );
+    my $grammar = Marpa::R3::Scanless::G->new( { source => \$source } );
     push @tests_data,
         [
         $grammar, $input, $expected_output,
@@ -393,7 +393,7 @@ END_OF_SOURCE
     my $expected_output =
         [ 1, 0, [ 2, 1, [ 4, undef, '42' ] ], [ 3, 2, [ 5, undef, '43' ] ] ];
 
-    my $grammar = Marpa::R2::Scanless::G->new( { source => \$source } );
+    my $grammar = Marpa::R3::Scanless::G->new( { source => \$source } );
     push @tests_data,
         [
         $grammar, $input, $expected_output,
@@ -404,7 +404,7 @@ END_OF_SOURCE
 # Test of 'symbol', 'name' array item descriptors
 if (1) {
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: symbol, name array descriptor example
 # start-after-line: END_OF_SOURCE
 # end-before-line: '^END_OF_SOURCE$'
@@ -420,7 +420,7 @@ if (1) {
     <forty three> ~ '43'
 END_OF_SOURCE
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
     my $input           = '4243';
     my $expected_output = [
@@ -430,7 +430,7 @@ END_OF_SOURCE
         [ 'number2', 'number 2', [ 'forty three', 'forty three', '43' ] ]
     ];
 
-    my $grammar = Marpa::R2::Scanless::G->new( { source => \$source } );
+    my $grammar = Marpa::R3::Scanless::G->new( { source => \$source } );
     push @tests_data,
         [
         $grammar, $input, $expected_output,
@@ -441,7 +441,7 @@ END_OF_SOURCE
 ### Test of 'inaccessible is ok'
 if (1) {
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: inaccessible is ok statement
 # start-after-line: END_OF_SOURCE
 # end-before-line: '^END_OF_SOURCE$'
@@ -459,7 +459,7 @@ if (1) {
     x ::= 'x'
 END_OF_SOURCE
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
     my $input           = 'xx';
     my $expected_output = [
@@ -467,7 +467,7 @@ END_OF_SOURCE
         [ [ 'x' ] ]
     ];
 
-    my $grammar = Marpa::R2::Scanless::G->new( { source => \$source } );
+    my $grammar = Marpa::R3::Scanless::G->new( { source => \$source } );
     push @tests_data,
         [
         $grammar, $input, $expected_output,
@@ -497,7 +497,7 @@ END_OF_SOURCE
 
         my $this_source = $source;
         $this_source =~ s/!START!/$this_start/;
-        my $grammar = Marpa::R2::Scanless::G->new( { source => \$this_source } );
+        my $grammar = Marpa::R3::Scanless::G->new( { source => \$this_source } );
         push @tests_data,
             [
             $grammar, $input, $expected_output,
@@ -525,25 +525,25 @@ END_OF_SOURCE
     my $input           = 'X';
     my $expected_output = 'X';
 
-    my $grammar = Marpa::R2::Scanless::G->new( { source => \$source } );
+    my $grammar = Marpa::R3::Scanless::G->new( { source => \$source } );
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: $grammar->start_symbol_id() example
 
     my $start_id = $grammar->start_symbol_id();
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
     Test::More::is( $start_id, 0, q{Test of $grammar->start_symbol_id()} );
 
     my @rule_names = ();
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: $grammar->rule_name() example
 
     push @rule_names, $grammar->rule_name($_) for $grammar->rule_ids();
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
     my $rule_names = join q{:}, @rule_names;
     Test::More::is(
@@ -579,7 +579,7 @@ for my $test_data (@tests_data) {
 sub my_parser {
     my ( $grammar, $string ) = @_;
 
-    my $recce = Marpa::R2::Scanless::R->new( { grammar => $grammar } );
+    my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
 
     if ( not defined eval { $recce->read( \$string ); 1 } ) {
         say $EVAL_ERROR if $DEBUG;

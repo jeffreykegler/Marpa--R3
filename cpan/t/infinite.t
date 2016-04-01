@@ -1,17 +1,17 @@
 #!perl
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 # A grammar with cycles
 
@@ -23,8 +23,8 @@ use Fatal qw(open close chdir);
 
 use Test::More tests => 6;
 use lib 'inc';
-use Marpa::R2::Test;
-use Marpa::R2;
+use Marpa::R3::Test;
+use Marpa::R3;
 
 
 ## no critic (Subroutines::RequireArgUnpacking)
@@ -175,7 +175,7 @@ for my $test_data ( $cycle1_test, $cycle2_test, $cycle8_test ) {
         @{$test_data};
     my $trace = q{};
     open my $MEMORY, '>', \$trace;
-    my $grammar = Marpa::R2::Grammar->new(
+    my $grammar = Marpa::R3::Grammar->new(
         {   infinite_action   => 'warn',
             trace_file_handle => $MEMORY,
         },
@@ -183,7 +183,7 @@ for my $test_data ( $cycle1_test, $cycle2_test, $cycle8_test ) {
     );
     $grammar->precompute();
 
-    my $recce = Marpa::R2::Recognizer->new( { grammar => $grammar } );
+    my $recce = Marpa::R3::Recognizer->new( { grammar => $grammar } );
     for my $earleme_input ( @{$input} ) {
         for my $token ( @{$earleme_input} ) {
             $recce->alternative(@{$token});
@@ -195,8 +195,8 @@ for my $test_data ( $cycle1_test, $cycle2_test, $cycle8_test ) {
 
     close $MEMORY;
 
-    Marpa::R2::Test::is( $value, $expected,       "$test_name result" );
-    Marpa::R2::Test::is( $trace, $expected_trace, "$test_name trace" );
+    Marpa::R3::Test::is( $value, $expected,       "$test_name result" );
+    Marpa::R3::Test::is( $trace, $expected_trace, "$test_name trace" );
 
 } ## end for my $test_data ( $cycle1_test, $cycle2_test, $cycle8_test)
 

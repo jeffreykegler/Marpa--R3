@@ -1,17 +1,17 @@
 #!perl
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
 # This test dumps the contents of the bocage and its iterator.
@@ -26,8 +26,8 @@ use warnings;
 
 use Test::More tests => 18;
 use lib 'inc';
-use Marpa::R2::Test;
-use Marpa::R2;
+use Marpa::R3::Test;
+use Marpa::R3;
 
 ## no critic (Subroutines::RequireArgUnpacking)
 
@@ -41,7 +41,7 @@ sub default_action {
 
 ## use critic
 
-my $grammar = Marpa::R2::Grammar->new(
+my $grammar = Marpa::R3::Grammar->new(
     {   start => 'S',
         rules => [
             [ 'S', [qw/A A A A/] ],
@@ -57,14 +57,14 @@ $grammar->set( { terminals => ['a'], } );
 
 $grammar->precompute();
 
-Marpa::R2::Test::is( $grammar->show_rules, <<'EOS', 'Aycock/Horspool Rules' );
+Marpa::R3::Test::is( $grammar->show_rules, <<'EOS', 'Aycock/Horspool Rules' );
 0: S -> A A A A
 1: A -> a
 2: A -> E /* !used */
 3: E -> /* empty !used */
 EOS
 
-Marpa::R2::Test::is( $grammar->show_symbols,
+Marpa::R3::Test::is( $grammar->show_symbols,
     <<'EOS', 'Aycock/Horspool Symbols' );
 0: S
 1: A
@@ -72,23 +72,23 @@ Marpa::R2::Test::is( $grammar->show_symbols,
 3: E, nulling
 EOS
 
-Marpa::R2::Test::is(
+Marpa::R3::Test::is(
     $grammar->show_nulling_symbols,
     q{E},
     'Aycock/Horspool Nulling Symbols'
 );
-Marpa::R2::Test::is(
+Marpa::R3::Test::is(
     $grammar->show_productive_symbols,
     q{A E S a},
     'Aycock/Horspool Productive Symbols'
 );
-Marpa::R2::Test::is(
+Marpa::R3::Test::is(
     $grammar->show_accessible_symbols,
     q{A E S a},
     'Aycock/Horspool Accessible Symbols'
 );
 
-Marpa::R2::Test::is( $grammar->show_ahms(),
+Marpa::R3::Test::is( $grammar->show_ahms(),
     <<'EOS', 'AHMs' );
 AHM 0: postdot = "A"
     S ::= . A S[R0:1]
@@ -142,7 +142,7 @@ AHM 24: completion
     S['] ::= S .
 EOS
 
-my $recce = Marpa::R2::Recognizer->new( { grammar => $grammar } );
+my $recce = Marpa::R3::Recognizer->new( { grammar => $grammar } );
 
 my $expected_earley_sets = <<'END_OF_SETS';
 Last Completed: 3; Furthest: 3
@@ -410,7 +410,7 @@ $recce->read( 'a', 'a' );
 $recce->read( 'a', 'a' );
 $recce->read( 'a', 'a' );
 
-Marpa::R2::Test::is(
+Marpa::R3::Test::is(
     $recce->show_earley_sets(1),
     $expected_earley_sets,
     'Aycock/Horspool Earley Sets'
@@ -429,7 +429,7 @@ while ( my $value_ref = $recce->value() ) {
     if ($value_ref) {
         $value = ${$value_ref};
 
-        Marpa::R2::Test::is( $recce->show_tree(), $tree_expected{$value},
+        Marpa::R3::Test::is( $recce->show_tree(), $tree_expected{$value},
             qq{Tree, "$value"} );
     }
     else {
@@ -472,7 +472,7 @@ R8:2@2-3
 R9:1@2-3
 END_OF_TEXT
 
-Marpa::R2::Test::is( $recce->show_or_nodes(), $or_node_output,
+Marpa::R3::Test::is( $recce->show_or_nodes(), $or_node_output,
     'XS Or nodes' );
 
 my $and_node_output = <<'END_OF_TEXT';
@@ -501,7 +501,7 @@ And-node #10: R8:2@2-3C9@2
 And-node #9: R9:1@2-3S4@2
 END_OF_TEXT
 
-Marpa::R2::Test::is( $recce->show_and_nodes(),
+Marpa::R3::Test::is( $recce->show_and_nodes(),
     $and_node_output, 'XS And nodes' );
 
 my $bocage_output = <<'END_OF_TEXT';
@@ -530,7 +530,7 @@ my $bocage_output = <<'END_OF_TEXT';
 22: 19=R3:2@1-3 R3:1@1-2 R8:2@2-3
 END_OF_TEXT
 
-Marpa::R2::Test::is( $recce->show_bocage(), $bocage_output, 'XS Bocage' );
+Marpa::R3::Test::is( $recce->show_bocage(), $bocage_output, 'XS Bocage' );
 
 1;    # In case used as "do" file
 

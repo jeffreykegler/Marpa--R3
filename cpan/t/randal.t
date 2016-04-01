@@ -1,17 +1,17 @@
 #!/usr/bin/perl
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
 use 5.010;
@@ -21,8 +21,8 @@ use English qw( -no_match_vars );
 
 use Test::More tests => 6;
 use lib 'inc';
-use Marpa::R2::Test;
-use Marpa::R2;
+use Marpa::R3::Test;
+use Marpa::R3;
 
 package Test_Grammar;
 
@@ -171,7 +171,7 @@ my @test_data = (
     [ 'time', q{time  / 25 ; # / ; die "this dies!"}, ['division, comment'] ]
 );
 
-my $g = Marpa::R2::Grammar->new(
+my $g = Marpa::R3::Grammar->new(
     {   warnings => 1,
         actions  => 'main',
     },
@@ -185,30 +185,30 @@ TEST: for my $test_data (@test_data) {
     my ( $test_name, $test_input, $test_results ) = @{$test_data};
 
     my @event_tokens = keys %regexes;
-    my $recce        = Marpa::R2::Recognizer->new(
+    my $recce        = Marpa::R3::Recognizer->new(
         { grammar => $g, event_if_expected => \@event_tokens } );
 
     my $input_length = length $test_input;
     pos $test_input = 0;
     my $terminals_expected_matches_events = 1;
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: Recognizer terminals_expected Synopsis
 
     my $terminals_expected = $recce->terminals_expected();
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
     for ( my $pos = 0; $pos < $input_length; $pos++ ) {
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: Recognizer events() Synopsis
 
         my @expected_symbols =
             map { $_->[1]; }
             grep { $_->[0] eq 'SYMBOL_EXPECTED' } @{ $recce->events() };
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
         TOKEN: for my $token ( @{$terminals_expected} ) {
             next TOKEN if grep { $token eq $_ } @expected_symbols;
@@ -248,12 +248,12 @@ TEST: for my $test_data (@test_data) {
     }
     my $expected_parse_count = scalar @{$test_results};
     my $parse_count          = scalar @parses;
-    Marpa::R2::Test::is( $parse_count, $expected_parse_count,
+    Marpa::R3::Test::is( $parse_count, $expected_parse_count,
         "$test_name: Parse count" );
 
     my $expected = join "\n", sort @{$test_results};
     my $actual   = join "\n", sort @parses;
-    Marpa::R2::Test::is( $actual, $expected, "$test_name: Parse match" );
+    Marpa::R3::Test::is( $actual, $expected, "$test_name: Parse match" );
 
     Test::More::ok( $terminals_expected_matches_events,
         'Output of terminals_expected() matched events()' );

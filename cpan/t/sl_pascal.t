@@ -1,17 +1,17 @@
 #!perl
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
 use 5.010;
@@ -26,8 +26,8 @@ use warnings;
 
 use Test::More tests => 6;
 use lib 'inc';
-use Marpa::R2::Test;
-use Marpa::R2;
+use Marpa::R3::Test;
+use Marpa::R3;
 
 my $base_dsl = <<'END_OF_BASE_DSL';
 :start ::= S
@@ -39,9 +39,9 @@ sub ah_extended {
     my $n = shift;
 
     my $full_dsl = $base_dsl . join q{ }, 'S', '::=', ( ('A') x $n );
-    my $grammar   = Marpa::R2::Scanless::G->new( { source => \$full_dsl, } );
+    my $grammar   = Marpa::R3::Scanless::G->new( { source => \$full_dsl, } );
     my $input = 'a' x $n;
-    my $recce   = Marpa::R2::Scanless::R->new( { grammar => $grammar } );
+    my $recce   = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
     $recce->read( \$input );
 
     my @parse_counts = (1);
@@ -49,7 +49,7 @@ sub ah_extended {
         my $parse_number = 0;
 
         $recce->series_restart( { end => $loc } );
-        my $asf = Marpa::R2::ASF->new( { slr => $recce , factoring_max => 1000} );
+        my $asf = Marpa::R3::ASF->new( { slr => $recce , factoring_max => 1000} );
         $parse_counts[$loc] = $asf->traverse(
             {},
             sub {
@@ -92,7 +92,7 @@ my @answers = (
 for my $a ( ( 1 .. 5 ), 10 ) {
 ## use critic
 
-    Marpa::R2::Test::is( ah_extended($a), $answers[$a],
+    Marpa::R3::Test::is( ah_extended($a), $answers[$a],
         "Row $a of Pascal's triangle matches parse counts" );
 
 } ## end for my $a ( ( 0 .. 5 ), 10 )

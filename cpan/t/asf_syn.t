@@ -1,17 +1,17 @@
 #!perl
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
 # The low-level ASF synopses and related tests
@@ -23,15 +23,15 @@ use warnings;
 use Test::More tests => 1;
 use English qw( -no_match_vars );
 use lib 'inc';
-use Marpa::R2::Test;
-use Marpa::R2;
+use Marpa::R3::Test;
+use Marpa::R3;
 use Data::Dumper;
 use Scalar::Util;
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: ASF low-level calls synopsis, code part 1
 
-my $grammar = Marpa::R2::Scanless::G->new(
+my $grammar = Marpa::R3::Scanless::G->new(
     {   source => \(<<'END_OF_SOURCE'),
 :start ::= pair
 pair ::= duple | item item
@@ -43,16 +43,16 @@ END_OF_SOURCE
     }
 );
 
-my $slr = Marpa::R2::Scanless::R->new( { grammar => $grammar } );
+my $slr = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
 $slr->read( \'aa' );
-my $asf = Marpa::R2::ASF->new( { slr => $slr } );
+my $asf = Marpa::R3::ASF->new( { slr => $slr } );
 die 'No ASF' if not defined $asf;
 my $output_as_array = asf_to_basic_tree($asf);
 my $actual_output   = array_display($output_as_array);
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: ASF low-level calls synopsis, output
 # start-after-line: EXPECTED_OUTPUT
 # end-before-line: '^EXPECTED_OUTPUT$'
@@ -80,12 +80,12 @@ Glade 2 has 2 symches
       Glade 7 revisited
 EXPECTED_OUTPUT
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
-Marpa::R2::Test::is( $actual_output, $expected_output,
+Marpa::R3::Test::is( $actual_output, $expected_output,
     'Output for basic ASF synopsis' );
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: ASF low-level calls synopsis, code part 2
 
 sub asf_to_basic_tree {
@@ -153,9 +153,9 @@ sub glade_to_basic_tree {
     return $symches[0];
 } ## end sub glade_to_basic_tree
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: ASF low-level calls synopsis, code part 3
 
 sub array_display {
@@ -184,6 +184,6 @@ sub array_lines_display {
     return \@lines;
 } ## end sub array_lines_display
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
 # vim: expandtab shiftwidth=4:

@@ -1,17 +1,17 @@
 #!perl
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 # The example from p. 166 of Leo's paper.
 
@@ -22,8 +22,8 @@ use warnings;
 use Test::More tests => 9;
 
 use lib 'inc';
-use Marpa::R2::Test;
-use Marpa::R2;
+use Marpa::R3::Test;
+use Marpa::R3;
 
 ## no critic (Subroutines::RequireArgUnpacking)
 
@@ -34,7 +34,7 @@ sub main::default_action {
 
 ## use critic
 
-my $grammar = Marpa::R2::Grammar->new(
+my $grammar = Marpa::R3::Grammar->new(
     {   start          => 'S',
         rules          => [ [ 'S', [qw/a S/] ], [ 'S', [], ], ],
         terminals      => [qw(a)],
@@ -44,19 +44,19 @@ my $grammar = Marpa::R2::Grammar->new(
 
 $grammar->precompute();
 
-Marpa::R2::Test::is( $grammar->show_symbols(),
+Marpa::R3::Test::is( $grammar->show_symbols(),
     <<'END_OF_STRING', 'Leo166 Symbols' );
 0: a, terminal
 1: S
 END_OF_STRING
 
-Marpa::R2::Test::is( $grammar->show_rules,
+Marpa::R3::Test::is( $grammar->show_rules,
     <<'END_OF_STRING', 'Leo166 Rules' );
 0: S -> a S
 1: S -> /* empty !used */
 END_OF_STRING
 
-Marpa::R2::Test::is( $grammar->show_ahms, <<'END_OF_STRING', 'Leo166 AHMs' );
+Marpa::R3::Test::is( $grammar->show_ahms, <<'END_OF_STRING', 'Leo166 AHMs' );
 AHM 0: postdot = "a"
     S ::= . a S
 AHM 1: postdot = "S"
@@ -76,17 +76,17 @@ END_OF_STRING
 my $length = 50;
 
 LEO_FLAG: for my $leo_flag ( 0, 1 ) {
-    my $recce = Marpa::R2::Recognizer->new(
+    my $recce = Marpa::R3::Recognizer->new(
         { grammar => $grammar, leo => $leo_flag } );
 
     my $i = 0;
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: latest_earley_set() Synopsis
 
     my $latest_earley_set = $recce->latest_earley_set();
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
     my $max_size          = $recce->earley_set_size($latest_earley_set);
     TOKEN: while ( $i++ < $length ) {
@@ -97,17 +97,17 @@ LEO_FLAG: for my $leo_flag ( 0, 1 ) {
     } ## end while ( $i++ < $length )
 
     my $expected_size = $leo_flag ? 6 : $length + 4;
-    Marpa::R2::Test::is( $max_size, $expected_size,
+    Marpa::R3::Test::is( $max_size, $expected_size,
         "Leo flag $leo_flag, size" );
 
     my $value_ref = $recce->value();
     my $value = $value_ref ? ${$value_ref} : 'No parse';
-    Marpa::R2::Test::is( $value, 'a' x $length, 'Leo p166 parse' );
+    Marpa::R3::Test::is( $value, 'a' x $length, 'Leo p166 parse' );
 } ## end for my $leo_flag ( 0, 1 )
 
 {
     open my $trace_fh, q{>}, \( my $trace_output = q{} );
-    my $recce = Marpa::R2::Recognizer->new(
+    my $recce = Marpa::R3::Recognizer->new(
         {   grammar               => $grammar,
             leo                   => 0,
             too_many_earley_items => $length,
@@ -125,10 +125,10 @@ LEO_FLAG: for my $leo_flag ( 0, 1 ) {
         Test::More::pass('Warns at earley item threshold');
     }
     else {
-        Marpa::R2::Test::is( $trace_output, q{}, 'Leo p166 parse' );
+        Marpa::R3::Test::is( $trace_output, q{}, 'Leo p166 parse' );
     }
     my $value = $value_ref ? ${$value_ref} : 'No parse';
-    Marpa::R2::Test::is( $value, 'a' x $length, 'Leo p166 parse' );
+    Marpa::R3::Test::is( $value, 'a' x $length, 'Leo p166 parse' );
 }
 
 1;    # In case used as "do" file

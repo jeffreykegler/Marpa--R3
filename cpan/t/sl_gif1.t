@@ -1,17 +1,17 @@
 #!perl
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
 # Tests which require only a GIF combination-- a grammar (G),
@@ -24,13 +24,13 @@ use warnings;
 use Test::More tests => 22;
 use English qw( -no_match_vars );
 use lib 'inc';
-use Marpa::R2::Test;
-use Marpa::R2;
+use Marpa::R3::Test;
+use Marpa::R3;
 use Data::Dumper;
 
 my @tests_data = ();
 
-my $aaaa_grammar = Marpa::R2::Scanless::G->new(
+my $aaaa_grammar = Marpa::R3::Scanless::G->new(
     {   source => \(<<'END_OF_SOURCE'),
     :start ::= quartet
     quartet ::= a a a a
@@ -53,7 +53,7 @@ END_OF_ASF
     ]
     if 1;
 
-my $abcd_grammar = Marpa::R2::Scanless::G->new(
+my $abcd_grammar = Marpa::R3::Scanless::G->new(
     {   source => \(<<'END_OF_SOURCE'),
     :start ::= quartet
     quartet ::= a b c d
@@ -65,12 +65,12 @@ END_OF_SOURCE
     }
 );
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: ASF symch dump example grammar
 # start-after-line: END_OF_SOURCE
 # end-before-line: '^END_OF_SOURCE$'
 
-my $venus_grammar = Marpa::R2::Scanless::G->new(
+my $venus_grammar = Marpa::R3::Scanless::G->new(
     {   source => \(<<'END_OF_SOURCE'),
 :start ::= planet
 planet ::= hesperus
@@ -82,9 +82,9 @@ END_OF_SOURCE
     }
 );
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: ASF symch dump example output
 # start-after-line: END_OF_OUTPUT
 # end-before-line: '^END_OF_OUTPUT$'
@@ -107,7 +107,7 @@ END_OF_OUTPUT
     ]
     if 1;
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
 push @tests_data, [
     $abcd_grammar, 'abcd',
@@ -123,12 +123,12 @@ END_OF_ASF
     ]
     if 1;
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: ASF factoring dump example grammar
 # start-after-line: END_OF_SOURCE
 # end-before-line: '^END_OF_SOURCE$'
 
-my $bb_grammar = Marpa::R2::Scanless::G->new(
+my $bb_grammar = Marpa::R3::Scanless::G->new(
     {   source => \(<<'END_OF_SOURCE'),
 :start ::= top
 top ::= b b
@@ -139,9 +139,9 @@ END_OF_SOURCE
     }
 );
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: ASF factoring dump example output
 # start-after-line: END_OF_OUTPUT
 # end-before-line: '^END_OF_OUTPUT$'
@@ -168,9 +168,9 @@ END_OF_OUTPUT
     ]
     if 1;
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
-my $seq_grammar = Marpa::R2::Scanless::G->new(
+my $seq_grammar = Marpa::R3::Scanless::G->new(
     {   source => \(<<'END_OF_SOURCE'),
 :start ::= sequence
 sequence ::= item+
@@ -244,7 +244,7 @@ END_OF_ASF
     ]
     if 1;
 
-my $venus_seq_grammar = Marpa::R2::Scanless::G->new(
+my $venus_seq_grammar = Marpa::R3::Scanless::G->new(
     {   source => \(<<'END_OF_SOURCE'),
 :start ::= sequence
 sequence ::= item+
@@ -290,7 +290,7 @@ END_OF_ASF
     ]
     if 1;
 
-my $nulls_grammar = Marpa::R2::Scanless::G->new(
+my $nulls_grammar = Marpa::R3::Scanless::G->new(
     {   source => \(<<'END_OF_SOURCE'),
 :start ::= top
 top ::= a a a a
@@ -433,7 +433,7 @@ for my $test_data (@tests_data) {
     my ( $actual_value, $actual_result ) =
         my_parser( $grammar, $test_string );
 
-    Marpa::R2::Test::is(
+    Marpa::R3::Test::is(
         Data::Dumper::Dumper( \$actual_value ),
         Data::Dumper::Dumper( \$expected_value ),
         qq{Value of $test_name}
@@ -446,14 +446,14 @@ for my $test_data (@tests_data) {
 sub my_parser {
     my ( $grammar, $string ) = @_;
 
-    my $slr = Marpa::R2::Scanless::R->new( { grammar => $grammar } );
+    my $slr = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
 
     if ( not defined eval { $slr->read( \$string ); 1 } ) {
         my $abbreviated_error = $EVAL_ERROR;
         chomp $abbreviated_error;
         return 'No parse', $abbreviated_error;
     } ## end if ( not defined eval { $slr->read( \$string ); 1 } )
-    my $asf = Marpa::R2::ASF->new( { slr => $slr } );
+    my $asf = Marpa::R3::ASF->new( { slr => $slr } );
     if ( not defined $asf ) {
         return 'No ASF', 'Input read to end but no ASF';
     }
