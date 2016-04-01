@@ -1,19 +1,19 @@
 # Copyright 2016 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-package Marpa::R2::Internal::License;
+package Marpa::R3::Internal::License;
 
 use 5.010;
 use strict;
@@ -29,7 +29,7 @@ my $copyright_line = q{Copyright 2016 Jeffrey Kegler};
     =~ s/ ^ Copyright \s /Copyright \\copyright\\ /xms;
 
 my $closed_license = "$copyright_line\n" . <<'END_OF_STRING';
-This document is not part of the Marpa or Marpa::R2 source.
+This document is not part of the Marpa or Marpa::R3 source.
 Although it may be included with a Marpa distribution that
 is under an open source license, this document is
 not under that open source license.
@@ -37,24 +37,24 @@ Jeffrey Kegler retains full rights.
 END_OF_STRING
 
 my $license_body = <<'END_OF_STRING';
-This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 redistribute it and/or modify it under the terms of the GNU Lesser
 General Public License as published by the Free Software Foundation,
 either version 3 of the License, or (at your option) any later version.
 
-Marpa::R2 is distributed in the hope that it will be useful,
+Marpa::R3 is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser
-General Public License along with Marpa::R2.  If not, see
+General Public License along with Marpa::R3.  If not, see
 http://www.gnu.org/licenses/.
 END_OF_STRING
 
 my $license = "$copyright_line\n$license_body";
 my $marpa_r2_license = $license;
-$marpa_r2_license =~ s/Marpa::R2/Libmarpa/gxms;
+$marpa_r2_license =~ s/Marpa::R3/Libmarpa/gxms;
 
 my $mit_license_body = <<'END_OF_STRING';
 Permission is hereby granted, free of charge, to any person obtaining a
@@ -85,7 +85,7 @@ $license_in_tex =~ s/^$/\\smallskip\\noindent/gxms;
 
 my $license_file = $license . <<'END_OF_STRING';
 
-In the Marpa::R2 distribution, the GNU Lesser General Public License
+In the Marpa::R3 distribution, the GNU Lesser General Public License
 version 3 should be in a file named "COPYING.LESSER".
 END_OF_STRING
 
@@ -145,7 +145,7 @@ $indented_license =~ s/[ ]+$//gxms;
 my $pod_section = <<'END_OF_STRING';
 =head1 Copyright and License
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 ignore: 1
 
 END_OF_STRING
@@ -159,7 +159,7 @@ $pod_section .= "$indented_license\n";
 =cut
 
 $pod_section .= <<'END_OF_STRING';
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 END_OF_STRING
 
@@ -421,7 +421,7 @@ sub file_type {
 
 } ## end sub file_type
 
-sub Marpa::R2::License::file_license_problems {
+sub Marpa::R3::License::file_license_problems {
     my ( $filename, $verbose ) = @_;
     $verbose //= 0;
     if ($verbose) {
@@ -439,14 +439,14 @@ sub Marpa::R2::License::file_license_problems {
     my $problems_closure = gen_license_problems_in_text_file();
     push @problems, $problems_closure->( $filename, $verbose );
     return @problems;
-} ## end sub Marpa::R2::License::file_license_problems
+} ## end sub Marpa::R3::License::file_license_problems
 
-sub Marpa::R2::License::license_problems {
+sub Marpa::R3::License::license_problems {
     my ( $files, $verbose ) = @_;
     return
-        map { Marpa::R2::License::file_license_problems( $_, $verbose ) }
+        map { Marpa::R3::License::file_license_problems( $_, $verbose ) }
         @{$files};
-} ## end sub Marpa::R2::License::license_problems
+} ## end sub Marpa::R3::License::license_problems
 
 sub slurp {
     my ($filename) = @_;

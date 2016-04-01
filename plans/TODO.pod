@@ -1,26 +1,26 @@
-# Copyright 2014 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
 =head1 Name
 
-Marpa::R2 To Do -- "To Do" list for Marpa
+Marpa::R3 To Do -- "To Do" list for Marpa
 
 =head1 About this document
 
 This list needs to be revisted in light of the Kollos project.
-Most of its items will probably never been done in Marpa::R2.
+Most of its items will probably never been done in Marpa::R3.
 
 =head1 Items to do
 
@@ -117,25 +117,25 @@ Nonetheless, I do not want to push my luck.
 
 =head1 Copyright and License
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 ignore: 1
 
   Copyright 2014 Jeffrey Kegler
-  This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+  This file is part of Marpa::R3.  Marpa::R3 is free software: you can
   redistribute it and/or modify it under the terms of the GNU Lesser
   General Public License as published by the Free Software Foundation,
   either version 3 of the License, or (at your option) any later version.
 
-  Marpa::R2 is distributed in the hope that it will be useful,
+  Marpa::R3 is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
   Lesser General Public License for more details.
 
   You should have received a copy of the GNU Lesser
-  General Public License along with Marpa::R2.  If not, see
+  General Public License along with Marpa::R3.  If not, see
   http://www.gnu.org/licenses/.
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 =cut
 

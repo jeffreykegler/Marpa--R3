@@ -35,7 +35,7 @@ tag explicitly:
 
     ./configure MARPA_DEBUG_FLAG=-DMARPA_TAG=testing123
 
-The standard Marpa::R2 test suite prints the tag early in its test output:
+The standard Marpa::R3 test suite prints the tag early in its test output:
 
     t/00-load.t ............ 1/4 # Marpa::R2 version is 2.085_004 #
     Libmarpa version is 6.0.3 # Libmarpa tag: testing123

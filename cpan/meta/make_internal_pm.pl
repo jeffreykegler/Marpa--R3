@@ -145,7 +145,6 @@ __DATA__
     DEFAULT_ACTION { Action for rules without one }
     TRACE_FILE_HANDLE
     WARNINGS { print warnings about grammar? }
-    INTERFACE { currently 'standard' or 'stuifzand' }
     INTERNAL { internal grammar -- relax various restrictions }
 
     CHARACTER_CLASSES { an hash of

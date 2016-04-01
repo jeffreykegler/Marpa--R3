@@ -1,19 +1,19 @@
 # Copyright 2016 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-package Marpa::R2::Display;
+package Marpa::R3::Display;
 
 use 5.010;
 use strict;
@@ -23,19 +23,19 @@ use YAML::XS;
 use Data::Dumper;    # for debugging
 use Carp;
 
-package Marpa::R2::Display::Internal;
+package Marpa::R3::Display::Internal;
 
 use English qw( -no_match_vars );
 
-sub Marpa::R2::Display::new {
+sub Marpa::R3::Display::new {
     my ($class) = @_;
     my $self = {};
     $self->{displays}         = {};
     $self->{ignored_displays} = [];
     return bless $self, $class;
-} ## end sub Marpa::R2::Display::new
+} ## end sub Marpa::R3::Display::new
 
-@Marpa::R2::Display::Internal::DISPLAY_SPECS = qw(
+@Marpa::R3::Display::Internal::DISPLAY_SPECS = qw(
     start-after-line end-before-line perltidy normalize-whitespace name
     remove-display-indent
     remove-blank-last-line
@@ -43,7 +43,7 @@ sub Marpa::R2::Display::new {
     ignore
 );
 
-sub Marpa::R2::Display::read {
+sub Marpa::R3::Display::read {
     my ( $self, $data_arg, $file_name ) = @_;
     my @lines;
     GET_LINES: {
@@ -110,7 +110,7 @@ sub Marpa::R2::Display::read {
 
         my $display_spec;
         my $display_spec_line_number = $zero_based_line + 1;
-        if ( $line =~ /^[#] \s+ Marpa::R2[:][:]Display/xms ) {
+        if ( $line =~ /^[#] \s+ Marpa::R3[:][:]Display/xms ) {
 
             my $yaml = q{};
             while ( ( my $yaml_line = $lines[ ++$zero_based_line ] )
@@ -132,9 +132,9 @@ sub Marpa::R2::Display::read {
                         or Carp::croak("Cannot print: $ERRNO");
                 } ## end if ( not $eval_ok )
             } ## end if ( $yaml =~ / \S /xms )
-        } ## end if ( $line =~ /^[#] \s+ Marpa::R2[:][:]Display/xms )
+        } ## end if ( $line =~ /^[#] \s+ Marpa::R3[:][:]Display/xms )
 
-        if ( $line =~ /^[=]for \s+ Marpa::R2[:][:]Display/xms ) {
+        if ( $line =~ /^[=]for \s+ Marpa::R3[:][:]Display/xms ) {
 
             my $yaml = q{};
             while (
@@ -155,13 +155,13 @@ sub Marpa::R2::Display::read {
                         or Carp::croak("Cannot print: $ERRNO");
                 } ## end if ( not $eval_ok )
             } ## end if ( $yaml =~ / \S /xms )
-        } ## end if ( $line =~ /^[=]for \s+ Marpa::R2[:][:]Display/xms)
+        } ## end if ( $line =~ /^[=]for \s+ Marpa::R3[:][:]Display/xms)
 
         next LINE if not defined $display_spec;
 
         SPEC: for my $spec ( keys %{$display_spec} ) {
             next SPEC
-                if $spec ~~ \@Marpa::R2::Display::Internal::DISPLAY_SPECS;
+                if $spec ~~ \@Marpa::R3::Display::Internal::DISPLAY_SPECS;
             say {*STDERR}
                 qq{Warning: Unknown display spec "$spec" in $file_name, line $display_spec_line_number}
                 or Carp::croak("Cannot print: $ERRNO");
@@ -213,17 +213,17 @@ sub Marpa::R2::Display::read {
                 my $content_line = $lines[ ++$zero_based_line ];
                 if ( not defined $content_line ) {
                     say {*STDERR}
-                        q{Warning: Pattern "Marpa::R2::Display::End" never found,}
+                        q{Warning: Pattern "Marpa::R3::Display::End" never found,}
                         . qq{started looking at $file_name, line $display_spec_line_number}
                         or Carp::croak("Cannot print: $ERRNO");
                     return $self;
                 } ## end if ( not defined $content_line )
                 last CONTENT_LINE
                     if $content_line
-                        =~ /^[=]for \s+ Marpa::R2[:][:]Display[:][:]End\b/xms;
+                        =~ /^[=]for \s+ Marpa::R3[:][:]Display[:][:]End\b/xms;
                 last CONTENT_LINE
                     if $content_line
-                        =~ /^[#] \s* Marpa::R2[:][:]Display[:][:]End\b/xms;
+                        =~ /^[#] \s* Marpa::R3[:][:]Display[:][:]End\b/xms;
                 $content .= "$content_line\n";
                 $content_end_line = $zero_based_line + 1;
                 $content_start_line //= $zero_based_line + 1;
@@ -265,6 +265,6 @@ sub Marpa::R2::Display::read {
 
     return $self;
 
-} ## end sub Marpa::R2::Display::read
+} ## end sub Marpa::R3::Display::read
 
 1;

@@ -67,7 +67,7 @@ If no lexeme has yet been recognized, the G1 location will be zero.
 The main use of the G1 location will be for syncing discarded
 tokens with a parse tree.
 
-Marpa::R2 parse event descriptors have been documented as 
+Marpa::R3 parse event descriptors have been documented as 
 containing 1 or more elements, but those currently implemented
 always contain only one element, the event name.
 Discard events will therefore be the first event

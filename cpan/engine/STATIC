@@ -1,28 +1,28 @@
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
 This document describes how to link an external static library with
-Marpa::R2.  This method, and this document, are intended for re-packagers
+Marpa::R3.  This method, and this document, are intended for re-packagers
 and other very advanced users.  This method is not supported by the CPAN
 infrastructure.  Most users should prefer the basic method described in
-the INSTALL document at the top level of the Marpa::R2 CPAN directory.
+the INSTALL document at the top level of the Marpa::R3 CPAN directory.
 
 Here are the steps:
 
 1.) Be sure the library that you are building is a match to the one
-that Marpa::R2 expects.  The expected version can be found in the
+that Marpa::R3 expects.  The expected version can be found in the
 core/read_only/LIB_VERSION file.  Do *NOT* edit this file.  This version
 number must match exactly the version number of your external static
 library.
@@ -38,7 +38,7 @@ Instructions on how to install using autoconf can be found in the
 autoconf documentation.  Here, we will assume that, for test purposes,
 you have installed the external static library in /tmp/libmarpa.a.
 
-4.) Build Marpa::R2 to use the external static library.
+4.) Build Marpa::R3 to use the external static library.
 
    ./Build code --libmarpa-external=/tmp/libmarpa.a
 
@@ -63,9 +63,9 @@ If Libmarpa is compiled with GCC, the tag defaults to a time stamp,
 but it can be set explicitly: For instructions on how to set the tag,
 see the installation documentation of Libmarpa.
 
-The tag appears at the beginning of Marpa::R2's test output:
+The tag appears at the beginning of Marpa::R3's test output:
 
-    t/00-load.t ............ 1/4 # Marpa::R2 version is 2.085_004
+    t/00-load.t ............ 1/4 # Marpa::R3 version is 2.085_004
     # Libmarpa version is 6.0.3
     # Libmarpa tag: testing123
 

@@ -1,23 +1,23 @@
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
 This document describes how to link an external shared library with
-Marpa::R2.  This method, and this document, are intended for re-packagers
+Marpa::R3.  This method, and this document, are intended for re-packagers
 and other very advanced users.  This method is not supported by the CPAN
 infrastructure.  Most users should prefer the basic method described in
-the INSTALL document at the top level of the Marpa::R2 CPAN directory.
+the INSTALL document at the top level of the Marpa::R3 CPAN directory.
 
 This document only describes those aspects of linking which are special
 to shared libraries.  This document assumes you have already read the
@@ -28,7 +28,7 @@ libraries in general.  That material is not repeated here.
 Here are the steps:
 
 1.) As with linking a static library, you must ensure that the version
-of the library is an exact match to the one that Marpa::R2 expects.
+of the library is an exact match to the one that Marpa::R3 expects.
 For more detail, refer back to the "STATIC" document.
 
 2.) Build an external shared library using the separate Libmarpa
