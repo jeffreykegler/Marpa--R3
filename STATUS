@@ -1,0 +1,10 @@
+Thu Mar 31 17:44:40 PDT 2016
+
+Done:
+Conversion to Extutil::Makemaker done.
+Stuifzand interface removed.
+All tests succeed.
+
+Still to do:
+Clean out vestiges of R2 naming.
+Make sure checks of licensing, displays, etc. are clean.
