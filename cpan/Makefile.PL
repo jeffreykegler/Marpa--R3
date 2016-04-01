@@ -454,7 +454,7 @@ if ($use_perl_autoconf) {
         ## C.f. http://fr.slideshare.net/hashashin/building-c-and-c-libraries-with-perl
         #
         my @c = qw/marpa_ami.c marpa_avl.c marpa.c
-            marpa_codes.c marpa_obs.c marpa_slif.c marpa_tavl.c/;
+            marpa_codes.c marpa_obs.c marpa_tavl.c/;
         if ( !-r 'config.h' ) {
             #
             ## Because Config::AutoConf can only generate #define/#undef
@@ -547,11 +547,30 @@ INLINEHOOK
             $ac->write_config_h('config_from_autoconf.h');
         } ## end if ( !-r 'config.h' )
 
-        die "Could not run Makefile.PL: $ERRNO"
-            if not IPC::Cmd::run(
-            command => [ $EXECUTABLE_NAME, 'Makefile.PL' ],
-            verbose => 1
-            );
+        my @o = map {s/\.c$/$Config{obj_ext}/; $_} @c;
+        if (! -r 'Makefile.PL') {
+            open my $makefile_pl_fh, '>', 'Makefile.PL';
+            my $CCFLAGS = @debug_flags ? "$Config{ccflags} @debug_flags" : '';
+            my $linktype = 'static';
+            my $blib = 'blib';
+            my $name = 'libmarpa';
+            print {$makefile_pl_fh} "
+use ExtUtils::MakeMaker;
+WriteMakefile(VERSION        => \"$libmarpa_version\",
+              XS_VERSION     => \"$libmarpa_version\",
+              NAME           => \"$name\",
+              OBJECT         => '@o',
+              CCFLAGS        => '$CCFLAGS',
+              INST_LIB       => \"./$blib/lib\",
+              INST_ARCHLIB   => \"./$blib/arch\",
+              INST_SCRIPT    => \"./$blib/script\",
+              INST_BIN       => \"./$blib/bin\",
+              LINKTYPE       => $linktype);
+";
+            close $makefile_pl_fh;
+            die 'Making Makefile: perl Failure'
+                if not IPC::Cmd::run( command => [$^X, 'Makefile.PL'], verbose => 1 );
+		}
     }
 } ## end if ($use_perl_autoconf)
 else {
@@ -607,7 +626,7 @@ engine/gnu_ac_build/.libs/libmarpa$(LIB_EXT): engine/read_only/stamp-h1
 	cd engine/gnu_ac_build && $(MAKE)
 
 engine/perl_ac_build/libmarpa$(LIB_EXT): engine/read_only/stamp-h1
-	cd engine/perl_ac_build && $(MAKE)
+	cd engine/perl_ac_build && $(MAKE) && cp blib/arch/auto/libmarpa/libmarpa$(LIB_EXT) .
 
 xs/R3.o: xs/libmarpa$(LIB_EXT) \
     xs/marpa.h \
