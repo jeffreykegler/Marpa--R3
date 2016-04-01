@@ -13,7 +13,7 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-.PHONY: all all_tests critic display tidy
+.PHONY: all all_tests critic display tidy misc
 
 all: all_tests
 
@@ -22,6 +22,10 @@ critic.list: ../MANIFEST create_critic_list.pl
 
 all_tests: critic.list
 	-(cd ..; prove author.t/*.t ) 2>&1 | tee all.errs
+
+misc:
+	-(cd ..; prove author.t/ampersand.t)
+	-(cd ..; prove author.t/meta_yaml.t)
 
 tidy: critic.list
 	-(cd ..; prove author.t/tidy.t) 2>&1 | tee tidy.errs
