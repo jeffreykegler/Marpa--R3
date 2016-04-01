@@ -611,7 +611,15 @@ engine/perl_ac_build/libmarpa$(LIB_EXT): engine/read_only/stamp-h1
 
 xs/R3.o: xs/libmarpa$(LIB_EXT) \
     xs/marpa.h \
-    xs/marpa_codes.h
+    xs/marpa_codes.h \
+    xs/general_pattern.xsh \
+    xs/marpa_slifop.h
+
+xs/general_pattern.xsh: xs/gp_generate.pl
+	perl xs/gp_generate.pl xs/general_pattern.xsh
+
+xs/marpa_slifop.h: xs/create_ops.pl
+	perl xs/create_ops.pl > xs/marpa_slifop.h
 
 END_OF_POSTAMBLE
 
