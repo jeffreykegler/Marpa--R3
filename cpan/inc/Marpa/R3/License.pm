@@ -53,8 +53,8 @@ http://www.gnu.org/licenses/.
 END_OF_STRING
 
 my $license = "$copyright_line\n$license_body";
-my $marpa_r2_license = $license;
-$marpa_r2_license =~ s/Marpa::R3/Libmarpa/gxms;
+my $marpa_r3_license = $license;
+$marpa_r3_license =~ s/Marpa::R3/Libmarpa/gxms;
 
 my $mit_license_body = <<'END_OF_STRING';
 Permission is hereby granted, free of charge, to any person obtaining a
@@ -129,8 +129,10 @@ sub c_comment {
     return qq{/*\n$text */\n};
 } ## end sub c_comment
 
-my $c_license          = c_comment($marpa_r2_license);
+my $c_license          = c_comment($marpa_r3_license);
 my $c_mit_license          = c_comment($mit_license);
+my $c_mit_license_2015          = $c_mit_license;
+    $c_mit_license_2015          =~ s/2016/2015/xms;
 my $xs_license          = c_comment($license);
 my $r2_hash_license    = hash_comment($license);
 my $libmarpa_hash_license    = hash_comment($mit_license);
@@ -299,8 +301,8 @@ my %files_by_type = (
     'etc/compile_for_debug.sh'          => \&trivial,
     'etc/libmarpa_test.sh'              => \&trivial,
     'etc/reserved_check.sh'             => \&trivial,
-    'html/script/marpa_r2_html_fmt'    => gen_license_problems_in_perl_file(),
-    'html/script/marpa_r2_html_score'  => gen_license_problems_in_perl_file(),
+    'html/script/marpa_r3_html_fmt'    => gen_license_problems_in_perl_file(),
+    'html/script/marpa_r3_html_score'  => gen_license_problems_in_perl_file(),
     'html/t/fmt_t_data/expected1.html' => \&ignored,
     'html/t/fmt_t_data/expected2.html' => \&ignored,
     'html/t/fmt_t_data/input1.html'    => \&trivial,
@@ -314,21 +316,21 @@ my %files_by_type = (
     'engine/read_only/LIB_VERSION'    => \&trivial,
     'engine/read_only/LIB_VERSION.in' => \&trivial,
     'engine/read_only/Makefile.am' =>
-        gen_license_problems_in_hash_file($libmarpa_hash_license),
+        gen_license_problems_in_hash_file($libmarpa_hash_license, '2015'),
     'engine/read_only/configure.ac' =>
-        gen_license_problems_in_hash_file($libmarpa_hash_license),
+        gen_license_problems_in_hash_file($libmarpa_hash_license, '2015'),
     'engine/read_only/notes/shared_test.txt' =>
-        gen_license_problems_in_hash_file($libmarpa_hash_license),
+        gen_license_problems_in_hash_file($libmarpa_hash_license, '2015'),
     'engine/read_only/Makefile.win32' =>
-        gen_license_problems_in_hash_file($libmarpa_hash_license),
+        gen_license_problems_in_hash_file($libmarpa_hash_license, '2015'),
     'engine/read_only/win32/do_config_h.pl' =>
-        gen_license_problems_in_perl_file($libmarpa_hash_license),
+        gen_license_problems_in_perl_file($libmarpa_hash_license, '2015'),
     'etc/my_suppressions' => \&trivial,
     'xs/ppport.h' => \&ignored,    # copied from CPAN, just leave it alone
     'engine/read_only/README' =>
-        gen_license_problems_in_text_file($mit_license),
+        gen_license_problems_in_text_file($mit_license, '2015'),
     'engine/read_only/README.INSTALL' =>
-        gen_license_problems_in_text_file($libmarpa_hash_license),
+        gen_license_problems_in_text_file($libmarpa_hash_license, '2015'),
     'engine/read_only/AUTHORS' => \&trivial,
     'engine/read_only/NEWS' => \&trivial,
     'engine/read_only/ChangeLog' => \&trivial,
@@ -340,7 +342,6 @@ my %files_by_type = (
     'engine/read_only/INSTALL' => \&ignored,
 
     'engine/read_only/COPYING' => gen_license_problems_in_text_file( $mit_license_body ),
-    'engine/read_only/README' => gen_license_problems_in_text_file( $mit_license ),
     'engine/read_only/stamp-h1' => \&trivial,
     'engine/read_only/stamp-1' => \&trivial,
     'engine/read_only/stamp-vti' => \&trivial,
@@ -360,17 +361,17 @@ my %files_by_type = (
 
     # Libmarpa licensing
     'engine/read_only/marpa_ami.h' =>
-        &gen_license_problems_in_c_file($c_mit_license),
+        &gen_license_problems_in_c_file($c_mit_license_2015),
     'engine/read_only/marpa.h' =>
-        &gen_license_problems_in_c_file($c_mit_license),
+        &gen_license_problems_in_c_file($c_mit_license_2015),
     'engine/read_only/marpa_codes.c' =>
-        &gen_license_problems_in_c_file($c_mit_license),
+        &gen_license_problems_in_c_file($c_mit_license_2015),
     'engine/read_only/marpa.c' =>
-        &gen_license_problems_in_c_file($c_mit_license),
+        &gen_license_problems_in_c_file($c_mit_license_2015),
     'engine/read_only/marpa_codes.h' =>
-        &gen_license_problems_in_c_file($c_mit_license),
+        &gen_license_problems_in_c_file($c_mit_license_2015),
     'engine/read_only/marpa_ami.c' =>
-        &gen_license_problems_in_c_file($c_mit_license),
+        &gen_license_problems_in_c_file($c_mit_license_2015),
 
     # MS .def file -- contents trivial
     'engine/read_only/win32/marpa.def' => \&ignored,
@@ -504,8 +505,12 @@ sub license_problems_in_license_file {
 } ## end sub license_problems_in_license_file
 
 sub gen_license_problems_in_hash_file {
-    my ($license) = @_;
+    my ($license, $year) = @_;
+    $DB::single = 1;
     $license //= $r2_hash_license;
+    if ($year) {
+       $license =~ s/2016/$year/;
+    }
     return sub {
         my ( $filename, $verbose ) = @_;
         if ($verbose) {
@@ -597,8 +602,11 @@ sub license_problems_in_sh_file {
 
 
 sub gen_license_problems_in_perl_file {
-    my ($license) = @_;
+    my ($license, $year) = @_;
     my $perl_license = $license // $r2_hash_license;
+    if ($year) {
+        $perl_license =~ s/2016/$year/xms;
+    }
     return sub {
         my ( $filename, $verbose ) = @_;
         if ($verbose) {
@@ -607,7 +615,7 @@ sub gen_license_problems_in_perl_file {
         }
         $verbose //= 0;
         my @problems = ();
-        my $text = slurp_top( $filename, 132 + length $perl_license );
+        my $text = slurp_top( $filename, 256 + length $perl_license );
 
         # Delete hash bang line, if present
         ${$text} =~ s/\A [#][!] [^\n] \n//xms;
@@ -852,7 +860,10 @@ sub license_problems_in_pod_file {
 # In "Text" files, just look for the full language.
 # No need to comment it out.
 sub gen_license_problems_in_text_file {
-    my ($license) = @_;
+    my ($license, $year) = @_;
+    if ($year) {
+        $license =~ s/2016/$year/xms;
+    }
     return sub {
         my ( $filename, $verbose ) = @_;
         if ($verbose) {
