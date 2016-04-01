@@ -371,7 +371,7 @@ for my $test_data (@tests_data) {
             my $abbreviated_error = $EVAL_ERROR;
 
             chomp $abbreviated_error;
-            $abbreviated_error =~ s/^ Marpa[:][:]R2 \s+ exception \s+ at \s+ .* \z//xms;
+            $abbreviated_error =~ s/^ Marpa[:][:]R3 \s+ exception \s+ at \s+ .* \z//xms;
             $actual_value  = 'SLIF grammar failed';
             $actual_result = $abbreviated_error;
             last PROCESSING;

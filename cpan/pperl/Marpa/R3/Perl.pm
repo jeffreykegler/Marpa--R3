@@ -1,30 +1,30 @@
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2106 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-package Marpa::R2::Perl;
+package Marpa::R3::Perl;
 
 use 5.010;
 use strict;
 use warnings;
 
-package Marpa::R2::Internal::Perl;
+package Marpa::R3::Internal::Perl;
 
 use English qw( -no_match_vars );
 use charnames ':full';
 
-use Marpa::R2::Perl::Version ();
+use Marpa::R3::Perl::Version ();
 
 # This code is about Perl GRAMMAR.
 # If you're looking here
@@ -852,7 +852,7 @@ my %rule_rank = (
     short_use        => 0,
 );
 
-sub Marpa::R2::Perl::new {
+sub Marpa::R3::Perl::new {
     my ( $class, $args ) = @_;
     $args //= {};
     my $gen_closure;
@@ -963,7 +963,7 @@ sub Marpa::R2::Perl::new {
         $start = 'embedded_perl';
     } ## end if ($embedded)
 
-    my $grammar = Marpa::R2::Grammar->new(
+    my $grammar = Marpa::R3::Grammar->new(
         {   start => $start,
             rules => \@rules,
         }
@@ -975,7 +975,7 @@ sub Marpa::R2::Perl::new {
     $self->{embedded} = $embedded ? 1 : 0;
     return $self;
 
-} ## end sub Marpa::R2::Perl::new
+} ## end sub Marpa::R3::Perl::new
 
 my @RECCE_NAMED_ARGUMENTS =
     qw(trace_terminals trace_values trace_actions);
@@ -1006,9 +1006,9 @@ sub token_not_accepted {
         q{content="},                      $ppi_token->content(),
         q{"}
     ;
-    if ($Marpa::R2::Perl::PARSER->{embedded}) {
-      push @{$Marpa::R2::Perl::PARSER->{token_issues}}, $error_string;
-      return if $Marpa::R2::Perl::PARSER->{in_prefix};
+    if ($Marpa::R3::Perl::PARSER->{embedded}) {
+      push @{$Marpa::R3::Perl::PARSER->{token_issues}}, $error_string;
+      return if $Marpa::R3::Perl::PARSER->{in_prefix};
       die "TOKEN_NOT_ACCEPTED\n";
     }
     Carp::croak($error_string);
@@ -1017,17 +1017,17 @@ sub token_not_accepted {
 sub unknown_ppi_token {
     my ($ppi_token) = @_;
     my $issue = join q{}, 'Failed at Token: ', Data::Dumper::Dumper($ppi_token),
-        'Marpa::R2::Perl did not know how to process token',
-        Marpa::R2::Perl::default_show_location($ppi_token), "\n";
-    if ($Marpa::R2::Perl::PARSER->{embedded}) {
-      push @{$Marpa::R2::Perl::PARSER->{token_issues}}, $issue;
-      return if $Marpa::R2::Perl::PARSER->{in_prefix};
+        'Marpa::R3::Perl did not know how to process token',
+        Marpa::R3::Perl::default_show_location($ppi_token), "\n";
+    if ($Marpa::R3::Perl::PARSER->{embedded}) {
+      push @{$Marpa::R3::Perl::PARSER->{token_issues}}, $issue;
+      return if $Marpa::R3::Perl::PARSER->{in_prefix};
       die "TOKEN_NOT_ACCEPTED\n";
     }
     die $issue;
 } ## end sub unknown_ppi_token
 
-sub Marpa::R2::Perl::tokens {
+sub Marpa::R3::Perl::tokens {
     my ( $parser, $input ) = @_;
     # We need to keep a reference to the document,
     # not just the tokens,
@@ -1035,21 +1035,21 @@ sub Marpa::R2::Perl::tokens {
     my $document = $parser->{document} = PPI::Document->new($input);
     $document->index_locations();
     return $parser->{PPI_tokens} = [$document->tokens()];
-} ## end sub Marpa::R2::Perl::tokens
+} ## end sub Marpa::R3::Perl::tokens
 
-sub Marpa::R2::Perl::clone_tokens {
+sub Marpa::R3::Perl::clone_tokens {
     my ( $to_parser, $from_parser ) = @_;
     $to_parser->{document} = $from_parser->{document} ;
     $to_parser->{PPI_tokens} = $from_parser->{PPI_tokens} ;
 }
 
-sub Marpa::R2::Perl::read {
+sub Marpa::R3::Perl::read {
     my ( $parser, $input ) = @_;
     $parser->tokens($input);
     $parser->read_tokens();
 }
 
-sub Marpa::R2::Perl::read_tokens {
+sub Marpa::R3::Perl::read_tokens {
 
     my ( $parser, $first_token_ix, $last_token_ix, $hash_arg ) = @_;
 
@@ -1067,7 +1067,7 @@ sub Marpa::R2::Perl::read_tokens {
 
     my $grammar = $parser->{grammar};
 
-    my $recce = Marpa::R2::Recognizer->new(
+    my $recce = Marpa::R3::Recognizer->new(
         {   grammar        => $grammar,
             closures       => $parser->{closure},
             ranking_method => 'high_rule_only',
@@ -1079,13 +1079,13 @@ sub Marpa::R2::Perl::read_tokens {
 
     # This is convenient for making the recognizer available to
     # error messages
-    local $Marpa::R2::Perl::RECOGNIZER = $recce;
+    local $Marpa::R3::Perl::RECOGNIZER = $recce;
 
     my $PPI_tokens = $parser->{PPI_tokens};
     my $earleme_to_PPI_token = $parser->{earleme_to_PPI_token} = [];
 
     # For use by read_PPI_token
-    local $Marpa::R2::Perl::LAST_PERL_TYPE = undef;
+    local $Marpa::R3::Perl::LAST_PERL_TYPE = undef;
 
     $first_token_ix //= 0;
     $last_token_ix  //= $#{$PPI_tokens};
@@ -1098,9 +1098,9 @@ sub Marpa::R2::Perl::read_tokens {
     $recce->end_input();
     return $parser;
 
-} ## end sub Marpa::R2::Perl::read
+} ## end sub Marpa::R3::Perl::read
 
-sub Marpa::R2::Perl::earleme_complete {
+sub Marpa::R3::Perl::earleme_complete {
     my ($parser) = @_;
 
     my $recce     = $parser->{recce};
@@ -1123,18 +1123,18 @@ sub Marpa::R2::Perl::earleme_complete {
         next EVENT if $event_type eq 'MARPA_EVENT_EXHAUSTED';
         if ( $event_type eq 'MARPA_EVENT_EARLEY_ITEM_THRESHOLD' ) {
             say {
-                $recce->[Marpa::R2::Internal::Recognizer::TRACE_FILE_HANDLE] }
+                $recce->[Marpa::R3::Internal::Recognizer::TRACE_FILE_HANDLE] }
                 "Earley item count ($value) exceeds warning threshold"
                 or die "say: $ERRNO";
             next EVENT;
         } ## end if ( $event_type eq 'MARPA_EVENT_EARLEY_ITEM_THRESHOLD')
-        Marpa::R2::exception(
+        Marpa::R3::exception(
             qq{Unknown earleme completion event; type="$event_type"});
     } ## end EVENT: for my $event_ix ( 0 .. $event_count - 1 )
 
     return $event_count;
 
-} ## end sub Marpa::R2::Perl::earleme_complete
+} ## end sub Marpa::R3::Perl::earleme_complete
 
 sub read_PPI_token {
     my ( $parser, $token_ix ) = @_;
@@ -1285,8 +1285,8 @@ sub read_PPI_token {
             goto SUCCESS;
         }
         if ( $perl_type eq 'RCURLY' ) {
-            if ((   not defined $Marpa::R2::Perl::LAST_PERL_TYPE
-                    or $Marpa::R2::Perl::LAST_PERL_TYPE ne 'SEMI'
+            if ((   not defined $Marpa::R3::Perl::LAST_PERL_TYPE
+                    or $Marpa::R3::Perl::LAST_PERL_TYPE ne 'SEMI'
                 )
                 and ( grep { 'SEMI' eq $_ } @{$expected_tokens} )
                 )
@@ -1294,7 +1294,7 @@ sub read_PPI_token {
                 defined $recce->alternative( 'SEMI', \q{;} )
                     or token_not_accepted( $token, 'SEMI', q{;} );
                 $parser->earleme_complete();
-            } ## end if ( ( not defined $Marpa::R2::Perl::LAST_PERL_TYPE ...))
+            } ## end if ( ( not defined $Marpa::R3::Perl::LAST_PERL_TYPE ...))
             defined $recce->alternative( $perl_type, \$content )
                 or token_not_accepted( $token, $perl_type, $content );
             $parser->earleme_complete();
@@ -1303,8 +1303,8 @@ sub read_PPI_token {
         if ( $perl_type eq 'LCURLY' ) {
             my @potential_types = ();
             push @potential_types, 'LCURLY';
-            if ( not defined $Marpa::R2::Perl::LAST_PERL_TYPE
-                or $Marpa::R2::Perl::LAST_PERL_TYPE ne 'DO' )
+            if ( not defined $Marpa::R3::Perl::LAST_PERL_TYPE
+                or $Marpa::R3::Perl::LAST_PERL_TYPE ne 'DO' )
             {
                 push @potential_types, 'HASHBRACK';
             }
@@ -1370,18 +1370,18 @@ sub read_PPI_token {
     unknown_ppi_token($token);
 
     SUCCESS:
-    $Marpa::R2::Perl::LAST_PERL_TYPE = $perl_type;
+    $Marpa::R3::Perl::LAST_PERL_TYPE = $perl_type;
     return 1;
 
 } ## end sub read_PPI_token
 
-sub Marpa::R2::Perl::find_perl {
+sub Marpa::R3::Perl::find_perl {
 
     my ( $parser, $first_token_ix, $last_token_ix ) = @_;
 
     my $grammar = $parser->{grammar};
 
-    my $recce = Marpa::R2::Recognizer->new(
+    my $recce = Marpa::R3::Recognizer->new(
         {   grammar        => $grammar,
             ranking_method => 'high_rule_only',
         }
@@ -1392,13 +1392,13 @@ sub Marpa::R2::Perl::find_perl {
 
     # This is convenient for making the recognizer available to
     # error messages
-    local $Marpa::R2::Perl::PARSER = $parser;
+    local $Marpa::R3::Perl::PARSER = $parser;
 
     my $PPI_tokens           = $parser->{PPI_tokens};
     my @PPI_token_to_earleme = ();
 
     # For use by read_PPI_token
-    local $Marpa::R2::Perl::LAST_PERL_TYPE = undef;
+    local $Marpa::R3::Perl::LAST_PERL_TYPE = undef;
     die 'find_perl requires embedded parser' if not $parser->{embedded};
     my $in_prefix = $parser->{in_prefix} = 1;
     my $last_end_marker_ix;
@@ -1461,12 +1461,12 @@ sub Marpa::R2::Perl::find_perl {
     my $start_PPI_ix = $earleme_to_PPI_token->[$start];
     return ($start_PPI_ix, $last_end_marker_ix);
 
-} ## end sub Marpa::R2::Perl::find_perl
+} ## end sub Marpa::R3::Perl::find_perl
 
-sub Marpa::R2::Perl::eval {
+sub Marpa::R3::Perl::eval {
     my ($parser) = @_;
     my $recce = $parser->{recce};
-    local $Marpa::R2::Perl::Internal::CONTEXT =
+    local $Marpa::R3::Perl::Internal::CONTEXT =
         [ $parser->{PPI_tokens}, $parser->{earleme_to_PPI_token} ];
     if (wantarray) {
         my @values = ();
@@ -1477,15 +1477,15 @@ sub Marpa::R2::Perl::eval {
     } ## end if (wantarray)
     my $value_ref = $recce->value();
     return $value_ref;
-} ## end sub Marpa::R2::Perl::eval
+} ## end sub Marpa::R3::Perl::eval
 
-sub Marpa::R2::Perl::parse {
+sub Marpa::R3::Perl::parse {
     my ( $parser, $input, $hash_arg ) = @_;
-    $parser->Marpa::R2::Perl::read( $input, $hash_arg );
-    return $parser->Marpa::R2::Perl::eval();
+    $parser->Marpa::R3::Perl::read( $input, $hash_arg );
+    return $parser->Marpa::R3::Perl::eval();
 }
 
-sub Marpa::R2::Perl::default_show_location {
+sub Marpa::R3::Perl::default_show_location {
     my ($token) = @_;
     my $file_name = $token->logical_filename();
     my $file_description = $file_name ? qq{ file "$file_name"} : q{};
@@ -1494,7 +1494,7 @@ sub Marpa::R2::Perl::default_show_location {
         . $token->logical_line_number()
         . q{, column }
         . $token->column_number();
-} ## end sub Marpa::R2::Perl::default_show_location
+} ## end sub Marpa::R3::Perl::default_show_location
 
 1;
 

@@ -17,7 +17,7 @@
 use 5.010;
 use strict;
 use warnings;
-use Marpa::R3 2.097_002;
+use Marpa::R3;
 use Data::Dumper;
 use Test::More tests => 3;
 use Getopt::Long ();

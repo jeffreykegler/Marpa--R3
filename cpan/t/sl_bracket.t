@@ -31,7 +31,7 @@
 use 5.010;
 use strict;
 use warnings;
-use Marpa::R3 2.098000;
+use Marpa::R3;
 use Data::Dumper;
 use English qw( -no_match_vars );
 use Getopt::Long ();
