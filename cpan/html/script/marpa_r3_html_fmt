@@ -1,24 +1,24 @@
 #!/usr/bin/perl
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
 use 5.010;
 use strict;
 use warnings;
 use English qw( -no_match_vars );
-use Marpa::R2::HTML;
+use Marpa::R3::HTML;
 use Fatal qw(open close);
 use Getopt::Long;
 
@@ -394,11 +394,11 @@ sub post_process {
 
 sub do_pre {
     my @new_line_data = ();
-    my $start_tag     = Marpa::R2::HTML::start_tag();
-    my $end_tag       = Marpa::R2::HTML::end_tag();
+    my $start_tag     = Marpa::R3::HTML::start_tag();
+    my $end_tag       = Marpa::R3::HTML::end_tag();
 
     CHILD:
-    for my $value ( @{ Marpa::R2::HTML::values() } ) {
+    for my $value ( @{ Marpa::R3::HTML::values() } ) {
         for my $line_data ( @{$value} ) {
             if ( $line_data->[0] =~ /\A msg [:] /xms ) {
                 push @new_line_data,
@@ -408,7 +408,7 @@ sub do_pre {
                     ];
             } ## end if ( $line_data->[0] =~ /\A msg [:] /xms )
         } ## end for my $line_data ( @{$value} )
-    } ## end CHILD: for my $value ( @{ Marpa::R2::HTML::values() } )
+    } ## end CHILD: for my $value ( @{ Marpa::R3::HTML::values() } )
 
     if ( not defined $start_tag ) {
         push @new_line_data, [ 'msg: missing pre start tag', 0 ]
@@ -416,7 +416,7 @@ sub do_pre {
         push @new_line_data, [ 'start tag', 0, '<pre>' ];
     }
 
-    my $original = Marpa::R2::HTML::original();
+    my $original = Marpa::R3::HTML::original();
     push @new_line_data, [ 'pre', 0, $original ];
 
     if ( not defined $end_tag ) {
@@ -428,24 +428,24 @@ sub do_pre {
 } ## end sub do_pre
 
 sub do_cruft {
-    my $literal = Marpa::R2::HTML::literal();
-    my @new_line_data = ( [ 'msg: cruft', 0, 'following', $literal, Marpa::R2::HTML::token_type() ] );
+    my $literal = Marpa::R3::HTML::literal();
+    my @new_line_data = ( [ 'msg: cruft', 0, 'following', $literal, Marpa::R3::HTML::token_type() ] );
     push @new_line_data, [ 'cruft', 0, $literal ];
     return \@new_line_data;
 } ## end sub do_cruft
 
 sub do_comment {
-    my $literal = Marpa::R2::HTML::literal();
+    my $literal = Marpa::R3::HTML::literal();
     return [ [ 'comment', 0, $literal ] ];
 }
 
 sub do_default {
-    my $tagname       = Marpa::R2::HTML::tagname();
+    my $tagname       = Marpa::R3::HTML::tagname();
     my @new_line_data = ();
 
-    my $start_tag = Marpa::R2::HTML::start_tag();
-    my $end_tag   = Marpa::R2::HTML::end_tag();
-    my $is_empty_element  = Marpa::R2::HTML::is_empty_element();
+    my $start_tag = Marpa::R3::HTML::start_tag();
+    my $end_tag   = Marpa::R3::HTML::end_tag();
+    my $is_empty_element  = Marpa::R3::HTML::is_empty_element();
     {
         ## no critic(Variables::ProhibitPackageVars)
         my $tag_type =
@@ -464,7 +464,7 @@ sub do_default {
         } ## end else [ if ( defined $start_tag ) ]
     }
 
-    my @descendant_data = @{ Marpa::R2::HTML::descendants('value,original') };
+    my @descendant_data = @{ Marpa::R3::HTML::descendants('value,original') };
     my $first_content_child = defined $start_tag ? 1 : 0;
     my $last_content_child = $#descendant_data - ( defined $end_tag ? 1 : 0 );
     CHILD:
@@ -498,13 +498,13 @@ sub do_default {
 
 my %html_args = (
     'script' => sub {
-        return [ [ 'script', 0, Marpa::R2::HTML::original() ] ];
+        return [ [ 'script', 0, Marpa::R3::HTML::original() ] ];
     },
     ':CRUFT'   => \&do_cruft,
     ':COMMENT' => \&do_comment,
     'pre'      => \&do_pre,
     q{*}       => \&do_default,
-    ':TOP'     => sub { return Marpa::R2::HTML::values(); }
+    ':TOP'     => sub { return Marpa::R3::HTML::values(); }
 );
 
 my %flags = (
@@ -521,7 +521,7 @@ if (defined $compile_flag) {
   $flags{compile} = \$source;
 }
 
-my $value_ref = Marpa::R2::HTML::html( \$document, \%html_args, \\%flags );
+my $value_ref = Marpa::R3::HTML::html( \$document, \%html_args, \\%flags );
 die 'Internal error: no parse' if not defined $value_ref;
 if ($dump_config_flag or $dump_AHFA_flag) {
   print ${$value_ref};

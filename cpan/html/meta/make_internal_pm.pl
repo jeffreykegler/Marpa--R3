@@ -71,7 +71,7 @@ say "\n1;";
 BEGIN {
 
 $HEADER = <<'END_OF_HEADER';
-# Copyright 2015 Jeffrey Kegler
+# Copyright 2016 Jeffrey Kegler
 # This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,

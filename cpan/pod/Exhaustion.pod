@@ -1,21 +1,21 @@
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
 =head1 Name
 
-Marpa::R2::Exhaustion - Parse exhaustion in the SLIF
+Marpa::R3::Exhaustion - Parse exhaustion in the SLIF
 
 =head1 About this document
 
@@ -80,10 +80,10 @@ We can call those languages B<exhaustion-conflicted>.
 
 The methods that may encounter parse exhaustion are those
 that read input:
-L<read()|Marpa::R2::Scanless::R/"read()">,
-L<resume()|Marpa::R2::Scanless::R/"resume()">,
-L<lexeme_complete()|Marpa::R2::Scanless::R/"lexeme_complete()">,
-and L<lexeme_read()|Marpa::R2::Scanless::R/"lexeme_read()">.
+L<read()|Marpa::R3::Scanless::R/"read()">,
+L<resume()|Marpa::R3::Scanless::R/"resume()">,
+L<lexeme_complete()|Marpa::R3::Scanless::R/"lexeme_complete()">,
+and L<lexeme_read()|Marpa::R3::Scanless::R/"lexeme_read()">.
 These are also, and not by coincidence, the event-triggering methods.
 In this document, we will call them the B<reading methods>.
 
@@ -132,7 +132,7 @@ a location at which parse exhaustion occurs.
 How parse exhaustion is handled depends on the setting
 of the
 L<SLIF's C<exhaustion> recognizer
-setting|Marpa::R2::Scanless::R/"exhaustion">.
+setting|Marpa::R3::Scanless::R/"exhaustion">.
 The value of this may be "C<fatal>" or
 "C<event>".
 ("C<fatal>" is the default.)
@@ -147,14 +147,14 @@ asynchronous parse exhaustion is thrown
 as a fatal error.
 If the C<exhaustion> setting is "C<event>",
 then an
-L<exhaustion event|Marpa::R2::Event/"Exhaustion events">
+L<exhaustion event|Marpa::R3::Event/"Exhaustion events">
 is triggered, returning control to the application.
 This is treated by the
 triggering method as a successful return.
 
 Note that the
-L<lexeme_complete()|Marpa::R2::Scanless::R/"lexeme_complete()">,
-and L<lexeme_read()|Marpa::R2::Scanless::R/"lexeme_read()">,
+L<lexeme_complete()|Marpa::R3::Scanless::R/"lexeme_complete()">,
+and L<lexeme_read()|Marpa::R3::Scanless::R/"lexeme_read()">,
 always ignore
 parse exhaustion,
 regardless of the C<exhaustion> recognizer setting.
@@ -177,8 +177,8 @@ a parse is exhausted or not
 can directly query
 parse exhaustion status
 with
-the L<C<exhausted()> method|Marpa::R2::Scanless::R/"exhausted()">.
-Even when L<parse exhaustion events|Marpa::R2::Event/"Exhaustion events">
+the L<C<exhausted()> method|Marpa::R3::Scanless::R/"exhausted()">.
+Even when L<parse exhaustion events|Marpa::R3::Event/"Exhaustion events">
 are enabled,
 using the C<exhausted()> method is the preferred method for detecting exhaustion,
 because it reports both asynchronous and synchronous parse exhaustion.
@@ -294,7 +294,7 @@ Completion parse events may be a cleaner way to deal with this.
 Applications which do want to use parse exhaustion as part of
 a strategy for finding the EOP
 can set the
-L<SLIF's C<exhaustion> recognizer setting|Marpa::R2::Scanless::R/"exhaustion">
+L<SLIF's C<exhaustion> recognizer setting|Marpa::R3::Scanless::R/"exhaustion">
 to "C<event>", so that a parse event occurs at parse exhaustion.
 When the event-triggering method returns, the application
 can then
@@ -302,25 +302,25 @@ L<check for exhaustion explicitly|/"Detecting parse exhaustion">.
 
 =head1 Copyright and License
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 ignore: 1
 
-  Copyright 2015 Jeffrey Kegler
-  This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+  Copyright 2016 Jeffrey Kegler
+  This file is part of Marpa::R3.  Marpa::R3 is free software: you can
   redistribute it and/or modify it under the terms of the GNU Lesser
   General Public License as published by the Free Software Foundation,
   either version 3 of the License, or (at your option) any later version.
 
-  Marpa::R2 is distributed in the hope that it will be useful,
+  Marpa::R3 is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
   Lesser General Public License for more details.
 
   You should have received a copy of the GNU Lesser
-  General Public License along with Marpa::R2.  If not, see
+  General Public License along with Marpa::R3.  If not, see
   http://www.gnu.org/licenses/.
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 =cut
 

@@ -1,17 +1,17 @@
 #!perl
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
 use 5.010;
@@ -26,21 +26,21 @@ use Test::More;
 
 BEGIN {
     use lib 'html/tool/lib';
-    my $eval_result = eval { require Marpa::R2::HTML::Test::Util; 1 };
+    my $eval_result = eval { require Marpa::R3::HTML::Test::Util; 1 };
     if ( !$eval_result ) {
         Test::More::plan tests => 1;
         Test::More::fail(
-            "Could not load Marpa::R2::HTML::Test::Util; $EVAL_ERROR");
+            "Could not load Marpa::R3::HTML::Test::Util; $EVAL_ERROR");
         exit 0;
     } ## end if ( !$eval_result )
 } ## end BEGIN
 
-BEGIN { Marpa::R2::HTML::Test::Util::load_or_skip_all('HTML::Parser'); }
+BEGIN { Marpa::R3::HTML::Test::Util::load_or_skip_all('HTML::Parser'); }
 
 BEGIN { Test::More::plan tests => 10; }
 
 use lib 'tool/lib';
-use Marpa::R2::Test;
+use Marpa::R3::Test;
 
 my $blib = $ENV{MARPA_TEST_BLIB} // 'blib';
 my $script_dir = File::Spec->catdir( $blib, 'script' );
@@ -61,7 +61,7 @@ sub run_one_test {
     );
     print {$cfg_fh} ${$config_ref};
     close $cfg_fh;
-    my $output = Marpa::R2::HTML::Test::Util::run_command(
+    my $output = Marpa::R3::HTML::Test::Util::run_command(
         File::Spec->catfile( $script_dir, 'marpa_r2_html_fmt' ),
         '--no-added-tag',
         '--compile=' . $test_config_name,
@@ -69,7 +69,7 @@ sub run_one_test {
     );
 
     unlink $test_config_name, $html_file_name;
-    Marpa::R2::Test::is( $output, ${$expected_ref}, $test_name );
+    Marpa::R3::Test::is( $output, ${$expected_ref}, $test_name );
 } ## end sub run_one_test
 
 my $default_config = do {

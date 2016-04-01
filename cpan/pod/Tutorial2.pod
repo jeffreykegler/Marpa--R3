@@ -1,29 +1,29 @@
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
 =head1 NAME
 
-Marpa::R2::Tutorial2 - Marpa Tutorial 2
+Marpa::R3::Tutorial2 - Marpa Tutorial 2
 
 =head1 Synopsis
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: Tutorial 2 synopsis
 normalize-whitespace: 1
 
-    use Marpa::R2;
+    use Marpa::R3;
 
     my $dsl = <<'END_OF_DSL';
     :default ::= action => [name,values]
@@ -43,8 +43,8 @@ normalize-whitespace: 1
     whitespace ~ [\s]+
     END_OF_DSL
 
-    my $grammar = Marpa::R2::Scanless::G->new( { source => \$dsl } );
-    my $recce = Marpa::R2::Scanless::R->new(
+    my $grammar = Marpa::R3::Scanless::G->new( { source => \$dsl } );
+    my $recce = Marpa::R3::Scanless::R->new(
         { grammar => $grammar, semantics_package => 'My_Actions' } );
     my $input = '42 * 1 + 7';
     my $length_read = $recce->read( \$input );
@@ -70,7 +70,7 @@ normalize-whitespace: 1
         return $t1 * $t2;
     }
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 =head1 Description
 
@@ -102,39 +102,39 @@ and to get finer control of the response to Marpa errors.
 =back
 
 This uses the same extremely simple calculator
-as the tutorial in the L<landing page|Marpa::R2>.
+as the tutorial in the L<landing page|Marpa::R3>.
 Most of the code is exactly the same in fact,
 and we will skip it.
 Here is what is new:
 
-=head2 Marpa::R2::Scanless::R::new
+=head2 Marpa::R3::Scanless::R::new
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: Tutorial 2 synopsis
 partial: 1
 normalize-whitespace: 1
 
-    my $recce = Marpa::R2::Scanless::R->new(
+    my $recce = Marpa::R3::Scanless::R->new(
         { grammar => $grammar, semantics_package => 'My_Actions' } );
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
-C<Marpa::R2::Scanless::R::new> creates a new SLIF recognizer.
+C<Marpa::R3::Scanless::R::new> creates a new SLIF recognizer.
 Its arguments are references to hashes of named arguments.
 In this example the first named argument is
 the required argument: "C<grammar>".
 The value of the
 C<grammar>
-named argument must be a Marpa::R2 SLIF
+named argument must be a Marpa::R3 SLIF
 grammar.
 
 The second argument is optional, but you will use it frequently.
 The "C<semantics_package>" named argument tells Marpa in which Perl package to
 look for the closures implementing the semantics for this grammar.
 
-=head2 Marpa::R2::Scanless::R::read
+=head2 Marpa::R3::Scanless::R::read
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: Tutorial 2 synopsis
 partial: 1
 normalize-whitespace: 1
@@ -142,20 +142,20 @@ normalize-whitespace: 1
     my $input = '42 * 1 + 7';
     my $length_read = $recce->read( \$input );
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 To parse a string,
 we use 
-the C<Marpa::R2::Scanless::R::read()> method.
+the C<Marpa::R3::Scanless::R::read()> method.
 In its simplest form,
 as here,
-the C<Marpa::R2::Scanless::R::read()> method
+the C<Marpa::R3::Scanless::R::read()> method
 takes a reference
 to a string containing the input stream as its argument.
 
 =head2 Checking for a premature end
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: Tutorial 2 synopsis
 partial: 1
 normalize-whitespace: 1
@@ -163,13 +163,13 @@ normalize-whitespace: 1
     die "Read ended after $length_read of ", length $input, " characters"
         if $length_read != length $input;
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 Most premature endings occur when a parse is exhausted.
 A parse is "exhausted" when there is no possible way for it
 to continue on to success.
 Premature parse exhaustion is thrown as a failure by
-the C<Marpa::R2::Scanless::R::read()> method,
+the C<Marpa::R3::Scanless::R::read()> method,
 and it is not necessary to check for it explicitly.
 
 There are other premature endings
@@ -177,7 +177,7 @@ that are not necessarily failures,
 and which therefore are not thrown.
 These are Marpa's SLIF parse events.
 SLIF parse events are an advanced feature, and are described
-L<elsewhere|Marpa::R2::Event>.
+L<elsewhere|Marpa::R3::Event>.
 In this example,
 any premature ending caused by
 the triggering of a SLIF parse event will be caused
@@ -193,7 +193,7 @@ and as an example of a cautious programming style.
 
 =head2 Checking for an ambiguous parse
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: Tutorial 2 synopsis
 partial: 1
 normalize-whitespace: 1
@@ -203,7 +203,7 @@ normalize-whitespace: 1
         die "Parse is ambiguous\n", $ambiguous_status;
     }
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 Much more likely than stray SLIF parse events are ambiguous parses --
 parses where the input can be parsed in two or more ways.
@@ -221,21 +221,21 @@ and only if you know that ambiguities of that kind
 will not cause trouble.
 The above code uses
 L<the recognizer's C<ambigous()>
-method|Marpa::R2::Scanless::R/"ambiguous()"> to spot ambiguous parses.
+method|Marpa::R3::Scanless::R/"ambiguous()"> to spot ambiguous parses.
 The L<C<ambigous()>
-method|Marpa::R2::Scanless::R/"ambiguous()"> returns the empty string
+method|Marpa::R3::Scanless::R/"ambiguous()"> returns the empty string
 if there was exactly one parse.
 If there was no parse, 
 the L<C<ambigous()>
-method|Marpa::R2::Scanless::R/"ambiguous()"> returns a string stating that.
+method|Marpa::R3::Scanless::R/"ambiguous()"> returns a string stating that.
 If there were two or more parses,
 the L<C<ambigous()>
-method|Marpa::R2::Scanless::R/"ambiguous()"> returns a string describing
+method|Marpa::R3::Scanless::R/"ambiguous()"> returns a string describing
 the ambiguity.
 
-=head2 Marpa::R2::Scanless::R::value
+=head2 Marpa::R3::Scanless::R::value
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: Tutorial 2 synopsis
 partial: 1
 normalize-whitespace: 1
@@ -243,13 +243,13 @@ normalize-whitespace: 1
     my $value_ref = $recce->value;
     my $value = ${$value_ref};
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
-The C<Marpa::R2::Scanless::R::value()> method returns
+The C<Marpa::R3::Scanless::R::value()> method returns
 a reference to the parse result's value,
 if there was a parse result.
 If there was no parse result,
-C<Marpa::R2::Scanless::R::value()>
+C<Marpa::R3::Scanless::R::value()>
 returns
 C<undef>.
 This code does not check for the case where there is
@@ -262,25 +262,25 @@ as in the previous tutorial.
 
 =head1 Copyright and License
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 ignore: 1
 
-  Copyright 2015 Jeffrey Kegler
-  This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+  Copyright 2016 Jeffrey Kegler
+  This file is part of Marpa::R3.  Marpa::R3 is free software: you can
   redistribute it and/or modify it under the terms of the GNU Lesser
   General Public License as published by the Free Software Foundation,
   either version 3 of the License, or (at your option) any later version.
 
-  Marpa::R2 is distributed in the hope that it will be useful,
+  Marpa::R3 is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
   Lesser General Public License for more details.
 
   You should have received a copy of the GNU Lesser
-  General Public License along with Marpa::R2.  If not, see
+  General Public License along with Marpa::R3.  If not, see
   http://www.gnu.org/licenses/.
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 =cut
 

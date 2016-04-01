@@ -1,19 +1,19 @@
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-package Marpa::R2::HTML::Config::Compile;
+package Marpa::R3::HTML::Config::Compile;
 
 use 5.010;
 use strict;
@@ -29,8 +29,8 @@ $VERSION = eval $VERSION;
 use Data::Dumper;
 use English qw( -no_match_vars );
 
-use Marpa::R2::HTML::Config::Core;
-use Marpa::R2::Thin::Trace;
+use Marpa::R3::HTML::Config::Core;
+use Marpa::R3::Thin::Trace;
 
 # Indexes into the symbol table
 use constant CONTEXT_CLOSED  => 0;
@@ -54,7 +54,7 @@ sub do_is_included_statement {
     # For now, new groups cannot be defined
     Carp::croak(
         qq{Group "$group" does not exist\n},
-        qq{  Problem was in this line: }, $Marpa::R2::HTML::Config::Compile::LINE
+        qq{  Problem was in this line: }, $Marpa::R3::HTML::Config::Compile::LINE
     ) if not defined $group_entry;
 
     my $closed_reason = $element_entry->[CONTEXT_CLOSED];
@@ -62,7 +62,7 @@ sub do_is_included_statement {
         Carp::croak(
             qq{Context of "$element" cannot be changed:\n},
             qq{  Reason: $closed_reason\n},
-            qq{  Problem was in this line: }, $Marpa::R2::HTML::Config::Compile::LINE
+            qq{  Problem was in this line: }, $Marpa::R3::HTML::Config::Compile::LINE
         );
     } ## end if ($closed_reason)
     $closed_reason = $group_entry->[CONTENTS_CLOSED];
@@ -70,7 +70,7 @@ sub do_is_included_statement {
         Carp::croak(
             qq{Contents of "$group" cannot be changed:\n},
             qq{  Reason: $closed_reason\n},
-            qq{  Problem was in this line: }, $Marpa::R2::HTML::Config::Compile::LINE
+            qq{  Problem was in this line: }, $Marpa::R3::HTML::Config::Compile::LINE
         );
     } ## end if ($closed_reason)
 
@@ -101,11 +101,11 @@ sub do_is_a_included_statement {
     # For now, new flows and groups cannot be defined
     Carp::croak(
         qq{Group "$group" does not exist\n},
-            qq{  Problem was in this line: }, $Marpa::R2::HTML::Config::Compile::LINE
+            qq{  Problem was in this line: }, $Marpa::R3::HTML::Config::Compile::LINE
     ) if not defined $group_entry;
     Carp::croak(
         qq{Flow "$flow" does not exist\n},
-            qq{  Problem was in this line: }, $Marpa::R2::HTML::Config::Compile::LINE
+            qq{  Problem was in this line: }, $Marpa::R3::HTML::Config::Compile::LINE
     ) if not defined $flow_entry;
 
     my $closed_reason = $element_entry->[CONTEXT_CLOSED];
@@ -113,7 +113,7 @@ sub do_is_a_included_statement {
         Carp::croak(
             qq{Context of "$element" cannot be changed:\n},
             qq{  Reason: $closed_reason\n},
-            qq{  Problem was in this line: }, $Marpa::R2::HTML::Config::Compile::LINE
+            qq{  Problem was in this line: }, $Marpa::R3::HTML::Config::Compile::LINE
         );
     } ## end if ($closed_reason)
     $closed_reason = $element_entry->[CONTENTS_CLOSED];
@@ -121,7 +121,7 @@ sub do_is_a_included_statement {
         Carp::croak(
             qq{Contents of "$element" cannot be changed:\n},
             qq{  Reason: $closed_reason\n},
-            qq{  Problem was in this line: }, $Marpa::R2::HTML::Config::Compile::LINE
+            qq{  Problem was in this line: }, $Marpa::R3::HTML::Config::Compile::LINE
         );
     } ## end if ($closed_reason)
     $closed_reason = $flow_entry->[CONTEXT_CLOSED];
@@ -129,7 +129,7 @@ sub do_is_a_included_statement {
         Carp::croak(
             qq{Context of "$flow" cannot be changed:\n},
             qq{  Reason: $closed_reason\n},
-            qq{  Problem was in this line: }, $Marpa::R2::HTML::Config::Compile::LINE
+            qq{  Problem was in this line: }, $Marpa::R3::HTML::Config::Compile::LINE
         );
     } ## end if ($closed_reason)
     $closed_reason = $group_entry->[CONTENTS_CLOSED];
@@ -137,14 +137,14 @@ sub do_is_a_included_statement {
         Carp::croak(
             qq{Contents of "$group" cannot be changed:\n},
             qq{  Reason: $closed_reason\n},
-            qq{  Problem was in this line: }, $Marpa::R2::HTML::Config::Compile::LINE
+            qq{  Problem was in this line: }, $Marpa::R3::HTML::Config::Compile::LINE
         );
     } ## end if ($closed_reason)
 
     Carp::croak(
         qq{Contents of "$element" are already being defined:\n},
         qq{  Problem was in this line: },
-        $Marpa::R2::HTML::Config::Compile::LINE
+        $Marpa::R3::HTML::Config::Compile::LINE
     ) if defined $element_entry->[CONTENTS];
     Carp::croak(
         qq{Context of "$element" is already being defined:\n},

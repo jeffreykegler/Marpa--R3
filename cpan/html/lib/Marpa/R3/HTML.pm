@@ -1,19 +1,19 @@
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-package Marpa::R2::HTML;
+package Marpa::R3::HTML;
 
 use 5.010;
 use strict;
@@ -30,13 +30,13 @@ our @EXPORT_OK;
 use base qw(Exporter);
 BEGIN { @EXPORT_OK = qw(html); }
 
-package Marpa::R2::HTML::Internal;
+package Marpa::R3::HTML::Internal;
 
 # Data::Dumper is used in tracing
 use Data::Dumper;
 
-use Marpa::R2::HTML::Internal;
-use Marpa::R2::HTML::Config;
+use Marpa::R3::HTML::Internal;
+use Marpa::R3::HTML::Config;
 use Carp ();
 use HTML::Parser 3.69;
 use HTML::Entities qw(decode_entities);
@@ -45,24 +45,24 @@ use HTML::Entities qw(decode_entities);
 # those required in Build.PL
 
 use English qw( -no_match_vars );
-use Marpa::R2;
+use Marpa::R3;
 {
-    my $submodule_version = $Marpa::R2::VERSION;
-    die 'Marpa::R2::VERSION not defined' if not defined $submodule_version;
+    my $submodule_version = $Marpa::R3::VERSION;
+    die 'Marpa::R3::VERSION not defined' if not defined $submodule_version;
     die
-        "Marpa::R2::VERSION ($submodule_version) does not match Marpa::R2::HTML::VERSION ",
-        $Marpa::R2::HTML::VERSION
-        if $submodule_version != $Marpa::R2::HTML::VERSION;
+        "Marpa::R3::VERSION ($submodule_version) does not match Marpa::R3::HTML::VERSION ",
+        $Marpa::R3::HTML::VERSION
+        if $submodule_version != $Marpa::R3::HTML::VERSION;
 }
 
-use Marpa::R2::Thin::Trace;
+use Marpa::R3::Thin::Trace;
 
 # constants
 
 use constant PHYSICAL_TOKEN      => 42;
 use constant RUBY_SLIPPERS_TOKEN => 43;
 
-our @LIBMARPA_ERROR_NAMES = Marpa::R2::Thin::error_names();
+our @LIBMARPA_ERROR_NAMES = Marpa::R3::Thin::error_names();
 our $UNEXPECTED_TOKEN_ID;
 our $NO_MARPA_ERROR;
 ERROR: for my $error_number ( 0 .. $#LIBMARPA_ERROR_NAMES ) {
@@ -77,15 +77,15 @@ ERROR: for my $error_number ( 0 .. $#LIBMARPA_ERROR_NAMES ) {
     }
 } ## end ERROR: for my $error_number ( 0 .. $#LIBMARPA_ERROR_NAMES )
 
-use Marpa::R2::HTML::Callback;
+use Marpa::R3::HTML::Callback;
 {
-    my $submodule_version = $Marpa::R2::HTML::Callback::VERSION;
-    die 'Marpa::R2::HTML::Callback::VERSION not defined'
+    my $submodule_version = $Marpa::R3::HTML::Callback::VERSION;
+    die 'Marpa::R3::HTML::Callback::VERSION not defined'
         if not defined $submodule_version;
     die
-        "Marpa::R2::HTML::Callback::VERSION ($submodule_version) does not match Marpa::R2::HTML::VERSION ",
-        $Marpa::R2::HTML::VERSION
-        if $submodule_version != $Marpa::R2::HTML::VERSION;
+        "Marpa::R3::HTML::Callback::VERSION ($submodule_version) does not match Marpa::R3::HTML::VERSION ",
+        $Marpa::R3::HTML::VERSION
+        if $submodule_version != $Marpa::R3::HTML::VERSION;
 }
 
 sub earleme_to_linecol {
@@ -96,8 +96,8 @@ sub earleme_to_linecol {
     die if not defined $html_token_ix;
 
     return @{ $html_parser_tokens->[$html_token_ix] }[
-        Marpa::R2::HTML::Internal::Token::LINE,
-        Marpa::R2::HTML::Internal::Token::COLUMN,
+        Marpa::R3::HTML::Internal::Token::LINE,
+        Marpa::R3::HTML::Internal::Token::COLUMN,
     ];
 
 } ## end sub earleme_to_linecol
@@ -110,26 +110,26 @@ sub earleme_to_offset {
     die if not defined $html_token_ix;
 
     return $html_parser_tokens->[$html_token_ix]
-        ->[Marpa::R2::HTML::Internal::Token::END_OFFSET];
+        ->[Marpa::R3::HTML::Internal::Token::END_OFFSET];
 
 } ## end sub earleme_to_offset
 
 sub add_handler {
     my ( $self, $handler_description ) = @_;
     my $ref_type = ref $handler_description || 'not a reference';
-    Marpa::R2::exception(
+    Marpa::R3::exception(
         "Long form handler description should be ref to hash, but it is $ref_type"
     ) if $ref_type ne 'HASH';
     my $element     = delete $handler_description->{element};
     my $class       = delete $handler_description->{class};
     my $pseudoclass = delete $handler_description->{pseudoclass};
     my $action      = delete $handler_description->{action};
-    Marpa::R2::exception(
+    Marpa::R3::exception(
         'Unknown option(s) in Long form handler description: ',
         ( join q{ }, keys %{$handler_description} )
     ) if scalar keys %{$handler_description};
 
-    Marpa::R2::exception('Handler action must be CODE ref')
+    Marpa::R3::exception('Handler action must be CODE ref')
         if ref $action ne 'CODE';
 
     if ( defined $pseudoclass ) {
@@ -148,7 +148,7 @@ sub add_handler {
 sub add_handlers_from_hashes {
     my ( $self, $handler_specs ) = @_;
     my $ref_type = ref $handler_specs || 'not a reference';
-    Marpa::R2::exception(
+    Marpa::R3::exception(
         "handlers arg must must be ref to ARRAY, it is $ref_type")
         if $ref_type ne 'ARRAY';
     for my $handler_spec ( keys %{$handler_specs} ) {
@@ -173,12 +173,12 @@ sub add_handlers {
         if ( $pseudoclass
             and not exists $allowed_pseudoclasses->{$pseudoclass} )
         {
-            Marpa::R2::exception(
+            Marpa::R3::exception(
                 qq{pseudoclass "$pseudoclass" is not known:\n},
                 "Specifier was $specifier\n" );
         } ## end if ( $pseudoclass and not exists $allowed_pseudoclasses...)
         if ( $pseudoclass and $element ) {
-            Marpa::R2::exception(
+            Marpa::R3::exception(
                 qq{pseudoclass "$pseudoclass" may not have an element specified:\n},
                 "Specifier was $specifier\n"
             );
@@ -206,15 +206,15 @@ sub create {
     ARG: for my $arg (@_) {
         my $ref_type = ref $arg || 'not a reference';
         if ( $ref_type eq 'HASH' ) {
-            Marpa::R2::HTML::Internal::add_handlers( $self, $arg );
+            Marpa::R3::HTML::Internal::add_handlers( $self, $arg );
             next ARG;
         }
-        Marpa::R2::exception(
+        Marpa::R3::exception(
             "Argument must be hash or refs to hash: it is $ref_type")
             if $ref_type ne 'REF';
         my $option_hash = ${$arg};
         $ref_type = ref $option_hash || 'not a reference';
-        Marpa::R2::exception(
+        Marpa::R3::exception(
             "Argument must be hash or refs to hash: it is ref to $ref_type")
             if $ref_type ne 'HASH';
         OPTION: for my $option ( keys %{$option_hash} ) {
@@ -230,7 +230,7 @@ sub create {
                     )
             };
             if ( not exists $allowed_options->{$option} ) {
-                Marpa::R2::exception("unknown option: $option");
+                Marpa::R3::exception("unknown option: $option");
             }
             $self->{$option} = $option_hash->{$option};
         } ## end OPTION: for my $option ( keys %{$option_hash} )
@@ -239,12 +239,12 @@ sub create {
     my $source_ref = $self->{compile};
     if ( defined $source_ref ) {
         ref $source_ref eq 'SCALAR'
-            or Marpa::R2::exception(
+            or Marpa::R3::exception(
             qq{value of "compile" option must be a SCALAR});
-        $self->{config} = Marpa::R2::HTML::Config->new_from_compile($source_ref);
+        $self->{config} = Marpa::R3::HTML::Config->new_from_compile($source_ref);
     } ## end if ( defined $source_ref )
     else {
-        $self->{config} = Marpa::R2::HTML::Config->new();
+        $self->{config} = Marpa::R3::HTML::Config->new();
     }
 
     return $self;
@@ -312,10 +312,10 @@ sub token_range_to_original {
     my $tokens   = $self->{tokens};
     my $start_offset =
         $tokens->[$first_token_ix]
-        ->[Marpa::R2::HTML::Internal::Token::START_OFFSET];
+        ->[Marpa::R3::HTML::Internal::Token::START_OFFSET];
     my $end_offset =
         $tokens->[$last_token_ix]
-        ->[Marpa::R2::HTML::Internal::Token::END_OFFSET];
+        ->[Marpa::R3::HTML::Internal::Token::END_OFFSET];
     my $original = substr ${$document}, $start_offset,
         ( $end_offset - $start_offset );
     return \$original;
@@ -337,15 +337,15 @@ sub tdesc_item_to_original {
     if ( $tdesc_item_type eq 'PHYSICAL_TOKEN' ) {
         return token_range_to_original(
             $self,
-            $tdesc_item->[Marpa::R2::HTML::Internal::TDesc::START_TOKEN],
-            $tdesc_item->[Marpa::R2::HTML::Internal::TDesc::END_TOKEN],
+            $tdesc_item->[Marpa::R3::HTML::Internal::TDesc::START_TOKEN],
+            $tdesc_item->[Marpa::R3::HTML::Internal::TDesc::END_TOKEN],
         );
     } ## end if ( $tdesc_item_type eq 'PHYSICAL_TOKEN' )
     if ( $tdesc_item_type eq 'VALUED_SPAN' ) {
         return token_range_to_original(
             $self,
-            $tdesc_item->[Marpa::R2::HTML::Internal::TDesc::START_TOKEN],
-            $tdesc_item->[Marpa::R2::HTML::Internal::TDesc::END_TOKEN],
+            $tdesc_item->[Marpa::R3::HTML::Internal::TDesc::START_TOKEN],
+            $tdesc_item->[Marpa::R3::HTML::Internal::TDesc::END_TOKEN],
         );
     } ## end if ( $tdesc_item_type eq 'VALUED_SPAN' )
     return q{};
@@ -364,7 +364,7 @@ sub range_and_values_to_literal {
         next TDESC_ITEM if $type eq 'RUBY_SLIPPERS_TOKEN';
         if ( $type eq 'VALUES' ) {
             push @flat_tdesc_list,
-                @{ $tdesc_item->[Marpa::R2::HTML::Internal::TDesc::VALUE] };
+                @{ $tdesc_item->[Marpa::R3::HTML::Internal::TDesc::VALUE] };
             next TDESC_ITEM;
         }
         push @flat_tdesc_list, $tdesc_item;
@@ -383,7 +383,7 @@ sub range_and_values_to_literal {
             ## Treat this as a special case.
             if ( $tdesc_item_type eq 'VALUED_SPAN' ) {
                 my $value =
-                    $tdesc_item->[Marpa::R2::HTML::Internal::TDesc::VALUE]
+                    $tdesc_item->[Marpa::R3::HTML::Internal::TDesc::VALUE]
                     // q{};
                 push @literal_pieces, \( q{} . $value );
             } ## end if ( $tdesc_item_type eq 'VALUED_SPAN' )
@@ -396,7 +396,7 @@ sub range_and_values_to_literal {
             if $next_token_ix < $next_explicit_token_ix;
         if ( $tdesc_item_type eq 'VALUED_SPAN' ) {
             my $value =
-                $tdesc_item->[Marpa::R2::HTML::Internal::TDesc::VALUE];
+                $tdesc_item->[Marpa::R3::HTML::Internal::TDesc::VALUE];
             if ( defined $value ) {
                 push @literal_pieces, \( q{} . $value );
                 $next_token_ix = $furthest_explicit_token_ix + 1;
@@ -432,7 +432,7 @@ sub parse {
 
     my %tags = ();
 
-    Marpa::R2::exception(
+    Marpa::R3::exception(
         "parse() already run on this object\n",
         'For a new parse, create a new object'
     ) if $self->{document};
@@ -444,7 +444,7 @@ sub parse {
     my $trace_values    = $self->{trace_values};
     my $trace_fh        = $self->{trace_fh};
     my $ref_type        = ref $document_ref;
-    Marpa::R2::exception('Arg to parse() must be ref to string')
+    Marpa::R3::exception('Arg to parse() must be ref to string')
         if not $ref_type
             or $ref_type ne 'SCALAR'
             or not defined ${$document_ref};
@@ -461,8 +461,8 @@ sub parse {
     }
     my @action_by_rule_id = ();
     $self->{action_by_rule_id} = \@action_by_rule_id;
-    my $thin_grammar = Marpa::R2::Thin::G->new( { if => 1 } );
-    my $tracer = Marpa::R2::Thin::Trace->new($thin_grammar);
+    my $thin_grammar = Marpa::R3::Thin::G->new( { if => 1 } );
+    my $tracer = Marpa::R3::Thin::Trace->new($thin_grammar);
     $self->{tracer}                  = $tracer;
 
     RULE: for my $rule ( @{$core_rules} ) {
@@ -531,7 +531,7 @@ sub parse {
 
         PROCESS_TOKEN_TYPE: {
             if ($is_cdata) {
-                $raw_token->[Marpa::R2::HTML::Internal::Token::TOKEN_ID] =
+                $raw_token->[Marpa::R3::HTML::Internal::Token::TOKEN_ID] =
                     $SYMID_CDATA;
                 last PROCESS_TOKEN_TYPE;
             }
@@ -543,7 +543,7 @@ sub parse {
                 # carriage return (x0D) and line feed (x0A)
                 # I avoid the Perl character codes because I do NOT want
                 # localization
-                $raw_token->[Marpa::R2::HTML::Internal::Token::TOKEN_ID] =
+                $raw_token->[Marpa::R3::HTML::Internal::Token::TOKEN_ID] =
                  $SYMID_PCDATA if
                     substr(
                         ${$document}, $offset, ( $offset_end - $offset )
@@ -563,7 +563,7 @@ sub parse {
                 next HTML_PARSER_TOKEN if $offset_end <= $offset;
 
                 my $tag_name = $raw_token
-                    ->[Marpa::R2::HTML::Internal::Token::TAG_NAME];
+                    ->[Marpa::R3::HTML::Internal::Token::TAG_NAME];
                 my $terminal    = $token_type . q{_} . $tag_name;
                 my $terminal_id = $tracer->symbol_by_name($terminal);
                 if ( not defined $terminal_id ) {
@@ -592,7 +592,7 @@ sub parse {
                     $terminal_id = $tracer->symbol_by_name($terminal);
 
                 } ## end if ( not defined $terminal_id )
-                $raw_token->[Marpa::R2::HTML::Internal::Token::TOKEN_ID] =
+                $raw_token->[Marpa::R3::HTML::Internal::Token::TOKEN_ID] =
                     $terminal_id;
                 last PROCESS_TOKEN_TYPE;
             } ## end if ( $token_type eq 'E' or $token_type eq 'S' )
@@ -610,8 +610,8 @@ sub parse {
             [
             $SYMID_EOF, 'EOF',
             @{$last_token}[
-                Marpa::R2::HTML::Internal::Token::LINE,
-            Marpa::R2::HTML::Internal::Token::COLUMN
+                Marpa::R3::HTML::Internal::Token::LINE,
+            Marpa::R3::HTML::Internal::Token::COLUMN
             ],
             $document_length,
             $document_length
@@ -739,7 +739,7 @@ sub parse {
         }
     }
 
-    my $recce = Marpa::R2::Thin::R->new($thin_grammar);
+    my $recce = Marpa::R3::Thin::R->new($thin_grammar);
     $recce->start_input();
 
     $self->{recce}                    = $recce;
@@ -797,7 +797,7 @@ sub parse {
         my $token = $html_parser_tokens[$token_number];
 
         my $attempted_symbol_id = $token
-                ->[Marpa::R2::HTML::Internal::Token::TOKEN_ID];
+                ->[Marpa::R3::HTML::Internal::Token::TOKEN_ID];
         my $read_result =
             $recce->alternative( $attempted_symbol_id, PHYSICAL_TOKEN, 1 );
         if ( $read_result != $UNEXPECTED_TOKEN_ID ) {
@@ -911,7 +911,7 @@ sub parse {
                 or Carp::croak("Cannot print: $ERRNO");
         }
 
-        my $fatal_cruft_error = $token->[Marpa::R2::HTML::Internal::Token::TOKEN_ID]
+        my $fatal_cruft_error = $token->[Marpa::R3::HTML::Internal::Token::TOKEN_ID]
             == $SYMID_CRUFT ? 1 : 0;
 
         if ( $trace_cruft or $fatal_cruft_error ) {
@@ -940,7 +940,7 @@ sub parse {
 
         # Cruft tokens are not virtual.
         # They are the real things, hacked up.
-        $token->[Marpa::R2::HTML::Internal::Token::TOKEN_ID] = $SYMID_CRUFT;
+        $token->[Marpa::R3::HTML::Internal::Token::TOKEN_ID] = $SYMID_CRUFT;
 
     } ## end RECCE_RESPONSE: while ( $token_number < $token_count )
     $thin_grammar->throw_set(1);
@@ -950,21 +950,21 @@ sub parse {
             or Carp::croak("Cannot print: $ERRNO");
     }
 
-    $Marpa::R2::HTML::INSTANCE = $self;
-    local $Marpa::R2::HTML::Internal::PARSE_INSTANCE = $self;
+    $Marpa::R3::HTML::INSTANCE = $self;
+    local $Marpa::R3::HTML::Internal::PARSE_INSTANCE = $self;
     my $latest_earley_set_ID = $recce->latest_earley_set();
-    my $bocage = Marpa::R2::Thin::B->new( $recce, $latest_earley_set_ID );
-    my $order  = Marpa::R2::Thin::O->new($bocage);
-    my $tree   = Marpa::R2::Thin::T->new($order);
+    my $bocage = Marpa::R3::Thin::B->new( $recce, $latest_earley_set_ID );
+    my $order  = Marpa::R3::Thin::O->new($bocage);
+    my $tree   = Marpa::R3::Thin::T->new($order);
     $tree->next();
 
     my @stack = ();
-    local $Marpa::R2::HTML::Internal::STACK = \@stack;
+    local $Marpa::R3::HTML::Internal::STACK = \@stack;
     my %memoized_handlers = ();
 
-    my $valuator = Marpa::R2::Thin::V->new($tree);
-    local $Marpa::R2::HTML::Internal::RECCE    = $recce;
-    local $Marpa::R2::HTML::Internal::VALUATOR = $valuator;
+    my $valuator = Marpa::R3::Thin::V->new($tree);
+    local $Marpa::R3::HTML::Internal::RECCE    = $recce;
+    local $Marpa::R3::HTML::Internal::VALUATOR = $valuator;
 
     for my $rule_id ( grep { $thin_grammar->rule_length($_); }
         0 .. $thin_grammar->highest_rule_id() )
@@ -1013,42 +1013,42 @@ sub parse {
             my $attributes = undef;
             my $class      = undef;
             my $action     = $action_by_rule_id[$rule_id];
-            local $Marpa::R2::HTML::Internal::START_TAG_IX   = undef;
-            local $Marpa::R2::HTML::Internal::END_TAG_IX_REF = undef;
-            local $Marpa::R2::HTML::Internal::ELEMENT        = undef;
-            local $Marpa::R2::HTML::Internal::SPECIES        = q{};
+            local $Marpa::R3::HTML::Internal::START_TAG_IX   = undef;
+            local $Marpa::R3::HTML::Internal::END_TAG_IX_REF = undef;
+            local $Marpa::R3::HTML::Internal::ELEMENT        = undef;
+            local $Marpa::R3::HTML::Internal::SPECIES        = q{};
 
             if ( defined $action and ( index $action, 'ELE_' ) == 0 ) {
-                $Marpa::R2::HTML::Internal::SPECIES =
-                    $Marpa::R2::HTML::Internal::ELEMENT = substr $action, 4;
+                $Marpa::R3::HTML::Internal::SPECIES =
+                    $Marpa::R3::HTML::Internal::ELEMENT = substr $action, 4;
                 my $start_tag_marpa_token = $stack[$arg_0];
 
                 my $start_tag_type = $start_tag_marpa_token
-                    ->[Marpa::R2::HTML::Internal::TDesc::TYPE];
+                    ->[Marpa::R3::HTML::Internal::TDesc::TYPE];
                 if ( defined $start_tag_type
                     and $start_tag_type eq 'PHYSICAL_TOKEN' )
                 {
                     my $start_tag_ix    = $start_tag_marpa_token->[1];
                     my $start_tag_token = $html_parser_tokens[$start_tag_ix];
                     if ( $start_tag_token
-                        ->[Marpa::R2::HTML::Internal::Token::TYPE] eq 'S' )
+                        ->[Marpa::R3::HTML::Internal::Token::TYPE] eq 'S' )
                     {
-                        $Marpa::R2::HTML::Internal::START_TAG_IX =
+                        $Marpa::R3::HTML::Internal::START_TAG_IX =
                             $start_tag_ix;
                         $attributes = $start_tag_token
-                            ->[Marpa::R2::HTML::Internal::Token::ATTR];
+                            ->[Marpa::R3::HTML::Internal::Token::ATTR];
                     } ## end if ( $start_tag_token->[...])
                 } ## end if ( defined $start_tag_type and $start_tag_type eq ...)
             } ## end if ( defined $action and ( index $action, 'ELE_' ) ==...)
             if ( defined $action and ( index $action, 'SPE_' ) == 0 ) {
-                $Marpa::R2::HTML::Internal::SPECIES = q{:} . substr $action,
+                $Marpa::R3::HTML::Internal::SPECIES = q{:} . substr $action,
                     4;
             }
-            local $Marpa::R2::HTML::Internal::ATTRIBUTES = $attributes;
+            local $Marpa::R3::HTML::Internal::ATTRIBUTES = $attributes;
             $class = $attributes->{class} // q{*};
-            local $Marpa::R2::HTML::Internal::CLASS = $class;
-            local $Marpa::R2::HTML::Internal::ARG_0 = $arg_0;
-            local $Marpa::R2::HTML::Internal::ARG_N = $arg_n;
+            local $Marpa::R3::HTML::Internal::CLASS = $class;
+            local $Marpa::R3::HTML::Internal::ARG_0 = $arg_0;
+            local $Marpa::R3::HTML::Internal::ARG_N = $arg_n;
 
             my ( $start_earley_set_id, $end_earley_set_id ) =
                 $valuator->location();
@@ -1063,13 +1063,13 @@ sub parse {
             if ( $start_html_token_ix > $end_html_token_ix ) {
                 $start_html_token_ix = $end_html_token_ix = undef;
             }
-            local $Marpa::R2::HTML::Internal::START_HTML_TOKEN_IX =
+            local $Marpa::R3::HTML::Internal::START_HTML_TOKEN_IX =
                 $start_html_token_ix;
-            local $Marpa::R2::HTML::Internal::END_HTML_TOKEN_IX =
+            local $Marpa::R3::HTML::Internal::END_HTML_TOKEN_IX =
                 $end_html_token_ix;
 
             my $handler_key =
-                $rule_id . q{;} . $Marpa::R2::HTML::Internal::CLASS;
+                $rule_id . q{;} . $Marpa::R3::HTML::Internal::CLASS;
 
             my $handler = $memoized_handlers{$handler_key};
 
@@ -1096,28 +1096,28 @@ sub parse {
                 } ## end if ( ref $handler )
                 my @flat_tdesc_list = ();
                 STACK_IX:
-                for my $stack_ix ( $Marpa::R2::HTML::Internal::ARG_0 ..
-                    $Marpa::R2::HTML::Internal::ARG_N )
+                for my $stack_ix ( $Marpa::R3::HTML::Internal::ARG_0 ..
+                    $Marpa::R3::HTML::Internal::ARG_N )
                 {
                     my $tdesc_item =
-                        $Marpa::R2::HTML::Internal::STACK->[$stack_ix];
+                        $Marpa::R3::HTML::Internal::STACK->[$stack_ix];
                     my $tdesc_type = $tdesc_item->[0];
                     next STACK_IX if not defined $tdesc_type;
                     if ( $tdesc_type eq 'VALUES' ) {
                         push @flat_tdesc_list,
                             @{ $tdesc_item
-                                ->[Marpa::R2::HTML::Internal::TDesc::VALUE] };
+                                ->[Marpa::R3::HTML::Internal::TDesc::VALUE] };
                         next STACK_IX;
                     } ## end if ( $tdesc_type eq 'VALUES' )
                     next STACK_IX if $tdesc_type ne 'VALUED_SPAN';
                     push @flat_tdesc_list, $tdesc_item;
-                } ## end STACK_IX: for my $stack_ix ( $Marpa::R2::HTML::Internal::ARG_0...)
+                } ## end STACK_IX: for my $stack_ix ( $Marpa::R3::HTML::Internal::ARG_0...)
                 if ( scalar @flat_tdesc_list <= 1 ) {
                     $stack[$arg_0] = [
                         VALUED_SPAN => $start_html_token_ix,
                         $end_html_token_ix,
                         $flat_tdesc_list[0]
-                            ->[Marpa::R2::HTML::Internal::TDesc::VALUE],
+                            ->[Marpa::R3::HTML::Internal::TDesc::VALUE],
                         $rule_id
                     ];
                     last COMPUTE_VALUE;
@@ -1157,21 +1157,21 @@ sub parse {
     } ## end STEP: while (1)
 
     my $result = $stack[0];
-    Marpa::R2::exception('No parse: evaler returned undef')
+    Marpa::R3::exception('No parse: evaler returned undef')
         if not defined $result;
 
     if ( ref $self->{handler_by_species}->{TOP} ) {
         ## This is a user-defined handler.  We assume it returns
         ## a VALUED_SPAN.
-        $result = $result->[Marpa::R2::HTML::Internal::TDesc::VALUE];
+        $result = $result->[Marpa::R3::HTML::Internal::TDesc::VALUE];
     }
     else {
         ## The TOP handler was the default handler.
         ## We now want to "literalize" its result.
         FIND_LITERALIZEABLE: {
-            my $type = $result->[Marpa::R2::HTML::Internal::TDesc::TYPE];
+            my $type = $result->[Marpa::R3::HTML::Internal::TDesc::TYPE];
             if ( $type eq 'VALUES' ) {
-                $result = $result->[Marpa::R2::HTML::Internal::TDesc::VALUE];
+                $result = $result->[Marpa::R3::HTML::Internal::TDesc::VALUE];
                 last FIND_LITERALIZEABLE;
             }
             if ( $type eq 'VALUED_SPAN' ) {
@@ -1188,10 +1188,10 @@ sub parse {
 
 } ## end sub parse
 
-sub Marpa::R2::HTML::html {
+sub Marpa::R3::HTML::html {
     my ( $document_ref, @args ) = @_;
-    my $html = Marpa::R2::HTML::Internal::create(@args);
-    return Marpa::R2::HTML::Internal::parse( $html, $document_ref );
+    my $html = Marpa::R3::HTML::Internal::create(@args);
+    return Marpa::R3::HTML::Internal::parse( $html, $document_ref );
 }
 
 1;

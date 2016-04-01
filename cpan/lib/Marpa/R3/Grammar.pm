@@ -224,11 +224,11 @@ sub Marpa::R3::Grammar::set {
                     $value = $value->[0];
                 } ## end if ( ref $value eq 'ARRAY' and scalar @{$value} == 1...)
                 if ( not ref $value ) {
-                    Marpa::R2::exception(
+                    Marpa::R3::exception(
                         qq{Attempt to specify BNF as string -- no longer allowed!\n}
                         )
                 }
-                Marpa::R2::exception(
+                Marpa::R3::exception(
                     q{"rules" named argument must be ref to ARRAY}
                 ) if ref $value ne 'ARRAY';
 

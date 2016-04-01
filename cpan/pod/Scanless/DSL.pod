@@ -1,32 +1,32 @@
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
 =head1 Name
 
-Marpa::R2::Scanless::DSL - The DSL for the Scanless interface
+Marpa::R3::Scanless::DSL - The DSL for the Scanless interface
 
 =head1 Synopsis
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: SLIF DSL synopsis
 partial: 1
 normalize-whitespace: 1
 
-    use Marpa::R2;
+    use Marpa::R3;
 
-    my $grammar = Marpa::R2::Scanless::G->new(
+    my $grammar = Marpa::R3::Scanless::G->new(
         {   bless_package => 'My_Nodes',
             source        => \(<<'END_OF_SOURCE'),
     :default ::= action => [values] bless => ::lhs
@@ -61,7 +61,7 @@ normalize-whitespace: 1
         }
     );
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 =head1 About this document
 
@@ -99,12 +99,12 @@ and will not be part of the explicit symbol name.
 If angle brackets are used, symbol names may also contain whitespace,
 as in
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 ignore: 1
 
     <op comma>
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 A whitespace sequence inside angle brackets can
 include any whitespace character that is legal in Perl,
@@ -122,25 +122,25 @@ and all other whitespace sequences are converted to a single ASCII
 space character.
 This means that
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 ignore: 1
 
     < op comma  >
     <op   comma>
     <     op comma>
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 and even
 
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 ignore: 1
 
     <op
     comma>
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 will all be regarded as the same symbol name.
 The explicit form of that symbol name
@@ -159,7 +159,7 @@ it is the symbol's explicit name that is used.
 
 =head2 Single-quoted strings
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: SLIF DSL synopsis
 partial: 1
 normalize-whitespace: 1
@@ -173,16 +173,16 @@ normalize-whitespace: 1
        || Expression '+' Expression bless => add
         | Expression '-' Expression bless => subtract
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: Case-insensitive characters examples
 partial: 1
 normalize-whitespace: 1
 
     Child ~ 'cHILd':i
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 Single quotes can be used in prioritized
 rules to indicate character strings.
@@ -221,23 +221,23 @@ match case-insensitive.
 
 =head2 Character classes
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: SLIF DSL synopsis
 partial: 1
 normalize-whitespace: 1
 
     <vertical space char> ~ [\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: Case-insensitive characters examples
 partial: 1
 normalize-whitespace: 1
 
     word ~ [\w]:ic +
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 A character class in square brackets ("C<[]>")
 can be used in a RHS alternative of a prioritized rule,
@@ -320,7 +320,7 @@ specify exactly the same set of characters.
 
 =head1 Event initializer
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: SLIF completed event statement synopsis
 partial: 1
 normalize-whitespace: 1
@@ -329,9 +329,9 @@ normalize-whitespace: 1
     event 'b'=off = completed B
     event 'c'=on = completed C
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: SLIF discard event statement synopsis 2
 partial: 1
 normalize-whitespace: 1
@@ -340,9 +340,9 @@ normalize-whitespace: 1
     :discard ~ [;] event => 'semicolon'=on
     :discard ~ [.] event => period
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: SLIF nulled event statement synopsis
 partial: 1
 normalize-whitespace: 1
@@ -351,7 +351,7 @@ normalize-whitespace: 1
     event '!b'=off = nulled B
     event '!c'=on = nulled C
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 An event initializer is an event name,
 optionally with an explicit initialization.
@@ -472,7 +472,7 @@ and the adverb's value.
 
 Within an alternative, primaries may be enclosed in parentheses.
 A primary enclosed in parentheses is hidden from
-L<Marpa's semantics|Marpa::R2::Semantics>.
+L<Marpa's semantics|Marpa::R3::Semantics>.
 A set of parentheses may contain more than one primary,
 in which case the entire sequence of primaries is hidden,
 as if they had been enclosed in parentheses individually.
@@ -482,12 +482,12 @@ the semantics will ignore, perhaps because the value is constant.
 For example,
 in the following rule
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 ignore: 1
 
     a ::= b (',' c) d action => ::first
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 there is
 
@@ -533,14 +533,14 @@ there is only one priority.
 
 =head2 Start rule
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: SLIF DSL synopsis
 partial: 1
 normalize-whitespace: 1
 
     :start ::= Script
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 By default, the start symbol of the grammar is the LHS of the
 first G1 rule.
@@ -565,14 +565,14 @@ A empty rule makes its LHS symbol a nullable symbol.
 
 =head2 Quantified rule
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: SLIF DSL synopsis
 partial: 1
 normalize-whitespace: 1
 
     Script ::= Expression+ separator => comma
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 A quantified rule has only one RHS alternative,
 which is followed by a quantifier.
@@ -593,7 +593,7 @@ L<C<separator>|/"separator">.
 
 =head2 Prioritized rule
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: SLIF DSL synopsis
 partial: 1
 normalize-whitespace: 1
@@ -607,7 +607,7 @@ normalize-whitespace: 1
        || Expression '+' Expression bless => add
         | Expression '-' Expression bless => subtract
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 A prioritized rule contains a series of one or more RHS alternatives,
 separated by either the alternation operator ("C<|>")
@@ -634,23 +634,23 @@ Associativity is specified using adverbs, as described below.
 
 =head2 Discard pseudo-rule
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: SLIF DSL synopsis
 partial: 1
 normalize-whitespace: 1
 
     :discard ~ whitespace
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: SLIF discard event synopsis
 partial: 1
 normalize-whitespace: 1
 
     :discard ~ whitespace event => ws
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 A discard pseudo-rule is a rule whose LHS is
 the C<:discard> pseudo-symbol,
@@ -686,27 +686,27 @@ L<above|/"Event initializer">.
 If present, it defines a discard event,
 as described in
 L<the document on SLIF parse
-events|Marpa::R2::Event/"Discard events">.
+events|Marpa::R3::Event/"Discard events">.
 
 =head2 Default pseudo-rule
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: SLIF DSL synopsis
 partial: 1
 normalize-whitespace: 1
 
     :default ::= action => [values] bless => ::lhs
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: SLIF "time flies" DSL synopsis
 partial: 1
 normalize-whitespace: 1
 
     :default ::= action => [ name, values ]
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 The purpose of
 the default pseudo-rule is to change the defaults for
@@ -728,14 +728,14 @@ the value which it had prior to any explicit settings.
 
 =head2 Lexeme pseudo-rule
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: SLIF lexeme rule synopsis
 partial: 1
 normalize-whitespace: 1
 
     :lexeme ~ <say keyword> priority => 1
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 The purpose of
 the C<:lexeme> pseudo-rule is to allow adverbs to
@@ -762,23 +762,23 @@ and for documenting grammars.
 
 =head2 Discard default statement
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: SLIF default discard event statement synopsis 1
 partial: 1
 normalize-whitespace: 1
 
     discard default = event => :symbol=on
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: SLIF default discard event statement synopsis 2
 partial: 1
 normalize-whitespace: 1
 
     discard default = event => :symbol
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 The discard default statement changes the defaults for
 discard pseudo-rules.
@@ -797,7 +797,7 @@ names|/"Event name">.
 
 =head2 Lexeme default statement
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: SLIF DSL synopsis
 partial: 1
 normalize-whitespace: 1
@@ -805,16 +805,16 @@ normalize-whitespace: 1
     lexeme default = action => [ start, length, value ]
         bless => ::name latm => 
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: SLIF "time flies" DSL synopsis
 partial: 1
 normalize-whitespace: 1
 
     lexeme default = action => [ name, value ]
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 The lexeme default statement changes the defaults for
 lexeme adverbs.
@@ -830,7 +830,7 @@ Only one lexeme default statement is allowed in a grammar.
 
 =head2 Named event statement
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: SLIF completed event statement synopsis
 partial: 1
 normalize-whitespace: 1
@@ -840,9 +840,9 @@ normalize-whitespace: 1
     event 'c'=on = completed C
     event 'd' = completed D
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: SLIF nulled event statement synopsis
 partial: 1
 normalize-whitespace: 1
@@ -852,9 +852,9 @@ normalize-whitespace: 1
     event '!c'=on = nulled C
     event '!d' = nulled D
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: SLIF predicted event statement synopsis
 partial: 1
 normalize-whitespace: 1
@@ -864,7 +864,7 @@ normalize-whitespace: 1
     event '^c'=on = predicted C
     event '^d' = predicted D
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 The named event statement sets up a
 SLIF parse event.
@@ -899,10 +899,10 @@ A symbol name.
 =back
 
 The SLIF's event-triggering methods are
-L<the Scanless recognizer's read()|Marpa::R2::Scanless::R/"read()">,
-L<resume()|Marpa::R2::Scanless::R/"resume()">,
-L<lexeme_complete()|Marpa::R2::Scanless::R/"lexeme_complete()">,
-and L<lexeme_read()|Marpa::R2::Scanless::R/"lexeme_read()">.
+L<the Scanless recognizer's read()|Marpa::R3::Scanless::R/"read()">,
+L<resume()|Marpa::R3::Scanless::R/"resume()">,
+L<lexeme_complete()|Marpa::R3::Scanless::R/"lexeme_complete()">,
+and L<lexeme_read()|Marpa::R3::Scanless::R/"lexeme_read()">.
 If the condition described
 by the named event statement
 occurs during an event-triggering method,
@@ -911,30 +911,30 @@ with the current location at the trigger location.
 Once triggered,
 named events may be queried using
 L<the Scanless recognizer's events()
-method|Marpa::R2::Scanless::R/"events()">.
+method|Marpa::R3::Scanless::R/"events()">.
 For details, see
 L<the document on SLIF parse
-events|Marpa::R2::Event>.
+events|Marpa::R3::Event>.
 
 =head2 Inaccessible symbol statement
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: inaccessible is ok statement
 partial: 1
 normalize-whitespace: 1
 
     inaccessible is ok by default
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: inaccessible is fatal statement
 partial: 1
 normalize-whitespace: 1
 
     inaccessible is fatal by default
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 Inaccessible symbols are symbols
 which cannot be reached from the start symbol.
@@ -947,12 +947,12 @@ you may have rules and symbols in grammar intended for future use.
 The default can be specified
 or changed with a statement of the form:
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 ignore: 1
 
     inaccessible is TREATMENT by default
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 
 where C<TREATMENT> is one of C<warn>, C<ok>, or C<fatal>.
 
@@ -982,7 +982,7 @@ be more than one way to do this.
 
 =head2 Separating statements with semicolons
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: statements separted by semicolon
 partial: 1
 normalize-whitespace: 1
@@ -992,13 +992,13 @@ normalize-whitespace: 1
         inaccessible is warn by default
         a ~ 'a'
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 A statement may be terminated with a semicolon ("C<;>").
 
 =head2 Grouping statements in curly braces
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: statements grouped in curly braces
 partial: 1
 normalize-whitespace: 1
@@ -1010,7 +1010,7 @@ normalize-whitespace: 1
       inaccessible is warn by default
       a ~ 'a'
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 Statements can be grouped, using curly braces.
 These do B<not> create scopes -- the curly braces
@@ -1056,7 +1056,7 @@ The lexeme default statement, in which case the action is for all lexemes.
 The C<action> adverb is not allowed for L0 rules.
 The possible values of actions are described,
 along with other details of the semantics, in
-L<a separate document|Marpa::R2::Semantics>.
+L<a separate document|Marpa::R3::Semantics>.
 
 =head2 assoc
 
@@ -1074,11 +1074,11 @@ The C<bless> adverb causes the result of the semantics to be
 blessed into the class indicated by the value of the adverb.
 Details of its use may be found in
 L<the semantics
-document|Marpa::R2::Semantics/"Blessings">.
+document|Marpa::R3::Semantics/"Blessings">.
 
 =head2 event
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: SLIF named lexeme event synopsis
 normalize-whitespace: 1
 
@@ -1087,7 +1087,7 @@ normalize-whitespace: 1
     :lexeme ~ <c> pause => before event => 'before c'=off
     :lexeme ~ <d> pause => after event => 'after d'
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 The C<event> adverb applies only to lexemes and
 is only allowed in 
@@ -1110,32 +1110,32 @@ An unnamed event cannot be accessed by normal methods
 and the use of unnamed events is
 strongly discouraged.
 SLIF parse events are described in detail in
-L<a separate document|Marpa::R2::Event>.
+L<a separate document|Marpa::R3::Event>.
 
 =head2 forgiving
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: forgiving adverb example
 partial: 1
 normalize-whitespace: 1
 
     :lexeme ~ <name> forgiving => 1
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 The forgiving adverb is a synonym for 
 L<the C<latm> adverb|/"latm">.
 
 =head2 latm
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: latm adverb example
 partial: 1
 normalize-whitespace: 1
 
     :lexeme ~ value latm => 1
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 The C<latm> adverb applies only to lexemes and
 is only allowed in 
@@ -1207,7 +1207,7 @@ lexer searches only for those.
 
 =head2 name
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: symbol, name array descriptor example
 partial: 1
 normalize-whitespace: 1
@@ -1216,7 +1216,7 @@ normalize-whitespace: 1
     number1 ::= <forty two> name => 'number 1'
     number2 ::= <forty three> name => 'number 2'
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 The C<name> adverb applies only to rules and
 rule alternatives.
@@ -1225,14 +1225,14 @@ alternative.
 
 =head2 null-ranking
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: null-ranking adverb example
 partial: 1
 normalize-whitespace: 1
 
     S ::= A A A A null-ranking => high
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 The C<null-ranking> adverb applies only to G1 rules
 (L0 rules do not have a semantics) and is ignored unless
@@ -1252,11 +1252,11 @@ This is the default,
 and is acceptable to most applications.
 For details on using the
 C<null-ranking> adverb,
-see L<the document on parse order|Marpa::R2::Semantics::Order>.
+see L<the document on parse order|Marpa::R3::Semantics::Order>.
 
 =head2 pause
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: SLIF named lexeme event synopsis
 normalize-whitespace: 1
 
@@ -1265,7 +1265,7 @@ normalize-whitespace: 1
     :lexeme ~ <c> pause => before event => 'before c'=off
     :lexeme ~ <d> pause => after event => 'after d'
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 The C<pause> adverb applies only to lexemes and
 is only allowed in 
@@ -1364,7 +1364,7 @@ sequence items.
 
 =head2 rank
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: rank adverb example
 partial: 1
 normalize-whitespace: 1
@@ -1372,7 +1372,7 @@ normalize-whitespace: 1
     unspecial ::= ('I' 'am' 'special') words ('--' 'NOT!' ';') rank => 1
     special ::= words (';') rank => -1
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 C<rank> is ignored unless
 the recognizer's C<ranking_method> named argument
@@ -1384,7 +1384,7 @@ will always be allowed.
 C<rank> is 0 by default.
 For details on using the
 C<rank> named argument,
-see L<the document on parse order|Marpa::R2::Semantics::Order>.
+see L<the document on parse order|Marpa::R3::Semantics::Order>.
 
 =head2 separator
 
@@ -1416,28 +1416,28 @@ number imposed by system limits such as memory and file size.
 For example, in the synopsis, the LHS symbol is
 C<Expression>.  The alternative
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: Stuifzand Synopsis
 partial: 1
 normalize-whitespace: 1
 
         (<op lparen>) Expression (<op rparen>)
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 contains one occurrence of C<Expression> and therefore has an arity of one.
 The C<< <op lparen> >> and C<< <op rparen> >> are considered operators.
 
 In the RHS alternative
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: Stuifzand Synopsis
 partial: 1
 normalize-whitespace: 1
 
        Expression (<op pow>) Expression
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 C<Expression> occurs twice, and therefore the arity is 2.
 C<< <op pow> >> is considered to be an operator.
@@ -1448,14 +1448,14 @@ that would not be considered operators in the traditional approach.
 For example,
 in the RHS alternative
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: Stuifzand Synopsis
 partial: 1
 normalize-whitespace: 1
 
        Number
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 there are no occurrences of C<Expression>, so that the alternative
 has an arity of zero -- it is nullary.
@@ -1547,25 +1547,25 @@ can parse it.
 
 =head1 Copyright and License
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 ignore: 1
 
-  Copyright 2015 Jeffrey Kegler
-  This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+  Copyright 2016 Jeffrey Kegler
+  This file is part of Marpa::R3.  Marpa::R3 is free software: you can
   redistribute it and/or modify it under the terms of the GNU Lesser
   General Public License as published by the Free Software Foundation,
   either version 3 of the License, or (at your option) any later version.
 
-  Marpa::R2 is distributed in the hope that it will be useful,
+  Marpa::R3 is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
   Lesser General Public License for more details.
 
   You should have received a copy of the GNU Lesser
-  General Public License along with Marpa::R2.  If not, see
+  General Public License along with Marpa::R3.  If not, see
   http://www.gnu.org/licenses/.
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 =cut
 

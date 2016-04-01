@@ -1,19 +1,19 @@
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-package Marpa::R2::HTML::Test::Util;
+package Marpa::R3::HTML::Test::Util;
 
 # This code was based on study of the test suite in Andy Lester's Ack package
 
@@ -79,17 +79,17 @@ sub load_or_skip_all {
         exit 0;
     } ## end if ( !$eval_result )
     use lib 'config';
-    $eval_result = eval { require Marpa::R2::Config; 1 };
+    $eval_result = eval { require Marpa::R3::Config; 1 };
     if ( !$eval_result ) {
         Test::More::plan tests => 1;
         Test::More::diag($EVAL_ERROR);
-        Test::More::fail("Could not load Marpa::R2::Config\n");
+        Test::More::fail("Could not load Marpa::R3::Config\n");
         exit 0;
     } ## end if ( !$eval_result )
-    my $version_wanted = $Marpa::R2::VERSION_FOR_CONFIG{$module_name};
+    my $version_wanted = $Marpa::R3::VERSION_FOR_CONFIG{$module_name};
     if ( not defined $version_wanted ) {
         Test::More::plan tests => 1;
-        Test::More::fail("$module_name is not known to Marpa::R2");
+        Test::More::fail("$module_name is not known to Marpa::R3");
         exit 0;
     }
     my $module_version = eval q{$} . $module_name . '::VERSION';

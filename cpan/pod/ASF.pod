@@ -1,37 +1,37 @@
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
 =head1 Name
 
-Marpa::R2::ASF - Marpa's abstract syntax forests (ASF's)
+Marpa::R3::ASF - Marpa's abstract syntax forests (ASF's)
 
 =head1 Synopsis
 
 We want to "diagram" the following sentence.
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: ASF synopsis input
 normalize-whitespace: 1
 
   my $sentence = 'a panda eats shoots and leaves.';
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 Here's the result we are looking for.  It is in Penntag form:
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: ASF synopsis output
 partial: 1
 remove-display-indent: 1
@@ -47,11 +47,11 @@ remove-blank-last-line: 1
      (VP (VP (VBZ eats)) (VP (VBZ shoots)) (CC and) (VP (VBZ leaves)))
      (. .))
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 Here is the grammar.
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: ASF synopsis grammar
 normalize-whitespace: 1
 remove-display-indent: 1
@@ -85,29 +85,29 @@ remove-blank-last-line: 1
   NNS  ~ 'shoots' | 'leaves'
   VBZ ~ 'eats' | 'shoots' | 'leaves'
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 Here's the code. It actually does two traversals, one that produces the full result as
 shown above, and another which "prunes" the forest down to a single tree.
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: ASF synopsis code
 normalize-whitespace: 1
 
-  my $panda_grammar = Marpa::R2::Scanless::G->new(
+  my $panda_grammar = Marpa::R3::Scanless::G->new(
       { source => \$dsl, bless_package => 'PennTags', } );
-  my $panda_recce = Marpa::R2::Scanless::R->new( { grammar => $panda_grammar } );
+  my $panda_recce = Marpa::R3::Scanless::R->new( { grammar => $panda_grammar } );
   $panda_recce->read( \$sentence );
-  my $asf = Marpa::R2::ASF->new( { slr=>$panda_recce } );
+  my $asf = Marpa::R3::ASF->new( { slr=>$panda_recce } );
   my $full_result = $asf->traverse( {}, \&full_traverser );
   my $pruned_result = $asf->traverse( {}, \&pruning_traverser );
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 The code for the full traverser is in an appendix.
 The pruning code is simpler.  Here it is:
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: ASF synopsis pruning traverser code
 normalize-whitespace: 1
 
@@ -145,11 +145,11 @@ normalize-whitespace: 1
 
   }
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 Here is the "pruned" output:
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: ASF pruned synopsis output
 remove-display-indent: 1
 remove-blank-last-line: 1
@@ -158,7 +158,7 @@ remove-blank-last-line: 1
      (VP (VBZ eats) (NP (NNS shoots) (CC and) (NNS leaves)))
      (. .))
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 =head1 About this document
 
@@ -170,15 +170,15 @@ An ASF is an efficient and practical way to represent multiple abstract syntax t
 
 =head2 new()
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: ASF low-level calls synopsis, code part 1
 normalize-whitespace: 1
 partial: 1
 
-  my $asf = Marpa::R2::ASF->new( { slr => $slr } );
+  my $asf = Marpa::R3::ASF->new( { slr => $slr } );
   die 'No ASF' if not defined $asf;
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 Creates a new ASF object.
 Must be called with a list of one or more hashes of named arguments.
@@ -192,14 +192,14 @@ Returns the new ASF object, or C<undef> if there was a problem.
 
 =head2 grammar()
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: ASF low-level calls synopsis, code part 2
 normalize-whitespace: 1
 partial: 1
 
     my $grammar     = $asf->grammar();
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 Returns the SLIF grammar associated with the ASF.
 This can be convenient when using SLIF grammar methods
@@ -210,14 +210,14 @@ All failures are thrown as exceptions.
 
 =head2 traverse()
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: ASF synopsis code
 normalize-whitespace: 1
 partial: 1
 
   my $full_result = $asf->traverse( {}, \&full_traverser );
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 Performs a traversal of the ASF.
 Returns the value of the traversal,
@@ -321,14 +321,14 @@ and are only valid within its scope.
 
 =head2 literal()
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: ASF synopsis full traverser code
 normalize-whitespace: 1
 partial: 1
 
   my $literal = $glade->literal();
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 Returns the B<glade literal>, a string in the input which corresponds to this glade.
 The glade literal remains constant inside a glade.
@@ -336,7 +336,7 @@ The C<literal()> method accepts no arguments.
 
 =head2 span()
 
-=for Marpa::R2::Display::Start
+=for Marpa::R3::Display::Start
 name: ASF span() traverser method example
 normalize-whitespace: 1
 partial: 1
@@ -344,7 +344,7 @@ partial: 1
   my ( $start, $length ) = $glade->span();
   my $end = $start + $length - 1;
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 Returns the B<glade span>, two numbers which describe
 the location which corresponds to this glade.
@@ -365,14 +365,14 @@ do not have defined first (start) and last (end) characters.
 
 =head2 symbol_id()
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: ASF synopsis full traverser code
 normalize-whitespace: 1
 partial: 1
 
     my $symbol_id   = $glade->symbol_id();
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 Returns the B<glade symbol>.
 For a token alternative, the glade symbol is the token
@@ -384,14 +384,14 @@ The C<symbol_id()> method accepts no arguments.
 
 =head2 rule_id()
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: ASF synopsis full traverser code
 normalize-whitespace: 1
 partial: 1
 
   my $rule_id     = $glade->rule_id();
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 Returns the ID of the rule for the current
 alternative.
@@ -406,14 +406,14 @@ The C<rule_id()> method accepts no arguments.
 
 =head2 rh_length()
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: ASF synopsis full traverser code
 normalize-whitespace: 1
 partial: 1
 
   my $length = $glade->rh_length();
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 Returns the number of RHS children of the current rule.
 On success, this will always be an integer greater than zero.
@@ -423,14 +423,14 @@ that currently points to a token alternative.
 
 =head2 rh_value()
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: ASF synopsis full traverser code
 normalize-whitespace: 1
 partial: 1
 
   my $child_value = $glade->rh_value($rh_ix);
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 Requires exactly one argument, C<$rh_ix>, which must be the zero-based
 index of a RHS child of the current rule instance.
@@ -444,14 +444,14 @@ that currently points to a token alternative.
 
 =head2 rh_values()
 
-=for Marpa::R2::Display::Start
+=for Marpa::R3::Display::Start
 name: ASF rh_values() traverser method example
 normalize-whitespace: 1
 partial: 1
 
     my @return_value = $glade->rh_values();
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 Returns the RHS children of the current rule.
 The C<rh_values()> method accepts no arguments.
@@ -460,14 +460,14 @@ that currently points to a token alternative.
 
 =head2 all_choices()
 
-=for Marpa::R2::Display::Start
+=for Marpa::R3::Display::Start
 name: ASF all_choices() traverser method example
 normalize-whitespace: 1
 partial: 1
 
         my @results = $glade->all_choices();
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 Returns a new result list produced by taking
 a Cartesian product of the parse results
@@ -475,14 +475,14 @@ a Cartesian product of the parse results
 
 =head2 next()
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: ASF synopsis full traverser code
 normalize-whitespace: 1
 partial: 1
 
   last CHOICE if not defined $glade->next();
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 Points the glade at the next alternative.
 If there is no next alternative, returns C<undef>.
@@ -570,7 +570,7 @@ visited.
 
 =head1 Appendix: full traverser code
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: ASF synopsis full traverser code
 normalize-whitespace: 1
 
@@ -636,29 +636,29 @@ normalize-whitespace: 1
       return \@return_value;
   } ## end sub full_traverser
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 =head1 Copyright and License
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 ignore: 1
 
-  Copyright 2015 Jeffrey Kegler
-  This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+  Copyright 2016 Jeffrey Kegler
+  This file is part of Marpa::R3.  Marpa::R3 is free software: you can
   redistribute it and/or modify it under the terms of the GNU Lesser
   General Public License as published by the Free Software Foundation,
   either version 3 of the License, or (at your option) any later version.
 
-  Marpa::R2 is distributed in the hope that it will be useful,
+  Marpa::R3 is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
   Lesser General Public License for more details.
 
   You should have received a copy of the GNU Lesser
-  General Public License along with Marpa::R2.  If not, see
+  General Public License along with Marpa::R3.  If not, see
   http://www.gnu.org/licenses/.
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 =cut
 

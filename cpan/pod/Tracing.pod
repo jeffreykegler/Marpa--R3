@@ -1,21 +1,21 @@
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
 =head1 NAME
 
-Marpa::R2::Tracing - Tracing your grammar
+Marpa::R3::Tracing - Tracing your grammar
 
 =head1 Description
 
@@ -40,7 +40,7 @@ in a rush to use more advanced techniques.
 
 Sometimes, even when there is a parse error, you can still evaluate the parse
 using the L<SLIF recognizer's C<value()>
-method|Marpa::R2::Scanless::R/"value()">.
+method|Marpa::R3::Scanless::R/"value()">.
 If you are fortunate enough to have a parse value at the point of failure,
 it can be an excellent way
 to determine what the parser thinks it has seen so far.
@@ -52,7 +52,7 @@ if your parse values are AST's.
 If you are trying to run diagnostics on a failed parse,
 it is useful to catch the exception using C<eval>:
 
-=for Marpa::R2::Display:
+=for Marpa::R3::Display:
 name: SLIF debug example, part 2
 partial: 1
 normalize-whitespace: 1
@@ -60,12 +60,12 @@ normalize-whitespace: 1
     my $eval_error = $EVAL_ERROR if not eval { $recce->read( \$test_input ); 1 };
     $progress_report = $recce->show_progress( 0, -1 );
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 =head2 Trace terminals
 
 Set the L<C<trace_terminals> recognizer named
-argument|Marpa::R2::Scanless::R/"trace_terminals">
+argument|Marpa::R3::Scanless::R/"trace_terminals">
 to 1.
 This tells you which tokens the recognizer is looking for and which ones it thinks it found.
 If the problem is in lexing, C<trace_terminals> tells you the whole story.
@@ -83,7 +83,7 @@ C<show_progress>
 should provide all the
 information necessary to
 debug an application's grammar.
-L<A separate document|Marpa::R2::Progress>
+L<A separate document|Marpa::R3::Progress>
 explains how to interpret the progress reports.
 That document includes an
 example of the use of C<show_progress>
@@ -92,9 +92,9 @@ to debug an error in a grammar.
 =head2 Double check rules and symbols
 
 It sometimes helps to look carefully at the output of
-L<C<show_symbols>|Marpa::R2::Scanless::G/"show_symbols()">
+L<C<show_symbols>|Marpa::R3::Scanless::G/"show_symbols()">
 and
-L<C<show_rules>|Marpa::R2::Scanless::G/"show_rules()">.
+L<C<show_rules>|Marpa::R3::Scanless::G/"show_rules()">.
 Check if anything there is
 not what you expected.
 For thorough checking, it can be helpful to use a
@@ -102,7 +102,7 @@ verbosity level higher than 1.
 
 =head2 Other traces
 
-Setting the L<SLIF recognizer's C<trace_values> named argument|Marpa::R2::Scanless::R/"trace_values">
+Setting the L<SLIF recognizer's C<trace_values> named argument|Marpa::R3::Scanless::R/"trace_values">
 to a trace level of 1
 traces the values of the parse tree nodes as they are pushed on, and
 popped off, the evaluation stack.
@@ -120,19 +120,19 @@ includes the following:
 
 =item * Set the 
 L<SLIF recognizer's C<trace_terminals> named
-argument|Marpa::R2::Scanless::R/"trace_terminals">
+argument|Marpa::R3::Scanless::R/"trace_terminals">
 to level 1.
 
 =item * Run 
-L<C<show_rules>|Marpa::R2::Scanless::G/"show_rules()">
+L<C<show_rules>|Marpa::R3::Scanless::G/"show_rules()">
 on the SLIF grammar.
 
 =item * Run 
-L<C<show_symbols>|Marpa::R2::Scanless::G/"show_symbols()">
+L<C<show_symbols>|Marpa::R3::Scanless::G/"show_symbols()">
 on the SLIF grammar.
 
 =item * Run
-L<C<show_progress()>|Marpa::R2::Progress>
+L<C<show_progress()>|Marpa::R3::Progress>
 on the SLIF recognizer.
 
 =back
@@ -149,25 +149,25 @@ You want to work with short inputs when possible.
 
 =head1 Copyright and License
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 ignore: 1
 
-  Copyright 2015 Jeffrey Kegler
-  This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+  Copyright 2016 Jeffrey Kegler
+  This file is part of Marpa::R3.  Marpa::R3 is free software: you can
   redistribute it and/or modify it under the terms of the GNU Lesser
   General Public License as published by the Free Software Foundation,
   either version 3 of the License, or (at your option) any later version.
 
-  Marpa::R2 is distributed in the hope that it will be useful,
+  Marpa::R3 is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
   Lesser General Public License for more details.
 
   You should have received a copy of the GNU Lesser
-  General Public License along with Marpa::R2.  If not, see
+  General Public License along with Marpa::R3.  If not, see
   http://www.gnu.org/licenses/.
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 =cut
 

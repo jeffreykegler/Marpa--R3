@@ -1,24 +1,24 @@
 #!/usr/bin/perl
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
 use 5.010;
 use strict;
 use warnings;
 use English qw( -no_match_vars );
-use Marpa::R2::HTML;
+use Marpa::R3::HTML;
 use List::Util qw(sum);
 use Fatal qw(open close);
 use Getopt::Long;
@@ -126,16 +126,16 @@ if (defined $compile_flag) {
 }
 
 my ( $instance, $value ) = @{
-    Marpa::R2::HTML::html(
+    Marpa::R3::HTML::html(
         \$document,
         {   ':COMMENT' => sub { return { depths => {}, length => 0 } },
             q{*}       => sub {
                 my $descendant_data =
-                    Marpa::R2::HTML::descendants('value,literal');
-                my $tagname = Marpa::R2::HTML::tagname();
+                    Marpa::R3::HTML::descendants('value,literal');
+                my $tagname = Marpa::R3::HTML::tagname();
                 my $length  = calculate_length($descendant_data);
-                $Marpa::R2::HTML::INSTANCE->{count}->{$tagname}++;
-                $Marpa::R2::HTML::INSTANCE->{length}->{$tagname} += $length;
+                $Marpa::R3::HTML::INSTANCE->{count}->{$tagname}++;
+                $Marpa::R3::HTML::INSTANCE->{length}->{$tagname} += $length;
                 my $return_depths = calculate_max_depths($descendant_data);
                 ( $return_depths->{$tagname} //= 0 )++;
                 $return_depths->{ANY}++;
@@ -146,11 +146,11 @@ my ( $instance, $value ) = @{
             },
             ':CRUFT' => sub {
                 my $descendant_data =
-                    Marpa::R2::HTML::descendants('value,literal');
+                    Marpa::R3::HTML::descendants('value,literal');
                 my $return_depths = { '[CRUFT]' => 1 };
                 my $length = calculate_length($descendant_data);
-                $Marpa::R2::HTML::INSTANCE->{count}->{'[CRUFT]'}++;
-                $Marpa::R2::HTML::INSTANCE->{length}->{'[CRUFT]'} += $length;
+                $Marpa::R3::HTML::INSTANCE->{count}->{'[CRUFT]'}++;
+                $Marpa::R3::HTML::INSTANCE->{length}->{'[CRUFT]'} += $length;
                 return {
                     depths => $return_depths,
                     length => $length,
@@ -158,9 +158,9 @@ my ( $instance, $value ) = @{
             },
             ':TOP' => sub {
                 my $descendant_data =
-                    Marpa::R2::HTML::descendants('value,literal');
+                    Marpa::R3::HTML::descendants('value,literal');
                 return [
-                    $Marpa::R2::HTML::INSTANCE,
+                    $Marpa::R3::HTML::INSTANCE,
                     {   depths => calculate_max_depths($descendant_data),
                         length => calculate_length($descendant_data),
                     },

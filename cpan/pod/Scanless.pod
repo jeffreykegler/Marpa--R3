@@ -1,31 +1,31 @@
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
 =head1 Name
 
-Marpa::R2::Scanless - Scanless interface
+Marpa::R3::Scanless - Scanless interface
 
 =head1 Synopsis
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: SLIF full synopsis
 normalize-whitespace: 1
 
-    use Marpa::R2;
+    use Marpa::R3;
 
-    my $grammar = Marpa::R2::Scanless::G->new(
+    my $grammar = Marpa::R3::Scanless::G->new(
         {   bless_package => 'My_Nodes',
             source        => \(<<'END_OF_SOURCE'),
     :default ::= action => [values] bless => ::lhs
@@ -61,7 +61,7 @@ normalize-whitespace: 1
     );
 
 
-    my $recce = Marpa::R2::Scanless::R->new( { grammar => $grammar } );
+    my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
 
     my $input = '42*2+7/3, 42*(2+7)/3, 2**7-3, 2**(7-3)';
     $recce->read(\$input);
@@ -108,15 +108,15 @@ normalize-whitespace: 1
         return join q{ }, map { $_->doit() } @{$self};
     }
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 =head1 About this document
 
 This document
 is an introduction and overview
 to Marpa's Scanless interface (SLIF).
-Marpa::R2's top-level page has
-L<an SLIF tutorial in Marpa's top-level page|Marpa::R2>.
+Marpa::R3's top-level page has
+L<an SLIF tutorial in Marpa's top-level page|Marpa::R3>.
 If you are new to Marpa or its SLIF,
 you probably want to start with that.
 
@@ -125,10 +125,10 @@ looking more deeply and carefully at the concepts
 behind the SLIF.
 Separate documents provide
 the reference documentation for
-L<Scanless grammar objects|Marpa::R2::Scanless::G>,
-L<Scanless recognizer objects|Marpa::R2::Scanless::R>
+L<Scanless grammar objects|Marpa::R3::Scanless::G>,
+L<Scanless recognizer objects|Marpa::R3::Scanless::R>
 and
-L<the Scanless DSL|Marpa::R2::Scanless::DSL>.
+L<the Scanless DSL|Marpa::R3::Scanless::DSL>.
 
 =head1 The two levels of language description
 
@@ -146,12 +146,12 @@ The first level is structural.
 For example, here is how the Perl docs describe one of
 the forms that Perl's C<use> statement takes:
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 ignore: 1
 
     use Module VERSION LIST
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 and in Perl's source code (C<perly.y>) something similar
 drives the parser.
@@ -160,13 +160,13 @@ The second level is lexical.
 For example,
 Perl's L<perlpodspec> page has a number of statements like this:
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 ignore: 1
 
     [...] you can distinguish URL-links from anything else
     by the fact that they match m/\A\w+:[^:\s]\S*\z/.
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 The lexical level is character by character.
 The structural level is less well-defined,
@@ -202,14 +202,14 @@ The semantics will treat it as a series of integers to be added.
 
 Here are three strings in that language
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 ignore: 1
 
      8675311
      867 5311
      8 6 7 5 3 1 1
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 According to our semantics,
 the three strings contain respectively,
@@ -252,13 +252,13 @@ language standard and recasting it so that
 every rule takes into account whitespace.
 As one example, consider declarations in the C language.
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 ignore: 1
 
     unsigned int a;
     unsigned*b;
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 In the first of the two lines above the whitespace is necessary.
 In the second of the two lines whitespace would be allowed,
@@ -302,9 +302,9 @@ interweaves the "split" and "unified" approaches
 and, I hope, preserves the best features of each.
 Here is full syntax of
 the example whitespace-and-digit language,
-described using Marpa::R2's scanless interface:
+described using Marpa::R3's scanless interface:
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: Scanless concept example
 partial: 1
 normalize-whitespace: 1
@@ -316,7 +316,7 @@ normalize-whitespace: 1
     :discard ~ whitespace
     whitespace ~ [\s]+
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 =head2 A new operator
 
@@ -400,7 +400,7 @@ uses the full set of longest tokens
 in looking for possible parses.
 For more about LATM and its alternative, LTM,
 see L<the detailed description of the C<latm>
-adverb|Marpa::R2::Scanless::DSL/"latm">.
+adverb|Marpa::R3::Scanless::DSL/"latm">.
 
 =head1 Semantics
 
@@ -415,7 +415,7 @@ the semantics of the G1 grammar are exactly the
 same as for ordinary grammars.
 Actions may be specified for G1 rules and will
 behave as described in
-L<Marpa::R2::Semantics>.
+L<Marpa::R3::Semantics>.
 
 =head1 Implementation
 
@@ -436,25 +436,25 @@ before changing to the dual grammar implementation.
 
 =head1 Copyright and License
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 ignore: 1
 
-  Copyright 2015 Jeffrey Kegler
-  This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+  Copyright 2016 Jeffrey Kegler
+  This file is part of Marpa::R3.  Marpa::R3 is free software: you can
   redistribute it and/or modify it under the terms of the GNU Lesser
   General Public License as published by the Free Software Foundation,
   either version 3 of the License, or (at your option) any later version.
 
-  Marpa::R2 is distributed in the hope that it will be useful,
+  Marpa::R3 is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
   Lesser General Public License for more details.
 
   You should have received a copy of the GNU Lesser
-  General Public License along with Marpa::R2.  If not, see
+  General Public License along with Marpa::R3.  If not, see
   http://www.gnu.org/licenses/.
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 =cut
 

@@ -1,29 +1,29 @@
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
 =head1 NAME
 
-Marpa::R2 - Release 2 of Marpa
+Marpa::R3 - Release 3 of Marpa
 
 =head1 Synopsis
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: Landing page synopsis
 normalize-whitespace: 1
 
-    use Marpa::R2;
+    use Marpa::R3;
 
     my $dsl = <<'END_OF_DSL';
     :default ::= action => [name,values]
@@ -44,7 +44,7 @@ normalize-whitespace: 1
     whitespace ~ [\s]+
     END_OF_DSL
 
-    my $grammar = Marpa::R2::Scanless::G->new( { source => \$dsl } );
+    my $grammar = Marpa::R3::Scanless::G->new( { source => \$dsl } );
     my $input = '42 * 1 + 7';
     my $value_ref = $grammar->parse( \$input, 'My_Actions' );
 
@@ -58,7 +58,7 @@ normalize-whitespace: 1
         return $t1 * $t2;
     }
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 =head1 Description
 
@@ -88,9 +88,9 @@ The explanation will assume that the reader
 understands BNF and the basics of grammars -- what rules are,
 what symbols are, what the start symbol of a grammar is, etc.
 
-=head2 Marpa::R2::Scanless::G::new
+=head2 Marpa::R3::Scanless::G::new
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: Landing page synopsis
 partial: 1
 normalize-whitespace: 1
@@ -114,19 +114,19 @@ normalize-whitespace: 1
     whitespace ~ [\s]+
     END_OF_DSL
 
-    my $grammar = Marpa::R2::Scanless::G->new( { source => \$dsl } );
+    my $grammar = Marpa::R3::Scanless::G->new( { source => \$dsl } );
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 The code first creates a new SLIF grammar.
 SLIF grammars are
-L<C<Marpa::R2::Scanless:G>|Marpa::R2::Scanless::G> objects.
+L<C<Marpa::R3::Scanless:G>|Marpa::R3::Scanless::G> objects.
 They are created
 with the
-L<Marpa::R2::Scanless:G::new|Marpa::R2::Scanless::G/"Constructor">
+L<Marpa::R3::Scanless:G::new|Marpa::R3::Scanless::G/"Constructor">
 constructor.
 The arguments to
-L<Marpa::R2::Scanless::G::new|Marpa::R2::Scanless::G/"Constructor">
+L<Marpa::R3::Scanless::G::new|Marpa::R3::Scanless::G/"Constructor">
 are references to
 hashes of named arguments.
 In the key/value pairs of these hashes,
@@ -142,14 +142,14 @@ value of the named argument.
 In the example, there is only one named argument to the SLIF grammar constructor:
 C<source>.
 The value of C<source> must be a reference to a string in the
-L<SLIF's domain-specific language|Marpa::R2::Scanless::DSL>
+L<SLIF's domain-specific language|Marpa::R3::Scanless::DSL>
 (DSL).
 In this example, the DSL consists of several rules
 and pseudo-rules.
 
 =head2 The default pseudo-rule
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: Landing page synopsis
 partial: 1
 normalize-whitespace: 1
@@ -157,7 +157,7 @@ normalize-whitespace: 1
     :default ::= action => [name,values]
     lexeme default = latm => 1
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 These two lines set useful defaults.
 The first sets a default semantics,
@@ -181,7 +181,7 @@ will usually be the start rule of the
 grammar.
 (It is also possible to
 L<specify the start rule
-explicitly|Marpa::R2::Scanless::DSL/"Start rule">.)
+explicitly|Marpa::R3::Scanless::DSL/"Start rule">.)
 
 Structural rules are the kinds of rules typically seen in BNF --
 they describe the symbols which provide the structure of the grammar,
@@ -190,14 +190,14 @@ The SLIF also handles the lexical details in this example.
 It does this via L0 rules,
 which we will see shortly.
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: Landing page synopsis
 partial: 1
 normalize-whitespace: 1
 
     Calculator ::= Expression action => ::first
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 As is normal for BNF rules, the first rule consists of 
 a left hand side symbol ("C<Calculator>"),
@@ -224,18 +224,18 @@ L<semantics|/"Semantics">
 
 The second rule is very similar to the first:
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: Landing page synopsis
 partial: 1
 normalize-whitespace: 1
 
     Factor ::= Number action => ::first
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 =head2 More complicated G1 rules
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: Landing page synopsis
 partial: 1
 normalize-whitespace: 1
@@ -245,7 +245,7 @@ normalize-whitespace: 1
         | Factor action => ::first
 
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 This rule says that an C<Term> may be one of two
 alternatives:
@@ -266,7 +266,7 @@ Immediately following is another G1 rule defining
 a C<Term>.  It is very similar in form
 to the one for C<Expression>.
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: Landing page synopsis
 partial: 1
 normalize-whitespace: 1
@@ -275,7 +275,7 @@ normalize-whitespace: 1
         Expression '+' Term action => do_add
         | Term action => ::first
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 =head2 L0 rules
 
@@ -285,7 +285,7 @@ Now we look at how the low-level, lexical issues are handled.
 This very simple calculator language does not allow comments,
 but it does define whitespace.
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: Landing page synopsis
 partial: 1
 normalize-whitespace: 1
@@ -293,7 +293,7 @@ normalize-whitespace: 1
           :discard ~ whitespace
           whitespace ~ [\s]+
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 The C<:discard> rule is a pseudo-rule, which tells Marpa to use whatever
 it matches to separate G1 symbols,
@@ -320,7 +320,7 @@ as Perl does.
 
 The next pair of L0 rules define the C<Number> symbol
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: Landing page synopsis
 partial: 1
 normalize-whitespace: 1
@@ -328,7 +328,7 @@ normalize-whitespace: 1
           Number ~ digits
           digits ~ [\d]+
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 The above two rules say that a C<Number> is a sequence of one or more digits.
 C<Number> is a lexeme -- a G1 symbol which is defined and recognized at the lexical
@@ -341,7 +341,7 @@ the C<whitespace> lexeme, which will be discarded without being seen by G1.
 The addition and multiplication operators were defined with single quoted strings
 in the G1 rules.  As a reminder, here's the rule for C<Term> again:
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: Landing page synopsis
 partial: 1
 normalize-whitespace: 1
@@ -350,7 +350,7 @@ normalize-whitespace: 1
         Expression '+' Term action => do_add
         | Term action => ::first
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 In the above rule, the single-quoted string C<'+'> implicitly defines a L0 lexeme.
 Something similar happens with the C<'*'> string in the rule for a C<Term>.
@@ -361,14 +361,14 @@ Almost always, you'll want Marpa to look only for tokens that are
 actually acceptable to the parse.
 Telling Marpa to do so was the purpose of this line:
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: Landing page synopsis
 partial: 1
 normalize-whitespace: 1
 
     lexeme default = latm => 1
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 LATM means "longest acceptable tokens match".
 (LATM is not the default for historical reasons.)
@@ -380,11 +380,11 @@ Marpa tolerates ambiguity,
 so one feature special to Marpa is that LATM is a longest acceptable B<tokens> match --
 if more than one token is longest, all of them are considered in the parse.
 The logic of SLIF lexing is described with more precision in the
-L<SLIF overview document|Marpa::R2::Scanless>.
+L<SLIF overview document|Marpa::R3::Scanless>.
 
-=head2 Marpa::R2::Scanless::G::parse
+=head2 Marpa::R3::Scanless::G::parse
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: Landing page synopsis
 partial: 1
 normalize-whitespace: 1
@@ -392,12 +392,12 @@ normalize-whitespace: 1
     my $input = '42 * 1 + 7';
     my $value_ref = $grammar->parse( \$input, 'My_Actions' );
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 To parse a string,
 we use 
-the C<Marpa::R2::Scanless::G::parse()> method.
-C<Marpa::R2::Scanless::G::parse()> requires a reference
+the C<Marpa::R3::Scanless::G::parse()> method.
+C<Marpa::R3::Scanless::G::parse()> requires a reference
 to a string as its first argument.
 Optionally, the second argument is
 another string specifying the "semantics package".
@@ -420,7 +420,7 @@ to their parent node when the parent node is evaluated.
 Parse trees are usually drawn upside-down
 with their root at the top,
 and their "leaves" at the bottom.
-In Marpa::R2's SLIF, the "leaves" are the symbols
+In Marpa::R3's SLIF, the "leaves" are the symbols
 that the G1 (structural) rules share with the L0 (lexical)
 rules.
 The symbols shared by L0 and G1
@@ -451,7 +451,7 @@ of the input that matched the C<[\d]+>
 pattern.
 
 Starting with the values for leaves,
-Marpa::R2 moves recursively
+Marpa::R3 moves recursively
 "up" the tree to its root,
 assigning a value to each node of the tree
 based on the value of its child nodes.
@@ -476,14 +476,14 @@ and this is the parse result value
 to which the C<value()> method
 returns a reference.
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: Landing page synopsis
 partial: 1
 normalize-whitespace: 1
 
     :default ::= action => [name,values]
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 Each non-leaf node determines its value with an action.
 The default pseudo-rule allows you to specify the default action.
@@ -492,14 +492,14 @@ not a real one.)
 Often actions are Perl functions, which in this context are
 called Perl semantic closures.
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: Landing page synopsis
 partial: 1
 normalize-whitespace: 1
 
     my $value_ref = $grammar->parse( \$input, 'My_Actions' );
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 When we did the parse,
 we used the C<semantics_package> named argument.
@@ -522,7 +522,7 @@ But "C<[name,values]>" is an excellent starting point when you're
 first developing a DSL and, since this code is intended as a
 template, we've kept it.
 For more about array descriptors, see the L<semantics
-document|Marpa::R2::Semantics/"Array descriptor actions">
+document|Marpa::R3::Semantics/"Array descriptor actions">
 
 The other way we specify semantics in this example
 is by using an
@@ -532,7 +532,7 @@ We've seen the C<action> adverb several times,
 but skipped over it.
 Now it is time to look at it.
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: Landing page synopsis
 partial: 1
 normalize-whitespace: 1
@@ -544,7 +544,7 @@ normalize-whitespace: 1
         Expression '+' Term action => do_add
         | Term action => ::first
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 The "C<::first>" action indicates that the value of a rule is to be
 the value of its first child,
@@ -564,7 +564,7 @@ So, to resolve the C<do_multiply> action,
 Marpa looks for a closure whose fully qualified name is C<My_Actions::do_multiply>,
 which it finds:
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: Landing page synopsis
 partial: 1
 normalize-whitespace: 1
@@ -574,13 +574,13 @@ normalize-whitespace: 1
         return $t1 * $t2;
     }
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 The C<do_add> action is resolved
 to a Perl semantic closure
 in much the same way:
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: Landing page synopsis
 partial: 1
 normalize-whitespace: 1
@@ -590,7 +590,7 @@ normalize-whitespace: 1
         return $t1 + $t2;
     }
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 The Perl semantic closures are callbacks.
 They are called as each node in a parse tree is evaluated.
@@ -614,7 +614,7 @@ the parse result.
 
 =head1 Tainted data
 
-Marpa::R2 exists to allow its input to alter execution in
+Marpa::R3 exists to allow its input to alter execution in
 flexible and powerful ways.
 Marpa should not be used with untrusted input.
 In Perl' s taint mode, it is a fatal error to use Marpa's SLIF
@@ -624,7 +624,7 @@ or tainted token values.
 
 =head1 Threads
 
-When used in a thread-safe Perl, Marpa::R2 should be thread-safe,
+When used in a thread-safe Perl, Marpa::R3 should be thread-safe,
 with one important restriction:
 All Marpa objects that share the same grammar must be created
 and used within a single thread.
@@ -660,19 +660,19 @@ This document gives a semi-tutorial overview of Marpa's Scanless interface (SLIF
 For a continuation of this tutorial, which describes how to get finer control
 of Marpa and access more of its features,
 see
-L<the followup tutorial to this one|Marpa::R2::Tutorial2>.
+L<the followup tutorial to this one|Marpa::R3::Tutorial2>.
 If you are beginner who wants to learn more about Marpa,
 you probably want to go next to
-L<the overview of the SLIF interface|Marpa::R2::Scanless>,
+L<the overview of the SLIF interface|Marpa::R3::Scanless>,
 and then the pages describing
-L<its DSL|Marpa::R2::Scanless::DSL>,
-L<its grammar methods|Marpa::R2::Scanless::G>,
+L<its DSL|Marpa::R3::Scanless::DSL>,
+L<its grammar methods|Marpa::R3::Scanless::G>,
 and
-L<its recognizer methods|Marpa::R2::Scanless::R>.
+L<its recognizer methods|Marpa::R3::Scanless::R>.
 
 Marpa has two other interfaces.
 L<The thin
-interface|Marpa::R2::Advanced::Thin>
+interface|Marpa::R3::Advanced::Thin>
 provides direct access to the underlying
 Libmarpa C library.
 Of the Perl interfaces to Marpa,
@@ -682,25 +682,25 @@ Marpa parse engine,
 but it requires the application to do a lot of the work itself.
 
 Now discouraged,
-the L<named argument inteface (NAIF)|Marpa::R2::NAIF>
-was Marpa::R2's first interface.
+the L<named argument inteface (NAIF)|Marpa::R3::NAIF>
+was Marpa::R3's first interface.
 It is a more traditional,
 middle level interface which uses Perl calls
 instead of a DSL.
 
-L<Marpa::R2::Vocabulary> is intended as a quick refresher in
+L<Marpa::R3::Vocabulary> is intended as a quick refresher in
 parsing terminology,
 emphasizing how the standard terms are used
 in the Marpa context.
 Marpa's standard semantics are fully described in the
-L<Marpa::R2::Semantics> document.
+L<Marpa::R3::Semantics> document.
 Techniques for tracing and for debugging your Marpa grammars
 are described in the
-L<Marpa::R2::Tracing> document and the
-L<Marpa::R2::Progress> document.
+L<Marpa::R3::Tracing> document and the
+L<Marpa::R3::Progress> document.
 For those with a theoretical bent,
 my sources, and other useful references, are described in
-L<Marpa::R2::Advanced::Bibliography>.
+L<Marpa::R3::Advanced::Bibliography>.
 
 =head1 Author
 
@@ -730,33 +730,33 @@ L<http://www.amazon.com/God-Proof-Jeffrey-Kegler/dp/1434807355>.
 
 =head1 Support
 
-L<Marpa::R2> comes without warranty.
+L<Marpa::R3> comes without warranty.
 Support is provided
 on a volunteer basis
 through the standard mechanisms for CPAN modules.
-L<The Support document|Marpa::R2::Support> has details.
+L<The Support document|Marpa::R3::Support> has details.
 
 =head1 Copyright and License
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 ignore: 1
 
-  Copyright 2015 Jeffrey Kegler
-  This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+  Copyright 2016 Jeffrey Kegler
+  This file is part of Marpa::R3.  Marpa::R3 is free software: you can
   redistribute it and/or modify it under the terms of the GNU Lesser
   General Public License as published by the Free Software Foundation,
   either version 3 of the License, or (at your option) any later version.
 
-  Marpa::R2 is distributed in the hope that it will be useful,
+  Marpa::R3 is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
   Lesser General Public License for more details.
 
   You should have received a copy of the GNU Lesser
-  General Public License along with Marpa::R2.  If not, see
+  General Public License along with Marpa::R3.  If not, see
   http://www.gnu.org/licenses/.
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 =cut
 

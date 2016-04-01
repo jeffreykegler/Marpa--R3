@@ -1,29 +1,29 @@
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
 =head1 Name
 
-Marpa::R2::Glade - Low-level interface to Marpa's Abstract Syntax Forests (ASF's)
+Marpa::R3::Glade - Low-level interface to Marpa's Abstract Syntax Forests (ASF's)
 
 =head1 Synopsis
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: ASF low-level calls synopsis, code part 1
 normalize-whitespace: 1
 
-  my $grammar = Marpa::R2::Scanless::G->new(
+  my $grammar = Marpa::R3::Scanless::G->new(
       {   source => \(<<'END_OF_SOURCE'),
   :start ::= pair
   pair ::= duple | item item
@@ -35,14 +35,14 @@ normalize-whitespace: 1
       }
   );
 
-  my $slr = Marpa::R2::Scanless::R->new( { grammar => $grammar } );
+  my $slr = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
   $slr->read( \'aa' );
-  my $asf = Marpa::R2::ASF->new( { slr => $slr } );
+  my $asf = Marpa::R3::ASF->new( { slr => $slr } );
   die 'No ASF' if not defined $asf;
   my $output_as_array = asf_to_basic_tree($asf);
   my $actual_output   = array_display($output_as_array);
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 The code for C<asf_to_basic_tree()> represents a user-supplied call
 using the interface described below.  An full example of C<asf_to_basic_tree()>,
@@ -53,7 +53,7 @@ C<array_display()> displays the tree in a compact form.
 The code for it is also given L<below|/"The array_display() code">.
 The return value of C<array_display()> is as follows:
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: ASF low-level calls synopsis, output
 remove-display-indent: 1
 remove-blank-last-line: 1
@@ -79,12 +79,12 @@ remove-blank-last-line: 1
           Glade 8 revisited
           Glade 7 revisited
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 =head1 About this document
 
 This document describes the low-level interface to Marpa's abstract syntax forests (ASF's).
-It assumes that you are already familiar with L<the high-level interface|Marpa::R2::ASF>.
+It assumes that you are already familiar with L<the high-level interface|Marpa::R3::ASF>.
 This low-level interface allows the maximum flexiblity in building the forest,
 but requires the application to do much of the work.
 
@@ -131,7 +131,7 @@ Hesperus is Venus's traditional name as an evening star,
 and Phosphorus (aka Lucifer) is its traditional name as a morning star.
 For the grammar,
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: ASF symch dump example grammar
 remove-display-indent: 1
 remove-blank-last-line: 1
@@ -143,11 +143,11 @@ remove-blank-last-line: 1
     phosphorus ::= venus
     venus ~ 'venus'
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 and the input string 'C<venus>', the forest would look like
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: ASF symch dump example output
 remove-blank-last-line: 1
 remove-display-indent: 1
@@ -162,7 +162,7 @@ remove-display-indent: 1
         GL5 Rule 3: phosphorus ::= venus
           GL6 Symbol venus: "venus"
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 Notice the tags of the form "C<GLn>", where I<n> is an integer.
 These identify the glade.
@@ -179,7 +179,7 @@ is a symch.
 
 For the grammar,
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: ASF factoring dump example grammar
 normalize-whitespace: 1
 partial: 1
@@ -190,7 +190,7 @@ partial: 1
     b ::= a
     a ~ 'a'
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 and the input 'C<aaa>',
 a successful parse will always have two C<b>'s.
@@ -205,18 +205,18 @@ two different ways: long string first; or short string first.
 
 These two different ways of dividing the input stream using the rule
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: ASF factoring dump example grammar
 normalize-whitespace: 1
 partial: 1
 
     top ::= b b
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 are called a B<factoring>.  Here's Marpa's dump of the forest:
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: ASF factoring dump example output
 remove-blank-last-line: 1
 remove-display-indent: 1
@@ -235,7 +235,7 @@ remove-display-indent: 1
         GL11 Rule 2: b ::= a
           GL12 Symbol a: "a"
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 =head1 The structure of a forest
 
@@ -406,7 +406,7 @@ The example in this POD includes a memoization scheme which is very simple,
 but adequate for most purposes.
 The main logic of its memoization is shown here.
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: ASF low-level calls synopsis, code part 2
 normalize-whitespace: 1
 partial: 1
@@ -416,7 +416,7 @@ partial: 1
             if $seen->[$glade];
         $seen->[$glade] = 1;
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 Putting memoization in one of the very first drafts
 of your code
@@ -426,14 +426,14 @@ will save you time and trouble.
 
 =head2 peak()
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: ASF low-level calls synopsis, code part 2
 normalize-whitespace: 1
 partial: 1
 
     my $peak = $asf->peak();
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 Returns the glade ID of the peak.
 This may be zero.
@@ -443,14 +443,14 @@ All failures are thrown as exceptions.
 
 =head2 glade_literal()
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: ASF low-level calls synopsis, code part 2
 normalize-whitespace: 1
 partial: 1
 
         my $literal = $asf->glade_literal($glade);
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 Returns the literal substring of the input associated
 with the glade.
@@ -468,17 +468,17 @@ such as whitespace.
 Most applications are monotonic,
 and yours is, unless you've taken special pains to make it otherwise.
 Computation of literal substrings for non-monotonic applications
-is addressed in L<Marpa::R2::Scanless::R/"Literals and G1 spans">.
+is addressed in L<Marpa::R3::Scanless::R/"Literals and G1 spans">.
 
 =head2 glade_span()
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: glade_span() example
 normalize-whitespace: 1
 
     my ( $glade_start, $glade_length ) = $asf->glade_span($glade_id);
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 Returns the span of the input associated
 with the glade.
@@ -492,18 +492,18 @@ one-by-one in order.
 Most applications are monotonic,
 and yours is, unless you've taken special pains to make it otherwise.
 Computation of literal substrings for non-monotonic applications
-is addressed in L<Marpa::R2::Scanless::R/"Literals and G1 spans">.
+is addressed in L<Marpa::R3::Scanless::R/"Literals and G1 spans">.
 
 =head2 glade_symch_count()
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: ASF low-level calls synopsis, code part 2
 normalize-whitespace: 1
 partial: 1
 
     my $symch_count = $asf->glade_symch_count($glade);
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 Requires a glade ID as its only argument.
 Returns the number of symches contained in the glade specified by the argument.
@@ -511,7 +511,7 @@ On failure, throws an exception.
 
 =head2 glade_symbol_id()
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: ASF low-level calls synopsis, code part 2
 normalize-whitespace: 1
 partial: 1
@@ -519,7 +519,7 @@ partial: 1
     my $symbol_id    = $asf->glade_symbol_id($glade);
     my $display_form = $grammar->symbol_display_form($symbol_id);
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 Requires a glade ID as its only argument.
 Returns the symbol ID of the "glade symbol" for the glade specified by the argument.
@@ -529,14 +529,14 @@ On failure, throws an exception.
 
 =head2 symch_rule_id()
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: ASF low-level calls synopsis, code part 2
 normalize-whitespace: 1
 partial: 1
 
     my $rule_id = $asf->symch_rule_id( $glade, $symch_ix );
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 Requires two arguments: a glade ID and a zero-based symch index.
 These specify a symch.
@@ -552,7 +552,7 @@ On other failure, throws an exception.
 
 =head2 symch_factoring_count()
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: ASF low-level calls synopsis, code part 2
 normalize-whitespace: 1
 partial: 1
@@ -560,7 +560,7 @@ partial: 1
     my $factoring_count =
         $asf->symch_factoring_count( $glade, $symch_ix );
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 Requires two arguments: a glade ID and a zero-based symch index.
 These specify a symch.
@@ -575,7 +575,7 @@ On other failure, throws an exception.
 
 =head2 factoring_downglades()
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: ASF low-level calls synopsis, code part 2
 normalize-whitespace: 1
 partial: 1
@@ -584,7 +584,7 @@ partial: 1
         $asf->factoring_downglades( $glade, $symch_ix,
         $factor_ix );
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 Requires three arguments: a glade ID,
 the zero-based index of a symch
@@ -602,37 +602,37 @@ and if the glade exists, but the symch index is too high.
 
 =head1 Methods for reporting ambiguity
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: ASF ambiguity reporting
 normalize-whitespace: 1
 partial: 1
 
     if ( $recce->ambiguity_metric() > 1 ) {
-        my $asf = Marpa::R2::ASF->new( { slr => $recce } );
+        my $asf = Marpa::R3::ASF->new( { slr => $recce } );
         die 'No ASF' if not defined $asf;
-        my $ambiguities = Marpa::R2::Internal::ASF::ambiguities($asf);
+        my $ambiguities = Marpa::R3::Internal::ASF::ambiguities($asf);
 
         # Only report the first two
         my @ambiguities = grep {defined} @{$ambiguities}[ 0 .. 1 ];
 
         $actual_value = 'Application grammar is ambiguous';
         $actual_result =
-            Marpa::R2::Internal::ASF::ambiguities_show( $asf, \@ambiguities );
+            Marpa::R3::Internal::ASF::ambiguities_show( $asf, \@ambiguities );
         last PROCESSING;
     } ## end if ( $recce->ambiguity_metric() > 1 )
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 =head2 ambiguities()
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: ASF ambiguity reporting
 normalize-whitespace: 1
 partial: 1
 
-    my $ambiguities = Marpa::R2::Internal::ASF::ambiguities($asf);
+    my $ambiguities = Marpa::R3::Internal::ASF::ambiguities($asf);
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 Returns a reference to an array of ambiguity reports in the ASF.
 The first and only argument must be an ASF object.
@@ -641,7 +641,7 @@ Ambiguity reports are as L<described below|"Ambiguity reports">.
 
 While the C<ambiguities()> method can be called to determine whether
 or not ambiguities exist, it is the more expensive way to do it.
-The L<$slr-E<gt>ambiguity_metric() method|Marpa::R2::Scanless::R/"ambiguity_metric()">
+The L<$slr-E<gt>ambiguity_metric() method|Marpa::R3::Scanless::R/"ambiguity_metric()">
 tests an already-existing boolean and is therefore extremely fast.
 If you are simply testing for ambiguity,
 use the C<ambiguity_metric()> method instead.
@@ -651,15 +651,15 @@ before calling the C<ambiguities()> method.
 
 =head2 ambiguities_show()
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: ASF ambiguity reporting
 normalize-whitespace: 1
 partial: 1
 
   $actual_result =
-    Marpa::R2::Internal::ASF::ambiguities_show( $asf, \@ambiguities );
+    Marpa::R3::Internal::ASF::ambiguities_show( $asf, \@ambiguities );
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 Returns a string which contains a description of the ambiguities in its arguments.
 Takes two arguments, both required.
@@ -711,12 +711,12 @@ A symch report is issued whenever, in a top-down traversal of the ASF,
 a glade is encountered which has more than one symch.
 A symch report takes the form
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 ignore: 1
 
    [ 'symch', $glade ]
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 where C<$glade> is the ID of the glade with the symch ambiguity.
 With this and the accessor methods in this document, an application can report full
@@ -737,12 +737,12 @@ with each other, broken by other stretches where they are out of sync.
 
 A factoring report takes the form
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 ignore: 1
 
     [ 'factoring', $glade, $symch_ix, $rhs_ix1, $factor_ix2, $rhs_ix2 ];
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 where C<$glade> is the ID of the glade with the factoring ambiguity,
 and C<$symch_ix> is the index of the symch involved.
@@ -768,7 +768,7 @@ using the accessor methods described in this document.
 
 =head2 The asf_to_basic_tree() code
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: ASF low-level calls synopsis, code part 2
 normalize-whitespace: 1
 
@@ -837,7 +837,7 @@ normalize-whitespace: 1
       return $symches[0];
   } ## end sub glade_to_basic_tree
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 =head2 The array_display() code
 
@@ -851,7 +851,7 @@ and works for all Perl arrays.
 It is included for completeness,
 and as a simple example of array traversal.
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: ASF low-level calls synopsis, code part 3
 normalize-whitespace: 1
 
@@ -881,7 +881,7 @@ normalize-whitespace: 1
         return \@lines;
     } ## end sub array_lines_display
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 =head1 Details
 
@@ -1158,25 +1158,25 @@ many repetitions of a single symbol.
 
 =head1 Copyright and License
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 ignore: 1
 
-  Copyright 2015 Jeffrey Kegler
-  This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+  Copyright 2016 Jeffrey Kegler
+  This file is part of Marpa::R3.  Marpa::R3 is free software: you can
   redistribute it and/or modify it under the terms of the GNU Lesser
   General Public License as published by the Free Software Foundation,
   either version 3 of the License, or (at your option) any later version.
 
-  Marpa::R2 is distributed in the hope that it will be useful,
+  Marpa::R3 is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
   Lesser General Public License for more details.
 
   You should have received a copy of the GNU Lesser
-  General Public License along with Marpa::R2.  If not, see
+  General Public License along with Marpa::R3.  If not, see
   http://www.gnu.org/licenses/.
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 =cut
 

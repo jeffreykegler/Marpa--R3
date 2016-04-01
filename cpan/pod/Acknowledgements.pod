@@ -1,21 +1,21 @@
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
 =head1 NAME
 
-Marpa::R2::Acknowledgements - Marpa acknowledgements
+Marpa::R3::Acknowledgements - Marpa acknowledgements
 
 =head1 Acknowledgements
 
@@ -25,12 +25,12 @@ The first was discovered by
 John Aycock and
 R.  Nigel Horspool
 and is described in their
-L<Aycock and Horspool 2002|Marpa::R2::Advanced::Bibliography/"Aycock and Horspool 2002">.
+L<Aycock and Horspool 2002|Marpa::R3::Advanced::Bibliography/"Aycock and Horspool 2002">.
 The second was discovered by Joop Leo and is described in
-L<Leo 1991|Marpa::R2::Advanced::Bibliography/"Leo 1991">.
+L<Leo 1991|Marpa::R3::Advanced::Bibliography/"Leo 1991">.
 Aycock, Horspool, and Leo, in turn, based their
 algorithms on the
-L<algorithm discovered by Jay Earley|Marpa::R2::Advanced::Bibliography/"Earley 1970">.
+L<algorithm discovered by Jay Earley|Marpa::R3::Advanced::Bibliography/"Earley 1970">.
 I combined the Aycock-Horspool algorithm with the Leo algorithm,
 and added significant changes of my own.
 
@@ -103,25 +103,25 @@ contributors to the list.
 
 =head1 Copyright and License
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 ignore: 1
 
-  Copyright 2015 Jeffrey Kegler
-  This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+  Copyright 2016 Jeffrey Kegler
+  This file is part of Marpa::R3.  Marpa::R3 is free software: you can
   redistribute it and/or modify it under the terms of the GNU Lesser
   General Public License as published by the Free Software Foundation,
   either version 3 of the License, or (at your option) any later version.
 
-  Marpa::R2 is distributed in the hope that it will be useful,
+  Marpa::R3 is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
   Lesser General Public License for more details.
 
   You should have received a copy of the GNU Lesser
-  General Public License along with Marpa::R2.  If not, see
+  General Public License along with Marpa::R3.  If not, see
   http://www.gnu.org/licenses/.
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 =cut
 

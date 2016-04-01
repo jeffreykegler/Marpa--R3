@@ -1,31 +1,31 @@
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
 =head1 NAME
 
-Marpa::R2::Semantics - How the SLIF evaluates parses
+Marpa::R3::Semantics - How the SLIF evaluates parses
 
 =head1 Synopsis
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: SLIF full synopsis
 normalize-whitespace: 1
 
-    use Marpa::R2;
+    use Marpa::R3;
 
-    my $grammar = Marpa::R2::Scanless::G->new(
+    my $grammar = Marpa::R3::Scanless::G->new(
         {   bless_package => 'My_Nodes',
             source        => \(<<'END_OF_SOURCE'),
     :default ::= action => [values] bless => ::lhs
@@ -61,7 +61,7 @@ normalize-whitespace: 1
     );
 
 
-    my $recce = Marpa::R2::Scanless::R->new( { grammar => $grammar } );
+    my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
 
     my $input = '42*2+7/3, 42*(2+7)/3, 2**7-3, 2**(7-3)';
     $recce->read(\$input);
@@ -108,7 +108,7 @@ normalize-whitespace: 1
         return join q{ }, map { $_->doit() } @{$self};
     }
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 =head1 About this document
 
@@ -212,13 +212,13 @@ of the parse tree.
 =head1  Parse trees
 
 The calls of the
-L<C<value()> method|Marpa::R2::Scanless::R/"value()">
+L<C<value()> method|Marpa::R3::Scanless::R/"value()">
 by a SLIF recognizer produce a series of zero
 or more parses trees,
 called a B<parse series>.
 A recognizer will have only one parse series,
 unless it calls
-the L<C<series_restart()> method|Marpa::R2::Scanless::R/"series_restart()">.
+the L<C<series_restart()> method|Marpa::R3::Scanless::R/"series_restart()">.
 
 There may be zero parses in a parse series,
 because there may be no valid parse of a virtual input.
@@ -228,7 +228,7 @@ Full details about the life cycle of a Marpa
 recognizer,
 including a full treatment of parse series
 can be found in
-L<another document|Marpa::R2::Semantics::Phases>.
+L<another document|Marpa::R3::Semantics::Phases>.
 
 =head1 Nulled subtrees
 
@@ -243,7 +243,7 @@ simplest and
 Marpa's users have found it a natural approach.
 More detail on the semantics of nulled symbols and subtrees
 can be found in
-L<a separate document|Marpa::R2::Semantics::Null>.
+L<a separate document|Marpa::R3::Semantics::Null>.
 
 =head1 Actions and how Marpa finds them
 
@@ -260,7 +260,7 @@ explicit action.
 The implicit action for a lexeme is to return
 its literal value in the input stream, as a string.
 An explicit default action name for lexemes may be set using the
-L<the lexeme default statement|Marpa::R2::Scanless::DSL/"Lexeme default statement">.
+L<the lexeme default statement|Marpa::R3::Scanless::DSL/"Lexeme default statement">.
 A lexeme action cannot be a Perl closure action --
 it must be one of the built-in actions that are
 appropriate for lexemes.
@@ -269,10 +269,10 @@ appropriate for lexemes.
 
 The implicit action for a rule instance is to return a Perl C<undef>.
 An explicit action for a RHS alternative can be specified using
-L<the C<action> adverb|Marpa::R2::Scanless::DSL/"action">
+L<the C<action> adverb|Marpa::R3::Scanless::DSL/"action">
 for the its RHS alternative.
 A default explicit action for RHS alternatives can be specified with a
-L<default pseudo-rule|Marpa::R2::Scanless::DSL/"Default pseudo-rule">.
+L<default pseudo-rule|Marpa::R3::Scanless::DSL/"Default pseudo-rule">.
 
 =head2 Nulled symbol actions
 
@@ -311,7 +311,7 @@ the blessing is taken into account.
 Two rule alternatives are considered to have different semantics if
 they are blessed differently.
 The SLIF's null semantics are described in more detail
-L<in a separate document|Marpa::R2::Semantics::Null>.
+L<in a separate document|Marpa::R3::Semantics::Null>.
 
 =head1 Blessings
 
@@ -360,7 +360,7 @@ If the blessing is a Perl word
 (a string of alphanumerics or underscores),
 the name of the class will be formed by prepending
 the value of L<the C<bless_package>
-named argument|Marpa::R2::Scanless::G/"bless_package">, followed
+named argument|Marpa::R3::Scanless::G/"bless_package">, followed
 by a double colon ("C<::>").
 
 If the blessing begins with a double colon ("C<::>"), it is a
@@ -444,7 +444,7 @@ The other actions are B<Perl closure actions>.
 
 =head1 Array descriptor actions
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: SLIF DSL synopsis
 partial: 1
 normalize-whitespace: 1
@@ -452,7 +452,7 @@ normalize-whitespace: 1
     lexeme default = action => [ start, length, value ]
         bless => ::name latm => 1
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 If an action is enclosed in square brackets, it is an B<array descriptor>,
 and the value of the lexeme or rule alternative will be an array.
@@ -486,7 +486,7 @@ the G1 start location of the rule or lexeme instance.
 Together
 the C<g1length> and C<g1start> array item descriptors
 describe a G1 location
-L<span|Marpa::R2::Scanless::R/"Spans">.
+L<span|Marpa::R3::Scanless::R/"Spans">.
 
 Typical applications will prefer to use
 the C<start> and C<length> array item descriptors,
@@ -498,7 +498,7 @@ for example with application which do not scan
 monotonically forward in the physical input,
 but instead jump backwards in it.
 G1 locations are described in detail
-L<in another document|Marpa::R2::Scanless::R/"G1 locations">.
+L<in another document|Marpa::R3::Scanless::R/"G1 locations">.
 
 =item C<length>
 
@@ -672,14 +672,14 @@ To resolve Perl identifiers to Perl names,
 a semantics package must be defined.
 The semantics package can be defined using the
 L<SLIF recognizer's C<semantics_package> named
-argument|Marpa::R2::Scanless::R/"semantics_package">,
+argument|Marpa::R3::Scanless::R/"semantics_package">,
 or it can be taken from the argument to the first C<value()>
 call of the parse series.
 (All of a recognizer's C<value()> method calls
 refer to a single parse series unless
 the recognizer calls
 the
-L<C<series_restart()> method|Marpa::R2::Scanless::R/"series_restart()">.)
+L<C<series_restart()> method|Marpa::R3::Scanless::R/"series_restart()">.)
 The C<semantics_package> named argument takes precedence.
 
 If the arguments to the C<value()> method are used to specify
@@ -687,7 +687,7 @@ the semantics package, within a parse series they must consistently
 specify the same package.
 For details, see the description of
 L<SLIF recognizer's C<value()>
-method|Marpa::R2::Scanless::R/"value()">.
+method|Marpa::R3::Scanless::R/"value()">.
 
 If the user wants the Perl variables implementing the semantics
 in the C<main> namespace,
@@ -772,7 +772,7 @@ the first argument of a rule evaluation closure is the per-parse argument.
 Everything just said about rule nodes
 applies to nodes for
 L<quantified
-rules|Marpa::R2::Scanless::DSL/"Quantified rule">.
+rules|Marpa::R3::Scanless::DSL/"Quantified rule">.
 But there is a difference between quantified rules
 and others, and it a big one if you are writing a rule
 evaluation closure.
@@ -789,25 +789,25 @@ a variable number of child nodes.
 
 =head1 Action context
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: SLIF action context synopsis
 normalize-whitespace: 1
 
     sub do_S {
         my ($action_object) = @_;
-        my $rule_id         = $Marpa::R2::Context::rule;
-        my $slg             = $Marpa::R2::Context::slg;
+        my $rule_id         = $Marpa::R3::Context::rule;
+        my $slg             = $Marpa::R3::Context::slg;
         my ( $lhs, @rhs ) =
             map { $slg->symbol_display_form($_) } $slg->rule_expand($rule_id);
         $action_object->{text} =
               "rule $rule_id: $lhs ::= "
             . ( join q{ }, @rhs ) . "\n"
             . "locations: "
-            . ( join q{-}, Marpa::R2::Context::location() ) . "\n";
+            . ( join q{-}, Marpa::R3::Context::location() ) . "\n";
         return $action_object;
     } ## end sub do_S
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 In addition to the per-parse argument
 and their child values,
@@ -816,26 +816,26 @@ to B<context variables>.
 
 =over
 
-=item * C<$Marpa::R2::Context::slg> is set to
-L<the SLIF grammar|Marpa::R2::Scanless::G> being parsed.
+=item * C<$Marpa::R3::Context::slg> is set to
+L<the SLIF grammar|Marpa::R3::Scanless::G> being parsed.
 
-=item * C<$Marpa::R2::Context::rule> is the ID of the
+=item * C<$Marpa::R3::Context::rule> is the ID of the
 current rule alternative.
 Given the rule alternative ID, an application can find
 its LHS and RHS symbols using
-L<the SLIF grammar's C<rule_expand()> method|Marpa::R2::Scanless::G/"rule_expand()">.
+L<the SLIF grammar's C<rule_expand()> method|Marpa::R3::Scanless::G/"rule_expand()">.
 
-=item * C<Marpa::R2::Context::location()> returns the start
+=item * C<Marpa::R3::Context::location()> returns the start
 and end G1 locations of the current rule instance.
 Note that these are
-L<G1 locations|Marpa::R2::Scanless::R/"G1 locations">,
+L<G1 locations|Marpa::R3::Scanless::R/"G1 locations">,
 not input stream locations.
 
 =back
 
 =head1 Bailing out of parse evaluation
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 name: SLIF bail synopsis
 normalize-whitespace: 1
 
@@ -843,17 +843,17 @@ normalize-whitespace: 1
 
     sub do_bail_with_message_if_A {
         my ($action_object, $terminal) = @_;
-        Marpa::R2::Context::bail($bail_message) if $terminal eq 'A';
+        Marpa::R3::Context::bail($bail_message) if $terminal eq 'A';
     }
 
     sub do_bail_with_object_if_A {
         my ($action_object, $terminal) = @_;
-        Marpa::R2::Context::bail([$bail_message]) if $terminal eq 'A';
+        Marpa::R3::Context::bail([$bail_message]) if $terminal eq 'A';
     }
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
-The C<Marpa::R2::Context::bail()> static method is used to
+The C<Marpa::R3::Context::bail()> static method is used to
 "bail out" of the evaluation of a parse tree.
 It will cause an exception to be thrown.
 If its first and only argument is a reference,
@@ -863,7 +863,7 @@ by converting the method's arguments to strings,
 concatenating them,
 and prepending them with a message indicating
 the file and line number at which the
-C<Marpa::R2::Context::bail()> method was called.
+C<Marpa::R3::Context::bail()> method was called.
 
 =head1 Perl scalars as actions
 
@@ -892,13 +892,13 @@ For example,
 assume that actions are in a package named C<My_Actions>,
 which contains a hash reference named C<empty_hash>, 
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 ignore: 1
 
         package My_Actions;
         our $empty_hash = {};
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 It can be tempting, in building objects which are hashes,
 to start with a left node whose action is C<empty_hash>
@@ -915,12 +915,12 @@ initializes an empty hash is as a rule
 evaluation closure 
 that returns C<{}>.
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 ignore: 1
 
         sub My_Actions::empty_hash { return {}; }
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 =head1 Visibility of Perl object actions
 
@@ -940,7 +940,7 @@ and this variable must be visible,
 at the time when actions are resolved.
 The timing of action resolution
 is specified in
-L<a separate document|Marpa::R2::Semantics::Phases>.
+L<a separate document|Marpa::R3::Semantics::Phases>.
 
 =head1 The per-parse argument
 
@@ -982,20 +982,20 @@ the name of the semantics package.
 
 The per-parse constructor is called
 in the
-L<Parse Tree Setup Subphase|Marpa::R2::Semantics::Phases/"Parse Tree Setup Subphase">.
+L<Parse Tree Setup Subphase|Marpa::R3::Semantics::Phases/"Parse Tree Setup Subphase">.
 The Parse Tree Setup Subphase occurs during
-the first call to a recognizer's L<C<value()>|Marpa::R2::Scanless::R/"value()">
+the first call to a recognizer's L<C<value()>|Marpa::R3::Scanless::R/"value()">
 method in a parse series.
 (All of a recognizer's C<value()> method calls
 refer to a single parse series unless
 the recognizer calls
 the
-L<C<series_restart()> method|Marpa::R2::Scanless::R/"series_restart()">.)
+L<C<series_restart()> method|Marpa::R3::Scanless::R/"series_restart()">.)
 More details about
 Parse Tree Setup Subphase
 can be found in
 L<the document that describes the processing phases of Marpa's
-semantics|Marpa::R2::Semantics::Phases>.
+semantics|Marpa::R3::Semantics::Phases>.
 
 =head1 Parse order
 
@@ -1004,7 +1004,7 @@ with no duplication.
 By default, the order is arbitrary, but
 it is also possible to control the order.
 Details are in L<the document
-on parse order|Marpa::R2::Semantics::Order>.
+on parse order|Marpa::R3::Semantics::Order>.
 
 =head1 Infinite loops
 
@@ -1015,29 +1015,29 @@ the SLIF does not currently support them,
 although Libmarpa itself, Marpa's thin interface and the NAIF all do.
 Those interested in knowing more can look at L<the
 document on the NAIF's support of infinitely ambiguous
-grammars|Marpa::R2::NAIF::Semantics::Infinite>.
+grammars|Marpa::R3::NAIF::Semantics::Infinite>.
 
 =head1 Copyright and License
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 ignore: 1
 
-  Copyright 2015 Jeffrey Kegler
-  This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+  Copyright 2016 Jeffrey Kegler
+  This file is part of Marpa::R3.  Marpa::R3 is free software: you can
   redistribute it and/or modify it under the terms of the GNU Lesser
   General Public License as published by the Free Software Foundation,
   either version 3 of the License, or (at your option) any later version.
 
-  Marpa::R2 is distributed in the hope that it will be useful,
+  Marpa::R3 is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
   Lesser General Public License for more details.
 
   You should have received a copy of the GNU Lesser
-  General Public License along with Marpa::R2.  If not, see
+  General Public License along with Marpa::R3.  If not, see
   http://www.gnu.org/licenses/.
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 =cut
 

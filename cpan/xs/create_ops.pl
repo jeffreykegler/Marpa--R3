@@ -1,5 +1,5 @@
 #!perl
-# Copyright 2106 Jeffrey Kegler
+# Copyright 2016 Jeffrey Kegler
 # This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
@@ -57,7 +57,7 @@ my @ops = sort { $a->[0] cmp $b->[0] }
 
 say <<'END_OF_PREAMBLE';
 /*
- * Copyright 2015 Jeffrey Kegler
+ * Copyright 2016 Jeffrey Kegler
  * This file is part of Libmarpa.  Libmarpa is free software: you can
  * redistribute it and/or modify it under the terms of the GNU Lesser
  * General Public License as published by the Free Software Foundation,

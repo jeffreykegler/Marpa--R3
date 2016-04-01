@@ -1,17 +1,17 @@
 #!/usr/bin/perl
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
 =head1 Name
@@ -20,7 +20,7 @@ html_fmt - Reformat HTML, indented according to structure
 
 =head1 Synopsis
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 ignore: 1
 
     html_fmt [--avoid-whitespace=[yes|comment|no]]
@@ -29,7 +29,7 @@ ignore: 1
       [--added-tag-comment|--no-added-tag-comment]
       [uri|file]
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 =head1 Description
 
@@ -213,25 +213,25 @@ C<html_fmt> to make its output readable.
 
 Given this input:
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 ignore: 1
 
     <title>Test page<tr>x<head attr="I am cruft"><p>Final graf
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 to this command:
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 ignore: 1
 
     html_fmt --avoid-whitespace=comment --ws-ok-before-end-tag
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 the output is
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 ignore: 1
 
   <html>
@@ -277,7 +277,7 @@ ignore: 1
     <!-- html_fmt: Following end tag is replacement for a missing one -->
   </html>
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 =head1 Acknowledgements
 
@@ -286,25 +286,25 @@ L<HTML::TokeParser|HTML::TokeParser>, by Gisle Aas.
 
 =head1 Copyright and License
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 ignore: 1
 
-  Copyright 2015 Jeffrey Kegler
-  This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+  Copyright 2016 Jeffrey Kegler
+  This file is part of Marpa::R3.  Marpa::R3 is free software: you can
   redistribute it and/or modify it under the terms of the GNU Lesser
   General Public License as published by the Free Software Foundation,
   either version 3 of the License, or (at your option) any later version.
 
-  Marpa::R2 is distributed in the hope that it will be useful,
+  Marpa::R3 is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
   Lesser General Public License for more details.
 
   You should have received a copy of the GNU Lesser
-  General Public License along with Marpa::R2.  If not, see
+  General Public License along with Marpa::R3.  If not, see
   http://www.gnu.org/licenses/.
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 =cut
 

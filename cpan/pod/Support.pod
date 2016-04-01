@@ -1,25 +1,25 @@
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
 =head1 NAME
 
-Marpa::R2::Support - Support, and how to report bugs
+Marpa::R3::Support - Support, and how to report bugs
 
 =head1 Description
 
-Marpa::R2 is free software.
+Marpa::R3 is free software.
 There is no warranty.
 
 =head1 Mailing list
@@ -31,7 +31,7 @@ L<https://groups.google.com/forum/?fromgroups#!forum/marpa-parser>.
 
 Please report any bugs or feature requests to
 C<bug-marpa-xs at rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Marpa::R2>.
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Marpa::R3>.
 I will be notified, and then you'll automatically be notified of progress on
 your bug as I make changes.
 
@@ -39,12 +39,12 @@ your bug as I make changes.
 
 You can find documentation for this module with the perldoc command.
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 ignore: 1
 
-    perldoc Marpa::R2
+    perldoc Marpa::R3
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 You can also look for information at:
 
@@ -62,25 +62,25 @@ L<http://search.cpan.org/dist/Marpa-R2>
 
 =head1 Copyright and License
 
-=for Marpa::R2::Display
+=for Marpa::R3::Display
 ignore: 1
 
-  Copyright 2015 Jeffrey Kegler
-  This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+  Copyright 2016 Jeffrey Kegler
+  This file is part of Marpa::R3.  Marpa::R3 is free software: you can
   redistribute it and/or modify it under the terms of the GNU Lesser
   General Public License as published by the Free Software Foundation,
   either version 3 of the License, or (at your option) any later version.
 
-  Marpa::R2 is distributed in the hope that it will be useful,
+  Marpa::R3 is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
   Lesser General Public License for more details.
 
   You should have received a copy of the GNU Lesser
-  General Public License along with Marpa::R2.  If not, see
+  General Public License along with Marpa::R3.  If not, see
   http://www.gnu.org/licenses/.
 
-=for Marpa::R2::Display::End
+=for Marpa::R3::Display::End
 
 =cut
 

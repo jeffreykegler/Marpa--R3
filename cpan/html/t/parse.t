@@ -1,17 +1,17 @@
 #!perl
-# Copyright 2015 Jeffrey Kegler
-# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 #
-# Marpa::R2 is distributed in the hope that it will be useful,
+# Marpa::R3 is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R2.  If not, see
+# General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
 use 5.010;
@@ -22,17 +22,17 @@ use Test::More;
 
 BEGIN {
     use lib 'html/tool/lib';
-    my $eval_result = eval { require Marpa::R2::HTML::Test::Util; 1 };
+    my $eval_result = eval { require Marpa::R3::HTML::Test::Util; 1 };
     if ( !$eval_result ) {
         Test::More::plan tests => 1;
         Test::More::fail(
-            "Could not load Marpa::R2::HTML::Test::Util; $EVAL_ERROR");
+            "Could not load Marpa::R3::HTML::Test::Util; $EVAL_ERROR");
         exit 0;
     } ## end if ( !$eval_result )
 } ## end BEGIN
 
-BEGIN { Marpa::R2::HTML::Test::Util::load_or_skip_all('HTML::Parser'); }
-BEGIN { Marpa::R2::HTML::Test::Util::load_or_skip_all('HTML::Entities'); }
+BEGIN { Marpa::R3::HTML::Test::Util::load_or_skip_all('HTML::Parser'); }
+BEGIN { Marpa::R3::HTML::Test::Util::load_or_skip_all('HTML::Entities'); }
 
 # These tests are based closely on those in the HTML-Tree module,
 # the authors of which I gratefully acknowledge.
@@ -40,17 +40,17 @@ BEGIN { Marpa::R2::HTML::Test::Util::load_or_skip_all('HTML::Entities'); }
 Test::More::plan tests => 40;
 my $DEBUG = 2;
 
-use Marpa::R2::HTML;
+use Marpa::R3::HTML;
 
 my $html_args = {
     ':CRUFT' => sub {
-        my $literal = Marpa::R2::HTML::literal();
+        my $literal = Marpa::R3::HTML::literal();
         say {*STDERR} 'Cruft: ', $literal
             or Carp::croak("Cannot print: $ERRNO");
         return qq{<CRUFT literal="$literal">};
     },
     ':PCDATA' => sub {
-        my $literal = Marpa::R2::HTML::literal();
+        my $literal = Marpa::R3::HTML::literal();
         if ( defined &HTML::Entities::decode_entities ) {
             $literal =
                 HTML::Entities::encode_entities(
@@ -59,19 +59,19 @@ my $html_args = {
         return $literal;
     },
     ':PROLOG' => sub {
-        my $literal = Marpa::R2::HTML::literal();
+        my $literal = Marpa::R3::HTML::literal();
         $literal =~ s/\A [\x{20}\t\f\x{200B}]+ //xms;
         $literal =~ s/ [\x{20}\t\f\x{200B}]+ \z//xms;
         return $literal;
     },
     ':COMMENT' => sub { return q{} },
     q{*}       => sub {
-        my $tagname = Marpa::R2::HTML::tagname();
+        my $tagname = Marpa::R3::HTML::tagname();
 
         # say STDERR "In handler for $tagname element";
 
         Carp::croak('Not in an element') if not $tagname;
-        my $attributes = Marpa::R2::HTML::attributes();
+        my $attributes = Marpa::R3::HTML::attributes();
 
         # Note this logic suffices to get through
         # the test set but it does not handle
@@ -87,12 +87,12 @@ my $html_args = {
 
         my $descendant_data =
 
-# Marpa::R2::Display
+# Marpa::R3::Display
 # name: dataspec example
 
-            Marpa::R2::HTML::descendants('token_type,literal,element')
+            Marpa::R3::HTML::descendants('token_type,literal,element')
 
-# Marpa::R2::Display::End
+# Marpa::R3::Display::End
 
             ;    # semi to end $descendant_data definition
 
@@ -223,22 +223,22 @@ sub same {
     if ( ref $code2 ) { $code2 = ${$code2} }
 
     my $value1;
-    if (not eval { $value1 = Marpa::R2::HTML::html( \$code1, $html_args ); 1 }
+    if (not eval { $value1 = Marpa::R3::HTML::html( \$code1, $html_args ); 1 }
         )
     {
         say "No parse for $code1; $EVAL_ERROR"
             or Carp::croak("Cannot print: $ERRNO");
         return $flip;
-    } ## end if ( not eval { $value1 = Marpa::R2::HTML::html( \$code1...)})
+    } ## end if ( not eval { $value1 = Marpa::R3::HTML::html( \$code1...)})
 
     my $value2;
-    if (not eval { $value2 = Marpa::R2::HTML::html( \$code2, $html_args ); 1 }
+    if (not eval { $value2 = Marpa::R3::HTML::html( \$code2, $html_args ); 1 }
         )
     {
         say "No parse for $code2; $EVAL_ERROR"
             or Carp::croak("Cannot print: $ERRNO");
         return $flip;
-    } ## end if ( not eval { $value2 = Marpa::R2::HTML::html( \$code2...)})
+    } ## end if ( not eval { $value2 = Marpa::R3::HTML::html( \$code2...)})
 
     my $out1 = ${$value1};
     my $out2 = ${$value2};
