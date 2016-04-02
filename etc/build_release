@@ -1,9 +1,9 @@
 set -x
-if test -r Marpa--R2 
+if test -r Marpa--R3 
 then
-    echo Marpa--R2 exists -- please remove it
+    echo Marpa--R3 exists -- please remove it
     exit 1
 fi
-git clone -b trial git@github.com:jeffreykegler/Marpa--R2.git
-cd Marpa--R2
+git clone -b trial git@github.com:jeffreykegler/Marpa--R3.git
+cd Marpa--R3
 make releng
