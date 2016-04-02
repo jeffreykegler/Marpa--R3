@@ -60,7 +60,9 @@ my %version_for_config = (
     'English'               => '1.04',
     'Exporter'              => '5.62',
     'ExtUtils::CBuilder'    => '0.27',
-    'ExtUtils::MakeMaker'   => '6.42',
+    # ExtUtils::MakeMaker must be 6.48 so that MIN_PERL_VERSION
+    # is supported
+    'ExtUtils::MakeMaker'   => '6.48',
     'ExtUtils::Manifest'    => '1.51_01',
     'ExtUtils::Mkbootstrap' => '6.42',
     'Fatal'                 => '1.05',
@@ -71,7 +73,6 @@ my %version_for_config = (
     'HTML::Parser'          => '3.69',
     'IPC::Cmd'              => '0.40_1',
     'List::Util'            => '1.21',
-    'Module::Build'         => '0.4003',
     'PPI'                   => '1.206',
     'Scalar::Util'          => '1.21',
     'Test::More'            => '0.94',
@@ -95,7 +96,7 @@ if ($use_perl_autoconf) {
 } ## end if ($use_perl_autoconf)
 
 my $preamble = <<'END_OF_STRING';
-# This file is written by Build.PL
+# This file is written by Makefile.PL
 # It is not intended to be modified directly
 
 END_OF_STRING
@@ -373,6 +374,8 @@ WriteMakefile(
     PM                 => \%pm_files,
     # OBJECT => 'xs/R3.o',
     TYPEMAPS => ['typemap'],
+    dist => { COMPRESS => 'gzip --best -f' },
+    MIN_PERL_VERSION => '5.10.1',
     DIR => ['xs'],
     EXE_FILES          => [
         'html/script/marpa_r3_html_fmt',
@@ -381,7 +384,7 @@ WriteMakefile(
     META_ADD => {
         no_index => {
             directory => [
-                qw( pperl tool libmarpa author.t
+                qw( pperl tool engine author.t
                     html/etc html/sandbox html/script html/t
                     )
             ],
@@ -428,14 +431,20 @@ chomp $libmarpa_version;
 my @libmarpa_version = split /[.]/xms, $libmarpa_version;
 
 my $cwd = Cwd::getcwd();
-if ($use_perl_autoconf) {
+
+my $build_sub_dir = $use_perl_autoconf ? 'perl_ac_build' : 'gnu_ac_build';
+my $build_dir = File::Spec->catdir('engine', $build_sub_dir);
+{
     my $from_dir  = File::Spec->catdir(qw(engine read_only));
-    my $build_dir = File::Spec->catdir(qw(engine perl_ac_build));
     ExtUtils::Install::install(
         [   from_to => { $from_dir => $build_dir, },
             verbose => 1
         ]
     );
+}
+
+if ($use_perl_autoconf) {
+    $build_dir = File::Spec->catdir(qw(engine perl_ac_build));
 
     my $src_makefile_writer = do {
         my $cf_dir = File::Spec->catdir(qw(engine cf));
@@ -443,58 +452,58 @@ if ($use_perl_autoconf) {
     };
     my $dest_makefile_pl = File::Spec->catfile( $build_dir, 'Makefile.PL' );
     File::Copy::copy( $src_makefile_writer => $dest_makefile_pl );
+}
 
-    chdir $build_dir || die "Cannot chdir to $build_dir: $ERRNO";
-    my $stamp_file = 'stamp-h1';
-    File::Path::rmtree( $stamp_file, 0, 0 );
+chdir $build_dir || die "Cannot chdir to $build_dir: $ERRNO";
+my $stamp_file = 'stamp-h1';
+File::Path::rmtree( $stamp_file, 0, 0 );
 
-    {
+if ($use_perl_autoconf) {
 
+    #
+    ## C.f. http://fr.slideshare.net/hashashin/building-c-and-c-libraries-with-perl
+    #
+    my @c = qw/marpa_ami.c marpa_avl.c marpa.c
+      marpa_codes.c marpa_obs.c marpa_tavl.c/;
+    if ( !-r 'config.h' ) {
         #
-        ## C.f. http://fr.slideshare.net/hashashin/building-c-and-c-libraries-with-perl
+        ## Because Config::AutoConf can only generate #define/#undef
+        ## stubs, we write our config.h with these stubs, our config.h
+        ## will then include a generated config_from_autoconf.h
         #
-        my @c = qw/marpa_ami.c marpa_avl.c marpa.c
-            marpa_codes.c marpa_obs.c marpa_tavl.c/;
-        if ( !-r 'config.h' ) {
-            #
-            ## Because Config::AutoConf can only generate #define/#undef
-            ## stubs, we write our config.h with these stubs, our config.h
-            ## will then include a generated config_from_autoconf.h
-            #
-            if ($verbose) {
-                say join q{ }, "Doing config.h"
-                    or die "print failed: $ERRNO";
-            }
-            open my $config_fh, '>>',
-                'config.h' || die "Cannot open config.h, $!\n";
-            my $ac        = Config::AutoConf->new();
-            my $inline_ok = 0;
-            {
-                $ac->msg_checking('inline');
+        if ($verbose) {
+            say join q{ }, "Doing config.h"
+              or die "print failed: $ERRNO";
+        }
+        open my $config_fh, '>>',
+          'config.h' || die "Cannot open config.h, $!\n";
+        my $ac        = Config::AutoConf->new();
+        my $inline_ok = 0;
+        {
+            $ac->msg_checking('inline');
+            my $program = $ac->lang_build_program(
+                "static inline int testinline() {return 1;}\n", 'testinline' );
+            $inline_ok = $ac->compile_if_else($program);
+            $ac->msg_result( $inline_ok ? 'yes' : 'no' );
+        }
+        my $inline = '';
+        if ( !$inline_ok ) {
+            foreach (qw/__inline__ __inline/) {
+                my $candidate = $_;
+                $ac->msg_checking($candidate);
                 my $program = $ac->lang_build_program(
-                    "static inline int testinline() {return 1;}\n",
+                    "static $candidate int testinline() {return 1;}\n",
                     'testinline' );
-                $inline_ok = $ac->compile_if_else($program);
-                $ac->msg_result( $inline_ok ? 'yes' : 'no' );
-            }
-            my $inline = '';
-            if ( !$inline_ok ) {
-                foreach (qw/__inline__ __inline/) {
-                    my $candidate = $_;
-                    $ac->msg_checking($candidate);
-                    my $program = $ac->lang_build_program(
-                        "static $candidate int testinline() {return 1;}\n",
-                        'testinline' );
-                    my $rc = $ac->compile_if_else($program);
-                    $ac->msg_result( $rc ? 'yes' : 'no' );
-                    if ($rc) {
-                        $inline = $candidate;
-                        last;
-                    }
-                } ## end foreach (qw/__inline__ __inline/)
-            } ## end if ( !$inline_ok )
-            if ($inline) {
-                print {$config_fh} <<INLINEHOOK;
+                my $rc = $ac->compile_if_else($program);
+                $ac->msg_result( $rc ? 'yes' : 'no' );
+                if ($rc) {
+                    $inline = $candidate;
+                    last;
+                }
+            } ## end foreach (qw/__inline__ __inline/)
+        } ## end if ( !$inline_ok )
+        if ($inline) {
+            print {$config_fh} <<INLINEHOOK;
 #ifndef __CONFIG_WITH_STUBS_H
 #ifndef __cplusplus
 #define inline $inline
@@ -502,9 +511,9 @@ if ($use_perl_autoconf) {
 #include "config_from_autoconf.h"
 #endif /* __CONFIG_WITH_STUBS_H */
 INLINEHOOK
-            } ## end if ($inline)
-            else {
-                print {$config_fh} <<INLINEHOOK;
+        } ## end if ($inline)
+        else {
+            print {$config_fh} <<INLINEHOOK;
 #ifndef __CONFIG_WITH_STUBS_H
 #ifndef __cplusplus
 /* #undef inline */
@@ -512,95 +521,63 @@ INLINEHOOK
 #include "config_from_autoconf.h"
 #endif /* __CONFIG_WITH_STUBS_H */
 INLINEHOOK
-            } ## end else [ if ($inline) ]
+        } ## end else [ if ($inline) ]
 
-            # Config::Autoconf mistakes 0 for undef, so these must be done explicitly
-            say {$config_fh} join q{ }, '#define MARPA_LIB_MAJOR_VERSION',
-                $libmarpa_version[0];
-            say {$config_fh} join q{ }, '#define MARPA_LIB_MINOR_VERSION',
-                $libmarpa_version[1];
-            say {$config_fh} join q{ }, '#define MARPA_LIB_MICRO_VERSION',
-                $libmarpa_version[2];
+       # Config::Autoconf mistakes 0 for undef, so these must be done explicitly
+        say {$config_fh} join q{ }, '#define MARPA_LIB_MAJOR_VERSION',
+          $libmarpa_version[0];
+        say {$config_fh} join q{ }, '#define MARPA_LIB_MINOR_VERSION',
+          $libmarpa_version[1];
+        say {$config_fh} join q{ }, '#define MARPA_LIB_MICRO_VERSION',
+          $libmarpa_version[2];
 
-            close($config_fh);
-            $ac = Config::AutoConf->new();
-            my $sizeof_int = $ac->check_sizeof_type('int');
-            if ( $sizeof_int < 4 ) {
-                die
-                    "Marpa requires that int be at least 32 bits -- on this system that is not the case";
-            }
+        close($config_fh);
+        $ac = Config::AutoConf->new();
+        my $sizeof_int = $ac->check_sizeof_type('int');
+        if ( $sizeof_int < 4 ) {
+            die
+"Marpa requires that int be at least 32 bits -- on this system that is not the case";
+        }
 
-            $ac->check_stdc_headers;
-            $ac->check_default_headers();
+        $ac->check_stdc_headers;
+        $ac->check_default_headers();
 
-            $ac->define_var( 'PACKAGE', "\"libmarpa\"" );
-            $ac->define_var( 'PACKAGE_BUGREPORT',
-                "\"http://rt.cpan.org/NoAuth/Bugs.html?Dist=Marpa\"" );
-            $ac->define_var( 'PACKAGE_NAME', "\"libmarpa\"" );
-            $ac->define_var( 'PACKAGE_STRING',
-                "\"libmarpa $libmarpa_version[0].$libmarpa_version[1].$libmarpa_version[2]\""
-            );
-            $ac->define_var( 'PACKAGE_TARNAME', "\"libmarpa\"" );
-            $ac->define_var( 'PACKAGE_URL',     "\"\"" );
-            $ac->define_var( 'PACKAGE_VERSION', "\"$libmarpa_version\"" );
-            $ac->define_var( 'PACKAGE_STRING',  "\"$libmarpa_version\"" );
-            $ac->write_config_h('config_from_autoconf.h');
-        } ## end if ( !-r 'config.h' )
+        $ac->define_var( 'PACKAGE', "\"libmarpa\"" );
+        $ac->define_var( 'PACKAGE_BUGREPORT',
+            "\"http://rt.cpan.org/NoAuth/Bugs.html?Dist=Marpa\"" );
+        $ac->define_var( 'PACKAGE_NAME', "\"libmarpa\"" );
+        $ac->define_var( 'PACKAGE_STRING',
+"\"libmarpa $libmarpa_version[0].$libmarpa_version[1].$libmarpa_version[2]\""
+        );
+        $ac->define_var( 'PACKAGE_TARNAME', "\"libmarpa\"" );
+        $ac->define_var( 'PACKAGE_URL',     "\"\"" );
+        $ac->define_var( 'PACKAGE_VERSION', "\"$libmarpa_version\"" );
+        $ac->define_var( 'PACKAGE_STRING',  "\"$libmarpa_version\"" );
+        $ac->write_config_h('config_from_autoconf.h');
+    } ## end if ( !-r 'config.h' )
 
-        my @o = map {s/\.c$/$Config{obj_ext}/; $_} @c;
-        if (! -r 'Makefile.PL') {
-            open my $makefile_pl_fh, '>', 'Makefile.PL';
-            my $CCFLAGS = @debug_flags ? "$Config{ccflags} @debug_flags" : '';
-            my $linktype = 'static';
-            my $blib = 'blib';
-            my $name = 'libmarpa';
-            print {$makefile_pl_fh} "
-use ExtUtils::MakeMaker;
-WriteMakefile(VERSION        => \"$libmarpa_version\",
-              XS_VERSION     => \"$libmarpa_version\",
-              NAME           => \"$name\",
-              OBJECT         => '@o',
-              CCFLAGS        => '$CCFLAGS',
-              INST_LIB       => \"./$blib/lib\",
-              INST_ARCHLIB   => \"./$blib/arch\",
-              INST_SCRIPT    => \"./$blib/script\",
-              INST_BIN       => \"./$blib/bin\",
-              LINKTYPE       => $linktype);
-";
-            close $makefile_pl_fh;
-            die 'Making Makefile: perl Failure'
-                if not IPC::Cmd::run( command => [$^X, 'Makefile.PL'], verbose => 1 );
-		}
-    }
 } ## end if ($use_perl_autoconf)
-else {
-    my $from_dir = File::Spec->catdir(qw(engine read_only));
-    my $build_dir   = File::Spec->catdir(qw(engine gnu_ac_build));
-    ExtUtils::Install::install(
-        [ from_to => { $from_dir => $build_dir }, verbose => 1 ] );
-    my $stamp_file = 'stamp-h1';
 
-    chdir $build_dir;
-    File::Path::rmtree( $stamp_file, 0, 0 );
-
+{
     my $shell            = $Config{sh};
     my $configure_script = 'configure';
     if ($verbose) {
         say join q{ }, "Running command:", $shell, $configure_script,
-            @configure_command_args
-            or die "print failed: $ERRNO";
+          @configure_command_args
+          or die "print failed: $ERRNO";
     }
-    if (not IPC::Cmd::run(
+    if (
+        not IPC::Cmd::run(
             command => [ $shell, $configure_script, @configure_command_args ],
             verbose => 1
         )
-        )
+      )
     {
         die "Failed: $configure_script\n",
-         "Current directory: $build_dir\n",
-        'Cannot run libmarpa configure';
+          "Current directory: $build_dir\n",
+          'Cannot run libmarpa configure';
     } ## end if ( not IPC::Cmd::run( command => [ $shell, $configure_script...]))
-} ## end else [ if ($use_perl_autoconf) ]
+}
 
 chdir $cwd;
 
@@ -625,8 +602,8 @@ engine/gnu_ac_build/.libs/libmarpa$(LIB_EXT): engine/read_only/stamp-h1
 	-$(TOUCH) engine/gnu_ac_build/config.h.in
 	cd engine/gnu_ac_build && $(MAKE)
 
-engine/perl_ac_build/libmarpa$(LIB_EXT): engine/read_only/stamp-h1
-	cd engine/perl_ac_build && $(MAKE) && cp blib/arch/auto/libmarpa/libmarpa$(LIB_EXT) .
+engine/perl_ac_build/.libs/libmarpa$(LIB_EXT): engine/read_only/stamp-h1
+	cd engine/perl_ac_build && $(MAKE)
 
 xs/R3.o: xs/libmarpa$(LIB_EXT) \
     xs/marpa.h \
@@ -650,7 +627,7 @@ xs/marpa.h: engine/perl_ac_build/marpa.h
 xs/marpa_codes.h: engine/perl_ac_build/marpa_codes.h
 	cp $? $@
 
-xs/libmarpa$(LIB_EXT): engine/perl_ac_build/libmarpa$(LIB_EXT)
+xs/libmarpa$(LIB_EXT): engine/perl_ac_build/.libs/libmarpa$(LIB_EXT)
 	cp $? $@
 
 EOT

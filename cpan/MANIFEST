@@ -16,17 +16,14 @@
 # LC_ALL=C sort
 .gdbinit
 .gitattributes
-.gitignore
 COPYING.LESSER
 Changes
 INSTALL
 LICENSE
 MANIFEST
 MANIFEST.SKIP
-META.json
-META.yml
+Makefile.PL
 README
-author.t/.gitignore
 author.t/Makefile
 author.t/accept_tidy
 author.t/ampersand.t
@@ -88,7 +85,6 @@ engine/read_only/missing
 engine/read_only/stamp-h1
 engine/read_only/win32/do_config_h.pl
 engine/read_only/win32/marpa.def
-etc/.gitignore
 etc/Makefile
 etc/check_license.pl
 etc/check_links.pl
@@ -103,9 +99,7 @@ etc/pod_inlinks.pl
 etc/pod_links.pl
 etc/reserved_check.sh
 g/config/default.txt
-html/.gitignore
 html/lib/Marpa/R3/HTML.pm
-html/lib/Marpa/R3/HTML/.gitignore
 html/lib/Marpa/R3/HTML/Callback.pm
 html/lib/Marpa/R3/HTML/Config.pm
 html/lib/Marpa/R3/HTML/Config/Compile.pm
@@ -144,9 +138,7 @@ inc/Marpa/R3/Display.pm
 inc/Marpa/R3/License.pm
 inc/Marpa/R3/Test.pm
 inc/Marpa/R3/legal.pl
-lib/Marpa/.gitignore
 lib/Marpa/R3.pm
-lib/Marpa/R3/.gitignore
 lib/Marpa/R3/ASF.pm
 lib/Marpa/R3/Grammar.pm
 lib/Marpa/R3/Internal.pm
@@ -182,8 +174,6 @@ pod/Support.pod
 pod/Tracing.pod
 pod/Tutorial2.pod
 pperl/Marpa/R3/Perl.pm
-pperl/Marpa/R3/Perl/.gitignore
-t/.gitignore
 t/00-load.t
 t/ah2.t
 t/ah_numeric.t
@@ -251,8 +241,8 @@ t/sl_discard3.t
 t/sl_dsl.t
 t/sl_durand.t
 t/sl_dyck.t
-t/sl_evinit.t
 t/sl_event.t
+t/sl_evinit.t
 t/sl_evsyn.t
 t/sl_evsyn2.t
 t/sl_exhaust.t
@@ -292,8 +282,7 @@ t/thin_deprec.t
 t/thin_eq.t
 t/timeflies.t
 t/use.t
-xs/typemap
-xs/.gitignore
+xs/meta_make
 xs/Makefile.PL
 xs/R3.xs
 xs/create_ops.pl
@@ -301,3 +290,4 @@ xs/general_pattern.xsh
 xs/gp_generate.pl
 xs/marpa_slifop.h
 xs/ppport.h
+xs/typemap
