@@ -15,7 +15,7 @@
 
 package Marpa::R3::Thin::Trace;
 
-use 5.010;
+use 5.010001;
 use warnings;
 use strict;
 

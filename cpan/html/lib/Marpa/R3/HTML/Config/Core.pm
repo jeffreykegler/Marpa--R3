@@ -15,7 +15,7 @@
 
 package Marpa::R3::HTML::Internal::Core;
 
-use 5.010;
+use 5.010001;
 use strict;
 use warnings;
 use Data::Dumper;
