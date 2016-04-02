@@ -361,7 +361,7 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     my $discard_default_adverbs = $hashed_source->{discard_default_adverbs};
     my $lexeme_declarations     = $hashed_source->{lexeme_declarations};
     my $lexeme_default_adverbs  = $hashed_source->{lexeme_default_adverbs};
-    my $latm_default_value      = $lexeme_default_adverbs->{latm} // 0;
+    my $latm_default_value      = $lexeme_default_adverbs->{latm} // 1;
 
     # Current lexeme data is spread out in many places.
     # Change so that it all resides in this hash, indexed by
