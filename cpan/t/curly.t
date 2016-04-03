@@ -14,8 +14,8 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-# CENSUS: TODO
-
+# CENSUS: PPERL TEST -- DELETE
+# Delete entire Perl parsing prototype along with NAIF
 
 use 5.010001;
 use warnings;
