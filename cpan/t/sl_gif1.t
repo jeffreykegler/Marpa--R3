@@ -14,6 +14,9 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
+# CENSUS: SLIF TEST -- KEEP
+
+
 # Tests which require only a GIF combination-- a grammar (G),
 # input (I), and an (F) ASF output, with no semantics
 

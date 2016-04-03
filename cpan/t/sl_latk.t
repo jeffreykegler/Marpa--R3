@@ -14,6 +14,9 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
+# CENSUS: SLIF TEST -- KEEP
+
+
 # Based on Github issue #254 -- constructor invoked
 # on per-parse argument, which should not happen.
 

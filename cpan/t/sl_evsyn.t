@@ -14,6 +14,9 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
+# CENSUS: SLIF TEST -- KEEP
+
+
 # Example for synopsis in POD for overview of SLIF parse events
 
 use 5.010001;

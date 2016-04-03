@@ -14,6 +14,9 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
+# CENSUS: SLIF TEST -- KEEP
+
+
 # Test of scannerless parsing -- prefix addition
 
 use 5.010001;

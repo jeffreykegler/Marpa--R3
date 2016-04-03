@@ -14,6 +14,9 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
+# CENSUS: SLIF TEST -- KEEP
+
+
 # Test of scannerless parsing -- predicted, nulled and completed events with 
 # deactivation and reactivation
 

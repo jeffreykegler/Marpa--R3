@@ -14,6 +14,9 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
+# CENSUS: SLIF TEST -- KEEP
+
+
 # Tests of ambiguity detection in the target grammar
 # (as opposed to the SLIF DSL itself).
 

@@ -13,6 +13,9 @@
 # You should have received a copy of the GNU Lesser
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
+
+# CENSUS: SLIF TEST -- KEEP
+
 #
 use 5.010001;
 use strict;

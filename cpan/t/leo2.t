@@ -13,6 +13,9 @@
 # You should have received a copy of the GNU Lesser
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
+
+# CENSUS: TODO
+
 # The example from p. 166 of Leo's paper.
 
 use 5.010001;

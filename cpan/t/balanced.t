@@ -14,6 +14,9 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
+# CENSUS: DUPLICATE -- DELETE
+# ROUGH DUPLICATE of sl_bracket.t
+
 use 5.010001;
 use strict;
 use warnings;

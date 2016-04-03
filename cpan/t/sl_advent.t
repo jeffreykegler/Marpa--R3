@@ -14,6 +14,9 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
+# CENSUS: SLIF TEST -- KEEP
+
+
 # This example is from a Perl 6 advent blog post
 # (Day 18 2013) by Dwarring, adapted to Marpa by Jean-Damien
 # Durand.

@@ -13,6 +13,9 @@
 # You should have received a copy of the GNU Lesser
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
+
+# CENSUS: TODO
+
 # Catch the case of a final non-nulling symbol at the end of a rule
 # which has more than 2 proper nullables
 # This is to test an untested branch of the CHAF logic.

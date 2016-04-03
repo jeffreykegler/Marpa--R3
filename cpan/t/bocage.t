@@ -14,6 +14,8 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
+# CENSUS: NAIF INTERNALS TEST -- DELETE
+
 # This test dumps the contents of the bocage and its iterator.
 # The example grammar is Aycock/Horspool's
 # "Practical Earley Parsing",
