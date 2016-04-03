@@ -29,9 +29,6 @@ use Data::Dumper;
 
 my $progress_report = q{};
 
-# Marpa::R3::Display
-# name: Debug Example Part 1
-
 my $grammar = Marpa::R3::Grammar->new(
     {   start          => 'Expression',
         actions        => 'My_Actions',
@@ -57,21 +54,11 @@ my $grammar = Marpa::R3::Grammar->new(
     }
 );
 
-# Marpa::R3::Display::End
-
 ## no critic (InputOutput::RequireBriefOpen)
 open my $trace_fh, q{>}, \( my $trace_output = q{} );
 ## use critic
 
-# Marpa::R3::Display
-# name: Grammar set Synopsis
-
 $grammar->set( { trace_file_handle => $trace_fh } );
-
-# Marpa::R3::Display::End
-
-# Marpa::R3::Display
-# name: Debug Example Part 2
 
 $grammar->precompute();
 
@@ -106,17 +93,10 @@ TOKEN: for my $token_and_value (@tokens) {
 
 $progress_report = $recce->show_progress( 0, -1 );
 
-# Marpa::R3::Display::End
-
 my $value_ref = $recce->value;
 my $value = $value_ref ? ${$value_ref} : 'No Parse';
 
 Test::More::is( $value, 42, 'value' );
-
-# Marpa::R3::Display
-# name: Debug Example Progress Report
-# start-after-line: END_PROGRESS_REPORT
-# end-before-line: '^END_PROGRESS_REPORT$'
 
 Marpa::R3::Test::is( $progress_report,
     <<'END_PROGRESS_REPORT', 'progress report' );
@@ -135,30 +115,16 @@ R4:1 x2 @0,2-3 Factor -> Factor . Multiply Factor
 F4 @0-3 Factor -> Factor Multiply Factor .
 END_PROGRESS_REPORT
 
-# Marpa::R3::Display::End
-
 $Data::Dumper::Indent = 0;
 $Data::Dumper::Terse  = 1;
 
-# Marpa::R3::Display
-# name: progress(0) example
-
 my $report0 = $recce->progress(0);
-
-# Marpa::R3::Display::End
-
-# Marpa::R3::Display
-# name: progress() output at location 0
-# start-after-line: END_PROGRESS_REPORT
-# end-before-line: '^END_PROGRESS_REPORT$'
 
 chomp( my $expected_report0 = <<'END_PROGRESS_REPORT');
 [[0,0,0],[2,0,0],[4,0,0]]
 END_PROGRESS_REPORT
 Marpa::R3::Test::is( Data::Dumper::Dumper($report0),
     $expected_report0, 'progress report at location 0' );
-
-# Marpa::R3::Display::End
 
 # Try again with negative index
 $report0 = $recce->progress(-4);
@@ -167,18 +133,11 @@ Marpa::R3::Test::is( Data::Dumper::Dumper($report0),
 
 my $report1 = $recce->progress(1);
 
-# Marpa::R3::Display
-# name: progress() output at location 1
-# start-after-line: END_PROGRESS_REPORT
-# end-before-line: '^END_PROGRESS_REPORT$'
-
 chomp( my $expected_report1 = <<'END_PROGRESS_REPORT');
 [[0,-1,0],[2,-1,0],[4,1,0]]
 END_PROGRESS_REPORT
 Marpa::R3::Test::is( Data::Dumper::Dumper($report1),
     $expected_report1, 'progress report at location 1' );
-
-# Marpa::R3::Display::End
 
 # Try again with negative index
 $report1 = $recce->progress(-3);
@@ -187,43 +146,24 @@ Marpa::R3::Test::is( Data::Dumper::Dumper($report1),
 
 my $report2 = $recce->progress(2);
 
-# Marpa::R3::Display
-# name: progress() output at location 2
-# start-after-line: END_PROGRESS_REPORT
-# end-before-line: '^END_PROGRESS_REPORT$'
-
 chomp( my $expected_report2 = <<'END_PROGRESS_REPORT');
 [[2,0,2],[4,0,2],[4,2,0]]
 END_PROGRESS_REPORT
 Marpa::R3::Test::is( Data::Dumper::Dumper($report2),
     $expected_report2, 'progress report at location 2' );
 
-# Marpa::R3::Display::End
-
 # Try again with negative index
 $report2 = $recce->progress(-2);
 Marpa::R3::Test::is( Data::Dumper::Dumper($report2),
     $expected_report2, 'progress report at location -2' );
 
-# Marpa::R3::Display
-# name: progress() example
-
 my $latest_report = $recce->progress();
-
-# Marpa::R3::Display::End
-
-# Marpa::R3::Display
-# name: progress() output at location 3
-# start-after-line: END_PROGRESS_REPORT
-# end-before-line: '^END_PROGRESS_REPORT$'
 
 chomp( my $expected_report3 = <<'END_PROGRESS_REPORT');
 [[0,-1,0],[2,-1,2],[4,-1,0],[4,1,0],[4,1,2]]
 END_PROGRESS_REPORT
 Marpa::R3::Test::is( Data::Dumper::Dumper($latest_report),
     $expected_report3, 'progress report at location 3' );
-
-# Marpa::R3::Display::End
 
 # Try latest report again with explicit index
 my $report3 = $recce->progress(3);
@@ -234,11 +174,6 @@ Marpa::R3::Test::is( Data::Dumper::Dumper($report3),
 $latest_report = $recce->progress(-1);
 Marpa::R3::Test::is( Data::Dumper::Dumper($latest_report),
     $expected_report3, 'progress report at location -1' );
-
-# Marpa::R3::Display
-# name: Debug Example Trace Output
-# start-after-line: END_TRACE_OUTPUT
-# end-before-line: '^END_TRACE_OUTPUT$'
 
 Marpa::R3::Test::is( $trace_output, <<'END_TRACE_OUTPUT', 'trace output' );
 Inaccessible symbol: Add
@@ -253,10 +188,6 @@ Accepted "Number" at 2-3
 Expecting "Multiply" at 3
 Rejected "Add" at 3-4
 END_TRACE_OUTPUT
-
-# Marpa::R3::Display::End
-
-1;    # In case used as "do" file
 
 # Local Variables:
 #   mode: cperl

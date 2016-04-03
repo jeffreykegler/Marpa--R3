@@ -30,9 +30,6 @@ use Marpa::R3;
 
 my $trace_rules = q{};
 
-# Marpa::R3::Display
-# name: Action context synopsis
-
 sub do_S {
     my ($action_object) = @_;
     my $rule_id = $Marpa::R3::Context::rule;
@@ -46,11 +43,6 @@ sub do_S {
     return $action_object;
 } ## end sub do_S
 
-# Marpa::R3::Display::End
-
-# Marpa::R3::Display
-# name: Semantics bail synopsis
-
 my $bail_message = "This is a bail out message!";
 
 sub do_bail_with_message_if_A {
@@ -63,8 +55,6 @@ sub do_bail_with_object_if_A {
     Marpa::R3::Context::bail([$bail_message]) if $terminal eq 'A';
 }
 
-# Marpa::R3::Display::End
-
 my @terminals = qw/A B C D/;
 my $grammar   = Marpa::R3::Grammar->new(
     {   start => 'S',
@@ -76,12 +66,7 @@ my $grammar   = Marpa::R3::Grammar->new(
 
 $grammar->precompute();
 
-# Marpa::R3::Display
-# name: rule_ids() Synopsis
-
 my @rule_ids = $grammar->rule_ids();
-
-# Marpa::R3::Display::End
 
 Test::More::is( ( join q{ }, @rule_ids ), '0', '$g->rule_ids() ok?' );
 

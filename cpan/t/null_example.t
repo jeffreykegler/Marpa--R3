@@ -45,9 +45,6 @@ sub restore_stdout {
     return 1;
 }
 
-# Marpa::R3::Display
-# name: Null Value Example
-
 sub do_L {
     shift;
     return 'L(' . ( join q{;}, map { $_ // '[ERROR!]' } @_ ) . ')';
@@ -99,20 +96,11 @@ my $recce = Marpa::R3::Recognizer->new( { grammar => $grammar } );
 
 $recce->read( 'x', 'x' );
 
-# Marpa::R3::Display::End
-
 ## use critic
-
-# Marpa::R3::Display
-# name: Null Value Example Output
-# start-after-line: END_OF_OUTPUT
-# end-before-line: '^END_OF_OUTPUT$'
 
 chomp( my $expected = <<'END_OF_OUTPUT');
 S(L(null A;null B;X(x));null R)
 END_OF_OUTPUT
-
-# Marpa::R3::Display::End
 
 my $value = $recce->value();
 Marpa::R3::Test::is( ${$value}, $expected, 'Null example' );

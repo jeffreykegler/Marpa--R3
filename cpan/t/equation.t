@@ -98,13 +98,8 @@ $grammar->precompute();
 my $actual_ref;
 $actual_ref = save_stdout();
 
-# Marpa::R3::Display
-# name: show_symbols Synopsis
-
 print $grammar->show_symbols()
     or die "print failed: $ERRNO";
-
-# Marpa::R3::Display::End
 
 restore_stdout();
 
@@ -117,13 +112,8 @@ END_SYMBOLS
 
 $actual_ref = save_stdout();
 
-# Marpa::R3::Display
-# name: show_rules Synopsis
-
 print $grammar->show_rules()
     or die "print failed: $ERRNO";
-
-# Marpa::R3::Display::End
 
 restore_stdout();
 
@@ -162,13 +152,8 @@ EOS
 
 $actual_ref = save_stdout();
 
-# Marpa::R3::Display
-# name: show_problems Synopsis
-
 print $grammar->show_problems()
     or die "print failed: $ERRNO";
-
-# Marpa::R3::Display::End
 
 Marpa::R3::Test::is(
     ${$actual_ref},
@@ -320,13 +305,8 @@ restore_stdout();
 
 $actual_ref = save_stdout();
 
-# Marpa::R3::Display
-# name: show_progress Synopsis
-
 print $recce->show_progress()
     or die "print failed: $ERRNO";
-
-# Marpa::R3::Display::End
 
 Marpa::R3::Test::is( ${$actual_ref},
     <<'END_OF_PROGRESS_REPORT', 'Ambiguous Equation Progress Report' );
@@ -348,12 +328,7 @@ my %expected_value = (
 # Set max at 10 just in case there's an infinite loop.
 # This is for debugging, after all
 
-# Marpa::R3::Display
-# name: Recognizer set Synopsis
-
 $recce->set( { max_parses => 10, } );
-
-# Marpa::R3::Display::End
 
 my $i = 0;
 while ( defined( my $value = $recce->value() ) ) {

@@ -270,8 +270,7 @@ name: SLIF debug example error message
 partial: 1
 normalize-whitespace: 1
 
-    Error in SLIF parse: No lexemes accepted at line 1, column 18
-      Rejected lexeme #0: '*'; value="*"; length = 1
+    Error in SLIF parse: No lexeme found at line 1, column 18
     * String before error: a = 8675309 + 42\s
     * The error was at line 1, column 18, and at character 0x002a '*', ...
     * here: * 711
@@ -357,7 +356,6 @@ partial: 1
 normalize-whitespace: 1
 
     Discarded lexeme L1c17: whitespace
-    Rejected lexeme L1c18: '*'; value="*"
 
 =for Marpa::R3::Display::End
 
@@ -1011,8 +1009,7 @@ partial: 1
 remove-display-indent: 1
 remove-blank-last-line: 1
 
-    Error in SLIF parse: No lexemes accepted at line 1, column 18
-      Rejected lexeme #0: '*'; value="*"; length = 1
+    Error in SLIF parse: No lexeme found at line 1, column 18
     * String before error: a = 8675309 + 42\s
     * The error was at line 1, column 18, and at character 0x002a '*', ...
     * here: * 711
@@ -1066,16 +1063,12 @@ remove-blank-last-line: 1
     Discarded lexeme L1c2: whitespace
     Accepted lexeme L1c3 e2: '='; value="="
     Discarded lexeme L1c4: whitespace
-    Rejected lexeme L1c5-11: number; value="8675309"
     Accepted lexeme L1c5-11 e3: variable; value="8675309"
     Discarded lexeme L1c12: whitespace
-    Rejected lexeme L1c13: '+'; value="+"
     Accepted lexeme L1c13 e4: '+'; value="+"
     Discarded lexeme L1c14: whitespace
-    Rejected lexeme L1c15-16: number; value="42"
     Accepted lexeme L1c15-16 e5: variable; value="42"
     Discarded lexeme L1c17: whitespace
-    Rejected lexeme L1c18: '*'; value="*"
 
 =for Marpa::R3::Display::End
 

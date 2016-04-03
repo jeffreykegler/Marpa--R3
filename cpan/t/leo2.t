@@ -81,12 +81,7 @@ LEO_FLAG: for my $leo_flag ( 0, 1 ) {
 
     my $i = 0;
 
-# Marpa::R3::Display
-# name: latest_earley_set() Synopsis
-
     my $latest_earley_set = $recce->latest_earley_set();
-
-# Marpa::R3::Display::End
 
     my $max_size          = $recce->earley_set_size($latest_earley_set);
     TOKEN: while ( $i++ < $length ) {

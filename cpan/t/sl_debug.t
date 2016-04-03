@@ -106,8 +106,7 @@ $progress_report = $recce->show_progress( 0, -1 );
 
 $eval_error =~ s/^(Marpa::R3 \s+ exception \s+ at) .*/$1\n/xms;
 Marpa::R3::Test::is($eval_error, <<'END_OF_TEXT', 'Error message before fix');
-Error in SLIF parse: No lexemes accepted at line 1, column 18
-  Rejected lexeme #0: '*'; value="*"; length = 1
+Error in SLIF parse: No lexeme found at line 1, column 18
 * String before error: a = 8675309 + 42\s
 * The error was at line 1, column 18, and at character 0x002a '*', ...
 * here: * 711
@@ -316,16 +315,12 @@ Accepted lexeme L1c1 e1: variable; value="a"
 Discarded lexeme L1c2: whitespace
 Accepted lexeme L1c3 e2: '='; value="="
 Discarded lexeme L1c4: whitespace
-Rejected lexeme L1c5-11: number; value="8675309"
 Accepted lexeme L1c5-11 e3: variable; value="8675309"
 Discarded lexeme L1c12: whitespace
-Rejected lexeme L1c13: '+'; value="+"
 Accepted lexeme L1c13 e4: '+'; value="+"
 Discarded lexeme L1c14: whitespace
-Rejected lexeme L1c15-16: number; value="42"
 Accepted lexeme L1c15-16 e5: variable; value="42"
 Discarded lexeme L1c17: whitespace
-Rejected lexeme L1c18: '*'; value="*"
 END_TRACE_OUTPUT
 
 # Marpa::R3::Display::End
