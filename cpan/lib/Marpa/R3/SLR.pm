@@ -1054,7 +1054,13 @@ sub Marpa::R3::Scanless::R::resume {
 
             # Recover by registering character, if we can
             my $codepoint = $thin_slr->codepoint();
-            my $character = chr($codepoint);
+            # say STDERR ${$slr->[Marpa::R3::Internal::Scanless::R::P_INPUT_STRING]} ;
+            # say STDERR 
+                # utf8::is_utf8( ${$slr->[Marpa::R3::Internal::Scanless::R::P_INPUT_STRING]} ) ? "is utf8" : "is NOT utf8";
+            my $character = 
+                substr ${$slr->[Marpa::R3::Internal::Scanless::R::P_INPUT_STRING]},
+                   $thin_slr->pos(), 1;
+           # say STDERR join " ", "Character via string vs. codepoint:", $character, (ord $character), (chr $codepoint), $codepoint;
             my $character_class_table =
                 $slg->[Marpa::R3::Internal::Scanless::G::CHARACTER_CLASS_TABLES]
                 ->[0];
