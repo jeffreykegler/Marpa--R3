@@ -42,8 +42,6 @@ my $grammar = Marpa::R3::Grammar->new(
     }
 );
 
-# Marpa::R3::Display::End
-
 $grammar->precompute();
 
 my $recce = Marpa::R3::Recognizer->new( { grammar => $grammar } );
@@ -56,22 +54,12 @@ for (1 .. 20) {
 # The call to current earlem is Useless,
 # but provides an example for the docs
 
-# Marpa::R3::Display
-# name: current_earleme Example
-
 $current_earleme = $recce->current_earleme();
-
-# Marpa::R3::Display::End
 
 $progress_report = $recce->show_progress();
 
 my $value_ref = $recce->value;
 Test::More::ok( $value_ref, 'Parse ok?' );
-
-# Marpa::R3::Display
-# name: Debug Leo Example Progress Report
-# start-after-line: END_PROGRESS_REPORT
-# end-before-line: '^END_PROGRESS_REPORT$'
 
 Marpa::R3::Test::is( $progress_report,
     <<'END_PROGRESS_REPORT', 'sorted progress report' );
@@ -90,10 +78,6 @@ F5 @19-20 Lower_Middle -> Bottom .
 P6 @20-20 Bottom -> . T
 F6 @19-20 Bottom -> T .
 END_PROGRESS_REPORT
-
-# Marpa::R3::Display::End
-
-1;    # In case used as "do" file
 
 # Local Variables:
 #   mode: cperl
