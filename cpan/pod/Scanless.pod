@@ -30,7 +30,7 @@ normalize-whitespace: 1
             source        => \(<<'END_OF_SOURCE'),
     :default ::= action => [values] bless => ::lhs
     lexeme default = action => [ start, length, value ]
-        bless => ::name latm => 1
+        bless => ::name
 
     :start ::= Script
     Script ::= Expression+ separator => comma
@@ -381,11 +381,7 @@ So in practice I will usually simply refer to "lexemes".
 
 =head1 Longest acceptable tokens match
 
-If you specify
-"C<< latm => 1 >>"
-as the default,
-which you almost always should,
-the L0 grammar looks for tokens on a
+The L0 grammar looks for tokens on a
 longest acceptable tokens match (LATM) basis.
 Tokens which the structural grammar would reject
 are thrown away.
@@ -398,9 +394,6 @@ so several tokens may be "longest".
 When that happens, Marpa
 uses the full set of longest tokens
 in looking for possible parses.
-For more about LATM and its alternative, LTM,
-see L<the detailed description of the C<latm>
-adverb|Marpa::R3::Scanless::DSL/"latm">.
 
 =head1 Semantics
 

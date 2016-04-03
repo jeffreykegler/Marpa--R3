@@ -231,11 +231,6 @@ END_OF_SOURCE
 # Test of forgiving token from Peter Stuifzand
 if (1) {
 
-# Marpa::R3::Display
-# name: forgiving adverb example
-# start-after-line: END_OF_SOURCE
-# end-before-line: '^END_OF_SOURCE$'
-
     my $source = <<'END_OF_SOURCE';
 :default ::= action => ::array
 product ::= sku (nl) name (nl) price price price (nl)
@@ -255,8 +250,6 @@ name      ~ [^\n]+
 
 END_OF_SOURCE
 
-# Marpa::R3::Display::END
-
     my $input = <<'INPUT';
 130.12312
 Descriptive line
@@ -275,11 +268,6 @@ INPUT
 # Test of LATM token from Ruslan Zakirov
 if (1) {
 
-# Marpa::R3::Display
-# name: latm adverb example
-# start-after-line: END_OF_SOURCE
-# end-before-line: '^END_OF_SOURCE$'
-
     my $source = <<'END_OF_SOURCE';
 :default ::= action => ::array
 :start ::= content
@@ -288,8 +276,6 @@ name ~ [A-Za-z0-9-]+
 value ~ [A-Za-z0-9:-]+
 :lexeme ~ value latm => 1
 END_OF_SOURCE
-
-# Marpa::R3::Display
 
     my $input = 'UID:urn:uuid:4fbe8971-0bc3-424c-9c26-36c3e1eff6b1';
     my $expected_output =

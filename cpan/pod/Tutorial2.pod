@@ -27,7 +27,6 @@ normalize-whitespace: 1
 
     my $dsl = <<'END_OF_DSL';
     :default ::= action => [name,values]
-    lexeme default = latm => 1
     Calculator ::= Expression action => ::first
 
     Factor ::= Number action => ::first

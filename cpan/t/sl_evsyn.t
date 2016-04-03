@@ -36,7 +36,6 @@ use Marpa::R3;
 
 my $dsl = <<'END_OF_DSL';
 :default ::= action => [name,values]
-lexeme default = latm => 1
 
 test ::= a b c d e e f g h action => main::forty_two
     | a ambig1 | a ambig2

@@ -31,7 +31,7 @@ normalize-whitespace: 1
             source        => \(<<'END_OF_SOURCE'),
     :default ::= action => [values] bless => ::lhs
     lexeme default = action => [ start, length, value ]
-        bless => ::name latm => 1
+        bless => ::name
 
     :start ::= Script
     Script ::= Expression+ separator => comma
@@ -803,7 +803,7 @@ partial: 1
 normalize-whitespace: 1
 
     lexeme default = action => [ start, length, value ]
-        bless => ::name latm => 
+        bless => ::name
 
 =for Marpa::R3::Display::End
 
@@ -822,8 +822,7 @@ It only changes the defaults for lexemes,
 and does not affect rules.
 Only the defaults for
 the L<C<action>|/"action">,
-L<C<bless>|/"bless">,
-and L<C<latm>|/"latm">
+and L<C<bless>|/"bless">
 adverbs
 can be specified in a lexeme default statement.
 Only one lexeme default statement is allowed in a grammar.
@@ -1111,99 +1110,6 @@ and the use of unnamed events is
 strongly discouraged.
 SLIF parse events are described in detail in
 L<a separate document|Marpa::R3::Event>.
-
-=head2 forgiving
-
-=for Marpa::R3::Display
-name: forgiving adverb example
-partial: 1
-normalize-whitespace: 1
-
-    :lexeme ~ <name> forgiving => 1
-
-=for Marpa::R3::Display::End
-
-The forgiving adverb is a synonym for 
-L<the C<latm> adverb|/"latm">.
-
-=head2 latm
-
-=for Marpa::R3::Display
-name: latm adverb example
-partial: 1
-normalize-whitespace: 1
-
-    :lexeme ~ value latm => 1
-
-=for Marpa::R3::Display::End
-
-The C<latm> adverb applies only to lexemes and
-is only allowed in 
-L<a C<:lexeme> pseudo-rule|/"Lexeme pseudo-rule"> and 
-L<a C<lexeme default> statement|/"Lexeme default statement">.
-Its value is a boolean.
-If the boolean is set it indicates that a token
-is LATM.
-A value of 1 is recommended, which indicates
-that a token is LATM.
-The default value is 0,
-for reasons of backward compatibility.
-
-LATM means "longest acceptable tokens match".
-In this,
-the lexer find those tokens that
-are the longest that
-would be accepted by the G1 grammar.
-There may be more than one
-such "longest" acceptable token,
-in which case, the lexing will be ambiguous,
-and the parse will use all of the matching tokens.
-
-The alternative to LATM, and the default, is
-the "longest tokens match" (LTM) discipline.
-LTM is similar to LATM, except that it
-takes no account of whether a token would
-be acceptable to the G1 grammar.
-This makes it possible that LTM will find
-one or more lexemes that are a longest match,
-and none of them will be acceptable to G1.
-When that happens, the parse fails with an error message.
-This failure occurs even if shorter
-lexemes would have been
-found using LATM,
-lexemes which would have
-been acceptable to the G1 grammar.
-This means that matching succeeds more often under LATM than 
-under LTM.
-
-Intuitively, LATM is a longest tokens match that considers context,
-while LTM is a longest tokens match that ignores context.
-LATM is usually preferable.
-Usually if LATM is chosen, a parse will want to use the 
-L<a C<lexeme default> statement|/"Lexeme default statement">
-and use LATM globally.
-It is possible to use LATM adverb on a lexeme by
-lexeme basis.  When that is done, the lexemes marked
-LATM will match only if acceptable to the G1 grammar,
-and the lexemes not marked LATM will match regardless
-of their acceptability to the G1 grammar.
-
-Whichever token discipline is chosen,
-all tokens matched will be of the same length.
-Shorter tokens will not be considered.
-
-LTM is the default for historical reasons.
-LTM was the SLIF's original token matching discipline because
-it more closely models traditional lexing.
-Also for historical reasons, LATM lexemes
-are sometimes called "forgiving" -- in the original implementation, an
-LTM search was always done for all lexemes,
-and LATM was implemented by "forgiving" rejection by the G1 grammar,
-and backing up over the input to find acceptable lexemes.
-Marpa now does LATM far more efficiently --
-the G1 grammar indicates to the lexer, in advance,
-which lexemes are acceptable, and the
-lexer searches only for those.
 
 =head2 name
 

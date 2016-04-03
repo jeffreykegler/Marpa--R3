@@ -27,7 +27,6 @@ normalize-whitespace: 1
 
     my $dsl = <<'END_OF_DSL';
     :default ::= action => [name,values]
-    lexeme default = latm => 1
 
     Calculator ::= Expression action => ::first
 
@@ -97,7 +96,6 @@ normalize-whitespace: 1
 
     my $dsl = <<'END_OF_DSL';
     :default ::= action => [name,values]
-    lexeme default = latm => 1
     
     Calculator ::= Expression action => ::first
 
@@ -155,7 +153,6 @@ partial: 1
 normalize-whitespace: 1
 
     :default ::= action => [name,values]
-    lexeme default = latm => 1
 
 =for Marpa::R3::Display::End
 
@@ -355,30 +352,16 @@ normalize-whitespace: 1
 In the above rule, the single-quoted string C<'+'> implicitly defines a L0 lexeme.
 Something similar happens with the C<'*'> string in the rule for a C<Term>.
 
-The SLIF's lexer mostly "does what you mean".
-While the input is being read, it looks for all lexemes defined in the DSL.
-Almost always, you'll want Marpa to look only for tokens that are
-actually acceptable to the parse.
-Telling Marpa to do so was the purpose of this line:
-
-=for Marpa::R3::Display
-name: Landing page synopsis
-partial: 1
-normalize-whitespace: 1
-
-    lexeme default = latm => 1
-
-=for Marpa::R3::Display::End
-
-LATM means "longest acceptable tokens match".
-(LATM is not the default for historical reasons.)
-
 Among the acceptable tokens,
-Marpa looks for longest matches -- if multiple tokens match,
-the longest match is the winner.
-Marpa tolerates ambiguity,
-so one feature special to Marpa is that LATM is a longest acceptable B<tokens> match --
-if more than one token is longest, all of them are considered in the parse.
+Marpa looks for longest matches.
+If more than one token is acceptable according
+to the grammar,
+then the longest match is the winner.
+
+What if the longest match is a tie?
+Marpa tolerates ambiguity.
+If more than one token tie for longest token,
+then all of these ``longest'' tokens are considered in the parse.
 The logic of SLIF lexing is described with more precision in the
 L<SLIF overview document|Marpa::R3::Scanless>.
 

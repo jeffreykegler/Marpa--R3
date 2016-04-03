@@ -30,7 +30,7 @@ normalize-whitespace: 1
             source        => \(<<'END_OF_SOURCE'),
     :default ::= action => [values] bless => ::lhs
     lexeme default = action => [ start, length, value ]
-        bless => ::name latm => 1
+        bless => ::name
 
     :start ::= Script
     Script ::= Expression+ separator => comma
@@ -450,7 +450,7 @@ partial: 1
 normalize-whitespace: 1
 
     lexeme default = action => [ start, length, value ]
-        bless => ::name latm => 1
+        bless => ::name
 
 =for Marpa::R3::Display::End
 
