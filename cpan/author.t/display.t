@@ -169,6 +169,13 @@ sub format_display {
 # second, and compare.
 sub compare {
     my ( $original, $copy ) = @_;
+    if ( $original->{partial} ) {
+        # say STDERR join " ",
+            # "Partial to partial comparison succeeds vacuously for",
+            # $original->{filename}, $copy->{filename};
+        return 1;
+    }
+    # say STDERR join " ", "Comparing", $original->{filename}, $copy->{filename};
     my $formatted_original =
         format_display( \$original->{content}, $copy, 0 );
     my $formatted_copy = format_display( \$copy->{content}, $copy, 1 );
