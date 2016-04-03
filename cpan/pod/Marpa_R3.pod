@@ -60,6 +60,19 @@ normalize-whitespace: 1
 =for Marpa::R3::Display::End
 
 =head1 Description
+ 
+=head2 Marpa::R3 is ALPHA and EXPERIMENTAL
+
+Marpa::R3 is in alpha status, and is experimental.
+Interfaces will change without notice.
+Agressive refactoring is likely,
+and this carries the risk of introducing bugs.
+Some features will be removed,
+and some releases will contain
+bugs which are only fixed in subsequent releases
+with a different interface.
+
+Please do not use Marpa::R3 for production.
 
 =head2 Overview
 
