@@ -100,18 +100,11 @@ my $grammar = Marpa::R3::Grammar->new(
                 action => 'number'
             },
         ],
-
-# Marpa::R3::Display
-# name: Symbol descriptor example
-
         symbols => {
             MinusMinus => { terminal => 1 },
             Minus      => { terminal => 1 },
             Number     => { terminal => 1 },
         },
-
-# Marpa::R3::Display::End
-
         default_action => 'default_action',
     },
 );

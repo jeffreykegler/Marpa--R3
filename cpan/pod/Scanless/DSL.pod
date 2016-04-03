@@ -1417,11 +1417,11 @@ For example, in the synopsis, the LHS symbol is
 C<Expression>.  The alternative
 
 =for Marpa::R3::Display
-name: Stuifzand Synopsis
+name: SLIF DSL Synopsis
 partial: 1
 normalize-whitespace: 1
 
-        (<op lparen>) Expression (<op rparen>)
+        '(' Expression ')'
 
 =for Marpa::R3::Display::End
 
@@ -1431,11 +1431,11 @@ The C<< <op lparen> >> and C<< <op rparen> >> are considered operators.
 In the RHS alternative
 
 =for Marpa::R3::Display
-name: Stuifzand Synopsis
+name: SLIF DSL Synopsis
 partial: 1
 normalize-whitespace: 1
 
-       Expression (<op pow>) Expression
+       Expression '**' Expression
 
 =for Marpa::R3::Display::End
 
@@ -1449,7 +1449,7 @@ For example,
 in the RHS alternative
 
 =for Marpa::R3::Display
-name: Stuifzand Synopsis
+name: SLIF DSL Synopsis
 partial: 1
 normalize-whitespace: 1
 
