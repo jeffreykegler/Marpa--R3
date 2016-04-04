@@ -558,7 +558,7 @@ INLINEHOOK
 
 } ## end if ($use_perl_autoconf)
 
-{
+else {
     my $shell            = $Config{sh};
     my $configure_script = 'configure';
     if ($verbose) {
