@@ -216,6 +216,7 @@ INPUT
 if (1) {
     my $grammar = Marpa::R3::Scanless::G->new(
         {   source => \(<<'END_OF_SOURCE'),
+:default ::= action => ::undef
 :start ::= null
 null ::=
 END_OF_SOURCE
@@ -327,7 +328,6 @@ if (1) {
 
     my $source = <<'END_OF_SOURCE';
 lexeme default = latm => 1
-:default ::= action => [name,values]
 :start ::= externals
 externals ::= external* action => [values]
 external ::= special action => ::first
@@ -394,7 +394,7 @@ END_OF_SOURCE
 if (1) {
 
 # Marpa::R3::Display
-# name: symbol, name array descriptor example
+# name: SLIF symbol, name array descriptor example
 # start-after-line: END_OF_SOURCE
 # end-before-line: '^END_OF_SOURCE$'
 

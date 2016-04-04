@@ -38,7 +38,6 @@ sub forty_two { return 42; };
 use Marpa::R3;
 
 my $dsl = <<'END_OF_DSL';
-:default ::= action => [name,values]
 
 test ::= a b c d e e f g h action => main::forty_two
     | a ambig1 | a ambig2

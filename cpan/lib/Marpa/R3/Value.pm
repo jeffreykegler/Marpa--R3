@@ -985,7 +985,7 @@ sub registration_init {
         my $semantics = $semantics_by_rule_id[$rule_id];
         my $blessing  = $blessing_by_rule_id[$rule_id];
 
-        $semantics = '::undef'  if $semantics eq '::!default';
+        $semantics = '[name,values]' if $semantics eq '::!default';
         $semantics = '[values]' if $semantics eq '::array';
         $semantics = '::undef'  if $semantics eq '::whatever';
         $semantics = '::rhs0'   if $semantics eq '::first';

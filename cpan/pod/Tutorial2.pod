@@ -26,7 +26,6 @@ normalize-whitespace: 1
     use Marpa::R3;
 
     my $dsl = <<'END_OF_DSL';
-    :default ::= action => [name,values]
     Calculator ::= Expression action => ::first
 
     Factor ::= Number action => ::first

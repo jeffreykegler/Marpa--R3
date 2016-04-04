@@ -36,7 +36,6 @@ use Marpa::R3::Test;
 use Marpa::R3;
 
 my $dsl = <<'END_OF_DSL';
-:default ::= action => [name,values]
 
 Calculator ::= Expression action => ::first
 

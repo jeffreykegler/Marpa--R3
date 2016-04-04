@@ -700,11 +700,11 @@ normalize-whitespace: 1
 =for Marpa::R3::Display::End
 
 =for Marpa::R3::Display
-name: SLIF "time flies" DSL synopsis
+name: SLIF symbol, name array descriptor example
 partial: 1
 normalize-whitespace: 1
 
-    :default ::= action => [ name, values ]
+    :default ::= action => [symbol, name, values]
 
 =for Marpa::R3::Display::End
 
@@ -1114,7 +1114,7 @@ L<a separate document|Marpa::R3::Event>.
 =head2 name
 
 =for Marpa::R3::Display
-name: symbol, name array descriptor example
+name: SLIF symbol, name array descriptor example
 partial: 1
 normalize-whitespace: 1
 

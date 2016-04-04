@@ -26,7 +26,6 @@ normalize-whitespace: 1
     use Marpa::R3;
 
     my $dsl = <<'END_OF_DSL';
-    :default ::= action => [name,values]
 
     Calculator ::= Expression action => ::first
 
@@ -108,7 +107,6 @@ partial: 1
 normalize-whitespace: 1
 
     my $dsl = <<'END_OF_DSL';
-    :default ::= action => [name,values]
     
     Calculator ::= Expression action => ::first
 
@@ -161,11 +159,11 @@ and pseudo-rules.
 =head2 The default pseudo-rule
 
 =for Marpa::R3::Display
-name: Landing page synopsis
+name: SLIF symbol, name array descriptor example
 partial: 1
 normalize-whitespace: 1
 
-    :default ::= action => [name,values]
+    :default ::= action => [symbol, name, values]
 
 =for Marpa::R3::Display::End
 
@@ -473,11 +471,11 @@ to which the C<value()> method
 returns a reference.
 
 =for Marpa::R3::Display
-name: Landing page synopsis
+name: SLIF symbol, name array descriptor example
 partial: 1
 normalize-whitespace: 1
 
-    :default ::= action => [name,values]
+    :default ::= action => [symbol, name, values]
 
 =for Marpa::R3::Display::End
 
