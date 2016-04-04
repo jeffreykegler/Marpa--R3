@@ -40,7 +40,6 @@ for my $grammar_setting (@settings) {
 :default ::= action => [g1start,g1length,name,values]
 discard default = event => :symbol=off
 lexeme default = action => [ g1start, g1length, start, length, value ]
-    latm => 1
 
 Script ::=
 :discard ~ whitespace event => ws=on
@@ -107,7 +106,6 @@ END_OF_SOURCE
 :default ::= action => [g1start,g1length,name,values]
 discard default = event => :symbol=off
 lexeme default = action => [ g1start, g1length, start, length, value ]
-    latm => 1
 
 text ::= a b
 a ~ 'a'
@@ -179,7 +177,6 @@ for my $ws_g_setting (@settings) {
 :default ::= action => [g1start,g1length,name,values]
 discard default = event => :symbol=off
 lexeme default = action => [ g1start, g1length, start, length, value ]
-    latm => 1
 
 Script ::=
 :discard ~ whitespace event => ws=on

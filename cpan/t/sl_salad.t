@@ -38,8 +38,7 @@ my $verbose;
 die if not Getopt::Long::GetOptions( verbose => \$verbose );
 
 my $grammar = << '=== GRAMMAR ===';
-:default ::= action => [ name, value ]
-lexeme default = action => [ name, value ] latm => 1 # to add token names to ast
+lexeme default = action => [ name, value ] # to add token names to ast
 
 <prefixed target> ::= prefix target
 prefix ::= <prefix lexeme>*

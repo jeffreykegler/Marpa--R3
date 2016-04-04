@@ -35,8 +35,6 @@ use Marpa::R3;
 my $n = 10;
 
 my $dsl = <<'=== END_OF_DSL ===';
-:default ::= action => [name,values]
-lexeme default = latm => 1
 
 sequence ::= A action => main::one
     | A sequence action => main::add

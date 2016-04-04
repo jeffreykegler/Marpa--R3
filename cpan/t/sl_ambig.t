@@ -135,7 +135,6 @@ else {
 
 # Tests of ambiguity_metric() anb ambiguous() across all ranking methods
 $source = \(<<'END_OF_SOURCE');
-lexeme default = latm => 1
 
 top ::= unchoice rank => 1
 top ::= choice

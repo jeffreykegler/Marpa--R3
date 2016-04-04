@@ -39,7 +39,6 @@ my $null_grammar = Marpa::R3::Scanless::G->new(
 :default ::= action => [g1start,g1length,name,values]
 discard default = event => :symbol=off
 lexeme default = action => [ g1start, g1length, start, length, value ]
-    latm => 1
 
 Script ::=
 :discard ~ whitespace event => ws
@@ -76,7 +75,6 @@ my $grammar2 = Marpa::R3::Scanless::G->new(
 :default ::= action => [g1start,g1length,name,values]
 discard default = event => :symbol=off
 lexeme default = action => [ g1start, g1length, start, length, value ]
-    latm => 1
 
 Script ::=
 :discard ~ whitespace event => ws
@@ -119,7 +117,6 @@ my $non_trivial_grammar = Marpa::R3::Scanless::G->new(
 :default ::= action => [g1start,g1length,name,values]
 discard default = event => :symbol=off
 lexeme default = action => [ g1start, g1length, start, length, value ]
-    latm => 1
 
 text ::= a b c
 a ~ 'a'

@@ -233,6 +233,7 @@ END_OF_SOURCE
 } ## end if (1)
 
 # Test of forgiving token from Peter Stuifzand
+# Note: forgiving is now the default
 if (1) {
 
     my $source = <<'END_OF_SOURCE';
@@ -249,7 +250,6 @@ nl        ~ [\n]
 sp        ~ [ ]+
 :discard  ~ sp
 
-:lexeme ~ <name> forgiving => 1
 name      ~ [^\n]+
 
 END_OF_SOURCE
@@ -278,7 +278,7 @@ if (1) {
 content ::= name ':' value
 name ~ [A-Za-z0-9-]+
 value ~ [A-Za-z0-9:-]+
-:lexeme ~ value latm => 1
+:lexeme ~ value
 END_OF_SOURCE
 
     my $input = 'UID:urn:uuid:4fbe8971-0bc3-424c-9c26-36c3e1eff6b1';
@@ -298,7 +298,6 @@ END_OF_SOURCE
 if (1) {
 
     my $source = <<'END_OF_SOURCE';
-lexeme default = latm => 1
 :default ::= action => ::array
 :start ::= content
 content ::= name ':' value
@@ -327,7 +326,6 @@ if (1) {
 # end-before-line: '^END_OF_SOURCE$'
 
     my $source = <<'END_OF_SOURCE';
-lexeme default = latm => 1
 :start ::= externals
 externals ::= external* action => [values]
 external ::= special action => ::first

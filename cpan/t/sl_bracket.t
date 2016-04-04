@@ -55,8 +55,7 @@ usage() if @ARGV;
 Test::More::plan tests => 5 if $TESTING;
 
 my $grammar = << '=== GRAMMAR ===';
-:default ::= action => [ name, value ]
-lexeme default = action => [ name, value ] latm => 1 # to add token names to ast
+lexeme default = action => [ name, value ] # to add token names to ast
 
 text ::= pieces
 pieces ::= piece*

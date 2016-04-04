@@ -34,8 +34,7 @@ use Data::Dumper;
 my $g = Marpa::R3::Scanless::G->new(
     {   source => \(<<'END_OF_SOURCE'),
 
-    :default ::= action => [ name, value]
-    lexeme default = action => [ name, value ] latm => 1
+    lexeme default = action => [ name, value ]
 
         Expr ::=
               Number

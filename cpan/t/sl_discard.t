@@ -40,7 +40,6 @@ my $grammar = Marpa::R3::Scanless::G->new(
     {
         source        => \(<<'END_OF_SOURCE'),
 :default ::= action => [g1start, g1length, values]
-lexeme default = latm => 1
 
 Script ::= Expression+ separator => comma action => do_expression
 comma ~ [,]

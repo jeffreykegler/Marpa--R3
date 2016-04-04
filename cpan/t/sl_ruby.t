@@ -31,8 +31,7 @@ die if not Getopt::Long::GetOptions( verbose => \$verbose );
 # This example tests the Ruby Slippers using the SLIF
 
 my $grammar = << '=== GRAMMAR ===';
-:default ::= action => [ name, value ]
-lexeme default = action => [ name, value ] latm => 1 # to add token names to ast
+lexeme default = action => [ name, value ] # to add token names to ast
 
 script ::= E+ separator => semi action => [values]
 E ::= 
