@@ -54,7 +54,7 @@ WriteMakefile(
 
 sub MY::top_targets {
     my $r = '
-all :: R3.o
+all :: R3$(OBJ_EXT)
 	$(NOECHO) $(NOOP)
 
 config ::
