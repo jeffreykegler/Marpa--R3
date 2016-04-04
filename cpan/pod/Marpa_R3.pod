@@ -156,31 +156,6 @@ L<SLIF's domain-specific language|Marpa::R3::Scanless::DSL>
 In this example, the DSL consists of several rules
 and pseudo-rules.
 
-=head2 The default pseudo-rule
-
-=for Marpa::R3::Display
-name: SLIF symbol, name array descriptor example
-partial: 1
-normalize-whitespace: 1
-
-    :default ::= action => [symbol, name, values]
-
-=for Marpa::R3::Display::End
-
-These two lines set useful defaults.
-The first sets a default semantics,
-one which is especially useful for development.
-This is a finished script, so the default semantics
-is not used much.
-We'll talk about this more when we discuss
-L<semantics at the end|/"Semantics">.
-
-The second line sets the longest acceptable tokens match (LATM)
-style of lexing,
-which is what you'll almost always want.
-It is not the default for historical reasons, so your scripts will
-almost always start with this line.
-
 =head2 A G1 rule
 
 Next follows a G1, or structural rule.
@@ -470,19 +445,7 @@ and this is the parse result value
 to which the C<value()> method
 returns a reference.
 
-=for Marpa::R3::Display
-name: SLIF symbol, name array descriptor example
-partial: 1
-normalize-whitespace: 1
-
-    :default ::= action => [symbol, name, values]
-
-=for Marpa::R3::Display::End
-
 Each non-leaf node determines its value with an action.
-The default pseudo-rule allows you to specify the default action.
-(It is a pseudo-rule because its LHS, "C<:default>", is a pseudo-symbol,
-not a real one.)
 Often actions are Perl functions, which in this context are
 called Perl semantic closures.
 
@@ -501,27 +464,24 @@ The value of the C<semantics_package> argument
 specifies the package that is used
 to find the Perl semantic closures.
 
-In this example the default semantics,
-as specified by the C<default_action> named argument,
-come from a "array descriptor" named "C<[name,values]>".
-This indicates that, by default, the value of a rule is to be
+By default, a Marpa rule returns
 a reference to an array consisting of the rule's name,
 followed by the values of its children.
-
-In this case,
-the semantics is not actually used,
-and you would usually change it to something more convenient
-for your application.
-But "C<[name,values]>" is an excellent starting point when you're
-first developing a DSL and, since this code is intended as a
-template, we've kept it.
+This semantics,
+which corresponds to the array descriptor "C<[name,values]>",
+is an excellent starting point
+when you are first developing a DSL, which is why it is the default.
 For more about array descriptors, see the L<semantics
 document|Marpa::R3::Semantics/"Array descriptor actions">
 
-The other way we specify semantics in this example
-is by using an
+In this example,
+Marpa's default semantics is not actually used --
+we always override it.
+In this example,
+we specify semantics
+by using an
 C<action> adverb
-for a RHS alternative.
+for each RHS alternative.
 We've seen the C<action> adverb several times,
 but skipped over it.
 Now it is time to look at it.

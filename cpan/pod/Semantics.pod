@@ -267,7 +267,19 @@ appropriate for lexemes.
 
 =head2 Rule actions
 
-The implicit action for a rule instance is to return a Perl C<undef>.
+The implicit action for a rule instance is
+that specified by the action descriptor
+C<[name,values]>.
+Array descriptors are described in detail
+L<below|"Array descriptor actions">.
+Peeking ahead, when a rule's array descriptor is
+C<[name,values]>,
+that rule returns a Perl array of I<n>+1 elements,
+where I<n> is the length of the RHS alternative.
+The first element is the "name" of the rule.
+The remaining I<n> elements are the values of the rule's
+RHS children, in lexical order.
+
 An explicit action for a RHS alternative can be specified using
 L<the C<action> adverb|Marpa::R3::Scanless::DSL/"action">
 for the its RHS alternative.
