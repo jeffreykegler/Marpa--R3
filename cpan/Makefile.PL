@@ -603,7 +603,9 @@ engine/gnu_ac_build/.libs/libmarpa$(LIB_EXT): engine/read_only/stamp-h1
 	cd engine/gnu_ac_build && $(MAKE)
 
 engine/perl_ac_build/.libs/libmarpa$(LIB_EXT): engine/read_only/stamp-h1
-	cd engine/perl_ac_build && $(MAKE)
+	cd engine/perl_ac_build && $(PERLRUN) Makefile.PL && $(MAKE)
+	$(MKPATH) engine/perl_ac_build/.libs
+	cp engine/perl_ac_build/libmarpa$(LIB_EXT) engine/perl_ac_build/.libs
 
 xs/R3.o: xs/libmarpa$(LIB_EXT) \
     xs/marpa.h \
