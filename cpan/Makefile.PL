@@ -403,7 +403,7 @@ WriteMakefile(
     NO_META  => 1,
     MAN1PODS => \%pod_files,
     LICENSE  => 'lgpl3',
-    MYEXTLIB => 'xs/R3.o xs/libmarpa$(LIB_EXT)',
+    MYEXTLIB => 'xs/R3$(OBJ_EXT) xs/libmarpa$(LIB_EXT)',
 
     test => { RECURSIVE_TEST_FILES => 1 }
 
@@ -607,7 +607,7 @@ engine/perl_ac_build/.libs/libmarpa$(LIB_EXT): engine/read_only/stamp-h1
 	$(MKPATH) engine/perl_ac_build/.libs
 	cp engine/perl_ac_build/libmarpa$(LIB_EXT) engine/perl_ac_build/.libs
 
-xs/R3.o: xs/libmarpa$(LIB_EXT) \
+xs/R3$(OBJ_EXT): xs/libmarpa$(LIB_EXT) \
     xs/marpa.h \
     xs/marpa_codes.h \
     xs/general_pattern.xsh \
