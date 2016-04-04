@@ -60,6 +60,10 @@ all :: R3$(OBJ_EXT)
 config ::
 	$(NOECHO) $(NOOP)
 
+# test is SKIP’ped, so this avoids nmake’s “don’t know how to make test” complaints
+test ::
+	$(NOECHO) $(NOOP)
+
 ';
     return $r;
 }
