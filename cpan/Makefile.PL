@@ -602,7 +602,7 @@ engine/gnu_ac_build/.libs/libmarpa$(LIB_EXT): engine/read_only/stamp-h1
 	-$(TOUCH) engine/gnu_ac_build/config.h.in
 	cd engine/gnu_ac_build && $(MAKE)
 
-engine/perl_ac_build/Makefile.PL: engine/perl_ac_build/cf/perl_ac_makefile.PL
+engine/perl_ac_build/Makefile.PL: engine/cf/perl_ac_makefile.PL
 	cp $? $@
 
 engine/perl_ac_build/blib/arch/auto/libmarpa/libmarpa$(LIB_EXT): engine/read_only/stamp-h1 \
