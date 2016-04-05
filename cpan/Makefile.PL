@@ -605,7 +605,7 @@ engine/gnu_ac_build/.libs/libmarpa$(LIB_EXT): engine/read_only/stamp-h1
 engine/perl_ac_build/Makefile.PL: engine/cf/perl_ac_makefile.PL
 	cp $? $@
 
-engine/perl_ac_build/blib/arch/auto/libmarpa/libmarpa$(LIB_EXT): engine/read_only/stamp-h1 \
+engine/perl_ac_build/libmarpa$(LIB_EXT): engine/read_only/stamp-h1 \
     engine/perl_ac_build/Makefile.PL
 	cd engine/perl_ac_build && $(PERLRUN) Makefile.PL && $(MAKE)
 
@@ -631,7 +631,7 @@ xs/marpa.h: engine/perl_ac_build/marpa.h
 xs/marpa_codes.h: engine/perl_ac_build/marpa_codes.h
 	cp $? $@
 
-xs/libmarpa$(LIB_EXT): engine/perl_ac_build/blib/arch/auto/libmarpa/libmarpa$(LIB_EXT)
+xs/libmarpa$(LIB_EXT): engine/perl_ac_build/libmarpa$(LIB_EXT)
 	cp $? $@
 
 EOT

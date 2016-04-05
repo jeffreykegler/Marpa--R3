@@ -97,6 +97,7 @@
 ^pperl/Marpa/R3/Perl/Version[.]pm$
 ^xs/MYMETA.
 ^xs/Makefile$
+^xs/Makefile[.]old$
 ^xs/R3[.]c$
 ^xs/marpa[.]h$
 ^xs/marpa_codes[.]h$
