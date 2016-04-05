@@ -14,8 +14,7 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-# CENSUS: TODO
-
+# CENSUS: CYCLE TEST -- DELETE
 
 # This is based on the
 # example from p. 166 of Leo's paper,

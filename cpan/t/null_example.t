@@ -14,9 +14,8 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-# CENSUS: TODO
-
-# An ambiguous equation
+# CENSUS: DUPLICATE -- DELETE
+# Duplicate of sl_null_example.t
 
 use 5.010001;
 use strict;

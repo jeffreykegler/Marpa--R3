@@ -16,8 +16,6 @@
 
 # CENSUS: SLIF TEST -- KEEP
 
-# An ambiguous equation
-
 use 5.010001;
 use strict;
 use warnings;

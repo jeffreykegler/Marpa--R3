@@ -14,8 +14,8 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-# CENSUS: TODO
-
+# CENSUS: DUPLICATE -- DELETE
+# Duplicate of sl_rank.t
 
 # This uses an ambiguous grammar to implement a binary
 # counter.  A very expensive way to do it, but a

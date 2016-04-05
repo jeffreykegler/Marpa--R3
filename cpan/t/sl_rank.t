@@ -16,7 +16,6 @@
 
 # CENSUS: SLIF TEST -- KEEP
 
-
 # Tests negative ranks, SLIF ranks and
 # external SLIF scanning
 
