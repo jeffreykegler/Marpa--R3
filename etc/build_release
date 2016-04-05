@@ -4,6 +4,6 @@ then
     echo Marpa--R3 exists -- please remove it
     exit 1
 fi
-git clone -b trial git@github.com:jeffreykegler/Marpa--R3.git
+git clone --depth 1 -b trial git@github.com:jeffreykegler/Marpa--R3.git
 cd Marpa--R3
 make releng

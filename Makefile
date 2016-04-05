@@ -65,8 +65,6 @@ perl_ac_disttest:
 	cd cpan && $(MAKE) realclean
 	@echo === perl_ac_disttest: perl Makefile.PL ===
 	cd cpan && MARPA_USE_PERL_AUTOCONF=1 perl Makefile.PL
-	@echo === perl_ac_disttest: make ===
-	cd cpan && MARPA_USE_PERL_AUTOCONF=1 $(MAKE)
 	@echo === perl_ac_disttest: make disttest ===
 	cd cpan && MARPA_USE_PERL_AUTOCONF=1 $(MAKE) disttest
 
@@ -76,8 +74,6 @@ gnu_ac_disttest:
 	cd cpan && $(MAKE) realclean
 	@echo === gnu_ac_disttest: perl Makefile.PL ===
 	cd cpan && perl Makefile.PL
-	@echo === gnu_ac_disttest: make ===
-	cd cpan && $(MAKE)
 	@echo === gnu_ac_disttest: make disttest ===
 	cd cpan && $(MAKE) disttest
 
