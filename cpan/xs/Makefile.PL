@@ -54,10 +54,14 @@ WriteMakefile(
 
 sub MY::top_targets {
     my $r = '
-all :: R3.o
+all :: R3$(OBJ_EXT)
 	$(NOECHO) $(NOOP)
 
 config ::
+	$(NOECHO) $(NOOP)
+
+# test is SKIP’ped, so this avoids nmake’s “don’t know how to make test” complaints
+test ::
 	$(NOECHO) $(NOOP)
 
 ';

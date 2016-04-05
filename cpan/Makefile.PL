@@ -403,7 +403,7 @@ WriteMakefile(
     NO_META  => 1,
     MAN1PODS => \%pod_files,
     LICENSE  => 'lgpl3',
-    MYEXTLIB => 'xs/R3.o xs/libmarpa$(LIB_EXT)',
+    MYEXTLIB => 'xs/R3$(OBJ_EXT) xs/libmarpa$(LIB_EXT)',
 
     test => { RECURSIVE_TEST_FILES => 1 }
 
@@ -558,7 +558,7 @@ INLINEHOOK
 
 } ## end if ($use_perl_autoconf)
 
-{
+else {
     my $shell            = $Config{sh};
     my $configure_script = 'configure';
     if ($verbose) {
@@ -603,9 +603,11 @@ engine/gnu_ac_build/.libs/libmarpa$(LIB_EXT): engine/read_only/stamp-h1
 	cd engine/gnu_ac_build && $(MAKE)
 
 engine/perl_ac_build/.libs/libmarpa$(LIB_EXT): engine/read_only/stamp-h1
-	cd engine/perl_ac_build && $(MAKE)
+	cd engine/perl_ac_build && $(PERLRUN) Makefile.PL && $(MAKE)
+	$(MKPATH) engine/perl_ac_build/.libs
+	cp engine/perl_ac_build/libmarpa$(LIB_EXT) engine/perl_ac_build/.libs
 
-xs/R3.o: xs/libmarpa$(LIB_EXT) \
+xs/R3$(OBJ_EXT): xs/libmarpa$(LIB_EXT) \
     xs/marpa.h \
     xs/marpa_codes.h \
     xs/general_pattern.xsh \
