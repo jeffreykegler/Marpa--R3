@@ -556,8 +556,34 @@ INLINEHOOK
         $ac->write_config_h('config_from_autoconf.h');
     } ## end if ( !-r 'config.h' )
 
-} ## end if ($use_perl_autoconf)
+    my @o = map { s/\.c$/$Config{obj_ext}/; $_ } @c;
+    if ( !-r 'Makefile.PL' ) {
+        open my $makefile_pl_fh, '>', 'Makefile.PL';
+        my $CCFLAGS  = @debug_flags ? "$Config{ccflags} @debug_flags" : '';
+        my $linktype = 'static';
+        my $blib     = 'blib';
+        my $name     = 'libmarpa';
+        print {$makefile_pl_fh} "
+use ExtUtils::MakeMaker;
+WriteMakefile(VERSION        => \"$libmarpa_version\",
+              XS_VERSION     => \"$libmarpa_version\",
+              NAME           => \"$name\",
+              OBJECT         => '@o',
+              CCFLAGS        => '$CCFLAGS',
+              INST_LIB       => \"./$blib/lib\",
+              INST_ARCHLIB   => \"./$blib/arch\",
+              INST_SCRIPT    => \"./$blib/script\",
+              INST_BIN       => \"./$blib/bin\",
+              LINKTYPE       => $linktype);
+";
+        close $makefile_pl_fh;
+        die 'Making Makefile: perl Failure'
+          if
+## Please see file perltidy.ERR
+          not IPC::Cmd::run( command => [ $^X, 'Makefile.PL' ], verbose => 1 );
+    }
 
+} ## end if ($use_perl_autoconf)
 else {
     my $shell            = $Config{sh};
     my $configure_script = 'configure';
