@@ -629,7 +629,7 @@ engine/gnu_ac_build/.libs/libmarpa$(LIB_EXT): engine/read_only/stamp-h1
 	cd engine/gnu_ac_build && $(MAKE)
 
 engine/perl_ac_build/blib/arch/auto/libmarpa/libmarpa$(LIB_EXT): engine/read_only/stamp-h1
-	cd engine/perl_ac_build && $(PERLRUN) Makefile.PL && $(MAKE)
+	cd engine/perl_ac_build && $(PERLRUN) Makefile.PL LINKTYPE=static && $(MAKE)
 
 xs/R3$(OBJ_EXT): xs/libmarpa$(LIB_EXT) \
     xs/marpa.h \

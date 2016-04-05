@@ -13,7 +13,8 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-.PHONY: dummy basic_test rebuild single_test full_test install releng
+.PHONY: dummy basic_test rebuild single_test full_test install releng \
+  cpan_dir_full_test perl_ac_disttest gnu_ac_disttest
 
 dummy: 
 
@@ -45,20 +46,40 @@ single_test:
 	    $(MAKE) test --test_files $(TEST); \
 	) 2>&1 | tee single_test.out
 
-full_test:
-	@echo === full_test target ===
-	@echo === full_test: make realclean ===
+full_test: cpan_dir_full_test perl_ac_disttest gnu_ac_disttest
+
+cpan_dir_full_test:
+	@echo === cpan_dir_full_test target ===
+	@echo === cpan_dir_full_test: make realclean ===
 	cd cpan && $(MAKE) realclean
-	@echo === full_test: PERL Makefile.PL ===
+	@echo === cpan_dir_full_test: perl Makefile.PL ===
 	cd cpan && perl Makefile.PL
-	@echo === full_test: make ===
+	@echo === cpan_dir_full_test: make ===
 	cd cpan && $(MAKE)
-	@echo === full_test: make test ===
+	@echo === cpan_dir_full_test: make test ===
 	cd cpan && $(MAKE) test
-	@echo === full_test: make disttest for GNU autoconf ===
-	cd cpan && $(MAKE) disttest
-	@echo === full_test: make disttest for Perl autoconf ===
+
+perl_ac_disttest:
+	@echo === perl_ac_disttest target ===
+	@echo === perl_ac_disttest: make realclean ===
+	cd cpan && $(MAKE) realclean
+	@echo === perl_ac_disttest: perl Makefile.PL ===
+	cd cpan && MARPA_USE_PERL_AUTOCONF=1 perl Makefile.PL
+	@echo === perl_ac_disttest: make ===
+	cd cpan && MARPA_USE_PERL_AUTOCONF=1 $(MAKE)
+	@echo === perl_ac_disttest: make disttest ===
 	cd cpan && MARPA_USE_PERL_AUTOCONF=1 $(MAKE) disttest
+
+gnu_ac_disttest:
+	@echo === gnu_ac_disttest target ===
+	@echo === gnu_ac_disttest: make realclean ===
+	cd cpan && $(MAKE) realclean
+	@echo === gnu_ac_disttest: perl Makefile.PL ===
+	cd cpan && perl Makefile.PL
+	@echo === gnu_ac_disttest: make ===
+	cd cpan && $(MAKE)
+	@echo === gnu_ac_disttest: make disttest ===
+	cd cpan && $(MAKE) disttest
 
 install:
 	@echo === install target ===
