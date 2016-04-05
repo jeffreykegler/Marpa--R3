@@ -43,7 +43,7 @@ rebuild:
 single_test:
 	(cd cpan; \
 	    $(MAKE); \
-	    $(MAKE) test --test_files $(TEST); \
+	    $(MAKE) test TEST_FILES='$(TEST)'; \
 	) 2>&1 | tee single_test.out
 
 full_test: cpan_dir_full_test perl_ac_disttest gnu_ac_disttest
