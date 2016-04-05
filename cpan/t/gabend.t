@@ -14,8 +14,7 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-# CENSUS: TODO
-
+# CENSUS: NAIF INTERNALS TEST -- DELETE
 
 # Test grammar exceptions -- make sure problems actually
 # are detected.  These tests are for problems which are supposed

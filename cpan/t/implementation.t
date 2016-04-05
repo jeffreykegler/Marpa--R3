@@ -14,8 +14,9 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-# CENSUS: TODO
-
+# CENSUS: NAIF DUPLICATE -- DELETE
+# Apparently just a test of the NAIF diagnostics
+# using the standard textbook multiply/add example
 
 use 5.010001;
 use strict;
