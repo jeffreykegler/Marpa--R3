@@ -454,6 +454,7 @@ if ($use_perl_autoconf) {
     File::Copy::copy( $src_makefile_writer => $dest_makefile_pl );
 }
 
+# Change to build directory
 chdir $build_dir || die "Cannot chdir to $build_dir: $ERRNO";
 my $stamp_file = 'stamp-h1';
 File::Path::rmtree( $stamp_file, 0, 0 );
@@ -556,33 +557,6 @@ INLINEHOOK
         $ac->write_config_h('config_from_autoconf.h');
     } ## end if ( !-r 'config.h' )
 
-    my @o = map { s/\.c$/$Config{obj_ext}/; $_ } @c;
-    if ( !-r 'Makefile.PL' ) {
-        open my $makefile_pl_fh, '>', 'Makefile.PL';
-        my $CCFLAGS  = @debug_flags ? "$Config{ccflags} @debug_flags" : '';
-        my $linktype = 'static';
-        my $blib     = 'blib';
-        my $name     = 'libmarpa';
-        print {$makefile_pl_fh} "
-use ExtUtils::MakeMaker;
-WriteMakefile(VERSION        => \"$libmarpa_version\",
-              XS_VERSION     => \"$libmarpa_version\",
-              NAME           => \"$name\",
-              OBJECT         => '@o',
-              CCFLAGS        => '$CCFLAGS',
-              INST_LIB       => \"./$blib/lib\",
-              INST_ARCHLIB   => \"./$blib/arch\",
-              INST_SCRIPT    => \"./$blib/script\",
-              INST_BIN       => \"./$blib/bin\",
-              LINKTYPE       => $linktype);
-";
-        close $makefile_pl_fh;
-        die 'Making Makefile: perl Failure'
-          if
-## Please see file perltidy.ERR
-          not IPC::Cmd::run( command => [ $^X, 'Makefile.PL' ], verbose => 1 );
-    }
-
 } ## end if ($use_perl_autoconf)
 else {
     my $shell            = $Config{sh};
@@ -628,8 +602,12 @@ engine/gnu_ac_build/.libs/libmarpa$(LIB_EXT): engine/read_only/stamp-h1
 	-$(TOUCH) engine/gnu_ac_build/config.h.in
 	cd engine/gnu_ac_build && $(MAKE)
 
-engine/perl_ac_build/blib/arch/auto/libmarpa/libmarpa$(LIB_EXT): engine/read_only/stamp-h1
-	cd engine/perl_ac_build && $(PERLRUN) Makefile.PL LINKTYPE=static && $(MAKE)
+engine/perl_ac_build/Makefile.PL: engine/perl_ac_build/cf/perl_ac_makefile.PL
+	cp $? $@
+
+engine/perl_ac_build/blib/arch/auto/libmarpa/libmarpa$(LIB_EXT): engine/read_only/stamp-h1 \
+    engine/perl_ac_build/Makefile.PL
+	cd engine/perl_ac_build && $(PERLRUN) Makefile.PL && $(MAKE)
 
 xs/R3$(OBJ_EXT): xs/libmarpa$(LIB_EXT) \
     xs/marpa.h \
