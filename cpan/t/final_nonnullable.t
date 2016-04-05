@@ -14,7 +14,9 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-# CENSUS: TODO
+# CENSUS: DUPLICATE -- REPLACE
+# Note same grammar as duplicate_parse.t
+# So one replacement test should cover both
 
 # Catch the case of a final non-nulling symbol at the end of a rule
 # which has more than 2 proper nullables

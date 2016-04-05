@@ -14,8 +14,8 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-# CENSUS: TODO
-
+# CENSUS: REPLACE
+# Rewrite in sl_gia.t?
 
 # Test of deletion of duplicate parses.
 
