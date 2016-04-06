@@ -410,8 +410,6 @@ WriteMakefile(
 );
 
 my @debug_flags            = ();
-my @configure_command_args = ();
-push @configure_command_args, qw(--with-pic --disable-shared);
 
 if ($libmarpa_debug) {
     if ( defined $ENV{LIBMARPA_CFLAGS} ) {
@@ -420,8 +418,6 @@ if ($libmarpa_debug) {
     push @debug_flags, '-DMARPA_DEBUG=1';
     push @debug_flags, '-fno-inline', '-Wno-inline'
         if ( $Config{'cc'} eq 'gcc' );
-    push @configure_command_args,
-        'MARPA_DEBUG_FLAG=' . ( join q{ }, @debug_flags );
 } ## end if ($libmarpa_debug)
 
 # As of this writing, only used by Config::AutoConf logic,
@@ -558,26 +554,6 @@ INLINEHOOK
     } ## end if ( !-r 'config.h' )
 
 } ## end if ($use_perl_autoconf)
-else {
-    my $shell            = $Config{sh};
-    my $configure_script = 'configure';
-    if ($verbose) {
-        say join q{ }, "Running command:", $shell, $configure_script,
-          @configure_command_args
-          or die "print failed: $ERRNO";
-    }
-    if (
-        not IPC::Cmd::run(
-            command => [ $shell, $configure_script, @configure_command_args ],
-            verbose => 1
-        )
-      )
-    {
-        die "Failed: $configure_script\n",
-          "Current directory: $build_dir\n",
-          'Cannot run libmarpa configure';
-    } ## end if ( not IPC::Cmd::run( command => [ $shell, $configure_script...]))
-}
 
 chdir $cwd;
 
@@ -601,20 +577,26 @@ sub MY::postamble {
 # are necessary for GNU autoconf, which is aggressive
 # about looking for things to update
 # This might be accomplished more easily by adding
-# AM_MAINTAINER_MODe([disable]) to configure.ac
+# AM_MAINTAINER_MODE([disable]) to configure.ac
 
-engine/gnu_ac_build/.libs/libmarpa$(LIB_EXT): engine/read_only/stamp-h1
-	-$(TOUCH) engine/gnu_ac_build/aclocal.m4
-	-$(TOUCH) engine/gnu_ac_build/configure
-	-$(TOUCH) engine/gnu_ac_build/config.h.in
+# -$(TOUCH) engine/gnu_ac_build/aclocal.m4
+# -$(TOUCH) engine/gnu_ac_build/configure
+# -$(TOUCH) engine/gnu_ac_build/config.h.in
+
+engine/gnu_ac_build/config.h engine/gnu_ac_build/Makefile: engine/gnu_ac_build/configure
+	cd engine/gnu_ac_build && sh configure --with-pic --disable-shared --disable-maintainer-mode
+
+engine/gnu_ac_build/.libs/libmarpa$(LIB_EXT): engine/gnu_ac_build/config.h engine/gnu_ac_build/Makefile
 	cd engine/gnu_ac_build && $(MAKE)
 
 engine/perl_ac_build/Makefile.PL: engine/cf/perl_ac_makefile.PL
 	cp $? $@
 
-engine/perl_ac_build/libmarpa$(LIB_EXT): engine/read_only/stamp-h1 \
-    engine/perl_ac_build/Makefile.PL
-	cd engine/perl_ac_build && $(PERLRUN) Makefile.PL && $(MAKE)
+engine/perl_ac_build/Makefile: engine/perl_ac_build/Makefile.PL
+	cd engine/perl_ac_build && $(PERLRUN) Makefile.PL
+
+engine/perl_ac_build/libmarpa$(LIB_EXT): engine/perl_ac_build/Makefile
+	cd engine/perl_ac_build && $(MAKE)
 
 xs/R3$(OBJ_EXT): xs/libmarpa$(LIB_EXT) \
     xs/marpa.h \
