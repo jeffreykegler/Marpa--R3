@@ -582,11 +582,18 @@ else {
 chdir $cwd;
 
 sub MY::postamble {
-    my $postamble = (
-        $use_perl_autoconf
-        ? "LIBMARPA_BUILD_DIR = engine/perl_ac_build\n"
-        : "LIBMARPA_BUILD_DIR = engine/gnu_ac_build\n"
-    );
+    my $postamble = "\n";
+    if ($use_perl_autoconf) {
+        $postamble .= join "\n",
+	    'LIBMARPA_BUILD_DIR = engine/perl_ac_build',
+	    'LIBMARPA_IN_BUILD_DIR = $(LIBMARPA_BUILD_DIR)/libmarpa$(LIB_EXT)',
+	    q{}, q{};
+    } else {
+        $postamble .= join "\n",
+	    'LIBMARPA_BUILD_DIR = engine/gnu_ac_build',
+	    'LIBMARPA_IN_BUILD_DIR = $(LIBMARPA_BUILD_DIR)/.libs/libmarpa$(LIB_EXT)',
+	    q{}, q{};
+    }
 
     $postamble .= <<'END_OF_POSTAMBLE';
 
@@ -621,37 +628,18 @@ xs/general_pattern.xsh: xs/gp_generate.pl
 xs/marpa_slifop.h: xs/create_ops.pl
 	perl xs/create_ops.pl > xs/marpa_slifop.h
 
+xs/marpa.h: $(LIBMARPA_BUILD_DIR)/marpa.h
+	cp $? $@
+
+xs/marpa_codes.h: $(LIBMARPA_BUILD_DIR)/marpa_codes.h
+	cp $? $@
+
+xs/libmarpa$(LIB_EXT): $(LIBMARPA_IN_BUILD_DIR)
+	cp $? $@
+
 END_OF_POSTAMBLE
-
-    if ($use_perl_autoconf) {
-        $postamble .= <<'EOT';
-xs/marpa.h: engine/perl_ac_build/marpa.h
-	cp $? $@
-
-xs/marpa_codes.h: engine/perl_ac_build/marpa_codes.h
-	cp $? $@
-
-xs/libmarpa$(LIB_EXT): engine/perl_ac_build/libmarpa$(LIB_EXT)
-	cp $? $@
-
-EOT
-    } ## end if ($use_perl_autoconf)
-    else {
-        $postamble .= <<'EOT';
-xs/marpa.h: engine/gnu_ac_build/marpa.h
-	cp $? $@
-
-xs/marpa_codes.h: engine/gnu_ac_build/marpa_codes.h
-	cp $? $@
-
-xs/libmarpa$(LIB_EXT): engine/gnu_ac_build/.libs/libmarpa$(LIB_EXT)
-	cp $? $@
-
-EOT
-    } ## end else [ if ($use_perl_autoconf) ]
 
     return $postamble;
 } ## end sub MY::postamble
-
 
 # vim: shiftwidth=4:
