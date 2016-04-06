@@ -440,8 +440,12 @@ engine/perl_ac_build/marpa.c engine/perl_ac_build/marpa.h: engine/read_only/stam
 	test -d engine/perl_ac_build || mkdir engine/perl_ac_build
 	cd engine/perl_ac_build && (cd ../read_only; tar -cf - .) | tar xomf -
 
-engine/perl_ac_build/Makefile.PL: engine/cf/perl_ac_makefile.PL
-	cp $? $@
+# The Makefile.PL reads the contents of the directory.  marpa.h
+# and marpa.c are prerequisites, so that the directory is populated
+# before Makefile.PL is copied over
+engine/perl_ac_build/Makefile.PL: engine/cf/perl_ac_makefile.PL \
+		engine/perl_ac_build/marpa.c engine/perl_ac_build/marpa.h
+	cp engine/cf/perl_ac_makefile.PL engine/perl_ac_build/Makefile.PL
 
 engine/perl_ac_build/Makefile: engine/perl_ac_build/Makefile.PL
 	cd engine/perl_ac_build && $(PERLRUN) Makefile.PL

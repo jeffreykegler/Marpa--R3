@@ -140,7 +140,7 @@ my $o_files = join q{ }, @c_files;
 $o_files =~ s/[.]c/.o/xmsg;
 
 WriteMakefile(
-    NAME      => 'marpa', # (doesn't matter what the name is here) oh yes it does
+    NAME      => 'marpa',
 #    LINKTYPE  => 'static',
     DEFINE    => $define,
     SKIP      => [qw(dynamic dynamic_lib dlsyms)],
@@ -169,7 +169,8 @@ config ::
 
 ';
 if (0) {
-    # I hope I don't need this.
+    # From the SDBM original ...
+    # I hope Mapra doesn't need this -- Jeffrey
     $r .= '
 # This is a workaround, the problem is that our old GNU make exports
 # variables into the environment so $(MYEXTLIB) is set in here to this
