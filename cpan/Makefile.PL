@@ -437,8 +437,9 @@ engine/gnu_ac_build/.libs/libmarpa$(LIB_EXT): engine/gnu_ac_build/config.h engin
 	cd engine/gnu_ac_build && $(MAKE)
 
 engine/perl_ac_build/marpa.c engine/perl_ac_build/marpa.h: engine/read_only/stamp-h1
-	test -d engine/perl_ac_build || mkdir engine/perl_ac_build
-	cd engine/perl_ac_build && (cd ../read_only; tar -cf - .) | tar xomf -
+	$(RM_RF) engine/perl_ac_build
+	$(MKPATH) engine/perl_ac_build
+	cd engine/read_only && $(TAR) cf - . | $(TAR) xomf - -C ../perl_ac_build
 
 # The Makefile.PL reads the contents of the directory.  marpa.h
 # and marpa.c are prerequisites, so that the directory is populated
