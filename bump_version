@@ -58,6 +58,8 @@ cpan/lib/Marpa/R3/Recognizer.pm
 cpan/lib/Marpa/R3/SLG.pm
 cpan/lib/Marpa/R3/SLR.pm
 cpan/lib/Marpa/R3/Thin/Trace.pm
+cpan/lib/Marpa/R3/Thin/G.pm
+cpan/lib/Marpa/R3/Thin/R.pm
 cpan/lib/Marpa/R3/Value.pm
 cpan/Makefile.PL
 cpan/meta/make_internal_pm.pl

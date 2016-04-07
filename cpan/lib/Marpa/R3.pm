@@ -126,6 +126,14 @@ require Marpa::R3::MetaG;
 ( $version_result = version_ok($Marpa::R3::MetaG::VERSION) )
     and die 'Marpa::R3::MetaG::VERSION ', $version_result;
 
+require Marpa::R3::Thin::G;
+( $version_result = version_ok($Marpa::R3::Thin::G::VERSION) )
+    and die 'Marpa::R3::Thin::G::VERSION ', $version_result;
+
+require Marpa::R3::Thin::R;
+( $version_result = version_ok($Marpa::R3::Thin::R::VERSION) )
+    and die 'Marpa::R3::Thin::R::VERSION ', $version_result;
+
 require Marpa::R3::SLG;
 ( $version_result = version_ok($Marpa::R3::Scanless::G::VERSION) )
     and die 'Marpa::R3::Scanless::G::VERSION ', $version_result;

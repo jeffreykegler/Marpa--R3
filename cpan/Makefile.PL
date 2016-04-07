@@ -430,13 +430,12 @@ LIBMARPA_INSTALL = $(ABSPERLRUN) -MExtUtils::Install -e \
 
 engine/gnu_ac_build/marpa.c engine/gnu_ac_build/marpa.h engine/gnu_ac_build/configure: \
             engine/read_only/stamp-h1
-	$(RM_RF) engine/gnu_ac_build
 	$(LIBMARPA_INSTALL) engine/read_only engine/gnu_ac_build
 
 engine/gnu_ac_build/config.h engine/gnu_ac_build/Makefile: engine/gnu_ac_build/configure
 	cd engine/gnu_ac_build && $(SHELL) configure --with-pic --disable-shared --disable-maintainer-mode
 
-engine/gnu_ac_build/.libs/libmarpa$(LIB_EXT): engine/gnu_ac_build/config.h engine/gnu_ac_build/Makefile
+engine/gnu_ac_build/stamp-h1: engine/gnu_ac_build/config.h engine/gnu_ac_build/Makefile
 	cd engine/gnu_ac_build && $(MAKE)
 
 engine/perl_ac_build/marpa.c engine/perl_ac_build/marpa.h: engine/read_only/stamp-h1
@@ -455,7 +454,7 @@ engine/perl_ac_build/Makefile: engine/perl_ac_build/Makefile.PL
 
 # gnu autoconf automatically creates/updates stamp-h1
 # for Config::AutoConf, we have to do this manually
-engine/perl_ac_build/libmarpa$(LIB_EXT): engine/perl_ac_build/Makefile
+engine/perl_ac_build/stamp-h1: engine/perl_ac_build/Makefile
 	cd engine/perl_ac_build && $(MAKE) && $(TOUCH) stamp-h1
 
 xs/R3$(OBJ_EXT): xs/libmarpa$(LIB_EXT) \
@@ -476,8 +475,8 @@ xs/marpa.h: $(LIBMARPA_BUILD_DIR)/marpa.h
 xs/marpa_codes.h: $(LIBMARPA_BUILD_DIR)/marpa_codes.h
 	cp $? $@
 
-xs/libmarpa$(LIB_EXT): $(LIBMARPA_IN_BUILD_DIR)
-	cp $? $@
+xs/libmarpa$(LIB_EXT): $(LIBMARPA_BUILD_DIR)/stamp-h1
+	cp $(LIBMARPA_IN_BUILD_DIR) R@
 
 END_OF_POSTAMBLE
 

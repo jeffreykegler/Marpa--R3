@@ -1875,6 +1875,8 @@ sub Marpa::R3::Scanless::R::lexeme_priority_set {
     return $thin_slr->lexeme_priority_set($lexeme_id, $new_priority);
 }
 
+# Need to port show_earley_sets(), show_and_nodes(), show_or_nodes() NAIF recognizer methods
+
 # Internal methods, not to be documented
 
 sub Marpa::R3::Scanless::R::thick_g1_grammar {
@@ -1910,6 +1912,27 @@ sub Marpa::R3::Scanless::R::earley_set_size {
     return $self->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE]
         ->earley_set_size($set_id);
 }
+
+sub Marpa::R3::Scanless::R::show_earley_sets {
+    my ($slr)                = @_;
+    my $naif_recce = $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
+    my $recce_c                = $naif_recce->[Marpa::R3::Internal::Recognizer::C];
+    my $grammar = $naif_recce->[Marpa::R3::Internal::Recognizer::GRAMMAR];
+    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
+    my $tracer  = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $last_completed_earleme = $recce_c->current_earleme();
+    my $furthest_earleme       = $recce_c->furthest_earleme();
+    my $text                   = "Last Completed: $last_completed_earleme; "
+        . "Furthest: $furthest_earleme\n";
+    LIST: for ( my $ix = 0;; $ix++ ) {
+        my $set_desc =
+          $recce_c->Marpa::R3::Thin::R::show_earley_set( $tracer, $ix,
+            $naif_recce->[Marpa::R3::Internal::Recognizer::TOKEN_VALUES] );
+        last LIST if not $set_desc;
+        $text .= "Earley Set $ix\n$set_desc";
+    }
+    return $text;
+} ## end sub Marpa::R3::Recognizer::show_earley_sets
 
 1;
 

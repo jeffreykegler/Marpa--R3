@@ -1069,11 +1069,21 @@ sub Marpa::R3::Scanless::G::thick_g1_grammar {
     return $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
 }
 
+sub Marpa::R3::Scanless::G::tracer {
+    my ($slg) = @_;
+    my $grammar =  $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
+    return $grammar->tracer();
+}
+
 sub Marpa::R3::Scanless::G::show_irls {
     my ($slg, $subgrammar) = @_;
     return thick_subgrammar_by_name($slg, $subgrammar)->show_irls();
 }
 
+sub Marpa::R3::Scanless::G::show_ahms {
+    my ( $slg, $verbose ) = @_;
+    return $slg->tracer()->show_ahms($verbose);
+}
 1;
 
 # vim: expandtab shiftwidth=4:
