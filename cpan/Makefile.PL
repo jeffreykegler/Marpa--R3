@@ -409,54 +409,78 @@ WriteMakefile(
 # } ## end if ($libmarpa_debug)
 
 sub MY::postamble {
-    my $postamble = "\n";
+    my ($self) = @_;
+    my @postamble_pieces = (q{});
     if ($use_perl_autoconf) {
-        $postamble .= join "\n",
+        push @postamble_pieces, 
 	    'LIBMARPA_BUILD_DIR = engine/perl_ac_build',
 	    'LIBMARPA_IN_BUILD_DIR = $(LIBMARPA_BUILD_DIR)/libmarpa$(LIB_EXT)',
-	    q{}, q{};
+	    q{};
     } else {
-        $postamble .= join "\n",
+        push @postamble_pieces, 
 	    'LIBMARPA_BUILD_DIR = engine/gnu_ac_build',
 	    'LIBMARPA_IN_BUILD_DIR = $(LIBMARPA_BUILD_DIR)/.libs/libmarpa$(LIB_EXT)',
-	    q{}, q{};
+	    q{};
     }
 
-    $postamble .= <<'END_OF_POSTAMBLE';
+    push @postamble_pieces, sprintf "LIBMARPA_INSTALL = %s\n",
+      $self->oneliner(
+'install([ from_to => {@ARGV}, skip => q{engine/cf/INSTALL.SKIP}, dir_mode => "$(PERM_DIR)" ]);',
+        [qw(-MExtUtils::Install)]
+      );
 
-LIBMARPA_INSTALL = $(ABSPERLRUN) -MExtUtils::Install -e \
-    'install([ from_to => {@ARGV}, skip => q{engine/cf/INSTALL.SKIP}, dir_mode => '\''$(PERM_DIR)'\'' ]);' \
-    --
-
+    push @postamble_pieces, <<'END_OF_POSTAMBLE_PIECE';
 engine/gnu_ac_build/marpa.c engine/gnu_ac_build/marpa.h engine/gnu_ac_build/configure: \
             engine/read_only/stamp-h1
 	$(LIBMARPA_INSTALL) engine/read_only engine/gnu_ac_build
+END_OF_POSTAMBLE_PIECE
 
+    push @postamble_pieces, sprintf <<'END_OF_POSTAMBLE_PIECE',
 engine/gnu_ac_build/config.h engine/gnu_ac_build/Makefile: engine/gnu_ac_build/configure
-	cd engine/gnu_ac_build && $(SHELL) configure --with-pic --disable-shared --disable-maintainer-mode
+	%s
+END_OF_POSTAMBLE_PIECE
+        $self->cd( File::Spec->catdir(qw(engine gnu_ac_build)),
+'$(SHELL) configure --with-pic --disable-shared --disable-maintainer-mode'
+        );
 
+    push @postamble_pieces, sprintf <<'END_OF_POSTAMBLE_PIECE',
 engine/gnu_ac_build/stamp-h1: engine/gnu_ac_build/config.h engine/gnu_ac_build/Makefile
-	cd engine/gnu_ac_build && $(MAKE)
+	%s
+END_OF_POSTAMBLE_PIECE
+	$self->cd(File::Spec->catdir(qw(engine gnu_ac_build)), '$(MAKE)');
 
+    push @postamble_pieces, <<'END_OF_POSTAMBLE_PIECE';
 engine/perl_ac_build/marpa.c engine/perl_ac_build/marpa.h: engine/read_only/stamp-h1
 	$(RM_RF) engine/perl_ac_build
 	$(LIBMARPA_INSTALL) engine/read_only engine/perl_ac_build
+END_OF_POSTAMBLE_PIECE
 
 # The Makefile.PL reads the contents of the directory.  marpa.h
 # and marpa.c are prerequisites, so that the directory is populated
 # before Makefile.PL is copied over
+
+    push @postamble_pieces, <<'END_OF_POSTAMBLE_PIECE';
 engine/perl_ac_build/Makefile.PL: engine/cf/perl_ac_makefile.PL \
 		engine/perl_ac_build/marpa.c engine/perl_ac_build/marpa.h
 	cp engine/cf/perl_ac_makefile.PL engine/perl_ac_build/Makefile.PL
+END_OF_POSTAMBLE_PIECE
 
+    push @postamble_pieces, sprintf <<'END_OF_POSTAMBLE_PIECE',
 engine/perl_ac_build/Makefile: engine/perl_ac_build/Makefile.PL
-	cd engine/perl_ac_build && $(PERLRUN) Makefile.PL
+	%s
+END_OF_POSTAMBLE_PIECE
+	$self->cd(File::Spec->catdir(qw(engine perl_ac_build)), '$(PERLRUN) Makefile.PL');
 
 # gnu autoconf automatically creates/updates stamp-h1
 # for Config::AutoConf, we have to do this manually
+    push @postamble_pieces, sprintf <<'END_OF_POSTAMBLE_PIECE',
 engine/perl_ac_build/stamp-h1: engine/perl_ac_build/Makefile
-	cd engine/perl_ac_build && $(MAKE) && $(TOUCH) stamp-h1
+	%s
+	$(TOUCH) engine/perl_ac_build/stamp-h1
+END_OF_POSTAMBLE_PIECE
+	$self->cd(File::Spec->catdir(qw(engine perl_ac_build)), '$(MAKE)');
 
+    push @postamble_pieces, <<'END_OF_POSTAMBLE_PIECE';
 xs/R3$(OBJ_EXT): xs/libmarpa$(LIB_EXT) \
     xs/marpa.h \
     xs/marpa_codes.h \
@@ -478,9 +502,9 @@ xs/marpa_codes.h: $(LIBMARPA_BUILD_DIR)/marpa_codes.h
 xs/libmarpa$(LIB_EXT): $(LIBMARPA_BUILD_DIR)/stamp-h1
 	cp $(LIBMARPA_IN_BUILD_DIR) $@
 
-END_OF_POSTAMBLE
+END_OF_POSTAMBLE_PIECE
 
-    return $postamble;
+    return join "\n", @postamble_pieces;
 } ## end sub MY::postamble
 
 # vim: shiftwidth=4:
