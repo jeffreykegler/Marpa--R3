@@ -412,12 +412,12 @@ sub MY::postamble {
     my ($self) = @_;
     my @postamble_pieces = (q{});
     if ($use_perl_autoconf) {
-        push @postamble_pieces, 
+        push @postamble_pieces,
 	    'LIBMARPA_BUILD_DIR = engine/perl_ac_build',
 	    'LIBMARPA_IN_BUILD_DIR = $(LIBMARPA_BUILD_DIR)/libmarpa$(LIB_EXT)',
 	    q{};
     } else {
-        push @postamble_pieces, 
+        push @postamble_pieces,
 	    'LIBMARPA_BUILD_DIR = engine/gnu_ac_build',
 	    'LIBMARPA_IN_BUILD_DIR = $(LIBMARPA_BUILD_DIR)/.libs/libmarpa$(LIB_EXT)',
 	    q{};
