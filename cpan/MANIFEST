@@ -42,6 +42,7 @@ engine/LOG_DATA
 engine/README
 engine/SHARED
 engine/STATIC
+engine/cf/INSTALL.SKIP
 engine/cf/perl_ac_makefile.PL
 engine/read_only/AUTHORS
 engine/read_only/COPYING
@@ -283,12 +284,12 @@ t/thin_deprec.t
 t/thin_eq.t
 t/timeflies.t
 t/use.t
-xs/meta_make
 xs/Makefile.PL
 xs/R3.xs
 xs/create_ops.pl
 xs/general_pattern.xsh
 xs/gp_generate.pl
 xs/marpa_slifop.h
+xs/meta_make
 xs/ppport.h
 xs/typemap

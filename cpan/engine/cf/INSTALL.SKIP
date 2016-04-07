@@ -1,0 +1,3 @@
+# this INSTALL.SKIP is for the copy of the libmarpa code
+# file names must be cpan-directory relative
+^engine/read_only/stamp-h1$

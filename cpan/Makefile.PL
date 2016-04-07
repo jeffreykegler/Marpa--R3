@@ -424,12 +424,14 @@ sub MY::postamble {
 
     $postamble .= <<'END_OF_POSTAMBLE';
 
-MARPA_CP_R = $(ABSPERLRUN) -MExtUtils::Install -e 'install([ from_to => {@ARGV}, dir_mode => '\''$(PERM_DIR)'\'' ]);' --
+LIBMARPA_INSTALL = $(ABSPERLRUN) -MExtUtils::Install -e \
+    'install([ from_to => {@ARGV}, skip => q{engine/cf/INSTALL.SKIP}, dir_mode => '\''$(PERM_DIR)'\'' ]);' \
+    --
 
 engine/gnu_ac_build/marpa.c engine/gnu_ac_build/marpa.h engine/gnu_ac_build/configure: \
             engine/read_only/stamp-h1
 	$(RM_RF) engine/gnu_ac_build
-	$(MARPA_CP_R) engine/read_only engine/gnu_ac_build
+	$(LIBMARPA_INSTALL) engine/read_only engine/gnu_ac_build
 
 engine/gnu_ac_build/config.h engine/gnu_ac_build/Makefile: engine/gnu_ac_build/configure
 	cd engine/gnu_ac_build && $(SHELL) configure --with-pic --disable-shared --disable-maintainer-mode
@@ -439,7 +441,7 @@ engine/gnu_ac_build/.libs/libmarpa$(LIB_EXT): engine/gnu_ac_build/config.h engin
 
 engine/perl_ac_build/marpa.c engine/perl_ac_build/marpa.h: engine/read_only/stamp-h1
 	$(RM_RF) engine/perl_ac_build
-	$(MARPA_CP_R) engine/read_only engine/perl_ac_build
+	$(LIBMARPA_INSTALL) engine/read_only engine/perl_ac_build
 
 # The Makefile.PL reads the contents of the directory.  marpa.h
 # and marpa.c are prerequisites, so that the directory is populated
@@ -451,8 +453,10 @@ engine/perl_ac_build/Makefile.PL: engine/cf/perl_ac_makefile.PL \
 engine/perl_ac_build/Makefile: engine/perl_ac_build/Makefile.PL
 	cd engine/perl_ac_build && $(PERLRUN) Makefile.PL
 
+# gnu autoconf automatically creates/updates stamp-h1
+# for Config::AutoConf, we have to do this manually
 engine/perl_ac_build/libmarpa$(LIB_EXT): engine/perl_ac_build/Makefile
-	cd engine/perl_ac_build && $(MAKE)
+	cd engine/perl_ac_build && $(MAKE) && $(TOUCH) stamp-h1
 
 xs/R3$(OBJ_EXT): xs/libmarpa$(LIB_EXT) \
     xs/marpa.h \
