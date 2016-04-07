@@ -412,12 +412,12 @@ sub MY::postamble {
     my ($self) = @_;
     my @postamble_pieces = (q{});
     if ($use_perl_autoconf) {
-        push @postamble_pieces, 
+        push @postamble_pieces,
 	    'LIBMARPA_BUILD_DIR = engine/perl_ac_build',
 	    'LIBMARPA_IN_BUILD_DIR = $(LIBMARPA_BUILD_DIR)/libmarpa$(LIB_EXT)',
 	    q{};
     } else {
-        push @postamble_pieces, 
+        push @postamble_pieces,
 	    'LIBMARPA_BUILD_DIR = engine/gnu_ac_build',
 	    'LIBMARPA_IN_BUILD_DIR = $(LIBMARPA_BUILD_DIR)/.libs/libmarpa$(LIB_EXT)',
 	    q{};
@@ -476,6 +476,7 @@ END_OF_POSTAMBLE_PIECE
     push @postamble_pieces, sprintf <<'END_OF_POSTAMBLE_PIECE',
 engine/perl_ac_build/stamp-h1: engine/perl_ac_build/Makefile
 	%s
+	$(RM_RF) engine/perl_ac_build/stamp-h1
 	$(TOUCH) engine/perl_ac_build/stamp-h1
 END_OF_POSTAMBLE_PIECE
 	$self->cd(File::Spec->catdir(qw(engine perl_ac_build)), '$(MAKE)');
