@@ -476,7 +476,7 @@ xs/marpa_codes.h: $(LIBMARPA_BUILD_DIR)/marpa_codes.h
 	cp $? $@
 
 xs/libmarpa$(LIB_EXT): $(LIBMARPA_BUILD_DIR)/stamp-h1
-	cp $(LIBMARPA_IN_BUILD_DIR) R@
+	cp $(LIBMARPA_IN_BUILD_DIR) $@
 
 END_OF_POSTAMBLE
 

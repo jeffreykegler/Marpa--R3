@@ -1932,38 +1932,8 @@ sub Marpa::R3::Recognizer::show_or_nodes {
     my ( $recce, $verbose ) = @_;
     my $recce_c = $recce->[Marpa::R3::Internal::Recognizer::C];
     my $bocage  = $recce->[Marpa::R3::Internal::Recognizer::B_C];
-    my $text;
-    my @data = ();
-    my $id   = 0;
-    OR_NODE: for ( ;; ) {
-        my $origin   = $bocage->_marpa_b_or_node_origin($id);
-        my $set      = $bocage->_marpa_b_or_node_set($id);
-        my $irl_id   = $bocage->_marpa_b_or_node_irl($id);
-        my $position = $bocage->_marpa_b_or_node_position($id);
-        $id++;
-        last OR_NODE if not defined $origin;
-        my $origin_earleme  = $recce_c->earleme($origin);
-        my $current_earleme = $recce_c->earleme($set);
-
-#<<<  perltidy introduces trailing space on this
-        my $desc =
-              'R'
-            . $irl_id . q{:}
-            . $position . q{@}
-            . $origin_earleme . q{-}
-            . $current_earleme;
-#>>>
-        push @data,
-            [ $origin_earleme, $current_earleme, $irl_id, $position, $desc ];
-    } ## end OR_NODE: for ( ;; )
-    my @sorted_data = map { $_->[-1] } sort {
-               $a->[0] <=> $b->[0]
-            or $a->[1] <=> $b->[1]
-            or $a->[2] <=> $b->[2]
-            or $a->[3] <=> $b->[3]
-    } @data;
-    return ( join "\n", @sorted_data ) . "\n";
-} ## end sub Marpa::R3::Recognizer::show_or_nodes
+    return $recce_c->show_or_nodes( $bocage, $verbose);
+}
 
 # Not sorted and therefore not suitable for test suite
 sub Marpa::R3::Recognizer::verbose_or_nodes {
