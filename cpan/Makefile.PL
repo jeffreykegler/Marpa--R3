@@ -425,7 +425,7 @@ sub MY::postamble {
     $postamble .= <<'END_OF_POSTAMBLE';
 
 LIBMARPA_INSTALL = $(ABSPERLRUN) -MExtUtils::Install -e \
-    'install([ from_to => {@ARGV}, skip => q{engine/cf/INSTALL.SKIP}, dir_mode => '\''$(PERM_DIR)'\'' ]);' \
+    "install([ from_to => {@ARGV}, skip => q{engine/cf/INSTALL.SKIP}, dir_mode => '$(PERM_DIR)' ]);" \
     --
 
 engine/gnu_ac_build/marpa.c engine/gnu_ac_build/marpa.h engine/gnu_ac_build/configure: \
