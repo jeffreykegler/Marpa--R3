@@ -456,7 +456,9 @@ engine/perl_ac_build/Makefile: engine/perl_ac_build/Makefile.PL
 # gnu autoconf automatically creates/updates stamp-h1
 # for Config::AutoConf, we have to do this manually
 engine/perl_ac_build/libmarpa$(LIB_EXT): engine/perl_ac_build/Makefile
-	cd engine/perl_ac_build && $(MAKE) && $(TOUCH) stamp-h1
+	cd engine/perl_ac_build && $(MAKE)
+	$(RM_RF) engine/perl_ac_build/stamp-h1
+	$(TOUCH) engine/perl_ac_build/stamp-h1
 
 xs/R3$(OBJ_EXT): xs/libmarpa$(LIB_EXT) \
     xs/marpa.h \
