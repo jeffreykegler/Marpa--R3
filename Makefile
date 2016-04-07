@@ -20,8 +20,6 @@ dummy:
 
 releng: 
 	@echo === releng target ===
-	@echo === releng: make install ===
-	$(MAKE) install
 	@echo === releng: make full_test ===
 	$(MAKE) full_test 2>&1 | tee full_test.out
 	@echo === releng: make distcheck ===
