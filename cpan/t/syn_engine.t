@@ -14,8 +14,9 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-# CENSUS: NAIF SPECIFIC TEST -- DELETE
-# This was the test for NAIF POD page's example grammar
+# CENSUS: DELETE
+# Note: Another small calculator example, duplicated many ...
+# Note: times over in the SLIF tests.
 
 # Engine Synopsis
 

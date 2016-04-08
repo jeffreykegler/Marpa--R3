@@ -14,7 +14,8 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-# CENSUS: NAIF SPECIFIC TEST -- DELETE
+# CENSUS: UNDECIDED
+# Note: Do I have a SLIF test for bail and context variables?
 
 # NAIF semantics examples
 

@@ -14,8 +14,8 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-# CENSUS: NAIF TEST -- DELETE
-# One small test, not worth converting
+# CENSUS: REWORK
+# Note: One small test for sl_gia.t, if it's not there already
 
 use 5.010001;
 

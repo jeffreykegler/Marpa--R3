@@ -14,8 +14,8 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-# CENSUS: NAIF TEST -- DELETE
-# Deprecated NAIF methods -- delete this test
+# CENSUS: DELETE
+# Note: Deprecated NAIF methods, definitely can delete this test
 
 # !!! WARNING !!!
 # The code in this test uses deprecated methods, techniques, etc.
