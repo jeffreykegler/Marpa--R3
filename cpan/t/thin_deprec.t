@@ -14,8 +14,8 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-# CENSUS: THIF TEST -- KEEP
-
+# CENSUS: ASIS
+# Note: THIF TEST
 
 # Testing using deprecated methods of
 # the thin interface
