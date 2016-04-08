@@ -14,8 +14,10 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-# CENSUS: REPLACE
-# Rewrite in sl_gia.t?
+# CENSUS: REWORK
+# Note: Rewrite as a test sl_gia.t?  Once rewritten, delete this.
+# Note: duplicate_parse.t and final_nonnullable.t are same grammar ..
+# Note: so that one replacement test should cover both
 
 # Test of deletion of duplicate parses.
 

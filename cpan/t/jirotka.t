@@ -14,7 +14,8 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-# CENSUS: REPLACE
+# CENSUS: REWORK
+# Note: Create an sl_jirotka.t, then delete this
 
 # An ambiguous equation
 
