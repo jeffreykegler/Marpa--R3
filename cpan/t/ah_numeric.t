@@ -14,8 +14,9 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-# CENSUS: DUPLICATE -- DELETE
-
+# CENSUS: REWORK
+# Note: a check of the null ranking settings, using the ah2 grammar ...
+# Note: rewrite into SLIF if we don't have it already.
 
 # the example grammar in Aycock/Horspool "Practical Earley Parsing",
 # _The Computer Journal_, Vol. 45, No. 6, pp. 620-630,

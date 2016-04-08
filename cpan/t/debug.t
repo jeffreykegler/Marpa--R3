@@ -14,8 +14,12 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-# CENSUS: NAIF DUPLICATE -- DELETE
-# Duplicate is sl_debug.t
+# CENSUS: REWORK
+# Note: An example for the POD on NAIF debugging.
+# Note: Duplicate is sl_debug.t
+# Note: It's safe to delete this one, I think
+# Note: Convert to SLIF, it we don't have this in the
+# Note: SLIF tests already.
 
 use 5.010001;
 use strict;

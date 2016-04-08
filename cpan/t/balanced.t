@@ -14,8 +14,9 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-# CENSUS: DUPLICATE -- DELETE
-# ROUGH DUPLICATE of sl_bracket.t
+# CENSUS: DELETE
+# An earlier version  of sl_bracket.t, using the NAIF ...
+# I think it's safe to delete this one.
 
 use 5.010001;
 use strict;
