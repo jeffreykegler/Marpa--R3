@@ -14,7 +14,9 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-# CENSUS: UNDECIDED
+# CENSUS: REWORK
+# Note: Rewrite as sl_leo_unit.t ...
+# Note: then mark this version for deletion.
 
 # Test of Leo logic for unit rule.
 
