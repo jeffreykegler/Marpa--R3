@@ -14,7 +14,9 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-# CENSUS: UNDECIDED
+# CENSUS: REWRITE
+# Note: Rewrite as sl_zorro.t ...
+# Note: then mark this for deletion.
 
 use 5.010001;
 use strict;
