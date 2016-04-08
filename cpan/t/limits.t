@@ -14,7 +14,8 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-# CENSUS: UNDECIDED
+# CENSUS: REWORK
+# Note: Convert this to a THIF test?
 
 use 5.010001;
 use strict;
