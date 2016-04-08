@@ -14,11 +14,9 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-# CENSUS: DELETE
-# Note: duplicate_parse.t and final_nonnullable.t are same grammar ..
-# Note: duplicate_parse.t was folded into final_nonnullable.t, then deleted.
-# Note: This test has been converted to the SLIF as final_nn.t, ...
-# Note: and therefore may be deleted.
+# CENSUS: ASIS
+# Note: This test is duplicate_parse.t and final_nonnullable.t, ...
+# Note: converted to the SLIF
 
 # Catch the case of a final non-nulling symbol at the end of a rule
 # which has more than 2 proper nullables
@@ -47,28 +45,26 @@ sub default_action {
 
 ## use critic
 
-my $grammar = Marpa::R3::Grammar->new(
-    {   start => 'S',
-
-        rules => [
-            [ 'S', [qw/p p p n/], ],
-            [ 'p', ['a'], ],
-            [ 'p', [], ],
-            [ 'n', ['a'], ],
-        ],
-        terminals      => ['a'],
-        default_action => 'main::default_action',
+my $grammar = Marpa::R3::Scanless::G->new(
+    {
+        source => \<<'DSL'
+:default ::= action => main::default_action
+S ::= p p p n
+p ::= a
+p ::=
+n ::= a
+a ~ [\d\D]
+DSL
     }
 );
 
-$grammar->precompute();
-
-Marpa::R3::Test::is( $grammar->show_rules,
+Marpa::R3::Test::is( $grammar->show_rules(1),
     <<'END_OF_STRING', 'final nonnulling Rules' );
-0: S -> p p p n
-1: p -> a
-2: p -> /* empty !used */
-3: n -> a
+G1 R0 S ::= p p p n
+G1 R1 p ::= a
+G1 R2 p ::=
+G1 R3 n ::= a
+G1 R4 :start ::= S
 END_OF_STRING
 
 Marpa::R3::Test::is( $grammar->show_ahms,
@@ -116,9 +112,13 @@ AHM 19: postdot = "a"
 AHM 20: completion
     n ::= a .
 AHM 21: postdot = "S"
-    S['] ::= . S
+    [:start] ::= . S
 AHM 22: completion
-    S['] ::= S .
+    [:start] ::= S .
+AHM 23: postdot = "[:start]"
+    [:start]['] ::= . [:start]
+AHM 24: completion
+    [:start]['] ::= [:start] .
 END_OF_STRING
 
 my @expected = map {
@@ -136,11 +136,10 @@ for my $input_length ( 1 .. 4 ) {
 
     # Set max at 10 just in case there's an infinite loop.
     # This is for debugging, after all
-    my $recce = Marpa::R3::Recognizer->new(
+    my $recce = Marpa::R3::Scanless::R->new(
         { grammar => $grammar, max_parses => 10 } );
-    for (my $input_ix = 0; $input_ix < $input_length; $input_ix++ ) {
-        $recce->read( 'a', chr( SPACE + 1 + $input_ix ) );
-    }
+    my $input = substr('abcd', 0, $input_length);
+    $recce->read( \$input );
     while ( my $value_ref = $recce->value() ) {
         my $value = $value_ref ? ${$value_ref} : 'No parse';
         my $expected = $expected[$input_length];
@@ -153,8 +152,6 @@ for my $input_length ( 1 .. 4 ) {
         }
     } ## end while ( my $value_ref = $recce->value() )
 } ## end for my $input_length ( 1 .. 4 )
-
-1;    # In case used as "do" file
 
 # Local Variables:
 #   mode: cperl
