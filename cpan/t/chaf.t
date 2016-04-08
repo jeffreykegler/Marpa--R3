@@ -14,9 +14,9 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-# CENSUS: UNDECIDED
-
-# Regression test for a chaf bug
+# CENSUS: REWORK
+# Note: I think this is not in the SLIF test suite.
+# Note: A good candidate for sl_gia.t.
 
 use 5.010001;
 use strict;

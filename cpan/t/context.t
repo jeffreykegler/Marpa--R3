@@ -14,8 +14,9 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-# CENSUS: UNDECIDED
-# Note: Do I have a SLIF test for bail and context variables?
+# CENSUS: REWORK
+# Note: I don't think I have a SLIF test for bail and context variables.
+# Note: Create an sl_context.t and delete this.
 
 # NAIF semantics examples
 

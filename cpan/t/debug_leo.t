@@ -14,7 +14,9 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-# CENSUS: UNDECIDED
+# CENSUS: REWORK
+# Note: I don't think I have this in the SLIF
+# Note: Create an sl_debug_leo.t, then mark this for deletion.
 
 use 5.010001;
 use strict;
@@ -52,11 +54,6 @@ my $current_earleme;
 for (1 .. 20) {
     $current_earleme = $recce->read( 'T' );
 }
-
-# The call to current earlem is Useless,
-# but provides an example for the docs
-
-$current_earleme = $recce->current_earleme();
 
 $progress_report = $recce->show_progress();
 

@@ -14,7 +14,9 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-# CENSUS: UNDECIDED
+# CENSUS: REWORK
+# Note: I can't find this covered in the SLIF test suite
+# Note: Add it if it's not there
 
 # Ensure various coding errors are caught
 
