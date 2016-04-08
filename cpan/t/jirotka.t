@@ -15,9 +15,7 @@
 # http://www.gnu.org/licenses/.
 
 # CENSUS: REWORK
-# Note: Create an sl_jirotka.t, then delete this
-
-# An ambiguous equation
+# Note: Create an sl_jirotka.t, then mark this for deletion
 
 use 5.010001;
 use strict;
