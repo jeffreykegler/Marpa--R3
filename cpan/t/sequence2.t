@@ -14,9 +14,11 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-# CENSUS: UNDECIDED
+# CENSUS: REWORK
+# Note: Convert to sl_seq2.t ...
+# Note: then mark this for deletion
 
-# Tests of the sequence in the Marpa::R3::Grammar doc
+# Some small sequence tests
 
 use 5.010001;
 use strict;

@@ -14,7 +14,9 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-# CENSUS: UNDECIDED
+# CENSUS: REWORK
+# Note: Convert to SLIF as sl_seq.t ...
+# Note: then mark this for deletion
 
 # Basic tests of sequences.
 # The matrix is separation (none/perl5/proper);
