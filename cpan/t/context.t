@@ -16,7 +16,8 @@
 
 # CENSUS: REWORK
 # Note: I don't think I have a SLIF test for bail and context variables.
-# Note: Create an sl_context.t and delete this.
+# Note: Rewrite as sl_context.t, then ...
+# Note: mark this for deletion.
 
 # NAIF semantics examples
 

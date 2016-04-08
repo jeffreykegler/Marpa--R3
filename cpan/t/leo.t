@@ -14,12 +14,11 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-# CENSUS: UNDECIDED
+# CENSUS: REWORK
+# Note: Rewrite this as sl_leo168.t ...
+# Note: then mark this for deletion.
 
 # The example from p. 168-169 of Leo's paper.
-#
-# Make sure I have a CHAF example!
-#
 
 use 5.010001;
 use strict;

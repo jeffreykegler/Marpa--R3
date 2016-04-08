@@ -15,7 +15,8 @@
 # http://www.gnu.org/licenses/.
 
 # CENSUS: REWORK
-# Note: Create an sl_catalan.t, then delete this
+# Note: Create an sl_catalan.t ...
+# Note: then mark this for deletion.
 
 use 5.010001;
 

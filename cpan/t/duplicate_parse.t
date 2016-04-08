@@ -15,9 +15,11 @@
 # http://www.gnu.org/licenses/.
 
 # CENSUS: REWORK
-# Note: Rewrite as a test sl_gia.t?  Once rewritten, delete this.
+# Note: Rewrite as a SLIF test in sl_gia.t, then ...
+# Note: mark this for deletion.
 # Note: duplicate_parse.t and final_nonnullable.t are same grammar ..
-# Note: so that one replacement test should cover both
+# Note: so that the same SLIF test should cover both
+
 
 # Test of deletion of duplicate parses.
 
