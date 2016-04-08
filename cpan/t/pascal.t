@@ -14,8 +14,9 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-# CENSUS: NAIF DUPLICATE -- DELETE
-# Duplicate is sl_pascal.t
+# CENSUS: DELETE
+# Note: Duplicate is sl_pascal.t
+# Note: It is safe to delete this one.
 
 use 5.010001;
 
