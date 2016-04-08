@@ -14,7 +14,7 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-# CENSUS: REWRITE
+# CENSUS: REWORK
 # Note: Rewrite this as sl_rewrite.t ...
 # Note: then mark this for deletion.
 
