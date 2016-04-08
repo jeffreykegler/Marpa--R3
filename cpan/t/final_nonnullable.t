@@ -124,9 +124,11 @@ my @expected = map {
     }
     [q{}],
     [qw( (-;-;-;a) )],
-    [qw( (a;-;-;a) (-;-;a;a) (-;a;-;a) )],
-    [qw( (a;a;-;a) (-;a;a;a) (a;-;a;a))],
-    [qw( (a;a;a;a) )];
+    [qw( (a;-;-;b) (-;-;a;b) (-;a;-;b) )],
+    [qw( (a;b;-;c) (-;a;b;c) (a;-;b;c))],
+    [qw( (a;b;c;d) )];
+
+use constant SPACE => 0x60;
 
 for my $input_length ( 1 .. 4 ) {
 
@@ -134,8 +136,8 @@ for my $input_length ( 1 .. 4 ) {
     # This is for debugging, after all
     my $recce = Marpa::R3::Recognizer->new(
         { grammar => $grammar, max_parses => 10 } );
-    for ( 1 .. $input_length ) {
-        $recce->read( 'a', 'a' );
+    for (my $input_ix = 0; $input_ix < $input_length; $input_ix++ ) {
+        $recce->read( 'a', chr( SPACE + 1 + $input_ix ) );
     }
     while ( my $value_ref = $recce->value() ) {
         my $value = $value_ref ? ${$value_ref} : 'No parse';

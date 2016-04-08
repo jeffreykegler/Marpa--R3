@@ -195,7 +195,6 @@ t/debug.t
 t/debug_leo.t
 t/debug_seq.t
 t/deprecated1.t
-t/duplicate_parse.t
 t/equation.t
 t/final_nonnullable.t
 t/gabend.t
