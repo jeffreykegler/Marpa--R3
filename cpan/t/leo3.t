@@ -14,11 +14,13 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-# CENSUS: UNDECIDED
+# CENSUS: REWORK
+# Note: this is a duplicate of sl_leo.t ...
+# Note: with some of the diagnostics missing.
+# Note: Add the diagnostics, then mark this for deletion.
 
 # The example from p. 166 of Leo's paper,
 # augmented to test Leo prediction items.
-#
 
 use 5.010001;
 use strict;

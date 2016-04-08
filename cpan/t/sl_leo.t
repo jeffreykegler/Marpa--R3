@@ -19,7 +19,6 @@
 
 # The example from p. 166 of Leo's paper,
 # augmented to test Leo prediction items.
-#
 
 use 5.010001;
 use strict;

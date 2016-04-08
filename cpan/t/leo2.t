@@ -14,7 +14,10 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-# CENSUS: UNDECIDED
+# CENSUS: REWORK
+# Note: I do not think this one is in the SLIF test suite.
+# Note: Write SLIF version as sl_leo166.t ...
+# Note: then mark this for deletion.
 
 # The example from p. 166 of Leo's paper.
 
