@@ -14,7 +14,8 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-# CENSUS: CYCLE TEST -- DELETE
+# CENSUS: DELETE
+# Note: CYCLE TEST
 
 # Two rules which start with nullables, and cycle.
 
