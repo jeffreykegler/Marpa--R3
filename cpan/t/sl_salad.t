@@ -14,8 +14,8 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-# CENSUS: SLIF TEST -- KEEP
-
+# CENSUS: ASIS
+# Note: SLIF TEST
 
 # This example searches for recursively nested braces --
 # curly, square and round -- in a "salad" of other things.
