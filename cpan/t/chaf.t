@@ -14,8 +14,7 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-# CENSUS: TODO
-
+# CENSUS: UNDECIDED
 
 # Regression test for a chaf bug
 
