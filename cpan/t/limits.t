@@ -14,8 +14,10 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-# CENSUS: REWORK
-# Note: Convert this to a THIF test?
+# CENSUS: DELETE
+# Note: Converting this to SLIF causes an out of memory error.
+# Note: It's really a libmarpa test, not a NAIF or SLIF test ...
+# Note: just delete it.
 
 use 5.010001;
 use strict;
