@@ -1494,7 +1494,6 @@ sub set_start_symbol {
     my $default_start_id = $tracer->symbol_by_name($default_start_name);
     my $start_id;
     VALIDATE_START_NAME: {
-        $DB::single = 1;
         my $named_arg_start_name =
             $grammar->[Marpa::R3::Internal::Grammar::START_NAME];
         if ( defined $named_arg_start_name and defined $start_id ) {

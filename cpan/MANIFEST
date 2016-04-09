@@ -273,6 +273,7 @@ t/sl_panda.t
 t/sl_panda1.t
 t/sl_pascal.t
 t/sl_prefix.t
+t/sl_rabend.t
 t/sl_rank.t
 t/sl_ruby.t
 t/sl_salad.t

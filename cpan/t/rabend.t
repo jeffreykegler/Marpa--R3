@@ -14,9 +14,8 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-# CENSUS: REWORK
-# Note: Convert to slif (in sl_giaerr.t?) if we don't cover these
-# already.
+# CENSUS: DELETE
+# Note: Convert to SLIF as sl_rabend.t
 
 use 5.010001;
 use strict;
