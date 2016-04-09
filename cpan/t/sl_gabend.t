@@ -14,9 +14,8 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-# CENSUS: REWORK
-# Note: Convert to SLIF, if we don't have test for these exceptions
-# already.
+# CENSUS: ASIS
+# Note: Converted from gabend.t
 
 # Test grammar exceptions -- make sure problems actually
 # are detected.  These tests are for problems which are supposed
@@ -133,13 +132,15 @@ END_OF_MESSAGE
 );
 
 my $start_not_lhs_grammar = <<'END_OF_DSL';
-    inaccessible is ok by default
+    inaccessible is fatal by default
     :start ::= Bad
     Top ::= Bad
     Bad ~ [\d\D]
 END_OF_DSL
 test_grammar( 'start symbol not on lhs',
-    $start_not_lhs_grammar, qq{Start symbol "Bad" not on LHS of any rule\n} );
+    $start_not_lhs_grammar,
+    qq{Inaccessible symbol: Top\n}
+);
 
 my $unproductive_start_grammar = <<'END_OF_DSL';
     :start ::= Bad
