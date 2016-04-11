@@ -31,7 +31,7 @@ $VERSION = eval $VERSION;
 ## use critic
 
 my $define = q{};
-$define .= ' -DWIN32 -DPERL_STATIC_SYMS' if ($^O eq 'MSWin32');
+$define .= ' -DWIN32' if ($^O eq 'MSWin32');
 
 my @c_files = <*.c>;
 my $o_files = join q{ }, @c_files;
