@@ -83,10 +83,16 @@ my $input = q{Create Metric m As Select 1 Where True};
 
 say $grammar->show_symbols();
 say $grammar->show_rules();
+say $grammar->show_ahms();
 
 my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar, semantics_package => 'Maql_Actions' } );
 $recce->read( \$input );
 my $value_ref = $recce->value();
+
+say $recce->show_earley_sets();
+$recce->show_or_nodes();
+$recce->show_and_nodes();
+
 say Dumper(${$value_ref});
 
 ## INPUT DATA
