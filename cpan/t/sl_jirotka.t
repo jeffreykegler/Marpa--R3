@@ -16,6 +16,7 @@
 
 # CENSUS: REWORK
 # Note: Create an sl_jirotka.t, then mark this for deletion
+#
 
 use 5.010001;
 use strict;
@@ -81,146 +82,13 @@ END_OF_DSL
 
 my $input = q{Create Metric m As Select 1 Where True};
 
-say $grammar->show_symbols();
-say $grammar->show_rules();
-say $grammar->show_ahms();
-
-my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar, semantics_package => 'Maql_Actions' } );
-$recce->read( \$input );
-my $value_ref = $recce->value();
-
-say $recce->show_earley_sets();
-$recce->show_or_nodes();
-$recce->show_and_nodes();
-
-say Dumper(${$value_ref});
-
-## INPUT DATA
-my $tokens = [
-    [ 'CREATE',    'Create' ],
-    [ 'METRIC',    'Metric' ],
-    [ 'ID_METRIC', 'm' ],
-    [ 'AS',        'As' ],
-    [ 'SELECT',    'Select' ],
-    [ 'NUMBER',    1 ],
-    [ 'WHERE',     'Where' ],
-    [ 'TRUE',      'True' ],
-];
-
-my @terminals =
-    qw/AS BY CREATE FALSE FOR METRIC PF SELECT TRUE WHERE WITH ID_METRIC SEPARATOR NUMBER/;
-
-$grammar = Marpa::R3::Grammar->new(
-    {   start          => 'Input',
-        action_object  => 'Maql_Actions',
-        default_action => 'tisk',
-        default_empty_action => '::undef',
-        terminals      => \@terminals,
-        rules          => [
-            {   lhs       => 'Input',
-                rhs       => ['Statement'],
-                min       => 1,
-                separator => 'SEPARATOR'
-            },
-            {   lhs => 'Statement',
-                rhs => [qw/CREATE TypeDef/],
-            },
-            {   lhs => 'TypeDef',
-                rhs => [qw/METRIC ID_METRIC AS MetricSelect/],
-            },
-            {   lhs => 'MetricSelect',
-                rhs => [qw/SELECT MetricExpr ByClause Match Filter WithPf/],
-            },
-            {   lhs => 'MetricExpr',
-                rhs => [qw/NUMBER/],
-            },
-##############################################################################
-            {   lhs => 'ByClause',
-                rhs => [],
-            },
-            {   lhs => 'ByClause',
-                rhs => [qw/BY/],
-            },
-##############################################################################
-            {   lhs => 'Match',
-                rhs => [],
-            },
-            {   lhs => 'Match',
-                rhs => [qw/FOR/],
-            },
-#############################################################################
-            {   lhs => 'Filter',
-                rhs => [],
-            },
-            {   lhs => 'Filter',
-                rhs => [qw/WHERE FilterExpr/],
-            },
-            {   lhs => 'FilterExpr',
-                rhs => [qw/TRUE/],
-            },
-            {   lhs => 'FilterExpr',
-                rhs => [qw/FALSE/],
-            },
-###############################################################################
-            {   lhs => 'WithPf',
-                rhs => [],
-            },
-            {   lhs => 'WithPf',
-                rhs => [qw/WITH PF/],
-            },
-###############################################################################
-        ],
-    }
-);
-
-$grammar->precompute();
-
 Marpa::R3::Test::is(
     $grammar->show_symbols(),
     <<'END_OF_SYMBOLS', 'Symbols' );
-0: AS, terminal
-1: BY, terminal
-2: CREATE, terminal
-3: FALSE, terminal
-4: FOR, terminal
-5: METRIC, terminal
-6: PF, terminal
-7: SELECT, terminal
-8: TRUE, terminal
-9: WHERE, terminal
-10: WITH, terminal
-11: ID_METRIC, terminal
-12: SEPARATOR, terminal
-13: NUMBER, terminal
-14: Input
-15: Statement
-16: TypeDef
-17: MetricSelect
-18: MetricExpr
-19: ByClause
-20: Match
-21: Filter
-22: WithPf
-23: FilterExpr
 END_OF_SYMBOLS
 
 Marpa::R3::Test::is( $grammar->show_rules(),
 <<'END_OF_RULES', 'Rules' );
-0: Input -> Statement+ /* discard_sep */
-1: Statement -> CREATE TypeDef
-2: TypeDef -> METRIC ID_METRIC AS MetricSelect
-3: MetricSelect -> SELECT MetricExpr ByClause Match Filter WithPf
-4: MetricExpr -> NUMBER
-5: ByClause -> /* empty !used */
-6: ByClause -> BY
-7: Match -> /* empty !used */
-8: Match -> FOR
-9: Filter -> /* empty !used */
-10: Filter -> WHERE FilterExpr
-11: FilterExpr -> TRUE
-12: FilterExpr -> FALSE
-13: WithPf -> /* empty !used */
-14: WithPf -> WITH PF
 END_OF_RULES
 
 Marpa::R3::Test::is( $grammar->show_ahms(),
@@ -361,11 +229,11 @@ AHM 66: completion
     Input['] ::= Input .
 END_OF_AHMS
 
-my $recog = Marpa::R3::Recognizer->new( { grammar => $grammar } );
-for my $token ( @{$tokens} ) { $recog->read( @{$token} ); }
-my @result = $recog->value();
+my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar, semantics_package => 'Maql_Actions' } );
+$recce->read( \$input );
+my $value_ref = $recce->value();
 
-Marpa::R3::Test::is( $recog->show_earley_sets(),
+Marpa::R3::Test::is( $recce->show_earley_sets(),
     <<'END_OF_EARLEY_SETS', 'Earley Sets' );
 Last Completed: 8; Furthest: 8
 Earley Set 0
@@ -531,57 +399,64 @@ ahm62: R22:0@8-8
   R22:0: WithPf ::= . WITH PF
 END_OF_EARLEY_SETS
 
-Marpa::R3::Test::is( $recog->show_and_nodes(),
-    <<'END_OF_AND_NODES', 'And Nodes' );
-And-node #0: R4:1@0-1S2@0
-And-node #19: R0:1@0-8C2@0
-And-node #18: R2:1@0-8C4@0
-And-node #17: R4:2@0-8C5@1
-And-node #20: R23:1@0-8C0@0
-And-node #1: R5:1@1-2S5@1
-And-node #2: R5:2@1-3S11@2
-And-node #3: R5:3@1-4S0@3
-And-node #16: R5:4@1-8C8@4
-And-node #4: R8:1@4-5S7@4
-And-node #6: R8:2@4-6C16@5
-And-node #7: R8:3@4-6S20@6
-And-node #15: R8:4@4-8C12@6
-And-node #5: R16:1@5-6S13@5
-And-node #8: R12:1@6-6S22@6
-And-node #9: R19:1@6-7S9@6
-And-node #14: R12:2@6-8C14@6
-And-node #12: R14:1@6-8C19@6
-And-node #13: R14:2@6-8S26@8
-And-node #11: R19:2@6-8C20@7
-And-node #10: R20:1@7-8S8@7
+TODO: {
+    todo_skip "show_and_nodes() porting not completed", 1;
+
+    Marpa::R3::Test::is( $recce->show_and_nodes(),
+        <<'END_OF_AND_NODES', 'And Nodes' );
+    And-node #0: R4:1@0-1S2@0
+    And-node #19: R0:1@0-8C2@0
+    And-node #18: R2:1@0-8C4@0
+    And-node #17: R4:2@0-8C5@1
+    And-node #20: R23:1@0-8C0@0
+    And-node #1: R5:1@1-2S5@1
+    And-node #2: R5:2@1-3S11@2
+    And-node #3: R5:3@1-4S0@3
+    And-node #16: R5:4@1-8C8@4
+    And-node #4: R8:1@4-5S7@4
+    And-node #6: R8:2@4-6C16@5
+    And-node #7: R8:3@4-6S20@6
+    And-node #15: R8:4@4-8C12@6
+    And-node #5: R16:1@5-6S13@5
+    And-node #8: R12:1@6-6S22@6
+    And-node #9: R19:1@6-7S9@6
+    And-node #14: R12:2@6-8C14@6
+    And-node #12: R14:1@6-8C19@6
+    And-node #13: R14:2@6-8S26@8
+    And-node #11: R19:2@6-8C20@7
+    And-node #10: R20:1@7-8S8@7
 END_OF_AND_NODES
+}
 
-Marpa::R3::Test::is( $recog->show_or_nodes(),
-    <<'END_OF_OR_NODES', 'Or Nodes' );
-R4:1@0-1
-R0:1@0-8
-R2:1@0-8
-R4:2@0-8
-R23:1@0-8
-R5:1@1-2
-R5:2@1-3
-R5:3@1-4
-R5:4@1-8
-R8:1@4-5
-R8:2@4-6
-R8:3@4-6
-R8:4@4-8
-R16:1@5-6
-R12:1@6-6
-R19:1@6-7
-R12:2@6-8
-R14:1@6-8
-R14:2@6-8
-R19:2@6-8
-R20:1@7-8
+TODO: {
+    todo_skip "show_or_nodes() porting not completed", 1;
+    Marpa::R3::Test::is( $recce->show_or_nodes(),
+        <<'END_OF_OR_NODES', 'Or Nodes' );
+    R4:1@0-1
+    R0:1@0-8
+    R2:1@0-8
+    R4:2@0-8
+    R23:1@0-8
+    R5:1@1-2
+    R5:2@1-3
+    R5:3@1-4
+    R5:4@1-8
+    R8:1@4-5
+    R8:2@4-6
+    R8:3@4-6
+    R8:4@4-8
+    R16:1@5-6
+    R12:1@6-6
+    R19:1@6-7
+    R12:2@6-8
+    R14:1@6-8
+    R14:2@6-8
+    R19:2@6-8
+    R20:1@7-8
 END_OF_OR_NODES
+}
 
-Marpa::R3::Test::is( Dumper( \@result ), <<'END_OF_STRING', 'Result' );
+Marpa::R3::Test::is( Dumper( ${$value_ref} ), <<'END_OF_STRING', 'Result' );
 $VAR1 = [
           \[
               [
