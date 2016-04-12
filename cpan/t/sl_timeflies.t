@@ -53,33 +53,37 @@ use Marpa::R3;
 sub do_sva_sentence      { return "sva($_[1];$_[2];$_[3])" }
 sub do_svo_sentence      { return "svo($_[1];$_[2];$_[3])" }
 sub do_adjunct           { return "adju($_[1];$_[2])" }
-sub do_adjective         { return "adje($_[1])" }
+sub do_adjective         { return "adje(${$_[1]})" }
 sub do_qualified_subject { return "s($_[1];$_[2])" }
 sub do_bare_subject      { return "s($_[1])" }
-sub do_noun              { return "n($_[1])" }
-sub do_verb              { return "v($_[1])" }
+sub do_noun              { return "n(${$_[1]})" }
+sub do_verb              { return "v(${$_[1]})" }
 sub do_object            { return "o($_[1];$_[2])" }
-sub do_article           { return "art($_[1])" }
-sub do_preposition       { return "pr($_[1])" }
+sub do_article           { return "art(${$_[1]})" }
+sub do_preposition       { return "pr(${$_[1]})" }
 
 ## use critic
 
-my $grammar = Marpa::R3::Grammar->new(
-    {   start   => 'sentence',
-        actions => 'main',
-        rules   => [
-            [ 'sentence', [qw(subject verb adjunct)], 'do_sva_sentence' ],
-            [ 'sentence', [qw(subject verb object)],  'do_svo_sentence' ],
-            [ 'adjunct',  [qw(preposition object)], 'do_adjunct' ],
-            [ 'adjective',   [qw(adjective_noun_lex)], 'do_adjective' ],
-            [ 'subject',     [qw(adjective noun)], 'do_qualified_subject' ],
-            [ 'subject',     [qw(noun)], 'do_bare_subject' ],
-            [ 'noun',        [qw(adjective_noun_lex)], 'do_noun' ],
-            [ 'verb',        [qw(verb_lex)], 'do_verb' ],
-            [ 'object',      [qw(article noun)], 'do_object' ],
-            [ 'article',     [qw(article_lex)], 'do_article' ],
-            [ 'preposition', [qw(preposition_lex)], 'do_preposition' ],
-        ],
+my $grammar = Marpa::R3::Scanless::G->new(
+    {
+        source => \<<'END_OF_DSL',
+sentence    ::= subject verb adjunct    action => do_sva_sentence
+sentence    ::= subject verb object     action => do_svo_sentence
+adjunct     ::= preposition object      action => do_adjunct
+adjective   ::= adjective_noun_lex      action => do_adjective
+subject     ::= adjective noun          action => do_qualified_subject
+subject     ::= noun                    action => do_bare_subject
+noun        ::= adjective_noun_lex      action => do_noun
+verb        ::= verb_lex                action => do_verb
+object      ::= article noun            action => do_object
+article     ::= article_lex             action => do_article
+preposition ::= preposition_lex         action => do_preposition
+adjective_noun_lex ~ unicorn
+verb_lex ~ unicorn
+article_lex ~ unicorn
+preposition_lex ~ unicorn
+unicorn ~ [\d\D]
+END_OF_DSL
     }
 );
 
@@ -90,8 +94,6 @@ svo(s(adje(fruit);n(flies));v(like);o(art(a);n(banana)))
 svo(s(adje(time);n(flies));v(like);o(art(an);n(arrow)))
 EOS
 my @actual = ();
-
-$grammar->precompute();
 
 my %lexical_class = (
     'preposition_lex'    => 'like',
@@ -109,19 +111,22 @@ for my $lexical_class (keys %lexical_class) {
 
 for my $data ( 'time flies like an arrow', 'fruit flies like a banana' ) {
 
-    my $recce = Marpa::R3::Recognizer->new( { grammar => $grammar } );
+    my $recce = Marpa::R3::Scanless::R->new( {
+        grammar => $grammar,
+        semantics_package => 'main',
+    } );
     die 'Failed to create recognizer' if not $recce;
 
+    my $lexeme_start = 0;
+    $recce->read( \$data, 0, 0 );
     for my $word ( split q{ }, $data ) {
-        $recce->exhausted() and die 'Recognizer exhausted';
         for my $type ( @{ $vocabulary{$word} } ) {
-            $recce->alternative( $type, \$word, 1 )
+            $recce->lexeme_alternative( $type, \$word )
                 or die 'Recognition failed';
         }
-        $recce->earleme_complete();
+        $recce->lexeme_complete($lexeme_start, length $word);
+        $lexeme_start += length $word;
     } ## end for my $word ( split q{ }, $data )
-
-    $recce->end_input();
 
     while ( defined( my $value_ref = $recce->value() ) ) {
         my $value = $value_ref ? ${$value_ref} : 'No parse';
