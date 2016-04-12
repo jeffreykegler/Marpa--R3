@@ -28,7 +28,7 @@
 # most of us native speakers.
 
 # 'time', 'fruit', and 'flies' can be nouns or verbs, 'like' can be
-# a preposition or a verb.  This creates syntactic ambiguity shown 
+# a preposition or a verb.  This creates syntactic ambiguity shown
 # in the parse results.
 
 # Modifier nouns are not tagged or lexed as adjectives (JJ), because
@@ -61,22 +61,22 @@ use Marpa::R3;
 
 my $grammar = Marpa::R3::Scanless::G->new(
     {   source => \(<<'END_OF_SOURCE'),
-        
+
 :default     ::= action => [ name, values ]
 lexeme default = action => [ name, value ]
 
-S   ::= NP  VP  period  
+S   ::= NP  VP  period
 
-NP  ::= NN              
-    |   DT  NN          
-    |   NN  NNS         
+NP  ::= NN
+    |   DT  NN
+    |   NN  NNS
 
-VP  ::= VBP NP          
-    |   VBP PP          
-    |   VBZ PP          
+VP  ::= VBP NP
+    |   VBP PP
+    |   VBZ PP
 
-PP  ::= IN  NP          
-    
+PP  ::= IN  NP
+
 period ~ '.'
 
 :discard ~ whitespace
@@ -85,7 +85,7 @@ whitespace ~ [\s]+
 DT  ~ 'a' | 'an'
 NN  ~ 'arrow' | 'banana'
 NNS ~ 'flies'
-VBZ ~ 'flies' 
+VBZ ~ 'flies'
 NN  ~ 'fruit':i
 VBP ~ 'fruit':i
 IN  ~ 'like'
@@ -100,27 +100,27 @@ END_OF_SOURCE
 # Marpa::R3::Display::End
 
 my $expected = <<'EOS';
-(S 
-  (NP (NN Time)) 
-  (VP (VBZ flies) 
-    (PP (IN like) 
-      (NP (DT an) (NN arrow)))) 
+(S
+  (NP (NN Time))
+  (VP (VBZ flies)
+    (PP (IN like)
+      (NP (DT an) (NN arrow))))
   (. .))
-(S 
-  (NP (NN Time) (NNS flies)) 
-  (VP (VBP like) 
-    (NP (DT an) (NN arrow))) 
+(S
+  (NP (NN Time) (NNS flies))
+  (VP (VBP like)
+    (NP (DT an) (NN arrow)))
   (. .))
-(S 
-  (NP (NN Fruit)) 
-  (VP (VBZ flies) 
-    (PP (IN like) 
-      (NP (DT a) (NN banana)))) 
+(S
+  (NP (NN Fruit))
+  (VP (VBZ flies)
+    (PP (IN like)
+      (NP (DT a) (NN banana))))
   (. .))
-(S 
-  (NP (NN Fruit) (NNS flies)) 
-  (VP (VBP like) 
-    (NP (DT a) (NN banana))) 
+(S
+  (NP (NN Fruit) (NNS flies))
+  (VP (VBP like)
+    (NP (DT a) (NN banana)))
   (. .))
 EOS
 
@@ -130,7 +130,7 @@ Fruit flies like a banana.
 END_OF_PARAGRAPH
 
 # structural tags -- need a newline
-my %s_tags = map { $_ => undef } qw{ NP VP PP period }; 
+my %s_tags = map { $_ => undef } qw{ NP VP PP period };
 
 my @actual = ();
 for my $sentence (split /\n/, $paragraph){
@@ -144,22 +144,23 @@ for my $sentence (split /\n/, $paragraph){
     }
 }
 
-sub bracket   { 
+sub bracket   {
     my ($tag, @contents) = @{ $_[0] };
     state $level++;
-    my $bracketed = 
+    my $bracketed =
         exists $s_tags{$tag} ? ("\n" . ("  " x ($level-1))) : '';
     $tag = '.' if $tag eq 'period';
     if (ref $contents[0]){
-        $bracketed .= 
+        $bracketed .=
                 "($tag "
-            .   join(' ', map { bracket($_) } @contents) 
+            .   join(' ', map { bracket($_) } @contents)
             .   ")";
     }
     else {
         $bracketed .= "($tag $contents[0])";
     }
     $level--;
+    $bracketed =~ s/\s\n/\n/g;
     return $bracketed;
 }
 
