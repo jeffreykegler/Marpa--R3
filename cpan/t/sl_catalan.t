@@ -14,8 +14,8 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-# CENSUS: REWORK
-# Note: reworked version of catalan.t ...
+# CENSUS: ASIS
+# Note: replacement for catalan.t ...
 
 use 5.010001;
 

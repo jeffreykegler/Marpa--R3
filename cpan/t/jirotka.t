@@ -14,8 +14,8 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-# CENSUS: REWORK
-# Note: Create an sl_jirotka.t, then mark this for deletion
+# CENSUS: DELETE
+# Note: Replaced by sl_jirotka.t
 
 use 5.010001;
 use strict;

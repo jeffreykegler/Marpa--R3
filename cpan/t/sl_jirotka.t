@@ -14,9 +14,8 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-# CENSUS: REWORK
-# Note: Create an sl_jirotka.t, then mark this for deletion
-#
+# CENSUS: ASIS
+# Note: Replaces jirotka.t
 
 use 5.010001;
 use strict;
@@ -38,24 +37,26 @@ use Marpa::R3;
 my $grammar = Marpa::R3::Scanless::G->new(
 	{
 		source => \<<'END_OF_DSL',
+:default ::= action => Maql_Actions::tisk
+
 Input ::= Statement+ separator => SEPARATOR
 Statement ::= CREATE TypeDef
 TypeDef ::= METRIC ID_METRIC AS MetricSelect
 MetricSelect ::= SELECT MetricExpr ByClause Match Filter WithPf
 MetricExpr ::= NUMBER
 ############################################################################
-ByClause ::=
+ByClause ::= action => ::undef
 ByClause ::= BY
 ############################################################################
-Match ::=
+Match ::= action => ::undef
 Match ::= FOR
 #############################################################################
-Filter ::=
+Filter ::= action => ::undef
 Filter ::= WHERE FilterExpr
 FilterExpr ::= TRUE
 FilterExpr ::= FALSE
 #############################################################################
-WithPf ::=
+WithPf ::= action => ::undef
 WithPf ::= WITH PF
 #############################################################################
 CREATE ~ 'Create'
