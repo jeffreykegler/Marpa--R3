@@ -16,6 +16,7 @@
 
 # CENSUS: ASIS
 # Note: SLIF TEST
+# Note: version of sl_timeflies.t with AST semantics
 
 # This example parses ambiguous English sentences.  The target annotation
 # is Penn Treebank's syntactic bracketing tags.  For details, see

@@ -15,8 +15,8 @@
 # http://www.gnu.org/licenses/.
 
 # CENSUS: REWORK
-# Note: Very similar to sl_timeflies.t
-# Note: Is this worth redoing in SLIF?
+# Note: sl_timeflies.t is now sl_timeflies_ast.t as it uses AST semantics
+# Note: redoing of timeflies.t in SLIF
 
 # This example is from Ralf Muschall, who clearly knows English
 # grammar better than most native speakers.  I've reworked the
