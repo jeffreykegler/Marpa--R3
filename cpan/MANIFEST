@@ -261,6 +261,7 @@ t/sl_gif1.t
 t/sl_gires.t
 t/sl_gsyn.t
 t/sl_incremental.t
+t/sl_jirotka.t
 t/sl_json.t
 t/sl_json_ast.t
 t/sl_latk.t

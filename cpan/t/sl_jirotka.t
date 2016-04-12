@@ -85,10 +85,51 @@ my $input = q{Create Metric m As Select 1 Where True};
 Marpa::R3::Test::is(
     $grammar->show_symbols(),
     <<'END_OF_SYMBOLS', 'Symbols' );
+G1 S0 :start -- Internal G1 start symbol
+G1 S1 Input
+G1 S2 Statement
+G1 S3 SEPARATOR
+G1 S4 CREATE
+G1 S5 TypeDef
+G1 S6 METRIC
+G1 S7 ID_METRIC
+G1 S8 AS
+G1 S9 MetricSelect
+G1 S10 SELECT
+G1 S11 MetricExpr
+G1 S12 ByClause
+G1 S13 Match
+G1 S14 Filter
+G1 S15 WithPf
+G1 S16 NUMBER
+G1 S17 BY
+G1 S18 FOR
+G1 S19 WHERE
+G1 S20 FilterExpr
+G1 S21 TRUE
+G1 S22 FALSE
+G1 S23 WITH
+G1 S24 PF
 END_OF_SYMBOLS
 
 Marpa::R3::Test::is( $grammar->show_rules(),
 <<'END_OF_RULES', 'Rules' );
+G1 R0 Input ::= Statement +
+G1 R1 Statement ::= CREATE TypeDef
+G1 R2 TypeDef ::= METRIC ID_METRIC AS MetricSelect
+G1 R3 MetricSelect ::= SELECT MetricExpr ByClause Match Filter WithPf
+G1 R4 MetricExpr ::= NUMBER
+G1 R5 ByClause ::=
+G1 R6 ByClause ::= BY
+G1 R7 Match ::=
+G1 R8 Match ::= FOR
+G1 R9 Filter ::=
+G1 R10 Filter ::= WHERE FilterExpr
+G1 R11 FilterExpr ::= TRUE
+G1 R12 FilterExpr ::= FALSE
+G1 R13 WithPf ::=
+G1 R14 WithPf ::= WITH PF
+G1 R15 :start ::= Input
 END_OF_RULES
 
 Marpa::R3::Test::is( $grammar->show_ahms(),
@@ -224,9 +265,13 @@ AHM 63: postdot = "PF"
 AHM 64: completion
     WithPf ::= WITH PF .
 AHM 65: postdot = "Input"
-    Input['] ::= . Input
+    [:start] ::= . Input
 AHM 66: completion
-    Input['] ::= Input .
+    [:start] ::= Input .
+AHM 67: postdot = "[:start]"
+    [:start]['] ::= . [:start]
+AHM 68: completion
+    [:start]['] ::= [:start] .
 END_OF_AHMS
 
 my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar, semantics_package => 'Maql_Actions' } );
