@@ -14,27 +14,20 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-# CENSUS: ASIS
-# Note: SLIF TEST
+# CENSUS: REWORK
+# Note: Very similar to sl_timeflies.t
+# Note: Is this worth redoing in SLIF?
 
-# This example parses ambiguous English sentences.  The target annotation
-# is Penn Treebank's syntactic bracketing tags.  For details, see
-# http://www.cis.upenn.edu/~treebank/
-
-# This example originally came from Ralf Muschall.  Ruslan Shvedov
-# reworked my implementation, converting it to the SLIF and
-# Penn Treebank.  Ruslan and Ralf clearly know English grammar better than
-# most of us native speakers.
-
-# 'time', 'fruit', and 'flies' can be nouns or verbs, 'like' can be
-# a preposition or a verb.  This creates syntactic ambiguity shown 
-# in the parse results.
-
-# Modifier nouns are not tagged or lexed as adjectives (JJ), because
-# "Nouns that are used as modifiers, whether in isolation or in sequences,
-# should be tagged as nouns (NN, NNS) rather than as adjectives (JJ)."
-# -- ftp://ftp.cis.upenn.edu/pub/treebank/doc/tagguide.ps.gz
-
+# This example is from Ralf Muschall, who clearly knows English
+# grammar better than most native speakers.  I've reworked the
+# terminology to follow _A Comprehensive Grammar of the English
+# Language_, by Quirk, Greenbaum, Leech and Svartvik.  My edition
+# was the "Seventh (corrected) impression 1989".
+#
+# When it is not a verb, I treat "like"
+# as a preposition in an adjunct of manner,
+# as per 8.79, p. 557; 9.4, pp. 661; and 9.48, pp. 698-699.
+#
 # The saying "time flies like an arrow; fruit flies like a banana"
 # is attributed to Groucho Marx, but there is no reason to believe
 # he ever said it.  Apparently, the saying
@@ -55,117 +48,89 @@ use lib 'inc';
 use Marpa::R3::Test;
 use Marpa::R3;
 
-# Marpa::R3::Display
-# name: SLIF "time flies" DSL synopsis
+## no critic (Subroutines::RequireArgUnpacking)
 
-my $grammar = Marpa::R3::Scanless::G->new(
-    {   source => \(<<'END_OF_SOURCE'),
-        
-:default     ::= action => [ name, values ]
-lexeme default = action => [ name, value ]
+sub do_sva_sentence      { return "sva($_[1];$_[2];$_[3])" }
+sub do_svo_sentence      { return "svo($_[1];$_[2];$_[3])" }
+sub do_adjunct           { return "adju($_[1];$_[2])" }
+sub do_adjective         { return "adje($_[1])" }
+sub do_qualified_subject { return "s($_[1];$_[2])" }
+sub do_bare_subject      { return "s($_[1])" }
+sub do_noun              { return "n($_[1])" }
+sub do_verb              { return "v($_[1])" }
+sub do_object            { return "o($_[1];$_[2])" }
+sub do_article           { return "art($_[1])" }
+sub do_preposition       { return "pr($_[1])" }
 
-S   ::= NP  VP  period  
+## use critic
 
-NP  ::= NN              
-    |   DT  NN          
-    |   NN  NNS         
-
-VP  ::= VBP NP          
-    |   VBP PP          
-    |   VBZ PP          
-
-PP  ::= IN  NP          
-    
-period ~ '.'
-
-:discard ~ whitespace
-whitespace ~ [\s]+
-
-DT  ~ 'a' | 'an'
-NN  ~ 'arrow' | 'banana'
-NNS ~ 'flies'
-VBZ ~ 'flies' 
-NN  ~ 'fruit':i
-VBP ~ 'fruit':i
-IN  ~ 'like'
-VBP ~ 'like'
-NN  ~ 'time':i
-VBP ~ 'time':i
-
-END_OF_SOURCE
+my $grammar = Marpa::R3::Grammar->new(
+    {   start   => 'sentence',
+        actions => 'main',
+        rules   => [
+            [ 'sentence', [qw(subject verb adjunct)], 'do_sva_sentence' ],
+            [ 'sentence', [qw(subject verb object)],  'do_svo_sentence' ],
+            [ 'adjunct',  [qw(preposition object)], 'do_adjunct' ],
+            [ 'adjective',   [qw(adjective_noun_lex)], 'do_adjective' ],
+            [ 'subject',     [qw(adjective noun)], 'do_qualified_subject' ],
+            [ 'subject',     [qw(noun)], 'do_bare_subject' ],
+            [ 'noun',        [qw(adjective_noun_lex)], 'do_noun' ],
+            [ 'verb',        [qw(verb_lex)], 'do_verb' ],
+            [ 'object',      [qw(article noun)], 'do_object' ],
+            [ 'article',     [qw(article_lex)], 'do_article' ],
+            [ 'preposition', [qw(preposition_lex)], 'do_preposition' ],
+        ],
     }
 );
 
-# Marpa::R3::Display::End
-
 my $expected = <<'EOS';
-(S 
-  (NP (NN Time)) 
-  (VP (VBZ flies) 
-    (PP (IN like) 
-      (NP (DT an) (NN arrow)))) 
-  (. .))
-(S 
-  (NP (NN Time) (NNS flies)) 
-  (VP (VBP like) 
-    (NP (DT an) (NN arrow))) 
-  (. .))
-(S 
-  (NP (NN Fruit)) 
-  (VP (VBZ flies) 
-    (PP (IN like) 
-      (NP (DT a) (NN banana)))) 
-  (. .))
-(S 
-  (NP (NN Fruit) (NNS flies)) 
-  (VP (VBP like) 
-    (NP (DT a) (NN banana))) 
-  (. .))
+sva(s(n(fruit));v(flies);adju(pr(like);o(art(a);n(banana))))
+sva(s(n(time));v(flies);adju(pr(like);o(art(an);n(arrow))))
+svo(s(adje(fruit);n(flies));v(like);o(art(a);n(banana)))
+svo(s(adje(time);n(flies));v(like);o(art(an);n(arrow)))
 EOS
-
-my $paragraph = <<END_OF_PARAGRAPH;
-Time flies like an arrow.
-Fruit flies like a banana.
-END_OF_PARAGRAPH
-
-# structural tags -- need a newline
-my %s_tags = map { $_ => undef } qw{ NP VP PP period }; 
-
 my @actual = ();
-for my $sentence (split /\n/, $paragraph){
 
-    my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar  } );
-    $recce->read( \$sentence );
+$grammar->precompute();
+
+my %lexical_class = (
+    'preposition_lex'    => 'like',
+    'verb_lex'           => 'like flies',
+    'adjective_noun_lex' => 'fruit banana time arrow flies',
+    'article_lex'        => 'a an',
+);
+my %vocabulary = ();
+for my $lexical_class (keys %lexical_class) {
+    my $words = $lexical_class{$lexical_class};
+    for my $word ( split q{ }, $words ) {
+        push @{ $vocabulary{$word} }, $lexical_class;
+    }
+} ## end for my $lexical_class (%lexical_class)
+
+for my $data ( 'time flies like an arrow', 'fruit flies like a banana' ) {
+
+    my $recce = Marpa::R3::Recognizer->new( { grammar => $grammar } );
+    die 'Failed to create recognizer' if not $recce;
+
+    for my $word ( split q{ }, $data ) {
+        $recce->exhausted() and die 'Recognizer exhausted';
+        for my $type ( @{ $vocabulary{$word} } ) {
+            $recce->alternative( $type, \$word, 1 )
+                or die 'Recognition failed';
+        }
+        $recce->earleme_complete();
+    } ## end for my $word ( split q{ }, $data )
+
+    $recce->end_input();
 
     while ( defined( my $value_ref = $recce->value() ) ) {
-        my $value = $value_ref ? bracket ( ${$value_ref} ) : 'No parse';
+        my $value = $value_ref ? ${$value_ref} : 'No parse';
         push @actual, $value;
     }
-}
+} ## end for my $data ( 'time flies like an arrow', ...)
 
-sub bracket   { 
-    my ($tag, @contents) = @{ $_[0] };
-    state $level++;
-    my $bracketed = 
-        exists $s_tags{$tag} ? ("\n" . ("  " x ($level-1))) : '';
-    $tag = '.' if $tag eq 'period';
-    if (ref $contents[0]){
-        $bracketed .= 
-                "($tag "
-            .   join(' ', map { bracket($_) } @contents) 
-            .   ")";
-    }
-    else {
-        $bracketed .= "($tag $contents[0])";
-    }
-    $level--;
-    return $bracketed;
-}
-
-Marpa::R3::Test::is( ( join "\n", @actual ) . "\n",
+Marpa::R3::Test::is( ( join "\n", sort @actual ) . "\n",
     $expected, 'Ambiguous English sentences' );
 
 1;    # In case used as "do" file
-
-# vim: set expandtab shiftwidth=4:
 
