@@ -14,9 +14,8 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-# CENSUS: REWORK
-# Note: Rewrite this as sl_minus.t ....
-# Note: then mark this for deletion.
+# CENSUS: ASIS
+# Note: Converted to SLIF from minus.t
 
 use 5.010001;
 
@@ -70,6 +69,10 @@ sub number {
     return "$value==$value";
 }
 
+sub minusminus {
+    return q{--};
+}
+
 sub default_action {
     shift;
     return q{} if scalar @_ <= 0;
@@ -88,10 +91,9 @@ E ::= E MinusMinus action => postfix_decr
 E ::= MinusMinus E action => prefix_decr
 E ::= Minus E action => negation
 E ::= Number action => number
-MinusMinus ~ unicorn
-Minus ~ unicorn
-Number ~ unicorn
-unicorn ~ [\d\D]
+MinusMinus ::= Minus Minus action => minusminus
+Minus ~ '-'
+Number ~ [\d]+
 END_OF_DSL
 	}
 );
@@ -103,11 +105,13 @@ my $recce = Marpa::R3::Scanless::R->new( {
 
 Marpa::R3::Test::is( $grammar->show_rules,
     <<'END_RULES', 'Minuses Equation Rules' );
-0: E -> E Minus E
-1: E -> E MinusMinus
-2: E -> MinusMinus E
-3: E -> Minus E
-4: E -> Number
+G1 R0 E ::= E Minus E
+G1 R1 E ::= E MinusMinus
+G1 R2 E ::= MinusMinus E
+G1 R3 E ::= Minus E
+G1 R4 E ::= Number
+G1 R5 MinusMinus ::= Minus Minus
+G1 R6 :start ::= E
 END_RULES
 
 Marpa::R3::Test::is( $grammar->show_ahms,
@@ -142,10 +146,20 @@ AHM 13: postdot = "Number"
     E ::= . Number
 AHM 14: completion
     E ::= Number .
-AHM 15: postdot = "E"
-    E['] ::= . E
-AHM 16: completion
-    E['] ::= E .
+AHM 15: postdot = "Minus"
+    MinusMinus ::= . Minus Minus
+AHM 16: postdot = "Minus"
+    MinusMinus ::= Minus . Minus
+AHM 17: completion
+    MinusMinus ::= Minus Minus .
+AHM 18: postdot = "E"
+    [:start] ::= . E
+AHM 19: completion
+    [:start] ::= E .
+AHM 20: postdot = "[:start]"
+    [:start]['] ::= . [:start]
+AHM 21: completion
+    [:start]['] ::= [:start] .
 END_AHMS
 
 my %expected = map { ( $_ => 1 ) } (
@@ -161,17 +175,7 @@ my %expected = map { ( $_ => 1 ) } (
     #>>>
 );
 
-$recce->read( \q{6-----1}, 0, 0 );
-
-my $lexeme_start = 0;
-$recce->lexeme_read( 'Number', $lexeme_start, 1, '6' );
-for ( 1 .. 4 ) {
-    $recce->lexeme_alternative( 'MinusMinus', q{--} );
-    $recce->lexeme_alternative( 'Minus', q{-} );
-    $recce->lexeme_complete( ++$lexeme_start, 1 );
-}
-$recce->lexeme_read( 'Minus',  ++$lexeme_start, 1, q{-} );
-$recce->lexeme_read( 'Number', ++$lexeme_start, 1, '1'  );
+$recce->read( \q{6-----1} );
 
 # Set max_parses to 20 in case there's an infinite loop.
 # This is for debugging, after all

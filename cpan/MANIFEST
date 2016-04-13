@@ -272,6 +272,7 @@ t/sl_lc.t
 t/sl_leo.t
 t/sl_leo2.t
 t/sl_lexevent.t
+t/sl_minus.t
 t/sl_null_example.t
 t/sl_numeric.t
 t/sl_panda.t

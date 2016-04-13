@@ -14,9 +14,8 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-# CENSUS: REWORK
-# Note: Rewrite this as sl_minus.t ....
-# Note: then mark this for deletion.
+# CENSUS: DELETE
+# Note: Converted to sl_minus.t
 
 use 5.010001;
 
