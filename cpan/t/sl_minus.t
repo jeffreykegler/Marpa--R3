@@ -79,42 +79,27 @@ sub default_action {
 
 ## use critic
 
-my $grammar = Marpa::R3::Grammar->new(
-    {   start   => 'E',
-        actions => 'main',
-        rules   => [
-            {   lhs    => 'E',
-                rhs    => [qw/E Minus E/],
-                action => 'subtraction',
-            },
-            {   lhs    => 'E',
-                rhs    => [qw/E MinusMinus/],
-                action => 'postfix_decr',
-            },
-            {   lhs    => 'E',
-                rhs    => [qw/MinusMinus E/],
-                action => 'prefix_decr',
-            },
-            {   lhs    => 'E',
-                rhs    => [qw/Minus E/],
-                action => 'negation'
-            },
-            {   lhs    => 'E',
-                rhs    => [qw/Number/],
-                action => 'number'
-            },
-        ],
-        symbols => {
-            MinusMinus => { terminal => 1 },
-            Minus      => { terminal => 1 },
-            Number     => { terminal => 1 },
-        },
-        default_action => 'default_action',
-    },
+my $grammar = Marpa::R3::Scanless::G->new(
+    {
+        source => \<<'END_OF_DSL',
+:default ::= action => default_action
+E ::= E Minus E action => subtraction
+E ::= E MinusMinus action => postfix_decr
+E ::= MinusMinus E action => prefix_decr
+E ::= Minus E action => negation
+E ::= Number action => number
+MinusMinus ~ unicorn
+Minus ~ unicorn
+Number ~ unicorn
+unicorn ~ [\d\D]
+END_OF_DSL
+	}
 );
-$grammar->precompute();
 
-my $recce = Marpa::R3::Recognizer->new( { grammar => $grammar } );
+my $recce = Marpa::R3::Scanless::R->new( {
+	grammar => $grammar,
+	semantics_package => 'main',
+} );
 
 Marpa::R3::Test::is( $grammar->show_rules,
     <<'END_RULES', 'Minuses Equation Rules' );
@@ -176,14 +161,17 @@ my %expected = map { ( $_ => 1 ) } (
     #>>>
 );
 
-$recce->read( 'Number', '6' );
+$recce->read( \q{6-----1}, 0, 0 );
+
+my $lexeme_start = 0;
+$recce->lexeme_read( 'Number', $lexeme_start, 1, '6' );
 for ( 1 .. 4 ) {
-    $recce->alternative( 'MinusMinus', \q{--}, 2 );
-    $recce->alternative( 'Minus', \q{-} );
-    $recce->earleme_complete();
+    $recce->lexeme_alternative( 'MinusMinus', q{--} );
+    $recce->lexeme_alternative( 'Minus', q{-} );
+    $recce->lexeme_complete( ++$lexeme_start, 1 );
 }
-$recce->read( 'Minus',  q{-}, );
-$recce->read( 'Number', '1' );
+$recce->lexeme_read( 'Minus',  ++$lexeme_start, 1, q{-} );
+$recce->lexeme_read( 'Number', ++$lexeme_start, 1, '1'  );
 
 # Set max_parses to 20 in case there's an infinite loop.
 # This is for debugging, after all
