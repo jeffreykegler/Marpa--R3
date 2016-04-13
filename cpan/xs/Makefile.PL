@@ -24,7 +24,7 @@
 use ExtUtils::MakeMaker;
 
 use vars qw($VERSION $STRING_VERSION);
-$VERSION        = '1.001_000';
+$VERSION        = '4.001_000';
 $STRING_VERSION = $VERSION;
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 $VERSION = eval $VERSION;

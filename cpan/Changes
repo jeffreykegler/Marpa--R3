@@ -15,6 +15,10 @@
 
 Revision history for Marpa::R3
 
+4.001_000 (libmarpa 8.3.0) Tue Apr 12 17:39:56 PDT 2016
+
+   * Version bump, for the benefit of CPAN indexing
+
 1.001_000 (libmarpa 8.3.0) Thu Mar 31 19:05:09 PDT 2016
 
    * Starting Marpa::R3
