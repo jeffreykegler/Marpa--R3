@@ -236,6 +236,7 @@ t/sl_astsyn.t
 t/sl_bracket.t
 t/sl_calc.t
 t/sl_catalan.t
+t/sl_code_diag.t
 t/sl_completed.t
 t/sl_debug.t
 t/sl_diag.t
@@ -252,6 +253,8 @@ t/sl_evsyn2.t
 t/sl_exhaust.t
 t/sl_external1.t
 t/sl_final_nn.t
+t/sl_flies.t
+t/sl_flies_ast.t
 t/sl_fullsyn.t
 t/sl_gabend.t
 t/sl_gia.t
@@ -281,8 +284,6 @@ t/sl_ruby.t
 t/sl_salad.t
 t/sl_syn.t
 t/sl_taint.t
-t/sl_flies.t
-t/sl_flies_ast.t
 t/sl_topsyn.t
 t/sl_tut2.t
 t/sl_wall.t

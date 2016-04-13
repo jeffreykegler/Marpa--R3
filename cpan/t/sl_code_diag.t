@@ -14,8 +14,8 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-# CENSUS: DELETE
-# Note: Converted to sl_code_diag.t
+# CENSUS: ASIS
+# Note: Convert from code_diag.t
 
 # Ensure various coding errors are caught
 
@@ -35,17 +35,10 @@ our $DEFAULT_NULL_DESC = '[default null]';
 our $NULL_DESC         = '[null]';
 
 my @features = qw(
-    e_op_action default_action
+    E_OP_ACTION_FEATURE DEFAULT_ACTION_FEATURE
 );
 
 my @tests = ( 'run phase warning', 'run phase error', 'run phase die', );
-
-my %good_code = (
-    'e_op_action'     => 'main::e_op_action',
-    'e_pass_through'  => 'main::e_pass_through',
-    'e_number_action' => 'main::e_number_action',
-    'default_action'  => 'main::default_action',
-);
 
 # Code to produce a run phase warning
 sub run_phase_warning {
@@ -99,7 +92,7 @@ $x++;
 1;
 __END__
 
-| expected e_op_action run phase warning
+| expected E_OP_ACTION_FEATURE run phase warning
 ============================================================
 * THERE WERE 2 WARNING(S) IN THE MARPA SEMANTICS:
 Marpa treats warnings as fatal errors
@@ -112,7 +105,7 @@ Test Warning 2 at <LOCATION>
 Marpa::R3 exception at <LOCATION>
 __END__
 
-| expected default_action run phase warning
+| expected DEFAULT_ACTION_FEATURE run phase warning
 ============================================================
 * THERE WERE 2 WARNING(S) IN THE MARPA SEMANTICS:
 Marpa treats warnings as fatal errors
@@ -133,7 +126,7 @@ $x++;
 1;
 __END__
 
-| expected e_op_action run phase error
+| expected E_OP_ACTION_FEATURE run phase error
 ============================================================
 * THE MARPA SEMANTICS PRODUCED A FATAL ERROR
 * THIS IS WHAT MARPA WAS DOING WHEN THE PROBLEM OCCURRED:
@@ -143,7 +136,7 @@ Illegal division by zero at <LOCATION>
 Marpa::R3 exception at <LOCATION>
 __END__
 
-| expected default_action run phase error
+| expected DEFAULT_ACTION_FEATURE run phase error
 ============================================================
 * THE MARPA SEMANTICS PRODUCED A FATAL ERROR
 * THIS IS WHAT MARPA WAS DOING WHEN THE PROBLEM OCCURRED:
@@ -161,7 +154,7 @@ $x++;
 1;
 __END__
 
-| expected e_op_action run phase die
+| expected E_OP_ACTION_FEATURE run phase die
 ============================================================
 * THE MARPA SEMANTICS PRODUCED A FATAL ERROR
 * THIS IS WHAT MARPA WAS DOING WHEN THE PROBLEM OCCURRED:
@@ -171,7 +164,7 @@ test call to die at <LOCATION>
 Marpa::R3 exception at <LOCATION>
 __END__
 
-| expected default_action run phase die
+| expected DEFAULT_ACTION_FEATURE run phase die
 ============================================================
 * THE MARPA SEMANTICS PRODUCED A FATAL ERROR
 * THIS IS WHAT MARPA WAS DOING WHEN THE PROBLEM OCCURRED:
@@ -244,70 +237,51 @@ sub canonical {
     return $template;
 } ## end sub canonical
 
+my $dsl = <<'END_OF_DSL';
+:default ::= action => DEFAULT_ACTION_FEATURE
+S ::= T trailer optional_trailer1 optional_trailer2
+T ::= T AddOp T action => main::e_op_action
+T ::= F action => main::e_pass_through
+F ::= F MultOp F action => E_OP_ACTION_FEATURE
+F ::=  Number action => main::e_number_action
+optional_trailer1 ::= trailer
+optional_trailer1 ::= action => main::DEFAULT_NULL_DESC
+optional_trailer2 ::= action => main::NULL_DESC
+trailer ::= Text
+
+Number ~ [\d]+
+AddOp ~ '+'
+MultOp ~ '*'
+Text ~ 'trailer'
+:discard ~ ws
+ws ~ [\s]+
+END_OF_DSL
+
 sub run_test {
     my $args = shift;
 
-    my $e_op_action     = $good_code{e_op_action};
-    my $e_pass_through  = $good_code{e_pass_through};
-    my $e_number_action = $good_code{e_number_action};
-    my $default_action  = $good_code{default_action};
-
-    ### e_op_action default: $e_op_action
-    ### e_number_action default: $e_number_action
+    my $this_dsl = $dsl;
 
     ARG: for my $arg ( keys %{$args} ) {
         my $value        = $args->{$arg};
-        my $run_test_arg = lc $arg;
-        if ( $run_test_arg eq 'e_op_action' ) {
-            $e_op_action = $value;
+        if ( $arg eq 'E_OP_ACTION_FEATURE' ) {
+            $this_dsl =~ s/E_OP_ACTION_FEATURE/$value/xms;
             next ARG;
         }
-        if ( $run_test_arg eq 'e_number_action' ) {
-            $e_number_action = $value;
-            next ARG;
-        }
-        if ( $run_test_arg eq 'default_action' ) {
-            $default_action = $value;
+        if ( $arg eq 'DEFAULT_ACTION_FEATURE' ) {
+            $this_dsl =~ s/DEFAULT_ACTION_FEATURE/$value/xms;
             next ARG;
         }
         die "unknown argument to run_test: $arg";
     } ## end ARG: for my $arg ( keys %{$args} )
 
-    ### e_op_action: $e_op_action
-    ### e_number_action: $e_number_action
+    $this_dsl =~ s/E_OP_ACTION_FEATURE/main::e_op_action/xmsg;
+    $this_dsl =~ s/DEFAULT_ACTION_FEATURE/main::default_action/xmsg;
 
-    my $grammar = Marpa::R3::Grammar->new(
-        {   start => 'S',
-            rules => [
-                [ 'S', [qw/T trailer optional_trailer1 optional_trailer2/], ],
-                [ 'T', [qw/T AddOp T/], $e_op_action, ],
-                [ 'T', [qw/F/], $e_pass_through, ],
-                [ 'F', [qw/F MultOp F/], $e_op_action, ],
-                [ 'F', [qw/Number/], $e_number_action, ],
-                [ 'optional_trailer1', [qw/trailer/], ],
-                [ 'optional_trailer1', [], ],
-                [ 'optional_trailer2', [], 'main::NULL_DESC' ],
-                [ 'trailer',           [qw/Text/], ],
-            ],
-            default_action       => $default_action,
-            default_empty_action => 'main::DEFAULT_NULL_DESC',
-            terminals            => [qw(Number AddOp MultOp Text)],
-        }
-    );
-    $grammar->precompute();
+    my $grammar = Marpa::R3::Scanless::G->new( { source => \$this_dsl });
 
-    my $recce = Marpa::R3::Recognizer->new( { grammar => $grammar } );
-
-    $recce->read( Number => 2 );
-    $recce->read( MultOp => q{*} );
-    $recce->read( Number => 3 );
-    $recce->read( AddOp  => q{+} );
-    $recce->read( Number => 4 );
-    $recce->read( MultOp => q{*} );
-    $recce->read( Number => 1 );
-    $recce->read( Text   => q{trailer} );
-
-    $recce->end_input();
+    my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
+    $recce->read(\'2*3+4*1trailer');
 
     my $expected  = '(((2*3)+(4*1))==10;trailer;[default null];[null])';
     my $value_ref = $recce->value();
