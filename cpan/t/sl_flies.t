@@ -14,9 +14,8 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-# CENSUS: REWORK
-# Note: sl_timeflies.t is now sl_timeflies_ast.t as it uses AST semantics
-# Note: redoing of timeflies.t in SLIF
+# CENSUS: ASIS
+# Note: converted from timeflies.t NAIF test to SLIF
 
 # This example is from Ralf Muschall, who clearly knows English
 # grammar better than most native speakers.  I've reworked the

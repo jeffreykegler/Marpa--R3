@@ -14,9 +14,8 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-# CENSUS: REWORK
-# Note: Very similar to sl_timeflies.t
-# Note: Is this worth redoing in SLIF?
+# CENSUS: DELETE
+# Note: Converted to sl_timeflies.t
 
 # This example is from Ralf Muschall, who clearly knows English
 # grammar better than most native speakers.  I've reworked the
