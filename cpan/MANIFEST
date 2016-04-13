@@ -281,7 +281,8 @@ t/sl_ruby.t
 t/sl_salad.t
 t/sl_syn.t
 t/sl_taint.t
-t/sl_timeflies.t
+t/sl_flies.t
+t/sl_flies_ast.t
 t/sl_topsyn.t
 t/sl_tut2.t
 t/sl_wall.t
