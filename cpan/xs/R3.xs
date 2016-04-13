@@ -7068,6 +7068,26 @@ PPCODE:
   XSRETURN_IV( old_priority );
 }
 
+
+void
+token_value(slr, token_ix)
+    Scanless_R *slr;
+    int token_ix;
+PPCODE:
+{
+  SV **p_token_value_sv;
+  p_token_value_sv = av_fetch (slr->token_values, (I32) token_ix, 0);
+  if (!p_token_value_sv)
+    {
+      char *error_message =
+        form ( "$slr->token_value(): No token value for index %lu",
+	 (unsigned long) token_ix);
+      XSRETURN_PV(error_message);
+    }
+  XPUSHs (sv_2mortal (SvREFCNT_inc_simple_NN (*p_token_value_sv)));
+}
+
+
 INCLUDE: general_pattern.xsh
 
 BOOT:

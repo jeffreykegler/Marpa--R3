@@ -283,8 +283,10 @@ Marpa::R3::Test::is( $recce->show_earley_sets(),
     <<'END_OF_EARLEY_SETS', 'Earley Sets' );
 Last Completed: 8; Furthest: 8
 Earley Set 0
+ahm67: R24:0@0-0
+  R24:0: [:start]['] ::= . [:start]
 ahm65: R23:0@0-0
-  R23:0: Input['] ::= . Input
+  R23:0: [:start] ::= . Input
 ahm0: R0:0@0-0
   R0:0: Input ::= . Input[Seq]
 ahm2: R1:0@0-0
@@ -339,7 +341,7 @@ ahm49: R16:0@5-5
 Earley Set 6
 ahm50: R16$@5-6
   R16$: MetricExpr ::= NUMBER .
-  [c=R16:0@5-5; s=NUMBER; t=\1]
+  [c=R16:0@5-5; s=NUMBER; t=\'1']
 ahm21: R6:2@4-6
   R6:2: MetricSelect ::= SELECT MetricExpr . ByClause MetricSelect[R3:3]
   [p=R6:1@4-5; c=R16$@5-6]
@@ -371,8 +373,11 @@ ahm1: R0$@0-6
   R0$: Input ::= Input[Seq] .
   [p=R0:0@0-0; c=R2$@0-6]
 ahm66: R23$@0-6
-  R23$: Input['] ::= Input .
+  R23$: [:start] ::= Input .
   [p=R23:0@0-0; c=R0$@0-6]
+ahm68: R24$@0-6
+  R24$: [:start]['] ::= [:start] .
+  [p=R24:0@0-0; c=R23$@0-6]
 ahm51: R17:0@6-6
   R17:0: ByClause ::= . BY
 ahm35: R10:0@6-6
@@ -439,8 +444,11 @@ ahm1: R0$@0-8
   R0$: Input ::= Input[Seq] .
   [p=R0:0@0-0; c=R2$@0-8]
 ahm66: R23$@0-8
-  R23$: Input['] ::= Input .
+  R23$: [:start] ::= Input .
   [p=R23:0@0-0; c=R0$@0-8]
+ahm68: R24$@0-8
+  R24$: [:start]['] ::= [:start] .
+  [p=R24:0@0-0; c=R23$@0-8]
 ahm62: R22:0@8-8
   R22:0: WithPf ::= . WITH PF
 END_OF_EARLEY_SETS
@@ -502,35 +510,18 @@ TODO: {
 END_OF_OR_NODES
 }
 
-Marpa::R3::Test::is( Dumper( ${$value_ref} ), <<'END_OF_STRING', 'Result' );
-$VAR1 = [
-          \[
-              [
-                'Create',
-                [
-                  'Metric',
-                  'm',
-                  'As',
-                  [
-                    'Select',
-                    [
-                      1
-                    ],
-                    undef,
-                    undef,
-                    [
-                      'Where',
-                      [
-                        'True'
-                      ]
-                    ],
-                    undef
-                  ]
-                ]
-              ]
-            ]
-        ];
-END_OF_STRING
+my $expected_value = [
+    [
+        'Create',
+        [
+            'Metric',
+            'm',
+            'As',
+            [ 'Select', [ '1' ], undef, undef, [ 'Where', [ 'True' ] ], undef ]
+        ]
+    ]
+];
+Marpa::R3::Test::is( Dumper( ${$value_ref} ), Dumper($expected_value), 'Result' );
 
 #############################################################################
 package Maql_Actions;
