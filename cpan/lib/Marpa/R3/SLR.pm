@@ -1875,7 +1875,7 @@ sub Marpa::R3::Scanless::R::lexeme_priority_set {
     return $thin_slr->lexeme_priority_set($lexeme_id, $new_priority);
 }
 
-# Need to port show_earley_sets(), show_and_nodes(), show_or_nodes() NAIF recognizer methods
+# Need to port show_and_nodes(), show_or_nodes() NAIF recognizer methods
 
 # Internal methods, not to be documented
 
@@ -2186,6 +2186,26 @@ sub Marpa::R3::Scanless::R::show_earley_set {
     push @sorted_data, join q{},
         map { $_->[-1] . "\n" } sort { $a->[0] <=> $b->[0] } @sort_data;
     return join q{}, @sorted_data;
+}
+
+sub Marpa::R3::Scanless::R::show_or_nodes {
+    my ( $slr, $verbose ) = @_;
+    my $naif_recce = $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
+    my $recce_c                = $naif_recce->[Marpa::R3::Internal::Recognizer::C];
+    my $thick_g1_recce =
+        $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
+    my $bocage = $thick_g1_recce->[Marpa::R3::Internal::Recognizer::B_C];
+    return $recce_c->show_or_nodes($bocage, $verbose);
+}
+
+sub Marpa::R3::Scanless::R::show_and_nodes {
+    my ( $slr ) = @_;
+    my $naif_recce = $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
+    my $recce_c                = $naif_recce->[Marpa::R3::Internal::Recognizer::C];
+    my $thick_g1_recce =
+        $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
+    my $bocage = $thick_g1_recce->[Marpa::R3::Internal::Recognizer::B_C];
+    return $recce_c->show_and_nodes($bocage);
 }
 
 1;

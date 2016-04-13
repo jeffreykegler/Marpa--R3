@@ -454,59 +454,60 @@ ahm62: R22:0@8-8
 END_OF_EARLEY_SETS
 
 TODO: {
-    todo_skip "show_and_nodes() porting not completed", 1;
+    # todo_skip "show_and_nodes() porting not completed", 1;
 
     Marpa::R3::Test::is( $recce->show_and_nodes(),
         <<'END_OF_AND_NODES', 'And Nodes' );
-    And-node #0: R4:1@0-1S2@0
-    And-node #19: R0:1@0-8C2@0
-    And-node #18: R2:1@0-8C4@0
-    And-node #17: R4:2@0-8C5@1
-    And-node #20: R23:1@0-8C0@0
-    And-node #1: R5:1@1-2S5@1
-    And-node #2: R5:2@1-3S11@2
-    And-node #3: R5:3@1-4S0@3
-    And-node #16: R5:4@1-8C8@4
-    And-node #4: R8:1@4-5S7@4
-    And-node #6: R8:2@4-6C16@5
-    And-node #7: R8:3@4-6S20@6
-    And-node #15: R8:4@4-8C12@6
-    And-node #5: R16:1@5-6S13@5
-    And-node #8: R12:1@6-6S22@6
-    And-node #9: R19:1@6-7S9@6
-    And-node #14: R12:2@6-8C14@6
-    And-node #12: R14:1@6-8C19@6
-    And-node #13: R14:2@6-8S26@8
-    And-node #11: R19:2@6-8C20@7
-    And-node #10: R20:1@7-8S8@7
+And-node #0: R4:1@0-1S4@0
+And-node #19: R0:1@0-8C2@0
+And-node #18: R2:1@0-8C4@0
+And-node #17: R4:2@0-8C5@1
+And-node #20: R23:1@0-8C0@0
+And-node #21: R24:1@0-8C23@0
+And-node #1: R5:1@1-2S6@1
+And-node #2: R5:2@1-3S7@2
+And-node #3: R5:3@1-4S8@3
+And-node #16: R5:4@1-8C8@4
+And-node #4: R8:1@4-5S10@4
+And-node #6: R8:2@4-6C16@5
+And-node #7: R8:3@4-6S13@6
+And-node #15: R8:4@4-8C12@6
+And-node #5: R16:1@5-6S20@5
+And-node #8: R12:1@6-6S15@6
+And-node #9: R19:1@6-7S23@6
+And-node #14: R12:2@6-8C14@6
+And-node #12: R14:1@6-8C19@6
+And-node #13: R14:2@6-8S19@8
+And-node #11: R19:2@6-8C20@7
+And-node #10: R20:1@7-8S25@7
 END_OF_AND_NODES
 }
 
 TODO: {
-    todo_skip "show_or_nodes() porting not completed", 1;
     Marpa::R3::Test::is( $recce->show_or_nodes(),
         <<'END_OF_OR_NODES', 'Or Nodes' );
-    R4:1@0-1
-    R0:1@0-8
-    R2:1@0-8
-    R4:2@0-8
-    R23:1@0-8
-    R5:1@1-2
-    R5:2@1-3
-    R5:3@1-4
-    R5:4@1-8
-    R8:1@4-5
-    R8:2@4-6
-    R8:3@4-6
-    R8:4@4-8
-    R16:1@5-6
-    R12:1@6-6
-    R19:1@6-7
-    R12:2@6-8
-    R14:1@6-8
-    R14:2@6-8
-    R19:2@6-8
-    R20:1@7-8
+R4:1@0-1
+R0:1@0-8
+R2:1@0-8
+R4:2@0-8
+R23:1@0-8
+R24:1@0-8
+R5:1@1-2
+R5:2@1-3
+R5:3@1-4
+R5:4@1-8
+R8:1@4-5
+R8:2@4-6
+R8:3@4-6
+R8:4@4-8
+R16:1@5-6
+R12:1@6-6
+R19:1@6-7
+R12:2@6-8
+R14:1@6-8
+R14:2@6-8
+R19:2@6-8
+R20:1@7-8
 END_OF_OR_NODES
 }
 
