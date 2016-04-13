@@ -16,6 +16,7 @@
 
 # CENSUS: ASIS
 # Note: SLIF TEST
+# Note: Adds tests from implementation.t to this test test file
 
 # Tutorial 2 synopsis
 
@@ -23,7 +24,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-use Test::More tests => 1;
+use Test::More tests => 8;
 
 use lib 'inc';
 use Marpa::R3::Test;
@@ -83,7 +84,277 @@ sub My_Actions::do_multiply {
 
 Test::More::is( $value, 49, 'Tutorial 2 synopsis value' );
 
-1;    # In case used as "do" file
+$recce->series_restart( {  semantics_package => 'My_Actions' } );
+
+my $show_symbols_output = $grammar->show_symbols();
+
+Marpa::R3::Test::is( $show_symbols_output,
+    <<'END_SYMBOLS', 'Implementation Example Symbols' );
+G1 S0 :start -- Internal G1 start symbol
+G1 S1 '*' -- Internal lexical symbol for "'*'"
+G1 S2 '+' -- Internal lexical symbol for "'+'"
+G1 S3 Calculator
+G1 S4 Expression
+G1 S5 Factor
+G1 S6 Number
+G1 S7 Term
+END_SYMBOLS
+
+my $show_rules_output = $grammar->show_rules();
+
+Marpa::R3::Test::is( $show_rules_output,
+    <<'END_RULES', 'Implementation Example Rules' );
+G1 R0 Calculator ::= Expression
+G1 R1 Factor ::= Number
+G1 R2 Term ::= Term '*' Factor
+G1 R3 Term ::= Factor
+G1 R4 Expression ::= Expression '+' Term
+G1 R5 Expression ::= Term
+G1 R6 :start ::= Calculator
+END_RULES
+
+my $show_ahms_output = $grammar->show_ahms();
+
+Marpa::R3::Test::is( $show_ahms_output,
+    <<'END_AHM', 'Implementation Example AHMs' );
+AHM 0: postdot = "Expression"
+    Calculator ::= . Expression
+AHM 1: completion
+    Calculator ::= Expression .
+AHM 2: postdot = "Number"
+    Factor ::= . Number
+AHM 3: completion
+    Factor ::= Number .
+AHM 4: postdot = "Term"
+    Term ::= . Term [Lex-0] Factor
+AHM 5: postdot = "[Lex-0]"
+    Term ::= Term . [Lex-0] Factor
+AHM 6: postdot = "Factor"
+    Term ::= Term [Lex-0] . Factor
+AHM 7: completion
+    Term ::= Term [Lex-0] Factor .
+AHM 8: postdot = "Factor"
+    Term ::= . Factor
+AHM 9: completion
+    Term ::= Factor .
+AHM 10: postdot = "Expression"
+    Expression ::= . Expression [Lex-1] Term
+AHM 11: postdot = "[Lex-1]"
+    Expression ::= Expression . [Lex-1] Term
+AHM 12: postdot = "Term"
+    Expression ::= Expression [Lex-1] . Term
+AHM 13: completion
+    Expression ::= Expression [Lex-1] Term .
+AHM 14: postdot = "Term"
+    Expression ::= . Term
+AHM 15: completion
+    Expression ::= Term .
+AHM 16: postdot = "Calculator"
+    [:start] ::= . Calculator
+AHM 17: completion
+    [:start] ::= Calculator .
+AHM 18: postdot = "[:start]"
+    [:start]['] ::= . [:start]
+AHM 19: completion
+    [:start]['] ::= [:start] .
+END_AHM
+
+my $show_earley_sets_output = $recce->show_earley_sets();
+
+my $expected_earley_sets = <<'END_EARLEY_SETS';
+Last Completed: 5; Furthest: 5
+Earley Set 0
+ahm18: R7:0@0-0
+  R7:0: [:start]['] ::= . [:start]
+ahm16: R6:0@0-0
+  R6:0: [:start] ::= . Calculator
+ahm0: R0:0@0-0
+  R0:0: Calculator ::= . Expression
+ahm10: R4:0@0-0
+  R4:0: Expression ::= . Expression [Lex-1] Term
+ahm14: R5:0@0-0
+  R5:0: Expression ::= . Term
+ahm4: R2:0@0-0
+  R2:0: Term ::= . Term [Lex-0] Factor
+ahm8: R3:0@0-0
+  R3:0: Term ::= . Factor
+ahm2: R1:0@0-0
+  R1:0: Factor ::= . Number
+Earley Set 1
+ahm3: R1$@0-1
+  R1$: Factor ::= Number .
+  [c=R1:0@0-0; s=Number; t=\'42']
+ahm9: R3$@0-1
+  R3$: Term ::= Factor .
+  [p=R3:0@0-0; c=R1$@0-1]
+ahm5: R2:1@0-1
+  R2:1: Term ::= Term . [Lex-0] Factor
+  [p=R2:0@0-0; c=R3$@0-1]
+ahm15: R5$@0-1
+  R5$: Expression ::= Term .
+  [p=R5:0@0-0; c=R3$@0-1]
+ahm11: R4:1@0-1
+  R4:1: Expression ::= Expression . [Lex-1] Term
+  [p=R4:0@0-0; c=R5$@0-1]
+ahm1: R0$@0-1
+  R0$: Calculator ::= Expression .
+  [p=R0:0@0-0; c=R5$@0-1]
+ahm17: R6$@0-1
+  R6$: [:start] ::= Calculator .
+  [p=R6:0@0-0; c=R0$@0-1]
+ahm19: R7$@0-1
+  R7$: [:start]['] ::= [:start] .
+  [p=R7:0@0-0; c=R6$@0-1]
+Earley Set 2
+ahm6: R2:2@0-2
+  R2:2: Term ::= Term [Lex-0] . Factor
+  [c=R2:1@0-1; s=[Lex-0]; t=\'*']
+ahm2: R1:0@2-2
+  R1:0: Factor ::= . Number
+Earley Set 3
+ahm3: R1$@2-3
+  R1$: Factor ::= Number .
+  [c=R1:0@2-2; s=Number; t=\'1']
+ahm7: R2$@0-3
+  R2$: Term ::= Term [Lex-0] Factor .
+  [p=R2:2@0-2; c=R1$@2-3]
+ahm5: R2:1@0-3
+  R2:1: Term ::= Term . [Lex-0] Factor
+  [p=R2:0@0-0; c=R2$@0-3]
+ahm15: R5$@0-3
+  R5$: Expression ::= Term .
+  [p=R5:0@0-0; c=R2$@0-3]
+ahm11: R4:1@0-3
+  R4:1: Expression ::= Expression . [Lex-1] Term
+  [p=R4:0@0-0; c=R5$@0-3]
+ahm1: R0$@0-3
+  R0$: Calculator ::= Expression .
+  [p=R0:0@0-0; c=R5$@0-3]
+ahm17: R6$@0-3
+  R6$: [:start] ::= Calculator .
+  [p=R6:0@0-0; c=R0$@0-3]
+ahm19: R7$@0-3
+  R7$: [:start]['] ::= [:start] .
+  [p=R7:0@0-0; c=R6$@0-3]
+Earley Set 4
+ahm12: R4:2@0-4
+  R4:2: Expression ::= Expression [Lex-1] . Term
+  [c=R4:1@0-3; s=[Lex-1]; t=\'+']
+ahm2: R1:0@4-4
+  R1:0: Factor ::= . Number
+ahm4: R2:0@4-4
+  R2:0: Term ::= . Term [Lex-0] Factor
+ahm8: R3:0@4-4
+  R3:0: Term ::= . Factor
+Earley Set 5
+ahm3: R1$@4-5
+  R1$: Factor ::= Number .
+  [c=R1:0@4-4; s=Number; t=\'7']
+ahm9: R3$@4-5
+  R3$: Term ::= Factor .
+  [p=R3:0@4-4; c=R1$@4-5]
+ahm5: R2:1@4-5
+  R2:1: Term ::= Term . [Lex-0] Factor
+  [p=R2:0@4-4; c=R3$@4-5]
+ahm13: R4$@0-5
+  R4$: Expression ::= Expression [Lex-1] Term .
+  [p=R4:2@0-4; c=R3$@4-5]
+ahm11: R4:1@0-5
+  R4:1: Expression ::= Expression . [Lex-1] Term
+  [p=R4:0@0-0; c=R4$@0-5]
+ahm1: R0$@0-5
+  R0$: Calculator ::= Expression .
+  [p=R0:0@0-0; c=R4$@0-5]
+ahm17: R6$@0-5
+  R6$: [:start] ::= Calculator .
+  [p=R6:0@0-0; c=R0$@0-5]
+ahm19: R7$@0-5
+  R7$: [:start]['] ::= [:start] .
+  [p=R7:0@0-0; c=R6$@0-5]
+END_EARLEY_SETS
+
+Marpa::R3::Test::is( $show_earley_sets_output, $expected_earley_sets,
+    'Implementation Example Earley Sets' );
+
+my $trace_output;
+open my $trace_fh, q{>}, \$trace_output;
+$recce->set( { trace_file_handle => $trace_fh, trace_values => 3 } );
+$value_ref = $recce->value();
+$recce->set( { trace_file_handle => \*STDOUT, trace_values => 0 } );
+close $trace_fh;
+
+$value = $value_ref ? ${$value_ref} : 'No Parse';
+Marpa::R3::Test::is( 49, $value, 'Implementation Example Value 2' );
+
+my $expected_trace_output = <<'END_TRACE_OUTPUT';
+Setting trace_values option
+Registering semantics for rule: [:start]
+  Semantics are result_is_rhs_n 0
+Registering semantics for rule: [Lex-0]
+  Semantics are result_is_rhs_n 0
+Registering semantics for rule: [Lex-1]
+  Semantics are push_one 0 push_one 1 push_one 2 callback
+Registering semantics for rule: Calculator
+  Semantics are result_is_rhs_n 0
+Registering semantics for rule: Expression
+  Semantics are push_one 0 push_one 1 push_one 2 callback
+Registering semantics for rule: Factor
+  Semantics are result_is_rhs_n 0
+Registering semantics for rule: Number
+  Semantics are result_is_rhs_n 0
+Registering semantics for token: [:start]
+  Semantics are result_is_token_value
+Registering semantics for token: [Lex-0]
+  Semantics are result_is_token_value
+Registering semantics for token: [Lex-1]
+  Semantics are result_is_token_value
+Registering semantics for token: Calculator
+  Semantics are result_is_token_value
+Registering semantics for token: Expression
+  Semantics are result_is_token_value
+Registering semantics for token: Factor
+  Semantics are result_is_token_value
+Registering semantics for token: Number
+  Semantics are result_is_token_value
+Registering semantics for token: Term
+  Semantics are result_is_token_value
+value event: starting op MARPA_STEP_TOKEN result_is_token_value
+value event: starting op MARPA_STEP_RULE result_is_rhs_n
+value event: starting op MARPA_STEP_RULE result_is_rhs_n
+value event: starting op MARPA_STEP_TOKEN result_is_token_value
+value event: starting op MARPA_STEP_TOKEN result_is_token_value
+value event: starting op MARPA_STEP_RULE result_is_rhs_n
+value event: starting op MARPA_STEP_RULE push_one
+value event: starting op MARPA_STEP_RULE push_one
+value event: starting op MARPA_STEP_RULE push_one
+value event: starting op MARPA_STEP_RULE callback
+Popping 3 values to evaluate R2:3@0-3C1@2, rule: 2: Term -> Term [Lex-0] Factor
+Calculated and pushed value: 42
+value event: starting op MARPA_STEP_RULE result_is_rhs_n
+value event: starting op MARPA_STEP_TOKEN result_is_token_value
+value event: starting op MARPA_STEP_TOKEN result_is_token_value
+value event: starting op MARPA_STEP_RULE result_is_rhs_n
+value event: starting op MARPA_STEP_RULE result_is_rhs_n
+value event: starting op MARPA_STEP_RULE push_one
+value event: starting op MARPA_STEP_RULE push_one
+value event: starting op MARPA_STEP_RULE push_one
+value event: starting op MARPA_STEP_RULE callback
+Popping 3 values to evaluate R4:3@0-5C3@4, rule: 4: Expression -> Expression [Lex-1] Term
+Calculated and pushed value: 49
+value event: starting op MARPA_STEP_RULE result_is_rhs_n
+value event: starting op MARPA_STEP_RULE result_is_rhs_n
+New Virtual Rule: R7:1@0-5C6@0, rule: 7: [:start]['] -> [:start]
+Real symbol count is 1
+END_TRACE_OUTPUT
+
+Marpa::R3::Test::is( $trace_output, $expected_trace_output,
+    'Implementation Example Trace Output' );
+
+$recce->series_restart( {  semantics_package => 'My_Actions' } );
+
+$value_ref = $recce->value();
+$value = $value_ref ? ${$value_ref} : 'No Parse';
+Marpa::R3::Test::is( 49, $value, 'Implementation Example Value 3' );
 
 # Local Variables:
 #   mode: cperl

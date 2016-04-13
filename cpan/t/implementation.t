@@ -14,10 +14,8 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-# CENSUS: REWORK
-# Note: A test of the NAIF diagnostics
-# Note: using the standard textbook E/T/F example
-# Note: Convert to SLIF, if we don't have this already
+# CENSUS: DELETE
+# Note: Added these tests to sl_tut2.t
 
 use 5.010001;
 use strict;
