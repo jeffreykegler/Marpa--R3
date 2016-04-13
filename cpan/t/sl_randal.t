@@ -153,12 +153,8 @@ TEST: for my $test_data (@test_data) {
 	  $pos < length($test_input);
 	  $pos = $recce->resume($pos)
 	) {
-      my @expected_symbols = map { @$_ } @{ $recce->events() };
-      my $terminals_expected = $recce->terminals_expected();
-	  EVENTS: {
-		for my $event (@{ $recce->events }) {
-			my ($name) = @{$event};
-		}
+		my @expected_symbols = map { @$_ } @{ $recce->events() };
+		my $terminals_expected = $recce->terminals_expected();
 
         TOKEN: for my $token ( @{$terminals_expected} ) {
             next TOKEN if grep { $token eq $_ } @expected_symbols;
@@ -173,8 +169,7 @@ TEST: for my $test_data (@test_data) {
                 $pos );
         } ## end TOKEN: for my $token (@expected_symbols)
 
-	  }
-	}
+	} ## INPUT: for(
 
     my @parses;
     while ( defined( my $value_ref = $recce->value() ) ) {
