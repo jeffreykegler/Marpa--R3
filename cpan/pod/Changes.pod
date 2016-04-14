@@ -1,0 +1,65 @@
+# Copyright 2016 Jeffrey Kegler
+# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
+# redistribute it and/or modify it under the terms of the GNU Lesser
+# General Public License as published by the Free Software Foundation,
+# either version 3 of the License, or (at your option) any later version.
+#
+# Marpa::R3 is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser
+# General Public License along with Marpa::R3.  If not, see
+# http://www.gnu.org/licenses/.
+
+=head1 NAME
+
+Marpa::R3::Changes - Differences between Marpa::R2 and Marpa::R3
+
+=head1 About this document
+
+This document describes the incompatible
+differences between Marpa::R2
+and Marpa::R3.
+(Differences that do not give rise to incompatibility
+are outside of its scope.)
+It is intended for readers already familiar with Marpa::R2,
+who are writing new applications for Marpa::R3,
+and for readers migrating Marpa::XS applications
+and tools to Marpa::R3.
+
+=head1 Changes
+
+=head2 LATM is now the default
+
+=head2 [name, values] is now the default action
+
+=head2 Unicode now works in the SLIF DSL
+
+=head2 New method g1_input_span
+
+=head1 Copyright and License
+
+=for Marpa::R3::Display
+ignore: 1
+
+  Copyright 2016 Jeffrey Kegler
+  This file is part of Marpa::R3.  Marpa::R3 is free software: you can
+  redistribute it and/or modify it under the terms of the GNU Lesser
+  General Public License as published by the Free Software Foundation,
+  either version 3 of the License, or (at your option) any later version.
+
+  Marpa::R3 is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser
+  General Public License along with Marpa::R3.  If not, see
+  http://www.gnu.org/licenses/.
+
+=for Marpa::R3::Display::End
+
+=cut
+
