@@ -256,13 +256,19 @@ sub Marpa::R3::Context::bail { ## no critic (Subroutines::RequireArgUnpacking)
 } ## end sub Marpa::R3::Context::bail
 ## use critic
 
-sub Marpa::R3::Context::location {
+sub Marpa::R3::Context::g1_range {
     my $valuator = $Marpa::R3::Internal::Context::VALUATOR;
     Marpa::R3::exception(
-        'Marpa::R3::Context::location called outside of a valuation context')
+        'Marpa::R3::Context::g1_range called outside of a valuation context')
         if not defined $valuator;
     return $valuator->location();
-} ## end sub Marpa::R3::Context::location
+} ## end sub Marpa::R3::Context::g1_range
+
+sub Marpa::R3::Context::g1_span {
+    my $valuator = $Marpa::R3::Internal::Context::VALUATOR;
+    my ($start, $end) = $valuator->location();
+    return $start, ($start - $end) + 1;
+}
 
 sub code_problems {
     my $args = shift;

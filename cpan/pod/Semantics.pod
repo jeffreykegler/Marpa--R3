@@ -815,7 +815,7 @@ normalize-whitespace: 1
               "rule $rule_id: $lhs ::= "
             . ( join q{ }, @rhs ) . "\n"
             . "locations: "
-            . ( join q{-}, Marpa::R3::Context::location() ) . "\n";
+            . ( join q{-}, Marpa::R3::Context::g1_range() ) . "\n";
         return $action_object;
     } ## end sub do_S
 
@@ -837,11 +837,13 @@ Given the rule alternative ID, an application can find
 its LHS and RHS symbols using
 L<the SLIF grammar's C<rule_expand()> method|Marpa::R3::Scanless::G/"rule_expand()">.
 
-=item * C<Marpa::R3::Context::location()> returns the start
+=item * C<Marpa::R3::Context::g1_range()> returns the start
 and end G1 locations of the current rule instance.
-Note that these are
-L<G1 locations|Marpa::R3::Scanless::R/"G1 locations">,
-not input stream locations.
+
+=item * C<Marpa::R3::Context::g1_span()> returns the start
+and length of the current rule instance.
+The start is a G1 location,
+and the length is in G1 locations.
 
 =back
 

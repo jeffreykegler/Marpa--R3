@@ -217,7 +217,7 @@ sub do_is_statement {
 
 sub problem_in_rule {
     my ($string) = @_;
-    Marpa::R3::Context::bail( [ 'rule', $string, Marpa::R3::Context::location() ] );
+    Marpa::R3::Context::bail( [ 'rule', $string, Marpa::R3::Context::g1_range() ] );
 }
 
 sub do_contains_statement {

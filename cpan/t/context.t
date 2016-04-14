@@ -44,7 +44,7 @@ sub do_S {
           "rule $rule_id: $lhs ::= "
         . ( join q{ }, @rhs ) . "\n"
         . "locations: "
-        . ( join q{-}, Marpa::R3::Context::location() ) . "\n";
+        . ( join q{-}, Marpa::R3::Context::g1_range() ) . "\n";
     return $action_object;
 } ## end sub do_S
 
