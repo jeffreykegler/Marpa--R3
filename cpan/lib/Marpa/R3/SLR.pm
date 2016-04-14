@@ -121,7 +121,7 @@ sub Marpa::R3::Scanless::R::range_to_string {
 }
 
 # Not documented.  Should I?
-sub Marpa::R3::Scanless::R::es_to_input_span {
+sub Marpa::R3::Scanless::R::g1_input_span {
     my ( $slr, $start_earley_set, $length_in_parse_locations ) = @_;
     return
         if not defined $start_earley_set
@@ -157,7 +157,7 @@ sub Marpa::R3::Scanless::R::es_to_input_span {
     $length_in_characters = 0 if $length_in_characters <= 0;
     return ( $first_start_position, $length_in_characters );
 
-} ## end sub Marpa::R3::Scanless::R::es_to_input_span
+}
 
 # Substring in terms of earley sets.
 # Necessary for the use of show_progress()
@@ -165,11 +165,11 @@ sub Marpa::R3::Scanless::R::es_to_input_span {
 # and two earley sets, return the input string
 sub Marpa::R3::Scanless::R::substring {
     my ( $slr, $start_earley_set, $length_in_parse_locations ) = @_;
-    my ( $first_start_position, $length_in_characters ) =
-        $slr->es_to_input_span( $start_earley_set,
-        $length_in_parse_locations );
     my $p_input = $slr->[Marpa::R3::Internal::Scanless::R::P_INPUT_STRING];
-    return substr ${$p_input}, $first_start_position, $length_in_characters;
+    my ($l0_start, $l0_length) = $slr->g1_input_span($start_earley_set, $length_in_parse_locations);
+    die "Error in $slr->substring($start_earley_set, $length_in_parse_locations)\n"
+       if not defined $l0_start;
+    return substr ${$p_input}, $l0_start, $l0_length;
 } ## end sub Marpa::R3::Scanless::R::substring
 
 sub Marpa::R3::Scanless::R::g1_location_to_span {
