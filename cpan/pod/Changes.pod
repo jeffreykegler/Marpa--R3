@@ -31,6 +31,25 @@ and tools to Marpa::R3.
 
 =head1 Changes
 
+=head2 The Stuifzand interface (PSIF) has been removed
+
+The Stuifzand interface (PSIF), and its documentation,
+have been removed.
+Important in the development of Marpa,
+it now has little or now usage.
+
+=head2 The Thin interface (THIF) is deprecated
+
+The THIF is subject to major change, or outright removal,
+without further notice.
+
+=head2 The NAIF is deprecated
+
+The NAIF is an older interface using hashes of named
+variables, instead of a DSL.
+It is now severely deprecated.
+Expect it to be broken or removed shortly.
+
 =head2 LATM is now the default
 
 =head2 [name, values] is now the default action
