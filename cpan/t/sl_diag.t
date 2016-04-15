@@ -23,7 +23,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-use Test::More tests => 12;
+use Test::More tests => 11;
 use English qw( -no_match_vars );
 use lib 'inc';
 use Marpa::R3::Test;
@@ -297,17 +297,14 @@ END_OF_OUTPUT
         qq{Scanless progress()}
     );
 
-    my $latest_g1_location = $recce->latest_g1_location();
-    Test::More::is( $latest_g1_location, 11, qq{Scanless latest_g1_location()} );
-
 # Marpa::R3::Display
-# name: Scanless current_g1_location() synopsis
+# name: Scanless g1_pos() synopsis
 
-    my $current_g1_location = $recce->current_g1_location();
+    my $g1_pos = $recce->g1_pos();
 
 # Marpa::R3::Display::End
 
-    Test::More::is( $current_g1_location, 11, qq{Scanless current_g1_location()} );
+    Test::More::is( $g1_pos, 11, qq{Scanless g1_pos()} );
 
 # Marpa::R3::Display
 # name: SLIF pos() example

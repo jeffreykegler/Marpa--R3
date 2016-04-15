@@ -135,7 +135,7 @@ for my $test_data (@tests) {
 
                 # In our example there is a single event: no need to ask Marpa what it is
                 my ( $start, $length ) =
-                    $re->g1_location_to_span( $re->current_g1_location() );
+                    $re->g1_location_to_span( $re->g1_pos() );
                 my $card = $re->literal( $start, $length );
                 if ( ++$played{$card} > 1 ) {
                     $actual_result = 'Parse stopped by application';

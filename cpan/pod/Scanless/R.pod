@@ -1513,12 +1513,12 @@ The best metric is, of course,
 would be the exact parse count,
 but determining that is expensive.
 
-=head2 current_g1_location()
+=head2 g1_pos
 
 =for Marpa::R3::Display
-name: Scanless current_g1_location() synopsis
+name: Scanless g1_pos() synopsis
 
-    my $current_g1_location = $recce->current_g1_location();
+    my $g1_pos = $recce->g1_pos();
 
 =for Marpa::R3::Display::End
 

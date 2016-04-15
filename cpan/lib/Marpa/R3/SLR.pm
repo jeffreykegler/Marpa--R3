@@ -602,7 +602,7 @@ my $libmarpa_trace_event_handlers = {
         say {$trace_file_handle} qq{Accepted lexeme },
             input_range_describe( $slr, $lexeme_start_pos,
             $lexeme_end_pos - 1 ),
-            q{ e}, $slr->current_g1_location(),
+            q{ e}, $slr->g1_pos(),
             q{: },
             $thick_g1_grammar->symbol_in_display_form($g1_lexeme),
             qq{; value="$raw_token_value"}
@@ -715,7 +715,7 @@ my $libmarpa_trace_event_handlers = {
             'Attempting to read lexeme ',
             input_range_describe( $slr, $lexeme_start_pos,
             $lexeme_end_pos - 1 ),
-            q{ e}, $slr->current_g1_location(),
+            q{ e}, $slr->g1_pos(),
             q{: },
             $thick_g1_grammar->symbol_in_display_form($g1_lexeme),
             qq{; value="$raw_token_value"}
@@ -1735,14 +1735,7 @@ sub Marpa::R3::Scanless::R::exhausted {
 }
 
 # Latest and current G1 location are the same
-sub Marpa::R3::Scanless::R::latest_g1_location {
-    my ($slg) = @_;
-    return $slg->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE]
-        ->latest_earley_set();
-}
-
-# Latest and current G1 location are the same
-sub Marpa::R3::Scanless::R::current_g1_location {
+sub Marpa::R3::Scanless::R::g1_pos {
     my ($slg) = @_;
     return $slg->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE]
         ->latest_earley_set();

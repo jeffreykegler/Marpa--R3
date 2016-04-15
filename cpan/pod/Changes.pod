@@ -72,6 +72,8 @@ will have C<g1> as part of their name.
 
 =head2 New context variable, Context::g1_span
 
+=head2 $slr->current_g1_location() is now $slr->g1_pos()
+
 =head1 Copyright and License
 
 =for Marpa::R3::Display
