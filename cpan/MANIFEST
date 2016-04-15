@@ -193,7 +193,6 @@ t/curly.t
 t/curly2.t
 t/debug.t
 t/debug_leo.t
-t/sl_debug_leo.t
 t/debug_seq.t
 t/deprecated1.t
 t/equation.t
@@ -241,6 +240,8 @@ t/sl_code_diag.t
 t/sl_completed.t
 t/sl_context.t
 t/sl_debug.t
+t/sl_debug2.t
+t/sl_debug_leo.t
 t/sl_diag.t
 t/sl_discard.t
 t/sl_discard2.t

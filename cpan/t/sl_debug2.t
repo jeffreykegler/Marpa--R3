@@ -14,8 +14,8 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-# CENSUS: DELETE
-# Note: Converted to SLIF as sl_debug2.t
+# CENSUS: ASIS
+# Note: Converted to SLIF from debug.t
 
 use 5.010001;
 use strict;
@@ -32,46 +32,33 @@ use Data::Dumper;
 
 my $progress_report = q{};
 
-my $grammar = Marpa::R3::Grammar->new(
-    {   start          => 'Expression',
-        actions        => 'My_Actions',
-        default_action => 'first_arg',
-        rules          => [
-            ## This is a deliberate error in the grammar
-            ## The next line should be:
-            ## { lhs => 'Expression', rhs => [qw/Term/] },
-            ## I have changed the Term to 'Factor' which
-            ## will cause problems.
-            { lhs => 'Expression', rhs => [qw/Factor/] },
-            { lhs => 'Term',       rhs => [qw/Factor/] },
-            { lhs => 'Factor',     rhs => [qw/Number/] },
-            {   lhs    => 'Term',
-                rhs    => [qw/Term Add Term/],
-                action => 'do_add'
-            },
-            {   lhs    => 'Factor',
-                rhs    => [qw/Factor Multiply Factor/],
-                action => 'do_multiply'
-            },
-        ],
-    }
-);
+my $dsl = <<'END_OF_DSL';
+## This is a deliberate error in the grammar
+## The next line should be:
+##    Expression ::= Term
+## I have changed the Term to 'Factor' which
+## will cause problems.
+inaccessible is ok by default
+:default ::= action => ::first
+
+Expression ::= Factor
+Term ::= Factor
+Factor ::= Number
+Term ::= Term Add Term action => do_add
+Factor ::= Factor Multiply Factor action => do_multiply
+Number ~ [\d]+
+Multiply ~ [*]
+Add ~ [+]
+END_OF_DSL
+
 
 ## no critic (InputOutput::RequireBriefOpen)
 open my $trace_fh, q{>}, \( my $trace_output = q{} );
 ## use critic
 
+my $grammar = Marpa::R3::Scanless::G->new( { source => \$dsl } );
+
 $grammar->set( { trace_file_handle => $trace_fh } );
-
-$grammar->precompute();
-
-my @tokens = (
-    [ 'Number',   42 ],
-    [ 'Multiply', q{*} ],
-    [ 'Number',   1 ],
-    [ 'Add',      q{+} ],
-    [ 'Number',   7 ],
-);
 
 sub My_Actions::do_add {
     my ( undef, $t1, undef, $t2 ) = @_;
@@ -83,15 +70,27 @@ sub My_Actions::do_multiply {
     return $t1 * $t2;
 }
 
-sub My_Actions::first_arg { shift; return shift; }
+my $recce = Marpa::R3::Scanless::R->new(
+    {
+        grammar           => $grammar,
+        semantics_package => 'My_Actions',
+        trace_terminals   => 99
+    }
+);
 
-my $recce = Marpa::R3::Recognizer->new(
-    { grammar => $grammar, trace_terminals => 2 } );
+my @tokens = (
+    [ 'Number',   '42' ],
+    [ 'Multiply', q{*} ],
+    [ 'Number',   '1' ],
+    [ 'Add',      q{+} ],
+    [ 'Number',   '7' ],
+);
 
-my $token_ix = 0;
-
+my $dummy_input = join q{}, map { $_->[1] } @tokens;
+$recce->read( \$dummy_input, 0, 0);
 TOKEN: for my $token_and_value (@tokens) {
-    last TOKEN if not defined $recce->read( @{$token_and_value} );
+    my ($name, $value) = @{$token_and_value};
+    last TOKEN if not defined $recce->lexeme_read( $name, $recce->pos(), (length $value), $value );
 }
 
 $progress_report = $recce->show_progress( 0, -1 );
@@ -103,19 +102,22 @@ Test::More::is( $value, 42, 'value' );
 
 Marpa::R3::Test::is( $progress_report,
     <<'END_PROGRESS_REPORT', 'progress report' );
-P0 @0-0 Expression -> . Factor
-P2 @0-0 Factor -> . Number
-P4 @0-0 Factor -> . Factor Multiply Factor
-F0 @0-1 Expression -> Factor .
-F2 @0-1 Factor -> Number .
-R4:1 @0-1 Factor -> Factor . Multiply Factor
-P2 @2-2 Factor -> . Number
-P4 @2-2 Factor -> . Factor Multiply Factor
-R4:2 @0-2 Factor -> Factor Multiply . Factor
-F0 @0-3 Expression -> Factor .
-F2 @2-3 Factor -> Number .
-R4:1 x2 @0,2-3 Factor -> Factor . Multiply Factor
-F4 @0-3 Factor -> Factor Multiply Factor .
+P0 @0-0 L0c0 Expression -> . Factor
+P2 @0-0 L0c0 Factor -> . Number
+P4 @0-0 L0c0 Factor -> . Factor Multiply Factor
+P5 @0-0 L0c0 :start -> . Expression
+F0 @0-1 L1c1-2 Expression -> Factor .
+F2 @0-1 L1c1-2 Factor -> Number .
+R4:1 @0-1 L1c1-2 Factor -> Factor . Multiply Factor
+F5 @0-1 L1c1-2 :start -> Expression .
+P2 @2-2 L1c3 Factor -> . Number
+P4 @2-2 L1c3 Factor -> . Factor Multiply Factor
+R4:2 @0-2 L1c1-3 Factor -> Factor Multiply . Factor
+F0 @0-3 L1c1-4 Expression -> Factor .
+F2 @2-3 L1c3-4 Factor -> Number .
+R4:1 x2 @0,2-3 L1c1-4 Factor -> Factor . Multiply Factor
+F4 @0-3 L1c1-4 Factor -> Factor Multiply Factor .
+F5 @0-3 L1c1-4 :start -> Expression .
 END_PROGRESS_REPORT
 
 $Data::Dumper::Indent = 0;
@@ -124,7 +126,7 @@ $Data::Dumper::Terse  = 1;
 my $report0 = $recce->progress(0);
 
 chomp( my $expected_report0 = <<'END_PROGRESS_REPORT');
-[[0,0,0],[2,0,0],[4,0,0]]
+[[0,0,0],[2,0,0],[4,0,0],[5,0,0]]
 END_PROGRESS_REPORT
 Marpa::R3::Test::is( Data::Dumper::Dumper($report0),
     $expected_report0, 'progress report at location 0' );
@@ -137,7 +139,7 @@ Marpa::R3::Test::is( Data::Dumper::Dumper($report0),
 my $report1 = $recce->progress(1);
 
 chomp( my $expected_report1 = <<'END_PROGRESS_REPORT');
-[[0,-1,0],[2,-1,0],[4,1,0]]
+[[0,-1,0],[2,-1,0],[5,-1,0],[4,1,0]]
 END_PROGRESS_REPORT
 Marpa::R3::Test::is( Data::Dumper::Dumper($report1),
     $expected_report1, 'progress report at location 1' );
@@ -163,7 +165,7 @@ Marpa::R3::Test::is( Data::Dumper::Dumper($report2),
 my $latest_report = $recce->progress();
 
 chomp( my $expected_report3 = <<'END_PROGRESS_REPORT');
-[[0,-1,0],[2,-1,2],[4,-1,0],[4,1,0],[4,1,2]]
+[[0,-1,0],[2,-1,2],[4,-1,0],[5,-1,0],[4,1,0],[4,1,2]]
 END_PROGRESS_REPORT
 Marpa::R3::Test::is( Data::Dumper::Dumper($latest_report),
     $expected_report3, 'progress report at location 3' );
@@ -178,23 +180,10 @@ $latest_report = $recce->progress(-1);
 Marpa::R3::Test::is( Data::Dumper::Dumper($latest_report),
     $expected_report3, 'progress report at location -1' );
 
+# Currently external scanning does not show up in trace_terminals
 Marpa::R3::Test::is( $trace_output, <<'END_TRACE_OUTPUT', 'trace output' );
-Inaccessible symbol: Add
-Inaccessible symbol: Term
 Setting trace_terminals option
 Expecting "Number" at earleme 0
-Accepted "Number" at 0-1
-Expecting "Multiply" at 1
-Accepted "Multiply" at 1-2
-Expecting "Number" at 2
-Accepted "Number" at 2-3
-Expecting "Multiply" at 3
-Rejected "Add" at 3-4
 END_TRACE_OUTPUT
 
-# Local Variables:
-#   mode: cperl
-#   cperl-indent-level: 4
-#   fill-column: 100
-# End:
 # vim: expandtab shiftwidth=4:
