@@ -14,9 +14,8 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-# CENSUS: REWORK
-# Note: I think this is not in the SLIF test suite.
-# Note: A good candidate for sl_gia.t.
+# CENSUS: ASIS
+# Note: Converted from sl_gia.t
 
 use 5.010001;
 use strict;
