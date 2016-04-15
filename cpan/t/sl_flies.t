@@ -136,5 +136,4 @@ for my $data ( 'time flies like an arrow', 'fruit flies like a banana' ) {
 Marpa::R3::Test::is( ( join "\n", sort @actual ) . "\n",
     $expected, 'Ambiguous English sentences' );
 
-1;    # In case used as "do" file
-
+# vim: expandtab shiftwidth=4:

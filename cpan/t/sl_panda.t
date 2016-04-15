@@ -329,5 +329,4 @@ sub PennTags::VBZ::bracket {"(VBZ $_[0]->[0])"}
 
 sub PennTags::period::bracket {"(. .)"}
 
-1;    # In case used as "do" file
-
+# vim: expandtab shiftwidth=4:

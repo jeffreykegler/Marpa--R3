@@ -61,3 +61,5 @@ $r->lexeme_read(TOKEN => 0, 1, "_");
     # ev_token should NOT be reported here.
     Test::More::is( (join q{ }, @events), q{ev_other_token}, 'after' );
 }
+
+# vim: expandtab shiftwidth=4:

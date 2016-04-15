@@ -112,3 +112,4 @@ sub My_Actions::check_array {
     return $array;
 } ## end sub check_array
 
+# vim: expandtab shiftwidth=4:

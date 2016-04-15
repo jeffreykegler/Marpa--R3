@@ -150,3 +150,5 @@ for my $pos (
 } ## end for my $pos ( 0, 1, 2, -( 2 + length $target ), -( 1 ...))
 my $test_string = '(' x 20 . ')' x 20;
 Marpa::R3::Test::is( find_match($test_string), '0-40', 'Middle target' );
+
+# vim: expandtab shiftwidth=4:

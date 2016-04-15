@@ -367,4 +367,4 @@ sub decode_string {
     return $s;
 } ## end sub decode_string
 
-1;
+# vim: expandtab shiftwidth=4:

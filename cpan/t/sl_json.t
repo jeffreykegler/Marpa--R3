@@ -397,4 +397,4 @@ sub MarpaX::JSON::Actions::do_true {
     return $_[0] eq 'true';
 }
 
-1;
+# vim: expandtab shiftwidth=4:

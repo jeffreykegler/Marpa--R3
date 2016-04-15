@@ -66,17 +66,7 @@ for my $i (0 .. length $input) {
 }
 my $actual = join "\n", @actual, q{};
 
-my @expected = ();
-for my $line (<DATA>)
-{
-   chomp $line;
-  $line =~ s/\A(\d+ \s+ \d+) \s .*\z/$1/xms;
-  push @expected, $line;
-}
-my $expected = join "\n", @expected, q{};
-Marpa::R3::Test::is($actual, $expected, "Line and column test");
-
-__DATA__
+my $line_data = <<'END_OF_LINE_DATA';
 1 1 1\n2\r3\r\n4�5\n\r\n7\n\r\n\r\n\r
 1 2 \n2\r3\r\n4�5\n\r\n7\n\r\n\r\n\r\n
 2 1 2\r3\r\n4�5\n\r\n7\n\r\n\r\n\r\n\r
@@ -117,3 +107,16 @@ __DATA__
 24 1 24
 24 2 4
 24 3 
+END_OF_LINE_DATA
+
+my @expected = ();
+for my $line (split $RS, $line_data)
+{
+   chomp $line;
+  $line =~ s/\A(\d+ \s+ \d+) \s .*\z/$1/xms;
+  push @expected, $line;
+}
+my $expected = join "\n", @expected, q{};
+Marpa::R3::Test::is($actual, $expected, "Line and column test");
+
+# vim: expandtab shiftwidth=4:

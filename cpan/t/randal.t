@@ -266,4 +266,4 @@ sub show_die                { return 'die statement' }
 sub show_unary              { return $_[1] . ' function call' }
 sub show_nullary            { return $_[1] . ' function call' }
 
-1;    # In case used as "do" file
+# vim: expandtab shiftwidth=4:

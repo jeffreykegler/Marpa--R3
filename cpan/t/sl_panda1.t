@@ -235,5 +235,4 @@ sub PennTags::do_VP_VP_CC_VP    { "(VP $_[1] (CC $_[2]) $_[3])" }
 sub PennTags::do_VP_VP_VP_CC_VP { "(VP $_[1] $_[2] (CC $_[3]) $_[4])" }
 sub PennTags::do_VP_VBZ         { "(VP (VBZ $_[1]))" }
 
-1;    # In case used as "do" file
-
+# vim: expandtab shiftwidth=4:
