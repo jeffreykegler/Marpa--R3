@@ -479,6 +479,236 @@ Marpa::R3::Test::is(
 
 } ## end TESTS_FOLDED_FROM_ah2_t
 
+TESTS_FOLDED_FROM_bocage_t: {
+
+my %tree_expected = ();
+
+$tree_expected{'(;a;a;a)'} = <<'END_OF_TEXT';
+0: o17[-] R10:1@0-3 p=ok c=ok
+ o17[0]* ::= a17 R10:1@0-3C2@0
+ o17[1] ::= a18 R10:1@0-3C0@0
+1: o16[c0] R2:2@0-3 p=ok c=ok
+ o16[0]* ::= a16 R2:2@0-3C3@0
+2: o15[c1] R3:2@0-3 p=ok c=ok
+ o15[0]* ::= a15 R3:2@0-3C6@1
+3: o13[c2] R6:2@1-3 p=ok c=ok
+ o13[0]* ::= a13 R6:2@1-3C9@2
+4: o9[c3] R9:1@2-3 p=ok c=ok
+ o9[0]* ::= a9 R9:1@2-3S4@2
+5: o7[p3] R6:1@1-2 p=ok c=ok
+ o7[0]* ::= a7 R6:1@1-2C9@1
+6: o5[c5] R9:1@1-2 p=ok c=ok
+ o5[0]* ::= a5 R9:1@1-2S4@1
+7: o2[p2] R3:1@0-1 p=ok c=ok
+ o2[0]* ::= a2 R3:1@0-1C9@0
+8: o1[c7] R9:1@0-1 p=ok c=ok
+ o1[0]* ::= a1 R9:1@0-1S4@0
+9: o0[p1] R2:1@0-0 p=ok c=ok
+ o0[0]* ::= a0 R2:1@0-0S3@0
+END_OF_TEXT
+
+$tree_expected{'(a;;a;a)'} = <<'END_OF_TEXT';
+0: o17[-] R10:1@0-3 p=ok c=ok
+ o17[0] ::= a17 R10:1@0-3C2@0
+ o17[1]* ::= a18 R10:1@0-3C0@0
+1: o18[c0] R0:2@0-3 p=ok c=ok
+ o18[0]* ::= a19 R0:2@0-3C5@1
+ o18[1] ::= a20 R0:2@0-3C3@1
+2: o14[c1] R5:2@1-3 p=ok c=ok
+ o14[0]* ::= a14 R5:2@1-3C6@1
+3: o13[c2] R6:2@1-3 p=ok c=ok
+ o13[0]* ::= a13 R6:2@1-3C9@2
+4: o9[c3] R9:1@2-3 p=ok c=ok
+ o9[0]* ::= a9 R9:1@2-3S4@2
+5: o7[p3] R6:1@1-2 p=ok c=ok
+ o7[0]* ::= a7 R6:1@1-2C9@1
+6: o5[c5] R9:1@1-2 p=ok c=ok
+ o5[0]* ::= a5 R9:1@1-2S4@1
+7: o4[p2] R5:1@1-1 p=ok c=ok
+ o4[0]* ::= a4 R5:1@1-1S3@1
+8: o3[p1] R0:1@0-1 p=ok c=ok
+ o3[0]* ::= a3 R0:1@0-1C9@0
+9: o1[c8] R9:1@0-1 p=ok c=ok
+ o1[0]* ::= a1 R9:1@0-1S4@0
+END_OF_TEXT
+
+$tree_expected{'(a;a;;a)'} = <<'END_OF_TEXT';
+0: o17[-] R10:1@0-3 p=ok c=ok
+ o17[0] ::= a17 R10:1@0-3C2@0
+ o17[1]* ::= a18 R10:1@0-3C0@0
+1: o18[c0] R0:2@0-3 p=ok c=ok
+ o18[0] ::= a19 R0:2@0-3C5@1
+ o18[1]* ::= a20 R0:2@0-3C3@1
+2: o19[c1] R3:2@1-3 p=ok c=ok
+ o19[0] ::= a21 R3:2@1-3C7@2
+ o19[1]* ::= a22 R3:2@1-3C8@2
+3: o10[c2] R8:2@2-3 p=ok c=ok
+ o10[0]* ::= a10 R8:2@2-3C9@2
+4: o9[c3] R9:1@2-3 p=ok c=ok
+ o9[0]* ::= a9 R9:1@2-3S4@2
+5: o8[p3] R8:1@2-2 p=ok c=ok
+ o8[0]* ::= a8 R8:1@2-2S3@2
+6: o6[p2] R3:1@1-2 p=ok c=ok
+ o6[0]* ::= a6 R3:1@1-2C9@1
+7: o5[c6] R9:1@1-2 p=ok c=ok
+ o5[0]* ::= a5 R9:1@1-2S4@1
+8: o3[p1] R0:1@0-1 p=ok c=ok
+ o3[0]* ::= a3 R0:1@0-1C9@0
+9: o1[c8] R9:1@0-1 p=ok c=ok
+ o1[0]* ::= a1 R9:1@0-1S4@0
+END_OF_TEXT
+
+$tree_expected{'(a;a;a;)'} = <<'END_OF_TEXT';
+0: o17[-] R10:1@0-3 p=ok c=ok
+ o17[0] ::= a17 R10:1@0-3C2@0
+ o17[1]* ::= a18 R10:1@0-3C0@0
+1: o18[c0] R0:2@0-3 p=ok c=ok
+ o18[0] ::= a19 R0:2@0-3C5@1
+ o18[1]* ::= a20 R0:2@0-3C3@1
+2: o19[c1] R3:2@1-3 p=ok c=ok
+ o19[0]* ::= a21 R3:2@1-3C7@2
+ o19[1] ::= a22 R3:2@1-3C8@2
+3: o12[c2] R7:2@2-3 p=ok c=ok
+ o12[0]* ::= a12 R7:2@2-3S3@3
+4: o11[p3] R7:1@2-3 p=ok c=ok
+ o11[0]* ::= a11 R7:1@2-3C9@2
+5: o9[c4] R9:1@2-3 p=ok c=ok
+ o9[0]* ::= a9 R9:1@2-3S4@2
+6: o6[p2] R3:1@1-2 p=ok c=ok
+ o6[0]* ::= a6 R3:1@1-2C9@1
+7: o5[c6] R9:1@1-2 p=ok c=ok
+ o5[0]* ::= a5 R9:1@1-2S4@1
+8: o3[p1] R0:1@0-1 p=ok c=ok
+ o3[0]* ::= a3 R0:1@0-1C9@0
+9: o1[c8] R9:1@0-1 p=ok c=ok
+ o1[0]* ::= a1 R9:1@0-1S4@0
+END_OF_TEXT
+
+my %expected =
+    map { ( $_ => 1 ) } qw( (a;a;a;) (a;a;;a) (a;;a;a) (;a;a;a) );
+
+$recce->set( { max_parses => 20 } );
+
+while ( my $value_ref = $recce->value() ) {
+
+    my $tree_output = q{};
+
+    my $value = 'No parse';
+    if ($value_ref) {
+        $value = ${$value_ref};
+
+        Marpa::R3::Test::is( $recce->show_tree(), $tree_expected{$value},
+            qq{Tree, "$value"} );
+    }
+    else {
+        Test::More::fail('Tree');
+    }
+
+    if ( defined $expected{$value} ) {
+        delete $expected{$value};
+        Test::More::pass(qq{Expected result, "$value"});
+    }
+    else {
+        Test::More::fail(qq{Unexpected result, "$value"});
+    }
+} ## end while ( my $value_ref = $recce->value() )
+
+for my $value ( keys %expected ) {
+    Test::More::fail(qq{Missing result, "$value"});
+}
+
+my $or_node_output = <<'END_OF_TEXT';
+R2:1@0-0
+R0:1@0-1
+R3:1@0-1
+R9:1@0-1
+R0:2@0-3
+R2:2@0-3
+R3:2@0-3
+R10:1@0-3
+R5:1@1-1
+R3:1@1-2
+R6:1@1-2
+R9:1@1-2
+R3:2@1-3
+R5:2@1-3
+R6:2@1-3
+R8:1@2-2
+R7:1@2-3
+R7:2@2-3
+R8:2@2-3
+R9:1@2-3
+END_OF_TEXT
+
+Marpa::R3::Test::is( $recce->show_or_nodes(), $or_node_output,
+    'XS Or nodes' );
+
+my $and_node_output = <<'END_OF_TEXT';
+And-node #0: R2:1@0-0S3@0
+And-node #3: R0:1@0-1C9@0
+And-node #2: R3:1@0-1C9@0
+And-node #1: R9:1@0-1S4@0
+And-node #19: R0:2@0-3C5@1
+And-node #20: R0:2@0-3C3@1
+And-node #16: R2:2@0-3C3@0
+And-node #15: R3:2@0-3C6@1
+And-node #17: R10:1@0-3C2@0
+And-node #18: R10:1@0-3C0@0
+And-node #4: R5:1@1-1S3@1
+And-node #6: R3:1@1-2C9@1
+And-node #7: R6:1@1-2C9@1
+And-node #5: R9:1@1-2S4@1
+And-node #21: R3:2@1-3C7@2
+And-node #22: R3:2@1-3C8@2
+And-node #14: R5:2@1-3C6@1
+And-node #13: R6:2@1-3C9@2
+And-node #8: R8:1@2-2S3@2
+And-node #11: R7:1@2-3C9@2
+And-node #12: R7:2@2-3S3@3
+And-node #10: R8:2@2-3C9@2
+And-node #9: R9:1@2-3S4@2
+END_OF_TEXT
+
+Marpa::R3::Test::is( $recce->show_and_nodes(),
+    $and_node_output, 'XS And nodes' );
+
+TODO: {
+
+	todo_skip "Marpa::R3::Scanless::R::show_bocage() unimplemented", 1;
+
+my $bocage_output = <<'END_OF_TEXT';
+0: 0=R2:1@0-0 - S3
+1: 1=R9:1@0-1 - S4
+2: 2=R3:1@0-1 - R9:1@0-1
+3: 3=R0:1@0-1 - R9:1@0-1
+4: 4=R5:1@1-1 - S3
+5: 5=R9:1@1-2 - S4
+6: 6=R3:1@1-2 - R9:1@1-2
+7: 7=R6:1@1-2 - R9:1@1-2
+8: 8=R8:1@2-2 - S3
+9: 9=R9:1@2-3 - S4
+10: 10=R8:2@2-3 R8:1@2-2 R9:1@2-3
+11: 11=R7:1@2-3 - R9:1@2-3
+12: 12=R7:2@2-3 R7:1@2-3 S3
+13: 13=R6:2@1-3 R6:1@1-2 R9:1@2-3
+14: 14=R5:2@1-3 R5:1@1-1 R6:2@1-3
+15: 15=R3:2@0-3 R3:1@0-1 R6:2@1-3
+16: 16=R2:2@0-3 R2:1@0-0 R3:2@0-3
+17: 17=R10:1@0-3 - R2:2@0-3
+18: 17=R10:1@0-3 - R0:2@0-3
+19: 18=R0:2@0-3 R0:1@0-1 R5:2@1-3
+20: 18=R0:2@0-3 R0:1@0-1 R3:2@1-3
+21: 19=R3:2@1-3 R3:1@1-2 R7:2@2-3
+22: 19=R3:2@1-3 R3:1@1-2 R8:2@2-3
+END_OF_TEXT
+
+Marpa::R3::Test::is( $recce->show_bocage(), $bocage_output, 'XS Bocage' );
+
+} ## end TODO & SKIP show_bocage()
+
+
+} ## end TESTS_FOLDED_FROM_bocage_t
+
 1;    # In case used as "do" file
 
 # Local Variables:
