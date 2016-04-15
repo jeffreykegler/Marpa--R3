@@ -1080,6 +1080,11 @@ sub Marpa::R3::Scanless::G::show_irls {
     return thick_subgrammar_by_name($slg, $subgrammar)->show_irls();
 }
 
+sub Marpa::R3::Scanless::G::show_isys {
+    my ($slg, $subgrammar) = @_;
+    return thick_subgrammar_by_name($slg, $subgrammar)->show_isys();
+}
+
 sub Marpa::R3::Scanless::G::show_ahms {
     my ( $slg, $verbose ) = @_;
     return $slg->tracer()->show_ahms($verbose);

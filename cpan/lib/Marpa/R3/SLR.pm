@@ -2201,6 +2201,18 @@ sub Marpa::R3::Scanless::R::show_and_nodes {
     return $recce_c->show_and_nodes($bocage);
 }
 
+sub Marpa::R3::Scanless::R::show_tree {
+    my ( $slr ) = @_;
+    my $naif_recce = $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
+    return $naif_recce->show_tree();
+}
+
+sub Marpa::R3::Scanless::R::show_bocage {
+    my ( $slr ) = @_;
+    my $naif_recce = $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
+    return $naif_recce->show_bocage();
+}
+
 1;
 
 # vim: expandtab shiftwidth=4:
