@@ -186,6 +186,7 @@ t/balanced.t
 t/bocage.t
 t/catalan.t
 t/chaf.t
+t/sl_chaf.t
 t/code_diag.t
 t/context.t
 t/counter.t
