@@ -25,7 +25,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-use Test::More tests => 26;
+use Test::More tests => 35;
 use lib 'inc';
 use Marpa::R3::Test;
 use Marpa::R3;
@@ -148,13 +148,336 @@ for my $i ( 0 .. $input_length ) {
 
 } ## end for my $i ( 0 .. $input_length )
 
-#
-# tests folded from ah2.t start here
-#
+TESTS_FOLDED_FROM_ah2_t: {
 
-#
-# tests folded from bocage.t start here
-#
+Marpa::R3::Test::is( $grammar->show_rules, <<'EOS', 'Aycock/Horspool Rules' );
+0: S -> A A A A
+1: A -> a
+2: A -> E /* !used */
+3: E -> /* empty !used */
+EOS
+
+Marpa::R3::Test::is( $grammar->show_symbols,
+    <<'EOS', 'Aycock/Horspool Symbols' );
+0: S
+1: A
+2: a, terminal
+3: E, nulling
+EOS
+
+TODO: {
+
+	todo_skip "Marpa::R3::Scanless::G::show_isys() unimplemented", 1;
+
+Marpa::R3::Test::is( $grammar->show_isys,
+	<<'EOS', 'Aycock/Horspool ISYs' );
+0: S
+1: S[], nulling
+2: A
+3: A[], nulling
+4: a
+5: E[], nulling
+6: S[R0:1]
+7: S[R0:2]
+8: S[']
+EOS
+
+} ## TODO & SKIP show_isys()
+
+
+TODO: {
+
+	todo_skip "Marpa::R3::Scanless::G::show_irls() unimplemented", 1;
+
+Marpa::R3::Test::is( $grammar->show_irls,
+    <<'EOS', 'Aycock/Horspool IRLs' );
+0: S -> A S[R0:1]
+1: S -> A A[] A[] A[]
+2: S -> A[] S[R0:1]
+3: S[R0:1] -> A S[R0:2]
+4: S[R0:1] -> A A[] A[]
+5: S[R0:1] -> A[] S[R0:2]
+6: S[R0:2] -> A A
+7: S[R0:2] -> A A[]
+8: S[R0:2] -> A[] A
+9: A -> a
+10: S['] -> S
+EOS
+
+} ## TODO & SKIP show_irls()
+
+TODO: {
+
+	todo_skip "Marpa::R3::Scanless::G::show_nulling_symbols() unimplemented", 1;
+
+Marpa::R3::Test::is(
+    $grammar->show_nulling_symbols,
+    q{E},
+    'Aycock/Horspool Nulling Symbols'
+);
+
+} ## TODO & SKIP show_nulling_symbols()
+
+TODO: {
+
+	todo_skip "Marpa::R3::Scanless::G::show_productive_symbols() unimplemented", 1;
+
+Marpa::R3::Test::is(
+    $grammar->show_productive_symbols,
+    q{A E S a},
+    'Aycock/Horspool Productive Symbols'
+);
+
+} ## TODO & SKIP show_productive_symbols()
+
+TODO: {
+
+	todo_skip "Marpa::R3::Scanless::G::show_accessible_symbols() unimplemented", 1;
+
+Marpa::R3::Test::is(
+    $grammar->show_accessible_symbols,
+    q{A E S a},
+    'Aycock/Horspool Accessible Symbols'
+);
+
+} ## TODO SKIP show_accessible_symbols()
+
+Marpa::R3::Test::is( $grammar->show_ahms(),
+    <<'EOS', 'Aycock/Horspool AHMs' );
+AHM 0: postdot = "A"
+    S ::= . A S[R0:1]
+AHM 1: postdot = "S[R0:1]"
+    S ::= A . S[R0:1]
+AHM 2: completion
+    S ::= A S[R0:1] .
+AHM 3: postdot = "A"
+    S ::= . A A[] A[] A[]
+AHM 4: completion
+    S ::= A A[] A[] A[] .
+AHM 5: postdot = "S[R0:1]"
+    S ::= A[] . S[R0:1]
+AHM 6: completion
+    S ::= A[] S[R0:1] .
+AHM 7: postdot = "A"
+    S[R0:1] ::= . A S[R0:2]
+AHM 8: postdot = "S[R0:2]"
+    S[R0:1] ::= A . S[R0:2]
+AHM 9: completion
+    S[R0:1] ::= A S[R0:2] .
+AHM 10: postdot = "A"
+    S[R0:1] ::= . A A[] A[]
+AHM 11: completion
+    S[R0:1] ::= A A[] A[] .
+AHM 12: postdot = "S[R0:2]"
+    S[R0:1] ::= A[] . S[R0:2]
+AHM 13: completion
+    S[R0:1] ::= A[] S[R0:2] .
+AHM 14: postdot = "A"
+    S[R0:2] ::= . A A
+AHM 15: postdot = "A"
+    S[R0:2] ::= A . A
+AHM 16: completion
+    S[R0:2] ::= A A .
+AHM 17: postdot = "A"
+    S[R0:2] ::= . A A[]
+AHM 18: completion
+    S[R0:2] ::= A A[] .
+AHM 19: postdot = "A"
+    S[R0:2] ::= A[] . A
+AHM 20: completion
+    S[R0:2] ::= A[] A .
+AHM 21: postdot = "a"
+    A ::= . a
+AHM 22: completion
+    A ::= a .
+AHM 23: postdot = "S"
+    S['] ::= . S
+AHM 24: completion
+    S['] ::= S .
+EOS
+
+my $expected_earley_sets = <<'END_OF_SETS';
+Last Completed: 4; Furthest: 4
+Earley Set 0
+ahm23: R10:0@0-0
+  R10:0: S['] ::= . S
+ahm0: R0:0@0-0
+  R0:0: S ::= . A S[R0:1]
+ahm3: R1:0@0-0
+  R1:0: S ::= . A A[] A[] A[]
+ahm5: R2:1@0-0
+  R2:1: S ::= A[] . S[R0:1]
+ahm7: R3:0@0-0
+  R3:0: S[R0:1] ::= . A S[R0:2]
+ahm10: R4:0@0-0
+  R4:0: S[R0:1] ::= . A A[] A[]
+ahm12: R5:1@0-0
+  R5:1: S[R0:1] ::= A[] . S[R0:2]
+ahm14: R6:0@0-0
+  R6:0: S[R0:2] ::= . A A
+ahm17: R7:0@0-0
+  R7:0: S[R0:2] ::= . A A[]
+ahm19: R8:1@0-0
+  R8:1: S[R0:2] ::= A[] . A
+ahm21: R9:0@0-0
+  R9:0: A ::= . a
+Earley Set 1
+ahm22: R9$@0-1
+  R9$: A ::= a .
+  [c=R9:0@0-0; s=a; t=\'a']
+ahm20: R8$@0-1
+  R8$: S[R0:2] ::= A[] A .
+  [p=R8:1@0-0; c=R9$@0-1]
+ahm18: R7$@0-1
+  R7$: S[R0:2] ::= A A[] .
+  [p=R7:0@0-0; c=R9$@0-1]
+ahm15: R6:1@0-1
+  R6:1: S[R0:2] ::= A . A
+  [p=R6:0@0-0; c=R9$@0-1]
+ahm11: R4$@0-1
+  R4$: S[R0:1] ::= A A[] A[] .
+  [p=R4:0@0-0; c=R9$@0-1]
+ahm8: R3:1@0-1
+  R3:1: S[R0:1] ::= A . S[R0:2]
+  [p=R3:0@0-0; c=R9$@0-1]
+ahm4: R1$@0-1
+  R1$: S ::= A A[] A[] A[] .
+  [p=R1:0@0-0; c=R9$@0-1]
+ahm1: R0:1@0-1
+  R0:1: S ::= A . S[R0:1]
+  [p=R0:0@0-0; c=R9$@0-1]
+ahm24: R10$@0-1
+  R10$: S['] ::= S .
+  [p=R10:0@0-0; c=R1$@0-1] [p=R10:0@0-0; c=R2$@0-1]
+ahm6: R2$@0-1
+  R2$: S ::= A[] S[R0:1] .
+  [p=R2:1@0-0; c=R4$@0-1] [p=R2:1@0-0; c=R5$@0-1]
+ahm13: R5$@0-1
+  R5$: S[R0:1] ::= A[] S[R0:2] .
+  [p=R5:1@0-0; c=R7$@0-1] [p=R5:1@0-0; c=R8$@0-1]
+ahm21: R9:0@1-1
+  R9:0: A ::= . a
+ahm14: R6:0@1-1
+  R6:0: S[R0:2] ::= . A A
+ahm17: R7:0@1-1
+  R7:0: S[R0:2] ::= . A A[]
+ahm19: R8:1@1-1
+  R8:1: S[R0:2] ::= A[] . A
+ahm7: R3:0@1-1
+  R3:0: S[R0:1] ::= . A S[R0:2]
+ahm10: R4:0@1-1
+  R4:0: S[R0:1] ::= . A A[] A[]
+ahm12: R5:1@1-1
+  R5:1: S[R0:1] ::= A[] . S[R0:2]
+Earley Set 2
+ahm22: R9$@1-2
+  R9$: A ::= a .
+  [c=R9:0@1-1; s=a; t=\'a']
+ahm11: R4$@1-2
+  R4$: S[R0:1] ::= A A[] A[] .
+  [p=R4:0@1-1; c=R9$@1-2]
+ahm8: R3:1@1-2
+  R3:1: S[R0:1] ::= A . S[R0:2]
+  [p=R3:0@1-1; c=R9$@1-2]
+ahm20: R8$@1-2
+  R8$: S[R0:2] ::= A[] A .
+  [p=R8:1@1-1; c=R9$@1-2]
+ahm18: R7$@1-2
+  R7$: S[R0:2] ::= A A[] .
+  [p=R7:0@1-1; c=R9$@1-2]
+ahm15: R6:1@1-2
+  R6:1: S[R0:2] ::= A . A
+  [p=R6:0@1-1; c=R9$@1-2]
+ahm16: R6$@0-2
+  R6$: S[R0:2] ::= A A .
+  [p=R6:1@0-1; c=R9$@1-2]
+ahm13: R5$@0-2
+  R5$: S[R0:1] ::= A[] S[R0:2] .
+  [p=R5:1@0-0; c=R6$@0-2]
+ahm6: R2$@0-2
+  R2$: S ::= A[] S[R0:1] .
+  [p=R2:1@0-0; c=R3$@0-2] [p=R2:1@0-0; c=R5$@0-2]
+ahm24: R10$@0-2
+  R10$: S['] ::= S .
+  [p=R10:0@0-0; c=R0$@0-2] [p=R10:0@0-0; c=R2$@0-2]
+ahm13: R5$@1-2
+  R5$: S[R0:1] ::= A[] S[R0:2] .
+  [p=R5:1@1-1; c=R7$@1-2] [p=R5:1@1-1; c=R8$@1-2]
+ahm9: R3$@0-2
+  R3$: S[R0:1] ::= A S[R0:2] .
+  [p=R3:1@0-1; c=R7$@1-2] [p=R3:1@0-1; c=R8$@1-2]
+ahm2: R0$@0-2
+  R0$: S ::= A S[R0:1] .
+  [p=R0:1@0-1; c=R4$@1-2] [p=R0:1@0-1; c=R5$@1-2]
+ahm14: R6:0@2-2
+  R6:0: S[R0:2] ::= . A A
+ahm17: R7:0@2-2
+  R7:0: S[R0:2] ::= . A A[]
+ahm19: R8:1@2-2
+  R8:1: S[R0:2] ::= A[] . A
+ahm21: R9:0@2-2
+  R9:0: A ::= . a
+Earley Set 3
+ahm22: R9$@2-3
+  R9$: A ::= a .
+  [c=R9:0@2-2; s=a; t=\'a']
+ahm20: R8$@2-3
+  R8$: S[R0:2] ::= A[] A .
+  [p=R8:1@2-2; c=R9$@2-3]
+ahm18: R7$@2-3
+  R7$: S[R0:2] ::= A A[] .
+  [p=R7:0@2-2; c=R9$@2-3]
+ahm15: R6:1@2-3
+  R6:1: S[R0:2] ::= A . A
+  [p=R6:0@2-2; c=R9$@2-3]
+ahm16: R6$@1-3
+  R6$: S[R0:2] ::= A A .
+  [p=R6:1@1-2; c=R9$@2-3]
+ahm13: R5$@1-3
+  R5$: S[R0:1] ::= A[] S[R0:2] .
+  [p=R5:1@1-1; c=R6$@1-3]
+ahm9: R3$@0-3
+  R3$: S[R0:1] ::= A S[R0:2] .
+  [p=R3:1@0-1; c=R6$@1-3]
+ahm6: R2$@0-3
+  R2$: S ::= A[] S[R0:1] .
+  [p=R2:1@0-0; c=R3$@0-3]
+ahm24: R10$@0-3
+  R10$: S['] ::= S .
+  [p=R10:0@0-0; c=R0$@0-3] [p=R10:0@0-0; c=R2$@0-3]
+ahm2: R0$@0-3
+  R0$: S ::= A S[R0:1] .
+  [p=R0:1@0-1; c=R3$@1-3] [p=R0:1@0-1; c=R5$@1-3]
+ahm9: R3$@1-3
+  R3$: S[R0:1] ::= A S[R0:2] .
+  [p=R3:1@1-2; c=R7$@2-3] [p=R3:1@1-2; c=R8$@2-3]
+ahm21: R9:0@3-3
+  R9:0: A ::= . a
+Earley Set 4
+ahm22: R9$@3-4
+  R9$: A ::= a .
+  [c=R9:0@3-3; s=a; t=\'a']
+ahm16: R6$@2-4
+  R6$: S[R0:2] ::= A A .
+  [p=R6:1@2-3; c=R9$@3-4]
+ahm9: R3$@1-4
+  R3$: S[R0:1] ::= A S[R0:2] .
+  [p=R3:1@1-2; c=R6$@2-4]
+ahm2: R0$@0-4
+  R0$: S ::= A S[R0:1] .
+  [p=R0:1@0-1; c=R3$@1-4]
+ahm24: R10$@0-4
+  R10$: S['] ::= S .
+  [p=R10:0@0-0; c=R0$@0-4]
+END_OF_SETS
+
+Marpa::R3::Test::is(
+    $recce->show_earley_sets(2),
+    $expected_earley_sets,
+    'Aycock/Horspool Earley sets'
+);
+
+} ## end TESTS_FOLDED_FROM_ah2_t
 
 1;    # In case used as "do" file
 
