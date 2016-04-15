@@ -464,17 +464,17 @@ END_OF_SOURCE
 
 if (1) {
     my $source = <<'END_OF_SOURCE';
- 
+
     inaccessible is ok by default
     :default ::= action => ::first
-    
+
     start ::= !START!
     start1 ::= X
     start2 ::= Y
- 
+
     X ~ 'X'
     Y ~ 'X'
- 
+
 END_OF_SOURCE
 
     my $input           = 'X';
@@ -496,17 +496,17 @@ END_OF_SOURCE
 
 if (1) {
     my $source = <<'END_OF_SOURCE';
- 
+
     :default ::= action => ::first
-    
+
     dual_start ::= start1 name => 'first start rule'
     dual_start ::= start2 name => 'second start rule'
     start1 ::= X
     start2 ::= Y
- 
+
     X ~ 'X'
     Y ~ 'Y'
- 
+
 END_OF_SOURCE
 
     my $input           = 'X';
