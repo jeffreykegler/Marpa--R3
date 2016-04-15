@@ -148,6 +148,14 @@ for my $i ( 0 .. $input_length ) {
 
 } ## end for my $i ( 0 .. $input_length )
 
+#
+# tests folded from ah2.t start here
+#
+
+#
+# tests folded from bocage.t start here
+#
+
 1;    # In case used as "do" file
 
 # Local Variables:
