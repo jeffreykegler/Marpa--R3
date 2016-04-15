@@ -14,16 +14,16 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-# CENSUS: DELETE
-# Note: Converted to sl_context.t
+# CENSUS: ASIS
+# Note: Converted from sl_context.t
 
-# NAIF semantics examples
+# Test of bail() and context variables in SLIF semantics
 
 use 5.010001;
 use strict;
 use warnings;
 
-use Test::More tests => 7;
+use Test::More tests => 6;
 
 use English qw( -no_match_vars );
 use Fatal qw( open close );
@@ -33,11 +33,11 @@ use Marpa::R3;
 
 my $trace_rules = q{};
 
-sub do_S {
+sub no_bail {
     my ($action_object) = @_;
     my $rule_id = $Marpa::R3::Context::rule;
-    my $grammar = $Marpa::R3::Context::grammar;
-    my ( $lhs, @rhs ) = $grammar->rule($rule_id);
+    my $slg = $Marpa::R3::Context::slg;
+    my ( $lhs, @rhs ) = $slg->rule($rule_id);
     $action_object->{text} =
           "rule $rule_id: $lhs ::= "
         . ( join q{ }, @rhs ) . "\n"
@@ -50,39 +50,38 @@ my $bail_message = "This is a bail out message!";
 
 sub do_bail_with_message_if_A {
     my ($action_object, $terminal) = @_;
-    Marpa::R3::Context::bail($bail_message) if $terminal eq 'A';
+    Marpa::R3::Context::bail($bail_message) if $terminal eq 'a';
 }
 
 sub do_bail_with_object_if_A {
     my ($action_object, $terminal) = @_;
-    Marpa::R3::Context::bail([$bail_message]) if $terminal eq 'A';
+    Marpa::R3::Context::bail([$bail_message]) if $terminal eq 'a';
 }
 
+my $dsl = <<'END_OF_DSL';
+S ::= A B C D action => DOIT
+A ~ [\d\D]
+B ~ [\d\D]
+C ~ [\d\D]
+D ~ [\d\D]
+END_OF_DSL
+
 my @terminals = qw/A B C D/;
-my $grammar   = Marpa::R3::Grammar->new(
-    {   start => 'S',
-        rules =>
-            [ { lhs => 'S', rhs => \@terminals, action => 'main::do_S' }, ],
-        symbols => { map { ( $_ => { terminal => 1 } ) } @terminals }
-    }
-);
-
-$grammar->precompute();
-
-my @rule_ids = $grammar->rule_ids();
-
-Test::More::is( ( join q{ }, @rule_ids ), '0', '$g->rule_ids() ok?' );
 
 sub do_parse {
-    my $recce = Marpa::R3::Recognizer->new( { grammar => $grammar } );
-    for my $terminal (@terminals) {
-        $recce->read( $terminal, $terminal );
-    }
+    my ($action) = @_;
+    my $this_dsl = $dsl;
+    $this_dsl =~ s/DOIT/$action/xms;
+    my $grammar   = Marpa::R3::Scanless::G->new(
+        {   source => \$this_dsl }
+    );
+    my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
+    $recce->read( \'abcd' );
     return $recce->value();
 } ## end sub do_parse
 
 my $value_ref;
-$value_ref = do_parse();
+$value_ref = do_parse('main::no_bail');
 VALUE_TEST: {
     if ( ref $value_ref ne 'REF' ) {
         my $ref_type = ref $value_ref;
@@ -103,8 +102,10 @@ VALUE_TEST: {
 
 my $eval_ok;
 {
-    local *do_S = *do_bail_with_message_if_A;
-    $eval_ok = eval { $value_ref = do_parse(); 1 };
+    $eval_ok = eval {
+        $value_ref = do_parse( 'main::do_bail_with_message_if_A' );
+        1;
+    };
 }
 my $actual_eval_error = $EVAL_ERROR
     // 'no eval error';    # grab it now to be safe
@@ -119,8 +120,10 @@ Test::More::is(
 );
 
 {
-    local *do_S = *do_bail_with_object_if_A;
-    $eval_ok = eval { $value_ref = do_parse(); 1 };
+    $eval_ok = eval {
+        $value_ref = do_parse( 'main::do_bail_with_object_if_A' );
+        1;
+    };
 }
 $actual_eval_error = $EVAL_ERROR;
 my $eval_error_ref_type = ref $actual_eval_error;
@@ -135,9 +138,4 @@ Test::More::is( $eval_error_ref_type, 'ARRAY',
 Test::More::is( $exception_value_desc, $bail_message,
     "bail with object argument value" );
 
-# Local Variables:
-#   mode: cperl
-#   cperl-indent-level: 4
-#   fill-column: 100
-# End:
 # vim: expandtab shiftwidth=4:
