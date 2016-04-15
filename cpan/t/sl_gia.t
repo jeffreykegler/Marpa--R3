@@ -24,7 +24,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-use Test::More tests => 34;
+use Test::More tests => 36;
 use English qw( -no_match_vars );
 use lib 'inc';
 use Marpa::R3::Test;
@@ -580,5 +580,47 @@ sub my_parser {
     }
     return [ return ${$value_ref}, 'Parse OK' ];
 } ## end sub my_parser
+
+## no critic (Subroutines::RequireArgUnpacking)
+
+sub default_action {
+    shift;
+    my $v_count = scalar @_;
+    return q{}   if $v_count <= 0;
+    return $_[0] if $v_count == 1;
+    return '(' . ( join q{;}, @_ ) . ')';
+} ## end sub default_action
+
+## use critic
+
+my $grammar = Marpa::R3::Scanless::G->new(
+    {   source => \<<'END_OF_DSL'
+:default ::= action => default_action
+S ::= A B B B C C
+A ::= 'a'
+B ::= 'a'
+B ::=
+C ::=
+END_OF_DSL
+    }
+);
+
+Marpa::R3::Test::is( $grammar->show_rules, <<'EOS', 'Aycock/Horspool Rules' );
+G1 R0 S ::= A B B B C C
+G1 R1 A ::= 'a'
+G1 R2 B ::= 'a'
+G1 R3 B ::=
+G1 R4 C ::=
+G1 R5 :start ::= S
+EOS
+
+my $recce = Marpa::R3::Scanless::R->new(
+	{ grammar => $grammar, semantics_package => 'main' } );
+
+$recce->read( \q{a} );
+
+my $value_ref = $recce->value();
+my $value = defined $value_ref ? ${$value_ref} : 'undef';
+Test::More::is( $value, '(a;;;;;)', 'subp test' );
 
 # vim: expandtab shiftwidth=4:
