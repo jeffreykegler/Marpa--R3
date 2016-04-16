@@ -14,9 +14,8 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-# CENSUS: REWORK
-# Note: an ah2 test with diagnostics.  Convert to SLIF if we ...
-# Note: don't have one already
+# CENSUS: DELETE
+# Note: Folded into sl_ah2.t
 
 # This test dumps the contents of the bocage and its iterator.
 # The example grammar is Aycock/Horspool's

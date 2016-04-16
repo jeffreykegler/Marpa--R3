@@ -1007,6 +1007,27 @@ sub Marpa::R3::Scanless::G::show_symbols {
     return $text;
 } ## end sub Marpa::R3::Scanless::G::show_symbols
 
+sub Marpa::R3::Scanless::G::symid_is_accessible {
+    my ( $slg, $symid ) = @_;
+    my $thick_grammar = thick_subgrammar_by_name($slg, 'G1');
+    my $grammar_c = $thick_grammar->[Marpa::R3::Internal::Grammar::C];
+    return $grammar_c->symbol_is_accessible($symid)
+}
+
+sub Marpa::R3::Scanless::G::symid_is_productive {
+    my ( $slg, $symid ) = @_;
+    my $thick_grammar = thick_subgrammar_by_name($slg, 'G1');
+    my $grammar_c = $thick_grammar->[Marpa::R3::Internal::Grammar::C];
+    return $grammar_c->symbol_is_productive($symid)
+}
+
+sub Marpa::R3::Scanless::G::symid_is_nulling {
+    my ( $slg, $symid ) = @_;
+    my $thick_grammar = thick_subgrammar_by_name($slg, 'G1');
+    my $grammar_c = $thick_grammar->[Marpa::R3::Internal::Grammar::C];
+    return $grammar_c->symbol_is_nulling($symid)
+}
+
 sub Marpa::R3::Scanless::G::show_dotted_rule {
     my ( $slg, $rule_id, $dot_position ) = @_;
     my $grammar =  $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];

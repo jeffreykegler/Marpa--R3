@@ -15,7 +15,7 @@
 # http://www.gnu.org/licenses/.
 
 # CENSUS: ASIS
-# Note: SLIF TEST
+# Note: ah2.t and bocage.t folded into this test
 
 # the example grammar in Aycock/Horspool "Practical Earley Parsing",
 # _The Computer Journal_, Vol. 45, No. 6, pp. 620-630,
@@ -99,41 +99,20 @@ Marpa::R3::Test::is( $grammar->show_irls,
 11: [:start]['] -> [:start]
 EOS
 
-TODO: {
+my $nulling_symbols = join q{ }, sort map { $grammar->symbol_name($_) }
+  grep { $grammar->symid_is_nulling($_) } $grammar->symbol_ids();
+Marpa::R3::Test::is( $nulling_symbols, q{},
+    'Aycock/Horspool Nulling Symbols' );
 
-	todo_skip "Marpa::R3::Scanless::G::show_nulling_symbols() unimplemented", 1;
+my $productive_symbols = join q{ }, sort map { $grammar->symbol_name($_) }
+  grep { $grammar->symid_is_productive($_) } $grammar->symbol_ids();
+Marpa::R3::Test::is( $productive_symbols, q{A S [:start] [Lex-0]},
+    'Aycock/Horspool Productive Symbols' );
 
-Marpa::R3::Test::is(
-    $grammar->show_nulling_symbols,
-    q{E},
-    'Aycock/Horspool Nulling Symbols'
-);
-
-} ## TODO & SKIP show_nulling_symbols()
-
-TODO: {
-
-	todo_skip "Marpa::R3::Scanless::G::show_productive_symbols() unimplemented", 1;
-
-Marpa::R3::Test::is(
-    $grammar->show_productive_symbols,
-    q{A E S a},
-    'Aycock/Horspool Productive Symbols'
-);
-
-} ## TODO & SKIP show_productive_symbols()
-
-TODO: {
-
-	todo_skip "Marpa::R3::Scanless::G::show_accessible_symbols() unimplemented", 1;
-
-Marpa::R3::Test::is(
-    $grammar->show_accessible_symbols,
-    q{A E S a},
-    'Aycock/Horspool Accessible Symbols'
-);
-
-} ## TODO SKIP show_accessible_symbols()
+my $accessible_symbols = join q{ }, sort map { $grammar->symbol_name($_) }
+  grep { $grammar->symid_is_accessible($_) } $grammar->symbol_ids();
+Marpa::R3::Test::is( $accessible_symbols, q{A S [:start] [Lex-0]},
+    'Aycock/Horspool Accessible Symbols' );
 
 Marpa::R3::Test::is( $grammar->show_ahms(),
     <<'EOS', 'Aycock/Horspool AHMs' );

@@ -14,9 +14,8 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-# CENSUS: REWORK
-# Note: yet another ah2 test, with diagnostics.
-# Note: check to see that we have all these for the SLIF
+# CENSUS: DELETE
+# Note: Folded into sl_ah2.t
 
 # the example grammar in Aycock/Horspool "Practical Earley Parsing",
 # _The Computer Journal_, Vol. 45, No. 6, pp. 620-630,
