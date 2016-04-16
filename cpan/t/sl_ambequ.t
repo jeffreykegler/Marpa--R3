@@ -14,8 +14,8 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-# CENSUS: DELETE
-# Note: Converted to SLIF as sl_ambeq.t
+# CENSUS: ASIS
+# Note: Converted to SLIF from equation.t
 
 # An ambiguous equation
 
@@ -23,7 +23,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-use Test::More tests => 11;
+use Test::More tests => 10;
 
 use lib 'inc';
 use Marpa::R3::Test;
@@ -86,18 +86,15 @@ sub default_action {
     return '(' . join( q{;}, @_ ) . ')';
 } ## end sub default_action
 
-my $grammar = Marpa::R3::Grammar->new(
-    {   start   => 'E',
-        actions => 'main',
-        rules   => [
-            [ 'E', [qw/E Op E/], 'do_op' ],
-            [ 'E', [qw/Number/], 'number' ],
-        ],
-        default_action => 'default_action',
-    }
-);
+my $dsl = <<'END_OF_DSL';
+:default ::= action => main::default_action
+E ::= E Op E action => main::do_op
+E ::= Number action => main::number
+Number ~ [\d]+
+Op ~ [-+*]
+END_OF_DSL
 
-$grammar->precompute();
+my $grammar = Marpa::R3::Scanless::G->new( {   source => \$dsl });
 
 my $actual_ref;
 $actual_ref = save_stdout();
@@ -109,9 +106,10 @@ restore_stdout();
 
 Marpa::R3::Test::is( ${$actual_ref},
     <<'END_SYMBOLS', 'Ambiguous Equation Symbols' );
-0: E
-1: Op, terminal
-2: Number, terminal
+G1 S0 :start -- Internal G1 start symbol
+G1 S1 E
+G1 S2 Op
+G1 S3 Number
 END_SYMBOLS
 
 $actual_ref = save_stdout();
@@ -123,8 +121,9 @@ restore_stdout();
 
 Marpa::R3::Test::is( ${$actual_ref},
     <<'END_RULES', 'Ambiguous Equation Rules' );
-0: E -> E Op E
-1: E -> Number
+G1 R0 E ::= E Op E
+G1 R1 E ::= Number
+G1 R2 :start ::= E
 END_RULES
 
 $actual_ref = save_stdout();
@@ -149,33 +148,18 @@ AHM 4: postdot = "Number"
 AHM 5: completion
     E ::= Number .
 AHM 6: postdot = "E"
-    E['] ::= . E
+    [:start] ::= . E
 AHM 7: completion
-    E['] ::= E .
+    [:start] ::= E .
+AHM 8: postdot = "[:start]"
+    [:start]['] ::= . [:start]
+AHM 9: completion
+    [:start]['] ::= [:start] .
 EOS
 
-$actual_ref = save_stdout();
+my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
 
-print $grammar->show_problems()
-    or die "print failed: $ERRNO";
-
-Marpa::R3::Test::is(
-    ${$actual_ref},
-    "Grammar has no problems\n",
-    'Ambiguous Equation Problems'
-);
-
-restore_stdout();
-
-my $recce = Marpa::R3::Recognizer->new( { grammar => $grammar } );
-
-$recce->read( 'Number', 2 );
-$recce->read( 'Op',     q{-} );
-$recce->read( 'Number', 0 );
-$recce->read( 'Op',     q{*} );
-$recce->read( 'Number', 3 );
-$recce->read( 'Op',     q{+} );
-$recce->read( 'Number', 1 );
+$recce->read( \'2-0*3+1' );
 
 $actual_ref = save_stdout();
 
@@ -185,8 +169,10 @@ print $recce->show_earley_sets()
 my $expected_earley_sets = <<'END_OF_EARLEY_SETS';
 Last Completed: 7; Furthest: 7
 Earley Set 0
+ahm8: R3:0@0-0
+  R3:0: [:start]['] ::= . [:start]
 ahm6: R2:0@0-0
-  R2:0: E['] ::= . E
+  R2:0: [:start] ::= . E
 ahm0: R0:0@0-0
   R0:0: E ::= . E Op E
 ahm4: R1:0@0-0
@@ -194,13 +180,16 @@ ahm4: R1:0@0-0
 Earley Set 1
 ahm5: R1$@0-1
   R1$: E ::= Number .
-  [c=R1:0@0-0; s=Number; t=\2]
+  [c=R1:0@0-0; s=Number; t=\'2']
 ahm1: R0:1@0-1
   R0:1: E ::= E . Op E
   [p=R0:0@0-0; c=R1$@0-1]
 ahm7: R2$@0-1
-  R2$: E['] ::= E .
+  R2$: [:start] ::= E .
   [p=R2:0@0-0; c=R1$@0-1]
+ahm9: R3$@0-1
+  R3$: [:start]['] ::= [:start] .
+  [p=R3:0@0-0; c=R2$@0-1]
 Earley Set 2
 ahm2: R0:2@0-2
   R0:2: E ::= E Op . E
@@ -212,7 +201,7 @@ ahm4: R1:0@2-2
 Earley Set 3
 ahm5: R1$@2-3
   R1$: E ::= Number .
-  [c=R1:0@2-2; s=Number; t=\0]
+  [c=R1:0@2-2; s=Number; t=\'0']
 ahm1: R0:1@2-3
   R0:1: E ::= E . Op E
   [p=R0:0@2-2; c=R1$@2-3]
@@ -223,8 +212,11 @@ ahm1: R0:1@0-3
   R0:1: E ::= E . Op E
   [p=R0:0@0-0; c=R0$@0-3]
 ahm7: R2$@0-3
-  R2$: E['] ::= E .
+  R2$: [:start] ::= E .
   [p=R2:0@0-0; c=R0$@0-3]
+ahm9: R3$@0-3
+  R3$: [:start]['] ::= [:start] .
+  [p=R3:0@0-0; c=R2$@0-3]
 Earley Set 4
 ahm2: R0:2@0-4
   R0:2: E ::= E Op . E
@@ -239,7 +231,7 @@ ahm4: R1:0@4-4
 Earley Set 5
 ahm5: R1$@4-5
   R1$: E ::= Number .
-  [c=R1:0@4-4; s=Number; t=\3]
+  [c=R1:0@4-4; s=Number; t=\'3']
 ahm1: R0:1@4-5
   R0:1: E ::= E . Op E
   [p=R0:0@4-4; c=R1$@4-5]
@@ -253,8 +245,11 @@ ahm1: R0:1@0-5
   R0:1: E ::= E . Op E
   [p=R0:0@0-0; c=R0$@0-5]
 ahm7: R2$@0-5
-  R2$: E['] ::= E .
+  R2$: [:start] ::= E .
   [p=R2:0@0-0; c=R0$@0-5]
+ahm9: R3$@0-5
+  R3$: [:start]['] ::= [:start] .
+  [p=R3:0@0-0; c=R2$@0-5]
 ahm1: R0:1@2-5
   R0:1: E ::= E . Op E
   [p=R0:0@2-2; c=R0$@2-5]
@@ -275,7 +270,7 @@ ahm4: R1:0@6-6
 Earley Set 7
 ahm5: R1$@6-7
   R1$: E ::= Number .
-  [c=R1:0@6-6; s=Number; t=\1]
+  [c=R1:0@6-6; s=Number; t=\'1']
 ahm1: R0:1@6-7
   R0:1: E ::= E . Op E
   [p=R0:0@6-6; c=R1$@6-7]
@@ -295,8 +290,11 @@ ahm1: R0:1@0-7
   R0:1: E ::= E . Op E
   [p=R0:0@0-0; c=R0$@0-7]
 ahm7: R2$@0-7
-  R2$: E['] ::= E .
+  R2$: [:start] ::= E .
   [p=R2:0@0-0; c=R0$@0-7]
+ahm9: R3$@0-7
+  R3$: [:start]['] ::= [:start] .
+  [p=R3:0@0-0; c=R2$@0-7]
 ahm1: R0:1@4-7
   R0:1: E ::= E . Op E
   [p=R0:0@4-4; c=R0$@4-7]
@@ -314,9 +312,10 @@ print $recce->show_progress()
 
 Marpa::R3::Test::is( ${$actual_ref},
     <<'END_OF_PROGRESS_REPORT', 'Ambiguous Equation Progress Report' );
-R0:1 x4 @0...6-7 E -> E . Op E
-F0 x3 @0,2,4-7 E -> E Op E .
-F1 @6-7 E -> Number .
+R0:1 x4 @0...6-7 L1c1-7 E -> E . Op E
+F0 x3 @0,2,4-7 L1c1-7 E -> E Op E .
+F1 @6-7 L1c6-7 E -> Number .
+F2 @0-7 L1c1-7 :start -> E .
 END_OF_PROGRESS_REPORT
 
 restore_stdout();
