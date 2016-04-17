@@ -67,7 +67,6 @@ sub Marpa::R3::Recognizer::reset_evaluation {
     $recce->[Marpa::R3::Internal::Recognizer::NO_PARSE]          = undef;
     $recce->[Marpa::R3::Internal::Recognizer::ASF_OR_NODES]          = [];
     $recce->[Marpa::R3::Internal::Recognizer::B_C]                   = undef;
-    $recce->[Marpa::R3::Internal::Recognizer::EVENTS]                = [];
     $recce->[Marpa::R3::Internal::Recognizer::O_C]                   = undef;
     $recce->[Marpa::R3::Internal::Recognizer::PER_PARSE_CONSTRUCTOR] = undef;
     $recce->[Marpa::R3::Internal::Recognizer::READ_STRING_ERROR]     = undef;
@@ -473,42 +472,6 @@ sub Marpa::R3::Recognizer::terminals_expected {
     return [ map { $grammar->symbol_name($_) }
             $recce_c->terminals_expected() ];
 } ## end sub Marpa::R3::Recognizer::terminals_expected
-
-sub cook_events {
-    my ($recce)   = @_;
-    my $recce_c   = $recce->[Marpa::R3::Internal::Recognizer::C];
-    my $grammar   = $recce->[Marpa::R3::Internal::Recognizer::GRAMMAR];
-    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
-
-    my @cooked_events = ();
-    my $event_count   = $grammar_c->event_count();
-    EVENT: for ( my $event_ix = 0; $event_ix < $event_count; $event_ix++ ) {
-        my ( $event_type, $value ) = $grammar_c->event($event_ix);
-        if ( $event_type eq 'MARPA_EVENT_EARLEY_ITEM_THRESHOLD' ) {
-            say {
-                $recce->[Marpa::R3::Internal::Recognizer::TRACE_FILE_HANDLE] }
-                "Earley item count ($value) exceeds warning threshold"
-                or die "say: $ERRNO";
-            push @cooked_events, ['EARLEY_ITEM_THRESHOLD'];
-            next EVENT;
-        } ## end if ( $event_type eq 'MARPA_EVENT_EARLEY_ITEM_THRESHOLD')
-        if ( $event_type eq 'MARPA_EVENT_SYMBOL_EXPECTED' ) {
-            push @cooked_events,
-                [ 'SYMBOL_EXPECTED', $grammar->symbol_name($value) ];
-            next EVENT;
-        }
-        if ( $event_type eq 'MARPA_EVENT_EXHAUSTED' ) {
-            push @cooked_events, ['EXHAUSTED'];
-            next EVENT;
-        }
-    } ## end EVENT: for ( my $event_ix = 0; $event_ix < $event_count; ...)
-    return \@cooked_events;
-} ## end sub cook_events
-
-sub Marpa::R3::Recognizer::events {
-    my ($recce) = @_;
-    return $recce->[Marpa::R3::Internal::Recognizer::EVENTS];
-}
 
 my @escape_by_ord = ();
 $escape_by_ord[ ord q{\\} ] = q{\\\\};

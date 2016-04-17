@@ -209,7 +209,6 @@ __DATA__
     { The following fields must be reinitialized when
     evaluation is reset }
 
-    EVENTS
     NO_PARSE { no parse found in parse series -- memoized }
     READ_STRING_ERROR
     NULL_VALUES
