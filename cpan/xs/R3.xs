@@ -3419,6 +3419,8 @@ PPCODE:
   XPUSHs (sv_2mortal (newSViv (gp_result)));
 }
 
+
+   # I think this can be removed once the NAIF is eliminated
 void
 alternative( r_wrapper, symbol_id, value, length )
     R_Wrapper *r_wrapper;

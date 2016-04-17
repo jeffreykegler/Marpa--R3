@@ -622,6 +622,7 @@ sub Marpa::R3::Recognizer::read {
     return $recce->earleme_complete();
 } ## end sub Marpa::R3::Recognizer::read
 
+# I think this can be removed early in the elimnation of the NAIF
 sub Marpa::R3::Recognizer::alternative {
 
     my ( $recce, $symbol_name, $value_ref, $length ) = @_;

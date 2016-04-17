@@ -14,8 +14,8 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-# CENSUS: DELETE
-# Note: Converted to SLIF as sl_leo_example.t
+# CENSUS: ASIS
+# Note: Converted to SLIF from leo_example.t
 
 use 5.010001;
 use strict;
@@ -36,53 +36,32 @@ use Marpa::R3;
 
 ## no critic (Subroutines::RequireArgUnpacking)
 
-my $grammar = Marpa::R3::Grammar->new(
-    {   start          => 'Statement',
-        actions        => 'My_Actions',
-        default_action => 'first_arg',
-        rules          => [
-            {   lhs    => 'Statement',
-                rhs    => [qw/Expression/],
-                action => 'do_Statement'
-            },
-            {   lhs    => 'Expression',
-                rhs    => [qw/Lvalue AssignOp Expression/],
-                action => 'do_Expression'
-            },
-            {   lhs    => 'Expression',
-                rhs    => [qw/Lvalue AddAssignOp Expression/],
-                action => 'do_Expression'
-            },
-            {   lhs    => 'Expression',
-                rhs    => [qw/Lvalue MinusAssignOp Expression/],
-                action => 'do_Expression'
-            },
-            {   lhs    => 'Expression',
-                rhs    => [qw/Lvalue MultiplyAssignOp Expression/],
-                action => 'do_Expression'
-            },
-            {   lhs    => 'Expression',
-                rhs    => [qw/Variable/],
-                action => 'do_Expression'
-            },
-            { lhs => 'Lvalue', rhs => [qw/Variable/] },
-        ],
+my $dsl = <<'END_OF_DSL';
+:default ::= action => ::first
+Statement ::= Expression action => do_Statement
+Expression ::= Lvalue AssignOp Expression action => do_Expression
+Expression ::= Lvalue AddAssignOp Expression action => do_Expression
+Expression ::= Lvalue MinusAssignOp Expression action => do_Expression
+Expression ::= Lvalue MultiplyAssignOp Expression action => do_Expression
+Expression ::= Variable action => do_Expression
+Lvalue ::= Variable
+Variable ~ [a-z]+
+AssignOp ~ [=]
+AddAssignOp ~ '+='
+MinusAssignOp ~ '-='
+MultiplyAssignOp ~ '*='
+END_OF_DSL
+
+my $grammar = Marpa::R3::Scanless::G->new(
+    {   source => \$dsl
     }
 );
 
-$grammar->precompute();
+my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar,
+semantics_package => 'My_Actions'
+} );
 
-my $recce = Marpa::R3::Recognizer->new( { grammar => $grammar } );
-
-$recce->read( 'Variable',         'a' );
-$recce->read( 'AssignOp',         q{=} );
-$recce->read( 'Variable',         'b' );
-$recce->read( 'AddAssignOp',      q{+=} );
-$recce->read( 'Variable',         'c' );
-$recce->read( 'MinusAssignOp',    q{-=} );
-$recce->read( 'Variable',         'd' );
-$recce->read( 'MultiplyAssignOp', q{*=} );
-$recce->read( 'Variable',         'e' );
+$recce->read( \'a=b+=c-=d*=e' );
 
 %My_Actions::VALUES = ( a => 711, b => 47, c => 1, d => 2, e => 3 );
 
@@ -104,34 +83,34 @@ sub My_Actions::do_Expression {
 
 } ## end sub My_Actions::do_Expression
 
-sub My_Actions::first_arg { return $_[1] }
-
 ## use critic
 
 my $show_symbols_output = $grammar->show_symbols();
 
 Marpa::R3::Test::is( $show_symbols_output,
     <<'END_SYMBOLS', 'Leo Example Symbols' );
-0: Statement
-1: Expression
-2: Lvalue
-3: AssignOp, terminal
-4: AddAssignOp, terminal
-5: MinusAssignOp, terminal
-6: MultiplyAssignOp, terminal
-7: Variable, terminal
+G1 S0 :start -- Internal G1 start symbol
+G1 S1 Statement
+G1 S2 Expression
+G1 S3 Lvalue
+G1 S4 AssignOp
+G1 S5 AddAssignOp
+G1 S6 MinusAssignOp
+G1 S7 MultiplyAssignOp
+G1 S8 Variable
 END_SYMBOLS
 
 my $show_rules_output = $grammar->show_rules();
 
 Marpa::R3::Test::is( $show_rules_output, <<'END_RULES', 'Leo Example Rules' );
-0: Statement -> Expression
-1: Expression -> Lvalue AssignOp Expression
-2: Expression -> Lvalue AddAssignOp Expression
-3: Expression -> Lvalue MinusAssignOp Expression
-4: Expression -> Lvalue MultiplyAssignOp Expression
-5: Expression -> Variable
-6: Lvalue -> Variable
+G1 R0 Statement ::= Expression
+G1 R1 Expression ::= Lvalue AssignOp Expression
+G1 R2 Expression ::= Lvalue AddAssignOp Expression
+G1 R3 Expression ::= Lvalue MinusAssignOp Expression
+G1 R4 Expression ::= Lvalue MultiplyAssignOp Expression
+G1 R5 Expression ::= Variable
+G1 R6 Lvalue ::= Variable
+G1 R7 :start ::= Statement
 END_RULES
 
 my $show_ahms_output = $grammar->show_ahms();
@@ -182,9 +161,13 @@ AHM 20: postdot = "Variable"
 AHM 21: completion
     Lvalue ::= Variable .
 AHM 22: postdot = "Statement"
-    Statement['] ::= . Statement
+    [:start] ::= . Statement
 AHM 23: completion
-    Statement['] ::= Statement .
+    [:start] ::= Statement .
+AHM 24: postdot = "[:start]"
+    [:start]['] ::= . [:start]
+AHM 25: completion
+    [:start]['] ::= [:start] .
 END_AHMS
 
 my $show_earley_sets_output_before = $recce->show_earley_sets();
@@ -193,8 +176,10 @@ Marpa::R3::Test::is( $show_earley_sets_output_before,
     <<'END_EARLEY_SETS', 'Leo Example Earley Sets "Before"' );
 Last Completed: 9; Furthest: 9
 Earley Set 0
+ahm24: R8:0@0-0
+  R8:0: [:start]['] ::= . [:start]
 ahm22: R7:0@0-0
-  R7:0: Statement['] ::= . Statement
+  R7:0: [:start] ::= . Statement
 ahm0: R0:0@0-0
   R0:0: Statement ::= . Expression
 ahm2: R1:0@0-0
@@ -220,8 +205,11 @@ ahm1: R0$@0-1
   R0$: Statement ::= Expression .
   [p=R0:0@0-0; c=R5$@0-1]
 ahm23: R7$@0-1
-  R7$: Statement['] ::= Statement .
+  R7$: [:start] ::= Statement .
   [p=R7:0@0-0; c=R0$@0-1]
+ahm25: R8$@0-1
+  R8$: [:start]['] ::= [:start] .
+  [p=R8:0@0-0; c=R7$@0-1]
 ahm15: R4:1@0-1
   R4:1: Expression ::= Lvalue . MultiplyAssignOp Expression
   [p=R4:0@0-0; c=R6$@0-1]
@@ -250,7 +238,7 @@ ahm18: R5:0@2-2
   R5:0: Expression ::= . Variable
 ahm20: R6:0@2-2
   R6:0: Lvalue ::= . Variable
-L1@2 ["Expression"; S4@0-2]
+L2@2 ["Expression"; S4@0-2]
 Earley Set 3
 ahm21: R6$@2-3
   R6$: Lvalue ::= Variable .
@@ -260,13 +248,16 @@ ahm19: R5$@2-3
   [c=R5:0@2-2; s=Variable; t=\'b']
 ahm5: R1$@0-3
   R1$: Expression ::= Lvalue AssignOp Expression .
-  [l=L1@2; c=R5$@2-3]
+  [l=L2@2; c=R5$@2-3]
 ahm1: R0$@0-3
   R0$: Statement ::= Expression .
   [p=R0:0@0-0; c=R1$@0-3]
 ahm23: R7$@0-3
-  R7$: Statement['] ::= Statement .
+  R7$: [:start] ::= Statement .
   [p=R7:0@0-0; c=R0$@0-3]
+ahm25: R8$@0-3
+  R8$: [:start]['] ::= [:start] .
+  [p=R8:0@0-0; c=R7$@0-3]
 ahm15: R4:1@2-3
   R4:1: Expression ::= Lvalue . MultiplyAssignOp Expression
   [p=R4:0@2-2; c=R6$@2-3]
@@ -295,7 +286,7 @@ ahm18: R5:0@4-4
   R5:0: Expression ::= . Variable
 ahm20: R6:0@4-4
   R6:0: Lvalue ::= . Variable
-L1@4 ["Expression"; L1@2; S8@2-4]
+L2@4 ["Expression"; L2@2; S8@2-4]
 Earley Set 5
 ahm21: R6$@4-5
   R6$: Lvalue ::= Variable .
@@ -305,13 +296,16 @@ ahm19: R5$@4-5
   [c=R5:0@4-4; s=Variable; t=\'c']
 ahm5: R1$@0-5
   R1$: Expression ::= Lvalue AssignOp Expression .
-  [l=L1@4; c=R5$@4-5]
+  [l=L2@4; c=R5$@4-5]
 ahm1: R0$@0-5
   R0$: Statement ::= Expression .
   [p=R0:0@0-0; c=R1$@0-5]
 ahm23: R7$@0-5
-  R7$: Statement['] ::= Statement .
+  R7$: [:start] ::= Statement .
   [p=R7:0@0-0; c=R0$@0-5]
+ahm25: R8$@0-5
+  R8$: [:start]['] ::= [:start] .
+  [p=R8:0@0-0; c=R7$@0-5]
 ahm15: R4:1@4-5
   R4:1: Expression ::= Lvalue . MultiplyAssignOp Expression
   [p=R4:0@4-4; c=R6$@4-5]
@@ -340,7 +334,7 @@ ahm18: R5:0@6-6
   R5:0: Expression ::= . Variable
 ahm20: R6:0@6-6
   R6:0: Lvalue ::= . Variable
-L1@6 ["Expression"; L1@4; S12@4-6]
+L2@6 ["Expression"; L2@4; S12@4-6]
 Earley Set 7
 ahm21: R6$@6-7
   R6$: Lvalue ::= Variable .
@@ -350,13 +344,16 @@ ahm19: R5$@6-7
   [c=R5:0@6-6; s=Variable; t=\'d']
 ahm5: R1$@0-7
   R1$: Expression ::= Lvalue AssignOp Expression .
-  [l=L1@6; c=R5$@6-7]
+  [l=L2@6; c=R5$@6-7]
 ahm1: R0$@0-7
   R0$: Statement ::= Expression .
   [p=R0:0@0-0; c=R1$@0-7]
 ahm23: R7$@0-7
-  R7$: Statement['] ::= Statement .
+  R7$: [:start] ::= Statement .
   [p=R7:0@0-0; c=R0$@0-7]
+ahm25: R8$@0-7
+  R8$: [:start]['] ::= [:start] .
+  [p=R8:0@0-0; c=R7$@0-7]
 ahm15: R4:1@6-7
   R4:1: Expression ::= Lvalue . MultiplyAssignOp Expression
   [p=R4:0@6-6; c=R6$@6-7]
@@ -385,7 +382,7 @@ ahm18: R5:0@8-8
   R5:0: Expression ::= . Variable
 ahm20: R6:0@8-8
   R6:0: Lvalue ::= . Variable
-L1@8 ["Expression"; L1@6; S16@6-8]
+L2@8 ["Expression"; L2@6; S16@6-8]
 Earley Set 9
 ahm21: R6$@8-9
   R6$: Lvalue ::= Variable .
@@ -395,13 +392,16 @@ ahm19: R5$@8-9
   [c=R5:0@8-8; s=Variable; t=\'e']
 ahm5: R1$@0-9
   R1$: Expression ::= Lvalue AssignOp Expression .
-  [l=L1@8; c=R5$@8-9]
+  [l=L2@8; c=R5$@8-9]
 ahm1: R0$@0-9
   R0$: Statement ::= Expression .
   [p=R0:0@0-0; c=R1$@0-9]
 ahm23: R7$@0-9
-  R7$: Statement['] ::= Statement .
+  R7$: [:start] ::= Statement .
   [p=R7:0@0-0; c=R0$@0-9]
+ahm25: R8$@0-9
+  R8$: [:start]['] ::= [:start] .
+  [p=R8:0@0-0; c=R7$@0-9]
 ahm15: R4:1@8-9
   R4:1: Expression ::= Lvalue . MultiplyAssignOp Expression
   [p=R4:0@8-8; c=R6$@8-9]
@@ -418,7 +418,7 @@ END_EARLEY_SETS
 
 my $trace_output;
 open my $trace_fh, q{>}, \$trace_output;
-$recce->set( { trace_fh => $trace_fh, trace_values => 2 } );
+$recce->set( { trace_file_handle => $trace_fh, trace_values => 2 } );
 my $value_ref = $recce->value();
 close $trace_fh;
 
@@ -429,24 +429,7 @@ my $show_earley_sets_output_after = $recce->show_earley_sets();
 
 my $expected_trace_output = <<'END_TRACE_OUTPUT';
 Setting trace_values option
-Pushed value from R6:1@0-1S7@0: Variable = \'a'
-Popping 1 values to evaluate R6:1@0-1S7@0, rule: 6: Lvalue -> Variable
-Calculated and pushed value: 'a'
-Pushed value from R1:2@0-2S3@1: AssignOp = \'='
-Pushed value from R6:1@2-3S7@2: Variable = \'b'
-Popping 1 values to evaluate R6:1@2-3S7@2, rule: 6: Lvalue -> Variable
-Calculated and pushed value: 'b'
-Pushed value from R2:2@2-4S4@3: AddAssignOp = \'+='
-Pushed value from R6:1@4-5S7@4: Variable = \'c'
-Popping 1 values to evaluate R6:1@4-5S7@4, rule: 6: Lvalue -> Variable
-Calculated and pushed value: 'c'
-Pushed value from R3:2@4-6S5@5: MinusAssignOp = \'-='
-Pushed value from R6:1@6-7S7@6: Variable = \'d'
-Popping 1 values to evaluate R6:1@6-7S7@6, rule: 6: Lvalue -> Variable
-Calculated and pushed value: 'd'
-Pushed value from R4:2@6-8S6@7: MultiplyAssignOp = \'*='
-Pushed value from R5:1@8-9S7@8: Variable = \'e'
-Popping 1 values to evaluate R5:1@8-9S7@8, rule: 5: Expression -> Variable
+Popping 1 values to evaluate R5:1@8-9S8@8, rule: 5: Expression -> Variable
 Calculated and pushed value: 3
 Popping 3 values to evaluate R4:3@6-9C5@8, rule: 4: Expression -> Lvalue MultiplyAssignOp Expression
 Calculated and pushed value: 6
@@ -458,18 +441,11 @@ Popping 3 values to evaluate R1:3@0-9C2@2, rule: 1: Expression -> Lvalue AssignO
 Calculated and pushed value: 42
 Popping 1 values to evaluate R0:1@0-9C1@0, rule: 0: Statement -> Expression
 Calculated and pushed value: 'a=42 b=42 c=-5 d=6 e=3'
-New Virtual Rule: R7:1@0-9C0@0, rule: 7: Statement['] -> Statement
+New Virtual Rule: R8:1@0-9C7@0, rule: 8: [:start]['] -> [:start]
 Real symbol count is 1
 END_TRACE_OUTPUT
 
 Marpa::R3::Test::is( $trace_output, $expected_trace_output,
     'Leo Example Trace Output' );
 
-1;    # In case used as "do" file
-
-# Local Variables:
-#   mode: cperl
-#   cperl-indent-level: 4
-#   fill-column: 100
-# End:
 # vim: expandtab shiftwidth=4:
