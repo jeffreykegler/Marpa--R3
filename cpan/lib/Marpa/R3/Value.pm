@@ -46,7 +46,6 @@ package Marpa::R3::Internal::Value;
 sub Marpa::R3::Internal::Recognizer::resolve_action {
     my ( $recce, $closure_name, $p_error ) = @_;
     my $grammar  = $recce->[Marpa::R3::Internal::Recognizer::GRAMMAR];
-    my $closures = $recce->[Marpa::R3::Internal::Recognizer::CLOSURES];
     my $trace_actions =
         $recce->[Marpa::R3::Internal::Recognizer::TRACE_ACTIONS];
 
@@ -65,16 +64,6 @@ sub Marpa::R3::Internal::Recognizer::resolve_action {
     {
         return [ q{}, undef, $closure_name ];
     }
-
-    if ( my $closure = $closures->{$closure_name} ) {
-        if ($trace_actions) {
-            print {$Marpa::R3::Internal::TRACE_FH}
-                qq{Resolved "$closure_name" to explicit closure\n}
-                or Marpa::R3::exception('Could not print to trace file');
-        }
-
-        return [ $closure_name, $closure, '::array' ];
-    } ## end if ( my $closure = $closures->{$closure_name} )
 
     my $fully_qualified_name;
     if ( $closure_name =~ /([:][:])|[']/xms ) {
@@ -1306,7 +1295,6 @@ sub registration_init {
     } ## end WORK_ITEM: for my $work_item (@work_list)
 
     SLR_NULLING_GRAMMAR_HACK: {
-        last SLR_NULLING_GRAMMAR_HACK if not $Marpa::R3::Context::slr;
 
         # A hack for nulling SLR grammars --
         # the nulling semantics of the start symbol should
@@ -1563,21 +1551,7 @@ sub Marpa::R3::Recognizer::value {
     $semantics_arg0 //= $per_parse_arg // {};
 
     my $value = Marpa::R3::Thin::V->new($tree);
-    if ($slr) {
-        $value->slr_set( $slr->thin() );
-    }
-    else {
-        my $token_values =
-            $recce->[Marpa::R3::Internal::Recognizer::TOKEN_VALUES];
-        $value->valued_force();
-        TOKEN_IX:
-        for ( my $token_ix = 2; $token_ix <= $#{$token_values}; $token_ix++ )
-        {
-            my $token_value = $token_values->[$token_ix];
-            $value->token_value_set( $token_ix, $token_value )
-                if defined $token_value;
-        } ## end TOKEN_IX: for ( my $token_ix = 2; $token_ix <= $#{...})
-    } ## end else [ if ($slr) ]
+    $value->slr_set( $slr->thin() );
     local $Marpa::R3::Internal::Context::VALUATOR = $value;
     value_trace( $value, $trace_values ? 1 : 0 );
     $value->trace_values($trace_values);

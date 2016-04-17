@@ -184,8 +184,6 @@ __DATA__
 
     GRAMMAR { the grammar used }
     TREE_MODE { 'tree' or 'forest' or undef }
-    FINISHED
-    TOKEN_VALUES
 
     ASF_OR_NODES { memoized or-nodes }
 
@@ -196,8 +194,6 @@ __DATA__
     }
 
     END_OF_PARSE
-    CLOSURES
-    EVENT_IF_EXPECTED
     MAX_PARSES
     RANKING_METHOD
     TRACE_ACTIONS

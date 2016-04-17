@@ -276,11 +276,6 @@ sub Marpa::R3::Scanless::R::new {
     $thick_g1_recce->[Marpa::R3::Internal::Recognizer::MAX_PARSES]     = 0;
     $thick_g1_recce->[Marpa::R3::Internal::Recognizer::TRACE_TERMINALS]     = 0;
 
-    # Position 0 is not used because 0 indicates an unvalued token.
-    # Position 1 is reserved for undef.
-    # Position 2 is reserved for literal tokens (used in SLIF).
-    $thick_g1_recce->[Marpa::R3::Internal::Recognizer::TOKEN_VALUES] = [undef, undef, undef];
-
     $thick_g1_recce->reset_evaluation();
 
     my $thin_slr =
