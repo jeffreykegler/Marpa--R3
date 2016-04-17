@@ -69,11 +69,8 @@ my %version_for_config = (
     'File::Copy'            => '2.11',
     'File::Spec'            => '3.2501',
     'File::Find'            => '1.12',
-    'HTML::Entities'        => '3.68',
-    'HTML::Parser'          => '3.69',
     'IPC::Cmd'              => '0.40_1',
     'List::Util'            => '1.21',
-    'PPI'                   => '1.206',
     'Scalar::Util'          => '1.21',
     'Test::More'            => '0.94',
     'Time::Piece'           => '1.12',
@@ -141,7 +138,7 @@ sub xs_version_contents {
 
 sub perl_version_contents {
     my ( $package, ) = @_;
-    my @use_packages     = qw( Scalar::Util Carp Data::Dumper PPI Marpa::R3 );
+    my @use_packages     = qw( Scalar::Util Carp Data::Dumper Marpa::R3 );
     my $text             = $preamble;
     my $marpa_version = $STRING_VERSION;
     $text .= "package $package;\n";
@@ -202,7 +199,6 @@ my @always_required            = qw(
     File::Spec
     IPC::Cmd
     List::Util
-    PPI
     Scalar::Util
     Test::More
     Time::Piece
@@ -214,14 +210,6 @@ my %configure_requires =
     qw( CPAN::Meta::Converter ),
     @always_required,
     @packages_for_perl_autoconf;
-my %requires =
-    map { ( $_, $version_for_config{$_} ) }
-    qw( HTML::Entities HTML::Parser ),
-    @always_required;
-
-# my %recommends =
-    # map { ( $_, $version_for_config{$_} ) }
-    # ( @packages_for_perl_autoconf, qw( PPI ) );
 
 my %pod_files = ();
 {
@@ -240,59 +228,23 @@ my %pod_files = ();
             $pod_files{$pod_file} = q{$(INST_MAN1DIR)/} . $destfile;
             next LINE;
         } ## end if ( ( my $destfile = $pod_file ) =~ ...)
-        if ( ( my $destfile = $pod_file )
-            =~ s{ \A html [/] pod [/] }{Marpa/R3/}xms )
-        {
-            $destfile =~ s{[/]}{-}xmsg;
-            $pod_files{$pod_file} = q{$(INST_MAN1DIR)/} . $destfile;
-            next LINE;
-        } ## end if ( ( my $destfile = $pod_file ) =~ ...)
         die "Failed to rename POD file: $pod_file";
     } ## end LINE: for my $pod_file (@pod_files)
 }
 $pod_files{'pod/Marpa_R3.pod'}  = q{$(INST_MAN1DIR)} . '/Marpa-R3.pod';
-$pod_files{'html/pod/HTML.pod'} = q{$(INST_MAN1DIR)} . '/Marpa-R3-HTML.pod';
 
 {
-    my @r3_perl_components = qw(pperl Marpa R3 Perl);
     my @r3_components      = qw(lib Marpa R3);
     my $config_pm_filename = File::Spec->catfile(qw(inc Marpa R3 Config.pm ));
     my @derived_files      = (
         File::Spec->catfile( @r3_components,      'Version.pm' ),
         File::Spec->catfile( @r3_components,      'Installed.pm' ),
-        File::Spec->catfile( @r3_perl_components, 'Version.pm' ),
-        File::Spec->catfile( @r3_perl_components, 'Installed.pm' ),
     );
     say {*STDERR} 'Writing version files' or die "say failed: $ERRNO";
     write_installed_pm(qw(lib Marpa R3 ));
-    write_installed_pm(qw(pperl Marpa R3 Perl ));
     my $perl_version_pm = perl_version_contents('Marpa::R3::Perl');
     my $version_pm      = xs_version_contents('Marpa::R3');
     file_write( $version_pm,      qw(lib Marpa R3 Version.pm) );
-    file_write( $perl_version_pm, qw(pperl Marpa R3 Perl Version.pm) );
-
-}
-
-{
-    my @use_packages = qw( HTML::Entities HTML::Parser);
-    my $text         = $preamble;
-    $text .= "package Marpa::R3::HTML::Test;\n";
-
-##no critic(ValuesAndExpressions::RequireInterpolationOfMetachars)
-    $text .= q{use vars qw($TIMESTAMP %VERSION_FOR_CONFIG)} . qq{;\n};
-    $text .= q{$TIMESTAMP='} . localtime()->datetime . qq{';\n};
-##use critic
-
-    $text .= '%VERSION_FOR_CONFIG = (' . "\n";
-    for my $package (@use_packages) {
-        my $version = $version_for_config{$package};
-        die "No version defined for $package" if not defined $version;
-        $text .= q{    '} . $package . q{' => '} . $version . qq{',\n};
-    }
-    $text .= ');' . "\n\n";
-    $text .= "1;\n";
-
-    file_write( $text, qw(html tool lib Marpa R3 HTML Test Version.pm ) );
 
 }
 
@@ -309,18 +261,6 @@ File::Find::find(
     },
     'lib/Marpa/R3'
 );
-File::Find::find(
-    sub {
-        return if not m/[.]pm \z/xms;
-        my ( $vol, $dirs, $file ) = File::Spec->splitpath($File::Find::name);
-        my @dirs      = File::Spec->splitdir($dirs);
-        shift @dirs, shift @dirs; # shift off the html/lib components
-        my $dest_dirs = File::Spec->catdir( q{$(INST_LIB)}, @dirs );
-        my $dest_name = File::Spec->catpath( $vol, $dest_dirs, $file );
-        $pm_files{$File::Find::name} = $dest_name;
-    },
-    'html/lib'
-);
 {
     my $filename = 'R3.pm';
     my $from_dir = File::Spec->catdir( qw{lib Marpa } );
@@ -333,7 +273,6 @@ File::Find::find(
 # die Data::Dumper::Dumper(\%pm_files);
 
 my @no_index_namespace_inclusive = qw(
-    Marpa::R3::HTML
     Marpa::R3::Value
     Marpa::R3::Perl
     Marpa::R3::Test
@@ -345,10 +284,9 @@ my @no_index_namespace_inclusive = qw(
 );
 
 my @files_to_cleanup = (
-    'lib/Marpa/R3/Version.pm',           'pperl/Marpa/R3/Perl/Version.pm',
-    'html/lib/Marpa/R3/Test/Version.pm', 'lib/Marpa/R3/Installed.pm',
-    'pperl/Marpa/R3/Perl/Installed.pm',  'lib/Marpa/R3.o',
-    'engine/gnu_ac_build',                 'engine/perl_ac_build',
+    'lib/Marpa/R3/Version.pm', 'lib/Marpa/R3/Installed.pm',
+    'lib/Marpa/R3.o',          'engine/gnu_ac_build',
+    'engine/perl_ac_build',
 );
 
 WriteMakefile(
@@ -359,23 +297,16 @@ WriteMakefile(
     ABSTRACT => 'Release 3 of Marpa',
 
     # recommends         => \%recommends,
-    PREREQ_PM          => \%requires,
     CONFIGURE_REQUIRES => \%configure_requires,
     PM                 => \%pm_files,
     # OBJECT => 'xs/R3.o',
     TYPEMAPS => ['typemap'],
     MIN_PERL_VERSION => '5.10.1',
     DIR => ['xs'],
-    EXE_FILES          => [
-        'html/script/marpa_r3_html_fmt',
-        'html/script/marpa_r3_html_score',
-    ],
     META_ADD => {
         no_index => {
             directory => [
-                qw( pperl tool engine author.t
-                    html/etc html/sandbox html/script html/t
-                    )
+                qw( tool engine author.t )
             ],
             namespace => [
                 'Marpa::R3::Recognizer', 'Marpa::R3::Grammar',

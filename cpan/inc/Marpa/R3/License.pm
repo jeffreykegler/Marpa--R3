@@ -301,16 +301,6 @@ my %files_by_type = (
     'etc/compile_for_debug.sh'          => \&trivial,
     'etc/libmarpa_test.sh'              => \&trivial,
     'etc/reserved_check.sh'             => \&trivial,
-    'html/script/marpa_r3_html_fmt'    => gen_license_problems_in_perl_file(),
-    'html/script/marpa_r3_html_score'  => gen_license_problems_in_perl_file(),
-    'html/t/fmt_t_data/expected1.html' => \&ignored,
-    'html/t/fmt_t_data/expected2.html' => \&ignored,
-    'html/t/fmt_t_data/input1.html'    => \&trivial,
-    'html/t/fmt_t_data/input2.html'    => \&trivial,
-    'html/t/fmt_t_data/score_expected1.html' => \&trivial,
-    'html/t/fmt_t_data/score_expected2.html' => \&trivial,
-    'html/t/no_tang.html'                    => \&ignored,
-    'html/t/test.html'                       => \&ignored,
     'engine/LOG_DATA'                 => \&ignored,    # not worth the trouble
     'engine/cf/LIBMARPA_MODE'         => \&trivial,
     'engine/read_only/LIB_VERSION'    => \&trivial,
@@ -384,10 +374,6 @@ sub file_type {
     return $closure if defined $closure;
     my ( $volume, $dirpart, $filepart ) = File::Spec->splitpath($filename);
     my @dirs = grep {length} File::Spec->splitdir($dirpart);
-    return gen_license_problems_in_perl_file()
-        if scalar @dirs > 1
-            and $dirs[0] eq 'pperl'
-            and $filepart =~ /[.]pm\z/xms;
     return \&ignored if $filepart =~ /[.]tar\z/xms;
 
     # info files are generated -- licensing is in source

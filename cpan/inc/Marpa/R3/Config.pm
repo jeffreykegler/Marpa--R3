@@ -49,7 +49,6 @@ $Marpa::R3::USE_PERL_AUTOCONF = $ENV{MARPA_USE_PERL_AUTOCONF}
     'IPC::Cmd'              => '0.40_1',
     'List::Util'            => '1.21',
     'Module::Build'         => '0.4003',
-    'PPI'                   => '1.206',
     'Scalar::Util'          => '1.21',
     'Test::More'            => '0.94',
     'Time::Piece'           => '1.12',

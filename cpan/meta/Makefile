@@ -13,15 +13,13 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-.PHONY: dummy all html_meta
+.PHONY: dummy all
 
 dummy:
 	@echo '!!!' The main target is '"all"' '!!!'
 
-all: ../lib/Marpa/R3/Internal.pm html_meta
+all: ../lib/Marpa/R3/Internal.pm
 
 ../lib/Marpa/R3/Internal.pm: make_internal_pm.pl
 	perl make_internal_pm.pl > $@
 
-html_meta:
-	(cd ../html/meta; make all)

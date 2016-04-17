@@ -22,12 +22,10 @@ use Test::More tests => 5;
 use lib 'lib';
 use lib 'blib/arch';
 use lib 'inc';
-use lib 'pperl';
 
 BEGIN {
     Test::More::use_ok('Devel::SawAmpersand');
     Test::More::use_ok('Marpa::R3');
-    Test::More::use_ok('Marpa::R3::Perl');
     Test::More::use_ok('Marpa::R3::Test');
 } ## end BEGIN
 
