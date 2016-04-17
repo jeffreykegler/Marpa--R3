@@ -14,8 +14,8 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-# CENSUS: DELETE
-# Note: Converted to SLIF as sl_leo168.t
+# CENSUS: ASIS
+# Note: Converted to SLIF from leo.t
 
 # The example from p. 168-169 of Leo's paper.
 
@@ -42,41 +42,43 @@ sub generate_action {
         }
 } ## end sub generate_action
 
-my $C_action       = generate_action('C');
-my $S_action       = generate_action('S');
-my $default_action = generate_action(q{?});
+*{My_Action::C_action} = generate_action('C');
+$My_Action::C_action = 0 if 0; # prevent spurious warning
+*{My_Action::S_action} = generate_action('S');
+$My_Action::S_action = 0 if 0; # prevent spurious warning
+*{My_Action::default_action} = generate_action(q{?});
+$My_Action::default_action = 0 if 0; # prevent spurious warning
 
 ## use critic
 
-my $grammar = Marpa::R3::Grammar->new(
-    {   start => 'S',
-        rules => [
-            [ 'S', [qw/a S/],   'S_action', ],
-            [ 'S', [qw/C/],     'S_action', ],
-            [ 'C', [qw(a C b)], 'C_action', ],
-            [ 'C', [], ],
-        ],
-        terminals      => [qw(a b)],
-        default_action => 'default_action',
-    }
-);
+my $dsl = <<'END_OF_DSL';
+:default ::= action => My_Action::default_action;
+S ::= a S action => My_Action::S_action
+S ::= C action => My_Action::S_action
+C ::= a C b action => My_Action::C_action
+C ::=
+a ~ 'a'
+b ~ 'b'
+END_OF_DSL
 
-$grammar->precompute();
+my $grammar = Marpa::R3::Scanless::G->new( { source => \$dsl } );
 
 Marpa::R3::Test::is( $grammar->show_symbols(),
     <<'END_OF_STRING', 'Leo168 Symbols' );
-0: a, terminal
-1: b, terminal
-2: S
-3: C
+G1 S0 :start -- Internal G1 start symbol
+G1 S1 S
+G1 S2 a
+G1 S3 C
+G1 S4 b
 END_OF_STRING
 
 Marpa::R3::Test::is( $grammar->show_rules,
     <<'END_OF_STRING', 'Leo168 Rules' );
-0: S -> a S
-1: S -> C
-2: C -> a C b
-3: C -> /* empty !used */
+G1 R0 S ::= a S
+G1 R1 S ::= C
+G1 R2 C ::= a C b
+G1 R3 C ::=
+G1 R4 :start ::= S
 END_OF_STRING
 
 Marpa::R3::Test::is( $grammar->show_ahms, <<'END_OF_STRING', 'Leo168 AHMs' );
@@ -109,9 +111,13 @@ AHM 12: postdot = "b"
 AHM 13: completion
     C ::= a C[] b .
 AHM 14: postdot = "S"
-    S['] ::= . S
+    [:start] ::= . S
 AHM 15: completion
-    S['] ::= S .
+    [:start] ::= S .
+AHM 16: postdot = "[:start]"
+    [:start]['] ::= . [:start]
+AHM 17: completion
+    [:start]['] ::= [:start] .
 END_OF_STRING
 
 my %expected = (
@@ -135,21 +141,12 @@ for my $a_length ( 1 .. 4 ) {
     for my $b_length ( 0 .. $a_length ) {
 
         my $string = ( 'a' x $a_length ) . ( 'b' x $b_length );
-        my $recce = Marpa::R3::Recognizer->new(
+        my $recce = Marpa::R3::Scanless::R->new(
             {   grammar  => $grammar,
-                closures => {
-                    'C_action'       => $C_action,
-                    'S_action'       => $S_action,
-                    'default_action' => $default_action,
-                }
             }
         );
-        for (1 .. $a_length ) {
-            $recce->read( 'a', 'a' );
-        }
-        for (1 .. $b_length ) {
-            $recce->read( 'b', 'b' );
-        }
+        my $input = ('a' x $a_length) .  ('b' x $b_length);
+        $recce->read( \$input );
         my $value_ref = $recce->value();
         my $value = $value_ref ? ${$value_ref} : 'No parse';
         Marpa::R3::Test::is( $value, $expected{$string}, "Parse of $string" );
@@ -157,11 +154,4 @@ for my $a_length ( 1 .. 4 ) {
     } ## end for my $b_length ( 0 .. $a_length )
 } ## end for my $a_length ( 1 .. 4 )
 
-1;    # In case used as "do" file
-
-# Local Variables:
-#   mode: cperl
-#   cperl-indent-level: 4
-#   fill-column: 100
-# End:
 # vim: expandtab shiftwidth=4:
