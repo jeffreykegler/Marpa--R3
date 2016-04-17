@@ -669,7 +669,9 @@ sub resolve_recce {
 } ## end sub resolve_recce
 
 sub registration_init {
-    my ( $recce, $per_parse_arg ) = @_;
+    my ( $slr, $per_parse_arg ) = @_;
+    my $recce =
+        $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
 
     my $trace_file_handle =
         $recce->[Marpa::R3::Internal::Recognizer::TRACE_FILE_HANDLE];
@@ -1495,7 +1497,7 @@ sub Marpa::R3::Recognizer::value {
         if defined $slr;
 
     if ( not $recce->[Marpa::R3::Internal::Recognizer::REGISTRATIONS] ) {
-        registration_init( $recce, $per_parse_arg );
+        registration_init( $slr, $per_parse_arg );
     }
 
     my $semantics_arg0;

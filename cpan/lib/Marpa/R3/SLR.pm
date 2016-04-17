@@ -1534,7 +1534,7 @@ sub Marpa::R3::Scanless::R::rule_closure {
         my $symbols           = $grammar->[Marpa::R3::Internal::Grammar::SYMBOLS];
         my $tracer            = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
 
-        Marpa::R3::Internal::Value::registration_init( $recce, $per_parse_arg );
+        Marpa::R3::Internal::Value::registration_init( $slr, $per_parse_arg );
 
     } ## end if ( not $recce->[Marpa::R3::Internal::Recognizer::REGISTRATIONS...])
 
