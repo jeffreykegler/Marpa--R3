@@ -105,18 +105,14 @@ sub Marpa::R3::Recognizer::set {
             map { ( $_, 1 ) }
                 qw(
                 end
-                leo
                 max_parses
                 semantics_package
                 ranking_method
                 too_many_earley_items
                 trace_actions
-                trace_and_nodes
-                trace_bocage
                 trace_earley_sets
                 trace_fh
                 trace_file_handle
-                trace_or_nodes
                 trace_terminals
                 trace_values
                 warnings
@@ -197,41 +193,6 @@ sub Marpa::R3::Recognizer::set {
             }
         } ## end if ( defined( my $value = $args->{'trace_actions'} ))
 
-        if ( defined( my $value = $args->{'trace_and_nodes'} ) ) {
-            Marpa::R3::exception(
-                'trace_and_nodes must be set to a number >= 0')
-                if $value !~ /\A\d+\z/xms;
-            $recce->[Marpa::R3::Internal::Recognizer::TRACE_AND_NODES] =
-                $value + 0;
-            if ($value) {
-                say {$trace_fh} "Setting trace_and_nodes option to $value"
-                    or Marpa::R3::exception("Cannot print: $ERRNO");
-            }
-        } ## end if ( defined( my $value = $args->{'trace_and_nodes'}...))
-
-        if ( defined( my $value = $args->{'trace_bocage'} ) ) {
-            Marpa::R3::exception('trace_bocage must be set to a number >= 0')
-                if $value !~ /\A\d+\z/xms;
-            $recce->[Marpa::R3::Internal::Recognizer::TRACE_BOCAGE] =
-                $value + 0;
-            if ($value) {
-                say {$trace_fh} "Setting trace_bocage option to $value"
-                    or Marpa::R3::exception("Cannot print: $ERRNO");
-            }
-        } ## end if ( defined( my $value = $args->{'trace_bocage'} ) )
-
-        if ( defined( my $value = $args->{'trace_or_nodes'} ) ) {
-            Marpa::R3::exception(
-                'trace_or_nodes must be set to a number >= 0')
-                if $value !~ /\A\d+\z/xms;
-            $recce->[Marpa::R3::Internal::Recognizer::TRACE_OR_NODES] =
-                $value + 0;
-            if ($value) {
-                say {$trace_fh} "Setting trace_or_nodes option to $value"
-                    or Marpa::R3::exception("Cannot print: $ERRNO");
-            }
-        } ## end if ( defined( my $value = $args->{'trace_or_nodes'} ...))
-
         if ( defined( my $value = $args->{'trace_terminals'} ) ) {
             $recce->[Marpa::R3::Internal::Recognizer::TRACE_TERMINALS] =
                 Scalar::Util::looks_like_number($value) ? $value : 0;
@@ -240,15 +201,6 @@ sub Marpa::R3::Recognizer::set {
                     or Marpa::R3::exception("Cannot print: $ERRNO");
             }
         } ## end if ( defined( my $value = $args->{'trace_terminals'}...))
-
-        if ( defined( my $value = $args->{'trace_earley_sets'} ) ) {
-            $recce->[Marpa::R3::Internal::Recognizer::TRACE_EARLEY_SETS] =
-                $value;
-            if ($value) {
-                say {$trace_fh} 'Setting trace_earley_sets option'
-                    or Marpa::R3::exception("Cannot print: $ERRNO");
-            }
-        } ## end if ( defined( my $value = $args->{'trace_earley_sets'...}))
 
         if ( defined( my $value = $args->{'trace_values'} ) ) {
             $recce->[Marpa::R3::Internal::Recognizer::TRACE_VALUES] = $value;

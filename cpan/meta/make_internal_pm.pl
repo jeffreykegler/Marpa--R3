@@ -197,13 +197,8 @@ __DATA__
     MAX_PARSES
     RANKING_METHOD
     TRACE_ACTIONS
-    TRACE_AND_NODES
-    TRACE_BOCAGE
-    TRACE_EARLEY_SETS
-    TRACE_OR_NODES
     TRACE_TERMINALS
     TRACE_VALUES
-    TRACE_SL
     WARNINGS
 
     { The following fields must be reinitialized when

@@ -1467,21 +1467,6 @@ sub Marpa::R3::Recognizer::value {
 
     } ## end else [ if ($tree) ]
 
-    if ( $recce->[Marpa::R3::Internal::Recognizer::TRACE_AND_NODES] ) {
-        print {$trace_file_handle} 'AND_NODES: ', $recce->show_and_nodes()
-            or Marpa::R3::exception('print to trace handle failed');
-    }
-
-    if ( $recce->[Marpa::R3::Internal::Recognizer::TRACE_OR_NODES] ) {
-        print {$trace_file_handle} 'OR_NODES: ', $recce->show_or_nodes()
-            or Marpa::R3::exception('print to trace handle failed');
-    }
-
-    if ( $recce->[Marpa::R3::Internal::Recognizer::TRACE_BOCAGE] ) {
-        print {$trace_file_handle} 'BOCAGE: ', $recce->show_bocage()
-            or Marpa::R3::exception('print to trace handle failed');
-    }
-
     return if not defined $tree->next();
 
     local $Marpa::R3::Context::grammar = $grammar;
