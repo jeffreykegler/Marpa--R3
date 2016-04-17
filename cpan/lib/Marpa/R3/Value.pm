@@ -453,7 +453,9 @@ sub Marpa::R3::Recognizer::ordering_get {
 } ## end sub Marpa::R3::Recognizer::ordering_get
 
 sub resolve_rule_by_id {
-    my ( $recce, $rule_id ) = @_;
+    my ( $slr, $rule_id ) = @_;
+    my $recce =
+        $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
     my $grammar     = $recce->[Marpa::R3::Internal::Recognizer::GRAMMAR];
     my $rules       = $grammar->[Marpa::R3::Internal::Grammar::RULES];
     my $rule        = $rules->[$rule_id];
@@ -573,7 +575,7 @@ sub resolve_recce {
 
     RULE: for my $rule_id ( $grammar->rule_ids() ) {
 
-        my $rule_resolution = resolve_rule_by_id( $recce, $rule_id );
+        my $rule_resolution = resolve_rule_by_id( $slr, $rule_id );
         if (    not defined $rule_resolution
             and $default_empty_action
             and $grammar_c->rule_length($rule_id) == 0 )
