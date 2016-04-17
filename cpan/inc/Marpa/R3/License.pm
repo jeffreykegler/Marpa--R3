@@ -303,6 +303,9 @@ my %files_by_type = (
     'etc/reserved_check.sh'             => \&trivial,
     'engine/LOG_DATA'                 => \&ignored,    # not worth the trouble
     'engine/cf/LIBMARPA_MODE'         => \&trivial,
+    # 'engine/cf/perl_ac_makefile.PL' =>
+        # gen_license_problems_in_perl_file($libmarpa_hash_license, '2015'),
+    'engine/cf/INSTALL.SKIP' => \&trivial,
     'engine/read_only/LIB_VERSION'    => \&trivial,
     'engine/read_only/LIB_VERSION.in' => \&trivial,
     'engine/read_only/Makefile.am' =>
