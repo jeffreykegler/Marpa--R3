@@ -213,6 +213,7 @@ t/leo_unit.t
 t/limits.t
 t/minus.t
 t/naif.t
+t/sl_naif.t
 t/null_example.t
 t/null_infinite1.t
 t/null_infinite4.t

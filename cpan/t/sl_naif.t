@@ -14,8 +14,9 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-# CENSUS: DELETE
-# Converted to SLIF as sl_naif.t
+# CENSUS: ASIS
+# Converted to SLIF from naif.t
+
 # Regression test of ref to undef as token value
 
 use 5.010001;
@@ -31,30 +32,30 @@ use Marpa::R3::Test;
 use Marpa::R3;
 use Data::Dumper;
 
-my $grammar = Marpa::R3::Grammar->new( {
-    start   => 'start',
-    actions => 'main',
-    default_action => 'My_Actions::dwim',
-    rules   => [
-        [ start => [qw/x y/] ], 
-    ], 
-} ); 
+my $dsl = <<'END_OF_DSL';
+:default ::= action => My_Actions::dwim
+start ::= x y
+x ~ unicorn
+y ~ unicorn
+unicorn ~ [^\d\D]
+END_OF_DSL
 
-$grammar->precompute;
-my $rec = Marpa::R3::Recognizer->new( { grammar => $grammar } ); 
+my $grammar = Marpa::R3::Scanless::G->new( { source => \$dsl } ); 
+my $rec = Marpa::R3::Scanless::R->new( { grammar => $grammar } ); 
 
-$rec->alternative('x',\undef, 1);
-$rec->earleme_complete;
-$rec->alternative('y',\"some", 1);
-$rec->earleme_complete;
+$rec->read( \'xy', 0, 0);
+$rec->lexeme_alternative('x',\undef);
+$rec->lexeme_complete(undef, 1);
+$rec->lexeme_alternative('y',\"some");
+$rec->lexeme_complete(undef, 1);
 
 my $value_ref = $rec->value();
 die if not defined $value_ref;
 
 Test::More::is_deeply(
     ${$value_ref},
-    [ undef, 'some' ],
-    "Regression test of ref to undef as toke value"
+    [ \undef, \'some' ],
+    "Regression test of ref to undef as token value"
 );
 
 sub My_Actions::dwim {
