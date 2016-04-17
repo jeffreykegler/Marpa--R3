@@ -466,7 +466,7 @@ sub resolve_rule_by_id {
         $action_name, \$resolve_error );
 
     if ( not $resolution ) {
-        my $rule_desc = rule_describe( $grammar, $rule_id );
+        my $rule_desc = $slr->rule_show( $rule_id );
         Marpa::R3::exception(
             "Could not resolve rule action named '$action_name'\n",
             "  Rule was $rule_desc\n",
@@ -476,15 +476,6 @@ sub resolve_rule_by_id {
     } ## end if ( not $resolution )
     return $resolution;
 } ## end sub resolve_rule_by_id
-
-# For error messages -- checks if it is called in context with
-# SLR defined
-sub rule_describe {
-    my ( $grammar, $rule_id ) = @_;
-    return $Marpa::R3::Context::slr->rule_show($rule_id)
-        if $Marpa::R3::Context::slr;
-    return $grammar->rule_describe($rule_id);
-} ## end sub rule_describe
 
 sub resolve_recce {
 
@@ -586,7 +577,7 @@ sub resolve_recce {
         $rule_resolution //= $default_action_resolution;
 
         if ( not $rule_resolution ) {
-            my $rule_desc = rule_describe( $grammar, $rule_id );
+            my $rule_desc = $slr->rule_show( $rule_id );
             my $message = "Could not resolve action\n  Rule was $rule_desc\n";
 
             my $rule   = $rules->[$rule_id];
@@ -1053,7 +1044,7 @@ sub registration_init {
                 last DO_CONSTANT if not defined $thingy_ref;
                 my $ref_type = Scalar::Util::reftype $thingy_ref;
                 if ( $ref_type eq q{} ) {
-                    my $rule_desc = rule_describe( $grammar, $rule_id );
+                    my $rule_desc = $slr->rule_show( $rule_id );
                     Marpa::R3::exception(
                         qq{An action resolved to a scalar.\n},
                         qq{  This is not allowed.\n},
@@ -1089,7 +1080,7 @@ sub registration_init {
                     last SET_OPS;
                 }
 
-                my $rule_desc = rule_describe( $grammar, $rule_id );
+                my $rule_desc = $slr->rule_show( $rule_id );
                 Marpa::R3::exception(
                     qq{Constant action is not of an allowed type.\n},
                     qq{  It was of type reference to $ref_type.\n},
