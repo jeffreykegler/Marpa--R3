@@ -218,6 +218,7 @@ t/null_example.t
 t/null_infinite1.t
 t/null_infinite4.t
 t/null_value.t
+t/sl_zorro.t
 t/pascal.t
 t/perl.t
 t/rabend.t

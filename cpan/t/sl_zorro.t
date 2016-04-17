@@ -14,8 +14,8 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-# CENSUS: REWORK
-# Note: Converted to SLIF as sl_zorro.t
+# CENSUS: ASIS
+# Note: Converted to SLIF from null_value.t
 
 use 5.010001;
 use strict;
@@ -45,51 +45,22 @@ sub rule4 { return 'C is missing' }
 sub rule5 { return 'C matches Y' }
 sub rule6 { return 'Zorro was here' }
 
-package Test_Grammar;
-
-$Test_Grammar::MARPA_OPTIONS = [
-    {   'rules' => [
-            {   'action' => 'rule0',
-                'lhs'    => 's',
-                'rhs'    => [ 'a', 'y' ]
-            },
-            {   'lhs'  => 'a',
-                'rhs'  => [],
-                action => 'rule1',
-            },
-            {   'action' => 'rule2',
-                'lhs'    => 'a',
-                'rhs'    => [ 'b', 'c' ]
-            },
-            {   'lhs'  => 'b',
-                'rhs'  => [],
-                action => 'rule3'
-            },
-            {   'lhs'  => 'c',
-                'rhs'  => [],
-                action => 'rule4'
-            },
-            {   'action' => 'rule5',
-                'lhs'    => 'c',
-                'rhs'    => ['y']
-            },
-            {   'action' => 'rule6',
-                'lhs'    => 'y',
-                'rhs'    => ['Z']
-            }
-        ],
-        'start'         => 's',
-        'terminals'     => ['Z'],
-        'action_object' => 'Test'
-    }
-];
-
 package main;
 
-my $g = Marpa::R3::Grammar->new( @{$Test_Grammar::MARPA_OPTIONS} );
-$g->precompute();
-my $recce = Marpa::R3::Recognizer->new( { grammar => $g } );
-$recce->read( 'Z', 'Z' );
+my $dsl = <<'END_OF_DSL';
+s ::= a y action => Test::rule0
+a ::= action => Test::rule1
+a ::= b c action => Test::rule2
+b ::= action => Test::rule3
+c ::= action => Test::rule4
+c ::= y action => Test::rule5
+y ::= Z action => Test::rule6
+Z ~ 'Z'
+END_OF_DSL
+
+my $g = Marpa::R3::Scanless::G->new( { source => \$dsl } );
+my $recce = Marpa::R3::Scanless::R->new( { grammar => $g } );
+$recce->read( \'Z' );
 my $ref_value = $recce->value();
 my $value = $ref_value ? ${$ref_value} : 'No parse';
 Marpa::R3::Test::is(
@@ -98,11 +69,4 @@ Marpa::R3::Test::is(
     'null value example'
 );
 
-1;    # In case used as "do" file
-
-# Local Variables:
-#   mode: cperl
-#   cperl-indent-level: 4
-#   fill-column: 100
-# End:
 # vim: expandtab shiftwidth=4:
