@@ -361,8 +361,7 @@ sub MY::postamble {
       );
 
     push @postamble_pieces, <<'END_OF_POSTAMBLE_PIECE';
-engine/gnu_ac_build/marpa.c engine/gnu_ac_build/marpa.h \
-    engine/gnu_ac_build/marpa_codes.h engine/gnu_ac_build/configure: \
+engine/gnu_ac_build/marpa.c engine/gnu_ac_build/marpa.h engine/gnu_ac_build/configure: \
             engine/read_only/stamp-h1
 	$(LIBMARPA_INSTALL) engine/read_only engine/gnu_ac_build
 END_OF_POSTAMBLE_PIECE
@@ -376,7 +375,7 @@ END_OF_POSTAMBLE_PIECE
         );
 
     push @postamble_pieces, sprintf <<'END_OF_POSTAMBLE_PIECE',
-$(LIBMARPA_IN_BUILD_DIR): engine/gnu_ac_build/config.h engine/gnu_ac_build/Makefile
+engine/gnu_ac_build/stamp-h1: engine/gnu_ac_build/config.h engine/gnu_ac_build/Makefile
 	%s
 END_OF_POSTAMBLE_PIECE
 	$self->cd(File::Spec->catdir(qw(engine gnu_ac_build)), '$(MAKE)');
@@ -431,7 +430,7 @@ xs/marpa.h: $(LIBMARPA_BUILD_DIR)/marpa.h
 xs/marpa_codes.h: $(LIBMARPA_BUILD_DIR)/marpa_codes.h
 	cp $? $@
 
-xs/libmarpa$(LIB_EXT): $(LIBMARPA_IN_BUILD_DIR)
+xs/libmarpa$(LIB_EXT): $(LIBMARPA_BUILD_DIR)/stamp-h1
 	cp $(LIBMARPA_IN_BUILD_DIR) $@
 
 END_OF_POSTAMBLE_PIECE
