@@ -14,8 +14,8 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-# CENSUS: DELETE
-# Note: Converted to SLIF as sl_leo_unit.t
+# CENSUS: ASIS
+# Note: Converted to SLIF from leo_unit.t
 
 # Test of Leo logic for unit rule.
 
@@ -24,7 +24,7 @@ use strict;
 use warnings;
 
 use List::Util;
-use Test::More tests => 7;
+use Test::More tests => 5;
 
 use lib 'inc';
 use Marpa::R3::Test;
@@ -39,36 +39,35 @@ sub main::default_action {
 
 ## use critic
 
-my $grammar = Marpa::R3::Grammar->new(
-    {   start => 'A',
-        rules => [
-            [ 'A', [qw/a B/] ],
-            [ 'B', [qw/C/] ],
-            [ 'C', [qw/c A/] ],
-            [ 'C', [qw/c/] ],
-        ],
-        terminals      => [qw(a c)],
-        default_action => 'main::default_action',
-    }
-);
+my $dsl = <<'END_OF_DSL';
+:default ::= action => main::default_action
+A ::= a B
+B ::= C
+C ::= c A
+C ::= c
+a ~ 'a'
+c ~ 'c'
+END_OF_DSL
 
-$grammar->precompute();
+my $grammar = Marpa::R3::Scanless::G->new( { source => \$dsl } );
 
 Marpa::R3::Test::is( $grammar->show_symbols(),
     <<'END_OF_STRING', 'Leo166 Symbols' );
-0: a, terminal
-1: c, terminal
-2: A
-3: B
-4: C
+G1 S0 :start -- Internal G1 start symbol
+G1 S1 A
+G1 S2 a
+G1 S3 B
+G1 S4 C
+G1 S5 c
 END_OF_STRING
 
 Marpa::R3::Test::is( $grammar->show_rules,
     <<'END_OF_STRING', 'Leo166 Rules' );
-0: A -> a B
-1: B -> C
-2: C -> c A
-3: C -> c
+G1 R0 A ::= a B
+G1 R1 B ::= C
+G1 R2 C ::= c A
+G1 R3 C ::= c
+G1 R4 :start ::= A
 END_OF_STRING
 
 
@@ -94,40 +93,34 @@ AHM 8: postdot = "c"
 AHM 9: completion
     C ::= c .
 AHM 10: postdot = "A"
-    A['] ::= . A
+    [:start] ::= . A
 AHM 11: completion
-    A['] ::= A .
+    [:start] ::= A .
+AHM 12: postdot = "[:start]"
+    [:start]['] ::= . [:start]
+AHM 13: completion
+    [:start]['] ::= [:start] .
 END_OF_STRING
+
+my $recce = Marpa::R3::Scanless::R->new(
+    { grammar => $grammar } );
 
 my $input = 'acacac';
 my $length_of_input = length $input;
+$recce->read( \$input );
 
-LEO_FLAG: for my $leo_flag ( 0, 1 ) {
-    my $recce = Marpa::R3::Recognizer->new(
-        { grammar => $grammar, leo => $leo_flag } );
+my @sizes = (0);
+TOKEN: for ( my $i = 0; $i < $length_of_input; $i++ ) {
+    push @sizes, $recce->earley_set_size($i);
+}
 
-    my $i                 = 0;
-    my $latest_earley_set = $recce->latest_earley_set();
-    my @sizes = ($recce->earley_set_size($latest_earley_set));
-    TOKEN: for ( my $i = 0; $i < $length_of_input; $i++ ) {
-        my $token_name = substr( $input, $i, 1 );
+my $max_size = List::Util::max(@sizes);
+my $expected_size = 6;
+Marpa::R3::Test::is( $max_size, $expected_size,
+    "Earley set size was $max_size; $expected_size was expected" );
 
-        # token name and value are the same
-        $recce->read( $token_name, $token_name );
-        $latest_earley_set = $recce->latest_earley_set();
-        push @sizes, $recce->earley_set_size($latest_earley_set);
-
-    } ## end TOKEN: for ( my $i = 0; $i < $length_of_input; $i++ )
-
-    my $max_size = List::Util::max(@sizes);
-    my $expected_size = $leo_flag ? 5 : ( $length_of_input / 2 ) * 3 + 3;
-    Marpa::R3::Test::is( $max_size, $expected_size,
-        "Leo flag $leo_flag, size was $max_size but $expected_size was expected" );
-
-    my $value_ref = $recce->value();
-    my $value = $value_ref ? ${$value_ref} : 'No parse';
-    Marpa::R3::Test::is( $value, 'acacac', 'Leo unit rule parse' );
-
-} ## end LEO_FLAG: for my $leo_flag ( 0, 1 )
+my $value_ref = $recce->value();
+my $value = $value_ref ? ${$value_ref} : 'No parse';
+Marpa::R3::Test::is( $value, 'acacac', 'Leo unit rule parse' );
 
 # vim: expandtab shiftwidth=4:
