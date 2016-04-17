@@ -336,12 +336,12 @@ for my $i ( 0 .. $input_length ) {
     $recce->series_restart( { end => $i } );
     my $expected = $expected[$i];
 
-    # Marpa::R3::Display
-    # name: Scanless ambiguity_metric() synopsis
+# Marpa::R3::Display
+# name: Scanless ambiguity_metric() synopsis
 
     my $ambiguity_metric = $recce->ambiguity_metric();
 
-    # Marpa::R3::Display::End
+# Marpa::R3::Display::End
 
     $ambiguity_metric = 2
       if $ambiguity_metric > 2;    # cap at 2 -- higher numbers not defined
