@@ -486,7 +486,9 @@ sub rule_describe {
 
 sub resolve_recce {
 
-    my ( $recce, $per_parse_arg ) = @_;
+    my ( $slr, $per_parse_arg ) = @_;
+    my $recce =
+        $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
     my $grammar   = $recce->[Marpa::R3::Internal::Recognizer::GRAMMAR];
     my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
     my $rules     = $grammar->[Marpa::R3::Internal::Grammar::RULES];
@@ -689,7 +691,7 @@ sub registration_init {
     my @blessing_by_rule_id  = ();
 
     my ( $rule_resolutions, $lexeme_resolutions ) =
-        resolve_recce( $recce, $per_parse_arg );
+        resolve_recce( $slr, $per_parse_arg );
 
     # Set the arrays, and perform various checks on the resolutions
     # we received

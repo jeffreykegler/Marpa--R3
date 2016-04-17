@@ -376,7 +376,7 @@ sub Marpa::R3::ASF::new {
 
     (   $asf->[Marpa::R3::Internal::ASF::RULE_RESOLUTIONS],
         $asf->[Marpa::R3::Internal::ASF::LEXEME_RESOLUTIONS]
-    ) = Marpa::R3::Internal::Value::resolve_recce( $recce, $slr );
+    ) = Marpa::R3::Internal::Value::resolve_recce( $slr );
 
     $asf->[Marpa::R3::Internal::ASF::SYMCH_BLESSING_PACKAGE] = 'My_Symch';
     $asf->[Marpa::R3::Internal::ASF::FACTORING_BLESSING_PACKAGE] =
