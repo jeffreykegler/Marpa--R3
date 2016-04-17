@@ -14,9 +14,8 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-# CENSUS: REWORK
-# Note: Convert to sl_seq2.t ...
-# Note: then mark this for deletion
+# CENSUS: DELETE
+# Note: Trivail test of material thoroughly covered elsewhere
 
 # Some small sequence tests
 

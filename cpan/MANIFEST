@@ -225,6 +225,7 @@ t/rabend.t
 t/randal.t
 t/rewrite.t
 t/sequence.t
+t/sl_seq.t
 t/sequence2.t
 t/sl_action.t
 t/sl_action2.t
