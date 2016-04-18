@@ -81,12 +81,11 @@ use constant O_C => 2;
 use constant T_C => 3;
 use constant GRAMMAR => 4;
 use constant TREE_MODE => 5;
-use constant ASF_OR_NODES => 6;
-use constant END_OF_PARSE => 7;
-use constant MAX_PARSES => 8;
-use constant RANKING_METHOD => 9;
-use constant TRACE_ACTIONS => 10;
-use constant TRACE_VALUES => 11;
+use constant END_OF_PARSE => 6;
+use constant MAX_PARSES => 7;
+use constant RANKING_METHOD => 8;
+use constant TRACE_ACTIONS => 9;
+use constant TRACE_VALUES => 10;
 
 package Marpa::R3::Internal::Progress_Report;
 use constant RULE_ID => 0;

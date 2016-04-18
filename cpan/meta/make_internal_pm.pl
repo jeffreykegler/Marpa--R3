@@ -183,8 +183,6 @@ __DATA__
     GRAMMAR { the grammar used }
     TREE_MODE { 'tree' or 'forest' or undef }
 
-    ASF_OR_NODES { memoized or-nodes }
-
     END_OF_PARSE
     MAX_PARSES
     RANKING_METHOD

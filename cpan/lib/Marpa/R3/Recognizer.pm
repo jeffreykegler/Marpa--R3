@@ -64,7 +64,6 @@ sub Marpa::R3::Scanless::R::reset_evaluation {
             undef;
     } ## end if ( defined $package_source and $package_source ne ...)
     $slr->[Marpa::R3::Internal::Scanless::R::NO_PARSE]          = undef;
-    $recce->[Marpa::R3::Internal::Recognizer::ASF_OR_NODES]          = [];
     $recce->[Marpa::R3::Internal::Recognizer::B_C]                   = undef;
     $recce->[Marpa::R3::Internal::Recognizer::O_C]                   = undef;
     $slr->[Marpa::R3::Internal::Scanless::R::PER_PARSE_CONSTRUCTOR] = undef;
