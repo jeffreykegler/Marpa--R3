@@ -1514,19 +1514,7 @@ sub Marpa::R3::Scanless::R::rule_closure {
     my $recce = $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
 
     if ( not $recce->[Marpa::R3::Internal::Recognizer::REGISTRATIONS] ) {
-
-        my $grammar           = $recce->[Marpa::R3::Internal::Recognizer::GRAMMAR];
-        my $grammar_c         = $grammar->[Marpa::R3::Internal::Grammar::C];
-        my $recce_c           = $recce->[Marpa::R3::Internal::Recognizer::C];
-        my $per_parse_arg     = {};
-        my $trace_actions     = $recce->[Marpa::R3::Internal::Recognizer::TRACE_ACTIONS] // 0;
-        my $trace_file_handle = $recce->[Marpa::R3::Internal::Recognizer::TRACE_FILE_HANDLE];
-        my $rules             = $grammar->[Marpa::R3::Internal::Grammar::RULES];
-        my $symbols           = $grammar->[Marpa::R3::Internal::Grammar::SYMBOLS];
-        my $tracer            = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
-
-        Marpa::R3::Internal::Value::registration_init( $slr, $per_parse_arg );
-
+        Marpa::R3::Internal::Value::registration_init( $slr, {} );
     } ## end if ( not $recce->[Marpa::R3::Internal::Recognizer::REGISTRATIONS...])
 
     my $rule_closure = $recce->[Marpa::R3::Internal::Recognizer::CLOSURE_BY_RULE_ID]->[$rule_id];
