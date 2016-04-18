@@ -188,10 +188,6 @@ __DATA__
     ASF_OR_NODES { memoized or-nodes }
 
     TRACE_FILE_HANDLE
-    ERROR_MESSAGE { Temporary place to put an error message for later use.
-    One use is when the error occurs in a subroutine, but you want the bail message
-    to have the benefit of a higher-level context.
-    }
 
     END_OF_PARSE
     MAX_PARSES
@@ -345,6 +341,11 @@ __DATA__
     TRACE_TERMINALS
     READ_STRING_ERROR
     EVENTS
+
+    ERROR_MESSAGE { Temporary place to put an error message for later use.
+    One use is when the error occurs in a subroutine, but you want the bail message
+    to have the benefit of a higher-level context.
+    }
 
     { vim: set expandtab shiftwidth=4:
     }

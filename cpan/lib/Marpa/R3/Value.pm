@@ -190,8 +190,10 @@ sub Marpa::R3::Internal::Recognizer::rule_blessing_find {
 } ## end sub Marpa::R3::Internal::Recognizer::rule_blessing_find
 
 # Find the blessing for a lexeme.
-sub Marpa::R3::Internal::Recognizer::lexeme_blessing_find {
-    my ( $recce, $lexeme_id ) = @_;
+sub Marpa::R3::Scanless::R::lexeme_blessing_find {
+    my ( $slr, $lexeme_id ) = @_;
+    my $recce =
+        $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
     my $grammar  = $recce->[Marpa::R3::Internal::Recognizer::GRAMMAR];
     my $symbols  = $grammar->[Marpa::R3::Internal::Grammar::SYMBOLS];
     my $symbol   = $symbols->[$lexeme_id];
@@ -202,7 +204,7 @@ sub Marpa::R3::Internal::Recognizer::lexeme_blessing_find {
     if ( $blessing =~ m/\A [:][:] /xms ) {
         my $tracer      = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
         my $lexeme_name = $tracer->symbol_name($lexeme_id);
-        $recce->[Marpa::R3::Internal::Recognizer::ERROR_MESSAGE] =
+        $slr->[Marpa::R3::Internal::Scanless::R::ERROR_MESSAGE] =
             qq{Symbol "$lexeme_name" has unknown blessing: "$blessing"};
         return;
     } ## end if ( $blessing =~ m/\A [:][:] /xms )
@@ -214,7 +216,7 @@ sub Marpa::R3::Internal::Recognizer::lexeme_blessing_find {
     if ( not defined $bless_package ) {
         my $tracer      = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
         my $lexeme_name = $tracer->symbol_name($lexeme_id);
-        $recce->[Marpa::R3::Internal::Recognizer::ERROR_MESSAGE] =
+        $slr->[Marpa::R3::Internal::Scanless::R::ERROR_MESSAGE] =
             qq{Symbol "$lexeme_name" needs a blessing package, but grammar has none\n}
             . qq{  The blessing for "$lexeme_name" was "$blessing"\n};
         return;
@@ -585,7 +587,7 @@ sub resolve_recce {
             $message .= qq{  Action was specified as "$action"\n}
                 if defined $action;
             my $recce_error =
-                $recce->[Marpa::R3::Internal::Recognizer::ERROR_MESSAGE];
+                $slr->[Marpa::R3::Internal::Scanless::R::ERROR_MESSAGE];
             $message .= q{  } . $recce_error if defined $recce_error;
             Marpa::R3::exception($message);
         } ## end if ( not $rule_resolution )
@@ -640,12 +642,10 @@ sub resolve_recce {
                 . $grammar->symbol_name($lexeme_id) . "\n";
             $message
                 .= q{  }
-                . $recce->[Marpa::R3::Internal::Recognizer::ERROR_MESSAGE];
+                . $slr->[Marpa::R3::Internal::Scanless::R::ERROR_MESSAGE];
             Marpa::R3::exception($message);
         } ## end if ( not defined $semantics )
-        my $blessing =
-            Marpa::R3::Internal::Recognizer::lexeme_blessing_find( $recce,
-            $lexeme_id );
+        my $blessing = $slr->lexeme_blessing_find( $lexeme_id );
         if ( not defined $blessing ) {
             my $message =
                   "Could not determine lexeme's blessing\n"
@@ -653,7 +653,7 @@ sub resolve_recce {
                 . $grammar->symbol_name($lexeme_id) . "\n";
             $message
                 .= q{  }
-                . $recce->[Marpa::R3::Internal::Recognizer::ERROR_MESSAGE];
+                . $slr->[Marpa::R3::Internal::Scanless::R::ERROR_MESSAGE];
             Marpa::R3::exception($message);
         } ## end if ( not defined $blessing )
         $lexeme_resolutions[$lexeme_id] = [ $semantics, $blessing ];
