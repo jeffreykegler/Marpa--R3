@@ -291,7 +291,6 @@ sub Marpa::R3::Scanless::R::new {
     $thick_g1_recce->[Marpa::R3::Internal::Recognizer::WARNINGS]       = 1;
     $thick_g1_recce->[Marpa::R3::Internal::Recognizer::RANKING_METHOD] = 'none';
     $thick_g1_recce->[Marpa::R3::Internal::Recognizer::MAX_PARSES]     = 0;
-    $thick_g1_recce->[Marpa::R3::Internal::Recognizer::TRACE_TERMINALS]     = 0;
 
     $thick_g1_recce->reset_evaluation();
 
@@ -355,7 +354,7 @@ sub Marpa::R3::Scanless::R::new {
 
     $slr->naif_set($g1_recce_args);
 
-    if ( $thick_g1_recce->[Marpa::R3::Internal::Recognizer::TRACE_TERMINALS] > 1 ) {
+    if ( $slr->[Marpa::R3::Internal::Scanless::R::TRACE_TERMINALS] > 1 ) {
         my @terminals_expected = @{ $thick_g1_recce->terminals_expected() };
         for my $terminal ( sort @terminals_expected ) {
             # We may have set and reset the trace file handle during this method,
@@ -397,10 +396,10 @@ sub Marpa::R3::Internal::Scanless::R::set {
     state $common_naif_recce_args = {
         map { ( $_, 1 ); }
             qw(end max_parses semantics_package too_many_earley_items
-            trace_actions trace_terminals trace_values)
+            trace_actions trace_values)
     };
     state $common_slif_recce_args =
-        { map { ( $_, 1 ); } qw(trace_lexers trace_file_handle rejection exhaustion) };
+        { map { ( $_, 1 ); } qw(trace_lexers trace_terminals trace_file_handle rejection exhaustion) };
     state $set_method_args = {
         map { ( $_, 1 ); } (
             keys %{$common_slif_recce_args},
@@ -433,8 +432,32 @@ sub Marpa::R3::Internal::Scanless::R::set {
     } ## end if ( scalar @bad_args )
 
     # Special SLIF (not NAIF) recce arg processing goes here
+
     if ( my $value = $flat_args->{'trace_file_handle'} ) {
         $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE] = $value;
+    }
+    my $trace_file_handle = $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
+
+    if ( exists $flat_args->{'trace_terminals'} ) {
+        my $value = $flat_args->{'trace_terminals'};
+        my $normalized_value =
+            Scalar::Util::looks_like_number( $value ) ? $value : 0;
+        $slr->[Marpa::R3::Internal::Scanless::R::TRACE_TERMINALS] = 
+            $normalized_value;
+        if ($normalized_value) {
+            say {$trace_file_handle} qq{Setting trace_terminals option};
+        }
+    }
+
+    if ( exists $flat_args->{'trace_lexers'} ) {
+        my $value = $flat_args->{'trace_lexers'};
+        my $normalized_value =
+            Scalar::Util::looks_like_number( $value ) ? $value : 0;
+        $slr->[Marpa::R3::Internal::Scanless::R::TRACE_LEXERS] = 
+            $normalized_value;
+        if ($normalized_value) {
+            say {$trace_file_handle} qq{Setting trace_lexers option};
+        }
     }
 
     if ( exists $flat_args->{'exhaustion'} ) {
@@ -468,38 +491,12 @@ sub Marpa::R3::Internal::Scanless::R::set {
 
     }
 
-    # A bit hack-ish, but some named args are copies straight to an member of
-    # the Scanless::R class, so this maps named args to the index of the array
-    # that holds the members.
-    state $copy_arg_to_index = {
-        trace_lexers    => Marpa::R3::Internal::Scanless::R::TRACE_LEXERS,
-        trace_terminals => Marpa::R3::Internal::Scanless::R::TRACE_TERMINALS,
-    };
-
-    ARG: for my $arg_name ( keys %{$flat_args} ) {
-        my $index = $copy_arg_to_index->{$arg_name};
-        next ARG if not defined $index;
-        my $value = $flat_args->{$arg_name};
-        $slr->[$index] = $value;
-    }
-
-    # Normalize trace levels to numbers
-    for my $trace_level_arg (
-        Marpa::R3::Internal::Scanless::R::TRACE_TERMINALS,
-        Marpa::R3::Internal::Scanless::R::TRACE_LEXERS
-        )
-    {
-        $slr->[$trace_level_arg] = 0
-            if
-            not Scalar::Util::looks_like_number( $slr->[$trace_level_arg] );
-    } ## end for my $trace_level_arg ( ...)
-
     # These NAIF recce args, when applicable, are simply copies of the the
     # SLIF args of the same name
     state $copyable_naif_recce_args = {
         map { ( $_, 1 ); }
             qw(end max_parses semantics_package too_many_earley_items ranking_method
-            trace_actions trace_terminals trace_values)
+            trace_actions trace_values)
     };
 
     # Prune flat args of all those named args which are NOT to be copied
