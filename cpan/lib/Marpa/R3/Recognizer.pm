@@ -58,25 +58,25 @@ sub Marpa::R3::Scanless::R::reset_evaluation {
         $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
     my $grammar = $recce->[Marpa::R3::Internal::Recognizer::GRAMMAR];
     my $package_source =
-        $recce->[Marpa::R3::Internal::Recognizer::RESOLVE_PACKAGE_SOURCE];
+        $slr->[Marpa::R3::Internal::Scanless::R::RESOLVE_PACKAGE_SOURCE];
     if ( defined $package_source and $package_source ne 'legacy' ) {
 
         # Packaage source, once legacy, stays legacy
         # Otherwise, reset it
-        $recce->[Marpa::R3::Internal::Recognizer::RESOLVE_PACKAGE_SOURCE] =
+        $slr->[Marpa::R3::Internal::Scanless::R::RESOLVE_PACKAGE_SOURCE] =
             undef;
     } ## end if ( defined $package_source and $package_source ne ...)
     $slr->[Marpa::R3::Internal::Scanless::R::NO_PARSE]          = undef;
     $recce->[Marpa::R3::Internal::Recognizer::ASF_OR_NODES]          = [];
     $recce->[Marpa::R3::Internal::Recognizer::B_C]                   = undef;
     $recce->[Marpa::R3::Internal::Recognizer::O_C]                   = undef;
-    $recce->[Marpa::R3::Internal::Recognizer::PER_PARSE_CONSTRUCTOR] = undef;
-    $recce->[Marpa::R3::Internal::Recognizer::RESOLVE_PACKAGE]       = undef;
+    $slr->[Marpa::R3::Internal::Scanless::R::PER_PARSE_CONSTRUCTOR] = undef;
+    $slr->[Marpa::R3::Internal::Scanless::R::RESOLVE_PACKAGE]       = undef;
     $slr->[Marpa::R3::Internal::Scanless::R::NULL_VALUES]        = undef;
 
-    $recce->[Marpa::R3::Internal::Recognizer::REGISTRATIONS]         = undef;
-    $recce->[Marpa::R3::Internal::Recognizer::CLOSURE_BY_SYMBOL_ID] = undef;
-    $recce->[Marpa::R3::Internal::Recognizer::CLOSURE_BY_RULE_ID]   = undef;
+    $slr->[Marpa::R3::Internal::Scanless::R::REGISTRATIONS]         = undef;
+    $slr->[Marpa::R3::Internal::Scanless::R::CLOSURE_BY_SYMBOL_ID] = undef;
+    $slr->[Marpa::R3::Internal::Scanless::R::CLOSURE_BY_RULE_ID]   = undef;
 
     $recce->[Marpa::R3::Internal::Recognizer::T_C] = undef;
     $recce->[Marpa::R3::Internal::Recognizer::TREE_MODE] = undef;
@@ -141,10 +141,10 @@ sub Marpa::R3::Scanless::R::naif_set {
                 );
             }
 
-            $recce->[Marpa::R3::Internal::Recognizer::RESOLVE_PACKAGE_SOURCE]
+            $slr->[Marpa::R3::Internal::Scanless::R::RESOLVE_PACKAGE_SOURCE]
                 //= 'semantics_package';
-            if ( $recce
-                ->[Marpa::R3::Internal::Recognizer::RESOLVE_PACKAGE_SOURCE] ne
+            if ( $slr
+                ->[Marpa::R3::Internal::Scanless::R::RESOLVE_PACKAGE_SOURCE] ne
                 'semantics_package' )
             {
                 Marpa::R3::exception(
@@ -152,7 +152,7 @@ sub Marpa::R3::Scanless::R::naif_set {
                     qq{   Usually this means you tried to use the discouraged 'action_object' named argument as well\n}
                 );
             } ## end if ( $recce->[...])
-            $recce->[Marpa::R3::Internal::Recognizer::RESOLVE_PACKAGE] =
+            $slr->[Marpa::R3::Internal::Scanless::R::RESOLVE_PACKAGE] =
                 $value;
         } ## end if ( defined( my $value = $args->{'semantics_package'...}))
 

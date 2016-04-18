@@ -278,7 +278,7 @@ sub Marpa::R3::Scanless::R::new {
         or defined $thick_g1_grammar->[Marpa::R3::Internal::Grammar::ACTIONS]
         or not defined $thick_g1_grammar->[Marpa::R3::Internal::Grammar::INTERNAL] )
     {
-        $thick_g1_recce->[Marpa::R3::Internal::Recognizer::RESOLVE_PACKAGE_SOURCE] =
+        $slr->[Marpa::R3::Internal::Scanless::R::RESOLVE_PACKAGE_SOURCE] =
             'legacy';
     } ## end if ( defined $grammar->[...])
 
@@ -1511,25 +1511,26 @@ sub Marpa::R3::Scanless::R::rule_closure {
 
     my $recce = $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
 
-    if ( not $recce->[Marpa::R3::Internal::Recognizer::REGISTRATIONS] ) {
+    if ( not $slr->[Marpa::R3::Internal::Scanless::R::REGISTRATIONS] ) {
         Marpa::R3::Internal::Value::registration_init( $slr, {} );
-    } ## end if ( not $recce->[Marpa::R3::Internal::Recognizer::REGISTRATIONS...])
+    }
 
-    my $rule_closure = $recce->[Marpa::R3::Internal::Recognizer::CLOSURE_BY_RULE_ID]->[$rule_id];
-    if (defined $rule_closure){
+    my $rule_closure =
+      $slr->[Marpa::R3::Internal::Scanless::R::CLOSURE_BY_RULE_ID]->[$rule_id];
+    if ( defined $rule_closure ) {
         my $ref_rule_closure = ref $rule_closure;
-        if (    $ref_rule_closure eq 'CODE' ){
+        if ( $ref_rule_closure eq 'CODE' ) {
             return $rule_closure;
         }
-        elsif ( $ref_rule_closure eq 'SCALAR' ){
+        elsif ( $ref_rule_closure eq 'SCALAR' ) {
             return $rule_closure;
         }
     }
-    else{
-        return
+    else {
+        return;
     }
 
-} ## end sub Marpa::R3::Scanless::R::rule_closure
+}
 
 sub Marpa::R3::Scanless::R::value {
     my ( $slr, $per_parse_arg ) = @_;

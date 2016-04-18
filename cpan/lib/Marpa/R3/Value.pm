@@ -76,7 +76,7 @@ sub Marpa::R3::Internal::Recognizer::resolve_action {
 
     if ( not $fully_qualified_name ) {
         my $resolve_package =
-            $recce->[Marpa::R3::Internal::Recognizer::RESOLVE_PACKAGE];
+            $slr->[Marpa::R3::Internal::Scanless::R::RESOLVE_PACKAGE];
         if ( not defined $resolve_package ) {
             ${$p_error} = Marpa::R3::Internal::X->new(
                 {   message =>
@@ -501,23 +501,23 @@ sub resolve_recce {
         $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
 
     my $package_source =
-        $recce->[Marpa::R3::Internal::Recognizer::RESOLVE_PACKAGE_SOURCE];
+        $slr->[Marpa::R3::Internal::Scanless::R::RESOLVE_PACKAGE_SOURCE];
     if (    not defined $package_source
         and defined $per_parse_arg
         and ( my $arg_blessing = Scalar::Util::blessed $per_parse_arg) )
     {
-        $recce->[Marpa::R3::Internal::Recognizer::RESOLVE_PACKAGE] =
+        $slr->[Marpa::R3::Internal::Scanless::R::RESOLVE_PACKAGE] =
             $arg_blessing;
         $package_source = 'arg';
     } ## end if ( not defined $package_source and defined $per_parse_arg...)
     $package_source //= 'semantics_package';
-    $recce->[Marpa::R3::Internal::Recognizer::RESOLVE_PACKAGE_SOURCE] =
+    $slr->[Marpa::R3::Internal::Scanless::R::RESOLVE_PACKAGE_SOURCE] =
         $package_source;
 
     if ( $package_source eq 'legacy' ) {
 
         # RESOLVE_PACKAGE is already set if not 'legacy'
-        $recce->[Marpa::R3::Internal::Recognizer::RESOLVE_PACKAGE] =
+        $slr->[Marpa::R3::Internal::Scanless::R::RESOLVE_PACKAGE] =
             $grammar->[Marpa::R3::Internal::Grammar::ACTIONS]
             // $grammar->[Marpa::R3::Internal::Grammar::ACTION_OBJECT];
     } ## end if ( $package_source eq 'legacy' )
@@ -526,7 +526,7 @@ sub resolve_recce {
         my $constructor_package =
             ( $package_source eq 'legacy' )
             ? $grammar->[Marpa::R3::Internal::Grammar::ACTION_OBJECT]
-            : $recce->[Marpa::R3::Internal::Recognizer::RESOLVE_PACKAGE];
+            : $slr->[Marpa::R3::Internal::Scanless::R::RESOLVE_PACKAGE];
         last FIND_CONSTRUCTOR if not defined $constructor_package;
         my $constructor_name = $constructor_package . q{::new};
         my $resolve_error;
@@ -534,7 +534,7 @@ sub resolve_recce {
             Marpa::R3::Internal::Recognizer::resolve_action( $slr,
             $constructor_name, \$resolve_error );
         if ($resolution) {
-            $recce->[ Marpa::R3::Internal::Recognizer::PER_PARSE_CONSTRUCTOR ]
+            $slr->[ Marpa::R3::Internal::Scanless::R::PER_PARSE_CONSTRUCTOR ]
                 = $resolution->[1];
             last FIND_CONSTRUCTOR;
         }
@@ -1330,11 +1330,11 @@ sub registration_init {
         } ## end REGISTRATION: for my $registration (@registrations)
     } ## end SLR_NULLING_GRAMMAR_HACK:
 
-    $recce->[Marpa::R3::Internal::Recognizer::REGISTRATIONS] =
+    $slr->[Marpa::R3::Internal::Scanless::R::REGISTRATIONS] =
         \@registrations;
-    $recce->[Marpa::R3::Internal::Recognizer::CLOSURE_BY_SYMBOL_ID] =
+    $slr->[Marpa::R3::Internal::Scanless::R::CLOSURE_BY_SYMBOL_ID] =
         \@nulling_closures;
-    $recce->[Marpa::R3::Internal::Recognizer::CLOSURE_BY_RULE_ID] =
+    $slr->[Marpa::R3::Internal::Scanless::R::CLOSURE_BY_RULE_ID] =
         \@closure_by_rule_id;
 
 } ## end sub registration_init
@@ -1388,8 +1388,8 @@ sub Marpa::R3::Recognizer::value {
         # On second and later calls to value() in a parse series, we need
         # to check the per-parse arg
         CHECK_ARG: {
-            my $package_source = $recce
-                ->[Marpa::R3::Internal::Recognizer::RESOLVE_PACKAGE_SOURCE];
+            my $package_source = $slr
+                ->[Marpa::R3::Internal::Scanless::R::RESOLVE_PACKAGE_SOURCE];
             last CHECK_ARG
                 if $package_source eq 'semantics_package';    # Anything is OK
             if ( $package_source eq 'legacy' ) {
@@ -1411,8 +1411,8 @@ sub Marpa::R3::Recognizer::value {
                     "  find the parse's semantics closures, it must always be called with an arg\n",
                     "  that is blessed in the same package\n",
                     q{  In this case, the package was "},
-                    $recce
-                        ->[Marpa::R3::Internal::Recognizer::RESOLVE_PACKAGE],
+                    $slr
+                        ->[Marpa::R3::Internal::Scanless::R::RESOLVE_PACKAGE],
                     qq{"\n"}
                 );
             } ## end if ( not defined $per_parse_arg )
@@ -1425,15 +1425,15 @@ sub Marpa::R3::Recognizer::value {
                     "  find the parse's semantics closures, it must always be called with an arg\n",
                     "  that is blessed in the same package\n",
                     q{  In this case, the original package was "},
-                    $recce
-                        ->[Marpa::R3::Internal::Recognizer::RESOLVE_PACKAGE],
+                    $slr
+                        ->[Marpa::R3::Internal::Scanless::R::RESOLVE_PACKAGE],
                     qq{"\n"},
                     qq{  and the blessing in this call was "$arg_blessing"\n}
                 );
             } ## end if ( not defined $arg_blessing )
 
             my $required_blessing =
-                $recce->[Marpa::R3::Internal::Recognizer::RESOLVE_PACKAGE];
+                $slr->[Marpa::R3::Internal::Scanless::R::RESOLVE_PACKAGE];
             if ( $arg_blessing ne $required_blessing ) {
                 Marpa::R3::exception(
                     "value() arg is blessed into the wrong package.\n",
@@ -1481,7 +1481,7 @@ sub Marpa::R3::Recognizer::value {
         $slr->[Marpa::R3::Internal::Scanless::R::GRAMMAR]
         if defined $slr;
 
-    if ( not $recce->[Marpa::R3::Internal::Recognizer::REGISTRATIONS] ) {
+    if ( not $slr->[Marpa::R3::Internal::Scanless::R::REGISTRATIONS] ) {
         registration_init( $slr, $per_parse_arg );
     }
 
@@ -1491,13 +1491,13 @@ sub Marpa::R3::Recognizer::value {
         last RUN_CONSTRUCTOR if defined $per_parse_arg;
 
         my $per_parse_constructor =
-            $recce->[Marpa::R3::Internal::Recognizer::PER_PARSE_CONSTRUCTOR];
+            $slr->[Marpa::R3::Internal::Scanless::R::PER_PARSE_CONSTRUCTOR];
 
         # Do not run the constructor if there isn't one
         last RUN_CONSTRUCTOR if not defined $per_parse_constructor;
 
         my $constructor_arg0;
-        if ( $recce->[Marpa::R3::Internal::Recognizer::RESOLVE_PACKAGE_SOURCE]
+        if ( $slr->[Marpa::R3::Internal::Scanless::R::RESOLVE_PACKAGE_SOURCE]
             eq 'legacy' )
         {
             $constructor_arg0 =
@@ -1505,7 +1505,7 @@ sub Marpa::R3::Recognizer::value {
         } ## end if ( $recce->[...])
         else {
             $constructor_arg0 =
-                $recce->[Marpa::R3::Internal::Recognizer::RESOLVE_PACKAGE];
+                $slr->[Marpa::R3::Internal::Scanless::R::RESOLVE_PACKAGE];
         }
         my @warnings;
         my $eval_ok;
@@ -1546,12 +1546,12 @@ sub Marpa::R3::Recognizer::value {
 
     my $null_values = $slr->[Marpa::R3::Internal::Scanless::R::NULL_VALUES];
     my $nulling_closures =
-        $recce->[Marpa::R3::Internal::Recognizer::CLOSURE_BY_SYMBOL_ID];
+        $slr->[Marpa::R3::Internal::Scanless::R::CLOSURE_BY_SYMBOL_ID];
     my $rule_closures =
-        $recce->[Marpa::R3::Internal::Recognizer::CLOSURE_BY_RULE_ID];
+        $slr->[Marpa::R3::Internal::Scanless::R::CLOSURE_BY_RULE_ID];
     REGISTRATION:
     for my $registration (
-        @{ $recce->[Marpa::R3::Internal::Recognizer::REGISTRATIONS] } )
+        @{ $slr->[Marpa::R3::Internal::Scanless::R::REGISTRATIONS] } )
     {
         my ( $type, $id, @raw_ops ) = @{$registration};
         my @ops = ();
