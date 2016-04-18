@@ -32,7 +32,6 @@ use Scalar::Util 'blessed';
 use English qw( -no_match_vars );
 
 our $PACKAGE = 'Marpa::R3::Scanless::R';
-our $TRACE_FILE_HANDLE;
 
 sub Marpa::R3::Scanless::R::last_completed_range {
     my ( $self,  $symbol_name ) = @_;
@@ -237,6 +236,7 @@ sub Marpa::R3::Scanless::R::new {
 
     my $trace_file_handle = $g1_recce_args->{trace_file_handle};
     $trace_file_handle //= $thick_g1_grammar->[Marpa::R3::Internal::Grammar::TRACE_FILE_HANDLE] ;
+    $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE] = $trace_file_handle;
 
     my $thick_g1_recce =
         $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE] = bless [],
@@ -492,14 +492,6 @@ sub Marpa::R3::Internal::Scanless::R::set {
             if
             not Scalar::Util::looks_like_number( $slr->[$trace_level_arg] );
     } ## end for my $trace_level_arg ( ...)
-
-    # Trace file handle can never be undefined
-    if (not defined $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE] )
-    {
-        my $slg = $slr->[Marpa::R3::Internal::Scanless::R::GRAMMAR];
-        $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE] =
-            $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE];
-    } ## end if ( not defined $slr->[...])
 
     # These NAIF recce args, when applicable, are simply copies of the the
     # SLIF args of the same name
