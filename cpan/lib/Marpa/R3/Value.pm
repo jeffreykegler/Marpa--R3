@@ -420,9 +420,11 @@ sub show_semantics {
 
 # Return false if no ordering was created,
 # otherwise return the ordering.
-sub Marpa::R3::Recognizer::ordering_get {
-    my ($recce) = @_;
-    return if $recce->[Marpa::R3::Internal::Recognizer::NO_PARSE];
+sub Marpa::R3::Scanless::R::ordering_get {
+    my ($slr) = @_;
+    my $recce =
+        $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
+    return if $slr->[Marpa::R3::Internal::Scanless::R::NO_PARSE];
     my $ordering = $recce->[Marpa::R3::Internal::Recognizer::O_C];
     return $ordering if $ordering;
     my $parse_set_arg =
@@ -436,7 +438,7 @@ sub Marpa::R3::Recognizer::ordering_get {
         Marpa::R3::Thin::B->new( $recce_c, ( $parse_set_arg // -1 ) );
     $grammar_c->throw_set(1);
     if ( not $bocage ) {
-        $recce->[Marpa::R3::Internal::Recognizer::NO_PARSE] = 1;
+        $slr->[Marpa::R3::Internal::Scanless::R::NO_PARSE] = 1;
         return;
     }
     $ordering = $recce->[Marpa::R3::Internal::Recognizer::O_C] =
@@ -883,7 +885,7 @@ sub registration_init {
     # Do consistency checks
 
     # Set the object values
-    $recce->[Marpa::R3::Internal::Recognizer::NULL_VALUES] =
+    $slr->[Marpa::R3::Internal::Scanless::R::NULL_VALUES] =
         \@null_symbol_closures;
 
     my @semantics_by_lexeme_id = ();
@@ -941,7 +943,7 @@ sub registration_init {
 
     }
 
-    my $null_values = $recce->[Marpa::R3::Internal::Recognizer::NULL_VALUES];
+    my $null_values = $slr->[Marpa::R3::Internal::Scanless::R::NULL_VALUES];
 
     state $op_bless          = Marpa::R3::Thin::op('bless');
     state $op_callback       = Marpa::R3::Thin::op('callback');
@@ -1463,7 +1465,7 @@ sub Marpa::R3::Recognizer::value {
     else {
         # No tree, therefore not initialized
 
-        my $order = $recce->ordering_get();
+        my $order = $slr->ordering_get();
         return if not $order;
         $tree = $recce->[Marpa::R3::Internal::Recognizer::T_C] =
             Marpa::R3::Thin::T->new($order);
@@ -1542,7 +1544,7 @@ sub Marpa::R3::Recognizer::value {
     $value->trace_values($trace_values);
     $value->stack_mode_set();
 
-    my $null_values = $recce->[Marpa::R3::Internal::Recognizer::NULL_VALUES];
+    my $null_values = $slr->[Marpa::R3::Internal::Scanless::R::NULL_VALUES];
     my $nulling_closures =
         $recce->[Marpa::R3::Internal::Recognizer::CLOSURE_BY_SYMBOL_ID];
     my $rule_closures =

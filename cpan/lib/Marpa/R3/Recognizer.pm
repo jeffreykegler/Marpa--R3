@@ -52,8 +52,10 @@ sub Marpa::R3::Recognizer::thin {
 # to allow 'ranking_method' to be changed.
 # But for now I will do nothing.
 # JK -- Mon Nov 24 17:35:24 PST 2014
-sub Marpa::R3::Recognizer::reset_evaluation {
-    my ($recce) = @_;
+sub Marpa::R3::Scanless::R::reset_evaluation {
+    my ($slr) = @_;
+    my $recce =
+        $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
     my $grammar = $recce->[Marpa::R3::Internal::Recognizer::GRAMMAR];
     my $package_source =
         $recce->[Marpa::R3::Internal::Recognizer::RESOLVE_PACKAGE_SOURCE];
@@ -64,13 +66,13 @@ sub Marpa::R3::Recognizer::reset_evaluation {
         $recce->[Marpa::R3::Internal::Recognizer::RESOLVE_PACKAGE_SOURCE] =
             undef;
     } ## end if ( defined $package_source and $package_source ne ...)
-    $recce->[Marpa::R3::Internal::Recognizer::NO_PARSE]          = undef;
+    $slr->[Marpa::R3::Internal::Scanless::R::NO_PARSE]          = undef;
     $recce->[Marpa::R3::Internal::Recognizer::ASF_OR_NODES]          = [];
     $recce->[Marpa::R3::Internal::Recognizer::B_C]                   = undef;
     $recce->[Marpa::R3::Internal::Recognizer::O_C]                   = undef;
     $recce->[Marpa::R3::Internal::Recognizer::PER_PARSE_CONSTRUCTOR] = undef;
     $recce->[Marpa::R3::Internal::Recognizer::RESOLVE_PACKAGE]       = undef;
-    $recce->[Marpa::R3::Internal::Recognizer::NULL_VALUES]        = undef;
+    $slr->[Marpa::R3::Internal::Scanless::R::NULL_VALUES]        = undef;
 
     $recce->[Marpa::R3::Internal::Recognizer::REGISTRATIONS]         = undef;
     $recce->[Marpa::R3::Internal::Recognizer::CLOSURE_BY_SYMBOL_ID] = undef;

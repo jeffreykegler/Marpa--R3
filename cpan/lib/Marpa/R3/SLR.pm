@@ -292,7 +292,7 @@ sub Marpa::R3::Scanless::R::new {
     $thick_g1_recce->[Marpa::R3::Internal::Recognizer::RANKING_METHOD] = 'none';
     $thick_g1_recce->[Marpa::R3::Internal::Recognizer::MAX_PARSES]     = 0;
 
-    $thick_g1_recce->reset_evaluation();
+    $slr->reset_evaluation();
 
     my $thin_slr =
         Marpa::R3::Thin::SLR->new( $slg->[Marpa::R3::Internal::Scanless::G::C],
@@ -1426,7 +1426,7 @@ sub Marpa::R3::Scanless::R::ambiguity_metric {
     my ($slr) = @_;
     my $thick_g1_recce =
         $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
-    my $ordering = $thick_g1_recce->ordering_get();
+    my $ordering = $slr->ordering_get();
     my $metric = $ordering ? $ordering->ambiguity_metric() : 0;
     my $bocage = $thick_g1_recce->[Marpa::R3::Internal::Recognizer::B_C];
     return $metric;
@@ -1548,7 +1548,7 @@ sub Marpa::R3::Scanless::R::series_restart {
     $slr->[Marpa::R3::Internal::Scanless::R::EXHAUSTION_ACTION] = 'fatal';
     $slr->[Marpa::R3::Internal::Scanless::R::REJECTION_ACTION] = 'fatal';
 
-    $thick_g1_recce->reset_evaluation();
+    $slr->reset_evaluation();
 
     my ($flat_args, $error_message) = flatten_hash_args(\@args);
     Marpa::R3::exception( sprintf $error_message, '$slr->series_restart()' ) if not $flat_args;

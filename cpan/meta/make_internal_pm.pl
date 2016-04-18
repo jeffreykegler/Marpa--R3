@@ -199,9 +199,6 @@ __DATA__
     { The following fields must be reinitialized when
     evaluation is reset }
 
-    NO_PARSE { no parse found in parse series -- memoized }
-    NULL_VALUES
-
     { Fields for new SLIF resolution logic
     -- must be reinitialized when evaluation is reset }
     PER_PARSE_CONSTRUCTOR
@@ -344,6 +341,15 @@ __DATA__
     One use is when the error occurs in a subroutine, but you want the bail message
     to have the benefit of a higher-level context.
     }
+
+    { The following fields must be reinitialized when
+    evaluation is reset }
+
+    NO_PARSE { no parse found in parse series -- memoized }
+    NULL_VALUES
+
+    { This is the end of the list of fields which
+    must be reinitialized when evaluation is reset }
 
     { vim: set expandtab shiftwidth=4:
     }

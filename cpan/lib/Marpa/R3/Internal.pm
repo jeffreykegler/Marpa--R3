@@ -91,14 +91,12 @@ use constant RANKING_METHOD => 10;
 use constant TRACE_ACTIONS => 11;
 use constant TRACE_VALUES => 12;
 use constant WARNINGS => 13;
-use constant NO_PARSE => 14;
-use constant NULL_VALUES => 15;
-use constant PER_PARSE_CONSTRUCTOR => 16;
-use constant RESOLVE_PACKAGE => 17;
-use constant RESOLVE_PACKAGE_SOURCE => 18;
-use constant REGISTRATIONS => 19;
-use constant CLOSURE_BY_SYMBOL_ID => 20;
-use constant CLOSURE_BY_RULE_ID => 21;
+use constant PER_PARSE_CONSTRUCTOR => 14;
+use constant RESOLVE_PACKAGE => 15;
+use constant RESOLVE_PACKAGE_SOURCE => 16;
+use constant REGISTRATIONS => 17;
+use constant CLOSURE_BY_SYMBOL_ID => 18;
+use constant CLOSURE_BY_RULE_ID => 19;
 
 package Marpa::R3::Internal::Progress_Report;
 use constant RULE_ID => 0;
@@ -193,5 +191,7 @@ use constant TRACE_TERMINALS => 8;
 use constant READ_STRING_ERROR => 9;
 use constant EVENTS => 10;
 use constant ERROR_MESSAGE => 11;
+use constant NO_PARSE => 12;
+use constant NULL_VALUES => 13;
 
 1;
