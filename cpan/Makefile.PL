@@ -407,7 +407,8 @@ END_OF_POSTAMBLE_PIECE
     push @postamble_pieces, sprintf <<'END_OF_POSTAMBLE_PIECE',
 engine/perl_ac_build/stamp-h1: engine/perl_ac_build/Makefile
 	%s
-	$(TOUCH) engine/perl_ac_build/stamp-h1
+	$(RM_RF) engine/perl_ac_build/stamp-h1
+	$(ECHO) stamp-h1 > engine/perl_ac_build/stamp-h1
 END_OF_POSTAMBLE_PIECE
 	$self->cd(File::Spec->catdir(qw(engine perl_ac_build)), '$(MAKE)');
 
