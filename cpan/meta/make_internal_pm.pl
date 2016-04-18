@@ -192,7 +192,6 @@ __DATA__
     RANKING_METHOD
     TRACE_ACTIONS
     TRACE_VALUES
-    WARNINGS
 
     { The following fields must be reinitialized when
     evaluation is reset }

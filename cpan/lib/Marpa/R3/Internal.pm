@@ -89,7 +89,6 @@ use constant MAX_PARSES => 8;
 use constant RANKING_METHOD => 9;
 use constant TRACE_ACTIONS => 10;
 use constant TRACE_VALUES => 11;
-use constant WARNINGS => 12;
 
 package Marpa::R3::Internal::Progress_Report;
 use constant RULE_ID => 0;

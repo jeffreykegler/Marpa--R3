@@ -115,7 +115,6 @@ sub Marpa::R3::Scanless::R::naif_set {
                 trace_actions
                 trace_earley_sets
                 trace_values
-                warnings
                 )
         };
 
@@ -198,10 +197,6 @@ sub Marpa::R3::Scanless::R::naif_set {
             }
             $recce->[Marpa::R3::Internal::Recognizer::END_OF_PARSE] = $value;
         } ## end if ( defined( my $value = $args->{'end'} ) )
-
-        if ( defined( my $value = $args->{'warnings'} ) ) {
-            $recce->[Marpa::R3::Internal::Recognizer::WARNINGS] = $value;
-        }
 
         if ( defined( my $value = $args->{'too_many_earley_items'} ) ) {
             $recce_c->earley_item_warning_threshold_set($value);

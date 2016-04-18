@@ -288,7 +288,6 @@ sub Marpa::R3::Scanless::R::new {
             delete $g1_recce_args->{leo};
         }
 
-    $thick_g1_recce->[Marpa::R3::Internal::Recognizer::WARNINGS]       = 1;
     $thick_g1_recce->[Marpa::R3::Internal::Recognizer::RANKING_METHOD] = 'none';
     $thick_g1_recce->[Marpa::R3::Internal::Recognizer::MAX_PARSES]     = 0;
 
