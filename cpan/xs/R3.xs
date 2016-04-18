@@ -106,6 +106,10 @@ union marpa_slr_event_s;
 #define MARPA_SLREV_DELETED 22
 #define MARPA_SLRTR_LEXEME_ACCEPTABLE 23
 #define MARPA_SLRTR_LEXEME_OUTPRIORITIZED 24
+/* This one is strange -- only invoked at position 0.
+ * Compare MARPA_SLRTR_LEXEME_ACCEPTABLE
+ * Do I need MARPA_SLRTR_LEXEME_EXPECTED?
+ */
 #define MARPA_SLRTR_LEXEME_EXPECTED 26
 
 #define MARPA_SLREV_TYPE(event) ((event)->t_header.t_event_type)
@@ -6502,6 +6506,37 @@ PPCODE:
   XPUSHs (sv_2mortal (newSViv ((IV) line)));
   XPUSHs (sv_2mortal (newSViv ((IV) column)));
 }
+
+ # TODO: Currently end location is not known at this
+ # point.  Once it is, add tracing:
+ # Don't bother with lexeme events as unnecessary
+ # and counter-productive for this call, which often
+ # is used to override them
+ # MARPA_SLRTR_AFTER_LEXEME
+ # MARPA_SLRTR_BEFORE_LEXEME
+ #
+ # Yes, at trace level > 0
+ # MARPA_SLRTR_LEXEME_REJECTED
+ # MARPA_SLRTR_G1_DUPLICATE_LEXEME
+ # MARPA_SLRTR_G1_ACCEPTED_LEXEME
+ #
+ # Yes, at trace level > 0
+ # MARPA_SLRTR_G1_ATTEMPTING_LEXEME
+ #
+ # Irrelevant, cannot happen
+ # MARPA_SLRTR_LEXEME_DISCARDED
+ #
+ # Irrelevant?  Need to investigate.
+ # MARPA_SLRTR_LEXEME_IGNORED
+ #
+ # Irrelevant, because this call overrides priorities
+ # MARPA_SLRTR_LEXEME_OUTPRIORITIZED
+ #
+ # These are about lexeme expectations, which are
+ # regarded as known before this call (or alternatively non-
+ # acceptance is caught here via rejection).  Ignore
+ # MARPA_SLRTR_LEXEME_ACCEPTABLE
+ # MARPA_SLRTR_LEXEME_EXPECTED
 
  # Variable arg as opposed to a ref,
  # because there seems to be no
