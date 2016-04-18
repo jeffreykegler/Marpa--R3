@@ -74,6 +74,12 @@ will have C<g1> as part of their name.
 
 =head2 $slr->current_g1_location() is now $slr->g1_pos()
 
+=head2 Deprecated named arguments of Scanless grammar elimated
+
+The C<actions>, C<action_object>, C<default_action>
+and C<default_empty_action>
+named arguments no longer exist.
+
 =head1 Copyright and License
 
 =for Marpa::R3::Display

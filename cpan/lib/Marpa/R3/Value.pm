@@ -532,42 +532,19 @@ sub resolve_recce {
 
     my $resolve_error;
 
-    my $default_action =
-        $grammar->[Marpa::R3::Internal::Grammar::DEFAULT_ACTION];
     my $default_action_resolution =
         Marpa::R3::Internal::Recognizer::resolve_action( $slr,
-        $default_action, \$resolve_error );
+        undef, \$resolve_error );
     Marpa::R3::exception(
-        "Could not resolve default action named '$default_action'\n",
+        "Could not resolve default action\n",
         q{  }, ( $resolve_error // 'Failed to resolve action' ) )
         if not $default_action_resolution;
-
-    my $default_empty_action =
-        $grammar->[Marpa::R3::Internal::Grammar::DEFAULT_EMPTY_ACTION];
-    my $default_empty_action_resolution;
-    if ($default_empty_action) {
-        $default_empty_action_resolution =
-            Marpa::R3::Internal::Recognizer::resolve_action( $slr,
-            $default_empty_action, \$resolve_error );
-        Marpa::R3::exception(
-            "Could not resolve default empty rule action named '$default_empty_action'",
-            q{  },
-            ( $resolve_error // 'Failed to resolve action' )
-        ) if not $default_empty_action_resolution;
-    } ## end if ($default_empty_action)
 
     my $rule_resolutions = [];
 
     RULE: for my $rule_id ( $grammar->rule_ids() ) {
 
         my $rule_resolution = resolve_rule_by_id( $slr, $rule_id );
-        if (    not defined $rule_resolution
-            and $default_empty_action
-            and $grammar_c->rule_length($rule_id) == 0 )
-        {
-            $rule_resolution = $default_empty_action_resolution;
-        } ## end if ( not defined $rule_resolution and $default_empty_action...)
-
         $rule_resolution //= $default_action_resolution;
 
         if ( not $rule_resolution ) {

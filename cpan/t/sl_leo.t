@@ -41,8 +41,8 @@ sub main::default_action {
 
 my $grammar = Marpa::R3::Scanless::G->new(
     { 
-        default_action => 'main::default_action',
         source => \(<<'END_OF_DSL'),
+:default ::= action => main::default_action
 :start ::= S
 S ::= 'a' A
 A ::= B

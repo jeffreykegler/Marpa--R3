@@ -141,7 +141,6 @@ __DATA__
     SYMBOLS { array of symbol refs }
 
     BLESS_PACKAGE { Default package into which nodes are blessed }
-    DEFAULT_ACTION { Action for rules without one }
     TRACE_FILE_HANDLE
     WARNINGS { print warnings about grammar? }
     INTERNAL { internal grammar -- relax various restrictions }
@@ -157,7 +156,6 @@ __DATA__
 
     { === Evaluator Fields === }
 
-    DEFAULT_EMPTY_ACTION { default value for empty rules }
     INFINITE_ACTION
 
     =LAST_EVALUATOR_FIELD

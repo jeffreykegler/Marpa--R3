@@ -97,30 +97,6 @@ Trace output and warning messages
 go to the trace file handle.
 By default the trace file handle is C<STDERR>.
 
-=head2 Discouraged named arguments
-
-=head3 action_object
-
-Use of this argument is discouraged
-in favor of L<the C<semantics_package> named argument of the SLIF
-recognizer|Marpa::R3::Scanless::R/"semantics_package">.
-Like the C<semantics_package> named argument, it sets the semantic
-package.
-Unlike the C<semantics_package> named argument, it is a fatal error if used
-together with an explicit per-parse argument of the SLIF recognizer's C<value()> method.
-It is also a fatal error to try to use the C<semantics_package>
-and C<action_object> arguments together.
-
-=head3 default_action
-
-Use of this argument is discouraged in favor of using the
-L<C<action> adverb|Marpa::R3::Scanless::DSL/"action">
-in a
-L<default pseudo-rule|Marpa::R3::Scanless::DSL/"Default pseudo-rule">.
-Specifies the C<default_action> named argument that
-will be used for the G1 grammar.
-For details, see L<Marpa::R3::NAIF::Grammar/"default_action">.
-
 =head1 Mutators
 
 =head2 parse()

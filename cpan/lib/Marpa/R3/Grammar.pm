@@ -123,8 +123,6 @@ sub Marpa::R3::Grammar::set {
                 qw{ _internal_
                 bless_package
                 infinite_action
-                default_action
-                default_empty_action
                 default_rank
                 inaccessible_ok
                 rules
@@ -234,18 +232,8 @@ sub Marpa::R3::Grammar::set {
 
         } ## end if ( defined( my $value = $args->{'rules'} ) )
 
-        if ( exists $args->{'default_empty_action'} ) {
-            my $value = $args->{'default_empty_action'};
-            $grammar->[Marpa::R3::Internal::Grammar::DEFAULT_EMPTY_ACTION] =
-                $value;
-        }
-
         if ( defined( my $value = $args->{'bless_package'} ) ) {
             $grammar->[Marpa::R3::Internal::Grammar::BLESS_PACKAGE] = $value;
-        }
-
-        if ( defined( my $value = $args->{'default_action'} ) ) {
-            $grammar->[Marpa::R3::Internal::Grammar::DEFAULT_ACTION] = $value;
         }
 
         if ( defined( my $value = $args->{'infinite_action'} ) ) {
