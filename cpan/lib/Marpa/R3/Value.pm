@@ -528,10 +528,6 @@ sub resolve_recce {
                 = $resolution->[1];
             last FIND_CONSTRUCTOR;
         }
-        last FIND_CONSTRUCTOR if $package_source ne 'legacy';
-        Marpa::R3::exception(
-            qq{Could not find constructor "$constructor_name"},
-            q{  }, ( $resolve_error // 'Failed to resolve action' ) );
     } ## end FIND_CONSTRUCTOR:
 
     my $resolve_error;

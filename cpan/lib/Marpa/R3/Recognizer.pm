@@ -59,10 +59,7 @@ sub Marpa::R3::Scanless::R::reset_evaluation {
     my $grammar = $recce->[Marpa::R3::Internal::Recognizer::GRAMMAR];
     my $package_source =
         $slr->[Marpa::R3::Internal::Scanless::R::RESOLVE_PACKAGE_SOURCE];
-    if ( defined $package_source and $package_source ne 'legacy' ) {
-
-        # Packaage source, once legacy, stays legacy
-        # Otherwise, reset it
+    if ( defined $package_source ) {
         $slr->[Marpa::R3::Internal::Scanless::R::RESOLVE_PACKAGE_SOURCE] =
             undef;
     } ## end if ( defined $package_source and $package_source ne ...)
