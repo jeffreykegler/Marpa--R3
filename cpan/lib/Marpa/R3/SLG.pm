@@ -94,7 +94,7 @@ sub Marpa::R3::Internal::Scanless::G::set {
 
     state $copy_to_g1_args =
         { map { ( $_, 1 ); }
-            qw(trace_file_handle action_object default_action bless_package) };
+            qw(trace_file_handle default_action bless_package) };
     state $set_method_args =
         { map { ( $_, 1 ); } qw(trace_file_handle trace_terminals) };
     state $new_method_args = {

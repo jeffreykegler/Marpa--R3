@@ -274,14 +274,6 @@ sub Marpa::R3::Scanless::R::new {
 
     $recce_c->ruby_slippers_set(1);
 
-    if (   defined $thick_g1_grammar->[Marpa::R3::Internal::Grammar::ACTION_OBJECT]
-        or defined $thick_g1_grammar->[Marpa::R3::Internal::Grammar::ACTIONS]
-        or not defined $thick_g1_grammar->[Marpa::R3::Internal::Grammar::INTERNAL] )
-    {
-        $slr->[Marpa::R3::Internal::Scanless::R::RESOLVE_PACKAGE_SOURCE] =
-            'legacy';
-    } ## end if ( defined $grammar->[...])
-
     if ( defined( my $value = $g1_recce_args->{'leo'} ) ) {
             my $boolean = $value ? 1 : 0;
             $thick_g1_recce->use_leo_set($boolean);

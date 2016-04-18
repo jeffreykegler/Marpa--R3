@@ -121,8 +121,6 @@ sub Marpa::R3::Grammar::set {
         state $grammar_options = {
             map { ( $_, 1 ) }
                 qw{ _internal_
-                action_object
-                actions
                 bless_package
                 infinite_action
                 default_action
@@ -242,16 +240,8 @@ sub Marpa::R3::Grammar::set {
                 $value;
         }
 
-        if ( defined( my $value = $args->{'actions'} ) ) {
-            $grammar->[Marpa::R3::Internal::Grammar::ACTIONS] = $value;
-        }
-
         if ( defined( my $value = $args->{'bless_package'} ) ) {
             $grammar->[Marpa::R3::Internal::Grammar::BLESS_PACKAGE] = $value;
-        }
-
-        if ( defined( my $value = $args->{'action_object'} ) ) {
-            $grammar->[Marpa::R3::Internal::Grammar::ACTION_OBJECT] = $value;
         }
 
         if ( defined( my $value = $args->{'default_action'} ) ) {

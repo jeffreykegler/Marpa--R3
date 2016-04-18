@@ -514,19 +514,9 @@ sub resolve_recce {
     $slr->[Marpa::R3::Internal::Scanless::R::RESOLVE_PACKAGE_SOURCE] =
         $package_source;
 
-    if ( $package_source eq 'legacy' ) {
-
-        # RESOLVE_PACKAGE is already set if not 'legacy'
-        $slr->[Marpa::R3::Internal::Scanless::R::RESOLVE_PACKAGE] =
-            $grammar->[Marpa::R3::Internal::Grammar::ACTIONS]
-            // $grammar->[Marpa::R3::Internal::Grammar::ACTION_OBJECT];
-    } ## end if ( $package_source eq 'legacy' )
-
     FIND_CONSTRUCTOR: {
         my $constructor_package =
-            ( $package_source eq 'legacy' )
-            ? $grammar->[Marpa::R3::Internal::Grammar::ACTION_OBJECT]
-            : $slr->[Marpa::R3::Internal::Scanless::R::RESOLVE_PACKAGE];
+            $slr->[Marpa::R3::Internal::Scanless::R::RESOLVE_PACKAGE];
         last FIND_CONSTRUCTOR if not defined $constructor_package;
         my $constructor_name = $constructor_package . q{::new};
         my $resolve_error;
@@ -1392,16 +1382,6 @@ sub Marpa::R3::Recognizer::value {
                 ->[Marpa::R3::Internal::Scanless::R::RESOLVE_PACKAGE_SOURCE];
             last CHECK_ARG
                 if $package_source eq 'semantics_package';    # Anything is OK
-            if ( $package_source eq 'legacy' ) {
-                if ( defined $per_parse_arg ) {
-                    Marpa::R3::exception(
-                        "value() called with an argument while incompatible options are in use.\n",
-                        "  Often this means that the discouraged 'action_object' named argument was used,\n",
-                        "  and that 'semantics_package' should be used instead.\n"
-                    );
-                } ## end if ( defined $per_parse_arg )
-                last CHECK_ARG;
-            } ## end if ( $package_source eq 'legacy' )
 
             # If here the resolve package source is 'arg'
             if ( not defined $per_parse_arg ) {
@@ -1496,17 +1476,9 @@ sub Marpa::R3::Recognizer::value {
         # Do not run the constructor if there isn't one
         last RUN_CONSTRUCTOR if not defined $per_parse_constructor;
 
-        my $constructor_arg0;
-        if ( $slr->[Marpa::R3::Internal::Scanless::R::RESOLVE_PACKAGE_SOURCE]
-            eq 'legacy' )
-        {
-            $constructor_arg0 =
-                $grammar->[Marpa::R3::Internal::Grammar::ACTION_OBJECT];
-        } ## end if ( $recce->[...])
-        else {
-            $constructor_arg0 =
+        my $constructor_arg0 =
                 $slr->[Marpa::R3::Internal::Scanless::R::RESOLVE_PACKAGE];
-        }
+
         my @warnings;
         my $eval_ok;
         my $fatal_error;

@@ -140,7 +140,6 @@ __DATA__
 
     SYMBOLS { array of symbol refs }
 
-    ACTIONS { Default package in which to find actions }
     BLESS_PACKAGE { Default package into which nodes are blessed }
     DEFAULT_ACTION { Action for rules without one }
     TRACE_FILE_HANDLE
@@ -159,7 +158,6 @@ __DATA__
     { === Evaluator Fields === }
 
     DEFAULT_EMPTY_ACTION { default value for empty rules }
-    ACTION_OBJECT
     INFINITE_ACTION
 
     =LAST_EVALUATOR_FIELD

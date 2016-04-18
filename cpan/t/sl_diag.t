@@ -30,6 +30,7 @@ use Marpa::R3::Test;
 use Marpa::R3;
 
 my $dsl = <<'END_OF_RULES';
+:default ::= action => My_Actions::do_arg0
 :start ::= Script
 Script ::= Calculation* action => do_list
 Calculation ::= Expression | ('say') Expression
@@ -50,12 +51,7 @@ whitespace ~ [\s]+
 <hash comment char> ~ [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
 END_OF_RULES
 
-my $grammar = Marpa::R3::Scanless::G->new(
-    {   action_object  => 'My_Actions',
-        default_action => 'do_arg0',
-        source => \$dsl,
-    }
-);
+my $grammar = Marpa::R3::Scanless::G->new( { source => \$dsl, });
 
 my $g0_rules_description;
 
@@ -157,6 +153,7 @@ sub my_parser {
     open my $trace_fh, q{>}, \$trace_output;
     my $recce = Marpa::R3::Scanless::R->new(
         {   grammar               => $grammar,
+            semantics_package => 'My_Actions',
             trace_terminals       => 2,
             trace_file_handle     => $trace_fh,
             too_many_earley_items => 100,         # test this
