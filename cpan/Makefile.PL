@@ -419,19 +419,19 @@ xs/R3$(OBJ_EXT): xs/libmarpa$(LIB_EXT) \
     xs/marpa_slifop.h
 
 xs/general_pattern.xsh: xs/gp_generate.pl
-	perl xs/gp_generate.pl xs/general_pattern.xsh
+	$(RUNPERL) xs/gp_generate.pl xs/general_pattern.xsh
 
 xs/marpa_slifop.h: xs/create_ops.pl
-	perl xs/create_ops.pl > xs/marpa_slifop.h
+	$(RUNPERL) xs/create_ops.pl > xs/marpa_slifop.h
 
 xs/marpa.h: $(LIBMARPA_BUILD_DIR)/marpa.h
-	cp $? $@
+	$(CP) $? $@
 
 xs/marpa_codes.h: $(LIBMARPA_BUILD_DIR)/marpa_codes.h
-	cp $? $@
+	$(CP) $? $@
 
 xs/libmarpa$(LIB_EXT): $(LIBMARPA_BUILD_DIR)/stamp-h1
-	cp $(LIBMARPA_IN_BUILD_DIR) $@
+	$(CP) $(LIBMARPA_IN_BUILD_DIR) $@
 
 END_OF_POSTAMBLE_PIECE
 
