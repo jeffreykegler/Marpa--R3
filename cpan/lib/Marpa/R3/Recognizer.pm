@@ -69,7 +69,6 @@ sub Marpa::R3::Recognizer::reset_evaluation {
     $recce->[Marpa::R3::Internal::Recognizer::B_C]                   = undef;
     $recce->[Marpa::R3::Internal::Recognizer::O_C]                   = undef;
     $recce->[Marpa::R3::Internal::Recognizer::PER_PARSE_CONSTRUCTOR] = undef;
-    $recce->[Marpa::R3::Internal::Recognizer::READ_STRING_ERROR]     = undef;
     $recce->[Marpa::R3::Internal::Recognizer::RESOLVE_PACKAGE]       = undef;
     $recce->[Marpa::R3::Internal::Recognizer::NULL_VALUES]        = undef;
 

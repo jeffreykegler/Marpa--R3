@@ -200,7 +200,6 @@ __DATA__
     evaluation is reset }
 
     NO_PARSE { no parse found in parse series -- memoized }
-    READ_STRING_ERROR
     NULL_VALUES
 
     { Fields for new SLIF resolution logic
