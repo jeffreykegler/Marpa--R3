@@ -47,6 +47,8 @@ sub Marpa::R3::Internal::Recognizer::resolve_action {
     my ( $slr, $closure_name, $p_error ) = @_;
     my $recce =
         $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
+    my $trace_file_handle =
+        $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
     my $grammar  = $recce->[Marpa::R3::Internal::Recognizer::GRAMMAR];
     my $trace_actions =
         $recce->[Marpa::R3::Internal::Recognizer::TRACE_ACTIONS];
@@ -121,7 +123,7 @@ sub Marpa::R3::Internal::Recognizer::resolve_action {
 
     if ( defined $closure ) {
         if ($trace_actions) {
-            print {$Marpa::R3::Internal::TRACE_FH}
+            print {$trace_file_handle}
                 qq{Successful resolution of action "$closure_name" as $type },
                 'to ', $fully_qualified_name, "\n"
                 or Marpa::R3::exception('Could not print to trace file');
@@ -137,7 +139,7 @@ sub Marpa::R3::Internal::Recognizer::resolve_action {
                     qq{Failed resolution of action "$closure_name" to $fully_qualified_name\n}
                     . qq{  $fully_qualified_name is present as a $slot, but a $slot is not an acceptable resolution\n};
                 if ($trace_actions) {
-                    print {$Marpa::R3::Internal::TRACE_FH} $error
+                    print {$trace_file_handle} $error
                         or
                         Marpa::R3::exception('Could not print to trace file');
                 }
@@ -152,7 +154,7 @@ sub Marpa::R3::Internal::Recognizer::resolve_action {
             qq{Failed resolution of action "$closure_name" to $fully_qualified_name\n};
         ${$p_error} = $error if defined $p_error;
         if ($trace_actions) {
-            print {$Marpa::R3::Internal::TRACE_FH} $error
+            print {$trace_file_handle} $error
                 or Marpa::R3::exception('Could not print to trace file');
         }
     }
@@ -494,7 +496,7 @@ sub resolve_recce {
     my $trace_actions =
         $recce->[Marpa::R3::Internal::Recognizer::TRACE_ACTIONS] // 0;
     my $trace_file_handle =
-        $recce->[Marpa::R3::Internal::Recognizer::TRACE_FILE_HANDLE];
+        $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
 
     my $package_source =
         $recce->[Marpa::R3::Internal::Recognizer::RESOLVE_PACKAGE_SOURCE];
@@ -671,7 +673,7 @@ sub registration_init {
         $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
 
     my $trace_file_handle =
-        $recce->[Marpa::R3::Internal::Recognizer::TRACE_FILE_HANDLE];
+        $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
     my $grammar   = $recce->[Marpa::R3::Internal::Recognizer::GRAMMAR];
     my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
     my $recce_c   = $recce->[Marpa::R3::Internal::Recognizer::C];
@@ -1348,8 +1350,7 @@ sub Marpa::R3::Recognizer::value {
     my $trace_values =
         $recce->[Marpa::R3::Internal::Recognizer::TRACE_VALUES] // 0;
     my $trace_file_handle =
-        $recce->[Marpa::R3::Internal::Recognizer::TRACE_FILE_HANDLE];
-    local $Marpa::R3::Internal::TRACE_FH = $trace_file_handle;
+        $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
 
     my $rules   = $grammar->[Marpa::R3::Internal::Grammar::RULES];
     my $symbols = $grammar->[Marpa::R3::Internal::Grammar::SYMBOLS];
@@ -1605,7 +1606,7 @@ sub Marpa::R3::Recognizer::value {
                 my ( $event_type, @event_data ) = @{$event};
                 if ( $event_type eq 'MARPA_STEP_TOKEN' ) {
                     my ( $token_id, $token_value_ix, $token_value ) = @event_data;
-                    trace_token_evaluation( $recce, $value, $token_id,
+                    trace_token_evaluation( $slr, $value, $token_id,
                         $token_value );
                     next EVENT;
                 } ## end if ( $event_type eq 'MARPA_STEP_TOKEN' )
@@ -1670,7 +1671,7 @@ sub Marpa::R3::Recognizer::value {
             } ## end if ( not $eval_ok or @warnings )
 
             $value->result_set($result);
-            trace_token_evaluation( $recce, $value, $token_id, \$result )
+            trace_token_evaluation( $slr, $value, $token_id, \$result )
                 if $trace_values;
             next STEP;
         } ## end if ( $value_type eq 'MARPA_STEP_NULLING_SYMBOL' )
@@ -2001,14 +2002,19 @@ sub Marpa::R3::Recognizer::show_tree {
 } ## end sub Marpa::R3::Recognizer::show_tree
 
 sub trace_token_evaluation {
-    my ( $recce, $value, $token_id, $token_value ) = @_;
+    my ( $slr, $value, $token_id, $token_value ) = @_;
+    my $recce =
+        $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
+    my $trace_file_handle =
+        $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
+
     my $order   = $recce->[Marpa::R3::Internal::Recognizer::O_C];
     my $tree    = $recce->[Marpa::R3::Internal::Recognizer::T_C];
     my $grammar = $recce->[Marpa::R3::Internal::Recognizer::GRAMMAR];
 
     my $nook_ix = $value->_marpa_v_nook();
     if ( not defined $nook_ix ) {
-        print {$Marpa::R3::Internal::TRACE_FH} "Nulling valuator\n"
+        print {$trace_file_handle} "Nulling valuator\n"
             or Marpa::R3::exception('Could not print to trace file');
         return;
     }
@@ -2021,7 +2027,7 @@ sub trace_token_evaluation {
         $token_name = $grammar->symbol_name($token_id);
     }
 
-    print {$Marpa::R3::Internal::TRACE_FH}
+    print {$trace_file_handle}
         'Pushed value from ',
         Marpa::R3::Recognizer::and_node_tag( $recce, $and_node_id ),
         ': ',
