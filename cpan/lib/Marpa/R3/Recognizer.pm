@@ -113,8 +113,6 @@ sub Marpa::R3::Scanless::R::naif_set {
                 too_many_earley_items
                 trace_actions
                 trace_earley_sets
-                trace_fh
-                trace_file_handle
                 trace_terminals
                 trace_values
                 warnings
@@ -174,18 +172,6 @@ sub Marpa::R3::Scanless::R::naif_set {
             $recce->[Marpa::R3::Internal::Recognizer::RANKING_METHOD] =
                 $value;
         } ## end if ( defined( my $value = $args->{'ranking_method'} ...))
-
-        if ( defined( my $value = $args->{'trace_fh'} ) ) {
-            $trace_fh =
-                $recce->[Marpa::R3::Internal::Recognizer::TRACE_FILE_HANDLE] =
-                $value;
-        }
-
-        if ( defined( my $value = $args->{'trace_file_handle'} ) ) {
-            $trace_fh =
-                $recce->[Marpa::R3::Internal::Recognizer::TRACE_FILE_HANDLE] =
-                $value;
-        }
 
         if ( defined( my $value = $args->{'trace_actions'} ) ) {
             $recce->[Marpa::R3::Internal::Recognizer::TRACE_ACTIONS] = $value;

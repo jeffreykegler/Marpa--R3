@@ -200,6 +200,24 @@ sub Marpa::R3::Scanless::R::rule_show {
     return $slg->rule_show($rule_id);
 }
 
+sub flatten_hash_args {
+    my ($hash_arg_array) = @_;
+    my %flat_args = ();
+    for my $hash_ref (@{$hash_arg_array}) {
+        my $ref_type = ref $hash_ref;
+        if ( not $ref_type ) {
+            return undef, qq{"%s expects args as ref to HASH, got non-reference instead};
+        } ## end if ( not $ref_type )
+        if ( $ref_type ne 'HASH' ) {
+            return undef, qq{"%s expects args as ref to HASH, got ref to $ref_type instead};
+        } ## end if ( $ref_type ne 'HASH' )
+        ARG: for my $arg_name ( keys %{$hash_ref} ) {
+            $flat_args{$arg_name} = $hash_ref->{$arg_name};
+        }
+    } ## end for my $args (@hash_ref_args)
+    return \%flat_args;
+}
+
 sub Marpa::R3::Scanless::R::new {
     my ( $class, @args ) = @_;
 
@@ -212,15 +230,15 @@ sub Marpa::R3::Scanless::R::new {
     $slr->[Marpa::R3::Internal::Scanless::R::TRACE_LEXERS] = 0;
     $slr->[Marpa::R3::Internal::Scanless::R::TRACE_TERMINALS] = 0;
 
-    my ($g1_recce_args, $flat_args) =
-        Marpa::R3::Internal::Scanless::R::set( $slr, "new", @args );
-    my $too_many_earley_items = $g1_recce_args->{too_many_earley_items};
+    my ($flat_args, $error_message) = flatten_hash_args(\@args);
+    Marpa::R3::exception( sprintf $error_message, '$slr->new' ) if not $flat_args;
 
-    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::GRAMMAR];
-
+    my $slg = $flat_args->{grammar};
     Marpa::R3::exception(
         qq{Marpa::R3::Scanless::R::new() called without a "grammar" argument}
     ) if not defined $slg;
+    $slr->[Marpa::R3::Internal::Scanless::R::GRAMMAR] = $slg;
+    delete $flat_args->{grammar};
 
     my $slg_class = 'Marpa::R3::Scanless::G';
     if ( not blessed $slg or not $slg->isa($slg_class) ) {
@@ -233,16 +251,16 @@ sub Marpa::R3::Scanless::R::new {
 
     my $thick_g1_grammar =
         $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
+    $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE] =
+         $thick_g1_grammar->[Marpa::R3::Internal::Grammar::TRACE_FILE_HANDLE];
 
-    my $trace_file_handle = $g1_recce_args->{trace_file_handle};
-    $trace_file_handle //= $thick_g1_grammar->[Marpa::R3::Internal::Grammar::TRACE_FILE_HANDLE] ;
-    $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE] = $trace_file_handle;
+    my $g1_recce_args =
+        Marpa::R3::Internal::Scanless::R::set( $slr, "new",  $flat_args );
+    my $too_many_earley_items = $g1_recce_args->{too_many_earley_items};
 
     my $thick_g1_recce =
         $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE] = bless [],
         'Marpa::R3::Recognizer';
-
-    $thick_g1_recce->[Marpa::R3::Internal::Recognizer::TRACE_FILE_HANDLE] = $trace_file_handle;
 
     $thick_g1_recce->[Marpa::R3::Internal::Recognizer::GRAMMAR] = $thick_g1_grammar;
 
@@ -340,7 +358,9 @@ sub Marpa::R3::Scanless::R::new {
     if ( $thick_g1_recce->[Marpa::R3::Internal::Recognizer::TRACE_TERMINALS] > 1 ) {
         my @terminals_expected = @{ $thick_g1_recce->terminals_expected() };
         for my $terminal ( sort @terminals_expected ) {
-            say {$trace_file_handle}
+            # We may have set and reset the trace file handle during this method,
+            # so we do not memoize its value, bjut get it directly
+            say {$slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE]}
                 qq{Expecting "$terminal" at earleme 0}
                 or Marpa::R3::exception("Cannot print: $ERRNO");
         }
@@ -353,8 +373,10 @@ sub Marpa::R3::Scanless::R::new {
 
 sub Marpa::R3::Scanless::R::set {
     my ( $slr, @args ) = @_;
+    my ($flat_args, $error_message) = flatten_hash_args(\@args);
+    Marpa::R3::exception( sprintf $error_message, '$slr->set()' ) if not $flat_args;
     my $naif_recce_args =
-        Marpa::R3::Internal::Scanless::R::set( $slr, "set", @args );
+        Marpa::R3::Internal::Scanless::R::set( $slr, "set", $flat_args );
     my $naif_recce = $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
     $slr->naif_set($naif_recce_args);
     return $slr;
@@ -369,16 +391,16 @@ sub Marpa::R3::Scanless::R::set {
 # contexts is a small price to pay.
 sub Marpa::R3::Internal::Scanless::R::set {
 
-    my ( $slr, $method, @hash_ref_args ) = @_;
+    my ( $slr, $method, $flat_args ) = @_;
 
     # These NAIF recce args are allowed in all contexts
     state $common_naif_recce_args = {
         map { ( $_, 1 ); }
             qw(end max_parses semantics_package too_many_earley_items
-            trace_actions trace_file_handle trace_terminals trace_values)
+            trace_actions trace_terminals trace_values)
     };
     state $common_slif_recce_args =
-        { map { ( $_, 1 ); } qw(trace_lexers rejection exhaustion) };
+        { map { ( $_, 1 ); } qw(trace_lexers trace_file_handle rejection exhaustion) };
     state $set_method_args = {
         map { ( $_, 1 ); } (
             keys %{$common_slif_recce_args},
@@ -396,32 +418,10 @@ sub Marpa::R3::Internal::Scanless::R::set {
         )
     };
 
-    for my $args (@hash_ref_args) {
-        my $ref_type = ref $args;
-        if ( not $ref_type ) {
-            Marpa::R3::exception( q{$slr->}
-                    . $method
-                    . qq{() expects args as ref to HASH; got non-reference instead}
-            );
-        } ## end if ( not $ref_type )
-        if ( $ref_type ne 'HASH' ) {
-            Marpa::R3::exception( q{$slr->}
-                    . $method
-                    . qq{() expects args as ref to HASH, got ref to $ref_type instead}
-            );
-        } ## end if ( $ref_type ne 'HASH' )
-    } ## end for my $args (@hash_ref_args)
-
-    my %flat_args = ();
-    for my $hash_ref (@hash_ref_args) {
-        ARG: for my $arg_name ( keys %{$hash_ref} ) {
-            $flat_args{$arg_name} = $hash_ref->{$arg_name};
-        }
-    }
     my $ok_args = $set_method_args;
     $ok_args = $new_method_args            if $method eq 'new';
     $ok_args = $series_restart_method_args if $method eq 'series_restart';
-    my @bad_args = grep { not $ok_args->{$_} } keys %flat_args;
+    my @bad_args = grep { not $ok_args->{$_} } keys %{$flat_args};
     if ( scalar @bad_args ) {
         Marpa::R3::exception(
             q{Bad named argument(s) to $slr->}
@@ -433,10 +433,14 @@ sub Marpa::R3::Internal::Scanless::R::set {
     } ## end if ( scalar @bad_args )
 
     # Special SLIF (not NAIF) recce arg processing goes here
-    if ( exists $flat_args{'exhaustion'} ) {
+    if ( my $value = $flat_args->{'trace_file_handle'} ) {
+        $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE] = $value;
+    }
+
+    if ( exists $flat_args->{'exhaustion'} ) {
 
         state $exhaustion_actions = { map { ( $_, 0 ) } qw(fatal event) };
-        my $value = $flat_args{'exhaustion'} // 'undefined';
+        my $value = $flat_args->{'exhaustion'} // 'undefined';
         Marpa::R3::exception(
             qq{'exhaustion' named arg value is $value (should be one of },
             (   join q{, },
@@ -446,13 +450,13 @@ sub Marpa::R3::Internal::Scanless::R::set {
         ) if not exists $exhaustion_actions->{$value};
         $slr->[Marpa::R3::Internal::Scanless::R::EXHAUSTION_ACTION] = $value;
 
-    } ## end if ( exists $flat_args{'exhaustion'} )
+    }
 
     # Special SLIF (not NAIF) recce arg processing goes here
-    if ( exists $flat_args{'rejection'} ) {
+    if ( exists $flat_args->{'rejection'} ) {
 
         state $rejection_actions = { map { ( $_, 0 ) } qw(fatal event) };
-        my $value = $flat_args{'rejection'} // 'undefined';
+        my $value = $flat_args->{'rejection'} // 'undefined';
         Marpa::R3::exception(
             qq{'rejection' named arg value is $value (should be one of },
             (   join q{, },
@@ -462,25 +466,22 @@ sub Marpa::R3::Internal::Scanless::R::set {
         ) if not exists $rejection_actions->{$value};
         $slr->[Marpa::R3::Internal::Scanless::R::REJECTION_ACTION] = $value;
 
-    } ## end if ( exists $flat_args{'rejection'} )
+    }
 
     # A bit hack-ish, but some named args are copies straight to an member of
     # the Scanless::R class, so this maps named args to the index of the array
     # that holds the members.
     state $copy_arg_to_index = {
-        trace_file_handle =>
-            Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE,
         trace_lexers    => Marpa::R3::Internal::Scanless::R::TRACE_LEXERS,
         trace_terminals => Marpa::R3::Internal::Scanless::R::TRACE_TERMINALS,
-        grammar         => Marpa::R3::Internal::Scanless::R::GRAMMAR,
     };
 
-    ARG: for my $arg_name ( keys %flat_args ) {
+    ARG: for my $arg_name ( keys %{$flat_args} ) {
         my $index = $copy_arg_to_index->{$arg_name};
         next ARG if not defined $index;
-        my $value = $flat_args{$arg_name};
+        my $value = $flat_args->{$arg_name};
         $slr->[$index] = $value;
-    } ## end ARG: for my $arg_name ( keys %flat_args )
+    }
 
     # Normalize trace levels to numbers
     for my $trace_level_arg (
@@ -498,19 +499,19 @@ sub Marpa::R3::Internal::Scanless::R::set {
     state $copyable_naif_recce_args = {
         map { ( $_, 1 ); }
             qw(end max_parses semantics_package too_many_earley_items ranking_method
-            trace_actions trace_file_handle trace_terminals trace_values)
+            trace_actions trace_terminals trace_values)
     };
 
     # Prune flat args of all those named args which are NOT to be copied
     # into the NAIF recce args
     my %g1_recce_args = ();
     for my $arg_name ( grep { $copyable_naif_recce_args->{$_} }
-        keys %flat_args )
+        keys %{$flat_args} )
     {
-        $g1_recce_args{$arg_name} = $flat_args{$arg_name};
+        $g1_recce_args{$arg_name} = $flat_args->{$arg_name};
     }
 
-    return \%g1_recce_args, \%flat_args;
+    return \%g1_recce_args;
 
 } ## end sub Marpa::R3::Internal::Scanless::R::set
 
@@ -1551,7 +1552,10 @@ sub Marpa::R3::Scanless::R::series_restart {
     $slr->[Marpa::R3::Internal::Scanless::R::REJECTION_ACTION] = 'fatal';
 
     $thick_g1_recce->reset_evaluation();
-    my ($g1_recce_args) = Marpa::R3::Internal::Scanless::R::set($slr, "series_restart", @args );
+
+    my ($flat_args, $error_message) = flatten_hash_args(\@args);
+    Marpa::R3::exception( sprintf $error_message, '$slr->series_restart()' ) if not $flat_args;
+    my ($g1_recce_args) = Marpa::R3::Internal::Scanless::R::set($slr, "series_restart", $flat_args );
     $slr->naif_set( $g1_recce_args );
     return 1;
 }
