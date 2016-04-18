@@ -242,8 +242,7 @@ sub Marpa::R3::Scanless::R::new {
         $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE] = bless [],
         'Marpa::R3::Recognizer';
 
-    local $Marpa::R3::Internal::TRACE_FH =
-        $thick_g1_recce->[Marpa::R3::Internal::Recognizer::TRACE_FILE_HANDLE] = $trace_file_handle;
+    $thick_g1_recce->[Marpa::R3::Internal::Recognizer::TRACE_FILE_HANDLE] = $trace_file_handle;
 
     $thick_g1_recce->[Marpa::R3::Internal::Recognizer::GRAMMAR] = $thick_g1_grammar;
 
@@ -341,7 +340,7 @@ sub Marpa::R3::Scanless::R::new {
     if ( $thick_g1_recce->[Marpa::R3::Internal::Recognizer::TRACE_TERMINALS] > 1 ) {
         my @terminals_expected = @{ $thick_g1_recce->terminals_expected() };
         for my $terminal ( sort @terminals_expected ) {
-            say {$Marpa::R3::Internal::TRACE_FH}
+            say {$trace_file_handle}
                 qq{Expecting "$terminal" at earleme 0}
                 or Marpa::R3::exception("Cannot print: $ERRNO");
         }
