@@ -187,8 +187,6 @@ __DATA__
 
     ASF_OR_NODES { memoized or-nodes }
 
-    TRACE_FILE_HANDLE
-
     END_OF_PARSE
     MAX_PARSES
     RANKING_METHOD
