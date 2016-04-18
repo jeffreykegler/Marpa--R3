@@ -44,7 +44,9 @@ package Marpa::R3::Internal::Value;
 # Given the grammar and an action name, resolve it to a closure,
 # or return undef
 sub Marpa::R3::Internal::Recognizer::resolve_action {
-    my ( $recce, $closure_name, $p_error ) = @_;
+    my ( $slr, $closure_name, $p_error ) = @_;
+    my $recce =
+        $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
     my $grammar  = $recce->[Marpa::R3::Internal::Recognizer::GRAMMAR];
     my $trace_actions =
         $recce->[Marpa::R3::Internal::Recognizer::TRACE_ACTIONS];
@@ -464,7 +466,7 @@ sub resolve_rule_by_id {
     my $action_name = $rule->[Marpa::R3::Internal::Rule::ACTION_NAME];
     my $resolve_error;
     return if not defined $action_name;
-    my $resolution = Marpa::R3::Internal::Recognizer::resolve_action( $recce,
+    my $resolution = Marpa::R3::Internal::Recognizer::resolve_action( $slr,
         $action_name, \$resolve_error );
 
     if ( not $resolution ) {
@@ -525,7 +527,7 @@ sub resolve_recce {
         my $constructor_name = $constructor_package . q{::new};
         my $resolve_error;
         my $resolution =
-            Marpa::R3::Internal::Recognizer::resolve_action( $recce,
+            Marpa::R3::Internal::Recognizer::resolve_action( $slr,
             $constructor_name, \$resolve_error );
         if ($resolution) {
             $recce->[ Marpa::R3::Internal::Recognizer::PER_PARSE_CONSTRUCTOR ]
@@ -543,7 +545,7 @@ sub resolve_recce {
     my $default_action =
         $grammar->[Marpa::R3::Internal::Grammar::DEFAULT_ACTION];
     my $default_action_resolution =
-        Marpa::R3::Internal::Recognizer::resolve_action( $recce,
+        Marpa::R3::Internal::Recognizer::resolve_action( $slr,
         $default_action, \$resolve_error );
     Marpa::R3::exception(
         "Could not resolve default action named '$default_action'\n",
@@ -555,7 +557,7 @@ sub resolve_recce {
     my $default_empty_action_resolution;
     if ($default_empty_action) {
         $default_empty_action_resolution =
-            Marpa::R3::Internal::Recognizer::resolve_action( $recce,
+            Marpa::R3::Internal::Recognizer::resolve_action( $slr,
             $default_empty_action, \$resolve_error );
         Marpa::R3::exception(
             "Could not resolve default empty rule action named '$default_empty_action'",
