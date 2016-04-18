@@ -1,3 +1,6 @@
 # this INSTALL.SKIP is for the copy of the libmarpa code
 # file names must be cpan-directory relative
 ^engine/read_only/stamp-h1$
+# ExtUtils::Install uses system-specific paths
+# so this will skip the file under Windows
+^engine\\read_only\\stamp-h1$
