@@ -335,7 +335,7 @@ sub Marpa::R3::Scanless::R::new {
         Marpa::R3::exception( 'Recognizer start of input failed: ', $error );
     }
 
-    $thick_g1_recce->set($g1_recce_args);
+    $slr->naif_set($g1_recce_args);
 
     if ( $thick_g1_recce->[Marpa::R3::Internal::Recognizer::TRACE_TERMINALS] > 1 ) {
         my @terminals_expected = @{ $thick_g1_recce->terminals_expected() };
@@ -356,7 +356,7 @@ sub Marpa::R3::Scanless::R::set {
     my $naif_recce_args =
         Marpa::R3::Internal::Scanless::R::set( $slr, "set", @args );
     my $naif_recce = $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
-    $naif_recce->set($naif_recce_args);
+    $slr->naif_set($naif_recce_args);
     return $slr;
 } ## end sub Marpa::R3::Scanless::R::set
 
@@ -1564,7 +1564,7 @@ sub Marpa::R3::Scanless::R::series_restart {
 
     $thick_g1_recce->reset_evaluation();
     my ($g1_recce_args) = Marpa::R3::Internal::Scanless::R::set($slr, "series_restart", @args );
-    $thick_g1_recce->set( $g1_recce_args );
+    $slr->naif_set( $g1_recce_args );
     return 1;
 }
 

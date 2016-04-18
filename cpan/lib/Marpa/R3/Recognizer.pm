@@ -82,13 +82,15 @@ sub Marpa::R3::Recognizer::reset_evaluation {
     return;
 } ## end sub Marpa::R3::Recognizer::reset_evaluation
 
-sub Marpa::R3::Recognizer::set {
-    my ( $recce, @arg_hashes ) = @_;
+sub Marpa::R3::Scanless::R::naif_set {
+    my ( $slr, @arg_hashes ) = @_;
+    my $recce =
+        $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
     my $recce_c = $recce->[Marpa::R3::Internal::Recognizer::C];
 
     # This may get changed below
     my $trace_fh =
-        $recce->[Marpa::R3::Internal::Recognizer::TRACE_FILE_HANDLE];
+        $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
 
     for my $args (@arg_hashes) {
 
