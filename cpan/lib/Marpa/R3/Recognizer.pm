@@ -113,7 +113,6 @@ sub Marpa::R3::Recognizer::set {
                 trace_earley_sets
                 trace_fh
                 trace_file_handle
-                trace_terminals
                 trace_values
                 warnings
                 )
@@ -192,15 +191,6 @@ sub Marpa::R3::Recognizer::set {
                     or Marpa::R3::exception("Cannot print: $ERRNO");
             }
         } ## end if ( defined( my $value = $args->{'trace_actions'} ))
-
-        if ( defined( my $value = $args->{'trace_terminals'} ) ) {
-            $recce->[Marpa::R3::Internal::Recognizer::TRACE_TERMINALS] =
-                Scalar::Util::looks_like_number($value) ? $value : 0;
-            if ($value) {
-                say {$trace_fh} 'Setting trace_terminals option'
-                    or Marpa::R3::exception("Cannot print: $ERRNO");
-            }
-        } ## end if ( defined( my $value = $args->{'trace_terminals'}...))
 
         if ( defined( my $value = $args->{'trace_values'} ) ) {
             $recce->[Marpa::R3::Internal::Recognizer::TRACE_VALUES] = $value;

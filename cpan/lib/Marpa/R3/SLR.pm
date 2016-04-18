@@ -338,14 +338,14 @@ sub Marpa::R3::Scanless::R::new {
 
     $thick_g1_recce->set($g1_recce_args);
 
-    if ( $thick_g1_recce->[Marpa::R3::Internal::Recognizer::TRACE_TERMINALS] > 1 ) {
+    if ( $slr->[Marpa::R3::Internal::Scanless::R::TRACE_TERMINALS] > 1 ) {
         my @terminals_expected = @{ $thick_g1_recce->terminals_expected() };
         for my $terminal ( sort @terminals_expected ) {
             say {$Marpa::R3::Internal::TRACE_FH}
-                qq{Expecting "$terminal" at earleme 0}
-                or Marpa::R3::exception("Cannot print: $ERRNO");
+              qq{Expecting "$terminal" at earleme 0}
+              or Marpa::R3::exception("Cannot print: $ERRNO");
         }
-    } ## end if ( $thick_g1_recce->[Marpa::R3::Internal::Recognizer::TRACE_TERMINALS...])
+    }
 
     Marpa::R3::Internal::Scanless::convert_libmarpa_events($slr);
 
@@ -376,10 +376,10 @@ sub Marpa::R3::Internal::Scanless::R::set {
     state $common_naif_recce_args = {
         map { ( $_, 1 ); }
             qw(end max_parses semantics_package too_many_earley_items
-            trace_actions trace_file_handle trace_terminals trace_values)
+            trace_actions trace_file_handle trace_values)
     };
     state $common_slif_recce_args =
-        { map { ( $_, 1 ); } qw(trace_lexers rejection exhaustion) };
+        { map { ( $_, 1 ); } qw(trace_lexers rejection trace_terminals exhaustion) };
     state $set_method_args = {
         map { ( $_, 1 ); } (
             keys %{$common_slif_recce_args},
@@ -471,8 +471,6 @@ sub Marpa::R3::Internal::Scanless::R::set {
     state $copy_arg_to_index = {
         trace_file_handle =>
             Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE,
-        trace_lexers    => Marpa::R3::Internal::Scanless::R::TRACE_LEXERS,
-        trace_terminals => Marpa::R3::Internal::Scanless::R::TRACE_TERMINALS,
         grammar         => Marpa::R3::Internal::Scanless::R::GRAMMAR,
     };
 
@@ -483,17 +481,6 @@ sub Marpa::R3::Internal::Scanless::R::set {
         $slr->[$index] = $value;
     } ## end ARG: for my $arg_name ( keys %flat_args )
 
-    # Normalize trace levels to numbers
-    for my $trace_level_arg (
-        Marpa::R3::Internal::Scanless::R::TRACE_TERMINALS,
-        Marpa::R3::Internal::Scanless::R::TRACE_LEXERS
-        )
-    {
-        $slr->[$trace_level_arg] = 0
-            if
-            not Scalar::Util::looks_like_number( $slr->[$trace_level_arg] );
-    } ## end for my $trace_level_arg ( ...)
-
     # Trace file handle can never be undefined
     if (not defined $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE] )
     {
@@ -502,12 +489,32 @@ sub Marpa::R3::Internal::Scanless::R::set {
             $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE];
     } ## end if ( not defined $slr->[...])
 
+    my $trace_fh = $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
+
+    if (my $value = $flat_args{trace_terminals}) {
+        # Normalize trace levels to numbers
+        $value = Scalar::Util::looks_like_number( $value ) ? $value : 0;
+        $slr->[Marpa::R3::Internal::Scanless::R::TRACE_TERMINALS] = $value;
+        if ($value) {
+            say {$trace_fh} "Setting trace_terminals option";
+        }
+    }
+
+    if (my $value = $flat_args{trace_lexers}) {
+        # Normalize trace levels to numbers
+        $value = Scalar::Util::looks_like_number( $value ) ? $value : 0;
+        $slr->[Marpa::R3::Internal::Scanless::R::TRACE_LEXERS] = $value;
+        if ($value) {
+            say {$trace_fh} "Setting trace_lexers option";
+        }
+    }
+
     # These NAIF recce args, when applicable, are simply copies of the the
     # SLIF args of the same name
     state $copyable_naif_recce_args = {
         map { ( $_, 1 ); }
             qw(end max_parses semantics_package too_many_earley_items ranking_method
-            trace_actions trace_file_handle trace_terminals trace_values)
+            trace_actions trace_file_handle trace_values)
     };
 
     # Prune flat args of all those named args which are NOT to be copied
