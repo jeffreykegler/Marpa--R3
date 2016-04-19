@@ -209,12 +209,6 @@ sub Marpa::R3::Recognizer::latest_earley_set {
     return $recce_c->latest_earley_set();
 }
 
-sub Marpa::R3::Recognizer::check_terminal {
-    my ( $recce, $name ) = @_;
-    my $grammar = $recce->[Marpa::R3::Internal::Recognizer::GRAMMAR];
-    return $grammar->check_terminal($name);
-}
-
 sub Marpa::R3::Recognizer::exhausted {
     my ($recce) = @_;
     my $recce_c = $recce->[Marpa::R3::Internal::Recognizer::R_C];

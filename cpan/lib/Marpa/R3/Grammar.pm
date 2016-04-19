@@ -1034,20 +1034,6 @@ sub Marpa::R3::Grammar::show_dotted_rule {
     return join q{ }, $lhs, q{->}, @rhs;
 } ## end sub Marpa::R3::Grammar::show_dotted_rule
 
-# Used by lexers to check that symbol is a terminal
-sub Marpa::R3::Grammar::check_terminal {
-    my ( $grammar, $name ) = @_;
-    return 0 if not defined $name;
-    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
-    my $symbol_id =
-        $grammar->[Marpa::R3::Internal::Grammar::TRACER]
-        ->symbol_by_name($name);
-    return 0 if not defined $symbol_id;
-    my $symbols = $grammar->[Marpa::R3::Internal::Grammar::SYMBOLS];
-    my $symbol  = $symbols->[$symbol_id];
-    return $grammar_c->symbol_is_terminal($symbol_id) ? 1 : 0;
-} ## end sub Marpa::R3::Grammar::check_terminal
-
 sub Marpa::R3::Grammar::symbol_name {
     my ( $grammar, $id ) = @_;
     my $symbol_name =
