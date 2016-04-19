@@ -33,14 +33,6 @@ use English qw( -no_match_vars );
 
 our $PACKAGE = 'Marpa::R3::Scanless::R';
 
-sub Marpa::R3::Scanless::R::last_completed_range {
-    my ( $self,  $symbol_name ) = @_;
-    my ( $start, $length )      = $self->last_completed($symbol_name);
-    return if not defined $start;
-    my $end = $start + $length;
-    return ( $start, $end );
-} ## end sub Marpa::R3::Scanless::R::last_completed_range
-
 # Given a scanless
 # recognizer and a symbol,
 # return the start earley set

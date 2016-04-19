@@ -1959,47 +1959,6 @@ the application must provide that name explicitly,
 by specifying the character class
 or quoted string in an L0 rule.
 
-=head1 Discouraged methods
-
-Methods in this section continue to be supported, but their use is
-discouraged in favor of other, better solutions.
-New applications should avoid using discouraged methods.
-
-=head2 last_completed_range()
-
-Use of this method is discouraged in favor of
-L</"last_completed()">.
-Given the name of a symbol,
-C<last_completed_range()>
-returns the G1 start and G1 end locations of the most recent match.
-If there was more than one most recent match,
-C<last_completed_range()>
-returns the longest.
-If there was no match,
-C<last_completed_range()>
-returns the empty array in array context
-and a Perl false in scalar context.
-
-=head2 range_to_string()
-
-Use of this method is discouraged in favor of
-L</"g1_literal()">.
-Given a G1 start and a G1 end location,
-C<range_to_string()>
-returns the substring of the input
-stream that is between the two.
-The C<range_to_string()> method
-assumes that
-the application read
-the physical input stream in
-lexical order and
-without gaps
-except for whitespace and other normal discards.
-When that is not the case,
-C<range_to_string()> behaves in
-much the same way as described above
-for L</"g1_literal()">.
-
 =head1 Copyright and License
 
 =for Marpa::R3::Display
@@ -2024,10 +1983,5 @@ ignore: 1
 
 =cut
 
-# Local Variables:
-#   mode: cperl
-#   cperl-indent-level: 4
-#   fill-column: 100
-# End:
 # vim: expandtab shiftwidth=4:
 
