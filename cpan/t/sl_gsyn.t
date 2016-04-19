@@ -195,7 +195,7 @@ sub show_last_expression {
     my $recce = $self->{recce};
     my ( $g1_start, $g1_length ) = $recce->last_completed('Expression');
     return 'No expression was successfully parsed' if not defined $g1_start;
-    my $last_expression = $recce->substring( $g1_start, $g1_length );
+    my $last_expression = $recce->g1_literal( $g1_start, $g1_length );
     return "Last expression successfully parsed was: $last_expression";
 } ## end sub show_last_expression
 
