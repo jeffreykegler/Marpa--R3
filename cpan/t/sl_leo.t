@@ -64,11 +64,7 @@ my $input         = 'aaa';
 my $event_history = q{};
 my $pos           = $recce->read( \$input );
 READ: while (1) {
-    my @event_names;
-    for ( my $ix = 0; my $event = $recce->event($ix); $ix++ ) {
-        push @event_names, @{$event};
-    }
-    $event_history .= join q{ }, $pos, sort @event_names;
+    $event_history .= join q{ }, $pos, sort map { $_->[0] } @{ $recce->events()};
     $event_history .= "\n";
     last READ if $pos >= length $input;
     $pos = $recce->resume();

@@ -66,25 +66,13 @@ sub do_test {
         { grammar => $grammar, semantics_package => 'My_Actions' } );
     my $length = length $string;
     my $pos    = $recce->read( \$string );
-    READ: while (1) {
+  READ: while (1) {
 
-# Marpa::R3::Display
-# name: SLR event() method synopsis
-
-        EVENT: for (
-            my $event_ix = 0;
-            my $event    = $recce->event($event_ix);
-            $event_ix++
-            )
-        {
+      EVENT: for my $event ( @{ $recce->events() } ) {
             my ($name) = @{$event};
-            if ( $name eq 'subtext' ) {
-                push @actual_events, show_last_subtext($recce);
-                next EVENT;
-            }
-        } ## end for ( my $event_ix = 0; my $event = $recce->event($event_ix...))
-
-# Marpa::R3::Display::End
+            next EVENT if $name ne 'subtext';
+            push @actual_events, show_last_subtext($recce);
+        }
 
         last READ if $pos >= $length;
         $pos = $recce->resume($pos);
@@ -95,7 +83,8 @@ sub do_test {
     }
     my $actual_value = ${$value_ref};
     Test::More::is( $actual_value, q{1792}, qq{Value for "$string"} );
-    Test::More::is_deeply( \@actual_events, $expected_events, qq{Events for "$string"} );
+    Test::More::is_deeply( \@actual_events, $expected_events,
+        qq{Events for "$string"} );
 } ## end sub do_test
 
 sub My_Actions::OK { return 1792 };

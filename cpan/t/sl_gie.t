@@ -325,33 +325,10 @@ for my $test_data (@tests_data) {
             $eval_ok = eval { $pos = $recce->read( \$test_string ); 1 };
         }
         die $EVAL_ERROR if not $eval_ok;
-        $actual_events .= record_events($recce);
+        $actual_events .= (join q{ }, sort map { $_->[0] } @{$recce->events()}) . "\n";
     } ## end for ( my $pass = 0; $pos < $length; $pass++ )
 
     Test::More::is( $actual_events, $expected_events, $test_name );
 } ## end for my $test_data (@tests_data)
 
-sub record_events {
-    my ( $recce, $pos ) = @_;
-    my $text = q{};
-    my @events;
-    for (
-        my $event_ix = 0;
-        my $event    = $recce->event($event_ix);
-        $event_ix++
-        )
-    {
-        my ( $event_name, @event_data ) = @{$event};
-        push @events, $event_name;
-    } ## end for ( my $event_ix = 0; my $event = $recce->event($event_ix...))
-    return ( join q{ }, sort @events ) . "\n";
-} ## end sub record_events
-
-1;    # In case used as "do" file
-
-# Local Variables:
-#   mode: cperl
-#   cperl-indent-level: 4
-#   fill-column: 100
-# End:
 # vim: expandtab shiftwidth=4:

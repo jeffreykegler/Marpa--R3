@@ -171,15 +171,10 @@ END_OF_HISTORY
 sub do_test {
     my ( $grammar, $input, $expected_history ) = @_;
     my $slr = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
-    my $event_history;
+    my @event_history;
     my $pos = $slr->read( \$input );
     READ: while (1) {
-        my @event_names;
-        for ( my $ix = 0; my $event = $slr->event($ix); $ix++ ) {
-            push @event_names, @{$event};
-        }
-        $event_history .= join q{ }, sort @event_names;
-        $event_history .= "\n";
+        push @event_history, join q{ }, sort map { $_->[0] } @{ $slr->events()};
         last READ if $pos >= length $input;
         $pos = $slr->resume();
     } ## end READ: while (1)
@@ -187,6 +182,7 @@ sub do_test {
     my $value = $value_ref ? ${$value_ref} : 'No parse';
     ( my $expected = $input ) =~ s/\s//gxms;
     Marpa::R3::Test::is( $value, $expected, "Leo SLIF parse of $expected" );
+    my $event_history = join "\n", @event_history, q{};
     Marpa::R3::Test::is( $event_history, $expected_history, "Event history of $expected" );
     return $slr;
 } ## end sub do_test
