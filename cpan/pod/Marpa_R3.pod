@@ -624,37 +624,12 @@ L<its grammar methods|Marpa::R3::Scanless::G>,
 and
 L<its recognizer methods|Marpa::R3::Scanless::R>.
 
-Marpa has two other interfaces.
-L<The thin
-interface|Marpa::R3::Advanced::Thin>
-provides direct access to the underlying
-Libmarpa C library.
-Of the Perl interfaces to Marpa,
-the thin interface is the most low-level.
-The thin interface offers efficient access to the full power of the
-Marpa parse engine,
-but it requires the application to do a lot of the work itself.
-
-Now discouraged,
-the L<named argument inteface (NAIF)|Marpa::R3::NAIF>
-was Marpa::R3's first interface.
-It is a more traditional,
-middle level interface which uses Perl calls
-instead of a DSL.
-
-L<Marpa::R3::Vocabulary> is intended as a quick refresher in
-parsing terminology,
-emphasizing how the standard terms are used
-in the Marpa context.
 Marpa's standard semantics are fully described in the
 L<Marpa::R3::Semantics> document.
 Techniques for tracing and for debugging your Marpa grammars
 are described in the
 L<Marpa::R3::Tracing> document and the
 L<Marpa::R3::Progress> document.
-For those with a theoretical bent,
-my sources, and other useful references, are described in
-L<Marpa::R3::Advanced::Bibliography>.
 
 =head1 Author
 
