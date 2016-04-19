@@ -91,8 +91,10 @@ $slr->current_g1_location() is now $slr->g1_pos().
 
 The
 C<Marpa::R2::Scanless::R::event()> method,
-and the
+C<Marpa::R2::Scanless::R::last_completed_range()> method,
 C<Marpa::R2::Scanless::R::pause_lexeme()> method,
+and the
+C<Marpa::R2::Scanless::R::range_to_string()> method,
 discouraged in Marpa::R2,
 have been eliminated in Marpa::R3.
 
