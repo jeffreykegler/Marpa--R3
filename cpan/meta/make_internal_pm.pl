@@ -143,7 +143,7 @@ __DATA__
     BLESS_PACKAGE { Default package into which nodes are blessed }
     TRACE_FILE_HANDLE
     WARNINGS { print warnings about grammar? }
-    INTERNAL { internal grammar -- relax various restrictions }
+    IF_INACCESSIBLE { default for symbols }
 
     CHARACTER_CLASSES { an hash of
     character class regex by symbol name.

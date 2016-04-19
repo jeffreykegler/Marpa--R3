@@ -120,7 +120,7 @@ sub Marpa::R3::Grammar::set {
 
         state $grammar_options = {
             map { ( $_, 1 ) }
-                qw{ _internal_
+                qw{ if_inaccessible
                 bless_package
                 infinite_action
                 default_rank
@@ -149,8 +149,8 @@ sub Marpa::R3::Grammar::set {
         # options and are expected to take force for the other
         # options, even if specified afterwards
 
-        if ( defined( my $value = $args->{'_internal_'} ) ) {
-            $grammar->[Marpa::R3::Internal::Grammar::INTERNAL] =  $value;
+        if ( defined( my $value = $args->{'if_inaccessible'} ) ) {
+            $grammar->[Marpa::R3::Internal::Grammar::IF_INACCESSIBLE] =  $value;
         }
 
         if ( defined( my $value = $args->{'trace_file_handle'} ) ) {
@@ -712,7 +712,7 @@ sub Marpa::R3::Internal::Grammar::slif_precompute {
     } ## end if ( $loop_rule_count and $infinite_action ne 'quiet')
 
     my $default_if_inaccessible =
-        $grammar->[Marpa::R3::Internal::Grammar::INTERNAL]->{if_inaccessible}
+        $grammar->[Marpa::R3::Internal::Grammar::IF_INACCESSIBLE]
         // 'warn';
     SYMBOL:
     for my $symbol_id ( grep { !$grammar_c->symbol_is_accessible($_) }

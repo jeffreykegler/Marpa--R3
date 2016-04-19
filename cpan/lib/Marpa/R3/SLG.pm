@@ -242,8 +242,7 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     $g1_args->{symbols} = $hashed_source->{symbols}->{G1};
     state $g1_target_symbol = '[:start]';
     $g1_args->{start} = $g1_target_symbol;
-    $g1_args->{'_internal_'} =
-        { 'if_inaccessible' => $if_inaccessible_default };
+    $g1_args->{if_inaccessible} = $if_inaccessible_default;
 
     my $thick_g1_grammar = Marpa::R3::Grammar->new($g1_args);
     my $g1_tracer        = $thick_g1_grammar->tracer();
@@ -482,8 +481,7 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     my %lex_args = ();
     $lex_args{trace_file_handle} = $trace_fh;
     $lex_args{start}             = $lex_start_symbol_name;
-    $lex_args{'_internal_'} =
-        { 'if_inaccessible' => $if_inaccessible_default };
+    $lex_args{if_inaccessible} = $if_inaccessible_default;
     $lex_args{rules}   = $lexer_rules;
     $lex_args{symbols} = \%this_lexer_symbols;
 
