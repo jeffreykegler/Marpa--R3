@@ -177,7 +177,7 @@ sub Marpa::R3::Grammar::set {
                 if ref $value ne 'HASH';
             for my $symbol ( sort keys %{$value} ) {
                 my $properties = $value->{$symbol};
-                assign_user_symbol( $grammar, $symbol, $properties );
+                assign_symbol( $grammar, $symbol, $properties );
             }
         } ## end if ( defined( my $value = $args->{'symbols'} ) )
 
@@ -188,7 +188,7 @@ sub Marpa::R3::Grammar::set {
             Marpa::R3::exception('terminals value must be REF to ARRAY')
                 if ref $value ne 'ARRAY';
             for my $symbol ( @{$value} ) {
-                assign_user_symbol( $grammar, $symbol, { terminal => 1 } );
+                assign_symbol( $grammar, $symbol, { terminal => 1 } );
             }
         } ## end if ( defined( my $value = $args->{'terminals'} ) )
 
@@ -1155,30 +1155,6 @@ sub assign_symbol {
 
 } ## end sub assign_symbol
 
-sub assign_user_symbol {
-    my $grammar   = shift;
-    my $name      = shift;
-    my $options   = shift;
-    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
-
-    if ( my $type = ref $name ) {
-        Marpa::R3::exception(
-            "Symbol name was ref to $type; it must be a scalar string");
-    }
-    if ( not $grammar->[Marpa::R3::Internal::Grammar::INTERNAL] ) {
-        my $final_symbol = substr $name, -1;
-        if ( $DEFAULT_SYMBOLS_RESERVED{$final_symbol} ) {
-            Marpa::R3::exception(
-                qq{Symbol name $name ends in "$final_symbol": that's not allowed}
-            );
-        }
-    } ## end if ( not $grammar->[Marpa::R3::Internal::Grammar::INTERNAL...])
-    my $symbol = assign_symbol( $grammar, $name, $options );
-
-    return $symbol;
-
-} ## end sub assign_user_symbol
-
 # add one or more rules
 sub add_user_rules {
     my ( $grammar, $rules ) = @_;
@@ -1285,12 +1261,8 @@ sub add_user_rule {
         Marpa::R3::exception(
             q{"min" must be undefined or a valid Perl number});
     }
-    my $grammar_is_internal = $grammar->[Marpa::R3::Internal::Grammar::INTERNAL];
 
-    my $lhs =
-        $grammar_is_internal
-        ? assign_symbol( $grammar, $lhs_name )
-        : assign_user_symbol( $grammar, $lhs_name );
+    my $lhs = assign_symbol( $grammar, $lhs_name );
     $rhs_names //= [];
 
     my @rule_problems = ();
@@ -1342,9 +1314,7 @@ sub add_user_rule {
 
     my $rhs = [
         map {
-            $grammar_is_internal
-                ? assign_symbol( $grammar, $_ )
-                : assign_user_symbol( $grammar, $_ );
+                assign_symbol( $grammar, $_ )
         } @{$rhs_names}
     ];
 
@@ -1377,10 +1347,7 @@ sub add_user_rule {
 
         # create the separator symbol, if we're using one
         if ( defined $separator_name ) {
-            my $separator =
-                $grammar_is_internal
-                ? assign_symbol( $grammar, $separator_name )
-                : assign_user_symbol( $grammar, $separator_name );
+            my $separator = assign_symbol( $grammar, $separator_name ) ;
             $separator_id = $separator->[Marpa::R3::Internal::Symbol::ID];
         } ## end if ( defined $separator_name )
 
@@ -1418,7 +1385,7 @@ sub add_user_rule {
     if ($is_ordinary_rule) {
 
         # Only internal grammars can set a custom mask
-        if ( not defined $mask or not $grammar_is_internal ) {
+        if ( not defined $mask ) {
             $mask = [ (1) x scalar @rhs_ids ];
         }
         $base_rule->[Marpa::R3::Internal::Rule::MASK] = $mask;
