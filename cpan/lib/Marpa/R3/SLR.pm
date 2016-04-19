@@ -1083,11 +1083,6 @@ sub Marpa::R3::Scanless::R::resume {
     return $thin_slr->pos();
 } ## end sub Marpa::R3::Scanless::R::resume
 
-sub Marpa::R3::Scanless::R::event {
-    my ( $self, $event_ix ) = @_;
-    return $self->[Marpa::R3::Internal::Scanless::R::EVENTS]->[$event_ix];
-}
-
 sub Marpa::R3::Scanless::R::events {
     my ($self) = @_;
     return $self->[Marpa::R3::Internal::Scanless::R::EVENTS];

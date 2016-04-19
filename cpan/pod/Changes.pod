@@ -83,9 +83,11 @@ named arguments no longer exist.
 =head2 Marpa::R2::Scanless::R methods removed in Marpa::R3
 
 The
-Marpa::R2::Scanless::R::pause_lexeme method,
+C<Marpa::R2::Scanless::R::event()> method,
+and the
+C<Marpa::R2::Scanless::R::pause_lexeme()> method,
 discouraged in Marpa::R2,
-has been eliminated in Marpa::R3.
+have been eliminated in Marpa::R3.
 
 =head1 Copyright and License
 
