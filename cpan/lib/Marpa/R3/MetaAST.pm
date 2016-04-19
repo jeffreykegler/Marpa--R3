@@ -1075,6 +1075,15 @@ sub Marpa::R3::Internal::MetaAST_Nodes::lexeme_rule::evaluate {
             "  Location was line $line, column $column\n",
             '  Rule was ', $parse->substring( $start, $length ), "\n";
     } ## end if ( exists $declarations{'event'} and not exists $declarations...)
+    if ( exists $declarations{'pause'} and not exists $declarations{'event'} )
+    {
+        my ( $line, $column ) = $parse->{meta_recce}->line_column($start);
+        die
+            qq{"pause" adverb not allowed without "event" adverb in lexeme rule"\n},
+            qq{  Events must be named with the "event" adverb\n},
+            "  Location was line $line, column $column\n",
+            '  Rule was ', $parse->substring( $start, $length ), "\n";
+    } ## end if ( exists $declarations{'event'} and not exists $declarations...)
     $parse->{lexeme_declarations}->{$symbol_name} = \%declarations;
     ## no critic(Subroutines::ProhibitExplicitReturnUndef)
     return undef;
