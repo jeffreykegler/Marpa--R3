@@ -57,9 +57,9 @@ sub do_list {
 sub show_last_expression {
     my ($self) = @_;
     my $recce = $self->{slr};
-    my ( $start, $end ) = $recce->last_completed_range('Number');
+    my ( $start, $length ) = $recce->last_completed('Number');
     return '[none]' if not defined $start;
-    my $last_expression = $recce->range_to_string( $start, $end );
+    my $last_expression = $recce->g1_literal( $start, $length );
     return $last_expression;
 } ## end sub show_last_expression
 

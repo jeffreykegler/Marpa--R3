@@ -135,9 +135,9 @@ sub do_arg0 { shift; return shift; }
 sub show_last_expression {
     my ($self) = @_;
     my $recce = $self->{recce};
-    my ( $start, $end ) = $recce->last_completed_range('Expression');
+    my ( $start, $length ) = $recce->last_completed('Expression');
     return if not defined $start;
-    my $last_expression = $recce->range_to_string( $start, $end );
+    my $last_expression = $recce->length( $start, $length );
     return $last_expression;
 } ## end sub show_last_expression
 

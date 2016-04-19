@@ -258,9 +258,9 @@ sub do_reduce {
 sub show_last_expression {
     my ($self) = @_;
     my $slr = $self->{slr};
-    my ( $start, $end ) = $slr->last_completed_range('expression');
+    my ( $start, $length ) = $slr->last_completed('expression');
     return 'No expression was successfully parsed' if not defined $start;
-    my $last_expression = $slr->range_to_string( $start, $end );
+    my $last_expression = $slr->g1_literal( $start, $length );
     return "Last expression successfully parsed was: $last_expression";
 } ## end sub show_last_expression
 

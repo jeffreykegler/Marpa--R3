@@ -58,9 +58,9 @@ sub add_sequence {
 sub show_sequence_so_far {
     my ($self) = @_;
     my $recce = $self->{recce};
-    my ( $start, $end ) = $recce->last_completed_range('number sequence');
+    my ( $start, $length ) = $recce->last_completed('number sequence');
     return if not defined $start;
-    my $sequence_so_far = $recce->range_to_string( $start, $end );
+    my $sequence_so_far = $recce->g1_literal( $start, $length );
     return $sequence_so_far;
 } ## end sub show_sequence_so_far
 

@@ -111,15 +111,6 @@ sub Marpa::R3::Scanless::R::last_completed_span {
     return ($start_input_location, ($end_span[0]+$end_span[1])-$start_input_location);
 }
 
-# In terms of earley sets.
-# Kept for backward compatibiity
-sub Marpa::R3::Scanless::R::range_to_string {
-    my ( $self, $start_earley_set, $end_earley_set ) = @_;
-    return $self->g1_literal( $start_earley_set,
-        $end_earley_set - $start_earley_set );
-}
-
-# Not documented.  Should I?
 sub Marpa::R3::Scanless::R::g1_input_span {
     my ( $slr, $start_earley_set, $length_in_parse_locations ) = @_;
     return

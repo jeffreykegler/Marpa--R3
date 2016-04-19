@@ -154,9 +154,9 @@ for my $test_data (@tests) {
 
             my $value_ref = $re->value();
             my $last_hand;
-            my ( $start, $end ) = $re->last_completed_range('hand');
-            if ( defined $start ) {
-                $last_hand = $re->range_to_string( $start, $end );
+            my ( $hand_start, $hand_length ) = $re->last_completed('hand');
+            if ( defined $hand_start ) {
+                $last_hand = $re->g1_literal( $hand_start, $hand_length );
             }
             if ($value_ref) {
                 $actual_result = 'Parse OK';

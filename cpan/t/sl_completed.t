@@ -54,9 +54,9 @@ do_test($grammar, q{(((1)2)3)4}, [ qw{(1) ((1)2) (((1)2)3)} ]);
 
 sub show_last_subtext {
     my ($recce) = @_;
-    my ( $start, $end ) = $recce->last_completed_range('subtext');
+    my ( $start, $length ) = $recce->last_completed('subtext');
     return 'No expression was successfully parsed' if not defined $start;
-    return $recce->range_to_string( $start, $end );
+    return $recce->g1_literal( $start, $length );
 }
 
 sub do_test {
