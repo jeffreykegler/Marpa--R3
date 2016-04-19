@@ -51,7 +51,7 @@ sub Marpa::R3::Internal::Recognizer::resolve_action {
         $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
     my $grammar  = $recce->[Marpa::R3::Internal::Recognizer::GRAMMAR];
     my $trace_actions =
-        $recce->[Marpa::R3::Internal::Recognizer::TRACE_ACTIONS];
+        $slr->[Marpa::R3::Internal::Scanless::R::TRACE_ACTIONS];
 
     # A reserved closure name;
     return [ q{}, undef, '::!default' ] if not defined $closure_name;
@@ -496,7 +496,7 @@ sub resolve_recce {
     my $symbols   = $grammar->[Marpa::R3::Internal::Grammar::SYMBOLS];
 
     my $trace_actions =
-        $recce->[Marpa::R3::Internal::Recognizer::TRACE_ACTIONS] // 0;
+        $slr->[Marpa::R3::Internal::Scanless::R::TRACE_ACTIONS] // 0;
     my $trace_file_handle =
         $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
 
@@ -644,7 +644,7 @@ sub registration_init {
     my $recce_c   = $recce->[Marpa::R3::Internal::Recognizer::C];
     my $tracer    = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
     my $trace_actions =
-        $recce->[Marpa::R3::Internal::Recognizer::TRACE_ACTIONS] // 0;
+        $slr->[Marpa::R3::Internal::Scanless::R::TRACE_ACTIONS] // 0;
     my $rules   = $grammar->[Marpa::R3::Internal::Grammar::RULES];
     my $symbols = $grammar->[Marpa::R3::Internal::Grammar::SYMBOLS];
 
@@ -1311,7 +1311,7 @@ sub Marpa::R3::Recognizer::value {
     my $tracer    = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
 
     my $trace_actions =
-        $recce->[Marpa::R3::Internal::Recognizer::TRACE_ACTIONS] // 0;
+        $slr->[Marpa::R3::Internal::Scanless::R::TRACE_ACTIONS] // 0;
     my $trace_values =
         $slr->[Marpa::R3::Internal::Scanless::R::TRACE_VALUES] // 0;
     my $trace_file_handle =

@@ -184,7 +184,6 @@ __DATA__
     END_OF_PARSE
     MAX_PARSES
     RANKING_METHOD
-    TRACE_ACTIONS
 
     { The following fields must be reinitialized when
     evaluation is reset }
@@ -304,7 +303,7 @@ __DATA__
 
     :package=Marpa::R3::Internal::Scanless::R
 
-    C { The thin version of this object }
+    SLR_C { The thin version of this object }
 
     GRAMMAR
     THICK_G1_RECCE
@@ -316,6 +315,7 @@ __DATA__
     TRACE_LEXERS
     TRACE_TERMINALS
     TRACE_VALUES
+    TRACE_ACTIONS
     READ_STRING_ERROR
     EVENTS
 

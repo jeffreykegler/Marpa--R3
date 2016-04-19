@@ -126,7 +126,7 @@ sub Marpa::R3::Scanless::R::g1_input_span {
         "end ( $start_earley_set + $length_in_parse_locations ) is after latest_earley_set ($latest_earley_set)"
         if $earley_set_for_last_position > $latest_earley_set;
 
-    my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::C];
+    my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
     my ($first_start_position) =
         $thin_slr->span($earley_set_for_first_position);
     my ( $last_start_position, $last_length ) =
@@ -156,7 +156,7 @@ sub Marpa::R3::Scanless::R::g1_literal {
 
 sub Marpa::R3::Scanless::R::g1_location_to_span {
     my ( $self, $g1_location ) = @_;
-    my $thin_self = $self->[Marpa::R3::Internal::Scanless::R::C];
+    my $thin_self = $self->[Marpa::R3::Internal::Scanless::R::SLR_C];
     return $thin_self->span($g1_location);
 }
 
@@ -164,7 +164,7 @@ sub Marpa::R3::Scanless::R::g1_location_to_span {
 # This is the one users will be most interested in.
 sub Marpa::R3::Scanless::R::literal {
     my ( $slr, $start_pos, $length ) = @_;
-    my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::C];
+    my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
     return $thin_slr->substring( $start_pos, $length );
 } ## end sub Marpa::R3::Scanless::R::literal
 
@@ -273,7 +273,7 @@ sub Marpa::R3::Scanless::R::new {
         $thick_g1_recce->thin() );
     $thin_slr->earley_item_warning_threshold_set($too_many_earley_items)
         if defined $too_many_earley_items;
-    $slr->[Marpa::R3::Internal::Scanless::R::C]      = $thin_slr;
+    $slr->[Marpa::R3::Internal::Scanless::R::SLR_C]      = $thin_slr;
     $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] = [];
 
     my $symbol_ids_by_event_name_and_type =
@@ -487,12 +487,12 @@ sub Marpa::R3::Internal::Scanless::R::set {
 } ## end sub Marpa::R3::Internal::Scanless::R::set
 
 sub Marpa::R3::Scanless::R::thin {
-    return $_[0]->[Marpa::R3::Internal::Scanless::R::C];
+    return $_[0]->[Marpa::R3::Internal::Scanless::R::SLR_C];
 }
 
 sub Marpa::R3::Scanless::R::trace {
     my ( $self, $level ) = @_;
-    my $thin_slr = $self->[Marpa::R3::Internal::Scanless::R::C];
+    my $thin_slr = $self->[Marpa::R3::Internal::Scanless::R::SLR_C];
     $level //= 1;
     return $thin_slr->trace($level);
 } ## end sub Marpa::R3::Scanless::R::trace
@@ -527,7 +527,7 @@ sub Marpa::R3::Scanless::R::read {
 
     $self->[Marpa::R3::Internal::Scanless::R::P_INPUT_STRING] = $p_string;
 
-    my $thin_slr = $self->[Marpa::R3::Internal::Scanless::R::C];
+    my $thin_slr = $self->[Marpa::R3::Internal::Scanless::R::SLR_C];
     my $trace_terminals = $self->[Marpa::R3::Internal::Scanless::R::TRACE_TERMINALS];
     my $trace_lexers = $self->[Marpa::R3::Internal::Scanless::R::TRACE_LEXERS];
     $thin_slr->trace_terminals($trace_terminals) if $trace_terminals;
@@ -547,7 +547,7 @@ my $libmarpa_trace_event_handlers = {
         my ( $slr, $event ) = @_;
         my ( undef, undef, $lexeme_start_pos, $lexeme_end_pos, $g1_lexeme)
             = @{$event};
-        my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::C];
+        my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
         my $raw_token_value =
             $thin_slr->substring( $lexeme_start_pos,
             $lexeme_end_pos - $lexeme_start_pos );
@@ -572,7 +572,7 @@ my $libmarpa_trace_event_handlers = {
         return if not $slr->[Marpa::R3::Internal::Scanless::R::TRACE_TERMINALS];
         my ( undef, undef, $lexeme_start_pos, $lexeme_end_pos, $g1_lexeme)
             = @{$event};
-        my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::C];
+        my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
         my $raw_token_value =
             $thin_slr->substring( $lexeme_start_pos,
             $lexeme_end_pos - $lexeme_start_pos );
@@ -597,7 +597,7 @@ my $libmarpa_trace_event_handlers = {
         my ( undef, undef, $position, $g1_lexeme, $assertion_id)
             = @{$event};
         my ( $line, $column ) = $slr->line_column($position);
-        my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::C];
+        my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
         my $trace_file_handle =
             $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
         my $thick_g1_recce =
@@ -614,7 +614,7 @@ my $libmarpa_trace_event_handlers = {
         my ( undef, undef, $lexeme_start_pos, $lexeme_end_pos, $g1_lexeme,
             $lexeme_priority, $required_priority )
             = @{$event};
-        my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::C];
+        my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
         my $raw_token_value =
             $thin_slr->substring( $lexeme_start_pos,
             $lexeme_end_pos - $lexeme_start_pos );
@@ -638,7 +638,7 @@ my $libmarpa_trace_event_handlers = {
         my ( $slr, $event ) = @_;
         my ( undef, undef, $lexeme_start_pos, $lexeme_end_pos, $g1_lexeme ) =
             @{$event};
-        my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::C];
+        my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
         my $raw_token_value =
             $thin_slr->substring( $lexeme_start_pos,
             $lexeme_end_pos - $lexeme_start_pos );
@@ -660,7 +660,7 @@ my $libmarpa_trace_event_handlers = {
         my ( $slr, $event ) = @_;
         my ( undef, undef, $lexeme_start_pos, $lexeme_end_pos, $g1_lexeme ) =
             @{$event};
-        my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::C];
+        my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
         my $raw_token_value =
             $thin_slr->substring( $lexeme_start_pos,
             $lexeme_end_pos - $lexeme_start_pos );
@@ -916,7 +916,7 @@ $libmarpa_event_handlers->{'after lexeme'} = $libmarpa_event_handlers->{'before 
 sub Marpa::R3::Internal::Scanless::convert_libmarpa_events {
     my ($slr)    = @_;
     my $pause    = 0;
-    my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::C];
+    my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
     EVENT: for my $event ( $thin_slr->events() ) {
         my ($event_type) = @{$event};
         my $handler = $libmarpa_event_handlers->{$event_type};
@@ -935,7 +935,7 @@ sub Marpa::R3::Scanless::R::resume {
         )
         if not defined $slr->[Marpa::R3::Internal::Scanless::R::P_INPUT_STRING];
 
-    my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::C];
+    my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
     my $trace_terminals =
         $slr->[Marpa::R3::Internal::Scanless::R::TRACE_TERMINALS];
     my $trace_lexers = $slr->[Marpa::R3::Internal::Scanless::R::TRACE_LEXERS];
@@ -1078,7 +1078,7 @@ sub Marpa::R3::Scanless::R::read_problem {
 
     die 'No problem_code in slr->read_problem()' if not $problem_code;
 
-    my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::C];
+    my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
     my $grammar  = $slr->[Marpa::R3::Internal::Scanless::R::GRAMMAR];
 
     my $thick_lex_grammar =
@@ -1136,7 +1136,7 @@ sub Marpa::R3::Scanless::R::read_problem {
                 next EVENT
                     if $event_type ne q{'trace}
                     or $trace_event_type ne 'rejected lexeme';
-                my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::C];
+                my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
                 my $raw_token_value =
                     $thin_slr->substring( $lexeme_start_pos,
                     $lexeme_end_pos - $lexeme_start_pos );
@@ -1533,7 +1533,7 @@ sub Marpa::R3::Scanless::R::series_restart {
 # when the parse is initialized.
 sub g1_locations_to_input_range {
     my ( $slr, @g1_locations ) = @_;
-    my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::C];
+    my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
     my $first_pos = $thin_slr->input_length();
     my $last_pos = 0;
     for my $g1_location (@g1_locations) {
@@ -1688,7 +1688,7 @@ sub Marpa::R3::Scanless::R::g1_pos {
 
 sub Marpa::R3::Scanless::R::lexeme_alternative {
     my ( $slr, $symbol_name, @value ) = @_;
-    my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::C];
+    my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
 
     Marpa::R3::exception(
         "slr->alternative(): symbol name is undefined\n",
@@ -1721,7 +1721,7 @@ sub Marpa::R3::Scanless::R::lexeme_alternative {
 # Returns 0 on unthrown failure, current location on success
 sub Marpa::R3::Scanless::R::lexeme_complete {
     my ( $slr, $start, $length ) = @_;
-    my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::C];
+    my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
     $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] = [];
     my $return_value = $thin_slr->g1_lexeme_complete( $start, $length );
     Marpa::R3::Internal::Scanless::convert_libmarpa_events($slr);
@@ -1739,26 +1739,26 @@ sub Marpa::R3::Scanless::R::lexeme_read {
 
 sub Marpa::R3::Scanless::R::pause_span {
     my ($slr) = @_;
-    my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::C];
+    my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
     return $thin_slr->pause_span();
 }
 
 sub Marpa::R3::Scanless::R::line_column {
     my ( $slr, $pos ) = @_;
-    my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::C];
+    my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
     $pos //= $thin_slr->pos();
     return $thin_slr->line_column($pos);
 } ## end sub Marpa::R3::Scanless::R::line_column
 
 sub Marpa::R3::Scanless::R::pos {
     my ( $slr ) = @_;
-    my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::C];
+    my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
     return $thin_slr->pos();
 }
 
 sub Marpa::R3::Scanless::R::input_length {
     my ( $slr ) = @_;
-    my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::C];
+    my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
     return $thin_slr->input_length();
 }
 
@@ -1766,7 +1766,7 @@ sub Marpa::R3::Scanless::R::input_length {
 sub Marpa::R3::Scanless::R::activate {
     my ( $slr, $event_name, $activate ) = @_;
     my $slg      = $slr->[Marpa::R3::Internal::Scanless::R::GRAMMAR];
-    my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::C];
+    my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
     $activate //= 1;
     my $thick_g1_recce =
         $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
@@ -1790,7 +1790,7 @@ sub Marpa::R3::Scanless::R::activate {
 # Failures are thrown.
 sub Marpa::R3::Scanless::R::lexeme_priority_set {
     my ($slr, $lexeme_name, $new_priority) = @_;
-    my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::C];
+    my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::GRAMMAR];
     my $thick_g1_grammar =
         $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];

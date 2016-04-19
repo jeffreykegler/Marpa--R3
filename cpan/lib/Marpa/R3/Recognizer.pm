@@ -169,7 +169,7 @@ sub Marpa::R3::Scanless::R::naif_set {
         } ## end if ( defined( my $value = $args->{'ranking_method'} ...))
 
         if ( defined( my $value = $args->{'trace_actions'} ) ) {
-            $recce->[Marpa::R3::Internal::Recognizer::TRACE_ACTIONS] = $value;
+            $slr->[Marpa::R3::Internal::Scanless::R::TRACE_ACTIONS] = $value;
             if ($value) {
                 say {$trace_fh} 'Setting trace_actions option'
                     or Marpa::R3::exception("Cannot print: $ERRNO");

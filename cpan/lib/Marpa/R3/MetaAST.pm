@@ -50,7 +50,7 @@ sub new {
 sub Marpa::R3::Internal::MetaAST::Parse::substring {
     my ( $parse, $start, $length ) = @_;
     my $meta_slr      = $parse->{meta_recce};
-    my $thin_meta_slr = $meta_slr->[Marpa::R3::Internal::Scanless::R::C];
+    my $thin_meta_slr = $meta_slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
     my $string        = $thin_meta_slr->substring( $start, $length );
     chomp $string;
     return $string;

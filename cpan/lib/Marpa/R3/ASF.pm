@@ -396,7 +396,7 @@ sub Marpa::R3::ASF::new {
     $asf->[Marpa::R3::Internal::ASF::GLADES] = [];
 
     my $slg       = $slr->[Marpa::R3::Internal::Scanless::R::GRAMMAR];
-    my $thin_slr  = $slr->[Marpa::R3::Internal::Scanless::R::C];
+    my $thin_slr  = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
     my $grammar   = $recce->[Marpa::R3::Internal::Recognizer::GRAMMAR];
     my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
     my $recce_c   = $recce->[Marpa::R3::Internal::Recognizer::C];
