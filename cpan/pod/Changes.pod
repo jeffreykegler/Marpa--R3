@@ -75,8 +75,10 @@ removed in Marpa::R3.
 
 The
 C<Marpa::R2::Scanless::G::g0_rule()> method,
-and the
-C<Marpa::R2::Scanless::G::g0_rule_ids()> method,
+the C<Marpa::R2::Scanless::G::g0_rule_ids()> method,
+the C<Marpa::R2::Scanless::G::g1_rule_ids()> method,
+and
+the C<Marpa::R2::Scanless::G::rule()> method,
 discouraged in Marpa::R2,
 have been eliminated in Marpa::R3.
 

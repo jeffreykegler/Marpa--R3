@@ -23,7 +23,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-use Test::More tests => 10;
+use Test::More tests => 9;
 use English qw( -no_match_vars );
 use lib 'inc';
 use Marpa::R3::Test;
@@ -52,32 +52,6 @@ whitespace ~ [\s]+
 END_OF_RULES
 
 my $grammar = Marpa::R3::Scanless::G->new( { source => \$dsl, });
-
-my $g1_rules_description;
-
-# Marpa::R3::Display
-# name: Scanless rule() synopsis
-
-    my @g1_rule_ids = $grammar->g1_rule_ids();
-    for my $g1_rule_id (@g1_rule_ids) {
-        $g1_rules_description .= "$g1_rule_id "
-            . ( join q{ }, map {"<$_>"} $grammar->rule($g1_rule_id) ) . "\n";
-    }
-
-# Marpa::R3::Display::End
-
-Marpa::R3::Test::is(
-    $g1_rules_description,
-    <<'END_OF_DESCRIPTION',
-0 <Script> <Calculation>
-1 <Calculation> <Expression>
-2 <Calculation> <[Lex-0]> <Expression>
-3 <Expression> <Number>
-4 <Expression> <[Lex-1]> <Expression> <Expression>
-5 <[:start]> <Script>
-END_OF_DESCRIPTION
-    'g1_rule_ids() and rule()'
-);
 
 package My_Actions;
 # The SELF object is a very awkward way of specifying the per-parse

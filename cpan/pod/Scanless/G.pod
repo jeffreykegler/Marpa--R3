@@ -509,62 +509,6 @@ experts.
 The second, optional, argument is the name of a subgrammar.
 Currently there are L0 and G1 subgrammars.
 
-=head1 Discouraged methods
-
-Discouraged methods are those that
-continue to be supported, but whose use is discouraged for one
-reason or another.
-
-=head2 g1_rule_ids()
-
-=for Marpa::R3::Display
-name: Scanless rule() synopsis
-normalize-whitespace: 1
-
-    my @g1_rule_ids = $grammar->g1_rule_ids();
-    for my $g1_rule_id (@g1_rule_ids) {
-        $g1_rules_description .= "$g1_rule_id "
-            . ( join q{ }, map {"<$_>"} $grammar->rule($g1_rule_id) ) . "\n";
-    }
-
-=for Marpa::R3::Display::End
-
-Please prefer L<"rule_expand()">.
-Returns a list of the G1 rule ID's.
-
-=head2 rule()
-
-=for Marpa::R3::Display
-name: Scanless rule() synopsis
-
-    my @g1_rule_ids = $grammar->g1_rule_ids();
-    for my $g1_rule_id (@g1_rule_ids) {
-        $g1_rules_description .= "$g1_rule_id "
-            . ( join q{ }, map {"<$_>"} $grammar->rule($g1_rule_id) ) . "\n";
-    }
-
-=for Marpa::R3::Display::End
-
-Please prefer L<"rule_expand()">, together with
-L<"symbol_name()"> or
-L<"symbol_display_form()">.
-Given a G1 rule ID as its argument,
-returns an array containing the
-names of the symbols of that rule.
-The C<rule()> method
-returns a Perl false if no G1 rule with that rule ID exists.
-If the rule ID exists,
-C<rule()> returns a list of one or more symbol names.
-The first symbol name will be that of
-the rule's LHS symbol.
-The rest of the list will be the names of the rule's
-RHS symbols, in order.
-The SLIF's C<rule()> method is useful in
-combination with
-the SLIF's
-of L<the progress method|Marpa::R3::Scanless::R/progress()>,
-whose output identifies rules by rule ID.
-
 =head1 Copyright and License
 
 =for Marpa::R3::Display
@@ -589,10 +533,5 @@ ignore: 1
 
 =cut
 
-# Local Variables:
-#   mode: cperl
-#   cperl-indent-level: 4
-#   fill-column: 100
-# End:
 # vim: expandtab shiftwidth=4:
 

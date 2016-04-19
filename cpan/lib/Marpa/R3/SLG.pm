@@ -1049,12 +1049,6 @@ sub Marpa::R3::Scanless::G::show_dotted_rule {
     }
 } ## end sub Marpa::R3::Grammar::show_dotted_rule
 
-sub Marpa::R3::Scanless::G::rule {
-    my ( $slg, @args ) = @_;
-    return $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR]
-        ->rule(@args);
-}
-
 sub Marpa::R3::Scanless::G::rule_ids {
     my ($slg, $subgrammar) = @_;
     return thick_subgrammar_by_name($slg, $subgrammar)->rule_ids();
@@ -1063,11 +1057,6 @@ sub Marpa::R3::Scanless::G::rule_ids {
 sub Marpa::R3::Scanless::G::symbol_ids {
     my ($slg, $subgrammar) = @_;
     return thick_subgrammar_by_name($slg, $subgrammar)->symbol_ids();
-}
-
-sub Marpa::R3::Scanless::G::g1_rule_ids {
-    my ($slg) = @_;
-    return $slg->rule_ids();
 }
 
 # Internal methods, not to be documented

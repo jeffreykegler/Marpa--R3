@@ -938,12 +938,24 @@ sub Marpa::R3::Grammar::tag {
 
 sub Marpa::R3::Grammar::brief_rule {
     my ( $grammar, $rule_id ) = @_;
+    my $symbols   = $grammar->[Marpa::R3::Internal::Grammar::SYMBOLS];
     my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
-    my ( $lhs, @rhs ) = $grammar->rule($rule_id);
+    my $tracer    = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+
+    my @symbol_names = ();
+    my @symbols = $tracer->rule_expand($rule_id);
+    SYMBOL_ID: for my $symbol_id (@symbols) {
+        ## The name of the symbols, before the BNF rewrites
+        my $name =
+            $symbols->[$symbol_id]->[Marpa::R3::Internal::Symbol::LEGACY_NAME]
+            // $grammar->symbol_name($symbol_id);
+        push @symbol_names, $name;
+    }
+    my ( $lhs, @rhs ) = @symbol_names;
     my $minimum = $grammar_c->sequence_min($rule_id);
     my $quantifier = defined $minimum ? $minimum <= 0 ? q{*} : q{+} : q{};
     return ( join q{ }, "$rule_id:", $lhs, '->', @rhs ) . $quantifier;
-} ## end sub Marpa::R3::Grammar::brief_rule
+}
 
 sub Marpa::R3::Grammar::show_rule {
     my ( $grammar, $rule ) = @_;
@@ -998,24 +1010,6 @@ sub Marpa::R3::Grammar::symbol_ids {
     return 0 .. $grammar_c->highest_symbol_id();
 } ## end sub Marpa::R3::Grammar::rule_ids
 
-# Returns empty array if not such rule
-sub Marpa::R3::Grammar::rule {
-    my ( $grammar, $rule_id ) = @_;
-    my $symbols     = $grammar->[Marpa::R3::Internal::Grammar::SYMBOLS];
-    my $tracer    = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
-    my @symbol_names = ();
-
-    my @symbols = $tracer->rule_expand($rule_id);
-    SYMBOL_ID: for my $symbol_id (@symbols) {
-        ## The name of the symbols, before the BNF rewrites
-        my $name =
-            $symbols->[$symbol_id]->[Marpa::R3::Internal::Symbol::LEGACY_NAME]
-            // $grammar->symbol_name($symbol_id);
-        push @symbol_names, $name;
-    } ## end SYMBOL_ID: for my $symbol_id (@symbol_ids)
-    return @symbol_names;
-} ## end sub Marpa::R3::Grammar::rule
-
 # Internal, for use with in coordinating thin and thick
 # interfaces.  NOT DOCUMENTED.
 sub Marpa::R3::Grammar::_rule_mask {
@@ -1024,14 +1018,6 @@ sub Marpa::R3::Grammar::_rule_mask {
     my $rule = $rules->[$rule_id];
     return $rule->[Marpa::R3::Internal::Rule::MASK];
 } ## end sub Marpa::R3::Grammar::rule
-
-# Deprecated and for removal
-# Used in blog post, and part of
-# CPAN version 2.023_008 but
-# never documented in any CPAN version
-sub Marpa::R3::Grammar::bnf_rule {
-    goto &Marpa::R3::Grammar::rule;
-} ## end sub Marpa::R3::Grammar::bnf_rule
 
 sub Marpa::R3::Grammar::show_dotted_rule {
     my ( $grammar, $rule_id, $dot_position ) = @_;

@@ -35,14 +35,15 @@ my $trace_rules = q{};
 
 sub no_bail {
     my ($action_object) = @_;
-    my $rule_id = $Marpa::R3::Context::rule;
-    my $slg = $Marpa::R3::Context::slg;
-    my ( $lhs, @rhs ) = $slg->rule($rule_id);
+    my $rule_id         = $Marpa::R3::Context::rule;
+    my $slg             = $Marpa::R3::Context::slg;
+    my ( $lhs, @rhs ) =
+      map { $slg->symbol_name($_) } $slg->rule_expand($rule_id);
     $action_object->{text} =
-          "rule $rule_id: $lhs ::= "
-        . ( join q{ }, @rhs ) . "\n"
-        . "locations: "
-        . ( join q{-}, Marpa::R3::Context::g1_range() ) . "\n";
+        "rule $rule_id: $lhs ::= "
+      . ( join q{ }, @rhs ) . "\n"
+      . "locations: "
+      . ( join q{-}, Marpa::R3::Context::g1_range() ) . "\n";
     return $action_object;
 } ## end sub do_S
 
