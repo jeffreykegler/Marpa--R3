@@ -1647,7 +1647,7 @@ normalize-whitespace: 1
         my $recce = $self->{recce};
         my ( $g1_start, $g1_length ) = $recce->last_completed('Expression');
         return 'No expression was successfully parsed' if not defined $g1_start;
-        my $last_expression = $recce->substring( $g1_start, $g1_length );
+        my $last_expression = $recce->g1_literal( $g1_start, $g1_length );
         return "Last expression successfully parsed was: $last_expression";
     } ## end sub show_last_expression
 
@@ -1899,19 +1899,19 @@ The output is intended only for reading by humans.
 The exact format is subject to change
 and should not be relied on by applications.
 
-=head2 substring()
+=head2 g1_literal()
 
 =for Marpa::R3::Display
 name: Scanless recognizer diagnostics
 partial: 1
 normalize-whitespace: 1
 
-    my $last_expression = $recce->substring( $g1_start, $g1_length );
+    my $last_expression = $recce->g1_literal( $g1_start, $g1_length );
 
 =for Marpa::R3::Display::End
 
 Given a G1 span -- that is, a G1 start location and a length in G1 locations --
-the C<substring()> method
+the C<g1_literal()> method
 returns a substring of the input
 stream.
 A G1 length of zero will produce the zero-length string.
@@ -1983,7 +1983,7 @@ and a Perl false in scalar context.
 =head2 range_to_string()
 
 Use of this method is discouraged in favor of
-L</"substring()">.
+L</"g1_literal()">.
 Given a G1 start and a G1 end location,
 C<range_to_string()>
 returns the substring of the input
@@ -1998,7 +1998,7 @@ except for whitespace and other normal discards.
 When that is not the case,
 C<range_to_string()> behaves in
 much the same way as described above
-for L</"substring()">.
+for L</"g1_literal()">.
 
 =head1 Copyright and License
 

@@ -115,7 +115,7 @@ sub Marpa::R3::Scanless::R::last_completed_span {
 # Kept for backward compatibiity
 sub Marpa::R3::Scanless::R::range_to_string {
     my ( $self, $start_earley_set, $end_earley_set ) = @_;
-    return $self->substring( $start_earley_set,
+    return $self->g1_literal( $start_earley_set,
         $end_earley_set - $start_earley_set );
 }
 
@@ -134,11 +134,11 @@ sub Marpa::R3::Scanless::R::g1_input_span {
     my $earley_set_for_last_position =
         $start_earley_set + $length_in_parse_locations;
 
-    die 'Error in $slr->substring(',
+    die 'Error in $slr->g1_literal(',
         "$start_earley_set, $length_in_parse_locations", '): ',
         "start ($start_earley_set) is at or after latest_earley_set ($latest_earley_set)"
         if $earley_set_for_first_position > $latest_earley_set;
-    die 'Error in $slr->substring(',
+    die 'Error in $slr->g1_literal(',
         "$start_earley_set, $length_in_parse_locations", '): ',
         "end ( $start_earley_set + $length_in_parse_locations ) is after latest_earley_set ($latest_earley_set)"
         if $earley_set_for_last_position > $latest_earley_set;
@@ -162,14 +162,14 @@ sub Marpa::R3::Scanless::R::g1_input_span {
 # Necessary for the use of show_progress()
 # Given a scanless recognizer and
 # and two earley sets, return the input string
-sub Marpa::R3::Scanless::R::substring {
+sub Marpa::R3::Scanless::R::g1_literal {
     my ( $slr, $start_earley_set, $length_in_parse_locations ) = @_;
     my $p_input = $slr->[Marpa::R3::Internal::Scanless::R::P_INPUT_STRING];
     my ($l0_start, $l0_length) = $slr->g1_input_span($start_earley_set, $length_in_parse_locations);
-    die "Error in $slr->substring($start_earley_set, $length_in_parse_locations)\n"
+    die "Error in $slr->g1_literal($start_earley_set, $length_in_parse_locations)\n"
        if not defined $l0_start;
     return substr ${$p_input}, $l0_start, $l0_length;
-} ## end sub Marpa::R3::Scanless::R::substring
+} ## end sub Marpa::R3::Scanless::R::g1_literal
 
 sub Marpa::R3::Scanless::R::g1_location_to_span {
     my ( $self, $g1_location ) = @_;
@@ -1936,7 +1936,7 @@ sub Marpa::R3::Scanless::R::show_token_link_choice {
     my $value;
     if ($value_ix == 2) {
         # Value is literal
-        $value = $slr->substring ( $middle_earleme, $token_length);
+        $value = $slr->g1_literal ( $middle_earleme, $token_length);
     } else {
         $value = $slr->thin()->token_value($value_ix);
     }

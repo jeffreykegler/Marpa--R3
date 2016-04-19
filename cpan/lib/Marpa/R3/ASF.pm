@@ -521,10 +521,10 @@ sub nid_literal {
         my $and_node_id = nid_to_and_node($nid);
         my ( $start, $length ) = token_es_span( $asf, $and_node_id );
         return q{} if $length == 0;
-        return $slr->substring( $start, $length );
+        return $slr->g1_literal( $start, $length );
     } ## end if ( $nid <= $NID_LEAF_BASE )
     if ( $nid >= 0 ) {
-        return $slr->substring( or_node_es_span( $asf, $nid ) );
+        return $slr->g1_literal( or_node_es_span( $asf, $nid ) );
     }
     Marpa::R3::exception("No literal for node ID: $nid");
 }

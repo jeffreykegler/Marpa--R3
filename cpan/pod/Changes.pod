@@ -56,29 +56,36 @@ Expect it to be broken or removed shortly.
 
 =head2 Unicode now works in the SLIF DSL
 
-=head2 Changes in names of location methods
-
-The specific names changes of methods that deal with
-G1 and input locations are given below.
-The general idea is to make sure that
-all methods that use G1 locations,
-lengths, ranges or spans,
-whether as arguments or as return values,
-will have C<g1> as part of their name.
-
 =head2 New method g1_input_span
 
 =head2 Context::location is now Context::g1_range
 
 =head2 New context variable, Context::g1_span
 
-=head2 $slr->current_g1_location() is now $slr->g1_pos()
-
-=head2 Deprecated named arguments of Scanless grammar elimated
+=head2 Marpa::R2::Scanless::G named arguments removed in Marpa::R3
 
 The C<actions>, C<action_object>, C<default_action>
 and C<default_empty_action>
-named arguments no longer exist.
+named arguments
+of Marpa::R2::Scanless::G named arguments
+have been
+removed in Marpa::R3.
+
+=head2 Marpa::R2::Scanless::R methods renamed in Marpa::R3
+
+For historical reasons,
+the methods dealing with input and G1 parse location in Marpa::R2
+often had unhelpful or misleading names.
+In Marpa::R3 an attempt is being made to name
+methods dealing with G1 and input parse location consistently,
+and to ensure that the
+G1 variants
+have C<g1> somewhere in their name.
+Accordingly,
+C<$slr->substring()> has been renamed
+C<$slr->g1_literal()>;
+and
+$slr->current_g1_location() is now $slr->g1_pos().
 
 =head2 Marpa::R2::Scanless::R methods removed in Marpa::R3
 

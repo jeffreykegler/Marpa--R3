@@ -117,7 +117,7 @@ my $output_re =
     for my $expression (@{${$value_ref}}) {
         my ($g1start, $g1length, $value) = @{$expression};
         my $g1end = $g1start+$g1length-1;
-        $result .= qq{expression: "} . $recce->substring( $g1start, $g1length-1 ) .
+        $result .= qq{expression: "} . $recce->g1_literal( $g1start, $g1length-1 ) .
             qq{" = } . round_value($value);
         $result .= "\n";
         EVENT: while ($event_ix <= $#events) {
