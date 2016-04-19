@@ -284,7 +284,7 @@ e              ~ 'e'
 
 string       ::= lstring
 
-:lexeme ~ lstring pause => before
+:lexeme ~ lstring pause => before event => 'before lstring'
 
 lstring        ~ quote in_string quote
 quote          ~ ["]

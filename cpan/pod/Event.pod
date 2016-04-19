@@ -88,16 +88,6 @@ an application can do its own "external" scanning of lexemes.
 An application may ask Marpa to resume internal scanning at
 any point.
 
-SLIF parse events may be named or unnamed.
-Use of unnamed events is discouraged, and should be reserved for legacy
-code.
-New applications should only use named events.
-When not otherwise specified,
-this document is talking about named events.
-Unnamed events are described
-L<below,
-in a section dedicated to them|/"Unnamed events">.
-
 =head1 Terminology
 
 SLIF parse events are called B<parse events>
@@ -1388,34 +1378,6 @@ normalize-whitespace: 1
     === EOS ===
 
 =for Marpa::R3::Display::End
-
-=head1 Unnamed events
-
-Use of unnamed events is strongly discouraged.
-However, to support legacy code, unnamed events are still supported.
-
-Unnamed events are declared by
-L<C<:lexeme> pseudo-rules|Marpa::R3::Scanless::DSL/"Lexeme pseudo-rule">,
-when
-L<the C<pause> adverb|Marpa::R3::Scanless::DSL/"pause"> 
-is used without
-L<the C<event> adverb|Marpa::R3::Scanless::DSL/"event">.
-Since the
-L<the C<pause> adverb|Marpa::R3::Scanless::DSL/"pause">
-creates a SLIF parse event, but
-L<the C<event> adverb|Marpa::R3::Scanless::DSL/"event">
-provides the event's name,
-this results in a SLIF parse event without a name --
-an unnamed event.
-
-Unnamed events cannot be accessed using
-L<the C<< $slr->events() >>
-method|Marpa::R3::Scanless::R/"events()">.
-The only accessors for unnamed events are
-L<the C<< $slr->pause_lexeme() >>
-method|Marpa::R3::Scanless::R/"pause_lexeme()">
-and L<the C<< $slr->pause_span() >>
-method|Marpa::R3::Scanless::R/"pause_span()">.
 
 =head1 Copyright and License
 

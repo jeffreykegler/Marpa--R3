@@ -24,7 +24,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-use Test::More tests => 12;
+use Test::More tests => 10;
 use English qw( -no_match_vars );
 use lib 'inc';
 use Marpa::R3::Test;
@@ -171,13 +171,6 @@ $slr = Marpa::R3::Scanless::R->new( { grammar => $grammar, semantics_package => 
 do_test($slr, 'once');
 $slr = Marpa::R3::Scanless::R->new( { grammar => $grammar, semantics_package => 'My_Actions' } );
 do_test($slr, 'seq');
-
-# Once again, but with unnamed events
-$expected_events{'all'} =~ s/^ [^\n]+ $/unnamed/gxms;
-$rules =~ s/^ ([:] lexeme \s [^\n]* ) \s+ event \s* [=][>] [^\n]* $/$1/gxms;
-$grammar = Marpa::R3::Scanless::G->new( { source => \$rules } );
-$slr = Marpa::R3::Scanless::R->new( { grammar => $grammar, semantics_package => 'My_Actions' } );
-do_test($slr, 'all');
 
 # Yet another time, with initializers
 %expected_events = %base_expected_events;

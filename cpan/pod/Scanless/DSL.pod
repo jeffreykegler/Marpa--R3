@@ -1093,21 +1093,17 @@ is only allowed in
 L<a C<:lexeme> pseudo-rule|/"Lexeme pseudo-rule">.
 It names the event specified by
 the L<C<pause>|/"pause"> adverb.
+The two adverbs must occur together:
 It is a fatal error to specify the C<event> adverb
 if the L<C<pause>|/"pause"> adverb is not also specified.
+And
+It is a fatal error to specify the C<pause> adverb
+if the L<C<event>|/"event"> adverb is not also specified.
 
 The value of the C<event> adverb is an event
 initializer.
 Event initializers are as described
 L<above|/"Event initializer">.
-
-When an event declared with the
-the L<C<pause>|/"pause"> adverb
-is not named using the C<event> adverb,
-an B<unnamed event> results.
-An unnamed event cannot be accessed by normal methods
-and the use of unnamed events is
-strongly discouraged.
 SLIF parse events are described in detail in
 L<a separate document|Marpa::R3::Event>.
 
@@ -1180,14 +1176,9 @@ The C<pause> adverb declares a SLIF parse event.
 The L<event adverb|/"event"> names the SLIF parse event
 declared by
 the C<pause> adverb.
-
-When an event declared with the
-the L<C<pause>|/"pause"> adverb
-is not named using the C<event> adverb,
-an B<unnamed event> results.
-An unnamed event cannot be accessed by normal methods
-and the use of unnamed events is
-strongly discouraged.
+It is a fatal error to specify the
+C<pause> adverb if the C<event> adverb is
+not also specified.
 
 =head2 priority
 
