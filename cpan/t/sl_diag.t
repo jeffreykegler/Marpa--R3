@@ -23,7 +23,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-use Test::More tests => 11;
+use Test::More tests => 10;
 use English qw( -no_match_vars );
 use lib 'inc';
 use Marpa::R3::Test;
@@ -52,43 +52,6 @@ whitespace ~ [\s]+
 END_OF_RULES
 
 my $grammar = Marpa::R3::Scanless::G->new( { source => \$dsl, });
-
-my $g0_rules_description;
-
-# Marpa::R3::Display
-# name: Scanless g0_rule() synopsis
-
-    my @g0_rule_ids = $grammar->g0_rule_ids();
-    for my $g0_rule_id (@g0_rule_ids) {
-        $g0_rules_description .= "$g0_rule_id "
-            . ( join q{ }, map {"<$_>"} $grammar->g0_rule($g0_rule_id) ) . "\n";
-    }
-
-# Marpa::R3::Display::End
-
-Marpa::R3::Test::is(
-    $g0_rules_description,
-    <<'END_OF_DESCRIPTION',
-0 <[Lex-0]> <[[s]]> <[[a]]> <[[y]]>
-1 <[Lex-1]> <[[\+]]>
-2 <Number> <[[\d]]>
-3 <[:discard]> <whitespace>
-4 <whitespace> <[[\s]]>
-5 <[:discard]> <hash comment>
-6 <hash comment> <terminated hash comment>
-7 <hash comment> <unterminated final hash comment>
-8 <terminated hash comment> <[[\#]]> <hash comment body> <vertical space char>
-9 <unterminated final hash comment> <[[\#]]> <hash comment body>
-10 <hash comment body> <hash comment char>
-11 <vertical space char> <[[\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]]>
-12 <hash comment char> <[[^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]]>
-13 <[:start_lex]> <Number>
-14 <[:start_lex]> <[:discard]>
-15 <[:start_lex]> <[Lex-0]>
-16 <[:start_lex]> <[Lex-1]>
-END_OF_DESCRIPTION
-    'g0_rule_ids() and g0_rule()'
-);
 
 my $g1_rules_description;
 

@@ -1070,17 +1070,6 @@ sub Marpa::R3::Scanless::G::g1_rule_ids {
     return $slg->rule_ids();
 }
 
-sub Marpa::R3::Scanless::G::g0_rule_ids {
-    my ($slg) = @_;
-    return $slg->rule_ids('L0');
-}
-
-sub Marpa::R3::Scanless::G::g0_rule {
-    my ( $slg, @args ) = @_;
-    return $slg->[Marpa::R3::Internal::Scanless::G::THICK_LEX_GRAMMARS]->[0]
-        ->rule(@args);
-}
-
 # Internal methods, not to be documented
 
 sub Marpa::R3::Scanless::G::thick_g1_grammar {

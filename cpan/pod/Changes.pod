@@ -71,6 +71,15 @@ of Marpa::R2::Scanless::G named arguments
 have been
 removed in Marpa::R3.
 
+=head2 Marpa::R2::Scanless::G methods removed in Marpa::R3
+
+The
+C<Marpa::R2::Scanless::G::g0_rule()> method,
+and the
+C<Marpa::R2::Scanless::G::g0_rule_ids()> method,
+discouraged in Marpa::R2,
+have been eliminated in Marpa::R3.
+
 =head2 Marpa::R2::Scanless::R methods renamed in Marpa::R3
 
 For historical reasons,
