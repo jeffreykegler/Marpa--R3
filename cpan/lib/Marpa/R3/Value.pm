@@ -446,7 +446,7 @@ sub Marpa::R3::Scanless::R::ordering_get {
 
     GIVEN_RANKING_METHOD: {
         my $ranking_method =
-            $recce->[Marpa::R3::Internal::Recognizer::RANKING_METHOD];
+            $slr->[Marpa::R3::Internal::Scanless::R::RANKING_METHOD];
         if ( $ranking_method eq 'high_rule_only' ) {
             do_high_rule_only($recce);
             last GIVEN_RANKING_METHOD;
@@ -1407,7 +1407,7 @@ sub Marpa::R3::Recognizer::value {
             Marpa::R3::exception('value() called for recognizer in ASF mode');
         }
         my $max_parses =
-            $recce->[Marpa::R3::Internal::Recognizer::MAX_PARSES];
+            $slr->[Marpa::R3::Internal::Scanless::R::MAX_PARSES];
         my $parse_count = $tree->parse_count();
         if ( $max_parses and $parse_count > $max_parses ) {
             Marpa::R3::exception(
@@ -1431,7 +1431,7 @@ sub Marpa::R3::Recognizer::value {
     local $Marpa::R3::Context::rule    = undef;
     local $Marpa::R3::Context::slr     = $slr;
     local $Marpa::R3::Context::slg =
-        $slr->[Marpa::R3::Internal::Scanless::R::GRAMMAR]
+        $slr->[Marpa::R3::Internal::Scanless::R::SLG]
         if defined $slr;
 
     if ( not $slr->[Marpa::R3::Internal::Scanless::R::REGISTRATIONS] ) {

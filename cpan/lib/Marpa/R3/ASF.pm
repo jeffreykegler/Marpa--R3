@@ -395,7 +395,7 @@ sub Marpa::R3::ASF::new {
 
     $asf->[Marpa::R3::Internal::ASF::GLADES] = [];
 
-    my $slg       = $slr->[Marpa::R3::Internal::Scanless::R::GRAMMAR];
+    my $slg       = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $thin_slr  = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
     my $grammar   = $recce->[Marpa::R3::Internal::Recognizer::GRAMMAR];
     my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
@@ -469,7 +469,7 @@ sub nid_sort_ix {
 sub Marpa::R3::ASF::grammar {
     my ($asf)   = @_;
     my $slr     = $asf->[Marpa::R3::Internal::ASF::SLR];
-    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::GRAMMAR];
+    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     return $slg;
 } ## end sub Marpa::R3::ASF::grammar
 

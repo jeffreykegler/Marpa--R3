@@ -124,7 +124,7 @@ sub Marpa::R3::Scanless::R::naif_set {
         } ## end if ( my @bad_options = grep { not exists $recognizer_options...})
 
         if ( defined( my $value = $args->{'max_parses'} ) ) {
-            $recce->[Marpa::R3::Internal::Recognizer::MAX_PARSES] = $value;
+            $slr->[Marpa::R3::Internal::Scanless::R::MAX_PARSES] = $value;
         }
 
         if ( defined( my $value = $args->{'semantics_package'} ) ) {
@@ -164,7 +164,7 @@ sub Marpa::R3::Scanless::R::naif_set {
                 ( join q{, }, map { q{'} . $_ . q{'} } keys %{$ranking_methods} ),
                 ')' )
                 if not exists $ranking_methods->{$value};
-            $recce->[Marpa::R3::Internal::Recognizer::RANKING_METHOD] =
+            $slr->[Marpa::R3::Internal::Scanless::R::RANKING_METHOD] =
                 $value;
         } ## end if ( defined( my $value = $args->{'ranking_method'} ...))
 

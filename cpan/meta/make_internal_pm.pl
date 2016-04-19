@@ -182,8 +182,6 @@ __DATA__
     TREE_MODE { 'tree' or 'forest' or undef }
 
     END_OF_PARSE
-    MAX_PARSES
-    RANKING_METHOD
 
     { The following fields must be reinitialized when
     evaluation is reset }
@@ -304,9 +302,9 @@ __DATA__
     :package=Marpa::R3::Internal::Scanless::R
 
     SLR_C { The thin version of this object }
+    SLG
 
-    GRAMMAR
-    THICK_G1_RECCE
+    THICK_G1_RECCE { to be deleted }
     P_INPUT_STRING
 
     EXHAUSTION_ACTION
@@ -324,6 +322,8 @@ __DATA__
     to have the benefit of a higher-level context.
     }
 
+    MAX_PARSES
+    RANKING_METHOD
 
     { The following fields must be reinitialized when
     evaluation is reset }
