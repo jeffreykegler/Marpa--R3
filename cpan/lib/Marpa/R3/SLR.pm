@@ -1561,7 +1561,7 @@ sub Marpa::R3::Scanless::R::show_progress {
     my ( $slr, $start_ordinal, $end_ordinal ) = @_;
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $recce = $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
-    my $grammar   = $recce->[Marpa::R3::Internal::Recognizer::GRAMMAR];
+    my $grammar  = $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
     my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
 
     my $last_ordinal = $recce->latest_earley_set();
