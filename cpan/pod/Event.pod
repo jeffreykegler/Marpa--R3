@@ -473,8 +473,7 @@ its trigger location and its event location
 are set to the current location,
 which will also be the location where the lexeme ends.
 A post-lexeme event also sets the
-L<C<pause span> and
-C<pause lexeme>|"Pause span and pause lexeme">.
+L<C<pause span>|"Pause span">.
 Post-lexeme events which trigger during
 C<< $slr->lexeme_complete() >> and
 C<< $slr->lexeme_read() >> calls are discarded.
@@ -504,8 +503,7 @@ is set to the current location.
 Its trigger location is set to the location where the lexeme starts,
 which will be before the event location.
 A pre-lexeme event also sets the
-L<C<pause span> and
-C<pause lexeme>|"Pause span and pause lexeme">.
+L<C<pause span>|"Pause span">.
 
 The SLIF recognizer will B<not> have
 read the lexeme
@@ -763,33 +761,22 @@ Marpa allows ambiguous lexemes and,
 even after all the above criteria have been applied,
 there may be more than one lexeme event at a G1 location.
 
-=head2 Pause span and pause lexeme
+=head2 Pause span
 
 When a lexeme event triggers, it will set
-the B<pause lexeme> to the lexeme symbol.
-It will also set
 the B<pause span> to the start physical input stream location
 and length of the triggering lexeme.
-The pause span and pause lexeme are
+The pause span is
 originally undefined.
 Every call
 to the L<C<read()>|Marpa::R3::Scanless::R/"read()">
 or the L<C<resume()>|Marpa::R3::Scanless::R/"resume()">
-methods resets the pause lexeme
-and the pause span to undefined.
-
+methods resets
+the pause span to undefined.
 The pause span may be accessed directly
 with the
 L<C<< $slr->pause_span() >>
 method|Marpa::R3::Scanless::R/"pause_span()">.
-L<Accessing the pause lexeme
-directly|Marpa::R3::Scanless::R/"pause_lexeme()">
-is discouraged,
-because multiple lexeme events may occur at the
-same G1 location,
-but only one pause lexeme, arbitrarily chosen, is recorded.
-This is not a problem with the pause span, because
-all pause spans at a G1 location will be identical.
 
 =head1 Non-lexeme events
 

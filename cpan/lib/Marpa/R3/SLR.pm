@@ -1765,18 +1765,6 @@ sub Marpa::R3::Scanless::R::pause_span {
     return $thin_slr->pause_span();
 }
 
-sub Marpa::R3::Scanless::R::pause_lexeme {
-    my ($slr)    = @_;
-    my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::C];
-    my $grammar  = $slr->[Marpa::R3::Internal::Scanless::R::GRAMMAR];
-    my $thick_g1_grammar =
-        $grammar->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
-    my $g1_tracer = $thick_g1_grammar->tracer();
-    my $symbol    = $thin_slr->pause_lexeme();
-    return if not defined $symbol;
-    return $g1_tracer->symbol_name($symbol);
-} ## end sub Marpa::R3::Scanless::R::pause_lexeme
-
 sub Marpa::R3::Scanless::R::line_column {
     my ( $slr, $pos ) = @_;
     my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::C];

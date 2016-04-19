@@ -535,7 +535,6 @@ typedef struct
   int throw;
   int start_of_pause_lexeme;
   int end_of_pause_lexeme;
-  Marpa_Symbol_ID pause_lexeme;
   struct symbol_r_properties *symbol_r_properties;
   struct l0_rule_r_properties *l0_rule_r_properties;
   Pos_Entry *pos_db;
@@ -2565,7 +2564,6 @@ slr_alternatives (Scanless_R * slr)
 		  lexeme_entry->t_lexeme_acceptable.t_start_of_lexeme;
 		slr->end_of_pause_lexeme =
 		  lexeme_entry->t_lexeme_acceptable.t_end_of_lexeme;
-		slr->pause_lexeme = g1_lexeme;
 		if (slr->trace_terminals > 2)
 		  {
 		    union marpa_slr_event_s *slr_event =
@@ -2574,14 +2572,14 @@ slr_alternatives (Scanless_R * slr)
 		    slr_event->t_trace_before_lexeme.t_start_of_pause_lexeme =
 		      slr->start_of_pause_lexeme;
 		    slr_event->t_trace_before_lexeme.t_end_of_pause_lexeme = slr->end_of_pause_lexeme;	/* end */
-		    slr_event->t_trace_before_lexeme.t_pause_lexeme = slr->pause_lexeme;	/* lexeme */
+		    slr_event->t_trace_before_lexeme.t_pause_lexeme = g1_lexeme;	/* lexeme */
 		  }
 		{
 		  union marpa_slr_event_s *slr_event =
 		    marpa__slr_event_push (slr->gift);
 		  MARPA_SLREV_TYPE (slr_event) = MARPA_SLREV_BEFORE_LEXEME;
 		  slr_event->t_before_lexeme.t_pause_lexeme =
-		    slr->pause_lexeme;
+		    g1_lexeme;
 		}
 	      }
 	  }
@@ -2655,7 +2653,6 @@ slr_alternatives (Scanless_R * slr)
 		      event->t_lexeme_acceptable.t_start_of_lexeme;
 		    slr->end_of_pause_lexeme =
 		      event->t_lexeme_acceptable.t_end_of_lexeme;
-		    slr->pause_lexeme = g1_lexeme;
 		    if (slr->trace_terminals > 2)
 		      {
 			union marpa_slr_event_s *event =
@@ -2671,7 +2668,7 @@ slr_alternatives (Scanless_R * slr)
 		      union marpa_slr_event_s *event =
 			marpa__slr_event_push (slr->gift);
 		      MARPA_SLREV_TYPE (event) = MARPA_SLREV_AFTER_LEXEME;
-		      event->t_after_lexeme.t_lexeme = slr->pause_lexeme;
+		      event->t_after_lexeme.t_lexeme = g1_lexeme;
 		    }
 		  }
 		break;
@@ -5812,7 +5809,6 @@ PPCODE:
   slr->r1_earleme_complete_result = 0;
   slr->start_of_pause_lexeme = -1;
   slr->end_of_pause_lexeme = -1;
-  slr->pause_lexeme = -1;
 
   slr->pos_db = 0;
   slr->pos_db_logical_size = -1;
@@ -6008,7 +6004,6 @@ PPCODE:
   slr->r1_earleme_complete_result = 0;
   slr->start_of_pause_lexeme = -1;
   slr->end_of_pause_lexeme = -1;
-  slr->pause_lexeme = -1;
 
   /* Clear event queue */
   av_clear (slr->r1_wrapper->event_queue);
@@ -6120,8 +6115,7 @@ pause_span (slr)
      Scanless_R *slr;
 PPCODE:
 {
-  Marpa_Symbol_ID pause_lexeme = slr->pause_lexeme;
-  if (pause_lexeme < 0)
+  if (slr->end_of_pause_lexeme < 0)
     {
       XSRETURN_UNDEF;
     }
@@ -6129,19 +6123,6 @@ PPCODE:
   XPUSHs (sv_2mortal
           (newSViv
            ((IV) slr->end_of_pause_lexeme - slr->start_of_pause_lexeme)));
-}
-
-void
-pause_lexeme (slr)
-     Scanless_R *slr;
-PPCODE:
-{
-  Marpa_Symbol_ID pause_lexeme = slr->pause_lexeme;
-  if (pause_lexeme < 0)
-    {
-      XSRETURN_UNDEF;
-    }
-  XPUSHs (sv_2mortal (newSViv ((IV) pause_lexeme)));
 }
 
 void

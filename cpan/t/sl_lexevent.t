@@ -146,10 +146,6 @@ sub do_test {
             $actual_events .= "\n";
             my ( $start_of_lexeme, $length_of_lexeme ) = $slr->pause_span();
             $pos = $start_of_lexeme + $length_of_lexeme;
-        } elsif (my $pause_lexeme = $slr->pause_lexeme()) {
-            $actual_events .= "unnamed\n";
-            my ( $start_of_lexeme, $length_of_lexeme ) = $slr->pause_span();
-            $pos = $start_of_lexeme + $length_of_lexeme;
         }
         last READ if $pos >= $length;
         $pos = $slr->resume($pos);

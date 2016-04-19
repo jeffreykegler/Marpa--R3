@@ -1332,9 +1332,9 @@ In the span specified by
 the second and third arguments,
 the start location defaults to the current location.
 If the
-L<pause span|Marpa::R3::Event/"Pause span and pause lexeme">
+L<pause span|Marpa::R3::Event/"Pause span">
 is defined,
-and the start of the pause lexeme is
+and the start of the pause span is
 the same as the current location,
 length defaults to the length of the pause span.
 Otherwise length defaults to -1.
@@ -1793,39 +1793,6 @@ physical input stream.
 It returns the substring of the input stream
 corresponding to that span.
 
-=head2 pause_lexeme()
-
-=for Marpa::R3::Display
-name: SLIF trace example
-partial: 1
-normalize-whitespace: 1
-
-   my $lexeme = $re->pause_lexeme();
-
-=for Marpa::R3::Display::End
-
-Use of this method is discouraged.
-New applications should avoid it.
-Instead the lexeme event should be declared as
-a named event.
-The named lexeme event can be set up in such
-a way that
-it uniquely identifies
-the lexeme that triggered it.
-SLIF parse events are described in detail in
-L<a separate document|Marpa::R3::Event>.
-
-The C<pause_lexeme()> method accepts no arguments.
-It returns the current
-L<pause lexeme|Marpa::R3::Event/"Pause span and pause lexeme">.
-More than one lexeme may trigger at the same location,
-in which case the choice of pause lexeme
-is made arbitrarily.
-This is one reason that the use of
-C<pause_lexeme()> is discouraged.
-C<pause_lexeme()> returns a Perl C<undef> when
-the pause lexeme is undefined.
-
 =head2 pause_span()
 
 =for Marpa::R3::Display
@@ -1843,7 +1810,7 @@ the pause span
 as a 2-element array: start and length.
 The "pause span" is
 described in detail
-L<in another document|Marpa::R3::Event/"Pause span and pause lexeme">.
+L<in another document|Marpa::R3::Event/"Pause span">.
 C<pause_span()> returns a Perl C<undef> if
 the pause span is undefined.
 
