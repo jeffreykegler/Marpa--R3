@@ -141,8 +141,6 @@ sub Marpa::R3::Scanless::R::g1_input_span {
 
 }
 
-# Substring in terms of earley sets.
-# Necessary for the use of show_progress()
 # Given a scanless recognizer and
 # and two earley sets, return the input string
 sub Marpa::R3::Scanless::R::g1_literal {
@@ -1577,7 +1575,7 @@ sub Marpa::R3::Scanless::R::show_progress {
     else {
         if ( $start_ordinal < 0 or $start_ordinal > $last_ordinal ) {
             return
-                "Marpa::PP::Recognizer::show_progress start index is $start_ordinal, "
+                "Marpa::R3::Scanless::R::show_progress start index is $start_ordinal, "
                 . "must be in range 0-$last_ordinal";
         }
     } ## end else [ if ( $start_ordinal < 0 ) ]
@@ -1592,7 +1590,7 @@ sub Marpa::R3::Scanless::R::show_progress {
         }
         if ( $end_ordinal < 0 ) {
             return
-                "Marpa::PP::Recognizer::show_progress end index is $end_ordinal_argument, "
+                "Marpa::R3::Scanless::R::show_progress end index is $end_ordinal_argument, "
                 . sprintf ' must be in range %d-%d', -( $last_ordinal + 1 ),
                 $last_ordinal;
         } ## end if ( $end_ordinal < 0 )
