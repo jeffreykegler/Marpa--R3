@@ -1313,7 +1313,7 @@ sub Marpa::R3::Recognizer::value {
     my $trace_actions =
         $recce->[Marpa::R3::Internal::Recognizer::TRACE_ACTIONS] // 0;
     my $trace_values =
-        $recce->[Marpa::R3::Internal::Recognizer::TRACE_VALUES] // 0;
+        $slr->[Marpa::R3::Internal::Scanless::R::TRACE_VALUES] // 0;
     my $trace_file_handle =
         $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
 
@@ -1689,7 +1689,7 @@ sub Marpa::R3::Recognizer::value {
 
         if ( $value_type eq 'MARPA_STEP_TRACE' ) {
 
-            if ( my $trace_output = trace_op( $grammar, $recce, $value ) ) {
+            if ( my $trace_output = trace_op( $slr, $grammar, $value ) ) {
                 print {$trace_file_handle} $trace_output
                     or Marpa::R3::exception('Could not print to trace file');
             }
@@ -2009,11 +2009,13 @@ sub trace_stack_1 {
 
 sub trace_op {
 
-    my ( $grammar, $recce, $value ) = @_;
+    my ( $slr, $grammar, $value ) = @_;
+    my $recce =
+        $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
 
     my $trace_output = q{};
     my $trace_values =
-        $recce->[Marpa::R3::Internal::Recognizer::TRACE_VALUES] // 0;
+        $slr->[Marpa::R3::Internal::Scanless::R::TRACE_VALUES] // 0;
 
     return $trace_output if not $trace_values >= 2;
 

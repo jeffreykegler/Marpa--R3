@@ -185,7 +185,6 @@ __DATA__
     MAX_PARSES
     RANKING_METHOD
     TRACE_ACTIONS
-    TRACE_VALUES
 
     { The following fields must be reinitialized when
     evaluation is reset }
@@ -316,6 +315,7 @@ __DATA__
     TRACE_FILE_HANDLE
     TRACE_LEXERS
     TRACE_TERMINALS
+    TRACE_VALUES
     READ_STRING_ERROR
     EVENTS
 
@@ -323,6 +323,7 @@ __DATA__
     One use is when the error occurs in a subroutine, but you want the bail message
     to have the benefit of a higher-level context.
     }
+
 
     { The following fields must be reinitialized when
     evaluation is reset }

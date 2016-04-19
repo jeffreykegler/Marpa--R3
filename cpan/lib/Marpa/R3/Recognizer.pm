@@ -177,7 +177,7 @@ sub Marpa::R3::Scanless::R::naif_set {
         } ## end if ( defined( my $value = $args->{'trace_actions'} ))
 
         if ( defined( my $value = $args->{'trace_values'} ) ) {
-            $recce->[Marpa::R3::Internal::Recognizer::TRACE_VALUES] = $value;
+            $slr->[Marpa::R3::Internal::Scanless::R::TRACE_VALUES] = $value;
             if ($value) {
                 say {$trace_fh} 'Setting trace_values option'
                     or Marpa::R3::exception("Cannot print: $ERRNO");
