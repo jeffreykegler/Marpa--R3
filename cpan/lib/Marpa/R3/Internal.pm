@@ -73,7 +73,7 @@ use constant TRACE_RULES => 16;
 use constant LAST_FIELD => 16;
 
 package Marpa::R3::Internal::Recognizer;
-use constant C => 0;
+use constant R_C => 0;
 use constant B_C => 1;
 use constant O_C => 2;
 use constant T_C => 3;

@@ -249,7 +249,7 @@ sub Marpa::R3::Scanless::R::new {
 
     my $grammar_c = $thick_g1_grammar->[Marpa::R3::Internal::Grammar::C];
 
-    my $recce_c = $thick_g1_recce->[Marpa::R3::Internal::Recognizer::C] =
+    my $recce_c = $thick_g1_recce->[Marpa::R3::Internal::Recognizer::R_C] =
         Marpa::R3::Thin::R->new($grammar_c);
     if ( not defined $recce_c ) {
         Marpa::R3::exception( $grammar_c->error() );
@@ -1842,7 +1842,7 @@ sub Marpa::R3::Scanless::R::earley_set_size {
 sub Marpa::R3::Scanless::R::show_earley_sets {
     my ($slr)                = @_;
     my $naif_recce = $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
-    my $recce_c                = $naif_recce->[Marpa::R3::Internal::Recognizer::C];
+    my $recce_c                = $naif_recce->[Marpa::R3::Internal::Recognizer::R_C];
     my $last_completed_earleme = $recce_c->current_earleme();
     my $furthest_earleme       = $recce_c->furthest_earleme();
     my $text                   = "Last Completed: $last_completed_earleme; "
@@ -1859,7 +1859,7 @@ sub Marpa::R3::Scanless::R::show_earley_sets {
 sub Marpa::R3::Scanless::R::show_leo_item {
     my ($slr)        = @_;
     my $naif_recce = $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
-    my $recce_c                = $naif_recce->[Marpa::R3::Internal::Recognizer::C];
+    my $recce_c                = $naif_recce->[Marpa::R3::Internal::Recognizer::R_C];
     my $grammar = $naif_recce->[Marpa::R3::Internal::Recognizer::GRAMMAR];
     my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
     my $tracer  = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
@@ -1890,7 +1890,7 @@ sub Marpa::R3::Scanless::R::show_leo_item {
 sub Marpa::R3::Scanless::R::show_token_link_choice {
     my ( $slr, $current_earleme ) = @_;
     my $naif_recce = $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
-    my $recce_c                = $naif_recce->[Marpa::R3::Internal::Recognizer::C];
+    my $recce_c                = $naif_recce->[Marpa::R3::Internal::Recognizer::R_C];
     my $grammar = $naif_recce->[Marpa::R3::Internal::Recognizer::GRAMMAR];
     my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
     my $tracer  = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
@@ -1933,7 +1933,7 @@ sub Marpa::R3::Scanless::R::show_token_link_choice {
 sub Marpa::R3::Scanless::R::show_completion_link_choice {
     my ( $slr, $link_ahm_id, $current_earleme ) = @_;
     my $naif_recce = $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
-    my $recce_c                = $naif_recce->[Marpa::R3::Internal::Recognizer::C];
+    my $recce_c                = $naif_recce->[Marpa::R3::Internal::Recognizer::R_C];
     my $grammar = $naif_recce->[Marpa::R3::Internal::Recognizer::GRAMMAR];
     my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
     my $tracer  = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
@@ -1964,7 +1964,7 @@ sub Marpa::R3::Scanless::R::show_completion_link_choice {
 sub Marpa::R3::Scanless::R::show_leo_link_choice {
     my ( $slr, $link_ahm_id, $current_earleme ) = @_;
     my $naif_recce = $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
-    my $recce_c                = $naif_recce->[Marpa::R3::Internal::Recognizer::C];
+    my $recce_c                = $naif_recce->[Marpa::R3::Internal::Recognizer::R_C];
     my $grammar = $naif_recce->[Marpa::R3::Internal::Recognizer::GRAMMAR];
     my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
 
@@ -1987,7 +1987,7 @@ sub Marpa::R3::Scanless::R::show_leo_link_choice {
 sub Marpa::R3::Scanless::R::show_earley_item {
     my ( $slr, $current_es, $item_id ) = @_;
     my $naif_recce = $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
-    my $recce_c                = $naif_recce->[Marpa::R3::Internal::Recognizer::C];
+    my $recce_c                = $naif_recce->[Marpa::R3::Internal::Recognizer::R_C];
     my $grammar = $naif_recce->[Marpa::R3::Internal::Recognizer::GRAMMAR];
     my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
     my $tracer  = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
@@ -2081,7 +2081,7 @@ sub Marpa::R3::Scanless::R::show_earley_item {
 sub Marpa::R3::Scanless::R::show_earley_set {
     my ( $slr, $traced_set_id ) = @_;
     my $naif_recce = $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
-    my $recce_c                = $naif_recce->[Marpa::R3::Internal::Recognizer::C];
+    my $recce_c                = $naif_recce->[Marpa::R3::Internal::Recognizer::R_C];
 
     my $text      = q{};
     my @sorted_data = ();
@@ -2117,7 +2117,7 @@ sub Marpa::R3::Scanless::R::show_earley_set {
 sub Marpa::R3::Scanless::R::show_or_nodes {
     my ( $slr, $verbose ) = @_;
     my $naif_recce = $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
-    my $recce_c                = $naif_recce->[Marpa::R3::Internal::Recognizer::C];
+    my $recce_c                = $naif_recce->[Marpa::R3::Internal::Recognizer::R_C];
     my $thick_g1_recce =
         $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
     my $bocage = $thick_g1_recce->[Marpa::R3::Internal::Recognizer::B_C];
@@ -2127,7 +2127,7 @@ sub Marpa::R3::Scanless::R::show_or_nodes {
 sub Marpa::R3::Scanless::R::show_and_nodes {
     my ( $slr ) = @_;
     my $naif_recce = $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
-    my $recce_c                = $naif_recce->[Marpa::R3::Internal::Recognizer::C];
+    my $recce_c                = $naif_recce->[Marpa::R3::Internal::Recognizer::R_C];
     my $thick_g1_recce =
         $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
     my $bocage = $thick_g1_recce->[Marpa::R3::Internal::Recognizer::B_C];

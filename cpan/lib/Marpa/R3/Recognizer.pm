@@ -39,7 +39,7 @@ sub Marpa::R3::Recognizer::grammar {
 }
 
 sub Marpa::R3::Recognizer::thin {
-    $_[0]->[Marpa::R3::Internal::Recognizer::C];
+    $_[0]->[Marpa::R3::Internal::Recognizer::R_C];
 }
 
 # For the non-legacy case,
@@ -83,7 +83,7 @@ sub Marpa::R3::Scanless::R::naif_set {
     my ( $slr, @arg_hashes ) = @_;
     my $recce =
         $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
-    my $recce_c = $recce->[Marpa::R3::Internal::Recognizer::C];
+    my $recce_c = $recce->[Marpa::R3::Internal::Recognizer::R_C];
 
     # This may get changed below
     my $trace_fh =
@@ -205,7 +205,7 @@ sub Marpa::R3::Scanless::R::naif_set {
 
 sub Marpa::R3::Recognizer::latest_earley_set {
     my ($recce) = @_;
-    my $recce_c = $recce->[Marpa::R3::Internal::Recognizer::C];
+    my $recce_c = $recce->[Marpa::R3::Internal::Recognizer::R_C];
     return $recce_c->latest_earley_set();
 }
 
@@ -217,31 +217,31 @@ sub Marpa::R3::Recognizer::check_terminal {
 
 sub Marpa::R3::Recognizer::exhausted {
     my ($recce) = @_;
-    my $recce_c = $recce->[Marpa::R3::Internal::Recognizer::C];
+    my $recce_c = $recce->[Marpa::R3::Internal::Recognizer::R_C];
     return $recce_c->is_exhausted();
 }
 
 sub Marpa::R3::Recognizer::current_earleme {
     my ($recce) = @_;
-    my $recce_c = $recce->[Marpa::R3::Internal::Recognizer::C];
+    my $recce_c = $recce->[Marpa::R3::Internal::Recognizer::R_C];
     return $recce_c->current_earleme();
 }
 
 sub Marpa::R3::Recognizer::furthest_earleme {
     my ($recce) = @_;
-    my $recce_c = $recce->[Marpa::R3::Internal::Recognizer::C];
+    my $recce_c = $recce->[Marpa::R3::Internal::Recognizer::R_C];
     return $recce_c->furthest_earleme();
 }
 
 sub Marpa::R3::Recognizer::earleme {
     my ( $recce, $earley_set_id ) = @_;
-    my $recce_c = $recce->[Marpa::R3::Internal::Recognizer::C];
+    my $recce_c = $recce->[Marpa::R3::Internal::Recognizer::R_C];
     return $recce_c->earleme($earley_set_id);
 }
 
 sub Marpa::R3::Recognizer::expected_symbol_event_set {
     my ( $recce, $symbol_name, $value ) = @_;
-    my $recce_c = $recce->[Marpa::R3::Internal::Recognizer::C];
+    my $recce_c = $recce->[Marpa::R3::Internal::Recognizer::R_C];
     my $grammar = $recce->[Marpa::R3::Internal::Recognizer::GRAMMAR];
     my $symbol_id =
         $grammar->[Marpa::R3::Internal::Grammar::TRACER]
@@ -258,7 +258,7 @@ sub Marpa::R3::Recognizer::strip { return 1; }
 
 sub Marpa::R3::Recognizer::progress {
     my ( $recce, $ordinal_arg ) = @_;
-    my $recce_c = $recce->[Marpa::R3::Internal::Recognizer::C];
+    my $recce_c = $recce->[Marpa::R3::Internal::Recognizer::R_C];
     my $latest_earley_set = $recce->latest_earley_set();
     my $ordinal;
     SET_ORDINAL: {
@@ -389,7 +389,7 @@ sub Marpa::R3::Recognizer::show_progress {
 
 sub Marpa::R3::Recognizer::terminals_expected {
     my ($recce) = @_;
-    my $recce_c = $recce->[Marpa::R3::Internal::Recognizer::C];
+    my $recce_c = $recce->[Marpa::R3::Internal::Recognizer::R_C];
     my $grammar = $recce->[Marpa::R3::Internal::Recognizer::GRAMMAR];
     return [ map { $grammar->symbol_name($_) }
             $recce_c->terminals_expected() ];
@@ -431,7 +431,7 @@ sub Marpa::R3::escape_string {
 
 sub Marpa::R3::Recognizer::use_leo_set {
     my ( $recce, $boolean ) = @_;
-    my $recce_c = $recce->[Marpa::R3::Internal::Recognizer::C];
+    my $recce_c = $recce->[Marpa::R3::Internal::Recognizer::R_C];
     return $recce_c->_marpa_r_is_use_leo_set($boolean);
 }
 
@@ -441,7 +441,7 @@ sub Marpa::R3::Recognizer::use_leo_set {
 # are doing their job.
 sub Marpa::R3::Recognizer::earley_set_size {
     my ( $recce, $set_id ) = @_;
-    my $recce_c = $recce->[Marpa::R3::Internal::Recognizer::C];
+    my $recce_c = $recce->[Marpa::R3::Internal::Recognizer::R_C];
     $set_id //= $recce_c->latest_earley_set();
     return $recce_c->_marpa_r_earley_set_size($set_id);
 }

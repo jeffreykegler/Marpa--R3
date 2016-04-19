@@ -431,7 +431,7 @@ sub Marpa::R3::Scanless::R::ordering_get {
         $recce->[Marpa::R3::Internal::Recognizer::END_OF_PARSE];
     my $grammar   = $recce->[Marpa::R3::Internal::Recognizer::GRAMMAR];
     my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
-    my $recce_c   = $recce->[Marpa::R3::Internal::Recognizer::C];
+    my $recce_c   = $recce->[Marpa::R3::Internal::Recognizer::R_C];
 
     $grammar_c->throw_set(0);
     my $bocage = $recce->[Marpa::R3::Internal::Recognizer::B_C] =
@@ -641,7 +641,7 @@ sub registration_init {
         $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
     my $grammar   = $recce->[Marpa::R3::Internal::Recognizer::GRAMMAR];
     my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
-    my $recce_c   = $recce->[Marpa::R3::Internal::Recognizer::C];
+    my $recce_c   = $recce->[Marpa::R3::Internal::Recognizer::R_C];
     my $tracer    = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
     my $trace_actions =
         $slr->[Marpa::R3::Internal::Scanless::R::TRACE_ACTIONS] // 0;
@@ -1307,7 +1307,7 @@ sub Marpa::R3::Recognizer::value {
     my ( $recce, $slr, $per_parse_arg ) = @_;
     my $grammar   = $recce->[Marpa::R3::Internal::Recognizer::GRAMMAR];
     my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
-    my $recce_c   = $recce->[Marpa::R3::Internal::Recognizer::C];
+    my $recce_c   = $recce->[Marpa::R3::Internal::Recognizer::R_C];
     my $tracer    = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
 
     my $trace_actions =
@@ -1730,7 +1730,7 @@ sub Marpa::R3::Recognizer::show_bocage {
     my ($recce)   = @_;
     my @data      = ();
     my $id        = 0;
-    my $recce_c   = $recce->[Marpa::R3::Internal::Recognizer::C];
+    my $recce_c   = $recce->[Marpa::R3::Internal::Recognizer::R_C];
     my $bocage    = $recce->[Marpa::R3::Internal::Recognizer::B_C];
     my $grammar   = $recce->[Marpa::R3::Internal::Recognizer::GRAMMAR];
     my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
@@ -1783,7 +1783,7 @@ sub Marpa::R3::Recognizer::show_bocage {
 sub Marpa::R3::Recognizer::and_node_tag {
     my ( $recce, $and_node_id ) = @_;
     my $bocage            = $recce->[Marpa::R3::Internal::Recognizer::B_C];
-    my $recce_c           = $recce->[Marpa::R3::Internal::Recognizer::C];
+    my $recce_c           = $recce->[Marpa::R3::Internal::Recognizer::R_C];
     my $parent_or_node_id = $bocage->_marpa_b_and_node_parent($and_node_id);
     my $origin         = $bocage->_marpa_b_or_node_origin($parent_or_node_id);
     my $origin_earleme = $recce_c->earleme($origin);
@@ -1821,7 +1821,7 @@ sub Marpa::R3::Recognizer::and_node_tag {
 
 sub Marpa::R3::Recognizer::show_and_nodes {
     my ($recce) = @_;
-    my $recce_c = $recce->[Marpa::R3::Internal::Recognizer::C];
+    my $recce_c = $recce->[Marpa::R3::Internal::Recognizer::R_C];
     my $bocage  = $recce->[Marpa::R3::Internal::Recognizer::B_C];
     return $recce_c->show_and_nodes($bocage);
 } ## end sub Marpa::R3::Recognizer::show_and_nodes
@@ -1838,7 +1838,7 @@ sub Marpa::R3::Recognizer::or_node_tag {
 
 sub Marpa::R3::Recognizer::show_or_nodes {
     my ( $recce, $verbose ) = @_;
-    my $recce_c = $recce->[Marpa::R3::Internal::Recognizer::C];
+    my $recce_c = $recce->[Marpa::R3::Internal::Recognizer::R_C];
     my $bocage  = $recce->[Marpa::R3::Internal::Recognizer::B_C];
     return $recce_c->show_or_nodes( $bocage, $verbose);
 }
@@ -1861,7 +1861,7 @@ sub Marpa::R3::Recognizer::verbose_or_nodes {
 
 sub Marpa::R3::Recognizer::verbose_or_node {
     my ( $recce, $or_node_id ) = @_;
-    my $recce_c = $recce->[Marpa::R3::Internal::Recognizer::C];
+    my $recce_c = $recce->[Marpa::R3::Internal::Recognizer::R_C];
     my $bocage  = $recce->[Marpa::R3::Internal::Recognizer::B_C];
     my $origin  = $bocage->_marpa_b_or_node_origin($or_node_id);
     return if not defined $origin;
@@ -1884,7 +1884,7 @@ sub Marpa::R3::Recognizer::verbose_or_node {
 
 sub Marpa::R3::Recognizer::show_nook {
     my ( $recce, $nook_id, $verbose ) = @_;
-    my $recce_c = $recce->[Marpa::R3::Internal::Recognizer::C];
+    my $recce_c = $recce->[Marpa::R3::Internal::Recognizer::R_C];
     my $order   = $recce->[Marpa::R3::Internal::Recognizer::O_C];
     my $tree    = $recce->[Marpa::R3::Internal::Recognizer::T_C];
 
@@ -1988,7 +1988,7 @@ sub trace_token_evaluation {
 
 sub trace_stack_1 {
     my ( $grammar, $recce, $value, $args, $rule_id ) = @_;
-    my $recce_c = $recce->[Marpa::R3::Internal::Recognizer::C];
+    my $recce_c = $recce->[Marpa::R3::Internal::Recognizer::R_C];
     my $bocage  = $recce->[Marpa::R3::Internal::Recognizer::B_C];
     my $order   = $recce->[Marpa::R3::Internal::Recognizer::O_C];
     my $tree    = $recce->[Marpa::R3::Internal::Recognizer::T_C];
