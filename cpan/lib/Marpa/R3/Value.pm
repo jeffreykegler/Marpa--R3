@@ -49,7 +49,9 @@ sub Marpa::R3::Internal::Recognizer::resolve_action {
         $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
     my $trace_file_handle =
         $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
-    my $grammar  = $recce->[Marpa::R3::Internal::Recognizer::GRAMMAR];
+    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+    my $grammar =
+        $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
     my $trace_actions =
         $slr->[Marpa::R3::Internal::Scanless::R::TRACE_ACTIONS];
 
@@ -202,7 +204,9 @@ sub Marpa::R3::Scanless::R::lexeme_blessing_find {
     my ( $slr, $lexeme_id ) = @_;
     my $recce =
         $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
-    my $grammar  = $recce->[Marpa::R3::Internal::Recognizer::GRAMMAR];
+    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+    my $grammar =
+        $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
     my $symbols  = $grammar->[Marpa::R3::Internal::Grammar::SYMBOLS];
     my $symbol   = $symbols->[$lexeme_id];
     my $blessing = $symbol->[Marpa::R3::Internal::Symbol::BLESSING];
@@ -468,7 +472,9 @@ sub resolve_rule_by_id {
     my ( $slr, $rule_id ) = @_;
     my $recce =
         $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
-    my $grammar     = $recce->[Marpa::R3::Internal::Recognizer::GRAMMAR];
+    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+    my $grammar =
+        $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
     my $rules       = $grammar->[Marpa::R3::Internal::Grammar::RULES];
     my $rule        = $rules->[$rule_id];
     my $action_name = $rule->[Marpa::R3::Internal::Rule::ACTION_NAME];
@@ -494,7 +500,9 @@ sub resolve_recce {
     my ( $slr, $per_parse_arg ) = @_;
     my $recce =
         $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
-    my $grammar   = $recce->[Marpa::R3::Internal::Recognizer::GRAMMAR];
+    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+    my $grammar =
+        $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
     my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
     my $rules     = $grammar->[Marpa::R3::Internal::Grammar::RULES];
     my $symbols   = $grammar->[Marpa::R3::Internal::Grammar::SYMBOLS];
@@ -643,7 +651,9 @@ sub registration_init {
 
     my $trace_file_handle =
         $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
-    my $grammar   = $recce->[Marpa::R3::Internal::Recognizer::GRAMMAR];
+    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+    my $grammar =
+        $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
     my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
     my $recce_c   = $recce->[Marpa::R3::Internal::Recognizer::R_C];
     my $tracer    = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
@@ -1309,7 +1319,9 @@ sub registration_init {
 # Returns false if no parse
 sub Marpa::R3::Recognizer::value {
     my ( $recce, $slr, $per_parse_arg ) = @_;
-    my $grammar   = $recce->[Marpa::R3::Internal::Recognizer::GRAMMAR];
+    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+    my $grammar =
+        $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
     my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
     my $recce_c   = $recce->[Marpa::R3::Internal::Recognizer::R_C];
     my $tracer    = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
