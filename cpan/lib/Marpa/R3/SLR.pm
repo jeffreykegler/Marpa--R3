@@ -46,7 +46,7 @@ sub Marpa::R3::Scanless::R::last_completed {
         $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
     my $thick_g1_recce =
         $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
-    my $thin_g1_recce = $thick_g1_recce->thin();
+    my $thin_g1_recce = $thick_g1_recce->[Marpa::R3::Internal::Recognizer::R_C];
     my $sought_rules =
         $slg->[Marpa::R3::Internal::Scanless::G::CACHE_RULEIDS_BY_LHS_NAME]
         ->{$symbol_name};
@@ -110,7 +110,7 @@ sub Marpa::R3::Scanless::R::g1_input_span {
         or not defined $length_in_parse_locations;
     my $thick_g1_recce =
         $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
-    my $thin_g1_recce     = $thick_g1_recce->thin();
+    my $thin_g1_recce     = $thick_g1_recce->[Marpa::R3::Internal::Recognizer::R_C];
     my $latest_earley_set = $thin_g1_recce->latest_earley_set();
 
     my $earley_set_for_first_position = $start_earley_set + 1;
@@ -266,9 +266,10 @@ sub Marpa::R3::Scanless::R::new {
 
     $slr->reset_evaluation();
 
-    my $thin_slr =
-        Marpa::R3::Thin::SLR->new( $slg->[Marpa::R3::Internal::Scanless::G::C],
-        $thick_g1_recce->thin() );
+    my $thin_slr = Marpa::R3::Thin::SLR->new(
+        $slg->[Marpa::R3::Internal::Scanless::G::C],
+        $thick_g1_recce->[Marpa::R3::Internal::Recognizer::R_C]
+    );
     $thin_slr->earley_item_warning_threshold_set($too_many_earley_items)
         if defined $too_many_earley_items;
     $slr->[Marpa::R3::Internal::Scanless::R::SLR_C]      = $thin_slr;
@@ -553,8 +554,8 @@ my $libmarpa_trace_event_handlers = {
             $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
         my $thick_g1_recce =
             $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
-        my $thick_g1_grammar = $thick_g1_recce->grammar();
         my $slg              = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+        my $thick_g1_grammar = $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
         say {$trace_file_handle} qq{Accepted lexeme },
             input_range_describe( $slr, $lexeme_start_pos,
             $lexeme_end_pos - 1 ),
@@ -1077,10 +1078,10 @@ sub Marpa::R3::Scanless::R::read_problem {
     die 'No problem_code in slr->read_problem()' if not $problem_code;
 
     my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
-    my $grammar  = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+    my $slg  = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
 
     my $thick_lex_grammar =
-        $grammar->[Marpa::R3::Internal::Scanless::G::THICK_LEX_GRAMMARS]->[0];
+        $slg->[Marpa::R3::Internal::Scanless::G::THICK_LEX_GRAMMARS]->[0];
     my $lex_tracer = $thick_lex_grammar->tracer();
 
     my $trace_file_handle =
@@ -1088,8 +1089,8 @@ sub Marpa::R3::Scanless::R::read_problem {
 
     my $thick_g1_recce =
         $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
-    my $thin_g1_recce    = $thick_g1_recce->thin();
-    my $thick_g1_grammar = $thick_g1_recce->grammar();
+    my $thin_g1_recce    = $thick_g1_recce->[Marpa::R3::Internal::Recognizer::R_C];
+    my $thick_g1_grammar = $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
     my $g1_tracer        = $thick_g1_grammar->tracer();
 
     my $pos      = $thin_slr->pos();
@@ -1276,7 +1277,7 @@ sub Marpa::R3::Scanless::R::read_problem {
             $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
         my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
         my $thick_lex_grammar =
-            $grammar->[Marpa::R3::Internal::Scanless::G::THICK_LEX_GRAMMARS]->[0];
+            $slg->[Marpa::R3::Internal::Scanless::G::THICK_LEX_GRAMMARS]->[0];
         my $lex_tracer = $thick_lex_grammar->tracer();
         my ( $line, $column ) = $slr->line_column($stream_pos);
         $read_string_error .=
@@ -1768,7 +1769,7 @@ sub Marpa::R3::Scanless::R::activate {
     $activate //= 1;
     my $thick_g1_recce =
         $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
-    my $thin_g1_recce = $thick_g1_recce->thin();
+    my $thin_g1_recce = $thick_g1_recce->[Marpa::R3::Internal::Recognizer::R_C];
     my $event_symbol_ids_by_type =
         $slg
         ->[Marpa::R3::Internal::Scanless::G::SYMBOL_IDS_BY_EVENT_NAME_AND_TYPE]
@@ -1919,7 +1920,7 @@ sub Marpa::R3::Scanless::R::show_token_link_choice {
         # Value is literal
         $value = $slr->g1_literal ( $middle_earleme, $token_length);
     } else {
-        $value = $slr->thin()->token_value($value_ix);
+        $value = $slr->[Marpa::R3::Internal::Recognizer::R_C]->token_value($value_ix);
     }
     my $token_dump = Data::Dumper->new( [ \$value ] )->Terse(1)->Dump;
     chomp $token_dump;

@@ -33,15 +33,6 @@ use English qw( -no_match_vars );
 
 my $parse_number = 0;
 
-# Not documented, at least for the moment
-sub Marpa::R3::Recognizer::grammar {
-    $_[0]->[Marpa::R3::Internal::Recognizer::GRAMMAR];
-}
-
-sub Marpa::R3::Recognizer::thin {
-    $_[0]->[Marpa::R3::Internal::Recognizer::R_C];
-}
-
 # For the non-legacy case,
 # I reset the ordering, forcing it to be recalculated
 # for each parse series.
