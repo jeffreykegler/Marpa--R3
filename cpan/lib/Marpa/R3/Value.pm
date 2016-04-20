@@ -242,8 +242,12 @@ sub Marpa::R3::Scanless::R::lexeme_blessing_find {
 
 # For diagnostics
 sub Marpa::R3::Internal::Recognizer::brief_rule_list {
-    my ( $recce, $rule_ids ) = @_;
-    my $grammar = $recce->[Marpa::R3::Internal::Recognizer::GRAMMAR];
+    my ( $slr, $rule_ids ) = @_;
+    my $recce =
+        $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
+    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+    my $grammar =
+        $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
     my @brief_rules = map { $grammar->brief_rule($_) } @{$rule_ids};
     return join q{}, map { q{    } . $_ . "\n" } @brief_rules;
 } ## end sub Marpa::R3::Internal::Recognizer::brief_rule_list
@@ -840,7 +844,7 @@ sub registration_init {
                     qq{  Marpa needs there to be only one semantics\n},
                     qq{  The rules involved are:\n},
                     Marpa::R3::Internal::Recognizer::brief_rule_list(
-                        $recce, $rule_ids
+                        $slr, $rule_ids
                     )
                 );
             } ## end if ( $first_closure_name ne $other_closure_name or ...)
