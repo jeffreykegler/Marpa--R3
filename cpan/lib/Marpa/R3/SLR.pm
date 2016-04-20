@@ -1563,10 +1563,11 @@ sub Marpa::R3::Scanless::R::show_progress {
     my ( $slr, $start_ordinal, $end_ordinal ) = @_;
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $recce = $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
+    my $recce_c = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
     my $grammar  = $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
     my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
 
-    my $last_ordinal = $recce->latest_earley_set();
+    my $last_ordinal = $recce_c->latest_earley_set();
 
     if ( not defined $start_ordinal ) {
         $start_ordinal = $last_ordinal;
@@ -1600,7 +1601,7 @@ sub Marpa::R3::Scanless::R::show_progress {
 
     my $text = q{};
     for my $current_ordinal ( $start_ordinal .. $end_ordinal ) {
-        my $current_earleme     = $recce->earleme($current_ordinal);
+        my $current_earleme     = $slr->earleme($current_ordinal);
         my %by_rule_by_position = ();
         for my $progress_item ( @{ $recce->progress($current_ordinal) } ) {
             my ( $rule_id, $position, $origin ) = @{$progress_item};
@@ -1676,16 +1677,35 @@ sub Marpa::R3::Scanless::R::terminals_expected {
 }
 
 sub Marpa::R3::Scanless::R::exhausted {
-    my ($self) = @_;
-    return $self->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE]
-        ->exhausted();
+    my ($slr) = @_;
+    return $slr->[Marpa::R3::Internal::Scanless::R::R_C]
+        ->is_exhausted();
 }
 
 # Latest and current G1 location are the same
 sub Marpa::R3::Scanless::R::g1_pos {
-    my ($slg) = @_;
-    return $slg->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE]
+    my ($slr) = @_;
+    return $slr->[Marpa::R3::Internal::Scanless::R::R_C]
         ->latest_earley_set();
+}
+
+sub Marpa::R3::Scanless::R::current_earleme {
+    my ($slr) = @_;
+    my $recce_c = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
+    return $recce_c->current_earleme();
+}
+
+# Not documented, I think
+sub Marpa::R3::Scanless::R::furthest_earleme {
+    my ($slr) = @_;
+    my $recce_c = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
+    return $recce_c->furthest_earleme();
+}
+
+sub Marpa::R3::Scanless::R::earleme {
+    my ( $slr, $earley_set_id ) = @_;
+    my $recce_c = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
+    return $recce_c->earleme($earley_set_id);
 }
 
 sub Marpa::R3::Scanless::R::lexeme_alternative {

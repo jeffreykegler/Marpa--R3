@@ -73,7 +73,7 @@ sub Marpa::R3::Scanless::R::naif_set {
     my ( $slr, @arg_hashes ) = @_;
     my $recce =
         $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
-    my $recce_c = $recce->[Marpa::R3::Internal::Recognizer::R_C];
+    my $recce_c = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
 
     # This may get changed below
     my $trace_fh =
@@ -193,42 +193,12 @@ sub Marpa::R3::Scanless::R::naif_set {
     return 1;
 } ## end sub Marpa::R3::Recognizer::set
 
-sub Marpa::R3::Recognizer::latest_earley_set {
-    my ($recce) = @_;
-    my $recce_c = $recce->[Marpa::R3::Internal::Recognizer::R_C];
-    return $recce_c->latest_earley_set();
-}
-
-sub Marpa::R3::Recognizer::exhausted {
-    my ($recce) = @_;
-    my $recce_c = $recce->[Marpa::R3::Internal::Recognizer::R_C];
-    return $recce_c->is_exhausted();
-}
-
-sub Marpa::R3::Recognizer::current_earleme {
-    my ($recce) = @_;
-    my $recce_c = $recce->[Marpa::R3::Internal::Recognizer::R_C];
-    return $recce_c->current_earleme();
-}
-
-sub Marpa::R3::Recognizer::furthest_earleme {
-    my ($recce) = @_;
-    my $recce_c = $recce->[Marpa::R3::Internal::Recognizer::R_C];
-    return $recce_c->furthest_earleme();
-}
-
-sub Marpa::R3::Recognizer::earleme {
-    my ( $recce, $earley_set_id ) = @_;
-    my $recce_c = $recce->[Marpa::R3::Internal::Recognizer::R_C];
-    return $recce_c->earleme($earley_set_id);
-}
-
 # Viewing methods, for debugging
 
 sub Marpa::R3::Recognizer::progress {
     my ( $recce, $ordinal_arg ) = @_;
     my $recce_c = $recce->[Marpa::R3::Internal::Recognizer::R_C];
-    my $latest_earley_set = $recce->latest_earley_set();
+    my $latest_earley_set = $recce_c->latest_earley_set();
     my $ordinal;
     SET_ORDINAL: {
         if ( not defined $ordinal_arg ) {
