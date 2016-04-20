@@ -73,12 +73,11 @@ use constant TRACE_RULES => 16;
 use constant LAST_FIELD => 16;
 
 package Marpa::R3::Internal::Recognizer;
-use constant R_C => 0;
-use constant B_C => 1;
-use constant O_C => 2;
-use constant T_C => 3;
-use constant TREE_MODE => 4;
-use constant END_OF_PARSE => 5;
+use constant B_C => 0;
+use constant O_C => 1;
+use constant T_C => 2;
+use constant TREE_MODE => 3;
+use constant END_OF_PARSE => 4;
 
 package Marpa::R3::Internal::Progress_Report;
 use constant RULE_ID => 0;

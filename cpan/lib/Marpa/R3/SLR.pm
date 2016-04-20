@@ -247,7 +247,6 @@ sub Marpa::R3::Scanless::R::new {
 
     my $recce_c =
         $slr->[Marpa::R3::Internal::Scanless::R::R_C] =
-        $thick_g1_recce->[Marpa::R3::Internal::Recognizer::R_C] =
         Marpa::R3::Thin::R->new($grammar_c);
     if ( not defined $recce_c ) {
         Marpa::R3::exception( $grammar_c->error() );
