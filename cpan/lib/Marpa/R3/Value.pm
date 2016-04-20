@@ -164,8 +164,12 @@ sub Marpa::R3::Internal::Recognizer::resolve_action {
 
 # Find the semantics for a lexeme.
 sub Marpa::R3::Internal::Recognizer::lexeme_semantics_find {
-    my ( $recce, $lexeme_id ) = @_;
-    my $grammar   = $recce->[Marpa::R3::Internal::Recognizer::GRAMMAR];
+    my ( $slr, $lexeme_id ) = @_;
+    my $recce = $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
+    my $recce_c                = $recce->[Marpa::R3::Internal::Recognizer::R_C];
+    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+    my $grammar =
+        $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
     my $symbols   = $grammar->[Marpa::R3::Internal::Grammar::SYMBOLS];
     my $symbol    = $symbols->[$lexeme_id];
     my $semantics = $symbol->[Marpa::R3::Internal::Symbol::LEXEME_SEMANTICS];
@@ -602,7 +606,7 @@ sub resolve_recce {
     my @lexeme_resolutions = ();
     SYMBOL: for my $lexeme_id ( 0 .. $#{$symbols} ) {
         my $semantics =
-            Marpa::R3::Internal::Recognizer::lexeme_semantics_find( $recce,
+            Marpa::R3::Internal::Recognizer::lexeme_semantics_find( $slr,
             $lexeme_id );
         if ( not defined $semantics ) {
             my $message =
