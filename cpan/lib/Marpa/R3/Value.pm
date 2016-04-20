@@ -1700,7 +1700,7 @@ sub Marpa::R3::Recognizer::value {
 
             if ($trace_values) {
                 say {$trace_file_handle}
-                    trace_stack_1( $grammar, $recce, $value, $values,
+                    trace_stack_1( $slr, $value, $values,
                     $rule_id )
                     or Marpa::R3::exception('Could not print to trace file');
                 print {$trace_file_handle}
@@ -1856,8 +1856,13 @@ sub trace_token_evaluation {
 } ## end sub trace_token_evaluation
 
 sub trace_stack_1 {
-    my ( $grammar, $recce, $value, $args, $rule_id ) = @_;
-    my $recce_c = $recce->[Marpa::R3::Internal::Recognizer::R_C];
+    my ( $slr, $value, $args, $rule_id ) = @_;
+    my $recce =
+        $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
+    my $recce_c = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
+    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+    my $grammar =
+        $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
     my $bocage  = $recce->[Marpa::R3::Internal::Recognizer::B_C];
     my $order   = $recce->[Marpa::R3::Internal::Recognizer::O_C];
     my $tree    = $recce->[Marpa::R3::Internal::Recognizer::T_C];
