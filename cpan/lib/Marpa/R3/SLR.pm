@@ -1895,7 +1895,9 @@ sub Marpa::R3::Scanless::R::show_token_link_choice {
     my ( $slr, $current_earleme ) = @_;
     my $naif_recce = $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
     my $recce_c                = $naif_recce->[Marpa::R3::Internal::Recognizer::R_C];
-    my $grammar = $naif_recce->[Marpa::R3::Internal::Recognizer::GRAMMAR];
+    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+    my $grammar =
+        $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
     my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
     my $tracer  = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
 
@@ -1938,7 +1940,9 @@ sub Marpa::R3::Scanless::R::show_completion_link_choice {
     my ( $slr, $link_ahm_id, $current_earleme ) = @_;
     my $naif_recce = $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
     my $recce_c                = $naif_recce->[Marpa::R3::Internal::Recognizer::R_C];
-    my $grammar = $naif_recce->[Marpa::R3::Internal::Recognizer::GRAMMAR];
+    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+    my $grammar =
+        $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
     my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
     my $tracer  = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
  
@@ -1969,7 +1973,9 @@ sub Marpa::R3::Scanless::R::show_leo_link_choice {
     my ( $slr, $link_ahm_id, $current_earleme ) = @_;
     my $naif_recce = $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
     my $recce_c                = $naif_recce->[Marpa::R3::Internal::Recognizer::R_C];
-    my $grammar = $naif_recce->[Marpa::R3::Internal::Recognizer::GRAMMAR];
+    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+    my $grammar =
+        $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
     my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
 
     my $text           = q{};
@@ -1992,7 +1998,9 @@ sub Marpa::R3::Scanless::R::show_earley_item {
     my ( $slr, $current_es, $item_id ) = @_;
     my $naif_recce = $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
     my $recce_c                = $naif_recce->[Marpa::R3::Internal::Recognizer::R_C];
-    my $grammar = $naif_recce->[Marpa::R3::Internal::Recognizer::GRAMMAR];
+    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+    my $grammar =
+        $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
     my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
     my $tracer  = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
 
