@@ -181,8 +181,12 @@ sub Marpa::R3::Internal::Recognizer::lexeme_semantics_find {
 
 # Find the blessing for a rule.
 sub Marpa::R3::Internal::Recognizer::rule_blessing_find {
-    my ( $recce, $rule_id ) = @_;
-    my $grammar  = $recce->[Marpa::R3::Internal::Recognizer::GRAMMAR];
+    my ( $slr, $rule_id ) = @_;
+    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+    my $grammar =
+        $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
+    my $recce =
+        $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
     my $rules    = $grammar->[Marpa::R3::Internal::Grammar::RULES];
     my $rule     = $rules->[$rule_id];
     my $blessing = $rule->[Marpa::R3::Internal::Rule::BLESSING];
@@ -576,7 +580,7 @@ sub resolve_recce {
         DETERMINE_BLESSING: {
 
             my $blessing =
-                Marpa::R3::Internal::Recognizer::rule_blessing_find( $recce,
+                Marpa::R3::Internal::Recognizer::rule_blessing_find( $slr,
                 $rule_id );
             my ( $closure_name, $closure, $semantics ) = @{$rule_resolution};
 
