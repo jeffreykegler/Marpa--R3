@@ -77,9 +77,8 @@ use constant R_C => 0;
 use constant B_C => 1;
 use constant O_C => 2;
 use constant T_C => 3;
-use constant GRAMMAR => 4;
-use constant TREE_MODE => 5;
-use constant END_OF_PARSE => 6;
+use constant TREE_MODE => 4;
+use constant END_OF_PARSE => 5;
 
 package Marpa::R3::Internal::Progress_Report;
 use constant RULE_ID => 0;

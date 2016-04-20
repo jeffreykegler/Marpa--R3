@@ -178,9 +178,7 @@ __DATA__
     O_C { C structure for the Marpa order object }
     T_C { C structure for the Marpa tree iterator }
 
-    GRAMMAR { the grammar used }
     TREE_MODE { 'tree' or 'forest' or undef }
-
     END_OF_PARSE
 
     { The following fields must be reinitialized when

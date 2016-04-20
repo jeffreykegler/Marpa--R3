@@ -243,8 +243,6 @@ sub Marpa::R3::Scanless::R::new {
         $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE] = bless [],
         'Marpa::R3::Recognizer';
 
-    $thick_g1_recce->[Marpa::R3::Internal::Recognizer::GRAMMAR] = $thick_g1_grammar;
-
     my $grammar_c = $thick_g1_grammar->[Marpa::R3::Internal::Grammar::C];
 
     my $recce_c = $thick_g1_recce->[Marpa::R3::Internal::Recognizer::R_C] =
