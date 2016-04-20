@@ -1862,7 +1862,9 @@ sub Marpa::R3::Scanless::R::show_leo_item {
     my ($slr)        = @_;
     my $naif_recce = $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
     my $recce_c                = $naif_recce->[Marpa::R3::Internal::Recognizer::R_C];
-    my $grammar = $naif_recce->[Marpa::R3::Internal::Recognizer::GRAMMAR];
+    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+    my $grammar =
+        $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
     my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
     my $tracer  = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
     my $leo_base_state = $recce_c->_marpa_r_leo_base_state();
