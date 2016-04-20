@@ -1891,10 +1891,10 @@ sub Marpa::R3::Scanless::R::default_g1_start_closure {
 
 # not to be documented
 sub Marpa::R3::Scanless::R::earley_set_size {
-    my ($self, $set_id) = @_;
-    # OK if set ID is undef, just pass it on.
-    return $self->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE]
-        ->earley_set_size($set_id);
+    my ($slr, $set_id) = @_;
+    my $recce_c = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
+    $set_id //= $recce_c->latest_earley_set();
+    return $recce_c->_marpa_r_earley_set_size($set_id);
 }
 
 sub Marpa::R3::Scanless::R::show_earley_sets {

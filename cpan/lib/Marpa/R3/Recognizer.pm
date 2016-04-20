@@ -229,25 +229,6 @@ sub Marpa::R3::escape_string {
     return join q{}, @escaped_chars;
 } ## end sub escape_string
 
-# INTERNAL OK AFTER HERE _marpa_
-
-sub Marpa::R3::Recognizer::use_leo_set {
-    my ( $recce, $boolean ) = @_;
-    my $recce_c = $recce->[Marpa::R3::Internal::Recognizer::R_C];
-    return $recce_c->_marpa_r_is_use_leo_set($boolean);
-}
-
-# Not intended to be documented.
-# Returns the size of the last completed earley set.
-# For testing, especially that the Leo items
-# are doing their job.
-sub Marpa::R3::Recognizer::earley_set_size {
-    my ( $recce, $set_id ) = @_;
-    my $recce_c = $recce->[Marpa::R3::Internal::Recognizer::R_C];
-    $set_id //= $recce_c->latest_earley_set();
-    return $recce_c->_marpa_r_earley_set_size($set_id);
-}
-
 1;
 
 # vim: set expandtab shiftwidth=4:
