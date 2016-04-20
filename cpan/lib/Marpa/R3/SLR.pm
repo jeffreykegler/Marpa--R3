@@ -2181,7 +2181,7 @@ sub Marpa::R3::Scanless::R::show_nook {
         $text .= '[-]';
     } ## end CHILD_TYPE:
     my $or_node_tag =
-        Marpa::R3::Recognizer::or_node_tag( $recce, $or_node_id );
+        $slr->or_node_tag( $or_node_id );
     $text .= " $or_node_tag";
 
     $text .= ' p';
@@ -2212,6 +2212,17 @@ sub Marpa::R3::Scanless::R::show_nook {
     } ## end DESCRIBE_CHOICES:
     return $text;
 } ## end sub Marpa::R3::Recognizer::show_nook
+
+sub Marpa::R3::Scanless::R::or_node_tag {
+    my ( $slr, $or_node_id ) = @_;
+    my $recce     = $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
+    my $bocage   = $recce->[Marpa::R3::Internal::Recognizer::B_C];
+    my $set      = $bocage->_marpa_b_or_node_set($or_node_id);
+    my $irl_id   = $bocage->_marpa_b_or_node_irl($or_node_id);
+    my $origin   = $bocage->_marpa_b_or_node_origin($or_node_id);
+    my $position = $bocage->_marpa_b_or_node_position($or_node_id);
+    return 'R' . $irl_id . q{:} . $position . q{@} . $origin . q{-} . $set;
+} ## end sub Marpa::R3::Recognizer::or_node_tag
 
 sub Marpa::R3::Scanless::R::show_bocage {
     my ($slr)     = @_;
@@ -2248,16 +2259,16 @@ sub Marpa::R3::Scanless::R::show_bocage {
             if ( defined $cause_id ) {
                 $cause_irl_id = $bocage->_marpa_b_or_node_irl($cause_id);
                 $cause_tag =
-                  Marpa::R3::Recognizer::or_node_tag( $recce, $cause_id );
+                  $slr->or_node_tag( $cause_id );
             }
             my $parent_tag =
-              Marpa::R3::Recognizer::or_node_tag( $recce, $or_node_id );
+              $slr->or_node_tag( $or_node_id );
             my $predecessor_id =
               $bocage->_marpa_b_and_node_predecessor($and_node_id);
             my $predecessor_tag = q{-};
             if ( defined $predecessor_id ) {
                 $predecessor_tag =
-                  Marpa::R3::Recognizer::or_node_tag( $recce, $predecessor_id );
+                  $slr->or_node_tag( $predecessor_id );
             }
             my $tag = join q{ }, "$and_node_id:", "$or_node_id=$parent_tag",
               $predecessor_tag, $cause_tag;

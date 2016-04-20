@@ -1757,7 +1757,7 @@ sub Marpa::R3::Scanless::R::and_node_tag {
     my $recce =
         $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
     my $bocage            = $recce->[Marpa::R3::Internal::Recognizer::B_C];
-    my $recce_c           = $recce->[Marpa::R3::Internal::Recognizer::R_C];
+    my $recce_c           = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
     my $parent_or_node_id = $bocage->_marpa_b_and_node_parent($and_node_id);
     my $origin         = $bocage->_marpa_b_or_node_origin($parent_or_node_id);
     my $origin_earleme = $recce_c->earleme($origin);
@@ -1792,30 +1792,6 @@ sub Marpa::R3::Scanless::R::and_node_tag {
     $tag .= q{@} . $middle_earleme;
     return $tag;
 } ## end sub Marpa::R3::Recognizer::and_node_tag
-
-sub Marpa::R3::Recognizer::show_and_nodes {
-    my ($recce) = @_;
-    my $recce_c = $recce->[Marpa::R3::Internal::Recognizer::R_C];
-    my $bocage  = $recce->[Marpa::R3::Internal::Recognizer::B_C];
-    return $recce_c->show_and_nodes($bocage);
-} ## end sub Marpa::R3::Recognizer::show_and_nodes
-
-sub Marpa::R3::Recognizer::or_node_tag {
-    my ( $recce, $or_node_id ) = @_;
-    my $bocage   = $recce->[Marpa::R3::Internal::Recognizer::B_C];
-    my $set      = $bocage->_marpa_b_or_node_set($or_node_id);
-    my $irl_id   = $bocage->_marpa_b_or_node_irl($or_node_id);
-    my $origin   = $bocage->_marpa_b_or_node_origin($or_node_id);
-    my $position = $bocage->_marpa_b_or_node_position($or_node_id);
-    return 'R' . $irl_id . q{:} . $position . q{@} . $origin . q{-} . $set;
-} ## end sub Marpa::R3::Recognizer::or_node_tag
-
-sub Marpa::R3::Recognizer::show_or_nodes {
-    my ( $recce, $verbose ) = @_;
-    my $recce_c = $recce->[Marpa::R3::Internal::Recognizer::R_C];
-    my $bocage  = $recce->[Marpa::R3::Internal::Recognizer::B_C];
-    return $recce_c->show_or_nodes( $bocage, $verbose);
-}
 
 sub trace_token_evaluation {
     my ( $slr, $value, $token_id, $token_value ) = @_;
