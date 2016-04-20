@@ -406,7 +406,7 @@ sub Marpa::R3::ASF::new {
     my $grammar =
         $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
     my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
-    my $recce_c   = $recce->[Marpa::R3::Internal::Recognizer::R_C];
+    my $recce_c   = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
 
     my $ordering = $slr->ordering_get();
     Marpa::R3::exception( "Parse failed\n") if not $ordering;

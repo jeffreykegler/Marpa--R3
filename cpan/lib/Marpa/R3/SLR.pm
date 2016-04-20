@@ -245,7 +245,9 @@ sub Marpa::R3::Scanless::R::new {
 
     my $grammar_c = $thick_g1_grammar->[Marpa::R3::Internal::Grammar::C];
 
-    my $recce_c = $thick_g1_recce->[Marpa::R3::Internal::Recognizer::R_C] =
+    my $recce_c =
+        $slr->[Marpa::R3::Internal::Scanless::R::R_C] =
+        $thick_g1_recce->[Marpa::R3::Internal::Recognizer::R_C] =
         Marpa::R3::Thin::R->new($grammar_c);
     if ( not defined $recce_c ) {
         Marpa::R3::exception( $grammar_c->error() );
@@ -2145,10 +2147,71 @@ sub Marpa::R3::Scanless::R::show_and_nodes {
 }
 
 sub Marpa::R3::Scanless::R::show_tree {
-    my ( $slr ) = @_;
-    my $naif_recce = $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
-    return $naif_recce->show_tree();
-}
+    my ( $slr, $verbose ) = @_;
+    my $text = q{};
+    NOOK: for ( my $nook_id = 0; 1; $nook_id++ ) {
+        my $nook_text = $slr->show_nook( $nook_id, $verbose );
+        last NOOK if not defined $nook_text;
+        $text .= "$nook_id: $nook_text";
+    }
+    return $text;
+} ## end sub Marpa::R3::Recognizer::show_tree
+
+sub Marpa::R3::Scanless::R::show_nook {
+    my ( $slr, $nook_id, $verbose ) = @_;
+    my $recce = $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
+    my $recce_c = $recce->[Marpa::R3::Internal::Scanless::R::R_C];
+    my $order   = $recce->[Marpa::R3::Internal::Recognizer::O_C];
+    my $tree    = $recce->[Marpa::R3::Internal::Recognizer::T_C];
+
+    my $or_node_id = $tree->_marpa_t_nook_or_node($nook_id);
+    return if not defined $or_node_id;
+
+    my $text = "o$or_node_id";
+    my $parent = $tree->_marpa_t_nook_parent($nook_id) // q{-};
+    CHILD_TYPE: {
+        if ( $tree->_marpa_t_nook_is_cause($nook_id) ) {
+            $text .= "[c$parent]";
+            last CHILD_TYPE;
+        }
+        if ( $tree->_marpa_t_nook_is_predecessor($nook_id) ) {
+            $text .= "[p$parent]";
+            last CHILD_TYPE;
+        }
+        $text .= '[-]';
+    } ## end CHILD_TYPE:
+    my $or_node_tag =
+        Marpa::R3::Recognizer::or_node_tag( $recce, $or_node_id );
+    $text .= " $or_node_tag";
+
+    $text .= ' p';
+    $text .=
+        $tree->_marpa_t_nook_predecessor_is_ready($nook_id)
+        ? q{=ok}
+        : q{-};
+    $text .= ' c';
+    $text .= $tree->_marpa_t_nook_cause_is_ready($nook_id) ? q{=ok} : q{-};
+    $text .= "\n";
+
+    DESCRIBE_CHOICES: {
+        my $this_choice = $tree->_marpa_t_nook_choice($nook_id);
+        CHOICE: for ( my $choice_ix = 0;; $choice_ix++ ) {
+            my $and_node_id =
+                $order->_marpa_o_and_node_order_get( $or_node_id,
+                $choice_ix );
+            last CHOICE if not defined $and_node_id;
+            $text .= " o$or_node_id" . '[' . $choice_ix . ']';
+            if ( defined $this_choice and $this_choice == $choice_ix ) {
+                $text .= q{*};
+            }
+            my $and_node_tag =
+                Marpa::R3::Recognizer::and_node_tag( $recce, $and_node_id );
+            $text .= " ::= a$and_node_id $and_node_tag";
+            $text .= "\n";
+        } ## end CHOICE: for ( my $choice_ix = 0;; $choice_ix++ )
+    } ## end DESCRIBE_CHOICES:
+    return $text;
+} ## end sub Marpa::R3::Recognizer::show_nook
 
 sub Marpa::R3::Scanless::R::show_bocage {
     my ($slr)     = @_;

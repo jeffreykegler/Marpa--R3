@@ -299,8 +299,14 @@ __DATA__
 
     :package=Marpa::R3::Internal::Scanless::R
 
-    SLR_C { The thin version of this object }
     SLG
+
+    { "Thin" interfaces,
+      that is, objects for the C language Perl/XS
+      interfaces
+    }
+    SLR_C { The thin version of this object }
+    R_C { The thin version of the G1 recognizer }
 
     THICK_G1_RECCE { to be deleted }
     P_INPUT_STRING

@@ -168,7 +168,7 @@ sub Marpa::R3::Internal::Recognizer::resolve_action {
 sub Marpa::R3::Internal::Recognizer::lexeme_semantics_find {
     my ( $slr, $lexeme_id ) = @_;
     my $recce = $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
-    my $recce_c                = $recce->[Marpa::R3::Internal::Recognizer::R_C];
+    my $recce_c                = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $grammar =
         $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
@@ -449,7 +449,7 @@ sub Marpa::R3::Scanless::R::ordering_get {
     my $grammar =
         $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
     my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
-    my $recce_c   = $recce->[Marpa::R3::Internal::Recognizer::R_C];
+    my $recce_c   = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
 
     $grammar_c->throw_set(0);
     my $bocage = $recce->[Marpa::R3::Internal::Recognizer::B_C] =
@@ -665,7 +665,7 @@ sub registration_init {
     my $grammar =
         $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
     my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
-    my $recce_c   = $recce->[Marpa::R3::Internal::Recognizer::R_C];
+    my $recce_c   = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
     my $tracer    = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
     my $trace_actions =
         $slr->[Marpa::R3::Internal::Scanless::R::TRACE_ACTIONS] // 0;
@@ -1333,7 +1333,7 @@ sub Marpa::R3::Recognizer::value {
     my $grammar =
         $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
     my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
-    my $recce_c   = $recce->[Marpa::R3::Internal::Recognizer::R_C];
+    my $recce_c   = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
     my $tracer    = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
 
     my $trace_actions =
@@ -1814,72 +1814,6 @@ sub Marpa::R3::Recognizer::show_or_nodes {
     my $bocage  = $recce->[Marpa::R3::Internal::Recognizer::B_C];
     return $recce_c->show_or_nodes( $bocage, $verbose);
 }
-
-sub Marpa::R3::Recognizer::show_nook {
-    my ( $recce, $nook_id, $verbose ) = @_;
-    my $recce_c = $recce->[Marpa::R3::Internal::Recognizer::R_C];
-    my $order   = $recce->[Marpa::R3::Internal::Recognizer::O_C];
-    my $tree    = $recce->[Marpa::R3::Internal::Recognizer::T_C];
-
-    my $or_node_id = $tree->_marpa_t_nook_or_node($nook_id);
-    return if not defined $or_node_id;
-
-    my $text = "o$or_node_id";
-    my $parent = $tree->_marpa_t_nook_parent($nook_id) // q{-};
-    CHILD_TYPE: {
-        if ( $tree->_marpa_t_nook_is_cause($nook_id) ) {
-            $text .= "[c$parent]";
-            last CHILD_TYPE;
-        }
-        if ( $tree->_marpa_t_nook_is_predecessor($nook_id) ) {
-            $text .= "[p$parent]";
-            last CHILD_TYPE;
-        }
-        $text .= '[-]';
-    } ## end CHILD_TYPE:
-    my $or_node_tag =
-        Marpa::R3::Recognizer::or_node_tag( $recce, $or_node_id );
-    $text .= " $or_node_tag";
-
-    $text .= ' p';
-    $text .=
-        $tree->_marpa_t_nook_predecessor_is_ready($nook_id)
-        ? q{=ok}
-        : q{-};
-    $text .= ' c';
-    $text .= $tree->_marpa_t_nook_cause_is_ready($nook_id) ? q{=ok} : q{-};
-    $text .= "\n";
-
-    DESCRIBE_CHOICES: {
-        my $this_choice = $tree->_marpa_t_nook_choice($nook_id);
-        CHOICE: for ( my $choice_ix = 0;; $choice_ix++ ) {
-            my $and_node_id =
-                $order->_marpa_o_and_node_order_get( $or_node_id,
-                $choice_ix );
-            last CHOICE if not defined $and_node_id;
-            $text .= " o$or_node_id" . '[' . $choice_ix . ']';
-            if ( defined $this_choice and $this_choice == $choice_ix ) {
-                $text .= q{*};
-            }
-            my $and_node_tag =
-                Marpa::R3::Recognizer::and_node_tag( $recce, $and_node_id );
-            $text .= " ::= a$and_node_id $and_node_tag";
-            $text .= "\n";
-        } ## end CHOICE: for ( my $choice_ix = 0;; $choice_ix++ )
-    } ## end DESCRIBE_CHOICES:
-    return $text;
-} ## end sub Marpa::R3::Recognizer::show_nook
-
-sub Marpa::R3::Recognizer::show_tree {
-    my ( $recce, $verbose ) = @_;
-    my $text = q{};
-    NOOK: for ( my $nook_id = 0; 1; $nook_id++ ) {
-        my $nook_text = $recce->show_nook( $nook_id, $verbose );
-        last NOOK if not defined $nook_text;
-        $text .= "$nook_id: $nook_text";
-    }
-    return $text;
-} ## end sub Marpa::R3::Recognizer::show_tree
 
 sub trace_token_evaluation {
     my ( $slr, $value, $token_id, $token_value ) = @_;
