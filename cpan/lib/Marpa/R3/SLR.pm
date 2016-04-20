@@ -328,13 +328,14 @@ sub Marpa::R3::Scanless::R::new {
     $slr->naif_set($g1_recce_args);
 
     if ( $slr->[Marpa::R3::Internal::Scanless::R::TRACE_TERMINALS] > 1 ) {
-        my @terminals_expected = @{ $thick_g1_recce->terminals_expected() };
-        for my $terminal ( sort @terminals_expected ) {
-            # We may have set and reset the trace file handle during this method,
-            # so we do not memoize its value, bjut get it directly
-            say {$slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE]}
-                qq{Expecting "$terminal" at earleme 0}
-                or Marpa::R3::exception("Cannot print: $ERRNO");
+        my $terminals_expected = $slr->terminals_expected();
+        for my $terminal ( sort @{$terminals_expected} ) {
+
+           # We may have set and reset the trace file handle during this method,
+           # so we do not memoize its value, bjut get it directly
+            say { $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE] }
+              qq{Expecting "$terminal" at earleme 0}
+              or Marpa::R3::exception("Cannot print: $ERRNO");
         }
     } ## end if ( $thick_g1_recce->[Marpa::R3::Internal::Recognizer::TRACE_TERMINALS...])
 
@@ -1667,9 +1668,11 @@ sub Marpa::R3::Scanless::R::progress {
 }
 
 sub Marpa::R3::Scanless::R::terminals_expected {
-    my ($self) = @_;
-    return $self->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE]
-        ->terminals_expected();
+    my ($slr)      = @_;
+    my $naif_recce = $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
+    my $recce_c    = $naif_recce->[Marpa::R3::Internal::Recognizer::R_C];
+    my $slg        = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+    return [ map { $slg->symbol_name($_) } $recce_c->terminals_expected() ];
 }
 
 sub Marpa::R3::Scanless::R::exhausted {

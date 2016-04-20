@@ -267,14 +267,6 @@ sub Marpa::R3::Recognizer::progress {
 
 # Perform the completion step on an earley set
 
-sub Marpa::R3::Recognizer::terminals_expected {
-    my ($recce) = @_;
-    my $recce_c = $recce->[Marpa::R3::Internal::Recognizer::R_C];
-    my $grammar = $recce->[Marpa::R3::Internal::Recognizer::GRAMMAR];
-    return [ map { $grammar->symbol_name($_) }
-            $recce_c->terminals_expected() ];
-} ## end sub Marpa::R3::Recognizer::terminals_expected
-
 my @escape_by_ord = ();
 $escape_by_ord[ ord q{\\} ] = q{\\\\};
 $escape_by_ord[ ord eval qq{"$_"} ] = $_
