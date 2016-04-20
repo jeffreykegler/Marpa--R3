@@ -2205,7 +2205,7 @@ sub Marpa::R3::Scanless::R::show_nook {
                 $text .= q{*};
             }
             my $and_node_tag =
-                Marpa::R3::Recognizer::and_node_tag( $recce, $and_node_id );
+                $slr->and_node_tag( $and_node_id );
             $text .= " ::= a$and_node_id $and_node_tag";
             $text .= "\n";
         } ## end CHOICE: for ( my $choice_ix = 0;; $choice_ix++ )

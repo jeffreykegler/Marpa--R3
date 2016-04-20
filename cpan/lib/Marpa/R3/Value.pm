@@ -1752,8 +1752,10 @@ sub do_rank_by_rule {
 
 # INTERNAL OK AFTER HERE _marpa_
 
-sub Marpa::R3::Recognizer::and_node_tag {
-    my ( $recce, $and_node_id ) = @_;
+sub Marpa::R3::Scanless::R::and_node_tag {
+    my ( $slr, $and_node_id ) = @_;
+    my $recce =
+        $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
     my $bocage            = $recce->[Marpa::R3::Internal::Recognizer::B_C];
     my $recce_c           = $recce->[Marpa::R3::Internal::Recognizer::R_C];
     my $parent_or_node_id = $bocage->_marpa_b_and_node_parent($and_node_id);
@@ -1845,7 +1847,7 @@ sub trace_token_evaluation {
 
     print {$trace_file_handle}
         'Pushed value from ',
-        Marpa::R3::Recognizer::and_node_tag( $recce, $and_node_id ),
+        $slr->and_node_tag( $and_node_id ),
         ': ',
         ( $token_name ? qq{$token_name = } : q{} ),
         Data::Dumper->new( [ \$token_value ] )->Terse(1)->Dump
@@ -1876,7 +1878,7 @@ sub trace_stack_1 {
 
     return 'Popping ', $argc,
         ' values to evaluate ',
-        Marpa::R3::Recognizer::and_node_tag( $recce, $and_node_id ),
+        $slr->and_node_tag( $and_node_id ),
         ', rule: ', $grammar->brief_rule($rule_id);
 
 } ## end sub trace_stack_1
@@ -1917,7 +1919,7 @@ sub trace_op {
 
         $trace_output .= join q{},
             'Head of Virtual Rule: ',
-            Marpa::R3::Recognizer::and_node_tag( $recce, $and_node_id ),
+            $slr->and_node_tag( $and_node_id ),
             ', rule: ', $grammar->brief_irl($trace_irl_id),
             "\n",
             'Incrementing virtual rule by ',
@@ -1933,7 +1935,7 @@ sub trace_op {
 
         $trace_output .= join q{},
             'Virtual Rule: ',
-            Marpa::R3::Recognizer::and_node_tag( $recce, $and_node_id ),
+            $slr->and_node_tag( $and_node_id ),
             ', rule: ', $grammar->brief_irl($trace_irl_id),
             "\nAdding ",
             $grammar_c->_marpa_g_real_symbol_count($trace_irl_id),
@@ -1947,7 +1949,7 @@ sub trace_op {
 
         $trace_output .= join q{},
             'New Virtual Rule: ',
-            Marpa::R3::Recognizer::and_node_tag( $recce, $and_node_id ),
+            $slr->and_node_tag( $and_node_id ),
             ', rule: ', $grammar->brief_irl($trace_irl_id),
             "\nReal symbol count is ",
             $grammar_c->_marpa_g_real_symbol_count($trace_irl_id),
