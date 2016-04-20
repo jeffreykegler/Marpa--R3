@@ -47,7 +47,6 @@ sub Marpa::R3::Scanless::R::reset_evaluation {
     my ($slr) = @_;
     my $recce =
         $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
-    my $grammar = $recce->[Marpa::R3::Internal::Recognizer::GRAMMAR];
     my $package_source =
         $slr->[Marpa::R3::Internal::Scanless::R::RESOLVE_PACKAGE_SOURCE];
     if ( defined $package_source ) {
@@ -223,21 +222,6 @@ sub Marpa::R3::Recognizer::earleme {
     my $recce_c = $recce->[Marpa::R3::Internal::Recognizer::R_C];
     return $recce_c->earleme($earley_set_id);
 }
-
-sub Marpa::R3::Recognizer::expected_symbol_event_set {
-    my ( $recce, $symbol_name, $value ) = @_;
-    my $recce_c = $recce->[Marpa::R3::Internal::Recognizer::R_C];
-    my $grammar = $recce->[Marpa::R3::Internal::Recognizer::GRAMMAR];
-    my $symbol_id =
-        $grammar->[Marpa::R3::Internal::Grammar::TRACER]
-        ->symbol_by_name($symbol_name);
-    Marpa::exception(qq{Unknown symbol: "$symbol_name"})
-        if not defined $symbol_id;
-    return $recce_c->expected_symbol_event_set( $symbol_id, $value );
-} ## end sub Marpa::R3::Recognizer::expected_symbol_event_set
-
-# Now useless and deprecated
-sub Marpa::R3::Recognizer::strip { return 1; }
 
 # Viewing methods, for debugging
 
