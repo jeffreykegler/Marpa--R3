@@ -141,7 +141,6 @@ __DATA__
     SYMBOLS { array of symbol refs }
 
     BLESS_PACKAGE { Default package into which nodes are blessed }
-    TRACE_FILE_HANDLE
     WARNINGS { print warnings about grammar? }
     IF_INACCESSIBLE { default for symbols }
 
