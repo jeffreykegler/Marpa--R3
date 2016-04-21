@@ -45,8 +45,6 @@ my $parse_number = 0;
 # JK -- Mon Nov 24 17:35:24 PST 2014
 sub Marpa::R3::Scanless::R::reset_evaluation {
     my ($slr) = @_;
-    my $recce =
-        $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
     my $package_source =
         $slr->[Marpa::R3::Internal::Scanless::R::RESOLVE_PACKAGE_SOURCE];
     if ( defined $package_source ) {
@@ -71,8 +69,6 @@ sub Marpa::R3::Scanless::R::reset_evaluation {
 
 sub Marpa::R3::Scanless::R::naif_set {
     my ( $slr, @arg_hashes ) = @_;
-    my $recce =
-        $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
     my $recce_c = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
 
     # This may get changed below

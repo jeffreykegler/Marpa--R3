@@ -43,10 +43,8 @@ package Marpa::R3::Internal::Value;
 
 # Given the grammar and an action name, resolve it to a closure,
 # or return undef
-sub Marpa::R3::Internal::Recognizer::resolve_action {
+sub Marpa::R3::Internal::Scanless::R::resolve_action {
     my ( $slr, $closure_name, $p_error ) = @_;
-    my $recce =
-        $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
     my $trace_file_handle =
         $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
@@ -162,12 +160,11 @@ sub Marpa::R3::Internal::Recognizer::resolve_action {
     }
     return;
 
-} ## end sub Marpa::R3::Internal::Recognizer::resolve_action
+}
 
 # Find the semantics for a lexeme.
 sub Marpa::R3::Internal::Recognizer::lexeme_semantics_find {
     my ( $slr, $lexeme_id ) = @_;
-    my $recce = $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
     my $recce_c                = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $grammar =
@@ -185,8 +182,6 @@ sub Marpa::R3::Internal::Recognizer::rule_blessing_find {
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $grammar =
         $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
-    my $recce =
-        $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
     my $rules    = $grammar->[Marpa::R3::Internal::Grammar::RULES];
     my $rule     = $rules->[$rule_id];
     my $blessing = $rule->[Marpa::R3::Internal::Rule::BLESSING];
@@ -206,8 +201,6 @@ sub Marpa::R3::Internal::Recognizer::rule_blessing_find {
 # Find the blessing for a lexeme.
 sub Marpa::R3::Scanless::R::lexeme_blessing_find {
     my ( $slr, $lexeme_id ) = @_;
-    my $recce =
-        $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $grammar =
         $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
@@ -243,8 +236,6 @@ sub Marpa::R3::Scanless::R::lexeme_blessing_find {
 # For diagnostics
 sub Marpa::R3::Internal::Recognizer::brief_rule_list {
     my ( $slr, $rule_ids ) = @_;
-    my $recce =
-        $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $grammar =
         $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
@@ -438,8 +429,6 @@ sub show_semantics {
 # otherwise return the ordering.
 sub Marpa::R3::Scanless::R::ordering_get {
     my ($slr) = @_;
-    my $recce =
-        $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
     return if $slr->[Marpa::R3::Internal::Scanless::R::NO_PARSE];
     my $ordering = $slr->[Marpa::R3::Internal::Scanless::R::O_C];
     return $ordering if $ordering;
@@ -482,8 +471,6 @@ sub Marpa::R3::Scanless::R::ordering_get {
 
 sub resolve_rule_by_id {
     my ( $slr, $rule_id ) = @_;
-    my $recce =
-        $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $grammar =
         $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
@@ -492,7 +479,7 @@ sub resolve_rule_by_id {
     my $action_name = $rule->[Marpa::R3::Internal::Rule::ACTION_NAME];
     my $resolve_error;
     return if not defined $action_name;
-    my $resolution = Marpa::R3::Internal::Recognizer::resolve_action( $slr,
+    my $resolution = Marpa::R3::Internal::Scanless::R::resolve_action( $slr,
         $action_name, \$resolve_error );
 
     if ( not $resolution ) {
@@ -510,8 +497,6 @@ sub resolve_rule_by_id {
 sub resolve_recce {
 
     my ( $slr, $per_parse_arg ) = @_;
-    my $recce =
-        $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $grammar =
         $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
@@ -545,8 +530,7 @@ sub resolve_recce {
         my $constructor_name = $constructor_package . q{::new};
         my $resolve_error;
         my $resolution =
-            Marpa::R3::Internal::Recognizer::resolve_action( $slr,
-            $constructor_name, \$resolve_error );
+            Marpa::R3::Internal::Scanless::R::resolve_action( $slr, $constructor_name, \$resolve_error );
         if ($resolution) {
             $slr->[ Marpa::R3::Internal::Scanless::R::PER_PARSE_CONSTRUCTOR ]
                 = $resolution->[1];
@@ -557,8 +541,7 @@ sub resolve_recce {
     my $resolve_error;
 
     my $default_action_resolution =
-        Marpa::R3::Internal::Recognizer::resolve_action( $slr,
-        undef, \$resolve_error );
+        Marpa::R3::Internal::Scanless::R::resolve_action( $slr, undef, \$resolve_error );
     Marpa::R3::exception(
         "Could not resolve default action\n",
         q{  }, ( $resolve_error // 'Failed to resolve action' ) )
@@ -658,8 +641,6 @@ sub resolve_recce {
 
 sub registration_init {
     my ( $slr, $per_parse_arg ) = @_;
-    my $recce =
-        $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
 
     my $trace_file_handle =
         $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
@@ -1331,8 +1312,6 @@ sub registration_init {
 # Returns false if no parse
 sub Marpa::R3::Scanless::R::value {
     my ( $slr, $per_parse_arg ) = @_;
-    my $recce =
-        $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $grammar =
         $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
@@ -1740,8 +1719,6 @@ sub Marpa::R3::Scanless::R::value {
 
 sub Marpa::R3::Scanless::R::and_node_tag {
     my ( $slr, $and_node_id ) = @_;
-    my $recce =
-        $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
     my $bocage            = $slr->[Marpa::R3::Internal::Scanless::R::B_C];
     my $recce_c           = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
     my $parent_or_node_id = $bocage->_marpa_b_and_node_parent($and_node_id);
@@ -1781,8 +1758,6 @@ sub Marpa::R3::Scanless::R::and_node_tag {
 
 sub trace_token_evaluation {
     my ( $slr, $value, $token_id, $token_value ) = @_;
-    my $recce =
-        $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $grammar =
         $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
@@ -1821,8 +1796,6 @@ sub trace_token_evaluation {
 
 sub trace_stack_1 {
     my ( $slr, $value, $args, $rule_id ) = @_;
-    my $recce =
-        $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
     my $recce_c = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $grammar =
@@ -1848,8 +1821,6 @@ sub trace_stack_1 {
 sub trace_op {
 
     my ( $slr, $grammar, $value ) = @_;
-    my $recce =
-        $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
 
     my $trace_output = q{};
     my $trace_values =

@@ -304,7 +304,6 @@ __DATA__
     O_C { The Marpa order object }
     T_C { The Marpa tree iterator }
 
-    THICK_G1_RECCE { to be deleted }
     P_INPUT_STRING
 
     EXHAUSTION_ACTION
