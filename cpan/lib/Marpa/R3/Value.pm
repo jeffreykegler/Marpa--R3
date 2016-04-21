@@ -453,14 +453,16 @@ sub Marpa::R3::Scanless::R::ordering_get {
 
     $grammar_c->throw_set(0);
     my $bocage = $recce->[Marpa::R3::Internal::Recognizer::B_C] =
-        Marpa::R3::Thin::B->new( $recce_c, ( $parse_set_arg // -1 ) );
+      $slr->[Marpa::R3::Internal::Scanless::R::B_C] =
+      Marpa::R3::Thin::B->new( $recce_c, ( $parse_set_arg // -1 ) );
     $grammar_c->throw_set(1);
     if ( not $bocage ) {
         $slr->[Marpa::R3::Internal::Scanless::R::NO_PARSE] = 1;
         return;
     }
     $ordering = $recce->[Marpa::R3::Internal::Recognizer::O_C] =
-        Marpa::R3::Thin::O->new($bocage);
+      $slr->[Marpa::R3::Internal::Scanless::R::O_C] =
+      Marpa::R3::Thin::O->new($bocage);
 
     GIVEN_RANKING_METHOD: {
         my $ranking_method =
@@ -1449,6 +1451,7 @@ sub Marpa::R3::Scanless::R::value {
         my $order = $slr->ordering_get();
         return if not $order;
         $tree = $recce->[Marpa::R3::Internal::Recognizer::T_C] =
+         $slr->[Marpa::R3::Internal::Scanless::R::T_C] =
             Marpa::R3::Thin::T->new($order);
 
     } ## end else [ if ($tree) ]

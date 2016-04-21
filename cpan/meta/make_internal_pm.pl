@@ -306,6 +306,9 @@ __DATA__
     }
     SLR_C { The thin version of this object }
     R_C { The thin version of the G1 recognizer }
+    B_C { The Marpa bocage }
+    O_C { The Marpa order object }
+    T_C { The Marpa tree iterator }
 
     THICK_G1_RECCE { to be deleted }
     P_INPUT_STRING

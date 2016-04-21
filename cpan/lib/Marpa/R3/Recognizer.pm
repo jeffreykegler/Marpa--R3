@@ -53,18 +53,21 @@ sub Marpa::R3::Scanless::R::reset_evaluation {
         $slr->[Marpa::R3::Internal::Scanless::R::RESOLVE_PACKAGE_SOURCE] =
             undef;
     } ## end if ( defined $package_source and $package_source ne ...)
-    $slr->[Marpa::R3::Internal::Scanless::R::NO_PARSE]          = undef;
-    $recce->[Marpa::R3::Internal::Recognizer::B_C]                   = undef;
-    $recce->[Marpa::R3::Internal::Recognizer::O_C]                   = undef;
+    $slr->[Marpa::R3::Internal::Scanless::R::NO_PARSE]              = undef;
+    $recce->[Marpa::R3::Internal::Recognizer::B_C]                  = undef;
+    $recce->[Marpa::R3::Internal::Recognizer::O_C]                  = undef;
+    $recce->[Marpa::R3::Internal::Recognizer::T_C]                  = undef;
+    $slr->[Marpa::R3::Internal::Scanless::R::B_C]                   = undef;
+    $slr->[Marpa::R3::Internal::Scanless::R::O_C]                   = undef;
+    $slr->[Marpa::R3::Internal::Scanless::R::T_C]                   = undef;
     $slr->[Marpa::R3::Internal::Scanless::R::PER_PARSE_CONSTRUCTOR] = undef;
     $slr->[Marpa::R3::Internal::Scanless::R::RESOLVE_PACKAGE]       = undef;
-    $slr->[Marpa::R3::Internal::Scanless::R::NULL_VALUES]        = undef;
+    $slr->[Marpa::R3::Internal::Scanless::R::NULL_VALUES]           = undef;
 
     $slr->[Marpa::R3::Internal::Scanless::R::REGISTRATIONS]         = undef;
     $slr->[Marpa::R3::Internal::Scanless::R::CLOSURE_BY_SYMBOL_ID] = undef;
     $slr->[Marpa::R3::Internal::Scanless::R::CLOSURE_BY_RULE_ID]   = undef;
 
-    $recce->[Marpa::R3::Internal::Recognizer::T_C] = undef;
     $recce->[Marpa::R3::Internal::Recognizer::TREE_MODE] = undef;
     return;
 } ## end sub Marpa::R3::Recognizer::reset_evaluation
