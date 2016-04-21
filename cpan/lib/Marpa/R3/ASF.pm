@@ -367,18 +367,18 @@ sub Marpa::R3::ASF::new {
 
     my $recce = $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
 
-    if ( defined $recce->[Marpa::R3::Internal::Recognizer::TREE_MODE] ) {
+    if ( defined $slr->[Marpa::R3::Internal::Scanless::R::TREE_MODE] ) {
 
         # If we already in ASF mode, or are in valuation mode, we cannot create an ASF
         Marpa::R3::exception(
             "An attempt was made to create an ASF for a SLIF recognizer already in use\n",
             "   The recognizer must be reset first\n",
             '  The current SLIF recognizer mode is "',
-            $recce->[Marpa::R3::Internal::Recognizer::TREE_MODE],
+            $slr->[Marpa::R3::Internal::Scanless::R::TREE_MODE],
             qq{"\n}
         );
-    } ## end if ( defined $recce->[Marpa::R3::Internal::Recognizer::TREE_MODE...])
-    $recce->[Marpa::R3::Internal::Recognizer::TREE_MODE] = 'forest';
+    }
+    $slr->[Marpa::R3::Internal::Scanless::R::TREE_MODE] = 'forest';
 
     (   $asf->[Marpa::R3::Internal::ASF::RULE_RESOLUTIONS],
         $asf->[Marpa::R3::Internal::ASF::LEXEME_RESOLUTIONS]

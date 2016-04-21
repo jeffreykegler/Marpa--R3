@@ -173,11 +173,6 @@ __DATA__
 
     :package=Marpa::R3::Internal::Recognizer
 
-    B_C { C structure for the bocage }
-    O_C { C structure for the Marpa order object }
-    T_C { C structure for the Marpa tree iterator }
-
-    TREE_MODE { 'tree' or 'forest' or undef }
     END_OF_PARSE
 
     { The following fields must be reinitialized when
@@ -336,6 +331,7 @@ __DATA__
 
     NO_PARSE { no parse found in parse series -- memoized }
     NULL_VALUES
+    TREE_MODE { 'tree' or 'forest' or undef }
 
     { Fields for new SLIF resolution logic
     -- must be reinitialized when evaluation is reset }

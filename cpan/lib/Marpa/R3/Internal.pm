@@ -73,11 +73,7 @@ use constant TRACE_RULES => 16;
 use constant LAST_FIELD => 16;
 
 package Marpa::R3::Internal::Recognizer;
-use constant B_C => 0;
-use constant O_C => 1;
-use constant T_C => 2;
-use constant TREE_MODE => 3;
-use constant END_OF_PARSE => 4;
+use constant END_OF_PARSE => 0;
 
 package Marpa::R3::Internal::Progress_Report;
 use constant RULE_ID => 0;
@@ -182,11 +178,12 @@ use constant MAX_PARSES => 18;
 use constant RANKING_METHOD => 19;
 use constant NO_PARSE => 20;
 use constant NULL_VALUES => 21;
-use constant PER_PARSE_CONSTRUCTOR => 22;
-use constant RESOLVE_PACKAGE => 23;
-use constant RESOLVE_PACKAGE_SOURCE => 24;
-use constant REGISTRATIONS => 25;
-use constant CLOSURE_BY_SYMBOL_ID => 26;
-use constant CLOSURE_BY_RULE_ID => 27;
+use constant TREE_MODE => 22;
+use constant PER_PARSE_CONSTRUCTOR => 23;
+use constant RESOLVE_PACKAGE => 24;
+use constant RESOLVE_PACKAGE_SOURCE => 25;
+use constant REGISTRATIONS => 26;
+use constant CLOSURE_BY_SYMBOL_ID => 27;
+use constant CLOSURE_BY_RULE_ID => 28;
 
 1;

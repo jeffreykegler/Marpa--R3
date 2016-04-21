@@ -452,16 +452,14 @@ sub Marpa::R3::Scanless::R::ordering_get {
     my $recce_c   = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
 
     $grammar_c->throw_set(0);
-    my $bocage = $recce->[Marpa::R3::Internal::Recognizer::B_C] =
-      $slr->[Marpa::R3::Internal::Scanless::R::B_C] =
+    my $bocage = $slr->[Marpa::R3::Internal::Scanless::R::B_C] =
       Marpa::R3::Thin::B->new( $recce_c, ( $parse_set_arg // -1 ) );
     $grammar_c->throw_set(1);
     if ( not $bocage ) {
         $slr->[Marpa::R3::Internal::Scanless::R::NO_PARSE] = 1;
         return;
     }
-    $ordering = $recce->[Marpa::R3::Internal::Recognizer::O_C] =
-      $slr->[Marpa::R3::Internal::Scanless::R::O_C] =
+    $ordering = $slr->[Marpa::R3::Internal::Scanless::R::O_C] =
       Marpa::R3::Thin::O->new($bocage);
 
     GIVEN_RANKING_METHOD: {
@@ -1358,15 +1356,15 @@ sub Marpa::R3::Scanless::R::value {
             if ref $slr ne 'Marpa::R3::Scanless::R';
     }
 
-    $recce->[Marpa::R3::Internal::Recognizer::TREE_MODE] //= 'tree';
-    if ( $recce->[Marpa::R3::Internal::Recognizer::TREE_MODE] ne 'tree' ) {
+    $slr->[Marpa::R3::Internal::Scanless::R::TREE_MODE] //= 'tree';
+    if ( $slr->[Marpa::R3::Internal::Scanless::R::TREE_MODE] ne 'tree' ) {
         Marpa::R3::exception(
             "value() called when recognizer is not in tree mode\n",
             '  The current mode is "',
-            $recce->[Marpa::R3::Internal::Recognizer::TREE_MODE],
+            $slr->[Marpa::R3::Internal::Scanless::R::TREE_MODE],
             qq{"\n}
         );
-    } ## end if ( $recce->[Marpa::R3::Internal::Recognizer::TREE_MODE...])
+    }
 
     my $furthest_earleme       = $recce_c->furthest_earleme();
     my $last_completed_earleme = $recce_c->current_earleme();
@@ -1452,8 +1450,7 @@ sub Marpa::R3::Scanless::R::value {
 
         my $order = $slr->ordering_get();
         return if not $order;
-        $tree = $recce->[Marpa::R3::Internal::Recognizer::T_C] =
-         $slr->[Marpa::R3::Internal::Scanless::R::T_C] =
+        $tree = $slr->[Marpa::R3::Internal::Scanless::R::T_C] =
             Marpa::R3::Thin::T->new($order);
 
     } ## end else [ if ($tree) ]
