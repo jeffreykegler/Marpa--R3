@@ -156,8 +156,6 @@ __DATA__
 
     { === Evaluator Fields === }
 
-    INFINITE_ACTION
-
     =LAST_EVALUATOR_FIELD
 
     PROBLEMS { fatal problems }
@@ -167,7 +165,6 @@ __DATA__
     START_NAME { name of original symbol }
     INACCESSIBLE_OK
     UNPRODUCTIVE_OK
-    TRACE_RULES
 
     =LAST_FIELD
 

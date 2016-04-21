@@ -146,7 +146,6 @@ pod/Tracing.pod
 pod/Tutorial2.pod
 t/00-load.t
 t/asf_syn.t
-t/gabend.t
 t/sl_action.t
 t/sl_action2.t
 t/sl_advent.t
