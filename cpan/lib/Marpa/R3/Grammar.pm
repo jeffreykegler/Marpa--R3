@@ -53,8 +53,8 @@ sub Marpa::R3::uncaught_error {
 
 package Marpa::R3::Internal::Grammar;
 
-sub Marpa::R3::Grammar::new {
-    my ( $class, @arg_hashes ) = @_;
+sub Marpa::R3::Grammar::naif_new {
+    my ( $class, $slg, @arg_hashes ) = @_;
 
     my $grammar = [];
     bless $grammar, $class;
@@ -75,7 +75,7 @@ sub Marpa::R3::Grammar::new {
     $grammar->[Marpa::R3::Internal::Grammar::TRACER] =
         Marpa::R3::Thin::Trace->new($grammar_c);
 
-    $grammar->set(@arg_hashes);
+    $grammar->naif_set($slg, @arg_hashes);
 
     return $grammar;
 } ## end sub Marpa::R3::Grammar::new
@@ -94,8 +94,8 @@ sub Marpa::R3::Grammar::thin_symbol {
         ->symbol_by_name($symbol_name);
 }
 
-sub Marpa::R3::Grammar::set {
-    my ( $grammar, @arg_hashes ) = @_;
+sub Marpa::R3::Grammar::naif_set {
+    my ( $grammar, $slg, @arg_hashes ) = @_;
 
     # set trace_fh even if no tracing, because we may turn it on in this method
     my $trace_fh =
