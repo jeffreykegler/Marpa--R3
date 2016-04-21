@@ -306,7 +306,7 @@ sub Marpa::R3::Thin::R::show_and_nodes {
             or $a->[6] <=> $b->[6]
     } @data;
     return ( join "\n", @sorted_data ) . "\n";
-} ## end sub Marpa::R3::Recognizer::show_and_nodes
+}
 
 sub Marpa::R3::Thin::R::show_or_nodes {
     my ( $recce_c, $bocage, $verbose ) = @_;

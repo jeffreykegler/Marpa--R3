@@ -2266,7 +2266,7 @@ sub Marpa::R3::Scanless::R::show_bocage {
 #         $text .= $or_node_desc;
 #     } ## end OR_NODE: for ( my $or_node_id = 0; defined( my $or_node_desc =...))
 #     return $text;
-# } ## end sub Marpa::R3::Recognizer::verbose_or_nodes
+# }
 
 sub Marpa::R3::Scanless::R::verbose_or_node {
     my ( $slr, $or_node_id ) = @_;
@@ -2291,7 +2291,7 @@ sub Marpa::R3::Scanless::R::verbose_or_node {
     $text .= ( q{ } x 4 )
         . $tracer->show_dotted_irl( $irl_id, $position ) . "\n";
     return $text;
-} ## end sub Marpa::R3::Recognizer::verbose_or_node
+}
 
 1;
 

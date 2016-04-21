@@ -163,7 +163,7 @@ sub Marpa::R3::Internal::Scanless::R::resolve_action {
 }
 
 # Find the semantics for a lexeme.
-sub Marpa::R3::Internal::Recognizer::lexeme_semantics_find {
+sub Marpa::R3::Internal::Scanless::R::lexeme_semantics_find {
     my ( $slr, $lexeme_id ) = @_;
     my $recce_c                = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
@@ -174,10 +174,10 @@ sub Marpa::R3::Internal::Recognizer::lexeme_semantics_find {
     my $semantics = $symbol->[Marpa::R3::Internal::Symbol::LEXEME_SEMANTICS];
     return '::!default' if not defined $semantics;
     return $semantics;
-} ## end sub Marpa::R3::Internal::Recognizer::lexeme_semantics_find
+}
 
 # Find the blessing for a rule.
-sub Marpa::R3::Internal::Recognizer::rule_blessing_find {
+sub Marpa::R3::Internal::Scanless::R::rule_blessing_find {
     my ( $slr, $rule_id ) = @_;
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $grammar =
@@ -196,7 +196,7 @@ sub Marpa::R3::Internal::Recognizer::rule_blessing_find {
                 . qq{  The rule was blessed as "$blessing"\n} );
     }
     return join q{}, $bless_package, q{::}, $blessing;
-} ## end sub Marpa::R3::Internal::Recognizer::rule_blessing_find
+}
 
 # Find the blessing for a lexeme.
 sub Marpa::R3::Scanless::R::lexeme_blessing_find {
@@ -231,17 +231,17 @@ sub Marpa::R3::Scanless::R::lexeme_blessing_find {
         return;
     } ## end if ( not defined $bless_package )
     return $bless_package . q{::} . $blessing;
-} ## end sub Marpa::R3::Internal::Recognizer::lexeme_blessing_find
+}
 
 # For diagnostics
-sub Marpa::R3::Internal::Recognizer::brief_rule_list {
+sub Marpa::R3::Internal::Scanless::R::brief_rule_list {
     my ( $slr, $rule_ids ) = @_;
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $grammar =
         $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
     my @brief_rules = map { $grammar->brief_rule($_) } @{$rule_ids};
     return join q{}, map { q{    } . $_ . "\n" } @brief_rules;
-} ## end sub Marpa::R3::Internal::Recognizer::brief_rule_list
+}
 
 our $CONTEXT_EXCEPTION_CLASS = __PACKAGE__ . '::Context_Exception';
 
@@ -467,7 +467,7 @@ sub Marpa::R3::Scanless::R::ordering_get {
     } ## end GIVEN_RANKING_METHOD:
 
     return $ordering;
-} ## end sub Marpa::R3::Recognizer::ordering_get
+}
 
 sub resolve_rule_by_id {
     my ( $slr, $rule_id ) = @_;
@@ -571,7 +571,7 @@ sub resolve_recce {
         DETERMINE_BLESSING: {
 
             my $blessing =
-                Marpa::R3::Internal::Recognizer::rule_blessing_find( $slr,
+                Marpa::R3::Internal::Scanless::R::rule_blessing_find( $slr,
                 $rule_id );
             my ( $closure_name, $closure, $semantics ) = @{$rule_resolution};
 
@@ -609,7 +609,7 @@ sub resolve_recce {
     my @lexeme_resolutions = ();
     SYMBOL: for my $lexeme_id ( 0 .. $#{$symbols} ) {
         my $semantics =
-            Marpa::R3::Internal::Recognizer::lexeme_semantics_find( $slr,
+            Marpa::R3::Internal::Scanless::R::lexeme_semantics_find( $slr,
             $lexeme_id );
         if ( not defined $semantics ) {
             my $message =
@@ -828,7 +828,7 @@ sub registration_init {
                     qq{  can have more than one semantics\n},
                     qq{  Marpa needs there to be only one semantics\n},
                     qq{  The rules involved are:\n},
-                    Marpa::R3::Internal::Recognizer::brief_rule_list(
+                    Marpa::R3::Internal::Scanless::R::brief_rule_list(
                         $slr, $rule_ids
                     )
                 );
@@ -1713,7 +1713,7 @@ sub Marpa::R3::Scanless::R::value {
 
     return \( $value->absolute(0) );
 
-} ## end sub Marpa::R3::Recognizer::value
+}
 
 # INTERNAL OK AFTER HERE _marpa_
 
@@ -1754,7 +1754,7 @@ sub Marpa::R3::Scanless::R::and_node_tag {
     }
     $tag .= q{@} . $middle_earleme;
     return $tag;
-} ## end sub Marpa::R3::Recognizer::and_node_tag
+}
 
 sub trace_token_evaluation {
     my ( $slr, $value, $token_id, $token_value ) = @_;

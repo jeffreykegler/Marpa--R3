@@ -65,7 +65,7 @@ sub Marpa::R3::Scanless::R::reset_evaluation {
 
     $slr->[Marpa::R3::Internal::Scanless::R::TREE_MODE] = undef;
     return;
-} ## end sub Marpa::R3::Recognizer::reset_evaluation
+}
 
 sub Marpa::R3::Scanless::R::naif_set {
     my ( $slr, @arg_hashes ) = @_;
@@ -187,7 +187,7 @@ sub Marpa::R3::Scanless::R::naif_set {
     } ## end for my $args (@arg_hashes)
 
     return 1;
-} ## end sub Marpa::R3::Recognizer::set
+}
 
 # Viewing methods, for debugging
 
