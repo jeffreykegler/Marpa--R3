@@ -1500,14 +1500,6 @@ sub Marpa::R3::Scanless::R::rule_closure {
 
 }
 
-sub Marpa::R3::Scanless::R::value {
-    my ( $slr, $per_parse_arg ) = @_;
-    my $thick_g1_recce =
-        $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
-    my $thick_g1_value = $thick_g1_recce->value( $slr, $per_parse_arg );
-    return $thick_g1_value;
-} ## end sub Marpa::R3::Scanless::R::value
-
 sub Marpa::R3::Scanless::R::series_restart {
     my ( $slr , @args ) = @_;
     my $thick_g1_recce =

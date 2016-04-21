@@ -1327,8 +1327,10 @@ sub registration_init {
 } ## end sub registration_init
 
 # Returns false if no parse
-sub Marpa::R3::Recognizer::value {
-    my ( $recce, $slr, $per_parse_arg ) = @_;
+sub Marpa::R3::Scanless::R::value {
+    my ( $slr, $per_parse_arg ) = @_;
+    my $recce =
+        $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $grammar =
         $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
@@ -1348,7 +1350,7 @@ sub Marpa::R3::Recognizer::value {
 
     if ( scalar @_ != 1 ) {
         Marpa::R3::exception(
-            'Too many arguments to Marpa::R3::Recognizer::value')
+            'Too many arguments to Marpa::R3::Scanless::R::value')
             if ref $slr ne 'Marpa::R3::Scanless::R';
     }
 
