@@ -59,9 +59,6 @@ sub Marpa::R3::Grammar::naif_new {
     my $grammar = [];
     bless $grammar, $class;
 
-    # set the defaults and the default defaults
-    $grammar->[Marpa::R3::Internal::Grammar::TRACE_FILE_HANDLE] = *STDERR;
-
     $grammar->[Marpa::R3::Internal::Grammar::WARNINGS]        = 1;
     $grammar->[Marpa::R3::Internal::Grammar::INACCESSIBLE_OK] = {};
     $grammar->[Marpa::R3::Internal::Grammar::UNPRODUCTIVE_OK] = {};
@@ -99,7 +96,7 @@ sub Marpa::R3::Grammar::naif_set {
 
     # set trace_fh even if no tracing, because we may turn it on in this method
     my $trace_fh =
-        $grammar->[Marpa::R3::Internal::Grammar::TRACE_FILE_HANDLE];
+        $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE];
     my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
 
     for my $args (@arg_hashes) {
@@ -127,7 +124,6 @@ sub Marpa::R3::Grammar::naif_set {
                 start
                 symbols
                 terminals
-                trace_file_handle
                 unproductive_ok
                 warnings
                 }
@@ -148,12 +144,6 @@ sub Marpa::R3::Grammar::naif_set {
 
         if ( defined( my $value = $args->{'if_inaccessible'} ) ) {
             $grammar->[Marpa::R3::Internal::Grammar::IF_INACCESSIBLE] =  $value;
-        }
-
-        if ( defined( my $value = $args->{'trace_file_handle'} ) ) {
-            $trace_fh =
-                $grammar->[Marpa::R3::Internal::Grammar::TRACE_FILE_HANDLE] =
-                $value;
         }
 
         if ( defined( my $value = $args->{'default_rank'} ) ) {

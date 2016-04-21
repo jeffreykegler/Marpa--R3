@@ -180,18 +180,6 @@ sub Marpa::R3::Internal::Scanless::G::set {
         $slg->[Marpa::R3::Internal::Scanless::G::TRACE_TERMINALS] );
 
     # Trace file handle needs to be populated downwards
-    if ( defined( my $trace_file_handle = $flat_args{trace_file_handle} ) ) {
-        GRAMMAR:
-        for my $naif_grammar (
-            $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR],
-            @{ $slg->[Marpa::R3::Internal::Scanless::G::THICK_LEX_GRAMMARS] }
-            )
-        {
-            next GRAMMAR if not defined $naif_grammar;
-            $naif_grammar->naif_set( $slg, { trace_file_handle => $trace_file_handle } );
-        } ## end GRAMMAR: for my $naif_grammar ( $slg->[...])
-    } ## end if ( defined( my $trace_file_handle = $flat_args{...}))
-
     if ( $method eq 'new' ) {
 
         # Prune flat args of all those named args which are NOT to be copied
@@ -474,7 +462,6 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
 
     # Prepare the arguments for the lex grammar
     my %lex_args = ();
-    $lex_args{trace_file_handle} = $trace_fh;
     $lex_args{start}             = $lex_start_symbol_name;
     $lex_args{if_inaccessible} = $if_inaccessible_default;
     $lex_args{rules}   = $lexer_rules;
@@ -794,8 +781,10 @@ sub Marpa::R3::Internal::Scanless::G::precompute {
     my $rules     = $grammar->[Marpa::R3::Internal::Grammar::RULES];
     my $symbols     = $grammar->[Marpa::R3::Internal::Grammar::SYMBOLS];
     my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
+
+    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $trace_fh =
-        $grammar->[Marpa::R3::Internal::Grammar::TRACE_FILE_HANDLE];
+        $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE];
 
     return if $grammar_c->is_precomputed();
     if ($grammar_c->force_valued() < 0) {
