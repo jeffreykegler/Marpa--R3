@@ -72,8 +72,6 @@ use constant UNPRODUCTIVE_OK => 15;
 use constant TRACE_RULES => 16;
 use constant LAST_FIELD => 16;
 
-package Marpa::R3::Internal::Recognizer;
-
 package Marpa::R3::Internal::Progress_Report;
 use constant RULE_ID => 0;
 use constant POSITION => 1;

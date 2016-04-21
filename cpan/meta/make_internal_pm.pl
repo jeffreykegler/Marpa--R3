@@ -171,15 +171,6 @@ __DATA__
 
     =LAST_FIELD
 
-    :package=Marpa::R3::Internal::Recognizer
-
-
-    { The following fields must be reinitialized when
-    evaluation is reset }
-
-    { This is the end of the list of fields which
-    must be reinitialized when evaluation is reset }
-
     :package=Marpa::R3::Internal::Progress_Report
 
     RULE_ID
