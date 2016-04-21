@@ -229,7 +229,7 @@ sub Marpa::R3::Scanless::R::new {
     my $thick_g1_grammar =
         $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
     $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE] =
-         $thick_g1_grammar->[Marpa::R3::Internal::Grammar::TRACE_FILE_HANDLE];
+         $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE];
 
     my $g1_recce_args =
         Marpa::R3::Internal::Scanless::R::set( $slr, "new",  $flat_args );

@@ -154,14 +154,6 @@ __DATA__
 
     =LAST_BASIC_DATA_FIELD
 
-    { === Evaluator Fields === }
-
-    =LAST_EVALUATOR_FIELD
-
-    PROBLEMS { fatal problems }
-
-    =LAST_RECOGNIZER_FIELD
-
     START_NAME { name of original symbol }
     INACCESSIBLE_OK
     UNPRODUCTIVE_OK
