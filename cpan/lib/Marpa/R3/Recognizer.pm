@@ -123,7 +123,7 @@ sub Marpa::R3::Scanless::R::naif_set {
         if ( defined( my $value = $args->{'semantics_package'} ) ) {
 
             # Not allowed once parsing is started
-            if ( defined $recce->[Marpa::R3::Internal::Recognizer::B_C] ) {
+            if ( defined $slr->[Marpa::R3::Internal::Scanless::R::B_C] ) {
                 Marpa::R3::exception(
                     q{Cannot change 'semantics_package' named argument once parsing has started}
                 );
@@ -147,7 +147,7 @@ sub Marpa::R3::Scanless::R::naif_set {
         if ( defined( my $value = $args->{'ranking_method'} ) ) {
 
             # Not allowed once parsing is started
-            if ( defined $recce->[Marpa::R3::Internal::Recognizer::B_C] ) {
+            if ( defined $slr->[Marpa::R3::Internal::Scanless::R::B_C] ) {
                 Marpa::R3::exception(
                     q{Cannot change ranking method once parsing has started});
             }
@@ -180,7 +180,7 @@ sub Marpa::R3::Scanless::R::naif_set {
         if ( defined( my $value = $args->{'end'} ) ) {
 
             # Not allowed once evaluation is started
-            if ( defined $recce->[Marpa::R3::Internal::Recognizer::B_C] ) {
+            if ( defined $slr->[Marpa::R3::Internal::Scanless::R::B_C] ) {
                 Marpa::R3::exception(
                     q{Cannot reset end once evaluation has started});
             }

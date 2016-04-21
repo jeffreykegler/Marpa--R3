@@ -336,7 +336,7 @@ sub Marpa::R3::Scanless::R::new {
               qq{Expecting "$terminal" at earleme 0}
               or Marpa::R3::exception("Cannot print: $ERRNO");
         }
-    } ## end if ( $thick_g1_recce->[Marpa::R3::Internal::Recognizer::TRACE_TERMINALS...])
+    }
 
     Marpa::R3::Internal::Scanless::convert_libmarpa_events($slr);
 
@@ -1396,7 +1396,7 @@ sub Marpa::R3::Scanless::R::ambiguity_metric {
         $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
     my $ordering = $slr->ordering_get();
     my $metric = $ordering ? $ordering->ambiguity_metric() : 0;
-    my $bocage = $thick_g1_recce->[Marpa::R3::Internal::Recognizer::B_C];
+    my $bocage = $slr->[Marpa::R3::Internal::Scanless::R::B_C];
     return $metric;
 } ## end sub Marpa::R3::Scanless::R::ambiguity_metric
 
@@ -1692,7 +1692,7 @@ sub Marpa::R3::Scanless::R::progress {
     }
     $recce_c->progress_report_finish();
     return $result;
-} ## end sub Marpa::R3::Recognizer::progress
+}
 
 
 sub Marpa::R3::Scanless::R::terminals_expected {
@@ -1902,7 +1902,7 @@ sub Marpa::R3::Scanless::R::show_earley_sets {
         $text .= "Earley Set $ix\n$set_desc";
     }
     return $text;
-} ## end sub Marpa::R3::Recognizer::show_earley_sets
+}
 
 sub Marpa::R3::Scanless::R::show_leo_item {
     my ($slr)        = @_;
@@ -2178,7 +2178,7 @@ sub Marpa::R3::Scanless::R::show_or_nodes {
     my $recce_c                = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
     my $thick_g1_recce =
         $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
-    my $bocage = $thick_g1_recce->[Marpa::R3::Internal::Recognizer::B_C];
+    my $bocage = $slr->[Marpa::R3::Internal::Scanless::R::B_C];
     return $recce_c->show_or_nodes($bocage, $verbose);
 }
 
@@ -2188,7 +2188,7 @@ sub Marpa::R3::Scanless::R::show_and_nodes {
     my $recce_c                = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
     my $thick_g1_recce =
         $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
-    my $bocage = $thick_g1_recce->[Marpa::R3::Internal::Recognizer::B_C];
+    my $bocage = $slr->[Marpa::R3::Internal::Scanless::R::B_C];
     return $recce_c->show_and_nodes($bocage);
 }
 
@@ -2201,14 +2201,14 @@ sub Marpa::R3::Scanless::R::show_tree {
         $text .= "$nook_id: $nook_text";
     }
     return $text;
-} ## end sub Marpa::R3::Recognizer::show_tree
+}
 
 sub Marpa::R3::Scanless::R::show_nook {
     my ( $slr, $nook_id, $verbose ) = @_;
     my $recce = $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
-    my $recce_c = $recce->[Marpa::R3::Internal::Scanless::R::R_C];
-    my $order   = $recce->[Marpa::R3::Internal::Recognizer::O_C];
-    my $tree    = $recce->[Marpa::R3::Internal::Recognizer::T_C];
+    my $recce_c = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
+    my $order   = $slr->[Marpa::R3::Internal::Scanless::R::O_C];
+    my $tree    = $slr->[Marpa::R3::Internal::Scanless::R::T_C];
 
     my $or_node_id = $tree->_marpa_t_nook_or_node($nook_id);
     return if not defined $or_node_id;
@@ -2257,18 +2257,18 @@ sub Marpa::R3::Scanless::R::show_nook {
         } ## end CHOICE: for ( my $choice_ix = 0;; $choice_ix++ )
     } ## end DESCRIBE_CHOICES:
     return $text;
-} ## end sub Marpa::R3::Recognizer::show_nook
+}
 
 sub Marpa::R3::Scanless::R::or_node_tag {
     my ( $slr, $or_node_id ) = @_;
     my $recce     = $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
-    my $bocage   = $recce->[Marpa::R3::Internal::Recognizer::B_C];
+    my $bocage   = $slr->[Marpa::R3::Internal::Scanless::R::B_C];
     my $set      = $bocage->_marpa_b_or_node_set($or_node_id);
     my $irl_id   = $bocage->_marpa_b_or_node_irl($or_node_id);
     my $origin   = $bocage->_marpa_b_or_node_origin($or_node_id);
     my $position = $bocage->_marpa_b_or_node_position($or_node_id);
     return 'R' . $irl_id . q{:} . $position . q{@} . $origin . q{-} . $set;
-} ## end sub Marpa::R3::Recognizer::or_node_tag
+}
 
 sub Marpa::R3::Scanless::R::show_bocage {
     my ($slr)     = @_;
@@ -2278,7 +2278,7 @@ sub Marpa::R3::Scanless::R::show_bocage {
     my $slg       = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $grammar   = $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
     my $recce_c   = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
-    my $bocage    = $recce->[Marpa::R3::Internal::Recognizer::B_C];
+    my $bocage    = $slr->[Marpa::R3::Internal::Scanless::R::B_C];
     my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
   OR_NODE: for ( my $or_node_id = 0 ; ; $or_node_id++ ) {
         my $irl_id = $bocage->_marpa_b_or_node_irl($or_node_id);
@@ -2324,7 +2324,7 @@ sub Marpa::R3::Scanless::R::show_bocage {
     } ## end OR_NODE: for ( my $or_node_id = 0;; $or_node_id++ )
     my @sorted_data = map { $_->[-1] } sort { $a->[0] <=> $b->[0] } @data;
     return ( join "\n", @sorted_data ) . "\n";
-} ## end sub Marpa::R3::Recognizer::show_bocage
+}
 
 # These were not sorted and therefore were not suitable for test suite
 # This code has not been updated from Marpa::R2.
