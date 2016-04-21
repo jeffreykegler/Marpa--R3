@@ -13,7 +13,7 @@
 # General Public License along with Marpa::R3.  If not, see
 # http://www.gnu.org/licenses/.
 
-package Marpa::R3;
+package Marpa::R3::Common;
 
 # Marpa::R3 "common" methods
 
@@ -28,6 +28,8 @@ $STRING_VERSION = $VERSION;
 ## no critic(BuiltinFunctions::ProhibitStringyEval)
 $VERSION = eval $VERSION;
 ## use critic
+
+package Marpa::R3::Internal::Common;
 
 use English qw( -no_match_vars );
 

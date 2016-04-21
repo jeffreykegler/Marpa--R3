@@ -309,7 +309,7 @@ WriteMakefile(
                 qw( tool engine author.t )
             ],
             namespace => [
-                'Marpa::R3::Recognizer', 'Marpa::R3::Grammar',
+                'Marpa::R3::Grammar',
                 @no_index_namespace_inclusive
             ],
             package =>

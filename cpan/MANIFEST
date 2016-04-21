@@ -112,7 +112,7 @@ lib/Marpa/R3/Grammar.pm
 lib/Marpa/R3/Internal.pm
 lib/Marpa/R3/MetaAST.pm
 lib/Marpa/R3/MetaG.pm
-lib/Marpa/R3/Recognizer.pm
+lib/Marpa/R3/Common.pm
 lib/Marpa/R3/SLG.pm
 lib/Marpa/R3/SLR.pm
 lib/Marpa/R3/Thin/G.pm
