@@ -181,7 +181,7 @@ sub Marpa::R3::Scanless::R::naif_set {
                 Marpa::R3::exception(
                     q{Cannot reset end once evaluation has started});
             }
-            $recce->[Marpa::R3::Internal::Recognizer::END_OF_PARSE] = $value;
+            $slr->[Marpa::R3::Internal::Scanless::R::END_OF_PARSE] = $value;
         } ## end if ( defined( my $value = $args->{'end'} ) )
 
         if ( defined( my $value = $args->{'too_many_earley_items'} ) ) {

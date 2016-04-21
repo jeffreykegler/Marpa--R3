@@ -444,7 +444,7 @@ sub Marpa::R3::Scanless::R::ordering_get {
     my $ordering = $slr->[Marpa::R3::Internal::Scanless::R::O_C];
     return $ordering if $ordering;
     my $parse_set_arg =
-        $recce->[Marpa::R3::Internal::Recognizer::END_OF_PARSE];
+        $slr->[Marpa::R3::Internal::Scanless::R::END_OF_PARSE];
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $grammar =
         $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];

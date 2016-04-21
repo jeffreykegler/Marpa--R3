@@ -173,7 +173,6 @@ __DATA__
 
     :package=Marpa::R3::Internal::Recognizer
 
-    END_OF_PARSE
 
     { The following fields must be reinitialized when
     evaluation is reset }
@@ -332,6 +331,7 @@ __DATA__
     NO_PARSE { no parse found in parse series -- memoized }
     NULL_VALUES
     TREE_MODE { 'tree' or 'forest' or undef }
+    END_OF_PARSE
 
     { Fields for new SLIF resolution logic
     -- must be reinitialized when evaluation is reset }
