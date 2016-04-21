@@ -114,9 +114,9 @@ require Marpa::R3::Grammar;
 ( $version_result = version_ok($Marpa::R3::Grammar::VERSION) )
     and die 'Marpa::R3::Grammar::VERSION ', $version_result;
 
-require Marpa::R3::Recognizer;
-( $version_result = version_ok($Marpa::R3::Recognizer::VERSION) )
-    and die 'Marpa::R3::Recognizer::VERSION ', $version_result;
+require Marpa::R3::Common;
+( $version_result = version_ok($Marpa::R3::Common::VERSION) )
+    and die 'Marpa::R3::Common::VERSION ', $version_result;
 
 require Marpa::R3::Value;
 ( $version_result = version_ok($Marpa::R3::Value::VERSION) )

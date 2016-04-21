@@ -1480,6 +1480,162 @@ sub Marpa::R3::Scanless::R::series_restart {
     return 1;
 }
 
+sub Marpa::R3::Scanless::R::naif_set {
+    my ( $slr, @arg_hashes ) = @_;
+    my $recce_c = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
+
+    # This may get changed below
+    my $trace_fh =
+        $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
+
+    for my $args (@arg_hashes) {
+
+        my $ref_type = ref $args;
+        if ( not $ref_type or $ref_type ne 'HASH' ) {
+            Carp::croak(
+                'Marpa::R3 Recognizer expects args as ref to HASH, got ',
+                ( "ref to $ref_type" || 'non-reference' ),
+                ' instead'
+            );
+        } ## end if ( not $ref_type or $ref_type ne 'HASH' )
+
+        state $recognizer_options = {
+            map { ( $_, 1 ) }
+                qw(
+                end
+                max_parses
+                semantics_package
+                ranking_method
+                too_many_earley_items
+                trace_actions
+                trace_earley_sets
+                trace_values
+                )
+        };
+
+        if (my @bad_options =
+            grep { not exists $recognizer_options->{$_} }
+            keys %{$args}
+            )
+        {
+            Carp::croak( 'Unknown option(s) for Marpa::R3 Recognizer: ',
+                join q{ }, @bad_options );
+        } ## end if ( my @bad_options = grep { not exists $recognizer_options...})
+
+        if ( defined( my $value = $args->{'max_parses'} ) ) {
+            $slr->[Marpa::R3::Internal::Scanless::R::MAX_PARSES] = $value;
+        }
+
+        if ( defined( my $value = $args->{'semantics_package'} ) ) {
+
+            # Not allowed once parsing is started
+            if ( defined $slr->[Marpa::R3::Internal::Scanless::R::B_C] ) {
+                Marpa::R3::exception(
+                    q{Cannot change 'semantics_package' named argument once parsing has started}
+                );
+            }
+
+            $slr->[Marpa::R3::Internal::Scanless::R::RESOLVE_PACKAGE_SOURCE]
+                //= 'semantics_package';
+            if ( $slr
+                ->[Marpa::R3::Internal::Scanless::R::RESOLVE_PACKAGE_SOURCE] ne
+                'semantics_package' )
+            {
+                Marpa::R3::exception(
+                    qq{'semantics_package' named argument in conflict with other choices\n},
+                    qq{   Usually this means you tried to use the discouraged 'action_object' named argument as well\n}
+                );
+            } ## end if ( $recce->[...])
+            $slr->[Marpa::R3::Internal::Scanless::R::RESOLVE_PACKAGE] =
+                $value;
+        } ## end if ( defined( my $value = $args->{'semantics_package'...}))
+
+        if ( defined( my $value = $args->{'ranking_method'} ) ) {
+
+            # Not allowed once parsing is started
+            if ( defined $slr->[Marpa::R3::Internal::Scanless::R::B_C] ) {
+                Marpa::R3::exception(
+                    q{Cannot change ranking method once parsing has started});
+            }
+            state $ranking_methods = { map { ($_, 0) } qw(high_rule_only rule none) };
+            Marpa::R3::exception(
+                qq{ranking_method value is $value (should be one of },
+                ( join q{, }, map { q{'} . $_ . q{'} } keys %{$ranking_methods} ),
+                ')' )
+                if not exists $ranking_methods->{$value};
+            $slr->[Marpa::R3::Internal::Scanless::R::RANKING_METHOD] =
+                $value;
+        } ## end if ( defined( my $value = $args->{'ranking_method'} ...))
+
+        if ( defined( my $value = $args->{'trace_actions'} ) ) {
+            $slr->[Marpa::R3::Internal::Scanless::R::TRACE_ACTIONS] = $value;
+            if ($value) {
+                say {$trace_fh} 'Setting trace_actions option'
+                    or Marpa::R3::exception("Cannot print: $ERRNO");
+            }
+        } ## end if ( defined( my $value = $args->{'trace_actions'} ))
+
+        if ( defined( my $value = $args->{'trace_values'} ) ) {
+            $slr->[Marpa::R3::Internal::Scanless::R::TRACE_VALUES] = $value;
+            if ($value) {
+                say {$trace_fh} 'Setting trace_values option'
+                    or Marpa::R3::exception("Cannot print: $ERRNO");
+            }
+        } ## end if ( defined( my $value = $args->{'trace_values'} ) )
+
+        if ( defined( my $value = $args->{'end'} ) ) {
+
+            # Not allowed once evaluation is started
+            if ( defined $slr->[Marpa::R3::Internal::Scanless::R::B_C] ) {
+                Marpa::R3::exception(
+                    q{Cannot reset end once evaluation has started});
+            }
+            $slr->[Marpa::R3::Internal::Scanless::R::END_OF_PARSE] = $value;
+        } ## end if ( defined( my $value = $args->{'end'} ) )
+
+        if ( defined( my $value = $args->{'too_many_earley_items'} ) ) {
+            $recce_c->earley_item_warning_threshold_set($value);
+        }
+
+    } ## end for my $args (@arg_hashes)
+
+    return 1;
+}
+
+# For the non-legacy case,
+# I reset the ordering, forcing it to be recalculated
+# for each parse series.
+# But I do not actually allow the ranking method to
+# be changed once a parse is created.
+# Since I am stabilizing Marpa::R3, the "fix" should
+# probably be to save the overhead, rather than
+# to allow 'ranking_method' to be changed.
+# But for now I will do nothing.
+# JK -- Mon Nov 24 17:35:24 PST 2014
+sub Marpa::R3::Scanless::R::reset_evaluation {
+    my ($slr) = @_;
+    my $package_source =
+        $slr->[Marpa::R3::Internal::Scanless::R::RESOLVE_PACKAGE_SOURCE];
+    if ( defined $package_source ) {
+        $slr->[Marpa::R3::Internal::Scanless::R::RESOLVE_PACKAGE_SOURCE] =
+            undef;
+    } ## end if ( defined $package_source and $package_source ne ...)
+    $slr->[Marpa::R3::Internal::Scanless::R::NO_PARSE]              = undef;
+    $slr->[Marpa::R3::Internal::Scanless::R::B_C]                   = undef;
+    $slr->[Marpa::R3::Internal::Scanless::R::O_C]                   = undef;
+    $slr->[Marpa::R3::Internal::Scanless::R::T_C]                   = undef;
+    $slr->[Marpa::R3::Internal::Scanless::R::PER_PARSE_CONSTRUCTOR] = undef;
+    $slr->[Marpa::R3::Internal::Scanless::R::RESOLVE_PACKAGE]       = undef;
+    $slr->[Marpa::R3::Internal::Scanless::R::NULL_VALUES]           = undef;
+
+    $slr->[Marpa::R3::Internal::Scanless::R::REGISTRATIONS]         = undef;
+    $slr->[Marpa::R3::Internal::Scanless::R::CLOSURE_BY_SYMBOL_ID] = undef;
+    $slr->[Marpa::R3::Internal::Scanless::R::CLOSURE_BY_RULE_ID]   = undef;
+
+    $slr->[Marpa::R3::Internal::Scanless::R::TREE_MODE] = undef;
+    return;
+}
+
 # Given a list of G1 locations, return the minimum span in the input string
 # that includes them all
 # Caller must ensure that there is an input, which is not the case
