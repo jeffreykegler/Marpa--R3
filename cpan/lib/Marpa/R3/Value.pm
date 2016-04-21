@@ -441,7 +441,7 @@ sub Marpa::R3::Scanless::R::ordering_get {
     my $recce =
         $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
     return if $slr->[Marpa::R3::Internal::Scanless::R::NO_PARSE];
-    my $ordering = $recce->[Marpa::R3::Internal::Recognizer::O_C];
+    my $ordering = $slr->[Marpa::R3::Internal::Scanless::R::O_C];
     return $ordering if $ordering;
     my $parse_set_arg =
         $recce->[Marpa::R3::Internal::Recognizer::END_OF_PARSE];
@@ -468,11 +468,13 @@ sub Marpa::R3::Scanless::R::ordering_get {
         my $ranking_method =
             $slr->[Marpa::R3::Internal::Scanless::R::RANKING_METHOD];
         if ( $ranking_method eq 'high_rule_only' ) {
-            do_high_rule_only($recce);
+            $ordering->high_rank_only_set(1);
+            $ordering->rank();
             last GIVEN_RANKING_METHOD;
         }
         if ( $ranking_method eq 'rule' ) {
-            do_rank_by_rule($recce);
+            $ordering->high_rank_only_set(0);
+            $ordering->rank();
             last GIVEN_RANKING_METHOD;
         }
     } ## end GIVEN_RANKING_METHOD:
@@ -1374,7 +1376,7 @@ sub Marpa::R3::Scanless::R::value {
         "  Recognition done only as far as location $last_completed_earleme\n"
     ) if $furthest_earleme > $last_completed_earleme;
 
-    my $tree = $recce->[Marpa::R3::Internal::Recognizer::T_C];
+    my $tree = $slr->[Marpa::R3::Internal::Scanless::R::T_C];
 
     if ($tree) {
 
@@ -1737,31 +1739,13 @@ sub Marpa::R3::Scanless::R::value {
 
 } ## end sub Marpa::R3::Recognizer::value
 
-sub do_high_rule_only {
-    my ($recce) = @_;
-    my $order = $recce->[Marpa::R3::Internal::Recognizer::O_C];
-    $order->high_rank_only_set(1);
-    $order->rank();
-    return 1;
-} ## end sub do_high_rule_only
-
-sub do_rank_by_rule {
-    my ($recce) = @_;
-    my $order = $recce->[Marpa::R3::Internal::Recognizer::O_C];
-
-    # Rank by rule is the default, but just in case
-    $order->high_rank_only_set(0);
-    $order->rank();
-    return 1;
-} ## end sub do_rank_by_rule
-
 # INTERNAL OK AFTER HERE _marpa_
 
 sub Marpa::R3::Scanless::R::and_node_tag {
     my ( $slr, $and_node_id ) = @_;
     my $recce =
         $slr->[Marpa::R3::Internal::Scanless::R::THICK_G1_RECCE];
-    my $bocage            = $recce->[Marpa::R3::Internal::Recognizer::B_C];
+    my $bocage            = $slr->[Marpa::R3::Internal::Scanless::R::B_C];
     my $recce_c           = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
     my $parent_or_node_id = $bocage->_marpa_b_and_node_parent($and_node_id);
     my $origin         = $bocage->_marpa_b_or_node_origin($parent_or_node_id);
@@ -1808,8 +1792,8 @@ sub trace_token_evaluation {
     my $trace_file_handle =
         $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
 
-    my $order   = $recce->[Marpa::R3::Internal::Recognizer::O_C];
-    my $tree    = $recce->[Marpa::R3::Internal::Recognizer::T_C];
+    my $order   = $slr->[Marpa::R3::Internal::Scanless::R::O_C];
+    my $tree    = $slr->[Marpa::R3::Internal::Scanless::R::T_C];
 
     my $nook_ix = $value->_marpa_v_nook();
     if ( not defined $nook_ix ) {
@@ -1846,9 +1830,9 @@ sub trace_stack_1 {
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $grammar =
         $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
-    my $bocage  = $recce->[Marpa::R3::Internal::Recognizer::B_C];
-    my $order   = $recce->[Marpa::R3::Internal::Recognizer::O_C];
-    my $tree    = $recce->[Marpa::R3::Internal::Recognizer::T_C];
+    my $bocage  = $slr->[Marpa::R3::Internal::Scanless::R::B_C];
+    my $order   = $slr->[Marpa::R3::Internal::Scanless::R::O_C];
+    my $tree    = $slr->[Marpa::R3::Internal::Scanless::R::T_C];
 
     my $argc       = scalar @{$args};
     my $nook_ix    = $value->_marpa_v_nook();
@@ -1877,9 +1861,9 @@ sub trace_op {
     return $trace_output if not $trace_values >= 2;
 
     my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
-    my $bocage    = $recce->[Marpa::R3::Internal::Recognizer::B_C];
-    my $order     = $recce->[Marpa::R3::Internal::Recognizer::O_C];
-    my $tree      = $recce->[Marpa::R3::Internal::Recognizer::T_C];
+    my $bocage    = $slr->[Marpa::R3::Internal::Scanless::R::B_C];
+    my $order     = $slr->[Marpa::R3::Internal::Scanless::R::O_C];
+    my $tree      = $slr->[Marpa::R3::Internal::Scanless::R::T_C];
 
     my $nook_ix    = $value->_marpa_v_nook();
     my $or_node_id = $tree->_marpa_t_nook_or_node($nook_ix);
