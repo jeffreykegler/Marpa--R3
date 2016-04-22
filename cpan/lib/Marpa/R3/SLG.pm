@@ -457,14 +457,10 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
         }
     } sort keys %is_lexeme_in_this_lexer;
 
-    # Prepare the arguments for the lex grammar
-    my %lex_args = ();
-    $lex_args{start}             = $lex_start_symbol_name;
-    $lex_args{rules}   = $lexer_rules;
-    $lex_args{symbols} = \%this_lexer_symbols;
-
     # Create the thick lex grammar
-    my $lex_grammar = Marpa::R3::Grammar->l0_naif_new( $slg, \%lex_args );
+    my $lex_grammar =
+      Marpa::R3::Grammar->l0_naif_new( $slg, $lex_start_symbol_name,
+        \%this_lexer_symbols, $lexer_rules );
     $thick_grammar_by_lexer_name{$lexer_name} = $lex_grammar;
     my $lex_tracer = $lex_grammar->tracer();
     my $lex_thin   = $lex_tracer->grammar();

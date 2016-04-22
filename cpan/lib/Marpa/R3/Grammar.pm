@@ -74,7 +74,7 @@ sub Marpa::R3::Grammar::g1_naif_new {
 } ## end sub Marpa::R3::Grammar::new
 
 sub Marpa::R3::Grammar::l0_naif_new {
-    my ( $class, $slg, @arg_hashes ) = @_;
+    my ( $class, $slg, $start_name, $symbols, $rules ) = @_;
 
     my $grammar = [];
     bless $grammar, $class;
@@ -88,7 +88,14 @@ sub Marpa::R3::Grammar::l0_naif_new {
     $grammar->[Marpa::R3::Internal::Grammar::TRACER] =
         Marpa::R3::Thin::Trace->new($grammar_c);
 
-    $grammar->l0_naif_set($slg, @arg_hashes);
+    for my $symbol ( sort keys %{$symbols} ) {
+        my $properties = $symbols->{$symbol};
+        assign_symbol( $grammar, $symbol, $properties );
+    }
+
+    $grammar->[Marpa::R3::Internal::Grammar::START_NAME] = $start_name;
+
+    add_user_rules( $slg, $grammar, $rules );
 
     return $grammar;
 } ## end sub Marpa::R3::Grammar::new
@@ -250,24 +257,6 @@ sub Marpa::R3::Grammar::g1_naif_set {
 
     return 1;
 } ## end sub Marpa::R3::Grammar::set
-
-sub Marpa::R3::Grammar::l0_naif_set {
-    my ( $grammar, $slg, $hash_args ) = @_;
-
-    my $value = $hash_args->{'symbols'};
-    for my $symbol ( sort keys %{$value} ) {
-        my $properties = $value->{$symbol};
-        assign_symbol( $grammar, $symbol, $properties );
-    }
-
-    $value = $hash_args->{'start'};
-    $grammar->[Marpa::R3::Internal::Grammar::START_NAME] = $value;
-
-    $value = $hash_args->{'rules'};
-    add_user_rules( $slg, $grammar, $value );
-
-    return 1;
-}
 
 sub Marpa::R3::Grammar::symbol_reserved_set {
     my ( $grammar, $final_character, $boolean ) = @_;
