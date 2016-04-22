@@ -983,7 +983,7 @@ sub Marpa::R3::Internal::Scanless::G::precompute {
         } ## end SYMBOL: for my $symbol ( @{ ...})
     } ## end if ( $grammar->[Marpa::R3::Internal::Grammar::WARNINGS...])
 
-    my $cc_hash = $grammar->[Marpa::R3::Internal::Grammar::CHARACTER_CLASSES];
+    my $cc_hash = $slg->[Marpa::R3::Internal::Scanless::G::CHARACTER_CLASSES];
     if ( defined $cc_hash ) {
         my $class_table =
             $grammar->[Marpa::R3::Internal::Grammar::CHARACTER_CLASS_TABLE] =
@@ -996,7 +996,7 @@ sub Marpa::R3::Internal::Scanless::G::precompute {
     } ## end if ( defined $cc_hash )
 
     # Save some memory
-    $grammar->[Marpa::R3::Internal::Grammar::CHARACTER_CLASSES] = undef;
+    $slg->[Marpa::R3::Internal::Scanless::G::CHARACTER_CLASSES] = undef;
 
     return ;
 

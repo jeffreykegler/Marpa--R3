@@ -144,10 +144,6 @@ __DATA__
     WARNINGS { print warnings about grammar? }
     IF_INACCESSIBLE { default for symbols }
 
-    CHARACTER_CLASSES { an hash of
-    character class regex by symbol name.
-    Used before precomputation. }
-
     CHARACTER_CLASS_TABLE { An array of symbol ID and
     regex.  Used after precomputation. }
 
@@ -268,6 +264,10 @@ __DATA__
 
     TRACE_FILE_HANDLE
     TRACE_TERMINALS
+
+    CHARACTER_CLASSES { an hash of
+    character class regex by symbol name.
+    Used before precomputation. }
 
     :package=Marpa::R3::Internal::Scanless::R
 
