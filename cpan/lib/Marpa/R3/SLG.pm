@@ -463,7 +463,6 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     # Prepare the arguments for the lex grammar
     my %lex_args = ();
     $lex_args{start}             = $lex_start_symbol_name;
-    $lex_args{if_inaccessible} = $if_inaccessible_default;
     $lex_args{rules}   = $lexer_rules;
     $lex_args{symbols} = \%this_lexer_symbols;
 
