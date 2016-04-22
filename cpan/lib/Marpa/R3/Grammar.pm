@@ -252,89 +252,19 @@ sub Marpa::R3::Grammar::g1_naif_set {
 } ## end sub Marpa::R3::Grammar::set
 
 sub Marpa::R3::Grammar::l0_naif_set {
-    my ( $grammar, $slg, @arg_hashes ) = @_;
+    my ( $grammar, $slg, $hash_args ) = @_;
 
-    # set trace_fh even if no tracing, because we may turn it on in this method
-    my $trace_fh  = $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE];
-    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
+    my $value = $hash_args->{'symbols'};
+    for my $symbol ( sort keys %{$value} ) {
+        my $properties = $value->{$symbol};
+        assign_symbol( $grammar, $symbol, $properties );
+    }
 
-    for my $args (@arg_hashes) {
+    $value = $hash_args->{'start'};
+    $grammar->[Marpa::R3::Internal::Grammar::START_NAME] = $value;
 
-        my $ref_type = ref $args;
-        if ( not $ref_type ) {
-            Carp::croak(
-'Marpa::R3::Grammar expects args as ref to HASH; arg was non-reference'
-            );
-        }
-        if ( $ref_type ne 'HASH' ) {
-            Carp::croak(
-"Marpa::R3::Grammar expects args as ref to HASH, got ref to $ref_type instead"
-            );
-        }
-
-        state $grammar_options = {
-            map { ( $_, 1 ) }
-              qw{
-              rules
-              start
-              symbols
-              }
-        };
-
-        if (
-            my @bad_options =
-            grep { not exists $grammar_options->{$_} }
-            keys %{$args}
-          )
-        {
-            Carp::croak( 'Unknown option(s) for Marpa::R3::Grammar: ',
-                join q{ }, @bad_options );
-        } ## end if ( my @bad_options = grep { not exists $grammar_options...})
-
-        if ( defined( my $value = $args->{'symbols'} ) ) {
-            Marpa::R3::exception(
-                'symbols option not allowed after grammar is precomputed')
-              if $grammar_c->is_precomputed();
-            Marpa::R3::exception('symbols value must be REF to HASH')
-              if ref $value ne 'HASH';
-            for my $symbol ( sort keys %{$value} ) {
-                my $properties = $value->{$symbol};
-                assign_symbol( $grammar, $symbol, $properties );
-            }
-        } ## end if ( defined( my $value = $args->{'symbols'} ) )
-
-        if ( defined( my $value = $args->{'start'} ) ) {
-            Marpa::R3::exception(
-                'start option not allowed after grammar is precomputed')
-              if $grammar_c->is_precomputed();
-            $grammar->[Marpa::R3::Internal::Grammar::START_NAME] = $value;
-        } ## end if ( defined( my $value = $args->{'start'} ) )
-
-        if ( defined( my $value = $args->{'rules'} ) ) {
-            Marpa::R3::exception(
-                'rules option not allowed after grammar is precomputed')
-              if $grammar_c->is_precomputed();
-
-            if (    ref $value eq 'ARRAY'
-                and scalar @{$value} == 1
-                and not ref $value->[0] )
-            {
-                $value = $value->[0];
-            } ## end if ( ref $value eq 'ARRAY' and scalar @{$value} == 1...)
-            if ( not ref $value ) {
-                Marpa::R3::exception(
-                    qq{Attempt to specify BNF as string -- no longer allowed!\n}
-                );
-            }
-            Marpa::R3::exception(
-                q{"rules" named argument must be ref to ARRAY} )
-              if ref $value ne 'ARRAY';
-
-            add_user_rules( $slg, $grammar, $value );
-
-        } ## end if ( defined( my $value = $args->{'rules'} ) )
-
-    } ## end for my $args (@arg_hashes)
+    $value = $hash_args->{'rules'};
+    add_user_rules( $slg, $grammar, $value );
 
     return 1;
 }
