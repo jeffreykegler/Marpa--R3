@@ -66,8 +66,11 @@ sub Marpa::R3::Scanless::G::new {
     $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE] = \*STDERR;
     $slg->[Marpa::R3::Internal::Scanless::G::WARNINGS]          = 1;
 
+    my ($flat_args, $error_message) = Marpa::R3::flatten_hash_args(\@hash_ref_args);
+    Marpa::R3::exception( sprintf $error_message, '$slg->new' ) if not $flat_args;
+
     my ( $dsl, $g1_args ) =
-      Marpa::R3::Internal::Scanless::G::set( $slg, 'new', @hash_ref_args );
+      Marpa::R3::Internal::Scanless::G::set( $slg, $flat_args );
     my $ast        = Marpa::R3::Internal::MetaAST->new($dsl);
     my $hashed_ast = $ast->ast_to_hash();
     Marpa::R3::Internal::Scanless::G::hash_to_runtime( $slg, $hashed_ast,
@@ -77,83 +80,69 @@ sub Marpa::R3::Scanless::G::new {
 
 sub Marpa::R3::Scanless::G::set {
     my ( $slg, @hash_ref_args ) = @_;
-    Marpa::R3::Internal::Scanless::G::set ( $slg, 'set', @hash_ref_args );
+    my ($flat_args, $error_message) = Marpa::R3::flatten_hash_args(\@hash_ref_args);
+    Marpa::R3::exception( sprintf $error_message, '$slg->set' ) if not $flat_args;
+
+    my $value = $flat_args->{trace_terminals};
+    if (defined $value) {
+        $slg->[Marpa::R3::Internal::Scanless::G::TRACE_TERMINALS] = $value;
+        delete $flat_args->{trace_terminals};
+    }
+
+    $value = $flat_args->{trace_file_handle};
+    if (defined $value) {
+        $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE] = $value;
+        delete $flat_args->{trace_file_handle};
+    }
+
+    my @bad_arguments = keys %{$flat_args};
+    if ( scalar @bad_arguments ) {
+        Marpa::R3::exception(
+            q{Bad named argument(s) to $slg->set() method}
+                . join q{ },
+            @bad_arguments
+        );
+    }
     return $slg;
 }
 
-# The context flag indicates whether this ::set() is called directly by the user;
-# is for the external constructor; or is for the internal ("meta") constructor.
-# "Context" flags of this kind
-# are much decried practice, and for good reason, but in this case
-# I think it is justified.
-# This logic really needs to be all in one place, and so a flag
-# to trigger the minor differences needed by the various calling
-# contexts is a small price to pay.
 sub Marpa::R3::Internal::Scanless::G::set {
-    my ( $slg, $method, @hash_ref_args ) = @_;
+    my ( $slg, $flat_args ) = @_;
 
     state $copy_to_g1_args =
-        { map { ( $_, 1 ); }
-            qw(trace_file_handle default_action bless_package) };
-    state $set_method_args =
-        { map { ( $_, 1 ); } qw(trace_file_handle trace_terminals) };
-    state $new_method_args = {
-        map { ( $_, 1 ); } qw(source trace_terminals), keys %{$copy_to_g1_args}
+      { map { ( $_, 1 ); } qw(trace_file_handle default_action bless_package) };
+    state $ok_args = {
+        map { ( $_, 1 ); } qw(source trace_terminals),
+        keys %{$copy_to_g1_args}
     };
-    for my $args (@hash_ref_args) {
-        my $ref_type = ref $args;
-        if ( not $ref_type ) {
-            Marpa::R3::exception( q{$slg->}
-                    . $method
-                    . qq{() expects args as ref to HASH; got non-reference instead}
-            );
-        } ## end if ( not $ref_type )
-        if ( $ref_type ne 'HASH' ) {
-            Marpa::R3::exception( q{$slg->}
-                    . $method
-                    . qq{() expects args as ref to HASH, got ref to $ref_type instead}
-            );
-        } ## end if ( $ref_type ne 'HASH' )
-    } ## end for my $args (@hash_ref_args)
 
-    my %flat_args = ();
-    for my $hash_ref (@hash_ref_args) {
-        ARG: for my $arg_name ( keys %{$hash_ref} ) {
-            $flat_args{$arg_name} = $hash_ref->{$arg_name};
-        }
-    }
-
-    my $ok_args = $set_method_args;
-    $ok_args = $new_method_args if $method eq 'new';
-    my @bad_args = grep { not $ok_args->{$_} } keys %flat_args;
+    my @bad_args = grep { not $ok_args->{$_} } keys %{$flat_args};
     if ( scalar @bad_args ) {
         Marpa::R3::exception(
-            q{Bad named argument(s) to $slg->}
-                . $method
-                . q{() method: }
-                . join q{ },
+            q{Bad named argument(s) to $slg->new(): }
+              . join q{ },
             @bad_args
         );
     } ## end if ( scalar @bad_args )
 
     my $dsl;
-    if ( $method eq 'new' ) {
+    {
         state $arg_name = 'source';
-        $dsl = $flat_args{$arg_name};
+        $dsl = $flat_args->{$arg_name};
         Marpa::R3::exception(
-            qq{Marpa::R3::Scanless::G::new() called without a "$arg_name" argument}
+qq{Marpa::R3::Scanless::G::new() called without a "$arg_name" argument}
         ) if not defined $dsl;
         my $ref_type = ref $dsl;
         if ( $ref_type ne 'SCALAR' ) {
             my $desc = $ref_type ? "a ref to $ref_type" : 'not a ref';
             Marpa::R3::exception(
-                qq{'$arg_name' name argument to Marpa::R3::Scanless::G->new() is $desc\n},
+qq{'$arg_name' name argument to Marpa::R3::Scanless::G->new() is $desc\n},
                 "  It should be a ref to a string\n"
             );
         } ## end if ( $ref_type ne 'SCALAR' )
         if ( not defined ${$dsl} ) {
             Marpa::R3::exception(
-                qq{'$arg_name' name argument to Marpa::R3::Scanless::G->new() is a ref to a an undef\n},
+qq{'$arg_name' name argument to Marpa::R3::Scanless::G->new() is a ref to a an undef\n},
                 "  It should be a ref to a string\n"
             );
         } ## end if ( $ref_type ne 'SCALAR' )
@@ -163,36 +152,33 @@ sub Marpa::R3::Internal::Scanless::G::set {
     # the Scanless::G class, so this maps named args to the index of the array
     # that holds the members.
     state $copy_arg_to_index = {
-        trace_file_handle => Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE,
+        trace_file_handle =>
+          Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE,
         trace_terminals => Marpa::R3::Internal::Scanless::G::TRACE_TERMINALS
     };
 
-    ARG: for my $arg_name ( keys %flat_args ) {
+  ARG: for my $arg_name ( keys %{$flat_args} ) {
         my $index = $copy_arg_to_index->{$arg_name};
         next ARG if not defined $index;
-        my $value = $flat_args{$arg_name};
+        my $value = $flat_args->{$arg_name};
         $slg->[$index] = $value;
-    } ## end ARG: for my $arg_name ( keys %flat_args )
+    } ## end ARG: for my $arg_name ( keys %{$flat_args} )
 
     # Normalize trace_terminals
     $slg->[Marpa::R3::Internal::Scanless::G::TRACE_TERMINALS] = 0
-        if not Scalar::Util::looks_like_number(
+      if not Scalar::Util::looks_like_number(
         $slg->[Marpa::R3::Internal::Scanless::G::TRACE_TERMINALS] );
 
     # Trace file handle needs to be populated downwards
-    if ( $method eq 'new' ) {
 
-        # Prune flat args of all those named args which are NOT to be copied
-        # into the NAIF recce args
-        for my $arg_name ( keys %flat_args ) {
-            delete $flat_args{$arg_name}
-                if not $copy_to_g1_args->{$arg_name};
-        }
+    # Prune flat args of all those named args which are NOT to be copied
+    # into the G1 grammar args
+    for my $arg_name ( keys %{$flat_args} ) {
+        delete $flat_args->{$arg_name}
+          if not $copy_to_g1_args->{$arg_name};
+    }
 
-        return ($dsl, \%flat_args);
-    } ## end if ( $method eq 'new' )
-
-    return;
+    return ( $dsl, $flat_args );
 
 } ## end sub Marpa::R3::Internal::Scanless::G::set
 
