@@ -144,9 +144,6 @@ __DATA__
     WARNINGS { print warnings about grammar? }
     IF_INACCESSIBLE { default for symbols }
 
-    CHARACTER_CLASS_TABLE { An array of symbol ID and
-    regex.  Used after precomputation. }
-
     =LAST_BASIC_DATA_FIELD
 
     START_NAME { name of original symbol }

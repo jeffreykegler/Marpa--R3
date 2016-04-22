@@ -58,12 +58,11 @@ use constant SYMBOLS => 4;
 use constant BLESS_PACKAGE => 5;
 use constant WARNINGS => 6;
 use constant IF_INACCESSIBLE => 7;
-use constant CHARACTER_CLASS_TABLE => 8;
-use constant LAST_BASIC_DATA_FIELD => 8;
-use constant START_NAME => 9;
-use constant INACCESSIBLE_OK => 10;
-use constant UNPRODUCTIVE_OK => 11;
-use constant LAST_FIELD => 11;
+use constant LAST_BASIC_DATA_FIELD => 7;
+use constant START_NAME => 8;
+use constant INACCESSIBLE_OK => 9;
+use constant UNPRODUCTIVE_OK => 10;
+use constant LAST_FIELD => 10;
 
 package Marpa::R3::Internal::Progress_Report;
 use constant RULE_ID => 0;
