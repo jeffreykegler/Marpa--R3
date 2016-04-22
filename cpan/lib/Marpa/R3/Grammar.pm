@@ -142,7 +142,6 @@ sub Marpa::R3::Grammar::g1_naif_set {
                 bless_package
                 default_rank
                 rules
-                source
                 start
                 symbols
                 terminals
@@ -168,9 +167,6 @@ sub Marpa::R3::Grammar::g1_naif_set {
         }
 
         if ( defined( my $value = $args->{'default_rank'} ) ) {
-            Marpa::R3::exception(
-                'default_rank option not allowed after grammar is precomputed'
-            ) if $grammar_c->is_precomputed();
             $grammar_c->default_rank_set($value);
         } ## end if ( defined( my $value = $args->{'default_rank'} ) )
 
@@ -178,11 +174,6 @@ sub Marpa::R3::Grammar::g1_naif_set {
         # Second pass options
 
         if ( defined( my $value = $args->{'symbols'} ) ) {
-            Marpa::R3::exception(
-                'symbols option not allowed after grammar is precomputed')
-                if $grammar_c->is_precomputed();
-            Marpa::R3::exception('symbols value must be REF to HASH')
-                if ref $value ne 'HASH';
             for my $symbol ( sort keys %{$value} ) {
                 my $properties = $value->{$symbol};
                 assign_symbol( $grammar, $symbol, $properties );
@@ -190,54 +181,17 @@ sub Marpa::R3::Grammar::g1_naif_set {
         } ## end if ( defined( my $value = $args->{'symbols'} ) )
 
         if ( defined( my $value = $args->{'terminals'} ) ) {
-            Marpa::R3::exception(
-                'terminals option not allowed after grammar is precomputed')
-                if $grammar_c->is_precomputed();
-            Marpa::R3::exception('terminals value must be REF to ARRAY')
-                if ref $value ne 'ARRAY';
             for my $symbol ( @{$value} ) {
                 assign_symbol( $grammar, $symbol, { terminal => 1 } );
             }
         } ## end if ( defined( my $value = $args->{'terminals'} ) )
 
         if ( defined( my $value = $args->{'start'} ) ) {
-            Marpa::R3::exception(
-                'start option not allowed after grammar is precomputed')
-                if $grammar_c->is_precomputed();
             $grammar->[Marpa::R3::Internal::Grammar::START_NAME] = $value;
         } ## end if ( defined( my $value = $args->{'start'} ) )
 
-        if ( defined( my $value = $args->{'source'} ) ) {
-            Marpa::R3::exception(
-                'source option not allowed after grammar is precomputed')
-                if $grammar_c->is_precomputed();
-            Marpa::R3::exception(
-                q{"source" named argument must be string or ref to SCALAR}
-            ) if ref $value ne 'SCALAR';
-        }
-
         if ( defined( my $value = $args->{'rules'} ) ) {
-            Marpa::R3::exception(
-                'rules option not allowed after grammar is precomputed')
-                if $grammar_c->is_precomputed();
-
-                if (    ref $value eq 'ARRAY'
-                    and scalar @{$value} == 1
-                    and not ref $value->[0] )
-                {
-                    $value = $value->[0];
-                } ## end if ( ref $value eq 'ARRAY' and scalar @{$value} == 1...)
-                if ( not ref $value ) {
-                    Marpa::R3::exception(
-                        qq{Attempt to specify BNF as string -- no longer allowed!\n}
-                        )
-                }
-                Marpa::R3::exception(
-                    q{"rules" named argument must be ref to ARRAY}
-                ) if ref $value ne 'ARRAY';
-
                 add_user_rules( $slg, $grammar, $value );
-
         } ## end if ( defined( my $value = $args->{'rules'} ) )
 
         if ( defined( my $value = $args->{'bless_package'} ) ) {
@@ -245,11 +199,6 @@ sub Marpa::R3::Grammar::g1_naif_set {
         }
 
         if ( defined( my $value = $args->{'warnings'} ) ) {
-            if ( $value && $grammar_c->is_precomputed() ) {
-                say {$trace_fh}
-                    q{"warnings" option is useless after grammar is precomputed}
-                    or Marpa::R3::exception("Could not print: $ERRNO");
-            }
             $slg->[Marpa::R3::Internal::Scanless::G::WARNINGS] = $value;
         } ## end if ( defined( my $value = $args->{'warnings'} ) )
 
