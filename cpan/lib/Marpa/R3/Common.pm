@@ -67,6 +67,24 @@ sub Marpa::R3::escape_string {
     return join q{}, @escaped_chars;
 } ## end sub escape_string
 
+sub Marpa::R3::flatten_hash_args {
+    my ($hash_arg_array) = @_;
+    my %flat_args = ();
+    for my $hash_ref (@{$hash_arg_array}) {
+        my $ref_type = ref $hash_ref;
+        if ( not $ref_type ) {
+            return undef, qq{"%s expects args as ref to HASH, got non-reference instead};
+        } ## end if ( not $ref_type )
+        if ( $ref_type ne 'HASH' ) {
+            return undef, qq{"%s expects args as ref to HASH, got ref to $ref_type instead};
+        } ## end if ( $ref_type ne 'HASH' )
+        ARG: for my $arg_name ( keys %{$hash_ref} ) {
+            $flat_args{$arg_name} = $hash_ref->{$arg_name};
+        }
+    } ## end for my $args (@hash_ref_args)
+    return \%flat_args;
+}
+
 1;
 
 # vim: set expandtab shiftwidth=4:

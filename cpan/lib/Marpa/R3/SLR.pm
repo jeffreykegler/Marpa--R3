@@ -177,24 +177,6 @@ sub Marpa::R3::Scanless::R::rule_show {
     return $slg->rule_show($rule_id);
 }
 
-sub flatten_hash_args {
-    my ($hash_arg_array) = @_;
-    my %flat_args = ();
-    for my $hash_ref (@{$hash_arg_array}) {
-        my $ref_type = ref $hash_ref;
-        if ( not $ref_type ) {
-            return undef, qq{"%s expects args as ref to HASH, got non-reference instead};
-        } ## end if ( not $ref_type )
-        if ( $ref_type ne 'HASH' ) {
-            return undef, qq{"%s expects args as ref to HASH, got ref to $ref_type instead};
-        } ## end if ( $ref_type ne 'HASH' )
-        ARG: for my $arg_name ( keys %{$hash_ref} ) {
-            $flat_args{$arg_name} = $hash_ref->{$arg_name};
-        }
-    } ## end for my $args (@hash_ref_args)
-    return \%flat_args;
-}
-
 sub Marpa::R3::Scanless::R::new {
     my ( $class, @args ) = @_;
 
@@ -207,7 +189,7 @@ sub Marpa::R3::Scanless::R::new {
     $slr->[Marpa::R3::Internal::Scanless::R::TRACE_LEXERS] = 0;
     $slr->[Marpa::R3::Internal::Scanless::R::TRACE_TERMINALS] = 0;
 
-    my ($flat_args, $error_message) = flatten_hash_args(\@args);
+    my ($flat_args, $error_message) = Marpa::R3::flatten_hash_args(\@args);
     Marpa::R3::exception( sprintf $error_message, '$slr->new' ) if not $flat_args;
 
     my $slg = $flat_args->{grammar};
@@ -331,7 +313,7 @@ sub Marpa::R3::Scanless::R::new {
 
 sub Marpa::R3::Scanless::R::set {
     my ( $slr, @args ) = @_;
-    my ($flat_args, $error_message) = flatten_hash_args(\@args);
+    my ($flat_args, $error_message) = Marpa::R3::flatten_hash_args(\@args);
     Marpa::R3::exception( sprintf $error_message, '$slr->set()' ) if not $flat_args;
     my $naif_recce_args =
         Marpa::R3::Internal::Scanless::R::set( $slr, "set", $flat_args );
@@ -1473,7 +1455,7 @@ sub Marpa::R3::Scanless::R::series_restart {
 
     $slr->reset_evaluation();
 
-    my ($flat_args, $error_message) = flatten_hash_args(\@args);
+    my ($flat_args, $error_message) = Marpa::R3::flatten_hash_args(\@args);
     Marpa::R3::exception( sprintf $error_message, '$slr->series_restart()' ) if not $flat_args;
     my ($g1_recce_args) = Marpa::R3::Internal::Scanless::R::set($slr, "series_restart", $flat_args );
     $slr->naif_set( $g1_recce_args );
