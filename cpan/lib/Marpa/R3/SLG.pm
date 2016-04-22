@@ -86,12 +86,6 @@ sub Marpa::R3::Scanless::G::set {
 sub Marpa::R3::Internal::Scanless::G::set {
     my ( $slg, $method, @hash_ref_args ) = @_;
 
-    # Other possible grammar options:
-    # default_rank
-    # inaccessible_ok
-    # unproductive_ok
-    # warnings
-
     state $copy_to_g1_args =
         { map { ( $_, 1 ); }
             qw(trace_file_handle default_action bless_package) };

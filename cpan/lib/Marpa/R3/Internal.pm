@@ -59,9 +59,8 @@ use constant BLESS_PACKAGE => 5;
 use constant IF_INACCESSIBLE => 6;
 use constant LAST_BASIC_DATA_FIELD => 6;
 use constant START_NAME => 7;
-use constant INACCESSIBLE_OK => 8;
-use constant UNPRODUCTIVE_OK => 9;
-use constant LAST_FIELD => 9;
+use constant UNPRODUCTIVE_OK => 8;
+use constant LAST_FIELD => 8;
 
 package Marpa::R3::Internal::Progress_Report;
 use constant RULE_ID => 0;

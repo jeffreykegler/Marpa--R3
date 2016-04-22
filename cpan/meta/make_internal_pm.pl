@@ -146,7 +146,6 @@ __DATA__
     =LAST_BASIC_DATA_FIELD
 
     START_NAME { name of original symbol }
-    INACCESSIBLE_OK
     UNPRODUCTIVE_OK
 
     =LAST_FIELD
