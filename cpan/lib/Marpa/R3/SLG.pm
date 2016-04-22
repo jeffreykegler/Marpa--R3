@@ -959,7 +959,7 @@ sub Marpa::R3::Internal::Scanless::G::precompute {
     # A bit hackish here: UNPRODUCTIVE_OK is not a HASH ref iff
     # it is a Boolean TRUE indicating that all inaccessibles are OK.
     # A Boolean FALSE will have been replaced with an empty hash.
-    if ($grammar->[Marpa::R3::Internal::Grammar::WARNINGS]
+    if ($slg->[Marpa::R3::Internal::Scanless::G::WARNINGS]
         and ref(
             my $ok = $grammar->[Marpa::R3::Internal::Grammar::UNPRODUCTIVE_OK]
         ) eq 'HASH'
@@ -981,7 +981,7 @@ sub Marpa::R3::Internal::Scanless::G::precompute {
             say {$trace_fh} "Unproductive symbol: $symbol"
                 or Marpa::R3::exception("Could not print: $ERRNO");
         } ## end SYMBOL: for my $symbol ( @{ ...})
-    } ## end if ( $grammar->[Marpa::R3::Internal::Grammar::WARNINGS...])
+    }
 
     # Save some memory
     $slg->[Marpa::R3::Internal::Scanless::G::CHARACTER_CLASSES] = undef;

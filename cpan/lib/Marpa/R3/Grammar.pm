@@ -59,7 +59,7 @@ sub Marpa::R3::Grammar::naif_new {
     my $grammar = [];
     bless $grammar, $class;
 
-    $grammar->[Marpa::R3::Internal::Grammar::WARNINGS]        = 1;
+    $slg->[Marpa::R3::Internal::Scanless::G::WARNINGS]        = 1;
     $grammar->[Marpa::R3::Internal::Grammar::INACCESSIBLE_OK] = {};
     $grammar->[Marpa::R3::Internal::Grammar::UNPRODUCTIVE_OK] = {};
 
@@ -229,7 +229,7 @@ sub Marpa::R3::Grammar::naif_set {
                     q{"warnings" option is useless after grammar is precomputed}
                     or Marpa::R3::exception("Could not print: $ERRNO");
             }
-            $grammar->[Marpa::R3::Internal::Grammar::WARNINGS] = $value;
+            $slg->[Marpa::R3::Internal::Scanless::G::WARNINGS] = $value;
         } ## end if ( defined( my $value = $args->{'warnings'} ) )
 
         if ( defined( my $value = $args->{'inaccessible_ok'} ) ) {
