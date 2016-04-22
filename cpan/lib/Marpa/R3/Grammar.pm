@@ -59,8 +59,6 @@ sub Marpa::R3::Grammar::naif_new {
     my $grammar = [];
     bless $grammar, $class;
 
-    $slg->[Marpa::R3::Internal::Scanless::G::WARNINGS]        = 1;
-
     $grammar->[Marpa::R3::Internal::Grammar::SYMBOLS]            = [];
     $grammar->[Marpa::R3::Internal::Grammar::RULES]              = [];
     $grammar->[Marpa::R3::Internal::Grammar::RULE_ID_BY_TAG]     = {};

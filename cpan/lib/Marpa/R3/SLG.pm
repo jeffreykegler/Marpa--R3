@@ -39,6 +39,7 @@ sub Marpa::R3::Internal::Scanless::meta_grammar {
     my $meta_slg = bless [], 'Marpa::R3::Scanless::G';
     state $hashed_metag = Marpa::R3::Internal::MetaG::hashed_grammar();
     $meta_slg->[Marpa::R3::Internal::Scanless::G::TRACE_TERMINALS] = 0;
+    $meta_slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE] = \*STDERR;
     Marpa::R3::Internal::Scanless::G::hash_to_runtime( $meta_slg,
         $hashed_metag,
         { bless_package => 'Marpa::R3::Internal::MetaAST_Nodes' } );
@@ -62,12 +63,17 @@ sub Marpa::R3::Scanless::G::new {
     my $slg = [];
     bless $slg, $class;
 
-    my ($dsl, $g1_args) = Marpa::R3::Internal::Scanless::G::set ( $slg, 'new', @hash_ref_args );
-    my $ast = Marpa::R3::Internal::MetaAST->new( $dsl );
+    $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE] = \*STDERR;
+    $slg->[Marpa::R3::Internal::Scanless::G::WARNINGS]          = 1;
+
+    my ( $dsl, $g1_args ) =
+      Marpa::R3::Internal::Scanless::G::set( $slg, 'new', @hash_ref_args );
+    my $ast        = Marpa::R3::Internal::MetaAST->new($dsl);
     my $hashed_ast = $ast->ast_to_hash();
-    Marpa::R3::Internal::Scanless::G::hash_to_runtime($slg, $hashed_ast, $g1_args);
+    Marpa::R3::Internal::Scanless::G::hash_to_runtime( $slg, $hashed_ast,
+        $g1_args );
     return $slg;
-} ## end sub Marpa::R3::Scanless::G::new
+}
 
 sub Marpa::R3::Scanless::G::set {
     my ( $slg, @hash_ref_args ) = @_;
@@ -183,9 +189,6 @@ sub Marpa::R3::Internal::Scanless::G::set {
                 if not $copy_to_g1_args->{$arg_name};
         }
 
-        # trace file handle must always be defined
-        $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE] //= \*STDERR;
-
         return ($dsl, \%flat_args);
     } ## end if ( $method eq 'new' )
 
@@ -213,8 +216,8 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
         $hashed_source->{'default_g1_start_action'};
 
     my $trace_fh =
-        $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE] =
-        $g1_args->{trace_file_handle} // \*STDERR;
+        $g1_args->{trace_file_handle} //
+        $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE];
 
     my $if_inaccessible_default =
         $hashed_source->{defaults}->{if_inaccessible} // 'warn';
