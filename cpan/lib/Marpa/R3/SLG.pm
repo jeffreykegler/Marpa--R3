@@ -546,7 +546,14 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
         }
     } ## end RULE_ID: for my $rule_id ( 0 .. $lex_thin->highest_rule_id() )
 
+    my $lex_precompute_error =
       Marpa::R3::Internal::Scanless::G::precompute( $slg, $lex_grammar );
+    if ( defined $lex_precompute_error ) {
+        Marpa::R3::exception(
+'Internal errror: expected error code from precompute of lexer grammar ',
+            $precompute_error
+        );
+    }
 
     my @class_table          = ();
 
