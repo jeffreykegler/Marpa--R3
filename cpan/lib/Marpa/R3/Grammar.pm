@@ -211,7 +211,7 @@ sub Marpa::R3::Grammar::naif_set {
                     q{"rules" named argument must be ref to ARRAY}
                 ) if ref $value ne 'ARRAY';
 
-                add_user_rules( $grammar, $value );
+                add_user_rules( $slg, $grammar, $value );
 
         } ## end if ( defined( my $value = $args->{'rules'} ) )
 
@@ -585,49 +585,10 @@ sub assign_symbol {
 
 # add one or more rules
 sub add_user_rules {
-    my ( $grammar, $rules ) = @_;
+    my ( $slg, $grammar, $rules ) = @_;
 
-    my @hash_rules = ();
-    RULE: for my $rule ( @{$rules} ) {
-
-        # Translate other rule formats into hash rules
-        my $ref_rule = ref $rule;
-        if ( $ref_rule eq 'HASH' ) {
-            push @hash_rules, $rule;
-            next RULE;
-        }
-        if ( $ref_rule eq 'ARRAY' ) {
-            my $arg_count = @{$rule};
-
-            if ( $arg_count > 4 or $arg_count < 1 ) {
-                Marpa::R3::exception(
-                    "Rule has $arg_count arguments: "
-                        . join( ', ',
-                        map { defined $_ ? $_ : 'undef' } @{$rule} )
-                        . "\n"
-                        . 'Rule must have from 1 to 4 arguments'
-                );
-            } ## end if ( $arg_count > 4 or $arg_count < 1 )
-            my ( $lhs, $rhs, $action ) = @{$rule};
-            push @hash_rules,
-                {
-                lhs           => $lhs,
-                rhs           => $rhs,
-                action        => $action,
-                };
-            next RULE;
-        } ## end if ( $ref_rule eq 'ARRAY' )
-        Marpa::R3::exception(
-            'Invalid rule: ',
-            Data::Dumper->new( [$rule], ['Invalid_Rule'] )->Indent(2)
-                ->Terse(1)->Maxdepth(2)->Dump,
-            'Rule must be ref to HASH or ARRAY'
-        );
-
-    }    # RULE
-
-    for my $hash_rule (@hash_rules) {
-        add_user_rule( $grammar, $hash_rule );
+    for my $rule (@{$rules}) {
+        add_user_rule( $slg, $grammar, $rule );
     }
 
     return;
@@ -635,7 +596,7 @@ sub add_user_rules {
 } ## end sub add_user_rules
 
 sub add_user_rule {
-    my ( $grammar, $options ) = @_;
+    my ( $slg, $grammar, $options ) = @_;
 
     Marpa::R3::exception('Missing argument to add_user_rule')
         if not defined $grammar
@@ -849,7 +810,7 @@ sub add_user_rule {
 
     return;
 
-} ## end sub add_user_rule
+}
 
 sub rule_describe {
     my ( $lhs_name, $rhs_names ) = @_;
