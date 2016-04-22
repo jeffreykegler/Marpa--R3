@@ -229,7 +229,7 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     $g1_args->{start} = $g1_target_symbol;
     $g1_args->{if_inaccessible} = $if_inaccessible_default;
 
-    my $thick_g1_grammar = Marpa::R3::Grammar->naif_new($slg, $g1_args);
+    my $thick_g1_grammar = Marpa::R3::Grammar->g1_naif_new($slg, $g1_args);
     my $g1_tracer        = $thick_g1_grammar->tracer();
     my $g1_thin          = $g1_tracer->grammar();
 
@@ -464,7 +464,7 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     $lex_args{symbols} = \%this_lexer_symbols;
 
     # Create the thick lex grammar
-    my $lex_grammar = Marpa::R3::Grammar->naif_new( $slg, \%lex_args );
+    my $lex_grammar = Marpa::R3::Grammar->l0_naif_new( $slg, \%lex_args );
     $thick_grammar_by_lexer_name{$lexer_name} = $lex_grammar;
     my $lex_tracer = $lex_grammar->tracer();
     my $lex_thin   = $lex_tracer->grammar();
