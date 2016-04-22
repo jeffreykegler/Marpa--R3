@@ -135,18 +135,14 @@ __DATA__
        is probably worthwhile to save a the extra
        indirection.
     }
-    RULES { array of rule refs }
     RULE_ID_BY_TAG
 
+    START_NAME { name of original symbol }
     SYMBOLS { array of symbol refs }
+    RULES { array of rule refs }
 
     BLESS_PACKAGE { Default package into which nodes are blessed }
     IF_INACCESSIBLE { default for symbols }
-
-    =LAST_BASIC_DATA_FIELD
-
-    START_NAME { name of original symbol }
-    UNPRODUCTIVE_OK
 
     =LAST_FIELD
 

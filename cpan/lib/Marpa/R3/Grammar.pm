@@ -60,7 +60,6 @@ sub Marpa::R3::Grammar::naif_new {
     bless $grammar, $class;
 
     $slg->[Marpa::R3::Internal::Scanless::G::WARNINGS]        = 1;
-    $grammar->[Marpa::R3::Internal::Grammar::UNPRODUCTIVE_OK] = {};
 
     $grammar->[Marpa::R3::Internal::Grammar::SYMBOLS]            = [];
     $grammar->[Marpa::R3::Internal::Grammar::RULES]              = [];
@@ -122,7 +121,6 @@ sub Marpa::R3::Grammar::naif_set {
                 start
                 symbols
                 terminals
-                unproductive_ok
                 warnings
                 }
         };
@@ -229,30 +227,6 @@ sub Marpa::R3::Grammar::naif_set {
             }
             $slg->[Marpa::R3::Internal::Scanless::G::WARNINGS] = $value;
         } ## end if ( defined( my $value = $args->{'warnings'} ) )
-
-        if ( defined( my $value = $args->{'unproductive_ok'} ) ) {
-            if ( $value && $grammar_c->is_precomputed() ) {
-                say {$trace_fh}
-                    q{"unproductive_ok" option is useless after grammar is precomputed}
-                    or Marpa::R3::exception("Could not print: $ERRNO");
-            }
-            GIVEN_REF_VALUE: {
-                my $ref_value = ref $value;
-                if ( $ref_value eq q{} ) {
-                    $value //= {};
-                    last GIVEN_REF_VALUE;
-                }
-                if ( $ref_value eq 'ARRAY' ) {
-                    $value = { map { ( $_, 1 ) } @{$value} };
-                    last GIVEN_REF_VALUE;
-                }
-                Marpa::R3::exception(
-                        'value of unproductive_ok option must be boolean or an array ref'
-                );
-            } ## end GIVEN_REF_VALUE:
-            $grammar->[Marpa::R3::Internal::Grammar::UNPRODUCTIVE_OK] =
-                $value;
-        } ## end if ( defined( my $value = $args->{'unproductive_ok'}...))
 
     } ## end for my $args (@arg_hashes)
 
