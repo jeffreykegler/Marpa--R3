@@ -141,7 +141,6 @@ __DATA__
     SYMBOLS { array of symbol refs }
     RULES { array of rule refs }
 
-    BLESS_PACKAGE { Default package into which nodes are blessed }
     IF_INACCESSIBLE { default for symbols }
 
     =LAST_FIELD
@@ -252,6 +251,8 @@ __DATA__
 
     { This saves a lot of time at points }
     CACHE_RULEIDS_BY_LHS_NAME
+
+    BLESS_PACKAGE { Default package into which nodes are blessed }
 
     WARNINGS { print warnings about grammar? }
     TRACE_FILE_HANDLE

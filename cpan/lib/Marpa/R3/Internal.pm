@@ -56,9 +56,8 @@ use constant RULE_ID_BY_TAG => 2;
 use constant START_NAME => 3;
 use constant SYMBOLS => 4;
 use constant RULES => 5;
-use constant BLESS_PACKAGE => 6;
-use constant IF_INACCESSIBLE => 7;
-use constant LAST_FIELD => 7;
+use constant IF_INACCESSIBLE => 6;
+use constant LAST_FIELD => 6;
 
 package Marpa::R3::Internal::Progress_Report;
 use constant RULE_ID => 0;
@@ -137,10 +136,11 @@ use constant PREDICTION_EVENT_BY_ID => 9;
 use constant LEXEME_EVENT_BY_ID => 10;
 use constant SYMBOL_IDS_BY_EVENT_NAME_AND_TYPE => 11;
 use constant CACHE_RULEIDS_BY_LHS_NAME => 12;
-use constant WARNINGS => 13;
-use constant TRACE_FILE_HANDLE => 14;
-use constant TRACE_TERMINALS => 15;
-use constant CHARACTER_CLASSES => 16;
+use constant BLESS_PACKAGE => 13;
+use constant WARNINGS => 14;
+use constant TRACE_FILE_HANDLE => 15;
+use constant TRACE_TERMINALS => 16;
+use constant CHARACTER_CLASSES => 17;
 
 package Marpa::R3::Internal::Scanless::R;
 use constant SLG => 0;

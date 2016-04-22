@@ -188,7 +188,7 @@ sub Marpa::R3::Internal::Scanless::R::rule_blessing_find {
     $blessing = '::undef' if not defined $blessing;
     return $blessing if $blessing eq '::undef';
     my $bless_package =
-        $grammar->[Marpa::R3::Internal::Grammar::BLESS_PACKAGE];
+        $slg->[Marpa::R3::Internal::Scanless::G::BLESS_PACKAGE];
 
     if ( not defined $bless_package ) {
         Marpa::R3::exception(
@@ -221,7 +221,7 @@ sub Marpa::R3::Scanless::R::lexeme_blessing_find {
         return $blessing;
     }
     my $bless_package =
-        $grammar->[Marpa::R3::Internal::Grammar::BLESS_PACKAGE];
+        $slg->[Marpa::R3::Internal::Scanless::G::BLESS_PACKAGE];
     if ( not defined $bless_package ) {
         my $tracer      = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
         my $lexeme_name = $tracer->symbol_name($lexeme_id);

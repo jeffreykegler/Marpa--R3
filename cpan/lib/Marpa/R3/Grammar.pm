@@ -216,7 +216,7 @@ sub Marpa::R3::Grammar::naif_set {
         } ## end if ( defined( my $value = $args->{'rules'} ) )
 
         if ( defined( my $value = $args->{'bless_package'} ) ) {
-            $grammar->[Marpa::R3::Internal::Grammar::BLESS_PACKAGE] = $value;
+            $slg->[Marpa::R3::Internal::Scanless::G::BLESS_PACKAGE] = $value;
         }
 
         if ( defined( my $value = $args->{'warnings'} ) ) {
