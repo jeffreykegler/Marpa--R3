@@ -54,7 +54,7 @@ sub Marpa::R3::uncaught_error {
 package Marpa::R3::Internal::Grammar;
 
 sub Marpa::R3::Grammar::g1_naif_new {
-    my ( $class, $slg, @arg_hashes ) = @_;
+    my ( $class, $slg, $flat_args ) = @_;
 
     my $grammar = [];
     bless $grammar, $class;
@@ -68,7 +68,7 @@ sub Marpa::R3::Grammar::g1_naif_new {
     $grammar->[Marpa::R3::Internal::Grammar::TRACER] =
         Marpa::R3::Thin::Trace->new($grammar_c);
 
-    $grammar->g1_naif_set($slg, @arg_hashes);
+    $grammar->g1_naif_set($slg, $flat_args);
 
     return $grammar;
 } ## end sub Marpa::R3::Grammar::new
@@ -115,94 +115,69 @@ sub Marpa::R3::Grammar::thin_symbol {
 }
 
 sub Marpa::R3::Grammar::g1_naif_set {
-    my ( $grammar, $slg, @arg_hashes ) = @_;
+    my ( $grammar, $slg, $flat_args ) = @_;
 
-    # set trace_fh even if no tracing, because we may turn it on in this method
-    my $trace_fh =
-        $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE];
     my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
 
-    for my $args (@arg_hashes) {
+    # First pass options: These affect processing of other
+    # options and are expected to take force for the other
+    # options, even if specified afterwards
 
-        my $ref_type = ref $args;
-        if ( not $ref_type ) {
-            Carp::croak(
-                'Marpa::R3::Grammar expects args as ref to HASH; arg was non-reference'
-            );
+    if ( defined( my $value = $flat_args->{'if_inaccessible'} ) ) {
+        $grammar->[Marpa::R3::Internal::Grammar::IF_INACCESSIBLE] = $value;
+        delete $flat_args->{'if_inaccessible'};
+    }
+
+    if ( defined( my $value = $flat_args->{'default_rank'} ) ) {
+        $grammar_c->default_rank_set($value);
+        delete $flat_args->{'default_rank'};
+    } ## end if ( defined( my $value = $flat_args->{'default_rank'} ) )
+
+    # Second pass options
+
+    if ( defined( my $value = $flat_args->{'symbols'} ) ) {
+        for my $symbol ( sort keys %{$value} ) {
+            my $properties = $value->{$symbol};
+            assign_symbol( $grammar, $symbol, $properties );
         }
-        if ( $ref_type ne 'HASH' ) {
-            Carp::croak(
-                "Marpa::R3::Grammar expects args as ref to HASH, got ref to $ref_type instead"
-            );
+        delete $flat_args->{'symbols'};
+    } ## end if ( defined( my $value = $flat_args->{'symbols'} ) )
+
+    if ( defined( my $value = $flat_args->{'terminals'} ) ) {
+        for my $symbol ( @{$value} ) {
+            assign_symbol( $grammar, $symbol, { terminal => 1 } );
         }
+        delete $flat_args->{'terminals'};
+    } ## end if ( defined( my $value = $flat_args->{'terminals'} ) )
 
-        state $grammar_options = {
-            map { ( $_, 1 ) }
-                qw{ if_inaccessible
-                bless_package
-                default_rank
-                rules
-                start
-                symbols
-                terminals
-                warnings
-                }
-        };
+    if ( defined( my $value = $flat_args->{'start'} ) ) {
+        $grammar->[Marpa::R3::Internal::Grammar::START_NAME] = $value;
+        delete $flat_args->{'start'};
+    } ## end if ( defined( my $value = $flat_args->{'start'} ) )
 
-        if (my @bad_options =
-            grep { not exists $grammar_options->{$_} }
-            keys %{$args}
-            )
-        {
-            Carp::croak( 'Unknown option(s) for Marpa::R3::Grammar: ',
-                join q{ }, @bad_options );
-        } ## end if ( my @bad_options = grep { not exists $grammar_options...})
+    if ( defined( my $value = $flat_args->{'rules'} ) ) {
+        add_user_rules( $slg, $grammar, $value );
+        delete $flat_args->{'rules'};
+    } ## end if ( defined( my $value = $flat_args->{'rules'} ) )
 
-        # First pass options: These affect processing of other
-        # options and are expected to take force for the other
-        # options, even if specified afterwards
+    if ( defined( my $value = $flat_args->{'bless_package'} ) ) {
+        $slg->[Marpa::R3::Internal::Scanless::G::BLESS_PACKAGE] = $value;
+        delete $flat_args->{'bless_package'};
+    }
 
-        if ( defined( my $value = $args->{'if_inaccessible'} ) ) {
-            $grammar->[Marpa::R3::Internal::Grammar::IF_INACCESSIBLE] =  $value;
-        }
+    if ( defined( my $value = $flat_args->{'warnings'} ) ) {
+        $slg->[Marpa::R3::Internal::Scanless::G::WARNINGS] = $value;
+        delete $flat_args->{'warnings'};
+    } ## end if ( defined( my $value = $flat_args->{'warnings'} ) )
 
-        if ( defined( my $value = $args->{'default_rank'} ) ) {
-            $grammar_c->default_rank_set($value);
-        } ## end if ( defined( my $value = $args->{'default_rank'} ) )
-
-
-        # Second pass options
-
-        if ( defined( my $value = $args->{'symbols'} ) ) {
-            for my $symbol ( sort keys %{$value} ) {
-                my $properties = $value->{$symbol};
-                assign_symbol( $grammar, $symbol, $properties );
-            }
-        } ## end if ( defined( my $value = $args->{'symbols'} ) )
-
-        if ( defined( my $value = $args->{'terminals'} ) ) {
-            for my $symbol ( @{$value} ) {
-                assign_symbol( $grammar, $symbol, { terminal => 1 } );
-            }
-        } ## end if ( defined( my $value = $args->{'terminals'} ) )
-
-        if ( defined( my $value = $args->{'start'} ) ) {
-            $grammar->[Marpa::R3::Internal::Grammar::START_NAME] = $value;
-        } ## end if ( defined( my $value = $args->{'start'} ) )
-
-        if ( defined( my $value = $args->{'rules'} ) ) {
-                add_user_rules( $slg, $grammar, $value );
-        } ## end if ( defined( my $value = $args->{'rules'} ) )
-
-        if ( defined( my $value = $args->{'bless_package'} ) ) {
-            $slg->[Marpa::R3::Internal::Scanless::G::BLESS_PACKAGE] = $value;
-        }
-
-        if ( defined( my $value = $args->{'warnings'} ) ) {
-            $slg->[Marpa::R3::Internal::Scanless::G::WARNINGS] = $value;
-        } ## end if ( defined( my $value = $args->{'warnings'} ) )
-
-    } ## end for my $args (@arg_hashes)
+    my @bad_arguments = keys %{$flat_args};
+    if (scalar @bad_arguments) {
+        Marpa::R3::exception(
+            q{Internal error: Bad named argument(s) to $naif_grammar->set() method}
+                . join q{ },
+            @bad_arguments
+        );
+    }
 
     return 1;
 } ## end sub Marpa::R3::Grammar::set
