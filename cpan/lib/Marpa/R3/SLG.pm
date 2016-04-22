@@ -109,74 +109,42 @@ sub Marpa::R3::Scanless::G::set {
 sub Marpa::R3::Internal::Scanless::G::set {
     my ( $slg, $flat_args ) = @_;
 
-    state $copy_to_g1_args =
-      { map { ( $_, 1 ); } qw(trace_file_handle default_action bless_package) };
-    state $ok_args = {
-        map { ( $_, 1 ); } qw(source trace_terminals),
-        keys %{$copy_to_g1_args}
-    };
-
-    my @bad_args = grep { not $ok_args->{$_} } keys %{$flat_args};
-    if ( scalar @bad_args ) {
+    my $dsl = $flat_args->{'source'};
+    Marpa::R3::exception(
+        qq{Marpa::R3::Scanless::G::new() called without a 'source' argument})
+      if not defined $dsl;
+    my $dsl_ref_type = ref $dsl;
+    if ( $dsl_ref_type ne 'SCALAR' ) {
+        my $desc = $dsl_ref_type ? "a ref to $dsl_ref_type" : 'not a ref';
         Marpa::R3::exception(
-            q{Bad named argument(s) to $slg->new(): }
-              . join q{ },
-            @bad_args
+qq{'source' name argument to Marpa::R3::Scanless::G->new() is $desc\n},
+            "  It should be a ref to a string\n"
         );
-    } ## end if ( scalar @bad_args )
-
-    my $dsl;
-    {
-        state $arg_name = 'source';
-        $dsl = $flat_args->{$arg_name};
+    }
+    if ( not defined ${$dsl} ) {
         Marpa::R3::exception(
-qq{Marpa::R3::Scanless::G::new() called without a "$arg_name" argument}
-        ) if not defined $dsl;
-        my $ref_type = ref $dsl;
-        if ( $ref_type ne 'SCALAR' ) {
-            my $desc = $ref_type ? "a ref to $ref_type" : 'not a ref';
-            Marpa::R3::exception(
-qq{'$arg_name' name argument to Marpa::R3::Scanless::G->new() is $desc\n},
-                "  It should be a ref to a string\n"
-            );
-        } ## end if ( $ref_type ne 'SCALAR' )
-        if ( not defined ${$dsl} ) {
-            Marpa::R3::exception(
-qq{'$arg_name' name argument to Marpa::R3::Scanless::G->new() is a ref to a an undef\n},
-                "  It should be a ref to a string\n"
-            );
-        } ## end if ( $ref_type ne 'SCALAR' )
-    } ## end if ( $method eq 'new' )
+qq{'source' name argument to Marpa::R3::Scanless::G->new() is a ref to a an undef\n},
+            "  It should be a ref to a string\n"
+        );
+    } ## end if ( $ref_type ne 'SCALAR' )
+    delete $flat_args->{'source'};
 
-    # A bit hack-ish, but some named args will be copies straight to a member of
-    # the Scanless::G class, so this maps named args to the index of the array
-    # that holds the members.
-    state $copy_arg_to_index = {
-        trace_file_handle =>
-          Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE,
-        trace_terminals => Marpa::R3::Internal::Scanless::G::TRACE_TERMINALS
-    };
+    my $value = $flat_args->{trace_file_handle};
+    if ( defined $value ) {
+        $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE] = $value;
+        delete $flat_args->{'trace_terminals'};
+    }
 
-  ARG: for my $arg_name ( keys %{$flat_args} ) {
-        my $index = $copy_arg_to_index->{$arg_name};
-        next ARG if not defined $index;
-        my $value = $flat_args->{$arg_name};
-        $slg->[$index] = $value;
-    } ## end ARG: for my $arg_name ( keys %{$flat_args} )
+    $value = $flat_args->{trace_terminals};
+    if ( defined $value ) {
+        $slg->[Marpa::R3::Internal::Scanless::G::TRACE_TERMINALS] = $value;
+        delete $flat_args->{'trace_terminals'};
+    }
 
     # Normalize trace_terminals
     $slg->[Marpa::R3::Internal::Scanless::G::TRACE_TERMINALS] = 0
       if not Scalar::Util::looks_like_number(
         $slg->[Marpa::R3::Internal::Scanless::G::TRACE_TERMINALS] );
-
-    # Trace file handle needs to be populated downwards
-
-    # Prune flat args of all those named args which are NOT to be copied
-    # into the G1 grammar args
-    for my $arg_name ( keys %{$flat_args} ) {
-        delete $flat_args->{$arg_name}
-          if not $copy_to_g1_args->{$arg_name};
-    }
 
     return ( $dsl, $flat_args );
 
