@@ -334,14 +334,10 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
 
     # Lexers
 
-    my $lexer_id   = 0;
     my $lexer_name = 'L0';
 
-    my %lexer_id_by_name                    = ();
-    my %thick_grammar_by_lexer_name         = ();
     my @discard_event_by_lexer_rule_id      = ();
     my %lexer_and_rule_to_g1_lexeme         = ();
-    my %character_class_table_by_lexer_name = ();
     state $lex_start_symbol_name = '[:start_lex]';
     state $discard_symbol_name   = '[:discard]';
 
@@ -436,11 +432,10 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     } sort keys %is_lexeme_in_this_lexer;
 
     # Create the thick lex grammar
-    my $lex_grammar =
+    my $lex_thick_grammar =
       Marpa::R3::Grammar->l0_naif_new( $slg, $lex_start_symbol_name,
         \%this_lexer_symbols, $lexer_rules );
-    $thick_grammar_by_lexer_name{$lexer_name} = $lex_grammar;
-    my $lex_tracer = $lex_grammar->tracer();
+    my $lex_tracer = $lex_thick_grammar->tracer();
     my $lex_thin   = $lex_tracer->grammar();
 
     my $lex_discard_symbol_id =
@@ -514,12 +509,12 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
         if ( $trace_terminals >= 2 ) {
             say {$trace_fh}
                 "Assertion $assertion_id applied to $lexer_name rule ",
-                slg_rule_show( $slg, $rule_id, $lex_grammar );
+                slg_rule_show( $slg, $rule_id, $lex_thick_grammar );
         }
     } ## end RULE_ID: for my $rule_id ( 0 .. $lex_thin->highest_rule_id() )
 
     my $lex_precompute_error =
-      Marpa::R3::Internal::Scanless::G::precompute( $slg, $lex_grammar );
+      Marpa::R3::Internal::Scanless::G::precompute( $slg, $lex_thick_grammar );
     if ( defined $lex_precompute_error ) {
         Marpa::R3::exception(
 'Internal errror: expected error code from precompute of lexer grammar ',
@@ -543,7 +538,7 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
         }
         push @class_table, [ $symbol_id, $compiled_re ];
     } ## end CLASS_SYMBOL: for my $class_symbol ( sort keys %{...})
-    $character_class_table_by_lexer_name{$lexer_name} = \@class_table;
+    my $character_class_table = \@class_table;
 
     $lexer_and_rule_to_g1_lexeme{$lexer_name} = \@lex_rule_to_g1_lexeme;
 
@@ -552,7 +547,7 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
 
     my $default_discard_event = $discard_default_adverbs->{event};
     RULE_ID: for my $rule_id ( 0 .. $lex_thin->highest_rule_id() ) {
-        my $tag = $lex_grammar->tag($rule_id);
+        my $tag = $lex_thick_grammar->tag($rule_id);
         next RULE_ID if not defined $tag;
         my $event;
         FIND_EVENT: {
@@ -585,13 +580,9 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
 
     # Post-lexer G1 processing
 
-    my $thick_L0 = $thick_grammar_by_lexer_name{'L0'};
-    my $thin_L0  = $thick_L0->[Marpa::R3::Internal::Grammar::C];
+    my $thin_L0  = $lex_thick_grammar->[Marpa::R3::Internal::Grammar::C];
     my $thin_slg = $slg->[Marpa::R3::Internal::Scanless::G::C] =
         Marpa::R3::Thin::SLG->new( $thin_L0, $g1_tracer->grammar() );
-
-    # Relies on default lexer being given number zero
-    $lexer_id_by_name{'L0'} = 0;
 
     LEXEME: for my $lexeme_name ( keys %g1_id_by_lexeme_name ) {
         Marpa::R3::exception(
@@ -687,14 +678,10 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     # More lexer processing
     # Determine events by lexer rule, applying the defaults
 
-    {
-        my $character_class_table =
-            $character_class_table_by_lexer_name{$lexer_name};
-        $slg->[Marpa::R3::Internal::Scanless::G::CHARACTER_CLASS_TABLE]
-            = $character_class_table;
-        $slg->[Marpa::R3::Internal::Scanless::G::THICK_L0_GRAMMAR]
-            = $thick_grammar_by_lexer_name{$lexer_name};
-    }
+    $slg->[Marpa::R3::Internal::Scanless::G::CHARACTER_CLASS_TABLE]
+        = $character_class_table;
+    $slg->[Marpa::R3::Internal::Scanless::G::THICK_L0_GRAMMAR]
+        = $lex_thick_grammar;
 
     # This section violates the NAIF interface, directly changing some
     # of its internal structures.
