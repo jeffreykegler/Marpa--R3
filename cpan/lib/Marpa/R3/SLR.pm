@@ -967,9 +967,7 @@ sub Marpa::R3::Scanless::R::resume {
                 substr ${$slr->[Marpa::R3::Internal::Scanless::R::P_INPUT_STRING]},
                    $thin_slr->pos(), 1;
            # say STDERR join " ", "Character via string vs. codepoint:", $character, (ord $character), (chr $codepoint), $codepoint;
-            my $character_class_table =
-                $slg->[Marpa::R3::Internal::Scanless::G::CHARACTER_CLASS_TABLES]
-                ->[0];
+            my $character_class_table = $slg->[Marpa::R3::Internal::Scanless::G::CHARACTER_CLASS_TABLE];
             my @ops;
             for my $entry ( @{$character_class_table} ) {
 

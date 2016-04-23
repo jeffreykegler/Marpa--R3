@@ -690,8 +690,8 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     {
         my $character_class_table =
             $character_class_table_by_lexer_name{$lexer_name};
-        $slg->[Marpa::R3::Internal::Scanless::G::CHARACTER_CLASS_TABLES]
-            ->[$lexer_id] = $character_class_table;
+        $slg->[Marpa::R3::Internal::Scanless::G::CHARACTER_CLASS_TABLE]
+            = $character_class_table;
         $slg->[Marpa::R3::Internal::Scanless::G::THICK_L0_GRAMMAR]
             = $thick_grammar_by_lexer_name{$lexer_name};
     }

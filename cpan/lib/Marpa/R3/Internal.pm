@@ -124,7 +124,7 @@ package Marpa::R3::Internal::Scanless::G;
 use constant C => 0;
 use constant THICK_L0_GRAMMAR => 1;
 use constant THICK_G1_GRAMMAR => 2;
-use constant CHARACTER_CLASS_TABLES => 3;
+use constant CHARACTER_CLASS_TABLE => 3;
 use constant DISCARD_EVENT_BY_LEXER_RULE => 4;
 use constant MASK_BY_RULE_ID => 5;
 use constant DEFAULT_G1_START_ACTION => 6;
