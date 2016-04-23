@@ -141,8 +141,6 @@ __DATA__
     SYMBOLS { array of symbol refs }
     RULES { array of rule refs }
 
-    IF_INACCESSIBLE { default for symbols }
-
     =LAST_FIELD
 
     :package=Marpa::R3::Internal::Progress_Report
@@ -253,6 +251,7 @@ __DATA__
     CACHE_RULEIDS_BY_LHS_NAME
 
     BLESS_PACKAGE { Default package into which nodes are blessed }
+    IF_INACCESSIBLE { default for symbols }
 
     WARNINGS { print warnings about grammar? }
     TRACE_FILE_HANDLE

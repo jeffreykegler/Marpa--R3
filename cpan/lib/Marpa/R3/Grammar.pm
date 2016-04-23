@@ -119,17 +119,6 @@ sub Marpa::R3::Grammar::g1_naif_set {
 
     my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
 
-    # First pass options: These affect processing of other
-    # options and are expected to take force for the other
-    # options, even if specified afterwards
-
-    if ( defined( my $value = $flat_args->{'if_inaccessible'} ) ) {
-        $grammar->[Marpa::R3::Internal::Grammar::IF_INACCESSIBLE] = $value;
-        delete $flat_args->{'if_inaccessible'};
-    }
-
-    # Second pass options
-
     if ( defined( my $value = $flat_args->{'symbols'} ) ) {
         for my $symbol ( sort keys %{$value} ) {
             my $properties = $value->{$symbol};

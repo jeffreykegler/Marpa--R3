@@ -63,12 +63,15 @@ sub Marpa::R3::Scanless::G::new {
     my $slg = [];
     bless $slg, $class;
 
-    $slg->[Marpa::R3::Internal::Scanless::G::TRACE_TERMINALS] = 0;
+    $slg->[Marpa::R3::Internal::Scanless::G::TRACE_TERMINALS]   = 0;
     $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE] = \*STDERR;
     $slg->[Marpa::R3::Internal::Scanless::G::WARNINGS]          = 1;
+    $slg->[Marpa::R3::Internal::Scanless::G::IF_INACCESSIBLE]   = 'warn';
 
-    my ($flat_args, $error_message) = Marpa::R3::flatten_hash_args(\@hash_ref_args);
-    Marpa::R3::exception( sprintf $error_message, '$slg->new' ) if not $flat_args;
+    my ( $flat_args, $error_message ) =
+      Marpa::R3::flatten_hash_args( \@hash_ref_args );
+    Marpa::R3::exception( sprintf $error_message, '$slg->new' )
+      if not $flat_args;
 
     my ( $dsl, $g1_args ) =
       Marpa::R3::Internal::Scanless::G::set( $slg, $flat_args );
@@ -179,15 +182,20 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
         $g1_args->{trace_file_handle} //
         $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE];
 
+    my $if_inaccessible_default_arg =
+      $hashed_source->{defaults}->{if_inaccessible};
+    if ( defined $if_inaccessible_default_arg ) {
+        $slg->[Marpa::R3::Internal::Scanless::G::IF_INACCESSIBLE] =
+          $if_inaccessible_default_arg;
+    }
     my $if_inaccessible_default =
-        $hashed_source->{defaults}->{if_inaccessible} // 'warn';
+      $slg->[Marpa::R3::Internal::Scanless::G::IF_INACCESSIBLE];
 
     # Prepare the arguments for the G1 grammar
     $g1_args->{rules}   = $hashed_source->{rules}->{G1};
     $g1_args->{symbols} = $hashed_source->{symbols}->{G1};
     state $g1_target_symbol = '[:start]';
     $g1_args->{start} = $g1_target_symbol;
-    $g1_args->{if_inaccessible} = $if_inaccessible_default;
 
     if ( defined( my $value = $g1_args->{'bless_package'} ) ) {
         $slg->[Marpa::R3::Internal::Scanless::G::BLESS_PACKAGE] = $value;
@@ -746,13 +754,12 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
 } ## end sub Marpa::R3::Internal::Scanless::G::hash_to_runtime
 
 sub Marpa::R3::Internal::Scanless::G::precompute {
-    my ($slr, $grammar) = @_;
+    my ($slg, $grammar) = @_;
 
     my $rules     = $grammar->[Marpa::R3::Internal::Grammar::RULES];
     my $symbols     = $grammar->[Marpa::R3::Internal::Grammar::SYMBOLS];
     my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
 
-    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $trace_fh =
         $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE];
 
@@ -893,7 +900,7 @@ sub Marpa::R3::Internal::Scanless::G::precompute {
     }
 
     my $default_if_inaccessible =
-        $grammar->[Marpa::R3::Internal::Grammar::IF_INACCESSIBLE]
+        $slg->[Marpa::R3::Internal::Scanless::G::IF_INACCESSIBLE]
         // 'warn';
     SYMBOL:
     for my $symbol_id ( grep { !$grammar_c->symbol_is_accessible($_) }
@@ -916,6 +923,7 @@ sub Marpa::R3::Internal::Scanless::G::precompute {
         next SYMBOL if $treatment eq 'ok';
         my $message = "Inaccessible symbol: $symbol_name";
         Marpa::R3::exception($message) if $treatment eq 'fatal';
+        $DB::single = 1;
         say {$trace_fh} $message
             or Marpa::R3::exception("Could not print: $ERRNO");
     } ## end for my $symbol_id ( grep { !$grammar_c->...})
