@@ -63,6 +63,7 @@ sub Marpa::R3::Scanless::G::new {
     my $slg = [];
     bless $slg, $class;
 
+    $slg->[Marpa::R3::Internal::Scanless::G::TRACE_TERMINALS] = 0;
     $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE] = \*STDERR;
     $slg->[Marpa::R3::Internal::Scanless::G::WARNINGS]          = 1;
 
@@ -80,17 +81,29 @@ sub Marpa::R3::Scanless::G::new {
 
 sub Marpa::R3::Scanless::G::set {
     my ( $slg, @hash_ref_args ) = @_;
-    my ($flat_args, $error_message) = Marpa::R3::flatten_hash_args(\@hash_ref_args);
-    Marpa::R3::exception( sprintf $error_message, '$slg->set' ) if not $flat_args;
+    my ( $flat_args, $error_message ) =
+      Marpa::R3::flatten_hash_args( \@hash_ref_args );
+    Marpa::R3::exception( sprintf $error_message, '$slg->set' )
+      if not $flat_args;
 
     my $value = $flat_args->{trace_terminals};
-    if (defined $value) {
+    if ( defined $value ) {
+        if ( Scalar::Util::looks_like_number($value) ) {
+            Marpa::R3::exception(
+"trace_terminals named argument is $value; must have a value > 0"
+            ) if $value < 0;
+        }
+        else {
+            Marpa::R3::exception(
+"trace_terminals named argument is $value; must have a numeric value"
+            );
+        }
         $slg->[Marpa::R3::Internal::Scanless::G::TRACE_TERMINALS] = $value;
         delete $flat_args->{trace_terminals};
     }
 
     $value = $flat_args->{trace_file_handle};
-    if (defined $value) {
+    if ( defined $value ) {
         $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE] = $value;
         delete $flat_args->{trace_file_handle};
     }
@@ -98,10 +111,8 @@ sub Marpa::R3::Scanless::G::set {
     my @bad_arguments = keys %{$flat_args};
     if ( scalar @bad_arguments ) {
         Marpa::R3::exception(
-            q{Bad named argument(s) to $slg->set() method}
-                . join q{ },
-            @bad_arguments
-        );
+            q{Bad named argument(s) to $slg->set() method} . join q{ },
+            @bad_arguments );
     }
     return $slg;
 }
@@ -132,7 +143,7 @@ qq{'source' name argument to Marpa::R3::Scanless::G->new() is a ref to a an unde
     my $value = $flat_args->{trace_file_handle};
     if ( defined $value ) {
         $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE] = $value;
-        delete $flat_args->{'trace_terminals'};
+        delete $flat_args->{'trace_file_handle'};
     }
 
     $value = $flat_args->{trace_terminals};
@@ -140,11 +151,6 @@ qq{'source' name argument to Marpa::R3::Scanless::G->new() is a ref to a an unde
         $slg->[Marpa::R3::Internal::Scanless::G::TRACE_TERMINALS] = $value;
         delete $flat_args->{'trace_terminals'};
     }
-
-    # Normalize trace_terminals
-    $slg->[Marpa::R3::Internal::Scanless::G::TRACE_TERMINALS] = 0
-      if not Scalar::Util::looks_like_number(
-        $slg->[Marpa::R3::Internal::Scanless::G::TRACE_TERMINALS] );
 
     return ( $dsl, $flat_args );
 
@@ -473,6 +479,7 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
         # If 1 is the default, we don't need an assertion
         next RULE_ID if not $lexeme_data{$lexeme_name}{latm};
 
+        my $trace_terminals = $slg->[Marpa::R3::Internal::Scanless::G::TRACE_TERMINALS];
         my $assertion_id =
             $lexeme_data{$lexeme_name}{lexers}{$lexer_name}{'assertion'};
         if ( not defined $assertion_id ) {

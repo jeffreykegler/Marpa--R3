@@ -138,13 +138,6 @@ sub Marpa::R3::Grammar::g1_naif_set {
         delete $flat_args->{'symbols'};
     } ## end if ( defined( my $value = $flat_args->{'symbols'} ) )
 
-    if ( defined( my $value = $flat_args->{'terminals'} ) ) {
-        for my $symbol ( @{$value} ) {
-            assign_symbol( $grammar, $symbol, { terminal => 1 } );
-        }
-        delete $flat_args->{'terminals'};
-    } ## end if ( defined( my $value = $flat_args->{'terminals'} ) )
-
     if ( defined( my $value = $flat_args->{'start'} ) ) {
         $grammar->[Marpa::R3::Internal::Grammar::START_NAME] = $value;
         delete $flat_args->{'start'};
