@@ -127,7 +127,7 @@ test_grammar(
     'nulling terminal grammar',
     $nulling_terminal_grammar,
     <<'END_OF_MESSAGE'
-A lexeme in lexer L0 is not a lexeme in G1: Bad
+A lexeme in L0 is not a lexeme in G1: Bad
 END_OF_MESSAGE
 );
 

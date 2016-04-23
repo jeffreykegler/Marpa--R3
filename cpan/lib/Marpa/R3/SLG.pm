@@ -334,13 +334,11 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
 
     # Lexers
 
-    my $lexer_name = 'L0';
-
     my @discard_event_by_lexer_rule_id      = ();
     state $lex_start_symbol_name = '[:start_lex]';
     state $discard_symbol_name   = '[:discard]';
 
-    my $lexer_rules = $hashed_source->{rules}->{$lexer_name};
+    my $lexer_rules = $hashed_source->{rules}->{'L0'};
     my $character_class_hash = $hashed_source->{character_classes};
     my $lexer_symbols = $hashed_source->{symbols}->{'L'};
 
@@ -404,7 +402,7 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
 
     my @lex_lexeme_names = keys %is_lexeme_in_this_lexer;
 
-    Marpa::R3::exception( "No lexemes in lexer: $lexer_name\n",
+    Marpa::R3::exception( "No lexemes in lexer\n",
         "  An SLIF grammar must have at least one lexeme\n" )
         if not scalar @lex_lexeme_names;
 
@@ -448,12 +446,12 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
         my $g1_symbol_id = $g1_id_by_lexeme_name{$lexeme_name};
         if ( not defined $g1_symbol_id ) {
             Marpa::R3::exception(
-                "A lexeme in lexer $lexer_name is not a lexeme in G1: $lexeme_name"
+                "A lexeme in L0 is not a lexeme in G1: $lexeme_name"
             );
         }
         if ( not $g1_thin->symbol_is_accessible($g1_symbol_id) ) {
             my $message =
-                "A lexeme in lexer $lexer_name is not accessible from the G1 start symbol: $lexeme_name";
+                "A lexeme in L0 is not accessible from the G1 start symbol: $lexeme_name";
             say {$trace_fh} $message
                 if $if_inaccessible_default eq 'warn';
             Marpa::R3::exception($message)
@@ -507,7 +505,7 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
         $lex_thin->zwa_place( $assertion_id, $rule_id, 0 );
         if ( $trace_terminals >= 2 ) {
             say {$trace_fh}
-                "Assertion $assertion_id applied to $lexer_name rule ",
+                "Assertion $assertion_id applied to L0 rule ",
                 slg_rule_show( $slg, $rule_id, $lex_thick_grammar );
         }
     } ## end RULE_ID: for my $rule_id ( 0 .. $lex_thin->highest_rule_id() )
