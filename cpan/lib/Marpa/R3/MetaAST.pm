@@ -90,18 +90,6 @@ sub ast_to_hash {
     my @lexers =
         grep { ( substr $_, 0, 1 ) eq 'L' } keys %grammars;
 
-    for my $lexer (@lexers) {
-        my $lexer_name = $lexer;
-        NAME_LEXER: {
-            if ( $lexer eq 'L0' ) {
-                $lexer_name = "L0 (the default)";
-                last NAME_LEXER;
-            }
-            last NAME_LEXER if ( substr $lexer_name, 0, 2 ) ne 'L-';
-            $lexer_name = substr $lexer_name, 2;
-        } ## end NAME_LEXER:
-    } ## end for my $lexer (@lexers)
-
     my %stripped_character_classes = ();
     {
         my $character_classes = $hashed_ast->{character_classes};
@@ -197,11 +185,6 @@ sub Marpa::R3::Internal::MetaAST_Nodes::alternative_name::name {
 }
 
 sub Marpa::R3::Internal::MetaAST_Nodes::event_name::name {
-    my ( $self, $parse ) = @_;
-    return $self->[2]->name($parse);
-}
-
-sub Marpa::R3::Internal::MetaAST_Nodes::lexer_name::name {
     my ( $self, $parse ) = @_;
     return $self->[2]->name($parse);
 }
@@ -1373,29 +1356,6 @@ sub Marpa::R3::Internal::MetaAST_Nodes::prediction_event_declaration::evaluate
     ## no critic(Subroutines::ProhibitExplicitReturnUndef)
     return undef;
 } ## end sub Marpa::R3::Internal::MetaAST_Nodes::prediction_event_declaration::evaluate
-
-sub Marpa::R3::Internal::MetaAST_Nodes::current_lexer_statement::evaluate
-{
-    my ( $values, $parse ) = @_;
-    my ( $start, $length, $lexer_name_object ) = @{$values};
-    my $raw_lexer_name        = $lexer_name_object->name();
-    if ( $raw_lexer_name eq 'L0' ) {
-      $parse->{current_lexer} = $raw_lexer_name;
-      ## no critic(Subroutines::ProhibitExplicitReturnUndef)
-      return undef;
-    }
-    if ( $raw_lexer_name =~ m/\A [[:upper:]] [[:digit:]]+ \z/xms) {
-        my ( $line, $column ) = $parse->{meta_recce}->line_column($start);
-        die qq{Attempt to name a new lexer "$raw_lexer_name"\n},
-            qq{  Lexer names of the form [A-Z][0-9]+ are reserved\n},
-            qq{  Please choose another name\n},
-            "  Problem occurred at line $line, column $column\n";
-    } ## end if ( defined $prediction_events->{$symbol_name} )
-    my $lexer_name .= 'L-' . $raw_lexer_name;
-    $parse->{current_lexer} = $lexer_name;
-    ## no critic(Subroutines::ProhibitExplicitReturnUndef)
-    return undef;
-}
 
 sub Marpa::R3::Internal::MetaAST_Nodes::alternatives::evaluate {
     my ( $values, $parse ) = @_;
