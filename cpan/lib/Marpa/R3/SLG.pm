@@ -337,7 +337,6 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     my $lexer_name = 'L0';
 
     my @discard_event_by_lexer_rule_id      = ();
-    my %lexer_and_rule_to_g1_lexeme         = ();
     state $lex_start_symbol_name = '[:start_lex]';
     state $discard_symbol_name   = '[:discard]';
 
@@ -540,8 +539,6 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     } ## end CLASS_SYMBOL: for my $class_symbol ( sort keys %{...})
     my $character_class_table = \@class_table;
 
-    $lexer_and_rule_to_g1_lexeme{$lexer_name} = \@lex_rule_to_g1_lexeme;
-
     # Apply defaults to determine the discard event for every
     # rule id of the lexer.
 
@@ -645,10 +642,8 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     } ## end LEXEME: for my $lexeme_name ( keys %g1_id_by_lexeme_name )
 
     # Second phase of lexer processing
-    my $lexer_rule_to_g1_lexeme = $lexer_and_rule_to_g1_lexeme{$lexer_name};
-
-    RULE_ID: for my $lexer_rule_id ( 0 .. $#{$lexer_rule_to_g1_lexeme} ) {
-        my $g1_lexeme_id = $lexer_rule_to_g1_lexeme->[$lexer_rule_id];
+    RULE_ID: for my $lexer_rule_id ( 0 .. $#lex_rule_to_g1_lexeme ) {
+        my $g1_lexeme_id = $lex_rule_to_g1_lexeme[$lexer_rule_id];
         my $lexeme_name  = $g1_tracer->symbol_name($g1_lexeme_id);
         my $assertion_id =
             $lexeme_data{$lexeme_name}{lexers}{$lexer_name}{'assertion'}
@@ -667,7 +662,7 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
             $thin_slg->discard_event_activate( $lexer_rule_id, 1 )
                 if $is_active;
         } ## end if ( defined $discard_event )
-    } ## end RULE_ID: for my $lexer_rule_id ( 0 .. $#{$lexer_rule_to_g1_lexeme...})
+    }
 
     # Second phase of G1 processing
 
