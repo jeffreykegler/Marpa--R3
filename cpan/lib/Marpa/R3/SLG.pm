@@ -189,6 +189,16 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     $g1_args->{start} = $g1_target_symbol;
     $g1_args->{if_inaccessible} = $if_inaccessible_default;
 
+    if ( defined( my $value = $g1_args->{'bless_package'} ) ) {
+        $slg->[Marpa::R3::Internal::Scanless::G::BLESS_PACKAGE] = $value;
+        delete $g1_args->{'bless_package'};
+    }
+
+    if ( defined( my $value = $g1_args->{'warnings'} ) ) {
+        $slg->[Marpa::R3::Internal::Scanless::G::WARNINGS] = $value;
+        delete $g1_args->{'warnings'};
+    }
+
     my $thick_g1_grammar = Marpa::R3::Grammar->g1_naif_new($slg, $g1_args);
     my $g1_tracer        = $thick_g1_grammar->tracer();
     my $g1_thin          = $g1_tracer->grammar();

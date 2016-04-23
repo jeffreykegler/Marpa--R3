@@ -148,16 +148,6 @@ sub Marpa::R3::Grammar::g1_naif_set {
         delete $flat_args->{'rules'};
     } ## end if ( defined( my $value = $flat_args->{'rules'} ) )
 
-    if ( defined( my $value = $flat_args->{'bless_package'} ) ) {
-        $slg->[Marpa::R3::Internal::Scanless::G::BLESS_PACKAGE] = $value;
-        delete $flat_args->{'bless_package'};
-    }
-
-    if ( defined( my $value = $flat_args->{'warnings'} ) ) {
-        $slg->[Marpa::R3::Internal::Scanless::G::WARNINGS] = $value;
-        delete $flat_args->{'warnings'};
-    } ## end if ( defined( my $value = $flat_args->{'warnings'} ) )
-
     my @bad_arguments = keys %{$flat_args};
     if (scalar @bad_arguments) {
         Marpa::R3::exception(
