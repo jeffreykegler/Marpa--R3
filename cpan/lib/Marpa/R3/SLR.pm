@@ -662,16 +662,15 @@ my $libmarpa_trace_event_handlers = {
             if $char =~ /[\p{IsGraph}]/xms;
         push @char_desc, ( sprintf '0x%04x', $codepoint );
         my $char_desc = join q{ }, @char_desc;
-        my $grammar = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+        my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
         my $thick_lex_grammar =
-            $grammar->[Marpa::R3::Internal::Scanless::G::THICK_LEX_GRAMMARS]
+            $slg->[Marpa::R3::Internal::Scanless::G::THICK_L0_GRAMMAR]
             ->[0];
         my $symbol_in_display_form =
             $thick_lex_grammar->symbol_in_display_form($token_id),
             my ( $line, $column ) = $slr->line_column($position);
         my $trace_file_handle =
             $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
-        my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
         say {$trace_file_handle}
             qq{Codepoint $char_desc accepted as $symbol_in_display_form at line $line, column $column}
             or Marpa::R3::exception("Could not say(): $ERRNO");
@@ -686,14 +685,12 @@ my $libmarpa_trace_event_handlers = {
             if $char =~ /[\p{IsGraph}]/xms;
         push @char_desc, ( sprintf '0x%04x', $codepoint );
         my $char_desc = join q{ }, @char_desc;
-        my $grammar = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+        my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
         my $thick_lex_grammar =
-            $grammar->[Marpa::R3::Internal::Scanless::G::THICK_LEX_GRAMMARS]
-            ->[0];
+            $slg->[Marpa::R3::Internal::Scanless::G::THICK_L0_GRAMMAR];
         my $symbol_in_display_form =
             $thick_lex_grammar->symbol_in_display_form($token_id),
             my ( $line, $column ) = $slr->line_column($position);
-        my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
         my $trace_file_handle =
             $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
         say {$trace_file_handle}
@@ -715,10 +712,9 @@ my $libmarpa_trace_event_handlers = {
         my ( $slr, $event ) = @_;
         my ( undef, undef, $lex_rule_id, $start, $end ) =
             @{$event};
-        my $grammar = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+        my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
         my $thick_lex_grammar =
-            $grammar->[Marpa::R3::Internal::Scanless::G::THICK_LEX_GRAMMARS]
-            ->[0];
+            $slg->[Marpa::R3::Internal::Scanless::G::THICK_L0_GRAMMAR];
         my $grammar_c = $thick_lex_grammar->[Marpa::R3::Internal::Grammar::C];
         my $rule_length = $grammar_c->rule_length($lex_rule_id);
         my @rhs_ids =
@@ -726,7 +722,6 @@ my $libmarpa_trace_event_handlers = {
             ( 0 .. $rule_length - 1 );
         my @rhs =
             map { $thick_lex_grammar->symbol_in_display_form($_) } @rhs_ids;
-        my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
         my $trace_file_handle =
             $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
         say {$trace_file_handle} qq{Discarded lexeme },
@@ -910,7 +905,7 @@ sub Marpa::R3::Scanless::R::resume {
             my $trace_file_handle =
                 $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
             my $thick_lex_grammar =
-                $slg->[Marpa::R3::Internal::Scanless::G::THICK_LEX_GRAMMARS]->[0];
+                $slg->[Marpa::R3::Internal::Scanless::G::THICK_L0_GRAMMAR];
             my $lex_tracer = $thick_lex_grammar->tracer();
             my ( $line, $column ) = $slr->line_column($stream_pos);
             print {$trace_file_handle}
@@ -984,8 +979,7 @@ sub Marpa::R3::Scanless::R::resume {
                     if ( $trace_terminals >= 2 ) {
                         my $thick_lex_grammar =
                             $slg->[
-                            Marpa::R3::Internal::Scanless::G::THICK_LEX_GRAMMARS]
-                            ->[0];
+                            Marpa::R3::Internal::Scanless::G::THICK_L0_GRAMMAR];
                         my $trace_file_handle = $slr->[
                             Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
                         my $char_desc = sprintf 'U+%04x', $codepoint;
@@ -1035,7 +1029,7 @@ sub Marpa::R3::Scanless::R::read_problem {
     my $slg  = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
 
     my $thick_lex_grammar =
-        $slg->[Marpa::R3::Internal::Scanless::G::THICK_LEX_GRAMMARS]->[0];
+        $slg->[Marpa::R3::Internal::Scanless::G::THICK_L0_GRAMMAR];
     my $lex_tracer = $thick_lex_grammar->tracer();
 
     my $trace_file_handle =
@@ -1227,7 +1221,7 @@ sub Marpa::R3::Scanless::R::read_problem {
             $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
         my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
         my $thick_lex_grammar =
-            $slg->[Marpa::R3::Internal::Scanless::G::THICK_LEX_GRAMMARS]->[0];
+            $slg->[Marpa::R3::Internal::Scanless::G::THICK_L0_GRAMMAR];
         my $lex_tracer = $thick_lex_grammar->tracer();
         my ( $line, $column ) = $slr->line_column($stream_pos);
         $read_string_error .=

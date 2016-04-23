@@ -122,7 +122,7 @@ use constant NIDSET_IDS => 1;
 
 package Marpa::R3::Internal::Scanless::G;
 use constant C => 0;
-use constant THICK_LEX_GRAMMARS => 1;
+use constant THICK_L0_GRAMMAR => 1;
 use constant THICK_G1_GRAMMAR => 2;
 use constant CHARACTER_CLASS_TABLES => 3;
 use constant DISCARD_EVENT_BY_LEXER_RULE => 4;

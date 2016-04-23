@@ -233,7 +233,7 @@ __DATA__
 
     C { The thin version of this object }
 
-    THICK_LEX_GRAMMARS
+    THICK_L0_GRAMMAR
     THICK_G1_GRAMMAR
     CHARACTER_CLASS_TABLES
     DISCARD_EVENT_BY_LEXER_RULE

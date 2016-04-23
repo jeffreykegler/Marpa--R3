@@ -692,8 +692,8 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
             $character_class_table_by_lexer_name{$lexer_name};
         $slg->[Marpa::R3::Internal::Scanless::G::CHARACTER_CLASS_TABLES]
             ->[$lexer_id] = $character_class_table;
-        $slg->[Marpa::R3::Internal::Scanless::G::THICK_LEX_GRAMMARS]
-            ->[$lexer_id] = $thick_grammar_by_lexer_name{$lexer_name};
+        $slg->[Marpa::R3::Internal::Scanless::G::THICK_L0_GRAMMAR]
+            = $thick_grammar_by_lexer_name{$lexer_name};
     }
 
     # This section violates the NAIF interface, directly changing some
@@ -987,8 +987,7 @@ sub thick_subgrammar_by_name {
     return $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR]
         if $subgrammar eq 'G1';
 
-    return $slg->[Marpa::R3::Internal::Scanless::G::THICK_LEX_GRAMMARS]
-        ->[0];
+    return $slg->[Marpa::R3::Internal::Scanless::G::THICK_L0_GRAMMAR];
 } ## end sub thick_subgrammar_by_name
 
 sub Marpa::R3::Scanless::G::start_symbol_id {
