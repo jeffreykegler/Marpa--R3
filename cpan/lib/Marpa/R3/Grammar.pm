@@ -128,11 +128,6 @@ sub Marpa::R3::Grammar::g1_naif_set {
         delete $flat_args->{'if_inaccessible'};
     }
 
-    if ( defined( my $value = $flat_args->{'default_rank'} ) ) {
-        $grammar_c->default_rank_set($value);
-        delete $flat_args->{'default_rank'};
-    } ## end if ( defined( my $value = $flat_args->{'default_rank'} ) )
-
     # Second pass options
 
     if ( defined( my $value = $flat_args->{'symbols'} ) ) {
