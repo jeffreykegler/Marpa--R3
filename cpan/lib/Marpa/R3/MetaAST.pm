@@ -63,7 +63,6 @@ sub ast_to_hash {
     $hashed_ast->{meta_recce} = $ast->{meta_recce};
     bless $hashed_ast, 'Marpa::R3::Internal::MetaAST::Parse';
 
-    $hashed_ast->{current_lexer} = 'L0';
     $hashed_ast->{rules}->{G1} = [];
     my $g1_symbols = $hashed_ast->{symbols}->{G1} = {};
 
@@ -439,7 +438,7 @@ sub Marpa::R3::Internal::MetaAST_Nodes::adverb_item::evaluate {
 sub Marpa::R3::Internal::MetaAST_Nodes::default_rule::evaluate {
     my ( $values, $parse ) = @_;
     my ( $start, $length, undef, $op_declare, $raw_adverb_list ) = @{$values};
-    my $subgrammar = $op_declare->op() eq q{::=} ? 'G1' : $parse->{current_lexer};
+    my $subgrammar = $op_declare->op() eq q{::=} ? 'G1' : 'L0';
     my $adverb_list = $raw_adverb_list->evaluate($parse);
 
     # A default rule clears the previous default
@@ -553,21 +552,7 @@ sub Marpa::R3::Internal::MetaAST_Nodes::priority_rule::evaluate {
     my ( $start, $length, $raw_lhs, $op_declare, $raw_priorities ) =
         @{$values};
 
-    my $current_lexer = $parse->{current_lexer};
-    my $subgrammar;
-    if ( $op_declare->op() eq q{::=} ) {
-        if ( $current_lexer ne 'L0' ) {
-            my ( $line, $column ) = $parse->{meta_recce}->line_column($start);
-            die "G1 rules currently allowed only when L0 is current lexer\n",
-                qq{  A prioritized rule was found when "$current_lexer" was the current lexer\n"},
-                "  Location was line $line, column $column\n",
-                '  Rule was ', $parse->substring( $start, $length ), "\n";
-        } ## end if ( $current_lexer ne 'L0' )
-        $subgrammar = 'G1';
-    } ## end if ( $op_declare->op() eq q{::=} )
-    else {
-        $subgrammar = $current_lexer;
-    }
+    my $subgrammar = $op_declare->op() eq q{::=} ? 'G1' : 'L0';
 
     my $lhs = $raw_lhs->name($parse);
     $parse->{'first_lhs'} //= $lhs if $subgrammar eq 'G1';
@@ -901,21 +886,7 @@ sub Marpa::R3::Internal::MetaAST_Nodes::empty_rule::evaluate {
     my ( $start, $length, $raw_lhs, $op_declare, $raw_adverb_list ) =
         @{$values};
 
-    my $current_lexer = $parse->{current_lexer};
-    my $subgrammar;
-    if ( $op_declare->op() eq q{::=} ) {
-        if ( $current_lexer ne 'L0' ) {
-            my ( $line, $column ) = $parse->{meta_recce}->line_column($start);
-            die "G1 rules currently allowed only when L0 is current lexer\n",
-                qq{  An empty rule was found when "$current_lexer" was the current lexer\n"},
-                "  Location was line $line, column $column\n",
-                '  Rule was ', $parse->substring( $start, $length ), "\n";
-        } ## end if ( $current_lexer ne 'L0' )
-        $subgrammar = 'G1';
-    } ## end if ( $op_declare->op() eq q{::=} )
-    else {
-        $subgrammar = $current_lexer;
-    }
+    my $subgrammar = $op_declare->op() eq q{::=} ? 'G1' : 'L0';
 
     my $lhs = $raw_lhs->name($parse);
     $parse->{'first_lhs'} //= $lhs if $subgrammar eq 'G1';
@@ -1137,14 +1108,13 @@ sub Marpa::R3::Internal::MetaAST_Nodes::discard_rule::evaluate {
     my ( $values, $parse ) = @_;
     my ( $start, $length, $symbol, $raw_adverb_list ) = @{$values};
 
-    my $lexer_name = $parse->{current_lexer};
-    local $Marpa::R3::Internal::SUBGRAMMAR = $lexer_name;
+    local $Marpa::R3::Internal::SUBGRAMMAR = 'L0';
     my $discard_lhs = '[:discard]';
     $parse->symbol_names_set(
         $discard_lhs,
         'L',
         {   display_form => ':discard',
-            description  => qq{Internal LHS for lexer "$lexer_name" discard}
+            description  => qq{Internal LHS for lexer discard}
         }
     );
     my $rhs         = $symbol->names($parse);
@@ -1170,7 +1140,7 @@ sub Marpa::R3::Internal::MetaAST_Nodes::discard_rule::evaluate {
         symbol_as_event => $rhs_as_event
     );
     $rule_hash{event} = $event if defined $event;
-    push @{ $parse->{rules}->{$lexer_name} }, \%rule_hash;
+    push @{ $parse->{rules}->{L0} }, \%rule_hash;
     ## no critic(Subroutines::ProhibitExplicitReturnUndef)
     return undef;
 } ## end sub Marpa::R3::Internal::MetaAST_Nodes::discard_rule::evaluate
@@ -1181,21 +1151,7 @@ sub Marpa::R3::Internal::MetaAST_Nodes::quantified_rule::evaluate {
         $proto_adverb_list )
         = @{$values};
 
-    my $subgrammar;
-    my $current_lexer = $parse->{current_lexer};
-    if ( $op_declare->op() eq q{::=} ) {
-        if ( $current_lexer ne 'L0' ) {
-            my ( $line, $column ) = $parse->{meta_recce}->line_column($start);
-            die "G1 rules currently allowed only when L0 is current lexer\n",
-                qq{  A quantified rule was found when "$current_lexer" was the current lexer\n"},
-                "  Location was line $line, column $column\n",
-                '  Rule was ', $parse->substring( $start, $length ), "\n";
-        } ## end if ( $current_lexer ne 'L0' )
-        $subgrammar = 'G1';
-    } ## end if ( $op_declare->op() eq q{::=} )
-    else {
-        $subgrammar = $current_lexer;
-    }
+    my $subgrammar = $op_declare->op() eq q{::=} ? 'G1' : 'L0';
 
     my $lhs_name = $lhs->name($parse);
     $parse->{'first_lhs'} //= $lhs_name if $subgrammar eq 'G1';
