@@ -135,7 +135,6 @@ __DATA__
        is probably worthwhile to save a the extra
        indirection.
     }
-    RULE_ID_BY_TAG
 
     START_NAME { name of original symbol }
     SYMBOLS { array of symbol refs }
@@ -246,6 +245,8 @@ __DATA__
     PREDICTION_EVENT_BY_ID
     LEXEME_EVENT_BY_ID
     SYMBOL_IDS_BY_EVENT_NAME_AND_TYPE
+
+    G1_RULE_ID_BY_TAG { Tracks "SLIF tags" }
 
     { This saves a lot of time at points }
     CACHE_RULEIDS_BY_LHS_NAME

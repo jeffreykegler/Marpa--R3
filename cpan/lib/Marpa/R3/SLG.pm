@@ -787,8 +787,8 @@ sub Marpa::R3::Internal::Scanless::G::precompute {
         return $precompute_error_code
             if $precompute_error_code == $Marpa::R3::Error::PRECOMPUTED;
 
-        # Cycles are not necessarily errors,
-        # and get special handling
+        # We'll collect the 'MARPA_EVENT_LOOP_RULES' events later,
+        # and use them to give a detailed error message
         $precompute_error_code = $Marpa::R3::Error::NONE
             if $precompute_error_code == $Marpa::R3::Error::GRAMMAR_HAS_CYCLE;
 
