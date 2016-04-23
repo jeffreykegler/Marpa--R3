@@ -460,7 +460,7 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
                 if $if_inaccessible_default eq 'fatal';
         } ## end if ( not $g1_thin->symbol_is_accessible($g1_symbol_id...))
         my $lex_symbol_id = $lex_tracer->symbol_by_name($lexeme_name);
-        $lexeme_data{$lexeme_name}{lexers}{$lexer_name}{'id'} =
+        $lexeme_data{$lexeme_name}{lexer}{'id'} =
             $lex_symbol_id;
         $lex_lexeme_to_g1_symbol[$lex_symbol_id] = $g1_symbol_id;
     } ## end LEXEME_NAME: for my $lexeme_name (@lex_lexeme_names)
@@ -493,7 +493,7 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
 
         my $trace_terminals = $slg->[Marpa::R3::Internal::Scanless::G::TRACE_TERMINALS];
         my $assertion_id =
-            $lexeme_data{$lexeme_name}{lexers}{$lexer_name}{'assertion'};
+            $lexeme_data{$lexeme_name}{lexer}{'assertion'};
         if ( not defined $assertion_id ) {
             $assertion_id = $lex_thin->zwa_new(0);
 
@@ -501,7 +501,7 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
                 say {$trace_fh} "Assertion $assertion_id defaults to 0";
             }
 
-            $lexeme_data{$lexeme_name}{lexers}{$lexer_name}{'assertion'} =
+            $lexeme_data{$lexeme_name}{lexer}{'assertion'} =
                 $assertion_id;
         } ## end if ( not defined $assertion_id )
         $lex_thin->zwa_place( $assertion_id, $rule_id, 0 );
@@ -583,8 +583,8 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
 
     LEXEME: for my $lexeme_name ( keys %g1_id_by_lexeme_name ) {
         Marpa::R3::exception(
-            "A lexeme in G1 is not a lexeme in any of the lexers: $lexeme_name"
-        ) if not defined $lexeme_data{$lexeme_name}{'lexers'};
+            "A lexeme in G1 is not a lexeme in L0: $lexeme_name"
+        ) if not defined $lexeme_data{$lexeme_name}{'lexer'};
     }
 
     # At this point we know which symbols are lexemes.
@@ -646,7 +646,7 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
         my $g1_lexeme_id = $lex_rule_to_g1_lexeme[$lexer_rule_id];
         my $lexeme_name  = $g1_tracer->symbol_name($g1_lexeme_id);
         my $assertion_id =
-            $lexeme_data{$lexeme_name}{lexers}{$lexer_name}{'assertion'}
+            $lexeme_data{$lexeme_name}{lexer}{'assertion'}
             // -1;
         $thin_slg->lexer_rule_to_g1_lexeme_set( $lexer_rule_id,
             $g1_lexeme_id, $assertion_id );
