@@ -113,7 +113,6 @@ __DATA__
     DISPLAY_FORM
     DSL_FORM
     LEGACY_NAME
-    DESCRIPTION
     IF_INACCESSIBLE
 
     :package=Marpa::R3::Internal::Rule
@@ -125,7 +124,6 @@ __DATA__
     SLIF_TAG { A tag for use by the SLIF }
     ACTION_NAME
     BLESSING
-    DESCRIPTION
 
     :package=Marpa::R3::Internal::Grammar
 

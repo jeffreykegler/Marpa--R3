@@ -86,7 +86,7 @@ my $input = q{Create Metric m As Select 1 Where True};
 Marpa::R3::Test::is(
     $grammar->show_symbols(),
     <<'END_OF_SYMBOLS', 'Symbols' );
-G1 S0 :start -- Internal G1 start symbol
+G1 S0 :start
 G1 S1 Input
 G1 S2 Statement
 G1 S3 SEPARATOR

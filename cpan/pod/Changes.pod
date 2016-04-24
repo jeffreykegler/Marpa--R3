@@ -82,6 +82,10 @@ the C<Marpa::R2::Scanless::G::rule()> method,
 discouraged in Marpa::R2,
 have been eliminated in Marpa::R3.
 
+The
+C<Marpa::R2::Scanless::G::symbol_description()> method
+has been removed.
+
 =head2 Marpa::R2::Scanless::R methods renamed in Marpa::R3
 
 For historical reasons,

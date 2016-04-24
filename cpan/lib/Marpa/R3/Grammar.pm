@@ -178,15 +178,6 @@ sub Marpa::R3::Grammar::symbol_dsl_form {
     return $symbol->[Marpa::R3::Internal::Symbol::DSL_FORM];
 }
 
-# Return description of symbol
-# Does no checking
-sub Marpa::R3::Grammar::symbol_description {
-    my ( $grammar, $symbol_id ) = @_;
-    my $symbols   = $grammar->[Marpa::R3::Internal::Grammar::SYMBOLS];
-    my $symbol = $symbols->[$symbol_id];
-    return $symbol->[Marpa::R3::Internal::Symbol::DESCRIPTION];
-}
-
 # Return display form of symbol
 # Does lots of checking and makes use of alternatives.
 sub Marpa::R3::Grammar::symbol_in_display_form {
@@ -467,8 +458,7 @@ sub assign_symbol {
             next PROPERTY;
         } ## end if ( $property eq 'rank' )
         if ( $property eq 'description' ) {
-            my $value = $options->{$property};
-            $symbol->[Marpa::R3::Internal::Symbol::DESCRIPTION] = $value;
+            # TODO: Delete this once description field eliminated
             next PROPERTY;
         }
         if ( $property eq 'dsl_form' ) {
@@ -531,9 +521,8 @@ sub add_user_rule {
     my $mask;
     my $proper_separation = 0;
     my $keep_separation   = 0;
-    my $description;
 
-    OPTION: for my $option ( keys %{$options} ) {
+  OPTION: for my $option ( keys %{$options} ) {
         my $value = $options->{$option};
         if ( $option eq 'name' )   { $rule_name = $value; next OPTION; }
         if ( $option eq 'tag' )    { $slif_tag  = $value; next OPTION; }
@@ -557,7 +546,11 @@ sub add_user_rule {
         }
         if ( $option eq 'keep' ) { $keep_separation = $value; next OPTION }
         if ( $option eq 'mask' ) { $mask            = $value; next OPTION }
-        if ( $option eq 'description' ) { $description = $value; next OPTION }
+        if ( $option eq 'description' ) {
+
+            # TODO: Delete this once description field eliminated
+            next OPTION;
+        }
         Marpa::R3::exception("Unknown user rule option: $option");
     } ## end OPTION: for my $option ( keys %{$options} )
 
@@ -718,9 +711,6 @@ sub add_user_rule {
     } ## end if ( defined $slif_tag )
     if ( defined $blessing ) {
         $base_rule->[Marpa::R3::Internal::Rule::BLESSING] = $blessing;
-    }
-    if ( defined $description ) {
-        $base_rule->[Marpa::R3::Internal::Rule::DESCRIPTION] = $description;
     }
 
     return;

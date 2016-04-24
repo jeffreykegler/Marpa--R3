@@ -63,8 +63,8 @@ EOS
 
 Marpa::R3::Test::is( $grammar->show_symbols,
     <<'EOS', 'Aycock/Horspool Symbols' );
-G1 S0 :start -- Internal G1 start symbol
-G1 S1 'a' -- Internal lexical symbol for "'a'"
+G1 S0 :start
+G1 S1 'a'
 G1 S2 S
 G1 S3 A
 EOS

@@ -90,9 +90,9 @@ my $show_symbols_output = $grammar->show_symbols();
 
 Marpa::R3::Test::is( $show_symbols_output,
     <<'END_SYMBOLS', 'Implementation Example Symbols' );
-G1 S0 :start -- Internal G1 start symbol
-G1 S1 '*' -- Internal lexical symbol for "'*'"
-G1 S2 '+' -- Internal lexical symbol for "'+'"
+G1 S0 :start
+G1 S1 '*'
+G1 S2 '+'
 G1 S3 Calculator
 G1 S4 Expression
 G1 S5 Factor

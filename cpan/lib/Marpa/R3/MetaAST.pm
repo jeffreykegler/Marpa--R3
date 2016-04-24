@@ -721,18 +721,18 @@ sub Marpa::R3::Internal::MetaAST_Nodes::priority_rule::evaluate {
         lhs => $lhs,
         rhs => [ $parse->prioritized_symbol( $lhs, 0 ) ],
         @arg0_action,
-        description => qq{Internal rule top priority rule for <$lhs>},
+        # description => qq{Internal rule top priority rule for <$lhs>},
         },
         (
         map {
             ;
             {   lhs         => $parse->prioritized_symbol( $lhs,   $_ - 1 ),
                 rhs         => [ $parse->prioritized_symbol( $lhs, $_ ) ],
-                description => (
-                    qq{Internal rule for symbol <$lhs> priority transition from }
-                        . ( $_ - 1 )
-                        . qq{ to $_}
-                ),
+                # description => (
+                    # qq{Internal rule for symbol <$lhs> priority transition from }
+                        # . ( $_ - 1 )
+                        # . qq{ to $_}
+                # ),
                 @arg0_action
             }
         } 1 .. $priority_count - 1
@@ -893,7 +893,7 @@ sub Marpa::R3::Internal::MetaAST_Nodes::empty_rule::evaluate {
     local $Marpa::R3::Internal::SUBGRAMMAR = $subgrammar;
 
     my %rule = ( lhs => $lhs,
-    description => qq{Empty rule for <$lhs>},
+    # description => qq{Empty rule for <$lhs>},
     rhs => [] );
     my $adverb_list = $raw_adverb_list->evaluate($parse);
 
@@ -1077,7 +1077,7 @@ sub Marpa::R3::Internal::MetaAST::start_rule_create {
         $parse->{'default_adverbs'}->{'G1'}->{'action'};
     $parse->{'symbols'}->{'G1'}->{$start_lhs} = {
         display_form => ':start',
-        description  => 'Internal G1 start symbol'
+        # description  => 'Internal G1 start symbol'
     };
     push @{ $parse->{rules}->{G1} },
         {
@@ -1114,7 +1114,7 @@ sub Marpa::R3::Internal::MetaAST_Nodes::discard_rule::evaluate {
         $discard_lhs,
         'L',
         {   display_form => ':discard',
-            description  => qq{Internal LHS for lexer discard}
+            # description  => qq{Internal LHS for lexer discard}
         }
     );
     my $rhs         = $symbol->names($parse);
@@ -1131,10 +1131,10 @@ sub Marpa::R3::Internal::MetaAST_Nodes::discard_rule::evaluate {
             qq{"$key" adverb not allowed as discard default"});
     } ## end ADVERB: for my $key ( keys %{$adverb_list} )
     my %rule_hash = (
-        description => (
-            "Discard rule for " . join q{ },
-            map { '<' . $_ . '>' } @{$rhs}
-        ),
+        # description => (
+            # "Discard rule for " . join q{ },
+            # map { '<' . $_ . '>' } @{$rhs}
+        # ),
         lhs => $discard_lhs,
         rhs => $rhs,
         symbol_as_event => $rhs_as_event
@@ -1500,7 +1500,7 @@ sub Marpa::R3::Internal::MetaAST_Nodes::single_quoted_string::evaluate {
     my %lexical_rule      = (
         lhs  => $lexical_lhs,
         rhs  => $lexical_rhs,
-        description => "Internal rule for single-quoted string $string",
+        # description => "Internal rule for single-quoted string $string",
         mask => [ map { ; 1 } @{$lexical_rhs} ],
     );
     push @{ $parse->{rules}->{$lexical_grammar} }, \%lexical_rule;
@@ -1602,7 +1602,7 @@ sub char_class_to_symbol {
             $subgrammar,
             {   dsl_form     => $char_class,
                 display_form => $char_class,
-                description  => "Character class: $char_class"
+                # description  => "Character class: $char_class"
             }
         );
     } ## end if ( not defined $symbol )
@@ -1636,7 +1636,7 @@ sub Marpa::R3::Internal::MetaAST::Parse::prioritized_symbol {
         {   legacy_name  => $base_symbol,
             dsl_form     => $base_symbol,
             display_form => $display_form,
-            description  => "<$base_symbol> at priority $priority"
+            # description  => "<$base_symbol> at priority $priority"
         }
     );
     return $symbol_name;
@@ -1653,7 +1653,7 @@ sub Marpa::R3::Internal::MetaAST::Parse::internal_lexeme {
     my %names             = (
         dsl_form     => $dsl_form,
         display_form => $dsl_form,
-        description  => qq{Internal lexical symbol for "$dsl_form"}
+        # description  => qq{Internal lexical symbol for "$dsl_form"}
     );
     $parse->symbol_names_set( $lexical_symbol, $_, \%names ) for qw(G1 L);
     return $lexical_symbol;

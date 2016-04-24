@@ -351,18 +351,18 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
             {   'rhs'         => [ '[[^\\d\\D]]' ],
                 'lhs'         => '[:discard]',
                 'symbol_as_event' => '[^\\d\\D]',
-                'description' => 'Discard rule for <[[^\\d\\D]]>'
+                # 'description' => 'Discard rule for <[[^\\d\\D]]>'
             },
         ];
         $lexer_symbols = {
             '[:discard]' => {
                 'display_form' => ':discard',
-                'description'  => 'Internal LHS for lexer "L0" discard'
+                # 'description'  => 'Internal LHS for lexer "L0" discard'
             },
             '[[^\\d\\D]]' => {
                 'dsl_form'     => '[^\\d\\D]',
                 'display_form' => '[^\\d\\D]',
-                'description'  => 'Character class: [^\\d\\D]'
+                # 'description'  => 'Character class: [^\\d\\D]'
             }
         };
     } ## end if ( not $lexer_rules )
@@ -416,15 +416,16 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
             join q{ }, @unproductive );
     }
 
-    $this_lexer_symbols{$lex_start_symbol_name}->{display_form} =
-        ':start_lex';
-    $this_lexer_symbols{$lex_start_symbol_name}->{description} =
-        'Internal L0 (lexical) start symbol';
+    $this_lexer_symbols{$lex_start_symbol_name}->{display_form} = ':start_lex';
+
+    # $this_lexer_symbols{$lex_start_symbol_name}->{description} =
+    # 'Internal L0 (lexical) start symbol';
     push @{$lexer_rules}, map {
         ;
-        {   description => "Internal lexical start rule for <$_>",
-            lhs         => $lex_start_symbol_name,
-            rhs         => [$_]
+        {
+            #   description => "Internal lexical start rule for <$_>",
+            lhs => $lex_start_symbol_name,
+            rhs => [$_]
         }
     } sort keys %is_lexeme_in_this_lexer;
 
@@ -1004,12 +1005,6 @@ sub Marpa::R3::Scanless::G::symbol_dsl_form {
         ->symbol_dsl_form($symbol_id);
 }
 
-sub Marpa::R3::Scanless::G::symbol_description {
-    my ( $slg, $symbol_id, $subgrammar ) = @_;
-    return thick_subgrammar_by_name($slg, $subgrammar)
-        ->symbol_description($symbol_id);
-}
-
 sub Marpa::R3::Scanless::G::rule_show
 {
     my ( $slg, $rule_id, $subgrammar) = @_;
@@ -1064,8 +1059,6 @@ sub Marpa::R3::Scanless::G::show_rules {
 
         if ( $verbose >= 2 ) {
 
-            my $description = $rule->[Marpa::R3::Internal::Rule::DESCRIPTION];
-            $text .= "  $description\n" if $description;
             my @comment = ();
             $grammar_c->rule_length($rule_id) == 0
                 and push @comment, 'empty';
@@ -1123,11 +1116,6 @@ sub Marpa::R3::Scanless::G::show_symbols {
 
         $text .= join q{ }, $subgrammar, "S$symbol_id",
             $thick_grammar->symbol_in_display_form($symbol_id);
-
-        my $description = $symbol->[Marpa::R3::Internal::Symbol::DESCRIPTION];
-        if ($description) {
-            $text .= " -- $description";
-        }
         $text .= "\n";
 
         if ( $verbose >= 2 ) {

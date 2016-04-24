@@ -106,7 +106,7 @@ restore_stdout();
 
 Marpa::R3::Test::is( ${$actual_ref},
     <<'END_SYMBOLS', 'Ambiguous Equation Symbols' );
-G1 S0 :start -- Internal G1 start symbol
+G1 S0 :start
 G1 S1 E
 G1 S2 Op
 G1 S3 Number

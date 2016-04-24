@@ -268,39 +268,6 @@ Returns the ID of the start symbol.
 Note that there is no method to return the ID of the start
 rule, because there may be no unique start rule.
 
-=head2 symbol_description()
-
-=for Marpa::R3::Display
-name: SLG symbol_description() synopsis
-
-    my $description = $grammar->symbol_description($symbol_id)
-        // '[No description]';
-    $text .= "symbol number: $symbol_id  description $description\n";
-
-=for Marpa::R3::Display::End
-
-=for Marpa::R3::Display
-name: SLG symbol_description() 2 arg synopsis
-
-    my $description = $grammar->symbol_description( $symbol_id, 'L0' )
-        // '[No description]';
-    $text .= "L0 symbol number: $symbol_id  description $description\n";
-
-=for Marpa::R3::Display::End
-
-Given a symbol ID, returns a description of the symbol.
-The description may not be defined.
-Currently internal symbols tend to have descriptions,
-while symbols explicitly specified by the user in the DSL are treated as self-explanatory.
-The description is intended for humans to read, and is subject to change.
-
-The first argument is the symbol ID.
-A second, optional, argument is the subgrammar.
-Currently there are L0 and G1 subgrammars.
-The default subgrammar is G1.
-Returns a Perl C<undef> if the symbol does not exist,
-or if it has no description.
-
 =head2 symbol_display_form()
 
 =for Marpa::R3::Display

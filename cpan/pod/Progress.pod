@@ -1159,15 +1159,12 @@ partial: 1
     Symbol IDs: <19> ::= <20> <3> <22>
     Internal symbols: <numeric assignment> ::= <variable> <[Lex-2]> <numeric expression>
   G1 R5 expression ::= expression
-    Internal rule top priority rule for <expression>
     Symbol IDs: <21> ::= <10>
     Internal symbols: <expression> ::= <expression[0]>
   G1 R6 expression ::= expression
-    Internal rule for symbol <expression> priority transition from 0 to 1
     Symbol IDs: <10> ::= <11>
     Internal symbols: <expression[0]> ::= <expression[1]>
   G1 R7 expression ::= expression
-    Internal rule for symbol <expression> priority transition from 1 to 2
     Symbol IDs: <11> ::= <12>
     Internal symbols: <expression[1]> ::= <expression[2]>
   G1 R8 expression ::= variable
@@ -1183,15 +1180,12 @@ partial: 1
     Symbol IDs: <10> ::= <10> <7> <11>
     Internal symbols: <expression[0]> ::= <expression[0]> <[Lex-6]> <expression[1]>
   G1 R12 <numeric expression> ::= <numeric expression>
-    Internal rule top priority rule for <numeric expression>
     Symbol IDs: <22> ::= <13>
     Internal symbols: <numeric expression> ::= <numeric expression[0]>
   G1 R13 <numeric expression> ::= <numeric expression>
-    Internal rule for symbol <numeric expression> priority transition from 0 to 1
     Symbol IDs: <13> ::= <14>
     Internal symbols: <numeric expression[0]> ::= <numeric expression[1]>
   G1 R14 <numeric expression> ::= <numeric expression>
-    Internal rule for symbol <numeric expression> priority transition from 1 to 2
     Symbol IDs: <14> ::= <15>
     Internal symbols: <numeric expression[1]> ::= <numeric expression[2]>
   G1 R15 <numeric expression> ::= variable
@@ -1211,39 +1205,30 @@ partial: 1
     Internal symbols: <[:start]> ::= <statements>
   Lex (L0) Rules:
   L0 R0 'set' ::= [s] [e] [t]
-    Internal rule for single-quoted string 'set'
     Symbol IDs: <2> ::= <27> <21> <28>
     Internal symbols: <[Lex-0]> ::= <[[s]]> <[[e]]> <[[t]]>
   L0 R1 'to' ::= [t] [o]
-    Internal rule for single-quoted string 'to'
     Symbol IDs: <3> ::= <28> <25>
     Internal symbols: <[Lex-1]> ::= <[[t]]> <[[o]]>
   L0 R2 '=' ::= [\=]
-    Internal rule for single-quoted string '='
     Symbol IDs: <4> ::= <16>
     Internal symbols: <[Lex-2]> ::= <[[\=]]>
   L0 R3 'string' ::= [s] [t] [r] [i] [n] [g]
-    Internal rule for single-quoted string 'string'
     Symbol IDs: <5> ::= <27> <28> <26> <23> <24> <22>
     Internal symbols: <[Lex-3]> ::= <[[s]]> <[[t]]> <[[r]]> <[[i]]> <[[n]]> <[[g]]>
   L0 R4 '(' ::= [\(]
-    Internal rule for single-quoted string '('
     Symbol IDs: <6> ::= <12>
     Internal symbols: <[Lex-4]> ::= <[[\(]]>
   L0 R5 ')' ::= [\)]
-    Internal rule for single-quoted string ')'
     Symbol IDs: <7> ::= <13>
     Internal symbols: <[Lex-5]> ::= <[[\)]]>
   L0 R6 '+' ::= [\+]
-    Internal rule for single-quoted string '+'
     Symbol IDs: <8> ::= <15>
     Internal symbols: <[Lex-6]> ::= <[[\+]]>
   L0 R7 '+' ::= [\+]
-    Internal rule for single-quoted string '+'
     Symbol IDs: <9> ::= <15>
     Internal symbols: <[Lex-7]> ::= <[[\+]]>
   L0 R8 '*' ::= [\*]
-    Internal rule for single-quoted string '*'
     Symbol IDs: <10> ::= <14>
     Internal symbols: <[Lex-8]> ::= <[[\*]]>
   L0 R9 variable ::= [\w] +
@@ -1259,62 +1244,48 @@ partial: 1
     Symbol IDs: <32> ::= <20>
     Internal symbols: <string contents> ::= <[[^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}]]>
   L0 R13 :discard ::= whitespace
-    Discard rule for <whitespace>
     Symbol IDs: <0> ::= <33>
     Internal symbols: <[:discard]> ::= <whitespace>
   L0 R14 whitespace ::= [\s] +
     Symbol IDs: <33> ::= <18>
     Internal symbols: <whitespace> ::= <[[\s]]>
   L0 R15 :start_lex ::= :discard
-    Internal lexical start rule for <[:discard]>
     Symbol IDs: <1> ::= <0>
     Internal symbols: <[:start_lex]> ::= <[:discard]>
   L0 R16 :start_lex ::= 'set'
-    Internal lexical start rule for <[Lex-0]>
     Symbol IDs: <1> ::= <2>
     Internal symbols: <[:start_lex]> ::= <[Lex-0]>
   L0 R17 :start_lex ::= 'to'
-    Internal lexical start rule for <[Lex-1]>
     Symbol IDs: <1> ::= <3>
     Internal symbols: <[:start_lex]> ::= <[Lex-1]>
   L0 R18 :start_lex ::= '='
-    Internal lexical start rule for <[Lex-2]>
     Symbol IDs: <1> ::= <4>
     Internal symbols: <[:start_lex]> ::= <[Lex-2]>
   L0 R19 :start_lex ::= 'string'
-    Internal lexical start rule for <[Lex-3]>
     Symbol IDs: <1> ::= <5>
     Internal symbols: <[:start_lex]> ::= <[Lex-3]>
   L0 R20 :start_lex ::= '('
-    Internal lexical start rule for <[Lex-4]>
     Symbol IDs: <1> ::= <6>
     Internal symbols: <[:start_lex]> ::= <[Lex-4]>
   L0 R21 :start_lex ::= ')'
-    Internal lexical start rule for <[Lex-5]>
     Symbol IDs: <1> ::= <7>
     Internal symbols: <[:start_lex]> ::= <[Lex-5]>
   L0 R22 :start_lex ::= '+'
-    Internal lexical start rule for <[Lex-6]>
     Symbol IDs: <1> ::= <8>
     Internal symbols: <[:start_lex]> ::= <[Lex-6]>
   L0 R23 :start_lex ::= '+'
-    Internal lexical start rule for <[Lex-7]>
     Symbol IDs: <1> ::= <9>
     Internal symbols: <[:start_lex]> ::= <[Lex-7]>
   L0 R24 :start_lex ::= '*'
-    Internal lexical start rule for <[Lex-8]>
     Symbol IDs: <1> ::= <10>
     Internal symbols: <[:start_lex]> ::= <[Lex-8]>
   L0 R25 :start_lex ::= number
-    Internal lexical start rule for <number>
     Symbol IDs: <1> ::= <30>
     Internal symbols: <[:start_lex]> ::= <number>
   L0 R26 :start_lex ::= string
-    Internal lexical start rule for <string>
     Symbol IDs: <1> ::= <31>
     Internal symbols: <[:start_lex]> ::= <string>
   L0 R27 :start_lex ::= variable
-    Internal lexical start rule for <variable>
     Symbol IDs: <1> ::= <29>
     Internal symbols: <[:start_lex]> ::= <variable>
 
@@ -1329,60 +1300,60 @@ remove-blank-last-line: 1
 partial: 1
 
     G1 Symbols:
-    G1 S0 :start -- Internal G1 start symbol
+    G1 S0 :start
       Internal name: <[:start]>
-    G1 S1 'set' -- Internal lexical symbol for "'set'"
+    G1 S1 'set'
       /* terminal */
       Internal name: <[Lex-0]>
       SLIF name: 'set'
-    G1 S2 'to' -- Internal lexical symbol for "'to'"
+    G1 S2 'to'
       /* terminal */
       Internal name: <[Lex-1]>
       SLIF name: 'to'
-    G1 S3 '=' -- Internal lexical symbol for "'='"
+    G1 S3 '='
       /* terminal */
       Internal name: <[Lex-2]>
       SLIF name: '='
-    G1 S4 'string' -- Internal lexical symbol for "'string'"
+    G1 S4 'string'
       /* terminal */
       Internal name: <[Lex-3]>
       SLIF name: 'string'
-    G1 S5 '(' -- Internal lexical symbol for "'('"
+    G1 S5 '('
       /* terminal */
       Internal name: <[Lex-4]>
       SLIF name: '('
-    G1 S6 ')' -- Internal lexical symbol for "')'"
+    G1 S6 ')'
       /* terminal */
       Internal name: <[Lex-5]>
       SLIF name: ')'
-    G1 S7 '+' -- Internal lexical symbol for "'+'"
+    G1 S7 '+'
       /* terminal */
       Internal name: <[Lex-6]>
       SLIF name: '+'
-    G1 S8 '+' -- Internal lexical symbol for "'+'"
+    G1 S8 '+'
       /* terminal */
       Internal name: <[Lex-7]>
       SLIF name: '+'
-    G1 S9 '*' -- Internal lexical symbol for "'*'"
+    G1 S9 '*'
       /* terminal */
       Internal name: <[Lex-8]>
       SLIF name: '*'
-    G1 S10 expression -- <expression> at priority 0
+    G1 S10 expression
       Internal name: <expression[0]>
       SLIF name: expression
-    G1 S11 expression -- <expression> at priority 1
+    G1 S11 expression
       Internal name: <expression[1]>
       SLIF name: expression
-    G1 S12 expression -- <expression> at priority 2
+    G1 S12 expression
       Internal name: <expression[2]>
       SLIF name: expression
-    G1 S13 <numeric expression> -- <numeric expression> at priority 0
+    G1 S13 <numeric expression>
       Internal name: <numeric expression[0]>
       SLIF name: numeric expression
-    G1 S14 <numeric expression> -- <numeric expression> at priority 1
+    G1 S14 <numeric expression>
       Internal name: <numeric expression[1]>
       SLIF name: numeric expression
-    G1 S15 <numeric expression> -- <numeric expression> at priority 2
+    G1 S15 <numeric expression>
       Internal name: <numeric expression[2]>
       SLIF name: numeric expression
     G1 S16 statements

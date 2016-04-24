@@ -415,15 +415,12 @@ G1 R4 <numeric assignment> ::= variable '=' <numeric expression>
   Symbol IDs: <19> ::= <20> <3> <22>
   Internal symbols: <numeric assignment> ::= <variable> <[Lex-2]> <numeric expression>
 G1 R5 expression ::= expression
-  Internal rule top priority rule for <expression>
   Symbol IDs: <21> ::= <10>
   Internal symbols: <expression> ::= <expression[0]>
 G1 R6 expression ::= expression
-  Internal rule for symbol <expression> priority transition from 0 to 1
   Symbol IDs: <10> ::= <11>
   Internal symbols: <expression[0]> ::= <expression[1]>
 G1 R7 expression ::= expression
-  Internal rule for symbol <expression> priority transition from 1 to 2
   Symbol IDs: <11> ::= <12>
   Internal symbols: <expression[1]> ::= <expression[2]>
 G1 R8 expression ::= variable
@@ -439,15 +436,12 @@ G1 R11 expression ::= expression '+' expression
   Symbol IDs: <10> ::= <10> <7> <11>
   Internal symbols: <expression[0]> ::= <expression[0]> <[Lex-6]> <expression[1]>
 G1 R12 <numeric expression> ::= <numeric expression>
-  Internal rule top priority rule for <numeric expression>
   Symbol IDs: <22> ::= <13>
   Internal symbols: <numeric expression> ::= <numeric expression[0]>
 G1 R13 <numeric expression> ::= <numeric expression>
-  Internal rule for symbol <numeric expression> priority transition from 0 to 1
   Symbol IDs: <13> ::= <14>
   Internal symbols: <numeric expression[0]> ::= <numeric expression[1]>
 G1 R14 <numeric expression> ::= <numeric expression>
-  Internal rule for symbol <numeric expression> priority transition from 1 to 2
   Symbol IDs: <14> ::= <15>
   Internal symbols: <numeric expression[1]> ::= <numeric expression[2]>
 G1 R15 <numeric expression> ::= variable
@@ -467,39 +461,30 @@ G1 R19 :start ::= statements
   Internal symbols: <[:start]> ::= <statements>
 Lex (L0) Rules:
 L0 R0 'set' ::= [s] [e] [t]
-  Internal rule for single-quoted string 'set'
   Symbol IDs: <2> ::= <27> <21> <28>
   Internal symbols: <[Lex-0]> ::= <[[s]]> <[[e]]> <[[t]]>
 L0 R1 'to' ::= [t] [o]
-  Internal rule for single-quoted string 'to'
   Symbol IDs: <3> ::= <28> <25>
   Internal symbols: <[Lex-1]> ::= <[[t]]> <[[o]]>
 L0 R2 '=' ::= [\=]
-  Internal rule for single-quoted string '='
   Symbol IDs: <4> ::= <16>
   Internal symbols: <[Lex-2]> ::= <[[\=]]>
 L0 R3 'string' ::= [s] [t] [r] [i] [n] [g]
-  Internal rule for single-quoted string 'string'
   Symbol IDs: <5> ::= <27> <28> <26> <23> <24> <22>
   Internal symbols: <[Lex-3]> ::= <[[s]]> <[[t]]> <[[r]]> <[[i]]> <[[n]]> <[[g]]>
 L0 R4 '(' ::= [\(]
-  Internal rule for single-quoted string '('
   Symbol IDs: <6> ::= <12>
   Internal symbols: <[Lex-4]> ::= <[[\(]]>
 L0 R5 ')' ::= [\)]
-  Internal rule for single-quoted string ')'
   Symbol IDs: <7> ::= <13>
   Internal symbols: <[Lex-5]> ::= <[[\)]]>
 L0 R6 '+' ::= [\+]
-  Internal rule for single-quoted string '+'
   Symbol IDs: <8> ::= <15>
   Internal symbols: <[Lex-6]> ::= <[[\+]]>
 L0 R7 '+' ::= [\+]
-  Internal rule for single-quoted string '+'
   Symbol IDs: <9> ::= <15>
   Internal symbols: <[Lex-7]> ::= <[[\+]]>
 L0 R8 '*' ::= [\*]
-  Internal rule for single-quoted string '*'
   Symbol IDs: <10> ::= <14>
   Internal symbols: <[Lex-8]> ::= <[[\*]]>
 L0 R9 variable ::= [\w] +
@@ -515,62 +500,48 @@ L0 R12 <string contents> ::= [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}
   Symbol IDs: <32> ::= <20>
   Internal symbols: <string contents> ::= <[[^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}]]>
 L0 R13 :discard ::= whitespace
-  Discard rule for <whitespace>
   Symbol IDs: <0> ::= <33>
   Internal symbols: <[:discard]> ::= <whitespace>
 L0 R14 whitespace ::= [\s] +
   Symbol IDs: <33> ::= <18>
   Internal symbols: <whitespace> ::= <[[\s]]>
 L0 R15 :start_lex ::= :discard
-  Internal lexical start rule for <[:discard]>
   Symbol IDs: <1> ::= <0>
   Internal symbols: <[:start_lex]> ::= <[:discard]>
 L0 R16 :start_lex ::= 'set'
-  Internal lexical start rule for <[Lex-0]>
   Symbol IDs: <1> ::= <2>
   Internal symbols: <[:start_lex]> ::= <[Lex-0]>
 L0 R17 :start_lex ::= 'to'
-  Internal lexical start rule for <[Lex-1]>
   Symbol IDs: <1> ::= <3>
   Internal symbols: <[:start_lex]> ::= <[Lex-1]>
 L0 R18 :start_lex ::= '='
-  Internal lexical start rule for <[Lex-2]>
   Symbol IDs: <1> ::= <4>
   Internal symbols: <[:start_lex]> ::= <[Lex-2]>
 L0 R19 :start_lex ::= 'string'
-  Internal lexical start rule for <[Lex-3]>
   Symbol IDs: <1> ::= <5>
   Internal symbols: <[:start_lex]> ::= <[Lex-3]>
 L0 R20 :start_lex ::= '('
-  Internal lexical start rule for <[Lex-4]>
   Symbol IDs: <1> ::= <6>
   Internal symbols: <[:start_lex]> ::= <[Lex-4]>
 L0 R21 :start_lex ::= ')'
-  Internal lexical start rule for <[Lex-5]>
   Symbol IDs: <1> ::= <7>
   Internal symbols: <[:start_lex]> ::= <[Lex-5]>
 L0 R22 :start_lex ::= '+'
-  Internal lexical start rule for <[Lex-6]>
   Symbol IDs: <1> ::= <8>
   Internal symbols: <[:start_lex]> ::= <[Lex-6]>
 L0 R23 :start_lex ::= '+'
-  Internal lexical start rule for <[Lex-7]>
   Symbol IDs: <1> ::= <9>
   Internal symbols: <[:start_lex]> ::= <[Lex-7]>
 L0 R24 :start_lex ::= '*'
-  Internal lexical start rule for <[Lex-8]>
   Symbol IDs: <1> ::= <10>
   Internal symbols: <[:start_lex]> ::= <[Lex-8]>
 L0 R25 :start_lex ::= number
-  Internal lexical start rule for <number>
   Symbol IDs: <1> ::= <30>
   Internal symbols: <[:start_lex]> ::= <number>
 L0 R26 :start_lex ::= string
-  Internal lexical start rule for <string>
   Symbol IDs: <1> ::= <31>
   Internal symbols: <[:start_lex]> ::= <string>
 L0 R27 :start_lex ::= variable
-  Internal lexical start rule for <variable>
   Symbol IDs: <1> ::= <29>
   Internal symbols: <[:start_lex]> ::= <variable>
 END_OF_SHOW_RULES_OUTPUT
@@ -596,60 +567,60 @@ $show_symbols_output .= $grammar->show_symbols(3, 'L0');
 Marpa::R3::Test::is( $show_symbols_output,
     <<'END_OF_SHOW_SYMBOLS_OUTPUT', 'SLIF show_symbols()' );
 G1 Symbols:
-G1 S0 :start -- Internal G1 start symbol
+G1 S0 :start
   Internal name: <[:start]>
-G1 S1 'set' -- Internal lexical symbol for "'set'"
+G1 S1 'set'
   /* terminal */
   Internal name: <[Lex-0]>
   SLIF name: 'set'
-G1 S2 'to' -- Internal lexical symbol for "'to'"
+G1 S2 'to'
   /* terminal */
   Internal name: <[Lex-1]>
   SLIF name: 'to'
-G1 S3 '=' -- Internal lexical symbol for "'='"
+G1 S3 '='
   /* terminal */
   Internal name: <[Lex-2]>
   SLIF name: '='
-G1 S4 'string' -- Internal lexical symbol for "'string'"
+G1 S4 'string'
   /* terminal */
   Internal name: <[Lex-3]>
   SLIF name: 'string'
-G1 S5 '(' -- Internal lexical symbol for "'('"
+G1 S5 '('
   /* terminal */
   Internal name: <[Lex-4]>
   SLIF name: '('
-G1 S6 ')' -- Internal lexical symbol for "')'"
+G1 S6 ')'
   /* terminal */
   Internal name: <[Lex-5]>
   SLIF name: ')'
-G1 S7 '+' -- Internal lexical symbol for "'+'"
+G1 S7 '+'
   /* terminal */
   Internal name: <[Lex-6]>
   SLIF name: '+'
-G1 S8 '+' -- Internal lexical symbol for "'+'"
+G1 S8 '+'
   /* terminal */
   Internal name: <[Lex-7]>
   SLIF name: '+'
-G1 S9 '*' -- Internal lexical symbol for "'*'"
+G1 S9 '*'
   /* terminal */
   Internal name: <[Lex-8]>
   SLIF name: '*'
-G1 S10 expression -- <expression> at priority 0
+G1 S10 expression
   Internal name: <expression[0]>
   SLIF name: expression
-G1 S11 expression -- <expression> at priority 1
+G1 S11 expression
   Internal name: <expression[1]>
   SLIF name: expression
-G1 S12 expression -- <expression> at priority 2
+G1 S12 expression
   Internal name: <expression[2]>
   SLIF name: expression
-G1 S13 <numeric expression> -- <numeric expression> at priority 0
+G1 S13 <numeric expression>
   Internal name: <numeric expression[0]>
   SLIF name: numeric expression
-G1 S14 <numeric expression> -- <numeric expression> at priority 1
+G1 S14 <numeric expression>
   Internal name: <numeric expression[1]>
   SLIF name: numeric expression
-G1 S15 <numeric expression> -- <numeric expression> at priority 2
+G1 S15 <numeric expression>
   Internal name: <numeric expression[2]>
   SLIF name: numeric expression
 G1 S16 statements
@@ -674,106 +645,106 @@ G1 S24 number
   /* terminal */
   Internal name: <number>
 Lex (L0) Symbols:
-L0 S0 :discard -- Internal LHS for lexer discard
+L0 S0 :discard
   Internal name: <[:discard]>
-L0 S1 :start_lex -- Internal L0 (lexical) start symbol
+L0 S1 :start_lex
   Internal name: <[:start_lex]>
-L0 S2 'set' -- Internal lexical symbol for "'set'"
+L0 S2 'set'
   Internal name: <[Lex-0]>
   SLIF name: 'set'
-L0 S3 'to' -- Internal lexical symbol for "'to'"
+L0 S3 'to'
   Internal name: <[Lex-1]>
   SLIF name: 'to'
-L0 S4 '=' -- Internal lexical symbol for "'='"
+L0 S4 '='
   Internal name: <[Lex-2]>
   SLIF name: '='
-L0 S5 'string' -- Internal lexical symbol for "'string'"
+L0 S5 'string'
   Internal name: <[Lex-3]>
   SLIF name: 'string'
-L0 S6 '(' -- Internal lexical symbol for "'('"
+L0 S6 '('
   Internal name: <[Lex-4]>
   SLIF name: '('
-L0 S7 ')' -- Internal lexical symbol for "')'"
+L0 S7 ')'
   Internal name: <[Lex-5]>
   SLIF name: ')'
-L0 S8 '+' -- Internal lexical symbol for "'+'"
+L0 S8 '+'
   Internal name: <[Lex-6]>
   SLIF name: '+'
-L0 S9 '+' -- Internal lexical symbol for "'+'"
+L0 S9 '+'
   Internal name: <[Lex-7]>
   SLIF name: '+'
-L0 S10 '*' -- Internal lexical symbol for "'*'"
+L0 S10 '*'
   Internal name: <[Lex-8]>
   SLIF name: '*'
-L0 S11 ['] -- Character class: [']
+L0 S11 [']
   /* terminal */
   Internal name: <[[']]>
   SLIF name: [']
-L0 S12 [\(] -- Character class: [\(]
+L0 S12 [\(]
   /* terminal */
   Internal name: <[[\(]]>
   SLIF name: [\(]
-L0 S13 [\)] -- Character class: [\)]
+L0 S13 [\)]
   /* terminal */
   Internal name: <[[\)]]>
   SLIF name: [\)]
-L0 S14 [\*] -- Character class: [\*]
+L0 S14 [\*]
   /* terminal */
   Internal name: <[[\*]]>
   SLIF name: [\*]
-L0 S15 [\+] -- Character class: [\+]
+L0 S15 [\+]
   /* terminal */
   Internal name: <[[\+]]>
   SLIF name: [\+]
-L0 S16 [\=] -- Character class: [\=]
+L0 S16 [\=]
   /* terminal */
   Internal name: <[[\=]]>
   SLIF name: [\=]
-L0 S17 [\d] -- Character class: [\d]
+L0 S17 [\d]
   /* terminal */
   Internal name: <[[\d]]>
   SLIF name: [\d]
-L0 S18 [\s] -- Character class: [\s]
+L0 S18 [\s]
   /* terminal */
   Internal name: <[[\s]]>
   SLIF name: [\s]
-L0 S19 [\w] -- Character class: [\w]
+L0 S19 [\w]
   /* terminal */
   Internal name: <[[\w]]>
   SLIF name: [\w]
-L0 S20 [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] -- Character class: [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}]
+L0 S20 [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}]
   /* terminal */
   Internal name: <[[^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}]]>
   SLIF name: [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}]
-L0 S21 [e] -- Character class: [e]
+L0 S21 [e]
   /* terminal */
   Internal name: <[[e]]>
   SLIF name: [e]
-L0 S22 [g] -- Character class: [g]
+L0 S22 [g]
   /* terminal */
   Internal name: <[[g]]>
   SLIF name: [g]
-L0 S23 [i] -- Character class: [i]
+L0 S23 [i]
   /* terminal */
   Internal name: <[[i]]>
   SLIF name: [i]
-L0 S24 [n] -- Character class: [n]
+L0 S24 [n]
   /* terminal */
   Internal name: <[[n]]>
   SLIF name: [n]
-L0 S25 [o] -- Character class: [o]
+L0 S25 [o]
   /* terminal */
   Internal name: <[[o]]>
   SLIF name: [o]
-L0 S26 [r] -- Character class: [r]
+L0 S26 [r]
   /* terminal */
   Internal name: <[[r]]>
   SLIF name: [r]
-L0 S27 [s] -- Character class: [s]
+L0 S27 [s]
   /* terminal */
   Internal name: <[[s]]>
   SLIF name: [s]
-L0 S28 [t] -- Character class: [t]
+L0 S28 [t]
   /* terminal */
   Internal name: <[[t]]>
   SLIF name: [t]
@@ -951,15 +922,6 @@ for my $symbol_id ( $grammar->symbol_ids() ) {
 # Marpa::R3::Display::End
 
 # Marpa::R3::Display
-# name: SLG symbol_description() synopsis
-
-    my $description = $grammar->symbol_description($symbol_id)
-        // '[No description]';
-    $text .= "symbol number: $symbol_id  description $description\n";
-
-# Marpa::R3::Display::End
-
-# Marpa::R3::Display
 # name: SLG symbol_display_form() synopsis
 
     my $display_form = $grammar->symbol_display_form($symbol_id);
@@ -981,103 +943,78 @@ for my $symbol_id ( $grammar->symbol_ids() ) {
 
 Marpa::R3::Test::is( $text, <<'END_OF_TEXT', 'G1 symbol names and description');
 symbol number: 0  name: [:start]
-symbol number: 0  description Internal G1 start symbol
 symbol number: 0  name in display form: :start
 symbol number: 0  DSL form: [No name in DSL form]
 symbol number: 1  name: [Lex-0]
-symbol number: 1  description Internal lexical symbol for "'set'"
 symbol number: 1  name in display form: 'set'
 symbol number: 1  DSL form: 'set'
 symbol number: 2  name: [Lex-1]
-symbol number: 2  description Internal lexical symbol for "'to'"
 symbol number: 2  name in display form: 'to'
 symbol number: 2  DSL form: 'to'
 symbol number: 3  name: [Lex-2]
-symbol number: 3  description Internal lexical symbol for "'='"
 symbol number: 3  name in display form: '='
 symbol number: 3  DSL form: '='
 symbol number: 4  name: [Lex-3]
-symbol number: 4  description Internal lexical symbol for "'string'"
 symbol number: 4  name in display form: 'string'
 symbol number: 4  DSL form: 'string'
 symbol number: 5  name: [Lex-4]
-symbol number: 5  description Internal lexical symbol for "'('"
 symbol number: 5  name in display form: '('
 symbol number: 5  DSL form: '('
 symbol number: 6  name: [Lex-5]
-symbol number: 6  description Internal lexical symbol for "')'"
 symbol number: 6  name in display form: ')'
 symbol number: 6  DSL form: ')'
 symbol number: 7  name: [Lex-6]
-symbol number: 7  description Internal lexical symbol for "'+'"
 symbol number: 7  name in display form: '+'
 symbol number: 7  DSL form: '+'
 symbol number: 8  name: [Lex-7]
-symbol number: 8  description Internal lexical symbol for "'+'"
 symbol number: 8  name in display form: '+'
 symbol number: 8  DSL form: '+'
 symbol number: 9  name: [Lex-8]
-symbol number: 9  description Internal lexical symbol for "'*'"
 symbol number: 9  name in display form: '*'
 symbol number: 9  DSL form: '*'
 symbol number: 10  name: expression[0]
-symbol number: 10  description <expression> at priority 0
 symbol number: 10  name in display form: expression
 symbol number: 10  DSL form: expression
 symbol number: 11  name: expression[1]
-symbol number: 11  description <expression> at priority 1
 symbol number: 11  name in display form: expression
 symbol number: 11  DSL form: expression
 symbol number: 12  name: expression[2]
-symbol number: 12  description <expression> at priority 2
 symbol number: 12  name in display form: expression
 symbol number: 12  DSL form: expression
 symbol number: 13  name: numeric expression[0]
-symbol number: 13  description <numeric expression> at priority 0
 symbol number: 13  name in display form: <numeric expression>
 symbol number: 13  DSL form: numeric expression
 symbol number: 14  name: numeric expression[1]
-symbol number: 14  description <numeric expression> at priority 1
 symbol number: 14  name in display form: <numeric expression>
 symbol number: 14  DSL form: numeric expression
 symbol number: 15  name: numeric expression[2]
-symbol number: 15  description <numeric expression> at priority 2
 symbol number: 15  name in display form: <numeric expression>
 symbol number: 15  DSL form: numeric expression
 symbol number: 16  name: statements
-symbol number: 16  description [No description]
 symbol number: 16  name in display form: statements
 symbol number: 16  DSL form: [No name in DSL form]
 symbol number: 17  name: statement
-symbol number: 17  description [No description]
 symbol number: 17  name in display form: statement
 symbol number: 17  DSL form: [No name in DSL form]
 symbol number: 18  name: assignment
-symbol number: 18  description [No description]
 symbol number: 18  name in display form: assignment
 symbol number: 18  DSL form: [No name in DSL form]
 symbol number: 19  name: numeric assignment
-symbol number: 19  description [No description]
 symbol number: 19  name in display form: <numeric assignment>
 symbol number: 19  DSL form: [No name in DSL form]
 symbol number: 20  name: variable
-symbol number: 20  description [No description]
 symbol number: 20  name in display form: variable
 symbol number: 20  DSL form: [No name in DSL form]
 symbol number: 21  name: expression
-symbol number: 21  description [No description]
 symbol number: 21  name in display form: expression
 symbol number: 21  DSL form: [No name in DSL form]
 symbol number: 22  name: numeric expression
-symbol number: 22  description [No description]
 symbol number: 22  name in display form: <numeric expression>
 symbol number: 22  DSL form: [No name in DSL form]
 symbol number: 23  name: string
-symbol number: 23  description [No description]
 symbol number: 23  name in display form: string
 symbol number: 23  DSL form: [No name in DSL form]
 symbol number: 24  name: number
-symbol number: 24  description [No description]
 symbol number: 24  name in display form: number
 symbol number: 24  DSL form: [No name in DSL form]
 END_OF_TEXT
@@ -1178,15 +1115,6 @@ for my $symbol_id ( $grammar->symbol_ids('L0') ) {
 # Marpa::R3::Display::End
 
 # Marpa::R3::Display
-# name: SLG symbol_description() 2 arg synopsis
-
-    my $description = $grammar->symbol_description( $symbol_id, 'L0' )
-        // '[No description]';
-    $text .= "L0 symbol number: $symbol_id  description $description\n";
-
-# Marpa::R3::Display::End
-
-# Marpa::R3::Display
 # name: SLG symbol_display_form() 2 arg synopsis
 
     my $display_form = $grammar->symbol_display_form( $symbol_id, 'L0' );
@@ -1208,139 +1136,105 @@ for my $symbol_id ( $grammar->symbol_ids('L0') ) {
 
 Marpa::R3::Test::is( $text, <<'END_OF_TEXT', 'L0 symbol names and description');
 L0 symbol number: 0  name: [:discard]
-L0 symbol number: 0  description Internal LHS for lexer discard
 L0 symbol number: 0  name in display form: :discard
 L0 symbol number: 0  DSL form: [No name in DSL form]
 L0 symbol number: 1  name: [:start_lex]
-L0 symbol number: 1  description Internal L0 (lexical) start symbol
 L0 symbol number: 1  name in display form: :start_lex
 L0 symbol number: 1  DSL form: [No name in DSL form]
 L0 symbol number: 2  name: [Lex-0]
-L0 symbol number: 2  description Internal lexical symbol for "'set'"
 L0 symbol number: 2  name in display form: 'set'
 L0 symbol number: 2  DSL form: 'set'
 L0 symbol number: 3  name: [Lex-1]
-L0 symbol number: 3  description Internal lexical symbol for "'to'"
 L0 symbol number: 3  name in display form: 'to'
 L0 symbol number: 3  DSL form: 'to'
 L0 symbol number: 4  name: [Lex-2]
-L0 symbol number: 4  description Internal lexical symbol for "'='"
 L0 symbol number: 4  name in display form: '='
 L0 symbol number: 4  DSL form: '='
 L0 symbol number: 5  name: [Lex-3]
-L0 symbol number: 5  description Internal lexical symbol for "'string'"
 L0 symbol number: 5  name in display form: 'string'
 L0 symbol number: 5  DSL form: 'string'
 L0 symbol number: 6  name: [Lex-4]
-L0 symbol number: 6  description Internal lexical symbol for "'('"
 L0 symbol number: 6  name in display form: '('
 L0 symbol number: 6  DSL form: '('
 L0 symbol number: 7  name: [Lex-5]
-L0 symbol number: 7  description Internal lexical symbol for "')'"
 L0 symbol number: 7  name in display form: ')'
 L0 symbol number: 7  DSL form: ')'
 L0 symbol number: 8  name: [Lex-6]
-L0 symbol number: 8  description Internal lexical symbol for "'+'"
 L0 symbol number: 8  name in display form: '+'
 L0 symbol number: 8  DSL form: '+'
 L0 symbol number: 9  name: [Lex-7]
-L0 symbol number: 9  description Internal lexical symbol for "'+'"
 L0 symbol number: 9  name in display form: '+'
 L0 symbol number: 9  DSL form: '+'
 L0 symbol number: 10  name: [Lex-8]
-L0 symbol number: 10  description Internal lexical symbol for "'*'"
 L0 symbol number: 10  name in display form: '*'
 L0 symbol number: 10  DSL form: '*'
 L0 symbol number: 11  name: [[']]
-L0 symbol number: 11  description Character class: [']
 L0 symbol number: 11  name in display form: [']
 L0 symbol number: 11  DSL form: [']
 L0 symbol number: 12  name: [[\(]]
-L0 symbol number: 12  description Character class: [\(]
 L0 symbol number: 12  name in display form: [\(]
 L0 symbol number: 12  DSL form: [\(]
 L0 symbol number: 13  name: [[\)]]
-L0 symbol number: 13  description Character class: [\)]
 L0 symbol number: 13  name in display form: [\)]
 L0 symbol number: 13  DSL form: [\)]
 L0 symbol number: 14  name: [[\*]]
-L0 symbol number: 14  description Character class: [\*]
 L0 symbol number: 14  name in display form: [\*]
 L0 symbol number: 14  DSL form: [\*]
 L0 symbol number: 15  name: [[\+]]
-L0 symbol number: 15  description Character class: [\+]
 L0 symbol number: 15  name in display form: [\+]
 L0 symbol number: 15  DSL form: [\+]
 L0 symbol number: 16  name: [[\=]]
-L0 symbol number: 16  description Character class: [\=]
 L0 symbol number: 16  name in display form: [\=]
 L0 symbol number: 16  DSL form: [\=]
 L0 symbol number: 17  name: [[\d]]
-L0 symbol number: 17  description Character class: [\d]
 L0 symbol number: 17  name in display form: [\d]
 L0 symbol number: 17  DSL form: [\d]
 L0 symbol number: 18  name: [[\s]]
-L0 symbol number: 18  description Character class: [\s]
 L0 symbol number: 18  name in display form: [\s]
 L0 symbol number: 18  DSL form: [\s]
 L0 symbol number: 19  name: [[\w]]
-L0 symbol number: 19  description Character class: [\w]
 L0 symbol number: 19  name in display form: [\w]
 L0 symbol number: 19  DSL form: [\w]
 L0 symbol number: 20  name: [[^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}]]
-L0 symbol number: 20  description Character class: [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}]
 L0 symbol number: 20  name in display form: [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}]
 L0 symbol number: 20  DSL form: [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}]
 L0 symbol number: 21  name: [[e]]
-L0 symbol number: 21  description Character class: [e]
 L0 symbol number: 21  name in display form: [e]
 L0 symbol number: 21  DSL form: [e]
 L0 symbol number: 22  name: [[g]]
-L0 symbol number: 22  description Character class: [g]
 L0 symbol number: 22  name in display form: [g]
 L0 symbol number: 22  DSL form: [g]
 L0 symbol number: 23  name: [[i]]
-L0 symbol number: 23  description Character class: [i]
 L0 symbol number: 23  name in display form: [i]
 L0 symbol number: 23  DSL form: [i]
 L0 symbol number: 24  name: [[n]]
-L0 symbol number: 24  description Character class: [n]
 L0 symbol number: 24  name in display form: [n]
 L0 symbol number: 24  DSL form: [n]
 L0 symbol number: 25  name: [[o]]
-L0 symbol number: 25  description Character class: [o]
 L0 symbol number: 25  name in display form: [o]
 L0 symbol number: 25  DSL form: [o]
 L0 symbol number: 26  name: [[r]]
-L0 symbol number: 26  description Character class: [r]
 L0 symbol number: 26  name in display form: [r]
 L0 symbol number: 26  DSL form: [r]
 L0 symbol number: 27  name: [[s]]
-L0 symbol number: 27  description Character class: [s]
 L0 symbol number: 27  name in display form: [s]
 L0 symbol number: 27  DSL form: [s]
 L0 symbol number: 28  name: [[t]]
-L0 symbol number: 28  description Character class: [t]
 L0 symbol number: 28  name in display form: [t]
 L0 symbol number: 28  DSL form: [t]
 L0 symbol number: 29  name: variable
-L0 symbol number: 29  description [No description]
 L0 symbol number: 29  name in display form: variable
 L0 symbol number: 29  DSL form: [No name in DSL form]
 L0 symbol number: 30  name: number
-L0 symbol number: 30  description [No description]
 L0 symbol number: 30  name in display form: number
 L0 symbol number: 30  DSL form: [No name in DSL form]
 L0 symbol number: 31  name: string
-L0 symbol number: 31  description [No description]
 L0 symbol number: 31  name in display form: string
 L0 symbol number: 31  DSL form: [No name in DSL form]
 L0 symbol number: 32  name: string contents
-L0 symbol number: 32  description [No description]
 L0 symbol number: 32  name in display form: <string contents>
 L0 symbol number: 32  DSL form: [No name in DSL form]
 L0 symbol number: 33  name: whitespace
-L0 symbol number: 33  description [No description]
 L0 symbol number: 33  name in display form: whitespace
 L0 symbol number: 33  DSL form: [No name in DSL form]
 END_OF_TEXT

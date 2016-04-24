@@ -49,7 +49,7 @@ my $grammar = Marpa::R3::Scanless::G->new( { source => \$dsl } );
 
 Marpa::R3::Test::is( $grammar->show_symbols(),
     <<'END_OF_STRING', 'Leo166 Symbols' );
-G1 S0 :start -- Internal G1 start symbol
+G1 S0 :start
 G1 S1 S
 G1 S2 a
 END_OF_STRING

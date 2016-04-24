@@ -89,7 +89,7 @@ my $show_symbols_output = $grammar->show_symbols();
 
 Marpa::R3::Test::is( $show_symbols_output,
     <<'END_SYMBOLS', 'Leo Example Symbols' );
-G1 S0 :start -- Internal G1 start symbol
+G1 S0 :start
 G1 S1 Statement
 G1 S2 Expression
 G1 S3 Lvalue

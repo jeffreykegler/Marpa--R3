@@ -36,8 +36,7 @@ use constant LEXEME_SEMANTICS => 2;
 use constant DISPLAY_FORM => 3;
 use constant DSL_FORM => 4;
 use constant LEGACY_NAME => 5;
-use constant DESCRIPTION => 6;
-use constant IF_INACCESSIBLE => 7;
+use constant IF_INACCESSIBLE => 6;
 
 package Marpa::R3::Internal::Rule;
 use constant ID => 0;
@@ -47,7 +46,6 @@ use constant MASK => 3;
 use constant SLIF_TAG => 4;
 use constant ACTION_NAME => 5;
 use constant BLESSING => 6;
-use constant DESCRIPTION => 7;
 
 package Marpa::R3::Internal::Grammar;
 use constant C => 0;
