@@ -53,7 +53,7 @@ static int currentline (lua_State *L, CallInfo *ci) {
 /*
 ** this function can be called asynchronous (e.g. during a signal)
 */
-LUA_API int lua_sethook (lua_State *L, lua_Hook func, int mask, int count) {
+LUA_API int marpa_lua_sethook (lua_State *L, lua_Hook func, int mask, int count) {
   if (func == NULL || mask == 0) {  /* turn off hooks? */
     mask = 0;
     func = NULL;
@@ -66,22 +66,22 @@ LUA_API int lua_sethook (lua_State *L, lua_Hook func, int mask, int count) {
 }
 
 
-LUA_API lua_Hook lua_gethook (lua_State *L) {
+LUA_API lua_Hook marpa_lua_gethook (lua_State *L) {
   return L->hook;
 }
 
 
-LUA_API int lua_gethookmask (lua_State *L) {
+LUA_API int marpa_lua_gethookmask (lua_State *L) {
   return L->hookmask;
 }
 
 
-LUA_API int lua_gethookcount (lua_State *L) {
+LUA_API int marpa_lua_gethookcount (lua_State *L) {
   return L->basehookcount;
 }
 
 
-LUA_API int lua_getstack (lua_State *L, int level, lua_Debug *ar) {
+LUA_API int marpa_lua_getstack (lua_State *L, int level, lua_Debug *ar) {
   int status;
   CallInfo *ci;
   lua_lock(L);
@@ -124,7 +124,7 @@ static const char *findlocal (lua_State *L, CallInfo *ci, int n) {
 }
 
 
-LUA_API const char *lua_getlocal (lua_State *L, const lua_Debug *ar, int n) {
+LUA_API const char *marpa_lua_getlocal (lua_State *L, const lua_Debug *ar, int n) {
   CallInfo *ci = L->base_ci + ar->i_ci;
   const char *name = findlocal(L, ci, n);
   lua_lock(L);
@@ -135,7 +135,7 @@ LUA_API const char *lua_getlocal (lua_State *L, const lua_Debug *ar, int n) {
 }
 
 
-LUA_API const char *lua_setlocal (lua_State *L, const lua_Debug *ar, int n) {
+LUA_API const char *marpa_lua_setlocal (lua_State *L, const lua_Debug *ar, int n) {
   CallInfo *ci = L->base_ci + ar->i_ci;
   const char *name = findlocal(L, ci, n);
   lua_lock(L);
@@ -220,7 +220,7 @@ static int auxgetinfo (lua_State *L, const char *what, lua_Debug *ar,
         break;
       }
       case 'L':
-      case 'f':  /* handled by lua_getinfo */
+      case 'f':  /* handled by marpa_lua_getinfo */
         break;
       default: status = 0;  /* invalid option */
     }
@@ -229,7 +229,7 @@ static int auxgetinfo (lua_State *L, const char *what, lua_Debug *ar,
 }
 
 
-LUA_API int lua_getinfo (lua_State *L, const char *what, lua_Debug *ar) {
+LUA_API int marpa_lua_getinfo (lua_State *L, const char *what, lua_Debug *ar) {
   int status;
   Closure *f = NULL;
   CallInfo *ci = NULL;
@@ -566,7 +566,7 @@ static int isinstack (CallInfo *ci, const TValue *o) {
 
 void luaG_typeerror (lua_State *L, const TValue *o, const char *op) {
   const char *name = NULL;
-  const char *t = luaT_typenames[ttype(o)];
+  const char *t = marpa_luaT_typenames[ttype(o)];
   const char *kind = (isinstack(L->ci, o)) ?
                          getobjname(L, L->ci, cast_int(o - L->base), &name) :
                          NULL;
@@ -594,8 +594,8 @@ void luaG_aritherror (lua_State *L, const TValue *p1, const TValue *p2) {
 
 
 int luaG_ordererror (lua_State *L, const TValue *p1, const TValue *p2) {
-  const char *t1 = luaT_typenames[ttype(p1)];
-  const char *t2 = luaT_typenames[ttype(p2)];
+  const char *t1 = marpa_luaT_typenames[ttype(p1)];
+  const char *t2 = marpa_luaT_typenames[ttype(p2)];
   if (t1[2] == t2[2])
     luaG_runerror(L, "attempt to compare two %s values", t1);
   else

@@ -87,7 +87,7 @@ static void PrintCode(const Proto* f)
   int line=getline(f,pc);
   printf("\t%d\t",pc+1);
   if (line>0) printf("[%d]\t",line); else printf("[-]\t");
-  printf("%-9s\t",luaP_opnames[o]);
+  printf("%-9s\t",marpa_luaP_opnames[o]);
   switch (getOpMode(o))
   {
    case iABC:

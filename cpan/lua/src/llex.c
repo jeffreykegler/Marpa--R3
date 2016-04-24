@@ -34,7 +34,7 @@
 
 
 /* ORDER RESERVED */
-const char *const luaX_tokens [] = {
+const char *const marpa_luaX_tokens [] = {
     "and", "break", "do", "else", "elseif",
     "end", "false", "for", "function", "if",
     "in", "local", "nil", "not", "or", "repeat",
@@ -64,9 +64,9 @@ static void save (LexState *ls, int c) {
 void luaX_init (lua_State *L) {
   int i;
   for (i=0; i<NUM_RESERVED; i++) {
-    TString *ts = luaS_new(L, luaX_tokens[i]);
+    TString *ts = luaS_new(L, marpa_luaX_tokens[i]);
     luaS_fix(ts);  /* reserved words are never collected */
-    lua_assert(strlen(luaX_tokens[i])+1 <= TOKEN_LEN);
+    lua_assert(strlen(marpa_luaX_tokens[i])+1 <= TOKEN_LEN);
     ts->tsv.reserved = cast_byte(i+1);  /* reserved word */
   }
 }
@@ -82,7 +82,7 @@ const char *luaX_token2str (LexState *ls, int token) {
                               luaO_pushfstring(ls->L, "%c", token);
   }
   else
-    return luaX_tokens[token-FIRST_RESERVED];
+    return marpa_luaX_tokens[token-FIRST_RESERVED];
 }
 
 

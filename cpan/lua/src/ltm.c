@@ -20,7 +20,7 @@
 
 
 
-const char *const luaT_typenames[] = {
+const char *const marpa_luaT_typenames[] = {
   "nil", "boolean", "userdata", "number",
   "string", "table", "function", "userdata", "thread",
   "proto", "upval"

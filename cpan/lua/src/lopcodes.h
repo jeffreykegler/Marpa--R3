@@ -249,16 +249,16 @@ enum OpArgMask {
   OpArgK   /* argument is a constant or register/constant */
 };
 
-LUAI_DATA const lu_byte luaP_opmodes[NUM_OPCODES];
+LUAI_DATA const lu_byte marpa_luaP_opmodes[NUM_OPCODES];
 
-#define getOpMode(m)	(cast(enum OpMode, luaP_opmodes[m] & 3))
-#define getBMode(m)	(cast(enum OpArgMask, (luaP_opmodes[m] >> 4) & 3))
-#define getCMode(m)	(cast(enum OpArgMask, (luaP_opmodes[m] >> 2) & 3))
-#define testAMode(m)	(luaP_opmodes[m] & (1 << 6))
-#define testTMode(m)	(luaP_opmodes[m] & (1 << 7))
+#define getOpMode(m)	(cast(enum OpMode, marpa_luaP_opmodes[m] & 3))
+#define getBMode(m)	(cast(enum OpArgMask, (marpa_luaP_opmodes[m] >> 4) & 3))
+#define getCMode(m)	(cast(enum OpArgMask, (marpa_luaP_opmodes[m] >> 2) & 3))
+#define testAMode(m)	(marpa_luaP_opmodes[m] & (1 << 6))
+#define testTMode(m)	(marpa_luaP_opmodes[m] & (1 << 7))
 
 
-LUAI_DATA const char *const luaP_opnames[NUM_OPCODES+1];  /* opcode names */
+LUAI_DATA const char *const marpa_luaP_opnames[NUM_OPCODES+1];  /* opcode names */
 
 
 /* number of list items to accumulate before a SETLIST instruction */

@@ -415,7 +415,7 @@ static int resume_error (lua_State *L, const char *msg) {
 }
 
 
-LUA_API int lua_resume (lua_State *L, int nargs) {
+LUA_API int marpa_lua_resume (lua_State *L, int nargs) {
   int status;
   lua_lock(L);
   if (L->status != LUA_YIELD && (L->status != 0 || L->ci != L->base_ci))
@@ -441,7 +441,7 @@ LUA_API int lua_resume (lua_State *L, int nargs) {
 }
 
 
-LUA_API int lua_yield (lua_State *L, int nresults) {
+LUA_API int marpa_lua_yield (lua_State *L, int nresults) {
   luai_userstateyield(L, nresults);
   lua_lock(L);
   if (L->nCcalls > L->baseCcalls)

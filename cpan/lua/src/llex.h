@@ -37,7 +37,7 @@ enum RESERVED {
 
 
 /* array with token `names' */
-LUAI_DATA const char *const luaX_tokens [];
+LUAI_DATA const char *const marpa_luaX_tokens [];
 
 
 typedef union {

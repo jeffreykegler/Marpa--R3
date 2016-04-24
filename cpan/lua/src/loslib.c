@@ -23,20 +23,20 @@
 static int os_pushresult (lua_State *L, int i, const char *filename) {
   int en = errno;  /* calls to Lua API may change this value */
   if (i) {
-    lua_pushboolean(L, 1);
+    marpa_lua_pushboolean(L, 1);
     return 1;
   }
   else {
-    lua_pushnil(L);
-    lua_pushfstring(L, "%s: %s", filename, strerror(en));
-    lua_pushinteger(L, en);
+    marpa_lua_pushnil(L);
+    marpa_lua_pushfstring(L, "%s: %s", filename, strerror(en));
+    marpa_lua_pushinteger(L, en);
     return 3;
   }
 }
 
 
 static int os_execute (lua_State *L) {
-  lua_pushinteger(L, system(luaL_optstring(L, 1, NULL)));
+  marpa_lua_pushinteger(L, system(luaL_optstring(L, 1, NULL)));
   return 1;
 }
 
@@ -59,20 +59,20 @@ static int os_tmpname (lua_State *L) {
   int err;
   lua_tmpnam(buff, err);
   if (err)
-    return luaL_error(L, "unable to generate a unique filename");
-  lua_pushstring(L, buff);
+    return marpa_luaL_error(L, "unable to generate a unique filename");
+  marpa_lua_pushstring(L, buff);
   return 1;
 }
 
 
 static int os_getenv (lua_State *L) {
-  lua_pushstring(L, getenv(luaL_checkstring(L, 1)));  /* if NULL push nil */
+  marpa_lua_pushstring(L, getenv(luaL_checkstring(L, 1)));  /* if NULL push nil */
   return 1;
 }
 
 
 static int os_clock (lua_State *L) {
-  lua_pushnumber(L, ((lua_Number)clock())/(lua_Number)CLOCKS_PER_SEC);
+  marpa_lua_pushnumber(L, ((lua_Number)clock())/(lua_Number)CLOCKS_PER_SEC);
   return 1;
 }
 
@@ -86,21 +86,21 @@ static int os_clock (lua_State *L) {
 */
 
 static void setfield (lua_State *L, const char *key, int value) {
-  lua_pushinteger(L, value);
-  lua_setfield(L, -2, key);
+  marpa_lua_pushinteger(L, value);
+  marpa_lua_setfield(L, -2, key);
 }
 
 static void setboolfield (lua_State *L, const char *key, int value) {
   if (value < 0)  /* undefined? */
     return;  /* does not set field */
-  lua_pushboolean(L, value);
-  lua_setfield(L, -2, key);
+  marpa_lua_pushboolean(L, value);
+  marpa_lua_setfield(L, -2, key);
 }
 
 static int getboolfield (lua_State *L, const char *key) {
   int res;
-  lua_getfield(L, -1, key);
-  res = lua_isnil(L, -1) ? -1 : lua_toboolean(L, -1);
+  marpa_lua_getfield(L, -1, key);
+  res = lua_isnil(L, -1) ? -1 : marpa_lua_toboolean(L, -1);
   lua_pop(L, 1);
   return res;
 }
@@ -108,12 +108,12 @@ static int getboolfield (lua_State *L, const char *key) {
 
 static int getfield (lua_State *L, const char *key, int d) {
   int res;
-  lua_getfield(L, -1, key);
-  if (lua_isnumber(L, -1))
-    res = (int)lua_tointeger(L, -1);
+  marpa_lua_getfield(L, -1, key);
+  if (marpa_lua_isnumber(L, -1))
+    res = (int)marpa_lua_tointeger(L, -1);
   else {
     if (d < 0)
-      return luaL_error(L, "field " LUA_QS " missing in date table", key);
+      return marpa_luaL_error(L, "field " LUA_QS " missing in date table", key);
     res = d;
   }
   lua_pop(L, 1);
@@ -123,7 +123,7 @@ static int getfield (lua_State *L, const char *key, int d) {
 
 static int os_date (lua_State *L) {
   const char *s = luaL_optstring(L, 1, "%c");
-  time_t t = luaL_opt(L, (time_t)luaL_checknumber, 2, time(NULL));
+  time_t t = luaL_opt(L, (time_t)marpa_luaL_checknumber, 2, time(NULL));
   struct tm *stm;
   if (*s == '!') {  /* UTC? */
     stm = gmtime(&t);
@@ -132,9 +132,9 @@ static int os_date (lua_State *L) {
   else
     stm = localtime(&t);
   if (stm == NULL)  /* invalid date? */
-    lua_pushnil(L);
+    marpa_lua_pushnil(L);
   else if (strcmp(s, "*t") == 0) {
-    lua_createtable(L, 0, 9);  /* 9 = number of fields */
+    marpa_lua_createtable(L, 0, 9);  /* 9 = number of fields */
     setfield(L, "sec", stm->tm_sec);
     setfield(L, "min", stm->tm_min);
     setfield(L, "hour", stm->tm_hour);
@@ -149,7 +149,7 @@ static int os_date (lua_State *L) {
     char cc[3];
     luaL_Buffer b;
     cc[0] = '%'; cc[2] = '\0';
-    luaL_buffinit(L, &b);
+    marpa_luaL_buffinit(L, &b);
     for (; *s; s++) {
       if (*s != '%' || *(s + 1) == '\0')  /* no conversion specifier? */
         luaL_addchar(&b, *s);
@@ -158,10 +158,10 @@ static int os_date (lua_State *L) {
         char buff[200];  /* should be big enough for any conversion result */
         cc[1] = *(++s);
         reslen = strftime(buff, sizeof(buff), cc, stm);
-        luaL_addlstring(&b, buff, reslen);
+        marpa_luaL_addlstring(&b, buff, reslen);
       }
     }
-    luaL_pushresult(&b);
+    marpa_luaL_pushresult(&b);
   }
   return 1;
 }
@@ -173,8 +173,8 @@ static int os_time (lua_State *L) {
     t = time(NULL);  /* get current time */
   else {
     struct tm ts;
-    luaL_checktype(L, 1, LUA_TTABLE);
-    lua_settop(L, 1);  /* make sure table is at the top */
+    marpa_luaL_checktype(L, 1, LUA_TTABLE);
+    marpa_lua_settop(L, 1);  /* make sure table is at the top */
     ts.tm_sec = getfield(L, "sec", 0);
     ts.tm_min = getfield(L, "min", 0);
     ts.tm_hour = getfield(L, "hour", 12);
@@ -185,16 +185,16 @@ static int os_time (lua_State *L) {
     t = mktime(&ts);
   }
   if (t == (time_t)(-1))
-    lua_pushnil(L);
+    marpa_lua_pushnil(L);
   else
-    lua_pushnumber(L, (lua_Number)t);
+    marpa_lua_pushnumber(L, (lua_Number)t);
   return 1;
 }
 
 
 static int os_difftime (lua_State *L) {
-  lua_pushnumber(L, difftime((time_t)(luaL_checknumber(L, 1)),
-                             (time_t)(luaL_optnumber(L, 2, 0))));
+  marpa_lua_pushnumber(L, difftime((time_t)(marpa_luaL_checknumber(L, 1)),
+                             (time_t)(marpa_luaL_optnumber(L, 2, 0))));
   return 1;
 }
 
@@ -207,8 +207,8 @@ static int os_setlocale (lua_State *L) {
   static const char *const catnames[] = {"all", "collate", "ctype", "monetary",
      "numeric", "time", NULL};
   const char *l = luaL_optstring(L, 1, NULL);
-  int op = luaL_checkoption(L, 2, "all", catnames);
-  lua_pushstring(L, setlocale(cat[op], l));
+  int op = marpa_luaL_checkoption(L, 2, "all", catnames);
+  marpa_lua_pushstring(L, setlocale(cat[op], l));
   return 1;
 }
 
@@ -236,8 +236,8 @@ static const luaL_Reg syslib[] = {
 
 
 
-LUALIB_API int luaopen_os (lua_State *L) {
-  luaL_register(L, LUA_OSLIBNAME, syslib);
+LUALIB_API int marpa_luaopen_os (lua_State *L) {
+  marpa_luaL_register(L, LUA_OSLIBNAME, syslib);
   return 1;
 }
 

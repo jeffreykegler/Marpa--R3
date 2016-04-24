@@ -136,7 +136,7 @@
 
 
 /*
-@@ LUA_INTEGER is the integral type used by lua_pushinteger/lua_tointeger.
+@@ LUA_INTEGER is the integral type used by marpa_lua_pushinteger/marpa_lua_tointeger.
 ** CHANGE that if ptrdiff_t is not adequate on your machine. (On most
 ** machines, ptrdiff_t gives a good choice between int or long.)
 */
@@ -358,10 +358,10 @@
 #define LUA_COMPAT_GFIND
 
 /*
-@@ LUA_COMPAT_OPENLIB controls compatibility with old 'luaL_openlib'
+@@ LUA_COMPAT_OPENLIB controls compatibility with old 'marpa_luaL_openlib'
 @* behavior.
-** CHANGE it to undefined as soon as you replace to 'luaL_register'
-** your uses of 'luaL_openlib'
+** CHANGE it to undefined as soon as you replace to 'marpa_luaL_register'
+** your uses of 'marpa_luaL_openlib'
 */
 #define LUA_COMPAT_OPENLIB
 
@@ -678,7 +678,7 @@ union luai_Cast { double l_d; long l_l; };
 #else
 
 #define lua_popen(L,c,m)	((void)((void)c, m),  \
-		luaL_error(L, LUA_QL("popen") " not supported"), (FILE*)0)
+		marpa_luaL_error(L, LUA_QL("popen") " not supported"), (FILE*)0)
 #define lua_pclose(L,file)		((void)((void)L, file), 0)
 
 #endif

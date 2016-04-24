@@ -360,9 +360,9 @@ typedef struct Table {
 #define sizenode(t)	(twoto((t)->lsizenode))
 
 
-#define luaO_nilobject		(&luaO_nilobject_)
+#define luaO_nilobject		(&marpa_luaO_nilobject_)
 
-LUAI_DATA const TValue luaO_nilobject_;
+LUAI_DATA const TValue marpa_luaO_nilobject_;
 
 #define ceillog2(x)	(luaO_log2((x)-1) + 1)
 
