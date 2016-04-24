@@ -185,9 +185,7 @@ sub Marpa::R3::Grammar::symbol_in_display_form {
     my $symbols   = $grammar->[Marpa::R3::Internal::Grammar::SYMBOLS];
     my $symbol = $symbols->[$symbol_id];
     return "<!No symbol with ID $symbol_id!>" if not defined $symbol;
-    my $text = $symbol->[Marpa::R3::Internal::Symbol::DISPLAY_FORM];
-    return $text if defined $text;
-    $text = $symbol->[Marpa::R3::Internal::Symbol::DSL_FORM] //
+    my $text = $symbol->[Marpa::R3::Internal::Symbol::DSL_FORM] //
      $grammar->symbol_name($symbol_id);
     return ($text =~ m/\s/xms) ? "<$text>" : $text;
 }

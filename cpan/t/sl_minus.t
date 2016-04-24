@@ -111,7 +111,7 @@ G1 R2 E ::= MinusMinus E
 G1 R3 E ::= Minus E
 G1 R4 E ::= Number
 G1 R5 MinusMinus ::= Minus Minus
-G1 R6 :start ::= E
+G1 R6 [:start] ::= E
 END_RULES
 
 Marpa::R3::Test::is( $grammar->show_ahms,

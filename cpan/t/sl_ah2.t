@@ -58,12 +58,12 @@ Marpa::R3::Test::is( $grammar->show_rules, <<'EOS', 'Aycock/Horspool Rules' );
 G1 R0 S ::= A A A A
 G1 R1 A ::=
 G1 R2 A ::= 'a'
-G1 R3 :start ::= S
+G1 R3 [:start] ::= S
 EOS
 
 Marpa::R3::Test::is( $grammar->show_symbols,
     <<'EOS', 'Aycock/Horspool Symbols' );
-G1 S0 :start
+G1 S0 [:start]
 G1 S1 'a'
 G1 S2 S
 G1 S3 A

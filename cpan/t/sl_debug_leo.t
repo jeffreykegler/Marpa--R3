@@ -69,7 +69,7 @@ P5 @20-20 L1c20 Lower_Middle -> . Bottom
 F5 @19-20 L1c19-20 Lower_Middle -> Bottom .
 P6 @20-20 L1c20 Bottom -> . T
 F6 @19-20 L1c19-20 Bottom -> T .
-F7 @0-20 L1c1-20 :start -> S .
+F7 @0-20 L1c1-20 [:start] -> S .
 END_PROGRESS_REPORT
 
 # vim: expandtab shiftwidth=4:

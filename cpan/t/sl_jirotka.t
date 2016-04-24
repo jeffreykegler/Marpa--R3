@@ -86,7 +86,7 @@ my $input = q{Create Metric m As Select 1 Where True};
 Marpa::R3::Test::is(
     $grammar->show_symbols(),
     <<'END_OF_SYMBOLS', 'Symbols' );
-G1 S0 :start
+G1 S0 [:start]
 G1 S1 Input
 G1 S2 Statement
 G1 S3 SEPARATOR
@@ -130,7 +130,7 @@ G1 R11 FilterExpr ::= TRUE
 G1 R12 FilterExpr ::= FALSE
 G1 R13 WithPf ::=
 G1 R14 WithPf ::= WITH PF
-G1 R15 :start ::= Input
+G1 R15 [:start] ::= Input
 END_OF_RULES
 
 Marpa::R3::Test::is( $grammar->show_ahms(),

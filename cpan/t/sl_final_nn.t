@@ -64,7 +64,7 @@ G1 R0 S ::= p p p n
 G1 R1 p ::= a
 G1 R2 p ::=
 G1 R3 n ::= a
-G1 R4 :start ::= S
+G1 R4 [:start] ::= S
 END_OF_STRING
 
 Marpa::R3::Test::is( $grammar->show_ahms,

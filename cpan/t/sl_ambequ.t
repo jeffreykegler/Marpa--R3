@@ -106,7 +106,7 @@ restore_stdout();
 
 Marpa::R3::Test::is( ${$actual_ref},
     <<'END_SYMBOLS', 'Ambiguous Equation Symbols' );
-G1 S0 :start
+G1 S0 [:start]
 G1 S1 E
 G1 S2 Op
 G1 S3 Number
@@ -123,7 +123,7 @@ Marpa::R3::Test::is( ${$actual_ref},
     <<'END_RULES', 'Ambiguous Equation Rules' );
 G1 R0 E ::= E Op E
 G1 R1 E ::= Number
-G1 R2 :start ::= E
+G1 R2 [:start] ::= E
 END_RULES
 
 $actual_ref = save_stdout();
@@ -315,7 +315,7 @@ Marpa::R3::Test::is( ${$actual_ref},
 R0:1 x4 @0...6-7 L1c1-7 E -> E . Op E
 F0 x3 @0,2,4-7 L1c1-7 E -> E Op E .
 F1 @6-7 L1c6-7 E -> Number .
-F2 @0-7 L1c1-7 :start -> E .
+F2 @0-7 L1c1-7 [:start] -> E .
 END_OF_PROGRESS_REPORT
 
 restore_stdout();

@@ -89,7 +89,7 @@ my $show_symbols_output = $grammar->show_symbols();
 
 Marpa::R3::Test::is( $show_symbols_output,
     <<'END_SYMBOLS', 'Leo Example Symbols' );
-G1 S0 :start
+G1 S0 [:start]
 G1 S1 Statement
 G1 S2 Expression
 G1 S3 Lvalue
@@ -110,7 +110,7 @@ G1 R3 Expression ::= Lvalue MinusAssignOp Expression
 G1 R4 Expression ::= Lvalue MultiplyAssignOp Expression
 G1 R5 Expression ::= Variable
 G1 R6 Lvalue ::= Variable
-G1 R7 :start ::= Statement
+G1 R7 [:start] ::= Statement
 END_RULES
 
 my $show_ahms_output = $grammar->show_ahms();

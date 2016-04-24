@@ -157,7 +157,7 @@ P1 @0-0 L0c0 statement -> . assignment
 P2 @0-0 L0c0 statement -> . <numeric assignment>
 P3 @0-0 L0c0 assignment -> . 'set' variable 'to' expression
 P4 @0-0 L0c0 <numeric assignment> -> . variable '=' expression
-P19 @0-0 L0c0 :start -> . statements
+P19 @0-0 L0c0 [:start] -> . statements
 R4:1 @0-1 L1c1 <numeric assignment> -> variable . '=' expression
 R4:2 @0-2 L1c1-3 <numeric assignment> -> variable '=' . expression
 P5 @2-2 L1c3 expression -> . expression
@@ -180,7 +180,7 @@ F6 @2-3 L1c3-11 expression -> expression .
 F7 @2-3 L1c3-11 expression -> expression .
 F8 @2-3 L1c3-11 expression -> variable .
 R11:1 @2-3 L1c3-11 expression -> expression . '+' expression
-F19 @0-3 L1c1-11 :start -> statements .
+F19 @0-3 L1c1-11 [:start] -> statements .
 P7 @4-4 L1c13 expression -> . expression
 P8 @4-4 L1c13 expression -> . variable
 P9 @4-4 L1c13 expression -> . string
@@ -199,7 +199,7 @@ F7 @4-5 L1c13-16 expression -> expression .
 F8 @4-5 L1c13-16 expression -> variable .
 R11:1 @2-5 L1c3-16 expression -> expression . '+' expression
 F11 @2-5 L1c3-16 expression -> expression '+' expression .
-F19 @0-5 L1c1-16 :start -> statements .
+F19 @0-5 L1c1-16 [:start] -> statements .
 END_PROGRESS_REPORT
 
 # Marpa::R3::Display::End
@@ -456,7 +456,7 @@ G1 R17 <numeric expression> ::= <numeric expression> '+' <numeric expression>
 G1 R18 <numeric expression> ::= <numeric expression> '*' <numeric expression>
   Symbol IDs: <13> ::= <13> <9> <14>
   Internal symbols: <numeric expression[0]> ::= <numeric expression[0]> <[Lex-8]> <numeric expression[1]>
-G1 R19 :start ::= statements
+G1 R19 [:start] ::= statements
   Symbol IDs: <0> ::= <16>
   Internal symbols: <[:start]> ::= <statements>
 Lex (L0) Rules:
@@ -499,49 +499,49 @@ L0 R11 string ::= ['] <string contents> [']
 L0 R12 <string contents> ::= [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] +
   Symbol IDs: <32> ::= <20>
   Internal symbols: <string contents> ::= <[[^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}]]>
-L0 R13 :discard ::= whitespace
+L0 R13 [:discard] ::= whitespace
   Symbol IDs: <0> ::= <33>
   Internal symbols: <[:discard]> ::= <whitespace>
 L0 R14 whitespace ::= [\s] +
   Symbol IDs: <33> ::= <18>
   Internal symbols: <whitespace> ::= <[[\s]]>
-L0 R15 :start_lex ::= :discard
+L0 R15 [:start_lex] ::= [:discard]
   Symbol IDs: <1> ::= <0>
   Internal symbols: <[:start_lex]> ::= <[:discard]>
-L0 R16 :start_lex ::= 'set'
+L0 R16 [:start_lex] ::= 'set'
   Symbol IDs: <1> ::= <2>
   Internal symbols: <[:start_lex]> ::= <[Lex-0]>
-L0 R17 :start_lex ::= 'to'
+L0 R17 [:start_lex] ::= 'to'
   Symbol IDs: <1> ::= <3>
   Internal symbols: <[:start_lex]> ::= <[Lex-1]>
-L0 R18 :start_lex ::= '='
+L0 R18 [:start_lex] ::= '='
   Symbol IDs: <1> ::= <4>
   Internal symbols: <[:start_lex]> ::= <[Lex-2]>
-L0 R19 :start_lex ::= 'string'
+L0 R19 [:start_lex] ::= 'string'
   Symbol IDs: <1> ::= <5>
   Internal symbols: <[:start_lex]> ::= <[Lex-3]>
-L0 R20 :start_lex ::= '('
+L0 R20 [:start_lex] ::= '('
   Symbol IDs: <1> ::= <6>
   Internal symbols: <[:start_lex]> ::= <[Lex-4]>
-L0 R21 :start_lex ::= ')'
+L0 R21 [:start_lex] ::= ')'
   Symbol IDs: <1> ::= <7>
   Internal symbols: <[:start_lex]> ::= <[Lex-5]>
-L0 R22 :start_lex ::= '+'
+L0 R22 [:start_lex] ::= '+'
   Symbol IDs: <1> ::= <8>
   Internal symbols: <[:start_lex]> ::= <[Lex-6]>
-L0 R23 :start_lex ::= '+'
+L0 R23 [:start_lex] ::= '+'
   Symbol IDs: <1> ::= <9>
   Internal symbols: <[:start_lex]> ::= <[Lex-7]>
-L0 R24 :start_lex ::= '*'
+L0 R24 [:start_lex] ::= '*'
   Symbol IDs: <1> ::= <10>
   Internal symbols: <[:start_lex]> ::= <[Lex-8]>
-L0 R25 :start_lex ::= number
+L0 R25 [:start_lex] ::= number
   Symbol IDs: <1> ::= <30>
   Internal symbols: <[:start_lex]> ::= <number>
-L0 R26 :start_lex ::= string
+L0 R26 [:start_lex] ::= string
   Symbol IDs: <1> ::= <31>
   Internal symbols: <[:start_lex]> ::= <string>
-L0 R27 :start_lex ::= variable
+L0 R27 [:start_lex] ::= variable
   Symbol IDs: <1> ::= <29>
   Internal symbols: <[:start_lex]> ::= <variable>
 END_OF_SHOW_RULES_OUTPUT
@@ -567,7 +567,7 @@ $show_symbols_output .= $grammar->show_symbols(3, 'L0');
 Marpa::R3::Test::is( $show_symbols_output,
     <<'END_OF_SHOW_SYMBOLS_OUTPUT', 'SLIF show_symbols()' );
 G1 Symbols:
-G1 S0 :start
+G1 S0 [:start]
   Internal name: <[:start]>
 G1 S1 'set'
   /* terminal */
@@ -645,9 +645,9 @@ G1 S24 number
   /* terminal */
   Internal name: <number>
 Lex (L0) Symbols:
-L0 S0 :discard
+L0 S0 [:discard]
   Internal name: <[:discard]>
-L0 S1 :start_lex
+L0 S1 [:start_lex]
   Internal name: <[:start_lex]>
 L0 S2 'set'
   Internal name: <[Lex-0]>
@@ -943,7 +943,7 @@ for my $symbol_id ( $grammar->symbol_ids() ) {
 
 Marpa::R3::Test::is( $text, <<'END_OF_TEXT', 'G1 symbol names and description');
 symbol number: 0  name: [:start]
-symbol number: 0  name in display form: :start
+symbol number: 0  name in display form: [:start]
 symbol number: 0  DSL form: [No name in DSL form]
 symbol number: 1  name: [Lex-0]
 symbol number: 1  name in display form: 'set'
@@ -1054,7 +1054,7 @@ expression ::= expression '+' expression
 <numeric expression> ::= number
 <numeric expression> ::= <numeric expression> '+' <numeric expression>
 <numeric expression> ::= <numeric expression> '*' <numeric expression>
-:start ::= statements
+[:start] ::= statements
 END_OF_TEXT
 
 $text = q{};
@@ -1085,21 +1085,21 @@ variable ::= [\w] +
 number ::= [\d] +
 string ::= ['] <string contents> [']
 <string contents> ::= [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] +
-:discard ::= whitespace
+[:discard] ::= whitespace
 whitespace ::= [\s] +
-:start_lex ::= :discard
-:start_lex ::= 'set'
-:start_lex ::= 'to'
-:start_lex ::= '='
-:start_lex ::= 'string'
-:start_lex ::= '('
-:start_lex ::= ')'
-:start_lex ::= '+'
-:start_lex ::= '+'
-:start_lex ::= '*'
-:start_lex ::= number
-:start_lex ::= string
-:start_lex ::= variable
+[:start_lex] ::= [:discard]
+[:start_lex] ::= 'set'
+[:start_lex] ::= 'to'
+[:start_lex] ::= '='
+[:start_lex] ::= 'string'
+[:start_lex] ::= '('
+[:start_lex] ::= ')'
+[:start_lex] ::= '+'
+[:start_lex] ::= '+'
+[:start_lex] ::= '*'
+[:start_lex] ::= number
+[:start_lex] ::= string
+[:start_lex] ::= variable
 END_OF_TEXT
 
 $text = '';
@@ -1136,10 +1136,10 @@ for my $symbol_id ( $grammar->symbol_ids('L0') ) {
 
 Marpa::R3::Test::is( $text, <<'END_OF_TEXT', 'L0 symbol names and description');
 L0 symbol number: 0  name: [:discard]
-L0 symbol number: 0  name in display form: :discard
+L0 symbol number: 0  name in display form: [:discard]
 L0 symbol number: 0  DSL form: [No name in DSL form]
 L0 symbol number: 1  name: [:start_lex]
-L0 symbol number: 1  name in display form: :start_lex
+L0 symbol number: 1  name in display form: [:start_lex]
 L0 symbol number: 1  DSL form: [No name in DSL form]
 L0 symbol number: 2  name: [Lex-0]
 L0 symbol number: 2  name in display form: 'set'

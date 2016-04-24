@@ -35,8 +35,7 @@ use constant BLESSING => 1;
 use constant LEXEME_SEMANTICS => 2;
 use constant DISPLAY_FORM => 3;
 use constant DSL_FORM => 4;
-use constant LEGACY_NAME => 5;
-use constant IF_INACCESSIBLE => 6;
+use constant IF_INACCESSIBLE => 5;
 
 package Marpa::R3::Internal::Rule;
 use constant ID => 0;

@@ -90,7 +90,7 @@ my $show_symbols_output = $grammar->show_symbols();
 
 Marpa::R3::Test::is( $show_symbols_output,
     <<'END_SYMBOLS', 'Implementation Example Symbols' );
-G1 S0 :start
+G1 S0 [:start]
 G1 S1 '*'
 G1 S2 '+'
 G1 S3 Calculator
@@ -110,7 +110,7 @@ G1 R2 Term ::= Term '*' Factor
 G1 R3 Term ::= Factor
 G1 R4 Expression ::= Expression '+' Term
 G1 R5 Expression ::= Term
-G1 R6 :start ::= Calculator
+G1 R6 [:start] ::= Calculator
 END_RULES
 
 my $show_ahms_output = $grammar->show_ahms();

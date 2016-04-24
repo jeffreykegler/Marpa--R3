@@ -59,7 +59,7 @@ END_OF_DSL
 
 Marpa::R3::Test::is( $grammar->show_symbols(),
     <<'END_OF_STRING', 'Leo166 Symbols' );
-G1 S0 :start
+G1 S0 [:start]
 G1 S1 S
 G1 S2 a
 G1 S3 A
@@ -74,7 +74,7 @@ G1 R1 A ::= B
 G1 R2 B ::= C
 G1 R3 C ::= S
 G1 R4 S ::=
-G1 R5 :start ::= S
+G1 R5 [:start] ::= S
 END_OF_STRING
 
 Marpa::R3::Test::is( $grammar->show_ahms, <<'END_OF_STRING', 'Leo166 AHMs' );
