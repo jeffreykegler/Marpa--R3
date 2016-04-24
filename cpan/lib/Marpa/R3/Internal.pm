@@ -31,6 +31,15 @@ $VERSION = eval $VERSION;
 
 package Marpa::R3::Internal::Symbol;
 use constant ID => 0;
+use constant ISYID => 1;
+use constant XSYID => 2;
+use constant BLESSING => 3;
+use constant LEXEME_SEMANTICS => 4;
+use constant DSL_FORM => 5;
+use constant IF_INACCESSIBLE => 6;
+
+package Marpa::R3::Internal::XSY;
+use constant ID => 0;
 use constant BLESSING => 1;
 use constant LEXEME_SEMANTICS => 2;
 use constant DSL_FORM => 3;

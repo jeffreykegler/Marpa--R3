@@ -1108,7 +1108,7 @@ sub Marpa::R3::Scanless::G::show_symbols {
     my $grammar_c = $thick_grammar->[Marpa::R3::Internal::Grammar::C];
 
     for my $symbol ( @{$symbols} ) {
-        my $symbol_id = $symbol->[Marpa::R3::Internal::Symbol::ID];
+        my $symbol_id = $symbol->[Marpa::R3::Internal::Symbol::ISYID];
 
         $text .= join q{ }, $subgrammar, "S$symbol_id",
             $thick_grammar->symbol_in_display_form($symbol_id);

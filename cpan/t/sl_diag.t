@@ -171,23 +171,23 @@ Setting trace_terminals option
 Expecting "Number" at earleme 0
 Expecting "[Lex-0]" at earleme 0
 Expecting "[Lex-1]" at earleme 0
-Registering character U+002b '+' as symbol 5: [\+]
-Registering character U+002b '+' as symbol 9: [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
+Registering character U+002b '+' as symbol 3: [\+]
+Registering character U+002b '+' as symbol 7: [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
 Accepted lexeme L1c1 e1: '+'; value="+"
 Accepted lexeme L1c2 e2: '+'; value="+"
 Accepted lexeme L1c3 e3: '+'; value="+"
-Registering character U+0020 as symbol 7: [\s]
-Registering character U+0020 as symbol 9: [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
-Registering character U+0031 '1' as symbol 6: [\d]
-Registering character U+0031 '1' as symbol 9: [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
+Registering character U+0020 as symbol 5: [\s]
+Registering character U+0020 as symbol 7: [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
+Registering character U+0031 '1' as symbol 4: [\d]
+Registering character U+0031 '1' as symbol 7: [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
 Discarded lexeme L1c4: whitespace
 Accepted lexeme L1c5 e4: Number; value="1"
-Registering character U+0032 '2' as symbol 6: [\d]
-Registering character U+0032 '2' as symbol 9: [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
+Registering character U+0032 '2' as symbol 4: [\d]
+Registering character U+0032 '2' as symbol 7: [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
 Discarded lexeme L1c6: whitespace
 Accepted lexeme L1c7 e5: Number; value="2"
-Registering character U+0033 '3' as symbol 6: [\d]
-Registering character U+0033 '3' as symbol 9: [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
+Registering character U+0033 '3' as symbol 4: [\d]
+Registering character U+0033 '3' as symbol 7: [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
 Discarded lexeme L1c8: whitespace
 Accepted lexeme L1c9 e6: Number; value="3"
 Discarded lexeme L1c10: whitespace
@@ -198,8 +198,8 @@ Discarded lexeme L1c14: whitespace
 Accepted lexeme L1c15 e9: Number; value="1"
 Discarded lexeme L1c16: whitespace
 Accepted lexeme L1c17 e10: Number; value="2"
-Registering character U+0034 '4' as symbol 6: [\d]
-Registering character U+0034 '4' as symbol 9: [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
+Registering character U+0034 '4' as symbol 4: [\d]
+Registering character U+0034 '4' as symbol 7: [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
 Discarded lexeme L1c18: whitespace
 Accepted lexeme L1c19 e11: Number; value="4"
 END_OF_OUTPUT

@@ -194,7 +194,7 @@ sub Marpa::R3::Grammar::show_symbol {
     my ( $grammar, $symbol ) = @_;
     my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
     my $text      = q{};
-    my $symbol_id = $symbol->[Marpa::R3::Internal::Symbol::ID];
+    my $symbol_id = $symbol->[Marpa::R3::Internal::Symbol::ISYID];
 
     my $name = $grammar->symbol_name($symbol_id);
     $text .= "$symbol_id: $name";
@@ -403,7 +403,7 @@ sub shadow_symbol {
     my ( $grammar, $symbol_id ) = @_;
     my $symbols = $grammar->[Marpa::R3::Internal::Grammar::SYMBOLS];
     my $symbol = $symbols->[$symbol_id] = [];
-    $symbol->[Marpa::R3::Internal::Symbol::ID] = $symbol_id;
+    $symbol->[Marpa::R3::Internal::Symbol::ISYID] = $symbol_id;
     return $symbol;
 } ## end sub shadow_symbol
 
@@ -606,8 +606,8 @@ sub add_user_rule {
         }
     } ## end if ( defined $separator_name and $is_ordinary_rule )
 
-    my @rhs_ids = map { $_->[Marpa::R3::Internal::Symbol::ID] } @{$rhs};
-    my $lhs_id = $lhs->[Marpa::R3::Internal::Symbol::ID];
+    my @rhs_ids = map { $_->[Marpa::R3::Internal::Symbol::ISYID] } @{$rhs};
+    my $lhs_id = $lhs->[Marpa::R3::Internal::Symbol::ISYID];
 
     my $base_rule_id;
     my $separator_id = -1;
@@ -627,7 +627,7 @@ sub add_user_rule {
         # create the separator symbol, if we're using one
         if ( defined $separator_name ) {
             my $separator = assign_symbol( $grammar, $separator_name ) ;
-            $separator_id = $separator->[Marpa::R3::Internal::Symbol::ID];
+            $separator_id = $separator->[Marpa::R3::Internal::Symbol::ISYID];
         } ## end if ( defined $separator_name )
 
         $grammar_c->throw_set(0);

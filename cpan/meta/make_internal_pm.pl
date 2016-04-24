@@ -108,6 +108,15 @@ __DATA__
 
     :package=Marpa::R3::Internal::Symbol
     ID { Unique ID }
+    ISYID
+    XSYID
+    BLESSING
+    LEXEME_SEMANTICS
+    DSL_FORM
+    IF_INACCESSIBLE
+
+    :package=Marpa::R3::Internal::XSY
+    ID
     BLESSING
     LEXEME_SEMANTICS
     DSL_FORM
