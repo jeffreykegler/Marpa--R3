@@ -33,9 +33,8 @@ package Marpa::R3::Internal::Symbol;
 use constant ID => 0;
 use constant BLESSING => 1;
 use constant LEXEME_SEMANTICS => 2;
-use constant DISPLAY_FORM => 3;
-use constant DSL_FORM => 4;
-use constant IF_INACCESSIBLE => 5;
+use constant DSL_FORM => 3;
+use constant IF_INACCESSIBLE => 4;
 
 package Marpa::R3::Internal::Rule;
 use constant ID => 0;

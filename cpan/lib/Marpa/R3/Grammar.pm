@@ -453,18 +453,9 @@ sub assign_symbol {
             $grammar_c->symbol_rank_set($symbol_id) = $value;
             next PROPERTY;
         } ## end if ( $property eq 'rank' )
-        if ( $property eq 'description' ) {
-            # TODO: Delete this once description field eliminated
-            next PROPERTY;
-        }
         if ( $property eq 'dsl_form' ) {
             my $value = $options->{$property};
             $symbol->[Marpa::R3::Internal::Symbol::DSL_FORM] = $value;
-            next PROPERTY;
-        }
-        if ( $property eq 'display_form' ) {
-            my $value = $options->{$property};
-            $symbol->[Marpa::R3::Internal::Symbol::DISPLAY_FORM] = $value;
             next PROPERTY;
         }
         if ( $property eq 'if_inaccessible' ) {

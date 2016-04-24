@@ -356,12 +356,10 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
         ];
         $lexer_symbols = {
             '[:discard]' => {
-                'display_form' => ':discard',
                 # 'description'  => 'Internal LHS for lexer "L0" discard'
             },
             '[[^\\d\\D]]' => {
                 'dsl_form'     => '[^\\d\\D]',
-                'display_form' => '[^\\d\\D]',
                 # 'description'  => 'Character class: [^\\d\\D]'
             }
         };
@@ -415,8 +413,6 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
         Marpa::R3::exception( 'Unproductive lexical symbols: ',
             join q{ }, @unproductive );
     }
-
-    $this_lexer_symbols{$lex_start_symbol_name}->{display_form} = ':start_lex';
 
     # $this_lexer_symbols{$lex_start_symbol_name}->{description} =
     # 'Internal L0 (lexical) start symbol';

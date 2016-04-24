@@ -1076,7 +1076,6 @@ sub Marpa::R3::Internal::MetaAST::start_rule_create {
     $parse->{'default_g1_start_action'} =
         $parse->{'default_adverbs'}->{'G1'}->{'action'};
     $parse->{'symbols'}->{'G1'}->{$start_lhs} = {
-        display_form => ':start',
         # description  => 'Internal G1 start symbol'
     };
     push @{ $parse->{rules}->{G1} },
@@ -1113,8 +1112,7 @@ sub Marpa::R3::Internal::MetaAST_Nodes::discard_rule::evaluate {
     $parse->symbol_names_set(
         $discard_lhs,
         'L',
-        {   display_form => ':discard',
-            # description  => qq{Internal LHS for lexer discard}
+        {   # description  => qq{Internal LHS for lexer discard}
         }
     );
     my $rhs         = $symbol->names($parse);
@@ -1601,7 +1599,6 @@ sub char_class_to_symbol {
             $symbol_name,
             $subgrammar,
             {   dsl_form     => $char_class,
-                display_form => $char_class,
                 # description  => "Character class: $char_class"
             }
         );
@@ -1628,13 +1625,10 @@ sub Marpa::R3::Internal::MetaAST::Parse::prioritized_symbol {
     my $symbol_data =
         $parse->{symbols}->{$Marpa::R3::Internal::SUBGRAMMAR eq 'G1' ? 'G1' : 'L'}->{$symbol_name};
     return $symbol_name if defined $symbol_data;
-    my $display_form =
-        ( $base_symbol =~ m/\s/xms ) ? "<$base_symbol>" : $base_symbol;
     $parse->symbol_names_set(
         $symbol_name,
         $Marpa::R3::Internal::SUBGRAMMAR,
         {   dsl_form     => $base_symbol,
-            display_form => $display_form,
             # description  => "<$base_symbol> at priority $priority"
         }
     );
@@ -1651,7 +1645,6 @@ sub Marpa::R3::Internal::MetaAST::Parse::internal_lexeme {
     my $lexical_symbol    = "[Lex-$lexical_lhs_index]";
     my %names             = (
         dsl_form     => $dsl_form,
-        display_form => $dsl_form,
         # description  => qq{Internal lexical symbol for "$dsl_form"}
     );
     $parse->symbol_names_set( $lexical_symbol, $_, \%names ) for qw(G1 L);
