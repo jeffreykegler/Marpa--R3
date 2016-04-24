@@ -1633,8 +1633,7 @@ sub Marpa::R3::Internal::MetaAST::Parse::prioritized_symbol {
     $parse->symbol_names_set(
         $symbol_name,
         $Marpa::R3::Internal::SUBGRAMMAR,
-        {   legacy_name  => $base_symbol,
-            dsl_form     => $base_symbol,
+        {   dsl_form     => $base_symbol,
             display_form => $display_form,
             # description  => "<$base_symbol> at priority $priority"
         }

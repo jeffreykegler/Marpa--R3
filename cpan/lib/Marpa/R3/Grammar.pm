@@ -308,9 +308,7 @@ sub Marpa::R3::Grammar::brief_rule {
     my @symbols = $tracer->rule_expand($rule_id);
     SYMBOL_ID: for my $symbol_id (@symbols) {
         ## The name of the symbols, before the BNF rewrites
-        my $name =
-            $symbols->[$symbol_id]->[Marpa::R3::Internal::Symbol::LEGACY_NAME]
-            // $grammar->symbol_name($symbol_id);
+        my $name = $grammar->symbol_name($symbol_id);
         push @symbol_names, $name;
     }
     my ( $lhs, @rhs ) = @symbol_names;
@@ -464,11 +462,6 @@ sub assign_symbol {
         if ( $property eq 'dsl_form' ) {
             my $value = $options->{$property};
             $symbol->[Marpa::R3::Internal::Symbol::DSL_FORM] = $value;
-            next PROPERTY;
-        }
-        if ( $property eq 'legacy_name' ) {
-            my $value = $options->{$property};
-            $symbol->[Marpa::R3::Internal::Symbol::LEGACY_NAME] = $value;
             next PROPERTY;
         }
         if ( $property eq 'display_form' ) {

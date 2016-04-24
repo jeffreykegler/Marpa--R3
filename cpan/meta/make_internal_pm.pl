@@ -112,7 +112,6 @@ __DATA__
     LEXEME_SEMANTICS
     DISPLAY_FORM
     DSL_FORM
-    LEGACY_NAME
     IF_INACCESSIBLE
 
     :package=Marpa::R3::Internal::Rule
