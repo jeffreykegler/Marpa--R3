@@ -375,7 +375,7 @@ END_OF_POSTAMBLE_PIECE
         );
 
     push @postamble_pieces, sprintf <<'END_OF_POSTAMBLE_PIECE',
-engine/gnu_ac_build/stamp-h1: engine/gnu_ac_build/config.h engine/gnu_ac_build/Makefile
+$(LIBMARPA_IN_BUILD_DIR): engine/gnu_ac_build/config.h engine/gnu_ac_build/Makefile
 	%s
 END_OF_POSTAMBLE_PIECE
 	$self->cd(File::Spec->catdir(qw(engine gnu_ac_build)), '$(MAKE)');
@@ -402,12 +402,12 @@ engine/perl_ac_build/Makefile: engine/perl_ac_build/Makefile.PL
 END_OF_POSTAMBLE_PIECE
 	$self->cd(File::Spec->catdir(qw(engine perl_ac_build)), '$(PERLRUN) Makefile.PL');
 
-# gnu autoconf automatically creates/updates stamp-h1
-# for Config::AutoConf, we have to do this manually
+# GNU autoconf automatically creates/updates stamp-h1.
+# For Config::AutoConf, but we don't use it, so we don't create one.
+
     push @postamble_pieces, sprintf <<'END_OF_POSTAMBLE_PIECE',
-engine/perl_ac_build/stamp-h1: engine/perl_ac_build/Makefile
+$(LIBMARPA_IN_BUILD_DIR): engine/perl_ac_build/Makefile
 	%s
-	$(TOUCH) engine/perl_ac_build/stamp-h1
 END_OF_POSTAMBLE_PIECE
 	$self->cd(File::Spec->catdir(qw(engine perl_ac_build)), '$(MAKE)');
 
@@ -430,7 +430,7 @@ xs/marpa.h: $(LIBMARPA_BUILD_DIR)/marpa.h
 xs/marpa_codes.h: $(LIBMARPA_BUILD_DIR)/marpa_codes.h
 	$(CP) $? $@
 
-xs/libmarpa$(LIB_EXT): $(LIBMARPA_BUILD_DIR)/stamp-h1
+xs/libmarpa$(LIB_EXT): $(LIBMARPA_IN_BUILD_DIR)
 	$(CP) $(LIBMARPA_IN_BUILD_DIR) $@
 
 END_OF_POSTAMBLE_PIECE
