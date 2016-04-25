@@ -84,6 +84,24 @@ sub ast_to_hash {
     };
     Marpa::R3::exception($EVAL_ERROR) if not $eval_ok;
 
+    # add all the "ordinary" symbols, those with no
+    # special properties and whose name is their DSL
+    # form.
+    for my $grammar (keys %{$hashed_ast->{rules}}) {
+        my $rules = $hashed_ast->{rules}->{$grammar};
+        my $wsyms = $hashed_ast->{symbols}->{$grammar};
+        my @symbols = map { $_->{lhs} } @{$rules};
+        push @symbols, map { @{$_->{rhs}} } @{$rules};
+        SYM: for my $symbol_name (@symbols) {
+            next SYM if defined $wsyms->{$symbol_name};
+            # say STDERR "$grammar $symbol_name";
+            my $symbol_data = { dsl_form => $symbol_name };
+            my $xsyid = $hashed_ast->xsy_assign( $symbol_name, $symbol_data );
+            $symbol_data->{xsyid} = $xsyid;
+            $hashed_ast->symbol_names_set( $symbol_name, $grammar, $symbol_data);
+        }
+    }
+
     my %stripped_character_classes = ();
     {
         my $character_classes = $hashed_ast->{character_classes};
@@ -1656,7 +1674,7 @@ sub Marpa::R3::Internal::MetaAST::Parse::xsy_create {
 
 sub Marpa::R3::Internal::MetaAST::Parse::xsy_assign {
     my ( $parse, $symbol_name, $args ) = @_;
-    my $xsyid = $parse->{xsy_by_name}->{$symbol_name};
+    my $xsyid = $parse->{xsy}->{$symbol_name};
     return $xsyid if $xsyid;
     return $parse->xsy_create( $symbol_name, $args );
 }
