@@ -126,7 +126,7 @@ sub Marpa::R3::Internal::MetaAST::Proto_Alternative::combine {
 
 sub Marpa::R3::Internal::MetaAST::Parse::bless_hash_rule {
     my ( $parse, $hash_rule, $blessing, $naming, $original_lhs ) = @_;
-    return if (substr $Marpa::R3::Internal::SUBGRAMMAR, 0, 1) eq 'L';
+    return if (substr $Marpa::R3::Internal::SUBGRAMMAR, 0, 1) eq 'L0';
 
     $naming //= $original_lhs;
     $hash_rule->{name} = $naming;
@@ -1106,7 +1106,7 @@ sub Marpa::R3::Internal::MetaAST_Nodes::discard_rule::evaluate {
     my $discard_lhs = '[:discard]';
     $parse->symbol_names_set(
         $discard_lhs,
-        'L',
+        'L0',
         {   # description  => qq{Internal LHS for lexer discard}
         }
     );
@@ -1607,7 +1607,7 @@ sub char_class_to_symbol {
 
 sub Marpa::R3::Internal::MetaAST::Parse::symbol_names_set {
     my ( $parse, $symbol, $subgrammar, $args ) = @_;
-    my $symbol_type = $subgrammar eq 'G1' ? 'G1' : 'L';
+    my $symbol_type = $subgrammar eq 'G1' ? 'G1' : 'L0';
     my $wsyid = $parse->{next_wsyid}++;
     $parse->{symbols}->{$symbol_type}->{$symbol}->{wsyid} = $wsyid;
     for my $arg_type (keys %{$args}) {
@@ -1624,7 +1624,7 @@ sub Marpa::R3::Internal::MetaAST::Parse::prioritized_symbol {
     # character class symbol name always start with TWO left square brackets
     my $symbol_name = $base_symbol . '[' . $priority . ']';
     my $current_symbol_data =
-        $parse->{symbols}->{$Marpa::R3::Internal::SUBGRAMMAR eq 'G1' ? 'G1' : 'L'}->{$symbol_name};
+        $parse->{symbols}->{$Marpa::R3::Internal::SUBGRAMMAR eq 'G1' ? 'G1' : 'L0'}->{$symbol_name};
     return $symbol_name if defined $current_symbol_data;
     my $symbol_data = {
         dsl_form     => $base_symbol,

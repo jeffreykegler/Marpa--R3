@@ -340,7 +340,7 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
 
     my $lexer_rules = $hashed_source->{rules}->{'L0'};
     my $character_class_hash = $hashed_source->{character_classes};
-    my $lexer_symbols = $hashed_source->{symbols}->{'L'};
+    my $lexer_symbols = $hashed_source->{symbols}->{'L0'};
 
     # If no lexer rules, fake a lexer
     # Fake a lexer -- it discards symbols in character classes which
