@@ -400,149 +400,149 @@ Marpa::R3::Test::is( $show_rules_output,
     <<'END_OF_SHOW_RULES_OUTPUT', 'SLIF show_rules()' );
 G1 Rules:
 G1 R0 statements ::= statement *
-  Symbol IDs: <16> ::= <17>
+  Symbol IDs: <22> ::= <21>
   Internal symbols: <statements> ::= <statement>
 G1 R1 statement ::= assignment
-  Symbol IDs: <17> ::= <18>
+  Symbol IDs: <21> ::= <10>
   Internal symbols: <statement> ::= <assignment>
 G1 R2 statement ::= <numeric assignment>
-  Symbol IDs: <17> ::= <19>
+  Symbol IDs: <21> ::= <16>
   Internal symbols: <statement> ::= <numeric assignment>
 G1 R3 assignment ::= 'set' variable 'to' expression
-  Symbol IDs: <18> ::= <1> <20> <2> <21>
+  Symbol IDs: <10> ::= <1> <24> <2> <11>
   Internal symbols: <assignment> ::= <[Lex-0]> <variable> <[Lex-1]> <expression>
 G1 R4 <numeric assignment> ::= variable '=' <numeric expression>
-  Symbol IDs: <19> ::= <20> <3> <22>
+  Symbol IDs: <16> ::= <24> <3> <17>
   Internal symbols: <numeric assignment> ::= <variable> <[Lex-2]> <numeric expression>
 G1 R5 expression ::= expression
-  Symbol IDs: <21> ::= <10>
+  Symbol IDs: <11> ::= <12>
   Internal symbols: <expression> ::= <expression[0]>
 G1 R6 expression ::= expression
-  Symbol IDs: <10> ::= <11>
+  Symbol IDs: <12> ::= <13>
   Internal symbols: <expression[0]> ::= <expression[1]>
 G1 R7 expression ::= expression
-  Symbol IDs: <11> ::= <12>
+  Symbol IDs: <13> ::= <14>
   Internal symbols: <expression[1]> ::= <expression[2]>
 G1 R8 expression ::= variable
-  Symbol IDs: <12> ::= <20>
+  Symbol IDs: <14> ::= <24>
   Internal symbols: <expression[2]> ::= <variable>
 G1 R9 expression ::= string
-  Symbol IDs: <12> ::= <23>
+  Symbol IDs: <14> ::= <23>
   Internal symbols: <expression[2]> ::= <string>
 G1 R10 expression ::= 'string' '(' <numeric expression> ')'
-  Symbol IDs: <11> ::= <4> <5> <22> <6>
+  Symbol IDs: <13> ::= <4> <5> <17> <6>
   Internal symbols: <expression[1]> ::= <[Lex-3]> <[Lex-4]> <numeric expression> <[Lex-5]>
 G1 R11 expression ::= expression '+' expression
-  Symbol IDs: <10> ::= <10> <7> <11>
+  Symbol IDs: <12> ::= <12> <7> <13>
   Internal symbols: <expression[0]> ::= <expression[0]> <[Lex-6]> <expression[1]>
 G1 R12 <numeric expression> ::= <numeric expression>
-  Symbol IDs: <22> ::= <13>
+  Symbol IDs: <17> ::= <18>
   Internal symbols: <numeric expression> ::= <numeric expression[0]>
 G1 R13 <numeric expression> ::= <numeric expression>
-  Symbol IDs: <13> ::= <14>
+  Symbol IDs: <18> ::= <19>
   Internal symbols: <numeric expression[0]> ::= <numeric expression[1]>
 G1 R14 <numeric expression> ::= <numeric expression>
-  Symbol IDs: <14> ::= <15>
+  Symbol IDs: <19> ::= <20>
   Internal symbols: <numeric expression[1]> ::= <numeric expression[2]>
 G1 R15 <numeric expression> ::= variable
-  Symbol IDs: <15> ::= <20>
+  Symbol IDs: <20> ::= <24>
   Internal symbols: <numeric expression[2]> ::= <variable>
 G1 R16 <numeric expression> ::= number
-  Symbol IDs: <15> ::= <24>
+  Symbol IDs: <20> ::= <15>
   Internal symbols: <numeric expression[2]> ::= <number>
 G1 R17 <numeric expression> ::= <numeric expression> '+' <numeric expression>
-  Symbol IDs: <14> ::= <14> <8> <15>
+  Symbol IDs: <19> ::= <19> <8> <20>
   Internal symbols: <numeric expression[1]> ::= <numeric expression[1]> <[Lex-7]> <numeric expression[2]>
 G1 R18 <numeric expression> ::= <numeric expression> '*' <numeric expression>
-  Symbol IDs: <13> ::= <13> <9> <14>
+  Symbol IDs: <18> ::= <18> <9> <19>
   Internal symbols: <numeric expression[0]> ::= <numeric expression[0]> <[Lex-8]> <numeric expression[1]>
 G1 R19 [:start] ::= statements
-  Symbol IDs: <0> ::= <16>
+  Symbol IDs: <0> ::= <22>
   Internal symbols: <[:start]> ::= <statements>
 Lex (L0) Rules:
 L0 R0 'set' ::= [s] [e] [t]
-  Symbol IDs: <2> ::= <27> <21> <28>
+  Symbol IDs: <1> ::= <26> <20> <27>
   Internal symbols: <[Lex-0]> ::= <[[s]]> <[[e]]> <[[t]]>
 L0 R1 'to' ::= [t] [o]
-  Symbol IDs: <3> ::= <28> <25>
+  Symbol IDs: <2> ::= <27> <24>
   Internal symbols: <[Lex-1]> ::= <[[t]]> <[[o]]>
 L0 R2 '=' ::= [\=]
-  Symbol IDs: <4> ::= <16>
+  Symbol IDs: <3> ::= <15>
   Internal symbols: <[Lex-2]> ::= <[[\=]]>
 L0 R3 'string' ::= [s] [t] [r] [i] [n] [g]
-  Symbol IDs: <5> ::= <27> <28> <26> <23> <24> <22>
+  Symbol IDs: <4> ::= <26> <27> <25> <22> <23> <21>
   Internal symbols: <[Lex-3]> ::= <[[s]]> <[[t]]> <[[r]]> <[[i]]> <[[n]]> <[[g]]>
 L0 R4 '(' ::= [\(]
-  Symbol IDs: <6> ::= <12>
+  Symbol IDs: <5> ::= <11>
   Internal symbols: <[Lex-4]> ::= <[[\(]]>
 L0 R5 ')' ::= [\)]
-  Symbol IDs: <7> ::= <13>
+  Symbol IDs: <6> ::= <12>
   Internal symbols: <[Lex-5]> ::= <[[\)]]>
 L0 R6 '+' ::= [\+]
-  Symbol IDs: <8> ::= <15>
+  Symbol IDs: <7> ::= <14>
   Internal symbols: <[Lex-6]> ::= <[[\+]]>
 L0 R7 '+' ::= [\+]
-  Symbol IDs: <9> ::= <15>
+  Symbol IDs: <8> ::= <14>
   Internal symbols: <[Lex-7]> ::= <[[\+]]>
 L0 R8 '*' ::= [\*]
-  Symbol IDs: <10> ::= <14>
+  Symbol IDs: <9> ::= <13>
   Internal symbols: <[Lex-8]> ::= <[[\*]]>
 L0 R9 variable ::= [\w] +
-  Symbol IDs: <29> ::= <19>
+  Symbol IDs: <31> ::= <18>
   Internal symbols: <variable> ::= <[[\w]]>
 L0 R10 number ::= [\d] +
-  Symbol IDs: <30> ::= <17>
+  Symbol IDs: <28> ::= <16>
   Internal symbols: <number> ::= <[[\d]]>
 L0 R11 string ::= ['] <string contents> [']
-  Symbol IDs: <31> ::= <11> <32> <11>
+  Symbol IDs: <29> ::= <10> <30> <10>
   Internal symbols: <string> ::= <[[']]> <string contents> <[[']]>
 L0 R12 <string contents> ::= [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] +
-  Symbol IDs: <32> ::= <20>
+  Symbol IDs: <30> ::= <19>
   Internal symbols: <string contents> ::= <[[^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}]]>
 L0 R13 [:discard] ::= whitespace
-  Symbol IDs: <0> ::= <33>
+  Symbol IDs: <0> ::= <32>
   Internal symbols: <[:discard]> ::= <whitespace>
 L0 R14 whitespace ::= [\s] +
-  Symbol IDs: <33> ::= <18>
+  Symbol IDs: <32> ::= <17>
   Internal symbols: <whitespace> ::= <[[\s]]>
 L0 R15 [:start_lex] ::= [:discard]
-  Symbol IDs: <1> ::= <0>
+  Symbol IDs: <33> ::= <0>
   Internal symbols: <[:start_lex]> ::= <[:discard]>
 L0 R16 [:start_lex] ::= 'set'
-  Symbol IDs: <1> ::= <2>
+  Symbol IDs: <33> ::= <1>
   Internal symbols: <[:start_lex]> ::= <[Lex-0]>
 L0 R17 [:start_lex] ::= 'to'
-  Symbol IDs: <1> ::= <3>
+  Symbol IDs: <33> ::= <2>
   Internal symbols: <[:start_lex]> ::= <[Lex-1]>
 L0 R18 [:start_lex] ::= '='
-  Symbol IDs: <1> ::= <4>
+  Symbol IDs: <33> ::= <3>
   Internal symbols: <[:start_lex]> ::= <[Lex-2]>
 L0 R19 [:start_lex] ::= 'string'
-  Symbol IDs: <1> ::= <5>
+  Symbol IDs: <33> ::= <4>
   Internal symbols: <[:start_lex]> ::= <[Lex-3]>
 L0 R20 [:start_lex] ::= '('
-  Symbol IDs: <1> ::= <6>
+  Symbol IDs: <33> ::= <5>
   Internal symbols: <[:start_lex]> ::= <[Lex-4]>
 L0 R21 [:start_lex] ::= ')'
-  Symbol IDs: <1> ::= <7>
+  Symbol IDs: <33> ::= <6>
   Internal symbols: <[:start_lex]> ::= <[Lex-5]>
 L0 R22 [:start_lex] ::= '+'
-  Symbol IDs: <1> ::= <8>
+  Symbol IDs: <33> ::= <7>
   Internal symbols: <[:start_lex]> ::= <[Lex-6]>
 L0 R23 [:start_lex] ::= '+'
-  Symbol IDs: <1> ::= <9>
+  Symbol IDs: <33> ::= <8>
   Internal symbols: <[:start_lex]> ::= <[Lex-7]>
 L0 R24 [:start_lex] ::= '*'
-  Symbol IDs: <1> ::= <10>
+  Symbol IDs: <33> ::= <9>
   Internal symbols: <[:start_lex]> ::= <[Lex-8]>
 L0 R25 [:start_lex] ::= number
-  Symbol IDs: <1> ::= <30>
+  Symbol IDs: <33> ::= <28>
   Internal symbols: <[:start_lex]> ::= <number>
 L0 R26 [:start_lex] ::= string
-  Symbol IDs: <1> ::= <31>
+  Symbol IDs: <33> ::= <29>
   Internal symbols: <[:start_lex]> ::= <string>
 L0 R27 [:start_lex] ::= variable
-  Symbol IDs: <1> ::= <29>
+  Symbol IDs: <33> ::= <31>
   Internal symbols: <[:start_lex]> ::= <variable>
 END_OF_SHOW_RULES_OUTPUT
 
@@ -605,159 +605,173 @@ G1 S9 '*'
   /* terminal */
   Internal name: <[Lex-8]>
   SLIF name: '*'
-G1 S10 expression
-  Internal name: <expression[0]>
-  SLIF name: expression
+G1 S10 assignment
+  Internal name: <assignment>
+  SLIF name: assignment
 G1 S11 expression
-  Internal name: <expression[1]>
+  Internal name: <expression>
   SLIF name: expression
 G1 S12 expression
+  Internal name: <expression[0]>
+  SLIF name: expression
+G1 S13 expression
+  Internal name: <expression[1]>
+  SLIF name: expression
+G1 S14 expression
   Internal name: <expression[2]>
   SLIF name: expression
-G1 S13 <numeric expression>
+G1 S15 number
+  /* terminal */
+  Internal name: <number>
+  SLIF name: number
+G1 S16 <numeric assignment>
+  Internal name: <numeric assignment>
+  SLIF name: numeric assignment
+G1 S17 <numeric expression>
+  Internal name: <numeric expression>
+  SLIF name: numeric expression
+G1 S18 <numeric expression>
   Internal name: <numeric expression[0]>
   SLIF name: numeric expression
-G1 S14 <numeric expression>
+G1 S19 <numeric expression>
   Internal name: <numeric expression[1]>
   SLIF name: numeric expression
-G1 S15 <numeric expression>
+G1 S20 <numeric expression>
   Internal name: <numeric expression[2]>
   SLIF name: numeric expression
-G1 S16 statements
-  Internal name: <statements>
-G1 S17 statement
+G1 S21 statement
   Internal name: <statement>
-G1 S18 assignment
-  Internal name: <assignment>
-G1 S19 <numeric assignment>
-  Internal name: <numeric assignment>
-G1 S20 variable
-  /* terminal */
-  Internal name: <variable>
-G1 S21 expression
-  Internal name: <expression>
-G1 S22 <numeric expression>
-  Internal name: <numeric expression>
+  SLIF name: statement
+G1 S22 statements
+  Internal name: <statements>
+  SLIF name: statements
 G1 S23 string
   /* terminal */
   Internal name: <string>
-G1 S24 number
+  SLIF name: string
+G1 S24 variable
   /* terminal */
-  Internal name: <number>
+  Internal name: <variable>
+  SLIF name: variable
 Lex (L0) Symbols:
 L0 S0 [:discard]
   Internal name: <[:discard]>
-L0 S1 [:start_lex]
-  Internal name: <[:start_lex]>
-L0 S2 'set'
+L0 S1 'set'
   Internal name: <[Lex-0]>
   SLIF name: 'set'
-L0 S3 'to'
+L0 S2 'to'
   Internal name: <[Lex-1]>
   SLIF name: 'to'
-L0 S4 '='
+L0 S3 '='
   Internal name: <[Lex-2]>
   SLIF name: '='
-L0 S5 'string'
+L0 S4 'string'
   Internal name: <[Lex-3]>
   SLIF name: 'string'
-L0 S6 '('
+L0 S5 '('
   Internal name: <[Lex-4]>
   SLIF name: '('
-L0 S7 ')'
+L0 S6 ')'
   Internal name: <[Lex-5]>
   SLIF name: ')'
-L0 S8 '+'
+L0 S7 '+'
   Internal name: <[Lex-6]>
   SLIF name: '+'
-L0 S9 '+'
+L0 S8 '+'
   Internal name: <[Lex-7]>
   SLIF name: '+'
-L0 S10 '*'
+L0 S9 '*'
   Internal name: <[Lex-8]>
   SLIF name: '*'
-L0 S11 [']
+L0 S10 [']
   /* terminal */
   Internal name: <[[']]>
   SLIF name: [']
-L0 S12 [\(]
+L0 S11 [\(]
   /* terminal */
   Internal name: <[[\(]]>
   SLIF name: [\(]
-L0 S13 [\)]
+L0 S12 [\)]
   /* terminal */
   Internal name: <[[\)]]>
   SLIF name: [\)]
-L0 S14 [\*]
+L0 S13 [\*]
   /* terminal */
   Internal name: <[[\*]]>
   SLIF name: [\*]
-L0 S15 [\+]
+L0 S14 [\+]
   /* terminal */
   Internal name: <[[\+]]>
   SLIF name: [\+]
-L0 S16 [\=]
+L0 S15 [\=]
   /* terminal */
   Internal name: <[[\=]]>
   SLIF name: [\=]
-L0 S17 [\d]
+L0 S16 [\d]
   /* terminal */
   Internal name: <[[\d]]>
   SLIF name: [\d]
-L0 S18 [\s]
+L0 S17 [\s]
   /* terminal */
   Internal name: <[[\s]]>
   SLIF name: [\s]
-L0 S19 [\w]
+L0 S18 [\w]
   /* terminal */
   Internal name: <[[\w]]>
   SLIF name: [\w]
-L0 S20 [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}]
+L0 S19 [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}]
   /* terminal */
   Internal name: <[[^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}]]>
   SLIF name: [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}]
-L0 S21 [e]
+L0 S20 [e]
   /* terminal */
   Internal name: <[[e]]>
   SLIF name: [e]
-L0 S22 [g]
+L0 S21 [g]
   /* terminal */
   Internal name: <[[g]]>
   SLIF name: [g]
-L0 S23 [i]
+L0 S22 [i]
   /* terminal */
   Internal name: <[[i]]>
   SLIF name: [i]
-L0 S24 [n]
+L0 S23 [n]
   /* terminal */
   Internal name: <[[n]]>
   SLIF name: [n]
-L0 S25 [o]
+L0 S24 [o]
   /* terminal */
   Internal name: <[[o]]>
   SLIF name: [o]
-L0 S26 [r]
+L0 S25 [r]
   /* terminal */
   Internal name: <[[r]]>
   SLIF name: [r]
-L0 S27 [s]
+L0 S26 [s]
   /* terminal */
   Internal name: <[[s]]>
   SLIF name: [s]
-L0 S28 [t]
+L0 S27 [t]
   /* terminal */
   Internal name: <[[t]]>
   SLIF name: [t]
-L0 S29 variable
-  Internal name: <variable>
-L0 S30 number
+L0 S28 number
   Internal name: <number>
-L0 S31 string
+  SLIF name: number
+L0 S29 string
   Internal name: <string>
-L0 S32 <string contents>
+  SLIF name: string
+L0 S30 <string contents>
   Internal name: <string contents>
-L0 S33 whitespace
+  SLIF name: string contents
+L0 S31 variable
+  Internal name: <variable>
+  SLIF name: variable
+L0 S32 whitespace
   Internal name: <whitespace>
+  SLIF name: whitespace
+L0 S33 [:start_lex]
+  Internal name: <[:start_lex]>
 END_OF_SHOW_SYMBOLS_OUTPUT
 
 # Marpa::R3::Display::End
