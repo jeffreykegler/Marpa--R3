@@ -378,7 +378,7 @@ END_OF_SOURCE
 
     my $input = '4243';
     my $expected_output =
-        [ 1, 0, [ 2, 1, [ 4, undef, '42' ] ], [ 3, 2, [ 5, undef, '43' ] ] ];
+        [ 5, 0, [ 3, 1, [ 2, undef, '42' ] ], [ 4, 2, [ 1, undef, '43' ] ] ];
 
     my $grammar = Marpa::R3::Scanless::G->new( { source => \$source } );
     push @tests_data,
@@ -521,7 +521,7 @@ END_OF_SOURCE
 
 # Marpa::R3::Display::End
 
-    Test::More::is( $start_id, 0, q{Test of $grammar->start_symbol_id()} );
+    Test::More::is( $start_id, 2, q{Test of $grammar->start_symbol_id()} );
 
     my @rule_names = ();
 

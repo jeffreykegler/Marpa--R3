@@ -101,26 +101,26 @@ END_OF_SOURCE
 
 my $expected = <<'EOS';
 (S
+  (NP (NN Time) (NNS flies))
+  (VP (VBP like)
+    (NP (DT an) (NN arrow)))
+  (. .))
+(S
   (NP (NN Time))
   (VP (VBZ flies)
     (PP (IN like)
       (NP (DT an) (NN arrow))))
   (. .))
 (S
-  (NP (NN Time) (NNS flies))
+  (NP (NN Fruit) (NNS flies))
   (VP (VBP like)
-    (NP (DT an) (NN arrow)))
+    (NP (DT a) (NN banana)))
   (. .))
 (S
   (NP (NN Fruit))
   (VP (VBZ flies)
     (PP (IN like)
       (NP (DT a) (NN banana))))
-  (. .))
-(S
-  (NP (NN Fruit) (NNS flies))
-  (VP (VBP like)
-    (NP (DT a) (NN banana)))
   (. .))
 EOS
 

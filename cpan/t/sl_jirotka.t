@@ -86,31 +86,31 @@ my $input = q{Create Metric m As Select 1 Where True};
 Marpa::R3::Test::is(
     $grammar->show_symbols(),
     <<'END_OF_SYMBOLS', 'Symbols' );
-G1 S0 [:start]
-G1 S1 Input
-G1 S2 Statement
-G1 S3 SEPARATOR
-G1 S4 CREATE
-G1 S5 TypeDef
-G1 S6 METRIC
-G1 S7 ID_METRIC
-G1 S8 AS
-G1 S9 MetricSelect
-G1 S10 SELECT
-G1 S11 MetricExpr
-G1 S12 ByClause
-G1 S13 Match
-G1 S14 Filter
-G1 S15 WithPf
-G1 S16 NUMBER
-G1 S17 BY
-G1 S18 FOR
-G1 S19 WHERE
-G1 S20 FilterExpr
-G1 S21 TRUE
-G1 S22 FALSE
-G1 S23 WITH
-G1 S24 PF
+G1 S0 AS
+G1 S1 BY
+G1 S2 ByClause
+G1 S3 CREATE
+G1 S4 FALSE
+G1 S5 FOR
+G1 S6 Filter
+G1 S7 FilterExpr
+G1 S8 ID_METRIC
+G1 S9 Input
+G1 S10 METRIC
+G1 S11 Match
+G1 S12 MetricExpr
+G1 S13 MetricSelect
+G1 S14 NUMBER
+G1 S15 PF
+G1 S16 SELECT
+G1 S17 Statement
+G1 S18 TRUE
+G1 S19 TypeDef
+G1 S20 WHERE
+G1 S21 WITH
+G1 S22 WithPf
+G1 S23 [:start]
+G1 S24 SEPARATOR
 END_OF_SYMBOLS
 
 Marpa::R3::Test::is( $grammar->show_rules(),
@@ -464,22 +464,22 @@ And-node #18: R2:1@0-8C4@0
 And-node #17: R4:2@0-8C5@1
 And-node #20: R23:1@0-8C0@0
 And-node #21: R24:1@0-8C23@0
-And-node #1: R5:1@1-2S6@1
-And-node #2: R5:2@1-3S7@2
-And-node #3: R5:3@1-4S8@3
+And-node #1: R5:1@1-2S12@1
+And-node #2: R5:2@1-3S10@2
+And-node #3: R5:3@1-4S0@3
 And-node #16: R5:4@1-8C8@4
-And-node #4: R8:1@4-5S10@4
+And-node #4: R8:1@4-5S19@4
 And-node #6: R8:2@4-6C16@5
-And-node #7: R8:3@4-6S13@6
+And-node #7: R8:3@4-6S3@6
 And-node #15: R8:4@4-8C12@6
-And-node #5: R16:1@5-6S20@5
-And-node #8: R12:1@6-6S15@6
+And-node #5: R16:1@5-6S17@5
+And-node #8: R12:1@6-6S14@6
 And-node #9: R19:1@6-7S23@6
 And-node #14: R12:2@6-8C14@6
 And-node #12: R14:1@6-8C19@6
-And-node #13: R14:2@6-8S19@8
+And-node #13: R14:2@6-8S26@8
 And-node #11: R19:2@6-8C20@7
-And-node #10: R20:1@7-8S25@7
+And-node #10: R20:1@7-8S21@7
 END_OF_AND_NODES
 }
 

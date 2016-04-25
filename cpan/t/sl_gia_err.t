@@ -307,8 +307,8 @@ END_OF_SOURCE
 
 {
     my $grammar = \(<<'END_OF_SOURCE');
-    :default ::= action => [lhs, value]
-    lexeme default = action => [ lhs, value ]
+    :default ::= action => [name, value]
+    lexeme default = action => [ name, value ]
     s ::= a
     a ~ '42'
 END_OF_SOURCE
@@ -316,7 +316,7 @@ END_OF_SOURCE
     push @tests_data,
         [
         $grammar,      '42',
-        [ 1, [ 2, '42' ] ], 'Parse OK',
+        [ 's', [ 'a', '42' ] ], 'Parse OK',
         'Grammar with spaces in array descriptor actions'
         ];
 }
@@ -325,8 +325,8 @@ END_OF_SOURCE
 
 if (1) {
     my $grammar = \(<<'END_OF_SOURCE');
-    :default ::= action => [ lhs, value]
-    lexeme default = action => [lhs, value ]
+    :default ::= action => [ name, value]
+    lexeme default = action => [name, value ]
     s ::= a
     a ~ '42'
 END_OF_SOURCE
@@ -334,7 +334,7 @@ END_OF_SOURCE
     push @tests_data,
         [
         $grammar,      '42',
-        [ 1, [ 2, '42' ] ], 'Parse OK',
+        [ 's', [ 'a', '42' ] ], 'Parse OK',
         'Grammar with spaces in array descriptor actions'
         ];
 }

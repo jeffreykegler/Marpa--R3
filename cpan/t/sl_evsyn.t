@@ -148,7 +148,7 @@ READ: while (1) {
 } ## end READ: while (1)
 
 my $expected_events = <<'=== EOS ===';
-Events at position 0: ^test ^a
+Events at position 0: ^a ^test
 Events at position 1: "a" ^b ^start1 ^start2
 Events at position 3: "b" start1$ ^c ^mid1
 Events at position 5: "c" start2$ ^d ^mid2
@@ -156,7 +156,7 @@ Events at position 6: insert d
 Events at position 21: d$ mid1$ mid2$ e[] ^e ^f
 Events at position 23: "e" e$ e[] ^e ^f
 Events at position 25: "e" e$ ^f
-Events at position 27: "f" g[] g1[] g3[] g2[] g4[] ^h
+Events at position 27: "f" g[] g1[] g2[] g3[] g4[] ^h
 Events at position 29: "h" test$
 === EOS ===
 
