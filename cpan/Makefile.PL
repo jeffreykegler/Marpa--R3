@@ -366,6 +366,14 @@ engine/gnu_ac_build/marpa.c engine/gnu_ac_build/marpa.h engine/gnu_ac_build/conf
 	$(LIBMARPA_INSTALL) engine/read_only engine/gnu_ac_build
 END_OF_POSTAMBLE_PIECE
 
+    push @postamble_pieces, <<'END_OF_POSTAMBLE_PIECE';
+engine/perl_ac_build/marpa.c engine/perl_ac_build/marpa.h: engine/read_only/stamp-h1
+	$(RM_RF) engine/perl_ac_build
+	$(LIBMARPA_INSTALL) engine/read_only engine/perl_ac_build
+END_OF_POSTAMBLE_PIECE
+
+
+# == Logic to create Makefile for GNU autoconf
     push @postamble_pieces, sprintf <<'END_OF_POSTAMBLE_PIECE',
 engine/gnu_ac_build/config.h engine/gnu_ac_build/Makefile: engine/gnu_ac_build/configure
 	%s
@@ -374,18 +382,7 @@ END_OF_POSTAMBLE_PIECE
 '$(SHELL) configure --with-pic --disable-shared --disable-maintainer-mode'
         );
 
-    push @postamble_pieces, sprintf <<'END_OF_POSTAMBLE_PIECE',
-$(LIBMARPA_IN_BUILD_DIR): engine/gnu_ac_build/config.h engine/gnu_ac_build/Makefile
-	%s
-END_OF_POSTAMBLE_PIECE
-	$self->cd(File::Spec->catdir(qw(engine gnu_ac_build)), '$(MAKE)');
-
-    push @postamble_pieces, <<'END_OF_POSTAMBLE_PIECE';
-engine/perl_ac_build/marpa.c engine/perl_ac_build/marpa.h: engine/read_only/stamp-h1
-	$(RM_RF) engine/perl_ac_build
-	$(LIBMARPA_INSTALL) engine/read_only engine/perl_ac_build
-END_OF_POSTAMBLE_PIECE
-
+# == Logic to create Makefile for Perl autoconf
 # The Makefile.PL reads the contents of the directory.  marpa.h
 # and marpa.c are prerequisites, so that the directory is populated
 # before Makefile.PL is copied over
@@ -402,14 +399,26 @@ engine/perl_ac_build/Makefile: engine/perl_ac_build/Makefile.PL
 END_OF_POSTAMBLE_PIECE
 	$self->cd(File::Spec->catdir(qw(engine perl_ac_build)), '$(PERLRUN) Makefile.PL');
 
+# == Logic to compile and build library for GNU autoconf
+    push @postamble_pieces, sprintf <<'END_OF_POSTAMBLE_PIECE',
+engine/gnu_ac_build/.libs/libmarpa$(LIB_EXT): \
+	    engine/gnu_ac_build/config.h engine/gnu_ac_build/Makefile
+	%s
+END_OF_POSTAMBLE_PIECE
+	$self->cd(File::Spec->catdir(qw(engine gnu_ac_build)), '$(MAKE)');
+
+# == Logic to compile and build library for Perl autoconf
 # GNU autoconf automatically creates/updates stamp-h1.
 # For Config::AutoConf, but we don't use it, so we don't create one.
 
     push @postamble_pieces, sprintf <<'END_OF_POSTAMBLE_PIECE',
-$(LIBMARPA_IN_BUILD_DIR): engine/perl_ac_build/Makefile
+engine/perl_ac_build/libmarpa$(LIB_EXT): engine/perl_ac_build/Makefile
 	%s
 END_OF_POSTAMBLE_PIECE
 	$self->cd(File::Spec->catdir(qw(engine perl_ac_build)), '$(MAKE)');
+
+# == Logic to build in XS directory:
+# This is common to both Perl and GNU autoconf
 
     push @postamble_pieces, <<'END_OF_POSTAMBLE_PIECE';
 xs/R3$(OBJ_EXT): xs/libmarpa$(LIB_EXT) \
