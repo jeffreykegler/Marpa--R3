@@ -89,15 +89,15 @@ my $show_symbols_output = $grammar->show_symbols();
 
 Marpa::R3::Test::is( $show_symbols_output,
     <<'END_SYMBOLS', 'Leo Example Symbols' );
-G1 S0 [:start]
-G1 S1 Statement
+G1 S0 AddAssignOp
+G1 S1 AssignOp
 G1 S2 Expression
 G1 S3 Lvalue
-G1 S4 AssignOp
-G1 S5 AddAssignOp
-G1 S6 MinusAssignOp
-G1 S7 MultiplyAssignOp
-G1 S8 Variable
+G1 S4 MinusAssignOp
+G1 S5 MultiplyAssignOp
+G1 S6 Statement
+G1 S7 Variable
+G1 S8 [:start]
 END_SYMBOLS
 
 my $show_rules_output = $grammar->show_rules();
@@ -429,7 +429,7 @@ my $show_earley_sets_output_after = $recce->show_earley_sets();
 
 my $expected_trace_output = <<'END_TRACE_OUTPUT';
 Setting trace_values option
-Popping 1 values to evaluate R5:1@8-9S8@8, rule: 5: Expression -> Variable
+Popping 1 values to evaluate R5:1@8-9S7@8, rule: 5: Expression -> Variable
 Calculated and pushed value: 3
 Popping 3 values to evaluate R4:3@6-9C5@8, rule: 4: Expression -> Lvalue MultiplyAssignOp Expression
 Calculated and pushed value: 6

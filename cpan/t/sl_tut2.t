@@ -90,14 +90,14 @@ my $show_symbols_output = $grammar->show_symbols();
 
 Marpa::R3::Test::is( $show_symbols_output,
     <<'END_SYMBOLS', 'Implementation Example Symbols' );
-G1 S0 [:start]
-G1 S1 '*'
-G1 S2 '+'
-G1 S3 Calculator
-G1 S4 Expression
-G1 S5 Factor
-G1 S6 Number
-G1 S7 Term
+G1 S0 Calculator
+G1 S1 Expression
+G1 S2 Factor
+G1 S3 Number
+G1 S4 Term
+G1 S5 [:start]
+G1 S6 '*'
+G1 S7 '+'
 END_SYMBOLS
 
 my $show_rules_output = $grammar->show_rules();
@@ -288,26 +288,20 @@ Marpa::R3::Test::is( 49, $value, 'Implementation Example Value 2' );
 
 my $expected_trace_output = <<'END_TRACE_OUTPUT';
 Setting trace_values option
-Registering semantics for rule: [:start]
+Registering semantics for rule: Calculator ::= Expression
   Semantics are result_is_rhs_n 0
-Registering semantics for rule: [Lex-0]
+Registering semantics for rule: Factor ::= Number
   Semantics are result_is_rhs_n 0
-Registering semantics for rule: [Lex-1]
+Registering semantics for rule: Term ::= Term [Lex-0] Factor
   Semantics are push_one 0 push_one 1 push_one 2 callback
-Registering semantics for rule: Calculator
+Registering semantics for rule: Term ::= Factor
   Semantics are result_is_rhs_n 0
-Registering semantics for rule: Expression
+Registering semantics for rule: Expression ::= Expression [Lex-1] Term
   Semantics are push_one 0 push_one 1 push_one 2 callback
-Registering semantics for rule: Factor
+Registering semantics for rule: Expression ::= Term
   Semantics are result_is_rhs_n 0
-Registering semantics for rule: Number
+Registering semantics for rule: [:start] ::= Calculator
   Semantics are result_is_rhs_n 0
-Registering semantics for token: [:start]
-  Semantics are result_is_token_value
-Registering semantics for token: [Lex-0]
-  Semantics are result_is_token_value
-Registering semantics for token: [Lex-1]
-  Semantics are result_is_token_value
 Registering semantics for token: Calculator
   Semantics are result_is_token_value
 Registering semantics for token: Expression
@@ -317,6 +311,12 @@ Registering semantics for token: Factor
 Registering semantics for token: Number
   Semantics are result_is_token_value
 Registering semantics for token: Term
+  Semantics are result_is_token_value
+Registering semantics for token: [:start]
+  Semantics are result_is_token_value
+Registering semantics for token: [Lex-0]
+  Semantics are result_is_token_value
+Registering semantics for token: [Lex-1]
   Semantics are result_is_token_value
 value event: starting op MARPA_STEP_TOKEN result_is_token_value
 value event: starting op MARPA_STEP_RULE result_is_rhs_n

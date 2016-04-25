@@ -1313,11 +1313,11 @@ sub registration_init {
 sub Marpa::R3::Scanless::R::value {
     my ( $slr, $per_parse_arg ) = @_;
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $grammar =
+    my $naif_grammar =
         $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
-    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
+    my $grammar_c = $naif_grammar->[Marpa::R3::Internal::Grammar::C];
     my $recce_c   = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
-    my $tracer    = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $tracer    = $naif_grammar->[Marpa::R3::Internal::Grammar::TRACER];
 
     my $trace_actions =
         $slr->[Marpa::R3::Internal::Scanless::R::TRACE_ACTIONS] // 0;
@@ -1326,8 +1326,8 @@ sub Marpa::R3::Scanless::R::value {
     my $trace_file_handle =
         $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
 
-    my $rules   = $grammar->[Marpa::R3::Internal::Grammar::RULES];
-    my $symbols = $grammar->[Marpa::R3::Internal::Grammar::SYMBOLS];
+    my $rules   = $naif_grammar->[Marpa::R3::Internal::Grammar::RULES];
+    my $symbols = $naif_grammar->[Marpa::R3::Internal::Grammar::SYMBOLS];
 
     if ( scalar @_ != 1 ) {
         Marpa::R3::exception(
@@ -1436,7 +1436,7 @@ sub Marpa::R3::Scanless::R::value {
 
     return if not defined $tree->next();
 
-    local $Marpa::R3::Context::grammar = $grammar;
+    local $Marpa::R3::Context::grammar = $naif_grammar;
     local $Marpa::R3::Context::rule    = undef;
     local $Marpa::R3::Context::slr     = $slr;
     local $Marpa::R3::Context::slg =
@@ -1480,7 +1480,7 @@ sub Marpa::R3::Scanless::R::value {
         if ( not $eval_ok or @warnings ) {
             code_problems(
                 {   fatal_error => $fatal_error,
-                    grammar     => $grammar,
+                    grammar     => $naif_grammar,
                     eval_ok     => $eval_ok,
                     warnings    => \@warnings,
                     where       => 'constructing action object',
@@ -1509,22 +1509,34 @@ sub Marpa::R3::Scanless::R::value {
     {
         my ( $type, $id, @raw_ops ) = @{$registration};
         my @ops = ();
-        PRINT_TRACES: {
+      PRINT_TRACES: {
             last PRINT_TRACES if $trace_values <= 2;
             if ( $type eq 'nulling' ) {
                 say {$trace_file_handle}
-                    "Registering semantics for nulling symbol: ",
-                    $grammar->symbol_name($id),
-                    "\n", '  Semantics are ', show_semantics(@raw_ops)
-                    or
-                    Marpa::R3::exception('Cannot say to trace file handle');
+                  "Registering semantics for nulling symbol: ",
+                  $tracer->symbol_name($id),
+                  "\n", '  Semantics are ', show_semantics(@raw_ops)
+                  or Marpa::R3::exception('Cannot say to trace file handle');
                 last PRINT_TRACES;
             } ## end if ( $type eq 'nulling' )
-            say {$trace_file_handle}
-                "Registering semantics for $type: ",
-                $grammar->symbol_name($id),
-                "\n", '  Semantics are ', show_semantics(@raw_ops)
-                or Marpa::R3::exception('Cannot say to trace file handle');
+            if ( $type eq 'rule' ) {
+                say {$trace_file_handle}
+                  "Registering semantics for $type: ",
+                  $tracer->show_rule($id),
+                  '  Semantics are ', show_semantics(@raw_ops)
+                  or Marpa::R3::exception('Cannot say to trace file handle');
+                last PRINT_TRACES;
+            }
+            if ( $type eq 'token' ) {
+                say {$trace_file_handle}
+                  "Registering semantics for $type: ",
+                  $tracer->symbol_name($id),
+                  "\n", '  Semantics are ', show_semantics(@raw_ops)
+                  or Marpa::R3::exception('Cannot say to trace file handle');
+                last PRINT_TRACES;
+            }
+            say {$trace_file_handle} "Registration has unknown type: $type"
+                  or Marpa::R3::exception('Cannot say to trace file handle');
         } ## end PRINT_TRACES:
 
         OP: for my $raw_op (@raw_ops) {
@@ -1616,12 +1628,12 @@ sub Marpa::R3::Scanless::R::value {
                 my $fatal_error = $EVAL_ERROR;
                 code_problems(
                     {   fatal_error => $fatal_error,
-                        grammar     => $grammar,
+                        grammar     => $naif_grammar,
                         eval_ok     => $eval_ok,
                         warnings    => \@warnings,
                         where       => 'computing value',
                         long_where  => 'Computing value for null symbol: '
-                            . $grammar->symbol_name($token_id),
+                            . $naif_grammar->symbol_name($token_id),
                     }
                 );
             } ## end if ( not $eval_ok or @warnings )
@@ -1666,12 +1678,12 @@ sub Marpa::R3::Scanless::R::value {
                     my $fatal_error = $EVAL_ERROR;
                     code_problems(
                         {   fatal_error => $fatal_error,
-                            grammar     => $grammar,
+                            grammar     => $naif_grammar,
                             eval_ok     => $eval_ok,
                             warnings    => \@warnings,
                             where       => 'computing value',
                             long_where  => 'Computing value for rule: '
-                                . $grammar->brief_rule($rule_id),
+                                . $naif_grammar->brief_rule($rule_id),
                         }
                     );
                 } ## end if ( not $eval_ok or @warnings )
@@ -1698,7 +1710,7 @@ sub Marpa::R3::Scanless::R::value {
 
         if ( $value_type eq 'MARPA_STEP_TRACE' ) {
 
-            if ( my $trace_output = trace_op( $slr, $grammar, $value ) ) {
+            if ( my $trace_output = trace_op( $slr, $naif_grammar, $value ) ) {
                 print {$trace_file_handle} $trace_output
                     or Marpa::R3::exception('Could not print to trace file');
             }
