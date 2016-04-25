@@ -30,7 +30,7 @@ $VERSION = eval $VERSION;
 
 
 package Marpa::R3::Internal::Symbol;
-use constant ID => 0;
+use constant WSYID => 0;
 use constant ISYID => 1;
 use constant XSYID => 2;
 use constant BLESSING => 3;

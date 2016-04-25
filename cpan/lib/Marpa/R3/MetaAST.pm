@@ -1595,12 +1595,16 @@ sub char_class_to_symbol {
         $symbol =
             Marpa::R3::Internal::MetaAST::Symbol_List->new($symbol_name);
         $cc_hash->{$symbol_name} = [ $cc_components, $symbol ];
+        my $symbol_data = {   dsl_form     => $char_class,
+                # description  => "Character class: $char_class"
+            };
+        # description  => "Character class: $char_class"
+        my $xsyid = $parse->xsy_create( $symbol_name, $symbol_data );
+        $symbol_data->{xsyid} = $xsyid;
         $parse->symbol_names_set(
             $symbol_name,
             $subgrammar,
-            {   dsl_form     => $char_class,
-                # description  => "Character class: $char_class"
-            }
+            $symbol_data
         );
     } ## end if ( not defined $symbol )
     return $symbol;
@@ -1609,6 +1613,8 @@ sub char_class_to_symbol {
 sub Marpa::R3::Internal::MetaAST::Parse::symbol_names_set {
     my ( $parse, $symbol, $subgrammar, $args ) = @_;
     my $symbol_type = $subgrammar eq 'G1' ? 'G1' : 'L';
+    my $wsyid = $parse->{next_wsyid}++;
+    $parse->{symbols}->{$symbol_type}->{$symbol}->{wsyid} = $wsyid;
     for my $arg_type (keys %{$args}) {
         my $value = $args->{$arg_type};
         $parse->{symbols}->{$symbol_type}->{$symbol}->{$arg_type} = $value;
@@ -1622,18 +1628,43 @@ sub Marpa::R3::Internal::MetaAST::Parse::prioritized_symbol {
 
     # character class symbol name always start with TWO left square brackets
     my $symbol_name = $base_symbol . '[' . $priority . ']';
-    my $symbol_data =
+    my $current_symbol_data =
         $parse->{symbols}->{$Marpa::R3::Internal::SUBGRAMMAR eq 'G1' ? 'G1' : 'L'}->{$symbol_name};
-    return $symbol_name if defined $symbol_data;
+    return $symbol_name if defined $current_symbol_data;
+    my $symbol_data = {
+        dsl_form     => $base_symbol,
+         # description  => "<$base_symbol> at priority $priority"
+    };
+    my $xsyid = $parse->xsy_create( $base_symbol, $symbol_data );
+    $symbol_data->{xsyid} = $xsyid;
     $parse->symbol_names_set(
         $symbol_name,
         $Marpa::R3::Internal::SUBGRAMMAR,
-        {   dsl_form     => $base_symbol,
-            # description  => "<$base_symbol> at priority $priority"
-        }
+        $symbol_data
     );
     return $symbol_name;
 } ## end sub Marpa::R3::Internal::MetaAST::Parse::prioritized_symbol
+
+sub Marpa::R3::Internal::MetaAST::Parse::xsy_create {
+    my ( $parse, $symbol_name, $args ) = @_;
+    my $xsyid = $parse->{next_xsyid}++;
+    my $xsy_data = $parse->{xsy}->[$xsyid] = {};
+    $xsy_data->{name} = $symbol_name;
+    $xsy_data->{id} = $xsyid;
+    $parse->{xsy_by_name}->{$symbol_name} = $xsyid;
+    for my $datum (keys %{$args}) {
+        my $value = $args->{$datum};
+        $xsy_data->{$datum} = $value;
+    }
+    return $xsyid;
+}
+
+sub Marpa::R3::Internal::MetaAST::Parse::xsy_assign {
+    my ( $parse, $symbol_name, $args ) = @_;
+    my $xsyid = $parse->{xsy_by_name}->{$symbol_name};
+    return $xsyid if $xsyid;
+    return $parse->xsy_create( $symbol_name, $args );
+}
 
 # Return the prioritized symbol name,
 # after ensuring everything is set up properly

@@ -107,9 +107,9 @@ END_OF_HEADER
 __DATA__
 
     :package=Marpa::R3::Internal::Symbol
-    ID { Unique ID }
-    ISYID
-    XSYID
+    WSYID { unique Working SYmbol ID }
+    ISYID { unique Internal SYmbol ID }
+    XSYID { unique eXternal SYmbol ID }
     BLESSING
     LEXEME_SEMANTICS
     DSL_FORM

@@ -430,6 +430,16 @@ sub assign_symbol {
     my $symbol = shadow_symbol( $grammar, $symbol_id );
 
     PROPERTY: for my $property ( sort keys %{$options} ) {
+        if ( $property eq 'wsyid' ) {
+            my $value = $options->{$property};
+            $symbol->[Marpa::R3::Internal::Symbol::WSYID] = $value;
+            next PROPERTY;
+        }
+        if ( $property eq 'xsyid' ) {
+            my $value = $options->{$property};
+            $symbol->[Marpa::R3::Internal::Symbol::XSYID] = $value;
+            next PROPERTY;
+        }
         if ( $property eq 'semantics' ) {
             my $value = $options->{$property};
             $symbol->[Marpa::R3::Internal::Symbol::LEXEME_SEMANTICS] = $value;
