@@ -63,21 +63,21 @@ EOS
 
 Marpa::R3::Test::is( $grammar->show_symbols,
     <<'EOS', 'Aycock/Horspool Symbols' );
-G1 S0 [:start]
-G1 S1 'a'
-G1 S2 S
-G1 S3 A
+G1 S0 A
+G1 S1 S
+G1 S2 [:start]
+G1 S3 'a'
 EOS
 
 Marpa::R3::Test::is( $grammar->show_isys,
 	<<'EOS', 'Aycock/Horspool ISYs' );
-0: [:start]
-1: [:start][], nulling
-2: [Lex-0]
-3: S
-4: S[], nulling
-5: A
-6: A[], nulling
+0: A
+1: A[], nulling
+2: S
+3: S[], nulling
+4: [:start]
+5: [:start][], nulling
+6: [Lex-0]
 7: S[R0:1]
 8: S[R0:2]
 9: [:start][']
@@ -235,17 +235,17 @@ $tree_expected{'(;a;a;a)'} = <<'END_OF_TEXT';
 4: o13[c3] R6:2@1-3 p=ok c=ok
  o13[0]* ::= a13 R6:2@1-3C9@2
 5: o9[c4] R9:1@2-3 p=ok c=ok
- o9[0]* ::= a9 R9:1@2-3S2@2
+ o9[0]* ::= a9 R9:1@2-3S6@2
 6: o7[p4] R6:1@1-2 p=ok c=ok
  o7[0]* ::= a7 R6:1@1-2C9@1
 7: o5[c6] R9:1@1-2 p=ok c=ok
- o5[0]* ::= a5 R9:1@1-2S2@1
+ o5[0]* ::= a5 R9:1@1-2S6@1
 8: o2[p3] R3:1@0-1 p=ok c=ok
  o2[0]* ::= a2 R3:1@0-1C9@0
 9: o1[c8] R9:1@0-1 p=ok c=ok
- o1[0]* ::= a1 R9:1@0-1S2@0
+ o1[0]* ::= a1 R9:1@0-1S6@0
 10: o0[p2] R2:1@0-0 p=ok c=ok
- o0[0]* ::= a0 R2:1@0-0S6@0
+ o0[0]* ::= a0 R2:1@0-0S1@0
 END_OF_TEXT
 
 $tree_expected{'(a;;a;a)'} = <<'END_OF_TEXT';
@@ -262,17 +262,17 @@ $tree_expected{'(a;;a;a)'} = <<'END_OF_TEXT';
 4: o13[c3] R6:2@1-3 p=ok c=ok
  o13[0]* ::= a13 R6:2@1-3C9@2
 5: o9[c4] R9:1@2-3 p=ok c=ok
- o9[0]* ::= a9 R9:1@2-3S2@2
+ o9[0]* ::= a9 R9:1@2-3S6@2
 6: o7[p4] R6:1@1-2 p=ok c=ok
  o7[0]* ::= a7 R6:1@1-2C9@1
 7: o5[c6] R9:1@1-2 p=ok c=ok
- o5[0]* ::= a5 R9:1@1-2S2@1
+ o5[0]* ::= a5 R9:1@1-2S6@1
 8: o4[p3] R5:1@1-1 p=ok c=ok
- o4[0]* ::= a4 R5:1@1-1S6@1
+ o4[0]* ::= a4 R5:1@1-1S1@1
 9: o3[p2] R0:1@0-1 p=ok c=ok
  o3[0]* ::= a3 R0:1@0-1C9@0
 10: o1[c9] R9:1@0-1 p=ok c=ok
- o1[0]* ::= a1 R9:1@0-1S2@0
+ o1[0]* ::= a1 R9:1@0-1S6@0
 END_OF_TEXT
 
 $tree_expected{'(a;a;;a)'} = <<'END_OF_TEXT';
@@ -290,17 +290,17 @@ $tree_expected{'(a;a;;a)'} = <<'END_OF_TEXT';
 4: o10[c3] R8:2@2-3 p=ok c=ok
  o10[0]* ::= a10 R8:2@2-3C9@2
 5: o9[c4] R9:1@2-3 p=ok c=ok
- o9[0]* ::= a9 R9:1@2-3S2@2
+ o9[0]* ::= a9 R9:1@2-3S6@2
 6: o8[p4] R8:1@2-2 p=ok c=ok
- o8[0]* ::= a8 R8:1@2-2S6@2
+ o8[0]* ::= a8 R8:1@2-2S1@2
 7: o6[p3] R3:1@1-2 p=ok c=ok
  o6[0]* ::= a6 R3:1@1-2C9@1
 8: o5[c7] R9:1@1-2 p=ok c=ok
- o5[0]* ::= a5 R9:1@1-2S2@1
+ o5[0]* ::= a5 R9:1@1-2S6@1
 9: o3[p2] R0:1@0-1 p=ok c=ok
  o3[0]* ::= a3 R0:1@0-1C9@0
 10: o1[c9] R9:1@0-1 p=ok c=ok
- o1[0]* ::= a1 R9:1@0-1S2@0
+ o1[0]* ::= a1 R9:1@0-1S6@0
 END_OF_TEXT
 
 $tree_expected{'(a;a;a;)'} = <<'END_OF_TEXT';
@@ -316,19 +316,19 @@ $tree_expected{'(a;a;a;)'} = <<'END_OF_TEXT';
  o20[0]* ::= a22 R3:2@1-3C7@2
  o20[1] ::= a23 R3:2@1-3C8@2
 4: o12[c3] R7:2@2-3 p=ok c=ok
- o12[0]* ::= a12 R7:2@2-3S6@3
+ o12[0]* ::= a12 R7:2@2-3S1@3
 5: o11[p4] R7:1@2-3 p=ok c=ok
  o11[0]* ::= a11 R7:1@2-3C9@2
 6: o9[c5] R9:1@2-3 p=ok c=ok
- o9[0]* ::= a9 R9:1@2-3S2@2
+ o9[0]* ::= a9 R9:1@2-3S6@2
 7: o6[p3] R3:1@1-2 p=ok c=ok
  o6[0]* ::= a6 R3:1@1-2C9@1
 8: o5[c7] R9:1@1-2 p=ok c=ok
- o5[0]* ::= a5 R9:1@1-2S2@1
+ o5[0]* ::= a5 R9:1@1-2S6@1
 9: o3[p2] R0:1@0-1 p=ok c=ok
  o3[0]* ::= a3 R0:1@0-1C9@0
 10: o1[c9] R9:1@0-1 p=ok c=ok
- o1[0]* ::= a1 R9:1@0-1S2@0
+ o1[0]* ::= a1 R9:1@0-1S6@0
 END_OF_TEXT
 
 for my $i ( 0 .. $input_length ) {
@@ -353,10 +353,10 @@ for my $i ( 0 .. $input_length ) {
       TESTS_FOLDED_FROM_bocage_t: {
 
             my $and_node_output = <<'END_OF_TEXT';
-And-node #0: R2:1@0-0S6@0
+And-node #0: R2:1@0-0S1@0
 And-node #3: R0:1@0-1C9@0
 And-node #2: R3:1@0-1C9@0
-And-node #1: R9:1@0-1S2@0
+And-node #1: R9:1@0-1S6@0
 And-node #20: R0:2@0-3C5@1
 And-node #21: R0:2@0-3C3@1
 And-node #16: R2:2@0-3C3@0
@@ -364,19 +364,19 @@ And-node #15: R3:2@0-3C6@1
 And-node #17: R10:1@0-3C2@0
 And-node #18: R10:1@0-3C0@0
 And-node #19: R11:1@0-3C10@0
-And-node #4: R5:1@1-1S6@1
+And-node #4: R5:1@1-1S1@1
 And-node #6: R3:1@1-2C9@1
 And-node #7: R6:1@1-2C9@1
-And-node #5: R9:1@1-2S2@1
+And-node #5: R9:1@1-2S6@1
 And-node #22: R3:2@1-3C7@2
 And-node #23: R3:2@1-3C8@2
 And-node #14: R5:2@1-3C6@1
 And-node #13: R6:2@1-3C9@2
-And-node #8: R8:1@2-2S6@2
+And-node #8: R8:1@2-2S1@2
 And-node #11: R7:1@2-3C9@2
-And-node #12: R7:2@2-3S6@3
+And-node #12: R7:2@2-3S1@3
 And-node #10: R8:2@2-3C9@2
-And-node #9: R9:1@2-3S2@2
+And-node #9: R9:1@2-3S6@2
 END_OF_TEXT
 
             Marpa::R3::Test::is( $recce->show_and_nodes(),
@@ -412,19 +412,19 @@ END_OF_TEXT
           TODO: {
 
                 my $bocage_output = <<'END_OF_TEXT';
-0: 0=R2:1@0-0 - S6
-1: 1=R9:1@0-1 - S2
+0: 0=R2:1@0-0 - S1
+1: 1=R9:1@0-1 - S6
 2: 2=R3:1@0-1 - R9:1@0-1
 3: 3=R0:1@0-1 - R9:1@0-1
-4: 4=R5:1@1-1 - S6
-5: 5=R9:1@1-2 - S2
+4: 4=R5:1@1-1 - S1
+5: 5=R9:1@1-2 - S6
 6: 6=R3:1@1-2 - R9:1@1-2
 7: 7=R6:1@1-2 - R9:1@1-2
-8: 8=R8:1@2-2 - S6
-9: 9=R9:1@2-3 - S2
+8: 8=R8:1@2-2 - S1
+9: 9=R9:1@2-3 - S6
 10: 10=R8:2@2-3 R8:1@2-2 R9:1@2-3
 11: 11=R7:1@2-3 - R9:1@2-3
-12: 12=R7:2@2-3 R7:1@2-3 S6
+12: 12=R7:2@2-3 R7:1@2-3 S1
 13: 13=R6:2@1-3 R6:1@1-2 R9:1@2-3
 14: 14=R5:2@1-3 R5:1@1-1 R6:2@1-3
 15: 15=R3:2@0-3 R3:1@0-1 R6:2@1-3
