@@ -1643,10 +1643,10 @@ sub Marpa::R3::Internal::MetaAST::Parse::prioritized_symbol {
 sub Marpa::R3::Internal::MetaAST::Parse::xsy_create {
     my ( $parse, $symbol_name, $args ) = @_;
     my $xsyid = $parse->{next_xsyid}++;
-    my $xsy_data = $parse->{xsy}->[$xsyid] = {};
-    $xsy_data->{name} = $symbol_name;
-    $xsy_data->{id} = $xsyid;
-    $parse->{xsy_by_name}->{$symbol_name} = $xsyid;
+    my $xsy_data = $parse->{xsy}->{$symbol_name} = {
+       name => $symbol_name,
+       id => $xsyid
+    };
     for my $datum (keys %{$args}) {
         my $value = $args->{$datum};
         $xsy_data->{$datum} = $value;
@@ -1669,11 +1669,11 @@ sub Marpa::R3::Internal::MetaAST::Parse::internal_lexeme {
     # character class symbol name always start with TWO left square brackets
     my $lexical_lhs_index = $parse->{lexical_lhs_index}++;
     my $lexical_symbol    = "[Lex-$lexical_lhs_index]";
-    my %names             = (
-        dsl_form     => $dsl_form,
-        # description  => qq{Internal lexical symbol for "$dsl_form"}
-    );
-    $parse->symbol_names_set( $lexical_symbol, $_, \%names ) for qw(G1 L);
+    # description  => qq{Internal lexical symbol for "$dsl_form"}
+    my $symbol_data = { dsl_form     => $dsl_form };
+    my $xsyid = $parse->xsy_assign( $lexical_symbol, $symbol_data );
+    $symbol_data->{xsyid} = $xsyid;
+    $parse->symbol_names_set( $lexical_symbol, $_, $symbol_data ) for qw(G1 L);
     return $lexical_symbol;
 } ## end sub Marpa::R3::Internal::MetaAST::Parse::internal_lexeme
 
