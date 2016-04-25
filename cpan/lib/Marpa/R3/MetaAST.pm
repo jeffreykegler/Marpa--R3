@@ -84,11 +84,6 @@ sub ast_to_hash {
     };
     Marpa::R3::exception($EVAL_ERROR) if not $eval_ok;
 
-    my %grammars = ();
-    $grammars{$_} = 1 for keys %{ $hashed_ast->{rules} };
-    my @lexers =
-        grep { ( substr $_, 0, 1 ) eq 'L' } keys %grammars;
-
     my %stripped_character_classes = ();
     {
         my $character_classes = $hashed_ast->{character_classes};
@@ -1635,7 +1630,7 @@ sub Marpa::R3::Internal::MetaAST::Parse::prioritized_symbol {
         dsl_form     => $base_symbol,
          # description  => "<$base_symbol> at priority $priority"
     };
-    my $xsyid = $parse->xsy_create( $base_symbol, $symbol_data );
+    my $xsyid = $parse->xsy_assign( $base_symbol, $symbol_data );
     $symbol_data->{xsyid} = $xsyid;
     $parse->symbol_names_set(
         $symbol_name,
