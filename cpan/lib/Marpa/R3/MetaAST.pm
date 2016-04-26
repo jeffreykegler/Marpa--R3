@@ -1685,8 +1685,8 @@ sub Marpa::R3::Internal::MetaAST::Parse::internal_lexeme {
     my $lexical_symbol    = "[Lex-$lexical_lhs_index]";
     # description  => qq{Internal lexical symbol for "$dsl_form"}
     my $symbol_data = { dsl_form     => $dsl_form };
-    my $xsyid = $parse->xsy_assign( $lexical_symbol, $symbol_data );
-    $symbol_data->{xsyid} = $xsyid;
+    $parse->xsy_assign( $lexical_symbol, $symbol_data );
+    $symbol_data->{xsy} = $lexical_symbol;
     $parse->symbol_names_set( $lexical_symbol, $_, $symbol_data ) for qw(G1 L);
     return $lexical_symbol;
 } ## end sub Marpa::R3::Internal::MetaAST::Parse::internal_lexeme
