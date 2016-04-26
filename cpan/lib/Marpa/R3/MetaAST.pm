@@ -96,8 +96,8 @@ sub ast_to_hash {
             next SYM if defined $wsyms->{$symbol_name};
             # say STDERR "$grammar $symbol_name";
             my $symbol_data = { dsl_form => $symbol_name };
-            my $xsyid = $hashed_ast->xsy_assign( $symbol_name, $symbol_data );
-            $symbol_data->{xsyid} = $xsyid;
+            $hashed_ast->xsy_assign( $symbol_name, $symbol_data );
+            $symbol_data->{xsy} = $symbol_name;
             $hashed_ast->symbol_names_set( $symbol_name, $grammar, $symbol_data);
         }
     }
@@ -1612,8 +1612,8 @@ sub char_class_to_symbol {
                 # description  => "Character class: $char_class"
             };
         # description  => "Character class: $char_class"
-        my $xsyid = $parse->xsy_create( $symbol_name, $symbol_data );
-        $symbol_data->{xsyid} = $xsyid;
+        $parse->xsy_create( $symbol_name, $symbol_data );
+        $symbol_data->{xsy} = $symbol_name;
         $parse->symbol_names_set(
             $symbol_name,
             $subgrammar,
@@ -1648,8 +1648,8 @@ sub Marpa::R3::Internal::MetaAST::Parse::prioritized_symbol {
         dsl_form     => $base_symbol,
          # description  => "<$base_symbol> at priority $priority"
     };
-    my $xsyid = $parse->xsy_assign( $base_symbol, $symbol_data );
-    $symbol_data->{xsyid} = $xsyid;
+    $parse->xsy_assign( $base_symbol, $symbol_data );
+    $symbol_data->{xsy} = $base_symbol;
     $parse->symbol_names_set(
         $symbol_name,
         $Marpa::R3::Internal::SUBGRAMMAR,
@@ -1660,22 +1660,18 @@ sub Marpa::R3::Internal::MetaAST::Parse::prioritized_symbol {
 
 sub Marpa::R3::Internal::MetaAST::Parse::xsy_create {
     my ( $parse, $symbol_name, $args ) = @_;
-    my $xsyid = $parse->{next_xsyid}++;
-    my $xsy_data = $parse->{xsy}->{$symbol_name} = {
-       name => $symbol_name,
-       id => $xsyid
-    };
+    my $xsy_data = $parse->{xsy}->{$symbol_name} = {};
     for my $datum (keys %{$args}) {
         my $value = $args->{$datum};
         $xsy_data->{$datum} = $value;
     }
-    return $xsyid;
+    return $xsy_data;
 }
 
 sub Marpa::R3::Internal::MetaAST::Parse::xsy_assign {
     my ( $parse, $symbol_name, $args ) = @_;
-    my $xsyid = $parse->{xsy}->{$symbol_name};
-    return $xsyid if $xsyid;
+    my $xsy_data = $parse->{xsy}->{$symbol_name};
+    return $xsy_data if $xsy_data;
     return $parse->xsy_create( $symbol_name, $args );
 }
 
