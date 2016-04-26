@@ -174,7 +174,7 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     Marpa::R3::Internal::MetaAST::start_rule_create( $hashed_source,
         $start_lhs );
 
-    $slg->[Marpa::R3::Internal::Scanless::G::CACHE_RULEIDS_BY_LHS_NAME] = {};
+    $slg->[Marpa::R3::Internal::Scanless::G::CACHE_G1_IRLIDS_BY_LHS_NAME] = {};
     $slg->[Marpa::R3::Internal::Scanless::G::DEFAULT_G1_START_ACTION] =
         $hashed_source->{'default_g1_start_action'};
 

@@ -107,7 +107,7 @@ END_OF_HEADER
 __DATA__
 
     :package=Marpa::R3::Internal::Symbol
-    WSYID { unique Working SYmbol ID }
+    ID { unique Working SYmbol ID }
     ISYID { unique Internal SYmbol ID }
     XSYID { unique eXternal SYmbol ID }
     BLESSING
@@ -244,6 +244,7 @@ __DATA__
     DISCARD_EVENT_BY_LEXER_RULE
     MASK_BY_RULE_ID
 
+    XSY { eXternal symbols, by ID }
     DEFAULT_G1_START_ACTION
     COMPLETION_EVENT_BY_ID
     NULLED_EVENT_BY_ID
@@ -254,7 +255,7 @@ __DATA__
     G1_RULE_ID_BY_TAG { Tracks "SLIF tags" }
 
     { This saves a lot of time at points }
-    CACHE_RULEIDS_BY_LHS_NAME
+    CACHE_G1_IRLIDS_BY_LHS_NAME
 
     BLESS_PACKAGE { Default package into which nodes are blessed }
     IF_INACCESSIBLE { default for symbols }

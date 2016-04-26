@@ -89,7 +89,7 @@ sub Marpa::R3::Grammar::l0_naif_new {
 
     for my $symbol ( sort keys %{$symbols} ) {
         my $properties = $symbols->{$symbol};
-        assign_symbol( $grammar, $symbol, $properties );
+        assign_symbol( $slg, $grammar, $symbol, $properties );
     }
 
     $grammar->[Marpa::R3::Internal::Grammar::START_NAME] = $start_name;
@@ -121,7 +121,7 @@ sub Marpa::R3::Grammar::g1_naif_set {
     if ( defined( my $value = $flat_args->{'symbols'} ) ) {
         for my $symbol ( sort keys %{$value} ) {
             my $properties = $value->{$symbol};
-            assign_symbol( $grammar, $symbol, $properties );
+            assign_symbol( $slg, $grammar, $symbol, $properties );
         }
         delete $flat_args->{'symbols'};
     } ## end if ( defined( my $value = $flat_args->{'symbols'} ) )
@@ -417,7 +417,8 @@ sub shadow_rule {
 } ## end sub shadow_rule
 
 sub assign_symbol {
-    my ( $grammar, $name, $options ) = @_;
+    # $slg will be needed for the XSY's
+    my ( $slg, $grammar, $name, $options ) = @_;
 
     my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
     my $tracer    = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
@@ -432,7 +433,11 @@ sub assign_symbol {
     PROPERTY: for my $property ( sort keys %{$options} ) {
         if ( $property eq 'wsyid' ) {
             my $value = $options->{$property};
-            $symbol->[Marpa::R3::Internal::Symbol::WSYID] = $value;
+            $symbol->[Marpa::R3::Internal::Symbol::ID] = $value;
+            next PROPERTY;
+        }
+        if ( $property eq 'xsy' ) {
+            # TODO convert to XSYID
             next PROPERTY;
         }
         if ( $property eq 'xsyid' ) {
@@ -551,7 +556,7 @@ sub add_user_rule {
             q{"min" must be undefined or a valid Perl number});
     }
 
-    my $lhs = assign_symbol( $grammar, $lhs_name );
+    my $lhs = assign_symbol( $slg, $grammar, $lhs_name );
     $rhs_names //= [];
 
     my @rule_problems = ();
@@ -603,7 +608,7 @@ sub add_user_rule {
 
     my $rhs = [
         map {
-                assign_symbol( $grammar, $_ )
+                assign_symbol( $slg, $grammar, $_ )
         } @{$rhs_names}
     ];
 
@@ -636,7 +641,7 @@ sub add_user_rule {
 
         # create the separator symbol, if we're using one
         if ( defined $separator_name ) {
-            my $separator = assign_symbol( $grammar, $separator_name ) ;
+            my $separator = assign_symbol( $slg, $grammar, $separator_name ) ;
             $separator_id = $separator->[Marpa::R3::Internal::Symbol::ISYID];
         } ## end if ( defined $separator_name )
 

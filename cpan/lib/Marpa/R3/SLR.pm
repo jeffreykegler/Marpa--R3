@@ -46,7 +46,7 @@ sub Marpa::R3::Scanless::R::last_completed {
         $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
     my $thin_g1_recce = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
     my $sought_rules =
-        $slg->[Marpa::R3::Internal::Scanless::G::CACHE_RULEIDS_BY_LHS_NAME]
+        $slg->[Marpa::R3::Internal::Scanless::G::CACHE_G1_IRLIDS_BY_LHS_NAME]
         ->{$symbol_name};
     if ( not defined $sought_rules ) {
         my $g1_tracer       = $thick_g1_grammar->tracer();
@@ -55,7 +55,7 @@ sub Marpa::R3::Scanless::R::last_completed {
         Marpa::R3::exception("Bad symbol in last_completed(): $symbol_name")
             if not defined $symbol_id;
         $sought_rules =
-            $slg->[Marpa::R3::Internal::Scanless::G::CACHE_RULEIDS_BY_LHS_NAME]
+            $slg->[Marpa::R3::Internal::Scanless::G::CACHE_G1_IRLIDS_BY_LHS_NAME]
             ->{$symbol_name} =
             [ grep { $thin_g1_grammar->rule_lhs($_) == $symbol_id; }
                 0 .. $thin_g1_grammar->highest_rule_id() ];
