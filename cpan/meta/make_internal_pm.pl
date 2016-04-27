@@ -244,7 +244,7 @@ __DATA__
     DISCARD_EVENT_BY_LEXER_RULE
     MASK_BY_RULE_ID
 
-    XSY { eXternal symbols, by ID }
+    XSYS { eXternal symbols, by ID }
     DEFAULT_G1_START_ACTION
     COMPLETION_EVENT_BY_ID
     NULLED_EVENT_BY_ID

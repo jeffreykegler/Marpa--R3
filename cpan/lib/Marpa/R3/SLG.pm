@@ -162,10 +162,46 @@ qq{'source' name argument to Marpa::R3::Scanless::G->new() is a ref to a an unde
 sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     my ( $slg, $hashed_source, $g1_args ) = @_;
 
+    my $trace_fh =
+        $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE];
     my $trace_terminals =
         $slg->[Marpa::R3::Internal::Scanless::G::TRACE_TERMINALS];
 
     # Pre-lexer G1 processing
+
+    my @xsy_names = keys %{$hashed_source->{xsy}};
+
+    my $xsys = $slg->[Marpa::R3::Internal::Scanless::G::XSYS] = [];
+    for my $xsy_name ( sort @xsy_names ) {
+        my $runtime_xsy_data = [];
+        $runtime_xsy_data->[Marpa::R3::Internal::XSY::ID] = scalar @{$xsys};
+        my $source_xsy_data = $hashed_source->{xsy}->{$xsy_name};
+      KEY: for my $datum_key ( keys %{$source_xsy_data} ) {
+            if ( $datum_key eq 'blessing' ) {
+                $runtime_xsy_data->[Marpa::R3::Internal::XSY::BLESSING] =
+                  $source_xsy_data->{blessing};
+                next KEY;
+            }
+            if ( $datum_key eq 'lexeme_semantics' ) {
+                $runtime_xsy_data->[Marpa::R3::Internal::XSY::LEXEME_SEMANTICS] =
+                  $source_xsy_data->{lexeme_semantics};
+                next KEY;
+            }
+            if ( $datum_key eq 'dsl_form' ) {
+                $runtime_xsy_data->[Marpa::R3::Internal::XSY::DSL_FORM] =
+                  $source_xsy_data->{dsl_form};
+                next KEY;
+            }
+            if ( $datum_key eq 'if_inaccessible' ) {
+                $runtime_xsy_data->[Marpa::R3::Internal::XSY::IF_INACCESSIBLE] =
+                  $source_xsy_data->{if_inaccessible};
+                next KEY;
+            }
+            Marpa::R3::exception(
+                "Internal error: Unknown hashed source xsy field: $datum_key");
+        }
+        push @{$xsys}, $runtime_xsy_data;
+    }
 
     my $start_lhs = $hashed_source->{'start_lhs'}
         // $hashed_source->{'first_lhs'};
@@ -177,10 +213,6 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     $slg->[Marpa::R3::Internal::Scanless::G::CACHE_G1_IRLIDS_BY_LHS_NAME] = {};
     $slg->[Marpa::R3::Internal::Scanless::G::DEFAULT_G1_START_ACTION] =
         $hashed_source->{'default_g1_start_action'};
-
-    my $trace_fh =
-        $g1_args->{trace_file_handle} //
-        $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE];
 
     my $if_inaccessible_default_arg =
       $hashed_source->{defaults}->{if_inaccessible};
