@@ -474,11 +474,6 @@ sub assign_symbol {
             $grammar_c->symbol_rank_set($symbol_id) = $value;
             next PROPERTY;
         } ## end if ( $property eq 'rank' )
-        if ( $property eq 'if_inaccessible' ) {
-            my $value = $options->{$property};
-            $symbol->[Marpa::R3::Internal::Symbol::IF_INACCESSIBLE] = $value;
-            next PROPERTY;
-        }
         Marpa::R3::exception(qq{Unknown symbol property "$property"});
     } ## end PROPERTY: for my $property ( keys %{$options} )
 

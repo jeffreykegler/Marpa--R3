@@ -919,7 +919,7 @@ sub Marpa::R3::Internal::Scanless::G::precompute {
     {
 
         my $symbol      = $symbols->[$symbol_id];
-        my $symbol_name = $grammar->symbol_name($symbol_id);
+        my $xsy = $symbol->[Marpa::R3::Internal::Symbol::XSY];
 
         # Inaccessible internal symbols may be created
         # from inaccessible use symbols -- ignore these.
@@ -927,11 +927,13 @@ sub Marpa::R3::Internal::Scanless::G::precompute {
         # is correct and that
         # it is not creating inaccessible symbols from
         # accessible ones.
-        next SYMBOL if $symbol_name =~ /\]/xms;
+        next SYMBOL if not defined $xsy;
+
         my $treatment =
-            $symbol->[Marpa::R3::Internal::Symbol::IF_INACCESSIBLE] //
+            $xsy->[Marpa::R3::Internal::XSY::IF_INACCESSIBLE] //
             $default_if_inaccessible;
         next SYMBOL if $treatment eq 'ok';
+        my $symbol_name = $grammar->symbol_name($symbol_id);
         my $message = "Inaccessible symbol: $symbol_name";
         Marpa::R3::exception($message) if $treatment eq 'fatal';
         $DB::single = 1;

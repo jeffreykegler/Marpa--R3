@@ -112,7 +112,6 @@ __DATA__
     XSY { unique eXternal SYmbol }
     BLESSING
     LEXEME_SEMANTICS
-    IF_INACCESSIBLE
 
     :package=Marpa::R3::Internal::XSY
     ID
