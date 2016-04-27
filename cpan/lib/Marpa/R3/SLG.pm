@@ -394,7 +394,6 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
                 # 'description'  => 'Internal LHS for lexer "L0" discard'
             },
             '[[^\\d\\D]]' => {
-                'dsl_form'     => '[^\\d\\D]',
                 # 'description'  => 'Character class: [^\\d\\D]'
             }
         };
@@ -1027,13 +1026,19 @@ sub Marpa::R3::Scanless::G::symbol_name {
 sub Marpa::R3::Scanless::G::symbol_display_form {
     my ( $slg, $symbol_id, $subgrammar ) = @_;
     return thick_subgrammar_by_name( $slg, $subgrammar )
-        ->symbol_in_display_form($symbol_id);
+        ->symbol_in_display_form($slg, $symbol_id);
 }
 
 sub Marpa::R3::Scanless::G::symbol_dsl_form {
-    my ( $slg, $symbol_id, $subgrammar ) = @_;
-    return thick_subgrammar_by_name( $slg, $subgrammar )
-        ->symbol_dsl_form($symbol_id);
+    my ( $slg, $symbol_id ) = @_;
+    my $subgrammar = $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
+    return $subgrammar->symbol_dsl_form($slg, $symbol_id);
+}
+
+sub Marpa::R3::Scanless::G::l0_symbol_dsl_form {
+    my ( $slg, $symbol_id ) = @_;
+    my $subgrammar = $slg->[Marpa::R3::Internal::Scanless::G::THICK_L0_GRAMMAR];
+    return $subgrammar->symbol_dsl_form($slg, $symbol_id);
 }
 
 sub Marpa::R3::Scanless::G::rule_show
@@ -1049,7 +1054,7 @@ sub slg_rule_show {
     my @symbol_ids   = $tracer->rule_expand($rule_id);
     return if not scalar @symbol_ids;
     my ( $lhs, @rhs ) =
-        map { $subgrammar->symbol_in_display_form($_) } @symbol_ids;
+        map { $subgrammar->symbol_in_display_form($slg, $_) } @symbol_ids;
     my $minimum    = $subgrammar_c->sequence_min($rule_id);
     my @quantifier = ();
 
@@ -1082,9 +1087,9 @@ sub Marpa::R3::Scanless::G::show_rules {
             map { $grammar_c->rule_rhs( $rule_id, $_ ) }
             ( 0 .. $rule_length - 1 );
         $text .= join q{ }, $subgrammar, "R$rule_id",
-            $thick_grammar->symbol_in_display_form($lhs_id),
+            $thick_grammar->symbol_in_display_form($slg, $lhs_id),
             '::=',
-            ( map { $thick_grammar->symbol_in_display_form($_) } @rhs_ids ),
+            ( map { $thick_grammar->symbol_in_display_form($slg, $_) } @rhs_ids ),
             @quantifier;
         $text .= "\n";
 
@@ -1146,7 +1151,7 @@ sub Marpa::R3::Scanless::G::show_symbols {
         my $symbol_id = $symbol->[Marpa::R3::Internal::Symbol::ISYID];
 
         $text .= join q{ }, $subgrammar, "S$symbol_id",
-            $thick_grammar->symbol_in_display_form($symbol_id);
+            $thick_grammar->symbol_in_display_form($slg, $symbol_id);
         $text .= "\n";
 
         if ( $verbose >= 2 ) {
@@ -1174,7 +1179,7 @@ sub Marpa::R3::Scanless::G::show_symbols {
 
         if ( $verbose >= 3 ) {
 
-            my $dsl_form = $symbol->[Marpa::R3::Internal::Symbol::DSL_FORM];
+            my $dsl_form = $thick_grammar->symbol_dsl_form( $slg, $symbol_id );
             if ($dsl_form) { $text .= qq{  SLIF name: $dsl_form\n}; }
 
         } ## end if ( $verbose >= 3 )
@@ -1211,7 +1216,7 @@ sub Marpa::R3::Scanless::G::show_dotted_rule {
     my $tracer  = $grammar->tracer();
     my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
     my ( $lhs, @rhs ) =
-    map { $grammar->symbol_in_display_form($_) } $tracer->rule_expand($rule_id);
+    map { $grammar->symbol_in_display_form($slg, $_) } $tracer->rule_expand($rule_id);
     my $rhs_length = scalar @rhs;
 
     my $minimum = $grammar_c->sequence_min($rule_id);

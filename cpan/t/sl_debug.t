@@ -1138,9 +1138,9 @@ for my $symbol_id ( $grammar->symbol_ids('L0') ) {
 # Marpa::R3::Display::End
 
 # Marpa::R3::Display
-# name: SLG symbol_dsl_form() 2 arg synopsis
+# name: SLG l0_symbol_dsl_form() synopsis
 
-    my $dsl_form = $grammar->symbol_dsl_form( $symbol_id, 'L0' )
+    my $dsl_form = $grammar->l0_symbol_dsl_form( $symbol_id )
         // '[No name in DSL form]';
     $text .= "L0 symbol number: $symbol_id  DSL form: $dsl_form\n";
 

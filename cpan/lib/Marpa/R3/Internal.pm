@@ -35,8 +35,7 @@ use constant ISYID => 1;
 use constant XSYID => 2;
 use constant BLESSING => 3;
 use constant LEXEME_SEMANTICS => 4;
-use constant DSL_FORM => 5;
-use constant IF_INACCESSIBLE => 6;
+use constant IF_INACCESSIBLE => 5;
 
 package Marpa::R3::Internal::XSY;
 use constant ID => 0;

@@ -311,34 +311,29 @@ name: SLG symbol_dsl_form() synopsis
 
 =for Marpa::R3::Display::End
 
-=for Marpa::R3::Display
-name: SLG symbol_dsl_form() 2 arg synopsis
+Takes one, required, argument: a symbol ID in the G1 grammar.
+The return value is the "DSL form" of the symbol.
+This is the symbol exactly as it was
+specified by the user in the SLIF DSL.
+The return value is a Perl C<undef> if the symbol does not exist,
+or if it has no DSL form.
 
-    my $dsl_form = $grammar->symbol_dsl_form( $symbol_id, 'L0' )
+=head2 l0_symbol_dsl_form()
+
+=for Marpa::R3::Display
+name: SLG l0_symbol_dsl_form() synopsis
+
+    my $dsl_form = $grammar->l0_symbol_dsl_form( $symbol_id )
         // '[No name in DSL form]';
     $text .= "L0 symbol number: $symbol_id  DSL form: $dsl_form\n";
 
 =for Marpa::R3::Display::End
 
-Given a symbol ID, returns the "DSL form" of the symbol.
-This is the name of the symbol in a form similar
-to the way it is specified by the user in the DSL.
-If the symbol has an explicit name,
-the symbol's DSL form is the same as its explicit name.
-If the symbol does not have an explicit name,
-the method may return a Perl C<undef>,
-or it may return a DSL name invented by Marpa
-and intended to be suggestive.
-The DSL form of a symbol is not intended for use as a symbol name
--- it is not necessarily unique,
-is not always defined,
-and it is subject to change.
-
-The first argument is the symbol ID.
-A second, optional, argument is the subgrammar.
-Currently there are L0 and G1 subgrammars.
-The default subgrammar is G1.
-Returns a Perl C<undef> if the symbol does not exist,
+Takes one, required, argument: a symbol ID in the L0 grammar.
+The return value is the "DSL form" of the symbol.
+This is the symbol exactly as it was
+specified by the user in the SLIF DSL.
+The return value is a Perl C<undef> if the symbol does not exist,
 or if it has no DSL form.
 
 =head2 symbol_ids()

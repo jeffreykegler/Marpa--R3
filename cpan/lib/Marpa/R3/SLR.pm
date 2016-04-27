@@ -526,7 +526,7 @@ my $libmarpa_trace_event_handlers = {
             $lexeme_end_pos - 1 ),
             q{ e}, $slr->g1_pos(),
             q{: },
-            $thick_g1_grammar->symbol_in_display_form($g1_lexeme),
+            $thick_g1_grammar->symbol_in_display_form($slg, $g1_lexeme),
             qq{; value="$raw_token_value"}
             or Marpa::R3::exception("Could not say(): $ERRNO");
     },
@@ -548,7 +548,7 @@ my $libmarpa_trace_event_handlers = {
             input_range_describe( $slr, $lexeme_start_pos,
             $lexeme_end_pos - 1 ),
             q{: },
-            $thick_g1_grammar->symbol_in_display_form($g1_lexeme),
+            $thick_g1_grammar->symbol_in_display_form($slg, $g1_lexeme),
             qq{; value="$raw_token_value"}
             or Marpa::R3::exception("Could not say(): $ERRNO");
     },
@@ -565,7 +565,7 @@ my $libmarpa_trace_event_handlers = {
         my $slg              = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
         my $thick_g1_grammar = $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
         say {$trace_file_handle} qq{Expected lexeme },
-            $thick_g1_grammar->symbol_in_display_form($g1_lexeme),
+            $thick_g1_grammar->symbol_in_display_form($slg, $g1_lexeme),
             " at line $line, column $column; assertion ID = $assertion_id"
             or Marpa::R3::exception("Could not say(): $ERRNO");
     },
@@ -587,7 +587,7 @@ my $libmarpa_trace_event_handlers = {
             input_range_describe( $slr, $lexeme_start_pos,
             $lexeme_end_pos - 1 ),
             q{: },
-            $thick_g1_grammar->symbol_in_display_form($g1_lexeme),
+            $thick_g1_grammar->symbol_in_display_form($slg, $g1_lexeme),
             qq{; value="$raw_token_value"; },
             qq{priority was $lexeme_priority, but $required_priority was required}
             or Marpa::R3::exception("Could not say(): $ERRNO");
@@ -609,7 +609,7 @@ my $libmarpa_trace_event_handlers = {
             input_range_describe( $slr, $lexeme_start_pos,
             $lexeme_end_pos - 1 ),
             q{: },
-            $thick_g1_grammar->symbol_in_display_form($g1_lexeme),
+            $thick_g1_grammar->symbol_in_display_form($slg, $g1_lexeme),
             qq{; value="$raw_token_value"}
             or Marpa::R3::exception("Could not say(): $ERRNO");
     },
@@ -631,7 +631,7 @@ my $libmarpa_trace_event_handlers = {
             $lexeme_end_pos - 1 ),
             q{ e}, $slr->g1_pos(),
             q{: },
-            $thick_g1_grammar->symbol_in_display_form($g1_lexeme),
+            $thick_g1_grammar->symbol_in_display_form($slg, $g1_lexeme),
             qq{; value="$raw_token_value"}
             or Marpa::R3::exception("Could not say(): $ERRNO");
     },
@@ -667,7 +667,7 @@ my $libmarpa_trace_event_handlers = {
             $slg->[Marpa::R3::Internal::Scanless::G::THICK_L0_GRAMMAR]
             ->[0];
         my $symbol_in_display_form =
-            $thick_lex_grammar->symbol_in_display_form($token_id),
+            $thick_lex_grammar->symbol_in_display_form($slg, $token_id),
             my ( $line, $column ) = $slr->line_column($position);
         my $trace_file_handle =
             $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
@@ -689,7 +689,7 @@ my $libmarpa_trace_event_handlers = {
         my $thick_lex_grammar =
             $slg->[Marpa::R3::Internal::Scanless::G::THICK_L0_GRAMMAR];
         my $symbol_in_display_form =
-            $thick_lex_grammar->symbol_in_display_form($token_id),
+            $thick_lex_grammar->symbol_in_display_form($slg, $token_id),
             my ( $line, $column ) = $slr->line_column($position);
         my $trace_file_handle =
             $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
@@ -721,7 +721,7 @@ my $libmarpa_trace_event_handlers = {
             map { $grammar_c->rule_rhs( $lex_rule_id, $_ ) }
             ( 0 .. $rule_length - 1 );
         my @rhs =
-            map { $thick_lex_grammar->symbol_in_display_form($_) } @rhs_ids;
+            map { $thick_lex_grammar->symbol_in_display_form($slg, $_) } @rhs_ids;
         my $trace_file_handle =
             $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
         say {$trace_file_handle} qq{Discarded lexeme },
@@ -735,7 +735,7 @@ my $libmarpa_trace_event_handlers = {
         my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
         my $thick_g1_grammar = $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
         my $lexeme_name =
-            $thick_g1_grammar->symbol_in_display_form($lexeme_id);
+            $thick_g1_grammar->symbol_in_display_form($slg, $lexeme_id);
         my $trace_file_handle =
             $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
         say {$trace_file_handle} 'Paused before lexeme ',
@@ -748,7 +748,7 @@ my $libmarpa_trace_event_handlers = {
         my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
         my $thick_g1_grammar = $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
         my $lexeme_name =
-            $thick_g1_grammar->symbol_in_display_form($lexeme_id);
+            $thick_g1_grammar->symbol_in_display_form($slg, $lexeme_id);
         my $trace_file_handle =
             $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
         say {$trace_file_handle} 'Paused after lexeme ',
@@ -761,7 +761,7 @@ my $libmarpa_trace_event_handlers = {
         my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
         my $thick_g1_grammar = $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
         my $lexeme_name =
-            $thick_g1_grammar->symbol_in_display_form($g1_symbol_id);
+            $thick_g1_grammar->symbol_in_display_form($slg, $g1_symbol_id);
         my $trace_file_handle =
             $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
         say {$trace_file_handle} 'Ignored lexeme ',
@@ -976,20 +976,20 @@ sub Marpa::R3::Scanless::R::resume {
 
                     if ( $trace_terminals >= 2 ) {
                         my $thick_lex_grammar =
-                            $slg->[
-                            Marpa::R3::Internal::Scanless::G::THICK_L0_GRAMMAR];
+                          $slg
+                          ->[Marpa::R3::Internal::Scanless::G::THICK_L0_GRAMMAR
+                          ];
                         my $trace_file_handle = $slr->[
-                            Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
+                          Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
                         my $char_desc = sprintf 'U+%04x', $codepoint;
                         if ( $character =~ m/[[:graph:]]+/ ) {
                             $char_desc .= qq{ '$character'};
                         }
                         say {$trace_file_handle}
-                            qq{Registering character $char_desc as symbol $symbol_id: },
-                            $thick_lex_grammar->symbol_in_display_form(
-                            $symbol_id)
-                            or
-                            Marpa::R3::exception("Could not say(): $ERRNO");
+qq{Registering character $char_desc as symbol $symbol_id: },
+                          $thick_lex_grammar->symbol_in_display_form( $slg,
+                            $symbol_id )
+                          or Marpa::R3::exception("Could not say(): $ERRNO");
                     } ## end if ( $trace_terminals >= 2 )
                     push @ops, $op_alternative, $symbol_id, 1, 1;
                 } ## end if ( $character =~ $re )
@@ -1071,34 +1071,36 @@ sub Marpa::R3::Scanless::R::read_problem {
                     "  [there were $omitted events -- only the first 100 were examined]";
                 $#events = 99;
             } ## end if ( scalar @events > 100 )
-            EVENT: for my $event (@events) {
-                my ( $event_type, $trace_event_type, $lexeme_start_pos,
-                    $lexeme_end_pos, $g1_lexeme )
-                    = @{$event};
+          EVENT: for my $event (@events) {
+                my (
+                    $event_type,     $trace_event_type, $lexeme_start_pos,
+                    $lexeme_end_pos, $g1_lexeme
+                ) = @{$event};
                 next EVENT
-                    if $event_type ne q{'trace}
-                    or $trace_event_type ne 'rejected lexeme';
+                  if $event_type ne q{'trace}
+                  or $trace_event_type ne 'rejected lexeme';
                 my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
                 my $raw_token_value =
-                    $thin_slr->substring( $lexeme_start_pos,
+                  $thin_slr->substring( $lexeme_start_pos,
                     $lexeme_end_pos - $lexeme_start_pos );
                 my $trace_file_handle =
-                    $slr
-                    ->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
+                  $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
                 my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-                my $thick_g1_grammar = $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
+                my $thick_g1_grammar =
+                  $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
 
-                # Different internal symbols may have the same external "display form",
-                # which in naive reporting logic would result in many identical messages,
-                # confusing the user.  This logic makes sure that identical rejection
-                # reports are not repeated, even when they have different causes
-                # internally.
+       # Different internal symbols may have the same external "display form",
+       # which in naive reporting logic would result in many identical messages,
+       # confusing the user.  This logic makes sure that identical rejection
+       # reports are not repeated, even when they have different causes
+       # internally.
 
-                $rejections{ 
-                        $thick_g1_grammar->symbol_in_display_form(
-                        $g1_lexeme)
-                        . qq{; value="$raw_token_value"; length = }
-                        . ( $lexeme_end_pos - $lexeme_start_pos ) } = 1;
+                $rejections{
+                    $thick_g1_grammar->symbol_in_display_form( $slg,
+                        $g1_lexeme )
+                      . qq{; value="$raw_token_value"; length = }
+                      . ( $lexeme_end_pos - $lexeme_start_pos )
+                } = 1;
             } ## end EVENT: for my $event (@events)
             my @problem    = ();
             my @rejections = keys %rejections;

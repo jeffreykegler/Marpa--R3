@@ -97,7 +97,7 @@ sub ast_to_hash {
             # say STDERR "$grammar $symbol_name";
             my $symbol_data = { dsl_form => $symbol_name };
             $hashed_ast->xsy_assign( $symbol_name, $symbol_data );
-            $symbol_data->{xsy} = $symbol_name;
+            $symbol_data = { xsy => $symbol_name };
             $hashed_ast->symbol_names_set( $symbol_name, $grammar, $symbol_data);
         }
     }
@@ -1613,7 +1613,7 @@ sub char_class_to_symbol {
             };
         # description  => "Character class: $char_class"
         $parse->xsy_create( $symbol_name, $symbol_data );
-        $symbol_data->{xsy} = $symbol_name;
+        $symbol_data = { xsy => $symbol_name };
         $parse->symbol_names_set(
             $symbol_name,
             $subgrammar,
@@ -1649,7 +1649,7 @@ sub Marpa::R3::Internal::MetaAST::Parse::prioritized_symbol {
          # description  => "<$base_symbol> at priority $priority"
     };
     $parse->xsy_assign( $base_symbol, $symbol_data );
-    $symbol_data->{xsy} = $base_symbol;
+    $symbol_data = { xsy => $base_symbol };
     $parse->symbol_names_set(
         $symbol_name,
         $Marpa::R3::Internal::SUBGRAMMAR,
@@ -1686,7 +1686,7 @@ sub Marpa::R3::Internal::MetaAST::Parse::internal_lexeme {
     # description  => qq{Internal lexical symbol for "$dsl_form"}
     my $symbol_data = { dsl_form     => $dsl_form };
     $parse->xsy_assign( $lexical_symbol, $symbol_data );
-    $symbol_data->{xsy} = $lexical_symbol;
+    $symbol_data = { xsy => $lexical_symbol };
     $parse->symbol_names_set( $lexical_symbol, $_, $symbol_data ) for qw(G1 L);
     return $lexical_symbol;
 } ## end sub Marpa::R3::Internal::MetaAST::Parse::internal_lexeme

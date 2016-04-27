@@ -172,22 +172,26 @@ sub Marpa::R3::Grammar::symbol_reserved_set {
 # Return DSL form of symbol
 # Does no checking
 sub Marpa::R3::Grammar::symbol_dsl_form {
-    my ( $grammar, $symbol_id ) = @_;
+    my ( $grammar, $slg, $isyid ) = @_;
     my $symbols   = $grammar->[Marpa::R3::Internal::Grammar::SYMBOLS];
-    my $symbol = $symbols->[$symbol_id];
-    return $symbol->[Marpa::R3::Internal::Symbol::DSL_FORM];
+    my $wsy = $symbols->[$isyid];
+    return undef if not defined $wsy;
+    my $xsyid = $wsy->[Marpa::R3::Internal::Symbol::XSYID];
+    return undef if not defined $xsyid;
+    my $xsy = $slg->[Marpa::R3::Internal::Scanless::G::XSY_BY_ID]->[$xsyid];
+    return $xsy->[Marpa::R3::Internal::XSY::DSL_FORM];
 }
 
 # Return display form of symbol
 # Does lots of checking and makes use of alternatives.
 sub Marpa::R3::Grammar::symbol_in_display_form {
-    my ( $grammar, $symbol_id ) = @_;
-    my $symbols   = $grammar->[Marpa::R3::Internal::Grammar::SYMBOLS];
-    my $symbol = $symbols->[$symbol_id];
+    my ( $grammar, $slg, $symbol_id ) = @_;
+    my $symbols = $grammar->[Marpa::R3::Internal::Grammar::SYMBOLS];
+    my $symbol  = $symbols->[$symbol_id];
     return "<!No symbol with ID $symbol_id!>" if not defined $symbol;
-    my $text = $symbol->[Marpa::R3::Internal::Symbol::DSL_FORM] //
-     $grammar->symbol_name($symbol_id);
-    return ($text =~ m/\s/xms) ? "<$text>" : $text;
+    my $text = $grammar->symbol_dsl_form( $slg, $symbol_id )
+      // $grammar->symbol_name($symbol_id);
+    return ( $text =~ m/\s/xms ) ? "<$text>" : $text;
 }
 
 sub Marpa::R3::Grammar::show_symbol {
@@ -467,11 +471,6 @@ sub assign_symbol {
             $grammar_c->symbol_rank_set($symbol_id) = $value;
             next PROPERTY;
         } ## end if ( $property eq 'rank' )
-        if ( $property eq 'dsl_form' ) {
-            my $value = $options->{$property};
-            $symbol->[Marpa::R3::Internal::Symbol::DSL_FORM] = $value;
-            next PROPERTY;
-        }
         if ( $property eq 'if_inaccessible' ) {
             my $value = $options->{$property};
             $symbol->[Marpa::R3::Internal::Symbol::IF_INACCESSIBLE] = $value;

@@ -112,7 +112,6 @@ __DATA__
     XSYID { unique eXternal SYmbol ID }
     BLESSING
     LEXEME_SEMANTICS
-    DSL_FORM
     IF_INACCESSIBLE
 
     :package=Marpa::R3::Internal::XSY
