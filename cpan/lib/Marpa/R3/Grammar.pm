@@ -438,11 +438,10 @@ sub assign_symbol {
         }
         if ( $property eq 'xsy' ) {
             # TODO convert to XSYID
-            next PROPERTY;
-        }
-        if ( $property eq 'xsyid' ) {
-            my $value = $options->{$property};
-            $symbol->[Marpa::R3::Internal::Symbol::XSYID] = $value;
+            my $xsy_name = $options->{$property};
+            my $xsy = $slg->[Marpa::R3::Internal::Scanless::G::XSY_BY_NAME]->{$xsy_name};
+            my $xsyid = $xsy->[Marpa::R3::Internal::XSY::ID];
+            $symbol->[Marpa::R3::Internal::Symbol::XSYID] = $xsyid;
             next PROPERTY;
         }
         if ( $property eq 'semantics' ) {

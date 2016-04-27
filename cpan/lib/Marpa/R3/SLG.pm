@@ -171,10 +171,12 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
 
     my @xsy_names = keys %{$hashed_source->{xsy}};
 
-    my $xsys = $slg->[Marpa::R3::Internal::Scanless::G::XSYS] = [];
+    my $xsy_by_id = $slg->[Marpa::R3::Internal::Scanless::G::XSY_BY_ID] = [];
+    my $xsy_by_name = $slg->[Marpa::R3::Internal::Scanless::G::XSY_BY_NAME] = {};
     for my $xsy_name ( sort @xsy_names ) {
         my $runtime_xsy_data = [];
-        $runtime_xsy_data->[Marpa::R3::Internal::XSY::ID] = scalar @{$xsys};
+        $runtime_xsy_data->[Marpa::R3::Internal::XSY::ID] = scalar @{$xsy_by_id};
+        $runtime_xsy_data->[Marpa::R3::Internal::XSY::NAME] = $xsy_name;
         my $source_xsy_data = $hashed_source->{xsy}->{$xsy_name};
       KEY: for my $datum_key ( keys %{$source_xsy_data} ) {
             if ( $datum_key eq 'blessing' ) {
@@ -200,7 +202,8 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
             Marpa::R3::exception(
                 "Internal error: Unknown hashed source xsy field: $datum_key");
         }
-        push @{$xsys}, $runtime_xsy_data;
+        push @{$xsy_by_id}, $runtime_xsy_data;
+        $xsy_by_name->{$xsy_name} = $runtime_xsy_data;
     }
 
     my $start_lhs = $hashed_source->{'start_lhs'}

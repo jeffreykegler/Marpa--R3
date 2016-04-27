@@ -117,6 +117,7 @@ __DATA__
 
     :package=Marpa::R3::Internal::XSY
     ID
+    NAME
     BLESSING
     LEXEME_SEMANTICS
     DSL_FORM
@@ -244,7 +245,8 @@ __DATA__
     DISCARD_EVENT_BY_LEXER_RULE
     MASK_BY_RULE_ID
 
-    XSYS { eXternal symbols, by ID }
+    XSY_BY_ID { eXternal symbols, by XSYID }
+    XSY_BY_NAME { eXternal symbols, by XSY name }
     DEFAULT_G1_START_ACTION
     COMPLETION_EVENT_BY_ID
     NULLED_EVENT_BY_ID
