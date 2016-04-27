@@ -61,6 +61,8 @@ sub Marpa::R3::Grammar::g1_naif_new {
 
     $grammar->[Marpa::R3::Internal::Grammar::SYMBOLS]            = [];
     $grammar->[Marpa::R3::Internal::Grammar::RULES]              = [];
+    $grammar->[Marpa::R3::Internal::Grammar::XSY_BY_ISYID] = [];
+
     $slg->[Marpa::R3::Internal::Scanless::G::G1_RULE_ID_BY_TAG]     = {};
 
     my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C] =
@@ -81,6 +83,7 @@ sub Marpa::R3::Grammar::l0_naif_new {
 
     $grammar->[Marpa::R3::Internal::Grammar::SYMBOLS]            = [];
     $grammar->[Marpa::R3::Internal::Grammar::RULES]              = [];
+    $grammar->[Marpa::R3::Internal::Grammar::XSY_BY_ISYID] = [];
 
     my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C] =
         Marpa::R3::Thin::G->new( { if => 1 } );
@@ -176,9 +179,8 @@ sub Marpa::R3::Grammar::symbol_dsl_form {
     my $symbols   = $grammar->[Marpa::R3::Internal::Grammar::SYMBOLS];
     my $wsy = $symbols->[$isyid];
     return undef if not defined $wsy;
-    my $xsyid = $wsy->[Marpa::R3::Internal::Symbol::XSYID];
-    return undef if not defined $xsyid;
-    my $xsy = $slg->[Marpa::R3::Internal::Scanless::G::XSY_BY_ID]->[$xsyid];
+    my $xsy = $wsy->[Marpa::R3::Internal::Symbol::XSY];
+    return undef if not defined $xsy;
     return $xsy->[Marpa::R3::Internal::XSY::DSL_FORM];
 }
 
@@ -408,6 +410,8 @@ sub shadow_symbol {
     my $symbols = $grammar->[Marpa::R3::Internal::Grammar::SYMBOLS];
     my $symbol = $symbols->[$symbol_id] = [];
     $symbol->[Marpa::R3::Internal::Symbol::ISYID] = $symbol_id;
+    $grammar->[Marpa::R3::Internal::Grammar::XSY_BY_ISYID]->[$symbol_id] =
+        $symbol->[Marpa::R3::Internal::Symbol::XSY];
     return $symbol;
 } ## end sub shadow_symbol
 
@@ -444,8 +448,7 @@ sub assign_symbol {
             # TODO convert to XSYID
             my $xsy_name = $options->{$property};
             my $xsy = $slg->[Marpa::R3::Internal::Scanless::G::XSY_BY_NAME]->{$xsy_name};
-            my $xsyid = $xsy->[Marpa::R3::Internal::XSY::ID];
-            $symbol->[Marpa::R3::Internal::Symbol::XSYID] = $xsyid;
+            $symbol->[Marpa::R3::Internal::Symbol::XSY] = $xsy;
             next PROPERTY;
         }
         if ( $property eq 'semantics' ) {

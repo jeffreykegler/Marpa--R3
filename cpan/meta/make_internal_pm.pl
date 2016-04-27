@@ -109,7 +109,7 @@ __DATA__
     :package=Marpa::R3::Internal::Symbol
     ID { unique Working SYmbol ID }
     ISYID { unique Internal SYmbol ID }
-    XSYID { unique eXternal SYmbol ID }
+    XSY { unique eXternal SYmbol }
     BLESSING
     LEXEME_SEMANTICS
     IF_INACCESSIBLE
@@ -144,6 +144,7 @@ __DATA__
     START_NAME { name of original symbol }
     SYMBOLS { array of symbol refs }
     RULES { array of rule refs }
+    XSY_BY_ISYID { Array mapping ISYID to XSY }
 
     =LAST_FIELD
 

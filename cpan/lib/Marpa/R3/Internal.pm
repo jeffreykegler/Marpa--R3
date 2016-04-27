@@ -32,7 +32,7 @@ $VERSION = eval $VERSION;
 package Marpa::R3::Internal::Symbol;
 use constant ID => 0;
 use constant ISYID => 1;
-use constant XSYID => 2;
+use constant XSY => 2;
 use constant BLESSING => 3;
 use constant LEXEME_SEMANTICS => 4;
 use constant IF_INACCESSIBLE => 5;
@@ -60,7 +60,8 @@ use constant TRACER => 1;
 use constant START_NAME => 2;
 use constant SYMBOLS => 3;
 use constant RULES => 4;
-use constant LAST_FIELD => 4;
+use constant XSY_BY_ISYID => 5;
+use constant LAST_FIELD => 5;
 
 package Marpa::R3::Internal::Progress_Report;
 use constant RULE_ID => 0;
