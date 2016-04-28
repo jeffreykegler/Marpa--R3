@@ -713,10 +713,15 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
         my $action = $lexeme_default_adverbs->{action};
         my $g1_symbols =
             $thick_g1_grammar->[Marpa::R3::Internal::Grammar::SYMBOLS];
+        my $xsy_by_isyid =
+            $thick_g1_grammar->[Marpa::R3::Internal::Grammar::XSY_BY_ISYID];
+
         LEXEME:
         for my $lexeme_name ( keys %g1_id_by_lexeme_name ) {
             my $g1_lexeme_id = $g1_id_by_lexeme_name{$lexeme_name};
             my $g1_symbol    = $g1_symbols->[$g1_lexeme_id];
+            my $xsy = $xsy_by_isyid->[$g1_lexeme_id];
+            # next LEXEME if not defined $xsy;
             next LEXEME if $lexeme_name =~ m/ \] \z/xms;
             $g1_symbol->[Marpa::R3::Internal::Symbol::LEXEME_SEMANTICS] = $action;
         } ## end LEXEME: for my $lexeme_name ( keys %g1_id_by_lexeme_name )

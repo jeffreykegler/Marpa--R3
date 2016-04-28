@@ -405,16 +405,6 @@ sub Marpa::R3::Grammar::symbol_name {
     return defined $symbol_name ? $symbol_name : '[SYMBOL#' . $id . ']';
 } ## end sub Marpa::R3::Grammar::symbol_name
 
-sub shadow_symbol {
-    my ( $grammar, $symbol_id ) = @_;
-    my $symbols = $grammar->[Marpa::R3::Internal::Grammar::SYMBOLS];
-    my $symbol = $symbols->[$symbol_id] = [];
-    $symbol->[Marpa::R3::Internal::Symbol::ISYID] = $symbol_id;
-    $grammar->[Marpa::R3::Internal::Grammar::XSY_BY_ISYID]->[$symbol_id] =
-        $symbol->[Marpa::R3::Internal::Symbol::XSY];
-    return $symbol;
-} ## end sub shadow_symbol
-
 # Create the structure which "shadows" the libmarpa rule
 sub shadow_rule {
     my ( $grammar, $rule_id ) = @_;
@@ -430,13 +420,14 @@ sub assign_symbol {
 
     my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
     my $tracer    = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $symbols = $grammar->[Marpa::R3::Internal::Grammar::SYMBOLS];
     my $symbol_id = $tracer->symbol_by_name($name);
     if ( defined $symbol_id ) {
-        my $symbols = $grammar->[Marpa::R3::Internal::Grammar::SYMBOLS];
         return $symbols->[$symbol_id];
     }
     $symbol_id = $tracer->symbol_new($name);
-    my $symbol = shadow_symbol( $grammar, $symbol_id );
+    my $symbol = $symbols->[$symbol_id] = [];
+    $symbol->[Marpa::R3::Internal::Symbol::ISYID] = $symbol_id;
 
     PROPERTY: for my $property ( sort keys %{$options} ) {
         if ( $property eq 'wsyid' ) {
@@ -449,6 +440,8 @@ sub assign_symbol {
             my $xsy_name = $options->{$property};
             my $xsy = $slg->[Marpa::R3::Internal::Scanless::G::XSY_BY_NAME]->{$xsy_name};
             $symbol->[Marpa::R3::Internal::Symbol::XSY] = $xsy;
+            $grammar->[Marpa::R3::Internal::Grammar::XSY_BY_ISYID]->[$symbol_id] =
+                $xsy;
             next PROPERTY;
         }
         if ( $property eq 'bless' ) {
