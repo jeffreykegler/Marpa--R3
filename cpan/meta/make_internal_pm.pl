@@ -116,6 +116,9 @@ __DATA__
     :package=Marpa::R3::Internal::XSY
     ID
     NAME
+    NAME_SOURCE { Where is the symbol name from?
+       lexical?  internal?
+    }
     BLESSING
     LEXEME_SEMANTICS
     DSL_FORM

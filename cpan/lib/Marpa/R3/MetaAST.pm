@@ -87,18 +87,23 @@ sub ast_to_hash {
     # add all the "ordinary" symbols, those with no
     # special properties and whose name is their DSL
     # form.
-    for my $grammar (keys %{$hashed_ast->{rules}}) {
-        my $rules = $hashed_ast->{rules}->{$grammar};
-        my $wsyms = $hashed_ast->{symbols}->{$grammar};
+    for my $grammar ( keys %{ $hashed_ast->{rules} } ) {
+        my $rules   = $hashed_ast->{rules}->{$grammar};
+        my $wsyms   = $hashed_ast->{symbols}->{$grammar};
         my @symbols = map { $_->{lhs} } @{$rules};
-        push @symbols, map { @{$_->{rhs}} } @{$rules};
-        SYM: for my $symbol_name (@symbols) {
+        push @symbols, map { @{ $_->{rhs} } } @{$rules};
+      SYM: for my $symbol_name (@symbols) {
             next SYM if defined $wsyms->{$symbol_name};
+
             # say STDERR "$grammar $symbol_name";
-            my $symbol_data = { dsl_form => $symbol_name };
+            my $symbol_data = {
+                dsl_form    => $symbol_name,
+                name_source => 'lexical'
+            };
             $hashed_ast->xsy_assign( $symbol_name, $symbol_data );
             $symbol_data = { xsy => $symbol_name };
-            $hashed_ast->symbol_names_set( $symbol_name, $grammar, $symbol_data);
+            $hashed_ast->symbol_names_set( $symbol_name, $grammar,
+                $symbol_data );
         }
     }
 
@@ -1583,8 +1588,8 @@ sub char_class_to_symbol {
     my ( $class, $parse, $char_class ) = @_;
 
     my $end_of_char_class = rindex $char_class, q{]};
-      my $unmodified_char_class = substr $char_class, 0, $end_of_char_class+1;
-      my $raw_flags = substr $char_class, $end_of_char_class+1;
+    my $unmodified_char_class = substr $char_class, 0, $end_of_char_class + 1;
+    my $raw_flags = substr $char_class, $end_of_char_class + 1;
     my $flags = Marpa::R3::Internal::MetaAST::flag_string_to_flags($raw_flags);
     my $subgrammar = $Marpa::R3::Internal::SUBGRAMMAR;
 
@@ -1595,30 +1600,29 @@ sub char_class_to_symbol {
     my ( undef, $symbol ) = $cc_hash->{$symbol_name};
     if ( not defined $symbol ) {
 
-        my $cc_components = [$unmodified_char_class, $flags];
+        my $cc_components = [ $unmodified_char_class, $flags ];
 
-        # Fast fail on badly formed char_class -- we re-evaluate the regex just in time
-        # before we register characters.
+ # Fast fail on badly formed char_class -- we re-evaluate the regex just in time
+ # before we register characters.
         my ( $regex, $eval_error ) =
-            Marpa::R3::Internal::MetaAST::char_class_to_re($cc_components);
+          Marpa::R3::Internal::MetaAST::char_class_to_re($cc_components);
         Carp::croak( 'Bad Character class: ',
             $char_class, "\n", 'Perl said ', $eval_error )
-            if not $regex;
+          if not $regex;
 
-        $symbol =
-            Marpa::R3::Internal::MetaAST::Symbol_List->new($symbol_name);
+        $symbol = Marpa::R3::Internal::MetaAST::Symbol_List->new($symbol_name);
         $cc_hash->{$symbol_name} = [ $cc_components, $symbol ];
-        my $symbol_data = {   dsl_form     => $char_class,
-                # description  => "Character class: $char_class"
-            };
+
+        # description  => "Character class: $char_class"
+        my $symbol_data = {
+            dsl_form    => $char_class,
+            name_source => 'internal',
+        };
+
         # description  => "Character class: $char_class"
         $parse->xsy_create( $symbol_name, $symbol_data );
         $symbol_data = { xsy => $symbol_name };
-        $parse->symbol_names_set(
-            $symbol_name,
-            $subgrammar,
-            $symbol_data
-        );
+        $parse->symbol_names_set( $symbol_name, $subgrammar, $symbol_data );
     } ## end if ( not defined $symbol )
     return $symbol;
 } ## end sub char_class_to_symbol
@@ -1642,19 +1646,20 @@ sub Marpa::R3::Internal::MetaAST::Parse::prioritized_symbol {
     # character class symbol name always start with TWO left square brackets
     my $symbol_name = $base_symbol . '[' . $priority . ']';
     my $current_symbol_data =
-        $parse->{symbols}->{$Marpa::R3::Internal::SUBGRAMMAR eq 'G1' ? 'G1' : 'L0'}->{$symbol_name};
+      $parse->{symbols}
+      ->{ $Marpa::R3::Internal::SUBGRAMMAR eq 'G1' ? 'G1' : 'L0' }
+      ->{$symbol_name};
     return $symbol_name if defined $current_symbol_data;
+
+    # description  => "<$base_symbol> at priority $priority"
     my $symbol_data = {
-        dsl_form     => $base_symbol,
-         # description  => "<$base_symbol> at priority $priority"
+        dsl_form    => $base_symbol,
+        name_source => 'lexical',
     };
     $parse->xsy_assign( $base_symbol, $symbol_data );
     $symbol_data = { xsy => $base_symbol };
-    $parse->symbol_names_set(
-        $symbol_name,
-        $Marpa::R3::Internal::SUBGRAMMAR,
-        $symbol_data
-    );
+    $parse->symbol_names_set( $symbol_name, $Marpa::R3::Internal::SUBGRAMMAR,
+        $symbol_data );
     return $symbol_name;
 } ## end sub Marpa::R3::Internal::MetaAST::Parse::prioritized_symbol
 
@@ -1683,8 +1688,12 @@ sub Marpa::R3::Internal::MetaAST::Parse::internal_lexeme {
     # character class symbol name always start with TWO left square brackets
     my $lexical_lhs_index = $parse->{lexical_lhs_index}++;
     my $lexical_symbol    = "[Lex-$lexical_lhs_index]";
+
     # description  => qq{Internal lexical symbol for "$dsl_form"}
-    my $symbol_data = { dsl_form     => $dsl_form };
+    my $symbol_data = {
+        dsl_form => $dsl_form,
+        name_source => 'internal'
+    };
     $parse->xsy_assign( $lexical_symbol, $symbol_data );
     $symbol_data = { xsy => $lexical_symbol };
     $parse->symbol_names_set( $lexical_symbol, $_, $symbol_data ) for qw(G1 L);

@@ -181,17 +181,22 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
       KEY: for my $datum_key ( keys %{$source_xsy_data} ) {
             if ( $datum_key eq 'blessing' ) {
                 $runtime_xsy_data->[Marpa::R3::Internal::XSY::BLESSING] =
-                  $source_xsy_data->{blessing};
+                  $source_xsy_data->{$datum_key};
                 next KEY;
             }
             if ( $datum_key eq 'dsl_form' ) {
                 $runtime_xsy_data->[Marpa::R3::Internal::XSY::DSL_FORM] =
-                  $source_xsy_data->{dsl_form};
+                  $source_xsy_data->{$datum_key};
                 next KEY;
             }
             if ( $datum_key eq 'if_inaccessible' ) {
                 $runtime_xsy_data->[Marpa::R3::Internal::XSY::IF_INACCESSIBLE] =
-                  $source_xsy_data->{if_inaccessible};
+                  $source_xsy_data->{$datum_key};
+                next KEY;
+            }
+            if ( $datum_key eq 'name_source' ) {
+                $runtime_xsy_data->[Marpa::R3::Internal::XSY::NAME_SOURCE] =
+                  $source_xsy_data->{$datum_key};
                 next KEY;
             }
             Marpa::R3::exception(
@@ -721,8 +726,10 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
             my $g1_lexeme_id = $g1_id_by_lexeme_name{$lexeme_name};
             my $g1_symbol    = $g1_symbols->[$g1_lexeme_id];
             my $xsy = $xsy_by_isyid->[$g1_lexeme_id];
-            # next LEXEME if not defined $xsy;
-            next LEXEME if $lexeme_name =~ m/ \] \z/xms;
+            next LEXEME if not defined $xsy;
+            next LEXEME if 
+                $xsy->[Marpa::R3::Internal::XSY::NAME_SOURCE] ne 'lexical';
+            # next LEXEME if $lexeme_name =~ m/ \] \z/xms;
             $g1_symbol->[Marpa::R3::Internal::Symbol::LEXEME_SEMANTICS] = $action;
         } ## end LEXEME: for my $lexeme_name ( keys %g1_id_by_lexeme_name )
 
