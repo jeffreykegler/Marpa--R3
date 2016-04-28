@@ -451,11 +451,6 @@ sub assign_symbol {
             $symbol->[Marpa::R3::Internal::Symbol::XSY] = $xsy;
             next PROPERTY;
         }
-        if ( $property eq 'semantics' ) {
-            my $value = $options->{$property};
-            $symbol->[Marpa::R3::Internal::Symbol::LEXEME_SEMANTICS] = $value;
-            next PROPERTY;
-        }
         if ( $property eq 'bless' ) {
             my $value = $options->{$property};
             $symbol->[Marpa::R3::Internal::Symbol::BLESSING] = $value;
