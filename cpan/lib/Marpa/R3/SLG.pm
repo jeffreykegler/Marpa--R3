@@ -726,10 +726,10 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
             my $g1_lexeme_id = $g1_id_by_lexeme_name{$lexeme_name};
             my $g1_symbol    = $g1_symbols->[$g1_lexeme_id];
             my $xsy = $xsy_by_isyid->[$g1_lexeme_id];
-            next LEXEME if not defined $xsy;
-            next LEXEME if 
-                $xsy->[Marpa::R3::Internal::XSY::NAME_SOURCE] ne 'lexical';
-            # next LEXEME if $lexeme_name =~ m/ \] \z/xms;
+            # next LEXEME if not defined $xsy;
+            # next LEXEME if 
+                # $xsy->[Marpa::R3::Internal::XSY::NAME_SOURCE] ne 'lexical';
+            next LEXEME if $lexeme_name =~ m/ \] \z/xms;
             $g1_symbol->[Marpa::R3::Internal::Symbol::LEXEME_SEMANTICS] = $action;
         } ## end LEXEME: for my $lexeme_name ( keys %g1_id_by_lexeme_name )
 
