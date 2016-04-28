@@ -184,11 +184,6 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
                   $source_xsy_data->{blessing};
                 next KEY;
             }
-            if ( $datum_key eq 'lexeme_semantics' ) {
-                $runtime_xsy_data->[Marpa::R3::Internal::XSY::LEXEME_SEMANTICS] =
-                  $source_xsy_data->{lexeme_semantics};
-                next KEY;
-            }
             if ( $datum_key eq 'dsl_form' ) {
                 $runtime_xsy_data->[Marpa::R3::Internal::XSY::DSL_FORM] =
                   $source_xsy_data->{dsl_form};
@@ -723,8 +718,7 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
             my $g1_lexeme_id = $g1_id_by_lexeme_name{$lexeme_name};
             my $g1_symbol    = $g1_symbols->[$g1_lexeme_id];
             next LEXEME if $lexeme_name =~ m/ \] \z/xms;
-            $g1_symbol->[Marpa::R3::Internal::Symbol::LEXEME_SEMANTICS] //=
-                $action;
+            $g1_symbol->[Marpa::R3::Internal::Symbol::LEXEME_SEMANTICS] = $action;
         } ## end LEXEME: for my $lexeme_name ( keys %g1_id_by_lexeme_name )
 
         my $blessing = $lexeme_default_adverbs->{bless};
