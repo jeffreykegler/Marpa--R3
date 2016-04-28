@@ -36,69 +36,78 @@ use Data::Dumper;
 our $DEBUG = 0;
 my @tests_data = ();
 
-my $zero_grammar = \(<<'END_OF_SOURCE');
+if (1) {
+    my $zero_grammar = \(<<'END_OF_SOURCE');
             :default ::= action => ::array
             quartet  ::= a a a a
         a ~ 'a'
 END_OF_SOURCE
 
-push @tests_data,
-    [ $zero_grammar, 'aaaa', [qw(a a a a)], 'Parse OK',
-    'No start statement' ];
+    push @tests_data,
+      [ $zero_grammar, 'aaaa', [qw(a a a a)], 'Parse OK',
+        'No start statement' ];
+}
 
-my $colon1_grammar = \(<<'END_OF_SOURCE');
+if (1) {
+    my $colon1_grammar = \(<<'END_OF_SOURCE');
             :default ::= action => ::array
         :start ::= quartet
             quartet  ::= a a a a
         a ~ 'a'
 END_OF_SOURCE
 
-push @tests_data,
-    [
-    $colon1_grammar, 'aaaa',
-    [qw(a a a a)],   'Parse OK',
-    'Colon start statement first'
-    ];
+    push @tests_data,
+      [
+        $colon1_grammar, 'aaaa',
+        [qw(a a a a)],   'Parse OK',
+        'Colon start statement first'
+      ];
+}
 
-my $colon2_grammar = \(<<'END_OF_SOURCE');
+if (1) {
+    my $colon2_grammar = \(<<'END_OF_SOURCE');
             :default ::= action => ::array
             quartet  ::= a a a a
         :start ::= quartet
         a ~ 'a'
 END_OF_SOURCE
 
-push @tests_data,
-    [
-    $colon2_grammar, 'aaaa',
-    [qw(a a a a)],   'Parse OK',
-    'Colon start statement second'
-    ];
+    push @tests_data,
+      [
+        $colon2_grammar, 'aaaa',
+        [qw(a a a a)],   'Parse OK',
+        'Colon start statement second'
+      ];
+}
 
-my $english1_grammar = \(<<'END_OF_SOURCE');
+if (1) {
+    my $english1_grammar = \(<<'END_OF_SOURCE');
             :default ::= action => ::array
         start symbol is quartet
             quartet  ::= a a a a
         a ~ 'a'
 END_OF_SOURCE
 
-push @tests_data,
-    [
-    $english1_grammar, 'aaaa',
-    [qw(a a a a)],     'Parse OK',
-    'English start statement first'
-    ];
+    push @tests_data,
+      [
+        $english1_grammar, 'aaaa',
+        [qw(a a a a)],     'Parse OK',
+        'English start statement first'
+      ];
+}
 
-my $english2_grammar = \(<<'END_OF_SOURCE');
+if (1) {
+    my $english2_grammar = \(<<'END_OF_SOURCE');
             :default ::= action => ::array
             quartet  ::= a a a a
         start symbol is quartet
         a ~ 'a'
 END_OF_SOURCE
 
-push @tests_data, [
-    $english2_grammar, 'aaaa',
-    'SLIF grammar failed',
-    <<'END_OF_MESSAGE',
+    push @tests_data, [
+        $english2_grammar, 'aaaa',
+        'SLIF grammar failed',
+        <<'END_OF_MESSAGE',
 Parse of BNF/Scanless source failed:
 Length of symbol "statement" at line 2, column 13 is ambiguous
   Choices start with: quartet  ::= a a a a
@@ -107,94 +116,100 @@ Length of symbol "statement" at line 2, column 13 is ambiguous
   Choice 2, length=52, ends at line 3, column 31
   Choice 2: quartet  ::= a a a a\n        start symbol is quarte
 END_OF_MESSAGE
-    'English start statement second'
-];
+        'English start statement second'
+    ];
+}
 
-my $invalid_syntax_grammar = \(<<'END_OF_SOURCE');
+if (1) {
+    my $invalid_syntax_grammar = \(<<'END_OF_SOURCE');
     quartet$ ::= a b c d e f
 END_OF_SOURCE
 
-push @tests_data, [
-    $invalid_syntax_grammar, 'n/a',
-    'SLIF grammar failed',
-    <<'END_OF_MESSAGE',
+    push @tests_data, [
+        $invalid_syntax_grammar, 'n/a',
+        'SLIF grammar failed',
+        <<'END_OF_MESSAGE',
 Parse of BNF/Scanless source failed
 Error in SLIF parse: No lexeme found at line 1, column 12
 * String before error:     quartet
 * The error was at line 1, column 12, and at character 0x0024 '$', ...
 * here: $ ::= a b c d e f\n
 END_OF_MESSAGE
-    'Grammar with syntax error'
-];
+        'Grammar with syntax error'
+    ];
+}
 
 # test <>-wrapping of SLIF symbol names containing spaces
 
-my $non_unique_sequence_grammar = \(<<'END_OF_SOURCE');
+if (1) {
+    my $non_unique_sequence_grammar = \(<<'END_OF_SOURCE');
     <sequence of items> ::= item* proper => 1
     <sequence of items> ::= <forty two>
 END_OF_SOURCE
 
-push @tests_data, [
-    $non_unique_sequence_grammar, 'n/a',
-    'SLIF grammar failed',
-    <<'END_OF_MESSAGE',
+    push @tests_data, [
+        $non_unique_sequence_grammar, 'n/a',
+        'SLIF grammar failed',
+        <<'END_OF_MESSAGE',
 LHS of sequence rule would not be unique: <sequence of items> -> <forty two>
 END_OF_MESSAGE
-    'Grammar with non-unique LHS sequence symbols'
-];
+        'Grammar with non-unique LHS sequence symbols'
+    ];
+}
 
 #####
 
-my $explicit_grammar1 = \(<<'END_OF_SOURCE');
+if (1) {
+    my $explicit_grammar1 = \(<<'END_OF_SOURCE');
           :default ::= action => ::array
           quartet  ::= a a a a;
         start symbol is quartet
         a ~ 'a'
 END_OF_SOURCE
 
-push @tests_data,
-    [
-    $explicit_grammar1, 'aaaa',
-    [qw(a a a a)],     'Parse OK',
-    'Explicit English start statement second'
-    ];
+    push @tests_data,
+      [
+        $explicit_grammar1, 'aaaa',
+        [qw(a a a a)],      'Parse OK',
+        'Explicit English start statement second'
+      ];
+}
 
 #####
 
-{
+if (1) {
 
-# Marpa::R3::Display
-# name: statements separted by semicolon
-# start-after-line: END_OF_SOURCE
-# end-before-line: '^END_OF_SOURCE$'
+    # Marpa::R3::Display
+    # name: statements separted by semicolon
+    # start-after-line: END_OF_SOURCE
+    # end-before-line: '^END_OF_SOURCE$'
 
-my $source = \(<<'END_OF_SOURCE');
+    my $source = \(<<'END_OF_SOURCE');
           :default ::= action => ::array
           quartet  ::= a a a a;
         inaccessible is warn by default
         a ~ 'a'
 END_OF_SOURCE
 
-# Marpa::R3::Display::End
+    # Marpa::R3::Display::End
 
-push @tests_data,
-    [
-    $source, 'aaaa',
-    [qw(a a a a)],     'Parse OK',
-    'Explicit inaccessible is warn statement second, using semi-colon'
-    ];
+    push @tests_data,
+      [
+        $source, 'aaaa', [qw(a a a a)], 'Parse OK',
+        'Explicit inaccessible is warn statement second, using semi-colon'
+      ];
 }
 
 ###
 
-{
+if (1) {
 
-# Marpa::R3::Display
-# name: statements grouped in curly braces
-# start-after-line: END_OF_SOURCE
-# end-before-line: '^END_OF_SOURCE$'
+    # Marpa::R3::Display
+    # name: statements grouped in curly braces
+    # start-after-line: END_OF_SOURCE
+    # end-before-line: '^END_OF_SOURCE$'
 
-my $source = \(<<'END_OF_SOURCE');
+    my $source = \(<<'END_OF_SOURCE');
       {
           :default ::= action => ::array
           quartet  ::= a a a a
@@ -203,19 +218,19 @@ my $source = \(<<'END_OF_SOURCE');
       a ~ 'a'
 END_OF_SOURCE
 
-# Marpa::R3::Display::End
+    # Marpa::R3::Display::End
 
-push @tests_data,
-    [
-    $source, 'aaaa',
-    [qw(a a a a)],     'Parse OK',
-    'Explicit inaccessible is warn statement second, using grouping'
-    ];
+    push @tests_data,
+      [
+        $source, 'aaaa', [qw(a a a a)], 'Parse OK',
+        'Explicit inaccessible is warn statement second, using grouping'
+      ];
 }
 
 #####
 
-my $explicit_grammar2 = \(<<'END_OF_SOURCE');
+if (1) {
+    my $explicit_grammar2 = \(<<'END_OF_SOURCE');
     :default ::= action => ::array
     octet  ::= a a a a
         start symbol <is> octet
@@ -226,50 +241,57 @@ my $explicit_grammar2 = \(<<'END_OF_SOURCE');
         octet ::= a
 END_OF_SOURCE
 
-push @tests_data,
-    [
-    $explicit_grammar2, 'aaaaaaaa',
-    [qw(a a a a a a a), ['a']],     'Parse OK',
-    'Long quartet; no start statement'
-    ];
+    push @tests_data,
+      [
+        $explicit_grammar2,
+        'aaaaaaaa',
+        [ qw(a a a a a a a), ['a'] ],
+        'Parse OK',
+        'Long quartet; no start statement'
+      ];
+}
 
 #####
 # test null statements
 
-my $disambig_grammar = \(<<'END_OF_SOURCE');
+if (1) {
+    my $disambig_grammar = \(<<'END_OF_SOURCE');
     ;:default ::= action => ::array
     octet  ::= a a a a
         ;a ~ 'a';;;;;
 END_OF_SOURCE
 
-push @tests_data,
-    [
-    $disambig_grammar, 'aaaa',
-    [qw(a a a a)],     'Parse OK',
-    'Grammar with null statements'
-    ];
+    push @tests_data,
+      [
+        $disambig_grammar, 'aaaa',
+        [qw(a a a a)],     'Parse OK',
+        'Grammar with null statements'
+      ];
+}
 
 #####
 # test grouped statements
 
-my $grouping_grammar = \(<<'END_OF_SOURCE');
+if (1) {
+    my $grouping_grammar = \(<<'END_OF_SOURCE');
     ;:default ::= action => ::array
     {quartet ::= a b c d };
         a ~ 'a' { b ~ 'b' c~'c' } { d ~ 'd'; };
     { {;} }
 END_OF_SOURCE
 
-push @tests_data,
-    [
-    $grouping_grammar, 'abcd',
-    [qw(a b c d)],     'Parse OK',
-    'Grammar with grouped statements'
-    ];
+    push @tests_data,
+      [
+        $grouping_grammar, 'abcd',
+        [qw(a b c d)],     'Parse OK',
+        'Grammar with grouped statements'
+      ];
+}
 
 #####
 # test null adverbs
 
-{
+if (1) {
     my $grammar = \(<<'END_OF_SOURCE');
     :default ::= ,action => ::array,
     quartet ::= a b c d ,
@@ -277,17 +299,17 @@ push @tests_data,
 END_OF_SOURCE
 
     push @tests_data,
-        [
+      [
         $grammar,      'abcd',
         [qw(a b c d)], 'Parse OK',
         'Grammar with null adverbs'
-        ];
+      ];
 }
 
 #####
 # test null adverbs
 
-{
+if (1) {
     my $grammar = \(<<'END_OF_SOURCE');
     :default ::= ,action => ::array,
     quartet ::= a b c d e f
@@ -295,17 +317,17 @@ END_OF_SOURCE
 END_OF_SOURCE
 
     push @tests_data,
-        [
-        $grammar,      'abcdef',
+      [
+        $grammar,          'abcdef',
         [qw(a b c d e f)], 'Parse OK',
         'Grammar with nested statement groups'
-        ];
+      ];
 }
 
 #####
 # test discarding of spaces in array descriptor actions
 
-{
+if (1) {
     my $grammar = \(<<'END_OF_SOURCE');
     :default ::= action => [name, value]
     lexeme default = action => [ name, value ]
@@ -314,11 +336,10 @@ END_OF_SOURCE
 END_OF_SOURCE
 
     push @tests_data,
-        [
-        $grammar,      '42',
-        [ 's', [ 'a', '42' ] ], 'Parse OK',
-        'Grammar with spaces in array descriptor actions'
-        ];
+      [
+        $grammar, '42', [ 's', [ 'a', '42' ] ],
+        'Parse OK', 'Grammar with spaces in array descriptor actions'
+      ];
 }
 
 #####
@@ -332,11 +353,10 @@ if (1) {
 END_OF_SOURCE
 
     push @tests_data,
-        [
-        $grammar,      '42',
-        [ 's', [ 'a', '42' ] ], 'Parse OK',
-        'Grammar with spaces in array descriptor actions'
-        ];
+      [
+        $grammar, '42', [ 's', [ 'a', '42' ] ],
+        'Parse OK', 'Grammar with spaces in array descriptor actions'
+      ];
 }
 
 if (1) {
@@ -349,11 +369,11 @@ start ~ 'X'
 END_OF_SOURCE
 
     push @tests_data,
-        [
+      [
         $grammar,      'X',
-        [ qw(start X) ], 'Parse OK',
+        [qw(start X)], 'Parse OK',
         'Bug found by Jean-Damien Durand'
-        ];
+      ];
 }
 
 if (1) {
@@ -369,7 +389,7 @@ END_OF_SOURCE
 
     push @tests_data,
       [
-        $grammar, 'aac', ['Š', [qw(Á a a)], [qw(Č c)] ],
+        $grammar, 'aac', [ 'Š', [qw(Á a a)], [qw(Č c)] ],
         'Parse OK', 'Bug in Unicode found by choroba'
       ];
 }
@@ -377,22 +397,23 @@ END_OF_SOURCE
 TEST:
 for my $test_data (@tests_data) {
     my ( $source, $input, $expected_value, $expected_result, $test_name ) =
-        @{$test_data};
+      @{$test_data};
     my ( $actual_value, $actual_result );
-    PROCESSING: {
+  PROCESSING: {
         my $grammar;
-        if (not defined eval {
-                $grammar =
-                    Marpa::R3::Scanless::G->new( { source => $source } );
+        if (
+            not defined eval {
+                $grammar = Marpa::R3::Scanless::G->new( { source => $source } );
                 1;
             }
-            )
+          )
         {
             say $EVAL_ERROR if $DEBUG;
             my $abbreviated_error = $EVAL_ERROR;
 
             chomp $abbreviated_error;
-            $abbreviated_error =~ s/^ Marpa[:][:]R3 \s+ exception \s+ at \s+ .* \z//xms;
+            $abbreviated_error =~
+              s/^ Marpa[:][:]R3 \s+ exception \s+ at \s+ .* \z//xms;
             $actual_value  = 'SLIF grammar failed';
             $actual_result = $abbreviated_error;
             last PROCESSING;
