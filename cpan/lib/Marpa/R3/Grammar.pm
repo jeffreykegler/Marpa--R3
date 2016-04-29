@@ -59,7 +59,6 @@ sub Marpa::R3::Grammar::g1_naif_new {
     my $grammar = [];
     bless $grammar, $class;
 
-    $grammar->[Marpa::R3::Internal::Grammar::SYMBOLS]            = [];
     $grammar->[Marpa::R3::Internal::Grammar::RULES]              = [];
     $grammar->[Marpa::R3::Internal::Grammar::XSY_BY_ISYID] = [];
 
@@ -81,7 +80,6 @@ sub Marpa::R3::Grammar::l0_naif_new {
     my $grammar = [];
     bless $grammar, $class;
 
-    $grammar->[Marpa::R3::Internal::Grammar::SYMBOLS]            = [];
     $grammar->[Marpa::R3::Internal::Grammar::RULES]              = [];
     $grammar->[Marpa::R3::Internal::Grammar::XSY_BY_ISYID] = [];
 

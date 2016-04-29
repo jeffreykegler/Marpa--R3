@@ -106,9 +106,6 @@ END_OF_HEADER
 
 __DATA__
 
-    :package=Marpa::R3::Internal::Symbol
-    ISYID { unique Internal SYmbol ID }
-
     :package=Marpa::R3::Internal::XSY
     ID
     NAME
@@ -140,7 +137,6 @@ __DATA__
     }
 
     START_NAME { name of original symbol }
-    SYMBOLS { array of symbol refs }
     RULES { array of rule refs }
     XSY_BY_ISYID { Array mapping ISYID to XSY }
 
