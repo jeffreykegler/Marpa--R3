@@ -34,7 +34,6 @@ use constant ID => 0;
 use constant ISYID => 1;
 use constant XSY => 2;
 use constant BLESSING => 3;
-use constant LEXEME_SEMANTICS => 4;
 
 package Marpa::R3::Internal::XSY;
 use constant ID => 0;

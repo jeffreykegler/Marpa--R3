@@ -169,9 +169,10 @@ sub Marpa::R3::Internal::Scanless::R::lexeme_semantics_find {
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $grammar =
         $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
-    my $symbols   = $grammar->[Marpa::R3::Internal::Grammar::SYMBOLS];
-    my $symbol    = $symbols->[$lexeme_id];
-    my $semantics = $symbol->[Marpa::R3::Internal::Symbol::LEXEME_SEMANTICS];
+    my $xsy_by_isyid =
+        $grammar->[Marpa::R3::Internal::Grammar::XSY_BY_ISYID];
+    my $xsy = $xsy_by_isyid->[$lexeme_id];
+    my $semantics = $xsy->[Marpa::R3::Internal::XSY::LEXEME_SEMANTICS];
     return '::!default' if not defined $semantics;
     return $semantics;
 }

@@ -111,7 +111,6 @@ __DATA__
     ISYID { unique Internal SYmbol ID }
     XSY { unique eXternal SYmbol }
     BLESSING
-    LEXEME_SEMANTICS
 
     :package=Marpa::R3::Internal::XSY
     ID
