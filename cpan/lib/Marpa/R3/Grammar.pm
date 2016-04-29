@@ -234,38 +234,36 @@ sub Marpa::R3::Grammar::show_nulling_symbols {
 sub Marpa::R3::Grammar::show_productive_symbols {
     my ($grammar) = @_;
     my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
-    my $symbols   = $grammar->[Marpa::R3::Internal::Grammar::SYMBOLS];
     return join q{ }, sort map { $grammar->symbol_name($_) }
-        grep { $grammar_c->symbol_is_productive($_) } ( 0 .. $#{$symbols} );
+        grep { $grammar_c->symbol_is_productive($_) }
+            ( 0 ..  $grammar_c->highest_symbol_id() )
 } ## end sub Marpa::R3::Grammar::show_productive_symbols
 
 sub Marpa::R3::Grammar::show_accessible_symbols {
     my ($grammar) = @_;
     my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
-    my $symbols   = $grammar->[Marpa::R3::Internal::Grammar::SYMBOLS];
     return join q{ }, sort map { $grammar->symbol_name($_) }
-        grep { $grammar_c->symbol_is_accessible($_) } ( 0 .. $#{$symbols} );
+        grep { $grammar_c->symbol_is_accessible($_) }
+            ( 0 ..  $grammar_c->highest_symbol_id() )
 } ## end sub Marpa::R3::Grammar::show_accessible_symbols
 
 sub Marpa::R3::Grammar::inaccessible_symbols {
     my ($grammar) = @_;
     my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
-    my $symbols   = $grammar->[Marpa::R3::Internal::Grammar::SYMBOLS];
     return [
         sort map { $grammar->symbol_name($_) }
             grep { !$grammar_c->symbol_is_accessible($_) }
-            ( 0 .. $#{$symbols} )
+            ( 0 ..  $grammar_c->highest_symbol_id() )
     ];
 } ## end sub Marpa::R3::Grammar::inaccessible_symbols
 
 sub Marpa::R3::Grammar::unproductive_symbols {
     my ($grammar) = @_;
     my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
-    my $symbols   = $grammar->[Marpa::R3::Internal::Grammar::SYMBOLS];
     return [
         sort map { $grammar->symbol_name($_) }
             grep { !$grammar_c->symbol_is_productive($_) }
-            ( 0 .. $#{$symbols} )
+            ( 0 ..  $grammar_c->highest_symbol_id() )
     ];
 } ## end sub Marpa::R3::Grammar::unproductive_symbols
 
@@ -298,7 +296,6 @@ sub Marpa::R3::Grammar::tag {
 
 sub Marpa::R3::Grammar::brief_rule {
     my ( $grammar, $rule_id ) = @_;
-    my $symbols   = $grammar->[Marpa::R3::Internal::Grammar::SYMBOLS];
     my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
     my $tracer    = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
 
