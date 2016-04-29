@@ -84,6 +84,24 @@ sub ast_to_hash {
     };
     Marpa::R3::exception($EVAL_ERROR) if not $eval_ok;
 
+    # Add the augment rule
+    {
+        my $start_lhs = $hashed_ast->{'start_lhs'}
+          // $hashed_ast->{'first_lhs'};
+        Marpa::R3::exception('No rules in SLIF grammar')
+          if not defined $start_lhs;
+        my $augment_lhs = '[:start]';
+
+        # description  => 'Internal G1 start symbol'
+        $hashed_ast->{'symbols'}->{'G1'}->{$augment_lhs} = {};
+        push @{ $hashed_ast->{rules}->{G1} },
+          {
+            lhs    => $augment_lhs,
+            rhs    => [$start_lhs],
+            action => '::first'
+          };
+    } ## end sub Marpa::R3::Internal::MetaAST::start_rule_create
+
     # add all the "ordinary" symbols, those with no
     # special properties and whose name is their DSL
     # form.
@@ -117,16 +135,10 @@ sub ast_to_hash {
     }
     $hashed_ast->{character_classes} = \%stripped_character_classes;
 
+    # say STDERR Data::Dumper::Dumper($hashed_ast);
+
     return $hashed_ast;
 } ## end sub ast_to_hash
-
-sub Marpa::R3::Internal::MetaAST::Parse::start_rule_setup {
-    my ($ast) = @_;
-    my $start_lhs = $ast->{'start_lhs'} // $ast->{'first_lhs'};
-    Marpa::R3::exception('No rules in SLIF grammar')
-        if not defined $start_lhs;
-    Marpa::R3::Internal::MetaAST::start_rule_create( $ast, $start_lhs );
-} ## end sub Marpa::R3::Internal::MetaAST::Parse::start_rule_setup
 
 # This class is for pieces of RHS alternatives, as they are
 # being constructed
@@ -1087,22 +1099,6 @@ sub Marpa::R3::Internal::MetaAST_Nodes::statement_group::evaluate {
     ## no critic(Subroutines::ProhibitExplicitReturnUndef)
     return undef;
 }
-
-sub Marpa::R3::Internal::MetaAST::start_rule_create {
-    my ( $parse, $symbol_name ) = @_;
-    my $start_lhs = '[:start]';
-    $parse->{'default_g1_start_action'} =
-        $parse->{'default_adverbs'}->{'G1'}->{'action'};
-    $parse->{'symbols'}->{'G1'}->{$start_lhs} = {
-        # description  => 'Internal G1 start symbol'
-    };
-    push @{ $parse->{rules}->{G1} },
-        {
-        lhs    => $start_lhs,
-        rhs    => [$symbol_name],
-        action => '::first'
-        };
-} ## end sub Marpa::R3::Internal::MetaAST::start_rule_create
 
 sub Marpa::R3::Internal::MetaAST_Nodes::start_rule::evaluate {
     my ( $values, $parse ) = @_;

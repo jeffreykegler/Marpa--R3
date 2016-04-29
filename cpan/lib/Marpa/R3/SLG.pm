@@ -206,16 +206,7 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
         $xsy_by_name->{$xsy_name} = $runtime_xsy_data;
     }
 
-    my $start_lhs = $hashed_source->{'start_lhs'}
-        // $hashed_source->{'first_lhs'};
-    Marpa::R3::exception('No rules in SLIF grammar')
-        if not defined $start_lhs;
-    Marpa::R3::Internal::MetaAST::start_rule_create( $hashed_source,
-        $start_lhs );
-
     $slg->[Marpa::R3::Internal::Scanless::G::CACHE_G1_IRLIDS_BY_LHS_NAME] = {};
-    $slg->[Marpa::R3::Internal::Scanless::G::DEFAULT_G1_START_ACTION] =
-        $hashed_source->{'default_g1_start_action'};
 
     my $if_inaccessible_default_arg =
       $hashed_source->{defaults}->{if_inaccessible};
