@@ -130,11 +130,8 @@ __DATA__
     :package=Marpa::R3::Internal::Grammar
 
     C { A C structure }
-    TRACER { Also contains a copy of the C structure.
-       It is used frequently, so that an easy memoization
-       is probably worthwhile to save a the extra
-       indirection.
-    }
+    TRACER { The "tracer", a "thin" object
+       around the C structure.  }
 
     START_NAME { name of original symbol }
     RULES { array of rule refs }
