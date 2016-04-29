@@ -707,8 +707,6 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
         last APPLY_DEFAULT_LEXEME_ADVERBS if not $lexeme_default_adverbs;
 
         my $action = $lexeme_default_adverbs->{action};
-        my $g1_symbols =
-            $thick_g1_grammar->[Marpa::R3::Internal::Grammar::SYMBOLS];
         my $xsy_by_isyid =
             $thick_g1_grammar->[Marpa::R3::Internal::Grammar::XSY_BY_ISYID];
 
@@ -729,7 +727,6 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
         LEXEME:
         for my $lexeme_name ( keys %g1_id_by_lexeme_name ) {
             my $g1_lexeme_id = $g1_id_by_lexeme_name{$lexeme_name};
-            my $g1_symbol    = $g1_symbols->[$g1_lexeme_id];
             my $xsy = $xsy_by_isyid->[$g1_lexeme_id];
             next LEXEME if not defined $xsy;
             next LEXEME if 
@@ -767,7 +764,6 @@ sub Marpa::R3::Internal::Scanless::G::precompute {
     my ($slg, $grammar) = @_;
 
     my $rules     = $grammar->[Marpa::R3::Internal::Grammar::RULES];
-    my $symbols     = $grammar->[Marpa::R3::Internal::Grammar::SYMBOLS];
     my $xsy_by_isyid     = $grammar->[Marpa::R3::Internal::Grammar::XSY_BY_ISYID];
     my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
 
@@ -1144,7 +1140,6 @@ sub Marpa::R3::Scanless::G::show_symbols {
 
     my $thick_grammar = thick_subgrammar_by_name($slg, $subgrammar);
 
-    my $symbols   = $thick_grammar->[Marpa::R3::Internal::Grammar::SYMBOLS];
     my $grammar_c = $thick_grammar->[Marpa::R3::Internal::Grammar::C];
 
     for my $symbol_id ( 0 .. $grammar_c->highest_symbol_id() ) {

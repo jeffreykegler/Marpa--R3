@@ -284,7 +284,6 @@ sub Marpa::R3::Internal::ASF::blessings_set {
         $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
     my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
     my $rules     = $grammar->[Marpa::R3::Internal::Grammar::RULES];
-    my $symbols   = $grammar->[Marpa::R3::Internal::Grammar::SYMBOLS];
     my $xsy_by_isyid   = $grammar->[Marpa::R3::Internal::Grammar::XSY_BY_ISYID];
 
     my $default_token_blessing_package =

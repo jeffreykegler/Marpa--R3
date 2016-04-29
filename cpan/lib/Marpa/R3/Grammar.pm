@@ -420,11 +420,10 @@ sub assign_symbol {
     my $symbols = $grammar->[Marpa::R3::Internal::Grammar::SYMBOLS];
     my $symbol_id = $tracer->symbol_by_name($name);
     if ( defined $symbol_id ) {
-        return $symbols->[$symbol_id];
+        return $symbol_id;
     }
     $symbol_id = $tracer->symbol_new($name);
     my $symbol = $symbols->[$symbol_id] = [];
-    $symbol->[Marpa::R3::Internal::Symbol::ISYID] = $symbol_id;
 
     PROPERTY: for my $property ( sort keys %{$options} ) {
         if ( $property eq 'wsyid' ) {
@@ -453,7 +452,7 @@ sub assign_symbol {
         Marpa::R3::exception(qq{Unknown symbol property "$property"});
     } ## end PROPERTY: for my $property ( keys %{$options} )
 
-    return $symbol;
+    return $symbol_id;
 
 } ## end sub assign_symbol
 
@@ -528,7 +527,6 @@ sub add_user_rule {
             q{"min" must be undefined or a valid Perl number});
     }
 
-    my $lhs = assign_symbol( $slg, $grammar, $lhs_name );
     $rhs_names //= [];
 
     my @rule_problems = ();
@@ -578,11 +576,6 @@ sub add_user_rule {
         Marpa::R3::exception($msg);
     } ## end if ( scalar @rule_problems )
 
-    my $rhs = [
-        map {
-                assign_symbol( $slg, $grammar, $_ )
-        } @{$rhs_names}
-    ];
 
     # Is this is an ordinary, non-counted rule?
     my $is_ordinary_rule = scalar @{$rhs_names} == 0 || !defined $min;
@@ -593,8 +586,10 @@ sub add_user_rule {
         }
     } ## end if ( defined $separator_name and $is_ordinary_rule )
 
-    my @rhs_ids = map { $_->[Marpa::R3::Internal::Symbol::ISYID] } @{$rhs};
-    my $lhs_id = $lhs->[Marpa::R3::Internal::Symbol::ISYID];
+    my @rhs_ids = map {
+                assign_symbol( $slg, $grammar, $_ )
+        } @{$rhs_names};
+    my $lhs_id = assign_symbol( $slg, $grammar, $lhs_name );
 
     my $base_rule_id;
     my $separator_id = -1;
@@ -613,8 +608,7 @@ sub add_user_rule {
 
         # create the separator symbol, if we're using one
         if ( defined $separator_name ) {
-            my $separator = assign_symbol( $slg, $grammar, $separator_name ) ;
-            $separator_id = $separator->[Marpa::R3::Internal::Symbol::ISYID];
+            $separator_id = assign_symbol( $slg, $grammar, $separator_name ) ;
         } ## end if ( defined $separator_name )
 
         $grammar_c->throw_set(0);
