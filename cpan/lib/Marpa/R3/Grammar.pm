@@ -195,10 +195,9 @@ sub Marpa::R3::Grammar::symbol_in_display_form {
 }
 
 sub Marpa::R3::Grammar::show_symbol {
-    my ( $grammar, $symbol ) = @_;
+    my ( $grammar, $symbol_id ) = @_;
     my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
     my $text      = q{};
-    my $symbol_id = $symbol->[Marpa::R3::Internal::Symbol::ISYID];
 
     my $name = $grammar->symbol_name($symbol_id);
     $text .= "$symbol_id: $name";
@@ -219,10 +218,10 @@ sub Marpa::R3::Grammar::show_symbol {
 
 sub Marpa::R3::Grammar::show_symbols {
     my ($grammar) = @_;
-    my $symbols   = $grammar->[Marpa::R3::Internal::Grammar::SYMBOLS];
+    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
     my $text      = q{};
-    for my $symbol_ref ( @{$symbols} ) {
-        $text .= $grammar->show_symbol($symbol_ref);
+    for my $symbol_id ( 0 .. $grammar_c->highest_symbol_id() ) {
+        $text .= $grammar->show_symbol($symbol_id);
     }
     return $text;
 } ## end sub Marpa::R3::Grammar::show_symbols
@@ -429,12 +428,9 @@ sub assign_symbol {
 
     PROPERTY: for my $property ( sort keys %{$options} ) {
         if ( $property eq 'wsyid' ) {
-            my $value = $options->{$property};
-            $symbol->[Marpa::R3::Internal::Symbol::ID] = $value;
             next PROPERTY;
         }
         if ( $property eq 'xsy' ) {
-            # TODO convert to XSYID
             my $xsy_name = $options->{$property};
             my $xsy = $slg->[Marpa::R3::Internal::Scanless::G::XSY_BY_NAME]->{$xsy_name};
             $grammar->[Marpa::R3::Internal::Grammar::XSY_BY_ISYID]->[$symbol_id] =

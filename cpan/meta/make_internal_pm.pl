@@ -107,9 +107,7 @@ END_OF_HEADER
 __DATA__
 
     :package=Marpa::R3::Internal::Symbol
-    ID { unique Working SYmbol ID }
     ISYID { unique Internal SYmbol ID }
-    XSY { unique eXternal SYmbol }
 
     :package=Marpa::R3::Internal::XSY
     ID
