@@ -480,6 +480,10 @@ sub add_user_rule {
 
   OPTION: for my $option ( keys %{$options} ) {
         my $value = $options->{$option};
+        if ( $option eq 'xaltid' )   {
+            # TODO expand this
+            next OPTION;
+        }
         if ( $option eq 'name' )   { $rule_name = $value; next OPTION; }
         if ( $option eq 'tag' )    { $slif_tag  = $value; next OPTION; }
         if ( $option eq 'rhs' )    { $rhs_names = $value; next OPTION }

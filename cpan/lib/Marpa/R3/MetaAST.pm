@@ -63,6 +63,7 @@ sub ast_to_hash {
     $hashed_ast->{meta_recce} = $ast->{meta_recce};
     bless $hashed_ast, 'Marpa::R3::Internal::MetaAST::Parse';
 
+    $hashed_ast->{xalt} = [];
     $hashed_ast->{rules}->{G1} = [];
     my $g1_symbols = $hashed_ast->{symbols}->{G1} = {};
 
@@ -94,12 +95,13 @@ sub ast_to_hash {
 
         # description  => 'Internal G1 start symbol'
         $hashed_ast->{'symbols'}->{'G1'}->{$augment_lhs} = {};
-        push @{ $hashed_ast->{rules}->{G1} },
-          {
+        my $rule_data = {
             lhs    => $augment_lhs,
             rhs    => [$start_lhs],
             action => '::first'
           };
+        $rule_data->{xaltid} = $hashed_ast->xalt_create( $rule_data );
+        push @{ $hashed_ast->{rules}->{G1} }, $rule_data;
     } ## end sub Marpa::R3::Internal::MetaAST::start_rule_create
 
     # add all the "ordinary" symbols, those with no
@@ -1662,6 +1664,9 @@ sub Marpa::R3::Internal::MetaAST::Parse::prioritized_symbol {
 sub Marpa::R3::Internal::MetaAST::Parse::xsy_create {
     my ( $parse, $symbol_name, $args ) = @_;
     my $xsy_data = $parse->{xsy}->{$symbol_name} = {};
+
+    # Do I need to copy any more?
+    # Can't I just use $args?
     for my $datum (keys %{$args}) {
         my $value = $args->{$datum};
         $xsy_data->{$datum} = $value;
@@ -1674,6 +1679,23 @@ sub Marpa::R3::Internal::MetaAST::Parse::xsy_assign {
     my $xsy_data = $parse->{xsy}->{$symbol_name};
     return $xsy_data if $xsy_data;
     return $parse->xsy_create( $symbol_name, $args );
+}
+
+sub Marpa::R3::Internal::MetaAST::Parse::xalt_create {
+    my ( $parse, $args ) = @_;
+    my $rule_id = scalar @{$parse->{xalt}};
+    my $xalt_data = $parse->{xalt}->[$rule_id] = {};
+    DATUM: for my $datum (keys %{$args}) {
+        my $value = $args->{$datum};
+        # Deep copy of rhs
+        if ($datum eq 'rhs') {
+            my @rhs = @{$value};
+            $xalt_data->{$datum} = \@rhs;
+            next DATUM;
+        }
+        $xalt_data->{$datum} = $value;
+    }
+    return $rule_id;
 }
 
 # Return the prioritized symbol name,
