@@ -176,11 +176,9 @@ sub Marpa::R3::Grammar::symbol_reserved_set {
 # Does no checking
 sub Marpa::R3::Grammar::symbol_dsl_form {
     my ( $grammar, $slg, $isyid ) = @_;
-    my $symbols   = $grammar->[Marpa::R3::Internal::Grammar::SYMBOLS];
-    my $wsy = $symbols->[$isyid];
-    return undef if not defined $wsy;
-    my $xsy = $wsy->[Marpa::R3::Internal::Symbol::XSY];
-    return undef if not defined $xsy;
+    my $xsy_by_isyid   = $grammar->[Marpa::R3::Internal::Grammar::XSY_BY_ISYID];
+    my $xsy = $xsy_by_isyid->[$isyid];
+    return if not defined $xsy;
     return $xsy->[Marpa::R3::Internal::XSY::DSL_FORM];
 }
 
@@ -439,7 +437,6 @@ sub assign_symbol {
             # TODO convert to XSYID
             my $xsy_name = $options->{$property};
             my $xsy = $slg->[Marpa::R3::Internal::Scanless::G::XSY_BY_NAME]->{$xsy_name};
-            $symbol->[Marpa::R3::Internal::Symbol::XSY] = $xsy;
             $grammar->[Marpa::R3::Internal::Grammar::XSY_BY_ISYID]->[$symbol_id] =
                 $xsy;
             next PROPERTY;

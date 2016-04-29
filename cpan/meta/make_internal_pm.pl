@@ -110,7 +110,6 @@ __DATA__
     ID { unique Working SYmbol ID }
     ISYID { unique Internal SYmbol ID }
     XSY { unique eXternal SYmbol }
-    BLESSING
 
     :package=Marpa::R3::Internal::XSY
     ID

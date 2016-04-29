@@ -744,8 +744,6 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
                 } ## end if ( $lexeme_name =~ / [^ [:alnum:]] /xms )
                 my $blessing_by_name = $lexeme_name;
                 $blessing_by_name =~ s/[ ]/_/gxms;
-                $g1_symbol->[Marpa::R3::Internal::Symbol::BLESSING] =
-                    $blessing_by_name;
                 $xsy->[Marpa::R3::Internal::XSY::BLESSING] =
                     $blessing_by_name;
                 next LEXEME;
@@ -756,7 +754,6 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
                     qq{   Problematic lexeme was <$lexeme_name>\n}
                 );
             } ## end if ( $blessing =~ / [\W] /xms )
-            $g1_symbol->[Marpa::R3::Internal::Symbol::BLESSING] = $blessing;
             $xsy->[Marpa::R3::Internal::XSY::BLESSING] = $blessing;
         } ## end LEXEME: for my $lexeme_name ( keys %g1_id_by_lexeme_name )
 
@@ -771,6 +768,7 @@ sub Marpa::R3::Internal::Scanless::G::precompute {
 
     my $rules     = $grammar->[Marpa::R3::Internal::Grammar::RULES];
     my $symbols     = $grammar->[Marpa::R3::Internal::Grammar::SYMBOLS];
+    my $xsy_by_isyid     = $grammar->[Marpa::R3::Internal::Grammar::XSY_BY_ISYID];
     my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
 
     my $trace_fh =
@@ -917,11 +915,9 @@ sub Marpa::R3::Internal::Scanless::G::precompute {
         // 'warn';
     SYMBOL:
     for my $symbol_id ( grep { !$grammar_c->symbol_is_accessible($_) }
-        ( 0 .. $#{$symbols} ) )
+        ( 0 .. $grammar_c->highest_symbol_id() ) )
     {
-
-        my $symbol      = $symbols->[$symbol_id];
-        my $xsy = $symbol->[Marpa::R3::Internal::Symbol::XSY];
+        my $xsy      = $xsy_by_isyid->[$symbol_id];
 
         # Inaccessible internal symbols may be created
         # from inaccessible use symbols -- ignore these.
