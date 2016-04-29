@@ -444,11 +444,6 @@ sub assign_symbol {
                 $xsy;
             next PROPERTY;
         }
-        if ( $property eq 'bless' ) {
-            my $value = $options->{$property};
-            $symbol->[Marpa::R3::Internal::Symbol::BLESSING] = $value;
-            next PROPERTY;
-        }
         if ( $property eq 'terminal' ) {
             my $value = $options->{$property};
             $grammar_c->symbol_is_terminal_set( $symbol_id, $value );

@@ -285,6 +285,7 @@ sub Marpa::R3::Internal::ASF::blessings_set {
     my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
     my $rules     = $grammar->[Marpa::R3::Internal::Grammar::RULES];
     my $symbols   = $grammar->[Marpa::R3::Internal::Grammar::SYMBOLS];
+    my $xsy_by_isyid   = $grammar->[Marpa::R3::Internal::Grammar::XSY_BY_ISYID];
 
     my $default_token_blessing_package =
         $asf->[ Marpa::R3::Internal::ASF::DEFAULT_TOKEN_BLESSING_PACKAGE ];
@@ -314,9 +315,9 @@ sub Marpa::R3::Internal::ASF::blessings_set {
     for ( my $symbol_id = 0; $symbol_id <= $highest_symbol_id; $symbol_id++ )
     {
         my $blessing;
-        my $symbol = $symbols->[$symbol_id];
-        $blessing = $symbol->[Marpa::R3::Internal::Symbol::BLESSING]
-            if defined $symbol;
+        my $xsy = $xsy_by_isyid->[$symbol_id];
+        $blessing = $xsy->[Marpa::R3::Internal::XSY::BLESSING]
+            if defined $xsy;
         if ( defined $blessing and q{::} ne substr $blessing, 0, 2 ) {
             $symbol_blessing[$symbol_id] = $blessing;
             next SYMBOL;

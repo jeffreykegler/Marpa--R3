@@ -205,9 +205,9 @@ sub Marpa::R3::Scanless::R::lexeme_blessing_find {
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $grammar =
         $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
-    my $symbols  = $grammar->[Marpa::R3::Internal::Grammar::SYMBOLS];
-    my $symbol   = $symbols->[$lexeme_id];
-    my $blessing = $symbol->[Marpa::R3::Internal::Symbol::BLESSING];
+    my $xsy_by_isyid = $grammar->[Marpa::R3::Internal::Grammar::XSY_BY_ISYID];
+    my $xsy   = $xsy_by_isyid->[$lexeme_id];
+    my $blessing = $xsy->[Marpa::R3::Internal::XSY::BLESSING];
 
     return '::undef' if not defined $blessing;
     return '::undef' if $blessing eq '::undef';

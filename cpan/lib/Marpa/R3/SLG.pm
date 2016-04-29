@@ -730,7 +730,11 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
         for my $lexeme_name ( keys %g1_id_by_lexeme_name ) {
             my $g1_lexeme_id = $g1_id_by_lexeme_name{$lexeme_name};
             my $g1_symbol    = $g1_symbols->[$g1_lexeme_id];
-            next LEXEME if $lexeme_name =~ m/ \] \z/xms;
+            my $xsy = $xsy_by_isyid->[$g1_lexeme_id];
+            next LEXEME if not defined $xsy;
+            next LEXEME if 
+                $xsy->[Marpa::R3::Internal::XSY::NAME_SOURCE] ne 'lexical';
+
             if ( $blessing eq '::name' ) {
                 if ( $lexeme_name =~ / [^ [:alnum:]] /xms ) {
                     Marpa::R3::exception(
@@ -740,7 +744,9 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
                 } ## end if ( $lexeme_name =~ / [^ [:alnum:]] /xms )
                 my $blessing_by_name = $lexeme_name;
                 $blessing_by_name =~ s/[ ]/_/gxms;
-                $g1_symbol->[Marpa::R3::Internal::Symbol::BLESSING] //=
+                $g1_symbol->[Marpa::R3::Internal::Symbol::BLESSING] =
+                    $blessing_by_name;
+                $xsy->[Marpa::R3::Internal::XSY::BLESSING] =
                     $blessing_by_name;
                 next LEXEME;
             } ## end if ( $blessing eq '::name' )
@@ -750,7 +756,8 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
                     qq{   Problematic lexeme was <$lexeme_name>\n}
                 );
             } ## end if ( $blessing =~ / [\W] /xms )
-            $g1_symbol->[Marpa::R3::Internal::Symbol::BLESSING] //= $blessing;
+            $g1_symbol->[Marpa::R3::Internal::Symbol::BLESSING] = $blessing;
+            $xsy->[Marpa::R3::Internal::XSY::BLESSING] = $blessing;
         } ## end LEXEME: for my $lexeme_name ( keys %g1_id_by_lexeme_name )
 
     } ## end APPLY_DEFAULT_LEXEME_ADVERBS:
