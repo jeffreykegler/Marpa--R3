@@ -62,8 +62,6 @@ sub Marpa::R3::Grammar::g1_naif_new {
     $grammar->[Marpa::R3::Internal::Grammar::RULES]              = [];
     $grammar->[Marpa::R3::Internal::Grammar::XSY_BY_ISYID] = [];
 
-    $slg->[Marpa::R3::Internal::Scanless::G::G1_RULE_ID_BY_TAG]     = {};
-
     my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C] =
         Marpa::R3::Thin::G->new( { if => 1 } );
     $grammar->[Marpa::R3::Internal::Grammar::TRACER] =
@@ -654,13 +652,6 @@ sub add_user_rule {
     }
     if ( defined $slif_tag ) {
         $base_rule->[Marpa::R3::Internal::Rule::SLIF_TAG] = $slif_tag;
-        my $rule_id_by_tag =
-            $slg->[Marpa::R3::Internal::Scanless::G::G1_RULE_ID_BY_TAG];
-        if ( $rule_id_by_tag->{$slif_tag} ) {
-            Marpa::R3::exception(
-                qq{Duplicate tag in SLIF rule, tag was "$slif_tag"});
-        }
-        $rule_id_by_tag->{$slif_tag} = $base_rule_id;
     } ## end if ( defined $slif_tag )
     if ( defined $blessing ) {
         $base_rule->[Marpa::R3::Internal::Rule::BLESSING] = $blessing;

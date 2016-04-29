@@ -244,8 +244,6 @@ __DATA__
     LEXEME_EVENT_BY_ID
     SYMBOL_IDS_BY_EVENT_NAME_AND_TYPE
 
-    G1_RULE_ID_BY_TAG { Tracks "SLIF tags" }
-
     { This saves a lot of time at points }
     CACHE_G1_IRLIDS_BY_LHS_NAME
 
