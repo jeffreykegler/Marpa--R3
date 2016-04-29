@@ -503,7 +503,6 @@ sub resolve_recce {
         $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
     my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
     my $rules     = $grammar->[Marpa::R3::Internal::Grammar::RULES];
-    my $symbols   = $grammar->[Marpa::R3::Internal::Grammar::SYMBOLS];
 
     my $trace_actions =
         $slr->[Marpa::R3::Internal::Scanless::R::TRACE_ACTIONS] // 0;
@@ -608,7 +607,8 @@ sub resolve_recce {
     } ## end if ( $trace_actions >= 2 )
 
     my @lexeme_resolutions = ();
-    SYMBOL: for my $lexeme_id ( 0 .. $#{$symbols} ) {
+    SYMBOL: for my $lexeme_id ( 0 .. $grammar_c->highest_symbol_id()) {
+
         my $semantics =
             Marpa::R3::Internal::Scanless::R::lexeme_semantics_find( $slr,
             $lexeme_id );
@@ -635,7 +635,7 @@ sub resolve_recce {
         } ## end if ( not defined $blessing )
         $lexeme_resolutions[$lexeme_id] = [ $semantics, $blessing ];
 
-    } ## end SYMBOL: for my $lexeme_id ( 0 .. $#{$symbols} )
+    }
 
     return ( $rule_resolutions, \@lexeme_resolutions );
 } ## end sub resolve_recce
@@ -654,7 +654,6 @@ sub registration_init {
     my $trace_actions =
         $slr->[Marpa::R3::Internal::Scanless::R::TRACE_ACTIONS] // 0;
     my $rules   = $grammar->[Marpa::R3::Internal::Grammar::RULES];
-    my $symbols = $grammar->[Marpa::R3::Internal::Grammar::SYMBOLS];
 
     my @closure_by_rule_id   = ();
     my @semantics_by_rule_id = ();
@@ -866,11 +865,11 @@ sub registration_init {
     {
         # ::whatever is deprecated and has been removed from the docs
         # it is now equivalent to ::undef
-        LEXEME: for my $lexeme_id ( 0 .. $#{$symbols} ) {
+      LEXEME: for my $lexeme_id ( 0 .. $grammar_c->highest_symbol_id() ) {
 
             my ( $semantics, $blessing ) =
-                @{ $lexeme_resolutions->[$lexeme_id] };
-            CHECK_SEMANTICS: {
+              @{ $lexeme_resolutions->[$lexeme_id] };
+          CHECK_SEMANTICS: {
                 if ( not $semantics ) {
                     $semantics = '::!default';
                     last CHECK_SEMANTICS;
@@ -880,7 +879,7 @@ sub registration_init {
                     last CHECK_SEMANTICS;
                 }
                 state $allowed_semantics =
-                    { map { ; ( $_, 1 ) } qw(::array ::undef ::!default ) };
+                  { map { ; ( $_, 1 ) } qw(::array ::undef ::!default ) };
 
                 if ( not $allowed_semantics->{$semantics} ) {
                     Marpa::R3::exception(
@@ -892,14 +891,14 @@ sub registration_init {
                 } ## end if ( not $allowed_semantics->{$semantics} )
 
             } ## end CHECK_SEMANTICS:
-            CHECK_BLESSING: {
+          CHECK_BLESSING: {
                 if ( not $blessing ) {
                     $blessing = '::undef';
                     last CHECK_BLESSING;
                 }
                 last CHECK_BLESSING if $blessing eq '::undef';
                 last CHECK_BLESSING
-                    if $blessing =~ /\A [[:alpha:]] [:\w]* \z /xms;
+                  if $blessing =~ /\A [[:alpha:]] [:\w]* \z /xms;
                 Marpa::R3::exception(
                     q{Unknown blessing for lexeme },
                     $grammar->symbol_name($lexeme_id),
@@ -910,7 +909,7 @@ sub registration_init {
             $semantics_by_lexeme_id[$lexeme_id] = $semantics;
             $blessing_by_lexeme_id[$lexeme_id]  = $blessing;
 
-        } ## end LEXEME: for my $lexeme_id ( 0 .. $#{$symbols} )
+        }
 
     }
 
@@ -958,7 +957,7 @@ sub registration_init {
         push @work_list, [ $rule_id, undef, $semantics, $blessing ];
     } ## end RULE: for my $rule_id ( $grammar->rule_ids() )
 
-    RULE: for my $lexeme_id ( 0 .. $#{$symbols} ) {
+  RULE: for my $lexeme_id ( 0 .. $grammar_c->highest_symbol_id() ) {
 
         my $semantics = $semantics_by_lexeme_id[$lexeme_id];
         my $blessing  = $blessing_by_lexeme_id[$lexeme_id];
@@ -967,7 +966,7 @@ sub registration_init {
         $semantics = '[value]' if $semantics eq '::array';
 
         push @work_list, [ undef, $lexeme_id, $semantics, $blessing ];
-    } ## end RULE: for my $lexeme_id ( 0 .. $#{$symbols} )
+    }
 
     # Registering operations is postponed to this point, because
     # the valuator must exist for this to happen.  In the future,
@@ -1328,7 +1327,6 @@ sub Marpa::R3::Scanless::R::value {
         $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
 
     my $rules   = $naif_grammar->[Marpa::R3::Internal::Grammar::RULES];
-    my $symbols = $naif_grammar->[Marpa::R3::Internal::Grammar::SYMBOLS];
 
     if ( scalar @_ != 1 ) {
         Marpa::R3::exception(

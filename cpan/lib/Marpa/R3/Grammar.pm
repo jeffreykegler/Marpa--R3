@@ -186,11 +186,9 @@ sub Marpa::R3::Grammar::symbol_dsl_form {
 # Does lots of checking and makes use of alternatives.
 sub Marpa::R3::Grammar::symbol_in_display_form {
     my ( $grammar, $slg, $symbol_id ) = @_;
-    my $symbols = $grammar->[Marpa::R3::Internal::Grammar::SYMBOLS];
-    my $symbol  = $symbols->[$symbol_id];
-    return "<!No symbol with ID $symbol_id!>" if not defined $symbol;
     my $text = $grammar->symbol_dsl_form( $slg, $symbol_id )
       // $grammar->symbol_name($symbol_id);
+    return "<!No symbol with ID $symbol_id!>" if not defined $text;
     return ( $text =~ m/\s/xms ) ? "<$text>" : $text;
 }
 
@@ -229,9 +227,8 @@ sub Marpa::R3::Grammar::show_symbols {
 sub Marpa::R3::Grammar::show_nulling_symbols {
     my ($grammar) = @_;
     my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
-    my $symbols   = $grammar->[Marpa::R3::Internal::Grammar::SYMBOLS];
     return join q{ }, sort map { $grammar->symbol_name($_) }
-        grep { $grammar_c->symbol_is_nulling($_) } ( 0 .. $#{$symbols} );
+        grep { $grammar_c->symbol_is_nulling($_) } ( 0 ..  $grammar_c->highest_symbol_id() );
 } ## end sub Marpa::R3::Grammar::show_nulling_symbols
 
 sub Marpa::R3::Grammar::show_productive_symbols {
@@ -417,13 +414,11 @@ sub assign_symbol {
 
     my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
     my $tracer    = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
-    my $symbols = $grammar->[Marpa::R3::Internal::Grammar::SYMBOLS];
     my $symbol_id = $tracer->symbol_by_name($name);
     if ( defined $symbol_id ) {
         return $symbol_id;
     }
     $symbol_id = $tracer->symbol_new($name);
-    my $symbol = $symbols->[$symbol_id] = [];
 
     PROPERTY: for my $property ( sort keys %{$options} ) {
         if ( $property eq 'wsyid' ) {
