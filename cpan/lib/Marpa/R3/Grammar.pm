@@ -222,14 +222,16 @@ sub Marpa::R3::Grammar::show_symbols {
 
 sub Marpa::R3::Grammar::show_nulling_symbols {
     my ($grammar) = @_;
-    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
+    my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
     return join q{ }, sort map { $grammar->symbol_name($_) }
         grep { $grammar_c->symbol_is_nulling($_) } ( 0 ..  $grammar_c->highest_symbol_id() );
 } ## end sub Marpa::R3::Grammar::show_nulling_symbols
 
 sub Marpa::R3::Grammar::show_productive_symbols {
     my ($grammar) = @_;
-    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
+    my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
     return join q{ }, sort map { $grammar->symbol_name($_) }
         grep { $grammar_c->symbol_is_productive($_) }
             ( 0 ..  $grammar_c->highest_symbol_id() )
@@ -237,7 +239,8 @@ sub Marpa::R3::Grammar::show_productive_symbols {
 
 sub Marpa::R3::Grammar::show_accessible_symbols {
     my ($grammar) = @_;
-    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
+    my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
     return join q{ }, sort map { $grammar->symbol_name($_) }
         grep { $grammar_c->symbol_is_accessible($_) }
             ( 0 ..  $grammar_c->highest_symbol_id() )
@@ -245,7 +248,8 @@ sub Marpa::R3::Grammar::show_accessible_symbols {
 
 sub Marpa::R3::Grammar::inaccessible_symbols {
     my ($grammar) = @_;
-    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
+    my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
     return [
         sort map { $grammar->symbol_name($_) }
             grep { !$grammar_c->symbol_is_accessible($_) }
@@ -255,7 +259,8 @@ sub Marpa::R3::Grammar::inaccessible_symbols {
 
 sub Marpa::R3::Grammar::unproductive_symbols {
     my ($grammar) = @_;
-    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
+    my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
     return [
         sort map { $grammar->symbol_name($_) }
             grep { !$grammar_c->symbol_is_productive($_) }
@@ -265,7 +270,8 @@ sub Marpa::R3::Grammar::unproductive_symbols {
 
 sub Marpa::R3::Grammar::start_symbol {
     my ( $grammar ) = @_;
-    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
+    my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
     return $grammar_c->start_symbol();
 }
 
@@ -292,8 +298,8 @@ sub Marpa::R3::Grammar::tag {
 
 sub Marpa::R3::Grammar::brief_rule {
     my ( $grammar, $rule_id ) = @_;
-    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
-    my $tracer    = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
 
     my @symbol_names = ();
     my @symbols = $tracer->rule_expand($rule_id);
@@ -311,7 +317,8 @@ sub Marpa::R3::Grammar::brief_rule {
 sub Marpa::R3::Grammar::show_rule {
     my ( $grammar, $rule ) = @_;
 
-    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
+    my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
     my $rule_id   = $rule->[Marpa::R3::Internal::Rule::ID];
     my @comment   = ();
 
@@ -348,7 +355,8 @@ sub Marpa::R3::Grammar::show_rules {
 # guarantee this.
 sub Marpa::R3::Grammar::rule_ids {
     my ($grammar) = @_;
-    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
+    my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
     return 0 .. $grammar_c->highest_rule_id();
 } ## end sub Marpa::R3::Grammar::rule_ids
 
@@ -357,7 +365,8 @@ sub Marpa::R3::Grammar::rule_ids {
 # guarantee this.
 sub Marpa::R3::Grammar::symbol_ids {
     my ($grammar) = @_;
-    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
+    my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
     return 0 .. $grammar_c->highest_symbol_id();
 } ## end sub Marpa::R3::Grammar::rule_ids
 
@@ -372,7 +381,8 @@ sub Marpa::R3::Grammar::_rule_mask {
 
 sub Marpa::R3::Grammar::show_dotted_rule {
     my ( $grammar, $rule_id, $dot_position ) = @_;
-    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
+    my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
     my ( $lhs, @rhs ) = $grammar->rule($rule_id);
 
     my $minimum = $grammar_c->sequence_min($rule_id);
@@ -405,8 +415,8 @@ sub assign_symbol {
     # $slg will be needed for the XSY's
     my ( $slg, $grammar, $name, $options ) = @_;
 
-    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
-    my $tracer    = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
     my $symbol_id = $tracer->symbol_by_name($name);
     if ( defined $symbol_id ) {
         return $symbol_id;
@@ -463,8 +473,8 @@ sub add_user_rule {
         if not defined $grammar
         or not defined $options;
 
-    my $grammar_c    = $grammar->[Marpa::R3::Internal::Grammar::C];
-    my $tracer       = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
     my $rules        = $grammar->[Marpa::R3::Internal::Grammar::RULES];
     my $default_rank = $grammar_c->default_rank();
 
@@ -674,7 +684,8 @@ sub rule_describe {
 
 sub Marpa::R3::Grammar::error {
     my ($grammar) = @_;
-    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
+    my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
     return $grammar_c->error();
 }
 
@@ -682,8 +693,8 @@ sub Marpa::R3::Grammar::error {
 
 sub Marpa::R3::Grammar::show_isy {
     my ( $grammar, $isy_id ) = @_;
-    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
-    my $tracer    = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
     my $text      = q{};
 
     my $name = $tracer->isy_name($isy_id);
@@ -702,7 +713,8 @@ sub Marpa::R3::Grammar::show_isy {
 
 sub Marpa::R3::Grammar::show_isys {
     my ($grammar) = @_;
-    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
+    my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
     my $text      = q{};
     for my $isy_id ( 0 .. $grammar_c->_marpa_g_nsy_count() - 1 ) {
         $text .= $grammar->show_isy($isy_id);
@@ -712,8 +724,8 @@ sub Marpa::R3::Grammar::show_isys {
 
 sub Marpa::R3::Grammar::brief_irl {
     my ( $grammar, $irl_id ) = @_;
-    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
-    my $tracer    = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
     my $lhs_id    = $grammar_c->_marpa_g_irl_lhs($irl_id);
     my $text = $irl_id . ': ' . $tracer->isy_name($lhs_id) . ' ->';
     if ( my $rh_length = $grammar_c->_marpa_g_irl_length($irl_id) ) {
@@ -728,7 +740,8 @@ sub Marpa::R3::Grammar::brief_irl {
 
 sub Marpa::R3::Grammar::show_irls {
     my ($grammar) = @_;
-    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
+    my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
     my $text      = q{};
     for my $irl_id ( 0 .. $grammar_c->_marpa_g_irl_count() - 1 ) {
         $text .= $grammar->brief_irl($irl_id) . "\n";
@@ -738,7 +751,8 @@ sub Marpa::R3::Grammar::show_irls {
 
 sub Marpa::R3::Grammar::rule_is_used {
     my ( $grammar, $rule_id ) = @_;
-    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
+    my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
     return $grammar_c->_marpa_g_rule_is_used($rule_id);
 }
 
