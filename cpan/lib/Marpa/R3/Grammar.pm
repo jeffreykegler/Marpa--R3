@@ -102,10 +102,6 @@ sub Marpa::R3::Grammar::tracer {
     return $_[0]->[Marpa::R3::Internal::Grammar::TRACER];
 }
 
-sub Marpa::R3::Grammar::thin {
-    return $_[0]->[Marpa::R3::Internal::Grammar::C];
-}
-
 sub Marpa::R3::Grammar::thin_symbol {
     my ( $grammar, $symbol_name ) = @_;
     return $grammar->[Marpa::R3::Internal::Grammar::TRACER]
@@ -115,7 +111,8 @@ sub Marpa::R3::Grammar::thin_symbol {
 sub Marpa::R3::Grammar::g1_naif_set {
     my ( $grammar, $slg, $flat_args ) = @_;
 
-    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
+    my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
 
     if ( defined( my $value = $flat_args->{'symbols'} ) ) {
         for my $symbol ( sort keys %{$value} ) {
@@ -191,7 +188,8 @@ sub Marpa::R3::Grammar::symbol_in_display_form {
 
 sub Marpa::R3::Grammar::show_symbol {
     my ( $grammar, $symbol_id ) = @_;
-    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
+    my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
     my $text      = q{};
 
     my $name = $grammar->symbol_name($symbol_id);
@@ -213,7 +211,8 @@ sub Marpa::R3::Grammar::show_symbol {
 
 sub Marpa::R3::Grammar::show_symbols {
     my ($grammar) = @_;
-    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
+    my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
     my $text      = q{};
     for my $symbol_id ( 0 .. $grammar_c->highest_symbol_id() ) {
         $text .= $grammar->show_symbol($symbol_id);

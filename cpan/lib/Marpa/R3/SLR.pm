@@ -49,8 +49,8 @@ sub Marpa::R3::Scanless::R::last_completed {
         $slg->[Marpa::R3::Internal::Scanless::G::CACHE_G1_IRLIDS_BY_LHS_NAME]
         ->{$symbol_name};
     if ( not defined $sought_rules ) {
-        my $g1_tracer       = $thick_g1_grammar->tracer();
-        my $thin_g1_grammar = $thick_g1_grammar->thin();
+        my $g1_tracer       = $thick_g1_grammar->[Marpa::R3::Internal::Grammar::TRACER];
+        my $thin_g1_grammar = $g1_tracer->[Marpa::R3::Internal::Trace::G::C];
         my $symbol_id       = $g1_tracer->symbol_by_name($symbol_name);
         Marpa::R3::exception("Bad symbol in last_completed(): $symbol_name")
             if not defined $symbol_id;
