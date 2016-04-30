@@ -179,6 +179,11 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
         $runtime_xsy_data->[Marpa::R3::Internal::XSY::NAME] = $xsy_name;
         my $source_xsy_data = $hashed_source->{xsy}->{$xsy_name};
       KEY: for my $datum_key ( keys %{$source_xsy_data} ) {
+            if ( $datum_key eq 'action' ) {
+                $runtime_xsy_data->[Marpa::R3::Internal::XSY::LEXEME_SEMANTICS] =
+                  $source_xsy_data->{$datum_key};
+                next KEY;
+            }
             if ( $datum_key eq 'blessing' ) {
                 $runtime_xsy_data->[Marpa::R3::Internal::XSY::BLESSING] =
                   $source_xsy_data->{$datum_key};
@@ -706,7 +711,7 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     APPLY_DEFAULT_LEXEME_ADVERBS: {
         last APPLY_DEFAULT_LEXEME_ADVERBS if not $lexeme_default_adverbs;
 
-        my $action = $lexeme_default_adverbs->{action};
+        my $default_lexeme_action = $lexeme_default_adverbs->{action};
         my $xsy_by_isyid =
             $thick_g1_grammar->[Marpa::R3::Internal::Grammar::XSY_BY_ISYID];
 
@@ -717,7 +722,8 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
             next LEXEME if not defined $xsy;
             next LEXEME if 
                 $xsy->[Marpa::R3::Internal::XSY::NAME_SOURCE] ne 'lexical';
-            $xsy->[Marpa::R3::Internal::XSY::LEXEME_SEMANTICS] = $action;
+            $xsy->[Marpa::R3::Internal::XSY::LEXEME_SEMANTICS] //=
+                $default_lexeme_action;
         } ## end LEXEME: for my $lexeme_name ( keys %g1_id_by_lexeme_name )
 
         my $blessing = $lexeme_default_adverbs->{bless};

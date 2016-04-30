@@ -436,15 +436,12 @@ sub Marpa::R3::Internal::MetaAST_Nodes::before_or_after::value {
 
 sub Marpa::R3::Internal::MetaAST_Nodes::event_initializer::on_or_off
 {
-    # die Data::Dumper::Dumper(\@_);
     my ($values) = @_;
-    my $is_activated = $values->[2];
+    # say STDERR Data::Dumper::Dumper(\@_);
+    my (undef, undef, $is_activated) = @{$values};
     return 1 if not defined $is_activated;
-    return $is_activated->value();
-}
-
-sub Marpa::R3::Internal::MetaAST_Nodes::on_or_off::value {
-    return $_[0]->[2] eq 'off' ? 0 : 1;
+    my (undef, undef, $on_or_off) = @{$is_activated};
+    return $on_or_off eq 'on' ? 1 : 0;
 }
 
 sub Marpa::R3::Internal::MetaAST_Nodes::boolean::value {
@@ -1044,7 +1041,11 @@ sub Marpa::R3::Internal::MetaAST_Nodes::lexeme_rule::evaluate {
             $declarations{$key} = $raw_value;
             next ADVERB;
         }
-        if ( $key eq 'latm' ) {
+        if ( $key eq 'action' ) {
+            $declarations{$key} = $raw_value;
+            next ADVERB;
+        }
+        if ( $key eq 'blessing' ) {
             $declarations{$key} = $raw_value;
             next ADVERB;
         }
