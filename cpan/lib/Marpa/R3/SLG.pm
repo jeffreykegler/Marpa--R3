@@ -769,8 +769,8 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
 sub Marpa::R3::Internal::Scanless::G::precompute {
     my ($slg, $grammar) = @_;
 
-    my $rules     = $grammar->[Marpa::R3::Internal::Grammar::RULES];
     my $tracer     = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $rules = $tracer->[Marpa::R3::Internal::Trace::G::RULES];
     my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
     my $xsy_by_isyid     = $tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID];
 
@@ -1054,10 +1054,9 @@ sub Marpa::R3::Scanless::G::show_rules {
     $subgrammar //= 'G1';
 
     my $thick_grammar = thick_subgrammar_by_name($slg, $subgrammar);
-    my $tracer = $thick_grammar->tracer();
+    my $tracer = $thick_grammar->[Marpa::R3::Internal::Grammar::TRACER];
     my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
-
-    my $rules     = $thick_grammar->[Marpa::R3::Internal::Grammar::RULES];
+    my $rules = $tracer->[Marpa::R3::Internal::Trace::G::RULES];
 
     for my $rule ( @{$rules} ) {
         my $rule_id = $rule->[Marpa::R3::Internal::Rule::ID];
