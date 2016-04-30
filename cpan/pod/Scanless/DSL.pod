@@ -982,7 +982,7 @@ be more than one way to do this.
 =head2 Separating statements with semicolons
 
 =for Marpa::R3::Display
-name: statements separted by semicolon
+name: statements separated by semicolon
 partial: 1
 normalize-whitespace: 1
 

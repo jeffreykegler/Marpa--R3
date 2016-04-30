@@ -179,10 +179,10 @@ END_OF_SOURCE
 
 if (1) {
 
-    # Marpa::R3::Display
-    # name: statements separted by semicolon
-    # start-after-line: END_OF_SOURCE
-    # end-before-line: '^END_OF_SOURCE$'
+# Marpa::R3::Display
+# name: statements separated by semicolon
+# start-after-line: END_OF_SOURCE
+# end-before-line: '^END_OF_SOURCE$'
 
     my $source = \(<<'END_OF_SOURCE');
           :default ::= action => ::array
@@ -191,7 +191,7 @@ if (1) {
         a ~ 'a'
 END_OF_SOURCE
 
-    # Marpa::R3::Display::End
+# Marpa::R3::Display::End
 
     push @tests_data,
       [
@@ -204,10 +204,10 @@ END_OF_SOURCE
 
 if (1) {
 
-    # Marpa::R3::Display
-    # name: statements grouped in curly braces
-    # start-after-line: END_OF_SOURCE
-    # end-before-line: '^END_OF_SOURCE$'
+# Marpa::R3::Display
+# name: statements grouped in curly braces
+# start-after-line: END_OF_SOURCE
+# end-before-line: '^END_OF_SOURCE$'
 
     my $source = \(<<'END_OF_SOURCE');
       {
@@ -218,7 +218,7 @@ if (1) {
       a ~ 'a'
 END_OF_SOURCE
 
-    # Marpa::R3::Display::End
+# Marpa::R3::Display::End
 
     push @tests_data,
       [

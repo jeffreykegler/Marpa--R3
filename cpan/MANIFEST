@@ -117,7 +117,7 @@ lib/Marpa/R3/SLG.pm
 lib/Marpa/R3/SLR.pm
 lib/Marpa/R3/Thin/G.pm
 lib/Marpa/R3/Thin/R.pm
-lib/Marpa/R3/Thin/Trace.pm
+lib/Marpa/R3/Trace/G.pm
 lib/Marpa/R3/Value.pm
 lib/Marpa/R3/meta/Makefile
 lib/Marpa/R3/meta/metag.bnf
