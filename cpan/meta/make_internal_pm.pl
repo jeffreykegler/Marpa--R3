@@ -234,6 +234,11 @@ __DATA__
 
     C { The thin version of this object }
 
+    { The "tracers", are objects
+       which wrap the "thin" C structure.  }
+    L0_TRACER
+    G1_TRACER
+
     THICK_L0_GRAMMAR
     THICK_G1_GRAMMAR
     CHARACTER_CLASS_TABLE
@@ -275,11 +280,6 @@ __DATA__
     B_C { The Marpa bocage }
     O_C { The Marpa order object }
     T_C { The Marpa tree iterator }
-
-    { The "tracers", are objects
-       which wrap the "thin" C structure.  }
-    L0_TRACER
-    G1_TRACER
 
     P_INPUT_STRING
 

@@ -908,7 +908,8 @@ sub Marpa::R3::Scanless::R::resume {
                 $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
             my $thick_lex_grammar =
                 $slg->[Marpa::R3::Internal::Scanless::G::THICK_L0_GRAMMAR];
-            my $lex_tracer = $thick_lex_grammar->tracer();
+            my $lex_tracer =
+                $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER];
             my ( $line, $column ) = $slr->line_column($stream_pos);
             print {$trace_file_handle}
                 qq{\n=== Progress report at line $line, column $column\n},
@@ -1030,14 +1031,16 @@ sub Marpa::R3::Scanless::R::read_problem {
 
     my $thick_lex_grammar =
         $slg->[Marpa::R3::Internal::Scanless::G::THICK_L0_GRAMMAR];
-    my $lex_tracer = $thick_lex_grammar->tracer();
+    my $lex_tracer =
+        $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER];
 
     my $trace_file_handle =
         $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
 
     my $thin_g1_recce    = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
     my $thick_g1_grammar = $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
-    my $g1_tracer        = $thick_g1_grammar->tracer();
+    my $g1_tracer =
+        $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
 
     my $pos      = $thin_slr->pos();
     my $problem_pos = $pos;
