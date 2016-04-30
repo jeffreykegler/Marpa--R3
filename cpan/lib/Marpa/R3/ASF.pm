@@ -182,7 +182,8 @@ sub set_last_choice {
         my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
         my $grammar =
             $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
-        my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
+        my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+        my $grammar_c = $grammar->[Marpa::R3::Internal::Trace::G::C];
         my $bocage    = $slr->[Marpa::R3::Internal::Scanless::R::B_C];
         my $and_node_id = $and_nodes->[$choice];
         my $current_predecessor =
@@ -227,7 +228,8 @@ sub nook_has_semantic_cause {
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $grammar =
         $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
-    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
+    my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $grammar_c = $grammar->[Marpa::R3::Internal::Trace::G::C];
     my $bocage    = $slr->[Marpa::R3::Internal::Scanless::R::B_C];
 
     my $irl_id          = $bocage->_marpa_b_or_node_irl($or_node);
@@ -282,9 +284,8 @@ sub Marpa::R3::Internal::ASF::blessings_set {
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $grammar =
         $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
-    my $tracer =
-        $grammar->[Marpa::R3::Internal::Grammar::TRACER];
-    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
+    my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $grammar_c = $grammar->[Marpa::R3::Internal::Trace::G::C];
     my $rules     = $grammar->[Marpa::R3::Internal::Grammar::RULES];
     my $xsy_by_isyid   = $tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID];
 
@@ -401,7 +402,8 @@ sub Marpa::R3::ASF::new {
     my $thin_slr  = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
     my $grammar =
         $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
-    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
+    my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $grammar_c = $grammar->[Marpa::R3::Internal::Trace::G::C];
     my $recce_c   = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
 
     my $ordering = $slr->ordering_get();
@@ -455,7 +457,8 @@ sub nid_sort_ix {
     my $slr       = $asf->[Marpa::R3::Internal::ASF::SLR];
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $grammar = $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
-    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
+    my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $grammar_c = $grammar->[Marpa::R3::Internal::Trace::G::C];
     my $bocage    = $slr->[Marpa::R3::Internal::Scanless::R::B_C];
     if ( $nid >= 0 ) {
         my $irl_id = $bocage->_marpa_b_or_node_irl($nid);
@@ -484,7 +487,8 @@ sub nid_rule_id {
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $grammar =
         $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
-    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
+    my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $grammar_c = $grammar->[Marpa::R3::Internal::Trace::G::C];
     my $irl_id    = $bocage->_marpa_b_or_node_irl($nid);
     my $xrl_id    = $grammar_c->_marpa_g_source_xrl($irl_id);
     return $xrl_id;
@@ -505,7 +509,8 @@ sub token_es_span {
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $grammar =
         $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
-    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
+    my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $grammar_c = $grammar->[Marpa::R3::Internal::Trace::G::C];
     my $bocage    = $slr->[Marpa::R3::Internal::Scanless::R::B_C];
     my $predecessor_id = $bocage->_marpa_b_and_node_predecessor($and_node_id);
     my $parent_or_node_id = $bocage->_marpa_b_and_node_parent($and_node_id);
@@ -556,7 +561,8 @@ sub nid_token_id {
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $grammar =
         $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
-    my $grammar_c    = $grammar->[Marpa::R3::Internal::Grammar::C];
+    my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $grammar_c = $grammar->[Marpa::R3::Internal::Trace::G::C];
     my $bocage       = $slr->[Marpa::R3::Internal::Scanless::R::B_C];
     my $token_nsy_id = $bocage->_marpa_b_and_node_symbol($and_node_id);
     my $token_id     = $grammar_c->_marpa_g_source_xsy($token_nsy_id);
@@ -574,7 +580,8 @@ sub nid_symbol_id {
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $grammar =
         $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
-    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
+    my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $grammar_c = $grammar->[Marpa::R3::Internal::Trace::G::C];
     my $bocage    = $slr->[Marpa::R3::Internal::Scanless::R::B_C];
     my $irl_id    = $bocage->_marpa_b_or_node_irl($nid);
     my $xrl_id    = $grammar_c->_marpa_g_source_xrl($irl_id);
@@ -717,7 +724,8 @@ sub factoring_finish {
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $grammar =
         $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
-    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
+    my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $grammar_c = $grammar->[Marpa::R3::Internal::Trace::G::C];
     my $bocage    = $slr->[Marpa::R3::Internal::Scanless::R::B_C];
 
     my @worklist = ( 0 .. $#{$factoring_stack} );
@@ -808,7 +816,8 @@ sub glade_id_factors {
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $grammar =
         $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
-    my $grammar_c     = $grammar->[Marpa::R3::Internal::Grammar::C];
+    my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $grammar_c = $grammar->[Marpa::R3::Internal::Trace::G::C];
     my $bocage        = $slr->[Marpa::R3::Internal::Scanless::R::B_C];
     my $or_nodes      = $asf->[Marpa::R3::Internal::ASF::OR_NODES];
 
