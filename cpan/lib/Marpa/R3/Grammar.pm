@@ -174,7 +174,8 @@ sub Marpa::R3::Grammar::symbol_reserved_set {
 # Does no checking
 sub Marpa::R3::Grammar::symbol_dsl_form {
     my ( $grammar, $slg, $isyid ) = @_;
-    my $xsy_by_isyid   = $grammar->[Marpa::R3::Internal::Grammar::XSY_BY_ISYID];
+    my $tracer   = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $xsy_by_isyid   = $tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID];
     my $xsy = $xsy_by_isyid->[$isyid];
     return if not defined $xsy;
     return $xsy->[Marpa::R3::Internal::XSY::DSL_FORM];

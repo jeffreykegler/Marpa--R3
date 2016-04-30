@@ -282,9 +282,11 @@ sub Marpa::R3::Internal::ASF::blessings_set {
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $grammar =
         $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
+    my $tracer =
+        $grammar->[Marpa::R3::Internal::Grammar::TRACER];
     my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
     my $rules     = $grammar->[Marpa::R3::Internal::Grammar::RULES];
-    my $xsy_by_isyid   = $grammar->[Marpa::R3::Internal::Grammar::XSY_BY_ISYID];
+    my $xsy_by_isyid   = $tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID];
 
     my $default_token_blessing_package =
         $asf->[ Marpa::R3::Internal::ASF::DEFAULT_TOKEN_BLESSING_PACKAGE ];
