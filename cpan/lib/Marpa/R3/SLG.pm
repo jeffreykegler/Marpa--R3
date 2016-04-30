@@ -1053,7 +1053,7 @@ sub Marpa::R3::Scanless::G::rule_show
 sub slg_rule_show {
     my ( $slg, $rule_id, $subgrammar ) = @_;
     my $tracer       = $subgrammar->tracer();
-    my $subgrammar_c = $subgrammar->[Marpa::R3::Internal::Grammar::C];
+    my $subgrammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
     my @symbol_ids   = $tracer->rule_expand($rule_id);
     return if not scalar @symbol_ids;
     my ( $lhs, @rhs ) =
@@ -1074,9 +1074,10 @@ sub Marpa::R3::Scanless::G::show_rules {
     $subgrammar //= 'G1';
 
     my $thick_grammar = thick_subgrammar_by_name($slg, $subgrammar);
+    my $tracer = $thick_grammar->tracer();
+    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
 
     my $rules     = $thick_grammar->[Marpa::R3::Internal::Grammar::RULES];
-    my $grammar_c = $thick_grammar->[Marpa::R3::Internal::Grammar::C];
 
     for my $rule ( @{$rules} ) {
         my $rule_id = $rule->[Marpa::R3::Internal::Rule::ID];
@@ -1121,8 +1122,6 @@ sub Marpa::R3::Scanless::G::show_rules {
 
         if ( $verbose >= 3 ) {
 
-            my $tracer = $thick_grammar->tracer();
-
             $text
                 .= "  Internal symbols: <"
                 . $tracer->symbol_name($lhs_id)
@@ -1145,36 +1144,34 @@ sub Marpa::R3::Scanless::G::show_symbols {
     $verbose    //= 0;
     $subgrammar //= 'G1';
 
-    my $thick_grammar = thick_subgrammar_by_name($slg, $subgrammar);
-
-    my $grammar_c = $thick_grammar->[Marpa::R3::Internal::Grammar::C];
+    my $thick_grammar = thick_subgrammar_by_name( $slg, $subgrammar );
+    my $tracer        = $thick_grammar->tracer();
+    my $grammar_c     = $tracer->[Marpa::R3::Internal::Trace::G::C];
 
     for my $symbol_id ( 0 .. $grammar_c->highest_symbol_id() ) {
 
         $text .= join q{ }, $subgrammar, "S$symbol_id",
-            $thick_grammar->symbol_in_display_form($slg, $symbol_id);
+          $thick_grammar->symbol_in_display_form( $slg, $symbol_id );
         $text .= "\n";
 
         if ( $verbose >= 2 ) {
 
             my @tag_list = ();
             $grammar_c->symbol_is_productive($symbol_id)
-                or push @tag_list, 'unproductive';
+              or push @tag_list, 'unproductive';
             $grammar_c->symbol_is_accessible($symbol_id)
-                or push @tag_list, 'inaccessible';
+              or push @tag_list, 'inaccessible';
             $grammar_c->symbol_is_nulling($symbol_id)
-                and push @tag_list, 'nulling';
+              and push @tag_list, 'nulling';
             $grammar_c->symbol_is_terminal($symbol_id)
-                and push @tag_list, 'terminal';
+              and push @tag_list, 'terminal';
 
             if (@tag_list) {
-                $text
-                    .= q{  } . ( join q{ }, q{/*}, @tag_list, q{*/} ) . "\n";
+                $text .= q{  } . ( join q{ }, q{/*}, @tag_list, q{*/} ) . "\n";
             }
 
-            my $tracer = $thick_grammar->tracer();
-            $text .= "  Internal name: <"
-                . $tracer->symbol_name($symbol_id) . qq{>\n};
+            $text .=
+              "  Internal name: <" . $tracer->symbol_name($symbol_id) . qq{>\n};
 
         } ## end if ( $verbose >= 2 )
 
@@ -1193,14 +1190,16 @@ sub Marpa::R3::Scanless::G::show_symbols {
 sub Marpa::R3::Scanless::G::symid_is_accessible {
     my ( $slg, $symid ) = @_;
     my $thick_grammar = thick_subgrammar_by_name($slg, 'G1');
-    my $grammar_c = $thick_grammar->[Marpa::R3::Internal::Grammar::C];
+    my $tracer = $thick_grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
     return $grammar_c->symbol_is_accessible($symid)
 }
 
 sub Marpa::R3::Scanless::G::symid_is_productive {
     my ( $slg, $symid ) = @_;
     my $thick_grammar = thick_subgrammar_by_name($slg, 'G1');
-    my $grammar_c = $thick_grammar->[Marpa::R3::Internal::Grammar::C];
+    my $tracer = $thick_grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
     return $grammar_c->symbol_is_productive($symid)
 }
 
