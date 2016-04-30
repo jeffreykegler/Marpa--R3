@@ -856,7 +856,7 @@ sub Marpa::R3::Internal::Scanless::G::precompute {
             Marpa::R3::exception('No start symbol');
         }
         if ( $precompute_error_code == $Marpa::R3::Error::START_NOT_LHS ) {
-            my $name = $grammar->[Marpa::R3::Internal::Grammar::START_NAME];
+            my $name = $tracer->[Marpa::R3::Internal::Trace::G::START_NAME];
             Marpa::R3::exception(
                 qq{Start symbol "$name" not on LHS of any rule});
         }

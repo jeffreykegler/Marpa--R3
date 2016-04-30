@@ -133,6 +133,8 @@ __DATA__
     NAME_BY_ISYID
     ISYID_BY_NAME
     XSY_BY_ISYID { Array mapping ISYID to XSY }
+    START_NAME
+    RULES
 
     :package=Marpa::R3::Internal::Grammar
 

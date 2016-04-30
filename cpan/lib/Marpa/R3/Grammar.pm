@@ -67,6 +67,8 @@ sub Marpa::R3::Grammar::g1_naif_new {
     $tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID] = [];
 
     $grammar->g1_naif_set($slg, $flat_args);
+    $grammar->[Marpa::R3::Internal::Grammar::START_NAME] = '[:start]';
+    $tracer->[Marpa::R3::Internal::Trace::G::START_NAME] = '[:start]';
 
     return $grammar;
 } ## end sub Marpa::R3::Grammar::new
@@ -84,12 +86,13 @@ sub Marpa::R3::Grammar::l0_naif_new {
         Marpa::R3::Trace::G->new($grammar_c);
     $tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID] = [];
 
+    $grammar->[Marpa::R3::Internal::Grammar::START_NAME] = '[:start_lex]';
+    $tracer->[Marpa::R3::Internal::Trace::G::START_NAME] = '[:start_lex]';
+
     for my $symbol ( sort keys %{$symbols} ) {
         my $properties = $symbols->{$symbol};
         assign_symbol( $slg, $grammar, $symbol, $properties );
     }
-
-    $grammar->[Marpa::R3::Internal::Grammar::START_NAME] = $start_name;
 
     add_user_rules( $slg, $grammar, $rules );
 
@@ -121,7 +124,7 @@ sub Marpa::R3::Grammar::g1_naif_set {
     } ## end if ( defined( my $value = $flat_args->{'symbols'} ) )
 
     if ( defined( my $value = $flat_args->{'start'} ) ) {
-        $grammar->[Marpa::R3::Internal::Grammar::START_NAME] = $value;
+        # TODO delete this
         delete $flat_args->{'start'};
     } ## end if ( defined( my $value = $flat_args->{'start'} ) )
 

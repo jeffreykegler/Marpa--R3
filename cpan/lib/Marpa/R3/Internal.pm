@@ -52,6 +52,8 @@ use constant C => 0;
 use constant NAME_BY_ISYID => 1;
 use constant ISYID_BY_NAME => 2;
 use constant XSY_BY_ISYID => 3;
+use constant START_NAME => 4;
+use constant RULES => 5;
 
 package Marpa::R3::Internal::Grammar;
 use constant TRACER => 0;
