@@ -239,7 +239,7 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     }
 
     my $thick_g1_grammar = Marpa::R3::Grammar->g1_naif_new($slg, $g1_args);
-    my $g1_tracer        = $thick_g1_grammar->tracer();
+    my $g1_tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     my $g1_thin          = $g1_tracer->grammar();
 
     my $symbol_ids_by_event_name_and_type = {};
@@ -459,7 +459,7 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     my $lex_thick_grammar =
       Marpa::R3::Grammar->l0_naif_new( $slg, $lex_start_symbol_name,
         \%this_lexer_symbols, $lexer_rules );
-    my $lex_tracer = $lex_thick_grammar->tracer();
+    my $lex_tracer = $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER];
     my $lex_thin   = $lex_tracer->grammar();
 
     my $lex_discard_symbol_id =
@@ -1248,7 +1248,8 @@ sub Marpa::R3::Scanless::G::show_isys {
 
 sub Marpa::R3::Scanless::G::show_ahms {
     my ( $slg, $verbose ) = @_;
-    return $slg->tracer()->show_ahms($verbose);
+    my $g1_tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
+    return $g1_tracer->show_ahms($verbose);
 }
 1;
 
