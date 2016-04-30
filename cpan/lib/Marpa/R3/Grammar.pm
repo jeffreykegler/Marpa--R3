@@ -36,7 +36,7 @@ package Marpa::R3::Internal::Grammar;
 
 use English qw( -no_match_vars );
 
-use Marpa::R3::Thin::Trace;
+use Marpa::R3::Trace::G;
 
 our %DEFAULT_SYMBOLS_RESERVED;
 %DEFAULT_SYMBOLS_RESERVED = map { ($_, 1) } split //xms, '}]>)';
@@ -65,7 +65,7 @@ sub Marpa::R3::Grammar::g1_naif_new {
     my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C] =
         Marpa::R3::Thin::G->new( { if => 1 } );
     $grammar->[Marpa::R3::Internal::Grammar::TRACER] =
-        Marpa::R3::Thin::Trace->new($grammar_c);
+        Marpa::R3::Trace::G->new($grammar_c);
 
     $grammar->g1_naif_set($slg, $flat_args);
 
@@ -84,7 +84,7 @@ sub Marpa::R3::Grammar::l0_naif_new {
     my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C] =
         Marpa::R3::Thin::G->new( { if => 1 } );
     $grammar->[Marpa::R3::Internal::Grammar::TRACER] =
-        Marpa::R3::Thin::Trace->new($grammar_c);
+        Marpa::R3::Trace::G->new($grammar_c);
 
     for my $symbol ( sort keys %{$symbols} ) {
         my $properties = $symbols->{$symbol};
