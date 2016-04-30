@@ -1226,7 +1226,8 @@ sub Marpa::R3::Scanless::R::read_problem {
         my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
         my $thick_lex_grammar =
             $slg->[Marpa::R3::Internal::Scanless::G::THICK_L0_GRAMMAR];
-        my $lex_tracer = $thick_lex_grammar->tracer();
+        my $lex_tracer =
+            $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER];
         my ( $line, $column ) = $slr->line_column($stream_pos);
         $read_string_error .=
             qq{\n=== Progress report for lexer at line $line, column $column\n} .
@@ -1842,7 +1843,8 @@ sub Marpa::R3::Scanless::R::lexeme_alternative {
 
     my $slg        = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $g1_grammar = $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
-    my $g1_tracer  = $g1_grammar->tracer();
+    my $g1_tracer =
+            $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     my $symbol_id  = $g1_tracer->symbol_by_name($symbol_name);
     if ( not defined $symbol_id ) {
         Marpa::R3::exception(
@@ -1932,16 +1934,16 @@ sub Marpa::R3::Scanless::R::activate {
 # On success, returns the old priority value.
 # Failures are thrown.
 sub Marpa::R3::Scanless::R::lexeme_priority_set {
-    my ($slr, $lexeme_name, $new_priority) = @_;
+    my ( $slr, $lexeme_name, $new_priority ) = @_;
     my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
-    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+    my $slg      = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $thick_g1_grammar =
-        $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
-    my $g1_tracer       = $thick_g1_grammar->tracer();
-    my $lexeme_id       = $g1_tracer->symbol_by_name($lexeme_name);
+      $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
+    my $g1_tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
+    my $lexeme_id = $g1_tracer->symbol_by_name($lexeme_name);
     Marpa::R3::exception("Bad symbol in lexeme_priority_set(): $lexeme_name")
-        if not defined $lexeme_id;
-    return $thin_slr->lexeme_priority_set($lexeme_id, $new_priority);
+      if not defined $lexeme_id;
+    return $thin_slr->lexeme_priority_set( $lexeme_id, $new_priority );
 }
 
 # Need to port show_and_nodes(), show_or_nodes() NAIF recognizer methods
