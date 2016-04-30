@@ -276,6 +276,11 @@ __DATA__
     O_C { The Marpa order object }
     T_C { The Marpa tree iterator }
 
+    { The "tracers", are objects
+       which wrap the "thin" C structure.  }
+    L0_TRACER
+    G1_TRACER
+
     P_INPUT_STRING
 
     EXHAUSTION_ACTION
