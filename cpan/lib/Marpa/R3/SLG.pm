@@ -602,7 +602,7 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
 
     # Post-lexer G1 processing
 
-    my $thin_L0  = $lex_thick_grammar->[Marpa::R3::Internal::Grammar::C];
+    my $thin_L0  = $lex_tracer->[Marpa::R3::Internal::Trace::G::C];
     my $thin_slg = $slg->[Marpa::R3::Internal::Scanless::G::C] =
         Marpa::R3::Thin::SLG->new( $thin_L0, $g1_tracer->grammar() );
 
@@ -771,8 +771,8 @@ sub Marpa::R3::Internal::Scanless::G::precompute {
 
     my $rules     = $grammar->[Marpa::R3::Internal::Grammar::RULES];
     my $tracer     = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
     my $xsy_by_isyid     = $tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID];
-    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
 
     my $trace_fh =
         $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE];
@@ -952,9 +952,9 @@ sub Marpa::R3::Internal::Scanless::G::precompute {
 sub set_start_symbol {
     my $grammar = shift;
 
-    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
     state $default_start_name = '[:start]';
     my $tracer           = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
     my $default_start_id = $tracer->symbol_by_name($default_start_name);
     my $start_id;
     VALIDATE_START_NAME: {
