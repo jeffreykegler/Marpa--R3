@@ -952,35 +952,15 @@ sub Marpa::R3::Internal::Scanless::G::precompute {
 sub set_start_symbol {
     my $grammar = shift;
 
-    state $default_start_name = '[:start]';
     my $tracer           = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
-    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
-    my $default_start_id = $tracer->symbol_by_name($default_start_name);
-    my $start_id;
-    VALIDATE_START_NAME: {
-        my $named_arg_start_name =
-            $grammar->[Marpa::R3::Internal::Grammar::START_NAME];
-        if ( defined $named_arg_start_name and defined $start_id ) {
-            Marpa::R3::exception(
-                qq{Start symbol specified as '[:start]', but also with named argument\n},
-                qq{   You must use one or the other\n}
-            );
-        } ## end if ( defined $named_arg_start_name and defined $start_id)
-        if ( defined $named_arg_start_name ) {
-            $start_id = $tracer->symbol_by_name($named_arg_start_name);
-            Marpa::R3::exception(
-                qq{Start symbol "$named_arg_start_name" not in grammar})
-                if not defined $start_id;
-            last VALIDATE_START_NAME;
-        } ## end if ( defined $named_arg_start_name )
-        if ( defined $default_start_id ) {
-            $start_id = $default_start_id;
-            $grammar->[Marpa::R3::Internal::Grammar::START_NAME] =
-                $named_arg_start_name;
-            last VALIDATE_START_NAME;
-        } ## end if ( defined $default_start_id )
-        Marpa::R3::exception(qq{No start symbol specified in grammar\n});
-    } ## end VALIDATE_START_NAME:
+    my $grammar_c        = $tracer->[Marpa::R3::Internal::Trace::G::C];
+    my $start_name = $tracer->[Marpa::R3::Internal::Trace::G::START_NAME];
+    my $start_id = $tracer->symbol_by_name($start_name);
+    if ( not defined $start_id ) {
+        Marpa::R3::exception(
+qq{Internal error: Start symbol $start_name missing from grammar\n}
+        );
+    }
 
     if ( not defined $grammar_c->start_symbol_set($start_id) ) {
         Marpa::R3::uncaught_error( $grammar_c->error() );
