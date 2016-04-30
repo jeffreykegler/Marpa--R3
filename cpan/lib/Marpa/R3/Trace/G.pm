@@ -25,27 +25,27 @@ $STRING_VERSION = $VERSION;
 $VERSION        = eval $VERSION;
 
 sub new {
-    my ( $class, $grammar ) = @_;
-    my $self = bless {}, $class;
-    $self->{g}              = $grammar;
-    $self->{symbol_by_name} = {};
-    $self->{symbol_names}   = {};
+    my ( $class, $grammar_c ) = @_;
+    my $self = bless [], $class;
+    $self->[Marpa::R3::Internal::Trace::G::C] = $grammar_c;
+    $self->[Marpa::R3::Internal::Trace::G::ISYID_BY_NAME] = {};
+    $self->[Marpa::R3::Internal::Trace::G::NAME_BY_ISYID] = [];
     return $self;
 } ## end sub new
 
 sub grammar {
     my ($self) = @_;
-    return $self->{g};
+    return $self->[Marpa::R3::Internal::Trace::G::C];
 }
 
 sub symbol_by_name {
     my ( $self, $name ) = @_;
-    return $self->{symbol_by_name}->{$name};
+    return $self->[Marpa::R3::Internal::Trace::G::ISYID_BY_NAME]->{$name};
 }
 
 sub symbol_name {
     my ( $self, $symbol_id ) = @_;
-    my $symbol_name = $self->{symbol_name}->[$symbol_id];
+    my $symbol_name = $self->[Marpa::R3::Internal::Trace::G::NAME_BY_ISYID]->[$symbol_id];
     $symbol_name = 'R' . $symbol_id if not defined $symbol_name;
     return $symbol_name;
 } ## end sub symbol_name
@@ -62,28 +62,29 @@ sub formatted_symbol_name {
 
 sub symbol_name_set {
     my ( $self, $name, $symbol_id ) = @_;
-    $self->{symbol_name}->[$symbol_id] = $name;
-    $self->{symbol_by_name}->{$name} = $symbol_id;
+    $self->[Marpa::R3::Internal::Trace::G::NAME_BY_ISYID]->[$symbol_id] = $name;
+    $self->[Marpa::R3::Internal::Trace::G::ISYID_BY_NAME]->{$name} = $symbol_id;
     return $symbol_id;
 } ## end sub symbol_name_set
 
 sub symbol_new {
     my ( $self, $name ) = @_;
-    return $self->symbol_name_set( $name, $self->{g}->symbol_new() );
+    return $self->symbol_name_set( $name,
+        $self->[Marpa::R3::Internal::Trace::G::C]->symbol_new() );
 }
 
 sub symbol_force {
     my ( $self, $name ) = @_;
-    return $self->{symbol_by_name}->{$name} // $self->symbol_new($name);
+    return $self->[Marpa::R3::Internal::Trace::G::ISYID_BY_NAME]->{$name} // $self->symbol_new($name);
 }
 
 sub rule {
     my ( $self, $rule_id ) = @_;
-    my $grammar     = $self->{g};
-    my $rule_length = $grammar->rule_length($rule_id);
-    my $lhs = $self->symbol_name( $grammar->rule_lhs($rule_id) );
+    my $grammar_c     = $self->[Marpa::R3::Internal::Trace::G::C];
+    my $rule_length = $grammar_c->rule_length($rule_id);
+    my $lhs = $self->symbol_name( $grammar_c->rule_lhs($rule_id) );
     my @rhs =
-        map { $self->symbol_name( $grammar->rule_rhs( $rule_id, $_ ) ) }
+        map { $self->symbol_name( $grammar_c->rule_rhs( $rule_id, $_ ) ) }
         ( 0 .. $rule_length - 1 );
     return ($lhs, @rhs);
 }
@@ -91,23 +92,23 @@ sub rule {
 # Expand a rule into a list of symbol IDs
 sub rule_expand {
     my ( $self, $rule_id ) = @_;
-    my $grammar     = $self->{g};
-    my $rule_length = $grammar->rule_length($rule_id);
+    my $grammar_c     = $self->[Marpa::R3::Internal::Trace::G::C];
+    my $rule_length = $grammar_c->rule_length($rule_id);
     return if not defined $rule_length;
-    my $lhs         = ( $grammar->rule_lhs($rule_id) );
+    my $lhs         = ( $grammar_c->rule_lhs($rule_id) );
     return ( $lhs,
-        map { $grammar->rule_rhs( $rule_id, $_ ) }
+        map { $grammar_c->rule_rhs( $rule_id, $_ ) }
             ( 0 .. $rule_length - 1 ) );
 } ## end sub rule_expand
 
 sub dotted_rule {
     my ( $self, $rule_id, $dot_position ) = @_;
-    my $grammar     = $self->{g};
-    my $rule_length = $grammar->rule_length($rule_id);
+    my $grammar_c     = $self->[Marpa::R3::Internal::Trace::G::C];
+    my $rule_length = $grammar_c->rule_length($rule_id);
     $dot_position = $rule_length if $dot_position < 0;
-    my $lhs = $self->formatted_symbol_name( $grammar->rule_lhs($rule_id) );
+    my $lhs = $self->formatted_symbol_name( $grammar_c->rule_lhs($rule_id) );
     my @rhs =
-        map { $self->formatted_symbol_name( $grammar->rule_rhs( $rule_id, $_ ) ) }
+        map { $self->formatted_symbol_name( $grammar_c->rule_rhs( $rule_id, $_ ) ) }
         ( 0 .. $rule_length - 1 );
     $dot_position = 0 if $dot_position < 0;
     splice( @rhs, $dot_position, 0, q{.} );
@@ -116,13 +117,13 @@ sub dotted_rule {
 
 sub brief_rule {
     my ( $self, $rule_id ) = @_;
-    my $grammar     = $self->{g};
-    my $rule_length = $grammar->rule_length($rule_id);
-    my $lhs = $self->formatted_symbol_name( $grammar->rule_lhs($rule_id) );
+    my $grammar_c     = $self->[Marpa::R3::Internal::Trace::G::C];
+    my $rule_length = $grammar_c->rule_length($rule_id);
+    my $lhs = $self->formatted_symbol_name( $grammar_c->rule_lhs($rule_id) );
     my @rhs =
-        map { $self->formatted_symbol_name( $grammar->rule_rhs( $rule_id, $_ ) ) }
+        map { $self->formatted_symbol_name( $grammar_c->rule_rhs( $rule_id, $_ ) ) }
         ( 0 .. $rule_length - 1 );
-    my $minimum = $grammar->sequence_min($rule_id);
+    my $minimum = $grammar_c->sequence_min($rule_id);
     my @quantifier = ();
     if (defined $minimum) {
          push @quantifier, ($minimum <= 0 ? q{ *} : q{ +});
@@ -167,7 +168,7 @@ sub lexer_progress_report {
 
 sub show_dotted_irl {
     my ( $self, $irl_id, $dot_position ) = @_;
-    my $grammar_c  = $self->{g};
+    my $grammar_c     = $self->[Marpa::R3::Internal::Trace::G::C];
     my $lhs_id     = $grammar_c->_marpa_g_irl_lhs($irl_id);
     my $irl_length = $grammar_c->_marpa_g_irl_length($irl_id);
 
@@ -199,7 +200,7 @@ sub show_dotted_irl {
 
 sub show_ahm {
     my ( $self, $item_id ) = @_;
-    my $grammar_c  = $self->{g};
+    my $grammar_c     = $self->[Marpa::R3::Internal::Trace::G::C];
     my $postdot_id = $grammar_c->_marpa_g_ahm_postdot($item_id);
     my $text       = "AHM $item_id: ";
     my @properties = ();
@@ -218,7 +219,7 @@ sub show_ahm {
 
 sub show_brief_ahm {
     my ( $self, $item_id ) = @_;
-    my $grammar_c  = $self->{g};
+    my $grammar_c     = $self->[Marpa::R3::Internal::Trace::G::C];
     my $postdot_id = $grammar_c->_marpa_g_ahm_postdot($item_id);
     my $irl_id     = $grammar_c->_marpa_g_ahm_irl($item_id);
     my $position   = $grammar_c->_marpa_g_ahm_position($item_id);
@@ -227,7 +228,7 @@ sub show_brief_ahm {
 
 sub show_ahms {
     my ($self)    = @_;
-    my $grammar_c = $self->{g};
+    my $grammar_c     = $self->[Marpa::R3::Internal::Trace::G::C];
     my $text      = q{};
     my $count     = $grammar_c->_marpa_g_ahm_count();
     for my $AHFA_item_id ( 0 .. $count - 1 ) {
@@ -238,7 +239,7 @@ sub show_ahms {
 
 sub isy_name {
     my ( $self, $id ) = @_;
-    my $grammar_c = $self->{g};
+    my $grammar_c     = $self->[Marpa::R3::Internal::Trace::G::C];
 
     # The next is a little roundabout to prevent auto-instantiation
     my $name = '[ISY' . $id . ']';
@@ -282,12 +283,12 @@ sub isy_name {
 sub show_rule {
     my ( $self, $rule_id ) = @_;
 
-    my $grammar = $self->{g};
+    my $grammar_c     = $self->[Marpa::R3::Internal::Trace::G::C];
     my @comment   = ();
 
-    $grammar->rule_length($rule_id) == 0 and push @comment, 'empty';
-    $grammar->rule_is_productive($rule_id) or push @comment, 'unproductive';
-    $grammar->rule_is_accessible($rule_id) or push @comment, 'inaccessible';
+    $grammar_c->rule_length($rule_id) == 0 and push @comment, 'empty';
+    $grammar_c->rule_is_productive($rule_id) or push @comment, 'unproductive';
+    $grammar_c->rule_is_accessible($rule_id) or push @comment, 'inaccessible';
 
     my $text = $self->brief_rule($rule_id);
 
@@ -302,10 +303,10 @@ sub show_rule {
 
 sub show_rules {
     my ($self) = @_;
-    my $grammar = $self->{g};
+    my $grammar_c     = $self->[Marpa::R3::Internal::Trace::G::C];
     my $text;
 
-    my $highest_rule_id = $grammar->highest_rule_id();
+    my $highest_rule_id = $grammar_c->highest_rule_id();
     RULE:
     for ( my $rule_id = 0; $rule_id <= $highest_rule_id; $rule_id++ ) {
         $text .= $self->show_rule($rule_id);

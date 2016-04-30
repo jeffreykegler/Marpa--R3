@@ -127,6 +127,13 @@ __DATA__
     ACTION_NAME
     BLESSING
 
+    :package=Marpa::R3::Internal::Trace::G
+
+    C { A C structure }
+    NAME_BY_ISYID
+    ISYID_BY_NAME
+    XSY_BY_ISYID { Array mapping ISYID to XSY }
+
     :package=Marpa::R3::Internal::Grammar
 
     C { A C structure }

@@ -47,6 +47,12 @@ use constant SLIF_TAG => 4;
 use constant ACTION_NAME => 5;
 use constant BLESSING => 6;
 
+package Marpa::R3::Internal::Trace::G;
+use constant C => 0;
+use constant NAME_BY_ISYID => 1;
+use constant ISYID_BY_NAME => 2;
+use constant XSY_BY_ISYID => 3;
+
 package Marpa::R3::Internal::Grammar;
 use constant C => 0;
 use constant TRACER => 1;
