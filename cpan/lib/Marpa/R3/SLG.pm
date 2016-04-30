@@ -713,7 +713,7 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
 
         my $default_lexeme_action = $lexeme_default_adverbs->{action};
         my $xsy_by_isyid =
-            $thick_g1_grammar->[Marpa::R3::Internal::Grammar::XSY_BY_ISYID];
+            $g1_tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID];
 
         LEXEME:
         for my $lexeme_name ( keys %g1_id_by_lexeme_name ) {
@@ -770,7 +770,8 @@ sub Marpa::R3::Internal::Scanless::G::precompute {
     my ($slg, $grammar) = @_;
 
     my $rules     = $grammar->[Marpa::R3::Internal::Grammar::RULES];
-    my $xsy_by_isyid     = $grammar->[Marpa::R3::Internal::Grammar::XSY_BY_ISYID];
+    my $tracer     = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $xsy_by_isyid     = $tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID];
     my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
 
     my $trace_fh =

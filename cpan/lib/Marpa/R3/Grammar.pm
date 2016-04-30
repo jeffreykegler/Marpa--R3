@@ -64,8 +64,9 @@ sub Marpa::R3::Grammar::g1_naif_new {
 
     my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C] =
         Marpa::R3::Thin::G->new( { if => 1 } );
-    $grammar->[Marpa::R3::Internal::Grammar::TRACER] =
+    my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER] =
         Marpa::R3::Trace::G->new($grammar_c);
+    $tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID] = [];
 
     $grammar->g1_naif_set($slg, $flat_args);
 
@@ -83,8 +84,9 @@ sub Marpa::R3::Grammar::l0_naif_new {
 
     my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C] =
         Marpa::R3::Thin::G->new( { if => 1 } );
-    $grammar->[Marpa::R3::Internal::Grammar::TRACER] =
+    my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER] =
         Marpa::R3::Trace::G->new($grammar_c);
+    $tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID] = [];
 
     for my $symbol ( sort keys %{$symbols} ) {
         my $properties = $symbols->{$symbol};
@@ -421,6 +423,8 @@ sub assign_symbol {
             my $xsy_name = $options->{$property};
             my $xsy = $slg->[Marpa::R3::Internal::Scanless::G::XSY_BY_NAME]->{$xsy_name};
             $grammar->[Marpa::R3::Internal::Grammar::XSY_BY_ISYID]->[$symbol_id] =
+                $xsy;
+            $tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID]->[$symbol_id] =
                 $xsy;
             next PROPERTY;
         }
