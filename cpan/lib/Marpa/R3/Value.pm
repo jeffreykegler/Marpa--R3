@@ -184,7 +184,8 @@ sub Marpa::R3::Internal::Scanless::R::rule_blessing_find {
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $grammar =
         $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
-    my $rules    = $grammar->[Marpa::R3::Internal::Grammar::RULES];
+    my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $rules = $tracer->[Marpa::R3::Internal::Trace::G::RULES];
     my $rule     = $rules->[$rule_id];
     my $blessing = $rule->[Marpa::R3::Internal::Rule::BLESSING];
     $blessing = '::undef' if not defined $blessing;
@@ -479,7 +480,8 @@ sub resolve_rule_by_id {
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $grammar =
         $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
-    my $rules       = $grammar->[Marpa::R3::Internal::Grammar::RULES];
+    my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $rules = $tracer->[Marpa::R3::Internal::Trace::G::RULES];
     my $rule        = $rules->[$rule_id];
     my $action_name = $rule->[Marpa::R3::Internal::Rule::ACTION_NAME];
     my $resolve_error;
@@ -507,7 +509,7 @@ sub resolve_recce {
         $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
     my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
     my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
-    my $rules     = $grammar->[Marpa::R3::Internal::Grammar::RULES];
+    my $rules = $tracer->[Marpa::R3::Internal::Trace::G::RULES];
 
     my $trace_actions =
         $slr->[Marpa::R3::Internal::Scanless::R::TRACE_ACTIONS] // 0;
@@ -658,7 +660,7 @@ sub registration_init {
     my $recce_c   = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
     my $trace_actions =
         $slr->[Marpa::R3::Internal::Scanless::R::TRACE_ACTIONS] // 0;
-    my $rules   = $grammar->[Marpa::R3::Internal::Grammar::RULES];
+    my $rules = $tracer->[Marpa::R3::Internal::Trace::G::RULES];
 
     my @closure_by_rule_id   = ();
     my @semantics_by_rule_id = ();
@@ -1331,7 +1333,7 @@ sub Marpa::R3::Scanless::R::value {
     my $trace_file_handle =
         $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
 
-    my $rules   = $naif_grammar->[Marpa::R3::Internal::Grammar::RULES];
+    my $rules = $tracer->[Marpa::R3::Internal::Trace::G::RULES];
 
     if ( scalar @_ != 1 ) {
         Marpa::R3::exception(
