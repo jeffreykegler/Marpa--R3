@@ -136,7 +136,6 @@ __DATA__
 
     :package=Marpa::R3::Internal::Grammar
 
-    C { A C structure }
     TRACER { The "tracer", a "thin" object
        around the C structure.  }
 

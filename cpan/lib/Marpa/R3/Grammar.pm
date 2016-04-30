@@ -61,8 +61,7 @@ sub Marpa::R3::Grammar::g1_naif_new {
 
     $grammar->[Marpa::R3::Internal::Grammar::RULES]              = [];
 
-    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C] =
-        Marpa::R3::Thin::G->new( { if => 1 } );
+    my $grammar_c = Marpa::R3::Thin::G->new( { if => 1 } );
     my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER] =
         Marpa::R3::Trace::G->new($grammar_c);
     $tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID] = [];
@@ -80,8 +79,7 @@ sub Marpa::R3::Grammar::l0_naif_new {
 
     $grammar->[Marpa::R3::Internal::Grammar::RULES]              = [];
 
-    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C] =
-        Marpa::R3::Thin::G->new( { if => 1 } );
+    my $grammar_c = Marpa::R3::Thin::G->new( { if => 1 } );
     my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER] =
         Marpa::R3::Trace::G->new($grammar_c);
     $tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID] = [];
