@@ -313,7 +313,7 @@ WriteMakefile(
                 @no_index_namespace_inclusive
             ],
             package =>
-                [ @no_index_namespace_inclusive, 'Marpa::R3::Thin::Trace' ],
+                [ @no_index_namespace_inclusive, 'Marpa::R3::Trace::G' ],
         }
     },
     META_MERGE => {
