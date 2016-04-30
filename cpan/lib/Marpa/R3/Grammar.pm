@@ -64,9 +64,7 @@ sub Marpa::R3::Grammar::g1_naif_new {
     my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER] =
         Marpa::R3::Trace::G->new($grammar_c);
     $tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID] = [];
-
-    $tracer->[Marpa::R3::Internal::Trace::G::RULES] =
-      $grammar->[Marpa::R3::Internal::Grammar::RULES] = [];
+    $tracer->[Marpa::R3::Internal::Trace::G::RULES] = [];
 
     $grammar->g1_naif_set($slg, $flat_args);
     $tracer->[Marpa::R3::Internal::Trace::G::START_NAME] = '[:start]';
@@ -84,8 +82,7 @@ sub Marpa::R3::Grammar::l0_naif_new {
     my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER] =
         Marpa::R3::Trace::G->new($grammar_c);
     $tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID] = [];
-    $tracer->[Marpa::R3::Internal::Trace::G::RULES] =
-      $grammar->[Marpa::R3::Internal::Grammar::RULES] = [];
+    $tracer->[Marpa::R3::Internal::Trace::G::RULES] = [];
     $tracer->[Marpa::R3::Internal::Trace::G::START_NAME] = '[:start_lex]';
 
     for my $symbol ( sort keys %{$symbols} ) {

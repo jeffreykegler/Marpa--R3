@@ -134,14 +134,12 @@ __DATA__
     ISYID_BY_NAME
     XSY_BY_ISYID { Array mapping ISYID to XSY }
     START_NAME
-    RULES
+    RULES { array of rule refs }
 
     :package=Marpa::R3::Internal::Grammar
 
     TRACER { The "tracer", a "thin" object
        around the C structure.  }
-
-    RULES { array of rule refs }
 
     =LAST_FIELD
 
