@@ -1648,7 +1648,8 @@ sub Marpa::R3::Scanless::R::show_progress {
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $recce_c = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
     my $grammar  = $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
-    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
+    my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
 
     my $last_ordinal = $recce_c->latest_earley_set();
 
@@ -1978,8 +1979,8 @@ sub Marpa::R3::Scanless::R::show_leo_item {
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $grammar =
         $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
-    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
     my $tracer  = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
     my $leo_base_state = $recce_c->_marpa_r_leo_base_state();
     return if not defined $leo_base_state;
     my $trace_earley_set      = $recce_c->_marpa_r_trace_earley_set();
@@ -2010,8 +2011,8 @@ sub Marpa::R3::Scanless::R::show_token_link_choice {
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $grammar =
         $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
-    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
     my $tracer  = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
 
     my $text    = q{};
     my @pieces  = ();

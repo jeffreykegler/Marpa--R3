@@ -58,8 +58,7 @@ use constant C => 0;
 use constant TRACER => 1;
 use constant START_NAME => 2;
 use constant RULES => 3;
-use constant XSY_BY_ISYID => 4;
-use constant LAST_FIELD => 4;
+use constant LAST_FIELD => 3;
 
 package Marpa::R3::Internal::Progress_Report;
 use constant RULE_ID => 0;

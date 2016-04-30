@@ -142,7 +142,6 @@ __DATA__
 
     START_NAME { name of original symbol }
     RULES { array of rule refs }
-    XSY_BY_ISYID { Array mapping ISYID to XSY }
 
     =LAST_FIELD
 

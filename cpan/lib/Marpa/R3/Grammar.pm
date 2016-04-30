@@ -60,7 +60,6 @@ sub Marpa::R3::Grammar::g1_naif_new {
     bless $grammar, $class;
 
     $grammar->[Marpa::R3::Internal::Grammar::RULES]              = [];
-    $grammar->[Marpa::R3::Internal::Grammar::XSY_BY_ISYID] = [];
 
     my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C] =
         Marpa::R3::Thin::G->new( { if => 1 } );
@@ -80,7 +79,6 @@ sub Marpa::R3::Grammar::l0_naif_new {
     bless $grammar, $class;
 
     $grammar->[Marpa::R3::Internal::Grammar::RULES]              = [];
-    $grammar->[Marpa::R3::Internal::Grammar::XSY_BY_ISYID] = [];
 
     my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C] =
         Marpa::R3::Thin::G->new( { if => 1 } );
@@ -423,8 +421,6 @@ sub assign_symbol {
         if ( $property eq 'xsy' ) {
             my $xsy_name = $options->{$property};
             my $xsy = $slg->[Marpa::R3::Internal::Scanless::G::XSY_BY_NAME]->{$xsy_name};
-            $grammar->[Marpa::R3::Internal::Grammar::XSY_BY_ISYID]->[$symbol_id] =
-                $xsy;
             $tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID]->[$symbol_id] =
                 $xsy;
             next PROPERTY;
