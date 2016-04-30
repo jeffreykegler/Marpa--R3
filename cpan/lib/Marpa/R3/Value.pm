@@ -441,7 +441,8 @@ sub Marpa::R3::Scanless::R::ordering_get {
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $grammar =
         $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
-    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
+    my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
     my $recce_c   = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
 
     $grammar_c->throw_set(0);
@@ -504,7 +505,8 @@ sub resolve_recce {
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $grammar =
         $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
-    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
+    my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
     my $rules     = $grammar->[Marpa::R3::Internal::Grammar::RULES];
 
     my $trace_actions =
@@ -651,9 +653,9 @@ sub registration_init {
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $grammar =
         $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
-    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
+    my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
     my $recce_c   = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
-    my $tracer    = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
     my $trace_actions =
         $slr->[Marpa::R3::Internal::Scanless::R::TRACE_ACTIONS] // 0;
     my $rules   = $grammar->[Marpa::R3::Internal::Grammar::RULES];
@@ -1318,9 +1320,9 @@ sub Marpa::R3::Scanless::R::value {
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $naif_grammar =
         $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
-    my $grammar_c = $naif_grammar->[Marpa::R3::Internal::Grammar::C];
+    my $tracer = $naif_grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
     my $recce_c   = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
-    my $tracer    = $naif_grammar->[Marpa::R3::Internal::Grammar::TRACER];
 
     my $trace_actions =
         $slr->[Marpa::R3::Internal::Scanless::R::TRACE_ACTIONS] // 0;
@@ -1842,7 +1844,8 @@ sub trace_op {
 
     return $trace_output if not $trace_values >= 2;
 
-    my $grammar_c = $grammar->[Marpa::R3::Internal::Grammar::C];
+    my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
     my $bocage    = $slr->[Marpa::R3::Internal::Scanless::R::B_C];
     my $order     = $slr->[Marpa::R3::Internal::Scanless::R::O_C];
     my $tree      = $slr->[Marpa::R3::Internal::Scanless::R::T_C];
