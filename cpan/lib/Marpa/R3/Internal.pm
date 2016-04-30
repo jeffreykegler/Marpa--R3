@@ -57,9 +57,8 @@ use constant RULES => 5;
 
 package Marpa::R3::Internal::Grammar;
 use constant TRACER => 0;
-use constant START_NAME => 1;
-use constant RULES => 2;
-use constant LAST_FIELD => 2;
+use constant RULES => 1;
+use constant LAST_FIELD => 1;
 
 package Marpa::R3::Internal::Progress_Report;
 use constant RULE_ID => 0;

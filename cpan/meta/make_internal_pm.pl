@@ -141,7 +141,6 @@ __DATA__
     TRACER { The "tracer", a "thin" object
        around the C structure.  }
 
-    START_NAME { name of original symbol }
     RULES { array of rule refs }
 
     =LAST_FIELD

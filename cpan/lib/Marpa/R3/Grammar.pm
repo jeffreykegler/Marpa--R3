@@ -59,15 +59,16 @@ sub Marpa::R3::Grammar::g1_naif_new {
     my $grammar = [];
     bless $grammar, $class;
 
-    $grammar->[Marpa::R3::Internal::Grammar::RULES]              = [];
 
     my $grammar_c = Marpa::R3::Thin::G->new( { if => 1 } );
     my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER] =
         Marpa::R3::Trace::G->new($grammar_c);
     $tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID] = [];
 
+    $tracer->[Marpa::R3::Internal::Trace::G::RULES] =
+      $grammar->[Marpa::R3::Internal::Grammar::RULES] = [];
+
     $grammar->g1_naif_set($slg, $flat_args);
-    $grammar->[Marpa::R3::Internal::Grammar::START_NAME] = '[:start]';
     $tracer->[Marpa::R3::Internal::Trace::G::START_NAME] = '[:start]';
 
     return $grammar;
@@ -79,14 +80,12 @@ sub Marpa::R3::Grammar::l0_naif_new {
     my $grammar = [];
     bless $grammar, $class;
 
-    $grammar->[Marpa::R3::Internal::Grammar::RULES]              = [];
-
     my $grammar_c = Marpa::R3::Thin::G->new( { if => 1 } );
     my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER] =
         Marpa::R3::Trace::G->new($grammar_c);
     $tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID] = [];
-
-    $grammar->[Marpa::R3::Internal::Grammar::START_NAME] = '[:start_lex]';
+    $tracer->[Marpa::R3::Internal::Trace::G::RULES] =
+      $grammar->[Marpa::R3::Internal::Grammar::RULES] = [];
     $tracer->[Marpa::R3::Internal::Trace::G::START_NAME] = '[:start_lex]';
 
     for my $symbol ( sort keys %{$symbols} ) {
@@ -278,12 +277,12 @@ sub Marpa::R3::Grammar::start_symbol {
 
 sub Marpa::R3::Grammar::rule_name {
     my ( $grammar, $rule_id ) = @_;
-    my $rules = $grammar->[Marpa::R3::Internal::Grammar::RULES];
+    my $tracer    = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $rules = $tracer->[Marpa::R3::Internal::Trace::G::RULES];
     my $rule  = $rules->[$rule_id];
     return "Non-existent rule $rule_id" if not defined $rule;
     my $name = $rule->[Marpa::R3::Internal::Rule::NAME];
     return $name if defined $name;
-    my $tracer    = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
     my ( $lhs_id ) = $tracer->rule_expand($rule_id);
     return $grammar->symbol_name($lhs_id);
 } ## end sub Marpa::R3::Grammar::rule_name
@@ -292,7 +291,8 @@ sub Marpa::R3::Grammar::rule_name {
 # by the SLIF
 sub Marpa::R3::Grammar::tag {
     my ( $grammar, $rule_id ) = @_;
-    my $rules = $grammar->[Marpa::R3::Internal::Grammar::RULES];
+    my $tracer    = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $rules = $tracer->[Marpa::R3::Internal::Trace::G::RULES];
     my $rule  = $rules->[$rule_id];
     return $rule->[Marpa::R3::Internal::Rule::SLIF_TAG];
 } ## end sub Marpa::R3::Grammar::rule_name
@@ -342,7 +342,8 @@ sub Marpa::R3::Grammar::show_rule {
 
 sub Marpa::R3::Grammar::show_rules {
     my ($grammar) = @_;
-    my $rules = $grammar->[Marpa::R3::Internal::Grammar::RULES];
+    my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $rules = $tracer->[Marpa::R3::Internal::Trace::G::RULES];
     my $text;
 
     for my $rule ( @{$rules} ) {
@@ -375,7 +376,8 @@ sub Marpa::R3::Grammar::symbol_ids {
 # interfaces.  NOT DOCUMENTED.
 sub Marpa::R3::Grammar::_rule_mask {
     my ( $grammar, $rule_id ) = @_;
-    my $rules = $grammar->[Marpa::R3::Internal::Grammar::RULES];
+    my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $rules = $tracer->[Marpa::R3::Internal::Trace::G::RULES];
     my $rule = $rules->[$rule_id];
     return $rule->[Marpa::R3::Internal::Rule::MASK];
 } ## end sub Marpa::R3::Grammar::rule
@@ -406,7 +408,8 @@ sub Marpa::R3::Grammar::symbol_name {
 # Create the structure which "shadows" the libmarpa rule
 sub shadow_rule {
     my ( $grammar, $rule_id ) = @_;
-    my $rules = $grammar->[Marpa::R3::Internal::Grammar::RULES];
+    my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $rules = $tracer->[Marpa::R3::Internal::Trace::G::RULES];
     my $new_rule = $rules->[$rule_id] = [];
     $new_rule->[Marpa::R3::Internal::Rule::ID] = $rule_id;
     return $new_rule;
@@ -476,7 +479,7 @@ sub add_user_rule {
 
     my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
     my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
-    my $rules        = $grammar->[Marpa::R3::Internal::Grammar::RULES];
+    my $rules = $tracer->[Marpa::R3::Internal::Trace::G::RULES];
     my $default_rank = $grammar_c->default_rank();
 
     my ( $lhs_name, $rhs_names, $action, $blessing );
