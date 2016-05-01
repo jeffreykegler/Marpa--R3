@@ -1649,8 +1649,7 @@ sub Marpa::R3::Scanless::R::show_progress {
     my ( $slr, $start_ordinal, $end_ordinal ) = @_;
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $recce_c = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
-    my $grammar  = $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
-    my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $tracer  = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
 
     my $last_ordinal = $recce_c->latest_earley_set();
@@ -1980,9 +1979,8 @@ sub Marpa::R3::Scanless::R::show_leo_item {
     my ($slr)        = @_;
     my $recce_c                = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $grammar =
-        $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
-    my $tracer  = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $tracer =
+        $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
     my $leo_base_state = $recce_c->_marpa_r_leo_base_state();
     return if not defined $leo_base_state;
@@ -2012,9 +2010,8 @@ sub Marpa::R3::Scanless::R::show_token_link_choice {
     my ( $slr, $current_earleme ) = @_;
     my $recce_c                = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $grammar =
-        $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
-    my $tracer  = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $tracer =
+        $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
 
     my $text    = q{};
@@ -2056,9 +2053,8 @@ sub Marpa::R3::Scanless::R::show_completion_link_choice {
     my ( $slr, $link_ahm_id, $current_earleme ) = @_;
     my $recce_c                = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $grammar =
-        $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
-    my $tracer  = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $tracer =
+        $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
  
     my $text    = q{};
@@ -2088,9 +2084,8 @@ sub Marpa::R3::Scanless::R::show_leo_link_choice {
     my ( $slr, $link_ahm_id, $current_earleme ) = @_;
     my $recce_c                = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $grammar =
-        $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
-    my $tracer  = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $tracer =
+        $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
 
     my $text           = q{};
@@ -2113,9 +2108,8 @@ sub Marpa::R3::Scanless::R::show_earley_item {
     my ( $slr, $current_es, $item_id ) = @_;
     my $recce_c                = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $grammar =
-        $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
-    my $tracer  = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $tracer =
+        $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
 
     my $ahm_id_of_yim = $recce_c->_marpa_r_earley_item_trace($item_id);
@@ -2334,10 +2328,9 @@ sub Marpa::R3::Scanless::R::show_bocage {
     my @data      = ();
     my $id        = 0;
     my $slg       = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $grammar   = $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
+    my $tracer   = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     my $recce_c   = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
     my $bocage    = $slr->[Marpa::R3::Internal::Scanless::R::B_C];
-    my $tracer  = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
     my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
   OR_NODE: for ( my $or_node_id = 0 ; ; $or_node_id++ ) {
         my $irl_id = $bocage->_marpa_b_or_node_irl($or_node_id);
@@ -2412,9 +2405,8 @@ sub Marpa::R3::Scanless::R::verbose_or_node {
     my $origin  = $bocage->_marpa_b_or_node_origin($or_node_id);
     return if not defined $origin;
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $grammar =
-        $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
-    my $tracer  = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $tracer =
+        $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     my $set             = $bocage->_marpa_b_or_node_set($or_node_id);
     my $irl_id          = $bocage->_marpa_b_or_node_irl($or_node_id);
     my $position        = $bocage->_marpa_b_or_node_position($or_node_id);
