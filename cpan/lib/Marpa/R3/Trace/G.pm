@@ -476,7 +476,7 @@ sub Marpa::R3::Trace::G::brief_irl {
         $text .= q{ } . ( join q{ }, map { $tracer->isy_name($_) } @rhs_ids );
     } ## end if ( my $rh_length = $grammar_c->_marpa_g_irl_length...)
     return $text;
-} ## end sub Marpa::R3::Grammar::brief_irl
+}
 
 sub Marpa::R3::Trace::G::show_isys {
     my ($tracer) = @_;
@@ -486,7 +486,7 @@ sub Marpa::R3::Trace::G::show_isys {
         $text .= $tracer->show_isy($isy_id);
     }
     return $text;
-} ## end sub Marpa::R3::Grammar::show_isys
+}
 
 sub Marpa::R3::Trace::G::show_isy {
     my ( $tracer, $isy_id ) = @_;
@@ -515,7 +515,7 @@ sub Marpa::R3::Trace::G::show_irls {
         $text .= $tracer->brief_irl($irl_id) . "\n";
     }
     return $text;
-} ## end sub Marpa::R3::Grammar::show_irls
+}
 
 sub Marpa::R3::Trace::G::error {
     my ($tracer) = @_;
@@ -530,7 +530,7 @@ sub Marpa::R3::Trace::G::_rule_mask {
     my $rules = $tracer->[Marpa::R3::Internal::Trace::G::RULES];
     my $rule = $rules->[$rule_id];
     return $rule->[Marpa::R3::Internal::Rule::MASK];
-} ## end sub Marpa::R3::Grammar::rule
+}
 
 sub Marpa::R3::Trace::G::start_symbol {
     my ( $tracer ) = @_;
@@ -547,7 +547,7 @@ sub Marpa::R3::Trace::G::rule_name {
     return $name if defined $name;
     my ( $lhs_id ) = $tracer->rule_expand($rule_id);
     return $tracer->symbol_name($lhs_id);
-} ## end sub Marpa::R3::Grammar::rule_name
+}
 
 # Undocumented -- assumes it is called internally,
 # by the SLIF
@@ -556,6 +556,6 @@ sub Marpa::R3::Trace::G::tag {
     my $rules = $tracer->[Marpa::R3::Internal::Trace::G::RULES];
     my $rule  = $rules->[$rule_id];
     return $rule->[Marpa::R3::Internal::Rule::SLIF_TAG];
-} ## end sub Marpa::R3::Grammar::rule_name
+}
 
 1;
