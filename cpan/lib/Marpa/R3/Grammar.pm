@@ -352,16 +352,6 @@ sub Marpa::R3::Grammar::symbol_ids {
     return 0 .. $grammar_c->highest_symbol_id();
 } ## end sub Marpa::R3::Grammar::rule_ids
 
-# Internal, for use with in coordinating thin and thick
-# interfaces.  NOT DOCUMENTED.
-sub Marpa::R3::Grammar::_rule_mask {
-    my ( $grammar, $rule_id ) = @_;
-    my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
-    my $rules = $tracer->[Marpa::R3::Internal::Trace::G::RULES];
-    my $rule = $rules->[$rule_id];
-    return $rule->[Marpa::R3::Internal::Rule::MASK];
-} ## end sub Marpa::R3::Grammar::rule
-
 sub Marpa::R3::Grammar::show_dotted_rule {
     my ( $grammar, $rule_id, $dot_position ) = @_;
     my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER];

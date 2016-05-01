@@ -44,11 +44,11 @@ sub Marpa::R3::Internal::Scanless::meta_grammar {
         $hashed_metag,
         { bless_package => 'Marpa::R3::Internal::MetaAST_Nodes' } );
 
-    my $thick_g1_grammar =
-        $meta_slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
+    my $tracer =
+        $meta_slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     my @mask_by_rule_id;
-    $mask_by_rule_id[$_] = $thick_g1_grammar->_rule_mask($_)
-        for $thick_g1_grammar->rule_ids();
+    $mask_by_rule_id[$_] = $tracer->_rule_mask($_)
+        for $tracer->rule_ids();
     $meta_slg->[Marpa::R3::Internal::Scanless::G::MASK_BY_RULE_ID] =
         \@mask_by_rule_id;
     $meta_slg->[Marpa::R3::Internal::Scanless::G::TRACE_TERMINALS] = 0;

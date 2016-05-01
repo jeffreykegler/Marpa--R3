@@ -48,8 +48,6 @@ sub Marpa::R3::Internal::Scanless::R::resolve_action {
     my $trace_file_handle =
         $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $grammar =
-        $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
     my $trace_actions =
         $slr->[Marpa::R3::Internal::Scanless::R::TRACE_ACTIONS];
 
