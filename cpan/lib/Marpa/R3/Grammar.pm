@@ -99,16 +99,6 @@ sub Marpa::R3::Grammar::l0_naif_new {
     return $grammar;
 } ## end sub Marpa::R3::Grammar::new
 
-sub Marpa::R3::Grammar::tracer {
-    return $_[0]->[Marpa::R3::Internal::Grammar::TRACER];
-}
-
-sub Marpa::R3::Grammar::thin_symbol {
-    my ( $grammar, $symbol_name ) = @_;
-    return $grammar->[Marpa::R3::Internal::Grammar::TRACER]
-        ->symbol_by_name($symbol_name);
-}
-
 sub Marpa::R3::Grammar::g1_naif_set {
     my ( $grammar, $slg, $flat_args ) = @_;
 
