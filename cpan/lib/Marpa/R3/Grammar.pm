@@ -56,32 +56,25 @@ package Marpa::R3::Internal::Grammar;
 sub Marpa::R3::Grammar::g1_naif_new {
     my ( $class, $slg, $flat_args ) = @_;
 
-    my $grammar = [];
-    bless $grammar, $class;
-
-
     my $grammar_c = Marpa::R3::Thin::G->new( { if => 1 } );
-    my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER] =
+    my $tracer =
         $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER] =
         Marpa::R3::Trace::G->new($grammar_c);
     $tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID] = [];
     $tracer->[Marpa::R3::Internal::Trace::G::RULES] = [];
 
-    $grammar->g1_naif_set($slg, $flat_args);
+    g1_naif_set($tracer, $slg, $flat_args);
     $tracer->[Marpa::R3::Internal::Trace::G::START_NAME] = '[:start]';
     $tracer->[Marpa::R3::Internal::Trace::G::NAME] = 'G1';
 
-    return $grammar;
+    return;
 } ## end sub Marpa::R3::Grammar::new
 
 sub Marpa::R3::Grammar::l0_naif_new {
     my ( $class, $slg, $start_name, $symbols, $rules ) = @_;
 
-    my $grammar = [];
-    bless $grammar, $class;
-
     my $grammar_c = Marpa::R3::Thin::G->new( { if => 1 } );
-    my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER] =
+    my $tracer =
         $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER] =
         Marpa::R3::Trace::G->new($grammar_c);
     $tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID] = [];
@@ -91,24 +84,23 @@ sub Marpa::R3::Grammar::l0_naif_new {
 
     for my $symbol ( sort keys %{$symbols} ) {
         my $properties = $symbols->{$symbol};
-        assign_symbol( $slg, $grammar, $symbol, $properties );
+        assign_symbol( $slg, $tracer, $symbol, $properties );
     }
 
-    add_user_rules( $slg, $grammar, $rules );
+    add_user_rules( $slg, $tracer, $rules );
 
-    return $grammar;
+    return;
 } ## end sub Marpa::R3::Grammar::new
 
-sub Marpa::R3::Grammar::g1_naif_set {
-    my ( $grammar, $slg, $flat_args ) = @_;
+sub g1_naif_set {
+    my ( $tracer, $slg, $flat_args ) = @_;
 
-    my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
     my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
 
     if ( defined( my $value = $flat_args->{'symbols'} ) ) {
         for my $symbol ( sort keys %{$value} ) {
             my $properties = $value->{$symbol};
-            assign_symbol( $slg, $grammar, $symbol, $properties );
+            assign_symbol( $slg, $tracer, $symbol, $properties );
         }
         delete $flat_args->{'symbols'};
     } ## end if ( defined( my $value = $flat_args->{'symbols'} ) )
@@ -119,7 +111,7 @@ sub Marpa::R3::Grammar::g1_naif_set {
     } ## end if ( defined( my $value = $flat_args->{'start'} ) )
 
     if ( defined( my $value = $flat_args->{'rules'} ) ) {
-        add_user_rules( $slg, $grammar, $value );
+        add_user_rules( $slg, $tracer, $value );
         delete $flat_args->{'rules'};
     } ## end if ( defined( my $value = $flat_args->{'rules'} ) )
 
@@ -137,9 +129,8 @@ sub Marpa::R3::Grammar::g1_naif_set {
 
 sub assign_symbol {
     # $slg will be needed for the XSY's
-    my ( $slg, $grammar, $name, $options ) = @_;
+    my ( $slg, $tracer, $name, $options ) = @_;
 
-    my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
     my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
     my $symbol_id = $tracer->symbol_by_name($name);
     if ( defined $symbol_id ) {
@@ -180,10 +171,10 @@ sub assign_symbol {
 
 # add one or more rules
 sub add_user_rules {
-    my ( $slg, $grammar, $rules ) = @_;
+    my ( $slg, $tracer, $rules ) = @_;
 
     for my $rule (@{$rules}) {
-        add_user_rule( $slg, $grammar, $rule );
+        add_user_rule( $slg, $tracer, $rule );
     }
 
     return;
@@ -191,13 +182,8 @@ sub add_user_rules {
 } ## end sub add_user_rules
 
 sub add_user_rule {
-    my ( $slg, $grammar, $options ) = @_;
+    my ( $slg, $tracer, $options ) = @_;
 
-    Marpa::R3::exception('Missing argument to add_user_rule')
-        if not defined $grammar
-        or not defined $options;
-
-    my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
     my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
     my $rules = $tracer->[Marpa::R3::Internal::Trace::G::RULES];
     my $default_rank = $grammar_c->default_rank();
@@ -313,9 +299,9 @@ sub add_user_rule {
     } ## end if ( defined $separator_name and $is_ordinary_rule )
 
     my @rhs_ids = map {
-                assign_symbol( $slg, $grammar, $_ )
+                assign_symbol( $slg, $tracer, $_ )
         } @{$rhs_names};
-    my $lhs_id = assign_symbol( $slg, $grammar, $lhs_name );
+    my $lhs_id = assign_symbol( $slg, $tracer, $lhs_name );
 
     my $base_rule_id;
     my $separator_id = -1;
@@ -334,7 +320,7 @@ sub add_user_rule {
 
         # create the separator symbol, if we're using one
         if ( defined $separator_name ) {
-            $separator_id = assign_symbol( $slg, $grammar, $separator_name ) ;
+            $separator_id = assign_symbol( $slg, $tracer, $separator_name ) ;
         } ## end if ( defined $separator_name )
 
         $grammar_c->throw_set(0);
