@@ -1100,24 +1100,21 @@ sub Marpa::R3::Scanless::G::l0_show_symbols {
 
 sub Marpa::R3::Scanless::G::symid_is_accessible {
     my ( $slg, $symid ) = @_;
-    my $thick_grammar = thick_subgrammar_by_name($slg, 'G1');
-    my $tracer = $thick_grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
     return $grammar_c->symbol_is_accessible($symid)
 }
 
 sub Marpa::R3::Scanless::G::symid_is_productive {
     my ( $slg, $symid ) = @_;
-    my $thick_grammar = thick_subgrammar_by_name($slg, 'G1');
-    my $tracer = $thick_grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
     return $grammar_c->symbol_is_productive($symid)
 }
 
 sub Marpa::R3::Scanless::G::symid_is_nulling {
     my ( $slg, $symid ) = @_;
-    my $thick_grammar = thick_subgrammar_by_name($slg, 'G1');
-    my $tracer = $thick_grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
     return $grammar_c->symbol_is_nulling($symid)
 }
