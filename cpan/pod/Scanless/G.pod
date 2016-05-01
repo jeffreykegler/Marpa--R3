@@ -171,25 +171,35 @@ name: SLG rule_expand() synopsis
 
 =for Marpa::R3::Display::End
 
-=for Marpa::R3::Display
-name: SLG rule_expand() 2 args synopsis
-
-    my ($lhs_id, @rhs_ids) = $grammar->rule_expand($rule_id, 'L0');
-    $text .= "L0 Rule #$rule_id: $lhs_id ::= " . (join q{ }, @rhs_ids) . "\n";
-
-=for Marpa::R3::Display::End
-
-"Expands" a rule ID into symbol ID's.
+"Expands" a G1 grammar
+rule ID into symbol ID's.
+The first and only argument,
+which is required, is the ID of the rule to be "expanded".
 An array of symbol ID's is returned.
 The ID of the LHS symbol is the first element,
 and the remaining elements are the ID's of the RHS symbols,
 in order.
-Returns an empty array if the rule does not exist.
+Returns an empty array if the G1 grammar rule does not exist.
 
-The first argument is the ID of the rule to be "expanded".
-The second, optional, argument is the name of a subgrammar.
-Currently there are L0 and G1 subgrammars.
-The default subgrammar is G1.
+=head2 l0_rule_expand()
+
+=for Marpa::R3::Display
+name: SLG l0_rule_expand() synopsis
+
+    my ($lhs_id, @rhs_ids) = $grammar->l0_rule_expand($rule_id);
+    $text .= "L0 Rule #$rule_id: $lhs_id ::= " . (join q{ }, @rhs_ids) . "\n";
+
+=for Marpa::R3::Display::End
+
+"Expands" a L0 grammar
+rule ID into symbol ID's.
+The first and only argument,
+which is required, is the ID of the rule to be "expanded".
+An array of symbol ID's is returned.
+The ID of the LHS symbol is the first element,
+and the remaining elements are the ID's of the RHS symbols,
+in order.
+Returns an empty array if the L0 grammar rule does not exist.
 
 =head2 rule_ids()
 
@@ -201,18 +211,19 @@ normalize-whitespace: 1
 
 =for Marpa::R3::Display::End
 
+Returns a list of the G1 grammar rule ID's as an array.
+
+=head2 l0_rule_ids()
+
 =for Marpa::R3::Display
-name: SLG rule_ids() 2 arg synopsis
+name: SLG l0_rule_ids() synopsis
 normalize-whitespace: 1
 
-    do_something($_) for $grammar->rule_ids('L0');
+    do_something($_) for $grammar->l0_rule_ids();
 
 =for Marpa::R3::Display::End
 
-Returns a list of the rule ID's as an array.
-Takes one, optional, argument: the name of a subgrammar.
-Currently there are L0 and G1 subgrammars.
-The default subgrammar is G1.
+Returns a list of the L0 grammar rule ID's as an array.
 
 =head2 rule_name()
 
@@ -238,22 +249,26 @@ name: SLG rule_show() synopsis
 
 =for Marpa::R3::Display::End
 
-=for Marpa::R3::Display
-name: SLG rule_show() 2 args synopsis
-
-    my $rule_description = $grammar->rule_show($rule_id, 'L0');
-
-=for Marpa::R3::Display::End
-
-For a rule ID,
-returns a string describing that rule in a form which is useful for tracing and debugging,
+The first argument, which is required,
+is the ID of a G1 grammar rule.
+Returns a string describing that rule in a form which is useful for tracing and debugging,
 but subject to change.
 Returns a Perl undef if the rule does not exist.
 
-The first argument is the ID of the rule to be displayed.
-The second, optional, argument is the name of a subgrammar.
-Currently there are L0 and G1 subgrammars.
-The default subgrammar is G1.
+=head2 SLG l0_rule_show()
+
+=for Marpa::R3::Display
+name: SLG l0_rule_show() synopsis
+
+    my $rule_description = $grammar->l0_rule_show($rule_id);
+
+=for Marpa::R3::Display::End
+
+The first argument, which is required,
+is the ID of a L0 grammar rule.
+Returns a string describing that rule in a form which is useful for tracing and debugging,
+but subject to change.
+Returns a Perl undef if the rule does not exist.
 
 =head2 start_symbol_id()
 
@@ -279,26 +294,34 @@ name: SLG symbol_display_form() synopsis
 
 =for Marpa::R3::Display::End
 
-=for Marpa::R3::Display
-name: SLG symbol_display_form() 2 arg synopsis
+The first, required, argument is a G1 grammar symbol ID.
+Returns the "display form" of the symbol.
+This is the symbol in a form thought most suitable for display in messages, etc.
+Returns a Perl C<undef> if the symbol does not exist.
 
-    my $display_form = $grammar->symbol_display_form( $symbol_id, 'L0' );
+The display form of a symbol is always defined.
+The display form of a symbol is not useable as a name -- it is not necessarily unique,
+and is subject to change.
+
+=head2 l0_symbol_display_form()
+
+=for Marpa::R3::Display
+name: SLG l0_symbol_display_form() synopsis
+
+    my $display_form = $grammar->l0_symbol_display_form( $symbol_id );
     $text
         .= "L0 symbol number: $symbol_id  name in display form: $display_form\n";
 
 =for Marpa::R3::Display::End
 
-Given a symbol ID, returns the "display form" of the symbol.
+The first, required, argument is an L0 grammar symbol ID.
+Returns the "display form" of the symbol.
 This is the symbol in a form thought most suitable for display in messages, etc.
-The display form is always defined.
+Returns a Perl C<undef> if the symbol does not exist.
+
+The display form of a symbol is always defined.
 The display form of a symbol is not useable as a name -- it is not necessarily unique,
 and is subject to change.
-
-The first argument is the symbol ID.
-A second, optional, argument is the subgrammar.
-Currently there are L0 and G1 subgrammars.
-The default subgrammar is G1.
-Returns a Perl C<undef> if the symbol does not exist.
 
 =head2 symbol_dsl_form()
 
@@ -346,18 +369,19 @@ normalize-whitespace: 1
 
 =for Marpa::R3::Display::End
 
+Returns a list of the G1 grammar symbol ID's as an array.
+
+=head2 l0_symbol_ids()
+
 =for Marpa::R3::Display
-name: SLG symbol_ids() 2 arg synopsis
+name: SLG l0_symbol_ids() synopsis
 normalize-whitespace: 1
 
-    do_something($_) for $grammar->symbol_ids('L0');
+    do_something($_) for $grammar->l0_symbol_ids();
 
 =for Marpa::R3::Display::End
 
-Returns a list of the symbol ID's as an array.
-Takes one, optional, argument: the name of a subgrammar.
-Currently there are L0 and G1 subgrammars.
-The default subgrammar is G1.
+Returns a list of the L0 grammar symbol ID's as an array.
 
 =head2 symbol_name()
 
@@ -369,28 +393,41 @@ name: SLG symbol_name() synopsis
 
 =for Marpa::R3::Display::End
 
-=for Marpa::R3::Display
-name: SLG symbol_name() 2 arg synopsis
+The first and only argument, which is required, is a G1 grammar
+symbol ID.
+The return value is the name of the symbol, if the symbol exists,
+and a Perl C<undef> if the symbol does not exist.
 
-    my $name = $grammar->symbol_name( $symbol_id, 'L0' );
+For every symbol ID, this method's return value will be defined
+and will be unique to that symbol ID,
+so that it is suitable for use as a symbol name.
+If the SLIF DSL explicitly specifies a name,
+the return value is that explicitly specified name.
+Otherwise, the return value is an internal name,
+which is subject to change in future versions of Marpa::R3.
+
+=head2 l0_symbol_name()
+
+=for Marpa::R3::Display
+name: SLG l0_symbol_name() synopsis
+
+    my $name = $grammar->l0_symbol_name( $symbol_id );
     $text .= "L0 symbol number: $symbol_id  name: $name\n";
 
 =for Marpa::R3::Display::End
 
-Given a symbol ID, returns the name of the symbol.
+The first and only argument, which is required, is an L0 grammar
+symbol ID.
+The return value is the name of the symbol, if the symbol exists,
+and a Perl C<undef> if the symbol does not exist.
+
 For every symbol ID, this method's return value will be defined
 and will be unique to that symbol ID,
 so that it is suitable for use as a symbol name.
-If a symbol has an explicit name, the return value will be
-the symbol's explicit name.
-If there is no explicit name, it will be an internal name.
-Internal names are subject to change.
-
-The first argument is the symbol ID.
-A second, optional, argument is the subgrammar.
-Currently there are L0 and G1 subgrammars.
-The default subgrammar is G1.
-Returns a Perl C<undef> if the symbol does not exist.
+If the SLIF DSL explicitly specifies a name,
+the return value is that explicitly specified name.
+Otherwise, the return value is an internal name,
+which is subject to change in future versions of Marpa::R3.
 
 =head1 Trace methods
 
@@ -405,17 +442,8 @@ normalize-whitespace: 1
 
 =for Marpa::R3::Display::End
 
-=for Marpa::R3::Display
-name: SLG show_rules() synopsis with 2 args
-partial: 1
-normalize-whitespace: 1
-
-    $show_rules_output .= $grammar->show_rules(3, 'L0');
-
-=for Marpa::R3::Display::End
-
-The C<show_rules()> method returns a descripton of
-the rules for a subgrammar, by default G1.
+The C<show_rules()> method returns a description of
+the rules for the G1 grammar.
 It is useful for understanding the rules as they
 appear in trace and debugging outputs.
 To allow for improvements in Marpa::R3,
@@ -429,8 +457,31 @@ for those new to SLIF tracing and debugging.
 A verbosity of 3 prints additional information for
 experts.
 
-The second, optional, argument is the name of a subgrammar.
-Currently there are L0 and G1 subgrammars.
+=head2 l0_show_rules()
+
+=for Marpa::R3::Display
+name: SLG l0_show_rules() synopsis
+partial: 1
+normalize-whitespace: 1
+
+    $show_rules_output .= $grammar->l0_show_rules(3);
+
+=for Marpa::R3::Display::End
+
+The C<show_rules()> method returns a description of
+the rules for the L0 grammar.
+It is useful for understanding the rules as they
+appear in trace and debugging outputs.
+To allow for improvements in Marpa::R3,
+the output of C<show_rules()> is subject to change.
+
+The first optional argument can be a numeric verbosity level.
+The default verbosity is 1, which is adequate for
+most purposes.
+A verbosity of 2 prints additional information useful
+for those new to SLIF tracing and debugging.
+A verbosity of 3 prints additional information for
+experts.
 
 =head2 show_symbols()
 
@@ -443,24 +494,16 @@ normalize-whitespace: 1
 
 =for Marpa::R3::Display::End
 
-=for Marpa::R3::Display
-name: SLIF show_symbols() synopsis
-partial: 1
-normalize-whitespace: 1
-
-    $show_symbols_output .= $grammar->show_symbols(3, 'L0');
-
-=for Marpa::R3::Display::End
-
-The C<show_symbols()> method returns a descripton of
-the symbols for a subgrammar,
-by default G1.
+The first and only argument,
+which is optional,
+is a numeric verbosity level.
+The return value is a descripton of
+the symbols for the G1 grammar.
 It is useful for understanding the symbols as they
 appear in trace and debugging outputs.
 To allow for improvements in Marpa::R3,
 the output of C<show_symbols()> is subject to change.
 
-The first argument can be a numeric verbosity level.
 The default verbosity is 1, which is adequate for
 most purposes.
 A verbosity of 2 prints additional information useful
@@ -468,8 +511,33 @@ for those new to SLIF tracing and debugging.
 A verbosity of 3 prints additional information for
 experts.
 
-The second, optional, argument is the name of a subgrammar.
-Currently there are L0 and G1 subgrammars.
+=head2 l0_show_symbols()
+
+=for Marpa::R3::Display
+name: SLIF l0_show_symbols() synopsis
+partial: 1
+normalize-whitespace: 1
+
+    $show_symbols_output .= $grammar->l0_show_symbols(3);
+
+=for Marpa::R3::Display::End
+
+The first and only argument,
+which is optional,
+is a numeric verbosity level.
+The return value is a descripton of
+the symbols for the L0 grammar.
+It is useful for understanding the symbols as they
+appear in trace and debugging outputs.
+To allow for improvements in Marpa::R3,
+the output of C<show_symbols()> is subject to change.
+
+The default verbosity is 1, which is adequate for
+most purposes.
+A verbosity of 2 prints additional information useful
+for those new to SLIF tracing and debugging.
+A verbosity of 3 prints additional information for
+experts.
 
 =head1 Copyright and License
 

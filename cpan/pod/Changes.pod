@@ -71,6 +71,33 @@ of Marpa::R2::Scanless::G named arguments
 have been
 removed in Marpa::R3.
 
+=head2 New Marpa::R3::Scanless::G methods
+
+Several new methods have been added as accessors for
+L0 grammars:
+
+=over 4
+
+=item * C<Marpa::R2::Scanless::G::l0_symbol_dsl_form()>
+
+=item * C<Marpa::R2::Scanless::G::l0_rule_expand()>
+
+=item * C<Marpa::R2::Scanless::G::l0_rule_ids()>
+
+=item * C<Marpa::R2::Scanless::G::l0_rule_show()>
+
+=item * C<Marpa::R2::Scanless::G::l0_symbol_display_form()>
+
+=item * C<Marpa::R2::Scanless::G::l0_symbol_ids()>
+
+=item * C<Marpa::R2::Scanless::G::l0_symbol_name()>
+
+=item * C<Marpa::R2::Scanless::G::l0_show_rules()>
+
+=item * C<Marpa::R2::Scanless::G::l0_show_symbols()>
+
+=back
+
 =head2 Marpa::R2::Scanless::G methods removed in Marpa::R3
 
 The
@@ -88,14 +115,36 @@ has been removed.
 
 =head2 Marpa::R2::Scanless::G methods changed in Marpa::R3
 
-The C<Marpa::R2::Scanless::G::symbol_dsl_form()> is now two methods:
-C<Marpa::R3::Scanless::G::symbol_dsl_form()> and
-C<Marpa::R3::Scanless::G::l0_symbol_dsl_form()>.
-C<Marpa::R3::Scanless::G::symbol_dsl_form()> no longer takes a second
-argument indicating the subgrammar: it always returns the value
-for the G1 grammar.
-C<Marpa::R3::Scanless::G::l0_symbol_dsl_form()> returns the value for
-the L0 grammar.
+The following methods have been changed:
+
+=over 4
+
+=item * C<Marpa::R2::Scanless::G::symbol_dsl_form()>
+
+=item * C<Marpa::R2::Scanless::G::rule_expand()>
+
+=item * C<Marpa::R2::Scanless::G::rule_ids()>
+
+=item * C<Marpa::R2::Scanless::G::rule_show()>
+
+=item * C<Marpa::R2::Scanless::G::symbol_display_form()>
+
+=item * C<Marpa::R2::Scanless::G::symbol_ids()>
+
+=item * C<Marpa::R2::Scanless::G::symbol_name()>
+
+=item * C<Marpa::R2::Scanless::G::show_rules()>
+
+=item * C<Marpa::R2::Scanless::G::show_symbols()>
+
+=back
+
+They no longer take an argument indicating the subgrammar --
+instead they always return result for the G1 grammar.
+New methods have been added to return results for the L0
+grammar.
+For these, see
+L</"New Marpa::R3::Scanless::G methods">.
 
 =head2 Marpa::R2::Scanless::R methods renamed in Marpa::R3
 
