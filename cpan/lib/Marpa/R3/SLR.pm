@@ -758,9 +758,9 @@ my $libmarpa_trace_event_handlers = {
         my ( $slr, $event ) = @_;
         my ( undef, undef, $g1_symbol_id, $start, $end ) = @{$event};
         my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-        my $thick_g1_grammar = $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
+        my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
         my $lexeme_name =
-            $thick_g1_grammar->symbol_in_display_form($slg, $g1_symbol_id);
+            $tracer->symbol_in_display_form($g1_symbol_id);
         my $trace_file_handle =
             $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
         say {$trace_file_handle} 'Ignored lexeme ',
@@ -1034,7 +1034,6 @@ sub Marpa::R3::Scanless::R::read_problem {
         $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
 
     my $thin_g1_recce    = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
-    my $thick_g1_grammar = $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
     my $g1_tracer =
         $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
 
@@ -1087,8 +1086,8 @@ sub Marpa::R3::Scanless::R::read_problem {
                 my $trace_file_handle =
                   $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
                 my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-                my $thick_g1_grammar =
-                  $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
+                my $tracer =
+                  $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
 
        # Different internal symbols may have the same external "display form",
        # which in naive reporting logic would result in many identical messages,
@@ -1097,8 +1096,7 @@ sub Marpa::R3::Scanless::R::read_problem {
        # internally.
 
                 $rejections{
-                    $thick_g1_grammar->symbol_in_display_form( $slg,
-                        $g1_lexeme )
+                    $tracer->symbol_in_display_form( $g1_lexeme )
                       . qq{; value="$raw_token_value"; length = }
                       . ( $lexeme_end_pos - $lexeme_start_pos )
                 } = 1;
@@ -1837,9 +1835,7 @@ sub Marpa::R3::Scanless::R::lexeme_alternative {
     ) if not defined $symbol_name;
 
     my $slg        = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $g1_grammar = $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
-    my $g1_tracer =
-            $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
+    my $g1_tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     my $symbol_id  = $g1_tracer->symbol_by_name($symbol_name);
     if ( not defined $symbol_id ) {
         Marpa::R3::exception(
@@ -1857,7 +1853,7 @@ sub Marpa::R3::Scanless::R::lexeme_alternative {
             || $result == $Marpa::R3::Error::INACCESSIBLE_TOKEN;
 
     Marpa::R3::exception( qq{Problem reading symbol "$symbol_name": },
-        ( scalar $g1_grammar->error() ) );
+        ( scalar $g1_tracer->error() ) );
 } ## end sub Marpa::R3::Scanless::R::lexeme_alternative
 
 # Returns 0 on unthrown failure, current location on success
@@ -1932,8 +1928,6 @@ sub Marpa::R3::Scanless::R::lexeme_priority_set {
     my ( $slr, $lexeme_name, $new_priority ) = @_;
     my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
     my $slg      = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $thick_g1_grammar =
-      $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
     my $g1_tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     my $lexeme_id = $g1_tracer->symbol_by_name($lexeme_name);
     Marpa::R3::exception("Bad symbol in lexeme_priority_set(): $lexeme_name")

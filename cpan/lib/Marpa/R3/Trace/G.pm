@@ -517,4 +517,10 @@ sub Marpa::R3::Trace::G::show_irls {
     return $text;
 } ## end sub Marpa::R3::Grammar::show_irls
 
+sub Marpa::R3::Trace::G::error {
+    my ($tracer) = @_;
+    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
+    return $grammar_c->error();
+}
+
 1;

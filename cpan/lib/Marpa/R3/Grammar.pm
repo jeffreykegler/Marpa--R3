@@ -656,13 +656,6 @@ sub rule_describe {
     return "$lhs_name -> " . ( join q{ }, map { / / ? "<$_>" : $_ } @{$rhs_names} );
 } ## end sub rule_describe
 
-sub Marpa::R3::Grammar::error {
-    my ($grammar) = @_;
-    my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
-    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
-    return $grammar_c->error();
-}
-
 # INTERNAL OK AFTER HERE _marpa_
 
 sub Marpa::R3::Grammar::rule_is_used {
