@@ -1126,8 +1126,7 @@ sub Marpa::R3::Scanless::G::symid_is_nulling {
 
 sub Marpa::R3::Scanless::G::show_dotted_rule {
     my ( $slg, $rule_id, $dot_position ) = @_;
-    my $grammar =  $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
-    my $tracer  = $grammar->tracer();
+    my $tracer =  $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
     my ( $lhs, @rhs ) =
     map { $tracer->symbol_in_display_form($_) } $tracer->rule_expand($rule_id);
@@ -1176,12 +1175,6 @@ sub Marpa::R3::Scanless::G::l0_symbol_ids {
 sub Marpa::R3::Scanless::G::thick_g1_grammar {
     my ($slg) = @_;
     return $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
-}
-
-sub Marpa::R3::Scanless::G::tracer {
-    my ($slg) = @_;
-    my $grammar =  $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
-    return $grammar->tracer();
 }
 
 sub Marpa::R3::Scanless::G::show_irls {
