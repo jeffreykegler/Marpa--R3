@@ -306,45 +306,6 @@ sub Marpa::R3::Grammar::show_rules {
 # This logic deals with gaps in the rule numbering.
 # Currently there are none, but Libmarpa does not
 # guarantee this.
-sub Marpa::R3::Grammar::rule_ids {
-    my ($grammar) = @_;
-    my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
-    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
-    return 0 .. $grammar_c->highest_rule_id();
-} ## end sub Marpa::R3::Grammar::rule_ids
-
-# This logic deals with gaps in the symbol numbering.
-# Currently there are none, but Libmarpa does not
-# guarantee this.
-sub Marpa::R3::Grammar::symbol_ids {
-    my ($grammar) = @_;
-    my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
-    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
-    return 0 .. $grammar_c->highest_symbol_id();
-} ## end sub Marpa::R3::Grammar::rule_ids
-
-sub Marpa::R3::Grammar::show_dotted_rule {
-    my ( $grammar, $rule_id, $dot_position ) = @_;
-    my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
-    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
-    my ( $lhs, @rhs ) = $grammar->rule($rule_id);
-
-    my $minimum = $grammar_c->sequence_min($rule_id);
-    if (defined $minimum) {
-        my $quantifier = $minimum <= 0 ? q{*} : q{+} ;
-        $rhs[0] .= $quantifier;
-    }
-    $dot_position = 0 if $dot_position < 0;
-    splice @rhs, $dot_position, 0, q{.};
-    return join q{ }, $lhs, q{->}, @rhs;
-} ## end sub Marpa::R3::Grammar::show_dotted_rule
-
-sub Marpa::R3::Grammar::symbol_name {
-    my ( $grammar, $id ) = @_;
-    my $symbol_name =
-        $grammar->[Marpa::R3::Internal::Grammar::TRACER]->symbol_name($id);
-    return defined $symbol_name ? $symbol_name : '[SYMBOL#' . $id . ']';
-} ## end sub Marpa::R3::Grammar::symbol_name
 
 sub assign_symbol {
     # $slg will be needed for the XSY's
@@ -618,20 +579,6 @@ sub rule_describe {
 } ## end sub rule_describe
 
 # INTERNAL OK AFTER HERE _marpa_
-
-sub Marpa::R3::Grammar::rule_is_used {
-    my ( $grammar, $rule_id ) = @_;
-    my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
-    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
-    return $grammar_c->_marpa_g_rule_is_used($rule_id);
-}
-
-sub Marpa::R3::Grammar::show_ahms {
-    my ( $grammar, $verbose ) = @_;
-    return $grammar->[Marpa::R3::Internal::Grammar::TRACER]
-        ->show_ahms($verbose);
-}
-
 1;
 
 # vim: expandtab shiftwidth=4:
