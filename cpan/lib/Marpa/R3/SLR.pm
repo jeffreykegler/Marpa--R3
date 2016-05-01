@@ -977,9 +977,9 @@ sub Marpa::R3::Scanless::R::resume {
                 if ( $character =~ $re ) {
 
                     if ( $trace_terminals >= 2 ) {
-                        my $thick_lex_grammar =
+                        my $lex_tracer =
                           $slg
-                          ->[Marpa::R3::Internal::Scanless::G::THICK_L0_GRAMMAR
+                          ->[Marpa::R3::Internal::Scanless::G::L0_TRACER
                           ];
                         my $trace_file_handle = $slr->[
                           Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
@@ -989,8 +989,7 @@ sub Marpa::R3::Scanless::R::resume {
                         }
                         say {$trace_file_handle}
 qq{Registering character $char_desc as symbol $symbol_id: },
-                          $thick_lex_grammar->symbol_in_display_form( $slg,
-                            $symbol_id )
+                          $lex_tracer->symbol_in_display_form($symbol_id )
                           or Marpa::R3::exception("Could not say(): $ERRNO");
                     } ## end if ( $trace_terminals >= 2 )
                     push @ops, $op_alternative, $symbol_id, 1, 1;
