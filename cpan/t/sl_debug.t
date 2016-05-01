@@ -385,9 +385,9 @@ $show_rules_output .= $grammar->show_rules(3);
 $show_rules_output .= "Lex (L0) Rules:\n";
 
 # Marpa::R3::Display
-# name: SLG show_rules() synopsis with 2 args
+# name: SLG l0_show_rules() synopsis
 
-$show_rules_output .= $grammar->show_rules(3, 'L0');
+$show_rules_output .= $grammar->l0_show_rules(3);
 
 # Marpa::R3::Display::End
 
@@ -555,7 +555,7 @@ my $show_symbols_output;
 $show_symbols_output .= "G1 Symbols:\n";
 $show_symbols_output .= $grammar->show_symbols(3);
 $show_symbols_output .= "Lex (L0) Symbols:\n";
-$show_symbols_output .= $grammar->show_symbols(3, 'L0');
+$show_symbols_output .= $grammar->l0_show_symbols(3);
 
 # Marpa::R3::Display::End
 
@@ -782,9 +782,9 @@ sub do_something { push @TEST_ARRAY, $_[0] }
 @TEST_ARRAY = ();
 
 # Marpa::R3::Display
-# name: SLG symbol_ids() 2 arg synopsis
+# name: SLG l0_symbol_ids() synopsis
 
-do_something($_) for $grammar->symbol_ids('L0');
+do_something($_) for $grammar->l0_symbol_ids();
 
 # Marpa::R3::Display::End
 
@@ -827,9 +827,9 @@ Marpa::R3::Test::is(
 @TEST_ARRAY = ();
 
 # Marpa::R3::Display
-# name: SLG rule_ids() 2 arg synopsis
+# name: SLG l0_rule_ids() synopsis
 
-do_something($_) for $grammar->rule_ids('L0');
+do_something($_) for $grammar->l0_rule_ids();
 
 # Marpa::R3::Display::End
 
@@ -880,12 +880,12 @@ END_OF_TEXT
 
 $text = q{};
 
-for my $rule_id ( $grammar->rule_ids('L0') ) {
+for my $rule_id ( $grammar->l0_rule_ids() ) {
 
 # Marpa::R3::Display
-# name: SLG rule_expand() 2 args synopsis
+# name: SLG l0_rule_expand() synopsis
 
-    my ($lhs_id, @rhs_ids) = $grammar->rule_expand($rule_id, 'L0');
+    my ($lhs_id, @rhs_ids) = $grammar->l0_rule_expand($rule_id);
     $text .= "L0 Rule #$rule_id: $lhs_id ::= " . (join q{ }, @rhs_ids) . "\n";
 
 # Marpa::R3::Display::End
@@ -1073,12 +1073,12 @@ END_OF_TEXT
 
 $text = q{};
 
-for my $rule_id ( $grammar->rule_ids('L0') ) {
+for my $rule_id ( $grammar->l0_rule_ids() ) {
 
 # Marpa::R3::Display
-# name: SLG rule_show() 2 args synopsis
+# name: SLG l0_rule_show() synopsis
 
-    my $rule_description = $grammar->rule_show($rule_id, 'L0');
+    my $rule_description = $grammar->l0_rule_show($rule_id);
 
 # Marpa::R3::Display::End
     $text .= "$rule_description\n";
@@ -1118,20 +1118,20 @@ END_OF_TEXT
 
 $text = '';
 
-for my $symbol_id ( $grammar->symbol_ids('L0') ) {
+for my $symbol_id ( $grammar->l0_symbol_ids() ) {
 
 # Marpa::R3::Display
-# name: SLG symbol_name() 2 arg synopsis
+# name: SLG l0_symbol_name() synopsis
 
-    my $name = $grammar->symbol_name( $symbol_id, 'L0' );
+    my $name = $grammar->l0_symbol_name( $symbol_id );
     $text .= "L0 symbol number: $symbol_id  name: $name\n";
 
 # Marpa::R3::Display::End
 
 # Marpa::R3::Display
-# name: SLG symbol_display_form() 2 arg synopsis
+# name: SLG l0_symbol_display_form() synopsis
 
-    my $display_form = $grammar->symbol_display_form( $symbol_id, 'L0' );
+    my $display_form = $grammar->l0_symbol_display_form( $symbol_id );
     $text
         .= "L0 symbol number: $symbol_id  name in display form: $display_form\n";
 
@@ -1146,7 +1146,7 @@ for my $symbol_id ( $grammar->symbol_ids('L0') ) {
 
 # Marpa::R3::Display::End
 
-} ## end for my $symbol_id ( $grammar->symbol_ids('L0') )
+}
 
 Marpa::R3::Test::is( $text, <<'END_OF_TEXT', 'L0 symbol names and description');
 L0 symbol number: 0  name: [:discard]

@@ -69,6 +69,7 @@ sub Marpa::R3::Grammar::g1_naif_new {
 
     $grammar->g1_naif_set($slg, $flat_args);
     $tracer->[Marpa::R3::Internal::Trace::G::START_NAME] = '[:start]';
+    $tracer->[Marpa::R3::Internal::Trace::G::NAME] = 'G1';
 
     return $grammar;
 } ## end sub Marpa::R3::Grammar::new
@@ -86,6 +87,7 @@ sub Marpa::R3::Grammar::l0_naif_new {
     $tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID] = [];
     $tracer->[Marpa::R3::Internal::Trace::G::RULES] = [];
     $tracer->[Marpa::R3::Internal::Trace::G::START_NAME] = '[:start_lex]';
+    $tracer->[Marpa::R3::Internal::Trace::G::NAME] = 'L0';
 
     for my $symbol ( sort keys %{$symbols} ) {
         my $properties = $symbols->{$symbol};
@@ -163,27 +165,6 @@ sub Marpa::R3::Grammar::symbol_reserved_set {
     # Return a value to make perlcritic happy
     return $DEFAULT_SYMBOLS_RESERVED{$final_character} = $boolean ? 1 : 0;
 } ## end sub Marpa::R3::Grammar::symbol_reserved_set
-
-# Return DSL form of symbol
-# Does no checking
-sub Marpa::R3::Grammar::symbol_dsl_form {
-    my ( $grammar, $slg, $isyid ) = @_;
-    my $tracer   = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
-    my $xsy_by_isyid   = $tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID];
-    my $xsy = $xsy_by_isyid->[$isyid];
-    return if not defined $xsy;
-    return $xsy->[Marpa::R3::Internal::XSY::DSL_FORM];
-}
-
-# Return display form of symbol
-# Does lots of checking and makes use of alternatives.
-sub Marpa::R3::Grammar::symbol_in_display_form {
-    my ( $grammar, $slg, $symbol_id ) = @_;
-    my $text = $grammar->symbol_dsl_form( $slg, $symbol_id )
-      // $grammar->symbol_name($symbol_id);
-    return "<!No symbol with ID $symbol_id!>" if not defined $text;
-    return ( $text =~ m/\s/xms ) ? "<$text>" : $text;
-}
 
 sub Marpa::R3::Grammar::show_symbol {
     my ( $grammar, $symbol_id ) = @_;

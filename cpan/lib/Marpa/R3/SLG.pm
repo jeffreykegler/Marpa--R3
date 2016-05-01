@@ -533,7 +533,7 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
         if ( $trace_terminals >= 2 ) {
             say {$trace_fh}
                 "Assertion $assertion_id applied to L0 rule ",
-                slg_rule_show( $slg, $rule_id, $lex_thick_grammar );
+                slg_rule_show( $lex_tracer, $rule_id );
         }
     } ## end RULE_ID: for my $rule_id ( 0 .. $lex_thin->highest_rule_id() )
 
@@ -995,49 +995,74 @@ sub Marpa::R3::Scanless::G::rule_name {
 }
 
 sub Marpa::R3::Scanless::G::rule_expand {
-    my ( $slg, $rule_id, $subgrammar ) = @_;
-    return thick_subgrammar_by_name( $slg, $subgrammar )->tracer()
-        ->rule_expand($rule_id);
+    my ( $slg, $rule_id ) = @_;
+    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
+    return $tracer->rule_expand($rule_id);
+}
+
+sub Marpa::R3::Scanless::G::l0_rule_expand {
+    my ( $slg, $rule_id ) = @_;
+    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER];
+    return $tracer->rule_expand($rule_id);
 }
 
 sub Marpa::R3::Scanless::G::symbol_name {
-    my ( $slg, $symbol_id, $subgrammar ) = @_;
-    return thick_subgrammar_by_name($slg, $subgrammar)->tracer()
-        ->symbol_name($symbol_id);
+    my ( $slg, $symbol_id ) = @_;
+    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
+    return $tracer->symbol_name($symbol_id);
+}
+
+sub Marpa::R3::Scanless::G::l0_symbol_name {
+    my ( $slg, $symbol_id ) = @_;
+    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER];
+    return $tracer->symbol_name($symbol_id);
 }
 
 sub Marpa::R3::Scanless::G::symbol_display_form {
-    my ( $slg, $symbol_id, $subgrammar ) = @_;
-    return thick_subgrammar_by_name( $slg, $subgrammar )
-        ->symbol_in_display_form($slg, $symbol_id);
+    my ( $slg, $symbol_id ) = @_;
+    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
+    return $tracer->symbol_in_display_form($symbol_id);
+}
+
+sub Marpa::R3::Scanless::G::l0_symbol_display_form {
+    my ( $slg, $symbol_id ) = @_;
+    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER];
+    return $tracer->symbol_in_display_form($symbol_id);
 }
 
 sub Marpa::R3::Scanless::G::symbol_dsl_form {
     my ( $slg, $symbol_id ) = @_;
-    my $subgrammar = $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
-    return $subgrammar->symbol_dsl_form($slg, $symbol_id);
+    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
+    return $tracer->symbol_dsl_form($symbol_id);
 }
 
 sub Marpa::R3::Scanless::G::l0_symbol_dsl_form {
     my ( $slg, $symbol_id ) = @_;
-    my $subgrammar = $slg->[Marpa::R3::Internal::Scanless::G::THICK_L0_GRAMMAR];
-    return $subgrammar->symbol_dsl_form($slg, $symbol_id);
+    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER];
+    return $tracer->symbol_dsl_form($symbol_id);
 }
 
 sub Marpa::R3::Scanless::G::rule_show
 {
-    my ( $slg, $rule_id, $subgrammar) = @_;
-    return slg_rule_show($slg, $rule_id, thick_subgrammar_by_name($slg, $subgrammar));
+    my ( $slg, $rule_id ) = @_;
+    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
+    return slg_rule_show($tracer, $rule_id);
+}
+
+sub Marpa::R3::Scanless::G::l0_rule_show
+{
+    my ( $slg, $rule_id ) = @_;
+    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER];
+    return slg_rule_show($tracer, $rule_id);
 }
 
 sub slg_rule_show {
-    my ( $slg, $rule_id, $subgrammar ) = @_;
-    my $tracer       = $subgrammar->tracer();
+    my ( $tracer, $rule_id ) = @_;
     my $subgrammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
     my @symbol_ids   = $tracer->rule_expand($rule_id);
     return if not scalar @symbol_ids;
     my ( $lhs, @rhs ) =
-        map { $subgrammar->symbol_in_display_form($slg, $_) } @symbol_ids;
+        map { $tracer->symbol_in_display_form($_) } @symbol_ids;
     my $minimum    = $subgrammar_c->sequence_min($rule_id);
     my @quantifier = ();
 
@@ -1045,126 +1070,35 @@ sub slg_rule_show {
         @quantifier = ( $minimum <= 0 ? q{*} : q{+} );
     }
     return join q{ }, $lhs, q{::=}, @rhs, @quantifier;
-} ## end sub slg_rule_show
+}
 
 sub Marpa::R3::Scanless::G::show_rules {
-    my ( $slg, $verbose, $subgrammar ) = @_;
-    my $text     = q{};
-    $verbose    //= 0;
-    $subgrammar //= 'G1';
+    my ( $slg, $verbose ) = @_;
+    $verbose //= 0;
+    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
+    return $tracer->show_rules($verbose);
+}
 
-    my $thick_grammar = thick_subgrammar_by_name($slg, $subgrammar);
-    my $tracer = $thick_grammar->[Marpa::R3::Internal::Grammar::TRACER];
-    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
-    my $rules = $tracer->[Marpa::R3::Internal::Trace::G::RULES];
-
-    for my $rule ( @{$rules} ) {
-        my $rule_id = $rule->[Marpa::R3::Internal::Rule::ID];
-
-        my $minimum = $grammar_c->sequence_min($rule_id);
-        my @quantifier =
-            defined $minimum ? $minimum <= 0 ? (q{*}) : (q{+}) : ();
-        my $lhs_id      = $grammar_c->rule_lhs($rule_id);
-        my $rule_length = $grammar_c->rule_length($rule_id);
-        my @rhs_ids =
-            map { $grammar_c->rule_rhs( $rule_id, $_ ) }
-            ( 0 .. $rule_length - 1 );
-        $text .= join q{ }, $subgrammar, "R$rule_id",
-            $thick_grammar->symbol_in_display_form($slg, $lhs_id),
-            '::=',
-            ( map { $thick_grammar->symbol_in_display_form($slg, $_) } @rhs_ids ),
-            @quantifier;
-        $text .= "\n";
-
-        if ( $verbose >= 2 ) {
-
-            my @comment = ();
-            $grammar_c->rule_length($rule_id) == 0
-                and push @comment, 'empty';
-            $thick_grammar->rule_is_used($rule_id)
-                or push @comment, '!used';
-            $grammar_c->rule_is_productive($rule_id)
-                or push @comment, 'unproductive';
-            $grammar_c->rule_is_accessible($rule_id)
-                or push @comment, 'inaccessible';
-            $rule->[Marpa::R3::Internal::Rule::DISCARD_SEPARATION]
-                and push @comment, 'discard_sep';
-
-            if (@comment) {
-                $text .= q{  } . ( join q{ }, q{/*}, @comment, q{*/} ) . "\n";
-            }
-
-            $text .= "  Symbol IDs: <$lhs_id> ::= "
-                . ( join q{ }, map {"<$_>"} @rhs_ids ) . "\n";
-
-        } ## end if ( $verbose >= 2 )
-
-        if ( $verbose >= 3 ) {
-
-            $text
-                .= "  Internal symbols: <"
-                . $tracer->symbol_name($lhs_id)
-                . q{> ::= }
-                . (
-                join q{ },
-                map { '<' . $tracer->symbol_name($_) . '>' } @rhs_ids
-                ) . "\n";
-
-        } ## end if ( $verbose >= 3 )
-
-    } ## end for my $rule ( @{$rules} )
-
-    return $text;
-} ## end sub Marpa::R3::Scanless::G::show_rules
+sub Marpa::R3::Scanless::G::l0_show_rules {
+    my ( $slg, $verbose ) = @_;
+    $verbose //= 0;
+    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER];
+    return $tracer->show_rules($verbose);
+}
 
 sub Marpa::R3::Scanless::G::show_symbols {
-    my ( $slg, $verbose, $subgrammar ) = @_;
-    my $text = q{};
-    $verbose    //= 0;
-    $subgrammar //= 'G1';
+    my ( $slg, $verbose ) = @_;
+    $verbose //= 0;
+    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
+    return $tracer->show_symbols($verbose);
+}
 
-    my $thick_grammar = thick_subgrammar_by_name( $slg, $subgrammar );
-    my $tracer        = $thick_grammar->tracer();
-    my $grammar_c     = $tracer->[Marpa::R3::Internal::Trace::G::C];
-
-    for my $symbol_id ( 0 .. $grammar_c->highest_symbol_id() ) {
-
-        $text .= join q{ }, $subgrammar, "S$symbol_id",
-          $thick_grammar->symbol_in_display_form( $slg, $symbol_id );
-        $text .= "\n";
-
-        if ( $verbose >= 2 ) {
-
-            my @tag_list = ();
-            $grammar_c->symbol_is_productive($symbol_id)
-              or push @tag_list, 'unproductive';
-            $grammar_c->symbol_is_accessible($symbol_id)
-              or push @tag_list, 'inaccessible';
-            $grammar_c->symbol_is_nulling($symbol_id)
-              and push @tag_list, 'nulling';
-            $grammar_c->symbol_is_terminal($symbol_id)
-              and push @tag_list, 'terminal';
-
-            if (@tag_list) {
-                $text .= q{  } . ( join q{ }, q{/*}, @tag_list, q{*/} ) . "\n";
-            }
-
-            $text .=
-              "  Internal name: <" . $tracer->symbol_name($symbol_id) . qq{>\n};
-
-        } ## end if ( $verbose >= 2 )
-
-        if ( $verbose >= 3 ) {
-
-            my $dsl_form = $thick_grammar->symbol_dsl_form( $slg, $symbol_id );
-            if ($dsl_form) { $text .= qq{  SLIF name: $dsl_form\n}; }
-
-        } ## end if ( $verbose >= 3 )
-
-    } ## end for my $symbol ( @{$symbols} )
-
-    return $text;
-} ## end sub Marpa::R3::Scanless::G::show_symbols
+sub Marpa::R3::Scanless::G::l0_show_symbols {
+    my ( $slg, $verbose ) = @_;
+    $verbose //= 0;
+    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER];
+    return $tracer->show_symbols($verbose);
+}
 
 sub Marpa::R3::Scanless::G::symid_is_accessible {
     my ( $slg, $symid ) = @_;
@@ -1196,7 +1130,7 @@ sub Marpa::R3::Scanless::G::show_dotted_rule {
     my $tracer  = $grammar->tracer();
     my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
     my ( $lhs, @rhs ) =
-    map { $grammar->symbol_in_display_form($slg, $_) } $tracer->rule_expand($rule_id);
+    map { $tracer->symbol_in_display_form($_) } $tracer->rule_expand($rule_id);
     my $rhs_length = scalar @rhs;
 
     my $minimum = $grammar_c->sequence_min($rule_id);
@@ -1214,13 +1148,27 @@ sub Marpa::R3::Scanless::G::show_dotted_rule {
 } ## end sub Marpa::R3::Grammar::show_dotted_rule
 
 sub Marpa::R3::Scanless::G::rule_ids {
-    my ($slg, $subgrammar) = @_;
-    return thick_subgrammar_by_name($slg, $subgrammar)->rule_ids();
+    my ($slg) = @_;
+    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
+    return $tracer->rule_ids();
+}
+
+sub Marpa::R3::Scanless::G::l0_rule_ids {
+    my ($slg) = @_;
+    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER];
+    return $tracer->rule_ids();
 }
 
 sub Marpa::R3::Scanless::G::symbol_ids {
-    my ($slg, $subgrammar) = @_;
-    return thick_subgrammar_by_name($slg, $subgrammar)->symbol_ids();
+    my ($slg) = @_;
+    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
+    return $tracer->symbol_ids();
+}
+
+sub Marpa::R3::Scanless::G::l0_symbol_ids {
+    my ($slg) = @_;
+    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER];
+    return $tracer->symbol_ids();
 }
 
 # Internal methods, not to be documented

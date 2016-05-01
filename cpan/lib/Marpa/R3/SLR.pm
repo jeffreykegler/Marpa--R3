@@ -521,13 +521,13 @@ my $libmarpa_trace_event_handlers = {
         my $trace_file_handle =
             $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
         my $slg              = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-        my $thick_g1_grammar = $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
+        my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
         say {$trace_file_handle} qq{Accepted lexeme },
             input_range_describe( $slr, $lexeme_start_pos,
             $lexeme_end_pos - 1 ),
             q{ e}, $slr->g1_pos(),
             q{: },
-            $thick_g1_grammar->symbol_in_display_form($slg, $g1_lexeme),
+            $tracer->symbol_in_display_form($g1_lexeme),
             qq{; value="$raw_token_value"}
             or Marpa::R3::exception("Could not say(): $ERRNO");
     },
@@ -714,16 +714,15 @@ my $libmarpa_trace_event_handlers = {
         my ( undef, undef, $lex_rule_id, $start, $end ) =
             @{$event};
         my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-        my $thick_lex_grammar =
-            $slg->[Marpa::R3::Internal::Scanless::G::THICK_L0_GRAMMAR];
-        my $tracer = $thick_lex_grammar->[Marpa::R3::Internal::Grammar::TRACER];
+        my $tracer =
+            $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER];
         my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
         my $rule_length = $grammar_c->rule_length($lex_rule_id);
         my @rhs_ids =
             map { $grammar_c->rule_rhs( $lex_rule_id, $_ ) }
             ( 0 .. $rule_length - 1 );
         my @rhs =
-            map { $thick_lex_grammar->symbol_in_display_form($slg, $_) } @rhs_ids;
+            map { $tracer->symbol_in_display_form($_) } @rhs_ids;
         my $trace_file_handle =
             $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
         say {$trace_file_handle} qq{Discarded lexeme },

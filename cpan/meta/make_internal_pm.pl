@@ -129,6 +129,8 @@ __DATA__
 
     :package=Marpa::R3::Internal::Trace::G
 
+    NAME { Name of the grammar -- 'L0' or 'G1' }
+
     C { A C structure }
     NAME_BY_ISYID
     ISYID_BY_NAME

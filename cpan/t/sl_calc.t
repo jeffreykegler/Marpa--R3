@@ -66,7 +66,7 @@ END_OF_SOURCE
 );
 
 my $show_rules_output = $calculator_grammar->show_rules();
-$show_rules_output .= $calculator_grammar->show_rules(1, 'L0');
+$show_rules_output .= $calculator_grammar->l0_show_rules(1);
 
 Marpa::R3::Test::is( $show_rules_output,
     <<'END_OF_SHOW_RULES_OUTPUT', 'Scanless show_rules()' );

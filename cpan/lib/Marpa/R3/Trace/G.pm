@@ -301,17 +301,157 @@ sub show_rule {
 
 }    # sub show_rule
 
-sub show_rules {
-    my ($self) = @_;
-    my $grammar_c     = $self->[Marpa::R3::Internal::Trace::G::C];
-    my $text;
+sub Marpa::R3::Trace::G::show_rules {
+    my ( $tracer, $verbose ) = @_;
+    my $text     = q{};
+    $verbose    //= 0;
 
-    my $highest_rule_id = $grammar_c->highest_rule_id();
-    RULE:
-    for ( my $rule_id = 0; $rule_id <= $highest_rule_id; $rule_id++ ) {
-        $text .= $self->show_rule($rule_id);
-    }
+    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
+    my $rules = $tracer->[Marpa::R3::Internal::Trace::G::RULES];
+    my $grammar_name = $tracer->[Marpa::R3::Internal::Trace::G::NAME];
+
+    for my $rule ( @{$rules} ) {
+        my $rule_id = $rule->[Marpa::R3::Internal::Rule::ID];
+
+        my $minimum = $grammar_c->sequence_min($rule_id);
+        my @quantifier =
+            defined $minimum ? $minimum <= 0 ? (q{*}) : (q{+}) : ();
+        my $lhs_id      = $grammar_c->rule_lhs($rule_id);
+        my $rule_length = $grammar_c->rule_length($rule_id);
+        my @rhs_ids =
+            map { $grammar_c->rule_rhs( $rule_id, $_ ) }
+            ( 0 .. $rule_length - 1 );
+        $text .= join q{ }, $grammar_name, "R$rule_id",
+            $tracer->symbol_in_display_form($lhs_id),
+            '::=',
+            ( map { $tracer->symbol_in_display_form($_) } @rhs_ids ),
+            @quantifier;
+        $text .= "\n";
+
+        if ( $verbose >= 2 ) {
+
+            my @comment = ();
+            $grammar_c->rule_length($rule_id) == 0
+                and push @comment, 'empty';
+	    $grammar_c->_marpa_g_rule_is_used($rule_id)
+                or push @comment, '!used';
+            $grammar_c->rule_is_productive($rule_id)
+                or push @comment, 'unproductive';
+            $grammar_c->rule_is_accessible($rule_id)
+                or push @comment, 'inaccessible';
+            $rule->[Marpa::R3::Internal::Rule::DISCARD_SEPARATION]
+                and push @comment, 'discard_sep';
+
+            if (@comment) {
+                $text .= q{  } . ( join q{ }, q{/*}, @comment, q{*/} ) . "\n";
+            }
+
+            $text .= "  Symbol IDs: <$lhs_id> ::= "
+                . ( join q{ }, map {"<$_>"} @rhs_ids ) . "\n";
+
+        } ## end if ( $verbose >= 2 )
+
+        if ( $verbose >= 3 ) {
+
+            $text
+                .= "  Internal symbols: <"
+                . $tracer->symbol_name($lhs_id)
+                . q{> ::= }
+                . (
+                join q{ },
+                map { '<' . $tracer->symbol_name($_) . '>' } @rhs_ids
+                ) . "\n";
+
+        } ## end if ( $verbose >= 3 )
+
+    } ## end for my $rule ( @{$rules} )
+
     return $text;
-} ## end sub show_rules
+}
+
+# Return DSL form of symbol
+# Does no checking
+sub Marpa::R3::Trace::G::symbol_dsl_form {
+    my ( $tracer, $isyid ) = @_;
+    my $xsy_by_isyid   = $tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID];
+    my $xsy = $xsy_by_isyid->[$isyid];
+    return if not defined $xsy;
+    return $xsy->[Marpa::R3::Internal::XSY::DSL_FORM];
+}
+
+# Return display form of symbol
+# Does lots of checking and makes use of alternatives.
+sub Marpa::R3::Trace::G::symbol_in_display_form {
+    my ( $tracer, $symbol_id ) = @_;
+    my $text = $tracer->symbol_dsl_form( $symbol_id )
+      // $tracer->symbol_name($symbol_id);
+    return "<!No symbol with ID $symbol_id!>" if not defined $text;
+    return ( $text =~ m/\s/xms ) ? "<$text>" : $text;
+}
+
+sub Marpa::R3::Trace::G::show_symbols {
+    my ( $tracer, $verbose, ) = @_;
+    my $text = q{};
+    $verbose    //= 0;
+
+    my $grammar_name = $tracer->[Marpa::R3::Internal::Trace::G::NAME];
+    my $grammar_c     = $tracer->[Marpa::R3::Internal::Trace::G::C];
+
+    for my $symbol_id ( 0 .. $grammar_c->highest_symbol_id() ) {
+
+        $text .= join q{ }, $grammar_name, "S$symbol_id",
+          $tracer->symbol_in_display_form( $symbol_id );
+        $text .= "\n";
+
+        if ( $verbose >= 2 ) {
+
+            my @tag_list = ();
+            $grammar_c->symbol_is_productive($symbol_id)
+              or push @tag_list, 'unproductive';
+            $grammar_c->symbol_is_accessible($symbol_id)
+              or push @tag_list, 'inaccessible';
+            $grammar_c->symbol_is_nulling($symbol_id)
+              and push @tag_list, 'nulling';
+            $grammar_c->symbol_is_terminal($symbol_id)
+              and push @tag_list, 'terminal';
+
+            if (@tag_list) {
+                $text .= q{  } . ( join q{ }, q{/*}, @tag_list, q{*/} ) . "\n";
+            }
+
+            $text .=
+              "  Internal name: <" . $tracer->symbol_name($symbol_id) . qq{>\n};
+
+        } ## end if ( $verbose >= 2 )
+
+        if ( $verbose >= 3 ) {
+
+            my $dsl_form = $tracer->symbol_dsl_form( $symbol_id );
+            if ($dsl_form) { $text .= qq{  SLIF name: $dsl_form\n}; }
+
+        } ## end if ( $verbose >= 3 )
+
+    } ## end for my $symbol ( @{$symbols} )
+
+    return $text;
+}
+
+# This logic deals with gaps in the rule numbering.
+# Currently there are none, but Libmarpa does not
+# guarantee this.
+sub Marpa::R3::Trace::G::rule_ids {
+    my ($tracer) = @_;
+    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
+    return 0 .. $grammar_c->highest_rule_id();
+}
+
+# This logic deals with gaps in the symbol numbering.
+# Currently there are none, but Libmarpa does not
+# guarantee this.
+sub Marpa::R3::Trace::G::symbol_ids {
+    my ($tracer) = @_;
+    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
+    return 0 .. $grammar_c->highest_symbol_id();
+}
 
 1;
