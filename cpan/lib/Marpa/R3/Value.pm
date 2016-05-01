@@ -233,9 +233,9 @@ sub Marpa::R3::Scanless::R::lexeme_blessing_find {
 sub Marpa::R3::Internal::Scanless::R::brief_rule_list {
     my ( $slr, $rule_ids ) = @_;
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $grammar =
-        $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
-    my @brief_rules = map { $grammar->brief_rule($_) } @{$rule_ids};
+    my $tracer =
+        $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
+    my @brief_rules = map { $tracer->brief_rule($_) } @{$rule_ids};
     return join q{}, map { q{    } . $_ . "\n" } @brief_rules;
 }
 
@@ -467,9 +467,7 @@ sub Marpa::R3::Scanless::R::ordering_get {
 sub resolve_rule_by_id {
     my ( $slr, $rule_id ) = @_;
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $grammar =
-        $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
-    my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     my $rules = $tracer->[Marpa::R3::Internal::Trace::G::RULES];
     my $rule        = $rules->[$rule_id];
     my $action_name = $rule->[Marpa::R3::Internal::Rule::ACTION_NAME];
@@ -494,9 +492,7 @@ sub resolve_recce {
 
     my ( $slr, $per_parse_arg ) = @_;
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $grammar =
-        $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
-    my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
     my $rules = $tracer->[Marpa::R3::Internal::Trace::G::RULES];
 
@@ -545,7 +541,7 @@ sub resolve_recce {
 
     my $rule_resolutions = [];
 
-    RULE: for my $rule_id ( $grammar->rule_ids() ) {
+    RULE: for my $rule_id ( $tracer->rule_ids() ) {
 
         my $rule_resolution = resolve_rule_by_id( $slr, $rule_id );
         $rule_resolution //= $default_action_resolution;
@@ -589,14 +585,14 @@ sub resolve_recce {
 
         $rule_resolutions->[$rule_id] = $rule_resolution;
 
-    } ## end RULE: for my $rule_id ( $grammar->rule_ids() )
+    } ## end RULE: for my $rule_id ( $tracer->rule_ids() )
 
     if ( $trace_actions >= 2 ) {
         RULE: for my $rule_id ( 0 .. $#{$rules} ) {
             my ( $resolution_name, $closure ) =
                 @{ $rule_resolutions->[$rule_id] };
             say {$trace_file_handle} 'Rule ',
-                $grammar->brief_rule($rule_id),
+                $tracer->brief_rule($rule_id),
                 qq{ resolves to "$resolution_name"}
                 or Marpa::R3::exception('print to trace handle failed');
         } ## end RULE: for my $rule_id ( 0 .. $#{$rules} )
@@ -612,7 +608,7 @@ sub resolve_recce {
             my $message =
                   "Could not determine lexeme's semantics\n"
                 . q{  Lexeme was }
-                . $grammar->symbol_name($lexeme_id) . "\n";
+                . $tracer->symbol_name($lexeme_id) . "\n";
             $message
                 .= q{  }
                 . $slr->[Marpa::R3::Internal::Scanless::R::ERROR_MESSAGE];
@@ -623,7 +619,7 @@ sub resolve_recce {
             my $message =
                   "Could not determine lexeme's blessing\n"
                 . q{  Lexeme was }
-                . $grammar->symbol_name($lexeme_id) . "\n";
+                . $tracer->symbol_name($lexeme_id) . "\n";
             $message
                 .= q{  }
                 . $slr->[Marpa::R3::Internal::Scanless::R::ERROR_MESSAGE];
@@ -642,9 +638,7 @@ sub registration_init {
     my $trace_file_handle =
         $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $grammar =
-        $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
-    my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
     my $recce_c   = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
     my $trace_actions =
@@ -665,7 +659,7 @@ sub registration_init {
         # it is now equivalent to ::undef
 
         RULE:
-        for my $rule_id ( $grammar->rule_ids() ) {
+        for my $rule_id ( $tracer->rule_ids() ) {
             my ( $new_resolution, $closure, $semantics, $blessing ) =
                 @{ $rule_resolutions->[$rule_id] };
             my $lhs_id = $grammar_c->rule_lhs($rule_id);
@@ -693,7 +687,7 @@ sub registration_init {
 
                 Marpa::R3::exception(
                     q{Unknown semantics for rule },
-                    $grammar->brief_rule($rule_id),
+                    $tracer->brief_rule($rule_id),
                     "\n",
                     qq{    Semantics were specified as "$semantics"\n}
                 );
@@ -717,7 +711,7 @@ sub registration_init {
                             Data::Dumper::Dumper($closure),
                             qq{  Blessing is "$blessing"\n},
                             q{  Rule is: },
-                            $grammar->brief_rule($rule_id),
+                            $tracer->brief_rule($rule_id),
                             "\n",
                             qq{  Cannot bless rule when it resolves to a scalar constant},
                             "\n",
@@ -730,14 +724,14 @@ sub registration_init {
                 Marpa::R3::exception(
                     qq{Cannot bless rule when the semantics are "$semantics"},
                     q{  Rule is: },
-                    $grammar->brief_rule($rule_id),
+                    $tracer->brief_rule($rule_id),
                     "\n",
                     qq{  Blessing is "$blessing"\n},
                     qq{  Semantics are "$semantics"\n}
                 );
             } ## end CHECK_BLESSING:
 
-        } ## end RULE: for my $rule_id ( $grammar->rule_ids() )
+        } ## end RULE: for my $rule_id ( $tracer->rule_ids() )
 
     } ## end CHECK_FOR_WHATEVER_CONFLICT
 
@@ -745,7 +739,7 @@ sub registration_init {
     # and that means more than one semantics might be specified for
     # the nullable symbol.  This logic deals with that.
     my @nullable_rule_ids_by_lhs = ();
-    RULE: for my $rule_id ( $grammar->rule_ids() ) {
+    RULE: for my $rule_id ( $tracer->rule_ids() ) {
         my $lhs_id = $grammar_c->rule_lhs($rule_id);
         push @{ $nullable_rule_ids_by_lhs[$lhs_id] }, $rule_id
             if $grammar_c->rule_is_nullable($rule_id);
@@ -770,11 +764,11 @@ sub registration_init {
             my ( $resolution_name, $closure ) =
                 @{ $rule_resolutions->[$resolution_rule] };
             if ($trace_actions) {
-                my $lhs_name = $grammar->symbol_name($lhs_id);
+                my $lhs_name = $tracer->symbol_name($lhs_id);
                 say {$trace_file_handle}
                     qq{Nulled symbol "$lhs_name" },
                     qq{ resolved to "$resolution_name" from rule },
-                    $grammar->brief_rule($resolution_rule)
+                    $tracer->brief_rule($resolution_rule)
                     or Marpa::R3::exception('print to trace handle failed');
             } ## end if ($trace_actions)
             $null_symbol_closures[$lhs_id] = $resolution_rule;
@@ -790,11 +784,11 @@ sub registration_init {
             my ( $resolution_name, $closure ) =
                 @{ $rule_resolutions->[$resolution_rule] };
             if ($trace_actions) {
-                my $lhs_name = $grammar->symbol_name($lhs_id);
+                my $lhs_name = $tracer->symbol_name($lhs_id);
                 say {$trace_file_handle}
                     qq{Nulled symbol "$lhs_name" },
                     qq{ resolved to "$resolution_name" from rule },
-                    $grammar->brief_rule($resolution_rule)
+                    $tracer->brief_rule($resolution_rule)
                     or Marpa::R3::exception('print to trace handle failed');
             } ## end if ($trace_actions)
             $null_symbol_closures[$lhs_id] = $resolution_rule;
@@ -820,7 +814,7 @@ sub registration_init {
             {
                 Marpa::R3::exception(
                     'When nulled, symbol ',
-                    $grammar->symbol_name($lhs_id),
+                    $tracer->symbol_name($lhs_id),
                     qq{  can have more than one semantics\n},
                     qq{  Marpa needs there to be only one semantics\n},
                     qq{  The rules involved are:\n},
@@ -837,11 +831,11 @@ sub registration_init {
         my ( $resolution_name, $closure ) =
             @{ $rule_resolutions->[$resolution_rule] };
         if ($trace_actions) {
-            my $lhs_name = $grammar->symbol_name($lhs_id);
+            my $lhs_name = $tracer->symbol_name($lhs_id);
             say {$trace_file_handle}
                 qq{Nulled symbol "$lhs_name" },
                 qq{ resolved to "$resolution_name" from rule },
-                $grammar->brief_rule($resolution_rule)
+                $tracer->brief_rule($resolution_rule)
                 or Marpa::R3::exception('print to trace handle failed');
         } ## end if ($trace_actions)
         $null_symbol_closures[$lhs_id] = $resolution_rule;
@@ -880,7 +874,7 @@ sub registration_init {
                 if ( not $allowed_semantics->{$semantics} ) {
                     Marpa::R3::exception(
                         q{Unknown semantics for lexeme },
-                        $grammar->symbol_name($lexeme_id),
+                        $tracer->symbol_name($lexeme_id),
                         "\n",
                         qq{    Semantics were specified as "$semantics"\n}
                     );
@@ -897,7 +891,7 @@ sub registration_init {
                   if $blessing =~ /\A [[:alpha:]] [:\w]* \z /xms;
                 Marpa::R3::exception(
                     q{Unknown blessing for lexeme },
-                    $grammar->symbol_name($lexeme_id),
+                    $tracer->symbol_name($lexeme_id),
                     "\n",
                     qq{    Blessing as specified as "$blessing"\n}
                 );
@@ -940,7 +934,7 @@ sub registration_init {
     } ## end NULLING_SYMBOL: for my $nulling_symbol ( 0 .. $#{$null_values} )
 
     my @work_list = ();
-    RULE: for my $rule_id ( $grammar->rule_ids() ) {
+    RULE: for my $rule_id ( $tracer->rule_ids() ) {
 
         my $semantics = $semantics_by_rule_id[$rule_id];
         my $blessing  = $blessing_by_rule_id[$rule_id];
@@ -951,7 +945,7 @@ sub registration_init {
         $semantics = '::rhs0'   if $semantics eq '::first';
 
         push @work_list, [ $rule_id, undef, $semantics, $blessing ];
-    } ## end RULE: for my $rule_id ( $grammar->rule_ids() )
+    } ## end RULE: for my $rule_id ( $tracer->rule_ids() )
 
   RULE: for my $lexeme_id ( 0 .. $grammar_c->highest_symbol_id() ) {
 
@@ -1094,7 +1088,7 @@ sub registration_init {
                     my $original_semantics = $semantics_by_rule_id[$rule_id];
                     Marpa::R3::exception(
                         q{Impossible semantics for empty rule: },
-                        $grammar->brief_rule($rule_id),
+                        $tracer->brief_rule($rule_id),
                         "\n",
                         qq{    Semantics were specified as "$original_semantics"\n}
                     );
@@ -1105,7 +1099,7 @@ sub registration_init {
                     my $original_semantics = $semantics_by_rule_id[$rule_id];
                     Marpa::R3::exception(
                         q{Impossible semantics for rule: },
-                        $grammar->brief_rule($rule_id),
+                        $tracer->brief_rule($rule_id),
                         "\n",
                         qq{    Semantics were specified as "$original_semantics"\n}
                     );
@@ -1169,7 +1163,7 @@ sub registration_init {
 
                 if ( $result_descriptor eq 'name' ) {
                     if ( defined $rule_id ) {
-                        my $name = $grammar->rule_name($rule_id);
+                        my $name = $slg->rule_name($rule_id);
                         push @push_ops, $op_push_constant, \$name;
                         next RESULT_DESCRIPTOR;
                     }
@@ -1276,13 +1270,13 @@ sub registration_init {
             if not $grammar_c->symbol_is_nullable($start_symbol_id);
 
         my $start_rhs_symbol_id;
-        RULE: for my $rule_id ( $grammar->rule_ids() ) {
+        RULE: for my $rule_id ( $tracer->rule_ids() ) {
             my ( $lhs, $rhs0 ) = $tracer->rule_expand($rule_id);
             if ( $start_symbol_id == $lhs ) {
                 $start_rhs_symbol_id = $rhs0;
                 last RULE;
             }
-        } ## end RULE: for my $rule_id ( $grammar->rule_ids() )
+        } ## end RULE: for my $rule_id ( $tracer->rule_ids() )
 
         REGISTRATION: for my $registration (@registrations) {
             my ( $type, $nulling_symbol_id ) = @{$registration};
@@ -1309,9 +1303,7 @@ sub registration_init {
 sub Marpa::R3::Scanless::R::value {
     my ( $slr, $per_parse_arg ) = @_;
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $naif_grammar =
-        $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
-    my $tracer = $naif_grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
     my $recce_c   = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
 
@@ -1431,7 +1423,6 @@ sub Marpa::R3::Scanless::R::value {
 
     return if not defined $tree->next();
 
-    local $Marpa::R3::Context::grammar = $naif_grammar;
     local $Marpa::R3::Context::rule    = undef;
     local $Marpa::R3::Context::slr     = $slr;
     local $Marpa::R3::Context::slg =
@@ -1475,7 +1466,6 @@ sub Marpa::R3::Scanless::R::value {
         if ( not $eval_ok or @warnings ) {
             code_problems(
                 {   fatal_error => $fatal_error,
-                    grammar     => $naif_grammar,
                     eval_ok     => $eval_ok,
                     warnings    => \@warnings,
                     where       => 'constructing action object',
@@ -1623,12 +1613,11 @@ sub Marpa::R3::Scanless::R::value {
                 my $fatal_error = $EVAL_ERROR;
                 code_problems(
                     {   fatal_error => $fatal_error,
-                        grammar     => $naif_grammar,
                         eval_ok     => $eval_ok,
                         warnings    => \@warnings,
                         where       => 'computing value',
                         long_where  => 'Computing value for null symbol: '
-                            . $naif_grammar->symbol_name($token_id),
+                            . $tracer->symbol_name($token_id),
                     }
                 );
             } ## end if ( not $eval_ok or @warnings )
@@ -1673,12 +1662,11 @@ sub Marpa::R3::Scanless::R::value {
                     my $fatal_error = $EVAL_ERROR;
                     code_problems(
                         {   fatal_error => $fatal_error,
-                            grammar     => $naif_grammar,
                             eval_ok     => $eval_ok,
                             warnings    => \@warnings,
                             where       => 'computing value',
                             long_where  => 'Computing value for rule: '
-                                . $naif_grammar->brief_rule($rule_id),
+                                . $tracer->brief_rule($rule_id),
                         }
                     );
                 } ## end if ( not $eval_ok or @warnings )
@@ -1705,7 +1693,7 @@ sub Marpa::R3::Scanless::R::value {
 
         if ( $value_type eq 'MARPA_STEP_TRACE' ) {
 
-            if ( my $trace_output = trace_op( $slr, $naif_grammar, $value ) ) {
+            if ( my $trace_output = trace_op( $slr, $value ) ) {
                 print {$trace_file_handle} $trace_output
                     or Marpa::R3::exception('Could not print to trace file');
             }
@@ -1766,8 +1754,8 @@ sub Marpa::R3::Scanless::R::and_node_tag {
 sub trace_token_evaluation {
     my ( $slr, $value, $token_id, $token_value ) = @_;
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $grammar =
-        $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
+    my $tracer =
+        $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     my $trace_file_handle =
         $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
 
@@ -1786,7 +1774,7 @@ sub trace_token_evaluation {
         $order->_marpa_o_and_node_order_get( $or_node_id, $choice );
     my $token_name;
     if ( defined $token_id ) {
-        $token_name = $grammar->symbol_name($token_id);
+        $token_name = $tracer->symbol_name($token_id);
     }
 
     print {$trace_file_handle}
@@ -1805,8 +1793,8 @@ sub trace_stack_1 {
     my ( $slr, $value, $args, $rule_id ) = @_;
     my $recce_c = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $grammar =
-        $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
+    my $tracer =
+        $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     my $bocage  = $slr->[Marpa::R3::Internal::Scanless::R::B_C];
     my $order   = $slr->[Marpa::R3::Internal::Scanless::R::O_C];
     my $tree    = $slr->[Marpa::R3::Internal::Scanless::R::T_C];
@@ -1821,13 +1809,15 @@ sub trace_stack_1 {
     return 'Popping ', $argc,
         ' values to evaluate ',
         $slr->and_node_tag( $and_node_id ),
-        ', rule: ', $grammar->brief_rule($rule_id);
+        ', rule: ', $tracer->brief_rule($rule_id);
 
 } ## end sub trace_stack_1
 
 sub trace_op {
 
-    my ( $slr, $grammar, $value ) = @_;
+    my ( $slr, $value ) = @_;
+    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
 
     my $trace_output = q{};
     my $trace_values =
@@ -1835,7 +1825,6 @@ sub trace_op {
 
     return $trace_output if not $trace_values >= 2;
 
-    my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
     my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
     my $bocage    = $slr->[Marpa::R3::Internal::Scanless::R::B_C];
     my $order     = $slr->[Marpa::R3::Internal::Scanless::R::O_C];
@@ -1861,7 +1850,7 @@ sub trace_op {
         $trace_output .= join q{},
             'Head of Virtual Rule: ',
             $slr->and_node_tag( $and_node_id ),
-            ', rule: ', $grammar->brief_irl($trace_irl_id),
+            ', rule: ', $tracer->brief_irl($trace_irl_id),
             "\n",
             'Incrementing virtual rule by ',
             $grammar_c->_marpa_g_real_symbol_count($trace_irl_id), ' symbols',
@@ -1877,7 +1866,7 @@ sub trace_op {
         $trace_output .= join q{},
             'Virtual Rule: ',
             $slr->and_node_tag( $and_node_id ),
-            ', rule: ', $grammar->brief_irl($trace_irl_id),
+            ', rule: ', $tracer->brief_irl($trace_irl_id),
             "\nAdding ",
             $grammar_c->_marpa_g_real_symbol_count($trace_irl_id),
             "\n";
@@ -1891,7 +1880,7 @@ sub trace_op {
         $trace_output .= join q{},
             'New Virtual Rule: ',
             $slr->and_node_tag( $and_node_id ),
-            ', rule: ', $grammar->brief_irl($trace_irl_id),
+            ', rule: ', $tracer->brief_irl($trace_irl_id),
             "\nReal symbol count is ",
             $grammar_c->_marpa_g_real_symbol_count($trace_irl_id),
             "\n";

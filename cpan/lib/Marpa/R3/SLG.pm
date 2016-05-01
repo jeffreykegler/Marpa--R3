@@ -1173,13 +1173,15 @@ sub Marpa::R3::Scanless::G::thick_g1_grammar {
 }
 
 sub Marpa::R3::Scanless::G::show_irls {
-    my ($slg, $subgrammar) = @_;
-    return thick_subgrammar_by_name($slg, $subgrammar)->show_irls();
+    my ($slg) = @_;
+    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
+    return $tracer->show_irls();
 }
 
 sub Marpa::R3::Scanless::G::show_isys {
-    my ($slg, $subgrammar) = @_;
-    return thick_subgrammar_by_name($slg, $subgrammar)->show_isys();
+    my ($slg) = @_;
+    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
+    return $tracer->show_isys();
 }
 
 sub Marpa::R3::Scanless::G::show_ahms {

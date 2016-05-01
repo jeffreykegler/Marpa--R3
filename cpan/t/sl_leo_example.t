@@ -429,17 +429,17 @@ my $show_earley_sets_output_after = $recce->show_earley_sets();
 
 my $expected_trace_output = <<'END_TRACE_OUTPUT';
 Setting trace_values option
-Popping 1 values to evaluate R5:1@8-9S7@8, rule: 5: Expression -> Variable
+Popping 1 values to evaluate R5:1@8-9S7@8, rule: Expression ::= Variable
 Calculated and pushed value: 3
-Popping 3 values to evaluate R4:3@6-9C5@8, rule: 4: Expression -> Lvalue MultiplyAssignOp Expression
+Popping 3 values to evaluate R4:3@6-9C5@8, rule: Expression ::= Lvalue MultiplyAssignOp Expression
 Calculated and pushed value: 6
-Popping 3 values to evaluate R3:3@4-9C4@6, rule: 3: Expression -> Lvalue MinusAssignOp Expression
+Popping 3 values to evaluate R3:3@4-9C4@6, rule: Expression ::= Lvalue MinusAssignOp Expression
 Calculated and pushed value: -5
-Popping 3 values to evaluate R2:3@2-9C3@4, rule: 2: Expression -> Lvalue AddAssignOp Expression
+Popping 3 values to evaluate R2:3@2-9C3@4, rule: Expression ::= Lvalue AddAssignOp Expression
 Calculated and pushed value: 42
-Popping 3 values to evaluate R1:3@0-9C2@2, rule: 1: Expression -> Lvalue AssignOp Expression
+Popping 3 values to evaluate R1:3@0-9C2@2, rule: Expression ::= Lvalue AssignOp Expression
 Calculated and pushed value: 42
-Popping 1 values to evaluate R0:1@0-9C1@0, rule: 0: Statement -> Expression
+Popping 1 values to evaluate R0:1@0-9C1@0, rule: Statement ::= Expression
 Calculated and pushed value: 'a=42 b=42 c=-5 d=6 e=3'
 New Virtual Rule: R8:1@0-9C7@0, rule: 8: [:start]['] -> [:start]
 Real symbol count is 1

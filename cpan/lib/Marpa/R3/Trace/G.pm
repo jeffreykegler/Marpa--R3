@@ -463,4 +463,58 @@ sub Marpa::R3::Trace::G::shadow_rule {
     return $new_rule;
 } ## end sub shadow_rule
 
+sub Marpa::R3::Trace::G::brief_irl {
+    my ( $tracer, $irl_id ) = @_;
+    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
+    my $lhs_id    = $grammar_c->_marpa_g_irl_lhs($irl_id);
+    my $text = $irl_id . ': ' . $tracer->isy_name($lhs_id) . ' ->';
+    if ( my $rh_length = $grammar_c->_marpa_g_irl_length($irl_id) ) {
+        my @rhs_ids = ();
+        for my $ix ( 0 .. $rh_length - 1 ) {
+            push @rhs_ids, $grammar_c->_marpa_g_irl_rhs( $irl_id, $ix );
+        }
+        $text .= q{ } . ( join q{ }, map { $tracer->isy_name($_) } @rhs_ids );
+    } ## end if ( my $rh_length = $grammar_c->_marpa_g_irl_length...)
+    return $text;
+} ## end sub Marpa::R3::Grammar::brief_irl
+
+sub Marpa::R3::Trace::G::show_isys {
+    my ($tracer) = @_;
+    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
+    my $text      = q{};
+    for my $isy_id ( 0 .. $grammar_c->_marpa_g_nsy_count() - 1 ) {
+        $text .= $tracer->show_isy($isy_id);
+    }
+    return $text;
+} ## end sub Marpa::R3::Grammar::show_isys
+
+sub Marpa::R3::Trace::G::show_isy {
+    my ( $tracer, $isy_id ) = @_;
+    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
+    my $text      = q{};
+
+    my $name = $tracer->isy_name($isy_id);
+    $text .= "$isy_id: $name";
+
+    my @tag_list = ();
+    $grammar_c->_marpa_g_nsy_is_nulling($isy_id)
+        and push @tag_list, 'nulling';
+
+    $text .= join q{ }, q{,}, @tag_list if scalar @tag_list;
+    $text .= "\n";
+
+    return $text;
+
+}
+
+sub Marpa::R3::Trace::G::show_irls {
+    my ($tracer) = @_;
+    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
+    my $text      = q{};
+    for my $irl_id ( 0 .. $grammar_c->_marpa_g_irl_count() - 1 ) {
+        $text .= $tracer->brief_irl($irl_id) . "\n";
+    }
+    return $text;
+} ## end sub Marpa::R3::Grammar::show_irls
+
 1;

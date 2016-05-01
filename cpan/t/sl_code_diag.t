@@ -97,7 +97,7 @@ __END__
 * THERE WERE 2 WARNING(S) IN THE MARPA SEMANTICS:
 Marpa treats warnings as fatal errors
 * THIS IS WHAT MARPA WAS DOING WHEN THE PROBLEM OCCURRED:
-Computing value for rule: 3: F -> F MultOp F
+Computing value for rule: F ::= F MultOp F
 * WARNING MESSAGE NUMBER 0:
 Test Warning 1 at <LOCATION>
 * WARNING MESSAGE NUMBER 1:
@@ -110,7 +110,7 @@ __END__
 * THERE WERE 2 WARNING(S) IN THE MARPA SEMANTICS:
 Marpa treats warnings as fatal errors
 * THIS IS WHAT MARPA WAS DOING WHEN THE PROBLEM OCCURRED:
-Computing value for rule: 8: trailer -> Text
+Computing value for rule: trailer ::= Text
 * WARNING MESSAGE NUMBER 0:
 Test Warning 1 at <LOCATION>
 * WARNING MESSAGE NUMBER 1:
@@ -130,7 +130,7 @@ __END__
 ============================================================
 * THE MARPA SEMANTICS PRODUCED A FATAL ERROR
 * THIS IS WHAT MARPA WAS DOING WHEN THE PROBLEM OCCURRED:
-Computing value for rule: 3: F -> F MultOp F
+Computing value for rule: F ::= F MultOp F
 * THIS WAS THE FATAL ERROR MESSAGE:
 Illegal division by zero at <LOCATION>
 Marpa::R3 exception at <LOCATION>
@@ -140,7 +140,7 @@ __END__
 ============================================================
 * THE MARPA SEMANTICS PRODUCED A FATAL ERROR
 * THIS IS WHAT MARPA WAS DOING WHEN THE PROBLEM OCCURRED:
-Computing value for rule: 8: trailer -> Text
+Computing value for rule: trailer ::= Text
 * THIS WAS THE FATAL ERROR MESSAGE:
 Illegal division by zero at <LOCATION>
 Marpa::R3 exception at <LOCATION>
@@ -158,7 +158,7 @@ __END__
 ============================================================
 * THE MARPA SEMANTICS PRODUCED A FATAL ERROR
 * THIS IS WHAT MARPA WAS DOING WHEN THE PROBLEM OCCURRED:
-Computing value for rule: 3: F -> F MultOp F
+Computing value for rule: F ::= F MultOp F
 * THIS WAS THE FATAL ERROR MESSAGE:
 test call to die at <LOCATION>
 Marpa::R3 exception at <LOCATION>
@@ -168,7 +168,7 @@ __END__
 ============================================================
 * THE MARPA SEMANTICS PRODUCED A FATAL ERROR
 * THIS IS WHAT MARPA WAS DOING WHEN THE PROBLEM OCCURRED:
-Computing value for rule: 8: trailer -> Text
+Computing value for rule: trailer ::= Text
 * THIS WAS THE FATAL ERROR MESSAGE:
 test call to die at <LOCATION>
 Marpa::R3 exception at <LOCATION>
