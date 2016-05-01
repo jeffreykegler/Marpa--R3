@@ -662,11 +662,10 @@ my $libmarpa_trace_event_handlers = {
         push @char_desc, ( sprintf '0x%04x', $codepoint );
         my $char_desc = join q{ }, @char_desc;
         my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-        my $thick_lex_grammar =
-            $slg->[Marpa::R3::Internal::Scanless::G::THICK_L0_GRAMMAR]
-            ->[0];
+        my $lex_tracer =
+            $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER];
         my $symbol_in_display_form =
-            $thick_lex_grammar->symbol_in_display_form($slg, $token_id),
+            $lex_tracer->symbol_in_display_form($slg, $token_id),
             my ( $line, $column ) = $slr->line_column($position);
         my $trace_file_handle =
             $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
@@ -685,10 +684,10 @@ my $libmarpa_trace_event_handlers = {
         push @char_desc, ( sprintf '0x%04x', $codepoint );
         my $char_desc = join q{ }, @char_desc;
         my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-        my $thick_lex_grammar =
-            $slg->[Marpa::R3::Internal::Scanless::G::THICK_L0_GRAMMAR];
+        my $lex_tracer =
+            $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER];
         my $symbol_in_display_form =
-            $thick_lex_grammar->symbol_in_display_form($slg, $token_id),
+            $lex_tracer->symbol_in_display_form($slg, $token_id),
             my ( $line, $column ) = $slr->line_column($position);
         my $trace_file_handle =
             $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
@@ -903,8 +902,6 @@ sub Marpa::R3::Scanless::R::resume {
             my $stream_pos = $thin_slr->pos();
             my $trace_file_handle =
                 $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
-            my $thick_lex_grammar =
-                $slg->[Marpa::R3::Internal::Scanless::G::THICK_L0_GRAMMAR];
             my $lex_tracer =
                 $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER];
             my ( $line, $column ) = $slr->line_column($stream_pos);
