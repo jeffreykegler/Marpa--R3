@@ -732,9 +732,9 @@ my $libmarpa_trace_event_handlers = {
         my ( $slr, $event ) = @_;
         my ( undef, undef, $start, $end, $lexeme_id ) = @{$event};
         my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-        my $thick_g1_grammar = $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
+        my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
         my $lexeme_name =
-            $thick_g1_grammar->symbol_in_display_form($slg, $lexeme_id);
+            $tracer->symbol_in_display_form($lexeme_id);
         my $trace_file_handle =
             $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
         say {$trace_file_handle} 'Paused before lexeme ',
@@ -745,9 +745,9 @@ my $libmarpa_trace_event_handlers = {
         my ( $slr, $event ) = @_;
         my ( undef, undef, $start, $end, $lexeme_id ) = @{$event};
         my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-        my $thick_g1_grammar = $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
+        my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
         my $lexeme_name =
-            $thick_g1_grammar->symbol_in_display_form($slg, $lexeme_id);
+            $tracer->symbol_in_display_form($lexeme_id);
         my $trace_file_handle =
             $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
         say {$trace_file_handle} 'Paused after lexeme ',
