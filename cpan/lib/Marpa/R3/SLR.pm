@@ -42,14 +42,13 @@ our $PACKAGE = 'Marpa::R3::Scanless::R';
 sub Marpa::R3::Scanless::R::last_completed {
     my ( $slr, $symbol_name ) = @_;
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $thick_g1_grammar =
-        $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
+    my $g1_tracer =
+        $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     my $thin_g1_recce = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
     my $sought_rules =
         $slg->[Marpa::R3::Internal::Scanless::G::CACHE_G1_IRLIDS_BY_LHS_NAME]
         ->{$symbol_name};
     if ( not defined $sought_rules ) {
-        my $g1_tracer       = $thick_g1_grammar->[Marpa::R3::Internal::Grammar::TRACER];
         my $thin_g1_grammar = $g1_tracer->[Marpa::R3::Internal::Trace::G::C];
         my $symbol_id       = $g1_tracer->symbol_by_name($symbol_name);
         Marpa::R3::exception("Bad symbol in last_completed(): $symbol_name")
@@ -208,8 +207,8 @@ sub Marpa::R3::Scanless::R::new {
             "  It should be a ref to $slg_class\n" );
     } ## end if ( not blessed $slg or not $slg->isa($slg_class) )
 
-    my $thick_g1_grammar =
-        $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
+    my $tracer =
+        $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE] =
          $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE];
 
@@ -217,7 +216,6 @@ sub Marpa::R3::Scanless::R::new {
         Marpa::R3::Internal::Scanless::R::set( $slr, "new",  $flat_args );
     my $too_many_earley_items = $g1_recce_args->{too_many_earley_items};
 
-    my $tracer = $thick_g1_grammar->[Marpa::R3::Internal::Grammar::TRACER];
     my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
 
     my $recce_c =
