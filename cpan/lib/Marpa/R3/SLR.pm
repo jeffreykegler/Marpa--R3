@@ -1022,8 +1022,6 @@ sub Marpa::R3::Scanless::R::read_problem {
     my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
     my $slg  = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
 
-    my $thick_lex_grammar =
-        $slg->[Marpa::R3::Internal::Scanless::G::THICK_L0_GRAMMAR];
     my $lex_tracer =
         $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER];
 
@@ -1215,8 +1213,6 @@ sub Marpa::R3::Scanless::R::read_problem {
         my $trace_file_handle =
             $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
         my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-        my $thick_lex_grammar =
-            $slg->[Marpa::R3::Internal::Scanless::G::THICK_L0_GRAMMAR];
         my $lex_tracer =
             $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER];
         my ( $line, $column ) = $slr->line_column($stream_pos);

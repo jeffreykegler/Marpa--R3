@@ -549,4 +549,13 @@ sub Marpa::R3::Trace::G::rule_name {
     return $tracer->symbol_name($lhs_id);
 } ## end sub Marpa::R3::Grammar::rule_name
 
+# Undocumented -- assumes it is called internally,
+# by the SLIF
+sub Marpa::R3::Trace::G::tag {
+    my ( $tracer, $rule_id ) = @_;
+    my $rules = $tracer->[Marpa::R3::Internal::Trace::G::RULES];
+    my $rule  = $rules->[$rule_id];
+    return $rule->[Marpa::R3::Internal::Rule::SLIF_TAG];
+} ## end sub Marpa::R3::Grammar::rule_name
+
 1;

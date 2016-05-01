@@ -456,8 +456,7 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     } sort keys %is_lexeme_in_this_lexer;
 
     # Create the thick lex grammar
-    my $lex_thick_grammar =
-      Marpa::R3::Grammar->l0_naif_new( $slg, $lex_start_symbol_name,
+    Marpa::R3::Grammar->l0_naif_new( $slg, $lex_start_symbol_name,
         \%this_lexer_symbols, $lexer_rules );
     my $lex_tracer = $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER];
     my $lex_thin   = $lex_tracer->grammar();
@@ -569,7 +568,7 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
 
     my $default_discard_event = $discard_default_adverbs->{event};
     RULE_ID: for my $rule_id ( 0 .. $lex_thin->highest_rule_id() ) {
-        my $tag = $lex_thick_grammar->tag($rule_id);
+        my $tag = $lex_tracer->tag($rule_id);
         next RULE_ID if not defined $tag;
         my $event;
         FIND_EVENT: {
@@ -698,8 +697,6 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
 
     $slg->[Marpa::R3::Internal::Scanless::G::CHARACTER_CLASS_TABLE]
         = $character_class_table;
-    $slg->[Marpa::R3::Internal::Scanless::G::THICK_L0_GRAMMAR]
-        = $lex_thick_grammar;
 
     # This section violates the NAIF interface, directly changing some
     # of its internal structures.

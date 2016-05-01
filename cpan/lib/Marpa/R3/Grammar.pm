@@ -248,16 +248,6 @@ sub Marpa::R3::Grammar::unproductive_symbols {
     ];
 } ## end sub Marpa::R3::Grammar::unproductive_symbols
 
-# Undocumented -- assumes it is called internally,
-# by the SLIF
-sub Marpa::R3::Grammar::tag {
-    my ( $grammar, $rule_id ) = @_;
-    my $tracer    = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
-    my $rules = $tracer->[Marpa::R3::Internal::Trace::G::RULES];
-    my $rule  = $rules->[$rule_id];
-    return $rule->[Marpa::R3::Internal::Rule::SLIF_TAG];
-} ## end sub Marpa::R3::Grammar::rule_name
-
 sub Marpa::R3::Grammar::brief_rule {
     my ( $grammar, $rule_id ) = @_;
     my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
