@@ -138,13 +138,6 @@ __DATA__
     START_NAME
     RULES { array of rule refs }
 
-    :package=Marpa::R3::Internal::Grammar
-
-    TRACER { The "tracer", a "thin" object
-       around the C structure.  }
-
-    =LAST_FIELD
-
     :package=Marpa::R3::Internal::Progress_Report
 
     RULE_ID

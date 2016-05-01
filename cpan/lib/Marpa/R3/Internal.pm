@@ -56,10 +56,6 @@ use constant XSY_BY_ISYID => 4;
 use constant START_NAME => 5;
 use constant RULES => 6;
 
-package Marpa::R3::Internal::Grammar;
-use constant TRACER => 0;
-use constant LAST_FIELD => 0;
-
 package Marpa::R3::Internal::Progress_Report;
 use constant RULE_ID => 0;
 use constant POSITION => 1;
