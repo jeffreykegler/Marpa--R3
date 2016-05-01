@@ -385,16 +385,6 @@ sub Marpa::R3::Grammar::symbol_name {
     return defined $symbol_name ? $symbol_name : '[SYMBOL#' . $id . ']';
 } ## end sub Marpa::R3::Grammar::symbol_name
 
-# Create the structure which "shadows" the libmarpa rule
-sub shadow_rule {
-    my ( $grammar, $rule_id ) = @_;
-    my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
-    my $rules = $tracer->[Marpa::R3::Internal::Trace::G::RULES];
-    my $new_rule = $rules->[$rule_id] = [];
-    $new_rule->[Marpa::R3::Internal::Rule::ID] = $rule_id;
-    return $new_rule;
-} ## end sub shadow_rule
-
 sub assign_symbol {
     # $slg will be needed for the XSY's
     my ( $slg, $grammar, $name, $options ) = @_;
@@ -626,7 +616,7 @@ sub add_user_rule {
         Marpa::R3::exception("$problem_description: $rule_description");
     } ## end if ( not defined $base_rule_id or $base_rule_id < 0 )
 
-    my $base_rule = shadow_rule( $grammar, $base_rule_id );
+    my $base_rule = $tracer->shadow_rule( $base_rule_id );
 
     if ($is_ordinary_rule) {
 

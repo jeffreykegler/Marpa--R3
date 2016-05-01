@@ -320,7 +320,7 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     my $lexeme_events_by_id =
         $slg->[Marpa::R3::Internal::Scanless::G::LEXEME_EVENT_BY_ID] = [];
 
-    my $precompute_error = Marpa::R3::Internal::Scanless::G::precompute($slg, $thick_g1_grammar);
+    my $precompute_error = Marpa::R3::Internal::Scanless::G::precompute($slg, $g1_tracer);
     if (defined $precompute_error) {
         if ( $precompute_error == $Marpa::R3::Error::UNPRODUCTIVE_START ) {
 
@@ -538,7 +538,7 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     } ## end RULE_ID: for my $rule_id ( 0 .. $lex_thin->highest_rule_id() )
 
     my $lex_precompute_error =
-      Marpa::R3::Internal::Scanless::G::precompute( $slg, $lex_thick_grammar );
+      Marpa::R3::Internal::Scanless::G::precompute( $slg, $lex_tracer );
     if ( defined $lex_precompute_error ) {
         Marpa::R3::exception(
 'Internal errror: expected error code from precompute of lexer grammar ',
@@ -767,9 +767,8 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
 } ## end sub Marpa::R3::Internal::Scanless::G::hash_to_runtime
 
 sub Marpa::R3::Internal::Scanless::G::precompute {
-    my ($slg, $grammar) = @_;
+    my ($slg, $tracer) = @_;
 
-    my $tracer     = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
     my $rules = $tracer->[Marpa::R3::Internal::Trace::G::RULES];
     my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
     my $xsy_by_isyid     = $tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID];
@@ -782,7 +781,7 @@ sub Marpa::R3::Internal::Scanless::G::precompute {
         Marpa::R3::uncaught_error( scalar $grammar_c->error() );
     }
 
-    set_start_symbol($grammar);
+    set_start_symbol($tracer);
 
     # Catch errors in precomputation
     my $precompute_error_code = $Marpa::R3::Error::NONE;
@@ -823,7 +822,7 @@ sub Marpa::R3::Internal::Scanless::G::precompute {
             for ( my $event_ix = 0; $event_ix < $event_count; $event_ix++ ) {
                 my ( $event_type, $value ) = $grammar_c->event($event_ix);
                 if ( $event_type eq 'MARPA_EVENT_NULLING_TERMINAL' ) {
-                    push @nulling_terminals, $grammar->symbol_name($value);
+                    push @nulling_terminals, $tracer->symbol_name($value);
                 }
             } ## end EVENT: for ( my $event_ix = 0; $event_ix < $event_count; ...)
             my @nulling_terminal_messages =
@@ -839,7 +838,7 @@ sub Marpa::R3::Internal::Scanless::G::precompute {
             for ( my $event_ix = 0; $event_ix < $event_count; $event_ix++ ) {
                 my ( $event_type, $value ) = $grammar_c->event($event_ix);
                 if ( $event_type eq 'MARPA_EVENT_COUNTED_NULLABLE' ) {
-                    push @counted_nullables, $grammar->symbol_name($value);
+                    push @counted_nullables, $tracer->symbol_name($value);
                 }
             } ## end EVENT: for ( my $event_ix = 0; $event_ix < $event_count; ...)
             my @counted_nullable_messages = map {
@@ -879,7 +878,7 @@ sub Marpa::R3::Internal::Scanless::G::precompute {
             # The Marpa::R3 logic assumes no "gaps" in the rule numbering,
             # which is currently the case for Libmarpa,
             # but not guaranteed.
-            shadow_rule( $grammar, $rule_id );
+            $tracer->shadow_rule( $rule_id );
         } ## end RULE: for ( my $rule_id = 0; $rule_id <= $highest_rule_id; ...)
     }
 
@@ -907,7 +906,7 @@ sub Marpa::R3::Internal::Scanless::G::precompute {
         for my $rule_id (@loop_rules) {
             print {$trace_fh}
                 'Cycle found involving rule: ',
-                $grammar->brief_rule($rule_id), "\n"
+                $tracer->brief_rule($rule_id), "\n"
                 or Marpa::R3::exception("Could not print: $ERRNO");
         } ## end for my $rule_id (@loop_rules)
         Marpa::R3::exception('Cycles in grammar, fatal error');
@@ -934,7 +933,7 @@ sub Marpa::R3::Internal::Scanless::G::precompute {
             $xsy->[Marpa::R3::Internal::XSY::IF_INACCESSIBLE] //
             $default_if_inaccessible;
         next SYMBOL if $treatment eq 'ok';
-        my $symbol_name = $grammar->symbol_name($symbol_id);
+        my $symbol_name = $tracer->symbol_name($symbol_id);
         my $message = "Inaccessible symbol: $symbol_name";
         Marpa::R3::exception($message) if $treatment eq 'fatal';
         $DB::single = 1;
@@ -950,9 +949,8 @@ sub Marpa::R3::Internal::Scanless::G::precompute {
 }
 
 sub set_start_symbol {
-    my $grammar = shift;
+    my $tracer = shift;
 
-    my $tracer           = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
     my $grammar_c        = $tracer->[Marpa::R3::Internal::Trace::G::C];
     my $start_name = $tracer->[Marpa::R3::Internal::Trace::G::START_NAME];
     my $start_id = $tracer->symbol_by_name($start_name);
