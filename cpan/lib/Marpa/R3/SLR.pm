@@ -1939,12 +1939,6 @@ sub Marpa::R3::Scanless::R::lexeme_priority_set {
 
 # Internal methods, not to be documented
 
-sub Marpa::R3::Scanless::R::thick_g1_grammar {
-    my ($slr) = @_;
-    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    return $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
-}
-
 # not to be documented
 sub Marpa::R3::Scanless::R::earley_set_size {
     my ($slr, $set_id) = @_;

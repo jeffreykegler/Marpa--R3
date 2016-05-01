@@ -584,21 +584,19 @@ sub nid_symbol_name {
     my ( $asf, $nid ) = @_;
     my $slr       = $asf->[Marpa::R3::Internal::ASF::SLR];
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $grammar =
-        $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
+    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     my $symbol_id = nid_symbol_id($asf, $nid);
-    return $grammar->symbol_name($symbol_id);
+    return $tracer->symbol_name($symbol_id);
 }
 
 sub nid_token_name {
     my ( $asf, $nid ) = @_;
     my $slr      = $asf->[Marpa::R3::Internal::ASF::SLR];
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $grammar =
-        $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
+    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     my $token_id = nid_token_id($asf, $nid);
     return if not defined $token_id;
-    return $grammar->symbol_name($token_id);
+    return $tracer->symbol_name($token_id);
 }
 
 # Memoization is heavily used -- it needs to be to keep the worst cases from
