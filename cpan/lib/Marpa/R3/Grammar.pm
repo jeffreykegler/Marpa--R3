@@ -40,19 +40,6 @@ use English qw( -no_match_vars );
 
 use Marpa::R3::Trace::G;
 
-our %DEFAULT_SYMBOLS_RESERVED;
-%DEFAULT_SYMBOLS_RESERVED = map { ($_, 1) } split //xms, '}]>)';
-
-sub Marpa::R3::uncaught_error {
-    my ($error) = @_;
-
-    # This would be Carp::confess, but in the testing
-    # the stack trace includes the hoped for error
-    # message, which causes spurious success reports.
-    Carp::croak( "libmarpa reported an error which Marpa::R3 did not catch\n",
-        $error );
-} ## end sub Marpa::R3::uncaught_error
-
 package Marpa::R3::Internal::Scanless::G;
 # INTERNAL OK AFTER HERE _marpa_
 1;

@@ -238,7 +238,7 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
         delete $g1_args->{'warnings'};
     }
 
-    Marpa::R3::Grammar->g1_naif_new($slg, $g1_args);
+    g1_naif_new($slg, $g1_args);
     my $g1_tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     my $g1_thin          = $g1_tracer->grammar();
 
@@ -456,7 +456,7 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     } sort keys %is_lexeme_in_this_lexer;
 
     # Create the thick lex grammar
-    Marpa::R3::Grammar->l0_naif_new( $slg, $lex_start_symbol_name,
+    l0_naif_new( $slg, $lex_start_symbol_name,
         \%this_lexer_symbols, $lexer_rules );
     my $lex_tracer = $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER];
     my $lex_thin   = $lex_tracer->grammar();
@@ -962,8 +962,8 @@ qq{Internal error: Start symbol $start_name missing from grammar\n}
 } ## end sub set_start_symbol
 
 
-sub Marpa::R3::Grammar::g1_naif_new {
-    my ( $class, $slg, $flat_args ) = @_;
+sub g1_naif_new {
+    my ( $slg, $flat_args ) = @_;
 
     my $grammar_c = Marpa::R3::Thin::G->new( { if => 1 } );
     my $tracer =
@@ -979,8 +979,8 @@ sub Marpa::R3::Grammar::g1_naif_new {
     return;
 }
 
-sub Marpa::R3::Grammar::l0_naif_new {
-    my ( $class, $slg, $start_name, $symbols, $rules ) = @_;
+sub l0_naif_new {
+    my ( $slg, $start_name, $symbols, $rules ) = @_;
 
     my $grammar_c = Marpa::R3::Thin::G->new( { if => 1 } );
     my $tracer =
