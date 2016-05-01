@@ -248,25 +248,6 @@ sub Marpa::R3::Grammar::unproductive_symbols {
     ];
 } ## end sub Marpa::R3::Grammar::unproductive_symbols
 
-sub Marpa::R3::Grammar::start_symbol {
-    my ( $grammar ) = @_;
-    my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
-    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
-    return $grammar_c->start_symbol();
-}
-
-sub Marpa::R3::Grammar::rule_name {
-    my ( $grammar, $rule_id ) = @_;
-    my $tracer    = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
-    my $rules = $tracer->[Marpa::R3::Internal::Trace::G::RULES];
-    my $rule  = $rules->[$rule_id];
-    return "Non-existent rule $rule_id" if not defined $rule;
-    my $name = $rule->[Marpa::R3::Internal::Rule::NAME];
-    return $name if defined $name;
-    my ( $lhs_id ) = $tracer->rule_expand($rule_id);
-    return $grammar->symbol_name($lhs_id);
-} ## end sub Marpa::R3::Grammar::rule_name
-
 # Undocumented -- assumes it is called internally,
 # by the SLIF
 sub Marpa::R3::Grammar::tag {

@@ -238,7 +238,7 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
         delete $g1_args->{'warnings'};
     }
 
-    my $thick_g1_grammar = Marpa::R3::Grammar->g1_naif_new($slg, $g1_args);
+    Marpa::R3::Grammar->g1_naif_new($slg, $g1_args);
     my $g1_tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     my $g1_thin          = $g1_tracer->grammar();
 
@@ -692,8 +692,6 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     # Second phase of G1 processing
 
     $thin_slg->precompute();
-    $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR] =
-        $thick_g1_grammar;
 
     # More lexer processing
     # Determine events by lexer rule, applying the defaults
@@ -966,30 +964,16 @@ qq{Internal error: Start symbol $start_name missing from grammar\n}
     return 1;
 } ## end sub set_start_symbol
 
-sub thick_subgrammar_by_name {
-    my ( $slg, $subgrammar ) = @_;
-
-    # Allow G0 as legacy synonym for L0
-    state $grammar_names = { 'G0' => 1, 'G1' => 1, 'L0' => 1 };
-    $subgrammar //= 'G1';
-
-    Marpa::R3::exception(qq{No lexer named "$subgrammar"})
-        if not defined $grammar_names->{$subgrammar};
-
-    return $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR]
-        if $subgrammar eq 'G1';
-
-    return $slg->[Marpa::R3::Internal::Scanless::G::THICK_L0_GRAMMAR];
-} ## end sub thick_subgrammar_by_name
-
 sub Marpa::R3::Scanless::G::start_symbol_id {
-    my ( $slg, $rule_id, $subgrammar ) = @_;
-    return thick_subgrammar_by_name( $slg, $subgrammar )->start_symbol();
+    my ( $slg, $rule_id ) = @_;
+    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
+    return $tracer->start_symbol();
 }
 
 sub Marpa::R3::Scanless::G::rule_name {
-    my ( $slg, $rule_id, $subgrammar ) = @_;
-    return thick_subgrammar_by_name( $slg, $subgrammar )->rule_name($rule_id);
+    my ( $slg, $rule_id ) = @_;
+    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
+    return $tracer->rule_name($rule_id);
 }
 
 sub Marpa::R3::Scanless::G::rule_expand {
@@ -1166,11 +1150,6 @@ sub Marpa::R3::Scanless::G::l0_symbol_ids {
 }
 
 # Internal methods, not to be documented
-
-sub Marpa::R3::Scanless::G::thick_g1_grammar {
-    my ($slg) = @_;
-    return $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
-}
 
 sub Marpa::R3::Scanless::G::show_irls {
     my ($slg) = @_;

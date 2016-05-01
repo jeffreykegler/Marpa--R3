@@ -532,4 +532,21 @@ sub Marpa::R3::Trace::G::_rule_mask {
     return $rule->[Marpa::R3::Internal::Rule::MASK];
 } ## end sub Marpa::R3::Grammar::rule
 
+sub Marpa::R3::Trace::G::start_symbol {
+    my ( $tracer ) = @_;
+    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
+    return $grammar_c->start_symbol();
+}
+
+sub Marpa::R3::Trace::G::rule_name {
+    my ( $tracer, $rule_id ) = @_;
+    my $rules = $tracer->[Marpa::R3::Internal::Trace::G::RULES];
+    my $rule  = $rules->[$rule_id];
+    return "Non-existent rule $rule_id" if not defined $rule;
+    my $name = $rule->[Marpa::R3::Internal::Rule::NAME];
+    return $name if defined $name;
+    my ( $lhs_id ) = $tracer->rule_expand($rule_id);
+    return $tracer->symbol_name($lhs_id);
+} ## end sub Marpa::R3::Grammar::rule_name
+
 1;
