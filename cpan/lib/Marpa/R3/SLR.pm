@@ -542,12 +542,12 @@ my $libmarpa_trace_event_handlers = {
         my $trace_file_handle =
             $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
         my $slg              = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-        my $thick_g1_grammar = $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
+        my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
         say {$trace_file_handle} qq{Rejected lexeme },
             input_range_describe( $slr, $lexeme_start_pos,
             $lexeme_end_pos - 1 ),
             q{: },
-            $thick_g1_grammar->symbol_in_display_form($slg, $g1_lexeme),
+            $tracer->symbol_in_display_form($g1_lexeme),
             qq{; value="$raw_token_value"}
             or Marpa::R3::exception("Could not say(): $ERRNO");
     },
@@ -562,9 +562,9 @@ my $libmarpa_trace_event_handlers = {
         my $trace_file_handle =
             $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
         my $slg              = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-        my $thick_g1_grammar = $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
+        my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
         say {$trace_file_handle} qq{Expected lexeme },
-            $thick_g1_grammar->symbol_in_display_form($slg, $g1_lexeme),
+            $tracer->symbol_in_display_form($g1_lexeme),
             " at line $line, column $column; assertion ID = $assertion_id"
             or Marpa::R3::exception("Could not say(): $ERRNO");
     },
@@ -580,13 +580,13 @@ my $libmarpa_trace_event_handlers = {
         my $trace_file_handle =
             $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
         my $slg              = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-        my $thick_g1_grammar = $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
+        my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
         say {$trace_file_handle}
             qq{Outprioritized lexeme },
             input_range_describe( $slr, $lexeme_start_pos,
             $lexeme_end_pos - 1 ),
             q{: },
-            $thick_g1_grammar->symbol_in_display_form($slg, $g1_lexeme),
+            $tracer->symbol_in_display_form($slg, $g1_lexeme),
             qq{; value="$raw_token_value"; },
             qq{priority was $lexeme_priority, but $required_priority was required}
             or Marpa::R3::exception("Could not say(): $ERRNO");
@@ -602,13 +602,13 @@ my $libmarpa_trace_event_handlers = {
         my $trace_file_handle =
             $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
         my $slg              = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-        my $thick_g1_grammar = $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
+        my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
         say {$trace_file_handle}
             'Rejected as duplicate lexeme ',
             input_range_describe( $slr, $lexeme_start_pos,
             $lexeme_end_pos - 1 ),
             q{: },
-            $thick_g1_grammar->symbol_in_display_form($slg, $g1_lexeme),
+            $tracer->symbol_in_display_form($slg, $g1_lexeme),
             qq{; value="$raw_token_value"}
             or Marpa::R3::exception("Could not say(): $ERRNO");
     },
@@ -623,14 +623,14 @@ my $libmarpa_trace_event_handlers = {
         my $trace_file_handle =
             $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
         my $slg              = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-        my $thick_g1_grammar = $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
+        my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
         say {$trace_file_handle}
             'Attempting to read lexeme ',
             input_range_describe( $slr, $lexeme_start_pos,
             $lexeme_end_pos - 1 ),
             q{ e}, $slr->g1_pos(),
             q{: },
-            $thick_g1_grammar->symbol_in_display_form($slg, $g1_lexeme),
+            $tracer->symbol_in_display_form($slg, $g1_lexeme),
             qq{; value="$raw_token_value"}
             or Marpa::R3::exception("Could not say(): $ERRNO");
     },
