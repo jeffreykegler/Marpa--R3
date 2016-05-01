@@ -167,9 +167,7 @@ sub Marpa::R3::Internal::Scanless::R::lexeme_semantics_find {
     my ( $slr, $lexeme_id ) = @_;
     my $recce_c                = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $grammar =
-        $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
-    my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     my $xsy_by_isyid =
         $tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID];
     my $xsy = $xsy_by_isyid->[$lexeme_id];
@@ -182,9 +180,7 @@ sub Marpa::R3::Internal::Scanless::R::lexeme_semantics_find {
 sub Marpa::R3::Internal::Scanless::R::rule_blessing_find {
     my ( $slr, $rule_id ) = @_;
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $grammar =
-        $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
-    my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     my $rules = $tracer->[Marpa::R3::Internal::Trace::G::RULES];
     my $rule     = $rules->[$rule_id];
     my $blessing = $rule->[Marpa::R3::Internal::Rule::BLESSING];
@@ -205,10 +201,7 @@ sub Marpa::R3::Internal::Scanless::R::rule_blessing_find {
 sub Marpa::R3::Scanless::R::lexeme_blessing_find {
     my ( $slr, $lexeme_id ) = @_;
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $grammar =
-        $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
-    my $tracer =
-        $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     my $xsy_by_isyid = $tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID];
     my $xsy   = $xsy_by_isyid->[$lexeme_id];
     my $blessing = $xsy->[Marpa::R3::Internal::XSY::BLESSING];
@@ -216,7 +209,6 @@ sub Marpa::R3::Scanless::R::lexeme_blessing_find {
     return '::undef' if not defined $blessing;
     return '::undef' if $blessing eq '::undef';
     if ( $blessing =~ m/\A [:][:] /xms ) {
-        my $tracer      = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
         my $lexeme_name = $tracer->symbol_name($lexeme_id);
         $slr->[Marpa::R3::Internal::Scanless::R::ERROR_MESSAGE] =
             qq{Symbol "$lexeme_name" has unknown blessing: "$blessing"};
@@ -228,7 +220,6 @@ sub Marpa::R3::Scanless::R::lexeme_blessing_find {
     my $bless_package =
         $slg->[Marpa::R3::Internal::Scanless::G::BLESS_PACKAGE];
     if ( not defined $bless_package ) {
-        my $tracer      = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
         my $lexeme_name = $tracer->symbol_name($lexeme_id);
         $slr->[Marpa::R3::Internal::Scanless::R::ERROR_MESSAGE] =
             qq{Symbol "$lexeme_name" needs a blessing package, but grammar has none\n}
@@ -440,9 +431,7 @@ sub Marpa::R3::Scanless::R::ordering_get {
     my $parse_set_arg =
         $slr->[Marpa::R3::Internal::Scanless::R::END_OF_PARSE];
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $grammar =
-        $slg->[Marpa::R3::Internal::Scanless::G::THICK_G1_GRAMMAR];
-    my $tracer = $grammar->[Marpa::R3::Internal::Grammar::TRACER];
+    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
     my $recce_c   = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
 
