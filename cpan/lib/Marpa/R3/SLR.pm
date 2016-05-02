@@ -215,6 +215,8 @@ sub Marpa::R3::Scanless::R::new {
     $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE] =
          $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE];
 
+    $slr->reset_evaluation();
+
     my $g1_recce_args =
         common_set_1( $slr, "new",  $flat_args );
     my $too_many_earley_items = $g1_recce_args->{too_many_earley_items};
@@ -229,8 +231,6 @@ sub Marpa::R3::Scanless::R::new {
     }
 
     $recce_c->ruby_slippers_set(1);
-
-    $slr->reset_evaluation();
 
     my $thin_slr = Marpa::R3::Thin::SLR->new(
         $slg->[Marpa::R3::Internal::Scanless::G::C],
@@ -427,12 +427,54 @@ sub common_set_1 {
             ')' )
           if not exists $ranking_methods->{$value};
         $slr->[Marpa::R3::Internal::Scanless::R::RANKING_METHOD] = $value;
-    } ## end if ( defined( my $value = $arg_hash->{'ranking_method'} ...))
+    }
+
+    if ( defined $flat_args->{'max_parses'} ) {
+        my $value = $flat_args->{'max_parses'};
+        $slr->[Marpa::R3::Internal::Scanless::R::MAX_PARSES] = $value;
+    }
+
+    if ( defined( my $value = $flat_args->{'semantics_package'} ) ) {
+
+        # Not allowed once parsing is started
+        if ( defined $slr->[Marpa::R3::Internal::Scanless::R::B_C] ) {
+            Marpa::R3::exception(
+q{Cannot change 'semantics_package' named argument once parsing has started}
+            );
+        }
+
+        $slr->[Marpa::R3::Internal::Scanless::R::RESOLVE_PACKAGE_SOURCE] //=
+          'semantics_package';
+        if ( $slr->[Marpa::R3::Internal::Scanless::R::RESOLVE_PACKAGE_SOURCE] ne
+            'semantics_package' )
+        {
+            Marpa::R3::exception(
+qq{'semantics_package' named argument in conflict with other choices\n},
+qq{   Usually this means you tried to use the discouraged 'action_object' named argument as well\n}
+            );
+        } ## end if ( $recce->[...])
+        $slr->[Marpa::R3::Internal::Scanless::R::RESOLVE_PACKAGE] = $value;
+    } ## end if ( defined( my $value = $flat_args->{'semantics_package'...}))
+
+    if ( defined( my $value = $flat_args->{'trace_actions'} ) ) {
+        $slr->[Marpa::R3::Internal::Scanless::R::TRACE_ACTIONS] = $value;
+        if ($value) {
+            say {$trace_file_handle} 'Setting trace_actions option'
+              or Marpa::R3::exception("Cannot print: $ERRNO");
+        }
+    } ## end if ( defined( my $value = $flat_args->{'trace_actions'} ))
+
+    if ( defined( my $value = $flat_args->{'trace_values'} ) ) {
+        $slr->[Marpa::R3::Internal::Scanless::R::TRACE_VALUES] = $value;
+        if ($value) {
+            say {$trace_file_handle} 'Setting trace_values option'
+              or Marpa::R3::exception("Cannot print: $ERRNO");
+        }
+    } ## end if ( defined( my $value = $flat_args->{'trace_values'} ) )
 
     state $copyable_recce_args = {
         map { ( $_, 1 ); }
-          qw(end max_parses semantics_package too_many_earley_items
-          trace_actions trace_values)
+          qw(end too_many_earley_items)
     };
 
     # Prune flat args of all those named args which are NOT to be copied
@@ -1449,48 +1491,6 @@ sub Marpa::R3::Internal::Scanless::R::common_set_2 {
     my $recce_c = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
 
     my $trace_fh = $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
-
-    if ( defined( my $value = $arg_hash->{'max_parses'} ) ) {
-        $slr->[Marpa::R3::Internal::Scanless::R::MAX_PARSES] = $value;
-    }
-
-    if ( defined( my $value = $arg_hash->{'semantics_package'} ) ) {
-
-        # Not allowed once parsing is started
-        if ( defined $slr->[Marpa::R3::Internal::Scanless::R::B_C] ) {
-            Marpa::R3::exception(
-q{Cannot change 'semantics_package' named argument once parsing has started}
-            );
-        }
-
-        $slr->[Marpa::R3::Internal::Scanless::R::RESOLVE_PACKAGE_SOURCE] //=
-          'semantics_package';
-        if ( $slr->[Marpa::R3::Internal::Scanless::R::RESOLVE_PACKAGE_SOURCE] ne
-            'semantics_package' )
-        {
-            Marpa::R3::exception(
-qq{'semantics_package' named argument in conflict with other choices\n},
-qq{   Usually this means you tried to use the discouraged 'action_object' named argument as well\n}
-            );
-        } ## end if ( $recce->[...])
-        $slr->[Marpa::R3::Internal::Scanless::R::RESOLVE_PACKAGE] = $value;
-    } ## end if ( defined( my $value = $arg_hash->{'semantics_package'...}))
-
-    if ( defined( my $value = $arg_hash->{'trace_actions'} ) ) {
-        $slr->[Marpa::R3::Internal::Scanless::R::TRACE_ACTIONS] = $value;
-        if ($value) {
-            say {$trace_fh} 'Setting trace_actions option'
-              or Marpa::R3::exception("Cannot print: $ERRNO");
-        }
-    } ## end if ( defined( my $value = $arg_hash->{'trace_actions'} ))
-
-    if ( defined( my $value = $arg_hash->{'trace_values'} ) ) {
-        $slr->[Marpa::R3::Internal::Scanless::R::TRACE_VALUES] = $value;
-        if ($value) {
-            say {$trace_fh} 'Setting trace_values option'
-              or Marpa::R3::exception("Cannot print: $ERRNO");
-        }
-    } ## end if ( defined( my $value = $arg_hash->{'trace_values'} ) )
 
     if ( defined( my $value = $arg_hash->{'end'} ) ) {
 
