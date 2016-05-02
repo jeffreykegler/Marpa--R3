@@ -564,10 +564,6 @@ typedef struct
   SV* input;
   int too_many_earley_items;
 
-  /* In case YIM counts exceed thresholds */
-  int t_l0_yim_count;
-  int t_g1_yim_count;
-
   /* A "Gift" because it is something that is "wrapped". */
   Marpa_SLR gift;
 
@@ -928,28 +924,14 @@ u_convert_events (Scanless_R * slr)
              * The warning raised for MARPA_EVENT_EARLEY_ITEM_THRESHOLD 
              * can be turned off by raising
              * the Earley item warning threshold.
-             *
-             * The SLR's yim count field is used to prevent duplicate
-             * YIM threshold events.  The event will be updated with the
-             * high number before being reported.
-             *
-             * This code is not tested.
              */
-              {
-                const int yim_count = (long) marpa_g_event_value (&marpa_event);
-                if (slr->t_l0_yim_count < 0)
-                  {
-                    union marpa_slr_event_s *event = marpa__slr_event_push (slr->gift);
-                    MARPA_SLREV_TYPE (event) = MARPA_SLREV_L0_YIM_THRESHOLD_EXCEEDED;
-                    event->t_l0_yim_threshold_exceeded.t_yim_count = yim_count;
-                    event->t_l0_yim_threshold_exceeded.t_perl_pos = slr->perl_pos;
-                  }
-                slr->t_l0_yim_count = yim_count;
-                /* warn
-                  * ("Marpa: lexer Earley item count (%ld) exceeds warning threshold",
-                  * (long) marpa_g_event_value (&marpa_event));
-                  */
-              }
+            {
+              const int yim_count = (long) marpa_g_event_value (&marpa_event);
+              union marpa_slr_event_s *event = marpa__slr_event_push (slr->gift);
+              MARPA_SLREV_TYPE (event) = MARPA_SLREV_L0_YIM_THRESHOLD_EXCEEDED;
+              event->t_l0_yim_threshold_exceeded.t_yim_count = yim_count;
+              event->t_l0_yim_threshold_exceeded.t_perl_pos = slr->perl_pos;
+            }
             break;
         default:
             {
@@ -2202,7 +2184,7 @@ MARPA_SLREV_TYPE(slr_event) = MARPA_SLREV_SYMBOL_PREDICTED;
             }
             break;
         case MARPA_EVENT_EARLEY_ITEM_THRESHOLD:
-            /* All events are ignored on faiulre
+            /* All events are ignored on failure
              * On success, all except MARPA_EVENT_EARLEY_ITEM_THRESHOLD
              * are ignored.
              *
@@ -2212,18 +2194,10 @@ MARPA_SLREV_TYPE(slr_event) = MARPA_SLREV_SYMBOL_PREDICTED;
              */
             {
               const int yim_count = marpa_g_event_value (&marpa_event);
-              if (slr->t_g1_yim_count < 0)
-                {
-                  union marpa_slr_event_s *event = marpa__slr_event_push (slr->gift);
-                  MARPA_SLREV_TYPE (event) = MARPA_SLREV_G1_YIM_THRESHOLD_EXCEEDED;
-                  event->t_g1_yim_threshold_exceeded.t_yim_count = yim_count;
-                  event->t_g1_yim_threshold_exceeded.t_perl_pos = slr->perl_pos;
-                }
-              slr->t_g1_yim_count = yim_count;
-              /* warn
-                * ("Marpa: Scanless G1 Earley item count (%ld) exceeds warning threshold",
-                 * (long) marpa_g_event_value (&marpa_event));
-                 */
+              union marpa_slr_event_s *event = marpa__slr_event_push (slr->gift);
+              MARPA_SLREV_TYPE (event) = MARPA_SLREV_G1_YIM_THRESHOLD_EXCEEDED;
+              event->t_g1_yim_threshold_exceeded.t_yim_count = yim_count;
+              event->t_g1_yim_threshold_exceeded.t_perl_pos = slr->perl_pos;
             }
             break;
         default:
@@ -5866,9 +5840,6 @@ PPCODE:
   slr->end_pos = 0;
   slr->too_many_earley_items = -1;
 
-  slr->t_l0_yim_count = -1;
-  slr->t_g1_yim_count = -1;
-
   slr->gift = marpa__slr_new();
 
   new_sv = sv_newmortal ();
@@ -6058,8 +6029,6 @@ PPCODE:
   /* Clear event queue */
   av_clear (slr->r1_wrapper->event_queue);
   marpa__slr_event_clear (slr->gift);
-  slr->t_l0_yim_count = -1;
-  slr->t_g1_yim_count = -1;
 
   /* Application intervention resets perl_pos */
   slr->last_perl_pos = -1;
@@ -6459,9 +6428,8 @@ PPCODE:
             AV *event_av = newAV ();
             av_push (event_av, newSVpvs ("l0 earley item threshold exceeded"));
             av_push (event_av, newSViv ((IV) slr_event->t_l0_yim_threshold_exceeded.t_perl_pos));
-            av_push (event_av, newSViv ((IV) slr->t_l0_yim_count));
+            av_push (event_av, newSViv ((IV) slr_event->t_l0_yim_threshold_exceeded.t_yim_count));
             XPUSHs (sv_2mortal (newRV_noinc ((SV *) event_av)));
-            slr->t_l0_yim_count = -1;
             break;
         }
 
@@ -6471,9 +6439,8 @@ PPCODE:
             AV *event_av = newAV ();
             av_push (event_av, newSVpvs ("g1 earley item threshold exceeded"));
             av_push (event_av, newSViv ((IV) slr_event->t_g1_yim_threshold_exceeded.t_perl_pos));
-            av_push (event_av, newSViv ((IV) slr->t_g1_yim_count));
+            av_push (event_av, newSViv ((IV) slr_event->t_g1_yim_threshold_exceeded.t_yim_count));
             XPUSHs (sv_2mortal (newRV_noinc ((SV *) event_av)));
-            slr->t_g1_yim_count = -1;
             break;
         }
 
@@ -6690,8 +6657,6 @@ PPCODE:
 
   av_clear (slr->r1_wrapper->event_queue);
   marpa__slr_event_clear(slr->gift);
-  slr->t_l0_yim_count = -1;
-  slr->t_g1_yim_count = -1;
 
   result = marpa_r_earleme_complete (slr->r1);
   slr->is_external_scanning = 0;
