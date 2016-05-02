@@ -213,7 +213,7 @@ sub Marpa::R3::Scanless::R::new {
          $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE];
 
     my $g1_recce_args =
-        Marpa::R3::Internal::Scanless::R::set( $slr, "new",  $flat_args );
+        common_set_1( $slr, "new",  $flat_args );
     my $too_many_earley_items = $g1_recce_args->{too_many_earley_items};
 
     my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
@@ -291,7 +291,7 @@ sub Marpa::R3::Scanless::R::new {
         Marpa::R3::exception( 'Recognizer start of input failed: ', $error );
     }
 
-    Marpa::R3::Internal::Scanless::R::common_set($slr, $g1_recce_args);
+    Marpa::R3::Internal::Scanless::R::common_set_2($slr, $g1_recce_args);
 
     if ( $slr->[Marpa::R3::Internal::Scanless::R::TRACE_TERMINALS] > 1 ) {
         my $terminals_expected = $slr->terminals_expected();
@@ -315,8 +315,8 @@ sub Marpa::R3::Scanless::R::set {
     my ($flat_args, $error_message) = Marpa::R3::flatten_hash_args(\@args);
     Marpa::R3::exception( sprintf $error_message, '$slr->set()' ) if not $flat_args;
     my $recce_args =
-        Marpa::R3::Internal::Scanless::R::set( $slr, "set", $flat_args );
-    Marpa::R3::Internal::Scanless::R::common_set($slr, $recce_args);
+        common_set_1( $slr, "set", $flat_args );
+    Marpa::R3::Internal::Scanless::R::common_set_2($slr, $recce_args);
     return $slr;
 } ## end sub Marpa::R3::Scanless::R::set
 
@@ -327,26 +327,24 @@ sub Marpa::R3::Scanless::R::set {
 # This logic really needs to be all in one place, and so a flag
 # to trigger the minor differences needed by the various calling
 # contexts is a small price to pay.
-sub Marpa::R3::Internal::Scanless::R::set {
+sub common_set_1 {
 
     my ( $slr, $method, $flat_args ) = @_;
 
     # These recce args are allowed in all contexts
-    state $common_recce_args =
-        { map { ( $_, 1 ); } qw(trace_lexers trace_terminals trace_file_handle rejection exhaustion
-            end max_parses semantics_package too_many_earley_items
-            trace_actions trace_values)
-        };
-    state $set_method_args = {
-        map { ( $_, 1 ); } keys %{$common_recce_args}
+    state $common_recce_args = {
+        map { ( $_, 1 ); }
+          qw(trace_lexers trace_terminals trace_file_handle rejection exhaustion
+          end max_parses semantics_package too_many_earley_items
+          trace_actions trace_values)
     };
+    state $set_method_args = { map { ( $_, 1 ); } keys %{$common_recce_args} };
     state $new_method_args = {
         map { ( $_, 1 ); } qw(grammar ranking_method event_is_active),
         keys %{$set_method_args}
     };
-    state $series_restart_method_args = {
-        map { ( $_, 1 ); } keys %{$common_recce_args}
-    };
+    state $series_restart_method_args =
+      { map { ( $_, 1 ); } keys %{$common_recce_args} };
 
     my $ok_args = $set_method_args;
     $ok_args = $new_method_args            if $method eq 'new';
@@ -355,9 +353,9 @@ sub Marpa::R3::Internal::Scanless::R::set {
     if ( scalar @bad_args ) {
         Marpa::R3::exception(
             q{Bad named argument(s) to $slr->}
-                . $method
-                . q{() method: }
-                . join q{ },
+              . $method
+              . q{() method: }
+              . join q{ },
             @bad_args
         );
     } ## end if ( scalar @bad_args )
@@ -365,14 +363,15 @@ sub Marpa::R3::Internal::Scanless::R::set {
     if ( my $value = $flat_args->{'trace_file_handle'} ) {
         $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE] = $value;
     }
-    my $trace_file_handle = $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
+    my $trace_file_handle =
+      $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
 
     if ( exists $flat_args->{'trace_terminals'} ) {
         my $value = $flat_args->{'trace_terminals'};
         my $normalized_value =
-            Scalar::Util::looks_like_number( $value ) ? $value : 0;
-        $slr->[Marpa::R3::Internal::Scanless::R::TRACE_TERMINALS] = 
-            $normalized_value;
+          Scalar::Util::looks_like_number($value) ? $value : 0;
+        $slr->[Marpa::R3::Internal::Scanless::R::TRACE_TERMINALS] =
+          $normalized_value;
         if ($normalized_value) {
             say {$trace_file_handle} qq{Setting trace_terminals option};
         }
@@ -381,9 +380,9 @@ sub Marpa::R3::Internal::Scanless::R::set {
     if ( exists $flat_args->{'trace_lexers'} ) {
         my $value = $flat_args->{'trace_lexers'};
         my $normalized_value =
-            Scalar::Util::looks_like_number( $value ) ? $value : 0;
-        $slr->[Marpa::R3::Internal::Scanless::R::TRACE_LEXERS] = 
-            $normalized_value;
+          Scalar::Util::looks_like_number($value) ? $value : 0;
+        $slr->[Marpa::R3::Internal::Scanless::R::TRACE_LEXERS] =
+          $normalized_value;
         if ($normalized_value) {
             say {$trace_file_handle} qq{Setting trace_lexers option};
         }
@@ -395,8 +394,8 @@ sub Marpa::R3::Internal::Scanless::R::set {
         my $value = $flat_args->{'exhaustion'} // 'undefined';
         Marpa::R3::exception(
             qq{'exhaustion' named arg value is $value (should be one of },
-            (   join q{, },
-                map { q{'} . $_ . q{'} } keys %{$exhaustion_actions}
+            (
+                join q{, }, map { q{'} . $_ . q{'} } keys %{$exhaustion_actions}
             ),
             ')'
         ) if not exists $exhaustion_actions->{$value};
@@ -410,9 +409,7 @@ sub Marpa::R3::Internal::Scanless::R::set {
         my $value = $flat_args->{'rejection'} // 'undefined';
         Marpa::R3::exception(
             qq{'rejection' named arg value is $value (should be one of },
-            (   join q{, },
-                map { q{'} . $_ . q{'} } keys %{$rejection_actions}
-            ),
+            ( join q{, }, map { q{'} . $_ . q{'} } keys %{$rejection_actions} ),
             ')'
         ) if not exists $rejection_actions->{$value};
         $slr->[Marpa::R3::Internal::Scanless::R::REJECTION_ACTION] = $value;
@@ -421,21 +418,23 @@ sub Marpa::R3::Internal::Scanless::R::set {
 
     state $copyable_recce_args = {
         map { ( $_, 1 ); }
-            qw(end max_parses semantics_package too_many_earley_items ranking_method
-            trace_actions trace_values)
+          qw(end max_parses semantics_package too_many_earley_items ranking_method
+          trace_actions trace_values)
     };
 
     # Prune flat args of all those named args which are NOT to be copied
     my %g1_recce_args = ();
-    for my $arg_name ( grep { $copyable_recce_args->{$_} }
-        keys %{$flat_args} )
+    for my $arg_name (
+        grep { $copyable_recce_args->{$_} }
+        keys %{$flat_args}
+      )
     {
         $g1_recce_args{$arg_name} = $flat_args->{$arg_name};
     }
 
     return \%g1_recce_args;
 
-} ## end sub Marpa::R3::Internal::Scanless::R::set
+}
 
 sub Marpa::R3::Scanless::R::thin {
     return $_[0]->[Marpa::R3::Internal::Scanless::R::SLR_C];
@@ -1427,129 +1426,89 @@ sub Marpa::R3::Scanless::R::series_restart {
 
     my ($flat_args, $error_message) = Marpa::R3::flatten_hash_args(\@args);
     Marpa::R3::exception( sprintf $error_message, '$slr->series_restart()' ) if not $flat_args;
-    my ($g1_recce_args) = Marpa::R3::Internal::Scanless::R::set($slr, "series_restart", $flat_args );
-    Marpa::R3::Internal::Scanless::R::common_set( $slr, $g1_recce_args );
+    my ($g1_recce_args) = common_set_1($slr, "series_restart", $flat_args );
+    Marpa::R3::Internal::Scanless::R::common_set_2( $slr, $g1_recce_args );
     return 1;
 }
 
-sub Marpa::R3::Internal::Scanless::R::common_set {
-    my ( $slr, @arg_hashes ) = @_;
+sub Marpa::R3::Internal::Scanless::R::common_set_2 {
+    my ( $slr, $arg_hash ) = @_;
     my $recce_c = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
 
-    # This may get changed below
-    my $trace_fh =
-        $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
+    my $trace_fh = $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
 
-    for my $args (@arg_hashes) {
+    if ( defined( my $value = $arg_hash->{'max_parses'} ) ) {
+        $slr->[Marpa::R3::Internal::Scanless::R::MAX_PARSES] = $value;
+    }
 
-        my $ref_type = ref $args;
-        if ( not $ref_type or $ref_type ne 'HASH' ) {
-            Carp::croak(
-                'Marpa::R3 Recognizer expects args as ref to HASH, got ',
-                ( "ref to $ref_type" || 'non-reference' ),
-                ' instead'
-            );
-        } ## end if ( not $ref_type or $ref_type ne 'HASH' )
+    if ( defined( my $value = $arg_hash->{'semantics_package'} ) ) {
 
-        state $recognizer_options = {
-            map { ( $_, 1 ) }
-                qw(
-                end
-                max_parses
-                semantics_package
-                ranking_method
-                too_many_earley_items
-                trace_actions
-                trace_earley_sets
-                trace_values
-                )
-        };
-
-        if (my @bad_options =
-            grep { not exists $recognizer_options->{$_} }
-            keys %{$args}
-            )
-        {
-            Carp::croak( 'Unknown option(s) for Marpa::R3 Recognizer: ',
-                join q{ }, @bad_options );
-        } ## end if ( my @bad_options = grep { not exists $recognizer_options...})
-
-        if ( defined( my $value = $args->{'max_parses'} ) ) {
-            $slr->[Marpa::R3::Internal::Scanless::R::MAX_PARSES] = $value;
-        }
-
-        if ( defined( my $value = $args->{'semantics_package'} ) ) {
-
-            # Not allowed once parsing is started
-            if ( defined $slr->[Marpa::R3::Internal::Scanless::R::B_C] ) {
-                Marpa::R3::exception(
-                    q{Cannot change 'semantics_package' named argument once parsing has started}
-                );
-            }
-
-            $slr->[Marpa::R3::Internal::Scanless::R::RESOLVE_PACKAGE_SOURCE]
-                //= 'semantics_package';
-            if ( $slr
-                ->[Marpa::R3::Internal::Scanless::R::RESOLVE_PACKAGE_SOURCE] ne
-                'semantics_package' )
-            {
-                Marpa::R3::exception(
-                    qq{'semantics_package' named argument in conflict with other choices\n},
-                    qq{   Usually this means you tried to use the discouraged 'action_object' named argument as well\n}
-                );
-            } ## end if ( $recce->[...])
-            $slr->[Marpa::R3::Internal::Scanless::R::RESOLVE_PACKAGE] =
-                $value;
-        } ## end if ( defined( my $value = $args->{'semantics_package'...}))
-
-        if ( defined( my $value = $args->{'ranking_method'} ) ) {
-
-            # Not allowed once parsing is started
-            if ( defined $slr->[Marpa::R3::Internal::Scanless::R::B_C] ) {
-                Marpa::R3::exception(
-                    q{Cannot change ranking method once parsing has started});
-            }
-            state $ranking_methods = { map { ($_, 0) } qw(high_rule_only rule none) };
+        # Not allowed once parsing is started
+        if ( defined $slr->[Marpa::R3::Internal::Scanless::R::B_C] ) {
             Marpa::R3::exception(
-                qq{ranking_method value is $value (should be one of },
-                ( join q{, }, map { q{'} . $_ . q{'} } keys %{$ranking_methods} ),
-                ')' )
-                if not exists $ranking_methods->{$value};
-            $slr->[Marpa::R3::Internal::Scanless::R::RANKING_METHOD] =
-                $value;
-        } ## end if ( defined( my $value = $args->{'ranking_method'} ...))
-
-        if ( defined( my $value = $args->{'trace_actions'} ) ) {
-            $slr->[Marpa::R3::Internal::Scanless::R::TRACE_ACTIONS] = $value;
-            if ($value) {
-                say {$trace_fh} 'Setting trace_actions option'
-                    or Marpa::R3::exception("Cannot print: $ERRNO");
-            }
-        } ## end if ( defined( my $value = $args->{'trace_actions'} ))
-
-        if ( defined( my $value = $args->{'trace_values'} ) ) {
-            $slr->[Marpa::R3::Internal::Scanless::R::TRACE_VALUES] = $value;
-            if ($value) {
-                say {$trace_fh} 'Setting trace_values option'
-                    or Marpa::R3::exception("Cannot print: $ERRNO");
-            }
-        } ## end if ( defined( my $value = $args->{'trace_values'} ) )
-
-        if ( defined( my $value = $args->{'end'} ) ) {
-
-            # Not allowed once evaluation is started
-            if ( defined $slr->[Marpa::R3::Internal::Scanless::R::B_C] ) {
-                Marpa::R3::exception(
-                    q{Cannot reset end once evaluation has started});
-            }
-            $slr->[Marpa::R3::Internal::Scanless::R::END_OF_PARSE] = $value;
-        } ## end if ( defined( my $value = $args->{'end'} ) )
-
-        if ( defined( my $value = $args->{'too_many_earley_items'} ) ) {
-            $recce_c->earley_item_warning_threshold_set($value);
+q{Cannot change 'semantics_package' named argument once parsing has started}
+            );
         }
 
-    } ## end for my $args (@arg_hashes)
+        $slr->[Marpa::R3::Internal::Scanless::R::RESOLVE_PACKAGE_SOURCE] //=
+          'semantics_package';
+        if ( $slr->[Marpa::R3::Internal::Scanless::R::RESOLVE_PACKAGE_SOURCE] ne
+            'semantics_package' )
+        {
+            Marpa::R3::exception(
+qq{'semantics_package' named argument in conflict with other choices\n},
+qq{   Usually this means you tried to use the discouraged 'action_object' named argument as well\n}
+            );
+        } ## end if ( $recce->[...])
+        $slr->[Marpa::R3::Internal::Scanless::R::RESOLVE_PACKAGE] = $value;
+    } ## end if ( defined( my $value = $arg_hash->{'semantics_package'...}))
+
+    if ( defined( my $value = $arg_hash->{'ranking_method'} ) ) {
+
+        # Not allowed once parsing is started
+        if ( defined $slr->[Marpa::R3::Internal::Scanless::R::B_C] ) {
+            Marpa::R3::exception(
+                q{Cannot change ranking method once parsing has started});
+        }
+        state $ranking_methods =
+          { map { ( $_, 0 ) } qw(high_rule_only rule none) };
+        Marpa::R3::exception(
+            qq{ranking_method value is $value (should be one of },
+            ( join q{, }, map { q{'} . $_ . q{'} } keys %{$ranking_methods} ),
+            ')' )
+          if not exists $ranking_methods->{$value};
+        $slr->[Marpa::R3::Internal::Scanless::R::RANKING_METHOD] = $value;
+    } ## end if ( defined( my $value = $arg_hash->{'ranking_method'} ...))
+
+    if ( defined( my $value = $arg_hash->{'trace_actions'} ) ) {
+        $slr->[Marpa::R3::Internal::Scanless::R::TRACE_ACTIONS] = $value;
+        if ($value) {
+            say {$trace_fh} 'Setting trace_actions option'
+              or Marpa::R3::exception("Cannot print: $ERRNO");
+        }
+    } ## end if ( defined( my $value = $arg_hash->{'trace_actions'} ))
+
+    if ( defined( my $value = $arg_hash->{'trace_values'} ) ) {
+        $slr->[Marpa::R3::Internal::Scanless::R::TRACE_VALUES] = $value;
+        if ($value) {
+            say {$trace_fh} 'Setting trace_values option'
+              or Marpa::R3::exception("Cannot print: $ERRNO");
+        }
+    } ## end if ( defined( my $value = $arg_hash->{'trace_values'} ) )
+
+    if ( defined( my $value = $arg_hash->{'end'} ) ) {
+
+        # Not allowed once evaluation is started
+        if ( defined $slr->[Marpa::R3::Internal::Scanless::R::B_C] ) {
+            Marpa::R3::exception(
+                q{Cannot reset end once evaluation has started});
+        }
+        $slr->[Marpa::R3::Internal::Scanless::R::END_OF_PARSE] = $value;
+    } ## end if ( defined( my $value = $arg_hash->{'end'} ) )
+
+    if ( defined( my $value = $arg_hash->{'too_many_earley_items'} ) ) {
+        $recce_c->earley_item_warning_threshold_set($value);
+    }
 
     return 1;
 }
@@ -1562,8 +1521,15 @@ sub Marpa::R3::Internal::Scanless::R::common_set {
 # Since I am stabilizing Marpa::R3, the "fix" should
 # probably be to save the overhead, rather than
 # to allow 'ranking_method' to be changed.
+#
 # But for now I will do nothing.
 # JK -- Mon Nov 24 17:35:24 PST 2014
+#
+# In Marpa::R3, the ranking_method can only be set in
+# the recce constructor, so I should stop resetting the
+# ordering
+# JK -- Sun May  1 19:18:08 PDT 2016
+#
 sub Marpa::R3::Scanless::R::reset_evaluation {
     my ($slr) = @_;
     my $package_source =
