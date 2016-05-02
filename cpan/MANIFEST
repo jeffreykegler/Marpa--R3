@@ -331,6 +331,8 @@ t/sl_wall.t
 t/sl_zorro.t
 t/thin_deprec.t
 t/thin_eq.t
+t/too_many_g1_yims.t
+t/too_many_l0_yims.t
 xs/Makefile.PL
 xs/R3.xs
 xs/create_ops.pl

@@ -893,7 +893,7 @@ my $libmarpa_event_handlers = {
         my $trace_file_handle =
             $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
         say {$trace_file_handle}
-            qq{G1 exceeded earley item threshold at pos $position: $yim_count Earley items}
+            qq{L0 exceeded earley item threshold at pos $position: $yim_count Earley items}
             or Marpa::R3::exception("Could not say(): $ERRNO");
     },
 
@@ -903,7 +903,7 @@ my $libmarpa_event_handlers = {
         my $trace_file_handle =
             $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
         say {$trace_file_handle}
-            qq{L0 exceeded earley item threshold at pos $position: $yim_count Earley items}
+            qq{G1 exceeded earley item threshold at pos $position: $yim_count Earley items}
             or Marpa::R3::exception("Could not say(): $ERRNO");
     },
 

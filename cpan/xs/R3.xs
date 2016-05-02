@@ -932,6 +932,8 @@ u_convert_events (Scanless_R * slr)
              * The SLR's yim count field is used to prevent duplicate
              * YIM threshold events.  The event will be updated with the
              * high number before being reported.
+             *
+             * This code is not tested.
              */
               {
                 const int yim_count = (long) marpa_g_event_value (&marpa_event);
@@ -943,9 +945,10 @@ u_convert_events (Scanless_R * slr)
                     event->t_l0_yim_threshold_exceeded.t_perl_pos = slr->perl_pos;
                   }
                 slr->t_l0_yim_count = yim_count;
-                warn
-                  ("Marpa: lexer Earley item count (%ld) exceeds warning threshold",
-                   (long) marpa_g_event_value (&marpa_event));
+                /* warn
+                  * ("Marpa: lexer Earley item count (%ld) exceeds warning threshold",
+                  * (long) marpa_g_event_value (&marpa_event));
+                  */
               }
             break;
         default:
@@ -2217,9 +2220,10 @@ MARPA_SLREV_TYPE(slr_event) = MARPA_SLREV_SYMBOL_PREDICTED;
                   event->t_g1_yim_threshold_exceeded.t_perl_pos = slr->perl_pos;
                 }
               slr->t_g1_yim_count = yim_count;
-              warn
-                ("Marpa: Scanless G1 Earley item count (%ld) exceeds warning threshold",
-                 (long) marpa_g_event_value (&marpa_event));
+              /* warn
+                * ("Marpa: Scanless G1 Earley item count (%ld) exceeds warning threshold",
+                 * (long) marpa_g_event_value (&marpa_event));
+                 */
             }
             break;
         default:
