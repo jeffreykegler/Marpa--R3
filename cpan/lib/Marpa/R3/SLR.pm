@@ -332,28 +332,20 @@ sub Marpa::R3::Internal::Scanless::R::set {
     my ( $slr, $method, $flat_args ) = @_;
 
     # These NAIF recce args are allowed in all contexts
-    state $common_naif_recce_args = {
-        map { ( $_, 1 ); }
-            qw(end max_parses semantics_package too_many_earley_items
+    state $common_recce_args =
+        { map { ( $_, 1 ); } qw(trace_lexers trace_terminals trace_file_handle rejection exhaustion
+            end max_parses semantics_package too_many_earley_items
             trace_actions trace_values)
-    };
-    state $common_slif_recce_args =
-        { map { ( $_, 1 ); } qw(trace_lexers trace_terminals trace_file_handle rejection exhaustion) };
+        };
     state $set_method_args = {
-        map { ( $_, 1 ); } (
-            keys %{$common_slif_recce_args},
-            keys %{$common_naif_recce_args}
-        )
+        map { ( $_, 1 ); } keys %{$common_recce_args}
     };
     state $new_method_args = {
         map { ( $_, 1 ); } qw(grammar ranking_method event_is_active),
         keys %{$set_method_args}
     };
     state $series_restart_method_args = {
-        map { ( $_, 1 ); } (
-            keys %{$common_slif_recce_args},
-            keys %{$common_naif_recce_args}
-        )
+        map { ( $_, 1 ); } keys %{$common_recce_args}
     };
 
     my $ok_args = $set_method_args;
