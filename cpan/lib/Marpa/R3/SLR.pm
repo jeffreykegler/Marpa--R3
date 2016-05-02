@@ -291,7 +291,7 @@ sub Marpa::R3::Scanless::R::new {
         Marpa::R3::exception( 'Recognizer start of input failed: ', $error );
     }
 
-    $slr->naif_set($g1_recce_args);
+    Marpa::R3::Internal::Scanless::R::common_set($slr, $g1_recce_args);
 
     if ( $slr->[Marpa::R3::Internal::Scanless::R::TRACE_TERMINALS] > 1 ) {
         my $terminals_expected = $slr->terminals_expected();
@@ -314,9 +314,9 @@ sub Marpa::R3::Scanless::R::set {
     my ( $slr, @args ) = @_;
     my ($flat_args, $error_message) = Marpa::R3::flatten_hash_args(\@args);
     Marpa::R3::exception( sprintf $error_message, '$slr->set()' ) if not $flat_args;
-    my $naif_recce_args =
+    my $recce_args =
         Marpa::R3::Internal::Scanless::R::set( $slr, "set", $flat_args );
-    $slr->naif_set($naif_recce_args);
+    Marpa::R3::Internal::Scanless::R::common_set($slr, $recce_args);
     return $slr;
 } ## end sub Marpa::R3::Scanless::R::set
 
@@ -424,7 +424,7 @@ sub Marpa::R3::Internal::Scanless::R::set {
 
     # These NAIF recce args, when applicable, are simply copies of the the
     # SLIF args of the same name
-    state $copyable_naif_recce_args = {
+    state $copyable_recce_args = {
         map { ( $_, 1 ); }
             qw(end max_parses semantics_package too_many_earley_items ranking_method
             trace_actions trace_values)
@@ -433,7 +433,7 @@ sub Marpa::R3::Internal::Scanless::R::set {
     # Prune flat args of all those named args which are NOT to be copied
     # into the NAIF recce args
     my %g1_recce_args = ();
-    for my $arg_name ( grep { $copyable_naif_recce_args->{$_} }
+    for my $arg_name ( grep { $copyable_recce_args->{$_} }
         keys %{$flat_args} )
     {
         $g1_recce_args{$arg_name} = $flat_args->{$arg_name};
@@ -1436,11 +1436,11 @@ sub Marpa::R3::Scanless::R::series_restart {
     my ($flat_args, $error_message) = Marpa::R3::flatten_hash_args(\@args);
     Marpa::R3::exception( sprintf $error_message, '$slr->series_restart()' ) if not $flat_args;
     my ($g1_recce_args) = Marpa::R3::Internal::Scanless::R::set($slr, "series_restart", $flat_args );
-    $slr->naif_set( $g1_recce_args );
+    Marpa::R3::Internal::Scanless::R::common_set( $slr, $g1_recce_args );
     return 1;
 }
 
-sub Marpa::R3::Scanless::R::naif_set {
+sub Marpa::R3::Internal::Scanless::R::common_set {
     my ( $slr, @arg_hashes ) = @_;
     my $recce_c = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
 
