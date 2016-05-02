@@ -971,37 +971,6 @@ sub g1_naif_new {
     $tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID] = [];
     $tracer->[Marpa::R3::Internal::Trace::G::RULES] = [];
 
-    g1_naif_set($tracer, $slg, $flat_args);
-    $tracer->[Marpa::R3::Internal::Trace::G::START_NAME] = '[:start]';
-    $tracer->[Marpa::R3::Internal::Trace::G::NAME] = 'G1';
-
-    return;
-}
-
-sub l0_naif_new {
-    my ( $slg, $start_name, $symbols, $rules ) = @_;
-
-    my $tracer =
-        $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER] =
-        Marpa::R3::Trace::G->new();
-    $tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID] = [];
-    $tracer->[Marpa::R3::Internal::Trace::G::RULES] = [];
-    $tracer->[Marpa::R3::Internal::Trace::G::START_NAME] = '[:start_lex]';
-    $tracer->[Marpa::R3::Internal::Trace::G::NAME] = 'L0';
-
-    for my $symbol ( sort keys %{$symbols} ) {
-        my $properties = $symbols->{$symbol};
-        assign_symbol( $slg, $tracer, $symbol, $properties );
-    }
-
-    add_user_rules( $slg, $tracer, $rules );
-
-    return;
-}
-
-sub g1_naif_set {
-    my ( $tracer, $slg, $flat_args ) = @_;
-
     my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
 
     if ( defined( my $value = $flat_args->{'symbols'} ) ) {
@@ -1031,7 +1000,31 @@ sub g1_naif_set {
         );
     }
 
-    return 1;
+    $tracer->[Marpa::R3::Internal::Trace::G::START_NAME] = '[:start]';
+    $tracer->[Marpa::R3::Internal::Trace::G::NAME] = 'G1';
+
+    return;
+}
+
+sub l0_naif_new {
+    my ( $slg, $start_name, $symbols, $rules ) = @_;
+
+    my $tracer =
+        $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER] =
+        Marpa::R3::Trace::G->new();
+    $tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID] = [];
+    $tracer->[Marpa::R3::Internal::Trace::G::RULES] = [];
+    $tracer->[Marpa::R3::Internal::Trace::G::START_NAME] = '[:start_lex]';
+    $tracer->[Marpa::R3::Internal::Trace::G::NAME] = 'L0';
+
+    for my $symbol ( sort keys %{$symbols} ) {
+        my $properties = $symbols->{$symbol};
+        assign_symbol( $slg, $tracer, $symbol, $properties );
+    }
+
+    add_user_rules( $slg, $tracer, $rules );
+
+    return;
 }
 
 sub assign_symbol {
