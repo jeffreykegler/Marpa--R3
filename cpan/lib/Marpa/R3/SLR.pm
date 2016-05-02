@@ -182,7 +182,7 @@ sub Marpa::R3::Scanless::R::new {
     my $slr = [];
     bless $slr, $class;
 
-    # Set SLIF (not NAIF) recognizer args to default
+    # Set recognizer args to default
     $slr->[Marpa::R3::Internal::Scanless::R::EXHAUSTION_ACTION] = 'fatal';
     $slr->[Marpa::R3::Internal::Scanless::R::REJECTION_ACTION] = 'fatal';
     $slr->[Marpa::R3::Internal::Scanless::R::TRACE_LEXERS] = 0;
@@ -331,7 +331,7 @@ sub Marpa::R3::Internal::Scanless::R::set {
 
     my ( $slr, $method, $flat_args ) = @_;
 
-    # These NAIF recce args are allowed in all contexts
+    # These recce args are allowed in all contexts
     state $common_recce_args =
         { map { ( $_, 1 ); } qw(trace_lexers trace_terminals trace_file_handle rejection exhaustion
             end max_parses semantics_package too_many_earley_items
@@ -361,8 +361,6 @@ sub Marpa::R3::Internal::Scanless::R::set {
             @bad_args
         );
     } ## end if ( scalar @bad_args )
-
-    # Special SLIF (not NAIF) recce arg processing goes here
 
     if ( my $value = $flat_args->{'trace_file_handle'} ) {
         $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE] = $value;
@@ -406,7 +404,6 @@ sub Marpa::R3::Internal::Scanless::R::set {
 
     }
 
-    # Special SLIF (not NAIF) recce arg processing goes here
     if ( exists $flat_args->{'rejection'} ) {
 
         state $rejection_actions = { map { ( $_, 0 ) } qw(fatal event) };
@@ -422,8 +419,6 @@ sub Marpa::R3::Internal::Scanless::R::set {
 
     }
 
-    # These NAIF recce args, when applicable, are simply copies of the the
-    # SLIF args of the same name
     state $copyable_recce_args = {
         map { ( $_, 1 ); }
             qw(end max_parses semantics_package too_many_earley_items ranking_method
@@ -431,7 +426,6 @@ sub Marpa::R3::Internal::Scanless::R::set {
     };
 
     # Prune flat args of all those named args which are NOT to be copied
-    # into the NAIF recce args
     my %g1_recce_args = ();
     for my $arg_name ( grep { $copyable_recce_args->{$_} }
         keys %{$flat_args} )
@@ -1245,7 +1239,6 @@ $escape_by_ord[$_] //= sprintf( "\\x%02x", $_ ) for 0 .. 255;
 
 # This and the sister routine for "forward strings"
 # should replace the other string "escaping" subroutine
-# in the NAIF
 sub Marpa::R3::Internal::Scanless::reversed_input_escape {
     my ( $p_input, $base_pos, $length ) = @_;
     my @escaped_chars = ();
@@ -1427,7 +1420,6 @@ sub Marpa::R3::Scanless::R::rule_closure {
 sub Marpa::R3::Scanless::R::series_restart {
     my ( $slr , @args ) = @_;
 
-    # Reset SLIF (not NAIF) recognizer args to default
     $slr->[Marpa::R3::Internal::Scanless::R::EXHAUSTION_ACTION] = 'fatal';
     $slr->[Marpa::R3::Internal::Scanless::R::REJECTION_ACTION] = 'fatal';
 
@@ -1919,8 +1911,6 @@ sub Marpa::R3::Scanless::R::lexeme_priority_set {
       if not defined $lexeme_id;
     return $thin_slr->lexeme_priority_set( $lexeme_id, $new_priority );
 }
-
-# Need to port show_and_nodes(), show_or_nodes() NAIF recognizer methods
 
 # Internal methods, not to be documented
 
