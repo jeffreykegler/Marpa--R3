@@ -473,10 +473,21 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
         }
     } sort keys %is_lexeme_in_this_lexer;
 
-    # Create the thick lex grammar
-    l0_naif_new( $slg, $lex_start_symbol_name,
-        \%this_lexer_symbols, $lexer_rules );
-    my $lex_tracer = $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER];
+    my $lex_tracer =
+        $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER] =
+        Marpa::R3::Trace::G->new();
+    $lex_tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID] = [];
+    $lex_tracer->[Marpa::R3::Internal::Trace::G::RULES] = [];
+    $lex_tracer->[Marpa::R3::Internal::Trace::G::START_NAME] = $lex_start_symbol_name;
+    $lex_tracer->[Marpa::R3::Internal::Trace::G::NAME] = 'L0';
+
+    for my $symbol ( sort keys %this_lexer_symbols ) {
+        my $properties = $this_lexer_symbols{$symbol};
+        assign_symbol( $slg, $lex_tracer, $symbol, $properties );
+    }
+
+    add_user_rules( $slg, $lex_tracer, $lexer_rules );
+
     my $lex_thin   = $lex_tracer->grammar();
 
     my $lex_discard_symbol_id =
@@ -980,30 +991,8 @@ qq{Internal error: Start symbol $start_name missing from grammar\n}
 } ## end sub set_start_symbol
 
 
-sub g1_naif_new {
-    my ( $slg, $flat_args ) = @_;
-
-
-    return;
-}
-
 sub l0_naif_new {
     my ( $slg, $start_name, $symbols, $rules ) = @_;
-
-    my $tracer =
-        $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER] =
-        Marpa::R3::Trace::G->new();
-    $tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID] = [];
-    $tracer->[Marpa::R3::Internal::Trace::G::RULES] = [];
-    $tracer->[Marpa::R3::Internal::Trace::G::START_NAME] = '[:start_lex]';
-    $tracer->[Marpa::R3::Internal::Trace::G::NAME] = 'L0';
-
-    for my $symbol ( sort keys %{$symbols} ) {
-        my $properties = $symbols->{$symbol};
-        assign_symbol( $slg, $tracer, $symbol, $properties );
-    }
-
-    add_user_rules( $slg, $tracer, $rules );
 
     return;
 }
