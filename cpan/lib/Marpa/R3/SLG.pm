@@ -222,11 +222,7 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     my $if_inaccessible_default =
       $slg->[Marpa::R3::Internal::Scanless::G::IF_INACCESSIBLE];
 
-    # Prepare the arguments for the G1 grammar
-    $g1_args->{rules}   = $hashed_source->{rules}->{G1};
-    $g1_args->{symbols} = $hashed_source->{symbols}->{G1};
-    state $g1_target_symbol = '[:start]';
-    $g1_args->{start} = $g1_target_symbol;
+    # Create the the G1 grammar
 
     if ( defined( my $value = $g1_args->{'bless_package'} ) ) {
         $slg->[Marpa::R3::Internal::Scanless::G::BLESS_PACKAGE] = $value;
@@ -238,8 +234,30 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
         delete $g1_args->{'warnings'};
     }
 
-    g1_naif_new($slg, $g1_args);
-    my $g1_tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
+    my $g1_tracer =
+        $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER] =
+        Marpa::R3::Trace::G->new();
+    $g1_tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID] = [];
+    $g1_tracer->[Marpa::R3::Internal::Trace::G::RULES] = [];
+    $g1_tracer->[Marpa::R3::Internal::Trace::G::START_NAME] = '[:start]';
+    $g1_tracer->[Marpa::R3::Internal::Trace::G::NAME] = 'G1';
+
+    for my $symbol ( sort keys %{ $hashed_source->{symbols}->{G1} } ) {
+        assign_symbol( $slg, $g1_tracer, $symbol,
+            $hashed_source->{symbols}->{G1}->{$symbol} );
+    }
+
+    add_user_rules( $slg, $g1_tracer, $hashed_source->{rules}->{G1} );
+
+    my @bad_arguments = keys %{$g1_args};
+    if (scalar @bad_arguments) {
+        Marpa::R3::exception(
+            q{Internal error: Bad named argument(s) to $naif_grammar->set() method}
+                . join q{ },
+            @bad_arguments
+        );
+    }
+
     my $g1_thin          = $g1_tracer->grammar();
 
     my $symbol_ids_by_event_name_and_type = {};
@@ -965,43 +983,6 @@ qq{Internal error: Start symbol $start_name missing from grammar\n}
 sub g1_naif_new {
     my ( $slg, $flat_args ) = @_;
 
-    my $tracer =
-        $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER] =
-        Marpa::R3::Trace::G->new();
-    $tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID] = [];
-    $tracer->[Marpa::R3::Internal::Trace::G::RULES] = [];
-
-    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
-
-    if ( defined( my $value = $flat_args->{'symbols'} ) ) {
-        for my $symbol ( sort keys %{$value} ) {
-            my $properties = $value->{$symbol};
-            assign_symbol( $slg, $tracer, $symbol, $properties );
-        }
-        delete $flat_args->{'symbols'};
-    } ## end if ( defined( my $value = $flat_args->{'symbols'} ) )
-
-    if ( defined( my $value = $flat_args->{'start'} ) ) {
-        # TODO delete this
-        delete $flat_args->{'start'};
-    } ## end if ( defined( my $value = $flat_args->{'start'} ) )
-
-    if ( defined( my $value = $flat_args->{'rules'} ) ) {
-        add_user_rules( $slg, $tracer, $value );
-        delete $flat_args->{'rules'};
-    } ## end if ( defined( my $value = $flat_args->{'rules'} ) )
-
-    my @bad_arguments = keys %{$flat_args};
-    if (scalar @bad_arguments) {
-        Marpa::R3::exception(
-            q{Internal error: Bad named argument(s) to $naif_grammar->set() method}
-                . join q{ },
-            @bad_arguments
-        );
-    }
-
-    $tracer->[Marpa::R3::Internal::Trace::G::START_NAME] = '[:start]';
-    $tracer->[Marpa::R3::Internal::Trace::G::NAME] = 'G1';
 
     return;
 }
