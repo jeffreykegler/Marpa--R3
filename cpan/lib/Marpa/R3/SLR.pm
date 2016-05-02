@@ -187,6 +187,9 @@ sub Marpa::R3::Scanless::R::new {
     $slr->[Marpa::R3::Internal::Scanless::R::REJECTION_ACTION] = 'fatal';
     $slr->[Marpa::R3::Internal::Scanless::R::TRACE_LEXERS] = 0;
     $slr->[Marpa::R3::Internal::Scanless::R::TRACE_TERMINALS] = 0;
+    $slr->[Marpa::R3::Internal::Scanless::R::RANKING_METHOD] = 'none';
+    $slr->[Marpa::R3::Internal::Scanless::R::MAX_PARSES]     = 0;
+    $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] = [];
 
     my ($flat_args, $error_message) = Marpa::R3::flatten_hash_args(\@args);
     Marpa::R3::exception( sprintf $error_message, '$slr->new' ) if not $flat_args;
@@ -227,9 +230,6 @@ sub Marpa::R3::Scanless::R::new {
 
     $recce_c->ruby_slippers_set(1);
 
-    $slr->[Marpa::R3::Internal::Scanless::R::RANKING_METHOD] = 'none';
-    $slr->[Marpa::R3::Internal::Scanless::R::MAX_PARSES]     = 0;
-
     $slr->reset_evaluation();
 
     my $thin_slr = Marpa::R3::Thin::SLR->new(
@@ -239,7 +239,6 @@ sub Marpa::R3::Scanless::R::new {
     $thin_slr->earley_item_warning_threshold_set($too_many_earley_items)
         if defined $too_many_earley_items;
     $slr->[Marpa::R3::Internal::Scanless::R::SLR_C]      = $thin_slr;
-    $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] = [];
 
     my $symbol_ids_by_event_name_and_type =
         $slg->[
@@ -416,9 +415,23 @@ sub common_set_1 {
 
     }
 
+    if ( exists $flat_args->{'ranking_method'} ) {
+
+        # Only allowed in new method
+        state $ranking_methods =
+          { map { ( $_, 0 ) } qw(high_rule_only rule none) };
+        my $value = $flat_args->{'ranking_method'} // 'undefined';
+        Marpa::R3::exception(
+            qq{ranking_method value is $value (should be one of },
+            ( join q{, }, map { q{'} . $_ . q{'} } keys %{$ranking_methods} ),
+            ')' )
+          if not exists $ranking_methods->{$value};
+        $slr->[Marpa::R3::Internal::Scanless::R::RANKING_METHOD] = $value;
+    } ## end if ( defined( my $value = $arg_hash->{'ranking_method'} ...))
+
     state $copyable_recce_args = {
         map { ( $_, 1 ); }
-          qw(end max_parses semantics_package too_many_earley_items ranking_method
+          qw(end max_parses semantics_package too_many_earley_items
           trace_actions trace_values)
     };
 
@@ -1462,23 +1475,6 @@ qq{   Usually this means you tried to use the discouraged 'action_object' named 
         } ## end if ( $recce->[...])
         $slr->[Marpa::R3::Internal::Scanless::R::RESOLVE_PACKAGE] = $value;
     } ## end if ( defined( my $value = $arg_hash->{'semantics_package'...}))
-
-    if ( defined( my $value = $arg_hash->{'ranking_method'} ) ) {
-
-        # Not allowed once parsing is started
-        if ( defined $slr->[Marpa::R3::Internal::Scanless::R::B_C] ) {
-            Marpa::R3::exception(
-                q{Cannot change ranking method once parsing has started});
-        }
-        state $ranking_methods =
-          { map { ( $_, 0 ) } qw(high_rule_only rule none) };
-        Marpa::R3::exception(
-            qq{ranking_method value is $value (should be one of },
-            ( join q{, }, map { q{'} . $_ . q{'} } keys %{$ranking_methods} ),
-            ')' )
-          if not exists $ranking_methods->{$value};
-        $slr->[Marpa::R3::Internal::Scanless::R::RANKING_METHOD] = $value;
-    } ## end if ( defined( my $value = $arg_hash->{'ranking_method'} ...))
 
     if ( defined( my $value = $arg_hash->{'trace_actions'} ) ) {
         $slr->[Marpa::R3::Internal::Scanless::R::TRACE_ACTIONS] = $value;
