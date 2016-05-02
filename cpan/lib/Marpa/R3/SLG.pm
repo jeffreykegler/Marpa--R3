@@ -252,7 +252,7 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     my @bad_arguments = keys %{$g1_args};
     if (scalar @bad_arguments) {
         Marpa::R3::exception(
-            q{Internal error: Bad named argument(s) to $naif_grammar->set() method}
+            q{Internal error: Bad named argument(s) to hash_to_runtime() method}
                 . join q{ },
             @bad_arguments
         );
@@ -990,12 +990,6 @@ qq{Internal error: Start symbol $start_name missing from grammar\n}
     return 1;
 } ## end sub set_start_symbol
 
-
-sub l0_naif_new {
-    my ( $slg, $start_name, $symbols, $rules ) = @_;
-
-    return;
-}
 
 sub assign_symbol {
     # $slg will be needed for the XSY's
