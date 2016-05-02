@@ -17,9 +17,11 @@ useful, but it is provided “as is” and without any express
 or implied warranties. For details, see the full text of
 of the licenses in the directory LICENSES.
 
-Files with different licenses or copyright holders: Certain files and
-directories in this hierarchy have different licensing and/or copyright
-holders, as noted in those individual files and directories.
+### Files with different licenses or copyright holders
+
+Certain files and directories in this hierarchy have different licensing
+and/or copyright holders, as noted in those individual files and
+directories.
 
 ## Contributing to Marpa::R3
 
@@ -34,8 +36,8 @@ By submitting code to this repository, you are considered to have
 signed off on the Developer's Certificate of Origin, which is given
 below.
 
-All code contributed must be compatible with license of Perl version
-5.10.1, which is the license covering the Marpa::R3 distribution as
+All code contributed must be compatible with the license as described
+above, which is the license covering the Marpa::R3 distribution as
 a whole.
 
 Copyright assignments are not required (or requested). All code
@@ -49,11 +51,11 @@ It is imperative that all contributed code be legitimately free
 software.  For that reason, code from anonymous (or pseudonymous)
 contributors will not be accepted.  By contributing code to this
 repository, all contributors "sign off" on that code, agreeing that
-the code can be distributed under the Perl license.  Code which has not
-been licensed as free software by its owner, or which risks creating
-copyright-related problems (such as code which derives from
-reverse-engineering efforts lacking proper safeguards) cannot be
-contributed.
+the code can be distributed under the license as described above.
+Code which has not been licensed as free software by its owner, or
+which risks creating copyright-related problems (such as code which
+derives from reverse-engineering efforts lacking proper safeguards)
+cannot be contributed.
 
 Developer's Certificate of Origin
 ---------------------------------
