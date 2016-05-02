@@ -110,10 +110,6 @@ require Marpa::R3::Internal;
 ( $version_result = version_ok($Marpa::R3::Internal::VERSION) )
     and die 'Marpa::R3::Internal::VERSION ', $version_result;
 
-require Marpa::R3::Grammar;
-( $version_result = version_ok($Marpa::R3::Grammar::VERSION) )
-    and die 'Marpa::R3::Grammar::VERSION ', $version_result;
-
 require Marpa::R3::Common;
 ( $version_result = version_ok($Marpa::R3::Common::VERSION) )
     and die 'Marpa::R3::Common::VERSION ', $version_result;
