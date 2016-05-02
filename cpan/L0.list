@@ -1,8 +1,0 @@
-rule_expand($rule_id, 'L0');
-rule_ids('L0');
-rule_show($rule_id, 'L0');
-symbol_display_form( $symbol_id, 'L0' );
-symbol_ids('L0');
-symbol_name( $symbol_id, 'L0' );
-show_rules(3, 'L0');
-show_symbols(3, 'L0');
