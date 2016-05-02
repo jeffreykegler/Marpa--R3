@@ -106,11 +106,15 @@ union marpa_slr_event_s;
 #define MARPA_SLREV_DELETED 22
 #define MARPA_SLRTR_LEXEME_ACCEPTABLE 23
 #define MARPA_SLRTR_LEXEME_OUTPRIORITIZED 24
+
 /* This one is strange -- only invoked at position 0.
  * Compare MARPA_SLRTR_LEXEME_ACCEPTABLE
  * Do I need MARPA_SLRTR_LEXEME_EXPECTED?
  */
 #define MARPA_SLRTR_LEXEME_EXPECTED 26
+
+#define MARPA_SLRTR_L0_YIM_THRESHOLD_EXCEEDED 27
+#define MARPA_SLRTR_G1_YIM_THRESHOLD_EXCEEDED 28
 
 #define MARPA_SLREV_TYPE(event) ((event)->t_header.t_event_type)
 
@@ -293,6 +297,18 @@ union marpa_slr_event_s
     Marpa_Symbol_ID t_lexeme;
     Marpa_Assertion_ID t_assertion;
   } t_trace_lexeme_expected;
+  struct
+  {
+    int event_type;
+    int t_perl_pos;
+    int yim_count;
+  } t_l0_yim_threshold_exceeded;
+  struct
+  {
+    int event_type;
+    int t_perl_pos;
+    int yim_count;
+  } t_g1_yim_threshold_exceeded;
 
 };
 

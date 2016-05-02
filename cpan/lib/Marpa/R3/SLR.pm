@@ -217,10 +217,6 @@ sub Marpa::R3::Scanless::R::new {
 
     $slr->reset_evaluation();
 
-    my $g1_recce_args =
-        common_set_1( $slr, "new",  $flat_args );
-    my $too_many_earley_items = $g1_recce_args->{too_many_earley_items};
-
     my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
 
     my $recce_c =
@@ -230,14 +226,15 @@ sub Marpa::R3::Scanless::R::new {
         Marpa::R3::exception( $grammar_c->error() );
     }
 
+    my $g1_recce_args =
+        common_set_1( $slr, "new",  $flat_args );
+
     $recce_c->ruby_slippers_set(1);
 
     my $thin_slr = Marpa::R3::Thin::SLR->new(
         $slg->[Marpa::R3::Internal::Scanless::G::C],
         $slr->[Marpa::R3::Internal::Scanless::R::R_C]
     );
-    $thin_slr->earley_item_warning_threshold_set($too_many_earley_items)
-        if defined $too_many_earley_items;
     $slr->[Marpa::R3::Internal::Scanless::R::SLR_C]      = $thin_slr;
 
     my $symbol_ids_by_event_name_and_type =
@@ -329,6 +326,8 @@ sub Marpa::R3::Scanless::R::set {
 sub common_set_1 {
 
     my ( $slr, $method, $flat_args ) = @_;
+
+    my $recce_c = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
 
     # These recce args are allowed in all contexts
     state $common_recce_args = {
@@ -472,9 +471,13 @@ qq{   Usually this means you tried to use the discouraged 'action_object' named 
         }
     } ## end if ( defined( my $value = $flat_args->{'trace_values'} ) )
 
+    if ( defined( my $value = $flat_args->{'too_many_earley_items'} ) ) {
+        $recce_c->earley_item_warning_threshold_set($value);
+    }
+
     state $copyable_recce_args = {
         map { ( $_, 1 ); }
-          qw(end too_many_earley_items)
+          qw(end)
     };
 
     # Prune flat args of all those named args which are NOT to be copied
@@ -1501,10 +1504,6 @@ sub Marpa::R3::Internal::Scanless::R::common_set_2 {
         }
         $slr->[Marpa::R3::Internal::Scanless::R::END_OF_PARSE] = $value;
     } ## end if ( defined( my $value = $arg_hash->{'end'} ) )
-
-    if ( defined( my $value = $arg_hash->{'too_many_earley_items'} ) ) {
-        $recce_c->earley_item_warning_threshold_set($value);
-    }
 
     return 1;
 }
