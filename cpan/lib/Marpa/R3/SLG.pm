@@ -965,10 +965,9 @@ qq{Internal error: Start symbol $start_name missing from grammar\n}
 sub g1_naif_new {
     my ( $slg, $flat_args ) = @_;
 
-    my $grammar_c = Marpa::R3::Thin::G->new( { if => 1 } );
     my $tracer =
         $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER] =
-        Marpa::R3::Trace::G->new($grammar_c);
+        Marpa::R3::Trace::G->new();
     $tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID] = [];
     $tracer->[Marpa::R3::Internal::Trace::G::RULES] = [];
 
@@ -982,10 +981,9 @@ sub g1_naif_new {
 sub l0_naif_new {
     my ( $slg, $start_name, $symbols, $rules ) = @_;
 
-    my $grammar_c = Marpa::R3::Thin::G->new( { if => 1 } );
     my $tracer =
         $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER] =
-        Marpa::R3::Trace::G->new($grammar_c);
+        Marpa::R3::Trace::G->new();
     $tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID] = [];
     $tracer->[Marpa::R3::Internal::Trace::G::RULES] = [];
     $tracer->[Marpa::R3::Internal::Trace::G::START_NAME] = '[:start_lex]';

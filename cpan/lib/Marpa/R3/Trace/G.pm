@@ -25,8 +25,9 @@ $STRING_VERSION = $VERSION;
 $VERSION        = eval $VERSION;
 
 sub new {
-    my ( $class, $grammar_c ) = @_;
+    my ( $class ) = @_;
     my $self = bless [], $class;
+    my $grammar_c = Marpa::R3::Thin::G->new( { if => 1 } );
     $self->[Marpa::R3::Internal::Trace::G::C] = $grammar_c;
     $self->[Marpa::R3::Internal::Trace::G::ISYID_BY_NAME] = {};
     $self->[Marpa::R3::Internal::Trace::G::NAME_BY_ISYID] = [];
