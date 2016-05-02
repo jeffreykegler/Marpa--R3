@@ -1,0 +1,5 @@
+This is the R3 version of the Marpa module.
+Installation is discussed in the INSTALL document.
+Licensing is discussed in the LICENSE document.
+
+Marpa::R3 is alpha and experimental.  Please do not use it in production.
