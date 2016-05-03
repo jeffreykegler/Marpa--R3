@@ -70,11 +70,11 @@ sub Marpa::R3::Internal::Scanless::R::resolve_action {
 
     if ( not $fully_qualified_name ) {
         my $resolve_package =
-            $slr->[Marpa::R3::Internal::Scanless::R::RESOLVE_PACKAGE];
+            $slr->[Marpa::R3::Internal::Scanless::R::SEMANTICS_PACKAGE];
         if ( not defined $resolve_package ) {
             ${$p_error} = Marpa::R3::Internal::X->new(
                 {   message =>
-                        qq{Could not fully qualify "$closure_name": no resolve package},
+                        qq{Could not fully qualify "$closure_name": no semantics package},
                     name => 'NO RESOLVE PACKAGE'
                 }
             );
@@ -494,20 +494,6 @@ sub resolve_recce {
         $slr->[Marpa::R3::Internal::Scanless::R::TRACE_ACTIONS] // 0;
     my $trace_file_handle =
         $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
-
-    my $package_source =
-        $slr->[Marpa::R3::Internal::Scanless::R::RESOLVE_PACKAGE_SOURCE];
-    if (    not defined $package_source
-        and defined $per_parse_arg
-        and ( my $arg_blessing = Scalar::Util::blessed $per_parse_arg) )
-    {
-        $slr->[Marpa::R3::Internal::Scanless::R::RESOLVE_PACKAGE] =
-            $arg_blessing;
-        $package_source = 'arg';
-    } ## end if ( not defined $package_source and defined $per_parse_arg...)
-    $package_source //= 'semantics_package';
-    $slr->[Marpa::R3::Internal::Scanless::R::RESOLVE_PACKAGE_SOURCE] =
-        $package_source;
 
     my $resolve_error;
 
@@ -1323,64 +1309,6 @@ sub Marpa::R3::Scanless::R::value {
 
     if ($tree) {
 
-        # On second and later calls to value() in a parse series, we need
-        # to check the per-parse arg
-        CHECK_ARG: {
-            my $package_source = $slr
-                ->[Marpa::R3::Internal::Scanless::R::RESOLVE_PACKAGE_SOURCE];
-            last CHECK_ARG
-                if $package_source eq 'semantics_package';    # Anything is OK
-
-            # If here the resolve package source is 'arg'
-            if ( not defined $per_parse_arg ) {
-                Marpa::R3::exception(
-                    "No value() arg, when one is required to resolve semantics.\n",
-                    "  Once value() has been called with a argument whose blessing is used to\n",
-                    "  find the parse's semantics closures, it must always be called with an arg\n",
-                    "  that is blessed in the same package\n",
-                    q{  In this case, the package was "},
-                    $slr
-                        ->[Marpa::R3::Internal::Scanless::R::RESOLVE_PACKAGE],
-                    qq{"\n"}
-                );
-            } ## end if ( not defined $per_parse_arg )
-
-            my $arg_blessing = Scalar::Util::blessed $per_parse_arg;
-            if ( not defined $arg_blessing ) {
-                Marpa::R3::exception(
-                    "value() arg is not blessed when required for the semantics.\n",
-                    "  Once value() has been called with a argument whose blessing is used to\n",
-                    "  find the parse's semantics closures, it must always be called with an arg\n",
-                    "  that is blessed in the same package\n",
-                    q{  In this case, the original package was "},
-                    $slr
-                        ->[Marpa::R3::Internal::Scanless::R::RESOLVE_PACKAGE],
-                    qq{"\n"},
-                    qq{  and the blessing in this call was "$arg_blessing"\n}
-                );
-            } ## end if ( not defined $arg_blessing )
-
-            my $required_blessing =
-                $slr->[Marpa::R3::Internal::Scanless::R::RESOLVE_PACKAGE];
-            if ( $arg_blessing ne $required_blessing ) {
-                Marpa::R3::exception(
-                    "value() arg is blessed into the wrong package.\n",
-                    "  Once value() has been called with a argument whose blessing is used to\n",
-                    "  find the parse's semantics closures, it must always be called with an arg\n",
-                    "  that is blessed in the same package\n",
-                    qq{  In this case, the original package was "$required_blessing" and \n},
-                    qq{  and the blessing in this call was "$arg_blessing"\n}
-                );
-            } ## end if ( $arg_blessing ne $required_blessing )
-
-        } ## end CHECK_ARG:
-
-        # If we have a bocage, we are initialized
-        if ( not $tree ) {
-
-            # No tree means we are in ASF mode
-            Marpa::R3::exception('value() called for recognizer in ASF mode');
-        }
         my $max_parses =
             $slr->[Marpa::R3::Internal::Scanless::R::MAX_PARSES];
         my $parse_count = $tree->parse_count();

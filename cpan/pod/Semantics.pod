@@ -680,22 +680,7 @@ To resolve Perl identifiers to Perl names,
 a semantics package must be defined.
 The semantics package can be defined using the
 L<SLIF recognizer's C<semantics_package> named
-argument|Marpa::R3::Scanless::R/"semantics_package">,
-or it can be taken from the argument to the first C<value()>
-call of the parse series.
-(All of a recognizer's C<value()> method calls
-refer to a single parse series unless
-the recognizer calls
-the
-L<C<series_restart()> method|Marpa::R3::Scanless::R/"series_restart()">.)
-The C<semantics_package> named argument takes precedence.
-
-If the arguments to the C<value()> method are used to specify
-the semantics package, within a parse series they must consistently
-specify the same package.
-For details, see the description of
-L<SLIF recognizer's C<value()>
-method|Marpa::R3::Scanless::R/"value()">.
+argument|Marpa::R3::Scanless::R/"semantics_package">.
 
 If the user wants the Perl variables implementing the semantics
 in the C<main> namespace,

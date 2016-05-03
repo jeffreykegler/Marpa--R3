@@ -306,7 +306,7 @@ partial: 1
 normalize-whitespace: 1
 
     :start ::= <number sequence>
-    <number sequence> ::= <number>+ action => add_sequence
+    <number sequence> ::= <number>+ action => My_Actions::add_sequence
     number ~ digit+
     digit ~ [0-9]
     :discard ~ whitespace

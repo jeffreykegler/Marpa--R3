@@ -329,16 +329,17 @@ sub common_set_1 {
     state $common_recce_args = {
         map { ( $_, 1 ); }
           qw(trace_lexers trace_terminals trace_file_handle rejection exhaustion
-          end max_parses semantics_package too_many_earley_items
+          end max_parses too_many_earley_items
           trace_actions trace_values)
     };
     state $set_method_args = { map { ( $_, 1 ); } keys %{$common_recce_args} };
     state $new_method_args = {
-        map { ( $_, 1 ); } qw(grammar ranking_method event_is_active),
+        map { ( $_, 1 ); }
+          qw(grammar semantics_package ranking_method event_is_active),
         keys %{$set_method_args}
     };
     state $series_restart_method_args =
-      { map { ( $_, 1 ); } keys %{$common_recce_args} };
+      { map { ( $_, 1 ); } qw(semantics_package), keys %{$common_recce_args} };
 
     my $ok_args = $set_method_args;
     $ok_args = $new_method_args            if $method eq 'new';
@@ -430,25 +431,7 @@ sub common_set_1 {
     }
 
     if ( defined( my $value = $flat_args->{'semantics_package'} ) ) {
-
-        # Not allowed once parsing is started
-        if ( defined $slr->[Marpa::R3::Internal::Scanless::R::B_C] ) {
-            Marpa::R3::exception(
-q{Cannot change 'semantics_package' named argument once parsing has started}
-            );
-        }
-
-        $slr->[Marpa::R3::Internal::Scanless::R::RESOLVE_PACKAGE_SOURCE] //=
-          'semantics_package';
-        if ( $slr->[Marpa::R3::Internal::Scanless::R::RESOLVE_PACKAGE_SOURCE] ne
-            'semantics_package' )
-        {
-            Marpa::R3::exception(
-qq{'semantics_package' named argument in conflict with other choices\n},
-qq{   Usually this means you tried to use the discouraged 'action_object' named argument as well\n}
-            );
-        } ## end if ( $recce->[...])
-        $slr->[Marpa::R3::Internal::Scanless::R::RESOLVE_PACKAGE] = $value;
+        $slr->[Marpa::R3::Internal::Scanless::R::SEMANTICS_PACKAGE] = $value;
     } ## end if ( defined( my $value = $flat_args->{'semantics_package'...}))
 
     if ( defined( my $value = $flat_args->{'trace_actions'} ) ) {
@@ -1543,17 +1526,11 @@ sub Marpa::R3::Internal::Scanless::R::common_set_2 {
 #
 sub Marpa::R3::Scanless::R::reset_evaluation {
     my ($slr) = @_;
-    my $package_source =
-        $slr->[Marpa::R3::Internal::Scanless::R::RESOLVE_PACKAGE_SOURCE];
-    if ( defined $package_source ) {
-        $slr->[Marpa::R3::Internal::Scanless::R::RESOLVE_PACKAGE_SOURCE] =
-            undef;
-    } ## end if ( defined $package_source and $package_source ne ...)
     $slr->[Marpa::R3::Internal::Scanless::R::NO_PARSE]              = undef;
     $slr->[Marpa::R3::Internal::Scanless::R::B_C]                   = undef;
     $slr->[Marpa::R3::Internal::Scanless::R::O_C]                   = undef;
     $slr->[Marpa::R3::Internal::Scanless::R::T_C]                   = undef;
-    $slr->[Marpa::R3::Internal::Scanless::R::RESOLVE_PACKAGE]       = undef;
+    $slr->[Marpa::R3::Internal::Scanless::R::SEMANTICS_PACKAGE]       = undef;
     $slr->[Marpa::R3::Internal::Scanless::R::NULL_VALUES]           = undef;
 
     $slr->[Marpa::R3::Internal::Scanless::R::REGISTRATIONS]         = undef;

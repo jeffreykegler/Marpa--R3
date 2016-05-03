@@ -510,7 +510,7 @@ experts.
 =head2 l0_show_symbols()
 
 =for Marpa::R3::Display
-name: SLIF l0_show_symbols() synopsis
+name: SLIF show_symbols() synopsis
 partial: 1
 normalize-whitespace: 1
 

@@ -161,10 +161,9 @@ use constant NO_PARSE => 19;
 use constant NULL_VALUES => 20;
 use constant TREE_MODE => 21;
 use constant END_OF_PARSE => 22;
-use constant RESOLVE_PACKAGE => 23;
-use constant RESOLVE_PACKAGE_SOURCE => 24;
-use constant REGISTRATIONS => 25;
-use constant CLOSURE_BY_SYMBOL_ID => 26;
-use constant CLOSURE_BY_RULE_ID => 27;
+use constant SEMANTICS_PACKAGE => 23;
+use constant REGISTRATIONS => 24;
+use constant CLOSURE_BY_SYMBOL_ID => 25;
+use constant CLOSURE_BY_RULE_ID => 26;
 
 1;

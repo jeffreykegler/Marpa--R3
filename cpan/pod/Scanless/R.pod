@@ -797,9 +797,6 @@ L<section on rejection parse events|Marpa::R3::Event/"Rejection events">.
 =head2 semantics_package
 
 Sets the semantic package for the recognizer.
-This setting takes precedence
-over any package implied by the blessing of the per-parse arguments to
-the SLIF recognizer's C<value()> method.
 The C<semantics_package> recognizer setting
 is used when resolving action names to
 fully qualified Perl names.
@@ -812,6 +809,7 @@ when a new parse series is begun.
 That is, it is only allowed in calls
 of the L<C<new()>|/"Constructor">
 and L<C<series_restart()>|"series_restart()"> methods.
+
 The C<semantics_package> recognizer setting
 should not be confused with the
 L<SLIF's
@@ -1110,45 +1108,6 @@ is useful for sharing it within
 the tree.
 Symbol tables are one example of the kind of data which parses often
 require, but which it is not convenient to accumulate bottom-up.
-
-If the L<C<semantics_package>|/"semantics_package">
-setting of the SLIF
-recognizer was not specified,
-Marpa will use the package into which the per-parse argument was blessed
-as the semantics package.
-(As a reminder, the semantics package is the package
-in which Marpa looks for the parse's Perl semantic closures.)
-
-When the per-parse argument of the C<value()> method is the
-source of the semantics package,
-all calls to the C<value()> method in the same
-parse series must have a per-parse
-argument that
-specifies the same semantics package.
-More precisely,
-if the per-parse argument of the first
-call of the C<value()> method
-in a parse series
-is
-the source of the semantics package,
-it will be a fatal error if any subsequent
-C<value()> call in that parse series
-
-=over 4
-
-=item *
-
-does not have a per-parse argument;
-
-=item *
-
-if that per-parse argument is not blessed; or
-
-=item *
-
-if that per-parse argument is blessed into a different package.
-
-=back
 
 =head1 Mutators for external scanning
 

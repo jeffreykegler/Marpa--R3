@@ -297,8 +297,7 @@ __DATA__
 
     { Fields for new SLIF resolution logic
     -- must be reinitialized when evaluation is reset }
-    RESOLVE_PACKAGE
-    RESOLVE_PACKAGE_SOURCE
+    SEMANTICS_PACKAGE
     REGISTRATIONS
     CLOSURE_BY_SYMBOL_ID
     CLOSURE_BY_RULE_ID

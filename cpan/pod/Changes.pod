@@ -176,6 +176,15 @@ method, that method was used as the constructor of
 the per-parse object.
 In Marpa::R3, there is no per-parse constructor.
 
+=head2 The per-parse argument never affects the semantics package
+
+In Marpa::R2, if the c<semantics_package> named argument was
+not used and the per-parse argument was blessed,
+then the package into which the per-parse argument was blessed
+became the semantics package.
+In Marpa::R3, the per-parse argument has no effect on
+the semantics package.
+
 =head1 COPYRIGHT AND LICENSE
 
 =for Marpa::R3::Display

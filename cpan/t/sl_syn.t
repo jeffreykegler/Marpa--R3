@@ -33,7 +33,7 @@ my $grammar = Marpa::R3::Scanless::G->new(
 
         source => \(<<'END_OF_SOURCE'),
 :start ::= <number sequence>
-<number sequence> ::= <number>+ action => add_sequence
+<number sequence> ::= <number>+ action => My_Actions::add_sequence
 number ~ digit+
 digit ~ [0-9]
 :discard ~ whitespace
@@ -46,6 +46,7 @@ END_OF_SOURCE
 );
 
 package My_Actions;
+
 sub add_sequence {
     my ($self, @numbers) = @_;
     return List::Util::sum @numbers, 0;
@@ -111,4 +112,5 @@ for my $test_data (@tests_data) {
     Test::More::like( $actual_result, $expected_result, qq{Result of "$test_string"} );
     Test::More::is( $actual_sequence_so_far, $expected_sequence_so_far, qq{Sequence so far from "$test_string"} );
 } ## end TEST: for my $test_string (@test_strings)
+
 # vim: expandtab shiftwidth=4:
