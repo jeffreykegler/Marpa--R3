@@ -1,9 +1,9 @@
 # Marpa::R3 is Copyright (C) 2016, Jeffrey Kegler.
-# 
+#
 # This module is free software; you can redistribute it and/or modify it
 # under the same terms as Perl 5.10.1. For more details, see the full text
 # of the licenses in the directory LICENSES.
-# 
+#
 # This program is distributed in the hope that it will be
 # useful, but it is provided “as is” and without any express
 # or implied warranties. For details, see the full text of
@@ -54,7 +54,7 @@ is determined as follows:
 is empty (that is, has a zero-length RHS),
 then the empty alternative's semantics are used.
 
-=item * 
+=item *
 In the remaining case,
 two or more of the rule alternatives have different action names,
 but none of the alternatives has a zero-length RHS.
@@ -241,15 +241,15 @@ because there is an empty rule for C<R>, and that takes priority.
 =for Marpa::R3::Display
 ignore: 1
 
-    Copyright (C) 2016, Jeffrey Kegler.
+  Marpa::R3 is Copyright (C) 2016, Jeffrey Kegler.
 
-    This module is free software; you can redistribute it and/or modify it
-    under the same terms as Perl 5.10.1. For more details, see the full text
-    of the licenses in the directory LICENSES.
+  This module is free software; you can redistribute it and/or modify it
+  under the same terms as Perl 5.10.1. For more details, see the full text
+  of the licenses in the directory LICENSES.
 
-    This program is distributed in the hope that it will be
-    useful, but without any warranty; without even the implied
-    warranty of merchantability or fitness for a particular purpose.
+  This program is distributed in the hope that it will be
+  useful, but without any warranty; without even the implied
+  warranty of merchantability or fitness for a particular purpose.
 
 =for Marpa::R3::Display::End
 

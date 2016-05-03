@@ -1,9 +1,9 @@
 # Marpa::R3 is Copyright (C) 2016, Jeffrey Kegler.
-# 
+#
 # This module is free software; you can redistribute it and/or modify it
 # under the same terms as Perl 5.10.1. For more details, see the full text
 # of the licenses in the directory LICENSES.
-# 
+#
 # This program is distributed in the hope that it will be
 # useful, but it is provided “as is” and without any express
 # or implied warranties. For details, see the full text of
@@ -661,7 +661,7 @@ when the recognizer starts.
 The C<event_is_active> setting is only allowed
 with the L<recognizer's C<new() method>|/"Constructor">.
 
-The setting in the 
+The setting in the
 C<event_is_active> hash
 overrides the activation setting in the grammar.
 The setting will be in effect
@@ -1960,15 +1960,15 @@ or quoted string in an L0 rule.
 =for Marpa::R3::Display
 ignore: 1
 
-    Copyright (C) 2016, Jeffrey Kegler.
+  Marpa::R3 is Copyright (C) 2016, Jeffrey Kegler.
 
-    This module is free software; you can redistribute it and/or modify it
-    under the same terms as Perl 5.10.1. For more details, see the full text
-    of the licenses in the directory LICENSES.
+  This module is free software; you can redistribute it and/or modify it
+  under the same terms as Perl 5.10.1. For more details, see the full text
+  of the licenses in the directory LICENSES.
 
-    This program is distributed in the hope that it will be
-    useful, but without any warranty; without even the implied
-    warranty of merchantability or fitness for a particular purpose.
+  This program is distributed in the hope that it will be
+  useful, but without any warranty; without even the implied
+  warranty of merchantability or fitness for a particular purpose.
 
 =for Marpa::R3::Display::End
 

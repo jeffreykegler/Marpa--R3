@@ -1,9 +1,9 @@
 # Marpa::R3 is Copyright (C) 2016, Jeffrey Kegler.
-# 
+#
 # This module is free software; you can redistribute it and/or modify it
 # under the same terms as Perl 5.10.1. For more details, see the full text
 # of the licenses in the directory LICENSES.
-# 
+#
 # This program is distributed in the hope that it will be
 # useful, but it is provided “as is” and without any express
 # or implied warranties. For details, see the full text of
@@ -149,7 +149,7 @@ displayed between angle brackets,
 regardless of whether the symbol was originally
 specified in bracketed form.
 
-When a SLIF symbol needs to be 
+When a SLIF symbol needs to be
 referred to by name in Perl code,
 it is the symbol's explicit name that is used.
 
@@ -554,7 +554,7 @@ Start rules must be G1 rules.
 An empty rule is a rule with an empty RHS.
 The empty RHS, technically, is a RHS alternative, one with zero RHS primaries.
 The L<C<action>|/"action"> and
-L<C<bless>|/"bless"> adverbs are allowed 
+L<C<bless>|/"bless"> adverbs are allowed
 for the empty RHS alternative,
 but no others.
 A empty rule makes its LHS symbol a nullable symbol.
@@ -614,7 +614,7 @@ consisting of only one RHS alternative.
 For brevity, RHS alternatives are often called B<alternatives>.
 
 Each alternative may be followed by a list of associated adverbs.
-The 
+The
 L<C<action>|/"action">,
 L<C<assoc>|/"assoc"> and
 L<C<bless>|/"bless"> adverbs are allowed.
@@ -873,7 +873,7 @@ The C<event> keyword.
 
 =item *
 
-An event initializer, 
+An event initializer,
 as described in L<the section on
 event initializers|/"Event initializer">.
 
@@ -951,7 +951,7 @@ ignore: 1
 
 where C<TREATMENT> is one of C<warn>, C<ok>, or C<fatal>.
 
-C<fatal> indicates that an inaccessible symbol should be 
+C<fatal> indicates that an inaccessible symbol should be
 a fatal error.
 C<warn> indicates that Marpa should print a warning message,
 but proceed with the parse.
@@ -1085,7 +1085,7 @@ normalize-whitespace: 1
 =for Marpa::R3::Display::End
 
 The C<event> adverb applies only to lexemes and
-is only allowed in 
+is only allowed in
 L<a C<:lexeme> pseudo-rule|/"Lexeme pseudo-rule">.
 It names the event specified by
 the L<C<pause>|/"pause"> adverb.
@@ -1166,7 +1166,7 @@ normalize-whitespace: 1
 =for Marpa::R3::Display::End
 
 The C<pause> adverb applies only to lexemes and
-is only allowed in 
+is only allowed in
 L<a C<:lexeme> pseudo-rule|/"Lexeme pseudo-rule">.
 The C<pause> adverb declares a SLIF parse event.
 The L<event adverb|/"event"> names the SLIF parse event
@@ -1299,7 +1299,7 @@ the special treatment of operators.
 For the purpose of precedence,
 an operand is an occurrence in a RHS alternative
 of the LHS symbol.
-An operator is considered to be anything 
+An operator is considered to be anything
 that is not an operand.
 The arity of an alternative is the number of operands that
 it contains.
@@ -1443,15 +1443,15 @@ can parse it.
 =for Marpa::R3::Display
 ignore: 1
 
-    Copyright (C) 2016, Jeffrey Kegler.
+  Marpa::R3 is Copyright (C) 2016, Jeffrey Kegler.
 
-    This module is free software; you can redistribute it and/or modify it
-    under the same terms as Perl 5.10.1. For more details, see the full text
-    of the licenses in the directory LICENSES.
+  This module is free software; you can redistribute it and/or modify it
+  under the same terms as Perl 5.10.1. For more details, see the full text
+  of the licenses in the directory LICENSES.
 
-    This program is distributed in the hope that it will be
-    useful, but without any warranty; without even the implied
-    warranty of merchantability or fitness for a particular purpose.
+  This program is distributed in the hope that it will be
+  useful, but without any warranty; without even the implied
+  warranty of merchantability or fitness for a particular purpose.
 
 =for Marpa::R3::Display::End
 

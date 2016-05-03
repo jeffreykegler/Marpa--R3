@@ -1,9 +1,9 @@
 # Marpa::R3 is Copyright (C) 2016, Jeffrey Kegler.
-# 
+#
 # This module is free software; you can redistribute it and/or modify it
 # under the same terms as Perl 5.10.1. For more details, see the full text
 # of the licenses in the directory LICENSES.
-# 
+#
 # This program is distributed in the hope that it will be
 # useful, but it is provided “as is” and without any express
 # or implied warranties. For details, see the full text of
@@ -56,14 +56,17 @@ my $perl_license_body = <<'END_OF_STRING';
 This module is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.1. For more details, see the full text
 of the licenses in the directory LICENSES.
+END_OF_STRING
 
+my $perl_no_warranty = <<'END_OF_STRING';
 This program is distributed in the hope that it will be
 useful, but it is provided “as is” and without any express
 or implied warranties. For details, see the full text of
 of the licenses in the directory LICENSES.
 END_OF_STRING
 
-my $perl_license = "$perl_copyright_line\n$perl_license_body";
+my $perl_license = join "\n", $perl_copyright_line, q{}, $perl_license_body,
+  $perl_no_warranty;
 
 my $marpa_r3_license = $lgpl_license;
 $marpa_r3_license =~ s/Marpa::R3/Libmarpa/gxms;
@@ -94,12 +97,6 @@ my $mit_license = "$lgpl_copyright_line\n$mit_license_body";
 my $license_in_tex =
     "$copyright_line_in_tex\n" . "\\bigskip\\noindent\n" . "$lgpl_license_body";
 $license_in_tex =~ s/^$/\\smallskip\\noindent/gxms;
-
-my $license_file = $lgpl_license . <<'END_OF_STRING';
-
-In the Marpa::R3 distribution, the GNU Lesser General Public License
-version 3 should be in a file named "COPYING.LESSER".
-END_OF_STRING
 
 my $texi_copyright = <<'END_OF_TEXI_COPYRIGHT';
 Copyright @copyright{} 2016 Jeffrey Kegler.
@@ -147,24 +144,33 @@ my $c_mit_license_2015          = $c_mit_license;
     $c_mit_license_2015          =~ s/2016/2015/xms;
 my $xs_license          = c_comment($lgpl_license);
 my $r2_hash_license    = hash_comment($lgpl_license);
+my $perl_hash_license    = hash_comment($perl_license);
 my $libmarpa_hash_license    = hash_comment($mit_license);
 my $xsh_hash_license    = hash_comment($lgpl_license, q{ #});
 my $tex_closed_license = hash_comment( $closed_license, q{%} );
 my $tex_license        = hash_comment( $lgpl_license, q{%} );
 my $tex_cc_a_nd_license = hash_comment( $cc_a_nd_license, q{%} );
-my $indented_license   = $lgpl_license;
-$indented_license =~ s/^/  /gxms;
-$indented_license =~ s/[ ]+$//gxms;
 
-my $pod_section = <<'END_OF_STRING';
-=head1 Copyright and License
+my $perl_pod_no_warranty = <<'END_OF_NO_WARRANTY';
+This program is distributed in the hope that it will be
+useful, but without any warranty; without even the implied
+warranty of merchantability or fitness for a particular purpose.
+END_OF_NO_WARRANTY
+
+my $perl_pod_legalese = join "\n", $perl_copyright_line, q{}, $perl_license_body,
+  $perl_pod_no_warranty;
+$perl_pod_legalese =~ s/^/  /gxms;
+$perl_pod_legalese =~ s/[ ]+$//gxms;
+
+my $perl_pod_section = <<'END_OF_STRING';
+=head1 COPYRIGHT AND LICENSE
 
 =for Marpa::R3::Display
 ignore: 1
 
 END_OF_STRING
 
-$pod_section .= "$indented_license\n";
+$perl_pod_section .= "$perl_pod_legalese\n";
 
 # Next line is to fake out display checking logic
 # Otherwise it will think the lines to come are part
@@ -172,7 +178,7 @@ $pod_section .= "$indented_license\n";
 
 =cut
 
-$pod_section .= <<'END_OF_STRING';
+$perl_pod_section .= <<'END_OF_STRING';
 =for Marpa::R3::Display::End
 
 END_OF_STRING
@@ -293,8 +299,8 @@ sub check_tag {
 } ## end sub check_tag
 
 my %files_by_type = (
-    'COPYING.LESSER' => \&ignored,    # GNU license text, leave it alone
-    'LICENSE' => \&license_problems_in_license_file,
+    'LICENSES/Artistic_1_0' => \&ignored,
+    'LICENSES/GPL_2' => \&ignored,
     'META.json' =>
         \&ignored,    # not source, and not clear how to add license at top
     'META.yml' =>
@@ -311,12 +317,10 @@ my %files_by_type = (
     'etc/pod_dump.pl'                   => \&trivial,
     'etc/dovg.sh'                       => \&trivial,
     'etc/compile_for_debug.sh'          => \&trivial,
-    'etc/libmarpa_test.sh'              => \&trivial,
+    'etc/OLD_libmarpa_test.sh'              => \&trivial,
     'etc/reserved_check.sh'             => \&trivial,
     'engine/LOG_DATA'                 => \&ignored,    # not worth the trouble
     'engine/cf/LIBMARPA_MODE'         => \&trivial,
-    # 'engine/cf/perl_ac_makefile.PL' =>
-        # gen_license_problems_in_perl_file($libmarpa_hash_license, '2015'),
     'engine/cf/INSTALL.SKIP' => \&trivial,
     'engine/read_only/LIB_VERSION'    => \&trivial,
     'engine/read_only/LIB_VERSION.in' => \&trivial,
@@ -326,10 +330,10 @@ my %files_by_type = (
         gen_license_problems_in_hash_file($libmarpa_hash_license, '2015'),
     'engine/read_only/notes/shared_test.txt' =>
         gen_license_problems_in_hash_file($libmarpa_hash_license, '2015'),
+    'engine/read_only/win32/do_config_h.pl' =>
+        gen_license_problems_in_hash_file($libmarpa_hash_license, '2015'),
     'engine/read_only/Makefile.win32' =>
         gen_license_problems_in_hash_file($libmarpa_hash_license, '2015'),
-    'engine/read_only/win32/do_config_h.pl' =>
-        gen_license_problems_in_perl_file($libmarpa_hash_license, '2015'),
     'etc/my_suppressions' => \&trivial,
     'xs/ppport.h' => \&ignored,    # copied from CPAN, just leave it alone
     'engine/read_only/README' =>
@@ -507,8 +511,10 @@ sub file_type {
     return \&trivial if $filepart eq '.gdbinit';
     return \&check_GNU_copyright
         if $GNU_file{$filename};
+    return gen_license_problems_in_perl_file($perl_hash_license)
+        if $filepart =~ /[.] (pm) \z /xms;
     return gen_license_problems_in_perl_file()
-        if $filepart =~ /[.] (t|pl|pm|PL) \z /xms;
+        if $filepart =~ /[.] (t|pl|PL) \z /xms;
     return gen_license_problems_in_perl_file()
         if $filepart eq 'typemap';
     return \&license_problems_in_fdl_file
@@ -590,30 +596,6 @@ sub tops_equal {
         ${ slurp_top( $filename2, $length ) };
 }
 
-sub license_problems_in_license_file {
-    my ( $filename, $verbose ) = @_;
-    my @problems = ();
-    my $text     = ${ slurp($filename) };
-    if ( $text ne $license_file ) {
-        my $problem = "LICENSE file is wrong\n";
-        if ($verbose) {
-            $problem
-                .= "=== Differences ===\n"
-                . Text::Diff::diff( \$text, \$license_file )
-                . ( q{=} x 30 );
-        } ## end if ($verbose)
-        push @problems, $problem;
-    } ## end if ( $text ne $license_file )
-    if ( scalar @problems and $verbose >= 2 ) {
-        my $problem =
-              "=== $filename should be as follows:\n"
-            . $license_file
-            . ( q{=} x 30 );
-        push @problems, $problem;
-    } ## end if ( scalar @problems and $verbose >= 2 )
-    return @problems;
-} ## end sub license_problems_in_license_file
-
 sub gen_license_problems_in_hash_file {
     my ($license, $year) = @_;
     $DB::single = 1;
@@ -628,8 +610,8 @@ sub gen_license_problems_in_hash_file {
                 or die "say failed: $ERRNO";
         }
         my @problems = ();
-        my $text = slurp_top( $filename, length $license );
-        if ( $license ne ${$text} ) {
+        my $text = slurp_top( $filename, 200 + length $license );
+        if ( 0 > index ${$text}, $license ) {
             my $problem = "No license language in $filename (hash style)\n";
             if ($verbose) {
                 $problem
@@ -686,16 +668,16 @@ sub license_problems_in_sh_file {
     }
     my @problems = ();
     $DB::single = 1;
-    my $ref_text = slurp_top( $filename, 256 + length $r2_hash_license );
+    my $ref_text = slurp_top( $filename, 256 + length $perl_hash_license );
     my $text = ${$ref_text};
     $text =~ s/ \A [#][!] [^\n]* \n//xms;
-    $text = substr $text, 0, length $r2_hash_license;
-    if ( $r2_hash_license ne $text ) {
+    $text = substr $text, 0, length $perl_hash_license;
+    if ( $perl_hash_license ne $text ) {
         my $problem = "No license language in $filename (sh hash style)\n";
         if ($verbose) {
             $problem
                 .= "=== Differences ===\n"
-                . Text::Diff::diff( \$text, \$r2_hash_license )
+                . Text::Diff::diff( \$text, \$perl_hash_license )
                 . ( q{=} x 30 );
         } ## end if ($verbose)
         push @problems, $problem;
@@ -703,7 +685,7 @@ sub license_problems_in_sh_file {
     if ( scalar @problems and $verbose >= 2 ) {
         my $problem =
               "=== license for $filename should be as follows:\n"
-            . $r2_hash_license
+            . $perl_hash_license
             . ( q{=} x 30 );
         push @problems, $problem;
     } ## end if ( scalar @problems and $verbose >= 2 )
@@ -934,31 +916,31 @@ sub license_problems_in_pod_file {
 
     # Pod files are Perl files, and should also have the
     # license statement at the start of the file
-    my $closure = gen_license_problems_in_perl_file();
+    my $closure = gen_license_problems_in_perl_file($perl_hash_license);
     my @problems = $closure->( $filename, $verbose );
 
-    my $text = ${ slurp($filename) };
-    if ( $text =~ m/ ^ [=]head1 \s+ Copyright \s+ and \s+ License /xmsp ) {
+    my $text = ${ slurp($filename, (length $perl_pod_section + 100)) };
+    if ( $text =~ m/ ^ [=]head1 \s+ COPYRIGHT \s+ AND \s+ LICENSE /xmsp ) {
         ## no critic (Variables::ProhibitPunctuationVars);
         my $pos = length ${^PREMATCH};
         $text = substr $text, $pos;
     }
     else {
         push @problems,
-            qq{No "Copyright and License" header in pod file $filename\n};
+            qq{No "COPYRIGHT AND LICENSE" header in pod file $filename\n};
     }
-    if ( not scalar @problems and ( index $text, $pod_section ) < 0 ) {
+    if ( not scalar @problems and ( index $text, $perl_pod_section ) < 0 ) {
         my $problem = "No LICENSE pod section in $filename\n";
         if ($verbose) {
             $problem .= "Missing pod section:\n"
-                . Text::Diff::diff( \$text, \$pod_section );
+                . Text::Diff::diff( \$text, \$perl_pod_section );
         }
         push @problems, $problem;
-    } ## end if ( not scalar @problems and ( index $text, $pod_section...))
+    } ## end if ( not scalar @problems and ( index $text, $perl_pod_section...))
     if ( scalar @problems and $verbose >= 2 ) {
         my $problem =
             "=== licensing pod section for $filename should be as follows:\n"
-            . $pod_section
+            . $perl_pod_section
             . ( q{=} x 30 )
             . "\n"
             ;
@@ -1030,7 +1012,7 @@ sub license_problems_in_fdl_file {
     if ( scalar @problems and $verbose >= 2 ) {
         my $problem =
             "=== FDL licensing section for $filename should be as follows:\n"
-            . $pod_section
+            . $perl_pod_section
             . ( q{=} x 30 );
         push @problems, $problem;
     } ## end if ( scalar @problems and $verbose >= 2 )

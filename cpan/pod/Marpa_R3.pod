@@ -1,9 +1,9 @@
 # Marpa::R3 is Copyright (C) 2016, Jeffrey Kegler.
-# 
+#
 # This module is free software; you can redistribute it and/or modify it
 # under the same terms as Perl 5.10.1. For more details, see the full text
 # of the licenses in the directory LICENSES.
-# 
+#
 # This program is distributed in the hope that it will be
 # useful, but it is provided “as is” and without any express
 # or implied warranties. For details, see the full text of
@@ -55,7 +55,7 @@ normalize-whitespace: 1
 =for Marpa::R3::Display::End
 
 =head1 Description
- 
+
 =head2 Marpa::R3 is ALPHA and EXPERIMENTAL
 
 Marpa::R3 is in alpha status, and is experimental.
@@ -103,7 +103,7 @@ partial: 1
 normalize-whitespace: 1
 
     my $dsl = <<'END_OF_DSL';
-    
+
     Calculator ::= Expression action => ::first
 
     Factor ::= Number action => ::first
@@ -178,7 +178,7 @@ normalize-whitespace: 1
 
 =for Marpa::R3::Display::End
 
-As is normal for BNF rules, the first rule consists of 
+As is normal for BNF rules, the first rule consists of
 a left hand side symbol ("C<Calculator>"),
 the BNF operator ("C<::=>")
 and a series of right hand side (RHS) symbols.
@@ -235,7 +235,7 @@ alternatives:
 
 A C<Term> and a C<Factor> separated by an multiplication operator; or
 
-=item * 
+=item *
 
 a C<Factor>.
 
@@ -360,7 +360,7 @@ normalize-whitespace: 1
 =for Marpa::R3::Display::End
 
 To parse a string,
-we use 
+we use
 the C<Marpa::R3::Scanless::G::parse()> method.
 C<Marpa::R3::Scanless::G::parse()> requires a reference
 to a string as its first argument.
@@ -505,7 +505,7 @@ that is, the value corresponding to the first symbol of the rule's RHS.
 The action for the first RHS alternative defining C<Expression> is C<do_add>,
 and the action for the first RHS alternative defining C<Term> is C<do_multiply>.
 To implement these actions, we need to "resolve" their names --
-map the action names into 
+map the action names into
 the Perl closures which actually carry out the semantics.
 
 The C<semantics_package> specified the package where we can find the actions:
@@ -581,7 +581,7 @@ and used within a single thread.
 
 This restriction may be lifted someday, but
 in practice it does not seem onerous.
-Note that 
+Note that
 you can use
 the same grammar in different
 threads by creating grammars
@@ -666,15 +666,15 @@ L<The Support document|Marpa::R3::Support> has details.
 =for Marpa::R3::Display
 ignore: 1
 
-    Copyright (C) 2016, Jeffrey Kegler.
+  Marpa::R3 is Copyright (C) 2016, Jeffrey Kegler.
 
-    This module is free software; you can redistribute it and/or modify it
-    under the same terms as Perl 5.10.1. For more details, see the full text
-    of the licenses in the directory LICENSES.
+  This module is free software; you can redistribute it and/or modify it
+  under the same terms as Perl 5.10.1. For more details, see the full text
+  of the licenses in the directory LICENSES.
 
-    This program is distributed in the hope that it will be
-    useful, but without any warranty; without even the implied
-    warranty of merchantability or fitness for a particular purpose.
+  This program is distributed in the hope that it will be
+  useful, but without any warranty; without even the implied
+  warranty of merchantability or fitness for a particular purpose.
 
 =for Marpa::R3::Display::End
 

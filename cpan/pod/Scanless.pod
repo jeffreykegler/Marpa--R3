@@ -1,9 +1,9 @@
 # Marpa::R3 is Copyright (C) 2016, Jeffrey Kegler.
-# 
+#
 # This module is free software; you can redistribute it and/or modify it
 # under the same terms as Perl 5.10.1. For more details, see the full text
 # of the licenses in the directory LICENSES.
-# 
+#
 # This program is distributed in the hope that it will be
 # useful, but it is provided “as is” and without any express
 # or implied warranties. For details, see the full text of
@@ -428,15 +428,15 @@ before changing to the dual grammar implementation.
 =for Marpa::R3::Display
 ignore: 1
 
-    Copyright (C) 2016, Jeffrey Kegler.
+  Marpa::R3 is Copyright (C) 2016, Jeffrey Kegler.
 
-    This module is free software; you can redistribute it and/or modify it
-    under the same terms as Perl 5.10.1. For more details, see the full text
-    of the licenses in the directory LICENSES.
+  This module is free software; you can redistribute it and/or modify it
+  under the same terms as Perl 5.10.1. For more details, see the full text
+  of the licenses in the directory LICENSES.
 
-    This program is distributed in the hope that it will be
-    useful, but without any warranty; without even the implied
-    warranty of merchantability or fitness for a particular purpose.
+  This program is distributed in the hope that it will be
+  useful, but without any warranty; without even the implied
+  warranty of merchantability or fitness for a particular purpose.
 
 =for Marpa::R3::Display::End
 

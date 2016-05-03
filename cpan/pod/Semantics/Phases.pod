@@ -1,9 +1,9 @@
 # Marpa::R3 is Copyright (C) 2016, Jeffrey Kegler.
-# 
+#
 # This module is free software; you can redistribute it and/or modify it
 # under the same terms as Perl 5.10.1. For more details, see the full text
 # of the licenses in the directory LICENSES.
-# 
+#
 # This program is distributed in the hope that it will be
 # useful, but it is provided “as is” and without any express
 # or implied warranties. For details, see the full text of
@@ -106,7 +106,7 @@ virtual input stream, it is there for the life of the recognizer.
 It cannot be "unread".
 But during the Reading Phase of a new parse series,
 a recognizer can extend the virtual input stream,
-using the recognizer's 
+using the recognizer's
 L<C<resume()> method|Marpa::R3::Scanless::R/"resume()">.
 
 =item *
@@ -248,7 +248,7 @@ The Evaluation Phase has two subphases:
 
 =over 4
 
-=item * 
+=item *
 
 The Parse Tree Setup Subphase.
 
@@ -303,15 +303,15 @@ the rule evaluation closures are called.
 =for Marpa::R3::Display
 ignore: 1
 
-    Copyright (C) 2016, Jeffrey Kegler.
+  Marpa::R3 is Copyright (C) 2016, Jeffrey Kegler.
 
-    This module is free software; you can redistribute it and/or modify it
-    under the same terms as Perl 5.10.1. For more details, see the full text
-    of the licenses in the directory LICENSES.
+  This module is free software; you can redistribute it and/or modify it
+  under the same terms as Perl 5.10.1. For more details, see the full text
+  of the licenses in the directory LICENSES.
 
-    This program is distributed in the hope that it will be
-    useful, but without any warranty; without even the implied
-    warranty of merchantability or fitness for a particular purpose.
+  This program is distributed in the hope that it will be
+  useful, but without any warranty; without even the implied
+  warranty of merchantability or fitness for a particular purpose.
 
 =for Marpa::R3::Display::End
 

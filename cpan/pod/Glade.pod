@@ -1,9 +1,9 @@
 # Marpa::R3 is Copyright (C) 2016, Jeffrey Kegler.
-# 
+#
 # This module is free software; you can redistribute it and/or modify it
 # under the same terms as Perl 5.10.1. For more details, see the full text
 # of the licenses in the directory LICENSES.
-# 
+#
 # This program is distributed in the hope that it will be
 # useful, but it is provided “as is” and without any express
 # or implied warranties. For details, see the full text of
@@ -359,7 +359,7 @@ a 3-level structure,
 within a given containing glade I<G>,
 any downglade can be uniquely
 identified as C<($symch_ix, $factor_ix, $downglade_ix)>,
-where 
+where
 C<$symch_ix> is a zero-based symch index,
 C<$factor_ix> is a zero-based factoring index, and
 C<$downglade_ix> is a zero-based downglade index.
@@ -389,7 +389,7 @@ of an already visited glade.
 It does not eliminate multiple visits to a glade, but it does
 eliminate retraversal of the glades downhill from it.
 In practice, the improvement in speed can be stunning.
-It will often be the difference between 
+It will often be the difference between
 an program which is unuseably slow even for very small inputs,
 and one which is extremely fast even for large inputs.
 
@@ -455,7 +455,7 @@ and a length.
 On failure, throws an exception.
 
 The literal is determined by the range.
-This works as expected if your application reads the input characters 
+This works as expected if your application reads the input characters
 one-by-one, in order
 and without gaps except for characters
 that are normally discarded,
@@ -482,7 +482,7 @@ Every glade is associated with a span -- a start location in the input,
 and a length.
 On failure, throws an exception.
 
-The span will be as expected if your application reads the input characters 
+The span will be as expected if your application reads the input characters
 one-by-one in order.
 (We will call applications which read in this fashion, B<monotonic>.)
 Most applications are monotonic,
@@ -662,7 +662,7 @@ Takes two arguments, both required.
 The first is an ASF, and the second is a reference to an array of ambiguities,
 in the format returned by L<the ambiguities() method|/"ambiguities()">.
 
-Major applications will often have their own 
+Major applications will often have their own
 customized ambiguity formatting routine, one which can formulate
 error messages based, not just on the names of the rules and symbols,
 but on knowledge of the role that
@@ -687,7 +687,7 @@ is not reported if it is downhill
 and does not have a higher altitude.
 (Because of cycles,
 it is possible for a downhill glade to be at a higher altitude.)
-Within glade, all of the factorings are 
+Within glade, all of the factorings are
 considered downhill from,
 and of equal altitude to the symches,
 so that if a glade has a symch ambiguity,
@@ -842,7 +842,7 @@ a standard dump of the output array is
 too cluttered for comfortable reading.
 The following code displays the output from
 C<asf_to_basic_tree()> in a more compact form.
-Note that this code makes no use of Marpa, 
+Note that this code makes no use of Marpa,
 and works for all Perl arrays.
 It is included for completeness,
 and as a simple example of array traversal.
@@ -895,7 +895,7 @@ Segregating these details here serves the needs of both.
 
 Here's a way of defining some of the above terms which is less intuitive,
 but more precise.
-First, define the B<glade length> from glades A to glade B in an ASF as 
+First, define the B<glade length> from glades A to glade B in an ASF as
 the number of glades on the shortest path from A to B, not including glade A.
 (Recall that paths are directional.)
 If there is no path between glades A and B, the glade length is undefined.
@@ -1064,7 +1064,7 @@ A B<symch location set>
 is a set of I<N> downglade duples
 such there is exactly one element
 C<factor_ix, rhs_ix>
-in the set for each 
+in the set for each
 C<< 0 <= factor_ix < N >>.
 In other words, a symch location set is
 a total function from the factor indexes
@@ -1108,7 +1108,7 @@ and end G1 locations are anchors.
 A B<multifactored stretch> is an anchored G1 span
 which contains only one anchored G1 location.
 (Recall that, by the definition of a span,
-the end location of a span 
+the end location of a span
 is not contained in the span.)
 
 As a consequence of its definition,
@@ -1157,15 +1157,15 @@ many repetitions of a single symbol.
 =for Marpa::R3::Display
 ignore: 1
 
-    Copyright (C) 2016, Jeffrey Kegler.
+  Marpa::R3 is Copyright (C) 2016, Jeffrey Kegler.
 
-    This module is free software; you can redistribute it and/or modify it
-    under the same terms as Perl 5.10.1. For more details, see the full text
-    of the licenses in the directory LICENSES.
+  This module is free software; you can redistribute it and/or modify it
+  under the same terms as Perl 5.10.1. For more details, see the full text
+  of the licenses in the directory LICENSES.
 
-    This program is distributed in the hope that it will be
-    useful, but without any warranty; without even the implied
-    warranty of merchantability or fitness for a particular purpose.
+  This program is distributed in the hope that it will be
+  useful, but without any warranty; without even the implied
+  warranty of merchantability or fitness for a particular purpose.
 
 =for Marpa::R3::Display::End
 

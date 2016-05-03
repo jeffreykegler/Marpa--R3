@@ -1,9 +1,9 @@
 # Marpa::R3 is Copyright (C) 2016, Jeffrey Kegler.
-# 
+#
 # This module is free software; you can redistribute it and/or modify it
 # under the same terms as Perl 5.10.1. For more details, see the full text
 # of the licenses in the directory LICENSES.
-# 
+#
 # This program is distributed in the hope that it will be
 # useful, but it is provided “as is” and without any express
 # or implied warranties. For details, see the full text of
@@ -302,7 +302,7 @@ is determined as follows:
 is empty (that is, has a zero-length RHS),
 then the empty alternative's semantics are used.
 
-=item * 
+=item *
 In the remaining case,
 two or more of the rule alternatives have different action names,
 but none of the alternatives has a zero-length RHS.
@@ -345,7 +345,7 @@ an action is not blessed.
 The implicit action itself cannot be blessed --
 an attempt to do so is a fatal error.
 
-Explicit blessings are made using 
+Explicit blessings are made using
 the C<bless> adverb.
 The C<bless> adverb is allowed
 
@@ -473,7 +473,7 @@ If the array descriptor is an empty pair of square brackets ("C<[]>"),
 then there are zero array item descriptors,
 and the value will be an empty array.
 Otherwise the array item descriptors are interpreted as lists
-and those lists are used to fill out the 
+and those lists are used to fill out the
 array.
 
 =over 4
@@ -519,7 +519,7 @@ Length is in characters.
 
 The C<lhs> array item descriptor puts
 a single-element list into the array.
-That one element will be the LHS symbol ID of 
+That one element will be the LHS symbol ID of
 the rule.
 Because of historical reasons,
 for a lexeme instance,
@@ -632,7 +632,7 @@ will do exactly the same thing.
 
 The value of the rule instance is that of the rule instance's first child.
 If there is no such child, the value is a Perl C<undef>.
-It is a fatal error if a 
+It is a fatal error if a
 RHS alternative with a C<::first> action
 is blessed.
 It is also a fatal error to use a C<::first> action
@@ -642,7 +642,7 @@ with a lexeme.
 
 The value of the rule or lexeme instance will be
 a Perl C<undef>.
-It is a fatal error if a 
+It is a fatal error if a
 RHS alternative with an C<::undef> action
 is blessed.
 
@@ -900,7 +900,7 @@ Perl scalar actions should only be used as constants.
 
 For example,
 assume that actions are in a package named C<My_Actions>,
-which contains a hash reference named C<empty_hash>, 
+which contains a hash reference named C<empty_hash>,
 
 =for Marpa::R3::Display
 ignore: 1
@@ -922,7 +922,7 @@ namespace will share the same hash object.
 The correct way to define an
 C<empty_hash> action that
 initializes an empty hash is as a rule
-evaluation closure 
+evaluation closure
 that returns C<{}>.
 
 =for Marpa::R3::Display
@@ -1032,15 +1032,15 @@ grammars|Marpa::R3::NAIF::Semantics::Infinite>.
 =for Marpa::R3::Display
 ignore: 1
 
-    Copyright (C) 2016, Jeffrey Kegler.
+  Marpa::R3 is Copyright (C) 2016, Jeffrey Kegler.
 
-    This module is free software; you can redistribute it and/or modify it
-    under the same terms as Perl 5.10.1. For more details, see the full text
-    of the licenses in the directory LICENSES.
+  This module is free software; you can redistribute it and/or modify it
+  under the same terms as Perl 5.10.1. For more details, see the full text
+  of the licenses in the directory LICENSES.
 
-    This program is distributed in the hope that it will be
-    useful, but without any warranty; without even the implied
-    warranty of merchantability or fitness for a particular purpose.
+  This program is distributed in the hope that it will be
+  useful, but without any warranty; without even the implied
+  warranty of merchantability or fitness for a particular purpose.
 
 =for Marpa::R3::Display::End
 

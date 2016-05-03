@@ -1,9 +1,9 @@
 # Marpa::R3 is Copyright (C) 2016, Jeffrey Kegler.
-# 
+#
 # This module is free software; you can redistribute it and/or modify it
 # under the same terms as Perl 5.10.1. For more details, see the full text
 # of the licenses in the directory LICENSES.
-# 
+#
 # This program is distributed in the hope that it will be
 # useful, but it is provided “as is” and without any express
 # or implied warranties. For details, see the full text of
@@ -73,7 +73,7 @@ those Libmarpa
 methods to which
 no Marpa thin interface method directly corresponds.
 
-This style of documentation 
+This style of documentation
 is very efficient,
 which is one reason that it is the
 standard for C library interfaces to Perl.
@@ -99,7 +99,7 @@ methods of its own,
 most of its methods are wrappers for a method
 from the Libmarpa interface.
 On the other hand,
-many 
+many
 Libmarpa methods do not have
 Marpa thin interface wrappers.
 No internal Libmarpa method is part of the Marpa thin interface.
@@ -207,7 +207,7 @@ normalize-whitespace: 1
 =for Marpa::R3::Display::End
 
 Perl applications can destroy objects of the
-Marpa thin classes 
+Marpa thin classes
 by undefining them,
 or by letting them go out of scope.
 Application programmers do not need
@@ -226,7 +226,7 @@ Perl methods can communicate failure via their return values,
 or they can throw exceptions.
 
 Each has its place.
-Throwing failure as an exception is the default in 
+Throwing failure as an exception is the default in
 the Marpa thin interface because it is safer,
 and because
 it is convenient for prototyping and the first
@@ -321,7 +321,7 @@ Error descriptions are typically longer.
 Error names and error codes have a one to one correspondence (bijection).
 For a given error code, the error name will always
 be the same, and vice versa.
-Error descriptions 
+Error descriptions
 may contain text relating, not just to the error code,
 but to the specific error instance.
 
@@ -367,7 +367,7 @@ only if the most recently called Marpa thin method
 indicated that it set the error code.
 An application should assume that the
 error codes and error descriptions will be overwritten by the
-next call to 
+next call to
 any  thin interface method other than the L<< C<error()>
 method|C<< $g->error() >> >>.
 
@@ -487,7 +487,7 @@ In the general pattern,
 every argument whose type is one
 of Libmarpa's time classes is converted
 to the corresponding Marpa thin interface class.
-Arguments which belong to Libmarpa's numbered 
+Arguments which belong to Libmarpa's numbered
 classes (C<Marpa_Earley_Set_ID>,
 C<Marpa_Rank>,
 C<Marpa_Rule_ID> and C<Marpa_Symbol_ID>)
@@ -496,7 +496,7 @@ C language C<int>'s are also
 converted to Perl scalar integers.
 
 The Marpa thin interface does
-not recognize booleans, either in 
+not recognize booleans, either in
 C or in Perl.
 For example,
 if a Perl true value is not a numeric
@@ -701,7 +701,7 @@ found with the Marpa thin interface's C<event_count()>
 grammar method,
 which corresponds to Libmarpa's
 C<marpa_g_event_count()> method.
-The thin interface's C<event_count()> method 
+The thin interface's C<event_count()> method
 follows the general pattern.
 
 Since C<event()> returns the event value whenever it
@@ -789,7 +789,7 @@ is a Perl true value,
 the C<MARPA_PROPER_SEPARATION> flag
 will be set in the flags passed
 to the C<marpa_g_sequence_new()> method.
-Otherwise, 
+Otherwise,
 the C<MARPA_PROPER_SEPARATION> flag
 will not be set.
 
@@ -814,7 +814,7 @@ the Marpa thin interface level are "keep
 separation".
 This differs from the higher-level interface,
 which discards separators by default.
-At the 
+At the
 Marpa thin interface level, it is up
 to the programmer to discard separators,
 if that is what is wanted.
@@ -939,14 +939,14 @@ normalize-whitespace: 1
 With an argument of 1,
 the C<ruby_slippers_set()> method enables "Ruby Slippers" mode.
 An argument of 0 disables "Ruby Slippers" mode.
-By default, 
+By default,
 Ruby Slippers mode is disabled.
 Note that this default (disabled) is
 the opposite of that in the higher level L<Marpa::R3> interface.
 
 The L<< C<alternative()>
 method|C<< $r->alternative() >> >>
-will only throw exceptions when 
+will only throw exceptions when
 "Ruby Slippers" mode is disabled and the throw flag is on.
 One way of describing Ruby Slippers mode is as
 an override of the throw setting, one which only applies
@@ -972,12 +972,12 @@ In the Libmarpa API
 the
 C<alternative()> method returns an error
 code,
-with 
+with
 C<MARPA_ERR_NONE> being the code returned if there
 was no error.
 The C<alternative()> method will
 throw the error code as an
-exception if and only if all three 
+exception if and only if all three
 of the following are true:
 
 =over
@@ -1051,7 +1051,7 @@ C<progress_item()> will have a value of -2.
 
 =head2 Omitted recognizer methods
 
-Because the Marpa thin interface 
+Because the Marpa thin interface
 handles reference counting internally,
 it does not implement methods
 directly corresponding to
@@ -1067,7 +1067,7 @@ Libmarpa's C<marpa_r_earley_set_values()>
 and C<marpa_r_earley_set_values_set()> methods.
 The difference between these is that the "values" form allows an
 integer and a pointer value to be set,
-while 
+while
 the "value" form allows only an integer to be set.
 Perl applications which want to associate non-integer data with an Earley set
 should create an array, and use the integer to index the array.
@@ -1110,7 +1110,7 @@ On unthrown failure, it returns a Perl C<undef>.
 
 =head2 Omitted bocage methods
 
-Because the Marpa thin interface 
+Because the Marpa thin interface
 handles reference counting internally,
 it does not implement methods
 directly corresponding to
@@ -1146,7 +1146,7 @@ On unthrown failure, it returns a Perl C<undef>.
 
 =head2 Omitted ordering methods
 
-Because the Marpa thin interface 
+Because the Marpa thin interface
 handles reference counting internally,
 it does not implement methods
 directly corresponding to
@@ -1182,7 +1182,7 @@ On unthrown failure, it returns a Perl C<undef>.
 
 =head2 Omitted tree methods
 
-Because the Marpa thin interface 
+Because the Marpa thin interface
 handles reference counting internally,
 it does not implement methods
 directly corresponding to
@@ -1449,7 +1449,7 @@ The string will usually be a description of the error.
 
 =head2 Omitted value methods
 
-Because the Marpa thin interface 
+Because the Marpa thin interface
 handles reference counting internally,
 it does not implement methods
 directly corresponding to
@@ -1580,15 +1580,15 @@ normalize-whitespace: 1
 =for Marpa::R3::Display
 ignore: 1
 
-    Copyright (C) 2016, Jeffrey Kegler.
+  Marpa::R3 is Copyright (C) 2016, Jeffrey Kegler.
 
-    This module is free software; you can redistribute it and/or modify it
-    under the same terms as Perl 5.10.1. For more details, see the full text
-    of the licenses in the directory LICENSES.
+  This module is free software; you can redistribute it and/or modify it
+  under the same terms as Perl 5.10.1. For more details, see the full text
+  of the licenses in the directory LICENSES.
 
-    This program is distributed in the hope that it will be
-    useful, but without any warranty; without even the implied
-    warranty of merchantability or fitness for a particular purpose.
+  This program is distributed in the hope that it will be
+  useful, but without any warranty; without even the implied
+  warranty of merchantability or fitness for a particular purpose.
 
 =for Marpa::R3::Display::End
 
