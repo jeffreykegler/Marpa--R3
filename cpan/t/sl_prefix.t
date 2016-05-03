@@ -71,7 +71,12 @@ sub My_Actions::show_last_expression {
 sub my_parser {
     my ( $grammar, $string ) = @_;
 
-    my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
+    my $recce = Marpa::R3::Scanless::R->new(
+        {
+            grammar           => $grammar,
+            semantics_package => 'My_Actions'
+        }
+    );
     my $self = bless { grammar => $grammar, recce => $recce }, 'My_Actions';
     my ( $parse_value, $parse_status, $last_expression );
 
@@ -84,7 +89,7 @@ sub my_parser {
     my $value_ref = $recce->value($self);
     if ( not defined $value_ref ) {
         return 'No parse', 'Input read to end but no parse',
-            $self->show_last_expression();
+          $self->show_last_expression();
     }
     return [ return ${$value_ref}, 'Parse OK', 'entire input' ];
 } ## end sub my_parser
