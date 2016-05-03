@@ -423,10 +423,10 @@ xs/R3$(OBJ_EXT): xs/libmarpa$(LIB_EXT) \
     xs/marpa_slifop.h
 
 xs/general_pattern.xsh: xs/gp_generate.pl
-	$(RUNPERL) xs/gp_generate.pl xs/general_pattern.xsh
+	$(PERLRUN) xs/gp_generate.pl xs/general_pattern.xsh
 
 xs/marpa_slifop.h: xs/create_ops.pl
-	$(RUNPERL) xs/create_ops.pl > xs/marpa_slifop.h
+	$(PERLRUN) xs/create_ops.pl > xs/marpa_slifop.h
 
 xs/marpa.h: $(LIBMARPA_BUILD_DIR)/marpa.h
 	$(CP) $? $@
