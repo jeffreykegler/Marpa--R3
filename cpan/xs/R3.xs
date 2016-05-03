@@ -1,18 +1,14 @@
 /*
- * Copyright 2016 Jeffrey Kegler
- * This file is part of Marpa::R3.  Marpa::R3 is free software: you can
- * redistribute it and/or modify it under the terms of the GNU Lesser
- * General Public License as published by the Free Software Foundation,
- * either version 3 of the License, or (at your option) any later version.
+ * Marpa::R3 is Copyright (C) 2016, Jeffrey Kegler.
  *
- * Marpa::R3 is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
+ * This module is free software; you can redistribute it and/or modify it
+ * under the same terms as Perl 5.10.1. For more details, see the full text
+ * of the licenses in the directory LICENSES.
  *
- * You should have received a copy of the GNU Lesser
- * General Public License along with Marpa::R3.  If not, see
- * http://www.gnu.org/licenses/.
+ * This program is distributed in the hope that it will be
+ * useful, but it is provided “as is” and without any express
+ * or implied warranties. For details, see the full text of
+ * of the licenses in the directory LICENSES.
  */
 
 #include "config.h"
@@ -921,7 +917,7 @@ u_convert_events (Scanless_R * slr)
              * On success, all except MARPA_EVENT_EARLEY_ITEM_THRESHOLD
              * are ignored.
              *
-             * The warning raised for MARPA_EVENT_EARLEY_ITEM_THRESHOLD 
+             * The warning raised for MARPA_EVENT_EARLEY_ITEM_THRESHOLD
              * can be turned off by raising
              * the Earley item warning threshold.
              */
@@ -2066,7 +2062,7 @@ slr_discard (Scanless_R * slr)
 		    marpa__slr_event_push (slr->gift);
 		  MARPA_SLREV_TYPE (slr_event) = MARPA_SLRTR_LEXEME_DISCARDED;
 
-		  /* We do not have the lexeme, but we have the 
+		  /* We do not have the lexeme, but we have the
 		   * lexer rule.
 		   * The upper level will have to figure things out.
 		   */
@@ -2188,7 +2184,7 @@ MARPA_SLREV_TYPE(slr_event) = MARPA_SLREV_SYMBOL_PREDICTED;
              * On success, all except MARPA_EVENT_EARLEY_ITEM_THRESHOLD
              * are ignored.
              *
-             * The warning raised for MARPA_EVENT_EARLEY_ITEM_THRESHOLD 
+             * The warning raised for MARPA_EVENT_EARLEY_ITEM_THRESHOLD
              * can be turned off by raising
              * the Earley item warning threshold.
              */
@@ -2274,7 +2270,7 @@ r_convert_events (R_Wrapper * r_wrapper)
              * On success, all except MARPA_EVENT_EARLEY_ITEM_THRESHOLD
              * are ignored.
              *
-             * The warning raised for MARPA_EVENT_EARLEY_ITEM_THRESHOLD 
+             * The warning raised for MARPA_EVENT_EARLEY_ITEM_THRESHOLD
              * can be turned off by raising
              * the Earley item warning threshold.
              */
@@ -3052,9 +3048,9 @@ PPCODE:
   XPUSHs (sv_2mortal (newSViv (marpa_g_event_value (&event))));
 }
 
- # Actually returns Marpa_Rule_ID, void is here to eliminate RETVAL 
- # that remains unused with PPCODE. The same applies to all void's below 
- # when preceded with a return type commented out, e.g. 
+ # Actually returns Marpa_Rule_ID, void is here to eliminate RETVAL
+ # that remains unused with PPCODE. The same applies to all void's below
+ # when preceded with a return type commented out, e.g.
  #    # int
  #    void
 void
@@ -5309,7 +5305,7 @@ PPCODE:
 }
 
  #  it does not create a new one
- # 
+ #
 void
 g1( slg )
     Scanless_G *slg;
@@ -5346,7 +5342,7 @@ PPCODE:
     {
       croak
         ("Problem in slg->lexer_rule_to_g1_lexeme_set(%ld, %ld): rule ID was %ld, but highest lexer rule ID = %ld",
-         (long) lexer_rule, 
+         (long) lexer_rule,
          (long) g1_lexeme, (long) lexer_rule, (long) highest_lexer_rule_id);
     }
   if (g1_lexeme > highest_g1_symbol_id)
@@ -5414,7 +5410,7 @@ PPCODE:
           ("slg->lexeme_priority_set(%ld, %ld) called after SLG is precomputed",
            (long) g1_lexeme, (long) priority);
       }
-    if (g1_lexeme > highest_g1_symbol_id) 
+    if (g1_lexeme > highest_g1_symbol_id)
     {
       croak
         ("Problem in slg->g1_lexeme_priority_set(%ld, %ld): symbol ID was %ld, but highest G1 symbol ID = %ld",
@@ -5443,7 +5439,7 @@ g1_lexeme_priority( slg, g1_lexeme )
 PPCODE:
 {
   Marpa_Symbol_ID highest_g1_symbol_id = marpa_g_highest_symbol_id (slg->g1);
-    if (g1_lexeme > highest_g1_symbol_id) 
+    if (g1_lexeme > highest_g1_symbol_id)
     {
       croak
         ("Problem in slg->g1_lexeme_priority(%ld): symbol ID was %ld, but highest G1 symbol ID = %ld",
@@ -5476,7 +5472,7 @@ PPCODE:
           ("slg->lexeme_pause_set(%ld, %ld) called after SLG is precomputed",
            (long) g1_lexeme, (long) pause);
       }
-    if (g1_lexeme > highest_g1_symbol_id) 
+    if (g1_lexeme > highest_g1_symbol_id)
     {
       croak
         ("Problem in slg->g1_lexeme_pause_set(%ld, %ld): symbol ID was %ld, but highest G1 symbol ID = %ld",
@@ -5584,7 +5580,7 @@ PPCODE:
           ("slg->discard_event_set(%ld, %ld) called after SLG is precomputed",
            (long) l0_rule_id, (long) boolean);
       }
-    if (l0_rule_id > highest_l0_rule_id) 
+    if (l0_rule_id > highest_l0_rule_id)
     {
       croak
         ("Problem in slg->discard_event_set(%ld, %ld): rule ID was %ld, but highest L0 rule ID = %ld",
@@ -5680,7 +5676,7 @@ PPCODE:
           ("slg->lexeme_latm_set(%ld, %ld) called after SLG is precomputed",
            (long) g1_lexeme, (long) latm);
       }
-    if (g1_lexeme > highest_g1_symbol_id) 
+    if (g1_lexeme > highest_g1_symbol_id)
     {
       croak
         ("Problem in slg->g1_lexeme_latm(%ld, %ld): symbol ID was %ld, but highest G1 symbol ID = %ld",
@@ -5926,9 +5922,9 @@ PPCODE:
   slr->too_many_earley_items = too_many_earley_items;
 }
 
- #  Always returns the same SV for a given Scanless recce object -- 
+ #  Always returns the same SV for a given Scanless recce object --
  #  it does not create a new one
- # 
+ #
 void
 g1( slr )
     Scanless_R *slr;
@@ -6206,7 +6202,7 @@ PPCODE:
             AV *event_av = newAV ();
             av_push (event_av, newSVpvs ("'trace"));
             av_push (event_av, newSVpvs ("discarded lexeme"));
-            /* We do not have the lexeme, but we have the 
+            /* We do not have the lexeme, but we have the
              * lexer rule.
              * The upper level will have to figure things out.
              */
@@ -6567,7 +6563,7 @@ PPCODE:
  # easy, forward-compatible way
  # to determine whether the de-referenced value will cause
  # a "bizarre copy" error.
- # 
+ #
  # All errors are returned, not thrown
 void
 g1_alternative (slr, symbol_id, ...)
@@ -7068,7 +7064,7 @@ PPCODE:
 {
   const Scanless_G *slg = slr->slg;
   Marpa_Symbol_ID highest_g1_symbol_id = marpa_g_highest_symbol_id (slg->g1);
-    if (g1_lexeme > highest_g1_symbol_id) 
+    if (g1_lexeme > highest_g1_symbol_id)
     {
       croak
         ("Problem in slr->g1_lexeme_priority(%ld): symbol ID was %ld, but highest G1 symbol ID = %ld",
@@ -7102,7 +7098,7 @@ PPCODE:
   int old_priority;
   const Scanless_G *slg = slr->slg;
   Marpa_Symbol_ID highest_g1_symbol_id = marpa_g_highest_symbol_id (slg->g1);
-    if (g1_lexeme > highest_g1_symbol_id) 
+    if (g1_lexeme > highest_g1_symbol_id)
     {
       croak
         ("Problem in slr->g1_lexeme_priority(%ld): symbol ID was %ld, but highest G1 symbol ID = %ld",
