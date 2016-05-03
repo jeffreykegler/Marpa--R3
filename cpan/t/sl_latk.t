@@ -13,8 +13,11 @@
 # CENSUS: ASIS
 # Note: SLIF TEST
 
-# Based on Github issue #254 -- constructor invoked
-# on per-parse argument, which should not happen.
+# This test was originally based on Marpa::R2 Github issue #254 --
+# constructor invoked on per-parse argument, which should not happen.
+#
+# Per-parse constructors and all effects of per-parse arguments were
+# eliminated in Marpa::R3, so this test is now very basic and much simpler.
 
 # _The Computer Journal_, Vol. 45, No. 6, pp. 620-630,
 # in its "NNF" form
@@ -24,7 +27,7 @@ use strict;
 use warnings;
 
 use English qw( -no_match_vars );
-use Test::More tests => 12;
+use Test::More tests => 8;
 use lib 'inc';
 use Marpa::R3::Test;
 use Marpa::R3;
@@ -50,40 +53,35 @@ my $grammar =
     Marpa::R3::Scanless::G->new( { source => \q(A ::= 'a' action => do_A) } );
 
 my @tests = ();
-for my $recce_arg_desc ( 'semantics_package', 'no semantics_package' ) {
-    PPO:
-    for my $ppo_desc ( 'no', 'unblessed', 'same blessed', 'other blessed' ) {
-        my $recce_arg   = {};
-        my $method_desc = undef;
-        if ( $recce_arg_desc eq 'semantics_package' ) {
-            $recce_arg   = { semantics_package => 'Package_Actions' };
-            $method_desc = 'package method';
+PPO: for my $ppo_desc ( 'no', 'unblessed', 'same blessed', 'other blessed' ) {
+    my $recce_arg   = {};
+    my $method_desc = undef;
+    $recce_arg = { semantics_package => 'Package_Actions' };
+    $method_desc = 'package method';
+    my $ppo = undef;
+  SET_PPO_PARMS: {
+        last SET_PPO_PARMS if $ppo_desc eq 'no';
+        if ( $ppo_desc eq 'unblessed' ) {
+            $ppo = { desc => $ppo_desc };
+            last SET_PPO_PARMS;
         }
-        my $ppo = undef;
-        SET_PPO_PARMS: {
-            last SET_PPO_PARMS if $ppo_desc eq 'no';
-            if ( $ppo_desc eq 'unblessed' ) {
-                $ppo = { desc => $ppo_desc };
-                last SET_PPO_PARMS;
-            }
-            if ( $ppo_desc eq 'same blessed' ) {
-                $ppo         = bless { desc => $ppo_desc }, 'Package_Actions';
-                $method_desc = 'package method' if not defined $method_desc;
-                last SET_PPO_PARMS;
-            } ## end if ( $ppo_desc eq 'same blessed' )
-            if ( $ppo_desc eq 'other blessed' ) {
-                $ppo         = bless { desc => $ppo_desc }, 'Class_Actions';
-                $method_desc = 'class method' if not defined $method_desc;
-                last SET_PPO_PARMS;
-            } ## end if ( $ppo_desc eq 'other blessed' )
-            die;
-        } ## end SET_PPO_PARMS:
-        next PPO if not defined $method_desc;
-        my $value = join ';', $method_desc, 'letter=a';
-        my $desc = "$recce_arg_desc; $ppo_desc ppo";
-        push @tests, [ $recce_arg, $ppo, $value, 'Parse OK', $desc ];
-    } ## end PPO: for my $ppo_desc ( 'no', 'unblessed', 'same blessed',...)
-} ## end for my $recce_arg_desc ( 'semantics_package', 'no semantics_package')
+        if ( $ppo_desc eq 'same blessed' ) {
+            $ppo = bless { desc => $ppo_desc }, 'Package_Actions';
+            $method_desc = 'package method' if not defined $method_desc;
+            last SET_PPO_PARMS;
+        } ## end if ( $ppo_desc eq 'same blessed' )
+        if ( $ppo_desc eq 'other blessed' ) {
+            $ppo = bless { desc => $ppo_desc }, 'Class_Actions';
+            $method_desc = 'class method' if not defined $method_desc;
+            last SET_PPO_PARMS;
+        } ## end if ( $ppo_desc eq 'other blessed' )
+        die;
+    } ## end SET_PPO_PARMS:
+    next PPO if not defined $method_desc;
+    my $value = join ';', $method_desc, 'letter=a';
+    my $desc = "$ppo_desc ppo";
+    push @tests, [ $recce_arg, $ppo, $value, 'Parse OK', $desc ];
+} ## end PPO: for my $ppo_desc ( 'no', 'unblessed', 'same blessed',...)
 
 TEST:
 for my $test_data (@tests) {
