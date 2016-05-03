@@ -16,10 +16,10 @@
 # LC_ALL=C sort
 .gdbinit
 .gitattributes
-COPYING.LESSER
 Changes
 INSTALL
-LICENSE
+LICENSES/Artistic_1_0
+LICENSES/GPL_2
 MANIFEST
 MANIFEST.SKIP
 Makefile.PL
@@ -92,7 +92,9 @@ etc/check_license.pl
 etc/check_links.pl
 etc/compile_for_debug.sh
 etc/dovg.sh
-etc/libmarpa_get.pl
+etc/libmarpa_from_tar.sh
+etc/OLD_libmarpa_get.pl
+etc/OLD_libmarpa_test.sh
 etc/libmarpa_test.sh
 etc/my_suppressions
 etc/pod_dump.pl

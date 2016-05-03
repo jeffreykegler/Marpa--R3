@@ -1,17 +1,13 @@
-# Copyright 2016 Jeffrey Kegler
-# This file is part of Marpa::R3.  Marpa::R3 is free software: you can
-# redistribute it and/or modify it under the terms of the GNU Lesser
-# General Public License as published by the Free Software Foundation,
-# either version 3 of the License, or (at your option) any later version.
-#
-# Marpa::R3 is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-# Lesser General Public License for more details.
-#
-# You should have received a copy of the GNU Lesser
-# General Public License along with Marpa::R3.  If not, see
-# http://www.gnu.org/licenses/.
+# Marpa::R3 is Copyright (C) 2016, Jeffrey Kegler.
+# 
+# This module is free software; you can redistribute it and/or modify it
+# under the same terms as Perl 5.10.1. For more details, see the full text
+# of the licenses in the directory LICENSES.
+# 
+# This program is distributed in the hope that it will be
+# useful, but it is provided “as is” and without any express
+# or implied warranties. For details, see the full text of
+# of the licenses in the directory LICENSES.
 
 package Marpa::R3::Internal::License;
 
@@ -24,11 +20,11 @@ use Fatal qw(open close read);
 use File::Spec;
 use Text::Diff ();
 
-my $copyright_line = q{Copyright 2016 Jeffrey Kegler};
-( my $copyright_line_in_tex = $copyright_line )
+my $lgpl_copyright_line = q{Copyright 2016 Jeffrey Kegler};
+( my $copyright_line_in_tex = $lgpl_copyright_line )
     =~ s/ ^ Copyright \s /Copyright \\copyright\\ /xms;
 
-my $closed_license = "$copyright_line\n" . <<'END_OF_STRING';
+my $closed_license = "$lgpl_copyright_line\n" . <<'END_OF_STRING';
 This document is not part of the Marpa or Marpa::R3 source.
 Although it may be included with a Marpa distribution that
 is under an open source license, this document is
@@ -36,7 +32,7 @@ not under that open source license.
 Jeffrey Kegler retains full rights.
 END_OF_STRING
 
-my $license_body = <<'END_OF_STRING';
+my $lgpl_license_body = <<'END_OF_STRING';
 This file is part of Marpa::R3.  Marpa::R3 is free software: you can
 redistribute it and/or modify it under the terms of the GNU Lesser
 General Public License as published by the Free Software Foundation,
@@ -52,8 +48,24 @@ General Public License along with Marpa::R3.  If not, see
 http://www.gnu.org/licenses/.
 END_OF_STRING
 
-my $license = "$copyright_line\n$license_body";
-my $marpa_r3_license = $license;
+my $lgpl_license = "$lgpl_copyright_line\n$lgpl_license_body";
+
+my $perl_copyright_line = 'Marpa::R3 is Copyright (C) 2016, Jeffrey Kegler.';
+
+my $perl_license_body = <<'END_OF_STRING';
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5.10.1. For more details, see the full text
+of the licenses in the directory LICENSES.
+
+This program is distributed in the hope that it will be
+useful, but it is provided “as is” and without any express
+or implied warranties. For details, see the full text of
+of the licenses in the directory LICENSES.
+END_OF_STRING
+
+my $perl_license = "$perl_copyright_line\n$perl_license_body";
+
+my $marpa_r3_license = $lgpl_license;
 $marpa_r3_license =~ s/Marpa::R3/Libmarpa/gxms;
 
 my $mit_license_body = <<'END_OF_STRING';
@@ -76,14 +88,14 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 END_OF_STRING
 
-my $mit_license = "$copyright_line\n$mit_license_body";
+my $mit_license = "$lgpl_copyright_line\n$mit_license_body";
 
 # License, redone as Tex input
 my $license_in_tex =
-    "$copyright_line_in_tex\n" . "\\bigskip\\noindent\n" . "$license_body";
+    "$copyright_line_in_tex\n" . "\\bigskip\\noindent\n" . "$lgpl_license_body";
 $license_in_tex =~ s/^$/\\smallskip\\noindent/gxms;
 
-my $license_file = $license . <<'END_OF_STRING';
+my $license_file = $lgpl_license . <<'END_OF_STRING';
 
 In the Marpa::R3 distribution, the GNU Lesser General Public License
 version 3 should be in a file named "COPYING.LESSER".
@@ -110,7 +122,7 @@ This document is licensed under
 a Creative Commons Attribution-NoDerivs 3.0 United States License.
 END_OF_CC_A_ND_LANGUAGE
 
-my $cc_a_nd_license = "$copyright_line\n$cc_a_nd_body";
+my $cc_a_nd_license = "$lgpl_copyright_line\n$cc_a_nd_body";
 my $cc_a_nd_thanks = $cc_a_nd_body;
 
 sub hash_comment {
@@ -133,14 +145,14 @@ my $c_license          = c_comment($marpa_r3_license);
 my $c_mit_license          = c_comment($mit_license);
 my $c_mit_license_2015          = $c_mit_license;
     $c_mit_license_2015          =~ s/2016/2015/xms;
-my $xs_license          = c_comment($license);
-my $r2_hash_license    = hash_comment($license);
+my $xs_license          = c_comment($lgpl_license);
+my $r2_hash_license    = hash_comment($lgpl_license);
 my $libmarpa_hash_license    = hash_comment($mit_license);
-my $xsh_hash_license    = hash_comment($license, q{ #});
+my $xsh_hash_license    = hash_comment($lgpl_license, q{ #});
 my $tex_closed_license = hash_comment( $closed_license, q{%} );
-my $tex_license        = hash_comment( $license, q{%} );
+my $tex_license        = hash_comment( $lgpl_license, q{%} );
 my $tex_cc_a_nd_license = hash_comment( $cc_a_nd_license, q{%} );
-my $indented_license   = $license;
+my $indented_license   = $lgpl_license;
 $indented_license =~ s/^/  /gxms;
 $indented_license =~ s/[ ]+$//gxms;
 
@@ -352,6 +364,115 @@ my %files_by_type = (
     'engine/read_only/marpa_tavl.c' => \&ignored,
     'engine/read_only/marpa_tavl.h' => \&ignored,
 
+    # Leave Roberto's licensing as is
+
+    'lua/doc/contents.html' => \&ignored,
+    'lua/doc/cover.png' => \&ignored,
+    'lua/doc/logo.gif' => \&ignored,
+    'lua/doc/lua.1' => \&ignored,
+    'lua/doc/luac.1' => \&ignored,
+    'lua/doc/luac.html' => \&ignored,
+    'lua/doc/lua.css' => \&ignored,
+    'lua/doc/lua.html' => \&ignored,
+    'lua/doc/manual.css' => \&ignored,
+    'lua/doc/manual.html' => \&ignored,
+    'lua/doc/readme.html' => \&ignored,
+
+    'lua/COPYRIGHT' => \&ignored,
+    'lua/HISTORY' => \&ignored,
+    'lua/INSTALL' => \&ignored,
+    'lua/Makefile' => \&ignored,
+    'lua/README' => \&ignored,
+    'lua/test/bisect.lua' => \&ignored,
+    'lua/test/cf.lua' => \&ignored,
+    'lua/test/echo.lua' => \&ignored,
+    'lua/test/env.lua' => \&ignored,
+    'lua/test/factorial.lua' => \&ignored,
+    'lua/test/fibfor.lua' => \&ignored,
+    'lua/test/fib.lua' => \&ignored,
+    'lua/test/globals.lua' => \&ignored,
+    'lua/test/hello.lua' => \&ignored,
+    'lua/test/life.lua' => \&ignored,
+    'lua/test/luac.lua' => \&ignored,
+    'lua/test/printf.lua' => \&ignored,
+    'lua/test/README' => \&ignored,
+    'lua/test/readonly.lua' => \&ignored,
+    'lua/test/sieve.lua' => \&ignored,
+    'lua/test/sort.lua' => \&ignored,
+    'lua/test/table.lua' => \&ignored,
+    'lua/test/trace-calls.lua' => \&ignored,
+    'lua/test/trace-globals.lua' => \&ignored,
+    'lua/test/xd.lua' => \&ignored,
+    'lua/etc/all.c' => \&ignored,
+    'lua/etc/alllib.c' => \&ignored,
+    'lua/etc/lua.hpp' => \&ignored,
+    'lua/etc/lua.ico' => \&ignored,
+    'lua/etc/lua.pc' => \&ignored,
+    'lua/etc/luavs.bat' => \&ignored,
+    'lua/etc/Makefile' => \&ignored,
+    'lua/etc/min.c' => \&ignored,
+    'lua/etc/noparser.c' => \&ignored,
+    'lua/etc/README' => \&ignored,
+    'lua/etc/strict.lua' => \&ignored,
+    'lua/src/lapi.c' => \&ignored,
+    'lua/src/lapi.h' => \&ignored,
+    'lua/src/lauxlib.c' => \&ignored,
+    'lua/src/lauxlib.h' => \&ignored,
+    'lua/src/lbaselib.c' => \&ignored,
+    'lua/src/lcode.c' => \&ignored,
+    'lua/src/lcode.h' => \&ignored,
+    'lua/src/ldblib.c' => \&ignored,
+    'lua/src/ldebug.c' => \&ignored,
+    'lua/src/ldebug.h' => \&ignored,
+    'lua/src/ldo.c' => \&ignored,
+    'lua/src/ldo.h' => \&ignored,
+    'lua/src/ldump.c' => \&ignored,
+    'lua/src/lfunc.c' => \&ignored,
+    'lua/src/lfunc.h' => \&ignored,
+    'lua/src/lgc.c' => \&ignored,
+    'lua/src/lgc.h' => \&ignored,
+    'lua/src/liblua.a' => \&ignored,
+    'lua/src/linit.c' => \&ignored,
+    'lua/src/liolib.c' => \&ignored,
+    'lua/src/llex.c' => \&ignored,
+    'lua/src/llex.h' => \&ignored,
+    'lua/src/llimits.h' => \&ignored,
+    'lua/src/lmathlib.c' => \&ignored,
+    'lua/src/lmem.c' => \&ignored,
+    'lua/src/lmem.h' => \&ignored,
+    'lua/src/loadlib.c' => \&ignored,
+    'lua/src/lobject.c' => \&ignored,
+    'lua/src/lobject.h' => \&ignored,
+    'lua/src/lopcodes.c' => \&ignored,
+    'lua/src/lopcodes.h' => \&ignored,
+    'lua/src/loslib.c' => \&ignored,
+    'lua/src/lparser.c' => \&ignored,
+    'lua/src/lparser.h' => \&ignored,
+    'lua/src/lstate.c' => \&ignored,
+    'lua/src/lstate.h' => \&ignored,
+    'lua/src/lstring.c' => \&ignored,
+    'lua/src/lstring.h' => \&ignored,
+    'lua/src/lstrlib.c' => \&ignored,
+    'lua/src/ltable.c' => \&ignored,
+    'lua/src/ltable.h' => \&ignored,
+    'lua/src/ltablib.c' => \&ignored,
+    'lua/src/ltm.c' => \&ignored,
+    'lua/src/ltm.h' => \&ignored,
+    'lua/src/luac.c' => \&ignored,
+    'lua/src/lua.c' => \&ignored,
+    'lua/src/luaconf.h' => \&ignored,
+    'lua/src/lua.h' => \&ignored,
+    'lua/src/lualib.h' => \&ignored,
+    'lua/src/lundump.c' => \&ignored,
+    'lua/src/lundump.h' => \&ignored,
+    'lua/src/lvm.c' => \&ignored,
+    'lua/src/lvm.h' => \&ignored,
+    'lua/src/lzio.c' => \&ignored,
+    'lua/src/lzio.h' => \&ignored,
+    'lua/src/Makefile' => \&ignored,
+    'lua/src/prefix.pl' => \&ignored,
+    'lua/src/print.c' => \&ignored,
+
     # Libmarpa licensing
     'engine/read_only/marpa_ami.h' =>
         &gen_license_problems_in_c_file($c_mit_license_2015),
@@ -449,7 +570,7 @@ sub slurp {
 
 sub slurp_top {
     my ( $filename, $length ) = @_;
-    $length //= 1000 + ( length $license );
+    $length //= 2000 + ( length $perl_license );
     local $RS = undef;
     open my $fh, q{<}, $filename;
     my $text;
@@ -759,7 +880,7 @@ sub cc_a_nd {
         my $problem = "No CC-A-ND language in $filename (TeX style)\n";
         push @problems, $problem;
     }
-    if ( ( index ${$text}, $copyright_line ) < 0 ) {
+    if ( ( index ${$text}, $lgpl_copyright_line ) < 0 ) {
         my $problem = "No copyright line in $filename\n";
         push @problems, $problem;
     }
