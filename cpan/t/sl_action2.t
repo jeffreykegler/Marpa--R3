@@ -90,6 +90,6 @@ my $expected = \[
     'shadow of code_ref2'
 ];
 Test::More::is_deeply($value_ref, $expected, 'Constant actions');
-Test::More::is($side_effect, 42, 'semantics_package constructor');
+Test::More::is($side_effect, 0, 'semantics_package constructor elminated');
 
 # vim: expandtab shiftwidth=4:

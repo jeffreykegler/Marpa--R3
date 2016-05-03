@@ -32,28 +32,16 @@ use Data::Dumper;
 
 package Class_Actions;
 
-sub new {
-    my ( $class ) = @_;
-    return bless { ctor_desc => 'class ctor' }, $class;
-}
-
 sub do_A {
     my ( $self, $letter ) = @_;
-    my $ctor_desc = $self->{ctor_desc} // 'no ctor';
-    return join ';', $ctor_desc, "class method", "letter=$letter";
+    return join ';', "class method", "letter=$letter";
 }
 
 package Package_Actions;
 
-sub new {
-    my ( $class ) = @_;
-    return bless { ctor_desc => 'package ctor' }, $class;
-}
-
 sub do_A {
     my ( $self, $letter ) = @_;
-    my $ctor_desc = $self->{ctor_desc} // 'no ctor';
-    return join ';', $ctor_desc, "package method", "letter=$letter";
+    return join ';', "package method", "letter=$letter";
 }
 
 package main;
@@ -66,11 +54,9 @@ for my $recce_arg_desc ( 'semantics_package', 'no semantics_package' ) {
     PPO:
     for my $ppo_desc ( 'no', 'unblessed', 'same blessed', 'other blessed' ) {
         my $recce_arg   = {};
-        my $ctor_desc   = 'no ctor';
         my $method_desc = undef;
         if ( $recce_arg_desc eq 'semantics_package' ) {
             $recce_arg   = { semantics_package => 'Package_Actions' };
-            $ctor_desc   = 'package ctor';
             $method_desc = 'package method';
         }
         my $ppo = undef;
@@ -78,25 +64,22 @@ for my $recce_arg_desc ( 'semantics_package', 'no semantics_package' ) {
             last SET_PPO_PARMS if $ppo_desc eq 'no';
             if ( $ppo_desc eq 'unblessed' ) {
                 $ppo = { desc => $ppo_desc };
-                $ctor_desc = 'no ctor';
                 last SET_PPO_PARMS;
             }
             if ( $ppo_desc eq 'same blessed' ) {
                 $ppo         = bless { desc => $ppo_desc }, 'Package_Actions';
-                $ctor_desc   = 'no ctor';
                 $method_desc = 'package method' if not defined $method_desc;
                 last SET_PPO_PARMS;
             } ## end if ( $ppo_desc eq 'same blessed' )
             if ( $ppo_desc eq 'other blessed' ) {
                 $ppo         = bless { desc => $ppo_desc }, 'Class_Actions';
-                $ctor_desc   = 'no ctor';
                 $method_desc = 'class method' if not defined $method_desc;
                 last SET_PPO_PARMS;
             } ## end if ( $ppo_desc eq 'other blessed' )
             die;
         } ## end SET_PPO_PARMS:
         next PPO if not defined $method_desc;
-        my $value = join ';', $ctor_desc, $method_desc, 'letter=a';
+        my $value = join ';', $method_desc, 'letter=a';
         my $desc = "$recce_arg_desc; $ppo_desc ppo";
         push @tests, [ $recce_arg, $ppo, $value, 'Parse OK', $desc ];
     } ## end PPO: for my $ppo_desc ( 'no', 'unblessed', 'same blessed',...)

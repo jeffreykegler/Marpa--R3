@@ -273,10 +273,9 @@ In the Parse Tree Setup Subphase, the following happens:
 
 =item *
 
-The per-parse argument is created.
-If a per-parse constructor was found,
-it is run at this point, and the per-parse argument is
-its return value.
+If a per-parse argument was not supplied in the
+C<value()> method, the
+default per-parse argument is created.
 
 =item *
 

@@ -297,7 +297,6 @@ __DATA__
 
     { Fields for new SLIF resolution logic
     -- must be reinitialized when evaluation is reset }
-    PER_PARSE_CONSTRUCTOR
     RESOLVE_PACKAGE
     RESOLVE_PACKAGE_SOURCE
     REGISTRATIONS

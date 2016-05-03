@@ -963,10 +963,7 @@ This is initialized
 =item * To the argument to the SLIF recognizer's C<value()> method, if that
 argument is defined.
 
-=item * Otherwise, to the result returned by the per-parse constructor,
-if there is a per-parse constructor.
-
-=item * Otherwise, as a last resort, to an empty hashref.
+=item * Otherwise, to an empty hashref.
 
 =back
 
@@ -980,32 +977,6 @@ Applications can use
 the per-parse argument for data which does not conveniently fit the functional model.
 Symbol tables are
 one common example of data that is best handled outside the functional model.
-
-=head1 The per-parse constructor
-
-The per-parse constructor
-is the C<new()> method of the semantics package.
-If there is no semantics package, or if it has no C<new()> method,
-there is no per-parse constructor.
-The per-parse constructor is called with one argument:
-the name of the semantics package.
-
-The per-parse constructor is called
-in the
-L<Parse Tree Setup Subphase|Marpa::R3::Semantics::Phases/"Parse Tree Setup Subphase">.
-The Parse Tree Setup Subphase occurs during
-the first call to a recognizer's L<C<value()>|Marpa::R3::Scanless::R/"value()">
-method in a parse series.
-(All of a recognizer's C<value()> method calls
-refer to a single parse series unless
-the recognizer calls
-the
-L<C<series_restart()> method|Marpa::R3::Scanless::R/"series_restart()">.)
-More details about
-Parse Tree Setup Subphase
-can be found in
-L<the document that describes the processing phases of Marpa's
-semantics|Marpa::R3::Semantics::Phases>.
 
 =head1 Parse order
 

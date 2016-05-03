@@ -509,21 +509,6 @@ sub resolve_recce {
     $slr->[Marpa::R3::Internal::Scanless::R::RESOLVE_PACKAGE_SOURCE] =
         $package_source;
 
-    FIND_CONSTRUCTOR: {
-        my $constructor_package =
-            $slr->[Marpa::R3::Internal::Scanless::R::RESOLVE_PACKAGE];
-        last FIND_CONSTRUCTOR if not defined $constructor_package;
-        my $constructor_name = $constructor_package . q{::new};
-        my $resolve_error;
-        my $resolution =
-            Marpa::R3::Internal::Scanless::R::resolve_action( $slr, $constructor_name, \$resolve_error );
-        if ($resolution) {
-            $slr->[ Marpa::R3::Internal::Scanless::R::PER_PARSE_CONSTRUCTOR ]
-                = $resolution->[1];
-            last FIND_CONSTRUCTOR;
-        }
-    } ## end FIND_CONSTRUCTOR:
-
     my $resolve_error;
 
     my $default_action_resolution =
@@ -1427,48 +1412,7 @@ sub Marpa::R3::Scanless::R::value {
         registration_init( $slr, $per_parse_arg );
     }
 
-    my $semantics_arg0;
-    RUN_CONSTRUCTOR: {
-        # Do not run the constructor if there is a per-parse arg
-        last RUN_CONSTRUCTOR if defined $per_parse_arg;
-
-        my $per_parse_constructor =
-            $slr->[Marpa::R3::Internal::Scanless::R::PER_PARSE_CONSTRUCTOR];
-
-        # Do not run the constructor if there isn't one
-        last RUN_CONSTRUCTOR if not defined $per_parse_constructor;
-
-        my $constructor_arg0 =
-                $slr->[Marpa::R3::Internal::Scanless::R::RESOLVE_PACKAGE];
-
-        my @warnings;
-        my $eval_ok;
-        my $fatal_error;
-        DO_EVAL: {
-            local $EVAL_ERROR = undef;
-            local $SIG{__WARN__} = sub {
-                push @warnings, [ $_[0], ( caller 0 ) ];
-            };
-
-            $eval_ok = eval {
-                $semantics_arg0 = $per_parse_constructor->($constructor_arg0);
-                1;
-            };
-            $fatal_error = $EVAL_ERROR;
-        } ## end DO_EVAL:
-
-        if ( not $eval_ok or @warnings ) {
-            code_problems(
-                {   fatal_error => $fatal_error,
-                    eval_ok     => $eval_ok,
-                    warnings    => \@warnings,
-                    where       => 'constructing action object',
-                }
-            );
-        } ## end if ( not $eval_ok or @warnings )
-    } ## end RUN_CONSTRUCTOR:
-
-    $semantics_arg0 //= $per_parse_arg // {};
+    my $semantics_arg0 = $per_parse_arg // {};
 
     my $value = Marpa::R3::Thin::V->new($tree);
     $value->slr_set( $slr->thin() );

@@ -320,7 +320,6 @@ WriteMakefile(
     LICENSE  => 'perl_5',
     MYEXTLIB => 'xs/R3$(OBJ_EXT) xs/libmarpa$(LIB_EXT)',
 
-    test => { RECURSIVE_TEST_FILES => 1 }
 
 );
 
