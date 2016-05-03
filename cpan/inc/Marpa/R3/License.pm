@@ -512,9 +512,7 @@ sub file_type {
     return \&check_GNU_copyright
         if $GNU_file{$filename};
     return gen_license_problems_in_perl_file($perl_hash_license)
-        if $filepart =~ /[.] (pm) \z /xms;
-    return gen_license_problems_in_perl_file()
-        if $filepart =~ /[.] (t|pl|PL) \z /xms;
+        if $filepart =~ /[.] (PL|pl|pm|t) \z /xms;
     return gen_license_problems_in_perl_file()
         if $filepart eq 'typemap';
     return \&license_problems_in_fdl_file
