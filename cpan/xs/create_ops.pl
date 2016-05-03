@@ -53,20 +53,16 @@ my @ops = sort { $a->[0] cmp $b->[0] }
 
 say <<'END_OF_PREAMBLE';
 /*
- * Copyright 2016 Jeffrey Kegler
- * This file is part of Libmarpa.  Libmarpa is free software: you can
- * redistribute it and/or modify it under the terms of the GNU Lesser
- * General Public License as published by the Free Software Foundation,
- * either version 3 of the License, or (at your option) any later version.
+ * Marpa::R3 is Copyright (C) 2016, Jeffrey Kegler.
  *
- * Libmarpa is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
+ * This module is free software; you can redistribute it and/or modify it
+ * under the same terms as Perl 5.10.1. For more details, see the full text
+ * of the licenses in the directory LICENSES.
  *
- * You should have received a copy of the GNU Lesser
- * General Public License along with Libmarpa.  If not, see
- * http://www.gnu.org/licenses/.
+ * This program is distributed in the hope that it will be
+ * useful, but it is provided “as is” and without any express
+ * or implied warranties. For details, see the full text of
+ * of the licenses in the directory LICENSES.
  */
 
 END_OF_PREAMBLE
