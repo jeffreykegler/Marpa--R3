@@ -138,7 +138,7 @@ sub c_comment {
     return qq{/*\n$text */\n};
 } ## end sub c_comment
 
-my $c_license          = c_comment($marpa_r3_license);
+my $c_license          = c_comment($perl_license);
 my $c_mit_license          = c_comment($mit_license);
 my $c_mit_license_2015          = $c_mit_license;
     $c_mit_license_2015          =~ s/2016/2015/xms;
@@ -146,7 +146,7 @@ my $xs_license          = c_comment($perl_license);
 my $r2_hash_license    = hash_comment($lgpl_license);
 my $perl_hash_license    = hash_comment($perl_license);
 my $libmarpa_hash_license    = hash_comment($mit_license);
-my $xsh_hash_license    = hash_comment($lgpl_license, q{ #});
+my $xsh_hash_license    = hash_comment($perl_license, q{ #});
 my $tex_closed_license = hash_comment( $closed_license, q{%} );
 my $tex_license        = hash_comment( $lgpl_license, q{%} );
 my $tex_cc_a_nd_license = hash_comment( $cc_a_nd_license, q{%} );

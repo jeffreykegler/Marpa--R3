@@ -125,7 +125,6 @@ sub gp_generate {
 } ## end sub gp_generate
 
 print ${out} <<'END_OF_PREAMBLE';
- # Copyright 2016 Jeffrey Kegler
  # Marpa::R3 is Copyright (C) 2016, Jeffrey Kegler.
  #
  # This module is free software; you can redistribute it and/or modify it
