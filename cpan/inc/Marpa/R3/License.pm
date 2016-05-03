@@ -513,7 +513,7 @@ sub file_type {
         if $GNU_file{$filename};
     return gen_license_problems_in_perl_file($perl_hash_license)
         if $filepart =~ /[.] (PL|pl|pm|t) \z /xms;
-    return gen_license_problems_in_perl_file()
+    return gen_license_problems_in_perl_file($perl_hash_license)
         if $filepart eq 'typemap';
     return \&license_problems_in_fdl_file
         if $filepart eq 'internal.texi';
@@ -597,7 +597,7 @@ sub tops_equal {
 sub gen_license_problems_in_hash_file {
     my ($license, $year) = @_;
     $DB::single = 1;
-    $license //= $r2_hash_license;
+    $license //= $perl_hash_license;
     if ($year) {
        $license =~ s/2016/$year/;
     }
