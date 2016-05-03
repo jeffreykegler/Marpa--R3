@@ -125,7 +125,10 @@ sub my_parser {
 # Marpa::R3::Display
 # name: Scanless recognizer synopsis
 
-    my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
+    my $recce = Marpa::R3::Scanless::R->new( {
+        grammar => $grammar,
+        semantics_package => 'My_Actions'
+        } );
     my $self = bless { grammar => $grammar }, 'My_Actions';
     $self->{recce} = $recce;
 

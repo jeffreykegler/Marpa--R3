@@ -66,7 +66,10 @@ sub my_parser {
 
     my $self = bless { grammar => $grammar }, 'My_Actions';
 
-    my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
+    my $recce = Marpa::R3::Scanless::R->new( {
+        grammar => $grammar,
+        semantics_package => 'My_Actions'
+    } );
     $self->{slr} = $recce;
     my ( $parse_value, $parse_status, $last_expression );
 
