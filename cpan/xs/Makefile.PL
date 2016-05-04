@@ -40,7 +40,6 @@ WriteMakefile(
     VERSION => $STRING_VERSION,
     DEFINE    => $define,
     SKIP      => [qw(test dynamic dynamic_lib dlsyms)],
-    NO_MYMETA => 1,
     CCFLAGS => $ccflags,
     XS => { 'R3.xs' => 'R3.c' },
     OBJECT => 'R3.o',

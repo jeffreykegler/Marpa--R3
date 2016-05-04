@@ -44,7 +44,6 @@ WriteMakefile(
     VERSION => $STRING_VERSION,
     DEFINE    => $define,
     SKIP      => [qw(test dynamic dynamic_lib dlsyms)],
-    NO_MYMETA => 1,
 );
 
 sub MY::post_initialize {
