@@ -285,6 +285,63 @@ my @files_to_cleanup = (
     'engine/perl_ac_build',
 );
 
+my $libmarpa_build_dir =
+  $use_perl_autoconf
+  ? 'engine/perl_ac_build'
+  : 'engine/gnu_ac_build';
+my $libmarpa_in_build_dir =
+  $use_perl_autoconf
+  ?  $libmarpa_build_dir . q{/libmarpa$(LIB_EXT)}
+  :  $libmarpa_build_dir . q{/.libs/libmarpa$(LIB_EXT)};
+
+my $myextlib = join q{ }, 'xs/R3$(OBJ_EXT)', $libmarpa_in_build_dir;
+
+# my $ccflags = $Config{ccflags} . " -Iengine/read_only -Ixs";
+
+# my @debug_flags            = ();
+# if ($libmarpa_debug) {
+    # if ( defined $ENV{LIBMARPA_CFLAGS} ) {
+        # $ENV{CFLAGS} = $ENV{LIBMARPA_CFLAGS};
+    # }
+    # push @debug_flags, '-DMARPA_DEBUG=1';
+    # push @debug_flags, '-fno-inline', '-Wno-inline'
+        # if ( $Config{'cc'} eq 'gcc' );
+# } ## end if ($libmarpa_debug)
+
+undef &MY::postamble; # suppress warning
+*MY::postamble = sub {
+    my ($self) = @_;
+    my @postamble_pieces = (".NOTPARALLEL:\n");
+
+# == Logic to compile and build library for GNU autoconf
+    push @postamble_pieces, sprintf <<'END_OF_POSTAMBLE_PIECE',
+engine/gnu_ac_build/.libs/libmarpa$(LIB_EXT):
+	%s
+END_OF_POSTAMBLE_PIECE
+	$self->cd(File::Spec->catdir(qw(engine)), '$(MAKE)');
+
+# == Logic to compile and build library for Perl autoconf
+# GNU autoconf automatically creates/updates stamp-h1.
+# For Config::AutoConf, but we don't use it, so we don't create one.
+
+    push @postamble_pieces, sprintf <<'END_OF_POSTAMBLE_PIECE',
+engine/perl_ac_build/libmarpa$(LIB_EXT):
+	%s
+END_OF_POSTAMBLE_PIECE
+	$self->cd(File::Spec->catdir(qw(engine)), '$(MAKE)');
+
+# == Logic to build in XS directory:
+
+    push @postamble_pieces, sprintf <<'END_OF_POSTAMBLE_PIECE',
+xs/R3$(OBJ_EXT):
+	%s
+END_OF_POSTAMBLE_PIECE
+	$self->cd(File::Spec->catdir(qw(xs)), '$(MAKE)');
+
+    return join "\n", @postamble_pieces;
+
+}; ## end sub MY::postamble
+
 WriteMakefile(
     clean    => { FILES => ( join q{ }, @files_to_cleanup ) },
     NAME     => 'Marpa::R3',
@@ -295,10 +352,10 @@ WriteMakefile(
     # recommends         => \%recommends,
     CONFIGURE_REQUIRES => \%configure_requires,
     PM                 => \%pm_files,
-    # OBJECT => 'xs/R3.o',
     TYPEMAPS => ['typemap'],
     MIN_PERL_VERSION => '5.10.1',
-    DIR => ['xs'],
+    # CCFLAGS => $ccflags,
+    DIR => ['engine', 'xs'],
     META_ADD => {
         no_index => {
             directory => [
@@ -318,127 +375,8 @@ WriteMakefile(
     NO_META  => 1,
     MAN1PODS => \%pod_files,
     LICENSE  => 'perl_5',
-    MYEXTLIB => 'xs/R3$(OBJ_EXT) xs/libmarpa$(LIB_EXT)',
-
+    MYEXTLIB => $myextlib
 
 );
-
-# my @debug_flags            = ();
-# if ($libmarpa_debug) {
-    # if ( defined $ENV{LIBMARPA_CFLAGS} ) {
-        # $ENV{CFLAGS} = $ENV{LIBMARPA_CFLAGS};
-    # }
-    # push @debug_flags, '-DMARPA_DEBUG=1';
-    # push @debug_flags, '-fno-inline', '-Wno-inline'
-        # if ( $Config{'cc'} eq 'gcc' );
-# } ## end if ($libmarpa_debug)
-
-sub MY::postamble {
-    my ($self) = @_;
-    my @postamble_pieces = (".NOTPARALLEL:\n");
-    if ($use_perl_autoconf) {
-        push @postamble_pieces,
-	    'LIBMARPA_BUILD_DIR = engine/perl_ac_build',
-	    'LIBMARPA_IN_BUILD_DIR = $(LIBMARPA_BUILD_DIR)/libmarpa$(LIB_EXT)',
-	    q{};
-    } else {
-        push @postamble_pieces,
-	    'LIBMARPA_BUILD_DIR = engine/gnu_ac_build',
-	    'LIBMARPA_IN_BUILD_DIR = $(LIBMARPA_BUILD_DIR)/.libs/libmarpa$(LIB_EXT)',
-	    q{};
-    }
-
-    push @postamble_pieces, sprintf "LIBMARPA_INSTALL = %s\n",
-      $self->oneliner(
-'install([ from_to => {@ARGV}, skip => q{engine/cf/INSTALL.SKIP}, dir_mode => "$(PERM_DIR)" ]);',
-        [qw(-MExtUtils::Install)]
-      );
-
-    push @postamble_pieces, <<'END_OF_POSTAMBLE_PIECE';
-engine/gnu_ac_build/marpa.c engine/gnu_ac_build/marpa.h engine/gnu_ac_build/configure: \
-            engine/read_only/stamp-h1
-	$(LIBMARPA_INSTALL) engine/read_only engine/gnu_ac_build
-END_OF_POSTAMBLE_PIECE
-
-    push @postamble_pieces, <<'END_OF_POSTAMBLE_PIECE';
-engine/perl_ac_build/marpa.c engine/perl_ac_build/marpa.h: engine/read_only/stamp-h1
-	$(RM_RF) engine/perl_ac_build
-	$(LIBMARPA_INSTALL) engine/read_only engine/perl_ac_build
-END_OF_POSTAMBLE_PIECE
-
-
-# == Logic to create Makefile for GNU autoconf
-    push @postamble_pieces, sprintf <<'END_OF_POSTAMBLE_PIECE',
-engine/gnu_ac_build/config.h engine/gnu_ac_build/Makefile: engine/gnu_ac_build/configure
-	%s
-END_OF_POSTAMBLE_PIECE
-        $self->cd( File::Spec->catdir(qw(engine gnu_ac_build)),
-'$(SHELL) configure --with-pic --disable-shared --disable-maintainer-mode'
-        );
-
-# == Logic to create Makefile for Perl autoconf
-# The Makefile.PL reads the contents of the directory.  marpa.h
-# and marpa.c are prerequisites, so that the directory is populated
-# before Makefile.PL is copied over
-
-    push @postamble_pieces, <<'END_OF_POSTAMBLE_PIECE';
-engine/perl_ac_build/Makefile.PL: engine/cf/perl_ac_makefile.PL \
-		engine/perl_ac_build/marpa.c engine/perl_ac_build/marpa.h
-	cp engine/cf/perl_ac_makefile.PL engine/perl_ac_build/Makefile.PL
-END_OF_POSTAMBLE_PIECE
-
-    push @postamble_pieces, sprintf <<'END_OF_POSTAMBLE_PIECE',
-engine/perl_ac_build/Makefile: engine/perl_ac_build/Makefile.PL
-	%s
-END_OF_POSTAMBLE_PIECE
-	$self->cd(File::Spec->catdir(qw(engine perl_ac_build)), '$(PERLRUN) Makefile.PL');
-
-# == Logic to compile and build library for GNU autoconf
-    push @postamble_pieces, sprintf <<'END_OF_POSTAMBLE_PIECE',
-engine/gnu_ac_build/.libs/libmarpa$(LIB_EXT): \
-	    engine/gnu_ac_build/config.h engine/gnu_ac_build/Makefile
-	%s
-END_OF_POSTAMBLE_PIECE
-	$self->cd(File::Spec->catdir(qw(engine gnu_ac_build)), '$(MAKE)');
-
-# == Logic to compile and build library for Perl autoconf
-# GNU autoconf automatically creates/updates stamp-h1.
-# For Config::AutoConf, but we don't use it, so we don't create one.
-
-    push @postamble_pieces, sprintf <<'END_OF_POSTAMBLE_PIECE',
-engine/perl_ac_build/libmarpa$(LIB_EXT): engine/perl_ac_build/Makefile
-	%s
-END_OF_POSTAMBLE_PIECE
-	$self->cd(File::Spec->catdir(qw(engine perl_ac_build)), '$(MAKE)');
-
-# == Logic to build in XS directory:
-# This is common to both Perl and GNU autoconf
-
-    push @postamble_pieces, <<'END_OF_POSTAMBLE_PIECE';
-xs/R3$(OBJ_EXT): xs/libmarpa$(LIB_EXT) \
-    xs/marpa.h \
-    xs/marpa_codes.h \
-    xs/general_pattern.xsh \
-    xs/marpa_slifop.h
-
-xs/general_pattern.xsh: xs/gp_generate.pl
-	$(PERLRUN) xs/gp_generate.pl xs/general_pattern.xsh
-
-xs/marpa_slifop.h: xs/create_ops.pl
-	$(PERLRUN) xs/create_ops.pl > xs/marpa_slifop.h
-
-xs/marpa.h: $(LIBMARPA_BUILD_DIR)/marpa.h
-	$(CP) $? $@
-
-xs/marpa_codes.h: $(LIBMARPA_BUILD_DIR)/marpa_codes.h
-	$(CP) $? $@
-
-xs/libmarpa$(LIB_EXT): $(LIBMARPA_IN_BUILD_DIR)
-	$(CP) $(LIBMARPA_IN_BUILD_DIR) $@
-
-END_OF_POSTAMBLE_PIECE
-
-    return join "\n", @postamble_pieces;
-} ## end sub MY::postamble
 
 # vim: shiftwidth=4:

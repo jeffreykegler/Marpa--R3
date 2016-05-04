@@ -1,0 +1,155 @@
+# Marpa::R3 is Copyright (C) 2016, Jeffrey Kegler.
+#
+# This module is free software; you can redistribute it and/or modify it
+# under the same terms as Perl 5.10.1. For more details, see the full text
+# of the licenses in the directory LICENSES.
+#
+# This program is distributed in the hope that it will be
+# useful, but it is provided “as is” and without any express
+# or implied warranties. For details, see the full text of
+# of the licenses in the directory LICENSES.
+
+# This code is adopted from code in the SDBM_File module.
+
+use 5.010001;
+use strict;
+use warnings;
+use ExtUtils::Install;
+use Fatal qw(open close mkdir chdir);
+use File::Spec 0.82;
+use English qw( -no_match_vars );
+
+use Config;
+use ExtUtils::MakeMaker;
+
+use vars qw($VERSION $STRING_VERSION);
+$VERSION        = '4.001_003';
+$STRING_VERSION = $VERSION;
+## no critic (BuiltinFunctions::ProhibitStringyEval)
+$VERSION = eval $VERSION;
+## use critic
+
+
+my %perl_autoconf_os =
+    map { $_ => 1 } qw( MSWin32 openbsd solaris sunos midnightbsd );
+my $use_perl_autoconf = $ENV{MARPA_USE_PERL_AUTOCONF}
+    || ( $perl_autoconf_os{$^O} // 0 );
+
+my $define = q{};
+$define .= ' -DWIN32' if ($^O eq 'MSWin32');
+
+WriteMakefile(
+    INC => '-I.',
+    NAME      => 'Marpa::R3',
+    VERSION => $STRING_VERSION,
+    DEFINE    => $define,
+    SKIP      => [qw(test dynamic dynamic_lib dlsyms)],
+    NO_MYMETA => 1,
+);
+
+sub MY::post_initialize {
+    my ($self) = @_;
+    my @pieces = (".NOTPARALLEL:\n");
+    if ($use_perl_autoconf) {
+        push @pieces,
+	    'LIBMARPA_BUILD_DIR = perl_ac_build',
+	    'LIBMARPA_IN_BUILD_DIR = $(LIBMARPA_BUILD_DIR)/libmarpa$(LIB_EXT)',
+	    q{};
+    } else {
+        push @pieces,
+	    'LIBMARPA_BUILD_DIR = gnu_ac_build',
+	    'LIBMARPA_IN_BUILD_DIR = $(LIBMARPA_BUILD_DIR)/.libs/libmarpa$(LIB_EXT)',
+	    q{};
+    }
+    return join "\n", @pieces;
+}
+
+sub MY::top_targets {
+    my $r = '
+all :: $(LIBMARPA_IN_BUILD_DIR)
+	$(NOECHO) $(NOOP)
+	$(ECHO) hello from engine/Makefile.PL all target
+
+config ::
+	$(NOECHO) $(NOOP)
+
+# test is SKIP’ped, so this avoids nmake’s “don’t know how to make test” complaints
+test ::
+	$(NOECHO) $(NOOP)
+
+';
+    return $r;
+}
+
+sub MY::postamble {
+    my ($self) = @_;
+
+    my @postamble_pieces = ();
+    push @postamble_pieces, sprintf "LIBMARPA_INSTALL = %s\n",
+      $self->oneliner(
+'install([ from_to => {@ARGV}, skip => q{cf/INSTALL.SKIP}, dir_mode => "$(PERM_DIR)" ]);',
+        [qw(-MExtUtils::Install)]
+      );
+
+    push @postamble_pieces, <<'END_OF_POSTAMBLE_PIECE';
+gnu_ac_build/marpa.c gnu_ac_build/marpa.h gnu_ac_build/configure: \
+            read_only/stamp-h1
+	$(LIBMARPA_INSTALL) read_only gnu_ac_build
+END_OF_POSTAMBLE_PIECE
+
+    push @postamble_pieces, <<'END_OF_POSTAMBLE_PIECE';
+perl_ac_build/marpa.c perl_ac_build/marpa.h: read_only/stamp-h1
+	$(RM_RF) perl_ac_build
+	$(LIBMARPA_INSTALL) read_only perl_ac_build
+END_OF_POSTAMBLE_PIECE
+
+
+# == Logic to create Makefile for GNU autoconf
+    push @postamble_pieces, sprintf <<'END_OF_POSTAMBLE_PIECE',
+gnu_ac_build/config.h gnu_ac_build/Makefile: gnu_ac_build/configure
+	%s
+END_OF_POSTAMBLE_PIECE
+        $self->cd( File::Spec->catdir(qw(gnu_ac_build)),
+'$(SHELL) configure --with-pic --disable-shared --disable-maintainer-mode'
+        );
+
+# == Logic to create Makefile for Perl autoconf
+# The Makefile.PL reads the contents of the directory.  marpa.h
+# and marpa.c are prerequisites, so that the directory is populated
+# before Makefile.PL is copied over
+
+    push @postamble_pieces, <<'END_OF_POSTAMBLE_PIECE';
+perl_ac_build/Makefile.PL: cf/perl_ac_makefile.PL \
+		perl_ac_build/marpa.c perl_ac_build/marpa.h
+	cp cf/perl_ac_makefile.PL perl_ac_build/Makefile.PL
+END_OF_POSTAMBLE_PIECE
+
+    push @postamble_pieces, sprintf <<'END_OF_POSTAMBLE_PIECE',
+perl_ac_build/Makefile: perl_ac_build/Makefile.PL
+	%s
+END_OF_POSTAMBLE_PIECE
+	$self->cd(File::Spec->catdir(qw(perl_ac_build)), '$(PERLRUN) Makefile.PL');
+
+# == Logic to compile and build library for GNU autoconf
+    push @postamble_pieces, sprintf <<'END_OF_POSTAMBLE_PIECE',
+gnu_ac_build/.libs/libmarpa$(LIB_EXT): \
+	    gnu_ac_build/config.h gnu_ac_build/Makefile
+	%s
+	$(ECHO) hello from Perl AC libmarpa.a target
+END_OF_POSTAMBLE_PIECE
+	$self->cd(File::Spec->catdir(qw(gnu_ac_build)), '$(MAKE)');
+
+# == Logic to compile and build library for Perl autoconf
+# GNU autoconf automatically creates/updates stamp-h1.
+# For Config::AutoConf, but we don't use it, so we don't create one.
+
+    push @postamble_pieces, sprintf <<'END_OF_POSTAMBLE_PIECE',
+perl_ac_build/libmarpa$(LIB_EXT): perl_ac_build/Makefile
+	%s
+	$(ECHO) hello from Perl AC libmarpa.a target
+END_OF_POSTAMBLE_PIECE
+	$self->cd(File::Spec->catdir(qw(perl_ac_build)), '$(MAKE)');
+
+    return join "\n", @postamble_pieces;
+} ## end sub MY::postamble
+

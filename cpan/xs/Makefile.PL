@@ -9,13 +9,17 @@
 # or implied warranties. For details, see the full text of
 # of the licenses in the directory LICENSES.
 
-# This writes a Makefile in the libmarpa build directory.
-# It used in cases where GNU autoconf does not work.
-
-# It expects to be run in the libmarpa *build* directory.
-
 # This code is adopted from code in the SDBM_File module.
 
+use 5.010001;
+use strict;
+use warnings;
+use ExtUtils::Install;
+use Fatal qw(open close mkdir chdir);
+use File::Spec 0.82;
+use English qw( -no_match_vars );
+
+use Config;
 use ExtUtils::MakeMaker;
 
 use vars qw($VERSION $STRING_VERSION);
@@ -28,22 +32,18 @@ $VERSION = eval $VERSION;
 my $define = q{};
 $define .= ' -DWIN32' if ($^O eq 'MSWin32');
 
-my @c_files = <*.c>;
-my $o_files = join q{ }, @c_files;
-$o_files =~ s/[.]c/.o/xmsg;
+my $ccflags = $Config{ccflags} . " -I../engine/read_only";
 
 WriteMakefile(
     INC => '-I.',
     NAME      => 'Marpa::R3',
     VERSION => $STRING_VERSION,
-#    LINKTYPE  => 'static',
     DEFINE    => $define,
     SKIP      => [qw(test dynamic dynamic_lib dlsyms)],
+    NO_MYMETA => 1,
+    CCFLAGS => $ccflags,
     XS => { 'R3.xs' => 'R3.c' },
     OBJECT => 'R3.o',
-    # clean     => {'FILES' => 'libmarpa.a'},
-    # H         => \@h_files,
-    # C         => \@c_files,
 );
 
 
@@ -51,6 +51,8 @@ sub MY::top_targets {
     my $r = '
 all :: R3$(OBJ_EXT)
 	$(NOECHO) $(NOOP)
+	$(NOECHO) $(ECHO) Executing all target in xs directory
+
 
 config ::
 	$(NOECHO) $(NOOP)
@@ -62,3 +64,22 @@ test ::
 ';
     return $r;
 }
+
+sub MY::postamble {
+    my ($self) = @_;
+    my @postamble_pieces = (".NOTPARALLEL:\n");
+
+    push @postamble_pieces, <<'END_OF_POSTAMBLE_PIECE';
+R3$(OBJ_EXT): general_pattern.xsh marpa_slifop.h
+
+general_pattern.xsh: gp_generate.pl
+	$(PERLRUN) gp_generate.pl general_pattern.xsh
+
+marpa_slifop.h: create_ops.pl
+	$(PERLRUN) create_ops.pl > marpa_slifop.h
+
+END_OF_POSTAMBLE_PIECE
+
+    return join "\n", @postamble_pieces;
+} ## end sub MY::postamble
+
