@@ -222,7 +222,7 @@ sub Marpa::R3::Scanless::R::new {
         Marpa::R3::exception( $grammar_c->error() );
     }
 
-    common_set_1( $slr, "new",  $flat_args );
+    common_set( $slr, "new",  $flat_args );
 
     $recce_c->ruby_slippers_set(1);
 
@@ -303,7 +303,7 @@ sub Marpa::R3::Scanless::R::set {
     my ( $slr, @args ) = @_;
     my ($flat_args, $error_message) = Marpa::R3::flatten_hash_args(\@args);
     Marpa::R3::exception( sprintf $error_message, '$slr->set()' ) if not $flat_args;
-    common_set_1( $slr, "set", $flat_args );
+    common_set( $slr, "set", $flat_args );
     return $slr;
 } ## end sub Marpa::R3::Scanless::R::set
 
@@ -311,10 +311,11 @@ sub Marpa::R3::Scanless::R::set {
 # or is for series reset or the constructor.  "Context" flags of this kind
 # are much decried practice, and for good reason, but in this case
 # I think it is justified.
-# This logic really needs to be all in one place, and so a flag
+# This logic is best kept all in one place, and a flag
 # to trigger the minor differences needed by the various calling
-# contexts is a small price to pay.
-sub common_set_1 {
+# contexts is a small price to pay for that.
+#
+sub common_set {
 
     my ( $slr, $method, $flat_args ) = @_;
 
@@ -1471,7 +1472,7 @@ sub Marpa::R3::Scanless::R::series_restart {
 
     my ($flat_args, $error_message) = Marpa::R3::flatten_hash_args(\@args);
     Marpa::R3::exception( sprintf $error_message, '$slr->series_restart()' ) if not $flat_args;
-    common_set_1($slr, "series_restart", $flat_args );
+    common_set($slr, "series_restart", $flat_args );
     return 1;
 }
 
