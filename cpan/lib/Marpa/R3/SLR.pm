@@ -222,8 +222,7 @@ sub Marpa::R3::Scanless::R::new {
         Marpa::R3::exception( $grammar_c->error() );
     }
 
-    my $g1_recce_args =
-        common_set_1( $slr, "new",  $flat_args );
+    common_set_1( $slr, "new",  $flat_args );
 
     $recce_c->ruby_slippers_set(1);
 
@@ -283,8 +282,6 @@ sub Marpa::R3::Scanless::R::new {
         Marpa::R3::exception( 'Recognizer start of input failed: ', $error );
     }
 
-    Marpa::R3::Internal::Scanless::R::common_set_2($slr, $g1_recce_args);
-
     if ( $slr->[Marpa::R3::Internal::Scanless::R::TRACE_TERMINALS] > 1 ) {
         my $terminals_expected = $slr->terminals_expected();
         for my $terminal ( sort @{$terminals_expected} ) {
@@ -306,9 +303,7 @@ sub Marpa::R3::Scanless::R::set {
     my ( $slr, @args ) = @_;
     my ($flat_args, $error_message) = Marpa::R3::flatten_hash_args(\@args);
     Marpa::R3::exception( sprintf $error_message, '$slr->set()' ) if not $flat_args;
-    my $recce_args =
-        common_set_1( $slr, "set", $flat_args );
-    Marpa::R3::Internal::Scanless::R::common_set_2($slr, $recce_args);
+    common_set_1( $slr, "set", $flat_args );
     return $slr;
 } ## end sub Marpa::R3::Scanless::R::set
 
@@ -454,22 +449,15 @@ sub common_set_1 {
         $recce_c->earley_item_warning_threshold_set($value);
     }
 
-    state $copyable_recce_args = {
-        map { ( $_, 1 ); }
-          qw(end)
-    };
+    if ( defined( my $value = $flat_args->{'end'} ) ) {
 
-    # Prune flat args of all those named args which are NOT to be copied
-    my %g1_recce_args = ();
-    for my $arg_name (
-        grep { $copyable_recce_args->{$_} }
-        keys %{$flat_args}
-      )
-    {
-        $g1_recce_args{$arg_name} = $flat_args->{$arg_name};
-    }
-
-    return \%g1_recce_args;
+        # Not allowed once evaluation is started
+        if ( defined $slr->[Marpa::R3::Internal::Scanless::R::B_C] ) {
+            Marpa::R3::exception(
+                q{Cannot reset end once evaluation has started});
+        }
+        $slr->[Marpa::R3::Internal::Scanless::R::END_OF_PARSE] = $value;
+    } ## end if ( defined( my $value = $arg_hash->{'end'} ) )
 
 }
 
@@ -1483,27 +1471,7 @@ sub Marpa::R3::Scanless::R::series_restart {
 
     my ($flat_args, $error_message) = Marpa::R3::flatten_hash_args(\@args);
     Marpa::R3::exception( sprintf $error_message, '$slr->series_restart()' ) if not $flat_args;
-    my ($g1_recce_args) = common_set_1($slr, "series_restart", $flat_args );
-    Marpa::R3::Internal::Scanless::R::common_set_2( $slr, $g1_recce_args );
-    return 1;
-}
-
-sub Marpa::R3::Internal::Scanless::R::common_set_2 {
-    my ( $slr, $arg_hash ) = @_;
-    my $recce_c = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
-
-    my $trace_fh = $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
-
-    if ( defined( my $value = $arg_hash->{'end'} ) ) {
-
-        # Not allowed once evaluation is started
-        if ( defined $slr->[Marpa::R3::Internal::Scanless::R::B_C] ) {
-            Marpa::R3::exception(
-                q{Cannot reset end once evaluation has started});
-        }
-        $slr->[Marpa::R3::Internal::Scanless::R::END_OF_PARSE] = $value;
-    } ## end if ( defined( my $value = $arg_hash->{'end'} ) )
-
+    common_set_1($slr, "series_restart", $flat_args );
     return 1;
 }
 
