@@ -14,6 +14,7 @@ junk
 /Marpa-R3-[0-9].[0-9][0-9][0-9][0-9][0-9][0-9]/
 /Marpa-R3-[0-9].[0-9][0-9][0-9]_[0-9][0-9][0-9].tar.gz
 /Marpa-R3-[0-9].[0-9][0-9][0-9][0-9][0-9][0-9].tar.gz
+/Makefile[.]old
 /META.json
 /META.yml
 /MYMETA.json

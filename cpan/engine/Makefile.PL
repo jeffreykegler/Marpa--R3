@@ -90,21 +90,21 @@ sub MY::postamble {
       );
 
     push @postamble_pieces, <<'END_OF_POSTAMBLE_PIECE';
-gnu_ac_build/marpa.c gnu_ac_build/marpa.h gnu_ac_build/configure: \
-            read_only/stamp-h1
+gnu_ac_build/configure: read_only/stamp-h1
 	$(LIBMARPA_INSTALL) read_only gnu_ac_build
 END_OF_POSTAMBLE_PIECE
 
     push @postamble_pieces, <<'END_OF_POSTAMBLE_PIECE';
-perl_ac_build/marpa.c perl_ac_build/marpa.h: read_only/stamp-h1
+perl_ac_build/Makefile.PL: read_only/stamp-h1 cf/perl_ac_makefile.PL
 	$(RM_RF) perl_ac_build
 	$(LIBMARPA_INSTALL) read_only perl_ac_build
+	cp cf/perl_ac_makefile.PL perl_ac_build/Makefile.PL
 END_OF_POSTAMBLE_PIECE
 
 
 # == Logic to create Makefile for GNU autoconf
     push @postamble_pieces, sprintf <<'END_OF_POSTAMBLE_PIECE',
-gnu_ac_build/config.h gnu_ac_build/Makefile: gnu_ac_build/configure
+gnu_ac_build/Makefile: gnu_ac_build/configure
 	%s
 END_OF_POSTAMBLE_PIECE
         $self->cd( File::Spec->catdir(qw(gnu_ac_build)),
@@ -112,14 +112,11 @@ END_OF_POSTAMBLE_PIECE
         );
 
 # == Logic to create Makefile for Perl autoconf
-# The Makefile.PL reads the contents of the directory.  marpa.h
-# and marpa.c are prerequisites, so that the directory is populated
-# before Makefile.PL is copied over
+# The Makefile.PL reads the contents of the directory,
+# so the directory must be populated
+# before Makefile.PL is run.
 
     push @postamble_pieces, <<'END_OF_POSTAMBLE_PIECE';
-perl_ac_build/Makefile.PL: cf/perl_ac_makefile.PL \
-		perl_ac_build/marpa.c perl_ac_build/marpa.h
-	cp cf/perl_ac_makefile.PL perl_ac_build/Makefile.PL
 END_OF_POSTAMBLE_PIECE
 
     push @postamble_pieces, sprintf <<'END_OF_POSTAMBLE_PIECE',
@@ -130,8 +127,7 @@ END_OF_POSTAMBLE_PIECE
 
 # == Logic to compile and build library for GNU autoconf
     push @postamble_pieces, sprintf <<'END_OF_POSTAMBLE_PIECE',
-gnu_ac_build/.libs/libmarpa$(LIB_EXT): \
-	    gnu_ac_build/config.h gnu_ac_build/Makefile
+gnu_ac_build/.libs/libmarpa$(LIB_EXT): gnu_ac_build/Makefile
 	%s
 	$(ECHO) hello from Perl AC libmarpa.a target
 END_OF_POSTAMBLE_PIECE
