@@ -37,15 +37,8 @@ my $use_perl_autoconf = $ENV{MARPA_USE_PERL_AUTOCONF}
 my $define = q{};
 $define .= ' -DWIN32' if ($^O eq 'MSWin32');
 
-WriteMakefile(
-    INC => '-I.',
-    NAME      => 'Marpa::R3',
-    VERSION => $STRING_VERSION,
-    DEFINE    => $define,
-    SKIP      => [qw(test dynamic dynamic_lib dlsyms)],
-);
-
-sub MY::post_initialize {
+undef &MY::post_initialize; # suppress warning
+*MY::post_initialize = sub {
     my ($self) = @_;
     my @pieces = (".NOTPARALLEL:\n");
     if ($use_perl_autoconf) {
@@ -60,9 +53,10 @@ sub MY::post_initialize {
 	    q{};
     }
     return join "\n", @pieces;
-}
+};
 
-sub MY::top_targets {
+undef &MY::top_targets; # suppress warning
+*MY::top_targets = sub {
     my $r = '
 all :: $(LIBMARPA_IN_BUILD_DIR)
 	$(NOECHO) $(NOOP)
@@ -77,9 +71,10 @@ test ::
 
 ';
     return $r;
-}
+};
 
-sub MY::postamble {
+undef &MY::postamble; # suppress warning
+*MY::postamble = sub {
     my ($self) = @_;
 
     my @postamble_pieces = ();
@@ -145,5 +140,13 @@ END_OF_POSTAMBLE_PIECE
 	$self->cd(File::Spec->catdir(qw(perl_ac_build)), '$(MAKE)');
 
     return join "\n", @postamble_pieces;
-} ## end sub MY::postamble
+};
+
+WriteMakefile(
+    INC => '-I.',
+    NAME      => 'Marpa::R3',
+    VERSION => $STRING_VERSION,
+    DEFINE    => $define,
+    SKIP      => [qw(test dynamic dynamic_lib dlsyms)],
+);
 

@@ -34,19 +34,8 @@ $define .= ' -DWIN32' if ($^O eq 'MSWin32');
 
 my $ccflags = $Config{ccflags} . " -I../engine/read_only";
 
-WriteMakefile(
-    INC => '-I.',
-    NAME      => 'Marpa::R3',
-    VERSION => $STRING_VERSION,
-    DEFINE    => $define,
-    SKIP      => [qw(test dynamic dynamic_lib dlsyms)],
-    CCFLAGS => $ccflags,
-    XS => { 'R3.xs' => 'R3.c' },
-    OBJECT => 'R3.o',
-);
-
-
-sub MY::top_targets {
+undef &MY::top_targets; # suppress warning
+*MY::top_targets = sub {
     my $r = '
 all :: R3$(OBJ_EXT)
 	$(NOECHO) $(NOOP)
@@ -62,9 +51,10 @@ test ::
 
 ';
     return $r;
-}
+};
 
-sub MY::postamble {
+undef &MY::postamble; # suppress warning
+*MY::postamble = sub {
     my ($self) = @_;
     my @postamble_pieces = (".NOTPARALLEL:\n");
 
@@ -80,5 +70,16 @@ marpa_slifop.h: create_ops.pl
 END_OF_POSTAMBLE_PIECE
 
     return join "\n", @postamble_pieces;
-} ## end sub MY::postamble
+};
+
+WriteMakefile(
+    INC => '-I.',
+    NAME      => 'Marpa::R3',
+    VERSION => $STRING_VERSION,
+    DEFINE    => $define,
+    SKIP      => [qw(test dynamic dynamic_lib dlsyms)],
+    CCFLAGS => $ccflags,
+    XS => { 'R3.xs' => 'R3.c' },
+    OBJECT => 'R3.o',
+);
 

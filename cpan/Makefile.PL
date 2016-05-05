@@ -352,9 +352,7 @@ WriteMakefile(
     # recommends         => \%recommends,
     CONFIGURE_REQUIRES => \%configure_requires,
     PM                 => \%pm_files,
-    TYPEMAPS => ['typemap'],
     MIN_PERL_VERSION => '5.10.1',
-    # CCFLAGS => $ccflags,
     DIR => ['engine', 'xs'],
     META_ADD => {
         no_index => {
