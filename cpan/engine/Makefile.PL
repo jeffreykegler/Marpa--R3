@@ -23,12 +23,11 @@ use Config;
 use ExtUtils::MakeMaker;
 
 use vars qw($VERSION $STRING_VERSION);
-$VERSION        = '4.001_003';
+$VERSION        = '4.001_004';
 $STRING_VERSION = $VERSION;
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 $VERSION = eval $VERSION;
 ## use critic
-
 
 my %perl_autoconf_os =
     map { $_ => 1 } qw( MSWin32 openbsd solaris sunos midnightbsd );

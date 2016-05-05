@@ -12,21 +12,9 @@
 
 Revision history for Marpa::R3
 
-4.001_003 (libmarpa 8.4.0) Mon May  2 09:12:57 PDT 2016
+4.001_004 (libmarpa 8.4.0) Wed May  4 17:11:54 PDT 2016
 
-   * See Changes.pod
-
-4.001_002 (libmarpa 8.3.0) Wed Apr 20 20:12:36 PDT 2016
-
-   * See Changes.pod
-
-4.001_001 (libmarpa 8.3.0) Mon Apr 18 20:12:37 PDT 2016
-
-   * See Changes.pod
-
-4.001_000 (libmarpa 8.3.0) Tue Apr 12 17:39:56 PDT 2016
-
-   * Version bump, for the benefit of CPAN indexing
+   * For this series of releases, see Changes.pod
 
 1.001_000 (libmarpa 8.3.0) Thu Mar 31 19:05:09 PDT 2016
 

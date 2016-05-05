@@ -56,6 +56,7 @@ cpan/lib/Marpa/R3/Value.pm
 cpan/Makefile.PL
 cpan/meta/make_internal_pm.pl
 cpan/xs/Makefile.PL
+cpan/engine/Makefile.PL
 END_OF_LIST
 
 for my $versioned_file (@versioned_files) {
