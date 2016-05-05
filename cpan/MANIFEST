@@ -36,6 +36,7 @@ author.t/spelling_exceptions.list
 author.t/tidy.t
 author.t/tidy1
 engine/LOG_DATA
+engine/Makefile.PL
 engine/README
 engine/SHARED
 engine/STATIC
@@ -85,13 +86,13 @@ engine/read_only/stamp-h1
 engine/read_only/win32/do_config_h.pl
 engine/read_only/win32/marpa.def
 etc/Makefile
+etc/OLD_libmarpa_get.pl
+etc/OLD_libmarpa_test.sh
 etc/check_license.pl
 etc/check_links.pl
 etc/compile_for_debug.sh
 etc/dovg.sh
 etc/libmarpa_from_tar.sh
-etc/OLD_libmarpa_get.pl
-etc/OLD_libmarpa_test.sh
 etc/my_suppressions
 etc/pod_dump.pl
 etc/pod_errors.pl
