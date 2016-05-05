@@ -1,2 +1,5 @@
 /gnu_ac_build/
+/Makefile
+/Makefile[.]old
+/MYMETA[.]*
 /perl_ac_build/
