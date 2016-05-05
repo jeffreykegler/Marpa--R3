@@ -50,6 +50,9 @@
 ^blib/
 ^blib_shared/
 ^dovg[.]log$
+^engine/MYMETA.
+^engine/Makefile$
+^engine/Makefile[.]old$
 ^engine/cf/LIBMARPA_MODE$
 ^engine/gnu_ac_build/
 ^engine/perl_ac_build/

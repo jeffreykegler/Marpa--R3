@@ -306,6 +306,7 @@ my %files_by_type = (
     'META.yml' =>
         \&ignored,    # not source, and not clear how to add license at top
     'README'                            => \&trivial,
+    'ABOUT_ME'                          => \&trivial,
     'INSTALL'                           => \&trivial,
     'TODO'                              => \&trivial,
     'author.t/accept_tidy'              => \&trivial,
@@ -349,6 +350,7 @@ my %files_by_type = (
 
     ## GNU standard -- has their license language
     'engine/read_only/INSTALL' => \&ignored,
+    'engine/read_only/compile' => \&ignored,
 
     'engine/read_only/COPYING' => gen_license_problems_in_text_file( $mit_license_body ),
     'engine/read_only/stamp-h1' => \&trivial,
