@@ -49,6 +49,11 @@ config ::
 test ::
 	$(NOECHO) $(NOOP)
 
+# and so is test_dynamic, so this helps avoid make’s
+# “don’t know how to make test_dynamic” complaints under freebsd
+test_dynamic ::
+	$(NOECHO) $(NOOP)
+
 ';
     return $r;
 };
@@ -77,7 +82,7 @@ WriteMakefile(
     NAME      => 'Marpa::R3',
     VERSION => $STRING_VERSION,
     DEFINE    => $define,
-    SKIP      => [qw(test dynamic dynamic_lib dlsyms)],
+    SKIP      => [qw(test test_dynamic dynamic dynamic_lib dlsyms)],
     CCFLAGS => $ccflags,
     XS => { 'R3.xs' => 'R3.c' },
     OBJECT => 'R3.o',
