@@ -98,8 +98,8 @@ sub ast_to_hash {
             rhs    => [$start_lhs],
             action => '::first'
           };
-        $rule_data = $hashed_ast->xalt_create( $rule_data, 'G1' );
-        push @{ $hashed_ast->{rules}->{G1} }, $rule_data;
+        my $wrl= $hashed_ast->xalt_create( $rule_data, 'G1' );
+        push @{ $hashed_ast->{rules}->{G1} }, $wrl;
     } ## end sub Marpa::R3::Internal::MetaAST::start_rule_create
 
     # add all the "ordinary" symbols, those with no
@@ -1182,8 +1182,6 @@ sub Marpa::R3::Internal::MetaAST_Nodes::quantified_rule::evaluate {
         min => ( $quantifier->evaluate($parse) eq q{+} ? 1 : 0 )
     );
 
-    my @rules = ( \%sequence_rule );
-
     my $action;
     my $blessing;
     my $naming;
@@ -1266,7 +1264,8 @@ sub Marpa::R3::Internal::MetaAST_Nodes::quantified_rule::evaluate {
     }
     $parse->bless_hash_rule( \%sequence_rule, $blessing, $naming, $lhs_name );
 
-    push @{ $parse->{rules}->{$subgrammar} }, @rules;
+    my $wrl = $parse->xalt_create( \%sequence_rule, $subgrammar );
+    push @{ $parse->{rules}->{$subgrammar} }, $wrl;
     ## no critic(Subroutines::ProhibitExplicitReturnUndef)
     return undef;
 
