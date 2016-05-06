@@ -98,7 +98,7 @@ sub ast_to_hash {
             rhs    => [$start_lhs],
             action => '::first'
           };
-        $rule_data->{xaltid} = $hashed_ast->xalt_create( $rule_data, 'G1' );
+        $rule_data = $hashed_ast->xalt_create( $rule_data, 'G1' );
         push @{ $hashed_ast->{rules}->{G1} }, $rule_data;
     } ## end sub Marpa::R3::Internal::MetaAST::start_rule_create
 
@@ -992,8 +992,9 @@ sub Marpa::R3::Internal::MetaAST_Nodes::empty_rule::evaluate {
     }
     $parse->bless_hash_rule( \%rule, $blessing, $naming, $lhs );
 
+    my $wrl = $parse->xalt_create( \%rule, $subgrammar );
     # mask not needed
-    push @{ $parse->{rules}->{$subgrammar} }, \%rule;
+    push @{ $parse->{rules}->{$subgrammar} }, $wrl;
 
     ## no critic(Subroutines::ProhibitExplicitReturnUndef)
     return undef;
@@ -1153,7 +1154,8 @@ sub Marpa::R3::Internal::MetaAST_Nodes::discard_rule::evaluate {
         symbol_as_event => $rhs_as_event
     );
     $rule_hash{event} = $event if defined $event;
-    push @{ $parse->{rules}->{L0} }, \%rule_hash;
+    my $wrl = $parse->xalt_create( \%rule_hash, 'L0' );
+    push @{ $parse->{rules}->{L0} }, $wrl;
     ## no critic(Subroutines::ProhibitExplicitReturnUndef)
     return undef;
 } ## end sub Marpa::R3::Internal::MetaAST_Nodes::discard_rule::evaluate
@@ -1473,7 +1475,8 @@ sub Marpa::R3::Internal::MetaAST_Nodes::character_class::evaluate {
         rhs  => $lexical_rhs,
         mask => [1],
     );
-    push @{ $parse->{rules}->{L0} }, \%lexical_rule;
+    my $wrl = $parse->xalt_create( \%lexical_rule, 'L0' );
+    push @{ $parse->{rules}->{L0} }, $wrl;
     my $g1_symbol =
         Marpa::R3::Internal::MetaAST::Symbol_List->new($lexical_lhs);
     return $g1_symbol;
@@ -1516,7 +1519,8 @@ sub Marpa::R3::Internal::MetaAST_Nodes::single_quoted_string::evaluate {
         # description => "Internal rule for single-quoted string $string",
         mask => [ map { ; 1 } @{$lexical_rhs} ],
     );
-    push @{ $parse->{rules}->{$lexical_grammar} }, \%lexical_rule;
+    my $wrl = $parse->xalt_create( \%lexical_rule, 'L0' );
+    push @{ $parse->{rules}->{$lexical_grammar} }, $wrl;
     my $g1_symbol =
         Marpa::R3::Internal::MetaAST::Symbol_List->new($lexical_lhs);
     return $g1_symbol;
@@ -1688,14 +1692,15 @@ sub Marpa::R3::Internal::MetaAST::Parse::xalt_create {
     DATUM: for my $datum (keys %{$args}) {
         my $value = $args->{$datum};
         # Deep copy of rhs
-        if ($datum eq 'rhs') {
+        if ($datum =~ /\A (rhs|mask) \z$/xms) {
             my @rhs = @{$value};
             $xalt_data->{$datum} = \@rhs;
             next DATUM;
         }
         $xalt_data->{$datum} = $value;
     }
-    return $rule_id;
+    $args->{xaltid} = $rule_id;
+    return $args;
 }
 
 # Return the prioritized symbol name,
