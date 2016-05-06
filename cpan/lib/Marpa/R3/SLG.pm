@@ -390,7 +390,7 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     # If no lexer rules, fake a lexer
     # Fake a lexer -- it discards symbols in character classes which
     # never matches
-    if ( not $lexer_rules ) {
+    if ( not scalar @{$lexer_rules} ) {
         $character_class_hash = { '[[^\\d\\D]]' => [ '[^\\d\\D]', '' ] };
         $lexer_rules = [
             {   'rhs'         => [ '[[^\\d\\D]]' ],

@@ -59,7 +59,9 @@ sub ast_to_hash {
     $hashed_ast->{meta_recce} = $ast->{meta_recce};
     bless $hashed_ast, 'Marpa::R3::Internal::MetaAST::Parse';
 
-    $hashed_ast->{xalt} = [];
+    $hashed_ast->{xalt}->{L0} = [];
+    $hashed_ast->{xalt}->{G1} = [];
+    $hashed_ast->{rules}->{L0} = [];
     $hashed_ast->{rules}->{G1} = [];
     my $g1_symbols = $hashed_ast->{symbols}->{G1} = {};
 
@@ -96,7 +98,7 @@ sub ast_to_hash {
             rhs    => [$start_lhs],
             action => '::first'
           };
-        $rule_data->{xaltid} = $hashed_ast->xalt_create( $rule_data );
+        $rule_data->{xaltid} = $hashed_ast->xalt_create( $rule_data, 'G1' );
         push @{ $hashed_ast->{rules}->{G1} }, $rule_data;
     } ## end sub Marpa::R3::Internal::MetaAST::start_rule_create
 
@@ -1679,9 +1681,10 @@ sub Marpa::R3::Internal::MetaAST::Parse::xsy_assign {
 }
 
 sub Marpa::R3::Internal::MetaAST::Parse::xalt_create {
-    my ( $parse, $args ) = @_;
-    my $rule_id = scalar @{$parse->{xalt}};
-    my $xalt_data = $parse->{xalt}->[$rule_id] = {};
+    my ( $parse, $args, $subgrammar ) = @_;
+    $subgrammar //= 'G1';
+    my $rule_id = scalar @{$parse->{xalt}->{$subgrammar}};
+    my $xalt_data = $parse->{xalt}->{$subgrammar}->[$rule_id] = {};
     DATUM: for my $datum (keys %{$args}) {
         my $value = $args->{$datum};
         # Deep copy of rhs
