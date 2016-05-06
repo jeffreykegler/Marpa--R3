@@ -1702,6 +1702,7 @@ sub Marpa::R3::Internal::MetaAST::Parse::xseq_create {
     $args->{subkey} //= 0;
     my $rule_id = scalar @{$parse->{xseq}->{$subgrammar}};
     $parse->{xseq}->{$subgrammar}->[$rule_id] = $args;
+    $args->{id} = $rule_id;
 
     # Now create the initial working rule
     my %wrl = ( xseqid => $rule_id );

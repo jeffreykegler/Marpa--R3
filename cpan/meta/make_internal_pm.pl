@@ -244,6 +244,7 @@ __DATA__
 
     XSY_BY_ID { eXternal symbols, by XSYID }
     XSY_BY_NAME { eXternal symbols, by XSY name }
+    XSEQ_BY_ID { eXternal SEQuence, by XSEQID }
     COMPLETION_EVENT_BY_ID
     NULLED_EVENT_BY_ID
     PREDICTION_EVENT_BY_ID

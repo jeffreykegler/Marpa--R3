@@ -207,6 +207,69 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
         $xsy_by_name->{$xsy_name} = $runtime_xsy_data;
     }
 
+    for my $subgrammar (qw(G1 L0)) {
+        my $xseqs      = $hashed_source->{xseq}->{$subgrammar};
+        my $xseq_by_id = $slg->[Marpa::R3::Internal::Scanless::G::XSEQ_BY_ID] =
+          [];
+
+        # Sort (from major to minor) by start position,
+        # subkey and xseqid
+        for my $source_xseq_data (
+            map { $_->[0] }
+            sort {
+                     $a->[1] <=> $b->[1]
+                  || $a->[2] <=> $b->[2]
+                  || $a->[3] <=> $b->[3]
+            }
+            map { [ $_, $_->{start}, $_->{subkey}, $_->{id} ] } @{$xseqs}
+          )
+        {
+            my $runtime_xseq_data = [];
+          KEY: for my $datum_key ( keys %{$source_xseq_data} ) {
+                if ( $datum_key eq 'id' ) {
+                    $runtime_xseq_data->[Marpa::R3::Internal::XSEQ::ID] =
+                      $source_xseq_data->{$datum_key};
+                    next KEY;
+                }
+                if ( $datum_key eq 'name' ) {
+                    $runtime_xseq_data->[Marpa::R3::Internal::XSEQ::NAME] =
+                      $source_xseq_data->{$datum_key};
+                    next KEY;
+                }
+                if ( $datum_key eq 'discard_separation' ) {
+                    $runtime_xseq_data
+                      ->[Marpa::R3::Internal::XSEQ::DISCARD_SEPARATION] =
+                      $source_xseq_data->{$datum_key};
+                    next KEY;
+                }
+                if ( $datum_key eq 'mask' ) {
+                    $runtime_xseq_data->[Marpa::R3::Internal::XSEQ::MASK] =
+                      $source_xseq_data->{$datum_key};
+                    next KEY;
+                }
+                if ( $datum_key eq 'tag' ) {
+                    $runtime_xseq_data->[Marpa::R3::Internal::XSEQ::SLIF_TAG] =
+                      $source_xseq_data->{$datum_key};
+                    next KEY;
+                }
+                if ( $datum_key eq 'blessing' ) {
+                    $runtime_xseq_data->[Marpa::R3::Internal::XSEQ::BLESSING] =
+                      $source_xseq_data->{$datum_key};
+                    next KEY;
+                }
+                if ( $datum_key eq 'action_name' ) {
+                    $runtime_xseq_data->[Marpa::R3::Internal::XSEQ::ACTION_NAME]
+                      = $source_xseq_data->{$datum_key};
+                    next KEY;
+                }
+                Marpa::R3::exception(
+"Internal error: Unknown hashed source xseq field: $datum_key"
+                );
+            }
+            push @{$xseq_by_id}, $runtime_xseq_data;
+        }
+    }
+
     $slg->[Marpa::R3::Internal::Scanless::G::CACHE_G1_IRLIDS_BY_LHS_NAME] = {};
 
     my $if_inaccessible_default_arg =
