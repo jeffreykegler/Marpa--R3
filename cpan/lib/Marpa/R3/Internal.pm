@@ -34,6 +34,15 @@ use constant LEXEME_SEMANTICS => 4;
 use constant DSL_FORM => 5;
 use constant IF_INACCESSIBLE => 6;
 
+package Marpa::R3::Internal::XSEQ;
+use constant ID => 0;
+use constant NAME => 1;
+use constant DISCARD_SEPARATION => 2;
+use constant MASK => 3;
+use constant SLIF_TAG => 4;
+use constant ACTION_NAME => 5;
+use constant BLESSING => 6;
+
 package Marpa::R3::Internal::Rule;
 use constant ID => 0;
 use constant NAME => 1;
@@ -49,8 +58,9 @@ use constant C => 1;
 use constant NAME_BY_ISYID => 2;
 use constant ISYID_BY_NAME => 3;
 use constant XSY_BY_ISYID => 4;
-use constant START_NAME => 5;
-use constant RULES => 6;
+use constant XSEQ_BY_IRLID => 5;
+use constant START_NAME => 6;
+use constant RULES => 7;
 
 package Marpa::R3::Internal::Progress_Report;
 use constant RULE_ID => 0;

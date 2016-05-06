@@ -59,8 +59,8 @@ sub ast_to_hash {
     $hashed_ast->{meta_recce} = $ast->{meta_recce};
     bless $hashed_ast, 'Marpa::R3::Internal::MetaAST::Parse';
 
-    $hashed_ast->{xalt}->{L0} = [];
-    $hashed_ast->{xalt}->{G1} = [];
+    $hashed_ast->{xseq}->{L0} = [];
+    $hashed_ast->{xseq}->{G1} = [];
     $hashed_ast->{rules}->{L0} = [];
     $hashed_ast->{rules}->{G1} = [];
     my $g1_symbols = $hashed_ast->{symbols}->{G1} = {};
@@ -98,7 +98,7 @@ sub ast_to_hash {
             rhs    => [$start_lhs],
             action => '::first'
           };
-        my $wrl= $hashed_ast->xalt_create( $rule_data, 'G1' );
+        my $wrl= $hashed_ast->xseq_create( $rule_data, 'G1' );
         push @{ $hashed_ast->{rules}->{G1} }, $wrl;
     } ## end sub Marpa::R3::Internal::MetaAST::start_rule_create
 
@@ -995,7 +995,7 @@ sub Marpa::R3::Internal::MetaAST_Nodes::empty_rule::evaluate {
     }
     $parse->bless_hash_rule( \%rule, $blessing, $naming, $lhs );
 
-    my $wrl = $parse->xalt_create( \%rule, $subgrammar );
+    my $wrl = $parse->xseq_create( \%rule, $subgrammar );
     # mask not needed
     push @{ $parse->{rules}->{$subgrammar} }, $wrl;
 
@@ -1157,7 +1157,7 @@ sub Marpa::R3::Internal::MetaAST_Nodes::discard_rule::evaluate {
         symbol_as_event => $rhs_as_event
     );
     $rule_hash{event} = $event if defined $event;
-    my $wrl = $parse->xalt_create( \%rule_hash, 'L0' );
+    my $wrl = $parse->xseq_create( \%rule_hash, 'L0' );
     push @{ $parse->{rules}->{L0} }, $wrl;
     ## no critic(Subroutines::ProhibitExplicitReturnUndef)
     return undef;
@@ -1269,7 +1269,7 @@ sub Marpa::R3::Internal::MetaAST_Nodes::quantified_rule::evaluate {
     }
     $parse->bless_hash_rule( \%sequence_rule, $blessing, $naming, $lhs_name );
 
-    my $wrl = $parse->xalt_create( \%sequence_rule, $subgrammar );
+    my $wrl = $parse->xseq_create( \%sequence_rule, $subgrammar );
     push @{ $parse->{rules}->{$subgrammar} }, $wrl;
     ## no critic(Subroutines::ProhibitExplicitReturnUndef)
     return undef;
@@ -1482,7 +1482,7 @@ sub Marpa::R3::Internal::MetaAST_Nodes::character_class::evaluate {
         rhs    => $lexical_rhs,
         mask   => [1],
     );
-    my $wrl = $parse->xalt_create( \%lexical_rule, 'L0' );
+    my $wrl = $parse->xseq_create( \%lexical_rule, 'L0' );
     push @{ $parse->{rules}->{L0} }, $wrl;
     my $g1_symbol =
       Marpa::R3::Internal::MetaAST::Symbol_List->new($lexical_lhs);
@@ -1528,7 +1528,7 @@ sub Marpa::R3::Internal::MetaAST_Nodes::single_quoted_string::evaluate {
         # description => "Internal rule for single-quoted string $string",
         mask => [ map { ; 1 } @{$lexical_rhs} ],
     );
-    my $wrl = $parse->xalt_create( \%lexical_rule, 'L0' );
+    my $wrl = $parse->xseq_create( \%lexical_rule, 'L0' );
     push @{ $parse->{rules}->{$lexical_grammar} }, $wrl;
     my $g1_symbol =
         Marpa::R3::Internal::MetaAST::Symbol_List->new($lexical_lhs);
@@ -1693,18 +1693,18 @@ sub Marpa::R3::Internal::MetaAST::Parse::xsy_assign {
     return $parse->xsy_create( $symbol_name, $args );
 }
 
-sub Marpa::R3::Internal::MetaAST::Parse::xalt_create {
+sub Marpa::R3::Internal::MetaAST::Parse::xseq_create {
     my ( $parse, $args, $subgrammar ) = @_;
 
     # The eXternal ALTernative is the argument hash,
     # slightly adjusted.
     $subgrammar //= 'G1';
     $args->{subkey} //= 0;
-    my $rule_id = scalar @{$parse->{xalt}->{$subgrammar}};
-    $parse->{xalt}->{$subgrammar}->[$rule_id] = $args;
+    my $rule_id = scalar @{$parse->{xseq}->{$subgrammar}};
+    $parse->{xseq}->{$subgrammar}->[$rule_id] = $args;
 
     # Now create the initial working rule
-    my %wrl = ( xaltid => $rule_id );
+    my %wrl = ( xseqid => $rule_id );
     for my $field (
         qw(name tag lhs action bless rank
         symbol_as_event event
@@ -1715,8 +1715,8 @@ sub Marpa::R3::Internal::MetaAST::Parse::xalt_create {
     }
     # Deep copy these arrays
     FIELD: for my $field ( qw(mask rhs) ) {
-        my $xalt_datum = $args->{$field};
-        next FIELD if not defined $xalt_datum;
+        my $xseq_datum = $args->{$field};
+        next FIELD if not defined $xseq_datum;
         my @array = @{$args->{$field}};
         $wrl{$field} = \@array;
     }

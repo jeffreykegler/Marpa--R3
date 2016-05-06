@@ -110,7 +110,7 @@ __DATA__
     DSL_FORM
     IF_INACCESSIBLE
 
-    :package=Marpa::R3::Internal::XALT
+    :package=Marpa::R3::Internal::XSEQ
 
     ID
     NAME
@@ -138,7 +138,7 @@ __DATA__
     NAME_BY_ISYID
     ISYID_BY_NAME
     XSY_BY_ISYID { Array mapping ISYID to XSY }
-    XALT_BY_IRLID { Array mapping IRLID to XALT }
+    XSEQ_BY_IRLID { Array mapping IRLID to XSEQ }
     START_NAME
     RULES { array of rule refs }
 

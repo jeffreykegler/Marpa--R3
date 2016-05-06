@@ -1060,7 +1060,7 @@ sub add_user_rule {
 
   OPTION: for my $option ( keys %{$options} ) {
         my $value = $options->{$option};
-        if ( $option eq 'xaltid' )   {
+        if ( $option eq 'xseqid' )   {
             # TODO expand this
             next OPTION;
         }
