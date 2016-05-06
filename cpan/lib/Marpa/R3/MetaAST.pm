@@ -919,9 +919,12 @@ sub Marpa::R3::Internal::MetaAST_Nodes::empty_rule::evaluate {
     $parse->{'first_lhs'} //= $lhs if $subgrammar eq 'G1';
     local $Marpa::R3::Internal::SUBGRAMMAR = $subgrammar;
 
-    my %rule = ( lhs => $lhs,
     # description => qq{Empty rule for <$lhs>},
-    rhs => [] );
+    my %rule = (
+        lhs   => $lhs,
+        start => $start,
+        rhs   => []
+    );
     my $adverb_list = $raw_adverb_list->evaluate($parse);
 
     my $default_adverbs = $parse->{default_adverbs}->{$subgrammar};
@@ -1144,13 +1147,13 @@ sub Marpa::R3::Internal::MetaAST_Nodes::discard_rule::evaluate {
         Marpa::R3::exception(
             qq{"$key" adverb not allowed as discard default"});
     } ## end ADVERB: for my $key ( keys %{$adverb_list} )
+
+    # Discard rule
     my %rule_hash = (
-        # description => (
-            # "Discard rule for " . join q{ },
-            # map { '<' . $_ . '>' } @{$rhs}
-        # ),
         lhs => $discard_lhs,
         rhs => $rhs,
+        start => $start,
+        length => $length,
         symbol_as_event => $rhs_as_event
     );
     $rule_hash{event} = $event if defined $event;
@@ -1178,6 +1181,8 @@ sub Marpa::R3::Internal::MetaAST_Nodes::quantified_rule::evaluate {
     # Some properties of the sequence rule will not be altered
     # no matter how complicated this gets
     my %sequence_rule = (
+        start => $start,
+        length => $length,
         rhs => [ $rhs->name($parse) ],
         min => ( $quantifier->evaluate($parse) eq q{+} ? 1 : 0 )
     );
@@ -1454,36 +1459,39 @@ sub Marpa::R3::Internal::MetaAST_Nodes::character_class::name {
 
 sub Marpa::R3::Internal::MetaAST_Nodes::character_class::evaluate {
     my ( $values, $parse ) = @_;
-    my $character_class = $values->[2];
+    my ( $start, $length, $character_class ) = @{$values};
     my $subgrammar = $Marpa::R3::Internal::SUBGRAMMAR;
-    if  (( substr $subgrammar, 0, 1 ) eq 'L') {
+    if ( ( substr $subgrammar, 0, 1 ) eq 'L' ) {
         return Marpa::R3::Internal::MetaAST::Symbol_List->char_class_to_symbol(
             $parse, $character_class );
     }
+
     # If here, in G1
     # Character classes and strings always go into L0, for now
     my $lexer_symbol = do {
         local $Marpa::R3::Internal::SUBGRAMMAR = 'L0';
-        Marpa::R3::Internal::MetaAST::Symbol_List->char_class_to_symbol(
-            $parse, $character_class );
+        Marpa::R3::Internal::MetaAST::Symbol_List->char_class_to_symbol( $parse,
+            $character_class );
     };
-    my $lexical_lhs       = $parse->internal_lexeme($character_class);
-    my $lexical_rhs       = $lexer_symbol->names($parse);
-    my %lexical_rule      = (
-        lhs  => $lexical_lhs,
-        rhs  => $lexical_rhs,
-        mask => [1],
+    my $lexical_lhs  = $parse->internal_lexeme($character_class);
+    my $lexical_rhs  = $lexer_symbol->names($parse);
+    my %lexical_rule = (
+        start  => $start,
+        length => $length,
+        lhs    => $lexical_lhs,
+        rhs    => $lexical_rhs,
+        mask   => [1],
     );
     my $wrl = $parse->xalt_create( \%lexical_rule, 'L0' );
     push @{ $parse->{rules}->{L0} }, $wrl;
     my $g1_symbol =
-        Marpa::R3::Internal::MetaAST::Symbol_List->new($lexical_lhs);
+      Marpa::R3::Internal::MetaAST::Symbol_List->new($lexical_lhs);
     return $g1_symbol;
-} ## end sub Marpa::R3::Internal::MetaAST_Nodes::character_class::evaluate
+}
 
 sub Marpa::R3::Internal::MetaAST_Nodes::single_quoted_string::evaluate {
     my ( $values, $parse ) = @_;
-    my ( undef, undef, $string ) = @{$values};
+    my ( $start, $length, $string ) = @{$values};
     my @symbols = ();
 
     my $end_of_string = rindex $string, q{'};
@@ -1513,6 +1521,8 @@ sub Marpa::R3::Internal::MetaAST_Nodes::single_quoted_string::evaluate {
     my $lexical_lhs       = $parse->internal_lexeme($string);
     my $lexical_rhs       = $list->names($parse);
     my %lexical_rule      = (
+        start => $start,
+        length => $length,
         lhs  => $lexical_lhs,
         rhs  => $lexical_rhs,
         # description => "Internal rule for single-quoted string $string",
@@ -1685,21 +1695,35 @@ sub Marpa::R3::Internal::MetaAST::Parse::xsy_assign {
 
 sub Marpa::R3::Internal::MetaAST::Parse::xalt_create {
     my ( $parse, $args, $subgrammar ) = @_;
+
+    # The eXternal ALTernative is the argument hash,
+    # slightly adjusted.
     $subgrammar //= 'G1';
+    $args->{subkey} //= 0;
     my $rule_id = scalar @{$parse->{xalt}->{$subgrammar}};
-    my $xalt_data = $parse->{xalt}->{$subgrammar}->[$rule_id] = {};
-    DATUM: for my $datum (keys %{$args}) {
-        my $value = $args->{$datum};
-        # Deep copy of rhs
-        if ($datum =~ /\A (rhs|mask) \z$/xms) {
-            my @rhs = @{$value};
-            $xalt_data->{$datum} = \@rhs;
-            next DATUM;
-        }
-        $xalt_data->{$datum} = $value;
+    $parse->{xalt}->{$subgrammar}->[$rule_id] = $args;
+
+    # Now create the initial working rule
+    my %wrl = ( xaltid => $rule_id );
+    for my $field (
+        qw(name tag lhs action bless rank
+        symbol_as_event event
+        null_ranking min separator proper keep)
+      )
+    {
+        $wrl{$field} = $args->{$field} if defined $args->{$field};
     }
-    $args->{xaltid} = $rule_id;
-    return $args;
+    # Deep copy these arrays
+    FIELD: for my $field ( qw(mask rhs) ) {
+        my $xalt_datum = $args->{$field};
+        next FIELD if not defined $xalt_datum;
+        my @array = @{$args->{$field}};
+        $wrl{$field} = \@array;
+    }
+
+    # Return the initial working rule
+    return \%wrl;
+
 }
 
 # Return the prioritized symbol name,

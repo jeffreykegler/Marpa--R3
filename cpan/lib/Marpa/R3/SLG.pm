@@ -1086,11 +1086,6 @@ sub add_user_rule {
         }
         if ( $option eq 'keep' ) { $keep_separation = $value; next OPTION }
         if ( $option eq 'mask' ) { $mask            = $value; next OPTION }
-        if ( $option eq 'description' ) {
-
-            # TODO: Delete this once description field eliminated
-            next OPTION;
-        }
         Marpa::R3::exception("Unknown user rule option: $option");
     } ## end OPTION: for my $option ( keys %{$options} )
 

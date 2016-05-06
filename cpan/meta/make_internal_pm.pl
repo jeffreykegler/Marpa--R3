@@ -110,6 +110,16 @@ __DATA__
     DSL_FORM
     IF_INACCESSIBLE
 
+    :package=Marpa::R3::Internal::XALT
+
+    ID
+    NAME
+    DISCARD_SEPARATION
+    MASK { Semantic mask of RHS symbols }
+    SLIF_TAG { A tag for use by the SLIF }
+    ACTION_NAME
+    BLESSING
+
     :package=Marpa::R3::Internal::Rule
 
     ID
@@ -128,6 +138,7 @@ __DATA__
     NAME_BY_ISYID
     ISYID_BY_NAME
     XSY_BY_ISYID { Array mapping ISYID to XSY }
+    XALT_BY_IRLID { Array mapping IRLID to XALT }
     START_NAME
     RULES { array of rule refs }
 
