@@ -37,21 +37,14 @@ my $ccflags = $Config{ccflags} . " -I../engine/read_only";
 undef &MY::top_targets; # suppress warning
 *MY::top_targets = sub {
     my $r = '
-all :: R3$(OBJ_EXT)
+all :: pure_all R3$(OBJ_EXT)
 	$(NOECHO) $(NOOP)
 	$(NOECHO) $(ECHO) Executing all target in xs directory
 
+pure_all ::
+	$(NOECHO) $(NOOP)
 
 config ::
-	$(NOECHO) $(NOOP)
-
-# test is SKIP’ped, so this avoids nmake’s “don’t know how to make test” complaints
-test ::
-	$(NOECHO) $(NOOP)
-
-# and so is test_dynamic, so this helps avoid make’s
-# “don’t know how to make test_dynamic” complaints under freebsd
-test_dynamic ::
 	$(NOECHO) $(NOOP)
 
 ';
@@ -82,7 +75,8 @@ WriteMakefile(
     NAME      => 'Marpa::R3',
     VERSION => $STRING_VERSION,
     DEFINE    => $define,
-    SKIP      => [qw(test test_dynamic dynamic dynamic_lib dlsyms)],
+    SKIP      => [qw(dynamic dynamic_lib dlsyms)],
+    test      => { TESTS => '' },
     CCFLAGS => $ccflags,
     XS => { 'R3.xs' => 'R3.c' },
     OBJECT => 'R3.o',
