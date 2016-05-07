@@ -69,10 +69,9 @@ use constant C => 1;
 use constant NAME_BY_ISYID => 2;
 use constant ISYID_BY_NAME => 3;
 use constant XSY_BY_ISYID => 4;
-use constant L0_XSEQ_BY_IRLID => 5;
-use constant G1_XSEQ_BY_IRLID => 6;
-use constant START_NAME => 7;
-use constant RULES => 8;
+use constant XSEQ_BY_IRLID => 5;
+use constant START_NAME => 6;
+use constant RULES => 7;
 
 package Marpa::R3::Internal::Progress_Report;
 use constant RULE_ID => 0;

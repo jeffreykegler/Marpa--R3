@@ -149,8 +149,7 @@ __DATA__
     NAME_BY_ISYID
     ISYID_BY_NAME
     XSY_BY_ISYID { Array mapping ISYID to XSY }
-    L0_XSEQ_BY_IRLID { Array mapping L0 IRLID to L0 XSEQ }
-    G1_XSEQ_BY_IRLID { Array mapping G1 IRLID to G1 XSEQ }
+    XSEQ_BY_IRLID { Array mapping IRLID to XSEQ }
     START_NAME
     RULES { array of rule refs }
 
