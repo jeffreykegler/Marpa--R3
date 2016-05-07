@@ -207,16 +207,26 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
         $xsy_by_name->{$xsy_name} = $runtime_xsy_data;
     }
 
+    $slg->[Marpa::R3::Internal::Scanless::G::L0_XSEQ_BY_ID] = [];
+    $slg->[Marpa::R3::Internal::Scanless::G::G1_XSEQ_BY_ID] = [];
     for my $subgrammar (qw(G1 L0)) {
         my $xseqs      = $hashed_source->{xseq}->{$subgrammar};
-        my $xseq_by_id = $slg->[Marpa::R3::Internal::Scanless::G::XSEQ_BY_ID] =
-          [];
+        my $xseq_by_id =
+            $subgrammar eq 'G1'
+          ? $slg->[Marpa::R3::Internal::Scanless::G::L0_XSEQ_BY_ID]
+          : $slg->[Marpa::R3::Internal::Scanless::G::G1_XSEQ_BY_ID];
 
         # Sort (from major to minor) by start position,
         # subkey and xseqid
         for my $source_xseq_data (
             map { $_->[0] }
             sort {
+                     die  "a=", Data::Dumper::Dumper($a) if not defined $a->[1];
+                     die  "a=", Data::Dumper::Dumper($a) if not defined $a->[2];
+                     die  "a=", Data::Dumper::Dumper($a) if not defined $a->[3];
+                     die  "b=", Data::Dumper::Dumper($b) if not defined $b->[1];
+                     die  "b=", Data::Dumper::Dumper($b) if not defined $b->[2];
+                     die  "b=", Data::Dumper::Dumper($b) if not defined $b->[3];
                      $a->[1] <=> $b->[1]
                   || $a->[2] <=> $b->[2]
                   || $a->[3] <=> $b->[3]
@@ -226,6 +236,7 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
         {
             my $runtime_xseq_data = [];
           KEY: for my $datum_key ( keys %{$source_xseq_data} ) {
+
                 if ( $datum_key eq 'id' ) {
                     $runtime_xseq_data->[Marpa::R3::Internal::XSEQ::ID] =
                       $source_xseq_data->{$datum_key};
@@ -236,10 +247,55 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
                       $source_xseq_data->{$datum_key};
                     next KEY;
                 }
-                if ( $datum_key eq 'discard_separation' ) {
+                if ( $datum_key eq 'lhs' ) {
+                    $runtime_xseq_data->[Marpa::R3::Internal::XSEQ::LHS] =
+                      $source_xseq_data->{$datum_key};
+                    next KEY;
+                }
+                if ( $datum_key eq 'rhs' ) {
+                    $runtime_xseq_data->[Marpa::R3::Internal::XSEQ::RHS] =
+                      $source_xseq_data->{$datum_key};
+                    next KEY;
+                }
+                if ( $datum_key eq 'rank' ) {
+                    $runtime_xseq_data->[Marpa::R3::Internal::XSEQ::RANK] =
+                      $source_xseq_data->{$datum_key};
+                    next KEY;
+                }
+                if ( $datum_key eq 'null_ranking' ) {
+                    $runtime_xseq_data->[Marpa::R3::Internal::XSEQ::NULL_RANKING] =
+                      $source_xseq_data->{$datum_key};
+                    next KEY;
+                }
+                if ( $datum_key eq 'symbol_as_event' ) {
+                    $runtime_xseq_data->[Marpa::R3::Internal::XSEQ::SYMBOL_AS_EVENT] =
+                      $source_xseq_data->{$datum_key};
+                    next KEY;
+                }
+                if ( $datum_key eq 'event' ) {
+                    $runtime_xseq_data->[Marpa::R3::Internal::XSEQ::EVENT] =
+                      $source_xseq_data->{$datum_key};
+                    next KEY;
+                }
+                if ( $datum_key eq 'min' ) {
+                    $runtime_xseq_data->[Marpa::R3::Internal::XSEQ::MIN] =
+                      $source_xseq_data->{$datum_key};
+                    next KEY;
+                }
+                if ( $datum_key eq 'separator' ) {
+                    $runtime_xseq_data->[Marpa::R3::Internal::XSEQ::SEPARATOR] =
+                      $source_xseq_data->{$datum_key};
+                    next KEY;
+                }
+                if ( $datum_key eq 'proper' ) {
+                    $runtime_xseq_data->[Marpa::R3::Internal::XSEQ::PROPER] =
+                      $source_xseq_data->{$datum_key};
+                    next KEY;
+                }
+                if ( $datum_key eq 'keep' ) {
                     $runtime_xseq_data
                       ->[Marpa::R3::Internal::XSEQ::DISCARD_SEPARATION] =
-                      $source_xseq_data->{$datum_key};
+                      ! $source_xseq_data->{$datum_key};
                     next KEY;
                 }
                 if ( $datum_key eq 'mask' ) {
@@ -252,14 +308,27 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
                       $source_xseq_data->{$datum_key};
                     next KEY;
                 }
-                if ( $datum_key eq 'blessing' ) {
+                if ( $datum_key eq 'bless' ) {
                     $runtime_xseq_data->[Marpa::R3::Internal::XSEQ::BLESSING] =
                       $source_xseq_data->{$datum_key};
                     next KEY;
                 }
-                if ( $datum_key eq 'action_name' ) {
+                if ( $datum_key eq 'action' ) {
                     $runtime_xseq_data->[Marpa::R3::Internal::XSEQ::ACTION_NAME]
                       = $source_xseq_data->{$datum_key};
+                    next KEY;
+                }
+                if ( $datum_key eq 'start' ) {
+                    $runtime_xseq_data->[Marpa::R3::Internal::XSEQ::START_POS]
+                      = $source_xseq_data->{$datum_key};
+                    next KEY;
+                }
+                if ( $datum_key eq 'length' ) {
+                    $runtime_xseq_data->[Marpa::R3::Internal::XSEQ::LENGTH]
+                      = $source_xseq_data->{$datum_key};
+                    next KEY;
+                }
+                if ( $datum_key eq 'subkey' ) {
                     next KEY;
                 }
                 Marpa::R3::exception(

@@ -114,11 +114,22 @@ __DATA__
 
     ID
     NAME
+    LHS
+    RHS
+    RANK
+    NULL_RANKING
+    MIN
+    SEPARATOR
+    PROPER
     DISCARD_SEPARATION
     MASK { Semantic mask of RHS symbols }
     SLIF_TAG { A tag for use by the SLIF }
     ACTION_NAME
     BLESSING
+    SYMBOL_AS_EVENT
+    EVENT
+    START_POS
+    LENGTH
 
     :package=Marpa::R3::Internal::Rule
 
@@ -138,7 +149,8 @@ __DATA__
     NAME_BY_ISYID
     ISYID_BY_NAME
     XSY_BY_ISYID { Array mapping ISYID to XSY }
-    XSEQ_BY_IRLID { Array mapping IRLID to XSEQ }
+    L0_XSEQ_BY_IRLID { Array mapping L0 IRLID to L0 XSEQ }
+    G1_XSEQ_BY_IRLID { Array mapping G1 IRLID to G1 XSEQ }
     START_NAME
     RULES { array of rule refs }
 
@@ -244,7 +256,8 @@ __DATA__
 
     XSY_BY_ID { eXternal symbols, by XSYID }
     XSY_BY_NAME { eXternal symbols, by XSY name }
-    XSEQ_BY_ID { eXternal SEQuence, by XSEQID }
+    L0_XSEQ_BY_ID { L0 eXternal SEQuence, by XSEQID }
+    G1_XSEQ_BY_ID { G1 eXternal SEQuence, by XSEQID }
     COMPLETION_EVENT_BY_ID
     NULLED_EVENT_BY_ID
     PREDICTION_EVENT_BY_ID

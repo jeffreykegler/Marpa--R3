@@ -94,6 +94,8 @@ sub ast_to_hash {
         # description  => 'Internal G1 start symbol'
         $hashed_ast->{'symbols'}->{'G1'}->{$augment_lhs} = {};
         my $rule_data = {
+            start => 0,
+            length => 0,
             lhs    => $augment_lhs,
             rhs    => [$start_lhs],
             action => '::first'
