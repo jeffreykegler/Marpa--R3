@@ -629,8 +629,12 @@ sub Marpa::R3::Internal::MetaAST_Nodes::priority_rule::evaluate {
                     qq{hidden symbols are not allowed in lexical rules (rule's LHS was "$lhs")}
                 );
             }
-            my %hash_rule =
-                ( lhs => $lhs, rhs => \@rhs_names, mask => \@mask );
+            my %hash_rule = (
+                start => $start,
+                lhs   => $lhs,
+                rhs   => \@rhs_names,
+                mask  => \@mask
+            );
 
             my $action;
             my $blessing;
@@ -708,7 +712,8 @@ sub Marpa::R3::Internal::MetaAST_Nodes::priority_rule::evaluate {
 
             $parse->bless_hash_rule( \%hash_rule, $blessing, $naming, $lhs );
 
-            push @{$rules}, \%hash_rule;
+            my $wrl = $parse->xseq_create( \%hash_rule, $subgrammar );
+            push @{$rules}, $wrl;
         } ## end for my $alternative (@alternatives)
         ## no critic(Subroutines::ProhibitExplicitReturnUndef)
         return undef;
@@ -745,27 +750,31 @@ sub Marpa::R3::Internal::MetaAST_Nodes::priority_rule::evaluate {
     # Default mask (all ones) is OK for this rule
     my @arg0_action = ();
     @arg0_action = ( action => '::first' ) if $subgrammar eq 'G1';
-    push @{$rules},
+
+    # Internal rule top priority rule for <$lhs>
+    my @priority_rules = (
         {
-        lhs => $lhs,
-        rhs => [ $parse->prioritized_symbol( $lhs, 0 ) ],
-        @arg0_action,
-        # description => qq{Internal rule top priority rule for <$lhs>},
-        },
-        (
-        map {
-            ;
-            {   lhs         => $parse->prioritized_symbol( $lhs,   $_ - 1 ),
-                rhs         => [ $parse->prioritized_symbol( $lhs, $_ ) ],
-                # description => (
-                    # qq{Internal rule for symbol <$lhs> priority transition from }
-                        # . ( $_ - 1 )
-                        # . qq{ to $_}
-                # ),
-                @arg0_action
-            }
-        } 1 .. $priority_count - 1
-        );
+            start => $start,
+            lhs   => $lhs,
+            rhs   => [ $parse->prioritized_symbol( $lhs, 0 ) ],
+            @arg0_action,
+        }
+    );
+
+    # Internal rule for symbol <$lhs> priority transition
+    push @priority_rules,
+      {
+        start => $start,
+        lhs   => $parse->prioritized_symbol( $lhs, $_ - 1 ),
+        rhs   => [ $parse->prioritized_symbol( $lhs, $_ ) ],
+        @arg0_action
+      }
+      for 1 .. $priority_count - 1;
+  RULE: for my $priority_rule (@priority_rules) {
+        my $wrl = $parse->xseq_create( $priority_rule, $subgrammar );
+        push @{$rules}, $wrl;
+    }
+
     RULE: for my $working_rule (@working_rules) {
         my ( $priority, $rhs, $adverb_list ) = @{$working_rule};
         my @new_rhs = @{ $rhs->{rhs} };
@@ -781,7 +790,7 @@ sub Marpa::R3::Internal::MetaAST_Nodes::priority_rule::evaluate {
                 $lhs, '")'
             );
         }
-        my %new_xs_rule = ( lhs => $current_exp );
+        my %new_xs_rule = ( lhs => $current_exp, start => $start );
         $new_xs_rule{mask} = \@mask;
 
         my $action;
@@ -871,7 +880,8 @@ sub Marpa::R3::Internal::MetaAST_Nodes::priority_rule::evaluate {
 
         if ( not scalar @arity ) {
             $new_xs_rule{rhs} = \@new_rhs;
-            push @{$rules}, \%new_xs_rule;
+            my $wrl = $parse->xseq_create( \%new_xs_rule, $subgrammar );
+            push @{$rules}, $wrl;
             next RULE;
         }
 
@@ -904,7 +914,8 @@ sub Marpa::R3::Internal::MetaAST_Nodes::priority_rule::evaluate {
         } ## end DO_ASSOCIATION:
 
         $new_xs_rule{rhs} = \@new_rhs;
-        push @{$rules}, \%new_xs_rule;
+        my $wrl = $parse->xseq_create( \%new_xs_rule, $subgrammar );
+        push @{$rules}, $wrl;
     } ## end RULE: for my $working_rule (@working_rules)
     ## no critic(Subroutines::ProhibitExplicitReturnUndef)
     return undef;
