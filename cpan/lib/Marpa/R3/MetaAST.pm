@@ -1718,7 +1718,7 @@ sub Marpa::R3::Internal::MetaAST::Parse::xseq_create {
     # slightly adjusted.
     $subgrammar //= 'G1';
     $args->{subkey} //= 0;
-    my $rule_id = join q{:}, $args->{lhs}, @{$args->{rhs}};
+    my $rule_id = join q{,}, $args->{lhs}, @{$args->{rhs}};
     $parse->{xseq}->{$subgrammar}->{$rule_id} = $args;
 
     # Now create the initial working rule
