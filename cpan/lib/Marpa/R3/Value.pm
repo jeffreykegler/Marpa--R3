@@ -539,7 +539,9 @@ sub resolve_recce {
                     last CHECK_SEMANTICS
                         if ( substr $semantics, 0, 1 ) eq '[';
                     Marpa::R3::exception(
-                        qq{Attempt to bless, but improper semantics: "$semantics"}
+                        qq{Attempt to bless, but improper semantics: "$semantics"\n},
+                        qq{  Blessing: "$blessing"\n},
+                        '  Rule: ', $tracer->brief_rule($rule_id)
                     );
                 } ## end CHECK_SEMANTICS:
             } ## end if ( $blessing ne '::undef' )
