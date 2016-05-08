@@ -59,8 +59,8 @@ sub ast_to_hash {
     $hashed_ast->{meta_recce} = $ast->{meta_recce};
     bless $hashed_ast, 'Marpa::R3::Internal::MetaAST::Parse';
 
-    $hashed_ast->{xseq}->{L0} = [];
-    $hashed_ast->{xseq}->{G1} = [];
+    $hashed_ast->{xseq}->{L0} = {};
+    $hashed_ast->{xseq}->{G1} = {};
     $hashed_ast->{rules}->{L0} = [];
     $hashed_ast->{rules}->{G1} = [];
     my $g1_symbols = $hashed_ast->{symbols}->{G1} = {};
@@ -582,6 +582,7 @@ sub Marpa::R3::Internal::MetaAST_Nodes::priority_rule::evaluate {
         @{$values};
 
     my $subgrammar = $op_declare->op() eq q{::=} ? 'G1' : 'L0';
+    my $xseq_ordinal = 0;
 
     my $lhs = $raw_lhs->name($parse);
     $parse->{'first_lhs'} //= $lhs if $subgrammar eq 'G1';
@@ -631,6 +632,7 @@ sub Marpa::R3::Internal::MetaAST_Nodes::priority_rule::evaluate {
             }
             my %hash_rule = (
                 start => $start,
+                subkey => ++$xseq_ordinal,
                 lhs   => $lhs,
                 rhs   => \@rhs_names,
                 mask  => \@mask
@@ -757,6 +759,7 @@ sub Marpa::R3::Internal::MetaAST_Nodes::priority_rule::evaluate {
             start => $start,
             lhs   => $lhs,
             rhs   => [ $parse->prioritized_symbol( $lhs, 0 ) ],
+            subkey => ++$xseq_ordinal,
             @arg0_action,
         }
     );
@@ -767,6 +770,7 @@ sub Marpa::R3::Internal::MetaAST_Nodes::priority_rule::evaluate {
         start => $start,
         lhs   => $parse->prioritized_symbol( $lhs, $_ - 1 ),
         rhs   => [ $parse->prioritized_symbol( $lhs, $_ ) ],
+        subkey => ++$xseq_ordinal,
         @arg0_action
       }
       for 1 .. $priority_count - 1;
@@ -790,7 +794,8 @@ sub Marpa::R3::Internal::MetaAST_Nodes::priority_rule::evaluate {
                 $lhs, '")'
             );
         }
-        my %new_xs_rule = ( lhs => $current_exp, start => $start );
+        my %new_xs_rule =
+          ( lhs => $current_exp, start => $start, subkey => ++$xseq_ordinal );
         $new_xs_rule{mask} = \@mask;
 
         my $action;
@@ -1713,9 +1718,8 @@ sub Marpa::R3::Internal::MetaAST::Parse::xseq_create {
     # slightly adjusted.
     $subgrammar //= 'G1';
     $args->{subkey} //= 0;
-    my $rule_id = scalar @{$parse->{xseq}->{$subgrammar}};
-    $parse->{xseq}->{$subgrammar}->[$rule_id] = $args;
-    $args->{id} = $rule_id;
+    my $rule_id = join q{:}, $args->{lhs}, @{$args->{rhs}};
+    $parse->{xseq}->{$subgrammar}->{$rule_id} = $args;
 
     # Now create the initial working rule
     my %wrl = ( xseqid => $rule_id );

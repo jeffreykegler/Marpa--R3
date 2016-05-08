@@ -211,6 +211,14 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     $slg->[Marpa::R3::Internal::Scanless::G::G1_XSEQ_BY_ID] = [];
     for my $subgrammar (qw(G1 L0)) {
         my $xseqs      = $hashed_source->{xseq}->{$subgrammar};
+        if (ref $xseqs eq 'ARRAY') {
+            state $key = '0';
+            my %hashed_xseqs = ();
+            for my $xseq (@{$xseqs}) {
+                $hashed_xseqs{$key++} = $xseq;
+            }
+            $xseqs = \%hashed_xseqs;
+        }
         my $xseq_by_id =
             $subgrammar eq 'L0'
           ? $slg->[Marpa::R3::Internal::Scanless::G::L0_XSEQ_BY_ID]
@@ -218,20 +226,18 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
 
         # Sort (from major to minor) by start position,
         # subkey and xseqid
+        $DB::single = 1;
         for my $source_xseq_data (
             map { $_->[0] }
             sort {
-                     # die  "a=", Data::Dumper::Dumper($a) if not defined $a->[1];
-                     # die  "a=", Data::Dumper::Dumper($a) if not defined $a->[2];
-                     # die  "a=", Data::Dumper::Dumper($a) if not defined $a->[3];
-                     # die  "b=", Data::Dumper::Dumper($b) if not defined $b->[1];
-                     # die  "b=", Data::Dumper::Dumper($b) if not defined $b->[2];
-                     # die  "b=", Data::Dumper::Dumper($b) if not defined $b->[3];
+                     die  "a=", Data::Dumper::Dumper($a) if not defined $a->[1];
+                     die  "a=", Data::Dumper::Dumper($a) if not defined $a->[2];
+                     die  "b=", Data::Dumper::Dumper($b) if not defined $a->[1];
+                     die  "b=", Data::Dumper::Dumper($b) if not defined $b->[2];
                      $a->[1] <=> $b->[1]
                   || $a->[2] <=> $b->[2]
-                  || $a->[3] <=> $b->[3]
             }
-            map { [ $_, $_->{start}, $_->{subkey}, $_->{id} ] } @{$xseqs}
+            map { [ $_, $_->{start}, $_->{subkey} ] } values %{$xseqs}
           )
         {
             my $runtime_xseq_data = [];
@@ -1195,12 +1201,12 @@ sub add_user_rule {
   OPTION: for my $option ( keys %{$options} ) {
         my $value = $options->{$option};
         if ( $option eq 'xseqid' ) {
-            $xseq =
-              $slg->[
-              $subgrammar eq 'L0'
-              ? Marpa::R3::Internal::Scanless::G::L0_XSEQ_BY_ID
-              : Marpa::R3::Internal::Scanless::G::G1_XSEQ_BY_ID
-              ]->[$value];
+            # $xseq =
+              # $slg->[
+              # $subgrammar eq 'L0'
+              # ? Marpa::R3::Internal::Scanless::G::L0_XSEQ_BY_ID
+              # : Marpa::R3::Internal::Scanless::G::G1_XSEQ_BY_ID
+              # ]->{$value};
             next OPTION;
         }
         if ( $option eq 'name' )   { $rule_name = $value; next OPTION; }
@@ -1347,7 +1353,7 @@ sub add_user_rule {
             : $error_string;
         Marpa::R3::exception("$problem_description: $rule_description");
     } ## end if ( not defined $base_rule_id or $base_rule_id < 0 )
-    $tracer->[Marpa::R3::Internal::Trace::G::XSEQ_BY_IRLID]->[$base_rule_id] = $xseq;
+    # $tracer->[Marpa::R3::Internal::Trace::G::XSEQ_BY_IRLID]->[$base_rule_id] = $xseq;
 
     my $base_rule = $tracer->shadow_rule( $base_rule_id );
 
