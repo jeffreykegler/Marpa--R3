@@ -211,14 +211,6 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     $slg->[Marpa::R3::Internal::Scanless::G::G1_XSEQ_BY_ID] = [];
     for my $subgrammar (qw(G1 L0)) {
         my $xseqs      = $hashed_source->{xseq}->{$subgrammar};
-        if (ref $xseqs eq 'ARRAY') {
-            state $key = '0';
-            my %hashed_xseqs = ();
-            for my $xseq (@{$xseqs}) {
-                $hashed_xseqs{$key++} = $xseq;
-            }
-            $xseqs = \%hashed_xseqs;
-        }
         my $xseq_by_id =
             $subgrammar eq 'L0'
           ? $slg->[Marpa::R3::Internal::Scanless::G::L0_XSEQ_BY_ID]
