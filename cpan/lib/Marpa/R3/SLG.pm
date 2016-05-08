@@ -212,7 +212,7 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     for my $subgrammar (qw(G1 L0)) {
         my $xseqs      = $hashed_source->{xseq}->{$subgrammar};
         my $xseq_by_id =
-            $subgrammar eq 'G1'
+            $subgrammar eq 'L0'
           ? $slg->[Marpa::R3::Internal::Scanless::G::L0_XSEQ_BY_ID]
           : $slg->[Marpa::R3::Internal::Scanless::G::G1_XSEQ_BY_ID];
 
@@ -221,12 +221,12 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
         for my $source_xseq_data (
             map { $_->[0] }
             sort {
-                     die  "a=", Data::Dumper::Dumper($a) if not defined $a->[1];
-                     die  "a=", Data::Dumper::Dumper($a) if not defined $a->[2];
-                     die  "a=", Data::Dumper::Dumper($a) if not defined $a->[3];
-                     die  "b=", Data::Dumper::Dumper($b) if not defined $b->[1];
-                     die  "b=", Data::Dumper::Dumper($b) if not defined $b->[2];
-                     die  "b=", Data::Dumper::Dumper($b) if not defined $b->[3];
+                     # die  "a=", Data::Dumper::Dumper($a) if not defined $a->[1];
+                     # die  "a=", Data::Dumper::Dumper($a) if not defined $a->[2];
+                     # die  "a=", Data::Dumper::Dumper($a) if not defined $a->[3];
+                     # die  "b=", Data::Dumper::Dumper($b) if not defined $b->[1];
+                     # die  "b=", Data::Dumper::Dumper($b) if not defined $b->[2];
+                     # die  "b=", Data::Dumper::Dumper($b) if not defined $b->[3];
                      $a->[1] <=> $b->[1]
                   || $a->[2] <=> $b->[2]
                   || $a->[3] <=> $b->[3]
@@ -1176,12 +1176,14 @@ sub add_user_rules {
 sub add_user_rule {
     my ( $slg, $tracer, $options ) = @_;
 
+    my $subgrammar = $tracer->[Marpa::R3::Internal::Trace::G::NAME];
     my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
     my $rules = $tracer->[Marpa::R3::Internal::Trace::G::RULES];
     my $default_rank = $grammar_c->default_rank();
 
     my ( $lhs_name, $rhs_names, $action, $blessing );
     my ( $min, $separator_name );
+    my $xseq;
     my $rank;
     my $null_ranking;
     my $rule_name;
@@ -1192,8 +1194,13 @@ sub add_user_rule {
 
   OPTION: for my $option ( keys %{$options} ) {
         my $value = $options->{$option};
-        if ( $option eq 'xseqid' )   {
-            # TODO expand this
+        if ( $option eq 'xseqid' ) {
+            $xseq =
+              $slg->[
+              $subgrammar eq 'L0'
+              ? Marpa::R3::Internal::Scanless::G::L0_XSEQ_BY_ID
+              : Marpa::R3::Internal::Scanless::G::G1_XSEQ_BY_ID
+              ]->[$value];
             next OPTION;
         }
         if ( $option eq 'name' )   { $rule_name = $value; next OPTION; }
@@ -1220,6 +1227,7 @@ sub add_user_rule {
         if ( $option eq 'mask' ) { $mask            = $value; next OPTION }
         Marpa::R3::exception("Unknown user rule option: $option");
     } ## end OPTION: for my $option ( keys %{$options} )
+
 
     if ( defined $min and not Scalar::Util::looks_like_number($min) ) {
         Marpa::R3::exception(
@@ -1303,11 +1311,11 @@ sub add_user_rule {
     } ## end if ($is_ordinary_rule)
     else {
         Marpa::R3::exception('Only one rhs symbol allowed for counted rule')
-            if scalar @{$rhs_names} != 1;
+          if scalar @{$rhs_names} != 1;
 
         # create the separator symbol, if we're using one
         if ( defined $separator_name ) {
-            $separator_id = assign_symbol( $slg, $tracer, $separator_name ) ;
+            $separator_id = assign_symbol( $slg, $tracer, $separator_name );
         } ## end if ( defined $separator_name )
 
         $grammar_c->throw_set(0);
@@ -1320,7 +1328,8 @@ sub add_user_rule {
         $base_rule_id = $grammar_c->sequence_new(
             $lhs_id,
             $rhs_ids[0],
-            {   separator => $separator_id,
+            {
+                separator => $separator_id,
                 proper    => $proper_separation,
                 min       => $min,
             }
@@ -1338,6 +1347,7 @@ sub add_user_rule {
             : $error_string;
         Marpa::R3::exception("$problem_description: $rule_description");
     } ## end if ( not defined $base_rule_id or $base_rule_id < 0 )
+    $tracer->[Marpa::R3::Internal::Trace::G::XSEQ_BY_IRLID]->[$base_rule_id] = $xseq;
 
     my $base_rule = $tracer->shadow_rule( $base_rule_id );
 
