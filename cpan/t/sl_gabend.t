@@ -96,8 +96,6 @@ END_OF_DSL
 }
 
 if (1) {
-  TODO: {
-        local $TODO = "Working on dup exceptions";
         my $duplicate_rule_grammar = <<'END_OF_DSL';
     Top ::= Dup
     Dup ::= Item
@@ -105,22 +103,31 @@ if (1) {
     Item ::= a
 END_OF_DSL
         test_grammar( 'duplicate rule',
-            $duplicate_rule_grammar, qq{Duplicate rule: Dup -> Item\n} );
-    }
+            $duplicate_rule_grammar, <<'EOS');
+========= Marpa::R3 Fatal error =========
+Duplicate rules:
+One was at line 1, column 5
+One was at line 2, column 5
+Rule was <Dup> ::= <Item>
+=========================================
+EOS
 }
 
 if (1) {
-  TODO: {
-  local $TODO = "Working on dup exceptions";
         my $unique_lhs_grammar = <<'END_OF_DSL';
     Top ::= Dup
     Dup ::= Item*
     Dup ::= Item
     Item ::= a
 END_OF_DSL
-        test_grammar( 'unique_lhs', $unique_lhs_grammar,
-            qq{LHS of sequence rule would not be unique: Dup -> Item\n} );
-    }
+        test_grammar( 'unique_lhs', $unique_lhs_grammar, <<'EOS');
+========= Marpa::R3 Fatal error =========
+Duplicate rules:
+One was at line 1, column 5
+One was at line 2, column 5
+Rule was <Dup> ::= <Item>
+=========================================
+EOS
 }
 
 if (1) {

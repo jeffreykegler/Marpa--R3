@@ -405,8 +405,6 @@ END_OF_TEXT
             Marpa::R3::Test::is( $recce->show_or_nodes(),
                 $or_node_output, 'XS Or nodes' );
 
-          TODO: {
-
                 my $bocage_output = <<'END_OF_TEXT';
 0: 0=R2:1@0-0 - S1
 1: 1=R9:1@0-1 - S6
@@ -437,8 +435,6 @@ END_OF_TEXT
                 Marpa::R3::Test::is( $recce->show_bocage(), $bocage_output,
                     'XS Bocage' );
 
-            } ## end TODO & SKIP show_bocage()
-
         } ## end TESTS_FOLDED_FROM_bocage_t
     }
 
@@ -454,16 +450,8 @@ END_OF_TEXT
         }
 
         if ( $i == 3 ) {
-          TODO: {
-
-                # todo_skip "Marpa::R3::Scanless::R::show_tree() unimplemented",
-                  # 1;
-
                 Marpa::R3::Test::is( $recce->show_tree(),
                     $tree_expected{$value}, qq{Tree, "$value"} );
-
-            }
-
         }
 
     } ## end while ( my $value_ref = $recce->value() )

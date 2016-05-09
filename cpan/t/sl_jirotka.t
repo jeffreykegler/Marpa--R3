@@ -449,10 +449,7 @@ ahm62: R22:0@8-8
   R22:0: WithPf ::= . WITH PF
 END_OF_EARLEY_SETS
 
-TODO: {
-    # todo_skip "show_and_nodes() porting not completed", 1;
-
-    Marpa::R3::Test::is( $recce->show_and_nodes(),
+Marpa::R3::Test::is( $recce->show_and_nodes(),
         <<'END_OF_AND_NODES', 'And Nodes' );
 And-node #0: R4:1@0-1S4@0
 And-node #19: R0:1@0-8C2@0
@@ -477,10 +474,8 @@ And-node #13: R14:2@6-8S26@8
 And-node #11: R19:2@6-8C20@7
 And-node #10: R20:1@7-8S21@7
 END_OF_AND_NODES
-}
 
-TODO: {
-    Marpa::R3::Test::is( $recce->show_or_nodes(),
+Marpa::R3::Test::is( $recce->show_or_nodes(),
         <<'END_OF_OR_NODES', 'Or Nodes' );
 R4:1@0-1
 R0:1@0-8
@@ -505,7 +500,6 @@ R14:2@6-8
 R19:2@6-8
 R20:1@7-8
 END_OF_OR_NODES
-}
 
 my $expected_value = [
     [
