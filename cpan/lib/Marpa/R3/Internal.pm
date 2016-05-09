@@ -34,7 +34,7 @@ use constant LEXEME_SEMANTICS => 4;
 use constant DSL_FORM => 5;
 use constant IF_INACCESSIBLE => 6;
 
-package Marpa::R3::Internal::XSEQ;
+package Marpa::R3::Internal::XBNF;
 use constant ID => 0;
 use constant NAME => 1;
 use constant LHS => 2;
@@ -69,7 +69,7 @@ use constant C => 1;
 use constant NAME_BY_ISYID => 2;
 use constant ISYID_BY_NAME => 3;
 use constant XSY_BY_ISYID => 4;
-use constant XSEQ_BY_IRLID => 5;
+use constant XBNF_BY_IRLID => 5;
 use constant START_NAME => 6;
 use constant RULES => 7;
 
@@ -145,8 +145,8 @@ use constant DISCARD_EVENT_BY_LEXER_RULE => 4;
 use constant MASK_BY_RULE_ID => 5;
 use constant XSY_BY_ID => 6;
 use constant XSY_BY_NAME => 7;
-use constant L0_XSEQ_BY_ID => 8;
-use constant G1_XSEQ_BY_ID => 9;
+use constant L0_XBNF_BY_ID => 8;
+use constant G1_XBNF_BY_ID => 9;
 use constant COMPLETION_EVENT_BY_ID => 10;
 use constant NULLED_EVENT_BY_ID => 11;
 use constant PREDICTION_EVENT_BY_ID => 12;

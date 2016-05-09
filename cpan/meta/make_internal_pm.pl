@@ -110,7 +110,7 @@ __DATA__
     DSL_FORM
     IF_INACCESSIBLE
 
-    :package=Marpa::R3::Internal::XSEQ
+    :package=Marpa::R3::Internal::XBNF
 
     ID
     NAME
@@ -149,7 +149,7 @@ __DATA__
     NAME_BY_ISYID
     ISYID_BY_NAME
     XSY_BY_ISYID { Array mapping ISYID to XSY }
-    XSEQ_BY_IRLID { Array mapping IRLID to XSEQ }
+    XBNF_BY_IRLID { Array mapping IRLID to XBNF }
     START_NAME
     RULES { array of rule refs }
 
@@ -255,8 +255,8 @@ __DATA__
 
     XSY_BY_ID { eXternal symbols, by XSYID }
     XSY_BY_NAME { eXternal symbols, by XSY name }
-    L0_XSEQ_BY_ID { L0 eXternal SEQuence, by XSEQID }
-    G1_XSEQ_BY_ID { G1 eXternal SEQuence, by XSEQID }
+    L0_XBNF_BY_ID { L0 eXternal SEQuence, by XBNFID }
+    G1_XBNF_BY_ID { G1 eXternal SEQuence, by XBNFID }
     COMPLETION_EVENT_BY_ID
     NULLED_EVENT_BY_ID
     PREDICTION_EVENT_BY_ID

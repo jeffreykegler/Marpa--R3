@@ -207,14 +207,14 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
         $xsy_by_name->{$xsy_name} = $runtime_xsy_data;
     }
 
-    $slg->[Marpa::R3::Internal::Scanless::G::L0_XSEQ_BY_ID] = [];
-    $slg->[Marpa::R3::Internal::Scanless::G::G1_XSEQ_BY_ID] = [];
+    $slg->[Marpa::R3::Internal::Scanless::G::L0_XBNF_BY_ID] = [];
+    $slg->[Marpa::R3::Internal::Scanless::G::G1_XBNF_BY_ID] = [];
     for my $subgrammar (qw(G1 L0)) {
         my $xbnfs      = $hashed_source->{xbnf}->{$subgrammar};
         my $xbnf_by_id =
             $subgrammar eq 'L0'
-          ? $slg->[Marpa::R3::Internal::Scanless::G::L0_XSEQ_BY_ID]
-          : $slg->[Marpa::R3::Internal::Scanless::G::G1_XSEQ_BY_ID];
+          ? $slg->[Marpa::R3::Internal::Scanless::G::L0_XBNF_BY_ID]
+          : $slg->[Marpa::R3::Internal::Scanless::G::G1_XBNF_BY_ID];
 
         # Sort (from major to minor) by start position,
         # subkey and xbnfid
@@ -236,93 +236,93 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
           KEY: for my $datum_key ( keys %{$source_xbnf_data} ) {
 
                 if ( $datum_key eq 'id' ) {
-                    $runtime_xbnf_data->[Marpa::R3::Internal::XSEQ::ID] =
+                    $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::ID] =
                       $source_xbnf_data->{$datum_key};
                     next KEY;
                 }
                 if ( $datum_key eq 'name' ) {
-                    $runtime_xbnf_data->[Marpa::R3::Internal::XSEQ::NAME] =
+                    $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::NAME] =
                       $source_xbnf_data->{$datum_key};
                     next KEY;
                 }
                 if ( $datum_key eq 'lhs' ) {
-                    $runtime_xbnf_data->[Marpa::R3::Internal::XSEQ::LHS] =
+                    $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::LHS] =
                       $source_xbnf_data->{$datum_key};
                     next KEY;
                 }
                 if ( $datum_key eq 'rhs' ) {
-                    $runtime_xbnf_data->[Marpa::R3::Internal::XSEQ::RHS] =
+                    $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::RHS] =
                       $source_xbnf_data->{$datum_key};
                     next KEY;
                 }
                 if ( $datum_key eq 'rank' ) {
-                    $runtime_xbnf_data->[Marpa::R3::Internal::XSEQ::RANK] =
+                    $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::RANK] =
                       $source_xbnf_data->{$datum_key};
                     next KEY;
                 }
                 if ( $datum_key eq 'null_ranking' ) {
-                    $runtime_xbnf_data->[Marpa::R3::Internal::XSEQ::NULL_RANKING] =
+                    $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::NULL_RANKING] =
                       $source_xbnf_data->{$datum_key};
                     next KEY;
                 }
                 if ( $datum_key eq 'symbol_as_event' ) {
-                    $runtime_xbnf_data->[Marpa::R3::Internal::XSEQ::SYMBOL_AS_EVENT] =
+                    $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::SYMBOL_AS_EVENT] =
                       $source_xbnf_data->{$datum_key};
                     next KEY;
                 }
                 if ( $datum_key eq 'event' ) {
-                    $runtime_xbnf_data->[Marpa::R3::Internal::XSEQ::EVENT] =
+                    $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::EVENT] =
                       $source_xbnf_data->{$datum_key};
                     next KEY;
                 }
                 if ( $datum_key eq 'min' ) {
-                    $runtime_xbnf_data->[Marpa::R3::Internal::XSEQ::MIN] =
+                    $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::MIN] =
                       $source_xbnf_data->{$datum_key};
                     next KEY;
                 }
                 if ( $datum_key eq 'separator' ) {
-                    $runtime_xbnf_data->[Marpa::R3::Internal::XSEQ::SEPARATOR] =
+                    $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::SEPARATOR] =
                       $source_xbnf_data->{$datum_key};
                     next KEY;
                 }
                 if ( $datum_key eq 'proper' ) {
-                    $runtime_xbnf_data->[Marpa::R3::Internal::XSEQ::PROPER] =
+                    $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::PROPER] =
                       $source_xbnf_data->{$datum_key};
                     next KEY;
                 }
                 if ( $datum_key eq 'keep' ) {
                     $runtime_xbnf_data
-                      ->[Marpa::R3::Internal::XSEQ::DISCARD_SEPARATION] =
+                      ->[Marpa::R3::Internal::XBNF::DISCARD_SEPARATION] =
                       ! $source_xbnf_data->{$datum_key};
                     next KEY;
                 }
                 if ( $datum_key eq 'mask' ) {
-                    $runtime_xbnf_data->[Marpa::R3::Internal::XSEQ::MASK] =
+                    $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::MASK] =
                       $source_xbnf_data->{$datum_key};
                     next KEY;
                 }
                 if ( $datum_key eq 'tag' ) {
-                    $runtime_xbnf_data->[Marpa::R3::Internal::XSEQ::SLIF_TAG] =
+                    $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::SLIF_TAG] =
                       $source_xbnf_data->{$datum_key};
                     next KEY;
                 }
                 if ( $datum_key eq 'bless' ) {
-                    $runtime_xbnf_data->[Marpa::R3::Internal::XSEQ::BLESSING] =
+                    $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::BLESSING] =
                       $source_xbnf_data->{$datum_key};
                     next KEY;
                 }
                 if ( $datum_key eq 'action' ) {
-                    $runtime_xbnf_data->[Marpa::R3::Internal::XSEQ::ACTION_NAME]
+                    $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::ACTION_NAME]
                       = $source_xbnf_data->{$datum_key};
                     next KEY;
                 }
                 if ( $datum_key eq 'start' ) {
-                    $runtime_xbnf_data->[Marpa::R3::Internal::XSEQ::START_POS]
+                    $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::START_POS]
                       = $source_xbnf_data->{$datum_key};
                     next KEY;
                 }
                 if ( $datum_key eq 'length' ) {
-                    $runtime_xbnf_data->[Marpa::R3::Internal::XSEQ::LENGTH]
+                    $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::LENGTH]
                       = $source_xbnf_data->{$datum_key};
                     next KEY;
                 }
@@ -1195,8 +1195,8 @@ sub add_user_rule {
             # $xbnf =
               # $slg->[
               # $subgrammar eq 'L0'
-              # ? Marpa::R3::Internal::Scanless::G::L0_XSEQ_BY_ID
-              # : Marpa::R3::Internal::Scanless::G::G1_XSEQ_BY_ID
+              # ? Marpa::R3::Internal::Scanless::G::L0_XBNF_BY_ID
+              # : Marpa::R3::Internal::Scanless::G::G1_XBNF_BY_ID
               # ]->{$value};
             next OPTION;
         }
@@ -1344,7 +1344,7 @@ sub add_user_rule {
             : $error_string;
         Marpa::R3::exception("$problem_description: $rule_description");
     } ## end if ( not defined $base_rule_id or $base_rule_id < 0 )
-    # $tracer->[Marpa::R3::Internal::Trace::G::XSEQ_BY_IRLID]->[$base_rule_id] = $xbnf;
+    # $tracer->[Marpa::R3::Internal::Trace::G::XBNF_BY_IRLID]->[$base_rule_id] = $xbnf;
 
     my $base_rule = $tracer->shadow_rule( $base_rule_id );
 
