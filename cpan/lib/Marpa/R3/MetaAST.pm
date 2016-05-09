@@ -52,6 +52,11 @@ sub Marpa::R3::Internal::MetaAST::Parse::substring {
     return $string;
 } ## end sub Marpa::R3::Internal::MetaAST::Parse::substring
 
+sub Marpa::R3::Internal::MetaAST::Parse::line_column {
+    my ( $parse, $pos ) = @_;
+    return Marpa::R3::Internal::line_column($parse->{p_dsl}, $pos);
+}
+
 sub ast_to_hash {
     my ($ast, $p_dsl) = @_;
     my $hashed_ast = {};
@@ -1729,14 +1734,37 @@ sub Marpa::R3::Internal::MetaAST::Parse::xseq_create {
     $args->{subkey} //= 0;
     my $rule_id = join q{,}, $args->{lhs}, @{$args->{rhs}};
     my $hash_by_xbnfid = $parse->{xseq}->{$subgrammar};
-    if (exists $hash_by_xbnfid->{$rule_id}) {
-        Marpa::R3::Internal::X->new( {
-            desc => 'Duplicate rule',
-            start => $args->{start},
-            length => $args->{length},
-            other_xbnf => $hash_by_xbnfid->{$rule_id},
-            dump => Data::Dumper::Dumper($args)
-        })->throw();
+    if ( exists $hash_by_xbnfid->{$rule_id} ) {
+        Marpa::R3::Internal::X->new(
+            {
+                desc       => 'Duplicate rule',
+                lhs        => $args->{lhs},
+                rhs        => $args->{rhs},
+                start      => $args->{start},
+                length     => $args->{length},
+                other_xbnf => $hash_by_xbnfid->{$rule_id},
+                dump       => Data::Dumper::Dumper($args),
+                lc =>
+                  Data::Dumper::Dumper( $parse->line_column( $args->{start} ) ),
+                to_string => sub {
+                    my $self = shift;
+                    my ( $l1, $c1 ) =
+                      @{ $parse->line_column( $self->{other_xbnf}->{start} ) };
+                    my ( $l2, $c2 ) =
+                      @{ $parse->line_column( $self->{start} ) };
+                    my @string = ("Duplicate rules:");
+                    push @string, "One was at line $l1, column $c1";
+                    push @string, "One was at line $l2, column $c2";
+                    push @string,
+                        "Rule was <"
+                      . $self->{lhs}
+                      . '> ::= '
+                      . ( join q{ }, map { '<' . $_ . '>' } @{ $self->{rhs} } );
+                    push @string, q{};
+                    return join "\n", @string;
+                }
+            }
+        )->throw();
     }
     $hash_by_xbnfid->{$rule_id} = $args;
 

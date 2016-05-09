@@ -63,25 +63,39 @@ sub description {
 }
 
 sub as_string {
-    my $self   = shift;
-    my $string = q{};
-  FIELD: for my $field ( sort keys %{$self} ) {
-        next FIELD if $field =~ /\A (slg|slr|tracer|msg|fatal) \z/;
-        my $value = $self->{$field};
-        if ( not defined $value ) {
-            $string .= "$field: [not defined]\n";
-            next FIELD;
+    my $self      = shift;
+    my $string    = q{};
+    my $to_string = $self->{to_string};
+    if ( $to_string and ref $to_string eq 'CODE' ) {
+        $string = &{$to_string}($self);
+    }
+    else {
+      FIELD: for my $field ( sort keys %{$self} ) {
+            if ( $field eq 'try' ) {
+                my $try_to_string = $self->{try};
+                if ( ref $try_to_string ne 'CODE' ) {
+                    $string .= qq{$field: [!not a CODE object!]\n};
+                }
+                $string .= &{$try_to_string}($self);
+                next FIELD;
+            }
+            next FIELD if $field =~ /\A (slg|slr|tracer|msg|fatal) \z/;
+            my $value = $self->{$field};
+            if ( not defined $value ) {
+                $string .= "$field: [not defined]\n";
+                next FIELD;
+            }
+            my $ref_type = ref $value;
+            if ($ref_type) {
+                $string .= "$field: ref to $ref_type\n";
+                next FIELD;
+            }
+            $string .= "$field: $value\n";
         }
-        my $ref_type = ref $value;
-        if ($ref_type) {
-            $string .= "$field: ref to $ref_type\n";
-            next FIELD;
-        }
-        $string .= "$field: $value\n";
     }
     my $fatal = $self->{fatal} // 1;
     if ($fatal) {
-        $string .=
+        $string =
             qq{========= Marpa::R3 Fatal error =========\n}
           . $string
           . qq{=========================================\n};
