@@ -210,7 +210,7 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     $slg->[Marpa::R3::Internal::Scanless::G::L0_XSEQ_BY_ID] = [];
     $slg->[Marpa::R3::Internal::Scanless::G::G1_XSEQ_BY_ID] = [];
     for my $subgrammar (qw(G1 L0)) {
-        my $xbnfs      = $hashed_source->{xseq}->{$subgrammar};
+        my $xbnfs      = $hashed_source->{xbnf}->{$subgrammar};
         my $xbnf_by_id =
             $subgrammar eq 'L0'
           ? $slg->[Marpa::R3::Internal::Scanless::G::L0_XSEQ_BY_ID]

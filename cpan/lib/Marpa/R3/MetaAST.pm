@@ -65,8 +65,8 @@ sub ast_to_hash {
     bless $hashed_ast, 'Marpa::R3::Internal::MetaAST::Parse';
 
     $hashed_ast->{p_dsl} = $p_dsl;
-    $hashed_ast->{xseq}->{L0} = {};
-    $hashed_ast->{xseq}->{G1} = {};
+    $hashed_ast->{xbnf}->{L0} = {};
+    $hashed_ast->{xbnf}->{G1} = {};
     $hashed_ast->{rules}->{L0} = [];
     $hashed_ast->{rules}->{G1} = [];
     my $g1_symbols = $hashed_ast->{symbols}->{G1} = {};
@@ -1733,7 +1733,7 @@ sub Marpa::R3::Internal::MetaAST::Parse::xbnf_create {
     $subgrammar //= 'G1';
     $args->{subkey} //= 0;
     my $rule_id = join q{,}, $args->{lhs}, @{$args->{rhs}};
-    my $hash_by_xbnfid = $parse->{xseq}->{$subgrammar};
+    my $hash_by_xbnfid = $parse->{xbnf}->{$subgrammar};
     if ( exists $hash_by_xbnfid->{$rule_id} ) {
         Marpa::R3::Internal::X->new(
             {
