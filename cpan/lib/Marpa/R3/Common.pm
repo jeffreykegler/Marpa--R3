@@ -91,6 +91,19 @@ sub Marpa::R3::uncaught_error {
         $error );
 } ## end sub Marpa::R3::uncaught_error
 
+sub Marpa::R3::exception {
+    my $exception = join q{}, @_;
+    $exception =~ s/ \n* \z /\n/xms;
+    die($exception) if $Marpa::R3::JUST_DIE;
+    CALLER: for ( my $i = 0; 1; $i++) {
+        my ($package ) = caller($i);
+        last CALLER if not $package;
+        last CALLER if not 'Marpa::R3::' eq substr $package, 0, 11;
+        $Carp::Internal{ $package } = 1;
+    }
+    Carp::croak($exception, q{Marpa::R3 exception});
+}
+
 1;
 
 # vim: set expandtab shiftwidth=4:

@@ -146,51 +146,9 @@ require Marpa::R3::ASF;
 ( $version_result = version_ok($Marpa::R3::ASF::VERSION) )
     and die 'Marpa::R3::ASF::VERSION ', $version_result;
 
-sub Marpa::R3::exception {
-    my $exception = join q{}, @_;
-    $exception =~ s/ \n* \z /\n/xms;
-    die($exception) if $Marpa::R3::JUST_DIE;
-    CALLER: for ( my $i = 0; 1; $i++) {
-        my ($package ) = caller($i);
-        last CALLER if not $package;
-        last CALLER if not 'Marpa::R3::' eq substr $package, 0, 11;
-        $Carp::Internal{ $package } = 1;
-    }
-    Carp::croak($exception, q{Marpa::R3 exception});
-}
-
-package Marpa::R3::Internal::X;
-
-use overload (
-    q{""} => sub {
-        my ($self) = @_;
-        return $self->{message} // $self->{fallback_message};
-    },
-    fallback => 1
-);
-
-sub new {
-    my ( $class, @hash_ref_args ) = @_;
-    my %x_object = ();
-    for my $hash_ref_arg (@hash_ref_args) {
-        if ( ref $hash_ref_arg ne "HASH" ) {
-            my $ref_type = ref $hash_ref_arg;
-            my $ref_desc = $ref_type ? "ref to $ref_type" : "not a ref";
-            die
-                "Internal error: args to Marpa::R3::Internal::X->new is $ref_desc -- it should be hash ref";
-        } ## end if ( ref $hash_ref_arg ne "HASH" )
-        $x_object{$_} = $hash_ref_arg->{$_} for keys %{$hash_ref_arg};
-    } ## end for my $hash_ref_arg (@hash_ref_args)
-    my $name = $x_object{name};
-    die("Internal error: an excepion must have a name") if not $name;
-    $x_object{fallback_message} = qq{Exception "$name" thrown};
-    return bless \%x_object, $class;
-} ## end sub new
-
-sub name {
-    my ($self) = @_;
-    return $self->{name};
-}
+require Marpa::R3::X;
+( $version_result = version_ok($Marpa::R3::X::VERSION) )
+    and die 'Marpa::R3::X::VERSION ', $version_result;
 
 1;
 

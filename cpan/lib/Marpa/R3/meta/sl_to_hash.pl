@@ -34,9 +34,9 @@ my $result          = Getopt::Long::GetOptions(
 );
 die "usage $PROGRAM_NAME [--help] file ...\n" if $help_flag;
 
-my $bnf = do { local $RS = undef; \(<>) };
-my $ast = Marpa::R3::Internal::MetaAST->new($bnf);
-my $parse_result = $ast->ast_to_hash();
+my $p_bnf = do { local $RS = undef; \(<>) };
+my $ast = Marpa::R3::Internal::MetaAST->new($p_bnf);
+my $parse_result = $ast->ast_to_hash($p_bnf);
 
 sub sort_bnf {
     my $cmp = $a->{lhs} cmp $b->{lhs};

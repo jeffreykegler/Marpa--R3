@@ -69,10 +69,10 @@ sub Marpa::R3::Scanless::G::new {
     Marpa::R3::exception( sprintf $error_message, '$slg->new' )
       if not $flat_args;
 
-    my ( $dsl, $g1_args ) =
+    my ( $p_dsl, $g1_args ) =
       Marpa::R3::Internal::Scanless::G::set( $slg, $flat_args );
-    my $ast        = Marpa::R3::Internal::MetaAST->new($dsl);
-    my $hashed_ast = $ast->ast_to_hash();
+    my $ast        = Marpa::R3::Internal::MetaAST->new($p_dsl);
+    my $hashed_ast = $ast->ast_to_hash($p_dsl);
     Marpa::R3::Internal::Scanless::G::hash_to_runtime( $slg, $hashed_ast,
         $g1_args );
     return $slg;
