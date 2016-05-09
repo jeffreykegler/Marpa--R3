@@ -286,7 +286,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'statements'
                                                     ],
-                                           'xseqid' => '[:start],statements'
+                                           'xbnfid' => '[:start],statements'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -303,7 +303,7 @@ $hashed_metag = {
                                                       '[Lex-34]',
                                                       'action name'
                                                     ],
-                                           'xseqid' => 'action,[Lex-33],[Lex-34],action name'
+                                           'xbnfid' => 'action,[Lex-33],[Lex-34],action name'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -316,7 +316,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'Perl name'
                                                     ],
-                                           'xseqid' => 'action name,Perl name'
+                                           'xbnfid' => 'action name,Perl name'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -329,7 +329,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'array descriptor'
                                                     ],
-                                           'xseqid' => 'action name,array descriptor'
+                                           'xbnfid' => 'action name,array descriptor'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -342,7 +342,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'reserved action name'
                                                     ],
-                                           'xseqid' => 'action name,reserved action name'
+                                           'xbnfid' => 'action name,reserved action name'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -355,7 +355,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'action'
                                                     ],
-                                           'xseqid' => 'adverb item,action'
+                                           'xbnfid' => 'adverb item,action'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -368,7 +368,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'blessing'
                                                     ],
-                                           'xseqid' => 'adverb item,blessing'
+                                           'xbnfid' => 'adverb item,blessing'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -381,7 +381,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'event specification'
                                                     ],
-                                           'xseqid' => 'adverb item,event specification'
+                                           'xbnfid' => 'adverb item,event specification'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -394,7 +394,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'group association'
                                                     ],
-                                           'xseqid' => 'adverb item,group association'
+                                           'xbnfid' => 'adverb item,group association'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -407,7 +407,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'left association'
                                                     ],
-                                           'xseqid' => 'adverb item,left association'
+                                           'xbnfid' => 'adverb item,left association'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -420,7 +420,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'naming'
                                                     ],
-                                           'xseqid' => 'adverb item,naming'
+                                           'xbnfid' => 'adverb item,naming'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -433,7 +433,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'null adverb'
                                                     ],
-                                           'xseqid' => 'adverb item,null adverb'
+                                           'xbnfid' => 'adverb item,null adverb'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -446,7 +446,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'null ranking specification'
                                                     ],
-                                           'xseqid' => 'adverb item,null ranking specification'
+                                           'xbnfid' => 'adverb item,null ranking specification'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -459,7 +459,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'pause specification'
                                                     ],
-                                           'xseqid' => 'adverb item,pause specification'
+                                           'xbnfid' => 'adverb item,pause specification'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -472,7 +472,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'priority specification'
                                                     ],
-                                           'xseqid' => 'adverb item,priority specification'
+                                           'xbnfid' => 'adverb item,priority specification'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -485,7 +485,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'proper specification'
                                                     ],
-                                           'xseqid' => 'adverb item,proper specification'
+                                           'xbnfid' => 'adverb item,proper specification'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -498,7 +498,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'rank specification'
                                                     ],
-                                           'xseqid' => 'adverb item,rank specification'
+                                           'xbnfid' => 'adverb item,rank specification'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -511,7 +511,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'right association'
                                                     ],
-                                           'xseqid' => 'adverb item,right association'
+                                           'xbnfid' => 'adverb item,right association'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -524,7 +524,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'separator specification'
                                                     ],
-                                           'xseqid' => 'adverb item,separator specification'
+                                           'xbnfid' => 'adverb item,separator specification'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -537,7 +537,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'adverb list items'
                                                     ],
-                                           'xseqid' => 'adverb list,adverb list items'
+                                           'xbnfid' => 'adverb list,adverb list items'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -548,7 +548,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'adverb item'
                                                     ],
-                                           'xseqid' => 'adverb list items,adverb item'
+                                           'xbnfid' => 'adverb list items,adverb item'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -563,7 +563,7 @@ $hashed_metag = {
                                                       'rhs',
                                                       'adverb list'
                                                     ],
-                                           'xseqid' => 'alternative,rhs,adverb list'
+                                           'xbnfid' => 'alternative,rhs,adverb list'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -576,7 +576,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'single quoted name'
                                                     ],
-                                           'xseqid' => 'alternative name,single quoted name'
+                                           'xbnfid' => 'alternative name,single quoted name'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -589,7 +589,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'standard name'
                                                     ],
-                                           'xseqid' => 'alternative name,standard name'
+                                           'xbnfid' => 'alternative name,standard name'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -602,7 +602,7 @@ $hashed_metag = {
                                                       'alternative'
                                                     ],
                                            'separator' => 'op equal priority',
-                                           'xseqid' => 'alternatives,alternative'
+                                           'xbnfid' => 'alternatives,alternative'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -619,7 +619,7 @@ $hashed_metag = {
                                                       '[Lex-67]',
                                                       'blessing name'
                                                     ],
-                                           'xseqid' => 'blessing,[Lex-66],[Lex-67],blessing name'
+                                           'xbnfid' => 'blessing,[Lex-66],[Lex-67],blessing name'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -632,7 +632,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'reserved blessing name'
                                                     ],
-                                           'xseqid' => 'blessing name,reserved blessing name'
+                                           'xbnfid' => 'blessing name,reserved blessing name'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -645,7 +645,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'standard name'
                                                     ],
-                                           'xseqid' => 'blessing name,standard name'
+                                           'xbnfid' => 'blessing name,standard name'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -666,7 +666,7 @@ $hashed_metag = {
                                                       '[Lex-18]',
                                                       'symbol name'
                                                     ],
-                                           'xseqid' => 'completion event declaration,[Lex-16],event initialization,[Lex-17],[Lex-18],symbol name'
+                                           'xbnfid' => 'completion event declaration,[Lex-16],event initialization,[Lex-17],[Lex-18],symbol name'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -683,7 +683,7 @@ $hashed_metag = {
                                                       'op declare bnf',
                                                       'adverb list'
                                                     ],
-                                           'xseqid' => 'default rule,[Lex-7],op declare bnf,adverb list'
+                                           'xbnfid' => 'default rule,[Lex-7],op declare bnf,adverb list'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -702,7 +702,7 @@ $hashed_metag = {
                                                       '[Lex-13]',
                                                       'adverb list'
                                                     ],
-                                           'xseqid' => 'discard default statement,[Lex-11],[Lex-12],[Lex-13],adverb list'
+                                           'xbnfid' => 'discard default statement,[Lex-11],[Lex-12],[Lex-13],adverb list'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -721,7 +721,7 @@ $hashed_metag = {
                                                       'single symbol',
                                                       'adverb list'
                                                     ],
-                                           'xseqid' => 'discard rule,[Lex-14],op declare match,single symbol,adverb list'
+                                           'xbnfid' => 'discard rule,[Lex-14],op declare match,single symbol,adverb list'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -738,7 +738,7 @@ $hashed_metag = {
                                                       'op declare',
                                                       'adverb list'
                                                     ],
-                                           'xseqid' => 'empty rule,lhs,op declare,adverb list'
+                                           'xbnfid' => 'empty rule,lhs,op declare,adverb list'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -753,7 +753,7 @@ $hashed_metag = {
                                                       'event name',
                                                       'event initializer'
                                                     ],
-                                           'xseqid' => 'event initialization,event name,event initializer'
+                                           'xbnfid' => 'event initialization,event name,event initializer'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -761,7 +761,7 @@ $hashed_metag = {
                                            'lhs' => 'event initializer',
                                            'name' => 'event initializer',
                                            'rhs' => [],
-                                           'xseqid' => 'event initializer'
+                                           'xbnfid' => 'event initializer'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -776,7 +776,7 @@ $hashed_metag = {
                                                       '[Lex-63]',
                                                       'on or off'
                                                     ],
-                                           'xseqid' => 'event initializer,[Lex-63],on or off'
+                                           'xbnfid' => 'event initializer,[Lex-63],on or off'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -789,7 +789,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'reserved event name'
                                                     ],
-                                           'xseqid' => 'event name,reserved event name'
+                                           'xbnfid' => 'event name,reserved event name'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -802,7 +802,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'single quoted name'
                                                     ],
-                                           'xseqid' => 'event name,single quoted name'
+                                           'xbnfid' => 'event name,single quoted name'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -815,7 +815,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'standard name'
                                                     ],
-                                           'xseqid' => 'event name,standard name'
+                                           'xbnfid' => 'event name,standard name'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -832,7 +832,7 @@ $hashed_metag = {
                                                       '[Lex-62]',
                                                       'event initialization'
                                                     ],
-                                           'xseqid' => 'event specification,[Lex-61],[Lex-62],event initialization'
+                                           'xbnfid' => 'event specification,[Lex-61],[Lex-62],event initialization'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -849,7 +849,7 @@ $hashed_metag = {
                                                       '[Lex-42]',
                                                       '[Lex-43]'
                                                     ],
-                                           'xseqid' => 'group association,[Lex-41],[Lex-42],[Lex-43]'
+                                           'xbnfid' => 'group association,[Lex-41],[Lex-42],[Lex-43]'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -870,7 +870,7 @@ $hashed_metag = {
                                                       '[Lex-27]',
                                                       '[Lex-28]'
                                                     ],
-                                           'xseqid' => 'inaccessible statement,[Lex-25],[Lex-26],inaccessible treatment,[Lex-27],[Lex-28]'
+                                           'xbnfid' => 'inaccessible statement,[Lex-25],[Lex-26],inaccessible treatment,[Lex-27],[Lex-28]'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -883,7 +883,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[Lex-29]'
                                                     ],
-                                           'xseqid' => 'inaccessible treatment,[Lex-29]'
+                                           'xbnfid' => 'inaccessible treatment,[Lex-29]'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -896,7 +896,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[Lex-30]'
                                                     ],
-                                           'xseqid' => 'inaccessible treatment,[Lex-30]'
+                                           'xbnfid' => 'inaccessible treatment,[Lex-30]'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -909,7 +909,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[Lex-31]'
                                                     ],
-                                           'xseqid' => 'inaccessible treatment,[Lex-31]'
+                                           'xbnfid' => 'inaccessible treatment,[Lex-31]'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -926,7 +926,7 @@ $hashed_metag = {
                                                       '[Lex-36]',
                                                       '[Lex-37]'
                                                     ],
-                                           'xseqid' => 'left association,[Lex-35],[Lex-36],[Lex-37]'
+                                           'xbnfid' => 'left association,[Lex-35],[Lex-36],[Lex-37]'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -945,7 +945,7 @@ $hashed_metag = {
                                                       '[Lex-10]',
                                                       'adverb list'
                                                     ],
-                                           'xseqid' => 'lexeme default statement,[Lex-8],[Lex-9],[Lex-10],adverb list'
+                                           'xbnfid' => 'lexeme default statement,[Lex-8],[Lex-9],[Lex-10],adverb list'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -964,7 +964,7 @@ $hashed_metag = {
                                                       'symbol',
                                                       'adverb list'
                                                     ],
-                                           'xseqid' => 'lexeme rule,[Lex-15],op declare match,symbol,adverb list'
+                                           'xbnfid' => 'lexeme rule,[Lex-15],op declare match,symbol,adverb list'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -977,7 +977,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'symbol name'
                                                     ],
-                                           'xseqid' => 'lhs,symbol name'
+                                           'xbnfid' => 'lhs,symbol name'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -994,7 +994,7 @@ $hashed_metag = {
                                                       '[Lex-69]',
                                                       'alternative name'
                                                     ],
-                                           'xseqid' => 'naming,[Lex-68],[Lex-69],alternative name'
+                                           'xbnfid' => 'naming,[Lex-68],[Lex-69],alternative name'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -1007,7 +1007,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[Lex-32]'
                                                     ],
-                                           'xseqid' => 'null adverb,[Lex-32]'
+                                           'xbnfid' => 'null adverb,[Lex-32]'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -1020,7 +1020,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[Lex-55]'
                                                     ],
-                                           'xseqid' => 'null ranking constant,[Lex-55]'
+                                           'xbnfid' => 'null ranking constant,[Lex-55]'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -1033,7 +1033,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[Lex-56]'
                                                     ],
-                                           'xseqid' => 'null ranking constant,[Lex-56]'
+                                           'xbnfid' => 'null ranking constant,[Lex-56]'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -1050,7 +1050,7 @@ $hashed_metag = {
                                                       '[Lex-51]',
                                                       'null ranking constant'
                                                     ],
-                                           'xseqid' => 'null ranking specification,[Lex-50],[Lex-51],null ranking constant'
+                                           'xbnfid' => 'null ranking specification,[Lex-50],[Lex-51],null ranking constant'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -1069,7 +1069,7 @@ $hashed_metag = {
                                                       '[Lex-54]',
                                                       'null ranking constant'
                                                     ],
-                                           'xseqid' => 'null ranking specification,[Lex-52],[Lex-53],[Lex-54],null ranking constant'
+                                           'xbnfid' => 'null ranking specification,[Lex-52],[Lex-53],[Lex-54],null ranking constant'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -1082,7 +1082,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[Lex-0]'
                                                     ],
-                                           'xseqid' => 'null statement,[Lex-0]'
+                                           'xbnfid' => 'null statement,[Lex-0]'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -1103,7 +1103,7 @@ $hashed_metag = {
                                                       '[Lex-21]',
                                                       'symbol name'
                                                     ],
-                                           'xseqid' => 'nulled event declaration,[Lex-19],event initialization,[Lex-20],[Lex-21],symbol name'
+                                           'xbnfid' => 'nulled event declaration,[Lex-19],event initialization,[Lex-20],[Lex-21],symbol name'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -1116,7 +1116,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[Lex-64]'
                                                     ],
-                                           'xseqid' => 'on or off,[Lex-64]'
+                                           'xbnfid' => 'on or off,[Lex-64]'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -1129,7 +1129,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[Lex-65]'
                                                     ],
-                                           'xseqid' => 'on or off,[Lex-65]'
+                                           'xbnfid' => 'on or off,[Lex-65]'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -1142,7 +1142,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'op declare bnf'
                                                     ],
-                                           'xseqid' => 'op declare,op declare bnf'
+                                           'xbnfid' => 'op declare,op declare bnf'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -1155,7 +1155,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'op declare match'
                                                     ],
-                                           'xseqid' => 'op declare,op declare match'
+                                           'xbnfid' => 'op declare,op declare match'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -1172,7 +1172,7 @@ $hashed_metag = {
                                                       'rhs primary list',
                                                       '[Lex-71]'
                                                     ],
-                                           'xseqid' => 'parenthesized rhs primary list,[Lex-70],rhs primary list,[Lex-71]'
+                                           'xbnfid' => 'parenthesized rhs primary list,[Lex-70],rhs primary list,[Lex-71]'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -1189,7 +1189,7 @@ $hashed_metag = {
                                                       '[Lex-60]',
                                                       'before or after'
                                                     ],
-                                           'xseqid' => 'pause specification,[Lex-59],[Lex-60],before or after'
+                                           'xbnfid' => 'pause specification,[Lex-59],[Lex-60],before or after'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -1210,7 +1210,7 @@ $hashed_metag = {
                                                       '[Lex-24]',
                                                       'symbol name'
                                                     ],
-                                           'xseqid' => 'prediction event declaration,[Lex-22],event initialization,[Lex-23],[Lex-24],symbol name'
+                                           'xbnfid' => 'prediction event declaration,[Lex-22],event initialization,[Lex-23],[Lex-24],symbol name'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -1223,7 +1223,7 @@ $hashed_metag = {
                                                       'alternatives'
                                                     ],
                                            'separator' => 'op loosen',
-                                           'xseqid' => 'priorities,alternatives'
+                                           'xbnfid' => 'priorities,alternatives'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -1240,7 +1240,7 @@ $hashed_metag = {
                                                       'op declare',
                                                       'priorities'
                                                     ],
-                                           'xseqid' => 'priority rule,lhs,op declare,priorities'
+                                           'xbnfid' => 'priority rule,lhs,op declare,priorities'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -1257,7 +1257,7 @@ $hashed_metag = {
                                                       '[Lex-58]',
                                                       'signed integer'
                                                     ],
-                                           'xseqid' => 'priority specification,[Lex-57],[Lex-58],signed integer'
+                                           'xbnfid' => 'priority specification,[Lex-57],[Lex-58],signed integer'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -1274,7 +1274,7 @@ $hashed_metag = {
                                                       '[Lex-47]',
                                                       'boolean'
                                                     ],
-                                           'xseqid' => 'proper specification,[Lex-46],[Lex-47],boolean'
+                                           'xbnfid' => 'proper specification,[Lex-46],[Lex-47],boolean'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -1295,7 +1295,7 @@ $hashed_metag = {
                                                       'quantifier',
                                                       'adverb list'
                                                     ],
-                                           'xseqid' => 'quantified rule,lhs,op declare,single symbol,quantifier,adverb list'
+                                           'xbnfid' => 'quantified rule,lhs,op declare,single symbol,quantifier,adverb list'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -1308,7 +1308,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[Lex-72]'
                                                     ],
-                                           'xseqid' => 'quantifier,[Lex-72]'
+                                           'xbnfid' => 'quantifier,[Lex-72]'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -1321,7 +1321,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[Lex-73]'
                                                     ],
-                                           'xseqid' => 'quantifier,[Lex-73]'
+                                           'xbnfid' => 'quantifier,[Lex-73]'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -1338,7 +1338,7 @@ $hashed_metag = {
                                                       '[Lex-49]',
                                                       'signed integer'
                                                     ],
-                                           'xseqid' => 'rank specification,[Lex-48],[Lex-49],signed integer'
+                                           'xbnfid' => 'rank specification,[Lex-48],[Lex-49],signed integer'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -1349,7 +1349,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'rhs primary'
                                                     ],
-                                           'xseqid' => 'rhs,rhs primary'
+                                           'xbnfid' => 'rhs,rhs primary'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -1362,7 +1362,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'parenthesized rhs primary list'
                                                     ],
-                                           'xseqid' => 'rhs primary,parenthesized rhs primary list'
+                                           'xbnfid' => 'rhs primary,parenthesized rhs primary list'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -1375,7 +1375,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'single quoted string'
                                                     ],
-                                           'xseqid' => 'rhs primary,single quoted string'
+                                           'xbnfid' => 'rhs primary,single quoted string'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -1388,7 +1388,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'single symbol'
                                                     ],
-                                           'xseqid' => 'rhs primary,single symbol'
+                                           'xbnfid' => 'rhs primary,single symbol'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -1399,7 +1399,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'rhs primary'
                                                     ],
-                                           'xseqid' => 'rhs primary list,rhs primary'
+                                           'xbnfid' => 'rhs primary list,rhs primary'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -1416,7 +1416,7 @@ $hashed_metag = {
                                                       '[Lex-39]',
                                                       '[Lex-40]'
                                                     ],
-                                           'xseqid' => 'right association,[Lex-38],[Lex-39],[Lex-40]'
+                                           'xbnfid' => 'right association,[Lex-38],[Lex-39],[Lex-40]'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -1433,7 +1433,7 @@ $hashed_metag = {
                                                       '[Lex-45]',
                                                       'single symbol'
                                                     ],
-                                           'xseqid' => 'separator specification,[Lex-44],[Lex-45],single symbol'
+                                           'xbnfid' => 'separator specification,[Lex-44],[Lex-45],single symbol'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -1446,7 +1446,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'character class'
                                                     ],
-                                           'xseqid' => 'single symbol,character class'
+                                           'xbnfid' => 'single symbol,character class'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -1459,7 +1459,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'symbol'
                                                     ],
-                                           'xseqid' => 'single symbol,symbol'
+                                           'xbnfid' => 'single symbol,symbol'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -1476,7 +1476,7 @@ $hashed_metag = {
                                                       'op declare bnf',
                                                       'symbol'
                                                     ],
-                                           'xseqid' => 'start rule,[Lex-3],op declare bnf,symbol'
+                                           'xbnfid' => 'start rule,[Lex-3],op declare bnf,symbol'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -1495,7 +1495,7 @@ $hashed_metag = {
                                                       '[Lex-6]',
                                                       'symbol'
                                                     ],
-                                           'xseqid' => 'start rule,[Lex-4],[Lex-5],[Lex-6],symbol'
+                                           'xbnfid' => 'start rule,[Lex-4],[Lex-5],[Lex-6],symbol'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -1508,7 +1508,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'completion event declaration'
                                                     ],
-                                           'xseqid' => 'statement,completion event declaration'
+                                           'xbnfid' => 'statement,completion event declaration'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -1521,7 +1521,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'default rule'
                                                     ],
-                                           'xseqid' => 'statement,default rule'
+                                           'xbnfid' => 'statement,default rule'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -1534,7 +1534,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'discard default statement'
                                                     ],
-                                           'xseqid' => 'statement,discard default statement'
+                                           'xbnfid' => 'statement,discard default statement'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -1547,7 +1547,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'discard rule'
                                                     ],
-                                           'xseqid' => 'statement,discard rule'
+                                           'xbnfid' => 'statement,discard rule'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -1560,7 +1560,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'empty rule'
                                                     ],
-                                           'xseqid' => 'statement,empty rule'
+                                           'xbnfid' => 'statement,empty rule'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -1573,7 +1573,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'inaccessible statement'
                                                     ],
-                                           'xseqid' => 'statement,inaccessible statement'
+                                           'xbnfid' => 'statement,inaccessible statement'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -1586,7 +1586,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'lexeme default statement'
                                                     ],
-                                           'xseqid' => 'statement,lexeme default statement'
+                                           'xbnfid' => 'statement,lexeme default statement'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -1599,7 +1599,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'lexeme rule'
                                                     ],
-                                           'xseqid' => 'statement,lexeme rule'
+                                           'xbnfid' => 'statement,lexeme rule'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -1612,7 +1612,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'null statement'
                                                     ],
-                                           'xseqid' => 'statement,null statement'
+                                           'xbnfid' => 'statement,null statement'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -1625,7 +1625,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'nulled event declaration'
                                                     ],
-                                           'xseqid' => 'statement,nulled event declaration'
+                                           'xbnfid' => 'statement,nulled event declaration'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -1638,7 +1638,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'prediction event declaration'
                                                     ],
-                                           'xseqid' => 'statement,prediction event declaration'
+                                           'xbnfid' => 'statement,prediction event declaration'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -1651,7 +1651,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'priority rule'
                                                     ],
-                                           'xseqid' => 'statement,priority rule'
+                                           'xbnfid' => 'statement,priority rule'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -1664,7 +1664,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'quantified rule'
                                                     ],
-                                           'xseqid' => 'statement,quantified rule'
+                                           'xbnfid' => 'statement,quantified rule'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -1677,7 +1677,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'start rule'
                                                     ],
-                                           'xseqid' => 'statement,start rule'
+                                           'xbnfid' => 'statement,start rule'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -1690,7 +1690,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'statement group'
                                                     ],
-                                           'xseqid' => 'statement,statement group'
+                                           'xbnfid' => 'statement,statement group'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -1707,7 +1707,7 @@ $hashed_metag = {
                                                       'statements',
                                                       '[Lex-2]'
                                                     ],
-                                           'xseqid' => 'statement group,[Lex-1],statements,[Lex-2]'
+                                           'xbnfid' => 'statement group,[Lex-1],statements,[Lex-2]'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -1718,7 +1718,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'statement'
                                                     ],
-                                           'xseqid' => 'statements,statement'
+                                           'xbnfid' => 'statements,statement'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -1731,7 +1731,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'symbol name'
                                                     ],
-                                           'xseqid' => 'symbol,symbol name'
+                                           'xbnfid' => 'symbol,symbol name'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -1744,7 +1744,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'bare name'
                                                     ],
-                                           'xseqid' => 'symbol name,bare name'
+                                           'xbnfid' => 'symbol name,bare name'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -1757,7 +1757,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'bracketed name'
                                                     ],
-                                           'xseqid' => 'symbol name,bracketed name'
+                                           'xbnfid' => 'symbol name,bracketed name'
                                          }
                                        ],
                                'L0' => [
@@ -1768,7 +1768,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[[\\w]]'
                                                     ],
-                                           'xseqid' => 'Perl identifier,[[\\w]]'
+                                           'xbnfid' => 'Perl identifier,[[\\w]]'
                                          },
                                          {
                                            'lhs' => 'Perl name',
@@ -1779,7 +1779,7 @@ $hashed_metag = {
                                                       'Perl identifier'
                                                     ],
                                            'separator' => 'double colon',
-                                           'xseqid' => 'Perl name,Perl identifier'
+                                           'xbnfid' => 'Perl name,Perl identifier'
                                          },
                                          {
                                            'lhs' => '[:discard]',
@@ -1787,7 +1787,7 @@ $hashed_metag = {
                                                       'hash comment'
                                                     ],
                                            'symbol_as_event' => 'hash comment',
-                                           'xseqid' => '[:discard],hash comment'
+                                           'xbnfid' => '[:discard],hash comment'
                                          },
                                          {
                                            'lhs' => '[:discard]',
@@ -1795,7 +1795,7 @@ $hashed_metag = {
                                                       'whitespace'
                                                     ],
                                            'symbol_as_event' => 'whitespace',
-                                           'xseqid' => '[:discard],whitespace'
+                                           'xbnfid' => '[:discard],whitespace'
                                          },
                                          {
                                            'lhs' => '[Lex-0]',
@@ -1805,7 +1805,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[[\\;]]'
                                                     ],
-                                           'xseqid' => '[Lex-0],[[\\;]]'
+                                           'xbnfid' => '[Lex-0],[[\\;]]'
                                          },
                                          {
                                            'lhs' => '[Lex-10]',
@@ -1815,7 +1815,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[[\\=]]'
                                                     ],
-                                           'xseqid' => '[Lex-10],[[\\=]]'
+                                           'xbnfid' => '[Lex-10],[[\\=]]'
                                          },
                                          {
                                            'lhs' => '[Lex-11]',
@@ -1837,7 +1837,7 @@ $hashed_metag = {
                                                       '[[r]]',
                                                       '[[d]]'
                                                     ],
-                                           'xseqid' => '[Lex-11],[[d]],[[i]],[[s]],[[c]],[[a]],[[r]],[[d]]'
+                                           'xbnfid' => '[Lex-11],[[d]],[[i]],[[s]],[[c]],[[a]],[[r]],[[d]]'
                                          },
                                          {
                                            'lhs' => '[Lex-12]',
@@ -1859,7 +1859,7 @@ $hashed_metag = {
                                                       '[[l]]',
                                                       '[[t]]'
                                                     ],
-                                           'xseqid' => '[Lex-12],[[d]],[[e]],[[f]],[[a]],[[u]],[[l]],[[t]]'
+                                           'xbnfid' => '[Lex-12],[[d]],[[e]],[[f]],[[a]],[[u]],[[l]],[[t]]'
                                          },
                                          {
                                            'lhs' => '[Lex-13]',
@@ -1869,7 +1869,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[[\\=]]'
                                                     ],
-                                           'xseqid' => '[Lex-13],[[\\=]]'
+                                           'xbnfid' => '[Lex-13],[[\\=]]'
                                          },
                                          {
                                            'lhs' => '[Lex-14]',
@@ -1893,7 +1893,7 @@ $hashed_metag = {
                                                       '[[r]]',
                                                       '[[d]]'
                                                     ],
-                                           'xseqid' => '[Lex-14],[[\\:]],[[d]],[[i]],[[s]],[[c]],[[a]],[[r]],[[d]]'
+                                           'xbnfid' => '[Lex-14],[[\\:]],[[d]],[[i]],[[s]],[[c]],[[a]],[[r]],[[d]]'
                                          },
                                          {
                                            'lhs' => '[Lex-15]',
@@ -1915,7 +1915,7 @@ $hashed_metag = {
                                                       '[[m]]',
                                                       '[[e]]'
                                                     ],
-                                           'xseqid' => '[Lex-15],[[\\:]],[[l]],[[e]],[[x]],[[e]],[[m]],[[e]]'
+                                           'xbnfid' => '[Lex-15],[[\\:]],[[l]],[[e]],[[x]],[[e]],[[m]],[[e]]'
                                          },
                                          {
                                            'lhs' => '[Lex-16]',
@@ -1933,7 +1933,7 @@ $hashed_metag = {
                                                       '[[n]]',
                                                       '[[t]]'
                                                     ],
-                                           'xseqid' => '[Lex-16],[[e]],[[v]],[[e]],[[n]],[[t]]'
+                                           'xbnfid' => '[Lex-16],[[e]],[[v]],[[e]],[[n]],[[t]]'
                                          },
                                          {
                                            'lhs' => '[Lex-17]',
@@ -1943,7 +1943,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[[\\=]]'
                                                     ],
-                                           'xseqid' => '[Lex-17],[[\\=]]'
+                                           'xbnfid' => '[Lex-17],[[\\=]]'
                                          },
                                          {
                                            'lhs' => '[Lex-18]',
@@ -1969,7 +1969,7 @@ $hashed_metag = {
                                                       '[[e]]',
                                                       '[[d]]'
                                                     ],
-                                           'xseqid' => '[Lex-18],[[c]],[[o]],[[m]],[[p]],[[l]],[[e]],[[t]],[[e]],[[d]]'
+                                           'xbnfid' => '[Lex-18],[[c]],[[o]],[[m]],[[p]],[[l]],[[e]],[[t]],[[e]],[[d]]'
                                          },
                                          {
                                            'lhs' => '[Lex-19]',
@@ -1987,7 +1987,7 @@ $hashed_metag = {
                                                       '[[n]]',
                                                       '[[t]]'
                                                     ],
-                                           'xseqid' => '[Lex-19],[[e]],[[v]],[[e]],[[n]],[[t]]'
+                                           'xbnfid' => '[Lex-19],[[e]],[[v]],[[e]],[[n]],[[t]]'
                                          },
                                          {
                                            'lhs' => '[Lex-1]',
@@ -1997,7 +1997,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[[\\{]]'
                                                     ],
-                                           'xseqid' => '[Lex-1],[[\\{]]'
+                                           'xbnfid' => '[Lex-1],[[\\{]]'
                                          },
                                          {
                                            'lhs' => '[Lex-20]',
@@ -2007,7 +2007,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[[\\=]]'
                                                     ],
-                                           'xseqid' => '[Lex-20],[[\\=]]'
+                                           'xbnfid' => '[Lex-20],[[\\=]]'
                                          },
                                          {
                                            'lhs' => '[Lex-21]',
@@ -2027,7 +2027,7 @@ $hashed_metag = {
                                                       '[[e]]',
                                                       '[[d]]'
                                                     ],
-                                           'xseqid' => '[Lex-21],[[n]],[[u]],[[l]],[[l]],[[e]],[[d]]'
+                                           'xbnfid' => '[Lex-21],[[n]],[[u]],[[l]],[[l]],[[e]],[[d]]'
                                          },
                                          {
                                            'lhs' => '[Lex-22]',
@@ -2045,7 +2045,7 @@ $hashed_metag = {
                                                       '[[n]]',
                                                       '[[t]]'
                                                     ],
-                                           'xseqid' => '[Lex-22],[[e]],[[v]],[[e]],[[n]],[[t]]'
+                                           'xbnfid' => '[Lex-22],[[e]],[[v]],[[e]],[[n]],[[t]]'
                                          },
                                          {
                                            'lhs' => '[Lex-23]',
@@ -2055,7 +2055,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[[\\=]]'
                                                     ],
-                                           'xseqid' => '[Lex-23],[[\\=]]'
+                                           'xbnfid' => '[Lex-23],[[\\=]]'
                                          },
                                          {
                                            'lhs' => '[Lex-24]',
@@ -2081,7 +2081,7 @@ $hashed_metag = {
                                                       '[[e]]',
                                                       '[[d]]'
                                                     ],
-                                           'xseqid' => '[Lex-24],[[p]],[[r]],[[e]],[[d]],[[i]],[[c]],[[t]],[[e]],[[d]]'
+                                           'xbnfid' => '[Lex-24],[[p]],[[r]],[[e]],[[d]],[[i]],[[c]],[[t]],[[e]],[[d]]'
                                          },
                                          {
                                            'lhs' => '[Lex-25]',
@@ -2113,7 +2113,7 @@ $hashed_metag = {
                                                       '[[l]]',
                                                       '[[e]]'
                                                     ],
-                                           'xseqid' => '[Lex-25],[[i]],[[n]],[[a]],[[c]],[[c]],[[e]],[[s]],[[s]],[[i]],[[b]],[[l]],[[e]]'
+                                           'xbnfid' => '[Lex-25],[[i]],[[n]],[[a]],[[c]],[[c]],[[e]],[[s]],[[s]],[[i]],[[b]],[[l]],[[e]]'
                                          },
                                          {
                                            'lhs' => '[Lex-26]',
@@ -2125,7 +2125,7 @@ $hashed_metag = {
                                                       '[[i]]',
                                                       '[[s]]'
                                                     ],
-                                           'xseqid' => '[Lex-26],[[i]],[[s]]'
+                                           'xbnfid' => '[Lex-26],[[i]],[[s]]'
                                          },
                                          {
                                            'lhs' => '[Lex-27]',
@@ -2137,7 +2137,7 @@ $hashed_metag = {
                                                       '[[b]]',
                                                       '[[y]]'
                                                     ],
-                                           'xseqid' => '[Lex-27],[[b]],[[y]]'
+                                           'xbnfid' => '[Lex-27],[[b]],[[y]]'
                                          },
                                          {
                                            'lhs' => '[Lex-28]',
@@ -2159,7 +2159,7 @@ $hashed_metag = {
                                                       '[[l]]',
                                                       '[[t]]'
                                                     ],
-                                           'xseqid' => '[Lex-28],[[d]],[[e]],[[f]],[[a]],[[u]],[[l]],[[t]]'
+                                           'xbnfid' => '[Lex-28],[[d]],[[e]],[[f]],[[a]],[[u]],[[l]],[[t]]'
                                          },
                                          {
                                            'lhs' => '[Lex-29]',
@@ -2175,7 +2175,7 @@ $hashed_metag = {
                                                       '[[r]]',
                                                       '[[n]]'
                                                     ],
-                                           'xseqid' => '[Lex-29],[[w]],[[a]],[[r]],[[n]]'
+                                           'xbnfid' => '[Lex-29],[[w]],[[a]],[[r]],[[n]]'
                                          },
                                          {
                                            'lhs' => '[Lex-2]',
@@ -2185,7 +2185,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[[\\}]]'
                                                     ],
-                                           'xseqid' => '[Lex-2],[[\\}]]'
+                                           'xbnfid' => '[Lex-2],[[\\}]]'
                                          },
                                          {
                                            'lhs' => '[Lex-30]',
@@ -2197,7 +2197,7 @@ $hashed_metag = {
                                                       '[[o]]',
                                                       '[[k]]'
                                                     ],
-                                           'xseqid' => '[Lex-30],[[o]],[[k]]'
+                                           'xbnfid' => '[Lex-30],[[o]],[[k]]'
                                          },
                                          {
                                            'lhs' => '[Lex-31]',
@@ -2215,7 +2215,7 @@ $hashed_metag = {
                                                       '[[a]]',
                                                       '[[l]]'
                                                     ],
-                                           'xseqid' => '[Lex-31],[[f]],[[a]],[[t]],[[a]],[[l]]'
+                                           'xbnfid' => '[Lex-31],[[f]],[[a]],[[t]],[[a]],[[l]]'
                                          },
                                          {
                                            'lhs' => '[Lex-32]',
@@ -2225,7 +2225,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[[\\,]]'
                                                     ],
-                                           'xseqid' => '[Lex-32],[[\\,]]'
+                                           'xbnfid' => '[Lex-32],[[\\,]]'
                                          },
                                          {
                                            'lhs' => '[Lex-33]',
@@ -2245,7 +2245,7 @@ $hashed_metag = {
                                                       '[[o]]',
                                                       '[[n]]'
                                                     ],
-                                           'xseqid' => '[Lex-33],[[a]],[[c]],[[t]],[[i]],[[o]],[[n]]'
+                                           'xbnfid' => '[Lex-33],[[a]],[[c]],[[t]],[[i]],[[o]],[[n]]'
                                          },
                                          {
                                            'lhs' => '[Lex-34]',
@@ -2257,7 +2257,7 @@ $hashed_metag = {
                                                       '[[\\=]]',
                                                       '[[\\>]]'
                                                     ],
-                                           'xseqid' => '[Lex-34],[[\\=]],[[\\>]]'
+                                           'xbnfid' => '[Lex-34],[[\\=]],[[\\>]]'
                                          },
                                          {
                                            'lhs' => '[Lex-35]',
@@ -2275,7 +2275,7 @@ $hashed_metag = {
                                                       '[[o]]',
                                                       '[[c]]'
                                                     ],
-                                           'xseqid' => '[Lex-35],[[a]],[[s]],[[s]],[[o]],[[c]]'
+                                           'xbnfid' => '[Lex-35],[[a]],[[s]],[[s]],[[o]],[[c]]'
                                          },
                                          {
                                            'lhs' => '[Lex-36]',
@@ -2287,7 +2287,7 @@ $hashed_metag = {
                                                       '[[\\=]]',
                                                       '[[\\>]]'
                                                     ],
-                                           'xseqid' => '[Lex-36],[[\\=]],[[\\>]]'
+                                           'xbnfid' => '[Lex-36],[[\\=]],[[\\>]]'
                                          },
                                          {
                                            'lhs' => '[Lex-37]',
@@ -2303,7 +2303,7 @@ $hashed_metag = {
                                                       '[[f]]',
                                                       '[[t]]'
                                                     ],
-                                           'xseqid' => '[Lex-37],[[l]],[[e]],[[f]],[[t]]'
+                                           'xbnfid' => '[Lex-37],[[l]],[[e]],[[f]],[[t]]'
                                          },
                                          {
                                            'lhs' => '[Lex-38]',
@@ -2321,7 +2321,7 @@ $hashed_metag = {
                                                       '[[o]]',
                                                       '[[c]]'
                                                     ],
-                                           'xseqid' => '[Lex-38],[[a]],[[s]],[[s]],[[o]],[[c]]'
+                                           'xbnfid' => '[Lex-38],[[a]],[[s]],[[s]],[[o]],[[c]]'
                                          },
                                          {
                                            'lhs' => '[Lex-39]',
@@ -2333,7 +2333,7 @@ $hashed_metag = {
                                                       '[[\\=]]',
                                                       '[[\\>]]'
                                                     ],
-                                           'xseqid' => '[Lex-39],[[\\=]],[[\\>]]'
+                                           'xbnfid' => '[Lex-39],[[\\=]],[[\\>]]'
                                          },
                                          {
                                            'lhs' => '[Lex-3]',
@@ -2353,7 +2353,7 @@ $hashed_metag = {
                                                       '[[r]]',
                                                       '[[t]]'
                                                     ],
-                                           'xseqid' => '[Lex-3],[[\\:]],[[s]],[[t]],[[a]],[[r]],[[t]]'
+                                           'xbnfid' => '[Lex-3],[[\\:]],[[s]],[[t]],[[a]],[[r]],[[t]]'
                                          },
                                          {
                                            'lhs' => '[Lex-40]',
@@ -2371,7 +2371,7 @@ $hashed_metag = {
                                                       '[[h]]',
                                                       '[[t]]'
                                                     ],
-                                           'xseqid' => '[Lex-40],[[r]],[[i]],[[g]],[[h]],[[t]]'
+                                           'xbnfid' => '[Lex-40],[[r]],[[i]],[[g]],[[h]],[[t]]'
                                          },
                                          {
                                            'lhs' => '[Lex-41]',
@@ -2389,7 +2389,7 @@ $hashed_metag = {
                                                       '[[o]]',
                                                       '[[c]]'
                                                     ],
-                                           'xseqid' => '[Lex-41],[[a]],[[s]],[[s]],[[o]],[[c]]'
+                                           'xbnfid' => '[Lex-41],[[a]],[[s]],[[s]],[[o]],[[c]]'
                                          },
                                          {
                                            'lhs' => '[Lex-42]',
@@ -2401,7 +2401,7 @@ $hashed_metag = {
                                                       '[[\\=]]',
                                                       '[[\\>]]'
                                                     ],
-                                           'xseqid' => '[Lex-42],[[\\=]],[[\\>]]'
+                                           'xbnfid' => '[Lex-42],[[\\=]],[[\\>]]'
                                          },
                                          {
                                            'lhs' => '[Lex-43]',
@@ -2419,7 +2419,7 @@ $hashed_metag = {
                                                       '[[u]]',
                                                       '[[p]]'
                                                     ],
-                                           'xseqid' => '[Lex-43],[[g]],[[r]],[[o]],[[u]],[[p]]'
+                                           'xbnfid' => '[Lex-43],[[g]],[[r]],[[o]],[[u]],[[p]]'
                                          },
                                          {
                                            'lhs' => '[Lex-44]',
@@ -2445,7 +2445,7 @@ $hashed_metag = {
                                                       '[[o]]',
                                                       '[[r]]'
                                                     ],
-                                           'xseqid' => '[Lex-44],[[s]],[[e]],[[p]],[[a]],[[r]],[[a]],[[t]],[[o]],[[r]]'
+                                           'xbnfid' => '[Lex-44],[[s]],[[e]],[[p]],[[a]],[[r]],[[a]],[[t]],[[o]],[[r]]'
                                          },
                                          {
                                            'lhs' => '[Lex-45]',
@@ -2457,7 +2457,7 @@ $hashed_metag = {
                                                       '[[\\=]]',
                                                       '[[\\>]]'
                                                     ],
-                                           'xseqid' => '[Lex-45],[[\\=]],[[\\>]]'
+                                           'xbnfid' => '[Lex-45],[[\\=]],[[\\>]]'
                                          },
                                          {
                                            'lhs' => '[Lex-46]',
@@ -2477,7 +2477,7 @@ $hashed_metag = {
                                                       '[[e]]',
                                                       '[[r]]'
                                                     ],
-                                           'xseqid' => '[Lex-46],[[p]],[[r]],[[o]],[[p]],[[e]],[[r]]'
+                                           'xbnfid' => '[Lex-46],[[p]],[[r]],[[o]],[[p]],[[e]],[[r]]'
                                          },
                                          {
                                            'lhs' => '[Lex-47]',
@@ -2489,7 +2489,7 @@ $hashed_metag = {
                                                       '[[\\=]]',
                                                       '[[\\>]]'
                                                     ],
-                                           'xseqid' => '[Lex-47],[[\\=]],[[\\>]]'
+                                           'xbnfid' => '[Lex-47],[[\\=]],[[\\>]]'
                                          },
                                          {
                                            'lhs' => '[Lex-48]',
@@ -2505,7 +2505,7 @@ $hashed_metag = {
                                                       '[[n]]',
                                                       '[[k]]'
                                                     ],
-                                           'xseqid' => '[Lex-48],[[r]],[[a]],[[n]],[[k]]'
+                                           'xbnfid' => '[Lex-48],[[r]],[[a]],[[n]],[[k]]'
                                          },
                                          {
                                            'lhs' => '[Lex-49]',
@@ -2517,7 +2517,7 @@ $hashed_metag = {
                                                       '[[\\=]]',
                                                       '[[\\>]]'
                                                     ],
-                                           'xseqid' => '[Lex-49],[[\\=]],[[\\>]]'
+                                           'xbnfid' => '[Lex-49],[[\\=]],[[\\>]]'
                                          },
                                          {
                                            'lhs' => '[Lex-4]',
@@ -2535,7 +2535,7 @@ $hashed_metag = {
                                                       '[[r]]',
                                                       '[[t]]'
                                                     ],
-                                           'xseqid' => '[Lex-4],[[s]],[[t]],[[a]],[[r]],[[t]]'
+                                           'xbnfid' => '[Lex-4],[[s]],[[t]],[[a]],[[r]],[[t]]'
                                          },
                                          {
                                            'lhs' => '[Lex-50]',
@@ -2567,7 +2567,7 @@ $hashed_metag = {
                                                       '[[n]]',
                                                       '[[g]]'
                                                     ],
-                                           'xseqid' => '[Lex-50],[[n]],[[u]],[[l]],[[l]],[[\\-]],[[r]],[[a]],[[n]],[[k]],[[i]],[[n]],[[g]]'
+                                           'xbnfid' => '[Lex-50],[[n]],[[u]],[[l]],[[l]],[[\\-]],[[r]],[[a]],[[n]],[[k]],[[i]],[[n]],[[g]]'
                                          },
                                          {
                                            'lhs' => '[Lex-51]',
@@ -2579,7 +2579,7 @@ $hashed_metag = {
                                                       '[[\\=]]',
                                                       '[[\\>]]'
                                                     ],
-                                           'xseqid' => '[Lex-51],[[\\=]],[[\\>]]'
+                                           'xbnfid' => '[Lex-51],[[\\=]],[[\\>]]'
                                          },
                                          {
                                            'lhs' => '[Lex-52]',
@@ -2595,7 +2595,7 @@ $hashed_metag = {
                                                       '[[l]]',
                                                       '[[l]]'
                                                     ],
-                                           'xseqid' => '[Lex-52],[[n]],[[u]],[[l]],[[l]]'
+                                           'xbnfid' => '[Lex-52],[[n]],[[u]],[[l]],[[l]]'
                                          },
                                          {
                                            'lhs' => '[Lex-53]',
@@ -2611,7 +2611,7 @@ $hashed_metag = {
                                                       '[[n]]',
                                                       '[[k]]'
                                                     ],
-                                           'xseqid' => '[Lex-53],[[r]],[[a]],[[n]],[[k]]'
+                                           'xbnfid' => '[Lex-53],[[r]],[[a]],[[n]],[[k]]'
                                          },
                                          {
                                            'lhs' => '[Lex-54]',
@@ -2623,7 +2623,7 @@ $hashed_metag = {
                                                       '[[\\=]]',
                                                       '[[\\>]]'
                                                     ],
-                                           'xseqid' => '[Lex-54],[[\\=]],[[\\>]]'
+                                           'xbnfid' => '[Lex-54],[[\\=]],[[\\>]]'
                                          },
                                          {
                                            'lhs' => '[Lex-55]',
@@ -2637,7 +2637,7 @@ $hashed_metag = {
                                                       '[[o]]',
                                                       '[[w]]'
                                                     ],
-                                           'xseqid' => '[Lex-55],[[l]],[[o]],[[w]]'
+                                           'xbnfid' => '[Lex-55],[[l]],[[o]],[[w]]'
                                          },
                                          {
                                            'lhs' => '[Lex-56]',
@@ -2653,7 +2653,7 @@ $hashed_metag = {
                                                       '[[g]]',
                                                       '[[h]]'
                                                     ],
-                                           'xseqid' => '[Lex-56],[[h]],[[i]],[[g]],[[h]]'
+                                           'xbnfid' => '[Lex-56],[[h]],[[i]],[[g]],[[h]]'
                                          },
                                          {
                                            'lhs' => '[Lex-57]',
@@ -2677,7 +2677,7 @@ $hashed_metag = {
                                                       '[[t]]',
                                                       '[[y]]'
                                                     ],
-                                           'xseqid' => '[Lex-57],[[p]],[[r]],[[i]],[[o]],[[r]],[[i]],[[t]],[[y]]'
+                                           'xbnfid' => '[Lex-57],[[p]],[[r]],[[i]],[[o]],[[r]],[[i]],[[t]],[[y]]'
                                          },
                                          {
                                            'lhs' => '[Lex-58]',
@@ -2689,7 +2689,7 @@ $hashed_metag = {
                                                       '[[\\=]]',
                                                       '[[\\>]]'
                                                     ],
-                                           'xseqid' => '[Lex-58],[[\\=]],[[\\>]]'
+                                           'xbnfid' => '[Lex-58],[[\\=]],[[\\>]]'
                                          },
                                          {
                                            'lhs' => '[Lex-59]',
@@ -2707,7 +2707,7 @@ $hashed_metag = {
                                                       '[[s]]',
                                                       '[[e]]'
                                                     ],
-                                           'xseqid' => '[Lex-59],[[p]],[[a]],[[u]],[[s]],[[e]]'
+                                           'xbnfid' => '[Lex-59],[[p]],[[a]],[[u]],[[s]],[[e]]'
                                          },
                                          {
                                            'lhs' => '[Lex-5]',
@@ -2727,7 +2727,7 @@ $hashed_metag = {
                                                       '[[o]]',
                                                       '[[l]]'
                                                     ],
-                                           'xseqid' => '[Lex-5],[[s]],[[y]],[[m]],[[b]],[[o]],[[l]]'
+                                           'xbnfid' => '[Lex-5],[[s]],[[y]],[[m]],[[b]],[[o]],[[l]]'
                                          },
                                          {
                                            'lhs' => '[Lex-60]',
@@ -2739,7 +2739,7 @@ $hashed_metag = {
                                                       '[[\\=]]',
                                                       '[[\\>]]'
                                                     ],
-                                           'xseqid' => '[Lex-60],[[\\=]],[[\\>]]'
+                                           'xbnfid' => '[Lex-60],[[\\=]],[[\\>]]'
                                          },
                                          {
                                            'lhs' => '[Lex-61]',
@@ -2757,7 +2757,7 @@ $hashed_metag = {
                                                       '[[n]]',
                                                       '[[t]]'
                                                     ],
-                                           'xseqid' => '[Lex-61],[[e]],[[v]],[[e]],[[n]],[[t]]'
+                                           'xbnfid' => '[Lex-61],[[e]],[[v]],[[e]],[[n]],[[t]]'
                                          },
                                          {
                                            'lhs' => '[Lex-62]',
@@ -2769,7 +2769,7 @@ $hashed_metag = {
                                                       '[[\\=]]',
                                                       '[[\\>]]'
                                                     ],
-                                           'xseqid' => '[Lex-62],[[\\=]],[[\\>]]'
+                                           'xbnfid' => '[Lex-62],[[\\=]],[[\\>]]'
                                          },
                                          {
                                            'lhs' => '[Lex-63]',
@@ -2779,7 +2779,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[[\\=]]'
                                                     ],
-                                           'xseqid' => '[Lex-63],[[\\=]]'
+                                           'xbnfid' => '[Lex-63],[[\\=]]'
                                          },
                                          {
                                            'lhs' => '[Lex-64]',
@@ -2791,7 +2791,7 @@ $hashed_metag = {
                                                       '[[o]]',
                                                       '[[n]]'
                                                     ],
-                                           'xseqid' => '[Lex-64],[[o]],[[n]]'
+                                           'xbnfid' => '[Lex-64],[[o]],[[n]]'
                                          },
                                          {
                                            'lhs' => '[Lex-65]',
@@ -2805,7 +2805,7 @@ $hashed_metag = {
                                                       '[[f]]',
                                                       '[[f]]'
                                                     ],
-                                           'xseqid' => '[Lex-65],[[o]],[[f]],[[f]]'
+                                           'xbnfid' => '[Lex-65],[[o]],[[f]],[[f]]'
                                          },
                                          {
                                            'lhs' => '[Lex-66]',
@@ -2823,7 +2823,7 @@ $hashed_metag = {
                                                       '[[s]]',
                                                       '[[s]]'
                                                     ],
-                                           'xseqid' => '[Lex-66],[[b]],[[l]],[[e]],[[s]],[[s]]'
+                                           'xbnfid' => '[Lex-66],[[b]],[[l]],[[e]],[[s]],[[s]]'
                                          },
                                          {
                                            'lhs' => '[Lex-67]',
@@ -2835,7 +2835,7 @@ $hashed_metag = {
                                                       '[[\\=]]',
                                                       '[[\\>]]'
                                                     ],
-                                           'xseqid' => '[Lex-67],[[\\=]],[[\\>]]'
+                                           'xbnfid' => '[Lex-67],[[\\=]],[[\\>]]'
                                          },
                                          {
                                            'lhs' => '[Lex-68]',
@@ -2851,7 +2851,7 @@ $hashed_metag = {
                                                       '[[m]]',
                                                       '[[e]]'
                                                     ],
-                                           'xseqid' => '[Lex-68],[[n]],[[a]],[[m]],[[e]]'
+                                           'xbnfid' => '[Lex-68],[[n]],[[a]],[[m]],[[e]]'
                                          },
                                          {
                                            'lhs' => '[Lex-69]',
@@ -2863,7 +2863,7 @@ $hashed_metag = {
                                                       '[[\\=]]',
                                                       '[[\\>]]'
                                                     ],
-                                           'xseqid' => '[Lex-69],[[\\=]],[[\\>]]'
+                                           'xbnfid' => '[Lex-69],[[\\=]],[[\\>]]'
                                          },
                                          {
                                            'lhs' => '[Lex-6]',
@@ -2875,7 +2875,7 @@ $hashed_metag = {
                                                       '[[i]]',
                                                       '[[s]]'
                                                     ],
-                                           'xseqid' => '[Lex-6],[[i]],[[s]]'
+                                           'xbnfid' => '[Lex-6],[[i]],[[s]]'
                                          },
                                          {
                                            'lhs' => '[Lex-70]',
@@ -2885,7 +2885,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[[\\(]]'
                                                     ],
-                                           'xseqid' => '[Lex-70],[[\\(]]'
+                                           'xbnfid' => '[Lex-70],[[\\(]]'
                                          },
                                          {
                                            'lhs' => '[Lex-71]',
@@ -2895,7 +2895,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[[\\)]]'
                                                     ],
-                                           'xseqid' => '[Lex-71],[[\\)]]'
+                                           'xbnfid' => '[Lex-71],[[\\)]]'
                                          },
                                          {
                                            'lhs' => '[Lex-72]',
@@ -2905,7 +2905,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[[\\*]]'
                                                     ],
-                                           'xseqid' => '[Lex-72],[[\\*]]'
+                                           'xbnfid' => '[Lex-72],[[\\*]]'
                                          },
                                          {
                                            'lhs' => '[Lex-73]',
@@ -2915,7 +2915,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[[\\+]]'
                                                     ],
-                                           'xseqid' => '[Lex-73],[[\\+]]'
+                                           'xbnfid' => '[Lex-73],[[\\+]]'
                                          },
                                          {
                                            'lhs' => '[Lex-7]',
@@ -2939,7 +2939,7 @@ $hashed_metag = {
                                                       '[[l]]',
                                                       '[[t]]'
                                                     ],
-                                           'xseqid' => '[Lex-7],[[\\:]],[[d]],[[e]],[[f]],[[a]],[[u]],[[l]],[[t]]'
+                                           'xbnfid' => '[Lex-7],[[\\:]],[[d]],[[e]],[[f]],[[a]],[[u]],[[l]],[[t]]'
                                          },
                                          {
                                            'lhs' => '[Lex-8]',
@@ -2959,7 +2959,7 @@ $hashed_metag = {
                                                       '[[m]]',
                                                       '[[e]]'
                                                     ],
-                                           'xseqid' => '[Lex-8],[[l]],[[e]],[[x]],[[e]],[[m]],[[e]]'
+                                           'xbnfid' => '[Lex-8],[[l]],[[e]],[[x]],[[e]],[[m]],[[e]]'
                                          },
                                          {
                                            'lhs' => '[Lex-9]',
@@ -2981,7 +2981,7 @@ $hashed_metag = {
                                                       '[[l]]',
                                                       '[[t]]'
                                                     ],
-                                           'xseqid' => '[Lex-9],[[d]],[[e]],[[f]],[[a]],[[u]],[[l]],[[t]]'
+                                           'xbnfid' => '[Lex-9],[[d]],[[e]],[[f]],[[a]],[[u]],[[l]],[[t]]'
                                          },
                                          {
                                            'lhs' => 'array descriptor',
@@ -2996,7 +2996,7 @@ $hashed_metag = {
                                                       'result item descriptor list',
                                                       'array descriptor right bracket'
                                                     ],
-                                           'xseqid' => 'array descriptor,array descriptor left bracket,result item descriptor list,array descriptor right bracket'
+                                           'xbnfid' => 'array descriptor,array descriptor left bracket,result item descriptor list,array descriptor right bracket'
                                          },
                                          {
                                            'lhs' => 'array descriptor left bracket',
@@ -3007,7 +3007,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[[\\[]]'
                                                     ],
-                                           'xseqid' => 'array descriptor left bracket,[[\\[]]'
+                                           'xbnfid' => 'array descriptor left bracket,[[\\[]]'
                                          },
                                          {
                                            'lhs' => 'array descriptor left bracket',
@@ -3020,7 +3020,7 @@ $hashed_metag = {
                                                       '[[\\[]]',
                                                       'whitespace'
                                                     ],
-                                           'xseqid' => 'array descriptor left bracket,[[\\[]],whitespace'
+                                           'xbnfid' => 'array descriptor left bracket,[[\\[]],whitespace'
                                          },
                                          {
                                            'lhs' => 'array descriptor right bracket',
@@ -3031,7 +3031,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[[\\]]]'
                                                     ],
-                                           'xseqid' => 'array descriptor right bracket,[[\\]]]'
+                                           'xbnfid' => 'array descriptor right bracket,[[\\]]]'
                                          },
                                          {
                                            'lhs' => 'array descriptor right bracket',
@@ -3044,7 +3044,7 @@ $hashed_metag = {
                                                       'whitespace',
                                                       '[[\\]]]'
                                                     ],
-                                           'xseqid' => 'array descriptor right bracket,whitespace,[[\\]]]'
+                                           'xbnfid' => 'array descriptor right bracket,whitespace,[[\\]]]'
                                          },
                                          {
                                            'lhs' => 'bare name',
@@ -3053,7 +3053,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[[\\w]]'
                                                     ],
-                                           'xseqid' => 'bare name,[[\\w]]'
+                                           'xbnfid' => 'bare name,[[\\w]]'
                                          },
                                          {
                                            'lhs' => 'before or after',
@@ -3072,7 +3072,7 @@ $hashed_metag = {
                                                       '[[e]]',
                                                       '[[r]]'
                                                     ],
-                                           'xseqid' => 'before or after,[[a]],[[f]],[[t]],[[e]],[[r]]'
+                                           'xbnfid' => 'before or after,[[a]],[[f]],[[t]],[[e]],[[r]]'
                                          },
                                          {
                                            'lhs' => 'before or after',
@@ -3093,7 +3093,7 @@ $hashed_metag = {
                                                       '[[r]]',
                                                       '[[e]]'
                                                     ],
-                                           'xseqid' => 'before or after,[[b]],[[e]],[[f]],[[o]],[[r]],[[e]]'
+                                           'xbnfid' => 'before or after,[[b]],[[e]],[[f]],[[o]],[[r]],[[e]]'
                                          },
                                          {
                                            'lhs' => 'boolean',
@@ -3104,7 +3104,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[[01]]'
                                                     ],
-                                           'xseqid' => 'boolean,[[01]]'
+                                           'xbnfid' => 'boolean,[[01]]'
                                          },
                                          {
                                            'lhs' => 'bracketed name',
@@ -3119,7 +3119,7 @@ $hashed_metag = {
                                                       'bracketed name string',
                                                       '[[\\>]]'
                                                     ],
-                                           'xseqid' => 'bracketed name,[[\\<]],bracketed name string,[[\\>]]'
+                                           'xbnfid' => 'bracketed name,[[\\<]],bracketed name string,[[\\>]]'
                                          },
                                          {
                                            'lhs' => 'bracketed name string',
@@ -3128,7 +3128,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[[\\s\\w]]'
                                                     ],
-                                           'xseqid' => 'bracketed name string,[[\\s\\w]]'
+                                           'xbnfid' => 'bracketed name string,[[\\s\\w]]'
                                          },
                                          {
                                            'lhs' => 'cc element',
@@ -3139,7 +3139,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'escaped cc character'
                                                     ],
-                                           'xseqid' => 'cc element,escaped cc character'
+                                           'xbnfid' => 'cc element,escaped cc character'
                                          },
                                          {
                                            'lhs' => 'cc element',
@@ -3150,7 +3150,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'negated posix char class'
                                                     ],
-                                           'xseqid' => 'cc element,negated posix char class'
+                                           'xbnfid' => 'cc element,negated posix char class'
                                          },
                                          {
                                            'lhs' => 'cc element',
@@ -3161,7 +3161,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'posix char class'
                                                     ],
-                                           'xseqid' => 'cc element,posix char class'
+                                           'xbnfid' => 'cc element,posix char class'
                                          },
                                          {
                                            'lhs' => 'cc element',
@@ -3172,7 +3172,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'safe cc character'
                                                     ],
-                                           'xseqid' => 'cc element,safe cc character'
+                                           'xbnfid' => 'cc element,safe cc character'
                                          },
                                          {
                                            'lhs' => 'cc elements',
@@ -3181,7 +3181,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'cc element'
                                                     ],
-                                           'xseqid' => 'cc elements,cc element'
+                                           'xbnfid' => 'cc elements,cc element'
                                          },
                                          {
                                            'lhs' => 'character class',
@@ -3198,7 +3198,7 @@ $hashed_metag = {
                                                       '[[\\]]]',
                                                       'character class modifiers'
                                                     ],
-                                           'xseqid' => 'character class,[[\\[]],cc elements,[[\\]]],character class modifiers'
+                                           'xbnfid' => 'character class,[[\\[]],cc elements,[[\\]]],character class modifiers'
                                          },
                                          {
                                            'lhs' => 'character class modifier',
@@ -3211,7 +3211,7 @@ $hashed_metag = {
                                                       '[[\\:]]',
                                                       '[[i]]'
                                                     ],
-                                           'xseqid' => 'character class modifier,[[\\:]],[[i]]'
+                                           'xbnfid' => 'character class modifier,[[\\:]],[[i]]'
                                          },
                                          {
                                            'lhs' => 'character class modifier',
@@ -3226,7 +3226,7 @@ $hashed_metag = {
                                                       '[[i]]',
                                                       '[[c]]'
                                                     ],
-                                           'xseqid' => 'character class modifier,[[\\:]],[[i]],[[c]]'
+                                           'xbnfid' => 'character class modifier,[[\\:]],[[i]],[[c]]'
                                          },
                                          {
                                            'lhs' => 'character class modifiers',
@@ -3235,7 +3235,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'character class modifier'
                                                     ],
-                                           'xseqid' => 'character class modifiers,character class modifier'
+                                           'xbnfid' => 'character class modifiers,character class modifier'
                                          },
                                          {
                                            'lhs' => 'double colon',
@@ -3248,7 +3248,7 @@ $hashed_metag = {
                                                       '[[\\:]]',
                                                       '[[\\:]]'
                                                     ],
-                                           'xseqid' => 'double colon,[[\\:]],[[\\:]]'
+                                           'xbnfid' => 'double colon,[[\\:]],[[\\:]]'
                                          },
                                          {
                                            'lhs' => 'escaped cc character',
@@ -3261,7 +3261,7 @@ $hashed_metag = {
                                                       '[[\\\\]]',
                                                       'horizontal character'
                                                     ],
-                                           'xseqid' => 'escaped cc character,[[\\\\]],horizontal character'
+                                           'xbnfid' => 'escaped cc character,[[\\\\]],horizontal character'
                                          },
                                          {
                                            'lhs' => 'hash comment',
@@ -3272,7 +3272,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'terminated hash comment'
                                                     ],
-                                           'xseqid' => 'hash comment,terminated hash comment'
+                                           'xbnfid' => 'hash comment,terminated hash comment'
                                          },
                                          {
                                            'lhs' => 'hash comment',
@@ -3283,7 +3283,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'unterminated final hash comment'
                                                     ],
-                                           'xseqid' => 'hash comment,unterminated final hash comment'
+                                           'xbnfid' => 'hash comment,unterminated final hash comment'
                                          },
                                          {
                                            'lhs' => 'hash comment body',
@@ -3292,7 +3292,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'hash comment char'
                                                     ],
-                                           'xseqid' => 'hash comment body,hash comment char'
+                                           'xbnfid' => 'hash comment body,hash comment char'
                                          },
                                          {
                                            'lhs' => 'hash comment char',
@@ -3303,7 +3303,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[[^\\x{A}\\x{B}\\x{C}\\x{D}\\x{2028}\\x{2029}]]'
                                                     ],
-                                           'xseqid' => 'hash comment char,[[^\\x{A}\\x{B}\\x{C}\\x{D}\\x{2028}\\x{2029}]]'
+                                           'xbnfid' => 'hash comment char,[[^\\x{A}\\x{B}\\x{C}\\x{D}\\x{2028}\\x{2029}]]'
                                          },
                                          {
                                            'lhs' => 'horizontal character',
@@ -3314,7 +3314,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[[^\\x{A}\\x{B}\\x{C}\\x{D}\\x{2028}\\x{2029}]]'
                                                     ],
-                                           'xseqid' => 'horizontal character,[[^\\x{A}\\x{B}\\x{C}\\x{D}\\x{2028}\\x{2029}]]'
+                                           'xbnfid' => 'horizontal character,[[^\\x{A}\\x{B}\\x{C}\\x{D}\\x{2028}\\x{2029}]]'
                                          },
                                          {
                                            'lhs' => 'integer',
@@ -3323,7 +3323,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[[\\d]]'
                                                     ],
-                                           'xseqid' => 'integer,[[\\d]]'
+                                           'xbnfid' => 'integer,[[\\d]]'
                                          },
                                          {
                                            'lhs' => 'negated posix char class',
@@ -3344,7 +3344,7 @@ $hashed_metag = {
                                                       '[[\\:]]',
                                                       '[[\\]]]'
                                                     ],
-                                           'xseqid' => 'negated posix char class,[[\\[]],[[\\:]],[[\\^]],posix char class name,[[\\:]],[[\\]]]'
+                                           'xbnfid' => 'negated posix char class,[[\\[]],[[\\:]],[[\\^]],posix char class name,[[\\:]],[[\\]]]'
                                          },
                                          {
                                            'lhs' => 'one or more word characters',
@@ -3353,7 +3353,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[[\\w]]'
                                                     ],
-                                           'xseqid' => 'one or more word characters,[[\\w]]'
+                                           'xbnfid' => 'one or more word characters,[[\\w]]'
                                          },
                                          {
                                            'lhs' => 'op declare bnf',
@@ -3368,7 +3368,7 @@ $hashed_metag = {
                                                       '[[\\:]]',
                                                       '[[\\=]]'
                                                     ],
-                                           'xseqid' => 'op declare bnf,[[\\:]],[[\\:]],[[\\=]]'
+                                           'xbnfid' => 'op declare bnf,[[\\:]],[[\\:]],[[\\=]]'
                                          },
                                          {
                                            'lhs' => 'op declare match',
@@ -3379,7 +3379,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[[\\~]]'
                                                     ],
-                                           'xseqid' => 'op declare match,[[\\~]]'
+                                           'xbnfid' => 'op declare match,[[\\~]]'
                                          },
                                          {
                                            'lhs' => 'op equal priority',
@@ -3390,7 +3390,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[[\\|]]'
                                                     ],
-                                           'xseqid' => 'op equal priority,[[\\|]]'
+                                           'xbnfid' => 'op equal priority,[[\\|]]'
                                          },
                                          {
                                            'lhs' => 'op loosen',
@@ -3403,7 +3403,7 @@ $hashed_metag = {
                                                       '[[\\|]]',
                                                       '[[\\|]]'
                                                     ],
-                                           'xseqid' => 'op loosen,[[\\|]],[[\\|]]'
+                                           'xbnfid' => 'op loosen,[[\\|]],[[\\|]]'
                                          },
                                          {
                                            'lhs' => 'posix char class',
@@ -3422,7 +3422,7 @@ $hashed_metag = {
                                                       '[[\\:]]',
                                                       '[[\\]]]'
                                                     ],
-                                           'xseqid' => 'posix char class,[[\\[]],[[\\:]],posix char class name,[[\\:]],[[\\]]]'
+                                           'xbnfid' => 'posix char class,[[\\[]],[[\\:]],posix char class name,[[\\:]],[[\\]]]'
                                          },
                                          {
                                            'lhs' => 'posix char class name',
@@ -3431,7 +3431,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[[[:alnum:]]]'
                                                     ],
-                                           'xseqid' => 'posix char class name,[[[:alnum:]]]'
+                                           'xbnfid' => 'posix char class name,[[[:alnum:]]]'
                                          },
                                          {
                                            'lhs' => 'reserved action name',
@@ -3446,7 +3446,7 @@ $hashed_metag = {
                                                       '[[\\:]]',
                                                       'one or more word characters'
                                                     ],
-                                           'xseqid' => 'reserved action name,[[\\:]],[[\\:]],one or more word characters'
+                                           'xbnfid' => 'reserved action name,[[\\:]],[[\\:]],one or more word characters'
                                          },
                                          {
                                            'lhs' => 'reserved blessing name',
@@ -3461,7 +3461,7 @@ $hashed_metag = {
                                                       '[[\\:]]',
                                                       'one or more word characters'
                                                     ],
-                                           'xseqid' => 'reserved blessing name,[[\\:]],[[\\:]],one or more word characters'
+                                           'xbnfid' => 'reserved blessing name,[[\\:]],[[\\:]],one or more word characters'
                                          },
                                          {
                                            'lhs' => 'reserved event name',
@@ -3484,7 +3484,7 @@ $hashed_metag = {
                                                       '[[o]]',
                                                       '[[l]]'
                                                     ],
-                                           'xseqid' => 'reserved event name,[[\\:]],[[s]],[[y]],[[m]],[[b]],[[o]],[[l]]'
+                                           'xbnfid' => 'reserved event name,[[\\:]],[[s]],[[y]],[[m]],[[b]],[[o]],[[l]]'
                                          },
                                          {
                                            'lhs' => 'result item descriptor',
@@ -3499,7 +3499,7 @@ $hashed_metag = {
                                                       '[[h]]',
                                                       '[[s]]'
                                                     ],
-                                           'xseqid' => 'result item descriptor,[[l]],[[h]],[[s]]'
+                                           'xbnfid' => 'result item descriptor,[[l]],[[h]],[[s]]'
                                          },
                                          {
                                            'lhs' => 'result item descriptor',
@@ -3516,7 +3516,7 @@ $hashed_metag = {
                                                       '[[m]]',
                                                       '[[e]]'
                                                     ],
-                                           'xseqid' => 'result item descriptor,[[n]],[[a]],[[m]],[[e]]'
+                                           'xbnfid' => 'result item descriptor,[[n]],[[a]],[[m]],[[e]]'
                                          },
                                          {
                                            'lhs' => 'result item descriptor',
@@ -3533,7 +3533,7 @@ $hashed_metag = {
                                                       '[[l]]',
                                                       '[[e]]'
                                                     ],
-                                           'xseqid' => 'result item descriptor,[[r]],[[u]],[[l]],[[e]]'
+                                           'xbnfid' => 'result item descriptor,[[r]],[[u]],[[l]],[[e]]'
                                          },
                                          {
                                            'lhs' => 'result item descriptor',
@@ -3552,7 +3552,7 @@ $hashed_metag = {
                                                       '[[r]]',
                                                       '[[t]]'
                                                     ],
-                                           'xseqid' => 'result item descriptor,[[s]],[[t]],[[a]],[[r]],[[t]]'
+                                           'xbnfid' => 'result item descriptor,[[s]],[[t]],[[a]],[[r]],[[t]]'
                                          },
                                          {
                                            'lhs' => 'result item descriptor',
@@ -3571,7 +3571,7 @@ $hashed_metag = {
                                                       '[[u]]',
                                                       '[[e]]'
                                                     ],
-                                           'xseqid' => 'result item descriptor,[[v]],[[a]],[[l]],[[u]],[[e]]'
+                                           'xbnfid' => 'result item descriptor,[[v]],[[a]],[[l]],[[u]],[[e]]'
                                          },
                                          {
                                            'lhs' => 'result item descriptor',
@@ -3592,7 +3592,7 @@ $hashed_metag = {
                                                       '[[t]]',
                                                       '[[h]]'
                                                     ],
-                                           'xseqid' => 'result item descriptor,[[l]],[[e]],[[n]],[[g]],[[t]],[[h]]'
+                                           'xbnfid' => 'result item descriptor,[[l]],[[e]],[[n]],[[g]],[[t]],[[h]]'
                                          },
                                          {
                                            'lhs' => 'result item descriptor',
@@ -3613,7 +3613,7 @@ $hashed_metag = {
                                                       '[[o]]',
                                                       '[[l]]'
                                                     ],
-                                           'xseqid' => 'result item descriptor,[[s]],[[y]],[[m]],[[b]],[[o]],[[l]]'
+                                           'xbnfid' => 'result item descriptor,[[s]],[[y]],[[m]],[[b]],[[o]],[[l]]'
                                          },
                                          {
                                            'lhs' => 'result item descriptor',
@@ -3634,7 +3634,7 @@ $hashed_metag = {
                                                       '[[e]]',
                                                       '[[s]]'
                                                     ],
-                                           'xseqid' => 'result item descriptor,[[v]],[[a]],[[l]],[[u]],[[e]],[[s]]'
+                                           'xbnfid' => 'result item descriptor,[[v]],[[a]],[[l]],[[u]],[[e]],[[s]]'
                                          },
                                          {
                                            'lhs' => 'result item descriptor',
@@ -3657,7 +3657,7 @@ $hashed_metag = {
                                                       '[[r]]',
                                                       '[[t]]'
                                                     ],
-                                           'xseqid' => 'result item descriptor,[[g]],[[1]],[[s]],[[t]],[[a]],[[r]],[[t]]'
+                                           'xbnfid' => 'result item descriptor,[[g]],[[1]],[[s]],[[t]],[[a]],[[r]],[[t]]'
                                          },
                                          {
                                            'lhs' => 'result item descriptor',
@@ -3682,7 +3682,7 @@ $hashed_metag = {
                                                       '[[t]]',
                                                       '[[h]]'
                                                     ],
-                                           'xseqid' => 'result item descriptor,[[g]],[[1]],[[l]],[[e]],[[n]],[[g]],[[t]],[[h]]'
+                                           'xbnfid' => 'result item descriptor,[[g]],[[1]],[[l]],[[e]],[[n]],[[g]],[[t]],[[h]]'
                                          },
                                          {
                                            'lhs' => 'result item descriptor list',
@@ -3692,7 +3692,7 @@ $hashed_metag = {
                                                       'result item descriptor'
                                                     ],
                                            'separator' => 'result item descriptor separator',
-                                           'xseqid' => 'result item descriptor list,result item descriptor'
+                                           'xbnfid' => 'result item descriptor list,result item descriptor'
                                          },
                                          {
                                            'lhs' => 'result item descriptor separator',
@@ -3703,7 +3703,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[[,]]'
                                                     ],
-                                           'xseqid' => 'result item descriptor separator,[[,]]'
+                                           'xbnfid' => 'result item descriptor separator,[[,]]'
                                          },
                                          {
                                            'lhs' => 'result item descriptor separator',
@@ -3716,7 +3716,7 @@ $hashed_metag = {
                                                       '[[,]]',
                                                       'whitespace'
                                                     ],
-                                           'xseqid' => 'result item descriptor separator,[[,]],whitespace'
+                                           'xbnfid' => 'result item descriptor separator,[[,]],whitespace'
                                          },
                                          {
                                            'lhs' => 'safe cc character',
@@ -3727,7 +3727,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[[^\\x{5d}\\x{0A}\\x{0B}\\x{0C}\\x{0D}\\x{0085}\\x{2028}\\x{2029}]]'
                                                     ],
-                                           'xseqid' => 'safe cc character,[[^\\x{5d}\\x{0A}\\x{0B}\\x{0C}\\x{0D}\\x{0085}\\x{2028}\\x{2029}]]'
+                                           'xbnfid' => 'safe cc character,[[^\\x{5d}\\x{0A}\\x{0B}\\x{0C}\\x{0D}\\x{0085}\\x{2028}\\x{2029}]]'
                                          },
                                          {
                                            'lhs' => 'sign',
@@ -3738,7 +3738,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[[+-]]'
                                                     ],
-                                           'xseqid' => 'sign,[[+-]]'
+                                           'xbnfid' => 'sign,[[+-]]'
                                          },
                                          {
                                            'lhs' => 'signed integer',
@@ -3749,7 +3749,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'integer'
                                                     ],
-                                           'xseqid' => 'signed integer,integer'
+                                           'xbnfid' => 'signed integer,integer'
                                          },
                                          {
                                            'lhs' => 'signed integer',
@@ -3762,7 +3762,7 @@ $hashed_metag = {
                                                       'sign',
                                                       'integer'
                                                     ],
-                                           'xseqid' => 'signed integer,sign,integer'
+                                           'xbnfid' => 'signed integer,sign,integer'
                                          },
                                          {
                                            'lhs' => 'single quoted name',
@@ -3777,7 +3777,7 @@ $hashed_metag = {
                                                       'string without single quote or vertical space',
                                                       '[[\']]'
                                                     ],
-                                           'xseqid' => 'single quoted name,[[\']],string without single quote or vertical space,[[\']]'
+                                           'xbnfid' => 'single quoted name,[[\']],string without single quote or vertical space,[[\']]'
                                          },
                                          {
                                            'lhs' => 'single quoted string',
@@ -3794,7 +3794,7 @@ $hashed_metag = {
                                                       '[[\']]',
                                                       'character class modifiers'
                                                     ],
-                                           'xseqid' => 'single quoted string,[[\']],string without single quote or vertical space,[[\']],character class modifiers'
+                                           'xbnfid' => 'single quoted string,[[\']],string without single quote or vertical space,[[\']],character class modifiers'
                                          },
                                          {
                                            'lhs' => 'standard name',
@@ -3807,7 +3807,7 @@ $hashed_metag = {
                                                       '[[a-zA-Z]]',
                                                       'zero or more word characters'
                                                     ],
-                                           'xseqid' => 'standard name,[[a-zA-Z]],zero or more word characters'
+                                           'xbnfid' => 'standard name,[[a-zA-Z]],zero or more word characters'
                                          },
                                          {
                                            'lhs' => 'string without single quote or vertical space',
@@ -3816,7 +3816,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[[^\'\\x{0A}\\x{0B}\\x{0C}\\x{0D}\\x{0085}\\x{2028}\\x{2029}]]'
                                                     ],
-                                           'xseqid' => 'string without single quote or vertical space,[[^\'\\x{0A}\\x{0B}\\x{0C}\\x{0D}\\x{0085}\\x{2028}\\x{2029}]]'
+                                           'xbnfid' => 'string without single quote or vertical space,[[^\'\\x{0A}\\x{0B}\\x{0C}\\x{0D}\\x{0085}\\x{2028}\\x{2029}]]'
                                          },
                                          {
                                            'lhs' => 'terminated hash comment',
@@ -3831,7 +3831,7 @@ $hashed_metag = {
                                                       'hash comment body',
                                                       'vertical space char'
                                                     ],
-                                           'xseqid' => 'terminated hash comment,[[\\#]],hash comment body,vertical space char'
+                                           'xbnfid' => 'terminated hash comment,[[\\#]],hash comment body,vertical space char'
                                          },
                                          {
                                            'lhs' => 'unterminated final hash comment',
@@ -3844,7 +3844,7 @@ $hashed_metag = {
                                                       '[[\\#]]',
                                                       'hash comment body'
                                                     ],
-                                           'xseqid' => 'unterminated final hash comment,[[\\#]],hash comment body'
+                                           'xbnfid' => 'unterminated final hash comment,[[\\#]],hash comment body'
                                          },
                                          {
                                            'lhs' => 'vertical space char',
@@ -3855,7 +3855,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[[\\x{A}\\x{B}\\x{C}\\x{D}\\x{2028}\\x{2029}]]'
                                                     ],
-                                           'xseqid' => 'vertical space char,[[\\x{A}\\x{B}\\x{C}\\x{D}\\x{2028}\\x{2029}]]'
+                                           'xbnfid' => 'vertical space char,[[\\x{A}\\x{B}\\x{C}\\x{D}\\x{2028}\\x{2029}]]'
                                          },
                                          {
                                            'lhs' => 'whitespace',
@@ -3864,7 +3864,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[[\\s]]'
                                                     ],
-                                           'xseqid' => 'whitespace,[[\\s]]'
+                                           'xbnfid' => 'whitespace,[[\\s]]'
                                          },
                                          {
                                            'lhs' => 'zero or more word characters',
@@ -3873,7 +3873,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[[\\w]]'
                                                     ],
-                                           'xseqid' => 'zero or more word characters,[[\\w]]'
+                                           'xbnfid' => 'zero or more word characters,[[\\w]]'
                                          }
                                        ]
                              },

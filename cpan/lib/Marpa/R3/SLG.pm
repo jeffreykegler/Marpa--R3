@@ -1191,7 +1191,7 @@ sub add_user_rule {
 
   OPTION: for my $option ( keys %{$options} ) {
         my $value = $options->{$option};
-        if ( $option eq 'xseqid' ) {
+        if ( $option eq 'xbnfid' ) {
             # $xbnf =
               # $slg->[
               # $subgrammar eq 'L0'

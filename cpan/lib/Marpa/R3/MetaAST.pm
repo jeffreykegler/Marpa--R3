@@ -1769,7 +1769,7 @@ sub Marpa::R3::Internal::MetaAST::Parse::xbnf_create {
     $hash_by_xbnfid->{$rule_id} = $args;
 
     # Now create the initial working rule
-    my %wrl = ( xseqid => $rule_id );
+    my %wrl = ( xbnfid => $rule_id );
     for my $field (
         qw(name tag lhs action bless rank
         symbol_as_event event
