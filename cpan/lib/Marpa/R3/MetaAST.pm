@@ -1725,6 +1725,48 @@ sub Marpa::R3::Internal::MetaAST::Parse::xsy_assign {
     return $parse->xsy_create( $symbol_name, $args );
 }
 
+# eXternal RuLe
+sub Marpa::R3::Internal::MetaAST::Parse::xrl_create {
+    my ( $parse, $args ) = @_;
+    my $lhs = $args->{lhs};
+    my $start = $args->{start};
+    my $length = $args->{length};
+    my $xrlid = sprintf '%s@%d-%d', $lhs, $start, $length;
+    my $xrls_by_lhs = $parse->{xrls_by_lhs}->{$lhs};
+
+    # We don't add a precedenced xrl if there is already
+    # an xrl, so any pre-existing precedenced xrl is the only one.
+    my $other_xrl = $xrls_by_lhs->[0];
+    if ( $other_xrl and $other_xrl->{precedence_count} > 1) {
+        Marpa::R3::Internal::X->new(
+            {
+                desc       => 'Precedenced LHS not unique',
+                lhs        => $lhs,
+                start      => $start,
+                length     => $length,
+                other_xrl => $other_xrl,
+                try => sub {
+                    my $self = shift;
+                    my ( $l1, $c1 ) =
+                      @{ $parse->line_column( $self->{other_xrl}->{start} ) };
+                    my ( $l2, $c2 ) =
+                      @{ $parse->line_column( $self->{start} ) };
+                    my @string = ($self->{desc});
+                    push @string, "Precedenced rule was at line $l1, column $c1";
+                    push @string, "One was at line $l2, column $c2";
+                    push @string,
+                        "Rule was <"
+                      . $self->{lhs}
+                      . '> ::= '
+                      . ( join q{ }, map { '<' . $_ . '>' } @{ $self->{rhs} } );
+                    push @string, q{};
+                    return join "\n", @string;
+                }
+            });
+    }
+    return $xrlid;
+}
+
 sub Marpa::R3::Internal::MetaAST::Parse::xbnf_create {
     my ( $parse, $args, $subgrammar ) = @_;
 
@@ -1743,9 +1785,6 @@ sub Marpa::R3::Internal::MetaAST::Parse::xbnf_create {
                 start      => $args->{start},
                 length     => $args->{length},
                 other_xbnf => $hash_by_xbnfid->{$rule_id},
-                dump       => Data::Dumper::Dumper($args),
-                lc =>
-                  Data::Dumper::Dumper( $parse->line_column( $args->{start} ) ),
                 to_string => sub {
                     my $self = shift;
                     my ( $l1, $c1 ) =
