@@ -106,7 +106,7 @@ sub ast_to_hash {
             rhs    => [$start_lhs],
             action => '::first'
           };
-        my $wrl= $hashed_ast->xseq_create( $rule_data, 'G1' );
+        my $wrl= $hashed_ast->xbnf_create( $rule_data, 'G1' );
         push @{ $hashed_ast->{rules}->{G1} }, $wrl;
     } ## end sub Marpa::R3::Internal::MetaAST::start_rule_create
 
@@ -588,7 +588,7 @@ sub Marpa::R3::Internal::MetaAST_Nodes::priority_rule::evaluate {
         @{$values};
 
     my $subgrammar = $op_declare->op() eq q{::=} ? 'G1' : 'L0';
-    my $xseq_ordinal = 0;
+    my $xbnf_ordinal = 0;
 
     my $lhs = $raw_lhs->name($parse);
     $parse->{'first_lhs'} //= $lhs if $subgrammar eq 'G1';
@@ -639,7 +639,7 @@ sub Marpa::R3::Internal::MetaAST_Nodes::priority_rule::evaluate {
             my %hash_rule = (
                 start => $start,
                 length => $length,
-                subkey => ++$xseq_ordinal,
+                subkey => ++$xbnf_ordinal,
                 lhs   => $lhs,
                 rhs   => \@rhs_names,
                 mask  => \@mask
@@ -721,7 +721,7 @@ sub Marpa::R3::Internal::MetaAST_Nodes::priority_rule::evaluate {
 
             $parse->bless_hash_rule( \%hash_rule, $blessing, $naming, $lhs );
 
-            my $wrl = $parse->xseq_create( \%hash_rule, $subgrammar );
+            my $wrl = $parse->xbnf_create( \%hash_rule, $subgrammar );
             push @{$rules}, $wrl;
         } ## end for my $alternative (@alternatives)
         ## no critic(Subroutines::ProhibitExplicitReturnUndef)
@@ -767,7 +767,7 @@ sub Marpa::R3::Internal::MetaAST_Nodes::priority_rule::evaluate {
             length => $length,
             lhs   => $lhs,
             rhs   => [ $parse->prioritized_symbol( $lhs, 0 ) ],
-            subkey => ++$xseq_ordinal,
+            subkey => ++$xbnf_ordinal,
             @arg0_action,
         }
     );
@@ -779,12 +779,12 @@ sub Marpa::R3::Internal::MetaAST_Nodes::priority_rule::evaluate {
         length => $length,
         lhs   => $parse->prioritized_symbol( $lhs, $_ - 1 ),
         rhs   => [ $parse->prioritized_symbol( $lhs, $_ ) ],
-        subkey => ++$xseq_ordinal,
+        subkey => ++$xbnf_ordinal,
         @arg0_action
       }
       for 1 .. $priority_count - 1;
   RULE: for my $priority_rule (@priority_rules) {
-        my $wrl = $parse->xseq_create( $priority_rule, $subgrammar );
+        my $wrl = $parse->xbnf_create( $priority_rule, $subgrammar );
         push @{$rules}, $wrl;
     }
 
@@ -807,7 +807,7 @@ sub Marpa::R3::Internal::MetaAST_Nodes::priority_rule::evaluate {
             lhs    => $current_exp,
             start  => $start,
             length => $length,
-            subkey => ++$xseq_ordinal
+            subkey => ++$xbnf_ordinal
         );
         $new_xs_rule{mask} = \@mask;
 
@@ -898,7 +898,7 @@ sub Marpa::R3::Internal::MetaAST_Nodes::priority_rule::evaluate {
 
         if ( not scalar @arity ) {
             $new_xs_rule{rhs} = \@new_rhs;
-            my $wrl = $parse->xseq_create( \%new_xs_rule, $subgrammar );
+            my $wrl = $parse->xbnf_create( \%new_xs_rule, $subgrammar );
             push @{$rules}, $wrl;
             next RULE;
         }
@@ -932,7 +932,7 @@ sub Marpa::R3::Internal::MetaAST_Nodes::priority_rule::evaluate {
         } ## end DO_ASSOCIATION:
 
         $new_xs_rule{rhs} = \@new_rhs;
-        my $wrl = $parse->xseq_create( \%new_xs_rule, $subgrammar );
+        my $wrl = $parse->xbnf_create( \%new_xs_rule, $subgrammar );
         push @{$rules}, $wrl;
     } ## end RULE: for my $working_rule (@working_rules)
     ## no critic(Subroutines::ProhibitExplicitReturnUndef)
@@ -1027,7 +1027,7 @@ sub Marpa::R3::Internal::MetaAST_Nodes::empty_rule::evaluate {
     }
     $parse->bless_hash_rule( \%rule, $blessing, $naming, $lhs );
 
-    my $wrl = $parse->xseq_create( \%rule, $subgrammar );
+    my $wrl = $parse->xbnf_create( \%rule, $subgrammar );
     # mask not needed
     push @{ $parse->{rules}->{$subgrammar} }, $wrl;
 
@@ -1189,7 +1189,7 @@ sub Marpa::R3::Internal::MetaAST_Nodes::discard_rule::evaluate {
         symbol_as_event => $rhs_as_event
     );
     $rule_hash{event} = $event if defined $event;
-    my $wrl = $parse->xseq_create( \%rule_hash, 'L0' );
+    my $wrl = $parse->xbnf_create( \%rule_hash, 'L0' );
     push @{ $parse->{rules}->{L0} }, $wrl;
     ## no critic(Subroutines::ProhibitExplicitReturnUndef)
     return undef;
@@ -1301,7 +1301,7 @@ sub Marpa::R3::Internal::MetaAST_Nodes::quantified_rule::evaluate {
     }
     $parse->bless_hash_rule( \%sequence_rule, $blessing, $naming, $lhs_name );
 
-    my $wrl = $parse->xseq_create( \%sequence_rule, $subgrammar );
+    my $wrl = $parse->xbnf_create( \%sequence_rule, $subgrammar );
     push @{ $parse->{rules}->{$subgrammar} }, $wrl;
     ## no critic(Subroutines::ProhibitExplicitReturnUndef)
     return undef;
@@ -1514,7 +1514,7 @@ sub Marpa::R3::Internal::MetaAST_Nodes::character_class::evaluate {
         rhs    => $lexical_rhs,
         mask   => [1],
     );
-    my $wrl = $parse->xseq_create( \%lexical_rule, 'L0' );
+    my $wrl = $parse->xbnf_create( \%lexical_rule, 'L0' );
     push @{ $parse->{rules}->{L0} }, $wrl;
     my $g1_symbol =
       Marpa::R3::Internal::MetaAST::Symbol_List->new($lexical_lhs);
@@ -1560,7 +1560,7 @@ sub Marpa::R3::Internal::MetaAST_Nodes::single_quoted_string::evaluate {
         # description => "Internal rule for single-quoted string $string",
         mask => [ map { ; 1 } @{$lexical_rhs} ],
     );
-    my $wrl = $parse->xseq_create( \%lexical_rule, 'L0' );
+    my $wrl = $parse->xbnf_create( \%lexical_rule, 'L0' );
     push @{ $parse->{rules}->{$lexical_grammar} }, $wrl;
     my $g1_symbol =
         Marpa::R3::Internal::MetaAST::Symbol_List->new($lexical_lhs);
@@ -1725,7 +1725,7 @@ sub Marpa::R3::Internal::MetaAST::Parse::xsy_assign {
     return $parse->xsy_create( $symbol_name, $args );
 }
 
-sub Marpa::R3::Internal::MetaAST::Parse::xseq_create {
+sub Marpa::R3::Internal::MetaAST::Parse::xbnf_create {
     my ( $parse, $args, $subgrammar ) = @_;
 
     # The eXternal ALTernative is the argument hash,
@@ -1780,8 +1780,8 @@ sub Marpa::R3::Internal::MetaAST::Parse::xseq_create {
     }
     # Deep copy these arrays
     FIELD: for my $field ( qw(mask rhs) ) {
-        my $xseq_datum = $args->{$field};
-        next FIELD if not defined $xseq_datum;
+        my $xbnf_datum = $args->{$field};
+        next FIELD if not defined $xbnf_datum;
         my @array = @{$args->{$field}};
         $wrl{$field} = \@array;
     }
