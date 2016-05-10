@@ -21,7 +21,7 @@ use 5.010001;
 use strict;
 use warnings;
 use English qw( -no_match_vars );
-use Test::More tests => 6;
+use Test::More tests => 9;
 use Fatal qw(open close);
 
 use lib 'inc';
@@ -127,6 +127,46 @@ One was at line 1, column 5
 One was at line 2, column 5
 Rule was <Dup> ::= <Item>
 =========================================
+EOS
+}
+
+# Duplicate precedenced LHS: 2 precedenced rules
+if (1) {
+        my $unique_lhs_grammar = <<'END_OF_DSL';
+    Top ::= Dup
+    Dup ::= Dup '+' Dup || Dup '-' Dup || Item1
+    Dup ::= Dup '*' Dup || Dup '/' Dup || Item2
+    Item1 ::= a
+    Item2 ::= a
+    a ~ 'a'
+END_OF_DSL
+        test_grammar( 'dup precedenced lhs', $unique_lhs_grammar, <<'EOS');
+EOS
+}
+
+# Duplicate precedenced LHS: precedenced, then empty
+if (1) {
+        my $unique_lhs_grammar = <<'END_OF_DSL';
+    Top ::= Dup
+    Dup ::=
+    Dup ::= Dup '+' Dup || Dup '-' Dup || Item
+    Item ::= a
+    a ~ 'a'
+END_OF_DSL
+        test_grammar( 'LHS empty, then precedenced', $unique_lhs_grammar, <<'EOS');
+EOS
+}
+
+# Duplicate precedenced LHS: precedenced, then empty
+if (1) {
+        my $unique_lhs_grammar = <<'END_OF_DSL';
+    Top ::= Dup
+    Dup ::= Dup '+' Dup || Dup '-' Dup || Item1
+    Dup ::=
+    Item1 ::= a
+    a ~ 'a'
+END_OF_DSL
+        test_grammar( 'LHS precedenced, then empty', $unique_lhs_grammar, <<'EOS');
 EOS
 }
 

@@ -121,7 +121,6 @@ sub ast_to_hash {
       SYM: for my $symbol_name (@symbols) {
             next SYM if defined $wsyms->{$symbol_name};
 
-            # say STDERR "$grammar $symbol_name";
             my $symbol_data = {
                 dsl_form    => $symbol_name,
                 name_source => 'lexical'
@@ -142,8 +141,6 @@ sub ast_to_hash {
         }
     }
     $hashed_ast->{character_classes} = \%stripped_character_classes;
-
-    # say STDERR Data::Dumper::Dumper($hashed_ast);
 
     return $hashed_ast;
 } ## end sub ast_to_hash
@@ -443,7 +440,6 @@ sub Marpa::R3::Internal::MetaAST_Nodes::before_or_after::value {
 sub Marpa::R3::Internal::MetaAST_Nodes::event_initializer::on_or_off
 {
     my ($values) = @_;
-    # say STDERR Data::Dumper::Dumper(\@_);
     my (undef, undef, $is_activated) = @{$values};
     return 1 if not defined $is_activated;
     my (undef, undef, $on_or_off) = @{$is_activated};
@@ -607,7 +603,7 @@ sub Marpa::R3::Internal::MetaAST_Nodes::priority_rule::evaluate {
             lhs => $lhs,
             start => $start,
             length => $length,
-            precedence_count => $priority_count,
+            uniq_by_lhs => ($priority_count > 1),
         }
         );
     if ( $priority_count <= 1 ) {
@@ -964,7 +960,6 @@ sub Marpa::R3::Internal::MetaAST_Nodes::empty_rule::evaluate {
             lhs => $lhs,
             start => $start,
             length => $length,
-            precedence_count => 1,
         }
         );
     # description => qq{Empty rule for <$lhs>},
@@ -1225,10 +1220,13 @@ sub Marpa::R3::Internal::MetaAST_Nodes::quantified_rule::evaluate {
     $parse->{'first_lhs'} //= $lhs_name if $subgrammar eq 'G1';
     local $Marpa::R3::Internal::SUBGRAMMAR = $subgrammar;
 
+    my $quantifier_string = $quantifier->evaluate($parse);
     my $xrlid = xrl_create($parse, {
             lhs => $lhs_name,
             start => $start,
             length => $length,
+            uniq_by_lhs => 1,
+            quantifier => $quantifier_string,
         }
         );
 
@@ -1242,7 +1240,7 @@ sub Marpa::R3::Internal::MetaAST_Nodes::quantified_rule::evaluate {
         length => $length,
         xrlid => $xrlid,
         rhs => [ $rhs->name($parse) ],
-        min => ( $quantifier->evaluate($parse) eq q{+} ? 1 : 0 )
+        min => ( $quantifier_string eq q{+} ? 1 : 0 )
     );
 
     my $action;
@@ -1759,50 +1757,46 @@ sub Marpa::R3::Internal::MetaAST::xrl_create {
     my $lhs    = $new_xrl->{lhs};
     my $start  = $new_xrl->{start};
     my $length = $new_xrl->{length};
-    $new_xrl->{precedence_count} //= 1;
-    my $precedence_count = $new_xrl->{precedence_count};
     my $xrlid            = sprintf '%s@%d-%d', $lhs, $start, $length;
     my $xrls_by_lhs      = $parse->{xrls_by_lhs}->{$lhs};
 
+    say STDERR "xrl_create: lhs=$lhs";
+
     sub throw_precedenced_lhs_not_unique {
-        my ( $parse, $precedenced_xrl, $other_xrl ) = @_;
+        my ( $parse, $xrl1, $xrl2 ) = @_;
         Marpa::R3::Internal::X->new(
             {
                 desc            => 'Precedenced LHS not unique',
-                precedenced_xrl => $precedenced_xrl,
-                other_xrl       => $other_xrl,
+                xrl1 => $xrl1,
+                xrl2 => $xrl2,
                 try             => sub {
                     my $self = shift;
-                    my ( $l_prec, $c_prec ) = @{
-                        $parse->line_column(
-                            $self->{precedenced_xrl}->{start}
-                        )
-                    };
-                    my ( $l_oth, $c_oth ) =
-                      @{ $parse->line_column( $self->{other_xrl}->{start} ) };
+                    my ( $l1, $c1 ) = @{ $parse->line_column( $self->{xrl1}->{start} ) };
+                    my ( $l2, $c2 ) = @{ $parse->line_column( $self->{xrl2}->{start} ) };
                     my @string = ( $self->{desc} );
                     push @string,
-                      "Precendenced rule was at line $l_prec, column $c_prec";
+                      "First rule was at line $l1, column $c1";
                     push @string,
-                      "Other rule was at line $l_oth, column $c_oth";
+                      "Second rule was at line $l2, column $c2";
                     push @string, q{};
                     return join "\n", @string;
                 }
             }
-        );
+        )->throw();
     }
 
     my $earlier_xrl = $xrls_by_lhs->[0];
-    if ($earlier_xrl) {
-        # We don't add a precedenced xrl for this LHS if there is already
-        # an xrl for this LHS, so a pre-existing precedenced xrl for this LHS,
-        # if it exists, is the only pre-existing xrl 
-        if ( $earlier_xrl->{precedence_count} > 1 ) {
-            throw_precedenced_lhs_not_unique( $parse, $earlier_xrl, $new_xrl );
-        }
-        if ( $new_xrl->{precedence_count} > 1 ) {
-            throw_precedenced_lhs_not_unique( $parse, $new_xrl, $earlier_xrl );
-        }
+    if (    $earlier_xrl
+        and $earlier_xrl->{uniq_by_lhs} || $new_xrl->{uniq_by_lhs} )
+    {
+        say STDERR "xrl_create: lhs=$lhs, earlier xrl";
+
+        # If there was an earlier precedenced xrl
+        # that needed to be unique for this LHS,
+        # it was the only pre-existing xrl.
+        # That's because we will never add another one, once it is on
+        # list of XRLs by LHS.
+        throw_precedenced_lhs_not_unique( $parse, $earlier_xrl, $new_xrl );
     }
 
     my $xrl_by_id = $parse->{xrl}->{$xrlid} = $new_xrl;

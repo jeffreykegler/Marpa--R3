@@ -218,7 +218,6 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
 
         # Sort (from major to minor) by start position,
         # subkey and xbnfid
-        $DB::single = 1;
         for my $source_xbnf_data (
             map { $_->[0] }
             sort {
