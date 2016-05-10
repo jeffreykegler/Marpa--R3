@@ -1776,6 +1776,9 @@ sub Marpa::R3::Internal::MetaAST::Parse::xrl_create {
             throw_precedenced_lhs_not_unique( $parse, $new_xrl, $earlier_xrl );
         }
     }
+
+    my $xrl_by_id = $parse->{xrl}->{$xrlid} = $new_xrl;
+    push @{$parse->{xrls_by_lhs}->{$lhs}}, $new_xrl;
     return $xrlid;
 }
 
