@@ -1225,6 +1225,13 @@ sub Marpa::R3::Internal::MetaAST_Nodes::quantified_rule::evaluate {
     $parse->{'first_lhs'} //= $lhs_name if $subgrammar eq 'G1';
     local $Marpa::R3::Internal::SUBGRAMMAR = $subgrammar;
 
+    my $xrlid = xrl_create($parse, {
+            lhs => $lhs,
+            start => $start,
+            length => $length,
+        }
+        );
+
     my $adverb_list     = $proto_adverb_list->evaluate($parse);
     my $default_adverbs = $parse->{default_adverbs}->{$subgrammar};
 
@@ -1744,6 +1751,8 @@ sub Marpa::R3::Internal::MetaAST::Parse::xsy_assign {
 }
 
 # eXternal RuLe
+# At the moment, these are only for rules which can share
+# a LHS with a precedenced rule.
 sub Marpa::R3::Internal::MetaAST::xrl_create {
     my ( $parse, $new_xrl ) = @_;
     my $lhs    = $new_xrl->{lhs};
