@@ -1226,7 +1226,7 @@ sub Marpa::R3::Internal::MetaAST_Nodes::quantified_rule::evaluate {
     local $Marpa::R3::Internal::SUBGRAMMAR = $subgrammar;
 
     my $xrlid = xrl_create($parse, {
-            lhs => $lhs,
+            lhs => $lhs_name,
             start => $start,
             length => $length,
         }
@@ -1240,6 +1240,7 @@ sub Marpa::R3::Internal::MetaAST_Nodes::quantified_rule::evaluate {
     my %sequence_rule = (
         start => $start,
         length => $length,
+        xrlid => $xrlid,
         rhs => [ $rhs->name($parse) ],
         min => ( $quantifier->evaluate($parse) eq q{+} ? 1 : 0 )
     );
