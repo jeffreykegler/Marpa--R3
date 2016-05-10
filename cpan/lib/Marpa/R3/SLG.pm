@@ -326,7 +326,7 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
                       = $source_xbnf_data->{$datum_key};
                     next KEY;
                 }
-                if ( $datum_key eq 'subkey' ) {
+                if ( $datum_key =~ /\A (subkey|xrlid) \z/xms ) {
                     next KEY;
                 }
                 Marpa::R3::exception(

@@ -603,9 +603,17 @@ sub Marpa::R3::Internal::MetaAST_Nodes::priority_rule::evaluate {
 
     my $default_adverbs = $parse->{default_adverbs}->{$subgrammar};
 
+    my $xrlid = xrl_create($parse, {
+            lhs => $lhs,
+            start => $start,
+            length => $length,
+            precedence_count => $priority_count,
+        }
+        );
     if ( $priority_count <= 1 ) {
         ## If there is only one priority
         my ( undef, undef, @alternatives ) = @{ $priorities[0] };
+
         for my $alternative (@alternatives) {
             my ($alternative_start, $alternative_end,
                 $raw_rhs,           $raw_adverb_list
@@ -642,7 +650,8 @@ sub Marpa::R3::Internal::MetaAST_Nodes::priority_rule::evaluate {
                 subkey => ++$xbnf_ordinal,
                 lhs   => $lhs,
                 rhs   => \@rhs_names,
-                mask  => \@mask
+                mask  => \@mask,
+                xrlid => $xrlid,
             );
 
             my $action;
@@ -807,7 +816,8 @@ sub Marpa::R3::Internal::MetaAST_Nodes::priority_rule::evaluate {
             lhs    => $current_exp,
             start  => $start,
             length => $length,
-            subkey => ++$xbnf_ordinal
+            subkey => ++$xbnf_ordinal,
+            xrlid => $xrlid,
         );
         $new_xs_rule{mask} = \@mask;
 
@@ -950,12 +960,20 @@ sub Marpa::R3::Internal::MetaAST_Nodes::empty_rule::evaluate {
     $parse->{'first_lhs'} //= $lhs if $subgrammar eq 'G1';
     local $Marpa::R3::Internal::SUBGRAMMAR = $subgrammar;
 
+    my $xrlid = xrl_create($parse, {
+            lhs => $lhs,
+            start => $start,
+            length => $length,
+            precedence_count => 1,
+        }
+        );
     # description => qq{Empty rule for <$lhs>},
     my %rule = (
         lhs   => $lhs,
         start => $start,
         length => $length,
-        rhs   => []
+        rhs   => [],
+        xrlid => $xrlid,
     );
     my $adverb_list = $raw_adverb_list->evaluate($parse);
 
@@ -1726,7 +1744,7 @@ sub Marpa::R3::Internal::MetaAST::Parse::xsy_assign {
 }
 
 # eXternal RuLe
-sub Marpa::R3::Internal::MetaAST::Parse::xrl_create {
+sub Marpa::R3::Internal::MetaAST::xrl_create {
     my ( $parse, $new_xrl ) = @_;
     my $lhs    = $new_xrl->{lhs};
     my $start  = $new_xrl->{start};
