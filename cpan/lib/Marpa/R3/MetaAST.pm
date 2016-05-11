@@ -611,10 +611,10 @@ sub Marpa::R3::Internal::MetaAST_Nodes::priority_rule::evaluate {
         ## If there is only one priority
         my ( undef, undef, @alternatives ) = @{ $priorities[0] };
 
-        for my $alternative (@alternatives) {
-            my ($alternative_start, $alternative_end,
+        for my $alternative_ix (0 .. $#alternatives) {
+            my ($alternative_start, $alternative_length,
                 $raw_rhs,           $raw_adverb_list
-            ) = @{$alternative};
+            ) = @{$alternatives[$alternative_ix]};
             my ( $proto_rule, $adverb_list );
             my $eval_ok = eval {
                 $proto_rule  = $raw_rhs->evaluate($parse);
@@ -628,7 +628,7 @@ sub Marpa::R3::Internal::MetaAST_Nodes::priority_rule::evaluate {
                     qq{$eval_error\n},
                     qq{  The problem was in this RHS alternative:\n},
                     q{  },
-                    $parse->substring( $alternative_start, $alternative_end ),
+                    $parse->substring( $alternative_start, $alternative_length ),
                     "\n"
                 );
             } ## end if ( not $eval_ok )
@@ -642,13 +642,13 @@ sub Marpa::R3::Internal::MetaAST_Nodes::priority_rule::evaluate {
                 );
             }
             my %hash_rule = (
-                start => $start,
-                length => $length,
+                start  => ( $alternative_ix ? $alternative_start  : $start ),
+                length => ( $alternative_ix ? $alternative_length : $length ),
                 subkey => ++$xbnf_ordinal,
-                lhs   => $lhs,
-                rhs   => \@rhs_names,
-                mask  => \@mask,
-                xrlid => $xrlid,
+                lhs    => $lhs,
+                rhs    => \@rhs_names,
+                mask   => \@mask,
+                xrlid  => $xrlid,
             );
 
             my $action;
@@ -738,7 +738,7 @@ sub Marpa::R3::Internal::MetaAST_Nodes::priority_rule::evaluate {
         my $priority = $priority_count - ( $priority_ix + 1 );
         my ( undef, undef, @alternatives ) = @{ $priorities[$priority_ix] };
         for my $alternative (@alternatives) {
-            my ($alternative_start, $alternative_end,
+            my ($alternative_start, $alternative_length,
                 $raw_rhs,           $raw_adverb_list
             ) = @{$alternative};
             my ( $adverb_list, $rhs );
@@ -754,11 +754,11 @@ sub Marpa::R3::Internal::MetaAST_Nodes::priority_rule::evaluate {
                     qq{$eval_error\n},
                     qq{  The problem was in this RHS alternative:\n},
                     q{  },
-                    $parse->substring( $alternative_start, $alternative_end ),
+                    $parse->substring( $alternative_start, $alternative_length ),
                     "\n"
                 );
             } ## end if ( not $eval_ok )
-            push @working_rules, [ $priority, $rhs, $adverb_list ];
+            push @working_rules, [ $priority, $rhs, $adverb_list, $alternative_start, $alternative_length ];
         } ## end for my $alternative (@alternatives)
     } ## end for my $priority_ix ( 0 .. $priority_count - 1 )
 
@@ -795,7 +795,7 @@ sub Marpa::R3::Internal::MetaAST_Nodes::priority_rule::evaluate {
     }
 
     RULE: for my $working_rule (@working_rules) {
-        my ( $priority, $rhs, $adverb_list ) = @{$working_rule};
+        my ( $priority, $rhs, $adverb_list, $alternative_start, $alternative_length ) = @{$working_rule};
         my @new_rhs = @{ $rhs->{rhs} };
         my @arity   = grep { $new_rhs[$_] eq $lhs } 0 .. $#new_rhs;
         my $rhs_length  = scalar @new_rhs;
@@ -811,8 +811,8 @@ sub Marpa::R3::Internal::MetaAST_Nodes::priority_rule::evaluate {
         }
         my %new_xs_rule = (
             lhs    => $current_exp,
-            start  => $start,
-            length => $length,
+            start  => $alternative_start,
+            length => $alternative_length,
             subkey => ++$xbnf_ordinal,
             xrlid => $xrlid,
         );
