@@ -150,9 +150,9 @@ END_OF_SOURCE
 ========= Marpa::R3 Fatal error =========
 Quantified LHS not unique
 First quantified rule is at line 0, column 5:
-  <sequence of items> ::= item* proper => 1\n
+  <sequence of items> ::= item* proper => 1
 Second rule is at line 1, column 5:
-  <sequence of items> ::= <forty two>\n
+  <sequence of items> ::= <forty two>
 =========================================
 END_OF_MESSAGE
         'Grammar with non-unique LHS sequence symbols'

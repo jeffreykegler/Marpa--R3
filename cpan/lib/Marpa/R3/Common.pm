@@ -118,26 +118,26 @@ sub Marpa::R3::Internal::line_column {
 # a boolean indicating if it was truncated
 sub Marpa::R3::Internal::substr_as_line {
     my ( $p_string, $pos, $length, $max ) = @_;
-    my $truncated = 0;
+    my $truncated     = 0;
     my $used          = 0;
     my @escaped_chars = ();
-    CHAR: for ( my $ix = $pos ; $ix <= $pos + $length ; $ix++ ) {
+    my $trailing_ws   = 0;
+    my $last_ix = $max > $length ? $pos + $length : $pos + $max;
+  CHAR: for ( my $ix = $pos ; $ix <= $last_ix ; $ix++ ) {
         last CHAR if $used >= $max;
-        my $ord = ord substr ${$p_string}, $ix, 1;
+        my $char = substr ${$p_string}, $ix, 1;
+        $trailing_ws = $char =~ /\s/ ? $trailing_ws + 1 : 0;
+        my $ord = ord $char;
         my $escaped_char = $escape_by_ord[$ord] // sprintf( "\\x{%04x}", $ord );
+
         # say STDERR "ord=$ord $escaped_char";
         $used += length $escaped_char;
         push @escaped_chars, $escaped_char;
     }
-  IX: for my $ix ( reverse 0 .. $#escaped_chars ) {
-
-        # only trailing spaces are escaped
-        last IX if $escaped_chars[$ix] ne q{ };
-        $escaped_chars[$ix] = '\\s';
-
-        # this expands the string by one
-        $used += 1;
-    } ## end IX: for my $ix ( reverse 0 .. $#escaped_chars )
+    while ( $trailing_ws-- ) {
+        my $ws_char = pop @escaped_chars;
+        $used -= length $ws_char;
+    }
     while ( $used > $max ) {
         my $excess_char = pop @escaped_chars;
         $used -= length $excess_char;

@@ -89,9 +89,9 @@ END_OF_DSL
 ========= Marpa::R3 Fatal error =========
 Duplicate rules:
 First rule is at line 1, column 5:
-  Dup ::= Item\n
+  Dup ::= Item
 Second rule is at line 2, column 5:
-  Dup ::= Item\n
+  Dup ::= Item
 =========================================
 EOS
 }
@@ -107,9 +107,9 @@ END_OF_DSL
 ========= Marpa::R3 Fatal error =========
 Quantified LHS not unique
 First quantified rule is at line 1, column 5:
-  Dup ::= Item*\n
+  Dup ::= Item*
 Second rule is at line 2, column 5:
-  Dup ::= Item\n
+  Dup ::= Item
 =========================================
 EOS
 }
@@ -128,9 +128,9 @@ END_OF_DSL
 ========= Marpa::R3 Fatal error =========
 Precedenced LHS not unique
 First precedenced rule is at line 1, column 5:
-  Dup ::= Dup '+' Dup || Dup '-' Dup || Item1\n
+  Dup ::= Dup '+' Dup || Dup '-' Dup || Item1
 Second precedenced rule is at line 2, column 5:
-  Dup ::= Dup '*' Dup || Dup '/' Dup || Item2\n
+  Dup ::= Dup '*' Dup || Dup '/' Dup || Item2
 =========================================
 EOS
 }
@@ -148,9 +148,9 @@ END_OF_DSL
 ========= Marpa::R3 Fatal error =========
 Precedenced LHS not unique
 First rule is at line 1, column 5:
-  Dup ::=\n
+  Dup ::=
 Second precedenced rule is at line 2, column 5:
-  Dup ::= Dup '+' Dup || Dup '-' Dup || Item\n
+  Dup ::= Dup '+' Dup || Dup '-' Dup || Item
 =========================================
 EOS
 }
@@ -168,9 +168,9 @@ END_OF_DSL
 ========= Marpa::R3 Fatal error =========
 Precedenced LHS not unique
 First precedenced rule is at line 1, column 5:
-  Dup ::= Dup '+' Dup || Dup '-' Dup || Item1\n
+  Dup ::= Dup '+' Dup || Dup '-' Dup || Item1
 Second rule is at line 2, column 5:
-  Dup ::=\n
+  Dup ::=
 =========================================
 EOS
 }

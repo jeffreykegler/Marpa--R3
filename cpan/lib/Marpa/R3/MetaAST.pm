@@ -1767,24 +1767,26 @@ sub Marpa::R3::Internal::MetaAST::xrl_create {
         my ( $parse, $xrl1, $xrl2 ) = @_;
         Marpa::R3::Internal::X->new(
             {
-                desc => 'LHS not unique when required',
-                xrl1 => $xrl1,
-                xrl2 => $xrl2,
-                to_string  => sub {
-                    my $self = shift;
-                    my $pos1 = $self->{xrl1}->{start};
-                    my $len1 = $self->{xrl1}->{length};
-                    my $precedence_count1 = $self->{xrl1}->{precedence_count} // 1;
+                desc      => 'LHS not unique when required',
+                xrl1      => $xrl1,
+                xrl2      => $xrl2,
+                to_string => sub {
+                    my $self              = shift;
+                    my $pos1              = $self->{xrl1}->{start};
+                    my $len1              = $self->{xrl1}->{length};
+                    my $precedence_count1 = $self->{xrl1}->{precedence_count}
+                      // 1;
                     my $type1 = q{};
                     $type1 = 'Precedenced' if $precedence_count1 > 1;
-                    $type1 = 'Quantified' if $self->{xrl1}->{quantifier};
+                    $type1 = 'Quantified'  if $self->{xrl1}->{quantifier};
 
-                    my $pos2 = $self->{xrl2}->{start};
-                    my $len2 = $self->{xrl2}->{length};
-                    my $precedence_count2 = $self->{xrl2}->{precedence_count} // 1;
+                    my $pos2              = $self->{xrl2}->{start};
+                    my $len2              = $self->{xrl2}->{length};
+                    my $precedence_count2 = $self->{xrl2}->{precedence_count}
+                      // 1;
                     my $type2 = q{};
                     $type2 = 'Precedenced' if $precedence_count2 > 1;
-                    $type2 = 'Quantified' if $self->{xrl2}->{quantifier};
+                    $type2 = 'Quantified'  if $self->{xrl2}->{quantifier};
 
                     my @string = ();
                     push @string,
@@ -1807,9 +1809,9 @@ sub Marpa::R3::Internal::MetaAST::xrl_create {
                     push @string,
                       Marpa::R3::Internal::substr_as_2lines(
                         (
-                              $type2 eq "Precedenced" ? 'Second precedenced rule'
-                            : $type2 eq "Quantified"  ? 'Second quantified rule'
-                            :                           'Second rule'
+                            $type2 eq "Precedenced"  ? 'Second precedenced rule'
+                            : $type2 eq "Quantified" ? 'Second quantified rule'
+                            :                          'Second rule'
                         ),
                         $parse->{p_dsl},
                         $pos2, $len2, 74
@@ -1863,14 +1865,8 @@ sub Marpa::R3::Internal::MetaAST::Parse::xbnf_create {
                     my $self = shift;
                     my $pos1 = $self->{other_xbnf}->{start};
                     my $len1 = $self->{other_xbnf}->{length};
-
                     my $pos2 = $self->{start};
                     my $len2 = $self->{length};
-                    my ( $l2, $c2 ) =
-                      @{ $parse->line_column( $self->{start} ) };
-                    my ( $esc2, $trunc2 ) =
-                      Marpa::R3::Internal::substr_as_line( $parse->{p_dsl},
-                        $pos2, $len2, 74 );
 
                     my @string = ("Duplicate rules:",
                       Marpa::R3::Internal::substr_as_2lines(
