@@ -49,38 +49,16 @@ sub test_grammar {
         1;
     };
     my $eval_error = $EVAL_ERROR;
-  DETERMINE_TEST_RESULT: {
-        if ($eval_ok) {
-            Test::More::fail("Failed to catch problem: $test_name");
-            last DETERMINE_TEST_RESULT;
-        }
+    if ($eval_ok) {
+        Test::More::fail("Failed to catch problem: $test_name");
+    }
+    else {
         $eval_error =~ s/ ^ Marpa::R3 \s+ exception \s+ at \s+ .* \z //xms;
-        Marpa::R3::Test::is($eval_error, $expected_error,
-            "Successfully caught problem: $test_name");
-        last DETERMINE_TEST_RESULT;
-
-        if ( $eval_error eq $expected_error ) {
-            Test::More::pass("Successfully caught problem: $test_name");
-            last DETERMINE_TEST_RESULT;
-        }
-        my $diag_message = "Failed to find expected message, was expecting:\n";
-        my $temp;
-        $temp = $expected_error;
-        $temp =~ s/^/=== /xmsg;
-        chomp $temp;
-        $diag_message .= "$temp\n";
-        $diag_message .= "This was the message actually received:\n";
-        $temp = $eval_error;
-        $temp =~ s/^/=== /xmsg;
-        chomp $temp;
-        $diag_message .= "$temp\n";
-
-        # $diag_message =~ s/^Marpa::R3 \s+ exception \s+ at .* $//xms;
-        Test::More::diag($diag_message);
-        Test::More::fail("Unexpected message: $test_name");
-    } ## end DETERMINE_TEST_RESULT:
+        Marpa::R3::Test::is( $eval_error, $expected_error,
+            "Successfully caught problem: $test_name" );
+    }
     return;
-} ## end sub test_grammar
+}
 
 if (1) {
     my $counted_nullable_grammar = <<'END_OF_DSL';
@@ -111,9 +89,9 @@ END_OF_DSL
 ========= Marpa::R3 Fatal error =========
 Duplicate rules:
 First rule is at line 1, column 5:
-  Dup ::= Item*\\n
+  Dup ::= Item\n
 Second rule is at line 2, column 5:
-  Dup ::= Item\\n
+  Dup ::= Item\n
 =========================================
 EOS
 }

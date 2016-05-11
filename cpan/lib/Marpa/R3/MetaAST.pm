@@ -1860,18 +1860,35 @@ sub Marpa::R3::Internal::MetaAST::Parse::xbnf_create {
                 other_xbnf => $hash_by_xbnfid->{$rule_id},
                 to_string => sub {
                     my $self = shift;
-                    my ( $l1, $c1 ) =
-                      @{ $parse->line_column( $self->{other_xbnf}->{start} ) };
+                    my $pos1 = $self->{other_xbnf}->{start};
+                    my $len1 = $self->{other_xbnf}->{length};
+                    my ( $l1, $c1 ) = @{ $parse->line_column( $pos1 ) };
+                    my ( $esc1, $trunc1 ) =
+                      Marpa::R3::Internal::substr_as_line( $parse->{p_dsl},
+                        $pos1, $len1, 74 );
+
+                    my $pos2 = $self->{start};
+                    my $len2 = $self->{length};
                     my ( $l2, $c2 ) =
                       @{ $parse->line_column( $self->{start} ) };
+                    my ( $esc2, $trunc2 ) =
+                      Marpa::R3::Internal::substr_as_line( $parse->{p_dsl},
+                        $pos2, $len2, 74 );
+
                     my @string = ("Duplicate rules:");
-                    push @string, "One was at line $l1, column $c1";
-                    push @string, "One was at line $l2, column $c2";
-                    push @string,
-                        "Rule was <"
-                      . $self->{lhs}
-                      . '> ::= '
-                      . ( join q{ }, map { '<' . $_ . '>' } @{ $self->{rhs} } );
+
+                    my @pieces = ("First rule");
+                    push @pieces, $trunc1 ? "begins" : "is";
+                    push @pieces, "at line $l1, column $c1:";
+                    push @string, join q{ }, @pieces;
+                    push @string, "  $esc1";
+
+                    @pieces = ("Second rule");
+                    push @pieces, $trunc2 ? "begins" : "is";
+                    push @pieces, "at line $l2, column $c2:";
+                    push @string, join q{ }, @pieces;
+                    push @string, "  $esc2";
+
                     push @string, q{};
                     return join "\n", @string;
                 }
