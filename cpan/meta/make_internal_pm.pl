@@ -257,6 +257,8 @@ __DATA__
     XSY_BY_NAME { eXternal symbols, by XSY name }
     L0_XBNF_BY_ID { L0 eXternal SEQuence, by XBNFID }
     G1_XBNF_BY_ID { G1 eXternal SEQuence, by XBNFID }
+    L0_XBNF_BY_NAME { L0 eXternal SEQuence, by XBNF name }
+    G1_XBNF_BY_NAME { G1 eXternal SEQuence, by XBNF name }
     COMPLETION_EVENT_BY_ID
     NULLED_EVENT_BY_ID
     PREDICTION_EVENT_BY_ID

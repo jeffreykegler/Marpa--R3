@@ -209,12 +209,18 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
 
     $slg->[Marpa::R3::Internal::Scanless::G::L0_XBNF_BY_ID] = [];
     $slg->[Marpa::R3::Internal::Scanless::G::G1_XBNF_BY_ID] = [];
+    $slg->[Marpa::R3::Internal::Scanless::G::L0_XBNF_BY_NAME] = {};
+    $slg->[Marpa::R3::Internal::Scanless::G::G1_XBNF_BY_NAME] = {};
     for my $subgrammar (qw(G1 L0)) {
         my $xbnfs      = $hashed_source->{xbnf}->{$subgrammar};
         my $xbnf_by_id =
             $subgrammar eq 'L0'
           ? $slg->[Marpa::R3::Internal::Scanless::G::L0_XBNF_BY_ID]
           : $slg->[Marpa::R3::Internal::Scanless::G::G1_XBNF_BY_ID];
+        my $xbnf_by_name =
+            $subgrammar eq 'L0'
+          ? $slg->[Marpa::R3::Internal::Scanless::G::L0_XBNF_BY_NAME]
+          : $slg->[Marpa::R3::Internal::Scanless::G::G1_XBNF_BY_NAME];
 
         # Sort (from major to minor) by start position,
         # and subkey.
@@ -233,11 +239,10 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
         {
             my $runtime_xbnf_data = [];
             $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::ID] = scalar @{$xbnf_by_id};
+            my $xbnf_name = $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::NAME] =
+                      $source_xbnf_data->{id};
           KEY: for my $datum_key ( keys %{$source_xbnf_data} ) {
-
                 if ( $datum_key eq 'id' ) {
-                    $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::NAME] =
-                      $source_xbnf_data->{$datum_key};
                     next KEY;
                 }
                 if ( $datum_key eq 'name' ) {
@@ -326,7 +331,7 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
                       = $source_xbnf_data->{$datum_key};
                     next KEY;
                 }
-                if ( $datum_key =~ /\A (subkey|xrlid) \z/xms ) {
+                if ( $datum_key =~ /\A (subkey|xrlid|id) \z/xms ) {
                     next KEY;
                 }
                 Marpa::R3::exception(
@@ -334,6 +339,7 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
                 );
             }
             push @{$xbnf_by_id}, $runtime_xbnf_data;
+            # $xbnf_by_name->{$xbnf_name} = $runtime_xbnf_data;
         }
     }
 
@@ -1186,18 +1192,18 @@ sub add_user_rule {
     my $rule_name;
     my $slif_tag;
     my $mask;
+    my $xbnf;
     my $proper_separation = 0;
     my $keep_separation   = 0;
 
   OPTION: for my $option ( keys %{$options} ) {
         my $value = $options->{$option};
         if ( $option eq 'xbnfid' ) {
-            # $xbnf =
-              # $slg->[
+            # $xbnf = $slg->[
               # $subgrammar eq 'L0'
               # ? Marpa::R3::Internal::Scanless::G::L0_XBNF_BY_ID
               # : Marpa::R3::Internal::Scanless::G::G1_XBNF_BY_ID
-              # ]->{$value};
+            # ]->{$value};
             next OPTION;
         }
         if ( $option eq 'name' )   { $rule_name = $value; next OPTION; }
@@ -1344,7 +1350,7 @@ sub add_user_rule {
             : $error_string;
         Marpa::R3::exception("$problem_description: $rule_description");
     } ## end if ( not defined $base_rule_id or $base_rule_id < 0 )
-    # $tracer->[Marpa::R3::Internal::Trace::G::XBNF_BY_IRLID]->[$base_rule_id] = $xbnf;
+    $tracer->[Marpa::R3::Internal::Trace::G::XBNF_BY_IRLID]->[$base_rule_id] = $xbnf;
 
     my $base_rule = $tracer->shadow_rule( $base_rule_id );
 
