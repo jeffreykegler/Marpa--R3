@@ -232,10 +232,11 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
           )
         {
             my $runtime_xbnf_data = [];
+            $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::ID] = scalar @{$xbnf_by_id};
           KEY: for my $datum_key ( keys %{$source_xbnf_data} ) {
 
                 if ( $datum_key eq 'id' ) {
-                    $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::ID] =
+                    $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::NAME] =
                       $source_xbnf_data->{$datum_key};
                     next KEY;
                 }
