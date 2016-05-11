@@ -1758,7 +1758,7 @@ sub Marpa::R3::Internal::MetaAST::xrl_create {
     my $lhs    = $new_xrl->{lhs};
     my $start  = $new_xrl->{start};
     my $length = $new_xrl->{length};
-    my $xrlid            = sprintf '%s@%d-%d', $lhs, $start, $length;
+    my $xrlid            = sprintf '%s@%d+%d', $lhs, $start, $length;
     my $xrls_by_lhs      = $parse->{xrls_by_lhs}->{$lhs};
 
     # say STDERR "xrl_create: lhs=$lhs";

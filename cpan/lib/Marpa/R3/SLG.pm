@@ -217,14 +217,14 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
           : $slg->[Marpa::R3::Internal::Scanless::G::G1_XBNF_BY_ID];
 
         # Sort (from major to minor) by start position,
-        # subkey and xbnfid
+        # and subkey.
         for my $source_xbnf_data (
             map { $_->[0] }
             sort {
-                     die  "a=", Data::Dumper::Dumper($a) if not defined $a->[1];
-                     die  "a=", Data::Dumper::Dumper($a) if not defined $a->[2];
-                     die  "b=", Data::Dumper::Dumper($b) if not defined $a->[1];
-                     die  "b=", Data::Dumper::Dumper($b) if not defined $b->[2];
+                     # die  "a=", Data::Dumper::Dumper($a) if not defined $a->[1];
+                     # die  "a=", Data::Dumper::Dumper($a) if not defined $a->[2];
+                     # die  "b=", Data::Dumper::Dumper($b) if not defined $a->[1];
+                     # die  "b=", Data::Dumper::Dumper($b) if not defined $b->[2];
                      $a->[1] <=> $b->[1]
                   || $a->[2] <=> $b->[2]
             }
