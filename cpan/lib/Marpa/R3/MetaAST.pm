@@ -1775,46 +1775,47 @@ sub Marpa::R3::Internal::MetaAST::xrl_create {
                     my $pos1 = $self->{xrl1}->{start};
                     my $len1 = $self->{xrl1}->{length};
                     my $precedence_count1 = $self->{xrl1}->{precedence_count} // 1;
-                    my $type1;
+                    my $type1 = q{};
                     $type1 = 'Precedenced' if $precedence_count1 > 1;
                     $type1 = 'Quantified' if $self->{xrl1}->{quantifier};
-                    my ( $l1, $c1 ) = @{ $parse->line_column($pos1) };
-                    my ( $esc1, $trunc1 ) =
-                      Marpa::R3::Internal::substr_as_line( $parse->{p_dsl},
-                        $pos1, $len1, 74 );
 
                     my $pos2 = $self->{xrl2}->{start};
                     my $len2 = $self->{xrl2}->{length};
                     my $precedence_count2 = $self->{xrl2}->{precedence_count} // 1;
-                    my $type2;
+                    my $type2 = q{};
                     $type2 = 'Precedenced' if $precedence_count2 > 1;
                     $type2 = 'Quantified' if $self->{xrl2}->{quantifier};
-                    my ( $l2, $c2 ) = @{ $parse->line_column($pos2) };
-                    my ( $esc2, $trunc2 ) =
-                      Marpa::R3::Internal::substr_as_line( $parse->{p_dsl},
-                        $pos2, $len2, 74 );
 
-                    my $error_type = $type1 // $type2;
-                    my $desc = ($error_type // 'Internal error:') . ' LHS not unique';
-                    my @string = ( $desc );
+                    my @string = ();
+                    push @string,
+                      (
+                          $type1 ne q{} ? $type1
+                        : $type2 ne q{} ? $type2
+                        :                 'Internal error:'
+                      ) . ' LHS not unique';
 
-                    my @pieces = ('First');
-                    push @pieces, lc $type1 if defined $type1;
-                    push @pieces, 'rule';
-                    push @pieces, $trunc1 ? 'begins' : 'is';
-                    push @pieces, "at line $l1, column $c1:";
-                    push @string, join q{ }, @pieces;
-                    push @string, "  $esc1";
-
-                    @pieces = ('Second');
-                    push @pieces, lc $type2 if defined $type2;
-                    push @pieces, 'rule';
-                    push @pieces, $trunc2 ? 'begins' : 'is';
-                    push @pieces, "at line $l2, column $c2:";
-                    push @string, join q{ }, @pieces;
-                    push @string, "  $esc2";
-
+                    push @string,
+                      Marpa::R3::Internal::substr_as_2lines(
+                        (
+                              $type1 eq "Precedenced" ? 'First precedenced rule'
+                            : $type1 eq "Quantified"  ? 'First quantified rule'
+                            :                           'First rule'
+                        ),
+                        $parse->{p_dsl},
+                        $pos1, $len1, 74
+                      );
+                    push @string,
+                      Marpa::R3::Internal::substr_as_2lines(
+                        (
+                              $type2 eq "Precedenced" ? 'Second precedenced rule'
+                            : $type2 eq "Quantified"  ? 'Second quantified rule'
+                            :                           'Second rule'
+                        ),
+                        $parse->{p_dsl},
+                        $pos2, $len2, 74
+                      );
                     push @string, q{};
+
                     return join "\n", @string;
                 }
             }
@@ -1862,10 +1863,6 @@ sub Marpa::R3::Internal::MetaAST::Parse::xbnf_create {
                     my $self = shift;
                     my $pos1 = $self->{other_xbnf}->{start};
                     my $len1 = $self->{other_xbnf}->{length};
-                    my ( $l1, $c1 ) = @{ $parse->line_column( $pos1 ) };
-                    my ( $esc1, $trunc1 ) =
-                      Marpa::R3::Internal::substr_as_line( $parse->{p_dsl},
-                        $pos1, $len1, 74 );
 
                     my $pos2 = $self->{start};
                     my $len2 = $self->{length};
@@ -1875,19 +1872,16 @@ sub Marpa::R3::Internal::MetaAST::Parse::xbnf_create {
                       Marpa::R3::Internal::substr_as_line( $parse->{p_dsl},
                         $pos2, $len2, 74 );
 
-                    my @string = ("Duplicate rules:");
-
-                    my @pieces = ("First rule");
-                    push @pieces, $trunc1 ? "begins" : "is";
-                    push @pieces, "at line $l1, column $c1:";
-                    push @string, join q{ }, @pieces;
-                    push @string, "  $esc1";
-
-                    @pieces = ("Second rule");
-                    push @pieces, $trunc2 ? "begins" : "is";
-                    push @pieces, "at line $l2, column $c2:";
-                    push @string, join q{ }, @pieces;
-                    push @string, "  $esc2";
+                    my @string = ("Duplicate rules:",
+                      Marpa::R3::Internal::substr_as_2lines(
+                      'First rule',
+                      $parse->{p_dsl},
+                        $pos1, $len1, 74 ),
+                      Marpa::R3::Internal::substr_as_2lines(
+                      'Second rule',
+                      $parse->{p_dsl},
+                        $pos2, $len2, 74 )
+                        );
 
                     push @string, q{};
                     return join "\n", @string;

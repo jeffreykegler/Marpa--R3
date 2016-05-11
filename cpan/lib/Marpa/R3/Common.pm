@@ -25,7 +25,7 @@ $STRING_VERSION = $VERSION;
 $VERSION = eval $VERSION;
 ## use critic
 
-package Marpa::R3::Internal::Common;
+package Marpa::R3::Internal;
 
 use English qw( -no_match_vars );
 
@@ -144,6 +144,20 @@ sub Marpa::R3::Internal::substr_as_line {
         $truncated = 1;
     }
     return ( join q{}, @escaped_chars ), $truncated;
+}
+
+# Returns a two-line summary of a substring --
+# a first line with descriptive information and
+# a one-line escaped version, indented 2 spaces
+sub Marpa::R3::Internal::substr_as_2lines {
+    my ( $what, $p_string, $pos, $length, $max ) = @_;
+    my ($escaped, $trunc) = substr_as_line( $p_string, $pos, $length, $max );
+    my ($line_no, $column) = @{line_column( $p_string, $pos)};
+    my @pieces = ($what);
+    push @pieces, $trunc ? 'begins' : 'is';
+    push @pieces, qq{at line $line_no, column $column:};
+    my $line1 = join q{ }, @pieces;
+    return "$line1\n  $escaped";
 }
 
 1;
