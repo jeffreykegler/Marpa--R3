@@ -603,6 +603,7 @@ sub Marpa::R3::Internal::MetaAST_Nodes::priority_rule::evaluate {
             lhs => $lhs,
             start => $start,
             length => $length,
+            precedence_count => $priority_count,
             uniq_by_lhs => ($priority_count > 1),
         }
         );
@@ -1760,24 +1761,59 @@ sub Marpa::R3::Internal::MetaAST::xrl_create {
     my $xrlid            = sprintf '%s@%d-%d', $lhs, $start, $length;
     my $xrls_by_lhs      = $parse->{xrls_by_lhs}->{$lhs};
 
-    say STDERR "xrl_create: lhs=$lhs";
+    # say STDERR "xrl_create: lhs=$lhs";
 
     sub throw_precedenced_lhs_not_unique {
         my ( $parse, $xrl1, $xrl2 ) = @_;
         Marpa::R3::Internal::X->new(
             {
-                desc            => 'Precedenced LHS not unique',
+                desc => 'LHS not unique when required',
                 xrl1 => $xrl1,
                 xrl2 => $xrl2,
-                try             => sub {
+                to_string  => sub {
                     my $self = shift;
-                    my ( $l1, $c1 ) = @{ $parse->line_column( $self->{xrl1}->{start} ) };
-                    my ( $l2, $c2 ) = @{ $parse->line_column( $self->{xrl2}->{start} ) };
-                    my @string = ( $self->{desc} );
-                    push @string,
-                      "First rule was at line $l1, column $c1";
-                    push @string,
-                      "Second rule was at line $l2, column $c2";
+                    my $pos1 = $self->{xrl1}->{start};
+                    my $len1 = $self->{xrl1}->{length};
+                    my $precedence_count1 = $self->{xrl1}->{precedence_count} // 1;
+                    my $type1;
+                    $type1 = 'Precedenced' if $precedence_count1 > 1;
+                    $type1 = 'Quantified' if $self->{xrl1}->{quantifier};
+                    my ( $l1, $c1 ) = @{ $parse->line_column($pos1) };
+                    my ( $esc1, $trunc1 ) =
+                      Marpa::R3::Internal::substr_as_line( $parse->{p_dsl},
+                        $pos1, $len1, 74 );
+
+                    my $pos2 = $self->{xrl2}->{start};
+                    my $len2 = $self->{xrl2}->{length};
+                    my $precedence_count2 = $self->{xrl2}->{precedence_count} // 1;
+                    my $type2;
+                    $type2 = 'Precedenced' if $precedence_count2 > 1;
+                    $type2 = 'Quantified' if $self->{xrl2}->{quantifier};
+                    my ( $l2, $c2 ) = @{ $parse->line_column($pos2) };
+                    my ( $esc2, $trunc2 ) =
+                      Marpa::R3::Internal::substr_as_line( $parse->{p_dsl},
+                        $pos2, $len2, 74 );
+
+                    my $error_type = $type1 // $type2;
+                    my $desc = ($error_type // 'Internal error:') . ' LHS not unique';
+                    my @string = ( $desc );
+
+                    my @pieces = ('First');
+                    push @pieces, lc $type1 if defined $type1;
+                    push @pieces, 'rule';
+                    push @pieces, $trunc1 ? 'begins' : 'is';
+                    push @pieces, "at line $l1, column $c1:";
+                    push @string, join q{ }, @pieces;
+                    push @string, "  $esc1";
+
+                    @pieces = ('Second');
+                    push @pieces, lc $type2 if defined $type2;
+                    push @pieces, 'rule';
+                    push @pieces, $trunc2 ? 'begins' : 'is';
+                    push @pieces, "at line $l2, column $c2:";
+                    push @string, join q{ }, @pieces;
+                    push @string, "  $esc2";
+
                     push @string, q{};
                     return join "\n", @string;
                 }
@@ -1789,7 +1825,7 @@ sub Marpa::R3::Internal::MetaAST::xrl_create {
     if (    $earlier_xrl
         and $earlier_xrl->{uniq_by_lhs} || $new_xrl->{uniq_by_lhs} )
     {
-        say STDERR "xrl_create: lhs=$lhs, earlier xrl";
+        # say STDERR "xrl_create: lhs=$lhs, earlier xrl";
 
         # If there was an earlier precedenced xrl
         # that needed to be unique for this LHS,

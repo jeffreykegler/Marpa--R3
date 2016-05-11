@@ -55,6 +55,10 @@ sub test_grammar {
             last DETERMINE_TEST_RESULT;
         }
         $eval_error =~ s/ ^ Marpa::R3 \s+ exception \s+ at \s+ .* \z //xms;
+        Marpa::R3::Test::is($eval_error, $expected_error,
+            "Successfully caught problem: $test_name");
+        last DETERMINE_TEST_RESULT;
+
         if ( $eval_error eq $expected_error ) {
             Test::More::pass("Successfully caught problem: $test_name");
             last DETERMINE_TEST_RESULT;
@@ -106,9 +110,10 @@ END_OF_DSL
             $duplicate_rule_grammar, <<'EOS');
 ========= Marpa::R3 Fatal error =========
 Duplicate rules:
-One was at line 1, column 5
-One was at line 2, column 5
-Rule was <Dup> ::= <Item>
+First rule is at line 1, column 5:
+  Dup ::= Item*\\n
+Second rule is at line 2, column 5:
+  Dup ::= Item\\n
 =========================================
 EOS
 }
@@ -122,10 +127,11 @@ if (1) {
 END_OF_DSL
         test_grammar( 'unique_lhs', $unique_lhs_grammar, <<'EOS');
 ========= Marpa::R3 Fatal error =========
-Duplicate rules:
-One was at line 1, column 5
-One was at line 2, column 5
-Rule was <Dup> ::= <Item>
+Quantified LHS not unique
+First quantified rule is at line 1, column 5:
+  Dup ::= Item*\n
+Second rule is at line 2, column 5:
+  Dup ::= Item\n
 =========================================
 EOS
 }
@@ -141,6 +147,13 @@ if (1) {
     a ~ 'a'
 END_OF_DSL
         test_grammar( 'dup precedenced lhs', $unique_lhs_grammar, <<'EOS');
+========= Marpa::R3 Fatal error =========
+Precedenced LHS not unique
+First precedenced rule is at line 1, column 5:
+  Dup ::= Dup '+' Dup || Dup '-' Dup || Item1\n
+Second precedenced rule is at line 2, column 5:
+  Dup ::= Dup '*' Dup || Dup '/' Dup || Item2\n
+=========================================
 EOS
 }
 
@@ -154,6 +167,13 @@ if (1) {
     a ~ 'a'
 END_OF_DSL
         test_grammar( 'LHS empty, then precedenced', $unique_lhs_grammar, <<'EOS');
+========= Marpa::R3 Fatal error =========
+Precedenced LHS not unique
+First rule is at line 1, column 5:
+  Dup ::=\n
+Second precedenced rule is at line 2, column 5:
+  Dup ::= Dup '+' Dup || Dup '-' Dup || Item\n
+=========================================
 EOS
 }
 
@@ -167,6 +187,13 @@ if (1) {
     a ~ 'a'
 END_OF_DSL
         test_grammar( 'LHS precedenced, then empty', $unique_lhs_grammar, <<'EOS');
+========= Marpa::R3 Fatal error =========
+Precedenced LHS not unique
+First precedenced rule is at line 1, column 5:
+  Dup ::= Dup '+' Dup || Dup '-' Dup || Item1\n
+Second rule is at line 2, column 5:
+  Dup ::=\n
+=========================================
 EOS
 }
 

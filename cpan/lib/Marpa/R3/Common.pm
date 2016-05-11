@@ -112,6 +112,40 @@ sub Marpa::R3::Internal::line_column {
     return [$line, $column];
 }
 
+# Returns a one-line string that is the escaped equivalent
+# of its arguments, and whose length is at most $max.
+# Returns a list of two elements: the escaped string and
+# a boolean indicating if it was truncated
+sub Marpa::R3::Internal::substr_as_line {
+    my ( $p_string, $pos, $length, $max ) = @_;
+    my $truncated = 0;
+    my $used          = 0;
+    my @escaped_chars = ();
+    CHAR: for ( my $ix = $pos ; $ix <= $pos + $length ; $ix++ ) {
+        last CHAR if $used >= $max;
+        my $ord = ord substr ${$p_string}, $ix, 1;
+        my $escaped_char = $escape_by_ord[$ord] // sprintf( "\\x{%04x}", $ord );
+        # say STDERR "ord=$ord $escaped_char";
+        $used += length $escaped_char;
+        push @escaped_chars, $escaped_char;
+    }
+  IX: for my $ix ( reverse 0 .. $#escaped_chars ) {
+
+        # only trailing spaces are escaped
+        last IX if $escaped_chars[$ix] ne q{ };
+        $escaped_chars[$ix] = '\\s';
+
+        # this expands the string by one
+        $used += 1;
+    } ## end IX: for my $ix ( reverse 0 .. $#escaped_chars )
+    while ( $used > $max ) {
+        my $excess_char = pop @escaped_chars;
+        $used -= length $excess_char;
+        $truncated = 1;
+    }
+    return ( join q{}, @escaped_chars ), $truncated;
+}
+
 1;
 
 # vim: set expandtab shiftwidth=4:
