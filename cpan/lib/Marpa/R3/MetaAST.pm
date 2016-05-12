@@ -604,7 +604,6 @@ sub Marpa::R3::Internal::MetaAST_Nodes::priority_rule::evaluate {
             start => $start,
             length => $length,
             precedence_count => $priority_count,
-            uniq_by_lhs => ($priority_count > 1),
         }
         );
     if ( $priority_count <= 1 ) {
@@ -1226,8 +1225,6 @@ sub Marpa::R3::Internal::MetaAST_Nodes::quantified_rule::evaluate {
             lhs => $lhs_name,
             start => $start,
             length => $length,
-            uniq_by_lhs => 1,
-            quantifier => $quantifier_string,
         }
         );
 
@@ -1758,60 +1755,51 @@ sub Marpa::R3::Internal::MetaAST::xrl_create {
     my $lhs    = $new_xrl->{lhs};
     my $start  = $new_xrl->{start};
     my $length = $new_xrl->{length};
-    my $xrlid            = sprintf '%s@%d+%d', $lhs, $start, $length;
-    my $xrls_by_lhs      = $parse->{xrls_by_lhs}->{$lhs};
+    $new_xrl->{precedence_count} //= 1;
+    my $xrlid = sprintf '%s@%d+%d', $lhs, $start, $length;
+    my $xrls_by_lhs = $parse->{xrls_by_lhs}->{$lhs};
 
-    # say STDERR "xrl_create: lhs=$lhs";
+    my $earlier_xrl = $xrls_by_lhs->[0];
+    if (    $earlier_xrl
+        and $earlier_xrl->{precedence_count} > 1
+        || $new_xrl->{precedence_count} > 1 )
+    {
 
-    sub throw_precedenced_lhs_not_unique {
-        my ( $parse, $xrl1, $xrl2 ) = @_;
+        # If there was an earlier precedenced xrl
+        # that needed to be unique for this LHS,
+        # it was the only pre-existing xrl.
+        # That's because we will never add another one, once it is on
+        # list of XRLs by LHS.
         Marpa::R3::Internal::X->new(
             {
                 desc      => 'LHS not unique when required',
-                xrl1      => $xrl1,
-                xrl2      => $xrl2,
+                xrl1      => $earlier_xrl,
+                xrl2      => $new_xrl,
                 to_string => sub {
-                    my $self              = shift;
-                    my $pos1              = $self->{xrl1}->{start};
-                    my $len1              = $self->{xrl1}->{length};
-                    my $precedence_count1 = $self->{xrl1}->{precedence_count}
-                      // 1;
-                    my $type1 = q{};
-                    $type1 = 'Precedenced' if $precedence_count1 > 1;
-                    $type1 = 'Quantified'  if $self->{xrl1}->{quantifier};
+                    my $self   = shift;
+                    my @string = ('Precedenced LHS not unique');
 
-                    my $pos2              = $self->{xrl2}->{start};
-                    my $len2              = $self->{xrl2}->{length};
-                    my $precedence_count2 = $self->{xrl2}->{precedence_count}
-                      // 1;
-                    my $type2 = q{};
-                    $type2 = 'Precedenced' if $precedence_count2 > 1;
-                    $type2 = 'Quantified'  if $self->{xrl2}->{quantifier};
-
-                    my @string = ();
-                    push @string,
-                      (
-                          $type1 ne q{} ? $type1
-                        : $type2 ne q{} ? $type2
-                        :                 'Internal error:'
-                      ) . ' LHS not unique';
-
+                    my $pos1 = $self->{xrl1}->{start};
+                    my $len1 = $self->{xrl1}->{length};
                     push @string,
                       Marpa::R3::Internal::substr_as_2lines(
                         (
-                              $type1 eq "Precedenced" ? 'First precedenced rule'
-                            : $type1 eq "Quantified"  ? 'First quantified rule'
-                            :                           'First rule'
+                            $self->{xrl1}->{precedence_count} > 1
+                            ? 'First precedenced rule'
+                            : 'First rule'
                         ),
                         $parse->{p_dsl},
                         $pos1, $len1, 74
                       );
+
+                    my $pos2 = $self->{xrl2}->{start};
+                    my $len2 = $self->{xrl2}->{length};
                     push @string,
                       Marpa::R3::Internal::substr_as_2lines(
                         (
-                            $type2 eq "Precedenced"  ? 'Second precedenced rule'
-                            : $type2 eq "Quantified" ? 'Second quantified rule'
-                            :                          'Second rule'
+                            $self->{xrl2}->{precedence_count} > 1
+                            ? 'Second precedenced rule'
+                            : 'Second rule'
                         ),
                         $parse->{p_dsl},
                         $pos2, $len2, 74
@@ -1824,22 +1812,8 @@ sub Marpa::R3::Internal::MetaAST::xrl_create {
         )->throw();
     }
 
-    my $earlier_xrl = $xrls_by_lhs->[0];
-    if (    $earlier_xrl
-        and $earlier_xrl->{uniq_by_lhs} || $new_xrl->{uniq_by_lhs} )
-    {
-        # say STDERR "xrl_create: lhs=$lhs, earlier xrl";
-
-        # If there was an earlier precedenced xrl
-        # that needed to be unique for this LHS,
-        # it was the only pre-existing xrl.
-        # That's because we will never add another one, once it is on
-        # list of XRLs by LHS.
-        throw_precedenced_lhs_not_unique( $parse, $earlier_xrl, $new_xrl );
-    }
-
     my $xrl_by_id = $parse->{xrl}->{$xrlid} = $new_xrl;
-    push @{$parse->{xrls_by_lhs}->{$lhs}}, $new_xrl;
+    push @{ $parse->{xrls_by_lhs}->{$lhs} }, $new_xrl;
     return $xrlid;
 }
 

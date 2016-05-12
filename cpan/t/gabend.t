@@ -105,8 +105,8 @@ if (1) {
 END_OF_DSL
         test_grammar( 'unique_lhs', $unique_lhs_grammar, <<'EOS');
 ========= Marpa::R3 Fatal error =========
-Quantified LHS not unique
-First quantified rule is at line 1, column 5:
+Duplicate rules:
+First rule is at line 1, column 5:
   Dup ::= Item*
 Second rule is at line 2, column 5:
   Dup ::= Item

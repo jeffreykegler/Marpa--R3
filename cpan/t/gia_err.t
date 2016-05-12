@@ -147,13 +147,7 @@ END_OF_SOURCE
         $non_unique_sequence_grammar, 'n/a',
         'SLIF grammar failed',
         <<'END_OF_MESSAGE',
-========= Marpa::R3 Fatal error =========
-Quantified LHS not unique
-First quantified rule is at line 0, column 5:
-  <sequence of items> ::= item* proper => 1
-Second rule is at line 1, column 5:
-  <sequence of items> ::= <forty two>
-=========================================
+LHS of sequence rule would not be unique: <sequence of items> -> <forty two>
 END_OF_MESSAGE
         'Grammar with non-unique LHS sequence symbols'
     ];
