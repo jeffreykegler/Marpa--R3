@@ -1253,11 +1253,11 @@ sub add_user_rule {
   OPTION: for my $option ( keys %{$options} ) {
         my $value = $options->{$option};
         if ( $option eq 'xbnfid' ) {
-            # $xbnf = $slg->[
-              # $subgrammar eq 'L0'
-              # ? Marpa::R3::Internal::Scanless::G::L0_XBNF_BY_ID
-              # : Marpa::R3::Internal::Scanless::G::G1_XBNF_BY_ID
-            # ]->{$value};
+            $xbnf = $slg->[
+              $subgrammar eq 'L0'
+              ? Marpa::R3::Internal::Scanless::G::L0_XBNF_BY_NAME
+              : Marpa::R3::Internal::Scanless::G::G1_XBNF_BY_NAME
+            ]->{$value};
             next OPTION;
         }
         if ( $option eq 'name' )   { $rule_name = $value; next OPTION; }
