@@ -1865,14 +1865,13 @@ sub Marpa::R3::Internal::MetaAST::Parse::xbnf_create {
     my %wrl = ( xbnfid => $rule_id );
     for my $field (
         qw(lhs action rank
-        symbol_as_event event
-        null_ranking min separator proper keep)
+        null_ranking min separator proper )
       )
     {
         $wrl{$field} = $args->{$field} if defined $args->{$field};
     }
     # Deep copy these arrays
-    FIELD: for my $field ( qw(mask rhs) ) {
+    FIELD: for my $field ( qw(rhs) ) {
         my $xbnf_datum = $args->{$field};
         next FIELD if not defined $xbnf_datum;
         my @array = @{$args->{$field}};

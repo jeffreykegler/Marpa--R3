@@ -936,13 +936,13 @@ sub registration_init {
     WORK_ITEM: for my $work_item (@work_list) {
         my ( $irlid, $lexeme_id, $semantics, $blessing ) = @{$work_item};
 
-        my ( $closure, $rule, $rule_length, $is_sequence_rule,
+        my ( $closure, $xbnf, $rule, $rule_length, $is_sequence_rule,
             $is_discard_sequence_rule, $nulling_symbol_id );
         if ( defined $irlid ) {
             $nulling_symbol_id = $nulling_symbol_by_semantic_rule[$irlid];
             $closure          = $closure_by_irlid[$irlid];
             $rule             = $rules->[$irlid];
-            my $xbnf             = $xbnf_by_irlid->[$irlid];
+            $xbnf             = $xbnf_by_irlid->[$irlid];
             $rule_length      = $grammar_c->rule_length($irlid);
             $is_sequence_rule = defined $grammar_c->sequence_min($irlid);
             $is_discard_sequence_rule = $is_sequence_rule
@@ -1050,7 +1050,7 @@ sub registration_init {
                     @ops = ( $op_result_is_rhs_n, $singleton_element );
                     last SET_OPS;
                 }
-                my $mask = $rule->[Marpa::R3::Internal::Rule::MASK];
+                my $mask = $xbnf->[Marpa::R3::Internal::XBNF::MASK];
                 my @elements =
                     grep { $mask->[$_] } 0 .. ( $rule_length - 1 );
                 if ( not scalar @elements ) {
@@ -1194,7 +1194,7 @@ sub registration_init {
                         push @push_ops, $push_op;
                         next RESULT_DESCRIPTOR;
                     } ## end if ($is_sequence_rule)
-                    my $mask = $rule->[Marpa::R3::Internal::Rule::MASK];
+                    my $mask = $xbnf->[Marpa::R3::Internal::XBNF::MASK];
                     if ( $rule_length > 0 ) {
                         push @push_ops,
                             map { $mask->[$_] ? ( $op_push_one, $_ ) : () }

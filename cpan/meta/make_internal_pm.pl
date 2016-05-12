@@ -143,7 +143,6 @@ __DATA__
     :package=Marpa::R3::Internal::Rule
 
     ID
-    MASK { Semantic mask of RHS symbols }
     ACTION_NAME
 
     :package=Marpa::R3::Internal::Trace::G

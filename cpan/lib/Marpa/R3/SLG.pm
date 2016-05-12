@@ -211,9 +211,11 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
 
     # Sort (from major to minor) by start position,
     # and subkey.
-    for my $xrl_name ( map { $_->[0] }
+    for my $xrl_name (
+        map  { $_->[0] }
         sort { $a->[1] <=> $b->[1] }
-        map { [ $_, $xrls->{$_}->{start} ] } keys %{$xrls} )
+        map  { [ $_, $xrls->{$_}->{start} ] } keys %{$xrls}
+      )
     {
         my $source_xrl_data  = $xrls->{$xrl_name};
         my $runtime_xrl_data = [];
@@ -280,18 +282,19 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
                 $a->[1] <=> $b->[1]
                   || $a->[2] <=> $b->[2]
             }
-            map { [ $_, $xbnfs->{$_}->{start}, $xbnfs->{$_}->{subkey} ] } keys %{$xbnfs}
+            map { [ $_, $xbnfs->{$_}->{start}, $xbnfs->{$_}->{subkey} ] }
+            keys %{$xbnfs}
           )
         {
             $DB::single = 1 if not defined $xbnf_name;
-            my $source_xbnf_data = $xbnfs->{$xbnf_name};
+            my $source_xbnf_data  = $xbnfs->{$xbnf_name};
             my $runtime_xbnf_data = [];
             $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::ID] =
               scalar @{$xbnf_by_id};
           KEY: for my $datum_key ( keys %{$source_xbnf_data} ) {
                 if ( $datum_key eq 'xrlid' ) {
                     $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::XRL] =
-                        $xrl_by_name->{$datum_key};
+                      $xrl_by_name->{$datum_key};
                     next KEY;
                 }
                 if ( $datum_key eq 'name' ) {
@@ -346,11 +349,6 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
                       $source_xbnf_data->{$datum_key};
                     next KEY;
                 }
-                if ( $datum_key eq 'mask' ) {
-                    $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::MASK] =
-                      $source_xbnf_data->{$datum_key};
-                    next KEY;
-                }
                 if ( $datum_key eq 'bless' ) {
                     $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::BLESSING] =
                       $source_xbnf_data->{$datum_key};
@@ -371,16 +369,36 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
                       $source_xbnf_data->{$datum_key};
                     next KEY;
                 }
-                if ( $datum_key =~ /\A (keep|subkey|id) \z/xms ) {
+                if ( $datum_key =~ /\A (mask|keep|subkey|id) \z/xms ) {
                     next KEY;
                 }
                 Marpa::R3::exception(
 "Internal error: Unknown hashed source xbnf field: $datum_key"
                 );
             }
-            $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::DISCARD_SEPARATION] =
-                    $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::SEPARATOR]
-                      && !$source_xbnf_data->{keep};
+
+            $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::DISCARD_SEPARATION]
+              = $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::SEPARATOR]
+              && !$source_xbnf_data->{keep};
+
+            my $rhs_length =
+              scalar @{ $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::RHS] };
+
+            if ( $rhs_length == 0
+                || !
+                defined $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::MIN] )
+            {
+                my $explicit_mask = $source_xbnf_data->{mask};
+                if ($explicit_mask) {
+                    $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::MASK] =
+                      $explicit_mask;
+                }
+                else {
+                    $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::MASK] =
+                      [ (1) x $rhs_length ];
+                }
+            }
+
             push @{$xbnf_by_id}, $runtime_xbnf_data;
             $xbnf_by_name->{$xbnf_name} = $runtime_xbnf_data;
         }
@@ -588,9 +606,9 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
         };
     } ## end if ( not $lexer_rules )
 
-    my %lex_lhs           = ();
-    my %lex_rhs           = ();
-    my %lex_separator     = ();
+    my %lex_lhs       = ();
+    my %lex_rhs       = ();
+    my %lex_separator = ();
 
     for my $lex_rule ( @{$lexer_rules} ) {
         delete $lex_rule->{event};
@@ -671,7 +689,7 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
         my $g1_symbol_id = $g1_id_by_lexeme_name{$lexeme_name};
         if ( not defined $g1_symbol_id ) {
             Marpa::R3::exception(
-                "A lexeme in L0 is not a lexeme in G1: $lexeme_name" );
+                "A lexeme in L0 is not a lexeme in G1: $lexeme_name");
         }
         if ( not $g1_thin->symbol_is_accessible($g1_symbol_id) ) {
             my $message =
@@ -765,10 +783,12 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     # Apply defaults to determine the discard event for every
     # rule id of the lexer.
 
-    my $l0_xbnfs_by_irlid = $lex_tracer->[Marpa::R3::Internal::Trace::G::XBNF_BY_IRLID];
+    my $l0_xbnfs_by_irlid =
+      $lex_tracer->[Marpa::R3::Internal::Trace::G::XBNF_BY_IRLID];
     my $default_discard_event = $discard_default_adverbs->{event};
   RULE_ID: for my $irlid ( 0 .. $lex_thin->highest_rule_id() ) {
         my $xbnf = $l0_xbnfs_by_irlid->[$irlid];
+
         # There may be gaps in the IRLIDs
         next RULE_ID if not defined $xbnf;
         my $event;
@@ -794,8 +814,7 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
             $discard_event_by_lexer_rule_id[$irlid] = $event;
             next RULE_ID;
         }
-        Marpa::R3::exception(
-            qq{Discard event has unknown name: "$event_name"} );
+        Marpa::R3::exception(qq{Discard event has unknown name: "$event_name"});
 
     } ## end RULE_ID: for my $rule_id ( 0 .. $lex_thin->highest_rule_id() )
 
@@ -807,7 +826,7 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
 
   LEXEME: for my $lexeme_name ( keys %g1_id_by_lexeme_name ) {
         Marpa::R3::exception(
-            "A lexeme in G1 is not a lexeme in L0: $lexeme_name" )
+            "A lexeme in G1 is not a lexeme in L0: $lexeme_name")
           if not defined $lexeme_data{$lexeme_name}{'lexer'};
     }
 
@@ -1227,10 +1246,8 @@ sub add_user_rule {
     my ( $min, $separator_name );
     my $rank;
     my $null_ranking;
-    my $mask;
     my $xbnf;
     my $proper_separation = 0;
-    my $keep_separation   = 0;
 
   OPTION: for my $option ( keys %{$options} ) {
         my $value = $options->{$option};
@@ -1259,8 +1276,6 @@ sub add_user_rule {
             $proper_separation = $value;
             next OPTION;
         }
-        if ( $option eq 'keep' ) { $keep_separation = $value; next OPTION }
-        if ( $option eq 'mask' ) { $mask            = $value; next OPTION }
         Marpa::R3::exception("Unknown user rule option: $option");
     } ## end OPTION: for my $option ( keys %{$options} )
 
@@ -1386,15 +1401,6 @@ sub add_user_rule {
     $tracer->[Marpa::R3::Internal::Trace::G::XBNF_BY_IRLID]->[$base_rule_id] = $xbnf;
 
     my $base_rule = $tracer->shadow_rule( $base_rule_id );
-
-    if ($is_ordinary_rule) {
-
-        # Only internal grammars can set a custom mask
-        if ( not defined $mask ) {
-            $mask = [ (1) x scalar @rhs_ids ];
-        }
-        $base_rule->[Marpa::R3::Internal::Rule::MASK] = $mask;
-    } ## end if ($is_ordinary_rule)
 
     $base_rule->[Marpa::R3::Internal::Rule::ACTION_NAME] = $action;
     $grammar_c->rule_null_high_set( $base_rule_id,
