@@ -1265,7 +1265,9 @@ sub add_user_rule {
         if ( $option eq 'rhs' )    { $rhs_names = $value; next OPTION }
         if ( $option eq 'lhs' )    { $lhs_name  = $value; next OPTION }
         if ( $option eq 'action' ) { $action    = $value; next OPTION }
-        if ( $option eq 'bless' )  { $blessing  = $value; next OPTION }
+        if ( $option eq 'bless' )  {
+        # DELETE THIS
+        $blessing  = $value; next OPTION }
         if ( $option eq 'rank' )   { $rank      = $value; next OPTION }
         if ( $option eq 'null_ranking' ) {
             $null_ranking = $value;
@@ -1431,9 +1433,6 @@ sub add_user_rule {
     if ( defined $slif_tag ) {
         $base_rule->[Marpa::R3::Internal::Rule::SLIF_TAG] = $slif_tag;
     } ## end if ( defined $slif_tag )
-    if ( defined $blessing ) {
-        $base_rule->[Marpa::R3::Internal::Rule::BLESSING] = $blessing;
-    }
 
     return;
 

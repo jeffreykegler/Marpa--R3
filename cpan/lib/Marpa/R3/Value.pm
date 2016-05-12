@@ -172,12 +172,12 @@ sub Marpa::R3::Internal::Scanless::R::lexeme_semantics_find {
 
 # Find the blessing for a rule.
 sub Marpa::R3::Internal::Scanless::R::rule_blessing_find {
-    my ( $slr, $rule_id ) = @_;
+    my ( $slr, $irlid ) = @_;
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
-    my $rules = $tracer->[Marpa::R3::Internal::Trace::G::RULES];
-    my $rule     = $rules->[$rule_id];
-    my $blessing = $rule->[Marpa::R3::Internal::Rule::BLESSING];
+    my $xbnf_by_irlid = $tracer->[Marpa::R3::Internal::Trace::G::XBNF_BY_IRLID];
+    my $xbnf = $xbnf_by_irlid->[$irlid];
+    my $blessing = $xbnf->[Marpa::R3::Internal::XBNF::BLESSING];
     $blessing = '::undef' if not defined $blessing;
     return $blessing if $blessing eq '::undef';
     my $bless_package =

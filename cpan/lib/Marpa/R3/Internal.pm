@@ -70,7 +70,6 @@ use constant DISCARD_SEPARATION => 2;
 use constant MASK => 3;
 use constant SLIF_TAG => 4;
 use constant ACTION_NAME => 5;
-use constant BLESSING => 6;
 
 package Marpa::R3::Internal::Trace::G;
 use constant NAME => 0;

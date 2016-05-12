@@ -278,6 +278,7 @@ sub Marpa::R3::Internal::ASF::blessings_set {
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $tracer =
         $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
+    my $xbnf_by_irlid = $tracer->[Marpa::R3::Internal::Trace::G::XBNF_BY_IRLID];
     my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
     my $rules = $tracer->[Marpa::R3::Internal::Trace::G::RULES];
     my $xsy_by_isyid   = $tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID];
@@ -288,21 +289,21 @@ sub Marpa::R3::Internal::ASF::blessings_set {
         $asf->[Marpa::R3::Internal::ASF::DEFAULT_RULE_BLESSING_PACKAGE];
 
     my @rule_blessing   = ();
-    my $highest_rule_id = $grammar_c->highest_rule_id();
-    RULE: for ( my $rule_id = 0; $rule_id <= $highest_rule_id; $rule_id++ ) {
-        my $blessing;
-        my $rule = $rules->[$rule_id];
-        $blessing = $rule->[Marpa::R3::Internal::Rule::BLESSING]
-            if defined $rule;
+    my $highest_irlid = $grammar_c->highest_rule_id();
+    RULE: for ( my $irlid = 0; $irlid <= $highest_irlid; $irlid++ ) {
+        my $xbnf = $xbnf_by_irlid->[$irlid];
+        # In theory, there could be gaps in the IRL ids
+        next RULE if not $xbnf;
+        my $blessing = $xbnf->[Marpa::R3::Internal::XBNF::BLESSING];
         if ( defined $blessing and q{::} ne substr $blessing, 0, 2 ) {
-            $rule_blessing[$rule_id] = $blessing;
+            $rule_blessing[$irlid] = $blessing;
             next RULE;
         }
-        my $lhs_id = $grammar_c->rule_lhs($rule_id);
+        my $lhs_id = $grammar_c->rule_lhs($irlid);
         my $name   = $tracer->symbol_name($lhs_id);
-        $rule_blessing[$rule_id] = join q{::}, $default_rule_blessing_package,
+        $rule_blessing[$irlid] = join q{::}, $default_rule_blessing_package,
             normalize_asf_blessing($name);
-    } ## end RULE: for ( my $rule_id = 0; $rule_id <= $highest_rule_id; ...)
+    }
 
     my @symbol_blessing   = ();
     my $highest_symbol_id = $grammar_c->highest_symbol_id();

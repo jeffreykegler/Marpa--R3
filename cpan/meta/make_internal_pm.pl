@@ -149,7 +149,6 @@ __DATA__
     MASK { Semantic mask of RHS symbols }
     SLIF_TAG { A tag for use by the SLIF }
     ACTION_NAME
-    BLESSING
 
     :package=Marpa::R3::Internal::Trace::G
 
