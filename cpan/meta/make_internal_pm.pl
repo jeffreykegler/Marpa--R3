@@ -158,7 +158,8 @@ __DATA__
     XSY_BY_ISYID { Array mapping ISYID to XSY }
     XBNF_BY_IRLID { Array mapping IRLID to XBNF }
     START_NAME
-    RULES { array of rule refs }
+
+    RULES { From NAIF -- DELETE THIS }
 
     :package=Marpa::R3::Internal::Progress_Report
 
