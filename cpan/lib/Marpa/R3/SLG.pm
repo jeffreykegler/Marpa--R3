@@ -275,7 +275,7 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
 
         # Sort (from major to minor) by start position,
         # and subkey.
-        for my $source_xbnf_data (
+        for my $xbnf_name (
             map { $_->[0] }
             sort {
                 # die  "a=", Data::Dumper::Dumper($a) if not defined $a->[1];
@@ -285,17 +285,18 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
                 $a->[1] <=> $b->[1]
                   || $a->[2] <=> $b->[2]
             }
-            map { [ $_, $_->{start}, $_->{subkey} ] } values %{$xbnfs}
+            map { [ $_, $xbnfs->{$_}->{start}, $xbnfs->{$_}->{subkey} ] } keys %{$xbnfs}
           )
         {
+            $DB::single = 1 if not defined $xbnf_name;
+            my $source_xbnf_data = $xbnfs->{$xbnf_name};
             my $runtime_xbnf_data = [];
             $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::ID] =
               scalar @{$xbnf_by_id};
-            my $xbnf_name =
-              $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::NAME] =
-              $source_xbnf_data->{id};
           KEY: for my $datum_key ( keys %{$source_xbnf_data} ) {
-                if ( $datum_key eq 'id' ) {
+                if ( $datum_key eq 'xrlid' ) {
+                    $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::XRL] =
+                        $xrl_by_name->{$datum_key};
                     next KEY;
                 }
                 if ( $datum_key eq 'name' ) {
@@ -386,7 +387,7 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
                       $source_xbnf_data->{$datum_key};
                     next KEY;
                 }
-                if ( $datum_key =~ /\A (subkey|xrlid|id) \z/xms ) {
+                if ( $datum_key =~ /\A (subkey|id) \z/xms ) {
                     next KEY;
                 }
                 Marpa::R3::exception(
@@ -394,8 +395,7 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
                 );
             }
             push @{$xbnf_by_id}, $runtime_xbnf_data;
-
-            # $xbnf_by_name->{$xbnf_name} = $runtime_xbnf_data;
+            $xbnf_by_name->{$xbnf_name} = $runtime_xbnf_data;
         }
     }
 

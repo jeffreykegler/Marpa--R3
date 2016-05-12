@@ -123,6 +123,8 @@ __DATA__
 
     ID
     NAME
+    START
+    LENGTH
     LHS
     RHS
     RANK
@@ -137,8 +139,7 @@ __DATA__
     BLESSING
     SYMBOL_AS_EVENT
     EVENT
-    START
-    LENGTH
+    XRL
 
     :package=Marpa::R3::Internal::Rule
 
