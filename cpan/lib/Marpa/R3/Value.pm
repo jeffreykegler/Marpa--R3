@@ -1130,7 +1130,7 @@ sub registration_init {
 
                 if ( $result_descriptor eq 'name' ) {
                     if ( defined $irlid ) {
-                        my $name = $slg->rule_name($irlid);
+                        my $name = $tracer->rule_name($irlid);
                         push @push_ops, $op_push_constant, \$name;
                         next RESULT_DESCRIPTOR;
                     }

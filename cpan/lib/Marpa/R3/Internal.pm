@@ -64,10 +64,9 @@ use constant XRL => 17;
 
 package Marpa::R3::Internal::Rule;
 use constant ID => 0;
-use constant NAME => 1;
-use constant DISCARD_SEPARATION => 2;
-use constant MASK => 3;
-use constant ACTION_NAME => 4;
+use constant DISCARD_SEPARATION => 1;
+use constant MASK => 2;
+use constant ACTION_NAME => 3;
 
 package Marpa::R3::Internal::Trace::G;
 use constant NAME => 0;

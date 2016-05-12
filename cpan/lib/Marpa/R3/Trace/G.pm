@@ -537,10 +537,10 @@ sub Marpa::R3::Trace::G::start_symbol {
 
 sub Marpa::R3::Trace::G::rule_name {
     my ( $tracer, $rule_id ) = @_;
-    my $rules = $tracer->[Marpa::R3::Internal::Trace::G::RULES];
-    my $rule  = $rules->[$rule_id];
-    return "Non-existent rule $rule_id" if not defined $rule;
-    my $name = $rule->[Marpa::R3::Internal::Rule::NAME];
+    my $xbnf_by_irlid = $tracer->[Marpa::R3::Internal::Trace::G::XBNF_BY_IRLID];
+    my $xbnf  = $xbnf_by_irlid->[$rule_id];
+    return "Non-existent rule $rule_id" if not defined $xbnf;
+    my $name = $xbnf->[Marpa::R3::Internal::XBNF::NAME];
     return $name if defined $name;
     my ( $lhs_id ) = $tracer->rule_expand($rule_id);
     return $tracer->symbol_name($lhs_id);

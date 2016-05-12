@@ -1235,7 +1235,6 @@ sub add_user_rule {
     my ( $min, $separator_name );
     my $rank;
     my $null_ranking;
-    my $rule_name;
     my $mask;
     my $xbnf;
     my $proper_separation = 0;
@@ -1251,7 +1250,6 @@ sub add_user_rule {
             ]->{$value};
             next OPTION;
         }
-        if ( $option eq 'name' )   { $rule_name = $value; next OPTION; }
         if ( $option eq 'rhs' )    { $rhs_names = $value; next OPTION }
         if ( $option eq 'lhs' )    { $lhs_name  = $value; next OPTION }
         if ( $option eq 'action' ) { $action    = $value; next OPTION }
@@ -1413,10 +1411,6 @@ sub add_user_rule {
     $grammar_c->rule_null_high_set( $base_rule_id,
         ( $null_ranking eq 'high' ? 1 : 0 ) );
     $grammar_c->rule_rank_set( $base_rule_id, $rank );
-
-    if ( defined $rule_name ) {
-        $base_rule->[Marpa::R3::Internal::Rule::NAME] = $rule_name;
-    }
 
     return;
 

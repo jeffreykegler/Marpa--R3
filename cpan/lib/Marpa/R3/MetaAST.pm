@@ -1864,7 +1864,7 @@ sub Marpa::R3::Internal::MetaAST::Parse::xbnf_create {
     # Now create the initial working rule
     my %wrl = ( xbnfid => $rule_id );
     for my $field (
-        qw(name tag lhs action rank
+        qw(lhs action rank
         symbol_as_event event
         null_ranking min separator proper keep)
       )
