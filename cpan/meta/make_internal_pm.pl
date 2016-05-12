@@ -258,7 +258,6 @@ __DATA__
 
     CHARACTER_CLASS_TABLE
     DISCARD_EVENT_BY_LEXER_RULE
-    MASK_BY_RULE_ID
 
     XSY_BY_ID { eXternal symbols, by XSYID }
     XSY_BY_NAME { eXternal symbols, by XSY name }

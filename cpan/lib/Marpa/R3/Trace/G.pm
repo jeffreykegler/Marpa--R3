@@ -522,13 +522,6 @@ sub Marpa::R3::Trace::G::error {
 
 # Internal, for use with in coordinating thin and thick
 # interfaces.  NOT DOCUMENTED.
-sub Marpa::R3::Trace::G::_rule_mask {
-    my ( $tracer, $rule_id ) = @_;
-    my $rules = $tracer->[Marpa::R3::Internal::Trace::G::RULES];
-    my $rule = $rules->[$rule_id];
-    return $rule->[Marpa::R3::Internal::Rule::MASK];
-}
-
 sub Marpa::R3::Trace::G::start_symbol {
     my ( $tracer ) = @_;
     my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
