@@ -304,60 +304,59 @@ sub Marpa::R3::Trace::G::show_rules {
     $verbose    //= 0;
 
     my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
-    my $rules = $tracer->[Marpa::R3::Internal::Trace::G::RULES];
     my $grammar_name = $tracer->[Marpa::R3::Internal::Trace::G::NAME];
+    my $xbnf_by_irlid = $tracer->[Marpa::R3::Internal::Trace::G::XBNF_BY_IRLID];
 
-    for my $rule ( @{$rules} ) {
-        my $rule_id = $rule->[Marpa::R3::Internal::Rule::ID];
+    for my $irlid ( 0 .. $grammar_c->highest_rule_id() ) {
 
-        my $minimum = $grammar_c->sequence_min($rule_id);
+        my $xbnf    = $xbnf_by_irlid->[$irlid];
+        my $minimum = $grammar_c->sequence_min($irlid);
         my @quantifier =
-            defined $minimum ? $minimum <= 0 ? (q{*}) : (q{+}) : ();
-        my $lhs_id      = $grammar_c->rule_lhs($rule_id);
-        my $rule_length = $grammar_c->rule_length($rule_id);
+          defined $minimum ? $minimum <= 0 ? (q{*}) : (q{+}) : ();
+        my $lhs_id      = $grammar_c->rule_lhs($irlid);
+        my $rule_length = $grammar_c->rule_length($irlid);
         my @rhs_ids =
-            map { $grammar_c->rule_rhs( $rule_id, $_ ) }
-            ( 0 .. $rule_length - 1 );
-        $text .= join q{ }, $grammar_name, "R$rule_id",
-            $tracer->symbol_in_display_form($lhs_id),
-            '::=',
-            ( map { $tracer->symbol_in_display_form($_) } @rhs_ids ),
-            @quantifier;
+          map { $grammar_c->rule_rhs( $irlid, $_ ) } ( 0 .. $rule_length - 1 );
+        $text .= join q{ }, $grammar_name, "R$irlid",
+          $tracer->symbol_in_display_form($lhs_id),
+          '::=',
+          ( map { $tracer->symbol_in_display_form($_) } @rhs_ids ),
+          @quantifier;
         $text .= "\n";
 
         if ( $verbose >= 2 ) {
 
             my @comment = ();
-            $grammar_c->rule_length($rule_id) == 0
-                and push @comment, 'empty';
-	    $grammar_c->_marpa_g_rule_is_used($rule_id)
-                or push @comment, '!used';
-            $grammar_c->rule_is_productive($rule_id)
-                or push @comment, 'unproductive';
-            $grammar_c->rule_is_accessible($rule_id)
-                or push @comment, 'inaccessible';
-            $rule->[Marpa::R3::Internal::Rule::DISCARD_SEPARATION]
-                and push @comment, 'discard_sep';
+            $grammar_c->rule_length($irlid) == 0
+              and push @comment, 'empty';
+            $grammar_c->_marpa_g_rule_is_used($irlid)
+              or push @comment, '!used';
+            $grammar_c->rule_is_productive($irlid)
+              or push @comment, 'unproductive';
+            $grammar_c->rule_is_accessible($irlid)
+              or push @comment, 'inaccessible';
+            $xbnf->[Marpa::R3::Internal::XBNF::DISCARD_SEPARATION]
+              and push @comment, 'discard_sep';
 
             if (@comment) {
                 $text .= q{  } . ( join q{ }, q{/*}, @comment, q{*/} ) . "\n";
             }
 
             $text .= "  Symbol IDs: <$lhs_id> ::= "
-                . ( join q{ }, map {"<$_>"} @rhs_ids ) . "\n";
+              . ( join q{ }, map { "<$_>" } @rhs_ids ) . "\n";
 
         } ## end if ( $verbose >= 2 )
 
         if ( $verbose >= 3 ) {
 
-            $text
-                .= "  Internal symbols: <"
-                . $tracer->symbol_name($lhs_id)
-                . q{> ::= }
-                . (
+            $text .=
+                "  Internal symbols: <"
+              . $tracer->symbol_name($lhs_id)
+              . q{> ::= }
+              . (
                 join q{ },
                 map { '<' . $tracer->symbol_name($_) . '>' } @rhs_ids
-                ) . "\n";
+              ) . "\n";
 
         } ## end if ( $verbose >= 3 )
 

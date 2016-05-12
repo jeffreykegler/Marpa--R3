@@ -346,12 +346,6 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
                       $source_xbnf_data->{$datum_key};
                     next KEY;
                 }
-                if ( $datum_key eq 'keep' ) {
-                    $runtime_xbnf_data
-                      ->[Marpa::R3::Internal::XBNF::DISCARD_SEPARATION] =
-                      !$source_xbnf_data->{$datum_key};
-                    next KEY;
-                }
                 if ( $datum_key eq 'mask' ) {
                     $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::MASK] =
                       $source_xbnf_data->{$datum_key};
@@ -377,13 +371,16 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
                       $source_xbnf_data->{$datum_key};
                     next KEY;
                 }
-                if ( $datum_key =~ /\A (subkey|id) \z/xms ) {
+                if ( $datum_key =~ /\A (keep|subkey|id) \z/xms ) {
                     next KEY;
                 }
                 Marpa::R3::exception(
 "Internal error: Unknown hashed source xbnf field: $datum_key"
                 );
             }
+            $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::DISCARD_SEPARATION] =
+                    $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::SEPARATOR]
+                      && !$source_xbnf_data->{keep};
             push @{$xbnf_by_id}, $runtime_xbnf_data;
             $xbnf_by_name->{$xbnf_name} = $runtime_xbnf_data;
         }
@@ -1398,9 +1395,6 @@ sub add_user_rule {
         }
         $base_rule->[Marpa::R3::Internal::Rule::MASK] = $mask;
     } ## end if ($is_ordinary_rule)
-
-    $base_rule->[Marpa::R3::Internal::Rule::DISCARD_SEPARATION] =
-        $separator_id >= 0 && !$keep_separation;
 
     $base_rule->[Marpa::R3::Internal::Rule::ACTION_NAME] = $action;
     $grammar_c->rule_null_high_set( $base_rule_id,

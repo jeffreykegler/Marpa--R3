@@ -606,6 +606,7 @@ sub registration_init {
         $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
+    my $xbnf_by_irlid = $tracer->[Marpa::R3::Internal::Trace::G::XBNF_BY_IRLID];
     my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
     my $recce_c   = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
     my $trace_actions =
@@ -941,10 +942,11 @@ sub registration_init {
             $nulling_symbol_id = $nulling_symbol_by_semantic_rule[$irlid];
             $closure          = $closure_by_irlid[$irlid];
             $rule             = $rules->[$irlid];
+            my $xbnf             = $xbnf_by_irlid->[$irlid];
             $rule_length      = $grammar_c->rule_length($irlid);
             $is_sequence_rule = defined $grammar_c->sequence_min($irlid);
             $is_discard_sequence_rule = $is_sequence_rule
-                && $rule->[Marpa::R3::Internal::Rule::DISCARD_SEPARATION];
+                && $xbnf->[Marpa::R3::Internal::XBNF::DISCARD_SEPARATION];
         } ## end if ( defined $irlid )
 
         # Determine the "fate" of the array of child values
