@@ -612,9 +612,9 @@ sub registration_init {
         $slr->[Marpa::R3::Internal::Scanless::R::TRACE_ACTIONS] // 0;
     my $rules = $tracer->[Marpa::R3::Internal::Trace::G::RULES];
 
-    my @closure_by_rule_id   = ();
-    my @semantics_by_rule_id = ();
-    my @blessing_by_rule_id  = ();
+    my @closure_by_irlid   = ();
+    my @semantics_by_irlid = ();
+    my @blessing_by_irlid  = ();
 
     my ( $rule_resolutions, $lexeme_resolutions ) =
         resolve_recce( $slr, $per_parse_arg );
@@ -626,10 +626,10 @@ sub registration_init {
         # it is now equivalent to ::undef
 
         RULE:
-        for my $rule_id ( $tracer->rule_ids() ) {
+        for my $irlid ( $tracer->rule_ids() ) {
             my ( $new_resolution, $closure, $semantics, $blessing ) =
-                @{ $rule_resolutions->[$rule_id] };
-            my $lhs_id = $grammar_c->rule_lhs($rule_id);
+                @{ $rule_resolutions->[$irlid] };
+            my $lhs_id = $grammar_c->rule_lhs($irlid);
 
             REFINE_SEMANTICS: {
 
@@ -654,16 +654,16 @@ sub registration_init {
 
                 Marpa::R3::exception(
                     q{Unknown semantics for rule },
-                    $tracer->brief_rule($rule_id),
+                    $tracer->brief_rule($irlid),
                     "\n",
                     qq{    Semantics were specified as "$semantics"\n}
                 );
 
             } ## end REFINE_SEMANTICS:
 
-            $semantics_by_rule_id[$rule_id] = $semantics;
-            $blessing_by_rule_id[$rule_id]  = $blessing;
-            $closure_by_rule_id[$rule_id]   = $closure;
+            $semantics_by_irlid[$irlid] = $semantics;
+            $blessing_by_irlid[$irlid]  = $blessing;
+            $closure_by_irlid[$irlid]   = $closure;
 
             CHECK_BLESSING: {
                 last CHECK_BLESSING if $blessing eq '::undef';
@@ -678,7 +678,7 @@ sub registration_init {
                             Data::Dumper::Dumper($closure),
                             qq{  Blessing is "$blessing"\n},
                             q{  Rule is: },
-                            $tracer->brief_rule($rule_id),
+                            $tracer->brief_rule($irlid),
                             "\n",
                             qq{  Cannot bless rule when it resolves to a scalar constant},
                             "\n",
@@ -691,14 +691,14 @@ sub registration_init {
                 Marpa::R3::exception(
                     qq{Cannot bless rule when the semantics are "$semantics"},
                     q{  Rule is: },
-                    $tracer->brief_rule($rule_id),
+                    $tracer->brief_rule($irlid),
                     "\n",
                     qq{  Blessing is "$blessing"\n},
                     qq{  Semantics are "$semantics"\n}
                 );
             } ## end CHECK_BLESSING:
 
-        } ## end RULE: for my $rule_id ( $tracer->rule_ids() )
+        }
 
     } ## end CHECK_FOR_WHATEVER_CONFLICT
 
@@ -706,28 +706,28 @@ sub registration_init {
     # and that means more than one semantics might be specified for
     # the nullable symbol.  This logic deals with that.
     my @nullable_rule_ids_by_lhs = ();
-    RULE: for my $rule_id ( $tracer->rule_ids() ) {
-        my $lhs_id = $grammar_c->rule_lhs($rule_id);
-        push @{ $nullable_rule_ids_by_lhs[$lhs_id] }, $rule_id
-            if $grammar_c->rule_is_nullable($rule_id);
+    RULE: for my $irlid ( $tracer->rule_ids() ) {
+        my $lhs_id = $grammar_c->rule_lhs($irlid);
+        push @{ $nullable_rule_ids_by_lhs[$lhs_id] }, $irlid
+            if $grammar_c->rule_is_nullable($irlid);
     }
 
     my @null_symbol_closures;
     LHS:
     for ( my $lhs_id = 0; $lhs_id <= $#nullable_rule_ids_by_lhs; $lhs_id++ ) {
-        my $rule_ids = $nullable_rule_ids_by_lhs[$lhs_id];
+        my $irlids = $nullable_rule_ids_by_lhs[$lhs_id];
         my $resolution_rule;
 
         # No nullable rules for this LHS?  No problem.
-        next LHS if not defined $rule_ids;
-        my $rule_count = scalar @{$rule_ids};
+        next LHS if not defined $irlids;
+        my $rule_count = scalar @{$irlids};
 
         # I am not sure if this test is necessary
         next LHS if $rule_count <= 0;
 
         # Just one nullable rule?  Then that's our semantics.
         if ( $rule_count == 1 ) {
-            $resolution_rule = $rule_ids->[0];
+            $resolution_rule = $irlids->[0];
             my ( $resolution_name, $closure ) =
                 @{ $rule_resolutions->[$resolution_rule] };
             if ($trace_actions) {
@@ -745,7 +745,7 @@ sub registration_init {
         # More than one rule?  Are any empty?
         # If so, use the semantics of the empty rule
         my @empty_rules =
-            grep { $grammar_c->rule_length($_) <= 0 } @{$rule_ids};
+            grep { $grammar_c->rule_length($_) <= 0 } @{$irlids};
         if ( scalar @empty_rules ) {
             $resolution_rule = $empty_rules[0];
             my ( $resolution_name, $closure ) =
@@ -764,7 +764,7 @@ sub registration_init {
 
         # Multiple rules, none of them empty.
         my ( $first_resolution, @other_resolutions ) =
-            map { $rule_resolutions->[$_] } @{$rule_ids};
+            map { $rule_resolutions->[$_] } @{$irlids};
 
         # Do they have more than one semantics?
         # If so, just call it an error and let the user sort it out.
@@ -786,7 +786,7 @@ sub registration_init {
                     qq{  Marpa needs there to be only one semantics\n},
                     qq{  The rules involved are:\n},
                     Marpa::R3::Internal::Scanless::R::brief_rule_list(
-                        $slr, $rule_ids
+                        $slr, $irlids
                     )
                 );
             } ## end if ( $first_closure_name ne $other_closure_name or ...)
@@ -794,7 +794,7 @@ sub registration_init {
 
         # Multiple rules, but they all have one semantics.
         # So (obviously) use that semantics
-        $resolution_rule = $rule_ids->[0];
+        $resolution_rule = $irlids->[0];
         my ( $resolution_name, $closure ) =
             @{ $rule_resolutions->[$resolution_rule] };
         if ($trace_actions) {
@@ -901,18 +901,18 @@ sub registration_init {
     } ## end NULLING_SYMBOL: for my $nulling_symbol ( 0 .. $#{$null_values} )
 
     my @work_list = ();
-    RULE: for my $rule_id ( $tracer->rule_ids() ) {
+    RULE: for my $irlid ( $tracer->rule_ids() ) {
 
-        my $semantics = $semantics_by_rule_id[$rule_id];
-        my $blessing  = $blessing_by_rule_id[$rule_id];
+        my $semantics = $semantics_by_irlid[$irlid];
+        my $blessing  = $blessing_by_irlid[$irlid];
 
         $semantics = '[name,values]' if $semantics eq '::!default';
         $semantics = '[values]' if $semantics eq '::array';
         $semantics = '::undef'  if $semantics eq '::whatever';
         $semantics = '::rhs0'   if $semantics eq '::first';
 
-        push @work_list, [ $rule_id, undef, $semantics, $blessing ];
-    } ## end RULE: for my $rule_id ( $tracer->rule_ids() )
+        push @work_list, [ $irlid, undef, $semantics, $blessing ];
+    }
 
   RULE: for my $lexeme_id ( 0 .. $grammar_c->highest_symbol_id() ) {
 
@@ -933,19 +933,19 @@ sub registration_init {
     my $top_nulling_ops;
 
     WORK_ITEM: for my $work_item (@work_list) {
-        my ( $rule_id, $lexeme_id, $semantics, $blessing ) = @{$work_item};
+        my ( $irlid, $lexeme_id, $semantics, $blessing ) = @{$work_item};
 
         my ( $closure, $rule, $rule_length, $is_sequence_rule,
             $is_discard_sequence_rule, $nulling_symbol_id );
-        if ( defined $rule_id ) {
-            $nulling_symbol_id = $nulling_symbol_by_semantic_rule[$rule_id];
-            $closure          = $closure_by_rule_id[$rule_id];
-            $rule             = $rules->[$rule_id];
-            $rule_length      = $grammar_c->rule_length($rule_id);
-            $is_sequence_rule = defined $grammar_c->sequence_min($rule_id);
+        if ( defined $irlid ) {
+            $nulling_symbol_id = $nulling_symbol_by_semantic_rule[$irlid];
+            $closure          = $closure_by_irlid[$irlid];
+            $rule             = $rules->[$irlid];
+            $rule_length      = $grammar_c->rule_length($irlid);
+            $is_sequence_rule = defined $grammar_c->sequence_min($irlid);
             $is_discard_sequence_rule = $is_sequence_rule
                 && $rule->[Marpa::R3::Internal::Rule::DISCARD_SEPARATION];
-        } ## end if ( defined $rule_id )
+        } ## end if ( defined $irlid )
 
         # Determine the "fate" of the array of child values
         my $array_fate;
@@ -972,12 +972,12 @@ sub registration_init {
             }
 
             DO_CONSTANT: {
-                last DO_CONSTANT if not defined $rule_id;
-                my $thingy_ref = $closure_by_rule_id[$rule_id];
+                last DO_CONSTANT if not defined $irlid;
+                my $thingy_ref = $closure_by_irlid[$irlid];
                 last DO_CONSTANT if not defined $thingy_ref;
                 my $ref_type = Scalar::Util::reftype $thingy_ref;
                 if ( $ref_type eq q{} ) {
-                    my $rule_desc = $slr->rule_show( $rule_id );
+                    my $rule_desc = $slr->rule_show( $irlid );
                     Marpa::R3::exception(
                         qq{An action resolved to a scalar.\n},
                         qq{  This is not allowed.\n},
@@ -991,7 +991,7 @@ sub registration_init {
                     # Set the nulling closure if this is the nulling symbol of a rule
                     $nulling_closures[$nulling_symbol_id] = $thingy_ref
                         if defined $nulling_symbol_id
-                        and defined $rule_id;
+                        and defined $irlid;
                     last DO_CONSTANT;
                 } ## end if ( $ref_type eq 'CODE' )
                 if ( $ref_type eq 'SCALAR' ) {
@@ -1013,7 +1013,7 @@ sub registration_init {
                     last SET_OPS;
                 }
 
-                my $rule_desc = $slr->rule_show( $rule_id );
+                my $rule_desc = $slr->rule_show( $irlid );
                 Marpa::R3::exception(
                     qq{Constant action is not of an allowed type.\n},
                     qq{  It was of type reference to $ref_type.\n},
@@ -1029,7 +1029,7 @@ sub registration_init {
             }
 
             PROCESS_SINGLETON_RESULT: {
-                last PROCESS_SINGLETON_RESULT if not defined $rule_id;
+                last PROCESS_SINGLETON_RESULT if not defined $irlid;
 
                 my $singleton;
                 if ( $semantics =~ m/\A [:][:] rhs (\d+)  \z/xms ) {
@@ -1052,10 +1052,10 @@ sub registration_init {
                 my @elements =
                     grep { $mask->[$_] } 0 .. ( $rule_length - 1 );
                 if ( not scalar @elements ) {
-                    my $original_semantics = $semantics_by_rule_id[$rule_id];
+                    my $original_semantics = $semantics_by_irlid[$irlid];
                     Marpa::R3::exception(
                         q{Impossible semantics for empty rule: },
-                        $tracer->brief_rule($rule_id),
+                        $tracer->brief_rule($irlid),
                         "\n",
                         qq{    Semantics were specified as "$original_semantics"\n}
                     );
@@ -1063,10 +1063,10 @@ sub registration_init {
                 $singleton_element = $elements[$singleton];
 
                 if ( not defined $singleton_element ) {
-                    my $original_semantics = $semantics_by_rule_id[$rule_id];
+                    my $original_semantics = $semantics_by_irlid[$irlid];
                     Marpa::R3::exception(
                         q{Impossible semantics for rule: },
-                        $tracer->brief_rule($rule_id),
+                        $tracer->brief_rule($irlid),
                         "\n",
                         qq{    Semantics were specified as "$original_semantics"\n}
                     );
@@ -1115,8 +1115,8 @@ sub registration_init {
                 }
 
                 if ( $result_descriptor eq 'lhs' ) {
-                    if ( defined $rule_id ) {
-                        my $lhs_id = $grammar_c->rule_lhs($rule_id);
+                    if ( defined $irlid ) {
+                        my $lhs_id = $grammar_c->rule_lhs($irlid);
                         push @push_ops, $op_push_constant, \$lhs_id;
                         next RESULT_DESCRIPTOR;
                     }
@@ -1129,8 +1129,8 @@ sub registration_init {
                 } ## end if ( $result_descriptor eq 'lhs' )
 
                 if ( $result_descriptor eq 'name' ) {
-                    if ( defined $rule_id ) {
-                        my $name = $slg->rule_name($rule_id);
+                    if ( defined $irlid ) {
+                        my $name = $slg->rule_name($irlid);
                         push @push_ops, $op_push_constant, \$name;
                         next RESULT_DESCRIPTOR;
                     }
@@ -1149,12 +1149,12 @@ sub registration_init {
                 } ## end if ( $result_descriptor eq 'name' )
 
                 if ( $result_descriptor eq 'symbol' ) {
-                    if ( defined $rule_id ) {
-                        my $lhs_id = $grammar_c->rule_lhs($rule_id);
+                    if ( defined $irlid ) {
+                        my $lhs_id = $grammar_c->rule_lhs($irlid);
                         my $name   = $tracer->symbol_name($lhs_id);
                         push @push_ops, $op_push_constant, \$name;
                         next RESULT_DESCRIPTOR;
-                    } ## end if ( defined $rule_id )
+                    } ## end if ( defined $irlid )
                     if ( defined $lexeme_id ) {
                         my $name = $tracer->symbol_name($lexeme_id);
                         push @push_ops, $op_push_constant, \$name;
@@ -1170,8 +1170,8 @@ sub registration_init {
                 } ## end if ( $result_descriptor eq 'symbol' )
 
                 if ( $result_descriptor eq 'rule' ) {
-                    if ( defined $rule_id ) {
-                        push @push_ops, $op_push_constant, \$rule_id;
+                    if ( defined $irlid ) {
+                        push @push_ops, $op_push_constant, \$irlid;
                         next RESULT_DESCRIPTOR;
                     }
                     push @push_ops, $op_push_undef;
@@ -1209,8 +1209,8 @@ sub registration_init {
 
         } ## end SET_OPS:
 
-        if ( defined $rule_id ) {
-            push @registrations, [ 'rule', $rule_id, @ops ];
+        if ( defined $irlid ) {
+            push @registrations, [ 'rule', $irlid, @ops ];
         }
 
         if ( defined $nulling_symbol_id ) {
@@ -1237,13 +1237,13 @@ sub registration_init {
             if not $grammar_c->symbol_is_nullable($start_symbol_id);
 
         my $start_rhs_symbol_id;
-        RULE: for my $rule_id ( $tracer->rule_ids() ) {
-            my ( $lhs, $rhs0 ) = $tracer->rule_expand($rule_id);
+        RULE: for my $irlid ( $tracer->rule_ids() ) {
+            my ( $lhs, $rhs0 ) = $tracer->rule_expand($irlid);
             if ( $start_symbol_id == $lhs ) {
                 $start_rhs_symbol_id = $rhs0;
                 last RULE;
             }
-        } ## end RULE: for my $rule_id ( $tracer->rule_ids() )
+        }
 
         REGISTRATION: for my $registration (@registrations) {
             my ( $type, $nulling_symbol_id ) = @{$registration};
@@ -1262,7 +1262,7 @@ sub registration_init {
     $slr->[Marpa::R3::Internal::Scanless::R::CLOSURE_BY_SYMBOL_ID] =
         \@nulling_closures;
     $slr->[Marpa::R3::Internal::Scanless::R::CLOSURE_BY_RULE_ID] =
-        \@closure_by_rule_id;
+        \@closure_by_irlid;
 
 } ## end sub registration_init
 
