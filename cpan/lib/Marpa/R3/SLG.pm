@@ -158,26 +158,27 @@ qq{'source' name argument to Marpa::R3::Scanless::G->new() is a ref to a an unde
 sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     my ( $slg, $hashed_source, $g1_args ) = @_;
 
-    my $trace_fh =
-        $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE];
+    my $trace_fh = $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE];
     my $trace_terminals =
-        $slg->[Marpa::R3::Internal::Scanless::G::TRACE_TERMINALS];
+      $slg->[Marpa::R3::Internal::Scanless::G::TRACE_TERMINALS];
 
     # Pre-lexer G1 processing
 
-    my @xsy_names = keys %{$hashed_source->{xsy}};
+    my @xsy_names = keys %{ $hashed_source->{xsy} };
 
     my $xsy_by_id = $slg->[Marpa::R3::Internal::Scanless::G::XSY_BY_ID] = [];
-    my $xsy_by_name = $slg->[Marpa::R3::Internal::Scanless::G::XSY_BY_NAME] = {};
+    my $xsy_by_name = $slg->[Marpa::R3::Internal::Scanless::G::XSY_BY_NAME] =
+      {};
     for my $xsy_name ( sort @xsy_names ) {
         my $runtime_xsy_data = [];
-        $runtime_xsy_data->[Marpa::R3::Internal::XSY::ID] = scalar @{$xsy_by_id};
+        $runtime_xsy_data->[Marpa::R3::Internal::XSY::ID] =
+          scalar @{$xsy_by_id};
         $runtime_xsy_data->[Marpa::R3::Internal::XSY::NAME] = $xsy_name;
         my $source_xsy_data = $hashed_source->{xsy}->{$xsy_name};
       KEY: for my $datum_key ( keys %{$source_xsy_data} ) {
             if ( $datum_key eq 'action' ) {
-                $runtime_xsy_data->[Marpa::R3::Internal::XSY::LEXEME_SEMANTICS] =
-                  $source_xsy_data->{$datum_key};
+                $runtime_xsy_data->[Marpa::R3::Internal::XSY::LEXEME_SEMANTICS]
+                  = $source_xsy_data->{$datum_key};
                 next KEY;
             }
             if ( $datum_key eq 'blessing' ) {
@@ -191,8 +192,8 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
                 next KEY;
             }
             if ( $datum_key eq 'if_inaccessible' ) {
-                $runtime_xsy_data->[Marpa::R3::Internal::XSY::IF_INACCESSIBLE] =
-                  $source_xsy_data->{$datum_key};
+                $runtime_xsy_data->[Marpa::R3::Internal::XSY::IF_INACCESSIBLE]
+                  = $source_xsy_data->{$datum_key};
                 next KEY;
             }
             if ( $datum_key eq 'name_source' ) {
@@ -207,12 +208,62 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
         $xsy_by_name->{$xsy_name} = $runtime_xsy_data;
     }
 
-    $slg->[Marpa::R3::Internal::Scanless::G::L0_XBNF_BY_ID] = [];
-    $slg->[Marpa::R3::Internal::Scanless::G::G1_XBNF_BY_ID] = [];
+    $slg->[Marpa::R3::Internal::Scanless::G::XRL_BY_ID]   = [];
+    $slg->[Marpa::R3::Internal::Scanless::G::XRL_BY_NAME] = {};
+    my $xrls        = $hashed_source->{xrl};
+    my $xrl_by_id   = $slg->[Marpa::R3::Internal::Scanless::G::XRL_BY_ID];
+    my $xrl_by_name = $slg->[Marpa::R3::Internal::Scanless::G::XRL_BY_NAME];
+
+    # Sort (from major to minor) by start position,
+    # and subkey.
+    for my $xrl_name ( map { $_->[0] }
+        sort { $a->[1] <=> $b->[1] }
+        map { [ $_, $xrls->{$_}->{start} ] } keys %{$xrls} )
+    {
+        my $source_xrl_data  = $xrls->{$xrl_name};
+        my $runtime_xrl_data = [];
+        $runtime_xrl_data->[Marpa::R3::Internal::XRL::ID] =
+          scalar @{$xrl_by_id};
+        $runtime_xrl_data->[Marpa::R3::Internal::XRL::NAME] = $xrl_name;
+      KEY: for my $datum_key ( keys %{$source_xrl_data} ) {
+            if ( $datum_key eq 'id' ) {
+                $runtime_xrl_data->[Marpa::R3::Internal::XRL::NAME] =
+                  $source_xrl_data->{$datum_key};
+                next KEY;
+            }
+            if ( $datum_key eq 'precedence_count' ) {
+                $runtime_xrl_data->[Marpa::R3::Internal::XRL::PRECEDENCE_COUNT]
+                  = $source_xrl_data->{$datum_key};
+                next KEY;
+            }
+            if ( $datum_key eq 'lhs' ) {
+                $runtime_xrl_data->[Marpa::R3::Internal::XRL::LHS] =
+                  $source_xrl_data->{$datum_key};
+                next KEY;
+            }
+            if ( $datum_key eq 'start' ) {
+                $runtime_xrl_data->[Marpa::R3::Internal::XRL::START] =
+                  $source_xrl_data->{$datum_key};
+                next KEY;
+            }
+            if ( $datum_key eq 'length' ) {
+                $runtime_xrl_data->[Marpa::R3::Internal::XRL::LENGTH] =
+                  $source_xrl_data->{$datum_key};
+                next KEY;
+            }
+            Marpa::R3::exception(
+                "Internal error: Unknown hashed source xrl field: $datum_key");
+        }
+        push @{$xrl_by_id}, $runtime_xrl_data;
+        $xrl_by_name->{$xrl_name} = $runtime_xrl_data;
+    }
+
+    $slg->[Marpa::R3::Internal::Scanless::G::L0_XBNF_BY_ID]   = [];
+    $slg->[Marpa::R3::Internal::Scanless::G::G1_XBNF_BY_ID]   = [];
     $slg->[Marpa::R3::Internal::Scanless::G::L0_XBNF_BY_NAME] = {};
     $slg->[Marpa::R3::Internal::Scanless::G::G1_XBNF_BY_NAME] = {};
     for my $subgrammar (qw(G1 L0)) {
-        my $xbnfs      = $hashed_source->{xbnf}->{$subgrammar};
+        my $xbnfs = $hashed_source->{xbnf}->{$subgrammar};
         my $xbnf_by_id =
             $subgrammar eq 'L0'
           ? $slg->[Marpa::R3::Internal::Scanless::G::L0_XBNF_BY_ID]
@@ -227,20 +278,22 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
         for my $source_xbnf_data (
             map { $_->[0] }
             sort {
-                     # die  "a=", Data::Dumper::Dumper($a) if not defined $a->[1];
-                     # die  "a=", Data::Dumper::Dumper($a) if not defined $a->[2];
-                     # die  "b=", Data::Dumper::Dumper($b) if not defined $a->[1];
-                     # die  "b=", Data::Dumper::Dumper($b) if not defined $b->[2];
-                     $a->[1] <=> $b->[1]
+                # die  "a=", Data::Dumper::Dumper($a) if not defined $a->[1];
+                # die  "a=", Data::Dumper::Dumper($a) if not defined $a->[2];
+                # die  "b=", Data::Dumper::Dumper($b) if not defined $a->[1];
+                # die  "b=", Data::Dumper::Dumper($b) if not defined $b->[2];
+                $a->[1] <=> $b->[1]
                   || $a->[2] <=> $b->[2]
             }
             map { [ $_, $_->{start}, $_->{subkey} ] } values %{$xbnfs}
           )
         {
             my $runtime_xbnf_data = [];
-            $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::ID] = scalar @{$xbnf_by_id};
-            my $xbnf_name = $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::NAME] =
-                      $source_xbnf_data->{id};
+            $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::ID] =
+              scalar @{$xbnf_by_id};
+            my $xbnf_name =
+              $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::NAME] =
+              $source_xbnf_data->{id};
           KEY: for my $datum_key ( keys %{$source_xbnf_data} ) {
                 if ( $datum_key eq 'id' ) {
                     next KEY;
@@ -266,12 +319,14 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
                     next KEY;
                 }
                 if ( $datum_key eq 'null_ranking' ) {
-                    $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::NULL_RANKING] =
+                    $runtime_xbnf_data
+                      ->[Marpa::R3::Internal::XBNF::NULL_RANKING] =
                       $source_xbnf_data->{$datum_key};
                     next KEY;
                 }
                 if ( $datum_key eq 'symbol_as_event' ) {
-                    $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::SYMBOL_AS_EVENT] =
+                    $runtime_xbnf_data
+                      ->[Marpa::R3::Internal::XBNF::SYMBOL_AS_EVENT] =
                       $source_xbnf_data->{$datum_key};
                     next KEY;
                 }
@@ -286,8 +341,8 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
                     next KEY;
                 }
                 if ( $datum_key eq 'separator' ) {
-                    $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::SEPARATOR] =
-                      $source_xbnf_data->{$datum_key};
+                    $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::SEPARATOR]
+                      = $source_xbnf_data->{$datum_key};
                     next KEY;
                 }
                 if ( $datum_key eq 'proper' ) {
@@ -298,7 +353,7 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
                 if ( $datum_key eq 'keep' ) {
                     $runtime_xbnf_data
                       ->[Marpa::R3::Internal::XBNF::DISCARD_SEPARATION] =
-                      ! $source_xbnf_data->{$datum_key};
+                      !$source_xbnf_data->{$datum_key};
                     next KEY;
                 }
                 if ( $datum_key eq 'mask' ) {
@@ -322,13 +377,13 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
                     next KEY;
                 }
                 if ( $datum_key eq 'start' ) {
-                    $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::START_POS]
-                      = $source_xbnf_data->{$datum_key};
+                    $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::START] =
+                      $source_xbnf_data->{$datum_key};
                     next KEY;
                 }
                 if ( $datum_key eq 'length' ) {
-                    $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::LENGTH]
-                      = $source_xbnf_data->{$datum_key};
+                    $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::LENGTH] =
+                      $source_xbnf_data->{$datum_key};
                     next KEY;
                 }
                 if ( $datum_key =~ /\A (subkey|xrlid|id) \z/xms ) {
@@ -339,6 +394,7 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
                 );
             }
             push @{$xbnf_by_id}, $runtime_xbnf_data;
+
             # $xbnf_by_name->{$xbnf_name} = $runtime_xbnf_data;
         }
     }
@@ -366,13 +422,12 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
         delete $g1_args->{'warnings'};
     }
 
-    my $g1_tracer =
-        $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER] =
-        Marpa::R3::Trace::G->new();
+    my $g1_tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER] =
+      Marpa::R3::Trace::G->new();
     $g1_tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID] = [];
-    $g1_tracer->[Marpa::R3::Internal::Trace::G::RULES] = [];
-    $g1_tracer->[Marpa::R3::Internal::Trace::G::START_NAME] = '[:start]';
-    $g1_tracer->[Marpa::R3::Internal::Trace::G::NAME] = 'G1';
+    $g1_tracer->[Marpa::R3::Internal::Trace::G::RULES]        = [];
+    $g1_tracer->[Marpa::R3::Internal::Trace::G::START_NAME]   = '[:start]';
+    $g1_tracer->[Marpa::R3::Internal::Trace::G::NAME]         = 'G1';
 
     for my $symbol ( sort keys %{ $hashed_source->{symbols}->{G1} } ) {
         assign_symbol( $slg, $g1_tracer, $symbol,
@@ -382,51 +437,49 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     add_user_rules( $slg, $g1_tracer, $hashed_source->{rules}->{G1} );
 
     my @bad_arguments = keys %{$g1_args};
-    if (scalar @bad_arguments) {
+    if ( scalar @bad_arguments ) {
         Marpa::R3::exception(
             q{Internal error: Bad named argument(s) to hash_to_runtime() method}
-                . join q{ },
+              . join q{ },
             @bad_arguments
         );
     }
 
-    my $g1_thin          = $g1_tracer->grammar();
+    my $g1_thin = $g1_tracer->grammar();
 
     my $symbol_ids_by_event_name_and_type = {};
-    $slg->[
-        Marpa::R3::Internal::Scanless::G::SYMBOL_IDS_BY_EVENT_NAME_AND_TYPE]
-        = $symbol_ids_by_event_name_and_type;
+    $slg->[Marpa::R3::Internal::Scanless::G::SYMBOL_IDS_BY_EVENT_NAME_AND_TYPE]
+      = $symbol_ids_by_event_name_and_type;
 
     my $completion_events_by_name = $hashed_source->{completion_events};
     my $completion_events_by_id =
-        $slg->[Marpa::R3::Internal::Scanless::G::COMPLETION_EVENT_BY_ID] = [];
+      $slg->[Marpa::R3::Internal::Scanless::G::COMPLETION_EVENT_BY_ID] = [];
     for my $symbol_name ( keys %{$completion_events_by_name} ) {
         my ( $event_name, $is_active ) =
-            @{ $completion_events_by_name->{$symbol_name} };
+          @{ $completion_events_by_name->{$symbol_name} };
         my $symbol_id = $g1_tracer->symbol_by_name($symbol_name);
         if ( not defined $symbol_id ) {
             Marpa::R3::exception(
-                "Completion event defined for non-existent symbol: $symbol_name\n"
+"Completion event defined for non-existent symbol: $symbol_name\n"
             );
         }
 
         # Must be done before precomputation
         $g1_thin->symbol_is_completion_event_set( $symbol_id, 1 );
         $g1_thin->completion_symbol_activate( $symbol_id, 0 )
-            if not $is_active;
+          if not $is_active;
         $slg->[Marpa::R3::Internal::Scanless::G::COMPLETION_EVENT_BY_ID]
-            ->[$symbol_id] = $event_name;
-        push
-            @{ $symbol_ids_by_event_name_and_type->{$event_name}->{completion}
-            }, $symbol_id;
+          ->[$symbol_id] = $event_name;
+        push @{ $symbol_ids_by_event_name_and_type->{$event_name}->{completion}
+        }, $symbol_id;
     } ## end for my $symbol_name ( keys %{$completion_events_by_name...})
 
     my $nulled_events_by_name = $hashed_source->{nulled_events};
     my $nulled_events_by_id =
-        $slg->[Marpa::R3::Internal::Scanless::G::NULLED_EVENT_BY_ID] = [];
+      $slg->[Marpa::R3::Internal::Scanless::G::NULLED_EVENT_BY_ID] = [];
     for my $symbol_name ( keys %{$nulled_events_by_name} ) {
         my ( $event_name, $is_active ) =
-            @{ $nulled_events_by_name->{$symbol_name} };
+          @{ $nulled_events_by_name->{$symbol_name} };
         my $symbol_id = $g1_tracer->symbol_by_name($symbol_name);
         if ( not defined $symbol_id ) {
             Marpa::R3::exception(
@@ -438,54 +491,53 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
         $g1_thin->symbol_is_nulled_event_set( $symbol_id, 1 );
         $g1_thin->nulled_symbol_activate( $symbol_id, 0 ) if not $is_active;
         $slg->[Marpa::R3::Internal::Scanless::G::NULLED_EVENT_BY_ID]
-            ->[$symbol_id] = $event_name;
+          ->[$symbol_id] = $event_name;
         push @{ $symbol_ids_by_event_name_and_type->{$event_name}->{nulled} },
-            $symbol_id;
+          $symbol_id;
     } ## end for my $symbol_name ( keys %{$nulled_events_by_name} )
 
     my $prediction_events_by_name = $hashed_source->{prediction_events};
     my $prediction_events_by_id =
-        $slg->[Marpa::R3::Internal::Scanless::G::PREDICTION_EVENT_BY_ID] = [];
+      $slg->[Marpa::R3::Internal::Scanless::G::PREDICTION_EVENT_BY_ID] = [];
     for my $symbol_name ( keys %{$prediction_events_by_name} ) {
         my ( $event_name, $is_active ) =
-            @{ $prediction_events_by_name->{$symbol_name} };
+          @{ $prediction_events_by_name->{$symbol_name} };
         my $symbol_id = $g1_tracer->symbol_by_name($symbol_name);
         if ( not defined $symbol_id ) {
             Marpa::R3::exception(
-                "prediction event defined for non-existent symbol: $symbol_name\n"
+"prediction event defined for non-existent symbol: $symbol_name\n"
             );
         }
 
         # Must be done before precomputation
         $g1_thin->symbol_is_prediction_event_set( $symbol_id, 1 );
         $g1_thin->prediction_symbol_activate( $symbol_id, 0 )
-            if not $is_active;
+          if not $is_active;
         $slg->[Marpa::R3::Internal::Scanless::G::PREDICTION_EVENT_BY_ID]
-            ->[$symbol_id] = $event_name;
-        push
-            @{ $symbol_ids_by_event_name_and_type->{$event_name}->{prediction}
-            }, $symbol_id;
+          ->[$symbol_id] = $event_name;
+        push @{ $symbol_ids_by_event_name_and_type->{$event_name}->{prediction}
+        }, $symbol_id;
     } ## end for my $symbol_name ( keys %{$prediction_events_by_name...})
 
     my $lexeme_events_by_id =
-        $slg->[Marpa::R3::Internal::Scanless::G::LEXEME_EVENT_BY_ID] = [];
+      $slg->[Marpa::R3::Internal::Scanless::G::LEXEME_EVENT_BY_ID] = [];
 
-    my $precompute_error = Marpa::R3::Internal::Scanless::G::precompute($slg, $g1_tracer);
-    if (defined $precompute_error) {
+    my $precompute_error =
+      Marpa::R3::Internal::Scanless::G::precompute( $slg, $g1_tracer );
+    if ( defined $precompute_error ) {
         if ( $precompute_error == $Marpa::R3::Error::UNPRODUCTIVE_START ) {
 
             # Maybe someday improve this by finding the start rule and showing
             # its RHS -- for now it is clear enough
             Marpa::R3::exception(qq{Unproductive start symbol});
         } ## end if ( $precompute_error == ...)
-        Marpa::R3::exception(
-            'Internal errror: unnkown precompute error code ',
+        Marpa::R3::exception( 'Internal errror: unnkown precompute error code ',
             $precompute_error );
     } ## end if ( defined( my $precompute_error = ...))
 
     # Find out the list of lexemes according to G1
     my %g1_id_by_lexeme_name = ();
-    SYMBOL: for my $symbol_id ( 0 .. $g1_thin->highest_symbol_id() ) {
+  SYMBOL: for my $symbol_id ( 0 .. $g1_thin->highest_symbol_id() ) {
 
         # Not a lexeme, according to G1
         next SYMBOL if not $g1_thin->symbol_is_terminal($symbol_id);
@@ -507,7 +559,7 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     my %lexeme_data = ();
 
     # Determine "latm" status
-    LEXEME: for my $lexeme_name ( keys %g1_id_by_lexeme_name ) {
+  LEXEME: for my $lexeme_name ( keys %g1_id_by_lexeme_name ) {
         my $declarations = $lexeme_declarations->{$lexeme_name};
         my $latm_value = $declarations->{latm} // $latm_default_value;
         $lexeme_data{$lexeme_name}{latm} = $latm_value;
@@ -515,13 +567,13 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
 
     # Lexers
 
-    my @discard_event_by_lexer_rule_id      = ();
+    my @discard_event_by_lexer_rule_id = ();
     state $lex_start_symbol_name = '[:start_lex]';
     state $discard_symbol_name   = '[:discard]';
 
-    my $lexer_rules = $hashed_source->{rules}->{'L0'};
+    my $lexer_rules          = $hashed_source->{rules}->{'L0'};
     my $character_class_hash = $hashed_source->{character_classes};
-    my $lexer_symbols = $hashed_source->{symbols}->{'L0'};
+    my $lexer_symbols        = $hashed_source->{symbols}->{'L0'};
 
     # If no lexer rules, fake a lexer
     # Fake a lexer -- it discards symbols in character classes which
@@ -529,17 +581,21 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     if ( not scalar @{$lexer_rules} ) {
         $character_class_hash = { '[[^\\d\\D]]' => [ '[^\\d\\D]', '' ] };
         $lexer_rules = [
-            {   'rhs'         => [ '[[^\\d\\D]]' ],
-                'lhs'         => '[:discard]',
+            {
+                'rhs'             => ['[[^\\d\\D]]'],
+                'lhs'             => '[:discard]',
                 'symbol_as_event' => '[^\\d\\D]',
+
                 # 'description' => 'Discard rule for <[[^\\d\\D]]>'
             },
         ];
         $lexer_symbols = {
             '[:discard]' => {
+
                 # 'description'  => 'Internal LHS for lexer "L0" discard'
             },
             '[[^\\d\\D]]' => {
+
                 # 'description'  => 'Character class: [^\\d\\D]'
             }
         };
@@ -565,30 +621,30 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     } ## end for my $lex_rule ( @{$lexer_rules} )
 
     my %this_lexer_symbols = ();
-    SYMBOL:
+  SYMBOL:
     for my $symbol_name ( ( keys %lex_lhs ), ( keys %lex_rhs ),
         ( keys %lex_separator ) )
     {
         my $symbol_data = $lexer_symbols->{$symbol_name};
         $this_lexer_symbols{$symbol_name} = $symbol_data
-            if defined $symbol_data;
+          if defined $symbol_data;
     } ## end SYMBOL: for my $symbol_name ( ( keys %lex_lhs ), ( keys %lex_rhs...))
 
     my %is_lexeme_in_this_lexer = map { $_ => 1 }
-        grep { not $lex_rhs{$_} and not $lex_separator{$_} }
-        keys %lex_lhs;
+      grep { not $lex_rhs{$_} and not $lex_separator{$_} }
+      keys %lex_lhs;
 
     my @lex_lexeme_names = keys %is_lexeme_in_this_lexer;
 
     Marpa::R3::exception( "No lexemes in lexer\n",
         "  An SLIF grammar must have at least one lexeme\n" )
-        if not scalar @lex_lexeme_names;
+      if not scalar @lex_lexeme_names;
 
     # Do I need this?
     my @unproductive =
-        map {"<$_>"}
-        grep { not $lex_lhs{$_} and not $_ =~ /\A \[\[ /xms }
-        ( keys %lex_rhs, keys %lex_separator );
+      map { "<$_>" }
+      grep { not $lex_lhs{$_} and not $_ =~ /\A \[\[ /xms }
+      ( keys %lex_rhs, keys %lex_separator );
     if (@unproductive) {
         Marpa::R3::exception( 'Unproductive lexical symbols: ',
             join q{ }, @unproductive );
@@ -605,12 +661,12 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
         }
     } sort keys %is_lexeme_in_this_lexer;
 
-    my $lex_tracer =
-        $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER] =
-        Marpa::R3::Trace::G->new();
+    my $lex_tracer = $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER] =
+      Marpa::R3::Trace::G->new();
     $lex_tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID] = [];
-    $lex_tracer->[Marpa::R3::Internal::Trace::G::RULES] = [];
-    $lex_tracer->[Marpa::R3::Internal::Trace::G::START_NAME] = $lex_start_symbol_name;
+    $lex_tracer->[Marpa::R3::Internal::Trace::G::RULES]        = [];
+    $lex_tracer->[Marpa::R3::Internal::Trace::G::START_NAME] =
+      $lex_start_symbol_name;
     $lex_tracer->[Marpa::R3::Internal::Trace::G::NAME] = 'L0';
 
     for my $symbol ( sort keys %this_lexer_symbols ) {
@@ -620,40 +676,39 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
 
     add_user_rules( $slg, $lex_tracer, $lexer_rules );
 
-    my $lex_thin   = $lex_tracer->grammar();
+    my $lex_thin = $lex_tracer->grammar();
 
     my $lex_discard_symbol_id =
-        $lex_tracer->symbol_by_name($discard_symbol_name) // -1;
+      $lex_tracer->symbol_by_name($discard_symbol_name) // -1;
     my @lex_lexeme_to_g1_symbol;
     $lex_lexeme_to_g1_symbol[$_] = -1 for 0 .. $g1_thin->highest_symbol_id();
 
-    LEXEME_NAME: for my $lexeme_name (@lex_lexeme_names) {
+  LEXEME_NAME: for my $lexeme_name (@lex_lexeme_names) {
         next LEXEME_NAME if $lexeme_name eq $discard_symbol_name;
         next LEXEME_NAME if $lexeme_name eq $lex_start_symbol_name;
         my $g1_symbol_id = $g1_id_by_lexeme_name{$lexeme_name};
         if ( not defined $g1_symbol_id ) {
             Marpa::R3::exception(
-                "A lexeme in L0 is not a lexeme in G1: $lexeme_name"
-            );
+                "A lexeme in L0 is not a lexeme in G1: $lexeme_name" );
         }
         if ( not $g1_thin->symbol_is_accessible($g1_symbol_id) ) {
             my $message =
-                "A lexeme in L0 is not accessible from the G1 start symbol: $lexeme_name";
+"A lexeme in L0 is not accessible from the G1 start symbol: $lexeme_name";
             say {$trace_fh} $message
-                if $if_inaccessible_default eq 'warn';
+              if $if_inaccessible_default eq 'warn';
             Marpa::R3::exception($message)
-                if $if_inaccessible_default eq 'fatal';
+              if $if_inaccessible_default eq 'fatal';
         } ## end if ( not $g1_thin->symbol_is_accessible($g1_symbol_id...))
         my $lex_symbol_id = $lex_tracer->symbol_by_name($lexeme_name);
         $lexeme_data{$lexeme_name}{lexer}{'id'} =
-            $lex_symbol_id;
+          $lex_symbol_id;
         $lex_lexeme_to_g1_symbol[$lex_symbol_id] = $g1_symbol_id;
     } ## end LEXEME_NAME: for my $lexeme_name (@lex_lexeme_names)
 
     my @lex_rule_to_g1_lexeme;
     my $lex_start_symbol_id =
-        $lex_tracer->symbol_by_name($lex_start_symbol_name);
-    RULE_ID: for my $rule_id ( 0 .. $lex_thin->highest_rule_id() ) {
+      $lex_tracer->symbol_by_name($lex_start_symbol_name);
+  RULE_ID: for my $rule_id ( 0 .. $lex_thin->highest_rule_id() ) {
         my $lhs_id = $lex_thin->rule_lhs($rule_id);
         if ( $lhs_id == $lex_discard_symbol_id ) {
             $lex_rule_to_g1_lexeme[$rule_id] = -2;
@@ -676,9 +731,10 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
         # If 1 is the default, we don't need an assertion
         next RULE_ID if not $lexeme_data{$lexeme_name}{latm};
 
-        my $trace_terminals = $slg->[Marpa::R3::Internal::Scanless::G::TRACE_TERMINALS];
+        my $trace_terminals =
+          $slg->[Marpa::R3::Internal::Scanless::G::TRACE_TERMINALS];
         my $assertion_id =
-            $lexeme_data{$lexeme_name}{lexer}{'assertion'};
+          $lexeme_data{$lexeme_name}{lexer}{'assertion'};
         if ( not defined $assertion_id ) {
             $assertion_id = $lex_thin->zwa_new(0);
 
@@ -687,13 +743,13 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
             }
 
             $lexeme_data{$lexeme_name}{lexer}{'assertion'} =
-                $assertion_id;
+              $assertion_id;
         } ## end if ( not defined $assertion_id )
         $lex_thin->zwa_place( $assertion_id, $rule_id, 0 );
         if ( $trace_terminals >= 2 ) {
             say {$trace_fh}
-                "Assertion $assertion_id applied to L0 rule ",
-                slg_rule_show( $lex_tracer, $rule_id );
+              "Assertion $assertion_id applied to L0 rule ",
+              slg_rule_show( $lex_tracer, $rule_id );
         }
     } ## end RULE_ID: for my $rule_id ( 0 .. $lex_thin->highest_rule_id() )
 
@@ -706,15 +762,15 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
         );
     }
 
-    my @class_table          = ();
+    my @class_table = ();
 
-    CLASS_SYMBOL:
+  CLASS_SYMBOL:
     for my $class_symbol ( sort keys %{$character_class_hash} ) {
         my $symbol_id = $lex_tracer->symbol_by_name($class_symbol);
         next CLASS_SYMBOL if not defined $symbol_id;
         my $cc_components = $character_class_hash->{$class_symbol};
         my ( $compiled_re, $error ) =
-            Marpa::R3::Internal::MetaAST::char_class_to_re($cc_components);
+          Marpa::R3::Internal::MetaAST::char_class_to_re($cc_components);
         if ( not $compiled_re ) {
             $error =~ s/^/  /gxms;    #indent all lines
             Marpa::R3::exception(
@@ -728,11 +784,11 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     # rule id of the lexer.
 
     my $default_discard_event = $discard_default_adverbs->{event};
-    RULE_ID: for my $rule_id ( 0 .. $lex_thin->highest_rule_id() ) {
+  RULE_ID: for my $rule_id ( 0 .. $lex_thin->highest_rule_id() ) {
         my $tag = $lex_tracer->tag($rule_id);
         next RULE_ID if not defined $tag;
         my $event;
-        FIND_EVENT: {
+      FIND_EVENT: {
             $event = $lexer_rule_by_tag{$tag}->{event};
             last FIND_EVENT if defined $event;
             my $lhs_id = $lex_thin->rule_lhs($rule_id);
@@ -755,8 +811,7 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
             next RULE_ID;
         }
         Marpa::R3::exception(
-            qq{Discard event has unknown name: "$event_name"}
-        );
+            qq{Discard event has unknown name: "$event_name"} );
 
     } ## end RULE_ID: for my $rule_id ( 0 .. $lex_thin->highest_rule_id() )
 
@@ -764,12 +819,12 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
 
     my $thin_L0  = $lex_tracer->[Marpa::R3::Internal::Trace::G::C];
     my $thin_slg = $slg->[Marpa::R3::Internal::Scanless::G::C] =
-        Marpa::R3::Thin::SLG->new( $thin_L0, $g1_tracer->grammar() );
+      Marpa::R3::Thin::SLG->new( $thin_L0, $g1_tracer->grammar() );
 
-    LEXEME: for my $lexeme_name ( keys %g1_id_by_lexeme_name ) {
+  LEXEME: for my $lexeme_name ( keys %g1_id_by_lexeme_name ) {
         Marpa::R3::exception(
-            "A lexeme in G1 is not a lexeme in L0: $lexeme_name"
-        ) if not defined $lexeme_data{$lexeme_name}{'lexer'};
+            "A lexeme in G1 is not a lexeme in L0: $lexeme_name" )
+          if not defined $lexeme_data{$lexeme_name}{'lexer'};
     }
 
     # At this point we know which symbols are lexemes.
@@ -778,7 +833,7 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     # Check for lexeme declarations for things which are not lexemes
     for my $lexeme_name ( keys %{$lexeme_declarations} ) {
         Marpa::R3::exception(
-            "Symbol <$lexeme_name> is declared as a lexeme, but it is not used as one.\n"
+"Symbol <$lexeme_name> is declared as a lexeme, but it is not used as one.\n"
         ) if not defined $g1_id_by_lexeme_name{$lexeme_name};
     }
 
@@ -786,22 +841,22 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     # completion or a nulled event for one
     for my $symbol_name ( keys %{$completion_events_by_name} ) {
         Marpa::R3::exception(
-            "A completion event is declared for <$symbol_name>, but it is a lexeme.\n",
-            "  Completion events are only valid for symbols on the LHS of G1 rules.\n"
+"A completion event is declared for <$symbol_name>, but it is a lexeme.\n",
+"  Completion events are only valid for symbols on the LHS of G1 rules.\n"
         ) if defined $g1_id_by_lexeme_name{$symbol_name};
     } ## end for my $symbol_name ( keys %{$completion_events_by_name...})
 
     for my $symbol_name ( keys %{$nulled_events_by_name} ) {
         Marpa::R3::exception(
-            "A nulled event is declared for <$symbol_name>, but it is a G1 lexeme.\n",
-            "  nulled events are only valid for symbols on the LHS of G1 rules.\n"
+"A nulled event is declared for <$symbol_name>, but it is a G1 lexeme.\n",
+"  nulled events are only valid for symbols on the LHS of G1 rules.\n"
         ) if defined $g1_id_by_lexeme_name{$symbol_name};
     } ## end for my $symbol_name ( keys %{$nulled_events_by_name} )
 
     # Mark the lexemes, and set their data
     # Now that we have created the SLG, we can set the latm value,
     # already determined above.
-    LEXEME: for my $lexeme_name ( keys %g1_id_by_lexeme_name ) {
+  LEXEME: for my $lexeme_name ( keys %g1_id_by_lexeme_name ) {
         my $g1_lexeme_id = $g1_id_by_lexeme_name{$lexeme_name};
         my $declarations = $lexeme_declarations->{$lexeme_name};
         my $priority     = $declarations->{priority} // 0;
@@ -817,8 +872,9 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
                 my $event_name;
                 ( $event_name, $is_active ) = @{$event_data};
                 $lexeme_events_by_id->[$g1_lexeme_id] = $event_name;
-                push @{ $symbol_ids_by_event_name_and_type->{$event_name}
-                        ->{lexeme} }, $g1_lexeme_id;
+                push
+                  @{ $symbol_ids_by_event_name_and_type->{$event_name}->{lexeme}
+                  }, $g1_lexeme_id;
             } ## end if ( defined( my $event_data = $declarations->{'event'...}))
 
             $thin_slg->g1_lexeme_pause_activate( $g1_lexeme_id, $is_active );
@@ -827,25 +883,24 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     } ## end LEXEME: for my $lexeme_name ( keys %g1_id_by_lexeme_name )
 
     # Second phase of lexer processing
-    RULE_ID: for my $lexer_rule_id ( 0 .. $#lex_rule_to_g1_lexeme ) {
+  RULE_ID: for my $lexer_rule_id ( 0 .. $#lex_rule_to_g1_lexeme ) {
         my $g1_lexeme_id = $lex_rule_to_g1_lexeme[$lexer_rule_id];
         my $lexeme_name  = $g1_tracer->symbol_name($g1_lexeme_id);
-        my $assertion_id =
-            $lexeme_data{$lexeme_name}{lexer}{'assertion'}
-            // -1;
+        my $assertion_id = $lexeme_data{$lexeme_name}{lexer}{'assertion'} // -1;
         $thin_slg->lexer_rule_to_g1_lexeme_set( $lexer_rule_id,
             $g1_lexeme_id, $assertion_id );
         my $discard_event = $discard_event_by_lexer_rule_id[$lexer_rule_id];
         if ( defined $discard_event ) {
             my ( $event_name, $is_active ) = @{$discard_event};
-            $slg->[
-                Marpa::R3::Internal::Scanless::G::DISCARD_EVENT_BY_LEXER_RULE
-            ]->[$lexer_rule_id] = $event_name;
-            push @{ $symbol_ids_by_event_name_and_type->{$event_name}
-                    ->{discard} }, $lexer_rule_id;
+            $slg
+              ->[ Marpa::R3::Internal::Scanless::G::DISCARD_EVENT_BY_LEXER_RULE
+              ]->[$lexer_rule_id] = $event_name;
+            push
+              @{ $symbol_ids_by_event_name_and_type->{$event_name}->{discard} },
+              $lexer_rule_id;
             $thin_slg->discard_event_set( $lexer_rule_id, 1 );
             $thin_slg->discard_event_activate( $lexer_rule_id, 1 )
-                if $is_active;
+              if $is_active;
         } ## end if ( defined $discard_event )
     }
 
@@ -856,55 +911,54 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     # More lexer processing
     # Determine events by lexer rule, applying the defaults
 
-    $slg->[Marpa::R3::Internal::Scanless::G::CHARACTER_CLASS_TABLE]
-        = $character_class_table;
+    $slg->[Marpa::R3::Internal::Scanless::G::CHARACTER_CLASS_TABLE] =
+      $character_class_table;
 
     # This section violates the NAIF interface, directly changing some
     # of its internal structures.
     #
     # Some lexeme default adverbs are applied in earlier phases.
     #
-    APPLY_DEFAULT_LEXEME_ADVERBS: {
+  APPLY_DEFAULT_LEXEME_ADVERBS: {
         last APPLY_DEFAULT_LEXEME_ADVERBS if not $lexeme_default_adverbs;
 
         my $default_lexeme_action = $lexeme_default_adverbs->{action};
         my $xsy_by_isyid =
-            $g1_tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID];
+          $g1_tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID];
 
-        LEXEME:
+      LEXEME:
         for my $lexeme_name ( keys %g1_id_by_lexeme_name ) {
             my $g1_lexeme_id = $g1_id_by_lexeme_name{$lexeme_name};
-            my $xsy = $xsy_by_isyid->[$g1_lexeme_id];
+            my $xsy          = $xsy_by_isyid->[$g1_lexeme_id];
             next LEXEME if not defined $xsy;
-            next LEXEME if 
-                $xsy->[Marpa::R3::Internal::XSY::NAME_SOURCE] ne 'lexical';
+            next LEXEME
+              if $xsy->[Marpa::R3::Internal::XSY::NAME_SOURCE] ne 'lexical';
             $xsy->[Marpa::R3::Internal::XSY::LEXEME_SEMANTICS] //=
-                $default_lexeme_action;
+              $default_lexeme_action;
         } ## end LEXEME: for my $lexeme_name ( keys %g1_id_by_lexeme_name )
 
         my $blessing = $lexeme_default_adverbs->{bless};
         last APPLY_DEFAULT_LEXEME_ADVERBS if not $blessing;
         last APPLY_DEFAULT_LEXEME_ADVERBS if $blessing eq '::undef';
 
-        LEXEME:
+      LEXEME:
         for my $lexeme_name ( keys %g1_id_by_lexeme_name ) {
             my $g1_lexeme_id = $g1_id_by_lexeme_name{$lexeme_name};
-            my $xsy = $xsy_by_isyid->[$g1_lexeme_id];
+            my $xsy          = $xsy_by_isyid->[$g1_lexeme_id];
             next LEXEME if not defined $xsy;
-            next LEXEME if 
-                $xsy->[Marpa::R3::Internal::XSY::NAME_SOURCE] ne 'lexical';
+            next LEXEME
+              if $xsy->[Marpa::R3::Internal::XSY::NAME_SOURCE] ne 'lexical';
 
             if ( $blessing eq '::name' ) {
                 if ( $lexeme_name =~ / [^ [:alnum:]] /xms ) {
                     Marpa::R3::exception(
-                        qq{Lexeme blessing by '::name' only allowed if lexeme name is whitespace and alphanumerics\n},
+qq{Lexeme blessing by '::name' only allowed if lexeme name is whitespace and alphanumerics\n},
                         qq{   Problematic lexeme was <$lexeme_name>\n}
                     );
                 } ## end if ( $lexeme_name =~ / [^ [:alnum:]] /xms )
                 my $blessing_by_name = $lexeme_name;
                 $blessing_by_name =~ s/[ ]/_/gxms;
-                $xsy->[Marpa::R3::Internal::XSY::BLESSING] =
-                    $blessing_by_name;
+                $xsy->[Marpa::R3::Internal::XSY::BLESSING] = $blessing_by_name;
                 next LEXEME;
             } ## end if ( $blessing eq '::name' )
             if ( $blessing =~ / [\W] /xms ) {
