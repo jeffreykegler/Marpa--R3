@@ -56,20 +56,18 @@ use constant SEPARATOR => 9;
 use constant PROPER => 10;
 use constant DISCARD_SEPARATION => 11;
 use constant MASK => 12;
-use constant SLIF_TAG => 13;
-use constant ACTION_NAME => 14;
-use constant BLESSING => 15;
-use constant SYMBOL_AS_EVENT => 16;
-use constant EVENT => 17;
-use constant XRL => 18;
+use constant ACTION_NAME => 13;
+use constant BLESSING => 14;
+use constant SYMBOL_AS_EVENT => 15;
+use constant EVENT => 16;
+use constant XRL => 17;
 
 package Marpa::R3::Internal::Rule;
 use constant ID => 0;
 use constant NAME => 1;
 use constant DISCARD_SEPARATION => 2;
 use constant MASK => 3;
-use constant SLIF_TAG => 4;
-use constant ACTION_NAME => 5;
+use constant ACTION_NAME => 4;
 
 package Marpa::R3::Internal::Trace::G;
 use constant NAME => 0;

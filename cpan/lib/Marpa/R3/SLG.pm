@@ -362,11 +362,6 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
                       $source_xbnf_data->{$datum_key};
                     next KEY;
                 }
-                if ( $datum_key eq 'tag' ) {
-                    $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::SLIF_TAG] =
-                      $source_xbnf_data->{$datum_key};
-                    next KEY;
-                }
                 if ( $datum_key eq 'bless' ) {
                     $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::BLESSING] =
                       $source_xbnf_data->{$datum_key};
@@ -604,13 +599,8 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     my %lex_lhs           = ();
     my %lex_rhs           = ();
     my %lex_separator     = ();
-    my %lexer_rule_by_tag = ();
 
-    my $rule_tag = 'rule0';
     for my $lex_rule ( @{$lexer_rules} ) {
-        $lex_rule->{tag} = ++$rule_tag;
-        my %lex_rule_copy = %{$lex_rule};
-        $lexer_rule_by_tag{$rule_tag} = \%lex_rule_copy;
         delete $lex_rule->{event};
         delete $lex_rule->{symbol_as_event};
         $lex_lhs{ $lex_rule->{lhs} } = 1;
@@ -783,15 +773,17 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     # Apply defaults to determine the discard event for every
     # rule id of the lexer.
 
+    my $l0_xbnfs_by_irlid = $lex_tracer->[Marpa::R3::Internal::Trace::G::XBNF_BY_IRLID];
     my $default_discard_event = $discard_default_adverbs->{event};
-  RULE_ID: for my $rule_id ( 0 .. $lex_thin->highest_rule_id() ) {
-        my $tag = $lex_tracer->tag($rule_id);
-        next RULE_ID if not defined $tag;
+  RULE_ID: for my $irlid ( 0 .. $lex_thin->highest_rule_id() ) {
+        my $xbnf = $l0_xbnfs_by_irlid->[$irlid];
+        # There may be gaps in the IRLIDs
+        next RULE_ID if not defined $xbnf;
         my $event;
       FIND_EVENT: {
-            $event = $lexer_rule_by_tag{$tag}->{event};
+            $event = $xbnf->[Marpa::R3::Internal::XBNF::EVENT];
             last FIND_EVENT if defined $event;
-            my $lhs_id = $lex_thin->rule_lhs($rule_id);
+            my $lhs_id = $lex_thin->rule_lhs($irlid);
             last FIND_EVENT if $lhs_id != $lex_discard_symbol_id;
             $event = $default_discard_event;
         } ## end FIND_EVENT:
@@ -800,14 +792,14 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
         my ( $event_name, $event_starts_active ) = @{$event};
         if ( $event_name eq q{'symbol} ) {
             my @event = (
-                $lexer_rule_by_tag{$tag}->{symbol_as_event},
+                $event = $xbnf->[Marpa::R3::Internal::XBNF::SYMBOL_AS_EVENT],
                 $event_starts_active
             );
-            $discard_event_by_lexer_rule_id[$rule_id] = \@event;
+            $discard_event_by_lexer_rule_id[$irlid] = \@event;
             next RULE_ID;
         } ## end if ( $event_name eq q{'symbol} )
         if ( ( substr $event_name, 0, 1 ) ne q{'} ) {
-            $discard_event_by_lexer_rule_id[$rule_id] = $event;
+            $discard_event_by_lexer_rule_id[$irlid] = $event;
             next RULE_ID;
         }
         Marpa::R3::exception(
@@ -1244,7 +1236,6 @@ sub add_user_rule {
     my $rank;
     my $null_ranking;
     my $rule_name;
-    my $slif_tag;
     my $mask;
     my $xbnf;
     my $proper_separation = 0;
@@ -1261,7 +1252,6 @@ sub add_user_rule {
             next OPTION;
         }
         if ( $option eq 'name' )   { $rule_name = $value; next OPTION; }
-        if ( $option eq 'tag' )    { $slif_tag  = $value; next OPTION; }
         if ( $option eq 'rhs' )    { $rhs_names = $value; next OPTION }
         if ( $option eq 'lhs' )    { $lhs_name  = $value; next OPTION }
         if ( $option eq 'action' ) { $action    = $value; next OPTION }
@@ -1427,9 +1417,6 @@ sub add_user_rule {
     if ( defined $rule_name ) {
         $base_rule->[Marpa::R3::Internal::Rule::NAME] = $rule_name;
     }
-    if ( defined $slif_tag ) {
-        $base_rule->[Marpa::R3::Internal::Rule::SLIF_TAG] = $slif_tag;
-    } ## end if ( defined $slif_tag )
 
     return;
 

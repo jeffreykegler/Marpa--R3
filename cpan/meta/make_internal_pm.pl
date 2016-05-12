@@ -134,7 +134,6 @@ __DATA__
     PROPER
     DISCARD_SEPARATION
     MASK { Semantic mask of RHS symbols }
-    SLIF_TAG { A tag for use by the SLIF }
     ACTION_NAME
     BLESSING
     SYMBOL_AS_EVENT
@@ -147,7 +146,6 @@ __DATA__
     NAME
     DISCARD_SEPARATION
     MASK { Semantic mask of RHS symbols }
-    SLIF_TAG { A tag for use by the SLIF }
     ACTION_NAME
 
     :package=Marpa::R3::Internal::Trace::G
