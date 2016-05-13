@@ -459,19 +459,17 @@ sub Marpa::R3::Scanless::R::ordering_get {
 }
 
 sub resolve_rule_by_id {
-    my ( $slr, $rule_id ) = @_;
+    my ( $slr, $irlid ) = @_;
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
-    my $rules = $tracer->[Marpa::R3::Internal::Trace::G::RULES];
-    my $rule        = $rules->[$rule_id];
-    my $action_name = $rule->[Marpa::R3::Internal::Rule::ACTION_NAME];
+    my $action_name = $tracer->[Marpa::R3::Internal::Trace::G::ACTION_BY_IRLID]->[$irlid];
     my $resolve_error;
     return if not defined $action_name;
     my $resolution = Marpa::R3::Internal::Scanless::R::resolve_action( $slr,
         $action_name, \$resolve_error );
 
     if ( not $resolution ) {
-        my $rule_desc = $slr->rule_show( $rule_id );
+        my $rule_desc = $slr->rule_show( $irlid );
         Marpa::R3::exception(
             "Could not resolve rule action named '$action_name'\n",
             "  Rule was $rule_desc\n",
@@ -506,51 +504,53 @@ sub resolve_recce {
 
     my $rule_resolutions = [];
 
-    RULE: for my $rule_id ( $tracer->rule_ids() ) {
+  RULE: for my $irlid ( $tracer->rule_ids() ) {
 
-        my $rule_resolution = resolve_rule_by_id( $slr, $rule_id );
+        my $rule_resolution = resolve_rule_by_id( $slr, $irlid );
         $rule_resolution //= $default_action_resolution;
 
         if ( not $rule_resolution ) {
-            my $rule_desc = $slr->rule_show( $rule_id );
-            my $message = "Could not resolve action\n  Rule was $rule_desc\n";
+            my $rule_desc = $slr->rule_show($irlid);
+            my $message   = "Could not resolve action\n  Rule was $rule_desc\n";
 
-            my $rule   = $rules->[$rule_id];
-            my $action = $rule->[Marpa::R3::Internal::Rule::ACTION_NAME];
+            my $action =
+              $tracer->[Marpa::R3::Internal::Trace::G::ACTION_BY_IRLID]
+              ->[$irlid];
             $message .= qq{  Action was specified as "$action"\n}
-                if defined $action;
+              if defined $action;
             my $recce_error =
-                $slr->[Marpa::R3::Internal::Scanless::R::ERROR_MESSAGE];
+              $slr->[Marpa::R3::Internal::Scanless::R::ERROR_MESSAGE];
             $message .= q{  } . $recce_error if defined $recce_error;
             Marpa::R3::exception($message);
         } ## end if ( not $rule_resolution )
 
-        DETERMINE_BLESSING: {
+      DETERMINE_BLESSING: {
 
             my $blessing =
-                Marpa::R3::Internal::Scanless::R::rule_blessing_find( $slr,
-                $rule_id );
+              Marpa::R3::Internal::Scanless::R::rule_blessing_find( $slr,
+                $irlid );
             my ( $closure_name, $closure, $semantics ) = @{$rule_resolution};
 
             if ( $blessing ne '::undef' ) {
                 $semantics = '::array' if $semantics eq '::!default';
-                CHECK_SEMANTICS: {
+              CHECK_SEMANTICS: {
                     last CHECK_SEMANTICS if $semantics eq '::array';
                     last CHECK_SEMANTICS
-                        if ( substr $semantics, 0, 1 ) eq '[';
+                      if ( substr $semantics, 0, 1 ) eq '[';
                     Marpa::R3::exception(
-                        qq{Attempt to bless, but improper semantics: "$semantics"\n},
+qq{Attempt to bless, but improper semantics: "$semantics"\n},
                         qq{  Blessing: "$blessing"\n},
-                        '  Rule: ', $tracer->brief_rule($rule_id)
+                        '  Rule: ',
+                        $tracer->brief_rule($irlid)
                     );
                 } ## end CHECK_SEMANTICS:
             } ## end if ( $blessing ne '::undef' )
 
             $rule_resolution =
-                [ $closure_name, $closure, $semantics, $blessing ];
+              [ $closure_name, $closure, $semantics, $blessing ];
         } ## end DETERMINE_BLESSING:
 
-        $rule_resolutions->[$rule_id] = $rule_resolution;
+        $rule_resolutions->[$irlid] = $rule_resolution;
 
     } ## end RULE: for my $rule_id ( $tracer->rule_ids() )
 
@@ -931,17 +931,15 @@ sub registration_init {
     # it may be best to have a separate semantics object.
     my @nulling_closures = ();
     my @registrations    = ();
-    my $top_nulling_ops;
 
     WORK_ITEM: for my $work_item (@work_list) {
         my ( $irlid, $lexeme_id, $semantics, $blessing ) = @{$work_item};
 
-        my ( $closure, $xbnf, $rule, $rule_length, $is_sequence_rule,
+        my ( $closure, $xbnf, $rule_length, $is_sequence_rule,
             $is_discard_sequence_rule, $nulling_symbol_id );
         if ( defined $irlid ) {
             $nulling_symbol_id = $nulling_symbol_by_semantic_rule[$irlid];
             $closure          = $closure_by_irlid[$irlid];
-            $rule             = $rules->[$irlid];
             $xbnf             = $xbnf_by_irlid->[$irlid];
             $rule_length      = $grammar_c->rule_length($irlid);
             $is_sequence_rule = defined $grammar_c->sequence_min($irlid);
@@ -1050,7 +1048,7 @@ sub registration_init {
                     @ops = ( $op_result_is_rhs_n, $singleton_element );
                     last SET_OPS;
                 }
-                my $mask = $xbnf->[Marpa::R3::Internal::XBNF::MASK];
+                my $mask = $tracer->[Marpa::R3::Internal::Trace::G::MASK_BY_IRLID]->[$irlid];
                 my @elements =
                     grep { $mask->[$_] } 0 .. ( $rule_length - 1 );
                 if ( not scalar @elements ) {
@@ -1282,8 +1280,6 @@ sub Marpa::R3::Scanless::R::value {
         $slr->[Marpa::R3::Internal::Scanless::R::TRACE_VALUES] // 0;
     my $trace_file_handle =
         $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
-
-    my $rules = $tracer->[Marpa::R3::Internal::Trace::G::RULES];
 
     if ( scalar @_ != 1 ) {
         Marpa::R3::exception(

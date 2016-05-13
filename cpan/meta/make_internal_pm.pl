@@ -143,7 +143,6 @@ __DATA__
     :package=Marpa::R3::Internal::Rule
 
     ID
-    ACTION_NAME
 
     :package=Marpa::R3::Internal::Trace::G
 
@@ -154,6 +153,8 @@ __DATA__
     ISYID_BY_NAME
     XSY_BY_ISYID { Array mapping ISYID to XSY }
     XBNF_BY_IRLID { Array mapping IRLID to XBNF }
+    ACTION_BY_IRLID
+    MASK_BY_IRLID
     START_NAME
 
     RULES { From NAIF -- DELETE THIS }

@@ -1400,9 +1400,14 @@ sub add_user_rule {
     } ## end if ( not defined $base_rule_id or $base_rule_id < 0 )
     $tracer->[Marpa::R3::Internal::Trace::G::XBNF_BY_IRLID]->[$base_rule_id] = $xbnf;
 
+    # Later on we will need per-IRL actions and masks
+    $tracer->[Marpa::R3::Internal::Trace::G::ACTION_BY_IRLID]->[$base_rule_id] =
+        $xbnf->[Marpa::R3::Internal::XBNF::ACTION_NAME];
+    $tracer->[Marpa::R3::Internal::Trace::G::MASK_BY_IRLID]->[$base_rule_id] =
+        $xbnf->[Marpa::R3::Internal::XBNF::MASK];
+
     my $base_rule = $tracer->shadow_rule( $base_rule_id );
 
-    $base_rule->[Marpa::R3::Internal::Rule::ACTION_NAME] = $action;
     $grammar_c->rule_null_high_set( $base_rule_id,
         ( $null_ranking eq 'high' ? 1 : 0 ) );
     $grammar_c->rule_rank_set( $base_rule_id, $rank );
