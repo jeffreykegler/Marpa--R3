@@ -140,10 +140,6 @@ __DATA__
     EVENT
     XRL
 
-    :package=Marpa::R3::Internal::Rule
-
-    ID
-
     :package=Marpa::R3::Internal::Trace::G
 
     NAME { Name of the grammar -- 'L0' or 'G1' }
@@ -156,8 +152,6 @@ __DATA__
     ACTION_BY_IRLID
     MASK_BY_IRLID
     START_NAME
-
-    RULES { From NAIF -- DELETE THIS }
 
     :package=Marpa::R3::Internal::Progress_Report
 

@@ -62,9 +62,6 @@ use constant SYMBOL_AS_EVENT => 15;
 use constant EVENT => 16;
 use constant XRL => 17;
 
-package Marpa::R3::Internal::Rule;
-use constant ID => 0;
-
 package Marpa::R3::Internal::Trace::G;
 use constant NAME => 0;
 use constant C => 1;
@@ -75,7 +72,6 @@ use constant XBNF_BY_IRLID => 5;
 use constant ACTION_BY_IRLID => 6;
 use constant MASK_BY_IRLID => 7;
 use constant START_NAME => 8;
-use constant RULES => 9;
 
 package Marpa::R3::Internal::Progress_Report;
 use constant RULE_ID => 0;
