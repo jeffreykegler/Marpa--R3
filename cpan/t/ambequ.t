@@ -48,10 +48,9 @@ sub restore_stdout {
 ## no critic (Subroutines::RequireArgUnpacking, ErrorHandling::RequireCarping)
 
 sub do_op {
-    shift;
-    my ( $right_string, $right_value ) = ( $_[2] =~ /^(.*)==(.*)$/xms );
-    my ( $left_string,  $left_value )  = ( $_[0] =~ /^(.*)==(.*)$/xms );
-    my $op = $_[1];
+    my ( $right_string, $right_value ) = ( $_[1]->[2] =~ /^(.*)==(.*)$/xms );
+    my ( $left_string,  $left_value )  = ( $_[1]->[0] =~ /^(.*)==(.*)$/xms );
+    my $op = $_[1]->[1];
     my $value;
     if ( $op eq q{+} ) {
         $value = $left_value + $right_value;
@@ -69,18 +68,18 @@ sub do_op {
 } ## end sub do_op
 
 sub number {
-    shift;
-    my $v0 = pop @_;
+    my (undef, $v) = @_;
+    my $v0 = pop @{$v};
     return $v0 . q{==} . $v0;
 }
 
 sub default_action {
-    shift;
-    my $v_count = scalar @_;
-    return q{}   if $v_count <= 0;
-    return $_[0] if $v_count == 1;
-    return '(' . join( q{;}, @_ ) . ')';
-} ## end sub default_action
+    my ( undef, $v ) = @_;
+    my $v_count = scalar @{$v};
+    return q{} if $v_count <= 0;
+    return $v->[0] if $v_count == 1;
+    return '(' . join( q{;}, @{$v} ) . ')';
+}
 
 my $dsl = <<'END_OF_DSL';
 :default ::= action => main::default_action

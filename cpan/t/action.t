@@ -33,17 +33,17 @@ my $trace_rules = q{};
 # name: SLIF action context synopsis
 
 sub do_S {
-    my ($action_object) = @_;
+    my ($per_parse_object) = @_;
     my $rule_id         = $Marpa::R3::Context::rule;
     my $slg             = $Marpa::R3::Context::slg;
     my ( $lhs, @rhs ) =
         map { $slg->symbol_display_form($_) } $slg->rule_expand($rule_id);
-    $action_object->{text} =
+    $per_parse_object->{text} =
           "rule $rule_id: $lhs ::= "
         . ( join q{ }, @rhs ) . "\n"
         . "locations: "
         . ( join q{-}, Marpa::R3::Context::g1_range() ) . "\n";
-    return $action_object;
+    return $per_parse_object;
 } ## end sub do_S
 
 # Marpa::R3::Display::End
@@ -54,12 +54,14 @@ sub do_S {
 my $bail_message = "This is a bail out message!";
 
 sub do_bail_with_message_if_A {
-    my ($action_object, $terminal) = @_;
+    my ($action_object, $values) = @_;
+    my ($terminal) = @{$values};
     Marpa::R3::Context::bail($bail_message) if $terminal eq 'A';
 }
 
 sub do_bail_with_object_if_A {
-    my ($action_object, $terminal) = @_;
+    my ($action_object, $values) = @_;
+    my ($terminal) = @{$values};
     Marpa::R3::Context::bail([$bail_message]) if $terminal eq 'A';
 }
 
