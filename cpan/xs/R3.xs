@@ -21,12 +21,8 @@
 #include <XSUB.h>
 #include "ppport.h"
 
-/* This kind of pointer comparison is not portable per C89,
- * but the Perl source depends on it throughout,
- * and there seems to be no other way to do it.
- */
 #undef IS_PERL_UNDEF
-#define IS_PERL_UNDEF(x) ((x) == &PL_sv_undef)
+#define IS_PERL_UNDEF(x) (SvTYPE(x) == SVt_NULL)
 
 #undef STRINGIFY_ARG
 #undef STRINGIFY
@@ -1406,7 +1402,7 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
               }
             else
               {
-                av_store (stack, result_ix, &PL_sv_undef);
+                av_store (stack, result_ix, newSV(0));
               }
 
             if (v_wrapper->trace_values && step_type == MARPA_STEP_TOKEN)
