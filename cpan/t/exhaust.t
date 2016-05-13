@@ -46,8 +46,7 @@ my $grammar_star = Marpa::R3::Scanless::G->new( { source => \$source_star } );
 
 package My_Actions;
 sub do_list {
-    shift;
-    return join " ", @_;
+    return join " ", @{$_[1]};
 }
 
 sub show_last_expression {

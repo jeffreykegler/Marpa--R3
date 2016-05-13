@@ -31,11 +31,11 @@ use Marpa::R3;
 ## no critic (Subroutines::RequireArgUnpacking)
 
 sub default_action {
-    shift;
-    my $v_count = scalar @_;
+    my (undef, $v) = @_;
+    my $v_count = scalar @{$v};
     return q{-} if $v_count <= 0;
-    my @vals = map { $_ // q{-} } @_;
-    return $vals[0] if $v_count == 1;
+    return $v->[0] if $v_count == 1;
+    my @vals = map { $_ // q{-} } @{$v};
     return '(' . join( q{;}, @vals ) . ')';
 } ## end sub default_action
 

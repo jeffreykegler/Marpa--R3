@@ -31,7 +31,7 @@ sub generate_action {
     my ($lhs) = @_;
     return sub {
         my (undef, $values) = @_;
-        return q{-} if not defined $values;
+        return q{-} if @{$values} == 0;
         my @vals = map { $_ // q{-} } @{$values};
         return $lhs . '(' . ( join q{;}, @vals ) . ')';
         }

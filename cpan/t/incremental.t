@@ -38,9 +38,12 @@ A ::= 'a' action => main::one
 === END_OF_DSL ===
 
 sub one { return 1 }
-sub add { my (undef, $left, $right) = @_;
-# say STDERR join " ", "args:", @_;
-return $left+$right }
+
+sub add {
+    my ( undef, $values ) = @_;
+    my ( $left, $right )  = @{$values};
+    return $left + $right;
+}
 
 my $grammar = Marpa::R3::Scanless::G->new( { source  => \$dsl } );
 my $recce   = Marpa::R3::Scanless::R->new( { grammar => $grammar } );

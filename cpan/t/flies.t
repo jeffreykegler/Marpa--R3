@@ -45,17 +45,17 @@ use Marpa::R3;
 
 ## no critic (Subroutines::RequireArgUnpacking)
 
-sub do_sva_sentence      { return "sva($_[1];$_[2];$_[3])" }
-sub do_svo_sentence      { return "svo($_[1];$_[2];$_[3])" }
-sub do_adjunct           { return "adju($_[1];$_[2])" }
-sub do_adjective         { return "adje(${$_[1]})" }
-sub do_qualified_subject { return "s($_[1];$_[2])" }
-sub do_bare_subject      { return "s($_[1])" }
-sub do_noun              { return "n(${$_[1]})" }
-sub do_verb              { return "v(${$_[1]})" }
-sub do_object            { return "o($_[1];$_[2])" }
-sub do_article           { return "art(${$_[1]})" }
-sub do_preposition       { return "pr(${$_[1]})" }
+sub do_sva_sentence      { my @v = @{$_[1]}; return "sva($v[0];$v[1];$v[2])" }
+sub do_svo_sentence      { my @v = @{$_[1]}; return "svo($v[0];$v[1];$v[2])" }
+sub do_adjunct           { my @v = @{$_[1]}; return "adju($v[0];$v[1])" }
+sub do_adjective         { my @v = @{$_[1]}; return "adje(${$v[0]})" }
+sub do_qualified_subject { my @v = @{$_[1]}; return "s($v[0];$v[1])" }
+sub do_bare_subject      { my @v = @{$_[1]}; return "s($v[0])" }
+sub do_noun              { my @v = @{$_[1]}; return "n(${$v[0]})" }
+sub do_verb              { my @v = @{$_[1]}; return "v(${$v[0]})" }
+sub do_object            { my @v = @{$_[1]}; return "o($v[0];$v[1])" }
+sub do_article           { my @v = @{$_[1]}; return "art(${$v[0]})" }
+sub do_preposition       { my @v = @{$_[1]}; return "pr(${$v[0]})" }
 
 ## use critic
 

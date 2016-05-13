@@ -28,8 +28,8 @@ use Marpa::R3;
 
 sub default_action {
     my (undef, $values) = @_;
-    return q{}   if not defined $values;
     my $v_count = scalar @{$values};
+    return q{} if $v_count == 0;
     return $values->[0] if $v_count == 1;
     return '(' . join( q{;}, @{$values} ) . ')';
 } ## end sub default_action

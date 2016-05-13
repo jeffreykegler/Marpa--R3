@@ -175,14 +175,14 @@ for my $test (@tests) {
 
 package My_Actions;
 
-sub do_parens    { shift; return $_[1] }
-sub do_add       { shift; return $_[0] + $_[2] }
-sub do_subtract  { shift; return $_[0] - $_[2] }
-sub do_multiply  { shift; return $_[0] * $_[2] }
-sub do_divide    { shift; return $_[0] / $_[2] }
-sub do_pow       { shift; return $_[0]**$_[2] }
-sub do_first_arg { shift; return shift; }
-sub do_script    { shift; return join q{ }, @_ }
+sub do_parens    { return $_[1]->[1] }
+sub do_add       { return $_[1]->[0] + $_[1]->[2] }
+sub do_subtract  { return $_[1]->[0] - $_[1]->[2] }
+sub do_multiply  { return $_[1]->[0] * $_[1]->[2] }
+sub do_divide    { return $_[1]->[0] / $_[1]->[2] }
+sub do_pow       { return $_[1]->[0]**$_[1]->[2] }
+sub do_first_arg { return $_[1]->[0] }
+sub do_script    { return join q{ }, @{$_[1]} }
 
 # Marpa::R3::Display::End
 

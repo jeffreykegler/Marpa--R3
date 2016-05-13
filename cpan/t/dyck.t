@@ -100,7 +100,8 @@ EXPECTED_OUTPUT
 Test::More::is( $received, $expected , 'Dyck-Hollerith value');
 
 sub My_Actions::check_array {
-    my ( undef, undef, $declared_size, undef, $array ) = @_;
+    my ( undef, $v ) = @_;
+    my ( undef, $declared_size, undef, $array ) = @{$v};
     my $actual_size = @{$array};
     warn
         "Array size ($actual_size) does not match that specified ($declared_size)"

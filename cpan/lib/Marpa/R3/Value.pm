@@ -1467,7 +1467,7 @@ sub Marpa::R3::Scanless::R::value {
                 $eval_ok = eval {
                     local $Marpa::R3::Context::rule =
                         $null_values->[$token_id];
-                    $result = $value_ref->($semantics_arg0);
+                    $result = $value_ref->($semantics_arg0, []);
                     1;
                 };
 
