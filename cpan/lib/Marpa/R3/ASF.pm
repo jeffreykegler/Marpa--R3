@@ -280,7 +280,6 @@ sub Marpa::R3::Internal::ASF::blessings_set {
         $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     my $xbnf_by_irlid = $tracer->[Marpa::R3::Internal::Trace::G::XBNF_BY_IRLID];
     my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
-    my $rules = $tracer->[Marpa::R3::Internal::Trace::G::RULES];
     my $xsy_by_isyid   = $tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID];
 
     my $default_token_blessing_package =

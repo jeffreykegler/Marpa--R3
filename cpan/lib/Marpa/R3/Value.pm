@@ -486,7 +486,6 @@ sub resolve_recce {
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
-    my $rules = $tracer->[Marpa::R3::Internal::Trace::G::RULES];
 
     my $trace_actions =
         $slr->[Marpa::R3::Internal::Scanless::R::TRACE_ACTIONS] // 0;
@@ -555,15 +554,15 @@ qq{Attempt to bless, but improper semantics: "$semantics"\n},
     } ## end RULE: for my $rule_id ( $tracer->rule_ids() )
 
     if ( $trace_actions >= 2 ) {
-        RULE: for my $rule_id ( 0 .. $#{$rules} ) {
+        RULE: for my $rule_id ( 0 .. $grammar_c->highest_rule_id() ) {
             my ( $resolution_name, $closure ) =
                 @{ $rule_resolutions->[$rule_id] };
             say {$trace_file_handle} 'Rule ',
                 $tracer->brief_rule($rule_id),
                 qq{ resolves to "$resolution_name"}
                 or Marpa::R3::exception('print to trace handle failed');
-        } ## end RULE: for my $rule_id ( 0 .. $#{$rules} )
-    } ## end if ( $trace_actions >= 2 )
+        }
+    }
 
     my @lexeme_resolutions = ();
     SYMBOL: for my $lexeme_id ( 0 .. $grammar_c->highest_symbol_id()) {
@@ -611,7 +610,6 @@ sub registration_init {
     my $recce_c   = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
     my $trace_actions =
         $slr->[Marpa::R3::Internal::Scanless::R::TRACE_ACTIONS] // 0;
-    my $rules = $tracer->[Marpa::R3::Internal::Trace::G::RULES];
 
     my @closure_by_irlid   = ();
     my @semantics_by_irlid = ();
