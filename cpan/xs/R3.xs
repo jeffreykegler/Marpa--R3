@@ -1298,6 +1298,7 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
   dTHX;
   AV *stack = v_wrapper->stack;
   const Marpa_Value v = v_wrapper->v;
+  Scanless_R * const slr = v_wrapper->slr;
   const Marpa_Step_Type step_type = marpa_v_step_type (v);
   IV result_ix = marpa_v_result (v);
   IV *ops;
@@ -1555,7 +1556,6 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
                 {
                   SV **p_token_value_sv;
                   int token_ix = marpa_v_token_value (v);
-                  Scanless_R *slr = v_wrapper->slr;
                   if (slr && token_ix == TOKEN_VALUE_IS_LITERAL)
                     {
                       SV *sv;
@@ -1675,18 +1675,12 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
         case MARPA_OP_PUSH_START_LOCATION:
           {
             int start_location;
-            Scanless_R *slr = v_wrapper->slr;
             Marpa_Earley_Set_ID start_earley_set;
             int dummy;
 
             if (!values_av)
               {
                 values_av = (AV *) sv_2mortal ((SV *) newAV ());
-              }
-            if (!slr)
-              {
-                croak
-                  ("Problem in v->stack_step: 'push_start_location' op attempted when no slr is set");
               }
             switch (step_type)
               {
@@ -1711,16 +1705,10 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
         case MARPA_OP_PUSH_LENGTH:
           {
             int length;
-            Scanless_R *slr = v_wrapper->slr;
 
             if (!values_av)
               {
                 values_av = (AV *) sv_2mortal ((SV *) newAV ());
-              }
-            if (!slr)
-              {
-                croak
-                  ("Problem in v->stack_step: 'push_length' op attempted when no slr is set");
               }
             switch (step_type)
               {
@@ -1760,17 +1748,11 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
 
         case MARPA_OP_PUSH_G1_START:
           {
-            Scanless_R *slr = v_wrapper->slr;
             Marpa_Earley_Set_ID start_earley_set;
 
             if (!values_av)
               {
                 values_av = (AV *) sv_2mortal ((SV *) newAV ());
-              }
-            if (!slr)
-              {
-                croak
-                  ("Problem in v->stack_step: 'push_g1_start' op attempted when no slr is set");
               }
             switch (step_type)
               {
@@ -1793,16 +1775,10 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
         case MARPA_OP_PUSH_G1_LENGTH:
           {
             int length;
-            Scanless_R *slr = v_wrapper->slr;
 
             if (!values_av)
               {
                 values_av = (AV *) sv_2mortal ((SV *) newAV ());
-              }
-            if (!slr)
-              {
-                croak
-                  ("Problem in v->stack_step: 'push_length' op attempted when no slr is set");
               }
             switch (step_type)
               {
@@ -1896,7 +1872,6 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
         case MARPA_OP_RESULT_IS_TOKEN_VALUE:
           {
             SV **p_token_value_sv;
-            Scanless_R *slr = v_wrapper->slr;
             int token_ix = marpa_v_token_value (v);
 
             if (step_type != MARPA_STEP_TOKEN)
