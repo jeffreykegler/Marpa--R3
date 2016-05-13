@@ -10,9 +10,6 @@
 # or implied warranties. For details, see the full text of
 # of the licenses in the directory LICENSES.
 
-# CENSUS: ASIS
-# Note: SLIF TEST
-
 # Regression tests for several bugs found by Jean-Damien
 
 use 5.010001;
@@ -80,19 +77,15 @@ $actual_output = join " ", sort @values;
 Test::More::is( $actual_output, $expected_output, 'Values for Durand test' );
 
 sub My_Actions::do_add {
-    my ( undef, $t1, undef, $t2 ) = @_;
+    my ( undef, $v ) = @_;
+    my ( $t1, undef, $t2 ) = @{$v};
     return $t1 + $t2;
 }
 
 sub My_Actions::do_multiply {
-    my ( undef, $t1, undef, $t2 ) = @_;
+    my ( undef, $v ) = @_;
+    my ( $t1, undef, $t2 ) = @{$v};
     return $t1 * $t2;
 }
-1;    # In case used as "do" file
 
-# Local Variables:
-#   mode: cperl
-#   cperl-indent-level: 4
-#   fill-column: 100
-# End:
 # vim: expandtab shiftwidth=4:
