@@ -163,7 +163,8 @@ for my $test_data (@tests_data) {
 package My_Actions;
 
 sub do_is_var {
-    my ( undef, $var ) = @_;
+    my ( undef, $v ) = @_;
+    my ( $var ) = @{$v};
     my $value = $symbol_table{$var};
     Marpa::R3::Context::bail(qq{Undefined variable "$var"})
         if not defined $value;
@@ -171,20 +172,22 @@ sub do_is_var {
 } ## end sub do_is_var
 
 sub do_set_var {
-    my ( undef, $var, undef, $value ) = @_;
+    my ( undef, $v ) = @_;
+    my ( $var, undef, $value ) = @{$v};
     return $symbol_table{$var} = $value;
 }
 
 sub do_negate {
-    return -$_[2];
+    return -$_[1]->[1];
 }
 
-sub do_arg0 { return $_[1]; }
-sub do_arg1 { return $_[2]; }
-sub do_arg2 { return $_[3]; }
+sub do_arg0 { return $_[1]->[0]; }
+sub do_arg1 { return $_[1]->[1]; }
+sub do_arg2 { return $_[1]->[2]; }
 
 sub do_array {
-    my ( undef, $left, undef, $right ) = @_;
+    my ( undef, $v ) = @_;
+    my ( $left, undef, $right ) = @{$v};
     my @value = ();
     my $ref;
     if ( $ref = ref $left ) {
@@ -206,42 +209,48 @@ sub do_array {
     return \@value;
 } ## end sub do_array
 
-sub do_binop {
+sub binop {
     my ( $op, $left, $right ) = @_;
     my $closure = $binop_closure{$op};
     Marpa::R3::Context::bail(
         qq{Do not know how to perform binary operation "$op"})
         if not defined $closure;
     return $closure->( $left, $right );
-} ## end sub do_binop
+}
 
 sub do_caret {
-    my ( undef, $left, undef, $right ) = @_;
-    return do_binop( '^', $left, $right );
+    my ( undef, $v ) = @_;
+    my ( $left, undef, $right ) = @{$v};
+    return binop( '^', $left, $right );
 }
 
 sub do_star {
-    my ( undef, $left, undef, $right ) = @_;
-    return do_binop( '*', $left, $right );
+    my ( undef, $v ) = @_;
+    my ( $left, undef, $right ) = @{$v};
+    return binop( '*', $left, $right );
 }
 
 sub do_slash {
-    my ( undef, $left, undef, $right ) = @_;
-    return do_binop( '/', $left, $right );
+    my ( undef, $v ) = @_;
+    my ( $left, undef, $right ) = @{$v};
+    return binop( '/', $left, $right );
 }
 
 sub do_plus {
-    my ( undef, $left, undef, $right ) = @_;
-    return do_binop( '+', $left, $right );
+    my ( undef, $v ) = @_;
+    my ( $left, undef, $right ) = @{$v};
+    return binop( '+', $left, $right );
 }
 
 sub do_minus {
-    my ( undef, $left, undef, $right ) = @_;
-    return do_binop( '-', $left, $right );
+    my ( undef, $v ) = @_;
+    my ( $left, undef, $right ) = @{$v};
+    return binop( '-', $left, $right );
 }
 
 sub do_reduce {
-    my ( undef, $op, undef, $args ) = @_;
+    my ( undef, $v ) = @_;
+    my ( $op, undef, $args ) = @{$v};
     my $closure = $binop_closure{$op};
     Marpa::R3::Context::bail(
         qq{Do not know how to perform binary operation "$op"})

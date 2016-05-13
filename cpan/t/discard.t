@@ -10,9 +10,6 @@
 # or implied warranties. For details, see the full text of
 # of the licenses in the directory LICENSES.
 
-# CENSUS: ASIS
-# Note: SLIF TEST
-
 # Example of use of discard events
 
 use 5.010001;
@@ -198,43 +195,51 @@ Marpa::R3::Test::is($result, $expected_result, "interweave of events and parse t
 package My_Nodes;
 
 sub My_Nodes::do_expression {
-    my ($parse, @values) = @_;
+    my ($parse, $v) = @_;
+    my @values = @{$v};
     return \@values;
     # say STDERR "pushing value: ", Data::Dumper::Dumper(\@_);
 }
 
 sub My_Nodes::do_number {
-    my ($parse, $number) = @_;
+    my ($parse, $v) = @_;
+    my ($number) = @{$v};
     return $number+0;
 }
 
 sub My_Nodes::do_paren  {
-    my ($parse, $expr) = @_;
+    my ($parse, $v) = @_;
+    my ($expr) = @{$v};
     return $expr;
 }
 
 sub My_Nodes::do_add {
-    my ($parse, $right, $left) = @_;
+    my ($parse, $v) = @_;
+    my ($right, $left) = @{$v};
     return $right + $left;
 }
 
 sub My_Nodes::do_subtract {
-    my ($parse, $right, $left) = @_;
+    my ($parse, $v) = @_;
+    my ($right, $left) = @{$v};
     return $right - $left;
 }
 
 sub My_Nodes::do_multiply {
-    my ($parse, $right, $left) = @_;
+    my ($parse, $v) = @_;
+    my ($right, $left) = @{$v};
     return $right * $left;
 }
 
 sub My_Nodes::do_divide {
-    my ($parse, $right, $left) = @_;
+    my ($parse, $v) = @_;
+    my ($right, $left) = @{$v};
     return $right / $left;
 }
 
 sub My_Nodes::do_power {
-    my ($parse, $right, $left) = @_;
+    my ($parse, $v) = @_;
+    my ($right, $left) = @{$v};
     return $right ** $left;
 }
 
