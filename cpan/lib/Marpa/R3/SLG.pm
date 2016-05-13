@@ -430,7 +430,6 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     my $g1_tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER] =
       Marpa::R3::Trace::G->new();
     $g1_tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID] = [];
-    $g1_tracer->[Marpa::R3::Internal::Trace::G::RULES]        = [];
     $g1_tracer->[Marpa::R3::Internal::Trace::G::START_NAME]   = '[:start]';
     $g1_tracer->[Marpa::R3::Internal::Trace::G::NAME]         = 'G1';
 
@@ -664,7 +663,6 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     my $lex_tracer = $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER] =
       Marpa::R3::Trace::G->new();
     $lex_tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID] = [];
-    $lex_tracer->[Marpa::R3::Internal::Trace::G::RULES]        = [];
     $lex_tracer->[Marpa::R3::Internal::Trace::G::START_NAME] =
       $lex_start_symbol_name;
     $lex_tracer->[Marpa::R3::Internal::Trace::G::NAME] = 'L0';
@@ -982,7 +980,6 @@ qq{Lexeme blessing by '::name' only allowed if lexeme name is whitespace and alp
 sub Marpa::R3::Internal::Scanless::G::precompute {
     my ($slg, $tracer) = @_;
 
-    my $rules = $tracer->[Marpa::R3::Internal::Trace::G::RULES];
     my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
     my $xsy_by_isyid     = $tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID];
 
@@ -1081,20 +1078,6 @@ sub Marpa::R3::Internal::Scanless::G::precompute {
 
     } ## end if ( $precompute_error_code != $Marpa::R3::Error::NONE)
 
-    # Shadow all the new rules
-    {
-        my $highest_rule_id = $grammar_c->highest_rule_id();
-        RULE:
-        for ( my $rule_id = 0; $rule_id <= $highest_rule_id; $rule_id++ ) {
-            next RULE if defined $rules->[$rule_id];
-
-            # The Marpa::R3 logic assumes no "gaps" in the rule numbering,
-            # which is currently the case for Libmarpa,
-            # but not guaranteed.
-            $tracer->shadow_rule( $rule_id );
-        } ## end RULE: for ( my $rule_id = 0; $rule_id <= $highest_rule_id; ...)
-    }
-
     # Above I went through the error events
     # Here I go through the events for situations where there was no
     # hard error returned from libmarpa
@@ -1115,7 +1098,7 @@ sub Marpa::R3::Internal::Scanless::G::precompute {
 
     if ( $loop_rule_count ) {
         my @loop_rules =
-            grep { $grammar_c->rule_is_loop($_) } ( 0 .. $#{$rules} );
+            grep { $grammar_c->rule_is_loop($_) } ( 0 .. $grammar_c->highest_rule_id() );
         for my $rule_id (@loop_rules) {
             print {$trace_fh}
                 'Cycle found involving rule: ',
@@ -1239,7 +1222,6 @@ sub add_user_rule {
 
     my $subgrammar = $tracer->[Marpa::R3::Internal::Trace::G::NAME];
     my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
-    my $rules = $tracer->[Marpa::R3::Internal::Trace::G::RULES];
     my $default_rank = $grammar_c->default_rank();
 
     my ( $lhs_name, $rhs_names, $action, $blessing );
@@ -1405,8 +1387,6 @@ sub add_user_rule {
         $xbnf->[Marpa::R3::Internal::XBNF::ACTION_NAME];
     $tracer->[Marpa::R3::Internal::Trace::G::MASK_BY_IRLID]->[$base_rule_id] =
         $xbnf->[Marpa::R3::Internal::XBNF::MASK];
-
-    my $base_rule = $tracer->shadow_rule( $base_rule_id );
 
     $grammar_c->rule_null_high_set( $base_rule_id,
         ( $null_ranking eq 'high' ? 1 : 0 ) );

@@ -450,15 +450,6 @@ sub Marpa::R3::Trace::G::symbol_ids {
     return 0 .. $grammar_c->highest_symbol_id();
 }
 
-# Create the structure which "shadows" the libmarpa rule
-sub Marpa::R3::Trace::G::shadow_rule {
-    my ( $tracer, $rule_id ) = @_;
-    my $rules = $tracer->[Marpa::R3::Internal::Trace::G::RULES];
-    my $new_rule = $rules->[$rule_id] = [];
-    $new_rule->[Marpa::R3::Internal::Rule::ID] = $rule_id;
-    return $new_rule;
-} ## end sub shadow_rule
-
 sub Marpa::R3::Trace::G::brief_irl {
     my ( $tracer, $irl_id ) = @_;
     my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
