@@ -25,11 +25,11 @@ use Marpa::R3;
 ## no critic (Subroutines::RequireArgUnpacking)
 
 sub default_action {
-    shift;
-    my $v_count = scalar @_;
+    my (undef, $v) = @_;
+    my $v_count = scalar @{$v};
     return q{}   if $v_count <= 0;
-    return $_[0] if $v_count == 1;
-    return '(' . ( join q{;}, @_ ) . ')';
+    return $v->[0] if $v_count == 1;
+    return '(' . ( join q{;}, @{$v} ) . ')';
 } ## end sub default_action
 
 ## use critic

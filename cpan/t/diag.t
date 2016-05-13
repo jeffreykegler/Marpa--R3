@@ -58,7 +58,8 @@ our $SELF;
 sub new { return $SELF }
 
 sub do_list {
-    my ( $self, @results ) = @_;
+    my ( $self, $v ) = @_;
+    my @results = @{$v};
     return +( scalar @results ) . ' results: ' . join q{ }, @results;
 }
 
