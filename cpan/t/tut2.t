@@ -67,12 +67,14 @@ my $value_ref = $recce->value;
 my $value = ${$value_ref};
 
 sub My_Actions::do_add {
-    my ( undef, $t1, undef, $t2 ) = @_;
+    my ( undef, $values ) = @_;
+    my ( $t1, undef, $t2 ) = @{$values};
     return $t1 + $t2;
 }
 
 sub My_Actions::do_multiply {
-    my ( undef, $t1, undef, $t2 ) = @_;
+    my ( undef, $values ) = @_;
+    my ( $t1, undef, $t2 ) = @{$values};
     return $t1 * $t2;
 }
 

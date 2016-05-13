@@ -1499,38 +1499,32 @@ sub Marpa::R3::Scanless::R::value {
             next STEP if not defined $closure;
             my $result;
 
+                # TODO: DELETE THIS
+                die if  ref $values ne 'ARRAY' ;
+
             if ( ref $closure eq 'CODE' ) {
                 my @warnings;
                 my $eval_ok;
-                DO_EVAL: {
-                    local $SIG{__WARN__} = sub {
-                        push @warnings, [ $_[0], ( caller 0 ) ];
-                    };
-                    local $Marpa::R3::Context::rule = $rule_id;
+                local $SIG{__WARN__} = sub {
+                    push @warnings, [ $_[0], ( caller 0 ) ];
+                };
+                local $Marpa::R3::Context::rule = $rule_id;
 
-                    if ( Scalar::Util::blessed($values) ) {
-                        $eval_ok = eval {
-                            $result = $closure->( $semantics_arg0, $values );
-                            1;
-                        };
-                        last DO_EVAL;
-                    } ## end if ( Scalar::Util::blessed($values) )
-                    $eval_ok = eval {
-                        $result = $closure->( $semantics_arg0, @{$values} );
-                        1;
-                    };
-
-                } ## end DO_EVAL:
+                $eval_ok = eval {
+                    $result = $closure->( $semantics_arg0, $values );
+                    1;
+                };
 
                 if ( not $eval_ok or @warnings ) {
                     my $fatal_error = $EVAL_ERROR;
                     code_problems(
-                        {   fatal_error => $fatal_error,
+                        {
+                            fatal_error => $fatal_error,
                             eval_ok     => $eval_ok,
                             warnings    => \@warnings,
                             where       => 'computing value',
                             long_where  => 'Computing value for rule: '
-                                . $tracer->brief_rule($rule_id),
+                              . $tracer->brief_rule($rule_id),
                         }
                     );
                 } ## end if ( not $eval_ok or @warnings )

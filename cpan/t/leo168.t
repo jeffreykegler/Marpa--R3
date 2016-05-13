@@ -30,10 +30,9 @@ use Marpa::R3;
 sub generate_action {
     my ($lhs) = @_;
     return sub {
-        shift;
-        my $v_count = scalar @_;
-        return q{-} if $v_count <= 0;
-        my @vals = map { $_ // q{-} } @_;
+        my (undef, $values) = @_;
+        return q{-} if not defined $values;
+        my @vals = map { $_ // q{-} } @{$values};
         return $lhs . '(' . ( join q{;}, @vals ) . ')';
         }
 } ## end sub generate_action

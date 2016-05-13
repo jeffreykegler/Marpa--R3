@@ -36,14 +36,16 @@ use Data::Dumper;
 package Class_Actions;
 
 sub do_A {
-    my ( $self, $letter ) = @_;
+    my ( $self, $values ) = @_;
+    my ($letter) = @{$values};
     return join ';', "class method", "letter=$letter";
 }
 
 package Package_Actions;
 
 sub do_A {
-    my ( $self, $letter ) = @_;
+    my ( $self, $values ) = @_;
+    my ($letter) = @{$values};
     return join ';', "package method", "letter=$letter";
 }
 

@@ -29,8 +29,8 @@ use Marpa::R3;
 ## no critic (Subroutines::RequireArgUnpacking)
 
 sub main::default_action {
-    shift;
-    return ( join q{}, grep {defined} @_ );
+    my (undef, $values) = @_;
+    return ( join q{}, grep {defined} @{$values} );
 }
 
 ## use critic

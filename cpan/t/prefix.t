@@ -52,12 +52,12 @@ END_OF_RULES
 );
 
 sub My_Actions::do_list {
-    my ( $self, @results ) = @_;
-    return +( scalar @results ) . ' results: ' . join q{ }, @results;
+    my ( $self, $results ) = @_;
+    return +( scalar @{$results} ) . ' results: ' . join q{ }, @{$results};
 }
 
-sub My_Actions::do_add  { shift; return $_[0] + $_[1] }
-sub My_Actions::do_arg0 { shift; return shift; }
+sub My_Actions::do_add  { return $_[1]->[0] + $_[1]->[1] }
+sub My_Actions::do_arg0 { return $_[1]->[0] }
 
 sub My_Actions::show_last_expression {
     my ($self) = @_;

@@ -134,14 +134,14 @@ TEST: for my $test_data (@test_data) {
 } ## end TEST: for my $test_data (@test_data)
 
 sub concatenate {
-    shift;
-    return join q{}, grep { defined } @_;
+    my (undef, $values) = @_;
+    return join q{}, grep { defined } @{$values};
 }
 
 sub flatten {
-    shift;
+    my (undef, $values) = @_;
     my @children = ();
-  CHILD: for my $child (@_) {
+  CHILD: for my $child (@{$values}) {
         next CHILD if not defined $child;
         if ( ref $child eq 'ARRAY' ) {
             push @children, @{$child};
@@ -170,7 +170,8 @@ sub show_division {
 }
 
 sub show_function_call {
-    return $_[1] . join q{-}, Marpa::R3::Context::g1_range();
+    my (undef, $values) = @_;
+    return $values->[0] . join q{-}, Marpa::R3::Context::g1_range();
 }
 
 # vim: expandtab shiftwidth=4:

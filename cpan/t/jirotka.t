@@ -519,6 +519,6 @@ package Maql_Actions;
 
 sub new { }
 
-sub tisk { shift; return \@_; }
+sub tisk { return $_[1]; }
 
 # vim: expandtab shiftwidth=4:

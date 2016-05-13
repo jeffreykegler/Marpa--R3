@@ -117,17 +117,20 @@ sub test {
 } ## end sub test
 
 sub number {
-    my ( undef, $v1 ) = @_;
+    my ( undef, $values ) = @_;
+    my ( $v1 ) = @{$values};
     return $v1->[1];
 }
 
 sub add {
-    my ( $undef, $v1, $v2 ) = @_;
+    my ( undef, $values ) = @_;
+    my ( $v1, $v2 ) = @{$values};
     return $v1 + $v2;
 }
 
 sub multiply {
-    my ( $undef, $v1, $v2 ) = @_;
+    my ( undef, $values ) = @_;
+    my ( $v1, $v2 ) = @{$values};
     return $v1 * $v2;
 }
 

@@ -34,8 +34,8 @@ sub My_Actions::zero { return '0' }
 sub My_Actions::one  { return '1' }
 
 sub My_Actions::start_rule_action {
-    shift;
-    return join q{}, @_;
+    my (undef, $values) = @_;
+    return join q{}, @{$values};
 }
 
 ## use critic

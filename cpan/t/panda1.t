@@ -160,7 +160,7 @@ sub full_traverser {
             die "The semantics of Rule #" . $glade->rule_id() . "is not defined as a closure.";
         }
 
-        push @return_value, map { $closure->( {}, @{$_} ) } @results;
+        push @return_value, map { $closure->( {}, $_ ) } @results;
 
         # Look at the next alternative in this glade, or end the
         # loop if there is none
@@ -204,7 +204,7 @@ sub pruning_traverser {
         my $closure = $panda_recce->rule_closure($rule_id);
         die "The semantics of Rule $rule_id is not defined as a closure."
             unless defined $closure and ref $closure eq 'CODE';
-        return $closure->( {}, @return_value );
+        return $closure->( {}, \@return_value );
     }
 }
 
@@ -217,18 +217,18 @@ END_OF_OUTPUT
 Marpa::R3::Test::is( $pruned_result, $pruned_expected,
     'Ambiguous English sentence using ASF: pruned' );
 
-sub PennTags::do_S  { "(S $_[1]\n   $_[2]\n   (. .))" }
+sub PennTags::do_S  { my (undef, $values) = @_; my @v = @{$values}; "(S $v[0]\n   $v[1]\n   (. .))" }
 
-sub PennTags::do_NP_NN          { "(NP (NN $_[1]))" }
-sub PennTags::do_NP_NNS         { "(NP (NNS $_[1]))" }
-sub PennTags::do_NP_DT_NN       { "(NP (DT $_[1]) (NN $_[2]))" }
-sub PennTags::do_NP_NN_NNS      { "(NP (NN $_[1]) (NNS $_[2]))" }
-sub PennTags::do_NP_NNS_CC_NNS  { "(NP (NNS $_[1]) (CC $_[2]) (NNS $_[3]))" }
+sub PennTags::do_NP_NN          { my (undef, $values) = @_; my @v = @{$values};"(NP (NN $v[0]))" }
+sub PennTags::do_NP_NNS         { my (undef, $values) = @_; my @v = @{$values};"(NP (NNS $v[0]))" }
+sub PennTags::do_NP_DT_NN       { my (undef, $values) = @_; my @v = @{$values}; "(NP (DT $v[0]) (NN $v[1]))" }
+sub PennTags::do_NP_NN_NNS      { my (undef, $values) = @_; my @v = @{$values};"(NP (NN $v[0]) (NNS $v[1]))" }
+sub PennTags::do_NP_NNS_CC_NNS  { my (undef, $values) = @_; my @v = @{$values};"(NP (NNS $v[0]) (CC $v[1]) (NNS $v[2]))" }
 
-sub PennTags::do_VP_VBZ_NP      { "(VP (VBZ $_[1]) $_[2])" }
-sub PennTags::do_VP_VP_VBZ_NNS  { "(VP $_[1] (VBZ $_[2]) (NNS $_[3]))" }
-sub PennTags::do_VP_VP_CC_VP    { "(VP $_[1] (CC $_[2]) $_[3])" }
-sub PennTags::do_VP_VP_VP_CC_VP { "(VP $_[1] $_[2] (CC $_[3]) $_[4])" }
-sub PennTags::do_VP_VBZ         { "(VP (VBZ $_[1]))" }
+sub PennTags::do_VP_VBZ_NP      { my (undef, $values) = @_; my @v = @{$values};"(VP (VBZ $v[0]) $v[1])" }
+sub PennTags::do_VP_VP_VBZ_NNS  { my (undef, $values) = @_; my @v = @{$values};"(VP $v[0] (VBZ $v[1]) (NNS $v[2]))" }
+sub PennTags::do_VP_VP_CC_VP    { my (undef, $values) = @_; my @v = @{$values};"(VP $v[0] (CC $v[1]) $v[2])" }
+sub PennTags::do_VP_VP_VP_CC_VP { my (undef, $values) = @_; my @v = @{$values};"(VP $v[0] $v[1] (CC $v[2]) $v[3])" }
+sub PennTags::do_VP_VBZ         { my (undef, $values) = @_; my @v = @{$values};"(VP (VBZ $v[0]))" }
 
 # vim: expandtab shiftwidth=4:

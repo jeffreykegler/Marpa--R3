@@ -67,7 +67,8 @@ sub My_Actions::do_Statement {
 }
 
 sub My_Actions::do_Expression {
-    my ( undef, $lvariable, $op, $rvalue ) = @_;
+    my ( undef, $values ) = @_;
+    my ( $lvariable, $op, $rvalue ) = @{$values};
     my $original_value = $My_Actions::VALUES{$lvariable};
     return $original_value if not defined $rvalue;
     return

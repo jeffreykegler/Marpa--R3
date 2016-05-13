@@ -41,42 +41,42 @@ use Marpa::R3;
 ## no critic (Subroutines::RequireArgUnpacking)
 
 sub My_Actions::minus {
-    shift;
-    my ( $right_string, $right_value ) = ( $_[2] =~ /^(.*)==(.*)$/xms );
-    my ( $left_string,  $left_value )  = ( $_[0] =~ /^(.*)==(.*)$/xms );
+    my (undef, $values) = @_;
+    my ( $right_string, $right_value ) = ( $values->[2] =~ /^(.*)==(.*)$/xms );
+    my ( $left_string,  $left_value )  = ( $values->[0] =~ /^(.*)==(.*)$/xms );
     my $value = $left_value - $right_value;
     return '(' . $left_string . q{-} . $right_string . ')==' . $value;
 } ## end sub minus
 
 sub My_Actions::postfix_decr {
-    shift;
-    my ( $string, $value ) = ( $_[0] =~ /^(.*)==(.*)$/xms );
+    my (undef, $values) = @_;
+    my ( $string, $value ) = ( $values->[0] =~ /^(.*)==(.*)$/xms );
     return '(' . $string . q{--} . ')==' . $value--;
 }
 
 sub My_Actions::prefix_decr {
-    shift;
-    my ( $string, $value ) = ( $_[2] =~ /^(.*)==(.*)$/xms );
+    my (undef, $values) = @_;
+    my ( $string, $value ) = ( $values->[2] =~ /^(.*)==(.*)$/xms );
     return '(' . q{--} . $string . ')==' . --$value;
 }
 
 sub My_Actions::negation {
-    shift;
-    my ( $string, $value ) = ( $_[1] =~ /^(.*)==(.*)$/xms );
+    my (undef, $values) = @_;
+    my ( $string, $value ) = ( $values->[1] =~ /^(.*)==(.*)$/xms );
     return '(' . q{-} . $string . ')==' . -$value;
 }
 
 sub My_Actions::number {
-    shift;
-    return "$_[0]==$_[0]";
+    my (undef, $values) = @_;
+    return $values->[0] . q{==} . $values->[0];
 }
 
 sub My_Actions::default_action {
-    shift;
+    my (undef, $values) = @_;
     my $v_count = scalar @_;
     return q{}   if $v_count <= 0;
-    return $_[0] if $v_count == 1;
-    return '(' . join( q{;}, @_ ) . ')';
+    return $values->[0] if $v_count == 1;
+    return '(' . join( q{;}, @{$values} ) . ')';
 } ## end sub default_action
 
 ## use critic

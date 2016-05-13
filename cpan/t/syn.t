@@ -48,8 +48,8 @@ END_OF_SOURCE
 package My_Actions;
 
 sub add_sequence {
-    my ($self, @numbers) = @_;
-    return List::Util::sum @numbers, 0;
+    my ($self, $values) = @_;
+    return List::Util::sum @{$values}, 0;
 }
 
 sub show_sequence_so_far {

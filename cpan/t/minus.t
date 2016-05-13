@@ -34,34 +34,34 @@ use Marpa::R3;
 ## no critic (Subroutines::RequireArgUnpacking)
 
 sub subtraction {
-    shift;
-    my ( $right_string, $right_value ) = ( $_[2] =~ /^(.*)==(.*)$/xms );
-    my ( $left_string,  $left_value )  = ( $_[0] =~ /^(.*)==(.*)$/xms );
+    my (undef, $values) = @_;
+    my ( $right_string, $right_value ) = ( $values->[2] =~ /^(.*)==(.*)$/xms );
+    my ( $left_string,  $left_value )  = ( $values->[0] =~ /^(.*)==(.*)$/xms );
     my $value = $left_value - $right_value;
     return '(' . $left_string . q{-} . $right_string . ')==' . $value;
 } ## end sub subtraction
 
 sub postfix_decr {
-    shift;
-    my ( $string, $value ) = ( $_[0] =~ /^(.*)==(.*)$/xms );
+    my (undef, $values) = @_;
+    my ( $string, $value ) = ( $values->[0] =~ /^(.*)==(.*)$/xms );
     return '(' . $string . q{--} . ')==' . $value--;
 }
 
 sub prefix_decr {
-    shift;
-    my ( $string, $value ) = ( $_[1] =~ /^(.*)==(.*)$/xms );
+    my (undef, $values) = @_;
+    my ( $string, $value ) = ( $values->[1] =~ /^(.*)==(.*)$/xms );
     return '(' . q{--} . $string . ')==' . --$value;
 }
 
 sub negation {
-    shift;
-    my ( $string, $value ) = ( $_[1] =~ /^(.*)==(.*)$/xms );
+    my (undef, $values) = @_;
+    my ( $string, $value ) = ( $values->[1] =~ /^(.*)==(.*)$/xms );
     return '(' . q{-} . $string . ')==' . -$value;
 }
 
 sub number {
-    shift;
-    my $value = $_[0];
+    my (undef, $values) = @_;
+    my $value = $values->[0];
     return "$value==$value";
 }
 
@@ -70,10 +70,10 @@ sub minusminus {
 }
 
 sub default_action {
-    shift;
-    return q{} if scalar @_ <= 0;
-    return $_[0] if scalar @_ == 1;
-    return '(' . join( q{;}, @_ ) . ')';
+    my (undef, $values) = @_;
+    return q{} if not defined $values;
+    return $values->[0] if scalar @{$values} == 1;
+    return '(' . join( q{;}, @{$values} ) . ')';
 } ## end sub default_action
 
 ## use critic

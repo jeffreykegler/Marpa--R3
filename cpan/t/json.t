@@ -387,14 +387,13 @@ sub decode_string {
 use strict;
 
 sub MarpaX::JSON::Actions::do_object {
-    my (undef, $members) = @_;
-    use Data::Dumper;
+    my (undef, $values) = @_;
+    my ($members) = @{$values};
     return { map { @{$_} } @{$members} };
 }
 
 sub MarpaX::JSON::Actions::do_true {
-    shift;
-    return $_[0] eq 'true';
+    return $_[1]->[0] eq 'true';
 }
 
 # vim: expandtab shiftwidth=4:

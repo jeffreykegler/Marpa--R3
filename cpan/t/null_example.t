@@ -47,8 +47,8 @@ sub restore_stdout {
 # name: SLIF null value example
 
 sub do_L {
-    shift;
-    return 'L(' . ( join q{;}, map { $_ // '[ERROR!]' } @_ ) . ')';
+    my (undef, $values) = @_;
+    return 'L(' . ( join q{;}, map { $_ // '[ERROR!]' } @{$values} ) . ')';
 }
 
 sub do_R {
@@ -56,12 +56,12 @@ sub do_R {
 }
 
 sub do_S {
-    shift;
-    return 'S(' . ( join q{;}, map { $_ // '[ERROR!]' } @_ ) . ')';
+    my (undef, $values) = @_;
+    return 'S(' . ( join q{;}, map { $_ // '[ERROR!]' } @{$values} ) . ')';
 }
 
-sub do_X { return 'X(' . $_[1] . ')'; }
-sub do_Y { return 'Y(' . $_[1] . ')'; }
+sub do_X { return 'X(' . $_[1]->[0] . ')'; }
+sub do_Y { return 'Y(' . $_[1]->[0] . ')'; }
 
 ## no critic (Variables::ProhibitPackageVars)
 our $null_A = 'null A';

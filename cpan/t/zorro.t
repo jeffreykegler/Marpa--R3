@@ -30,7 +30,8 @@ sub new { my $class = shift; return bless {}, $class }
 
 ## no critic (Subroutines::RequireArgUnpacking)
 sub rule0 {
-    return $_[1] . ', but ' . $_[2];
+    my (undef, $values) = @_;
+    return $values->[0] . ', but ' . $values->[1];
 }
 ## use critic
 
