@@ -41,17 +41,19 @@ sub no_bail {
       . "locations: "
       . ( join q{-}, Marpa::R3::Context::g1_range() ) . "\n";
     return $action_object;
-} ## end sub do_S
+}
 
 my $bail_message = "This is a bail out message!";
 
 sub do_bail_with_message_if_A {
-    my ($action_object, $terminal) = @_;
+    my ($action_object, $v) = @_;
+    my ($terminal) = @{$v};
     Marpa::R3::Context::bail($bail_message) if $terminal eq 'a';
 }
 
 sub do_bail_with_object_if_A {
-    my ($action_object, $terminal) = @_;
+    my ($action_object, $v) = @_;
+    my ($terminal) = @{$v};
     Marpa::R3::Context::bail([$bail_message]) if $terminal eq 'a';
 }
 

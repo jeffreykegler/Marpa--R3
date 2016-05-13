@@ -62,8 +62,8 @@ sub do_list {
     return +( scalar @results ) . ' results: ' . join q{ }, @results;
 }
 
-sub do_add  { shift; return $_[0] + $_[1] }
-sub do_arg0 { shift; return shift; }
+sub do_add  { return $_[1]->[0] + $_[1]->[1] }
+sub do_arg0 { return $_[1]->[0] }
 
 sub show_last_expression {
     my ($self) = @_;

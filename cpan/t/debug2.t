@@ -57,12 +57,14 @@ my $grammar = Marpa::R3::Scanless::G->new( { source => \$dsl } );
 $grammar->set( { trace_file_handle => $trace_fh } );
 
 sub My_Actions::do_add {
-    my ( undef, $t1, undef, $t2 ) = @_;
+    my ( undef, $v ) = @_;
+    my ( $t1, undef, $t2 ) = @${v};
     return $t1 + $t2;
 }
 
 sub My_Actions::do_multiply {
-    my ( undef, $t1, undef, $t2 ) = @_;
+    my ( undef, $v ) = @_;
+    my ( $t1, undef, $t2 ) = @${v};
     return $t1 * $t2;
 }
 
