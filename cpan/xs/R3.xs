@@ -1417,7 +1417,7 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
                 if (p_constant_sv) {
                   event_data[2] = newSVsv (*p_constant_sv);
                 } else {
-                  event_data[2] = &PL_sv_undef;
+                  event_data[2] = newSV(0);
                 }
                 event = av_make (Dim (event_data), event_data);
                 av_push (v_wrapper->event_queue, newRV_noinc ((SV *) event));
@@ -1574,7 +1574,7 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
                     }
                   else
                     {
-                      av_push (values_av, &PL_sv_undef);
+                      av_push (values_av, newSV(0));
                     }
                 }
                 break;
@@ -1591,7 +1591,7 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
                       SV **p_sv = av_fetch (stack, stack_ix, 0);
                       if (!p_sv)
                         {
-                          av_push (values_av, &PL_sv_undef);
+                          av_push (values_av, newSV(0));
                         }
                       else
                         {
@@ -1615,7 +1615,7 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
               {
                 values_av = (AV *) sv_2mortal ((SV *) newAV ());
               }
-            av_push (values_av, &PL_sv_undef);
+            av_push (values_av, newSV(0));
           }
           goto NEXT_OP_CODE;
 
@@ -1635,7 +1635,7 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
               }
             else
               {
-                av_push (values_av, &PL_sv_undef);
+                av_push (values_av, newSV(0));
               }
 
           }
@@ -1653,13 +1653,13 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
               }
             if (step_type != MARPA_STEP_RULE)
               {
-                av_push (values_av, &PL_sv_undef);
+                av_push (values_av, newSV(0));
                 goto NEXT_OP_CODE;
               }
             p_sv = av_fetch (stack, result_ix + offset, 0);
             if (!p_sv)
               {
-                av_push (values_av, &PL_sv_undef);
+                av_push (values_av, newSV(0));
               }
             else
               {
@@ -1922,7 +1922,7 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
                 event_data[0] = newSVpv (step_type_string, 0);
                 event_data[1] = newSViv (marpa_v_token (v));
                 event_data[2] = newSViv (marpa_v_token_value (v));
-                event_data[3] = *p_token_value_sv ? newSVsv (*p_token_value_sv) : &PL_sv_undef;
+                event_data[3] = *p_token_value_sv ? newSVsv (*p_token_value_sv) : newSV(0);
                 event = av_make (Dim (event_data), event_data);
                 av_push (v_wrapper->event_queue, newRV_noinc ((SV *) event));
               }
@@ -2970,7 +2970,7 @@ PPCODE:
 	{
 	  XSRETURN_UNDEF;
 	}
-      XPUSHs (&PL_sv_undef);
+      XPUSHs (sv_2mortal (newSV (0)));
       XPUSHs (sv_2mortal (newSViv (error_code)));
     }
 }
@@ -3306,7 +3306,7 @@ PPCODE:
   Marpa_Grammar g = g_wrapper->g;
   const char *error_message =
     "Problem in $g->error(): Nothing in message buffer";
-  SV *error_code_sv = &PL_sv_undef;
+  SV *error_code_sv = 0;
 
   g_wrapper->libmarpa_error_code =
     marpa_g_error (g, &g_wrapper->libmarpa_error_string);
@@ -3324,6 +3324,9 @@ PPCODE:
     }
   if (GIMME == G_ARRAY)
     {
+      if (!error_code_sv) {
+        error_code_sv = sv_2mortal (newSV (0));
+      }
       XPUSHs (error_code_sv);
     }
   XPUSHs (sv_2mortal (newSVpv (error_message, 0)));
@@ -3642,7 +3645,7 @@ PPCODE:
 
   v_wrapper->constants = newAV ();
   /* Reserve position 0 */
-  av_push (v_wrapper->constants, &PL_sv_undef);
+  av_push (v_wrapper->constants, newSV(0));
 
   v_wrapper->rule_semantics = newAV ();
   v_wrapper->token_semantics = newAV ();
