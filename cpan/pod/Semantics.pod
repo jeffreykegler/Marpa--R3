@@ -729,36 +729,21 @@ the action name is resolved to that Perl scalar.
 
 A rule evaluation closure action is always called in scalar context,
 and its return value will be used as the value of its node.
-Arguments to the rule evaluation closure will be as follows:
+A rule evaluation closure always has exactly two arguments:
 
 =over 4
 
 =item *
 
-If the rule instance is not nulled and
-the rule alternative is not blessed,
-the second and subsequent arguments are the values of its child nodes, in lexical order.
+The first argument is the per-parse object.
 
 =item *
 
-If the rule instance is nulled, there will be only one argument:
-the per-parse argument.
-
-=item *
-
-If the rule alternative is blessed, and
-the rule instance is not nulled,
-the closure will always have exactly two arguments.
-The first will be the per-parse argument,
-and the second will be a blessed array that contains
-the child values in lexical order.
-(The grouping of child values into an array
-is required in order to allow the blessing to take effect.)
+The second argument is a reference to an array containing
+the values of the rule's child nodes, in lexical order.
+If the rule is nulled, the array will contain zero elements.
 
 =back
-
-Note that, in every case,
-the first argument of a rule evaluation closure is the per-parse argument.
 
 =head1 Quantified rule nodes
 
@@ -787,17 +772,17 @@ name: SLIF action context synopsis
 normalize-whitespace: 1
 
     sub do_S {
-        my ($action_object) = @_;
+        my ($per_parse_object) = @_;
         my $rule_id         = $Marpa::R3::Context::rule;
         my $slg             = $Marpa::R3::Context::slg;
         my ( $lhs, @rhs ) =
             map { $slg->symbol_display_form($_) } $slg->rule_expand($rule_id);
-        $action_object->{text} =
+        $per_parse_object->{text} =
               "rule $rule_id: $lhs ::= "
             . ( join q{ }, @rhs ) . "\n"
             . "locations: "
             . ( join q{-}, Marpa::R3::Context::g1_range() ) . "\n";
-        return $action_object;
+        return $per_parse_object;
     } ## end sub do_S
 
 =for Marpa::R3::Display::End

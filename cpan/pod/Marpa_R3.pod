@@ -43,12 +43,14 @@ normalize-whitespace: 1
     my $value_ref = $grammar->parse( \$input, 'My_Actions' );
 
     sub My_Actions::do_add {
-        my ( undef, $t1, undef, $t2 ) = @_;
+        my ( undef, $values ) = @_;
+        my ( $t1, undef, $t2 ) = @{$values};
         return $t1 + $t2;
     }
 
     sub My_Actions::do_multiply {
-        my ( undef, $t1, undef, $t2 ) = @_;
+        my ( undef, $values ) = @_;
+        my ( $t1, undef, $t2 ) = @{$values};
         return $t1 * $t2;
     }
 
@@ -520,7 +522,8 @@ partial: 1
 normalize-whitespace: 1
 
     sub My_Actions::do_multiply {
-        my ( undef, $t1, undef, $t2 ) = @_;
+        my ( undef, $values ) = @_;
+        my ( $t1, undef, $t2 ) = @{$values};
         return $t1 * $t2;
     }
 
@@ -536,7 +539,8 @@ partial: 1
 normalize-whitespace: 1
 
     sub My_Actions::do_add {
-        my ( undef, $t1, undef, $t2 ) = @_;
+        my ( undef, $values ) = @_;
+        my ( $t1, undef, $t2 ) = @{$values};
         return $t1 + $t2;
     }
 

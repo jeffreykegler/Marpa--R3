@@ -188,7 +188,7 @@ the semantics package.
 ==head2 The semantic closure now always receives exactly 2 arguments
 
 Under Marpa::R2, the semantic closure received a varying number
-of arguments, depending on the circumstancs.
+of arguments, depending on circumstances.
 Under Marpa::R3, the semantic closure always receives exactly 
 2 arguments.
 The first argument is the per-parse object.
