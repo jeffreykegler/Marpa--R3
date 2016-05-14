@@ -822,12 +822,14 @@ normalize-whitespace: 1
     my $bail_message = "This is a bail out message!";
 
     sub do_bail_with_message_if_A {
-        my ($action_object, $terminal) = @_;
+        my ($action_object, $values) = @_;
+        my ($terminal) = @{$values};
         Marpa::R3::Context::bail($bail_message) if $terminal eq 'A';
     }
 
     sub do_bail_with_object_if_A {
-        my ($action_object, $terminal) = @_;
+        my ($action_object, $values) = @_;
+        my ($terminal) = @{$values};
         Marpa::R3::Context::bail([$bail_message]) if $terminal eq 'A';
     }
 
