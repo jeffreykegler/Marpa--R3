@@ -53,6 +53,7 @@ cpan/lib/Marpa/R3/Thin/G.pm
 cpan/lib/Marpa/R3/Thin/R.pm
 cpan/lib/Marpa/R3/Trace/G.pm
 cpan/lib/Marpa/R3/Value.pm
+cpan/lib/Marpa/R3/X.pm
 cpan/Makefile.PL
 cpan/meta/make_internal_pm.pl
 cpan/xs/Makefile.PL
