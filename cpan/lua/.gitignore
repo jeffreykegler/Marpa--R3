@@ -3,4 +3,5 @@
 /alllib[.]o
 /marpa_lua[.]a
 /MYMETA[.]*
+# don't know why this is created -- it should not be
 /blib

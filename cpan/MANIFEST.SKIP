@@ -69,6 +69,9 @@
 ^lib/Marpa/R3[.]c
 ^lib/Marpa/R3[.]xs
 ^libmarpa_build/
+^lua/MYMETA.
+^lua/Makefile[.]old$
+^lua/blib/
 ^nogit
 ^nogit/
 ^notes/
