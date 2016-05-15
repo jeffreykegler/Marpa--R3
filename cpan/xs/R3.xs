@@ -19,7 +19,7 @@
 #include <lualib.h>
 #include <lauxlib.h>
 
-static lua_State *INTERPRETER = NULL;
+static lua_State *lua_interp = NULL;
 
 #define PERL_NO_GET_CONTEXT
 #include <EXTERN.h>
@@ -7073,10 +7073,11 @@ BOOT:
     /* Perl threads now discouraged, so we no longer worry about
      * thread safety
      */
-     INTERPRETER = marpa_luaL_newstate();
-     if (!INTERPRETER) {
+     lua_interp = marpa_luaL_newstate();
+     if (!lua_interp) {
       croak ("Marpa::R3 internal error: Lua interpreter failed to start");
        }
+    marpa_luaL_openlibs(lua_interp);  /* open libraries */
 
     marpa_debug_handler_set(marpa_r3_warn);
 
