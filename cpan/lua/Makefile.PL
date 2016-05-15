@@ -33,9 +33,7 @@ $define .= ' -DLUA_USE_LINUX' if ($^O eq 'darwin');
 $define .= ' -DLUA_USE_POSIX' if ($^O eq 'solaris');
 
 my @h_files = <*.h>;
-my @c_files = <*.c>;
-my $o_files = join q{ }, @c_files;
-$o_files =~ s/[.]c/.o/xmsg;
+my $c_files = 'alllib$(OBJ_EXT)';
 
 WriteMakefile(
     NAME      => 'marpa',
