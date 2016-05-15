@@ -185,7 +185,7 @@ became the semantics package.
 In Marpa::R3, the per-parse argument has no effect on
 the semantics package.
 
-==head2 The semantic closure now always receives exactly 2 arguments
+=head2 The semantic closure now always receives exactly 2 arguments
 
 Under Marpa::R2, the semantic closure received a varying number
 of arguments, depending on circumstances.
@@ -196,6 +196,16 @@ The second argument is a reference to an array containing
 the values of the child nodes, in lexical order.
 If there were no child nodes visible to the semantics,
 then the second argument is an empty array.
+
+=head2 Marpa::R3 does not support Perl threads
+
+Perl interpreter-based threads are now
+L<officially "discouraged"|perlthread/"WARNNG">,
+and
+Marpa::R3 does not support them.
+Marpa::R3's underlying library is thread-safe.
+When and if there is stable Perl threading,
+Marpa::R3 could be enhanced to support it.
 
 =head1 COPYRIGHT AND LICENSE
 

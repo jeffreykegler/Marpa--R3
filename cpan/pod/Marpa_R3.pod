@@ -578,20 +578,12 @@ or tainted token values.
 
 =head1 Threads
 
-When used in a thread-safe Perl, Marpa::R3 should be thread-safe,
-with one important restriction:
-All Marpa objects that share the same grammar must be created
-and used within a single thread.
-
-This restriction may be lifted someday, but
-in practice it does not seem onerous.
-Note that
-you can use
-the same grammar in different
-threads by creating grammars
-that are exact
-copies of each other,
-one grammar per thread.
+Perl interpreter-based threads are now
+L<officially "discouraged"|perlthread/"WARNNG">,
+and Marpa::R3 does not support them.
+Marpa::R3's underlying library is thread-safe.
+When and if there is stable Perl threading,
+Marpa::R3 could be enhanced to support it.
 
 =head1 The Marpa:: namespace
 
