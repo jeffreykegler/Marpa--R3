@@ -33,16 +33,19 @@ $define .= ' -DLUA_USE_LINUX' if ($^O eq 'darwin');
 $define .= ' -DLUA_USE_POSIX' if ($^O eq 'solaris');
 
 my @h_files = <*.h>;
-my $c_files = 'alllib$(OBJ_EXT)';
+my @c_files = <*.c>;
+my $o_files = join q{ }, @c_files;
+$o_files =~ s/[.]c/.o/xmsg;
 
 WriteMakefile(
-    NAME      => 'marpa',
-    DEFINE    => $define,
-    SKIP      => [qw(test test_dynamic dynamic dynamic_lib dlsyms)],
-    OBJECT    => $o_files,
-    clean     => {'FILES' => 'marpa_lua$(LIB_EXT)'},
-    H         => \@h_files,
-    C         => \@c_files,
+    NAME   => 'marpa',
+    DEFINE => $define,
+    SKIP   => [qw(test test_dynamic dynamic dynamic_lib dlsyms)],
+    OBJECT => $o_files,
+    INC    => '-Ic_pieces',
+    clean  => { 'FILES' => 'marpa_lua$(LIB_EXT)' },
+    H      => \@h_files,
+    C      => \@c_files,
 );
 
 sub MY::constants {
