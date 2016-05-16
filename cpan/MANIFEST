@@ -170,7 +170,9 @@ lua/ltable.h
 lua/ltablib.c.h
 lua/ltm.c.h
 lua/ltm.h
+lua/lua.c.h
 lua/lua.h
+lua/luac.c.h
 lua/luaconf.h
 lua/lualib.h
 lua/lundump.c.h

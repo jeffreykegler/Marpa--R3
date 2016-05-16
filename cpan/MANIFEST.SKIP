@@ -73,11 +73,12 @@ lua[.]old/
 ^lib/Marpa/R3[.]xs
 ^libmarpa_build/
 ^lua/MYMETA.
-^lua/Makefile
+^lua/Makefile$
 ^lua/Makefile[.]old$
 ^lua/blib/
-^lua/lua
-^lua/luac
+^lua/lua$
+^lua/lua_prefix[.]pl$
+^lua/luac$
 ^nogit
 ^nogit/
 ^notes/
