@@ -3,6 +3,7 @@
 /luac
 /luac[.]o
 /lua[.]o
+/one[.]o
 /Makefile
 /Makefile[.]old
 /marpa_lua[.]a
