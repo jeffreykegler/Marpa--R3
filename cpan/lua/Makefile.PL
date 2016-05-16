@@ -32,15 +32,11 @@ $define .= ' -DLUA_USE_POSIX' if ($^O eq 'linux');
 $define .= ' -DLUA_USE_POSIX' if ($^O eq 'darwin');
 $define .= ' -DLUA_USE_POSIX' if ($^O eq 'solaris');
 
-my @h_files = <*.h>;
-my @c_files = <*.c>;
-my $o_files = [qw(alllib.o lua.o luac.o)];
-
 WriteMakefile(
     NAME   => 'marpa',
     DEFINE => $define,
     SKIP   => [qw(test test_dynamic dynamic dynamic_lib dlsyms)],
-    OBJECT => $o_files,
+    # OBJECT => $o_files,
     clean  => { 'FILES' => 'marpa_lua$(LIB_EXT)' },
     # H      => \@h_files,
     # C      => \@c_files,
@@ -49,31 +45,7 @@ WriteMakefile(
 sub MY::top_targets {
     my $r = q{
 
-LUA_A=	marpa_lua.a
-BASE_O= alllib.o
-
-LUA_T=	lua
-LUA_O=	lua.o
-
-LUAC_T=	luac
-LUAC_O=	luac.o
-
-ALL_O= $(BASE_O) $(LUA_O) $(LUAC_O)
-ALL_T= $(LUA_A) $(LUA_T) $(LUAC_T)
-ALL_A= $(LUA_A)
-
-$(LUA_A): $(BASE_O)
-	$(RM_RF) $@
-	$(FULL_AR) $(AR_STATIC_ARGS) $@ $(BASE_O) && $(RANLIB) $@
-	$(CHMOD) $(PERM_RWX) $@
-
-$(LUA_T): $(LUA_O) $(LUA_A)
-	$(CC) -o $@ $(LDFLAGS) $(LUA_O) $(LUA_A) -lm
-
-$(LUAC_T): $(LUAC_O) $(LUA_A)
-	$(CC) -o $@ $(LDFLAGS) $(LUAC_O) $(LUA_A) -lm
-
-all :: marpa_lua$(LIB_EXT) $(LUA_T) $(LUAC_T)
+all :: marpa_lua$(LIB_EXT) lua luac
 	$(NOECHO) $(NOOP)
 
 config ::
@@ -87,6 +59,23 @@ test ::
 # “don’t know how to make test_dynamic” complaints under freebsd
 test_dynamic ::
 	$(NOECHO) $(NOOP)
+
+marpa_lua$(LIB_EXT): one$(OBJ_EXT)
+	$(RM_RF) $@
+	$(FULL_AR) $(AR_STATIC_ARGS) $@ one$(OBJ_EXT) && $(RANLIB) $@
+	$(CHMOD) $(PERM_RWX) $@
+
+one$(OBJ_EXT):
+	$(CC) -c $(PASTHRU_INC) $(INC) $(CCFLAGS) $(OPTIMIZE) \
+	  $(CCCDLFLAGS) $(PASTHRU_DEFINE) $(DEFINE) -DMAKE_LIB one.c
+
+lua: one.c
+	$(CC) -o $@ $(PASTHRU_INC) $(INC) $(CCFLAGS) $(OPTIMIZE) \
+	  $(PASTHRU_DEFINE) $(DEFINE) -DMAKE_LUA one.c -lm
+
+luac: one.c
+	$(CC) -o $@ $(PASTHRU_INC) $(INC) $(CCFLAGS) $(OPTIMIZE) \
+	  $(PASTHRU_DEFINE) $(DEFINE) -DMAKE_LUAC one.c -lm
 
 };
 }

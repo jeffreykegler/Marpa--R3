@@ -1,5 +1,9 @@
+/alllib[.]o
+/lua
+/luac
+/luac[.]o
+/lua[.]o
 /Makefile
 /Makefile[.]old
-/alllib[.]o
 /marpa_lua[.]a
 /MYMETA[.]*

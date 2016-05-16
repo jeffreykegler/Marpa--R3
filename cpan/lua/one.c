@@ -2,22 +2,13 @@
 * one.c -- Lua core, libraries, and interpreter in a single file
 */
 
-/* default is to build the full interpreter */
+/* default is to build the library */
 #ifndef MAKE_LIB
 #ifndef MAKE_LUAC
 #ifndef MAKE_LUA
-#define MAKE_LUA
+#define MAKE_LIB
 #endif
 #endif
-#endif
-
-/* choose suitable platform-specific features */
-/* some of these may need extra libraries such as -ldl -lreadline -lncurses */
-#if 0
-#define LUA_USE_LINUX
-#define LUA_USE_MACOSX
-#define LUA_USE_POSIX
-#define LUA_ANSI
 #endif
 
 /* no need to change anything below this line ----------------------------- */
@@ -38,51 +29,52 @@
 #define LUAI_DDEF	static
 
 /* core -- used by all */
-#include "lapi.c"
-#include "lcode.c"
-#include "lctype.c"
-#include "ldebug.c"
-#include "ldo.c"
-#include "ldump.c"
-#include "lfunc.c"
-#include "lgc.c"
-#include "llex.c"
-#include "lmem.c"
-#include "lobject.c"
-#include "lopcodes.c"
-#include "lparser.c"
-#include "lstate.c"
-#include "lstring.c"
-#include "ltable.c"
-#include "ltm.c"
-#include "lundump.c"
-#include "lvm.c"
-#include "lzio.c"
+#include "lapi.c.h"
+#include "lcode.c.h"
+#include "lctype.c.h"
+#include "ldebug.c.h"
+#include "ldo.c.h"
+#include "ldump.c.h"
+#include "lfunc.c.h"
+#include "lgc.c.h"
+#include "llex.c.h"
+#include "lmem.c.h"
+#include "lobject.c.h"
+#include "lopcodes.c.h"
+#include "lparser.c.h"
+#include "lstate.c.h"
+#include "lstring.c.h"
+#include "ltable.c.h"
+#include "ltm.c.h"
+#include "lundump.c.h"
+#include "lvm.c.h"
+#include "lzio.c.h"
 
 /* auxiliary library -- used by all */
-#include "lauxlib.c"
+#include "lauxlib.c.h"
 
 /* standard library  -- not used by luac */
 #ifndef MAKE_LUAC
-#include "lbaselib.c"
-#include "lbitlib.c"
-#include "lcorolib.c"
-#include "ldblib.c"
-#include "liolib.c"
-#include "lmathlib.c"
-#include "loadlib.c"
-#include "loslib.c"
-#include "lstrlib.c"
-#include "ltablib.c"
-#include "linit.c"
+#include "lbaselib.c.h"
+#include "lbitlib.c.h"
+#include "lcorolib.c.h"
+#include "ldblib.c.h"
+#include "liolib.c.h"
+#include "lmathlib.c.h"
+#include "loadlib.c.h"
+#include "loslib.c.h"
+#include "lstrlib.c.h"
+#include "ltablib.c.h"
+#include "lutf8lib.c.h"
+#include "linit.c.h"
 #endif
 
 /* lua */
 #ifdef MAKE_LUA
-#include "lua.c"
+#include "lua.c.h"
 #endif
 
 /* luac */
 #ifdef MAKE_LUAC
-#include "luac.c"
+#include "luac.c.h"
 #endif
