@@ -71,9 +71,9 @@ static const char *utf8_decode (const char *o, int *val) {
 static int utflen (lua_State *L) {
   int n = 0;
   size_t len;
-  const char *s = luaL_checklstring(L, 1, &len);
-  lua_Integer posi = u_posrelat(luaL_optinteger(L, 2, 1), len);
-  lua_Integer posj = u_posrelat(luaL_optinteger(L, 3, -1), len);
+  const char *s = marpa_luaL_checklstring(L, 1, &len);
+  lua_Integer posi = u_posrelat(marpa_luaL_optinteger(L, 2, 1), len);
+  lua_Integer posj = u_posrelat(marpa_luaL_optinteger(L, 3, -1), len);
   luaL_argcheck(L, 1 <= posi && --posi <= (lua_Integer)len, 2,
                    "initial position out of string");
   luaL_argcheck(L, --posj < (lua_Integer)len, 3,
@@ -81,14 +81,14 @@ static int utflen (lua_State *L) {
   while (posi <= posj) {
     const char *s1 = utf8_decode(s + posi, NULL);
     if (s1 == NULL) {  /* conversion error? */
-      lua_pushnil(L);  /* return nil ... */
-      lua_pushinteger(L, posi + 1);  /* ... and current position */
+      marpa_lua_pushnil(L);  /* return nil ... */
+      marpa_lua_pushinteger(L, posi + 1);  /* ... and current position */
       return 2;
     }
     posi = s1 - s;
     n++;
   }
-  lua_pushinteger(L, n);
+  marpa_lua_pushinteger(L, n);
   return 1;
 }
 
@@ -99,26 +99,26 @@ static int utflen (lua_State *L) {
 */
 static int codepoint (lua_State *L) {
   size_t len;
-  const char *s = luaL_checklstring(L, 1, &len);
-  lua_Integer posi = u_posrelat(luaL_optinteger(L, 2, 1), len);
-  lua_Integer pose = u_posrelat(luaL_optinteger(L, 3, posi), len);
+  const char *s = marpa_luaL_checklstring(L, 1, &len);
+  lua_Integer posi = u_posrelat(marpa_luaL_optinteger(L, 2, 1), len);
+  lua_Integer pose = u_posrelat(marpa_luaL_optinteger(L, 3, posi), len);
   int n;
   const char *se;
   luaL_argcheck(L, posi >= 1, 2, "out of range");
   luaL_argcheck(L, pose <= (lua_Integer)len, 3, "out of range");
   if (posi > pose) return 0;  /* empty interval; return no values */
   if (pose - posi >= INT_MAX)  /* (lua_Integer -> int) overflow? */
-    return luaL_error(L, "string slice too long");
+    return marpa_luaL_error(L, "string slice too long");
   n = (int)(pose -  posi) + 1;
-  luaL_checkstack(L, n, "string slice too long");
+  marpa_luaL_checkstack(L, n, "string slice too long");
   n = 0;
   se = s + pose;
   for (s += posi - 1; s < se;) {
     int code;
     s = utf8_decode(s, &code);
     if (s == NULL)
-      return luaL_error(L, "invalid UTF-8 code");
-    lua_pushinteger(L, code);
+      return marpa_luaL_error(L, "invalid UTF-8 code");
+    marpa_lua_pushinteger(L, code);
     n++;
   }
   return n;
@@ -126,9 +126,9 @@ static int codepoint (lua_State *L) {
 
 
 static void pushutfchar (lua_State *L, int arg) {
-  lua_Integer code = luaL_checkinteger(L, arg);
+  lua_Integer code = marpa_luaL_checkinteger(L, arg);
   luaL_argcheck(L, 0 <= code && code <= MAXUNICODE, arg, "value out of range");
-  lua_pushfstring(L, "%U", (long)code);
+  marpa_lua_pushfstring(L, "%U", (long)code);
 }
 
 
@@ -136,18 +136,18 @@ static void pushutfchar (lua_State *L, int arg) {
 ** utfchar(n1, n2, ...)  -> char(n1)..char(n2)...
 */
 static int utfchar (lua_State *L) {
-  int n = lua_gettop(L);  /* number of arguments */
+  int n = marpa_lua_gettop(L);  /* number of arguments */
   if (n == 1)  /* optimize common case of single char */
     pushutfchar(L, 1);
   else {
     int i;
     luaL_Buffer b;
-    luaL_buffinit(L, &b);
+    marpa_luaL_buffinit(L, &b);
     for (i = 1; i <= n; i++) {
       pushutfchar(L, i);
-      luaL_addvalue(&b);
+      marpa_luaL_addvalue(&b);
     }
-    luaL_pushresult(&b);
+    marpa_luaL_pushresult(&b);
   }
   return 1;
 }
@@ -159,10 +159,10 @@ static int utfchar (lua_State *L) {
 */
 static int byteoffset (lua_State *L) {
   size_t len;
-  const char *s = luaL_checklstring(L, 1, &len);
-  lua_Integer n  = luaL_checkinteger(L, 2);
+  const char *s = marpa_luaL_checklstring(L, 1, &len);
+  lua_Integer n  = marpa_luaL_checkinteger(L, 2);
   lua_Integer posi = (n >= 0) ? 1 : len + 1;
-  posi = u_posrelat(luaL_optinteger(L, 3, posi), len);
+  posi = u_posrelat(marpa_luaL_optinteger(L, 3, posi), len);
   luaL_argcheck(L, 1 <= posi && --posi <= (lua_Integer)len, 3,
                    "position out of range");
   if (n == 0) {
@@ -171,7 +171,7 @@ static int byteoffset (lua_State *L) {
   }
   else {
     if (iscont(s + posi))
-      luaL_error(L, "initial position is a continuation byte");
+      marpa_luaL_error(L, "initial position is a continuation byte");
     if (n < 0) {
        while (n < 0 && posi > 0) {  /* move back */
          do {  /* find beginning of previous character */
@@ -191,16 +191,16 @@ static int byteoffset (lua_State *L) {
      }
   }
   if (n == 0)  /* did it find given character? */
-    lua_pushinteger(L, posi + 1);
+    marpa_lua_pushinteger(L, posi + 1);
   else  /* no such character */
-    lua_pushnil(L);
+    marpa_lua_pushnil(L);
   return 1;  
 }
 
 
 static int iter_aux (lua_State *L) {
   size_t len;
-  const char *s = luaL_checklstring(L, 1, &len);
+  const char *s = marpa_luaL_checklstring(L, 1, &len);
   lua_Integer n = lua_tointeger(L, 2) - 1;
   if (n < 0)  /* first iteration? */
     n = 0;  /* start from here */
@@ -214,9 +214,9 @@ static int iter_aux (lua_State *L) {
     int code;
     const char *next = utf8_decode(s + n, &code);
     if (next == NULL || iscont(next))
-      return luaL_error(L, "invalid UTF-8 code");
-    lua_pushinteger(L, n + 1);
-    lua_pushinteger(L, code);
+      return marpa_luaL_error(L, "invalid UTF-8 code");
+    marpa_lua_pushinteger(L, n + 1);
+    marpa_lua_pushinteger(L, code);
     return 2;
   }
 }
@@ -225,8 +225,8 @@ static int iter_aux (lua_State *L) {
 static int iter_codes (lua_State *L) {
   luaL_checkstring(L, 1);
   lua_pushcfunction(L, iter_aux);
-  lua_pushvalue(L, 1);
-  lua_pushinteger(L, 0);
+  marpa_lua_pushvalue(L, 1);
+  marpa_lua_pushinteger(L, 0);
   return 3;
 }
 
@@ -247,10 +247,10 @@ static const luaL_Reg funcs[] = {
 };
 
 
-LUAMOD_API int luaopen_utf8 (lua_State *L) {
+LUAMOD_API int marpa_luaopen_utf8 (lua_State *L) {
   luaL_newlib(L, funcs);
-  lua_pushlstring(L, UTF8PATT, sizeof(UTF8PATT)/sizeof(char) - 1);
-  lua_setfield(L, -2, "charpattern");
+  marpa_lua_pushlstring(L, UTF8PATT, sizeof(UTF8PATT)/sizeof(char) - 1);
+  marpa_lua_setfield(L, -2, "charpattern");
   return 1;
 }
 

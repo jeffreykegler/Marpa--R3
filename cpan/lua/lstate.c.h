@@ -85,7 +85,7 @@ static unsigned int makeseed (lua_State *L) {
   addbuff(buff, p, L);  /* heap variable */
   addbuff(buff, p, &h);  /* local variable */
   addbuff(buff, p, luaO_nilobject);  /* global variable */
-  addbuff(buff, p, &lua_newstate);  /* public function */
+  addbuff(buff, p, &marpa_lua_newstate);  /* public function */
   lua_assert(p == sizeof(buff));
   return luaS_hash(buff, p, h);
 }
@@ -209,7 +209,7 @@ static void f_luaopen (lua_State *L, void *ud) {
   luaT_init(L);
   luaX_init(L);
   g->gcrunning = 1;  /* allow gc */
-  g->version = lua_version(NULL);
+  g->version = marpa_lua_version(NULL);
   luai_userstateopen(L);
 }
 
@@ -252,7 +252,7 @@ static void close_state (lua_State *L) {
 }
 
 
-LUA_API lua_State *lua_newthread (lua_State *L) {
+LUA_API lua_State *marpa_lua_newthread (lua_State *L) {
   global_State *g = G(L);
   lua_State *L1;
   lua_lock(L);
@@ -292,7 +292,7 @@ void luaE_freethread (lua_State *L, lua_State *L1) {
 }
 
 
-LUA_API lua_State *lua_newstate (lua_Alloc f, void *ud) {
+LUA_API lua_State *marpa_lua_newstate (lua_Alloc f, void *ud) {
   int i;
   lua_State *L;
   global_State *g;
@@ -338,7 +338,7 @@ LUA_API lua_State *lua_newstate (lua_Alloc f, void *ud) {
 }
 
 
-LUA_API void lua_close (lua_State *L) {
+LUA_API void marpa_lua_close (lua_State *L) {
   L = G(L)->mainthread;  /* only the main thread can be closed */
   lua_lock(L);
   close_state(L);

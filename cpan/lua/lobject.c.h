@@ -406,7 +406,7 @@ const char *luaO_pushvfstring (lua_State *L, const char *fmt, va_list argp) {
         break;
       }
       default: {
-        luaG_runerror(L, "invalid option '%%%c' to 'lua_pushfstring'",
+        luaG_runerror(L, "invalid option '%%%c' to 'marpa_lua_pushfstring'",
                          *(e + 1));
       }
     }

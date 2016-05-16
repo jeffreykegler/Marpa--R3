@@ -68,7 +68,7 @@
 /* ISO C definitions */
 #define l_popen(L,c,m)  \
 	  ((void)((void)c, m), \
-	  luaL_error(L, "'popen' not supported"), \
+	  marpa_luaL_error(L, "'popen' not supported"), \
 	  (FILE*)0)
 #define l_pclose(L,file)		((void)L, (void)file, -1)
 
@@ -141,17 +141,17 @@
 typedef luaL_Stream LStream;
 
 
-#define tolstream(L)	((LStream *)luaL_checkudata(L, 1, LUA_FILEHANDLE))
+#define tolstream(L)	((LStream *)marpa_luaL_checkudata(L, 1, LUA_FILEHANDLE))
 
 #define isclosed(p)	((p)->closef == NULL)
 
 
 static int io_type (lua_State *L) {
   LStream *p;
-  luaL_checkany(L, 1);
-  p = (LStream *)luaL_testudata(L, 1, LUA_FILEHANDLE);
+  marpa_luaL_checkany(L, 1);
+  p = (LStream *)marpa_luaL_testudata(L, 1, LUA_FILEHANDLE);
   if (p == NULL)
-    lua_pushnil(L);  /* not a file */
+    marpa_lua_pushnil(L);  /* not a file */
   else if (isclosed(p))
     lua_pushliteral(L, "closed file");
   else
@@ -165,7 +165,7 @@ static int f_tostring (lua_State *L) {
   if (isclosed(p))
     lua_pushliteral(L, "file (closed)");
   else
-    lua_pushfstring(L, "file (%p)", p->f);
+    marpa_lua_pushfstring(L, "file (%p)", p->f);
   return 1;
 }
 
@@ -173,7 +173,7 @@ static int f_tostring (lua_State *L) {
 static FILE *tofile (lua_State *L) {
   LStream *p = tolstream(L);
   if (isclosed(p))
-    luaL_error(L, "attempt to use a closed file");
+    marpa_luaL_error(L, "attempt to use a closed file");
   lua_assert(p->f);
   return p->f;
 }
@@ -185,9 +185,9 @@ static FILE *tofile (lua_State *L) {
 ** handle is in a consistent state.
 */
 static LStream *newprefile (lua_State *L) {
-  LStream *p = (LStream *)lua_newuserdata(L, sizeof(LStream));
+  LStream *p = (LStream *)marpa_lua_newuserdata(L, sizeof(LStream));
   p->closef = NULL;  /* mark file handle as 'closed' */
-  luaL_setmetatable(L, LUA_FILEHANDLE);
+  marpa_luaL_setmetatable(L, LUA_FILEHANDLE);
   return p;
 }
 
@@ -207,7 +207,7 @@ static int aux_close (lua_State *L) {
 
 static int io_close (lua_State *L) {
   if (lua_isnone(L, 1))  /* no argument? */
-    lua_getfield(L, LUA_REGISTRYINDEX, IO_OUTPUT);  /* use standard output */
+    marpa_lua_getfield(L, LUA_REGISTRYINDEX, IO_OUTPUT);  /* use standard output */
   tofile(L);  /* make sure argument is an open stream */
   return aux_close(L);
 }
@@ -227,7 +227,7 @@ static int f_gc (lua_State *L) {
 static int io_fclose (lua_State *L) {
   LStream *p = tolstream(L);
   int res = fclose(p->f);
-  return luaL_fileresult(L, (res == 0), NULL);
+  return marpa_luaL_fileresult(L, (res == 0), NULL);
 }
 
 
@@ -243,7 +243,7 @@ static void opencheck (lua_State *L, const char *fname, const char *mode) {
   LStream *p = newfile(L);
   p->f = fopen(fname, mode);
   if (p->f == NULL)
-    luaL_error(L, "cannot open file '%s' (%s)", fname, strerror(errno));
+    marpa_luaL_error(L, "cannot open file '%s' (%s)", fname, strerror(errno));
 }
 
 
@@ -254,7 +254,7 @@ static int io_open (lua_State *L) {
   const char *md = mode;  /* to traverse/check mode */
   luaL_argcheck(L, l_checkmode(md), 2, "invalid mode");
   p->f = fopen(filename, mode);
-  return (p->f == NULL) ? luaL_fileresult(L, 0, filename) : 1;
+  return (p->f == NULL) ? marpa_luaL_fileresult(L, 0, filename) : 1;
 }
 
 
@@ -263,7 +263,7 @@ static int io_open (lua_State *L) {
 */
 static int io_pclose (lua_State *L) {
   LStream *p = tolstream(L);
-  return luaL_execresult(L, l_pclose(L, p->f));
+  return marpa_luaL_execresult(L, l_pclose(L, p->f));
 }
 
 
@@ -273,23 +273,23 @@ static int io_popen (lua_State *L) {
   LStream *p = newprefile(L);
   p->f = l_popen(L, filename, mode);
   p->closef = &io_pclose;
-  return (p->f == NULL) ? luaL_fileresult(L, 0, filename) : 1;
+  return (p->f == NULL) ? marpa_luaL_fileresult(L, 0, filename) : 1;
 }
 
 
 static int io_tmpfile (lua_State *L) {
   LStream *p = newfile(L);
   p->f = tmpfile();
-  return (p->f == NULL) ? luaL_fileresult(L, 0, NULL) : 1;
+  return (p->f == NULL) ? marpa_luaL_fileresult(L, 0, NULL) : 1;
 }
 
 
 static FILE *getiofile (lua_State *L, const char *findex) {
   LStream *p;
-  lua_getfield(L, LUA_REGISTRYINDEX, findex);
-  p = (LStream *)lua_touserdata(L, -1);
+  marpa_lua_getfield(L, LUA_REGISTRYINDEX, findex);
+  p = (LStream *)marpa_lua_touserdata(L, -1);
   if (isclosed(p))
-    luaL_error(L, "standard %s file is closed", findex + IOPREF_LEN);
+    marpa_luaL_error(L, "standard %s file is closed", findex + IOPREF_LEN);
   return p->f;
 }
 
@@ -301,12 +301,12 @@ static int g_iofile (lua_State *L, const char *f, const char *mode) {
       opencheck(L, filename, mode);
     else {
       tofile(L);  /* check that it's a valid file handle */
-      lua_pushvalue(L, 1);
+      marpa_lua_pushvalue(L, 1);
     }
-    lua_setfield(L, LUA_REGISTRYINDEX, f);
+    marpa_lua_setfield(L, LUA_REGISTRYINDEX, f);
   }
   /* return current value */
-  lua_getfield(L, LUA_REGISTRYINDEX, f);
+  marpa_lua_getfield(L, LUA_REGISTRYINDEX, f);
   return 1;
 }
 
@@ -331,12 +331,12 @@ static int io_readline (lua_State *L);
 #define MAXARGLINE	250
 
 static void aux_lines (lua_State *L, int toclose) {
-  int n = lua_gettop(L) - 1;  /* number of arguments to read */
+  int n = marpa_lua_gettop(L) - 1;  /* number of arguments to read */
   luaL_argcheck(L, n <= MAXARGLINE, MAXARGLINE + 2, "too many arguments");
-  lua_pushinteger(L, n);  /* number of arguments to read */
-  lua_pushboolean(L, toclose);  /* close/not close file when finished */
-  lua_rotate(L, 2, 2);  /* move 'n' and 'toclose' to their positions */
-  lua_pushcclosure(L, io_readline, 3 + n);
+  marpa_lua_pushinteger(L, n);  /* number of arguments to read */
+  marpa_lua_pushboolean(L, toclose);  /* close/not close file when finished */
+  marpa_lua_rotate(L, 2, 2);  /* move 'n' and 'toclose' to their positions */
+  marpa_lua_pushcclosure(L, io_readline, 3 + n);
 }
 
 
@@ -349,9 +349,9 @@ static int f_lines (lua_State *L) {
 
 static int io_lines (lua_State *L) {
   int toclose;
-  if (lua_isnone(L, 1)) lua_pushnil(L);  /* at least one argument */
+  if (lua_isnone(L, 1)) marpa_lua_pushnil(L);  /* at least one argument */
   if (lua_isnil(L, 1)) {  /* no file name? */
-    lua_getfield(L, LUA_REGISTRYINDEX, IO_INPUT);  /* get default input */
+    marpa_lua_getfield(L, LUA_REGISTRYINDEX, IO_INPUT);  /* get default input */
     lua_replace(L, 1);  /* put it at index 1 */
     tofile(L);  /* check that it's a valid file handle */
     toclose = 0;  /* do not close it after iteration */
@@ -425,7 +425,7 @@ static int readdigits (RN *rn, int hex) {
 
 /*
 ** Read a number: first reads a valid prefix of a numeral into a buffer.
-** Then it calls 'lua_stringtonumber' to check whether the format is
+** Then it calls 'marpa_lua_stringtonumber' to check whether the format is
 ** correct and to convert it to a Lua number
 */
 static int read_number (lua_State *L, FILE *f) {
@@ -453,10 +453,10 @@ static int read_number (lua_State *L, FILE *f) {
   ungetc(rn.c, rn.f);  /* unread look-ahead char */
   l_unlockfile(rn.f);
   rn.buff[rn.n] = '\0';  /* finish string */
-  if (lua_stringtonumber(L, rn.buff))  /* is this a valid number? */
+  if (marpa_lua_stringtonumber(L, rn.buff))  /* is this a valid number? */
     return 1;  /* ok */
   else {  /* invalid format */
-   lua_pushnil(L);  /* "result" to be removed */
+   marpa_lua_pushnil(L);  /* "result" to be removed */
    return 0;  /* read fails */
   }
 }
@@ -473,7 +473,7 @@ static int test_eof (lua_State *L, FILE *f) {
 static int read_line (lua_State *L, FILE *f, int chop) {
   luaL_Buffer b;
   int c = '\0';
-  luaL_buffinit(L, &b);
+  marpa_luaL_buffinit(L, &b);
   while (c != EOF && c != '\n') {  /* repeat until end of line */
     char *buff = luaL_prepbuffer(&b);  /* preallocate buffer */
     int i = 0;
@@ -485,22 +485,22 @@ static int read_line (lua_State *L, FILE *f, int chop) {
   }
   if (!chop && c == '\n')  /* want a newline and have one? */
     luaL_addchar(&b, c);  /* add ending newline to result */
-  luaL_pushresult(&b);  /* close buffer */
+  marpa_luaL_pushresult(&b);  /* close buffer */
   /* return ok if read something (either a newline or something else) */
-  return (c == '\n' || lua_rawlen(L, -1) > 0);
+  return (c == '\n' || marpa_lua_rawlen(L, -1) > 0);
 }
 
 
 static void read_all (lua_State *L, FILE *f) {
   size_t nr;
   luaL_Buffer b;
-  luaL_buffinit(L, &b);
+  marpa_luaL_buffinit(L, &b);
   do {  /* read file in chunks of LUAL_BUFFERSIZE bytes */
     char *p = luaL_prepbuffer(&b);
     nr = fread(p, sizeof(char), LUAL_BUFFERSIZE, f);
     luaL_addsize(&b, nr);
   } while (nr == LUAL_BUFFERSIZE);
-  luaL_pushresult(&b);  /* close buffer */
+  marpa_luaL_pushresult(&b);  /* close buffer */
 }
 
 
@@ -508,17 +508,17 @@ static int read_chars (lua_State *L, FILE *f, size_t n) {
   size_t nr;  /* number of chars actually read */
   char *p;
   luaL_Buffer b;
-  luaL_buffinit(L, &b);
-  p = luaL_prepbuffsize(&b, n);  /* prepare buffer to read whole block */
+  marpa_luaL_buffinit(L, &b);
+  p = marpa_luaL_prepbuffsize(&b, n);  /* prepare buffer to read whole block */
   nr = fread(p, sizeof(char), n, f);  /* try to read 'n' chars */
   luaL_addsize(&b, nr);
-  luaL_pushresult(&b);  /* close buffer */
+  marpa_luaL_pushresult(&b);  /* close buffer */
   return (nr > 0);  /* true iff read something */
 }
 
 
 static int g_read (lua_State *L, FILE *f, int first) {
-  int nargs = lua_gettop(L) - 1;
+  int nargs = marpa_lua_gettop(L) - 1;
   int success;
   int n;
   clearerr(f);
@@ -527,11 +527,11 @@ static int g_read (lua_State *L, FILE *f, int first) {
     n = first+1;  /* to return 1 result */
   }
   else {  /* ensure stack space for all results and for auxlib's buffer */
-    luaL_checkstack(L, nargs+LUA_MINSTACK, "too many arguments");
+    marpa_luaL_checkstack(L, nargs+LUA_MINSTACK, "too many arguments");
     success = 1;
     for (n = first; nargs-- && success; n++) {
-      if (lua_type(L, n) == LUA_TNUMBER) {
-        size_t l = (size_t)luaL_checkinteger(L, n);
+      if (marpa_lua_type(L, n) == LUA_TNUMBER) {
+        size_t l = (size_t)marpa_luaL_checkinteger(L, n);
         success = (l == 0) ? test_eof(L, f) : read_chars(L, f, l);
       }
       else {
@@ -552,16 +552,16 @@ static int g_read (lua_State *L, FILE *f, int first) {
             success = 1; /* always success */
             break;
           default:
-            return luaL_argerror(L, n, "invalid format");
+            return marpa_luaL_argerror(L, n, "invalid format");
         }
       }
     }
   }
   if (ferror(f))
-    return luaL_fileresult(L, 0, NULL);
+    return marpa_luaL_fileresult(L, 0, NULL);
   if (!success) {
     lua_pop(L, 1);  /* remove last result */
-    lua_pushnil(L);  /* push nil instead */
+    marpa_lua_pushnil(L);  /* push nil instead */
   }
   return n - first;
 }
@@ -578,27 +578,27 @@ static int f_read (lua_State *L) {
 
 
 static int io_readline (lua_State *L) {
-  LStream *p = (LStream *)lua_touserdata(L, lua_upvalueindex(1));
+  LStream *p = (LStream *)marpa_lua_touserdata(L, lua_upvalueindex(1));
   int i;
   int n = (int)lua_tointeger(L, lua_upvalueindex(2));
   if (isclosed(p))  /* file is already closed? */
-    return luaL_error(L, "file is already closed");
-  lua_settop(L , 1);
-  luaL_checkstack(L, n, "too many arguments");
+    return marpa_luaL_error(L, "file is already closed");
+  marpa_lua_settop(L , 1);
+  marpa_luaL_checkstack(L, n, "too many arguments");
   for (i = 1; i <= n; i++)  /* push arguments to 'g_read' */
-    lua_pushvalue(L, lua_upvalueindex(3 + i));
+    marpa_lua_pushvalue(L, lua_upvalueindex(3 + i));
   n = g_read(L, p->f, 2);  /* 'n' is number of results */
   lua_assert(n > 0);  /* should return at least a nil */
-  if (lua_toboolean(L, -n))  /* read at least one value? */
+  if (marpa_lua_toboolean(L, -n))  /* read at least one value? */
     return n;  /* return them */
   else {  /* first result is nil: EOF or error */
     if (n > 1) {  /* is there error information? */
       /* 2nd result is error message */
-      return luaL_error(L, "%s", lua_tostring(L, -n + 1));
+      return marpa_luaL_error(L, "%s", lua_tostring(L, -n + 1));
     }
-    if (lua_toboolean(L, lua_upvalueindex(3))) {  /* generator created file? */
-      lua_settop(L, 0);
-      lua_pushvalue(L, lua_upvalueindex(1));
+    if (marpa_lua_toboolean(L, lua_upvalueindex(3))) {  /* generator created file? */
+      marpa_lua_settop(L, 0);
+      marpa_lua_pushvalue(L, lua_upvalueindex(1));
       aux_close(L);  /* close it */
     }
     return 0;
@@ -609,24 +609,24 @@ static int io_readline (lua_State *L) {
 
 
 static int g_write (lua_State *L, FILE *f, int arg) {
-  int nargs = lua_gettop(L) - arg;
+  int nargs = marpa_lua_gettop(L) - arg;
   int status = 1;
   for (; nargs--; arg++) {
-    if (lua_type(L, arg) == LUA_TNUMBER) {
+    if (marpa_lua_type(L, arg) == LUA_TNUMBER) {
       /* optimization: could be done exactly as for strings */
-      int len = lua_isinteger(L, arg)
+      int len = marpa_lua_isinteger(L, arg)
                 ? fprintf(f, LUA_INTEGER_FMT, lua_tointeger(L, arg))
                 : fprintf(f, LUA_NUMBER_FMT, lua_tonumber(L, arg));
       status = status && (len > 0);
     }
     else {
       size_t l;
-      const char *s = luaL_checklstring(L, arg, &l);
+      const char *s = marpa_luaL_checklstring(L, arg, &l);
       status = status && (fwrite(s, sizeof(char), l, f) == l);
     }
   }
   if (status) return 1;  /* file handle already on stack top */
-  else return luaL_fileresult(L, status, NULL);
+  else return marpa_luaL_fileresult(L, status, NULL);
 }
 
 
@@ -637,7 +637,7 @@ static int io_write (lua_State *L) {
 
 static int f_write (lua_State *L) {
   FILE *f = tofile(L);
-  lua_pushvalue(L, 1);  /* push file at the stack top (to be returned) */
+  marpa_lua_pushvalue(L, 1);  /* push file at the stack top (to be returned) */
   return g_write(L, f, 2);
 }
 
@@ -646,16 +646,16 @@ static int f_seek (lua_State *L) {
   static const int mode[] = {SEEK_SET, SEEK_CUR, SEEK_END};
   static const char *const modenames[] = {"set", "cur", "end", NULL};
   FILE *f = tofile(L);
-  int op = luaL_checkoption(L, 2, "cur", modenames);
-  lua_Integer p3 = luaL_optinteger(L, 3, 0);
+  int op = marpa_luaL_checkoption(L, 2, "cur", modenames);
+  lua_Integer p3 = marpa_luaL_optinteger(L, 3, 0);
   l_seeknum offset = (l_seeknum)p3;
   luaL_argcheck(L, (lua_Integer)offset == p3, 3,
                   "not an integer in proper range");
   op = l_fseek(f, offset, mode[op]);
   if (op)
-    return luaL_fileresult(L, 0, NULL);  /* error */
+    return marpa_luaL_fileresult(L, 0, NULL);  /* error */
   else {
-    lua_pushinteger(L, (lua_Integer)l_ftell(f));
+    marpa_lua_pushinteger(L, (lua_Integer)l_ftell(f));
     return 1;
   }
 }
@@ -665,21 +665,21 @@ static int f_setvbuf (lua_State *L) {
   static const int mode[] = {_IONBF, _IOFBF, _IOLBF};
   static const char *const modenames[] = {"no", "full", "line", NULL};
   FILE *f = tofile(L);
-  int op = luaL_checkoption(L, 2, NULL, modenames);
-  lua_Integer sz = luaL_optinteger(L, 3, LUAL_BUFFERSIZE);
+  int op = marpa_luaL_checkoption(L, 2, NULL, modenames);
+  lua_Integer sz = marpa_luaL_optinteger(L, 3, LUAL_BUFFERSIZE);
   int res = setvbuf(f, NULL, mode[op], (size_t)sz);
-  return luaL_fileresult(L, res == 0, NULL);
+  return marpa_luaL_fileresult(L, res == 0, NULL);
 }
 
 
 
 static int io_flush (lua_State *L) {
-  return luaL_fileresult(L, fflush(getiofile(L, IO_OUTPUT)) == 0, NULL);
+  return marpa_luaL_fileresult(L, fflush(getiofile(L, IO_OUTPUT)) == 0, NULL);
 }
 
 
 static int f_flush (lua_State *L) {
-  return luaL_fileresult(L, fflush(tofile(L)) == 0, NULL);
+  return marpa_luaL_fileresult(L, fflush(tofile(L)) == 0, NULL);
 }
 
 
@@ -720,10 +720,10 @@ static const luaL_Reg flib[] = {
 
 
 static void createmeta (lua_State *L) {
-  luaL_newmetatable(L, LUA_FILEHANDLE);  /* create metatable for file handles */
-  lua_pushvalue(L, -1);  /* push metatable */
-  lua_setfield(L, -2, "__index");  /* metatable.__index = metatable */
-  luaL_setfuncs(L, flib, 0);  /* add file methods to new metatable */
+  marpa_luaL_newmetatable(L, LUA_FILEHANDLE);  /* create metatable for file handles */
+  marpa_lua_pushvalue(L, -1);  /* push metatable */
+  marpa_lua_setfield(L, -2, "__index");  /* metatable.__index = metatable */
+  marpa_luaL_setfuncs(L, flib, 0);  /* add file methods to new metatable */
   lua_pop(L, 1);  /* pop new metatable */
 }
 
@@ -734,7 +734,7 @@ static void createmeta (lua_State *L) {
 static int io_noclose (lua_State *L) {
   LStream *p = tolstream(L);
   p->closef = &io_noclose;  /* keep file opened */
-  lua_pushnil(L);
+  marpa_lua_pushnil(L);
   lua_pushliteral(L, "cannot close standard file");
   return 2;
 }
@@ -746,14 +746,14 @@ static void createstdfile (lua_State *L, FILE *f, const char *k,
   p->f = f;
   p->closef = &io_noclose;
   if (k != NULL) {
-    lua_pushvalue(L, -1);
-    lua_setfield(L, LUA_REGISTRYINDEX, k);  /* add file to registry */
+    marpa_lua_pushvalue(L, -1);
+    marpa_lua_setfield(L, LUA_REGISTRYINDEX, k);  /* add file to registry */
   }
-  lua_setfield(L, -2, fname);  /* add file to module */
+  marpa_lua_setfield(L, -2, fname);  /* add file to module */
 }
 
 
-LUAMOD_API int luaopen_io (lua_State *L) {
+LUAMOD_API int marpa_luaopen_io (lua_State *L) {
   luaL_newlib(L, iolib);  /* new module */
   createmeta(L);
   /* create (and set) default files */

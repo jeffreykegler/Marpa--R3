@@ -788,7 +788,7 @@ static int constfolding (FuncState *fs, int op, expdesc *e1, expdesc *e2) {
 ** Code for binary and unary expressions that "produce values"
 ** (arithmetic operations, bitwise operations, concat, length). First
 ** try to do constant folding (only for numeric [arithmetic and
-** bitwise] operations, which is what 'lua_arith' accepts).
+** bitwise] operations, which is what 'marpa_lua_arith' accepts).
 ** Expression to produce final result will be encoded in 'e1'.
 */
 static void codeexpval (FuncState *fs, OpCode op,

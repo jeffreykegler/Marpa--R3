@@ -144,7 +144,7 @@ static const Proto* combine(lua_State* L, int n)
  {
   Proto* f;
   int i=n;
-  if (lua_load(L,reader,&i,"=(" PROGNAME ")",NULL)!=LUA_OK) fatal(lua_tostring(L,-1));
+  if (marpa_lua_load(L,reader,&i,"=(" PROGNAME ")",NULL)!=LUA_OK) fatal(lua_tostring(L,-1));
   f=toproto(L,-1);
   for (i=0; i<n; i++)
   {
@@ -165,10 +165,10 @@ static int writer(lua_State* L, const void* p, size_t size, void* u)
 static int pmain(lua_State* L)
 {
  int argc=(int)lua_tointeger(L,1);
- char** argv=(char**)lua_touserdata(L,2);
+ char** argv=(char**)marpa_lua_touserdata(L,2);
  const Proto* f;
  int i;
- if (!lua_checkstack(L,argc)) fatal("too many input files");
+ if (!marpa_lua_checkstack(L,argc)) fatal("too many input files");
  for (i=0; i<argc; i++)
  {
   const char* filename=IS("-") ? NULL : argv[i];
@@ -195,13 +195,13 @@ int main(int argc, char* argv[])
  int i=doargs(argc,argv);
  argc-=i; argv+=i;
  if (argc<=0) usage("no input files given");
- L=luaL_newstate();
+ L=marpa_luaL_newstate();
  if (L==NULL) fatal("cannot create state: not enough memory");
  lua_pushcfunction(L,&pmain);
- lua_pushinteger(L,argc);
- lua_pushlightuserdata(L,argv);
+ marpa_lua_pushinteger(L,argc);
+ marpa_lua_pushlightuserdata(L,argv);
  if (lua_pcall(L,2,0,0)!=LUA_OK) fatal(lua_tostring(L,-1));
- lua_close(L);
+ marpa_lua_close(L);
  return EXIT_SUCCESS;
 }
 

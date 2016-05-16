@@ -518,7 +518,7 @@ static void finishCcall (lua_State *L, int status) {
     ci->callstatus &= ~CIST_YPCALL;  /* finish 'lua_pcall' */
     L->errfunc = ci->u.c.old_errfunc;
   }
-  /* finish 'lua_callk'/'lua_pcall'; CIST_YPCALL and 'errfunc' already
+  /* finish 'marpa_lua_callk'/'lua_pcall'; CIST_YPCALL and 'errfunc' already
      handled */
   adjustresults(L, ci->nresults);
   /* call continuation function */
@@ -541,7 +541,7 @@ static void finishCcall (lua_State *L, int status) {
 */
 static void unroll (lua_State *L, void *ud) {
   if (ud != NULL)  /* error status? */
-    finishCcall(L, *(int *)ud);  /* finish 'lua_pcallk' callee */
+    finishCcall(L, *(int *)ud);  /* finish 'marpa_lua_pcallk' callee */
   while (L->ci != &L->base_ci) {  /* something in the stack */
     if (!isLua(L->ci))  /* C function? */
       finishCcall(L, LUA_YIELD);  /* complete its execution */
@@ -598,12 +598,12 @@ static l_noret resume_error (lua_State *L, const char *msg, StkId firstArg) {
   L->top = firstArg;  /* remove args from the stack */
   setsvalue2s(L, L->top, luaS_new(L, msg));  /* push error message */
   api_incr_top(L);
-  luaD_throw(L, -1);  /* jump back to 'lua_resume' */
+  luaD_throw(L, -1);  /* jump back to 'marpa_lua_resume' */
 }
 
 
 /*
-** Do the work for 'lua_resume' in protected mode. Most of the work
+** Do the work for 'marpa_lua_resume' in protected mode. Most of the work
 ** depends on the status of the coroutine: initial state, suspended
 ** inside a hook, or regularly suspended (optionally with a continuation
 ** function), plus erroneous cases: non-suspended coroutine or dead
@@ -646,7 +646,7 @@ static void resume (lua_State *L, void *ud) {
 }
 
 
-LUA_API int lua_resume (lua_State *L, lua_State *from, int nargs) {
+LUA_API int marpa_lua_resume (lua_State *L, lua_State *from, int nargs) {
   int status;
   unsigned short oldnny = L->nny;  /* save "number of non-yieldable" calls */
   lua_lock(L);
@@ -655,7 +655,7 @@ LUA_API int lua_resume (lua_State *L, lua_State *from, int nargs) {
   L->nny = 0;  /* allow yields */
   api_checknelems(L, (L->status == LUA_OK) ? nargs + 1 : nargs);
   status = luaD_rawrunprotected(L, resume, &nargs);
-  if (status == -1)  /* error calling 'lua_resume'? */
+  if (status == -1)  /* error calling 'marpa_lua_resume'? */
     status = LUA_ERRRUN;
   else {  /* continue running after recoverable errors */
     while (errorstatus(status) && recover(L, status)) {
@@ -677,12 +677,12 @@ LUA_API int lua_resume (lua_State *L, lua_State *from, int nargs) {
 }
 
 
-LUA_API int lua_isyieldable (lua_State *L) {
+LUA_API int marpa_lua_isyieldable (lua_State *L) {
   return (L->nny == 0);
 }
 
 
-LUA_API int lua_yieldk (lua_State *L, int nresults, lua_KContext ctx,
+LUA_API int marpa_lua_yieldk (lua_State *L, int nresults, lua_KContext ctx,
                         lua_KFunction k) {
   CallInfo *ci = L->ci;
   luai_userstateyield(L, nresults);

@@ -19,8 +19,8 @@
 #if defined(LUA_COMPAT_BITLIB)		/* { */
 
 
-#define pushunsigned(L,n)	lua_pushinteger(L, (lua_Integer)(n))
-#define checkunsigned(L,i)	((lua_Unsigned)luaL_checkinteger(L,i))
+#define pushunsigned(L,n)	marpa_lua_pushinteger(L, (lua_Integer)(n))
+#define checkunsigned(L,i)	((lua_Unsigned)marpa_luaL_checkinteger(L,i))
 
 
 /* number of bits to consider in a number */
@@ -47,7 +47,7 @@
 
 
 static lua_Unsigned andaux (lua_State *L) {
-  int i, n = lua_gettop(L);
+  int i, n = marpa_lua_gettop(L);
   lua_Unsigned r = ~(lua_Unsigned)0;
   for (i = 1; i <= n; i++)
     r &= checkunsigned(L, i);
@@ -64,13 +64,13 @@ static int b_and (lua_State *L) {
 
 static int b_test (lua_State *L) {
   lua_Unsigned r = andaux(L);
-  lua_pushboolean(L, r != 0);
+  marpa_lua_pushboolean(L, r != 0);
   return 1;
 }
 
 
 static int b_or (lua_State *L) {
-  int i, n = lua_gettop(L);
+  int i, n = marpa_lua_gettop(L);
   lua_Unsigned r = 0;
   for (i = 1; i <= n; i++)
     r |= checkunsigned(L, i);
@@ -80,7 +80,7 @@ static int b_or (lua_State *L) {
 
 
 static int b_xor (lua_State *L) {
-  int i, n = lua_gettop(L);
+  int i, n = marpa_lua_gettop(L);
   lua_Unsigned r = 0;
   for (i = 1; i <= n; i++)
     r ^= checkunsigned(L, i);
@@ -114,18 +114,18 @@ static int b_shift (lua_State *L, lua_Unsigned r, lua_Integer i) {
 
 
 static int b_lshift (lua_State *L) {
-  return b_shift(L, checkunsigned(L, 1), luaL_checkinteger(L, 2));
+  return b_shift(L, checkunsigned(L, 1), marpa_luaL_checkinteger(L, 2));
 }
 
 
 static int b_rshift (lua_State *L) {
-  return b_shift(L, checkunsigned(L, 1), -luaL_checkinteger(L, 2));
+  return b_shift(L, checkunsigned(L, 1), -marpa_luaL_checkinteger(L, 2));
 }
 
 
 static int b_arshift (lua_State *L) {
   lua_Unsigned r = checkunsigned(L, 1);
-  lua_Integer i = luaL_checkinteger(L, 2);
+  lua_Integer i = marpa_luaL_checkinteger(L, 2);
   if (i < 0 || !(r & ((lua_Unsigned)1 << (LUA_NBITS - 1))))
     return b_shift(L, r, -i);
   else {  /* arithmetic shift for 'negative' number */
@@ -150,28 +150,28 @@ static int b_rot (lua_State *L, lua_Integer d) {
 
 
 static int b_lrot (lua_State *L) {
-  return b_rot(L, luaL_checkinteger(L, 2));
+  return b_rot(L, marpa_luaL_checkinteger(L, 2));
 }
 
 
 static int b_rrot (lua_State *L) {
-  return b_rot(L, -luaL_checkinteger(L, 2));
+  return b_rot(L, -marpa_luaL_checkinteger(L, 2));
 }
 
 
 /*
 ** get field and width arguments for field-manipulation functions,
 ** checking whether they are valid.
-** ('luaL_error' called without 'return' to avoid later warnings about
+** ('marpa_luaL_error' called without 'return' to avoid later warnings about
 ** 'width' being used uninitialized.)
 */
 static int fieldargs (lua_State *L, int farg, int *width) {
-  lua_Integer f = luaL_checkinteger(L, farg);
-  lua_Integer w = luaL_optinteger(L, farg + 1, 1);
+  lua_Integer f = marpa_luaL_checkinteger(L, farg);
+  lua_Integer w = marpa_luaL_optinteger(L, farg + 1, 1);
   luaL_argcheck(L, 0 <= f, farg, "field cannot be negative");
   luaL_argcheck(L, 0 < w, farg + 1, "width must be positive");
   if (f + w > LUA_NBITS)
-    luaL_error(L, "trying to access non-existent bits");
+    marpa_luaL_error(L, "trying to access non-existent bits");
   *width = (int)w;
   return (int)f;
 }
@@ -217,7 +217,7 @@ static const luaL_Reg bitlib[] = {
 
 
 
-LUAMOD_API int luaopen_bit32 (lua_State *L) {
+LUAMOD_API int marpa_luaopen_bit32 (lua_State *L) {
   luaL_newlib(L, bitlib);
   return 1;
 }
@@ -226,8 +226,8 @@ LUAMOD_API int luaopen_bit32 (lua_State *L) {
 #else					/* }{ */
 
 
-LUAMOD_API int luaopen_bit32 (lua_State *L) {
-  return luaL_error(L, "library 'bit32' has been deprecated");
+LUAMOD_API int marpa_luaopen_bit32 (lua_State *L) {
+  return marpa_luaL_error(L, "library 'bit32' has been deprecated");
 }
 
 #endif					/* } */

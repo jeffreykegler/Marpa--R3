@@ -340,7 +340,7 @@
 */
 #define lua_cpcall(L,f,u)  \
 	(lua_pushcfunction(L, (f)), \
-	 lua_pushlightuserdata(L,(u)), \
+	 marpa_lua_pushlightuserdata(L,(u)), \
 	 lua_pcall(L,1,0,0))
 
 
@@ -366,12 +366,12 @@
 ** changes in the API. The macros themselves document how to
 ** change your code to avoid using them.
 */
-#define lua_strlen(L,i)		lua_rawlen(L, (i))
+#define lua_strlen(L,i)		marpa_lua_rawlen(L, (i))
 
-#define lua_objlen(L,i)		lua_rawlen(L, (i))
+#define lua_objlen(L,i)		marpa_lua_rawlen(L, (i))
 
-#define lua_equal(L,idx1,idx2)		lua_compare(L,(idx1),(idx2),LUA_OPEQ)
-#define lua_lessthan(L,idx1,idx2)	lua_compare(L,(idx1),(idx2),LUA_OPLT)
+#define lua_equal(L,idx1,idx2)		marpa_lua_compare(L,(idx1),(idx2),LUA_OPEQ)
+#define lua_lessthan(L,idx1,idx2)	marpa_lua_compare(L,(idx1),(idx2),LUA_OPLT)
 
 /*
 @@ LUA_COMPAT_MODULE controls compatibility with previous

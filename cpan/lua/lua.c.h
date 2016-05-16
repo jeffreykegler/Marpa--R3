@@ -108,8 +108,8 @@ static const char *progname = LUA_PROGNAME;
 */
 static void lstop (lua_State *L, lua_Debug *ar) {
   (void)ar;  /* unused arg. */
-  lua_sethook(L, NULL, 0, 0);  /* reset hook */
-  luaL_error(L, "interrupted!");
+  marpa_lua_sethook(L, NULL, 0, 0);  /* reset hook */
+  marpa_luaL_error(L, "interrupted!");
 }
 
 
@@ -121,7 +121,7 @@ static void lstop (lua_State *L, lua_Debug *ar) {
 */
 static void laction (int i) {
   signal(i, SIG_DFL); /* if another SIGINT happens, terminate process */
-  lua_sethook(globalL, lstop, LUA_MASKCALL | LUA_MASKRET | LUA_MASKCOUNT, 1);
+  marpa_lua_sethook(globalL, lstop, LUA_MASKCALL | LUA_MASKRET | LUA_MASKCOUNT, 1);
 }
 
 
@@ -177,14 +177,14 @@ static int report (lua_State *L, int status) {
 static int msghandler (lua_State *L) {
   const char *msg = lua_tostring(L, 1);
   if (msg == NULL) {  /* is error object not a string? */
-    if (luaL_callmeta(L, 1, "__tostring") &&  /* does it have a metamethod */
-        lua_type(L, -1) == LUA_TSTRING)  /* that produces a string? */
+    if (marpa_luaL_callmeta(L, 1, "__tostring") &&  /* does it have a metamethod */
+        marpa_lua_type(L, -1) == LUA_TSTRING)  /* that produces a string? */
       return 1;  /* that is the message */
     else
-      msg = lua_pushfstring(L, "(error object is a %s value)",
+      msg = marpa_lua_pushfstring(L, "(error object is a %s value)",
                                luaL_typename(L, 1));
   }
-  luaL_traceback(L, L, msg, 1);  /* append a standard traceback */
+  marpa_luaL_traceback(L, L, msg, 1);  /* append a standard traceback */
   return 1;  /* return the traceback */
 }
 
@@ -195,7 +195,7 @@ static int msghandler (lua_State *L) {
 */
 static int docall (lua_State *L, int narg, int nres) {
   int status;
-  int base = lua_gettop(L) - narg;  /* function index */
+  int base = marpa_lua_gettop(L) - narg;  /* function index */
   lua_pushcfunction(L, msghandler);  /* push message handler */
   lua_insert(L, base);  /* put it under function and args */
   globalL = L;  /* to be available to 'laction' */
@@ -225,12 +225,12 @@ static void createargtable (lua_State *L, char **argv, int argc, int script) {
   int i, narg;
   if (script == argc) script = 0;  /* no script name? */
   narg = argc - (script + 1);  /* number of positive indices */
-  lua_createtable(L, narg, script + 1);
+  marpa_lua_createtable(L, narg, script + 1);
   for (i = 0; i < argc; i++) {
-    lua_pushstring(L, argv[i]);
-    lua_rawseti(L, -2, i - script);
+    marpa_lua_pushstring(L, argv[i]);
+    marpa_lua_rawseti(L, -2, i - script);
   }
-  lua_setglobal(L, "arg");
+  marpa_lua_setglobal(L, "arg");
 }
 
 
@@ -256,11 +256,11 @@ static int dostring (lua_State *L, const char *s, const char *name) {
 */
 static int dolibrary (lua_State *L, const char *name) {
   int status;
-  lua_getglobal(L, "require");
-  lua_pushstring(L, name);
+  marpa_lua_getglobal(L, "require");
+  marpa_lua_pushstring(L, name);
   status = docall(L, 1, 1);  /* call 'require(name)' */
   if (status == LUA_OK)
-    lua_setglobal(L, name);  /* global[name] = require return */
+    marpa_lua_setglobal(L, name);  /* global[name] = require return */
   return report(L, status);
 }
 
@@ -270,7 +270,7 @@ static int dolibrary (lua_State *L, const char *name) {
 */
 static const char *get_prompt (lua_State *L, int firstline) {
   const char *p;
-  lua_getglobal(L, firstline ? "_PROMPT" : "_PROMPT2");
+  marpa_lua_getglobal(L, firstline ? "_PROMPT" : "_PROMPT2");
   p = lua_tostring(L, -1);
   if (p == NULL) p = (firstline ? LUA_PROMPT : LUA_PROMPT2);
   return p;
@@ -289,7 +289,7 @@ static const char *get_prompt (lua_State *L, int firstline) {
 static int incomplete (lua_State *L, int status) {
   if (status == LUA_ERRSYNTAX) {
     size_t lmsg;
-    const char *msg = lua_tolstring(L, -1, &lmsg);
+    const char *msg = marpa_lua_tolstring(L, -1, &lmsg);
     if (lmsg >= marklen && strcmp(msg + lmsg - marklen, EOFMARK) == 0) {
       lua_pop(L, 1);
       return 1;
@@ -315,9 +315,9 @@ static int pushline (lua_State *L, int firstline) {
   if (l > 0 && b[l-1] == '\n')  /* line ends with newline? */
     b[--l] = '\0';  /* remove it */
   if (firstline && b[0] == '=')  /* for compatibility with 5.2, ... */
-    lua_pushfstring(L, "return %s", b + 1);  /* change '=' to 'return' */
+    marpa_lua_pushfstring(L, "return %s", b + 1);  /* change '=' to 'return' */
   else
-    lua_pushlstring(L, b, l);
+    marpa_lua_pushlstring(L, b, l);
   lua_freeline(L, b);
   return 1;
 }
@@ -329,7 +329,7 @@ static int pushline (lua_State *L, int firstline) {
 */
 static int addreturn (lua_State *L) {
   const char *line = lua_tostring(L, -1);  /* original line */
-  const char *retline = lua_pushfstring(L, "return %s;", line);
+  const char *retline = marpa_lua_pushfstring(L, "return %s;", line);
   int status = luaL_loadbuffer(L, retline, strlen(retline), "=stdin");
   if (status == LUA_OK) {
     lua_remove(L, -2);  /* remove modified line */
@@ -348,7 +348,7 @@ static int addreturn (lua_State *L) {
 static int multiline (lua_State *L) {
   for (;;) {  /* repeat until gets a complete statement */
     size_t len;
-    const char *line = lua_tolstring(L, 1, &len);  /* get what it has */
+    const char *line = marpa_lua_tolstring(L, 1, &len);  /* get what it has */
     int status = luaL_loadbuffer(L, line, len, "=stdin");  /* try it */
     if (!incomplete(L, status) || !pushline(L, 0)) {
       lua_saveline(L, line);  /* keep history */
@@ -356,7 +356,7 @@ static int multiline (lua_State *L) {
     }
     lua_pushliteral(L, "\n");  /* add newline... */
     lua_insert(L, -2);  /* ...between the two lines */
-    lua_concat(L, 3);  /* join them */
+    marpa_lua_concat(L, 3);  /* join them */
   }
 }
 
@@ -369,13 +369,13 @@ static int multiline (lua_State *L) {
 */
 static int loadline (lua_State *L) {
   int status;
-  lua_settop(L, 0);
+  marpa_lua_settop(L, 0);
   if (!pushline(L, 1))
     return -1;  /* no input */
   if ((status = addreturn(L)) != LUA_OK)  /* 'return ...' did not work? */
     status = multiline(L);  /* try as command, maybe with continuation lines */
   lua_remove(L, 1);  /* remove line from the stack */
-  lua_assert(lua_gettop(L) == 1);
+  lua_assert(marpa_lua_gettop(L) == 1);
   return status;
 }
 
@@ -384,13 +384,13 @@ static int loadline (lua_State *L) {
 ** Prints (calling the Lua 'print' function) any values on the stack
 */
 static void l_print (lua_State *L) {
-  int n = lua_gettop(L);
+  int n = marpa_lua_gettop(L);
   if (n > 0) {  /* any result to be printed? */
-    luaL_checkstack(L, LUA_MINSTACK, "too many results to print");
-    lua_getglobal(L, "print");
+    marpa_luaL_checkstack(L, LUA_MINSTACK, "too many results to print");
+    marpa_lua_getglobal(L, "print");
     lua_insert(L, 1);
     if (lua_pcall(L, n, 0, 0) != LUA_OK)
-      l_message(progname, lua_pushfstring(L, "error calling 'print' (%s)",
+      l_message(progname, marpa_lua_pushfstring(L, "error calling 'print' (%s)",
                                              lua_tostring(L, -1)));
   }
 }
@@ -410,7 +410,7 @@ static void doREPL (lua_State *L) {
     if (status == LUA_OK) l_print(L);
     else report(L, status);
   }
-  lua_settop(L, 0);  /* clear stack */
+  marpa_lua_settop(L, 0);  /* clear stack */
   lua_writeline();
   progname = oldprogname;
 }
@@ -421,12 +421,12 @@ static void doREPL (lua_State *L) {
 */
 static int pushargs (lua_State *L) {
   int i, n;
-  if (lua_getglobal(L, "arg") != LUA_TTABLE)
-    luaL_error(L, "'arg' is not a table");
-  n = (int)luaL_len(L, -1);
-  luaL_checkstack(L, n + 3, "too many arguments to script");
+  if (marpa_lua_getglobal(L, "arg") != LUA_TTABLE)
+    marpa_luaL_error(L, "'arg' is not a table");
+  n = (int)marpa_luaL_len(L, -1);
+  marpa_luaL_checkstack(L, n + 3, "too many arguments to script");
   for (i = 1; i <= n; i++)
-    lua_rawgeti(L, -i, i);
+    marpa_lua_rawgeti(L, -i, i);
   lua_remove(L, -i);  /* remove table from the stack */
   return n;
 }
@@ -550,7 +550,7 @@ static int handle_luainit (lua_State *L) {
 */
 static int pmain (lua_State *L) {
   int argc = (int)lua_tointeger(L, 1);
-  char **argv = (char **)lua_touserdata(L, 2);
+  char **argv = (char **)marpa_lua_touserdata(L, 2);
   int script;
   int args = collectargs(argv, &script);
   luaL_checkversion(L);  /* check that interpreter has correct version */
@@ -562,10 +562,10 @@ static int pmain (lua_State *L) {
   if (args & has_v)  /* option '-v'? */
     print_version();
   if (args & has_E) {  /* option '-E'? */
-    lua_pushboolean(L, 1);  /* signal for libraries to ignore env. vars. */
-    lua_setfield(L, LUA_REGISTRYINDEX, "LUA_NOENV");
+    marpa_lua_pushboolean(L, 1);  /* signal for libraries to ignore env. vars. */
+    marpa_lua_setfield(L, LUA_REGISTRYINDEX, "LUA_NOENV");
   }
-  luaL_openlibs(L);  /* open standard libraries */
+  marpa_luaL_openlibs(L);  /* open standard libraries */
   createargtable(L, argv, argc, script);  /* create table 'arg' */
   if (!(args & has_E)) {  /* no option '-E'? */
     if (handle_luainit(L) != LUA_OK)  /* run LUA_INIT */
@@ -585,25 +585,25 @@ static int pmain (lua_State *L) {
     }
     else dofile(L, NULL);  /* executes stdin as a file */
   }
-  lua_pushboolean(L, 1);  /* signal no errors */
+  marpa_lua_pushboolean(L, 1);  /* signal no errors */
   return 1;
 }
 
 
 int main (int argc, char **argv) {
   int status, result;
-  lua_State *L = luaL_newstate();  /* create state */
+  lua_State *L = marpa_luaL_newstate();  /* create state */
   if (L == NULL) {
     l_message(argv[0], "cannot create state: not enough memory");
     return EXIT_FAILURE;
   }
   lua_pushcfunction(L, &pmain);  /* to call 'pmain' in protected mode */
-  lua_pushinteger(L, argc);  /* 1st argument */
-  lua_pushlightuserdata(L, argv); /* 2nd argument */
+  marpa_lua_pushinteger(L, argc);  /* 1st argument */
+  marpa_lua_pushlightuserdata(L, argv); /* 2nd argument */
   status = lua_pcall(L, 2, 1, 0);  /* do the call */
-  result = lua_toboolean(L, -1);  /* get result */
+  result = marpa_lua_toboolean(L, -1);  /* get result */
   report(L, status);
-  lua_close(L);
+  marpa_lua_close(L);
   return (result && status == LUA_OK) ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 

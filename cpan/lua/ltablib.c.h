@@ -30,12 +30,12 @@
 #define TAB_RW	(TAB_R | TAB_W)		/* read/write */
 
 
-#define aux_getn(L,n,w)	(checktab(L, n, (w) | TAB_L), luaL_len(L, n))
+#define aux_getn(L,n,w)	(checktab(L, n, (w) | TAB_L), marpa_luaL_len(L, n))
 
 
 static int checkfield (lua_State *L, const char *key, int n) {
-  lua_pushstring(L, key);
-  return (lua_rawget(L, -n) != LUA_TNIL);
+  marpa_lua_pushstring(L, key);
+  return (marpa_lua_rawget(L, -n) != LUA_TNIL);
 }
 
 
@@ -44,16 +44,16 @@ static int checkfield (lua_State *L, const char *key, int n) {
 ** has a metatable with the required metamethods)
 */
 static void checktab (lua_State *L, int arg, int what) {
-  if (lua_type(L, arg) != LUA_TTABLE) {  /* is it not a table? */
+  if (marpa_lua_type(L, arg) != LUA_TTABLE) {  /* is it not a table? */
     int n = 1;  /* number of elements to pop */
-    if (lua_getmetatable(L, arg) &&  /* must have metatable */
+    if (marpa_lua_getmetatable(L, arg) &&  /* must have metatable */
         (!(what & TAB_R) || checkfield(L, "__index", ++n)) &&
         (!(what & TAB_W) || checkfield(L, "__newindex", ++n)) &&
         (!(what & TAB_L) || checkfield(L, "__len", ++n))) {
       lua_pop(L, n);  /* pop metatable and tested metamethods */
     }
     else
-      luaL_argerror(L, arg, "table expected");  /* force an error */
+      marpa_luaL_argerror(L, arg, "table expected");  /* force an error */
   }
 }
 
@@ -61,16 +61,16 @@ static void checktab (lua_State *L, int arg, int what) {
 #if defined(LUA_COMPAT_MAXN)
 static int maxn (lua_State *L) {
   lua_Number max = 0;
-  luaL_checktype(L, 1, LUA_TTABLE);
-  lua_pushnil(L);  /* first key */
-  while (lua_next(L, 1)) {
+  marpa_luaL_checktype(L, 1, LUA_TTABLE);
+  marpa_lua_pushnil(L);  /* first key */
+  while (marpa_lua_next(L, 1)) {
     lua_pop(L, 1);  /* remove value */
-    if (lua_type(L, -1) == LUA_TNUMBER) {
+    if (marpa_lua_type(L, -1) == LUA_TNUMBER) {
       lua_Number v = lua_tonumber(L, -1);
       if (v > max) max = v;
     }
   }
-  lua_pushnumber(L, max);
+  marpa_lua_pushnumber(L, max);
   return 1;
 }
 #endif
@@ -79,42 +79,42 @@ static int maxn (lua_State *L) {
 static int tinsert (lua_State *L) {
   lua_Integer e = aux_getn(L, 1, TAB_RW) + 1;  /* first empty element */
   lua_Integer pos;  /* where to insert new element */
-  switch (lua_gettop(L)) {
+  switch (marpa_lua_gettop(L)) {
     case 2: {  /* called with only 2 arguments */
       pos = e;  /* insert new element at the end */
       break;
     }
     case 3: {
       lua_Integer i;
-      pos = luaL_checkinteger(L, 2);  /* 2nd argument is the position */
+      pos = marpa_luaL_checkinteger(L, 2);  /* 2nd argument is the position */
       luaL_argcheck(L, 1 <= pos && pos <= e, 2, "position out of bounds");
       for (i = e; i > pos; i--) {  /* move up elements */
-        lua_geti(L, 1, i - 1);
-        lua_seti(L, 1, i);  /* t[i] = t[i - 1] */
+        marpa_lua_geti(L, 1, i - 1);
+        marpa_lua_seti(L, 1, i);  /* t[i] = t[i - 1] */
       }
       break;
     }
     default: {
-      return luaL_error(L, "wrong number of arguments to 'insert'");
+      return marpa_luaL_error(L, "wrong number of arguments to 'insert'");
     }
   }
-  lua_seti(L, 1, pos);  /* t[pos] = v */
+  marpa_lua_seti(L, 1, pos);  /* t[pos] = v */
   return 0;
 }
 
 
 static int tremove (lua_State *L) {
   lua_Integer size = aux_getn(L, 1, TAB_RW);
-  lua_Integer pos = luaL_optinteger(L, 2, size);
+  lua_Integer pos = marpa_luaL_optinteger(L, 2, size);
   if (pos != size)  /* validate 'pos' if given */
     luaL_argcheck(L, 1 <= pos && pos <= size + 1, 1, "position out of bounds");
-  lua_geti(L, 1, pos);  /* result = t[pos] */
+  marpa_lua_geti(L, 1, pos);  /* result = t[pos] */
   for ( ; pos < size; pos++) {
-    lua_geti(L, 1, pos + 1);
-    lua_seti(L, 1, pos);  /* t[pos] = t[pos + 1] */
+    marpa_lua_geti(L, 1, pos + 1);
+    marpa_lua_seti(L, 1, pos);  /* t[pos] = t[pos + 1] */
   }
-  lua_pushnil(L);
-  lua_seti(L, 1, pos);  /* t[pos] = nil */
+  marpa_lua_pushnil(L);
+  marpa_lua_seti(L, 1, pos);  /* t[pos] = nil */
   return 1;
 }
 
@@ -126,9 +126,9 @@ static int tremove (lua_State *L) {
 ** than origin, or copying to another table.
 */
 static int tmove (lua_State *L) {
-  lua_Integer f = luaL_checkinteger(L, 2);
-  lua_Integer e = luaL_checkinteger(L, 3);
-  lua_Integer t = luaL_checkinteger(L, 4);
+  lua_Integer f = marpa_luaL_checkinteger(L, 2);
+  lua_Integer e = marpa_luaL_checkinteger(L, 3);
+  lua_Integer t = marpa_luaL_checkinteger(L, 4);
   int tt = !lua_isnoneornil(L, 5) ? 5 : 1;  /* destination table */
   checktab(L, 1, TAB_R);
   checktab(L, tt, TAB_W);
@@ -141,28 +141,28 @@ static int tmove (lua_State *L) {
                   "destination wrap around");
     if (t > e || t <= f || tt != 1) {
       for (i = 0; i < n; i++) {
-        lua_geti(L, 1, f + i);
-        lua_seti(L, tt, t + i);
+        marpa_lua_geti(L, 1, f + i);
+        marpa_lua_seti(L, tt, t + i);
       }
     }
     else {
       for (i = n - 1; i >= 0; i--) {
-        lua_geti(L, 1, f + i);
-        lua_seti(L, tt, t + i);
+        marpa_lua_geti(L, 1, f + i);
+        marpa_lua_seti(L, tt, t + i);
       }
     }
   }
-  lua_pushvalue(L, tt);  /* return "to table" */
+  marpa_lua_pushvalue(L, tt);  /* return "to table" */
   return 1;
 }
 
 
 static void addfield (lua_State *L, luaL_Buffer *b, lua_Integer i) {
-  lua_geti(L, 1, i);
-  if (!lua_isstring(L, -1))
-    luaL_error(L, "invalid value (%s) at index %d in table for 'concat'",
+  marpa_lua_geti(L, 1, i);
+  if (!marpa_lua_isstring(L, -1))
+    marpa_luaL_error(L, "invalid value (%s) at index %d in table for 'concat'",
                   luaL_typename(L, -1), i);
-  luaL_addvalue(b);
+  marpa_luaL_addvalue(b);
 }
 
 
@@ -170,17 +170,17 @@ static int tconcat (lua_State *L) {
   luaL_Buffer b;
   lua_Integer last = aux_getn(L, 1, TAB_R);
   size_t lsep;
-  const char *sep = luaL_optlstring(L, 2, "", &lsep);
-  lua_Integer i = luaL_optinteger(L, 3, 1);
-  last = luaL_opt(L, luaL_checkinteger, 4, last);
-  luaL_buffinit(L, &b);
+  const char *sep = marpa_luaL_optlstring(L, 2, "", &lsep);
+  lua_Integer i = marpa_luaL_optinteger(L, 3, 1);
+  last = luaL_opt(L, marpa_luaL_checkinteger, 4, last);
+  marpa_luaL_buffinit(L, &b);
   for (; i < last; i++) {
     addfield(L, &b, i);
-    luaL_addlstring(&b, sep, lsep);
+    marpa_luaL_addlstring(&b, sep, lsep);
   }
   if (i == last)  /* add last value (if interval was not empty) */
     addfield(L, &b, i);
-  luaL_pushresult(&b);
+  marpa_luaL_pushresult(&b);
   return 1;
 }
 
@@ -193,29 +193,29 @@ static int tconcat (lua_State *L) {
 
 static int pack (lua_State *L) {
   int i;
-  int n = lua_gettop(L);  /* number of elements to pack */
-  lua_createtable(L, n, 1);  /* create result table */
+  int n = marpa_lua_gettop(L);  /* number of elements to pack */
+  marpa_lua_createtable(L, n, 1);  /* create result table */
   lua_insert(L, 1);  /* put it at index 1 */
   for (i = n; i >= 1; i--)  /* assign elements */
-    lua_seti(L, 1, i);
-  lua_pushinteger(L, n);
-  lua_setfield(L, 1, "n");  /* t.n = number of elements */
+    marpa_lua_seti(L, 1, i);
+  marpa_lua_pushinteger(L, n);
+  marpa_lua_setfield(L, 1, "n");  /* t.n = number of elements */
   return 1;  /* return table */
 }
 
 
 static int unpack (lua_State *L) {
   lua_Unsigned n;
-  lua_Integer i = luaL_optinteger(L, 2, 1);
-  lua_Integer e = luaL_opt(L, luaL_checkinteger, 3, luaL_len(L, 1));
+  lua_Integer i = marpa_luaL_optinteger(L, 2, 1);
+  lua_Integer e = luaL_opt(L, marpa_luaL_checkinteger, 3, marpa_luaL_len(L, 1));
   if (i > e) return 0;  /* empty range */
   n = (lua_Unsigned)e - i;  /* number of elements minus 1 (avoid overflows) */
-  if (n >= (unsigned int)INT_MAX  || !lua_checkstack(L, (int)(++n)))
-    return luaL_error(L, "too many results to unpack");
+  if (n >= (unsigned int)INT_MAX  || !marpa_lua_checkstack(L, (int)(++n)))
+    return marpa_luaL_error(L, "too many results to unpack");
   for (; i < e; i++) {  /* push arg[i..e - 1] (to avoid overflows) */
-    lua_geti(L, 1, i);
+    marpa_lua_geti(L, 1, i);
   }
-  lua_geti(L, 1, e);  /* push last element */
+  marpa_lua_geti(L, 1, e);  /* push last element */
   return (int)n;
 }
 
@@ -271,8 +271,8 @@ static unsigned int l_randomizePivot (void) {
 
 
 static void set2 (lua_State *L, unsigned int i, unsigned int j) {
-  lua_seti(L, 1, i);
-  lua_seti(L, 1, j);
+  marpa_lua_seti(L, 1, i);
+  marpa_lua_seti(L, 1, j);
 }
 
 
@@ -282,14 +282,14 @@ static void set2 (lua_State *L, unsigned int i, unsigned int j) {
 */
 static int sort_comp (lua_State *L, int a, int b) {
   if (lua_isnil(L, 2))  /* no function? */
-    return lua_compare(L, a, b, LUA_OPLT);  /* a < b */
+    return marpa_lua_compare(L, a, b, LUA_OPLT);  /* a < b */
   else {  /* function */
     int res;
-    lua_pushvalue(L, 2);    /* push function */
-    lua_pushvalue(L, a-1);  /* -1 to compensate function */
-    lua_pushvalue(L, b-2);  /* -2 to compensate function and 'a' */
+    marpa_lua_pushvalue(L, 2);    /* push function */
+    marpa_lua_pushvalue(L, a-1);  /* -1 to compensate function */
+    marpa_lua_pushvalue(L, b-2);  /* -2 to compensate function and 'a' */
     lua_call(L, 2, 1);      /* call function */
-    res = lua_toboolean(L, -1);  /* get result */
+    res = marpa_lua_toboolean(L, -1);  /* get result */
     lua_pop(L, 1);          /* pop result */
     return res;
   }
@@ -310,16 +310,16 @@ static unsigned int partition (lua_State *L, unsigned int lo,
   /* loop invariant: a[lo .. i] <= P <= a[j .. up] */
   for (;;) {
     /* next loop: repeat ++i while a[i] < P */
-    while (lua_geti(L, 1, ++i), sort_comp(L, -1, -2)) {
+    while (marpa_lua_geti(L, 1, ++i), sort_comp(L, -1, -2)) {
       if (i == up - 1)  /* a[i] < P  but a[up - 1] == P  ?? */
-        luaL_error(L, "invalid order function for sorting");
+        marpa_luaL_error(L, "invalid order function for sorting");
       lua_pop(L, 1);  /* remove a[i] */
     }
     /* after the loop, a[i] >= P and a[lo .. i - 1] < P */
     /* next loop: repeat --j while P < a[j] */
-    while (lua_geti(L, 1, --j), sort_comp(L, -3, -1)) {
+    while (marpa_lua_geti(L, 1, --j), sort_comp(L, -3, -1)) {
       if (j < i)  /* j < i  but  a[j] > P ?? */
-        luaL_error(L, "invalid order function for sorting");
+        marpa_luaL_error(L, "invalid order function for sorting");
       lua_pop(L, 1);  /* remove a[j] */
     }
     /* after the loop, a[j] <= P and a[j + 1 .. up] >= P */
@@ -358,8 +358,8 @@ static void auxsort (lua_State *L, unsigned int lo, unsigned int up,
     unsigned int p;  /* Pivot index */
     unsigned int n;  /* to be used later */
     /* sort elements 'lo', 'p', and 'up' */
-    lua_geti(L, 1, lo);
-    lua_geti(L, 1, up);
+    marpa_lua_geti(L, 1, lo);
+    marpa_lua_geti(L, 1, up);
     if (sort_comp(L, -1, -2))  /* a[up] < a[lo]? */
       set2(L, lo, up);  /* swap a[lo] - a[up] */
     else
@@ -370,13 +370,13 @@ static void auxsort (lua_State *L, unsigned int lo, unsigned int up,
       p = (lo + up)/2;  /* middle element is a good pivot */
     else  /* for larger intervals, it is worth a random pivot */
       p = choosePivot(lo, up, rnd);
-    lua_geti(L, 1, p);
-    lua_geti(L, 1, lo);
+    marpa_lua_geti(L, 1, p);
+    marpa_lua_geti(L, 1, lo);
     if (sort_comp(L, -2, -1))  /* a[p] < a[lo]? */
       set2(L, p, lo);  /* swap a[p] - a[lo] */
     else {
       lua_pop(L, 1);  /* remove a[lo] */
-      lua_geti(L, 1, up);
+      marpa_lua_geti(L, 1, up);
       if (sort_comp(L, -1, -2))  /* a[up] < a[p]? */
         set2(L, p, up);  /* swap a[up] - a[p] */
       else
@@ -384,9 +384,9 @@ static void auxsort (lua_State *L, unsigned int lo, unsigned int up,
     }
     if (up - lo == 2)  /* only 3 elements? */
       return;  /* already sorted */
-    lua_geti(L, 1, p);  /* get middle element (Pivot) */
-    lua_pushvalue(L, -1);  /* push Pivot */
-    lua_geti(L, 1, up - 1);  /* push a[up - 1] */
+    marpa_lua_geti(L, 1, p);  /* get middle element (Pivot) */
+    marpa_lua_pushvalue(L, -1);  /* push Pivot */
+    marpa_lua_geti(L, 1, up - 1);  /* push a[up - 1] */
     set2(L, p, up - 1);  /* swap Pivot (a[p]) with a[up - 1] */
     p = partition(L, lo, up);
     /* a[lo .. p - 1] <= a[p] == P <= a[p + 1 .. up] */
@@ -410,10 +410,10 @@ static int sort (lua_State *L) {
   lua_Integer n = aux_getn(L, 1, TAB_RW);
   if (n > 1) {  /* non-trivial interval? */
     luaL_argcheck(L, n < INT_MAX, 1, "array too big");
-    luaL_checkstack(L, 40, "");  /* assume array is smaller than 2^40 */
+    marpa_luaL_checkstack(L, 40, "");  /* assume array is smaller than 2^40 */
     if (!lua_isnoneornil(L, 2))  /* is there a 2nd argument? */
-      luaL_checktype(L, 2, LUA_TFUNCTION);  /* must be a function */
-    lua_settop(L, 2);  /* make sure there are two arguments */
+      marpa_luaL_checktype(L, 2, LUA_TFUNCTION);  /* must be a function */
+    marpa_lua_settop(L, 2);  /* make sure there are two arguments */
     auxsort(L, 1, (unsigned int)n, 0u);
   }
   return 0;
@@ -437,12 +437,12 @@ static const luaL_Reg tab_funcs[] = {
 };
 
 
-LUAMOD_API int luaopen_table (lua_State *L) {
+LUAMOD_API int marpa_luaopen_table (lua_State *L) {
   luaL_newlib(L, tab_funcs);
 #if defined(LUA_COMPAT_UNPACK)
   /* _G.unpack = table.unpack */
-  lua_getfield(L, -1, "unpack");
-  lua_setglobal(L, "unpack");
+  marpa_lua_getfield(L, -1, "unpack");
+  marpa_lua_setglobal(L, "unpack");
 #endif
   return 1;
 }
