@@ -11,13 +11,16 @@
 # of the licenses in the directory LICENSES.
 
 # Temporary
+lua[.]old/
 
 # Permanent
+
 
 # LC_ALL=C sort
 /[.]gdb_history$
 /errs$
 /junk$
+/junk2$
 [.]DS_Store$
 [.]a$
 [.]gitignore$
@@ -70,8 +73,11 @@
 ^lib/Marpa/R3[.]xs
 ^libmarpa_build/
 ^lua/MYMETA.
+^lua/Makefile
 ^lua/Makefile[.]old$
 ^lua/blib/
+^lua/lua
+^lua/luac
 ^nogit
 ^nogit/
 ^notes/
