@@ -27,39 +27,58 @@ my $define = q{};
 $define .= ' -DWIN32 -DPERL_STATIC_SYMS' if ($^O eq 'MSWin32');
 $define .= ' -DLUA_USE_POSIX' if ($^O eq 'aix');
 $define .= ' -DLUA_USE_POSIX' if ($^O eq 'bsdos');
-$define .= ' -DLUA_USE_LINUX' if ($^O eq 'freebsd');
-$define .= ' -DLUA_USE_LINUX' if ($^O eq 'linux');
-$define .= ' -DLUA_USE_LINUX' if ($^O eq 'darwin');
+$define .= ' -DLUA_USE_POSIX' if ($^O eq 'freebsd');
+$define .= ' -DLUA_USE_POSIX' if ($^O eq 'linux');
+$define .= ' -DLUA_USE_POSIX' if ($^O eq 'darwin');
 $define .= ' -DLUA_USE_POSIX' if ($^O eq 'solaris');
 
 my @h_files = <*.h>;
 my @c_files = <*.c>;
-my $o_files = join q{ }, @c_files;
-$o_files =~ s/[.]c/.o/xmsg;
+my $o_files = [qw(alllib.o lua.o luac.o)];
 
 WriteMakefile(
     NAME   => 'marpa',
     DEFINE => $define,
     SKIP   => [qw(test test_dynamic dynamic dynamic_lib dlsyms)],
     OBJECT => $o_files,
-    INC    => '-Ic_pieces',
     clean  => { 'FILES' => 'marpa_lua$(LIB_EXT)' },
-    H      => \@h_files,
-    C      => \@c_files,
+    # H      => \@h_files,
+    # C      => \@c_files,
 );
-
-sub MY::constants {
-    package MY;
-    my $self = shift;
-
-    $self->{INST_STATIC} = 'marpa_lua$(LIB_EXT)';
-
-    return $self->SUPER::constants();
-}
 
 sub MY::top_targets {
     my $r = q{
-all :: static
+
+LUA_A=	marpa_lua.a
+CORE_O=	lapi.o lcode.o lctype.o ldebug.o ldo.o ldump.o lfunc.o lgc.o llex.o \
+	lmem.o lobject.o lopcodes.o lparser.o lstate.o lstring.o ltable.o \
+	ltm.o lundump.o lvm.o lzio.o
+LIB_O=	lauxlib.o lbaselib.o lbitlib.o lcorolib.o ldblib.o liolib.o \
+	lmathlib.o loslib.o lstrlib.o ltablib.o lutf8lib.o loadlib.o linit.o
+BASE_O= $(CORE_O) $(LIB_O)
+
+LUA_T=	lua
+LUA_O=	lua.o
+
+LUAC_T=	luac
+LUAC_O=	luac.o
+
+ALL_O= $(BASE_O) $(LUA_O) $(LUAC_O)
+ALL_T= $(LUA_A) $(LUA_T) $(LUAC_T)
+ALL_A= $(LUA_A)
+
+$(LUA_A): $(BASE_O)
+	$(RM_RF) $@
+	$(FULL_AR) $(AR_STATIC_ARGS) $@ $(BASE_O) && $(RANLIB) $@
+	$(CHMOD) $(PERM_RWX) $@
+
+$(LUA_T): $(LUA_O) $(LUA_A)
+	$(CC) -o $@ $(LDFLAGS) $(LUA_O) $(LUA_A) -lm
+
+$(LUAC_T): $(LUAC_O) $(LUA_A)
+	$(CC) -o $@ $(LDFLAGS) $(LUAC_O) $(LUA_A) -lm
+
+all :: marpa_lua$(LIB_EXT) $(LUA_T) $(LUAC_T)
 	$(NOECHO) $(NOOP)
 
 config ::
