@@ -21,7 +21,7 @@ use autodie;
 # installation environment
 
 sub usage {
-     die "usage: $PROGRAM_NAME [out.xsh]";
+     die "usage: $PROGRAM_NAME [auto.xs]";
 }
 
 if (@ARGV > 1) {
@@ -30,14 +30,7 @@ if (@ARGV > 1) {
 
 my $out;
 if ( @ARGV == 1 ) {
-  # For safety sake, only allow output files
-  # which end in '.xsh'.  This can be overriden
-  # by redirecting STDOUT, for example from
-  # the shell.
     my $xsh_file_name = $ARGV[0];
-    if ( $xsh_file_name !~ /[.]xsh$/ ) {
-        usage();
-    }
     open $out, q{>}, $xsh_file_name;
 } else {
    $out = *STDOUT;
@@ -125,22 +118,30 @@ sub gp_generate {
 } ## end sub gp_generate
 
 print ${out} <<'END_OF_PREAMBLE';
- # Marpa::R3 is Copyright (C) 2016, Jeffrey Kegler.
- #
- # This module is free software; you can redistribute it and/or modify it
- # under the same terms as Perl 5.10.1. For more details, see the full text
- # of the licenses in the directory LICENSES.
- #
- # This program is distributed in the hope that it will be
- # useful, but it is provided “as is” and without any express
- # or implied warranties. For details, see the full text of
- # of the licenses in the directory LICENSES.
+/*
+ * Marpa::R3 is Copyright (C) 2016, Jeffrey Kegler.
+ *
+ * This module is free software; you can redistribute it and/or modify it
+ * under the same terms as Perl 5.10.1. For more details, see the full text
+ * of the licenses in the directory LICENSES.
+ *
+ * This program is distributed in the hope that it will be
+ * useful, but it is provided “as is” and without any express
+ * or implied warranties. For details, see the full text of
+ * of the licenses in the directory LICENSES.
+ */
 
 END_OF_PREAMBLE
 
 print ${out} <<END_OF_PREAMBLE;
- # Generated automatically by $PROGRAM_NAME
- # NOTE: Changes made to this file will be lost: look at $PROGRAM_NAME.
+/*
+ * DO NOT EDIT please, unless you are aware that this file is
+ * generated automatically by $PROGRAM_NAME
+ * NOTE: Changes made to this file will be lost: look at $PROGRAM_NAME.
+ */
+
+#include "config.h"
+#include "marpa_xs.h"
 
 END_OF_PREAMBLE
 
