@@ -84,13 +84,13 @@ luac: one.c
     $r .= q{
 
 marpa_lua$(LIB_EXT): one$(OBJ_EXT)
-        $(RM_RF) $@
-        $(FULL_AR) $(AR_STATIC_ARGS) $@ one$(OBJ_EXT) && $(RANLIB) $@
-        $(CHMOD) $(PERM_RWX) $@
+	$(RM_RF) $@
+	$(FULL_AR) $(AR_STATIC_ARGS) $@ one$(OBJ_EXT) && $(RANLIB) $@
+	$(CHMOD) $(PERM_RWX) $@
  
 one$(OBJ_EXT):
-       $(CC) -c $(PASTHRU_INC) $(INC) $(CCFLAGS) $(OPTIMIZE) \
-         $(CCCDLFLAGS) $(PASTHRU_DEFINE) $(DEFINE) -DMAKE_LIB one.c
+	$(CC) -c $(PASTHRU_INC) $(INC) $(CCFLAGS) $(OPTIMIZE) \
+	  $(CCCDLFLAGS) $(PASTHRU_DEFINE) $(DEFINE) -DMAKE_LIB one.c
 
 lua: one.c
 	$(CC) -o $@ $(PASTHRU_INC) $(INC) $(CCFLAGS) $(OPTIMIZE) \
