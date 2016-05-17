@@ -283,3 +283,5 @@ say {$out} gp_generate(qw(_marpa_b_or_node_position Marpa_Or_Node_ID ordinal));
 say {$out} gp_generate(qw(_marpa_b_or_node_set Marpa_Or_Node_ID ordinal));
 say {$out} gp_generate(qw(_marpa_b_top_or_node));
 
+say {$out} 'PROTOTYPES: DISABLE';
+

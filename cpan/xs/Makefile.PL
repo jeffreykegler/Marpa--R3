@@ -66,8 +66,8 @@ undef &MY::postamble; # suppress warning
     push @postamble_pieces, <<'END_OF_POSTAMBLE_PIECE';
 R3$(OBJ_EXT): marpa_slifop.h
 
-auto.xs: gp_generate.pl
-	$(PERLRUN) gp_generate.pl $@
+auto.xs: gen_auto_xs.pl
+	$(PERLRUN) gen_auto_xs.pl $@
 
 marpa_slifop.h: create_ops.pl
 	$(PERLRUN) create_ops.pl > marpa_slifop.h

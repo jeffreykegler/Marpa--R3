@@ -1,7 +1,4 @@
-/general_pattern[.]xsh
 /libmarpa[.]a
-/libmarpa_la-marpa[.]o
-/libmarpa_la-marpa_obs[.]o
 /marpa_slifop[.]h
 /marpa_codes[.]h
 /marpa[.]h
@@ -9,4 +6,8 @@
 /Makefile[.]old
 /R3[.]o
 /R3[.]c
+/auto[.]o
+/auto[.]c
+/auto[.]xs
+/MYMETA[.]*
 /MYMETA[.]*

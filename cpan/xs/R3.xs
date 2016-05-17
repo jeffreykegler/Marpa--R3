@@ -4405,8 +4405,6 @@ PPCODE:
 
 MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::B
 
- # Move of bocage modules to gp_generate.pl is now complete
-
 void
 _marpa_b_and_node_token( b_wrapper, and_node_id )
      B_Wrapper *b_wrapper;
@@ -6645,9 +6643,6 @@ PPCODE:
     }
   XPUSHs (sv_2mortal (SvREFCNT_inc_simple_NN (*p_token_value_sv)));
 }
-
-
-INCLUDE: general_pattern.xsh
 
 BOOT:
     /* Perl threads now discouraged, so we no longer worry about
