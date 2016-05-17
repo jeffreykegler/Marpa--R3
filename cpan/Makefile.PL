@@ -294,7 +294,8 @@ my $libmarpa_in_build_dir =
   ?  $libmarpa_build_dir . q{/libmarpa$(LIB_EXT)}
   :  $libmarpa_build_dir . q{/.libs/libmarpa$(LIB_EXT)};
 
-my $myextlib = join q{ }, 'xs/R3$(OBJ_EXT)', $libmarpa_in_build_dir, 'lua/marpa_lua$(LIB_EXT)';
+my $myextlib = join q{ }, 'xs/R3$(OBJ_EXT)', $libmarpa_in_build_dir,
+  'lua/marpa_lua$(LIB_EXT)';
 
 # my $ccflags = $Config{ccflags} . " -Iengine/read_only -Ixs";
 

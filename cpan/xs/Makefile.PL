@@ -37,7 +37,7 @@ my $ccflags = $Config{ccflags} . " -I../engine/read_only";
 undef &MY::top_targets; # suppress warning
 *MY::top_targets = sub {
     my $r = '
-all :: R3$(OBJ_EXT) auto$(OBJ_EXT)
+all :: R3$(OBJ_EXT)
 	$(NOECHO) $(NOOP)
 	$(NOECHO) $(ECHO) Executing all target in xs directory
 
@@ -64,7 +64,7 @@ undef &MY::postamble; # suppress warning
     my @postamble_pieces = (".NOTPARALLEL:\n");
 
     push @postamble_pieces, <<'END_OF_POSTAMBLE_PIECE';
-R3$(OBJ_EXT): marpa_slifop.h
+R3.c: marpa_slifop.h auto.xs lua.xs
 
 auto.xs: gen_auto_xs.pl
 	$(PERLRUN) gen_auto_xs.pl $@
@@ -84,7 +84,7 @@ WriteMakefile(
     DEFINE  => $define,
     SKIP    => [qw(test test_dynamic dynamic dynamic_lib dlsyms)],
     CCFLAGS => $ccflags,
-    XS      => { 'R3.xs' => 'R3.c', 'auto.xs' => 'auto.c' },
+    XS      => { 'R3.xs' => 'R3.c' },
     # OBJECT  => 'R3.o',
 );
 

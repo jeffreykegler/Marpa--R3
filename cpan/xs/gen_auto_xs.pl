@@ -118,30 +118,23 @@ sub gp_generate {
 } ## end sub gp_generate
 
 print ${out} <<'END_OF_PREAMBLE';
-/*
- * Marpa::R3 is Copyright (C) 2016, Jeffrey Kegler.
- *
- * This module is free software; you can redistribute it and/or modify it
- * under the same terms as Perl 5.10.1. For more details, see the full text
- * of the licenses in the directory LICENSES.
- *
- * This program is distributed in the hope that it will be
- * useful, but it is provided “as is” and without any express
- * or implied warranties. For details, see the full text of
- * of the licenses in the directory LICENSES.
- */
+ # Marpa::R3 is Copyright (C) 2016, Jeffrey Kegler.
+ #
+ # This module is free software; you can redistribute it and/or modify it
+ # under the same terms as Perl 5.10.1. For more details, see the full text
+ # of the licenses in the directory LICENSES.
+ #
+ # This program is distributed in the hope that it will be
+ # useful, but it is provided “as is” and without any express
+ # or implied warranties. For details, see the full text of
+ # of the licenses in the directory LICENSES.
 
 END_OF_PREAMBLE
 
 print ${out} <<END_OF_PREAMBLE;
-/*
- * DO NOT EDIT please, unless you are aware that this file is
- * generated automatically by $PROGRAM_NAME
- * NOTE: Changes made to this file will be lost: look at $PROGRAM_NAME.
- */
-
-#include "config.h"
-#include "marpa_xs.h"
+ # DO NOT EDIT please, unless you are aware that this file is
+ # generated automatically by $PROGRAM_NAME
+ # NOTE: Changes made to this file will be lost: look at $PROGRAM_NAME.
 
 END_OF_PREAMBLE
 
@@ -282,6 +275,4 @@ say {$out} gp_generate(qw(_marpa_b_or_node_origin Marpa_Or_Node_ID ordinal));
 say {$out} gp_generate(qw(_marpa_b_or_node_position Marpa_Or_Node_ID ordinal));
 say {$out} gp_generate(qw(_marpa_b_or_node_set Marpa_Or_Node_ID ordinal));
 say {$out} gp_generate(qw(_marpa_b_top_or_node));
-
-say {$out} 'PROTOTYPES: DISABLE';
 

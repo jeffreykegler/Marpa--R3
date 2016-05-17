@@ -6644,6 +6644,9 @@ PPCODE:
   XPUSHs (sv_2mortal (SvREFCNT_inc_simple_NN (*p_token_value_sv)));
 }
 
+INCLUDE: auto.xs
+INCLUDE: lua.xs
+
 BOOT:
     /* Perl threads now discouraged, so we no longer worry about
      * safety
