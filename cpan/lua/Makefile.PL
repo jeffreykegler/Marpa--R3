@@ -62,12 +62,10 @@ test_dynamic ::
 
 marpa_lua$(LIB_EXT): one$(OBJ_EXT)
 	$(RM_RF) $@
-	$(FULL_AR) $(AR_STATIC_ARGS) $@ one$(OBJ_EXT) && $(RANLIB) $@
-	$(CHMOD) $(PERM_RWX) $@
-
-one$(OBJ_EXT):
 	$(CC) -c $(PASTHRU_INC) $(INC) $(CCFLAGS) $(OPTIMIZE) \
 	  $(CCCDLFLAGS) $(PASTHRU_DEFINE) $(DEFINE) -DMAKE_LIB one.c
+	$(FULL_AR) $(AR_STATIC_ARGS) $@ one$(OBJ_EXT) && $(RANLIB) $@
+	$(CHMOD) $(PERM_RWX) $@
 
 lua: one.c
 	$(CC) -o $@ $(PASTHRU_INC) $(INC) $(CCFLAGS) $(OPTIMIZE) \
@@ -78,4 +76,15 @@ luac: one.c
 	  $(PASTHRU_DEFINE) $(DEFINE) -DMAKE_LUAC one.c -lm
 
 };
+
+if ($^O eq 'MSWin32'){
+    my $posix_ar = q{$(FULL_AR) $(AR_STATIC_ARGS) $@ one$(OBJ_EXT) && $(RANLIB) $@};
+    my $windows_ar = q{$(AR) -out:$@ one$(OBJ_EXT)};
+    $r =~ s/\Q$posix_ar\E/$windows_ar/g;
+    $r =~ s/ -o / -Fo/g;
+    $r =~ s/-lm//g;
+}
+
+return $r;
+
 }
