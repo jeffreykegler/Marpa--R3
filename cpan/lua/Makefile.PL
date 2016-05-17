@@ -59,13 +59,38 @@ test ::
 # “don’t know how to make test_dynamic” complaints under freebsd
 test_dynamic ::
 	$(NOECHO) $(NOOP)
+};
+
+if ( $^O eq 'MSWin32' ) {
+    $r .= q{
 
 marpa_lua$(LIB_EXT): one$(OBJ_EXT)
 	$(RM_RF) $@
 	$(CC) -c $(PASTHRU_INC) $(INC) $(CCFLAGS) $(OPTIMIZE) \
 	  $(CCCDLFLAGS) $(PASTHRU_DEFINE) $(DEFINE) -DMAKE_LIB one.c
-	$(FULL_AR) $(AR_STATIC_ARGS) $@ one$(OBJ_EXT) && $(RANLIB) $@
+	$(AR) -out:$@ one$(OBJ_EXT)
 	$(CHMOD) $(PERM_RWX) $@
+
+lua: one.c
+	$(CC) -Fo $@ $(PASTHRU_INC) $(INC) $(CCFLAGS) $(OPTIMIZE) \
+	  $(PASTHRU_DEFINE) $(DEFINE) -DMAKE_LUA one.c
+
+luac: one.c
+	$(CC) -Fo $@ $(PASTHRU_INC) $(INC) $(CCFLAGS) $(OPTIMIZE) \
+	  $(PASTHRU_DEFINE) $(DEFINE) -DMAKE_LUAC one.c
+
+};
+} else {
+    $r .= q{
+
+marpa_lua$(LIB_EXT): one$(OBJ_EXT)
+        $(RM_RF) $@
+        $(FULL_AR) $(AR_STATIC_ARGS) $@ one$(OBJ_EXT) && $(RANLIB) $@
+        $(CHMOD) $(PERM_RWX) $@
+ 
+one$(OBJ_EXT):
+       $(CC) -c $(PASTHRU_INC) $(INC) $(CCFLAGS) $(OPTIMIZE) \
+         $(CCCDLFLAGS) $(PASTHRU_DEFINE) $(DEFINE) -DMAKE_LIB one.c
 
 lua: one.c
 	$(CC) -o $@ $(PASTHRU_INC) $(INC) $(CCFLAGS) $(OPTIMIZE) \
@@ -76,13 +101,6 @@ luac: one.c
 	  $(PASTHRU_DEFINE) $(DEFINE) -DMAKE_LUAC one.c -lm
 
 };
-
-if ($^O eq 'MSWin32'){
-    my $posix_ar = q{$(FULL_AR) $(AR_STATIC_ARGS) $@ one$(OBJ_EXT) && $(RANLIB) $@};
-    my $windows_ar = q{$(AR) -out:$@ one$(OBJ_EXT)};
-    $r =~ s/\Q$posix_ar\E/$windows_ar/g;
-    $r =~ s/ -o / -Fo/g;
-    $r =~ s/-lm//g;
 }
 
 return $r;
