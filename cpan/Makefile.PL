@@ -294,8 +294,8 @@ my $libmarpa_in_build_dir =
   ?  $libmarpa_build_dir . q{/libmarpa$(LIB_EXT)}
   :  $libmarpa_build_dir . q{/.libs/libmarpa$(LIB_EXT)};
 
-my $myextlib = join q{ }, 'xs/R3$(OBJ_EXT)', $libmarpa_in_build_dir,
-  'lua/marpa_lua$(LIB_EXT)';
+my $myextlib = join q{ }, 'xs/R3$(OBJ_EXT)', 'xs/lua$(OBJ_EXT)',
+    $libmarpa_in_build_dir, 'lua/marpa_lua$(LIB_EXT)';
 
 # my $ccflags = $Config{ccflags} . " -Iengine/read_only -Ixs";
 
@@ -337,7 +337,13 @@ END_OF_POSTAMBLE_PIECE
 xs/R3$(OBJ_EXT):
 	%s
 END_OF_POSTAMBLE_PIECE
-	$self->cd(File::Spec->catdir(qw(xs)), '$(MAKE)');
+	$self->cd(File::Spec->catdir(qw(xs)), '$(MAKE) R3$(OBJ_EXT)');
+
+    push @postamble_pieces, sprintf <<'END_OF_POSTAMBLE_PIECE',
+xs/lua$(OBJ_EXT):
+	%s
+END_OF_POSTAMBLE_PIECE
+	$self->cd(File::Spec->catdir(qw(xs)), '$(MAKE) lua$(OBJ_EXT)');
 
 # == Logic to build in Lua directory:
 
@@ -345,7 +351,7 @@ END_OF_POSTAMBLE_PIECE
 lua/marpa_lua$(LIB_EXT):
 	%s
 END_OF_POSTAMBLE_PIECE
-	$self->cd(File::Spec->catdir(qw(lua)), '$(MAKE)');
+	$self->cd(File::Spec->catdir(qw(lua)), '$(MAKE) ');
 
     return join "\n", @postamble_pieces;
 

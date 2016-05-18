@@ -14,12 +14,6 @@
 #include "config.h"
 #include "marpa_xs.h"
 
-#include <lua.h>
-#include <lualib.h>
-#include <lauxlib.h>
-
-static lua_State *marpa_L = NULL;
-
 #define PERL_NO_GET_CONTEXT
 #include <EXTERN.h>
 #include <perl.h>
@@ -6645,18 +6639,10 @@ PPCODE:
 }
 
 INCLUDE: auto.xs
-INCLUDE: lua.xs
 
 BOOT:
-    /* Perl threads now discouraged, so we no longer worry about
-     * safety
-     */
-     marpa_L = marpa_luaL_newstate();
-     if (!marpa_L) {
-      croak ("Marpa::R3 internal error: Lua interpreter failed to start");
-       }
-    marpa_luaL_openlibs(marpa_L);  /* open libraries */
 
     marpa_debug_handler_set(marpa_r3_warn);
+    boot_Marpa__R3__Lua(aTHX_ cv);
 
     /* vim: set expandtab shiftwidth=2: */
