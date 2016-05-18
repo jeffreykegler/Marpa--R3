@@ -72,11 +72,11 @@ marpa_lua$(LIB_EXT): one$(OBJ_EXT)
 	$(CHMOD) $(PERM_RWX) $@
 
 lua: one.c
-	$(CC) -Fo $@ $(PASTHRU_INC) $(INC) $(CCFLAGS) $(OPTIMIZE) \
+	$(CC) -Fe$@ $(PASTHRU_INC) $(INC) $(CCFLAGS) $(OPTIMIZE) \
 	  $(PASTHRU_DEFINE) $(DEFINE) -DMAKE_LUA one.c
 
 luac: one.c
-	$(CC) -Fo $@ $(PASTHRU_INC) $(INC) $(CCFLAGS) $(OPTIMIZE) \
+	$(CC) -Fe$@ $(PASTHRU_INC) $(INC) $(CCFLAGS) $(OPTIMIZE) \
 	  $(PASTHRU_DEFINE) $(DEFINE) -DMAKE_LUAC one.c
 
 };
