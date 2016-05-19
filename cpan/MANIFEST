@@ -297,10 +297,8 @@ t/wall.t
 t/zorro.t
 xs/Makefile.PL
 xs/R3.xs
-xs/auto.xs
 xs/create_ops.pl
 xs/gen_auto_xs.pl
-xs/marpa_slifop.h
 xs/marpa_xs.h
 xs/ppport.h
 xs/typemap
