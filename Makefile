@@ -66,7 +66,6 @@ gnu_ac_disttest:
 install:
 	@echo === install target ===
 	(cd cpan/meta && $(MAKE) all)
-	(cd cpan/xs && $(MAKE) -f meta_make)
 	(cd cpan && perl Makefile.PL)
 	(cd cpan && $(MAKE))
 
