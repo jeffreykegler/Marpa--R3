@@ -294,8 +294,7 @@ my $libmarpa_in_build_dir =
   ?  $libmarpa_build_dir . q{/libmarpa$(LIB_EXT)}
   :  $libmarpa_build_dir . q{/.libs/libmarpa$(LIB_EXT)};
 
-my $myextlib = join q{ }, 'xs/R3$(OBJ_EXT)', 'xs/lua$(OBJ_EXT)',
-    $libmarpa_in_build_dir, 'lua/marpa_lua$(LIB_EXT)';
+my $myextlib = join q{ }, $libmarpa_in_build_dir, 'lua/marpa_lua$(LIB_EXT)';
 
 # my $ccflags = $Config{ccflags} . " -Iengine/read_only -Ixs";
 
@@ -388,6 +387,7 @@ WriteMakefile(
     NO_META  => 1,
     MAN1PODS => \%pod_files,
     LICENSE  => 'perl_5',
+    OBJECT => 'xs/R3$(OBJ_EXT) xs/lua$(OBJ_EXT)',
     MYEXTLIB => $myextlib
 
 );

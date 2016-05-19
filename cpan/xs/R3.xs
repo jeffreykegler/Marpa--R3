@@ -6643,6 +6643,5 @@ INCLUDE: auto.xs
 BOOT:
 
     marpa_debug_handler_set(marpa_r3_warn);
-    boot_Marpa__R3__Lua(aTHX_ cv);
 
     /* vim: set expandtab shiftwidth=2: */
