@@ -105,10 +105,15 @@ inc/Marpa/R3/Config.pm
 inc/Marpa/R3/Display.pm
 inc/Marpa/R3/License.pm
 inc/Marpa/R3/Test.pm
+lib/Makefile.PL
+lib/Marpa/Makefile.PL
 lib/Marpa/R3.pm
 lib/Marpa/R3/ASF.pm
 lib/Marpa/R3/Common.pm
 lib/Marpa/R3/Internal.pm
+lib/Marpa/R3/Lua/Lua.xs
+lib/Marpa/R3/Lua/Makefile.PL
+lib/Marpa/R3/Makefile.PL
 lib/Marpa/R3/MetaAST.pm
 lib/Marpa/R3/MetaG.pm
 lib/Marpa/R3/SLG.pm
@@ -292,9 +297,10 @@ t/wall.t
 t/zorro.t
 xs/Makefile.PL
 xs/R3.xs
-xs/lua.xs
+xs/auto.xs
 xs/create_ops.pl
 xs/gen_auto_xs.pl
 xs/marpa_slifop.h
+xs/marpa_xs.h
 xs/ppport.h
 xs/typemap

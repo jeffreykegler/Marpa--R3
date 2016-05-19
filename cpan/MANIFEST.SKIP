@@ -11,7 +11,6 @@
 # of the licenses in the directory LICENSES.
 
 # Temporary
-lua[.]old/
 
 # Permanent
 
@@ -64,13 +63,31 @@ lua[.]old/
 ^hide/
 ^inc/proof/.*[.]lyx[~]$
 ^junk$
+^lib/MYMETA.
+^lib/Makefile$
+^lib/Makefile[.]old$
+^lib/pm_to_blib$
 ^lib/Marpa/.*[.]xsh
+^lib/Marpa/MYMETA.
+^lib/Marpa/Makefile$
+^lib/Marpa/pm_to_blib$
+^lib/Marpa/Makefile[.]old$
 ^lib/Marpa/R3/Installed.pm$
 ^lib/Marpa/R3/Version.pm$
 ^lib/Marpa/R3/meta/metag[-]g[123456789][.]pl
 ^lib/Marpa/R3/meta/metag[.]pl
 ^lib/Marpa/R3[.]c
 ^lib/Marpa/R3[.]xs
+^lib/Marpa/R3/MYMETA.
+^lib/Marpa/R3/pm_to_blib$
+^lib/Marpa/R3/Makefile$
+^lib/Marpa/R3/Makefile[.]old$
+^lib/Marpa/R3/Lua/Lua[.]c$
+^lib/Marpa/R3/Lua/Lua[.]o$
+^lib/Marpa/R3/Lua/MYMETA.
+^lib/Marpa/R3/Lua/pm_to_blib$
+^lib/Marpa/R3/Lua/Makefile$
+^lib/Marpa/R3/Lua/Makefile[.]old$
 ^libmarpa_build/
 ^lua/MYMETA.
 ^lua/Makefile$
