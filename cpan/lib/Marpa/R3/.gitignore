@@ -1,2 +1,5 @@
-/Version[.]pm
 /Installed[.]pm
+/Makefile
+/Makefile[.]old
+/MYMETA[.]*
+/Version[.]pm
