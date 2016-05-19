@@ -338,12 +338,6 @@ xs/R3$(OBJ_EXT):
 END_OF_POSTAMBLE_PIECE
 	$self->cd(File::Spec->catdir(qw(xs)), '$(MAKE) R3$(OBJ_EXT)');
 
-    push @postamble_pieces, sprintf <<'END_OF_POSTAMBLE_PIECE',
-xs/lua$(OBJ_EXT):
-	%s
-END_OF_POSTAMBLE_PIECE
-	$self->cd(File::Spec->catdir(qw(xs)), '$(MAKE) lua$(OBJ_EXT)');
-
 # == Logic to build in Lua directory:
 
     push @postamble_pieces, sprintf <<'END_OF_POSTAMBLE_PIECE',
@@ -367,7 +361,7 @@ WriteMakefile(
     CONFIGURE_REQUIRES => \%configure_requires,
     PM                 => \%pm_files,
     MIN_PERL_VERSION => '5.10.1',
-    DIR => [qw(engine lua xs)],
+    DIR => [qw(engine lua lib xs)],
     META_ADD => {
         no_index => {
             directory => [
@@ -387,7 +381,7 @@ WriteMakefile(
     NO_META  => 1,
     MAN1PODS => \%pod_files,
     LICENSE  => 'perl_5',
-    OBJECT => 'xs/R3$(OBJ_EXT) xs/lua$(OBJ_EXT)',
+    OBJECT => 'xs/R3$(OBJ_EXT)',
     MYEXTLIB => $myextlib
 
 );

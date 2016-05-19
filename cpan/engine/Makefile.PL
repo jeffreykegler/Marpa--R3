@@ -9,8 +9,6 @@
 # or implied warranties. For details, see the full text of
 # of the licenses in the directory LICENSES.
 
-# This code is adopted from code in the SDBM_File module.
-
 use 5.010001;
 use strict;
 use warnings;

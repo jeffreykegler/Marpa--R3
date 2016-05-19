@@ -37,7 +37,7 @@ my $ccflags = $Config{ccflags} . " -I../engine/read_only";
 undef &MY::top_targets; # suppress warning
 *MY::top_targets = sub {
     my $r = '
-all :: R3$(OBJ_EXT) lua$(OBJ_EXT)
+all :: R3$(OBJ_EXT)
 	$(NOECHO) $(NOOP)
 	$(NOECHO) $(ECHO) Executing all target in xs directory
 
@@ -66,8 +66,6 @@ undef &MY::postamble; # suppress warning
     push @postamble_pieces, <<'END_OF_POSTAMBLE_PIECE';
 R3.c: marpa_slifop.h marpa_xs.h auto.xs
 
-lua.c: marpa_slifop.h marpa_xs.h lua.xs
-
 auto.xs: gen_auto_xs.pl
 	$(PERLRUN) gen_auto_xs.pl $@
 
@@ -80,7 +78,7 @@ END_OF_POSTAMBLE_PIECE
 };
 
 WriteMakefile(
-    INC     => '-I. -I../lua',
+    INC     => '-I.',
     NAME    => 'Marpa::R3',
     VERSION => $STRING_VERSION,
     DEFINE  => $define,

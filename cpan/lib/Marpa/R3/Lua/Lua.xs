@@ -28,6 +28,8 @@ static lua_State *marpa_L = NULL;
 
 MODULE = Marpa::R3::Lua        PACKAGE = Marpa::R3::Lua
 
+PROTOTYPES: DISABLE
+
 void
 exec( ... )
 PPCODE:
