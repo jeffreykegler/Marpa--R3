@@ -112,7 +112,7 @@ push_val (lua_State * L, SV * val)
     }
       warn("%s %d\n", __FILE__, __LINE__);
   marpa_lua_pushfstring (marpa_L, "!!!Argument unsupported: Perl type (%d)",
-			 SvType (val));
+			 SvTYPE (val));
   return;
 }
 
@@ -128,14 +128,14 @@ PPCODE:
   // XPUSHs (sv_2mortal (newSVpv (hi, 0)));
   int i, status;
   int top_before, top_after;
-  char *codestr = "print [[SALVE!]]; return ..., [[salve, munde!]]";
+  char *codestr = "print [[SALVE!]]; return [[salve, munde!]], ...";
 
   top_before = marpa_lua_gettop (marpa_L);
   warn("top_before=%d", top_before);
 
   /* push arguments */
   for (i = 0; i < items; i++) {
-      warn("%s %d\n", __FILE__, __LINE__);
+      warn("%s %d: pushing Perl arg %d\n", __FILE__, __LINE__, i);
       push_val(marpa_L, ST(i));
       warn("%s %d\n", __FILE__, __LINE__);
   }
