@@ -16,19 +16,20 @@ use 5.010001;
 use strict;
 use warnings;
 
-use Test::More tests => 1;
+use Test::More tests => 3;
 use English qw( -no_match_vars );
 use lib 'inc';
 use Marpa::R3::Test;
 use Marpa::R3;
 
-my @result = Marpa::R3::Lua::exec();
+my @result;
+@result = Marpa::R3::Lua::exec();
 Marpa::R3::Test::is((join q{:}, map { $_ // 'undef' } @result), 'salve, munde!');
 
-my @result = Marpa::R3::Lua::exec(qw{hi});
+@result = Marpa::R3::Lua::exec(qw{hi});
 Marpa::R3::Test::is((join q{:}, map { $_ // 'undef' } @result), 'hi:salve, munde!');
 
-my @result = Marpa::R3::Lua::exec(qw{hi hi2});
+@result = Marpa::R3::Lua::exec(qw{hi hi2});
 Marpa::R3::Test::is((join q{:}, map { $_ // 'undef' } @result), 'hi:hi2:salve, munde!');
 
 # vim: expandtab shiftwidth=4:
