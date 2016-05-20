@@ -50,7 +50,7 @@ static void checktab (lua_State *L, int arg, int what) {
         (!(what & TAB_R) || checkfield(L, "__index", ++n)) &&
         (!(what & TAB_W) || checkfield(L, "__newindex", ++n)) &&
         (!(what & TAB_L) || checkfield(L, "__len", ++n))) {
-      lua_pop(L, n);  /* pop metatable and tested metamethods */
+      marpa_lua_pop(L, n);  /* pop metatable and tested metamethods */
     }
     else
       marpa_luaL_argerror(L, arg, "table expected");  /* force an error */
@@ -64,9 +64,9 @@ static int maxn (lua_State *L) {
   marpa_luaL_checktype(L, 1, LUA_TTABLE);
   marpa_lua_pushnil(L);  /* first key */
   while (marpa_lua_next(L, 1)) {
-    lua_pop(L, 1);  /* remove value */
+    marpa_lua_pop(L, 1);  /* remove value */
     if (marpa_lua_type(L, -1) == LUA_TNUMBER) {
-      lua_Number v = lua_tonumber(L, -1);
+      lua_Number v = marpa_lua_tonumber(L, -1);
       if (v > max) max = v;
     }
   }
@@ -129,7 +129,7 @@ static int tmove (lua_State *L) {
   lua_Integer f = marpa_luaL_checkinteger(L, 2);
   lua_Integer e = marpa_luaL_checkinteger(L, 3);
   lua_Integer t = marpa_luaL_checkinteger(L, 4);
-  int tt = !lua_isnoneornil(L, 5) ? 5 : 1;  /* destination table */
+  int tt = !marpa_lua_isnoneornil(L, 5) ? 5 : 1;  /* destination table */
   checktab(L, 1, TAB_R);
   checktab(L, tt, TAB_W);
   if (e >= f) {  /* otherwise, nothing to move */
@@ -195,7 +195,7 @@ static int pack (lua_State *L) {
   int i;
   int n = marpa_lua_gettop(L);  /* number of elements to pack */
   marpa_lua_createtable(L, n, 1);  /* create result table */
-  lua_insert(L, 1);  /* put it at index 1 */
+  marpa_lua_insert(L, 1);  /* put it at index 1 */
   for (i = n; i >= 1; i--)  /* assign elements */
     marpa_lua_seti(L, 1, i);
   marpa_lua_pushinteger(L, n);
@@ -281,16 +281,16 @@ static void set2 (lua_State *L, unsigned int i, unsigned int j) {
 ** index 'b' (according to the order of the sort).
 */
 static int sort_comp (lua_State *L, int a, int b) {
-  if (lua_isnil(L, 2))  /* no function? */
+  if (marpa_lua_isnil(L, 2))  /* no function? */
     return marpa_lua_compare(L, a, b, LUA_OPLT);  /* a < b */
   else {  /* function */
     int res;
     marpa_lua_pushvalue(L, 2);    /* push function */
     marpa_lua_pushvalue(L, a-1);  /* -1 to compensate function */
     marpa_lua_pushvalue(L, b-2);  /* -2 to compensate function and 'a' */
-    lua_call(L, 2, 1);      /* call function */
+    marpa_lua_call(L, 2, 1);      /* call function */
     res = marpa_lua_toboolean(L, -1);  /* get result */
-    lua_pop(L, 1);          /* pop result */
+    marpa_lua_pop(L, 1);          /* pop result */
     return res;
   }
 }
@@ -313,19 +313,19 @@ static unsigned int partition (lua_State *L, unsigned int lo,
     while (marpa_lua_geti(L, 1, ++i), sort_comp(L, -1, -2)) {
       if (i == up - 1)  /* a[i] < P  but a[up - 1] == P  ?? */
         marpa_luaL_error(L, "invalid order function for sorting");
-      lua_pop(L, 1);  /* remove a[i] */
+      marpa_lua_pop(L, 1);  /* remove a[i] */
     }
     /* after the loop, a[i] >= P and a[lo .. i - 1] < P */
     /* next loop: repeat --j while P < a[j] */
     while (marpa_lua_geti(L, 1, --j), sort_comp(L, -3, -1)) {
       if (j < i)  /* j < i  but  a[j] > P ?? */
         marpa_luaL_error(L, "invalid order function for sorting");
-      lua_pop(L, 1);  /* remove a[j] */
+      marpa_lua_pop(L, 1);  /* remove a[j] */
     }
     /* after the loop, a[j] <= P and a[j + 1 .. up] >= P */
     if (j < i) {  /* no elements out of place? */
       /* a[lo .. i - 1] <= P <= a[j + 1 .. i .. up] */
-      lua_pop(L, 1);  /* pop a[j] */
+      marpa_lua_pop(L, 1);  /* pop a[j] */
       /* swap pivot (a[up - 1]) with a[i] to satisfy pos-condition */
       set2(L, up - 1, i);
       return i;
@@ -363,7 +363,7 @@ static void auxsort (lua_State *L, unsigned int lo, unsigned int up,
     if (sort_comp(L, -1, -2))  /* a[up] < a[lo]? */
       set2(L, lo, up);  /* swap a[lo] - a[up] */
     else
-      lua_pop(L, 2);  /* remove both values */
+      marpa_lua_pop(L, 2);  /* remove both values */
     if (up - lo == 1)  /* only 2 elements? */
       return;  /* already sorted */
     if (up - lo < RANLIMIT || rnd == 0)  /* small interval or no randomize? */
@@ -375,12 +375,12 @@ static void auxsort (lua_State *L, unsigned int lo, unsigned int up,
     if (sort_comp(L, -2, -1))  /* a[p] < a[lo]? */
       set2(L, p, lo);  /* swap a[p] - a[lo] */
     else {
-      lua_pop(L, 1);  /* remove a[lo] */
+      marpa_lua_pop(L, 1);  /* remove a[lo] */
       marpa_lua_geti(L, 1, up);
       if (sort_comp(L, -1, -2))  /* a[up] < a[p]? */
         set2(L, p, up);  /* swap a[up] - a[p] */
       else
-        lua_pop(L, 2);
+        marpa_lua_pop(L, 2);
     }
     if (up - lo == 2)  /* only 3 elements? */
       return;  /* already sorted */
@@ -411,7 +411,7 @@ static int sort (lua_State *L) {
   if (n > 1) {  /* non-trivial interval? */
     luaL_argcheck(L, n < INT_MAX, 1, "array too big");
     marpa_luaL_checkstack(L, 40, "");  /* assume array is smaller than 2^40 */
-    if (!lua_isnoneornil(L, 2))  /* is there a 2nd argument? */
+    if (!marpa_lua_isnoneornil(L, 2))  /* is there a 2nd argument? */
       marpa_luaL_checktype(L, 2, LUA_TFUNCTION);  /* must be a function */
     marpa_lua_settop(L, 2);  /* make sure there are two arguments */
     auxsort(L, 1, (unsigned int)n, 0u);

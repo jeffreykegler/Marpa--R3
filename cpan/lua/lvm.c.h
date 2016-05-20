@@ -102,7 +102,7 @@ int luaV_tointeger (const TValue *obj, lua_Integer *p, int mode) {
       else if (mode > 1)  /* needs ceil? */
         f += 1;  /* convert floor to ceil (remember: n != f) */
     }
-    return lua_numbertointeger(f, p);
+    return marpa_lua_numbertointeger(f, p);
   }
   else if (ttisinteger(obj)) {
     *p = ivalue(obj);

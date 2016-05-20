@@ -19,9 +19,9 @@
 ** For that, do the following code:
 **
 **  marpa_luaL_getsubtable(L, LUA_REGISTRYINDEX, "_PRELOAD");
-**  lua_pushcfunction(L, luaopen_modname);
+**  marpa_lua_pushcfunction(L, luaopen_modname);
 **  marpa_lua_setfield(L, -2, modname);
-**  lua_pop(L, 1);  // remove _PRELOAD table
+**  marpa_lua_pop(L, 1);  // remove _PRELOAD table
 */
 
 #include "lprefix.h"
@@ -62,7 +62,7 @@ LUALIB_API void marpa_luaL_openlibs (lua_State *L) {
   /* "require" functions from 'loadedlibs' and set results to global table */
   for (lib = loadedlibs; lib->func; lib++) {
     marpa_luaL_requiref(L, lib->name, lib->func, 1);
-    lua_pop(L, 1);  /* remove lib */
+    marpa_lua_pop(L, 1);  /* remove lib */
   }
 }
 

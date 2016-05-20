@@ -126,12 +126,12 @@ static void laction (int i) {
 
 
 static void print_usage (const char *badoption) {
-  lua_writestringerror("%s: ", progname);
+  marpa_lua_writestringerror("%s: ", progname);
   if (badoption[1] == 'e' || badoption[1] == 'l')
-    lua_writestringerror("'%s' needs argument\n", badoption);
+    marpa_lua_writestringerror("'%s' needs argument\n", badoption);
   else
-    lua_writestringerror("unrecognized option '%s'\n", badoption);
-  lua_writestringerror(
+    marpa_lua_writestringerror("unrecognized option '%s'\n", badoption);
+  marpa_lua_writestringerror(
   "usage: %s [options] [script [args]]\n"
   "Available options are:\n"
   "  -e stat  execute string 'stat'\n"
@@ -151,8 +151,8 @@ static void print_usage (const char *badoption) {
 ** (if present)
 */
 static void l_message (const char *pname, const char *msg) {
-  if (pname) lua_writestringerror("%s: ", pname);
-  lua_writestringerror("%s\n", msg);
+  if (pname) marpa_lua_writestringerror("%s: ", pname);
+  marpa_lua_writestringerror("%s\n", msg);
 }
 
 
@@ -163,9 +163,9 @@ static void l_message (const char *pname, const char *msg) {
 */
 static int report (lua_State *L, int status) {
   if (status != LUA_OK) {
-    const char *msg = lua_tostring(L, -1);
+    const char *msg = marpa_lua_tostring(L, -1);
     l_message(progname, msg);
-    lua_pop(L, 1);  /* remove message */
+    marpa_lua_pop(L, 1);  /* remove message */
   }
   return status;
 }
@@ -175,7 +175,7 @@ static int report (lua_State *L, int status) {
 ** Message handler used to run all chunks
 */
 static int msghandler (lua_State *L) {
-  const char *msg = lua_tostring(L, 1);
+  const char *msg = marpa_lua_tostring(L, 1);
   if (msg == NULL) {  /* is error object not a string? */
     if (marpa_luaL_callmeta(L, 1, "__tostring") &&  /* does it have a metamethod */
         marpa_lua_type(L, -1) == LUA_TSTRING)  /* that produces a string? */
@@ -190,26 +190,26 @@ static int msghandler (lua_State *L) {
 
 
 /*
-** Interface to 'lua_pcall', which sets appropriate message function
+** Interface to 'marpa_lua_pcall', which sets appropriate message function
 ** and C-signal handler. Used to run all chunks.
 */
 static int docall (lua_State *L, int narg, int nres) {
   int status;
   int base = marpa_lua_gettop(L) - narg;  /* function index */
-  lua_pushcfunction(L, msghandler);  /* push message handler */
-  lua_insert(L, base);  /* put it under function and args */
+  marpa_lua_pushcfunction(L, msghandler);  /* push message handler */
+  marpa_lua_insert(L, base);  /* put it under function and args */
   globalL = L;  /* to be available to 'laction' */
   signal(SIGINT, laction);  /* set C-signal handler */
-  status = lua_pcall(L, narg, nres, base);
+  status = marpa_lua_pcall(L, narg, nres, base);
   signal(SIGINT, SIG_DFL); /* reset C-signal handler */
-  lua_remove(L, base);  /* remove message handler from the stack */
+  marpa_lua_remove(L, base);  /* remove message handler from the stack */
   return status;
 }
 
 
 static void print_version (void) {
-  lua_writestring(LUA_COPYRIGHT, strlen(LUA_COPYRIGHT));
-  lua_writeline();
+  marpa_lua_writestring(LUA_COPYRIGHT, strlen(LUA_COPYRIGHT));
+  marpa_lua_writeline();
 }
 
 
@@ -271,7 +271,7 @@ static int dolibrary (lua_State *L, const char *name) {
 static const char *get_prompt (lua_State *L, int firstline) {
   const char *p;
   marpa_lua_getglobal(L, firstline ? "_PROMPT" : "_PROMPT2");
-  p = lua_tostring(L, -1);
+  p = marpa_lua_tostring(L, -1);
   if (p == NULL) p = (firstline ? LUA_PROMPT : LUA_PROMPT2);
   return p;
 }
@@ -291,7 +291,7 @@ static int incomplete (lua_State *L, int status) {
     size_t lmsg;
     const char *msg = marpa_lua_tolstring(L, -1, &lmsg);
     if (lmsg >= marklen && strcmp(msg + lmsg - marklen, EOFMARK) == 0) {
-      lua_pop(L, 1);
+      marpa_lua_pop(L, 1);
       return 1;
     }
   }
@@ -310,7 +310,7 @@ static int pushline (lua_State *L, int firstline) {
   int readstatus = lua_readline(L, b, prmt);
   if (readstatus == 0)
     return 0;  /* no input (prompt will be popped by caller) */
-  lua_pop(L, 1);  /* remove prompt */
+  marpa_lua_pop(L, 1);  /* remove prompt */
   l = strlen(b);
   if (l > 0 && b[l-1] == '\n')  /* line ends with newline? */
     b[--l] = '\0';  /* remove it */
@@ -328,16 +328,16 @@ static int pushline (lua_State *L, int firstline) {
 ** has either compiled chunk or original line (if compilation failed).
 */
 static int addreturn (lua_State *L) {
-  const char *line = lua_tostring(L, -1);  /* original line */
+  const char *line = marpa_lua_tostring(L, -1);  /* original line */
   const char *retline = marpa_lua_pushfstring(L, "return %s;", line);
   int status = luaL_loadbuffer(L, retline, strlen(retline), "=stdin");
   if (status == LUA_OK) {
-    lua_remove(L, -2);  /* remove modified line */
+    marpa_lua_remove(L, -2);  /* remove modified line */
     if (line[0] != '\0')  /* non empty? */
       lua_saveline(L, line);  /* keep history */
   }
   else
-    lua_pop(L, 2);  /* pop result from 'luaL_loadbuffer' and modified line */
+    marpa_lua_pop(L, 2);  /* pop result from 'luaL_loadbuffer' and modified line */
   return status;
 }
 
@@ -354,8 +354,8 @@ static int multiline (lua_State *L) {
       lua_saveline(L, line);  /* keep history */
       return status;  /* cannot or should not try to add continuation line */
     }
-    lua_pushliteral(L, "\n");  /* add newline... */
-    lua_insert(L, -2);  /* ...between the two lines */
+    marpa_lua_pushliteral(L, "\n");  /* add newline... */
+    marpa_lua_insert(L, -2);  /* ...between the two lines */
     marpa_lua_concat(L, 3);  /* join them */
   }
 }
@@ -374,7 +374,7 @@ static int loadline (lua_State *L) {
     return -1;  /* no input */
   if ((status = addreturn(L)) != LUA_OK)  /* 'return ...' did not work? */
     status = multiline(L);  /* try as command, maybe with continuation lines */
-  lua_remove(L, 1);  /* remove line from the stack */
+  marpa_lua_remove(L, 1);  /* remove line from the stack */
   lua_assert(marpa_lua_gettop(L) == 1);
   return status;
 }
@@ -388,10 +388,10 @@ static void l_print (lua_State *L) {
   if (n > 0) {  /* any result to be printed? */
     marpa_luaL_checkstack(L, LUA_MINSTACK, "too many results to print");
     marpa_lua_getglobal(L, "print");
-    lua_insert(L, 1);
-    if (lua_pcall(L, n, 0, 0) != LUA_OK)
+    marpa_lua_insert(L, 1);
+    if (marpa_lua_pcall(L, n, 0, 0) != LUA_OK)
       l_message(progname, marpa_lua_pushfstring(L, "error calling 'print' (%s)",
-                                             lua_tostring(L, -1)));
+                                             marpa_lua_tostring(L, -1)));
   }
 }
 
@@ -411,7 +411,7 @@ static void doREPL (lua_State *L) {
     else report(L, status);
   }
   marpa_lua_settop(L, 0);  /* clear stack */
-  lua_writeline();
+  marpa_lua_writeline();
   progname = oldprogname;
 }
 
@@ -427,7 +427,7 @@ static int pushargs (lua_State *L) {
   marpa_luaL_checkstack(L, n + 3, "too many arguments to script");
   for (i = 1; i <= n; i++)
     marpa_lua_rawgeti(L, -i, i);
-  lua_remove(L, -i);  /* remove table from the stack */
+  marpa_lua_remove(L, -i);  /* remove table from the stack */
   return n;
 }
 
@@ -549,7 +549,7 @@ static int handle_luainit (lua_State *L) {
 ** Reads the options and handles them all.
 */
 static int pmain (lua_State *L) {
-  int argc = (int)lua_tointeger(L, 1);
+  int argc = (int)marpa_lua_tointeger(L, 1);
   char **argv = (char **)marpa_lua_touserdata(L, 2);
   int script;
   int args = collectargs(argv, &script);
@@ -597,10 +597,10 @@ int main (int argc, char **argv) {
     l_message(argv[0], "cannot create state: not enough memory");
     return EXIT_FAILURE;
   }
-  lua_pushcfunction(L, &pmain);  /* to call 'pmain' in protected mode */
+  marpa_lua_pushcfunction(L, &pmain);  /* to call 'pmain' in protected mode */
   marpa_lua_pushinteger(L, argc);  /* 1st argument */
   marpa_lua_pushlightuserdata(L, argv); /* 2nd argument */
-  status = lua_pcall(L, 2, 1, 0);  /* do the call */
+  status = marpa_lua_pcall(L, 2, 1, 0);  /* do the call */
   result = marpa_lua_toboolean(L, -1);  /* get result */
   report(L, status);
   marpa_lua_close(L);

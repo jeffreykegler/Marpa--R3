@@ -273,7 +273,7 @@ LUA_API lua_State *marpa_lua_newthread (lua_State *L) {
   L1->hook = L->hook;
   resethookcount(L1);
   /* initialize L1 extra space */
-  memcpy(lua_getextraspace(L1), lua_getextraspace(g->mainthread),
+  memcpy(marpa_lua_getextraspace(L1), marpa_lua_getextraspace(g->mainthread),
          LUA_EXTRASPACE);
   luai_userstatethread(L, L1);
   stack_init(L1, L);  /* init stack */

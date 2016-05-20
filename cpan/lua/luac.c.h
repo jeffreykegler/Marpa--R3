@@ -144,7 +144,7 @@ static const Proto* combine(lua_State* L, int n)
  {
   Proto* f;
   int i=n;
-  if (marpa_lua_load(L,reader,&i,"=(" PROGNAME ")",NULL)!=LUA_OK) fatal(lua_tostring(L,-1));
+  if (marpa_lua_load(L,reader,&i,"=(" PROGNAME ")",NULL)!=LUA_OK) fatal(marpa_lua_tostring(L,-1));
   f=toproto(L,-1);
   for (i=0; i<n; i++)
   {
@@ -164,7 +164,7 @@ static int writer(lua_State* L, const void* p, size_t size, void* u)
 
 static int pmain(lua_State* L)
 {
- int argc=(int)lua_tointeger(L,1);
+ int argc=(int)marpa_lua_tointeger(L,1);
  char** argv=(char**)marpa_lua_touserdata(L,2);
  const Proto* f;
  int i;
@@ -172,7 +172,7 @@ static int pmain(lua_State* L)
  for (i=0; i<argc; i++)
  {
   const char* filename=IS("-") ? NULL : argv[i];
-  if (luaL_loadfile(L,filename)!=LUA_OK) fatal(lua_tostring(L,-1));
+  if (luaL_loadfile(L,filename)!=LUA_OK) fatal(marpa_lua_tostring(L,-1));
  }
  f=combine(L,argc);
  if (listing) luaU_print(f,listing>1);
@@ -197,10 +197,10 @@ int main(int argc, char* argv[])
  if (argc<=0) usage("no input files given");
  L=marpa_luaL_newstate();
  if (L==NULL) fatal("cannot create state: not enough memory");
- lua_pushcfunction(L,&pmain);
+ marpa_lua_pushcfunction(L,&pmain);
  marpa_lua_pushinteger(L,argc);
  marpa_lua_pushlightuserdata(L,argv);
- if (lua_pcall(L,2,0,0)!=LUA_OK) fatal(lua_tostring(L,-1));
+ if (marpa_lua_pcall(L,2,0,0)!=LUA_OK) fatal(marpa_lua_tostring(L,-1));
  marpa_lua_close(L);
  return EXIT_SUCCESS;
 }

@@ -119,14 +119,14 @@ LUALIB_API void (marpa_luaL_requiref) (lua_State *L, const char *modname,
 #define luaL_typename(L,i)	marpa_lua_typename(L, marpa_lua_type(L,(i)))
 
 #define luaL_dofile(L, fn) \
-	(luaL_loadfile(L, fn) || lua_pcall(L, 0, LUA_MULTRET, 0))
+	(luaL_loadfile(L, fn) || marpa_lua_pcall(L, 0, LUA_MULTRET, 0))
 
 #define luaL_dostring(L, s) \
-	(marpa_luaL_loadstring(L, s) || lua_pcall(L, 0, LUA_MULTRET, 0))
+	(marpa_luaL_loadstring(L, s) || marpa_lua_pcall(L, 0, LUA_MULTRET, 0))
 
 #define luaL_getmetatable(L,n)	(marpa_lua_getfield(L, LUA_REGISTRYINDEX, (n)))
 
-#define luaL_opt(L,f,n,d)	(lua_isnoneornil(L,(n)) ? (d) : f(L,(n)))
+#define luaL_opt(L,f,n,d)	(marpa_lua_isnoneornil(L,(n)) ? (d) : f(L,(n)))
 
 #define luaL_loadbuffer(L,s,sz,n)	marpa_luaL_loadbufferx(L,s,sz,n,NULL)
 
@@ -211,18 +211,18 @@ LUALIB_API void (luaL_openlib) (lua_State *L, const char *libname,
 */
 
 /* print a string */
-#if !defined(lua_writestring)
-#define lua_writestring(s,l)   fwrite((s), sizeof(char), (l), stdout)
+#if !defined(marpa_lua_writestring)
+#define marpa_lua_writestring(s,l)   fwrite((s), sizeof(char), (l), stdout)
 #endif
 
 /* print a newline and flush the output */
-#if !defined(lua_writeline)
-#define lua_writeline()        (lua_writestring("\n", 1), fflush(stdout))
+#if !defined(marpa_lua_writeline)
+#define marpa_lua_writeline()        (marpa_lua_writestring("\n", 1), fflush(stdout))
 #endif
 
 /* print an error message */
-#if !defined(lua_writestringerror)
-#define lua_writestringerror(s,p) \
+#if !defined(marpa_lua_writestringerror)
+#define marpa_lua_writestringerror(s,p) \
         (fprintf(stderr, (s), (p)), fflush(stderr))
 #endif
 

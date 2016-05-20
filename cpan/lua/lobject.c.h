@@ -176,11 +176,11 @@ static int isneg (const char **s) {
 
 /*
 ** {==================================================================
-** Lua's implementation for 'lua_strx2number'
+** Lua's implementation for 'marpa_lua_strx2number'
 ** ===================================================================
 */
 
-#if !defined(lua_strx2number)
+#if !defined(marpa_lua_strx2number)
 
 /* maximum number of significant digits to read (to avoid overflows
    even with single floats) */
@@ -190,8 +190,8 @@ static int isneg (const char **s) {
 ** convert an hexadecimal numeric string to a number, following
 ** C99 specification for 'strtod'
 */
-static lua_Number lua_strx2number (const char *s, char **endptr) {
-  int dot = lua_getlocaledecpoint();
+static lua_Number marpa_lua_strx2number (const char *s, char **endptr) {
+  int dot = marpa_lua_getlocaledecpoint();
   lua_Number r = 0.0;  /* result (accumulator) */
   int sigdig = 0;  /* number of significant digits */
   int nosigdig = 0;  /* number of non-significant digits */
@@ -248,9 +248,9 @@ static const char *l_str2d (const char *s, lua_Number *result) {
   if (strpbrk(s, "nN"))  /* reject 'inf' and 'nan' */
     return NULL;
   else if (strpbrk(s, "xX"))  /* hex? */
-    *result = lua_strx2number(s, &endptr);
+    *result = marpa_lua_strx2number(s, &endptr);
   else
-    *result = lua_str2number(s, &endptr);
+    *result = marpa_lua_str2number(s, &endptr);
   if (endptr == s) return NULL;  /* nothing recognized */
   while (lisspace(cast_uchar(*endptr))) endptr++;
   return (*endptr == '\0' ? endptr : NULL);  /* OK if no trailing characters */
@@ -331,12 +331,12 @@ void luaO_tostring (lua_State *L, StkId obj) {
   size_t len;
   lua_assert(ttisnumber(obj));
   if (ttisinteger(obj))
-    len = lua_integer2str(buff, sizeof(buff), ivalue(obj));
+    len = marpa_lua_integer2str(buff, sizeof(buff), ivalue(obj));
   else {
-    len = lua_number2str(buff, sizeof(buff), fltvalue(obj));
+    len = marpa_lua_number2str(buff, sizeof(buff), fltvalue(obj));
 #if !defined(LUA_COMPAT_FLOATSTRING)
     if (buff[strspn(buff, "-0123456789")] == '\0') {  /* looks like an int? */
-      buff[len++] = lua_getlocaledecpoint();
+      buff[len++] = marpa_lua_getlocaledecpoint();
       buff[len++] = '0';  /* adds '.0' to result */
     }
 #endif

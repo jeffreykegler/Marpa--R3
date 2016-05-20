@@ -88,7 +88,7 @@ static int db_setuservalue (lua_State *L) {
 ** access their other arguments)
 */
 static lua_State *getthread (lua_State *L, int *arg) {
-  if (lua_isthread(L, 1)) {
+  if (marpa_lua_isthread(L, 1)) {
     *arg = 1;
     return marpa_lua_tothread(L, 1);
   }
@@ -148,7 +148,7 @@ static int db_getinfo (lua_State *L) {
   lua_State *L1 = getthread(L, &arg);
   const char *options = luaL_optstring(L, arg+2, "flnStu");
   checkstack(L, L1, 3);
-  if (lua_isfunction(L, arg + 1)) {  /* info about a function? */
+  if (marpa_lua_isfunction(L, arg + 1)) {  /* info about a function? */
     options = marpa_lua_pushfstring(L, ">%s", options);  /* add '>' to 'options' */
     marpa_lua_pushvalue(L, arg + 1);  /* move function to 'L1' stack */
     marpa_lua_xmove(L, L1, 1);
@@ -161,7 +161,7 @@ static int db_getinfo (lua_State *L) {
   }
   if (!marpa_lua_getinfo(L1, options, &ar))
     return marpa_luaL_argerror(L, arg+2, "invalid option");
-  lua_newtable(L);  /* table to collect results */
+  marpa_lua_newtable(L);  /* table to collect results */
   if (strchr(options, 'S')) {
     settabss(L, "source", ar.source);
     settabss(L, "short_src", ar.short_src);
@@ -196,7 +196,7 @@ static int db_getlocal (lua_State *L) {
   lua_Debug ar;
   const char *name;
   int nvar = (int)marpa_luaL_checkinteger(L, arg + 2);  /* local-variable index */
-  if (lua_isfunction(L, arg + 1)) {  /* function argument? */
+  if (marpa_lua_isfunction(L, arg + 1)) {  /* function argument? */
     marpa_lua_pushvalue(L, arg + 1);  /* push function */
     marpa_lua_pushstring(L, marpa_lua_getlocal(L, NULL, nvar));  /* push local name */
     return 1;  /* return only name (there is no value) */
@@ -236,7 +236,7 @@ static int db_setlocal (lua_State *L) {
   marpa_lua_xmove(L, L1, 1);
   name = marpa_lua_setlocal(L1, &ar, nvar);
   if (name == NULL)
-    lua_pop(L1, 1);  /* pop value (if not popped by 'marpa_lua_setlocal') */
+    marpa_lua_pop(L1, 1);  /* pop value (if not popped by 'marpa_lua_setlocal') */
   marpa_lua_pushstring(L, name);
   return 1;
 }
@@ -252,7 +252,7 @@ static int auxupvalue (lua_State *L, int get) {
   name = get ? marpa_lua_getupvalue(L, 1, n) : marpa_lua_setupvalue(L, 1, n);
   if (name == NULL) return 0;
   marpa_lua_pushstring(L, name);
-  lua_insert(L, -(get+1));  /* no-op if get is false */
+  marpa_lua_insert(L, -(get+1));  /* no-op if get is false */
   return get + 1;
 }
 
@@ -313,7 +313,7 @@ static void hookf (lua_State *L, lua_Debug *ar) {
       marpa_lua_pushinteger(L, ar->currentline);  /* push current line */
     else marpa_lua_pushnil(L);
     lua_assert(marpa_lua_getinfo(L, "lS", ar));
-    lua_call(L, 2, 0);  /* call hook function */
+    marpa_lua_call(L, 2, 0);  /* call hook function */
   }
 }
 
@@ -348,7 +348,7 @@ static int db_sethook (lua_State *L) {
   int arg, mask, count;
   lua_Hook func;
   lua_State *L1 = getthread(L, &arg);
-  if (lua_isnoneornil(L, arg+1)) {  /* no hook? */
+  if (marpa_lua_isnoneornil(L, arg+1)) {  /* no hook? */
     marpa_lua_settop(L, arg+1);
     func = NULL; mask = 0; count = 0;  /* turn off hooks */
   }
@@ -385,13 +385,13 @@ static int db_gethook (lua_State *L) {
   if (hook == NULL)  /* no hook? */
     marpa_lua_pushnil(L);
   else if (hook != hookf)  /* external hook? */
-    lua_pushliteral(L, "external hook");
+    marpa_lua_pushliteral(L, "external hook");
   else {  /* hook table must exist */
     marpa_lua_rawgetp(L, LUA_REGISTRYINDEX, &HOOKKEY);
     checkstack(L, L1, 1);
     marpa_lua_pushthread(L1); marpa_lua_xmove(L1, L, 1);
     marpa_lua_rawget(L, -2);   /* 1st result = hooktable[L1] */
-    lua_remove(L, -2);  /* remove hook table */
+    marpa_lua_remove(L, -2);  /* remove hook table */
   }
   marpa_lua_pushstring(L, unmakemask(mask, buff));  /* 2nd result = mask */
   marpa_lua_pushinteger(L, marpa_lua_gethookcount(L1));  /* 3rd result = count */
@@ -402,13 +402,13 @@ static int db_gethook (lua_State *L) {
 static int db_debug (lua_State *L) {
   for (;;) {
     char buffer[250];
-    lua_writestringerror("%s", "lua_debug> ");
+    marpa_lua_writestringerror("%s", "lua_debug> ");
     if (fgets(buffer, sizeof(buffer), stdin) == 0 ||
         strcmp(buffer, "cont\n") == 0)
       return 0;
     if (luaL_loadbuffer(L, buffer, strlen(buffer), "=(debug command)") ||
-        lua_pcall(L, 0, 0, 0))
-      lua_writestringerror("%s\n", lua_tostring(L, -1));
+        marpa_lua_pcall(L, 0, 0, 0))
+      marpa_lua_writestringerror("%s\n", marpa_lua_tostring(L, -1));
     marpa_lua_settop(L, 0);  /* remove eventual returns */
   }
 }
@@ -417,8 +417,8 @@ static int db_debug (lua_State *L) {
 static int db_traceback (lua_State *L) {
   int arg;
   lua_State *L1 = getthread(L, &arg);
-  const char *msg = lua_tostring(L, arg + 1);
-  if (msg == NULL && !lua_isnoneornil(L, arg + 1))  /* non-string 'msg'? */
+  const char *msg = marpa_lua_tostring(L, arg + 1);
+  if (msg == NULL && !marpa_lua_isnoneornil(L, arg + 1))  /* non-string 'msg'? */
     marpa_lua_pushvalue(L, arg + 1);  /* return it untouched */
   else {
     int level = (int)marpa_luaL_optinteger(L, arg + 2, (L == L1) ? 1 : 0);

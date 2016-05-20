@@ -198,8 +198,8 @@ static void setprogdir (lua_State *L) {
     marpa_luaL_error(L, "unable to get ModuleFileName");
   else {
     *lb = '\0';
-    marpa_luaL_gsub(L, lua_tostring(L, -1), LUA_EXEC_DIR, buff);
-    lua_remove(L, -2);  /* remove original string */
+    marpa_luaL_gsub(L, marpa_lua_tostring(L, -1), LUA_EXEC_DIR, buff);
+    marpa_lua_remove(L, -2);  /* remove original string */
   }
 }
 
@@ -257,14 +257,14 @@ static void lsys_unloadlib (void *lib) {
 
 static void *lsys_load (lua_State *L, const char *path, int seeglb) {
   (void)(path); (void)(seeglb);  /* not used */
-  lua_pushliteral(L, DLMSG);
+  marpa_lua_pushliteral(L, DLMSG);
   return NULL;
 }
 
 
 static lua_CFunction lsys_sym (lua_State *L, void *lib, const char *sym) {
   (void)(lib); (void)(sym);  /* not used */
-  lua_pushliteral(L, DLMSG);
+  marpa_lua_pushliteral(L, DLMSG);
   return NULL;
 }
 
@@ -280,7 +280,7 @@ static void *checkclib (lua_State *L, const char *path) {
   marpa_lua_rawgetp(L, LUA_REGISTRYINDEX, &CLIBS);
   marpa_lua_getfield(L, -1, path);
   plib = marpa_lua_touserdata(L, -1);  /* plib = CLIBS[path] */
-  lua_pop(L, 2);  /* pop CLIBS table and 'plib' */
+  marpa_lua_pop(L, 2);  /* pop CLIBS table and 'plib' */
   return plib;
 }
 
@@ -295,7 +295,7 @@ static void addtoclib (lua_State *L, const char *path, void *plib) {
   marpa_lua_pushvalue(L, -1);
   marpa_lua_setfield(L, -3, path);  /* CLIBS[path] = plib */
   marpa_lua_rawseti(L, -2, marpa_luaL_len(L, -2) + 1);  /* CLIBS[#CLIBS + 1] = plib */
-  lua_pop(L, 1);  /* pop CLIBS table */
+  marpa_lua_pop(L, 1);  /* pop CLIBS table */
 }
 
 
@@ -308,7 +308,7 @@ static int gctm (lua_State *L) {
   for (; n >= 1; n--) {  /* for each handle, in reverse order */
     marpa_lua_rawgeti(L, 1, n);  /* get handle CLIBS[n] */
     lsys_unloadlib(marpa_lua_touserdata(L, -1));
-    lua_pop(L, 1);  /* pop handle */
+    marpa_lua_pop(L, 1);  /* pop handle */
   }
   return 0;
 }
@@ -345,7 +345,7 @@ static int lookforfunc (lua_State *L, const char *path, const char *sym) {
     lua_CFunction f = lsys_sym(L, reg, sym);
     if (f == NULL)
       return ERRFUNC;  /* unable to find function */
-    lua_pushcfunction(L, f);  /* else create new function */
+    marpa_lua_pushcfunction(L, f);  /* else create new function */
     return 0;  /* no errors */
   }
 }
@@ -359,7 +359,7 @@ static int ll_loadlib (lua_State *L) {
     return 1;  /* return the loaded function */
   else {  /* error; error message is on stack top */
     marpa_lua_pushnil(L);
-    lua_insert(L, -2);
+    marpa_lua_insert(L, -2);
     marpa_lua_pushstring(L, (stat == ERRLIB) ?  LIB_FAIL : "init");
     return 3;  /* return nil, error message, and where */
   }
@@ -402,13 +402,13 @@ static const char *searchpath (lua_State *L, const char *name,
   if (*sep != '\0')  /* non-empty separator? */
     name = marpa_luaL_gsub(L, name, sep, dirsep);  /* replace it by 'dirsep' */
   while ((path = pushnexttemplate(L, path)) != NULL) {
-    const char *filename = marpa_luaL_gsub(L, lua_tostring(L, -1),
+    const char *filename = marpa_luaL_gsub(L, marpa_lua_tostring(L, -1),
                                      LUA_PATH_MARK, name);
-    lua_remove(L, -2);  /* remove path template */
+    marpa_lua_remove(L, -2);  /* remove path template */
     if (readable(filename))  /* does file exist and is readable? */
       return filename;  /* return that file name */
     marpa_lua_pushfstring(L, "\n\tno file '%s'", filename);
-    lua_remove(L, -2);  /* remove file name */
+    marpa_lua_remove(L, -2);  /* remove file name */
     marpa_luaL_addvalue(&msg);  /* concatenate error msg. entry */
   }
   marpa_luaL_pushresult(&msg);  /* create error message */
@@ -424,7 +424,7 @@ static int ll_searchpath (lua_State *L) {
   if (f != NULL) return 1;
   else {  /* error message is on top of the stack */
     marpa_lua_pushnil(L);
-    lua_insert(L, -2);
+    marpa_lua_insert(L, -2);
     return 2;  /* return nil + error message */
   }
 }
@@ -434,8 +434,8 @@ static const char *findfile (lua_State *L, const char *name,
                                            const char *pname,
                                            const char *dirsep) {
   const char *path;
-  marpa_lua_getfield(L, lua_upvalueindex(1), pname);
-  path = lua_tostring(L, -1);
+  marpa_lua_getfield(L, marpa_lua_upvalueindex(1), pname);
+  path = marpa_lua_tostring(L, -1);
   if (path == NULL)
     marpa_luaL_error(L, "'package.%s' must be a string", pname);
   return searchpath(L, name, path, ".", dirsep);
@@ -449,7 +449,7 @@ static int checkload (lua_State *L, int stat, const char *filename) {
   }
   else
     return marpa_luaL_error(L, "error loading module '%s' from file '%s':\n\t%s",
-                          lua_tostring(L, 1), filename, lua_tostring(L, -1));
+                          marpa_lua_tostring(L, 1), filename, marpa_lua_tostring(L, -1));
 }
 
 
@@ -503,7 +503,7 @@ static int searcher_Croot (lua_State *L) {
   int stat;
   if (p == NULL) return 0;  /* is root */
   marpa_lua_pushlstring(L, name, p - name);
-  filename = findfile(L, lua_tostring(L, -1), "cpath", LUA_CSUBSEP);
+  filename = findfile(L, marpa_lua_tostring(L, -1), "cpath", LUA_CSUBSEP);
   if (filename == NULL) return 1;  /* root not found */
   if ((stat = loadfunc(L, filename, name)) != 0) {
     if (stat != ERRFUNC)
@@ -532,25 +532,25 @@ static void findloader (lua_State *L, const char *name) {
   luaL_Buffer msg;  /* to build error message */
   marpa_luaL_buffinit(L, &msg);
   /* push 'package.searchers' to index 3 in the stack */
-  if (marpa_lua_getfield(L, lua_upvalueindex(1), "searchers") != LUA_TTABLE)
+  if (marpa_lua_getfield(L, marpa_lua_upvalueindex(1), "searchers") != LUA_TTABLE)
     marpa_luaL_error(L, "'package.searchers' must be a table");
   /*  iterate over available searchers to find a loader */
   for (i = 1; ; i++) {
     if (marpa_lua_rawgeti(L, 3, i) == LUA_TNIL) {  /* no more searchers? */
-      lua_pop(L, 1);  /* remove nil */
+      marpa_lua_pop(L, 1);  /* remove nil */
       marpa_luaL_pushresult(&msg);  /* create error message */
-      marpa_luaL_error(L, "module '%s' not found:%s", name, lua_tostring(L, -1));
+      marpa_luaL_error(L, "module '%s' not found:%s", name, marpa_lua_tostring(L, -1));
     }
     marpa_lua_pushstring(L, name);
-    lua_call(L, 1, 2);  /* call it */
-    if (lua_isfunction(L, -2))  /* did it find a loader? */
+    marpa_lua_call(L, 1, 2);  /* call it */
+    if (marpa_lua_isfunction(L, -2))  /* did it find a loader? */
       return;  /* module loader found */
     else if (marpa_lua_isstring(L, -2)) {  /* searcher returned error message? */
-      lua_pop(L, 1);  /* remove extra return */
+      marpa_lua_pop(L, 1);  /* remove extra return */
       marpa_luaL_addvalue(&msg);  /* concatenate error message */
     }
     else
-      lua_pop(L, 2);  /* remove both returns */
+      marpa_lua_pop(L, 2);  /* remove both returns */
   }
 }
 
@@ -563,12 +563,12 @@ static int ll_require (lua_State *L) {
   if (marpa_lua_toboolean(L, -1))  /* is it there? */
     return 1;  /* package is already loaded */
   /* else must load package */
-  lua_pop(L, 1);  /* remove 'getfield' result */
+  marpa_lua_pop(L, 1);  /* remove 'getfield' result */
   findloader(L, name);
   marpa_lua_pushstring(L, name);  /* pass name as argument to module loader */
-  lua_insert(L, -2);  /* name is 1st argument (before search data) */
-  lua_call(L, 2, 1);  /* run loader to load module */
-  if (!lua_isnil(L, -1))  /* non-nil return? */
+  marpa_lua_insert(L, -2);  /* name is 1st argument (before search data) */
+  marpa_lua_call(L, 2, 1);  /* run loader to load module */
+  if (!marpa_lua_isnil(L, -1))  /* non-nil return? */
     marpa_lua_setfield(L, 2, name);  /* _LOADED[name] = returned value */
   if (marpa_lua_getfield(L, 2, name) == LUA_TNIL) {   /* module set no value? */
     marpa_lua_pushboolean(L, 1);  /* use true as result */
@@ -600,17 +600,17 @@ static void set_env (lua_State *L) {
     marpa_luaL_error(L, "'module' not called from a Lua function");
   marpa_lua_pushvalue(L, -2);  /* copy new environment table to top */
   marpa_lua_setupvalue(L, -2, 1);
-  lua_pop(L, 1);  /* remove function */
+  marpa_lua_pop(L, 1);  /* remove function */
 }
 
 
 static void dooptions (lua_State *L, int n) {
   int i;
   for (i = 2; i <= n; i++) {
-    if (lua_isfunction(L, i)) {  /* avoid 'calling' extra info. */
+    if (marpa_lua_isfunction(L, i)) {  /* avoid 'calling' extra info. */
       marpa_lua_pushvalue(L, i);  /* get option (a function) */
       marpa_lua_pushvalue(L, -2);  /* module */
-      lua_call(L, 1, 0);
+      marpa_lua_call(L, 1, 0);
     }
   }
 }
@@ -637,9 +637,9 @@ static int ll_module (lua_State *L) {
   luaL_pushmodule(L, modname, 1);  /* get/create module table */
   /* check whether table already has a _NAME field */
   if (marpa_lua_getfield(L, -1, "_NAME") != LUA_TNIL)
-    lua_pop(L, 1);  /* table is an initialized module */
+    marpa_lua_pop(L, 1);  /* table is an initialized module */
   else {  /* no; initialize it */
-    lua_pop(L, 1);
+    marpa_lua_pop(L, 1);
     modinit(L, modname);
   }
   marpa_lua_pushvalue(L, -1);
@@ -656,7 +656,7 @@ static int ll_seeall (lua_State *L) {
     marpa_lua_pushvalue(L, -1);
     marpa_lua_setmetatable(L, 1);
   }
-  lua_pushglobaltable(L);
+  marpa_lua_pushglobaltable(L);
   marpa_lua_setfield(L, -2, "__index");  /* mt.__index = _G */
   return 0;
 }
@@ -677,7 +677,7 @@ static int noenv (lua_State *L) {
   int b;
   marpa_lua_getfield(L, LUA_REGISTRYINDEX, "LUA_NOENV");
   b = marpa_lua_toboolean(L, -1);
-  lua_pop(L, 1);  /* remove value */
+  marpa_lua_pop(L, 1);  /* remove value */
   return b;
 }
 
@@ -694,7 +694,7 @@ static void setpath (lua_State *L, const char *fieldname, const char *envname1,
     path = marpa_luaL_gsub(L, path, LUA_PATH_SEP LUA_PATH_SEP,
                               LUA_PATH_SEP AUXMARK LUA_PATH_SEP);
     marpa_luaL_gsub(L, path, AUXMARK, def);
-    lua_remove(L, -2);
+    marpa_lua_remove(L, -2);
   }
   setprogdir(L);
   marpa_lua_setfield(L, -2, fieldname);
@@ -751,9 +751,9 @@ static void createsearcherstable (lua_State *L) {
 ** setting a finalizer to close all libraries when closing state.
 */
 static void createclibstable (lua_State *L) {
-  lua_newtable(L);  /* create CLIBS table */
+  marpa_lua_newtable(L);  /* create CLIBS table */
   marpa_lua_createtable(L, 0, 1);  /* create metatable for CLIBS */
-  lua_pushcfunction(L, gctm);
+  marpa_lua_pushcfunction(L, gctm);
   marpa_lua_setfield(L, -2, "__gc");  /* set finalizer for CLIBS table */
   marpa_lua_setmetatable(L, -2);
   marpa_lua_rawsetp(L, LUA_REGISTRYINDEX, &CLIBS);  /* set CLIBS table in registry */
@@ -769,7 +769,7 @@ LUAMOD_API int marpa_luaopen_package (lua_State *L) {
   /* set field 'cpath' */
   setpath(L, "cpath", LUA_CPATHVARVERSION, LUA_CPATH_VAR, LUA_CPATH_DEFAULT);
   /* store config information */
-  lua_pushliteral(L, LUA_DIRSEP "\n" LUA_PATH_SEP "\n" LUA_PATH_MARK "\n"
+  marpa_lua_pushliteral(L, LUA_DIRSEP "\n" LUA_PATH_SEP "\n" LUA_PATH_MARK "\n"
                      LUA_EXEC_DIR "\n" LUA_IGMARK "\n");
   marpa_lua_setfield(L, -2, "config");
   /* set field 'loaded' */
@@ -778,10 +778,10 @@ LUAMOD_API int marpa_luaopen_package (lua_State *L) {
   /* set field 'preload' */
   marpa_luaL_getsubtable(L, LUA_REGISTRYINDEX, "_PRELOAD");
   marpa_lua_setfield(L, -2, "preload");
-  lua_pushglobaltable(L);
+  marpa_lua_pushglobaltable(L);
   marpa_lua_pushvalue(L, -2);  /* set 'package' as upvalue for next lib */
   marpa_luaL_setfuncs(L, ll_funcs, 1);  /* open lib into global table */
-  lua_pop(L, 1);  /* pop global table */
+  marpa_lua_pop(L, 1);  /* pop global table */
   return 1;  /* return 'package' table */
 }
 

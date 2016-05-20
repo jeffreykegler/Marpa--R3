@@ -30,7 +30,7 @@
 /* mark for precompiled code ('<esc>Lua') */
 #define LUA_SIGNATURE	"\x1bLua"
 
-/* option for multiple returns in 'lua_pcall' and 'lua_call' */
+/* option for multiple returns in 'marpa_lua_pcall' and 'marpa_lua_call' */
 #define LUA_MULTRET	(-1)
 
 
@@ -40,7 +40,7 @@
 ** space after that to help overflow detection)
 */
 #define LUA_REGISTRYINDEX	(-LUAI_MAXSTACK - 1000)
-#define lua_upvalueindex(i)	(LUA_REGISTRYINDEX - (i))
+#define marpa_lua_upvalueindex(i)	(LUA_REGISTRYINDEX - (i))
 
 
 /* thread status */
@@ -271,11 +271,11 @@ LUA_API void  (marpa_lua_setuservalue) (lua_State *L, int idx);
 */
 LUA_API void  (marpa_lua_callk) (lua_State *L, int nargs, int nresults,
                            lua_KContext ctx, lua_KFunction k);
-#define lua_call(L,n,r)		marpa_lua_callk(L, (n), (r), 0, NULL)
+#define marpa_lua_call(L,n,r)		marpa_lua_callk(L, (n), (r), 0, NULL)
 
 LUA_API int   (marpa_lua_pcallk) (lua_State *L, int nargs, int nresults, int errfunc,
                             lua_KContext ctx, lua_KFunction k);
-#define lua_pcall(L,n,r,f)	marpa_lua_pcallk(L, (n), (r), (f), 0, NULL)
+#define marpa_lua_pcall(L,n,r,f)	marpa_lua_pcallk(L, (n), (r), (f), 0, NULL)
 
 LUA_API int   (marpa_lua_load) (lua_State *L, lua_Reader reader, void *dt,
                           const char *chunkname, const char *mode);
@@ -292,7 +292,7 @@ LUA_API int  (marpa_lua_resume)     (lua_State *L, lua_State *from, int narg);
 LUA_API int  (marpa_lua_status)     (lua_State *L);
 LUA_API int (marpa_lua_isyieldable) (lua_State *L);
 
-#define lua_yield(L,n)		marpa_lua_yieldk(L, (n), 0, NULL)
+#define marpa_lua_yield(L,n)		marpa_lua_yieldk(L, (n), 0, NULL)
 
 
 /*
@@ -336,41 +336,41 @@ LUA_API void      (marpa_lua_setallocf) (lua_State *L, lua_Alloc f, void *ud);
 ** ===============================================================
 */
 
-#define lua_getextraspace(L)	((void *)((char *)(L) - LUA_EXTRASPACE))
+#define marpa_lua_getextraspace(L)	((void *)((char *)(L) - LUA_EXTRASPACE))
 
-#define lua_tonumber(L,i)	marpa_lua_tonumberx(L,(i),NULL)
-#define lua_tointeger(L,i)	marpa_lua_tointegerx(L,(i),NULL)
+#define marpa_lua_tonumber(L,i)	marpa_lua_tonumberx(L,(i),NULL)
+#define marpa_lua_tointeger(L,i)	marpa_lua_tointegerx(L,(i),NULL)
 
-#define lua_pop(L,n)		marpa_lua_settop(L, -(n)-1)
+#define marpa_lua_pop(L,n)		marpa_lua_settop(L, -(n)-1)
 
-#define lua_newtable(L)		marpa_lua_createtable(L, 0, 0)
+#define marpa_lua_newtable(L)		marpa_lua_createtable(L, 0, 0)
 
-#define lua_register(L,n,f) (lua_pushcfunction(L, (f)), marpa_lua_setglobal(L, (n)))
+#define marpa_lua_register(L,n,f) (marpa_lua_pushcfunction(L, (f)), marpa_lua_setglobal(L, (n)))
 
-#define lua_pushcfunction(L,f)	marpa_lua_pushcclosure(L, (f), 0)
+#define marpa_lua_pushcfunction(L,f)	marpa_lua_pushcclosure(L, (f), 0)
 
-#define lua_isfunction(L,n)	(marpa_lua_type(L, (n)) == LUA_TFUNCTION)
-#define lua_istable(L,n)	(marpa_lua_type(L, (n)) == LUA_TTABLE)
-#define lua_islightuserdata(L,n)	(marpa_lua_type(L, (n)) == LUA_TLIGHTUSERDATA)
-#define lua_isnil(L,n)		(marpa_lua_type(L, (n)) == LUA_TNIL)
-#define lua_isboolean(L,n)	(marpa_lua_type(L, (n)) == LUA_TBOOLEAN)
-#define lua_isthread(L,n)	(marpa_lua_type(L, (n)) == LUA_TTHREAD)
-#define lua_isnone(L,n)		(marpa_lua_type(L, (n)) == LUA_TNONE)
-#define lua_isnoneornil(L, n)	(marpa_lua_type(L, (n)) <= 0)
+#define marpa_lua_isfunction(L,n)	(marpa_lua_type(L, (n)) == LUA_TFUNCTION)
+#define marpa_lua_istable(L,n)	(marpa_lua_type(L, (n)) == LUA_TTABLE)
+#define marpa_lua_islightuserdata(L,n)	(marpa_lua_type(L, (n)) == LUA_TLIGHTUSERDATA)
+#define marpa_lua_isnil(L,n)		(marpa_lua_type(L, (n)) == LUA_TNIL)
+#define marpa_lua_isboolean(L,n)	(marpa_lua_type(L, (n)) == LUA_TBOOLEAN)
+#define marpa_lua_isthread(L,n)	(marpa_lua_type(L, (n)) == LUA_TTHREAD)
+#define marpa_lua_isnone(L,n)		(marpa_lua_type(L, (n)) == LUA_TNONE)
+#define marpa_lua_isnoneornil(L, n)	(marpa_lua_type(L, (n)) <= 0)
 
-#define lua_pushliteral(L, s)	marpa_lua_pushstring(L, "" s)
+#define marpa_lua_pushliteral(L, s)	marpa_lua_pushstring(L, "" s)
 
-#define lua_pushglobaltable(L)  \
+#define marpa_lua_pushglobaltable(L)  \
 	marpa_lua_rawgeti(L, LUA_REGISTRYINDEX, LUA_RIDX_GLOBALS)
 
-#define lua_tostring(L,i)	marpa_lua_tolstring(L, (i), NULL)
+#define marpa_lua_tostring(L,i)	marpa_lua_tolstring(L, (i), NULL)
 
 
-#define lua_insert(L,idx)	marpa_lua_rotate(L, (idx), 1)
+#define marpa_lua_insert(L,idx)	marpa_lua_rotate(L, (idx), 1)
 
-#define lua_remove(L,idx)	(marpa_lua_rotate(L, (idx), -1), lua_pop(L, 1))
+#define marpa_lua_remove(L,idx)	(marpa_lua_rotate(L, (idx), -1), marpa_lua_pop(L, 1))
 
-#define lua_replace(L,idx)	(marpa_lua_copy(L, -1, (idx)), lua_pop(L, 1))
+#define marpa_lua_replace(L,idx)	(marpa_lua_copy(L, -1, (idx)), marpa_lua_pop(L, 1))
 
 /* }============================================================== */
 
@@ -382,9 +382,9 @@ LUA_API void      (marpa_lua_setallocf) (lua_State *L, lua_Alloc f, void *ud);
 */
 #if defined(LUA_COMPAT_APIINTCASTS)
 
-#define lua_pushunsigned(L,n)	marpa_lua_pushinteger(L, (lua_Integer)(n))
-#define lua_tounsignedx(L,i,is)	((lua_Unsigned)marpa_lua_tointegerx(L,i,is))
-#define lua_tounsigned(L,i)	lua_tounsignedx(L,(i),NULL)
+#define marpa_lua_pushunsigned(L,n)	marpa_lua_pushinteger(L, (lua_Integer)(n))
+#define marpa_lua_tounsignedx(L,i,is)	((lua_Unsigned)marpa_lua_tointegerx(L,i,is))
+#define marpa_lua_tounsigned(L,i)	marpa_lua_tounsignedx(L,(i),NULL)
 
 #endif
 /* }============================================================== */

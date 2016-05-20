@@ -28,11 +28,11 @@ static lua_State *getco (lua_State *L) {
 static int auxresume (lua_State *L, lua_State *co, int narg) {
   int status;
   if (!marpa_lua_checkstack(co, narg)) {
-    lua_pushliteral(L, "too many arguments to resume");
+    marpa_lua_pushliteral(L, "too many arguments to resume");
     return -1;  /* error flag */
   }
   if (marpa_lua_status(co) == LUA_OK && marpa_lua_gettop(co) == 0) {
-    lua_pushliteral(L, "cannot resume dead coroutine");
+    marpa_lua_pushliteral(L, "cannot resume dead coroutine");
     return -1;  /* error flag */
   }
   marpa_lua_xmove(L, co, narg);
@@ -40,8 +40,8 @@ static int auxresume (lua_State *L, lua_State *co, int narg) {
   if (status == LUA_OK || status == LUA_YIELD) {
     int nres = marpa_lua_gettop(co);
     if (!marpa_lua_checkstack(L, nres + 1)) {
-      lua_pop(co, nres);  /* remove results anyway */
-      lua_pushliteral(L, "too many results to resume");
+      marpa_lua_pop(co, nres);  /* remove results anyway */
+      marpa_lua_pushliteral(L, "too many results to resume");
       return -1;  /* error flag */
     }
     marpa_lua_xmove(co, L, nres);  /* move yielded values */
@@ -60,24 +60,24 @@ static int luaB_coresume (lua_State *L) {
   r = auxresume(L, co, marpa_lua_gettop(L) - 1);
   if (r < 0) {
     marpa_lua_pushboolean(L, 0);
-    lua_insert(L, -2);
+    marpa_lua_insert(L, -2);
     return 2;  /* return false + error message */
   }
   else {
     marpa_lua_pushboolean(L, 1);
-    lua_insert(L, -(r + 1));
+    marpa_lua_insert(L, -(r + 1));
     return r + 1;  /* return true + 'resume' returns */
   }
 }
 
 
 static int luaB_auxwrap (lua_State *L) {
-  lua_State *co = marpa_lua_tothread(L, lua_upvalueindex(1));
+  lua_State *co = marpa_lua_tothread(L, marpa_lua_upvalueindex(1));
   int r = auxresume(L, co, marpa_lua_gettop(L));
   if (r < 0) {
     if (marpa_lua_isstring(L, -1)) {  /* error object is a string? */
       marpa_luaL_where(L, 1);  /* add extra info */
-      lua_insert(L, -2);
+      marpa_lua_insert(L, -2);
       marpa_lua_concat(L, 2);
     }
     return marpa_lua_error(L);  /* propagate error */
@@ -104,30 +104,30 @@ static int luaB_cowrap (lua_State *L) {
 
 
 static int luaB_yield (lua_State *L) {
-  return lua_yield(L, marpa_lua_gettop(L));
+  return marpa_lua_yield(L, marpa_lua_gettop(L));
 }
 
 
 static int luaB_costatus (lua_State *L) {
   lua_State *co = getco(L);
-  if (L == co) lua_pushliteral(L, "running");
+  if (L == co) marpa_lua_pushliteral(L, "running");
   else {
     switch (marpa_lua_status(co)) {
       case LUA_YIELD:
-        lua_pushliteral(L, "suspended");
+        marpa_lua_pushliteral(L, "suspended");
         break;
       case LUA_OK: {
         lua_Debug ar;
         if (marpa_lua_getstack(co, 0, &ar) > 0)  /* does it have frames? */
-          lua_pushliteral(L, "normal");  /* it is running */
+          marpa_lua_pushliteral(L, "normal");  /* it is running */
         else if (marpa_lua_gettop(co) == 0)
-            lua_pushliteral(L, "dead");
+            marpa_lua_pushliteral(L, "dead");
         else
-          lua_pushliteral(L, "suspended");  /* initial state */
+          marpa_lua_pushliteral(L, "suspended");  /* initial state */
         break;
       }
       default:  /* some error occurred */
-        lua_pushliteral(L, "dead");
+        marpa_lua_pushliteral(L, "dead");
         break;
     }
   }

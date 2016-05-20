@@ -30,15 +30,15 @@ static int luaB_print (lua_State *L) {
     size_t l;
     marpa_lua_pushvalue(L, -1);  /* function to be called */
     marpa_lua_pushvalue(L, i);   /* value to print */
-    lua_call(L, 1, 1);
+    marpa_lua_call(L, 1, 1);
     s = marpa_lua_tolstring(L, -1, &l);  /* get result */
     if (s == NULL)
       return marpa_luaL_error(L, "'tostring' must return a string to 'print'");
-    if (i>1) lua_writestring("\t", 1);
-    lua_writestring(s, l);
-    lua_pop(L, 1);  /* pop result */
+    if (i>1) marpa_lua_writestring("\t", 1);
+    marpa_lua_writestring(s, l);
+    marpa_lua_pop(L, 1);  /* pop result */
   }
-  lua_writeline();
+  marpa_lua_writeline();
   return 0;
 }
 
@@ -67,7 +67,7 @@ static const char *b_str2int (const char *s, int base, lua_Integer *pn) {
 
 
 static int luaB_tonumber (lua_State *L) {
-  if (lua_isnoneornil(L, 2)) {  /* standard conversion? */
+  if (marpa_lua_isnoneornil(L, 2)) {  /* standard conversion? */
     marpa_luaL_checkany(L, 1);
     if (marpa_lua_type(L, 1) == LUA_TNUMBER) {  /* already a number? */
       marpa_lua_settop(L, 1);  /* yes; return it */
@@ -210,14 +210,14 @@ static int pairsmeta (lua_State *L, const char *method, int iszero,
                       lua_CFunction iter) {
   if (marpa_luaL_getmetafield(L, 1, method) == LUA_TNIL) {  /* no metamethod? */
     marpa_luaL_checktype(L, 1, LUA_TTABLE);  /* argument must be a table */
-    lua_pushcfunction(L, iter);  /* will return generator, */
+    marpa_lua_pushcfunction(L, iter);  /* will return generator, */
     marpa_lua_pushvalue(L, 1);  /* state, */
     if (iszero) marpa_lua_pushinteger(L, 0);  /* and initial value */
     else marpa_lua_pushnil(L);
   }
   else {
     marpa_lua_pushvalue(L, 1);  /* argument 'self' to metamethod */
-    lua_call(L, 1, 3);  /* get 3 values from metamethod */
+    marpa_lua_call(L, 1, 3);  /* get 3 values from metamethod */
   }
   return 3;
 }
@@ -260,7 +260,7 @@ static int luaB_ipairs (lua_State *L) {
   return pairsmeta(L, "__ipairs", 1, ipairsaux);
 #else
   marpa_luaL_checkany(L, 1);
-  lua_pushcfunction(L, ipairsaux);  /* iteration function */
+  marpa_lua_pushcfunction(L, ipairsaux);  /* iteration function */
   marpa_lua_pushvalue(L, 1);  /* state */
   marpa_lua_pushinteger(L, 0);  /* initial value */
   return 3;
@@ -273,13 +273,13 @@ static int load_aux (lua_State *L, int status, int envidx) {
     if (envidx != 0) {  /* 'env' parameter? */
       marpa_lua_pushvalue(L, envidx);  /* environment for loaded function */
       if (!marpa_lua_setupvalue(L, -2, 1))  /* set it as 1st upvalue */
-        lua_pop(L, 1);  /* remove 'env' if not used by previous call */
+        marpa_lua_pop(L, 1);  /* remove 'env' if not used by previous call */
     }
     return 1;
   }
   else {  /* error (message is on top of the stack) */
     marpa_lua_pushnil(L);
-    lua_insert(L, -2);  /* put before error message */
+    marpa_lua_insert(L, -2);  /* put before error message */
     return 2;  /* return nil plus error message */
   }
 }
@@ -288,7 +288,7 @@ static int load_aux (lua_State *L, int status, int envidx) {
 static int luaB_loadfile (lua_State *L) {
   const char *fname = luaL_optstring(L, 1, NULL);
   const char *mode = luaL_optstring(L, 2, NULL);
-  int env = (!lua_isnone(L, 3) ? 3 : 0);  /* 'env' index or 0 if no 'env' */
+  int env = (!marpa_lua_isnone(L, 3) ? 3 : 0);  /* 'env' index or 0 if no 'env' */
   int status = marpa_luaL_loadfilex(L, fname, mode);
   return load_aux(L, status, env);
 }
@@ -319,15 +319,15 @@ static const char *generic_reader (lua_State *L, void *ud, size_t *size) {
   (void)(ud);  /* not used */
   marpa_luaL_checkstack(L, 2, "too many nested functions");
   marpa_lua_pushvalue(L, 1);  /* get function */
-  lua_call(L, 0, 1);  /* call it */
-  if (lua_isnil(L, -1)) {
-    lua_pop(L, 1);  /* pop result */
+  marpa_lua_call(L, 0, 1);  /* call it */
+  if (marpa_lua_isnil(L, -1)) {
+    marpa_lua_pop(L, 1);  /* pop result */
     *size = 0;
     return NULL;
   }
   else if (!marpa_lua_isstring(L, -1))
     marpa_luaL_error(L, "reader function must return a string");
-  lua_replace(L, RESERVEDSLOT);  /* save string in reserved slot */
+  marpa_lua_replace(L, RESERVEDSLOT);  /* save string in reserved slot */
   return marpa_lua_tolstring(L, RESERVEDSLOT, size);
 }
 
@@ -337,7 +337,7 @@ static int luaB_load (lua_State *L) {
   size_t l;
   const char *s = marpa_lua_tolstring(L, 1, &l);
   const char *mode = luaL_optstring(L, 3, "bt");
-  int env = (!lua_isnone(L, 4) ? 4 : 0);  /* 'env' index or 0 if no 'env' */
+  int env = (!marpa_lua_isnone(L, 4) ? 4 : 0);  /* 'env' index or 0 if no 'env' */
   if (s != NULL) {  /* loading a string? */
     const char *chunkname = luaL_optstring(L, 2, s);
     status = marpa_luaL_loadbufferx(L, s, l, chunkname, mode);
@@ -375,8 +375,8 @@ static int luaB_assert (lua_State *L) {
     return marpa_lua_gettop(L);  /* return all arguments */
   else {  /* error */
     marpa_luaL_checkany(L, 1);  /* there must be a condition */
-    lua_remove(L, 1);  /* remove it */
-    lua_pushliteral(L, "assertion failed!");  /* default message */
+    marpa_lua_remove(L, 1);  /* remove it */
+    marpa_lua_pushliteral(L, "assertion failed!");  /* default message */
     marpa_lua_settop(L, 1);  /* leave only message (default if no other one) */
     return luaB_error(L);  /* call 'error' */
   }
@@ -385,7 +385,7 @@ static int luaB_assert (lua_State *L) {
 
 static int luaB_select (lua_State *L) {
   int n = marpa_lua_gettop(L);
-  if (marpa_lua_type(L, 1) == LUA_TSTRING && *lua_tostring(L, 1) == '#') {
+  if (marpa_lua_type(L, 1) == LUA_TSTRING && *marpa_lua_tostring(L, 1) == '#') {
     marpa_lua_pushinteger(L, n-1);
     return 1;
   }
@@ -421,7 +421,7 @@ static int luaB_pcall (lua_State *L) {
   int status;
   marpa_luaL_checkany(L, 1);
   marpa_lua_pushboolean(L, 1);  /* first result if no errors */
-  lua_insert(L, 1);  /* put it in place */
+  marpa_lua_insert(L, 1);  /* put it in place */
   status = marpa_lua_pcallk(L, marpa_lua_gettop(L) - 2, LUA_MULTRET, 0, 0, finishpcall);
   return finishpcall(L, status, 0);
 }
@@ -486,13 +486,13 @@ static const luaL_Reg base_funcs[] = {
 
 LUAMOD_API int marpa_luaopen_base (lua_State *L) {
   /* open lib into global table */
-  lua_pushglobaltable(L);
+  marpa_lua_pushglobaltable(L);
   marpa_luaL_setfuncs(L, base_funcs, 0);
   /* set global _G */
   marpa_lua_pushvalue(L, -1);
   marpa_lua_setfield(L, -2, "_G");
   /* set global _VERSION */
-  lua_pushliteral(L, LUA_VERSION);
+  marpa_lua_pushliteral(L, LUA_VERSION);
   marpa_lua_setfield(L, -2, "_VERSION");
   return 1;
 }

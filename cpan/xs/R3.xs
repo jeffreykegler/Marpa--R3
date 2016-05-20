@@ -11,7 +11,6 @@
  * of the licenses in the directory LICENSES.
  */
 
-#include "config.h"
 #include "marpa_xs.h"
 
 #define PERL_NO_GET_CONTEXT

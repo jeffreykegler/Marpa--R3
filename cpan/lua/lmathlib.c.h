@@ -38,7 +38,7 @@
 
 static int math_abs (lua_State *L) {
   if (marpa_lua_isinteger(L, 1)) {
-    lua_Integer n = lua_tointeger(L, 1);
+    lua_Integer n = marpa_lua_tointeger(L, 1);
     if (n < 0) n = (lua_Integer)(0u - (lua_Unsigned)n);
     marpa_lua_pushinteger(L, n);
   }
@@ -95,7 +95,7 @@ static int math_toint (lua_State *L) {
 
 static void pushnumint (lua_State *L, lua_Number d) {
   lua_Integer n;
-  if (lua_numbertointeger(d, &n))  /* does 'd' fit in an integer? */
+  if (marpa_lua_numbertointeger(d, &n))  /* does 'd' fit in an integer? */
     marpa_lua_pushinteger(L, n);  /* result is integer */
   else
     marpa_lua_pushnumber(L, d);  /* result is float */
@@ -126,13 +126,13 @@ static int math_ceil (lua_State *L) {
 
 static int math_fmod (lua_State *L) {
   if (marpa_lua_isinteger(L, 1) && marpa_lua_isinteger(L, 2)) {
-    lua_Integer d = lua_tointeger(L, 2);
+    lua_Integer d = marpa_lua_tointeger(L, 2);
     if ((lua_Unsigned)d + 1u <= 1u) {  /* special cases: -1 or 0 */
       luaL_argcheck(L, d != 0, 2, "zero");
       marpa_lua_pushinteger(L, 0);  /* avoid overflow with 0x80000... / -1 */
     }
     else
-      marpa_lua_pushinteger(L, lua_tointeger(L, 1) % d);
+      marpa_lua_pushinteger(L, marpa_lua_tointeger(L, 1) % d);
   }
   else
     marpa_lua_pushnumber(L, l_mathop(fmod)(marpa_luaL_checknumber(L, 1),
@@ -179,7 +179,7 @@ static int math_ult (lua_State *L) {
 static int math_log (lua_State *L) {
   lua_Number x = marpa_luaL_checknumber(L, 1);
   lua_Number res;
-  if (lua_isnoneornil(L, 2))
+  if (marpa_lua_isnoneornil(L, 2))
     res = l_mathop(log)(x);
   else {
     lua_Number base = marpa_luaL_checknumber(L, 2);
@@ -281,9 +281,9 @@ static int math_randomseed (lua_State *L) {
 static int math_type (lua_State *L) {
   if (marpa_lua_type(L, 1) == LUA_TNUMBER) {
       if (marpa_lua_isinteger(L, 1))
-        lua_pushliteral(L, "integer"); 
+        marpa_lua_pushliteral(L, "integer"); 
       else
-        lua_pushliteral(L, "float"); 
+        marpa_lua_pushliteral(L, "float"); 
   }
   else {
     marpa_luaL_checkany(L, 1);

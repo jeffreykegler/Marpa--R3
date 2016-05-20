@@ -201,7 +201,7 @@ static int byteoffset (lua_State *L) {
 static int iter_aux (lua_State *L) {
   size_t len;
   const char *s = marpa_luaL_checklstring(L, 1, &len);
-  lua_Integer n = lua_tointeger(L, 2) - 1;
+  lua_Integer n = marpa_lua_tointeger(L, 2) - 1;
   if (n < 0)  /* first iteration? */
     n = 0;  /* start from here */
   else if (n < (lua_Integer)len) {
@@ -224,7 +224,7 @@ static int iter_aux (lua_State *L) {
 
 static int iter_codes (lua_State *L) {
   luaL_checkstring(L, 1);
-  lua_pushcfunction(L, iter_aux);
+  marpa_lua_pushcfunction(L, iter_aux);
   marpa_lua_pushvalue(L, 1);
   marpa_lua_pushinteger(L, 0);
   return 3;

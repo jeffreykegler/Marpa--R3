@@ -198,7 +198,7 @@ static void setboolfield (lua_State *L, const char *key, int value) {
 static int getboolfield (lua_State *L, const char *key) {
   int res;
   res = (marpa_lua_getfield(L, -1, key) == LUA_TNIL) ? -1 : marpa_lua_toboolean(L, -1);
-  lua_pop(L, 1);
+  marpa_lua_pop(L, 1);
   return res;
 }
 
@@ -224,7 +224,7 @@ static int getfield (lua_State *L, const char *key, int d, int delta) {
       return marpa_luaL_error(L, "field '%s' out-of-bounds", key);
     res -= delta;
   }
-  lua_pop(L, 1);
+  marpa_lua_pop(L, 1);
   return (int)res;
 }
 
@@ -305,7 +305,7 @@ static int os_date (lua_State *L) {
 
 static int os_time (lua_State *L) {
   time_t t;
-  if (lua_isnoneornil(L, 1))  /* called without args? */
+  if (marpa_lua_isnoneornil(L, 1))  /* called without args? */
     t = time(NULL);  /* get current time */
   else {
     struct tm ts;
@@ -351,7 +351,7 @@ static int os_setlocale (lua_State *L) {
 
 static int os_exit (lua_State *L) {
   int status;
-  if (lua_isboolean(L, 1))
+  if (marpa_lua_isboolean(L, 1))
     status = (marpa_lua_toboolean(L, 1) ? EXIT_SUCCESS : EXIT_FAILURE);
   else
     status = (int)marpa_luaL_optinteger(L, 1, EXIT_SUCCESS);

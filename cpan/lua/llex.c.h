@@ -226,7 +226,7 @@ static void buffreplace (LexState *ls, char from, char to) {
 */
 static void trydecpoint (LexState *ls, TValue *o) {
   char old = ls->decpoint;
-  ls->decpoint = lua_getlocaledecpoint();
+  ls->decpoint = marpa_lua_getlocaledecpoint();
   buffreplace(ls, old, ls->decpoint);  /* try new decimal separator */
   if (luaO_str2num(luaZ_buffer(ls->buff), o) == 0) {
     /* format error with correct decimal point: no more options */

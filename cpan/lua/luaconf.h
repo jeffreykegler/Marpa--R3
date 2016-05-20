@@ -308,7 +308,7 @@
 
 /*
 @@ LUA_COMPAT_APIINTCASTS controls the presence of macros for
-** manipulating other integer types (lua_pushunsigned, lua_tounsigned,
+** manipulating other integer types (marpa_lua_pushunsigned, marpa_lua_tounsigned,
 ** luaL_checkint, luaL_checklong, etc.)
 */
 #define LUA_COMPAT_APIINTCASTS
@@ -335,13 +335,13 @@
 #define LUA_COMPAT_LOADERS
 
 /*
-@@ macro 'lua_cpcall' emulates deprecated function lua_cpcall.
+@@ macro 'marpa_lua_cpcall' emulates deprecated function marpa_lua_cpcall.
 ** You can call your C function directly (with light C functions).
 */
-#define lua_cpcall(L,f,u)  \
-	(lua_pushcfunction(L, (f)), \
+#define marpa_lua_cpcall(L,f,u)  \
+	(marpa_lua_pushcfunction(L, (f)), \
 	 marpa_lua_pushlightuserdata(L,(u)), \
-	 lua_pcall(L,1,0,0))
+	 marpa_lua_pcall(L,1,0,0))
 
 
 /*
@@ -366,12 +366,12 @@
 ** changes in the API. The macros themselves document how to
 ** change your code to avoid using them.
 */
-#define lua_strlen(L,i)		marpa_lua_rawlen(L, (i))
+#define marpa_lua_strlen(L,i)		marpa_lua_rawlen(L, (i))
 
-#define lua_objlen(L,i)		marpa_lua_rawlen(L, (i))
+#define marpa_lua_objlen(L,i)		marpa_lua_rawlen(L, (i))
 
-#define lua_equal(L,idx1,idx2)		marpa_lua_compare(L,(idx1),(idx2),LUA_OPEQ)
-#define lua_lessthan(L,idx1,idx2)	marpa_lua_compare(L,(idx1),(idx2),LUA_OPLT)
+#define marpa_lua_equal(L,idx1,idx2)		marpa_lua_compare(L,(idx1),(idx2),LUA_OPEQ)
+#define marpa_lua_lessthan(L,idx1,idx2)	marpa_lua_compare(L,(idx1),(idx2),LUA_OPLT)
 
 /*
 @@ LUA_COMPAT_MODULE controls compatibility with previous
@@ -410,10 +410,10 @@
 ** by prefixing it with one of FLT/DBL/LDBL.
 @@ LUA_NUMBER_FRMLEN is the length modifier for writing floats.
 @@ LUA_NUMBER_FMT is the format for writing floats.
-@@ lua_number2str converts a float to a string.
+@@ marpa_lua_number2str converts a float to a string.
 @@ l_mathop allows the addition of an 'l' or 'f' to all math operations.
 @@ l_floor takes the floor of a float.
-@@ lua_str2number converts a decimal numeric string to a number.
+@@ marpa_lua_str2number converts a decimal numeric string to a number.
 */
 
 
@@ -421,17 +421,17 @@
 
 #define l_floor(x)		(l_mathop(floor)(x))
 
-#define lua_number2str(s,sz,n)	l_sprintf((s), sz, LUA_NUMBER_FMT, (n))
+#define marpa_lua_number2str(s,sz,n)	l_sprintf((s), sz, LUA_NUMBER_FMT, (n))
 
 /*
-@@ lua_numbertointeger converts a float number to an integer, or
+@@ marpa_lua_numbertointeger converts a float number to an integer, or
 ** returns 0 if float is not within the range of a lua_Integer.
 ** (The range comparisons are tricky because of rounding. The tests
 ** here assume a two-complement representation, where MININTEGER always
 ** has an exact representation as a float; MAXINTEGER may not have one,
 ** and therefore its conversion to float may have an ill-defined value.)
 */
-#define lua_numbertointeger(n,p) \
+#define marpa_lua_numbertointeger(n,p) \
   ((n) >= (LUA_NUMBER)(LUA_MININTEGER) && \
    (n) < -(LUA_NUMBER)(LUA_MININTEGER) && \
       (*(p) = (LUA_INTEGER)(n), 1))
@@ -452,7 +452,7 @@
 
 #define l_mathop(op)		op##f
 
-#define lua_str2number(s,p)	strtof((s), (p))
+#define marpa_lua_str2number(s,p)	strtof((s), (p))
 
 
 #elif LUA_FLOAT_TYPE == LUA_FLOAT_LONGDOUBLE	/* }{ long double */
@@ -468,7 +468,7 @@
 
 #define l_mathop(op)		op##l
 
-#define lua_str2number(s,p)	strtold((s), (p))
+#define marpa_lua_str2number(s,p)	strtold((s), (p))
 
 #elif LUA_FLOAT_TYPE == LUA_FLOAT_DOUBLE	/* }{ double */
 
@@ -483,7 +483,7 @@
 
 #define l_mathop(op)		op
 
-#define lua_str2number(s,p)	strtod((s), (p))
+#define marpa_lua_str2number(s,p)	strtod((s), (p))
 
 #else						/* }{ */
 
@@ -504,14 +504,14 @@
 @@ LUA_INTEGER_FMT is the format for writing integers.
 @@ LUA_MAXINTEGER is the maximum value for a LUA_INTEGER.
 @@ LUA_MININTEGER is the minimum value for a LUA_INTEGER.
-@@ lua_integer2str converts an integer to a string.
+@@ marpa_lua_integer2str converts an integer to a string.
 */
 
 
 /* The following definitions are good for most cases here */
 
 #define LUA_INTEGER_FMT		"%" LUA_INTEGER_FRMLEN "d"
-#define lua_integer2str(s,sz,n)	l_sprintf((s), sz, LUA_INTEGER_FMT, (n))
+#define marpa_lua_integer2str(s,sz,n)	l_sprintf((s), sz, LUA_INTEGER_FMT, (n))
 
 #define LUAI_UACINT		LUA_INTEGER
 
@@ -595,24 +595,24 @@
 
 
 /*
-@@ lua_strx2number converts an hexadecimal numeric string to a number.
+@@ marpa_lua_strx2number converts an hexadecimal numeric string to a number.
 ** In C99, 'strtod' does that conversion. Otherwise, you can
-** leave 'lua_strx2number' undefined and Lua will provide its own
+** leave 'marpa_lua_strx2number' undefined and Lua will provide its own
 ** implementation.
 */
 #if !defined(LUA_USE_C89)
-#define lua_strx2number(s,p)		lua_str2number(s,p)
+#define marpa_lua_strx2number(s,p)		marpa_lua_str2number(s,p)
 #endif
 
 
 /*
-@@ lua_number2strx converts a float to an hexadecimal numeric string. 
+@@ marpa_lua_number2strx converts a float to an hexadecimal numeric string. 
 ** In C99, 'sprintf' (with format specifiers '%a'/'%A') does that.
-** Otherwise, you can leave 'lua_number2strx' undefined and Lua will
+** Otherwise, you can leave 'marpa_lua_number2strx' undefined and Lua will
 ** provide its own implementation.
 */
 #if !defined(LUA_USE_C89)
-#define lua_number2strx(L,b,sz,f,n)	l_sprintf(b,sz,f,n)
+#define marpa_lua_number2strx(L,b,sz,f,n)	l_sprintf(b,sz,f,n)
 #endif
 
 
@@ -624,9 +624,9 @@
 */
 #if defined(LUA_USE_C89) || (defined(HUGE_VAL) && !defined(HUGE_VALF))
 #undef l_mathop  /* variants not available */
-#undef lua_str2number
+#undef marpa_lua_str2number
 #define l_mathop(op)		(lua_Number)op  /* no variant */
-#define lua_str2number(s,p)	((lua_Number)strtod((s), (p)))
+#define marpa_lua_str2number(s,p)	((lua_Number)strtod((s), (p)))
 #endif
 
 
@@ -649,12 +649,12 @@
 
 
 /*
-@@ lua_getlocaledecpoint gets the locale "radix character" (decimal point).
+@@ marpa_lua_getlocaledecpoint gets the locale "radix character" (decimal point).
 ** Change that if you do not want to use C locales. (Code using this
 ** macro must include header 'locale.h'.)
 */
-#if !defined(lua_getlocaledecpoint)
-#define lua_getlocaledecpoint()		(localeconv()->decimal_point[0])
+#if !defined(marpa_lua_getlocaledecpoint)
+#define marpa_lua_getlocaledecpoint()		(localeconv()->decimal_point[0])
 #endif
 
 /* }================================================================== */

@@ -74,7 +74,7 @@ static int str_sub (lua_State *L) {
   if (end > (lua_Integer)l) end = l;
   if (start <= end)
     marpa_lua_pushlstring(L, s + start - 1, (size_t)(end - start) + 1);
-  else lua_pushliteral(L, "");
+  else marpa_lua_pushliteral(L, "");
   return 1;
 }
 
@@ -122,7 +122,7 @@ static int str_rep (lua_State *L) {
   const char *s = marpa_luaL_checklstring(L, 1, &l);
   lua_Integer n = marpa_luaL_checkinteger(L, 2);
   const char *sep = marpa_luaL_optlstring(L, 3, "", &lsep);
-  if (n <= 0) lua_pushliteral(L, "");
+  if (n <= 0) marpa_lua_pushliteral(L, "");
   else if (l + lsep < l || l + lsep > MAXSIZE / n)  /* may overflow? */
     return marpa_luaL_error(L, "resulting string too large");
   else {
@@ -686,7 +686,7 @@ typedef struct GMatchState {
 
 
 static int gmatch_aux (lua_State *L) {
-  GMatchState *gm = (GMatchState *)marpa_lua_touserdata(L, lua_upvalueindex(3));
+  GMatchState *gm = (GMatchState *)marpa_lua_touserdata(L, marpa_lua_upvalueindex(3));
   const char *src;
   for (src = gm->src; src <= gm->ms.src_end; src++) {
     const char *e;
@@ -737,7 +737,7 @@ static void add_s (MatchState *ms, luaL_Buffer *b, const char *s,
       else {
         push_onecapture(ms, news[i] - '1', s, e);
         marpa_luaL_tolstring(L, -1, NULL);  /* if number, convert it to string */
-        lua_remove(L, -2);  /* remove original value */
+        marpa_lua_remove(L, -2);  /* remove original value */
         marpa_luaL_addvalue(b);  /* add capture to accumulated result */
       }
     }
@@ -753,7 +753,7 @@ static void add_value (MatchState *ms, luaL_Buffer *b, const char *s,
       int n;
       marpa_lua_pushvalue(L, 3);
       n = push_captures(ms, s, e);
-      lua_call(L, n, 1);
+      marpa_lua_call(L, n, 1);
       break;
     }
     case LUA_TTABLE: {
@@ -767,7 +767,7 @@ static void add_value (MatchState *ms, luaL_Buffer *b, const char *s,
     }
   }
   if (!marpa_lua_toboolean(L, -1)) {  /* nil or false? */
-    lua_pop(L, 1);
+    marpa_lua_pop(L, 1);
     marpa_lua_pushlstring(L, s, e - s);  /* keep original text */
   }
   else if (!marpa_lua_isstring(L, -1))
@@ -824,7 +824,7 @@ static int str_gsub (lua_State *L) {
 ** =======================================================
 */
 
-#if !defined(lua_number2strx)	/* { */
+#if !defined(marpa_lua_number2strx)	/* { */
 
 /*
 ** Hexadecimal floating-point formatter
@@ -875,7 +875,7 @@ static int num2straux (char *buff, int sz, lua_Number x) {
     m = adddigit(buff, n++, m * (1 << L_NBFD));  /* add first digit */
     e -= L_NBFD;  /* this digit goes before the radix point */
     if (m > 0) {  /* more digits? */
-      buff[n++] = lua_getlocaledecpoint();  /* add radix point */
+      buff[n++] = marpa_lua_getlocaledecpoint();  /* add radix point */
       do {  /* add as many digits as needed */
         m = adddigit(buff, n++, m * 16);
       } while (m > 0);
@@ -887,7 +887,7 @@ static int num2straux (char *buff, int sz, lua_Number x) {
 }
 
 
-static int lua_number2strx (lua_State *L, char *buff, int sz,
+static int marpa_lua_number2strx (lua_State *L, char *buff, int sz,
                             const char *fmt, lua_Number x) {
   int n = num2straux(buff, sz, x);
   if (fmt[SIZELENMOD] == 'A') {
@@ -1015,7 +1015,7 @@ static int str_format (lua_State *L) {
         }
         case 'a': case 'A':
           addlenmod(form, LUA_NUMBER_FRMLEN);
-          nb = lua_number2strx(L, buff, MAX_ITEM, form,
+          nb = marpa_lua_number2strx(L, buff, MAX_ITEM, form,
                                   marpa_luaL_checknumber(L, arg));
           break;
         case 'e': case 'E': case 'f':
@@ -1041,7 +1041,7 @@ static int str_format (lua_State *L) {
             }
             else {  /* format the string into 'buff' */
               nb = l_sprintf(buff, MAX_ITEM, form, s);
-              lua_pop(L, 1);  /* remove result from 'marpa_luaL_tolstring' */
+              marpa_lua_pop(L, 1);  /* remove result from 'marpa_luaL_tolstring' */
             }
           }
           break;
@@ -1532,13 +1532,13 @@ static const luaL_Reg strlib[] = {
 
 static void createmetatable (lua_State *L) {
   marpa_lua_createtable(L, 0, 1);  /* table to be metatable for strings */
-  lua_pushliteral(L, "");  /* dummy string */
+  marpa_lua_pushliteral(L, "");  /* dummy string */
   marpa_lua_pushvalue(L, -2);  /* copy table */
   marpa_lua_setmetatable(L, -2);  /* set table as metatable for strings */
-  lua_pop(L, 1);  /* pop dummy string */
+  marpa_lua_pop(L, 1);  /* pop dummy string */
   marpa_lua_pushvalue(L, -2);  /* get string library */
   marpa_lua_setfield(L, -2, "__index");  /* metatable.__index = string */
-  lua_pop(L, 1);  /* pop metatable */
+  marpa_lua_pop(L, 1);  /* pop metatable */
 }
 
 

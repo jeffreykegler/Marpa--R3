@@ -515,10 +515,10 @@ static void finishCcall (lua_State *L, int status) {
   /* error status can only happen in a protected call */
   lua_assert((ci->callstatus & CIST_YPCALL) || status == LUA_YIELD);
   if (ci->callstatus & CIST_YPCALL) {  /* was inside a pcall? */
-    ci->callstatus &= ~CIST_YPCALL;  /* finish 'lua_pcall' */
+    ci->callstatus &= ~CIST_YPCALL;  /* finish 'marpa_lua_pcall' */
     L->errfunc = ci->u.c.old_errfunc;
   }
-  /* finish 'marpa_lua_callk'/'lua_pcall'; CIST_YPCALL and 'errfunc' already
+  /* finish 'marpa_lua_callk'/'marpa_lua_pcall'; CIST_YPCALL and 'errfunc' already
      handled */
   adjustresults(L, ci->nresults);
   /* call continuation function */
