@@ -22,7 +22,7 @@ use lib 'inc';
 use Marpa::R3::Test;
 use Marpa::R3;
 
-my $result = Marpa::R3::Lua::exec(q{hi});
-Marpa::R3::Test::is($result, 'salve, munde!');
+my @result = Marpa::R3::Lua::exec(q{hi});
+Marpa::R3::Test::is((join q{:}, map { $_ // 'undef' } @result), 'salve, munde!');
 
 # vim: expandtab shiftwidth=4:

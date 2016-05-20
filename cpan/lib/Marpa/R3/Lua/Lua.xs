@@ -35,15 +35,19 @@ luaval_to_perlsv (lua_State * L, int idx)
 {
   const int type = marpa_lua_type (L, idx);
   SV *result;
+    warn("%s %d\n", __FILE__, __LINE__);
   switch (type)
     {
     case LUA_TNIL:
+    warn("%s %d\n", __FILE__, __LINE__);
       result = newSV (0);
       break;
     case LUA_TBOOLEAN:
+    warn("%s %d\n", __FILE__, __LINE__);
       result = bool_ref (L, marpa_lua_toboolean (L, idx));
       break;
     case LUA_TNUMBER:
+    warn("%s %d\n", __FILE__, __LINE__);
       result = newSVnv (marpa_lua_tonumber (L, idx));
       break;
     case LUA_TSTRING:
@@ -53,7 +57,8 @@ luaval_to_perlsv (lua_State * L, int idx)
     case LUA_TTABLE:
     case LUA_TFUNCTION:
     default:
-      result = newSVpvf ("Lua type %s not yet implemented", type);
+    warn("%s %d\n", __FILE__, __LINE__);
+      result = newSVpvf ("Lua type %d at index %d not yet implemented", type, idx);
       break;
     }
     warn("%s %d\n", __FILE__, __LINE__);
@@ -63,6 +68,52 @@ luaval_to_perlsv (lua_State * L, int idx)
 static SV*
 bool_ref (lua_State *L, int b) {
     return b ? newSViv(1) : newSV(0);
+}
+
+/* push a Perl value onto the Lua stack:
+ * does the right thing for any Perl type
+ * handled by Inline::Lua */
+static void
+push_val (lua_State * L, SV * val)
+{
+  if (SvTYPE (val) == SVt_NULL)
+    {
+      warn("%s %d\n", __FILE__, __LINE__);
+      marpa_lua_pushnil (marpa_L);
+      return;
+    }
+  if (SvPOK (val))
+    {
+      STRLEN n_a;
+      warn("%s %d\n", __FILE__, __LINE__);
+      char *cval = SvPV (val, n_a);
+      marpa_lua_pushlstring (marpa_L, cval, n_a);
+      return;
+    }
+  if (SvNOK (val))
+    {
+      warn("%s %d\n", __FILE__, __LINE__);
+      marpa_lua_pushnumber (marpa_L, (lua_Number) SvNV (val));
+      return;
+    }
+  if (SvIOK (val))
+    {
+      warn("%s %d\n", __FILE__, __LINE__);
+      marpa_lua_pushnumber (marpa_L, (lua_Number) SvIV (val));
+      return;
+    }
+  if (SvROK (val))
+    {
+      warn("%s %d\n", __FILE__, __LINE__);
+      marpa_lua_pushfstring (marpa_L,
+			     "!!!Argument unsupported: Perl reference type (%s)",
+			     sv_reftype (SvRV (val), 0));
+      return;
+    }
+      warn("%s %d\n", __FILE__, __LINE__);
+  marpa_lua_pushfstring (marpa_L, "!!!Argument unsupported: Perl type (%d)",
+			 SvType (val));
+  return;
 }
 
 MODULE = Marpa::R3::Lua        PACKAGE = Marpa::R3::Lua
@@ -77,10 +128,18 @@ PPCODE:
   // XPUSHs (sv_2mortal (newSVpv (hi, 0)));
   int i, status;
   int top_before, top_after;
-  char *codestr = "print [[SALVE!]]; return [[salve, munde!]]";
+  char *codestr = "print [[SALVE!]]; return ..., [[salve, munde!]]";
 
   top_before = marpa_lua_gettop (marpa_L);
   warn("top_before=%d", top_before);
+
+  /* push arguments */
+  for (i = 0; i < items; i++) {
+      warn("%s %d\n", __FILE__, __LINE__);
+      push_val(marpa_L, ST(i));
+      warn("%s %d\n", __FILE__, __LINE__);
+  }
+
   status = luaL_loadbuffer (marpa_L, codestr, strlen (codestr), codestr);
   if (status != 0)
     {
@@ -106,11 +165,13 @@ PPCODE:
     warn("%s %d\n", __FILE__, __LINE__);
       SV *result = luaval_to_perlsv (marpa_L, i);
     warn("%s %d\n", __FILE__, __LINE__);
-      marpa_lua_pop (marpa_L, 1);
     warn("%s %d\n", __FILE__, __LINE__);
       XPUSHs (sv_2mortal (result));
     warn("%s %d\n", __FILE__, __LINE__);
     }
+      if (top_after > top_before) {
+      marpa_lua_pop (marpa_L, top_after - top_before);
+      }
 }
 
 BOOT:
