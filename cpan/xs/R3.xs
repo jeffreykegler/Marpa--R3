@@ -6751,7 +6751,7 @@ PPCODE:
   XPUSHs (sv_2mortal (SvREFCNT_inc_simple_NN (*p_token_value_sv)));
 }
 
-MODULE = Marpa::R3::Lua        PACKAGE = Marpa::R3::Lua
+MODULE = Marpa::R3            PACKAGE = Marpa::R3::Lua
 
 void
 exec( ... )

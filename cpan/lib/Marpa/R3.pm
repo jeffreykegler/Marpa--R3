@@ -30,7 +30,6 @@ use XSLoader;
 use Marpa::R3::Version;
 
 XSLoader::load( 'Marpa::R3', $Marpa::R3::STRING_VERSION );
-XSLoader::load( 'Marpa::R3::Lua', $Marpa::R3::STRING_VERSION );
 
 if ( not $ENV{'MARPA_AUTHOR_TEST'} ) {
     $Marpa::R3::DEBUG = 0;
