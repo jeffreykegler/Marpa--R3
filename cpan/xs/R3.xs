@@ -2395,16 +2395,41 @@ push_val (lua_State * L, SV * val)
 }
 
 /* Register a "time object", a grammar, recce, etc. */
-static int marpa_xlua_time_ref()
+static int xlua_time_ref()
 {
     marpa_lua_newtable(marpa_L);
     return marpa_luaL_ref(marpa_L, LUA_REGISTRYINDEX);
 }
 
-static void marpa_xlua_time_unref(time_ref)
+static void xlua_time_unref(time_ref)
 int time_ref;
 {
     marpa_luaL_unref(marpa_L, LUA_REGISTRYINDEX, time_ref);
+}
+
+static int load_lua(time_ref, string)
+int time_ref;
+char* string;
+{
+  int time_object_registry;
+  int function_ref;
+  int status;
+
+  marpa_lua_rawgeti (marpa_L, LUA_REGISTRYINDEX, time_ref);
+  /* Lua stack: [ ..., time_object_table ] */
+  time_object_registry = marpa_lua_gettop (marpa_L);
+  status = luaL_loadbuffer (marpa_L, string, strlen (string), string);
+  if (status != 0)
+    {
+      const char *error_string = marpa_lua_tostring (marpa_L, -1);
+      marpa_lua_pop (marpa_L, 1);
+      croak ("Marpa::R3::Lua error in luaL_loadbuffer: %s", error_string);
+    }
+  /* [ ..., time_object_table , chunk ] */
+  function_ref = marpa_luaL_ref (marpa_L, time_object_registry);
+  /* [ ..., time_object_table  ] */
+  marpa_lua_pop(marpa_L, 1);
+  return function_ref;
 }
 
 MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin
@@ -5439,7 +5464,7 @@ PPCODE:
   slr->input = newSVpvn ("", 0);
   slr->end_pos = 0;
   slr->too_many_earley_items = -1;
-  slr->lua_ref = marpa_xlua_time_ref();
+  slr->lua_ref = xlua_time_ref();
 
   slr->gift = marpa__slr_new();
 
@@ -5455,7 +5480,7 @@ PPCODE:
 {
   const Marpa_Recce r0 = slr->r0;
 
-  marpa_xlua_time_unref(slr->lua_ref);
+  xlua_time_unref(slr->lua_ref);
 
   if (r0)
     {
