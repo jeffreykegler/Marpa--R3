@@ -22,14 +22,15 @@ use lib 'inc';
 use Marpa::R3::Test;
 use Marpa::R3;
 
+my $codestr = 'print [[SALVE!]]; return [[salve, munde!]], ...';
 my @result;
-@result = Marpa::R3::Lua::exec();
+@result = Marpa::R3::Lua::exec($codestr);
 Marpa::R3::Test::is((join q{:}, map { $_ // 'undef' } @result), 'salve, munde!');
 
-@result = Marpa::R3::Lua::exec(qw{hi});
+@result = Marpa::R3::Lua::exec($codestr, qw{hi});
 Marpa::R3::Test::is((join q{:}, map { $_ // 'undef' } @result), 'hi:salve, munde!');
 
-@result = Marpa::R3::Lua::exec(qw{hi hi2});
+@result = Marpa::R3::Lua::exec($codestr, qw{hi hi2});
 Marpa::R3::Test::is((join q{:}, map { $_ // 'undef' } @result), 'hi:hi2:salve, munde!');
 
 # vim: expandtab shiftwidth=4:
