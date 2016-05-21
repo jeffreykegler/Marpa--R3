@@ -399,6 +399,9 @@ typedef struct
   SV* input;
   int too_many_earley_items;
 
+  /* Lua "reference" to this object */
+  int lua_ref;
+
   /* A "Gift" because it is something that is "wrapped". */
   Marpa_SLR gift;
 

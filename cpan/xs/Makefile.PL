@@ -78,7 +78,7 @@ END_OF_POSTAMBLE_PIECE
 };
 
 WriteMakefile(
-    INC     => '-I.',
+    INC     => '-I. -I../lua',
     NAME    => 'Marpa::R3',
     VERSION => $STRING_VERSION,
     DEFINE  => $define,

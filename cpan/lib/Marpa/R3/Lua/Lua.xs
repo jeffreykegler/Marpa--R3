@@ -116,6 +116,18 @@ push_val (lua_State * L, SV * val)
   return;
 }
 
+/* Register a "time object", a grammar, recce, etc. */
+int marpa_xlua_time_ref()
+{
+    marpa_lua_newtable(marpa_L);
+    return marpa_luaL_ref(marpa_L, LUA_REGISTRYINDEX);
+}
+
+void marpa_xlua_time_unref()
+{
+    marpa_luaL_ref(marpa_L, LUA_REGISTRYINDEX);
+}
+
 MODULE = Marpa::R3::Lua        PACKAGE = Marpa::R3::Lua
 
 PROTOTYPES: DISABLE
