@@ -16,21 +16,27 @@ use 5.010001;
 use strict;
 use warnings;
 
-use Test::More tests => 3;
+use Test::More tests => 6;
 use English qw( -no_match_vars );
 use lib 'inc';
 use Marpa::R3::Test;
 use Marpa::R3;
 
-my $codestr = 'print [[SALVE!]]; return [[salve, munde!]], ...';
-my @result;
-@result = Marpa::R3::Lua::exec($codestr);
-Marpa::R3::Test::is((join q{:}, map { $_ // 'undef' } @result), 'salve, munde!');
+my $salve = ' return [[salve, munde!]], ...';
+my @tests = (
+   [$salve, [], ['salve, munde!'], 'Salve, 0 args'],
+   [$salve, [qw{hi}], ['hi', 'salve, munde!'], 'Salve, 1 arg'],
+   [$salve, [qw{hi hi2}], [qw(hi hi2), 'salve, munde!'], 'Salve, 2 args'],
+   ['return 42', [], ['42']],
+   ['function taxicurry(fact2) return 9^3 + fact2 end', [], []],
+   ['return taxicurry(10^3)', [], [1729]],
+);
 
-@result = Marpa::R3::Lua::exec($codestr, qw{hi});
-Marpa::R3::Test::is((join q{:}, map { $_ // 'undef' } @result), 'hi:salve, munde!');
-
-@result = Marpa::R3::Lua::exec($codestr, qw{hi hi2});
-Marpa::R3::Test::is((join q{:}, map { $_ // 'undef' } @result), 'hi:hi2:salve, munde!');
+for my $test (@tests) {
+    my ($code, $args, $expected, $test_name) = @{$test};
+    $test_name //= qq{"$code"};
+    my @actual = Marpa::R3::Lua::exec($code, @{$args});
+    Test::More::is_deeply( \@actual, $expected, $test_name);
+}
 
 # vim: expandtab shiftwidth=4:
