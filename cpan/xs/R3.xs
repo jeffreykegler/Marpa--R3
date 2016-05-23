@@ -2470,6 +2470,8 @@ char* string;
 static void marpa_sv_sv (lua_State* L, SV* sv) {
     SV** p_sv = (SV**)marpa_lua_newuserdata(L, sizeof(SV*));
     *p_sv = sv;
+    warn("new ud %p, SV %p %s %d\n", p_sv, sv, __FILE__, __LINE__);
+    SvREFCNT_inc_simple_void_NN (sv);
     marpa_luaL_getmetatable(L, MT_NAME_SV);
     marpa_lua_setmetatable(L, -2);
     /* [sv_userdata] */
@@ -2485,6 +2487,7 @@ static int marpa_sv_nil (lua_State* L) {
 static int marpa_sv_finalize (lua_State* L) {
     SV** p_sv = (SV**)marpa_luaL_checkudata(L, 1, MT_NAME_SV);
     SV* sv = *p_sv;
+    warn("decrementing ud %p, SV %p, %s %d\n", p_sv, sv, __FILE__, __LINE__);
     SvREFCNT_dec (sv);
     return 0;
 }
@@ -6921,9 +6924,9 @@ PPCODE:
   int top_before, top_after;
 
 
-  warn ("%s %d\n", __FILE__, __LINE__);
+  // warn ("%s %d\n", __FILE__, __LINE__);
   top_before = marpa_lua_gettop (marpa_L);
-  warn ("top before pcall = %d", top_before);
+  // warn ("top before pcall = %d", top_before);
 
   status =
     marpa_luaL_loadbuffer (marpa_L, codestr, strlen (codestr), codestr);
@@ -6934,7 +6937,7 @@ PPCODE:
       croak ("Marpa::R3::Lua error in luaL_loadbuffer: %s", error_string);
     }
 
-  warn ("%s %d\n", __FILE__, __LINE__);
+  // warn ("%s %d\n", __FILE__, __LINE__);
   /* push arguments */
   for (i = 1; i < items; i++)
     {
@@ -6945,7 +6948,7 @@ PPCODE:
 	  croak ("Marpa::R3::Lua::exec arg %d is not an SV", i);
 	}
       marpa_sv_sv (marpa_L, arg_sv);
-      warn ("%s %d\n", __FILE__, __LINE__);
+      // warn ("%s %d\n", __FILE__, __LINE__);
     }
 
   status = marpa_lua_pcall (marpa_L, items - 1, LUA_MULTRET, 0);
@@ -6958,21 +6961,21 @@ PPCODE:
 
   /* return args to caller */
   top_after = marpa_lua_gettop (marpa_L);
-  warn ("top after pcall = %d", top_after);
+  // warn ("top after pcall = %d", top_after);
   for (i = top_before + 1; i <= top_after; i++)
     {
-      warn ("%s %d\n", __FILE__, __LINE__);
+      // warn ("%s %d\n", __FILE__, __LINE__);
       SV *sv_result = coerce_to_sv (marpa_L, i);
-      warn ("%s %d\n", __FILE__, __LINE__);
+      // warn ("%s %d\n", __FILE__, __LINE__);
       /* Took ownership of sv_result, we now need to mortalize it */
       XPUSHs (sv_2mortal (sv_result));
-      warn ("%s %d\n", __FILE__, __LINE__);
+      // warn ("%s %d\n", __FILE__, __LINE__);
     }
   if (top_after > top_before)
     {
       marpa_lua_pop (marpa_L, top_after - top_before);
     }
-  warn ("%s %d\n", __FILE__, __LINE__);
+  // warn ("%s %d\n", __FILE__, __LINE__);
 }
 
 INCLUDE: auto.xs

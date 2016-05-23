@@ -45,5 +45,6 @@ for my $test (@tests) {
     my @actual = Marpa::R3::Lua::exec($code, @{$args});
     Test::More::is_deeply( \@actual, $expected, $test_name);
 }
+Marpa::R3::Lua::coerce_exec("collectgarbage()");
 
 # vim: expandtab shiftwidth=4:
