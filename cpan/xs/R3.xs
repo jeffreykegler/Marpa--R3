@@ -6833,16 +6833,14 @@ PPCODE:
 MODULE = Marpa::R3            PACKAGE = Marpa::R3::Lua
 
 void
-exec( codestr, ... )
+coerce_exec( codestr, ... )
    char* codestr;
 PPCODE:
 {
   int i, status;
   int top_before, top_after;
-  // char *codestr = "print [[SALVE!]]; return [[salve, munde!]], ...";
 
   top_before = marpa_lua_gettop (marpa_L);
-  // warn("top_before=%d", top_before);
 
   /* push arguments */
   for (i = 1; i < items; i++) {
