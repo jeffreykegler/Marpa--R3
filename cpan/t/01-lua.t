@@ -25,8 +25,8 @@ use Marpa::R3;
 my $salve = ' return [[salve, munde!]], ...';
 my @tests = (
    [$salve, [], ['salve, munde!'], 'Salve, 0 args'],
-   [$salve, [qw{hi}], ['hi', 'salve, munde!'], 'Salve, 1 arg'],
-   [$salve, [qw{hi hi2}], [qw(hi hi2), 'salve, munde!'], 'Salve, 2 args'],
+   [$salve, [qw{hi}], ['salve, munde!', 'hi'], 'Salve, 1 arg'],
+   [$salve, [qw{hi hi2}], ['salve, munde!', qw(hi hi2)], 'Salve, 2 args'],
    ['return 42', [], ['42']],
    ['function taxicurry(fact2) return 9^3 + fact2 end', [], []],
    ['return taxicurry(10^3)', [], [1729]],

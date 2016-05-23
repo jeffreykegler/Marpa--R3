@@ -6843,13 +6843,6 @@ PPCODE:
 
   top_before = marpa_lua_gettop (marpa_L);
 
-  /* push arguments */
-  for (i = 1; i < items; i++) {
-      // warn("%s %d: pushing Perl arg %d\n", __FILE__, __LINE__, i);
-      push_val(marpa_L, ST(i));
-      // warn("%s %d\n", __FILE__, __LINE__);
-  }
-
   status = marpa_luaL_loadbuffer (marpa_L, codestr, strlen (codestr), codestr);
   if (status != 0)
     {
@@ -6858,7 +6851,14 @@ PPCODE:
       croak ("Marpa::R3::Lua error in luaL_loadbuffer: %s", error_string);
     }
 
-  status = marpa_lua_pcall (marpa_L, 0, LUA_MULTRET, 0);
+  /* push arguments */
+  for (i = 1; i < items; i++) {
+      // warn("%s %d: pushing Perl arg %d\n", __FILE__, __LINE__, i);
+      push_val(marpa_L, ST(i));
+      // warn("%s %d\n", __FILE__, __LINE__);
+  }
+
+  status = marpa_lua_pcall (marpa_L, items-1, LUA_MULTRET, 0);
   if (status != 0)
     {
       const char *error_string = marpa_lua_tostring (marpa_L, -1);
@@ -6892,7 +6892,15 @@ PPCODE:
   int i, status;
   int top_before, top_after;
 
-  top_before = marpa_lua_gettop (marpa_L);
+
+    warn("%s %d\n", __FILE__, __LINE__);
+  status = marpa_luaL_loadbuffer (marpa_L, codestr, strlen (codestr), codestr);
+  if (status != 0)
+    {
+      const char *error_string = marpa_lua_tostring (marpa_L, -1);
+      marpa_lua_pop (marpa_L, 1);
+      croak ("Marpa::R3::Lua error in luaL_loadbuffer: %s", error_string);
+    }
 
     warn("%s %d\n", __FILE__, __LINE__);
   /* push arguments */
@@ -6906,16 +6914,9 @@ PPCODE:
       warn("%s %d\n", __FILE__, __LINE__);
   }
 
-    warn("%s %d\n", __FILE__, __LINE__);
-  status = marpa_luaL_loadbuffer (marpa_L, codestr, strlen (codestr), codestr);
-  if (status != 0)
-    {
-      const char *error_string = marpa_lua_tostring (marpa_L, -1);
-      marpa_lua_pop (marpa_L, 1);
-      croak ("Marpa::R3::Lua error in luaL_loadbuffer: %s", error_string);
-    }
-
-  status = marpa_lua_pcall (marpa_L, 0, LUA_MULTRET, 0);
+  top_before = marpa_lua_gettop (marpa_L);
+  warn("top before pcall = %d", top_before);
+  status = marpa_lua_pcall (marpa_L, items-1, LUA_MULTRET, 0);
   if (status != 0)
     {
       const char *error_string = marpa_lua_tostring (marpa_L, -1);
@@ -6926,7 +6927,7 @@ PPCODE:
   /* return args to caller:
    * lua functions appear to push their return values in reverse order */
   top_after = marpa_lua_gettop (marpa_L);
-  warn("top_after=%d", top_after);
+  warn("top after pcall = %d", top_after);
   for (i = top_before + 1; i <= top_after; i++)
     {
     warn("%s %d\n", __FILE__, __LINE__);
