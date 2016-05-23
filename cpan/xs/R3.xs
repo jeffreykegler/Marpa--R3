@@ -2440,8 +2440,8 @@ char* string;
  * the caller is prepared to transfer to the Lua userdata.
  */
 static void marpa_sv_sv (lua_State* L, SV* sv) {
-    SV* sv_copy = (SV*)marpa_lua_newuserdata(L, sizeof(SV*));
-    sv_copy = sv;
+    SV** p_sv = (SV**)marpa_lua_newuserdata(L, sizeof(SV*));
+    *p_sv = sv;
     marpa_luaL_getmetatable(L, MT_NAME_SV);
     marpa_lua_setmetatable(L, -2);
     /* [sv_userdata] */
@@ -2455,7 +2455,8 @@ static int marpa_sv_nil (lua_State* L) {
 }
 
 static int marpa_sv_finalize (lua_State* L) {
-    SV* const sv = (SV*)marpa_luaL_checkudata(L, 1, MT_NAME_SV);
+    SV** p_sv = (SV**)marpa_luaL_checkudata(L, 1, MT_NAME_SV);
+    SV* sv = *p_sv;
     SvREFCNT_dec (sv);
     return 0;
 }
@@ -6929,7 +6930,11 @@ PPCODE:
   for (i = top_before + 1; i <= top_after; i++)
     {
     warn("%s %d\n", __FILE__, __LINE__);
-      SV *sv_result = (SV*) marpa_lua_touserdata (marpa_L, i);
+      /* Perhaps remove check after debugging? */
+      SV** p_sv = (SV**)marpa_luaL_checkudata(marpa_L, i, MT_NAME_SV);
+    warn("%s %d\n", __FILE__, __LINE__);
+      SV* sv_result = *p_sv;
+    warn("%s %d\n", __FILE__, __LINE__);
       if (!SvOK(sv_result)) {
         croak ("Marpa::R3::Lua::exec return value %d is not an SV", i - (top_before + 1));
       }
@@ -6959,5 +6964,6 @@ BOOT:
       croak ("Marpa::R3 internal error: Lua interpreter failed to start");
        }
     marpa_luaL_openlibs(marpa_L);  /* open libraries */
+    marpa_luaopen_sv(marpa_L);  /* open Perl SV library */
 
     /* vim: set expandtab shiftwidth=2: */
