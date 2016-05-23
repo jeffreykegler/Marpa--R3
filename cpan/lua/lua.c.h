@@ -182,7 +182,7 @@ static int msghandler (lua_State *L) {
       return 1;  /* that is the message */
     else
       msg = marpa_lua_pushfstring(L, "(error object is a %s value)",
-                               luaL_typename(L, 1));
+                               marpa_luaL_typename(L, 1));
   }
   marpa_luaL_traceback(L, L, msg, 1);  /* append a standard traceback */
   return 1;  /* return the traceback */
@@ -241,12 +241,12 @@ static int dochunk (lua_State *L, int status) {
 
 
 static int dofile (lua_State *L, const char *name) {
-  return dochunk(L, luaL_loadfile(L, name));
+  return dochunk(L, marpa_luaL_loadfile(L, name));
 }
 
 
 static int dostring (lua_State *L, const char *s, const char *name) {
-  return dochunk(L, luaL_loadbuffer(L, s, strlen(s), name));
+  return dochunk(L, marpa_luaL_loadbuffer(L, s, strlen(s), name));
 }
 
 
@@ -330,14 +330,14 @@ static int pushline (lua_State *L, int firstline) {
 static int addreturn (lua_State *L) {
   const char *line = marpa_lua_tostring(L, -1);  /* original line */
   const char *retline = marpa_lua_pushfstring(L, "return %s;", line);
-  int status = luaL_loadbuffer(L, retline, strlen(retline), "=stdin");
+  int status = marpa_luaL_loadbuffer(L, retline, strlen(retline), "=stdin");
   if (status == LUA_OK) {
     marpa_lua_remove(L, -2);  /* remove modified line */
     if (line[0] != '\0')  /* non empty? */
       lua_saveline(L, line);  /* keep history */
   }
   else
-    marpa_lua_pop(L, 2);  /* pop result from 'luaL_loadbuffer' and modified line */
+    marpa_lua_pop(L, 2);  /* pop result from 'marpa_luaL_loadbuffer' and modified line */
   return status;
 }
 
@@ -349,7 +349,7 @@ static int multiline (lua_State *L) {
   for (;;) {  /* repeat until gets a complete statement */
     size_t len;
     const char *line = marpa_lua_tolstring(L, 1, &len);  /* get what it has */
-    int status = luaL_loadbuffer(L, line, len, "=stdin");  /* try it */
+    int status = marpa_luaL_loadbuffer(L, line, len, "=stdin");  /* try it */
     if (!incomplete(L, status) || !pushline(L, 0)) {
       lua_saveline(L, line);  /* keep history */
       return status;  /* cannot or should not try to add continuation line */
@@ -437,7 +437,7 @@ static int handle_script (lua_State *L, char **argv) {
   const char *fname = argv[0];
   if (strcmp(fname, "-") == 0 && strcmp(argv[-1], "--") != 0)
     fname = NULL;  /* stdin */
-  status = luaL_loadfile(L, fname);
+  status = marpa_luaL_loadfile(L, fname);
   if (status == LUA_OK) {
     int n = pushargs(L);  /* push arguments to script */
     status = docall(L, n, LUA_MULTRET);
@@ -553,7 +553,7 @@ static int pmain (lua_State *L) {
   char **argv = (char **)marpa_lua_touserdata(L, 2);
   int script;
   int args = collectargs(argv, &script);
-  luaL_checkversion(L);  /* check that interpreter has correct version */
+  marpa_luaL_checkversion(L);  /* check that interpreter has correct version */
   if (argv[0] && argv[0][0]) progname = argv[0];
   if (args == has_error) {  /* bad arg? */
     print_usage(argv[script]);  /* 'script' has index of bad arg. */

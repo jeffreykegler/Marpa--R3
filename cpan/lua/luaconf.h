@@ -309,7 +309,7 @@
 /*
 @@ LUA_COMPAT_APIINTCASTS controls the presence of macros for
 ** manipulating other integer types (marpa_lua_pushunsigned, marpa_lua_tounsigned,
-** luaL_checkint, luaL_checklong, etc.)
+** marpa_luaL_checkint, marpa_luaL_checklong, etc.)
 */
 #define LUA_COMPAT_APIINTCASTS
 
@@ -375,7 +375,7 @@
 
 /*
 @@ LUA_COMPAT_MODULE controls compatibility with previous
-** module functions 'module' (Lua) and 'luaL_register' (C).
+** module functions 'module' (Lua) and 'marpa_luaL_register' (C).
 */
 #define LUA_COMPAT_MODULE
 

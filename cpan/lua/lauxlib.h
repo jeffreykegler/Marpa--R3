@@ -29,7 +29,7 @@ typedef struct luaL_Reg {
 #define LUAL_NUMSIZES	(sizeof(lua_Integer)*16 + sizeof(lua_Number))
 
 LUALIB_API void (marpa_luaL_checkversion_) (lua_State *L, lua_Number ver, size_t sz);
-#define luaL_checkversion(L)  \
+#define marpa_luaL_checkversion(L)  \
 	  marpa_luaL_checkversion_(L, LUA_VERSION_NUM, LUAL_NUMSIZES)
 
 LUALIB_API int (marpa_luaL_getmetafield) (lua_State *L, int obj, const char *e);
@@ -75,7 +75,7 @@ LUALIB_API void (marpa_luaL_unref) (lua_State *L, int t, int ref);
 LUALIB_API int (marpa_luaL_loadfilex) (lua_State *L, const char *filename,
                                                const char *mode);
 
-#define luaL_loadfile(L,f)	marpa_luaL_loadfilex(L,f,NULL)
+#define marpa_luaL_loadfile(L,f)	marpa_luaL_loadfilex(L,f,NULL)
 
 LUALIB_API int (marpa_luaL_loadbufferx) (lua_State *L, const char *buff, size_t sz,
                                    const char *name, const char *mode);
@@ -105,30 +105,30 @@ LUALIB_API void (marpa_luaL_requiref) (lua_State *L, const char *modname,
 */
 
 
-#define luaL_newlibtable(L,l)	\
+#define marpa_luaL_newlibtable(L,l)	\
   marpa_lua_createtable(L, 0, sizeof(l)/sizeof((l)[0]) - 1)
 
-#define luaL_newlib(L,l)  \
-  (luaL_checkversion(L), luaL_newlibtable(L,l), marpa_luaL_setfuncs(L,l,0))
+#define marpa_luaL_newlib(L,l)  \
+  (marpa_luaL_checkversion(L), marpa_luaL_newlibtable(L,l), marpa_luaL_setfuncs(L,l,0))
 
-#define luaL_argcheck(L, cond,arg,extramsg)	\
+#define marpa_luaL_argcheck(L, cond,arg,extramsg)	\
 		((void)((cond) || marpa_luaL_argerror(L, (arg), (extramsg))))
-#define luaL_checkstring(L,n)	(marpa_luaL_checklstring(L, (n), NULL))
-#define luaL_optstring(L,n,d)	(marpa_luaL_optlstring(L, (n), (d), NULL))
+#define marpa_luaL_checkstring(L,n)	(marpa_luaL_checklstring(L, (n), NULL))
+#define marpa_luaL_optstring(L,n,d)	(marpa_luaL_optlstring(L, (n), (d), NULL))
 
-#define luaL_typename(L,i)	marpa_lua_typename(L, marpa_lua_type(L,(i)))
+#define marpa_luaL_typename(L,i)	marpa_lua_typename(L, marpa_lua_type(L,(i)))
 
-#define luaL_dofile(L, fn) \
-	(luaL_loadfile(L, fn) || marpa_lua_pcall(L, 0, LUA_MULTRET, 0))
+#define marpa_luaL_dofile(L, fn) \
+	(marpa_luaL_loadfile(L, fn) || marpa_lua_pcall(L, 0, LUA_MULTRET, 0))
 
-#define luaL_dostring(L, s) \
+#define marpa_luaL_dostring(L, s) \
 	(marpa_luaL_loadstring(L, s) || marpa_lua_pcall(L, 0, LUA_MULTRET, 0))
 
-#define luaL_getmetatable(L,n)	(marpa_lua_getfield(L, LUA_REGISTRYINDEX, (n)))
+#define marpa_luaL_getmetatable(L,n)	(marpa_lua_getfield(L, LUA_REGISTRYINDEX, (n)))
 
-#define luaL_opt(L,f,n,d)	(marpa_lua_isnoneornil(L,(n)) ? (d) : f(L,(n)))
+#define marpa_luaL_opt(L,f,n,d)	(marpa_lua_isnoneornil(L,(n)) ? (d) : f(L,(n)))
 
-#define luaL_loadbuffer(L,s,sz,n)	marpa_luaL_loadbufferx(L,s,sz,n,NULL)
+#define marpa_luaL_loadbuffer(L,s,sz,n)	marpa_luaL_loadbufferx(L,s,sz,n,NULL)
 
 
 /*
@@ -146,11 +146,11 @@ typedef struct luaL_Buffer {
 } luaL_Buffer;
 
 
-#define luaL_addchar(B,c) \
+#define marpa_luaL_addchar(B,c) \
   ((void)((B)->n < (B)->size || marpa_luaL_prepbuffsize((B), 1)), \
    ((B)->b[(B)->n++] = (c)))
 
-#define luaL_addsize(B,s)	((B)->n += (s))
+#define marpa_luaL_addsize(B,s)	((B)->n += (s))
 
 LUALIB_API void (marpa_luaL_buffinit) (lua_State *L, luaL_Buffer *B);
 LUALIB_API char *(marpa_luaL_prepbuffsize) (luaL_Buffer *B, size_t sz);
@@ -161,7 +161,7 @@ LUALIB_API void (marpa_luaL_pushresult) (luaL_Buffer *B);
 LUALIB_API void (marpa_luaL_pushresultsize) (luaL_Buffer *B, size_t sz);
 LUALIB_API char *(marpa_luaL_buffinitsize) (lua_State *L, luaL_Buffer *B, size_t sz);
 
-#define luaL_prepbuffer(B)	marpa_luaL_prepbuffsize(B, LUAL_BUFFERSIZE)
+#define marpa_luaL_prepbuffer(B)	marpa_luaL_prepbuffsize(B, LUAL_BUFFERSIZE)
 
 /* }====================================================== */
 
@@ -199,7 +199,7 @@ LUALIB_API void (luaL_pushmodule) (lua_State *L, const char *modname,
 LUALIB_API void (luaL_openlib) (lua_State *L, const char *libname,
                                 const luaL_Reg *l, int nup);
 
-#define luaL_register(L,n,l)	(luaL_openlib(L,(n),(l),0))
+#define marpa_luaL_register(L,n,l)	(luaL_openlib(L,(n),(l),0))
 
 #endif
 
@@ -236,15 +236,15 @@ LUALIB_API void (luaL_openlib) (lua_State *L, const char *libname,
 */
 #if defined(LUA_COMPAT_APIINTCASTS)
 
-#define luaL_checkunsigned(L,a)	((lua_Unsigned)marpa_luaL_checkinteger(L,a))
-#define luaL_optunsigned(L,a,d)	\
+#define marpa_luaL_checkunsigned(L,a)	((lua_Unsigned)marpa_luaL_checkinteger(L,a))
+#define marpa_luaL_optunsigned(L,a,d)	\
 	((lua_Unsigned)marpa_luaL_optinteger(L,a,(lua_Integer)(d)))
 
-#define luaL_checkint(L,n)	((int)marpa_luaL_checkinteger(L, (n)))
-#define luaL_optint(L,n,d)	((int)marpa_luaL_optinteger(L, (n), (d)))
+#define marpa_luaL_checkint(L,n)	((int)marpa_luaL_checkinteger(L, (n)))
+#define marpa_luaL_optint(L,n,d)	((int)marpa_luaL_optinteger(L, (n), (d)))
 
-#define luaL_checklong(L,n)	((long)marpa_luaL_checkinteger(L, (n)))
-#define luaL_optlong(L,n,d)	((long)marpa_luaL_optinteger(L, (n), (d)))
+#define marpa_luaL_checklong(L,n)	((long)marpa_luaL_checkinteger(L, (n)))
+#define marpa_luaL_optlong(L,n,d)	((long)marpa_luaL_optinteger(L, (n), (d)))
 
 #endif
 /* }============================================================ */

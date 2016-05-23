@@ -169,7 +169,7 @@ static int str_char (lua_State *L) {
   char *p = marpa_luaL_buffinitsize(L, &b, n);
   for (i=1; i<=n; i++) {
     lua_Integer c = marpa_luaL_checkinteger(L, i);
-    luaL_argcheck(L, uchar(c) == c, i, "value out of range");
+    marpa_luaL_argcheck(L, uchar(c) == c, i, "value out of range");
     p[i - 1] = uchar(c);
   }
   marpa_luaL_pushresultsize(&b, n);
@@ -724,13 +724,13 @@ static void add_s (MatchState *ms, luaL_Buffer *b, const char *s,
   const char *news = marpa_lua_tolstring(L, 3, &l);
   for (i = 0; i < l; i++) {
     if (news[i] != L_ESC)
-      luaL_addchar(b, news[i]);
+      marpa_luaL_addchar(b, news[i]);
     else {
       i++;  /* skip ESC */
       if (!isdigit(uchar(news[i]))) {
         if (news[i] != L_ESC)
           marpa_luaL_error(L, "invalid use of '%c' in replacement string", L_ESC);
-        luaL_addchar(b, news[i]);
+        marpa_luaL_addchar(b, news[i]);
       }
       else if (news[i] == '0')
           marpa_luaL_addlstring(b, s, e - s);
@@ -771,7 +771,7 @@ static void add_value (MatchState *ms, luaL_Buffer *b, const char *s,
     marpa_lua_pushlstring(L, s, e - s);  /* keep original text */
   }
   else if (!marpa_lua_isstring(L, -1))
-    marpa_luaL_error(L, "invalid replacement value (a %s)", luaL_typename(L, -1));
+    marpa_luaL_error(L, "invalid replacement value (a %s)", marpa_luaL_typename(L, -1));
   marpa_luaL_addvalue(b);  /* add result to accumulator */
 }
 
@@ -786,7 +786,7 @@ static int str_gsub (lua_State *L) {
   lua_Integer n = 0;
   MatchState ms;
   luaL_Buffer b;
-  luaL_argcheck(L, tr == LUA_TNUMBER || tr == LUA_TSTRING ||
+  marpa_luaL_argcheck(L, tr == LUA_TNUMBER || tr == LUA_TSTRING ||
                    tr == LUA_TFUNCTION || tr == LUA_TTABLE, 3,
                       "string/function/table expected");
   marpa_luaL_buffinit(L, &b);
@@ -804,7 +804,7 @@ static int str_gsub (lua_State *L) {
     if (e && e>src) /* non empty match? */
       src = e;  /* skip it */
     else if (src < ms.src_end)
-      luaL_addchar(&b, *src++);
+      marpa_luaL_addchar(&b, *src++);
     else break;
     if (anchor) break;
   }
@@ -925,11 +925,11 @@ static int marpa_lua_number2strx (lua_State *L, char *buff, int sz,
 static void addquoted (lua_State *L, luaL_Buffer *b, int arg) {
   size_t l;
   const char *s = marpa_luaL_checklstring(L, arg, &l);
-  luaL_addchar(b, '"');
+  marpa_luaL_addchar(b, '"');
   while (l--) {
     if (*s == '"' || *s == '\\' || *s == '\n') {
-      luaL_addchar(b, '\\');
-      luaL_addchar(b, *s);
+      marpa_luaL_addchar(b, '\\');
+      marpa_luaL_addchar(b, *s);
     }
     else if (*s == '\0' || iscntrl(uchar(*s))) {
       char buff[10];
@@ -940,10 +940,10 @@ static void addquoted (lua_State *L, luaL_Buffer *b, int arg) {
       marpa_luaL_addstring(b, buff);
     }
     else
-      luaL_addchar(b, *s);
+      marpa_luaL_addchar(b, *s);
     s++;
   }
-  luaL_addchar(b, '"');
+  marpa_luaL_addchar(b, '"');
 }
 
 static const char *scanformat (lua_State *L, const char *strfrmt, char *form) {
@@ -991,9 +991,9 @@ static int str_format (lua_State *L) {
   marpa_luaL_buffinit(L, &b);
   while (strfrmt < strfrmt_end) {
     if (*strfrmt != L_ESC)
-      luaL_addchar(&b, *strfrmt++);
+      marpa_luaL_addchar(&b, *strfrmt++);
     else if (*++strfrmt == L_ESC)
-      luaL_addchar(&b, *strfrmt++);  /* %% */
+      marpa_luaL_addchar(&b, *strfrmt++);  /* %% */
     else { /* format item */
       char form[MAX_FORMAT];  /* to store the format ('%...') */
       char *buff = marpa_luaL_prepbuffsize(&b, MAX_ITEM);  /* to put formatted item */
@@ -1034,7 +1034,7 @@ static int str_format (lua_State *L) {
           if (form[2] == '\0')  /* no modifiers? */
             marpa_luaL_addvalue(&b);  /* keep entire string */
           else {
-            luaL_argcheck(L, l == strlen(s), arg, "string contains zeros");
+            marpa_luaL_argcheck(L, l == strlen(s), arg, "string contains zeros");
             if (!strchr(form, '.') && l >= 100) {
               /* no precision and string is too long to be formatted */
               marpa_luaL_addvalue(&b);  /* keep entire string */
@@ -1052,7 +1052,7 @@ static int str_format (lua_State *L) {
         }
       }
       lua_assert(nb < MAX_ITEM);
-      luaL_addsize(&b, nb);
+      marpa_luaL_addsize(&b, nb);
     }
   }
   marpa_luaL_pushresult(&b);
@@ -1272,7 +1272,7 @@ static void packint (luaL_Buffer *b, lua_Unsigned n,
     for (i = SZINT; i < size; i++)  /* correct extra bytes */
       buff[islittle ? i : size - 1 - i] = (char)MC;
   }
-  luaL_addsize(b, size);  /* add result to buffer */
+  marpa_luaL_addsize(b, size);  /* add result to buffer */
 }
 
 
@@ -1297,7 +1297,7 @@ static void copywithendian (volatile char *dest, volatile const char *src,
 static int str_pack (lua_State *L) {
   luaL_Buffer b;
   Header h;
-  const char *fmt = luaL_checkstring(L, 1);  /* format string */
+  const char *fmt = marpa_luaL_checkstring(L, 1);  /* format string */
   int arg = 1;  /* current argument to pack */
   size_t totalsize = 0;  /* accumulate total size of result */
   initheader(L, &h);
@@ -1308,14 +1308,14 @@ static int str_pack (lua_State *L) {
     KOption opt = getdetails(&h, totalsize, &fmt, &size, &ntoalign);
     totalsize += ntoalign + size;
     while (ntoalign-- > 0)
-     luaL_addchar(&b, LUA_PACKPADBYTE);  /* fill alignment */
+     marpa_luaL_addchar(&b, LUA_PACKPADBYTE);  /* fill alignment */
     arg++;
     switch (opt) {
       case Kint: {  /* signed integers */
         lua_Integer n = marpa_luaL_checkinteger(L, arg);
         if (size < SZINT) {  /* need overflow check? */
           lua_Integer lim = (lua_Integer)1 << ((size * NB) - 1);
-          luaL_argcheck(L, -lim <= n && n < lim, arg, "integer overflow");
+          marpa_luaL_argcheck(L, -lim <= n && n < lim, arg, "integer overflow");
         }
         packint(&b, (lua_Unsigned)n, h.islittle, size, (n < 0));
         break;
@@ -1323,7 +1323,7 @@ static int str_pack (lua_State *L) {
       case Kuint: {  /* unsigned integers */
         lua_Integer n = marpa_luaL_checkinteger(L, arg);
         if (size < SZINT)  /* need overflow check? */
-          luaL_argcheck(L, (lua_Unsigned)n < ((lua_Unsigned)1 << (size * NB)),
+          marpa_luaL_argcheck(L, (lua_Unsigned)n < ((lua_Unsigned)1 << (size * NB)),
                            arg, "unsigned overflow");
         packint(&b, (lua_Unsigned)n, h.islittle, size, 0);
         break;
@@ -1337,7 +1337,7 @@ static int str_pack (lua_State *L) {
         else u.n = n;
         /* move 'u' to final result, correcting endianness if needed */
         copywithendian(buff, u.buff, size, h.islittle);
-        luaL_addsize(&b, size);
+        marpa_luaL_addsize(&b, size);
         break;
       }
       case Kchar: {  /* fixed-size string */
@@ -1348,14 +1348,14 @@ static int str_pack (lua_State *L) {
         else {  /* string smaller than needed */
           marpa_luaL_addlstring(&b, s, len);  /* add it all */
           while (len++ < (size_t)size)  /* pad extra space */
-            luaL_addchar(&b, LUA_PACKPADBYTE);
+            marpa_luaL_addchar(&b, LUA_PACKPADBYTE);
         }
         break;
       }
       case Kstring: {  /* strings with length count */
         size_t len;
         const char *s = marpa_luaL_checklstring(L, arg, &len);
-        luaL_argcheck(L, size >= (int)sizeof(size_t) ||
+        marpa_luaL_argcheck(L, size >= (int)sizeof(size_t) ||
                          len < ((size_t)1 << (size * NB)),
                          arg, "string length does not fit in given size");
         packint(&b, (lua_Unsigned)len, h.islittle, size, 0);  /* pack length */
@@ -1366,13 +1366,13 @@ static int str_pack (lua_State *L) {
       case Kzstr: {  /* zero-terminated string */
         size_t len;
         const char *s = marpa_luaL_checklstring(L, arg, &len);
-        luaL_argcheck(L, strlen(s) == len, arg, "string contains zeros");
+        marpa_luaL_argcheck(L, strlen(s) == len, arg, "string contains zeros");
         marpa_luaL_addlstring(&b, s, len);
-        luaL_addchar(&b, '\0');  /* add zero at the end */
+        marpa_luaL_addchar(&b, '\0');  /* add zero at the end */
         totalsize += len + 1;
         break;
       }
-      case Kpadding: luaL_addchar(&b, LUA_PACKPADBYTE);  /* FALLTHROUGH */
+      case Kpadding: marpa_luaL_addchar(&b, LUA_PACKPADBYTE);  /* FALLTHROUGH */
       case Kpaddalign: case Knop:
         arg--;  /* undo increment */
         break;
@@ -1385,14 +1385,14 @@ static int str_pack (lua_State *L) {
 
 static int str_packsize (lua_State *L) {
   Header h;
-  const char *fmt = luaL_checkstring(L, 1);  /* format string */
+  const char *fmt = marpa_luaL_checkstring(L, 1);  /* format string */
   size_t totalsize = 0;  /* accumulate total size of result */
   initheader(L, &h);
   while (*fmt != '\0') {
     int size, ntoalign;
     KOption opt = getdetails(&h, totalsize, &fmt, &size, &ntoalign);
     size += ntoalign;  /* total space used by option */
-    luaL_argcheck(L, totalsize <= MAXSIZE - size, 1,
+    marpa_luaL_argcheck(L, totalsize <= MAXSIZE - size, 1,
                      "format result too large");
     totalsize += size;
     switch (opt) {
@@ -1444,12 +1444,12 @@ static lua_Integer unpackint (lua_State *L, const char *str,
 
 static int str_unpack (lua_State *L) {
   Header h;
-  const char *fmt = luaL_checkstring(L, 1);
+  const char *fmt = marpa_luaL_checkstring(L, 1);
   size_t ld;
   const char *data = marpa_luaL_checklstring(L, 2, &ld);
   size_t pos = (size_t)posrelat(marpa_luaL_optinteger(L, 3, 1), ld) - 1;
   int n = 0;  /* number of results */
-  luaL_argcheck(L, pos <= ld, 3, "initial position out of string");
+  marpa_luaL_argcheck(L, pos <= ld, 3, "initial position out of string");
   initheader(L, &h);
   while (*fmt != '\0') {
     int size, ntoalign;
@@ -1484,7 +1484,7 @@ static int str_unpack (lua_State *L) {
       }
       case Kstring: {
         size_t len = (size_t)unpackint(L, data + pos, h.islittle, size, 0);
-        luaL_argcheck(L, pos + len + size <= ld, 2, "data string too short");
+        marpa_luaL_argcheck(L, pos + len + size <= ld, 2, "data string too short");
         marpa_lua_pushlstring(L, data + pos + size, len);
         pos += len;  /* skip string */
         break;
@@ -1546,7 +1546,7 @@ static void createmetatable (lua_State *L) {
 ** Open string library
 */
 LUAMOD_API int marpa_luaopen_string (lua_State *L) {
-  luaL_newlib(L, strlib);
+  marpa_luaL_newlib(L, strlib);
   createmetatable(L);
   return 1;
 }

@@ -57,7 +57,7 @@
 
 static time_t l_checktime (lua_State *L, int arg) {
   lua_Integer t = marpa_luaL_checkinteger(L, arg);
-  luaL_argcheck(L, (time_t)t == t, arg, "time out-of-bounds");
+  marpa_luaL_argcheck(L, (time_t)t == t, arg, "time out-of-bounds");
   return (time_t)t;
 }
 
@@ -128,7 +128,7 @@ static time_t l_checktime (lua_State *L, int arg) {
 
 
 static int os_execute (lua_State *L) {
-  const char *cmd = luaL_optstring(L, 1, NULL);
+  const char *cmd = marpa_luaL_optstring(L, 1, NULL);
   int stat = system(cmd);
   if (cmd != NULL)
     return marpa_luaL_execresult(L, stat);
@@ -140,14 +140,14 @@ static int os_execute (lua_State *L) {
 
 
 static int os_remove (lua_State *L) {
-  const char *filename = luaL_checkstring(L, 1);
+  const char *filename = marpa_luaL_checkstring(L, 1);
   return marpa_luaL_fileresult(L, remove(filename) == 0, filename);
 }
 
 
 static int os_rename (lua_State *L) {
-  const char *fromname = luaL_checkstring(L, 1);
-  const char *toname = luaL_checkstring(L, 2);
+  const char *fromname = marpa_luaL_checkstring(L, 1);
+  const char *toname = marpa_luaL_checkstring(L, 2);
   return marpa_luaL_fileresult(L, rename(fromname, toname) == 0, NULL);
 }
 
@@ -164,7 +164,7 @@ static int os_tmpname (lua_State *L) {
 
 
 static int os_getenv (lua_State *L) {
-  marpa_lua_pushstring(L, getenv(luaL_checkstring(L, 1)));  /* if NULL push nil */
+  marpa_lua_pushstring(L, getenv(marpa_luaL_checkstring(L, 1)));  /* if NULL push nil */
   return 1;
 }
 
@@ -258,8 +258,8 @@ static const char *checkoption (lua_State *L, const char *conv, char *buff) {
 
 
 static int os_date (lua_State *L) {
-  const char *s = luaL_optstring(L, 1, "%c");
-  time_t t = luaL_opt(L, l_checktime, 2, time(NULL));
+  const char *s = marpa_luaL_optstring(L, 1, "%c");
+  time_t t = marpa_luaL_opt(L, l_checktime, 2, time(NULL));
   struct tm tmr, *stm;
   if (*s == '!') {  /* UTC? */
     stm = l_gmtime(&t, &tmr);
@@ -288,13 +288,13 @@ static int os_date (lua_State *L) {
     marpa_luaL_buffinit(L, &b);
     while (*s) {
       if (*s != '%')  /* not a conversion specifier? */
-        luaL_addchar(&b, *s++);
+        marpa_luaL_addchar(&b, *s++);
       else {
         size_t reslen;
         char *buff = marpa_luaL_prepbuffsize(&b, SIZETIMEFMT);
         s = checkoption(L, s + 1, cc);
         reslen = strftime(buff, SIZETIMEFMT, cc, stm);
-        luaL_addsize(&b, reslen);
+        marpa_luaL_addsize(&b, reslen);
       }
     }
     marpa_luaL_pushresult(&b);
@@ -342,7 +342,7 @@ static int os_setlocale (lua_State *L) {
                       LC_NUMERIC, LC_TIME};
   static const char *const catnames[] = {"all", "collate", "ctype", "monetary",
      "numeric", "time", NULL};
-  const char *l = luaL_optstring(L, 1, NULL);
+  const char *l = marpa_luaL_optstring(L, 1, NULL);
   int op = marpa_luaL_checkoption(L, 2, "all", catnames);
   marpa_lua_pushstring(L, setlocale(cat[op], l));
   return 1;
@@ -382,7 +382,7 @@ static const luaL_Reg syslib[] = {
 
 
 LUAMOD_API int marpa_luaopen_os (lua_State *L) {
-  luaL_newlib(L, syslib);
+  marpa_luaL_newlib(L, syslib);
   return 1;
 }
 

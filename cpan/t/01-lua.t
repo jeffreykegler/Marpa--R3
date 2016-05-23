@@ -39,4 +39,11 @@ for my $test (@tests) {
     Test::More::is_deeply( \@actual, $expected, $test_name);
 }
 
+for my $test (@tests) {
+    my ($code, $args, $expected, $test_name) = @{$test};
+    $test_name //= qq{"$code"};
+    my @actual = Marpa::R3::Lua::exec($code, @{$args});
+    Test::More::is_deeply( \@actual, $expected, $test_name);
+}
+
 # vim: expandtab shiftwidth=4:

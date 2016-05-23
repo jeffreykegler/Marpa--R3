@@ -88,7 +88,7 @@ static int luaB_tonumber (lua_State *L) {
     lua_Integer base = marpa_luaL_checkinteger(L, 2);
     marpa_luaL_checktype(L, 1, LUA_TSTRING);  /* no numbers as strings */
     s = marpa_lua_tolstring(L, 1, &l);
-    luaL_argcheck(L, 2 <= base && base <= 36, 2, "base out of range");
+    marpa_luaL_argcheck(L, 2 <= base && base <= 36, 2, "base out of range");
     if (b_str2int(s, (int)base, &n) == s + l) {
       marpa_lua_pushinteger(L, n);
       return 1;
@@ -125,7 +125,7 @@ static int luaB_getmetatable (lua_State *L) {
 static int luaB_setmetatable (lua_State *L) {
   int t = marpa_lua_type(L, 2);
   marpa_luaL_checktype(L, 1, LUA_TTABLE);
-  luaL_argcheck(L, t == LUA_TNIL || t == LUA_TTABLE, 2,
+  marpa_luaL_argcheck(L, t == LUA_TNIL || t == LUA_TTABLE, 2,
                     "nil or table expected");
   if (marpa_luaL_getmetafield(L, 1, "__metatable") != LUA_TNIL)
     return marpa_luaL_error(L, "cannot change a protected metatable");
@@ -145,7 +145,7 @@ static int luaB_rawequal (lua_State *L) {
 
 static int luaB_rawlen (lua_State *L) {
   int t = marpa_lua_type(L, 1);
-  luaL_argcheck(L, t == LUA_TTABLE || t == LUA_TSTRING, 1,
+  marpa_luaL_argcheck(L, t == LUA_TTABLE || t == LUA_TSTRING, 1,
                    "table or string expected");
   marpa_lua_pushinteger(L, marpa_lua_rawlen(L, 1));
   return 1;
@@ -200,7 +200,7 @@ static int luaB_collectgarbage (lua_State *L) {
 
 static int luaB_type (lua_State *L) {
   int t = marpa_lua_type(L, 1);
-  luaL_argcheck(L, t != LUA_TNONE, 1, "value expected");
+  marpa_luaL_argcheck(L, t != LUA_TNONE, 1, "value expected");
   marpa_lua_pushstring(L, marpa_lua_typename(L, t));
   return 1;
 }
@@ -286,8 +286,8 @@ static int load_aux (lua_State *L, int status, int envidx) {
 
 
 static int luaB_loadfile (lua_State *L) {
-  const char *fname = luaL_optstring(L, 1, NULL);
-  const char *mode = luaL_optstring(L, 2, NULL);
+  const char *fname = marpa_luaL_optstring(L, 1, NULL);
+  const char *mode = marpa_luaL_optstring(L, 2, NULL);
   int env = (!marpa_lua_isnone(L, 3) ? 3 : 0);  /* 'env' index or 0 if no 'env' */
   int status = marpa_luaL_loadfilex(L, fname, mode);
   return load_aux(L, status, env);
@@ -336,14 +336,14 @@ static int luaB_load (lua_State *L) {
   int status;
   size_t l;
   const char *s = marpa_lua_tolstring(L, 1, &l);
-  const char *mode = luaL_optstring(L, 3, "bt");
+  const char *mode = marpa_luaL_optstring(L, 3, "bt");
   int env = (!marpa_lua_isnone(L, 4) ? 4 : 0);  /* 'env' index or 0 if no 'env' */
   if (s != NULL) {  /* loading a string? */
-    const char *chunkname = luaL_optstring(L, 2, s);
+    const char *chunkname = marpa_luaL_optstring(L, 2, s);
     status = marpa_luaL_loadbufferx(L, s, l, chunkname, mode);
   }
   else {  /* loading from a reader function */
-    const char *chunkname = luaL_optstring(L, 2, "=(load)");
+    const char *chunkname = marpa_luaL_optstring(L, 2, "=(load)");
     marpa_luaL_checktype(L, 1, LUA_TFUNCTION);
     marpa_lua_settop(L, RESERVEDSLOT);  /* create reserved slot */
     status = marpa_lua_load(L, generic_reader, NULL, chunkname, mode);
@@ -361,9 +361,9 @@ static int dofilecont (lua_State *L, int d1, lua_KContext d2) {
 
 
 static int luaB_dofile (lua_State *L) {
-  const char *fname = luaL_optstring(L, 1, NULL);
+  const char *fname = marpa_luaL_optstring(L, 1, NULL);
   marpa_lua_settop(L, 1);
-  if (luaL_loadfile(L, fname) != LUA_OK)
+  if (marpa_luaL_loadfile(L, fname) != LUA_OK)
     return marpa_lua_error(L);
   marpa_lua_callk(L, 0, LUA_MULTRET, 0, dofilecont);
   return dofilecont(L, 0, 0);
@@ -393,7 +393,7 @@ static int luaB_select (lua_State *L) {
     lua_Integer i = marpa_luaL_checkinteger(L, 1);
     if (i < 0) i = n + i;
     else if (i > n) i = n;
-    luaL_argcheck(L, 1 <= i, 1, "index out of range");
+    marpa_luaL_argcheck(L, 1 <= i, 1, "index out of range");
     return n - (int)i;
   }
 }

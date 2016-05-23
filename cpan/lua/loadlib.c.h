@@ -352,8 +352,8 @@ static int lookforfunc (lua_State *L, const char *path, const char *sym) {
 
 
 static int ll_loadlib (lua_State *L) {
-  const char *path = luaL_checkstring(L, 1);
-  const char *init = luaL_checkstring(L, 2);
+  const char *path = marpa_luaL_checkstring(L, 1);
+  const char *init = marpa_luaL_checkstring(L, 2);
   int stat = lookforfunc(L, path, init);
   if (stat == 0)  /* no errors? */
     return 1;  /* return the loaded function */
@@ -417,10 +417,10 @@ static const char *searchpath (lua_State *L, const char *name,
 
 
 static int ll_searchpath (lua_State *L) {
-  const char *f = searchpath(L, luaL_checkstring(L, 1),
-                                luaL_checkstring(L, 2),
-                                luaL_optstring(L, 3, "."),
-                                luaL_optstring(L, 4, LUA_DIRSEP));
+  const char *f = searchpath(L, marpa_luaL_checkstring(L, 1),
+                                marpa_luaL_checkstring(L, 2),
+                                marpa_luaL_optstring(L, 3, "."),
+                                marpa_luaL_optstring(L, 4, LUA_DIRSEP));
   if (f != NULL) return 1;
   else {  /* error message is on top of the stack */
     marpa_lua_pushnil(L);
@@ -455,10 +455,10 @@ static int checkload (lua_State *L, int stat, const char *filename) {
 
 static int searcher_Lua (lua_State *L) {
   const char *filename;
-  const char *name = luaL_checkstring(L, 1);
+  const char *name = marpa_luaL_checkstring(L, 1);
   filename = findfile(L, name, "path", LUA_LSUBSEP);
   if (filename == NULL) return 1;  /* module not found in this path */
-  return checkload(L, (luaL_loadfile(L, filename) == LUA_OK), filename);
+  return checkload(L, (marpa_luaL_loadfile(L, filename) == LUA_OK), filename);
 }
 
 
@@ -489,7 +489,7 @@ static int loadfunc (lua_State *L, const char *filename, const char *modname) {
 
 
 static int searcher_C (lua_State *L) {
-  const char *name = luaL_checkstring(L, 1);
+  const char *name = marpa_luaL_checkstring(L, 1);
   const char *filename = findfile(L, name, "cpath", LUA_CSUBSEP);
   if (filename == NULL) return 1;  /* module not found in this path */
   return checkload(L, (loadfunc(L, filename, name) == 0), filename);
@@ -498,7 +498,7 @@ static int searcher_C (lua_State *L) {
 
 static int searcher_Croot (lua_State *L) {
   const char *filename;
-  const char *name = luaL_checkstring(L, 1);
+  const char *name = marpa_luaL_checkstring(L, 1);
   const char *p = strchr(name, '.');
   int stat;
   if (p == NULL) return 0;  /* is root */
@@ -519,7 +519,7 @@ static int searcher_Croot (lua_State *L) {
 
 
 static int searcher_preload (lua_State *L) {
-  const char *name = luaL_checkstring(L, 1);
+  const char *name = marpa_luaL_checkstring(L, 1);
   marpa_lua_getfield(L, LUA_REGISTRYINDEX, "_PRELOAD");
   if (marpa_lua_getfield(L, -1, name) == LUA_TNIL)  /* not found? */
     marpa_lua_pushfstring(L, "\n\tno field package.preload['%s']", name);
@@ -556,7 +556,7 @@ static void findloader (lua_State *L, const char *name) {
 
 
 static int ll_require (lua_State *L) {
-  const char *name = luaL_checkstring(L, 1);
+  const char *name = marpa_luaL_checkstring(L, 1);
   marpa_lua_settop(L, 1);  /* _LOADED table will be at index 2 */
   marpa_lua_getfield(L, LUA_REGISTRYINDEX, "_LOADED");
   marpa_lua_getfield(L, 2, name);  /* _LOADED[name] */
@@ -632,7 +632,7 @@ static void modinit (lua_State *L, const char *modname) {
 
 
 static int ll_module (lua_State *L) {
-  const char *modname = luaL_checkstring(L, 1);
+  const char *modname = marpa_luaL_checkstring(L, 1);
   int lastarg = marpa_lua_gettop(L);  /* last parameter */
   luaL_pushmodule(L, modname, 1);  /* get/create module table */
   /* check whether table already has a _NAME field */
@@ -762,7 +762,7 @@ static void createclibstable (lua_State *L) {
 
 LUAMOD_API int marpa_luaopen_package (lua_State *L) {
   createclibstable(L);
-  luaL_newlib(L, pk_funcs);  /* create 'package' table */
+  marpa_luaL_newlib(L, pk_funcs);  /* create 'package' table */
   createsearcherstable(L);
   /* set field 'path' */
   setpath(L, "path", LUA_PATHVARVERSION, LUA_PATH_VAR, LUA_PATH_DEFAULT);

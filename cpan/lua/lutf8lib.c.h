@@ -74,9 +74,9 @@ static int utflen (lua_State *L) {
   const char *s = marpa_luaL_checklstring(L, 1, &len);
   lua_Integer posi = u_posrelat(marpa_luaL_optinteger(L, 2, 1), len);
   lua_Integer posj = u_posrelat(marpa_luaL_optinteger(L, 3, -1), len);
-  luaL_argcheck(L, 1 <= posi && --posi <= (lua_Integer)len, 2,
+  marpa_luaL_argcheck(L, 1 <= posi && --posi <= (lua_Integer)len, 2,
                    "initial position out of string");
-  luaL_argcheck(L, --posj < (lua_Integer)len, 3,
+  marpa_luaL_argcheck(L, --posj < (lua_Integer)len, 3,
                    "final position out of string");
   while (posi <= posj) {
     const char *s1 = utf8_decode(s + posi, NULL);
@@ -104,8 +104,8 @@ static int codepoint (lua_State *L) {
   lua_Integer pose = u_posrelat(marpa_luaL_optinteger(L, 3, posi), len);
   int n;
   const char *se;
-  luaL_argcheck(L, posi >= 1, 2, "out of range");
-  luaL_argcheck(L, pose <= (lua_Integer)len, 3, "out of range");
+  marpa_luaL_argcheck(L, posi >= 1, 2, "out of range");
+  marpa_luaL_argcheck(L, pose <= (lua_Integer)len, 3, "out of range");
   if (posi > pose) return 0;  /* empty interval; return no values */
   if (pose - posi >= INT_MAX)  /* (lua_Integer -> int) overflow? */
     return marpa_luaL_error(L, "string slice too long");
@@ -127,7 +127,7 @@ static int codepoint (lua_State *L) {
 
 static void pushutfchar (lua_State *L, int arg) {
   lua_Integer code = marpa_luaL_checkinteger(L, arg);
-  luaL_argcheck(L, 0 <= code && code <= MAXUNICODE, arg, "value out of range");
+  marpa_luaL_argcheck(L, 0 <= code && code <= MAXUNICODE, arg, "value out of range");
   marpa_lua_pushfstring(L, "%U", (long)code);
 }
 
@@ -163,7 +163,7 @@ static int byteoffset (lua_State *L) {
   lua_Integer n  = marpa_luaL_checkinteger(L, 2);
   lua_Integer posi = (n >= 0) ? 1 : len + 1;
   posi = u_posrelat(marpa_luaL_optinteger(L, 3, posi), len);
-  luaL_argcheck(L, 1 <= posi && --posi <= (lua_Integer)len, 3,
+  marpa_luaL_argcheck(L, 1 <= posi && --posi <= (lua_Integer)len, 3,
                    "position out of range");
   if (n == 0) {
     /* find beginning of current byte sequence */
@@ -223,7 +223,7 @@ static int iter_aux (lua_State *L) {
 
 
 static int iter_codes (lua_State *L) {
-  luaL_checkstring(L, 1);
+  marpa_luaL_checkstring(L, 1);
   marpa_lua_pushcfunction(L, iter_aux);
   marpa_lua_pushvalue(L, 1);
   marpa_lua_pushinteger(L, 0);
@@ -248,7 +248,7 @@ static const luaL_Reg funcs[] = {
 
 
 LUAMOD_API int marpa_luaopen_utf8 (lua_State *L) {
-  luaL_newlib(L, funcs);
+  marpa_luaL_newlib(L, funcs);
   marpa_lua_pushlstring(L, UTF8PATT, sizeof(UTF8PATT)/sizeof(char) - 1);
   marpa_lua_setfield(L, -2, "charpattern");
   return 1;

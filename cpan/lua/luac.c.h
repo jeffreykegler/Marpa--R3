@@ -172,7 +172,7 @@ static int pmain(lua_State* L)
  for (i=0; i<argc; i++)
  {
   const char* filename=IS("-") ? NULL : argv[i];
-  if (luaL_loadfile(L,filename)!=LUA_OK) fatal(marpa_lua_tostring(L,-1));
+  if (marpa_luaL_loadfile(L,filename)!=LUA_OK) fatal(marpa_lua_tostring(L,-1));
  }
  f=combine(L,argc);
  if (listing) luaU_print(f,listing>1);

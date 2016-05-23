@@ -187,7 +187,7 @@ static int typeerror (lua_State *L, int arg, const char *tname) {
   else if (marpa_lua_type(L, arg) == LUA_TLIGHTUSERDATA)
     typearg = "light userdata";  /* special name for messages */
   else
-    typearg = luaL_typename(L, arg);  /* standard name */
+    typearg = marpa_luaL_typename(L, arg);  /* standard name */
   msg = marpa_lua_pushfstring(L, "%s expected, got %s", tname, typearg);
   return marpa_luaL_argerror(L, arg, msg);
 }
@@ -288,7 +288,7 @@ LUALIB_API int marpa_luaL_execresult (lua_State *L, int stat) {
 */
 
 LUALIB_API int marpa_luaL_newmetatable (lua_State *L, const char *tname) {
-  if (luaL_getmetatable(L, tname) != LUA_TNIL)  /* name already in use? */
+  if (marpa_luaL_getmetatable(L, tname) != LUA_TNIL)  /* name already in use? */
     return 0;  /* leave previous value on top, but return 0 */
   marpa_lua_pop(L, 1);
   marpa_lua_createtable(L, 0, 2);  /* create metatable */
@@ -301,7 +301,7 @@ LUALIB_API int marpa_luaL_newmetatable (lua_State *L, const char *tname) {
 
 
 LUALIB_API void marpa_luaL_setmetatable (lua_State *L, const char *tname) {
-  luaL_getmetatable(L, tname);
+  marpa_luaL_getmetatable(L, tname);
   marpa_lua_setmetatable(L, -2);
 }
 
@@ -310,7 +310,7 @@ LUALIB_API void *marpa_luaL_testudata (lua_State *L, int ud, const char *tname) 
   void *p = marpa_lua_touserdata(L, ud);
   if (p != NULL) {  /* value is a userdata? */
     if (marpa_lua_getmetatable(L, ud)) {  /* does it have a metatable? */
-      luaL_getmetatable(L, tname);  /* get correct metatable */
+      marpa_luaL_getmetatable(L, tname);  /* get correct metatable */
       if (!marpa_lua_rawequal(L, -1, -2))  /* not the same? */
         p = NULL;  /* value is a userdata with wrong metatable */
       marpa_lua_pop(L, 2);  /* remove both metatables */
@@ -338,8 +338,8 @@ LUALIB_API void *marpa_luaL_checkudata (lua_State *L, int ud, const char *tname)
 
 LUALIB_API int marpa_luaL_checkoption (lua_State *L, int arg, const char *def,
                                  const char *const lst[]) {
-  const char *name = (def) ? luaL_optstring(L, arg, def) :
-                             luaL_checkstring(L, arg);
+  const char *name = (def) ? marpa_luaL_optstring(L, arg, def) :
+                             marpa_luaL_checkstring(L, arg);
   int i;
   for (i=0; lst[i]; i++)
     if (strcmp(lst[i], name) == 0)
@@ -401,7 +401,7 @@ LUALIB_API lua_Number marpa_luaL_checknumber (lua_State *L, int arg) {
 
 
 LUALIB_API lua_Number marpa_luaL_optnumber (lua_State *L, int arg, lua_Number def) {
-  return luaL_opt(L, marpa_luaL_checknumber, arg, def);
+  return marpa_luaL_opt(L, marpa_luaL_checknumber, arg, def);
 }
 
 
@@ -425,7 +425,7 @@ LUALIB_API lua_Integer marpa_luaL_checkinteger (lua_State *L, int arg) {
 
 LUALIB_API lua_Integer marpa_luaL_optinteger (lua_State *L, int arg,
                                                       lua_Integer def) {
-  return luaL_opt(L, marpa_luaL_checkinteger, arg, def);
+  return marpa_luaL_opt(L, marpa_luaL_checkinteger, arg, def);
 }
 
 /* }====================================================== */
@@ -515,7 +515,7 @@ LUALIB_API void marpa_luaL_addlstring (luaL_Buffer *B, const char *s, size_t l) 
   if (l > 0) {  /* avoid 'memcpy' when 's' can be NULL */
     char *b = marpa_luaL_prepbuffsize(B, l);
     memcpy(b, s, l * sizeof(char));
-    luaL_addsize(B, l);
+    marpa_luaL_addsize(B, l);
   }
 }
 
@@ -536,7 +536,7 @@ LUALIB_API void marpa_luaL_pushresult (luaL_Buffer *B) {
 
 
 LUALIB_API void marpa_luaL_pushresultsize (luaL_Buffer *B, size_t sz) {
-  luaL_addsize(B, sz);
+  marpa_luaL_addsize(B, sz);
   marpa_luaL_pushresult(B);
 }
 
@@ -748,7 +748,7 @@ LUALIB_API int marpa_luaL_loadbufferx (lua_State *L, const char *buff, size_t si
 
 
 LUALIB_API int marpa_luaL_loadstring (lua_State *L, const char *s) {
-  return luaL_loadbuffer(L, s, strlen(s), s);
+  return marpa_luaL_loadbuffer(L, s, strlen(s), s);
 }
 
 /* }====================================================== */
@@ -813,7 +813,7 @@ LUALIB_API const char *marpa_luaL_tolstring (lua_State *L, int idx, size_t *len)
         marpa_lua_pushliteral(L, "nil");
         break;
       default:
-        marpa_lua_pushfstring(L, "%s: %p", luaL_typename(L, idx),
+        marpa_lua_pushfstring(L, "%s: %p", marpa_luaL_typename(L, idx),
                                             marpa_lua_topointer(L, idx));
         break;
     }
@@ -889,7 +889,7 @@ LUALIB_API void luaL_pushmodule (lua_State *L, const char *modname,
 
 LUALIB_API void luaL_openlib (lua_State *L, const char *libname,
                                const luaL_Reg *l, int nup) {
-  luaL_checkversion(L);
+  marpa_luaL_checkversion(L);
   if (libname) {
     luaL_pushmodule(L, libname, libsize(l));  /* get/create library table */
     marpa_lua_insert(L, -(nup + 1));  /* move library table to below upvalues */

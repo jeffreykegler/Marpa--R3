@@ -55,7 +55,7 @@ static int db_getmetatable (lua_State *L) {
 
 static int db_setmetatable (lua_State *L) {
   int t = marpa_lua_type(L, 2);
-  luaL_argcheck(L, t == LUA_TNIL || t == LUA_TTABLE, 2,
+  marpa_luaL_argcheck(L, t == LUA_TNIL || t == LUA_TTABLE, 2,
                     "nil or table expected");
   marpa_lua_settop(L, 2);
   marpa_lua_setmetatable(L, 1);
@@ -146,7 +146,7 @@ static int db_getinfo (lua_State *L) {
   lua_Debug ar;
   int arg;
   lua_State *L1 = getthread(L, &arg);
-  const char *options = luaL_optstring(L, arg+2, "flnStu");
+  const char *options = marpa_luaL_optstring(L, arg+2, "flnStu");
   checkstack(L, L1, 3);
   if (marpa_lua_isfunction(L, arg + 1)) {  /* info about a function? */
     options = marpa_lua_pushfstring(L, ">%s", options);  /* add '>' to 'options' */
@@ -275,7 +275,7 @@ static int db_setupvalue (lua_State *L) {
 static int checkupval (lua_State *L, int argf, int argnup) {
   int nup = (int)marpa_luaL_checkinteger(L, argnup);  /* upvalue index */
   marpa_luaL_checktype(L, argf, LUA_TFUNCTION);  /* closure */
-  luaL_argcheck(L, (marpa_lua_getupvalue(L, argf, nup) != NULL), argnup,
+  marpa_luaL_argcheck(L, (marpa_lua_getupvalue(L, argf, nup) != NULL), argnup,
                    "invalid upvalue index");
   return nup;
 }
@@ -291,8 +291,8 @@ static int db_upvalueid (lua_State *L) {
 static int db_upvaluejoin (lua_State *L) {
   int n1 = checkupval(L, 1, 2);
   int n2 = checkupval(L, 3, 4);
-  luaL_argcheck(L, !marpa_lua_iscfunction(L, 1), 1, "Lua function expected");
-  luaL_argcheck(L, !marpa_lua_iscfunction(L, 3), 3, "Lua function expected");
+  marpa_luaL_argcheck(L, !marpa_lua_iscfunction(L, 1), 1, "Lua function expected");
+  marpa_luaL_argcheck(L, !marpa_lua_iscfunction(L, 3), 3, "Lua function expected");
   marpa_lua_upvaluejoin(L, 1, n1, 3, n2);
   return 0;
 }
@@ -353,7 +353,7 @@ static int db_sethook (lua_State *L) {
     func = NULL; mask = 0; count = 0;  /* turn off hooks */
   }
   else {
-    const char *smask = luaL_checkstring(L, arg+2);
+    const char *smask = marpa_luaL_checkstring(L, arg+2);
     marpa_luaL_checktype(L, arg+1, LUA_TFUNCTION);
     count = (int)marpa_luaL_optinteger(L, arg + 3, 0);
     func = hookf; mask = makemask(smask, count);
@@ -406,7 +406,7 @@ static int db_debug (lua_State *L) {
     if (fgets(buffer, sizeof(buffer), stdin) == 0 ||
         strcmp(buffer, "cont\n") == 0)
       return 0;
-    if (luaL_loadbuffer(L, buffer, strlen(buffer), "=(debug command)") ||
+    if (marpa_luaL_loadbuffer(L, buffer, strlen(buffer), "=(debug command)") ||
         marpa_lua_pcall(L, 0, 0, 0))
       marpa_lua_writestringerror("%s\n", marpa_lua_tostring(L, -1));
     marpa_lua_settop(L, 0);  /* remove eventual returns */
@@ -450,7 +450,7 @@ static const luaL_Reg dblib[] = {
 
 
 LUAMOD_API int marpa_luaopen_debug (lua_State *L) {
-  luaL_newlib(L, dblib);
+  marpa_luaL_newlib(L, dblib);
   return 1;
 }
 

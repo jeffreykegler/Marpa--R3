@@ -168,8 +168,8 @@ static int b_rrot (lua_State *L) {
 static int fieldargs (lua_State *L, int farg, int *width) {
   lua_Integer f = marpa_luaL_checkinteger(L, farg);
   lua_Integer w = marpa_luaL_optinteger(L, farg + 1, 1);
-  luaL_argcheck(L, 0 <= f, farg, "field cannot be negative");
-  luaL_argcheck(L, 0 < w, farg + 1, "width must be positive");
+  marpa_luaL_argcheck(L, 0 <= f, farg, "field cannot be negative");
+  marpa_luaL_argcheck(L, 0 < w, farg + 1, "width must be positive");
   if (f + w > LUA_NBITS)
     marpa_luaL_error(L, "trying to access non-existent bits");
   *width = (int)w;
@@ -218,7 +218,7 @@ static const luaL_Reg bitlib[] = {
 
 
 LUAMOD_API int marpa_luaopen_bit32 (lua_State *L) {
-  luaL_newlib(L, bitlib);
+  marpa_luaL_newlib(L, bitlib);
   return 1;
 }
 

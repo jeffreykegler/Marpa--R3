@@ -2418,7 +2418,7 @@ char* string;
   marpa_lua_rawgeti (marpa_L, LUA_REGISTRYINDEX, time_ref);
   /* Lua stack: [ ..., time_object_table ] */
   time_object_registry = marpa_lua_gettop (marpa_L);
-  status = luaL_loadbuffer (marpa_L, string, strlen (string), string);
+  status = marpa_luaL_loadbuffer (marpa_L, string, strlen (string), string);
   if (status != 0)
     {
       const char *error_string = marpa_lua_tostring (marpa_L, -1);
@@ -6849,7 +6849,7 @@ PPCODE:
       // warn("%s %d\n", __FILE__, __LINE__);
   }
 
-  status = luaL_loadbuffer (marpa_L, codestr, strlen (codestr), codestr);
+  status = marpa_luaL_loadbuffer (marpa_L, codestr, strlen (codestr), codestr);
   if (status != 0)
     {
       const char *error_string = marpa_lua_tostring (marpa_L, -1);
@@ -6881,6 +6881,68 @@ PPCODE:
       if (top_after > top_before) {
       marpa_lua_pop (marpa_L, top_after - top_before);
       }
+}
+
+void
+exec( codestr, ... )
+   char* codestr;
+PPCODE:
+{
+  int i, status;
+  int top_before, top_after;
+
+  top_before = marpa_lua_gettop (marpa_L);
+
+    warn("%s %d\n", __FILE__, __LINE__);
+  /* push arguments */
+  for (i = 1; i < items; i++) {
+      warn("%s %d: pushing Perl arg %d\n", __FILE__, __LINE__, i);
+      SV* arg_sv = ST(i);
+      if (!SvOK(arg_sv)) {
+        croak ("Marpa::R3::Lua::exec arg %d is not an SV", i);
+      }
+      marpa_sv_sv(marpa_L, arg_sv);
+      warn("%s %d\n", __FILE__, __LINE__);
+  }
+
+    warn("%s %d\n", __FILE__, __LINE__);
+  status = marpa_luaL_loadbuffer (marpa_L, codestr, strlen (codestr), codestr);
+  if (status != 0)
+    {
+      const char *error_string = marpa_lua_tostring (marpa_L, -1);
+      marpa_lua_pop (marpa_L, 1);
+      croak ("Marpa::R3::Lua error in luaL_loadbuffer: %s", error_string);
+    }
+
+  status = marpa_lua_pcall (marpa_L, 0, LUA_MULTRET, 0);
+  if (status != 0)
+    {
+      const char *error_string = marpa_lua_tostring (marpa_L, -1);
+      marpa_lua_pop (marpa_L, 1);
+      croak ("Marpa::R3::Lua error in pcall: %s", error_string);
+    }
+
+  /* return args to caller:
+   * lua functions appear to push their return values in reverse order */
+  top_after = marpa_lua_gettop (marpa_L);
+  warn("top_after=%d", top_after);
+  for (i = top_before + 1; i <= top_after; i++)
+    {
+    warn("%s %d\n", __FILE__, __LINE__);
+      SV *sv_result = (SV*) marpa_lua_touserdata (marpa_L, i);
+      if (!SvOK(sv_result)) {
+        croak ("Marpa::R3::Lua::exec return value %d is not an SV", i - (top_before + 1));
+      }
+    warn("%s %d\n", __FILE__, __LINE__);
+      /* Take ownership of sv_result, but mortalize it */
+      SvREFCNT_inc_simple_void_NN (sv_result);
+      XPUSHs (sv_2mortal (sv_result));
+    warn("%s %d\n", __FILE__, __LINE__);
+    }
+      if (top_after > top_before) {
+      marpa_lua_pop (marpa_L, top_after - top_before);
+      }
+    warn("%s %d\n", __FILE__, __LINE__);
 }
 
 INCLUDE: auto.xs

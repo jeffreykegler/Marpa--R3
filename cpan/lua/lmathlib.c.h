@@ -128,7 +128,7 @@ static int math_fmod (lua_State *L) {
   if (marpa_lua_isinteger(L, 1) && marpa_lua_isinteger(L, 2)) {
     lua_Integer d = marpa_lua_tointeger(L, 2);
     if ((lua_Unsigned)d + 1u <= 1u) {  /* special cases: -1 or 0 */
-      luaL_argcheck(L, d != 0, 2, "zero");
+      marpa_luaL_argcheck(L, d != 0, 2, "zero");
       marpa_lua_pushinteger(L, 0);  /* avoid overflow with 0x80000... / -1 */
     }
     else
@@ -213,7 +213,7 @@ static int math_min (lua_State *L) {
   int n = marpa_lua_gettop(L);  /* number of arguments */
   int imin = 1;  /* index of current minimum value */
   int i;
-  luaL_argcheck(L, n >= 1, 1, "value expected");
+  marpa_luaL_argcheck(L, n >= 1, 1, "value expected");
   for (i = 2; i <= n; i++) {
     if (marpa_lua_compare(L, i, imin, LUA_OPLT))
       imin = i;
@@ -227,7 +227,7 @@ static int math_max (lua_State *L) {
   int n = marpa_lua_gettop(L);  /* number of arguments */
   int imax = 1;  /* index of current maximum value */
   int i;
-  luaL_argcheck(L, n >= 1, 1, "value expected");
+  marpa_luaL_argcheck(L, n >= 1, 1, "value expected");
   for (i = 2; i <= n; i++) {
     if (marpa_lua_compare(L, imax, i, LUA_OPLT))
       imax = i;
@@ -262,8 +262,8 @@ static int math_random (lua_State *L) {
     default: return marpa_luaL_error(L, "wrong number of arguments");
   }
   /* random integer in the interval [low, up] */
-  luaL_argcheck(L, low <= up, 1, "interval is empty"); 
-  luaL_argcheck(L, low >= 0 || up <= LUA_MAXINTEGER + low, 1,
+  marpa_luaL_argcheck(L, low <= up, 1, "interval is empty"); 
+  marpa_luaL_argcheck(L, low >= 0 || up <= LUA_MAXINTEGER + low, 1,
                    "interval too large");
   r *= (double)(up - low) + 1.0;
   marpa_lua_pushinteger(L, (lua_Integer)r + low);
@@ -393,7 +393,7 @@ static const luaL_Reg mathlib[] = {
 ** Open math library
 */
 LUAMOD_API int marpa_luaopen_math (lua_State *L) {
-  luaL_newlib(L, mathlib);
+  marpa_luaL_newlib(L, mathlib);
   marpa_lua_pushnumber(L, PI);
   marpa_lua_setfield(L, -2, "pi");
   marpa_lua_pushnumber(L, (lua_Number)HUGE_VAL);

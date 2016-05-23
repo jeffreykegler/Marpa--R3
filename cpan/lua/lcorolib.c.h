@@ -20,7 +20,7 @@
 
 static lua_State *getco (lua_State *L) {
   lua_State *co = marpa_lua_tothread(L, 1);
-  luaL_argcheck(L, co, 1, "thread expected");
+  marpa_luaL_argcheck(L, co, 1, "thread expected");
   return co;
 }
 
@@ -162,7 +162,7 @@ static const luaL_Reg co_funcs[] = {
 
 
 LUAMOD_API int marpa_luaopen_coroutine (lua_State *L) {
-  luaL_newlib(L, co_funcs);
+  marpa_luaL_newlib(L, co_funcs);
   return 1;
 }
 

@@ -248,11 +248,11 @@ static void opencheck (lua_State *L, const char *fname, const char *mode) {
 
 
 static int io_open (lua_State *L) {
-  const char *filename = luaL_checkstring(L, 1);
-  const char *mode = luaL_optstring(L, 2, "r");
+  const char *filename = marpa_luaL_checkstring(L, 1);
+  const char *mode = marpa_luaL_optstring(L, 2, "r");
   LStream *p = newfile(L);
   const char *md = mode;  /* to traverse/check mode */
-  luaL_argcheck(L, l_checkmode(md), 2, "invalid mode");
+  marpa_luaL_argcheck(L, l_checkmode(md), 2, "invalid mode");
   p->f = fopen(filename, mode);
   return (p->f == NULL) ? marpa_luaL_fileresult(L, 0, filename) : 1;
 }
@@ -268,8 +268,8 @@ static int io_pclose (lua_State *L) {
 
 
 static int io_popen (lua_State *L) {
-  const char *filename = luaL_checkstring(L, 1);
-  const char *mode = luaL_optstring(L, 2, "r");
+  const char *filename = marpa_luaL_checkstring(L, 1);
+  const char *mode = marpa_luaL_optstring(L, 2, "r");
   LStream *p = newprefile(L);
   p->f = l_popen(L, filename, mode);
   p->closef = &io_pclose;
@@ -332,7 +332,7 @@ static int io_readline (lua_State *L);
 
 static void aux_lines (lua_State *L, int toclose) {
   int n = marpa_lua_gettop(L) - 1;  /* number of arguments to read */
-  luaL_argcheck(L, n <= MAXARGLINE, MAXARGLINE + 2, "too many arguments");
+  marpa_luaL_argcheck(L, n <= MAXARGLINE, MAXARGLINE + 2, "too many arguments");
   marpa_lua_pushinteger(L, n);  /* number of arguments to read */
   marpa_lua_pushboolean(L, toclose);  /* close/not close file when finished */
   marpa_lua_rotate(L, 2, 2);  /* move 'n' and 'toclose' to their positions */
@@ -357,7 +357,7 @@ static int io_lines (lua_State *L) {
     toclose = 0;  /* do not close it after iteration */
   }
   else {  /* open a new file */
-    const char *filename = luaL_checkstring(L, 1);
+    const char *filename = marpa_luaL_checkstring(L, 1);
     opencheck(L, filename, "r");
     marpa_lua_replace(L, 1);  /* put file at index 1 */
     toclose = 1;  /* close it after iteration */
@@ -475,16 +475,16 @@ static int read_line (lua_State *L, FILE *f, int chop) {
   int c = '\0';
   marpa_luaL_buffinit(L, &b);
   while (c != EOF && c != '\n') {  /* repeat until end of line */
-    char *buff = luaL_prepbuffer(&b);  /* preallocate buffer */
+    char *buff = marpa_luaL_prepbuffer(&b);  /* preallocate buffer */
     int i = 0;
     l_lockfile(f);  /* no memory errors can happen inside the lock */
     while (i < LUAL_BUFFERSIZE && (c = l_getc(f)) != EOF && c != '\n')
       buff[i++] = c;
     l_unlockfile(f);
-    luaL_addsize(&b, i);
+    marpa_luaL_addsize(&b, i);
   }
   if (!chop && c == '\n')  /* want a newline and have one? */
-    luaL_addchar(&b, c);  /* add ending newline to result */
+    marpa_luaL_addchar(&b, c);  /* add ending newline to result */
   marpa_luaL_pushresult(&b);  /* close buffer */
   /* return ok if read something (either a newline or something else) */
   return (c == '\n' || marpa_lua_rawlen(L, -1) > 0);
@@ -496,9 +496,9 @@ static void read_all (lua_State *L, FILE *f) {
   luaL_Buffer b;
   marpa_luaL_buffinit(L, &b);
   do {  /* read file in chunks of LUAL_BUFFERSIZE bytes */
-    char *p = luaL_prepbuffer(&b);
+    char *p = marpa_luaL_prepbuffer(&b);
     nr = fread(p, sizeof(char), LUAL_BUFFERSIZE, f);
-    luaL_addsize(&b, nr);
+    marpa_luaL_addsize(&b, nr);
   } while (nr == LUAL_BUFFERSIZE);
   marpa_luaL_pushresult(&b);  /* close buffer */
 }
@@ -511,7 +511,7 @@ static int read_chars (lua_State *L, FILE *f, size_t n) {
   marpa_luaL_buffinit(L, &b);
   p = marpa_luaL_prepbuffsize(&b, n);  /* prepare buffer to read whole block */
   nr = fread(p, sizeof(char), n, f);  /* try to read 'n' chars */
-  luaL_addsize(&b, nr);
+  marpa_luaL_addsize(&b, nr);
   marpa_luaL_pushresult(&b);  /* close buffer */
   return (nr > 0);  /* true iff read something */
 }
@@ -535,7 +535,7 @@ static int g_read (lua_State *L, FILE *f, int first) {
         success = (l == 0) ? test_eof(L, f) : read_chars(L, f, l);
       }
       else {
-        const char *p = luaL_checkstring(L, n);
+        const char *p = marpa_luaL_checkstring(L, n);
         if (*p == '*') p++;  /* skip optional '*' (for compatibility) */
         switch (*p) {
           case 'n':  /* number */
@@ -649,7 +649,7 @@ static int f_seek (lua_State *L) {
   int op = marpa_luaL_checkoption(L, 2, "cur", modenames);
   lua_Integer p3 = marpa_luaL_optinteger(L, 3, 0);
   l_seeknum offset = (l_seeknum)p3;
-  luaL_argcheck(L, (lua_Integer)offset == p3, 3,
+  marpa_luaL_argcheck(L, (lua_Integer)offset == p3, 3,
                   "not an integer in proper range");
   op = l_fseek(f, offset, mode[op]);
   if (op)
@@ -754,7 +754,7 @@ static void createstdfile (lua_State *L, FILE *f, const char *k,
 
 
 LUAMOD_API int marpa_luaopen_io (lua_State *L) {
-  luaL_newlib(L, iolib);  /* new module */
+  marpa_luaL_newlib(L, iolib);  /* new module */
   createmeta(L);
   /* create (and set) default files */
   createstdfile(L, stdin, IO_INPUT, "stdin");
