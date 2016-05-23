@@ -16,7 +16,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-use Test::More tests => 6;
+use Test::More tests => 12;
 use English qw( -no_match_vars );
 use lib 'inc';
 use Marpa::R3::Test;

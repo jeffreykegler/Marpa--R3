@@ -2305,47 +2305,77 @@ slr_es_span_to_literal_sv (Scanless_R * slr,
 
 static lua_State *marpa_L = NULL;
 
-static SV* bool_ref	    (lua_State *, int);
-static SV* luaval_to_perlsv  (lua_State *, int);
+#define MT_NAME_SV "Marpa.sv"
 
+/* Coerce a Lua value to a Perl SV, if necessary one that
+ * is simply a string with an error message.
+ * The call transfers ownership of one of the SV's reference
+ * counts to the caller.
+ * The Lua stack is left as is.
+ */
 static SV*
-luaval_to_perlsv (lua_State * L, int idx)
+coerce_to_sv (lua_State * L, int idx)
 {
-  const int type = marpa_lua_type (L, idx);
   SV *result;
-    // warn("%s %d\n", __FILE__, __LINE__);
+  const int type = marpa_lua_type (L, idx);
+
+  // warn("%s %d\n", __FILE__, __LINE__);
   switch (type)
     {
     case LUA_TNIL:
-    // warn("%s %d\n", __FILE__, __LINE__);
+      // warn("%s %d\n", __FILE__, __LINE__);
       result = newSV (0);
       break;
     case LUA_TBOOLEAN:
-    // warn("%s %d\n", __FILE__, __LINE__);
-      result = bool_ref (L, marpa_lua_toboolean (L, idx));
+      // warn("%s %d\n", __FILE__, __LINE__);
+      result = marpa_lua_toboolean (L, idx) ?  newSViv(1) : newSV(0);
       break;
     case LUA_TNUMBER:
-    // warn("%s %d\n", __FILE__, __LINE__);
+      // warn("%s %d\n", __FILE__, __LINE__);
       result = newSVnv (marpa_lua_tonumber (L, idx));
       break;
     case LUA_TSTRING:
       // warn("%s %d: %s len=%d\n", __FILE__, __LINE__, marpa_lua_tostring (L, idx), marpa_lua_rawlen (L, idx));
-      result = newSVpvn (marpa_lua_tostring (L, idx), marpa_lua_rawlen (L, idx));
+      result =
+	newSVpvn (marpa_lua_tostring (L, idx), marpa_lua_rawlen (L, idx));
       break;
-    case LUA_TTABLE:
-    case LUA_TFUNCTION:
+    case LUA_TUSERDATA:
+      {
+	int are_equal;
+	if (!marpa_lua_getmetatable (L, idx))
+	  {			/* does it have a metatable? */
+	    result =
+	      newSVpvf
+	      ("Lua userdata at index %d in coerce_to_sv has no metatable: coercion not implemented",
+	       idx);
+	    break;
+	  }
+	marpa_luaL_getmetatable (L, MT_NAME_SV);	/* get correct metatable */
+	are_equal = marpa_lua_rawequal (L, -1, -2);	/* the same? */
+	marpa_lua_pop (L, 2);	/* remove both metatables */
+	if (!are_equal)
+	  {
+	    result =
+	      newSVpvf
+	      ("Coercian not implemented for Lua userdata at index %d in coerce_to_sv",
+	       idx);
+	    break;
+	  }
+	result = *(SV **) marpa_lua_touserdata (marpa_L, idx);
+	SvREFCNT_inc_simple_void_NN (result);
+      };
+      break;
+
     default:
-    // warn("%s %d\n", __FILE__, __LINE__);
-      result = newSVpvf ("Lua type %d at index %d not yet implemented", type, idx);
+      // warn("%s %d\n", __FILE__, __LINE__);
+      result =
+	newSVpvf
+	("Lua type %d at index %d in coerce_to_sv: coercion not implemented",
+	 marpa_luaL_typename (L, idx), idx);
       break;
     }
-    // warn("%s %d\n", __FILE__, __LINE__);
+  // warn("%s %d\n", __FILE__, __LINE__);
   return result;
-}
-
-static SV*
-bool_ref (lua_State *L, int b) {
-    return b ? newSViv(1) : newSV(0);
 }
 
 /* push a Perl value onto the Lua stack:
@@ -2431,8 +2461,6 @@ char* string;
   marpa_lua_pop(marpa_L, 1);
   return function_ref;
 }
-
-#define MT_NAME_SV "Marpa.sv"
 
 /* Leaves the new userdata on top of the stack.
  * The Lua userdata takes ownership of one reference count.
@@ -6873,7 +6901,7 @@ PPCODE:
   for (i = top_before + 1; i <= top_after; i++)
     {
     // warn("%s %d\n", __FILE__, __LINE__);
-      SV *result = luaval_to_perlsv (marpa_L, i);
+      SV *result = coerce_to_sv (marpa_L, i);
     // warn("%s %d\n", __FILE__, __LINE__);
     // warn("%s %d\n", __FILE__, __LINE__);
       XPUSHs (sv_2mortal (result));
@@ -6893,8 +6921,12 @@ PPCODE:
   int top_before, top_after;
 
 
-    warn("%s %d\n", __FILE__, __LINE__);
-  status = marpa_luaL_loadbuffer (marpa_L, codestr, strlen (codestr), codestr);
+  warn ("%s %d\n", __FILE__, __LINE__);
+  top_before = marpa_lua_gettop (marpa_L);
+  warn ("top before pcall = %d", top_before);
+
+  status =
+    marpa_luaL_loadbuffer (marpa_L, codestr, strlen (codestr), codestr);
   if (status != 0)
     {
       const char *error_string = marpa_lua_tostring (marpa_L, -1);
@@ -6902,21 +6934,21 @@ PPCODE:
       croak ("Marpa::R3::Lua error in luaL_loadbuffer: %s", error_string);
     }
 
-    warn("%s %d\n", __FILE__, __LINE__);
+  warn ("%s %d\n", __FILE__, __LINE__);
   /* push arguments */
-  for (i = 1; i < items; i++) {
-      warn("%s %d: pushing Perl arg %d\n", __FILE__, __LINE__, i);
-      SV* arg_sv = ST(i);
-      if (!SvOK(arg_sv)) {
-        croak ("Marpa::R3::Lua::exec arg %d is not an SV", i);
-      }
-      marpa_sv_sv(marpa_L, arg_sv);
-      warn("%s %d\n", __FILE__, __LINE__);
-  }
+  for (i = 1; i < items; i++)
+    {
+      warn ("%s %d: pushing Perl arg %d\n", __FILE__, __LINE__, i);
+      SV *arg_sv = ST (i);
+      if (!SvOK (arg_sv))
+	{
+	  croak ("Marpa::R3::Lua::exec arg %d is not an SV", i);
+	}
+      marpa_sv_sv (marpa_L, arg_sv);
+      warn ("%s %d\n", __FILE__, __LINE__);
+    }
 
-  top_before = marpa_lua_gettop (marpa_L);
-  warn("top before pcall = %d", top_before);
-  status = marpa_lua_pcall (marpa_L, items-1, LUA_MULTRET, 0);
+  status = marpa_lua_pcall (marpa_L, items - 1, LUA_MULTRET, 0);
   if (status != 0)
     {
       const char *error_string = marpa_lua_tostring (marpa_L, -1);
@@ -6924,31 +6956,23 @@ PPCODE:
       croak ("Marpa::R3::Lua error in pcall: %s", error_string);
     }
 
-  /* return args to caller:
-   * lua functions appear to push their return values in reverse order */
+  /* return args to caller */
   top_after = marpa_lua_gettop (marpa_L);
-  warn("top after pcall = %d", top_after);
+  warn ("top after pcall = %d", top_after);
   for (i = top_before + 1; i <= top_after; i++)
     {
-    warn("%s %d\n", __FILE__, __LINE__);
-      /* Perhaps remove check after debugging? */
-      SV** p_sv = (SV**)marpa_luaL_checkudata(marpa_L, i, MT_NAME_SV);
-    warn("%s %d\n", __FILE__, __LINE__);
-      SV* sv_result = *p_sv;
-    warn("%s %d\n", __FILE__, __LINE__);
-      if (!SvOK(sv_result)) {
-        croak ("Marpa::R3::Lua::exec return value %d is not an SV", i - (top_before + 1));
-      }
-    warn("%s %d\n", __FILE__, __LINE__);
-      /* Take ownership of sv_result, but mortalize it */
-      SvREFCNT_inc_simple_void_NN (sv_result);
+      warn ("%s %d\n", __FILE__, __LINE__);
+      SV *sv_result = coerce_to_sv (marpa_L, i);
+      warn ("%s %d\n", __FILE__, __LINE__);
+      /* Took ownership of sv_result, we now need to mortalize it */
       XPUSHs (sv_2mortal (sv_result));
-    warn("%s %d\n", __FILE__, __LINE__);
+      warn ("%s %d\n", __FILE__, __LINE__);
     }
-      if (top_after > top_before) {
+  if (top_after > top_before)
+    {
       marpa_lua_pop (marpa_L, top_after - top_before);
-      }
-    warn("%s %d\n", __FILE__, __LINE__);
+    }
+  warn ("%s %d\n", __FILE__, __LINE__);
 }
 
 INCLUDE: auto.xs
