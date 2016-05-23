@@ -2432,6 +2432,60 @@ char* string;
   return function_ref;
 }
 
+#define MT_NAME_SV "Marpa.sv"
+
+/* Leaves the new userdata on top of the stack.
+ * The Lua userdata takes ownership of one reference count.
+ * The caller must have a reference count whose ownership
+ * the caller is prepared to transfer to the Lua userdata.
+ */
+static void marpa_sv_sv (lua_State* L, SV* sv) {
+    SV* sv_copy = (SV*)marpa_lua_newuserdata(L, sizeof(SV*));
+    sv_copy = sv;
+    marpa_luaL_getmetatable(L, MT_NAME_SV);
+    marpa_lua_setmetatable(L, -2);
+    /* [sv_userdata] */
+}
+
+static int marpa_sv_nil (lua_State* L) {
+    /* [] */
+    marpa_sv_sv( L, newSV(0) );
+    /* [sv_userdata] */
+    return 1;
+}
+
+static int marpa_sv_finalize (lua_State* L) {
+    SV* const sv = (SV*)marpa_luaL_checkudata(L, 1, MT_NAME_SV);
+    SvREFCNT_dec (sv);
+    return 0;
+}
+
+static const struct luaL_Reg marpa_sv_meths[] = {
+    {"__gc", marpa_sv_finalize},
+    {NULL, NULL},
+};
+
+static const struct luaL_Reg marpa_sv_funcs[] = {
+    {"nil", marpa_sv_nil},
+    {NULL, NULL},
+};
+
+static int marpa_luaopen_sv (lua_State* L) {
+    /* create metatable */
+    marpa_luaL_newmetatable(L, MT_NAME_SV);
+
+    /* metatable.__index = metatable */
+    marpa_lua_pushvalue(L, -1);
+    marpa_lua_setfield(L, -2, "__index");
+
+    /* register methods */
+    marpa_luaL_setfuncs(L, marpa_sv_meths, 0);
+
+    /* register new function */
+    marpa_luaL_newlib(L, marpa_sv_funcs);
+    return 1;
+}
+
 MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin
 
 PROTOTYPES: DISABLE
