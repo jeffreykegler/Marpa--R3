@@ -2357,7 +2357,7 @@ coerce_to_sv (lua_State * L, int idx)
 	  {
 	    result =
 	      newSVpvf
-	      ("Coercian not implemented for Lua userdata at index %d in coerce_to_sv",
+	      ("Coercion not implemented for Lua userdata at index %d in coerce_to_sv",
 	       idx);
 	    break;
 	  }
@@ -2378,9 +2378,7 @@ coerce_to_sv (lua_State * L, int idx)
   return result;
 }
 
-/* push a Perl value onto the Lua stack:
- * does the right thing for any Perl type
- * handled by Inline::Lua */
+/* Push a Perl value onto the Lua stack. */
 static void
 push_val (lua_State * L, SV * val)
 {
@@ -2462,8 +2460,9 @@ char* string;
   return function_ref;
 }
 
-/* Leaves the new userdata on top of the stack.
- * The Lua userdata takes ownership of one reference count.
+/* Creates a userdata containing a Perl SV, and
+ * leaves the new userdata on top of the stack.
+ * The new Lua userdata takes ownership of one reference count.
  * The caller must have a reference count whose ownership
  * the caller is prepared to transfer to the Lua userdata.
  */
@@ -2492,8 +2491,30 @@ static int marpa_sv_finalize (lua_State* L) {
     return 0;
 }
 
+static void marpa_av_store(lua_State* L, SV* table, lua_Integer key, SV*value) {
+     AV* av;
+     if ( !SvROK(table) || SvTYPE(SvRV(table)) != SVt_PVAV) {
+        croak ("Attempt to index an SV which is not an AV ref");
+     }
+     av = (AV*)SvRV(table);
+     av_store(av, key, value);
+}
+
+static int marpa_av_store_meth(lua_State* L) {
+    SV** p_table_sv = (SV**)marpa_luaL_checkudata(L, 1, MT_NAME_SV);
+    lua_Integer key = marpa_luaL_checkinteger(L, 2);
+    SV* value_sv = coerce_to_sv(L, 3);
+
+    /* coerce_to_sv transfered a reference count to us, which we
+     * pass on to the AV.
+     */
+    marpa_av_store(L, *p_table_sv, key, value_sv);
+    return 0;
+}
+
 static const struct luaL_Reg marpa_sv_meths[] = {
     {"__gc", marpa_sv_finalize},
+    {"__newindex", marpa_av_store_meth},
     {NULL, NULL},
 };
 
