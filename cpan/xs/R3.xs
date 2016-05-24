@@ -2466,19 +2466,21 @@ char* string;
  * The caller must have a reference count whose ownership
  * the caller is prepared to transfer to the Lua userdata.
  */
-static void marpa_sv_sv (lua_State* L, SV* sv) {
+static void marpa_sv_sv_noinc (lua_State* L, SV* sv) {
     SV** p_sv = (SV**)marpa_lua_newuserdata(L, sizeof(SV*));
     *p_sv = sv;
     warn("new ud %p, SV %p %s %d\n", p_sv, sv, __FILE__, __LINE__);
-    SvREFCNT_inc_simple_void_NN (sv);
     marpa_luaL_getmetatable(L, MT_NAME_SV);
     marpa_lua_setmetatable(L, -2);
     /* [sv_userdata] */
 }
 
+#define MARPA_SV_SV(L, sv) \
+    (marpa_sv_sv_noinc((L), (sv)), SvREFCNT_inc_simple_void_NN (sv))
+
 static int marpa_sv_nil (lua_State* L) {
     /* [] */
-    marpa_sv_sv( L, newSV(0) );
+    marpa_sv_sv_noinc( L, newSV(0) );
     /* [sv_userdata] */
     return 1;
 }
@@ -2489,6 +2491,38 @@ static int marpa_sv_finalize (lua_State* L) {
     warn("decrementing ud %p, SV %p, %s %d\n", p_sv, sv, __FILE__, __LINE__);
     SvREFCNT_dec (sv);
     return 0;
+}
+
+/* Fetch from table at index key.
+ * The reference count is not changed, if the caller must use this
+ * SV immediately, or increment the reference count.
+ * Will return 0, if there is no SV at that index.
+ */
+static SV** marpa_av_fetch(lua_State* L, SV* table, lua_Integer key) {
+     AV* av;
+     SV* sv;
+     if ( !SvROK(table) || SvTYPE(SvRV(table)) != SVt_PVAV) {
+        croak ("Attempt to index an SV which is not an AV ref");
+     }
+     av = (AV*)SvRV(table);
+     return av_fetch(av, key, 0);
+}
+
+static int marpa_av_fetch_meth(lua_State* L) {
+    SV** p_result_sv;
+    SV** p_table_sv = (SV**)marpa_luaL_checkudata(L, 1, MT_NAME_SV);
+    lua_Integer key = marpa_luaL_checkinteger(L, 2);
+
+    p_result_sv = marpa_av_fetch(L, *p_table_sv, key);
+    if (p_result_sv) {
+        SV* const sv = *p_result_sv;
+        /* Increment the reference count and put this SV on top of the stack */
+        MARPA_SV_SV(L, sv);
+    } else {
+        /* Put a new nil SV on top of the stack */
+        marpa_sv_nil(L);
+    }
+    return 1;
 }
 
 static void marpa_av_store(lua_State* L, SV* table, lua_Integer key, SV*value) {
@@ -2514,6 +2548,7 @@ static int marpa_av_store_meth(lua_State* L) {
 
 static const struct luaL_Reg marpa_sv_meths[] = {
     {"__gc", marpa_sv_finalize},
+    {"__index", marpa_av_fetch_meth},
     {"__newindex", marpa_av_store_meth},
     {NULL, NULL},
 };
@@ -6968,7 +7003,7 @@ PPCODE:
 	{
 	  croak ("Marpa::R3::Lua::exec arg %d is not an SV", i);
 	}
-      marpa_sv_sv (marpa_L, arg_sv);
+      MARPA_SV_SV (marpa_L, arg_sv);
       // warn ("%s %d\n", __FILE__, __LINE__);
     }
 

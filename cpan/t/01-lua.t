@@ -16,14 +16,14 @@ use 5.010001;
 use strict;
 use warnings;
 
-use Test::More tests => 12;
+use Test::More tests => 13;
 use English qw( -no_match_vars );
 use lib 'inc';
 use Marpa::R3::Test;
 use Marpa::R3;
 
 my $salve = ' return [[salve, munde!]], ...';
-my @tests = (
+my @tests1 = (
    [$salve, [], ['salve, munde!'], 'Salve, 0 args'],
    [$salve, [qw{hi}], ['salve, munde!', 'hi'], 'Salve, 1 arg'],
    [$salve, [qw{hi hi2}], ['salve, munde!', qw(hi hi2)], 'Salve, 2 args'],
@@ -32,14 +32,18 @@ my @tests = (
    ['return taxicurry(10^3)', [], [1729]],
 );
 
-for my $test (@tests) {
+for my $test (@tests1) {
     my ($code, $args, $expected, $test_name) = @{$test};
     $test_name //= qq{"$code"};
     my @actual = Marpa::R3::Lua::coerce_exec($code, @{$args});
     Test::More::is_deeply( \@actual, $expected, $test_name);
 }
 
-for my $test (@tests) {
+my @tests2 = (
+   ["x = ...; x[0] = 42; return x", [[]], [[42]]],
+);
+
+for my $test (@tests1, @tests2) {
     my ($code, $args, $expected, $test_name) = @{$test};
     $test_name //= qq{"$code"};
     my @actual = Marpa::R3::Lua::exec($code, @{$args});
