@@ -40,7 +40,7 @@ for my $test (@tests1) {
 }
 
 my @tests2 = (
-   ["x = ...; x[0] = 42; return x", [[]], [[42]]],
+   ["local x = ...; x[0] = 42; return x", [[]], [[42]]],
 );
 
 for my $test (@tests1, @tests2) {
