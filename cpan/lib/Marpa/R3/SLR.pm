@@ -1843,9 +1843,9 @@ sub Marpa::R3::Scanless::R::register_fn {
 }
 
 sub Marpa::R3::Scanless::R::exec {
-    my ( $slr, $codestr ) = @_;
+    my ( $slr, $fn_key, @args ) = @_;
     my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
-    return $thin_slr->exec($codestr);
+    return $thin_slr->exec($fn_key, @args);
 }
 
 # Internal methods, not to be documented

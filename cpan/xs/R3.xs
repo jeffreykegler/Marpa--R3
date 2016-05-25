@@ -2485,12 +2485,36 @@ static int marpa_sv_nil (lua_State* L) {
     return 1;
 }
 
-static int marpa_sv_finalize (lua_State* L) {
+static int marpa_sv_finalize_meth (lua_State* L) {
     SV** p_sv = (SV**)marpa_luaL_checkudata(L, 1, MT_NAME_SV);
     SV* sv = *p_sv;
     warn("decrementing ud %p, SV %p, %s %d\n", p_sv, sv, __FILE__, __LINE__);
     SvREFCNT_dec (sv);
     return 0;
+}
+
+/* Convert Lua object to number, including our custom Marpa userdata's
+ */
+static int marpa_xlua_tonumber (lua_State* L, int idx, int* pisnum) {
+    dTHX;
+    void* ud;
+    int pisnum2;
+    if (pisnum) *pisnum = 1;
+    int n = marpa_lua_tonumberx(L, idx, &pisnum2);
+    if (pisnum2) return n;
+    ud = marpa_luaL_testudata(L, idx, MT_NAME_SV);
+    if (!ud) {
+        if (pisnum) *pisnum = 0;
+        return 0;
+    }
+    return (lua_Number) SvNV (*(SV**)ud);
+}
+
+static int marpa_sv_add_meth (lua_State* L) {
+    int num1 = marpa_xlua_tonumber(L, 1, NULL);
+    int num2 = marpa_xlua_tonumber(L, 2, NULL);
+    marpa_lua_pushinteger(L, num1+num2);
+    return 1;
 }
 
 /* Fetch from table at index key.
@@ -2553,7 +2577,8 @@ static int marpa_av_store_meth(lua_State* L) {
 }
 
 static const struct luaL_Reg marpa_sv_meths[] = {
-    {"__gc", marpa_sv_finalize},
+    {"__add", marpa_sv_add_meth},
+    {"__gc", marpa_sv_finalize_meth},
     {"__index", marpa_av_fetch_meth},
     {"__newindex", marpa_av_store_meth},
     {NULL, NULL},
@@ -6972,7 +6997,8 @@ PPCODE:
 
   function_stack_ix = marpa_lua_gettop (marpa_L);
 
-  // warn ("%s %d\n", __FILE__, __LINE__);
+  warn ("function_stack_ix=%d %s %d\n", function_stack_ix, __FILE__, __LINE__);
+  warn ("items=%d %s %d\n", items, __FILE__, __LINE__);
   /* push arguments */
   for (i = 2; i < items; i++)
     {
@@ -6983,7 +7009,7 @@ PPCODE:
           croak ("Marpa::R3::Lua::exec arg %d is not an SV", i);
         }
       MARPA_SV_SV (marpa_L, arg_sv);
-      // warn ("%s %d\n", __FILE__, __LINE__);
+      warn ("%s %d\n", __FILE__, __LINE__);
     }
 
   status = marpa_lua_pcall (marpa_L, items - 2, LUA_MULTRET, 0);
@@ -6996,18 +7022,18 @@ PPCODE:
 
   /* return args to caller */
   top_after = marpa_lua_gettop (marpa_L);
-  // warn ("top after pcall = %d", top_after);
-  for (i = function_stack_ix + 1; i <= top_after; i++)
+  warn ("top after pcall = %d", top_after);
+  for (i = function_stack_ix; i <= top_after; i++)
     {
-      // warn ("%s %d\n", __FILE__, __LINE__);
+      warn ("%s %d\n", __FILE__, __LINE__);
       SV *sv_result = coerce_to_sv (marpa_L, i);
-      // warn ("%s %d\n", __FILE__, __LINE__);
+      warn ("%s %d\n", __FILE__, __LINE__);
       /* Took ownership of sv_result, we now need to mortalize it */
       XPUSHs (sv_2mortal (sv_result));
-      // warn ("%s %d\n", __FILE__, __LINE__);
+      warn ("%s %d\n", __FILE__, __LINE__);
     }
   marpa_lua_settop (marpa_L, recce_object - 1);
-  // warn ("%s %d\n", __FILE__, __LINE__);
+  warn ("%s %d\n", __FILE__, __LINE__);
 }
 
 MODULE = Marpa::R3            PACKAGE = Marpa::R3::Lua
