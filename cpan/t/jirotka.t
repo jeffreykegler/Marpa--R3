@@ -31,8 +31,8 @@ use Marpa::R3;
 # by Tomas Jirotka
 
 my $grammar = Marpa::R3::Scanless::G->new(
-	{
-		source => \<<'END_OF_DSL',
+        {
+                source => \<<'END_OF_DSL',
 :default ::= action => Maql_Actions::tisk
 
 Input ::= Statement+ separator => SEPARATOR
@@ -74,7 +74,7 @@ PF ~ 'Pf'
 whitespace ~ [\s]+
 
 END_OF_DSL
-	}
+        }
 );
 
 my $input = q{Create Metric m As Select 1 Where True};

@@ -42,7 +42,7 @@ my $log_data;
 if (not IPC::Cmd::run(
         command => [ qw(git log -n 5) ],
         verbose => 1,
-	buffer => \$log_data
+        buffer => \$log_data
     )
     )
 {

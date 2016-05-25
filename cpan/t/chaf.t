@@ -56,7 +56,7 @@ G1 R5 [:start] ::= S
 EOS
 
 my $recce = Marpa::R3::Scanless::R->new(
-	{ grammar => $grammar, semantics_package => 'main' } );
+        { grammar => $grammar, semantics_package => 'main' } );
 
 $recce->read( \q{a} );
 

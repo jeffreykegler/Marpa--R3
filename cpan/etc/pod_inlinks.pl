@@ -24,16 +24,16 @@ sub find_header {
      my ($subtree) = @_;
      if (ref $subtree eq 'ARRAY') {
          if (substr($subtree->[0], 0, 4) eq 'head') {
-	    $headers{$subtree->[2]} = 1;
-	    # say $subtree->[2];
-	 }
+            $headers{$subtree->[2]} = 1;
+            # say $subtree->[2];
+         }
          if ($subtree->[0] eq 'L') {
-	     my $hash = $subtree->[1];
-	     return if not $hash->{type} eq 'pod';
-	     return if exists $hash->{to};
-	     return if not exists $hash->{section};
-	     push @section_ref, $hash->{section};
-	 }
+             my $hash = $subtree->[1];
+             return if not $hash->{type} eq 'pod';
+             return if exists $hash->{to};
+             return if not exists $hash->{section};
+             push @section_ref, $hash->{section};
+         }
        find_header($_) for @{$subtree};
      }
      return;

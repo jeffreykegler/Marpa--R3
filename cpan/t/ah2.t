@@ -66,7 +66,7 @@ G1 S3 'a'
 EOS
 
 Marpa::R3::Test::is( $grammar->show_isys,
-	<<'EOS', 'Aycock/Horspool ISYs' );
+        <<'EOS', 'Aycock/Horspool ISYs' );
 0: A
 1: A[], nulling
 2: S

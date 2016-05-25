@@ -38,16 +38,16 @@ sub find_header {
      my ($subtree, $pod_name) = @_;
      if (ref $subtree eq 'ARRAY') {
          if (substr($subtree->[0], 0, 4) eq 'head') {
-	    $headers{join ' ', $pod_name, $subtree->[2]} = 1;
-	    # say $subtree->[2];
-	 }
+            $headers{join ' ', $pod_name, $subtree->[2]} = 1;
+            # say $subtree->[2];
+         }
          if ($subtree->[0] eq 'L') {
-	     my $hash = $subtree->[1];
-	     return if not $hash->{type} eq 'pod';
-	     $to_name = $hash->{to} // $pod_name;
-	     return if not exists $hash->{section};
-	    $links{join ' ', $to_name, $hash->{section}} = $pod_name;
-	 }
+             my $hash = $subtree->[1];
+             return if not $hash->{type} eq 'pod';
+             $to_name = $hash->{to} // $pod_name;
+             return if not exists $hash->{section};
+            $links{join ' ', $to_name, $hash->{section}} = $pod_name;
+         }
        find_header($_, $pod_name) for @{$subtree};
      }
      return;
@@ -62,7 +62,7 @@ sub find_header {
 for my $link (keys %links) {
     if (not exists $headers{$link})
     {
-	my $pod_name = $links{$link};
+        my $pod_name = $links{$link};
         say "$pod_name unresolved link: $link"
     }
 }

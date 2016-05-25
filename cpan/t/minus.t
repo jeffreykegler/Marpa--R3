@@ -91,12 +91,12 @@ MinusMinus ::= Minus Minus action => minusminus
 Minus ~ '-'
 Number ~ [\d]+
 END_OF_DSL
-	}
+        }
 );
 
 my $recce = Marpa::R3::Scanless::R->new( {
-	grammar => $grammar,
-	semantics_package => 'main',
+        grammar => $grammar,
+        semantics_package => 'main',
 } );
 
 Marpa::R3::Test::is( $grammar->show_rules,

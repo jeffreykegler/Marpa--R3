@@ -27,7 +27,7 @@
 
 static lua_State *marpa_L = NULL;
 
-static SV* bool_ref	    (lua_State *, int);
+static SV* bool_ref            (lua_State *, int);
 static SV* luaval_to_perlsv  (lua_State *, int);
 
 static SV*
@@ -106,13 +106,13 @@ push_val (lua_State * L, SV * val)
     {
       // warn("%s %d\n", __FILE__, __LINE__);
       marpa_lua_pushfstring (marpa_L,
-			     "!!!Argument unsupported: Perl reference type (%s)",
-			     sv_reftype (SvRV (val), 0));
+                             "!!!Argument unsupported: Perl reference type (%s)",
+                             sv_reftype (SvRV (val), 0));
       return;
     }
       // warn("%s %d\n", __FILE__, __LINE__);
   marpa_lua_pushfstring (marpa_L, "!!!Argument unsupported: Perl type (%d)",
-			 SvTYPE (val));
+                         SvTYPE (val));
   return;
 }
 
