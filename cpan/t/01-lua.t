@@ -70,7 +70,8 @@ END_OF_SOURCE
 
 my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
 
-$recce->register_fn(q{print("I am registered!")});
+my $fn_key = $recce->register_fn(q{print("I am registered!")});
+$recce->exec($fn_key);
 
 my $input = '42 * 1 + 7';
 $recce->read( \$input );

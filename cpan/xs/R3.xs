@@ -6943,13 +6943,71 @@ PPCODE:
     {
       const char *error_string = marpa_lua_tostring (marpa_L, -1);
       marpa_lua_pop (marpa_L, 1);
-      croak ("Marpa::R3::Lua error in luaL_loadbuffer: %s", error_string);
+      croak ("Marpa::R3::SLR::register_fn -- error lua code: %s", error_string);
     }
   /* [ recce_table, function ] */
 
   function_ref = marpa_luaL_ref (marpa_L, time_object_registry);
   marpa_lua_pop(marpa_L, (marpa_lua_gettop(marpa_L) - time_object_registry) + 1);
   XPUSHs (sv_2mortal (newSViv (function_ref)));
+}
+
+void
+exec( slr, fn_key, ... )
+   Scanless_R *slr;
+   int fn_key;
+PPCODE:
+{
+  int i, status;
+  int top_after;
+  int recce_object;
+  int function_ref;
+  int function_stack_ix;
+
+  marpa_lua_rawgeti (marpa_L, LUA_REGISTRYINDEX, slr->lua_ref);
+  /* Lua stack: [ recce_table ] */
+  recce_object = marpa_lua_gettop (marpa_L);
+  marpa_lua_rawgeti (marpa_L, recce_object, fn_key);
+  /* [ recce_table, function ] */
+
+  function_stack_ix = marpa_lua_gettop (marpa_L);
+
+  // warn ("%s %d\n", __FILE__, __LINE__);
+  /* push arguments */
+  for (i = 2; i < items; i++)
+    {
+      warn ("%s %d: pushing Perl arg %d\n", __FILE__, __LINE__, i);
+      SV *arg_sv = ST (i);
+      if (!SvOK (arg_sv))
+        {
+          croak ("Marpa::R3::Lua::exec arg %d is not an SV", i);
+        }
+      MARPA_SV_SV (marpa_L, arg_sv);
+      // warn ("%s %d\n", __FILE__, __LINE__);
+    }
+
+  status = marpa_lua_pcall (marpa_L, items - 2, LUA_MULTRET, 0);
+  if (status != 0)
+    {
+      const char *error_string = marpa_lua_tostring (marpa_L, -1);
+      marpa_lua_pop (marpa_L, 1);
+      croak ("Marpa::R3::Lua error in pcall: %s", error_string);
+    }
+
+  /* return args to caller */
+  top_after = marpa_lua_gettop (marpa_L);
+  // warn ("top after pcall = %d", top_after);
+  for (i = function_stack_ix + 1; i <= top_after; i++)
+    {
+      // warn ("%s %d\n", __FILE__, __LINE__);
+      SV *sv_result = coerce_to_sv (marpa_L, i);
+      // warn ("%s %d\n", __FILE__, __LINE__);
+      /* Took ownership of sv_result, we now need to mortalize it */
+      XPUSHs (sv_2mortal (sv_result));
+      // warn ("%s %d\n", __FILE__, __LINE__);
+    }
+  marpa_lua_settop (marpa_L, recce_object - 1);
+  // warn ("%s %d\n", __FILE__, __LINE__);
 }
 
 MODULE = Marpa::R3            PACKAGE = Marpa::R3::Lua
