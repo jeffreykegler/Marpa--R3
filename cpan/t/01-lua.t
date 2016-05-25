@@ -70,8 +70,14 @@ END_OF_SOURCE
 
 my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
 
-my $fn_key = $recce->register_fn(q{print("I am registered!")});
-$recce->exec($fn_key);
+for my $test (@tests1, @tests2) {
+    my ($code, $args, $expected, $test_name) = @{$test};
+    $test_name //= qq{"$code"};
+    $test_name = "Recce: $test_name";
+    my $fn_key = $recce->register_fn($code);
+    my @actual = $recce->exec($fn_key, @{$args});
+    Test::More::is_deeply( \@actual, $expected, $test_name);
+}
 
 my $input = '42 * 1 + 7';
 $recce->read( \$input );
