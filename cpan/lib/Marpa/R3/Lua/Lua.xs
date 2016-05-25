@@ -152,7 +152,7 @@ PPCODE:
       // warn("%s %d\n", __FILE__, __LINE__);
   }
 
-  status = luaL_loadbuffer (marpa_L, codestr, strlen (codestr), codestr);
+  status = marpa_luaL_loadbuffer (marpa_L, codestr, strlen (codestr), codestr);
   if (status != 0)
     {
       const char *error_string = marpa_lua_tostring (marpa_L, -1);
