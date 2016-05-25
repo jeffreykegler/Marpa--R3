@@ -1834,6 +1834,14 @@ sub Marpa::R3::Scanless::R::lexeme_priority_set {
     return $thin_slr->lexeme_priority_set( $lexeme_id, $new_priority );
 }
 
+# Lua method(s), not documented at this stage of their development
+
+sub Marpa::R3::Scanless::R::register_fn {
+    my ( $slr, $codestr ) = @_;
+    my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
+    return $thin_slr->register_fn($codestr);
+}
+
 # Internal methods, not to be documented
 
 # not to be documented

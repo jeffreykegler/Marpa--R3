@@ -10,9 +10,6 @@
 # or implied warranties. For details, see the full text of
 # of the licenses in the directory LICENSES.
 
-# CENSUS: ASIS
-# Note: Converted from debug_leo.t
-
 use 5.010001;
 use strict;
 use warnings;

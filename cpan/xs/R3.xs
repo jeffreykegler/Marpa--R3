@@ -2501,8 +2501,11 @@ static int marpa_sv_finalize (lua_State* L) {
 static SV** marpa_av_fetch(lua_State* L, SV* table, lua_Integer key) {
      AV* av;
      SV* sv;
-     if ( !SvROK(table) || SvTYPE(SvRV(table)) != SVt_PVAV) {
-        croak ("Attempt to index an SV which is not an AV ref");
+     if ( !SvROK(table) ) {
+        croak ("Attempt to fetch from an SV which is not a ref");
+     }
+     if ( SvTYPE(SvRV(table)) != SVt_PVAV) {
+        croak ("Attempt to fetch from an SV which is not an AV ref");
      }
      av = (AV*)SvRV(table);
      return av_fetch(av, key, 0);
@@ -2527,7 +2530,10 @@ static int marpa_av_fetch_meth(lua_State* L) {
 
 static void marpa_av_store(lua_State* L, SV* table, lua_Integer key, SV*value) {
      AV* av;
-     if ( !SvROK(table) || SvTYPE(SvRV(table)) != SVt_PVAV) {
+     if ( !SvROK(table) ) {
+        croak ("Attempt to index an SV which is not ref");
+     }
+     if ( SvTYPE(SvRV(table)) != SVt_PVAV) {
         croak ("Attempt to index an SV which is not an AV ref");
      }
      av = (AV*)SvRV(table);
@@ -6918,10 +6924,38 @@ PPCODE:
   XPUSHs (sv_2mortal (SvREFCNT_inc_simple_NN (*p_token_value_sv)));
 }
 
+void
+register_fn(slr, codestr)
+    Scanless_R *slr;
+    char* codestr;
+PPCODE:
+{
+  int status;
+  int time_object_registry;
+  int function_ref;
+
+  marpa_lua_rawgeti (marpa_L, LUA_REGISTRYINDEX, slr->lua_ref);
+  /* Lua stack: [ recce_table ] */
+  time_object_registry = marpa_lua_gettop (marpa_L);
+
+  status = marpa_luaL_loadbuffer (marpa_L, codestr, strlen (codestr), codestr);
+  if (status != 0)
+    {
+      const char *error_string = marpa_lua_tostring (marpa_L, -1);
+      marpa_lua_pop (marpa_L, 1);
+      croak ("Marpa::R3::Lua error in luaL_loadbuffer: %s", error_string);
+    }
+  /* [ recce_table, function ] */
+
+  function_ref = marpa_luaL_ref (marpa_L, time_object_registry);
+  marpa_lua_pop(marpa_L, (marpa_lua_gettop(marpa_L) - time_object_registry) + 1);
+  XPUSHs (sv_2mortal (newSViv (function_ref)));
+}
+
 MODULE = Marpa::R3            PACKAGE = Marpa::R3::Lua
 
 void
-coerce_exec( codestr, ... )
+raw_exec( codestr, ... )
    char* codestr;
 PPCODE:
 {

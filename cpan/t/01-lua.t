@@ -16,7 +16,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-use Test::More tests => 13;
+use Test::More tests => 16;
 use English qw( -no_match_vars );
 use lib 'inc';
 use Marpa::R3::Test;
@@ -35,12 +35,14 @@ my @tests1 = (
 for my $test (@tests1) {
     my ($code, $args, $expected, $test_name) = @{$test};
     $test_name //= qq{"$code"};
-    my @actual = Marpa::R3::Lua::coerce_exec($code, @{$args});
+    my @actual = Marpa::R3::Lua::raw_exec($code, @{$args});
     Test::More::is_deeply( \@actual, $expected, $test_name);
 }
 
 my @tests2 = (
    ["local x = ...; x[0] = 42; return x", [[]], [[42]]],
+   ["local x = ...; local tmp = x[1]; x[1] = x[0]; x[0] = tmp; return x", [[42, 7]], [[7, 42]], "Swap array elements #1"],
+   ["local x = ...;  x[1], x[0] = x[0], x[1]; return x", [[42, 7]], [[7, 42]], "Swap array elements #2"],
 );
 
 for my $test (@tests1, @tests2) {
@@ -49,6 +51,33 @@ for my $test (@tests1, @tests2) {
     my @actual = Marpa::R3::Lua::exec($code, @{$args});
     Test::More::is_deeply( \@actual, $expected, $test_name);
 }
-Marpa::R3::Lua::coerce_exec("collectgarbage()");
+Marpa::R3::Lua::raw_exec("collectgarbage()");
+
+my $grammar = Marpa::R3::Scanless::G->new(
+    {   
+        source          => \(<<'END_OF_SOURCE'),
+Expression ::=
+      Number action => ::first
+   || Expression '*' Expression action => main::do_multiply
+   || Expression '+' Expression action => main::do_add
+
+Number ~ [\d]+
+:discard ~ whitespace
+whitespace ~ [\s]+
+END_OF_SOURCE
+    }
+);
+
+my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
+
+$recce->register_fn(q{print("I am registered!")});
+
+my $input = '42 * 1 + 7';
+$recce->read( \$input );
+my $value_ref = $recce->value();
+Marpa::R3::Test::is( ${$value_ref}, 49, 'Synopsis value test' );
+
+sub do_add       { return $_[1]->[0] + $_[1]->[2] }
+sub do_multiply  { return $_[1]->[0] * $_[1]->[2] }
 
 # vim: expandtab shiftwidth=4:
