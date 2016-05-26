@@ -3534,8 +3534,6 @@ PPCODE:
   v_wrapper->base = t_wrapper->base;
   v_wrapper->v = v;
   v_wrapper->event_queue = newAV ();
-  v_wrapper->token_values = newAV ();
-  av_fill(v_wrapper->token_values , TOKEN_VALUE_IS_LITERAL);
   v_wrapper->stack = NULL;
   v_wrapper->mode = MARPA_XS_V_MODE_IS_INITIAL;
   v_wrapper->result = 0;
@@ -3573,7 +3571,6 @@ PPCODE:
     {
       SvREFCNT_dec (v_wrapper->stack);
     }
-  SvREFCNT_dec (v_wrapper->token_values);
   marpa_v_unref (v);
   Safefree (v_wrapper);
 }
@@ -3610,13 +3607,6 @@ PPCODE:
     }
   SvREFCNT_inc (slr);
   v_wrapper->slr = slr;
-
-  # Throw away the current token values hash
-  SvREFCNT_dec (v_wrapper->token_values);
-
-  # Take a reference to the one in the SLR
-  v_wrapper->token_values = slr->token_values;
-  SvREFCNT_inc (v_wrapper->token_values);
 }
 
 void

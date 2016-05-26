@@ -437,7 +437,6 @@ typedef struct
   SV *base_sv;
   G_Wrapper *base;
   AV *event_queue;
-  AV *token_values;
   AV *stack;
   IV trace_values;
   int mode;                     /* 'raw' or 'stack' */
