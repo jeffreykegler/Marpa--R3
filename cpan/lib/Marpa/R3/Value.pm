@@ -1341,11 +1341,10 @@ sub Marpa::R3::Scanless::R::value {
     my $semantics_arg0 = $per_parse_arg // {};
 
     my $value = Marpa::R3::Thin::V->new($tree);
-    $value->slr_set( $slr->thin() );
+    $value->stack_mode_set( $slr->thin() );
     local $Marpa::R3::Internal::Context::VALUATOR = $value;
     value_trace( $value, $trace_values ? 1 : 0 );
     $value->trace_values($trace_values);
-    $value->stack_mode_set();
 
     my $null_values = $slr->[Marpa::R3::Internal::Scanless::R::NULL_VALUES];
     my $nulling_closures =

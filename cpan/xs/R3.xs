@@ -846,21 +846,6 @@ u_substring (Scanless_R * slr, const char *name, int start_pos_arg,
 
 /* Static valuator methods */
 
-/* Return -1 on failure due to wrong mode */
-static IV
-v_create_stack(V_Wrapper* v_wrapper)
-{
-  dTHX;
-  if (v_wrapper->mode == MARPA_XS_V_MODE_IS_RAW)
-    {
-      return -1;
-    }
-  v_wrapper->stack = newAV ();
-  av_extend (v_wrapper->stack, 1023);
-  v_wrapper->mode = MARPA_XS_V_MODE_IS_STACK;
-  return 0;
-}
-
 static void slr_es_to_span (Scanless_R * slr, Marpa_Earley_Set_ID earley_set,
                            int *p_start, int *p_length);
 static void
@@ -3690,8 +3675,9 @@ PPCODE:
 }
 
 void
-stack_mode_set( v_wrapper )
+stack_mode_set( v_wrapper, slr )
     V_Wrapper *v_wrapper;
+    Scanless_R *slr;
 PPCODE:
 {
   Marpa_Grammar g = v_wrapper->base->g;
@@ -3702,11 +3688,13 @@ PPCODE:
           croak ("Problem in v->stack_mode_set(): Cannot re-set stack mode");
         }
     }
-  if (v_create_stack (v_wrapper) == -1)
-    {
-      croak ("Problem in v->stack_mode_set(): Could not create stack");
-    }
 
+  SvREFCNT_inc (slr);
+  v_wrapper->slr = slr;
+
+  v_wrapper->stack = newAV ();
+  av_extend (v_wrapper->stack, 1023);
+  v_wrapper->mode = MARPA_XS_V_MODE_IS_STACK;
 
   {
     int ix;
