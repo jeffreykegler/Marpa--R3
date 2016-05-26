@@ -2503,8 +2503,9 @@ static int marpa_xlua_tonumber (lua_State* L, int idx, int* pisnum) {
     dTHX;
     void* ud;
     int pisnum2;
+    int n;
     if (pisnum) *pisnum = 1;
-    int n = marpa_lua_tonumberx(L, idx, &pisnum2);
+    n = marpa_lua_tonumberx(L, idx, &pisnum2);
     if (pisnum2) return n;
     ud = marpa_luaL_testudata(L, idx, MT_NAME_SV);
     if (!ud) {
