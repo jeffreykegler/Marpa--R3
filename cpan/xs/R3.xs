@@ -2316,6 +2316,7 @@ static lua_State *marpa_L = NULL;
 static SV*
 coerce_to_sv (lua_State * L, int idx)
 {
+  dTHX;
   SV *result;
   const int type = marpa_lua_type (L, idx);
 
@@ -2382,6 +2383,7 @@ coerce_to_sv (lua_State * L, int idx)
 static void
 push_val (lua_State * L, SV * val)
 {
+  dTHX;
   if (SvTYPE (val) == SVt_NULL)
     {
       // warn("%s %d\n", __FILE__, __LINE__);
@@ -2479,6 +2481,7 @@ static void marpa_sv_sv_noinc (lua_State* L, SV* sv) {
     (marpa_sv_sv_noinc((L), (sv)), SvREFCNT_inc_simple_void_NN (sv))
 
 static int marpa_sv_nil (lua_State* L) {
+    dTHX;
     /* [] */
     marpa_sv_sv_noinc( L, newSV(0) );
     /* [sv_userdata] */
@@ -2486,6 +2489,7 @@ static int marpa_sv_nil (lua_State* L) {
 }
 
 static int marpa_sv_finalize_meth (lua_State* L) {
+    dTHX;
     SV** p_sv = (SV**)marpa_luaL_checkudata(L, 1, MT_NAME_SV);
     SV* sv = *p_sv;
     // warn("decrementing ud %p, SV %p, %s %d\n", p_sv, sv, __FILE__, __LINE__);
@@ -2499,8 +2503,9 @@ static int marpa_xlua_tonumber (lua_State* L, int idx, int* pisnum) {
     dTHX;
     void* ud;
     int pisnum2;
+    int n;
     if (pisnum) *pisnum = 1;
-    int n = marpa_lua_tonumberx(L, idx, &pisnum2);
+    n = marpa_lua_tonumberx(L, idx, &pisnum2);
     if (pisnum2) return n;
     ud = marpa_luaL_testudata(L, idx, MT_NAME_SV);
     if (!ud) {
@@ -2523,6 +2528,7 @@ static int marpa_sv_add_meth (lua_State* L) {
  * Will return 0, if there is no SV at that index.
  */
 static SV** marpa_av_fetch(lua_State* L, SV* table, lua_Integer key) {
+     dTHX;
      AV* av;
      SV* sv;
      if ( !SvROK(table) ) {
@@ -2553,6 +2559,7 @@ static int marpa_av_fetch_meth(lua_State* L) {
 }
 
 static void marpa_av_store(lua_State* L, SV* table, lua_Integer key, SV*value) {
+     dTHX;
      AV* av;
      if ( !SvROK(table) ) {
         croak ("Attempt to index an SV which is not ref");
