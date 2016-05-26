@@ -14,7 +14,6 @@
 
 # Permanent
 
-
 # LC_ALL=C sort
 /[.]gdb_history$
 /errs$
@@ -33,6 +32,7 @@
 ^MANIFEST[.]SKIP$
 ^MYMETA.
 ^Makefile$
+^Makefile[.]old$
 ^Marpa-R3-[0-9]+[.][0-9]{3}_[0-9]{3}/
 ^Marpa-R3-[0-9]+[.][0-9]{6}/
 ^R3[.]bs$
