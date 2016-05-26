@@ -361,7 +361,7 @@ WriteMakefile(
     CONFIGURE_REQUIRES => \%configure_requires,
     PM                 => \%pm_files,
     MIN_PERL_VERSION => '5.10.1',
-    DIR => [qw(engine lua xs)],
+    DIR => [qw(engine xs)],
     META_ADD => {
         no_index => {
             directory => [
