@@ -2480,6 +2480,25 @@ static void marpa_sv_sv_noinc (lua_State* L, SV* sv) {
 #define MARPA_SV_SV(L, sv) \
     (marpa_sv_sv_noinc((L), (sv)), SvREFCNT_inc_simple_void_NN (sv))
 
+/* Creates a userdata containing a reference to a Perl AV, and
+ * leaves the new userdata on top of the stack.
+ * The new Lua userdata takes ownership of one reference count.
+ * The caller must have a reference count whose ownership
+ * the caller is prepared to transfer to the Lua userdata.
+ */
+static void marpa_sv_av_noinc (lua_State* L, AV* av) {
+    SV* av_ref = newRV_noinc((SV*)av);
+    SV** p_sv = (SV**)marpa_lua_newuserdata(L, sizeof(SV*));
+    *p_sv = av_ref;
+    // warn("new ud %p, SV %p %s %d\n", p_sv, av_ref, __FILE__, __LINE__);
+    marpa_luaL_getmetatable(L, MT_NAME_SV);
+    marpa_lua_setmetatable(L, -2);
+    /* [sv_userdata] */
+}
+
+#define MARPA_SV_AV(L, av) \
+    (SvREFCNT_inc_simple_void_NN (av), marpa_sv_av_noinc((L), (av)))
+
 static int marpa_sv_nil (lua_State* L) {
     dTHX;
     /* [] */
