@@ -1139,7 +1139,7 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
                       break;
                     }
                   /* If token value is NOT literal */
-                  p_token_value_sv = av_fetch (v_wrapper->token_values, (I32) token_ix, 0);
+                  p_token_value_sv = av_fetch (slr->token_values, (I32) token_ix, 0);
                   if (p_token_value_sv)
                     {
                       av_push (values_av,
@@ -1421,7 +1421,7 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
               }
 
 
-            p_token_value_sv = av_fetch (v_wrapper->token_values, (I32) token_ix, 0);
+            p_token_value_sv = av_fetch (slr->token_values, (I32) token_ix, 0);
             if (p_token_value_sv)
               {
                 SV *token_value_sv = newSVsv (*p_token_value_sv);
