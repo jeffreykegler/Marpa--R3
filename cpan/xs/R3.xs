@@ -3599,26 +3599,6 @@ PPCODE:
 }
 
 void
-token_value_set( v_wrapper, token_ix, token_value )
-    V_Wrapper *v_wrapper;
-    int token_ix;
-    SV* token_value;
-PPCODE:
-{
-  if (token_ix <= TOKEN_VALUE_IS_LITERAL)
-    {
-      croak
-        ("Problem in v->token_value_set(): token_value cannot be set for index %ld",
-         (long) token_ix);
-    }
-  SvREFCNT_inc (token_value);
-  if (!av_store (v_wrapper->token_values, (I32)token_ix, token_value))
-  {
-    SvREFCNT_dec (token_value);
-  }
-}
-
-void
 slr_set( v_wrapper, slr )
     V_Wrapper *v_wrapper;
     Scanless_R *slr;
