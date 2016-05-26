@@ -23,17 +23,16 @@ use Marpa::R3::Test;
 use Marpa::R3;
 
 my $salve = ' return [[salve, munde!]], ...';
-my @tests1 = (
-   [$salve, [], ['salve, munde!'], 'Salve, 0 args'],
-   [$salve, [qw{hi}], ['salve, munde!', 'hi'], 'Salve, 1 arg'],
-   [$salve, [qw{hi hi2}], ['salve, munde!', qw(hi hi2)], 'Salve, 2 args'],
-   ['return 42', [], ['42']],
-   ['function taxicurry(fact2) return 9^3 + fact2 end', [], []],
-   ['return taxicurry(10^3)', [], [1729]],
-);
 
-for my $test (@tests1) {
-    my ($code, $args, $expected, $test_name) = @{$test};
+do_raw_test($salve, [], ['salve, munde!'], 'Salve, 0 args');
+do_raw_test($salve, [qw{hi}], ['salve, munde!', 'hi'], 'Salve, 1 arg');
+do_raw_test($salve, [qw{hi hi2}], ['salve, munde!', qw(hi hi2)], 'Salve, 2 args');
+do_raw_test('return 42', [], ['42']);
+do_raw_test('function taxicurry(fact2) return 9^3 + fact2 end', [], []);
+do_raw_test('return taxicurry(10^3)', [], [1729]);
+
+sub do_raw_test {
+    my ($code, $args, $expected, $test_name) = @_;
     $test_name //= qq{"$code"};
     my @actual = Marpa::R3::Lua::raw_exec($code, @{$args});
     Test::More::is_deeply( \@actual, $expected, $test_name);
@@ -89,13 +88,8 @@ sub do_recce_test {
     my ($code, $args, $expected, $test_name) = @_;
     $test_name //= qq{"$code"};
     $test_name = "Recce: $test_name";
-    say STDERR "=== ", $test_name;
-    say STDERR join ' ', "=== expected =", Data::Dumper::Dumper($expected);
     my $fn_key = $recce->register_fn($code);
-    say STDERR join ' ', "=== args =", Data::Dumper::Dumper($args);
     my @actual = $recce->exec($fn_key, @{$args});
-    say STDERR join ' ', "=== actual =", Data::Dumper::Dumper(\@actual);
-    say STDERR join ' ', "=== expected =", Data::Dumper::Dumper($expected);
     Test::More::is_deeply( \@actual, $expected, $test_name);
 }
 Marpa::R3::Lua::raw_exec("collectgarbage()");

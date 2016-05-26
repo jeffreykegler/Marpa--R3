@@ -2576,11 +2576,38 @@ static int marpa_av_store_meth(lua_State* L) {
     return 0;
 }
 
+static void
+marpa_av_fill (lua_State * L, SV * sv, int x)
+{
+  dTHX;
+  AV *av;
+  SV **p_sv = (SV **) marpa_lua_newuserdata (L, sizeof (SV *));
+  *p_sv = sv;
+  if (!SvROK (sv))
+    {
+      croak ("Attempt to fetch from an SV which is not a ref");
+    }
+  if (SvTYPE (SvRV (sv)) != SVt_PVAV)
+    {
+      croak ("Attempt to fill an SV which is not an AV ref");
+    }
+  av = (AV *) SvRV (sv);
+  av_fill (av, x);
+}
+
+static int marpa_av_fill_meth (lua_State* L) {
+    SV** p_table_sv = (SV**)marpa_luaL_checkudata(L, 1, MT_NAME_SV);
+    lua_Integer index = marpa_luaL_checkinteger(L, 2);
+    marpa_av_fill(L, *p_table_sv, index);
+    return 0;
+}
+
 static const struct luaL_Reg marpa_sv_meths[] = {
     {"__add", marpa_sv_add_meth},
     {"__gc", marpa_sv_finalize_meth},
     {"__index", marpa_av_fetch_meth},
     {"__newindex", marpa_av_store_meth},
+    {"fill", marpa_av_fill_meth},
     {NULL, NULL},
 };
 
@@ -6997,19 +7024,19 @@ PPCODE:
 
   function_stack_ix = marpa_lua_gettop (marpa_L);
 
-  warn ("function_stack_ix=%d %s %d\n", function_stack_ix, __FILE__, __LINE__);
-  warn ("items=%d %s %d\n", items, __FILE__, __LINE__);
+  // warn ("function_stack_ix=%d %s %d\n", function_stack_ix, __FILE__, __LINE__);
+  // warn ("items=%d %s %d\n", items, __FILE__, __LINE__);
   /* push arguments */
   for (i = 2; i < items; i++)
     {
-      warn ("%s %d: pushing Perl arg %d\n", __FILE__, __LINE__, i);
+      // warn ("%s %d: pushing Perl arg %d\n", __FILE__, __LINE__, i);
       SV *arg_sv = ST (i);
       if (!SvOK (arg_sv))
         {
           croak ("Marpa::R3::Lua::exec arg %d is not an SV", i);
         }
       MARPA_SV_SV (marpa_L, arg_sv);
-      warn ("%s %d\n", __FILE__, __LINE__);
+      // warn ("%s %d\n", __FILE__, __LINE__);
     }
 
   status = marpa_lua_pcall (marpa_L, items - 2, LUA_MULTRET, 0);
@@ -7022,18 +7049,18 @@ PPCODE:
 
   /* return args to caller */
   top_after = marpa_lua_gettop (marpa_L);
-  warn ("top after pcall = %d", top_after);
+  // warn ("top after pcall = %d", top_after);
   for (i = function_stack_ix; i <= top_after; i++)
     {
-      warn ("%s %d\n", __FILE__, __LINE__);
+      // warn ("%s %d\n", __FILE__, __LINE__);
       SV *sv_result = coerce_to_sv (marpa_L, i);
-      warn ("%s %d\n", __FILE__, __LINE__);
+      // warn ("%s %d\n", __FILE__, __LINE__);
       /* Took ownership of sv_result, we now need to mortalize it */
       XPUSHs (sv_2mortal (sv_result));
-      warn ("%s %d\n", __FILE__, __LINE__);
+      // warn ("%s %d\n", __FILE__, __LINE__);
     }
   marpa_lua_settop (marpa_L, recce_object - 1);
-  warn ("%s %d\n", __FILE__, __LINE__);
+  // warn ("%s %d\n", __FILE__, __LINE__);
 }
 
 MODULE = Marpa::R3            PACKAGE = Marpa::R3::Lua
@@ -7115,7 +7142,7 @@ PPCODE:
   /* push arguments */
   for (i = 1; i < items; i++)
     {
-      warn ("%s %d: pushing Perl arg %d\n", __FILE__, __LINE__, i);
+      // warn ("%s %d: pushing Perl arg %d\n", __FILE__, __LINE__, i);
       SV *arg_sv = ST (i);
       if (!SvOK (arg_sv))
         {
