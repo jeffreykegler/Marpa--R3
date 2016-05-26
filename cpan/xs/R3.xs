@@ -2305,7 +2305,7 @@ slr_es_span_to_literal_sv (Scanless_R * slr,
 
 static lua_State *marpa_L = NULL;
 
-#define MT_NAME_SV "Marpa.sv"
+#define MT_NAME_SV "Marpa_sv"
 
 /* Coerce a Lua value to a Perl SV, if necessary one that
  * is simply a string with an error message.
@@ -2469,7 +2469,7 @@ char* string;
 static void marpa_sv_sv_noinc (lua_State* L, SV* sv) {
     SV** p_sv = (SV**)marpa_lua_newuserdata(L, sizeof(SV*));
     *p_sv = sv;
-    warn("new ud %p, SV %p %s %d\n", p_sv, sv, __FILE__, __LINE__);
+    // warn("new ud %p, SV %p %s %d\n", p_sv, sv, __FILE__, __LINE__);
     marpa_luaL_getmetatable(L, MT_NAME_SV);
     marpa_lua_setmetatable(L, -2);
     /* [sv_userdata] */
@@ -2488,7 +2488,7 @@ static int marpa_sv_nil (lua_State* L) {
 static int marpa_sv_finalize_meth (lua_State* L) {
     SV** p_sv = (SV**)marpa_luaL_checkudata(L, 1, MT_NAME_SV);
     SV* sv = *p_sv;
-    warn("decrementing ud %p, SV %p, %s %d\n", p_sv, sv, __FILE__, __LINE__);
+    // warn("decrementing ud %p, SV %p, %s %d\n", p_sv, sv, __FILE__, __LINE__);
     SvREFCNT_dec (sv);
     return 0;
 }
@@ -2582,23 +2582,32 @@ marpa_av_fill (lua_State * L, SV * sv, int x)
   dTHX;
   AV *av;
   SV **p_sv = (SV **) marpa_lua_newuserdata (L, sizeof (SV *));
+     // warn("%s %d\n", __FILE__, __LINE__);
   *p_sv = sv;
+     // warn("%s %d\n", __FILE__, __LINE__);
   if (!SvROK (sv))
     {
       croak ("Attempt to fetch from an SV which is not a ref");
     }
+     // warn("%s %d\n", __FILE__, __LINE__);
   if (SvTYPE (SvRV (sv)) != SVt_PVAV)
     {
       croak ("Attempt to fill an SV which is not an AV ref");
     }
+     // warn("%s %d\n", __FILE__, __LINE__);
   av = (AV *) SvRV (sv);
+     // warn("%s %d about to call av_file(..., %d)\n", __FILE__, __LINE__, x);
   av_fill (av, x);
+     // warn("%s %d\n", __FILE__, __LINE__);
 }
 
 static int marpa_av_fill_meth (lua_State* L) {
     SV** p_table_sv = (SV**)marpa_luaL_checkudata(L, 1, MT_NAME_SV);
+    // warn("%s %d\n", __FILE__, __LINE__);
     lua_Integer index = marpa_luaL_checkinteger(L, 2);
+    // warn("%s %d\n", __FILE__, __LINE__);
     marpa_av_fill(L, *p_table_sv, index);
+    // warn("%s %d\n", __FILE__, __LINE__);
     return 0;
 }
 
@@ -2607,28 +2616,34 @@ static const struct luaL_Reg marpa_sv_meths[] = {
     {"__gc", marpa_sv_finalize_meth},
     {"__index", marpa_av_fetch_meth},
     {"__newindex", marpa_av_store_meth},
-    {"fill", marpa_av_fill_meth},
     {NULL, NULL},
 };
 
 static const struct luaL_Reg marpa_sv_funcs[] = {
+    {"fill", marpa_av_fill_meth},
     {"nil", marpa_sv_nil},
     {NULL, NULL},
 };
 
+/* Leaves the metatable on top of the stack */
 static int marpa_luaopen_sv (lua_State* L) {
     /* create metatable */
     marpa_luaL_newmetatable(L, MT_NAME_SV);
+    /* Lua stack: [mt] */
 
     /* metatable.__index = metatable */
     marpa_lua_pushvalue(L, -1);
     marpa_lua_setfield(L, -2, "__index");
+    /* Lua stack: [mt] */
 
     /* register methods */
     marpa_luaL_setfuncs(L, marpa_sv_meths, 0);
+    /* Lua stack: [mt] */
 
     /* register new function */
     marpa_luaL_newlib(L, marpa_sv_funcs);
+
+    /* Lua stack: [mt] */
     return 1;
 }
 
@@ -7044,7 +7059,7 @@ PPCODE:
     {
       const char *error_string = marpa_lua_tostring (marpa_L, -1);
       marpa_lua_pop (marpa_L, 1);
-      croak ("Marpa::R3::Lua error in pcall: %s", error_string);
+      croak ("Marpa::R3 Lua code error: %s", error_string);
     }
 
   /* return args to caller */
@@ -7194,5 +7209,8 @@ BOOT:
        }
     marpa_luaL_openlibs(marpa_L);  /* open libraries */
     marpa_luaopen_sv(marpa_L);  /* open Perl SV library */
+    /* Lua stack: [ sv_table ] */
+    marpa_lua_setglobal(marpa_L, MT_NAME_SV);
+    /* Lua stack: empty */
 
     /* vim: set expandtab shiftwidth=2: */

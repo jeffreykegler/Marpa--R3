@@ -16,7 +16,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-use Test::More tests => 25;
+use Test::More tests => 28;
 use English qw( -no_match_vars );
 use lib 'inc';
 use Marpa::R3::Test;
@@ -82,7 +82,10 @@ do_recce_test('function taxicurry(fact2) return 9^3 + fact2 end', [], []);
 do_recce_test('return taxicurry(10^3)', [], [1729]);
 do_recce_test("local x = ...; x[0] = 42; return x", [[]], [[42]]);
 do_recce_test("local x = ...; local tmp = x[1]; x[1] = x[0]; x[0] = tmp; return x", [[42, 7]], [[7, 42]], "Swap array elements #1");
-do_recce_test("local y = ...; y[1], y[0] = y[0], y[1]; return y", [[42, 7]], [[7, 42]], "Swap array elements #2");
+do_recce_test("local x = ...; x[1], x[0] = x[0], x[1]; return x", [[42, 7]], [[7, 42]], "Swap array elements #2");
+do_recce_test("local x = ...; Marpa_sv.fill(x, 1); return x", [[1, 2, 3, 4]], [[1, 2]], "Fill method #1");
+do_recce_test("local x = ...; Marpa_sv.fill(x, 4); return x", [[1, 2, 3, 4]], [[1, 2, 3, 4, undef]], "Fill method #2");
+do_recce_test("local x = ...; Marpa_sv.fill(x, -1); return x", [[1, 2, 3, 4]], [[]], "Fill method #2");
 
 sub do_recce_test {
     my ($code, $args, $expected, $test_name) = @_;
