@@ -3549,9 +3549,24 @@ PPCODE:
   SvREFCNT_dec (v_wrapper->rule_semantics);
   SvREFCNT_dec (v_wrapper->token_semantics);
   SvREFCNT_dec (v_wrapper->nulling_semantics);
+
+  /* These are "weak" cross-references, weak
+   * meaning that the reference counts are not
+   * incremented.  The destructors set both pointers
+   * to null, and callers must check that
+   * for NULL before dereferencing.
+   *
+   * This is necessary because at startup, an SLR will
+   * not yet have a valuator, and a valuator can be "thin"
+   * and never have an SLR.  For the thin valuators to be
+   * independent is useful for the tracing and debugging
+   * methods.
+   */
   if (v_wrapper->slr) {
-    SvREFCNT_dec (v_wrapper->slr);
+      slr->v_wrapper = NULL;
+      v_wrapper->slr = NULL;
   }
+
   if (v_wrapper->stack)
     {
       SvREFCNT_dec (v_wrapper->stack);
@@ -3669,14 +3684,14 @@ PPCODE:
   Marpa_Grammar g = v_wrapper->base->g;
   if (v_wrapper->mode != MARPA_XS_V_MODE_IS_INITIAL)
     {
-      if (v_wrapper->stack)
-        {
-          croak ("Problem in v->stack_mode_set(): Cannot re-set stack mode");
-        }
+        croak ("Problem in v->stack_mode_set(): Cannot re-set stack mode");
     }
+  if (slr->v_wrapper) {
+        croak ("SLR already has active valuator");
+  }
 
-  SvREFCNT_inc (slr);
   v_wrapper->slr = slr;
+  slr->v_wrapper = v_wrapper;
 
   v_wrapper->stack = newAV ();
   av_extend (v_wrapper->stack, 1023);
@@ -5647,6 +5662,7 @@ PPCODE:
   slr->end_pos = 0;
   slr->too_many_earley_items = -1;
   slr->lua_ref = xlua_time_ref();
+  slr->v_wrapper = NULL;
 
   slr->gift = marpa__slr_new();
 
@@ -5681,6 +5697,16 @@ PPCODE:
       SvREFCNT_dec ((SV *) slr->token_values);
     }
   SvREFCNT_dec (slr->input);
+  {
+     /* "Weak" cross-references
+      * See Thin::V destructor.
+      */
+     V_Wrapper* vw = slr->v_wrapper;
+     if (vw) {
+       vw->slr = NULL;
+       slr->v_wrapper = NULL;
+     }
+  }
   Safefree (slr);
 }
 
