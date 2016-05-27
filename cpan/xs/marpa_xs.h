@@ -347,6 +347,8 @@ typedef struct
   struct l0_rule_g_properties *l0_rule_g_properties;
 } Scanless_G;
 
+struct v_wrapper_s;
+
 typedef struct
 {
   SV *slg_sv;
@@ -402,6 +404,11 @@ typedef struct
   /* Lua "reference" to this object */
   int lua_ref;
 
+  /* A "weak" reference to the v_wrapper.
+   * See the explanation under the v_wrapper destructor
+   */
+  struct v_wrapper_s* v_wrapper;
+
   /* A "Gift" because it is something that is "wrapped". */
   Marpa_SLR gift;
 
@@ -431,7 +438,7 @@ typedef struct {
      G_Wrapper* base;
 } T_Wrapper;
 
-typedef struct
+struct v_wrapper_s
 {
   Marpa_Value v;
   SV *base_sv;
@@ -446,5 +453,6 @@ typedef struct
   AV *token_semantics;
   AV *nulling_semantics;
   Scanless_R* slr;
-} V_Wrapper;
+};
+typedef struct v_wrapper_s V_Wrapper;
 
