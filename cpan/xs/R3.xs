@@ -3962,57 +3962,57 @@ PPCODE:
   if (v_wrapper->mode != MARPA_XS_V_MODE_IS_STACK)
     {
       croak
-	("Problem in v->stack_step(): Cannot call unless valuator is in 'stack' mode");
+        ("Problem in v->stack_step(): Cannot call unless valuator is in 'stack' mode");
     }
 
   while (1)
     {
       Marpa_Step_Type step_type = marpa_v_step (v_wrapper->v);
       switch (step_type)
-	{
-	case MARPA_STEP_INACTIVE:
-	  XSRETURN_EMPTY;
+        {
+        case MARPA_STEP_INACTIVE:
+          XSRETURN_EMPTY;
 
-	  /* NOTREACHED */
-	case MARPA_STEP_RULE:
-	case MARPA_STEP_NULLING_SYMBOL:
-	case MARPA_STEP_TOKEN:
-	  {
-	    int ix;
-	    SV *stack_results[3];
-	    int stack_offset = v_do_stack_ops (v_wrapper, stack_results);
-	    if (stack_offset < 0)
-	      {
-		goto NEXT_STEP;
-	      }
-	    for (ix = 0; ix < stack_offset; ix++)
-	      {
-		XPUSHs (stack_results[ix]);
-	      }
-	    XSRETURN (stack_offset);
-	  }
-	  /* NOTREACHED */
+          /* NOTREACHED */
+        case MARPA_STEP_RULE:
+        case MARPA_STEP_NULLING_SYMBOL:
+        case MARPA_STEP_TOKEN:
+          {
+            int ix;
+            SV *stack_results[3];
+            int stack_offset = v_do_stack_ops (v_wrapper, stack_results);
+            if (stack_offset < 0)
+              {
+                goto NEXT_STEP;
+              }
+            for (ix = 0; ix < stack_offset; ix++)
+              {
+                XPUSHs (stack_results[ix]);
+              }
+            XSRETURN (stack_offset);
+          }
+          /* NOTREACHED */
 
-	default:
-	  /* Default is just return the step_type string and let the upper
-	   * layer deal with it.
-	   */
-	  {
-	    const char *step_type_string = step_type_to_string (step_type);
-	    if (!step_type_string)
-	      {
-		step_type_string = "Unknown";
-	      }
-	    XPUSHs (sv_2mortal (newSVpv (step_type_string, 0)));
-	    XSRETURN (1);
-	  }
-	}
+        default:
+          /* Default is just return the step_type string and let the upper
+           * layer deal with it.
+           */
+          {
+            const char *step_type_string = step_type_to_string (step_type);
+            if (!step_type_string)
+              {
+                step_type_string = "Unknown";
+              }
+            XPUSHs (sv_2mortal (newSVpv (step_type_string, 0)));
+            XSRETURN (1);
+          }
+        }
 
     NEXT_STEP:;
       if (v_wrapper->trace_values)
-	{
-	  XSRETURN_PV ("trace");
-	}
+        {
+          XSRETURN_PV ("trace");
+        }
     }
 }
 
