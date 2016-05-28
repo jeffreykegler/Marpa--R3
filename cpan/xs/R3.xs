@@ -3563,7 +3563,7 @@ PPCODE:
    * methods.
    */
   if (v_wrapper->slr) {
-      slr->v_wrapper = NULL;
+      v_wrapper->slr->v_wrapper = NULL;
       v_wrapper->slr = NULL;
   }
 
