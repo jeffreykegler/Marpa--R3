@@ -2472,6 +2472,7 @@ static void marpa_sv_sv_noinc (lua_State* L, SV* sv) {
  * the caller is prepared to transfer to the Lua userdata.
  */
 static void marpa_sv_av_noinc (lua_State* L, AV* av) {
+    dTHX;
     SV* av_ref = newRV_noinc((SV*)av);
     SV** p_sv = (SV**)marpa_lua_newuserdata(L, sizeof(SV*));
     *p_sv = av_ref;
