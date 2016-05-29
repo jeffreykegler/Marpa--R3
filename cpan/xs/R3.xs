@@ -2362,20 +2362,6 @@ push_val (lua_State * L, SV * val)
   return;
 }
 
-/* Register a "time object", a grammar, recce, etc. */
-static int xlua_time_ref(Scanless_R* slr)
-{
-    lua_State* L = slr->slg->L;
-    marpa_lua_newtable(L);
-    return marpa_luaL_ref(L, LUA_REGISTRYINDEX);
-}
-
-static void xlua_time_unref(Scanless_R* slr)
-{
-    lua_State* L = slr->slg->L;
-    warn("Unref SLR lua ref = %d, slr = %p, slg = %p, L = %p", slr->lua_ref, slr, slr->slg, L);
-    marpa_luaL_unref(L, LUA_REGISTRYINDEX, slr->lua_ref);
-}
 
 /* Creates a userdata containing a Perl SV, and
  * leaves the new userdata on top of the stack.
@@ -5055,7 +5041,7 @@ PPCODE:
               croak
                   ("Marpa::R3 internal error: Lua interpreter failed to start");
           }
-        warn("New lua state %p, slg = %p", L, slg);
+        // warn("New lua state %p, slg = %p", L, slg);
         marpa_luaL_openlibs (L);  /* open libraries */
         marpa_lua_newtable (L);
         marpa_table = marpa_lua_gettop (L);
@@ -5096,8 +5082,15 @@ PPCODE:
   for (i = 0; i < Dim(slg->per_codepoint_array); i++) {
     Safefree(slg->per_codepoint_array[i]);
   }
-  warn("Closing lua state %p, slg = %p", slg->L, slg);
+  // warn("Closing lua state %p, slg = %p", slg->L, slg);
+
+  /* On global destruction, Perl destructors are called in
+   * arbitrary order, so we NULL out the Lua state pointer
+   * so that other destructors can determine whether
+   * the Lua state has already been destroyed.
+   */
   marpa_lua_close(slg->L);
+  slg->L = NULL;
   Safefree (slg);
 }
 
@@ -5632,9 +5625,13 @@ PPCODE:
   slr->input = newSVpvn ("", 0);
   slr->end_pos = 0;
   slr->too_many_earley_items = -1;
-  slr->lua_ref = xlua_time_ref(slr);
 
-    warn("Create SLR lua ref = %d, slr = %p, slg = %p, L = %p", slr->lua_ref, slr, slr->slg, slr->slg->L);
+  {
+    lua_State* L = slr->slg->L;
+    marpa_lua_newtable(L);
+    slr->lua_ref =  marpa_luaL_ref(L, LUA_REGISTRYINDEX);
+    // warn("Create SLR lua ref = %d, slr = %p, slg = %p, L = %p", slr->lua_ref, slr, slr->slg, slr->slg->L);
+  }
 
   slr->v_wrapper = NULL;
 
@@ -5659,7 +5656,18 @@ PPCODE:
 {
   const Marpa_Recce r0 = slr->r0;
 
-  xlua_time_unref(slr);
+  if (!slr->slg->L) {
+      // warn("slr %p: LUA STATE ALREADY DESTROYED, slg=%p", slr, slr->slg);
+  }
+
+  /* On global destruction, Perl calls destructors in arbitrary order
+   * so we have to be prepared to deal with the situation where the
+   * Lua state has already been destroyed.
+   */
+  if (slr->slg->L) {
+      marpa_luaL_unref(slr->slg->L, LUA_REGISTRYINDEX, slr->lua_ref);
+  }
+
 
   if (r0)
     {
