@@ -50,37 +50,6 @@ typedef SV* SVREF;
 #undef Dim
 #define Dim(x) (sizeof(x)/sizeof(*x))
 
-static Marpa_SLR marpa__slr_new(void)
-{
-  SLR slr;
-  Newx (slr, 1, struct marpa_slr_s);
-  slr->t_ref_count = 1;
-
-  return slr;
-}
-
-static void slr_free(SLR slr)
-{
-  Safefree( slr);
-}
-
-static void
-slr_unref (Marpa_SLR slr)
-{
-  /* MARPA_ASSERT (slr->t_ref_count > 0) */
-  slr->t_ref_count--;
-  if (slr->t_ref_count <= 0)
-    {
-      slr_free(slr);
-    }
-}
-
-static void
-marpa__slr_unref (Marpa_SLR slr)
-{
-   slr_unref(slr);
-}
-
 typedef int Marpa_Op;
 
 struct op_data_s { const char *name; Marpa_Op op; };
@@ -5655,8 +5624,6 @@ PPCODE:
   slr->lua_ref = xlua_time_ref();
   slr->v_wrapper = NULL;
 
-  slr->gift = marpa__slr_new();
-
   slr->t_count_of_deleted_events = 0;
   slr->t_event_count = 0;
   slr->t_event_capacity = MAX (1024 / sizeof (union marpa_slr_event_s), 16);
@@ -5685,7 +5652,6 @@ PPCODE:
       marpa_r_unref (r0);
     }
 
-   marpa__slr_unref(slr->gift);
    Safefree(slr->t_events);
    Safefree(slr->t_lexemes);
 

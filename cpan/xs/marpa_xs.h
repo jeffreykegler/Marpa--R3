@@ -81,15 +81,6 @@ typedef struct {
      unsigned int ruby_slippers:1;
 } R_Wrapper;
 
-struct marpa_slr_s;
-typedef struct marpa_slr_s* Marpa_SLR;
-struct marpa_slr_s {
-
-  int t_ref_count;
-
-};
-typedef Marpa_SLR SLR;
-
 union marpa_slr_event_s;
 
 #define MARPA_SLREV_AFTER_LEXEME 1
@@ -408,9 +399,6 @@ typedef struct
   int t_event_capacity;
   int t_event_count;
   int t_count_of_deleted_events;
-
-  /* A "Gift" because it is something that is "wrapped". */
-  Marpa_SLR gift;
 
 } Scanless_R;
 
