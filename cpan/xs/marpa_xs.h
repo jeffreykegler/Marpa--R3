@@ -85,16 +85,7 @@ struct marpa_slr_s;
 typedef struct marpa_slr_s* Marpa_SLR;
 struct marpa_slr_s {
 
-  union marpa_slr_event_s* t_events;
-  int t_event_capacity;
-  int t_event_count;
-
-  union marpa_slr_event_s* t_lexemes;
-  int t_lexeme_capacity;
-  int t_lexeme_count;
-
   int t_ref_count;
-  int t_count_of_deleted_events;
 
 };
 typedef Marpa_SLR SLR;
@@ -408,6 +399,15 @@ typedef struct
    * See the explanation under the v_wrapper destructor
    */
   struct v_wrapper_s* v_wrapper;
+
+  union marpa_slr_event_s* t_lexemes;
+  int t_lexeme_capacity;
+  int t_lexeme_count;
+
+  union marpa_slr_event_s* t_events;
+  int t_event_capacity;
+  int t_event_count;
+  int t_count_of_deleted_events;
 
   /* A "Gift" because it is something that is "wrapped". */
   Marpa_SLR gift;
