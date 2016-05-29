@@ -7218,6 +7218,9 @@ BOOT:
       /* Lua stack: [ marpa_table, sv_table ] */
       marpa_lua_setfield(marpa_L, marpa_table, "sv");
       /* Lua stack: [ marpa_table ] */
+      marpa_lua_newtable(marpa_L);
+      /* Lua stack: [ marpa_table, context_table ] */
+      marpa_lua_setfield(marpa_L, marpa_table, "context");
       marpa_lua_settop(marpa_L, marpa_table-1);
       /* Lua stack: empty */
     }
