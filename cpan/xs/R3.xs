@@ -19,10 +19,6 @@
 #include <XSUB.h>
 #include "ppport.h"
 
-#include <lua.h>
-#include <lualib.h>
-#include <lauxlib.h>
-
 #undef IS_PERL_UNDEF
 #define IS_PERL_UNDEF(x) (SvTYPE(x) == SVt_NULL)
 
@@ -2246,8 +2242,6 @@ slr_es_span_to_literal_sv (Scanless_R * slr,
 
 /* Portions of this code adopted from Inline::Lua */
 
-static lua_State *marpa_L = NULL;
-
 #define MT_NAME_SV "Marpa_sv"
 #define MT_NAME_RECCE "Marpa_recce"
 
@@ -2306,7 +2300,7 @@ coerce_to_sv (lua_State * L, int idx)
                idx);
             break;
           }
-        result = *(SV **) marpa_lua_touserdata (marpa_L, idx);
+        result = *(SV **) marpa_lua_touserdata (L, idx);
         SvREFCNT_inc_simple_void_NN (result);
       };
       break;
@@ -2331,7 +2325,7 @@ push_val (lua_State * L, SV * val)
   if (SvTYPE (val) == SVt_NULL)
     {
       // warn("%s %d\n", __FILE__, __LINE__);
-      marpa_lua_pushnil (marpa_L);
+      marpa_lua_pushnil (L);
       return;
     }
   if (SvPOK (val))
@@ -2339,71 +2333,48 @@ push_val (lua_State * L, SV * val)
       STRLEN n_a;
       // warn("%s %d\n", __FILE__, __LINE__);
       char *cval = SvPV (val, n_a);
-      marpa_lua_pushlstring (marpa_L, cval, n_a);
+      marpa_lua_pushlstring (L, cval, n_a);
       return;
     }
   if (SvNOK (val))
     {
       // warn("%s %d\n", __FILE__, __LINE__);
-      marpa_lua_pushnumber (marpa_L, (lua_Number) SvNV (val));
+      marpa_lua_pushnumber (L, (lua_Number) SvNV (val));
       return;
     }
   if (SvIOK (val))
     {
       // warn("%s %d\n", __FILE__, __LINE__);
-      marpa_lua_pushnumber (marpa_L, (lua_Number) SvIV (val));
+      marpa_lua_pushnumber (L, (lua_Number) SvIV (val));
       return;
     }
   if (SvROK (val))
     {
       // warn("%s %d\n", __FILE__, __LINE__);
-      marpa_lua_pushfstring (marpa_L,
+      marpa_lua_pushfstring (L,
                              "!!!Argument unsupported: Perl reference type (%s)",
                              sv_reftype (SvRV (val), 0));
       return;
     }
       // warn("%s %d\n", __FILE__, __LINE__);
-  marpa_lua_pushfstring (marpa_L, "!!!Argument unsupported: Perl type (%d)",
+  marpa_lua_pushfstring (L, "!!!Argument unsupported: Perl type (%d)",
                          SvTYPE (val));
   return;
 }
 
 /* Register a "time object", a grammar, recce, etc. */
-static int xlua_time_ref()
+static int xlua_time_ref(Scanless_R* slr)
 {
-    marpa_lua_newtable(marpa_L);
-    return marpa_luaL_ref(marpa_L, LUA_REGISTRYINDEX);
+    lua_State* L = slr->slg->L;
+    marpa_lua_newtable(L);
+    return marpa_luaL_ref(L, LUA_REGISTRYINDEX);
 }
 
-static void xlua_time_unref(time_ref)
-int time_ref;
+static void xlua_time_unref(Scanless_R* slr)
 {
-    marpa_luaL_unref(marpa_L, LUA_REGISTRYINDEX, time_ref);
-}
-
-static int load_lua(time_ref, string)
-int time_ref;
-char* string;
-{
-  int time_object_registry;
-  int function_ref;
-  int status;
-
-  marpa_lua_rawgeti (marpa_L, LUA_REGISTRYINDEX, time_ref);
-  /* Lua stack: [ ..., time_object_table ] */
-  time_object_registry = marpa_lua_gettop (marpa_L);
-  status = marpa_luaL_loadbuffer (marpa_L, string, strlen (string), string);
-  if (status != 0)
-    {
-      const char *error_string = marpa_lua_tostring (marpa_L, -1);
-      marpa_lua_pop (marpa_L, 1);
-      croak ("Marpa::R3::Lua error in luaL_loadbuffer: %s", error_string);
-    }
-  /* [ ..., time_object_table , chunk ] */
-  function_ref = marpa_luaL_ref (marpa_L, time_object_registry);
-  /* [ ..., time_object_table  ] */
-  marpa_lua_pop(marpa_L, 1);
-  return function_ref;
+    lua_State* L = slr->slg->L;
+    warn("Unref SLR lua ref = %d, slr = %p, slg = %p, L = %p", slr->lua_ref, slr, slr->slg, L);
+    marpa_luaL_unref(L, LUA_REGISTRYINDEX, slr->lua_ref);
 }
 
 /* Creates a userdata containing a Perl SV, and
@@ -4989,87 +4960,125 @@ new( class, l0_sv, g1_sv )
     SV *g1_sv;
 PPCODE:
 {
-  SV* new_sv;
-  Scanless_G *slg;
-  PERL_UNUSED_ARG(class);
+    SV *new_sv;
+    Scanless_G *slg;
+    PERL_UNUSED_ARG (class);
 
-  if (!sv_isa (l0_sv, "Marpa::R3::Thin::G"))
-    {
-      croak ("Problem in u->new(): L0 arg is not of type Marpa::R3::Thin::G");
-    }
-  if (!sv_isa (g1_sv, "Marpa::R3::Thin::G"))
-    {
-      croak ("Problem in u->new(): G1 arg is not of type Marpa::R3::Thin::G");
-    }
-  Newx (slg, 1, Scanless_G);
-
-  slg->g1_sv = g1_sv;
-  SvREFCNT_inc (g1_sv);
-
-  # These do not need references, because parent objects
-  # hold references to them
-  SET_G_WRAPPER_FROM_G_SV(slg->g1_wrapper, g1_sv)
-  slg->g1 = slg->g1_wrapper->g;
-  slg->precomputed = 0;
-
-  slg->l0_sv = l0_sv;
-  SvREFCNT_inc (l0_sv);
-
-  # Wrapper does not need reference, because parent objects
-  # holds references to it
-  SET_G_WRAPPER_FROM_G_SV (slg->l0_wrapper, l0_sv);
-
-  {
-    int i;
-    slg->per_codepoint_hash = newHV ();
-    for (i = 0; i < (int)Dim (slg->per_codepoint_array); i++)
+    if (!sv_isa (l0_sv, "Marpa::R3::Thin::G"))
       {
-        slg->per_codepoint_array[i] = NULL;
+          croak
+              ("Problem in u->new(): L0 arg is not of type Marpa::R3::Thin::G");
       }
-  }
-
-  {
-    int symbol_ix;
-    int g1_symbol_count =
-      marpa_g_highest_symbol_id ( slg->g1 ) + 1;
-    Newx (slg->g1_lexeme_to_assertion, g1_symbol_count,
-          Marpa_Assertion_ID);
-    for (symbol_ix = 0; symbol_ix < g1_symbol_count;
-         symbol_ix++)
+    if (!sv_isa (g1_sv, "Marpa::R3::Thin::G"))
       {
-        slg->g1_lexeme_to_assertion[symbol_ix] = -1;
+          croak
+              ("Problem in u->new(): G1 arg is not of type Marpa::R3::Thin::G");
       }
-  }
+    Newx (slg, 1, Scanless_G);
 
-  {
-    Marpa_Symbol_ID symbol_id;
-    int g1_symbol_count = marpa_g_highest_symbol_id (slg->g1) + 1;
-    Newx (slg->symbol_g_properties, g1_symbol_count, struct symbol_g_properties);
-    for (symbol_id = 0; symbol_id < g1_symbol_count; symbol_id++) {
-        slg->symbol_g_properties[symbol_id].priority = 0;
-        slg->symbol_g_properties[symbol_id].latm = 0;
-        slg->symbol_g_properties[symbol_id].is_lexeme = 0;
-        slg->symbol_g_properties[symbol_id].t_pause_before = 0;
-        slg->symbol_g_properties[symbol_id].t_pause_before_active = 0;
-        slg->symbol_g_properties[symbol_id].t_pause_after = 0;
-        slg->symbol_g_properties[symbol_id].t_pause_after_active = 0;
+    slg->g1_sv = g1_sv;
+    SvREFCNT_inc (g1_sv);
+
+    #These do not need references, because parent objects
+    #hold references to them
+    SET_G_WRAPPER_FROM_G_SV (slg->g1_wrapper, g1_sv)
+        slg->g1 = slg->g1_wrapper->g;
+    slg->precomputed = 0;
+
+    slg->l0_sv = l0_sv;
+    SvREFCNT_inc (l0_sv);
+
+    #Wrapper does not need reference, because parent objects
+    #holds references to it
+    SET_G_WRAPPER_FROM_G_SV (slg->l0_wrapper, l0_sv);
+
+    {
+        int i;
+        slg->per_codepoint_hash = newHV ();
+        for (i = 0; i < (int) Dim (slg->per_codepoint_array); i++)
+          {
+              slg->per_codepoint_array[i] = NULL;
+          }
     }
-  }
 
-  {
-    Marpa_Rule_ID rule_id;
-    int g1_rule_count = marpa_g_highest_rule_id (slg->l0_wrapper->g) + 1;
-    Newx (slg->l0_rule_g_properties, g1_rule_count, struct l0_rule_g_properties);
-    for (rule_id = 0; rule_id < g1_rule_count; rule_id++) {
-        slg->l0_rule_g_properties[rule_id].g1_lexeme = -1;
-        slg->l0_rule_g_properties[rule_id].t_event_on_discard = 0;
-        slg->l0_rule_g_properties[rule_id].t_event_on_discard_active = 0;
+    {
+        int symbol_ix;
+        int g1_symbol_count = marpa_g_highest_symbol_id (slg->g1) + 1;
+        Newx (slg->g1_lexeme_to_assertion, g1_symbol_count,
+              Marpa_Assertion_ID);
+        for (symbol_ix = 0; symbol_ix < g1_symbol_count; symbol_ix++)
+          {
+              slg->g1_lexeme_to_assertion[symbol_ix] = -1;
+          }
     }
-  }
 
-  new_sv = sv_newmortal ();
-  sv_setref_pv (new_sv, scanless_g_class_name, (void *) slg);
-  XPUSHs (new_sv);
+    {
+        Marpa_Symbol_ID symbol_id;
+        int g1_symbol_count = marpa_g_highest_symbol_id (slg->g1) + 1;
+        Newx (slg->symbol_g_properties, g1_symbol_count,
+              struct symbol_g_properties);
+        for (symbol_id = 0; symbol_id < g1_symbol_count; symbol_id++)
+          {
+              slg->symbol_g_properties[symbol_id].priority = 0;
+              slg->symbol_g_properties[symbol_id].latm = 0;
+              slg->symbol_g_properties[symbol_id].is_lexeme = 0;
+              slg->symbol_g_properties[symbol_id].t_pause_before = 0;
+              slg->symbol_g_properties[symbol_id].t_pause_before_active =
+                  0;
+              slg->symbol_g_properties[symbol_id].t_pause_after = 0;
+              slg->symbol_g_properties[symbol_id].t_pause_after_active = 0;
+          }
+    }
+
+    {
+        Marpa_Rule_ID rule_id;
+        int g1_rule_count =
+            marpa_g_highest_rule_id (slg->l0_wrapper->g) + 1;
+        Newx (slg->l0_rule_g_properties, g1_rule_count,
+              struct l0_rule_g_properties);
+        for (rule_id = 0; rule_id < g1_rule_count; rule_id++)
+          {
+              slg->l0_rule_g_properties[rule_id].g1_lexeme = -1;
+              slg->l0_rule_g_properties[rule_id].t_event_on_discard = 0;
+              slg->l0_rule_g_properties[rule_id].
+                  t_event_on_discard_active = 0;
+          }
+    }
+
+    {
+        int marpa_table;
+        lua_State* L;
+
+        L = marpa_luaL_newstate ();
+        if (!L)
+          {
+              croak
+                  ("Marpa::R3 internal error: Lua interpreter failed to start");
+          }
+        warn("New lua state %p, slg = %p", L, slg);
+        marpa_luaL_openlibs (L);  /* open libraries */
+        marpa_lua_newtable (L);
+        marpa_table = marpa_lua_gettop (L);
+        /* Lua stack: [ marpa_table ] */
+        marpa_lua_pushvalue (L, -1);
+        /* Lua stack: [ marpa_table, marpa_table ] */
+        marpa_lua_setglobal (L, "marpa");
+        /* Lua stack: [ marpa_table ] */
+        marpa_luaopen_sv (L);     /* open Perl SV library */
+        /* Lua stack: [ marpa_table, sv_table ] */
+        marpa_lua_setfield (L, marpa_table, "sv");
+        /* Lua stack: [ marpa_table ] */
+        marpa_lua_newtable (L);
+        /* Lua stack: [ marpa_table, context_table ] */
+        marpa_lua_setfield (L, marpa_table, "context");
+        marpa_lua_settop (L, marpa_table - 1);
+        /* Lua stack: empty */
+        slg->L = L;
+    }
+
+    new_sv = sv_newmortal ();
+    sv_setref_pv (new_sv, scanless_g_class_name, (void *) slg);
+    XPUSHs (new_sv);
 }
 
 void
@@ -5087,6 +5096,8 @@ PPCODE:
   for (i = 0; i < Dim(slg->per_codepoint_array); i++) {
     Safefree(slg->per_codepoint_array[i]);
   }
+  warn("Closing lua state %p, slg = %p", slg->L, slg);
+  marpa_lua_close(slg->L);
   Safefree (slg);
 }
 
@@ -5621,7 +5632,10 @@ PPCODE:
   slr->input = newSVpvn ("", 0);
   slr->end_pos = 0;
   slr->too_many_earley_items = -1;
-  slr->lua_ref = xlua_time_ref();
+  slr->lua_ref = xlua_time_ref(slr);
+
+    warn("Create SLR lua ref = %d, slr = %p, slg = %p, L = %p", slr->lua_ref, slr, slr->slg, slr->slg->L);
+
   slr->v_wrapper = NULL;
 
   slr->t_count_of_deleted_events = 0;
@@ -5645,7 +5659,7 @@ PPCODE:
 {
   const Marpa_Recce r0 = slr->r0;
 
-  xlua_time_unref(slr->lua_ref);
+  xlua_time_unref(slr);
 
   if (r0)
     {
@@ -6961,22 +6975,23 @@ PPCODE:
   int status;
   int time_object_registry;
   int function_ref;
+  lua_State* const L = slr->slg->L;
 
-  marpa_lua_rawgeti (marpa_L, LUA_REGISTRYINDEX, slr->lua_ref);
+  marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, slr->lua_ref);
   /* Lua stack: [ recce_table ] */
-  time_object_registry = marpa_lua_gettop (marpa_L);
+  time_object_registry = marpa_lua_gettop (L);
 
-  status = marpa_luaL_loadbuffer (marpa_L, codestr, strlen (codestr), codestr);
+  status = marpa_luaL_loadbuffer (L, codestr, strlen (codestr), codestr);
   if (status != 0)
     {
-      const char *error_string = marpa_lua_tostring (marpa_L, -1);
-      marpa_lua_pop (marpa_L, 1);
+      const char *error_string = marpa_lua_tostring (L, -1);
+      marpa_lua_pop (L, 1);
       croak ("Marpa::R3::SLR::register_fn -- error lua code: %s", error_string);
     }
   /* [ recce_table, function ] */
 
-  function_ref = marpa_luaL_ref (marpa_L, time_object_registry);
-  marpa_lua_pop(marpa_L, (marpa_lua_gettop(marpa_L) - time_object_registry) + 1);
+  function_ref = marpa_luaL_ref (L, time_object_registry);
+  marpa_lua_pop(L, (marpa_lua_gettop(L) - time_object_registry) + 1);
   XPUSHs (sv_2mortal (newSViv (function_ref)));
 }
 
@@ -6991,14 +7006,15 @@ PPCODE:
   int recce_object;
   int function_ref;
   int function_stack_ix;
+  lua_State* const L = slr->slg->L;
 
-  marpa_lua_rawgeti (marpa_L, LUA_REGISTRYINDEX, slr->lua_ref);
+  marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, slr->lua_ref);
   /* Lua stack: [ recce_table ] */
-  recce_object = marpa_lua_gettop (marpa_L);
-  marpa_lua_rawgeti (marpa_L, recce_object, fn_key);
+  recce_object = marpa_lua_gettop (L);
+  marpa_lua_rawgeti (L, recce_object, fn_key);
   /* [ recce_table, function ] */
 
-  function_stack_ix = marpa_lua_gettop (marpa_L);
+  function_stack_ix = marpa_lua_gettop (L);
 
   // warn ("function_stack_ix=%d %s %d\n", function_stack_ix, __FILE__, __LINE__);
   // warn ("items=%d %s %d\n", items, __FILE__, __LINE__);
@@ -7011,106 +7027,109 @@ PPCODE:
         {
           croak ("Marpa::R3::Lua::exec arg %d is not an SV", i);
         }
-      MARPA_SV_SV (marpa_L, arg_sv);
+      MARPA_SV_SV (L, arg_sv);
       // warn ("%s %d\n", __FILE__, __LINE__);
     }
 
-  status = marpa_lua_pcall (marpa_L, items - 2, LUA_MULTRET, 0);
+  status = marpa_lua_pcall (L, items - 2, LUA_MULTRET, 0);
   if (status != 0)
     {
-      const char *error_string = marpa_lua_tostring (marpa_L, -1);
-      marpa_lua_pop (marpa_L, 1);
+      const char *error_string = marpa_lua_tostring (L, -1);
+      marpa_lua_pop (L, 1);
       croak ("Marpa::R3 Lua code error: %s", error_string);
     }
 
   /* return args to caller */
-  top_after = marpa_lua_gettop (marpa_L);
+  top_after = marpa_lua_gettop (L);
   // warn ("top after pcall = %d", top_after);
   for (i = function_stack_ix; i <= top_after; i++)
     {
       // warn ("%s %d\n", __FILE__, __LINE__);
-      SV *sv_result = coerce_to_sv (marpa_L, i);
+      SV *sv_result = coerce_to_sv (L, i);
       // warn ("%s %d\n", __FILE__, __LINE__);
       /* Took ownership of sv_result, we now need to mortalize it */
       XPUSHs (sv_2mortal (sv_result));
       // warn ("%s %d\n", __FILE__, __LINE__);
     }
-  marpa_lua_settop (marpa_L, recce_object - 1);
+  marpa_lua_settop (L, recce_object - 1);
   // warn ("%s %d\n", __FILE__, __LINE__);
 }
 
-MODULE = Marpa::R3            PACKAGE = Marpa::R3::Lua
+MODULE = Marpa::R3            PACKAGE = Marpa::R3::Thin::SLG
 
 void
-raw_exec( codestr, ... )
+raw_exec( slg, codestr, ... )
+   Scanless_G *slg;
    char* codestr;
 PPCODE:
 {
   int i, status;
   int top_before, top_after;
+  lua_State* const L = slg->L;
 
-  top_before = marpa_lua_gettop (marpa_L);
+  top_before = marpa_lua_gettop (L);
 
-  status = marpa_luaL_loadbuffer (marpa_L, codestr, strlen (codestr), codestr);
+  status = marpa_luaL_loadbuffer (L, codestr, strlen (codestr), codestr);
   if (status != 0)
     {
-      const char *error_string = marpa_lua_tostring (marpa_L, -1);
-      marpa_lua_pop (marpa_L, 1);
+      const char *error_string = marpa_lua_tostring (L, -1);
+      marpa_lua_pop (L, 1);
       croak ("Marpa::R3::Lua error in luaL_loadbuffer: %s", error_string);
     }
 
   /* push arguments */
   for (i = 1; i < items; i++) {
       // warn("%s %d: pushing Perl arg %d\n", __FILE__, __LINE__, i);
-      push_val(marpa_L, ST(i));
+      push_val(L, ST(i));
       // warn("%s %d\n", __FILE__, __LINE__);
   }
 
-  status = marpa_lua_pcall (marpa_L, items-1, LUA_MULTRET, 0);
+  status = marpa_lua_pcall (L, items-1, LUA_MULTRET, 0);
   if (status != 0)
     {
-      const char *error_string = marpa_lua_tostring (marpa_L, -1);
-      marpa_lua_pop (marpa_L, 1);
+      const char *error_string = marpa_lua_tostring (L, -1);
+      marpa_lua_pop (L, 1);
       croak ("Marpa::R3::Lua error in pcall: %s", error_string);
     }
 
   /* return args to caller:
    * lua functions appear to push their return values in reverse order */
-  top_after = marpa_lua_gettop (marpa_L);
+  top_after = marpa_lua_gettop (L);
   // warn("top_after=%d", top_after);
   for (i = top_before + 1; i <= top_after; i++)
     {
     // warn("%s %d\n", __FILE__, __LINE__);
-      SV *result = coerce_to_sv (marpa_L, i);
+      SV *result = coerce_to_sv (L, i);
     // warn("%s %d\n", __FILE__, __LINE__);
     // warn("%s %d\n", __FILE__, __LINE__);
       XPUSHs (sv_2mortal (result));
     // warn("%s %d\n", __FILE__, __LINE__);
     }
       if (top_after > top_before) {
-      marpa_lua_pop (marpa_L, top_after - top_before);
+      marpa_lua_pop (L, top_after - top_before);
       }
 }
 
 void
-exec( codestr, ... )
+exec( slg, codestr, ... )
+   Scanless_G* slg;
    char* codestr;
 PPCODE:
 {
   int i, status;
   int top_before, top_after;
-
+  lua_State* const L = slg->L;
 
   // warn ("%s %d\n", __FILE__, __LINE__);
-  top_before = marpa_lua_gettop (marpa_L);
+  top_before = marpa_lua_gettop (L);
   // warn ("top before pcall = %d", top_before);
 
   status =
-    marpa_luaL_loadbuffer (marpa_L, codestr, strlen (codestr), codestr);
+    marpa_luaL_loadbuffer (L, codestr, strlen (codestr), codestr);
   if (status != 0)
     {
-      const char *error_string = marpa_lua_tostring (marpa_L, -1);
-      marpa_lua_pop (marpa_L, 1);
+      const char *error_string = marpa_lua_tostring (L, -1);
+      marpa_lua_pop (L, 1);
       croak ("Marpa::R3::Lua error in luaL_loadbuffer: %s", error_string);
     }
 
@@ -7124,25 +7143,25 @@ PPCODE:
         {
           croak ("Marpa::R3::Lua::exec arg %d is not an SV", i);
         }
-      MARPA_SV_SV (marpa_L, arg_sv);
+      MARPA_SV_SV (L, arg_sv);
       // warn ("%s %d\n", __FILE__, __LINE__);
     }
 
-  status = marpa_lua_pcall (marpa_L, items - 1, LUA_MULTRET, 0);
+  status = marpa_lua_pcall (L, items - 1, LUA_MULTRET, 0);
   if (status != 0)
     {
-      const char *error_string = marpa_lua_tostring (marpa_L, -1);
-      marpa_lua_pop (marpa_L, 1);
+      const char *error_string = marpa_lua_tostring (L, -1);
+      marpa_lua_pop (L, 1);
       croak ("Marpa::R3::Lua error in pcall: %s", error_string);
     }
 
   /* return args to caller */
-  top_after = marpa_lua_gettop (marpa_L);
+  top_after = marpa_lua_gettop (L);
   // warn ("top after pcall = %d", top_after);
   for (i = top_before + 1; i <= top_after; i++)
     {
       // warn ("%s %d\n", __FILE__, __LINE__);
-      SV *sv_result = coerce_to_sv (marpa_L, i);
+      SV *sv_result = coerce_to_sv (L, i);
       // warn ("%s %d\n", __FILE__, __LINE__);
       /* Took ownership of sv_result, we now need to mortalize it */
       XPUSHs (sv_2mortal (sv_result));
@@ -7150,7 +7169,7 @@ PPCODE:
     }
   if (top_after > top_before)
     {
-      marpa_lua_pop (marpa_L, top_after - top_before);
+      marpa_lua_pop (L, top_after - top_before);
     }
   // warn ("%s %d\n", __FILE__, __LINE__);
 }
@@ -7160,35 +7179,5 @@ INCLUDE: auto.xs
 BOOT:
 
     marpa_debug_handler_set(marpa_r3_warn);
-
-    {
-      int marpa_table;
-
-      /* Perl threads now discouraged, Lua is not thread-safe, and
-       * the following code is not thread-safe
-       */
-      marpa_L = marpa_luaL_newstate ();
-      if (!marpa_L)
-        {
-          croak ("Marpa::R3 internal error: Lua interpreter failed to start");
-        }
-      marpa_luaL_openlibs (marpa_L);        /* open libraries */
-      marpa_lua_newtable(marpa_L);
-      marpa_table = marpa_lua_gettop(marpa_L);
-      /* Lua stack: [ marpa_table ] */
-      marpa_lua_pushvalue (marpa_L, -1);
-      /* Lua stack: [ marpa_table, marpa_table ] */
-      marpa_lua_setglobal (marpa_L, "marpa");
-      /* Lua stack: [ marpa_table ] */
-      marpa_luaopen_sv (marpa_L);   /* open Perl SV library */
-      /* Lua stack: [ marpa_table, sv_table ] */
-      marpa_lua_setfield(marpa_L, marpa_table, "sv");
-      /* Lua stack: [ marpa_table ] */
-      marpa_lua_newtable(marpa_L);
-      /* Lua stack: [ marpa_table, context_table ] */
-      marpa_lua_setfield(marpa_L, marpa_table, "context");
-      marpa_lua_settop(marpa_L, marpa_table-1);
-      /* Lua stack: empty */
-    }
 
     /* vim: set expandtab shiftwidth=2: */

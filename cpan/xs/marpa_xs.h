@@ -20,6 +20,10 @@
 #include <XSUB.h>
 #include "ppport.h"
 
+#include <lua.h>
+#include <lualib.h>
+#include <lauxlib.h>
+
 typedef unsigned int Marpa_Codepoint;
 
 extern const struct marpa_error_description_s marpa_error_description[];
@@ -327,6 +331,8 @@ typedef struct
   int precomputed;
   struct symbol_g_properties *symbol_g_properties;
   struct l0_rule_g_properties *l0_rule_g_properties;
+  lua_State* L;
+
 } Scanless_G;
 
 struct v_wrapper_s;
