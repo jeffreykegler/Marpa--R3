@@ -2291,6 +2291,7 @@ slr_es_span_to_literal_sv (Scanless_R * slr,
 static lua_State *marpa_L = NULL;
 
 #define MT_NAME_SV "Marpa_sv"
+#define MT_NAME_RECCE "Marpa_recce"
 
 /* Coerce a Lua value to a Perl SV, if necessary one that
  * is simply a string with an error message.
@@ -7194,17 +7195,31 @@ BOOT:
 
     marpa_debug_handler_set(marpa_r3_warn);
 
-    /* Perl threads now discouraged, Lua is not thread-safe, and
-     * the following code is not thread-safe
-     */
-     marpa_L = marpa_luaL_newstate();
-     if (!marpa_L) {
-      croak ("Marpa::R3 internal error: Lua interpreter failed to start");
-       }
-    marpa_luaL_openlibs(marpa_L);  /* open libraries */
-    marpa_luaopen_sv(marpa_L);  /* open Perl SV library */
-    /* Lua stack: [ sv_table ] */
-    marpa_lua_setglobal(marpa_L, MT_NAME_SV);
-    /* Lua stack: empty */
+    {
+      int marpa_table;
+
+      /* Perl threads now discouraged, Lua is not thread-safe, and
+       * the following code is not thread-safe
+       */
+      marpa_L = marpa_luaL_newstate ();
+      if (!marpa_L)
+        {
+          croak ("Marpa::R3 internal error: Lua interpreter failed to start");
+        }
+      marpa_luaL_openlibs (marpa_L);        /* open libraries */
+      marpa_lua_newtable(marpa_L);
+      marpa_table = marpa_lua_gettop(marpa_L);
+      /* Lua stack: [ marpa_table ] */
+      marpa_lua_pushvalue (marpa_L, -1);
+      /* Lua stack: [ marpa_table, marpa_table ] */
+      marpa_lua_setglobal (marpa_L, "marpa");
+      /* Lua stack: [ marpa_table ] */
+      marpa_luaopen_sv (marpa_L);   /* open Perl SV library */
+      /* Lua stack: [ marpa_table, sv_table ] */
+      marpa_lua_setfield(marpa_L, marpa_table, "sv");
+      /* Lua stack: [ marpa_table ] */
+      marpa_lua_settop(marpa_L, marpa_table-1);
+      /* Lua stack: empty */
+    }
 
     /* vim: set expandtab shiftwidth=2: */
