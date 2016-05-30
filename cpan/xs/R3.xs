@@ -7252,13 +7252,13 @@ PPCODE:
     }
 
   /* push arguments */
-  for (i = 1; i < items; i++) {
+  for (i = 2; i < items; i++) {
       // warn("%s %d: pushing Perl arg %d\n", __FILE__, __LINE__, i);
       push_val(L, ST(i));
       // warn("%s %d\n", __FILE__, __LINE__);
   }
 
-  status = marpa_lua_pcall (L, items-1, LUA_MULTRET, 0);
+  status = marpa_lua_pcall (L, items-2, LUA_MULTRET, 0);
   if (status != 0)
     {
       const char *error_string = marpa_lua_tostring (L, -1);
@@ -7309,7 +7309,7 @@ PPCODE:
 
   // warn ("%s %d\n", __FILE__, __LINE__);
   /* push arguments */
-  for (i = 1; i < items; i++)
+  for (i = 2; i < items; i++)
     {
       // warn ("%s %d: pushing Perl arg %d\n", __FILE__, __LINE__, i);
       SV *arg_sv = ST (i);
@@ -7321,7 +7321,7 @@ PPCODE:
       // warn ("%s %d\n", __FILE__, __LINE__);
     }
 
-  status = marpa_lua_pcall (L, items - 1, LUA_MULTRET, 0);
+  status = marpa_lua_pcall (L, items-2, LUA_MULTRET, 0);
   if (status != 0)
     {
       const char *error_string = marpa_lua_tostring (L, -1);
