@@ -152,6 +152,7 @@ static const char tree_c_class_name[] = "Marpa::R3::Thin::T";
 static const char value_c_class_name[] = "Marpa::R3::Thin::V";
 static const char scanless_g_class_name[] = "Marpa::R3::Thin::SLG";
 static const char scanless_r_class_name[] = "Marpa::R3::Thin::SLR";
+static const char marpa_lua_class_name[] = "Marpa::R3::Lua";
 
 static const char *
 event_type_to_string (Marpa_Event_Type event_code)
@@ -5548,6 +5549,124 @@ PPCODE:
   XSRETURN_IV (1);
 }
 
+
+void
+raw_exec( slg, codestr, ... )
+   Scanless_G *slg;
+   char* codestr;
+PPCODE:
+{
+  int i, status;
+  int top_before, top_after;
+  lua_State* const L = slg->L;
+
+  top_before = marpa_lua_gettop (L);
+
+  status = marpa_luaL_loadbuffer (L, codestr, strlen (codestr), codestr);
+  if (status != 0)
+    {
+      const char *error_string = marpa_lua_tostring (L, -1);
+      marpa_lua_pop (L, 1);
+      croak ("Marpa::R3::Lua error in luaL_loadbuffer: %s", error_string);
+    }
+
+  /* push arguments */
+  for (i = 1; i < items; i++) {
+      // warn("%s %d: pushing Perl arg %d\n", __FILE__, __LINE__, i);
+      push_val(L, ST(i));
+      // warn("%s %d\n", __FILE__, __LINE__);
+  }
+
+  status = marpa_lua_pcall (L, items-1, LUA_MULTRET, 0);
+  if (status != 0)
+    {
+      const char *error_string = marpa_lua_tostring (L, -1);
+      marpa_lua_pop (L, 1);
+      croak ("Marpa::R3::Lua error in pcall: %s", error_string);
+    }
+
+  /* return args to caller:
+   * lua functions appear to push their return values in reverse order */
+  top_after = marpa_lua_gettop (L);
+  // warn("top_after=%d", top_after);
+  for (i = top_before + 1; i <= top_after; i++)
+    {
+    // warn("%s %d\n", __FILE__, __LINE__);
+      SV *result = coerce_to_sv (L, i);
+    // warn("%s %d\n", __FILE__, __LINE__);
+    // warn("%s %d\n", __FILE__, __LINE__);
+      XPUSHs (sv_2mortal (result));
+    // warn("%s %d\n", __FILE__, __LINE__);
+    }
+      if (top_after > top_before) {
+      marpa_lua_pop (L, top_after - top_before);
+      }
+}
+
+void
+exec( slg, codestr, ... )
+   Scanless_G* slg;
+   char* codestr;
+PPCODE:
+{
+  int i, status;
+  int top_before, top_after;
+  lua_State* const L = slg->L;
+
+  // warn ("%s %d\n", __FILE__, __LINE__);
+  top_before = marpa_lua_gettop (L);
+  // warn ("top before pcall = %d", top_before);
+
+  status =
+    marpa_luaL_loadbuffer (L, codestr, strlen (codestr), codestr);
+  if (status != 0)
+    {
+      const char *error_string = marpa_lua_tostring (L, -1);
+      marpa_lua_pop (L, 1);
+      croak ("Marpa::R3::Lua error in luaL_loadbuffer: %s", error_string);
+    }
+
+  // warn ("%s %d\n", __FILE__, __LINE__);
+  /* push arguments */
+  for (i = 1; i < items; i++)
+    {
+      // warn ("%s %d: pushing Perl arg %d\n", __FILE__, __LINE__, i);
+      SV *arg_sv = ST (i);
+      if (!SvOK (arg_sv))
+        {
+          croak ("Marpa::R3::Lua::exec arg %d is not an SV", i);
+        }
+      MARPA_SV_SV (L, arg_sv);
+      // warn ("%s %d\n", __FILE__, __LINE__);
+    }
+
+  status = marpa_lua_pcall (L, items - 1, LUA_MULTRET, 0);
+  if (status != 0)
+    {
+      const char *error_string = marpa_lua_tostring (L, -1);
+      marpa_lua_pop (L, 1);
+      croak ("Marpa::R3::Lua error in pcall: %s", error_string);
+    }
+
+  /* return args to caller */
+  top_after = marpa_lua_gettop (L);
+  // warn ("top after pcall = %d", top_after);
+  for (i = top_before + 1; i <= top_after; i++)
+    {
+      // warn ("%s %d\n", __FILE__, __LINE__);
+      SV *sv_result = coerce_to_sv (L, i);
+      // warn ("%s %d\n", __FILE__, __LINE__);
+      /* Took ownership of sv_result, we now need to mortalize it */
+      XPUSHs (sv_2mortal (sv_result));
+      // warn ("%s %d\n", __FILE__, __LINE__);
+    }
+  if (top_after > top_before)
+    {
+      marpa_lua_pop (L, top_after - top_before);
+    }
+  // warn ("%s %d\n", __FILE__, __LINE__);
+}
+
 MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::SLR
 
 void
@@ -7087,17 +7206,40 @@ PPCODE:
   // warn ("%s %d\n", __FILE__, __LINE__);
 }
 
-MODULE = Marpa::R3            PACKAGE = Marpa::R3::Thin::SLG
+MODULE = Marpa::R3            PACKAGE = Marpa::R3::Lua
 
 void
-raw_exec( slg, codestr, ... )
-   Scanless_G *slg;
+new(class )
+PPCODE:
+{
+    SV *new_sv;
+    Marpa_Lua *lua_wrapper;
+
+    Newx (lua_wrapper, 1, Marpa_Lua);
+    lua_wrapper->L = xlua_newstate();
+    new_sv = sv_newmortal ();
+    sv_setref_pv (new_sv, marpa_lua_class_name, (void *) lua_wrapper);
+    XPUSHs (new_sv);
+}
+
+void
+DESTROY( lua_wrapper )
+    Marpa_Lua *lua_wrapper;
+PPCODE:
+{
+  xlua_refcount(lua_wrapper->L, -1);
+  Safefree (lua_wrapper);
+}
+
+void
+raw_exec( lua_wrapper, codestr, ... )
+   Marpa_Lua* lua_wrapper;
    char* codestr;
 PPCODE:
 {
   int i, status;
   int top_before, top_after;
-  lua_State* const L = slg->L;
+  lua_State* const L = lua_wrapper->L;
 
   top_before = marpa_lua_gettop (L);
 
@@ -7143,14 +7285,14 @@ PPCODE:
 }
 
 void
-exec( slg, codestr, ... )
-   Scanless_G* slg;
+exec( lua_wrapper, codestr, ... )
+   Marpa_Lua* lua_wrapper;
    char* codestr;
 PPCODE:
 {
   int i, status;
   int top_before, top_after;
-  lua_State* const L = slg->L;
+  lua_State* const L = lua_wrapper->L;
 
   // warn ("%s %d\n", __FILE__, __LINE__);
   top_before = marpa_lua_gettop (L);
