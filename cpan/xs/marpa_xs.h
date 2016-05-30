@@ -406,6 +406,8 @@ typedef struct
   int t_event_count;
   int t_count_of_deleted_events;
 
+  lua_State* L;
+
 } Scanless_R;
 
 #undef POS_TO_OFFSET

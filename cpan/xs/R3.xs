@@ -5661,6 +5661,8 @@ PPCODE:
 
   {
     lua_State* L = slr->slg->L;
+    slr->L = L;
+    xlua_refcount(L, 1);
     marpa_lua_newtable(L);
     slr->lua_ref =  marpa_luaL_ref(L, LUA_REGISTRYINDEX);
     // warn("Create SLR lua ref = %d, slr = %p, slg = %p, L = %p", slr->lua_ref, slr, slr->slg, slr->slg->L);
@@ -5689,18 +5691,8 @@ PPCODE:
 {
   const Marpa_Recce r0 = slr->r0;
 
-  if (!slr->slg->L) {
-      // warn("slr %p: LUA STATE ALREADY DESTROYED, slg=%p", slr, slr->slg);
-  }
-
-  /* On global destruction, Perl calls destructors in arbitrary order
-   * so we have to be prepared to deal with the situation where the
-   * Lua state has already been destroyed.
-   */
-  if (slr->slg->L) {
-      marpa_luaL_unref(slr->slg->L, LUA_REGISTRYINDEX, slr->lua_ref);
-  }
-
+  marpa_luaL_unref(slr->L, LUA_REGISTRYINDEX, slr->lua_ref);
+  xlua_refcount(slr->L, -1);
 
   if (r0)
     {
