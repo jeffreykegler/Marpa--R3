@@ -2607,6 +2607,42 @@ static int xlua_refcount(lua_State* L, int inc)
     /* Lua stack [ ] */
 }
 
+/* Returns a new Lua state, set up for Marpa, with
+ * a reference count of 1.
+ */
+static lua_State* xlua_newstate()
+{
+    int marpa_table;
+    lua_State *const L = marpa_luaL_newstate ();
+    const int base_of_stack = marpa_lua_gettop(L);
+
+    if (!L)
+      {
+          croak
+              ("Marpa::R3 internal error: Lua interpreter failed to start");
+      }
+    // warn("New lua state %p, slg = %p", L, slg);
+    xlua_refcount (L, 1);       // increment the ref count
+    marpa_luaL_openlibs (L);    /* open libraries */
+    marpa_lua_newtable (L);
+    marpa_table = marpa_lua_gettop (L);
+    /* Lua stack: [ marpa_table ] */
+    marpa_lua_pushvalue (L, -1);
+    /* Lua stack: [ marpa_table, marpa_table ] */
+    marpa_lua_setglobal (L, "marpa");
+    /* Lua stack: [ marpa_table ] */
+    marpa_luaopen_sv (L);       /* open Perl SV library */
+    /* Lua stack: [ marpa_table, sv_table ] */
+    marpa_lua_setfield (L, marpa_table, "sv");
+    /* Lua stack: [ marpa_table ] */
+    marpa_lua_newtable (L);
+    /* Lua stack: [ marpa_table, context_table ] */
+    marpa_lua_setfield (L, marpa_table, "context");
+    marpa_lua_settop (L, base_of_stack);
+    /* Lua stack: empty */
+    return L;
+}
+
 MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin
 
 PROTOTYPES: DISABLE
@@ -5063,37 +5099,7 @@ PPCODE:
           }
     }
 
-    {
-        int marpa_table;
-        lua_State* L;
-
-        L = marpa_luaL_newstate ();
-        if (!L)
-          {
-              croak
-                  ("Marpa::R3 internal error: Lua interpreter failed to start");
-          }
-        // warn("New lua state %p, slg = %p", L, slg);
-        xlua_refcount(L, 1); // increment the ref count
-        marpa_luaL_openlibs (L);  /* open libraries */
-        marpa_lua_newtable (L);
-        marpa_table = marpa_lua_gettop (L);
-        /* Lua stack: [ marpa_table ] */
-        marpa_lua_pushvalue (L, -1);
-        /* Lua stack: [ marpa_table, marpa_table ] */
-        marpa_lua_setglobal (L, "marpa");
-        /* Lua stack: [ marpa_table ] */
-        marpa_luaopen_sv (L);     /* open Perl SV library */
-        /* Lua stack: [ marpa_table, sv_table ] */
-        marpa_lua_setfield (L, marpa_table, "sv");
-        /* Lua stack: [ marpa_table ] */
-        marpa_lua_newtable (L);
-        /* Lua stack: [ marpa_table, context_table ] */
-        marpa_lua_setfield (L, marpa_table, "context");
-        marpa_lua_settop (L, marpa_table - 1);
-        /* Lua stack: empty */
-        slg->L = L;
-    }
+    slg->L = xlua_newstate();
 
     new_sv = sv_newmortal ();
     sv_setref_pv (new_sv, scanless_g_class_name, (void *) slg);
@@ -5115,15 +5121,8 @@ PPCODE:
   for (i = 0; i < Dim(slg->per_codepoint_array); i++) {
     Safefree(slg->per_codepoint_array[i]);
   }
-  // warn("Closing lua state %p, slg = %p", slg->L, slg);
 
-  /* On global destruction, Perl destructors are called in
-   * arbitrary order, so we NULL out the Lua state pointer
-   * so that other destructors can determine whether
-   * the Lua state has already been destroyed.
-   */
   xlua_refcount(slg->L, -1);
-  slg->L = NULL;
   Safefree (slg);
 }
 

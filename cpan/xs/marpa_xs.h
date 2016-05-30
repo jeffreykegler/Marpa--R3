@@ -452,3 +452,8 @@ struct v_wrapper_s
 };
 typedef struct v_wrapper_s V_Wrapper;
 
+typedef struct
+{
+  lua_State* L;
+} Marpa_Lua;
+
