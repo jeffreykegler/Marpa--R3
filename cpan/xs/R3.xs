@@ -2575,6 +2575,38 @@ static int marpa_luaopen_sv (lua_State* L) {
     return 1;
 }
 
+/* Manage the ref count of a Lua state, closing it
+ * when it falls to zero.
+ * 'inc' should be
+ * one of
+ *    -1   -- decrement
+ *     1   -- increment
+ *     0   -- query
+ * The current value of the ref count is always returned.
+ * If it has fallen to 0, the state is closed.
+ */
+static int xlua_refcount(lua_State* L, int inc)
+{
+    int base_of_stack = marpa_lua_gettop(L);
+    int new_refcount;
+    /* Lua stack [] */
+    marpa_lua_getfield(L, LUA_REGISTRYINDEX, "ref_count");
+    /* Lua stack [ old_ref_count ] */
+    new_refcount = marpa_lua_tointeger(L, -1);
+    /* Lua stack [ ] */
+    new_refcount += inc;
+    warn("xlua_refcount(), new_refcount=%d", new_refcount);
+    if (new_refcount <= 0) {
+       marpa_lua_close(L);
+       return 0;
+    }
+    marpa_lua_pushinteger(L, new_refcount);
+    /* Lua stack [ old_ref_count, new_ref_count ] */
+    marpa_lua_setfield(L, LUA_REGISTRYINDEX, "ref_count");
+    marpa_lua_settop(L, base_of_stack);
+    /* Lua stack [ ] */
+}
+
 MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin
 
 PROTOTYPES: DISABLE
@@ -5042,6 +5074,7 @@ PPCODE:
                   ("Marpa::R3 internal error: Lua interpreter failed to start");
           }
         // warn("New lua state %p, slg = %p", L, slg);
+        xlua_refcount(L, 1); // increment the ref count
         marpa_luaL_openlibs (L);  /* open libraries */
         marpa_lua_newtable (L);
         marpa_table = marpa_lua_gettop (L);
@@ -5089,7 +5122,7 @@ PPCODE:
    * so that other destructors can determine whether
    * the Lua state has already been destroyed.
    */
-  marpa_lua_close(slg->L);
+  xlua_refcount(slg->L, -1);
   slg->L = NULL;
   Safefree (slg);
 }
