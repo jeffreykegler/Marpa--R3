@@ -891,6 +891,7 @@ sub registration_init {
     state $op_result_is_token_value =
         Marpa::R3::Thin::op('result_is_token_value');
     state $op_result_is_undef = Marpa::R3::Thin::op('result_is_undef');
+    state $op_lua = Marpa::R3::Thin::op('lua');
 
     my @nulling_symbol_by_semantic_rule;
     NULLING_SYMBOL: for my $nulling_symbol ( 0 .. $#{$null_values} ) {
