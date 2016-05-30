@@ -903,6 +903,13 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
         case 0:
           return -1;
 
+        case MARPA_OP_LUA:
+        {
+          op_ix++;
+          warn("Executing MARPA_OP_LUA");
+          goto NEXT_OP_CODE;
+        }
+        
         case MARPA_OP_RESULT_IS_UNDEF:
           {
             av_fill (stack, -1 + result_ix);
@@ -2596,7 +2603,7 @@ static int xlua_refcount(lua_State* L, int inc)
     new_refcount = marpa_lua_tointeger(L, -1);
     /* Lua stack [ ] */
     new_refcount += inc;
-    warn("xlua_refcount(), new_refcount=%d", new_refcount);
+    // warn("xlua_refcount(), new_refcount=%d", new_refcount);
     if (new_refcount <= 0) {
        marpa_lua_close(L);
        return 0;

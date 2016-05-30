@@ -379,6 +379,11 @@ sub show_semantics {
             $op_ix++;
             next OP;
         }
+        if ( $op_name eq 'lua' ) {
+            push @op_descs, $ops[$op_ix];
+            $op_ix++;
+            next OP;
+        }
         if ( $op_name eq 'push_constant' ) {
             push @op_descs, $ops[$op_ix];
             $op_ix++;
@@ -966,7 +971,7 @@ sub registration_init {
         SET_OPS: {
 
             if ( $semantics eq '::undef' ) {
-                @ops = ($op_result_is_undef);
+                @ops = ($op_lua, 42, $op_result_is_undef);
                 last SET_OPS;
             }
 
