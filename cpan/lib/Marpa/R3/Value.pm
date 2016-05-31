@@ -971,7 +971,8 @@ sub registration_init {
         SET_OPS: {
 
             if ( $semantics eq '::undef' ) {
-                @ops = ($op_lua, 42, $op_result_is_undef);
+                my $fn_key = $slr->register_fn('local type, result_ix, argn = ...;print([[Salve, munde]], type, result_ix, argn)');
+                @ops = ($op_lua, $fn_key, $op_result_is_undef);
                 last SET_OPS;
             }
 

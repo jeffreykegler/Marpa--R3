@@ -5790,7 +5790,6 @@ PPCODE:
     xlua_refcount(L, 1);
     marpa_lua_newtable(L);
     slr->lua_ref =  marpa_luaL_ref(L, LUA_REGISTRYINDEX);
-    // warn("Create SLR lua ref = %d, slr = %p, slg = %p, L = %p", slr->lua_ref, slr, slr->slg, slr->slg->L);
   }
 
   slr->v_wrapper = NULL;
@@ -7133,7 +7132,7 @@ PPCODE:
   int status;
   int time_object_registry;
   int function_ref;
-  lua_State* const L = slr->slg->L;
+  lua_State* const L = slr->L;
 
   marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, slr->lua_ref);
   /* Lua stack: [ recce_table ] */
@@ -7164,7 +7163,7 @@ PPCODE:
   int recce_object;
   int function_ref;
   int function_stack_ix;
-  lua_State* const L = slr->slg->L;
+  lua_State* const L = slr->L;
 
   marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, slr->lua_ref);
   /* Lua stack: [ recce_table ] */
