@@ -904,11 +904,55 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
           return -1;
 
         case MARPA_OP_LUA:
-        {
-          op_ix++;
-          warn("Executing MARPA_OP_LUA");
-          goto NEXT_OP_CODE;
-        }
+{
+    int argc;
+    int status;
+    lua_State *const L = slr->L;
+    const int base_of_stack = marpa_lua_gettop (L);
+    const int fn_key = ops[op_ix++];
+
+    warn ("Executing MARPA_OP_LUA");
+
+    marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, slr->lua_ref);
+    /* Lua stack: [ recce_table ] */
+    marpa_lua_rawgeti (L, -1, fn_key);
+    /* [ recce_table, function ] */
+
+    marpa_lua_pushstring (L, step_type_to_string (step_type));
+    argc = 1;
+    switch (step_type)
+      {
+      case MARPA_STEP_RULE:
+          marpa_lua_pushinteger (L, result_ix);
+          marpa_lua_pushinteger (L, marpa_v_rule (v));
+          marpa_lua_pushinteger (L, marpa_v_arg_n (v));
+          argc += 3;
+          break;
+      case MARPA_STEP_TOKEN:
+          marpa_lua_pushinteger (L, result_ix);
+          marpa_lua_pushinteger (L, marpa_v_token (v));
+          marpa_lua_pushinteger (L, marpa_v_token_value (v));
+          argc += 3;
+          break;
+      case MARPA_STEP_NULLING_SYMBOL:
+          marpa_lua_pushinteger (L, result_ix);
+          marpa_lua_pushinteger (L, marpa_v_symbol (v));
+          argc += 2;
+          break;
+      default:
+          break;
+      }
+
+    status = marpa_lua_pcall (L, argc, LUA_MULTRET, 0);
+    if (status != 0)
+      {
+          const char *error_string = marpa_lua_tostring (L, -1);
+          marpa_lua_pop (L, 1);
+          croak ("Marpa::R3 Lua code error: %s", error_string);
+      }
+    marpa_lua_settop (L, base_of_stack);
+    goto NEXT_OP_CODE;
+}
         
         case MARPA_OP_RESULT_IS_UNDEF:
           {

@@ -898,6 +898,11 @@ sub registration_init {
     state $op_result_is_undef = Marpa::R3::Thin::op('result_is_undef');
     state $op_lua = Marpa::R3::Thin::op('lua');
 
+    # A handy function for debugging
+    my $debug_fn_key = $slr->register_fn(
+'local type, result_ix, rule_id, arg_n = ...;print([[OP_LUA:]], type, result_ix, rule_id, arg_n)'
+    );
+
     my @nulling_symbol_by_semantic_rule;
     NULLING_SYMBOL: for my $nulling_symbol ( 0 .. $#{$null_values} ) {
         my $semantic_rule = $null_values->[$nulling_symbol];
@@ -971,8 +976,8 @@ sub registration_init {
         SET_OPS: {
 
             if ( $semantics eq '::undef' ) {
-                my $fn_key = $slr->register_fn('local type, result_ix, argn = ...;print([[Salve, munde]], type, result_ix, argn)');
-                @ops = ($op_lua, $fn_key, $op_result_is_undef);
+                my $fn_key = $slr->register_fn('local type, result_ix, argn = ...;print([[OP_LUA:]], type, result_ix, argn)');
+                @ops = ($op_lua, $debug_fn_key, $op_result_is_undef);
                 last SET_OPS;
             }
 
