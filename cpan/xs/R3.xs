@@ -2463,6 +2463,7 @@ static int marpa_sv_nil (lua_State* L) {
 
 static int marpa_sv_finalize_meth (lua_State* L) {
     dTHX;
+    /* Is this check necessary after development? */
     SV** p_sv = (SV**)marpa_luaL_checkudata(L, 1, MT_NAME_SV);
     SV* sv = *p_sv;
     // warn("decrementing ud %p, SV %p, %s %d\n", p_sv, sv, __FILE__, __LINE__);
@@ -2605,9 +2606,9 @@ static const struct luaL_Reg marpa_sv_funcs[] = {
     {NULL, NULL},
 };
 
-/* Leaves the metatable on top of the stack */
-static int marpa_luaopen_sv (lua_State* L) {
-    /* create metatable */
+/* create SV metatable */
+static void create_sv_mt (lua_State* L) {
+    int base_of_stack = marpa_lua_gettop(L);
     marpa_luaL_newmetatable(L, MT_NAME_SV);
     /* Lua stack: [mt] */
 
@@ -2619,12 +2620,7 @@ static int marpa_luaopen_sv (lua_State* L) {
     /* register methods */
     marpa_luaL_setfuncs(L, marpa_sv_meths, 0);
     /* Lua stack: [mt] */
-
-    /* register new function */
-    marpa_luaL_newlib(L, marpa_sv_funcs);
-
-    /* Lua stack: [mt] */
-    return 1;
+    marpa_lua_settop(L, base_of_stack);
 }
 
 /* Manage the ref count of a Lua state, closing it
@@ -2659,6 +2655,20 @@ static int xlua_refcount(lua_State* L, int inc)
     /* Lua stack [ ] */
 }
 
+static int xlua_recce_func(lua_State* L)
+{
+  /* Lua stack [ recce_ref ] */
+  lua_Integer recce_ref = marpa_luaL_checkinteger(L, 1);
+  marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, recce_ref);
+  /* Lua stack [ recce_ref, recce_table ] */
+  return 1;
+}
+
+static const struct luaL_Reg marpa_funcs[] = {
+    {"recce", xlua_recce_func},
+    {NULL, NULL},
+};
+
 /* Returns a new Lua state, set up for Marpa, with
  * a reference count of 1.
  */
@@ -2674,16 +2684,21 @@ static lua_State* xlua_newstate()
               ("Marpa::R3 internal error: Lua interpreter failed to start");
       }
     // warn("New lua state %p, slg = %p", L, slg);
-    xlua_refcount (L, 1);       // increment the ref count
+    xlua_refcount (L, 1);       // increment the ref count of the Lua state
     marpa_luaL_openlibs (L);    /* open libraries */
-    marpa_lua_newtable (L);
+
+    create_sv_mt(L); // create SV metatable
+    /* Lua stack: [] */
+
+    marpa_luaL_newlib(L, marpa_funcs);
+    /* Lua stack: [ marpa_table ] */
     marpa_table = marpa_lua_gettop (L);
     /* Lua stack: [ marpa_table ] */
     marpa_lua_pushvalue (L, -1);
     /* Lua stack: [ marpa_table, marpa_table ] */
     marpa_lua_setglobal (L, "marpa");
     /* Lua stack: [ marpa_table ] */
-    marpa_luaopen_sv (L);       /* open Perl SV library */
+    marpa_luaL_newlib(L, marpa_sv_funcs);
     /* Lua stack: [ marpa_table, sv_table ] */
     marpa_lua_setfield (L, marpa_table, "sv");
     /* Lua stack: [ marpa_table ] */
