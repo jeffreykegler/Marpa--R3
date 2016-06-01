@@ -903,7 +903,15 @@ sub registration_init {
     <<'EOS'
 local recce, type, result_ix, rule_id, arg_n = ...
 print([[OP_LUA:]], recce, type, result_ix, rule_id, arg_n)
-print("stack len:", marpa.sv.top_index(recce.stack()))
+for k,v in pairs(recce)
+do print(k, v)
+end
+mt = debug.getmetatable(recce)
+print([[=== metatable ===]])
+for k,v in pairs(mt)
+do print(k, v)
+end
+print("stack len:", marpa.sv.top_index(recce:stack()))
 EOS
     );
 

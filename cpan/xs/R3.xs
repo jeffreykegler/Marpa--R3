@@ -5934,6 +5934,8 @@ PPCODE:
     // Lua stack: [ recce_table ]
     // No lock held -- SLR must delete recce table in its
     //   destructor.
+    marpa_luaL_setmetatable(L, MT_NAME_RECCE);
+    // Lua stack: [ recce_table ]
     marpa_lua_pushlightuserdata(L, slr);
     // Lua stack: [ recce_table, lud ]
     marpa_lua_setfield(L, -2, "lud");
