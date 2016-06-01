@@ -2623,7 +2623,35 @@ static void create_sv_mt (lua_State* L) {
     marpa_lua_settop(L, base_of_stack);
 }
 
+static int xlua_recce_stack_meth(lua_State* L) {
+    Scanless_R* slr;
+    V_Wrapper *v_wrapper;
+    AV* stack;
+
+    marpa_luaL_checktype(L, 1, LUA_TTABLE);
+    // Lua stack: [ recce_table ]
+    marpa_lua_getfield(L, -1, "lud");
+    // Lua stack: [ recce_table, lud ]
+    slr = (Scanless_R*)marpa_lua_touserdata(L, -1);
+    // the slr owns the recce table, so don't
+    // need to own its components.
+    v_wrapper = slr->v_wrapper;
+    if (!v_wrapper) {
+        // I think this is a reportable error
+        croak("recce.stack(): valuator is not yet active");
+    }
+    stack = v_wrapper->stack;
+    if (!stack) {
+        // I think this is an internal error
+        croak("recce.stack(): valuator has no stack");
+    }
+    marpa_sv_av_noinc(L, stack);
+    // Lua stack: [ recce_table, recce_lud, stack_ud ]
+    return 1;
+}
+
 static const struct luaL_Reg marpa_recce_meths[] = {
+    {"stack", xlua_recce_stack_meth},
     {NULL, NULL},
 };
 
@@ -2708,7 +2736,9 @@ static lua_State* xlua_newstate()
     xlua_refcount (L, 1);       // increment the ref count of the Lua state
     marpa_luaL_openlibs (L);    /* open libraries */
 
-    create_sv_mt(L); // create SV metatable
+    // create metatables
+    create_sv_mt(L);
+    create_recce_mt(L);
     /* Lua stack: [] */
 
     marpa_luaL_newlib(L, marpa_funcs);
