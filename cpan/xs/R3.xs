@@ -905,6 +905,7 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
 
         case MARPA_OP_LUA:
 {
+    // lua_Debug ar;
     int argc;
     int status;
     lua_State *const L = slr->L;
@@ -918,8 +919,14 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
     marpa_lua_rawgeti (L, -1, fn_key);
     /* [ recce_table, function ] */
 
+    // marpa_lua_pushvalue(L, -1);
+    // marpa_lua_getinfo(L, ">S", &ar);
+    // warn("Executing Lua code: %s", ar.source);
+
+    /* The recce table itself is an argument */
+    marpa_lua_pushvalue(L, -2);
     marpa_lua_pushstring (L, step_type_to_string (step_type));
-    argc = 1;
+    argc = 2;
     switch (step_type)
       {
       case MARPA_STEP_RULE:

@@ -900,7 +900,11 @@ sub registration_init {
 
     # A handy function for debugging
     my $debug_fn_key = $slr->register_fn(
-'local type, result_ix, rule_id, arg_n = ...;print([[OP_LUA:]], type, result_ix, rule_id, arg_n)'
+    <<'EOS'
+local recce, type, result_ix, rule_id, arg_n = ...
+print([[OP_LUA:]], recce, type, result_ix, rule_id, arg_n)
+print("stack len:", marpa.sv.top_index(recce.stack()))
+EOS
     );
 
     my @nulling_symbol_by_semantic_rule;
@@ -976,7 +980,6 @@ sub registration_init {
         SET_OPS: {
 
             if ( $semantics eq '::undef' ) {
-                my $fn_key = $slr->register_fn('local type, result_ix, argn = ...;print([[OP_LUA:]], type, result_ix, argn)');
                 @ops = ($op_lua, $debug_fn_key, $op_result_is_undef);
                 last SET_OPS;
             }
