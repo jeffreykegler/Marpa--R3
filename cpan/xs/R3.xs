@@ -2623,6 +2623,27 @@ static void create_sv_mt (lua_State* L) {
     marpa_lua_settop(L, base_of_stack);
 }
 
+static const struct luaL_Reg marpa_recce_meths[] = {
+    {NULL, NULL},
+};
+
+/* create SV metatable */
+static void create_recce_mt (lua_State* L) {
+    int base_of_stack = marpa_lua_gettop(L);
+    marpa_luaL_newmetatable(L, MT_NAME_RECCE);
+    /* Lua stack: [mt] */
+
+    /* metatable.__index = metatable */
+    marpa_lua_pushvalue(L, -1);
+    marpa_lua_setfield(L, -2, "__index");
+    /* Lua stack: [mt] */
+
+    /* register methods */
+    marpa_luaL_setfuncs(L, marpa_recce_meths, 0);
+    /* Lua stack: [mt] */
+    marpa_lua_settop(L, base_of_stack);
+}
+
 /* Manage the ref count of a Lua state, closing it
  * when it falls to zero.
  * 'inc' should be
@@ -5847,8 +5868,17 @@ PPCODE:
     lua_State* L = slr->slg->L;
     slr->L = L;
     xlua_refcount(L, 1);
+    // Lua stack: []
     marpa_lua_newtable(L);
+    // Lua stack: [ recce_table ]
+    // No lock held -- SLR must delete recce table in its
+    //   destructor.
+    marpa_lua_pushlightuserdata(L, slr);
+    // Lua stack: [ recce_table, lud ]
+    marpa_lua_setfield(L, -2, "lud");
+    // Lua stack: [ recce_table ]
     slr->lua_ref =  marpa_luaL_ref(L, LUA_REGISTRYINDEX);
+    // Lua stack: []
   }
 
   slr->v_wrapper = NULL;
