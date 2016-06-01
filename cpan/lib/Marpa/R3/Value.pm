@@ -899,8 +899,7 @@ sub registration_init {
     state $op_lua = Marpa::R3::Thin::op('lua');
 
     # A handy function for debugging
-    my $debug_fn_key = $slr->register_fn(
-    <<'EOS'
+    my $debug_fn_key = $slr->register_fn(<<'EOS');
 local recce, type, result_ix, rule_id, arg_n = ...
 print([[OP_LUA:]], recce, type, result_ix, rule_id, arg_n)
 for k,v in pairs(recce)
@@ -912,8 +911,16 @@ for k,v in pairs(mt)
 do print(k, v)
 end
 print("stack len:", marpa.sv.top_index(recce:stack()))
+return 0
 EOS
-    );
+
+    my $result_is_undef_key = $slr->register_fn(<<'EOS');
+    local recce, type, result_ix = ...
+    local stack = recce:stack()
+    stack[result_ix] = marpa.sv.lua_nil()
+    marpa.sv.fill(stack, result_ix)
+    return 0
+EOS
 
     my @nulling_symbol_by_semantic_rule;
     NULLING_SYMBOL: for my $nulling_symbol ( 0 .. $#{$null_values} ) {
@@ -988,7 +995,8 @@ EOS
         SET_OPS: {
 
             if ( $semantics eq '::undef' ) {
-                @ops = ($op_lua, $debug_fn_key, $op_result_is_undef);
+                # @ops = ($op_lua, $result_is_undef_key, $op_result_is_undef);
+                @ops = ($op_lua, $result_is_undef_key);
                 last SET_OPS;
             }
 

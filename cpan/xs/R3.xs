@@ -2633,7 +2633,7 @@ static const struct luaL_Reg marpa_sv_meths[] = {
 static const struct luaL_Reg marpa_sv_funcs[] = {
     {"fill", marpa_av_fill_meth},
     {"top_index", marpa_av_len_meth},
-    {"nil", marpa_sv_nil},
+    {"lua_nil", marpa_sv_nil},
     {NULL, NULL},
 };
 
