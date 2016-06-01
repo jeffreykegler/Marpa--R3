@@ -895,7 +895,6 @@ sub registration_init {
     state $op_result_is_rhs_n = Marpa::R3::Thin::op('result_is_rhs_n');
     state $op_result_is_token_value =
         Marpa::R3::Thin::op('result_is_token_value');
-    state $op_result_is_undef = Marpa::R3::Thin::op('result_is_undef');
     state $op_lua = Marpa::R3::Thin::op('lua');
 
     # A handy function for debugging
@@ -1026,7 +1025,7 @@ EOS
                 if ( $ref_type eq 'SCALAR' ) {
                     my $thingy = ${$thingy_ref};
                     if ( not defined $thingy ) {
-                        @ops = ($op_result_is_undef);
+                        @ops = ($op_lua, $result_is_undef_key);
                         last SET_OPS;
                     }
                     @ops = ( $op_result_is_constant, $thingy_ref );
@@ -1105,7 +1104,7 @@ EOS
             } ## end PROCESS_SINGLETON_RESULT:
 
             if ( not defined $array_fate ) {
-                @ops = ($op_result_is_undef);
+                @ops = ($op_lua, $result_is_undef_key);
                 last SET_OPS;
             }
 
