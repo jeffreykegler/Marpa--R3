@@ -16,7 +16,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-use Test::More tests => 28;
+use Test::More tests => 30;
 use English qw( -no_match_vars );
 use lib 'inc';
 use Marpa::R3::Test;
@@ -48,6 +48,8 @@ do_global_test('return taxicurry(10^3)', [], [1729]);
 do_global_test("local x = ...; x[0] = 42; return x", [[]], [[42]]);
 do_global_test("local x = ...; local tmp = x[1]; x[1] = x[0]; x[0] = tmp; return x", [[42, 7]], [[7, 42]], "Swap array elements #1");
 do_global_test("local y = ...; y[1], y[0] = y[0], y[1]; return y", [[42, 7]], [[7, 42]], "Swap array elements #2");
+do_global_test("local y = ...; return marpa.sv.top_index(y)", [[42, 7]], [1], "Array top index of 1");
+do_global_test("local y = ...; return marpa.sv.top_index(y)", [[]], [-1], "Array top index of -1");
 
 sub do_global_test {
     my ($code, $args, $expected, $test_name) = @_;

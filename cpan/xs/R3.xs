@@ -2497,7 +2497,7 @@ static int marpa_sv_add_meth (lua_State* L) {
 }
 
 /* Fetch from table at index key.
- * The reference count is not changed, if the caller must use this
+ * The reference count is not changed, the caller must use this
  * SV immediately, or increment the reference count.
  * Will return 0, if there is no SV at that index.
  */
@@ -2529,6 +2529,29 @@ static int marpa_av_fetch_meth(lua_State* L) {
         /* Put a new nil SV on top of the stack */
         marpa_sv_nil(L);
     }
+    return 1;
+}
+
+/* Basically a Lua wrapper for Perl's av_len()
+ */
+static int
+marpa_av_len_meth (lua_State * L)
+{
+    dTHX;
+    AV *av;
+    SV **const p_table_sv = (SV **) marpa_luaL_checkudata (L, 1, MT_NAME_SV);
+    SV* const table = *p_table_sv;
+
+    if (!SvROK (table))
+      {
+          croak ("Attempt to fetch from an SV which is not a ref");
+      }
+    if (SvTYPE (SvRV (table)) != SVt_PVAV)
+      {
+          croak ("Attempt to fetch from an SV which is not an AV ref");
+      }
+    av = (AV *) SvRV (table);
+    marpa_lua_pushinteger (L, av_len (av));
     return 1;
 }
 
@@ -2602,6 +2625,7 @@ static const struct luaL_Reg marpa_sv_meths[] = {
 
 static const struct luaL_Reg marpa_sv_funcs[] = {
     {"fill", marpa_av_fill_meth},
+    {"top_index", marpa_av_len_meth},
     {"nil", marpa_sv_nil},
     {NULL, NULL},
 };
