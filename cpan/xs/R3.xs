@@ -2676,7 +2676,7 @@ static int xlua_recce_stack_meth(lua_State* L) {
         // I think this is an internal error
         croak("recce.stack(): valuator has no stack");
     }
-    marpa_sv_av_noinc(L, stack);
+    MARPA_SV_AV(L, stack);
     // Lua stack: [ recce_table, recce_lud, stack_ud ]
     return 1;
 }
