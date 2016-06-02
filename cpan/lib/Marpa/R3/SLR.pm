@@ -1437,31 +1437,6 @@ sub Marpa::R3::Scanless::G::parse {
     return $value_ref;
 } ## end sub Marpa::R3::Scanless::G::parse
 
-sub Marpa::R3::Scanless::R::rule_closure {
-
-    my ( $slr, $rule_id ) = @_;
-
-    if ( not $slr->[Marpa::R3::Internal::Scanless::R::REGISTRATIONS] ) {
-        Marpa::R3::Internal::Value::registration_init( $slr, {} );
-    }
-
-    my $rule_closure =
-      $slr->[Marpa::R3::Internal::Scanless::R::CLOSURE_BY_RULE_ID]->[$rule_id];
-    if ( defined $rule_closure ) {
-        my $ref_rule_closure = ref $rule_closure;
-        if ( $ref_rule_closure eq 'CODE' ) {
-            return $rule_closure;
-        }
-        elsif ( $ref_rule_closure eq 'SCALAR' ) {
-            return $rule_closure;
-        }
-    }
-    else {
-        return;
-    }
-
-}
-
 sub Marpa::R3::Scanless::R::series_restart {
     my ( $slr , @args ) = @_;
 
