@@ -83,6 +83,37 @@ marpa_slif_op_id (const char *name)
   return -1;
 }
 
+/* Assumes the marpa table is on the top of the stack,
+ * and leaves it there.
+ */
+static void populate_ops(lua_State* L)
+{
+    int op_table;
+    int i;
+    const int marpa_table = marpa_lua_gettop(L);
+
+    marpa_lua_newtable(L);
+    // [ marpa_table, op_table ]
+    marpa_lua_pushvalue(L, -1);
+    // [ marpa_table, op_table, op_table ]
+    marpa_lua_setfield(L, marpa_table, "marpa");
+    // [ marpa_table, op_table ]
+    op_table = marpa_lua_gettop(L);
+    for (i = 0; i < Dim(op_by_name_object); i++) {
+        // [ marpa_table, op_table ]
+        marpa_lua_pushinteger(L, i);
+        // [ marpa_table, op_table, i ]
+        marpa_lua_setfield(L, op_table, op_by_name_object[i].name);
+        // [ marpa_table, op_table ]
+        marpa_lua_pushinteger(L, i);
+        marpa_lua_pushstring(L, op_by_name_object[i].name);
+        // [ marpa_table, op_table, i, name ]
+        marpa_lua_settable(L, op_table);
+        // [ marpa_table, op_table ]
+    }
+    marpa_lua_settop(L, marpa_table);
+}
+
 static void marpa_slr_event_clear( Scanless_R* slr )
 {
   slr->t_event_count = 0;
@@ -2810,8 +2841,13 @@ static lua_State* xlua_newstate()
     marpa_lua_newtable (L);
     /* Lua stack: [ marpa_table, context_table ] */
     marpa_lua_setfield (L, marpa_table, "context");
+    /* Lua stack: [ marpa_table ] */
+
+    populate_ops(L);
+    /* Lua stack: [ marpa_table ] */
+
     marpa_lua_settop (L, base_of_stack);
-    /* Lua stack: empty */
+    /* Lua stack: [] */
     return L;
 }
 
