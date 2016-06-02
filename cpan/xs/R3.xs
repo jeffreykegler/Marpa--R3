@@ -7316,6 +7316,7 @@ PPCODE:
   int function_ref;
   int function_stack_ix;
   lua_State* const L = slr->L;
+  const int base_of_stack = marpa_lua_gettop(L);
 
   marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, slr->lua_ref);
   /* Lua stack: [ recce_table ] */
@@ -7328,6 +7329,10 @@ PPCODE:
   // warn ("function_stack_ix=%d %s %d\n", function_stack_ix, __FILE__, __LINE__);
   // warn ("items=%d %s %d\n", items, __FILE__, __LINE__);
   /* push arguments */
+  marpa_lua_pushvalue(L, -2); // first argument is recce table
+  /* [ recce_table, function, recce_table ] */
+
+  /* the remaining arguments are those passed to the Perl call */
   for (i = 2; i < items; i++)
     {
       // warn ("%s %d: pushing Perl arg %d\n", __FILE__, __LINE__, i);
@@ -7340,11 +7345,11 @@ PPCODE:
       // warn ("%s %d\n", __FILE__, __LINE__);
     }
 
-  status = marpa_lua_pcall (L, items - 2, LUA_MULTRET, 0);
+  status = marpa_lua_pcall (L, (items - 2) + 1, LUA_MULTRET, 0);
   if (status != 0)
     {
       const char *error_string = marpa_lua_tostring (L, -1);
-      marpa_lua_pop (L, 1);
+      marpa_lua_settop (L, base_of_stack);
       croak ("Marpa::R3 Lua code error: %s", error_string);
     }
 
@@ -7360,7 +7365,8 @@ PPCODE:
       XPUSHs (sv_2mortal (sv_result));
       // warn ("%s %d\n", __FILE__, __LINE__);
     }
-  marpa_lua_settop (L, recce_object - 1);
+
+  marpa_lua_settop (L, base_of_stack);
   // warn ("%s %d\n", __FILE__, __LINE__);
 }
 
