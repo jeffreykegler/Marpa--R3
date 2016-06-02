@@ -331,6 +331,8 @@ typedef struct
   int precomputed;
   struct symbol_g_properties *symbol_g_properties;
   struct l0_rule_g_properties *l0_rule_g_properties;
+
+  int lua_ref;
   lua_State* L;
 
 } Scanless_G;

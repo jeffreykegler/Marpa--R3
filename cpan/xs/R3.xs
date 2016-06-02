@@ -2303,6 +2303,7 @@ slr_es_span_to_literal_sv (Scanless_R * slr,
 
 #define MT_NAME_SV "Marpa_sv"
 #define MT_NAME_RECCE "Marpa_recce"
+#define MT_NAME_GRAMMAR "Marpa_grammar"
 
 /* Coerce a Lua value to a Perl SV, if necessary one that
  * is simply a string with an error message.
@@ -2703,6 +2704,27 @@ static void create_recce_mt (lua_State* L) {
     marpa_lua_settop(L, base_of_stack);
 }
 
+static const struct luaL_Reg marpa_grammar_meths[] = {
+    {NULL, NULL},
+};
+
+/* create SV metatable */
+static void create_grammar_mt (lua_State* L) {
+    int base_of_stack = marpa_lua_gettop(L);
+    marpa_luaL_newmetatable(L, MT_NAME_GRAMMAR);
+    /* Lua stack: [mt] */
+
+    /* metatable.__index = metatable */
+    marpa_lua_pushvalue(L, -1);
+    marpa_lua_setfield(L, -2, "__index");
+    /* Lua stack: [mt] */
+
+    /* register methods */
+    marpa_luaL_setfuncs(L, marpa_grammar_meths, 0);
+    /* Lua stack: [mt] */
+    marpa_lua_settop(L, base_of_stack);
+}
+
 /* Manage the ref count of a Lua state, closing it
  * when it falls to zero.
  * 'inc' should be
@@ -2769,6 +2791,7 @@ static lua_State* xlua_newstate()
 
     // create metatables
     create_sv_mt(L);
+    create_grammar_mt(L);
     create_recce_mt(L);
     /* Lua stack: [] */
 
@@ -5250,6 +5273,24 @@ PPCODE:
 
     slg->L = xlua_newstate();
 
+  {
+    lua_State* L = slg->L;
+    xlua_refcount(L, 1);
+    // Lua stack: []
+    marpa_lua_newtable(L);
+    // Lua stack: [ grammar_table ]
+    // No lock held -- SLG must delete grammar table in its
+    //   destructor.
+    marpa_luaL_setmetatable(L, MT_NAME_GRAMMAR);
+    // Lua stack: [ grammar_table ]
+    marpa_lua_pushlightuserdata(L, slg);
+    // Lua stack: [ grammar_table, lud ]
+    marpa_lua_setfield(L, -2, "lud");
+    // Lua stack: [ grammar_table ]
+    slg->lua_ref =  marpa_luaL_ref(L, LUA_REGISTRYINDEX);
+    // Lua stack: []
+  }
+
     new_sv = sv_newmortal ();
     sv_setref_pv (new_sv, scanless_g_class_name, (void *) slg);
     XPUSHs (new_sv);
@@ -5271,6 +5312,11 @@ PPCODE:
     Safefree(slg->per_codepoint_array[i]);
   }
 
+  /* This is unnecessary at the moment, so the next statement
+   * will destroy the Lua state.  But someday grammars may share
+   * Lua states, and then this will be necessary.
+   */
+  marpa_luaL_unref(slg->L, LUA_REGISTRYINDEX, slg->lua_ref);
   xlua_refcount(slg->L, -1);
   Safefree (slg);
 }
@@ -5751,32 +5797,29 @@ PPCODE:
       }
 }
 
+   # !! NOT TESTED !!!
+   # No register_fn() method yet !!
 void
-exec( slg, codestr, ... )
+exec( slg, fn_key, ... )
    Scanless_G* slg;
-   char* codestr;
+   int fn_key;
 PPCODE:
 {
   int i, status;
   int top_before, top_after;
   lua_State* const L = slg->L;
+  const int base_of_stack = marpa_lua_gettop(L);
 
-  // warn ("%s %d\n", __FILE__, __LINE__);
-  top_before = marpa_lua_gettop (L);
-  // warn ("top before pcall = %d", top_before);
+  marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, slg->lua_ref);
+  /* Lua stack: [ grammar_table ] */
+  marpa_lua_rawgeti (L, -1, fn_key);
+  /* [ grammar_table, function ] */
 
-  status =
-    marpa_luaL_loadbuffer (L, codestr, strlen (codestr), codestr);
-  if (status != 0)
-    {
-      const char *error_string = marpa_lua_tostring (L, -1);
-      marpa_lua_pop (L, 1);
-      croak ("Marpa::R3::Lua error in luaL_loadbuffer: %s", error_string);
-    }
-
-  // warn ("%s %d\n", __FILE__, __LINE__);
   /* push arguments */
-  for (i = 1; i < items; i++)
+  marpa_lua_pushvalue(L, -2); // first argument is recce table
+  /* [ grammar_table, function, grammar_table ] */
+
+  for (i = 2; i < items; i++)
     {
       // warn ("%s %d: pushing Perl arg %d\n", __FILE__, __LINE__, i);
       SV *arg_sv = ST (i);
@@ -5788,7 +5831,7 @@ PPCODE:
       // warn ("%s %d\n", __FILE__, __LINE__);
     }
 
-  status = marpa_lua_pcall (L, items - 1, LUA_MULTRET, 0);
+  status = marpa_lua_pcall (L, (items - 2) + 1, LUA_MULTRET, 0);
   if (status != 0)
     {
       const char *error_string = marpa_lua_tostring (L, -1);
