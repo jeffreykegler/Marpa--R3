@@ -1376,6 +1376,12 @@ sub Marpa::R3::Scanless::R::value {
     value_trace( $value, $trace_values ? 1 : 0 );
     $value->trace_values($trace_values);
 
+    $slr->exec_string(<<'END_OF_LUA');
+    for k,v in pairs(marpa.ops)
+    do print("OP:", k, v)
+    end
+END_OF_LUA
+
     my $null_values = $slr->[Marpa::R3::Internal::Scanless::R::NULL_VALUES];
     my $nulling_closures =
         $slr->[Marpa::R3::Internal::Scanless::R::CLOSURE_BY_SYMBOL_ID];

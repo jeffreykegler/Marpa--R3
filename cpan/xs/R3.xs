@@ -96,7 +96,7 @@ static void populate_ops(lua_State* L)
     // [ marpa_table, op_table ]
     marpa_lua_pushvalue(L, -1);
     // [ marpa_table, op_table, op_table ]
-    marpa_lua_setfield(L, marpa_table, "marpa");
+    marpa_lua_setfield(L, marpa_table, "ops");
     // [ marpa_table, op_table ]
     op_table = marpa_lua_gettop(L);
     for (i = 0; i < Dim(op_by_name_object); i++) {
@@ -7381,6 +7381,23 @@ PPCODE:
   function_ref = marpa_luaL_ref (L, time_object_registry);
   marpa_lua_pop(L, (marpa_lua_gettop(L) - time_object_registry) + 1);
   XPUSHs (sv_2mortal (newSViv (function_ref)));
+}
+
+void
+unregister_fn(slr, fn_key)
+    Scanless_R *slr;
+    int fn_key;
+PPCODE:
+{
+  int status;
+  int recce_table;
+  lua_State* const L = slr->L;
+  const int base_of_stack = marpa_lua_gettop(L);
+
+  marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, slr->lua_ref);
+  /* Lua stack: [ recce_table ] */
+  marpa_luaL_unref (L, -1, fn_key);
+  marpa_lua_settop (L, base_of_stack);
 }
 
 void
