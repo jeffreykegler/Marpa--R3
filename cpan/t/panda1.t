@@ -29,19 +29,22 @@ use Marpa::R3;
 
 my $dsl = <<'END_OF_SOURCE';
 
-S   ::= NP  VP  period  action => do_S
+:default ::= action => [ values ] bless => ::lhs
+lexeme default = action => [ value ] bless => ::name
 
-NP  ::= NN              action => do_NP_NN
-    |   NNS             action => do_NP_NNS
-    |   DT  NN          action => do_NP_DT_NN
-    |   NN  NNS         action => do_NP_NN_NNS
-    |   NNS CC NNS      action => do_NP_NNS_CC_NNS
+S   ::= NP  VP  period  bless => S
 
-VP  ::= VBZ NP          action => do_VP_VBZ_NP
-    | VP VBZ NNS        action => do_VP_VP_VBZ_NNS
-    | VP CC VP          action => do_VP_VP_CC_VP
-    | VP VP CC VP       action => do_VP_VP_VP_CC_VP
-    | VBZ               action => do_VP_VBZ
+NP  ::= NN              bless => NP
+    |   NNS          bless => NP
+    |   DT  NN          bless => NP
+    |   NN  NNS         bless => NP
+    |   NNS CC NNS  bless => NP
+
+VP  ::= VBZ NP          bless => VP
+    | VP VBZ NNS        bless => VP
+    | VP CC VP bless => VP
+    | VP VP CC VP bless => VP
+    | VBZ bless => VP
 
 period ~ '.'
 
@@ -57,7 +60,7 @@ VBZ ~ 'eats' | 'shoots' | 'leaves'
 END_OF_SOURCE
 
 my $grammar = Marpa::R3::Scanless::G->new(
-    { source => \$dsl } );
+    { bless_package => 'PennTags', source => \$dsl, } );
 
 my $full_expected = <<'END_OF_OUTPUT';
 (S (NP (DT a) (NN panda))
@@ -75,15 +78,12 @@ my $sentence = 'a panda eats shoots and leaves.';
 
 my @actual = ();
 
-my $recce = Marpa::R3::Scanless::R->new( {
-    grammar => $grammar,
-    semantics_package => 'PennTags'
-} );
+my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
 
 $recce->read( \$sentence );
 
 while ( defined( my $value_ref = $recce->value() ) ) {
-    my $value = $value_ref ? ${$value_ref} : 'No parse';
+    my $value = $value_ref ? ${$value_ref}->bracket() : 'No parse';
     push @actual, $value;
 }
 
@@ -91,10 +91,8 @@ Marpa::R3::Test::is( ( join "\n", sort @actual ) . "\n",
     $full_expected, 'Ambiguous English sentence using value()' );
 
 my $panda_grammar = Marpa::R3::Scanless::G->new(
-    { source => \$dsl } );
-my $panda_recce = Marpa::R3::Scanless::R->new(
-    { grammar => $panda_grammar,
-      semantics_package => 'PennTags' } );
+    { bless_package => 'PennTags', source => \$dsl, } );
+my $panda_recce = Marpa::R3::Scanless::R->new( { grammar => $panda_grammar } );
 $panda_recce->read( \$sentence );
 my $asf = Marpa::R3::ASF->new( { slr=>$panda_recce } );
 my $full_result = $asf->traverse( {}, \&full_traverser );
@@ -113,7 +111,9 @@ sub full_traverser {
     # A token is a single choice and we just return it as a literal wrapped
     # to match the rule closures parameter list
     if ( not defined $rule_id ) {
-        return [ $glade->literal() ];
+        my $literal = $glade->literal();
+        my $penn_tag = penn_tag($symbol_name);
+        return ["($penn_tag $literal)"];
     } ## end if ( not defined $rule_id )
 
     # Our result will be a list of choices
@@ -142,25 +142,11 @@ sub full_traverser {
         # and join into a single Penn-tagged element.  The result will be
         # to collapse one level of lists, and leave us with a list of
         # Penn-tagged elements.
-
-        # First, we take the semantic action closure of the rule as defined in the
-        # recognizer's semantic package.
-        my $closure = $panda_recce->rule_closure( $glade->rule_id() );
-        # Note: $glade->rule_id() is used instead of the above $rule_id, because
-        # $glade->next() must have been called and the current glade (and thus
-        # the rule) might have changed
-
-        # Now, we need to check if the semantic action of the rule is defined
-        # as a closure. For now, we just die if it is not.
-        #
-        # However, start, length, lhs, and values builtins can be emulated by
-        # using $glade->span(), $glade->symbol_id(), and $glade->rh_values().
-        # Still, defining closures would probably serve you better.
-        unless (defined $closure and ref $closure eq 'CODE'){
-            die "The semantics of Rule #" . $glade->rule_id() . "is not defined as a closure.";
-        }
-
-        push @return_value, map { $closure->( {}, $_ ) } @results;
+        my $join_ws = q{ };
+        $join_ws = qq{\n   } if $symbol_name eq 'S';
+        push @return_value,
+            map { '(' . penn_tag($symbol_name) . q{ } . ( join $join_ws, @{$_} ) . ')' }
+            @results;
 
         # Look at the next alternative in this glade, or end the
         # loop if there is none
@@ -176,6 +162,12 @@ my $cooked_result =  join "\n", (sort @{$full_result}), q{};
 Marpa::R3::Test::is( $cooked_result, $full_expected,
     'Ambiguous English sentence using ASF' );
 
+sub penn_tag {
+   my ($symbol_name) = @_;
+   return q{.} if $symbol_name eq 'period';
+   return $symbol_name;
+}
+
 sub pruning_traverser {
 
     # This routine converts the glade into a list of Penn-tagged elements.  It is called recursively.
@@ -186,7 +178,9 @@ sub pruning_traverser {
 
     # A token is a single choice, and we know enough to fully Penn-tag it
     if ( not defined $rule_id ) {
-        return $glade->literal(); # wrap for the closure call
+        my $literal = $glade->literal();
+        my $penn_tag = penn_tag($symbol_name);
+        return "($penn_tag $literal)";
     }
 
 # Marpa::R3::Display::Start
@@ -196,16 +190,14 @@ sub pruning_traverser {
 
 # Marpa::R3::Display::End
 
-    if ($symbol_name eq '[:start]'){
-        # Special case for the start rule
-        return $return_value[0] . "\n"  ;
-    }
-    else{
-        my $closure = $panda_recce->rule_closure($rule_id);
-        die "The semantics of Rule $rule_id is not defined as a closure."
-            unless defined $closure and ref $closure eq 'CODE';
-        return $closure->( {}, \@return_value );
-    }
+    # Special case for the start rule
+    return (join q{ }, @return_value) . "\n" if  $symbol_name eq '[:start]' ;
+
+    my $join_ws = q{ };
+    $join_ws = qq{\n   } if $symbol_name eq 'S';
+    my $penn_tag = penn_tag($symbol_name);
+    return "($penn_tag " . ( join $join_ws, @return_value ) . ')';
+
 }
 
 my $pruned_expected = <<'END_OF_OUTPUT';
@@ -217,18 +209,26 @@ END_OF_OUTPUT
 Marpa::R3::Test::is( $pruned_result, $pruned_expected,
     'Ambiguous English sentence using ASF: pruned' );
 
-sub PennTags::do_S  { my (undef, $values) = @_; my @v = @{$values}; "(S $v[0]\n   $v[1]\n   (. .))" }
+package PennTags;
 
-sub PennTags::do_NP_NN          { my (undef, $values) = @_; my @v = @{$values};"(NP (NN $v[0]))" }
-sub PennTags::do_NP_NNS         { my (undef, $values) = @_; my @v = @{$values};"(NP (NNS $v[0]))" }
-sub PennTags::do_NP_DT_NN       { my (undef, $values) = @_; my @v = @{$values}; "(NP (DT $v[0]) (NN $v[1]))" }
-sub PennTags::do_NP_NN_NNS      { my (undef, $values) = @_; my @v = @{$values};"(NP (NN $v[0]) (NNS $v[1]))" }
-sub PennTags::do_NP_NNS_CC_NNS  { my (undef, $values) = @_; my @v = @{$values};"(NP (NNS $v[0]) (CC $v[1]) (NNS $v[2]))" }
+sub contents {
+    join( $_[0], map { $_->bracket() } @{ $_[1] } );
+}
 
-sub PennTags::do_VP_VBZ_NP      { my (undef, $values) = @_; my @v = @{$values};"(VP (VBZ $v[0]) $v[1])" }
-sub PennTags::do_VP_VP_VBZ_NNS  { my (undef, $values) = @_; my @v = @{$values};"(VP $v[0] (VBZ $v[1]) (NNS $v[2]))" }
-sub PennTags::do_VP_VP_CC_VP    { my (undef, $values) = @_; my @v = @{$values};"(VP $v[0] (CC $v[1]) $v[2])" }
-sub PennTags::do_VP_VP_VP_CC_VP { my (undef, $values) = @_; my @v = @{$values};"(VP $v[0] $v[1] (CC $v[2]) $v[3])" }
-sub PennTags::do_VP_VBZ         { my (undef, $values) = @_; my @v = @{$values};"(VP (VBZ $v[0]))" }
+sub PennTags::S::bracket { "(S " . contents( "\n   ", $_[0] ) . ")" }
+sub PennTags::NP::bracket { "(NP " . contents( ' ', $_[0] ) . ")" }
+sub PennTags::VP::bracket { "(VP " . contents( ' ', $_[0] ) . ")" }
+sub PennTags::PP::bracket { "(PP " . contents( ' ', $_[0] ) . ")" }
+
+sub PennTags::CC::bracket  {"(CC $_[0]->[0])"}
+sub PennTags::DT::bracket  {"(DT $_[0]->[0])"}
+sub PennTags::IN::bracket  {"(IN $_[0]->[0])"}
+sub PennTags::NN::bracket  {"(NN $_[0]->[0])"}
+sub PennTags::NNS::bracket {"(NNS $_[0]->[0])"}
+sub PennTags::VB::bracket  {"(VB $_[0]->[0])"}
+sub PennTags::VBP::bracket {"(VBP $_[0]->[0])"}
+sub PennTags::VBZ::bracket {"(VBZ $_[0]->[0])"}
+
+sub PennTags::period::bracket {"(. .)"}
 
 # vim: expandtab shiftwidth=4:
