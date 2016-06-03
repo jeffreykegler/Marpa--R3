@@ -943,7 +943,7 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
     const int base_of_stack = marpa_lua_gettop (L);
     const int fn_key = ops[op_ix++];
 
-    warn ("Executing MARPA_OP_LUA");
+    // warn ("Executing MARPA_OP_LUA");
 
     marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, slr->lua_ref);
     /* Lua stack: [ recce_table ] */
@@ -2827,17 +2827,18 @@ static int xlua_array_new_func(lua_State* L)
 }
 
 static int
-xlua_array_from_list_meth (lua_State * L)
+xlua_array_from_list_func (lua_State * L)
 {
     int ix;
+    Xlua_Array *p_array;
     const int last_arg = marpa_lua_gettop (L);
-    Xlua_Array *p_array =
-        (Xlua_Array *) marpa_luaL_checkudata (L, 1, MT_NAME_ARRAY);
-    marpa_luaL_argcheck (L, ((last_arg - 1) > p_array->size), last_arg,
-        "too many values for array");
-    for (ix = 2; ix <= last_arg; ix++) {
+    
+    xlua_array_new(L, last_arg);
+    /* [ array_ud ] */
+    p_array = (Xlua_Array *) marpa_lua_touserdata (L, -1);
+    for (ix = 1; ix <= last_arg; ix++) {
         const unsigned int value = marpa_luaL_checkinteger (L, ix);
-        p_array->array[ix - 2] = value;
+        p_array->array[ix - 1] = value;
     }
     return 0;
 }
@@ -2855,6 +2856,19 @@ xlua_array_index_meth (lua_State * L)
 }
 
 static int
+xlua_array_new_index_meth (lua_State * L)
+{
+    Xlua_Array * const p_array =
+        (Xlua_Array *) marpa_luaL_checkudata (L, 1, MT_NAME_ARRAY);
+    const unsigned int ix = marpa_luaL_checkinteger (L, 2);
+    const unsigned int value = marpa_luaL_checkinteger (L, 3);
+    marpa_luaL_argcheck (L, (ix < 0 || ix >= p_array->size), 2,
+        "index out of bounds");
+    p_array->array[ix] = value;
+    return 1;
+}
+
+static int
 xlua_array_len_meth (lua_State * L)
 {
     Xlua_Array * const p_array =
@@ -2864,14 +2878,14 @@ xlua_array_len_meth (lua_State * L)
 }
 
 static const struct luaL_Reg marpa_array_meths[] = {
-    {"from_list", xlua_array_from_list_meth},
     {"__index", xlua_array_index_meth},
-    {"__newindex", xlua_array_from_list_meth},
+    {"__newindex", xlua_array_new_index_meth},
     {"__len", xlua_array_len_meth},
     {NULL, NULL},
 };
 
 static const struct luaL_Reg marpa_array_funcs[] = {
+    {"from_list", xlua_array_from_list_func},
     {"new", xlua_array_new_func},
     {NULL, NULL},
 };
@@ -2926,10 +2940,17 @@ static lua_State* xlua_newstate()
     /* Lua stack: [ marpa_table, marpa_table ] */
     marpa_lua_setglobal (L, "marpa");
     /* Lua stack: [ marpa_table ] */
+
     marpa_luaL_newlib(L, marpa_sv_funcs);
     /* Lua stack: [ marpa_table, sv_table ] */
     marpa_lua_setfield (L, marpa_table, "sv");
     /* Lua stack: [ marpa_table ] */
+
+    marpa_luaL_newlib(L, marpa_array_funcs);
+    /* Lua stack: [ marpa_table, sv_table ] */
+    marpa_lua_setfield (L, marpa_table, "array");
+    /* Lua stack: [ marpa_table ] */
+
     marpa_lua_newtable (L);
     /* Lua stack: [ marpa_table, context_table ] */
     marpa_lua_setfield (L, marpa_table, "context");

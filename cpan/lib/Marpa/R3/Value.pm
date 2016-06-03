@@ -1377,9 +1377,14 @@ sub Marpa::R3::Scanless::R::value {
     $value->trace_values($trace_values);
 
     $slr->exec_string(<<'END_OF_LUA');
-    for k,v in pairs(marpa.ops)
-    do io.stderr:write(string.format("OP: %s %s\n", k, v))
-    end
+    -- for k,v in pairs(marpa.ops)
+    -- do io.stderr:write(string.format("OP: %s %s\n", k, v))
+    -- end
+    local recce = ...
+    recce.rule_semantics = {}
+    recce.token_semantics = {}
+    recce.nulling_semantics = {}
+    recce.nulling_semantics.default = marpa.array.from_list(marpa.ops.result_is_undef,0)
 END_OF_LUA
 
     my $null_values = $slr->[Marpa::R3::Internal::Scanless::R::NULL_VALUES];
