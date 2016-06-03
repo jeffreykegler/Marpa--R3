@@ -2335,6 +2335,7 @@ slr_es_span_to_literal_sv (Scanless_R * slr,
 #define MT_NAME_SV "Marpa_sv"
 #define MT_NAME_RECCE "Marpa_recce"
 #define MT_NAME_GRAMMAR "Marpa_grammar"
+#define MT_NAME_ARRAY "Marpa_array"
 
 /* Coerce a Lua value to a Perl SV, if necessary one that
  * is simply a string with an error message.
@@ -2802,6 +2803,96 @@ static const struct luaL_Reg marpa_funcs[] = {
     {NULL, NULL},
 };
 
+/* === LUA ARRAY CLASS === */
+
+typedef struct Xlua_Array {
+    size_t size;
+    unsigned int array[1];
+} Xlua_Array;
+
+/* Leaves new userdata on top of stack */
+static void
+xlua_array_new (lua_State * L, size_t size)
+{
+    Xlua_Array *result = (Xlua_Array *) marpa_lua_newuserdata (L,
+        sizeof (Xlua_Array) + (size - 1) * sizeof (unsigned int));
+    marpa_luaL_setmetatable (L, MT_NAME_ARRAY);
+}
+
+static int xlua_array_new_func(lua_State* L)
+{
+   const size_t size = marpa_luaL_checkinteger(L, 1);
+   xlua_array_new(L, size);
+   return 1;
+}
+
+static int
+xlua_array_from_list_meth (lua_State * L)
+{
+    int ix;
+    const int last_arg = marpa_lua_gettop (L);
+    Xlua_Array *p_array =
+        (Xlua_Array *) marpa_luaL_checkudata (L, 1, MT_NAME_ARRAY);
+    marpa_luaL_argcheck (L, ((last_arg - 1) > p_array->size), last_arg,
+        "too many values for array");
+    for (ix = 2; ix <= last_arg; ix++) {
+        const unsigned int value = marpa_luaL_checkinteger (L, ix);
+        p_array->array[ix - 2] = value;
+    }
+    return 0;
+}
+
+static int
+xlua_array_index_meth (lua_State * L)
+{
+    Xlua_Array * const p_array =
+        (Xlua_Array *) marpa_luaL_checkudata (L, 1, MT_NAME_ARRAY);
+    const unsigned int ix = marpa_luaL_checkinteger (L, 2);
+    marpa_luaL_argcheck (L, (ix < 0 || ix >= p_array->size), 2,
+        "index out of bounds");
+    marpa_lua_pushinteger(L, p_array->array[ix]);
+    return 1;
+}
+
+static int
+xlua_array_len_meth (lua_State * L)
+{
+    Xlua_Array * const p_array =
+        (Xlua_Array *) marpa_luaL_checkudata (L, 1, MT_NAME_ARRAY);
+    marpa_lua_pushinteger(L, p_array->size);
+    return 1;
+}
+
+static const struct luaL_Reg marpa_array_meths[] = {
+    {"from_list", xlua_array_from_list_meth},
+    {"__index", xlua_array_index_meth},
+    {"__newindex", xlua_array_from_list_meth},
+    {"__len", xlua_array_len_meth},
+    {NULL, NULL},
+};
+
+static const struct luaL_Reg marpa_array_funcs[] = {
+    {"new", xlua_array_new_func},
+    {NULL, NULL},
+};
+
+/* create SV metatable */
+static void create_array_mt (lua_State* L) {
+    int base_of_stack = marpa_lua_gettop(L);
+    marpa_luaL_newmetatable(L, MT_NAME_ARRAY);
+    /* Lua stack: [mt] */
+
+    /* metatable.__index = metatable */
+    marpa_lua_pushvalue(L, -1);
+    marpa_lua_setfield(L, -2, "__index");
+    /* Lua stack: [mt] */
+
+    /* register methods */
+    marpa_luaL_setfuncs(L, marpa_array_meths, 0);
+    /* Lua stack: [mt] */
+    marpa_lua_settop(L, base_of_stack);
+}
+
 /* Returns a new Lua state, set up for Marpa, with
  * a reference count of 1.
  */
@@ -2824,6 +2915,7 @@ static lua_State* xlua_newstate()
     create_sv_mt(L);
     create_grammar_mt(L);
     create_recce_mt(L);
+    create_array_mt(L);
     /* Lua stack: [] */
 
     marpa_luaL_newlib(L, marpa_funcs);
@@ -5364,9 +5456,6 @@ g1( slg )
     Scanless_G *slg;
 PPCODE:
 {
-  /* Not mortalized because,
-   * held for the length of the scanless object.
-   */
   XPUSHs (sv_2mortal (SvREFCNT_inc_NN (slg->g1_sv)));
 }
 

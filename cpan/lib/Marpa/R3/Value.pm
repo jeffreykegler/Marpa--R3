@@ -1378,7 +1378,7 @@ sub Marpa::R3::Scanless::R::value {
 
     $slr->exec_string(<<'END_OF_LUA');
     for k,v in pairs(marpa.ops)
-    do print("OP:", k, v)
+    do io.stderr:write(string.format("OP: %s %s\n", k, v))
     end
 END_OF_LUA
 
