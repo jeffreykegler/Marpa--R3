@@ -2840,7 +2840,9 @@ xlua_array_from_list_func (lua_State * L)
         const unsigned int value = marpa_luaL_checkinteger (L, ix);
         p_array->array[ix - 1] = value;
     }
-    return 0;
+    p_array->size = last_arg;
+    /* [ array_ud ] */
+    return 1;
 }
 
 static int
@@ -2848,8 +2850,8 @@ xlua_array_index_meth (lua_State * L)
 {
     Xlua_Array * const p_array =
         (Xlua_Array *) marpa_luaL_checkudata (L, 1, MT_NAME_ARRAY);
-    const unsigned int ix = marpa_luaL_checkinteger (L, 2);
-    marpa_luaL_argcheck (L, (ix < 0 || ix >= p_array->size), 2,
+    const int ix = marpa_luaL_checkinteger (L, 2);
+    marpa_luaL_argcheck (L, (ix >= 0 && ix < p_array->size), 2,
         "index out of bounds");
     marpa_lua_pushinteger(L, p_array->array[ix]);
     return 1;
