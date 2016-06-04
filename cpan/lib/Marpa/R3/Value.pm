@@ -626,9 +626,6 @@ sub registration_init {
     # Set the arrays, and perform various checks on the resolutions
     # we received
     {
-        # ::whatever is deprecated and has been removed from the docs
-        # it is now equivalent to ::undef
-
         RULE:
         for my $irlid ( $tracer->rule_ids() ) {
             my ( $new_resolution, $closure, $semantics, $blessing ) =
@@ -649,7 +646,7 @@ sub registration_init {
 
                 state $allowed_semantics = {
                     map { ; ( $_, 1 ) }
-                        qw(::array ::undef ::first ::whatever ::!default),
+                        qw(::array ::undef ::first ::!default),
                     q{}
                 };
                 last REFINE_SEMANTICS if $allowed_semantics->{$semantics};
@@ -824,8 +821,6 @@ sub registration_init {
 
     # Check the lexeme semantics
     {
-        # ::whatever is deprecated and has been removed from the docs
-        # it is now equivalent to ::undef
       LEXEME: for my $lexeme_id ( 0 .. $grammar_c->highest_symbol_id() ) {
 
             my ( $semantics, $blessing ) =
@@ -936,17 +931,17 @@ EOS
 
         $semantics = '[name,values]' if $semantics eq '::!default';
         $semantics = '[values]' if $semantics eq '::array';
-        $semantics = '::undef'  if $semantics eq '::whatever';
         $semantics = '::rhs0'   if $semantics eq '::first';
 
         push @work_list, [ $irlid, undef, $semantics, $blessing ];
     }
 
-  RULE: for my $lexeme_id ( 0 .. $grammar_c->highest_symbol_id() ) {
+  LEXEME: for my $lexeme_id ( 0 .. $grammar_c->highest_symbol_id() ) {
 
         my $semantics = $semantics_by_lexeme_id[$lexeme_id];
         my $blessing  = $blessing_by_lexeme_id[$lexeme_id];
 
+        next LEXEME if $semantics eq '::!default' and not $blessing;
         $semantics = '::value' if $semantics eq '::!default';
         $semantics = '[value]' if $semantics eq '::array';
 
@@ -1389,7 +1384,7 @@ sub Marpa::R3::Scanless::R::value {
     recce.token_semantics.default
         = marpa.array.from_list(marpa.ops.result_is_token_value,0)
     recce.rule_semantics.default
-        = marpa.array.from_list(marpa.ops.push_values, marpa.ops.callback, 0)
+        = marpa.array.from_list(marpa.ops.result_is_undef, 0)
     -- print( recce.nulling_semantics.default )
     -- io.stderr:write(string.format("len: %s\n", #(recce.nulling_semantics.default)))
     -- io.stderr:write(string.format("#0: %s\n", recce.nulling_semantics.default[0]))
