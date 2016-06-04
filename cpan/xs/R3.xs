@@ -1506,49 +1506,40 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
 
     v_wrapper->result = result_ix;
 
-    switch (step_type) {
-        STRLEN dummy;
-    case MARPA_STEP_RULE:
-        {
-            SV **p_ops_sv =
-                av_fetch (v_wrapper->rule_semantics, marpa_v_rule (v), 0);
-            if (!p_ops_sv) {
-                croak
-                    ("Problem in v->stack_step: rule %d is not registered",
-                    marpa_v_rule (v));
-            }
+switch (step_type) {
+    STRLEN dummy;
+case MARPA_STEP_RULE:
+    {
+        SV **p_ops_sv =
+            av_fetch (v_wrapper->rule_semantics, marpa_v_rule (v), 0);
+        if (p_ops_sv) {
             ops = (unsigned int *) SvPV (*p_ops_sv, dummy);
         }
-        break;
-    case MARPA_STEP_TOKEN:
-        {
-            SV **p_ops_sv =
-                av_fetch (v_wrapper->token_semantics, marpa_v_token (v),
-                0);
-            if (!p_ops_sv) {
-                croak
-                    ("Problem in v->stack_step: token %d is not registered",
-                    marpa_v_token (v));
-            }
-            ops = (unsigned int *) SvPV (*p_ops_sv, dummy);
-        }
-        break;
-    case MARPA_STEP_NULLING_SYMBOL:
-        {
-            SV **p_ops_sv =
-                av_fetch (v_wrapper->nulling_semantics, marpa_v_token (v),
-                0);
-            if (!p_ops_sv) {
-                croak
-                    ("Problem in v->stack_step: nulling symbol %d is not registered",
-                    marpa_v_token (v));
-            }
-            ops = (unsigned int *) SvPV (*p_ops_sv, dummy);
-        }
-        break;
-    default:
-        croak ("Internal error: unknown step type %s", marpa_v_token (v));
     }
+    break;
+case MARPA_STEP_TOKEN:
+    {
+        SV **p_ops_sv =
+            av_fetch (v_wrapper->token_semantics, marpa_v_token (v),
+            0);
+        if (p_ops_sv) {
+            ops = (unsigned int *) SvPV (*p_ops_sv, dummy);
+        }
+    }
+    break;
+case MARPA_STEP_NULLING_SYMBOL:
+    {
+        SV **p_ops_sv =
+            av_fetch (v_wrapper->nulling_semantics, marpa_v_token (v),
+            0);
+        if (p_ops_sv) {
+            ops = (unsigned int *) SvPV (*p_ops_sv, dummy);
+        }
+    }
+    break;
+default:
+    croak ("Internal error: unknown step type %s", marpa_v_token (v));
+}
 
     if (!ops) {
         int base_of_stack;
@@ -1587,6 +1578,7 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
         ops_ud = (struct Xlua_Array*)marpa_lua_touserdata(L, -1);
         if (!ops_ud) {
           marpa_lua_pop(L, 1);
+          warn("Default for %s semantics kicking in", semantics_type);
           marpa_lua_getfield (L, -1, "default");
           /* Lua stack: [ "marpa", semantics_table, ops_ud ] */
           ops_ud = (Xlua_Array*)marpa_lua_touserdata(L, -1);
@@ -4036,27 +4028,6 @@ PPCODE:
                (void *) av, (long) ix);
           }
         sv_setpvn (*p_sv, (char *) ops, Dim(ops)*sizeof (ops[0]));
-      }
-  }
-
-  { /* Set the default nulling symbol semantics */
-    int ix;
-    IV ops[2];
-    const int highest_symbol_id = marpa_g_highest_symbol_id (g);
-    AV *av = v_wrapper->nulling_semantics;
-    av_extend (av, highest_symbol_id);
-    ops[0] = MARPA_OP_RESULT_IS_UNDEF;
-    ops[1] = 0;
-    for (ix = 0; ix <= highest_symbol_id; ix++)
-      {
-        SV **p_sv = av_fetch (av, ix, 1);
-        if (!p_sv)
-          {
-            croak
-              ("Internal error in v->stack_mode_set(): av_fetch(%p,%ld,1) failed",
-               (void *) av, (long) ix);
-          }
-        sv_setpvn (*p_sv, (char *) ops, Dim(ops) *sizeof (ops[0]));
       }
   }
 
