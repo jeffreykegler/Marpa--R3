@@ -941,7 +941,7 @@ EOS
         my $semantics = $semantics_by_lexeme_id[$lexeme_id];
         my $blessing  = $blessing_by_lexeme_id[$lexeme_id];
 
-        next LEXEME if $semantics eq '::!default' and not $blessing;
+        next LEXEME if $semantics eq '::!default' and $blessing eq '::undef';
         $semantics = '::value' if $semantics eq '::!default';
         $semantics = '[value]' if $semantics eq '::array';
 
