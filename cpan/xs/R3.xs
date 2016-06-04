@@ -302,12 +302,38 @@ static int marpa_r3_warn(const char* format, ...)
    return 1;
 }
 
-/* Portions of this code adopted from Inline::Lua */
+
+/* Xlua, that is, the eXtension of Lua for Marpa::XS.
+ * Portions of this code adopted from Inline::Lua
+ */
 
 #define MT_NAME_SV "Marpa_sv"
 #define MT_NAME_RECCE "Marpa_recce"
 #define MT_NAME_GRAMMAR "Marpa_grammar"
 #define MT_NAME_ARRAY "Marpa_array"
+
+/* Make the Lua reference facility available from
+ * Lua itself
+ */
+static int
+xlua_ref(lua_State* L)
+{
+    int ref;
+    marpa_luaL_checktype(L, 1, LUA_TTABLE);
+    marpa_lua_checkany(L, 2);
+    marpa_lua_pushinteger(L, marpa_luaL_ref(L, 1));
+    return 1;
+}
+
+static int
+xlua_unref(lua_State* L)
+{
+    int ref;
+    marpa_luaL_checktype(L, 1, LUA_TTABLE);
+    marpa_lua_checkinteger(L, 2);
+    marpa_luaL_unref(L, 1 marpa_lua_tointeger(2));
+    return 0;
+}
 
 /* Coerce a Lua value to a Perl SV, if necessary one that
  * is simply a string with an error message.
@@ -688,6 +714,8 @@ static int xlua_recce_stack_meth(lua_State* L) {
 
 static const struct luaL_Reg marpa_recce_meths[] = {
     {"stack", xlua_recce_stack_meth},
+    {"ref", xlua_ref},
+    {"unref", xlua_unref},
     {NULL, NULL},
 };
 
