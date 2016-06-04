@@ -845,665 +845,647 @@ slr_es_span_to_literal_sv (Scanless_R * slr,
 static int
 v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
 {
-  dTHX;
-  AV *stack = v_wrapper->stack;
-  const Marpa_Value v = v_wrapper->v;
-  Scanless_R * const slr = v_wrapper->slr;
-  const Marpa_Step_Type step_type = marpa_v_step_type (v);
-  IV result_ix = marpa_v_result (v);
-  IV *ops;
-  int op_ix;
-  UV blessing = 0;
+    dTHX;
+    AV *stack = v_wrapper->stack;
+    const Marpa_Value v = v_wrapper->v;
+    Scanless_R *const slr = v_wrapper->slr;
+    const Marpa_Step_Type step_type = marpa_v_step_type (v);
+    IV result_ix = marpa_v_result (v);
+    IV *ops = NULL;
+    int op_ix;
+    UV blessing = 0;
+    char *semantics_table;
+    char *semantics_type;
 
-   /* Create a new array, and a mortal reference to it.
-    * The reference, and therefore the array will be garbage collected
-    * automatically, unless we de-mortalize the reference.
-    */
-  AV *values_av = newAV ();
-  SV *ref_to_values_av = sv_2mortal (newRV_noinc ((SV *) values_av));
+    /* Create a new array, and a mortal reference to it.
+     * The reference, and therefore the array will be garbage collected
+     * automatically, unless we de-mortalize the reference.
+     */
+    AV *values_av = newAV ();
+    SV *ref_to_values_av = sv_2mortal (newRV_noinc ((SV *) values_av));
+    const char *const step_type_as_string =
+        step_type_to_string (step_type);
 
-  v_wrapper->result = result_ix;
+    v_wrapper->result = result_ix;
 
-  switch (step_type)
-    {
-      STRLEN dummy;
+    switch (step_type) {
+        STRLEN dummy;
     case MARPA_STEP_RULE:
-      {
-        SV **p_ops_sv =
-          av_fetch (v_wrapper->rule_semantics, marpa_v_rule (v), 0);
-        if (!p_ops_sv)
-          {
-            croak ("Problem in v->stack_step: rule %d is not registered",
-                   marpa_v_rule (v));
-          }
-        ops = (IV *) SvPV (*p_ops_sv, dummy);
-      }
-      break;
+        {
+            SV **p_ops_sv =
+                av_fetch (v_wrapper->rule_semantics, marpa_v_rule (v), 0);
+            if (!p_ops_sv) {
+                croak
+                    ("Problem in v->stack_step: rule %d is not registered",
+                    marpa_v_rule (v));
+            }
+            ops = (IV *) SvPV (*p_ops_sv, dummy);
+        }
+        break;
     case MARPA_STEP_TOKEN:
-      {
-        SV **p_ops_sv =
-          av_fetch (v_wrapper->token_semantics, marpa_v_token (v), 0);
-        if (!p_ops_sv)
-          {
-            croak ("Problem in v->stack_step: token %d is not registered",
-                   marpa_v_token (v));
-          }
-        ops = (IV *) SvPV (*p_ops_sv, dummy);
-      }
-      break;
+        {
+            SV **p_ops_sv =
+                av_fetch (v_wrapper->token_semantics, marpa_v_token (v),
+                0);
+            if (!p_ops_sv) {
+                croak
+                    ("Problem in v->stack_step: token %d is not registered",
+                    marpa_v_token (v));
+            }
+            ops = (IV *) SvPV (*p_ops_sv, dummy);
+        }
+        break;
     case MARPA_STEP_NULLING_SYMBOL:
-      {
-        SV **p_ops_sv =
-          av_fetch (v_wrapper->nulling_semantics, marpa_v_token (v), 0);
-        if (!p_ops_sv)
-          {
-            croak
-              ("Problem in v->stack_step: nulling symbol %d is not registered",
-               marpa_v_token (v));
-          }
-        ops = (IV *) SvPV (*p_ops_sv, dummy);
-      }
-      break;
+        {
+            SV **p_ops_sv =
+                av_fetch (v_wrapper->nulling_semantics, marpa_v_token (v),
+                0);
+            if (!p_ops_sv) {
+                croak
+                    ("Problem in v->stack_step: nulling symbol %d is not registered",
+                    marpa_v_token (v));
+            }
+            ops = (IV *) SvPV (*p_ops_sv, dummy);
+        }
+        break;
     default:
-      /* Never reached -- turns off warning about uninitialized ops */
-      ops = NULL;
+        croak ("Internal error: unknown step type %s", marpa_v_token (v));
     }
 
-  op_ix = 0;
-  while (1)
-    {
-      IV op_code = ops[op_ix++];
+    if (!ops) {
+        switch (step_type) {
+            STRLEN dummy;
+        case MARPA_STEP_RULE:
+            semantics_table = "rule_semantics";
+            semantics_type = "rule";
+            break;
+        case MARPA_STEP_TOKEN:
+            semantics_table = "token_semantics";
+            semantics_type = "token";
+            break;
+        case MARPA_STEP_NULLING_SYMBOL:
+            semantics_table = "nulling_semantics";
+            semantics_type = "nulling symbol";
+            break;
+        default:
+            /* Never reached -- turns off warning about uninitialized ops */
+            ops = NULL;
+        }
+    }
 
-      if (v_wrapper->trace_values >= 3)
-        {
-          AV *event;
-          SV *event_data[3];
-          const char *result_string = step_type_to_string (step_type);
-          if (!result_string)
-            result_string = "valuator unknown step";
-          event_data[0] = newSVpvs ("starting op");
-          event_data[1] = newSVpv (result_string, 0);
-          event_data[2] = newSVpv (marpa_slif_op_name (op_code), 0);
-          event = av_make (Dim (event_data), event_data);
-          av_push (v_wrapper->event_queue, newRV_noinc ((SV *) event));
+    op_ix = 0;
+    while (1) {
+        IV op_code = ops[op_ix++];
+
+        if (v_wrapper->trace_values >= 3) {
+            AV *event;
+            SV *event_data[3];
+            event_data[0] = newSVpvs ("starting op");
+            event_data[1] = newSVpv (step_type_as_string, 0);
+            event_data[2] = newSVpv (marpa_slif_op_name (op_code), 0);
+            event = av_make (Dim (event_data), event_data);
+            av_push (v_wrapper->event_queue, newRV_noinc ((SV *) event));
         }
 
-      switch (op_code)
-        {
+        switch (op_code) {
 
         case 0:
-          return -1;
+            return -1;
 
         case MARPA_OP_LUA:
-{
-    // lua_Debug ar;
-    int argc;
-    int status;
-    lua_State *const L = slr->L;
-    const int base_of_stack = marpa_lua_gettop (L);
-    const int fn_key = ops[op_ix++];
+            {
+                // lua_Debug ar;
+                int argc;
+                int status;
+                lua_State *const L = slr->L;
+                const int base_of_stack = marpa_lua_gettop (L);
+                const int fn_key = ops[op_ix++];
 
-    // warn ("Executing MARPA_OP_LUA");
+                // warn ("Executing MARPA_OP_LUA");
 
-    marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, slr->lua_ref);
-    /* Lua stack: [ recce_table ] */
-    marpa_lua_rawgeti (L, -1, fn_key);
-    /* [ recce_table, function ] */
+                marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, slr->lua_ref);
+                /* Lua stack: [ recce_table ] */
+                marpa_lua_rawgeti (L, -1, fn_key);
+                /* [ recce_table, function ] */
 
-    // marpa_lua_pushvalue(L, -1);
-    // marpa_lua_getinfo(L, ">S", &ar);
-    // warn("Executing Lua code: %s", ar.source);
+                // marpa_lua_pushvalue(L, -1);
+                // marpa_lua_getinfo(L, ">S", &ar);
+                // warn("Executing Lua code: %s", ar.source);
 
-    /* The recce table itself is an argument */
-    marpa_lua_pushvalue(L, -2);
-    marpa_lua_pushstring (L, step_type_to_string (step_type));
-    argc = 2;
-    switch (step_type)
-      {
-      case MARPA_STEP_RULE:
-          marpa_lua_pushinteger (L, result_ix);
-          marpa_lua_pushinteger (L, marpa_v_rule (v));
-          marpa_lua_pushinteger (L, marpa_v_arg_n (v));
-          argc += 3;
-          break;
-      case MARPA_STEP_TOKEN:
-          marpa_lua_pushinteger (L, result_ix);
-          marpa_lua_pushinteger (L, marpa_v_token (v));
-          marpa_lua_pushinteger (L, marpa_v_token_value (v));
-          argc += 3;
-          break;
-      case MARPA_STEP_NULLING_SYMBOL:
-          marpa_lua_pushinteger (L, result_ix);
-          marpa_lua_pushinteger (L, marpa_v_symbol (v));
-          argc += 2;
-          break;
-      default:
-          break;
-      }
+                /* The recce table itself is an argument */
+                marpa_lua_pushvalue (L, -2);
+                marpa_lua_pushstring (L, step_type_as_string);
+                argc = 2;
+                switch (step_type) {
+                case MARPA_STEP_RULE:
+                    marpa_lua_pushinteger (L, result_ix);
+                    marpa_lua_pushinteger (L, marpa_v_rule (v));
+                    marpa_lua_pushinteger (L, marpa_v_arg_n (v));
+                    argc += 3;
+                    break;
+                case MARPA_STEP_TOKEN:
+                    marpa_lua_pushinteger (L, result_ix);
+                    marpa_lua_pushinteger (L, marpa_v_token (v));
+                    marpa_lua_pushinteger (L, marpa_v_token_value (v));
+                    argc += 3;
+                    break;
+                case MARPA_STEP_NULLING_SYMBOL:
+                    marpa_lua_pushinteger (L, result_ix);
+                    marpa_lua_pushinteger (L, marpa_v_symbol (v));
+                    argc += 2;
+                    break;
+                default:
+                    break;
+                }
 
-    status = marpa_lua_pcall (L, argc, LUA_MULTRET, 0);
-    if (status != 0)
-      {
-          const char *error_string = marpa_lua_tostring (L, -1);
-          marpa_lua_pop (L, 1);
-          croak ("Marpa::R3 Lua code error: %s", error_string);
-      }
-    marpa_lua_settop (L, base_of_stack);
-    goto NEXT_OP_CODE;
-}
-        
+                status = marpa_lua_pcall (L, argc, LUA_MULTRET, 0);
+                if (status != 0) {
+                    const char *error_string = marpa_lua_tostring (L, -1);
+                    marpa_lua_pop (L, 1);
+                    croak ("Marpa::R3 Lua code error: %s", error_string);
+                }
+                marpa_lua_settop (L, base_of_stack);
+                goto NEXT_OP_CODE;
+            }
+
         case MARPA_OP_RESULT_IS_UNDEF:
-          {
-            av_fill (stack, -1 + result_ix);
-          }
-          return -1;
+            {
+                av_fill (stack, -1 + result_ix);
+            }
+            return -1;
 
         case MARPA_OP_RESULT_IS_CONSTANT:
-          {
-            IV constant_ix = ops[op_ix++];
-            SV **p_constant_sv;
+            {
+                IV constant_ix = ops[op_ix++];
+                SV **p_constant_sv;
 
-            p_constant_sv = av_fetch (v_wrapper->constants, constant_ix, 0);
-            if (p_constant_sv)
-              {
-                SV *constant_sv = newSVsv (*p_constant_sv);
-                SV **stored_sv = av_store (stack, result_ix, constant_sv);
-                if (!stored_sv)
-                  {
-                    SvREFCNT_dec (constant_sv);
-                  }
-              }
-            else
-              {
-                av_store (stack, result_ix, newSV(0));
-              }
-
-            if (v_wrapper->trace_values && step_type == MARPA_STEP_TOKEN)
-              {
-                AV *event;
-                SV *event_data[3];
-                const char *result_string = step_type_to_string (step_type);
-                if (!result_string)
-                  result_string = "valuator unknown step";
-                event_data[0] = newSVpvn (result_string, 0);
-                event_data[1] = newSViv (marpa_v_token (v));
+                p_constant_sv =
+                    av_fetch (v_wrapper->constants, constant_ix, 0);
                 if (p_constant_sv) {
-                  event_data[2] = newSVsv (*p_constant_sv);
+                    SV *constant_sv = newSVsv (*p_constant_sv);
+                    SV **stored_sv =
+                        av_store (stack, result_ix, constant_sv);
+                    if (!stored_sv) {
+                        SvREFCNT_dec (constant_sv);
+                    }
                 } else {
-                  event_data[2] = newSV(0);
+                    av_store (stack, result_ix, newSV (0));
                 }
-                event = av_make (Dim (event_data), event_data);
-                av_push (v_wrapper->event_queue, newRV_noinc ((SV *) event));
-              }
-          }
-          return -1;
+
+                if (v_wrapper->trace_values
+                    && step_type == MARPA_STEP_TOKEN) {
+                    AV *event;
+                    SV *event_data[3];
+                    const char *result_string = step_type_as_string;
+                    if (!result_string)
+                        result_string = "valuator unknown step";
+                    event_data[0] = newSVpvn (result_string, 0);
+                    event_data[1] = newSViv (marpa_v_token (v));
+                    if (p_constant_sv) {
+                        event_data[2] = newSVsv (*p_constant_sv);
+                    } else {
+                        event_data[2] = newSV (0);
+                    }
+                    event = av_make (Dim (event_data), event_data);
+                    av_push (v_wrapper->event_queue,
+                        newRV_noinc ((SV *) event));
+                }
+            }
+            return -1;
 
         case MARPA_OP_RESULT_IS_RHS_N:
         case MARPA_OP_RESULT_IS_N_OF_SEQUENCE:
-          {
-            SV **stored_av;
-            SV **p_sv;
-            IV stack_offset = ops[op_ix++];
-            IV fetch_ix;
+            {
+                SV **stored_av;
+                SV **p_sv;
+                IV stack_offset = ops[op_ix++];
+                IV fetch_ix;
 
-            if (step_type != MARPA_STEP_RULE)
-              {
-                av_fill (stack, result_ix - 1);
-                return -1;
-              }
-            if (stack_offset == 0)
-              {
-                /* Special-cased for 4 reasons --
-                 * it's common, it's reference count handling is
-                 * a special case and it can be easily and highly optimized.
-                 */
+                if (step_type != MARPA_STEP_RULE) {
+                    av_fill (stack, result_ix - 1);
+                    return -1;
+                }
+                if (stack_offset == 0) {
+                    /* Special-cased for 4 reasons --
+                     * it's common, it's reference count handling is
+                     * a special case and it can be easily and highly optimized.
+                     */
+                    av_fill (stack, result_ix);
+                    return -1;
+                }
+
+                /* Determine index of SV to fetch */
+                if (op_code == MARPA_OP_RESULT_IS_RHS_N) {
+                    if (stack_offset > 0) {
+                        fetch_ix = result_ix + stack_offset;
+                    } else {
+                        fetch_ix = marpa_v_arg_n (v) + 1 - stack_offset;
+                    }
+                } else {        /* sequence */
+                    int item_ix;
+                    if (stack_offset >= 0) {
+                        item_ix = stack_offset;
+                    } else {
+                        int item_count =
+                            (marpa_v_arg_n (v) - marpa_v_arg_0 (v)) / 2 +
+                            1;
+                        item_ix = (item_count + stack_offset);
+                    }
+                    fetch_ix = result_ix + item_ix * 2;
+                }
+
+                /* Bounds check fetch ix */
+                if (fetch_ix > marpa_v_arg_n (v) || fetch_ix < result_ix) {
+                    /* return an undef */
+                    av_fill (stack, result_ix - 1);
+                    return -1;
+                }
+                p_sv = av_fetch (stack, fetch_ix, 0);
+                if (!p_sv) {
+                    av_fill (stack, result_ix - 1);
+                    return -1;
+                }
+                stored_av =
+                    av_store (stack, result_ix, SvREFCNT_inc_NN (*p_sv));
+                if (!stored_av) {
+                    SvREFCNT_dec (*p_sv);
+                    av_fill (stack, result_ix - 1);
+                    return -1;
+                }
                 av_fill (stack, result_ix);
-                return -1;
-              }
-
-            /* Determine index of SV to fetch */
-            if (op_code == MARPA_OP_RESULT_IS_RHS_N)
-              {
-                if (stack_offset > 0)
-                  {
-                    fetch_ix = result_ix + stack_offset;
-                  }
-                else
-                  {
-                    fetch_ix = marpa_v_arg_n (v) + 1 - stack_offset;
-                  }
-              }
-            else
-              {                 /* sequence */
-                int item_ix;
-                if (stack_offset >= 0)
-                  {
-                    item_ix = stack_offset;
-                  }
-                else
-                  {
-                    int item_count =
-                      (marpa_v_arg_n (v) - marpa_v_arg_0 (v)) / 2 + 1;
-                    item_ix = (item_count + stack_offset);
-                  }
-                fetch_ix = result_ix + item_ix * 2;
-              }
-
-            /* Bounds check fetch ix */
-            if (fetch_ix > marpa_v_arg_n (v) || fetch_ix < result_ix)
-              {
-                /* return an undef */
-                av_fill (stack, result_ix - 1);
-                return -1;
-              }
-            p_sv = av_fetch (stack, fetch_ix, 0);
-            if (!p_sv)
-              {
-                av_fill (stack, result_ix - 1);
-                return -1;
-              }
-            stored_av = av_store (stack, result_ix, SvREFCNT_inc_NN (*p_sv));
-            if (!stored_av)
-              {
-                SvREFCNT_dec (*p_sv);
-                av_fill (stack, result_ix - 1);
-                return -1;
-              }
-            av_fill (stack, result_ix);
-          }
-          return -1;
+            }
+            return -1;
 
         case MARPA_OP_RESULT_IS_ARRAY:
-          {
-            SV **stored_av;
+            {
+                SV **stored_av;
 
-            if (blessing)
-              {
-                SV **p_blessing_sv =
-                  av_fetch (v_wrapper->constants, blessing, 0);
-                if (p_blessing_sv && SvPOK (*p_blessing_sv))
-                  {
-                    STRLEN blessing_length;
-                    char *classname = SvPV (*p_blessing_sv, blessing_length);
-                    sv_bless (ref_to_values_av, gv_stashpv (classname, 1));
-                  }
-              }
-            /* De-mortalize the reference to values_av */
-            SvREFCNT_inc_simple_void_NN (ref_to_values_av);
-            stored_av = av_store (stack, result_ix, ref_to_values_av);
+                if (blessing) {
+                    SV **p_blessing_sv =
+                        av_fetch (v_wrapper->constants, blessing, 0);
+                    if (p_blessing_sv && SvPOK (*p_blessing_sv)) {
+                        STRLEN blessing_length;
+                        char *classname =
+                            SvPV (*p_blessing_sv, blessing_length);
+                        sv_bless (ref_to_values_av, gv_stashpv (classname,
+                                1));
+                    }
+                }
+                /* De-mortalize the reference to values_av */
+                SvREFCNT_inc_simple_void_NN (ref_to_values_av);
+                stored_av = av_store (stack, result_ix, ref_to_values_av);
 
-            /* If the new RV did not get stored properly,
-             * decrement its ref count to re-mortalize it.
-             */
-            if (!stored_av)
-              {
-                SvREFCNT_dec (ref_to_values_av);
-                av_fill (stack, result_ix - 1);
-                return -1;
-              }
-            av_fill (stack, result_ix);
-          }
-          return -1;
+                /* If the new RV did not get stored properly,
+                 * decrement its ref count to re-mortalize it.
+                 */
+                if (!stored_av) {
+                    SvREFCNT_dec (ref_to_values_av);
+                    av_fill (stack, result_ix - 1);
+                    return -1;
+                }
+                av_fill (stack, result_ix);
+            }
+            return -1;
 
         case MARPA_OP_PUSH_VALUES:
         case MARPA_OP_PUSH_SEQUENCE:
-          {
-            switch (step_type)
-              {
-              case MARPA_STEP_TOKEN:
-                {
-                  SV **p_token_value_sv;
-                  int token_ix = marpa_v_token_value (v);
-                  if (slr && token_ix == TOKEN_VALUE_IS_LITERAL)
+            {
+                switch (step_type) {
+                case MARPA_STEP_TOKEN:
                     {
-                      SV *sv;
-                      Marpa_Earley_Set_ID start_earley_set =
-                        marpa_v_token_start_es_id (v);
-                      Marpa_Earley_Set_ID end_earley_set = marpa_v_es_id (v);
-                      sv =
-                        slr_es_span_to_literal_sv (slr, start_earley_set,
-                                                   end_earley_set -
-                                                   start_earley_set);
-                      av_push (values_av, sv);
-                      break;
-                    }
-                  /* If token value is NOT literal */
-                  p_token_value_sv = av_fetch (slr->token_values, (I32) token_ix, 0);
-                  if (p_token_value_sv)
-                    {
-                      av_push (values_av,
-                               SvREFCNT_inc_NN (*p_token_value_sv));
-                    }
-                  else
-                    {
-                      av_push (values_av, newSV(0));
-                    }
-                }
-                break;
-
-              case MARPA_STEP_RULE:
-                {
-                  int stack_ix;
-                  const int arg_n = marpa_v_arg_n (v);
-                  int increment = op_code == MARPA_OP_PUSH_SEQUENCE ? 2 : 1;
-
-                  for (stack_ix = result_ix; stack_ix <= arg_n;
-                       stack_ix += increment)
-                    {
-                      SV **p_sv = av_fetch (stack, stack_ix, 0);
-                      if (!p_sv)
-                        {
-                          av_push (values_av, newSV(0));
+                        SV **p_token_value_sv;
+                        int token_ix = marpa_v_token_value (v);
+                        if (slr && token_ix == TOKEN_VALUE_IS_LITERAL) {
+                            SV *sv;
+                            Marpa_Earley_Set_ID start_earley_set =
+                                marpa_v_token_start_es_id (v);
+                            Marpa_Earley_Set_ID end_earley_set =
+                                marpa_v_es_id (v);
+                            sv = slr_es_span_to_literal_sv (slr,
+                                start_earley_set,
+                                end_earley_set - start_earley_set);
+                            av_push (values_av, sv);
+                            break;
                         }
-                      else
-                        {
-                          av_push (values_av, SvREFCNT_inc_simple_NN (*p_sv));
+                        /* If token value is NOT literal */
+                        p_token_value_sv =
+                            av_fetch (slr->token_values, (I32) token_ix,
+                            0);
+                        if (p_token_value_sv) {
+                            av_push (values_av,
+                                SvREFCNT_inc_NN (*p_token_value_sv));
+                        } else {
+                            av_push (values_av, newSV (0));
                         }
                     }
-                }
-                break;
+                    break;
 
-              default:
-              case MARPA_STEP_NULLING_SYMBOL:
-                /* A no-op : push nothing */
-                break;
-              }
-          }
-          break;
+                case MARPA_STEP_RULE:
+                    {
+                        int stack_ix;
+                        const int arg_n = marpa_v_arg_n (v);
+                        int increment =
+                            op_code == MARPA_OP_PUSH_SEQUENCE ? 2 : 1;
+
+                        for (stack_ix = result_ix; stack_ix <= arg_n;
+                            stack_ix += increment) {
+                            SV **p_sv = av_fetch (stack, stack_ix, 0);
+                            if (!p_sv) {
+                                av_push (values_av, newSV (0));
+                            } else {
+                                av_push (values_av,
+                                    SvREFCNT_inc_simple_NN (*p_sv));
+                            }
+                        }
+                    }
+                    break;
+
+                default:
+                case MARPA_STEP_NULLING_SYMBOL:
+                    /* A no-op : push nothing */
+                    break;
+                }
+            }
+            break;
 
         case MARPA_OP_PUSH_UNDEF:
-          av_push (values_av, newSV(0));
-          goto NEXT_OP_CODE;
+            av_push (values_av, newSV (0));
+            goto NEXT_OP_CODE;
 
         case MARPA_OP_PUSH_CONSTANT:
-          {
-            IV constant_ix = ops[op_ix++];
-            SV **p_constant_sv;
+            {
+                IV constant_ix = ops[op_ix++];
+                SV **p_constant_sv;
 
-            p_constant_sv = av_fetch (v_wrapper->constants, constant_ix, 0);
-            if (p_constant_sv)
-              {
-                av_push (values_av, SvREFCNT_inc_simple_NN (*p_constant_sv));
-              }
-            else
-              {
-                av_push (values_av, newSV(0));
-              }
+                p_constant_sv =
+                    av_fetch (v_wrapper->constants, constant_ix, 0);
+                if (p_constant_sv) {
+                    av_push (values_av,
+                        SvREFCNT_inc_simple_NN (*p_constant_sv));
+                } else {
+                    av_push (values_av, newSV (0));
+                }
 
-          }
-          goto NEXT_OP_CODE;
+            }
+            goto NEXT_OP_CODE;
 
         case MARPA_OP_PUSH_ONE:
-          {
-            int offset;
-            SV **p_sv;
+            {
+                int offset;
+                SV **p_sv;
 
-            offset = ops[op_ix++];
-            if (step_type != MARPA_STEP_RULE)
-              {
-                av_push (values_av, newSV(0));
-                goto NEXT_OP_CODE;
-              }
-            p_sv = av_fetch (stack, result_ix + offset, 0);
-            if (!p_sv)
-              {
-                av_push (values_av, newSV(0));
-              }
-            else
-              {
-                av_push (values_av, SvREFCNT_inc_simple_NN (*p_sv));
-              }
-          }
-          goto NEXT_OP_CODE;
+                offset = ops[op_ix++];
+                if (step_type != MARPA_STEP_RULE) {
+                    av_push (values_av, newSV (0));
+                    goto NEXT_OP_CODE;
+                }
+                p_sv = av_fetch (stack, result_ix + offset, 0);
+                if (!p_sv) {
+                    av_push (values_av, newSV (0));
+                } else {
+                    av_push (values_av, SvREFCNT_inc_simple_NN (*p_sv));
+                }
+            }
+            goto NEXT_OP_CODE;
 
         case MARPA_OP_PUSH_START_LOCATION:
-          {
-            int start_location;
-            Marpa_Earley_Set_ID start_earley_set;
-            int dummy;
+            {
+                int start_location;
+                Marpa_Earley_Set_ID start_earley_set;
+                int dummy;
 
-            switch (step_type)
-              {
-              case MARPA_STEP_RULE:
-                start_earley_set = marpa_v_rule_start_es_id (v);
-                break;
-              case MARPA_STEP_NULLING_SYMBOL:
-              case MARPA_STEP_TOKEN:
-                start_earley_set = marpa_v_token_start_es_id (v);
-                break;
-              default:
-                croak
-                  ("Problem in v->stack_step: Range requested for improper step type: %s",
-                   step_type_to_string (step_type));
-              }
-            slr_es_to_literal_span (slr, start_earley_set, 0, &start_location,
-                                    &dummy);
-            av_push (values_av, newSViv ((IV) start_location));
-          }
-          goto NEXT_OP_CODE;
+                switch (step_type) {
+                case MARPA_STEP_RULE:
+                    start_earley_set = marpa_v_rule_start_es_id (v);
+                    break;
+                case MARPA_STEP_NULLING_SYMBOL:
+                case MARPA_STEP_TOKEN:
+                    start_earley_set = marpa_v_token_start_es_id (v);
+                    break;
+                default:
+                    croak
+                        ("Problem in v->stack_step: Range requested for improper step type: %s",
+                        step_type_to_string (step_type));
+                }
+                slr_es_to_literal_span (slr, start_earley_set, 0,
+                    &start_location, &dummy);
+                av_push (values_av, newSViv ((IV) start_location));
+            }
+            goto NEXT_OP_CODE;
 
         case MARPA_OP_PUSH_LENGTH:
-          {
-            int length;
+            {
+                int length;
 
-            switch (step_type)
-              {
-              case MARPA_STEP_NULLING_SYMBOL:
-                length = 0;
-                break;
-              case MARPA_STEP_RULE:
-                {
-                  int dummy;
-                  Marpa_Earley_Set_ID start_earley_set =
-                    marpa_v_rule_start_es_id (v);
-                  Marpa_Earley_Set_ID end_earley_set = marpa_v_es_id (v);
-                  slr_es_to_literal_span (slr, start_earley_set,
-                                          end_earley_set - start_earley_set,
-                                          &dummy, &length);
+                switch (step_type) {
+                case MARPA_STEP_NULLING_SYMBOL:
+                    length = 0;
+                    break;
+                case MARPA_STEP_RULE:
+                    {
+                        int dummy;
+                        Marpa_Earley_Set_ID start_earley_set =
+                            marpa_v_rule_start_es_id (v);
+                        Marpa_Earley_Set_ID end_earley_set =
+                            marpa_v_es_id (v);
+                        slr_es_to_literal_span (slr, start_earley_set,
+                            end_earley_set - start_earley_set, &dummy,
+                            &length);
+                    }
+                    break;
+                case MARPA_STEP_TOKEN:
+                    {
+                        int dummy;
+                        Marpa_Earley_Set_ID start_earley_set =
+                            marpa_v_token_start_es_id (v);
+                        Marpa_Earley_Set_ID end_earley_set =
+                            marpa_v_es_id (v);
+                        slr_es_to_literal_span (slr, start_earley_set,
+                            end_earley_set - start_earley_set, &dummy,
+                            &length);
+                    }
+                    break;
+                default:
+                    croak
+                        ("Problem in v->stack_step: Range requested for improper step type: %s",
+                        step_type_to_string (step_type));
                 }
-                break;
-              case MARPA_STEP_TOKEN:
-                {
-                  int dummy;
-                  Marpa_Earley_Set_ID start_earley_set =
-                    marpa_v_token_start_es_id (v);
-                  Marpa_Earley_Set_ID end_earley_set = marpa_v_es_id (v);
-                  slr_es_to_literal_span (slr, start_earley_set,
-                                          end_earley_set - start_earley_set,
-                                          &dummy, &length);
-                }
-                break;
-              default:
-                croak
-                  ("Problem in v->stack_step: Range requested for improper step type: %s",
-                   step_type_to_string (step_type));
-              }
-            av_push (values_av, newSViv ((IV) length));
-          }
-          goto NEXT_OP_CODE;
+                av_push (values_av, newSViv ((IV) length));
+            }
+            goto NEXT_OP_CODE;
 
         case MARPA_OP_PUSH_G1_START:
-          {
-            Marpa_Earley_Set_ID start_earley_set;
+            {
+                Marpa_Earley_Set_ID start_earley_set;
 
-            switch (step_type)
-              {
-              case MARPA_STEP_RULE:
-                start_earley_set = marpa_v_rule_start_es_id (v);
-                break;
-              case MARPA_STEP_NULLING_SYMBOL:
-              case MARPA_STEP_TOKEN:
-                start_earley_set = marpa_v_token_start_es_id (v);
-                break;
-              default:
-                croak
-                  ("Problem in v->stack_step: Range requested for improper step type: %s",
-                   step_type_to_string (step_type));
-              }
-            av_push (values_av, newSViv ((IV) start_earley_set));
-          }
-          goto NEXT_OP_CODE;
+                switch (step_type) {
+                case MARPA_STEP_RULE:
+                    start_earley_set = marpa_v_rule_start_es_id (v);
+                    break;
+                case MARPA_STEP_NULLING_SYMBOL:
+                case MARPA_STEP_TOKEN:
+                    start_earley_set = marpa_v_token_start_es_id (v);
+                    break;
+                default:
+                    croak
+                        ("Problem in v->stack_step: Range requested for improper step type: %s",
+                        step_type_as_string);
+                }
+                av_push (values_av, newSViv ((IV) start_earley_set));
+            }
+            goto NEXT_OP_CODE;
 
         case MARPA_OP_PUSH_G1_LENGTH:
-          {
-            int length;
+            {
+                int length;
 
-            switch (step_type)
-              {
-              case MARPA_STEP_NULLING_SYMBOL:
-                length = 0;
-                break;
-              case MARPA_STEP_RULE:
-                {
-                  Marpa_Earley_Set_ID start_earley_set =
-                    marpa_v_rule_start_es_id (v);
-                  Marpa_Earley_Set_ID end_earley_set = marpa_v_es_id (v);
-                  length = end_earley_set - start_earley_set + 1;
+                switch (step_type) {
+                case MARPA_STEP_NULLING_SYMBOL:
+                    length = 0;
+                    break;
+                case MARPA_STEP_RULE:
+                    {
+                        Marpa_Earley_Set_ID start_earley_set =
+                            marpa_v_rule_start_es_id (v);
+                        Marpa_Earley_Set_ID end_earley_set =
+                            marpa_v_es_id (v);
+                        length = end_earley_set - start_earley_set + 1;
+                    }
+                    break;
+                case MARPA_STEP_TOKEN:
+                    {
+                        Marpa_Earley_Set_ID start_earley_set =
+                            marpa_v_token_start_es_id (v);
+                        Marpa_Earley_Set_ID end_earley_set =
+                            marpa_v_es_id (v);
+                        length = end_earley_set - start_earley_set + 1;
+                    }
+                    break;
+                default:
+                    croak
+                        ("Problem in v->stack_step: Range requested for improper step type: %s",
+                        step_type_as_string);
                 }
-                break;
-              case MARPA_STEP_TOKEN:
-                {
-                  Marpa_Earley_Set_ID start_earley_set =
-                    marpa_v_token_start_es_id (v);
-                  Marpa_Earley_Set_ID end_earley_set = marpa_v_es_id (v);
-                  length = end_earley_set - start_earley_set + 1;
-                }
-                break;
-              default:
-                croak
-                  ("Problem in v->stack_step: Range requested for improper step type: %s",
-                   step_type_to_string (step_type));
-              }
-            av_push (values_av, newSViv ((IV) length));
-          }
-          goto NEXT_OP_CODE;
+                av_push (values_av, newSViv ((IV) length));
+            }
+            goto NEXT_OP_CODE;
 
         case MARPA_OP_BLESS:
-          {
-            blessing = ops[op_ix++];
-          }
-          goto NEXT_OP_CODE;
+            {
+                blessing = ops[op_ix++];
+            }
+            goto NEXT_OP_CODE;
 
         case MARPA_OP_CALLBACK:
-          {
-            const char *result_string = step_type_to_string (step_type);
-            SV **p_stack_results = stack_results;
+            {
+                SV **p_stack_results = stack_results;
 
-            switch (step_type)
-              {
-              case MARPA_STEP_RULE:
-              case MARPA_STEP_NULLING_SYMBOL:
-                break;
-              default:
-                goto BAD_OP;
-              }
+                switch (step_type) {
+                case MARPA_STEP_RULE:
+                case MARPA_STEP_NULLING_SYMBOL:
+                    break;
+                default:
+                    goto BAD_OP;
+                }
 
-            *p_stack_results++ = sv_2mortal (newSVpv (result_string, 0));
-            *p_stack_results++ =
-              sv_2mortal (newSViv
-                          (step_type ==
-                           MARPA_STEP_RULE ? marpa_v_rule (v) : marpa_v_token (v)));
+                *p_stack_results++ =
+                    sv_2mortal (newSVpv (step_type_as_string, 0));
+                *p_stack_results++ =
+                    sv_2mortal (newSViv (step_type ==
+                        MARPA_STEP_RULE ? marpa_v_rule (v) :
+                        marpa_v_token (v)));
 
-            if (blessing)
-              {
-                SV **p_blessing_sv = av_fetch (v_wrapper->constants, blessing, 0);
-                if (p_blessing_sv && SvPOK (*p_blessing_sv))
-                  {
-                    STRLEN blessing_length;
-                    char *classname = SvPV (*p_blessing_sv, blessing_length);
-                    sv_bless (ref_to_values_av, gv_stashpv (classname, 1));
-                  }
-              }
-            /* ref_to_values_av is already mortal -- leave it */
-            *p_stack_results++ = ref_to_values_av;
-            return p_stack_results - stack_results;
-          }
-          /* NOT REACHED */
+                if (blessing) {
+                    SV **p_blessing_sv =
+                        av_fetch (v_wrapper->constants, blessing, 0);
+                    if (p_blessing_sv && SvPOK (*p_blessing_sv)) {
+                        STRLEN blessing_length;
+                        char *classname =
+                            SvPV (*p_blessing_sv, blessing_length);
+                        sv_bless (ref_to_values_av, gv_stashpv (classname,
+                                1));
+                    }
+                }
+                /* ref_to_values_av is already mortal -- leave it */
+                *p_stack_results++ = ref_to_values_av;
+                return p_stack_results - stack_results;
+            }
+            /* NOT REACHED */
 
         case MARPA_OP_RESULT_IS_TOKEN_VALUE:
-          {
-            SV **p_token_value_sv;
-            int token_ix = marpa_v_token_value (v);
+            {
+                SV **p_token_value_sv;
+                int token_ix = marpa_v_token_value (v);
 
-            if (step_type != MARPA_STEP_TOKEN)
-              {
-                av_fill (stack, result_ix - 1);
-                return -1;
-              }
-            if (slr && token_ix == TOKEN_VALUE_IS_LITERAL)
-              {
-                SV **stored_sv;
-                SV *token_literal_sv;
-                Marpa_Earley_Set_ID start_earley_set =
-                  marpa_v_token_start_es_id (v);
-                Marpa_Earley_Set_ID end_earley_set = marpa_v_es_id (v);
-                token_literal_sv =
-                  slr_es_span_to_literal_sv (slr, start_earley_set,
-                                             end_earley_set -
-                                             start_earley_set);
-                stored_sv = av_store (stack, result_ix, token_literal_sv);
-                if (!stored_sv)
-                  {
-                    SvREFCNT_dec (token_literal_sv);
-                  }
-                return -1;
-              }
+                if (step_type != MARPA_STEP_TOKEN) {
+                    av_fill (stack, result_ix - 1);
+                    return -1;
+                }
+                if (slr && token_ix == TOKEN_VALUE_IS_LITERAL) {
+                    SV **stored_sv;
+                    SV *token_literal_sv;
+                    Marpa_Earley_Set_ID start_earley_set =
+                        marpa_v_token_start_es_id (v);
+                    Marpa_Earley_Set_ID end_earley_set = marpa_v_es_id (v);
+                    token_literal_sv =
+                        slr_es_span_to_literal_sv (slr, start_earley_set,
+                        end_earley_set - start_earley_set);
+                    stored_sv =
+                        av_store (stack, result_ix, token_literal_sv);
+                    if (!stored_sv) {
+                        SvREFCNT_dec (token_literal_sv);
+                    }
+                    return -1;
+                }
 
 
-            p_token_value_sv = av_fetch (slr->token_values, (I32) token_ix, 0);
-            if (p_token_value_sv)
-              {
-                SV *token_value_sv = newSVsv (*p_token_value_sv);
-                SV **stored_sv = av_store (stack, result_ix, token_value_sv);
-                if (!stored_sv)
-                  {
-                    SvREFCNT_dec (token_value_sv);
-                  }
-              }
-            else
-              {
-                av_fill (stack, result_ix - 1);
-                return -1;
-              }
+                p_token_value_sv =
+                    av_fetch (slr->token_values, (I32) token_ix, 0);
+                if (p_token_value_sv) {
+                    SV *token_value_sv = newSVsv (*p_token_value_sv);
+                    SV **stored_sv =
+                        av_store (stack, result_ix, token_value_sv);
+                    if (!stored_sv) {
+                        SvREFCNT_dec (token_value_sv);
+                    }
+                } else {
+                    av_fill (stack, result_ix - 1);
+                    return -1;
+                }
 
-            if (v_wrapper->trace_values)
-              {
-                AV *event;
-                SV *event_data[4];
-                const char *step_type_string =
-                  step_type_to_string (step_type);
-                if (!step_type_string)
-                  step_type_string = "token value written to tos";
-                event_data[0] = newSVpv (step_type_string, 0);
-                event_data[1] = newSViv (marpa_v_token (v));
-                event_data[2] = newSViv (marpa_v_token_value (v));
-                event_data[3] = *p_token_value_sv ? newSVsv (*p_token_value_sv) : newSV(0);
-                event = av_make (Dim (event_data), event_data);
-                av_push (v_wrapper->event_queue, newRV_noinc ((SV *) event));
-              }
+                if (v_wrapper->trace_values) {
+                    AV *event;
+                    SV *event_data[4];
+                    event_data[0] = newSVpv (step_type_as_string, 0);
+                    event_data[1] = newSViv (marpa_v_token (v));
+                    event_data[2] = newSViv (marpa_v_token_value (v));
+                    event_data[3] =
+                        *p_token_value_sv ? newSVsv (*p_token_value_sv) :
+                        newSV (0);
+                    event = av_make (Dim (event_data), event_data);
+                    av_push (v_wrapper->event_queue,
+                        newRV_noinc ((SV *) event));
+                }
 
-          }
-          return -1;
+            }
+            return -1;
 
         default:
-        BAD_OP:
-          {
-            const char *step_type_string = step_type_to_string (step_type);
-            if (!step_type_string)
-              step_type_string = "Unknown";
-            croak
-              ("Bad op code (%lu, '%s') in v->stack_step, step_type '%s'",
-               (unsigned long) op_code, marpa_slif_op_name (op_code),
-               step_type_string);
-          }
+          BAD_OP:
+            {
+                croak
+                    ("Bad op code (%lu, '%s') in v->stack_step, step_type '%s'",
+                    (unsigned long) op_code, marpa_slif_op_name (op_code),
+                    step_type_as_string);
+            }
         }
 
-    NEXT_OP_CODE:;              /* continue while(1) loop */
+      NEXT_OP_CODE:;           /* continue while(1) loop */
 
     }
 
-  /* Never reached */
-  return -1;
+    /* Never reached */
+    return -1;
 }
 
 /* Static SLG methods */

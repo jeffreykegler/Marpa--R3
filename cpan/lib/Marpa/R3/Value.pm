@@ -1385,10 +1385,10 @@ sub Marpa::R3::Scanless::R::value {
     recce.token_semantics = {}
     recce.nulling_semantics = {}
     recce.nulling_semantics.default = marpa.array.from_list(marpa.ops.result_is_undef,0)
-    print( recce.nulling_semantics.default )
-    io.stderr:write(string.format("len: %s\n", #(recce.nulling_semantics.default)))
-    io.stderr:write(string.format("#0: %s\n", recce.nulling_semantics.default[0]))
-    io.stderr:write(string.format("#1: %s\n", recce.nulling_semantics.default[1]))
+    -- print( recce.nulling_semantics.default )
+    -- io.stderr:write(string.format("len: %s\n", #(recce.nulling_semantics.default)))
+    -- io.stderr:write(string.format("#0: %s\n", recce.nulling_semantics.default[0]))
+    -- io.stderr:write(string.format("#1: %s\n", recce.nulling_semantics.default[1]))
 END_OF_LUA
 
     my $null_values = $slr->[Marpa::R3::Internal::Scanless::R::NULL_VALUES];
