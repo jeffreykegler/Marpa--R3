@@ -4009,49 +4009,6 @@ PPCODE:
   av_extend (v_wrapper->stack, 1023);
   v_wrapper->mode = MARPA_XS_V_MODE_IS_STACK;
 
-  {
-    int ix;
-    IV ops[3];
-    const int highest_rule_id = marpa_g_highest_rule_id (g);
-    AV *av = v_wrapper->rule_semantics;
-    av_extend (av, highest_rule_id);
-    ops[0] = MARPA_OP_PUSH_VALUES;
-    ops[1] = MARPA_OP_CALLBACK;
-    ops[2] = 0;
-    for (ix = 0; ix <= highest_rule_id; ix++)
-      {
-        SV **p_sv = av_fetch (av, ix, 1);
-        if (!p_sv)
-          {
-            croak
-              ("Internal error in v->stack_mode_set(): av_fetch(%p,%ld,1) failed",
-               (void *) av, (long) ix);
-          }
-        sv_setpvn (*p_sv, (char *) ops, Dim(ops)*sizeof (ops[0]));
-      }
-  }
-
-  { /* Set the default token semantics */
-    int ix;
-    IV ops[2];
-    const int highest_symbol_id = marpa_g_highest_symbol_id (g);
-    AV *av = v_wrapper->token_semantics;
-    av_extend (av, highest_symbol_id);
-    ops[0] = MARPA_OP_RESULT_IS_TOKEN_VALUE;
-    ops[1] = 0;
-    for (ix = 0; ix <= highest_symbol_id; ix++)
-      {
-        SV **p_sv = av_fetch (av, ix, 1);
-        if (!p_sv)
-          {
-            croak
-              ("Internal error in v->stack_mode_set(): av_fetch(%p,%ld,1) failed",
-               (void *) av, (long) ix);
-          }
-        sv_setpvn (*p_sv, (char *) ops, Dim(ops)*sizeof (ops[0]));
-      }
-  }
-
   XSRETURN_YES;
 }
 

@@ -1384,7 +1384,12 @@ sub Marpa::R3::Scanless::R::value {
     recce.rule_semantics = {}
     recce.token_semantics = {}
     recce.nulling_semantics = {}
-    recce.nulling_semantics.default = marpa.array.from_list(marpa.ops.result_is_undef,0)
+    recce.nulling_semantics.default
+        = marpa.array.from_list(marpa.ops.result_is_undef,0)
+    recce.token_semantics.default
+        = marpa.array.from_list(marpa.ops.result_is_token_value,0)
+    recce.rule_semantics.default
+        = marpa.array.from_list(marpa.ops.push_values, marpa.ops.callback, 0)
     -- print( recce.nulling_semantics.default )
     -- io.stderr:write(string.format("len: %s\n", #(recce.nulling_semantics.default)))
     -- io.stderr:write(string.format("#0: %s\n", recce.nulling_semantics.default[0]))
