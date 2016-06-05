@@ -37,6 +37,7 @@ $Marpa::R3::Lua::value_init = <<'END_OF_LUA';
     function op_fn_create(name, fn) 
         local ref = recce:ref(fn);
         recce.op_fn_key[name] = ref;
+	return ref
     end
 
     recce.rule_semantics = {}
@@ -68,13 +69,27 @@ $Marpa::R3::Lua::value_init = <<'END_OF_LUA';
 
     -- print("stack len:", marpa.sv.top_index(recce:stack()))
 
-    op_fn_create("result_is_undef", function (...)
+    local result_is_undef_key = op_fn_create("result_is_undef", function (...)
         local recce, type, result_ix = ...
         local stack = recce:stack()
         stack[result_ix] = marpa.sv.lua_nil()
         marpa.sv.fill(stack, result_ix)
         return 0
     end)
+
+    recce.rule_semantics = {}
+    recce.token_semantics = {}
+    recce.nulling_semantics = {}
+    recce.nulling_semantics.default
+        = marpa.array.from_list(marpa.ops.lua, result_is_undef_key,0)
+    recce.token_semantics.default
+        = marpa.array.from_list(marpa.ops.result_is_token_value,0)
+    recce.rule_semantics.default
+        = marpa.array.from_list(marpa.ops.result_is_undef, 0)
+    -- print( recce.nulling_semantics.default )
+    -- io.stderr:write(string.format("len: %s\n", #(recce.nulling_semantics.default)))
+    -- io.stderr:write(string.format("#0: %s\n", recce.nulling_semantics.default[0]))
+    -- io.stderr:write(string.format("#1: %s\n", recce.nulling_semantics.default[1]))
 
 END_OF_LUA
 1;
