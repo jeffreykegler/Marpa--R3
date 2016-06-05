@@ -7511,64 +7511,60 @@ exec( slr, fn_key, ... )
    int fn_key;
 PPCODE:
 {
-  int i, status;
-  int top_after;
-  int recce_object;
-  int function_ref;
-  int function_stack_ix;
-  lua_State* const L = slr->L;
-  const int base_of_stack = marpa_lua_gettop(L);
+    int recce_object;
+    lua_State *const L = slr->L;
+    const int base_of_stack = marpa_lua_gettop (L);
 
-  marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, slr->lua_ref);
-  /* Lua stack: [ recce_table ] */
-  recce_object = marpa_lua_gettop (L);
-  marpa_lua_rawgeti (L, recce_object, fn_key);
-  /* [ recce_table, function ] */
+    marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, slr->lua_ref);
+    /* Lua stack: [ recce_table ] */
+    recce_object = marpa_lua_gettop (L);
+    marpa_lua_rawgeti (L, recce_object, fn_key);
+    /* [ recce_table, function ] */
 
-  function_stack_ix = marpa_lua_gettop (L);
-
-  // warn ("function_stack_ix=%d %s %d\n", function_stack_ix, __FILE__, __LINE__);
-  // warn ("items=%d %s %d\n", items, __FILE__, __LINE__);
-  /* push arguments */
-  marpa_lua_pushvalue(L, -2); // first argument is recce table
-  /* [ recce_table, function, recce_table ] */
-
-  /* the remaining arguments are those passed to the Perl call */
-  for (i = 2; i < items; i++)
     {
-      // warn ("%s %d: pushing Perl arg %d\n", __FILE__, __LINE__, i);
-      SV *arg_sv = ST (i);
-      if (!SvOK (arg_sv))
-        {
-          croak ("Marpa::R3::Lua::exec arg %d is not an SV", i);
+        const int function_stack_ix = marpa_lua_gettop (L);
+        int i, status;
+        int top_after;
+
+        // warn ("function_stack_ix=%d %s %d\n", function_stack_ix, __FILE__, __LINE__);
+        // warn ("items=%d %s %d\n", items, __FILE__, __LINE__);
+        /* push arguments */
+        marpa_lua_pushvalue (L, -2);    // first argument is recce table
+        /* [ recce_table, function, recce_table ] */
+
+        /* the remaining arguments are those passed to the Perl call */
+        for (i = 2; i < items; i++) {
+            // warn ("%s %d: pushing Perl arg %d\n", __FILE__, __LINE__, i);
+            SV *arg_sv = ST (i);
+            if (!SvOK (arg_sv)) {
+                croak ("Marpa::R3::Lua::exec arg %d is not an SV", i);
+            }
+            MARPA_SV_SV (L, arg_sv);
+            // warn ("%s %d\n", __FILE__, __LINE__);
         }
-      MARPA_SV_SV (L, arg_sv);
-      // warn ("%s %d\n", __FILE__, __LINE__);
-    }
 
-  status = marpa_lua_pcall (L, (items - 2) + 1, LUA_MULTRET, 0);
-  if (status != 0)
-    {
-      const char *error_string = marpa_lua_tostring (L, -1);
-      marpa_lua_settop (L, base_of_stack);
-      croak ("Marpa::R3 Lua code error: %s", error_string);
-    }
+        status = marpa_lua_pcall (L, (items - 2) + 1, LUA_MULTRET, 0);
+        if (status != 0) {
+            const char *error_string = marpa_lua_tostring (L, -1);
+            marpa_lua_settop (L, base_of_stack);
+            croak ("Marpa::R3 Lua code error: %s", error_string);
+        }
 
-  /* return args to caller */
-  top_after = marpa_lua_gettop (L);
-  // warn ("top after pcall = %d", top_after);
-  for (i = function_stack_ix; i <= top_after; i++)
-    {
-      // warn ("%s %d\n", __FILE__, __LINE__);
-      SV *sv_result = coerce_to_sv (L, i);
-      // warn ("%s %d\n", __FILE__, __LINE__);
-      /* Took ownership of sv_result, we now need to mortalize it */
-      XPUSHs (sv_2mortal (sv_result));
-      // warn ("%s %d\n", __FILE__, __LINE__);
-    }
+        /* return args to caller */
+        top_after = marpa_lua_gettop (L);
+        // warn ("top after pcall = %d", top_after);
+        for (i = function_stack_ix; i <= top_after; i++) {
+            // warn ("%s %d\n", __FILE__, __LINE__);
+            SV *sv_result = coerce_to_sv (L, i);
+            // warn ("%s %d\n", __FILE__, __LINE__);
+            /* Took ownership of sv_result, we now need to mortalize it */
+            XPUSHs (sv_2mortal (sv_result));
+            // warn ("%s %d\n", __FILE__, __LINE__);
+        }
 
-  marpa_lua_settop (L, base_of_stack);
-  // warn ("%s %d\n", __FILE__, __LINE__);
+        marpa_lua_settop (L, base_of_stack);
+        // warn ("%s %d\n", __FILE__, __LINE__);
+    }
 }
 
 MODULE = Marpa::R3            PACKAGE = Marpa::R3::Lua
