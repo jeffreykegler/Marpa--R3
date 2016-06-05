@@ -892,29 +892,16 @@ sub registration_init {
         Marpa::R3::Thin::op('result_is_token_value');
     state $op_lua = Marpa::R3::Thin::op('lua');
 
-    # A handy function for debugging
-    my $debug_fn_key = $slr->register_fn(<<'EOS');
-local recce, type, result_ix, rule_id, arg_n = ...
-print([[OP_LUA:]], recce, type, result_ix, rule_id, arg_n)
-for k,v in pairs(recce)
-do print(k, v)
-end
-mt = debug.getmetatable(recce)
-print([[=== metatable ===]])
-for k,v in pairs(mt)
-do print(k, v)
-end
-print("stack len:", marpa.sv.top_index(recce:stack()))
-return 0
-EOS
-
-    my $result_is_undef_key = $slr->register_fn(<<'EOS');
-    local recce, type, result_ix = ...
-    local stack = recce:stack()
-    stack[result_ix] = marpa.sv.lua_nil()
-    marpa.sv.fill(stack, result_ix)
-    return 0
-EOS
+    my ($result_is_undef_key) = $slr->exec_string(<<'END_OF_LUA');
+    local recce = ...
+    io.stderr:write(string.format("in Lua, getting result is undef key"))
+    print(recce.op_fn_key)
+    for k,v in pairs(recce.op_fn_key) do
+        print("op_fn:", k, v)
+    end
+    print("returning:", recce.op_fn_key["result_is_undef"])
+    return recce.op_fn_key["result_is_undef"]
+END_OF_LUA
 
     my @nulling_symbol_by_semantic_rule;
     NULLING_SYMBOL: for my $nulling_symbol ( 0 .. $#{$null_values} ) {
@@ -990,6 +977,7 @@ EOS
 
             if ( $semantics eq '::undef' ) {
                 # @ops = ($op_lua, $result_is_undef_key, $op_result_is_undef);
+                warn("ops = $op_lua, $result_is_undef_key");
                 @ops = ($op_lua, $result_is_undef_key);
                 last SET_OPS;
             }
@@ -1021,6 +1009,7 @@ EOS
                     my $thingy = ${$thingy_ref};
                     if ( not defined $thingy ) {
                         @ops = ($op_lua, $result_is_undef_key);
+                        warn("ops = $op_lua, $result_is_undef_key");
                         last SET_OPS;
                     }
                     @ops = ( $op_result_is_constant, $thingy_ref );
@@ -1100,6 +1089,7 @@ EOS
 
             if ( not defined $array_fate ) {
                 @ops = ($op_lua, $result_is_undef_key);
+                warn("ops = $op_lua, $result_is_undef_key");
                 last SET_OPS;
             }
 
