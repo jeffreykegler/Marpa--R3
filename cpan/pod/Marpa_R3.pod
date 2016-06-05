@@ -579,11 +579,17 @@ or tainted token values.
 =head1 Threads
 
 Perl interpreter-based threads are now
-L<officially "discouraged"|perlthread/"WARNNG">,
-and Marpa::R3 does not support them.
-Marpa::R3's underlying library is thread-safe.
-When and if there is stable Perl threading,
-Marpa::R3 could be enhanced to support it.
+L<officially "discouraged"|perlthread/"WARNNG">.
+Nonetheless, Marpa::R3 supports them,
+with one restriction:
+A Marpa grammar object, and any recognizer or
+other object created from that grammar,
+must be used within a single thread.
+
+This restriction is less severe than it may sound:
+Marpa grammars are relatively inexpensive to create,
+and several Marpa grammar objects can be created from
+the same SLIF source.
 
 =head1 The Marpa:: namespace
 

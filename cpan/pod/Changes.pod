@@ -197,16 +197,6 @@ the values of the child nodes, in lexical order.
 If there were no child nodes visible to the semantics,
 then the second argument is an empty array.
 
-=head2 Marpa::R3 does not support Perl threads
-
-Perl interpreter-based threads are now
-L<officially "discouraged"|perlthread/"WARNNG">,
-and
-Marpa::R3 does not support them.
-Marpa::R3's underlying library is thread-safe.
-When and if there is stable Perl threading,
-Marpa::R3 could be enhanced to support it.
-
 =head1 COPYRIGHT AND LICENSE
 
 =for Marpa::R3::Display
