@@ -40,20 +40,6 @@ $Marpa::R3::Lua::value_init = <<'END_OF_LUA';
 	return ref
     end
 
-    recce.rule_semantics = {}
-    recce.token_semantics = {}
-    recce.nulling_semantics = {}
-    recce.nulling_semantics.default
-        = marpa.array.from_list(marpa.ops.result_is_undef,0)
-    recce.token_semantics.default
-        = marpa.array.from_list(marpa.ops.result_is_token_value,0)
-    recce.rule_semantics.default
-        = marpa.array.from_list(marpa.ops.result_is_undef, 0)
-    -- print( recce.nulling_semantics.default )
-    -- io.stderr:write(string.format("len: %s\n", #(recce.nulling_semantics.default)))
-    -- io.stderr:write(string.format("#0: %s\n", recce.nulling_semantics.default[0]))
-    -- io.stderr:write(string.format("#1: %s\n", recce.nulling_semantics.default[1]))
-
     op_fn_create("debug", function (...)
         local recce, type, result_ix, rule_id, arg_n = ...
         print([[OP_LUA:]], recce, type, result_ix, rule_id, arg_n)
