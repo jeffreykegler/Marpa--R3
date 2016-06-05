@@ -85,7 +85,7 @@ $Marpa::R3::Lua::value_init = <<'END_OF_LUA';
     recce.token_semantics.default
         = marpa.array.from_list(marpa.ops.result_is_token_value,0)
     recce.rule_semantics.default
-        = marpa.array.from_list(marpa.ops.result_is_undef, 0)
+        = marpa.array.from_list(marpa.ops.lua, result_is_undef_key,0)
     -- print( recce.nulling_semantics.default )
     -- io.stderr:write(string.format("len: %s\n", #(recce.nulling_semantics.default)))
     -- io.stderr:write(string.format("#0: %s\n", recce.nulling_semantics.default[0]))
