@@ -320,7 +320,7 @@ xlua_ref(lua_State* L)
 {
     int ref;
     marpa_luaL_checktype(L, 1, LUA_TTABLE);
-    marpa_lua_checkany(L, 2);
+    marpa_luaL_checkany(L, 2);
     marpa_lua_pushinteger(L, marpa_luaL_ref(L, 1));
     return 1;
 }
@@ -330,8 +330,8 @@ xlua_unref(lua_State* L)
 {
     int ref;
     marpa_luaL_checktype(L, 1, LUA_TTABLE);
-    marpa_lua_checkinteger(L, 2);
-    marpa_luaL_unref(L, 1 marpa_lua_tointeger(2));
+    marpa_luaL_checkinteger(L, 2);
+    marpa_luaL_unref(L, 1, marpa_lua_tointeger(L, 2));
     return 0;
 }
 
@@ -1595,26 +1595,26 @@ default:
             ops = NULL;
         }
 
-        warn("%s %d", __FILE__, __LINE__);
+        // warn("%s %d", __FILE__, __LINE__);
         base_of_stack = marpa_lua_gettop(L);
         /* Lua stack: [] */
         marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, slr->lua_ref);
         /* Lua stack: [ recce_table ] */
-        warn("%s %d", __FILE__, __LINE__);
+        // warn("%s %d", __FILE__, __LINE__);
         /* Lua stack: [ recce_table, ] */
         marpa_lua_getfield(L, -1, semantics_table);
-        warn("%s %d", __FILE__, __LINE__);
+        // warn("%s %d", __FILE__, __LINE__);
         /* Lua stack: [ recce_table, semantics_table ] */
          marpa_lua_geti (L, -1, semantics_ix);
-        warn("%s %d", __FILE__, __LINE__);
+        // warn("%s %d", __FILE__, __LINE__);
         /* Lua stack: [ recce_table, semantics_table, ops_ud ] */
         ops_ud = (struct Xlua_Array*)marpa_lua_touserdata(L, -1);
-        warn("%s %d", __FILE__, __LINE__);
+        // warn("%s %d", __FILE__, __LINE__);
         if (!ops_ud) {
           marpa_lua_pop(L, 1);
           warn("Default for %s semantics kicking in", semantics_type);
           marpa_lua_getfield (L, -1, "default");
-        warn("%s %d", __FILE__, __LINE__);
+        // warn("%s %d", __FILE__, __LINE__);
           /* Lua stack: [ recce_table, semantics_table, ops_ud ] */
           ops_ud = (Xlua_Array*)marpa_lua_touserdata(L, -1);
         }
@@ -1623,7 +1623,7 @@ default:
                     ("Problem in v->stack_step: %s %d is not registered",
                     semantics_type, semantics_ix);
         }
-        warn("%s %d", __FILE__, __LINE__);
+        // warn("%s %d", __FILE__, __LINE__);
         ops = ops_ud->array;
         marpa_lua_settop(L, base_of_stack);
     }

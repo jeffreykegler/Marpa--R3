@@ -300,22 +300,6 @@ Registering semantics for rule: Expression ::= Term
   Semantics are result_is_rhs_n 0
 Registering semantics for rule: [:start] ::= Calculator
   Semantics are result_is_rhs_n 0
-Registering semantics for token: Calculator
-  Semantics are result_is_token_value
-Registering semantics for token: Expression
-  Semantics are result_is_token_value
-Registering semantics for token: Factor
-  Semantics are result_is_token_value
-Registering semantics for token: Number
-  Semantics are result_is_token_value
-Registering semantics for token: Term
-  Semantics are result_is_token_value
-Registering semantics for token: [:start]
-  Semantics are result_is_token_value
-Registering semantics for token: [Lex-0]
-  Semantics are result_is_token_value
-Registering semantics for token: [Lex-1]
-  Semantics are result_is_token_value
 value event: starting op MARPA_STEP_TOKEN result_is_token_value
 value event: starting op MARPA_STEP_RULE result_is_rhs_n
 value event: starting op MARPA_STEP_RULE result_is_rhs_n

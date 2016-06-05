@@ -296,6 +296,26 @@ sub Marpa::R3::Scanless::R::new {
 
     Marpa::R3::Internal::Scanless::convert_libmarpa_events($slr);
 
+    $slr->exec_string(<<'END_OF_LUA');
+    -- for k,v in pairs(marpa.ops)
+    -- do io.stderr:write(string.format("OP: %s %s\n", k, v))
+    -- end
+    local recce = ...
+    recce.rule_semantics = {}
+    recce.token_semantics = {}
+    recce.nulling_semantics = {}
+    recce.nulling_semantics.default
+        = marpa.array.from_list(marpa.ops.result_is_undef,0)
+    recce.token_semantics.default
+        = marpa.array.from_list(marpa.ops.result_is_token_value,0)
+    recce.rule_semantics.default
+        = marpa.array.from_list(marpa.ops.result_is_undef, 0)
+    -- print( recce.nulling_semantics.default )
+    -- io.stderr:write(string.format("len: %s\n", #(recce.nulling_semantics.default)))
+    -- io.stderr:write(string.format("#0: %s\n", recce.nulling_semantics.default[0]))
+    -- io.stderr:write(string.format("#1: %s\n", recce.nulling_semantics.default[1]))
+END_OF_LUA
+
     return $slr;
 } ## end sub Marpa::R3::Scanless::R::new
 
