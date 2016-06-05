@@ -1533,7 +1533,7 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
         step_type_to_string (step_type);
 
     v_wrapper->result = result_ix;
-        warn("%s %d", __FILE__, __LINE__);
+  // warn("%s %d", __FILE__, __LINE__);
 
 switch (step_type) {
     STRLEN dummy;
@@ -1541,9 +1541,9 @@ case MARPA_STEP_RULE:
     {
         SV **p_ops_sv =
             av_fetch (v_wrapper->rule_semantics, marpa_v_rule (v), 0);
-        warn("%s %d", __FILE__, __LINE__);
+  // warn("%s %d", __FILE__, __LINE__);
         if (p_ops_sv) {
-        warn("%s %d", __FILE__, __LINE__);
+  // warn("%s %d", __FILE__, __LINE__);
             ops = (unsigned int *) SvPV (*p_ops_sv, dummy);
         }
     }
@@ -1553,9 +1553,9 @@ case MARPA_STEP_TOKEN:
         SV **p_ops_sv =
             av_fetch (v_wrapper->token_semantics, marpa_v_token (v),
             0);
-        warn("%s %d", __FILE__, __LINE__);
+  // warn("%s %d", __FILE__, __LINE__);
         if (p_ops_sv) {
-        warn("%s %d", __FILE__, __LINE__);
+  // warn("%s %d", __FILE__, __LINE__);
             ops = (unsigned int *) SvPV (*p_ops_sv, dummy);
         }
     }
@@ -1565,9 +1565,9 @@ case MARPA_STEP_NULLING_SYMBOL:
         SV **p_ops_sv =
             av_fetch (v_wrapper->nulling_semantics, marpa_v_token (v),
             0);
-        warn("%s %d", __FILE__, __LINE__);
+  // warn("%s %d", __FILE__, __LINE__);
         if (p_ops_sv) {
-        warn("%s %d", __FILE__, __LINE__);
+  // warn("%s %d", __FILE__, __LINE__);
             ops = (unsigned int *) SvPV (*p_ops_sv, dummy);
         }
     }
@@ -1579,35 +1579,35 @@ default:
     if (!ops) {
         int base_of_stack;
         Xlua_Array* ops_ud;
-        warn("%s %d", __FILE__, __LINE__);
+  // warn("%s %d", __FILE__, __LINE__);
 
         switch (step_type) {
             STRLEN dummy;
         case MARPA_STEP_RULE:
-        warn("%s %d", __FILE__, __LINE__);
+  // warn("%s %d", __FILE__, __LINE__);
             semantics_table = "rule_semantics";
             semantics_type = "rule";
             semantics_ix = marpa_v_rule (v);
             break;
         case MARPA_STEP_TOKEN:
-        warn("%s %d", __FILE__, __LINE__);
+  // warn("%s %d", __FILE__, __LINE__);
             semantics_table = "token_semantics";
             semantics_type = "token";
             semantics_ix = marpa_v_token (v);
             break;
         case MARPA_STEP_NULLING_SYMBOL:
-        warn("%s %d", __FILE__, __LINE__);
+  // warn("%s %d", __FILE__, __LINE__);
             semantics_table = "nulling_semantics";
             semantics_type = "nulling symbol";
             semantics_ix = marpa_v_token (v);
             break;
         default:
-        warn("%s %d", __FILE__, __LINE__);
+  // warn("%s %d", __FILE__, __LINE__);
             /* Never reached -- turns off warning about uninitialized ops */
             ops = NULL;
         }
 
-        warn("%s %d", __FILE__, __LINE__);
+  // warn("%s %d", __FILE__, __LINE__);
         base_of_stack = marpa_lua_gettop(L);
         /* Lua stack: [] */
         marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, slr->lua_ref);
@@ -1624,7 +1624,7 @@ default:
         // warn("%s %d", __FILE__, __LINE__);
         if (!ops_ud) {
           marpa_lua_pop(L, 1);
-          warn("Default for %s semantics kicking in", semantics_type);
+  // warn("Default for %s semantics kicking in", semantics_type);
           marpa_lua_getfield (L, -1, "default");
         // warn("%s %d", __FILE__, __LINE__);
           /* Lua stack: [ recce_table, semantics_table, ops_ud ] */
@@ -1644,7 +1644,7 @@ default:
     while (1) {
         IV op_code = ops[op_ix++];
 
-        warn ("Executing op: %d", op_code);
+  // warn ("Executing op: %d", op_code);
 
         if (v_wrapper->trace_values >= 3) {
             AV *event;
@@ -1669,18 +1669,18 @@ default:
                 const int base_of_stack = marpa_lua_gettop (L);
                 const int fn_key = ops[op_ix++];
 
-                warn ("Executing MARPA_OP_LUA, fn_key = %d", fn_key);
+  // warn ("Executing MARPA_OP_LUA, fn_key = %d", fn_key);
 
                 marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, slr->lua_ref);
                 /* Lua stack: [ recce_table ] */
                 marpa_lua_rawgeti (L, -1, fn_key);
                 /* [ recce_table, function ] */
 
-                warn ("Executing MARPA_OP_LUA, fn_key = %d", fn_key);
+  // warn ("Executing MARPA_OP_LUA, fn_key = %d", fn_key);
 
                 marpa_lua_pushvalue(L, -1);
                 marpa_lua_getinfo(L, ">S", &ar);
-                warn("Executing Lua code: %s", ar.source);
+  // warn("Executing Lua code: %s", ar.source);
 
                 /* The recce table itself is an argument */
                 marpa_lua_pushvalue (L, -2);
@@ -1707,11 +1707,11 @@ default:
                 default:
                     break;
                 }
-                warn ("%s %d\n", __FILE__, __LINE__);
+  // warn ("%s %d\n", __FILE__, __LINE__);
 
                 status = marpa_lua_pcall (L, argc, LUA_MULTRET, 0);
 
-                warn ("%s %d\n", __FILE__, __LINE__);
+  // warn ("%s %d\n", __FILE__, __LINE__);
 
                 if (status != 0) {
                     const char *error_string = marpa_lua_tostring (L, -1);
@@ -1719,7 +1719,7 @@ default:
                     croak ("Marpa::R3 Lua code error: %s", error_string);
                 }
 
-                warn ("%s %d\n", __FILE__, __LINE__);
+  // warn ("%s %d\n", __FILE__, __LINE__);
 
                 marpa_lua_settop (L, base_of_stack);
                 goto NEXT_OP_CODE;

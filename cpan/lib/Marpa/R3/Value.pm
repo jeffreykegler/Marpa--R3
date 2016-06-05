@@ -894,12 +894,6 @@ sub registration_init {
 
     my ($result_is_undef_key) = $slr->exec_string(<<'END_OF_LUA');
     local recce = ...
-    io.stderr:write(string.format("in Lua, getting result is undef key"))
-    print(recce.op_fn_key)
-    for k,v in pairs(recce.op_fn_key) do
-        print("op_fn:", k, v)
-    end
-    print("returning:", recce.op_fn_key["result_is_undef"])
     return recce.op_fn_key["result_is_undef"]
 END_OF_LUA
 
@@ -976,8 +970,6 @@ END_OF_LUA
         SET_OPS: {
 
             if ( $semantics eq '::undef' ) {
-                # @ops = ($op_lua, $result_is_undef_key, $op_result_is_undef);
-                warn("ops = $op_lua, $result_is_undef_key");
                 @ops = ($op_lua, $result_is_undef_key);
                 last SET_OPS;
             }
@@ -1009,7 +1001,6 @@ END_OF_LUA
                     my $thingy = ${$thingy_ref};
                     if ( not defined $thingy ) {
                         @ops = ($op_lua, $result_is_undef_key);
-                        warn("ops = $op_lua, $result_is_undef_key");
                         last SET_OPS;
                     }
                     @ops = ( $op_result_is_constant, $thingy_ref );
@@ -1089,7 +1080,6 @@ END_OF_LUA
 
             if ( not defined $array_fate ) {
                 @ops = ($op_lua, $result_is_undef_key);
-                warn("ops = $op_lua, $result_is_undef_key");
                 last SET_OPS;
             }
 
