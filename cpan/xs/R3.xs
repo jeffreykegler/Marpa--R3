@@ -1725,12 +1725,6 @@ default:
                 goto NEXT_OP_CODE;
             }
 
-        case MARPA_OP_RESULT_IS_UNDEF:
-            {
-                av_fill (stack, -1 + result_ix);
-            }
-            return -1;
-
         case MARPA_OP_RESULT_IS_CONSTANT:
             {
                 IV constant_ix = ops[op_ix++];
