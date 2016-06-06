@@ -97,7 +97,7 @@ sub do_recce_test {
     $test_name //= qq{"$code"};
     $test_name = "Recce: $test_name";
     my $fn_key = $recce->register_fn($code);
-    my @actual = $recce->exec($fn_key, @{$args});
+    my @actual = $recce->exec_key($fn_key, @{$args});
     Test::More::is_deeply( \@actual, $expected, $test_name);
 }
 

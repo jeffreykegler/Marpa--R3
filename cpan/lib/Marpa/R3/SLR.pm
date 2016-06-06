@@ -297,7 +297,7 @@ sub Marpa::R3::Scanless::R::new {
     Marpa::R3::Internal::Scanless::convert_libmarpa_events($slr);
 
     # Stuff in Lua
-    $slr->exec_string($Marpa::R3::Lua::value_init);
+    $slr->exec($Marpa::R3::Lua::value_init);
 
     return $slr;
 } ## end sub Marpa::R3::Scanless::R::new
@@ -1827,16 +1827,15 @@ sub Marpa::R3::Scanless::R::unregister_fn {
 }
 
 sub Marpa::R3::Scanless::R::exec {
-    my ( $slr, $fn_key, @args ) = @_;
+    my ( $slr, $codestr, @args ) = @_;
     my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
-    return $thin_slr->exec($fn_key, @args);
+    return $thin_slr->exec($codestr, @args);
 }
 
-sub Marpa::R3::Scanless::R::exec_string {
-    my ( $slr, $code_string, @args ) = @_;
-    my $fn_key = $slr->register_fn($code_string);
-    my @results = $slr->exec($fn_key, @args);
-    $slr->unregister_fn($fn_key);
+sub Marpa::R3::Scanless::R::exec_key {
+    my ( $slr, $key, @args ) = @_;
+    my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
+    my @results = $thin_slr->exec_key($key, @args);
     return @results;
 }
 

@@ -79,7 +79,7 @@ my $code = <<'END_OF_MAIN_CODE';
 MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::SLR
 
 void
-exec( slr, fn_key, ... )
+exec_key( slr, fn_key, ... )
    Scanless_R *slr;
    int fn_key;
 PPCODE:
@@ -98,6 +98,32 @@ PPCODE:
     === LUA EXEC BODY ===
 }
 
+void
+exec( slr, codestr, ... )
+   Scanless_R *slr;
+   char* codestr;
+PPCODE:
+{
+    const int is_method = 1;
+    lua_State *const L = slr->L;
+    const int base_of_stack = marpa_lua_gettop (L);
+    int load_status;
+
+    marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, slr->lua_ref);
+    /* Lua stack: [ recce_table ] */
+
+    load_status = marpa_luaL_loadbuffer (L, codestr, strlen (codestr), codestr);
+    if (load_status != 0)
+    {
+      const char *error_string = marpa_lua_tostring (L, -1);
+      marpa_lua_pop (L, 1);
+      croak ("Marpa::R3::Lua error in luaL_loadbuffer: %s", error_string);
+    }
+    /* [ recce_table, function ] */
+
+    === LUA EXEC BODY ===
+}
+
 MODULE = Marpa::R3            PACKAGE = Marpa::R3::Lua
 
 void
@@ -106,17 +132,17 @@ raw_exec( lua_wrapper, codestr, ... )
    char* codestr;
 PPCODE:
 {
-  int load_status;
-  const int is_method = 0;
-  lua_State* const L = lua_wrapper->L;
+    const int is_method = 0;
+    lua_State *const L = lua_wrapper->L;
     const int base_of_stack = marpa_lua_gettop (L);
+    const int load_status =
+        marpa_luaL_loadbuffer (L, codestr, strlen (codestr), codestr);
 
-  load_status = marpa_luaL_loadbuffer (L, codestr, strlen (codestr), codestr);
-  if (load_status != 0)
-    {
-      const char *error_string = marpa_lua_tostring (L, -1);
-      marpa_lua_pop (L, 1);
-      croak ("Marpa::R3::Lua error in luaL_loadbuffer: %s", error_string);
+    if (load_status != 0) {
+        const char *error_string = marpa_lua_tostring (L, -1);
+        marpa_lua_pop (L, 1);
+        croak ("Marpa::R3::Lua error in luaL_loadbuffer: %s",
+            error_string);
     }
 
     === LUA EXEC BODY ===
@@ -128,12 +154,11 @@ exec( lua_wrapper, codestr, ... )
    char* codestr;
 PPCODE:
 {
-  int load_status;
   const int is_method = 0;
   lua_State* const L = lua_wrapper->L;
     const int base_of_stack = marpa_lua_gettop (L);
 
-  load_status =
+  const int load_status =
     marpa_luaL_loadbuffer (L, codestr, strlen (codestr), codestr);
   if (load_status != 0)
     {

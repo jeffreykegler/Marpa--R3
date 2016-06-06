@@ -892,7 +892,7 @@ sub registration_init {
         Marpa::R3::Thin::op('result_is_token_value');
     state $op_lua = Marpa::R3::Thin::op('lua');
 
-    my ($result_is_undef_key) = $slr->exec_string(<<'END_OF_LUA');
+    my ($result_is_undef_key) = $slr->exec(<<'END_OF_LUA');
     local recce = ...
     return recce.op_fn_key["result_is_undef"]
 END_OF_LUA
