@@ -107,9 +107,9 @@ inc/Marpa/R3/License.pm
 inc/Marpa/R3/Test.pm
 lib/Marpa/R3.pm
 lib/Marpa/R3/ASF.pm
-lib/Marpa/R3/Lua.pm
 lib/Marpa/R3/Common.pm
 lib/Marpa/R3/Internal.pm
+lib/Marpa/R3/Lua.pm
 lib/Marpa/R3/MetaAST.pm
 lib/Marpa/R3/MetaG.pm
 lib/Marpa/R3/SLG.pm
@@ -295,6 +295,7 @@ xs/Makefile.PL
 xs/R3.xs
 xs/create_ops.pl
 xs/gen_auto_xs.pl
+xs/gen_exec_lua.pl
 xs/marpa_xs.h
 xs/ppport.h
 xs/typemap

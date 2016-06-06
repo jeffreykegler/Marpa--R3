@@ -111,6 +111,7 @@
 ^xs/Makefile[.]old$
 ^xs/R3[.]c$
 ^xs/auto[.]xs
+^xs/exec_lua[.]xs
 ^xs/marpa
 ^xs/marpa[.]h$
 ^xs/marpa_codes[.]h$
