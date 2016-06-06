@@ -1339,17 +1339,18 @@ sub Marpa::R3::Scanless::R::value {
         $slr->[Marpa::R3::Internal::Scanless::R::SLG]
         if defined $slr;
 
-    if ( not $slr->[Marpa::R3::Internal::Scanless::R::REGISTRATIONS] ) {
-        registration_init( $slr, $per_parse_arg );
-    }
-
-    my $semantics_arg0 = $per_parse_arg // {};
-
     my $value = Marpa::R3::Thin::V->new($tree);
     $value->stack_mode_set( $slr->thin() );
     local $Marpa::R3::Internal::Context::VALUATOR = $value;
     value_trace( $value, $trace_values ? 1 : 0 );
     $value->trace_values($trace_values);
+    $slr->exec_name('value_init');
+
+    if ( not $slr->[Marpa::R3::Internal::Scanless::R::REGISTRATIONS] ) {
+        registration_init( $slr, $per_parse_arg );
+    }
+
+    my $semantics_arg0 = $per_parse_arg // {};
 
     my $null_values = $slr->[Marpa::R3::Internal::Scanless::R::NULL_VALUES];
     my $nulling_closures =

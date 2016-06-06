@@ -79,7 +79,15 @@ function value_init(recce)
     -- io.stderr:write(string.format("#0: %s\n", recce.nulling_semantics.default[0]))
     -- io.stderr:write(string.format("#1: %s\n", recce.nulling_semantics.default[1]))
 
-    recce.is_inited = 1;
+    recce.is_inited = true;
+end
+
+function value_reset(recce)
+    recce.op_fn_key = nil
+    recce.rule_semantics = nil
+    recce.token_semantics = nil
+    recce.nulling_semantics = nil
+    recce.is_inited = false;
 end
 
 END_OF_LUA

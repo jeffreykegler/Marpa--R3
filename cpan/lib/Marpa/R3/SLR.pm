@@ -211,8 +211,6 @@ sub Marpa::R3::Scanless::R::new {
     $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE] =
          $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE];
 
-    $slr->reset_evaluation();
-
     my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
 
     my $recce_c =
@@ -222,8 +220,6 @@ sub Marpa::R3::Scanless::R::new {
         Marpa::R3::exception( $grammar_c->error() );
     }
 
-    common_set( $slr, "new",  $flat_args );
-
     $recce_c->ruby_slippers_set(1);
 
     my $thin_slr = Marpa::R3::Thin::SLR->new(
@@ -231,6 +227,13 @@ sub Marpa::R3::Scanless::R::new {
         $slr->[Marpa::R3::Internal::Scanless::R::R_C]
     );
     $slr->[Marpa::R3::Internal::Scanless::R::SLR_C]      = $thin_slr;
+
+    # Stuff in Lua
+    $slr->exec($Marpa::R3::Lua::lua_init);
+
+    $slr->reset_evaluation();
+
+    common_set( $slr, "new",  $flat_args );
 
     my $symbol_ids_by_event_name_and_type =
         $slg->[
@@ -295,10 +298,6 @@ sub Marpa::R3::Scanless::R::new {
     }
 
     Marpa::R3::Internal::Scanless::convert_libmarpa_events($slr);
-
-    # Stuff in Lua
-    $slr->exec($Marpa::R3::Lua::lua_init);
-    $slr->exec_name('value_init');
 
     return $slr;
 } ## end sub Marpa::R3::Scanless::R::new
@@ -1486,6 +1485,8 @@ sub Marpa::R3::Scanless::R::reset_evaluation {
     $slr->[Marpa::R3::Internal::Scanless::R::CLOSURE_BY_RULE_ID]   = undef;
 
     $slr->[Marpa::R3::Internal::Scanless::R::TREE_MODE] = undef;
+
+    $slr->exec_name('value_reset');
     return;
 }
 
@@ -1841,9 +1842,9 @@ sub Marpa::R3::Scanless::R::exec_key {
 }
 
 sub Marpa::R3::Scanless::R::exec_name {
-    my ( $slr, $key, @args ) = @_;
+    my ( $slr, $name, @args ) = @_;
     my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
-    my @results = $thin_slr->exec_name($key, @args);
+    my @results = $thin_slr->exec_name($name, @args);
     return @results;
 }
 
