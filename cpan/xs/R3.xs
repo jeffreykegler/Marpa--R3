@@ -1715,7 +1715,7 @@ default:
 
                 if (status != 0) {
                     const char *error_string = marpa_lua_tostring (L, -1);
-                    marpa_lua_pop (L, 1);
+                    marpa_lua_settop (L, base_of_stack);
                     croak ("Marpa::R3 Lua code error: %s", error_string);
                 }
 
