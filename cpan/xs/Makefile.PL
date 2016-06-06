@@ -64,10 +64,13 @@ undef &MY::postamble; # suppress warning
     my @postamble_pieces = (".NOTPARALLEL:\n");
 
     push @postamble_pieces, <<'END_OF_POSTAMBLE_PIECE';
-R3.c: marpa_slifop.h marpa_xs.h auto.xs
+R3.c: marpa_slifop.h marpa_xs.h auto.xs exec_lua.xs
 
 auto.xs: gen_auto_xs.pl
 	$(PERLRUN) gen_auto_xs.pl $@
+
+exec_lua.xs: gen_exec_lua.pl
+	$(PERLRUN) gen_exec_lua.pl $@
 
 marpa_slifop.h: create_ops.pl
 	$(PERLRUN) create_ops.pl > marpa_slifop.h
