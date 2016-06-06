@@ -297,7 +297,8 @@ sub Marpa::R3::Scanless::R::new {
     Marpa::R3::Internal::Scanless::convert_libmarpa_events($slr);
 
     # Stuff in Lua
-    $slr->exec($Marpa::R3::Lua::value_init);
+    $slr->exec($Marpa::R3::Lua::lua_init);
+    $slr->exec_name('value_init');
 
     return $slr;
 } ## end sub Marpa::R3::Scanless::R::new
@@ -1836,6 +1837,13 @@ sub Marpa::R3::Scanless::R::exec_key {
     my ( $slr, $key, @args ) = @_;
     my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
     my @results = $thin_slr->exec_key($key, @args);
+    return @results;
+}
+
+sub Marpa::R3::Scanless::R::exec_name {
+    my ( $slr, $key, @args ) = @_;
+    my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
+    my @results = $thin_slr->exec_name($key, @args);
     return @results;
 }
 

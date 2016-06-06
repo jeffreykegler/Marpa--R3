@@ -25,18 +25,20 @@ $VERSION        = eval $VERSION;
 # These can, and probably should, be pre-compiled someday,
 # reducing start-up time.
 
-$Marpa::R3::Lua::value_init = <<'END_OF_LUA';
+$Marpa::R3::Lua::lua_init = <<'END_OF_LUA';
     -- for k,v in pairs(marpa.ops)
     -- do io.stderr:write(string.format("OP: %s %s\n", k, v))
     -- end
 
-    local recce = ...
+function value_init(recce)
+
+    if recce.is_inited then return end
 
     recce.op_fn_key = {}
 
     function op_fn_create(name, fn) 
-        local ref = recce:ref(fn);
-        recce.op_fn_key[name] = ref;
+	local ref = recce:ref(fn);
+	recce.op_fn_key[name] = ref;
 	return ref
     end
 
@@ -76,6 +78,9 @@ $Marpa::R3::Lua::value_init = <<'END_OF_LUA';
     -- io.stderr:write(string.format("len: %s\n", #(recce.nulling_semantics.default)))
     -- io.stderr:write(string.format("#0: %s\n", recce.nulling_semantics.default[0]))
     -- io.stderr:write(string.format("#1: %s\n", recce.nulling_semantics.default[1]))
+
+    recce.is_inited = 1;
+end
 
 END_OF_LUA
 1;

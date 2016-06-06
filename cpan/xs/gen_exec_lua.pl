@@ -124,6 +124,30 @@ PPCODE:
     === LUA EXEC BODY ===
 }
 
+void
+exec_name( slr, name, ... )
+   Scanless_R *slr;
+   char* name;
+PPCODE:
+{
+    const int is_method = 1;
+    lua_State *const L = slr->L;
+    const int base_of_stack = marpa_lua_gettop (L);
+    int type;
+
+    marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, slr->lua_ref);
+    /* Lua stack: [ recce_table ] */
+
+    type = marpa_lua_getglobal (L, name);
+    if (type != LUA_TFUNCTION)
+    {
+      croak ("exec_name: global %s name is not a function", name);
+    }
+    /* [ recce_table, function ] */
+
+    === LUA EXEC BODY ===
+}
+
 MODULE = Marpa::R3            PACKAGE = Marpa::R3::Lua
 
 void
