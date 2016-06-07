@@ -1715,8 +1715,10 @@ default:
 
                 if (status != 0) {
                     const char *error_string = marpa_lua_tostring (L, -1);
+                    /* error_string must be copied before it is exposed to Lua GC */
+                    const char *croak_msg = form("Marpa::R3 Lua code error: %s", error_string);
                     marpa_lua_settop (L, base_of_stack);
-                    croak ("Marpa::R3 Lua code error: %s", error_string);
+                    croak (croak_msg);
                 }
 
   // warn ("%s %d\n", __FILE__, __LINE__);
@@ -3022,6 +3024,81 @@ slr_es_span_to_literal_sv (Scanless_R * slr,
 #define EXPECTED_LIBMARPA_MAJOR 8
 #define EXPECTED_LIBMARPA_MINOR 4
 #define EXPECTED_LIBMARPA_MICRO 0
+
+static void
+xlua_sig_call (lua_State * L, const char *codestr, const char *sig, ...)
+{
+    va_list vl;
+    int narg;
+    int status;
+    const int base_of_stack = marpa_lua_gettop (L);
+
+    va_start (vl, sig);
+
+    status = marpa_luaL_loadbuffer (L, codestr, strlen (codestr), codestr);
+    if (status != 0) {
+        const char *error_string = marpa_lua_tostring (L, -1);
+        marpa_lua_pop (L, 1);
+        croak ("Marpa::R3 error in xlua_sig_call: %s", error_string);
+    }
+    /* Lua stack: [ function ] */
+
+    for (narg = 0; *sig; narg++) {
+        if (!marpa_lua_checkstack (L, LUA_MINSTACK + 1)) {
+            /* This error is not considered recoverable */
+            croak ("Marpa::R3 error: could not grow Lua stack");
+        }
+
+        switch (*sig++) {
+        case 'd':
+            marpa_lua_pushnumber (L, va_arg (vl, double));
+            break;
+        case 'i':
+            marpa_lua_pushnumber (L, va_arg (vl, int));
+            break;
+        case 's':
+            marpa_lua_pushstring (L, va_arg (vl, char *));
+            break;
+        case 'S':
+            MARPA_SV_SV(L, va_arg(vl, SV*));
+            break;
+        case 'R': /* argument is ref key of recce table */
+            marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, va_arg(vl, int));
+            break;
+        case '>':              /* end of arguments */
+            goto endargs;
+        default:
+            croak
+                ("Internal error: invalid sig option %c in xlua_sig_call");
+        }
+    }
+  endargs:;
+
+    status = marpa_lua_pcall (L, narg, LUA_MULTRET, 0);
+    if (status != 0) {
+        const char *error_string = marpa_lua_tostring (L, -1);
+        /* error_string must be copied before it is exposed to Lua GC */
+        const char *croak_msg =
+            form ("Internal error: xlua_sig_call code error: %s",
+            error_string);
+        marpa_lua_settop (L, base_of_stack);
+        croak (croak_msg);
+    }
+
+    /* As of now, simply throw away all results */
+    marpa_lua_settop (L, base_of_stack);
+    va_end (vl);
+}
+
+/* get_mortalspace comes from "Extending and Embedding Perl"
+   by Jenness and Cozens, p. 242 */
+static void *
+get_mortalspace (size_t nbytes)
+{
+    SV *mortal;
+    mortal = sv_2mortal (NEWSV (0, nbytes));
+    return (void *) SvPVX (mortal);
+}
 
 MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin
 

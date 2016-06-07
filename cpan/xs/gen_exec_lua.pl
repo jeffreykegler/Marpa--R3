@@ -58,8 +58,10 @@ my $lua_exec_body = <<'END_OF_EXEC_BODY';
         status = marpa_lua_pcall (L, (items - 2) + is_method, LUA_MULTRET, 0);
         if (status != 0) {
             const char *error_string = marpa_lua_tostring (L, -1);
+            /* error_string must be copied before it is exposed to Lua GC */
+            const char *croak_msg = form("Marpa::R3 Lua code error: %s", error_string);
             marpa_lua_settop (L, base_of_stack);
-            croak ("Marpa::R3 Lua code error: %s", error_string);
+            croak (croak_msg);
         }
 
         /* return args to caller */
