@@ -1004,7 +1004,11 @@ xlua_sig_call (lua_State * L, const char *codestr, const char *sig, ...)
         case 's':
             marpa_lua_pushstring (L, va_arg (vl, char *));
             break;
-        case 'S':
+        case 'S': /* argument is SV -- ownership is taken of
+                   * a reference count, so caller is responsible
+                   * for making sure a reference count is
+                   * available for the taking.
+                   */
             // warn("%s %d narg=%d", __FILE__, __LINE__, narg, *sig);
             marpa_sv_sv_noinc (L, va_arg (vl, SV *));
             // warn("%s %d narg=%d", __FILE__, __LINE__, narg, *sig);
@@ -1733,8 +1737,8 @@ default:
         xlua_sig_call (slr->L,
             "local recce, tag, step_type, op_name = ...;\n"
             "if recce.trace_values >= 3 then\n"
-            "  local top_of_queue = #recce.trace_value_queue;\n"
-            "  recce.trace_value_queue[top_of_queue+1] = {tag, step_type, op_name};\n"
+            "  local top_of_queue = #recce.trace_values_queue;\n"
+            "  recce.trace_values_queue[top_of_queue+1] = {tag, step_type, op_name};\n"
             "end",
             "Rsss",
             slr->lua_ref,
@@ -1852,8 +1856,8 @@ default:
         xlua_sig_call (slr->L,
             "local recce, tag, step_type, token_ix, token_sv = ...;\n"
             "if recce.trace_values > 0 and step_type == 'MARPA_STEP_TYPE' then\n"
-            "  local top_of_queue = #recce.trace_value_queue;\n"
-            "  recce.trace_value_queue[top_of_queue+1] =\n"
+            "  local top_of_queue = #recce.trace_values_queue;\n"
+            "  recce.trace_values_queue[top_of_queue+1] =\n"
             "     {tag, step_type, token_ix, token_sv};\n"
             "end",
             "RssiS",
@@ -2280,6 +2284,22 @@ default:
                     av_push (v_wrapper->event_queue,
                         newRV_noinc ((SV *) event));
                 }
+
+        xlua_sig_call (slr->L,
+            "local recce, step_type, token_ix, token_value, token_sv = ...;\n"
+            "if recce.trace_values > 0 then\n"
+            "  local top_of_queue = #recce.trace_values_queue;\n"
+            "  recce.trace_values_queue[top_of_queue+1] =\n"
+            "     {tag, step_type, token_ix, token_value, token_sv};\n"
+            "end",
+            "RsiiS",
+            slr->lua_ref,
+            step_type_as_string,
+            marpa_v_token(v),
+            marpa_v_token_value(v),
+            (p_token_value_sv ? newSVsv(*p_token_value_sv) : newSV(0))
+            );
+
 
             }
             return -1;
@@ -4381,7 +4401,7 @@ PPCODE:
     }
 
   slr = v_wrapper->slr;
-  xlua_sig_call (slr->L, "local recce = ...; recce.trace_value_queue = {}", "R",
+  xlua_sig_call (slr->L, "local recce = ...; recce.trace_values_queue = {}", "R",
       slr->lua_ref);
 
   while (1)

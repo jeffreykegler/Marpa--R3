@@ -1421,6 +1421,17 @@ sub Marpa::R3::Scanless::R::value {
     STEP: while (1) {
         my ( $value_type, @value_data ) = $value->stack_step();
 
+        $slr->exec(
+        "local recce = ...;
+         for ix = 1, #recce.trace_values_queue do
+             print('Event:', ix)
+             local event = recce.trace_values_queue[ix]
+             for ix2 = 1, #event do
+                 print('Event:', ix, 'field:', ix2, event[ix2])
+             end
+         end
+         ");
+
         if ($trace_values) {
             EVENT: while (1) {
                 my $event = $value->event();

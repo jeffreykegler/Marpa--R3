@@ -80,7 +80,14 @@ function value_init(recce, trace_values)
     -- io.stderr:write(string.format("#1: %s\n", recce.nulling_semantics.default[1]))
 
     recce.trace_values = trace_values + 0;
-    recce.trace_value_queue = {};
+    recce.trace_values_queue = {};
+    if recce.trace_values > 0 then
+      local top_of_queue = #recce.trace_values_queue;
+      recce.trace_values_queue[top_of_queue+1] = {
+	"valuator trace level", 0,
+	recce.trace_values,
+      }
+    end
 
     recce.is_inited = true;
 end
@@ -92,7 +99,7 @@ function value_reset(recce)
     recce.nulling_semantics = nil
 
     recce.trace_values = 0;
-    recce.trace_value_queue = {};
+    recce.trace_values_queue = {};
 
     recce.is_inited = false;
 end
