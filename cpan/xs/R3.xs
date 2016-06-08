@@ -966,6 +966,80 @@ static lua_State* xlua_newstate()
     return L;
 }
 
+static void
+xlua_sig_call (lua_State * L, const char *codestr, const char *sig, ...)
+{
+    va_list vl;
+    int narg;
+    int status;
+    const int base_of_stack = marpa_lua_gettop (L);
+
+    va_start (vl, sig);
+
+    // warn("%s %d", __FILE__, __LINE__);
+    status = marpa_luaL_loadbuffer (L, codestr, strlen (codestr), codestr);
+    // warn("%s %d", __FILE__, __LINE__);
+    if (status != 0) {
+        const char *error_string = marpa_lua_tostring (L, -1);
+        marpa_lua_pop (L, 1);
+        croak ("Marpa::R3 error in xlua_sig_call: %s", error_string);
+    }
+    // warn("%s %d", __FILE__, __LINE__);
+    /* Lua stack: [ function ] */
+
+    for (narg = 0; *sig; narg++) {
+        // warn("%s %d narg=%d", __FILE__, __LINE__, narg);
+        if (!marpa_lua_checkstack (L, LUA_MINSTACK + 1)) {
+            /* This error is not considered recoverable */
+            croak ("Marpa::R3 error: could not grow Lua stack");
+        }
+        // warn("%s %d narg=%d *sig=%c", __FILE__, __LINE__, narg, *sig);
+        switch (*sig++) {
+        case 'd':
+            marpa_lua_pushnumber (L, va_arg (vl, double));
+            break;
+        case 'i':
+            marpa_lua_pushnumber (L, va_arg (vl, int));
+            break;
+        case 's':
+            marpa_lua_pushstring (L, va_arg (vl, char *));
+            break;
+        case 'S':
+            // warn("%s %d narg=%d", __FILE__, __LINE__, narg, *sig);
+            marpa_sv_sv_noinc (L, va_arg (vl, SV *));
+            // warn("%s %d narg=%d", __FILE__, __LINE__, narg, *sig);
+            break;
+        case 'R':              /* argument is ref key of recce table */
+            marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, va_arg (vl, int));
+            break;
+        case '>':              /* end of arguments */
+            goto endargs;
+        default:
+            croak
+                ("Internal error: invalid sig option %c in xlua_sig_call");
+        }
+        // warn("%s %d narg=%d *sig=%c", __FILE__, __LINE__, narg, *sig);
+    }
+  endargs:;
+
+    // warn("%s %d", __FILE__, __LINE__);
+    status = marpa_lua_pcall (L, narg, LUA_MULTRET, 0);
+    if (status != 0) {
+        const char *error_string = marpa_lua_tostring (L, -1);
+        /* error_string must be copied before it is exposed to Lua GC */
+        const char *croak_msg =
+            form ("Internal error: xlua_sig_call code error: %s",
+            error_string);
+        marpa_lua_settop (L, base_of_stack);
+        croak (croak_msg);
+    }
+    // warn("%s %d", __FILE__, __LINE__);
+    /* As of now, simply throw away all results */
+    marpa_lua_settop (L, base_of_stack);
+    // warn("%s %d", __FILE__, __LINE__);
+    va_end (vl);
+}
+
 /* Static grammar methods */
 
 #define SET_G_WRAPPER_FROM_G_SV(g_wrapper, g_sv) { \
@@ -1656,6 +1730,17 @@ default:
             av_push (v_wrapper->event_queue, newRV_noinc ((SV *) event));
         }
 
+        xlua_sig_call (slr->L,
+            "local recce, tag, step_type, op_name = ...;\n"
+            "if recce.trace_values >= 3 then\n"
+            "  local top_of_queue = #recce.trace_value_queue;\n"
+            "  recce.trace_value_queue[top_of_queue+1] = {tag, step_type, op_name};\n"
+            "end",
+            "Rsss",
+            slr->lua_ref,
+            "starting op", step_type_as_string, marpa_slif_op_name (op_code)
+            );
+
         switch (op_code) {
 
         case 0:
@@ -1763,6 +1848,22 @@ default:
                     av_push (v_wrapper->event_queue,
                         newRV_noinc ((SV *) event));
                 }
+
+        xlua_sig_call (slr->L,
+            "local recce, tag, step_type, token_ix, token_sv = ...;\n"
+            "if recce.trace_values > 0 and step_type == 'MARPA_STEP_TYPE' then\n"
+            "  local top_of_queue = #recce.trace_value_queue;\n"
+            "  recce.trace_value_queue[top_of_queue+1] =\n"
+            "     {tag, step_type, token_ix, token_sv};\n"
+            "end",
+            "RssiS",
+            slr->lua_ref,
+            "valuator unknown step",
+            step_type_as_string,
+            marpa_v_token(v),
+            (p_constant_sv ? newSVsv(*p_constant_sv) : newSV(0))
+            );
+
             }
             return -1;
 
@@ -3025,71 +3126,6 @@ slr_es_span_to_literal_sv (Scanless_R * slr,
 #define EXPECTED_LIBMARPA_MINOR 4
 #define EXPECTED_LIBMARPA_MICRO 0
 
-static void
-xlua_sig_call (lua_State * L, const char *codestr, const char *sig, ...)
-{
-    va_list vl;
-    int narg;
-    int status;
-    const int base_of_stack = marpa_lua_gettop (L);
-
-    va_start (vl, sig);
-
-    status = marpa_luaL_loadbuffer (L, codestr, strlen (codestr), codestr);
-    if (status != 0) {
-        const char *error_string = marpa_lua_tostring (L, -1);
-        marpa_lua_pop (L, 1);
-        croak ("Marpa::R3 error in xlua_sig_call: %s", error_string);
-    }
-    /* Lua stack: [ function ] */
-
-    for (narg = 0; *sig; narg++) {
-        if (!marpa_lua_checkstack (L, LUA_MINSTACK + 1)) {
-            /* This error is not considered recoverable */
-            croak ("Marpa::R3 error: could not grow Lua stack");
-        }
-
-        switch (*sig++) {
-        case 'd':
-            marpa_lua_pushnumber (L, va_arg (vl, double));
-            break;
-        case 'i':
-            marpa_lua_pushnumber (L, va_arg (vl, int));
-            break;
-        case 's':
-            marpa_lua_pushstring (L, va_arg (vl, char *));
-            break;
-        case 'S':
-            MARPA_SV_SV(L, va_arg(vl, SV*));
-            break;
-        case 'R': /* argument is ref key of recce table */
-            marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, va_arg(vl, int));
-            break;
-        case '>':              /* end of arguments */
-            goto endargs;
-        default:
-            croak
-                ("Internal error: invalid sig option %c in xlua_sig_call");
-        }
-    }
-  endargs:;
-
-    status = marpa_lua_pcall (L, narg, LUA_MULTRET, 0);
-    if (status != 0) {
-        const char *error_string = marpa_lua_tostring (L, -1);
-        /* error_string must be copied before it is exposed to Lua GC */
-        const char *croak_msg =
-            form ("Internal error: xlua_sig_call code error: %s",
-            error_string);
-        marpa_lua_settop (L, base_of_stack);
-        croak (croak_msg);
-    }
-
-    /* As of now, simply throw away all results */
-    marpa_lua_settop (L, base_of_stack);
-    va_end (vl);
-}
-
 /* get_mortalspace comes from "Extending and Embedding Perl"
    by Jenness and Cozens, p. 242 */
 static void *
@@ -4334,6 +4370,7 @@ stack_step( v_wrapper )
     V_Wrapper *v_wrapper;
 PPCODE:
 {
+  Scanless_R *slr;
 
   av_clear (v_wrapper->event_queue);
 
@@ -4342,6 +4379,10 @@ PPCODE:
       croak
         ("Problem in v->stack_step(): Cannot call unless valuator is in 'stack' mode");
     }
+
+  slr = v_wrapper->slr;
+  xlua_sig_call (slr->L, "local recce = ...; recce.trace_value_queue = {}", "R",
+      slr->lua_ref);
 
   while (1)
     {

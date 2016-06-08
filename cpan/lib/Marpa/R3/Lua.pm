@@ -30,7 +30,7 @@ $Marpa::R3::Lua::lua_init = <<'END_OF_LUA';
     -- do io.stderr:write(string.format("OP: %s %s\n", k, v))
     -- end
 
-function value_init(recce)
+function value_init(recce, trace_values)
 
     if recce.is_inited then return end
 
@@ -79,6 +79,9 @@ function value_init(recce)
     -- io.stderr:write(string.format("#0: %s\n", recce.nulling_semantics.default[0]))
     -- io.stderr:write(string.format("#1: %s\n", recce.nulling_semantics.default[1]))
 
+    recce.trace_values = trace_values + 0;
+    recce.trace_value_queue = {};
+
     recce.is_inited = true;
 end
 
@@ -87,6 +90,10 @@ function value_reset(recce)
     recce.rule_semantics = nil
     recce.token_semantics = nil
     recce.nulling_semantics = nil
+
+    recce.trace_values = 0;
+    recce.trace_value_queue = {};
+
     recce.is_inited = false;
 end
 

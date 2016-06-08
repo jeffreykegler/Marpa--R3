@@ -1344,7 +1344,7 @@ sub Marpa::R3::Scanless::R::value {
     local $Marpa::R3::Internal::Context::VALUATOR = $value;
     value_trace( $value, $trace_values ? 1 : 0 );
     $value->trace_values($trace_values);
-    $slr->exec_name('value_init');
+    $slr->exec_name('value_init', $trace_values);
 
     if ( not $slr->[Marpa::R3::Internal::Scanless::R::REGISTRATIONS] ) {
         registration_init( $slr, $per_parse_arg );
