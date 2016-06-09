@@ -970,7 +970,7 @@ static void
 xlua_sig_call (lua_State * L, const char *codestr, const char *sig, ...)
 {
     va_list vl;
-    int narg;
+    int narg, nres;
     int status;
     const int base_of_stack = marpa_lua_gettop (L);
 
@@ -1004,11 +1004,11 @@ xlua_sig_call (lua_State * L, const char *codestr, const char *sig, ...)
         case 's':
             marpa_lua_pushstring (L, va_arg (vl, char *));
             break;
-        case 'S': /* argument is SV -- ownership is taken of
-                   * a reference count, so caller is responsible
-                   * for making sure a reference count is
-                   * available for the taking.
-                   */
+        case 'S':              /* argument is SV -- ownership is taken of
+                                 * a reference count, so caller is responsible
+                                 * for making sure a reference count is
+                                 * available for the taking.
+                                 */
             // warn("%s %d narg=%d", __FILE__, __LINE__, narg, *sig);
             marpa_sv_sv_noinc (L, va_arg (vl, SV *));
             // warn("%s %d narg=%d", __FILE__, __LINE__, narg, *sig);
@@ -1026,8 +1026,10 @@ xlua_sig_call (lua_State * L, const char *codestr, const char *sig, ...)
     }
   endargs:;
 
+    nres = strlen (sig);
+
     // warn("%s %d", __FILE__, __LINE__);
-    status = marpa_lua_pcall (L, narg, LUA_MULTRET, 0);
+    status = marpa_lua_pcall (L, narg, nres, 0);
     if (status != 0) {
         const char *error_string = marpa_lua_tostring (L, -1);
         /* error_string must be copied before it is exposed to Lua GC */
@@ -1037,8 +1039,35 @@ xlua_sig_call (lua_State * L, const char *codestr, const char *sig, ...)
         marpa_lua_settop (L, base_of_stack);
         croak (croak_msg);
     }
-    // warn("%s %d", __FILE__, __LINE__);
-    /* As of now, simply throw away all results */
+
+    for (nres = -nres; *sig; nres++) {
+        switch (*sig++) {
+        case 'd':
+            {
+                int isnum;
+                const double n = marpa_lua_tonumberx (L, nres, &isnum);
+                if (!isnum)
+                    croak
+                        ("Internal error: xlua_sig_call: result type is not double");
+                *va_arg (vl, double *) = n;
+                break;
+            }
+        case 'i':
+            {
+                int isnum;
+                const int n = marpa_lua_tointegerx (L, nres, &isnum);
+                if (!isnum)
+                    croak
+                        ("Internal error: xlua_sig_call: result type is not integer");
+                *va_arg (vl, int *) = n;
+                break;
+            }
+        }
+    }
+
+    /* Results *must* be copied at this point, because
+     * now we expose them to Lua GC
+     */
     marpa_lua_settop (L, base_of_stack);
     // warn("%s %d", __FILE__, __LINE__);
     va_end (vl);
