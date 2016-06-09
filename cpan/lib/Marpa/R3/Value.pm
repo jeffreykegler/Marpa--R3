@@ -1421,24 +1421,15 @@ sub Marpa::R3::Scanless::R::value {
     STEP: while (1) {
         my ( $value_type, @value_data ) = $value->stack_step();
 
+                my @lua_event = $slr->exec(
+        "local recce = ...; io.stderr:write('Value.pm: ', inspect(recce))",
+        );
+
         if ($trace_values) {
             my $event_ix = 0;
             EVENT: while (1) {
                 my $event = $value->event();
                 $event_ix++;
-
-                my @lua_event = $slr->exec(
-        "local recce = ...;
-         print('qlen=', #recce.trace_values_queue)
-         for ix = 1, #recce.trace_values_queue do
-             print('Event:', ix)
-             local event = recce.trace_values_queue[ix]
-             for ix2 = 1, #event do
-                 print('Event:', ix, 'field:', ix2, event[ix2])
-             end
-         end
-         ", $event_ix);
-                say STDERR "Lua trace values event $event_ix: ", join " ", @lua_event;
 
                 last EVENT if not defined $event;
                 my ( $event_type, @event_data ) = @{$event};

@@ -21,7 +21,7 @@ $STRING_VERSION = $VERSION;
 $VERSION        = eval $VERSION;
 
 $Marpa::R3::Lua::Inspect::load = <<'END_OF_LUA';
-inspect = load([==========[
+local do_load = load([==========[
 local inspect ={
   _VERSION = 'inspect.lua 3.1.0',
   _URL     = 'http://github.com/kikito/inspect.lua',
@@ -364,6 +364,7 @@ setmetatable(inspect, { __call = function(_, ...) return inspect.inspect(...) en
 return inspect
 
 ]==========]);
+inspect = do_load()
 END_OF_LUA
 
 1;
