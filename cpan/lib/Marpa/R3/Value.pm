@@ -1422,24 +1422,20 @@ sub Marpa::R3::Scanless::R::value {
         my ( $value_type, @value_data ) = $value->stack_step();
 
         if ($trace_values) {
-            my $event_ix = 0;
-            EVENT: while (1) {
-                my $old_event = $value->event();
-                $event_ix++;
-                my @event = $slr->exec(
-                "local recce, event_ix_sv = ...;
-                -- io.stderr:write(inspect(recce))
-                local event_ix = event_ix_sv+0;
-                local entry = recce.trace_values_queue[event_ix]
-                if entry == nil then return end
-                return table.unpack(entry)
-                ",
-                $event_ix
-                );
+            EVENT: for( my $event_ix = 0;; $event_ix++) {
+                my @event = $slr->exec(<<'END_OF_LUA', $event_ix);
+local recce, event_ix_sv = ...;
+-- io.stderr:write(inspect(event_ix_sv), [[\n]])
+local event_ix = event_ix_sv+1;
+local entry = recce.trace_values_queue[event_ix]
+if entry == nil then return end
+return table.unpack(entry)
+END_OF_LUA
+
+                # say STDERR join "!", "Lua event:", @event;
 
                 my ( $event_type, @event_data ) = @event;
                 last EVENT if not $event_type;
-                # say STDERR join " ", "Lua event:", @event;
                 if ( $event_type eq 'MARPA_STEP_TOKEN' ) {
                     my ( $token_id, $token_value_ix, $token_value ) = @event_data;
                     trace_token_evaluation( $slr, $value, $token_id,
