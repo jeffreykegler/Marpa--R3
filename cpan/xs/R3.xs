@@ -4098,15 +4098,6 @@ PPCODE:
 }
 
 void
-event( v_wrapper )
-    V_Wrapper *v_wrapper;
-PPCODE:
-{
-    SV* event = av_shift(v_wrapper->event_queue);
-    XPUSHs (sv_2mortal (event));
-}
-
-void
 step( v_wrapper )
     V_Wrapper *v_wrapper;
 PPCODE:
