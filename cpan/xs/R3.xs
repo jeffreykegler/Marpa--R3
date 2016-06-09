@@ -1739,7 +1739,7 @@ default:
             "if recce.trace_values >= 3 then\n"
             "  local top_of_queue = #recce.trace_values_queue;\n"
             "  recce.trace_values_queue[top_of_queue+1] = {tag, step_type, op_name};\n"
-            "  io.stderr:write('starting op: ', inspect(recce))"
+            "  -- io.stderr:write('starting op: ', inspect(recce))\n"
             "end",
             "Rsss",
             slr->lua_ref,
@@ -1860,7 +1860,7 @@ default:
             "  local top_of_queue = #recce.trace_values_queue;\n"
             "  recce.trace_values_queue[top_of_queue+1] =\n"
             "     {tag, step_type, token_ix, token_sv};\n"
-            "  io.stderr:write('valuator unknown step: ', inspect(recce))"
+            "  -- io.stderr:write('valuator unknown step: ', inspect(recce))\n"
             "end",
             "RssiS",
             slr->lua_ref,
@@ -2293,7 +2293,7 @@ default:
             "  local top_of_queue = #recce.trace_values_queue;\n"
             "  recce.trace_values_queue[top_of_queue+1] =\n"
             "     {tag, step_type, token_ix, token_value, token_sv};\n"
-            "  io.stderr:write('[step_type]: ', inspect(recce))"
+            "  -- io.stderr:write('[step_type]: ', inspect(recce))\n"
             "end",
             "RsiiS",
             slr->lua_ref,
