@@ -46,6 +46,7 @@ cpan/engine/Makefile.PL
 cpan/lib/Marpa/R3/ASF.pm
 cpan/lib/Marpa/R3/Common.pm
 cpan/lib/Marpa/R3/Lua.pm
+cpan/lib/Marpa/R3/Lua/Inspect.pm
 cpan/lib/Marpa/R3/MetaAST.pm
 cpan/lib/Marpa/R3/MetaG.pm
 cpan/lib/Marpa/R3.pm

@@ -824,6 +824,7 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
 
     # Stuff in Lua
     $thin_slg->exec($Marpa::R3::Lua::lua_init);
+    $thin_slg->exec($Marpa::R3::Lua::Inspect::load);
 
   LEXEME: for my $lexeme_name ( keys %g1_id_by_lexeme_name ) {
         Marpa::R3::exception(
