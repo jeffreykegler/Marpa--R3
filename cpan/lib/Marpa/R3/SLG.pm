@@ -822,6 +822,9 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     my $thin_slg = $slg->[Marpa::R3::Internal::Scanless::G::C] =
       Marpa::R3::Thin::SLG->new( $thin_L0, $g1_tracer->grammar() );
 
+    # Stuff in Lua
+    $thin_slg->exec($Marpa::R3::Lua::lua_init);
+
   LEXEME: for my $lexeme_name ( keys %g1_id_by_lexeme_name ) {
         Marpa::R3::exception(
             "A lexeme in G1 is not a lexeme in L0: $lexeme_name")
@@ -1475,6 +1478,26 @@ sub Marpa::R3::Scanless::G::l0_rule_show
     my ( $slg, $rule_id ) = @_;
     my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER];
     return slg_rule_show($tracer, $rule_id);
+}
+
+sub Marpa::R3::Scanless::G::exec {
+    my ( $slg, $codestr, @args ) = @_;
+    my $thin_slg = $slg->[Marpa::R3::Internal::Scanless::G::C];
+    return $thin_slg->exec($codestr, @args);
+}
+
+sub Marpa::R3::Scanless::G::exec_key {
+    my ( $slg, $key, @args ) = @_;
+    my $thin_slg = $slg->[Marpa::R3::Internal::Scanless::G::C];
+    my @results = $thin_slg->exec_key($key, @args);
+    return @results;
+}
+
+sub Marpa::R3::Scanless::G::exec_name {
+    my ( $slg, $name, @args ) = @_;
+    my $thin_slg = $slg->[Marpa::R3::Internal::Scanless::G::C];
+    my @results = $thin_slg->exec_name($name, @args);
+    return @results;
 }
 
 sub slg_rule_show {

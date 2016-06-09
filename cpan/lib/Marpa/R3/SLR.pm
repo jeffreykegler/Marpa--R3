@@ -228,9 +228,6 @@ sub Marpa::R3::Scanless::R::new {
     );
     $slr->[Marpa::R3::Internal::Scanless::R::SLR_C]      = $thin_slr;
 
-    # Stuff in Lua
-    $slr->exec($Marpa::R3::Lua::lua_init);
-
     $slr->reset_evaluation();
 
     common_set( $slr, "new",  $flat_args );
