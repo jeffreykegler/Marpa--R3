@@ -78,6 +78,78 @@ END_OF_EXEC_BODY
 
 my $code = <<'END_OF_MAIN_CODE';
 
+MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::SLG
+
+void
+exec_key( slg, fn_key, ... )
+   Scanless_G *slg;
+   int fn_key;
+PPCODE:
+{
+    int recce_object;
+    const int is_method = 1;
+    lua_State *const L = slg->L;
+    const int base_of_stack = marpa_lua_gettop (L);
+
+    marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, slg->lua_ref);
+    /* Lua stack: [ grammar_table ] */
+    recce_object = marpa_lua_gettop (L);
+    marpa_lua_rawgeti (L, recce_object, fn_key);
+    /* [ grammar_table, function ] */
+
+    === LUA EXEC BODY ===
+}
+
+void
+exec( slg, codestr, ... )
+   Scanless_G *slg;
+   char* codestr;
+PPCODE:
+{
+    const int is_method = 1;
+    lua_State *const L = slg->L;
+    const int base_of_stack = marpa_lua_gettop (L);
+    int load_status;
+
+    marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, slg->lua_ref);
+    /* Lua stack: [ grammar_table ] */
+
+    load_status = marpa_luaL_loadbuffer (L, codestr, strlen (codestr), codestr);
+    if (load_status != 0)
+    {
+      const char *error_string = marpa_lua_tostring (L, -1);
+      marpa_lua_pop (L, 1);
+      croak ("Marpa::R3::Lua error in luaL_loadbuffer: %s", error_string);
+    }
+    /* [ grammar_table, function ] */
+
+    === LUA EXEC BODY ===
+}
+
+void
+exec_name( slg, name, ... )
+   Scanless_G *slg;
+   char* name;
+PPCODE:
+{
+    const int is_method = 1;
+    lua_State *const L = slg->L;
+    const int base_of_stack = marpa_lua_gettop (L);
+    int type;
+
+    marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, slg->lua_ref);
+    /* Lua stack: [ grammar_table ] */
+
+    type = marpa_lua_getglobal (L, name);
+    if (type != LUA_TFUNCTION)
+    {
+      croak ("exec_name: global %s name is not a function", name);
+    }
+    /* [ grammar_table, function ] */
+
+    === LUA EXEC BODY ===
+}
+
 MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::SLR
 
 void
