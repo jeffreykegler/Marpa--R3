@@ -1421,35 +1421,34 @@ sub Marpa::R3::Scanless::R::value {
     STEP: while (1) {
         my ( $value_type, @value_data ) = $value->stack_step();
 
-                # my @lua_event = $slr->exec(
-        # "local recce = ...; io.stderr:write('Value.pm: ', inspect(recce))",
-        # );
-
         if ($trace_values) {
             my $event_ix = 0;
             EVENT: while (1) {
-                my $event = $value->event();
-                last EVENT if not defined $event;
+                my $old_event = $value->event();
                 $event_ix++;
-                my @event_per_lua = $slr->exec(
+                my @event = $slr->exec(
                 "local recce, event_ix_sv = ...;
                 -- io.stderr:write(inspect(recce))
                 local event_ix = event_ix_sv+0;
-                 return table.unpack(recce.trace_values_queue[event_ix])
+                local entry = recce.trace_values_queue[event_ix]
+                if entry == nil then return end
+                return table.unpack(entry)
                 ",
                 $event_ix
                 );
 
-                # say STDERR join " ", "Lua event:", @event_per_lua;
-                # say STDERR join " ", "Event:", @{$event};
-
-                my ( $event_type, @event_data ) = @event_per_lua;
+                my ( $event_type, @event_data ) = @event;
+                last EVENT if not $event_type;
+                # say STDERR join " ", "Lua event:", @event;
                 if ( $event_type eq 'MARPA_STEP_TOKEN' ) {
                     my ( $token_id, $token_value_ix, $token_value ) = @event_data;
                     trace_token_evaluation( $slr, $value, $token_id,
                         $token_value );
                     next EVENT;
                 } ## end if ( $event_type eq 'MARPA_STEP_TOKEN' )
+
+                # $slr->exec( "local recce = ...; io.stderr:write('Value.pm: ', inspect(recce))");
+
                 say {$trace_file_handle} join q{ },
                     'value event:',
                     map { $_ // 'undef' } $event_type, @event_data
