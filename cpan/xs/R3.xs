@@ -3151,6 +3151,7 @@ slr_es_span_to_literal_sv (Scanless_R * slr,
 static void *
 get_mortalspace (size_t nbytes)
 {
+    dTHX;
     SV *mortal;
     mortal = sv_2mortal (NEWSV (0, nbytes));
     return (void *) SvPVX (mortal);
