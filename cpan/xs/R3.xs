@@ -1751,18 +1751,6 @@ default:
     while (1) {
         IV op_code = ops[op_ix++];
 
-  // warn ("Executing op: %d", op_code);
-
-        if (v_wrapper->trace_values >= 3) {
-            AV *event;
-            SV *event_data[3];
-            event_data[0] = newSVpvs ("starting op");
-            event_data[1] = newSVpv (step_type_as_string, 0);
-            event_data[2] = newSVpv (marpa_slif_op_name (op_code), 0);
-            event = av_make (Dim (event_data), event_data);
-            av_push (v_wrapper->event_queue, newRV_noinc ((SV *) event));
-        }
-
         xlua_sig_call (slr->L,
             "local recce, tag, step_type, op_name = ...;\n"
             "if recce.trace_values >= 3 then\n"
@@ -1862,25 +1850,6 @@ default:
                     }
                 } else {
                     av_store (stack, result_ix, newSV (0));
-                }
-
-                if (v_wrapper->trace_values
-                    && step_type == MARPA_STEP_TOKEN) {
-                    AV *event;
-                    SV *event_data[3];
-                    const char *result_string = step_type_as_string;
-                    if (!result_string)
-                        result_string = "valuator unknown step";
-                    event_data[0] = newSVpvn (result_string, 0);
-                    event_data[1] = newSViv (marpa_v_token (v));
-                    if (p_constant_sv) {
-                        event_data[2] = newSVsv (*p_constant_sv);
-                    } else {
-                        event_data[2] = newSV (0);
-                    }
-                    event = av_make (Dim (event_data), event_data);
-                    av_push (v_wrapper->event_queue,
-                        newRV_noinc ((SV *) event));
                 }
 
         xlua_sig_call (slr->L,
@@ -2300,20 +2269,6 @@ default:
                 } else {
                     av_fill (stack, result_ix - 1);
                     return -1;
-                }
-
-                if (v_wrapper->trace_values) {
-                    AV *event;
-                    SV *event_data[4];
-                    event_data[0] = newSVpv (step_type_as_string, 0);
-                    event_data[1] = newSViv (marpa_v_token (v));
-                    event_data[2] = newSViv (marpa_v_token_value (v));
-                    event_data[3] =
-                        *p_token_value_sv ? newSVsv (*p_token_value_sv) :
-                        newSV (0);
-                    event = av_make (Dim (event_data), event_data);
-                    av_push (v_wrapper->event_queue,
-                        newRV_noinc ((SV *) event));
                 }
 
         xlua_sig_call (slr->L,
