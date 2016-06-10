@@ -4004,7 +4004,6 @@ PPCODE:
   }
   v_wrapper->base = t_wrapper->base;
   v_wrapper->v = v;
-  v_wrapper->event_queue = newAV ();
   v_wrapper->stack = NULL;
   v_wrapper->mode = MARPA_XS_V_MODE_IS_INITIAL;
   v_wrapper->result = 0;
@@ -4030,7 +4029,6 @@ PPCODE:
 {
   const Marpa_Value v = v_wrapper->v;
   SvREFCNT_dec (v_wrapper->base_sv);
-  SvREFCNT_dec (v_wrapper->event_queue);
   SvREFCNT_dec (v_wrapper->constants);
   SvREFCNT_dec (v_wrapper->rule_semantics);
   SvREFCNT_dec (v_wrapper->token_semantics);
@@ -4069,15 +4067,6 @@ PPCODE:
 {
   IV old_level = v_wrapper->trace_values;
   v_wrapper->trace_values = level;
-  {
-    AV *event;
-    SV *event_data[3];
-    event_data[0] = newSVpvs ("valuator trace level");
-    event_data[1] = newSViv (old_level);
-    event_data[2] = newSViv (level);
-    event = av_make (Dim (event_data), event_data);
-    av_push (v_wrapper->event_queue, newRV_noinc ((SV *) event));
-  }
   XSRETURN_IV (old_level);
 }
 
@@ -4100,7 +4089,6 @@ PPCODE:
           croak ("Problem in v->step(): Cannot call when valuator is in 'stack' mode");
        }
   }
-  av_clear (v_wrapper->event_queue);
   if (step_type == MARPA_STEP_INACTIVE)
     {
       XSRETURN_EMPTY;
@@ -4370,8 +4358,6 @@ stack_step( v_wrapper )
 PPCODE:
 {
   Scanless_R *slr;
-
-  av_clear (v_wrapper->event_queue);
 
   if (v_wrapper->mode != MARPA_XS_V_MODE_IS_STACK)
     {
