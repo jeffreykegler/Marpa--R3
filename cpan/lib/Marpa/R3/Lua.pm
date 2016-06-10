@@ -30,6 +30,27 @@ $Marpa::R3::Lua::lua_init = <<'END_OF_LUA';
     -- do io.stderr:write(string.format("OP: %s %s\n", k, v))
     -- end
 
+function op_fn_debug (...)
+    local recce, type, result_ix, rule_id, arg_n = ...
+    print([[OP_LUA:]], recce, type, result_ix, rule_id, arg_n)
+    for k,v in pairs(recce) do
+	print(k, v)
+    end
+    mt = debug.getmetatable(recce)
+    print([[=== metatable ===]])
+    for k,v in pairs(mt) do
+	print(k, v)
+    end
+end
+
+function op_fn_result_is_undef(...)
+        local recce, type, result_ix = ...
+        local stack = recce:stack()
+        stack[result_ix] = marpa.sv.lua_nil()
+        marpa.sv.fill(stack, result_ix)
+        return 0
+end
+
 function value_init(recce, trace_values)
 
     if recce.is_inited then return end
@@ -42,28 +63,8 @@ function value_init(recce, trace_values)
 	return ref
     end
 
-    op_fn_create("debug", function (...)
-        local recce, type, result_ix, rule_id, arg_n = ...
-        print([[OP_LUA:]], recce, type, result_ix, rule_id, arg_n)
-        for k,v in pairs(recce) do
-            print(k, v)
-        end
-        mt = debug.getmetatable(recce)
-        print([[=== metatable ===]])
-        for k,v in pairs(mt) do
-            print(k, v)
-        end
-    end)
-
-    -- print("stack len:", marpa.sv.top_index(recce:stack()))
-
-    local result_is_undef_key = op_fn_create("result_is_undef", function (...)
-        local recce, type, result_ix = ...
-        local stack = recce:stack()
-        stack[result_ix] = marpa.sv.lua_nil()
-        marpa.sv.fill(stack, result_ix)
-        return 0
-    end)
+    op_fn_create("debug", op_fn_debug)
+    local result_is_undef_key = op_fn_create("result_is_undef", op_fn_result_is_undef)
 
     recce.rule_semantics = {}
     recce.token_semantics = {}
