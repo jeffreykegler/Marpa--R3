@@ -4427,10 +4427,15 @@ PPCODE:
         }
 
     NEXT_STEP:;
-      if (v_wrapper->trace_values)
+      {
+        int trace_queue_length;
+        xlua_sig_call (slr->L, "local recce = ...; return #recce.trace_values_queue", "R>i",
+            slr->lua_ref, &trace_queue_length);
+      if (trace_queue_length)
         {
           XSRETURN_PV ("trace");
         }
+      }
     }
 }
 
