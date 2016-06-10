@@ -4007,7 +4007,6 @@ PPCODE:
   v_wrapper->stack = NULL;
   v_wrapper->mode = MARPA_XS_V_MODE_IS_INITIAL;
   v_wrapper->result = 0;
-  v_wrapper->trace_values = 0;
 
   v_wrapper->constants = newAV ();
   /* Reserve position 0 */
@@ -4057,17 +4056,6 @@ PPCODE:
     }
   marpa_v_unref (v);
   Safefree (v_wrapper);
-}
-
-void
-trace_values( v_wrapper, level )
-    V_Wrapper *v_wrapper;
-    IV level;
-PPCODE:
-{
-  IV old_level = v_wrapper->trace_values;
-  v_wrapper->trace_values = level;
-  XSRETURN_IV (old_level);
 }
 
 void

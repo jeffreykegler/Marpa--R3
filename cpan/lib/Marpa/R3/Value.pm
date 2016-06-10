@@ -1342,8 +1342,8 @@ sub Marpa::R3::Scanless::R::value {
     my $value = Marpa::R3::Thin::V->new($tree);
     $value->stack_mode_set( $slr->thin() );
     local $Marpa::R3::Internal::Context::VALUATOR = $value;
-    value_trace( $value, $trace_values ? 1 : 0 );
-    $value->trace_values($trace_values);
+
+    $value->_marpa_v_trace($trace_values ? 1 : 0 );
     $slr->exec_name('value_init', $trace_values);
 
     if ( not $slr->[Marpa::R3::Internal::Scanless::R::REGISTRATIONS] ) {
@@ -1767,11 +1767,6 @@ sub trace_op {
 
     return $trace_output;
 } ## end sub trace_op
-
-sub value_trace {
-    my ( $value, $trace_flag ) = @_;
-    return $value->_marpa_v_trace($trace_flag);
-}
 
 1;
 
