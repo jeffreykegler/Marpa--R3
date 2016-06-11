@@ -831,7 +831,7 @@ xlua_array_from_list_func (lua_State * L)
     int ix;
     Xlua_Array *p_array;
     const int last_arg = marpa_lua_gettop (L);
-    
+
     xlua_array_new(L, last_arg);
     /* [ array_ud ] */
     p_array = (Xlua_Array *) marpa_lua_touserdata (L, -1);
@@ -1622,7 +1622,7 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
     Scanless_R *const slr = v_wrapper->slr;
     const Marpa_Step_Type step_type = marpa_v_step_type (v);
     IV result_ix = marpa_v_result (v);
-    unsigned int *ops = NULL;
+    IV *ops = NULL;
     int op_ix;
     UV blessing = 0;
 
@@ -1658,7 +1658,7 @@ case MARPA_STEP_RULE:
   /* warn("%s %d", __FILE__, __LINE__); */
         if (p_ops_sv) {
   /* warn("%s %d", __FILE__, __LINE__); */
-            ops = (unsigned int *) SvPV (*p_ops_sv, dummy);
+            ops = (IV *) SvPV (*p_ops_sv, dummy);
         }
     }
     break;
@@ -1670,7 +1670,7 @@ case MARPA_STEP_TOKEN:
   /* warn("%s %d", __FILE__, __LINE__); */
         if (p_ops_sv) {
   /* warn("%s %d", __FILE__, __LINE__); */
-            ops = (unsigned int *) SvPV (*p_ops_sv, dummy);
+            ops = (IV *) SvPV (*p_ops_sv, dummy);
         }
     }
     break;
@@ -1682,7 +1682,7 @@ case MARPA_STEP_NULLING_SYMBOL:
   /* warn("%s %d", __FILE__, __LINE__); */
         if (p_ops_sv) {
   /* warn("%s %d", __FILE__, __LINE__); */
-            ops = (unsigned int *) SvPV (*p_ops_sv, dummy);
+            ops = (IV *) SvPV (*p_ops_sv, dummy);
         }
     }
     break;
@@ -1749,7 +1749,7 @@ default:
                     semantics_type, semantics_ix);
         }
         /* warn("%s %d", __FILE__, __LINE__); */
-        ops = ops_ud->array;
+        ops = (IV *) ops_ud->array;
         marpa_lua_settop(L, base_of_stack);
     }
 
