@@ -93,23 +93,23 @@ static void populate_ops(lua_State* L)
     const int marpa_table = marpa_lua_gettop(L);
 
     marpa_lua_newtable(L);
-    // [ marpa_table, op_table ]
+    /* [ marpa_table, op_table ] */
     marpa_lua_pushvalue(L, -1);
-    // [ marpa_table, op_table, op_table ]
+    /* [ marpa_table, op_table, op_table ] */
     marpa_lua_setfield(L, marpa_table, "ops");
-    // [ marpa_table, op_table ]
+    /* [ marpa_table, op_table ] */
     op_table = marpa_lua_gettop(L);
     for (i = 0; i < Dim(op_by_name_object); i++) {
-        // [ marpa_table, op_table ]
+        /* [ marpa_table, op_table ] */
         marpa_lua_pushinteger(L, i);
-        // [ marpa_table, op_table, i ]
+        /* [ marpa_table, op_table, i ] */
         marpa_lua_setfield(L, op_table, op_by_name_object[i].name);
-        // [ marpa_table, op_table ]
+        /* [ marpa_table, op_table ] */
         marpa_lua_pushinteger(L, i);
         marpa_lua_pushstring(L, op_by_name_object[i].name);
-        // [ marpa_table, op_table, i, name ]
+        /* [ marpa_table, op_table, i, name ] */
         marpa_lua_settable(L, op_table);
-        // [ marpa_table, op_table ]
+        /* [ marpa_table, op_table ] */
     }
     marpa_lua_settop(L, marpa_table);
 }
@@ -318,7 +318,6 @@ static int marpa_r3_warn(const char* format, ...)
 static int
 xlua_ref(lua_State* L)
 {
-    int ref;
     marpa_luaL_checktype(L, 1, LUA_TTABLE);
     marpa_luaL_checkany(L, 2);
     marpa_lua_pushinteger(L, marpa_luaL_ref(L, 1));
@@ -328,7 +327,6 @@ xlua_ref(lua_State* L)
 static int
 xlua_unref(lua_State* L)
 {
-    int ref;
     marpa_luaL_checktype(L, 1, LUA_TTABLE);
     marpa_luaL_checkinteger(L, 2);
     marpa_luaL_unref(L, 1, marpa_lua_tointeger(L, 2));
@@ -348,23 +346,23 @@ coerce_to_sv (lua_State * L, int idx)
   SV *result;
   const int type = marpa_lua_type (L, idx);
 
-  // warn("%s %d\n", __FILE__, __LINE__);
+  /* warn("%s %d\n", __FILE__, __LINE__); */
   switch (type)
     {
     case LUA_TNIL:
-      // warn("%s %d\n", __FILE__, __LINE__);
+      /* warn("%s %d\n", __FILE__, __LINE__); */
       result = newSV (0);
       break;
     case LUA_TBOOLEAN:
-      // warn("%s %d\n", __FILE__, __LINE__);
+      /* warn("%s %d\n", __FILE__, __LINE__); */
       result = marpa_lua_toboolean (L, idx) ?  newSViv(1) : newSV(0);
       break;
     case LUA_TNUMBER:
-      // warn("%s %d\n", __FILE__, __LINE__);
+      /* warn("%s %d\n", __FILE__, __LINE__); */
       result = newSVnv (marpa_lua_tonumber (L, idx));
       break;
     case LUA_TSTRING:
-      // warn("%s %d: %s len=%d\n", __FILE__, __LINE__, marpa_lua_tostring (L, idx), marpa_lua_rawlen (L, idx));
+      /* warn("%s %d: %s len=%d\n", __FILE__, __LINE__, marpa_lua_tostring (L, idx), marpa_lua_rawlen (L, idx)); */
       result =
         newSVpvn (marpa_lua_tostring (L, idx), marpa_lua_rawlen (L, idx));
       break;
@@ -396,14 +394,14 @@ coerce_to_sv (lua_State * L, int idx)
       break;
 
     default:
-      // warn("%s %d\n", __FILE__, __LINE__);
+      /* warn("%s %d\n", __FILE__, __LINE__); */
       result =
         newSVpvf
-        ("Lua type %d at index %d in coerce_to_sv: coercion not implemented",
+        ("Lua type %s at index %d in coerce_to_sv: coercion not implemented",
          marpa_luaL_typename (L, idx), idx);
       break;
     }
-  // warn("%s %d\n", __FILE__, __LINE__);
+  /* warn("%s %d\n", __FILE__, __LINE__); */
   return result;
 }
 
@@ -414,39 +412,39 @@ push_val (lua_State * L, SV * val)
   dTHX;
   if (SvTYPE (val) == SVt_NULL)
     {
-      // warn("%s %d\n", __FILE__, __LINE__);
+      /* warn("%s %d\n", __FILE__, __LINE__); */
       marpa_lua_pushnil (L);
       return;
     }
   if (SvPOK (val))
     {
       STRLEN n_a;
-      // warn("%s %d\n", __FILE__, __LINE__);
+      /* warn("%s %d\n", __FILE__, __LINE__); */
       char *cval = SvPV (val, n_a);
       marpa_lua_pushlstring (L, cval, n_a);
       return;
     }
   if (SvNOK (val))
     {
-      // warn("%s %d\n", __FILE__, __LINE__);
+      /* warn("%s %d\n", __FILE__, __LINE__); */
       marpa_lua_pushnumber (L, (lua_Number) SvNV (val));
       return;
     }
   if (SvIOK (val))
     {
-      // warn("%s %d\n", __FILE__, __LINE__);
+      /* warn("%s %d\n", __FILE__, __LINE__); */
       marpa_lua_pushnumber (L, (lua_Number) SvIV (val));
       return;
     }
   if (SvROK (val))
     {
-      // warn("%s %d\n", __FILE__, __LINE__);
+      /* warn("%s %d\n", __FILE__, __LINE__); */
       marpa_lua_pushfstring (L,
                              "!!!Argument unsupported: Perl reference type (%s)",
                              sv_reftype (SvRV (val), 0));
       return;
     }
-      // warn("%s %d\n", __FILE__, __LINE__);
+      /* warn("%s %d\n", __FILE__, __LINE__); */
   marpa_lua_pushfstring (L, "!!!Argument unsupported: Perl type (%d)",
                          SvTYPE (val));
   return;
@@ -462,7 +460,7 @@ push_val (lua_State * L, SV * val)
 static void marpa_sv_sv_noinc (lua_State* L, SV* sv) {
     SV** p_sv = (SV**)marpa_lua_newuserdata(L, sizeof(SV*));
     *p_sv = sv;
-    // warn("new ud %p, SV %p %s %d\n", p_sv, sv, __FILE__, __LINE__);
+    /* warn("new ud %p, SV %p %s %d\n", p_sv, sv, __FILE__, __LINE__); */
     marpa_luaL_getmetatable(L, MT_NAME_SV);
     marpa_lua_setmetatable(L, -2);
     /* [sv_userdata] */
@@ -482,7 +480,7 @@ static void marpa_sv_av_noinc (lua_State* L, AV* av) {
     SV* av_ref = newRV_noinc((SV*)av);
     SV** p_sv = (SV**)marpa_lua_newuserdata(L, sizeof(SV*));
     *p_sv = av_ref;
-    // warn("new ud %p, SV %p %s %d\n", p_sv, av_ref, __FILE__, __LINE__);
+    /* warn("new ud %p, SV %p %s %d\n", p_sv, av_ref, __FILE__, __LINE__); */
     marpa_luaL_getmetatable(L, MT_NAME_SV);
     marpa_lua_setmetatable(L, -2);
     /* [sv_userdata] */
@@ -504,7 +502,7 @@ static int marpa_sv_finalize_meth (lua_State* L) {
     /* Is this check necessary after development? */
     SV** p_sv = (SV**)marpa_luaL_checkudata(L, 1, MT_NAME_SV);
     SV* sv = *p_sv;
-    // warn("decrementing ud %p, SV %p, %s %d\n", p_sv, sv, __FILE__, __LINE__);
+    /* warn("decrementing ud %p, SV %p, %s %d\n", p_sv, sv, __FILE__, __LINE__); */
     SvREFCNT_dec (sv);
     return 0;
 }
@@ -539,10 +537,9 @@ static int marpa_sv_add_meth (lua_State* L) {
  * SV immediately, or increment the reference count.
  * Will return 0, if there is no SV at that index.
  */
-static SV** marpa_av_fetch(lua_State* L, SV* table, lua_Integer key) {
+static SV** marpa_av_fetch(SV* table, lua_Integer key) {
      dTHX;
      AV* av;
-     SV* sv;
      if ( !SvROK(table) ) {
         croak ("Attempt to fetch from an SV which is not a ref");
      }
@@ -558,7 +555,7 @@ static int marpa_av_fetch_meth(lua_State* L) {
     SV** p_table_sv = (SV**)marpa_luaL_checkudata(L, 1, MT_NAME_SV);
     lua_Integer key = marpa_luaL_checkinteger(L, 2);
 
-    p_result_sv = marpa_av_fetch(L, *p_table_sv, key);
+    p_result_sv = marpa_av_fetch(*p_table_sv, key);
     if (p_result_sv) {
         SV* const sv = *p_result_sv;
         /* Increment the reference count and put this SV on top of the stack */
@@ -593,7 +590,7 @@ marpa_av_len_meth (lua_State * L)
     return 1;
 }
 
-static void marpa_av_store(lua_State* L, SV* table, lua_Integer key, SV*value) {
+static void marpa_av_store(SV* table, lua_Integer key, SV*value) {
      dTHX;
      AV* av;
      if ( !SvROK(table) ) {
@@ -614,7 +611,7 @@ static int marpa_av_store_meth(lua_State* L) {
     /* coerce_to_sv transfered a reference count to us, which we
      * pass on to the AV.
      */
-    marpa_av_store(L, *p_table_sv, key, value_sv);
+    marpa_av_store(*p_table_sv, key, value_sv);
     return 0;
 }
 
@@ -624,32 +621,32 @@ marpa_av_fill (lua_State * L, SV * sv, int x)
   dTHX;
   AV *av;
   SV **p_sv = (SV **) marpa_lua_newuserdata (L, sizeof (SV *));
-     // warn("%s %d\n", __FILE__, __LINE__);
+     /* warn("%s %d\n", __FILE__, __LINE__); */
   *p_sv = sv;
-     // warn("%s %d\n", __FILE__, __LINE__);
+     /* warn("%s %d\n", __FILE__, __LINE__); */
   if (!SvROK (sv))
     {
       croak ("Attempt to fetch from an SV which is not a ref");
     }
-     // warn("%s %d\n", __FILE__, __LINE__);
+     /* warn("%s %d\n", __FILE__, __LINE__); */
   if (SvTYPE (SvRV (sv)) != SVt_PVAV)
     {
       croak ("Attempt to fill an SV which is not an AV ref");
     }
-     // warn("%s %d\n", __FILE__, __LINE__);
+     /* warn("%s %d\n", __FILE__, __LINE__); */
   av = (AV *) SvRV (sv);
-     // warn("%s %d about to call av_file(..., %d)\n", __FILE__, __LINE__, x);
+     /* warn("%s %d about to call av_file(..., %d)\n", __FILE__, __LINE__, x); */
   av_fill (av, x);
-     // warn("%s %d\n", __FILE__, __LINE__);
+     /* warn("%s %d\n", __FILE__, __LINE__); */
 }
 
 static int marpa_av_fill_meth (lua_State* L) {
     SV** p_table_sv = (SV**)marpa_luaL_checkudata(L, 1, MT_NAME_SV);
-    // warn("%s %d\n", __FILE__, __LINE__);
+    /* warn("%s %d\n", __FILE__, __LINE__); */
     lua_Integer index = marpa_luaL_checkinteger(L, 2);
-    // warn("%s %d\n", __FILE__, __LINE__);
+    /* warn("%s %d\n", __FILE__, __LINE__); */
     marpa_av_fill(L, *p_table_sv, index);
-    // warn("%s %d\n", __FILE__, __LINE__);
+    /* warn("%s %d\n", __FILE__, __LINE__); */
     return 0;
 }
 
@@ -691,24 +688,24 @@ static int xlua_recce_stack_meth(lua_State* L) {
     AV* stack;
 
     marpa_luaL_checktype(L, 1, LUA_TTABLE);
-    // Lua stack: [ recce_table ]
+    /* Lua stack: [ recce_table ] */
     marpa_lua_getfield(L, -1, "lud");
-    // Lua stack: [ recce_table, lud ]
+    /* Lua stack: [ recce_table, lud ] */
     slr = (Scanless_R*)marpa_lua_touserdata(L, -1);
-    // the slr owns the recce table, so don't
-    // need to own its components.
+    /* the slr owns the recce table, so don't */
+    /* need to own its components. */
     v_wrapper = slr->v_wrapper;
     if (!v_wrapper) {
-        // I think this is a reportable error
+        /* I think this is a reportable error */
         croak("recce.stack(): valuator is not yet active");
     }
     stack = v_wrapper->stack;
     if (!stack) {
-        // I think this is an internal error
+        /* I think this is an internal error */
         croak("recce.stack(): valuator has no stack");
     }
     MARPA_SV_AV(L, stack);
-    // Lua stack: [ recce_table, recce_lud, stack_ud ]
+    /* Lua stack: [ recce_table, recce_lud, stack_ud ] */
     return 1;
 }
 
@@ -777,7 +774,7 @@ static int xlua_refcount(lua_State* L, int inc)
     new_refcount = marpa_lua_tointeger(L, -1);
     /* Lua stack [ ] */
     new_refcount += inc;
-    // warn("xlua_refcount(), new_refcount=%d", new_refcount);
+    /* warn("xlua_refcount(), new_refcount=%d", new_refcount); */
     if (new_refcount <= 0) {
        marpa_lua_close(L);
        return 0;
@@ -923,11 +920,11 @@ static lua_State* xlua_newstate()
           croak
               ("Marpa::R3 internal error: Lua interpreter failed to start");
       }
-    // warn("New lua state %p, slg = %p", L, slg);
-    xlua_refcount (L, 1);       // increment the ref count of the Lua state
+    /* warn("New lua state %p, slg = %p", L, slg); */
+    xlua_refcount (L, 1);       /* increment the ref count of the Lua state */
     marpa_luaL_openlibs (L);    /* open libraries */
 
-    // create metatables
+    /* create metatables */
     create_sv_mt(L);
     create_grammar_mt(L);
     create_recce_mt(L);
@@ -976,25 +973,26 @@ xlua_sig_call (lua_State * L, const char *codestr, const char *sig, ...)
 
     va_start (vl, sig);
 
-    // warn("%s %d", __FILE__, __LINE__);
+    /* warn("%s %d", __FILE__, __LINE__); */
     status = marpa_luaL_loadbuffer (L, codestr, strlen (codestr), codestr);
-    // warn("%s %d", __FILE__, __LINE__);
+    /* warn("%s %d", __FILE__, __LINE__); */
     if (status != 0) {
         const char *error_string = marpa_lua_tostring (L, -1);
         marpa_lua_pop (L, 1);
         croak ("Marpa::R3 error in xlua_sig_call: %s", error_string);
     }
-    // warn("%s %d", __FILE__, __LINE__);
+    /* warn("%s %d", __FILE__, __LINE__); */
     /* Lua stack: [ function ] */
 
     for (narg = 0; *sig; narg++) {
-        // warn("%s %d narg=%d", __FILE__, __LINE__, narg);
+        const char this_sig = *sig++;
+        /* warn("%s %d narg=%d", __FILE__, __LINE__, narg); */
         if (!marpa_lua_checkstack (L, LUA_MINSTACK + 1)) {
             /* This error is not considered recoverable */
             croak ("Marpa::R3 error: could not grow Lua stack");
         }
-        // warn("%s %d narg=%d *sig=%c", __FILE__, __LINE__, narg, *sig);
-        switch (*sig++) {
+        /* warn("%s %d narg=%d *sig=%c", __FILE__, __LINE__, narg, *sig); */
+        switch (this_sig) {
         case 'd':
             marpa_lua_pushnumber (L, va_arg (vl, double));
             break;
@@ -1009,9 +1007,9 @@ xlua_sig_call (lua_State * L, const char *codestr, const char *sig, ...)
                                  * for making sure a reference count is
                                  * available for the taking.
                                  */
-            // warn("%s %d narg=%d", __FILE__, __LINE__, narg, *sig);
+            /* warn("%s %d narg=%d", __FILE__, __LINE__, narg, *sig); */
             marpa_sv_sv_noinc (L, va_arg (vl, SV *));
-            // warn("%s %d narg=%d", __FILE__, __LINE__, narg, *sig);
+            /* warn("%s %d narg=%d", __FILE__, __LINE__, narg, *sig); */
             break;
         case 'R':              /* argument is ref key of recce table */
             marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, va_arg (vl, int));
@@ -1020,15 +1018,15 @@ xlua_sig_call (lua_State * L, const char *codestr, const char *sig, ...)
             goto endargs;
         default:
             croak
-                ("Internal error: invalid sig option %c in xlua_sig_call");
+                ("Internal error: invalid sig option %c in xlua_sig_call", this_sig);
         }
-        // warn("%s %d narg=%d *sig=%c", __FILE__, __LINE__, narg, *sig);
+        /* warn("%s %d narg=%d *sig=%c", __FILE__, __LINE__, narg, *sig); */
     }
   endargs:;
 
     nres = strlen (sig);
 
-    // warn("%s %d", __FILE__, __LINE__);
+    /* warn("%s %d", __FILE__, __LINE__); */
     status = marpa_lua_pcall (L, narg, nres, 0);
     if (status != 0) {
         const char *error_string = marpa_lua_tostring (L, -1);
@@ -1069,7 +1067,7 @@ xlua_sig_call (lua_State * L, const char *codestr, const char *sig, ...)
      * now we expose them to Lua GC
      */
     marpa_lua_settop (L, base_of_stack);
-    // warn("%s %d", __FILE__, __LINE__);
+    /* warn("%s %d", __FILE__, __LINE__); */
     va_end (vl);
 }
 
@@ -1625,7 +1623,7 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
     unsigned int *ops = NULL;
     int op_ix;
     UV blessing = 0;
-    char *semantics_table;
+    const char *semantics_table;
     char *semantics_type;
     int semantics_ix;
     lua_State *const L = slr->L;
@@ -1640,7 +1638,7 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
         step_type_to_string (step_type);
 
     v_wrapper->result = result_ix;
-  // warn("%s %d", __FILE__, __LINE__);
+  /* warn("%s %d", __FILE__, __LINE__); */
 
 switch (step_type) {
     STRLEN dummy;
@@ -1648,9 +1646,9 @@ case MARPA_STEP_RULE:
     {
         SV **p_ops_sv =
             av_fetch (v_wrapper->rule_semantics, marpa_v_rule (v), 0);
-  // warn("%s %d", __FILE__, __LINE__);
+  /* warn("%s %d", __FILE__, __LINE__); */
         if (p_ops_sv) {
-  // warn("%s %d", __FILE__, __LINE__);
+  /* warn("%s %d", __FILE__, __LINE__); */
             ops = (unsigned int *) SvPV (*p_ops_sv, dummy);
         }
     }
@@ -1660,9 +1658,9 @@ case MARPA_STEP_TOKEN:
         SV **p_ops_sv =
             av_fetch (v_wrapper->token_semantics, marpa_v_token (v),
             0);
-  // warn("%s %d", __FILE__, __LINE__);
+  /* warn("%s %d", __FILE__, __LINE__); */
         if (p_ops_sv) {
-  // warn("%s %d", __FILE__, __LINE__);
+  /* warn("%s %d", __FILE__, __LINE__); */
             ops = (unsigned int *) SvPV (*p_ops_sv, dummy);
         }
     }
@@ -1672,9 +1670,9 @@ case MARPA_STEP_NULLING_SYMBOL:
         SV **p_ops_sv =
             av_fetch (v_wrapper->nulling_semantics, marpa_v_token (v),
             0);
-  // warn("%s %d", __FILE__, __LINE__);
+  /* warn("%s %d", __FILE__, __LINE__); */
         if (p_ops_sv) {
-  // warn("%s %d", __FILE__, __LINE__);
+  /* warn("%s %d", __FILE__, __LINE__); */
             ops = (unsigned int *) SvPV (*p_ops_sv, dummy);
         }
     }
@@ -1686,54 +1684,53 @@ default:
     if (!ops) {
         int base_of_stack;
         Xlua_Array* ops_ud;
-  // warn("%s %d", __FILE__, __LINE__);
+  /* warn("%s %d", __FILE__, __LINE__); */
 
         switch (step_type) {
-            STRLEN dummy;
         case MARPA_STEP_RULE:
-  // warn("%s %d", __FILE__, __LINE__);
+  /* warn("%s %d", __FILE__, __LINE__); */
             semantics_table = "rule_semantics";
             semantics_type = "rule";
             semantics_ix = marpa_v_rule (v);
             break;
         case MARPA_STEP_TOKEN:
-  // warn("%s %d", __FILE__, __LINE__);
+  /* warn("%s %d", __FILE__, __LINE__); */
             semantics_table = "token_semantics";
             semantics_type = "token";
             semantics_ix = marpa_v_token (v);
             break;
         case MARPA_STEP_NULLING_SYMBOL:
-  // warn("%s %d", __FILE__, __LINE__);
+  /* warn("%s %d", __FILE__, __LINE__); */
             semantics_table = "nulling_semantics";
             semantics_type = "nulling symbol";
             semantics_ix = marpa_v_token (v);
             break;
         default:
-  // warn("%s %d", __FILE__, __LINE__);
+  /* warn("%s %d", __FILE__, __LINE__); */
             /* Never reached -- turns off warning about uninitialized ops */
             ops = NULL;
         }
 
-  // warn("%s %d", __FILE__, __LINE__);
+  /* warn("%s %d", __FILE__, __LINE__); */
         base_of_stack = marpa_lua_gettop(L);
         /* Lua stack: [] */
         marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, slr->lua_ref);
         /* Lua stack: [ recce_table ] */
-        // warn("%s %d", __FILE__, __LINE__);
+        /* warn("%s %d", __FILE__, __LINE__); */
         /* Lua stack: [ recce_table, ] */
         marpa_lua_getfield(L, -1, semantics_table);
-        // warn("%s %d", __FILE__, __LINE__);
+        /* warn("%s %d", __FILE__, __LINE__); */
         /* Lua stack: [ recce_table, semantics_table ] */
          marpa_lua_geti (L, -1, semantics_ix);
-        // warn("%s %d", __FILE__, __LINE__);
+        /* warn("%s %d", __FILE__, __LINE__); */
         /* Lua stack: [ recce_table, semantics_table, ops_ud ] */
         ops_ud = (struct Xlua_Array*)marpa_lua_touserdata(L, -1);
-        // warn("%s %d", __FILE__, __LINE__);
+        /* warn("%s %d", __FILE__, __LINE__); */
         if (!ops_ud) {
           marpa_lua_pop(L, 1);
-  // warn("Default for %s semantics kicking in", semantics_type);
+  /* warn("Default for %s semantics kicking in", semantics_type); */
           marpa_lua_getfield (L, -1, "default");
-        // warn("%s %d", __FILE__, __LINE__);
+        /* warn("%s %d", __FILE__, __LINE__); */
           /* Lua stack: [ recce_table, semantics_table, ops_ud ] */
           ops_ud = (Xlua_Array*)marpa_lua_touserdata(L, -1);
         }
@@ -1742,7 +1739,7 @@ default:
                     ("Problem in v->stack_step: %s %d is not registered",
                     semantics_type, semantics_ix);
         }
-        // warn("%s %d", __FILE__, __LINE__);
+        /* warn("%s %d", __FILE__, __LINE__); */
         ops = ops_ud->array;
         marpa_lua_settop(L, base_of_stack);
     }
@@ -1776,18 +1773,18 @@ default:
                 const int base_of_stack = marpa_lua_gettop (L);
                 const int fn_key = ops[op_ix++];
 
-  // warn ("Executing MARPA_OP_LUA, fn_key = %d", fn_key);
+  /* warn ("Executing MARPA_OP_LUA, fn_key = %d", fn_key); */
 
                 marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, slr->lua_ref);
                 /* Lua stack: [ recce_table ] */
                 marpa_lua_rawgeti (L, -1, fn_key);
                 /* [ recce_table, function ] */
 
-  // warn ("Executing MARPA_OP_LUA, fn_key = %d", fn_key);
+  /* warn ("Executing MARPA_OP_LUA, fn_key = %d", fn_key); */
 
                 marpa_lua_pushvalue(L, -1);
                 marpa_lua_getinfo(L, ">S", &ar);
-  // warn("Executing Lua code: %s", ar.source);
+  /* warn("Executing Lua code: %s", ar.source); */
 
                 /* The recce table itself is an argument */
                 marpa_lua_pushvalue (L, -2);
@@ -1814,11 +1811,11 @@ default:
                 default:
                     break;
                 }
-  // warn ("%s %d\n", __FILE__, __LINE__);
+  /* warn ("%s %d\n", __FILE__, __LINE__); */
 
                 status = marpa_lua_pcall (L, argc, LUA_MULTRET, 0);
 
-  // warn ("%s %d\n", __FILE__, __LINE__);
+  /* warn ("%s %d\n", __FILE__, __LINE__); */
 
                 if (status != 0) {
                     const char *error_string = marpa_lua_tostring (L, -1);
@@ -1828,7 +1825,7 @@ default:
                     croak (croak_msg);
                 }
 
-  // warn ("%s %d\n", __FILE__, __LINE__);
+  /* warn ("%s %d\n", __FILE__, __LINE__); */
 
                 marpa_lua_settop (L, base_of_stack);
                 goto NEXT_OP_CODE;
@@ -5516,19 +5513,19 @@ PPCODE:
   {
     lua_State* L = slg->L;
     xlua_refcount(L, 1);
-    // Lua stack: []
+    /* Lua stack: [] */
     marpa_lua_newtable(L);
-    // Lua stack: [ grammar_table ]
-    // No lock held -- SLG must delete grammar table in its
-    //   destructor.
+    /* Lua stack: [ grammar_table ] */
+    /* No lock held -- SLG must delete grammar table in its */
+    /*   destructor. */
     marpa_luaL_setmetatable(L, MT_NAME_GRAMMAR);
-    // Lua stack: [ grammar_table ]
+    /* Lua stack: [ grammar_table ] */
     marpa_lua_pushlightuserdata(L, slg);
-    // Lua stack: [ grammar_table, lud ]
+    /* Lua stack: [ grammar_table, lud ] */
     marpa_lua_setfield(L, -2, "lud");
-    // Lua stack: [ grammar_table ]
+    /* Lua stack: [ grammar_table ] */
     slg->lua_ref =  marpa_luaL_ref(L, LUA_REGISTRYINDEX);
-    // Lua stack: []
+    /* Lua stack: [] */
   }
 
     new_sv = sv_newmortal ();
@@ -6094,19 +6091,19 @@ PPCODE:
     lua_State* L = slr->slg->L;
     slr->L = L;
     xlua_refcount(L, 1);
-    // Lua stack: []
+    /* Lua stack: [] */
     marpa_lua_newtable(L);
-    // Lua stack: [ recce_table ]
-    // No lock held -- SLR must delete recce table in its
-    //   destructor.
+    /* Lua stack: [ recce_table ] */
+    /* No lock held -- SLR must delete recce table in its */
+    /*   destructor. */
     marpa_luaL_setmetatable(L, MT_NAME_RECCE);
-    // Lua stack: [ recce_table ]
+    /* Lua stack: [ recce_table ] */
     marpa_lua_pushlightuserdata(L, slr);
-    // Lua stack: [ recce_table, lud ]
+    /* Lua stack: [ recce_table, lud ] */
     marpa_lua_setfield(L, -2, "lud");
-    // Lua stack: [ recce_table ]
+    /* Lua stack: [ recce_table ] */
     slr->lua_ref =  marpa_luaL_ref(L, LUA_REGISTRYINDEX);
-    // Lua stack: []
+    /* Lua stack: [] */
   }
 
   slr->v_wrapper = NULL;
@@ -7475,8 +7472,6 @@ unregister_fn(slr, fn_key)
     int fn_key;
 PPCODE:
 {
-  int status;
-  int recce_table;
   lua_State* const L = slr->L;
   const int base_of_stack = marpa_lua_gettop(L);
 

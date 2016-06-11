@@ -32,7 +32,52 @@ $VERSION = eval $VERSION;
 my $define = q{};
 $define .= ' -DWIN32' if ($^O eq 'MSWin32');
 
-my $ccflags = $Config{ccflags} . " -I../engine/read_only";
+sub gcc_is_at_least {
+    my ($required) = @_;
+    state $gcc_version = $Config{gccversion};
+    return if not $gcc_version;
+    my @actual = ($gcc_version =~ m/ \A (\d+) [.] (\d+) [.] (\d+) \z /xms);
+    return if @actual != 3;
+    my @required = ($required =~ m/ \A (\d+) [.] (\d+) [.] (\d+) \z /xms);
+    die if scalar @required != 3;
+    my $cmp = $actual[0] <=> $required[0] ||
+     $actual[1] <=> $required[1]  ||
+     $actual[2] <=> $required[2] ;
+    return $cmp >= 0 ? 1 : 0;
+}
+
+my @new_ccflags = ( " -I../engine/read_only" );
+
+if ( $Config{'ccname'} eq 'gcc' ) {
+    ## -W instead of -Wextra is case the GCC is pre 3.0.0
+    ## -Winline omitted because too noisy
+    push @new_ccflags, qw( -Wall -W
+	-Wpointer-arith -Wstrict-prototypes -Wwrite-strings
+	-Wmissing-declarations );
+    # -ansi undefs 'inline' on Android, which breaks
+    # the build since it's used by bionic's headers.
+    push @new_ccflags, '-ansi' if $^O ne 'android';
+    push @new_ccflags, '-Wdeclaration-after-statement' if gcc_is_at_least('3.4.6');
+} ## end if ( $self->config('cc') eq 'gcc' )
+
+if (0) {
+#    if ( defined $self->args('XS-debug') ) {
+#        say 'XS-debug flag is on';
+#        if ( $self->config('ccname') eq 'gcc' ) {
+#            push @new_ccflags,
+#              qw( -Wall -ansi -pedantic -Wundef -Wendif-labels );
+#        } ## end if ( $self->config('cc') eq 'gcc' )
+#        elsif ( $self->config('ccname') eq 'cl' ) {
+#            ## gcc's -Wundef is msvc's C4668 that is on with -Wall
+#            ## gcc's -ansi -pedantic is msvc's /Za, but windows.h can't be compiled with it
+#            ## msvc's equivalent for gcc's -Wendif-labels can't be found :)
+#            push @new_ccflags, qw( -W4 -Wp64 );
+#        }
+#    }
+}
+
+my $ccflags = join q{ }, $Config{'ccflags'}, @new_ccflags;
+
 
 undef &MY::top_targets; # suppress warning
 *MY::top_targets = sub {

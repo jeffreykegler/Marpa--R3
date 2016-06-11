@@ -42,7 +42,8 @@ my $lua_exec_body = <<'END_OF_EXEC_BODY';
         int top_after;
 
         if (is_method) {
-            marpa_lua_pushvalue (L, -2);        // first argument is recce table
+            /* first argument is recce table */
+            marpa_lua_pushvalue (L, -2);
             /* [ object_table, function, object_table ] */
         }
 
