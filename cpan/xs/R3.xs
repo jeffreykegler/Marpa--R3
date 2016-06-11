@@ -89,7 +89,7 @@ marpa_slif_op_id (const char *name)
 static void populate_ops(lua_State* L)
 {
     int op_table;
-    int i;
+    lua_Integer i;
     const int marpa_table = marpa_lua_gettop(L);
 
     marpa_lua_newtable(L);
@@ -99,7 +99,7 @@ static void populate_ops(lua_State* L)
     marpa_lua_setfield(L, marpa_table, "ops");
     /* [ marpa_table, op_table ] */
     op_table = marpa_lua_gettop(L);
-    for (i = 0; i < Dim(op_by_name_object); i++) {
+    for (i = 0; i < (lua_Integer)Dim(op_by_name_object); i++) {
         /* [ marpa_table, op_table ] */
         marpa_lua_pushinteger(L, i);
         /* [ marpa_table, op_table, i ] */
@@ -406,6 +406,8 @@ coerce_to_sv (lua_State * L, int idx)
 }
 
 /* Push a Perl value onto the Lua stack. */
+static void
+push_val (lua_State * L, SV * val) PERL_UNUSED_DECL;
 static void
 push_val (lua_State * L, SV * val)
 {
@@ -764,7 +766,7 @@ static void create_grammar_mt (lua_State* L) {
  * The current value of the ref count is always returned.
  * If it has fallen to 0, the state is closed.
  */
-static int xlua_refcount(lua_State* L, int inc)
+static void xlua_refcount(lua_State* L, int inc)
 {
     int base_of_stack = marpa_lua_gettop(L);
     int new_refcount;
@@ -777,7 +779,7 @@ static int xlua_refcount(lua_State* L, int inc)
     /* warn("xlua_refcount(), new_refcount=%d", new_refcount); */
     if (new_refcount <= 0) {
        marpa_lua_close(L);
-       return 0;
+       return;
     }
     marpa_lua_pushinteger(L, new_refcount);
     /* Lua stack [ old_ref_count, new_ref_count ] */
@@ -811,7 +813,7 @@ typedef struct Xlua_Array {
 static void
 xlua_array_new (lua_State * L, size_t size)
 {
-    Xlua_Array *result = (Xlua_Array *) marpa_lua_newuserdata (L,
+    marpa_lua_newuserdata (L,
         sizeof (Xlua_Array) + (size - 1) * sizeof (unsigned int));
     marpa_luaL_setmetatable (L, MT_NAME_ARRAY);
 }
@@ -848,7 +850,7 @@ xlua_array_index_meth (lua_State * L)
     Xlua_Array * const p_array =
         (Xlua_Array *) marpa_luaL_checkudata (L, 1, MT_NAME_ARRAY);
     const int ix = marpa_luaL_checkinteger (L, 2);
-    marpa_luaL_argcheck (L, (ix >= 0 && ix < p_array->size), 2,
+    marpa_luaL_argcheck (L, (ix >= 0 && (size_t)ix < p_array->size), 2,
         "index out of bounds");
     marpa_lua_pushinteger(L, p_array->array[ix]);
     return 1;
@@ -859,9 +861,9 @@ xlua_array_new_index_meth (lua_State * L)
 {
     Xlua_Array * const p_array =
         (Xlua_Array *) marpa_luaL_checkudata (L, 1, MT_NAME_ARRAY);
-    const unsigned int ix = marpa_luaL_checkinteger (L, 2);
+    const lua_Integer ix = marpa_luaL_checkinteger (L, 2);
     const unsigned int value = marpa_luaL_checkinteger (L, 3);
-    marpa_luaL_argcheck (L, (ix < 0 || ix >= p_array->size), 2,
+    marpa_luaL_argcheck (L, (ix < 0 || (size_t)ix >= p_array->size), 2,
         "index out of bounds");
     p_array->array[ix] = value;
     return 1;
@@ -909,7 +911,7 @@ static void create_array_mt (lua_State* L) {
 /* Returns a new Lua state, set up for Marpa, with
  * a reference count of 1.
  */
-static lua_State* xlua_newstate()
+static lua_State* xlua_newstate(void)
 {
     int marpa_table;
     lua_State *const L = marpa_luaL_newstate ();
@@ -1623,9 +1625,16 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
     unsigned int *ops = NULL;
     int op_ix;
     UV blessing = 0;
-    const char *semantics_table;
-    char *semantics_type;
-    int semantics_ix;
+
+    /* Initializations are to silence GCC warnings --
+     * if these values appear to the user, there is
+     * an internal error. Note that
+     * zero is never an acceptable Lua index.
+     */
+    const char *semantics_table = "!no such semantics table!";
+    const char *semantics_type = "!no such semantic type!";
+    int semantics_ix = 0;
+
     lua_State *const L = slr->L;
 
     /* Create a new array, and a mortal reference to it.
@@ -1678,7 +1687,7 @@ case MARPA_STEP_NULLING_SYMBOL:
     }
     break;
 default:
-    croak ("Internal error: unknown step type %s", marpa_v_token (v));
+    croak ("Internal error: unknown step type %d", step_type);
 }
 
     if (!ops) {
@@ -3133,6 +3142,9 @@ slr_es_span_to_literal_sv (Scanless_R * slr,
 /* get_mortalspace comes from "Extending and Embedding Perl"
    by Jenness and Cozens, p. 242 */
 static void *
+get_mortalspace (size_t nbytes) PERL_UNUSED_DECL;
+
+static void *
 get_mortalspace (size_t nbytes)
 {
     dTHX;
@@ -4131,7 +4143,6 @@ stack_mode_set( v_wrapper, slr )
     Scanless_R *slr;
 PPCODE:
 {
-  Marpa_Grammar g = v_wrapper->base->g;
   if (v_wrapper->mode != MARPA_XS_V_MODE_IS_INITIAL)
     {
         croak ("Problem in v->stack_mode_set(): Cannot re-set stack mode");
