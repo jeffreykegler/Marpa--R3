@@ -768,7 +768,7 @@ static void create_grammar_mt (lua_State* L) {
  */
 static void xlua_refcount(lua_State* L, int inc)
 {
-    lua_Integer base_of_stack = marpa_lua_gettop(L);
+    int base_of_stack = marpa_lua_gettop(L);
     lua_Integer new_refcount;
     /* Lua stack [] */
     marpa_lua_getfield(L, LUA_REGISTRYINDEX, "ref_count");
@@ -814,7 +814,7 @@ static void
 xlua_array_new (lua_State * L, lua_Integer size)
 {
     marpa_lua_newuserdata (L,
-        sizeof (Xlua_Array) + (size - 1) * sizeof (unsigned int));
+        sizeof (Xlua_Array) + ((size_t)size - 1) * sizeof (unsigned int));
     marpa_luaL_setmetatable (L, MT_NAME_ARRAY);
 }
 
@@ -828,18 +828,18 @@ static int xlua_array_new_func(lua_State* L)
 static int
 xlua_array_from_list_func (lua_State * L)
 {
-    lua_Integer ix;
+    int ix;
     Xlua_Array *p_array;
-    const lua_Integer last_arg = marpa_lua_gettop (L);
+    const int last_arg = marpa_lua_gettop (L);
     
     xlua_array_new(L, last_arg);
     /* [ array_ud ] */
     p_array = (Xlua_Array *) marpa_lua_touserdata (L, -1);
     for (ix = 1; ix <= last_arg; ix++) {
-        const unsigned int value = marpa_luaL_checkinteger (L, ix);
-        p_array->array[ix - 1] = value;
+        const lua_Integer value = marpa_luaL_checkinteger (L, ix);
+        p_array->array[ix - 1] = (unsigned int)value;
     }
-    p_array->size = last_arg;
+    p_array->size = (size_t)last_arg;
     /* [ array_ud ] */
     return 1;
 }
