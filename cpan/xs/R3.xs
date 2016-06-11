@@ -329,7 +329,7 @@ xlua_unref(lua_State* L)
 {
     marpa_luaL_checktype(L, 1, LUA_TTABLE);
     marpa_luaL_checkinteger(L, 2);
-    marpa_luaL_unref(L, 1, marpa_lua_tointeger(L, 2));
+    marpa_luaL_unref(L, 1, (int)marpa_lua_tointeger(L, 2));
     return 0;
 }
 
@@ -511,11 +511,11 @@ static int marpa_sv_finalize_meth (lua_State* L) {
 
 /* Convert Lua object to number, including our custom Marpa userdata's
  */
-static int marpa_xlua_tonumber (lua_State* L, int idx, int* pisnum) {
+static lua_Number marpa_xlua_tonumber (lua_State* L, int idx, int* pisnum) {
     dTHX;
     void* ud;
     int pisnum2;
-    int n;
+    lua_Number n;
     if (pisnum) *pisnum = 1;
     n = marpa_lua_tonumberx(L, idx, &pisnum2);
     if (pisnum2) return n;
@@ -528,9 +528,9 @@ static int marpa_xlua_tonumber (lua_State* L, int idx, int* pisnum) {
 }
 
 static int marpa_sv_add_meth (lua_State* L) {
-    int num1 = marpa_xlua_tonumber(L, 1, NULL);
-    int num2 = marpa_xlua_tonumber(L, 2, NULL);
-    marpa_lua_pushinteger(L, num1+num2);
+    lua_Number num1 = marpa_xlua_tonumber(L, 1, NULL);
+    lua_Number num2 = marpa_xlua_tonumber(L, 2, NULL);
+    marpa_lua_pushnumber(L, num1+num2);
     return 1;
 }
 
@@ -549,7 +549,7 @@ static SV** marpa_av_fetch(SV* table, lua_Integer key) {
         croak ("Attempt to fetch from an SV which is not an AV ref");
      }
      av = (AV*)SvRV(table);
-     return av_fetch(av, key, 0);
+     return av_fetch(av, (int)key, 0);
 }
 
 static int marpa_av_fetch_meth(lua_State* L) {
@@ -602,7 +602,7 @@ static void marpa_av_store(SV* table, lua_Integer key, SV*value) {
         croak ("Attempt to index an SV which is not an AV ref");
      }
      av = (AV*)SvRV(table);
-     av_store(av, key, value);
+     av_store(av, (int)key, value);
 }
 
 static int marpa_av_store_meth(lua_State* L) {
@@ -647,7 +647,7 @@ static int marpa_av_fill_meth (lua_State* L) {
     /* warn("%s %d\n", __FILE__, __LINE__); */
     lua_Integer index = marpa_luaL_checkinteger(L, 2);
     /* warn("%s %d\n", __FILE__, __LINE__); */
-    marpa_av_fill(L, *p_table_sv, index);
+    marpa_av_fill(L, *p_table_sv, (int)index);
     /* warn("%s %d\n", __FILE__, __LINE__); */
     return 0;
 }
@@ -768,8 +768,8 @@ static void create_grammar_mt (lua_State* L) {
  */
 static void xlua_refcount(lua_State* L, int inc)
 {
-    int base_of_stack = marpa_lua_gettop(L);
-    int new_refcount;
+    lua_Integer base_of_stack = marpa_lua_gettop(L);
+    lua_Integer new_refcount;
     /* Lua stack [] */
     marpa_lua_getfield(L, LUA_REGISTRYINDEX, "ref_count");
     /* Lua stack [ old_ref_count ] */
@@ -811,7 +811,7 @@ typedef struct Xlua_Array {
 
 /* Leaves new userdata on top of stack */
 static void
-xlua_array_new (lua_State * L, size_t size)
+xlua_array_new (lua_State * L, lua_Integer size)
 {
     marpa_lua_newuserdata (L,
         sizeof (Xlua_Array) + (size - 1) * sizeof (unsigned int));
@@ -820,7 +820,7 @@ xlua_array_new (lua_State * L, size_t size)
 
 static int xlua_array_new_func(lua_State* L)
 {
-   const size_t size = marpa_luaL_checkinteger(L, 1);
+   const lua_Integer size = marpa_luaL_checkinteger(L, 1);
    xlua_array_new(L, size);
    return 1;
 }
@@ -828,9 +828,9 @@ static int xlua_array_new_func(lua_State* L)
 static int
 xlua_array_from_list_func (lua_State * L)
 {
-    int ix;
+    lua_Integer ix;
     Xlua_Array *p_array;
-    const int last_arg = marpa_lua_gettop (L);
+    const lua_Integer last_arg = marpa_lua_gettop (L);
     
     xlua_array_new(L, last_arg);
     /* [ array_ud ] */
@@ -849,7 +849,7 @@ xlua_array_index_meth (lua_State * L)
 {
     Xlua_Array * const p_array =
         (Xlua_Array *) marpa_luaL_checkudata (L, 1, MT_NAME_ARRAY);
-    const int ix = marpa_luaL_checkinteger (L, 2);
+    const lua_Integer ix = marpa_luaL_checkinteger (L, 2);
     marpa_luaL_argcheck (L, (ix >= 0 && (size_t)ix < p_array->size), 2,
         "index out of bounds");
     marpa_lua_pushinteger(L, p_array->array[ix]);
@@ -862,7 +862,7 @@ xlua_array_new_index_meth (lua_State * L)
     Xlua_Array * const p_array =
         (Xlua_Array *) marpa_luaL_checkudata (L, 1, MT_NAME_ARRAY);
     const lua_Integer ix = marpa_luaL_checkinteger (L, 2);
-    const unsigned int value = marpa_luaL_checkinteger (L, 3);
+    const unsigned int value = (unsigned int)marpa_luaL_checkinteger (L, 3);
     marpa_luaL_argcheck (L, (ix < 0 || (size_t)ix >= p_array->size), 2,
         "index out of bounds");
     p_array->array[ix] = value;
@@ -1055,11 +1055,11 @@ xlua_sig_call (lua_State * L, const char *codestr, const char *sig, ...)
         case 'i':
             {
                 int isnum;
-                const int n = marpa_lua_tointegerx (L, nres, &isnum);
+                const lua_Integer n = marpa_lua_tointegerx (L, nres, &isnum);
                 if (!isnum)
                     croak
                         ("Internal error: xlua_sig_call: result type is not integer");
-                *va_arg (vl, int *) = n;
+                *va_arg (vl, int *) = (int)n;
                 break;
             }
         }
