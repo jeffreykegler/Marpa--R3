@@ -1054,7 +1054,7 @@ remove-display-indent: 1
 remove-blank-last-line: 1
 
     Setting trace_terminals option
-    Setting trace_values option
+    Setting trace_values option to 1
     Accepted lexeme L1c1 e1: variable; value="a"
     Discarded lexeme L1c2: whitespace
     Accepted lexeme L1c3 e2: '='; value="="

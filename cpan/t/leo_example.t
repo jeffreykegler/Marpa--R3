@@ -425,7 +425,7 @@ Marpa::R3::Test::is( $value, 'a=42 b=42 c=-5 d=6 e=3', 'Leo Example Value' );
 my $show_earley_sets_output_after = $recce->show_earley_sets();
 
 my $expected_trace_output = <<'END_TRACE_OUTPUT';
-Setting trace_values option
+Setting trace_values option to 2
 Popping 1 values to evaluate R5:1@8-9S7@8, rule: Expression ::= Variable
 Calculated and pushed value: 3
 Popping 3 values to evaluate R4:3@6-9C5@8, rule: Expression ::= Lvalue MultiplyAssignOp Expression

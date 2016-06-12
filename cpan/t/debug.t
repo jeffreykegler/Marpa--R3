@@ -306,7 +306,7 @@ Marpa::R3::Test::is( Data::Dumper::Dumper($latest_report),
 
 Marpa::R3::Test::is( $trace_output, <<'END_TRACE_OUTPUT', 'trace output' );
 Setting trace_terminals option
-Setting trace_values option
+Setting trace_values option to 1
 Accepted lexeme L1c1 e1: variable; value="a"
 Discarded lexeme L1c2: whitespace
 Accepted lexeme L1c3 e2: '='; value="="

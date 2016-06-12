@@ -285,7 +285,7 @@ $value = $value_ref ? ${$value_ref} : 'No Parse';
 Marpa::R3::Test::is( 49, $value, 'Implementation Example Value 2' );
 
 my $expected_trace_output = <<'END_TRACE_OUTPUT';
-Setting trace_values option
+Setting trace_values option to 3
 Registering semantics for rule: Calculator ::= Expression
   Semantics are result_is_rhs_n 0
 Registering semantics for rule: Factor ::= Number
