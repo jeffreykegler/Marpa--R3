@@ -441,7 +441,7 @@ sub common_set {
     if ( defined( my $value = $flat_args->{'trace_values'} ) ) {
         $slr->[Marpa::R3::Internal::Scanless::R::TRACE_VALUES] = $value;
         if ($value) {
-            say {$trace_file_handle} 'Setting trace_values option'
+            say {$trace_file_handle} 'Setting trace_values option to $value'
               or Marpa::R3::exception("Cannot print: $ERRNO");
         }
     } ## end if ( defined( my $value = $flat_args->{'trace_values'} ) )
