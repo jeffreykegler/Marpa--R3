@@ -60,8 +60,6 @@ io.write[=[
 #include "lua.h"
 #include "lauxlib.h"
 
-#include "compat-5.2.c"
-
 #undef UNUSED
 #if     __GNUC__ >  2 || (__GNUC__ == 2 && __GNUC_MINOR__ >  4)
 #define UNUSED __attribute__((__unused__))
@@ -76,25 +74,25 @@ io.write[=[
 /* For debugging */
 static void dump_stack (lua_State *L) {
       int i;
-      int top = lua_gettop(L);
+      int top = marpa_lua_gettop(L);
       for (i = 1; i <= top; i++) {  /* repeat for each level */
-        int t = lua_type(L, i);
+        int t = marpa_lua_type(L, i);
         switch (t) {
     
           case LUA_TSTRING:  /* strings */
-            printf("`%s'", lua_tostring(L, i));
+            printf("`%s'", marpa_lua_tostring(L, i));
             break;
     
           case LUA_TBOOLEAN:  /* booleans */
-            printf(lua_toboolean(L, i) ? "true" : "false");
+            printf(marpa_lua_toboolean(L, i) ? "true" : "false");
             break;
     
           case LUA_TNUMBER:  /* numbers */
-            printf("%g", lua_tonumber(L, i));
+            printf("%g", marpa_lua_tonumber(L, i));
             break;
     
           default:  /* other values */
-            printf("%s", lua_typename(L, t));
+            printf("%s", marpa_lua_typename(L, t));
             break;
     
         }
@@ -106,67 +104,67 @@ static void dump_stack (lua_State *L) {
 static void dump_table(lua_State *L, int raw_table_index)
 {
     /* Original stack: [ ... ] */
-    const int table_index = lua_absindex(L, raw_table_index);
-    lua_pushnil(L);
+    const int table_index = marpa_lua_absindex(L, raw_table_index);
+    marpa_lua_pushnil(L);
     /* [ ..., nil ] */
-    while (lua_next(L, table_index))
+    while (marpa_lua_next(L, table_index))
     {
         /* [ ..., key, value ] */
-        const int value_stack_ix = lua_gettop(L);
-        const int key_stack_ix = lua_gettop(L)+1;
-        /* Copy the key, because lua_tostring() can be destructive */
-        lua_pushvalue(L, -2);
+        const int value_stack_ix = marpa_lua_gettop(L);
+        const int key_stack_ix = marpa_lua_gettop(L)+1;
+        /* Copy the key, because marpa_lua_tostring() can be destructive */
+        marpa_lua_pushvalue(L, -2);
         /* [ ..., key, value, key_copy ] */
-        switch (lua_type(L, key_stack_ix)) {
+        switch (marpa_lua_type(L, key_stack_ix)) {
     
           case LUA_TSTRING:  /* strings */
-            printf("`%s'", lua_tostring(L, key_stack_ix));
+            printf("`%s'", marpa_lua_tostring(L, key_stack_ix));
             break;
     
           case LUA_TBOOLEAN:  /* booleans */
-            printf(lua_toboolean(L, key_stack_ix) ? "true" : "false");
+            printf(marpa_lua_toboolean(L, key_stack_ix) ? "true" : "false");
             break;
     
           case LUA_TNUMBER:  /* numbers */
-            printf("%g", lua_tonumber(L, key_stack_ix));
+            printf("%g", marpa_lua_tonumber(L, key_stack_ix));
             break;
     
           case LUA_TTABLE:  /* numbers */
-            printf("table %s", lua_tostring(L, key_stack_ix));
+            printf("table %s", marpa_lua_tostring(L, key_stack_ix));
             break;
     
           default:  /* other values */
-            printf("%s", lua_typename(L, lua_type(L, key_stack_ix)));
+            printf("%s", marpa_lua_typename(L, marpa_lua_type(L, key_stack_ix)));
             break;
     
         }
         printf(" -> ");  /* end the listing */
-        switch (lua_type(L, value_stack_ix)) {
+        switch (marpa_lua_type(L, value_stack_ix)) {
     
           case LUA_TSTRING:  /* strings */
-            printf("`%s'", lua_tostring(L, value_stack_ix));
+            printf("`%s'", marpa_lua_tostring(L, value_stack_ix));
             break;
     
           case LUA_TBOOLEAN:  /* booleans */
-            printf(lua_toboolean(L, value_stack_ix) ? "true" : "false");
+            printf(marpa_lua_toboolean(L, value_stack_ix) ? "true" : "false");
             break;
     
           case LUA_TNUMBER:  /* numbers */
-            printf("%g", lua_tonumber(L, value_stack_ix));
+            printf("%g", marpa_lua_tonumber(L, value_stack_ix));
             break;
     
           case LUA_TTABLE:  /* numbers */
-            printf("table %s", lua_tostring(L, value_stack_ix));
+            printf("table %s", marpa_lua_tostring(L, value_stack_ix));
             break;
     
           default:  /* other values */
-            printf("%s", lua_typename(L, lua_type(L, value_stack_ix)));
+            printf("%s", marpa_lua_typename(L, marpa_lua_type(L, value_stack_ix)));
             break;
     
         }
         printf("\n");  /* end the listing */
         /* [ ..., key, value, key_copy ] */
-        lua_pop(L, 2);
+        marpa_lua_pop(L, 2);
         /* [ ..., key ] */
     }
     /* Back to original stack: [ ... ] */
@@ -334,13 +332,13 @@ static inline const char* error_description_by_code(lua_Integer error_code)
 
 static inline int l_error_description_by_code(lua_State* L)
 {
-   const lua_Integer error_code = luaL_checkinteger(L, 1);
+   const lua_Integer error_code = marpa_luaL_checkinteger(L, 1);
    const char* description = error_description_by_code(error_code);
    if (description)
    {
-       lua_pushstring(L, description);
+       marpa_lua_pushstring(L, description);
    } else {
-       lua_pushfstring(L, "Unknown error code (%d)", error_code);
+       marpa_lua_pushfstring(L, "Unknown error code (%d)", error_code);
    }
    return 1;
 }
@@ -358,13 +356,13 @@ static inline const char* error_name_by_code(lua_Integer error_code)
 
 static inline int l_error_name_by_code(lua_State* L)
 {
-   const lua_Integer error_code = luaL_checkinteger(L, 1);
+   const lua_Integer error_code = marpa_luaL_checkinteger(L, 1);
    const char* mnemonic = error_name_by_code(error_code);
    if (mnemonic)
    {
-       lua_pushstring(L, mnemonic);
+       marpa_lua_pushstring(L, mnemonic);
    } else {
-       lua_pushfstring(L, "Unknown error code (%d)", error_code);
+       marpa_lua_pushfstring(L, "Unknown error code (%d)", error_code);
    }
    return 1;
 }
@@ -456,13 +454,13 @@ static inline const char* event_description_by_code(lua_Integer event_code)
 
 static inline int l_event_description_by_code(lua_State* L)
 {
-   const lua_Integer event_code = luaL_checkinteger(L, 1);
+   const lua_Integer event_code = marpa_luaL_checkinteger(L, 1);
    const char* description = event_description_by_code(event_code);
    if (description)
    {
-       lua_pushstring(L, description);
+       marpa_lua_pushstring(L, description);
    } else {
-       lua_pushfstring(L, "Unknown event code (%d)", event_code);
+       marpa_lua_pushfstring(L, "Unknown event code (%d)", event_code);
    }
    return 1;
 }
@@ -477,13 +475,13 @@ static inline const char* event_name_by_code(lua_Integer event_code)
 
 static inline int l_event_name_by_code(lua_State* L)
 {
-   const lua_Integer event_code = luaL_checkinteger(L, 1);
+   const lua_Integer event_code = marpa_luaL_checkinteger(L, 1);
    const char* mnemonic = event_name_by_code(event_code);
    if (mnemonic)
    {
-       lua_pushstring(L, mnemonic);
+       marpa_lua_pushstring(L, mnemonic);
    } else {
-       lua_pushfstring(L, "Unknown event code (%d)", event_code);
+       marpa_lua_pushfstring(L, "Unknown event code (%d)", event_code);
    }
    return 1;
 }
@@ -511,49 +509,49 @@ static char kollos_v_ud_mt_key;
 static inline void kollos_error(lua_State* L,
     Marpa_Error_Code code, const char* details)
 {
-   const int error_object_stack_ix = lua_gettop(L)+1;
-   lua_newtable(L);
+   const int error_object_stack_ix = marpa_lua_gettop(L)+1;
+   marpa_lua_newtable(L);
    /* [ ..., error_object ] */
-   lua_rawgetp(L, LUA_REGISTRYINDEX, &kollos_error_mt_key);
+   marpa_lua_rawgetp(L, LUA_REGISTRYINDEX, &kollos_error_mt_key);
    /* [ ..., error_object, error_metatable ] */
-   lua_setmetatable(L, error_object_stack_ix);
+   marpa_lua_setmetatable(L, error_object_stack_ix);
    /* [ ..., error_object ] */
-   lua_pushinteger(L, (lua_Integer)code);
-   lua_setfield(L, error_object_stack_ix, "code" );
+   marpa_lua_pushinteger(L, (lua_Integer)code);
+   marpa_lua_setfield(L, error_object_stack_ix, "code" );
   if (0) printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
   if (0) printf ("%s code = %d\n", __PRETTY_FUNCTION__, code);
    /* [ ..., error_object ] */
-   lua_pushstring(L, details);
-   lua_setfield(L, error_object_stack_ix, "details" );
+   marpa_lua_pushstring(L, details);
+   marpa_lua_setfield(L, error_object_stack_ix, "details" );
    /* [ ..., error_object ] */
 }
 
 static int l_error_new(lua_State* L)
 {
-  if (lua_istable (L, 1))
+  if (marpa_lua_istable (L, 1))
     {
       const int table_ix = 1;
-      lua_getfield (L, table_ix, "code");
+      marpa_lua_getfield (L, table_ix, "code");
       /* [ error_table,  code ] */
-      if (!lua_isnumber (L, -1))
+      if (!marpa_lua_isnumber (L, -1))
 	{
 	  /* Want a special code for this, eventually */
 	  const Marpa_Error_Code code = MARPA_ERR_DEVELOPMENT;
-	  lua_pushinteger (L, (lua_Integer) code);
-	  lua_setfield (L, table_ix, "code");
+	  marpa_lua_pushinteger (L, (lua_Integer) code);
+	  marpa_lua_setfield (L, table_ix, "code");
 	}
-      lua_pop (L, 1);
-      lua_rawgetp (L, LUA_REGISTRYINDEX, &kollos_error_mt_key);
+      marpa_lua_pop (L, 1);
+      marpa_lua_rawgetp (L, LUA_REGISTRYINDEX, &kollos_error_mt_key);
       /* [ error_table, error_metatable ] */
-      lua_setmetatable (L, table_ix);
+      marpa_lua_setmetatable (L, table_ix);
       /* [ error_table ] */
       return 1;
     }
-  if (lua_isnumber (L, 1))
+  if (marpa_lua_isnumber (L, 1))
     {
-      const Marpa_Error_Code code = lua_tointeger (L, 1);
-      const char *details = lua_tostring (L, 2);
-      lua_pop (L, 2);
+      const Marpa_Error_Code code = marpa_lua_tointeger (L, 1);
+      const char *details = marpa_lua_tostring (L, 2);
+      marpa_lua_pop (L, 2);
       kollos_error (L, code, details);
       return 1;
     }
@@ -572,80 +570,80 @@ static int l_error_new(lua_State* L)
 static inline void error_tostring(lua_State* L)
 {
   Marpa_Error_Code error_code = -1;
-  const int error_object_ix = lua_gettop (L);
+  const int error_object_ix = marpa_lua_gettop (L);
   const char *temp_string;
 
   /* Room for details, code, mnemonic, description,
    * plus separators before and after: 4*3 = 12
    */
-  luaL_checkstack (L, 12, "not enough stack for error_tostring()");
+  marpa_luaL_checkstack (L, 12, "not enough stack for error_tostring()");
 
-  lua_getfield (L, error_object_ix, "string");
+  marpa_lua_getfield (L, error_object_ix, "string");
 
   /* [ ..., error_object, string ] */
 
   if (0) printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
   /* If present, a "string" overrides everything else */
-  if (lua_isstring (L, -1))
+  if (marpa_lua_isstring (L, -1))
     {
-      lua_replace (L, error_object_ix);
+      marpa_lua_replace (L, error_object_ix);
       return;
     }
 
   /* [ ..., error_object, bad-string ] */
-  lua_pop (L, 1);
+  marpa_lua_pop (L, 1);
   /* [ ..., error_object ] */
 
-  lua_getfield (L, error_object_ix, "details");
+  marpa_lua_getfield (L, error_object_ix, "details");
   /* [ ..., error_object, details ] */
-  if (lua_isstring (L, -1))
+  if (marpa_lua_isstring (L, -1))
     {
-      lua_pushstring (L, ": ");
+      marpa_lua_pushstring (L, ": ");
     }
   else
     {
-      lua_pop (L, 1);
+      marpa_lua_pop (L, 1);
     }
 
   /* [ ..., error_object ] */
-  lua_getfield (L, error_object_ix, "code");
+  marpa_lua_getfield (L, error_object_ix, "code");
   /* [ ..., error_object, code ] */
   if (0) printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
-  if (!lua_isnumber (L, -1))
+  if (!marpa_lua_isnumber (L, -1))
     {
-      lua_pop (L, 1);
-      lua_pushstring (L, "[No error code]");
+      marpa_lua_pop (L, 1);
+      marpa_lua_pushstring (L, "[No error code]");
     }
   else
     {
-      error_code = lua_tointeger (L, -1);
+      error_code = marpa_lua_tointeger (L, -1);
       /* Concatenation will eventually convert a numeric
        * code on top of the stack to a string, so we do
        * nothing with it here.
        */
     }
 
-  lua_pushstring (L, " ");	/* Add space separator */
+  marpa_lua_pushstring (L, " ");	/* Add space separator */
 
   temp_string = error_name_by_code (error_code);
   if (temp_string)
     {
-      lua_pushstring (L, temp_string);
+      marpa_lua_pushstring (L, temp_string);
     }
   else
     {
-      lua_pushfstring (L, "Unknown error code (%d)", (int) error_code);
+      marpa_lua_pushfstring (L, "Unknown error code (%d)", (int) error_code);
     }
-  lua_pushstring (L, " ");	/* Add space separator */
+  marpa_lua_pushstring (L, " ");	/* Add space separator */
 
   temp_string = error_description_by_code (error_code);
-  lua_pushstring (L, temp_string ? temp_string : "[no description]");
-  lua_pushstring (L, "\n");	/* Add space separator */
+  marpa_lua_pushstring (L, temp_string ? temp_string : "[no description]");
+  marpa_lua_pushstring (L, "\n");	/* Add space separator */
 
   if (0) printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
-  lua_concat (L, lua_gettop (L) - error_object_ix);
+  marpa_lua_concat (L, marpa_lua_gettop (L) - error_object_ix);
   /* stack is [ ..., error_object, concatenated_result ] */
-  lua_replace (L, error_object_ix);
+  marpa_lua_replace (L, error_object_ix);
   /* [ ..., concatenated_result ] */
 }
   
@@ -654,14 +652,14 @@ static inline int kollos_throw(lua_State* L,
 {
    kollos_error(L, code, details);
    error_tostring(L);
-   return lua_error(L);
+   return marpa_lua_error(L);
 }
 
 /* not safe - intended for internal use */
 static inline int wrap_kollos_throw(lua_State* L)
 {
-   const Marpa_Error_Code code = lua_tointeger(L, 1);
-   const char* details = lua_tostring(L, 2);
+   const Marpa_Error_Code code = marpa_lua_tointeger(L, 1);
+   const char* details = marpa_lua_tostring(L, 2);
   if (0) printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
   if (0) printf ("%s code = %d\n", __PRETTY_FUNCTION__, code);
    return kollos_throw(L, code, details);
@@ -678,28 +676,28 @@ static void luif_err_throw(lua_State *L, int error_code) {
 
 #if 0
     const char *where;
-    luaL_where(L, 1);
-    where = lua_tostring(L, -1);
+    marpa_luaL_where(L, 1);
+    where = marpa_lua_tostring(L, -1);
 #endif
 
     if (error_code < LIBMARPA_MIN_ERROR_CODE || error_code > LIBMARPA_MAX_ERROR_CODE) {
-        luaL_error(L, "Libmarpa returned invalid error code %d", error_code);
+        marpa_luaL_error(L, "Libmarpa returned invalid error code %d", error_code);
     }
-    luaL_error(L, "%s", libmarpa_error_codes[error_code].description );
+    marpa_luaL_error(L, "%s", libmarpa_error_codes[error_code].description );
 }
 
 static void luif_err_throw2(lua_State *L, int error_code, const char *msg) {
 
 #if 0
     const char *where;
-    luaL_where(L, 1);
-    where = lua_tostring(L, -1);
+    marpa_luaL_where(L, 1);
+    where = marpa_lua_tostring(L, -1);
 #endif
 
     if (error_code < 0 || error_code > LIBMARPA_MAX_ERROR_CODE) {
-        luaL_error(L, "%s\n    Libmarpa returned invalid error code %d", msg, error_code);
+        marpa_luaL_error(L, "%s\n    Libmarpa returned invalid error code %d", msg, error_code);
     }
-    luaL_error(L, "%s\n    %s", msg, libmarpa_error_codes[error_code].description);
+    marpa_luaL_error(L, "%s\n    %s", msg, libmarpa_error_codes[error_code].description);
 }
 
 static void check_libmarpa_table(
@@ -707,28 +705,28 @@ static void check_libmarpa_table(
 {
   const char *actual_type;
   /* stack is [ ... ] */
-  if (!lua_istable (L, stack_ix))
+  if (!marpa_lua_istable (L, stack_ix))
     {
-      const char *typename = lua_typename (L, lua_type (L, stack_ix));
-      luaL_error (L, "%s arg #1 type is %s, expected table",
+      const char *typename = marpa_lua_typename (L, marpa_lua_type (L, stack_ix));
+      marpa_luaL_error (L, "%s arg #1 type is %s, expected table",
 		  function_name, typename);
     }
-  lua_getfield (L, stack_ix, "_type");
+  marpa_lua_getfield (L, stack_ix, "_type");
   /* stack is [ ..., field ] */
-  if (!lua_isstring (L, -1))
+  if (!marpa_lua_isstring (L, -1))
     {
-      const char *typename = lua_typename (L, lua_type (L, -1));
-      luaL_error (L, "%s arg #1 field '_type' is %s, expected string",
+      const char *typename = marpa_lua_typename (L, marpa_lua_type (L, -1));
+      marpa_luaL_error (L, "%s arg #1 field '_type' is %s, expected string",
 		  function_name, typename);
     }
-  actual_type = lua_tostring (L, -1);
+  actual_type = marpa_lua_tostring (L, -1);
   if (strcmp (actual_type, expected_type))
     {
-      luaL_error (L, "%s arg #1 table is %s, expected %s",
+      marpa_luaL_error (L, "%s arg #1 table is %s, expected %s",
 		  function_name, actual_type, expected_type);
     }
   /* stack is [ ..., field ] */
-  lua_pop (L, 1);
+  marpa_lua_pop (L, 1);
   /* stack is [ ... ] */
 }
 
@@ -991,7 +989,7 @@ for ix = 1, #c_fn_signatures do
       -- because this code
       -- will be turned off most of the time
       for arg_ix = 1, arg_count do
-          io.write("    luaL_checkint(L, ", (arg_ix+1), ");\n")
+          io.write("    marpa_luaL_checkint(L, ", (arg_ix+1), ");\n")
       end
       io.write("  }\n");
    end -- if (!unsafe)
@@ -1001,21 +999,21 @@ for ix = 1, #c_fn_signatures do
      local arg_name = signature[1 + arg_ix*2]
      local c_type = c_type_of_libmarpa_type(arg_type)
      assert(c_type == "int", ("type " .. arg_type .. " not implemented"))
-     io.write("  ", arg_name, " = lua_tointeger(L, -1);\n")
-     io.write("  lua_pop(L, 1);\n")
+     io.write("  ", arg_name, " = marpa_lua_tointeger(L, -1);\n")
+     io.write("  marpa_lua_pop(L, 1);\n")
    end
 
-   io.write('  lua_getfield (L, -1, "_libmarpa");\n')
+   io.write('  marpa_lua_getfield (L, -1, "_libmarpa");\n')
    -- stack is [ self, self_ud ]
    local cast_to_ptr_to_class_type = "(" ..  libmarpa_class_type[class_letter] .. "*)"
-   io.write("  self = *", cast_to_ptr_to_class_type, "lua_touserdata (L, -1);\n")
-   io.write("  lua_pop(L, 1);\n")
+   io.write("  self = *", cast_to_ptr_to_class_type, "marpa_lua_touserdata (L, -1);\n")
+   io.write("  marpa_lua_pop(L, 1);\n")
    -- stack is [ self ]
 
-   io.write('  lua_getfield (L, -1, "_libmarpa_g");\n')
+   io.write('  marpa_lua_getfield (L, -1, "_libmarpa_g");\n')
    -- stack is [ self, grammar_ud ]
-   io.write("  grammar = *(Marpa_Grammar*)lua_touserdata (L, -1);\n")
-   io.write("  lua_pop(L, 1);\n")
+   io.write("  grammar = *(Marpa_Grammar*)marpa_lua_touserdata (L, -1);\n")
+   io.write("  marpa_lua_pop(L, 1);\n")
    -- stack is [ self ]
 
    -- assumes converting result to int is safe and right thing to do
@@ -1026,19 +1024,19 @@ for ix = 1, #c_fn_signatures do
      io.write("     ,", arg_name, "\n")
    end
    io.write("    );\n")
-   io.write("  if (result == -1) { lua_pushnil(L); return 1; }\n")
+   io.write("  if (result == -1) { marpa_lua_pushnil(L); return 1; }\n")
    io.write("  if (result < -1) {\n")
    io.write("    Marpa_Error_Code marpa_error = marpa_g_error(grammar, NULL);\n")
    io.write("    int throw_flag;\n")
    local wrapper_name_as_c_string = '"' .. wrapper_name .. '()"'
-   io.write('    lua_getfield (L, -1, "throw");\n')
+   io.write('    marpa_lua_getfield (L, -1, "throw");\n')
    -- stack is [ self, throw_flag ]
-   io.write("    throw_flag = lua_toboolean (L, -1);\n")
+   io.write("    throw_flag = marpa_lua_toboolean (L, -1);\n")
    io.write('    if (throw_flag) {\n')
    io.write('        kollos_throw( L, marpa_error, ', wrapper_name_as_c_string, ');\n')
    io.write('    }\n')
    io.write("  }\n")
-   io.write("  lua_pushinteger(L, (lua_Integer)result);\n")
+   io.write("  marpa_lua_pushinteger(L, (lua_Integer)result);\n")
    io.write("  return 1;\n")
    io.write("}\n\n");
 
@@ -1065,15 +1063,15 @@ common_g_error_handler (lua_State * L,
   const char *error_string = NULL;
   const Marpa_Error_Code marpa_error = marpa_g_error (*p_g, &error_string);
   /* Try to avoid any possiblity of stack overflow */
-  lua_getfield (L, grammar_stack_ix, "throw");
+  marpa_lua_getfield (L, grammar_stack_ix, "throw");
   /* [ ..., throw_flag ] */
-  throw_flag = lua_toboolean (L, -1);
+  throw_flag = marpa_lua_toboolean (L, -1);
   if (throw_flag)
     {
       kollos_throw (L, marpa_error, description);
     }
   /* Leave the stack as we found it */
-  lua_pop(L, 1);
+  marpa_lua_pop(L, 1);
 }
 
 /* Handle libmarpa recce errors in the most usual way.
@@ -1089,20 +1087,20 @@ common_r_error_handler (lua_State * L,
   int throw_flag;
   Marpa_Error_Code marpa_error;
   Marpa_Grammar *grammar_ud;
-  lua_getfield (L, recce_stack_ix, "_libmarpa_g");
+  marpa_lua_getfield (L, recce_stack_ix, "_libmarpa_g");
   /* [ ..., grammar_ud ] */
-  grammar_ud = (Marpa_Grammar *) lua_touserdata (L, -1);
-  lua_pop(L, 1);
+  grammar_ud = (Marpa_Grammar *) marpa_lua_touserdata (L, -1);
+  marpa_lua_pop(L, 1);
   marpa_error = marpa_g_error (*grammar_ud, NULL);
-  lua_getfield (L, recce_stack_ix, "throw");
+  marpa_lua_getfield (L, recce_stack_ix, "throw");
   /* [ ..., throw_flag ] */
-  throw_flag = lua_toboolean (L, -1);
+  throw_flag = marpa_lua_toboolean (L, -1);
   if (throw_flag)
     {
       kollos_throw (L, marpa_error, description);
     }
   /* Leave the stack as we found it */
-  lua_pop(L, 1);
+  marpa_lua_pop(L, 1);
 }
 
 /* Handle libmarpa bocage errors in the most usual way.
@@ -1118,14 +1116,14 @@ common_b_error_handler (lua_State * L,
   int throw_flag;
   Marpa_Error_Code marpa_error;
   Marpa_Grammar *grammar_ud;
-  lua_getfield (L, bocage_stack_ix, "_libmarpa_g");
+  marpa_lua_getfield (L, bocage_stack_ix, "_libmarpa_g");
   /* [ ..., grammar_ud ] */
-  grammar_ud = (Marpa_Grammar *) lua_touserdata (L, -1);
-  lua_pop(L, 1);
+  grammar_ud = (Marpa_Grammar *) marpa_lua_touserdata (L, -1);
+  marpa_lua_pop(L, 1);
   marpa_error = marpa_g_error (*grammar_ud, NULL);
-  lua_getfield (L, bocage_stack_ix, "throw");
+  marpa_lua_getfield (L, bocage_stack_ix, "throw");
   /* [ ..., throw_flag ] */
-  throw_flag = lua_toboolean (L, -1);
+  throw_flag = marpa_lua_toboolean (L, -1);
   /* [ ..., throw_flag ] */
   if (throw_flag)
     {
@@ -1133,7 +1131,7 @@ common_b_error_handler (lua_State * L,
     }
   /* [ ..., throw_flag ] */
   /* Leave the stack as we found it */
-  lua_pop(L, 1);
+  marpa_lua_pop(L, 1);
 }
 
 /* Handle libmarpa order errors in the most usual way.
@@ -1149,14 +1147,14 @@ common_o_error_handler (lua_State * L,
   int throw_flag;
   Marpa_Error_Code marpa_error;
   Marpa_Grammar *grammar_ud;
-  lua_getfield (L, order_stack_ix, "_libmarpa_g");
+  marpa_lua_getfield (L, order_stack_ix, "_libmarpa_g");
   /* [ ..., grammar_ud ] */
-  grammar_ud = (Marpa_Grammar *) lua_touserdata (L, -1);
-  lua_pop(L, 1);
+  grammar_ud = (Marpa_Grammar *) marpa_lua_touserdata (L, -1);
+  marpa_lua_pop(L, 1);
   marpa_error = marpa_g_error (*grammar_ud, NULL);
-  lua_getfield (L, order_stack_ix, "throw");
+  marpa_lua_getfield (L, order_stack_ix, "throw");
   /* [ ..., throw_flag ] */
-  throw_flag = lua_toboolean (L, -1);
+  throw_flag = marpa_lua_toboolean (L, -1);
   /* [ ..., throw_flag ] */
   if (throw_flag)
     {
@@ -1164,7 +1162,7 @@ common_o_error_handler (lua_State * L,
     }
   /* [ ..., throw_flag ] */
   /* Leave the stack as we found it */
-  lua_pop(L, 1);
+  marpa_lua_pop(L, 1);
 }
 
 /* Handle libmarpa tree errors in the most usual way.
@@ -1180,14 +1178,14 @@ common_t_error_handler (lua_State * L,
   int throw_flag;
   Marpa_Error_Code marpa_error;
   Marpa_Grammar *grammar_ud;
-  lua_getfield (L, tree_stack_ix, "_libmarpa_g");
+  marpa_lua_getfield (L, tree_stack_ix, "_libmarpa_g");
   /* [ ..., grammar_ud ] */
-  grammar_ud = (Marpa_Grammar *) lua_touserdata (L, -1);
-  lua_pop(L, 1);
+  grammar_ud = (Marpa_Grammar *) marpa_lua_touserdata (L, -1);
+  marpa_lua_pop(L, 1);
   marpa_error = marpa_g_error (*grammar_ud, NULL);
-  lua_getfield (L, tree_stack_ix, "throw");
+  marpa_lua_getfield (L, tree_stack_ix, "throw");
   /* [ ..., throw_flag ] */
-  throw_flag = lua_toboolean (L, -1);
+  throw_flag = marpa_lua_toboolean (L, -1);
   /* [ ..., throw_flag ] */
   if (throw_flag)
     {
@@ -1195,7 +1193,7 @@ common_t_error_handler (lua_State * L,
     }
   /* [ ..., throw_flag ] */
   /* Leave the stack as we found it */
-  lua_pop(L, 1);
+  marpa_lua_pop(L, 1);
 }
 
 /* Handle libmarpa value errors in the most usual way.
@@ -1211,14 +1209,14 @@ common_v_error_handler (lua_State * L,
   int throw_flag;
   Marpa_Error_Code marpa_error;
   Marpa_Grammar *grammar_ud;
-  lua_getfield (L, value_stack_ix, "_libmarpa_g");
+  marpa_lua_getfield (L, value_stack_ix, "_libmarpa_g");
   /* [ ..., grammar_ud ] */
-  grammar_ud = (Marpa_Grammar *) lua_touserdata (L, -1);
-  lua_pop(L, 1);
+  grammar_ud = (Marpa_Grammar *) marpa_lua_touserdata (L, -1);
+  marpa_lua_pop(L, 1);
   marpa_error = marpa_g_error (*grammar_ud, NULL);
-  lua_getfield (L, value_stack_ix, "throw");
+  marpa_lua_getfield (L, value_stack_ix, "throw");
   /* [ ..., throw_flag ] */
-  throw_flag = lua_toboolean (L, -1);
+  throw_flag = marpa_lua_toboolean (L, -1);
   /* [ ..., throw_flag ] */
   if (throw_flag)
     {
@@ -1226,7 +1224,7 @@ common_v_error_handler (lua_State * L,
     }
   /* [ ..., throw_flag ] */
   /* Leave the stack as we found it */
-  lua_pop(L, 1);
+  marpa_lua_pop(L, 1);
 }
 
 static int
@@ -1283,18 +1281,18 @@ wrap_grammar_new (lua_State * L)
     Marpa_Grammar *p_g;
     int result;
     /* [ grammar_table ] */
-    p_g = (Marpa_Grammar *) lua_newuserdata (L, sizeof (Marpa_Grammar));
+    p_g = (Marpa_Grammar *) marpa_lua_newuserdata (L, sizeof (Marpa_Grammar));
     /* [ grammar_table, userdata ] */
-    lua_rawgetp (L, LUA_REGISTRYINDEX, &kollos_g_ud_mt_key);
-    lua_setmetatable (L, -2);
+    marpa_lua_rawgetp (L, LUA_REGISTRYINDEX, &kollos_g_ud_mt_key);
+    marpa_lua_setmetatable (L, -2);
     /* [ grammar_table, userdata ] */
 
     /* dup top of stack */
-    lua_pushvalue (L, -1);
+    marpa_lua_pushvalue (L, -1);
     /* [ grammar_table, userdata, userdata ] */
-    lua_setfield (L, grammar_stack_ix, "_libmarpa");
+    marpa_lua_setfield (L, grammar_stack_ix, "_libmarpa");
     /* [ grammar_table, userdata ] */
-    lua_setfield (L, grammar_stack_ix, "_libmarpa_g");
+    marpa_lua_setfield (L, grammar_stack_ix, "_libmarpa_g");
     /* [ grammar_table ] */
 
     marpa_c_init (&marpa_config);
@@ -1303,14 +1301,14 @@ wrap_grammar_new (lua_State * L)
       {
 	int throw_flag;
 	Marpa_Error_Code marpa_error = marpa_c_error (&marpa_config, NULL);
-	lua_getfield (L, -1, "throw");
-	throw_flag = lua_toboolean (L, -1);
+	marpa_lua_getfield (L, -1, "throw");
+	throw_flag = marpa_lua_toboolean (L, -1);
 	/* [ grammar_table, throw_flag ] */
 	if (throw_flag)
 	  {
 	    kollos_throw (L, marpa_error, "marpa_g_new()");
 	  }
-	lua_pushnil (L);
+	marpa_lua_pushnil (L);
 	return 1;
       }
     result = marpa_g_force_valued (*p_g);
@@ -1318,7 +1316,7 @@ wrap_grammar_new (lua_State * L)
       {
 	common_g_error_handler (L, p_g, grammar_stack_ix,
 				"marpa_g_force_valued()");
-	lua_pushnil (L);
+	marpa_lua_pushnil (L);
 	return 1;
       }
     if (0)
@@ -1337,12 +1335,12 @@ static int wrap_grammar_error(lua_State *L)
   Marpa_Error_Code marpa_error;
   const char *error_string = NULL;
 
-  lua_getfield (L, grammar_stack_ix, "_libmarpa");
+  marpa_lua_getfield (L, grammar_stack_ix, "_libmarpa");
   /* [ grammar_object, grammar_ud ] */
-  p_g = (Marpa_Grammar *) lua_touserdata (L, -1);
+  p_g = (Marpa_Grammar *) marpa_lua_touserdata (L, -1);
   marpa_error = marpa_g_error(*p_g, &error_string);
-  lua_pushinteger(L, (lua_Integer)marpa_error);
-  lua_pushstring(L, error_string);
+  marpa_lua_pushinteger(L, (lua_Integer)marpa_error);
+  marpa_lua_pushstring(L, error_string);
   /* [ grammar_object, grammar_ud, error_code, error_string ] */
   return 2;
 }
@@ -1357,9 +1355,9 @@ static int wrap_grammar_events(lua_State *L)
   Marpa_Grammar *p_g;
   int event_count;
 
-  lua_getfield (L, grammar_stack_ix, "_libmarpa");
+  marpa_lua_getfield (L, grammar_stack_ix, "_libmarpa");
   /* [ grammar_object, grammar_ud ] */
-  p_g = (Marpa_Grammar *) lua_touserdata (L, -1);
+  p_g = (Marpa_Grammar *) marpa_lua_touserdata (L, -1);
   event_count = marpa_g_event_count (*p_g);
   if (event_count < 0)
     {
@@ -1367,12 +1365,12 @@ static int wrap_grammar_events(lua_State *L)
 			      "marpa_g_event_count()");
       return 0;
     }
-  lua_pop (L, 1);
+  marpa_lua_pop (L, 1);
   /* [ grammar_object ] */
-  lua_createtable (L, event_count, 0);
+  marpa_lua_createtable (L, event_count, 0);
   /* [ grammar_object, result_table ] */
   {
-    const int result_table_ix = lua_gettop (L);
+    const int result_table_ix = marpa_lua_gettop (L);
     int event_ix;
     for (event_ix = 0; event_ix < event_count; event_ix++)
       {
@@ -1386,15 +1384,15 @@ static int wrap_grammar_events(lua_State *L)
 				    "marpa_g_event()");
 	    return 0;
 	  }
-	lua_pushinteger (L, event_ix*2 + 1);
-	lua_pushinteger (L, event_type);
+	marpa_lua_pushinteger (L, event_ix*2 + 1);
+	marpa_lua_pushinteger (L, event_type);
 	/* [ grammar_object, result_table, event_ix*2+1, event_type ] */
-	lua_settable (L, result_table_ix);
+	marpa_lua_settable (L, result_table_ix);
 	/* [ grammar_object, result_table ] */
-	lua_pushinteger (L, event_ix*2 + 2);
-	lua_pushinteger (L, marpa_g_event_value (&event));
+	marpa_lua_pushinteger (L, event_ix*2 + 2);
+	marpa_lua_pushinteger (L, marpa_g_event_value (&event));
 	/* [ grammar_object, result_table, event_ix*2+2, event_value ] */
-	lua_settable (L, result_table_ix);
+	marpa_lua_settable (L, result_table_ix);
 	/* [ grammar_object, result_table ] */
       }
   }
@@ -1413,11 +1411,11 @@ static int wrap_grammar_event(lua_State *L)
   Marpa_Grammar *p_g;
   Marpa_Event_Type event_type;
   Marpa_Event event;
-  const int event_ix = (Marpa_Symbol_ID)lua_tointeger(L, event_ix_stack_ix)-1;
+  const int event_ix = (Marpa_Symbol_ID)marpa_lua_tointeger(L, event_ix_stack_ix)-1;
 
-  lua_getfield (L, grammar_stack_ix, "_libmarpa");
+  marpa_lua_getfield (L, grammar_stack_ix, "_libmarpa");
   /* [ grammar_object, grammar_ud ] */
-  p_g = (Marpa_Grammar *) lua_touserdata (L, -1);
+  p_g = (Marpa_Grammar *) marpa_lua_touserdata (L, -1);
   /* [ grammar_object, grammar_ud ] */
   event_type = marpa_g_event (*p_g, &event, event_ix);
   if (event_type <= -2)
@@ -1425,8 +1423,8 @@ static int wrap_grammar_event(lua_State *L)
       common_g_error_handler (L, p_g, grammar_stack_ix, "marpa_g_event()");
       return 0;
     }
-  lua_pushinteger (L, event_type);
-  lua_pushinteger (L, marpa_g_event_value (&event));
+  marpa_lua_pushinteger (L, event_type);
+  marpa_lua_pushinteger (L, marpa_g_event_value (&event));
   /* [ grammar_object, grammar_ud, event_type, event_value ] */
   return 2;
 }
@@ -1458,27 +1456,27 @@ static int wrap_grammar_rule_new(lua_State *L)
                               "grammar");
       }
 
-    lhs = (Marpa_Symbol_ID)lua_tointeger(L, 2);
+    lhs = (Marpa_Symbol_ID)marpa_lua_tointeger(L, 2);
     /* Unsafe, no arg count checking */
-    rhs_length = lua_isnumber(L, 4) ? 2 : 1;
+    rhs_length = marpa_lua_isnumber(L, 4) ? 2 : 1;
     {
       int rhs_ix;
       for (rhs_ix = 0; rhs_ix < rhs_length; rhs_ix++)
         {
-          rhs[rhs_ix] = (Marpa_Symbol_ID) lua_tointeger (L, rhs_ix + 3);
+          rhs[rhs_ix] = (Marpa_Symbol_ID) marpa_lua_tointeger (L, rhs_ix + 3);
         }
     }
-    lua_pop(L, lua_gettop(L)-1);
+    marpa_lua_pop(L, marpa_lua_gettop(L)-1);
     /* [ grammar_object ] */
 
-    lua_getfield (L, -1, "_libmarpa");
+    marpa_lua_getfield (L, -1, "_libmarpa");
     /* [ grammar_object, grammar_ud ] */
-    p_g = (Marpa_Grammar *) lua_touserdata (L, -1);
+    p_g = (Marpa_Grammar *) marpa_lua_touserdata (L, -1);
 
     result = (Marpa_Rule_ID)marpa_g_rule_new(*p_g, lhs, rhs, rhs_length);
     if (result <= -1) common_g_error_handler (L, p_g, grammar_stack_ix,
 			    "marpa_g_rule_new()");
-    lua_pushinteger(L, (lua_Integer)result);
+    marpa_lua_pushinteger(L, (lua_Integer)result);
     return 1;
 }
 
@@ -1510,33 +1508,33 @@ wrap_recce_new (lua_State * L)
 
     /* [ recce_table, grammar_table ] */
     recce_ud =
-      (Marpa_Recognizer *) lua_newuserdata (L, sizeof (Marpa_Recognizer));
+      (Marpa_Recognizer *) marpa_lua_newuserdata (L, sizeof (Marpa_Recognizer));
     /* [ recce_table, , grammar_table, recce_ud ] */
-    lua_rawgetp (L, LUA_REGISTRYINDEX, &kollos_r_ud_mt_key);
+    marpa_lua_rawgetp (L, LUA_REGISTRYINDEX, &kollos_r_ud_mt_key);
     /* [ recce_table, grammar_table, recce_ud, recce_ud_mt ] */
-    lua_setmetatable (L, -2);
+    marpa_lua_setmetatable (L, -2);
     /* [ recce_table, grammar_table, recce_ud ] */
 
-    lua_setfield (L, recce_stack_ix, "_libmarpa");
+    marpa_lua_setfield (L, recce_stack_ix, "_libmarpa");
     /* [ recce_table, grammar_table ] */
-    lua_getfield (L, grammar_stack_ix, "_libmarpa_g");
+    marpa_lua_getfield (L, grammar_stack_ix, "_libmarpa_g");
     /* [ recce_table, grammar_table, g_ud ] */
-    grammar_ud = (Marpa_Grammar *) lua_touserdata (L, -1);
-    lua_setfield (L, recce_stack_ix, "_libmarpa_g");
+    grammar_ud = (Marpa_Grammar *) marpa_lua_touserdata (L, -1);
+    marpa_lua_setfield (L, recce_stack_ix, "_libmarpa_g");
     /* [ recce_table, grammar_table ] */
 
     *recce_ud = marpa_r_new (*grammar_ud);
     if (!*recce_ud)
       {
 	common_r_error_handler (L, recce_stack_ix, "marpa_r_new()");
-        lua_pushnil (L);
+        marpa_lua_pushnil (L);
         return 1;
       }
   }
   if (0)
     printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
   /* [ recce_table, grammar_table ] */
-  lua_pop (L, 1);
+  marpa_lua_pop (L, 1);
   /* [ recce_table ] */
   return 1;
 }
@@ -1551,23 +1549,23 @@ static int wrap_progress_item(lua_State *L)
   int position;
   Marpa_Rule_ID rule_id;
 
-  lua_getfield (L, recce_stack_ix, "_libmarpa");
+  marpa_lua_getfield (L, recce_stack_ix, "_libmarpa");
   /* [ recce_object, recce_ud ] */
-  p_r = (Marpa_Recce *) lua_touserdata (L, -1);
+  p_r = (Marpa_Recce *) marpa_lua_touserdata (L, -1);
   rule_id = marpa_r_progress_item (*p_r, &position, &origin);
   if (rule_id < -1)
     {
       common_r_error_handler (L, recce_stack_ix, "marpa_r_progress_item()");
-      lua_pushinteger (L, (lua_Integer) rule_id);
+      marpa_lua_pushinteger (L, (lua_Integer) rule_id);
       return 1;
     }
   if (rule_id == -1)
     {
       return 0;
     }
-  lua_pushinteger (L, (lua_Integer) rule_id);
-  lua_pushinteger (L, (lua_Integer) position);
-  lua_pushinteger (L, (lua_Integer) origin);
+  marpa_lua_pushinteger (L, (lua_Integer) rule_id);
+  marpa_lua_pushinteger (L, (lua_Integer) position);
+  marpa_lua_pushinteger (L, (lua_Integer) origin);
   /* [ recce_object, recce_ud, 
    *     rule_id, position, origin ]
    */
@@ -1598,17 +1596,17 @@ wrap_bocage_new (lua_State * L)
     {
       check_libmarpa_table (L, "wrap_bocage_new()", bocage_stack_ix, "bocage");
       check_libmarpa_table (L, "wrap_bocage_new()", recce_stack_ix, "recce");
-      luaL_checktype(L, symbol_stack_ix, LUA_TNIL);
-      luaL_checktype(L, start_stack_ix, LUA_TNIL);
+      marpa_luaL_checktype(L, symbol_stack_ix, LUA_TNIL);
+      marpa_luaL_checktype(L, start_stack_ix, LUA_TNIL);
     }
 
-  if (lua_type(L, end_stack_ix) == LUA_TNIL) {
+  if (marpa_lua_type(L, end_stack_ix) == LUA_TNIL) {
       end_earley_set_is_nil = 1;
   } else {
-      end_earley_set = luaL_checkint(L, end_stack_ix);
+      end_earley_set = marpa_luaL_checkint(L, end_stack_ix);
   }
   /* Make some stack space */
-  lua_pop(L, 3);
+  marpa_lua_pop(L, 3);
 
   /* [ bocage_table, recce_table ] */
   {
@@ -1619,22 +1617,22 @@ wrap_bocage_new (lua_State * L)
 
     /* [ bocage_table, recce_table ] */
     Marpa_Bocage* bocage_ud =
-      (Marpa_Bocage *) lua_newuserdata (L, sizeof (Marpa_Bocage));
+      (Marpa_Bocage *) marpa_lua_newuserdata (L, sizeof (Marpa_Bocage));
     /* [ bocage_table, recce_table, bocage_ud ] */
-    lua_rawgetp (L, LUA_REGISTRYINDEX, &kollos_b_ud_mt_key);
+    marpa_lua_rawgetp (L, LUA_REGISTRYINDEX, &kollos_b_ud_mt_key);
     /* [ bocage_table, recce_table, bocage_ud, bocage_ud_mt ] */
-    lua_setmetatable (L, -2);
+    marpa_lua_setmetatable (L, -2);
     /* [ bocage_table, recce_table, bocage_ud ] */
 
-    lua_setfield (L, bocage_stack_ix, "_libmarpa");
+    marpa_lua_setfield (L, bocage_stack_ix, "_libmarpa");
     /* [ bocage_table, recce_table ] */
-    lua_getfield (L, recce_stack_ix, "_libmarpa_g");
+    marpa_lua_getfield (L, recce_stack_ix, "_libmarpa_g");
     /* [ recce_table, recce_table, g_ud ] */
-    lua_setfield (L, bocage_stack_ix, "_libmarpa_g");
+    marpa_lua_setfield (L, bocage_stack_ix, "_libmarpa_g");
     /* [ bocage_table, recce_table ] */
-    lua_getfield (L, recce_stack_ix, "_libmarpa");
+    marpa_lua_getfield (L, recce_stack_ix, "_libmarpa");
     /* [ recce_table, recce_table, recce_ud ] */
-    recce_ud = (Marpa_Recognizer *) lua_touserdata (L, -1);
+    recce_ud = (Marpa_Recognizer *) marpa_lua_touserdata (L, -1);
     /* [ bocage_table, recce_table, recce_ud ] */
 
     if (end_earley_set_is_nil) {
@@ -1644,7 +1642,7 @@ wrap_bocage_new (lua_State * L)
        if (end_earley_set < 0) {
          common_b_error_handler (L, bocage_stack_ix,
              "bocage_new(): end earley set arg is negative");
-         lua_pushnil (L);
+         marpa_lua_pushnil (L);
          return 1;
        }
     }
@@ -1653,14 +1651,14 @@ wrap_bocage_new (lua_State * L)
     if (!*bocage_ud)
       {
 	common_b_error_handler (L, bocage_stack_ix, "marpa_b_new()");
-        lua_pushnil (L);
+        marpa_lua_pushnil (L);
         return 1;
       }
   }
   if (0)
     printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
   /* [ bocage_table, recce_table, recce_ud ] */
-  lua_pop (L, 2);
+  marpa_lua_pop (L, 2);
   /* [ bocage_table ] */
   return 1;
 }
@@ -1692,36 +1690,36 @@ wrap_order_new (lua_State * L)
 
     /* [ order_table, bocage_table ] */
     Marpa_Order* order_ud =
-      (Marpa_Order *) lua_newuserdata (L, sizeof (Marpa_Order));
+      (Marpa_Order *) marpa_lua_newuserdata (L, sizeof (Marpa_Order));
     /* [ order_table, bocage_table, order_ud ] */
-    lua_rawgetp (L, LUA_REGISTRYINDEX, &kollos_o_ud_mt_key);
+    marpa_lua_rawgetp (L, LUA_REGISTRYINDEX, &kollos_o_ud_mt_key);
     /* [ order_table, bocage_table, order_ud, order_ud_mt ] */
-    lua_setmetatable (L, -2);
+    marpa_lua_setmetatable (L, -2);
     /* [ order_table, bocage_table, order_ud ] */
 
-    lua_setfield (L, order_stack_ix, "_libmarpa");
+    marpa_lua_setfield (L, order_stack_ix, "_libmarpa");
     /* [ order_table, bocage_table ] */
-    lua_getfield (L, bocage_stack_ix, "_libmarpa_g");
+    marpa_lua_getfield (L, bocage_stack_ix, "_libmarpa_g");
     /* [ order_table, bocage_table, g_ud ] */
-    lua_setfield (L, order_stack_ix, "_libmarpa_g");
+    marpa_lua_setfield (L, order_stack_ix, "_libmarpa_g");
     /* [ order_table, bocage_table ] */
-    lua_getfield (L, bocage_stack_ix, "_libmarpa");
+    marpa_lua_getfield (L, bocage_stack_ix, "_libmarpa");
     /* [ order_table, bocage_table, bocage_ud ] */
-    bocage_ud = (Marpa_Bocage *) lua_touserdata (L, -1);
+    bocage_ud = (Marpa_Bocage *) marpa_lua_touserdata (L, -1);
     /* [ order_table, bocage_table, bocage_ud ] */
 
     *order_ud = marpa_o_new (*bocage_ud);
     if (!*order_ud)
       {
 	common_o_error_handler (L, order_stack_ix, "marpa_o_new()");
-        lua_pushnil (L);
+        marpa_lua_pushnil (L);
         return 1;
       }
   }
   if (0)
     printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
   /* [ order_table, bocage_table, bocage_ud ] */
-  lua_pop (L, 2);
+  marpa_lua_pop (L, 2);
   /* [ order_table ] */
   return 1;
 }
@@ -1756,36 +1754,36 @@ wrap_tree_new (lua_State * L)
 
     /* [ tree_table, order_table ] */
     Marpa_Tree* tree_ud =
-      (Marpa_Tree *) lua_newuserdata (L, sizeof (Marpa_Tree));
+      (Marpa_Tree *) marpa_lua_newuserdata (L, sizeof (Marpa_Tree));
     /* [ tree_table, order_table, tree_ud ] */
-    lua_rawgetp (L, LUA_REGISTRYINDEX, &kollos_t_ud_mt_key);
+    marpa_lua_rawgetp (L, LUA_REGISTRYINDEX, &kollos_t_ud_mt_key);
     /* [ tree_table, order_table, tree_ud, tree_ud_mt ] */
-    lua_setmetatable (L, -2);
+    marpa_lua_setmetatable (L, -2);
     /* [ tree_table, order_table, tree_ud ] */
 
-    lua_setfield (L, tree_stack_ix, "_libmarpa");
+    marpa_lua_setfield (L, tree_stack_ix, "_libmarpa");
     /* [ tree_table, order_table ] */
-    lua_getfield (L, order_stack_ix, "_libmarpa_g");
+    marpa_lua_getfield (L, order_stack_ix, "_libmarpa_g");
     /* [ tree_table, order_table, g_ud ] */
-    lua_setfield (L, tree_stack_ix, "_libmarpa_g");
+    marpa_lua_setfield (L, tree_stack_ix, "_libmarpa_g");
     /* [ tree_table, order_table ] */
-    lua_getfield (L, order_stack_ix, "_libmarpa");
+    marpa_lua_getfield (L, order_stack_ix, "_libmarpa");
     /* [ tree_table, order_table, order_ud ] */
-    order_ud = (Marpa_Order *) lua_touserdata (L, -1);
+    order_ud = (Marpa_Order *) marpa_lua_touserdata (L, -1);
     /* [ tree_table, order_table, order_ud ] */
 
     *tree_ud = marpa_t_new (*order_ud);
     if (!*tree_ud)
       {
 	common_t_error_handler (L, tree_stack_ix, "marpa_t_new()");
-        lua_pushnil (L);
+        marpa_lua_pushnil (L);
         return 1;
       }
   }
   if (0)
     printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
   /* [ tree_table, order_table, order_ud ] */
-  lua_pop (L, 2);
+  marpa_lua_pop (L, 2);
   /* [ tree_table ] */
   return 1;
 }
@@ -1820,36 +1818,36 @@ wrap_value_new (lua_State * L)
 
     /* [ value_table, tree_table ] */
     Marpa_Value* value_ud =
-      (Marpa_Value *) lua_newuserdata (L, sizeof (Marpa_Value));
+      (Marpa_Value *) marpa_lua_newuserdata (L, sizeof (Marpa_Value));
     /* [ value_table, tree_table, value_ud ] */
-    lua_rawgetp (L, LUA_REGISTRYINDEX, &kollos_v_ud_mt_key);
+    marpa_lua_rawgetp (L, LUA_REGISTRYINDEX, &kollos_v_ud_mt_key);
     /* [ value_table, tree_table, value_ud, value_ud_mt ] */
-    lua_setmetatable (L, -2);
+    marpa_lua_setmetatable (L, -2);
     /* [ value_table, tree_table, value_ud ] */
 
-    lua_setfield (L, value_stack_ix, "_libmarpa");
+    marpa_lua_setfield (L, value_stack_ix, "_libmarpa");
     /* [ value_table, tree_table ] */
-    lua_getfield (L, tree_stack_ix, "_libmarpa_g");
+    marpa_lua_getfield (L, tree_stack_ix, "_libmarpa_g");
     /* [ value_table, tree_table, g_ud ] */
-    lua_setfield (L, value_stack_ix, "_libmarpa_g");
+    marpa_lua_setfield (L, value_stack_ix, "_libmarpa_g");
     /* [ value_table, tree_table ] */
-    lua_getfield (L, tree_stack_ix, "_libmarpa");
+    marpa_lua_getfield (L, tree_stack_ix, "_libmarpa");
     /* [ value_table, tree_table, tree_ud ] */
-    tree_ud = (Marpa_Tree *) lua_touserdata (L, -1);
+    tree_ud = (Marpa_Tree *) marpa_lua_touserdata (L, -1);
     /* [ value_table, tree_table, tree_ud ] */
 
     *value_ud = marpa_v_new (*tree_ud);
     if (!*value_ud)
       {
 	common_v_error_handler (L, value_stack_ix, "marpa_v_new()");
-        lua_pushnil (L);
+        marpa_lua_pushnil (L);
         return 1;
       }
   }
   if (0)
     printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
   /* [ value_table, tree_table, tree_ud ] */
-  lua_pop (L, 2);
+  marpa_lua_pop (L, 2);
   /* [ value_table ] */
   return 1;
 }
@@ -1866,7 +1864,7 @@ io.write[=[
 static int l_grammar_ud_mt_gc(lua_State *L) {
     Marpa_Grammar *p_g;
     if (0) printf("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
-    p_g = (Marpa_Grammar *) lua_touserdata (L, 1);
+    p_g = (Marpa_Grammar *) marpa_lua_touserdata (L, 1);
     if (*p_g) marpa_g_unref(*p_g);
    return 0;
 }
@@ -1874,7 +1872,7 @@ static int l_grammar_ud_mt_gc(lua_State *L) {
 static int l_recce_ud_mt_gc(lua_State *L) {
     Marpa_Recognizer *p_recce;
     if (0) printf("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
-    p_recce = (Marpa_Recognizer *) lua_touserdata (L, 1);
+    p_recce = (Marpa_Recognizer *) marpa_lua_touserdata (L, 1);
     if (*p_recce) marpa_r_unref(*p_recce);
    return 0;
 }
@@ -1882,7 +1880,7 @@ static int l_recce_ud_mt_gc(lua_State *L) {
 static int l_bocage_ud_mt_gc(lua_State *L) {
     Marpa_Bocage *p_bocage;
     if (0) printf("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
-    p_bocage = (Marpa_Bocage *) lua_touserdata (L, 1);
+    p_bocage = (Marpa_Bocage *) marpa_lua_touserdata (L, 1);
     if (*p_bocage) marpa_b_unref(*p_bocage);
    return 0;
 }
@@ -1890,7 +1888,7 @@ static int l_bocage_ud_mt_gc(lua_State *L) {
 static int l_order_ud_mt_gc(lua_State *L) {
     Marpa_Order *p_order;
     if (0) printf("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
-    p_order = (Marpa_Order *) lua_touserdata (L, 1);
+    p_order = (Marpa_Order *) marpa_lua_touserdata (L, 1);
     if (*p_order) marpa_o_unref(*p_order);
    return 0;
 }
@@ -1898,7 +1896,7 @@ static int l_order_ud_mt_gc(lua_State *L) {
 static int l_tree_ud_mt_gc(lua_State *L) {
     Marpa_Tree *p_tree;
     if (0) printf("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
-    p_tree = (Marpa_Tree *) lua_touserdata (L, 1);
+    p_tree = (Marpa_Tree *) marpa_lua_touserdata (L, 1);
     if (*p_tree) marpa_t_unref(*p_tree);
    return 0;
 }
@@ -1906,7 +1904,7 @@ static int l_tree_ud_mt_gc(lua_State *L) {
 static int l_value_ud_mt_gc(lua_State *L) {
     Marpa_Value *p_value;
     if (0) printf("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
-    p_value = (Marpa_Value *) lua_touserdata (L, 1);
+    p_value = (Marpa_Value *) marpa_lua_touserdata (L, 1);
     if (*p_value) marpa_v_unref(*p_value);
    return 0;
 }
@@ -1915,150 +1913,150 @@ LUALIB_API int luaopen_kollos_c(lua_State *L);
 LUALIB_API int luaopen_kollos_c(lua_State *L)
 {
     /* Create the main kollos object */
-    const int kollos_table_stack_ix = lua_gettop(L) + 1;
-    lua_newtable(L);
+    const int kollos_table_stack_ix = marpa_lua_gettop(L) + 1;
+    marpa_lua_newtable(L);
 
     /* Set up Kollos error handling metatable.
        The metatable starts out empty.
     */
-    lua_newtable(L);
+    marpa_lua_newtable(L);
     /* [ kollos, error_mt ] */
-    lua_rawsetp(L, LUA_REGISTRYINDEX, &kollos_error_mt_key);
+    marpa_lua_rawsetp(L, LUA_REGISTRYINDEX, &kollos_error_mt_key);
     /* [ kollos ] */
 
     /* Set up Kollos grammar userdata metatable */
-    lua_newtable(L);
+    marpa_lua_newtable(L);
     /* [ kollos, mt_ud_g ] */
-    lua_pushcfunction(L, l_grammar_ud_mt_gc);
+    marpa_lua_pushcfunction(L, l_grammar_ud_mt_gc);
     /* [ kollos, mt_g_ud, gc_function ] */
-    lua_setfield(L, -2, "__gc");
+    marpa_lua_setfield(L, -2, "__gc");
     /* [ kollos, mt_g_ud ] */
-    lua_rawsetp(L, LUA_REGISTRYINDEX, &kollos_g_ud_mt_key);
+    marpa_lua_rawsetp(L, LUA_REGISTRYINDEX, &kollos_g_ud_mt_key);
     /* [ kollos ] */
 
     /* Set up Kollos recce userdata metatable */
-    lua_newtable(L);
+    marpa_lua_newtable(L);
     /* [ kollos, mt_ud_r ] */
-    lua_pushcfunction(L, l_recce_ud_mt_gc);
+    marpa_lua_pushcfunction(L, l_recce_ud_mt_gc);
     /* [ kollos, mt_r_ud, gc_function ] */
-    lua_setfield(L, -2, "__gc");
+    marpa_lua_setfield(L, -2, "__gc");
     /* [ kollos, mt_r_ud ] */
-    lua_rawsetp(L, LUA_REGISTRYINDEX, &kollos_r_ud_mt_key);
+    marpa_lua_rawsetp(L, LUA_REGISTRYINDEX, &kollos_r_ud_mt_key);
     /* [ kollos ] */
 
     /* Set up Kollos bocage userdata metatable */
-    lua_newtable(L);
+    marpa_lua_newtable(L);
     /* [ kollos, mt_ud_bocage ] */
-    lua_pushcfunction(L, l_bocage_ud_mt_gc);
+    marpa_lua_pushcfunction(L, l_bocage_ud_mt_gc);
     /* [ kollos, mt_b_ud, gc_function ] */
-    lua_setfield(L, -2, "__gc");
+    marpa_lua_setfield(L, -2, "__gc");
     /* [ kollos, mt_b_ud ] */
-    lua_rawsetp(L, LUA_REGISTRYINDEX, &kollos_b_ud_mt_key);
+    marpa_lua_rawsetp(L, LUA_REGISTRYINDEX, &kollos_b_ud_mt_key);
     /* [ kollos ] */
 
     /* Set up Kollos order userdata metatable */
-    lua_newtable(L);
+    marpa_lua_newtable(L);
     /* [ kollos, mt_ud_order ] */
-    lua_pushcfunction(L, l_order_ud_mt_gc);
+    marpa_lua_pushcfunction(L, l_order_ud_mt_gc);
     /* [ kollos, mt_o_ud, gc_function ] */
-    lua_setfield(L, -2, "__gc");
+    marpa_lua_setfield(L, -2, "__gc");
     /* [ kollos, mt_o_ud ] */
-    lua_rawsetp(L, LUA_REGISTRYINDEX, &kollos_o_ud_mt_key);
+    marpa_lua_rawsetp(L, LUA_REGISTRYINDEX, &kollos_o_ud_mt_key);
     /* [ kollos ] */
 
     /* Set up Kollos tree userdata metatable */
-    lua_newtable(L);
+    marpa_lua_newtable(L);
     /* [ kollos, mt_ud_tree ] */
-    lua_pushcfunction(L, l_tree_ud_mt_gc);
+    marpa_lua_pushcfunction(L, l_tree_ud_mt_gc);
     /* [ kollos, mt_t_ud, gc_function ] */
-    lua_setfield(L, -2, "__gc");
+    marpa_lua_setfield(L, -2, "__gc");
     /* [ kollos, mt_t_ud ] */
-    lua_rawsetp(L, LUA_REGISTRYINDEX, &kollos_t_ud_mt_key);
+    marpa_lua_rawsetp(L, LUA_REGISTRYINDEX, &kollos_t_ud_mt_key);
     /* [ kollos ] */
 
     /* Set up Kollos value userdata metatable */
-    lua_newtable(L);
+    marpa_lua_newtable(L);
     /* [ kollos, mt_ud_value ] */
-    lua_pushcfunction(L, l_value_ud_mt_gc);
+    marpa_lua_pushcfunction(L, l_value_ud_mt_gc);
     /* [ kollos, mt_v_ud, gc_function ] */
-    lua_setfield(L, -2, "__gc");
+    marpa_lua_setfield(L, -2, "__gc");
     /* [ kollos, mt_v_ud ] */
-    lua_rawsetp(L, LUA_REGISTRYINDEX, &kollos_v_ud_mt_key);
+    marpa_lua_rawsetp(L, LUA_REGISTRYINDEX, &kollos_v_ud_mt_key);
     /* [ kollos ] */
 
     /* In alphabetical order by field name */
 
-    lua_pushcfunction(L, l_error_description_by_code);
+    marpa_lua_pushcfunction(L, l_error_description_by_code);
     /* [ kollos, function ] */
-    lua_setfield(L, kollos_table_stack_ix, "error_description");
+    marpa_lua_setfield(L, kollos_table_stack_ix, "error_description");
     /* [ kollos ] */
 
-    lua_pushcfunction(L, l_error_name_by_code);
-    lua_setfield(L, kollos_table_stack_ix, "error_name");
+    marpa_lua_pushcfunction(L, l_error_name_by_code);
+    marpa_lua_setfield(L, kollos_table_stack_ix, "error_name");
 
-    lua_pushcfunction(L, l_error_new);
-    lua_setfield(L, kollos_table_stack_ix, "error_new");
+    marpa_lua_pushcfunction(L, l_error_new);
+    marpa_lua_setfield(L, kollos_table_stack_ix, "error_new");
 
-    lua_pushcfunction(L, wrap_kollos_throw);
-    lua_setfield(L, kollos_table_stack_ix, "error_throw");
+    marpa_lua_pushcfunction(L, wrap_kollos_throw);
+    marpa_lua_setfield(L, kollos_table_stack_ix, "error_throw");
 
-    lua_pushcfunction(L, l_event_name_by_code);
-    lua_setfield(L, kollos_table_stack_ix, "event_name");
+    marpa_lua_pushcfunction(L, l_event_name_by_code);
+    marpa_lua_setfield(L, kollos_table_stack_ix, "event_name");
 
-    lua_pushcfunction(L, l_event_description_by_code);
-    lua_setfield(L, kollos_table_stack_ix, "event_description");
+    marpa_lua_pushcfunction(L, l_event_description_by_code);
+    marpa_lua_setfield(L, kollos_table_stack_ix, "event_description");
 
-    lua_pushcfunction(L, wrap_grammar_error);
-    lua_setfield(L, kollos_table_stack_ix, "grammar_error");
+    marpa_lua_pushcfunction(L, wrap_grammar_error);
+    marpa_lua_setfield(L, kollos_table_stack_ix, "grammar_error");
 
-    lua_pushcfunction(L, wrap_grammar_event);
-    lua_setfield(L, kollos_table_stack_ix, "grammar_event");
+    marpa_lua_pushcfunction(L, wrap_grammar_event);
+    marpa_lua_setfield(L, kollos_table_stack_ix, "grammar_event");
 
-    lua_pushcfunction(L, wrap_grammar_events);
-    lua_setfield(L, kollos_table_stack_ix, "grammar_events");
+    marpa_lua_pushcfunction(L, wrap_grammar_events);
+    marpa_lua_setfield(L, kollos_table_stack_ix, "grammar_events");
 
-    lua_pushcfunction(L, wrap_grammar_new);
-    lua_setfield(L, kollos_table_stack_ix, "grammar_new");
+    marpa_lua_pushcfunction(L, wrap_grammar_new);
+    marpa_lua_setfield(L, kollos_table_stack_ix, "grammar_new");
 
-    lua_pushcfunction(L, wrap_grammar_rule_new);
-    lua_setfield(L, kollos_table_stack_ix, "grammar_rule_new");
+    marpa_lua_pushcfunction(L, wrap_grammar_rule_new);
+    marpa_lua_setfield(L, kollos_table_stack_ix, "grammar_rule_new");
 
-    lua_pushcfunction(L, wrap_recce_new);
-    lua_setfield(L, kollos_table_stack_ix, "recce_new");
+    marpa_lua_pushcfunction(L, wrap_recce_new);
+    marpa_lua_setfield(L, kollos_table_stack_ix, "recce_new");
 
-    lua_pushcfunction(L, wrap_progress_item);
-    lua_setfield(L, kollos_table_stack_ix, "recce_progress_item");
+    marpa_lua_pushcfunction(L, wrap_progress_item);
+    marpa_lua_setfield(L, kollos_table_stack_ix, "recce_progress_item");
 
-    lua_pushcfunction(L, wrap_bocage_new);
-    lua_setfield(L, kollos_table_stack_ix, "bocage_new");
+    marpa_lua_pushcfunction(L, wrap_bocage_new);
+    marpa_lua_setfield(L, kollos_table_stack_ix, "bocage_new");
 
-    lua_pushcfunction(L, wrap_order_new);
-    lua_setfield(L, kollos_table_stack_ix, "order_new");
+    marpa_lua_pushcfunction(L, wrap_order_new);
+    marpa_lua_setfield(L, kollos_table_stack_ix, "order_new");
 
-    lua_pushcfunction(L, wrap_tree_new);
-    lua_setfield(L, kollos_table_stack_ix, "tree_new");
+    marpa_lua_pushcfunction(L, wrap_tree_new);
+    marpa_lua_setfield(L, kollos_table_stack_ix, "tree_new");
 
-    lua_pushcfunction(L, wrap_value_new);
-    lua_setfield(L, kollos_table_stack_ix, "value_new");
+    marpa_lua_pushcfunction(L, wrap_value_new);
+    marpa_lua_setfield(L, kollos_table_stack_ix, "value_new");
 
-    lua_newtable (L);
+    marpa_lua_newtable (L);
     /* [ kollos, error_code_table ] */
     {
-      const int name_table_stack_ix = lua_gettop (L);
+      const int name_table_stack_ix = marpa_lua_gettop (L);
       int error_code;
       for (error_code = LIBMARPA_MIN_ERROR_CODE;
            error_code <= LIBMARPA_MAX_ERROR_CODE; error_code++)
         {
-          lua_pushinteger (L, (lua_Integer) error_code);
-          lua_setfield (L, name_table_stack_ix,
+          marpa_lua_pushinteger (L, (lua_Integer) error_code);
+          marpa_lua_setfield (L, name_table_stack_ix,
                         libmarpa_error_codes[error_code -
                                              LIBMARPA_MIN_ERROR_CODE].mnemonic);
         }
       for (error_code = KOLLOS_MIN_ERROR_CODE;
            error_code <= KOLLOS_MAX_ERROR_CODE; error_code++)
         {
-          lua_pushinteger (L, (lua_Integer) error_code);
-          lua_setfield (L, name_table_stack_ix,
+          marpa_lua_pushinteger (L, (lua_Integer) error_code);
+          marpa_lua_setfield (L, name_table_stack_ix,
                         kollos_error_codes[error_code -
                                            KOLLOS_MIN_ERROR_CODE].mnemonic);
         }
@@ -2066,18 +2064,18 @@ LUALIB_API int luaopen_kollos_c(lua_State *L)
       /* if (1) dump_table(L, -1); */
 
     /* [ kollos, error_code_table ] */
-    lua_setfield (L, kollos_table_stack_ix, "error_code_by_name");
+    marpa_lua_setfield (L, kollos_table_stack_ix, "error_code_by_name");
 
-    lua_newtable (L);
+    marpa_lua_newtable (L);
     /* [ kollos, event_code_table ] */
     {
-      const int name_table_stack_ix = lua_gettop (L);
+      const int name_table_stack_ix = marpa_lua_gettop (L);
       int event_code;
       for (event_code = LIBMARPA_MIN_EVENT_CODE;
            event_code <= LIBMARPA_MAX_EVENT_CODE; event_code++)
         {
-          lua_pushinteger (L, (lua_Integer) event_code);
-          lua_setfield (L, name_table_stack_ix,
+          marpa_lua_pushinteger (L, (lua_Integer) event_code);
+          marpa_lua_setfield (L, name_table_stack_ix,
                         libmarpa_event_codes[event_code -
                                              LIBMARPA_MIN_EVENT_CODE].mnemonic);
         }
@@ -2085,7 +2083,7 @@ LUALIB_API int luaopen_kollos_c(lua_State *L)
       /* if (1) dump_table(L, -1); */
 
     /* [ kollos, event_code_table ] */
-    lua_setfield (L, kollos_table_stack_ix, "event_code_by_name");
+    marpa_lua_setfield (L, kollos_table_stack_ix, "event_code_by_name");
 
 ]=]
 
@@ -2098,11 +2096,11 @@ for ix = 1, #c_fn_signatures do
    local unprefixed_name = function_name:gsub("^[_]?marpa_", "", 1);
    local class_letter = unprefixed_name:gsub("_.*$", "", 1);
    local wrapper_name = "wrap_" .. unprefixed_name;
-   io.write("  lua_pushcfunction(L, " .. wrapper_name .. ");\n")
+   io.write("  marpa_lua_pushcfunction(L, " .. wrapper_name .. ");\n")
    local classless_name = function_name:gsub("^[_]?marpa_[^_]*_", "")
    local initial_underscore = function_name:match('^_') and '_' or ''
    local quoted_field_name = '"' .. initial_underscore .. libmarpa_class_name[class_letter] .. '_' .. classless_name .. '"'
-   io.write("  lua_setfield(L, kollos_table_stack_ix, " .. quoted_field_name .. ");\n")
+   io.write("  marpa_lua_setfield(L, kollos_table_stack_ix, " .. quoted_field_name .. ");\n")
 end
 
 io.write[=[
