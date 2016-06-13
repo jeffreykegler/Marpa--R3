@@ -226,7 +226,7 @@ do
        end
     end
     io.write('\n')
-    io.write('struct s_libmarpa_error_code libmarpa_error_codes[LIBMARPA_MAX_ERROR_CODE-LIBMARPA_MIN_ERROR_CODE+1] = {\n')
+    io.write('struct s_libmarpa_error_code marpa_error_codes[LIBMARPA_MAX_ERROR_CODE-LIBMARPA_MIN_ERROR_CODE+1] = {\n')
     for i = 0, max_code do
         local code_line = code_lines[i]
         if code_line then
@@ -284,7 +284,7 @@ do
     end
 
     io.write('\n')
-    io.write('struct s_libmarpa_error_code kollos_error_codes[(KOLLOS_MAX_ERROR_CODE-KOLLOS_MIN_ERROR_CODE)+1] = {\n')
+    io.write('struct s_libmarpa_error_code marpa_kollos_error_codes[(KOLLOS_MAX_ERROR_CODE-KOLLOS_MIN_ERROR_CODE)+1] = {\n')
     for i = min_code, max_code do
         local code_line = code_lines[i]
         if code_line then
@@ -322,10 +322,10 @@ io.write[=[
 static inline const char* error_description_by_code(lua_Integer error_code)
 {
    if (error_code >= LIBMARPA_MIN_ERROR_CODE && error_code <= LIBMARPA_MAX_ERROR_CODE) {
-       return libmarpa_error_codes[error_code-LIBMARPA_MIN_ERROR_CODE].description;
+       return marpa_error_codes[error_code-LIBMARPA_MIN_ERROR_CODE].description;
    }
    if (error_code >= KOLLOS_MIN_ERROR_CODE && error_code <= KOLLOS_MAX_ERROR_CODE) {
-       return kollos_error_codes[error_code-KOLLOS_MIN_ERROR_CODE].description;
+       return marpa_kollos_error_codes[error_code-KOLLOS_MIN_ERROR_CODE].description;
    }
    return (const char *)0;
 }
@@ -346,10 +346,10 @@ static inline int l_error_description_by_code(lua_State* L)
 static inline const char* error_name_by_code(lua_Integer error_code)
 {
    if (error_code >= LIBMARPA_MIN_ERROR_CODE && error_code <= LIBMARPA_MAX_ERROR_CODE) {
-       return libmarpa_error_codes[error_code-LIBMARPA_MIN_ERROR_CODE].mnemonic;
+       return marpa_error_codes[error_code-LIBMARPA_MIN_ERROR_CODE].mnemonic;
    }
    if (error_code >= KOLLOS_MIN_ERROR_CODE && error_code <= KOLLOS_MAX_ERROR_CODE) {
-       return kollos_error_codes[error_code-KOLLOS_MIN_ERROR_CODE].mnemonic;
+       return marpa_kollos_error_codes[error_code-KOLLOS_MIN_ERROR_CODE].mnemonic;
    }
    return (const char *)0;
 }
@@ -424,7 +424,7 @@ do
        end
     end
     io.write('\n')
-    io.write('struct s_libmarpa_event_code libmarpa_event_codes[LIBMARPA_MAX_EVENT_CODE-LIBMARPA_MIN_EVENT_CODE+1] = {\n')
+    io.write('struct s_libmarpa_event_code marpa_event_codes[LIBMARPA_MAX_EVENT_CODE-LIBMARPA_MIN_EVENT_CODE+1] = {\n')
     for i = 0, max_code do
         local code_line = code_lines[i]
         if code_line then
@@ -447,7 +447,7 @@ io.write[=[
 static inline const char* event_description_by_code(lua_Integer event_code)
 {
    if (event_code >= LIBMARPA_MIN_EVENT_CODE && event_code <= LIBMARPA_MAX_EVENT_CODE) {
-       return libmarpa_event_codes[event_code-LIBMARPA_MIN_EVENT_CODE].description;
+       return marpa_event_codes[event_code-LIBMARPA_MIN_EVENT_CODE].description;
    }
    return (const char *)0;
 }
@@ -468,7 +468,7 @@ static inline int l_event_description_by_code(lua_State* L)
 static inline const char* event_name_by_code(lua_Integer event_code)
 {
    if (event_code >= LIBMARPA_MIN_EVENT_CODE && event_code <= LIBMARPA_MAX_EVENT_CODE) {
-       return libmarpa_event_codes[event_code-LIBMARPA_MIN_EVENT_CODE].mnemonic;
+       return marpa_event_codes[event_code-LIBMARPA_MIN_EVENT_CODE].mnemonic;
    }
    return (const char *)0;
 }
@@ -683,7 +683,7 @@ static void luif_err_throw(lua_State *L, int error_code) {
     if (error_code < LIBMARPA_MIN_ERROR_CODE || error_code > LIBMARPA_MAX_ERROR_CODE) {
         marpa_luaL_error(L, "Libmarpa returned invalid error code %d", error_code);
     }
-    marpa_luaL_error(L, "%s", libmarpa_error_codes[error_code].description );
+    marpa_luaL_error(L, "%s", marpa_error_codes[error_code].description );
 }
 
 static void luif_err_throw2(lua_State *L, int error_code, const char *msg) {
@@ -697,7 +697,7 @@ static void luif_err_throw2(lua_State *L, int error_code, const char *msg) {
     if (error_code < 0 || error_code > LIBMARPA_MAX_ERROR_CODE) {
         marpa_luaL_error(L, "%s\n    Libmarpa returned invalid error code %d", msg, error_code);
     }
-    marpa_luaL_error(L, "%s\n    %s", msg, libmarpa_error_codes[error_code].description);
+    marpa_luaL_error(L, "%s\n    %s", msg, marpa_error_codes[error_code].description);
 }
 
 static void check_libmarpa_table(
@@ -2049,7 +2049,7 @@ LUALIB_API int marpa_luaopen_kollos(lua_State *L)
         {
           marpa_lua_pushinteger (L, (lua_Integer) error_code);
           marpa_lua_setfield (L, name_table_stack_ix,
-                        libmarpa_error_codes[error_code -
+                        marpa_error_codes[error_code -
                                              LIBMARPA_MIN_ERROR_CODE].mnemonic);
         }
       for (error_code = KOLLOS_MIN_ERROR_CODE;
@@ -2057,7 +2057,7 @@ LUALIB_API int marpa_luaopen_kollos(lua_State *L)
         {
           marpa_lua_pushinteger (L, (lua_Integer) error_code);
           marpa_lua_setfield (L, name_table_stack_ix,
-                        kollos_error_codes[error_code -
+                        marpa_kollos_error_codes[error_code -
                                            KOLLOS_MIN_ERROR_CODE].mnemonic);
         }
     }
@@ -2076,7 +2076,7 @@ LUALIB_API int marpa_luaopen_kollos(lua_State *L)
         {
           marpa_lua_pushinteger (L, (lua_Integer) event_code);
           marpa_lua_setfield (L, name_table_stack_ix,
-                        libmarpa_event_codes[event_code -
+                        marpa_event_codes[event_code -
                                              LIBMARPA_MIN_EVENT_CODE].mnemonic);
         }
     }
