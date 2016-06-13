@@ -67,6 +67,11 @@ io.write[=[
 #define UNUSED
 #endif
 
+#if defined(_MSC_VER)
+#define inline __inline
+#define __PRETTY_FUNCTION__ __FUNCTION__
+#endif
+
 #define EXPECTED_LIBMARPA_MAJOR 8
 #define EXPECTED_LIBMARPA_MINOR 3
 #define EXPECTED_LIBMARPA_MICRO 0
