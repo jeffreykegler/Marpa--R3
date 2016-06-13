@@ -24,10 +24,40 @@ $STRING_VERSION = $VERSION;
 $VERSION = eval $VERSION;
 ## use critic
 
+sub gcc_at_least {
+    my ($required) = @_;
+    state $gcc_version = $Config{gccversion};
+    return if not $gcc_version;
+    my @actual = ($gcc_version =~ m/ \A (\d+) [.] (\d+) [.] (\d+) \z /xms);
+    return if @actual != 3;
+    my @required = ($required =~ m/ \A (\d+) [.] (\d+) [.] (\d+) \z /xms);
+    die if scalar @required != 3;
+    my $cmp = $actual[0] <=> $required[0] ||
+     $actual[1] <=> $required[1]  ||
+     $actual[2] <=> $required[2] ;
+    return $cmp >= 0 ? 1 : 0;
+}
+
+my @new_ccflags = ( );
+
+if ( $Config{'ccname'} eq 'gcc' ) {
+    ## -W instead of -Wextra is case the GCC is pre 3.0.0
+    ## -Winline omitted because too noisy
+    ## -ansi will not work with Lua or on Android
+    push @new_ccflags, qw( -Wall -W
+        -ansi -pedantic -Wundef -Wendif-labels
+	-Wpointer-arith -Wstrict-prototypes -Wwrite-strings
+	-Wmissing-declarations );
+    push @new_ccflags, '-Wdeclaration-after-statement' if gcc_at_least('3.4.6');
+} ## end if ( $self->config('cc') eq 'gcc' )
+
+my $ccflags = join q{ }, $Config{'ccflags'}, @new_ccflags;
+
 WriteMakefile(
     INC     => '-I../lua -I../engine/read_only',
     NAME    => 'Marpa::R3',
     VERSION => $STRING_VERSION,
+    CCFLAGS => $ccflags,
     SKIP   => [qw(test test_dynamic dynamic dynamic_lib dlsyms)],
     clean  => { 'FILES' => 'kollos$(LIB_EXT)' },
 );
