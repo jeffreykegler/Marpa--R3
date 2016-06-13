@@ -41,11 +41,16 @@ sub gcc_at_least {
 my @new_ccflags = ( );
 
 if ( $Config{'ccname'} eq 'gcc' ) {
+    # Original flags, from kollos repo:
+    # -Wall -Wpointer-arith -Wstrict-prototypes -Wwrite-strings -Wshadow -Wmissing-declarations -Wconversion -ansi -pedantic -Wundef -Wendif-labels
+
     ## -W instead of -Wextra is case the GCC is pre 3.0.0
     ## -Winline omitted because too noisy
     ## -ansi will not work with Lua or on Android
+    ## Lua 5.3.2 gcc flags are -Wall -Wextra
+    ## Lua 5.3.2 prefers gcc -std=c99
     push @new_ccflags, qw( -Wall -W
-        -ansi -pedantic -Wundef -Wendif-labels
+        -Wundef -Wendif-labels
 	-Wpointer-arith -Wstrict-prototypes -Wwrite-strings
 	-Wmissing-declarations );
     push @new_ccflags, '-Wdeclaration-after-statement' if gcc_at_least('3.4.6');

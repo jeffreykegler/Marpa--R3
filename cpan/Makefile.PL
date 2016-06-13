@@ -347,6 +347,14 @@ lua/marpa_lua$(LIB_EXT):
 END_OF_POSTAMBLE_PIECE
 	$self->cd(File::Spec->catdir(qw(lua)), '$(MAKE) ');
 
+# == Logic to build in kollos directory:
+
+    push @postamble_pieces, sprintf <<'END_OF_POSTAMBLE_PIECE',
+kollos/kollos$(LIB_EXT):
+	%s
+END_OF_POSTAMBLE_PIECE
+	$self->cd(File::Spec->catdir(qw(kollos)), '$(MAKE) ');
+
     return join "\n", @postamble_pieces;
 
 }; ## end sub MY::postamble
