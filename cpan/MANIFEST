@@ -109,6 +109,8 @@ inc/Marpa/R3/Config.pm
 inc/Marpa/R3/Display.pm
 inc/Marpa/R3/License.pm
 inc/Marpa/R3/Test.pm
+kollos/Makefile.PL
+kollos/kollos.c.lua
 kollos/kollos.h
 lib/Marpa/R3.pm
 lib/Marpa/R3/ASF.pm
