@@ -52,6 +52,7 @@ if ( $Config{'ccname'} eq 'gcc' ) {
     push @my_ccflags, qw( -Wall -W
         -Wundef -Wendif-labels
 	-Wpointer-arith -Wstrict-prototypes -Wwrite-strings
+	-Wconversion
 	-Wmissing-declarations );
     push @my_ccflags, '-Wdeclaration-after-statement' if gcc_at_least('3.4.6');
 } ## end if ( $self->config('cc') eq 'gcc' )
