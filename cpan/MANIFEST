@@ -64,6 +64,8 @@ engine/read_only/config.sub
 engine/read_only/configure
 engine/read_only/configure.ac
 engine/read_only/depcomp
+engine/read_only/error_codes.table
+engine/read_only/events.table
 engine/read_only/install-sh
 engine/read_only/ltmain.sh
 engine/read_only/m4/libtool.m4
@@ -85,6 +87,7 @@ engine/read_only/marpa_tavl.c
 engine/read_only/marpa_tavl.h
 engine/read_only/missing
 engine/read_only/stamp-h1
+engine/read_only/steps.table
 engine/read_only/win32/do_config_h.pl
 engine/read_only/win32/marpa.def
 etc/Makefile
@@ -95,6 +98,7 @@ etc/check_links.pl
 etc/compile_for_debug.sh
 etc/dovg.sh
 etc/libmarpa_from_tar.sh
+etc/luatangle
 etc/my_suppressions
 etc/pod_dump.pl
 etc/pod_errors.pl
@@ -105,6 +109,7 @@ inc/Marpa/R3/Config.pm
 inc/Marpa/R3/Display.pm
 inc/Marpa/R3/License.pm
 inc/Marpa/R3/Test.pm
+kollos/kollos.h
 lib/Marpa/R3.pm
 lib/Marpa/R3/ASF.pm
 lib/Marpa/R3/Common.pm

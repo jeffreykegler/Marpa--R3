@@ -58,6 +58,9 @@
 ^engine/cf/LIBMARPA_MODE$
 ^engine/gnu_ac_build/
 ^engine/perl_ac_build/
+^kollos/kollos[.]c
+^kollos/Makefile
+^kollos/MYMETA[.]
 ^errs$
 ^etc/track[.]list
 ^hide/
