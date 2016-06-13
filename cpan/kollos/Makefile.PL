@@ -38,7 +38,7 @@ sub gcc_at_least {
     return $cmp >= 0 ? 1 : 0;
 }
 
-my @new_ccflags = ( );
+my @my_ccflags = ( );
 
 if ( $Config{'ccname'} eq 'gcc' ) {
     # Original flags, from kollos repo:
@@ -49,20 +49,19 @@ if ( $Config{'ccname'} eq 'gcc' ) {
     ## -ansi will not work with Lua or on Android
     ## Lua 5.3.2 gcc flags are -Wall -Wextra
     ## Lua 5.3.2 prefers gcc -std=c99
-    push @new_ccflags, qw( -Wall -W
+    push @my_ccflags, qw( -Wall -W
         -Wundef -Wendif-labels
 	-Wpointer-arith -Wstrict-prototypes -Wwrite-strings
 	-Wmissing-declarations );
-    push @new_ccflags, '-Wdeclaration-after-statement' if gcc_at_least('3.4.6');
+    push @my_ccflags, '-Wdeclaration-after-statement' if gcc_at_least('3.4.6');
 } ## end if ( $self->config('cc') eq 'gcc' )
 
-my $ccflags = join q{ }, $Config{'ccflags'}, @new_ccflags;
+my $my_ccflags = join q{ }, @my_ccflags;
 
 WriteMakefile(
     INC     => '-I../lua -I../engine/read_only',
     NAME    => 'Marpa::R3',
     VERSION => $STRING_VERSION,
-    CCFLAGS => $ccflags,
     SKIP   => [qw(test test_dynamic dynamic dynamic_lib dlsyms)],
     clean  => { 'FILES' => 'kollos$(LIB_EXT)' },
 );
@@ -89,6 +88,7 @@ sub constants {
             File::Spec->updir(), qw{engine read_only events.table}
         )
     );
+    $constants .= sprintf( "MY_CCFLAGS = %s\n", $my_ccflags);
 
     return $constants;
 
@@ -120,8 +120,10 @@ kollos.c: kollos.c.lua
     if ( $^O eq 'MSWin32' ) {
         $r .= q[
 
-kollos$(LIB_EXT): kollos$(OBJ_EXT)
+kollos$(LIB_EXT): kollos.c
 	$(RM_RF) $@
+	$(CC) -c $(PASTHRU_INC) $(INC) $(CCFLAGS) $(MY_CCFLAGS) $(OPTIMIZE) \
+	  $(CCCDLFLAGS) $(PASTHRU_DEFINE) $(DEFINE) -DMAKE_LIB kollos.c
 	$(AR) -out:$@ kollos$(OBJ_EXT)
 	$(CHMOD) $(PERM_RWX) $@
 
@@ -135,6 +137,10 @@ kollos$(LIB_EXT): kollos$(OBJ_EXT)
 	$(FULL_AR) $(AR_STATIC_ARGS) $@ kollos$(OBJ_EXT) && $(RANLIB) $@
 	$(CHMOD) $(PERM_RWX) $@
  
+kollos$(OBJ_EXT): kollos.c
+	$(CC) -c $(PASTHRU_INC) $(INC) $(CCFLAGS) $(MY_CCFLAGS) $(OPTIMIZE) \
+	  $(CCCDLFLAGS) $(PASTHRU_DEFINE) $(DEFINE) -DMAKE_LIB kollos.c
+
 ];
     }
 
