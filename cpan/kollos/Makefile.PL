@@ -56,6 +56,14 @@ if ( $Config{'ccname'} eq 'gcc' ) {
 	-Wmissing-declarations );
     push @my_ccflags, '-Wdeclaration-after-statement' if gcc_at_least('3.4.6');
 } ## end if ( $self->config('cc') eq 'gcc' )
+elsif ( $Config{'ccname'} eq 'cl' ) {
+	## gcc's -Wundef is msvc's C4668 that is on with -Wall
+	## gcc's -ansi -pedantic is msvc's /Za, but windows.h can't be compiled with it
+	## msvc's equivalent for gcc's -Wendif-labels can't be found :)
+	## -W4 -Wp64 will produce arguably too many warnings
+	## in perl header files and XS macros, but can be useful for debugging
+	push @my_ccflags, qw( -W3 );
+}
 
 my $my_ccflags = join q{ }, @my_ccflags;
 
@@ -137,7 +145,7 @@ kollos$(LIB_EXT): kollos$(OBJ_EXT)
 	$(RM_RF) $@
 	$(FULL_AR) $(AR_STATIC_ARGS) $@ kollos$(OBJ_EXT) && $(RANLIB) $@
 	$(CHMOD) $(PERM_RWX) $@
- 
+
 kollos$(OBJ_EXT): kollos.c
 	$(CC) -c $(PASTHRU_INC) $(INC) $(CCFLAGS) $(MY_CCFLAGS) $(OPTIMIZE) \
 	  $(CCCDLFLAGS) $(PASTHRU_DEFINE) $(DEFINE) -DMAKE_LIB kollos.c
