@@ -533,40 +533,38 @@ static inline void kollos_error(lua_State* L,
 
 static int l_error_new(lua_State* L)
 {
-  if (marpa_lua_istable (L, 1))
-    {
-      const int table_ix = 1;
-      marpa_lua_getfield (L, table_ix, "code");
-      /* [ error_table,  code ] */
-      if (!marpa_lua_isnumber (L, -1))
-        {
-          /* Want a special code for this, eventually */
-          const Marpa_Error_Code code = MARPA_ERR_DEVELOPMENT;
-          marpa_lua_pushinteger (L, (lua_Integer) code);
-          marpa_lua_setfield (L, table_ix, "code");
+    if (marpa_lua_istable (L, 1)) {
+        const int table_ix = 1;
+        marpa_lua_getfield (L, table_ix, "code");
+        /* [ error_table,  code ] */
+        if (!marpa_lua_isnumber (L, -1)) {
+            /* Want a special code for this, eventually */
+            const Marpa_Error_Code code = MARPA_ERR_DEVELOPMENT;
+            marpa_lua_pushinteger (L, (lua_Integer) code);
+            marpa_lua_setfield (L, table_ix, "code");
         }
-      marpa_lua_pop (L, 1);
-      marpa_lua_rawgetp (L, LUA_REGISTRYINDEX, &kollos_error_mt_key);
-      /* [ error_table, error_metatable ] */
-      marpa_lua_setmetatable (L, table_ix);
-      /* [ error_table ] */
-      return 1;
+        marpa_lua_pop (L, 1);
+        marpa_lua_rawgetp (L, LUA_REGISTRYINDEX, &kollos_error_mt_key);
+        /* [ error_table, error_metatable ] */
+        marpa_lua_setmetatable (L, table_ix);
+        /* [ error_table ] */
+        return 1;
     }
-  if (marpa_lua_isnumber (L, 1))
+    if (marpa_lua_isnumber (L, 1)) {
+        const Marpa_Error_Code code =
+            (Marpa_Error_Code) marpa_lua_tointeger (L, 1);
+        const char *details = marpa_lua_tostring (L, 2);
+        marpa_lua_pop (L, 2);
+        kollos_error (L, code, details);
+        return 1;
+    }
     {
-      const Marpa_Error_Code code = marpa_lua_tointeger (L, 1);
-      const char *details = marpa_lua_tostring (L, 2);
-      marpa_lua_pop (L, 2);
-      kollos_error (L, code, details);
-      return 1;
+        /* Want a special code for this, eventually */
+        const Marpa_Error_Code code = MARPA_ERR_DEVELOPMENT;
+        const char *details = "Error code is not a number";
+        kollos_error (L, code, details);
+        return 1;
     }
-  {
-    /* Want a special code for this, eventually */
-    const Marpa_Error_Code code = MARPA_ERR_DEVELOPMENT;
-    const char *details = "Error code is not a number";
-    kollos_error (L, code, details);
-    return 1;
-  }
 }
 
 /* Replace an error object, on top of the stack,
@@ -621,7 +619,7 @@ static inline void error_tostring(lua_State* L)
     }
   else
     {
-      error_code = marpa_lua_tointeger (L, -1);
+      error_code = (Marpa_Error_Code)marpa_lua_tointeger (L, -1);
       /* Concatenation will eventually convert a numeric
        * code on top of the stack to a string, so we do
        * nothing with it here.
@@ -663,7 +661,7 @@ static inline int kollos_throw(lua_State* L,
 /* not safe - intended for internal use */
 static inline int wrap_kollos_throw(lua_State* L)
 {
-   const Marpa_Error_Code code = marpa_lua_tointeger(L, 1);
+   const Marpa_Error_Code code = (Marpa_Error_Code)marpa_lua_tointeger(L, 1);
    const char* details = marpa_lua_tostring(L, 2);
   if (0) printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
   if (0) printf ("%s code = %d\n", __PRETTY_FUNCTION__, code);
@@ -1004,7 +1002,7 @@ for ix = 1, #c_fn_signatures do
      local arg_name = signature[1 + arg_ix*2]
      local c_type = c_type_of_libmarpa_type(arg_type)
      assert(c_type == "int", ("type " .. arg_type .. " not implemented"))
-     io.write("  ", arg_name, " = marpa_lua_tointeger(L, -1);\n")
+     io.write(string.format("  %s = (%s)marpa_lua_tointeger(L, -1);\n", arg_name, arg_type))
      io.write("  marpa_lua_pop(L, 1);\n")
    end
 
@@ -1586,86 +1584,89 @@ io.write[=[
 static int
 wrap_bocage_new (lua_State * L)
 {
-  const int bocage_stack_ix = 1;
-  const int recce_stack_ix = 2;
-  const int symbol_stack_ix = 3;
-  const int start_stack_ix = 4;
-  const int end_stack_ix = 5;
-  int end_earley_set = -1;
-  int end_earley_set_is_nil = 0;
+    const int bocage_stack_ix = 1;
+    const int recce_stack_ix = 2;
+    const int symbol_stack_ix = 3;
+    const int start_stack_ix = 4;
+    const int end_stack_ix = 5;
+    Marpa_Earley_Set_ID end_earley_set = -1;
+    int end_earley_set_is_nil = 0;
 
-  if (0)
-    printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
-  /* [ bocage_table, recce_table ] */
-  if (1)
-    {
-      check_libmarpa_table (L, "wrap_bocage_new()", bocage_stack_ix, "bocage");
-      check_libmarpa_table (L, "wrap_bocage_new()", recce_stack_ix, "recce");
-      marpa_luaL_checktype(L, symbol_stack_ix, LUA_TNIL);
-      marpa_luaL_checktype(L, start_stack_ix, LUA_TNIL);
+    if (0)
+        printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
+    /* [ bocage_table, recce_table ] */
+    if (1) {
+        check_libmarpa_table (L, "wrap_bocage_new()", bocage_stack_ix,
+            "bocage");
+        check_libmarpa_table (L, "wrap_bocage_new()", recce_stack_ix,
+            "recce");
+        marpa_luaL_checktype (L, symbol_stack_ix, LUA_TNIL);
+        marpa_luaL_checktype (L, start_stack_ix, LUA_TNIL);
     }
 
-  if (marpa_lua_type(L, end_stack_ix) == LUA_TNIL) {
-      end_earley_set_is_nil = 1;
-  } else {
-      end_earley_set = marpa_luaL_checkinteger(L, end_stack_ix);
-  }
-  /* Make some stack space */
-  marpa_lua_pop(L, 3);
-
-  /* [ bocage_table, recce_table ] */
-  {
-    Marpa_Recognizer *recce_ud;
-    /* Important: the bocage does *not* hold a reference to
-         the recognizer, so it should not memoize the userdata
-         pointing to it. */
-
-    /* [ bocage_table, recce_table ] */
-    Marpa_Bocage* bocage_ud =
-      (Marpa_Bocage *) marpa_lua_newuserdata (L, sizeof (Marpa_Bocage));
-    /* [ bocage_table, recce_table, bocage_ud ] */
-    marpa_lua_rawgetp (L, LUA_REGISTRYINDEX, &kollos_b_ud_mt_key);
-    /* [ bocage_table, recce_table, bocage_ud, bocage_ud_mt ] */
-    marpa_lua_setmetatable (L, -2);
-    /* [ bocage_table, recce_table, bocage_ud ] */
-
-    marpa_lua_setfield (L, bocage_stack_ix, "_libmarpa");
-    /* [ bocage_table, recce_table ] */
-    marpa_lua_getfield (L, recce_stack_ix, "_libmarpa_g");
-    /* [ recce_table, recce_table, g_ud ] */
-    marpa_lua_setfield (L, bocage_stack_ix, "_libmarpa_g");
-    /* [ bocage_table, recce_table ] */
-    marpa_lua_getfield (L, recce_stack_ix, "_libmarpa");
-    /* [ recce_table, recce_table, recce_ud ] */
-    recce_ud = (Marpa_Recognizer *) marpa_lua_touserdata (L, -1);
-    /* [ bocage_table, recce_table, recce_ud ] */
-
-    if (end_earley_set_is_nil) {
-        /* No error check -- always succeeds, say libmarpa docs */
-        end_earley_set = marpa_r_latest_earley_set(*recce_ud);
+    if (marpa_lua_type (L, end_stack_ix) == LUA_TNIL) {
+        end_earley_set_is_nil = 1;
     } else {
-       if (end_earley_set < 0) {
-         common_b_error_handler (L, bocage_stack_ix,
-             "bocage_new(): end earley set arg is negative");
-         marpa_lua_pushnil (L);
-         return 1;
-       }
+        end_earley_set =
+            (Marpa_Earley_Set_ID) marpa_luaL_checkinteger (L,
+            end_stack_ix);
     }
+    /* Make some stack space */
+    marpa_lua_pop (L, 3);
 
-    *bocage_ud = marpa_b_new (*recce_ud, end_earley_set);
-    if (!*bocage_ud)
-      {
-        common_b_error_handler (L, bocage_stack_ix, "marpa_b_new()");
-        marpa_lua_pushnil (L);
-        return 1;
-      }
-  }
-  if (0)
-    printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
-  /* [ bocage_table, recce_table, recce_ud ] */
-  marpa_lua_pop (L, 2);
-  /* [ bocage_table ] */
-  return 1;
+    /* [ bocage_table, recce_table ] */
+    {
+        Marpa_Recognizer *recce_ud;
+        /* Important: the bocage does *not* hold a reference to
+           the recognizer, so it should not memoize the userdata
+           pointing to it. */
+
+        /* [ bocage_table, recce_table ] */
+        Marpa_Bocage *bocage_ud =
+            (Marpa_Bocage *) marpa_lua_newuserdata (L,
+            sizeof (Marpa_Bocage));
+        /* [ bocage_table, recce_table, bocage_ud ] */
+        marpa_lua_rawgetp (L, LUA_REGISTRYINDEX, &kollos_b_ud_mt_key);
+        /* [ bocage_table, recce_table, bocage_ud, bocage_ud_mt ] */
+        marpa_lua_setmetatable (L, -2);
+        /* [ bocage_table, recce_table, bocage_ud ] */
+
+        marpa_lua_setfield (L, bocage_stack_ix, "_libmarpa");
+        /* [ bocage_table, recce_table ] */
+        marpa_lua_getfield (L, recce_stack_ix, "_libmarpa_g");
+        /* [ recce_table, recce_table, g_ud ] */
+        marpa_lua_setfield (L, bocage_stack_ix, "_libmarpa_g");
+        /* [ bocage_table, recce_table ] */
+        marpa_lua_getfield (L, recce_stack_ix, "_libmarpa");
+        /* [ recce_table, recce_table, recce_ud ] */
+        recce_ud = (Marpa_Recognizer *) marpa_lua_touserdata (L, -1);
+        /* [ bocage_table, recce_table, recce_ud ] */
+
+        if (end_earley_set_is_nil) {
+            /* No error check -- always succeeds, say libmarpa docs */
+            end_earley_set = marpa_r_latest_earley_set (*recce_ud);
+        } else {
+            if (end_earley_set < 0) {
+                common_b_error_handler (L, bocage_stack_ix,
+                    "bocage_new(): end earley set arg is negative");
+                marpa_lua_pushnil (L);
+                return 1;
+            }
+        }
+
+        *bocage_ud = marpa_b_new (*recce_ud, end_earley_set);
+        if (!*bocage_ud) {
+            common_b_error_handler (L, bocage_stack_ix, "marpa_b_new()");
+            marpa_lua_pushnil (L);
+            return 1;
+        }
+    }
+    if (0)
+        printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
+    /* [ bocage_table, recce_table, recce_ud ] */
+    marpa_lua_pop (L, 2);
+    /* [ bocage_table ] */
+    return 1;
 }
 
 ]=]
