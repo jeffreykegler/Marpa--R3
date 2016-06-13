@@ -67,6 +67,11 @@ io.write[=[
 #define UNUSED
 #endif
 
+#if defined(_MSC_VER)
+#define inline __inline
+#define __PRETTY_FUNCTION__ __FUNCTION__
+#endif
+
 #define EXPECTED_LIBMARPA_MAJOR 8
 #define EXPECTED_LIBMARPA_MINOR 3
 #define EXPECTED_LIBMARPA_MICRO 0
@@ -78,23 +83,23 @@ static void dump_stack (lua_State *L) {
       for (i = 1; i <= top; i++) {  /* repeat for each level */
         int t = marpa_lua_type(L, i);
         switch (t) {
-    
+
           case LUA_TSTRING:  /* strings */
             printf("`%s'", marpa_lua_tostring(L, i));
             break;
-    
+
           case LUA_TBOOLEAN:  /* booleans */
             printf(marpa_lua_toboolean(L, i) ? "true" : "false");
             break;
-    
+
           case LUA_TNUMBER:  /* numbers */
             printf("%g", marpa_lua_tonumber(L, i));
             break;
-    
+
           default:  /* other values */
             printf("%s", marpa_lua_typename(L, t));
             break;
-    
+
         }
         printf("  ");  /* put a separator */
       }
@@ -116,51 +121,51 @@ static void dump_table(lua_State *L, int raw_table_index)
         marpa_lua_pushvalue(L, -2);
         /* [ ..., key, value, key_copy ] */
         switch (marpa_lua_type(L, key_stack_ix)) {
-    
+
           case LUA_TSTRING:  /* strings */
             printf("`%s'", marpa_lua_tostring(L, key_stack_ix));
             break;
-    
+
           case LUA_TBOOLEAN:  /* booleans */
             printf(marpa_lua_toboolean(L, key_stack_ix) ? "true" : "false");
             break;
-    
+
           case LUA_TNUMBER:  /* numbers */
             printf("%g", marpa_lua_tonumber(L, key_stack_ix));
             break;
-    
+
           case LUA_TTABLE:  /* numbers */
             printf("table %s", marpa_lua_tostring(L, key_stack_ix));
             break;
-    
+
           default:  /* other values */
             printf("%s", marpa_lua_typename(L, marpa_lua_type(L, key_stack_ix)));
             break;
-    
+
         }
         printf(" -> ");  /* end the listing */
         switch (marpa_lua_type(L, value_stack_ix)) {
-    
+
           case LUA_TSTRING:  /* strings */
             printf("`%s'", marpa_lua_tostring(L, value_stack_ix));
             break;
-    
+
           case LUA_TBOOLEAN:  /* booleans */
             printf(marpa_lua_toboolean(L, value_stack_ix) ? "true" : "false");
             break;
-    
+
           case LUA_TNUMBER:  /* numbers */
             printf("%g", marpa_lua_tonumber(L, value_stack_ix));
             break;
-    
+
           case LUA_TTABLE:  /* numbers */
             printf("table %s", marpa_lua_tostring(L, value_stack_ix));
             break;
-    
+
           default:  /* other values */
             printf("%s", marpa_lua_typename(L, marpa_lua_type(L, value_stack_ix)));
             break;
-    
+
         }
         printf("\n");  /* end the listing */
         /* [ ..., key, value, key_copy ] */
@@ -342,7 +347,7 @@ static inline int l_error_description_by_code(lua_State* L)
    }
    return 1;
 }
- 
+
 static inline const char* error_name_by_code(lua_Integer error_code)
 {
    if (error_code >= LIBMARPA_MIN_ERROR_CODE && error_code <= LIBMARPA_MAX_ERROR_CODE) {
@@ -366,7 +371,7 @@ static inline int l_error_name_by_code(lua_State* L)
    }
    return 1;
 }
- 
+
 ]=]
 
 -- event codes
@@ -464,7 +469,7 @@ static inline int l_event_description_by_code(lua_State* L)
    }
    return 1;
 }
- 
+
 static inline const char* event_name_by_code(lua_Integer event_code)
 {
    if (event_code >= LIBMARPA_MIN_EVENT_CODE && event_code <= LIBMARPA_MAX_EVENT_CODE) {
@@ -485,7 +490,7 @@ static inline int l_event_name_by_code(lua_State* L)
    }
    return 1;
 }
- 
+
 ]=]
 
 io.write[=[
@@ -534,12 +539,12 @@ static int l_error_new(lua_State* L)
       marpa_lua_getfield (L, table_ix, "code");
       /* [ error_table,  code ] */
       if (!marpa_lua_isnumber (L, -1))
-	{
-	  /* Want a special code for this, eventually */
-	  const Marpa_Error_Code code = MARPA_ERR_DEVELOPMENT;
-	  marpa_lua_pushinteger (L, (lua_Integer) code);
-	  marpa_lua_setfield (L, table_ix, "code");
-	}
+        {
+          /* Want a special code for this, eventually */
+          const Marpa_Error_Code code = MARPA_ERR_DEVELOPMENT;
+          marpa_lua_pushinteger (L, (lua_Integer) code);
+          marpa_lua_setfield (L, table_ix, "code");
+        }
       marpa_lua_pop (L, 1);
       marpa_lua_rawgetp (L, LUA_REGISTRYINDEX, &kollos_error_mt_key);
       /* [ error_table, error_metatable ] */
@@ -623,7 +628,7 @@ static inline void error_tostring(lua_State* L)
        */
     }
 
-  marpa_lua_pushstring (L, " ");	/* Add space separator */
+  marpa_lua_pushstring (L, " ");        /* Add space separator */
 
   temp_string = error_name_by_code (error_code);
   if (temp_string)
@@ -634,11 +639,11 @@ static inline void error_tostring(lua_State* L)
     {
       marpa_lua_pushfstring (L, "Unknown error code (%d)", (int) error_code);
     }
-  marpa_lua_pushstring (L, " ");	/* Add space separator */
+  marpa_lua_pushstring (L, " ");        /* Add space separator */
 
   temp_string = error_description_by_code (error_code);
   marpa_lua_pushstring (L, temp_string ? temp_string : "[no description]");
-  marpa_lua_pushstring (L, "\n");	/* Add space separator */
+  marpa_lua_pushstring (L, "\n");        /* Add space separator */
 
   if (0) printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
   marpa_lua_concat (L, marpa_lua_gettop (L) - error_object_ix);
@@ -646,7 +651,7 @@ static inline void error_tostring(lua_State* L)
   marpa_lua_replace (L, error_object_ix);
   /* [ ..., concatenated_result ] */
 }
-  
+
 static inline int kollos_throw(lua_State* L,
     Marpa_Error_Code code, const char* details)
 {
@@ -709,7 +714,7 @@ static void check_libmarpa_table(
     {
       const char *typename = marpa_lua_typename (L, marpa_lua_type (L, stack_ix));
       marpa_luaL_error (L, "%s arg #1 type is %s, expected table",
-		  function_name, typename);
+                  function_name, typename);
     }
   marpa_lua_getfield (L, stack_ix, "_type");
   /* stack is [ ..., field ] */
@@ -717,13 +722,13 @@ static void check_libmarpa_table(
     {
       const char *typename = marpa_lua_typename (L, marpa_lua_type (L, -1));
       marpa_luaL_error (L, "%s arg #1 field '_type' is %s, expected string",
-		  function_name, typename);
+                  function_name, typename);
     }
   actual_type = marpa_lua_tostring (L, -1);
   if (strcmp (actual_type, expected_type))
     {
       marpa_luaL_error (L, "%s arg #1 table is %s, expected %s",
-		  function_name, actual_type, expected_type);
+                  function_name, actual_type, expected_type);
     }
   /* stack is [ ..., field ] */
   marpa_lua_pop (L, 1);
@@ -1056,8 +1061,8 @@ io.write[=[
 */
 static void
 common_g_error_handler (lua_State * L,
-		      Marpa_Grammar * p_g,
-		      int grammar_stack_ix, const char *description)
+                      Marpa_Grammar * p_g,
+                      int grammar_stack_ix, const char *description)
 {
   int throw_flag;
   const char *error_string = NULL;
@@ -1082,7 +1087,7 @@ common_g_error_handler (lua_State * L,
 */
 static void
 common_r_error_handler (lua_State * L,
-			int recce_stack_ix, const char *description)
+                        int recce_stack_ix, const char *description)
 {
   int throw_flag;
   Marpa_Error_Code marpa_error;
@@ -1111,7 +1116,7 @@ common_r_error_handler (lua_State * L,
 */
 static void
 common_b_error_handler (lua_State * L,
-			int bocage_stack_ix, const char *description)
+                        int bocage_stack_ix, const char *description)
 {
   int throw_flag;
   Marpa_Error_Code marpa_error;
@@ -1142,7 +1147,7 @@ common_b_error_handler (lua_State * L,
 */
 static void
 common_o_error_handler (lua_State * L,
-			int order_stack_ix, const char *description)
+                        int order_stack_ix, const char *description)
 {
   int throw_flag;
   Marpa_Error_Code marpa_error;
@@ -1173,7 +1178,7 @@ common_o_error_handler (lua_State * L,
 */
 static void
 common_t_error_handler (lua_State * L,
-			int tree_stack_ix, const char *description)
+                        int tree_stack_ix, const char *description)
 {
   int throw_flag;
   Marpa_Error_Code marpa_error;
@@ -1204,7 +1209,7 @@ common_t_error_handler (lua_State * L,
 */
 static void
 common_v_error_handler (lua_State * L,
-			int value_stack_ix, const char *description)
+                        int value_stack_ix, const char *description)
 {
   int throw_flag;
   Marpa_Error_Code marpa_error;
@@ -1239,7 +1244,7 @@ wrap_grammar_new (lua_State * L)
   if (1)
     {
       check_libmarpa_table (L, "wrap_grammar_NEW()", grammar_stack_ix,
-			    "grammar");
+                            "grammar");
     }
 
   /* I have forked Libmarpa into Kollos, which makes version checking
@@ -1299,25 +1304,25 @@ wrap_grammar_new (lua_State * L)
     *p_g = marpa_g_new (&marpa_config);
     if (!*p_g)
       {
-	int throw_flag;
-	Marpa_Error_Code marpa_error = marpa_c_error (&marpa_config, NULL);
-	marpa_lua_getfield (L, -1, "throw");
-	throw_flag = marpa_lua_toboolean (L, -1);
-	/* [ grammar_table, throw_flag ] */
-	if (throw_flag)
-	  {
-	    kollos_throw (L, marpa_error, "marpa_g_new()");
-	  }
-	marpa_lua_pushnil (L);
-	return 1;
+        int throw_flag;
+        Marpa_Error_Code marpa_error = marpa_c_error (&marpa_config, NULL);
+        marpa_lua_getfield (L, -1, "throw");
+        throw_flag = marpa_lua_toboolean (L, -1);
+        /* [ grammar_table, throw_flag ] */
+        if (throw_flag)
+          {
+            kollos_throw (L, marpa_error, "marpa_g_new()");
+          }
+        marpa_lua_pushnil (L);
+        return 1;
       }
     result = marpa_g_force_valued (*p_g);
     if (result < 0)
       {
-	common_g_error_handler (L, p_g, grammar_stack_ix,
-				"marpa_g_force_valued()");
-	marpa_lua_pushnil (L);
-	return 1;
+        common_g_error_handler (L, p_g, grammar_stack_ix,
+                                "marpa_g_force_valued()");
+        marpa_lua_pushnil (L);
+        return 1;
       }
     if (0)
       printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
@@ -1362,7 +1367,7 @@ static int wrap_grammar_events(lua_State *L)
   if (event_count < 0)
     {
       common_g_error_handler (L, p_g, grammar_stack_ix,
-			      "marpa_g_event_count()");
+                              "marpa_g_event_count()");
       return 0;
     }
   marpa_lua_pop (L, 1);
@@ -1374,26 +1379,26 @@ static int wrap_grammar_events(lua_State *L)
     int event_ix;
     for (event_ix = 0; event_ix < event_count; event_ix++)
       {
-	Marpa_Event_Type event_type;
-	Marpa_Event event;
-	/* [ grammar_object, result_table ] */
-	event_type = marpa_g_event (*p_g, &event, event_ix);
-	if (event_type <= -2)
-	  {
-	    common_g_error_handler (L, p_g, grammar_stack_ix,
-				    "marpa_g_event()");
-	    return 0;
-	  }
-	marpa_lua_pushinteger (L, event_ix*2 + 1);
-	marpa_lua_pushinteger (L, event_type);
-	/* [ grammar_object, result_table, event_ix*2+1, event_type ] */
-	marpa_lua_settable (L, result_table_ix);
-	/* [ grammar_object, result_table ] */
-	marpa_lua_pushinteger (L, event_ix*2 + 2);
-	marpa_lua_pushinteger (L, marpa_g_event_value (&event));
-	/* [ grammar_object, result_table, event_ix*2+2, event_value ] */
-	marpa_lua_settable (L, result_table_ix);
-	/* [ grammar_object, result_table ] */
+        Marpa_Event_Type event_type;
+        Marpa_Event event;
+        /* [ grammar_object, result_table ] */
+        event_type = marpa_g_event (*p_g, &event, event_ix);
+        if (event_type <= -2)
+          {
+            common_g_error_handler (L, p_g, grammar_stack_ix,
+                                    "marpa_g_event()");
+            return 0;
+          }
+        marpa_lua_pushinteger (L, event_ix*2 + 1);
+        marpa_lua_pushinteger (L, event_type);
+        /* [ grammar_object, result_table, event_ix*2+1, event_type ] */
+        marpa_lua_settable (L, result_table_ix);
+        /* [ grammar_object, result_table ] */
+        marpa_lua_pushinteger (L, event_ix*2 + 2);
+        marpa_lua_pushinteger (L, marpa_g_event_value (&event));
+        /* [ grammar_object, result_table, event_ix*2+2, event_value ] */
+        marpa_lua_settable (L, result_table_ix);
+        /* [ grammar_object, result_table ] */
       }
   }
   /* [ grammar_object, result_table ] */
@@ -1475,7 +1480,7 @@ static int wrap_grammar_rule_new(lua_State *L)
 
     result = (Marpa_Rule_ID)marpa_g_rule_new(*p_g, lhs, rhs, rhs_length);
     if (result <= -1) common_g_error_handler (L, p_g, grammar_stack_ix,
-			    "marpa_g_rule_new()");
+                            "marpa_g_rule_new()");
     marpa_lua_pushinteger(L, (lua_Integer)result);
     return 1;
 }
@@ -1498,7 +1503,7 @@ wrap_recce_new (lua_State * L)
     {
       check_libmarpa_table (L, "wrap_recce_new()", recce_stack_ix, "recce");
       check_libmarpa_table (L, "wrap_recce_new()", grammar_stack_ix,
-			    "grammar");
+                            "grammar");
     }
 
   /* [ recce_table, grammar_table ] */
@@ -1526,7 +1531,7 @@ wrap_recce_new (lua_State * L)
     *recce_ud = marpa_r_new (*grammar_ud);
     if (!*recce_ud)
       {
-	common_r_error_handler (L, recce_stack_ix, "marpa_r_new()");
+        common_r_error_handler (L, recce_stack_ix, "marpa_r_new()");
         marpa_lua_pushnil (L);
         return 1;
       }
@@ -1566,7 +1571,7 @@ static int wrap_progress_item(lua_State *L)
   marpa_lua_pushinteger (L, (lua_Integer) rule_id);
   marpa_lua_pushinteger (L, (lua_Integer) position);
   marpa_lua_pushinteger (L, (lua_Integer) origin);
-  /* [ recce_object, recce_ud, 
+  /* [ recce_object, recce_ud,
    *     rule_id, position, origin ]
    */
   return 3;
@@ -1650,7 +1655,7 @@ wrap_bocage_new (lua_State * L)
     *bocage_ud = marpa_b_new (*recce_ud, end_earley_set);
     if (!*bocage_ud)
       {
-	common_b_error_handler (L, bocage_stack_ix, "marpa_b_new()");
+        common_b_error_handler (L, bocage_stack_ix, "marpa_b_new()");
         marpa_lua_pushnil (L);
         return 1;
       }
@@ -1711,7 +1716,7 @@ wrap_order_new (lua_State * L)
     *order_ud = marpa_o_new (*bocage_ud);
     if (!*order_ud)
       {
-	common_o_error_handler (L, order_stack_ix, "marpa_o_new()");
+        common_o_error_handler (L, order_stack_ix, "marpa_o_new()");
         marpa_lua_pushnil (L);
         return 1;
       }
@@ -1775,7 +1780,7 @@ wrap_tree_new (lua_State * L)
     *tree_ud = marpa_t_new (*order_ud);
     if (!*tree_ud)
       {
-	common_t_error_handler (L, tree_stack_ix, "marpa_t_new()");
+        common_t_error_handler (L, tree_stack_ix, "marpa_t_new()");
         marpa_lua_pushnil (L);
         return 1;
       }
@@ -1839,7 +1844,7 @@ wrap_value_new (lua_State * L)
     *value_ud = marpa_v_new (*tree_ud);
     if (!*value_ud)
       {
-	common_v_error_handler (L, value_stack_ix, "marpa_v_new()");
+        common_v_error_handler (L, value_stack_ix, "marpa_v_new()");
         marpa_lua_pushnil (L);
         return 1;
       }
