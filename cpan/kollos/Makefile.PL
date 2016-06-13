@@ -39,8 +39,6 @@ sub constants {
     my $self      = shift;
     my $constants = $self->SUPER::constants(@_);
 
-    say STDERR "Running constants()";
-
     $constants .= "\n";
     $constants .= sprintf( "LUA_INTERP = %s\n",
         File::Spec->catfile( File::Spec->updir(), qw{lua lua} ) );

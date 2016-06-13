@@ -925,13 +925,17 @@ static lua_State* xlua_newstate(void)
     /* warn("New lua state %p, slg = %p", L, slg); */
     xlua_refcount (L, 1);       /* increment the ref count of the Lua state */
     marpa_luaL_openlibs (L);    /* open libraries */
+    /* Lua stack: [] */
+    marpa_luaopen_kollos(L); /* Open kollos library */
+    /* Lua stack: [ kollos_table ] */
+    marpa_lua_setglobal(L, "kollos");
+    /* Lua stack: [] */
 
     /* create metatables */
     create_sv_mt(L);
     create_grammar_mt(L);
     create_recce_mt(L);
     create_array_mt(L);
-    /* Lua stack: [] */
 
     marpa_luaL_newlib(L, marpa_funcs);
     /* Lua stack: [ marpa_table ] */

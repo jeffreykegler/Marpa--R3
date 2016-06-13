@@ -46,7 +46,7 @@ sub gcc_is_at_least {
     return $cmp >= 0 ? 1 : 0;
 }
 
-my @new_ccflags = ( " -I../engine/read_only" );
+my @new_ccflags = ( );
 
 if ( $Config{'ccname'} eq 'gcc' ) {
     ## -W instead of -Wextra is case the GCC is pre 3.0.0
@@ -124,7 +124,7 @@ END_OF_POSTAMBLE_PIECE
 };
 
 WriteMakefile(
-    INC     => '-I. -I../lua',
+    INC     => '-I. -I../engine/read_only -I../lua -I../kollos',
     NAME    => 'Marpa::R3',
     VERSION => $STRING_VERSION,
     DEFINE  => $define,

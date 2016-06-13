@@ -989,7 +989,7 @@ for ix = 1, #c_fn_signatures do
       -- because this code
       -- will be turned off most of the time
       for arg_ix = 1, arg_count do
-          io.write("    marpa_luaL_checkint(L, ", (arg_ix+1), ");\n")
+          io.write("    marpa_luaL_checkinteger(L, ", (arg_ix+1), ");\n")
       end
       io.write("  }\n");
    end -- if (!unsafe)
@@ -1603,7 +1603,7 @@ wrap_bocage_new (lua_State * L)
   if (marpa_lua_type(L, end_stack_ix) == LUA_TNIL) {
       end_earley_set_is_nil = 1;
   } else {
-      end_earley_set = marpa_luaL_checkint(L, end_stack_ix);
+      end_earley_set = marpa_luaL_checkinteger(L, end_stack_ix);
   }
   /* Make some stack space */
   marpa_lua_pop(L, 3);
@@ -1909,8 +1909,8 @@ static int l_value_ud_mt_gc(lua_State *L) {
    return 0;
 }
 
-LUALIB_API int luaopen_kollos_c(lua_State *L);
-LUALIB_API int luaopen_kollos_c(lua_State *L)
+LUALIB_API int marpa_luaopen_kollos(lua_State *L);
+LUALIB_API int marpa_luaopen_kollos(lua_State *L)
 {
     /* Create the main kollos object */
     const int kollos_table_stack_ix = marpa_lua_gettop(L) + 1;

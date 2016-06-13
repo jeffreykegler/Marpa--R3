@@ -24,6 +24,8 @@
 #include <lualib.h>
 #include <lauxlib.h>
 
+#include <kollos.h>
+
 typedef unsigned int Marpa_Codepoint;
 
 extern const struct marpa_error_description_s marpa_error_description[];
