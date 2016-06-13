@@ -57,6 +57,14 @@ if ( $Config{'ccname'} eq 'gcc' ) {
 	-Wmissing-declarations );
     push @new_ccflags, '-Wdeclaration-after-statement' if gcc_is_at_least('3.4.6');
 } ## end if ( $self->config('cc') eq 'gcc' )
+elsif ( $Config{'ccname'} eq 'cl' ) {
+	## gcc's -Wundef is msvc's C4668 that is on with -Wall
+	## gcc's -ansi -pedantic is msvc's /Za, but windows.h can't be compiled with it
+	## msvc's equivalent for gcc's -Wendif-labels can't be found :)
+	## -W4 -Wp64 will produce arguably too many warnings
+	## in perl header files and XS macros, but can be useful for debugging
+	push @new_ccflags, qw( -W3 );
+}
 
 if (0) {
 #    if ( defined $self->args('XS-debug') ) {
