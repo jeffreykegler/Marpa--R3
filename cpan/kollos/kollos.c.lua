@@ -512,7 +512,7 @@ static char kollos_v_ud_mt_key;
 /* Leaves the stack as before,
    except with the error object on top */
 static inline void kollos_error(lua_State* L,
-    Marpa_Error_Code code, const char* details)
+    lua_Integer code, const char* details)
 {
    const int error_object_stack_ix = marpa_lua_gettop(L)+1;
    marpa_lua_newtable(L);
@@ -521,10 +521,10 @@ static inline void kollos_error(lua_State* L,
    /* [ ..., error_object, error_metatable ] */
    marpa_lua_setmetatable(L, error_object_stack_ix);
    /* [ ..., error_object ] */
-   marpa_lua_pushinteger(L, (lua_Integer)code);
+   marpa_lua_pushinteger(L, code);
    marpa_lua_setfield(L, error_object_stack_ix, "code" );
   if (0) printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
-  if (0) printf ("%s code = %d\n", __PRETTY_FUNCTION__, code);
+  if (0) printf ("%s code = %ld\n", __PRETTY_FUNCTION__, (long)code);
    /* [ ..., error_object ] */
    marpa_lua_pushstring(L, details);
    marpa_lua_setfield(L, error_object_stack_ix, "details" );
@@ -551,8 +551,7 @@ static int l_error_new(lua_State* L)
         return 1;
     }
     if (marpa_lua_isnumber (L, 1)) {
-        const Marpa_Error_Code code =
-            (Marpa_Error_Code) marpa_lua_tointeger (L, 1);
+        const lua_Integer code = marpa_lua_tointeger (L, 1);
         const char *details = marpa_lua_tostring (L, 2);
         marpa_lua_pop (L, 2);
         kollos_error (L, code, details);
@@ -560,7 +559,7 @@ static int l_error_new(lua_State* L)
     }
     {
         /* Want a special code for this, eventually */
-        const Marpa_Error_Code code = MARPA_ERR_DEVELOPMENT;
+        const lua_Integer code = MARPA_ERR_DEVELOPMENT;
         const char *details = "Error code is not a number";
         kollos_error (L, code, details);
         return 1;
@@ -572,7 +571,7 @@ static int l_error_new(lua_State* L)
  */
 static inline void error_tostring(lua_State* L)
 {
-  Marpa_Error_Code error_code = -1;
+  lua_Integer error_code = -1;
   const int error_object_ix = marpa_lua_gettop (L);
   const char *temp_string;
 
@@ -619,7 +618,7 @@ static inline void error_tostring(lua_State* L)
     }
   else
     {
-      error_code = (Marpa_Error_Code)marpa_lua_tointeger (L, -1);
+      error_code = marpa_lua_tointeger (L, -1);
       /* Concatenation will eventually convert a numeric
        * code on top of the stack to a string, so we do
        * nothing with it here.
@@ -651,7 +650,7 @@ static inline void error_tostring(lua_State* L)
 }
 
 static inline int kollos_throw(lua_State* L,
-    Marpa_Error_Code code, const char* details)
+    lua_Integer code, const char* details)
 {
    kollos_error(L, code, details);
    error_tostring(L);
@@ -661,10 +660,10 @@ static inline int kollos_throw(lua_State* L,
 /* not safe - intended for internal use */
 static inline int wrap_kollos_throw(lua_State* L)
 {
-   const Marpa_Error_Code code = (Marpa_Error_Code)marpa_lua_tointeger(L, 1);
+   const lua_Integer code = marpa_lua_tointeger(L, 1);
    const char* details = marpa_lua_tostring(L, 2);
   if (0) printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
-  if (0) printf ("%s code = %d\n", __PRETTY_FUNCTION__, code);
+  if (0) printf ("%s code = %ld\n", __PRETTY_FUNCTION__, (long)code);
    return kollos_throw(L, code, details);
    /* NOTREACHED */
 }
@@ -744,7 +743,7 @@ static void check_libmarpa_table(
 --   1.) The number of arguments is fixed.
 --   2.) Their type is from a fixed list.
 --   3.) Converting the return value to int is a good thing to do.
---   4.) Non-negatvie return values indicate success
+--   4.) Non-negative return values indicate success
 --   5.) Return values less than -1 indicate failure
 --   6.) Return values less than -1 set the error code
 --   7.) Return value of -1 is "soft" and returning nil is
@@ -1002,8 +1001,12 @@ for ix = 1, #c_fn_signatures do
      local arg_name = signature[1 + arg_ix*2]
      local c_type = c_type_of_libmarpa_type(arg_type)
      assert(c_type == "int", ("type " .. arg_type .. " not implemented"))
-     io.write(string.format("  %s = (%s)marpa_lua_tointeger(L, -1);\n", arg_name, arg_type))
+     io.write("{\n")
+     io.write("  const lua_Integer this_arg = marpa_lua_tointeger(L, -1);\n")
+     io.write([[  marpa_luaL_argcheck(L, (0 <= this_arg && this_arg <= (2^30)), -1, "argument out of range");]], "\n")
+     io.write(string.format("  %s = (%s)this_arg;\n", arg_name, arg_type))
      io.write("  marpa_lua_pop(L, 1);\n")
+     io.write("}\n")
    end
 
    io.write('  marpa_lua_getfield (L, -1, "_libmarpa");\n')
@@ -1607,12 +1610,15 @@ wrap_bocage_new (lua_State * L)
     if (marpa_lua_type (L, end_stack_ix) == LUA_TNIL) {
         end_earley_set_is_nil = 1;
     } else {
-        end_earley_set =
-            (Marpa_Earley_Set_ID) marpa_luaL_checkinteger (L,
-            end_stack_ix);
+        const lua_Integer es_arg =
+            marpa_luaL_checkinteger (L, end_stack_ix);
+        marpa_luaL_argcheck (L, (0 <= es_arg
+                && es_arg <= (2 ^ 30)), end_stack_ix,
+            "earley set index out of range");
+        end_earley_set = (Marpa_Earley_Set_ID) es_arg;
     }
     /* Make some stack space */
-    marpa_lua_pop (L, 3);
+    marpa_lua_settop (L, recce_stack_ix);
 
     /* [ bocage_table, recce_table ] */
     {
