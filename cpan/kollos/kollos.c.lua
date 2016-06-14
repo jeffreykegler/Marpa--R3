@@ -1003,7 +1003,14 @@ for ix = 1, #c_fn_signatures do
      assert(c_type == "int", ("type " .. arg_type .. " not implemented"))
      io.write("{\n")
      io.write("  const lua_Integer this_arg = marpa_lua_tointeger(L, -1);\n")
-     io.write([[  marpa_luaL_argcheck(L, (0 <= this_arg && this_arg <= (2^30)), -1, "argument out of range");]], "\n")
+
+     -- Each call checks that its arguments are in range
+     -- the point of this check is to make sure that C's integer conversions
+     -- do not change the value before the call gets it.
+     -- We assume that all types involved are at least 32 bits and signed, so that
+     -- values from -2^30 to 2^30 will be unchanged by any conversions.
+     io.write([[  marpa_luaL_argcheck(L, (-(2^30) <= this_arg && this_arg <= (2^30)), -1, "argument out of range");]], "\n")
+
      io.write(string.format("  %s = (%s)this_arg;\n", arg_name, arg_type))
      io.write("  marpa_lua_pop(L, 1);\n")
      io.write("}\n")
