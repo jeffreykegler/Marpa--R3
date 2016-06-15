@@ -1157,7 +1157,8 @@ xlua_sig_call (lua_State * L, const char *codestr, const char *sig, ...)
     }
 
     for (nres = -nres; *sig; nres++) {
-        switch (*sig++) {
+        const char this_sig = *sig++;
+        switch (this_sig) {
         case 'd':
             {
                 int isnum;
