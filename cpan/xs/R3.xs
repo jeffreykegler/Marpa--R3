@@ -739,7 +739,7 @@ static int xlua_recce_step_meth(lua_State* L) {
         croak("recce.stack(): valuator is not yet active");
     }
     v = v_wrapper->v;
-    step_type = marpa_v_step (v);
+    step_type = (lua_Integer)marpa_v_step (v);
     marpa_lua_pushinteger(L, step_type);
     marpa_lua_pushstring(L, step_type_to_string (step_type));
     /* Lua stack: [ recce_table, lud, step_type, step_type_string ] */
