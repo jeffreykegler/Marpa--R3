@@ -353,8 +353,8 @@ typedef struct
   AV *token_values;
   IV trace_lexers;
   int trace_terminals;
-  STRLEN start_of_lexeme;
-  STRLEN end_of_lexeme;
+  int start_of_lexeme;
+  int end_of_lexeme;
 
   /* Input position at which to start the lexer.
      -1 means no restart.

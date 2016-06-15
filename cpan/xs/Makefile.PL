@@ -54,6 +54,7 @@ if ( $Config{'ccname'} eq 'gcc' ) {
     ## -ansi will not work with Lua or on Android
     push @new_ccflags, qw( -Wall -W
 	-Wpointer-arith -Wstrict-prototypes -Wwrite-strings
+	-Wconversion
 	-Wmissing-declarations );
     push @new_ccflags, '-Wdeclaration-after-statement' if gcc_is_at_least('3.4.6');
 } ## end if ( $self->config('cc') eq 'gcc' )

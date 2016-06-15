@@ -196,7 +196,7 @@ event_type_to_string (Marpa_Event_Type event_code)
 }
 
 static const char *
-step_type_to_string (const Marpa_Step_Type step_type)
+step_type_to_string (const lua_Integer step_type)
 {
   const char *step_type_name = NULL;
   if (step_type >= 0 && step_type < MARPA_STEP_COUNT) {
@@ -741,7 +741,7 @@ static int xlua_recce_step_meth(lua_State* L) {
     v = v_wrapper->v;
     step_type = (lua_Integer)marpa_v_step (v);
     marpa_lua_pushinteger(L, step_type);
-    marpa_lua_pushstring(L, step_type_to_string ((const Marpa_Step_Type)step_type));
+    marpa_lua_pushstring(L, step_type_to_string (step_type));
     /* Lua stack: [ recce_table, lud, step_type, step_type_string ] */
     marpa_lua_setfield(L, recce_table, "step_type" );
     /* Lua stack: [ recce_table, lud, step_type_string ] */
@@ -4321,9 +4321,9 @@ token_register( v_wrapper, token_id, ... )
 PPCODE:
 {
   /* OP Count is args less two */
-  const STRLEN op_count = items - 2;
-  STRLEN op_ix;
-  STRLEN dummy;
+  const int op_count = items - 2;
+  int op_ix;
+  int dummy;
   IV *ops;
   SV *ops_sv;
   AV *token_semantics = v_wrapper->token_semantics;
@@ -5933,11 +5933,11 @@ PPCODE:
 
   if (g_properties->t_pause_before)
     {
-      g_properties->t_pause_before_active = activate;
+      g_properties->t_pause_before_active = activate ? 1 : 0;
     }
   else if (g_properties->t_pause_after)
     {
-      g_properties->t_pause_after_active = activate;
+      g_properties->t_pause_after_active = activate ? 1 : 0;
     }
   else
     {
@@ -6033,7 +6033,7 @@ PPCODE:
 
   if (g_properties->t_event_on_discard)
     {
-      g_properties->t_event_on_discard_active = activate;
+      g_properties->t_event_on_discard_active = activate ? 1 : 0;
     }
   else
     {
@@ -6078,7 +6078,7 @@ PPCODE:
     }
     switch (latm) {
     case 0: case 1:
-        g_properties->latm = latm;
+        g_properties->latm = latm ? 1 : 0;
         break;
     default:
       croak
@@ -6174,7 +6174,7 @@ PPCODE:
     Marpa_Symbol_ID symbol_id;
     const Marpa_Symbol_ID g1_symbol_count =
       marpa_g_highest_symbol_id (slg->g1) + 1;
-    Newx (slr->symbol_r_properties, g1_symbol_count,
+    Newx (slr->symbol_r_properties, ((unsigned int)g1_symbol_count),
           struct symbol_r_properties);
     for (symbol_id = 0; symbol_id < g1_symbol_count; symbol_id++)
       {
@@ -6193,7 +6193,7 @@ PPCODE:
     Marpa_Rule_ID l0_rule_id;
     const Marpa_Rule_ID l0_rule_count =
       marpa_g_highest_rule_id (slg->l0_wrapper->g) + 1;
-    Newx (slr->l0_rule_r_properties, l0_rule_count,
+    Newx (slr->l0_rule_r_properties, (unsigned)l0_rule_count,
           struct l0_rule_r_properties);
     for (l0_rule_id = 0; l0_rule_id < l0_rule_count; l0_rule_id++)
       {
@@ -6243,7 +6243,7 @@ PPCODE:
   slr->t_count_of_deleted_events = 0;
   slr->t_event_count = 0;
   slr->t_event_capacity = MAX (1024 / sizeof (union marpa_slr_event_s), 16);
-  Newx (slr->t_events, slr->t_event_capacity, union marpa_slr_event_s);
+  Newx (slr->t_events, ((unsigned int)slr->t_event_capacity), union marpa_slr_event_s);
 
   slr->t_lexeme_count = 0;
   slr->t_lexeme_capacity = MAX (1024 / sizeof (union marpa_slr_event_s), 16);
@@ -6903,7 +6903,7 @@ lexeme_span (slr)
      Scanless_R *slr;
 PPCODE:
 {
-  STRLEN length = slr->end_of_lexeme - slr->start_of_lexeme;
+  int length = slr->end_of_lexeme - slr->start_of_lexeme;
   XPUSHs (sv_2mortal (newSViv ((IV) slr->start_of_lexeme)));
   XPUSHs (sv_2mortal (newSViv ((IV) length)));
 }
@@ -7338,7 +7338,7 @@ PPCODE:
   /* This original buffer size my be too small.
    */
   slr->pos_db_physical_size = 1024;
-  Newx (slr->pos_db, slr->pos_db_physical_size, Pos_Entry);
+  Newx (slr->pos_db, (unsigned int)slr->pos_db_physical_size, Pos_Entry);
 
   for (p = start_of_string; p < end_of_string;)
     {
@@ -7366,7 +7366,7 @@ PPCODE:
       if (slr->pos_db_logical_size >= slr->pos_db_physical_size)
         {
           slr->pos_db_physical_size *= 2;
-          Renew (slr->pos_db, slr->pos_db_physical_size, Pos_Entry);
+          Renew (slr->pos_db, (unsigned int)slr->pos_db_physical_size, Pos_Entry);
         }
       p += codepoint_length;
       slr->pos_db[slr->pos_db_logical_size].next_offset = p - start_of_string;
@@ -7441,27 +7441,25 @@ PPCODE:
 void
 char_register( slr, codepoint, ... )
     Scanless_R *slr;
-     UV codepoint;
+     int codepoint;
 PPCODE:
 {
   /* OP Count is args less two, then plus two for codepoint and length fields */
-  const STRLEN op_count = items;
-  STRLEN op_ix;
+  const int op_count = items;
+  int op_ix;
   IV *ops;
   SV *ops_sv = NULL;
-  const unsigned array_size = Dim (slr->slg->per_codepoint_array);
-  const int use_array = codepoint < array_size;
 
-  if (use_array)
+  if ( codepoint < (int)Dim (slr->slg->per_codepoint_array))
     {
       ops = slr->slg->per_codepoint_array[codepoint];
-      Renew (ops, op_count, IV);
+      Renew (ops, (unsigned int)op_count, IV);
       slr->slg->per_codepoint_array[codepoint] = ops;
     }
   else
     {
       STRLEN dummy;
-      ops_sv = newSV (op_count * sizeof (ops[0]));
+      ops_sv = newSV ((size_t)op_count * sizeof (ops[0]));
       SvPOK_on (ops_sv);
       ops = (IV *) SvPV (ops_sv, dummy);
     }
@@ -7472,7 +7470,7 @@ PPCODE:
       /* By coincidence, offset of individual ops is 2 both in the
        * method arguments and in the op_list, so that arg IX == op_ix
        */
-      ops[op_ix] = SvUV (ST (op_ix));
+      ops[op_ix] = SvIV (ST (op_ix));
     }
   if (ops_sv)
     {

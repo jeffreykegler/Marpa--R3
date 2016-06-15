@@ -85,7 +85,7 @@ sub gp_generate {
     $output .= "{\n";
     $output
         .= "  $main::LIBMARPA_CLASS self = $wrapper_variable->$main::CLASS_LETTER;\n";
-    $output .= "  int gp_result = $libmarpa_method("
+    $output .= "  int gp_result = (int)$libmarpa_method("
         . ( join q{, }, 'self', @args ) . ");\n";
     $output .= "  if ( gp_result == -1 ) { XSRETURN_UNDEF; }\n";
     $output .= "  if ( gp_result < 0 && $base->throw ) {\n";
