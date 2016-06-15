@@ -131,7 +131,7 @@ static union marpa_slr_event_s * marpa_slr_event_push( Scanless_R* slr )
   if (slr->t_event_count >= slr->t_event_capacity)
     {
       slr->t_event_capacity *= 2;
-      Renew (slr->t_events, slr->t_event_capacity, union marpa_slr_event_s);
+      Renew (slr->t_events, (unsigned int)slr->t_event_capacity, union marpa_slr_event_s);
     }
   return slr->t_events + (slr->t_event_count++);
 }
@@ -146,7 +146,7 @@ static union marpa_slr_event_s * marpa_slr_lexeme_push( Scanless_R* slr )
   if (slr->t_lexeme_count >= slr->t_lexeme_capacity)
     {
       slr->t_lexeme_capacity *= 2;
-      Renew (slr->t_lexemes, slr->t_lexeme_capacity, union marpa_slr_event_s);
+      Renew (slr->t_lexemes, (unsigned int)slr->t_lexeme_capacity, union marpa_slr_event_s);
     }
   return slr->t_lexemes + (slr->t_lexeme_count++);
 }
@@ -1219,34 +1219,33 @@ xlua_sig_call (lua_State * L, const char *codestr, const char *sig, ...)
 static R_Wrapper*
 r_wrap( Marpa_Recce r, SV* g_sv)
 {
-  dTHX;
-  int highest_symbol_id;
-  R_Wrapper *r_wrapper;
-  G_Wrapper *g_wrapper;
-  Marpa_Grammar g;
+    dTHX;
+    int highest_symbol_id;
+    R_Wrapper *r_wrapper;
+    G_Wrapper *g_wrapper;
+    Marpa_Grammar g;
 
-  SET_G_WRAPPER_FROM_G_SV(g_wrapper, g_sv);
-  g = g_wrapper->g;
+    SET_G_WRAPPER_FROM_G_SV (g_wrapper, g_sv);
+    g = g_wrapper->g;
 
-  highest_symbol_id = marpa_g_highest_symbol_id (g);
-  if (highest_symbol_id < 0)
-    {
-      if (!g_wrapper->throw)
-        {
-          return 0;
+    highest_symbol_id = marpa_g_highest_symbol_id (g);
+    if (highest_symbol_id < 0) {
+        if (!g_wrapper->throw) {
+            return 0;
         }
-      croak ("failure in marpa_g_highest_symbol_id: %s",
-             xs_g_error (g_wrapper));
+        croak ("failure in marpa_g_highest_symbol_id: %s",
+            xs_g_error (g_wrapper));
     };
-  Newx (r_wrapper, 1, R_Wrapper);
-  r_wrapper->r = r;
-  Newx (r_wrapper->terminals_buffer, highest_symbol_id + 1, Marpa_Symbol_ID);
-  r_wrapper->ruby_slippers = 0;
-  SvREFCNT_inc (g_sv);
-  r_wrapper->base_sv = g_sv;
-  r_wrapper->base = g_wrapper;
-  r_wrapper->event_queue = newAV();
-  return r_wrapper;
+    Newx (r_wrapper, 1, R_Wrapper);
+    r_wrapper->r = r;
+    Newx (r_wrapper->terminals_buffer,
+        (unsigned int) (highest_symbol_id + 1), Marpa_Symbol_ID);
+    r_wrapper->ruby_slippers = 0;
+    SvREFCNT_inc (g_sv);
+    r_wrapper->base_sv = g_sv;
+    r_wrapper->base = g_wrapper;
+    r_wrapper->event_queue = newAV ();
+    return r_wrapper;
 }
 
 /* It is up to the caller to deal with the Libmarpa recce's
@@ -1448,8 +1447,8 @@ u_read (Scanless_R * slr)
     {
       UV codepoint;
       STRLEN codepoint_length = 1;
-      STRLEN op_ix;
-      STRLEN op_count;
+      int op_ix;
+      int op_count;
       IV *ops;
       int tokens_accepted = 0;
       if (slr->perl_pos >= slr->end_pos)
@@ -1641,12 +1640,11 @@ if (trace_lexers >= 1)
 }
 
 /* It is OK to set pos to last codepoint + 1 */
-static STRLEN
+static void
 u_pos_set (Scanless_R * slr, const char* name, int start_pos_arg, int length_arg)
 {
   dTHX;
-  const STRLEN old_perl_pos = slr->perl_pos;
-  const STRLEN input_length = slr->pos_db_logical_size;
+  const int input_length = slr->pos_db_logical_size;
   int new_perl_pos;
   int new_end_pos;
 
@@ -1676,7 +1674,6 @@ u_pos_set (Scanless_R * slr, const char* name, int start_pos_arg, int length_arg
   slr->perl_pos = new_perl_pos;
   new_end_pos = new_end_pos;
   slr->end_pos = new_end_pos;
-  return old_perl_pos;
 }
 
 static SV *
@@ -3439,7 +3436,7 @@ PPCODE:
     {
       SV *sv;
       Newx (g_wrapper, 1, G_Wrapper);
-      g_wrapper->throw = throw;
+      g_wrapper->throw = throw ? 1 : 0;
       g_wrapper->g = g;
       g_wrapper->message_buffer = NULL;
       g_wrapper->libmarpa_error_code = MARPA_ERR_NONE;
@@ -3537,7 +3534,7 @@ PPCODE:
         rhs = (Marpa_Symbol_ID*)NULL;
     } else {
         int i;
-        Newx(rhs, length, Marpa_Symbol_ID);
+        Newx(rhs, (unsigned int)length, Marpa_Symbol_ID);
         for (i = 0; i < length; i++) {
             SV** elem = av_fetch(rhs_av, i, 0);
             if (elem == NULL) {
@@ -3791,7 +3788,7 @@ PPCODE:
       /* Always throws an exception if the arguments are bad */
       croak ("Problem in g->throw_set(%d): argument must be 0 or 1", boolean);
     }
-  g_wrapper->throw = boolean;
+  g_wrapper->throw = boolean ? 1 : 0;
   XPUSHs (sv_2mortal (newSViv (boolean)));
 }
 
@@ -3888,7 +3885,7 @@ PPCODE:
       /* Always thrown */
       croak ("Problem in g->ruby_slippers_set(%d): argument must be 0 or 1", boolean);
     }
-  r_wrapper->ruby_slippers = boolean;
+  r_wrapper->ruby_slippers = boolean ? 1 : 0;
   XPUSHs (sv_2mortal (newSViv (boolean)));
 }
 
@@ -4287,8 +4284,8 @@ rule_register( v_wrapper, rule_id, ... )
 PPCODE:
 {
   /* OP Count is args less two */
-  const STRLEN op_count = items - 2;
-  STRLEN op_ix;
+  const int op_count = items - 2;
+  int op_ix;
   STRLEN dummy;
   IV *ops;
   SV *ops_sv;
@@ -4300,13 +4297,13 @@ PPCODE:
     }
 
   /* Leave room for final 0 */
-  ops_sv = newSV ((op_count+1) * sizeof (ops[0]));
+  ops_sv = newSV ((size_t)(op_count+1) * sizeof (ops[0]));
 
   SvPOK_on (ops_sv);
   ops = (IV *) SvPV (ops_sv, dummy);
   for (op_ix = 0; op_ix < op_count; op_ix++)
     {
-      ops[op_ix] = SvUV (ST (op_ix+2));
+      ops[op_ix] = SvIV (ST (op_ix+2));
     }
   ops[op_ix] = 0;
   if (!av_store (rule_semantics, (I32) rule_id, ops_sv)) {
@@ -4323,7 +4320,7 @@ PPCODE:
   /* OP Count is args less two */
   const int op_count = items - 2;
   int op_ix;
-  int dummy;
+  STRLEN dummy;
   IV *ops;
   SV *ops_sv;
   AV *token_semantics = v_wrapper->token_semantics;
@@ -4334,7 +4331,7 @@ PPCODE:
     }
 
   /* Leave room for final 0 */
-  ops_sv = newSV ((op_count+1) * sizeof (ops[0]));
+  ops_sv = newSV ((size_t)(op_count+1) * sizeof (ops[0]));
 
   SvPOK_on (ops_sv);
   ops = (IV *) SvPV (ops_sv, dummy);
@@ -4355,8 +4352,8 @@ nulling_symbol_register( v_wrapper, symbol_id, ... )
 PPCODE:
 {
   /* OP Count is args less two */
-  const STRLEN op_count = items - 2;
-  STRLEN op_ix;
+  const int op_count = items - 2;
+  int op_ix;
   STRLEN dummy;
   IV *ops;
   SV *ops_sv;
@@ -4368,7 +4365,7 @@ PPCODE:
     }
 
   /* Leave room for final 0 */
-  ops_sv = newSV ((op_count+1) * sizeof (ops[0]));
+  ops_sv = newSV ((size_t)(op_count+1) * sizeof (ops[0]));
 
   SvPOK_on (ops_sv);
   ops = (IV *) SvPV (ops_sv, dummy);
@@ -5629,7 +5626,7 @@ PPCODE:
         Marpa_Rule_ID rule_id;
         int g1_rule_count =
             marpa_g_highest_rule_id (slg->l0_wrapper->g) + 1;
-        Newx (slg->l0_rule_g_properties, g1_rule_count,
+        Newx (slg->l0_rule_g_properties, ((unsigned int)g1_rule_count),
               struct l0_rule_g_properties);
         for (rule_id = 0; rule_id < g1_rule_count; rule_id++)
           {
@@ -5983,7 +5980,7 @@ PPCODE:
     switch (boolean) {
     case 0:
     case 1:
-        g_properties->t_event_on_discard = boolean;
+        g_properties->t_event_on_discard = boolean ? 1 : 0;
         break;
     default:
       croak
