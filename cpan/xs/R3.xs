@@ -694,11 +694,11 @@ static int xlua_recce_stack_meth(lua_State* L) {
     marpa_lua_getfield(L, -1, "lud");
     /* Lua stack: [ recce_table, lud ] */
     slr = (Scanless_R*)marpa_lua_touserdata(L, -1);
-    /* the slr owns the recce table, so don't */
+    /* the slr owns the recce table, so it doesn't */
     /* need to own its components. */
     v_wrapper = slr->v_wrapper;
     if (!v_wrapper) {
-        /* I think this is a reportable error */
+        /* A recoverable error?  Probably not */
         croak("recce.stack(): valuator is not yet active");
     }
     stack = v_wrapper->stack;
@@ -711,8 +711,120 @@ static int xlua_recce_stack_meth(lua_State* L) {
     return 1;
 }
 
+static int xlua_recce_step_meth(lua_State* L) {
+    Scanless_R* slr;
+    V_Wrapper *v_wrapper;
+    Marpa_Value v;
+    lua_Integer step_type;
+    const int base_of_stack = marpa_lua_gettop(L);
+    const int recce_table = base_of_stack;
+    lua_Integer v_result = -1;
+    lua_Integer v_rule = -1;
+    lua_Integer v_symbol = -1;
+    lua_Integer v_token = -1;
+    lua_Integer v_token_value = -1;
+    lua_Integer v_arg_0 = -1;
+    lua_Integer v_arg_n = -1;
+
+    marpa_luaL_checktype(L, 1, LUA_TTABLE);
+    /* Lua stack: [ recce_table ] */
+    marpa_lua_getfield(L, -1, "lud");
+    /* Lua stack: [ recce_table, lud ] */
+    slr = (Scanless_R*)marpa_lua_touserdata(L, -1);
+    /* the slr owns the recce table, so it doesn't */
+    /* need to own its components. */
+    v_wrapper = slr->v_wrapper;
+    if (!v_wrapper) {
+        /* A recoverable error?  Probably not */
+        croak("recce.stack(): valuator is not yet active");
+    }
+    v = v_wrapper->v;
+    step_type = marpa_v_step (v);
+    marpa_lua_pushinteger(L, step_type);
+    marpa_lua_pushstring(L, step_type_to_string (step_type));
+    /* Lua stack: [ recce_table, lud, step_type, step_type_string ] */
+    marpa_lua_setfield(L, recce_table, "step_type" );
+    /* Lua stack: [ recce_table, lud, step_type_string ] */
+    switch(step_type) {
+    case MARPA_STEP_RULE:
+        v_rule = marpa_v_rule(v);
+        v_result = marpa_v_result(v);
+        v_arg_0 = marpa_v_arg_0(v);
+        v_arg_n = marpa_v_arg_n(v);
+        break;
+    case MARPA_STEP_TOKEN:
+        v_rule = marpa_v_token(v);
+        v_rule = marpa_v_token_value(v);
+        v_result = marpa_v_result(v);
+        break;
+    case MARPA_STEP_NULLING_SYMBOL:
+        v_rule = marpa_v_symbol(v);
+        v_result = marpa_v_result(v);
+        break;
+    }
+
+    if (v_result >= 0) {
+      marpa_lua_pushinteger(L, v_result);
+    } else {
+      marpa_lua_pushnil(L);
+    }
+    marpa_lua_setfield(L, recce_table, "v_result" );
+    /* Lua stack: [ recce_table, lud, step_type ] */
+
+    if (v_rule >= 0) {
+      marpa_lua_pushinteger(L, v_rule);
+    } else {
+      marpa_lua_pushnil(L);
+    }
+    marpa_lua_setfield(L, recce_table, "v_rule" );
+    /* Lua stack: [ recce_table, lud, step_type ] */
+
+    if (v_symbol >= 0) {
+      marpa_lua_pushinteger(L, v_symbol);
+    } else {
+      marpa_lua_pushnil(L);
+    }
+    marpa_lua_setfield(L, recce_table, "v_symbol" );
+    /* Lua stack: [ recce_table, lud, step_type ] */
+
+    if (v_token >= 0) {
+      marpa_lua_pushinteger(L, v_token);
+    } else {
+      marpa_lua_pushnil(L);
+    }
+    marpa_lua_setfield(L, recce_table, "v_token" );
+    /* Lua stack: [ recce_table, lud, step_type ] */
+
+    if (v_token_value >= 0) {
+      marpa_lua_pushinteger(L, v_token_value);
+    } else {
+      marpa_lua_pushnil(L);
+    }
+    marpa_lua_setfield(L, recce_table, "v_token_value" );
+    /* Lua stack: [ recce_table, lud, step_type ] */
+
+    if (v_arg_0 >= 0) {
+      marpa_lua_pushinteger(L, v_arg_0);
+    } else {
+      marpa_lua_pushnil(L);
+    }
+    marpa_lua_setfield(L, recce_table, "v_arg_0" );
+    /* Lua stack: [ recce_table, lud, step_type ] */
+
+    if (v_arg_n >= 0) {
+      marpa_lua_pushinteger(L, v_arg_n);
+    } else {
+      marpa_lua_pushnil(L);
+    }
+    marpa_lua_setfield(L, recce_table, "v_arg_n" );
+    /* Lua stack: [ recce_table, lud, step_type ] */
+
+    return 1;
+}
+
 static const struct luaL_Reg marpa_recce_meths[] = {
     {"stack", xlua_recce_stack_meth},
+    {"step", xlua_recce_step_meth},
     {"ref", xlua_ref},
     {"unref", xlua_unref},
     {NULL, NULL},
@@ -4371,7 +4483,9 @@ PPCODE:
 
   while (1)
     {
-      Marpa_Step_Type step_type = marpa_v_step (v_wrapper->v);
+      int step_type;
+      xlua_sig_call (slr->L, "local recce = ...; return recce:step()", "R>i",
+          slr->lua_ref, &step_type);
       switch (step_type)
         {
         case MARPA_STEP_INACTIVE:
