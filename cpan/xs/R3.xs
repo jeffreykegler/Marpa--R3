@@ -1178,6 +1178,13 @@ xlua_sig_call (lua_State * L, const char *codestr, const char *sig, ...)
                 *va_arg (vl, int *) = (int)n;
                 break;
             }
+        case 'S':
+        {
+            croak("not yet implemented");
+        }
+        default:
+            croak
+                ("Internal error: invalid sig option %c in xlua_sig_call", this_sig);
         }
     }
 
@@ -1874,15 +1881,15 @@ default:
         IV op_code = ops[op_ix++];
 
         xlua_sig_call (slr->L,
-            "local recce, tag, step_type, op_name = ...;\n"
+            "local recce, tag, op_name = ...;\n"
             "if recce.trace_values >= 3 then\n"
             "  local top_of_queue = #recce.trace_values_queue;\n"
-            "  recce.trace_values_queue[top_of_queue+1] = {tag, step_type, op_name};\n"
+            "  recce.trace_values_queue[top_of_queue+1] = {tag, recce.step_type, op_name};\n"
             "  -- io.stderr:write('starting op: ', inspect(recce))\n"
             "end",
-            "Rsss",
+            "Rss",
             slr->lua_ref,
-            "starting op", step_type_as_string, marpa_slif_op_name (op_code)
+            "starting op", marpa_slif_op_name (op_code)
             );
 
         switch (op_code) {
@@ -1975,18 +1982,16 @@ default:
                 }
 
         xlua_sig_call (slr->L,
-            "local recce, tag, step_type, token_ix, token_sv = ...;\n"
-            "if recce.trace_values > 0 and step_type == 'MARPA_STEP_TYPE' then\n"
+            "local recce, tag, token_sv = ...;\n"
+            "if recce.trace_values > 0 and recce.step_type == 'MARPA_STEP_TYPE' then\n"
             "  local top_of_queue = #recce.trace_values_queue;\n"
             "  recce.trace_values_queue[top_of_queue+1] =\n"
-            "     {tag, step_type, token_ix, token_sv};\n"
+            "     {tag, recce.step_type, recce.token, token_sv};\n"
             "  -- io.stderr:write('valuator unknown step: ', inspect(recce))\n"
             "end",
-            "RssiS",
+            "RsS",
             slr->lua_ref,
             "valuator unknown step",
-            step_type_as_string,
-            marpa_v_token(v),
             (p_constant_sv ? newSVsv(*p_constant_sv) : newSV(0))
             );
 
@@ -2394,18 +2399,15 @@ default:
                 }
 
         xlua_sig_call (slr->L,
-            "local recce, step_type, token_ix, token_value, token_sv = ...;\n"
+            "local recce, token_sv = ...;\n"
             "if recce.trace_values > 0 then\n"
             "  local top_of_queue = #recce.trace_values_queue;\n"
             "  recce.trace_values_queue[top_of_queue+1] =\n"
-            "     {tag, step_type, token_ix, token_value, token_sv};\n"
+            "     {tag, recce.step_type, recce.v_token, recce.v_token_value, token_sv};\n"
             "  -- io.stderr:write('[step_type]: ', inspect(recce))\n"
             "end",
-            "RsiiS",
+            "RS",
             slr->lua_ref,
-            step_type_as_string,
-            marpa_v_token(v),
-            marpa_v_token_value(v),
             (p_token_value_sv ? newSVsv(*p_token_value_sv) : newSV(0))
             );
 
