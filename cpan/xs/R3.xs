@@ -46,7 +46,7 @@ typedef SV* SVREF;
 #undef Dim
 #define Dim(x) (sizeof(x)/sizeof(*x))
 
-typedef int Marpa_Op;
+typedef UV Marpa_Op;
 
 struct op_data_s { const char *name; Marpa_Op op; };
 
@@ -59,7 +59,7 @@ marpa_slif_op_name (Marpa_Op op_id)
   return op_name_by_id_object[op_id];
 }
 
-static Marpa_Op
+static int
 marpa_slif_op_id (const char *name)
 {
   int lo = 0;
@@ -70,7 +70,7 @@ marpa_slif_op_id (const char *name)
       const char *trial_name = op_by_name_object[trial].name;
       int cmp = strcmp (name, trial_name);
       if (!cmp)
-        return op_by_name_object[trial].op;
+        return (int)op_by_name_object[trial].op;
       if (cmp < 0)
         {
           hi = trial - 1;
@@ -1730,10 +1730,10 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
     const Marpa_Value v = v_wrapper->v;
     Scanless_R *const slr = v_wrapper->slr;
     const Marpa_Step_Type step_type = marpa_v_step_type (v);
-    IV result_ix = marpa_v_result (v);
+    UV result_ix = (UV)marpa_v_result (v);
     UV *ops = NULL;
     UV op_ix;
-    int blessing = 0;
+    UV blessing = 0;
 
     /* Initializations are to silence GCC warnings --
      * if these values appear to the user, there is
@@ -1755,7 +1755,7 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
     const char *const step_type_as_string =
         step_type_to_string (step_type);
 
-    v_wrapper->result = result_ix;
+    v_wrapper->result = (int)result_ix;
   /* warn("%s %d", __FILE__, __LINE__); */
 
 switch (step_type) {
@@ -1889,7 +1889,7 @@ default:
                 int argc;
                 int status;
                 const int base_of_stack = marpa_lua_gettop (L);
-                const int fn_key = ops[op_ix++];
+                const UV fn_key = ops[op_ix++];
 
   /* warn ("Executing MARPA_OP_LUA, fn_key = %d", fn_key); */
 
@@ -1955,16 +1955,16 @@ default:
                 SV **p_constant_sv;
 
                 p_constant_sv =
-                    av_fetch (v_wrapper->constants, constant_ix, 0);
+                    av_fetch (v_wrapper->constants, (I32)constant_ix, 0);
                 if (p_constant_sv) {
                     SV *constant_sv = newSVsv (*p_constant_sv);
                     SV **stored_sv =
-                        av_store (stack, result_ix, constant_sv);
+                        av_store (stack, (I32)result_ix, constant_sv);
                     if (!stored_sv) {
                         SvREFCNT_dec (constant_sv);
                     }
                 } else {
-                    av_store (stack, result_ix, newSV (0));
+                    av_store (stack, (I32)result_ix, newSV (0));
                 }
 
         xlua_sig_call (slr->L,
@@ -1990,10 +1990,10 @@ default:
                 SV **stored_av;
                 SV **p_sv;
                 UV stack_offset = ops[op_ix++];
-                IV fetch_ix;
+                UV fetch_ix;
 
                 if (step_type != MARPA_STEP_RULE) {
-                    av_fill (stack, result_ix - 1);
+                    av_fill (stack, (I32)result_ix - 1);
                     return -1;
                 }
                 if (stack_offset == 0) {
@@ -2001,49 +2001,37 @@ default:
                      * it's common, it's reference count handling is
                      * a special case and it can be easily and highly optimized.
                      */
-                    av_fill (stack, result_ix);
+                    av_fill (stack, (I32)result_ix);
                     return -1;
                 }
 
                 /* Determine index of SV to fetch */
                 if (op_code == MARPA_OP_RESULT_IS_RHS_N) {
-                    if (stack_offset > 0) {
-                        fetch_ix = result_ix + stack_offset;
-                    } else {
-                        fetch_ix = marpa_v_arg_n (v) + 1 - stack_offset;
-                    }
+                    fetch_ix = result_ix + stack_offset;
                 } else {        /* sequence */
-                    int item_ix;
-                    if (stack_offset >= 0) {
-                        item_ix = stack_offset;
-                    } else {
-                        int item_count =
-                            (marpa_v_arg_n (v) - marpa_v_arg_0 (v)) / 2 +
-                            1;
-                        item_ix = (item_count + stack_offset);
-                    }
+                    const UV item_ix = stack_offset;
                     fetch_ix = result_ix + item_ix * 2;
                 }
 
                 /* Bounds check fetch ix */
-                if (fetch_ix > marpa_v_arg_n (v) || fetch_ix < result_ix) {
+                if (fetch_ix > (UV)marpa_v_arg_n (v) || fetch_ix < result_ix) {
                     /* return an undef */
-                    av_fill (stack, result_ix - 1);
+                    av_fill (stack, (I32)result_ix - 1);
                     return -1;
                 }
-                p_sv = av_fetch (stack, fetch_ix, 0);
+                p_sv = av_fetch (stack, (I32)fetch_ix, 0);
                 if (!p_sv) {
-                    av_fill (stack, result_ix - 1);
+                    av_fill (stack, (I32)result_ix - 1);
                     return -1;
                 }
                 stored_av =
-                    av_store (stack, result_ix, SvREFCNT_inc_NN (*p_sv));
+                    av_store (stack, (I32)result_ix, SvREFCNT_inc_NN (*p_sv));
                 if (!stored_av) {
                     SvREFCNT_dec (*p_sv);
-                    av_fill (stack, result_ix - 1);
+                    av_fill (stack, (I32)result_ix - 1);
                     return -1;
                 }
-                av_fill (stack, result_ix);
+                av_fill (stack, (I32)result_ix);
             }
             return -1;
 
@@ -2053,7 +2041,7 @@ default:
 
                 if (blessing) {
                     SV **p_blessing_sv =
-                        av_fetch (v_wrapper->constants, blessing, 0);
+                        av_fetch (v_wrapper->constants, (I32)blessing, 0);
                     if (p_blessing_sv && SvPOK (*p_blessing_sv)) {
                         STRLEN blessing_length;
                         char *classname =
@@ -2064,17 +2052,17 @@ default:
                 }
                 /* De-mortalize the reference to values_av */
                 SvREFCNT_inc_simple_void_NN (ref_to_values_av);
-                stored_av = av_store (stack, result_ix, ref_to_values_av);
+                stored_av = av_store (stack, (I32)result_ix, ref_to_values_av);
 
                 /* If the new RV did not get stored properly,
                  * decrement its ref count to re-mortalize it.
                  */
                 if (!stored_av) {
                     SvREFCNT_dec (ref_to_values_av);
-                    av_fill (stack, result_ix - 1);
+                    av_fill (stack, (I32)result_ix - 1);
                     return -1;
                 }
-                av_fill (stack, result_ix);
+                av_fill (stack, (I32)result_ix);
             }
             return -1;
 
@@ -2113,14 +2101,14 @@ default:
 
                 case MARPA_STEP_RULE:
                     {
-                        int stack_ix;
+                        UV stack_ix;
                         const int arg_n = marpa_v_arg_n (v);
-                        int increment =
+                        UV increment =
                             op_code == MARPA_OP_PUSH_SEQUENCE ? 2 : 1;
 
-                        for (stack_ix = result_ix; stack_ix <= arg_n;
+                        for (stack_ix = result_ix; stack_ix <= (UV)arg_n;
                             stack_ix += increment) {
-                            SV **p_sv = av_fetch (stack, stack_ix, 0);
+                            SV **p_sv = av_fetch (stack, (I32)stack_ix, 0);
                             if (!p_sv) {
                                 av_push (values_av, newSV (0));
                             } else {
@@ -2149,7 +2137,7 @@ default:
                 SV **p_constant_sv;
 
                 p_constant_sv =
-                    av_fetch (v_wrapper->constants, constant_ix, 0);
+                    av_fetch (v_wrapper->constants, (I32)constant_ix, 0);
                 if (p_constant_sv) {
                     av_push (values_av,
                         SvREFCNT_inc_simple_NN (*p_constant_sv));
@@ -2170,7 +2158,7 @@ default:
                     av_push (values_av, newSV (0));
                     goto NEXT_OP_CODE;
                 }
-                p_sv = av_fetch (stack, result_ix + offset, 0);
+                p_sv = av_fetch (stack, (I32)(result_ix + offset), 0);
                 if (!p_sv) {
                     av_push (values_av, newSV (0));
                 } else {
@@ -2328,7 +2316,7 @@ default:
 
                 if (blessing) {
                     SV **p_blessing_sv =
-                        av_fetch (v_wrapper->constants, blessing, 0);
+                        av_fetch (v_wrapper->constants, (I32)blessing, 0);
                     if (p_blessing_sv && SvPOK (*p_blessing_sv)) {
                         STRLEN blessing_length;
                         char *classname =
@@ -2349,7 +2337,7 @@ default:
                 int token_ix = marpa_v_token_value (v);
 
                 if (step_type != MARPA_STEP_TOKEN) {
-                    av_fill (stack, result_ix - 1);
+                    av_fill (stack, (I32)result_ix - 1);
                     return -1;
                 }
                 if (slr && token_ix == TOKEN_VALUE_IS_LITERAL) {
@@ -2362,7 +2350,7 @@ default:
                         slr_es_span_to_literal_sv (slr, start_earley_set,
                         end_earley_set - start_earley_set);
                     stored_sv =
-                        av_store (stack, result_ix, token_literal_sv);
+                        av_store (stack, (I32)result_ix, token_literal_sv);
                     if (!stored_sv) {
                         SvREFCNT_dec (token_literal_sv);
                     }
@@ -2375,12 +2363,12 @@ default:
                 if (p_token_value_sv) {
                     SV *token_value_sv = newSVsv (*p_token_value_sv);
                     SV **stored_sv =
-                        av_store (stack, result_ix, token_value_sv);
+                        av_store (stack, (I32)result_ix, token_value_sv);
                     if (!stored_sv) {
                         SvREFCNT_dec (token_value_sv);
                     }
                 } else {
-                    av_fill (stack, result_ix - 1);
+                    av_fill (stack, (I32)result_ix - 1);
                     return -1;
                 }
 
@@ -3307,7 +3295,7 @@ PPCODE:
  # will be done mainly for error messages.
 void
 op_name( op )
-     IV op;
+     UV op;
 PPCODE:
 {
   XSRETURN_PV (marpa_slif_op_name(op));
@@ -4272,8 +4260,8 @@ rule_register( v_wrapper, rule_id, ... )
 PPCODE:
 {
   /* OP Count is args less two */
-  const int op_count = items - 2;
-  int op_ix;
+  const UV op_count = (UV)items - 2;
+  UV op_ix;
   STRLEN dummy;
   UV *ops;
   SV *ops_sv;
@@ -4291,7 +4279,7 @@ PPCODE:
   ops = (UV *) SvPV (ops_sv, dummy);
   for (op_ix = 0; op_ix < op_count; op_ix++)
     {
-      ops[op_ix] = SvIV (ST (op_ix+2));
+      ops[op_ix] = SvUV (ST ((int)op_ix+2));
     }
   ops[op_ix] = 0;
   if (!av_store (rule_semantics, (I32) rule_id, ops_sv)) {
