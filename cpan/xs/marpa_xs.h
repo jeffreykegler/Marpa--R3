@@ -34,7 +34,7 @@ extern const struct marpa_step_type_description_s
   marpa_step_type_description[];
 
 typedef struct {
-    int next_offset; /* Offset of *NEXT* codepoint */
+    size_t next_offset; /* Offset of *NEXT* codepoint */
     int linecol;
     /* Lines are 1-based, columns are zero-based and negated.
      * In the first column (column 0), linecol is the 1-based line number.
@@ -135,14 +135,14 @@ union marpa_slr_event_s
   struct
   {
     int event_type;
-    int t_codepoint;
+    UV t_codepoint;
     int t_perl_pos;
   } t_trace_codepoint_read;
 
   struct
   {
     int event_type;
-    int t_codepoint;
+    UV t_codepoint;
     int t_perl_pos;
     int t_symbol_id;
   } t_trace_codepoint_rejected;
@@ -150,7 +150,7 @@ union marpa_slr_event_s
   struct
   {
     int event_type;
-    int t_codepoint;
+    UV t_codepoint;
     int t_perl_pos;
     int t_symbol_id;
   } t_trace_codepoint_accepted;

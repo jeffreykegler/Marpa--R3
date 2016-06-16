@@ -1142,7 +1142,7 @@ xlua_sig_call (lua_State * L, const char *codestr, const char *sig, ...)
     }
   endargs:;
 
-    nres = strlen (sig);
+    nres = (int)strlen (sig);
 
     /* warn("%s %d", __FILE__, __LINE__); */
     status = marpa_lua_pcall (L, narg, nres, 0);
@@ -1684,8 +1684,8 @@ u_pos_span_to_literal_sv (Scanless_R * slr,
   STRLEN dummy;
   char *input = SvPV (slr->input, dummy);
   SV* new_sv;
-  int start_offset = POS_TO_OFFSET (slr, start_pos);
-  int length_in_bytes =
+  size_t start_offset = POS_TO_OFFSET (slr, start_pos);
+  const STRLEN length_in_bytes =
     POS_TO_OFFSET (slr,
                    start_pos + length_in_positions) - start_offset;
   new_sv = newSVpvn (input + start_offset, length_in_bytes);
@@ -1745,7 +1745,7 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
     IV result_ix = marpa_v_result (v);
     IV *ops = NULL;
     int op_ix;
-    UV blessing = 0;
+    int blessing = 0;
 
     /* Initializations are to silence GCC warnings --
      * if these values appear to the user, there is
@@ -7366,7 +7366,7 @@ PPCODE:
           Renew (slr->pos_db, (unsigned int)slr->pos_db_physical_size, Pos_Entry);
         }
       p += codepoint_length;
-      slr->pos_db[slr->pos_db_logical_size].next_offset = p - start_of_string;
+      slr->pos_db[slr->pos_db_logical_size].next_offset = (size_t)(p - start_of_string);
 
       /* The definition of newline here follows the Unicode standard TR13 */
       if (codepoint == 0x0a && previous_codepoint == 0x0d)
