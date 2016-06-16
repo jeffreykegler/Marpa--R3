@@ -5596,7 +5596,7 @@ PPCODE:
     {
         int symbol_ix;
         int g1_symbol_count = marpa_g_highest_symbol_id (slg->g1) + 1;
-        Newx (slg->g1_lexeme_to_assertion, g1_symbol_count,
+        Newx (slg->g1_lexeme_to_assertion, (unsigned int)g1_symbol_count,
               Marpa_Assertion_ID);
         for (symbol_ix = 0; symbol_ix < g1_symbol_count; symbol_ix++)
           {
@@ -5607,7 +5607,7 @@ PPCODE:
     {
         Marpa_Symbol_ID symbol_id;
         int g1_symbol_count = marpa_g_highest_symbol_id (slg->g1) + 1;
-        Newx (slg->symbol_g_properties, g1_symbol_count,
+        Newx (slg->symbol_g_properties, (unsigned int)g1_symbol_count,
               struct symbol_g_properties);
         for (symbol_id = 0; symbol_id < g1_symbol_count; symbol_id++)
           {
@@ -6239,12 +6239,12 @@ PPCODE:
 
   slr->t_count_of_deleted_events = 0;
   slr->t_event_count = 0;
-  slr->t_event_capacity = MAX (1024 / sizeof (union marpa_slr_event_s), 16);
-  Newx (slr->t_events, ((unsigned int)slr->t_event_capacity), union marpa_slr_event_s);
+  slr->t_event_capacity = (int)MAX (1024 / sizeof (union marpa_slr_event_s), 16);
+  Newx (slr->t_events, (unsigned int)slr->t_event_capacity, union marpa_slr_event_s);
 
   slr->t_lexeme_count = 0;
-  slr->t_lexeme_capacity = MAX (1024 / sizeof (union marpa_slr_event_s), 16);
-  Newx (slr->t_lexemes, slr->t_lexeme_capacity, union marpa_slr_event_s);
+  slr->t_lexeme_capacity = (int)MAX (1024 / sizeof (union marpa_slr_event_s), 16);
+  Newx (slr->t_lexemes, (unsigned int)slr->t_lexeme_capacity, union marpa_slr_event_s);
 
   new_sv = sv_newmortal ();
   sv_setref_pv (new_sv, scanless_r_class_name, (void *) slr);
