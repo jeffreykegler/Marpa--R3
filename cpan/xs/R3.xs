@@ -368,28 +368,16 @@ coerce_to_sv (lua_State * L, int idx)
       break;
     case LUA_TUSERDATA:
       {
-        int are_equal;
-        if (!marpa_lua_getmetatable (L, idx))
-          {                        /* does it have a metatable? */
-            result =
-              newSVpvf
-              ("Lua userdata at index %d in coerce_to_sv has no metatable: coercion not implemented",
-               idx);
-            break;
-          }
-        marpa_luaL_getmetatable (L, MT_NAME_SV);        /* get correct metatable */
-        are_equal = marpa_lua_rawequal (L, -1, -2);        /* the same? */
-        marpa_lua_pop (L, 2);        /* remove both metatables */
-        if (!are_equal)
-          {
+        SV** p_result = marpa_luaL_testudata (L, idx, MT_NAME_SV);
+        if (!p_result ) {
             result =
               newSVpvf
               ("Coercion not implemented for Lua userdata at index %d in coerce_to_sv",
                idx);
-            break;
-          }
-        result = *(SV **) marpa_lua_touserdata (L, idx);
-        SvREFCNT_inc_simple_void_NN (result);
+        } else {
+          result = *p_result;
+          SvREFCNT_inc_simple_void_NN (result);
+        }
       };
       break;
 
@@ -1179,7 +1167,7 @@ xlua_sig_call (lua_State * L, const char *codestr, const char *sig, ...)
                 *va_arg (vl, int *) = (int)n;
                 break;
             }
-        case 'S':
+        case 'S': /* SV -- caller becomes owner of 1 ref count. */
         {
             croak("not yet implemented");
         }
