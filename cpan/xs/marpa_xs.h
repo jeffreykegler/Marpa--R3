@@ -329,7 +329,7 @@ typedef struct
   G_Wrapper *l0_wrapper;
   Marpa_Assertion_ID *g1_lexeme_to_assertion;
   HV *per_codepoint_hash;
-  IV *per_codepoint_array[128];
+  UV *per_codepoint_array[128];
   int precomputed;
   struct symbol_g_properties *symbol_g_properties;
   struct l0_rule_g_properties *l0_rule_g_properties;

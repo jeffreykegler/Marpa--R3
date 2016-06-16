@@ -160,8 +160,8 @@ typedef struct marpa_g Grammar;
 
 typedef struct marpa_r Recce;
 
-#define TOKEN_VALUE_IS_LITERAL (0)
 #define TOKEN_VALUE_IS_UNDEF (1)
+#define TOKEN_VALUE_IS_LITERAL (2)
 
 typedef struct marpa_b Bocage;
 
@@ -1435,9 +1435,9 @@ u_read (Scanless_R * slr)
     {
       UV codepoint;
       STRLEN codepoint_length = 1;
-      int op_ix;
-      int op_count;
-      IV *ops;
+      UV op_ix;
+      UV op_count;
+      UV *ops;
       int tokens_accepted = 0;
       if (slr->perl_pos >= slr->end_pos)
         break;
@@ -1485,7 +1485,7 @@ u_read (Scanless_R * slr)
               slr->codepoint = codepoint;
               return U_READ_UNREGISTERED_CHAR;
             }
-          ops = (IV *) SvPV (*p_ops_sv, dummy);
+          ops = (UV *) SvPV (*p_ops_sv, dummy);
         }
 
 if (trace_lexers >= 1)
@@ -1500,7 +1500,7 @@ if (trace_lexers >= 1)
       op_count = ops[1];
       for (op_ix = 2; op_ix < op_count; op_ix++)
         {
-          IV op_code = ops[op_ix];
+          const UV op_code = ops[op_ix];
           switch (op_code)
             {
             case MARPA_OP_ALTERNATIVE:
@@ -1731,8 +1731,8 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
     Scanless_R *const slr = v_wrapper->slr;
     const Marpa_Step_Type step_type = marpa_v_step_type (v);
     IV result_ix = marpa_v_result (v);
-    IV *ops = NULL;
-    int op_ix;
+    UV *ops = NULL;
+    UV op_ix;
     int blessing = 0;
 
     /* Initializations are to silence GCC warnings --
@@ -1767,7 +1767,7 @@ case MARPA_STEP_RULE:
   /* warn("%s %d", __FILE__, __LINE__); */
         if (p_ops_sv) {
   /* warn("%s %d", __FILE__, __LINE__); */
-            ops = (IV *) SvPV (*p_ops_sv, dummy);
+            ops = (UV *) SvPV (*p_ops_sv, dummy);
         }
     }
     break;
@@ -1779,7 +1779,7 @@ case MARPA_STEP_TOKEN:
   /* warn("%s %d", __FILE__, __LINE__); */
         if (p_ops_sv) {
   /* warn("%s %d", __FILE__, __LINE__); */
-            ops = (IV *) SvPV (*p_ops_sv, dummy);
+            ops = (UV *) SvPV (*p_ops_sv, dummy);
         }
     }
     break;
@@ -1791,7 +1791,7 @@ case MARPA_STEP_NULLING_SYMBOL:
   /* warn("%s %d", __FILE__, __LINE__); */
         if (p_ops_sv) {
   /* warn("%s %d", __FILE__, __LINE__); */
-            ops = (IV *) SvPV (*p_ops_sv, dummy);
+            ops = (UV *) SvPV (*p_ops_sv, dummy);
         }
     }
     break;
@@ -1858,13 +1858,13 @@ default:
                     semantics_type, semantics_ix);
         }
         /* warn("%s %d", __FILE__, __LINE__); */
-        ops = (IV *) ops_ud->array;
+        ops = (UV *) ops_ud->array;
         marpa_lua_settop(L, base_of_stack);
     }
 
     op_ix = 0;
     while (1) {
-        IV op_code = ops[op_ix++];
+        UV op_code = ops[op_ix++];
 
         xlua_sig_call (slr->L,
             "local recce, tag, op_name = ...;\n"
@@ -1951,7 +1951,7 @@ default:
 
         case MARPA_OP_RESULT_IS_CONSTANT:
             {
-                IV constant_ix = ops[op_ix++];
+                UV constant_ix = ops[op_ix++];
                 SV **p_constant_sv;
 
                 p_constant_sv =
@@ -1989,7 +1989,7 @@ default:
             {
                 SV **stored_av;
                 SV **p_sv;
-                IV stack_offset = ops[op_ix++];
+                UV stack_offset = ops[op_ix++];
                 IV fetch_ix;
 
                 if (step_type != MARPA_STEP_RULE) {
@@ -2145,7 +2145,7 @@ default:
 
         case MARPA_OP_PUSH_CONSTANT:
             {
-                IV constant_ix = ops[op_ix++];
+                UV constant_ix = ops[op_ix++];
                 SV **p_constant_sv;
 
                 p_constant_sv =
@@ -2162,7 +2162,7 @@ default:
 
         case MARPA_OP_PUSH_ONE:
             {
-                int offset;
+                UV offset;
                 SV **p_sv;
 
                 offset = ops[op_ix++];
@@ -4275,7 +4275,7 @@ PPCODE:
   const int op_count = items - 2;
   int op_ix;
   STRLEN dummy;
-  IV *ops;
+  UV *ops;
   SV *ops_sv;
   AV *rule_semantics = v_wrapper->rule_semantics;
 
@@ -4288,7 +4288,7 @@ PPCODE:
   ops_sv = newSV ((size_t)(op_count+1) * sizeof (ops[0]));
 
   SvPOK_on (ops_sv);
-  ops = (IV *) SvPV (ops_sv, dummy);
+  ops = (UV *) SvPV (ops_sv, dummy);
   for (op_ix = 0; op_ix < op_count; op_ix++)
     {
       ops[op_ix] = SvIV (ST (op_ix+2));
@@ -4309,7 +4309,7 @@ PPCODE:
   const int op_count = items - 2;
   int op_ix;
   STRLEN dummy;
-  IV *ops;
+  UV *ops;
   SV *ops_sv;
   AV *token_semantics = v_wrapper->token_semantics;
 
@@ -4322,10 +4322,10 @@ PPCODE:
   ops_sv = newSV ((size_t)(op_count+1) * sizeof (ops[0]));
 
   SvPOK_on (ops_sv);
-  ops = (IV *) SvPV (ops_sv, dummy);
+  ops = (UV *) SvPV (ops_sv, dummy);
   for (op_ix = 0; op_ix < op_count; op_ix++)
     {
-      ops[op_ix] = SvIV (ST (op_ix+2));
+      ops[op_ix] = SvUV (ST (op_ix+2));
     }
   ops[op_ix] = 0;
   if (!av_store (token_semantics, (I32) token_id, ops_sv)) {
@@ -4343,7 +4343,7 @@ PPCODE:
   const int op_count = items - 2;
   int op_ix;
   STRLEN dummy;
-  IV *ops;
+  UV *ops;
   SV *ops_sv;
   AV *nulling_semantics = v_wrapper->nulling_semantics;
 
@@ -4356,10 +4356,10 @@ PPCODE:
   ops_sv = newSV ((size_t)(op_count+1) * sizeof (ops[0]));
 
   SvPOK_on (ops_sv);
-  ops = (IV *) SvPV (ops_sv, dummy);
+  ops = (UV *) SvPV (ops_sv, dummy);
   for (op_ix = 0; op_ix < op_count; op_ix++)
     {
-      ops[op_ix] = SvIV (ST (op_ix+2));
+      ops[op_ix] = SvUV (ST (op_ix+2));
     }
   ops[op_ix] = 0;
   if (!av_store (nulling_semantics, (I32) symbol_id, ops_sv)) {
@@ -6153,7 +6153,7 @@ PPCODE:
   slr->problem_pos = -1;
 
   slr->token_values = newAV ();
-  av_fill (slr->token_values, TOKEN_VALUE_IS_UNDEF);
+  av_fill (slr->token_values, TOKEN_VALUE_IS_LITERAL);
 
   {
     Marpa_Symbol_ID symbol_id;
@@ -7430,15 +7430,15 @@ char_register( slr, codepoint, ... )
 PPCODE:
 {
   /* OP Count is args less two, then plus two for codepoint and length fields */
-  const int op_count = items;
-  int op_ix;
-  IV *ops;
+  const UV op_count = (UV)items;
+  UV op_ix;
+  UV *ops;
   SV *ops_sv = NULL;
 
   if ( codepoint < (int)Dim (slr->slg->per_codepoint_array))
     {
       ops = slr->slg->per_codepoint_array[codepoint];
-      Renew (ops, (unsigned int)op_count, IV);
+      Renew (ops, (unsigned int)op_count, UV);
       slr->slg->per_codepoint_array[codepoint] = ops;
     }
   else
@@ -7446,7 +7446,7 @@ PPCODE:
       STRLEN dummy;
       ops_sv = newSV ((size_t)op_count * sizeof (ops[0]));
       SvPOK_on (ops_sv);
-      ops = (IV *) SvPV (ops_sv, dummy);
+      ops = (UV *) SvPV (ops_sv, dummy);
     }
   ops[0] = codepoint;
   ops[1] = op_count;
@@ -7455,7 +7455,7 @@ PPCODE:
       /* By coincidence, offset of individual ops is 2 both in the
        * method arguments and in the op_list, so that arg IX == op_ix
        */
-      ops[op_ix] = SvIV (ST (op_ix));
+      ops[op_ix] = SvUV (ST ((int)op_ix));
     }
   if (ops_sv)
     {
