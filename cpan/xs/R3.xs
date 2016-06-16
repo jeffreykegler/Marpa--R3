@@ -160,8 +160,8 @@ typedef struct marpa_g Grammar;
 
 typedef struct marpa_r Recce;
 
+#define TOKEN_VALUE_IS_LITERAL (0)
 #define TOKEN_VALUE_IS_UNDEF (1)
-#define TOKEN_VALUE_IS_LITERAL (2)
 
 typedef struct marpa_b Bocage;
 
@@ -6153,7 +6153,7 @@ PPCODE:
   slr->problem_pos = -1;
 
   slr->token_values = newAV ();
-  av_fill (slr->token_values, TOKEN_VALUE_IS_LITERAL);
+  av_fill (slr->token_values, TOKEN_VALUE_IS_UNDEF);
 
   {
     Marpa_Symbol_ID symbol_id;
