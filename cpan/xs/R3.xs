@@ -7426,7 +7426,7 @@ PPCODE:
 void
 char_register( slr, codepoint, ... )
     Scanless_R *slr;
-     int codepoint;
+    UV codepoint;
 PPCODE:
 {
   /* OP Count is args less two, then plus two for codepoint and length fields */
