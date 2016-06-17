@@ -46,7 +46,7 @@ end
 function op_fn_result_is_undef(...)
         local recce, type, result_ix = ...
         local stack = recce:stack()
-        stack[result_ix] = marpa.sv.lua_nil()
+        stack[result_ix] = marpa.sv.undef()
         marpa.sv.fill(stack, result_ix)
         return 0
 end
@@ -89,6 +89,15 @@ function value_init(recce, trace_values)
 	recce.trace_values,
       }
     end
+
+    recce.token_value = {}
+    recce.token_is_undef = 1
+    recce.token_value[recce.token_is_undef] = marpa.sv.undef()
+
+    -- token is literal is a pseudo-index, and the SV undef
+    -- is just a place holder
+    recce.token_is_literal = 2
+    recce.token_value[recce.token_is_literal] = marpa.sv.undef()
 
     recce.is_inited = true;
 end

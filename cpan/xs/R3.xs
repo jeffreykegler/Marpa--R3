@@ -479,7 +479,7 @@ static void marpa_sv_av_noinc (lua_State* L, AV* av) {
 #define MARPA_SV_AV(L, av) \
     (SvREFCNT_inc_simple_void_NN (av), marpa_sv_av_noinc((L), (av)))
 
-static int marpa_sv_nil (lua_State* L) {
+static int marpa_sv_undef (lua_State* L) {
     dTHX;
     /* [] */
     marpa_sv_sv_noinc( L, newSV(0) );
@@ -552,7 +552,7 @@ static int marpa_av_fetch_meth(lua_State* L) {
         MARPA_SV_SV(L, sv);
     } else {
         /* Put a new nil SV on top of the stack */
-        marpa_sv_nil(L);
+        marpa_sv_undef(L);
     }
     return 1;
 }
@@ -651,7 +651,7 @@ static const struct luaL_Reg marpa_sv_meths[] = {
 static const struct luaL_Reg marpa_sv_funcs[] = {
     {"fill", marpa_av_fill_meth},
     {"top_index", marpa_av_len_meth},
-    {"lua_nil", marpa_sv_nil},
+    {"undef", marpa_sv_undef},
     {NULL, NULL},
 };
 
