@@ -53,7 +53,7 @@ end
 
 function value_init(recce, trace_values)
 
-    if recce.is_inited then return end
+    if recce.value_is_inited then return end
 
     recce.op_fn_key = {}
 
@@ -90,16 +90,7 @@ function value_init(recce, trace_values)
       }
     end
 
-    recce.token_value = {}
-    recce.token_is_undef = 1
-    recce.token_value[recce.token_is_undef] = marpa.sv.undef()
-
-    -- token is literal is a pseudo-index, and the SV undef
-    -- is just a place holder
-    recce.token_is_literal = 2
-    recce.token_value[recce.token_is_literal] = marpa.sv.undef()
-
-    recce.is_inited = true;
+    recce.value_is_inited = true;
 end
 
 function value_reset(recce)
@@ -111,7 +102,7 @@ function value_reset(recce)
     recce.trace_values = 0;
     recce.trace_values_queue = {};
 
-    recce.is_inited = false;
+    recce.value_is_inited = false;
 end
 
 END_OF_LUA

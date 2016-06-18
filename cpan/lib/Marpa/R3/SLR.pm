@@ -296,6 +296,20 @@ sub Marpa::R3::Scanless::R::new {
 
     Marpa::R3::Internal::Scanless::convert_libmarpa_events($slr);
 
+    $slr->exec(<<'END_OF_LUA');
+    local recce = ...
+
+    recce.token_values = {}
+    recce.token_is_undef = 1
+    recce.token_values[recce.token_is_undef] = marpa.sv.undef()
+
+    -- token is literal is a pseudo-index, and the SV undef
+    -- is just a place holder
+    recce.token_is_literal = 2
+    recce.token_values[recce.token_is_literal] = marpa.sv.undef()
+
+END_OF_LUA
+
     return $slr;
 } ## end sub Marpa::R3::Scanless::R::new
 
