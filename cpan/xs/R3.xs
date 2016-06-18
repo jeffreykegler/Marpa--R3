@@ -2375,8 +2375,8 @@ default:
         xlua_sig_call (slr->L,
             "local recce, token_sv = ...;\n"
             "local stack = recce:stack()\n"
-            "-- stack[result_ix] = = recce.token_values[recce.v_token]\n"
-            "-- marpa.sv.fill(stack, recce.v_result)\n"
+            "stack[result_ix] = = recce.token_values[recce.v_token]\n"
+            "marpa.sv.fill(stack, recce.v_result)\n"
             "if recce.trace_values > 0 then\n"
             "  local top_of_queue = #recce.trace_values_queue;\n"
             "  recce.trace_values_queue[top_of_queue+1] =\n"
