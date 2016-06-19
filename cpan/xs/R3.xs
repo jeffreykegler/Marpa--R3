@@ -640,6 +640,12 @@ static int marpa_av_fill_meth (lua_State* L) {
     return 0;
 }
 
+static int marpa_sv_tostring_meth(lua_State* L) {
+    SV** p_table_sv = (SV**)marpa_luaL_checkudata(L, 1, MT_NAME_SV);
+    push_val (lua_State * L, *p_table_sv);
+    !!!
+}
+
 static const struct luaL_Reg marpa_sv_meths[] = {
     {"__add", marpa_sv_add_meth},
     {"__gc", marpa_sv_finalize_meth},
@@ -741,7 +747,7 @@ static int xlua_recce_step_meth(lua_State* L) {
         v_arg_n = marpa_v_arg_n(v);
         break;
     case MARPA_STEP_TOKEN:
-        v_rule = marpa_v_token(v);
+        v_token = marpa_v_token(v);
         v_rule = marpa_v_token_value(v);
         v_result = marpa_v_result(v);
         break;
@@ -2333,7 +2339,6 @@ default:
 
         case MARPA_OP_RESULT_IS_TOKEN_VALUE:
             {
-                SV **p_token_value_sv;
                 int token_ix = marpa_v_token_value (v);
 
                 if (step_type != MARPA_STEP_TOKEN) {
@@ -2357,35 +2362,34 @@ default:
                     return -1;
                 }
 
-
-                p_token_value_sv =
-                    av_fetch (slr->token_values, (I32) token_ix, 0);
-                if (p_token_value_sv) {
-                    SV *token_value_sv = newSVsv (*p_token_value_sv);
-                    SV **stored_sv =
-                        av_store (stack, (I32)result_ix, token_value_sv);
-                    if (!stored_sv) {
-                        SvREFCNT_dec (token_value_sv);
-                    }
-                } else {
-                    av_fill (stack, (I32)result_ix - 1);
-                    return -1;
-                }
-
         xlua_sig_call (slr->L,
-            "local recce, token_sv = ...;\n"
+            "-- case MARPA_OP_RESULT_IS_TOKEN_VALUE:\n"
+            "local recce = ...;\n"
             "local stack = recce:stack()\n"
-            "stack[result_ix] = = recce.token_values[recce.v_token]\n"
-            "marpa.sv.fill(stack, recce.v_result)\n"
+            "local result_ix = recce.v_result\n"
+            "print('before assign of recce.token_values recce.v_token ', recce.token_values[recce.v_token])\n"
+            "print('recce.token_values=', inspect(recce.token_values))\n"
+            "print('recce.v_token=', recce.v_token)\n"
+            "print([[assign is to stack at]], result_ix)\n"
+            "print('stack[result_ix] before assign:', stack[result_ix])\n"
+            "print([[stack, top ix, result_ix = ]], stack, marpa.sv.top_index(stack), result_ix)\n"
+            "stack[result_ix] = recce.token_values[recce.v_token]\n"
+            "print('stack[result_ix] after assign:', stack[result_ix])\n"
+            "print([[stack, top ix, result_ix = ]], stack, marpa.sv.top_index(stack), result_ix)\n"
+            "-- marpa.sv.fill(stack, result_ix)\n"
+            "print('stack[result_ix] after fill:', stack[result_ix])\n"
+            "print([[stack, top ix, result_ix = ]], stack, marpa.sv.top_index(stack), result_ix)\n"
+            "print('stack[result_ix] repeated:', stack[result_ix])\n"
+            "print([[stack, top ix, result_ix = ]], stack, marpa.sv.top_index(stack), result_ix)\n"
+            "print([[after fill, token_values = ]], inspect(recce.token_values))\n"
             "if recce.trace_values > 0 then\n"
             "  local top_of_queue = #recce.trace_values_queue;\n"
             "  recce.trace_values_queue[top_of_queue+1] =\n"
             "     {tag, recce.step_type, recce.v_token, recce.v_token_value, token_sv};\n"
             "  -- io.stderr:write('[step_type]: ', inspect(recce))\n"
             "end",
-            "RS",
-            slr->lua_ref,
-            (p_token_value_sv ? newSVsv(*p_token_value_sv) : newSV(0))
+            "R",
+            slr->lua_ref
             );
 
 
@@ -6975,7 +6979,6 @@ PPCODE:
 {
   int result;
   int token_ix;
-  int dummy;
   switch (items)
     {
     case 2:
@@ -6999,11 +7002,12 @@ PPCODE:
         token_ix = av_len (slr->token_values);
         xlua_sig_call (slr->L,
             "local recce, token_sv = ...;\n"
-            "local new_token_ix = #recce.token_values\n"
+            "local new_token_ix = #recce.token_values + 1\n"
+            "print([[before assign of]], token_sv, [[to recce.token_values at ix]], new_token_ix)\n"
             "recce.token_values[new_token_ix] = token_sv\n"
             "return new_token_ix\n",
             "RS>i",
-            slr->lua_ref, newSVsv(token_value), &dummy);
+            slr->lua_ref, newSVsv(token_value), &token_ix);
       }
       break;
     default:
