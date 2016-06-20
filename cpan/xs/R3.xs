@@ -430,16 +430,15 @@ push_val (lua_State * L, SV * val)
     {
       /* warn("%s %d\n", __FILE__, __LINE__); */
       marpa_lua_pushfstring (L,
-                             "!!!Argument unsupported: Perl reference type (%s)",
+                             "[Perl ref to type %s]",
                              sv_reftype (SvRV (val), 0));
       return;
     }
       /* warn("%s %d\n", __FILE__, __LINE__); */
-  marpa_lua_pushfstring (L, "!!!Argument unsupported: Perl type (%d)",
+  marpa_lua_pushfstring (L, "[Perl type %d]",
                          SvTYPE (val));
   return;
 }
-
 
 /* Creates a userdata containing a Perl SV, and
  * leaves the new userdata on top of the stack.
@@ -631,6 +630,7 @@ marpa_av_fill (lua_State * L, SV * sv, int x)
 }
 
 static int marpa_av_fill_meth (lua_State* L) {
+    /* After development, check not needed */
     SV** p_table_sv = (SV**)marpa_luaL_checkudata(L, 1, MT_NAME_SV);
     /* warn("%s %d\n", __FILE__, __LINE__); */
     lua_Integer index = marpa_luaL_checkinteger(L, 2);
@@ -641,9 +641,19 @@ static int marpa_av_fill_meth (lua_State* L) {
 }
 
 static int marpa_sv_tostring_meth(lua_State* L) {
+    /* Lua stack: [ sv_userdata ] */
+    /* After development, check not needed */
     SV** p_table_sv = (SV**)marpa_luaL_checkudata(L, 1, MT_NAME_SV);
-    push_val (lua_State * L, *p_table_sv);
-    !!!
+    marpa_lua_getglobal(L, "tostring");
+    /* Lua stack: [ sv_userdata, to_string_fn ] */
+    push_val (L, *p_table_sv);
+    /* Lua stack: [ sv_userdata, to_string_fn, lua_equiv_of_sv ] */
+    marpa_lua_call(L, 1, 1);
+    /* Lua stack: [ sv_userdata, string_equiv_of_sv ] */
+    if (!marpa_lua_isstring(L, -1)) {
+       croak("sv could not be converted to string");
+    }
+    return 1;
 }
 
 static const struct luaL_Reg marpa_sv_meths[] = {
@@ -651,6 +661,7 @@ static const struct luaL_Reg marpa_sv_meths[] = {
     {"__gc", marpa_sv_finalize_meth},
     {"__index", marpa_av_fetch_meth},
     {"__newindex", marpa_av_store_meth},
+    {"__tostring", marpa_sv_tostring_meth},
     {NULL, NULL},
 };
 
@@ -748,11 +759,11 @@ static int xlua_recce_step_meth(lua_State* L) {
         break;
     case MARPA_STEP_TOKEN:
         v_token = marpa_v_token(v);
-        v_rule = marpa_v_token_value(v);
+        v_token_value = marpa_v_token_value(v);
         v_result = marpa_v_result(v);
         break;
     case MARPA_STEP_NULLING_SYMBOL:
-        v_rule = marpa_v_symbol(v);
+        v_symbol = marpa_v_symbol(v);
         v_result = marpa_v_result(v);
         break;
     }
@@ -2367,18 +2378,21 @@ default:
             "local recce = ...;\n"
             "local stack = recce:stack()\n"
             "local result_ix = recce.v_result\n"
-            "print('before assign of recce.token_values recce.v_token ', recce.token_values[recce.v_token])\n"
+            "print('before assign of recce.token_values recce.v_token_value ', recce.token_values[recce.v_token_value])\n"
             "print('recce.token_values=', inspect(recce.token_values))\n"
-            "print('recce.v_token=', recce.v_token)\n"
+            "print('recce.v_token_value=', recce.v_token_value)\n"
             "print([[assign is to stack at]], result_ix)\n"
             "print('stack[result_ix] before assign:', stack[result_ix])\n"
             "print([[stack, top ix, result_ix = ]], stack, marpa.sv.top_index(stack), result_ix)\n"
-            "stack[result_ix] = recce.token_values[recce.v_token]\n"
+            "for ix = 0, marpa.sv.top_index(stack) do io.stdout:write(string.format([[stack[%d]=%s\n]], ix, stack[ix])) end\n"
+            "stack[result_ix] = recce.token_values[recce.v_token_value]\n"
             "print('stack[result_ix] after assign:', stack[result_ix])\n"
             "print([[stack, top ix, result_ix = ]], stack, marpa.sv.top_index(stack), result_ix)\n"
+            "for ix = 0, marpa.sv.top_index(stack) do io.stdout:write(string.format([[stack[%d]=%s\n]], ix, stack[ix])) end\n"
             "-- marpa.sv.fill(stack, result_ix)\n"
             "print('stack[result_ix] after fill:', stack[result_ix])\n"
             "print([[stack, top ix, result_ix = ]], stack, marpa.sv.top_index(stack), result_ix)\n"
+            "for ix = 0, marpa.sv.top_index(stack) do io.stdout:write(string.format([[stack[%d]=%s\n]], ix, stack[ix])) end\n"
             "print('stack[result_ix] repeated:', stack[result_ix])\n"
             "print([[stack, top ix, result_ix = ]], stack, marpa.sv.top_index(stack), result_ix)\n"
             "print([[after fill, token_values = ]], inspect(recce.token_values))\n"
