@@ -37,7 +37,7 @@ unicorn ~ [^\d\D]
 END_OF_DSL
 
 my $grammar = Marpa::R3::Scanless::G->new( { source => \$dsl } ); 
-my $rec = Marpa::R3::Scanless::R->new( { grammar => $grammar, trace_values => 99 } ); 
+my $rec = Marpa::R3::Scanless::R->new( { grammar => $grammar } ); 
 
 $rec->read( \'xy', 0, 0);
 $rec->lexeme_alternative('x',\undef);
