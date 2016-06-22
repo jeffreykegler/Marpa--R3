@@ -721,18 +721,8 @@ static int xlua_recce_step_meth(lua_State* L) {
     V_Wrapper *v_wrapper;
     Marpa_Value v;
     lua_Integer step_type;
-    const int base_of_stack = marpa_lua_gettop(L);
-    const int recce_table = base_of_stack;
-    lua_Integer v_result = -1;
-    lua_Integer v_rule = -1;
-    lua_Integer v_symbol = -1;
-    lua_Integer v_token = -1;
-    lua_Integer v_token_value = -1;
-    lua_Integer v_arg_0 = -1;
-    lua_Integer v_arg_n = -1;
-    lua_Integer v_es_id = -1;
-    lua_Integer v_rule_start_es_id = -1;
-    lua_Integer v_token_start_es_id = -1;
+    const int recce_table = marpa_lua_gettop(L);
+    int step_table;
 
     marpa_luaL_checktype(L, 1, LUA_TTABLE);
     /* Lua stack: [ recce_table ] */
@@ -741,123 +731,60 @@ static int xlua_recce_step_meth(lua_State* L) {
     slr = (Scanless_R*)marpa_lua_touserdata(L, -1);
     /* the slr owns the recce table, so it doesn't */
     /* need to own its components. */
+    warn("%s %d", __FILE__, __LINE__);
     v_wrapper = slr->v_wrapper;
     if (!v_wrapper) {
         /* A recoverable error?  Probably not */
         croak("recce.stack(): valuator is not yet active");
     }
     v = v_wrapper->v;
+    warn("%s %d", __FILE__, __LINE__);
+
+    if (LUA_TTABLE != marpa_lua_getfield(L, recce_table, "v")) {
+        croak("Internal error: recce.step(): recce.v not set");
+    }
+    warn("%s %d", __FILE__, __LINE__);
+    /* Lua stack: [ recce_table, lud, v_table ] */
+    marpa_lua_newtable(L);
+    step_table = marpa_lua_gettop(L);
+    marpa_lua_pushvalue(L, -1);
+    /* Lua stack: [ recce_table, lud, v_table, step_table, step_table ] */
+    warn("%s %d", __FILE__, __LINE__);
+    marpa_lua_setfield(L, -3, "step");
+    /* Lua stack: [ recce_table, lud, v_table, step_table ] */
+
     step_type = (lua_Integer)marpa_v_step (v);
-    marpa_lua_pushinteger(L, step_type);
     marpa_lua_pushstring(L, step_type_to_string (step_type));
-    /* Lua stack: [ recce_table, lud, step_type, step_type_string ] */
-    marpa_lua_setfield(L, recce_table, "step_type" );
-    /* Lua stack: [ recce_table, lud, step_type_string ] */
+    warn("%s %d", __FILE__, __LINE__);
+    marpa_lua_setfield(L, step_table, "type");
+    /* Lua stack: [ recce_table, lud, v_table, step_table ] */
+
+    warn("%s %d", __FILE__, __LINE__);
     switch(step_type) {
     case MARPA_STEP_RULE:
-        v_rule = marpa_v_rule(v);
-        v_result = marpa_v_result(v);
-        v_arg_0 = marpa_v_arg_0(v);
-        v_arg_n = marpa_v_arg_n(v);
-        v_es_id = marpa_v_es_id(v);
-        v_rule_start_es_id = marpa_v_rule_start_es_id(v);
+        marpa_lua_pushinteger(L, marpa_v_rule(v)); marpa_lua_setfield(L, step_table, "rule");
+        marpa_lua_pushinteger(L, marpa_v_result(v)); marpa_lua_setfield(L, step_table, "result");
+        marpa_lua_pushinteger(L, marpa_v_arg_0(v)); marpa_lua_setfield(L, step_table, "arg_0");
+        marpa_lua_pushinteger(L, marpa_v_arg_n(v)); marpa_lua_setfield(L, step_table, "arg_n");
+        marpa_lua_pushinteger(L, marpa_v_rule_start_es_id(v)); marpa_lua_setfield(L, step_table, "start_es");
+        marpa_lua_pushinteger(L, marpa_v_es_id(v)); marpa_lua_setfield(L, step_table, "end_es");
         break;
     case MARPA_STEP_TOKEN:
-        v_token = marpa_v_token(v);
-        v_token_value = marpa_v_token_value(v);
-        v_result = marpa_v_result(v);
-        v_es_id = marpa_v_es_id(v);
-        v_token_start_es_id = marpa_v_token_start_es_id(v);
+        marpa_lua_pushinteger(L, marpa_v_token(v)); marpa_lua_setfield(L, step_table, "symbol");
+        marpa_lua_pushinteger(L, marpa_v_token_value(v)); marpa_lua_setfield(L, step_table, "value");
+        marpa_lua_pushinteger(L, marpa_v_result(v)); marpa_lua_setfield(L, step_table, "result");
+        marpa_lua_pushinteger(L, marpa_v_token_start_es_id(v)); marpa_lua_setfield(L, step_table, "start_es");
+        marpa_lua_pushinteger(L, marpa_v_es_id(v)); marpa_lua_setfield(L, step_table, "end_es");
         break;
     case MARPA_STEP_NULLING_SYMBOL:
-        v_symbol = marpa_v_symbol(v);
-        v_result = marpa_v_result(v);
-        v_es_id = marpa_v_es_id(v);
-        v_token_start_es_id = marpa_v_token_start_es_id(v);
+        marpa_lua_pushinteger(L, marpa_v_token(v)); marpa_lua_setfield(L, step_table, "symbol");
+        marpa_lua_pushinteger(L, marpa_v_result(v)); marpa_lua_setfield(L, step_table, "result");
+        marpa_lua_pushinteger(L, marpa_v_token_start_es_id(v)); marpa_lua_setfield(L, step_table, "start_es");
+        marpa_lua_pushinteger(L, marpa_v_es_id(v)); marpa_lua_setfield(L, step_table, "end_es");
         break;
     }
 
-    if (v_result >= 0) {
-      marpa_lua_pushinteger(L, v_result);
-    } else {
-      marpa_lua_pushnil(L);
-    }
-    marpa_lua_setfield(L, recce_table, "v_result" );
-    /* Lua stack: [ recce_table, lud, step_type ] */
-
-    if (v_rule >= 0) {
-      marpa_lua_pushinteger(L, v_rule);
-    } else {
-      marpa_lua_pushnil(L);
-    }
-    marpa_lua_setfield(L, recce_table, "v_rule" );
-    /* Lua stack: [ recce_table, lud, step_type ] */
-
-    if (v_symbol >= 0) {
-      marpa_lua_pushinteger(L, v_symbol);
-    } else {
-      marpa_lua_pushnil(L);
-    }
-    marpa_lua_setfield(L, recce_table, "v_symbol" );
-    /* Lua stack: [ recce_table, lud, step_type ] */
-
-    if (v_token >= 0) {
-      marpa_lua_pushinteger(L, v_token);
-    } else {
-      marpa_lua_pushnil(L);
-    }
-    marpa_lua_setfield(L, recce_table, "v_token" );
-    /* Lua stack: [ recce_table, lud, step_type ] */
-
-    if (v_token_value >= 0) {
-      marpa_lua_pushinteger(L, v_token_value);
-    } else {
-      marpa_lua_pushnil(L);
-    }
-    marpa_lua_setfield(L, recce_table, "v_token_value" );
-    /* Lua stack: [ recce_table, lud, step_type ] */
-
-    if (v_arg_0 >= 0) {
-      marpa_lua_pushinteger(L, v_arg_0);
-    } else {
-      marpa_lua_pushnil(L);
-    }
-    marpa_lua_setfield(L, recce_table, "v_arg_0" );
-    /* Lua stack: [ recce_table, lud, step_type ] */
-
-    if (v_arg_n >= 0) {
-      marpa_lua_pushinteger(L, v_arg_n);
-    } else {
-      marpa_lua_pushnil(L);
-    }
-    marpa_lua_setfield(L, recce_table, "v_arg_n" );
-    /* Lua stack: [ recce_table, lud, step_type ] */
-
-    if (v_es_id >= 0) {
-      marpa_lua_pushinteger(L, v_es_id);
-    } else {
-      marpa_lua_pushnil(L);
-    }
-    marpa_lua_setfield(L, recce_table, "v_es_id" );
-    /* Lua stack: [ recce_table, lud, step_type ] */
-
-    if (v_rule_start_es_id >= 0) {
-      marpa_lua_pushinteger(L, v_rule_start_es_id);
-    } else {
-      marpa_lua_pushnil(L);
-    }
-    marpa_lua_setfield(L, recce_table, "v_rule_start_es_id" );
-    /* Lua stack: [ recce_table, lud, step_type ] */
-
-    if (v_token_start_es_id >= 0) {
-      marpa_lua_pushinteger(L, v_token_start_es_id);
-    } else {
-      marpa_lua_pushnil(L);
-    }
-    marpa_lua_setfield(L, recce_table, "v_token_start_es_id" );
-    /* Lua stack: [ recce_table, lud, step_type ] */
-
-    return 1;
+    return 0;
 }
 
 static const struct luaL_Reg marpa_recce_meths[] = {
@@ -1918,9 +1845,10 @@ default:
 
         xlua_sig_call (slr->L,
             "local recce, tag, op_name = ...;\n"
+            "print([[starting op]], inspect(recce.v))\n"
             "if recce.trace_values >= 3 then\n"
             "  local top_of_queue = #recce.trace_values_queue;\n"
-            "  recce.trace_values_queue[top_of_queue+1] = {tag, recce.step_type, op_name};\n"
+            "  recce.trace_values_queue[top_of_queue+1] = {tag, recce.v.step.type, op_name};\n"
             "  -- io.stderr:write('starting op: ', inspect(recce))\n"
             "end",
             "Rss",
@@ -2019,10 +1947,11 @@ default:
 
         xlua_sig_call (slr->L,
             "local recce, tag, token_sv = ...;\n"
-            "if recce.trace_values > 0 and recce.step_type == 'MARPA_STEP_TYPE' then\n"
+            "print([[RESULT_IS_CONSTANT]], inspect(recce.v))\n"
+            "if recce.trace_values > 0 and recce.v.step.type == 'MARPA_STEP_TYPE' then\n"
             "  local top_of_queue = #recce.trace_values_queue;\n"
             "  recce.trace_values_queue[top_of_queue+1] =\n"
-            "     {tag, recce.step_type, recce.token, token_sv};\n"
+            "     {tag, recce.v.step.type, recce.v.step.symbol, token_sv};\n"
             "  -- io.stderr:write('valuator unknown step: ', inspect(recce))\n"
             "end",
             "RsS",
@@ -2409,14 +2338,15 @@ default:
         xlua_sig_call (slr->L,
             "-- case MARPA_OP_RESULT_IS_TOKEN_VALUE:\n"
             "local recce = ...;\n"
+            "print([[RESULT_IS_TOKEN_VALUE]], inspect(recce.v))\n"
             "local stack = recce:stack()\n"
-            "local result_ix = recce.v_result\n"
-            "stack[result_ix] = recce.token_values[recce.v_token_value]\n"
+            "local result_ix = recce.v.step.result\n"
+            "stack[result_ix] = recce.token_values[recce.v.step.value]\n"
             "marpa.sv.fill(stack, result_ix)\n"
             "if recce.trace_values > 0 then\n"
             "  local top_of_queue = #recce.trace_values_queue;\n"
             "  recce.trace_values_queue[top_of_queue+1] =\n"
-            "     {tag, recce.step_type, recce.v_token, recce.v_token_value, token_sv};\n"
+            "     {tag, recce.v.step.type, recce.v.step.symbol, recce.v.step.value, token_sv};\n"
             "  -- io.stderr:write('[step_type]: ', inspect(recce))\n"
             "end",
             "R",
@@ -4498,8 +4428,14 @@ PPCODE:
   while (1)
     {
       int step_type;
-      xlua_sig_call (slr->L, "local recce = ...; return recce:step()", "R>i",
-          slr->lua_ref, &step_type);
+      xlua_sig_call (slr->L,
+          "local recce = ...\n"
+          "print('before recce:step()')\n"
+          "recce:step()\n"
+          "print('after recce:step()')\n",
+          "R",
+          slr->lua_ref);
+      step_type = marpa_v_step(v_wrapper->v);
       switch (step_type)
         {
         case MARPA_STEP_INACTIVE:
