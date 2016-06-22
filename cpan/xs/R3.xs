@@ -302,6 +302,15 @@ static int marpa_r3_warn(const char* format, ...)
    return 1;
 }
 
+static void slr_es_to_span (Scanless_R * slr, Marpa_Earley_Set_ID earley_set,
+                           int *p_start, int *p_length);
+static void
+slr_es_to_literal_span (Scanless_R * slr,
+                        Marpa_Earley_Set_ID start_earley_set, int length,
+                        int *p_start, int *p_length);
+static SV*
+slr_es_span_to_literal_sv (Scanless_R * slr,
+                        Marpa_Earley_Set_ID start_earley_set, int length);
 
 /* Xlua, that is, the eXtension of Lua for Marpa::XS.
  * Portions of this code adopted from Inline::Lua
@@ -727,7 +736,7 @@ static int xlua_recce_step_meth(lua_State* L) {
 
     marpa_luaL_checktype(L, 1, LUA_TTABLE);
     /* Lua stack: [ recce_table ] */
-    if (LUA_TUSERDATA != marpa_lua_getfield(L, -1, "lud")) {
+    if (LUA_TLIGHTUSERDATA != marpa_lua_getfield(L, -1, "lud")) {
         croak("Internal error: recce.lud userdata not set");
     }
     /* Lua stack: [ recce_table, lud ] */
@@ -798,9 +807,37 @@ static int xlua_recce_step_meth(lua_State* L) {
     return 0;
 }
 
+static int
+xlua_recce_literal_of_es_span_meth (lua_State * L)
+{
+    Scanless_R *slr;
+    int lud_type;
+    lua_Integer start_earley_set;
+    lua_Integer length;
+    SV *literal_sv;
+
+    marpa_luaL_checktype (L, 1, LUA_TTABLE);
+    /* Lua stack: [ recce_table ] */
+    lud_type = marpa_lua_getfield (L, -1, "lud");
+    /* Lua stack: [ recce_table, lud ] */
+    marpa_luaL_argcheck (L, (lud_type == LUA_TUSERDATA), 1,
+        "recce userdata not set");
+    start_earley_set = marpa_luaL_checkinteger (L, 2);
+    length = marpa_luaL_checkinteger (L, 3);
+
+    slr = (Scanless_R *) marpa_lua_touserdata (L, -1);
+    literal_sv =
+        slr_es_span_to_literal_sv (slr,
+        (Marpa_Earley_Set_ID) start_earley_set, (int)length);
+    marpa_sv_sv_noinc (L, literal_sv);
+    /* Lua stack: [ recce_table, recce_lud, stack_ud ] */
+    return 1;
+}
+
 static const struct luaL_Reg marpa_recce_meths[] = {
     {"stack", xlua_recce_stack_meth},
     {"step", xlua_recce_step_meth},
+    {"literal_of_es_span", xlua_recce_literal_of_es_span_meth},
     {"ref", xlua_ref},
     {"unref", xlua_unref},
     {NULL, NULL},
@@ -1700,16 +1737,6 @@ u_substring (Scanless_R * slr, const char *name, int start_pos_arg,
 
 /* Static valuator methods */
 
-static void slr_es_to_span (Scanless_R * slr, Marpa_Earley_Set_ID earley_set,
-                           int *p_start, int *p_length);
-static void
-slr_es_to_literal_span (Scanless_R * slr,
-                        Marpa_Earley_Set_ID start_earley_set, int length,
-                        int *p_start, int *p_length);
-static SV*
-slr_es_span_to_literal_sv (Scanless_R * slr,
-                        Marpa_Earley_Set_ID start_earley_set, int length);
-
 static int
 v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
 {
@@ -1944,7 +1971,7 @@ default:
 
                 p_constant_sv =
                     av_fetch (v_wrapper->constants, (I32)constant_ix, 0);
-                if (p_constant_sv) {
+       if (p_constant_sv) {
                     SV *constant_sv = newSVsv (*p_constant_sv);
                     SV **stored_sv =
                         av_store (stack, (I32)result_ix, constant_sv);
