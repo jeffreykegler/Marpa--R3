@@ -725,20 +725,11 @@ static int xlua_recce_step_meth(lua_State* L) {
     int step_table;
     int v_table;
 
-    lua_Integer v_result = -1;
-    lua_Integer v_rule = -1;
-    lua_Integer v_symbol = -1;
-    lua_Integer v_token = -1;
-    lua_Integer v_token_value = -1;
-    lua_Integer v_arg_0 = -1;
-    lua_Integer v_arg_n = -1;
-    lua_Integer v_es_id = -1;
-    lua_Integer v_rule_start_es_id = -1;
-    lua_Integer v_token_start_es_id = -1;
-
     marpa_luaL_checktype(L, 1, LUA_TTABLE);
     /* Lua stack: [ recce_table ] */
-    marpa_lua_getfield(L, -1, "lud");
+    if (LUA_TUSERDATA != marpa_lua_getfield(L, -1, "lud")) {
+        croak("Internal error: recce.lud userdata not set");
+    }
     /* Lua stack: [ recce_table, lud ] */
     slr = (Scanless_R*)marpa_lua_touserdata(L, -1);
     /* the slr owns the recce table, so it doesn't */
@@ -769,19 +760,18 @@ static int xlua_recce_step_meth(lua_State* L) {
 
     switch(step_type) {
     case MARPA_STEP_RULE:
-        v_rule = marpa_v_rule(v);
-        v_result = marpa_v_result(v);
-        v_arg_0 = marpa_v_arg_0(v);
-        v_arg_n = marpa_v_arg_n(v);
-        v_es_id = marpa_v_es_id(v);
-        v_rule_start_es_id = marpa_v_rule_start_es_id(v);
+        marpa_lua_pushinteger(L, marpa_v_result(v));
+        marpa_lua_setfield(L, step_table, "result");
+        marpa_lua_pushinteger(L, marpa_v_arg_n(v));
+        marpa_lua_setfield(L, step_table, "arg_n");
+        marpa_lua_pushinteger(L, marpa_v_rule(v));
+        marpa_lua_setfield(L, step_table, "rule");
+        marpa_lua_pushinteger(L, marpa_v_rule_start_es_id(v));
+        marpa_lua_setfield(L, step_table, "start_es_id");
+        marpa_lua_pushinteger(L, marpa_v_es_id(v));
+        marpa_lua_setfield(L, step_table, "es_id");
         break;
     case MARPA_STEP_TOKEN:
-        v_token = marpa_v_token(v);
-        v_token_value = marpa_v_token_value(v);
-        v_result = marpa_v_result(v);
-        v_es_id = marpa_v_es_id(v);
-        v_token_start_es_id = marpa_v_token_start_es_id(v);
         marpa_lua_pushinteger(L, marpa_v_result(v));
         marpa_lua_setfield(L, step_table, "result");
         marpa_lua_pushinteger(L, marpa_v_token(v));
@@ -794,10 +784,14 @@ static int xlua_recce_step_meth(lua_State* L) {
         marpa_lua_setfield(L, step_table, "es_id");
         break;
     case MARPA_STEP_NULLING_SYMBOL:
-        v_symbol = marpa_v_symbol(v);
-        v_result = marpa_v_result(v);
-        v_es_id = marpa_v_es_id(v);
-        v_token_start_es_id = marpa_v_token_start_es_id(v);
+        marpa_lua_pushinteger(L, marpa_v_result(v));
+        marpa_lua_setfield(L, step_table, "result");
+        marpa_lua_pushinteger(L, marpa_v_token(v));
+        marpa_lua_setfield(L, step_table, "symbol");
+        marpa_lua_pushinteger(L, marpa_v_token_start_es_id(v));
+        marpa_lua_setfield(L, step_table, "start_es_id");
+        marpa_lua_pushinteger(L, marpa_v_es_id(v));
+        marpa_lua_setfield(L, step_table, "es_id");
         break;
     }
 
