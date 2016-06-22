@@ -801,62 +801,6 @@ static int xlua_recce_step_meth(lua_State* L) {
         break;
     }
 
-    if (v_token >= 0) {
-      marpa_lua_pushinteger(L, v_token);
-    } else {
-      marpa_lua_pushnil(L);
-    }
-    marpa_lua_setfield(L, recce_table, "v_token" );
-    /* Lua stack: [ recce_table, lud, step_type ] */
-
-    if (v_token_value >= 0) {
-      marpa_lua_pushinteger(L, v_token_value);
-    } else {
-      marpa_lua_pushnil(L);
-    }
-    marpa_lua_setfield(L, recce_table, "v_token_value" );
-    /* Lua stack: [ recce_table, lud, step_type ] */
-
-    if (v_arg_0 >= 0) {
-      marpa_lua_pushinteger(L, v_arg_0);
-    } else {
-      marpa_lua_pushnil(L);
-    }
-    marpa_lua_setfield(L, recce_table, "v_arg_0" );
-    /* Lua stack: [ recce_table, lud, step_type ] */
-
-    if (v_arg_n >= 0) {
-      marpa_lua_pushinteger(L, v_arg_n);
-    } else {
-      marpa_lua_pushnil(L);
-    }
-    marpa_lua_setfield(L, recce_table, "v_arg_n" );
-    /* Lua stack: [ recce_table, lud, step_type ] */
-
-    if (v_es_id >= 0) {
-      marpa_lua_pushinteger(L, v_es_id);
-    } else {
-      marpa_lua_pushnil(L);
-    }
-    marpa_lua_setfield(L, recce_table, "v_es_id" );
-    /* Lua stack: [ recce_table, lud, step_type ] */
-
-    if (v_rule_start_es_id >= 0) {
-      marpa_lua_pushinteger(L, v_rule_start_es_id);
-    } else {
-      marpa_lua_pushnil(L);
-    }
-    marpa_lua_setfield(L, recce_table, "v_rule_start_es_id" );
-    /* Lua stack: [ recce_table, lud, step_type ] */
-
-    if (v_token_start_es_id >= 0) {
-      marpa_lua_pushinteger(L, v_token_start_es_id);
-    } else {
-      marpa_lua_pushnil(L);
-    }
-    marpa_lua_setfield(L, recce_table, "v_token_start_es_id" );
-    /* Lua stack: [ recce_table, lud, step_type ] */
-
     return 0;
 }
 
