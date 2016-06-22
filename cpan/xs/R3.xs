@@ -801,30 +801,6 @@ static int xlua_recce_step_meth(lua_State* L) {
         break;
     }
 
-    if (v_result >= 0) {
-      marpa_lua_pushinteger(L, v_result);
-    } else {
-      marpa_lua_pushnil(L);
-    }
-    marpa_lua_setfield(L, recce_table, "v_result" );
-    /* Lua stack: [ recce_table, lud, step_type ] */
-
-    if (v_rule >= 0) {
-      marpa_lua_pushinteger(L, v_rule);
-    } else {
-      marpa_lua_pushnil(L);
-    }
-    marpa_lua_setfield(L, recce_table, "v_rule" );
-    /* Lua stack: [ recce_table, lud, step_type ] */
-
-    if (v_symbol >= 0) {
-      marpa_lua_pushinteger(L, v_symbol);
-    } else {
-      marpa_lua_pushnil(L);
-    }
-    marpa_lua_setfield(L, recce_table, "v_symbol" );
-    /* Lua stack: [ recce_table, lud, step_type ] */
-
     if (v_token >= 0) {
       marpa_lua_pushinteger(L, v_token);
     } else {
@@ -2434,7 +2410,7 @@ default:
             "-- case MARPA_OP_RESULT_IS_TOKEN_VALUE:\n"
             "local recce = ...;\n"
             "local stack = recce:stack()\n"
-            "local result_ix = recce.v_result\n"
+            "local result_ix = recce.v.step.result\n"
             "stack[result_ix] = recce.token_values[recce.v_token_value]\n"
             "marpa.sv.fill(stack, result_ix)\n"
             "if recce.trace_values > 0 then\n"
