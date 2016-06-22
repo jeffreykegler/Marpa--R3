@@ -750,11 +750,6 @@ static int xlua_recce_step_meth(lua_State* L) {
         croak("recce.stack(): valuator is not yet active");
     }
     v = v_wrapper->v;
-    step_type = (lua_Integer)marpa_v_step (v);
-    marpa_lua_pushinteger(L, step_type);
-    marpa_lua_pushstring(L, step_type_to_string (step_type));
-    /* Lua stack: [ recce_table, lud, step_type, step_type_string ] */
-    marpa_lua_setfield(L, recce_table, "step_type" );
     /* Lua stack: [ recce_table, lud, ] */
     if (LUA_TTABLE != marpa_lua_getfield(L, recce_table, "v")) {
         croak("Internal error: recce.v table not set");
@@ -768,6 +763,7 @@ static int xlua_recce_step_meth(lua_State* L) {
     marpa_lua_setfield(L, v_table, "step");
     /* Lua stack: [ recce_table, lud, v_table, step_table ] */
 
+    step_type = (lua_Integer)marpa_v_step (v);
     marpa_lua_pushstring(L, step_type_to_string (step_type));
     marpa_lua_setfield(L, step_table, "type");
 
