@@ -1133,7 +1133,6 @@ sub Marpa::R3::Internal::MetaAST_Nodes::statements::evaluate {
 sub Marpa::R3::Internal::MetaAST_Nodes::statement::evaluate {
     my ( $data, $parse ) = @_;
     my ( undef, undef, $child ) = @{$data};
-    $DB::single = 1;
     $child->evaluate($parse);
     ## no critic(Subroutines::ProhibitExplicitReturnUndef)
     return undef;

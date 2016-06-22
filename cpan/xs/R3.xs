@@ -721,8 +721,7 @@ static int xlua_recce_step_meth(lua_State* L) {
     V_Wrapper *v_wrapper;
     Marpa_Value v;
     lua_Integer step_type;
-    const int base_of_stack = marpa_lua_gettop(L);
-    const int recce_table = base_of_stack;
+    const int recce_table = marpa_lua_gettop(L);
     lua_Integer v_result = -1;
     lua_Integer v_rule = -1;
     lua_Integer v_symbol = -1;
@@ -857,7 +856,7 @@ static int xlua_recce_step_meth(lua_State* L) {
     marpa_lua_setfield(L, recce_table, "v_token_start_es_id" );
     /* Lua stack: [ recce_table, lud, step_type ] */
 
-    return 1;
+    return 0;
 }
 
 static const struct luaL_Reg marpa_recce_meths[] = {
@@ -4498,8 +4497,9 @@ PPCODE:
   while (1)
     {
       int step_type;
-      xlua_sig_call (slr->L, "local recce = ...; return recce:step()", "R>i",
-          slr->lua_ref, &step_type);
+      xlua_sig_call (slr->L, "local recce = ...; recce:step()", "R",
+          slr->lua_ref);
+      step_type = marpa_v_step_type(v_wrapper->v);
       switch (step_type)
         {
         case MARPA_STEP_INACTIVE:
