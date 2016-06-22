@@ -2411,12 +2411,12 @@ default:
             "local recce = ...;\n"
             "local stack = recce:stack()\n"
             "local result_ix = recce.v.step.result\n"
-            "stack[result_ix] = recce.token_values[recce.v_token_value]\n"
+            "stack[result_ix] = recce.token_values[recce.v.step.value]\n"
             "marpa.sv.fill(stack, result_ix)\n"
             "if recce.trace_values > 0 then\n"
             "  local top_of_queue = #recce.trace_values_queue;\n"
             "  recce.trace_values_queue[top_of_queue+1] =\n"
-            "     {tag, recce.v.step.type, recce.v_token, recce.v_token_value, token_sv};\n"
+            "     {tag, recce.v.step.type, recce.v.step.token, recce.v.step.value, token_sv};\n"
             "  -- io.stderr:write('[step_type]: ', inspect(recce))\n"
             "end",
             "R",
