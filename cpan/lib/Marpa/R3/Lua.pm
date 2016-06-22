@@ -53,7 +53,7 @@ end
 
 function value_init(recce, trace_values)
 
-    if recce.value_is_inited then return end
+    if recce.v then return end
 
     recce.op_fn_key = {}
 
@@ -90,7 +90,7 @@ function value_init(recce, trace_values)
       }
     end
 
-    recce.value_is_inited = true;
+    recce.v = {}
 end
 
 function value_reset(recce)
@@ -102,7 +102,7 @@ function value_reset(recce)
     recce.trace_values = 0;
     recce.trace_values_queue = {};
 
-    recce.value_is_inited = false;
+    recce.v = nil
 end
 
 END_OF_LUA
