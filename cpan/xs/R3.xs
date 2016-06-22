@@ -722,6 +722,9 @@ static int xlua_recce_step_meth(lua_State* L) {
     Marpa_Value v;
     lua_Integer step_type;
     const int recce_table = marpa_lua_gettop(L);
+    int step_table;
+    int v_table;
+
     lua_Integer v_result = -1;
     lua_Integer v_rule = -1;
     lua_Integer v_symbol = -1;
@@ -740,6 +743,7 @@ static int xlua_recce_step_meth(lua_State* L) {
     slr = (Scanless_R*)marpa_lua_touserdata(L, -1);
     /* the slr owns the recce table, so it doesn't */
     /* need to own its components. */
+
     v_wrapper = slr->v_wrapper;
     if (!v_wrapper) {
         /* A recoverable error?  Probably not */
@@ -751,7 +755,22 @@ static int xlua_recce_step_meth(lua_State* L) {
     marpa_lua_pushstring(L, step_type_to_string (step_type));
     /* Lua stack: [ recce_table, lud, step_type, step_type_string ] */
     marpa_lua_setfield(L, recce_table, "step_type" );
-    /* Lua stack: [ recce_table, lud, step_type_string ] */
+    /* Lua stack: [ recce_table, lud, ] */
+    if (LUA_TTABLE != marpa_lua_getfield(L, recce_table, "v")) {
+        croak("Internal error: recce.v table not set");
+    }
+    v_table = marpa_lua_gettop(L);
+    /* Lua stack: [ recce_table, lud, v_table ] */
+    marpa_lua_newtable(L);
+    /* Lua stack: [ recce_table, lud, v_table, step_table ] */
+    step_table = marpa_lua_gettop(L);
+    marpa_lua_pushvalue(L, -1);
+    marpa_lua_setfield(L, v_table, "step");
+    /* Lua stack: [ recce_table, lud, v_table, step_table ] */
+
+    marpa_lua_pushstring(L, step_type_to_string (step_type));
+    marpa_lua_setfield(L, step_table, "type");
+
     switch(step_type) {
     case MARPA_STEP_RULE:
         v_rule = marpa_v_rule(v);
@@ -767,6 +786,16 @@ static int xlua_recce_step_meth(lua_State* L) {
         v_result = marpa_v_result(v);
         v_es_id = marpa_v_es_id(v);
         v_token_start_es_id = marpa_v_token_start_es_id(v);
+        marpa_lua_pushinteger(L, marpa_v_result(v));
+        marpa_lua_setfield(L, step_table, "result");
+        marpa_lua_pushinteger(L, marpa_v_token(v));
+        marpa_lua_setfield(L, step_table, "symbol");
+        marpa_lua_pushinteger(L, marpa_v_token_value(v));
+        marpa_lua_setfield(L, step_table, "value");
+        marpa_lua_pushinteger(L, marpa_v_token_start_es_id(v));
+        marpa_lua_setfield(L, step_table, "start_es_id");
+        marpa_lua_pushinteger(L, marpa_v_es_id(v));
+        marpa_lua_setfield(L, step_table, "es_id");
         break;
     case MARPA_STEP_NULLING_SYMBOL:
         v_symbol = marpa_v_symbol(v);
@@ -1919,7 +1948,7 @@ default:
             "local recce, tag, op_name = ...;\n"
             "if recce.trace_values >= 3 then\n"
             "  local top_of_queue = #recce.trace_values_queue;\n"
-            "  recce.trace_values_queue[top_of_queue+1] = {tag, recce.step_type, op_name};\n"
+            "  recce.trace_values_queue[top_of_queue+1] = {tag, recce.v.step.type, op_name};\n"
             "  -- io.stderr:write('starting op: ', inspect(recce))\n"
             "end",
             "Rss",
@@ -2018,10 +2047,10 @@ default:
 
         xlua_sig_call (slr->L,
             "local recce, tag, token_sv = ...;\n"
-            "if recce.trace_values > 0 and recce.step_type == 'MARPA_STEP_TYPE' then\n"
+            "if recce.trace_values > 0 and recce.v.step.type == 'MARPA_STEP_TYPE' then\n"
             "  local top_of_queue = #recce.trace_values_queue;\n"
             "  recce.trace_values_queue[top_of_queue+1] =\n"
-            "     {tag, recce.step_type, recce.token, token_sv};\n"
+            "     {tag, recce.v.step.type, recce.token, token_sv};\n"
             "  -- io.stderr:write('valuator unknown step: ', inspect(recce))\n"
             "end",
             "RsS",
@@ -2415,7 +2444,7 @@ default:
             "if recce.trace_values > 0 then\n"
             "  local top_of_queue = #recce.trace_values_queue;\n"
             "  recce.trace_values_queue[top_of_queue+1] =\n"
-            "     {tag, recce.step_type, recce.v_token, recce.v_token_value, token_sv};\n"
+            "     {tag, recce.v.step.type, recce.v_token, recce.v_token_value, token_sv};\n"
             "  -- io.stderr:write('[step_type]: ', inspect(recce))\n"
             "end",
             "R",
