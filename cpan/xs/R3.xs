@@ -725,82 +725,85 @@ static int xlua_recce_stack_meth(lua_State* L) {
     return 1;
 }
 
-static int xlua_recce_step_meth(lua_State* L) {
-    Scanless_R* slr;
+static int
+xlua_recce_step_meth (lua_State * L)
+{
+    Scanless_R *slr;
     V_Wrapper *v_wrapper;
     Marpa_Value v;
     lua_Integer step_type;
-    const int recce_table = marpa_lua_gettop(L);
+    const int recce_table = marpa_lua_gettop (L);
     int step_table;
     int v_table;
+    int lud_type;
 
-    marpa_luaL_checktype(L, 1, LUA_TTABLE);
+    marpa_luaL_checktype (L, 1, LUA_TTABLE);
     /* Lua stack: [ recce_table ] */
-    if (LUA_TLIGHTUSERDATA != marpa_lua_getfield(L, -1, "lud")) {
-        croak("Internal error: recce.lud userdata not set");
-    }
+    marpa_luaL_argcheck (L, (LUA_TLIGHTUSERDATA == marpa_lua_getfield (L,
+                -1, "lud")), 1,
+        "Internal error: recce.lud userdata not set");
     /* Lua stack: [ recce_table, lud ] */
-    slr = (Scanless_R*)marpa_lua_touserdata(L, -1);
+    slr = (Scanless_R *) marpa_lua_touserdata (L, -1);
     /* the slr owns the recce table, so it doesn't */
     /* need to own its components. */
 
     v_wrapper = slr->v_wrapper;
     if (!v_wrapper) {
         /* A recoverable error?  Probably not */
-        croak("recce.stack(): valuator is not yet active");
+        croak ("recce.stack(): valuator is not yet active");
     }
     v = v_wrapper->v;
     /* Lua stack: [ recce_table, lud, ] */
-    if (LUA_TTABLE != marpa_lua_getfield(L, recce_table, "v")) {
-        croak("Internal error: recce.v table not set");
+    if (LUA_TTABLE != marpa_lua_getfield (L, recce_table, "v")) {
+        croak ("Internal error: recce.v table not set");
     }
-    v_table = marpa_lua_gettop(L);
+    v_table = marpa_lua_gettop (L);
     /* Lua stack: [ recce_table, lud, v_table ] */
-    marpa_lua_newtable(L);
+    marpa_lua_newtable (L);
     /* Lua stack: [ recce_table, lud, v_table, step_table ] */
-    step_table = marpa_lua_gettop(L);
-    marpa_lua_pushvalue(L, -1);
-    marpa_lua_setfield(L, v_table, "step");
+    step_table = marpa_lua_gettop (L);
+    marpa_lua_pushvalue (L, -1);
+    marpa_lua_setfield (L, v_table, "step");
     /* Lua stack: [ recce_table, lud, v_table, step_table ] */
 
-    step_type = (lua_Integer)marpa_v_step (v);
-    marpa_lua_pushstring(L, step_type_to_string (step_type));
-    marpa_lua_setfield(L, step_table, "type");
+    step_type = (lua_Integer) marpa_v_step (v);
+    marpa_lua_pushstring (L, step_type_to_string (step_type));
+    marpa_lua_setfield (L, step_table, "type");
 
-    switch(step_type) {
+    switch (step_type) {
     case MARPA_STEP_RULE:
-        marpa_lua_pushinteger(L, marpa_v_result(v));
-        marpa_lua_setfield(L, step_table, "result");
-        marpa_lua_pushinteger(L, marpa_v_arg_n(v));
-        marpa_lua_setfield(L, step_table, "arg_n");
-        marpa_lua_pushinteger(L, marpa_v_rule(v));
-        marpa_lua_setfield(L, step_table, "rule");
-        marpa_lua_pushinteger(L, marpa_v_rule_start_es_id(v));
-        marpa_lua_setfield(L, step_table, "start_es_id");
-        marpa_lua_pushinteger(L, marpa_v_es_id(v));
-        marpa_lua_setfield(L, step_table, "es_id");
+        marpa_lua_pushinteger (L, marpa_v_result (v));
+        marpa_lua_setfield (L, step_table, "result");
+        marpa_lua_pushinteger (L, marpa_v_arg_n (v));
+        marpa_lua_setfield (L, step_table, "arg_n");
+        marpa_lua_pushinteger (L, marpa_v_rule (v));
+        marpa_lua_setfield (L, step_table, "rule");
+        marpa_lua_pushinteger (L, marpa_v_rule_start_es_id (v));
+        marpa_lua_setfield (L, step_table, "start_es_id");
+        marpa_lua_pushinteger (L, marpa_v_es_id (v));
+        marpa_lua_setfield (L, step_table, "es_id");
         break;
     case MARPA_STEP_TOKEN:
-        marpa_lua_pushinteger(L, marpa_v_result(v));
-        marpa_lua_setfield(L, step_table, "result");
-        marpa_lua_pushinteger(L, marpa_v_token(v));
-        marpa_lua_setfield(L, step_table, "symbol");
-        marpa_lua_pushinteger(L, marpa_v_token_value(v));
-        marpa_lua_setfield(L, step_table, "value");
-        marpa_lua_pushinteger(L, marpa_v_token_start_es_id(v));
-        marpa_lua_setfield(L, step_table, "start_es_id");
-        marpa_lua_pushinteger(L, marpa_v_es_id(v));
-        marpa_lua_setfield(L, step_table, "es_id");
+        marpa_lua_pushinteger (L, marpa_v_result (v));
+        marpa_lua_setfield (L, step_table, "result");
+        marpa_lua_pushinteger (L, marpa_v_token (v));
+        marpa_lua_setfield (L, step_table, "symbol");
+        marpa_lua_pushinteger (L, marpa_v_token_value (v));
+        marpa_lua_setfield (L, step_table, "value");
+        marpa_lua_pushinteger (L, marpa_v_token_start_es_id (v));
+        marpa_lua_setfield (L, step_table, "start_es_id");
+        marpa_lua_pushinteger (L, marpa_v_es_id (v));
+        marpa_lua_setfield (L, step_table, "es_id");
         break;
     case MARPA_STEP_NULLING_SYMBOL:
-        marpa_lua_pushinteger(L, marpa_v_result(v));
-        marpa_lua_setfield(L, step_table, "result");
-        marpa_lua_pushinteger(L, marpa_v_token(v));
-        marpa_lua_setfield(L, step_table, "symbol");
-        marpa_lua_pushinteger(L, marpa_v_token_start_es_id(v));
-        marpa_lua_setfield(L, step_table, "start_es_id");
-        marpa_lua_pushinteger(L, marpa_v_es_id(v));
-        marpa_lua_setfield(L, step_table, "es_id");
+        marpa_lua_pushinteger (L, marpa_v_result (v));
+        marpa_lua_setfield (L, step_table, "result");
+        marpa_lua_pushinteger (L, marpa_v_token (v));
+        marpa_lua_setfield (L, step_table, "symbol");
+        marpa_lua_pushinteger (L, marpa_v_token_start_es_id (v));
+        marpa_lua_setfield (L, step_table, "start_es_id");
+        marpa_lua_pushinteger (L, marpa_v_es_id (v));
+        marpa_lua_setfield (L, step_table, "es_id");
         break;
     }
 
@@ -1745,7 +1748,7 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
     const Marpa_Value v = v_wrapper->v;
     Scanless_R *const slr = v_wrapper->slr;
     const Marpa_Step_Type step_type = marpa_v_step_type (v);
-    UV result_ix = (UV)marpa_v_result (v);
+    UV result_ix = (UV) marpa_v_result (v);
     UV *ops = NULL;
     UV op_ix;
     UV blessing = 0;
@@ -1770,111 +1773,111 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
     const char *const step_type_as_string =
         step_type_to_string (step_type);
 
-    v_wrapper->result = (int)result_ix;
-  /* warn("%s %d", __FILE__, __LINE__); */
+    v_wrapper->result = (int) result_ix;
+    /* warn("%s %d", __FILE__, __LINE__); */
 
-switch (step_type) {
-    STRLEN dummy;
-case MARPA_STEP_RULE:
-    {
-        SV **p_ops_sv =
-            av_fetch (v_wrapper->rule_semantics, marpa_v_rule (v), 0);
-  /* warn("%s %d", __FILE__, __LINE__); */
-        if (p_ops_sv) {
-  /* warn("%s %d", __FILE__, __LINE__); */
-            ops = (UV *) SvPV (*p_ops_sv, dummy);
+    switch (step_type) {
+        STRLEN dummy;
+    case MARPA_STEP_RULE:
+        {
+            SV **p_ops_sv =
+                av_fetch (v_wrapper->rule_semantics, marpa_v_rule (v), 0);
+            /* warn("%s %d", __FILE__, __LINE__); */
+            if (p_ops_sv) {
+                /* warn("%s %d", __FILE__, __LINE__); */
+                ops = (UV *) SvPV (*p_ops_sv, dummy);
+            }
         }
-    }
-    break;
-case MARPA_STEP_TOKEN:
-    {
-        SV **p_ops_sv =
-            av_fetch (v_wrapper->token_semantics, marpa_v_token (v),
-            0);
-  /* warn("%s %d", __FILE__, __LINE__); */
-        if (p_ops_sv) {
-  /* warn("%s %d", __FILE__, __LINE__); */
-            ops = (UV *) SvPV (*p_ops_sv, dummy);
+        break;
+    case MARPA_STEP_TOKEN:
+        {
+            SV **p_ops_sv =
+                av_fetch (v_wrapper->token_semantics, marpa_v_token (v),
+                0);
+            /* warn("%s %d", __FILE__, __LINE__); */
+            if (p_ops_sv) {
+                /* warn("%s %d", __FILE__, __LINE__); */
+                ops = (UV *) SvPV (*p_ops_sv, dummy);
+            }
         }
-    }
-    break;
-case MARPA_STEP_NULLING_SYMBOL:
-    {
-        SV **p_ops_sv =
-            av_fetch (v_wrapper->nulling_semantics, marpa_v_token (v),
-            0);
-  /* warn("%s %d", __FILE__, __LINE__); */
-        if (p_ops_sv) {
-  /* warn("%s %d", __FILE__, __LINE__); */
-            ops = (UV *) SvPV (*p_ops_sv, dummy);
+        break;
+    case MARPA_STEP_NULLING_SYMBOL:
+        {
+            SV **p_ops_sv =
+                av_fetch (v_wrapper->nulling_semantics, marpa_v_token (v),
+                0);
+            /* warn("%s %d", __FILE__, __LINE__); */
+            if (p_ops_sv) {
+                /* warn("%s %d", __FILE__, __LINE__); */
+                ops = (UV *) SvPV (*p_ops_sv, dummy);
+            }
         }
+        break;
+    default:
+        croak ("Internal error: unknown step type %d", step_type);
     }
-    break;
-default:
-    croak ("Internal error: unknown step type %d", step_type);
-}
 
     if (!ops) {
         int base_of_stack;
-        Xlua_Array* ops_ud;
-  /* warn("%s %d", __FILE__, __LINE__); */
+        Xlua_Array *ops_ud;
+        /* warn("%s %d", __FILE__, __LINE__); */
 
         switch (step_type) {
         case MARPA_STEP_RULE:
-  /* warn("%s %d", __FILE__, __LINE__); */
+            /* warn("%s %d", __FILE__, __LINE__); */
             semantics_table = "rule_semantics";
             semantics_type = "rule";
             semantics_ix = marpa_v_rule (v);
             break;
         case MARPA_STEP_TOKEN:
-  /* warn("%s %d", __FILE__, __LINE__); */
+            /* warn("%s %d", __FILE__, __LINE__); */
             semantics_table = "token_semantics";
             semantics_type = "token";
             semantics_ix = marpa_v_token (v);
             break;
         case MARPA_STEP_NULLING_SYMBOL:
-  /* warn("%s %d", __FILE__, __LINE__); */
+            /* warn("%s %d", __FILE__, __LINE__); */
             semantics_table = "nulling_semantics";
             semantics_type = "nulling symbol";
             semantics_ix = marpa_v_token (v);
             break;
         default:
-  /* warn("%s %d", __FILE__, __LINE__); */
+            /* warn("%s %d", __FILE__, __LINE__); */
             /* Never reached -- turns off warning about uninitialized ops */
             ops = NULL;
         }
 
-  /* warn("%s %d", __FILE__, __LINE__); */
-        base_of_stack = marpa_lua_gettop(L);
+        /* warn("%s %d", __FILE__, __LINE__); */
+        base_of_stack = marpa_lua_gettop (L);
         /* Lua stack: [] */
         marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, slr->lua_ref);
         /* Lua stack: [ recce_table ] */
         /* warn("%s %d", __FILE__, __LINE__); */
         /* Lua stack: [ recce_table, ] */
-        marpa_lua_getfield(L, -1, semantics_table);
+        marpa_lua_getfield (L, -1, semantics_table);
         /* warn("%s %d", __FILE__, __LINE__); */
         /* Lua stack: [ recce_table, semantics_table ] */
-         marpa_lua_geti (L, -1, semantics_ix);
+        marpa_lua_geti (L, -1, semantics_ix);
         /* warn("%s %d", __FILE__, __LINE__); */
         /* Lua stack: [ recce_table, semantics_table, ops_ud ] */
-        ops_ud = (struct Xlua_Array*)marpa_lua_touserdata(L, -1);
+        ops_ud = (struct Xlua_Array *) marpa_lua_touserdata (L, -1);
         /* warn("%s %d", __FILE__, __LINE__); */
         if (!ops_ud) {
-          marpa_lua_pop(L, 1);
-  /* warn("Default for %s semantics kicking in", semantics_type); */
-          marpa_lua_getfield (L, -1, "default");
-        /* warn("%s %d", __FILE__, __LINE__); */
-          /* Lua stack: [ recce_table, semantics_table, ops_ud ] */
-          ops_ud = (Xlua_Array*)marpa_lua_touserdata(L, -1);
+            marpa_lua_pop (L, 1);
+            /* warn("Default for %s semantics kicking in", semantics_type); */
+            marpa_lua_getfield (L, -1, "default");
+            /* warn("%s %d", __FILE__, __LINE__); */
+            /* Lua stack: [ recce_table, semantics_table, ops_ud ] */
+            ops_ud = (Xlua_Array *) marpa_lua_touserdata (L, -1);
         }
         if (!ops_ud) {
-                croak
-                    ("Problem in v->stack_step: %s %d is not registered",
-                    semantics_type, semantics_ix);
+            croak
+                ("Problem in v->stack_step: %s %d is not registered",
+                semantics_type, semantics_ix);
         }
         /* warn("%s %d", __FILE__, __LINE__); */
         ops = (UV *) ops_ud->array;
-        marpa_lua_settop(L, base_of_stack);
+        marpa_lua_settop (L, base_of_stack);
     }
 
     op_ix = 0;
@@ -1889,8 +1892,7 @@ default:
             "  -- io.stderr:write('starting op: ', inspect(recce))\n"
             "end",
             "Rss",
-            slr->lua_ref,
-            "starting op", marpa_slif_op_name (op_code)
+            slr->lua_ref, "starting op", marpa_slif_op_name (op_code)
             );
 
         switch (op_code) {
@@ -1906,18 +1908,18 @@ default:
                 const int base_of_stack = marpa_lua_gettop (L);
                 const UV fn_key = ops[op_ix++];
 
-  /* warn ("Executing MARPA_OP_LUA, fn_key = %d", fn_key); */
+                /* warn ("Executing MARPA_OP_LUA, fn_key = %d", fn_key); */
 
                 marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, slr->lua_ref);
                 /* Lua stack: [ recce_table ] */
                 marpa_lua_rawgeti (L, -1, fn_key);
                 /* [ recce_table, function ] */
 
-  /* warn ("Executing MARPA_OP_LUA, fn_key = %d", fn_key); */
+                /* warn ("Executing MARPA_OP_LUA, fn_key = %d", fn_key); */
 
-                marpa_lua_pushvalue(L, -1);
-                marpa_lua_getinfo(L, ">S", &ar);
-  /* warn("Executing Lua code: %s", ar.source); */
+                marpa_lua_pushvalue (L, -1);
+                marpa_lua_getinfo (L, ">S", &ar);
+                /* warn("Executing Lua code: %s", ar.source); */
 
                 /* The recce table itself is an argument */
                 marpa_lua_pushvalue (L, -2);
@@ -1944,21 +1946,23 @@ default:
                 default:
                     break;
                 }
-  /* warn ("%s %d\n", __FILE__, __LINE__); */
+                /* warn ("%s %d\n", __FILE__, __LINE__); */
 
                 status = marpa_lua_pcall (L, argc, LUA_MULTRET, 0);
 
-  /* warn ("%s %d\n", __FILE__, __LINE__); */
+                /* warn ("%s %d\n", __FILE__, __LINE__); */
 
                 if (status != 0) {
                     const char *error_string = marpa_lua_tostring (L, -1);
                     /* error_string must be copied before it is exposed to Lua GC */
-                    const char *croak_msg = form("Marpa::R3 Lua code error: %s", error_string);
+                    const char *croak_msg =
+                        form ("Marpa::R3 Lua code error: %s",
+                        error_string);
                     marpa_lua_settop (L, base_of_stack);
                     croak (croak_msg);
                 }
 
-  /* warn ("%s %d\n", __FILE__, __LINE__); */
+                /* warn ("%s %d\n", __FILE__, __LINE__); */
 
                 marpa_lua_settop (L, base_of_stack);
                 goto NEXT_OP_CODE;
@@ -1970,31 +1974,31 @@ default:
                 SV **p_constant_sv;
 
                 p_constant_sv =
-                    av_fetch (v_wrapper->constants, (I32)constant_ix, 0);
-       if (p_constant_sv) {
+                    av_fetch (v_wrapper->constants, (I32) constant_ix, 0);
+                if (p_constant_sv) {
                     SV *constant_sv = newSVsv (*p_constant_sv);
                     SV **stored_sv =
-                        av_store (stack, (I32)result_ix, constant_sv);
+                        av_store (stack, (I32) result_ix, constant_sv);
                     if (!stored_sv) {
                         SvREFCNT_dec (constant_sv);
                     }
                 } else {
-                    av_store (stack, (I32)result_ix, newSV (0));
+                    av_store (stack, (I32) result_ix, newSV (0));
                 }
 
-        xlua_sig_call (slr->L,
-            "local recce, tag, token_sv = ...;\n"
-            "if recce.trace_values > 0 and recce.v.step.type == 'MARPA_STEP_TYPE' then\n"
-            "  local top_of_queue = #recce.trace_values_queue;\n"
-            "  recce.trace_values_queue[top_of_queue+1] =\n"
-            "     {tag, recce.v.step.type, recce.token, token_sv};\n"
-            "  -- io.stderr:write('valuator unknown step: ', inspect(recce))\n"
-            "end",
-            "RsS",
-            slr->lua_ref,
-            "valuator unknown step",
-            (p_constant_sv ? newSVsv(*p_constant_sv) : newSV(0))
-            );
+                xlua_sig_call (slr->L,
+                    "local recce, tag, token_sv = ...;\n"
+                    "if recce.trace_values > 0 and recce.v.step.type == 'MARPA_STEP_TYPE' then\n"
+                    "  local top_of_queue = #recce.trace_values_queue;\n"
+                    "  recce.trace_values_queue[top_of_queue+1] =\n"
+                    "     {tag, recce.v.step.type, recce.token, token_sv};\n"
+                    "  -- io.stderr:write('valuator unknown step: ', inspect(recce))\n"
+                    "end",
+                    "RsS",
+                    slr->lua_ref,
+                    "valuator unknown step",
+                    (p_constant_sv ? newSVsv (*p_constant_sv) : newSV (0))
+                    );
 
             }
             return -1;
@@ -2008,7 +2012,7 @@ default:
                 UV fetch_ix;
 
                 if (step_type != MARPA_STEP_RULE) {
-                    av_fill (stack, (I32)result_ix - 1);
+                    av_fill (stack, (I32) result_ix - 1);
                     return -1;
                 }
                 if (stack_offset == 0) {
@@ -2016,7 +2020,7 @@ default:
                      * it's common, it's reference count handling is
                      * a special case and it can be easily and highly optimized.
                      */
-                    av_fill (stack, (I32)result_ix);
+                    av_fill (stack, (I32) result_ix);
                     return -1;
                 }
 
@@ -2029,24 +2033,26 @@ default:
                 }
 
                 /* Bounds check fetch ix */
-                if (fetch_ix > (UV)marpa_v_arg_n (v) || fetch_ix < result_ix) {
+                if (fetch_ix > (UV) marpa_v_arg_n (v)
+                    || fetch_ix < result_ix) {
                     /* return an undef */
-                    av_fill (stack, (I32)result_ix - 1);
+                    av_fill (stack, (I32) result_ix - 1);
                     return -1;
                 }
-                p_sv = av_fetch (stack, (I32)fetch_ix, 0);
+                p_sv = av_fetch (stack, (I32) fetch_ix, 0);
                 if (!p_sv) {
-                    av_fill (stack, (I32)result_ix - 1);
+                    av_fill (stack, (I32) result_ix - 1);
                     return -1;
                 }
                 stored_av =
-                    av_store (stack, (I32)result_ix, SvREFCNT_inc_NN (*p_sv));
+                    av_store (stack, (I32) result_ix,
+                    SvREFCNT_inc_NN (*p_sv));
                 if (!stored_av) {
                     SvREFCNT_dec (*p_sv);
-                    av_fill (stack, (I32)result_ix - 1);
+                    av_fill (stack, (I32) result_ix - 1);
                     return -1;
                 }
-                av_fill (stack, (I32)result_ix);
+                av_fill (stack, (I32) result_ix);
             }
             return -1;
 
@@ -2056,7 +2062,7 @@ default:
 
                 if (blessing) {
                     SV **p_blessing_sv =
-                        av_fetch (v_wrapper->constants, (I32)blessing, 0);
+                        av_fetch (v_wrapper->constants, (I32) blessing, 0);
                     if (p_blessing_sv && SvPOK (*p_blessing_sv)) {
                         STRLEN blessing_length;
                         char *classname =
@@ -2067,17 +2073,18 @@ default:
                 }
                 /* De-mortalize the reference to values_av */
                 SvREFCNT_inc_simple_void_NN (ref_to_values_av);
-                stored_av = av_store (stack, (I32)result_ix, ref_to_values_av);
+                stored_av =
+                    av_store (stack, (I32) result_ix, ref_to_values_av);
 
                 /* If the new RV did not get stored properly,
                  * decrement its ref count to re-mortalize it.
                  */
                 if (!stored_av) {
                     SvREFCNT_dec (ref_to_values_av);
-                    av_fill (stack, (I32)result_ix - 1);
+                    av_fill (stack, (I32) result_ix - 1);
                     return -1;
                 }
-                av_fill (stack, (I32)result_ix);
+                av_fill (stack, (I32) result_ix);
             }
             return -1;
 
@@ -2121,9 +2128,10 @@ default:
                         UV increment =
                             op_code == MARPA_OP_PUSH_SEQUENCE ? 2 : 1;
 
-                        for (stack_ix = result_ix; stack_ix <= (UV)arg_n;
+                        for (stack_ix = result_ix; stack_ix <= (UV) arg_n;
                             stack_ix += increment) {
-                            SV **p_sv = av_fetch (stack, (I32)stack_ix, 0);
+                            SV **p_sv =
+                                av_fetch (stack, (I32) stack_ix, 0);
                             if (!p_sv) {
                                 av_push (values_av, newSV (0));
                             } else {
@@ -2152,7 +2160,7 @@ default:
                 SV **p_constant_sv;
 
                 p_constant_sv =
-                    av_fetch (v_wrapper->constants, (I32)constant_ix, 0);
+                    av_fetch (v_wrapper->constants, (I32) constant_ix, 0);
                 if (p_constant_sv) {
                     av_push (values_av,
                         SvREFCNT_inc_simple_NN (*p_constant_sv));
@@ -2173,7 +2181,7 @@ default:
                     av_push (values_av, newSV (0));
                     goto NEXT_OP_CODE;
                 }
-                p_sv = av_fetch (stack, (I32)(result_ix + offset), 0);
+                p_sv = av_fetch (stack, (I32) (result_ix + offset), 0);
                 if (!p_sv) {
                     av_push (values_av, newSV (0));
                 } else {
@@ -2331,7 +2339,7 @@ default:
 
                 if (blessing) {
                     SV **p_blessing_sv =
-                        av_fetch (v_wrapper->constants, (I32)blessing, 0);
+                        av_fetch (v_wrapper->constants, (I32) blessing, 0);
                     if (p_blessing_sv && SvPOK (*p_blessing_sv)) {
                         STRLEN blessing_length;
                         char *classname =
@@ -2351,7 +2359,7 @@ default:
                 int token_ix = marpa_v_token_value (v);
 
                 if (step_type != MARPA_STEP_TOKEN) {
-                    av_fill (stack, (I32)result_ix - 1);
+                    av_fill (stack, (I32) result_ix - 1);
                     return -1;
                 }
                 if (slr && token_ix == TOKEN_VALUE_IS_LITERAL) {
@@ -2364,29 +2372,27 @@ default:
                         slr_es_span_to_literal_sv (slr, start_earley_set,
                         end_earley_set - start_earley_set);
                     stored_sv =
-                        av_store (stack, (I32)result_ix, token_literal_sv);
+                        av_store (stack, (I32) result_ix,
+                        token_literal_sv);
                     if (!stored_sv) {
                         SvREFCNT_dec (token_literal_sv);
                     }
                     return -1;
                 }
 
-        xlua_sig_call (slr->L,
-            "-- case MARPA_OP_RESULT_IS_TOKEN_VALUE:\n"
-            "local recce = ...;\n"
-            "local stack = recce:stack()\n"
-            "local result_ix = recce.v.step.result\n"
-            "stack[result_ix] = recce.token_values[recce.v.step.value]\n"
-            "marpa.sv.fill(stack, result_ix)\n"
-            "if recce.trace_values > 0 then\n"
-            "  local top_of_queue = #recce.trace_values_queue;\n"
-            "  recce.trace_values_queue[top_of_queue+1] =\n"
-            "     {tag, recce.v.step.type, recce.v.step.token, recce.v.step.value, token_sv};\n"
-            "  -- io.stderr:write('[step_type]: ', inspect(recce))\n"
-            "end",
-            "R",
-            slr->lua_ref
-            );
+                xlua_sig_call (slr->L,
+                    "-- case MARPA_OP_RESULT_IS_TOKEN_VALUE:\n"
+                    "local recce = ...;\n"
+                    "local stack = recce:stack()\n"
+                    "local result_ix = recce.v.step.result\n"
+                    "stack[result_ix] = recce.token_values[recce.v.step.value]\n"
+                    "marpa.sv.fill(stack, result_ix)\n"
+                    "if recce.trace_values > 0 then\n"
+                    "  local top_of_queue = #recce.trace_values_queue;\n"
+                    "  recce.trace_values_queue[top_of_queue+1] =\n"
+                    "     {tag, recce.v.step.type, recce.v.step.token, recce.v.step.value, token_sv};\n"
+                    "  -- io.stderr:write('[step_type]: ', inspect(recce))\n"
+                    "end", "R", slr->lua_ref);
 
 
             }
