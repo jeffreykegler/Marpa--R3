@@ -816,22 +816,27 @@ xlua_recce_literal_of_es_span_meth (lua_State * L)
     Scanless_R *slr;
     int lud_type;
     lua_Integer start_earley_set;
-    lua_Integer length;
+    lua_Integer end_earley_set;
     SV *literal_sv;
 
+    warn("%s %d", __FILE__, __LINE__);
     marpa_luaL_checktype (L, 1, LUA_TTABLE);
-    /* Lua stack: [ recce_table ] */
-    lud_type = marpa_lua_getfield (L, -1, "lud");
-    /* Lua stack: [ recce_table, lud ] */
-    marpa_luaL_argcheck (L, (lud_type == LUA_TUSERDATA), 1,
+    warn("%s %d", __FILE__, __LINE__);
+    lud_type = marpa_lua_getfield (L, 1, "lud");
+    warn("%s %d", __FILE__, __LINE__);
+    marpa_luaL_argcheck (L, (lud_type == LUA_TLIGHTUSERDATA), 1,
         "recce userdata not set");
-    start_earley_set = marpa_luaL_checkinteger (L, 2);
-    length = marpa_luaL_checkinteger (L, 3);
-
     slr = (Scanless_R *) marpa_lua_touserdata (L, -1);
+    warn("%s %d", __FILE__, __LINE__);
+    start_earley_set = marpa_luaL_checkinteger (L, 2);
+    warn("%s %d", __FILE__, __LINE__);
+    end_earley_set = marpa_luaL_checkinteger (L, 3);
+    warn("%s %d", __FILE__, __LINE__);
+
     literal_sv =
         slr_es_span_to_literal_sv (slr,
-        (Marpa_Earley_Set_ID) start_earley_set, (int)length);
+        (Marpa_Earley_Set_ID) start_earley_set,
+        (int)(start_earley_set - end_earley_set + 1));
     marpa_sv_sv_noinc (L, literal_sv);
     /* Lua stack: [ recce_table, recce_lud, stack_ud ] */
     return 1;
@@ -2382,17 +2387,35 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
 
                 xlua_sig_call (slr->L,
                     "-- case MARPA_OP_RESULT_IS_TOKEN_VALUE:\n"
-                    "local recce = ...;\n"
-                    "local stack = recce:stack()\n"
-                    "local result_ix = recce.v.step.result\n"
-                    "stack[result_ix] = recce.token_values[recce.v.step.value]\n"
-                    "marpa.sv.fill(stack, result_ix)\n"
-                    "if recce.trace_values > 0 then\n"
-                    "  local top_of_queue = #recce.trace_values_queue;\n"
-                    "  recce.trace_values_queue[top_of_queue+1] =\n"
-                    "     {tag, recce.v.step.type, recce.v.step.token, recce.v.step.value, token_sv};\n"
-                    "  -- io.stderr:write('[step_type]: ', inspect(recce))\n"
-                    "end", "R", slr->lua_ref);
+                    " print(" STRINGIFY(__FILE__) "," STRINGIFY(__LINE__) ")\n"
+                    "repeat\n"
+                    "  local recce = ...;\n"
+                    "  local stack = recce:stack()\n"
+                    "  local result_ix = recce.v.step.result\n"
+                    " print('result_ix', result_ix)\n"
+                    " print(" STRINGIFY(__FILE__) "," STRINGIFY(__LINE__) ")\n"
+                    "  if recce.token_value_is_literal == recce.v.step.token then\n"
+                    " print(" STRINGIFY(__FILE__) "," STRINGIFY(__LINE__) ")\n"
+                    "    local start_es = recce.v.step.start_es_id\n"
+                    "    local end_es = recce.v.step.es_id\n"
+                    " print(" STRINGIFY(__FILE__) "," STRINGIFY(__LINE__) ")\n"
+                    "    stack[result_ix] = recce:literal_of_es_span(start_es, end_es)\n"
+                    " print(" STRINGIFY(__FILE__) "," STRINGIFY(__LINE__) ")\n"
+                    "    marpa.sv.fill(stack, result_ix)\n"
+                    " print(" STRINGIFY(__FILE__) "," STRINGIFY(__LINE__) ")\n"
+                    "    break\n"
+                    "  end\n"
+                    " print(" __FILE__ "," STRINGIFY(__LINE__) ")\n"
+                    "  stack[result_ix] = recce.token_values[recce.v.step.value]\n"
+                    "  marpa.sv.fill(stack, result_ix)\n"
+                    "  if recce.trace_values > 0 then\n"
+                    "    local top_of_queue = #recce.trace_values_queue;\n"
+                    "    recce.trace_values_queue[top_of_queue+1] =\n"
+                    "       {tag, recce.v.step.type, recce.v.step.token, recce.v.step.value, token_sv};\n"
+                    "       -- io.stderr:write('[step_type]: ', inspect(recce))\n"
+                    "  end\n"
+                    "until 0\n",
+                    "R", slr->lua_ref);
 
 
             }
