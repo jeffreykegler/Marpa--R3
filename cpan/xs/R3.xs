@@ -830,7 +830,7 @@ xlua_recce_literal_of_es_span_meth (lua_State * L)
     literal_sv =
         slr_es_span_to_literal_sv (slr,
         (Marpa_Earley_Set_ID) start_earley_set,
-        (int)(start_earley_set - end_earley_set + 1));
+        (int)(end_earley_set - start_earley_set));
     marpa_sv_sv_noinc (L, literal_sv);
     /* Lua stack: [ recce_table, recce_lud, stack_ud ] */
     return 1;
@@ -2359,23 +2359,6 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
 
                 if (step_type != MARPA_STEP_TOKEN) {
                     av_fill (stack, (I32) result_ix - 1);
-                    return -1;
-                }
-                if (slr && token_ix == TOKEN_VALUE_IS_LITERAL) {
-                    SV **stored_sv;
-                    SV *token_literal_sv;
-                    Marpa_Earley_Set_ID start_earley_set =
-                        marpa_v_token_start_es_id (v);
-                    Marpa_Earley_Set_ID end_earley_set = marpa_v_es_id (v);
-                    token_literal_sv =
-                        slr_es_span_to_literal_sv (slr, start_earley_set,
-                        end_earley_set - start_earley_set);
-                    stored_sv =
-                        av_store (stack, (I32) result_ix,
-                        token_literal_sv);
-                    if (!stored_sv) {
-                        SvREFCNT_dec (token_literal_sv);
-                    }
                     return -1;
                 }
 
