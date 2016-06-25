@@ -2367,6 +2367,7 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
                     av_fill (stack, (I32) result_ix - 1);
                     return -1;
                 }
+                warn("in C code, token_ix = %d", token_ix);
                 if (slr && token_ix == TOKEN_VALUE_IS_LITERAL) {
                     SV **stored_sv;
                     SV *token_literal_sv;
@@ -2388,13 +2389,17 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
                 xlua_sig_call (slr->L,
                     "-- case MARPA_OP_RESULT_IS_TOKEN_VALUE:\n"
                     " print(" STRINGIFY(__FILE__) "," STRINGIFY(__LINE__) ")\n"
+                    " io.stderr:write(" STRINGIFY(__FILE__) "," STRINGIFY(__LINE__) ")\n"
                     "repeat\n"
                     "  local recce = ...;\n"
+                    "       io.stderr:write(inspect(recce))\n"
                     "  local stack = recce:stack()\n"
                     "  local result_ix = recce.v.step.result\n"
                     " print('result_ix', result_ix)\n"
+                    " print('recce.token_is_literal', recce.token_is_literal)\n"
+                    " print('recce.v.step.symbol', recce.v.step.symbol)\n"
                     " print(" STRINGIFY(__FILE__) "," STRINGIFY(__LINE__) ")\n"
-                    "  if recce.token_value_is_literal == recce.v.step.token then\n"
+                    "  if recce.token_is_literal == recce.v.step.value then\n"
                     " print(" STRINGIFY(__FILE__) "," STRINGIFY(__LINE__) ")\n"
                     "    local start_es = recce.v.step.start_es_id\n"
                     "    local end_es = recce.v.step.es_id\n"
@@ -2405,16 +2410,20 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
                     " print(" STRINGIFY(__FILE__) "," STRINGIFY(__LINE__) ")\n"
                     "    break\n"
                     "  end\n"
-                    " print(" __FILE__ "," STRINGIFY(__LINE__) ")\n"
+                    " print('stack', stack)\n"
+                    " io.stderr:write(" STRINGIFY(__FILE__) "," STRINGIFY(__LINE__) ")\n"
+                    " io.stderr:write('result_ix', result_ix)\n"
                     "  stack[result_ix] = recce.token_values[recce.v.step.value]\n"
+                    " print(" STRINGIFY(__FILE__) "," STRINGIFY(__LINE__) ")\n"
                     "  marpa.sv.fill(stack, result_ix)\n"
+                    " print(" STRINGIFY(__FILE__) "," STRINGIFY(__LINE__) ")\n"
                     "  if recce.trace_values > 0 then\n"
                     "    local top_of_queue = #recce.trace_values_queue;\n"
                     "    recce.trace_values_queue[top_of_queue+1] =\n"
-                    "       {tag, recce.v.step.type, recce.v.step.token, recce.v.step.value, token_sv};\n"
+                    "       {tag, recce.v.step.type, recce.v.step.symbol, recce.v.step.value, token_sv};\n"
                     "       -- io.stderr:write('[step_type]: ', inspect(recce))\n"
                     "  end\n"
-                    "until 0\n",
+                    "until 1\n",
                     "R", slr->lua_ref);
 
 
