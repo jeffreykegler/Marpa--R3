@@ -1,5 +1,4 @@
 -- Copyright 2016 Jeffrey Kegler
---
 -- Permission is hereby granted, free of charge, to any person obtaining a
 -- copy of this software and associated documentation files (the "Software"),
 -- to deal in the Software without restriction, including without limitation
@@ -17,8 +16,8 @@
 -- OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 -- ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 -- OTHER DEALINGS IN THE SOFTWARE.
--- END_OF_STRING
 --
+-- [ MIT license: http://www.opensource.org/licenses/mit-license.php ]
 
     -- for k,v in pairs(marpa.ops)
     -- do io.stderr:write(string.format("OP: %s %s\n", k, v))
