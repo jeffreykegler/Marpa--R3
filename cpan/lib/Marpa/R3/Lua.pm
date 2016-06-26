@@ -30,8 +30,7 @@ $Marpa::R3::Lua::lua_init = <<'END_OF_LUA';
     -- do io.stderr:write(string.format("OP: %s %s\n", k, v))
     -- end
 
-function op_fn_debug (...)
-    local recce = ...
+function op_fn_debug (recce)
     for k,v in pairs(recce) do
 	print(k, v)
     end
@@ -43,16 +42,14 @@ function op_fn_debug (...)
     return -2
 end
 
-function op_fn_result_is_undef(...)
-        local recce = ...
-        local stack = recce:stack()
-        stack[recce.v.step.result] = marpa.sv.undef()
-        marpa.sv.fill(stack, recce.v.step.result)
-        return -1
+function op_fn_result_is_undef(recce)
+    local stack = recce:stack()
+    stack[recce.v.step.result] = marpa.sv.undef()
+    marpa.sv.fill(stack, recce.v.step.result)
+    return -1
 end
 
-function op_fn_result_is_token_value(...)
-  local recce = ...;
+function op_fn_result_is_token_value(recce)
   local stack = recce:stack()
   local result_ix = recce.v.step.result
   repeat
