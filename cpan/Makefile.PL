@@ -383,6 +383,9 @@ WriteMakefile(
                 [ @no_index_namespace_inclusive, 'Marpa::R3::Trace::G' ],
         }
     },
+    PL_FILES => {
+        'lib/Marpa/R3/Lua/Inspect.PL' => 'lib/Marpa/R3/Lua/Inspect.pm',
+    },
     META_MERGE => {
         resources =>
             { repository => 'git://github.com/jeffreykegler/Marpa--R3.git', },
