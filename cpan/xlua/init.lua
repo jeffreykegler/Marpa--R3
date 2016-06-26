@@ -1,31 +1,25 @@
-# Marpa::R3 is Copyright (C) 2016, Jeffrey Kegler.
-#
-# This module is free software; you can redistribute it and/or modify it
-# under the same terms as Perl 5.10.1. For more details, see the full text
-# of the licenses in the directory LICENSES.
-#
-# This program is distributed in the hope that it will be
-# useful, but it is provided “as is” and without any express
-# or implied warranties. For details, see the full text of
-# of the licenses in the directory LICENSES.
+-- Copyright 2016 Jeffrey Kegler
+--
+-- Permission is hereby granted, free of charge, to any person obtaining a
+-- copy of this software and associated documentation files (the "Software"),
+-- to deal in the Software without restriction, including without limitation
+-- the rights to use, copy, modify, merge, publish, distribute, sublicense,
+-- and/or sell copies of the Software, and to permit persons to whom the
+-- Software is furnished to do so, subject to the following conditions:
+--
+-- The above copyright notice and this permission notice shall be included
+-- in all copies or substantial portions of the Software.
+--
+-- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+-- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+-- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+-- THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+-- OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+-- ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+-- OTHER DEALINGS IN THE SOFTWARE.
+-- END_OF_STRING
+--
 
-package Marpa::R3::Lua::Init;
-
-use 5.010001;
-use warnings;
-use strict;
-
-use vars qw($VERSION $STRING_VERSION);
-$VERSION        = '4.001_013';
-$STRING_VERSION = $VERSION;
-$VERSION        = eval $VERSION;
-
-# Lua methods
-
-# These can, and probably should, be pre-compiled someday,
-# reducing start-up time.
-
-$Marpa::R3::Lua::Init::lua_init = <<'END_OF_LUA';
     -- for k,v in pairs(marpa.ops)
     -- do io.stderr:write(string.format("OP: %s %s\n", k, v))
     -- end
@@ -83,7 +77,7 @@ function value_init(recce, trace_values)
 
     recce.op_fn_key = {}
 
-    function op_fn_create(name, fn) 
+    function op_fn_create(name, fn)
 	local ref = recce:ref(fn);
 	recce.op_fn_key[name] = ref;
 	recce.op_fn_key[ref] = name;
@@ -133,5 +127,4 @@ function value_reset(recce)
     recce.v = nil
 end
 
-END_OF_LUA
-1;
+-- vim: set expandtab shiftwidth=4:

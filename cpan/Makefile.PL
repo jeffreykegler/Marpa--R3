@@ -385,6 +385,7 @@ WriteMakefile(
     },
     PL_FILES => {
         'lib/Marpa/R3/Lua/Inspect.PL' => 'lib/Marpa/R3/Lua/Inspect.pm',
+        'lib/Marpa/R3/Lua/Init.PL' => 'lib/Marpa/R3/Lua/Init.pm',
     },
     META_MERGE => {
         resources =>
