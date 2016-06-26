@@ -51,6 +51,35 @@ function op_fn_result_is_undef(...)
         return -1
 end
 
+function op_fn_result_is_token_value(...)
+  local recce = ...;
+  local stack = recce:stack()
+  local result_ix = recce.v.step.result
+  repeat
+    if recce.v.step.type ~= 'MARPA_STEP_TOKEN' then
+      stack[result_ix] = marpa.sv.undef()
+      marpa.sv.fill(stack, result_ix)
+      break
+    end
+    if recce.token_is_literal == recce.v.step.value then
+      local start_es = recce.v.step.start_es_id
+      local end_es = recce.v.step.es_id
+      stack[result_ix] = recce:literal_of_es_span(start_es, end_es)
+      marpa.sv.fill(stack, result_ix)
+      break
+    end
+    stack[result_ix] = recce.token_values[recce.v.step.value]
+    marpa.sv.fill(stack, result_ix)
+    if recce.trace_values > 0 then
+      local top_of_queue = #recce.trace_values_queue;
+      recce.trace_values_queue[top_of_queue+1] =
+	 {tag, recce.v.step.type, recce.v.step.symbol, recce.v.step.value, token_sv};
+	 -- io.stderr:write('[step_type]: ', inspect(recce))
+    end
+  until 1
+  return -1
+end
+
 function value_init(recce, trace_values)
 
     if recce.v then return end
