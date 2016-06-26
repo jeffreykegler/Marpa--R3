@@ -299,6 +299,7 @@ t/topsyn.t
 t/tut2.t
 t/wall.t
 t/zorro.t
+xlua/inspect.lua
 xs/Makefile.PL
 xs/R3.xs
 xs/create_ops.pl
