@@ -2330,10 +2330,10 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
                 xlua_sig_call (slr->L,
                     "-- case MARPA_OP_RESULT_IS_TOKEN_VALUE:\n"
                     /* " print(" STRINGIFY(__FILE__) "," STRINGIFY(__LINE__) ")\n" */
-                    "repeat\n"
                     "  local recce = ...;\n"
                     "  local stack = recce:stack()\n"
                     "  local result_ix = recce.v.step.result\n"
+                    "repeat\n"
                     "  if recce.v.step.type ~= 'MARPA_STEP_TOKEN' then\n"
                     "    stack[result_ix] = marpa.sv.undef()\n"
                     "    marpa.sv.fill(stack, result_ix)\n"
@@ -2354,7 +2354,8 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
                     "       {tag, recce.v.step.type, recce.v.step.symbol, recce.v.step.value, token_sv};\n"
                     "       -- io.stderr:write('[step_type]: ', inspect(recce))\n"
                     "  end\n"
-                    "until 1\n",
+                    "until 1\n"
+                    "return -1\n",
                     "R", slr->lua_ref);
 
             }
