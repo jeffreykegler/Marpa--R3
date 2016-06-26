@@ -1901,9 +1901,9 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
 
         case MARPA_OP_LUA:
             {
-                lua_Debug ar;
                 int argc;
                 int status;
+                lua_Integer return_value;
                 const int base_of_stack = marpa_lua_gettop (L);
                 const UV fn_key = ops[op_ix++];
 
@@ -1916,40 +1916,9 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
 
                 /* warn ("Executing MARPA_OP_LUA, fn_key = %d", fn_key); */
 
-                marpa_lua_pushvalue (L, -1);
-                marpa_lua_getinfo (L, ">S", &ar);
-                /* warn("Executing Lua code: %s", ar.source); */
-
-                /* The recce table itself is an argument */
+                /* The recce table itself is the only argument */
                 marpa_lua_pushvalue (L, -2);
-                marpa_lua_pushstring (L, step_type_as_string);
-                argc = 2;
-                switch (step_type) {
-                case MARPA_STEP_RULE:
-                    marpa_lua_pushinteger (L, result_ix);
-                    marpa_lua_pushinteger (L, marpa_v_rule (v));
-                    marpa_lua_pushinteger (L, marpa_v_arg_n (v));
-                    argc += 3;
-                    break;
-                case MARPA_STEP_TOKEN:
-                    marpa_lua_pushinteger (L, result_ix);
-                    marpa_lua_pushinteger (L, marpa_v_token (v));
-                    marpa_lua_pushinteger (L, marpa_v_token_value (v));
-                    argc += 3;
-                    break;
-                case MARPA_STEP_NULLING_SYMBOL:
-                    marpa_lua_pushinteger (L, result_ix);
-                    marpa_lua_pushinteger (L, marpa_v_symbol (v));
-                    argc += 2;
-                    break;
-                default:
-                    break;
-                }
-                /* warn ("%s %d\n", __FILE__, __LINE__); */
-
-                status = marpa_lua_pcall (L, argc, LUA_MULTRET, 0);
-
-                /* warn ("%s %d\n", __FILE__, __LINE__); */
+                status = marpa_lua_pcall (L, 1, 1, 0);
 
                 if (status != 0) {
                     const char *error_string = marpa_lua_tostring (L, -1);
@@ -1960,10 +1929,10 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
                     marpa_lua_settop (L, base_of_stack);
                     croak (croak_msg);
                 }
-
-                /* warn ("%s %d\n", __FILE__, __LINE__); */
+                return_value = marpa_lua_tointeger(L, -1);
 
                 marpa_lua_settop (L, base_of_stack);
+                if (return_value >= -1) return return_value;
                 goto NEXT_OP_CODE;
             }
 
