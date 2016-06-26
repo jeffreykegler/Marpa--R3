@@ -823,7 +823,7 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
       Marpa::R3::Thin::SLG->new( $thin_L0, $g1_tracer->grammar() );
 
     # Stuff in Lua
-    $thin_slg->exec($Marpa::R3::Lua::lua_init);
+    $thin_slg->exec($Marpa::R3::Lua::Init::lua_init);
     $thin_slg->exec($Marpa::R3::Lua::Inspect::load);
 
   LEXEME: for my $lexeme_name ( keys %g1_id_by_lexeme_name ) {

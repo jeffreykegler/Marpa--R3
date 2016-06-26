@@ -9,7 +9,7 @@
 # or implied warranties. For details, see the full text of
 # of the licenses in the directory LICENSES.
 
-package Marpa::R3::Lua;
+package Marpa::R3::Lua::Init;
 
 use 5.010001;
 use warnings;
@@ -25,7 +25,7 @@ $VERSION        = eval $VERSION;
 # These can, and probably should, be pre-compiled someday,
 # reducing start-up time.
 
-$Marpa::R3::Lua::lua_init = <<'END_OF_LUA';
+$Marpa::R3::Lua::Init::lua_init = <<'END_OF_LUA';
     -- for k,v in pairs(marpa.ops)
     -- do io.stderr:write(string.format("OP: %s %s\n", k, v))
     -- end
