@@ -735,7 +735,6 @@ xlua_recce_step_meth (lua_State * L)
     const int recce_table = marpa_lua_gettop (L);
     int step_table;
     int v_table;
-    int lud_type;
 
     marpa_luaL_checktype (L, 1, LUA_TTABLE);
     /* Lua stack: [ recce_table ] */
@@ -1902,7 +1901,7 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
         case MARPA_OP_LUA:
             {
                 int status;
-                lua_Integer return_value;
+                int return_value;
                 const int base_of_stack = marpa_lua_gettop (L);
                 const UV fn_key = ops[op_ix++];
 
@@ -1928,7 +1927,12 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
                     marpa_lua_settop (L, base_of_stack);
                     croak (croak_msg);
                 }
-                return_value = marpa_lua_tointeger(L, -1);
+
+                /* TODO: rather than array size, make return_value a result code.
+                 * That would eliminate any question about whether it fits
+                 * into an int.
+                 */
+                return_value = (int)marpa_lua_tointeger(L, -1);
 
                 marpa_lua_settop (L, base_of_stack);
                 if (return_value >= -1) return return_value;
