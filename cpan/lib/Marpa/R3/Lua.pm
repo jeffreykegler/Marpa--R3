@@ -31,8 +31,7 @@ $Marpa::R3::Lua::lua_init = <<'END_OF_LUA';
     -- end
 
 function op_fn_debug (...)
-    local recce, type, result_ix, rule_id, arg_n = ...
-    print([[OP_LUA:]], recce, type, result_ix, rule_id, arg_n)
+    local recce = ...
     for k,v in pairs(recce) do
 	print(k, v)
     end
@@ -41,14 +40,15 @@ function op_fn_debug (...)
     for k,v in pairs(mt) do
 	print(k, v)
     end
+    return -2
 end
 
 function op_fn_result_is_undef(...)
-        local recce, type, result_ix = ...
+        local recce = ...
         local stack = recce:stack()
-        stack[result_ix] = marpa.sv.undef()
-        marpa.sv.fill(stack, result_ix)
-        return 0
+        stack[recce.v.step.result] = marpa.sv.undef()
+        marpa.sv.fill(stack, recce.v.step.result)
+        return -1
 end
 
 function value_init(recce, trace_values)
