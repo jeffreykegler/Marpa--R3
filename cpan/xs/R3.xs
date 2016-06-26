@@ -1901,7 +1901,6 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
 
         case MARPA_OP_LUA:
             {
-                int argc;
                 int status;
                 lua_Integer return_value;
                 const int base_of_stack = marpa_lua_gettop (L);
@@ -1956,7 +1955,7 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
 
                 xlua_sig_call (slr->L,
                     "local recce, tag, token_sv = ...;\n"
-                    "if recce.trace_values > 0 and recce.v.step.type == 'MARPA_STEP_TYPE' then\n"
+                    "if recce.trace_values > 0 and recce.v.step.type == 'MARPA_STEP_TOKEN' then\n"
                     "  local top_of_queue = #recce.trace_values_queue;\n"
                     "  recce.trace_values_queue[top_of_queue+1] =\n"
                     "     {tag, recce.v.step.type, recce.token, token_sv};\n"
@@ -2324,13 +2323,6 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
 
         case MARPA_OP_RESULT_IS_TOKEN_VALUE:
             {
-                int token_ix = marpa_v_token_value (v);
-
-                if (step_type != MARPA_STEP_TOKEN) {
-                    av_fill (stack, (I32) result_ix - 1);
-                    return -1;
-                }
-
                 xlua_sig_call (slr->L,
                     "-- case MARPA_OP_RESULT_IS_TOKEN_VALUE:\n"
                     /* " print(" STRINGIFY(__FILE__) "," STRINGIFY(__LINE__) ")\n" */
@@ -2338,6 +2330,11 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
                     "  local recce = ...;\n"
                     "  local stack = recce:stack()\n"
                     "  local result_ix = recce.v.step.result\n"
+                    "  if recce.v.step.type ~= 'MARPA_STEP_TOKEN' then\n"
+                    "    stack[result_ix] = marpa.sv.undef()\n"
+                    "    marpa.sv.fill(stack, result_ix)\n"
+                    "    break\n"
+                    "  end\n"
                     "  if recce.token_is_literal == recce.v.step.value then\n"
                     "    local start_es = recce.v.step.start_es_id\n"
                     "    local end_es = recce.v.step.es_id\n"
@@ -2355,7 +2352,6 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
                     "  end\n"
                     "until 1\n",
                     "R", slr->lua_ref);
-
 
             }
             return -1;
