@@ -86,11 +86,13 @@ function value_init(recce, trace_values)
     function op_fn_create(name, fn) 
 	local ref = recce:ref(fn);
 	recce.op_fn_key[name] = ref;
+	recce.op_fn_key[ref] = name;
 	return ref
     end
 
     op_fn_create("debug", op_fn_debug)
     local result_is_undef_key = op_fn_create("result_is_undef", op_fn_result_is_undef)
+    local result_is_token_value_key = op_fn_create("result_is_token_value", op_fn_result_is_token_value)
 
     recce.rule_semantics = {}
     recce.token_semantics = {}
@@ -98,7 +100,7 @@ function value_init(recce, trace_values)
     recce.nulling_semantics.default
         = marpa.array.from_list(marpa.ops.lua, result_is_undef_key,0)
     recce.token_semantics.default
-        = marpa.array.from_list(marpa.ops.result_is_token_value,0)
+        = marpa.array.from_list(marpa.ops.lua, result_is_token_value_key,0)
     recce.rule_semantics.default
         = marpa.array.from_list(marpa.ops.lua, result_is_undef_key,0)
     -- print( recce.nulling_semantics.default )

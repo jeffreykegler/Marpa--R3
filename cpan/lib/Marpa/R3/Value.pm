@@ -897,6 +897,12 @@ sub registration_init {
     return recce.op_fn_key["result_is_undef"]
 END_OF_LUA
 
+    my ($result_is_token_value_key) = $slr->exec(<<'END_OF_LUA');
+    local recce = ...
+    return recce.op_fn_key["result_is_token_value"]
+END_OF_LUA
+
+
     my @nulling_symbol_by_semantic_rule;
     NULLING_SYMBOL: for my $nulling_symbol ( 0 .. $#{$null_values} ) {
         my $semantic_rule = $null_values->[$nulling_symbol];
@@ -1027,7 +1033,7 @@ END_OF_LUA
             # After this point, any closure will be a ref to 'CODE'
 
             if ( defined $lexeme_id and $semantics eq '::value' ) {
-                @ops = ($op_result_is_token_value);
+                @ops = ($op_lua, $result_is_token_value_key);
                 last SET_OPS;
             }
 

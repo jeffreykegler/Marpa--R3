@@ -300,11 +300,14 @@ Registering semantics for rule: Expression ::= Term
   Semantics are result_is_rhs_n 0
 Registering semantics for rule: [:start] ::= Calculator
   Semantics are result_is_rhs_n 0
-value event: starting op MARPA_STEP_TOKEN result_is_token_value
+value event: starting op MARPA_STEP_TOKEN lua
+value event: starting lua op MARPA_STEP_TOKEN result_is_token_value
 value event: starting op MARPA_STEP_RULE result_is_rhs_n
 value event: starting op MARPA_STEP_RULE result_is_rhs_n
-value event: starting op MARPA_STEP_TOKEN result_is_token_value
-value event: starting op MARPA_STEP_TOKEN result_is_token_value
+value event: starting op MARPA_STEP_TOKEN lua
+value event: starting lua op MARPA_STEP_TOKEN result_is_token_value
+value event: starting op MARPA_STEP_TOKEN lua
+value event: starting lua op MARPA_STEP_TOKEN result_is_token_value
 value event: starting op MARPA_STEP_RULE result_is_rhs_n
 value event: starting op MARPA_STEP_RULE push_one
 value event: starting op MARPA_STEP_RULE push_one
@@ -313,8 +316,10 @@ value event: starting op MARPA_STEP_RULE callback
 Popping 3 values to evaluate R2:3@0-3C1@2, rule: Term ::= Term [Lex-0] Factor
 Calculated and pushed value: 42
 value event: starting op MARPA_STEP_RULE result_is_rhs_n
-value event: starting op MARPA_STEP_TOKEN result_is_token_value
-value event: starting op MARPA_STEP_TOKEN result_is_token_value
+value event: starting op MARPA_STEP_TOKEN lua
+value event: starting lua op MARPA_STEP_TOKEN result_is_token_value
+value event: starting op MARPA_STEP_TOKEN lua
+value event: starting lua op MARPA_STEP_TOKEN result_is_token_value
 value event: starting op MARPA_STEP_RULE result_is_rhs_n
 value event: starting op MARPA_STEP_RULE result_is_rhs_n
 value event: starting op MARPA_STEP_RULE push_one

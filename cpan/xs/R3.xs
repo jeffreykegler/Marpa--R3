@@ -1899,14 +1899,27 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
             return -1;
 
         case MARPA_OP_LUA:
+
             {
                 int status;
                 int return_value;
-                const int base_of_stack = marpa_lua_gettop (L);
+                int base_of_stack;
                 const UV fn_key = ops[op_ix++];
+
+                xlua_sig_call (slr->L,
+                    "local recce, tag, fn_key = ...;\n"
+                    "if recce.trace_values >= 3 then\n"
+                    "  local top_of_queue = #recce.trace_values_queue;\n"
+                    "  recce.trace_values_queue[top_of_queue+1] = {tag, recce.v.step.type, recce.op_fn_key[fn_key]};\n"
+                    "  -- io.stderr:write('starting op: ', inspect(recce))\n"
+                    "end",
+                    "Rsi",
+                    slr->lua_ref, "starting lua op", fn_key
+                    );
 
                 /* warn ("Executing MARPA_OP_LUA, fn_key = %d", fn_key); */
 
+                base_of_stack = marpa_lua_gettop (L);
                 marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, slr->lua_ref);
                 /* Lua stack: [ recce_table ] */
                 marpa_lua_rawgeti (L, -1, fn_key);
