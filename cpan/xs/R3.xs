@@ -2338,42 +2338,6 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
             }
             /* NOT REACHED */
 
-        case MARPA_OP_RESULT_IS_TOKEN_VALUE:
-            {
-                xlua_sig_call (slr->L,
-                    "-- case MARPA_OP_RESULT_IS_TOKEN_VALUE:\n"
-                    /* " print(" STRINGIFY(__FILE__) "," STRINGIFY(__LINE__) ")\n" */
-                    "  local recce = ...;\n"
-                    "  local stack = recce:stack()\n"
-                    "  local result_ix = recce.v.step.result\n"
-                    "repeat\n"
-                    "  if recce.v.step.type ~= 'MARPA_STEP_TOKEN' then\n"
-                    "    stack[result_ix] = marpa.sv.undef()\n"
-                    "    marpa.sv.fill(stack, result_ix)\n"
-                    "    break\n"
-                    "  end\n"
-                    "  if recce.token_is_literal == recce.v.step.value then\n"
-                    "    local start_es = recce.v.step.start_es_id\n"
-                    "    local end_es = recce.v.step.es_id\n"
-                    "    stack[result_ix] = recce:literal_of_es_span(start_es, end_es)\n"
-                    "    marpa.sv.fill(stack, result_ix)\n"
-                    "    break\n"
-                    "  end\n"
-                    "  stack[result_ix] = recce.token_values[recce.v.step.value]\n"
-                    "  marpa.sv.fill(stack, result_ix)\n"
-                    "  if recce.trace_values > 0 then\n"
-                    "    local top_of_queue = #recce.trace_values_queue;\n"
-                    "    recce.trace_values_queue[top_of_queue+1] =\n"
-                    "       {tag, recce.v.step.type, recce.v.step.symbol, recce.v.step.value, token_sv};\n"
-                    "       -- io.stderr:write('[step_type]: ', inspect(recce))\n"
-                    "  end\n"
-                    "until 1\n"
-                    "return -1\n",
-                    "R", slr->lua_ref);
-
-            }
-            return -1;
-
         default:
           BAD_OP:
             {

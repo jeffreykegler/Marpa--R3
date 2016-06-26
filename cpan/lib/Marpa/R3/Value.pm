@@ -888,8 +888,6 @@ sub registration_init {
     state $op_result_is_n_of_sequence =
         Marpa::R3::Thin::op('result_is_n_of_sequence');
     state $op_result_is_rhs_n = Marpa::R3::Thin::op('result_is_rhs_n');
-    state $op_result_is_token_value =
-        Marpa::R3::Thin::op('result_is_token_value');
     state $op_lua = Marpa::R3::Thin::op('lua');
 
     my ($result_is_undef_key) = $slr->exec(<<'END_OF_LUA');

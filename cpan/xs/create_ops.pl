@@ -46,7 +46,6 @@ my @ops = sort { $a->[0] cmp $b->[0] }
     [ "result_is_constant",      "MARPA_OP_RESULT_IS_CONSTANT" ],
     [ "result_is_n_of_sequence", "MARPA_OP_RESULT_IS_N_OF_SEQUENCE" ],
     [ "result_is_rhs_n",         "MARPA_OP_RESULT_IS_RHS_N" ],
-    [ "result_is_token_value",   "MARPA_OP_RESULT_IS_TOKEN_VALUE" ],
     [ "lua",               "MARPA_OP_LUA" ];
 
 say <<'END_OF_PREAMBLE';
