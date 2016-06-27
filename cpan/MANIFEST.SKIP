@@ -18,6 +18,7 @@
 /[.]gdb_history$
 /errs$
 /junk$
+^junk[.]
 /junk2$
 [.]DS_Store$
 [.]a$
@@ -58,14 +59,14 @@
 ^engine/cf/LIBMARPA_MODE$
 ^engine/gnu_ac_build/
 ^engine/perl_ac_build/
-^kollos/kollos[.]c
-^kollos/Makefile
-^kollos/MYMETA[.]
 ^errs$
 ^etc/track[.]list
 ^hide/
 ^inc/proof/.*[.]lyx[~]$
 ^junk$
+^kollos/MYMETA[.]
+^kollos/Makefile
+^kollos/kollos[.]c
 ^lib/MYMETA.
 ^lib/Makefile$
 ^lib/Makefile[.]old$
@@ -74,6 +75,8 @@
 ^lib/Marpa/Makefile$
 ^lib/Marpa/Makefile[.]old$
 ^lib/Marpa/R3/Installed.pm$
+^lib/Marpa/R3/Lua/Init[.]pm$
+^lib/Marpa/R3/Lua/Inspect[.]pm$
 ^lib/Marpa/R3/Lua/Lua[.]c$
 ^lib/Marpa/R3/Lua/Lua[.]o$
 ^lib/Marpa/R3/Lua/MYMETA.
@@ -92,7 +95,6 @@
 ^lib/Marpa/pm_to_blib$
 ^lib/pm_to_blib$
 ^libmarpa_build/
-^lib/Marpa/R3/Lua/Inspect[.]pm$
 ^lua/MYMETA.
 ^lua/Makefile$
 ^lua/Makefile[.]old$
@@ -110,6 +112,9 @@
 ^pod/Semantics/Order[.]pod[.]save$
 ^pod2htmd[.]tmp
 ^pod2htmi[.]tmp
+^xlua/MYMETA.
+^xlua/Makefile$
+^xlua/init[.]lua$
 ^xs/MYMETA[.]
 ^xs/Makefile$
 ^xs/Makefile[.]old$

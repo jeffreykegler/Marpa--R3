@@ -321,7 +321,7 @@ my %files_by_type = (
     'etc/compile_for_debug.sh'          => \&trivial,
     'etc/OLD_libmarpa_test.sh'              => \&trivial,
     'etc/reserved_check.sh'             => \&trivial,
-    'etc/luatangle'             =>
+    'xlua/luatangle'             =>
         gen_license_problems_in_text_file($lua_license, '2016'),
     'engine/LOG_DATA'                 => \&ignored,    # not worth the trouble
     'engine/cf/LIBMARPA_MODE'         => \&trivial,
@@ -368,6 +368,9 @@ my %files_by_type = (
     'engine/read_only/install-sh' => \&check_X_copyright,
     'engine/read_only/config.h.in' =>
         check_tag( 'Generated from configure.ac by autoheader', 250 ),
+
+    # Leave inspect.lua licensing as is
+    'xlua/inspect.lua' => \&ignored,
 
     # Leave GNU obstack licensing as is
     'engine/read_only/marpa_obs.c' => \&ignored,
@@ -498,6 +501,8 @@ sub file_type {
     return \&license_problems_in_fdl_file
         if $filepart eq 'api.texi';
     return \&license_problems_in_pod_file if $filepart =~ /[.]pod \z/xms;
+    return gen_license_problems_in_text_file($lua_license, '2016')
+        if $filepart =~ /[.] (lua) \z /xms;
     return gen_license_problems_in_c_file($xs_license)
         if $filepart =~ /[.] (xs) \z /xms;
     return gen_license_problems_in_c_file()
