@@ -25,47 +25,24 @@ This is the code for Kollos, the "middle layer" of Marpa.
 Below it is Libmarpa, a library written in
 the C language which contains the actual parse engine.
 
-## Unclassified code
+## Marpa VM operations
 
-I changed to literate programming
-in mid-project, and am "making my
-code literate" as I go.
-For earlier code, this means I get
-to it when there's a rewrite,
-or otherwise as occasion demands.
+Initially, Marpa's semantics were performed using a VM of about a dozen
+operations.  I am converting them to Lua, one by one.  Once they are in
+Lua, the flexibility in defining operations becomes much greater than when
+they were in C/XS.  the set of operations which can be defined becomes
+literally open-ended.  This Marpa VM may well be altered.  For example,
+the choice at one extreme is to replace every sequence of operations
+with exactly one Lua function, using metaprogramming if necessary,
+eliminating the original VM entirely.
+
+### Marpa Debug operation
+
+Was used for development.
+Perhaps I should delete this.
 
 ```
-
-    -- luatangle: section main
-
-    -- luacheck: std lua53
-    -- luacheck: globals bit
-    -- luacheck: globals __FILE__ __LINE__
-
-    -- Copyright 2016 Jeffrey Kegler
-    -- Permission is hereby granted, free of charge, to any person obtaining a
-    -- copy of this software and associated documentation files (the "Software"),
-    -- to deal in the Software without restriction, including without limitation
-    -- the rights to use, copy, modify, merge, publish, distribute, sublicense,
-    -- and/or sell copies of the Software, and to permit persons to whom the
-    -- Software is furnished to do so, subject to the following conditions:
-    --
-    -- The above copyright notice and this permission notice shall be included
-    -- in all copies or substantial portions of the Software.
-    --
-    -- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-    -- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-    -- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-    -- THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
-    -- OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
-    -- ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-    -- OTHER DEALINGS IN THE SOFTWARE.
-    --
-    -- [ MIT license: http://www.opensource.org/licenses/mit-license.php ]
-
-        -- for k,v in pairs(marpa.ops)
-        -- do io.stderr:write(string.format("OP: %s %s\n", k, v))
-        -- end
+    -- luatangle: section VM operations
 
     function op_fn_debug (recce)
         for k,v in pairs(recce) do
@@ -79,6 +56,14 @@ or otherwise as occasion demands.
         return -2
     end
 
+```
+
+### Marpa "result is undef" operation
+
+Perhaps the simplest operation.
+The result of the semantics is a Perl undef.
+
+```
     function op_fn_result_is_undef(recce)
         local stack = recce:stack()
         stack[recce.v.step.result] = marpa.sv.undef()
@@ -86,6 +71,16 @@ or otherwise as occasion demands.
         return -1
     end
 
+```
+
+### Marpa "result is token value" operation
+
+The result of the semantics is the value of the
+token at the current location.
+It's assumed to be a MARPA_STEP_TOKEN step --
+if not the value is an undef.
+
+```
     function op_fn_result_is_token_value(recce)
       local stack = recce:stack()
       local result_ix = recce.v.step.result
@@ -113,6 +108,58 @@ or otherwise as occasion demands.
       until 1
       return -1
     end
+
+```
+
+## Unclassified code
+
+I've just switched over to literate programming
+for my Lua code.
+I will make this earlier code more literate
+when there's a rewrite,
+or otherwise as occasion demands.
+
+## Preliminaries to the main code
+
+Licensing, etc.
+
+```
+
+    -- luatangle: section preliminaries to main
+
+    -- Copyright 2016 Jeffrey Kegler
+    -- Permission is hereby granted, free of charge, to any person obtaining a
+    -- copy of this software and associated documentation files (the "Software"),
+    -- to deal in the Software without restriction, including without limitation
+    -- the rights to use, copy, modify, merge, publish, distribute, sublicense,
+    -- and/or sell copies of the Software, and to permit persons to whom the
+    -- Software is furnished to do so, subject to the following conditions:
+    --
+    -- The above copyright notice and this permission notice shall be included
+    -- in all copies or substantial portions of the Software.
+    --
+    -- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    -- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    -- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+    -- THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+    -- OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+    -- ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+    -- OTHER DEALINGS IN THE SOFTWARE.
+    --
+    -- [ MIT license: http://www.opensource.org/licenses/mit-license.php ]
+
+    -- luacheck: std lua53
+    -- luacheck: globals bit
+    -- luacheck: globals __FILE__ __LINE__
+
+```
+
+## Initializa a valuator
+
+Called when a valuator is set up.
+
+```
+    -- luatangle: section value_init()
 
     function value_init(recce, trace_values)
 
@@ -158,6 +205,16 @@ or otherwise as occasion demands.
         recce.v = {}
     end
 
+```
+
+## Reset a valuator
+
+A function to be called whenever a valuator is reset.
+
+```
+
+    -- luatangle: section value_reset()
+
     function value_reset(recce)
         recce.op_fn_key = nil
         recce.rule_semantics = nil
@@ -170,14 +227,18 @@ or otherwise as occasion demands.
         recce.v = nil
     end
 
+```
+
+```
+    -- luatangle: section main
+    -- luatangle: insert preliminaries to main
+    -- luatangle: insert VM operations
+    -- luatangle: insert value_init()
+    -- luatangle: insert value_reset()
+
+    -- luatangle: write stdout main
+
     -- vim: set expandtab shiftwidth=4:
-```
-
-```
-    -- luatangle: section+ main
-
-    --luatangle: write stdout main
-
 ```
 
 <!--
