@@ -1914,7 +1914,7 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
                     "  -- io.stderr:write('starting op: ', inspect(recce))\n"
                     "end",
                     "Rsi",
-                    slr->lua_ref, "starting lua op", fn_key
+                    slr->lua_ref, "starting lua op", (int)fn_key
                     );
 
                 /* warn ("Executing MARPA_OP_LUA, fn_key = %d", fn_key); */
