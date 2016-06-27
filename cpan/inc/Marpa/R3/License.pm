@@ -152,6 +152,8 @@ my $tex_closed_license = hash_comment( $closed_license, q{%} );
 my $tex_license        = hash_comment( $lgpl_license, q{%} );
 my $tex_cc_a_nd_license = hash_comment( $cc_a_nd_license, q{%} );
 
+my $md_license = "<!--\n" . $mit_license . '-->';
+
 my $perl_pod_no_warranty = <<'END_OF_NO_WARRANTY';
 This program is distributed in the hope that it will be
 useful, but without any warranty; without even the implied
@@ -503,6 +505,8 @@ sub file_type {
     return \&license_problems_in_pod_file if $filepart =~ /[.]pod \z/xms;
     return gen_license_problems_in_text_file($lua_license, '2016')
         if $filepart =~ /[.] (lua) \z /xms;
+    return gen_license_problems_in_text_file($md_license, '2016')
+        if $filepart =~ /[.] (md) \z /xms;
     return gen_license_problems_in_c_file($xs_license)
         if $filepart =~ /[.] (xs) \z /xms;
     return gen_license_problems_in_c_file()
