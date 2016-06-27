@@ -357,6 +357,21 @@ END_OF_POSTAMBLE_PIECE
 
 # == Additional dependencies for making from PL files
 
+if ($^O eq 'MSWin32'){
+    push @postamble_pieces, <<'END_OF_POSTAMBLE_PIECE';
+all :: lib\Marpa\R3\Lua\Init.pm
+
+all :: lib\Marpa\R3\Lua\Inspect.pm
+
+lib\Marpa\R3\Lua\Inspect.pm: xlua\inspect.lua lib\Marpa\R3\Lua\Inspect.PL
+	$(PERLRUN) lib\Marpa\R3\Lua\Inspect.PL lib\Marpa\R3\Lua\Inspect.pm
+
+lib\Marpa\R3\Lua\Init.pm: xlua\init.lua lib\Marpa\R3\Lua\Init.PL
+	$(PERLRUN) lib\Marpa\R3\Lua\Init.PL lib\Marpa\R3\Lua\Init.pm
+
+END_OF_POSTAMBLE_PIECE
+}
+else{
     push @postamble_pieces, <<'END_OF_POSTAMBLE_PIECE';
 all :: lib/Marpa/R3/Lua/Init.pm
 
@@ -369,7 +384,7 @@ lib/Marpa/R3/Lua/Init.pm: xlua/init.lua lib/Marpa/R3/Lua/Init.PL
 	$(PERLRUN) lib/Marpa/R3/Lua/Init.PL lib/Marpa/R3/Lua/Init.pm
 
 END_OF_POSTAMBLE_PIECE
-
+}
     push @postamble_pieces, sprintf <<'END_OF_POSTAMBLE_PIECE',
 xlua/init.lua: lua/lua xlua/init.lua.md
 	%s
