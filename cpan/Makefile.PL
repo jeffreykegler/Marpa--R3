@@ -371,10 +371,16 @@ lib/Marpa/R3/Lua/Init.pm: xlua/init.lua lib/Marpa/R3/Lua/Init.PL
 END_OF_POSTAMBLE_PIECE
 
     push @postamble_pieces, sprintf <<'END_OF_POSTAMBLE_PIECE',
-xlua/init.lua: xlua/init.lua.md
+xlua/init.lua: lua/lua xlua/init.lua.md
 	%s
 END_OF_POSTAMBLE_PIECE
 	$self->cd(File::Spec->catdir(qw(xlua)), '$(MAKE)');
+
+    push @postamble_pieces, sprintf <<'END_OF_POSTAMBLE_PIECE',
+lua/lua:
+	%s
+END_OF_POSTAMBLE_PIECE
+	$self->cd(File::Spec->catdir(qw(lua)), '$(MAKE)');
 
     return join "\n", @postamble_pieces;
 
