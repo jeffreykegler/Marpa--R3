@@ -111,14 +111,6 @@ if not the value is an undef.
 
 ```
 
-## Unclassified code
-
-I've just switched over to literate programming
-for my Lua code.
-I will make this earlier code more literate
-when there's a rewrite,
-or otherwise as occasion demands.
-
 ## Preliminaries to the main code
 
 Licensing, etc.
@@ -154,7 +146,7 @@ Licensing, etc.
 
 ```
 
-## Initializa a valuator
+## Initialize a valuator
 
 Called when a valuator is set up.
 
