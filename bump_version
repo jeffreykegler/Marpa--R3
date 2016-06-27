@@ -59,6 +59,7 @@ cpan/lib/Marpa/R3/Value.pm
 cpan/lib/Marpa/R3/X.pm
 cpan/kollos/Makefile.PL
 cpan/lua/Makefile.PL
+cpan/xlua/Makefile.PL
 cpan/Makefile.PL
 cpan/meta/make_internal_pm.pl
 cpan/xs/Makefile.PL

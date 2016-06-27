@@ -27,7 +27,7 @@ use Config;
 use ExtUtils::MakeMaker;
 
 use vars qw($VERSION $STRING_VERSION);
-$VERSION        = '4.001_013';
+$VERSION        = '4.001_014';
 $STRING_VERSION = $VERSION;
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 $VERSION = eval $VERSION;
@@ -358,9 +358,11 @@ END_OF_POSTAMBLE_PIECE
 # == Additional dependencies for making from PL files
 
     push @postamble_pieces, <<'END_OF_POSTAMBLE_PIECE';
-lib/Marpa/R3/Lua/Init.pm :: xlua/init.lua
+lib/Marpa/R3/Lua/Inspect.pm: xlua/inspect.lua lib/Marpa/R3/Lua/Inspect.PL
+	$(PERLRUN) lib/Marpa/R3/Lua/Inspect.PL lib/Marpa/R3/Lua/Inspect.pm
 
-lib/Marpa/R3/Lua/Inspect.pm :: xlua/inspect.lua
+lib/Marpa/R3/Lua/Init.pm: xlua/init.lua lib/Marpa/R3/Lua/Init.PL
+	$(PERLRUN) lib/Marpa/R3/Lua/Init.PL lib/Marpa/R3/Lua/Init.pm
 
 END_OF_POSTAMBLE_PIECE
 
@@ -397,10 +399,6 @@ WriteMakefile(
             package =>
                 [ @no_index_namespace_inclusive, 'Marpa::R3::Trace::G' ],
         }
-    },
-    PL_FILES => {
-        'lib/Marpa/R3/Lua/Inspect.PL' => 'lib/Marpa/R3/Lua/Inspect.pm',
-        'lib/Marpa/R3/Lua/Init.PL' => 'lib/Marpa/R3/Lua/Init.pm',
     },
     META_MERGE => {
         resources =>

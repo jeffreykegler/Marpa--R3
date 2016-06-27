@@ -64,6 +64,8 @@ Perhaps the simplest operation.
 The result of the semantics is a Perl undef.
 
 ```
+    -- luatangle: section+ VM operations
+
     function op_fn_result_is_undef(recce)
         local stack = recce:stack()
         stack[recce.v.step.result] = marpa.sv.undef()
@@ -81,6 +83,8 @@ It's assumed to be a MARPA_STEP_TOKEN step --
 if not the value is an undef.
 
 ```
+    -- luatangle: section+ VM operations
+
     function op_fn_result_is_token_value(recce)
       local stack = recce:stack()
       local result_ix = recce.v.step.result
@@ -227,6 +231,8 @@ A function to be called whenever a valuator is reset.
     -- luatangle: insert VM operations
     -- luatangle: insert value_init()
     -- luatangle: insert value_reset()
+
+    return "OK"
 
     -- luatangle: write stdout main
 

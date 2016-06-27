@@ -16,7 +16,7 @@ use strict;
 use warnings;
 
 use vars qw($VERSION $STRING_VERSION);
-$VERSION        = '4.001_013';
+$VERSION        = '4.001_014';
 $STRING_VERSION = $VERSION;
 ## no critic(BuiltinFunctions::ProhibitStringyEval)
 $VERSION = eval $VERSION;
@@ -823,8 +823,13 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
       Marpa::R3::Thin::SLG->new( $thin_L0, $g1_tracer->grammar() );
 
     # Stuff in Lua
-    $thin_slg->exec($Marpa::R3::Lua::Init::load);
-    $thin_slg->exec($Marpa::R3::Lua::Inspect::load);
+    my $load_result;
+    ($load_result) = $thin_slg->exec($Marpa::R3::Lua::Init::load);
+    $load_result //= "[undef]";
+    Marpa::R3::exception("Init::load failed: $load_result") if $load_result ne 'OK';
+    ($load_result) = $thin_slg->exec($Marpa::R3::Lua::Inspect::load);
+    $load_result //= "[undef]";
+    Marpa::R3::exception("Inspect::load failed: $load_result") if $load_result ne 'OK';
 
   LEXEME: for my $lexeme_name ( keys %g1_id_by_lexeme_name ) {
         Marpa::R3::exception(
