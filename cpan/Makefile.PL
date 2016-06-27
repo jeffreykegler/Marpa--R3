@@ -355,6 +355,21 @@ kollos/kollos$(LIB_EXT):
 END_OF_POSTAMBLE_PIECE
 	$self->cd(File::Spec->catdir(qw(kollos)), '$(MAKE) ');
 
+# == Additional dependencies for making from PL files
+
+    push @postamble_pieces, <<'END_OF_POSTAMBLE_PIECE';
+lib/Marpa/R3/Lua/Init.pm :: xlua/init.lua
+
+lib/Marpa/R3/Lua/Inspect.pm :: xlua/inspect.lua
+
+END_OF_POSTAMBLE_PIECE
+
+    push @postamble_pieces, sprintf <<'END_OF_POSTAMBLE_PIECE',
+xlua/init.lua: xlua/init.lua.md
+	%s
+END_OF_POSTAMBLE_PIECE
+	$self->cd(File::Spec->catdir(qw(xlua)), '$(MAKE)');
+
     return join "\n", @postamble_pieces;
 
 }; ## end sub MY::postamble
@@ -370,7 +385,7 @@ WriteMakefile(
     CONFIGURE_REQUIRES => \%configure_requires,
     PM                 => \%pm_files,
     MIN_PERL_VERSION => '5.10.1',
-    DIR => [qw(engine lua kollos xs)],
+    DIR => [qw(engine lua kollos xlua xs)],
     META_ADD => {
         no_index => {
             directory => [
