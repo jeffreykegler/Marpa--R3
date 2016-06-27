@@ -358,6 +358,10 @@ END_OF_POSTAMBLE_PIECE
 # == Additional dependencies for making from PL files
 
     push @postamble_pieces, <<'END_OF_POSTAMBLE_PIECE';
+all :: lib/Marpa/R3/Lua/Init.pm
+
+all :: lib/Marpa/R3/Lua/Inspect.pm
+
 lib/Marpa/R3/Lua/Inspect.pm: xlua/inspect.lua lib/Marpa/R3/Lua/Inspect.PL
 	$(PERLRUN) lib/Marpa/R3/Lua/Inspect.PL lib/Marpa/R3/Lua/Inspect.pm
 
@@ -400,6 +404,26 @@ WriteMakefile(
                 [ @no_index_namespace_inclusive, 'Marpa::R3::Trace::G' ],
         }
     },
+    PM => {
+        q[lib/Marpa/R3.pm]           => q[$(INST_LIB)/Marpa/R3.pm],
+        q[lib/Marpa/R3/ASF.pm]       => q[$(INST_LIB)/Marpa/R3/ASF.pm],
+        q[lib/Marpa/R3/Common.pm]    => q[$(INST_LIB)/Marpa/R3/Common.pm],
+        q[lib/Marpa/R3/Installed.pm] => q[$(INST_LIB)/Marpa/R3/Installed.pm],
+        q[lib/Marpa/R3/Internal.pm]  => q[$(INST_LIB)/Marpa/R3/Internal.pm],
+        q[lib/Marpa/R3/MetaAST.pm]   => q[$(INST_LIB)/Marpa/R3/MetaAST.pm],
+        q[lib/Marpa/R3/MetaG.pm]     => q[$(INST_LIB)/Marpa/R3/MetaG.pm],
+        q[lib/Marpa/R3/SLG.pm]       => q[$(INST_LIB)/Marpa/R3/SLG.pm],
+        q[lib/Marpa/R3/SLR.pm]       => q[$(INST_LIB)/Marpa/R3/SLR.pm],
+        q[lib/Marpa/R3/Lua/Init.pm]  => q[$(INST_LIB)/Marpa/R3/Lua/Init.pm],
+        q[lib/Marpa/R3/Lua/Inspect.pm] =>
+          q[$(INST_LIB)/Marpa/R3/Lua/Inspect.pm],
+        q[lib/Marpa/R3/Thin/G.pm]  => q[$(INST_LIB)/Marpa/R3/Thin/G.pm],
+        q[lib/Marpa/R3/Thin/R.pm]  => q[$(INST_LIB)/Marpa/R3/Thin/R.pm],
+        q[lib/Marpa/R3/Trace/G.pm] => q[$(INST_LIB)/Marpa/R3/Trace/G.pm],
+        q[lib/Marpa/R3/Value.pm]   => q[$(INST_LIB)/Marpa/R3/Value.pm],
+        q[lib/Marpa/R3/Version.pm] => q[$(INST_LIB)/Marpa/R3/Version.pm],
+        q[lib/Marpa/R3/X.pm]       => q[$(INST_LIB)/Marpa/R3/X.pm]
+      },
     META_MERGE => {
         resources =>
             { repository => 'git://github.com/jeffreykegler/Marpa--R3.git', },

@@ -114,6 +114,7 @@
 ^pod2htmi[.]tmp
 ^xlua/MYMETA.
 ^xlua/Makefile$
+^xlua/Makefile[.]old$
 ^xlua/init[.]lua$
 ^xs/MYMETA[.]
 ^xs/Makefile$
