@@ -1126,10 +1126,10 @@ xlua_sig_call (lua_State * L, const char *codestr, const char *sig, ...)
         /* warn("%s %d narg=%d *sig=%c", __FILE__, __LINE__, narg, *sig); */
         switch (this_sig) {
         case 'd':
-            marpa_lua_pushnumber (L, va_arg (vl, double));
+            marpa_lua_pushnumber (L, (lua_Number)va_arg (vl, double));
             break;
         case 'i':
-            marpa_lua_pushnumber (L, va_arg (vl, int));
+            marpa_lua_pushinteger (L, (lua_Integer)va_arg (vl, int));
             break;
         case 's':
             marpa_lua_pushstring (L, va_arg (vl, char *));
@@ -1144,7 +1144,7 @@ xlua_sig_call (lua_State * L, const char *codestr, const char *sig, ...)
             /* warn("%s %d narg=%d", __FILE__, __LINE__, narg, *sig); */
             break;
         case 'R':              /* argument is ref key of recce table */
-            marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, va_arg (vl, int));
+            marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, (lua_Integer)va_arg (vl, int));
             break;
         case '>':              /* end of arguments */
             goto endargs;
