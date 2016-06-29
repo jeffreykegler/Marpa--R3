@@ -30,11 +30,11 @@ the C language which contains the actual parse engine.
 Initially, Marpa's semantics were performed using a VM of about a dozen
 operations.  I am converting them to Lua, one by one.  Once they are in
 Lua, the flexibility in defining operations becomes much greater than when
-they were in C/XS.  the set of operations which can be defined becomes
+they were in C/XS.  The set of operations which can be defined becomes
 literally open-ended.  This Marpa VM may well be altered.  For example,
 the choice at one extreme is to replace every sequence of operations
 with exactly one Lua function, using metaprogramming if necessary,
-eliminating the original VM entirely.
+and eliminating the original VM entirely.
 
 ### Marpa Debug operation
 
@@ -63,7 +63,8 @@ Perhaps I should delete this.
 This is to used for development.
 Its intended use is as a dummy argument,
 which, if it is used by accident
-as a VM operation.
+as a VM operation,
+fast fails with a clear message.
 
 ```
     -- luatangle: section+ VM operations
