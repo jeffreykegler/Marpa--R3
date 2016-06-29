@@ -930,9 +930,10 @@ static const struct luaL_Reg marpa_funcs[] = {
 
 /* === LUA ARRAY CLASS === */
 
+/* Array must be UV because it is used for VM ops */
 typedef struct Xlua_Array {
     size_t size;
-    unsigned int array[1];
+    UV array[1];
 } Xlua_Array;
 
 /* Leaves new userdata on top of stack */
@@ -940,7 +941,7 @@ static void
 xlua_array_new (lua_State * L, lua_Integer size)
 {
     marpa_lua_newuserdata (L,
-        sizeof (Xlua_Array) + ((size_t)size - 1) * sizeof (unsigned int));
+        sizeof (Xlua_Array) + ((size_t)size - 1) * sizeof (UV));
     marpa_luaL_setmetatable (L, MT_NAME_ARRAY);
 }
 
@@ -963,7 +964,7 @@ xlua_array_from_list_func (lua_State * L)
     p_array = (Xlua_Array *) marpa_lua_touserdata (L, -1);
     for (ix = 1; ix <= last_arg; ix++) {
         const lua_Integer value = marpa_luaL_checkinteger (L, ix);
-        p_array->array[ix - 1] = (unsigned int)value;
+        p_array->array[ix - 1] = (UV)value;
     }
     p_array->size = (size_t)last_arg;
     /* [ array_ud ] */
@@ -988,10 +989,10 @@ xlua_array_new_index_meth (lua_State * L)
     Xlua_Array * const p_array =
         (Xlua_Array *) marpa_luaL_checkudata (L, 1, MT_NAME_ARRAY);
     const lua_Integer ix = marpa_luaL_checkinteger (L, 2);
-    const unsigned int value = (unsigned int)marpa_luaL_checkinteger (L, 3);
+    const lua_Integer value = marpa_luaL_checkinteger (L, 3);
     marpa_luaL_argcheck (L, (ix < 0 || (size_t)ix >= p_array->size), 2,
         "index out of bounds");
-    p_array->array[ix] = value;
+    p_array->array[ix] = (UV)value;
     return 1;
 }
 
