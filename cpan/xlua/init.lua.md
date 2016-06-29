@@ -58,6 +58,21 @@ Perhaps I should delete this.
 
 ```
 
+### Marpa No-op operation
+
+This is to be kept after development,
+even if not used.
+It may be useful in debugging.
+
+```
+    -- luatangle: section+ VM operations
+
+    function op_fn_noop (recce)
+        return -2
+    end
+
+```
+
 ### Marpa Abend operation
 
 This is to used for development.
@@ -188,8 +203,9 @@ Called when a valuator is set up.
             return ref
         end
 
-        op_fn_create("debug", op_fn_debug)
-        op_fn_create("abend", op_fn_abend)
+        local op_debug_key = op_fn_create("debug", op_fn_debug)
+        local op_abend_key = op_fn_create("abend", op_fn_abend)
+        local op_noop_key = op_fn_create("noop", op_fn_noop)
         local result_is_undef_key = op_fn_create("result_is_undef", op_fn_result_is_undef)
         local result_is_undef_key = op_fn_create("result_is_undef", op_fn_result_is_undef)
         local result_is_token_value_key = op_fn_create("result_is_token_value", op_fn_result_is_token_value)
