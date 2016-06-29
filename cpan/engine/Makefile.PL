@@ -96,7 +96,7 @@ END_OF_POSTAMBLE_PIECE
 perl_ac_build/Makefile.PL: read_only/stamp-h1 cf/perl_ac_makefile.PL
 	$(RM_RF) perl_ac_build
 	$(LIBMARPA_INSTALL) read_only perl_ac_build
-	cp cf/perl_ac_makefile.PL perl_ac_build/Makefile.PL
+	$(CP) cf/perl_ac_makefile.PL perl_ac_build/Makefile.PL
 END_OF_POSTAMBLE_PIECE
 
 
