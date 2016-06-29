@@ -148,6 +148,19 @@ if not the value is an undef.
 
 ```
 
+### Return operation key given its name
+
+```
+
+    -- luatangle: section+ VM operations
+
+    function get_op_fn_key_by_name(recce, op_name_sv)
+        local op_name = tostring(op_name_sv)
+        return recce.op_fn_key[op_name]
+    end
+
+```
+
 ## Preliminaries to the main code
 
 Licensing, etc.
@@ -207,18 +220,17 @@ Called when a valuator is set up.
         local op_abend_key = op_fn_create("abend", op_fn_abend)
         local op_noop_key = op_fn_create("noop", op_fn_noop)
         local result_is_undef_key = op_fn_create("result_is_undef", op_fn_result_is_undef)
-        local result_is_undef_key = op_fn_create("result_is_undef", op_fn_result_is_undef)
         local result_is_token_value_key = op_fn_create("result_is_token_value", op_fn_result_is_token_value)
 
         recce.rule_semantics = {}
         recce.token_semantics = {}
         recce.nulling_semantics = {}
         recce.nulling_semantics.default
-            = marpa.array.from_list(marpa.ops.lua, result_is_undef_key,0)
+            = marpa.array.from_list(marpa.ops.lua, result_is_undef_key, op_noop_key, 0)
         recce.token_semantics.default
-            = marpa.array.from_list(marpa.ops.lua, result_is_token_value_key,0)
+            = marpa.array.from_list(marpa.ops.lua, result_is_token_value_key, op_noop_key, 0)
         recce.rule_semantics.default
-            = marpa.array.from_list(marpa.ops.lua, result_is_undef_key,0)
+            = marpa.array.from_list(marpa.ops.lua, result_is_undef_key, op_noop_key, 0)
         -- print( recce.nulling_semantics.default )
         -- io.stderr:write(string.format("len: %s\n", #(recce.nulling_semantics.default)))
         -- io.stderr:write(string.format("#0: %s\n", recce.nulling_semantics.default[0]))
