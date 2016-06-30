@@ -226,11 +226,11 @@ Called when a valuator is set up.
         recce.token_semantics = {}
         recce.nulling_semantics = {}
         recce.nulling_semantics.default
-            = marpa.array.from_list(marpa.ops.lua, result_is_undef_key, op_noop_key, 0)
+            = marpa.array.from_list(marpa.ops.lua, result_is_undef_key, op_abend_key, 0)
         recce.token_semantics.default
-            = marpa.array.from_list(marpa.ops.lua, result_is_token_value_key, op_noop_key, 0)
+            = marpa.array.from_list(marpa.ops.lua, result_is_token_value_key, op_abend_key, 0)
         recce.rule_semantics.default
-            = marpa.array.from_list(marpa.ops.lua, result_is_undef_key, op_noop_key, 0)
+            = marpa.array.from_list(marpa.ops.lua, result_is_undef_key, op_abend_key, 0)
         -- print( recce.nulling_semantics.default )
         -- io.stderr:write(string.format("len: %s\n", #(recce.nulling_semantics.default)))
         -- io.stderr:write(string.format("#0: %s\n", recce.nulling_semantics.default[0]))

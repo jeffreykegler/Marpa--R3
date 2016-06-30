@@ -971,7 +971,7 @@ sub registration_init {
         SET_OPS: {
 
             if ( $semantics eq '::undef' ) {
-                @ops = ($op_lua, $result_is_undef_key, $op_noop_key);
+                @ops = ($op_lua, $result_is_undef_key, $op_abend_key);
                 last SET_OPS;
             }
 
@@ -1001,7 +1001,7 @@ sub registration_init {
                 if ( $ref_type eq 'SCALAR' ) {
                     my $thingy = ${$thingy_ref};
                     if ( not defined $thingy ) {
-                        @ops = ($op_lua, $result_is_undef_key, $op_noop_key);
+                        @ops = ($op_lua, $result_is_undef_key, $op_abend_key);
                         last SET_OPS;
                     }
                     @ops = ( $op_result_is_constant, $thingy_ref );
@@ -1028,7 +1028,7 @@ sub registration_init {
             # After this point, any closure will be a ref to 'CODE'
 
             if ( defined $lexeme_id and $semantics eq '::value' ) {
-                @ops = ($op_lua, $result_is_token_value_key, $op_noop_key);
+                @ops = ($op_lua, $result_is_token_value_key, $op_abend_key);
                 last SET_OPS;
             }
 
@@ -1080,7 +1080,7 @@ sub registration_init {
             } ## end PROCESS_SINGLETON_RESULT:
 
             if ( not defined $array_fate ) {
-                @ops = ($op_lua, $result_is_undef_key, $op_noop_key);
+                @ops = ($op_lua, $result_is_undef_key, $op_abend_key);
                 last SET_OPS;
             }
 
