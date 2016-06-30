@@ -1906,6 +1906,7 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
                 int return_value;
                 int base_of_stack;
                 const UV fn_key = ops[op_ix++];
+                const UV lua_op_arg = ops[op_ix++];
 
                 xlua_sig_call (slr->L,
                     "local recce, tag, fn_key = ...;\n"
@@ -1928,9 +1929,10 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
 
                 /* warn ("Executing MARPA_OP_LUA, fn_key = %d", fn_key); */
 
-                /* The recce table itself is the only argument */
+                /* The recce table itself is the first argument */
                 marpa_lua_pushvalue (L, -2);
-                status = marpa_lua_pcall (L, 1, 1, 0);
+                marpa_lua_pushinteger (L, (lua_Integer)lua_op_arg);
+                status = marpa_lua_pcall (L, 2, 1, 0);
 
                 if (status != 0) {
                     const char *error_string = marpa_lua_tostring (L, -1);
