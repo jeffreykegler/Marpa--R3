@@ -397,11 +397,6 @@ sub Marpa::R3::Scanless::R::show_semantics {
             $op_ix++;
             next OP;
         }
-        if ( $op_name eq 'result_is_n_of_sequence' ) {
-            push @op_descs, $ops[$op_ix];
-            $op_ix++;
-            next OP;
-        }
         if ( $op_name eq 'result_is_constant' ) {
             push @op_descs, $ops[$op_ix];
             $op_ix++;
@@ -883,8 +878,6 @@ sub registration_init {
     state $op_push_values        = Marpa::R3::Thin::op('push_values');
     state $op_result_is_array    = Marpa::R3::Thin::op('result_is_array');
     state $op_result_is_constant = Marpa::R3::Thin::op('result_is_constant');
-    state $op_result_is_n_of_sequence =
-        Marpa::R3::Thin::op('result_is_n_of_sequence');
     state $op_lua = Marpa::R3::Thin::op('lua');
 
     my ($result_is_undef_key) =
@@ -893,6 +886,8 @@ sub registration_init {
       $slr->exec_name( 'get_op_fn_key_by_name', "result_is_token_value" );
     my ($result_is_n_of_rhs_key) =
       $slr->exec_name( 'get_op_fn_key_by_name', "result_is_n_of_rhs" );
+    my ($result_is_n_of_sequence_key) =
+      $slr->exec_name( 'get_op_fn_key_by_name', "result_is_n_of_sequence" );
     my ($op_debug_key) = $slr->exec_name( 'get_op_fn_key_by_name', "debug" );
     my ($op_noop_key)  = $slr->exec_name( 'get_op_fn_key_by_name', "noop" );
     my ($op_abend_key) = $slr->exec_name( 'get_op_fn_key_by_name', "abend" );
@@ -1044,7 +1039,7 @@ sub registration_init {
                 my $singleton_element = $singleton;
                 if ($is_discard_sequence_rule) {
                     @ops =
-                        ( $op_result_is_n_of_sequence, $singleton_element );
+                        ( $op_lua, $result_is_n_of_sequence_key, $singleton_element );
                     last SET_OPS;
                 }
                 if ($is_sequence_rule) {
