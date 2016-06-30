@@ -890,13 +890,13 @@ sub registration_init {
     state $op_result_is_rhs_n = Marpa::R3::Thin::op('result_is_rhs_n');
     state $op_lua = Marpa::R3::Thin::op('lua');
 
-    my ($result_is_undef_key) = $slr->exec_name('get_op_fn_key_by_name', 'result_is_undef');
-
-    my ($result_is_token_value_key) = $slr->exec(<<'END_OF_LUA');
-    local recce = ...
-    return recce.op_fn_key["result_is_token_value"]
-END_OF_LUA
-
+    my ($result_is_undef_key) =
+      $slr->exec_name( 'get_op_fn_key_by_name', 'result_is_undef' );
+    my ($result_is_token_value_key) =
+      $slr->exec_name( 'get_op_fn_key_by_name', "result_is_token_value" );
+    my ($op_debug_key) = $slr->exec_name( 'get_op_fn_key_by_name', "debug" );
+    my ($op_noop_key)  = $slr->exec_name( 'get_op_fn_key_by_name', "noop" );
+    my ($op_abend_key) = $slr->exec_name( 'get_op_fn_key_by_name', "abend" );
 
     my @nulling_symbol_by_semantic_rule;
     NULLING_SYMBOL: for my $nulling_symbol ( 0 .. $#{$null_values} ) {
@@ -971,7 +971,7 @@ END_OF_LUA
         SET_OPS: {
 
             if ( $semantics eq '::undef' ) {
-                @ops = ($op_lua, $result_is_undef_key);
+                @ops = ($op_lua, $result_is_undef_key, $op_noop_key);
                 last SET_OPS;
             }
 
@@ -1001,7 +1001,7 @@ END_OF_LUA
                 if ( $ref_type eq 'SCALAR' ) {
                     my $thingy = ${$thingy_ref};
                     if ( not defined $thingy ) {
-                        @ops = ($op_lua, $result_is_undef_key);
+                        @ops = ($op_lua, $result_is_undef_key, $op_noop_key);
                         last SET_OPS;
                     }
                     @ops = ( $op_result_is_constant, $thingy_ref );
@@ -1028,7 +1028,7 @@ END_OF_LUA
             # After this point, any closure will be a ref to 'CODE'
 
             if ( defined $lexeme_id and $semantics eq '::value' ) {
-                @ops = ($op_lua, $result_is_token_value_key);
+                @ops = ($op_lua, $result_is_token_value_key, $op_noop_key);
                 last SET_OPS;
             }
 
@@ -1080,7 +1080,7 @@ END_OF_LUA
             } ## end PROCESS_SINGLETON_RESULT:
 
             if ( not defined $array_fate ) {
-                @ops = ($op_lua, $result_is_undef_key);
+                @ops = ($op_lua, $result_is_undef_key, $op_noop_key);
                 last SET_OPS;
             }
 
