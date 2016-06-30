@@ -382,6 +382,8 @@ sub show_semantics {
         if ( $op_name eq 'lua' ) {
             push @op_descs, $ops[$op_ix];
             $op_ix++;
+            push @op_descs, $ops[$op_ix];
+            $op_ix++;
             next OP;
         }
         if ( $op_name eq 'push_constant' ) {

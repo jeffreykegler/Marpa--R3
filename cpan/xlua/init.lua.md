@@ -148,6 +148,32 @@ if not the value is an undef.
 
 ```
 
+### VM "result is N of RHS" operation
+
+```
+    -- luatangle: section+ VM operations
+    function op_fn_result_is_n_of_rhs(recce, rh_ix)
+        local stack = recce:stack()
+        local result_ix = recce.v.step.result
+        repeat
+            if recce.v.step.type ~= 'MARPA_STEP_RULE' then
+              stack[result_ix] = marpa.sv.undef()
+              break
+            end
+            if rh_ix == 0 then break end
+            local fetch_ix = result_ix + rhs_ix
+            if fetch_ix > recce.v.step.arg_n then
+                stack[result_ix] = marpa.sv.undef()
+                break
+            end
+            stack[result_ix] = stack[fetch_ix]
+        until 1
+        marpa.sv.fill(stack, result_ix)
+        return -1
+    end
+
+```
+
 ### Return operation key given its name
 
 ```
