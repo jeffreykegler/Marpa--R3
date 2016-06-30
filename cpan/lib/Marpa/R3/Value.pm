@@ -869,7 +869,6 @@ sub registration_init {
     state $op_push_constant  = Marpa::R3::Thin::op('push_constant');
     state $op_push_g1_length = Marpa::R3::Thin::op('push_g1_length');
     state $op_push_length    = Marpa::R3::Thin::op('push_length');
-    state $op_push_undef     = Marpa::R3::Thin::op('push_undef');
     state $op_push_one       = Marpa::R3::Thin::op('push_one');
     state $op_push_sequence  = Marpa::R3::Thin::op('push_sequence');
     state $op_push_g1_start  = Marpa::R3::Thin::op('push_g1_start');
@@ -880,6 +879,9 @@ sub registration_init {
     state $op_result_is_constant = Marpa::R3::Thin::op('result_is_constant');
     state $op_lua = Marpa::R3::Thin::op('lua');
 
+    my ($op_debug_key) = $slr->exec_name( 'get_op_fn_key_by_name', "debug" );
+    my ($op_noop_key)  = $slr->exec_name( 'get_op_fn_key_by_name', "noop" );
+    my ($op_abend_key) = $slr->exec_name( 'get_op_fn_key_by_name', "abend" );
     my ($result_is_undef_key) =
       $slr->exec_name( 'get_op_fn_key_by_name', 'result_is_undef' );
     my ($result_is_token_value_key) =
@@ -888,9 +890,8 @@ sub registration_init {
       $slr->exec_name( 'get_op_fn_key_by_name', "result_is_n_of_rhs" );
     my ($result_is_n_of_sequence_key) =
       $slr->exec_name( 'get_op_fn_key_by_name', "result_is_n_of_sequence" );
-    my ($op_debug_key) = $slr->exec_name( 'get_op_fn_key_by_name', "debug" );
-    my ($op_noop_key)  = $slr->exec_name( 'get_op_fn_key_by_name', "noop" );
-    my ($op_abend_key) = $slr->exec_name( 'get_op_fn_key_by_name', "abend" );
+    my ($op_push_undef_key) =
+      $slr->exec_name( 'get_op_fn_key_by_name', 'push_undef' );
 
     my @nulling_symbol_by_semantic_rule;
     NULLING_SYMBOL: for my $nulling_symbol ( 0 .. $#{$null_values} ) {
@@ -1122,7 +1123,7 @@ sub registration_init {
                         push @push_ops, $op_push_constant, \$lexeme_id;
                         next RESULT_DESCRIPTOR;
                     }
-                    push @push_ops, $op_push_undef;
+                    push @push_ops, $op_lua, $op_push_undef_key, $op_abend_key;
                     next RESULT_DESCRIPTOR;
                 } ## end if ( $result_descriptor eq 'lhs' )
 
@@ -1142,7 +1143,7 @@ sub registration_init {
                         push @push_ops, $op_push_constant, \$name;
                         next RESULT_DESCRIPTOR;
                     }
-                    push @push_ops, $op_push_undef;
+                    push @push_ops, $op_lua, $op_push_undef_key, $op_abend_key;
                     next RESULT_DESCRIPTOR;
                 } ## end if ( $result_descriptor eq 'name' )
 
@@ -1163,7 +1164,7 @@ sub registration_init {
                         push @push_ops, $op_push_constant, \$name;
                         next RESULT_DESCRIPTOR;
                     }
-                    push @push_ops, $op_push_undef;
+                    push @push_ops, $op_lua, $op_push_undef_key, $op_abend_key;
                     next RESULT_DESCRIPTOR;
                 } ## end if ( $result_descriptor eq 'symbol' )
 
@@ -1172,7 +1173,7 @@ sub registration_init {
                         push @push_ops, $op_push_constant, \$irlid;
                         next RESULT_DESCRIPTOR;
                     }
-                    push @push_ops, $op_push_undef;
+                    push @push_ops, $op_lua, $op_push_undef_key, $op_abend_key;
                     next RESULT_DESCRIPTOR;
                 } ## end if ( $result_descriptor eq 'rule' )
                 if (   $result_descriptor eq 'values'

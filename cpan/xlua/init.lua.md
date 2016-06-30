@@ -108,6 +108,22 @@ The result of the semantics is a Perl undef.
 
 ```
 
+### Marpa "result is undef" operation
+
+Push an undef on the values array.
+
+```
+    -- luatangle: section+ VM operations
+
+    function op_fn_push_undef(recce)
+        local values = recce:values()
+        local next_ix = marpa.sv.top_index(values) + 1;
+        values[next_ix] = marpa.sv.undef()
+        return -1
+    end
+
+```
+
 ### Marpa "result is token value" operation
 
 The result of the semantics is the value of the
@@ -296,6 +312,7 @@ Called when a valuator is set up.
         local result_is_token_value_key = op_fn_create("result_is_token_value", op_fn_result_is_token_value)
         local result_is_n_of_rhs_key = op_fn_create("result_is_n_of_rhs", op_fn_result_is_n_of_rhs)
         local result_is_n_of_sequence_key = op_fn_create("result_is_n_of_sequence", op_fn_result_is_n_of_sequence)
+        op_fn_create("push_undef", op_fn_push_undef)
 
         recce.rule_semantics = {}
         recce.token_semantics = {}

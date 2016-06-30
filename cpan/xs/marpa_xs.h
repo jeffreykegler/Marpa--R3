@@ -442,8 +442,8 @@ struct v_wrapper_s
   Marpa_Value v;
   SV *base_sv;
   G_Wrapper *base;
-  AV *event_queue;
   AV *stack;
+  AV *values; /* for values accumulated by a semantic 'step' */
   IV trace_values;
   int mode;                     /* 'raw' or 'stack' */
   int result;                   /* stack location to which to write result */
