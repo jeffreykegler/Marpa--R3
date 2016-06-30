@@ -1990,7 +1990,6 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
             }
             return -1;
 
-        case MARPA_OP_RESULT_IS_RHS_N:
         case MARPA_OP_RESULT_IS_N_OF_SEQUENCE:
             {
                 SV **stored_av;
@@ -2012,9 +2011,7 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
                 }
 
                 /* Determine index of SV to fetch */
-                if (op_code == MARPA_OP_RESULT_IS_RHS_N) {
-                    fetch_ix = result_ix + stack_offset;
-                } else {        /* sequence */
+                {        /* sequence */
                     const UV item_ix = stack_offset;
                     fetch_ix = result_ix + item_ix * 2;
                 }

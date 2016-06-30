@@ -366,11 +366,11 @@ sub code_problems {
 } ## end sub code_problems
 
 # Dump semantics for diagnostics
-sub show_semantics {
-    my (@ops)    = @_;
+sub Marpa::R3::Scanless::R::show_semantics {
+    my ( $slr, @ops ) = @_;
     my @op_descs = ();
     my $op_ix    = 0;
-    OP: while ( $op_ix < scalar @ops ) {
+  OP: while ( $op_ix < scalar @ops ) {
         my $op      = $ops[ $op_ix++ ];
         my $op_name = Marpa::R3::Thin::op_name($op);
         push @op_descs, $op_name;
@@ -380,7 +380,8 @@ sub show_semantics {
             next OP;
         }
         if ( $op_name eq 'lua' ) {
-            push @op_descs, $ops[$op_ix];
+            my ($lua_op_name) = $slr->exec_name( 'get_op_fn_name_by_key', $ops[$op_ix] );
+            push @op_descs, $lua_op_name;
             $op_ix++;
             push @op_descs, $ops[$op_ix];
             $op_ix++;
@@ -392,11 +393,6 @@ sub show_semantics {
             next OP;
         }
         if ( $op_name eq 'push_one' ) {
-            push @op_descs, $ops[$op_ix];
-            $op_ix++;
-            next OP;
-        }
-        if ( $op_name eq 'result_is_rhs_n' ) {
             push @op_descs, $ops[$op_ix];
             $op_ix++;
             next OP;
@@ -889,13 +885,14 @@ sub registration_init {
     state $op_result_is_constant = Marpa::R3::Thin::op('result_is_constant');
     state $op_result_is_n_of_sequence =
         Marpa::R3::Thin::op('result_is_n_of_sequence');
-    state $op_result_is_rhs_n = Marpa::R3::Thin::op('result_is_rhs_n');
     state $op_lua = Marpa::R3::Thin::op('lua');
 
     my ($result_is_undef_key) =
       $slr->exec_name( 'get_op_fn_key_by_name', 'result_is_undef' );
     my ($result_is_token_value_key) =
       $slr->exec_name( 'get_op_fn_key_by_name', "result_is_token_value" );
+    my ($result_is_n_of_rhs_key) =
+      $slr->exec_name( 'get_op_fn_key_by_name', "result_is_n_of_rhs" );
     my ($op_debug_key) = $slr->exec_name( 'get_op_fn_key_by_name', "debug" );
     my ($op_noop_key)  = $slr->exec_name( 'get_op_fn_key_by_name', "noop" );
     my ($op_abend_key) = $slr->exec_name( 'get_op_fn_key_by_name', "abend" );
@@ -1051,7 +1048,7 @@ sub registration_init {
                     last SET_OPS;
                 }
                 if ($is_sequence_rule) {
-                    @ops = ( $op_result_is_rhs_n, $singleton_element );
+                    @ops = ( $op_lua, $result_is_n_of_rhs_key, $singleton_element );
                     last SET_OPS;
                 }
                 my $mask = $tracer->[Marpa::R3::Internal::Trace::G::MASK_BY_IRLID]->[$irlid];
@@ -1077,7 +1074,7 @@ sub registration_init {
                         qq{    Semantics were specified as "$original_semantics"\n}
                     );
                 } ## end if ( not defined $singleton_element )
-                @ops = ( $op_result_is_rhs_n, $singleton_element );
+                @ops = ( $op_lua, $result_is_n_of_rhs_key, $singleton_element );
                 last SET_OPS;
             } ## end PROCESS_SINGLETON_RESULT:
 
@@ -1372,7 +1369,7 @@ sub Marpa::R3::Scanless::R::value {
                 say {$trace_file_handle}
                   "Registering semantics for nulling symbol: ",
                   $tracer->symbol_name($id),
-                  "\n", '  Semantics are ', show_semantics(@raw_ops)
+                  "\n", '  Semantics are ', $slr->show_semantics(@raw_ops)
                   or Marpa::R3::exception('Cannot say to trace file handle');
                 last PRINT_TRACES;
             } ## end if ( $type eq 'nulling' )
@@ -1380,7 +1377,7 @@ sub Marpa::R3::Scanless::R::value {
                 say {$trace_file_handle}
                   "Registering semantics for $type: ",
                   $tracer->show_rule($id),
-                  '  Semantics are ', show_semantics(@raw_ops)
+                  '  Semantics are ', $slr->show_semantics(@raw_ops)
                   or Marpa::R3::exception('Cannot say to trace file handle');
                 last PRINT_TRACES;
             }
@@ -1388,7 +1385,7 @@ sub Marpa::R3::Scanless::R::value {
                 say {$trace_file_handle}
                   "Registering semantics for $type: ",
                   $tracer->symbol_name($id),
-                  "\n", '  Semantics are ', show_semantics(@raw_ops)
+                  "\n", '  Semantics are ', $slr->show_semantics(@raw_ops)
                   or Marpa::R3::exception('Cannot say to trace file handle');
                 last PRINT_TRACES;
             }

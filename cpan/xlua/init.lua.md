@@ -152,7 +152,7 @@ if not the value is an undef.
 
 ```
     -- luatangle: section+ VM operations
-    function op_fn_result_is_n_of_rhs(recce, rh_ix)
+    function op_fn_result_is_n_of_rhs(recce, rhs_ix)
         local stack = recce:stack()
         local result_ix = recce.v.step.result
         repeat
@@ -160,7 +160,7 @@ if not the value is an undef.
               stack[result_ix] = marpa.sv.undef()
               break
             end
-            if rh_ix == 0 then break end
+            if rhs_ix == 0 then break end
             local fetch_ix = result_ix + rhs_ix
             if fetch_ix > recce.v.step.arg_n then
                 stack[result_ix] = marpa.sv.undef()
@@ -183,6 +183,19 @@ if not the value is an undef.
     function get_op_fn_key_by_name(recce, op_name_sv)
         local op_name = tostring(op_name_sv)
         return recce.op_fn_key[op_name]
+    end
+
+```
+
+### Return operation name given its key
+
+```
+
+    -- luatangle: section+ VM operations
+
+    function get_op_fn_name_by_key(recce, op_key_sv)
+        local op_key = op_key_sv + 0
+        return recce.op_fn_key[op_key]
     end
 
 ```
@@ -247,6 +260,7 @@ Called when a valuator is set up.
         local op_noop_key = op_fn_create("noop", op_fn_noop)
         local result_is_undef_key = op_fn_create("result_is_undef", op_fn_result_is_undef)
         local result_is_token_value_key = op_fn_create("result_is_token_value", op_fn_result_is_token_value)
+        local result_is_n_of_rhs_key = op_fn_create("result_is_n_of_rhs", op_fn_result_is_n_of_rhs)
 
         recce.rule_semantics = {}
         recce.token_semantics = {}

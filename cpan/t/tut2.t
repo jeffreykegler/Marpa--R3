@@ -287,49 +287,57 @@ Marpa::R3::Test::is( 49, $value, 'Implementation Example Value 2' );
 my $expected_trace_output = <<'END_TRACE_OUTPUT';
 Setting trace_values option to 3
 Registering semantics for rule: Calculator ::= Expression
-  Semantics are result_is_rhs_n 0
+  Semantics are lua result_is_n_of_rhs 0
 Registering semantics for rule: Factor ::= Number
-  Semantics are result_is_rhs_n 0
+  Semantics are lua result_is_n_of_rhs 0
 Registering semantics for rule: Term ::= Term [Lex-0] Factor
   Semantics are push_one 0 push_one 1 push_one 2 callback
 Registering semantics for rule: Term ::= Factor
-  Semantics are result_is_rhs_n 0
+  Semantics are lua result_is_n_of_rhs 0
 Registering semantics for rule: Expression ::= Expression [Lex-1] Term
   Semantics are push_one 0 push_one 1 push_one 2 callback
 Registering semantics for rule: Expression ::= Term
-  Semantics are result_is_rhs_n 0
+  Semantics are lua result_is_n_of_rhs 0
 Registering semantics for rule: [:start] ::= Calculator
-  Semantics are result_is_rhs_n 0
+  Semantics are lua result_is_n_of_rhs 0
 value event: starting op MARPA_STEP_TOKEN lua
 value event: starting lua op MARPA_STEP_TOKEN result_is_token_value
-value event: starting op MARPA_STEP_RULE result_is_rhs_n
-value event: starting op MARPA_STEP_RULE result_is_rhs_n
+value event: starting op MARPA_STEP_RULE lua
+value event: starting lua op MARPA_STEP_RULE result_is_n_of_rhs
+value event: starting op MARPA_STEP_RULE lua
+value event: starting lua op MARPA_STEP_RULE result_is_n_of_rhs
 value event: starting op MARPA_STEP_TOKEN lua
 value event: starting lua op MARPA_STEP_TOKEN result_is_token_value
 value event: starting op MARPA_STEP_TOKEN lua
 value event: starting lua op MARPA_STEP_TOKEN result_is_token_value
-value event: starting op MARPA_STEP_RULE result_is_rhs_n
+value event: starting op MARPA_STEP_RULE lua
+value event: starting lua op MARPA_STEP_RULE result_is_n_of_rhs
 value event: starting op MARPA_STEP_RULE push_one
 value event: starting op MARPA_STEP_RULE push_one
 value event: starting op MARPA_STEP_RULE push_one
 value event: starting op MARPA_STEP_RULE callback
 Popping 3 values to evaluate R2:3@0-3C1@2, rule: Term ::= Term [Lex-0] Factor
 Calculated and pushed value: 42
-value event: starting op MARPA_STEP_RULE result_is_rhs_n
+value event: starting op MARPA_STEP_RULE lua
+value event: starting lua op MARPA_STEP_RULE result_is_n_of_rhs
 value event: starting op MARPA_STEP_TOKEN lua
 value event: starting lua op MARPA_STEP_TOKEN result_is_token_value
 value event: starting op MARPA_STEP_TOKEN lua
 value event: starting lua op MARPA_STEP_TOKEN result_is_token_value
-value event: starting op MARPA_STEP_RULE result_is_rhs_n
-value event: starting op MARPA_STEP_RULE result_is_rhs_n
+value event: starting op MARPA_STEP_RULE lua
+value event: starting lua op MARPA_STEP_RULE result_is_n_of_rhs
+value event: starting op MARPA_STEP_RULE lua
+value event: starting lua op MARPA_STEP_RULE result_is_n_of_rhs
 value event: starting op MARPA_STEP_RULE push_one
 value event: starting op MARPA_STEP_RULE push_one
 value event: starting op MARPA_STEP_RULE push_one
 value event: starting op MARPA_STEP_RULE callback
 Popping 3 values to evaluate R4:3@0-5C3@4, rule: Expression ::= Expression [Lex-1] Term
 Calculated and pushed value: 49
-value event: starting op MARPA_STEP_RULE result_is_rhs_n
-value event: starting op MARPA_STEP_RULE result_is_rhs_n
+value event: starting op MARPA_STEP_RULE lua
+value event: starting lua op MARPA_STEP_RULE result_is_n_of_rhs
+value event: starting op MARPA_STEP_RULE lua
+value event: starting lua op MARPA_STEP_RULE result_is_n_of_rhs
 New Virtual Rule: R7:1@0-5C6@0, rule: 7: [:start]['] -> [:start]
 Real symbol count is 1
 END_TRACE_OUTPUT

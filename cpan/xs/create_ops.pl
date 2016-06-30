@@ -29,10 +29,8 @@ my @ops = sort { $a->[0] cmp $b->[0] }
     [ "bless",                   "MARPA_OP_BLESS" ],
     [ "callback",                "MARPA_OP_CALLBACK" ],
     [ "earleme_complete",        "MARPA_OP_EARLEME_COMPLETE" ],
-    [ "end_marker",              "MARPA_OP_END_MARKER" ],
     [ "invalid_char",            "MARPA_OP_INVALID_CHAR" ],
     [ "noop",                    "MARPA_OP_NOOP" ],
-    [ "pause",                   "MARPA_OP_PAUSE" ],
     [ "push_g1_length",          "MARPA_OP_PUSH_G1_LENGTH" ],
     [ "push_g1_start",           "MARPA_OP_PUSH_G1_START" ],
     [ "push_length",             "MARPA_OP_PUSH_LENGTH" ],
@@ -45,7 +43,6 @@ my @ops = sort { $a->[0] cmp $b->[0] }
     [ "result_is_array",         "MARPA_OP_RESULT_IS_ARRAY" ],
     [ "result_is_constant",      "MARPA_OP_RESULT_IS_CONSTANT" ],
     [ "result_is_n_of_sequence", "MARPA_OP_RESULT_IS_N_OF_SEQUENCE" ],
-    [ "result_is_rhs_n",         "MARPA_OP_RESULT_IS_RHS_N" ],
     [ "lua",               "MARPA_OP_LUA" ];
 
 say <<'END_OF_PREAMBLE';
