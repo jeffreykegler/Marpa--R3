@@ -38,7 +38,6 @@ my @ops = sort { $a->[0] cmp $b->[0] }
     [ "push_one",                "MARPA_OP_PUSH_ONE" ],
     [ "push_sequence",           "MARPA_OP_PUSH_SEQUENCE" ],
     [ "push_start_location",     "MARPA_OP_PUSH_START_LOCATION" ],
-    [ "push_undef",              "MARPA_OP_PUSH_UNDEF" ],
     [ "push_values",             "MARPA_OP_PUSH_VALUES" ],
     [ "result_is_array",         "MARPA_OP_RESULT_IS_ARRAY" ],
     [ "result_is_constant",      "MARPA_OP_RESULT_IS_CONSTANT" ],

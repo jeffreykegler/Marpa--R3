@@ -108,7 +108,7 @@ The result of the semantics is a Perl undef.
 
 ```
 
-### Marpa "result is undef" operation
+### Marpa "push undef" operation
 
 Push an undef on the values array.
 

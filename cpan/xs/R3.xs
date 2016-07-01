@@ -2113,10 +2113,6 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
             }
             break;
 
-        case MARPA_OP_PUSH_UNDEF:
-            av_push (values_av, newSV (0));
-            goto NEXT_OP_CODE;
-
         case MARPA_OP_PUSH_CONSTANT:
             {
                 UV constant_ix = ops[op_ix++];
