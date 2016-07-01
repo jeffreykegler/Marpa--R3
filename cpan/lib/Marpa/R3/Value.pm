@@ -864,11 +864,9 @@ sub registration_init {
     state $op_push_constant  = Marpa::R3::Thin::op('push_constant');
     state $op_push_g1_length = Marpa::R3::Thin::op('push_g1_length');
     state $op_push_length    = Marpa::R3::Thin::op('push_length');
-    state $op_push_sequence  = Marpa::R3::Thin::op('push_sequence');
     state $op_push_g1_start  = Marpa::R3::Thin::op('push_g1_start');
     state $op_push_start_location =
         Marpa::R3::Thin::op('push_start_location');
-    state $op_push_values        = Marpa::R3::Thin::op('push_values');
     state $op_result_is_array    = Marpa::R3::Thin::op('result_is_array');
     state $op_result_is_constant = Marpa::R3::Thin::op('result_is_constant');
     state $op_lua = Marpa::R3::Thin::op('lua');
@@ -888,6 +886,8 @@ sub registration_init {
       $slr->exec_name( 'get_op_fn_key_by_name', 'push_undef' );
     my ($op_push_one_key) =
       $slr->exec_name( 'get_op_fn_key_by_name', 'push_one' );
+    my ($op_push_values_key) =
+      $slr->exec_name( 'get_op_fn_key_by_name', 'push_values' );
 
     my @nulling_symbol_by_semantic_rule;
     NULLING_SYMBOL: for my $nulling_symbol ( 0 .. $#{$null_values} ) {
@@ -1176,15 +1176,12 @@ sub registration_init {
                     or $result_descriptor eq 'value' )
                 {
                     if ( defined $lexeme_id ) {
-                        push @push_ops, $op_push_values;
+                        push @push_ops, $op_lua, $op_push_values_key, 1;
                         next RESULT_DESCRIPTOR;
                     }
                     if ($is_sequence_rule) {
-                        my $push_op =
-                              $is_discard_sequence_rule
-                            ? $op_push_sequence
-                            : $op_push_values;
-                        push @push_ops, $push_op;
+                        push @push_ops, $op_lua, $op_push_values_key, 
+                              ($is_discard_sequence_rule ? 2 : 1);
                         next RESULT_DESCRIPTOR;
                     } ## end if ($is_sequence_rule)
                     my $mask = $xbnf->[Marpa::R3::Internal::XBNF::MASK];

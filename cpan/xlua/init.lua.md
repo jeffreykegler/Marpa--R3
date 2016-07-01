@@ -208,6 +208,44 @@ if not the value is an undef.
 
 ```
 
+### Marpa "push values" operation
+
+Push the child values onto the `values` list.
+If it is a token step, then
+the token at the current location is pushed onto the `values` list.
+If it is a nulling step, the nothing is pushed.
+Otherwise the values of the RHS children are pushed.
+
+`increment` is 2 for sequences where separators must be discarded,
+1 otherwise.
+
+```
+    -- luatangle: section+ VM operations
+
+    function op_fn_push_values(recce, increment)
+        local values = recce:values()
+        if recce.v.step.type == 'MARPA_STEP_TOKEN' then
+            local next_ix = marpa.sv.top_index(values) + 1;
+            values[next_ix] = current_token_literal(recce)
+            return -2
+        end
+        if recce.v.step.type == 'MARPA_STEP_RULE' then
+            local stack = recce:stack()
+            local arg_n = recce.v.step.arg_n
+            local result_ix = recce.v.step.result
+            local to_ix = marpa.sv.top_index(values) + 1;
+            for from_ix = result_ix,arg_n,increment do
+                values[to_ix] = stack[from_ix]
+                to_ix = to_ix + 1
+            end
+            return -2
+        end
+        -- if 'MARPA_STEP_NULLING_SYMBOL', or unrecogized type
+        return -2
+    end
+
+```
+
 ### VM "result is N of RHS" operation
 
 ```
@@ -352,6 +390,7 @@ Called when a valuator is set up.
         local result_is_token_value_key = op_fn_create("result_is_token_value", op_fn_result_is_token_value)
         local result_is_n_of_rhs_key = op_fn_create("result_is_n_of_rhs", op_fn_result_is_n_of_rhs)
         local result_is_n_of_sequence_key = op_fn_create("result_is_n_of_sequence", op_fn_result_is_n_of_sequence)
+        op_fn_create("push_values", op_fn_push_values)
         op_fn_create("push_undef", op_fn_push_undef)
         op_fn_create("push_one", op_fn_push_one)
 
