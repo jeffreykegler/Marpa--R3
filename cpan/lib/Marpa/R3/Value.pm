@@ -392,11 +392,6 @@ sub Marpa::R3::Scanless::R::show_semantics {
             $op_ix++;
             next OP;
         }
-        if ( $op_name eq 'push_one' ) {
-            push @op_descs, $ops[$op_ix];
-            $op_ix++;
-            next OP;
-        }
         if ( $op_name eq 'result_is_constant' ) {
             push @op_descs, $ops[$op_ix];
             $op_ix++;
@@ -869,7 +864,6 @@ sub registration_init {
     state $op_push_constant  = Marpa::R3::Thin::op('push_constant');
     state $op_push_g1_length = Marpa::R3::Thin::op('push_g1_length');
     state $op_push_length    = Marpa::R3::Thin::op('push_length');
-    state $op_push_one       = Marpa::R3::Thin::op('push_one');
     state $op_push_sequence  = Marpa::R3::Thin::op('push_sequence');
     state $op_push_g1_start  = Marpa::R3::Thin::op('push_g1_start');
     state $op_push_start_location =
@@ -892,6 +886,8 @@ sub registration_init {
       $slr->exec_name( 'get_op_fn_key_by_name', "result_is_n_of_sequence" );
     my ($op_push_undef_key) =
       $slr->exec_name( 'get_op_fn_key_by_name', 'push_undef' );
+    my ($op_push_one_key) =
+      $slr->exec_name( 'get_op_fn_key_by_name', 'push_one' );
 
     my @nulling_symbol_by_semantic_rule;
     NULLING_SYMBOL: for my $nulling_symbol ( 0 .. $#{$null_values} ) {
@@ -1194,7 +1190,7 @@ sub registration_init {
                     my $mask = $xbnf->[Marpa::R3::Internal::XBNF::MASK];
                     if ( $rule_length > 0 ) {
                         push @push_ops,
-                            map { $mask->[$_] ? ( $op_push_one, $_ ) : () }
+                            map { $mask->[$_] ? ( $op_lua, $op_push_one_key, $_ ) : () }
                             0 .. $rule_length - 1;
                     }
                     next RESULT_DESCRIPTOR;
