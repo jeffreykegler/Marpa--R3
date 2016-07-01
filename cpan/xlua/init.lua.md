@@ -147,10 +147,34 @@ Push one of the RHS child values onto the values array.
         if recce.v.step.type ~= 'MARPA_STEP_RULE' then
           return op_fn_push_undef(recce)
         end
+        local stack = recce:stack()
         local values = recce:values()
+        local result_ix = recce.v.step.result
         local next_ix = marpa.sv.top_index(values) + 1;
         values[next_ix] = stack[result_ix + rhs_ix]
         return -2
+    end
+
+```
+
+### Find current token literal
+
+`current_token_literal` return the literal
+equivalent of the current token.
+It assumes that there *is* a current token,
+that is,
+it assumes that the caller has ensured that
+`recce.v.step.type ~= 'MARPA_STEP_TOKEN'`.
+
+```
+    -- luatangle: section+ VM operations
+    function current_token_literal(recce)
+      if recce.token_is_literal == recce.v.step.value then
+          local start_es = recce.v.step.start_es_id
+          local end_es = recce.v.step.es_id
+          return recce:literal_of_es_span(start_es, end_es)
+      end
+      return recce.token_values[recce.v.step.value]
     end
 
 ```
@@ -166,20 +190,12 @@ if not the value is an undef.
     -- luatangle: section+ VM operations
 
     function op_fn_result_is_token_value(recce)
-      if recce.v.step.type ~= 'MARPA_STEP_TOKEN' then
-        return op_fn_result_is_undef(recce)
-      end
-      local stack = recce:stack()
-      local result_ix = recce.v.step.result
-      repeat
-        if recce.token_is_literal == recce.v.step.value then
-          local start_es = recce.v.step.start_es_id
-          local end_es = recce.v.step.es_id
-          stack[result_ix] = recce:literal_of_es_span(start_es, end_es)
-          marpa.sv.fill(stack, result_ix)
-          break
+        if recce.v.step.type ~= 'MARPA_STEP_TOKEN' then
+          return op_fn_result_is_undef(recce)
         end
-        stack[result_ix] = recce.token_values[recce.v.step.value]
+        local stack = recce:stack()
+        local result_ix = recce.v.step.result
+        stack[result_ix] = current_token_literal(recce)
         marpa.sv.fill(stack, result_ix)
         if recce.trace_values > 0 then
           local top_of_queue = #recce.trace_values_queue;
@@ -187,8 +203,7 @@ if not the value is an undef.
              {tag, recce.v.step.type, recce.v.step.symbol, recce.v.step.value, token_sv};
              -- io.stderr:write('[step_type]: ', inspect(recce))
         end
-      until 1
-      return -1
+        return -1
     end
 
 ```
