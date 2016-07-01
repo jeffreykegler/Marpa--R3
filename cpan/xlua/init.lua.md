@@ -119,7 +119,7 @@ Push an undef on the values array.
         local values = recce:values()
         local next_ix = marpa.sv.top_index(values) + 1;
         values[next_ix] = marpa.sv.undef()
-        return -1
+        return -2
     end
 
 ```
