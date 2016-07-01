@@ -16,10 +16,6 @@ use warnings;
 use English qw( -no_match_vars );
 use autodie;
 
-# Portability is NOT emphasized here -- this script is part
-# of the development environment, not the configuration or
-# installation environment
-
 if (scalar @ARGV != 0) {
     die("usage: $PROGRAM_NAME > marpa_slifop.h");
 }
@@ -35,9 +31,7 @@ my @ops = sort { $a->[0] cmp $b->[0] }
     [ "push_g1_start",           "MARPA_OP_PUSH_G1_START" ],
     [ "push_length",             "MARPA_OP_PUSH_LENGTH" ],
     [ "push_constant",           "MARPA_OP_PUSH_CONSTANT" ],
-    [ "push_sequence",           "MARPA_OP_PUSH_SEQUENCE" ],
     [ "push_start_location",     "MARPA_OP_PUSH_START_LOCATION" ],
-    [ "push_values",             "MARPA_OP_PUSH_VALUES" ],
     [ "result_is_array",         "MARPA_OP_RESULT_IS_ARRAY" ],
     [ "result_is_constant",      "MARPA_OP_RESULT_IS_CONSTANT" ],
     [ "lua",               "MARPA_OP_LUA" ];

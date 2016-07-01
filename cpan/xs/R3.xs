@@ -2051,68 +2051,6 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
             }
             return -1;
 
-        case MARPA_OP_PUSH_VALUES:
-        case MARPA_OP_PUSH_SEQUENCE:
-            {
-                switch (step_type) {
-                case MARPA_STEP_TOKEN:
-                    {
-                        SV **p_token_value_sv;
-                        int token_ix = marpa_v_token_value (v);
-                        if (slr && token_ix == TOKEN_VALUE_IS_LITERAL) {
-                            SV *sv;
-                            Marpa_Earley_Set_ID start_earley_set =
-                                marpa_v_token_start_es_id (v);
-                            Marpa_Earley_Set_ID end_earley_set =
-                                marpa_v_es_id (v);
-                            sv = slr_es_span_to_literal_sv (slr,
-                                start_earley_set,
-                                end_earley_set - start_earley_set);
-                            av_push (values_av, sv);
-                            break;
-                        }
-                        /* If token value is NOT literal */
-                        p_token_value_sv =
-                            av_fetch (slr->token_values, (I32) token_ix,
-                            0);
-                        if (p_token_value_sv) {
-                            av_push (values_av,
-                                SvREFCNT_inc_NN (*p_token_value_sv));
-                        } else {
-                            av_push (values_av, newSV (0));
-                        }
-                    }
-                    break;
-
-                case MARPA_STEP_RULE:
-                    {
-                        UV stack_ix;
-                        const int arg_n = marpa_v_arg_n (v);
-                        UV increment =
-                            op_code == MARPA_OP_PUSH_SEQUENCE ? 2 : 1;
-
-                        for (stack_ix = result_ix; stack_ix <= (UV) arg_n;
-                            stack_ix += increment) {
-                            SV **p_sv =
-                                av_fetch (stack, (I32) stack_ix, 0);
-                            if (!p_sv) {
-                                av_push (values_av, newSV (0));
-                            } else {
-                                av_push (values_av,
-                                    SvREFCNT_inc_simple_NN (*p_sv));
-                            }
-                        }
-                    }
-                    break;
-
-                default:
-                case MARPA_STEP_NULLING_SYMBOL:
-                    /* A no-op : push nothing */
-                    break;
-                }
-            }
-            break;
-
         case MARPA_OP_PUSH_CONSTANT:
             {
                 UV constant_ix = ops[op_ix++];
