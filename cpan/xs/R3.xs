@@ -2130,25 +2130,6 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
             }
             goto NEXT_OP_CODE;
 
-        case MARPA_OP_PUSH_ONE:
-            {
-                UV offset;
-                SV **p_sv;
-
-                offset = ops[op_ix++];
-                if (step_type != MARPA_STEP_RULE) {
-                    av_push (values_av, newSV (0));
-                    goto NEXT_OP_CODE;
-                }
-                p_sv = av_fetch (stack, (I32) (result_ix + offset), 0);
-                if (!p_sv) {
-                    av_push (values_av, newSV (0));
-                } else {
-                    av_push (values_av, SvREFCNT_inc_simple_NN (*p_sv));
-                }
-            }
-            goto NEXT_OP_CODE;
-
         case MARPA_OP_PUSH_START_LOCATION:
             {
                 int start_location;

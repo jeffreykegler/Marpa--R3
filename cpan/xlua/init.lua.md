@@ -36,6 +36,18 @@ the choice at one extreme is to replace every sequence of operations
 with exactly one Lua function, using metaprogramming if necessary,
 and eliminating the original VM entirely.
 
+A return value of -1 indicates this should be the last VM operation.
+A return value of 0 or greater indicates this is the last VM operation,
+and that there is a Perl callback with the contents of the values array
+as its arguments.
+A return value of -2 or less indicates that the reading of VM operations
+should continue.
+
+Use of tails calls in made.
+Maintainters should be aware that these are finicky.
+In particular, while `return f(x)` is a tail call,
+`return (f(x))` is not.
+
 ### Marpa Debug operation
 
 Was used for development.
@@ -132,12 +144,11 @@ Push one of the RHS child values onto the values array.
     -- luatangle: section+ VM operations
 
     function op_fn_push_one(recce, rhs_ix)
+        if recce.v.step.type ~= 'MARPA_STEP_RULE' then
+          return op_fn_push_undef(recce)
+        end
         local values = recce:values()
         local next_ix = marpa.sv.top_index(values) + 1;
-        if recce.v.step.type ~= 'MARPA_STEP_RULE' then
-          values[next_ix] = marpa.sv.undef()
-          return -2
-        end
         values[next_ix] = stack[result_ix + rhs_ix]
         return -2
     end
@@ -155,14 +166,12 @@ if not the value is an undef.
     -- luatangle: section+ VM operations
 
     function op_fn_result_is_token_value(recce)
+      if recce.v.step.type ~= 'MARPA_STEP_TOKEN' then
+        return op_fn_result_is_undef(recce)
+      end
       local stack = recce:stack()
       local result_ix = recce.v.step.result
       repeat
-        if recce.v.step.type ~= 'MARPA_STEP_TOKEN' then
-          stack[result_ix] = marpa.sv.undef()
-          marpa.sv.fill(stack, result_ix)
-          break
-        end
         if recce.token_is_literal == recce.v.step.value then
           local start_es = recce.v.step.start_es_id
           local end_es = recce.v.step.es_id
@@ -189,13 +198,12 @@ if not the value is an undef.
 ```
     -- luatangle: section+ VM operations
     function op_fn_result_is_n_of_rhs(recce, rhs_ix)
+        if recce.v.step.type ~= 'MARPA_STEP_RULE' then
+          return op_fn_result_is_undef(recce)
+        end
         local stack = recce:stack()
         local result_ix = recce.v.step.result
         repeat
-            if recce.v.step.type ~= 'MARPA_STEP_RULE' then
-              stack[result_ix] = marpa.sv.undef()
-              break
-            end
             if rhs_ix == 0 then break end
             local fetch_ix = result_ix + rhs_ix
             if fetch_ix > recce.v.step.arg_n then
@@ -223,21 +231,18 @@ the "N of RHS" operation should be used.
 ```
     -- luatangle: section+ VM operations
     function op_fn_result_is_n_of_sequence(recce, item_ix)
-        local stack = recce:stack()
+        if recce.v.step.type ~= 'MARPA_STEP_RULE' then
+          return op_fn_result_is_undef(recce)
+        end
         local result_ix = recce.v.step.result
-        repeat
-            if recce.v.step.type ~= 'MARPA_STEP_RULE' then
-              stack[result_ix] = marpa.sv.undef()
-              break
-            end
-            if item_ix == 0 then break end
-            local fetch_ix = result_ix + item_ix * 2
-            if fetch_ix > recce.v.step.arg_n then
-                stack[result_ix] = marpa.sv.undef()
-                break
-            end
+        local fetch_ix = result_ix + item_ix * 2
+        if fetch_ix > recce.v.step.arg_n then
+          return op_fn_result_is_undef(recce)
+        end
+        local stack = recce:stack()
+        if item_ix > 0 then
             stack[result_ix] = stack[fetch_ix]
-        until 1
+        end
         marpa.sv.fill(stack, result_ix)
         return -1
     end
