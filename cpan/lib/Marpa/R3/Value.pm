@@ -862,9 +862,7 @@ sub registration_init {
     state $op_bless          = Marpa::R3::Thin::op('bless');
     state $op_callback       = Marpa::R3::Thin::op('callback');
     state $op_push_constant  = Marpa::R3::Thin::op('push_constant');
-    state $op_push_g1_length = Marpa::R3::Thin::op('push_g1_length');
     state $op_push_length    = Marpa::R3::Thin::op('push_length');
-    state $op_push_g1_start  = Marpa::R3::Thin::op('push_g1_start');
     state $op_push_start_location =
         Marpa::R3::Thin::op('push_start_location');
     state $op_result_is_array    = Marpa::R3::Thin::op('result_is_array');
@@ -888,6 +886,10 @@ sub registration_init {
       $slr->exec_name( 'get_op_fn_key_by_name', 'push_one' );
     my ($op_push_values_key) =
       $slr->exec_name( 'get_op_fn_key_by_name', 'push_values' );
+    my ($op_push_g1_start_key) =
+      $slr->exec_name( 'get_op_fn_key_by_name', 'push_g1_start' );
+    my ($op_push_g1_length_key) =
+      $slr->exec_name( 'get_op_fn_key_by_name', 'push_g1_length' );
 
     my @nulling_symbol_by_semantic_rule;
     NULLING_SYMBOL: for my $nulling_symbol ( 0 .. $#{$null_values} ) {
@@ -1093,11 +1095,11 @@ sub registration_init {
             {
                 $result_descriptor =~ s/^\s*|\s*$//g;
                 if ( $result_descriptor eq 'g1start' ) {
-                    push @push_ops, $op_push_g1_start;
+                    push @push_ops, $op_lua, $op_push_g1_start_key, $op_abend_key;
                     next RESULT_DESCRIPTOR;
                 }
                 if ( $result_descriptor eq 'g1length' ) {
-                    push @push_ops, $op_push_g1_length;
+                    push @push_ops, $op_lua, $op_push_g1_length_key, $op_abend_key;
                     next RESULT_DESCRIPTOR;
                 }
                 if ( $result_descriptor eq 'start' ) {

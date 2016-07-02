@@ -314,6 +314,39 @@ the "N of RHS" operation should be used.
 
 ```
 
+### VM operation: return G1 start location
+
+The current start location in G1 location terms -- that is,
+in terms of G1 Earley sets.
+
+```
+    -- luatangle: section+ VM operations
+    function op_fn_push_g1_start(recce)
+        local values = recce:values()
+        local next_ix = marpa.sv.top_index(values) + 1;
+        values[next_ix] = recce.v.step.start_es_id
+        return -2
+    end
+
+```
+
+### VM operation: return G1 length
+
+The length of the current step in G1 terms --
+that is, in terms of G1 Earley sets.
+
+```
+    -- luatangle: section+ VM operations
+    function op_fn_push_g1_length(recce)
+        local values = recce:values()
+        local next_ix = marpa.sv.top_index(values) + 1;
+        values[next_ix] = (recce.v.step.es_id
+            - recce.v.step.start_es_id) + 1
+        return -2
+    end
+
+```
+
 ### Return operation key given its name
 
 ```
@@ -395,16 +428,18 @@ Called when a valuator is set up.
             return ref
         end
 
-        local op_debug_key = op_fn_create("debug", op_fn_debug)
+        op_fn_create("debug", op_fn_debug)
         local op_abend_key = op_fn_create("abend", op_fn_abend)
-        local op_noop_key = op_fn_create("noop", op_fn_noop)
+        op_fn_create("noop", op_fn_noop)
         local result_is_undef_key = op_fn_create("result_is_undef", op_fn_result_is_undef)
         local result_is_token_value_key = op_fn_create("result_is_token_value", op_fn_result_is_token_value)
-        local result_is_n_of_rhs_key = op_fn_create("result_is_n_of_rhs", op_fn_result_is_n_of_rhs)
-        local result_is_n_of_sequence_key = op_fn_create("result_is_n_of_sequence", op_fn_result_is_n_of_sequence)
-        op_fn_create("push_values", op_fn_push_values)
-        op_fn_create("push_undef", op_fn_push_undef)
+        op_fn_create("result_is_n_of_rhs", op_fn_result_is_n_of_rhs)
+        op_fn_create("result_is_n_of_sequence", op_fn_result_is_n_of_sequence)
+        op_fn_create("push_g1_length", op_fn_push_g1_length)
+        op_fn_create("push_g1_start", op_fn_push_g1_start)
         op_fn_create("push_one", op_fn_push_one)
+        op_fn_create("push_undef", op_fn_push_undef)
+        op_fn_create("push_values", op_fn_push_values)
 
         recce.rule_semantics = {}
         recce.token_semantics = {}
