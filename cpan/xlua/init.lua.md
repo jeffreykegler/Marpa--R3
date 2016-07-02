@@ -24,17 +24,29 @@ OTHER DEALINGS IN THE SOFTWARE.
 This is the code for Kollos, the "middle layer" of Marpa.
 Below it is Libmarpa, a library written in
 the C language which contains the actual parse engine.
+Above it is code in a higher level language -- at this point Perl.
 
-## Marpa VM operations
+## Marpa virtual machine
 
-Initially, Marpa's semantics were performed using a VM of about a dozen
+Initially, Marpa's semantics were performed using a VM (virtual machine)
+of about two dozen
 operations.  I am converting them to Lua, one by one.  Once they are in
 Lua, the flexibility in defining operations becomes much greater than when
 they were in C/XS.  The set of operations which can be defined becomes
-literally open-ended.  This Marpa VM may well be altered.  For example,
-the choice at one extreme is to replace every sequence of operations
-with exactly one Lua function, using metaprogramming if necessary,
-and eliminating the original VM entirely.
+literally open-ended.
+
+With Lua replacing C, the constraints which dictated the original design
+of this VM are completely altered.
+It remains an open question what becomes of this VM and its operation
+set as Marpa evolves.
+For example,
+at the extreme end, every program in the old VM could be replaced with
+one that is a single instruction long, with that single instruction
+written entirely in Lua.
+If this were done, there no longer would be a VM, in any real sense of the
+word.
+
+## The Structure of Marpa VM operations
 
 A return value of -1 indicates this should be the last VM operation.
 A return value of 0 or greater indicates this is the last VM operation,
@@ -43,12 +55,12 @@ as its arguments.
 A return value of -2 or less indicates that the reading of VM operations
 should continue.
 
-Use of tails calls in made.
+Note the use of tails calls in the Lua code.
 Maintainters should be aware that these are finicky.
-In particular, while `return f(x)` is a tail call,
+In particular, while `return f(x)` is turned into a tail call,
 `return (f(x))` is not.
 
-### Marpa Debug operation
+### VM debug operation
 
 Was used for development.
 Perhaps I should delete this.
@@ -70,7 +82,7 @@ Perhaps I should delete this.
 
 ```
 
-### Marpa No-op operation
+### VM no-op operation
 
 This is to be kept after development,
 even if not used.
@@ -85,7 +97,7 @@ It may be useful in debugging.
 
 ```
 
-### Marpa Abend operation
+### VM abend operation
 
 This is to used for development.
 Its intended use is as a dummy argument,
@@ -103,7 +115,7 @@ fast fails with a clear message.
 
 ```
 
-### Marpa "result is undef" operation
+### VM "result is undef" operation
 
 Perhaps the simplest operation.
 The result of the semantics is a Perl undef.
@@ -120,7 +132,7 @@ The result of the semantics is a Perl undef.
 
 ```
 
-### Marpa "push undef" operation
+### VM "push undef" operation
 
 Push an undef on the values array.
 
@@ -136,7 +148,7 @@ Push an undef on the values array.
 
 ```
 
-### Marpa "push one" operation
+### VM "push one" operation
 
 Push one of the RHS child values onto the values array.
 
@@ -179,7 +191,7 @@ it assumes that the caller has ensured that
 
 ```
 
-### Marpa "result is token value" operation
+### VM "result is token value" operation
 
 The result of the semantics is the value of the
 token at the current location.
@@ -208,7 +220,7 @@ if not the value is an undef.
 
 ```
 
-### Marpa "push values" operation
+### VM "push values" operation
 
 Push the child values onto the `values` list.
 If it is a token step, then
