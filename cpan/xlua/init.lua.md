@@ -314,6 +314,43 @@ the "N of RHS" operation should be used.
 
 ```
 
+### VM operation: return start location
+
+The current start location in input location terms -- that is,
+in terms of the input string.
+
+```
+    -- luatangle: section+ VM operations
+    function op_fn_push_start(recce)
+        local values = recce:values()
+        local start_es = recce.v.step.start_es_id
+        local end_es = recce.v.step.es_id
+        local next_ix = marpa.sv.top_index(values) + 1;
+        local start, l = recce:span(start_es, end_es)
+        values[next_ix], _ = recce:span(start_es, end_es)
+        return -2
+    end
+
+```
+
+### VM operation: return length
+
+The length of the current step in input location terms --
+that is, in terms of the input string
+
+```
+    -- luatangle: section+ VM operations
+    function op_fn_push_length(recce)
+        local values = recce:values()
+        local start_es = recce.v.step.start_es_id
+        local end_es = recce.v.step.es_id
+        local next_ix = marpa.sv.top_index(values) + 1;
+        _, values[next_ix] = recce:span(start_es, end_es)
+        return -2
+    end
+
+```
+
 ### VM operation: return G1 start location
 
 The current start location in G1 location terms -- that is,
@@ -437,6 +474,8 @@ Called when a valuator is set up.
         op_fn_create("result_is_n_of_sequence", op_fn_result_is_n_of_sequence)
         op_fn_create("push_g1_length", op_fn_push_g1_length)
         op_fn_create("push_g1_start", op_fn_push_g1_start)
+        op_fn_create("push_length", op_fn_push_length)
+        op_fn_create("push_start", op_fn_push_start)
         op_fn_create("push_one", op_fn_push_one)
         op_fn_create("push_undef", op_fn_push_undef)
         op_fn_create("push_values", op_fn_push_values)

@@ -27,11 +27,7 @@ my @ops = sort { $a->[0] cmp $b->[0] }
     [ "earleme_complete",        "MARPA_OP_EARLEME_COMPLETE" ],
     [ "invalid_char",            "MARPA_OP_INVALID_CHAR" ],
     [ "noop",                    "MARPA_OP_NOOP" ],
-    [ "push_g1_length",          "MARPA_OP_PUSH_G1_LENGTH" ],
-    [ "push_g1_start",           "MARPA_OP_PUSH_G1_START" ],
-    [ "push_length",             "MARPA_OP_PUSH_LENGTH" ],
     [ "push_constant",           "MARPA_OP_PUSH_CONSTANT" ],
-    [ "push_start_location",     "MARPA_OP_PUSH_START_LOCATION" ],
     [ "result_is_array",         "MARPA_OP_RESULT_IS_ARRAY" ],
     [ "result_is_constant",      "MARPA_OP_RESULT_IS_CONSTANT" ],
     [ "lua",               "MARPA_OP_LUA" ];

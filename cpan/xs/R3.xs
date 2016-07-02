@@ -351,55 +351,61 @@ xlua_unref(lua_State* L)
 static SV*
 coerce_to_sv (lua_State * L, int idx)
 {
-  dTHX;
-  SV *result;
-  const int type = marpa_lua_type (L, idx);
+    dTHX;
+    SV *result;
+    const int type = marpa_lua_type (L, idx);
 
-  /* warn("%s %d\n", __FILE__, __LINE__); */
-  switch (type)
-    {
+    /* warn("%s %d\n", __FILE__, __LINE__); */
+    switch (type) {
     case LUA_TNIL:
-      /* warn("%s %d\n", __FILE__, __LINE__); */
-      result = newSV (0);
-      break;
+        /* warn("%s %d\n", __FILE__, __LINE__); */
+        result = newSV (0);
+        break;
     case LUA_TBOOLEAN:
-      /* warn("%s %d\n", __FILE__, __LINE__); */
-      result = marpa_lua_toboolean (L, idx) ?  newSViv(1) : newSV(0);
-      break;
+        /* warn("%s %d\n", __FILE__, __LINE__); */
+        result = marpa_lua_toboolean (L, idx) ? newSViv (1) : newSV (0);
+        break;
     case LUA_TNUMBER:
-      /* warn("%s %d\n", __FILE__, __LINE__); */
-      result = newSVnv (marpa_lua_tonumber (L, idx));
-      break;
-    case LUA_TSTRING:
-      /* warn("%s %d: %s len=%d\n", __FILE__, __LINE__, marpa_lua_tostring (L, idx), marpa_lua_rawlen (L, idx)); */
-      result =
-        newSVpvn (marpa_lua_tostring (L, idx), marpa_lua_rawlen (L, idx));
-      break;
-    case LUA_TUSERDATA:
-      {
-        SV** p_result = marpa_luaL_testudata (L, idx, MT_NAME_SV);
-        if (!p_result ) {
-            result =
-              newSVpvf
-              ("Coercion not implemented for Lua userdata at index %d in coerce_to_sv",
-               idx);
-        } else {
-          result = *p_result;
-          SvREFCNT_inc_simple_void_NN (result);
+        if (marpa_lua_isinteger (L, idx)) {
+            lua_Integer int_v = marpa_lua_tointeger (L, idx);
+            if (int_v <= IV_MAX && int_v >= IV_MIN) {
+                result = newSViv ((IV) marpa_lua_tointeger (L, idx));
+                break;
+            }
         }
-      };
-      break;
+        result = newSVnv (marpa_lua_tonumber (L, idx));
+        break;
+    case LUA_TSTRING:
+        /* warn("%s %d: %s len=%d\n", __FILE__, __LINE__, marpa_lua_tostring (L, idx), marpa_lua_rawlen (L, idx)); */
+        result =
+            newSVpvn (marpa_lua_tostring (L, idx), marpa_lua_rawlen (L,
+                idx));
+        break;
+    case LUA_TUSERDATA:
+        {
+            SV **p_result = marpa_luaL_testudata (L, idx, MT_NAME_SV);
+            if (!p_result) {
+                result =
+                    newSVpvf
+                    ("Coercion not implemented for Lua userdata at index %d in coerce_to_sv",
+                    idx);
+            } else {
+                result = *p_result;
+                SvREFCNT_inc_simple_void_NN (result);
+            }
+        };
+        break;
 
     default:
-      /* warn("%s %d\n", __FILE__, __LINE__); */
-      result =
-        newSVpvf
-        ("Lua type %s at index %d in coerce_to_sv: coercion not implemented",
-         marpa_luaL_typename (L, idx), idx);
-      break;
+        /* warn("%s %d\n", __FILE__, __LINE__); */
+        result =
+            newSVpvf
+            ("Lua type %s at index %d in coerce_to_sv: coercion not implemented",
+            marpa_luaL_typename (L, idx), idx);
+        break;
     }
-  /* warn("%s %d\n", __FILE__, __LINE__); */
-  return result;
+    /* warn("%s %d\n", __FILE__, __LINE__); */
+    return result;
 }
 
 /* Push a Perl value onto the Lua stack. */
@@ -862,11 +868,38 @@ xlua_recce_literal_of_es_span_meth (lua_State * L)
     return 1;
 }
 
+static int
+xlua_recce_span_meth (lua_State * L)
+{
+    Scanless_R *slr;
+    int lud_type;
+    lua_Integer start_earley_set;
+    lua_Integer end_earley_set;
+    lua_Integer g1_length;
+    int length_in_positions;
+    int start_position;
+
+    marpa_luaL_checktype (L, 1, LUA_TTABLE);
+    lud_type = marpa_lua_getfield (L, 1, "lud");
+    marpa_luaL_argcheck (L, (lud_type == LUA_TLIGHTUSERDATA), 1,
+        "recce userdata not set");
+    slr = (Scanless_R *) marpa_lua_touserdata (L, -1);
+    start_earley_set = marpa_luaL_checkinteger (L, 2);
+    end_earley_set = marpa_luaL_checkinteger (L, 3);
+    g1_length = end_earley_set - start_earley_set;
+    slr_es_to_literal_span (slr,
+        (Marpa_Earley_Set_ID)start_earley_set, (int)g1_length, &start_position, &length_in_positions);
+    marpa_lua_pushinteger (L, start_position);
+    marpa_lua_pushinteger (L, length_in_positions);
+    return 2;
+}
+
 static const struct luaL_Reg marpa_recce_meths[] = {
     {"stack", xlua_recce_stack_meth},
     {"values", xlua_recce_values_meth},
     {"step", xlua_recce_step_meth},
     {"literal_of_es_span", xlua_recce_literal_of_es_span_meth},
+    {"span", xlua_recce_span_meth},
     {"ref", xlua_ref},
     {"unref", xlua_unref},
     {NULL, NULL},
@@ -2065,128 +2098,6 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
                     av_push (values_av, newSV (0));
                 }
 
-            }
-            goto NEXT_OP_CODE;
-
-        case MARPA_OP_PUSH_START_LOCATION:
-            {
-                int start_location;
-                Marpa_Earley_Set_ID start_earley_set;
-                int dummy;
-
-                switch (step_type) {
-                case MARPA_STEP_RULE:
-                    start_earley_set = marpa_v_rule_start_es_id (v);
-                    break;
-                case MARPA_STEP_NULLING_SYMBOL:
-                case MARPA_STEP_TOKEN:
-                    start_earley_set = marpa_v_token_start_es_id (v);
-                    break;
-                default:
-                    croak
-                        ("Problem in v->stack_step: Range requested for improper step type: %s",
-                        step_type_to_string (step_type));
-                }
-                slr_es_to_literal_span (slr, start_earley_set, 0,
-                    &start_location, &dummy);
-                av_push (values_av, newSViv ((IV) start_location));
-            }
-            goto NEXT_OP_CODE;
-
-        case MARPA_OP_PUSH_LENGTH:
-            {
-                int length;
-
-                switch (step_type) {
-                case MARPA_STEP_NULLING_SYMBOL:
-                    length = 0;
-                    break;
-                case MARPA_STEP_RULE:
-                    {
-                        int dummy;
-                        Marpa_Earley_Set_ID start_earley_set =
-                            marpa_v_rule_start_es_id (v);
-                        Marpa_Earley_Set_ID end_earley_set =
-                            marpa_v_es_id (v);
-                        slr_es_to_literal_span (slr, start_earley_set,
-                            end_earley_set - start_earley_set, &dummy,
-                            &length);
-                    }
-                    break;
-                case MARPA_STEP_TOKEN:
-                    {
-                        int dummy;
-                        Marpa_Earley_Set_ID start_earley_set =
-                            marpa_v_token_start_es_id (v);
-                        Marpa_Earley_Set_ID end_earley_set =
-                            marpa_v_es_id (v);
-                        slr_es_to_literal_span (slr, start_earley_set,
-                            end_earley_set - start_earley_set, &dummy,
-                            &length);
-                    }
-                    break;
-                default:
-                    croak
-                        ("Problem in v->stack_step: Range requested for improper step type: %s",
-                        step_type_to_string (step_type));
-                }
-                av_push (values_av, newSViv ((IV) length));
-            }
-            goto NEXT_OP_CODE;
-
-        case MARPA_OP_PUSH_G1_START:
-            {
-                Marpa_Earley_Set_ID start_earley_set;
-
-                switch (step_type) {
-                case MARPA_STEP_RULE:
-                    start_earley_set = marpa_v_rule_start_es_id (v);
-                    break;
-                case MARPA_STEP_NULLING_SYMBOL:
-                case MARPA_STEP_TOKEN:
-                    start_earley_set = marpa_v_token_start_es_id (v);
-                    break;
-                default:
-                    croak
-                        ("Problem in v->stack_step: Range requested for improper step type: %s",
-                        step_type_as_string);
-                }
-                av_push (values_av, newSViv ((IV) start_earley_set));
-            }
-            goto NEXT_OP_CODE;
-
-        case MARPA_OP_PUSH_G1_LENGTH:
-            {
-                int length;
-
-                switch (step_type) {
-                case MARPA_STEP_NULLING_SYMBOL:
-                    length = 0;
-                    break;
-                case MARPA_STEP_RULE:
-                    {
-                        Marpa_Earley_Set_ID start_earley_set =
-                            marpa_v_rule_start_es_id (v);
-                        Marpa_Earley_Set_ID end_earley_set =
-                            marpa_v_es_id (v);
-                        length = end_earley_set - start_earley_set + 1;
-                    }
-                    break;
-                case MARPA_STEP_TOKEN:
-                    {
-                        Marpa_Earley_Set_ID start_earley_set =
-                            marpa_v_token_start_es_id (v);
-                        Marpa_Earley_Set_ID end_earley_set =
-                            marpa_v_es_id (v);
-                        length = end_earley_set - start_earley_set + 1;
-                    }
-                    break;
-                default:
-                    croak
-                        ("Problem in v->stack_step: Range requested for improper step type: %s",
-                        step_type_as_string);
-                }
-                av_push (values_av, newSViv ((IV) length));
             }
             goto NEXT_OP_CODE;
 
