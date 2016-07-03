@@ -862,7 +862,6 @@ sub registration_init {
     state $op_bless          = Marpa::R3::Thin::op('bless');
     state $op_callback       = Marpa::R3::Thin::op('callback');
     state $op_push_constant  = Marpa::R3::Thin::op('push_constant');
-        Marpa::R3::Thin::op('push_start_location');
     state $op_result_is_array    = Marpa::R3::Thin::op('result_is_array');
     state $op_result_is_constant = Marpa::R3::Thin::op('result_is_constant');
     state $op_lua = Marpa::R3::Thin::op('lua');
