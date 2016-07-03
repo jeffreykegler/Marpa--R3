@@ -731,6 +731,33 @@ static int xlua_recce_stack_meth(lua_State* L) {
     return 1;
 }
 
+static int xlua_recce_constants_meth(lua_State* L) {
+    Scanless_R* slr;
+    V_Wrapper *v_wrapper;
+    AV* constants;
+
+    marpa_luaL_checktype(L, 1, LUA_TTABLE);
+    /* Lua stack: [ recce_table ] */
+    marpa_lua_getfield(L, -1, "lud");
+    /* Lua stack: [ recce_table, lud ] */
+    slr = (Scanless_R*)marpa_lua_touserdata(L, -1);
+    /* the slr owns the recce table, so it doesn't */
+    /* need to own its components. */
+    v_wrapper = slr->v_wrapper;
+    if (!v_wrapper) {
+        /* A recoverable error?  Probably not */
+        croak("recce.constants(): valuator is not yet active");
+    }
+    constants = v_wrapper->constants;
+    if (!constants) {
+        /* I think this is an internal error */
+        croak("recce.constants(): valuator has no constants array");
+    }
+    MARPA_SV_AV(L, constants);
+    /* Lua stack: [ recce_table, recce_lud, constants_ud ] */
+    return 1;
+}
+
 static int xlua_recce_values_meth(lua_State* L) {
     Scanless_R* slr;
     V_Wrapper *v_wrapper;
@@ -896,6 +923,7 @@ xlua_recce_span_meth (lua_State * L)
 
 static const struct luaL_Reg marpa_recce_meths[] = {
     {"stack", xlua_recce_stack_meth},
+    {"constants", xlua_recce_constants_meth},
     {"values", xlua_recce_values_meth},
     {"step", xlua_recce_step_meth},
     {"literal_of_es_span", xlua_recce_literal_of_es_span_meth},
