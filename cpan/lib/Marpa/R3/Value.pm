@@ -392,11 +392,6 @@ sub Marpa::R3::Scanless::R::show_semantics {
             $op_ix++;
             next OP;
         }
-        if ( $op_name eq 'result_is_constant' ) {
-            push @op_descs, $ops[$op_ix];
-            $op_ix++;
-            next OP;
-        }
         if ( $op_name eq 'alternative' ) {
             push @op_descs, $ops[$op_ix];
             $op_ix++;
@@ -943,8 +938,6 @@ qq{Cannot bless rule when the semantics are "$semantics"},
         state $op_callback        = Marpa::R3::Thin::op('callback');
         state $op_push_constant   = Marpa::R3::Thin::op('push_constant');
         state $op_result_is_array = Marpa::R3::Thin::op('result_is_array');
-        state $op_result_is_constant =
-          Marpa::R3::Thin::op('result_is_constant');
         state $op_lua = Marpa::R3::Thin::op('lua');
 
         my ($op_debug_key) =
@@ -954,6 +947,8 @@ qq{Cannot bless rule when the semantics are "$semantics"},
           $slr->exec_name( 'get_op_fn_key_by_name', "abend" );
         my ($result_is_undef_key) =
           $slr->exec_name( 'get_op_fn_key_by_name', 'result_is_undef' );
+        my ($result_is_constant_key) =
+          $slr->exec_name( 'get_op_fn_key_by_name', 'result_is_constant' );
         my ($result_is_token_value_key) =
           $slr->exec_name( 'get_op_fn_key_by_name', "result_is_token_value" );
         my ($result_is_n_of_rhs_key) =
@@ -1083,7 +1078,7 @@ qq{Cannot bless rule when the semantics are "$semantics"},
                               ( $op_lua, $result_is_undef_key, $op_abend_key );
                             last SET_OPS;
                         }
-                        @ops = ( $op_result_is_constant, $thingy_ref );
+                        @ops = ( $op_lua, $result_is_constant_key, $thingy_ref );
                         last SET_OPS;
                     } ## end if ( $ref_type eq 'SCALAR' )
 
@@ -1092,7 +1087,7 @@ qq{Cannot bless rule when the semantics are "$semantics"},
         # and therefore cannot be to (among other things) an ARRAY or HASH
 
                     if ( $ref_type eq 'REF' ) {
-                        @ops = ( $op_result_is_constant, $thingy_ref );
+                        @ops = ( $op_lua, $result_is_constant_key, $thingy_ref );
                         last SET_OPS;
                     }
 

@@ -367,6 +367,30 @@ in terms of G1 Earley sets.
 
 ```
 
+### VM operation: result is constant
+
+Returns a constant result.
+
+```
+    -- luatangle: section+ VM operations
+    function op_fn_result_is_constant(recce, constant_ix)
+        local constants = recce:constants()
+        local constant = constants[constant_ix]
+        local stack = recce:stack()
+        local result_ix = recce.v.step.result
+        stack[result_ix] = constant
+        marpa.sv.fill(stack, result_ix)
+        if recce.trace_values > 0 and recce.v.step.type == 'MARPA_STEP_TOKEN' then
+            local top_of_queue = #recce.trace_values_queue
+            recce.trace_values_queue[top_of_queue+1] =
+                { "valuator unknown step", recce.v.step.type, recce.token, constant}
+                      -- io.stderr:write('valuator unknown step: ', inspect(recce))
+        end
+        return -1
+    end
+
+```
+
 ### VM operation: return G1 length
 
 The length of the current step in G1 terms --
@@ -468,6 +492,7 @@ Called when a valuator is set up.
         op_fn_create("debug", op_fn_debug)
         local op_abend_key = op_fn_create("abend", op_fn_abend)
         op_fn_create("noop", op_fn_noop)
+        local result_is_constant_key = op_fn_create("result_is_constant", op_fn_result_is_constant)
         local result_is_undef_key = op_fn_create("result_is_undef", op_fn_result_is_undef)
         local result_is_token_value_key = op_fn_create("result_is_token_value", op_fn_result_is_token_value)
         op_fn_create("result_is_n_of_rhs", op_fn_result_is_n_of_rhs)

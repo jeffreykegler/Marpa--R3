@@ -2045,41 +2045,6 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
                 goto NEXT_OP_CODE;
             }
 
-        case MARPA_OP_RESULT_IS_CONSTANT:
-            {
-                UV constant_ix = ops[op_ix++];
-                SV **p_constant_sv;
-
-                p_constant_sv =
-                    av_fetch (v_wrapper->constants, (I32) constant_ix, 0);
-                if (p_constant_sv) {
-                    SV *constant_sv = newSVsv (*p_constant_sv);
-                    SV **stored_sv =
-                        av_store (stack, (I32) result_ix, constant_sv);
-                    if (!stored_sv) {
-                        SvREFCNT_dec (constant_sv);
-                    }
-                } else {
-                    av_store (stack, (I32) result_ix, newSV (0));
-                }
-
-                xlua_sig_call (slr->L,
-                    "local recce, tag, token_sv = ...;\n"
-                    "if recce.trace_values > 0 and recce.v.step.type == 'MARPA_STEP_TOKEN' then\n"
-                    "  local top_of_queue = #recce.trace_values_queue;\n"
-                    "  recce.trace_values_queue[top_of_queue+1] =\n"
-                    "     {tag, recce.v.step.type, recce.token, token_sv};\n"
-                    "  -- io.stderr:write('valuator unknown step: ', inspect(recce))\n"
-                    "end",
-                    "RsS",
-                    slr->lua_ref,
-                    "valuator unknown step",
-                    (p_constant_sv ? newSVsv (*p_constant_sv) : newSV (0))
-                    );
-
-            }
-            return -1;
-
         case MARPA_OP_RESULT_IS_ARRAY:
             {
                 SV **stored_av;
