@@ -408,6 +408,21 @@ that is, in terms of G1 Earley sets.
 
 ```
 
+### VM operation: push constant onto values array
+
+```
+    -- luatangle: section+ VM operations
+    function op_fn_push_constant(recce, constant_ix)
+        local constants = recce:constants()
+        local constant = constants[constant_ix]
+        local values = recce:values()
+        local next_ix = marpa.sv.top_index(values) + 1;
+        values[next_ix] = constant
+        return -1
+    end
+
+```
+
 ### Return operation key given its name
 
 ```
@@ -497,6 +512,7 @@ Called when a valuator is set up.
         local result_is_token_value_key = op_fn_create("result_is_token_value", op_fn_result_is_token_value)
         op_fn_create("result_is_n_of_rhs", op_fn_result_is_n_of_rhs)
         op_fn_create("result_is_n_of_sequence", op_fn_result_is_n_of_sequence)
+        op_fn_create("push_constant", op_fn_push_constant)
         op_fn_create("push_g1_length", op_fn_push_g1_length)
         op_fn_create("push_g1_start", op_fn_push_g1_start)
         op_fn_create("push_length", op_fn_push_length)
