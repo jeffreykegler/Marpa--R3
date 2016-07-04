@@ -422,7 +422,7 @@ that is, in terms of G1 Earley sets.
         local values = recce:values()
         local next_ix = marpa.sv.top_index(values) + 1;
         values[next_ix] = constant
-        return -1
+        return -2
     end
 
 ```

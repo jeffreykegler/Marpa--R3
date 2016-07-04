@@ -1214,7 +1214,7 @@ qq{    Semantics were specified as "$original_semantics"\n}
                             next RESULT_DESCRIPTOR;
                         }
                         if ( defined $lexeme_id ) {
-                            push @push_ops, $op_push_constant, \$lexeme_id;
+                            push @push_ops, $op_lua, $op_push_constant_key, \$lexeme_id;
                             next RESULT_DESCRIPTOR;
                         }
                         push @push_ops, $op_lua, $op_push_undef_key,
