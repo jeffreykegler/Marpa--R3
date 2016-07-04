@@ -1829,7 +1829,7 @@ u_substring (Scanless_R * slr, const char *name, int start_pos_arg,
 /* Static valuator methods */
 
 static int
-v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
+v_do_stack_ops (V_Wrapper * v_wrapper, SV ** p_values_av)
 {
     dTHX;
     AV *stack = v_wrapper->stack;
@@ -2041,7 +2041,7 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
                 return_value = (int)marpa_lua_tointeger(L, -1);
 
                 marpa_lua_settop (L, base_of_stack);
-                if (return_value >= -1) return return_value;
+                if (return_value >= -1) return -1;
                 goto NEXT_OP_CODE;
             }
 
@@ -2085,8 +2085,6 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
 
         case MARPA_OP_CALLBACK:
             {
-                SV **p_stack_results = stack_results;
-
                 switch (step_type) {
                 case MARPA_STEP_RULE:
                 case MARPA_STEP_NULLING_SYMBOL:
@@ -2094,13 +2092,6 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
                 default:
                     goto BAD_OP;
                 }
-
-                *p_stack_results++ =
-                    sv_2mortal (newSVpv (step_type_as_string, 0));
-                *p_stack_results++ =
-                    sv_2mortal (newSViv (step_type ==
-                        MARPA_STEP_RULE ? marpa_v_rule (v) :
-                        marpa_v_token (v)));
 
                 if (blessing) {
                     SV **p_blessing_sv =
@@ -2114,8 +2105,8 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
                     }
                 }
                 /* ref_to_values_av is already mortal -- leave it */
-                *p_stack_results++ = ref_to_values_av;
-                return p_stack_results - stack_results;
+                *p_values_av = ref_to_values_av;
+                return 3;
             }
             /* NOT REACHED */
 
@@ -4167,6 +4158,7 @@ PPCODE:
   while (1)
     {
       int step_type;
+
       xlua_sig_call (slr->L, "local recce = ...; recce:step()", "R",
           slr->lua_ref);
       step_type = marpa_v_step_type(v_wrapper->v);
@@ -4180,18 +4172,18 @@ PPCODE:
         case MARPA_STEP_NULLING_SYMBOL:
         case MARPA_STEP_TOKEN:
           {
-            int ix;
-            SV *stack_results[3];
-            int stack_offset = v_do_stack_ops (v_wrapper, stack_results);
-            if (stack_offset < 0)
-              {
-                goto NEXT_STEP;
+              SV *values_ref = 0;
+              v_do_stack_ops (v_wrapper, &values_ref);
+              if (values_ref) {
+                  const char *step_type_string = step_type_to_string (step_type);
+                  XPUSHs (sv_2mortal (newSVpv (step_type_string, 0)));
+                  XPUSHs (sv_2mortal (newSViv (step_type ==
+                              MARPA_STEP_RULE ? marpa_v_rule (v_wrapper->v) :
+                              marpa_v_token (v_wrapper->v))));
+                  XPUSHs (values_ref);
+                  XSRETURN (3);
               }
-            for (ix = 0; ix < stack_offset; ix++)
-              {
-                XPUSHs (stack_results[ix]);
-              }
-            XSRETURN (stack_offset);
+              goto NEXT_STEP;
           }
           /* NOTREACHED */
 
