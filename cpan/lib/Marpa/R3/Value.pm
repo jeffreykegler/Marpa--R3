@@ -955,6 +955,8 @@ qq{Cannot bless rule when the semantics are "$semantics"},
           $slr->exec_name( 'get_op_fn_key_by_name', "result_is_n_of_rhs" );
         my ($result_is_n_of_sequence_key) =
           $slr->exec_name( 'get_op_fn_key_by_name', "result_is_n_of_sequence" );
+        my ($op_push_constant_key) =
+          $slr->exec_name( 'get_op_fn_key_by_name', 'push_constant' );
         my ($op_push_undef_key) =
           $slr->exec_name( 'get_op_fn_key_by_name', 'push_undef' );
         my ($op_push_one_key) =
@@ -1208,7 +1210,7 @@ qq{    Semantics were specified as "$original_semantics"\n}
                     if ( $result_descriptor eq 'lhs' ) {
                         if ( defined $irlid ) {
                             my $lhs_id = $grammar_c->rule_lhs($irlid);
-                            push @push_ops, $op_push_constant, \$lhs_id;
+                            push @push_ops, $op_lua, $op_push_constant_key, \$lhs_id;
                             next RESULT_DESCRIPTOR;
                         }
                         if ( defined $lexeme_id ) {
