@@ -414,6 +414,10 @@ that is, in terms of G1 Earley sets.
     -- luatangle: section+ VM operations
     function op_fn_push_constant(recce, constant_ix)
         local constants = recce:constants()
+        io.stderr:write('constants: ', inspect(constants), "\n")
+        io.stderr:write('constant_ix: ', constant_ix, "\n")
+        io.stderr:write('constants top ix: ', marpa.sv.top_index(constants), "\n")
+
         local constant = constants[constant_ix]
         local values = recce:values()
         local next_ix = marpa.sv.top_index(values) + 1;
@@ -439,12 +443,25 @@ that is, in terms of G1 Earley sets.
 ### Return operation name given its key
 
 ```
-
     -- luatangle: section+ VM operations
-
     function get_op_fn_name_by_key(recce, op_key_sv)
         local op_key = op_key_sv + 0
         return recce.op_fn_key[op_key]
+    end
+
+```
+
+### Register a constant
+
+Register a constant, returning its key.
+
+```
+    -- luatangle: section+ VM operations
+    function constant_register(recce, constant_sv)
+        local constants = recce:constants()
+        local next_constant_key = marpa.sv.top_index(constants) + 1
+        constants[next_constant_key] = constant_sv
+        return next_constant_key
     end
 
 ```

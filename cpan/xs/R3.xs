@@ -4103,29 +4103,6 @@ PPCODE:
 }
 
 void
-constant_register( v_wrapper, sv )
-     V_Wrapper *v_wrapper;
-     SV* sv;
-PPCODE:
-{
-  AV *constants = v_wrapper->constants;
-
-  if (!constants)
-    {
-      croak
-        ("Problem in v->constant_register(): valuator is not in stack mode");
-    }
-  if (SvTAINTED(sv)) {
-      croak
-        ("Problem in v->constant_register(): Attempt to register a tainted constant with Marpa::R3\n"
-        "Marpa::R3 is insecure for use with tainted data\n");
-  }
-
-  av_push (constants, SvREFCNT_inc_simple_NN (sv));
-  XSRETURN_IV (av_len (constants));
-}
-
-void
 highest_index( v_wrapper )
     V_Wrapper *v_wrapper;
 PPCODE:
