@@ -387,11 +387,6 @@ sub Marpa::R3::Scanless::R::show_semantics {
             $op_ix++;
             next OP;
         }
-        if ( $op_name eq 'push_constant' ) {
-            push @op_descs, $ops[$op_ix];
-            $op_ix++;
-            next OP;
-        }
         if ( $op_name eq 'alternative' ) {
             push @op_descs, $ops[$op_ix];
             $op_ix++;
@@ -936,7 +931,6 @@ qq{Cannot bless rule when the semantics are "$semantics"},
 
         state $op_bless           = Marpa::R3::Thin::op('bless');
         state $op_callback        = Marpa::R3::Thin::op('callback');
-        state $op_push_constant   = Marpa::R3::Thin::op('push_constant');
         state $op_result_is_array = Marpa::R3::Thin::op('result_is_array');
         state $op_lua = Marpa::R3::Thin::op('lua');
 
@@ -1247,17 +1241,17 @@ qq{    Semantics were specified as "$original_semantics"\n}
                         if ( defined $irlid ) {
                             my $lhs_id = $grammar_c->rule_lhs($irlid);
                             my $name   = $tracer->symbol_name($lhs_id);
-                            push @push_ops, $op_push_constant, \$name;
+                            push @push_ops, $op_lua, $op_push_constant_key, \$name;
                             next RESULT_DESCRIPTOR;
                         } ## end if ( defined $irlid )
                         if ( defined $lexeme_id ) {
                             my $name = $tracer->symbol_name($lexeme_id);
-                            push @push_ops, $op_push_constant, \$name;
+                            push @push_ops, $op_lua, $op_push_constant_key, \$name;
                             next RESULT_DESCRIPTOR;
                         }
                         if ( defined $nulling_symbol_id ) {
                             my $name = $tracer->symbol_name($nulling_symbol_id);
-                            push @push_ops, $op_push_constant, \$name;
+                            push @push_ops, $op_lua, $op_push_constant_key, \$name;
                             next RESULT_DESCRIPTOR;
                         }
                         push @push_ops, $op_lua, $op_push_undef_key,
@@ -1267,7 +1261,7 @@ qq{    Semantics were specified as "$original_semantics"\n}
 
                     if ( $result_descriptor eq 'rule' ) {
                         if ( defined $irlid ) {
-                            push @push_ops, $op_push_constant, \$irlid;
+                            push @push_ops, $op_lua, $op_push_constant_key, \$irlid;
                             next RESULT_DESCRIPTOR;
                         }
                         push @push_ops, $op_lua, $op_push_undef_key,

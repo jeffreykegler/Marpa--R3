@@ -414,9 +414,9 @@ that is, in terms of G1 Earley sets.
     -- luatangle: section+ VM operations
     function op_fn_push_constant(recce, constant_ix)
         local constants = recce:constants()
-        io.stderr:write('constants: ', inspect(constants), "\n")
-        io.stderr:write('constant_ix: ', constant_ix, "\n")
-        io.stderr:write('constants top ix: ', marpa.sv.top_index(constants), "\n")
+        -- io.stderr:write('constants: ', inspect(constants), "\n")
+        -- io.stderr:write('constant_ix: ', constant_ix, "\n")
+        -- io.stderr:write('constants top ix: ', marpa.sv.top_index(constants), "\n")
 
         local constant = constants[constant_ix]
         local values = recce:values()
