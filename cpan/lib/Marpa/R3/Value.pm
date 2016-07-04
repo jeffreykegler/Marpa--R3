@@ -1225,17 +1225,17 @@ qq{    Semantics were specified as "$original_semantics"\n}
                     if ( $result_descriptor eq 'name' ) {
                         if ( defined $irlid ) {
                             my $name = $tracer->rule_name($irlid);
-                            push @push_ops, $op_push_constant, \$name;
+                            push @push_ops, $op_lua, $op_push_constant_key, \$name;
                             next RESULT_DESCRIPTOR;
                         }
                         if ( defined $lexeme_id ) {
                             my $name = $tracer->symbol_name($lexeme_id);
-                            push @push_ops, $op_push_constant, \$name;
+                            push @push_ops, $op_lua, $op_push_constant_key, \$name;
                             next RESULT_DESCRIPTOR;
                         }
                         if ( defined $nulling_symbol_id ) {
                             my $name = $tracer->symbol_name($nulling_symbol_id);
-                            push @push_ops, $op_push_constant, \$name;
+                            push @push_ops, $op_lua, $op_push_constant_key, \$name;
                             next RESULT_DESCRIPTOR;
                         }
                         push @push_ops, $op_lua, $op_push_undef_key,
