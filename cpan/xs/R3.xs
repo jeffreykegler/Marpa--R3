@@ -2077,23 +2077,6 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** stack_results)
             }
             return -1;
 
-        case MARPA_OP_PUSH_CONSTANT:
-            {
-                UV constant_ix = ops[op_ix++];
-                SV **p_constant_sv;
-
-                p_constant_sv =
-                    av_fetch (v_wrapper->constants, (I32) constant_ix, 0);
-                if (p_constant_sv) {
-                    av_push (values_av,
-                        SvREFCNT_inc_simple_NN (*p_constant_sv));
-                } else {
-                    av_push (values_av, newSV (0));
-                }
-
-            }
-            goto NEXT_OP_CODE;
-
         case MARPA_OP_BLESS:
             {
                 blessing = ops[op_ix++];
