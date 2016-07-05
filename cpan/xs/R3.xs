@@ -2115,7 +2115,7 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV * ref_to_values_av)
                     "-- io.stderr:write('blessing_ix', blessing_ix)\n"
                     "local values = recce:values()\n"
                     "local constants = recce:constants()\n"
-                    "local blessing = constants[blessing_ix]\n"
+                    "local blessing = constants[recce.v.step.blessing_ix]\n"
                     "marpa.sv.bless(values, blessing)\n",
                     "Ri",
                     slr->lua_ref, (int)blessing
