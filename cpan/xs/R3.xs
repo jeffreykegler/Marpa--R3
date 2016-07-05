@@ -2110,15 +2110,16 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** p_values_av)
                 }
 
                 if (blessing) {
-                    SV **p_blessing_sv =
-                        av_fetch (v_wrapper->constants, (I32) blessing, 0);
-                    if (p_blessing_sv && SvPOK (*p_blessing_sv)) {
-                        STRLEN blessing_length;
-                        char *classname =
-                            SvPV (*p_blessing_sv, blessing_length);
-                        sv_bless (ref_to_values_av, gv_stashpv (classname,
-                                1));
-                    }
+                    xlua_sig_call (slr->L,
+                    "local recce, blessing_ix = ...\n"
+                    "-- io.stderr:write('blessing_ix', blessing_ix)\n"
+                    "local values = recce:values()\n"
+                    "local constants = recce:constants()\n"
+                    "local blessing = constants[blessing_ix]\n"
+                    "marpa.sv.bless(values, blessing)\n",
+                    "Ri",
+                    slr->lua_ref, (lua_Integer)blessing
+                    );
                 }
                 /* ref_to_values_av is already mortal -- leave it */
                 *p_values_av = ref_to_values_av;
