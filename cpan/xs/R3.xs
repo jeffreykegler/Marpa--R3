@@ -655,6 +655,20 @@ static int marpa_av_fill_meth (lua_State* L) {
     return 0;
 }
 
+static int marpa_av_bless_meth (lua_State* L) {
+    dTHX;
+    SV** p_ref_to_av = (SV**)marpa_luaL_checkudata(L, 1, MT_NAME_SV);
+    SV* blessing_sv = coerce_to_sv(L, 2);
+    STRLEN blessing_length;
+    char *classname;
+    if (!SvPOK(blessing_sv)) {
+       croak("Internal error: AV blessing must be string");
+    }
+    classname = SvPV (blessing_sv, blessing_length);
+    sv_bless (*p_ref_to_av, gv_stashpv (classname, 1));
+    return 0;
+}
+
 static int marpa_sv_tostring_meth(lua_State* L) {
     /* Lua stack: [ sv_userdata ] */
     /* After development, check not needed */
@@ -683,6 +697,7 @@ static const struct luaL_Reg marpa_sv_meths[] = {
 static const struct luaL_Reg marpa_sv_funcs[] = {
     {"fill", marpa_av_fill_meth},
     {"top_index", marpa_av_len_meth},
+    {"bless", marpa_av_bless_meth},
     {"undef", marpa_sv_undef},
     {NULL, NULL},
 };
@@ -2050,15 +2065,16 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** p_values_av)
                 SV **stored_av;
 
                 if (blessing) {
-                    SV **p_blessing_sv =
-                        av_fetch (v_wrapper->constants, (I32) blessing, 0);
-                    if (p_blessing_sv && SvPOK (*p_blessing_sv)) {
-                        STRLEN blessing_length;
-                        char *classname =
-                            SvPV (*p_blessing_sv, blessing_length);
-                        sv_bless (ref_to_values_av, gv_stashpv (classname,
-                                1));
-                    }
+                    xlua_sig_call (slr->L,
+                    "local recce, blessing_ix = ...\n"
+                    "-- io.stderr:write('blessing_ix', blessing_ix)\n"
+                    "local values = recce:values()\n"
+                    "local constants = recce:constants()\n"
+                    "local blessing = constants[blessing_ix]\n"
+                    "marpa.sv.bless(values, blessing)\n",
+                    "Ri",
+                    slr->lua_ref, (lua_Integer)blessing
+                    );
                 }
                 /* De-mortalize the reference to values_av */
                 SvREFCNT_inc_simple_void_NN (ref_to_values_av);
