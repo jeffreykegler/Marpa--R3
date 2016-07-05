@@ -16,7 +16,7 @@ use warnings;
 use strict;
 
 use vars qw($VERSION $STRING_VERSION);
-$VERSION        = '4.001_016';
+$VERSION        = '4.001_017';
 $STRING_VERSION = $VERSION;
 $VERSION        = eval $VERSION;
 
