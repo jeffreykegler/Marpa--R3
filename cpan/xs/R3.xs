@@ -2090,6 +2090,12 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV * ref_to_values_av)
         case MARPA_OP_BLESS:
             {
                 blessing = ops[op_ix++];
+                xlua_sig_call (slr->L,
+                    "local recce, blessing_ix = ...;\n"
+                    "recce.v.step.blessing_ix = blessing_ix\n",
+                    "Ri",
+                    slr->lua_ref, (int)blessing
+                    );
             }
             goto NEXT_OP_CODE;
 
@@ -2112,7 +2118,7 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV * ref_to_values_av)
                     "local blessing = constants[blessing_ix]\n"
                     "marpa.sv.bless(values, blessing)\n",
                     "Ri",
-                    slr->lua_ref, (lua_Integer)blessing
+                    slr->lua_ref, (int)blessing
                     );
                 }
                 return 3;
@@ -4167,6 +4173,8 @@ PPCODE:
   while (1)
     {
       int step_type;
+      AV *values_av = newAV ();
+      SV *ref_to_values_av = sv_2mortal (newRV_noinc ((SV *) values_av));
 
       xlua_sig_call (slr->L, "local recce = ...; recce:step()", "R",
           slr->lua_ref);
@@ -4181,8 +4189,6 @@ PPCODE:
         case MARPA_STEP_NULLING_SYMBOL:
         case MARPA_STEP_TOKEN:
           {
-              AV *values_av = newAV ();
-              SV *ref_to_values_av = sv_2mortal (newRV_noinc ((SV *) values_av));
               int result = v_do_stack_ops (v_wrapper, ref_to_values_av);
               if (result > 0) {
                   const char *step_type_string = step_type_to_string (step_type);
