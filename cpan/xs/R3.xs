@@ -1844,7 +1844,7 @@ u_substring (Scanless_R * slr, const char *name, int start_pos_arg,
 /* Static valuator methods */
 
 static int
-v_do_stack_ops (V_Wrapper * v_wrapper, SV ** p_values_av)
+v_do_stack_ops (V_Wrapper * v_wrapper, SV * ref_to_values_av)
 {
     dTHX;
     AV *stack = v_wrapper->stack;
@@ -1867,16 +1867,10 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** p_values_av)
 
     lua_State *const L = slr->L;
 
-    /* Create a new array, and a mortal reference to it.
-     * The reference, and therefore the array will be garbage collected
-     * automatically, unless we de-mortalize the reference.
-     */
-    AV *values_av = newAV ();
-    SV *ref_to_values_av = sv_2mortal (newRV_noinc ((SV *) values_av));
     const char *const step_type_as_string =
         step_type_to_string (step_type);
 
-    v_wrapper->values = values_av;
+    v_wrapper->values = (AV *) SvRV (ref_to_values_av);
     v_wrapper->result = (int) result_ix;
     /* warn("%s %d", __FILE__, __LINE__); */
 
@@ -2121,8 +2115,6 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV ** p_values_av)
                     slr->lua_ref, (lua_Integer)blessing
                     );
                 }
-                /* ref_to_values_av is already mortal -- leave it */
-                *p_values_av = ref_to_values_av;
                 return 3;
             }
             /* NOT REACHED */
@@ -4189,15 +4181,16 @@ PPCODE:
         case MARPA_STEP_NULLING_SYMBOL:
         case MARPA_STEP_TOKEN:
           {
-              SV *values_ref = 0;
-              v_do_stack_ops (v_wrapper, &values_ref);
-              if (values_ref) {
+              AV *values_av = newAV ();
+              SV *ref_to_values_av = sv_2mortal (newRV_noinc ((SV *) values_av));
+              int result = v_do_stack_ops (v_wrapper, ref_to_values_av);
+              if (result > 0) {
                   const char *step_type_string = step_type_to_string (step_type);
                   XPUSHs (sv_2mortal (newSVpv (step_type_string, 0)));
                   XPUSHs (sv_2mortal (newSViv (step_type ==
                               MARPA_STEP_RULE ? marpa_v_rule (v_wrapper->v) :
                               marpa_v_token (v_wrapper->v))));
-                  XPUSHs (values_ref);
+                  XPUSHs (ref_to_values_av); /* already mortal */
                   XSRETURN (3);
               }
               goto NEXT_STEP;
