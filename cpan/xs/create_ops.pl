@@ -27,7 +27,6 @@ my @ops = sort { $a->[0] cmp $b->[0] }
     [ "earleme_complete",        "MARPA_OP_EARLEME_COMPLETE" ],
     [ "invalid_char",            "MARPA_OP_INVALID_CHAR" ],
     [ "noop",                    "MARPA_OP_NOOP" ],
-    [ "result_is_array",         "MARPA_OP_RESULT_IS_ARRAY" ],
     [ "lua",               "MARPA_OP_LUA" ];
 
 say <<'END_OF_PREAMBLE';

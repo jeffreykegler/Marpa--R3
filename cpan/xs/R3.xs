@@ -2072,27 +2072,6 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV * ref_to_values_av)
                 goto NEXT_OP_CODE;
             }
 
-        case MARPA_OP_RESULT_IS_ARRAY:
-            {
-                    xlua_sig_call (slr->L,
-                    "local recce = ...\n"
-        "local stack = recce:stack()\n"
-        "local result_ix = recce.v.step.result\n"
-                    "local values = recce:values()\n"
-                    "local constants = recce:constants()\n"
-                    "local blessing_ix = recce.v.step.blessing_ix\n"
-                    "if blessing_ix then\n"
-                    "  local blessing = constants[blessing_ix]\n"
-                    "  marpa.sv.bless(values, blessing)\n"
-                    "end\n"
-                    "stack[result_ix] = values\n"
-        "marpa.sv.fill(stack, result_ix)\n",
-                    "R",
-                    slr->lua_ref
-                    );
-            }
-            return -1;
-
         case MARPA_OP_BLESS:
             {
                 blessing = ops[op_ix++];
@@ -2122,7 +2101,7 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV * ref_to_values_av)
                     "local constants = recce:constants()\n"
                     "local blessing = constants[recce.v.step.blessing_ix]\n"
                     "marpa.sv.bless(values, blessing)\n",
-                    "Ri",
+                    "R",
                     slr->lua_ref
                     );
                 }
