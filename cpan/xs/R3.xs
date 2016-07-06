@@ -685,6 +685,22 @@ static int marpa_sv_tostring_meth(lua_State* L) {
     return 1;
 }
 
+static int marpa_sv_svaddr_meth(lua_State* L) {
+    /* Lua stack: [ sv_userdata ] */
+    /* For debugging, so keep the check even after development */
+    SV** p_table_sv = (SV**)marpa_luaL_checkudata(L, 1, MT_NAME_SV);
+    marpa_lua_pushinteger (L, (lua_Integer)PTR2nat(*p_table_sv));
+    return 1;
+}
+
+static int marpa_sv_addr_meth(lua_State* L) {
+    /* Lua stack: [ sv_userdata ] */
+    /* For debugging, so keep the check even after development */
+    SV** p_table_sv = (SV**)marpa_luaL_checkudata(L, 1, MT_NAME_SV);
+    marpa_lua_pushinteger (L, (lua_Integer)PTR2nat(p_table_sv));
+    return 1;
+}
+
 static const struct luaL_Reg marpa_sv_meths[] = {
     {"__add", marpa_sv_add_meth},
     {"__gc", marpa_sv_finalize_meth},
@@ -699,6 +715,8 @@ static const struct luaL_Reg marpa_sv_funcs[] = {
     {"top_index", marpa_av_len_meth},
     {"bless", marpa_av_bless_meth},
     {"undef", marpa_sv_undef},
+    {"svaddr", marpa_sv_svaddr_meth},
+    {"addr", marpa_sv_addr_meth},
     {NULL, NULL},
 };
 
@@ -2056,34 +2074,22 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV * ref_to_values_av)
 
         case MARPA_OP_RESULT_IS_ARRAY:
             {
-                SV **stored_av;
-
-                if (blessing) {
                     xlua_sig_call (slr->L,
-                    "local recce, blessing_ix = ...\n"
-                    "-- io.stderr:write('blessing_ix', blessing_ix)\n"
+                    "local recce = ...\n"
+        "local stack = recce:stack()\n"
+        "local result_ix = recce.v.step.result\n"
                     "local values = recce:values()\n"
                     "local constants = recce:constants()\n"
-                    "local blessing = constants[blessing_ix]\n"
-                    "marpa.sv.bless(values, blessing)\n",
-                    "Ri",
-                    slr->lua_ref, (lua_Integer)blessing
+                    "local blessing_ix = recce.v.step.blessing_ix\n"
+                    "if blessing_ix then\n"
+                    "  local blessing = constants[blessing_ix]\n"
+                    "  marpa.sv.bless(values, blessing)\n"
+                    "end\n"
+                    "stack[result_ix] = values\n"
+        "marpa.sv.fill(stack, result_ix)\n",
+                    "R",
+                    slr->lua_ref
                     );
-                }
-                /* De-mortalize the reference to values_av */
-                SvREFCNT_inc_simple_void_NN (ref_to_values_av);
-                stored_av =
-                    av_store (stack, (I32) result_ix, ref_to_values_av);
-
-                /* If the new RV did not get stored properly,
-                 * decrement its ref count to re-mortalize it.
-                 */
-                if (!stored_av) {
-                    SvREFCNT_dec (ref_to_values_av);
-                    av_fill (stack, (I32) result_ix - 1);
-                    return -1;
-                }
-                av_fill (stack, (I32) result_ix);
             }
             return -1;
 
@@ -2111,14 +2117,13 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV * ref_to_values_av)
 
                 if (blessing) {
                     xlua_sig_call (slr->L,
-                    "local recce, blessing_ix = ...\n"
-                    "-- io.stderr:write('blessing_ix', blessing_ix)\n"
+                    "local recce = ...\n"
                     "local values = recce:values()\n"
                     "local constants = recce:constants()\n"
                     "local blessing = constants[recce.v.step.blessing_ix]\n"
                     "marpa.sv.bless(values, blessing)\n",
                     "Ri",
-                    slr->lua_ref, (int)blessing
+                    slr->lua_ref
                     );
                 }
                 return 3;
