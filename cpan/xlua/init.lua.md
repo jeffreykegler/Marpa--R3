@@ -493,6 +493,38 @@ is the result of this sequence of operations.
 
 ```
 
+### VM operation: callback
+
+Tells the VM to create a callback to Perl, with
+the `values` array as an argument.
+The return value of 3 is a vestige of an earlier
+implementation, which returned the size of the
+`values` array.
+
+```
+    function op_fn_callback(recce)
+        local step_type = recce.v.step.type
+        if step.type ~= 'MARPA_STEP_RULE'
+            and step.type ~= 'MARPA_STEP_NULLING_SYMBOL'
+        then
+            io.stderr:write(
+                'Internal error: callback for wrong step type ',
+                step_type
+            )
+            os.exit(false)
+        end
+        local blessing_ix = recce.v.step.blessing_ix
+        local values = recce:values()
+        if blessing_ix then
+          local constants = recce:constants()
+          local blessing = constants[blessing_ix]
+          marpa.sv.bless(values, blessing)
+        end
+        return 3
+    end
+
+```
+
 ### Operations for use in the Perl code
 
 The following operations are used by the higher-level Perl code
