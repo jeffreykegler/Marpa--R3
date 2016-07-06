@@ -1519,7 +1519,12 @@ END_OF_LUA
                 );
             } ## end if ( not $eval_ok or @warnings )
 
-            $value->result_set($result);
+                my ($highest_index) = $slr->exec( <<'END_OF_LUA', $result);
+local recce, v = ...
+local stack = recce:stack()
+stack[recce.v.step.result] = v
+END_OF_LUA
+
             trace_token_evaluation( $slr, $value, $token_id, \$result )
               if $trace_values;
             next STEP;
