@@ -931,7 +931,6 @@ qq{Cannot bless rule when the semantics are "$semantics"},
 
         state $op_bless           = Marpa::R3::Thin::op('bless');
         state $op_callback        = Marpa::R3::Thin::op('callback');
-        state $op_result_is_array = Marpa::R3::Thin::op('result_is_array');
         state $op_lua = Marpa::R3::Thin::op('lua');
 
         my ($op_debug_key) =
@@ -949,6 +948,8 @@ qq{Cannot bless rule when the semantics are "$semantics"},
           $slr->exec_name( 'get_op_fn_key_by_name', "result_is_n_of_rhs" );
         my ($result_is_n_of_sequence_key) =
           $slr->exec_name( 'get_op_fn_key_by_name', "result_is_n_of_sequence" );
+        my ($result_is_array_key) =
+          $slr->exec_name( 'get_op_fn_key_by_name', "result_is_array" );
         my ($op_push_constant_key) =
           $slr->exec_name( 'get_op_fn_key_by_name', 'push_constant' );
         my ($op_push_undef_key) =
@@ -1021,16 +1022,17 @@ qq{Cannot bless rule when the semantics are "$semantics"},
             } ## end if ( defined $irlid )
 
             # Determine the "fate" of the array of child values
-            my $array_fate;
+            my @array_fate = ();
           ARRAY_FATE: {
                 if ( defined $closure and ref $closure eq 'CODE' ) {
-                    $array_fate = $op_callback;
+                    push @array_fate, $op_callback;
                     last ARRAY_FATE;
 
                 }
 
                 if ( ( substr $semantics, 0, 1 ) eq '[' ) {
-                    $array_fate = $op_result_is_array;
+                    push @array_fate, $op_lua, $result_is_array_key,
+                      $op_abend_key;
                     last ARRAY_FATE;
                 }
             } ## end ARRAY_FATE:
@@ -1157,12 +1159,12 @@ qq{    Semantics were specified as "$original_semantics"\n}
                     last SET_OPS;
                 } ## end PROCESS_SINGLETON_RESULT:
 
-                if ( not defined $array_fate ) {
+                if ( not @array_fate ) {
                     @ops = ( $op_lua, $result_is_undef_key, $op_abend_key );
                     last SET_OPS;
                 }
 
-                # if here, $array_fate is defined
+                # if here, @array_fate is non-empty
 
                 my @bless_ops = ();
                 if ( $blessing ne '::undef' ) {
@@ -1295,7 +1297,7 @@ qq{    Semantics were specified as "$original_semantics"\n}
                         qq{  The full semantics were "$semantics"}
                     );
                 } ## end RESULT_DESCRIPTOR: for my $result_descriptor ( split /[,]\s*/xms, ...)
-                @ops = ( @push_ops, @bless_ops, $array_fate );
+                @ops = ( @push_ops, @bless_ops, @array_fate );
 
             } ## end SET_OPS:
 

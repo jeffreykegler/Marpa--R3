@@ -115,6 +115,27 @@ fast fails with a clear message.
 
 ```
 
+### VM result operations
+
+If an operation in the VM returns -1, it is a
+"result operation".
+The actual result is expected to be in the stack
+at index `recce.v.step.result`.
+
+The result operation is not required to be the
+last operation in a sequence,
+and
+a sequence of operations does not have to contain
+a result operation.
+If there are
+other operations after the result operation,
+they will not be performed.
+If a sequence ends without encountering a result
+operation, an implicit "no-op" result operation
+is assumed and, as usual,
+the result is the value in the stack
+at index `recce.v.step.result`.
+
 ### VM "result is undef" operation
 
 Perhaps the simplest operation.
@@ -128,65 +149,6 @@ The result of the semantics is a Perl undef.
         stack[recce.v.step.result] = marpa.sv.undef()
         marpa.sv.fill(stack, recce.v.step.result)
         return -1
-    end
-
-```
-
-### VM "push undef" operation
-
-Push an undef on the values array.
-
-```
-    -- luatangle: section+ VM operations
-
-    function op_fn_push_undef(recce)
-        local values = recce:values()
-        local next_ix = marpa.sv.top_index(values) + 1;
-        values[next_ix] = marpa.sv.undef()
-        return -2
-    end
-
-```
-
-### VM "push one" operation
-
-Push one of the RHS child values onto the values array.
-
-```
-    -- luatangle: section+ VM operations
-
-    function op_fn_push_one(recce, rhs_ix)
-        if recce.v.step.type ~= 'MARPA_STEP_RULE' then
-          return op_fn_push_undef(recce)
-        end
-        local stack = recce:stack()
-        local values = recce:values()
-        local result_ix = recce.v.step.result
-        local next_ix = marpa.sv.top_index(values) + 1;
-        values[next_ix] = stack[result_ix + rhs_ix]
-        return -2
-    end
-
-```
-
-### Find current token literal
-
-`current_token_literal` return the literal
-equivalent of the current token.
-It assumes that there *is* a current token,
-that is,
-it assumes that the caller has ensured that
-`recce.v.step.type ~= 'MARPA_STEP_TOKEN'`.
-
-```
-    -- luatangle: section+ VM operations
-    function current_token_literal(recce)
-      if recce.token_is_literal == recce.v.step.value then
-          local start_es = recce.v.step.start_es_id
-          local end_es = recce.v.step.es_id
-          return recce:literal_of_es_span(start_es, end_es)
-      end
-      return recce.token_values[recce.v.step.value]
     end
 
 ```
@@ -216,44 +178,6 @@ if not the value is an undef.
              -- io.stderr:write('[step_type]: ', inspect(recce))
         end
         return -1
-    end
-
-```
-
-### VM "push values" operation
-
-Push the child values onto the `values` list.
-If it is a token step, then
-the token at the current location is pushed onto the `values` list.
-If it is a nulling step, the nothing is pushed.
-Otherwise the values of the RHS children are pushed.
-
-`increment` is 2 for sequences where separators must be discarded,
-1 otherwise.
-
-```
-    -- luatangle: section+ VM operations
-
-    function op_fn_push_values(recce, increment)
-        local values = recce:values()
-        if recce.v.step.type == 'MARPA_STEP_TOKEN' then
-            local next_ix = marpa.sv.top_index(values) + 1;
-            values[next_ix] = current_token_literal(recce)
-            return -2
-        end
-        if recce.v.step.type == 'MARPA_STEP_RULE' then
-            local stack = recce:stack()
-            local arg_n = recce.v.step.arg_n
-            local result_ix = recce.v.step.result
-            local to_ix = marpa.sv.top_index(values) + 1;
-            for from_ix = result_ix,arg_n,increment do
-                values[to_ix] = stack[from_ix]
-                to_ix = to_ix + 1
-            end
-            return -2
-        end
-        -- if 'MARPA_STEP_NULLING_SYMBOL', or unrecogized type
-        return -2
     end
 
 ```
@@ -314,59 +238,6 @@ the "N of RHS" operation should be used.
 
 ```
 
-### VM operation: return start location
-
-The current start location in input location terms -- that is,
-in terms of the input string.
-
-```
-    -- luatangle: section+ VM operations
-    function op_fn_push_start(recce)
-        local values = recce:values()
-        local start_es = recce.v.step.start_es_id
-        local end_es = recce.v.step.es_id
-        local next_ix = marpa.sv.top_index(values) + 1;
-        local start, l = recce:span(start_es, end_es)
-        values[next_ix], _ = recce:span(start_es, end_es)
-        return -2
-    end
-
-```
-
-### VM operation: return length
-
-The length of the current step in input location terms --
-that is, in terms of the input string
-
-```
-    -- luatangle: section+ VM operations
-    function op_fn_push_length(recce)
-        local values = recce:values()
-        local start_es = recce.v.step.start_es_id
-        local end_es = recce.v.step.es_id
-        local next_ix = marpa.sv.top_index(values) + 1;
-        _, values[next_ix] = recce:span(start_es, end_es)
-        return -2
-    end
-
-```
-
-### VM operation: return G1 start location
-
-The current start location in G1 location terms -- that is,
-in terms of G1 Earley sets.
-
-```
-    -- luatangle: section+ VM operations
-    function op_fn_push_g1_start(recce)
-        local values = recce:values()
-        local next_ix = marpa.sv.top_index(values) + 1;
-        values[next_ix] = recce.v.step.start_es_id
-        return -2
-    end
-
-```
-
 ### VM operation: result is constant
 
 Returns a constant result.
@@ -391,7 +262,163 @@ Returns a constant result.
 
 ```
 
-### VM operation: return G1 length
+### Operation of the values array
+
+The following operations add elements to the `values` array.
+This is a special array which may eventually be the result of the
+sequence of operations.
+
+### VM "push undef" operation
+
+Push an undef on the values array.
+
+```
+    -- luatangle: section+ VM operations
+
+    function op_fn_push_undef(recce)
+        local values = recce:values()
+        local next_ix = marpa.sv.top_index(values) + 1;
+        values[next_ix] = marpa.sv.undef()
+        return -2
+    end
+
+```
+
+### VM "push one" operation
+
+Push one of the RHS child values onto the values array.
+
+```
+    -- luatangle: section+ VM operations
+
+    function op_fn_push_one(recce, rhs_ix)
+        if recce.v.step.type ~= 'MARPA_STEP_RULE' then
+          return op_fn_push_undef(recce)
+        end
+        local stack = recce:stack()
+        local values = recce:values()
+        local result_ix = recce.v.step.result
+        local next_ix = marpa.sv.top_index(values) + 1;
+        values[next_ix] = stack[result_ix + rhs_ix]
+        return -2
+    end
+
+```
+
+### Find current token literal
+
+`current_token_literal` return the literal
+equivalent of the current token.
+It assumes that there *is* a current token,
+that is,
+it assumes that the caller has ensured that
+`recce.v.step.type ~= 'MARPA_STEP_TOKEN'`.
+
+```
+    -- luatangle: section+ VM operations
+    function current_token_literal(recce)
+      if recce.token_is_literal == recce.v.step.value then
+          local start_es = recce.v.step.start_es_id
+          local end_es = recce.v.step.es_id
+          return recce:literal_of_es_span(start_es, end_es)
+      end
+      return recce.token_values[recce.v.step.value]
+    end
+
+```
+
+### VM "push values" operation
+
+Push the child values onto the `values` list.
+If it is a token step, then
+the token at the current location is pushed onto the `values` list.
+If it is a nulling step, the nothing is pushed.
+Otherwise the values of the RHS children are pushed.
+
+`increment` is 2 for sequences where separators must be discarded,
+1 otherwise.
+
+```
+    -- luatangle: section+ VM operations
+
+    function op_fn_push_values(recce, increment)
+        local values = recce:values()
+        if recce.v.step.type == 'MARPA_STEP_TOKEN' then
+            local next_ix = marpa.sv.top_index(values) + 1;
+            values[next_ix] = current_token_literal(recce)
+            return -2
+        end
+        if recce.v.step.type == 'MARPA_STEP_RULE' then
+            local stack = recce:stack()
+            local arg_n = recce.v.step.arg_n
+            local result_ix = recce.v.step.result
+            local to_ix = marpa.sv.top_index(values) + 1;
+            for from_ix = result_ix,arg_n,increment do
+                values[to_ix] = stack[from_ix]
+                to_ix = to_ix + 1
+            end
+            return -2
+        end
+        -- if 'MARPA_STEP_NULLING_SYMBOL', or unrecogized type
+        return -2
+    end
+
+```
+
+### VM operation: push start location
+
+The current start location in input location terms -- that is,
+in terms of the input string.
+
+```
+    -- luatangle: section+ VM operations
+    function op_fn_push_start(recce)
+        local values = recce:values()
+        local start_es = recce.v.step.start_es_id
+        local end_es = recce.v.step.es_id
+        local next_ix = marpa.sv.top_index(values) + 1;
+        local start, l = recce:span(start_es, end_es)
+        values[next_ix], _ = recce:span(start_es, end_es)
+        return -2
+    end
+
+```
+
+### VM operation: push length
+
+The length of the current step in input location terms --
+that is, in terms of the input string
+
+```
+    -- luatangle: section+ VM operations
+    function op_fn_push_length(recce)
+        local values = recce:values()
+        local start_es = recce.v.step.start_es_id
+        local end_es = recce.v.step.es_id
+        local next_ix = marpa.sv.top_index(values) + 1;
+        _, values[next_ix] = recce:span(start_es, end_es)
+        return -2
+    end
+
+```
+
+### VM operation: push G1 start location
+
+The current start location in G1 location terms -- that is,
+in terms of G1 Earley sets.
+
+```
+    -- luatangle: section+ VM operations
+    function op_fn_push_g1_start(recce)
+        local values = recce:values()
+        local next_ix = marpa.sv.top_index(values) + 1;
+        values[next_ix] = recce.v.step.start_es_id
+        return -2
+    end
+
+```
+
+### VM operation: push G1 length
 
 The length of the current step in G1 terms --
 that is, in terms of G1 Earley sets.
@@ -426,6 +453,35 @@ that is, in terms of G1 Earley sets.
     end
 
 ```
+
+### VM operation: result is array
+
+This operation tells the VM that the current `values` array
+is the result of this sequence of operations.
+
+```
+    -- luatangle: section+ VM operations
+    function op_fn_result_is_array(recce)
+        local blessing_ix = recce.v.step.blessing_ix
+        local values = recce:values()
+        if blessing_ix then
+          local constants = recce:constants()
+          local blessing = constants[blessing_ix]
+          marpa.sv.bless(values, blessing)
+        end
+        local stack = recce:stack()
+        local result_ix = recce.v.step.result
+        stack[result_ix] = values
+        marpa.sv.fill(stack, result_ix)
+        return -1
+    end
+
+```
+
+### Operations for use in the Perl code
+
+The following operations are used by the higher-level Perl code
+to set and discover various Lua values.
 
 ### Return operation key given its name
 
@@ -529,6 +585,7 @@ Called when a valuator is set up.
         local result_is_token_value_key = op_fn_create("result_is_token_value", op_fn_result_is_token_value)
         op_fn_create("result_is_n_of_rhs", op_fn_result_is_n_of_rhs)
         op_fn_create("result_is_n_of_sequence", op_fn_result_is_n_of_sequence)
+        op_fn_create("result_is_array", op_fn_result_is_array)
         op_fn_create("push_constant", op_fn_push_constant)
         op_fn_create("push_g1_length", op_fn_push_g1_length)
         op_fn_create("push_g1_start", op_fn_push_g1_start)
