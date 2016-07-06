@@ -22,7 +22,6 @@ if (scalar @ARGV != 0) {
 
 my @ops = sort { $a->[0] cmp $b->[0] }
     [ "alternative",             "MARPA_OP_ALTERNATIVE" ],
-    [ "bless",                   "MARPA_OP_BLESS" ],
     [ "callback",                "MARPA_OP_CALLBACK" ],
     [ "earleme_complete",        "MARPA_OP_EARLEME_COMPLETE" ],
     [ "invalid_char",            "MARPA_OP_INVALID_CHAR" ],

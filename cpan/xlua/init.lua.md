@@ -454,6 +454,21 @@ that is, in terms of G1 Earley sets.
 
 ```
 
+### VM operation: set the array blessing
+
+The blessing is registered in a constant, and this operation
+lets the VM know its index.  The index is cleared at the beginning
+of every sequence of operations
+
+```
+    -- luatangle: section+ VM operations
+    function op_fn_bless(recce, blessing_ix)
+        recce.v.step.blessing_ix = blessing_ix
+        return -2
+    end
+
+```
+
 ### VM operation: result is array
 
 This operation tells the VM that the current `values` array
@@ -577,12 +592,16 @@ Called when a valuator is set up.
             return ref
         end
 
-        op_fn_create("debug", op_fn_debug)
+        -- we record these values to set the defaults, below
         local op_abend_key = op_fn_create("abend", op_fn_abend)
-        op_fn_create("noop", op_fn_noop)
         local result_is_constant_key = op_fn_create("result_is_constant", op_fn_result_is_constant)
         local result_is_undef_key = op_fn_create("result_is_undef", op_fn_result_is_undef)
         local result_is_token_value_key = op_fn_create("result_is_token_value", op_fn_result_is_token_value)
+
+        -- these values are accessed only by name
+        op_fn_create("debug", op_fn_debug)
+        op_fn_create("noop", op_fn_noop)
+        op_fn_create("bless", op_fn_bless)
         op_fn_create("result_is_n_of_rhs", op_fn_result_is_n_of_rhs)
         op_fn_create("result_is_n_of_sequence", op_fn_result_is_n_of_sequence)
         op_fn_create("result_is_array", op_fn_result_is_array)

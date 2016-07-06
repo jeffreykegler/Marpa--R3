@@ -374,11 +374,6 @@ sub Marpa::R3::Scanless::R::show_semantics {
         my $op      = $ops[ $op_ix++ ];
         my $op_name = Marpa::R3::Thin::op_name($op);
         push @op_descs, $op_name;
-        if ( $op_name eq 'bless' ) {
-            push @op_descs, q{"} . $ops[$op_ix] . q{"};
-            $op_ix++;
-            next OP;
-        }
         if ( $op_name eq 'lua' ) {
             my ($lua_op_name) = $slr->exec_name( 'get_op_fn_name_by_key', $ops[$op_ix] );
             push @op_descs, $lua_op_name;
@@ -929,7 +924,6 @@ qq{Cannot bless rule when the semantics are "$semantics"},
 
         my $null_values = $slr->[Marpa::R3::Internal::Scanless::R::NULL_VALUES];
 
-        state $op_bless           = Marpa::R3::Thin::op('bless');
         state $op_callback        = Marpa::R3::Thin::op('callback');
         state $op_lua = Marpa::R3::Thin::op('lua');
 
@@ -938,6 +932,8 @@ qq{Cannot bless rule when the semantics are "$semantics"},
         my ($op_noop_key) = $slr->exec_name( 'get_op_fn_key_by_name', "noop" );
         my ($op_abend_key) =
           $slr->exec_name( 'get_op_fn_key_by_name', "abend" );
+        my ($op_bless_key) =
+          $slr->exec_name( 'get_op_fn_key_by_name', "bless" );
         my ($result_is_undef_key) =
           $slr->exec_name( 'get_op_fn_key_by_name', 'result_is_undef' );
         my ($result_is_constant_key) =
@@ -1168,7 +1164,7 @@ qq{    Semantics were specified as "$original_semantics"\n}
 
                 my @bless_ops = ();
                 if ( $blessing ne '::undef' ) {
-                    push @bless_ops, $op_bless, \$blessing;
+                    push @bless_ops, $op_lua, $op_bless_key, \$blessing;
                 }
 
                 Marpa::R3::exception(qq{Unknown semantics: "$semantics"})

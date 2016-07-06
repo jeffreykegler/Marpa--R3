@@ -2072,18 +2072,6 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV * ref_to_values_av)
                 goto NEXT_OP_CODE;
             }
 
-        case MARPA_OP_BLESS:
-            {
-                blessing = ops[op_ix++];
-                xlua_sig_call (slr->L,
-                    "local recce, blessing_ix = ...;\n"
-                    "recce.v.step.blessing_ix = blessing_ix\n",
-                    "Ri",
-                    slr->lua_ref, (int)blessing
-                    );
-            }
-            goto NEXT_OP_CODE;
-
         case MARPA_OP_CALLBACK:
             {
                 switch (step_type) {
