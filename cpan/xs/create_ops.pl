@@ -21,12 +21,11 @@ if (scalar @ARGV != 0) {
 }
 
 my @ops = sort { $a->[0] cmp $b->[0] }
-    [ "alternative",             "MARPA_OP_ALTERNATIVE" ],
-    [ "callback",                "MARPA_OP_CALLBACK" ],
-    [ "earleme_complete",        "MARPA_OP_EARLEME_COMPLETE" ],
-    [ "invalid_char",            "MARPA_OP_INVALID_CHAR" ],
-    [ "noop",                    "MARPA_OP_NOOP" ],
-    [ "lua",               "MARPA_OP_LUA" ];
+  [ "alternative",      "MARPA_OP_ALTERNATIVE" ],
+  [ "earleme_complete", "MARPA_OP_EARLEME_COMPLETE" ],
+  [ "invalid_char",     "MARPA_OP_INVALID_CHAR" ],
+  [ "noop",             "MARPA_OP_NOOP" ],
+  [ "lua",              "MARPA_OP_LUA" ];
 
 say <<'END_OF_PREAMBLE';
 /*

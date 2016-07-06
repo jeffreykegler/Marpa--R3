@@ -1865,14 +1865,12 @@ static int
 v_do_stack_ops (V_Wrapper * v_wrapper, SV * ref_to_values_av)
 {
     dTHX;
-    AV *stack = v_wrapper->stack;
     const Marpa_Value v = v_wrapper->v;
     Scanless_R *const slr = v_wrapper->slr;
     const Marpa_Step_Type step_type = marpa_v_step_type (v);
     UV result_ix = (UV) marpa_v_result (v);
     UV *ops = NULL;
     UV op_ix;
-    UV blessing = 0;
 
     /* Initializations are to silence GCC warnings --
      * if these values appear to the user, there is
@@ -2072,33 +2070,7 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV * ref_to_values_av)
                 goto NEXT_OP_CODE;
             }
 
-        case MARPA_OP_CALLBACK:
-            {
-                switch (step_type) {
-                case MARPA_STEP_RULE:
-                case MARPA_STEP_NULLING_SYMBOL:
-                    break;
-                default:
-                    goto BAD_OP;
-                }
-
-                if (blessing) {
-                    xlua_sig_call (slr->L,
-                    "local recce = ...\n"
-                    "local values = recce:values()\n"
-                    "local constants = recce:constants()\n"
-                    "local blessing = constants[recce.v.step.blessing_ix]\n"
-                    "marpa.sv.bless(values, blessing)\n",
-                    "R",
-                    slr->lua_ref
-                    );
-                }
-                return 3;
-            }
-            /* NOT REACHED */
-
         default:
-          BAD_OP:
             {
                 croak
                     ("Bad op code (%lu, '%s') in v->stack_step, step_type '%s'",
