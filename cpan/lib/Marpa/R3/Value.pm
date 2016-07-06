@@ -1459,12 +1459,22 @@ END_OF_LUA
             } ## end EVENT: while (1)
 
             if ( $trace_values >= 9 ) {
-                for my $i ( reverse 0 .. $value->highest_index ) {
+
+                my ($highest_index) = $slr->exec( <<'END_OF_LUA');
+local recce = ...
+return recce.v.step.result
+END_OF_LUA
+
+                for my $i ( reverse 0 .. $highest_index ) {
+                    my ($value) = $slr->exec( <<'END_OF_LUA', $i);
+local recce, ix = ...
+return recce:stack[ix+0]
+END_OF_LUA
+
                     printf {$trace_file_handle} "Stack position %3d:\n", $i,
                       or Marpa::R3::exception('print to trace handle failed');
                     print {$trace_file_handle} q{ },
-                      Data::Dumper->new( [ \$value->absolute($i) ] )->Terse(1)
-                      ->Dump
+                      Data::Dumper->new( [ \$value ] )->Terse(1)->Dump
                       or Marpa::R3::exception('print to trace handle failed');
                 } ## end for my $i ( reverse 0 .. $value->highest_index )
             } ## end if ( $trace_values >= 9 )
@@ -1586,7 +1596,13 @@ END_OF_LUA
 
     } ## end STEP: while (1)
 
-    return \( $value->absolute(0) );
+                    my ($final_value) = $slr->exec( <<'END_OF_LUA');
+local recce = ...
+local stack = recce:stack()
+return stack[0]
+END_OF_LUA
+
+    return \( $final_value );
 
 }
 

@@ -4036,44 +4036,6 @@ PPCODE:
 }
 
 void
-highest_index( v_wrapper )
-    V_Wrapper *v_wrapper;
-PPCODE:
-{
-  AV* stack = v_wrapper->stack;
-  IV length = stack ? av_len(stack) : -1;
-  XSRETURN_IV(length);
-}
-
-void
-absolute( v_wrapper, index )
-    V_Wrapper *v_wrapper;
-    IV index;
-PPCODE:
-{
-  SV** p_sv;
-  AV* stack = v_wrapper->stack;
-  if (!stack) { XSRETURN_UNDEF; }
-  p_sv = av_fetch(stack, index, 0);
-  if (!p_sv) { XSRETURN_UNDEF; }
-  XPUSHs (sv_mortalcopy(*p_sv));
-}
-
-void
-relative( v_wrapper, index )
-    V_Wrapper *v_wrapper;
-    IV index;
-PPCODE:
-{
-  SV** p_sv;
-  AV* stack = v_wrapper->stack;
-  if (!stack) { XSRETURN_UNDEF; }
-  p_sv = av_fetch(stack, index+v_wrapper->result, 0);
-  if (!p_sv) { XSRETURN_UNDEF; }
-  XPUSHs (sv_mortalcopy(*p_sv));
-}
-
-void
 result_set( v_wrapper, sv )
     V_Wrapper *v_wrapper;
     SV* sv;
