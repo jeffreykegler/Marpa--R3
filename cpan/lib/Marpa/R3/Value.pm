@@ -1570,7 +1570,12 @@ END_OF_LUA
             else {
                 $result = ${$closure};
             }
-            $value->result_set($result);
+                my ($highest_index) = $slr->exec( <<'END_OF_LUA', $result);
+local recce, v = ...
+local stack = recce:stack()
+stack[recce.v.step.result] = v
+END_OF_LUA
+
 
             if ($trace_values) {
                 say {$trace_file_handle}

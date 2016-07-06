@@ -4036,30 +4036,6 @@ PPCODE:
 }
 
 void
-result_set( v_wrapper, sv )
-    V_Wrapper *v_wrapper;
-    SV* sv;
-PPCODE:
-{
-  IV result_ix;
-  SV **p_stored_sv;
-  AV *stack = v_wrapper->stack;
-  if (!stack)
-    {
-      croak ("Problem in v->result_set(): valuator is not in stack mode");
-    }
-  result_ix = v_wrapper->result;
-  av_fill(stack, result_ix);
-
-  SvREFCNT_inc (sv);
-  p_stored_sv = av_store (stack, result_ix, sv);
-  if (!p_stored_sv)
-    {
-      SvREFCNT_dec (sv);
-    }
-}
-
-void
 stack_step( v_wrapper )
     V_Wrapper *v_wrapper;
 PPCODE:
