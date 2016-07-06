@@ -502,10 +502,11 @@ implementation, which returned the size of the
 `values` array.
 
 ```
+    -- luatangle: section+ VM operations
     function op_fn_callback(recce)
         local step_type = recce.v.step.type
-        if step.type ~= 'MARPA_STEP_RULE'
-            and step.type ~= 'MARPA_STEP_NULLING_SYMBOL'
+        if step_type ~= 'MARPA_STEP_RULE'
+            and step_type ~= 'MARPA_STEP_NULLING_SYMBOL'
         then
             io.stderr:write(
                 'Internal error: callback for wrong step type ',
@@ -514,8 +515,8 @@ implementation, which returned the size of the
             os.exit(false)
         end
         local blessing_ix = recce.v.step.blessing_ix
-        local values = recce:values()
         if blessing_ix then
+          local values = recce:values()
           local constants = recce:constants()
           local blessing = constants[blessing_ix]
           marpa.sv.bless(values, blessing)
@@ -634,6 +635,7 @@ Called when a valuator is set up.
         op_fn_create("debug", op_fn_debug)
         op_fn_create("noop", op_fn_noop)
         op_fn_create("bless", op_fn_bless)
+        op_fn_create("callback", op_fn_callback)
         op_fn_create("result_is_n_of_rhs", op_fn_result_is_n_of_rhs)
         op_fn_create("result_is_n_of_sequence", op_fn_result_is_n_of_sequence)
         op_fn_create("result_is_array", op_fn_result_is_array)

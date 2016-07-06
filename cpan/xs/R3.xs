@@ -2068,7 +2068,7 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV * ref_to_values_av)
                 return_value = (int)marpa_lua_tointeger(L, -1);
 
                 marpa_lua_settop (L, base_of_stack);
-                if (return_value >= -1) return -1;
+                if (return_value >= -1) return return_value;
                 goto NEXT_OP_CODE;
             }
 

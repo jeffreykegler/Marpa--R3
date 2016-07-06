@@ -924,7 +924,6 @@ qq{Cannot bless rule when the semantics are "$semantics"},
 
         my $null_values = $slr->[Marpa::R3::Internal::Scanless::R::NULL_VALUES];
 
-        state $op_callback        = Marpa::R3::Thin::op('callback');
         state $op_lua = Marpa::R3::Thin::op('lua');
 
         my ($op_debug_key) =
@@ -934,6 +933,8 @@ qq{Cannot bless rule when the semantics are "$semantics"},
           $slr->exec_name( 'get_op_fn_key_by_name', "abend" );
         my ($op_bless_key) =
           $slr->exec_name( 'get_op_fn_key_by_name', "bless" );
+        my ($op_callback_key) =
+          $slr->exec_name( 'get_op_fn_key_by_name', "callback" );
         my ($result_is_undef_key) =
           $slr->exec_name( 'get_op_fn_key_by_name', 'result_is_undef' );
         my ($result_is_constant_key) =
@@ -1021,7 +1022,7 @@ qq{Cannot bless rule when the semantics are "$semantics"},
             my @array_fate = ();
           ARRAY_FATE: {
                 if ( defined $closure and ref $closure eq 'CODE' ) {
-                    push @array_fate, $op_callback;
+                    push @array_fate, $op_lua, $op_callback_key, $op_abend_key;
                     last ARRAY_FATE;
 
                 }
