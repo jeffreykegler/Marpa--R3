@@ -145,9 +145,9 @@ The result of the semantics is a Perl undef.
     -- luatangle: section+ VM operations
 
     function op_fn_result_is_undef(recce)
-        local stack = recce:stack()
+        local stack = recce.v.stack
         stack[recce.v.step.result] = marpa.sv.undef()
-        marpa.sv.fill(stack, recce.v.step.result)
+        -- marpa.sv.fill(stack, recce.v.step.result)
         return -1
     end
 
@@ -167,10 +167,10 @@ if not the value is an undef.
         if recce.v.step.type ~= 'MARPA_STEP_TOKEN' then
           return op_fn_result_is_undef(recce)
         end
-        local stack = recce:stack()
+        local stack = recce.v.stack
         local result_ix = recce.v.step.result
         stack[result_ix] = current_token_literal(recce)
-        marpa.sv.fill(stack, result_ix)
+        -- marpa.sv.fill(stack, result_ix)
         if recce.trace_values > 0 then
           local top_of_queue = #recce.trace_values_queue;
           recce.trace_values_queue[top_of_queue+1] =
@@ -190,7 +190,7 @@ if not the value is an undef.
         if recce.v.step.type ~= 'MARPA_STEP_RULE' then
           return op_fn_result_is_undef(recce)
         end
-        local stack = recce:stack()
+        local stack = recce.v.stack
         local result_ix = recce.v.step.result
         repeat
             if rhs_ix == 0 then break end
@@ -201,7 +201,7 @@ if not the value is an undef.
             end
             stack[result_ix] = stack[fetch_ix]
         until 1
-        marpa.sv.fill(stack, result_ix)
+        -- marpa.sv.fill(stack, result_ix)
         return -1
     end
 
@@ -228,11 +228,11 @@ the "N of RHS" operation should be used.
         if fetch_ix > recce.v.step.arg_n then
           return op_fn_result_is_undef(recce)
         end
-        local stack = recce:stack()
+        local stack = recce.v.stack
         if item_ix > 0 then
             stack[result_ix] = stack[fetch_ix]
         end
-        marpa.sv.fill(stack, result_ix)
+        -- marpa.sv.fill(stack, result_ix)
         return -1
     end
 
@@ -247,10 +247,10 @@ Returns a constant result.
     function op_fn_result_is_constant(recce, constant_ix)
         local constants = recce:constants()
         local constant = constants[constant_ix]
-        local stack = recce:stack()
+        local stack = recce.v.stack
         local result_ix = recce.v.step.result
         stack[result_ix] = constant
-        marpa.sv.fill(stack, result_ix)
+        -- marpa.sv.fill(stack, result_ix)
         if recce.trace_values > 0 and recce.v.step.type == 'MARPA_STEP_TOKEN' then
             local top_of_queue = #recce.trace_values_queue
             recce.trace_values_queue[top_of_queue+1] =
@@ -295,7 +295,7 @@ Push one of the RHS child values onto the values array.
         if recce.v.step.type ~= 'MARPA_STEP_RULE' then
           return op_fn_push_undef(recce)
         end
-        local stack = recce:stack()
+        local stack = recce.v.stack
         local values = recce:values()
         local result_ix = recce.v.step.result
         local next_ix = marpa.sv.top_index(values) + 1;
@@ -349,7 +349,7 @@ Otherwise the values of the RHS children are pushed.
             return -2
         end
         if recce.v.step.type == 'MARPA_STEP_RULE' then
-            local stack = recce:stack()
+            local stack = recce.v.stack
             local arg_n = recce.v.step.arg_n
             local result_ix = recce.v.step.result
             local to_ix = marpa.sv.top_index(values) + 1;
@@ -484,10 +484,10 @@ is the result of this sequence of operations.
           local blessing = constants[blessing_ix]
           marpa.sv.bless(values, blessing)
         end
-        local stack = recce:stack()
+        local stack = recce.v.stack
         local result_ix = recce.v.step.result
         stack[result_ix] = values
-        marpa.sv.fill(stack, result_ix)
+        -- marpa.sv.fill(stack, result_ix)
         return -1
     end
 
@@ -583,7 +583,7 @@ Register a constant, returning its key.
 ```
     -- luatangle: section+ Utilities for Perl code
     function stack_get(recce, ix)
-        local stack = recce:stack()
+        local stack = recce.v.stack
         return stack[ix+0]
     end
 
@@ -594,7 +594,7 @@ Register a constant, returning its key.
 ```
     -- luatangle: section+ Utilities for Perl code
     function stack_set(recce, ix, v)
-        local stack = recce:stack()
+        local stack = recce.v.stack
         stack[ix+0] = v
     end
 
@@ -703,6 +703,7 @@ Called when a valuator is set up.
         end
 
         recce.v = {}
+        recce.v.stack = {}
     end
 
 ```

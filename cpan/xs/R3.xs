@@ -4072,6 +4072,9 @@ PPCODE:
         case MARPA_STEP_TOKEN:
           {
               int result = v_do_stack_ops (v_wrapper, ref_to_values_av);
+
+              /* If MARPA_STEP_RULE, truncate stack */
+
               if (result > 0) {
                   const char *step_type_string = step_type_to_string (step_type);
                   XPUSHs (sv_2mortal (newSVpv (step_type_string, 0)));
