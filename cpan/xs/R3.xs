@@ -737,33 +737,6 @@ static void create_sv_mt (lua_State* L) {
     marpa_lua_settop(L, base_of_stack);
 }
 
-static int xlua_recce_stack_meth(lua_State* L) {
-    Scanless_R* slr;
-    V_Wrapper *v_wrapper;
-    AV* stack;
-
-    marpa_luaL_checktype(L, 1, LUA_TTABLE);
-    /* Lua stack: [ recce_table ] */
-    marpa_lua_getfield(L, -1, "lud");
-    /* Lua stack: [ recce_table, lud ] */
-    slr = (Scanless_R*)marpa_lua_touserdata(L, -1);
-    /* the slr owns the recce table, so it doesn't */
-    /* need to own its components. */
-    v_wrapper = slr->v_wrapper;
-    if (!v_wrapper) {
-        /* A recoverable error?  Probably not */
-        croak("recce.stack(): valuator is not yet active");
-    }
-    stack = v_wrapper->stack;
-    if (!stack) {
-        /* I think this is an internal error */
-        croak("recce.stack(): valuator has no stack");
-    }
-    MARPA_SV_AV(L, stack);
-    /* Lua stack: [ recce_table, recce_lud, stack_ud ] */
-    return 1;
-}
-
 static int xlua_recce_constants_meth(lua_State* L) {
     Scanless_R* slr;
     V_Wrapper *v_wrapper;
@@ -955,7 +928,6 @@ xlua_recce_span_meth (lua_State * L)
 }
 
 static const struct luaL_Reg marpa_recce_meths[] = {
-    {"stack", xlua_recce_stack_meth},
     {"constants", xlua_recce_constants_meth},
     {"values", xlua_recce_values_meth},
     {"step", xlua_recce_step_meth},
@@ -3785,7 +3757,6 @@ PPCODE:
   }
   v_wrapper->base = t_wrapper->base;
   v_wrapper->v = v;
-  v_wrapper->stack = NULL;
   v_wrapper->mode = MARPA_XS_V_MODE_IS_INITIAL;
   v_wrapper->result = 0;
 
@@ -3831,10 +3802,6 @@ PPCODE:
       v_wrapper->slr = NULL;
   }
 
-  if (v_wrapper->stack)
-    {
-      SvREFCNT_dec (v_wrapper->stack);
-    }
   marpa_v_unref (v);
   Safefree (v_wrapper);
 }
@@ -3852,11 +3819,6 @@ PPCODE:
 
   if (v_wrapper->mode == MARPA_XS_V_MODE_IS_INITIAL) {
     v_wrapper->mode = MARPA_XS_V_MODE_IS_RAW;
-  }
-  if (v_wrapper->mode != MARPA_XS_V_MODE_IS_RAW) {
-       if (v_wrapper->stack) {
-          croak ("Problem in v->step(): Cannot call when valuator is in 'stack' mode");
-       }
   }
   if (step_type == MARPA_STEP_INACTIVE)
     {
@@ -3926,8 +3888,6 @@ PPCODE:
   v_wrapper->slr = slr;
   slr->v_wrapper = v_wrapper;
 
-  v_wrapper->stack = newAV ();
-  av_extend (v_wrapper->stack, 1023);
   v_wrapper->mode = MARPA_XS_V_MODE_IS_STACK;
 
   XSRETURN_YES;
