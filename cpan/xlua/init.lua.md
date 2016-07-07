@@ -531,12 +531,10 @@ implementation, which returned the size of the
 The following operations are used by the higher-level Perl code
 to set and discover various Lua values.
 
-### Return operation key given its name
+#### Return operation key given its name
 
 ```
-
-    -- luatangle: section+ VM operations
-
+    -- luatangle: section Utilities for Perl code
     function get_op_fn_key_by_name(recce, op_name_sv)
         local op_name = tostring(op_name_sv)
         return recce.op_fn_key[op_name]
@@ -544,10 +542,10 @@ to set and discover various Lua values.
 
 ```
 
-### Return operation name given its key
+#### Return operation name given its key
 
 ```
-    -- luatangle: section+ VM operations
+    -- luatangle: section+ Utilities for Perl code
     function get_op_fn_name_by_key(recce, op_key_sv)
         local op_key = op_key_sv + 0
         return recce.op_fn_key[op_key]
@@ -555,17 +553,49 @@ to set and discover various Lua values.
 
 ```
 
-### Register a constant
+#### Register a constant
 
 Register a constant, returning its key.
 
 ```
-    -- luatangle: section+ VM operations
+    -- luatangle: section+ Utilities for Perl code
     function constant_register(recce, constant_sv)
         local constants = recce:constants()
         local next_constant_key = marpa.sv.top_index(constants) + 1
         constants[next_constant_key] = constant_sv
         return next_constant_key
+    end
+
+```
+
+#### Return the top index of the stack
+
+```
+    -- luatangle: section+ Utilities for Perl code
+    function stack_top_index(recce)
+        return recce.v.step.result
+    end
+
+```
+
+#### Return the value of a stack entry
+
+```
+    -- luatangle: section+ Utilities for Perl code
+    function stack_get(recce, ix)
+        local stack = recce:stack()
+        return stack[ix+0]
+    end
+
+```
+
+#### Set the value of a stack entry
+
+```
+    -- luatangle: section+ Utilities for Perl code
+    function stack_set(recce, ix, v)
+        local stack = recce:stack()
+        stack[ix+0] = v
     end
 
 ```
@@ -705,6 +735,7 @@ A function to be called whenever a valuator is reset.
     -- luatangle: insert VM operations
     -- luatangle: insert value_init()
     -- luatangle: insert value_reset()
+    -- luatangle: insert Utilities for Perl code
 
     return "OK"
 

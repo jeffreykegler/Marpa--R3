@@ -1460,17 +1460,9 @@ END_OF_LUA
 
             if ( $trace_values >= 9 ) {
 
-                my ($highest_index) = $slr->exec( <<'END_OF_LUA');
-local recce = ...
-return recce.v.step.result
-END_OF_LUA
-
+                my ($highest_index) = $slr->exec_name( 'stack_top_index' );
                 for my $i ( reverse 0 .. $highest_index ) {
-                    my ($value) = $slr->exec( <<'END_OF_LUA', $i);
-local recce, ix = ...
-return recce:stack[ix+0]
-END_OF_LUA
-
+                    my ($value) = $slr->exec_name( 'stack_get', $i);
                     printf {$trace_file_handle} "Stack position %3d:\n", $i,
                       or Marpa::R3::exception('print to trace handle failed');
                     print {$trace_file_handle} q{ },
@@ -1519,12 +1511,8 @@ END_OF_LUA
                 );
             } ## end if ( not $eval_ok or @warnings )
 
-                my ($highest_index) = $slr->exec( <<'END_OF_LUA', $result);
-local recce, v = ...
-local stack = recce:stack()
-stack[recce.v.step.result] = v
-END_OF_LUA
-
+            my ($highest_index) = $slr->exec_name( 'stack_top_index' );
+            $slr->exec_name( 'stack_set', $highest_index, $result);
             trace_token_evaluation( $slr, $value, $token_id, \$result )
               if $trace_values;
             next STEP;
@@ -1570,13 +1558,8 @@ END_OF_LUA
             else {
                 $result = ${$closure};
             }
-                my ($highest_index) = $slr->exec( <<'END_OF_LUA', $result);
-local recce, v = ...
-local stack = recce:stack()
-stack[recce.v.step.result] = v
-END_OF_LUA
-
-
+            my ($highest_index) = $slr->exec_name( 'stack_top_index' );
+            $slr->exec_name( 'stack_set', $highest_index, $result);
             if ($trace_values) {
                 say {$trace_file_handle}
                   trace_stack_1( $slr, $value, $values, $rule_id )
@@ -1606,12 +1589,7 @@ END_OF_LUA
 
     } ## end STEP: while (1)
 
-                    my ($final_value) = $slr->exec( <<'END_OF_LUA');
-local recce = ...
-local stack = recce:stack()
-return stack[0]
-END_OF_LUA
-
+    my ($final_value) = $slr->exec_name( 'stack_get', 0);
     return \( $final_value );
 
 }
