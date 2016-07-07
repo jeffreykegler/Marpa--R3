@@ -646,6 +646,7 @@ marpa_av_fill (lua_State * L, SV * sv, int x)
 
 static int marpa_av_fill_meth (lua_State* L) {
     /* After development, check not needed */
+    /* I think this call is not used anywhere in the test suite */
     SV** p_table_sv = (SV**)marpa_luaL_checkudata(L, 1, MT_NAME_SV);
     /* warn("%s %d\n", __FILE__, __LINE__); */
     lua_Integer index = marpa_luaL_checkinteger(L, 2);

@@ -147,7 +147,6 @@ The result of the semantics is a Perl undef.
     function op_fn_result_is_undef(recce)
         local stack = recce.v.stack
         stack[recce.v.step.result] = marpa.sv.undef()
-        -- marpa.sv.fill(stack, recce.v.step.result)
         return -1
     end
 
@@ -170,7 +169,6 @@ if not the value is an undef.
         local stack = recce.v.stack
         local result_ix = recce.v.step.result
         stack[result_ix] = current_token_literal(recce)
-        -- marpa.sv.fill(stack, result_ix)
         if recce.trace_values > 0 then
           local top_of_queue = #recce.trace_values_queue;
           recce.trace_values_queue[top_of_queue+1] =
@@ -201,7 +199,6 @@ if not the value is an undef.
             end
             stack[result_ix] = stack[fetch_ix]
         until 1
-        -- marpa.sv.fill(stack, result_ix)
         return -1
     end
 
@@ -232,7 +229,6 @@ the "N of RHS" operation should be used.
         if item_ix > 0 then
             stack[result_ix] = stack[fetch_ix]
         end
-        -- marpa.sv.fill(stack, result_ix)
         return -1
     end
 
@@ -250,7 +246,6 @@ Returns a constant result.
         local stack = recce.v.stack
         local result_ix = recce.v.step.result
         stack[result_ix] = constant
-        -- marpa.sv.fill(stack, result_ix)
         if recce.trace_values > 0 and recce.v.step.type == 'MARPA_STEP_TOKEN' then
             local top_of_queue = #recce.trace_values_queue
             recce.trace_values_queue[top_of_queue+1] =
@@ -487,7 +482,6 @@ is the result of this sequence of operations.
         local stack = recce.v.stack
         local result_ix = recce.v.step.result
         stack[result_ix] = values
-        -- marpa.sv.fill(stack, result_ix)
         return -1
     end
 
