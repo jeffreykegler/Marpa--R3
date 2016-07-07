@@ -2031,10 +2031,6 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV * ref_to_values_av)
                     croak (croak_msg);
                 }
 
-                /* TODO: rather than array size, make return_value a result code.
-                 * That would eliminate any question about whether it fits
-                 * into an int.
-                 */
                 return_value = (int)marpa_lua_tointeger(L, -1);
 
                 marpa_lua_settop (L, base_of_stack);
@@ -4033,7 +4029,13 @@ PPCODE:
           {
               int result = v_do_stack_ops (v_wrapper, ref_to_values_av);
 
-              /* If MARPA_STEP_RULE, truncate stack */
+              /* truncate stack */
+      xlua_sig_call (slr->L,
+        "local recce = ...\n"
+        "local stack = recce.v.stack\n"
+        "local above_top = recce.v.step.result + 1\n"
+        "for i = above_top,#stack do stack[i] = nil end\n",
+      "R", slr->lua_ref);
 
               if (result > 0) {
                   const char *step_type_string = step_type_to_string (step_type);
