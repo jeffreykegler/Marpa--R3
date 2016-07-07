@@ -1461,7 +1461,7 @@ END_OF_LUA
             if ( $trace_values >= 9 ) {
 
                 my ($highest_index) = $slr->exec_name( 'stack_top_index' );
-                for my $i ( reverse 0 .. $highest_index ) {
+                for my $i ( reverse 1 .. $highest_index ) {
                     my ($value) = $slr->exec_name( 'stack_get', $i);
                     printf {$trace_file_handle} "Stack position %3d:\n", $i,
                       or Marpa::R3::exception('print to trace handle failed');
@@ -1589,7 +1589,7 @@ END_OF_LUA
 
     } ## end STEP: while (1)
 
-    my ($final_value) = $slr->exec_name( 'stack_get', 0);
+    my ($final_value) = $slr->exec_name( 'stack_get', 1);
     return \( $final_value );
 
 }

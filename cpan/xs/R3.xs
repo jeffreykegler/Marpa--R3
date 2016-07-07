@@ -835,11 +835,14 @@ xlua_recce_step_meth (lua_State * L)
     marpa_lua_pushstring (L, step_type_to_string (step_type));
     marpa_lua_setfield (L, step_table, "type");
 
+    /* Stack indexes adjusted up by 1, because Lua arrays
+     * are 1-based.
+     */
     switch (step_type) {
     case MARPA_STEP_RULE:
-        marpa_lua_pushinteger (L, marpa_v_result (v));
+        marpa_lua_pushinteger (L, marpa_v_result (v)+1);
         marpa_lua_setfield (L, step_table, "result");
-        marpa_lua_pushinteger (L, marpa_v_arg_n (v));
+        marpa_lua_pushinteger (L, marpa_v_arg_n (v)+1);
         marpa_lua_setfield (L, step_table, "arg_n");
         marpa_lua_pushinteger (L, marpa_v_rule (v));
         marpa_lua_setfield (L, step_table, "rule");
@@ -849,7 +852,7 @@ xlua_recce_step_meth (lua_State * L)
         marpa_lua_setfield (L, step_table, "es_id");
         break;
     case MARPA_STEP_TOKEN:
-        marpa_lua_pushinteger (L, marpa_v_result (v));
+        marpa_lua_pushinteger (L, marpa_v_result (v)+1);
         marpa_lua_setfield (L, step_table, "result");
         marpa_lua_pushinteger (L, marpa_v_token (v));
         marpa_lua_setfield (L, step_table, "symbol");
@@ -861,7 +864,7 @@ xlua_recce_step_meth (lua_State * L)
         marpa_lua_setfield (L, step_table, "es_id");
         break;
     case MARPA_STEP_NULLING_SYMBOL:
-        marpa_lua_pushinteger (L, marpa_v_result (v));
+        marpa_lua_pushinteger (L, marpa_v_result (v)+1);
         marpa_lua_setfield (L, step_table, "result");
         marpa_lua_pushinteger (L, marpa_v_token (v));
         marpa_lua_setfield (L, step_table, "symbol");
