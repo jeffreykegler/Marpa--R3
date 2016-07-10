@@ -97,7 +97,7 @@ It may be useful in debugging.
 
 ```
 
-### VM abend operation
+### VM bail operation
 
 This is to used for development.
 Its intended use is as a dummy argument,
@@ -108,9 +108,8 @@ fast fails with a clear message.
 ```
     -- luatangle: section+ VM operations
 
-    function op_fn_abend (recce)
-        io.stderr:write('executing VM op "abend"')
-        os.exit(false)
+    function op_fn_bail (recce)
+        error('executing VM op "bail"')
     end
 
 ```
@@ -650,7 +649,7 @@ Called when a valuator is set up.
         end
 
         -- we record these values to set the defaults, below
-        local op_abend_key = op_fn_create("abend", op_fn_abend)
+        local op_bail_key = op_fn_create("bail", op_fn_bail)
         local result_is_constant_key = op_fn_create("result_is_constant", op_fn_result_is_constant)
         local result_is_undef_key = op_fn_create("result_is_undef", op_fn_result_is_undef)
         local result_is_token_value_key = op_fn_create("result_is_token_value", op_fn_result_is_token_value)
@@ -676,11 +675,11 @@ Called when a valuator is set up.
         recce.token_semantics = {}
         recce.nulling_semantics = {}
         recce.nulling_semantics.default
-            = marpa.array.from_list(marpa.ops.lua, result_is_undef_key, op_abend_key, 0)
+            = marpa.array.from_list(marpa.ops.lua, result_is_undef_key, op_bail_key, 0)
         recce.token_semantics.default
-            = marpa.array.from_list(marpa.ops.lua, result_is_token_value_key, op_abend_key, 0)
+            = marpa.array.from_list(marpa.ops.lua, result_is_token_value_key, op_bail_key, 0)
         recce.rule_semantics.default
-            = marpa.array.from_list(marpa.ops.lua, result_is_undef_key, op_abend_key, 0)
+            = marpa.array.from_list(marpa.ops.lua, result_is_undef_key, op_bail_key, 0)
         -- print( recce.nulling_semantics.default )
         -- io.stderr:write(string.format("len: %s\n", #(recce.nulling_semantics.default)))
         -- io.stderr:write(string.format("#0: %s\n", recce.nulling_semantics.default[0]))

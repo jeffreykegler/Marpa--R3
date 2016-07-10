@@ -929,8 +929,8 @@ qq{Cannot bless rule when the semantics are "$semantics"},
         my ($op_debug_key) =
           $slr->exec_name( 'get_op_fn_key_by_name', "debug" );
         my ($op_noop_key) = $slr->exec_name( 'get_op_fn_key_by_name', "noop" );
-        my ($op_abend_key) =
-          $slr->exec_name( 'get_op_fn_key_by_name', "abend" );
+        my ($op_bail_key) =
+          $slr->exec_name( 'get_op_fn_key_by_name', "bail" );
         my ($op_bless_key) =
           $slr->exec_name( 'get_op_fn_key_by_name', "bless" );
         my ($op_callback_key) =
@@ -1022,14 +1022,14 @@ qq{Cannot bless rule when the semantics are "$semantics"},
             my @array_fate = ();
           ARRAY_FATE: {
                 if ( defined $closure and ref $closure eq 'CODE' ) {
-                    push @array_fate, $op_lua, $op_callback_key, $op_abend_key;
+                    push @array_fate, $op_lua, $op_callback_key, $op_bail_key;
                     last ARRAY_FATE;
 
                 }
 
                 if ( ( substr $semantics, 0, 1 ) eq '[' ) {
                     push @array_fate, $op_lua, $result_is_array_key,
-                      $op_abend_key;
+                      $op_bail_key;
                     last ARRAY_FATE;
                 }
             } ## end ARRAY_FATE:
@@ -1039,7 +1039,7 @@ qq{Cannot bless rule when the semantics are "$semantics"},
           SET_OPS: {
 
                 if ( $semantics eq '::undef' ) {
-                    @ops = ( $op_lua, $result_is_undef_key, $op_abend_key );
+                    @ops = ( $op_lua, $result_is_undef_key, $op_bail_key );
                     last SET_OPS;
                 }
 
@@ -1070,7 +1070,7 @@ qq{Cannot bless rule when the semantics are "$semantics"},
                         my $thingy = ${$thingy_ref};
                         if ( not defined $thingy ) {
                             @ops =
-                              ( $op_lua, $result_is_undef_key, $op_abend_key );
+                              ( $op_lua, $result_is_undef_key, $op_bail_key );
                             last SET_OPS;
                         }
                         @ops = ( $op_lua, $result_is_constant_key, $thingy_ref );
@@ -1098,7 +1098,7 @@ qq{Cannot bless rule when the semantics are "$semantics"},
 
                 if ( defined $lexeme_id and $semantics eq '::value' ) {
                     @ops =
-                      ( $op_lua, $result_is_token_value_key, $op_abend_key );
+                      ( $op_lua, $result_is_token_value_key, $op_bail_key );
                     last SET_OPS;
                 }
 
@@ -1157,7 +1157,7 @@ qq{    Semantics were specified as "$original_semantics"\n}
                 } ## end PROCESS_SINGLETON_RESULT:
 
                 if ( not @array_fate ) {
-                    @ops = ( $op_lua, $result_is_undef_key, $op_abend_key );
+                    @ops = ( $op_lua, $result_is_undef_key, $op_bail_key );
                     last SET_OPS;
                 }
 
@@ -1181,22 +1181,22 @@ qq{    Semantics were specified as "$original_semantics"\n}
                     $result_descriptor =~ s/^\s*|\s*$//g;
                     if ( $result_descriptor eq 'g1start' ) {
                         push @push_ops, $op_lua, $op_push_g1_start_key,
-                          $op_abend_key;
+                          $op_bail_key;
                         next RESULT_DESCRIPTOR;
                     }
                     if ( $result_descriptor eq 'g1length' ) {
                         push @push_ops, $op_lua, $op_push_g1_length_key,
-                          $op_abend_key;
+                          $op_bail_key;
                         next RESULT_DESCRIPTOR;
                     }
                     if ( $result_descriptor eq 'start' ) {
                         push @push_ops, $op_lua, $op_push_start_key,
-                          $op_abend_key;
+                          $op_bail_key;
                         next RESULT_DESCRIPTOR;
                     }
                     if ( $result_descriptor eq 'length' ) {
                         push @push_ops, $op_lua, $op_push_length_key,
-                          $op_abend_key;
+                          $op_bail_key;
                         next RESULT_DESCRIPTOR;
                     }
 
@@ -1211,7 +1211,7 @@ qq{    Semantics were specified as "$original_semantics"\n}
                             next RESULT_DESCRIPTOR;
                         }
                         push @push_ops, $op_lua, $op_push_undef_key,
-                          $op_abend_key;
+                          $op_bail_key;
                         next RESULT_DESCRIPTOR;
                     } ## end if ( $result_descriptor eq 'lhs' )
 
@@ -1232,7 +1232,7 @@ qq{    Semantics were specified as "$original_semantics"\n}
                             next RESULT_DESCRIPTOR;
                         }
                         push @push_ops, $op_lua, $op_push_undef_key,
-                          $op_abend_key;
+                          $op_bail_key;
                         next RESULT_DESCRIPTOR;
                     } ## end if ( $result_descriptor eq 'name' )
 
@@ -1254,7 +1254,7 @@ qq{    Semantics were specified as "$original_semantics"\n}
                             next RESULT_DESCRIPTOR;
                         }
                         push @push_ops, $op_lua, $op_push_undef_key,
-                          $op_abend_key;
+                          $op_bail_key;
                         next RESULT_DESCRIPTOR;
                     } ## end if ( $result_descriptor eq 'symbol' )
 
@@ -1264,7 +1264,7 @@ qq{    Semantics were specified as "$original_semantics"\n}
                             next RESULT_DESCRIPTOR;
                         }
                         push @push_ops, $op_lua, $op_push_undef_key,
-                          $op_abend_key;
+                          $op_bail_key;
                         next RESULT_DESCRIPTOR;
                     } ## end if ( $result_descriptor eq 'rule' )
                     if (   $result_descriptor eq 'values'
