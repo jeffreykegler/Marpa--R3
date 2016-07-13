@@ -489,6 +489,7 @@ coerce_to_hv (lua_State * L, int visited_ix, int table_ix)
         marpa_lua_call(L, 1, 1);
         key_base = keystr = marpa_lua_tolstring(L, -1, &keylen);
         if (!key_base) {
+           marpa_lua_settop(L, key);
            croak("lua constant could not be converted to key of hv");
         }
         while (1) {
@@ -516,6 +517,87 @@ coerce_to_hv (lua_State * L, int visited_ix, int table_ix)
     SvREFCNT_inc_simple_void_NN (result);
     marpa_lua_settop(L, base_of_stack);
     return result;
+}
+
+/* Called after pcall error -- assumes that "status" is
+ * the non-zero return value of lua_pcall() and that the
+ * error object is on top of the stack.  Does *NOT* clean up
+ * the Lua stack -- since this is an error condition, we assume
+ * the caller is about to do this.
+ */
+static const char* handle_pcall_error (lua_State* L, int status) {
+    dTHX;
+    /* Lua stack: [ exception_object ] */
+    const int exception_object = marpa_lua_gettop(L);
+
+    /* The best way to get a self-expanding sprintf buffer is to use a
+     * Perl SV.  We set it mortal, so that Perl makes sure that it is
+     * garbage collected after the next context switch.  Note 'temp_sv' is not
+     * used in some cases, for which we do not optimize.
+     */
+    SV*temp_sv = sv_newmortal();
+
+    switch (status) {
+    case LUA_ERRERR:
+        return "Internal error: pcall(): error running the message handler";
+    case LUA_ERRMEM:
+        return "Internal error: pcall(): error running the message handler";
+    case LUA_ERRGCMM:
+        return "Internal error: pcall(): error running a gc_ metamethod";
+    default:
+        sv_setpvf(temp_sv, "Internal error: pcall(): bad status %d", status);
+        return SvPV_nolen(temp_sv);
+    case LUA_ERRRUN:
+        break;
+    }
+
+    /* This is in the context of an error, so we have to be careful
+     * about having enough Lua stack.
+     */
+    /* Lua stack: [ exception_object ] */
+    marpa_lua_checkstack(L, 20);
+    marpa_lua_pushvalue(L, exception_object);
+    marpa_lua_setglobal(L, "last_exception");
+    /* Lua stack: [ exception_object ] */
+
+    /* This is probably more efficient, but the real object is to avoid
+     * handling the errors from one lua_pcall() by using a 2nd lua_pcall()
+     */
+    if (marpa_lua_isstring(L, exception_object)) {
+        const char *lua_exception_string = marpa_lua_tostring(L, exception_object);
+        sv_setpvf(temp_sv, "%s", lua_exception_string);
+        return SvPV_nolen(temp_sv);
+    }
+
+    /* 
+     * At this point we know that the first pcall() failed due
+     * to a runtime error, so that another more limited use of pcall() should be
+     * safe.
+     */
+    marpa_lua_getglobal(L, "tostring");
+    marpa_lua_pushvalue(L, exception_object);
+    status = marpa_lua_pcall(L, 1, 1, 0);
+    switch (status) {
+    case LUA_ERRERR:
+        return "Internal error: pcall(tostring): error running the message handler";
+    case LUA_ERRMEM:
+        return "Internal error: pcall(tostring): memory allocation error";
+    case LUA_ERRGCMM:
+        return "Internal error: pcall(tostring): error running a gc_ metamethod";
+    default:
+        sv_setpvf(temp_sv, "Internal error: pcall(tostring): bad status %d", status);
+        return SvPV_nolen(temp_sv);
+    case LUA_ERRRUN:
+        sv_setpvf(temp_sv, "pcall(tostring) %s", marpa_lua_tostring(L, -1));
+        return SvPV_nolen(temp_sv);
+    case 0:
+        break;
+    }
+
+    /* Lua stack: [ exception_object, tostring(exception_object) ] */
+    sv_setpvf(temp_sv, "%s", marpa_lua_tostring(L, -1));
+    return SvPV_nolen(temp_sv);
+    /* We return *WITHOUT* cleaning up the Lua stack */
 }
 
 /* Push a Perl value onto the Lua stack. */
@@ -1370,13 +1452,9 @@ xlua_sig_call (lua_State * L, const char *codestr, const char *sig, ...)
     /* warn("%s %d", __FILE__, __LINE__); */
     status = marpa_lua_pcall (L, narg, nres, 0);
     if (status != 0) {
-        const char *error_string = marpa_lua_tostring (L, -1);
-        /* error_string must be copied before it is exposed to Lua GC */
-        const char *croak_msg =
-            form ("Internal error: xlua_sig_call code error: %s",
-            error_string);
+        const char *exception_string = handle_pcall_error(L, status);
         marpa_lua_settop (L, base_of_stack);
-        croak (croak_msg);
+        croak(exception_string);
     }
 
     for (nres = -nres; *sig; nres++) {
@@ -2136,13 +2214,9 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV * ref_to_values_av)
                 status = marpa_lua_pcall (L, 2, 1, 0);
 
                 if (status != 0) {
-                    const char *error_string = marpa_lua_tostring (L, -1);
-                    /* error_string must be copied before it is exposed to Lua GC */
-                    const char *croak_msg =
-                        form ("Marpa::R3 Lua code error: %s",
-                        error_string);
+                    const char *exception_string = handle_pcall_error(L, status);
                     marpa_lua_settop (L, base_of_stack);
-                    croak (croak_msg);
+                    croak(exception_string);
                 }
 
                 return_value = (int)marpa_lua_tointeger(L, -1);
