@@ -2206,20 +2206,32 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV * ref_to_values_av)
                 marpa_lua_rawgeti (L, -1, fn_key);
                 /* [ recce_table, function ] */
 
+                xlua_sig_call (slr->L,
+                "local recce, fn_key, arg = ...\n"
+                "-- print('fn_key,ref(fn_key)', fn_key, recce[fn_key])\n"
+                "op_fn = recce[fn_key]\n"
+                "result = op_fn(recce, arg)\n"
+                "return result\n",
+                "Rii>i",
+                slr->lua_ref, fn_key, lua_op_arg, &return_value
+                );
+
                 /* warn ("Executing MARPA_OP_LUA, fn_key = %d", fn_key); */
 
                 /* The recce table itself is the first argument */
-                marpa_lua_pushvalue (L, -2);
-                marpa_lua_pushinteger (L, (lua_Integer)lua_op_arg);
-                status = marpa_lua_pcall (L, 2, 1, 0);
+                /*
+                 * marpa_lua_pushvalue (L, -2);
+                 * marpa_lua_pushinteger (L, (lua_Integer)lua_op_arg);
+                 * status = marpa_lua_pcall (L, 2, 1, 0);
 
-                if (status != 0) {
-                    const char *exception_string = handle_pcall_error(L, status);
-                    marpa_lua_settop (L, base_of_stack);
-                    croak(exception_string);
-                }
+                 * if (status != 0) {
+                     * const char *exception_string = handle_pcall_error(L, status);
+                     * marpa_lua_settop (L, base_of_stack);
+                     * croak(exception_string);
+                 * }
 
-                return_value = (int)marpa_lua_tointeger(L, -1);
+                 * return_value = (int)marpa_lua_tointeger(L, -1);
+                 */
 
                 marpa_lua_settop (L, base_of_stack);
                 if (return_value >= -1) return return_value;
