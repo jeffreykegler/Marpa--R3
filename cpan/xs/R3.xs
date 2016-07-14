@@ -2181,9 +2181,7 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV * ref_to_values_av)
         case MARPA_OP_LUA:
 
             {
-                int status;
                 int return_value;
-                int base_of_stack = marpa_lua_gettop (L);
                 const UV fn_key = ops[op_ix++];
                 const UV lua_op_arg = ops[op_ix++];
 
@@ -2202,7 +2200,6 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV * ref_to_values_av)
                 slr->lua_ref, (int)fn_key, (int)lua_op_arg, &return_value
                     );
 
-                marpa_lua_settop (L, base_of_stack);
                 if (return_value >= -1) return return_value;
                 goto NEXT_OP_CODE;
             }
