@@ -445,7 +445,6 @@ struct v_wrapper_s
   AV *values; /* for values accumulated by a semantic 'step' */
   IV trace_values;
   int mode;                     /* 'raw' or 'stack' */
-  int result;                   /* stack location to which to write result */
   AV *constants;
   Scanless_R* slr;
 };

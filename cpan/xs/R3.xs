@@ -2049,16 +2049,10 @@ static int
 v_do_stack_ops (V_Wrapper * v_wrapper, SV * ref_to_values_av)
 {
     dTHX;
-    const Marpa_Value v = v_wrapper->v;
     Scanless_R *const slr = v_wrapper->slr;
-    const Marpa_Step_Type step_type = marpa_v_step_type (v);
-    UV result_ix = (UV) marpa_v_result (v);
     int return_value;
 
-    lua_State *const L = slr->L;
-
     v_wrapper->values = (AV *) SvRV (ref_to_values_av);
-    v_wrapper->result = (int) result_ix;
 
     xlua_sig_call (slr->L,
         "local recce = ...\n"
@@ -2074,12 +2068,10 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV * ref_to_values_av)
         "-- io.stderr:write('Rule ops: ', inspect(ops), '\\n')\n"
         "end\n"
         "if recce.v.step.type == 'MARPA_STEP_TOKEN' then\n"
-        "-- io.stderr:write(string.format('Token semantics: %s', inspect(recce.token_semantics)))\n"
         "    ops = recce.token_semantics[recce.v.step.symbol]\n"
         "    if not ops then\n"
         "        ops = recce.token_semantics.default\n"
         "    end\n"
-        "-- io.stderr:write('Token ops: ', inspect(ops), '\\n')\n"
         "end\n"
         "if recce.v.step.type == 'MARPA_STEP_NULLING_SYMBOL' then\n"
         "    ops = recce.nulling_semantics[recce.v.step.symbol]\n"
@@ -3794,7 +3786,6 @@ PPCODE:
   v_wrapper->base = t_wrapper->base;
   v_wrapper->v = v;
   v_wrapper->mode = MARPA_XS_V_MODE_IS_INITIAL;
-  v_wrapper->result = 0;
 
   v_wrapper->constants = newAV ();
   /* Reserve position 0 */
