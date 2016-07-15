@@ -2053,7 +2053,6 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV * ref_to_values_av)
     Scanless_R *const slr = v_wrapper->slr;
     const Marpa_Step_Type step_type = marpa_v_step_type (v);
     UV result_ix = (UV) marpa_v_result (v);
-    UV *ops = NULL;
     int return_value;
 
     /* Initializations are to silence GCC warnings --
@@ -2074,46 +2073,6 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV * ref_to_values_av)
     v_wrapper->result = (int) result_ix;
     /* warn("%s %d", __FILE__, __LINE__); */
 
-    switch (step_type) {
-        STRLEN dummy;
-    case MARPA_STEP_RULE:
-        {
-            SV **p_ops_sv =
-                av_fetch (v_wrapper->rule_semantics, marpa_v_rule (v), 0);
-            /* warn("%s %d", __FILE__, __LINE__); */
-            if (p_ops_sv) {
-                /* warn("%s %d", __FILE__, __LINE__); */
-                ops = (UV *) SvPV (*p_ops_sv, dummy);
-            }
-        }
-        break;
-    case MARPA_STEP_TOKEN:
-        {
-            SV **p_ops_sv =
-                av_fetch (v_wrapper->token_semantics, marpa_v_token (v),
-                0);
-            /* warn("%s %d", __FILE__, __LINE__); */
-            if (p_ops_sv) {
-                /* warn("%s %d", __FILE__, __LINE__); */
-                ops = (UV *) SvPV (*p_ops_sv, dummy);
-            }
-        }
-        break;
-    case MARPA_STEP_NULLING_SYMBOL:
-        {
-            SV **p_ops_sv =
-                av_fetch (v_wrapper->nulling_semantics, marpa_v_token (v),
-                0);
-            /* warn("%s %d", __FILE__, __LINE__); */
-            if (p_ops_sv) {
-                /* warn("%s %d", __FILE__, __LINE__); */
-                ops = (UV *) SvPV (*p_ops_sv, dummy);
-            }
-        }
-        break;
-    default:
-        croak ("Internal error: unknown step type %d", step_type);
-    }
 
 {
     int lua_ops_defined;
@@ -2147,22 +2106,6 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV * ref_to_values_av)
         "-- io.stderr:write('No ops defined for ', recce.v.step.type, '\\n')\n"
         "recce.v.step.ops = {}\n"
         "return 0\n", "R>i", slr->lua_ref, &lua_ops_defined);
-    if (!lua_ops_defined) {
-        int op_ix = 0;
-        while (1) {
-            UV op0 = ops[op_ix++];
-            UV op1 = ops[op_ix++];
-            UV op2 = ops[op_ix++];
-            xlua_sig_call (slr->L,
-                "local recce, op0, op1, op2 = ...\n"
-                "ops = recce.v.step.ops\n"
-                "ops[#ops+1] = op0\n"
-                "ops[#ops+1] = op1\n"
-                "ops[#ops+1] = op2\n"
-                , "Riii", slr->lua_ref, (int)op0, (int)op1, (int)op2);
-            if (!op0) break;
-        }
-    }
 }
 
 xlua_sig_call (slr->L,
