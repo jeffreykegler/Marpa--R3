@@ -2209,21 +2209,6 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV * ref_to_values_av)
     while (1) {
         UV op_code = ops[op_ix];
 
-        xlua_sig_call (slr->L,
-            "local recce = ...;\n"
-            "local op_name = 'unknown'\n"
-            "if recce.trace_values >= 3 then\n"
-            "  local top_of_queue = #recce.trace_values_queue;\n"
-            "if op_code ~= op_lua then\n"
-            "   op_name = 'lua'\n"
-            "end\n"
-            "  recce.trace_values_queue[top_of_queue+1] = {'starting op', recce.v.step.type, op_name};\n"
-            "  -- io.stderr:write('starting op: ', inspect(recce))\n"
-            "end\n",
-            "R",
-            slr->lua_ref
-            );
-
         switch (op_code) {
 
         case 0:
@@ -2237,12 +2222,13 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV * ref_to_values_av)
                 xlua_sig_call (slr->L,
                     "local recce, op_ix = ...;\n"
                     "local op_code = recce.v.step.ops[op_ix]\n"
-                    "-- io.stderr:write('op_code: ', inspect(op_code), '\\n')\n"
-                    "-- io.stderr:write('op_lua: ', inspect(op_lua), '\\n')\n"
                     "if op_code == 0 then return -1 end\n"
                     "if op_code ~= op_lua then\n"
                     "    error(string.format('unknown op code in do_semantic_ops: %d', op_code))\n"
                     "end\n"
+                    "local op_name = 'lua'\n"
+                    "-- io.stderr:write('op_code: ', inspect(op_code), '\\n')\n"
+                    "-- io.stderr:write('op_lua: ', inspect(op_lua), '\\n')\n"
                     "local fn_key = recce.v.step.ops[op_ix+1]\n"
                     "-- io.stderr:write('ops: ', inspect(recce.v.step.ops), '\\n')\n"
                     "-- io.stderr:write('fn_key: ', inspect(fn_key), '\\n')\n"
@@ -2250,6 +2236,8 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV * ref_to_values_av)
                     "local arg = recce.v.step.ops[op_ix+2]\n"
                     "-- io.stderr:write('arg: ', inspect(arg), '\\n')\n"
                     "if recce.trace_values >= 3 then\n"
+            "  local top_of_queue = #recce.trace_values_queue;\n"
+            "  recce.trace_values_queue[top_of_queue+1] = {'starting op', recce.v.step.type, op_name};\n"
                     "  local top_of_queue = #recce.trace_values_queue;\n"
                     "  local tag = 'starting lua op'\n"
                     "  recce.trace_values_queue[top_of_queue+1] = {tag, recce.v.step.type, recce.op_fn_key[fn_key]};\n"
