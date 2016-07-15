@@ -2183,6 +2183,12 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV * ref_to_values_av)
     int lua_ops_defined;
     xlua_sig_call (slr->L,
         "local recce = ...;\n"
+        "if recce.v.step.type ~= 'MARPA_STEP_RULE' then\n"
+        "    recce.v.step.ops = recce.rule_semantics[recce.v.step.rule]\n"
+        "    if recce.v.step.ops then\n"
+        "        recce.v.step.ops = recce.rule_semantics.default\n"
+        "    end\n"
+        "end\n"
         "if recce.v.step.ops then return 1 end\n"
         "recce.v.step.ops = {}\n"
         "return 0\n", "R>i", slr->lua_ref, &lua_ops_defined);

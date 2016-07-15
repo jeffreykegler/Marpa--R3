@@ -1408,14 +1408,17 @@ qq{    Semantics were specified as "$original_semantics"\n}
         } ## end OP: for my $raw_op (@raw_ops)
         if ( $type eq 'token' ) {
             $value->token_register( $id, @ops );
+            $slr->exec_name( 'token_register', $id, @ops);
             next REGISTRATION;
         }
         if ( $type eq 'nulling' ) {
             $value->nulling_symbol_register( $id, @ops );
+            $slr->exec_name( 'nulling_register', $id, @ops);
             next REGISTRATION;
         }
         if ( $type eq 'rule' ) {
             $value->rule_register( $id, @ops );
+            $slr->exec_name( 'rule_register', $id, @ops);
             next REGISTRATION;
         }
         Marpa::R3::exception(

@@ -597,6 +597,54 @@ Register a constant, returning its key.
 
 ```
 
+#### Register semantics for a token
+
+Register the semantic operations, `ops`, for the token
+whose id is `id`.
+
+```
+    -- luatangle: section+ Utilities for Perl code
+    function token_register(...)
+        local recce, id = ...
+        local ops = table.unpack{{...}, 3}
+        recce.token_semantics[id] = ops
+    end
+
+```
+
+#### Register semantics for a nulling symbol
+
+Register the semantic operations, `ops`, for the nulling symbol
+whose id is `id`.
+
+```
+    -- luatangle: section+ Utilities for Perl code
+    function nulling_register(...)
+        local recce, id = ...
+        local ops = table.unpack{{...}, 3}
+        recce.nulling_semantics[id] = ops
+    end
+
+```
+
+#### Register semantics for a rule
+
+Register the semantic operations, `ops`, for the rule
+whose id is `id`.
+
+```
+    -- luatangle: section+ Utilities for Perl code
+    function rule_register(...)
+        -- io.stderr:write('args: ', inspect(args), '\n')
+        local recce, id = ...
+        local ops = table.unpack{{...}, 3}
+        -- io.stderr:write('recce: ', inspect(recce), '\n')
+        -- io.stderr:write('recce.rule_semantics: ', inspect(recce.rule_semantics), '\n')
+        recce.rule_semantics[id] = ops
+    end
+
+```
+
 #### Return the top index of the stack
 
 ```
@@ -707,6 +755,7 @@ Called when a valuator is set up.
         op_fn_create("push_undef", op_fn_push_undef)
         op_fn_create("push_values", op_fn_push_values)
 
+        -- io.stderr:write('Initializing rule semantics to {}\n')
         recce.rule_semantics = {}
         recce.token_semantics = {}
         recce.nulling_semantics = {}
@@ -747,6 +796,7 @@ A function to be called whenever a valuator is reset.
 
     function value_reset(recce)
         recce.op_fn_key = nil
+        -- io.stderr:write('Initializing rule semantics to nil\n')
         recce.rule_semantics = nil
         recce.token_semantics = nil
         recce.nulling_semantics = nil
