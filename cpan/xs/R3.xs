@@ -2115,70 +2115,6 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV * ref_to_values_av)
         croak ("Internal error: unknown step type %d", step_type);
     }
 
-    if (!ops && step_type == MARPA_STEP_NULLING_SYMBOL) {
-        int base_of_stack;
-        Xlua_Array *ops_ud;
-        /* warn("%s %d", __FILE__, __LINE__); */
-
-        switch (step_type) {
-        case MARPA_STEP_RULE:
-            /* warn("%s %d", __FILE__, __LINE__); */
-            semantics_table = "rule_semantics";
-            semantics_type = "rule";
-            semantics_ix = marpa_v_rule (v);
-            break;
-        case MARPA_STEP_TOKEN:
-            /* warn("%s %d", __FILE__, __LINE__); */
-            semantics_table = "token_semantics";
-            semantics_type = "token";
-            semantics_ix = marpa_v_token (v);
-            break;
-        case MARPA_STEP_NULLING_SYMBOL:
-            /* warn("%s %d", __FILE__, __LINE__); */
-            semantics_table = "nulling_semantics";
-            semantics_type = "nulling symbol";
-            semantics_ix = marpa_v_token (v);
-            break;
-        default:
-            /* warn("%s %d", __FILE__, __LINE__); */
-            /* Never reached -- turns off warning about uninitialized ops */
-            ops = NULL;
-        }
-
-        /* warn("%s %d", __FILE__, __LINE__); */
-        base_of_stack = marpa_lua_gettop (L);
-        /* Lua stack: [] */
-        marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, slr->lua_ref);
-        /* Lua stack: [ recce_table ] */
-        /* warn("%s %d", __FILE__, __LINE__); */
-        /* Lua stack: [ recce_table, ] */
-        marpa_lua_getfield (L, -1, semantics_table);
-        /* warn("%s %d", __FILE__, __LINE__); */
-        /* Lua stack: [ recce_table, semantics_table ] */
-        marpa_lua_geti (L, -1, semantics_ix);
-        /* warn("%s %d", __FILE__, __LINE__); */
-        /* Lua stack: [ recce_table, semantics_table, ops_ud ] */
-        ops_ud = (struct Xlua_Array *) marpa_lua_touserdata (L, -1);
-        /* warn("%s %d", __FILE__, __LINE__); */
-        if (!ops_ud) {
-            marpa_lua_pop (L, 1);
-            /* warn("Default for %s semantics kicking in", semantics_type); */
-            marpa_lua_getfield (L, -1, "old_default");
-            /* warn("%s %d", __FILE__, __LINE__); */
-            /* Lua stack: [ recce_table, semantics_table, ops_ud ] */
-            ops_ud = (Xlua_Array *) marpa_lua_touserdata (L, -1);
-        }
-        if (!ops_ud) {
-            croak
-                ("Problem in v->stack_step: %s %d is not registered",
-                semantics_type, semantics_ix);
-        }
-        /* warn("%s %d", __FILE__, __LINE__); */
-        ops = (UV *) ops_ud->array;
-        marpa_lua_settop (L, base_of_stack);
-    }
-
-
 {
     int lua_ops_defined;
     xlua_sig_call (slr->L,
@@ -2200,6 +2136,12 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV * ref_to_values_av)
         "        recce.v.step.ops = recce.token_semantics.default\n"
         "    end\n"
         "-- io.stderr:write('Token ops: ', inspect(recce.v.step.ops), '\\n')\n"
+        "end\n"
+        "if recce.v.step.type == 'MARPA_STEP_NULLING_SYMBOL' then\n"
+        "    recce.v.step.ops = recce.nulling_semantics[recce.v.step.symbol]\n"
+        "    if not recce.v.step.ops then\n"
+        "        recce.v.step.ops = recce.nulling_semantics.default\n"
+        "    end\n"
         "end\n"
         "if recce.v.step.ops then return 1 end\n"
         "-- io.stderr:write('No ops defined for ', recce.v.step.type, '\\n')\n"
