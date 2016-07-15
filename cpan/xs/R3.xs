@@ -2207,36 +2207,7 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV * ref_to_values_av)
 xlua_sig_call (slr->L,
     "local recce = ...\n"
     "local ops = recce.v.step.ops\n"
-    "local op_ix = 1\n"
-    "while op_ix <= #ops do\n"
-    "local op_code = ops[op_ix]\n"
-    "if op_code == 0 then return -1 end\n"
-    "if op_code ~= op_lua then\n"
-    "    error(string.format('unknown op code in do_semantic_ops: %d', op_code))\n"
-    "end\n"
-    "local op_name = 'lua'\n"
-    "-- io.stderr:write('op_code: ', inspect(op_code), '\\n')\n"
-    "-- io.stderr:write('op_lua: ', inspect(op_lua), '\\n')\n"
-    "local fn_key = ops[op_ix+1]\n"
-    "-- io.stderr:write('ops: ', inspect(ops), '\\n')\n"
-    "-- io.stderr:write('fn_key: ', inspect(fn_key), '\\n')\n"
-    "-- io.stderr:write('fn name: ', recce.op_fn_key[fn_key], '\\n')\n"
-    "local arg = ops[op_ix+2]\n"
-    "-- io.stderr:write('arg: ', inspect(arg), '\\n')\n"
-    "if recce.trace_values >= 3 then\n"
-    "  local top_of_queue = #recce.trace_values_queue;\n"
-    "  recce.trace_values_queue[top_of_queue+1] = {'starting op', recce.v.step.type, op_name};\n"
-    "  local top_of_queue = #recce.trace_values_queue;\n"
-    "  local tag = 'starting lua op'\n"
-    "  recce.trace_values_queue[top_of_queue+1] = {tag, recce.v.step.type, recce.op_fn_key[fn_key]};\n"
-    "  -- io.stderr:write('starting op: ', inspect(recce))\n"
-    "end\n"
-    "op_fn = recce[fn_key]\n"
-    "result = op_fn(recce, arg)\n"
-    "if result >= -1 then return result end\n"
-    "op_ix = op_ix + 3\n"
-    "end\n"
-    "return -1\n",
+    "return do_ops(recce, ops)\n",
     "R>i", slr->lua_ref, &return_value);
 
 return return_value;

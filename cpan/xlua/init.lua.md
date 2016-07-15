@@ -519,6 +519,42 @@ implementation, which returned the size of the
 
 ```
 
+### Run the virtual machine
+
+```
+    -- luatangle: section+ VM operations
+    function do_ops(recce, ops)
+        local op_ix = 1
+        while op_ix <= #ops do
+            local op_code = ops[op_ix]
+            if op_code == 0 then return -1 end
+            if op_code ~= op_lua then
+                error(string.format('unknown op code in do_semantic_ops: %d', op_code))
+            end
+            -- io.stderr:write('op_code: ', inspect(op_code), '\\n')
+            -- io.stderr:write('op_lua: ', inspect(op_lua), '\\n')
+            local fn_key = ops[op_ix+1]
+            -- io.stderr:write('ops: ', inspect(ops), '\\n')
+            -- io.stderr:write('fn_key: ', inspect(fn_key), '\\n')
+            -- io.stderr:write('fn name: ', recce.op_fn_key[fn_key], '\\n')
+            local arg = ops[op_ix+2]
+            -- io.stderr:write('arg: ', inspect(arg), '\\n')
+            if recce.trace_values >= 3 then
+              local top_of_queue = #recce.trace_values_queue
+              local tag = 'starting lua op'
+              recce.trace_values_queue[top_of_queue+1] = {'starting op', recce.v.step.type, 'lua'}
+              recce.trace_values_queue[top_of_queue+2] = {tag, recce.v.step.type, recce.op_fn_key[fn_key]}
+              -- io.stderr:write('starting op: ', inspect(recce))
+            end
+            op_fn = recce[fn_key]
+            result = op_fn(recce, arg)
+            if result >= -1 then return result end
+            op_ix = op_ix + 3
+            end
+        return -1
+    end
+
+```
 ### Operations for use in the Perl code
 
 The following operations are used by the higher-level Perl code
