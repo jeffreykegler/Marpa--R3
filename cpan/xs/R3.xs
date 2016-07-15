@@ -2163,7 +2163,7 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV * ref_to_values_av)
         if (!ops_ud) {
             marpa_lua_pop (L, 1);
             /* warn("Default for %s semantics kicking in", semantics_type); */
-            marpa_lua_getfield (L, -1, "default");
+            marpa_lua_getfield (L, -1, "old_default");
             /* warn("%s %d", __FILE__, __LINE__); */
             /* Lua stack: [ recce_table, semantics_table, ops_ud ] */
             ops_ud = (Xlua_Array *) marpa_lua_touserdata (L, -1);

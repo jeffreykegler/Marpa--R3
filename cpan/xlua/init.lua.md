@@ -710,16 +710,16 @@ Called when a valuator is set up.
         recce.rule_semantics = {}
         recce.token_semantics = {}
         recce.nulling_semantics = {}
-        recce.nulling_semantics.default
+        recce.nulling_semantics.old_default
             = marpa.array.from_list(marpa.ops.lua, result_is_undef_key, op_bail_key, 0)
-        recce.token_semantics.default
+        recce.token_semantics.old_default
             = marpa.array.from_list(marpa.ops.lua, result_is_token_value_key, op_bail_key, 0)
-        recce.rule_semantics.default
+        recce.rule_semantics.old_default
             = marpa.array.from_list(marpa.ops.lua, result_is_undef_key, op_bail_key, 0)
-        -- print( recce.nulling_semantics.default )
-        -- io.stderr:write(string.format("len: %s\n", #(recce.nulling_semantics.default)))
-        -- io.stderr:write(string.format("#0: %s\n", recce.nulling_semantics.default[0]))
-        -- io.stderr:write(string.format("#1: %s\n", recce.nulling_semantics.default[1]))
+
+        recce.nulling_semantics.default = { marpa.ops.lua, result_is_undef_key, op_bail_key }
+        recce.token_semantics.default = { marpa.ops.lua, result_is_token_value_key, op_bail_key }
+        recce.rule_semantics.default = { marpa.ops.lua, result_is_undef_key, op_bail_key }
 
         recce.trace_values = trace_values + 0;
         recce.trace_values_queue = {};
