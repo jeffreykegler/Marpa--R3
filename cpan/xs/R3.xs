@@ -2043,48 +2043,6 @@ u_substring (Scanless_R * slr, const char *name, int start_pos_arg,
   return u_pos_span_to_literal_sv (slr, start_pos, substring_length);
 }
 
-/* Static valuator methods */
-
-static int
-v_do_stack_ops (V_Wrapper * v_wrapper, SV * ref_to_values_av)
-{
-    dTHX;
-    Scanless_R *const slr = v_wrapper->slr;
-    int return_value;
-
-    xlua_sig_call (slr->L,
-        "local recce = ...\n"
-        "local ops = {}\n"
-        "if recce.v.step.type == 'MARPA_STEP_RULE' then\n"
-        "-- io.stderr:write(string.format('Rule semantics: %s', inspect(recce.rule_semantics)))\n"
-        "-- io.stderr:write(string.format('Rule semantics for %d: %s', recce.v.step.rule, inspect(recce.rule_semantics[recce.v.step.rule])))\n"
-        "    ops = recce.rule_semantics[recce.v.step.rule]\n"
-        "    if not ops then\n"
-        "-- io.stderr:write('Using default rule ops\\n')\n"
-        "        ops = recce.rule_semantics.default\n"
-        "    end\n"
-        "-- io.stderr:write('Rule ops: ', inspect(ops), '\\n')\n"
-        "end\n"
-        "if recce.v.step.type == 'MARPA_STEP_TOKEN' then\n"
-        "    ops = recce.token_semantics[recce.v.step.symbol]\n"
-        "    if not ops then\n"
-        "        ops = recce.token_semantics.default\n"
-        "    end\n"
-        "end\n"
-        "if recce.v.step.type == 'MARPA_STEP_NULLING_SYMBOL' then\n"
-        "    ops = recce.nulling_semantics[recce.v.step.symbol]\n"
-        "    if not ops then\n"
-        "        ops = recce.nulling_semantics.default\n"
-        "    end\n"
-        "end\n"
-        "if not ops then\n"
-        "    error(string.format('No semantics defined for %s', recce.v.step.type))\n"
-        "end\n"
-        "return do_ops(recce, ops)\n", "R>i", slr->lua_ref, &return_value);
-
-    return return_value;
-}
-
 /* Static SLG methods */
 
 #define SET_SLG_FROM_SLG_SV(slg, slg_sv) { \
@@ -3931,6 +3889,7 @@ PPCODE:
 
   while (1)
     {
+      int result;
       int step_type;
       AV *values_av = newAV ();
       SV *ref_to_values_av = sv_2mortal (newRV_noinc ((SV *) values_av));
@@ -3949,7 +3908,36 @@ PPCODE:
         case MARPA_STEP_NULLING_SYMBOL:
         case MARPA_STEP_TOKEN:
           {
-              int result = v_do_stack_ops (v_wrapper, ref_to_values_av);
+
+    xlua_sig_call (slr->L,
+        "local recce = ...\n"
+        "local ops = {}\n"
+        "if recce.v.step.type == 'MARPA_STEP_RULE' then\n"
+        "-- io.stderr:write(string.format('Rule semantics: %s', inspect(recce.rule_semantics)))\n"
+        "-- io.stderr:write(string.format('Rule semantics for %d: %s', recce.v.step.rule, inspect(recce.rule_semantics[recce.v.step.rule])))\n"
+        "    ops = recce.rule_semantics[recce.v.step.rule]\n"
+        "    if not ops then\n"
+        "-- io.stderr:write('Using default rule ops\\n')\n"
+        "        ops = recce.rule_semantics.default\n"
+        "    end\n"
+        "-- io.stderr:write('Rule ops: ', inspect(ops), '\\n')\n"
+        "end\n"
+        "if recce.v.step.type == 'MARPA_STEP_TOKEN' then\n"
+        "    ops = recce.token_semantics[recce.v.step.symbol]\n"
+        "    if not ops then\n"
+        "        ops = recce.token_semantics.default\n"
+        "    end\n"
+        "end\n"
+        "if recce.v.step.type == 'MARPA_STEP_NULLING_SYMBOL' then\n"
+        "    ops = recce.nulling_semantics[recce.v.step.symbol]\n"
+        "    if not ops then\n"
+        "        ops = recce.nulling_semantics.default\n"
+        "    end\n"
+        "end\n"
+        "if not ops then\n"
+        "    error(string.format('No semantics defined for %s', recce.v.step.type))\n"
+        "end\n"
+        "return do_ops(recce, ops)\n", "R>i", slr->lua_ref, &result);
 
               /* truncate stack */
       xlua_sig_call (slr->L,
