@@ -2158,6 +2158,29 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV * ref_to_values_av)
         marpa_lua_settop (L, base_of_stack);
     }
 
+
+{
+    int lua_ops_defined;
+    xlua_sig_call (slr->L,
+        "local recce = ...;\n"
+        "if recce.v.step.ops then return 1 end\n"
+        "recce.v.step.ops = {}\n"
+        "return 0\n", "R>i", slr->lua_ref, &lua_ops_defined);
+    if (!lua_ops_defined) {
+        int op_ix = 0;
+        while (1) {
+            UV op = ops[op_ix];
+            if (!op) break;
+            xlua_sig_call (slr->L,
+                "local recce, op = ...\n"
+                "ops = recce.v.step.ops\n"
+                "ops[#ops+1] = op\n", "Ri", slr->lua_ref, (int)op);
+            op_ix++;
+        }
+    }
+}
+
+
     op_ix = 0;
     while (1) {
         UV op_code = ops[op_ix++];
