@@ -2115,7 +2115,7 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV * ref_to_values_av)
         croak ("Internal error: unknown step type %d", step_type);
     }
 
-    if (!ops && step_type != MARPA_STEP_RULE) {
+    if (!ops && step_type == MARPA_STEP_NULLING_SYMBOL) {
         int base_of_stack;
         Xlua_Array *ops_ud;
         /* warn("%s %d", __FILE__, __LINE__); */
@@ -2192,6 +2192,14 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV * ref_to_values_av)
         "        recce.v.step.ops = recce.rule_semantics.default\n"
         "    end\n"
         "-- io.stderr:write('Rule ops: ', inspect(recce.v.step.ops), '\\n')\n"
+        "end\n"
+        "if recce.v.step.type == 'MARPA_STEP_TOKEN' then\n"
+        "-- io.stderr:write(string.format('Token semantics: %s', inspect(recce.token_semantics)))\n"
+        "    recce.v.step.ops = recce.token_semantics[recce.v.step.symbol]\n"
+        "    if not recce.v.step.ops then\n"
+        "        recce.v.step.ops = recce.token_semantics.default\n"
+        "    end\n"
+        "-- io.stderr:write('Token ops: ', inspect(recce.v.step.ops), '\\n')\n"
         "end\n"
         "if recce.v.step.ops then return 1 end\n"
         "-- io.stderr:write('No ops defined for ', recce.v.step.type, '\\n')\n"

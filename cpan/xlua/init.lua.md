@@ -605,13 +605,14 @@ whose id is `id`.
 ```
     -- luatangle: section+ Utilities for Perl code
     function token_register(...)
-        local recce, id = ...
+        local args = {...}
+        local recce = args[1]
+        local id = args[2]+0
         local ops = {}
-        local raw_ops = table.unpack{{...}, 3}
-        for ix = 3, #raw_ops do
-            ops[#ops+1] = raw_ops[ix]
+        for ix = 3, #args do
+            ops[#ops+1] = args[ix]+0
         end
-        recce.token_semantics[id+0] = ops
+        recce.token_semantics[id] = ops
     end
 
 ```
@@ -624,9 +625,14 @@ whose id is `id`.
 ```
     -- luatangle: section+ Utilities for Perl code
     function nulling_register(...)
-        local recce, id = ...
-        local ops = table.unpack{{...}, 3}
-        recce.nulling_semantics[id+0] = ops
+        local args = {...}
+        local recce = args[1]
+        local id = args[2]+0
+        local ops = {}
+        for ix = 3, #args do
+            ops[#ops+1] = args[ix]+0
+        end
+        recce.nulling_semantics[id] = ops
     end
 
 ```
