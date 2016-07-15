@@ -2210,8 +2210,9 @@ while (1) {
     int return_value;
 
     xlua_sig_call (slr->L,
-        "local recce, op_ix = ...;\n"
-        "local op_code = recce.v.step.ops[op_ix]\n"
+        "local recce, op_ix = ...\n"
+        "local ops = recce.v.step.ops\n"
+        "local op_code = ops[op_ix]\n"
         "if op_code == 0 then return -1 end\n"
         "if op_code ~= op_lua then\n"
         "    error(string.format('unknown op code in do_semantic_ops: %d', op_code))\n"
@@ -2219,11 +2220,11 @@ while (1) {
         "local op_name = 'lua'\n"
         "-- io.stderr:write('op_code: ', inspect(op_code), '\\n')\n"
         "-- io.stderr:write('op_lua: ', inspect(op_lua), '\\n')\n"
-        "local fn_key = recce.v.step.ops[op_ix+1]\n"
-        "-- io.stderr:write('ops: ', inspect(recce.v.step.ops), '\\n')\n"
+        "local fn_key = ops[op_ix+1]\n"
+        "-- io.stderr:write('ops: ', inspect(ops), '\\n')\n"
         "-- io.stderr:write('fn_key: ', inspect(fn_key), '\\n')\n"
         "-- io.stderr:write('fn name: ', recce.op_fn_key[fn_key], '\\n')\n"
-        "local arg = recce.v.step.ops[op_ix+2]\n"
+        "local arg = ops[op_ix+2]\n"
         "-- io.stderr:write('arg: ', inspect(arg), '\\n')\n"
         "if recce.trace_values >= 3 then\n"
         "  local top_of_queue = #recce.trace_values_queue;\n"
@@ -2236,7 +2237,7 @@ while (1) {
         "op_fn = recce[fn_key]\n"
         "result = op_fn(recce, arg)\n"
         "return result\n",
-        "Ri>i", slr->lua_ref, (int) op_ix + 1, &return_value);
+        "Ri>i", slr->lua_ref, (int)op_ix+1, &return_value);
 
     op_ix += 3;
     if (return_value >= -1)
