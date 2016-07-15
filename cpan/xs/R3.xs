@@ -2207,7 +2207,7 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV * ref_to_values_av)
 
     op_ix = 0;
     while (1) {
-        UV op_code = ops[op_ix++];
+        UV op_code = ops[op_ix];
 
         xlua_sig_call (slr->L,
             "local recce, tag, op_name = ...;\n"
@@ -2232,6 +2232,13 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV * ref_to_values_av)
 
                 xlua_sig_call (slr->L,
                     "local recce, op_ix = ...;\n"
+                    "local op_code = recce.v.step.ops[op_ix]\n"
+                    "-- io.stderr:write('op_code: ', inspect(op_code), '\\n')\n"
+                    "-- io.stderr:write('op_lua: ', inspect(op_lua), '\\n')\n"
+                    "if op_code == 0 then return -1 end\n"
+                    "if op_code ~= op_lua then\n"
+                    "    error(string.format('unknown op code in do_semantic_ops: %d', op_code))\n"
+                    "end\n"
                     "local fn_key = recce.v.step.ops[op_ix+1]\n"
                     "-- io.stderr:write('ops: ', inspect(recce.v.step.ops), '\\n')\n"
                     "-- io.stderr:write('fn_key: ', inspect(fn_key), '\\n')\n"
@@ -2248,10 +2255,10 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV * ref_to_values_av)
                     "result = op_fn(recce, arg)\n"
                     "return result\n",
                 "Ri>i",
-                slr->lua_ref, (int)op_ix, &return_value
+                slr->lua_ref, (int)op_ix+1, &return_value
                     );
 
-                op_ix += 2;
+                op_ix += 3;
                 if (return_value >= -1) return return_value;
                 goto NEXT_OP_CODE;
             }

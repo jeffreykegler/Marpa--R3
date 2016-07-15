@@ -831,6 +831,9 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     $load_result //= "[undef]";
     Marpa::R3::exception("Inspect::load failed: $load_result") if $load_result ne 'OK';
 
+    state $op_lua = Marpa::R3::Thin::op('lua');
+    $thin_slg->exec("local grammar, arg = ...; op_lua = arg+0", $op_lua);
+
   LEXEME: for my $lexeme_name ( keys %g1_id_by_lexeme_name ) {
         Marpa::R3::exception(
             "A lexeme in G1 is not a lexeme in L0: $lexeme_name")
