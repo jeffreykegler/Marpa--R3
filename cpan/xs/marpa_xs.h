@@ -447,9 +447,6 @@ struct v_wrapper_s
   int mode;                     /* 'raw' or 'stack' */
   int result;                   /* stack location to which to write result */
   AV *constants;
-  AV *rule_semantics;
-  AV *token_semantics;
-  AV *nulling_semantics;
   Scanless_R* slr;
 };
 typedef struct v_wrapper_s V_Wrapper;

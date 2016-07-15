@@ -1407,12 +1407,10 @@ qq{    Semantics were specified as "$original_semantics"\n}
             push @ops, $raw_op;
         } ## end OP: for my $raw_op (@raw_ops)
         if ( $type eq 'token' ) {
-            $value->token_register( $id, @ops );
             $slr->exec_name( 'token_register', $id, @ops);
             next REGISTRATION;
         }
         if ( $type eq 'nulling' ) {
-            $value->nulling_symbol_register( $id, @ops );
             $slr->exec_name( 'nulling_register', $id, @ops);
             next REGISTRATION;
         }

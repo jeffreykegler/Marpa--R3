@@ -3822,9 +3822,6 @@ PPCODE:
   /* Reserve position 0 */
   av_push (v_wrapper->constants, newSV(0));
 
-  v_wrapper->rule_semantics = newAV ();
-  v_wrapper->token_semantics = newAV ();
-  v_wrapper->nulling_semantics = newAV ();
   v_wrapper->slr = NULL;
   sv = sv_newmortal ();
   sv_setref_pv (sv, value_c_class_name, (void *) v_wrapper);
@@ -3839,9 +3836,6 @@ PPCODE:
   const Marpa_Value v = v_wrapper->v;
   SvREFCNT_dec (v_wrapper->base_sv);
   SvREFCNT_dec (v_wrapper->constants);
-  SvREFCNT_dec (v_wrapper->rule_semantics);
-  SvREFCNT_dec (v_wrapper->token_semantics);
-  SvREFCNT_dec (v_wrapper->nulling_semantics);
 
   /* These are "weak" cross-references, weak
    * meaning that the reference counts are not
@@ -3949,74 +3943,6 @@ PPCODE:
   v_wrapper->mode = MARPA_XS_V_MODE_IS_STACK;
 
   XSRETURN_YES;
-}
-
-void
-token_register( v_wrapper, token_id, ... )
-     V_Wrapper *v_wrapper;
-     Marpa_Symbol_ID token_id;
-PPCODE:
-{
-  /* OP Count is args less two */
-  const int op_count = items - 2;
-  int op_ix;
-  STRLEN dummy;
-  UV *ops;
-  SV *ops_sv;
-  AV *token_semantics = v_wrapper->token_semantics;
-
-  if (!token_semantics)
-    {
-      croak ("Problem in v->token_register(): valuator is not in stack mode");
-    }
-
-  /* Leave room for final 0 */
-  ops_sv = newSV ((size_t)(op_count+1) * sizeof (ops[0]));
-
-  SvPOK_on (ops_sv);
-  ops = (UV *) SvPV (ops_sv, dummy);
-  for (op_ix = 0; op_ix < op_count; op_ix++)
-    {
-      ops[op_ix] = SvUV (ST (op_ix+2));
-    }
-  ops[op_ix] = 0;
-  if (!av_store (token_semantics, (I32) token_id, ops_sv)) {
-     SvREFCNT_dec(ops_sv);
-  }
-}
-
-void
-nulling_symbol_register( v_wrapper, symbol_id, ... )
-     V_Wrapper *v_wrapper;
-     Marpa_Symbol_ID symbol_id;
-PPCODE:
-{
-  /* OP Count is args less two */
-  const int op_count = items - 2;
-  int op_ix;
-  STRLEN dummy;
-  UV *ops;
-  SV *ops_sv;
-  AV *nulling_semantics = v_wrapper->nulling_semantics;
-
-  if (!nulling_semantics)
-    {
-      croak ("Problem in v->nulling_symbol_register(): valuator is not in stack mode");
-    }
-
-  /* Leave room for final 0 */
-  ops_sv = newSV ((size_t)(op_count+1) * sizeof (ops[0]));
-
-  SvPOK_on (ops_sv);
-  ops = (UV *) SvPV (ops_sv, dummy);
-  for (op_ix = 0; op_ix < op_count; op_ix++)
-    {
-      ops[op_ix] = SvUV (ST (op_ix+2));
-    }
-  ops[op_ix] = 0;
-  if (!av_store (nulling_semantics, (I32) symbol_id, ops_sv)) {
-     SvREFCNT_dec(ops_sv);
-  }
 }
 
 void
