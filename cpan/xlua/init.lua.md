@@ -529,7 +529,6 @@ implementation, which returned the size of the
             local op_code = ops[op_ix]
             if op_code == 0 then return -1 end
             if op_code ~= op_lua then
-                error(string.format('unknown op code in do_semantic_ops: %d', op_code))
             end
             -- io.stderr:write('op_code: ', inspect(op_code), '\\n')
             -- io.stderr:write('op_lua: ', inspect(op_lua), '\\n')
@@ -771,10 +770,6 @@ Called when a valuator is set up.
         recce.rule_semantics = {}
         recce.token_semantics = {}
         recce.nulling_semantics = {}
-        recce.nulling_semantics.old_default
-            = marpa.array.from_list(marpa.ops.lua, result_is_undef_key, op_bail_key, 0)
-        recce.token_semantics.old_default
-            = marpa.array.from_list(marpa.ops.lua, result_is_token_value_key, op_bail_key, 0)
 
         recce.nulling_semantics.default = { marpa.ops.lua, result_is_undef_key, op_bail_key, 0 }
         recce.token_semantics.default = { marpa.ops.lua, result_is_token_value_key, op_bail_key, 0 }
