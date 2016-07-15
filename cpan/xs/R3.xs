@@ -3937,15 +3937,13 @@ PPCODE:
         "if not ops then\n"
         "    error(string.format('No semantics defined for %s', recce.v.step.type))\n"
         "end\n"
-        "return do_ops(recce, ops)\n", "R>i", slr->lua_ref, &result);
-
-              /* truncate stack */
-      xlua_sig_call (slr->L,
-        "local recce = ...\n"
+        "local result = do_ops(recce, ops)\n"
         "local stack = recce.v.stack\n"
+        "-- truncate stack\n"
         "local above_top = recce.v.step.result + 1\n"
-        "for i = above_top,#stack do stack[i] = nil end\n",
-      "R", slr->lua_ref);
+        "for i = above_top,#stack do stack[i] = nil end\n"
+        "return result\n",
+        "R>i", slr->lua_ref, &result);
 
               if (result > 0) {
                   const char *step_type_string = step_type_to_string (step_type);
