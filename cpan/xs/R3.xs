@@ -2055,66 +2055,44 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV * ref_to_values_av)
     UV result_ix = (UV) marpa_v_result (v);
     int return_value;
 
-    /* Initializations are to silence GCC warnings --
-     * if these values appear to the user, there is
-     * an internal error. Note that
-     * zero is never an acceptable Lua index.
-     */
-    const char *semantics_table = "!no such semantics table!";
-    const char *semantics_type = "!no such semantic type!";
-    int semantics_ix = 0;
-
     lua_State *const L = slr->L;
-
-    const char *const step_type_as_string =
-        step_type_to_string (step_type);
 
     v_wrapper->values = (AV *) SvRV (ref_to_values_av);
     v_wrapper->result = (int) result_ix;
-    /* warn("%s %d", __FILE__, __LINE__); */
 
-
-{
-    int lua_ops_defined;
     xlua_sig_call (slr->L,
-        "local recce = ...;\n"
+        "local recce = ...\n"
+        "local ops = {}\n"
         "if recce.v.step.type == 'MARPA_STEP_RULE' then\n"
         "-- io.stderr:write(string.format('Rule semantics: %s', inspect(recce.rule_semantics)))\n"
         "-- io.stderr:write(string.format('Rule semantics for %d: %s', recce.v.step.rule, inspect(recce.rule_semantics[recce.v.step.rule])))\n"
-        "    recce.v.step.ops = recce.rule_semantics[recce.v.step.rule]\n"
-        "    if not recce.v.step.ops then\n"
+        "    ops = recce.rule_semantics[recce.v.step.rule]\n"
+        "    if not ops then\n"
         "-- io.stderr:write('Using default rule ops\\n')\n"
-        "        recce.v.step.ops = recce.rule_semantics.default\n"
+        "        ops = recce.rule_semantics.default\n"
         "    end\n"
-        "-- io.stderr:write('Rule ops: ', inspect(recce.v.step.ops), '\\n')\n"
+        "-- io.stderr:write('Rule ops: ', inspect(ops), '\\n')\n"
         "end\n"
         "if recce.v.step.type == 'MARPA_STEP_TOKEN' then\n"
         "-- io.stderr:write(string.format('Token semantics: %s', inspect(recce.token_semantics)))\n"
-        "    recce.v.step.ops = recce.token_semantics[recce.v.step.symbol]\n"
-        "    if not recce.v.step.ops then\n"
-        "        recce.v.step.ops = recce.token_semantics.default\n"
+        "    ops = recce.token_semantics[recce.v.step.symbol]\n"
+        "    if not ops then\n"
+        "        ops = recce.token_semantics.default\n"
         "    end\n"
-        "-- io.stderr:write('Token ops: ', inspect(recce.v.step.ops), '\\n')\n"
+        "-- io.stderr:write('Token ops: ', inspect(ops), '\\n')\n"
         "end\n"
         "if recce.v.step.type == 'MARPA_STEP_NULLING_SYMBOL' then\n"
-        "    recce.v.step.ops = recce.nulling_semantics[recce.v.step.symbol]\n"
-        "    if not recce.v.step.ops then\n"
-        "        recce.v.step.ops = recce.nulling_semantics.default\n"
+        "    ops = recce.nulling_semantics[recce.v.step.symbol]\n"
+        "    if not ops then\n"
+        "        ops = recce.nulling_semantics.default\n"
         "    end\n"
         "end\n"
-        "if recce.v.step.ops then return 1 end\n"
-        "-- io.stderr:write('No ops defined for ', recce.v.step.type, '\\n')\n"
-        "recce.v.step.ops = {}\n"
-        "return 0\n", "R>i", slr->lua_ref, &lua_ops_defined);
-}
+        "if not ops then\n"
+        "    error(string.format('No semantics defined for %s', recce.v.step.type))\n"
+        "end\n"
+        "return do_ops(recce, ops)\n", "R>i", slr->lua_ref, &return_value);
 
-xlua_sig_call (slr->L,
-    "local recce = ...\n"
-    "local ops = recce.v.step.ops\n"
-    "return do_ops(recce, ops)\n",
-    "R>i", slr->lua_ref, &return_value);
-
-return return_value;
+    return return_value;
 }
 
 /* Static SLG methods */
