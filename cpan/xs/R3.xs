@@ -2052,8 +2052,6 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV * ref_to_values_av)
     Scanless_R *const slr = v_wrapper->slr;
     int return_value;
 
-    v_wrapper->values = (AV *) SvRV (ref_to_values_av);
-
     xlua_sig_call (slr->L,
         "local recce = ...\n"
         "local ops = {}\n"
@@ -3936,6 +3934,7 @@ PPCODE:
       int step_type;
       AV *values_av = newAV ();
       SV *ref_to_values_av = sv_2mortal (newRV_noinc ((SV *) values_av));
+      v_wrapper->values = (AV *) SvRV (ref_to_values_av);
 
       xlua_sig_call (slr->L, "local recce = ...; recce:step()", "R",
           slr->lua_ref);
