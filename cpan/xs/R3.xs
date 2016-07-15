@@ -2210,14 +2210,18 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV * ref_to_values_av)
         UV op_code = ops[op_ix];
 
         xlua_sig_call (slr->L,
-            "local recce, tag, op_name = ...;\n"
+            "local recce = ...;\n"
+            "local op_name = 'unknown'\n"
             "if recce.trace_values >= 3 then\n"
             "  local top_of_queue = #recce.trace_values_queue;\n"
-            "  recce.trace_values_queue[top_of_queue+1] = {tag, recce.v.step.type, op_name};\n"
+            "if op_code ~= op_lua then\n"
+            "   op_name = 'lua'\n"
+            "end\n"
+            "  recce.trace_values_queue[top_of_queue+1] = {'starting op', recce.v.step.type, op_name};\n"
             "  -- io.stderr:write('starting op: ', inspect(recce))\n"
-            "end",
-            "Rss",
-            slr->lua_ref, "starting op", marpa_slif_op_name (op_code)
+            "end\n",
+            "R",
+            slr->lua_ref
             );
 
         switch (op_code) {
