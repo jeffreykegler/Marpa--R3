@@ -1417,7 +1417,6 @@ qq{    Semantics were specified as "$original_semantics"\n}
             next REGISTRATION;
         }
         if ( $type eq 'rule' ) {
-            $value->rule_register( $id, @ops );
             $slr->exec_name( 'rule_register', $id, @ops);
             next REGISTRATION;
         }

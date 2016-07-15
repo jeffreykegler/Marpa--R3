@@ -2115,7 +2115,7 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV * ref_to_values_av)
         croak ("Internal error: unknown step type %d", step_type);
     }
 
-    if (!ops) {
+    if (!ops && step_type != MARPA_STEP_RULE) {
         int base_of_stack;
         Xlua_Array *ops_ud;
         /* warn("%s %d", __FILE__, __LINE__); */
@@ -2183,13 +2183,18 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV * ref_to_values_av)
     int lua_ops_defined;
     xlua_sig_call (slr->L,
         "local recce = ...;\n"
-        "if recce.v.step.type ~= 'MARPA_STEP_RULE' then\n"
+        "if recce.v.step.type == 'MARPA_STEP_RULE' then\n"
+        "-- io.stderr:write(string.format('Rule semantics: %s', inspect(recce.rule_semantics)))\n"
+        "-- io.stderr:write(string.format('Rule semantics for %d: %s', recce.v.step.rule, inspect(recce.rule_semantics[recce.v.step.rule])))\n"
         "    recce.v.step.ops = recce.rule_semantics[recce.v.step.rule]\n"
-        "    if recce.v.step.ops then\n"
+        "    if not recce.v.step.ops then\n"
+        "-- io.stderr:write('Using default rule ops\\n')\n"
         "        recce.v.step.ops = recce.rule_semantics.default\n"
         "    end\n"
+        "-- io.stderr:write('Rule ops: ', inspect(recce.v.step.ops), '\\n')\n"
         "end\n"
         "if recce.v.step.ops then return 1 end\n"
+        "-- io.stderr:write('No ops defined for ', recce.v.step.type, '\\n')\n"
         "recce.v.step.ops = {}\n"
         "return 0\n", "R>i", slr->lua_ref, &lua_ops_defined);
     if (!lua_ops_defined) {
@@ -4051,40 +4056,6 @@ PPCODE:
   v_wrapper->mode = MARPA_XS_V_MODE_IS_STACK;
 
   XSRETURN_YES;
-}
-
-void
-rule_register( v_wrapper, rule_id, ... )
-     V_Wrapper *v_wrapper;
-     Marpa_Rule_ID rule_id;
-PPCODE:
-{
-  /* OP Count is args less two */
-  const UV op_count = (UV)items - 2;
-  UV op_ix;
-  STRLEN dummy;
-  UV *ops;
-  SV *ops_sv;
-  AV *rule_semantics = v_wrapper->rule_semantics;
-
-  if (!rule_semantics)
-    {
-      croak ("Problem in v->rule_register(): valuator is not in stack mode");
-    }
-
-  /* Leave room for final 0 */
-  ops_sv = newSV ((size_t)(op_count+1) * sizeof (ops[0]));
-
-  SvPOK_on (ops_sv);
-  ops = (UV *) SvPV (ops_sv, dummy);
-  for (op_ix = 0; op_ix < op_count; op_ix++)
-    {
-      ops[op_ix] = SvUV (ST ((int)op_ix+2));
-    }
-  ops[op_ix] = 0;
-  if (!av_store (rule_semantics, (I32) rule_id, ops_sv)) {
-     SvREFCNT_dec(ops_sv);
-  }
 }
 
 void

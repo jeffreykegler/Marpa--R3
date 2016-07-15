@@ -606,8 +606,12 @@ whose id is `id`.
     -- luatangle: section+ Utilities for Perl code
     function token_register(...)
         local recce, id = ...
-        local ops = table.unpack{{...}, 3}
-        recce.token_semantics[id] = ops
+        local ops = {}
+        local raw_ops = table.unpack{{...}, 3}
+        for ix = 3, #raw_ops do
+            ops[#ops+1] = raw_ops[ix]
+        end
+        recce.token_semantics[id+0] = ops
     end
 
 ```
@@ -622,7 +626,7 @@ whose id is `id`.
     function nulling_register(...)
         local recce, id = ...
         local ops = table.unpack{{...}, 3}
-        recce.nulling_semantics[id] = ops
+        recce.nulling_semantics[id+0] = ops
     end
 
 ```
@@ -635,11 +639,13 @@ whose id is `id`.
 ```
     -- luatangle: section+ Utilities for Perl code
     function rule_register(...)
-        -- io.stderr:write('args: ', inspect(args), '\n')
-        local recce, id = ...
-        local ops = table.unpack{{...}, 3}
-        -- io.stderr:write('recce: ', inspect(recce), '\n')
-        -- io.stderr:write('recce.rule_semantics: ', inspect(recce.rule_semantics), '\n')
+        local args = {...}
+        local recce = args[1]
+        local id = args[2]+0
+        local ops = {}
+        for ix = 3, #args do
+            ops[#ops+1] = args[ix]+0
+        end
         recce.rule_semantics[id] = ops
     end
 
@@ -763,12 +769,10 @@ Called when a valuator is set up.
             = marpa.array.from_list(marpa.ops.lua, result_is_undef_key, op_bail_key, 0)
         recce.token_semantics.old_default
             = marpa.array.from_list(marpa.ops.lua, result_is_token_value_key, op_bail_key, 0)
-        recce.rule_semantics.old_default
-            = marpa.array.from_list(marpa.ops.lua, result_is_undef_key, op_bail_key, 0)
 
-        recce.nulling_semantics.default = { marpa.ops.lua, result_is_undef_key, op_bail_key }
-        recce.token_semantics.default = { marpa.ops.lua, result_is_token_value_key, op_bail_key }
-        recce.rule_semantics.default = { marpa.ops.lua, result_is_undef_key, op_bail_key }
+        recce.nulling_semantics.default = { marpa.ops.lua, result_is_undef_key, op_bail_key, 0 }
+        recce.token_semantics.default = { marpa.ops.lua, result_is_token_value_key, op_bail_key, 0 }
+        recce.rule_semantics.default = { marpa.ops.lua, result_is_undef_key, op_bail_key, 0 }
 
         recce.trace_values = trace_values + 0;
         recce.trace_values_queue = {};
