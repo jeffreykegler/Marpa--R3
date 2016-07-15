@@ -1386,6 +1386,23 @@ static lua_State* xlua_newstate(void)
     return L;
 }
 
+/*
+ * Message handler used to run all chunks
+ */
+static int xlua_msghandler (lua_State *L) {
+  const char *msg = marpa_lua_tostring(L, 1);
+  if (msg == NULL) {  /* is error object not a string? */
+    if (marpa_luaL_callmeta(L, 1, "__tostring") &&  /* does it have a metamethod */
+        marpa_lua_type(L, -1) == LUA_TSTRING)  /* that produces a string? */
+      return 1;  /* that is the message */
+    else
+      msg = marpa_lua_pushfstring(L, "(error object is a %s value)",
+                               marpa_luaL_typename(L, 1));
+  }
+  marpa_luaL_traceback(L, L, msg, 1);  /* append a standard traceback */
+  return 1;  /* return the traceback */
+}
+
 static void
 xlua_sig_call (lua_State * L, const char *codestr, const char *sig, ...)
 {
@@ -1393,6 +1410,9 @@ xlua_sig_call (lua_State * L, const char *codestr, const char *sig, ...)
     int narg, nres;
     int status;
     const int base_of_stack = marpa_lua_gettop (L);
+    const int msghandler_ix = base_of_stack+1;
+
+    marpa_lua_pushcfunction(L, xlua_msghandler);
 
     va_start (vl, sig);
 
@@ -1450,7 +1470,7 @@ xlua_sig_call (lua_State * L, const char *codestr, const char *sig, ...)
     nres = (int)strlen (sig);
 
     /* warn("%s %d", __FILE__, __LINE__); */
-    status = marpa_lua_pcall (L, narg, nres, 0);
+    status = marpa_lua_pcall (L, narg, nres, msghandler_ix);
     if (status != 0) {
         const char *exception_string = handle_pcall_error(L, status);
         marpa_lua_settop (L, base_of_stack);
@@ -2169,13 +2189,17 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV * ref_to_values_av)
     if (!lua_ops_defined) {
         int op_ix = 0;
         while (1) {
-            UV op = ops[op_ix];
-            if (!op) break;
+            UV op0 = ops[op_ix++];
+            UV op1 = ops[op_ix++];
+            UV op2 = ops[op_ix++];
             xlua_sig_call (slr->L,
-                "local recce, op = ...\n"
+                "local recce, op0, op1, op2 = ...\n"
                 "ops = recce.v.step.ops\n"
-                "ops[#ops+1] = op\n", "Ri", slr->lua_ref, (int)op);
-            op_ix++;
+                "ops[#ops+1] = op0\n"
+                "ops[#ops+1] = op1\n"
+                "ops[#ops+1] = op2\n"
+                , "Riii", slr->lua_ref, (int)op0, (int)op1, (int)op2);
+            if (!op0) break;
         }
     }
 }
@@ -2205,11 +2229,15 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV * ref_to_values_av)
 
             {
                 int return_value;
-                const UV fn_key = ops[op_ix++];
-                const UV lua_op_arg = ops[op_ix++];
 
                 xlua_sig_call (slr->L,
-                    "local recce, fn_key, arg = ...;\n"
+                    "local recce, op_ix = ...;\n"
+                    "local fn_key = recce.v.step.ops[op_ix+1]\n"
+                    "-- io.stderr:write('ops: ', inspect(recce.v.step.ops), '\\n')\n"
+                    "-- io.stderr:write('fn_key: ', inspect(fn_key), '\\n')\n"
+                    "-- io.stderr:write('fn name: ', recce.op_fn_key[fn_key], '\\n')\n"
+                    "local arg = recce.v.step.ops[op_ix+2]\n"
+                    "-- io.stderr:write('arg: ', inspect(arg), '\\n')\n"
                     "if recce.trace_values >= 3 then\n"
                     "  local top_of_queue = #recce.trace_values_queue;\n"
                     "  local tag = 'starting lua op'\n"
@@ -2219,10 +2247,11 @@ v_do_stack_ops (V_Wrapper * v_wrapper, SV * ref_to_values_av)
                     "op_fn = recce[fn_key]\n"
                     "result = op_fn(recce, arg)\n"
                     "return result\n",
-                "Rii>i",
-                slr->lua_ref, (int)fn_key, (int)lua_op_arg, &return_value
+                "Ri>i",
+                slr->lua_ref, (int)op_ix, &return_value
                     );
 
+                op_ix += 2;
                 if (return_value >= -1) return return_value;
                 goto NEXT_OP_CODE;
             }
