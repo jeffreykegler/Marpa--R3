@@ -3875,132 +3875,134 @@ stack_step( v_wrapper )
     V_Wrapper *v_wrapper;
 PPCODE:
 {
-  Scanless_R *slr;
+    Scanless_R *slr;
 
-  if (v_wrapper->mode != MARPA_XS_V_MODE_IS_STACK)
-    {
-      croak
-        ("Problem in v->stack_step(): Cannot call unless valuator is in 'stack' mode");
+    if (v_wrapper->mode != MARPA_XS_V_MODE_IS_STACK) {
+        croak
+            ("Problem in v->stack_step(): Cannot call unless valuator is in 'stack' mode");
     }
 
-  slr = v_wrapper->slr;
-  xlua_sig_call (slr->L, "local recce = ...; recce.trace_values_queue = {}", "R",
-      slr->lua_ref);
+    slr = v_wrapper->slr;
+    xlua_sig_call (slr->L,
+        "local recce = ...; recce.trace_values_queue = {}", "R",
+        slr->lua_ref);
 
-  while (1)
-    {
-      int result;
-      int step_type;
-      AV *values_av = newAV ();
-      SV *ref_to_values_av = sv_2mortal (newRV_noinc ((SV *) values_av));
-      v_wrapper->values = (AV *) SvRV (ref_to_values_av);
+    while (1) {
+        int result;
+        int step_type;
+        AV *values_av = newAV ();
+        SV *ref_to_values_av = sv_2mortal (newRV_noinc ((SV *) values_av));
+        v_wrapper->values = (AV *) SvRV (ref_to_values_av);
 
-      xlua_sig_call (slr->L, "local recce = ...; recce:step()", "R",
-          slr->lua_ref);
-      step_type = marpa_v_step_type(v_wrapper->v);
-      switch (step_type)
-        {
+        xlua_sig_call (slr->L, "local recce = ...; recce:step()", "R",
+            slr->lua_ref);
+        step_type = marpa_v_step_type (v_wrapper->v);
+        switch (step_type) {
         case MARPA_STEP_INACTIVE:
-          XSRETURN_EMPTY;
-
-          /* NOTREACHED */
         case MARPA_STEP_RULE:
         case MARPA_STEP_NULLING_SYMBOL:
         case MARPA_STEP_TOKEN:
-          {
+            {
 
-    xlua_sig_call (slr->L,
-        "-- Return codes:\n"
-        "-- 3 is callback\n"
-        "-- 1 is return step type\n"
-        "-- 0 is return empty\n"
-        "-- -1 is return 'trace'\n"
-        "-- -2 is do not return, continue to loop\n"
-        "-- mnemonic is size of list returned to Perl,\n"
-        "--    with trace and loop being special cases\n"
-        "local recce = ...\n"
-        "local ops = {}\n"
-        "if recce.v.step.type == 'MARPA_STEP_RULE' then\n"
-        "-- io.stderr:write(string.format('Rule semantics: %s', inspect(recce.rule_semantics)))\n"
-        "-- io.stderr:write(string.format('Rule semantics for %d: %s', recce.v.step.rule, inspect(recce.rule_semantics[recce.v.step.rule])))\n"
-        "    ops = recce.rule_semantics[recce.v.step.rule]\n"
-        "    if not ops then\n"
-        "-- io.stderr:write('Using default rule ops\\n')\n"
-        "        ops = recce.rule_semantics.default\n"
-        "    end\n"
-        "    goto DO_OPS\n"
-        "-- io.stderr:write('Rule ops: ', inspect(ops), '\\n')\n"
-        "end\n"
-        "if recce.v.step.type == 'MARPA_STEP_TOKEN' then\n"
-        "    ops = recce.token_semantics[recce.v.step.symbol]\n"
-        "    if not ops then\n"
-        "        ops = recce.token_semantics.default\n"
-        "    end\n"
-        "    goto DO_OPS\n"
-        "end\n"
-        "if recce.v.step.type == 'MARPA_STEP_NULLING_SYMBOL' then\n"
-        "    ops = recce.nulling_semantics[recce.v.step.symbol]\n"
-        "    if not ops then\n"
-        "        ops = recce.nulling_semantics.default\n"
-        "    end\n"
-        "    goto DO_OPS\n"
-        "end\n"
-        "::DO_OPS::\n"
-        "if not ops then\n"
-        "    error(string.format('No semantics defined for %s', recce.v.step.type))\n"
-        "end\n"
-        "local do_ops_result = do_ops(recce, ops)\n"
-        "local stack = recce.v.stack\n"
-        "-- truncate stack\n"
-        "local above_top = recce.v.step.result + 1\n"
-        "for i = above_top,#stack do stack[i] = nil end\n"
-        "if do_ops_result > 0 then return 3 end\n"
-        "return -2\n"
-        ,
-        "R>i", slr->lua_ref, &result);
+                xlua_sig_call (slr->L,
+                    "-- Return codes:\n"
+                    "-- 3 is callback\n"
+                    "-- 1 is return step type\n"
+                    "-- 0 is return empty\n"
+                    "-- -1 is return 'trace'\n"
+                    "-- -2 is do not return, continue to loop\n"
+                    "-- mnemonic is size of list returned to Perl,\n"
+                    "--    with trace and loop being special cases\n"
+                    "local recce = ...\n"
+                    "local ops = {}\n"
+                    "if recce.v.step.type == 'MARPA_STEP_INACTIVE' then\n"
+                    "    return 0\n"
+                    "end\n"
+                    "if recce.v.step.type == 'MARPA_STEP_RULE' then\n"
+                    "-- io.stderr:write(string.format('Rule semantics: %s', inspect(recce.rule_semantics)))\n"
+                    "-- io.stderr:write(string.format('Rule semantics for %d: %s', recce.v.step.rule, inspect(recce.rule_semantics[recce.v.step.rule])))\n"
+                    "    ops = recce.rule_semantics[recce.v.step.rule]\n"
+                    "    if not ops then\n"
+                    "-- io.stderr:write('Using default rule ops\\n')\n"
+                    "        ops = recce.rule_semantics.default\n"
+                    "    end\n"
+                    "    goto DO_OPS\n"
+                    "-- io.stderr:write('Rule ops: ', inspect(ops), '\\n')\n"
+                    "end\n"
+                    "if recce.v.step.type == 'MARPA_STEP_TOKEN' then\n"
+                    "    ops = recce.token_semantics[recce.v.step.symbol]\n"
+                    "    if not ops then\n"
+                    "        ops = recce.token_semantics.default\n"
+                    "    end\n"
+                    "    goto DO_OPS\n"
+                    "end\n"
+                    "if recce.v.step.type == 'MARPA_STEP_NULLING_SYMBOL' then\n"
+                    "    ops = recce.nulling_semantics[recce.v.step.symbol]\n"
+                    "    if not ops then\n"
+                    "        ops = recce.nulling_semantics.default\n"
+                    "    end\n"
+                    "    goto DO_OPS\n"
+                    "end\n"
+                    "::DO_OPS::\n"
+                    "if not ops then\n"
+                    "    error(string.format('No semantics defined for %s', recce.v.step.type))\n"
+                    "end\n"
+                    "local do_ops_result = do_ops(recce, ops)\n"
+                    "local stack = recce.v.stack\n"
+                    "-- truncate stack\n"
+                    "local above_top = recce.v.step.result + 1\n"
+                    "for i = above_top,#stack do stack[i] = nil end\n"
+                    "if do_ops_result > 0 then return 3 end\n"
+                    "return -2\n", "R>i", slr->lua_ref, &result);
 
-              switch(result) {
-              case 3:
-              {
-                  const char *step_type_string = step_type_to_string (step_type);
-                  XPUSHs (sv_2mortal (newSVpv (step_type_string, 0)));
-                  XPUSHs (sv_2mortal (newSViv (step_type ==
-                              MARPA_STEP_RULE ? marpa_v_rule (v_wrapper->v) :
-                              marpa_v_token (v_wrapper->v))));
-                  XPUSHs (ref_to_values_av); /* already mortal */
-                  XSRETURN (3);
-              }
-              default:
-              goto NEXT_STEP;
-              }
-          }
-          /* NOTREACHED */
+                switch (result) {
+                case 3:
+                    {
+                        const char *step_type_string =
+                            step_type_to_string (step_type);
+                        XPUSHs (sv_2mortal (newSVpv (step_type_string,
+                                    0)));
+                        XPUSHs (sv_2mortal (newSViv (step_type ==
+                                    MARPA_STEP_RULE ?
+                                    marpa_v_rule (v_wrapper->
+                                        v) : marpa_v_token (v_wrapper->
+                                        v))));
+                        XPUSHs (ref_to_values_av);      /* already mortal */
+                        XSRETURN (3);
+                    }
+                case 0:
+                    XSRETURN_EMPTY;
+                default:
+                    goto NEXT_STEP;
+                }
+            }
+            /* NOTREACHED */
 
         default:
-          /* Default is just return the step_type string and let the upper
-           * layer deal with it.
-           */
-          {
-            const char *step_type_string = step_type_to_string (step_type);
-            if (!step_type_string)
-              {
-                step_type_string = "Unknown";
-              }
-            XPUSHs (sv_2mortal (newSVpv (step_type_string, 0)));
-            XSRETURN (1);
-          }
+            /* Default is just return the step_type string and let the upper
+             * layer deal with it.
+             */
+            {
+                const char *step_type_string =
+                    step_type_to_string (step_type);
+                if (!step_type_string) {
+                    step_type_string = "Unknown";
+                }
+                XPUSHs (sv_2mortal (newSVpv (step_type_string, 0)));
+                XSRETURN (1);
+            }
         }
 
-    NEXT_STEP:;
-      {
-        int trace_queue_length;
-        xlua_sig_call (slr->L, "local recce = ...; return #recce.trace_values_queue", "R>i",
-            slr->lua_ref, &trace_queue_length);
-      if (trace_queue_length)
+      NEXT_STEP:;
         {
-          XSRETURN_PV ("trace");
+            int trace_queue_length;
+            xlua_sig_call (slr->L,
+                "local recce = ...; return #recce.trace_values_queue",
+                "R>i", slr->lua_ref, &trace_queue_length);
+            if (trace_queue_length) {
+                XSRETURN_PV ("trace");
+            }
         }
-      }
     }
 }
 
