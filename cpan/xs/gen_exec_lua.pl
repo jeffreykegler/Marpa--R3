@@ -41,6 +41,8 @@ my $lua_exec_body = <<'END_OF_EXEC_BODY';
         int i, status;
         int top_after;
 
+        marpa_luaL_checkstack(L, items+20, "xlua EXEC_BODY");
+
         if (is_method) {
             /* first argument is recce table */
             marpa_lua_pushvalue (L, -2);
@@ -62,6 +64,8 @@ my $lua_exec_body = <<'END_OF_EXEC_BODY';
             marpa_lua_settop (L, base_of_stack);
             croak(exception_string);
         }
+
+        marpa_luaL_checkstack(L, 20, "xlua EXEC_BODY");
 
         /* return args to caller */
         top_after = marpa_lua_gettop (L);
