@@ -3889,14 +3889,12 @@ PPCODE:
 
     while (1) {
         int result;
-        int step_type;
         AV *values_av = newAV ();
         SV *ref_to_values_av = sv_2mortal (newRV_noinc ((SV *) values_av));
         v_wrapper->values = (AV *) SvRV (ref_to_values_av);
 
         xlua_sig_call (slr->L, "local recce = ...; recce:step()", "R",
             slr->lua_ref);
-        step_type = marpa_v_step_type (v_wrapper->v);
 
         xlua_sig_call (slr->L,
             "-- Return codes:\n"
@@ -3955,6 +3953,7 @@ PPCODE:
         switch (result) {
         case 3:
             {
+                const int step_type = marpa_v_step_type (v_wrapper->v);
                 const char *step_type_string =
                     step_type_to_string (step_type);
                 XPUSHs (sv_2mortal (newSVpv (step_type_string, 0)));
@@ -3968,6 +3967,7 @@ PPCODE:
         default:
         case 1:
             {
+                const int step_type = marpa_v_step_type (v_wrapper->v);
                 const char *step_type_string =
                     step_type_to_string (step_type);
                 if (!step_type_string) {
