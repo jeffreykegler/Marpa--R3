@@ -539,10 +539,10 @@ implementation, which returned the size of the
             local arg = ops[op_ix+2]
             -- io.stderr:write('arg: ', inspect(arg), '\\n')
             if recce.trace_values >= 3 then
-              local top_of_queue = #recce.trace_values_queue
+              local queue = recce.trace_values_queue
               local tag = 'starting lua op'
-              recce.trace_values_queue[top_of_queue+1] = {'starting op', recce.v.step.type, 'lua'}
-              recce.trace_values_queue[top_of_queue+2] = {tag, recce.v.step.type, recce.op_fn_key[fn_key]}
+              queue[#queue+1] = {'starting op', recce.v.step.type, 'lua'}
+              queue[#queue+1] = {tag, recce.v.step.type, recce.op_fn_key[fn_key]}
               -- io.stderr:write('starting op: ', inspect(recce))
             end
             op_fn = recce[fn_key]
