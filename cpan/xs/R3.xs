@@ -3948,7 +3948,9 @@ PPCODE:
             "local above_top = recce.v.step.result + 1\n"
             "for i = above_top,#stack do stack[i] = nil end\n"
             "if do_ops_result > 0 then return 3 end\n"
-            "return -2\n", "R>i", slr->lua_ref, &result);
+            "if #recce.trace_values_queue > 0 then return -1 end\n"
+            "return -2\n",
+            "R>i", slr->lua_ref, &result);
 
         switch (result) {
         case 3:
@@ -3963,6 +3965,7 @@ PPCODE:
                 XPUSHs (ref_to_values_av);      /* already mortal */
                 XSRETURN (3);
             }
+        default:
         case 1:
             {
                 const char *step_type_string =
@@ -3975,22 +3978,13 @@ PPCODE:
             }
         case 0:
             XSRETURN_EMPTY;
-        default:
+        case -1:
+            XSRETURN_PV ("trace");
         case -2:
-            goto NEXT_STEP;
+            break;
         }
 
 
-      NEXT_STEP:;
-        {
-            int trace_queue_length;
-            xlua_sig_call (slr->L,
-                "local recce = ...; return #recce.trace_values_queue",
-                "R>i", slr->lua_ref, &trace_queue_length);
-            if (trace_queue_length) {
-                XSRETURN_PV ("trace");
-            }
-        }
     }
 }
 
