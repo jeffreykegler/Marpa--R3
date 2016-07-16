@@ -3893,9 +3893,6 @@ PPCODE:
         SV *ref_to_values_av = sv_2mortal (newRV_noinc ((SV *) values_av));
         v_wrapper->values = (AV *) SvRV (ref_to_values_av);
 
-        xlua_sig_call (slr->L, "local recce = ...; recce:step()", "R",
-            slr->lua_ref);
-
         xlua_sig_call (slr->L,
             "-- Return codes:\n"
             "-- 3 is callback\n"
@@ -3907,6 +3904,7 @@ PPCODE:
             "--    with trace and loop being special cases\n"
             "local recce = ...\n"
             "local ops = {}\n"
+            "recce:step()\n"
             "if recce.v.step.type == 'MARPA_STEP_INACTIVE' then\n"
             "    return 0\n"
             "end\n"
