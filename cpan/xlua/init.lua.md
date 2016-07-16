@@ -561,12 +561,11 @@ Determine the appropriate VM operations for this
 step, and perform them.
 Return codes are
 
-* Return codes:
-* 3 is callback
-* 1 is return step type
-* 0 is return empty
-* -1 is return 'trace'
-* -2 is do not return, continue to loop
+* 3 for callback;
+* 1 for return the step type;
+* 0 for return an empty list;
+* -1 for return 'trace';
+* -2 for no return.
 
 The mnemonic for these codes is
 that they represent the size of the list returned to Perl,
