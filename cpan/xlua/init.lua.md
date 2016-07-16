@@ -559,18 +559,22 @@ implementation, which returned the size of the
 
 Determine the appropriate VM operations for this
 step, and perform them.
+Return codes are
+
+* Return codes:
+* 3 is callback
+* 1 is return step type
+* 0 is return empty
+* -1 is return 'trace'
+* -2 is do not return, continue to loop
+
+The mnemonic for these codes is
+that they represent the size of the list returned to Perl,
+with "trace" and "do not return" being special cases.
 
 ```
     -- luatangle: section+ VM operations
     function find_and_do_ops(recce)
-        -- Return codes:
-        -- 3 is callback
-        -- 1 is return step type
-        -- 0 is return empty
-        -- -1 is return 'trace'
-        -- -2 is do not return, continue to loop
-        -- mnemonic is size of list returned to Perl,
-        --    with trace and loop being special cases
         local ops = {}
         recce:step()
         if recce.v.step.type == 'MARPA_STEP_INACTIVE' then
