@@ -554,6 +554,67 @@ implementation, which returned the size of the
     end
 
 ```
+
+### Find and perform the VM operations
+
+Determine the appropriate VM operations for this
+step, and perform them.
+
+```
+    -- luatangle: section+ VM operations
+    function find_and_do_ops(recce)
+        -- Return codes:
+        -- 3 is callback
+        -- 1 is return step type
+        -- 0 is return empty
+        -- -1 is return 'trace'
+        -- -2 is do not return, continue to loop
+        -- mnemonic is size of list returned to Perl,
+        --    with trace and loop being special cases
+        local ops = {}
+        recce:step()
+        if recce.v.step.type == 'MARPA_STEP_INACTIVE' then
+            return 0
+        end
+        if recce.v.step.type == 'MARPA_STEP_RULE' then
+            ops = recce.rule_semantics[recce.v.step.rule]
+            if not ops then
+                ops = recce.rule_semantics.default
+            end
+            goto DO_OPS
+        end
+        if recce.v.step.type == 'MARPA_STEP_TOKEN' then
+            ops = recce.token_semantics[recce.v.step.symbol]
+            if not ops then
+                ops = recce.token_semantics.default
+            end
+            goto DO_OPS
+        end
+        if recce.v.step.type == 'MARPA_STEP_NULLING_SYMBOL' then
+            ops = recce.nulling_semantics[recce.v.step.symbol]
+            if not ops then
+                ops = recce.nulling_semantics.default
+            end
+            goto DO_OPS
+        end
+        if true then return 1 end
+        ::DO_OPS::
+        if not ops then
+            error(string.format('No semantics defined for %s', recce.v.step.type))
+        end
+        local do_ops_result = do_ops(recce, ops)
+        local stack = recce.v.stack
+        -- truncate stack
+        local above_top = recce.v.step.result + 1
+        for i = above_top,#stack do stack[i] = nil end
+        if do_ops_result > 0 then return 3 end
+        if #recce.trace_values_queue > 0 then return -1 end
+        return -2
+    end
+
+```
+
+
 ### Operations for use in the Perl code
 
 The following operations are used by the higher-level Perl code
