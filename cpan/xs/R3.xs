@@ -3910,6 +3910,14 @@ PPCODE:
           {
 
     xlua_sig_call (slr->L,
+        "-- Return codes:\n"
+        "-- 3 is callback\n"
+        "-- 1 is return step type\n"
+        "-- 0 is return empty\n"
+        "-- -1 is return 'trace'\n"
+        "-- -2 is do not return, continue to loop\n"
+        "-- mnemonic is size of list returned to Perl,\n"
+        "--    with trace and loop being special cases\n"
         "local recce = ...\n"
         "local ops = {}\n"
         "if recce.v.step.type == 'MARPA_STEP_RULE' then\n"
@@ -3920,6 +3928,7 @@ PPCODE:
         "-- io.stderr:write('Using default rule ops\\n')\n"
         "        ops = recce.rule_semantics.default\n"
         "    end\n"
+        "    goto DO_OPS\n"
         "-- io.stderr:write('Rule ops: ', inspect(ops), '\\n')\n"
         "end\n"
         "if recce.v.step.type == 'MARPA_STEP_TOKEN' then\n"
@@ -3927,25 +3936,32 @@ PPCODE:
         "    if not ops then\n"
         "        ops = recce.token_semantics.default\n"
         "    end\n"
+        "    goto DO_OPS\n"
         "end\n"
         "if recce.v.step.type == 'MARPA_STEP_NULLING_SYMBOL' then\n"
         "    ops = recce.nulling_semantics[recce.v.step.symbol]\n"
         "    if not ops then\n"
         "        ops = recce.nulling_semantics.default\n"
         "    end\n"
+        "    goto DO_OPS\n"
         "end\n"
+        "::DO_OPS::\n"
         "if not ops then\n"
         "    error(string.format('No semantics defined for %s', recce.v.step.type))\n"
         "end\n"
-        "local result = do_ops(recce, ops)\n"
+        "local do_ops_result = do_ops(recce, ops)\n"
         "local stack = recce.v.stack\n"
         "-- truncate stack\n"
         "local above_top = recce.v.step.result + 1\n"
         "for i = above_top,#stack do stack[i] = nil end\n"
-        "return result\n",
+        "if do_ops_result > 0 then return 3 end\n"
+        "return -2\n"
+        ,
         "R>i", slr->lua_ref, &result);
 
-              if (result > 0) {
+              switch(result) {
+              case 3:
+              {
                   const char *step_type_string = step_type_to_string (step_type);
                   XPUSHs (sv_2mortal (newSVpv (step_type_string, 0)));
                   XPUSHs (sv_2mortal (newSViv (step_type ==
@@ -3954,7 +3970,9 @@ PPCODE:
                   XPUSHs (ref_to_values_av); /* already mortal */
                   XSRETURN (3);
               }
+              default:
               goto NEXT_STEP;
+              }
           }
           /* NOTREACHED */
 
