@@ -21,35 +21,35 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 # Table of contents
 <!--
-../lua/lua toc.lua init.lua.md
+../lua/lua toc.lua < init.lua.md
 -->
-* [Marpa virtual machine](marpa-virtual-machine)
-* [The Structure of Marpa VM operations](the-structure-of-marpa-vm-operations)
-  * [VM debug operation](vm-debug-operation)
-  * [VM no-op operation](vm-no-op-operation)
-  * [VM bail operation](vm-bail-operation)
-  * [VM result operations](vm-result-operations)
-  * [VM "result is undef" operation](vm-"result-is-undef"-operation)
-  * [VM "result is token value" operation](vm-"result-is-token-value"-operation)
-  * [VM "result is N of RHS" operation](vm-"result-is-n-of-rhs"-operation)
-  * [VM "result is N of sequence" operation](vm-"result-is-n-of-sequence"-operation)
-  * [VM operation: result is constant](vm-operation-result-is-constant)
-  * [Operation of the values array](operation-of-the-values-array)
-  * [VM "push undef" operation](vm-"push-undef"-operation)
-  * [VM "push one" operation](vm-"push-one"-operation)
-  * [Find current token literal](find-current-token-literal)
-  * [VM "push values" operation](vm-"push-values"-operation)
-  * [VM operation: push start location](vm-operation-push-start-location)
-  * [VM operation: push length](vm-operation-push-length)
-  * [VM operation: push G1 start location](vm-operation-push-g1-start-location)
-  * [VM operation: push G1 length](vm-operation-push-g1-length)
-  * [VM operation: push constant onto values array](vm-operation-push-constant-onto-values-array)
-  * [VM operation: set the array blessing](vm-operation-set-the-array-blessing)
-  * [VM operation: result is array](vm-operation-result-is-array)
-  * [VM operation: callback](vm-operation-callback)
+* [Marpa semantics](marpa-semantics)
+  * [VM operations](vm-operations)
+    * [VM debug operation](vm-debug-operation)
+    * [VM no-op operation](vm-no-op-operation)
+    * [VM bail operation](vm-bail-operation)
+    * [VM result operations](vm-result-operations)
+    * [VM "result is undef" operation](vm-"result-is-undef"-operation)
+    * [VM "result is token value" operation](vm-"result-is-token-value"-operation)
+    * [VM "result is N of RHS" operation](vm-"result-is-n-of-rhs"-operation)
+    * [VM "result is N of sequence" operation](vm-"result-is-n-of-sequence"-operation)
+    * [VM operation: result is constant](vm-operation-result-is-constant)
+    * [Operation of the values array](operation-of-the-values-array)
+    * [VM "push undef" operation](vm-"push-undef"-operation)
+    * [VM "push one" operation](vm-"push-one"-operation)
+    * [Find current token literal](find-current-token-literal)
+    * [VM "push values" operation](vm-"push-values"-operation)
+    * [VM operation: push start location](vm-operation-push-start-location)
+    * [VM operation: push length](vm-operation-push-length)
+    * [VM operation: push G1 start location](vm-operation-push-g1-start-location)
+    * [VM operation: push G1 length](vm-operation-push-g1-length)
+    * [VM operation: push constant onto values array](vm-operation-push-constant-onto-values-array)
+    * [VM operation: set the array blessing](vm-operation-set-the-array-blessing)
+    * [VM operation: result is array](vm-operation-result-is-array)
+    * [VM operation: callback](vm-operation-callback)
   * [Run the virtual machine](run-the-virtual-machine)
   * [Find and perform the VM operations](find-and-perform-the-vm-operations)
-  * [Operations for use in the Perl code](operations-for-use-in-the-perl-code)
+  * [VM-related utilities for use in the Perl code](vm-related-utilities-for-use-in-the-perl-code)
     * [Return operation key given its name](return-operation-key-given-its-name)
     * [Return operation name given its key](return-operation-name-given-its-key)
     * [Register a constant](register-a-constant)
@@ -60,8 +60,9 @@ OTHER DEALINGS IN THE SOFTWARE.
     * [Return the value of a stack entry](return-the-value-of-a-stack-entry)
     * [Set the value of a stack entry](set-the-value-of-a-stack-entry)
 * [Preliminaries to the main code](preliminaries-to-the-main-code)
-* [Initialize a valuator](initialize-a-valuator)
-* [Reset a valuator](reset-a-valuator)
+* [Marpa valuators](marpa-valuators)
+  * [Initialize a valuator](initialize-a-valuator)
+  * [Reset a valuator](reset-a-valuator)
 
 # Kollos "mid-level" code
 
@@ -70,7 +71,7 @@ Below it is Libmarpa, a library written in
 the C language which contains the actual parse engine.
 Above it is code in a higher level language -- at this point Perl.
 
-## Marpa virtual machine
+## Marpa semantics
 
 Initially, Marpa's semantics were performed using a VM (virtual machine)
 of about two dozen
@@ -90,7 +91,7 @@ written entirely in Lua.
 If this were done, there no longer would be a VM, in any real sense of the
 word.
 
-## The Structure of Marpa VM operations
+### VM operations
 
 A return value of -1 indicates this should be the last VM operation.
 A return value of 0 or greater indicates this is the last VM operation,
@@ -104,7 +105,7 @@ Maintainters should be aware that these are finicky.
 In particular, while `return f(x)` is turned into a tail call,
 `return (f(x))` is not.
 
-### VM debug operation
+#### VM debug operation
 
 Was used for development.
 Perhaps I should delete this.
@@ -126,7 +127,7 @@ Perhaps I should delete this.
 
 ```
 
-### VM no-op operation
+#### VM no-op operation
 
 This is to be kept after development,
 even if not used.
@@ -141,7 +142,7 @@ It may be useful in debugging.
 
 ```
 
-### VM bail operation
+#### VM bail operation
 
 This is to used for development.
 Its intended use is as a dummy argument,
@@ -158,7 +159,7 @@ fast fails with a clear message.
 
 ```
 
-### VM result operations
+#### VM result operations
 
 If an operation in the VM returns -1, it is a
 "result operation".
@@ -179,7 +180,7 @@ is assumed and, as usual,
 the result is the value in the stack
 at index `recce.v.step.result`.
 
-### VM "result is undef" operation
+#### VM "result is undef" operation
 
 Perhaps the simplest operation.
 The result of the semantics is a Perl undef.
@@ -195,7 +196,7 @@ The result of the semantics is a Perl undef.
 
 ```
 
-### VM "result is token value" operation
+#### VM "result is token value" operation
 
 The result of the semantics is the value of the
 token at the current location.
@@ -223,7 +224,7 @@ if not the value is an undef.
 
 ```
 
-### VM "result is N of RHS" operation
+#### VM "result is N of RHS" operation
 
 ```
     -- luatangle: section+ VM operations
@@ -247,7 +248,7 @@ if not the value is an undef.
 
 ```
 
-### VM "result is N of sequence" operation
+#### VM "result is N of sequence" operation
 
 In `stack`,
 set the result to the `item_ix`'th item of a sequence.
@@ -277,7 +278,7 @@ the "N of RHS" operation should be used.
 
 ```
 
-### VM operation: result is constant
+#### VM operation: result is constant
 
 Returns a constant result.
 
@@ -300,13 +301,13 @@ Returns a constant result.
 
 ```
 
-### Operation of the values array
+#### Operation of the values array
 
 The following operations add elements to the `values` array.
 This is a special array which may eventually be the result of the
 sequence of operations.
 
-### VM "push undef" operation
+#### VM "push undef" operation
 
 Push an undef on the values array.
 
@@ -322,7 +323,7 @@ Push an undef on the values array.
 
 ```
 
-### VM "push one" operation
+#### VM "push one" operation
 
 Push one of the RHS child values onto the values array.
 
@@ -343,7 +344,7 @@ Push one of the RHS child values onto the values array.
 
 ```
 
-### Find current token literal
+#### Find current token literal
 
 `current_token_literal` return the literal
 equivalent of the current token.
@@ -365,7 +366,7 @@ it assumes that the caller has ensured that
 
 ```
 
-### VM "push values" operation
+#### VM "push values" operation
 
 Push the child values onto the `values` list.
 If it is a token step, then
@@ -403,7 +404,7 @@ Otherwise the values of the RHS children are pushed.
 
 ```
 
-### VM operation: push start location
+#### VM operation: push start location
 
 The current start location in input location terms -- that is,
 in terms of the input string.
@@ -422,7 +423,7 @@ in terms of the input string.
 
 ```
 
-### VM operation: push length
+#### VM operation: push length
 
 The length of the current step in input location terms --
 that is, in terms of the input string
@@ -440,7 +441,7 @@ that is, in terms of the input string
 
 ```
 
-### VM operation: push G1 start location
+#### VM operation: push G1 start location
 
 The current start location in G1 location terms -- that is,
 in terms of G1 Earley sets.
@@ -456,7 +457,7 @@ in terms of G1 Earley sets.
 
 ```
 
-### VM operation: push G1 length
+#### VM operation: push G1 length
 
 The length of the current step in G1 terms --
 that is, in terms of G1 Earley sets.
@@ -473,7 +474,7 @@ that is, in terms of G1 Earley sets.
 
 ```
 
-### VM operation: push constant onto values array
+#### VM operation: push constant onto values array
 
 ```
     -- luatangle: section+ VM operations
@@ -492,7 +493,7 @@ that is, in terms of G1 Earley sets.
 
 ```
 
-### VM operation: set the array blessing
+#### VM operation: set the array blessing
 
 The blessing is registered in a constant, and this operation
 lets the VM know its index.  The index is cleared at the beginning
@@ -507,7 +508,7 @@ of every sequence of operations
 
 ```
 
-### VM operation: result is array
+#### VM operation: result is array
 
 This operation tells the VM that the current `values` array
 is the result of this sequence of operations.
@@ -530,7 +531,7 @@ is the result of this sequence of operations.
 
 ```
 
-### VM operation: callback
+#### VM operation: callback
 
 Tells the VM to create a callback to Perl, with
 the `values` array as an argument.
@@ -662,7 +663,7 @@ with "trace" and "do not return" being special cases.
 ```
 
 
-### Operations for use in the Perl code
+### VM-related utilities for use in the Perl code
 
 The following operations are used by the higher-level Perl code
 to set and discover various Lua values.
@@ -831,7 +832,9 @@ Licensing, etc.
 
 ```
 
-## Initialize a valuator
+## Marpa valuators
+
+### Initialize a valuator
 
 Called when a valuator is set up.
 
@@ -899,7 +902,7 @@ Called when a valuator is set up.
 
 ```
 
-## Reset a valuator
+### Reset a valuator
 
 A function to be called whenever a valuator is reset.
 
