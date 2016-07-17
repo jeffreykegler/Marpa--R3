@@ -17,7 +17,7 @@ while true do
   title = title:gsub(' *$', '')
   lowered = title:lower()
   local href = lowered:gsub('[%s%c%p]+', '-')
-  io.stdout:write(string.format('%s* [%s](%s)\n', string.rep('  ', depth-2), title, href))
+  io.stdout:write(string.format('%s* [%s](#%s)\n', string.rep('  ', depth-2), title, href))
   ::NEXT_LINE::
 end
 
