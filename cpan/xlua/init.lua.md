@@ -20,7 +20,9 @@ OTHER DEALINGS IN THE SOFTWARE.
 -->
 
 # Table of contents
-<!-- ../lua/lua toc.lua init.lua.md -->
+<!--
+../lua/lua toc.lua init.lua.md
+-->
 * [Marpa virtual machine](marpa-virtual-machine)
 * [The Structure of Marpa VM operations](the-structure-of-marpa-vm-operations)
   * [VM debug operation](vm-debug-operation)
@@ -31,20 +33,20 @@ OTHER DEALINGS IN THE SOFTWARE.
   * [VM "result is token value" operation](vm-"result-is-token-value"-operation)
   * [VM "result is N of RHS" operation](vm-"result-is-n-of-rhs"-operation)
   * [VM "result is N of sequence" operation](vm-"result-is-n-of-sequence"-operation)
-  * [VM operation: result is constant](vm-operation:-result-is-constant)
+  * [VM operation: result is constant](vm-operation-result-is-constant)
   * [Operation of the values array](operation-of-the-values-array)
   * [VM "push undef" operation](vm-"push-undef"-operation)
   * [VM "push one" operation](vm-"push-one"-operation)
   * [Find current token literal](find-current-token-literal)
   * [VM "push values" operation](vm-"push-values"-operation)
-  * [VM operation: push start location](vm-operation:-push-start-location)
-  * [VM operation: push length](vm-operation:-push-length)
-  * [VM operation: push G1 start location](vm-operation:-push-g1-start-location)
-  * [VM operation: push G1 length](vm-operation:-push-g1-length)
-  * [VM operation: push constant onto values array](vm-operation:-push-constant-onto-values-array)
-  * [VM operation: set the array blessing](vm-operation:-set-the-array-blessing)
-  * [VM operation: result is array](vm-operation:-result-is-array)
-  * [VM operation: callback](vm-operation:-callback)
+  * [VM operation: push start location](vm-operation-push-start-location)
+  * [VM operation: push length](vm-operation-push-length)
+  * [VM operation: push G1 start location](vm-operation-push-g1-start-location)
+  * [VM operation: push G1 length](vm-operation-push-g1-length)
+  * [VM operation: push constant onto values array](vm-operation-push-constant-onto-values-array)
+  * [VM operation: set the array blessing](vm-operation-set-the-array-blessing)
+  * [VM operation: result is array](vm-operation-result-is-array)
+  * [VM operation: callback](vm-operation-callback)
   * [Run the virtual machine](run-the-virtual-machine)
   * [Find and perform the VM operations](find-and-perform-the-vm-operations)
   * [Operations for use in the Perl code](operations-for-use-in-the-perl-code)
