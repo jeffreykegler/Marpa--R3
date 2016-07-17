@@ -19,6 +19,50 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 -->
 
+# Table of contents
+<!-- ../lua/lua toc.lua init.lua.md -->
+* [Table of contents](table-of-contents)
+* [Kollos "mid-level" code](kollos-"mid-level"-code)
+  * [Marpa virtual machine](marpa-virtual-machine)
+  * [The Structure of Marpa VM operations](the-structure-of-marpa-vm-operations)
+    * [VM debug operation](vm-debug-operation)
+    * [VM no-op operation](vm-no-op-operation)
+    * [VM bail operation](vm-bail-operation)
+    * [VM result operations](vm-result-operations)
+    * [VM "result is undef" operation](vm-"result-is-undef"-operation)
+    * [VM "result is token value" operation](vm-"result-is-token-value"-operation)
+    * [VM "result is N of RHS" operation](vm-"result-is-n-of-rhs"-operation)
+    * [VM "result is N of sequence" operation](vm-"result-is-n-of-sequence"-operation)
+    * [VM operation: result is constant](vm-operation:-result-is-constant)
+    * [Operation of the values array](operation-of-the-values-array)
+    * [VM "push undef" operation](vm-"push-undef"-operation)
+    * [VM "push one" operation](vm-"push-one"-operation)
+    * [Find current token literal](find-current-token-literal)
+    * [VM "push values" operation](vm-"push-values"-operation)
+    * [VM operation: push start location](vm-operation:-push-start-location)
+    * [VM operation: push length](vm-operation:-push-length)
+    * [VM operation: push G1 start location](vm-operation:-push-g1-start-location)
+    * [VM operation: push G1 length](vm-operation:-push-g1-length)
+    * [VM operation: push constant onto values array](vm-operation:-push-constant-onto-values-array)
+    * [VM operation: set the array blessing](vm-operation:-set-the-array-blessing)
+    * [VM operation: result is array](vm-operation:-result-is-array)
+    * [VM operation: callback](vm-operation:-callback)
+    * [Run the virtual machine](run-the-virtual-machine)
+    * [Find and perform the VM operations](find-and-perform-the-vm-operations)
+    * [Operations for use in the Perl code](operations-for-use-in-the-perl-code)
+      * [Return operation key given its name](return-operation-key-given-its-name)
+      * [Return operation name given its key](return-operation-name-given-its-key)
+      * [Register a constant](register-a-constant)
+      * [Register semantics for a token](register-semantics-for-a-token)
+      * [Register semantics for a nulling symbol](register-semantics-for-a-nulling-symbol)
+      * [Register semantics for a rule](register-semantics-for-a-rule)
+      * [Return the top index of the stack](return-the-top-index-of-the-stack)
+      * [Return the value of a stack entry](return-the-value-of-a-stack-entry)
+      * [Set the value of a stack entry](set-the-value-of-a-stack-entry)
+  * [Preliminaries to the main code](preliminaries-to-the-main-code)
+  * [Initialize a valuator](initialize-a-valuator)
+  * [Reset a valuator](reset-a-valuator)
+
 # Kollos "mid-level" code
 
 This is the code for Kollos, the "middle layer" of Marpa.
