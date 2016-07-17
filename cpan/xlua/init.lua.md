@@ -19,11 +19,14 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 -->
 
+# The Kollos code
+
 # Table of contents
 <!--
 ../lua/lua toc.lua < init.lua.md
 -->
-* [Marpa semantics](marpa-semantics)
+* [About Kollos](about-kollos)
+* [Kollos semantics](kollos-semantics)
   * [VM operations](vm-operations)
     * [VM debug operation](vm-debug-operation)
     * [VM no-op operation](vm-no-op-operation)
@@ -59,19 +62,24 @@ OTHER DEALINGS IN THE SOFTWARE.
     * [Return the top index of the stack](return-the-top-index-of-the-stack)
     * [Return the value of a stack entry](return-the-value-of-a-stack-entry)
     * [Set the value of a stack entry](set-the-value-of-a-stack-entry)
-* [Preliminaries to the main code](preliminaries-to-the-main-code)
-* [Marpa valuators](marpa-valuators)
+* [The Kollos valuator](the-kollos-valuator)
   * [Initialize a valuator](initialize-a-valuator)
   * [Reset a valuator](reset-a-valuator)
+* [Preliminaries to the main code](preliminaries-to-the-main-code)
 
-# Kollos "mid-level" code
+## About Kollos
 
 This is the code for Kollos, the "middle layer" of Marpa.
 Below it is Libmarpa, a library written in
 the C language which contains the actual parse engine.
 Above it is code in a higher level language -- at this point Perl.
 
-## Marpa semantics
+This document is evolving.  Most of the "middle layer" is still
+in the Perl code or in the Perl XS, and not represented here.
+This document only contains those portions converted to Lua or
+to Lua-centeric C code.
+
+## Kollos semantics
 
 Initially, Marpa's semantics were performed using a VM (virtual machine)
 of about two dozen
@@ -797,42 +805,11 @@ whose id is `id`.
 
 ```
 
-## Preliminaries to the main code
+## The Kollos valuator
 
-Licensing, etc.
-
-```
-
-    -- luatangle: section preliminaries to main
-
-    -- Copyright 2016 Jeffrey Kegler
-    -- Permission is hereby granted, free of charge, to any person obtaining a
-    -- copy of this software and associated documentation files (the "Software"),
-    -- to deal in the Software without restriction, including without limitation
-    -- the rights to use, copy, modify, merge, publish, distribute, sublicense,
-    -- and/or sell copies of the Software, and to permit persons to whom the
-    -- Software is furnished to do so, subject to the following conditions:
-    --
-    -- The above copyright notice and this permission notice shall be included
-    -- in all copies or substantial portions of the Software.
-    --
-    -- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-    -- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-    -- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-    -- THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
-    -- OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
-    -- ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-    -- OTHER DEALINGS IN THE SOFTWARE.
-    --
-    -- [ MIT license: http://www.opensource.org/licenses/mit-license.php ]
-
-    -- luacheck: std lua53
-    -- luacheck: globals bit
-    -- luacheck: globals __FILE__ __LINE__
-
-```
-
-## Marpa valuators
+The "valuator" portion of Kollos produces the
+value of a
+Kollos parse.
 
 ### Initialize a valuator
 
@@ -938,6 +915,41 @@ A function to be called whenever a valuator is reset.
     -- luatangle: write stdout main
 
     -- vim: set expandtab shiftwidth=4:
+```
+
+## Preliminaries to the main code
+
+Licensing, etc.
+
+```
+
+    -- luatangle: section preliminaries to main
+
+    -- Copyright 2016 Jeffrey Kegler
+    -- Permission is hereby granted, free of charge, to any person obtaining a
+    -- copy of this software and associated documentation files (the "Software"),
+    -- to deal in the Software without restriction, including without limitation
+    -- the rights to use, copy, modify, merge, publish, distribute, sublicense,
+    -- and/or sell copies of the Software, and to permit persons to whom the
+    -- Software is furnished to do so, subject to the following conditions:
+    --
+    -- The above copyright notice and this permission notice shall be included
+    -- in all copies or substantial portions of the Software.
+    --
+    -- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    -- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    -- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+    -- THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+    -- OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+    -- ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+    -- OTHER DEALINGS IN THE SOFTWARE.
+    --
+    -- [ MIT license: http://www.opensource.org/licenses/mit-license.php ]
+
+    -- luacheck: std lua53
+    -- luacheck: globals bit
+    -- luacheck: globals __FILE__ __LINE__
+
 ```
 
 <!--
