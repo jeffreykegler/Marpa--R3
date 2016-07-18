@@ -19,43 +19,55 @@
 --
 -- [ MIT license: http://www.opensource.org/licenses/mit-license.php ]
 
+-- The following is the description of the intended full argument syntax,
+-- almost, all of which is *not* implement at present.  Arguments
+-- have the form `key=value`, where key and value have no
+-- internal spaces.  Allowed keys include
+--     `in` -- where the value is an input file.
+--     `out:section` -- where `section` is the name of a section
+--          and the value is an output file.
+--
+-- If an argument does not contain an equal sign (`=`), the key `in`
+-- is assumed and the argument is considered to be "abbreviated".  All
+-- arguments after the first abbreviated argument are treated as abbreviated.
+-- If an abbreviated argument contains an equal sign, so that it is
+-- `section=file_name`, it is treated as if it was `out:section=file_name`.
+--
+-- The portion now implemented allows only "abbreviated" arguments,
+-- and only one input argument.
+
 local file_ids = {}
 
-local bare_arg_count = 0
+local outputs = {}
+local inputs = {}
+
 for arg_ix = 1,#arg do
     local this_arg = arg[arg_ix]
     if not this_arg:find("=") then
-        bare_arg_count = bare_arg_count + 1
-        if bare_arg_count == 1 then
-            file_ids.stdin = this_arg
-        elseif bare_arg_count == 2 then
-            file_ids.stdout = this_arg
-        else
-            return nil, "Bad option: ", arg
-        end
-    else
-        local id, val = this_arg:match("^([^=]+)%=(.*)") -- no space around =
-        if not id or not val then
-            return nil, "Bad option: ", this_arg
-        end
-        file_ids[id] = val
+        inputs[#inputs+1] = this_arg
+        goto NEXT_ARG
     end
+    local section, file_name = this_arg:match("^([^=]+)%=(.*)") -- no space around =
+    if not section or not file_name
+            or #section < 1 or #file_name < 1 then
+        error("Bad option: " .. this_arg)
+    end
+    outputs[section] = file_name
+    ::NEXT_ARG::
 end
 
-file_ids.stdout = file_ids.stdout or '-'
+if #inputs ~= 1 then
+    error("There must be exactly one input file")
+end
 
 local sections = {}
-local outputs = {}
 local current_section
 local current_subsection
 local current_prefix
 
 local input_handle
-if file_ids.stdin then
-    local error_message
-    input_handle, error_message = io.open(file_ids.stdin)
-    if not input_handle then error(error_message) end
-else input_handle = io.input() end
+input_handle, error_message = io.open(inputs[1])
+if not input_handle then error(error_message) end
 
 local line_number = 1
 local lines = {}
@@ -129,29 +141,6 @@ local function command_do(line, command_line_number)
         }
         current_prefix = prefix
         current_section[#current_section + 1] = current_subsection
-        return
-    elseif words[1] == 'write' then
-        if #words < 3 then
-            error("Malformed output command\n"
-                .. " Problem line: " .. line .. "\n"
-            )
-        end
-        local output_fileid = words[2]
-        local section_name = form_section_name(line, words, 3)
-        local output_section = sections[section_name]
-        if not output_section then
-            error("output command to non-existent section\n"
-                .. " Problem line: " .. line .. "\n"
-            )
-        end
-        if outputs[section_name] then
-            error("duplicate output command\n"
-                .. " Second command is: " .. line .. "\n"
-            )
-        end
-        local output_filename
-        output_filename = file_ids[output_fileid] or output_fileid
-        outputs[section_name] = output_filename
         return
     end
 
@@ -240,6 +229,7 @@ while true do
 end
 
 local function write_section(handle, section_name, parent_prefix, seen)
+    -- print('write_section: section_name,filename ', section_name)
     if seen[section_name] then
         error("Section '" .. section_name .. "' is called recursively\n"
             .. "  That would create an infinite loop and is not allowed\n"
@@ -260,6 +250,7 @@ local function write_section(handle, section_name, parent_prefix, seen)
             virtual_line, line_no, first_command_line_no = read_virtual_line(line_no)
             for command_line_no = first_command_line_no, line_no-1 do
                 local command_line = lines[command_line_no]:sub(#subsection_prefix+1)
+    -- print('write_section: writing line', command_line)
                 handle:write(parent_prefix .. command_line, '\n')
             end
             virtual_line = virtual_line:sub(#subsection_prefix+1)
@@ -281,28 +272,11 @@ local function write_section(handle, section_name, parent_prefix, seen)
     end
 end
 
-local was_output
-for section_name,output_filename in pairs(outputs) do
-    was_output = true
-    local handle
-    if output_filename == '-' then
-        handle = io.output()
-    else
-        local error_message
-        handle,error_message = io.open(output_filename, 'w')
-        if not handle then error(error_message) end
-    end
-    write_section(handle, section_name, '', {})
-end
-
-if not was_output then
-    error("No output commands: there must be at least one\n")
-end
-
-for section_name,section in pairs(sections) do
-    if not section.used then
-         print("Section not used: ", section_name)
-    end
+for section_name, filename in pairs(outputs) do
+        -- print('section_name,filename ', section_name,filename)
+        local handle, error_message = io.open(filename, 'w')
+        if not handle then  error(error_message) end
+        write_section(handle, section_name, '', {})
 end
 
 -- vim: expandtab shiftwidth=4:

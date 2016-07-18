@@ -79,7 +79,7 @@ test_dynamic ::
 	$(NOECHO) $(NOOP)
 
 init.lua: init.lua.md
-	$(LUA_INTERP) luatangle init.lua.md > $@
+	$(LUA_INTERP) luatangle init.lua.md main=$@
 
 };
 

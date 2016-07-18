@@ -912,8 +912,6 @@ A function to be called whenever a valuator is reset.
 
     return "OK"
 
-    -- luatangle: write stdout main
-
     -- vim: set expandtab shiftwidth=4:
 ```
 
