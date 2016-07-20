@@ -1,0 +1,142 @@
+-- Copyright 2016 Jeffrey Kegler
+-- Permission is hereby granted, free of charge, to any person obtaining a
+-- copy of this software and associated documentation files (the "Software"),
+-- to deal in the Software without restriction, including without limitation
+-- the rights to use, copy, modify, merge, publish, distribute, sublicense,
+-- and/or sell copies of the Software, and to permit persons to whom the
+-- Software is furnished to do so, subject to the following conditions:
+--
+-- The above copyright notice and this permission notice shall be included
+-- in all copies or substantial portions of the Software.
+--
+-- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+-- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+-- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+-- THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+-- OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+-- ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+-- OTHER DEALINGS IN THE SOFTWARE.
+--
+-- [ MIT license: http://www.opensource.org/licenses/mit-license.php ]
+
+-- The following is the description of the intended full argument syntax,
+-- almost, all of which is *not* implement at present.  Arguments
+-- have the form `key=value`, where key and value have no
+-- internal spaces.  Allowed keys include
+--     `in` -- where the value is an input file.
+--     `out:section` -- where `section` is the name of a section
+--          and the value is an output file.
+--
+-- If an argument does not contain an equal sign (`=`), the key `in`
+-- is assumed and the argument is considered to be "abbreviated".  All
+-- arguments after the first abbreviated argument are treated as abbreviated.
+-- If an abbreviated argument contains an equal sign, so that it is
+-- `section=file_name`, it is treated as if it was `out:section=file_name`.
+--
+-- The portion now implemented allows only "abbreviated" arguments,
+-- and only one input argument.
+
+local file_ids = {}
+
+local outputs = {}
+local inputs = {}
+
+for arg_ix = 1,#arg do
+    local this_arg = arg[arg_ix]
+    if not this_arg:find("=") then
+        inputs[#inputs+1] = this_arg
+        goto NEXT_ARG
+    end
+    local section, file_name = this_arg:match("^([^=]+)%=(.*)") -- no space around =
+    if not section or not file_name
+            or #section < 1 or #file_name < 1 then
+        error("Bad option: " .. this_arg)
+    end
+    outputs[section] = file_name
+    ::NEXT_ARG::
+end
+
+if #inputs ~= 1 then
+    error("There must be exactly one input file")
+end
+
+local sections = {}
+local current_section
+local current_subsection
+local current_prefix
+
+local input_handle
+input_handle, error_message = io.open(inputs[1])
+if not input_handle then error(error_message) end
+
+-- We need random access to the input, so we incur the
+-- cost of reading the entire input into memory.
+local lines = {}
+for line in input_handle:lines() do
+    if line:find('\t') then error("line contains tab: " .. line) end
+    if line:find(' $') then error("line has trailing space: " .. line) end
+    lines[#lines+1] = line
+end
+
+local produce_line = coroutine.wrap(
+    function() for line_no = 1, #lines do coroutine.yield(line_no) end
+    end
+)
+
+local instruction_pattern = '--%[?[%s]*luatangle:'
+
+function handle_text_run(first_line, ss_prefix)
+    local end_of_run = nil
+    local new_prefix = nil
+    local current_line = first_line
+    while current_line do
+        local line = lines[current_line]
+        -- an empty line is always part of the run
+        if #line <= 0 then
+            goto NEXT_LINE
+        end
+        -- a flush left line ends a run,
+        -- and resets the prefix
+        -- unless we already are flush left
+        if #ss_prefix > 0 and not line:match('^[^ ]') then
+            new_prefix = ''
+            goto EMIT
+        end
+        -- if not flush left, but does not match the prefix,
+        -- we have an error
+        if line:sub(1, #ss_prefix) ~= ss_prefix then
+            error(string.format('line does not have prefix of %d spaces: %s', #ss_prefix, line))
+        end
+        -- an instruction ends the text run,
+        -- without resetting the prefix
+        if line:match(instruction_pattern1) then
+            goto EMIT
+        end
+        -- anything else is part of the run
+        ::NEXT_LINE::
+        end_of_run = line
+        current_line = produce_line()
+    end
+    ::EMIT::
+    if end_of_run then
+        coroutine.yield({'run', first_line, end_of_run, ss_prefix})
+    end
+    return current_line, (new_prefix or ss_prefix)
+end
+
+-- Caller ensures that prefix is sane, but not that this actually is
+-- an instruction
+function handle_instruction(first_line_no, ss_prefix)
+    local current_line = first_line_no
+    local first_line = lines[first_line_no]
+    local instruction_prefix, comment_start =
+        first_line:find('--%[? *luatangle:')
+end
+
+while true do
+   local line = produce_line()
+   if not line then break end
+   print(line)
+end
+
+-- vim: expandtab shiftwidth=4:
