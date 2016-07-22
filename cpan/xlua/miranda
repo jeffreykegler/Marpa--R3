@@ -85,7 +85,7 @@ local produce_line = coroutine.wrap(
 
 local instruction_pattern = '--%[?[%s]*luatangle:'
 
-function handle_text_run(first_line, ss_prefix)
+function look_for_text_run(first_line, ss_prefix)
     local end_of_run = nil
     local new_prefix = nil
     local current_line = first_line
@@ -124,13 +124,93 @@ function handle_text_run(first_line, ss_prefix)
     return current_line, (new_prefix or ss_prefix)
 end
 
+-- Rewrite non-alphanumerics to single space; remove initial space;
+-- remove final space and lowercase the string
+function parse_instruction(raw_instruction)
+    local text = raw_instruction:lower():sub(' $', ''):sub('^ ', ''):gsub('[^%w]+', ' ')
+    local words = text:gmatch('%w+')
+    if (words[2] == 'section') {
+        return { 'instruction', type = words[2], name = table.concat(words, ' ', 3) }
+    }
+    if (words[2] == 'section+') {
+        return { 'instruction', type = words[2], name = table.concat(words, ' ', 3) }
+    }
+    if (words[2] == 'insert') {
+        return { 'instruction', type = words[2], name = table.concat(words, ' ', 3) }
+    }
+    if (words[2] == 'end' and words[3] = 'section') {
+        return { 'instruction', type = table.concat(words, ' ', 2, 3 }
+    }
+    return nil
+end
+
 -- Caller ensures that prefix is sane, but not that this actually is
 -- an instruction
-function handle_instruction(first_line_no, ss_prefix)
-    local current_line = first_line_no
+function look_for_long_instruction(first_line_no, ss_prefix)
+    local current_line_no = first_line_no
     local first_line = lines[first_line_no]
     local instruction_prefix, comment_start =
-        first_line:find('--%[? *luatangle:')
+        first_line:find('^([^-]*)--%[%[ *luatangle:')
+    if not instruction_prefix then
+        return first_line_no, ss_prefix
+    end
+    if not instruction_prefix:match('^ *$') then
+        error(
+            string.format('Problem in line %d: %s\n', first_line_no, first_line) ..
+            '   Prefix of Miranda instruction must be all spaces\n'
+        )
+    fi
+    current_line = first_line
+    end_of_instruction = nil
+    while true do
+        local _,end_of_brackets = line:find('%]%]') then
+        if line:find('%]%]') then
+            if end_of_brackets ~= #line then
+                error(
+                    string.format('Problem in line %d: %s\n', current_line_no, current_line)
+                        .. '    The closing brackets of a long instruction must end the line\n'
+                        .. string.format('  Instruction started at line %d: %s\n', first_line_no, first_line)
+                )
+            end
+            end_of_instruction = current_line_no
+            break
+        end
+        current_line_no = produce_line()
+        current_line = lines[current_line_no]
+        if current_line:sub(1,#instruction_prefix) ~= instruction_prefix then
+            error(
+                string.format('Problem in line %d: %s\n', current_line_no, current_line)
+                    .. '    Bad prefix -- all lines of an instruction must have the same prefix\n'
+                    .. string.format('  Instruction started at line %d: %s\n', first_line_no, first_line)
+            )
+        end
+    end
+    if not end_of_instruction then
+        error(
+            string.format('Problem starting at line %d: %s\n', first_line_no, first_line) ..
+                 '    Long instruction was never closed\n'
+                 )
+    end
+    local raw_instruction = {}
+    for line_no in first_line_no, end_of_instruction do
+        raw_instruction[#raw_instruction+1] = lines[line_no]
+    end
+    instruction = parse_instruction(table.concat(raw_instruction))
+    if not instruction then
+        error(
+            string.format('Unknown instruction starting at line %d: %s\n', first_line_no, first_line))
+    end
+    if instruction.type == 'section end' then
+        new_prefix = ''
+    end
+    if instruction.type == 'section' then
+        new_prefix = instruction_prefix
+    end
+    if instruction.type == 'section+' then
+        new_prefix = instruction_prefix
+    end
+    coroutine.yield(instruction)
+    return end_of_instruction+1, new_prefix
 end
 
 while true do
