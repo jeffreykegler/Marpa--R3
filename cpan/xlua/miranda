@@ -36,6 +36,8 @@
 -- The portion now implemented allows only "abbreviated" arguments,
 -- and only one input argument.
 
+require 'inspect' -- delete after development
+
 local file_ids = {}
 
 local outputs = {}
@@ -78,12 +80,39 @@ for line in input_handle:lines() do
     lines[#lines+1] = line
 end
 
-local produce_line = coroutine.wrap(
-    function() for line_no = 1, #lines do coroutine.yield(line_no) end
+-- Morphemes are the smallest meaningful pieces.  They
+-- are instructions (which may be multi-line) and, otherwise,
+-- individual lines.
+local produce_lexeme = coroutine.wrap(
+    function()
+        local line_no = 0
+        while true do
+            line_no = line_no+1
+            local line = lines[line_no]
+            if not line then return end
+            local equals = line:match('^%s*[-][-]%[(=)%[ *luatangle:')
+            if equals then
+                local first_line_no
+                while line_no do
+                    local line = lines[line_no]
+                    if line:match('%]' .. equals .. '%]') then
+                        coroutine.yield({'long', first_line_no, line_no})
+                        goto NEXT_LINE
+                    end
+                    line_no = line_no+1
+                end
+            end
+            print(line)
+            local is_instruction = line:find('^%s*[-][-] *luatangle:')
+            if is_instruction then
+                coroutine.yield({'short', line_no})
+                goto NEXT_LINE
+            end
+            coroutine.yield({'text', line_no})
+            ::NEXT_LINE::
+        end
     end
 )
-
-local instruction_pattern = '--%[?[%s]*luatangle:'
 
 function look_for_text_run(first_line, ss_prefix)
     local end_of_run = nil
@@ -129,18 +158,18 @@ end
 function parse_instruction(raw_instruction)
     local text = raw_instruction:lower():sub(' $', ''):sub('^ ', ''):gsub('[^%w]+', ' ')
     local words = text:gmatch('%w+')
-    if (words[2] == 'section') {
+    if words[2] == 'section' then
         return { 'instruction', type = words[2], name = table.concat(words, ' ', 3) }
-    }
-    if (words[2] == 'section+') {
+    end
+    if words[2] == 'section+' then
         return { 'instruction', type = words[2], name = table.concat(words, ' ', 3) }
-    }
-    if (words[2] == 'insert') {
+    end
+    if words[2] == 'insert' then
         return { 'instruction', type = words[2], name = table.concat(words, ' ', 3) }
-    }
-    if (words[2] == 'end' and words[3] = 'section') {
-        return { 'instruction', type = table.concat(words, ' ', 2, 3 }
-    }
+    end
+    if words[2] == 'end' and words[3] == 'section' then
+        return { 'instruction', type = table.concat(words, ' ', 2, 3) }
+    end
     return nil
 end
 
@@ -159,11 +188,11 @@ function look_for_long_instruction(first_line_no, ss_prefix)
             string.format('Problem in line %d: %s\n', first_line_no, first_line) ..
             '   Prefix of Miranda instruction must be all spaces\n'
         )
-    fi
+    end
     current_line = first_line
     end_of_instruction = nil
     while true do
-        local _,end_of_brackets = line:find('%]%]') then
+        local _, end_of_brackets = line:find('%]%]')
         if line:find('%]%]') then
             if end_of_brackets ~= #line then
                 error(
@@ -214,9 +243,9 @@ function look_for_long_instruction(first_line_no, ss_prefix)
 end
 
 while true do
-   local line = produce_line()
-   if not line then break end
-   print(line)
+   local lexeme = produce_lexeme()
+   if not lexeme then break end
+   print(inspect(lexeme))
 end
 
 -- vim: expandtab shiftwidth=4:
