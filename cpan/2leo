@@ -2,7 +2,7 @@ Recall the "open" question of whether there exists a grammar G which has
 an ambiguous right recursion, but where G itself is unambiguous.  I think
 the following proves the answer is no and wanted to ask if you agree.
 
-I write <X> for symbols and <<sf>> for sentential forms.  I write Px(<X>,
+I write <X> for symbols and <<sf>> for sentential forms.  I write Px(<<X>>,
 <<Y>>) to say that the ordered set of parse trees Px have the symbols
 in the sentential form <<X>> as their roots; and that the concatenation
 of their fringes is <<Y>>.
@@ -17,16 +17,19 @@ Proof:  Since <B> is accessible we know that there is a
 
 such that <S> is the start symbol of G; <<alpha>> is a productive
 sentential form in G; and <<gamma>> is a productive sentential form in G.
-Therefore we also have Palpha and Pgamma such that there are strings of
-terminals <<a>> and <<c>> where
+Therefore we also have Palpha and Pgamma such that
 
-2) Palpha(<<alpha>>, <<a>>) 3) Pgamma(<<gamma>>, <<c>>)
+2) Palpha(<<alpha>>, <<a>>), and
 
-We assemble P1, PS, Palpha and Pgamma into single parse tree
+3) Pgamma(<<gamma>>, <<c>>)
+
+where <<a>> and <<c>> are strings of terminals.
+
+We assemble P1, PS, Palpha and Pgamma into a single parse tree:
 
 4) PS1(<S>, <<a>> <<b>> <<c>>).
 
-We assemble P2, PS, Palpha and Pgamma into single parse tree
+We assemble P2, PS, Palpha and Pgamma into a single parse tree:
 
 5) PS2(<S>, <<a>> <<b>> <<c>>).
 
