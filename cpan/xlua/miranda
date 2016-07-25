@@ -90,25 +90,40 @@ local produce_lexeme = coroutine.wrap(
             line_no = line_no+1
             local line = lines[line_no]
             if not line then return end
-            local equals = line:match('^%s*[-][-]%[(=)%[ *luatangle:')
-            if equals then
-                local first_line_no
+            local prefix, equals = line:match('^(%s*)[-][-]%[(=)%[ *luatangle:')
+            if prefix then
+                if prefix:find('[^ ]') then
+                    error(string.format(
+                        'Problem in line %d: %s\n    Prefix must be all spaces',
+                        line_no, line)
+                    )
+                end
+                local first_line_no = line_no
                 while line_no do
                     local line = lines[line_no]
+                    if not line:sub(1, #prefix) ~= prefix then
+                        error(string.format(
+                            'Problem in line %d: %s\n'
+                            .. '    Lines does not have prefix of %d spaces\n'
+                            .. '    All lines of a long instruction must have its prefix\n',
+                            line_no, line, #prefix
+                            )
+                        )
+                    end
                     if line:match('%]' .. equals .. '%]') then
-                        coroutine.yield({'long', first_line_no, line_no})
+                        local instruction = parse_instruction(first_line_no, line_no)
+                        coroutine.yield(instruction)
                         goto NEXT_LINE
                     end
                     line_no = line_no+1
                 end
             end
-            print(line)
-            local is_instruction = line:find('^%s*[-][-] *luatangle:')
-            if is_instruction then
-                coroutine.yield({'short', line_no})
+            prefix = line:find('^(%s*)[-][-] *luatangle:')
+            if prefix then
+                local instruction = parse_instruction(line_no)
+                coroutine.yield(instruction)
                 goto NEXT_LINE
             end
-            coroutine.yield({'text', line_no})
             ::NEXT_LINE::
         end
     end
@@ -153,24 +168,56 @@ function look_for_text_run(first_line, ss_prefix)
     return current_line, (new_prefix or ss_prefix)
 end
 
+function parse_section_name(raw_name)
+    local text = raw_name:lower():gsub(' $', '', 1):gsub('^ ', '', 1):gsub('[^%w]+', ' ')
+    return text
+end
+
 -- Rewrite non-alphanumerics to single space; remove initial space;
 -- remove final space and lowercase the string
-function parse_instruction(raw_instruction)
-    local text = raw_instruction:lower():sub(' $', ''):sub('^ ', ''):gsub('[^%w]+', ' ')
-    local words = text:gmatch('%w+')
-    if words[2] == 'section' then
-        return { 'instruction', type = words[2], name = table.concat(words, ' ', 3) }
+function parse_instruction(first_line_no, last_line_no)
+    local raw_instruction = table.concat(lines, '', first_line_no, last_line_no)
+    local prefix, body
+    if last_line_no then
+        local raw_instruction = table.concat(lines, '', first_line_no, last_line_no)
+        local equals
+        prefix, equals, body = raw_instruction.match('^( *)--(%[(=*)%[)? *luatangle: *(.*)$')
+        body = body:gsub('%]' .. equals .. '%]$', '', 1)
+    else
+        local raw_instruction = lines[first_line_no]
+        prefix, body = raw_instruction:match('^( *)-- *luatangle: *(.*)$')
     end
-    if words[2] == 'section+' then
-        return { 'instruction', type = words[2], name = table.concat(words, ' ', 3) }
+    -- print('raw_instruction', first_line_no, last_line_no, raw_instruction)
+    local words = {}
+    for word in body:gmatch('[%w%p]+') do
+        words[#words+1] = word
     end
-    if words[2] == 'insert' then
-        return { 'instruction', type = words[2], name = table.concat(words, ' ', 3) }
+    -- print('words', inspect(words))
+    local instruction = { first_line_no, last_line_no, prefix = prefix }
+    if words[1] == 'section' then
+        instruction.type = words[1]
+        instruction.name = parse_section_name(table.concat(words, ' ', 2))
+        return instruction
     end
-    if words[2] == 'end' and words[3] == 'section' then
-        return { 'instruction', type = table.concat(words, ' ', 2, 3) }
+    if words[1] == 'section+' then
+        instruction.type = words[1]
+        instruction.name = parse_section_name(table.concat(words, ' ', 2))
+        return instruction
     end
-    return nil
+    if words[1] == 'insert' then
+        instruction.type = words[1]
+        instruction.name = parse_section_name(table.concat(words, ' ', 2))
+        return instruction
+    end
+    if words[1] == 'end' and words[2] == 'section' then
+        instruction.type = table.concat(words, ' ', 1, 2)
+        return instruction
+    end
+    error(string.format(
+        'Cannot parse instruction starting at line %d\n'
+        .. '    Instruction begins: %s',
+        first_line_no, lines[first_line_no]
+    ))
 end
 
 -- Caller ensures that prefix is sane, but not that this actually is
