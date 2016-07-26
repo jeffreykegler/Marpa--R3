@@ -306,6 +306,40 @@ for instruction in instruction_iter() do
     instructions[#instructions+1] = instruction
 end
 
+local function next_run_find(instruction_ix)
+    while true do
+        local instruction = instructions[instruction_ix]
+        if not instruction then return nil end
+        if type == 'section' then
+            local run_name = instruction.name
+            local section = sections[run_name]
+            if not section then return instruction_ix end
+            error(problem_in_line(instruction:first_line())
+                .. "   'section' command, but section already exists\n"
+                .. "   A 'section' command must start a new section\n"
+            )
+        end
+        if type == 'section+' then
+            local run_name = instruction.name
+            local section = sections[run_name]
+            if section then return instruction_ix end
+            error(problem_in_line(instruction:first_line())
+                .. "   'section+' command, but section does not exist\n"
+                .. "   A 'section+' command must continue an existing section\n"
+            )
+        end
+
+        -- Currently no instruction are allowed outside a run -- they
+        -- must either start a run or occur within one.
+        error(problem_in_line(instruction:first_line())
+            .. string.format("   '%s' command is only allowed inside a run\n",
+                 type)
+        )
+    end
+    return nil
+end
+
+
 -- A "run" is a series of consecutive lines which end up in a
 -- section.  A section consists 1 or more runs.
 local function run_iter()
@@ -314,48 +348,51 @@ local function run_iter()
             local run_name = nil
             local run_prefix = nil
             local current_line_no = nil
-            local instruction_ix = 0
+            local start_instruction_ix = 1
+            -- while we can find start instructions
+            while true do
+                local start_instruction_ix = next_run_find(start_instruction_ix)
+                if not start_instruction_ix then return nil end
+                local start_instruction = instructions[start_instruction_ix]
+                local run_name = start_instruction.name
+                local run_prefix = start_instruction.prefix
+                local current_instruction_ix = start_instruction_ix
                 while true do
-                    instruction_ix = instruction_ix+1
-                    local instruction = instructions[instruction_ix]
-                    if run_name then
-                        -- TODO
-                    else
-                        if not instruction then return end
-                        local type = instruction.type
-                        if type == 'section' then
-                            run_name = instruction.name
-                            local section = sections[run_name]
-                            if section then
-                                error(problem_in_line(instruction:first_line())
-                                    .. "   'section' command, but section already exists\n"
-                                    .. "   A 'section' command must start a new section\n"
-                                )
-                            end
-                            run_prefix = instruction.prefix
-                            current_line_no = instruction:last_line() + 1
-                            goto ADD_RUN
+                    local current_instruction = instructions[current_instruction_ix]
+                    local next_instruction = instructions[current_instruction_ix+1]
+                    local first_text_line = current_instruction:last_line() + 1
+                    local last_text_line = next_instruction and next_instruction:first_line()-1 or #lines
+                    local end_of_run = nil
+                    for text_line_no = first_text_line, last_text_line do
+                        local line = lines[text_line_no]
+                        if #line > 0 and line:sub(1, #run_prefix) ~= run_prefix then
+                            end_of_run = text_line_no
+                            break
                         end
-                        if type == 'section+' then
-                            run_name = instruction.name
-                            local section = sections[run_name]
-                            if not section then
-                                error(problem_in_line(instruction:first_line())
-                                    .. "   'section+' command, but section does not exist\n"
-                                    .. "   A 'section+' command must continue an existing section\n"
-                                )
-                            end
-                            run_prefix = instruction.prefix
-                            current_line_no = instruction:last_line() + 1
-                            goto ADD_RUN
-                        end
-                        error(problem_in_line(instruction:first_line())
-                            .. string.format("   '%s' command is only allowed inside a run\n",
-                                 type)
-                        )
                     end
-                    ::ADD_RUN::
+                    if end_of_run then
+                        coroutine.yield(start_instruction, end_of_run)
+                        start_instruction_ix = current_instruction_ix + 1
+                        goto NEXT_RUN
+                    end
+                    if not next_instruction then
+                        coroutine.yield(start_instruction, #lines)
+                    end
+                    local next_instruction_line_no = next_instruction:first_line()
+                    if next_instruction_line_no:sub(1, #run_prefix) ~= run_prefix then
+                        coroutine.yield(start_instruction, next_instruction_line_no-1)
+                        start_instruction_ix = current_instruction_ix + 1
+                        goto NEXT_RUN
+                    end
+                    if next_instruction.type == "end section" then
+                        coroutine.yield(start_instruction, next_instruction:last_line())
+                        start_instruction_ix = current_instruction_ix + 2
+                        goto NEXT_RUN
+                    end
+                    current_instruction_ix = current_instruction_ix + 1
                 end
+                ::NEXT_RUN::
+            end
         end
     )
 end
