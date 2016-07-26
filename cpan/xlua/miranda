@@ -180,8 +180,10 @@ function parse_section_name(raw_name)
 end
 
 local mt_instruction = {
-     last_line = function(instruction) return instruction[2] or instruction[1] end
+     last_line = function(instruction) return instruction[2] or instruction[1] end,
+     first_line = function(instruction) return instruction[1] end
 }
+mt_instruction.__index = mt_instruction
 
 -- Rewrite non-alphanumerics to single space; remove initial space;
 -- remove final space and lowercase the string
@@ -331,6 +333,7 @@ local function next_run_find(instruction_ix)
 
         -- Currently no instruction are allowed outside a run -- they
         -- must either start a run or occur within one.
+        print('error instruction', inspect(instruction))
         error(problem_in_line(instruction:first_line())
             .. string.format("   '%s' command is only allowed inside a run\n",
                  type)
@@ -395,6 +398,10 @@ local function run_iter()
             end
         end
     )
+end
+
+for instruction, end_line in run_iter() do
+    print(inspect(instruction), end_line)
 end
 
 -- vim: expandtab shiftwidth=4:
