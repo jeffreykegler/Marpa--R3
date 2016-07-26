@@ -80,6 +80,10 @@ for line in input_handle:lines() do
     lines[#lines+1] = line
 end
 
+local function problem_in_line(line_no)
+     return string.format("Problem in line %d: %s\n", line_no, lines[line_no])
+end
+
 -- Morphemes are the smallest meaningful pieces.  They
 -- are instructions (which may be multi-line) and, otherwise,
 -- individual lines.
@@ -175,6 +179,10 @@ function parse_section_name(raw_name)
     return text
 end
 
+local mt_instruction = {
+     last_line = function(instruction) return instruction[2] or instruction[1] end
+}
+
 -- Rewrite non-alphanumerics to single space; remove initial space;
 -- remove final space and lowercase the string
 function parse_instruction(first_line_no, last_line_no)
@@ -196,6 +204,7 @@ function parse_instruction(first_line_no, last_line_no)
     end
     -- print('words', inspect(words))
     local instruction = { first_line_no, last_line_no, prefix = prefix }
+    setmetatable(instruction, mt_instruction)
     if words[1] == 'section' then
         instruction.type = words[1]
         instruction.name = parse_section_name(table.concat(words, ' ', 2))
@@ -295,6 +304,60 @@ local instructions = {}
 for instruction in instruction_iter() do
     print(inspect(instruction))
     instructions[#instructions+1] = instruction
+end
+
+-- A "run" is a series of consecutive lines which end up in a
+-- section.  A section consists 1 or more runs.
+local function run_iter()
+    return  coroutine.wrap(
+        function()
+            local run_name = nil
+            local run_prefix = nil
+            local current_line_no = nil
+            local instruction_ix = 0
+                while true do
+                    instruction_ix = instruction_ix+1
+                    local instruction = instructions[instruction_ix]
+                    if run_name then
+                        -- TODO
+                    else
+                        if not instruction then return end
+                        local type = instruction.type
+                        if type == 'section' then
+                            run_name = instruction.name
+                            local section = sections[run_name]
+                            if section then
+                                error(problem_in_line(instruction:first_line())
+                                    .. "   'section' command, but section already exists\n"
+                                    .. "   A 'section' command must start a new section\n"
+                                )
+                            end
+                            run_prefix = instruction.prefix
+                            current_line_no = instruction:last_line() + 1
+                            goto ADD_RUN
+                        end
+                        if type == 'section+' then
+                            run_name = instruction.name
+                            local section = sections[run_name]
+                            if not section then
+                                error(problem_in_line(instruction:first_line())
+                                    .. "   'section+' command, but section does not exist\n"
+                                    .. "   A 'section+' command must continue an existing section\n"
+                                )
+                            end
+                            run_prefix = instruction.prefix
+                            current_line_no = instruction:last_line() + 1
+                            goto ADD_RUN
+                        end
+                        error(problem_in_line(instruction:first_line())
+                            .. string.format("   '%s' command is only allowed inside a run\n",
+                                 type)
+                        )
+                    end
+                    ::ADD_RUN::
+                end
+        end
+    )
 end
 
 -- vim: expandtab shiftwidth=4:
