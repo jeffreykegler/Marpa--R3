@@ -83,51 +83,53 @@ end
 -- Morphemes are the smallest meaningful pieces.  They
 -- are instructions (which may be multi-line) and, otherwise,
 -- individual lines.
-local produce_lexeme = coroutine.wrap(
-    function()
-        local line_no = 0
-        while true do
-            line_no = line_no+1
-            local line = lines[line_no]
-            if not line then return end
-            local prefix, equals = line:match('^(%s*)[-][-]%[(=)%[ *luatangle:')
-            if prefix then
-                if prefix:find('[^ ]') then
-                    error(string.format(
-                        'Problem in line %d: %s\n    Prefix must be all spaces',
-                        line_no, line)
-                    )
-                end
-                local first_line_no = line_no
-                while line_no do
+local function instruction_iter()
+    return  coroutine.wrap(
+        function()
+            local line_no = 0
+                while true do
+                    line_no = line_no+1
                     local line = lines[line_no]
-                    if not line:sub(1, #prefix) ~= prefix then
-                        error(string.format(
-                            'Problem in line %d: %s\n'
-                            .. '    Lines does not have prefix of %d spaces\n'
-                            .. '    All lines of a long instruction must have its prefix\n',
-                            line_no, line, #prefix
+                    if not line then return end
+                    local prefix, equals = line:match('^(%s*)[-][-]%[(=)%[ *luatangle:')
+                    if prefix then
+                        if prefix:find('[^ ]') then
+                            error(string.format(
+                                'Problem in line %d: %s\n    Prefix must be all spaces',
+                                line_no, line)
                             )
-                        )
+                        end
+                        local first_line_no = line_no
+                        while line_no do
+                            local line = lines[line_no]
+                            if not line:sub(1, #prefix) ~= prefix then
+                                error(string.format(
+                                    'Problem in line %d: %s\n'
+                                    .. '    Lines does not have prefix of %d spaces\n'
+                                    .. '    All lines of a long instruction must have its prefix\n',
+                                    line_no, line, #prefix
+                                    )
+                                )
+                            end
+                            if line:match('%]' .. equals .. '%]') then
+                                local instruction = parse_instruction(first_line_no, line_no)
+                                coroutine.yield(instruction)
+                                goto NEXT_LINE
+                            end
+                            line_no = line_no+1
+                        end
                     end
-                    if line:match('%]' .. equals .. '%]') then
-                        local instruction = parse_instruction(first_line_no, line_no)
+                    prefix = line:find('^(%s*)[-][-] *luatangle:')
+                    if prefix then
+                        local instruction = parse_instruction(line_no)
                         coroutine.yield(instruction)
                         goto NEXT_LINE
                     end
-                    line_no = line_no+1
-                end
+                ::NEXT_LINE::
             end
-            prefix = line:find('^(%s*)[-][-] *luatangle:')
-            if prefix then
-                local instruction = parse_instruction(line_no)
-                coroutine.yield(instruction)
-                goto NEXT_LINE
-            end
-            ::NEXT_LINE::
         end
-    end
-)
+    )
+end
 
 function look_for_text_run(first_line, ss_prefix)
     local end_of_run = nil
@@ -289,10 +291,10 @@ function look_for_long_instruction(first_line_no, ss_prefix)
     return end_of_instruction+1, new_prefix
 end
 
-while true do
-   local lexeme = produce_lexeme()
-   if not lexeme then break end
-   print(inspect(lexeme))
+local instructions = {}
+for instruction in instruction_iter() do
+    print(inspect(instruction))
+    instructions[#instructions+1] = instruction
 end
 
 -- vim: expandtab shiftwidth=4:
