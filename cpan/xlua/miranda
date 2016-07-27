@@ -194,75 +194,6 @@ function parse_instruction(first_line_no, last_line_no)
     ))
 end
 
--- Caller ensures that prefix is sane, but not that this actually is
--- an instruction
-function look_for_long_instruction(first_line_no, ss_prefix)
-    local current_line_no = first_line_no
-    local first_line = lines[first_line_no]
-    local instruction_prefix, comment_start =
-        first_line:find('^([^-]*)--%[%[ *luatangle:')
-    if not instruction_prefix then
-        return first_line_no, ss_prefix
-    end
-    if not instruction_prefix:match('^ *$') then
-        error(
-            string.format('Problem in line %d: %s\n', first_line_no, first_line) ..
-            '   Prefix of Miranda instruction must be all spaces\n'
-        )
-    end
-    current_line = first_line
-    end_of_instruction = nil
-    while true do
-        local _, end_of_brackets = line:find('%]%]')
-        if line:find('%]%]') then
-            if end_of_brackets ~= #line then
-                error(
-                    string.format('Problem in line %d: %s\n', current_line_no, current_line)
-                        .. '    The closing brackets of a long instruction must end the line\n'
-                        .. string.format('  Instruction started at line %d: %s\n', first_line_no, first_line)
-                )
-            end
-            end_of_instruction = current_line_no
-            break
-        end
-        current_line_no = produce_line()
-        current_line = lines[current_line_no]
-        if current_line:sub(1,#instruction_prefix) ~= instruction_prefix then
-            error(
-                string.format('Problem in line %d: %s\n', current_line_no, current_line)
-                    .. '    Bad prefix -- all lines of an instruction must have the same prefix\n'
-                    .. string.format('  Instruction started at line %d: %s\n', first_line_no, first_line)
-            )
-        end
-    end
-    if not end_of_instruction then
-        error(
-            string.format('Problem starting at line %d: %s\n', first_line_no, first_line) ..
-                 '    Long instruction was never closed\n'
-                 )
-    end
-    local raw_instruction = {}
-    for line_no in first_line_no, end_of_instruction do
-        raw_instruction[#raw_instruction+1] = lines[line_no]
-    end
-    instruction = parse_instruction(table.concat(raw_instruction))
-    if not instruction then
-        error(
-            string.format('Unknown instruction starting at line %d: %s\n', first_line_no, first_line))
-    end
-    if instruction.type == 'section end' then
-        new_prefix = ''
-    end
-    if instruction.type == 'section' then
-        new_prefix = instruction_prefix
-    end
-    if instruction.type == 'section+' then
-        new_prefix = instruction_prefix
-    end
-    coroutine.yield(instruction)
-    return end_of_instruction+1, new_prefix
-end
-
 local instructions = {}
 for instruction in instruction_iter() do
     print(inspect(instruction))
@@ -270,12 +201,12 @@ for instruction in instruction_iter() do
 end
 
 local function next_run_find(instruction_ix)
-    print('instruction_ix', instruction_ix)
+    -- print('instruction_ix', instruction_ix)
     while true do
         local instruction = instructions[instruction_ix]
         if not instruction then return nil end
         local itype = instruction.type
-        print('itype=', itype)
+        -- print('itype=', itype)
         if itype == 'section' then
             local run_name = instruction.name
             local section = sections[run_name]
@@ -300,7 +231,7 @@ local function next_run_find(instruction_ix)
 
         -- Currently no instruction are allowed outside a run -- they
         -- must either start a run or occur within one.
-        print('error instruction', inspect(instruction))
+        -- print('error instruction', inspect(instruction))
         error(problem_in_line(instruction:first_line())
             .. string.format("   '%s' command is only allowed inside a run\n",
                  itype)
@@ -320,7 +251,7 @@ local function run_iter()
             local start_instruction_ix = 1
             -- while we can find start instructions
             while true do
-                print('run_iter: start_instruction_ix=', start_instruction_ix)
+                -- print('run_iter: start_instruction_ix=', start_instruction_ix)
                 start_instruction_ix = next_run_find(start_instruction_ix)
                 if not start_instruction_ix then return nil end
                 local start_instruction = instructions[start_instruction_ix]
@@ -334,7 +265,7 @@ local function run_iter()
                     local end_of_run = nil
                     for text_line_no = first_text_line, last_text_line do
                         local line = lines[text_line_no]
-                        print('text line:', line)
+                        -- print('text line:', line)
                         if #line > 0 and line:sub(1, #run_prefix) ~= run_prefix then
                             end_of_run = text_line_no
                             break
