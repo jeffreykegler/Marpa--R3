@@ -135,45 +135,6 @@ local function instruction_iter()
     )
 end
 
-function look_for_text_run(first_line, ss_prefix)
-    local end_of_run = nil
-    local new_prefix = nil
-    local current_line = first_line
-    while current_line do
-        local line = lines[current_line]
-        -- an empty line is always part of the run
-        if #line <= 0 then
-            goto NEXT_LINE
-        end
-        -- a flush left line ends a run,
-        -- and resets the prefix
-        -- unless we already are flush left
-        if #ss_prefix > 0 and not line:match('^[^ ]') then
-            new_prefix = ''
-            goto EMIT
-        end
-        -- if not flush left, but does not match the prefix,
-        -- we have an error
-        if line:sub(1, #ss_prefix) ~= ss_prefix then
-            error(string.format('line does not have prefix of %d spaces: %s', #ss_prefix, line))
-        end
-        -- an instruction ends the text run,
-        -- without resetting the prefix
-        if line:match(instruction_pattern1) then
-            goto EMIT
-        end
-        -- anything else is part of the run
-        ::NEXT_LINE::
-        end_of_run = line
-        current_line = produce_line()
-    end
-    ::EMIT::
-    if end_of_run then
-        coroutine.yield({'run', first_line, end_of_run, ss_prefix})
-    end
-    return current_line, (new_prefix or ss_prefix)
-end
-
 function parse_section_name(raw_name)
     local text = raw_name:lower():gsub(' $', '', 1):gsub('^ ', '', 1):gsub('[^%w]+', ' ')
     return text
@@ -309,19 +270,25 @@ for instruction in instruction_iter() do
 end
 
 local function next_run_find(instruction_ix)
+    print('instruction_ix', instruction_ix)
     while true do
         local instruction = instructions[instruction_ix]
         if not instruction then return nil end
-        if type == 'section' then
+        local itype = instruction.type
+        print('itype=', itype)
+        if itype == 'section' then
             local run_name = instruction.name
             local section = sections[run_name]
-            if not section then return instruction_ix end
+            if not section then
+                sections[run_name] = {}
+                return instruction_ix
+            end
             error(problem_in_line(instruction:first_line())
                 .. "   'section' command, but section already exists\n"
                 .. "   A 'section' command must start a new section\n"
             )
         end
-        if type == 'section+' then
+        if itype == 'section+' then
             local run_name = instruction.name
             local section = sections[run_name]
             if section then return instruction_ix end
@@ -336,7 +303,7 @@ local function next_run_find(instruction_ix)
         print('error instruction', inspect(instruction))
         error(problem_in_line(instruction:first_line())
             .. string.format("   '%s' command is only allowed inside a run\n",
-                 type)
+                 itype)
         )
     end
     return nil
@@ -348,16 +315,15 @@ end
 local function run_iter()
     return  coroutine.wrap(
         function()
-            local run_name = nil
             local run_prefix = nil
             local current_line_no = nil
             local start_instruction_ix = 1
             -- while we can find start instructions
             while true do
-                local start_instruction_ix = next_run_find(start_instruction_ix)
+                print('run_iter: start_instruction_ix=', start_instruction_ix)
+                start_instruction_ix = next_run_find(start_instruction_ix)
                 if not start_instruction_ix then return nil end
                 local start_instruction = instructions[start_instruction_ix]
-                local run_name = start_instruction.name
                 local run_prefix = start_instruction.prefix
                 local current_instruction_ix = start_instruction_ix
                 while true do
@@ -368,39 +334,46 @@ local function run_iter()
                     local end_of_run = nil
                     for text_line_no = first_text_line, last_text_line do
                         local line = lines[text_line_no]
+                        print('text line:', line)
                         if #line > 0 and line:sub(1, #run_prefix) ~= run_prefix then
                             end_of_run = text_line_no
                             break
                         end
                     end
                     if end_of_run then
-                        coroutine.yield(start_instruction, end_of_run)
+                        coroutine.yield(start_instruction_ix, end_of_run)
                         start_instruction_ix = current_instruction_ix + 1
                         goto NEXT_RUN
                     end
                     if not next_instruction then
-                        coroutine.yield(start_instruction, #lines)
+                        coroutine.yield(start_instruction_ix, #lines)
+                        goto NEXT_RUN
                     end
                     local next_instruction_line_no = next_instruction:first_line()
-                    if next_instruction_line_no:sub(1, #run_prefix) ~= run_prefix then
-                        coroutine.yield(start_instruction, next_instruction_line_no-1)
+                    local next_instruction_first_line = lines[next_instruction_line_no]
+                    if next_instruction_first_line:sub(1, #run_prefix) ~= run_prefix then
+                        coroutine.yield(start_instruction_ix, next_instruction_line_no-1)
                         start_instruction_ix = current_instruction_ix + 1
                         goto NEXT_RUN
                     end
                     if next_instruction.type == "end section" then
-                        coroutine.yield(start_instruction, next_instruction:last_line())
+                        coroutine.yield(start_instruction_ix, next_instruction:last_line())
                         start_instruction_ix = current_instruction_ix + 2
                         goto NEXT_RUN
                     end
                     current_instruction_ix = current_instruction_ix + 1
                 end
+                start_instruction_ix = current_instruction_ix
                 ::NEXT_RUN::
             end
         end
     )
 end
 
-for instruction, end_line in run_iter() do
+for start_instruction_ix, end_line in run_iter() do
+    local instruction = instructions[start_instruction_ix]
+    local section = sections[instruction.name]
+    section[#section+1] = { start_instruction_ix, end_line } 
     print(inspect(instruction), end_line)
 end
 
