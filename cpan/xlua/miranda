@@ -196,7 +196,7 @@ end
 
 local instructions = {}
 for instruction in instruction_iter() do
-    print(inspect(instruction))
+    -- print(inspect(instruction))
     instructions[#instructions+1] = instruction
 end
 
@@ -267,7 +267,7 @@ local function run_iter()
                         local line = lines[text_line_no]
                         -- print('text line:', line)
                         if #line > 0 and line:sub(1, #run_prefix) ~= run_prefix then
-                            end_of_run = text_line_no
+                            end_of_run = text_line_no - 1
                             break
                         end
                     end
@@ -301,11 +301,70 @@ local function run_iter()
     )
 end
 
+local Run = {}
+function Run:new(o)
+    local o = o or {}
+    setmetatable(o, self)
+    self.__index = self
+    return o
+end
+
+function Run:first_instruction_ix()
+    return self[1]
+end
+
+function Run:last_line_no()
+    return self[2]
+end
+
 for start_instruction_ix, end_line in run_iter() do
     local instruction = instructions[start_instruction_ix]
     local section = sections[instruction.name]
-    section[#section+1] = { start_instruction_ix, end_line } 
-    print(inspect(instruction), end_line)
+    section[#section+1] = Run:new{ start_instruction_ix, end_line } 
+    -- print(inspect(instruction), end_line)
 end
+
+local section_on_stack = {}
+
+function section_output(fh, name, prefix_arg)
+     if section_on_stack[name] then
+         error(string.format('Section "%s" used inside itself', name)
+            .. '   This would cause an infinite recursion and is not allowed\n'
+        )
+     end
+     section_on_stack[name] = true
+     local prefix = prefix_arg or ''
+     local section = sections[name]
+     if not section then
+         error('Attempt to output missing section "%s"', name)
+     end
+     for _, run in ipairs(section) do
+          print('Starting run')
+          local instruction_ix = run:first_instruction_ix()
+          local run_last_line_no = run:last_line_no()
+          for instruction_ix = run:first_instruction_ix(), #instructions do
+              local instruction = instructions[instruction_ix]
+              local instruction_first_line_no = instruction:first_line()
+              if instruction_first_line_no > run_last_line_no then
+                  break
+              end
+              local instruction_last_line_no = instruction:last_line()
+              if instruction.type == 'insert' then
+                  section_output(fh, instruction.name, prefix_arg .. instruction.prefix)
+              else
+                  for line_no = instruction_first_line_no, instruction_last_line_no do
+                       fh:write(prefix_arg .. lines[line_no], '\n')
+                  end
+              end
+              for line_no = instruction:last_line() + 1, run_last_line_no do
+                  fh:write(prefix_arg .. lines[line_no], '\n')
+              end
+          end
+          print('Ending run')
+     end
+     section_on_stack[name] = nil
+end
+
+section_output(io.stdout, 'main', '')
 
 -- vim: expandtab shiftwidth=4:
