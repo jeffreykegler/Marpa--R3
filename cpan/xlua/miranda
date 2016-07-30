@@ -92,7 +92,7 @@ local function instruction_iter()
                     line_no = line_no+1
                     local line = lines[line_no]
                     if not line then return end
-                    local prefix, equals = line:match('^(%s*)[-][-]%[(=)%[ *luatangle:')
+                    local prefix, equals = line:match('^(%s*)[-][-]%[(=)%[ *miranda:')
                     if prefix then
                         if prefix:find('[^ ]') then
                             error(string.format(
@@ -120,7 +120,7 @@ local function instruction_iter()
                             line_no = line_no+1
                         end
                     end
-                    prefix = line:find('^(%s*)[-][-] *luatangle:')
+                    prefix = line:find('^(%s*)[-][-] *miranda:')
                     if prefix then
                         local instruction = parse_instruction(line_no)
                         coroutine.yield(instruction)
@@ -151,11 +151,11 @@ function parse_instruction(first_line_no, last_line_no)
     if last_line_no then
         local raw_instruction = table.concat(lines, '', first_line_no, last_line_no)
         local equals
-        prefix, equals, body = raw_instruction.match('^( *)--(%[(=*)%[)? *luatangle: *(.*)$')
+        prefix, equals, body = raw_instruction.match('^( *)--(%[(=*)%[)? *miranda: *(.*)$')
         body = body:gsub('%]' .. equals .. '%]$', '', 1)
     else
         local raw_instruction = lines[first_line_no]
-        prefix, body = raw_instruction:match('^( *)-- *luatangle: *(.*)$')
+        prefix, body = raw_instruction:match('^( *)-- *miranda: *(.*)$')
     end
     -- print('raw_instruction', first_line_no, last_line_no, raw_instruction)
     local words = {}

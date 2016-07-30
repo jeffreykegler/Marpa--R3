@@ -119,7 +119,7 @@ Was used for development.
 Perhaps I should delete this.
 
 ```
-    -- luatangle: section VM operations
+    -- miranda: section VM operations
 
     function op_fn_debug (recce)
         for k,v in pairs(recce) do
@@ -142,7 +142,7 @@ even if not used.
 It may be useful in debugging.
 
 ```
-    -- luatangle: section+ VM operations
+    -- miranda: section+ VM operations
 
     function op_fn_noop (recce)
         return -2
@@ -159,7 +159,7 @@ as a VM operation,
 fast fails with a clear message.
 
 ```
-    -- luatangle: section+ VM operations
+    -- miranda: section+ VM operations
 
     function op_fn_bail (recce)
         error('executing VM op "bail"')
@@ -194,7 +194,7 @@ Perhaps the simplest operation.
 The result of the semantics is a Perl undef.
 
 ```
-    -- luatangle: section+ VM operations
+    -- miranda: section+ VM operations
 
     function op_fn_result_is_undef(recce)
         local stack = recce.v.stack
@@ -212,7 +212,7 @@ It's assumed to be a MARPA_STEP_TOKEN step --
 if not the value is an undef.
 
 ```
-    -- luatangle: section+ VM operations
+    -- miranda: section+ VM operations
 
     function op_fn_result_is_token_value(recce)
         if recce.v.step.type ~= 'MARPA_STEP_TOKEN' then
@@ -235,7 +235,7 @@ if not the value is an undef.
 #### VM "result is N of RHS" operation
 
 ```
-    -- luatangle: section+ VM operations
+    -- miranda: section+ VM operations
     function op_fn_result_is_n_of_rhs(recce, rhs_ix)
         if recce.v.step.type ~= 'MARPA_STEP_RULE' then
           return op_fn_result_is_undef(recce)
@@ -267,7 +267,7 @@ For those with separators discarded,
 the "N of RHS" operation should be used.
 
 ```
-    -- luatangle: section+ VM operations
+    -- miranda: section+ VM operations
     function op_fn_result_is_n_of_sequence(recce, item_ix)
         if recce.v.step.type ~= 'MARPA_STEP_RULE' then
           return op_fn_result_is_undef(recce)
@@ -291,7 +291,7 @@ the "N of RHS" operation should be used.
 Returns a constant result.
 
 ```
-    -- luatangle: section+ VM operations
+    -- miranda: section+ VM operations
     function op_fn_result_is_constant(recce, constant_ix)
         local constants = recce:constants()
         local constant = constants[constant_ix]
@@ -320,7 +320,7 @@ sequence of operations.
 Push an undef on the values array.
 
 ```
-    -- luatangle: section+ VM operations
+    -- miranda: section+ VM operations
 
     function op_fn_push_undef(recce)
         local values = recce:values()
@@ -336,7 +336,7 @@ Push an undef on the values array.
 Push one of the RHS child values onto the values array.
 
 ```
-    -- luatangle: section+ VM operations
+    -- miranda: section+ VM operations
 
     function op_fn_push_one(recce, rhs_ix)
         if recce.v.step.type ~= 'MARPA_STEP_RULE' then
@@ -362,7 +362,7 @@ it assumes that the caller has ensured that
 `recce.v.step.type ~= 'MARPA_STEP_TOKEN'`.
 
 ```
-    -- luatangle: section+ VM operations
+    -- miranda: section+ VM operations
     function current_token_literal(recce)
       if recce.token_is_literal == recce.v.step.value then
           local start_es = recce.v.step.start_es_id
@@ -386,7 +386,7 @@ Otherwise the values of the RHS children are pushed.
 1 otherwise.
 
 ```
-    -- luatangle: section+ VM operations
+    -- miranda: section+ VM operations
 
     function op_fn_push_values(recce, increment)
         local values = recce:values()
@@ -418,7 +418,7 @@ The current start location in input location terms -- that is,
 in terms of the input string.
 
 ```
-    -- luatangle: section+ VM operations
+    -- miranda: section+ VM operations
     function op_fn_push_start(recce)
         local values = recce:values()
         local start_es = recce.v.step.start_es_id
@@ -437,7 +437,7 @@ The length of the current step in input location terms --
 that is, in terms of the input string
 
 ```
-    -- luatangle: section+ VM operations
+    -- miranda: section+ VM operations
     function op_fn_push_length(recce)
         local values = recce:values()
         local start_es = recce.v.step.start_es_id
@@ -455,7 +455,7 @@ The current start location in G1 location terms -- that is,
 in terms of G1 Earley sets.
 
 ```
-    -- luatangle: section+ VM operations
+    -- miranda: section+ VM operations
     function op_fn_push_g1_start(recce)
         local values = recce:values()
         local next_ix = marpa.sv.top_index(values) + 1;
@@ -471,7 +471,7 @@ The length of the current step in G1 terms --
 that is, in terms of G1 Earley sets.
 
 ```
-    -- luatangle: section+ VM operations
+    -- miranda: section+ VM operations
     function op_fn_push_g1_length(recce)
         local values = recce:values()
         local next_ix = marpa.sv.top_index(values) + 1;
@@ -485,7 +485,7 @@ that is, in terms of G1 Earley sets.
 #### VM operation: push constant onto values array
 
 ```
-    -- luatangle: section+ VM operations
+    -- miranda: section+ VM operations
     function op_fn_push_constant(recce, constant_ix)
         local constants = recce:constants()
         -- io.stderr:write('constants: ', inspect(constants), "\n")
@@ -508,7 +508,7 @@ lets the VM know its index.  The index is cleared at the beginning
 of every sequence of operations
 
 ```
-    -- luatangle: section+ VM operations
+    -- miranda: section+ VM operations
     function op_fn_bless(recce, blessing_ix)
         recce.v.step.blessing_ix = blessing_ix
         return -2
@@ -522,7 +522,7 @@ This operation tells the VM that the current `values` array
 is the result of this sequence of operations.
 
 ```
-    -- luatangle: section+ VM operations
+    -- miranda: section+ VM operations
     function op_fn_result_is_array(recce)
         local blessing_ix = recce.v.step.blessing_ix
         local values = recce:values()
@@ -548,7 +548,7 @@ implementation, which returned the size of the
 `values` array.
 
 ```
-    -- luatangle: section+ VM operations
+    -- miranda: section+ VM operations
     function op_fn_callback(recce)
         local step_type = recce.v.step.type
         if step_type ~= 'MARPA_STEP_RULE'
@@ -575,7 +575,7 @@ implementation, which returned the size of the
 ### Run the virtual machine
 
 ```
-    -- luatangle: section+ VM operations
+    -- miranda: section+ VM operations
     function do_ops(recce, ops)
         local op_ix = 1
         while op_ix <= #ops do
@@ -625,7 +625,7 @@ that they represent the size of the list returned to Perl,
 with "trace" and "do not return" being special cases.
 
 ```
-    -- luatangle: section+ VM operations
+    -- miranda: section+ VM operations
     function find_and_do_ops(recce)
         local ops = {}
         recce:step()
@@ -679,7 +679,7 @@ to set and discover various Lua values.
 #### Return operation key given its name
 
 ```
-    -- luatangle: section Utilities for Perl code
+    -- miranda: section Utilities for Perl code
     function get_op_fn_key_by_name(recce, op_name_sv)
         local op_name = tostring(op_name_sv)
         return recce.op_fn_key[op_name]
@@ -690,7 +690,7 @@ to set and discover various Lua values.
 #### Return operation name given its key
 
 ```
-    -- luatangle: section+ Utilities for Perl code
+    -- miranda: section+ Utilities for Perl code
     function get_op_fn_name_by_key(recce, op_key_sv)
         local op_key = op_key_sv + 0
         return recce.op_fn_key[op_key]
@@ -703,7 +703,7 @@ to set and discover various Lua values.
 Register a constant, returning its key.
 
 ```
-    -- luatangle: section+ Utilities for Perl code
+    -- miranda: section+ Utilities for Perl code
     function constant_register(recce, constant_sv)
         local constants = recce:constants()
         local next_constant_key = marpa.sv.top_index(constants) + 1
@@ -719,7 +719,7 @@ Register the semantic operations, `ops`, for the token
 whose id is `id`.
 
 ```
-    -- luatangle: section+ Utilities for Perl code
+    -- miranda: section+ Utilities for Perl code
     function token_register(...)
         local args = {...}
         local recce = args[1]
@@ -739,7 +739,7 @@ Register the semantic operations, `ops`, for the nulling symbol
 whose id is `id`.
 
 ```
-    -- luatangle: section+ Utilities for Perl code
+    -- miranda: section+ Utilities for Perl code
     function nulling_register(...)
         local args = {...}
         local recce = args[1]
@@ -759,7 +759,7 @@ Register the semantic operations, `ops`, for the rule
 whose id is `id`.
 
 ```
-    -- luatangle: section+ Utilities for Perl code
+    -- miranda: section+ Utilities for Perl code
     function rule_register(...)
         local args = {...}
         local recce = args[1]
@@ -776,7 +776,7 @@ whose id is `id`.
 #### Return the top index of the stack
 
 ```
-    -- luatangle: section+ Utilities for Perl code
+    -- miranda: section+ Utilities for Perl code
     function stack_top_index(recce)
         return recce.v.step.result
     end
@@ -786,7 +786,7 @@ whose id is `id`.
 #### Return the value of a stack entry
 
 ```
-    -- luatangle: section+ Utilities for Perl code
+    -- miranda: section+ Utilities for Perl code
     function stack_get(recce, ix)
         local stack = recce.v.stack
         return stack[ix+0]
@@ -797,7 +797,7 @@ whose id is `id`.
 #### Set the value of a stack entry
 
 ```
-    -- luatangle: section+ Utilities for Perl code
+    -- miranda: section+ Utilities for Perl code
     function stack_set(recce, ix, v)
         local stack = recce.v.stack
         stack[ix+0] = v
@@ -816,7 +816,7 @@ Kollos parse.
 Called when a valuator is set up.
 
 ```
-    -- luatangle: section value_init()
+    -- miranda: section value_init()
 
     function value_init(recce, trace_values)
 
@@ -885,7 +885,7 @@ A function to be called whenever a valuator is reset.
 
 ```
 
-    -- luatangle: section value_reset()
+    -- miranda: section value_reset()
 
     function value_reset(recce)
         recce.op_fn_key = nil
@@ -903,12 +903,12 @@ A function to be called whenever a valuator is reset.
 ```
 
 ```
-    -- luatangle: section main
-    -- luatangle: insert preliminaries to main
-    -- luatangle: insert VM operations
-    -- luatangle: insert value_init()
-    -- luatangle: insert value_reset()
-    -- luatangle: insert Utilities for Perl code
+    -- miranda: section main
+    -- miranda: insert preliminaries to main
+    -- miranda: insert VM operations
+    -- miranda: insert value_init()
+    -- miranda: insert value_reset()
+    -- miranda: insert Utilities for Perl code
 
     return "OK"
 
@@ -921,7 +921,7 @@ Licensing, etc.
 
 ```
 
-    -- luatangle: section preliminaries to main
+    -- miranda: section preliminaries to main
 
     -- Copyright 2016 Jeffrey Kegler
     -- Permission is hereby granted, free of charge, to any person obtaining a
