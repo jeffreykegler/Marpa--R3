@@ -396,6 +396,12 @@ function section_output(fh, name, prefix_arg)
      section_on_stack[name] = nil
 end
 
-section_output(io.stdout, 'main')
+for section_name, filename in pairs(outputs) do
+        print('section_name,filename ', section_name,filename)
+        local handle, error_message = io.open(filename, 'w')
+        if not handle then  error(error_message) end
+        section_output(handle, section_name)
+end
+
 
 -- vim: expandtab shiftwidth=4:
