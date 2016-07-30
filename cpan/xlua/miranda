@@ -63,9 +63,6 @@ if #inputs ~= 1 then
 end
 
 local sections = {}
-local current_section
-local current_subsection
-local current_prefix
 
 local input_handle
 input_handle, error_message = io.open(inputs[1])
@@ -166,7 +163,7 @@ function parse_instruction(first_line_no, last_line_no)
         words[#words+1] = word
     end
     -- print('words', inspect(words))
-    local instruction = { first_line_no, last_line_no, prefix = prefix }
+    local instruction = { first_line_no, last_line_no, prefix = #prefix }
     setmetatable(instruction, mt_instruction)
     if words[1] == 'section' then
         instruction.type = words[1]
@@ -266,7 +263,7 @@ local function run_iter()
                     for text_line_no = first_text_line, last_text_line do
                         local line = lines[text_line_no]
                         -- print('text line:', line)
-                        if #line > 0 and line:sub(1, #run_prefix) ~= run_prefix then
+                        if #line > 0 and line:sub(1, run_prefix) ~= string.rep(' ', run_prefix) then
                             end_of_run = text_line_no - 1
                             break
                         end
@@ -282,7 +279,7 @@ local function run_iter()
                     end
                     local next_instruction_line_no = next_instruction:first_line()
                     local next_instruction_first_line = lines[next_instruction_line_no]
-                    if next_instruction_first_line:sub(1, #run_prefix) ~= run_prefix then
+                    if next_instruction_first_line:sub(1, run_prefix) ~= string.rep(' ', run_prefix) then
                         coroutine.yield(start_instruction_ix, next_instruction_line_no-1)
                         start_instruction_ix = current_instruction_ix + 1
                         goto NEXT_RUN
@@ -327,20 +324,21 @@ end
 local section_on_stack = {}
 
 function section_output(fh, name, prefix_arg)
+     local current_prefix = prefix_arg or 0
      if section_on_stack[name] then
          error(string.format('Section "%s" used inside itself', name)
             .. '   This would cause an infinite recursion and is not allowed\n'
         )
      end
      section_on_stack[name] = true
-     local prefix = prefix_arg or ''
      local section = sections[name]
      if not section then
          error('Attempt to output missing section "%s"', name)
      end
      for _, run in ipairs(section) do
-          print('Starting run')
-          local instruction_ix = run:first_instruction_ix()
+          -- print('Starting run')
+          local first_instruction = instructions[run:first_instruction_ix()]
+          local run_prefix = first_instruction.prefix
           local run_last_line_no = run:last_line_no()
           for instruction_ix = run:first_instruction_ix(), #instructions do
               local instruction = instructions[instruction_ix]
@@ -350,21 +348,22 @@ function section_output(fh, name, prefix_arg)
               end
               local instruction_last_line_no = instruction:last_line()
               if instruction.type == 'insert' then
-                  section_output(fh, instruction.name, prefix_arg .. instruction.prefix)
+                  local insertion_prefix = current_prefix + (instruction.prefix - run_prefix)
+                  section_output(fh, instruction.name, insertion_prefix)
               else
                   for line_no = instruction_first_line_no, instruction_last_line_no do
-                       fh:write(prefix_arg .. lines[line_no], '\n')
+                       fh:write(string.rep(' ', current_prefix) .. lines[line_no]:sub(run_prefix+1), '\n')
                   end
               end
               for line_no = instruction:last_line() + 1, run_last_line_no do
-                  fh:write(prefix_arg .. lines[line_no], '\n')
+                  fh:write(string.rep(' ', current_prefix) .. lines[line_no]:sub(run_prefix+1), '\n')
               end
           end
-          print('Ending run')
+          -- print('Ending run')
      end
      section_on_stack[name] = nil
 end
 
-section_output(io.stdout, 'main', '')
+section_output(io.stdout, 'main')
 
 -- vim: expandtab shiftwidth=4:
