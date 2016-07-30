@@ -301,7 +301,7 @@ t/zorro.t
 xlua/Makefile.PL
 xlua/init.lua.md
 xlua/inspect.lua
-xlua/luatangle
+xlua/miranda
 xs/Makefile.PL
 xs/R3.xs
 xs/create_ops.pl

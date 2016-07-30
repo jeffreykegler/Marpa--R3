@@ -323,7 +323,7 @@ my %files_by_type = (
     'etc/compile_for_debug.sh'          => \&trivial,
     'etc/OLD_libmarpa_test.sh'              => \&trivial,
     'etc/reserved_check.sh'             => \&trivial,
-    'xlua/luatangle'             =>
+    'xlua/miranda'             =>
         gen_license_problems_in_text_file($lua_license, '2016'),
     'engine/LOG_DATA'                 => \&ignored,    # not worth the trouble
     'engine/cf/LIBMARPA_MODE'         => \&trivial,
