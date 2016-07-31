@@ -133,7 +133,12 @@ local function instruction_iter()
 end
 
 function parse_section_name(raw_name)
-    local text = raw_name:lower():gsub(' $', '', 1):gsub('^ ', '', 1):gsub('[^%w]+', ' ')
+    local text = raw_name:lower():gsub(' $', '', 1):gsub('^ ', '', 1):gsub('[^%w_]+', ' ')
+    return text
+end
+
+function parse_language_name(raw_name)
+    local text = raw_name:lower():gsub(' $', '', 1):gsub('^ ', '', 1):gsub('[^%w%p_]+', ' ')
     return text
 end
 
@@ -182,6 +187,11 @@ function parse_instruction(first_line_no, last_line_no)
     end
     if words[1] == 'end' and words[2] == 'section' then
         instruction.type = table.concat(words, ' ', 1, 2)
+        return instruction
+    end
+    if words[1] == 'language' then
+        instruction.type = words[1]
+        instruction.name = parse_language_name(table.concat(words, ' ', 2))
         return instruction
     end
     error(string.format(
@@ -414,6 +424,5 @@ for section_name, filename in pairs(outputs) do
         if not handle then  error(error_message) end
         section_output(handle, section_name)
 end
-
 
 -- vim: expandtab shiftwidth=4:
