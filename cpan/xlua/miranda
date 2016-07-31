@@ -321,6 +321,57 @@ for start_instruction_ix, end_line in run_iter() do
     -- print(inspect(instruction), end_line)
 end
 
+-- Returns an iterator of the instructions in a section.
+-- The optional second arg is the last line of the text run
+-- following the instruction
+local function section_instructions(section)
+    return  coroutine.wrap(
+        function()
+     for _, run in ipairs(section) do
+          -- print('Starting run')
+          local instruction_ix = run:first_instruction_ix()
+          local instruction = instructions[instruction_ix]
+          local instruction_last_line_no = instruction:last_line()
+          local run_last_line_no = run:last_line_no()
+
+          -- run prefix is prefix of 1st instruction in run
+          local run_prefix = instruction.prefix
+
+          -- For every "subrun" of this run.
+          -- A subrun consists of one instruction,
+          -- followed by zero or more non-instruction ("text") lines.
+          while instruction_last_line_no <= run_last_line_no do
+
+              if instruction_last_line_no == run_last_line_no then
+                  coroutine.yield(instruction, run_prefix, run_last_line_no)
+                  goto NEXT_RUN
+              end
+              local next_instruction = instructions[instruction_ix+1]
+              if not next_instruction then
+                  coroutine.yield(instruction, run_prefix, run_last_line_no)
+                  goto NEXT_RUN
+              end
+              local next_instruction_first_line_no = next_instruction:first_line()
+              local pre_next_instruction_line_no = next_instruction_first_line_no - 1
+              if pre_next_instruction_line_no >= run_last_line_no then
+                  coroutine.yield(instruction, run_prefix, run_last_line_no)
+                  goto NEXT_RUN
+              end
+              coroutine.yield(instruction, run_prefix, pre_next_instruction_line_no)
+
+              -- Set up the next instruction
+              instruction = next_instruction
+              instruction_last_line_no = next_instruction:last_line()
+              instruction_ix = instruction_ix + 1
+              -- print('Ending subrun')
+          end
+          ::NEXT_RUN::
+          -- print('Ending run')
+     end
+        end
+    )
+end
+
 local section_on_stack = {}
 
 function section_output(fh, name, prefix_arg)
@@ -336,61 +387,22 @@ function section_output(fh, name, prefix_arg)
      if not section then
          error('Attempt to output missing section "%s"', name)
      end
-     for _, run in ipairs(section) do
-          -- print('Starting run')
-          local instruction_ix = run:first_instruction_ix()
-          local first_instruction = instructions[instruction_ix]
-          local run_prefix = first_instruction.prefix
-          local run_last_line_no = run:last_line_no()
-
-          -- For every "subrun" of this run.
-          -- A subrun consists of one instruction,
-          -- followed by zero or more non-instruction ("text") lines.
-          while true do
-
-              -- print('Starting subrun, instruction_ix =', instruction_ix)
+     for instruction, run_prefix, last_text_line_no in section_instructions(section) do
               -- We first deal with outputing the instruction.
-              local instruction = instructions[instruction_ix]
-              local instruction_last_line_no = instruction:last_line()
-              if instruction.type == 'insert' then
-                  local insertion_prefix = current_prefix + (instruction.prefix - run_prefix)
-                  -- print(string.format("section_output: %s %d", instruction.name, instruction:first_line()))
-                  section_output(fh, instruction.name, insertion_prefix)
-              else
-                  local instruction_first_line_no = instruction:first_line()
-                  for line_no = instruction_first_line_no, instruction_last_line_no do
-                       fh:write(string.rep(' ', current_prefix) .. lines[line_no]:sub(run_prefix+1), '\n')
-                  end
+          local instruction_last_line_no = instruction:last_line()
+          if instruction.type == 'insert' then
+              local insertion_prefix = current_prefix + (instruction.prefix - run_prefix)
+              -- print(string.format("section_output: %s %d", instruction.name, instruction:first_line()))
+              section_output(fh, instruction.name, insertion_prefix)
+          else
+              local instruction_first_line_no = instruction:first_line()
+              for line_no = instruction_first_line_no, instruction_last_line_no do
+                   fh:write(string.rep(' ', current_prefix) .. lines[line_no]:sub(run_prefix+1), '\n')
               end
-
-              -- We next print out the text lines following this instruction.
-              -- We will need to determine the last text line in this run of
-              -- consection text (that is, non-instruction) lines
-              local at_end_of_subrun = false
-              local next_instruction = instructions[instruction_ix+1]
-              local next_instruction_first_line_no
-              if not next_instruction then
-                  at_end_of_subrun = true
-              else
-                  next_instruction_first_line_no = next_instruction:first_line()
-                  if next_instruction_first_line_no > run_last_line_no then
-                      at_end_of_subrun = true
-                  end
-              end
-              local last_text_line_no
-              if at_end_of_subrun then
-                  last_text_line_no = run_last_line_no
-              else
-                  last_text_line_no = next_instruction_first_line_no - 1
-              end
-              for line_no = instruction_last_line_no+1, last_text_line_no do
-                  fh:write(string.rep(' ', current_prefix) .. lines[line_no]:sub(run_prefix+1), '\n')
-              end
-              if at_end_of_subrun then goto NEXT_RUN end
-              instruction_ix = instruction_ix + 1
-              -- print('Ending subrun')
           end
-          ::NEXT_RUN::
+          for line_no = instruction_last_line_no+1, last_text_line_no do
+              fh:write(string.rep(' ', current_prefix) .. lines[line_no]:sub(run_prefix+1), '\n')
+          end
           -- print('Ending run')
      end
      section_on_stack[name] = nil
