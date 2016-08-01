@@ -72,7 +72,7 @@ WriteMakefile(
     NAME    => 'Marpa::R3',
     VERSION => $STRING_VERSION,
     SKIP   => [qw(test test_dynamic dynamic dynamic_lib dlsyms)],
-    clean  => { 'FILES' => 'kollos$(LIB_EXT)' },
+    clean  => { 'FILES' => 'okollos$(LIB_EXT)' },
 );
 
 package MY;
@@ -106,7 +106,7 @@ sub constants {
 sub MY::top_targets {
     my $r = q{
 
-all :: kollos$(LIB_EXT)
+all :: okollos$(LIB_EXT)
 	$(NOECHO) $(NOOP)
 
 config ::
@@ -121,19 +121,19 @@ test ::
 test_dynamic ::
 	$(NOECHO) $(NOOP)
 
-kollos.c: kollos.c.lua
-	$(LUA_INTERP) kollos.c.lua errors=$(ERROR_TABLE) events=$(EVENT_TABLE) > $@
+okollos.c: okollos.c.lua
+	$(LUA_INTERP) okollos.c.lua errors=$(ERROR_TABLE) events=$(EVENT_TABLE) > $@
 
 };
 
     if ( $^O eq 'MSWin32' ) {
         $r .= q[
 
-kollos$(LIB_EXT): kollos.c
+okollos$(LIB_EXT): okollos.c
 	$(RM_RF) $@
 	$(CC) -c $(PASTHRU_INC) $(INC) $(CCFLAGS) $(MY_CCFLAGS) $(OPTIMIZE) \
-	  $(CCCDLFLAGS) $(PASTHRU_DEFINE) $(DEFINE) -DMAKE_LIB kollos.c
-	$(AR) -out:$@ kollos$(OBJ_EXT)
+	  $(CCCDLFLAGS) $(PASTHRU_DEFINE) $(DEFINE) -DMAKE_LIB okollos.c
+	$(AR) -out:$@ okollos$(OBJ_EXT)
 	$(CHMOD) $(PERM_RWX) $@
 
 ];
@@ -141,14 +141,14 @@ kollos$(LIB_EXT): kollos.c
     else {
         $r .= q[
 
-kollos$(LIB_EXT): kollos$(OBJ_EXT)
+okollos$(LIB_EXT): okollos$(OBJ_EXT)
 	$(RM_RF) $@
-	$(FULL_AR) $(AR_STATIC_ARGS) $@ kollos$(OBJ_EXT) && $(RANLIB) $@
+	$(FULL_AR) $(AR_STATIC_ARGS) $@ okollos$(OBJ_EXT) && $(RANLIB) $@
 	$(CHMOD) $(PERM_RWX) $@
 
-kollos$(OBJ_EXT): kollos.c
+okollos$(OBJ_EXT): okollos.c
 	$(CC) -c $(PASTHRU_INC) $(INC) $(CCFLAGS) $(MY_CCFLAGS) $(OPTIMIZE) \
-	  $(CCCDLFLAGS) $(PASTHRU_DEFINE) $(DEFINE) -DMAKE_LIB kollos.c
+	  $(CCCDLFLAGS) $(PASTHRU_DEFINE) $(DEFINE) -DMAKE_LIB okollos.c
 
 ];
     }
