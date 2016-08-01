@@ -384,6 +384,33 @@ end
 
 local section_on_stack = {}
 
+-- Figure out per-section values
+for section_name,section in pairs(sections) do
+    local language = nil
+    local last_language_instruction = nil
+    for instruction, run_prefix, last_text_line_no in section_instructions(section) do
+        if instruction.type == 'language' then
+             language = instruction.name
+             if last_language_instruction
+                 and last_language_instruction.name ~= language
+             then
+                 local instruction_line_no_1 = last_language_instruction:first_line()
+                 local instruction_line_no_2 = instruction:first_line()
+                 error(
+                     string.format('Inconsistent language instructions for section "%s"',
+                         section_name)
+                     .. string.format('   First instruction, line %d: %s\n',
+                         instruction_line_no_1, lines[instruction_line_no_1])
+                     .. string.format('   Second instruction, line %d: %s\n',
+                         instruction_line_no_2, lines[instruction_line_no_2])
+                 )
+             end
+             last_language_instruction = instruction
+        end
+    end
+    section.language = language or 'lua'
+end
+
 function section_output(fh, name, prefix_arg)
      if section_on_stack[name] then
          error(string.format('Section "%s" used inside itself', name)

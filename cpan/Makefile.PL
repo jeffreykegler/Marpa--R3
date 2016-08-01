@@ -295,7 +295,7 @@ my $libmarpa_in_build_dir =
   :  $libmarpa_build_dir . q{/.libs/libmarpa$(LIB_EXT)};
 
 my $myextlib = join q{ }, $libmarpa_in_build_dir, 'lua/marpa_lua$(LIB_EXT)',
-  'kollos/kollos$(LIB_EXT)';
+  'okollos/okollos$(LIB_EXT)';
 
 # my $ccflags = $Config{ccflags} . " -Iengine/read_only -Ixs";
 
@@ -347,13 +347,13 @@ lua/marpa_lua$(LIB_EXT):
 END_OF_POSTAMBLE_PIECE
 	$self->cd(File::Spec->catdir(qw(lua)), '$(MAKE) ');
 
-# == Logic to build in kollos directory:
+# == Logic to build in okollos directory:
 
     push @postamble_pieces, sprintf <<'END_OF_POSTAMBLE_PIECE',
-kollos/kollos$(LIB_EXT):
+okollos/okollos$(LIB_EXT):
 	%s
 END_OF_POSTAMBLE_PIECE
-	$self->cd(File::Spec->catdir(qw(kollos)), '$(MAKE) ');
+	$self->cd(File::Spec->catdir(qw(okollos)), '$(MAKE) ');
 
 # == Additional dependencies for making from PL files
 
@@ -412,7 +412,7 @@ WriteMakefile(
     CONFIGURE_REQUIRES => \%configure_requires,
     PM                 => \%pm_files,
     MIN_PERL_VERSION => '5.10.1',
-    DIR => [qw(engine lua kollos xlua xs)],
+    DIR => [qw(engine lua okollos xlua xs)],
     META_ADD => {
         no_index => {
             directory => [
