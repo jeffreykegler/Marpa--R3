@@ -108,9 +108,9 @@ inc/Marpa/R3/Config.pm
 inc/Marpa/R3/Display.pm
 inc/Marpa/R3/License.pm
 inc/Marpa/R3/Test.pm
-kollos/Makefile.PL
-kollos/kollos.c.lua
-kollos/kollos.h
+okollos/Makefile.PL
+okollos/okollos.c.lua
+okollos/okollos.h
 lib/Marpa/R3.pm
 lib/Marpa/R3/ASF.pm
 lib/Marpa/R3/Common.pm
@@ -298,10 +298,10 @@ t/topsyn.t
 t/tut2.t
 t/wall.t
 t/zorro.t
-xlua/Makefile.PL
-xlua/init.lua.md
-xlua/inspect.lua
-xlua/miranda
+kollos/Makefile.PL
+kollos/init.lua.md
+kollos/inspect.lua
+kollos/miranda
 xs/Makefile.PL
 xs/R3.xs
 xs/create_ops.pl
