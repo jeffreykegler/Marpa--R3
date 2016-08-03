@@ -43,7 +43,7 @@ $VERSION        = eval $VERSION;
 $Marpa::R3::Lua::Inspect::load = <<'END_OF_LUA';
 END_OF_CHUNK
 
-my $lua_file_name  = File::Spec->catfile(qw(xlua inspect.lua));
+my $lua_file_name  = File::Spec->catfile(qw(kollos inspect.lua));
 open my $in_fh, '<', $lua_file_name;
 my $lua_file = do { local $RS = undef; <$in_fh>; };
 print {$out_fh} $lua_file;

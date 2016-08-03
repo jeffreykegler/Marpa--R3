@@ -323,7 +323,7 @@ my %files_by_type = (
     'etc/compile_for_debug.sh'          => \&trivial,
     'etc/OLD_libmarpa_test.sh'              => \&trivial,
     'etc/reserved_check.sh'             => \&trivial,
-    'xlua/miranda'             =>
+    'kollos/miranda'             =>
         gen_license_problems_in_text_file($lua_license, '2016'),
     'engine/LOG_DATA'                 => \&ignored,    # not worth the trouble
     'engine/cf/LIBMARPA_MODE'         => \&trivial,
@@ -372,7 +372,7 @@ my %files_by_type = (
         check_tag( 'Generated from configure.ac by autoheader', 250 ),
 
     # Leave inspect.lua licensing as is
-    'xlua/inspect.lua' => \&ignored,
+    'kollos/inspect.lua' => \&ignored,
 
     # Leave GNU obstack licensing as is
     'engine/read_only/marpa_obs.c' => \&ignored,
@@ -471,7 +471,7 @@ my %files_by_type = (
         &gen_license_problems_in_c_file($c_mit_license_2015),
 
     # Kollos licensing
-    'kollos/kollos.h' =>
+    'okollos/okollos.h' =>
         &gen_license_problems_in_c_file($c_mit_license),
 
     # MS .def file -- contents trivial
