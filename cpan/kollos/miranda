@@ -432,9 +432,30 @@ function section_output(fh, name, prefix_arg)
               -- print(string.format("section_output: %s %d", instruction.name, instruction:first_line()))
               section_output(fh, instruction.name, insertion_prefix)
           else
+              local language = section.language
               local instruction_first_line_no = instruction:first_line()
+              local raw_instruction = {}
               for line_no = instruction_first_line_no, instruction_last_line_no do
-                   fh:write(string.rep(' ', current_prefix) .. lines[line_no]:sub(run_prefix+1), '\n')
+                   raw_instruction[#raw_instruction+1] = string.rep(' ', current_prefix)
+                   raw_instruction[#raw_instruction+1] = lines[line_no]:sub(run_prefix+1)
+                   raw_instruction[#raw_instruction+1] = '\n'
+              end
+              local raw_instruction = table.concat(raw_instruction, '')
+              if language == 'lua' then
+                  fh:write(raw_instruction)
+              elseif language == 'c' then
+                  local long_bracket_start, long_bracket_end = raw_instruction:match('^ *()[-][-]%[=*%[()')
+                  if long_bracket_start then
+                      fh:write(raw_instruction:sub(1, long_bracket_start-1))
+                      fh:write('/*')
+                      raw_instruction:gsub('%]=*%]$', '*/', 1)
+                      fh:write(raw_instruction:sub(long_bracket_end))
+                  else
+                      raw_instruction = raw_instruction:gsub('[-][-]', '/*', 1)
+                      fh:write(raw_instruction, ' */')
+                  end
+              else
+                  error(string.format('Bad language ("%s") for section "%s"', language, name))
               end
           end
           for line_no = instruction_last_line_no+1, last_text_line_no do
