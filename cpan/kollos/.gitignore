@@ -1,5 +1,9 @@
-MYMETA[.]json
-MYMETA[.]yml
+init[.]lua
+kollos[.]a
+kollos[.]c
+kollos[.]h
+kollos[.]o
 Makefile
 Makefile[.]old
-init[.]lua
+MYMETA[.]json
+MYMETA[.]yml
