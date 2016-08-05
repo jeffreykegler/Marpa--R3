@@ -79,6 +79,50 @@ in the Perl code or in the Perl XS, and not represented here.
 This document only contains those portions converted to Lua or
 to Lua-centeric C code.
 
+## Kollos Lua interpreter
+
+Kollos uses a Lua interpreter.
+`kollos_refcount`
+manages the ref count of a Lua state, closing the Lua
+state when it falls to zero.
+'inc' should be
+one of
+   -1   -- decrement
+    1   -- increment
+    0   -- query
+The current value of the ref count is always returned.
+If it has fallen to 0, the state is closed.
+
+
+```
+
+    -- miranda: section Lua interpreter management
+    -- miranda: language c
+
+    static void kollos_refcount(lua_State* L, int inc)
+    {
+        int base_of_stack = marpa_lua_gettop(L);
+        lua_Integer new_refcount;
+        /* Lua stack [] */
+        marpa_lua_getfield(L, LUA_REGISTRYINDEX, "ref_count");
+        /* Lua stack [ old_ref_count ] */
+        new_refcount = marpa_lua_tointeger(L, -1);
+        /* Lua stack [ ] */
+        new_refcount += inc;
+        /* warn("xlua_refcount(), new_refcount=%d", new_refcount); */
+        if (new_refcount <= 0) {
+           marpa_lua_close(L);
+           return;
+        }
+        marpa_lua_pushinteger(L, new_refcount);
+        /* Lua stack [ old_ref_count, new_ref_count ] */
+        marpa_lua_setfield(L, LUA_REGISTRYINDEX, "ref_count");
+        marpa_lua_settop(L, base_of_stack);
+        /* Lua stack [ ] */
+    }
+
+```
+
 ## Kollos semantics
 
 Initially, Marpa's semantics were performed using a VM (virtual machine)
@@ -902,6 +946,8 @@ A function to be called whenever a valuator is reset.
 
 ```
 
+# The main Lua code file
+
 ```
     -- miranda: section main
     -- miranda: insert preliminaries to main
@@ -948,6 +994,15 @@ Licensing, etc.
     -- luacheck: globals bit
     -- luacheck: globals __FILE__ __LINE__
 
+```
+
+# The main Lua code file
+
+```
+    -- miranda: section clib
+    -- miranda: language c
+    -- miranda: insert Lua interpreter management
+    /* vim: set expandtab shiftwidth=4: */
 ```
 
 <!--

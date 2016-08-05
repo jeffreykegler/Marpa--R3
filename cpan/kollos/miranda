@@ -452,7 +452,8 @@ function section_output(fh, name, prefix_arg)
                       fh:write(raw_instruction:sub(long_bracket_end))
                   else
                       raw_instruction = raw_instruction:gsub('[-][-]', '/*', 1)
-                      fh:write(raw_instruction, ' */')
+                      raw_instruction = raw_instruction:gsub(' ?\n$', ' */\n', 1)
+                      fh:write(raw_instruction)
                   end
               else
                   error(string.format('Bad language ("%s") for section "%s"', language, name))
