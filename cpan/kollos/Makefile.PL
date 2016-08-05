@@ -10,9 +10,6 @@
 # or implied warranties. For details, see the full text of
 # of the licenses in the directory LICENSES.
 
-# This writes a Makefile in the libmarpa build directory.
-# It used in cases where GNU autoconf does not work.
-
 use 5.010001;
 use File::Spec;
 use ExtUtils::MakeMaker;
@@ -23,6 +20,49 @@ $STRING_VERSION = $VERSION;
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 $VERSION = eval $VERSION;
 ## use critic
+
+sub gcc_at_least {
+    my ($required) = @_;
+    state $gcc_version = $Config{gccversion};
+    return if not $gcc_version;
+    my @actual = ($gcc_version =~ m/ \A (\d+) [.] (\d+) [.] (\d+) \z /xms);
+    return if @actual != 3;
+    my @required = ($required =~ m/ \A (\d+) [.] (\d+) [.] (\d+) \z /xms);
+    die if scalar @required != 3;
+    my $cmp = $actual[0] <=> $required[0] ||
+     $actual[1] <=> $required[1]  ||
+     $actual[2] <=> $required[2] ;
+    return $cmp >= 0 ? 1 : 0;
+}
+
+my @my_ccflags = ( );
+
+if ( $Config{'ccname'} eq 'gcc' ) {
+    # Original flags, from kollos repo:
+    # -Wall -Wpointer-arith -Wstrict-prototypes -Wwrite-strings -Wshadow -Wmissing-declarations -Wconversion -ansi -pedantic -Wundef -Wendif-labels
+
+    ## -W instead of -Wextra is case the GCC is pre 3.0.0
+    ## -Winline omitted because too noisy
+    ## -ansi will not work with Lua or on Android
+    ## Lua 5.3.2 gcc flags are -Wall -Wextra
+    ## Lua 5.3.2 prefers gcc -std=c99
+    push @my_ccflags, qw( -Wall -W
+        -Wundef -Wendif-labels
+	-Wpointer-arith -Wstrict-prototypes -Wwrite-strings
+	-Wconversion
+	-Wmissing-declarations );
+    push @my_ccflags, '-Wdeclaration-after-statement' if gcc_at_least('3.4.6');
+} ## end if ( $self->config('cc') eq 'gcc' )
+elsif ( $Config{'ccname'} eq 'cl' ) {
+	## gcc's -Wundef is msvc's C4668 that is on with -Wall
+	## gcc's -ansi -pedantic is msvc's /Za, but windows.h can't be compiled with it
+	## msvc's equivalent for gcc's -Wendif-labels can't be found :)
+	## -W4 -Wp64 will produce arguably too many warnings
+	## in perl header files and XS macros, but can be useful for debugging
+	push @my_ccflags, qw( -W3 );
+}
+
+my $my_ccflags = join q{ }, @my_ccflags;
 
 WriteMakefile(
     INC     => '-I../lua -I../engine/read_only',
@@ -63,7 +103,7 @@ sub constants {
 sub MY::top_targets {
     my $r = q{
 
-all :: init.lua
+all :: init.lua kollos$(LIB_EXT) kollos.h
 	$(NOECHO) $(NOOP)
 
 config ::
@@ -79,9 +119,42 @@ test_dynamic ::
 	$(NOECHO) $(NOOP)
 
 init.lua: init.lua.md
-	$(LUA_INTERP) miranda init.lua.md main=$@
+	$(LUA_INTERP) miranda init.lua.md main=init.lua
+
+kollos.c: init.lua.md
+	$(LUA_INTERP) miranda init.lua.md kollos_c=kollos.c
+
+kollos.h: init.lua.md
+	$(LUA_INTERP) miranda init.lua.md kollos_h=kollos.h
 
 };
+
+    if ( $^O eq 'MSWin32' ) {
+        $r .= q[
+
+kollos$(LIB_EXT): kollos.c
+	$(RM_RF) $@
+	$(CC) -c $(PASTHRU_INC) $(INC) $(CCFLAGS) $(MY_CCFLAGS) $(OPTIMIZE) \
+	  $(CCCDLFLAGS) $(PASTHRU_DEFINE) $(DEFINE) -DMAKE_LIB kollos.c
+	$(AR) -out:$@ kollos$(OBJ_EXT)
+	$(CHMOD) $(PERM_RWX) $@
+
+];
+    }
+    else {
+        $r .= q[
+
+kollos$(LIB_EXT): kollos$(OBJ_EXT)
+	$(RM_RF) $@
+	$(FULL_AR) $(AR_STATIC_ARGS) $@ kollos$(OBJ_EXT) && $(RANLIB) $@
+	$(CHMOD) $(PERM_RWX) $@
+
+kollos$(OBJ_EXT): kollos.c
+	$(CC) -c $(PASTHRU_INC) $(INC) $(CCFLAGS) $(MY_CCFLAGS) $(OPTIMIZE) \
+	  $(CCCDLFLAGS) $(PASTHRU_DEFINE) $(DEFINE) -DMAKE_LIB kollos.c
+
+];
+    }
 
     return $r;
 

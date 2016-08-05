@@ -10,9 +10,6 @@
 # or implied warranties. For details, see the full text of
 # of the licenses in the directory LICENSES.
 
-# This writes a Makefile in the libmarpa build directory.
-# It used in cases where GNU autoconf does not work.
-
 use 5.010001;
 use File::Spec;
 use ExtUtils::MakeMaker;

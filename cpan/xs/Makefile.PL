@@ -133,7 +133,7 @@ END_OF_POSTAMBLE_PIECE
 };
 
 WriteMakefile(
-    INC     => '-I. -I../engine/read_only -I../lua -I../okollos',
+    INC     => '-I. -I../engine/read_only -I../lua -I../kollos',
     NAME    => 'Marpa::R3',
     VERSION => $STRING_VERSION,
     DEFINE  => $define,

@@ -23,7 +23,7 @@
 #include <lualib.h>
 #include <lauxlib.h>
 
-#include <okollos.h>
+#include <kollos.h>
 
 typedef unsigned int Marpa_Codepoint;
 

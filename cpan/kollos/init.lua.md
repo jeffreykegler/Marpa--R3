@@ -996,13 +996,129 @@ Licensing, etc.
 
 ```
 
-# The main Lua code file
+# The Kollos C code file
 
 ```
-    -- miranda: section clib
+    -- miranda: section kollos_c
     -- miranda: language c
+    -- miranda: insert preliminaries to the c library code
     -- miranda: insert Lua interpreter management
+    -- miranda: insert kollos Lua library
     /* vim: set expandtab shiftwidth=4: */
+```
+
+```
+    -- miranda: section kollos Lua library
+    -- miranda: language c
+    LUALIB_API int marpa_luaopen_kollos(lua_State *L);
+    LUALIB_API int marpa_luaopen_kollos(lua_State *L)
+    {
+        /* Create the main kollos object */
+        const int kollos_table_stack_ix = marpa_lua_gettop(L) + 1;
+        marpa_lua_newtable(L);
+        /* [ kollos ] */
+        return 1;
+    }
+```
+
+# Preliminaries to the C library code
+```
+    -- miranda: section preliminaries to the c library code
+    -- miranda: language c
+    /*
+    ** Permission is hereby granted, free of charge, to any person obtaining
+    ** a copy of this software and associated documentation files (the
+    ** "Software"), to deal in the Software without restriction, including
+    ** without limitation the rights to use, copy, modify, merge, publish,
+    ** distribute, sublicense, and/or sell copies of the Software, and to
+    ** permit persons to whom the Software is furnished to do so, subject to
+    ** the following conditions:
+    **
+    ** The above copyright notice and this permission notice shall be
+    ** included in all copies or substantial portions of the Software.
+    **
+    ** THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+    ** EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    ** MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+    ** IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+    ** CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+    ** TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+    ** SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+    **
+    ** [ MIT license: http://www.opensource.org/licenses/mit-license.php ]
+    */
+
+    /* EDITS IN THIS FILE WILL BE LOST
+     * This file is auto-generated.
+     */
+
+    #include "marpa.h"
+    #include "lua.h"
+    #include "lauxlib.h"
+
+    #undef UNUSED
+    #if     __GNUC__ >  2 || (__GNUC__ == 2 && __GNUC_MINOR__ >  4)
+    #define UNUSED __attribute__((__unused__))
+    #else
+    #define UNUSED
+    #endif
+
+    #if defined(_MSC_VER)
+    #define inline __inline
+    #define __PRETTY_FUNCTION__ __FUNCTION__
+    #endif
+```
+
+# The Kollos C header file
+
+```
+    -- miranda: section kollos_h
+    -- miranda: language c
+    -- miranda: insert preliminary comments of the c header file
+
+    #ifndef KOLLOS_H
+    #define KOLLOS_H
+
+    #include "lua.h"
+    #include "lauxlib.h"
+
+    LUALIB_API int marpa_luaopen_kollos(lua_State *L);
+
+    #endif
+
+    /* vim: set expandtab shiftwidth=4: */
+```
+
+# Preliminaries to the C header file
+```
+    -- miranda: section preliminary comments of the c header file
+    -- miranda: language c
+
+    /*
+     * Copyright 2016 Jeffrey Kegler
+     * Permission is hereby granted, free of charge, to any person obtaining a
+     * copy of this software and associated documentation files (the "Software"),
+     * to deal in the Software without restriction, including without limitation
+     * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+     * and/or sell copies of the Software, and to permit persons to whom the
+     * Software is furnished to do so, subject to the following conditions:
+     *
+     * The above copyright notice and this permission notice shall be included
+     * in all copies or substantial portions of the Software.
+     *
+     * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+     * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+     * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+     * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+     * OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+     * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+     * OTHER DEALINGS IN THE SOFTWARE.
+     */
+
+    /* EDITS IN THIS FILE WILL BE LOST
+     * This file is auto-generated.
+     */
+
 ```
 
 <!--
