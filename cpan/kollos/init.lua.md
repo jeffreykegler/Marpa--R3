@@ -93,7 +93,6 @@ one of
 The current value of the ref count is always returned.
 If it has fallen to 0, the state is closed.
 
-
 ```
 
     -- miranda: section Lua interpreter management
@@ -119,6 +118,29 @@ If it has fallen to 0, the state is closed.
         marpa_lua_setfield(L, LUA_REGISTRYINDEX, "ref_count");
         marpa_lua_settop(L, base_of_stack);
         /* Lua stack [ ] */
+    }
+
+```
+
+```
+
+    -- miranda: section+ Lua interpreter management
+    -- miranda: language c
+
+    lua_State* kollos_newstate(void)
+    {
+        lua_State *const L = marpa_luaL_newstate ();
+        int base_of_stack = marpa_lua_gettop(L);
+        marpa_lua_pushinteger(L, 1);
+        marpa_lua_setfield(L, LUA_REGISTRYINDEX, "ref_count");
+        marpa_luaL_openlibs (L);    /* open libraries */
+        /* Lua stack: [] */
+        marpa_luaopen_kollos(L); /* Open kollos library */
+        /* Lua stack: [ kollos_table ] */
+        marpa_lua_setglobal(L, "kollos");
+        /* Lua stack: [] */
+        marpa_lua_settop(L, base_of_stack);
+        return L;
     }
 
 ```
@@ -1002,16 +1024,15 @@ Licensing, etc.
     -- miranda: section kollos_c
     -- miranda: language c
     -- miranda: insert preliminaries to the c library code
-    -- miranda: insert Lua interpreter management
     -- miranda: insert kollos Lua library
+    -- miranda: insert Lua interpreter management
     /* vim: set expandtab shiftwidth=4: */
 ```
 
 ```
     -- miranda: section kollos Lua library
     -- miranda: language c
-    LUALIB_API int marpa_luaopen_kollos(lua_State *L);
-    LUALIB_API int marpa_luaopen_kollos(lua_State *L)
+    static int marpa_luaopen_kollos(lua_State *L)
     {
         /* Create the main kollos object */
         marpa_lua_newtable(L);
@@ -1082,8 +1103,8 @@ Licensing, etc.
     #include "lua.h"
     #include "lauxlib.h"
 
-    LUALIB_API int marpa_luaopen_kollos(lua_State *L);
     void kollos_refcount(lua_State* L, int inc);
+    lua_State* kollos_newstate(void);
 
     #endif
 

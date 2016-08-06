@@ -1299,22 +1299,15 @@ static void create_array_mt (lua_State* L) {
 static lua_State* xlua_newstate(void)
 {
     int marpa_table;
-    lua_State *const L = marpa_luaL_newstate ();
-    const int base_of_stack = marpa_lua_gettop(L);
-
+    int base_of_stack;
+    lua_State *const L = kollos_newstate ();
     if (!L)
       {
           croak
               ("Marpa::R3 internal error: Lua interpreter failed to start");
       }
-    /* warn("New lua state %p, slg = %p", L, slg); */
-    kollos_refcount (L, 1);       /* increment the ref count of the Lua state */
-    marpa_luaL_openlibs (L);    /* open libraries */
-    /* Lua stack: [] */
-    marpa_luaopen_kollos(L); /* Open kollos library */
-    /* Lua stack: [ kollos_table ] */
-    marpa_lua_setglobal(L, "kollos");
-    /* Lua stack: [] */
+
+    base_of_stack = marpa_lua_gettop(L);
 
     /* create metatables */
     create_sv_mt(L);

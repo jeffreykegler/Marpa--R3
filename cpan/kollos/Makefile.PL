@@ -121,7 +121,7 @@ test_dynamic ::
 init.lua: init.lua.md
 	$(LUA_INTERP) miranda init.lua.md main=init.lua
 
-kollos.c: init.lua.md
+kollos.c: init.lua.md kollos.h
 	$(LUA_INTERP) miranda init.lua.md kollos_c=kollos.c
 
 kollos.h: init.lua.md
