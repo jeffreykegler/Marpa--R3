@@ -1172,38 +1172,6 @@ static void create_grammar_mt (lua_State* L) {
     marpa_lua_settop(L, base_of_stack);
 }
 
-/* Manage the ref count of a Lua state, closing it
- * when it falls to zero.
- * 'inc' should be
- * one of
- *    -1   -- decrement
- *     1   -- increment
- *     0   -- query
- * The current value of the ref count is always returned.
- * If it has fallen to 0, the state is closed.
- */
-static void xlua_refcount(lua_State* L, int inc)
-{
-    int base_of_stack = marpa_lua_gettop(L);
-    lua_Integer new_refcount;
-    /* Lua stack [] */
-    marpa_lua_getfield(L, LUA_REGISTRYINDEX, "ref_count");
-    /* Lua stack [ old_ref_count ] */
-    new_refcount = marpa_lua_tointeger(L, -1);
-    /* Lua stack [ ] */
-    new_refcount += inc;
-    /* warn("xlua_refcount(), new_refcount=%d", new_refcount); */
-    if (new_refcount <= 0) {
-       marpa_lua_close(L);
-       return;
-    }
-    marpa_lua_pushinteger(L, new_refcount);
-    /* Lua stack [ old_ref_count, new_ref_count ] */
-    marpa_lua_setfield(L, LUA_REGISTRYINDEX, "ref_count");
-    marpa_lua_settop(L, base_of_stack);
-    /* Lua stack [ ] */
-}
-
 static int xlua_recce_func(lua_State* L)
 {
   /* Lua stack [ recce_ref ] */
@@ -1340,7 +1308,7 @@ static lua_State* xlua_newstate(void)
               ("Marpa::R3 internal error: Lua interpreter failed to start");
       }
     /* warn("New lua state %p, slg = %p", L, slg); */
-    xlua_refcount (L, 1);       /* increment the ref count of the Lua state */
+    kollos_refcount (L, 1);       /* increment the ref count of the Lua state */
     marpa_luaL_openlibs (L);    /* open libraries */
     /* Lua stack: [] */
     marpa_luaopen_kollos(L); /* Open kollos library */
@@ -5037,7 +5005,7 @@ PPCODE:
 
   {
     lua_State* L = slg->L;
-    xlua_refcount(L, 1);
+    kollos_refcount(L, 1);
     /* Lua stack: [] */
     marpa_lua_newtable(L);
     /* Lua stack: [ grammar_table ] */
@@ -5079,7 +5047,7 @@ PPCODE:
    * Lua states, and then this will be necessary.
    */
   marpa_luaL_unref(slg->L, LUA_REGISTRYINDEX, slg->lua_ref);
-  xlua_refcount(slg->L, -1);
+  kollos_refcount(slg->L, -1);
   Safefree (slg);
 }
 
@@ -5615,7 +5583,7 @@ PPCODE:
   {
     lua_State* L = slr->slg->L;
     slr->L = L;
-    xlua_refcount(L, 1);
+    kollos_refcount(L, 1);
     /* Lua stack: [] */
     marpa_lua_newtable(L);
     /* Lua stack: [ recce_table ] */
@@ -5655,7 +5623,7 @@ PPCODE:
   const Marpa_Recce r0 = slr->r0;
 
   marpa_luaL_unref(slr->L, LUA_REGISTRYINDEX, slr->lua_ref);
-  xlua_refcount(slr->L, -1);
+  kollos_refcount(slr->L, -1);
 
   if (r0)
     {
@@ -7032,7 +7000,7 @@ DESTROY( lua_wrapper )
     Marpa_Lua *lua_wrapper;
 PPCODE:
 {
-  xlua_refcount(lua_wrapper->L, -1);
+  kollos_refcount(lua_wrapper->L, -1);
   Safefree (lua_wrapper);
 }
 

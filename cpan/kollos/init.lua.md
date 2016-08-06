@@ -99,7 +99,7 @@ If it has fallen to 0, the state is closed.
     -- miranda: section Lua interpreter management
     -- miranda: language c
 
-    static void kollos_refcount(lua_State* L, int inc)
+    void kollos_refcount(lua_State* L, int inc)
     {
         int base_of_stack = marpa_lua_gettop(L);
         lua_Integer new_refcount;
@@ -1014,7 +1014,6 @@ Licensing, etc.
     LUALIB_API int marpa_luaopen_kollos(lua_State *L)
     {
         /* Create the main kollos object */
-        const int kollos_table_stack_ix = marpa_lua_gettop(L) + 1;
         marpa_lua_newtable(L);
         /* [ kollos ] */
         return 1;
@@ -1055,6 +1054,7 @@ Licensing, etc.
     #include "marpa.h"
     #include "lua.h"
     #include "lauxlib.h"
+    #include "kollos.h"
 
     #undef UNUSED
     #if     __GNUC__ >  2 || (__GNUC__ == 2 && __GNUC_MINOR__ >  4)
@@ -1083,6 +1083,7 @@ Licensing, etc.
     #include "lauxlib.h"
 
     LUALIB_API int marpa_luaopen_kollos(lua_State *L);
+    void kollos_refcount(lua_State* L, int inc);
 
     #endif
 
