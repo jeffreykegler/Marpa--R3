@@ -192,6 +192,13 @@ function parse_instruction(first_line_no, last_line_no)
     if words[1] == 'language' then
         instruction.type = words[1]
         instruction.name = parse_language_name(table.concat(words, ' ', 2))
+        local language = instruction.name
+        if language ~= 'c' and language ~= 'lua' then
+            error(string.format(
+                'Problem in "language" instruction starting at line %d\n'
+                .. '    Unknown language specified: "%s"\n',
+                first_line_no, language))
+        end
         return instruction
     end
     error(string.format(
@@ -412,13 +419,13 @@ for section_name,section in pairs(sections) do
                          instruction_line_no_2, lines[instruction_line_no_2])
                  )
              end
+             section.language = language
              last_language_instruction = instruction
         end
     end
-    section.language = language or 'lua'
 end
 
-function section_output(fh, name, prefix_arg)
+function section_output(fh, language_arg, name, prefix_arg)
      if section_on_stack[name] then
          error(string.format('Section "%s" used inside itself', name)
             .. '   This would cause an infinite recursion and is not allowed\n'
@@ -427,6 +434,7 @@ function section_output(fh, name, prefix_arg)
      section_on_stack[name] = true
      -- print('sections on stack:', inspect(section_on_stack))
      local section = sections[name]
+     local language = section.language or language_arg
      local current_prefix = prefix_arg or 0
      if not section then
          error(string.format('Attempt to output missing section "%s"', name))
@@ -437,9 +445,8 @@ function section_output(fh, name, prefix_arg)
           if instruction.type == 'insert' then
               local insertion_prefix = current_prefix + (instruction.prefix - run_prefix)
               -- print(string.format("section_output: %s %d", instruction.name, instruction:first_line()))
-              section_output(fh, instruction.name, insertion_prefix)
+              section_output(fh, language, instruction.name, insertion_prefix)
           else
-              local language = section.language
               local instruction_first_line_no = instruction:first_line()
               local raw_instruction = {}
               for line_no = instruction_first_line_no, instruction_last_line_no do
@@ -478,7 +485,7 @@ for section_name, filename in pairs(outputs) do
         print('section_name,filename ', section_name,filename)
         local handle, error_message = io.open(filename, 'w')
         if not handle then  error(error_message) end
-        section_output(handle, section_name)
+        section_output(handle, 'lua', section_name)
 end
 
 -- vim: expandtab shiftwidth=4:

@@ -95,8 +95,9 @@ If it has fallen to 0, the state is closed.
 
 ```
 
+    -- miranda: section C function declarations
+    void kollos_refcount(lua_State* L, int inc);
     -- miranda: section Lua interpreter management
-    -- miranda: language c
 
     void kollos_refcount(lua_State* L, int inc)
     {
@@ -122,15 +123,19 @@ If it has fallen to 0, the state is closed.
 
 ```
 
+Create a new Kollos object (which is also a Lua interpreter).
+
 ```
 
+    -- miranda: section+ C function declarations
+    lua_State* kollos_newstate(void);
     -- miranda: section+ Lua interpreter management
-    -- miranda: language c
-
     lua_State* kollos_newstate(void)
     {
+        int base_of_stack;
         lua_State *const L = marpa_luaL_newstate ();
-        int base_of_stack = marpa_lua_gettop(L);
+        if (!L) return NULL;
+        base_of_stack = marpa_lua_gettop(L);
         marpa_lua_pushinteger(L, 1);
         marpa_lua_setfield(L, LUA_REGISTRYINDEX, "ref_count");
         marpa_luaL_openlibs (L);    /* open libraries */
@@ -141,6 +146,61 @@ If it has fallen to 0, the state is closed.
         /* Lua stack: [] */
         marpa_lua_settop(L, base_of_stack);
         return L;
+    }
+
+```
+
+Take ownership of a new reference
+to a Kollos object.
+
+```
+
+    -- miranda: section+ C function declarations
+    void kollos_ref(lua_State* L);
+    -- miranda: section+ Lua interpreter management
+    void kollos_ref(lua_State* L)
+    {
+        const int base_of_stack = marpa_lua_gettop(L);
+        lua_Integer refcount;
+        /* Lua stack [] */
+        marpa_lua_getfield(L, LUA_REGISTRYINDEX, "ref_count");
+        /* Lua stack [ old_ref_count ] */
+        refcount = marpa_lua_tointeger(L, -1);
+        /* Lua stack [ ] */
+        refcount += 1;
+        marpa_lua_pushinteger(L, refcount);
+        /* Lua stack [ old_ref_count, ref_count ] */
+        marpa_lua_setfield(L, LUA_REGISTRYINDEX, "ref_count");
+        marpa_lua_settop(L, base_of_stack);
+        /* Lua stack [ ] */
+    }
+
+```
+
+Give up ownership of a reference to a Kollos object (Lua interpreter).
+Deletes the interpreter if the reference count drops to zero.
+
+```
+
+    -- miranda: section+ C function declarations
+    void kollos_unref(lua_State* L);
+    -- miranda: section+ Lua interpreter management
+    void kollos_unref(lua_State* L)
+    {
+        const int base_of_stack = marpa_lua_gettop(L);
+        lua_Integer refcount;
+        marpa_lua_getfield(L, LUA_REGISTRYINDEX, "ref_count");
+        refcount = marpa_lua_tointeger(L, -1);
+        /* Lua stack [ ] */
+        if (refcount <= 1) {
+           marpa_lua_close(L);
+           return;
+        }
+        refcount -= 1;
+        marpa_lua_pushinteger(L, refcount);
+        marpa_lua_setfield(L, LUA_REGISTRYINDEX, "ref_count");
+        marpa_lua_settop(L, base_of_stack);
+        /* Lua stack [ ] */
     }
 
 ```
@@ -1031,7 +1091,6 @@ Licensing, etc.
 
 ```
     -- miranda: section kollos Lua library
-    -- miranda: language c
     static int marpa_luaopen_kollos(lua_State *L)
     {
         /* Create the main kollos object */
@@ -1044,7 +1103,6 @@ Licensing, etc.
 # Preliminaries to the C library code
 ```
     -- miranda: section preliminaries to the c library code
-    -- miranda: language c
     /*
     ** Permission is hereby granted, free of charge, to any person obtaining
     ** a copy of this software and associated documentation files (the
@@ -1103,8 +1161,7 @@ Licensing, etc.
     #include "lua.h"
     #include "lauxlib.h"
 
-    void kollos_refcount(lua_State* L, int inc);
-    lua_State* kollos_newstate(void);
+    -- miranda: insert C function declarations
 
     #endif
 
@@ -1114,7 +1171,6 @@ Licensing, etc.
 # Preliminaries to the C header file
 ```
     -- miranda: section preliminary comments of the c header file
-    -- miranda: language c
 
     /*
      * Copyright 2016 Jeffrey Kegler
