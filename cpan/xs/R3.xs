@@ -4998,7 +4998,7 @@ PPCODE:
 
   {
     lua_State* L = slg->L;
-    kollos_refcount(L, 1);
+    kollos_ref(L);
     /* Lua stack: [] */
     marpa_lua_newtable(L);
     /* Lua stack: [ grammar_table ] */
@@ -5040,7 +5040,7 @@ PPCODE:
    * Lua states, and then this will be necessary.
    */
   marpa_luaL_unref(slg->L, LUA_REGISTRYINDEX, slg->lua_ref);
-  kollos_refcount(slg->L, -1);
+  kollos_unref(slg->L);
   Safefree (slg);
 }
 
@@ -5576,7 +5576,7 @@ PPCODE:
   {
     lua_State* L = slr->slg->L;
     slr->L = L;
-    kollos_refcount(L, 1);
+    kollos_ref(L);
     /* Lua stack: [] */
     marpa_lua_newtable(L);
     /* Lua stack: [ recce_table ] */
@@ -5616,7 +5616,7 @@ PPCODE:
   const Marpa_Recce r0 = slr->r0;
 
   marpa_luaL_unref(slr->L, LUA_REGISTRYINDEX, slr->lua_ref);
-  kollos_refcount(slr->L, -1);
+  kollos_unref(slr->L);
 
   if (r0)
     {
@@ -6993,7 +6993,7 @@ DESTROY( lua_wrapper )
     Marpa_Lua *lua_wrapper;
 PPCODE:
 {
-  kollos_refcount(lua_wrapper->L, -1);
+  kollos_unref(lua_wrapper->L);
   Safefree (lua_wrapper);
 }
 

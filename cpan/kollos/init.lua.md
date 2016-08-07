@@ -81,55 +81,20 @@ to Lua-centeric C code.
 
 ## Kollos Lua interpreter
 
-Kollos uses a Lua interpreter.
-`kollos_refcount`
-manages the ref count of a Lua state, closing the Lua
-state when it falls to zero.
-'inc' should be
-one of
-   -1   -- decrement
-    1   -- increment
-    0   -- query
-The current value of the ref count is always returned.
-If it has fallen to 0, the state is closed.
+A Kollos object is a Lua interpreter.
+It keeps its own reference count, in its Lua registry.
+`kollos_newstate()`,
+the constructor, creates one reference
+and gives its caller ownership.
+When
+the reference count falls to zero,
+the interpreter (Kollos object) is destroyed.
 
 ```
 
     -- miranda: section C function declarations
-    void kollos_refcount(lua_State* L, int inc);
-    -- miranda: section Lua interpreter management
-
-    void kollos_refcount(lua_State* L, int inc)
-    {
-        int base_of_stack = marpa_lua_gettop(L);
-        lua_Integer new_refcount;
-        /* Lua stack [] */
-        marpa_lua_getfield(L, LUA_REGISTRYINDEX, "ref_count");
-        /* Lua stack [ old_ref_count ] */
-        new_refcount = marpa_lua_tointeger(L, -1);
-        /* Lua stack [ ] */
-        new_refcount += inc;
-        /* warn("xlua_refcount(), new_refcount=%d", new_refcount); */
-        if (new_refcount <= 0) {
-           marpa_lua_close(L);
-           return;
-        }
-        marpa_lua_pushinteger(L, new_refcount);
-        /* Lua stack [ old_ref_count, new_ref_count ] */
-        marpa_lua_setfield(L, LUA_REGISTRYINDEX, "ref_count");
-        marpa_lua_settop(L, base_of_stack);
-        /* Lua stack [ ] */
-    }
-
-```
-
-Create a new Kollos object (which is also a Lua interpreter).
-
-```
-
-    -- miranda: section+ C function declarations
     lua_State* kollos_newstate(void);
-    -- miranda: section+ Lua interpreter management
+    -- miranda: section Lua interpreter management
     lua_State* kollos_newstate(void)
     {
         int base_of_stack;
@@ -150,8 +115,10 @@ Create a new Kollos object (which is also a Lua interpreter).
 
 ```
 
-Take ownership of a new reference
-to a Kollos object.
+`kollos_ref()`
+creates a new reference
+to a Kollos object,
+and takes ownership of it.
 
 ```
 
