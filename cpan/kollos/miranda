@@ -299,6 +299,13 @@ local function run_iter()
                         start_instruction_ix = current_instruction_ix + 2
                         goto NEXT_RUN
                     end
+                    if next_instruction.type == "section"
+                        or next_instruction.type == "section+"
+                    then
+                        coroutine.yield(start_instruction_ix, next_instruction_line_no-1)
+                        start_instruction_ix = current_instruction_ix + 1
+                        goto NEXT_RUN
+                    end
                     current_instruction_ix = current_instruction_ix + 1
                 end
                 start_instruction_ix = current_instruction_ix
@@ -422,7 +429,7 @@ function section_output(fh, name, prefix_arg)
      local section = sections[name]
      local current_prefix = prefix_arg or 0
      if not section then
-         error('Attempt to output missing section "%s"', name)
+         error(string.format('Attempt to output missing section "%s"', name))
      end
      for instruction, run_prefix, last_text_line_no in section_instructions(section) do
               -- We first deal with outputing the instruction.
