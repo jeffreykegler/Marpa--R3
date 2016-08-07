@@ -117,6 +117,8 @@
 ^kollos/Makefile[.]old$
 ^kollos/init[.]lua$
 ^kollos/toc[.]lua$
+^kollos/kollos[.]c$
+^kollos/kollos[.]h$
 ^xs/MYMETA[.]
 ^xs/Makefile$
 ^xs/Makefile[.]old$
