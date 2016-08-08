@@ -392,8 +392,6 @@ typedef struct
   SV* input;
   int too_many_earley_items;
 
-  /* Lua "reference" to this object */
-  int lua_ref;
 
   /* A "weak" reference to the v_wrapper.
    * See the explanation under the v_wrapper destructor
@@ -409,9 +407,15 @@ typedef struct
   int t_event_count;
   int t_count_of_deleted_events;
 
-  lua_State* L;
-
 } Scanless_R;
+
+typedef struct
+{
+  /* Lua "reference" to this object */
+  int lua_ref;
+  lua_State* L;
+  Scanless_R *slr;
+} Outer_R;
 
 #undef POS_TO_OFFSET
 #define POS_TO_OFFSET(slr, pos) \
@@ -446,7 +450,7 @@ struct v_wrapper_s
   IV trace_values;
   int mode;                     /* 'raw' or 'stack' */
   AV *constants;
-  Scanless_R* slr;
+  Outer_R* outer_slr;
 };
 typedef struct v_wrapper_s V_Wrapper;
 

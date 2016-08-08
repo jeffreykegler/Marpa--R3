@@ -17,7 +17,7 @@ O_Wrapper * T_MARPA_O_W
 T_Wrapper * T_MARPA_T_W
 V_Wrapper * T_MARPA_V_W
 Scanless_G * T_SCANLESS_G
-Scanless_R * T_SCANLESS_R
+Outer_R * T_SCANLESS_R
 Marpa_Lua * T_MARPA_LUA
 
 Marpa_AHM_ID T_IV
@@ -103,7 +103,7 @@ T_SCANLESS_G
 T_SCANLESS_R
         if (sv_isa($arg, \"Marpa::R3::Thin::SLR\")) {
             IV tmp = SvIV((SV*)SvRV($arg));
-            $var = INT2PTR(Scanless_R *, tmp);
+            $var = INT2PTR(Outer_R *, tmp);
         } else
             Perl_croak(aTHX_ \"%s: %s is not of type Marpa::R3::Thin::SLR\",
                         ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},

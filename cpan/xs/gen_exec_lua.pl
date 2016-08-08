@@ -156,17 +156,17 @@ PPCODE:
 MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::SLR
 
 void
-exec_key( slr, fn_key, ... )
-   Scanless_R *slr;
+exec_key( outer_slr, fn_key, ... )
+   Outer_R *outer_slr;
    int fn_key;
 PPCODE:
 {
     int recce_object;
     const int is_method = 1;
-    lua_State *const L = slr->L;
+    lua_State *const L = outer_slr->L;
     const int base_of_stack = marpa_lua_gettop (L);
 
-    marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, slr->lua_ref);
+    marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, outer_slr->lua_ref);
     /* Lua stack: [ recce_table ] */
     recce_object = marpa_lua_gettop (L);
     marpa_lua_rawgeti (L, recce_object, fn_key);
@@ -176,17 +176,17 @@ PPCODE:
 }
 
 void
-exec( slr, codestr, ... )
-   Scanless_R *slr;
+exec( outer_slr, codestr, ... )
+   Outer_R *outer_slr;
    char* codestr;
 PPCODE:
 {
     const int is_method = 1;
-    lua_State *const L = slr->L;
+    lua_State *const L = outer_slr->L;
     const int base_of_stack = marpa_lua_gettop (L);
     int load_status;
 
-    marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, slr->lua_ref);
+    marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, outer_slr->lua_ref);
     /* Lua stack: [ recce_table ] */
 
     load_status = marpa_luaL_loadbuffer (L, codestr, strlen (codestr), codestr);
@@ -202,17 +202,17 @@ PPCODE:
 }
 
 void
-exec_name( slr, name, ... )
-   Scanless_R *slr;
+exec_name( outer_slr, name, ... )
+   Outer_R *outer_slr;
    char* name;
 PPCODE:
 {
     const int is_method = 1;
-    lua_State *const L = slr->L;
+    lua_State *const L = outer_slr->L;
     const int base_of_stack = marpa_lua_gettop (L);
     int type;
 
-    marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, slr->lua_ref);
+    marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, outer_slr->lua_ref);
     /* Lua stack: [ recce_table ] */
 
     type = marpa_lua_getglobal (L, name);

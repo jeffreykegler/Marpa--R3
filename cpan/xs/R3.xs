@@ -3708,7 +3708,7 @@ PPCODE:
   /* Reserve position 0 */
   av_push (v_wrapper->constants, newSV(0));
 
-  v_wrapper->slr = NULL;
+  v_wrapper->outer_slr = NULL;
   sv = sv_newmortal ();
   sv_setref_pv (sv, value_c_class_name, (void *) v_wrapper);
   XPUSHs (sv);
@@ -3735,9 +3735,9 @@ PPCODE:
    * independent is useful for the tracing and debugging
    * methods.
    */
-  if (v_wrapper->slr) {
-      v_wrapper->slr->v_wrapper = NULL;
-      v_wrapper->slr = NULL;
+  if (v_wrapper->outer_slr) {
+      v_wrapper->outer_slr->slr->v_wrapper = NULL;
+      v_wrapper->outer_slr = NULL;
   }
 
   marpa_v_unref (v);
@@ -3810,11 +3810,12 @@ PPCODE:
 }
 
 void
-stack_mode_set( v_wrapper, slr )
+stack_mode_set( v_wrapper, outer_slr )
     V_Wrapper *v_wrapper;
-    Scanless_R *slr;
+    Outer_R *outer_slr;
 PPCODE:
 {
+  Scanless_R *slr = outer_slr->slr;
   if (v_wrapper->mode != MARPA_XS_V_MODE_IS_INITIAL)
     {
         croak ("Problem in v->stack_mode_set(): Cannot re-set stack mode");
@@ -3823,7 +3824,7 @@ PPCODE:
         croak ("SLR already has active valuator");
   }
 
-  v_wrapper->slr = slr;
+  v_wrapper->outer_slr = outer_slr;
   slr->v_wrapper = v_wrapper;
 
   v_wrapper->mode = MARPA_XS_V_MODE_IS_STACK;
@@ -3836,17 +3837,17 @@ stack_step( v_wrapper )
     V_Wrapper *v_wrapper;
 PPCODE:
 {
-    Scanless_R *slr;
+    Outer_R *outer_slr;
 
     if (v_wrapper->mode != MARPA_XS_V_MODE_IS_STACK) {
         croak
             ("Problem in v->stack_step(): Cannot call unless valuator is in 'stack' mode");
     }
 
-    slr = v_wrapper->slr;
-    xlua_sig_call (slr->L,
+    outer_slr = v_wrapper->outer_slr;
+    xlua_sig_call (outer_slr->L,
         "local recce = ...; recce.trace_values_queue = {}", "R",
-        slr->lua_ref);
+        outer_slr->lua_ref);
 
     while (1) {
         int result;
@@ -3854,9 +3855,9 @@ PPCODE:
         SV *ref_to_values_av = sv_2mortal (newRV_noinc ((SV *) values_av));
         v_wrapper->values = (AV *) SvRV (ref_to_values_av);
 
-        xlua_sig_call (slr->L,
+        xlua_sig_call (outer_slr->L,
             "local recce = ...; return find_and_do_ops(recce)\n",
-            "R>i", slr->lua_ref, &result);
+            "R>i", outer_slr->lua_ref, &result);
 
         switch (result) {
         case 3:
@@ -5473,6 +5474,7 @@ new( class, slg_sv, r1_sv )
 PPCODE:
 {
   SV *new_sv;
+  Outer_R *outer_slr;
   Scanless_R *slr;
   Scanless_G *slg;
   PERL_UNUSED_ARG(class);
@@ -5486,7 +5488,9 @@ PPCODE:
     {
       croak ("Problem in u->new(): r1 arg is not of type Marpa::R3::Thin::R");
     }
+  Newx (outer_slr, 1, Outer_R);
   Newx (slr, 1, Scanless_R);
+  outer_slr->slr = slr;
 
   slr->throw = 1;
   slr->trace_lexers = 0;
@@ -5575,7 +5579,7 @@ PPCODE:
 
   {
     lua_State* L = slr->slg->L;
-    slr->L = L;
+    outer_slr->L = L;
     kollos_ref(L);
     /* Lua stack: [] */
     marpa_lua_newtable(L);
@@ -5588,7 +5592,7 @@ PPCODE:
     /* Lua stack: [ recce_table, lud ] */
     marpa_lua_setfield(L, -2, "lud");
     /* Lua stack: [ recce_table ] */
-    slr->lua_ref =  marpa_luaL_ref(L, LUA_REGISTRYINDEX);
+    outer_slr->lua_ref =  marpa_luaL_ref(L, LUA_REGISTRYINDEX);
     /* Lua stack: [] */
   }
 
@@ -5604,19 +5608,20 @@ PPCODE:
   Newx (slr->t_lexemes, (unsigned int)slr->t_lexeme_capacity, union marpa_slr_event_s);
 
   new_sv = sv_newmortal ();
-  sv_setref_pv (new_sv, scanless_r_class_name, (void *) slr);
+  sv_setref_pv (new_sv, scanless_r_class_name, (void *) outer_slr);
   XPUSHs (new_sv);
 }
 
 void
-DESTROY( slr )
-    Scanless_R *slr;
+DESTROY( outer_slr )
+    Outer_R *outer_slr;
 PPCODE:
 {
+  Scanless_R *slr = outer_slr->slr;
   const Marpa_Recce r0 = slr->r0;
 
-  marpa_luaL_unref(slr->L, LUA_REGISTRYINDEX, slr->lua_ref);
-  kollos_unref(slr->L);
+  marpa_luaL_unref(outer_slr->L, LUA_REGISTRYINDEX, outer_slr->lua_ref);
+  kollos_unref(outer_slr->L);
 
   if (r0)
     {
@@ -5642,27 +5647,30 @@ PPCODE:
       */
      V_Wrapper* vw = slr->v_wrapper;
      if (vw) {
-       vw->slr = NULL;
+       vw->outer_slr = NULL;
        slr->v_wrapper = NULL;
      }
   }
   Safefree (slr);
+  Safefree (outer_slr);
 }
 
-void throw_set(slr, throw_setting)
-    Scanless_R *slr;
+void throw_set(outer_slr, throw_setting)
+    Outer_R *outer_slr;
     int throw_setting;
 PPCODE:
 {
+  Scanless_R *slr = outer_slr->slr;
   slr->throw = throw_setting;
 }
 
 void
-trace_lexers( slr, new_level )
-    Scanless_R *slr;
+trace_lexers( outer_slr, new_level )
+    Outer_R *outer_slr;
     int new_level;
 PPCODE:
 {
+  Scanless_R *slr = outer_slr->slr;
   IV old_level = slr->trace_lexers;
   slr->trace_lexers = new_level;
   if (new_level)
@@ -5675,30 +5683,33 @@ PPCODE:
 }
 
 void
-trace_terminals( slr, new_level )
-    Scanless_R *slr;
+trace_terminals( outer_slr, new_level )
+    Outer_R *outer_slr;
     int new_level;
 PPCODE:
 {
+  Scanless_R *slr = outer_slr->slr;
   IV old_level = slr->trace_terminals;
   slr->trace_terminals = new_level;
   XSRETURN_IV(old_level);
 }
 
 void
-earley_item_warning_threshold( slr )
-    Scanless_R *slr;
+earley_item_warning_threshold( outer_slr )
+    Outer_R *outer_slr;
 PPCODE:
 {
+  Scanless_R *slr = outer_slr->slr;
   XSRETURN_IV(slr->too_many_earley_items);
 }
 
 void
-earley_item_warning_threshold_set( slr, too_many_earley_items )
-    Scanless_R *slr;
+earley_item_warning_threshold_set( outer_slr, too_many_earley_items )
+    Outer_R *outer_slr;
     int too_many_earley_items;
 PPCODE:
 {
+  Scanless_R *slr = outer_slr->slr;
   slr->too_many_earley_items = too_many_earley_items;
 }
 
@@ -5706,28 +5717,31 @@ PPCODE:
  #  it does not create a new one
  #
 void
-g1( slr )
-    Scanless_R *slr;
+g1( outer_slr )
+    Outer_R *outer_slr;
 PPCODE:
 {
+  Scanless_R *slr = outer_slr->slr;
   XPUSHs (sv_2mortal (SvREFCNT_inc_NN ( slr->r1_wrapper->base_sv)));
 }
 
 void
-pos( slr )
-    Scanless_R *slr;
+pos( outer_slr )
+    Outer_R *outer_slr;
 PPCODE:
 {
+  Scanless_R *slr = outer_slr->slr;
   XSRETURN_IV(slr->perl_pos);
 }
 
 void
-pos_set( slr, start_pos_sv, length_sv )
-    Scanless_R *slr;
+pos_set( outer_slr, start_pos_sv, length_sv )
+    Outer_R *outer_slr;
      SV* start_pos_sv;
      SV* length_sv;
 PPCODE:
 {
+  Scanless_R *slr = outer_slr->slr;
   int start_pos = SvIOK(start_pos_sv) ? SvIV(start_pos_sv) : slr->perl_pos;
   int length = SvIOK(length_sv) ? SvIV(length_sv) : -1;
   u_pos_set(slr, "slr->pos_set", start_pos, length);
@@ -5736,12 +5750,13 @@ PPCODE:
 }
 
 void
-substring(slr, start_pos, length)
-    Scanless_R *slr;
+substring(outer_slr, start_pos, length)
+    Outer_R *outer_slr;
     int start_pos;
     int length;
 PPCODE:
 {
+  Scanless_R *slr = outer_slr->slr;
   SV* literal_sv = u_substring(slr, "slr->substring()", start_pos, length);
   XPUSHs (sv_2mortal (literal_sv));
 }
@@ -5750,12 +5765,13 @@ PPCODE:
  # one in terms of the input locations.
  # This is only meaningful in the context of an SLR
 void
-_es_to_literal_span(slr, start_earley_set, length)
-    Scanless_R *slr;
+_es_to_literal_span(outer_slr, start_earley_set, length)
+    Outer_R *outer_slr;
     Marpa_Earley_Set_ID start_earley_set;
     int length;
 PPCODE:
 {
+  Scanless_R *slr = outer_slr->slr;
   int literal_start;
   int literal_length;
   const Marpa_Recce r1 = slr->r1;
@@ -5785,10 +5801,11 @@ PPCODE:
 }
 
 void
-read(slr)
-    Scanless_R *slr;
+read(outer_slr)
+    Outer_R *outer_slr;
 PPCODE:
 {
+  Scanless_R *slr = outer_slr->slr;
   int lexer_read_result = 0;
   const int trace_lexers = slr->trace_lexers;
 
@@ -5892,26 +5909,29 @@ PPCODE:
 }
 
 void
-lexer_read_result (slr)
-     Scanless_R *slr;
+lexer_read_result (outer_slr)
+    Outer_R *outer_slr;
 PPCODE:
 {
+  Scanless_R *slr = outer_slr->slr;
   XPUSHs (sv_2mortal (newSViv ((IV) slr->lexer_read_result)));
 }
 
 void
-r1_earleme_complete_result (slr)
-     Scanless_R *slr;
+r1_earleme_complete_result (outer_slr)
+    Outer_R *outer_slr;
 PPCODE:
 {
+  Scanless_R *slr = outer_slr->slr;
   XPUSHs (sv_2mortal (newSViv ((IV) slr->r1_earleme_complete_result)));
 }
 
 void
-pause_span (slr)
-     Scanless_R *slr;
+pause_span (outer_slr)
+    Outer_R *outer_slr;
 PPCODE:
 {
+  Scanless_R *slr = outer_slr->slr;
   if (slr->end_of_pause_lexeme < 0)
     {
       XSRETURN_UNDEF;
@@ -5923,10 +5943,11 @@ PPCODE:
 }
 
 void
-events(slr)
-    Scanless_R *slr;
+events(outer_slr)
+    Outer_R *outer_slr;
 PPCODE:
 {
+  Scanless_R *slr = outer_slr->slr;
   int i;
   int queue_length;
   AV *const event_queue_av = slr->r1_wrapper->event_queue;
@@ -6240,11 +6261,12 @@ PPCODE:
 }
 
 void
-span(slr, earley_set)
-    Scanless_R *slr;
+span(outer_slr, earley_set)
+    Outer_R *outer_slr;
     IV earley_set;
 PPCODE:
 {
+  Scanless_R *slr = outer_slr->slr;
   int start_position;
   int length;
   slr_es_to_span(slr, earley_set, &start_position, &length);
@@ -6253,10 +6275,11 @@ PPCODE:
 }
 
 void
-lexeme_span (slr)
-     Scanless_R *slr;
+lexeme_span (outer_slr)
+    Outer_R *outer_slr;
 PPCODE:
 {
+  Scanless_R *slr = outer_slr->slr;
   int length = slr->end_of_lexeme - slr->start_of_lexeme;
   XPUSHs (sv_2mortal (newSViv ((IV) slr->start_of_lexeme)));
   XPUSHs (sv_2mortal (newSViv ((IV) length)));
@@ -6265,11 +6288,12 @@ PPCODE:
  # Return values are 1-based, as is the tradition
  # EOF is reported as the last line, last column plus one.
 void
-line_column(slr, pos)
-     Scanless_R *slr;
+line_column(outer_slr, pos)
+    Outer_R *outer_slr;
      IV pos;
 PPCODE:
 {
+  Scanless_R *slr = outer_slr->slr;
   int line = 1;
   int column = 1;
   int linecol;
@@ -6346,11 +6370,12 @@ PPCODE:
  #
  # All errors are returned, not thrown
 void
-g1_alternative (slr, symbol_id, ...)
-    Scanless_R *slr;
+g1_alternative (outer_slr, symbol_id, ...)
+    Outer_R *outer_slr;
     Marpa_Symbol_ID symbol_id;
 PPCODE:
 {
+  Scanless_R *slr = outer_slr->slr;
   int result;
   int token_ix;
   switch (items)
@@ -6374,13 +6399,13 @@ PPCODE:
         }
         av_push (slr->token_values, newSVsv (token_value));
         token_ix = av_len (slr->token_values);
-        xlua_sig_call (slr->L,
+        xlua_sig_call (outer_slr->L,
             "local recce, token_sv = ...;\n"
             "local new_token_ix = #recce.token_values + 1\n"
             "recce.token_values[new_token_ix] = token_sv\n"
             "return new_token_ix\n",
             "RS>i",
-            slr->lua_ref, newSVsv(token_value), &token_ix);
+            outer_slr->lua_ref, newSVsv(token_value), &token_ix);
       }
       break;
     default:
@@ -6397,12 +6422,13 @@ PPCODE:
 
  # Returns current position on success, 0 on unthrown failure
 void
-g1_lexeme_complete (slr, start_pos_sv, length_sv)
-    Scanless_R *slr;
+g1_lexeme_complete (outer_slr, start_pos_sv, length_sv)
+     Outer_R *outer_slr;
      SV* start_pos_sv;
      SV* length_sv;
 PPCODE:
 {
+  Scanless_R *slr = outer_slr->slr;
   int result;
   const int input_length = slr->pos_db_logical_size;
 
@@ -6470,12 +6496,13 @@ PPCODE:
 }
 
 void
-discard_event_activate( slr, l0_rule_id, reactivate )
-    Scanless_R *slr;
+discard_event_activate( outer_slr, l0_rule_id, reactivate )
+    Outer_R *outer_slr;
     Marpa_Rule_ID l0_rule_id;
     int reactivate;
 PPCODE:
 {
+  Scanless_R *slr = outer_slr->slr;
   struct l0_rule_r_properties *l0_rule_r_properties;
   const Scanless_G *slg = slr->slg;
   const Marpa_Rule_ID highest_l0_rule_id = marpa_g_highest_rule_id (slg->l0_wrapper->g);
@@ -6514,12 +6541,13 @@ PPCODE:
 }
 
 void
-lexeme_event_activate( slr, g1_lexeme_id, reactivate )
-    Scanless_R *slr;
+lexeme_event_activate( outer_slr, g1_lexeme_id, reactivate )
+    Outer_R *outer_slr;
     Marpa_Symbol_ID g1_lexeme_id;
     int reactivate;
 PPCODE:
 {
+  Scanless_R *slr = outer_slr->slr;
   struct symbol_r_properties *symbol_r_properties;
   const Scanless_G *slg = slr->slg;
   const Marpa_Symbol_ID highest_g1_symbol_id = marpa_g_highest_symbol_id (slg->g1);
@@ -6560,10 +6588,11 @@ PPCODE:
 }
 
 void
-problem_pos( slr )
-     Scanless_R *slr;
+problem_pos( outer_slr )
+    Outer_R *outer_slr;
 PPCODE:
 {
+  Scanless_R *slr = outer_slr->slr;
   if (slr->problem_pos < 0) {
      XSRETURN_UNDEF;
   }
@@ -6571,10 +6600,11 @@ PPCODE:
 }
 
 void
-lexer_latest_earley_set( slr )
-     Scanless_R *slr;
+lexer_latest_earley_set( outer_slr )
+    Outer_R *outer_slr;
 PPCODE:
 {
+  Scanless_R *slr = outer_slr->slr;
   const Marpa_Recce r0 = slr->r0;
   if (!r0)
     {
@@ -6584,11 +6614,12 @@ PPCODE:
 }
 
 void
-lexer_progress_report_start( slr, ordinal )
-    Scanless_R *slr;
+lexer_progress_report_start( outer_slr, ordinal )
+    Outer_R *outer_slr;
     Marpa_Earley_Set_ID ordinal;
 PPCODE:
 {
+  Scanless_R *slr = outer_slr->slr;
   int gp_result;
   G_Wrapper* lexer_wrapper;
   const Marpa_Recognizer recce = slr->r0;
@@ -6607,10 +6638,11 @@ PPCODE:
 }
 
 void
-lexer_progress_report_finish( slr )
-    Scanless_R *slr;
+lexer_progress_report_finish( outer_slr )
+    Outer_R *outer_slr;
 PPCODE:
 {
+  Scanless_R *slr = outer_slr->slr;
   int gp_result;
   G_Wrapper* lexer_wrapper;
   const Marpa_Recognizer recce = slr->r0;
@@ -6629,10 +6661,11 @@ PPCODE:
 }
 
 void
-lexer_progress_item( slr )
-    Scanless_R *slr;
+lexer_progress_item( outer_slr )
+    Outer_R *outer_slr;
 PPCODE:
 {
+  Scanless_R *slr = outer_slr->slr;
   Marpa_Rule_ID rule_id;
   Marpa_Earley_Set_ID origin = -1;
   int position = -1;
@@ -6659,11 +6692,12 @@ PPCODE:
 }
 
 void
-string_set( slr, string )
-     Scanless_R *slr;
+string_set( outer_slr, string )
+     Outer_R *outer_slr;
      SVREF string;
 PPCODE:
 {
+  Scanless_R *slr = outer_slr->slr;
   U8 *p;
   U8 *start_of_string;
   U8 *end_of_string;
@@ -6776,35 +6810,39 @@ PPCODE:
 }
 
 void
-input_length( slr )
-     Scanless_R *slr;
+input_length( outer_slr )
+     Outer_R *outer_slr;
 PPCODE:
 {
+  Scanless_R *slr = outer_slr->slr;
   XSRETURN_IV(slr->pos_db_logical_size);
 }
 
 void
-codepoint( slr )
-     Scanless_R *slr;
+codepoint( outer_slr )
+    Outer_R *outer_slr;
 PPCODE:
 {
+  Scanless_R *slr = outer_slr->slr;
   XSRETURN_UV(slr->codepoint);
 }
 
 void
-symbol_id( slr )
-     Scanless_R *slr;
+symbol_id( outer_slr )
+    Outer_R *outer_slr;
 PPCODE:
 {
+  Scanless_R *slr = outer_slr->slr;
   XSRETURN_IV(slr->input_symbol_id);
 }
 
 void
-char_register( slr, codepoint, ... )
-    Scanless_R *slr;
+char_register( outer_slr, codepoint, ... )
+    Outer_R *outer_slr;
     UV codepoint;
 PPCODE:
 {
+  Scanless_R *slr = outer_slr->slr;
   /* OP Count is args less two, then plus two for codepoint and length fields */
   const UV op_count = (UV)items;
   UV op_ix;
@@ -6842,11 +6880,12 @@ PPCODE:
 
   # Untested
 void
-lexeme_priority( slr, g1_lexeme )
-    Scanless_R *slr;
+lexeme_priority( outer_slr, g1_lexeme )
+    Outer_R *outer_slr;
     Marpa_Symbol_ID g1_lexeme;
 PPCODE:
 {
+  Scanless_R *slr = outer_slr->slr;
   const Scanless_G *slg = slr->slg;
   Marpa_Symbol_ID highest_g1_symbol_id = marpa_g_highest_symbol_id (slg->g1);
     if (g1_lexeme > highest_g1_symbol_id)
@@ -6874,12 +6913,13 @@ PPCODE:
 }
 
 void
-lexeme_priority_set( slr, g1_lexeme, new_priority )
-    Scanless_R *slr;
+lexeme_priority_set( outer_slr, g1_lexeme, new_priority )
+    Outer_R *outer_slr;
     Marpa_Symbol_ID g1_lexeme;
     int new_priority;
 PPCODE:
 {
+  Scanless_R *slr = outer_slr->slr;
   int old_priority;
   const Scanless_G *slg = slr->slg;
   Marpa_Symbol_ID highest_g1_symbol_id = marpa_g_highest_symbol_id (slg->g1);
@@ -6911,11 +6951,12 @@ PPCODE:
 
 
 void
-token_value(slr, token_ix)
-    Scanless_R *slr;
+token_value(outer_slr, token_ix)
+    Outer_R *outer_slr;
     int token_ix;
 PPCODE:
 {
+  Scanless_R *slr = outer_slr->slr;
   SV **p_token_value_sv;
   p_token_value_sv = av_fetch (slr->token_values, (I32) token_ix, 0);
   if (!p_token_value_sv)
@@ -6929,17 +6970,17 @@ PPCODE:
 }
 
 void
-register_fn(slr, codestr)
-    Scanless_R *slr;
+register_fn(outer_slr, codestr)
+    Outer_R *outer_slr;
     char* codestr;
 PPCODE:
 {
   int status;
   int time_object_registry;
   int function_ref;
-  lua_State* const L = slr->L;
+  lua_State* const L = outer_slr->L;
 
-  marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, slr->lua_ref);
+  marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, outer_slr->lua_ref);
   /* Lua stack: [ recce_table ] */
   time_object_registry = marpa_lua_gettop (L);
 
@@ -6958,15 +6999,15 @@ PPCODE:
 }
 
 void
-unregister_fn(slr, fn_key)
-    Scanless_R *slr;
+unregister_fn(outer_slr, fn_key)
+    Outer_R *outer_slr;
     int fn_key;
 PPCODE:
 {
-  lua_State* const L = slr->L;
+  lua_State* const L = outer_slr->L;
   const int base_of_stack = marpa_lua_gettop(L);
 
-  marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, slr->lua_ref);
+  marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, outer_slr->lua_ref);
   /* Lua stack: [ recce_table ] */
   marpa_luaL_unref (L, -1, fn_key);
   marpa_lua_settop (L, base_of_stack);
