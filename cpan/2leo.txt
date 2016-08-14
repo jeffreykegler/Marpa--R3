@@ -1,0 +1,10 @@
+Throughout, we assume a grammar G, all of whose symbols are accessible and productive.
+We assume the parsing algorithm of Leo 1991.
+
+Th: The number of Earley items added by any right recursion for G is less than c,
+where c is a constant.
+
+Lemma: Let RR be a right recursion in G which, for any constant c, adds more
+than c items to some Earley set.  Then there is some pair
+dr1, dr2 of dotted rules such that, for any constant c1, dr1 and dr2 appear in
+the same Earley set more than c1 times.
