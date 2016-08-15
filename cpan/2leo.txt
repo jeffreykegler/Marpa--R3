@@ -33,3 +33,5 @@ Let the recursive symbol be A.  Let WLOG
 dr1 be <Mlhs> ::= <<Mpre>> <M>
 dr1 be <Nlhs> ::= <<Npre>> <M> <<Npost>>
 
+Then
+<M> =>+ ... <A> ... =>+ <<pre>> <M> <<post>>
