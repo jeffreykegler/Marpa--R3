@@ -4,7 +4,22 @@ We assume the parsing algorithm of Leo 1991.
 Th: The number of Earley items added by any right recursion for G is less than c,
 where c is a constant.
 
-Lemma: Let RR be a right recursion in G which, for any constant c, adds more
+Non-linear RR Lemma: Let RR be a right recursion in G which, for any constant c, adds more
 than c items to some Earley set.  Then there is some pair
-dr1, dr2 of dotted rules such that, for any constant c1, dr1 and dr2 appear in
+dr1, dr2 of dotted rules such that dr1 and dr2 share the same transition symbol
+and, for any constant c1, dr1 and dr2 appear in
 the same Earley set more than c1 times.
+
+Proof: Suppose, for a reductio,
+there is some constant c1 such that no pair of dotted rules sharing
+a transition symbol appears more than c1 times in RR.
+Let the number of dotted rules be |dr|.
+Then there will be at most |dr|*c1 Earley sets in which two Earley items share a
+transition symbol.
+Therefore, there will be a last Earley set in RR in which an Earley items of RR
+shares a transition symbol with another item in the Earley set.
+This Earley set will have a finite number of items, call it c2.
+Subsequent Earley sets will be subject to Leo memoization and have c2+1 items
+belonging to RR.
+This shows the reductio and the Non-linear RR Lemma.
+
