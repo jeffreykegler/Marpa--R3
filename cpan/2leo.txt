@@ -6,8 +6,11 @@ where c is a constant.
 
 Non-linear RR Lemma: Let RR be a right recursion in G which, for any constant c, adds more
 than c items to some Earley set.  Then there is some pair
-dr1, dr2 of dotted rules such that dr1 and dr2 share the same transition symbol
-and, for any constant c1, dr1 and dr2 appear in
+dr1, dr2 of dotted rules such that
+
+1) dr1 is a right recursive rule, part of RR;
+2) dr1 and dr2 share the same transition symbol; and
+3) for any constant c1, dr1 and dr2 appear in
 the same Earley set more than c1 times.
 
 Proof: Suppose, for a reductio,
@@ -22,4 +25,11 @@ This Earley set will have a finite number of items, call it c2.
 Subsequent Earley sets will be subject to Leo memoization and have c2+1 items
 belonging to RR.
 This shows the reductio and the Non-linear RR Lemma.
+
+Main theorem, proof (part):
+
+So the pairs dr1, dr2 must be added via a recursive symbol.
+Let the recursive symbol be A.  Let WLOG
+dr1 be <Mlhs> ::= <<Mpre>> <M>
+dr1 be <Nlhs> ::= <<Npre>> <M> <<Npost>>
 
