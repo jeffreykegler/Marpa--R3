@@ -117,7 +117,7 @@ the interpreter (Kollos object) is destroyed.
 
 `kollos_refinc()`
 creates a new reference
-to a Kollos object,
+to a Kollos interpreter,
 and takes ownership of it.
 
 ```
@@ -144,7 +144,7 @@ and takes ownership of it.
 
 ```
 
-Give up ownership of a reference to a Kollos object (Lua interpreter).
+Give up ownership of a reference to a Kollos interpreter.
 Deletes the interpreter if the reference count drops to zero.
 
 ```
@@ -166,6 +166,63 @@ Deletes the interpreter if the reference count drops to zero.
         refcount -= 1;
         marpa_lua_pushinteger(L, refcount);
         marpa_lua_setfield(L, LUA_REGISTRYINDEX, "ref_count");
+        marpa_lua_settop(L, base_of_stack);
+        /* Lua stack [ ] */
+    }
+
+```
+
+`kollos_tblrefinc()`
+creates a new reference
+to a Kollos interpreter,
+and takes ownership of it.
+
+```
+
+    -- miranda: section+ C function declarations
+    void kollos_tblrefinc(lua_State* L, int lua_ref);
+    -- miranda: section+ Lua interpreter management
+    void kollos_tblrefinc(lua_State* L, int lua_ref)
+    {
+        const int base_of_stack = marpa_lua_gettop(L);
+        lua_Integer refcount;
+        /* Lua stack [] */
+        marpa_lua_geti(L, LUA_REGISTRYINDEX, lua_ref);
+        /* Lua stack [ old_ref_count ] */
+        refcount = marpa_lua_tointeger(L, -1);
+        /* Lua stack [ ] */
+        refcount += 1;
+        marpa_lua_pushinteger(L, refcount);
+        /* Lua stack [ old_ref_count, ref_count ] */
+        marpa_lua_seti(L, LUA_REGISTRYINDEX, lua_ref);
+        marpa_lua_settop(L, base_of_stack);
+        /* Lua stack [ ] */
+    }
+
+```
+
+Give up ownership of a reference to a Kollos interpreter.
+Deletes the interpreter if the reference count drops to zero.
+
+```
+
+    -- miranda: section+ C function declarations
+    void kollos_tblrefdec(lua_State* L, int lua_ref);
+    -- miranda: section+ Lua interpreter management
+    void kollos_tblrefdec(lua_State* L, int lua_ref)
+    {
+        const int base_of_stack = marpa_lua_gettop(L);
+        lua_Integer refcount;
+        marpa_lua_geti(L, LUA_REGISTRYINDEX, lua_ref);
+        refcount = marpa_lua_tointeger(L, -1);
+        /* Lua stack [ ] */
+        if (refcount <= 1) {
+           marpa_luaL_unref(L, LUA_REGISTRYINDEX, lua_ref);
+           return;
+        }
+        refcount -= 1;
+        marpa_lua_pushinteger(L, refcount);
+        marpa_lua_seti(L, LUA_REGISTRYINDEX, lua_ref);
         marpa_lua_settop(L, base_of_stack);
         /* Lua stack [ ] */
     }
