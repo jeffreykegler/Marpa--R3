@@ -2123,6 +2123,20 @@ static Scanless_R* marpa_inner_slr_new (
   return slr;
 }
 
+static Scanless_R* slr_inner_get(lua_State* L, int lua_ref) {
+    const int base_of_stack = marpa_lua_gettop(L);
+    Scanless_R *slr;
+    /* Necessary every time to check stack ?? */
+    marpa_lua_checkstack(L, 20);
+    marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, lua_ref);
+    /* Lua stack: [ recce_table ] */
+    marpa_lua_getfield(L, -1, "lud");
+    /* Lua stack: [ recce_table, lud ] */
+    slr = marpa_lua_touserdata(L, -1);
+    marpa_lua_settop(L, base_of_stack);
+    return slr;
+}
+
 /*
  * Try to discard lexemes.
  * It is assumed this is because R1 is exhausted and we
@@ -5627,17 +5641,7 @@ PPCODE:
     marpa_lua_settop(L, base_of_stack);
   }
 
-  {
-    lua_State* L = outer_slr->L;
-    const int base_of_stack = marpa_lua_gettop(L);
-    marpa_lua_checkstack(L, 20);
-    marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, outer_slr->lua_ref);
-    /* Lua stack: [ recce_table ] */
-    marpa_lua_getfield(L, -1, "lud");
-    /* Lua stack: [ recce_table, lud ] */
-    outer_slr->slr = marpa_lua_touserdata(L, -1);
-    marpa_lua_settop(L, base_of_stack);
-  }
+  outer_slr->slr = inner_slr_get(outer_slr->L, outer_slr->lua_ref);
 
   new_sv = sv_newmortal ();
   sv_setref_pv (new_sv, scanless_r_class_name, (void *) outer_slr);
