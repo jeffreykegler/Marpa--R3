@@ -1127,6 +1127,7 @@ Licensing, etc.
 
     #include "lua.h"
     #include "lauxlib.h"
+    #include "lualib.h"
 
     -- miranda: insert C function declarations
 
