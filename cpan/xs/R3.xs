@@ -5598,7 +5598,6 @@ PPCODE:
     }
   Newx (outer_slr, 1, Outer_R);
   slr = marpa_inner_slr_new(slg_sv, r1_sv);
-  outer_slr->slr = slr;
 
   {
     lua_State* L = slr->slg->L;
@@ -5625,6 +5624,8 @@ PPCODE:
     outer_slr->lua_ref =  marpa_luaL_ref(L, LUA_REGISTRYINDEX);
     /* Lua stack: [] */
   }
+
+  outer_slr->slr = slr;
 
   new_sv = sv_newmortal ();
   sv_setref_pv (new_sv, scanless_r_class_name, (void *) outer_slr);
