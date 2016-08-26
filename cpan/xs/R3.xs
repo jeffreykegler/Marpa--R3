@@ -2137,6 +2137,42 @@ static Scanless_R* slr_inner_get(lua_State* L, int lua_ref) {
     return slr;
 }
 
+static void slr_inner_destroy(Scanless_R* slr)
+{
+  dTHX;
+  const Marpa_Recce r0 = slr->r0;
+
+  if (r0)
+    {
+      marpa_r_unref (r0);
+    }
+
+   Safefree(slr->t_events);
+   Safefree(slr->t_lexemes);
+
+  Safefree(slr->pos_db);
+  SvREFCNT_dec (slr->slg_sv);
+  SvREFCNT_dec (slr->r1_sv);
+  Safefree(slr->symbol_r_properties);
+  Safefree(slr->l0_rule_r_properties);
+  if (slr->token_values)
+    {
+      SvREFCNT_dec ((SV *) slr->token_values);
+    }
+  SvREFCNT_dec (slr->input);
+  {
+     /* "Weak" cross-references
+      * See Thin::V destructor.
+      */
+     V_Wrapper* vw = slr->v_wrapper;
+     if (vw) {
+       vw->outer_slr = NULL;
+       slr->v_wrapper = NULL;
+     }
+  }
+  Safefree (slr);
+}
+
 /*
  * Try to discard lexemes.
  * It is assumed this is because R1 is exhausted and we
@@ -5641,7 +5677,7 @@ PPCODE:
     marpa_lua_settop(L, base_of_stack);
   }
 
-  outer_slr->slr = inner_slr_get(outer_slr->L, outer_slr->lua_ref);
+  outer_slr->slr = slr_inner_get(outer_slr->L, outer_slr->lua_ref);
 
   new_sv = sv_newmortal ();
   sv_setref_pv (new_sv, scanless_r_class_name, (void *) outer_slr);
@@ -5653,41 +5689,10 @@ DESTROY( outer_slr )
     Outer_R *outer_slr;
 PPCODE:
 {
-  Scanless_R *slr = outer_slr->slr;
-  const Marpa_Recce r0 = slr->r0;
-
+  Scanless_R *slr = slr_inner_get(outer_slr->L, outer_slr->lua_ref);
+  slr_inner_destroy(slr);
   marpa_luaL_unref(outer_slr->L, LUA_REGISTRYINDEX, outer_slr->lua_ref);
   kollos_unref(outer_slr->L);
-
-  if (r0)
-    {
-      marpa_r_unref (r0);
-    }
-
-   Safefree(slr->t_events);
-   Safefree(slr->t_lexemes);
-
-  Safefree(slr->pos_db);
-  SvREFCNT_dec (slr->slg_sv);
-  SvREFCNT_dec (slr->r1_sv);
-  Safefree(slr->symbol_r_properties);
-  Safefree(slr->l0_rule_r_properties);
-  if (slr->token_values)
-    {
-      SvREFCNT_dec ((SV *) slr->token_values);
-    }
-  SvREFCNT_dec (slr->input);
-  {
-     /* "Weak" cross-references
-      * See Thin::V destructor.
-      */
-     V_Wrapper* vw = slr->v_wrapper;
-     if (vw) {
-       vw->outer_slr = NULL;
-       slr->v_wrapper = NULL;
-     }
-  }
-  Safefree (slr);
   Safefree (outer_slr);
 }
 
