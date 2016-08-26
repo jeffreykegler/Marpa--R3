@@ -115,7 +115,7 @@ the interpreter (Kollos object) is destroyed.
 
 ```
 
-`kollos_ref()`
+`kollos_refinc()`
 creates a new reference
 to a Kollos object,
 and takes ownership of it.
@@ -123,9 +123,9 @@ and takes ownership of it.
 ```
 
     -- miranda: section+ C function declarations
-    void kollos_ref(lua_State* L);
+    void kollos_refinc(lua_State* L);
     -- miranda: section+ Lua interpreter management
-    void kollos_ref(lua_State* L)
+    void kollos_refinc(lua_State* L)
     {
         const int base_of_stack = marpa_lua_gettop(L);
         lua_Integer refcount;
@@ -150,9 +150,9 @@ Deletes the interpreter if the reference count drops to zero.
 ```
 
     -- miranda: section+ C function declarations
-    void kollos_unref(lua_State* L);
+    void kollos_refdec(lua_State* L);
     -- miranda: section+ Lua interpreter management
-    void kollos_unref(lua_State* L)
+    void kollos_refdec(lua_State* L)
     {
         const int base_of_stack = marpa_lua_gettop(L);
         lua_Integer refcount;
