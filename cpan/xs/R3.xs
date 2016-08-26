@@ -5601,6 +5601,8 @@ PPCODE:
 
   {
     lua_State* L = slr->slg->L;
+    const int base_of_stack = marpa_lua_gettop(L);
+    marpa_lua_checkstack(L, 20);
     outer_slr->L = L;
     /* Take ownership of a new reference to the Lua state */
     kollos_ref(L);
@@ -5622,10 +5624,20 @@ PPCODE:
      * registry and track it in the outer SLR C structure
      */
     outer_slr->lua_ref =  marpa_luaL_ref(L, LUA_REGISTRYINDEX);
-    /* Lua stack: [] */
+    marpa_lua_settop(L, base_of_stack);
   }
 
-  outer_slr->slr = slr;
+  {
+    lua_State* L = outer_slr->L;
+    const int base_of_stack = marpa_lua_gettop(L);
+    marpa_lua_checkstack(L, 20);
+    marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, outer_slr->lua_ref);
+    /* Lua stack: [ recce_table ] */
+    marpa_lua_getfield(L, -1, "lud");
+    /* Lua stack: [ recce_table, lud ] */
+    outer_slr->slr = marpa_lua_touserdata(L, -1);
+    marpa_lua_settop(L, base_of_stack);
+  }
 
   new_sv = sv_newmortal ();
   sv_setref_pv (new_sv, scanless_r_class_name, (void *) outer_slr);
