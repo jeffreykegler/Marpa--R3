@@ -2013,6 +2013,115 @@ u_substring (Scanless_R * slr, const char *name, int start_pos_arg,
 
 /* Static SLR methods */
 
+static Scanless_R* marpa_inner_slr_new (
+    SV *slg_sv, SV *r1_sv)
+{
+  dTHX;
+  Scanless_R *slr;
+  Scanless_G *slg;
+
+  Newx (slr, 1, Scanless_R);
+
+  slr->throw = 1;
+  slr->trace_lexers = 0;
+  slr->trace_terminals = 0;
+  slr->r0 = NULL;
+
+  /* Copy and take references to the "parent objects",
+   * the ones responsible for holding references.
+   */
+  slr->slg_sv = slg_sv;
+  SvREFCNT_inc (slg_sv);
+  slr->r1_sv = r1_sv;
+  SvREFCNT_inc (r1_sv);
+
+  /* These do not need references, because parent objects
+   * hold references to them
+   */
+  SET_R_WRAPPER_FROM_R_SV (slr->r1_wrapper, r1_sv);
+  SET_SLG_FROM_SLG_SV (slg, slg_sv);
+  if (!slg->precomputed)
+    {
+      croak
+        ("Problem in u->new(): Attempted to create SLIF recce from unprecomputed SLIF grammar");
+    }
+  slr->slg = slg;
+  slr->r1 = slr->r1_wrapper->r;
+  SET_G_WRAPPER_FROM_G_SV (slr->g1_wrapper, slr->r1_wrapper->base_sv);
+
+  slr->start_of_lexeme = 0;
+  slr->end_of_lexeme = 0;
+  slr->is_external_scanning = 0;
+
+  slr->perl_pos = 0;
+  slr->last_perl_pos = -1;
+  slr->problem_pos = -1;
+
+  slr->token_values = newAV ();
+  av_fill (slr->token_values, TOKEN_VALUE_IS_LITERAL);
+
+  {
+    Marpa_Symbol_ID symbol_id;
+    const Marpa_Symbol_ID g1_symbol_count =
+      marpa_g_highest_symbol_id (slg->g1) + 1;
+    Newx (slr->symbol_r_properties, ((unsigned int)g1_symbol_count),
+          struct symbol_r_properties);
+    for (symbol_id = 0; symbol_id < g1_symbol_count; symbol_id++)
+      {
+        const struct symbol_g_properties *g_properties =
+          slg->symbol_g_properties + symbol_id;
+        slr->symbol_r_properties[symbol_id].lexeme_priority =
+          g_properties->priority;
+        slr->symbol_r_properties[symbol_id].t_pause_before_active =
+          g_properties->t_pause_before_active;
+        slr->symbol_r_properties[symbol_id].t_pause_after_active =
+          g_properties->t_pause_after_active;
+      }
+  }
+
+  {
+    Marpa_Rule_ID l0_rule_id;
+    const Marpa_Rule_ID l0_rule_count =
+      marpa_g_highest_rule_id (slg->l0_wrapper->g) + 1;
+    Newx (slr->l0_rule_r_properties, (unsigned)l0_rule_count,
+          struct l0_rule_r_properties);
+    for (l0_rule_id = 0; l0_rule_id < l0_rule_count; l0_rule_id++)
+      {
+        const struct l0_rule_g_properties *g_properties =
+          slg->l0_rule_g_properties + l0_rule_id;
+        slr->l0_rule_r_properties[l0_rule_id].t_event_on_discard_active =
+          g_properties->t_event_on_discard_active;
+      }
+  }
+
+  slr->lexer_start_pos = slr->perl_pos;
+  slr->lexer_read_result = 0;
+  slr->r1_earleme_complete_result = 0;
+  slr->start_of_pause_lexeme = -1;
+  slr->end_of_pause_lexeme = -1;
+
+  slr->pos_db = 0;
+  slr->pos_db_logical_size = -1;
+  slr->pos_db_physical_size = -1;
+
+  slr->input_symbol_id = -1;
+  slr->input = newSVpvn ("", 0);
+  slr->end_pos = 0;
+  slr->too_many_earley_items = -1;
+
+  slr->v_wrapper = NULL;
+
+  slr->t_count_of_deleted_events = 0;
+  slr->t_event_count = 0;
+  slr->t_event_capacity = (int)MAX (1024 / sizeof (union marpa_slr_event_s), 16);
+  Newx (slr->t_events, (unsigned int)slr->t_event_capacity, union marpa_slr_event_s);
+
+  slr->t_lexeme_count = 0;
+  slr->t_lexeme_capacity = (int)MAX (1024 / sizeof (union marpa_slr_event_s), 16);
+  Newx (slr->t_lexemes, (unsigned int)slr->t_lexeme_capacity, union marpa_slr_event_s);
+
+  return slr;
+}
 
 /*
  * Try to discard lexemes.
@@ -5476,7 +5585,6 @@ PPCODE:
   SV *new_sv;
   Outer_R *outer_slr;
   Scanless_R *slr;
-  Scanless_G *slg;
   PERL_UNUSED_ARG(class);
 
   if (!sv_isa (slg_sv, "Marpa::R3::Thin::SLG"))
@@ -5489,123 +5597,34 @@ PPCODE:
       croak ("Problem in u->new(): r1 arg is not of type Marpa::R3::Thin::R");
     }
   Newx (outer_slr, 1, Outer_R);
-  Newx (slr, 1, Scanless_R);
+  slr = marpa_inner_slr_new(slg_sv, r1_sv);
   outer_slr->slr = slr;
-
-  slr->throw = 1;
-  slr->trace_lexers = 0;
-  slr->trace_terminals = 0;
-  slr->r0 = NULL;
-
-# Copy and take references to the "parent objects",
-# the ones responsible for holding references.
-  slr->slg_sv = slg_sv;
-  SvREFCNT_inc (slg_sv);
-  slr->r1_sv = r1_sv;
-  SvREFCNT_inc (r1_sv);
-
-# These do not need references, because parent objects
-# hold references to them
-  SET_R_WRAPPER_FROM_R_SV (slr->r1_wrapper, r1_sv);
-  SET_SLG_FROM_SLG_SV (slg, slg_sv);
-  if (!slg->precomputed)
-    {
-      croak
-        ("Problem in u->new(): Attempted to create SLIF recce from unprecomputed SLIF grammar");
-    }
-  slr->slg = slg;
-  slr->r1 = slr->r1_wrapper->r;
-  SET_G_WRAPPER_FROM_G_SV (slr->g1_wrapper, slr->r1_wrapper->base_sv);
-
-  slr->start_of_lexeme = 0;
-  slr->end_of_lexeme = 0;
-  slr->is_external_scanning = 0;
-
-  slr->perl_pos = 0;
-  slr->last_perl_pos = -1;
-  slr->problem_pos = -1;
-
-  slr->token_values = newAV ();
-  av_fill (slr->token_values, TOKEN_VALUE_IS_LITERAL);
-
-  {
-    Marpa_Symbol_ID symbol_id;
-    const Marpa_Symbol_ID g1_symbol_count =
-      marpa_g_highest_symbol_id (slg->g1) + 1;
-    Newx (slr->symbol_r_properties, ((unsigned int)g1_symbol_count),
-          struct symbol_r_properties);
-    for (symbol_id = 0; symbol_id < g1_symbol_count; symbol_id++)
-      {
-        const struct symbol_g_properties *g_properties =
-          slg->symbol_g_properties + symbol_id;
-        slr->symbol_r_properties[symbol_id].lexeme_priority =
-          g_properties->priority;
-        slr->symbol_r_properties[symbol_id].t_pause_before_active =
-          g_properties->t_pause_before_active;
-        slr->symbol_r_properties[symbol_id].t_pause_after_active =
-          g_properties->t_pause_after_active;
-      }
-  }
-
-  {
-    Marpa_Rule_ID l0_rule_id;
-    const Marpa_Rule_ID l0_rule_count =
-      marpa_g_highest_rule_id (slg->l0_wrapper->g) + 1;
-    Newx (slr->l0_rule_r_properties, (unsigned)l0_rule_count,
-          struct l0_rule_r_properties);
-    for (l0_rule_id = 0; l0_rule_id < l0_rule_count; l0_rule_id++)
-      {
-        const struct l0_rule_g_properties *g_properties =
-          slg->l0_rule_g_properties + l0_rule_id;
-        slr->l0_rule_r_properties[l0_rule_id].t_event_on_discard_active =
-          g_properties->t_event_on_discard_active;
-      }
-  }
-
-  slr->lexer_start_pos = slr->perl_pos;
-  slr->lexer_read_result = 0;
-  slr->r1_earleme_complete_result = 0;
-  slr->start_of_pause_lexeme = -1;
-  slr->end_of_pause_lexeme = -1;
-
-  slr->pos_db = 0;
-  slr->pos_db_logical_size = -1;
-  slr->pos_db_physical_size = -1;
-
-  slr->input_symbol_id = -1;
-  slr->input = newSVpvn ("", 0);
-  slr->end_pos = 0;
-  slr->too_many_earley_items = -1;
 
   {
     lua_State* L = slr->slg->L;
     outer_slr->L = L;
+    /* Take ownership of a new reference to the Lua state */
     kollos_ref(L);
     /* Lua stack: [] */
+    /* Create a table for this recce */
     marpa_lua_newtable(L);
     /* Lua stack: [ recce_table ] */
     /* No lock held -- SLR must delete recce table in its */
     /*   destructor. */
+    /* Set the metatable for the recce table */
     marpa_luaL_setmetatable(L, MT_NAME_RECCE);
     /* Lua stack: [ recce_table ] */
+    /* set recce_table.lud to the inner SLR C structure */
     marpa_lua_pushlightuserdata(L, slr);
     /* Lua stack: [ recce_table, lud ] */
     marpa_lua_setfield(L, -2, "lud");
     /* Lua stack: [ recce_table ] */
+    /* Set up a reference to this recce table in the Lua state
+     * registry and track it in the outer SLR C structure
+     */
     outer_slr->lua_ref =  marpa_luaL_ref(L, LUA_REGISTRYINDEX);
     /* Lua stack: [] */
   }
-
-  slr->v_wrapper = NULL;
-
-  slr->t_count_of_deleted_events = 0;
-  slr->t_event_count = 0;
-  slr->t_event_capacity = (int)MAX (1024 / sizeof (union marpa_slr_event_s), 16);
-  Newx (slr->t_events, (unsigned int)slr->t_event_capacity, union marpa_slr_event_s);
-
-  slr->t_lexeme_count = 0;
-  slr->t_lexeme_capacity = (int)MAX (1024 / sizeof (union marpa_slr_event_s), 16);
-  Newx (slr->t_lexemes, (unsigned int)slr->t_lexeme_capacity, union marpa_slr_event_s);
 
   new_sv = sv_newmortal ();
   sv_setref_pv (new_sv, scanless_r_class_name, (void *) outer_slr);

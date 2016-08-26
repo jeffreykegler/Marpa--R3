@@ -1,6 +1,14 @@
 Throughout, we assume a grammar G, all of whose symbols are accessible and productive.
 We assume the parsing algorithm of Leo 1991.
 
+Call a "middle prediction" an Earley Item whose dotted rule is a
+middle recursion with the dot just before the middle of the recursion.
+Consider a specific input and a given instance of a middle recursion.
+Let P be the index of the Earley set which contains a middle prediction
+which becomes part of a valid parse.  A middle recursion is UNMARKED iff,
+for some input and some middle recursion instance, middle predictions
+are added to Earley sets after P.
+
 Th: The number of Earley items added by any right recursion for G is less than c,
 where c is a constant.
 
