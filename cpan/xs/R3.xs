@@ -5691,7 +5691,7 @@ PPCODE:
 {
   Scanless_R *slr = slr_inner_get(outer_slr->L, outer_slr->lua_ref);
   slr_inner_destroy(slr);
-  marpa_luaL_unref(outer_slr->L, LUA_REGISTRYINDEX, outer_slr->lua_ref);
+  kollos_tblrefdec(outer_slr->L, outer_slr->lua_ref);
   kollos_refdec(outer_slr->L);
   Safefree (outer_slr);
 }
