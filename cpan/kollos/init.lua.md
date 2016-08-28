@@ -79,6 +79,17 @@ in the Perl code or in the Perl XS, and not represented here.
 This document only contains those portions converted to Lua or
 to Lua-centeric C code.
 
+## Kollos object
+
+```
+    -- miranda: section C function declarations
+    struct kollos_extraspace {
+        int ref_count;
+        int (*warn)(const char* format, ...);
+    };
+
+```
+
 ## Kollos Lua interpreter
 
 A Kollos object is a Lua interpreter.
@@ -92,17 +103,22 @@ the interpreter (Kollos object) is destroyed.
 
 ```
 
-    -- miranda: section C function declarations
+    -- miranda: section+ C function declarations
     lua_State* kollos_newstate(void);
     -- miranda: section Lua interpreter management
+    static int default_warn(const char *format, ...);
     lua_State* kollos_newstate(void)
     {
         int base_of_stack;
+        struct kollos_extraspace *p_extra;
         lua_State *const L = marpa_luaL_newstate ();
+
         if (!L) return NULL;
         base_of_stack = marpa_lua_gettop(L);
-        marpa_lua_pushinteger(L, 1);
-        marpa_lua_setfield(L, LUA_REGISTRYINDEX, "ref_count");
+        p_extra = malloc(sizeof(struct kollos_extraspace));
+        *(struct kollos_extraspace **)marpa_lua_getextraspace(L) = p_extra;
+        p_extra->ref_count = 1;
+        p_extra->warn = &default_warn;
         marpa_luaL_openlibs (L);    /* open libraries */
         /* Lua stack: [] */
         marpa_luaopen_kollos(L); /* Open kollos library */
@@ -113,6 +129,19 @@ the interpreter (Kollos object) is destroyed.
         return L;
     }
 
+```
+
+```
+    -- miranda: section+ Lua interpreter management
+    static int default_warn(const char *format, ...)
+    {
+       va_list args;
+       va_start (args, format);
+       vfprintf (stderr, format, args);
+       va_end (args);
+       fputs("\n", stderr);
+       return 1;
+    }
 ```
 
 `kollos_refinc()`
@@ -127,19 +156,9 @@ and takes ownership of it.
     -- miranda: section+ Lua interpreter management
     void kollos_refinc(lua_State* L)
     {
-        const int base_of_stack = marpa_lua_gettop(L);
-        lua_Integer refcount;
-        /* Lua stack [] */
-        marpa_lua_getfield(L, LUA_REGISTRYINDEX, "ref_count");
-        /* Lua stack [ old_ref_count ] */
-        refcount = marpa_lua_tointeger(L, -1);
-        /* Lua stack [ ] */
-        refcount += 1;
-        marpa_lua_pushinteger(L, refcount);
-        /* Lua stack [ old_ref_count, ref_count ] */
-        marpa_lua_setfield(L, LUA_REGISTRYINDEX, "ref_count");
-        marpa_lua_settop(L, base_of_stack);
-        /* Lua stack [ ] */
+        struct kollos_extraspace *p_extra =
+            *(struct kollos_extraspace **)marpa_lua_getextraspace(L);
+        p_extra->ref_count++;
     }
 
 ```
@@ -154,20 +173,49 @@ Deletes the interpreter if the reference count drops to zero.
     -- miranda: section+ Lua interpreter management
     void kollos_refdec(lua_State* L)
     {
-        const int base_of_stack = marpa_lua_gettop(L);
-        lua_Integer refcount;
-        marpa_lua_getfield(L, LUA_REGISTRYINDEX, "ref_count");
-        refcount = marpa_lua_tointeger(L, -1);
-        /* Lua stack [ ] */
-        if (refcount <= 1) {
+        struct kollos_extraspace *p_extra =
+            *(struct kollos_extraspace **)marpa_lua_getextraspace(L);
+        p_extra->ref_count--;
+        if (p_extra->ref_count <= 0) {
            marpa_lua_close(L);
-           return;
+           free(p_extra);
         }
-        refcount -= 1;
-        marpa_lua_pushinteger(L, refcount);
-        marpa_lua_setfield(L, LUA_REGISTRYINDEX, "ref_count");
-        marpa_lua_settop(L, base_of_stack);
-        /* Lua stack [ ] */
+    }
+
+```
+
+Set the warning function of the Kollos interpreter.
+
+```
+
+    -- miranda: section+ C function declarations
+    void kollos_warn_set(lua_State* L, int (*warn)(const char * format, ...));
+    -- miranda: section+ Lua interpreter management
+    void kollos_warn_set(lua_State* L, int (*warn)(const char * format, ...))
+    {
+       struct kollos_extraspace *p_extra =
+           *(struct kollos_extraspace **)marpa_lua_getextraspace(L);
+       p_extra->warn = warn;
+    }
+
+```
+
+Write a warning message using Kollos's warning handler.
+
+```
+
+    -- miranda: section+ C function declarations
+    void kollos_warn(lua_State* L, const char * format, ...);
+    -- miranda: section+ Lua interpreter management
+    void kollos_warn(lua_State* L, const char * format, ...)
+    {
+       va_list args;
+       struct kollos_extraspace *p_extra;
+       va_start (args, format);
+
+       p_extra = *(struct kollos_extraspace **)marpa_lua_getextraspace(L);
+       (*p_extra->warn)(format, args);
+       va_end (args);
     }
 
 ```
@@ -188,13 +236,14 @@ and takes ownership of it.
         lua_Integer refcount;
         /* Lua stack [] */
         marpa_lua_geti(L, LUA_REGISTRYINDEX, lua_ref);
-        /* Lua stack [ old_ref_count ] */
+        /* Lua stack [ table ] */
+        marpa_lua_getfield(L, -1, "ref_count");
+        /* Lua stack [ table, ref_count ] */
         refcount = marpa_lua_tointeger(L, -1);
-        /* Lua stack [ ] */
         refcount += 1;
         marpa_lua_pushinteger(L, refcount);
-        /* Lua stack [ old_ref_count, ref_count ] */
-        marpa_lua_seti(L, LUA_REGISTRYINDEX, lua_ref);
+        /* Lua stack [ table, ref_count, new_ref_count ] */
+        marpa_lua_setfield(L, -2, "ref_count");
         marpa_lua_settop(L, base_of_stack);
         /* Lua stack [ ] */
     }
@@ -214,15 +263,23 @@ Deletes the interpreter if the reference count drops to zero.
         const int base_of_stack = marpa_lua_gettop(L);
         lua_Integer refcount;
         marpa_lua_geti(L, LUA_REGISTRYINDEX, lua_ref);
+        /* Lua stack [ table ] */
+        marpa_lua_getfield(L, -1, "ref_count");
         refcount = marpa_lua_tointeger(L, -1);
-        /* Lua stack [ ] */
+        /* Lua stack [ table, ref_count ] */
         if (refcount <= 1) {
+           /* default_warn("kollos_tblrefdec lua_ref %d ref_count %d, will unref", lua_ref, refcount); */
            marpa_luaL_unref(L, LUA_REGISTRYINDEX, lua_ref);
+           /* marpa_lua_gc(L, LUA_GCCOLLECT, 0); */
+           /* marpa_lua_gc(L, LUA_GCCOLLECT, 0); */
+           marpa_lua_settop(L, base_of_stack);
            return;
         }
         refcount -= 1;
         marpa_lua_pushinteger(L, refcount);
-        marpa_lua_seti(L, LUA_REGISTRYINDEX, lua_ref);
+        /* Lua stack [ table, ref_count, new_ref_count ] */
+        marpa_lua_setfield(L, -2, "ref_count");
+        /* default_warn("kollos_tblrefdec lua_ref %d to ref_count %d", lua_ref, refcount); */
         marpa_lua_settop(L, base_of_stack);
         /* Lua stack [ ] */
     }
