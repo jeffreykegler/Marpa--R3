@@ -3919,7 +3919,9 @@ PPCODE:
    * methods.
    */
   if (v_wrapper->outer_slr) {
-      v_wrapper->outer_slr->slr->v_wrapper = NULL;
+      Outer_R* const outer_slr = v_wrapper->outer_slr;
+      Scanless_R * const slr = slr_inner_get(outer_slr->L, outer_slr->lua_ref);
+      slr->v_wrapper = NULL;
       v_wrapper->outer_slr = NULL;
   }
 
@@ -5701,7 +5703,7 @@ PPCODE:
     marpa_lua_settop(L, base_of_stack);
   }
 
-  outer_slr->slr = slr_inner_get(outer_slr->L, outer_slr->lua_ref);
+  /* outer_slr->slr = slr_inner_get(outer_slr->L, outer_slr->lua_ref); */
 
   new_sv = sv_newmortal ();
   sv_setref_pv (new_sv, scanless_r_class_name, (void *) outer_slr);
@@ -5713,16 +5715,7 @@ DESTROY( outer_slr )
     Outer_R *outer_slr;
 PPCODE:
 {
-  Scanless_R *slr = slr_inner_get(outer_slr->L, outer_slr->lua_ref);
-  /* slr_inner_destroy(slr); */
-        /* xlua_sig_call (outer_slr->L,
-         * "local recce = ...;\n"
-         * "io.stderr:write(inspect(recce));\n"
-         * "\n",
-         * "R", outer_slr->lua_ref);
-         */
   kollos_tblrefdec(outer_slr->L, outer_slr->lua_ref);
-  /* marpa_lua_gc(outer_slr->L, LUA_GCCOLLECT, 0); */
   kollos_refdec(outer_slr->L);
   Safefree (outer_slr);
 }

@@ -414,7 +414,6 @@ typedef struct
   /* Lua "reference" to this object */
   int lua_ref;
   lua_State* L;
-  Scanless_R *slr;
 } Outer_R;
 
 #undef POS_TO_OFFSET
