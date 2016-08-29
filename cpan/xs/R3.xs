@@ -1167,9 +1167,6 @@ static void create_recce_mt (lua_State* L) {
     /* register methods */
     marpa_luaL_setfuncs(L, marpa_recce_meths, 0);
     /* Lua stack: [mt] */
-    marpa_lua_pushinteger(L, 1);
-    /* Lua stack: [mt, ref_count ] */
-    marpa_lua_setfield(L, -2, "ref_count");
     marpa_lua_settop(L, base_of_stack);
 }
 
@@ -5675,34 +5672,12 @@ PPCODE:
   slr = marpa_inner_slr_new(slg_sv, r1_sv);
 
   {
-    lua_State* L = slr->slg->L;
-    const int base_of_stack = marpa_lua_gettop(L);
-    marpa_lua_checkstack(L, 20);
+    lua_State* const L = slr->slg->L;
     outer_slr->L = L;
     /* Take ownership of a new reference to the Lua state */
     kollos_refinc(L);
-    /* Lua stack: [] */
-    /* Create a table for this recce */
-    marpa_lua_newtable(L);
-    /* Lua stack: [ recce_table ] */
-    /* No lock held -- SLR must delete recce table in its */
-    /*   destructor. */
-    /* Set the metatable for the recce table */
-    marpa_luaL_setmetatable(L, MT_NAME_RECCE);
-    /* Lua stack: [ recce_table ] */
-    /* set recce_table.lud to the inner SLR C structure */
-    marpa_lua_pushlightuserdata(L, slr);
-    /* Lua stack: [ recce_table, lud ] */
-    marpa_lua_setfield(L, -2, "lud");
-    /* Lua stack: [ recce_table ] */
-    /* Set up a reference to this recce table in the Lua state
-     * registry and track it in the outer SLR C structure
-     */
-    outer_slr->lua_ref =  marpa_luaL_ref(L, LUA_REGISTRYINDEX);
-    marpa_lua_settop(L, base_of_stack);
+    outer_slr->lua_ref = kollos_recce_new(L, slr);
   }
-
-  /* outer_slr->slr = slr_inner_get(outer_slr->L, outer_slr->lua_ref); */
 
   new_sv = sv_newmortal ();
   sv_setref_pv (new_sv, scanless_r_class_name, (void *) outer_slr);

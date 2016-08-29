@@ -139,6 +139,41 @@ because it uses a lot of PERL/XS data structures.
 ```
     -- miranda: section+ C function declarations
     #define MT_NAME_RECCE "Marpa_recce"
+    int kollos_recce_new(lua_State* L, void* slr);
+    -- miranda: section+ Lua interpreter management
+    int kollos_recce_new(lua_State* L, void* slr)
+    {
+        int lua_id;
+        const int base_of_stack = marpa_lua_gettop(L);
+        marpa_lua_checkstack(L, 20);
+        /* Lua stack: [] */
+        /* Create a table for this recce */
+        marpa_lua_newtable(L);
+        /* Lua stack: [ recce_table ] */
+        /* No lock held -- SLR must delete recce table in its */
+        /*   destructor. */
+        /* Set the metatable for the recce table */
+        marpa_luaL_setmetatable(L, MT_NAME_RECCE);
+        /* Lua stack: [ recce_table ] */
+
+        /* recce_table.ref_count = 1 */
+        marpa_lua_pushinteger(L, 1);
+        /* Lua stack: [recce_table, ref_count ] */
+        marpa_lua_setfield(L, -2, "ref_count");
+        /* Lua stack: [ recce_table ] */
+
+        /* recce_table.lud = slr */
+        marpa_lua_pushlightuserdata(L, slr);
+        /* Lua stack: [ recce_table, lud ] */
+        marpa_lua_setfield(L, -2, "lud");
+        /* Lua stack: [ recce_table ] */
+        /* Set up a reference to this recce table in the Lua state
+         * registry.
+         */
+        lua_id = marpa_luaL_ref(L, LUA_REGISTRYINDEX);
+        marpa_lua_settop(L, base_of_stack);
+        return lua_id;
+    }
 ```
 
 ```
