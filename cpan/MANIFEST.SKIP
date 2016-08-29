@@ -11,6 +11,7 @@
 # of the licenses in the directory LICENSES.
 
 # Temporary
+^rr[.]txt$
 
 # Permanent
 
