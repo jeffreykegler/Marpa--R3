@@ -131,6 +131,16 @@ the interpreter (Kollos object) is destroyed.
 
 ```
 
+Add a recce to the Kollos object, returning its
+"lua_id".
+The inner SLR C structure is passed in for now,
+because it uses a lot of PERL/XS data structures.
+
+```
+    -- miranda: section+ C function declarations
+    #define MT_NAME_RECCE "Marpa_recce"
+```
+
 ```
     -- miranda: section+ Lua interpreter management
     static int default_warn(const char *format, ...)
