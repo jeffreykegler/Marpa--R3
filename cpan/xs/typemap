@@ -17,7 +17,8 @@ O_Wrapper * T_MARPA_O_W
 T_Wrapper * T_MARPA_T_W
 V_Wrapper * T_MARPA_V_W
 Scanless_G * T_SCANLESS_G
-Outer_R * T_SCANLESS_R
+Outer_G * T_OUTER_G
+Outer_R * T_OUTER_R
 Marpa_Lua * T_MARPA_LUA
 
 Marpa_AHM_ID T_IV
@@ -90,17 +91,26 @@ T_MARPA_V_W
                         ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
                         \"$var\")
 
+T_OUTER_G
+        if (sv_isa($arg, \"Marpa::R3::Thin::SLR\")) {
+            IV tmp = SvIV((SV*)SvRV($arg));
+            $var = INT2PTR(Outer_G *, tmp);
+        } else
+            Perl_croak(aTHX_ \"%s: %s is not of type Marpa::R3::Thin::SLR\",
+                        ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+                        \"$var\")
+
 T_SCANLESS_G
         if (sv_isa($arg, \"Marpa::R3::Thin::SLG\")) {
             IV tmp = SvIV((SV*)SvRV($arg));
-            $var = INT2PTR(Scanless_G *, tmp);
+            $var = &((INT2PTR(Outer_G *, tmp))->inner);
         } else
             Perl_croak(aTHX_ \"%s: %s is not of type Marpa::R3::Thin::SLG\",
                         ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
                         \"$var\")
 
 
-T_SCANLESS_R
+T_OUTER_R
         if (sv_isa($arg, \"Marpa::R3::Thin::SLR\")) {
             IV tmp = SvIV((SV*)SvRV($arg));
             $var = INT2PTR(Outer_R *, tmp);

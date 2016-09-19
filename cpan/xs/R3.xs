@@ -2025,6 +2025,10 @@ u_substring (Scanless_R * slr, const char *name, int start_pos_arg,
 
 /* Static SLG methods */
 
+static Scanless_G* slg_inner_get(Outer_G* outer_slg) {
+    return &(outer_slg->inner);
+}
+
 #define SET_SLG_FROM_SLG_SV(slg, slg_sv) { \
     IV tmp = SvIV ((SV *) SvRV (slg_sv)); \
     (slg) = INT2PTR (Scanless_G *, tmp); \
@@ -5094,6 +5098,7 @@ new( class, l0_sv, g1_sv )
 PPCODE:
 {
     SV *new_sv;
+    Outer_G *outer_slg;
     Scanless_G *slg;
     PERL_UNUSED_ARG (class);
 
@@ -5107,7 +5112,8 @@ PPCODE:
           croak
               ("Problem in u->new(): G1 arg is not of type Marpa::R3::Thin::G");
       }
-    Newx (slg, 1, Scanless_G);
+    Newx (outer_slg, 1, Outer_G);
+    slg = slg_inner_get(outer_slg);
 
     slg->g1_sv = g1_sv;
     SvREFCNT_inc (g1_sv);
@@ -5199,16 +5205,17 @@ PPCODE:
   }
 
     new_sv = sv_newmortal ();
-    sv_setref_pv (new_sv, scanless_g_class_name, (void *) slg);
+    sv_setref_pv (new_sv, scanless_g_class_name, (void *) outer_slg);
     XPUSHs (new_sv);
 }
 
 void
-DESTROY( slg )
-    Scanless_G *slg;
+DESTROY( outer_slg )
+    Outer_G *outer_slg;
 PPCODE:
 {
   unsigned int i = 0;
+  Scanless_G* slg = slg_inner_get(outer_slg);
   SvREFCNT_dec (slg->g1_sv);
   SvREFCNT_dec (slg->l0_sv);
   Safefree (slg->symbol_g_properties);
@@ -5225,7 +5232,7 @@ PPCODE:
    */
   marpa_luaL_unref(slg->L, LUA_REGISTRYINDEX, slg->lua_ref);
   kollos_refdec(slg->L);
-  Safefree (slg);
+  Safefree (outer_slg);
 }
 
  #  it does not create a new one

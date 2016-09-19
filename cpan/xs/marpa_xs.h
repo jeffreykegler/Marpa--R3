@@ -338,6 +338,10 @@ typedef struct
 
 } Scanless_G;
 
+typedef struct {
+   Scanless_G inner;
+} Outer_G;
+
 struct v_wrapper_s;
 
 typedef struct
