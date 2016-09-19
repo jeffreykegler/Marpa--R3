@@ -84,11 +84,12 @@ my $code = <<'END_OF_MAIN_CODE';
 MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::SLG
 
 void
-exec_key( slg, fn_key, ... )
-   Scanless_G *slg;
+exec_key( outer_slg, fn_key, ... )
+   Outer_G *outer_slg;
    int fn_key;
 PPCODE:
 {
+    Scanless_G* slg = slg_inner_get(outer_slg);
     int recce_object;
     const int is_method = 1;
     lua_State *const L = slg->L;
@@ -104,11 +105,12 @@ PPCODE:
 }
 
 void
-exec( slg, codestr, ... )
-   Scanless_G *slg;
+exec( outer_slg, codestr, ... )
+   Outer_G *outer_slg;
    char* codestr;
 PPCODE:
 {
+    Scanless_G* slg = slg_inner_get(outer_slg);
     const int is_method = 1;
     lua_State *const L = slg->L;
     const int base_of_stack = marpa_lua_gettop (L);
@@ -130,11 +132,12 @@ PPCODE:
 }
 
 void
-exec_name( slg, name, ... )
-   Scanless_G *slg;
+exec_name( outer_slg, name, ... )
+   Outer_G *outer_slg;
    char* name;
 PPCODE:
 {
+    Scanless_G* slg = slg_inner_get(outer_slg);
     const int is_method = 1;
     lua_State *const L = slg->L;
     const int base_of_stack = marpa_lua_gettop (L);
