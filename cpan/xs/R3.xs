@@ -5238,10 +5238,11 @@ PPCODE:
  #  it does not create a new one
  #
 void
-g1( slg )
-    Scanless_G *slg;
+g1( outer_slg )
+    Outer_G *outer_slg;
 PPCODE:
 {
+  Scanless_G *slg = slg_inner_get(outer_slg);
   XPUSHs (sv_2mortal (SvREFCNT_inc_NN (slg->g1_sv)));
 }
 
@@ -5325,12 +5326,13 @@ PPCODE:
  # A priority is required.
  #
 void
-g1_lexeme_set( slg, g1_lexeme, priority )
-    Scanless_G *slg;
+g1_lexeme_set( outer_slg, g1_lexeme, priority )
+    Outer_G *outer_slg;
     Marpa_Symbol_ID g1_lexeme;
     int priority;
 PPCODE:
 {
+  Scanless_G* slg = slg_inner_get(outer_slg);
   Marpa_Symbol_ID highest_g1_symbol_id = marpa_g_highest_symbol_id (slg->g1);
     if (slg->precomputed)
       {

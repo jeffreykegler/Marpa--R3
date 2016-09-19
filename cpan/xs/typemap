@@ -92,11 +92,11 @@ T_MARPA_V_W
                         \"$var\")
 
 T_OUTER_G
-        if (sv_isa($arg, \"Marpa::R3::Thin::SLR\")) {
+        if (sv_isa($arg, \"Marpa::R3::Thin::SLG\")) {
             IV tmp = SvIV((SV*)SvRV($arg));
             $var = INT2PTR(Outer_G *, tmp);
         } else
-            Perl_croak(aTHX_ \"%s: %s is not of type Marpa::R3::Thin::SLR\",
+            Perl_croak(aTHX_ \"%s: %s is not of type Marpa::R3::Thin::SLG\",
                         ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
                         \"$var\")
 
