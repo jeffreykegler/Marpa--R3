@@ -5247,13 +5247,14 @@ PPCODE:
 }
 
 void
-lexer_rule_to_g1_lexeme_set( slg, lexer_rule, g1_lexeme, assertion_id )
-    Scanless_G *slg;
+lexer_rule_to_g1_lexeme_set( outer_slg, lexer_rule, g1_lexeme, assertion_id )
+    Outer_G *outer_slg;
     Marpa_Rule_ID lexer_rule;
     Marpa_Symbol_ID g1_lexeme;
     Marpa_Assertion_ID assertion_id;
 PPCODE:
 {
+  Scanless_G* slg = slg_inner_get(outer_slg);
   Marpa_Rule_ID highest_lexer_rule_id;
   Marpa_Symbol_ID highest_g1_symbol_id;
   Marpa_Assertion_ID highest_assertion_id;
@@ -5363,11 +5364,12 @@ PPCODE:
 }
 
 void
-g1_lexeme_priority( slg, g1_lexeme )
-    Scanless_G *slg;
+g1_lexeme_priority( outer_slg, g1_lexeme )
+    Outer_G *outer_slg;
     Marpa_Symbol_ID g1_lexeme;
 PPCODE:
 {
+  Scanless_G* slg = slg_inner_get(outer_slg);
   Marpa_Symbol_ID highest_g1_symbol_id = marpa_g_highest_symbol_id (slg->g1);
     if (g1_lexeme > highest_g1_symbol_id)
     {
@@ -5388,12 +5390,13 @@ PPCODE:
 }
 
 void
-g1_lexeme_pause_set( slg, g1_lexeme, pause )
-    Scanless_G *slg;
+g1_lexeme_pause_set( outer_slg, g1_lexeme, pause )
+    Outer_G *outer_slg;
     Marpa_Symbol_ID g1_lexeme;
     int pause;
 PPCODE:
 {
+  Scanless_G* slg = slg_inner_get(outer_slg);
   Marpa_Symbol_ID highest_g1_symbol_id = marpa_g_highest_symbol_id (slg->g1);
     struct symbol_g_properties * g_properties = slg->symbol_g_properties + g1_lexeme;
     if (slg->precomputed)
@@ -5442,12 +5445,13 @@ PPCODE:
 }
 
 void
-g1_lexeme_pause_activate( slg, g1_lexeme, activate )
-    Scanless_G *slg;
+g1_lexeme_pause_activate( outer_slg, g1_lexeme, activate )
+    Outer_G *outer_slg;
     Marpa_Symbol_ID g1_lexeme;
     int activate;
 PPCODE:
 {
+  Scanless_G* slg = slg_inner_get(outer_slg);
   Marpa_Symbol_ID highest_g1_symbol_id = marpa_g_highest_symbol_id (slg->g1);
   struct symbol_g_properties *g_properties =
     slg->symbol_g_properties + g1_lexeme;
@@ -5496,12 +5500,13 @@ PPCODE:
 }
 
 void
-discard_event_set( slg, l0_rule_id, boolean )
-    Scanless_G *slg;
+discard_event_set( outer_slg, l0_rule_id, boolean )
+    Outer_G *outer_slg;
     Marpa_Rule_ID l0_rule_id;
     int boolean;
 PPCODE:
 {
+  Scanless_G* slg = slg_inner_get(outer_slg);
   Marpa_Rule_ID highest_l0_rule_id = marpa_g_highest_rule_id (slg->l0_wrapper->g);
     struct l0_rule_g_properties * g_properties = slg->l0_rule_g_properties + l0_rule_id;
     if (slg->precomputed)
@@ -5542,12 +5547,13 @@ PPCODE:
 }
 
 void
-discard_event_activate( slg, l0_rule_id, activate )
-    Scanless_G *slg;
+discard_event_activate( outer_slg, l0_rule_id, activate )
+    Outer_G *outer_slg;
     Marpa_Rule_ID l0_rule_id;
     int activate;
 PPCODE:
 {
+  Scanless_G* slg = slg_inner_get(outer_slg);
   Marpa_Rule_ID highest_l0_rule_id = marpa_g_highest_rule_id (slg->l0_wrapper->g);
   struct l0_rule_g_properties *g_properties =
     slg->l0_rule_g_properties + l0_rule_id;
@@ -5592,12 +5598,13 @@ PPCODE:
 }
 
 void
-g1_lexeme_latm_set( slg, g1_lexeme, latm )
-    Scanless_G *slg;
+g1_lexeme_latm_set( outer_slg, g1_lexeme, latm )
+    Outer_G *outer_slg;
     Marpa_Symbol_ID g1_lexeme;
     int latm;
 PPCODE:
 {
+  Scanless_G* slg = slg_inner_get(outer_slg);
   Marpa_Symbol_ID highest_g1_symbol_id = marpa_g_highest_symbol_id (slg->g1);
     struct symbol_g_properties * g_properties = slg->symbol_g_properties + g1_lexeme;
     if (slg->precomputed)
@@ -5637,10 +5644,11 @@ PPCODE:
 }
 
 void
-precompute( slg )
-    Scanless_G *slg;
+precompute( outer_slg )
+    Outer_G *outer_slg;
 PPCODE:
 {
+  Scanless_G* slg = slg_inner_get(outer_slg);
   /* Currently this routine does nothing except set a flag to
    * enforce the * separation of the precomputation phase
    * from the main processing.
