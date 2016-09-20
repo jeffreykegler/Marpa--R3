@@ -2029,11 +2029,6 @@ static Scanless_G* slg_inner_get(Outer_G* outer_slg) {
     return &(outer_slg->inner);
 }
 
-#define SET_SLG_FROM_SLG_SV(slg, slg_sv) { \
-    IV tmp = SvIV ((SV *) SvRV (slg_sv)); \
-    (slg) = INT2PTR (Scanless_G *, tmp); \
-}
-
 /* Static SLR methods */
 
 static Scanless_R* marpa_inner_slr_new (
@@ -5670,6 +5665,7 @@ new( class, slg_sv, r1_sv )
 PPCODE:
 {
   SV *new_sv;
+  Outer_G *outer_slg;
   Outer_R *outer_slr;
   Scanless_R *slr;
   Scanless_G *slg;
@@ -5685,13 +5681,20 @@ PPCODE:
       croak ("Problem in u->new(): r1 arg is not of type Marpa::R3::Thin::R");
     }
   Newx (outer_slr, 1, Outer_R);
-  SET_SLG_FROM_SLG_SV (slg, slg_sv);
+  /* Set slg and outer_slg from the SLG SV */
+  {
+    IV tmp = SvIV ((SV *) SvRV (slg_sv));
+    outer_slg = INT2PTR (Outer_G *, tmp);
+  }
+
+  slg = slg_inner_get(outer_slg);
   slr = marpa_inner_slr_new(slg, r1_sv);
   /* Copy and take references to the "parent objects",
    * the ones responsible for holding references.
    */
   outer_slr->slg_sv = slg_sv;
   SvREFCNT_inc (slg_sv);
+  outer_slr->outer_slg = outer_slg;
 
   {
     lua_State* const L = slr->slg->L;
