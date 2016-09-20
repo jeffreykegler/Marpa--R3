@@ -1651,13 +1651,16 @@ u_r0_new (Scanless_R * slr)
   return r0;
 }
 
+static Scanless_R* slr_inner_get(Outer_R* outer_slr);
+
 /* Assumes it is called
  after a successful marpa_r_earleme_complete()
  */
 static void
-u_convert_events (Scanless_R * slr)
+u_convert_events (Outer_R * outer_slr)
 {
   dTHX;
+  Scanless_R *slr = slr_inner_get(outer_slr);
   int event_ix;
   Marpa_Grammar g = slr->slg->l0_wrapper->g;
   const int event_count = marpa_g_event_count (g);
@@ -1725,9 +1728,10 @@ u_convert_events (Scanless_R * slr)
  * -5: earleme_complete() reported an exhausted parse on success
  */
 static int
-u_read (Scanless_R * slr)
+u_read (Outer_R * outer_slr)
 {
   dTHX;
+  Scanless_R *slr = slr_inner_get(outer_slr);
   U8 *input;
   STRLEN len;
   int input_is_utf8;
@@ -1899,7 +1903,7 @@ if (trace_lexers >= 1)
                 result = marpa_r_earleme_complete (r);
                 if (result > 0)
                   {
-                    u_convert_events (slr);
+                    u_convert_events (outer_slr);
                     /* Advance one character before returning */
                     if (marpa_r_is_exhausted (r))
                       {
@@ -2027,6 +2031,81 @@ u_substring (Scanless_R * slr, const char *name, int start_pos_arg,
 
 static Scanless_G* slg_inner_get(Outer_G* outer_slg) {
     return outer_slg->inner;
+}
+
+static Scanless_G* slg_inner_new (SV * l0_sv, SV * g1_sv)
+{
+    Scanless_G *slg;
+    dTHX;
+
+    Newx (slg, 1, Scanless_G);
+
+    slg->g1_sv = g1_sv;
+    SvREFCNT_inc (g1_sv);
+
+    /* These do not need references, because parent objects
+     * hold references to them.
+     */
+    SET_G_WRAPPER_FROM_G_SV (slg->g1_wrapper, g1_sv)
+        slg->g1 = slg->g1_wrapper->g;
+    slg->precomputed = 0;
+
+    slg->l0_sv = l0_sv;
+    SvREFCNT_inc (l0_sv);
+
+    /* Wrapper does not need reference, because parent objects
+     * holds references to it.
+     */
+    SET_G_WRAPPER_FROM_G_SV (slg->l0_wrapper, l0_sv);
+
+    {
+        int i;
+        slg->per_codepoint_hash = newHV ();
+        for (i = 0; i < (int) Dim (slg->per_codepoint_array); i++) {
+            slg->per_codepoint_array[i] = NULL;
+        }
+    }
+
+    {
+        int symbol_ix;
+        int g1_symbol_count = marpa_g_highest_symbol_id (slg->g1) + 1;
+        Newx (slg->g1_lexeme_to_assertion, (unsigned int) g1_symbol_count,
+            Marpa_Assertion_ID);
+        for (symbol_ix = 0; symbol_ix < g1_symbol_count; symbol_ix++) {
+            slg->g1_lexeme_to_assertion[symbol_ix] = -1;
+        }
+    }
+
+    {
+        Marpa_Symbol_ID symbol_id;
+        int g1_symbol_count = marpa_g_highest_symbol_id (slg->g1) + 1;
+        Newx (slg->symbol_g_properties, (unsigned int) g1_symbol_count,
+            struct symbol_g_properties);
+        for (symbol_id = 0; symbol_id < g1_symbol_count; symbol_id++) {
+            slg->symbol_g_properties[symbol_id].priority = 0;
+            slg->symbol_g_properties[symbol_id].latm = 0;
+            slg->symbol_g_properties[symbol_id].is_lexeme = 0;
+            slg->symbol_g_properties[symbol_id].t_pause_before = 0;
+            slg->symbol_g_properties[symbol_id].t_pause_before_active = 0;
+            slg->symbol_g_properties[symbol_id].t_pause_after = 0;
+            slg->symbol_g_properties[symbol_id].t_pause_after_active = 0;
+        }
+    }
+
+    {
+        Marpa_Rule_ID rule_id;
+        int g1_rule_count =
+            marpa_g_highest_rule_id (slg->l0_wrapper->g) + 1;
+        Newx (slg->l0_rule_g_properties, ((unsigned int) g1_rule_count),
+            struct l0_rule_g_properties);
+        for (rule_id = 0; rule_id < g1_rule_count; rule_id++) {
+            slg->l0_rule_g_properties[rule_id].g1_lexeme = -1;
+            slg->l0_rule_g_properties[rule_id].t_event_on_discard = 0;
+            slg->l0_rule_g_properties[rule_id].t_event_on_discard_active =
+                0;
+        }
+    }
+    return slg;
 }
 
 static void slg_inner_destroy(Scanless_G* slg) {
@@ -5105,111 +5184,39 @@ PPCODE:
 {
     SV *new_sv;
     Outer_G *outer_slg;
-    Scanless_G *slg;
+    Scanless_G* slg;
     PERL_UNUSED_ARG (class);
 
-    if (!sv_isa (l0_sv, "Marpa::R3::Thin::G"))
-      {
-          croak
-              ("Problem in u->new(): L0 arg is not of type Marpa::R3::Thin::G");
-      }
-    if (!sv_isa (g1_sv, "Marpa::R3::Thin::G"))
-      {
-          croak
-              ("Problem in u->new(): G1 arg is not of type Marpa::R3::Thin::G");
-      }
+    if (!sv_isa (l0_sv, "Marpa::R3::Thin::G")) {
+        croak
+            ("Problem in u->new(): L0 arg is not of type Marpa::R3::Thin::G");
+    }
+    if (!sv_isa (g1_sv, "Marpa::R3::Thin::G")) {
+        croak
+            ("Problem in u->new(): G1 arg is not of type Marpa::R3::Thin::G");
+    }
     Newx (outer_slg, 1, Outer_G);
-    Newx(slg, 1, Scanless_G);
-
-    slg->g1_sv = g1_sv;
-    SvREFCNT_inc (g1_sv);
+    slg = slg_inner_new (l0_sv, g1_sv);
     outer_slg->inner = slg;
-
-    #These do not need references, because parent objects
-    #hold references to them
-    SET_G_WRAPPER_FROM_G_SV (slg->g1_wrapper, g1_sv)
-        slg->g1 = slg->g1_wrapper->g;
-    slg->precomputed = 0;
-
-    slg->l0_sv = l0_sv;
-    SvREFCNT_inc (l0_sv);
-
-    #Wrapper does not need reference, because parent objects
-    #holds references to it
-    SET_G_WRAPPER_FROM_G_SV (slg->l0_wrapper, l0_sv);
+    outer_slg->L = xlua_newstate ();
 
     {
-        int i;
-        slg->per_codepoint_hash = newHV ();
-        for (i = 0; i < (int) Dim (slg->per_codepoint_array); i++)
-          {
-              slg->per_codepoint_array[i] = NULL;
-          }
+        lua_State *L = outer_slg->L;
+        kollos_refinc (L);
+        /* Lua stack: [] */
+        marpa_lua_newtable (L);
+        /* Lua stack: [ grammar_table ] */
+        /* No lock held -- SLG must delete grammar table in its */
+        /*   destructor. */
+        marpa_luaL_setmetatable (L, MT_NAME_GRAMMAR);
+        /* Lua stack: [ grammar_table ] */
+        marpa_lua_pushlightuserdata (L, slg);
+        /* Lua stack: [ grammar_table, lud ] */
+        marpa_lua_setfield (L, -2, "lud");
+        /* Lua stack: [ grammar_table ] */
+        outer_slg->lua_ref = marpa_luaL_ref (L, LUA_REGISTRYINDEX);
+        /* Lua stack: [] */
     }
-
-    {
-        int symbol_ix;
-        int g1_symbol_count = marpa_g_highest_symbol_id (slg->g1) + 1;
-        Newx (slg->g1_lexeme_to_assertion, (unsigned int)g1_symbol_count,
-              Marpa_Assertion_ID);
-        for (symbol_ix = 0; symbol_ix < g1_symbol_count; symbol_ix++)
-          {
-              slg->g1_lexeme_to_assertion[symbol_ix] = -1;
-          }
-    }
-
-    {
-        Marpa_Symbol_ID symbol_id;
-        int g1_symbol_count = marpa_g_highest_symbol_id (slg->g1) + 1;
-        Newx (slg->symbol_g_properties, (unsigned int)g1_symbol_count,
-              struct symbol_g_properties);
-        for (symbol_id = 0; symbol_id < g1_symbol_count; symbol_id++)
-          {
-              slg->symbol_g_properties[symbol_id].priority = 0;
-              slg->symbol_g_properties[symbol_id].latm = 0;
-              slg->symbol_g_properties[symbol_id].is_lexeme = 0;
-              slg->symbol_g_properties[symbol_id].t_pause_before = 0;
-              slg->symbol_g_properties[symbol_id].t_pause_before_active =
-                  0;
-              slg->symbol_g_properties[symbol_id].t_pause_after = 0;
-              slg->symbol_g_properties[symbol_id].t_pause_after_active = 0;
-          }
-    }
-
-    {
-        Marpa_Rule_ID rule_id;
-        int g1_rule_count =
-            marpa_g_highest_rule_id (slg->l0_wrapper->g) + 1;
-        Newx (slg->l0_rule_g_properties, ((unsigned int)g1_rule_count),
-              struct l0_rule_g_properties);
-        for (rule_id = 0; rule_id < g1_rule_count; rule_id++)
-          {
-              slg->l0_rule_g_properties[rule_id].g1_lexeme = -1;
-              slg->l0_rule_g_properties[rule_id].t_event_on_discard = 0;
-              slg->l0_rule_g_properties[rule_id].
-                  t_event_on_discard_active = 0;
-          }
-    }
-
-    outer_slg->L = xlua_newstate();
-
-  {
-    lua_State* L = outer_slg->L;
-    kollos_refinc(L);
-    /* Lua stack: [] */
-    marpa_lua_newtable(L);
-    /* Lua stack: [ grammar_table ] */
-    /* No lock held -- SLG must delete grammar table in its */
-    /*   destructor. */
-    marpa_luaL_setmetatable(L, MT_NAME_GRAMMAR);
-    /* Lua stack: [ grammar_table ] */
-    marpa_lua_pushlightuserdata(L, slg);
-    /* Lua stack: [ grammar_table, lud ] */
-    marpa_lua_setfield(L, -2, "lud");
-    /* Lua stack: [ grammar_table ] */
-    outer_slg->lua_ref =  marpa_luaL_ref(L, LUA_REGISTRYINDEX);
-    /* Lua stack: [] */
-  }
 
     new_sv = sv_newmortal ();
     sv_setref_pv (new_sv, scanless_g_class_name, (void *) outer_slg);
@@ -5919,7 +5926,7 @@ PPCODE:
             }
         }
 
-      lexer_read_result = slr->lexer_read_result = u_read (slr);
+      lexer_read_result = slr->lexer_read_result = u_read (outer_slr);
       switch (lexer_read_result)
         {
         case U_READ_TRACING:
