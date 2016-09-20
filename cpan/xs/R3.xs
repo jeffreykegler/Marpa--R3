@@ -2029,6 +2029,21 @@ static Scanless_G* slg_inner_get(Outer_G* outer_slg) {
     return outer_slg->inner;
 }
 
+static void slg_inner_destroy(Scanless_G* slg) {
+  unsigned int i = 0;
+  dTHX;
+  SvREFCNT_dec (slg->g1_sv);
+  SvREFCNT_dec (slg->l0_sv);
+  Safefree (slg->symbol_g_properties);
+  Safefree (slg->l0_rule_g_properties);
+  Safefree (slg->g1_lexeme_to_assertion);
+  SvREFCNT_dec (slg->per_codepoint_hash);
+  for (i = 0; i < Dim(slg->per_codepoint_array); i++) {
+    Safefree(slg->per_codepoint_array[i]);
+  }
+  Safefree (slg);
+}
+
 /* Static SLR methods */
 
 static Scanless_R* marpa_inner_slr_new (
@@ -5206,17 +5221,8 @@ DESTROY( outer_slg )
     Outer_G *outer_slg;
 PPCODE:
 {
-  unsigned int i = 0;
   Scanless_G* slg = slg_inner_get(outer_slg);
-  SvREFCNT_dec (slg->g1_sv);
-  SvREFCNT_dec (slg->l0_sv);
-  Safefree (slg->symbol_g_properties);
-  Safefree (slg->l0_rule_g_properties);
-  Safefree (slg->g1_lexeme_to_assertion);
-  SvREFCNT_dec (slg->per_codepoint_hash);
-  for (i = 0; i < Dim(slg->per_codepoint_array); i++) {
-    Safefree(slg->per_codepoint_array[i]);
-  }
+  slg_inner_destroy(slg);
 
   /* This is unnecessary at the moment, so the next statement
    * will destroy the Lua state.  But someday grammars may share
@@ -5224,7 +5230,6 @@ PPCODE:
    */
   marpa_luaL_unref(outer_slg->L, LUA_REGISTRYINDEX, outer_slg->lua_ref);
   kollos_refdec(outer_slg->L);
-  Safefree (slg);
   Safefree (outer_slg);
 }
 
