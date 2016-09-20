@@ -339,7 +339,7 @@ typedef struct
 typedef struct {
   int lua_ref;
   lua_State* L;
-  Scanless_G inner;
+  Scanless_G* inner;
 } Outer_G;
 
 struct v_wrapper_s;

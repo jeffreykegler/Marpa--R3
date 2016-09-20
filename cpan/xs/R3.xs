@@ -2026,7 +2026,7 @@ u_substring (Scanless_R * slr, const char *name, int start_pos_arg,
 /* Static SLG methods */
 
 static Scanless_G* slg_inner_get(Outer_G* outer_slg) {
-    return &(outer_slg->inner);
+    return outer_slg->inner;
 }
 
 /* Static SLR methods */
@@ -5104,10 +5104,11 @@ PPCODE:
               ("Problem in u->new(): G1 arg is not of type Marpa::R3::Thin::G");
       }
     Newx (outer_slg, 1, Outer_G);
-    slg = slg_inner_get(outer_slg);
+    Newx(slg, 1, Scanless_G);
 
     slg->g1_sv = g1_sv;
     SvREFCNT_inc (g1_sv);
+    outer_slg->inner = slg;
 
     #These do not need references, because parent objects
     #hold references to them
@@ -5223,6 +5224,7 @@ PPCODE:
    */
   marpa_luaL_unref(outer_slg->L, LUA_REGISTRYINDEX, outer_slg->lua_ref);
   kollos_refdec(outer_slg->L);
+  Safefree (slg);
   Safefree (outer_slg);
 }
 
