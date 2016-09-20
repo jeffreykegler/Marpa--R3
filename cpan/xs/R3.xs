@@ -2037,11 +2037,11 @@ static Scanless_G* slg_inner_get(Outer_G* outer_slg) {
 /* Static SLR methods */
 
 static Scanless_R* marpa_inner_slr_new (
-    SV *slg_sv, SV *r1_sv)
+  Scanless_G *slg,
+    SV *r1_sv)
 {
   dTHX;
   Scanless_R *slr;
-  Scanless_G *slg;
 
   Newx (slr, 1, Scanless_R);
 
@@ -2053,8 +2053,6 @@ static Scanless_R* marpa_inner_slr_new (
   /* Copy and take references to the "parent objects",
    * the ones responsible for holding references.
    */
-  slr->slg_sv = slg_sv;
-  SvREFCNT_inc (slg_sv);
   slr->r1_sv = r1_sv;
   SvREFCNT_inc (r1_sv);
 
@@ -2062,7 +2060,6 @@ static Scanless_R* marpa_inner_slr_new (
    * hold references to them
    */
   SET_R_WRAPPER_FROM_R_SV (slr->r1_wrapper, r1_sv);
-  SET_SLG_FROM_SLG_SV (slg, slg_sv);
   if (!slg->precomputed)
     {
       croak
@@ -2177,7 +2174,6 @@ static void slr_inner_destroy(Scanless_R* slr)
    Safefree(slr->t_lexemes);
 
   Safefree(slr->pos_db);
-  SvREFCNT_dec (slr->slg_sv);
   SvREFCNT_dec (slr->r1_sv);
   Safefree(slr->symbol_r_properties);
   Safefree(slr->l0_rule_r_properties);
@@ -5676,6 +5672,7 @@ PPCODE:
   SV *new_sv;
   Outer_R *outer_slr;
   Scanless_R *slr;
+  Scanless_G *slg;
   PERL_UNUSED_ARG(class);
 
   if (!sv_isa (slg_sv, "Marpa::R3::Thin::SLG"))
@@ -5688,7 +5685,13 @@ PPCODE:
       croak ("Problem in u->new(): r1 arg is not of type Marpa::R3::Thin::R");
     }
   Newx (outer_slr, 1, Outer_R);
-  slr = marpa_inner_slr_new(slg_sv, r1_sv);
+  SET_SLG_FROM_SLG_SV (slg, slg_sv);
+  slr = marpa_inner_slr_new(slg, r1_sv);
+  /* Copy and take references to the "parent objects",
+   * the ones responsible for holding references.
+   */
+  outer_slr->slg_sv = slg_sv;
+  SvREFCNT_inc (slg_sv);
 
   {
     lua_State* const L = slr->slg->L;
@@ -5710,6 +5713,7 @@ PPCODE:
 {
   kollos_tblrefdec(outer_slr->L, outer_slr->lua_ref);
   kollos_refdec(outer_slr->L);
+  SvREFCNT_dec (outer_slr->slg_sv);
   Safefree (outer_slr);
 }
 

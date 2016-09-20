@@ -346,7 +346,6 @@ struct v_wrapper_s;
 
 typedef struct
 {
-  SV *slg_sv;
   SV *r1_sv;
 
   Scanless_G *slg;
@@ -418,6 +417,7 @@ typedef struct
   /* Lua "reference" to this object */
   int lua_ref;
   lua_State* L;
+  SV *slg_sv;
 } Outer_R;
 
 #undef POS_TO_OFFSET
