@@ -89,13 +89,12 @@ exec_key( outer_slg, fn_key, ... )
    int fn_key;
 PPCODE:
 {
-    Scanless_G* slg = slg_inner_get(outer_slg);
     int recce_object;
     const int is_method = 1;
-    lua_State *const L = slg->L;
+    lua_State *const L = outer_slg->L;
     const int base_of_stack = marpa_lua_gettop (L);
 
-    marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, slg->lua_ref);
+    marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, outer_slg->lua_ref);
     /* Lua stack: [ grammar_table ] */
     recce_object = marpa_lua_gettop (L);
     marpa_lua_rawgeti (L, recce_object, fn_key);
@@ -110,13 +109,12 @@ exec( outer_slg, codestr, ... )
    char* codestr;
 PPCODE:
 {
-    Scanless_G* slg = slg_inner_get(outer_slg);
     const int is_method = 1;
-    lua_State *const L = slg->L;
+    lua_State *const L = outer_slg->L;
     const int base_of_stack = marpa_lua_gettop (L);
     int load_status;
 
-    marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, slg->lua_ref);
+    marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, outer_slg->lua_ref);
     /* Lua stack: [ grammar_table ] */
 
     load_status = marpa_luaL_loadbuffer (L, codestr, strlen (codestr), codestr);
@@ -137,13 +135,12 @@ exec_name( outer_slg, name, ... )
    char* name;
 PPCODE:
 {
-    Scanless_G* slg = slg_inner_get(outer_slg);
     const int is_method = 1;
-    lua_State *const L = slg->L;
+    lua_State *const L = outer_slg->L;
     const int base_of_stack = marpa_lua_gettop (L);
     int type;
 
-    marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, slg->lua_ref);
+    marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, outer_slg->lua_ref);
     /* Lua stack: [ grammar_table ] */
 
     type = marpa_lua_getglobal (L, name);

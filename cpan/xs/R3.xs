@@ -5175,10 +5175,10 @@ PPCODE:
           }
     }
 
-    slg->L = xlua_newstate();
+    outer_slg->L = xlua_newstate();
 
   {
-    lua_State* L = slg->L;
+    lua_State* L = outer_slg->L;
     kollos_refinc(L);
     /* Lua stack: [] */
     marpa_lua_newtable(L);
@@ -5191,7 +5191,7 @@ PPCODE:
     /* Lua stack: [ grammar_table, lud ] */
     marpa_lua_setfield(L, -2, "lud");
     /* Lua stack: [ grammar_table ] */
-    slg->lua_ref =  marpa_luaL_ref(L, LUA_REGISTRYINDEX);
+    outer_slg->lua_ref =  marpa_luaL_ref(L, LUA_REGISTRYINDEX);
     /* Lua stack: [] */
   }
 
@@ -5221,8 +5221,8 @@ PPCODE:
    * will destroy the Lua state.  But someday grammars may share
    * Lua states, and then this will be necessary.
    */
-  marpa_luaL_unref(slg->L, LUA_REGISTRYINDEX, slg->lua_ref);
-  kollos_refdec(slg->L);
+  marpa_luaL_unref(outer_slg->L, LUA_REGISTRYINDEX, outer_slg->lua_ref);
+  kollos_refdec(outer_slg->L);
   Safefree (outer_slg);
 }
 
@@ -5697,7 +5697,7 @@ PPCODE:
   outer_slr->outer_slg = outer_slg;
 
   {
-    lua_State* const L = slr->slg->L;
+    lua_State* const L = outer_slr->outer_slg->L;
     outer_slr->L = L;
     /* Take ownership of a new reference to the Lua state */
     kollos_refinc(L);
