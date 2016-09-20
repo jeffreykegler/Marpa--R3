@@ -523,6 +523,9 @@ coerce_to_hv (lua_State * L, int visited_ix, int table_ix)
  * error object is on top of the stack.  Does *NOT* clean up
  * the Lua stack -- since this is an error condition, we assume
  * the caller is about to do this.
+ *
+ * The return value is a string which is either a C constant string
+ * in static space, or in Perl mortal space.
  */
 static const char* handle_pcall_error (lua_State* L, int status) {
     dTHX;
@@ -1170,7 +1173,27 @@ static void create_recce_mt (lua_State* L) {
     marpa_lua_settop(L, base_of_stack);
 }
 
+static void slg_inner_destroy(Scanless_G* slg);
+
+static int
+xlua_grammar_gc (lua_State * L)
+{
+    Scanless_G *slg;
+    int lud_type;
+
+    /* marpa_r3_warn("xlua_grammar_gc"); */
+    /* Checks needed after development ?? */
+    marpa_luaL_checktype (L, 1, LUA_TTABLE);
+    lud_type = marpa_lua_getfield (L, 1, "lud");
+    marpa_luaL_argcheck (L, (lud_type == LUA_TLIGHTUSERDATA), 1,
+        "grammar userdata not set");
+    slg = (Scanless_G *) marpa_lua_touserdata (L, -1);
+    slg_inner_destroy(slg);
+    return 0;
+}
+
 static const struct luaL_Reg marpa_grammar_meths[] = {
+    {"__gc", xlua_grammar_gc},
     {NULL, NULL},
 };
 
@@ -5228,10 +5251,7 @@ DESTROY( outer_slg )
     Outer_G *outer_slg;
 PPCODE:
 {
-  Scanless_G* slg = slg_inner_get(outer_slg);
-  slg_inner_destroy(slg);
-
-  /* This is unnecessary at the moment, so the next statement
+  /* This is unnecessary at the moment, since the next statement
    * will destroy the Lua state.  But someday grammars may share
    * Lua states, and then this will be necessary.
    */
