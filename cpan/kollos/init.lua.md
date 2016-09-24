@@ -1192,17 +1192,18 @@ A function to be called whenever a valuator is reset.
        local unprefixed_name = string.gsub(function_name, "^[_]?marpa_", "");
        local class_letter = string.gsub(unprefixed_name, "_.*$", "");
        local wrapper_name = "wrap_" .. unprefixed_name;
-       io.write("static int ", wrapper_name, "(lua_State *L)\n");
-       io.write("{\n");
-       io.write("  ", libmarpa_class_type[class_letter], " self;\n");
-       io.write("  const int self_stack_ix = 1;\n");
-       io.write("  Marpa_Grammar grammar;\n");
+       local result = {}
+       result[#result+1] = "static int " .. wrapper_name .. "(lua_State *L)\n"
+       result[#result+1] = "{\n"
+       result[#result+1] = "  ", libmarpa_class_type[class_letter], " self;\n"
+       result[#result+1] = "  const int self_stack_ix = 1;\n"
+       result[#result+1] = "  Marpa_Grammar grammar;\n"
        for arg_ix = 1, arg_count do
          local arg_type = signature[arg_ix*2]
          local arg_name = signature[1 + arg_ix*2]
-         io.write("  ", arg_type, " ", arg_name, ";\n");
+         result[#result+1] = "  ", arg_type, " ", arg_name, ";\n"
        end
-       io.write("  int result;\n\n");
+       result[#result+1] = "  int result;\n\n"
 
        -- These wrappers will not be external interfaces
        -- so eventually they will run unsafe.
@@ -1210,7 +1211,7 @@ A function to be called whenever a valuator is reset.
        -- the possibility for debugging
        local safe = true;
        if (safe) then
-          io.write("  if (1) {\n")
+          result[#result+1] = "  if (1) {\n"
 
           local check_for_table =
             string.gsub(check_for_table_template, "!!FUNCNAME!!", wrapper_name);
@@ -1218,14 +1219,14 @@ A function to be called whenever a valuator is reset.
             string.gsub(check_for_table, "!!INDENT!!", "    ");
           check_for_table =
             string.gsub(check_for_table, "!!CLASS_NAME!!", libmarpa_class_name[class_letter])
-          io.write(check_for_table);
+          result[#result+1] = check_for_table
           -- I do not get the values from the integer checks,
           -- because this code
           -- will be turned off most of the time
           for arg_ix = 1, arg_count do
-              io.write("    marpa_luaL_checkinteger(L, ", (arg_ix+1), ");\n")
+              result[#result+1] = "    marpa_luaL_checkinteger(L, ", (arg_ix+1), ");\n"
           end
-          io.write("  }\n");
+          result[#result+1] = "  }\n"
        end -- if (!unsafe)
 
        for arg_ix = arg_count, 1, -1 do
@@ -1233,59 +1234,59 @@ A function to be called whenever a valuator is reset.
          local arg_name = signature[1 + arg_ix*2]
          local c_type = c_type_of_libmarpa_type(arg_type)
          assert(c_type == "int", ("type " .. arg_type .. " not implemented"))
-         io.write("{\n")
-         io.write("  const lua_Integer this_arg = marpa_lua_tointeger(L, -1);\n")
+         result[#result+1] = "{\n"
+         result[#result+1] = "  const lua_Integer this_arg = marpa_lua_tointeger(L, -1);\n"
 
          -- Each call checks that its arguments are in range
          -- the point of this check is to make sure that C's integer conversions
          -- do not change the value before the call gets it.
          -- We assume that all types involved are at least 32 bits and signed, so that
          -- values from -2^30 to 2^30 will be unchanged by any conversions.
-         io.write([[  marpa_luaL_argcheck(L, (-(2^30) <= this_arg && this_arg <= (2^30)), -1, "argument out of range");]], "\n")
+         result[#result+1] = [[  marpa_luaL_argcheck(L, (-(2^30) <= this_arg && this_arg <= (2^30)), -1, "argument out of range");]], "\n"
 
-         io.write(string.format("  %s = (%s)this_arg;\n", arg_name, arg_type))
-         io.write("  marpa_lua_pop(L, 1);\n")
-         io.write("}\n")
+         result[#result+1] = string.format("  %s = (%s)this_arg;\n", arg_name, arg_type)
+         result[#result+1] = "  marpa_lua_pop(L, 1);\n"
+         result[#result+1] = "}\n"
        end
 
-       io.write('  marpa_lua_getfield (L, -1, "_libmarpa");\n')
+       result[#result+1] = '  marpa_lua_getfield (L, -1, "_libmarpa");\n'
        -- stack is [ self, self_ud ]
        local cast_to_ptr_to_class_type = "(" ..  libmarpa_class_type[class_letter] .. "*)"
-       io.write("  self = *", cast_to_ptr_to_class_type, "marpa_lua_touserdata (L, -1);\n")
-       io.write("  marpa_lua_pop(L, 1);\n")
+       result[#result+1] = "  self = *", cast_to_ptr_to_class_type, "marpa_lua_touserdata (L, -1);\n"
+       result[#result+1] = "  marpa_lua_pop(L, 1);\n"
        -- stack is [ self ]
 
-       io.write('  marpa_lua_getfield (L, -1, "_libmarpa_g");\n')
+       result[#result+1] = '  marpa_lua_getfield (L, -1, "_libmarpa_g");\n'
        -- stack is [ self, grammar_ud ]
-       io.write("  grammar = *(Marpa_Grammar*)marpa_lua_touserdata (L, -1);\n")
-       io.write("  marpa_lua_pop(L, 1);\n")
+       result[#result+1] = "  grammar = *(Marpa_Grammar*)marpa_lua_touserdata (L, -1);\n"
+       result[#result+1] = "  marpa_lua_pop(L, 1);\n"
        -- stack is [ self ]
 
        -- assumes converting result to int is safe and right thing to do
        -- if that assumption is wrong, generate the wrapper by hand
-       io.write("  result = (int)", function_name, "(self\n")
+       result[#result+1] = "  result = (int)", function_name, "(self\n"
        for arg_ix = 1, arg_count do
          local arg_name = signature[1 + arg_ix*2]
-         io.write("     ,", arg_name, "\n")
+         result[#result+1] = "     ," .. arg_name .. "\n"
        end
-       io.write("    );\n")
-       io.write("  if (result == -1) { marpa_lua_pushnil(L); return 1; }\n")
-       io.write("  if (result < -1) {\n")
-       io.write("    Marpa_Error_Code marpa_error = marpa_g_error(grammar, NULL);\n")
-       io.write("    int throw_flag;\n")
+       result[#result+1] = "    );\n"
+       result[#result+1] = "  if (result == -1) { marpa_lua_pushnil(L); return 1; }\n"
+       result[#result+1] = "  if (result < -1) {\n"
+       result[#result+1] = "    Marpa_Error_Code marpa_error = marpa_g_error(grammar, NULL);\n"
+       result[#result+1] = "    int throw_flag;\n"
        local wrapper_name_as_c_string = '"' .. wrapper_name .. '()"'
-       io.write('    marpa_lua_getfield (L, -1, "throw");\n')
+       result[#result+1] = '    marpa_lua_getfield (L, -1, "throw");\n'
        -- stack is [ self, throw_flag ]
-       io.write("    throw_flag = marpa_lua_toboolean (L, -1);\n")
-       io.write('    if (throw_flag) {\n')
-       io.write('        kollos_throw( L, marpa_error, ', wrapper_name_as_c_string, ');\n')
-       io.write('    }\n')
-       io.write("  }\n")
-       io.write("  marpa_lua_pushinteger(L, (lua_Integer)result);\n")
-       io.write("  return 1;\n")
-       io.write("}\n\n");
+       result[#result+1] = "    throw_flag = marpa_lua_toboolean (L, -1);\n"
+       result[#result+1] = '    if (throw_flag) {\n'
+       result[#result+1] = '        kollos_throw( L, marpa_error, ', wrapper_name_as_c_string, ');\n'
+       result[#result+1] = '    }\n'
+       result[#result+1] = "  }\n"
+       result[#result+1] = "  marpa_lua_pushinteger(L, (lua_Integer)result);\n"
+       result[#result+1] = "  return 1;\n"
+       result[#result+1] = "}\n\n"
 
-       -- Now write the code that adds the functions to the kollos object
+       return table.concat(result, '')
 
     end
 
