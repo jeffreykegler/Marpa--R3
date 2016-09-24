@@ -220,8 +220,13 @@ function parse_instruction(first_line_no, last_line_no)
         end
         if #tag <= 0 then
             allowed_tag_length = 72 - (#prefix + string.len('-- exec "..."'))
-            tag = code_lines[1]:sub(1, allowed_tag_length)
-            tag = string.format('"%s"...', tag)
+            for line_no = 2, #code_lines do
+                local line = code_lines[line_no]
+                if line:find('[^%s]') then
+                    tag = line:gsub('^[%s]*', '', 1)
+                    break
+                end
+            end
         end
         instruction.tag = tag
         instruction.code = table.concat(code_lines);
@@ -493,19 +498,53 @@ function section_output(fh, language_arg, name, prefix_arg)
      -- print('sections on stack:', inspect(section_on_stack))
      local section = sections[name]
      local language = section.language or language_arg
+     if language ~= 'c' and language ~= 'lua' then
+         error(string.format('Bad language ("%s") for section "%s"', language, name))
+     end
      local current_prefix = prefix_arg or 0
      if not section then
          error(string.format('Attempt to output missing section "%s"', name))
      end
      for instruction, run_prefix, last_text_line_no in section_instructions(section) do
               -- We first deal with outputing the instruction.
+          local instruction_first_line_no = instruction:first_line()
           local instruction_last_line_no = instruction:last_line()
           if instruction.type == 'insert' then
               local insertion_prefix = current_prefix + (instruction.prefix - run_prefix)
               -- print(string.format("section_output: %s %d", instruction.name, instruction:first_line()))
               section_output(fh, language, instruction.name, insertion_prefix)
+          elseif instruction.type == 'exec' then
+              local raw_instruction = {}
+              if language == 'lua' then
+                   raw_instruction[#raw_instruction+1] = string.rep(' ', current_prefix)
+                   raw_instruction[#raw_instruction+1] = '-- exec '
+                   raw_instruction[#raw_instruction+1] = tag
+                   raw_instruction[#raw_instruction+1] = '\n'
+              else -- c language
+                   raw_instruction[#raw_instruction+1] = string.rep(' ', current_prefix)
+                   raw_instruction[#raw_instruction+1] = '/* exec '
+                   raw_instruction[#raw_instruction+1] = tag
+                   raw_instruction[#raw_instruction+1] = ' */'
+              end
+              local exec_text = instruction.text
+              raw_instruction[#raw_instruction+1] = exec_text
+              if exec_text:match('[^\n]$') then
+                  raw_instruction[#raw_instruction+1] = '\n'
+              end
+              if language == 'lua' then
+                   raw_instruction[#raw_instruction+1] = string.rep(' ', current_prefix)
+                   raw_instruction[#raw_instruction+1] = '-- end exec '
+                   raw_instruction[#raw_instruction+1] = tag
+                   raw_instruction[#raw_instruction+1] = '\n'
+              else -- c language
+                   raw_instruction[#raw_instruction+1] = string.rep(' ', current_prefix)
+                   raw_instruction[#raw_instruction+1] = '/* end exec '
+                   raw_instruction[#raw_instruction+1] = tag
+                   raw_instruction[#raw_instruction+1] = ' */'
+              end
+              local raw_instruction = table.concat(raw_instruction, '')
+              fh:write(raw_instruction)
           else
-              local instruction_first_line_no = instruction:first_line()
               local raw_instruction = {}
               for line_no = instruction_first_line_no, instruction_last_line_no do
                    raw_instruction[#raw_instruction+1] = string.rep(' ', current_prefix)
@@ -515,7 +554,7 @@ function section_output(fh, language_arg, name, prefix_arg)
               local raw_instruction = table.concat(raw_instruction, '')
               if language == 'lua' then
                   fh:write(raw_instruction)
-              elseif language == 'c' then
+              else -- c language
                   local long_bracket_start, long_bracket_end = raw_instruction:match('^ *()[-][-]%[=*%[()')
                   if long_bracket_start then
                       fh:write(raw_instruction:sub(1, long_bracket_start-1))
@@ -527,8 +566,6 @@ function section_output(fh, language_arg, name, prefix_arg)
                       raw_instruction = raw_instruction:gsub(' ?\n$', ' */\n', 1)
                       fh:write(raw_instruction)
                   end
-              else
-                  error(string.format('Bad language ("%s") for section "%s"', language, name))
               end
           end
           for line_no = instruction_last_line_no+1, last_text_line_no do
