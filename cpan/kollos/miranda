@@ -204,6 +204,48 @@ function parse_instruction(first_line_no, last_line_no)
     end
     if words[1] == 'exec' then
         instruction.type = words[1]
+        local line_iter = body:gmatch('[^\n]+')
+        local tag = line_iter()
+        tag = tag:gsub('^[ ]*exec[ ]*', '', 1):gsub('[ ]*$', '', 1)
+        local code_lines = {}
+        for line in line_iter() do
+            code_lines[#code_lines+1] = line:sub(1, #prefix)
+        end
+        if #code_lines <= 0 then
+            error(string.format(
+                'Exec command contains no code at line %d\n',
+                first_line_no))
+        end
+        if #tag <= 0 then
+            allowed_tag_length = 72 - (#prefix + string.len('-- exec "..."'))
+            tag = code_lines[1]:sub(1, allowed_tag_length)
+            tag = string.format('"%s"...', tag)
+        end
+        instruction.tag = tag
+        instruction.code = table.concat(code_lines);
+        local ok, msg = pcall(instruction.code)
+        if not ok then
+            error(string.format(
+                'Error in "exec" command at line %d\n%s',
+                first_line_no, msg))
+        end
+        local msg_type = type(msg)
+        if msg_type == 'nil' then
+            instruction.text = ''
+        elseif msg_type == 'string' then
+            instruction.text = msg
+        elseif msg_type == 'table' then
+            error(string.format(
+                '"exec" command returned a table at line %d\n'
+                .. '    table returns values are not yet implemented\n',
+                first_line_no))
+        else
+            error(string.format(
+                '"exec" command returned a value of type "%s" at line %d\n'
+                .. '    return value must be nil or a string\n',
+                msg_type, first_line_no))
+        end
+        return instruction
     end
     error(string.format(
         'Cannot parse instruction starting at line %d\n'
