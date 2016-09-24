@@ -1176,7 +1176,42 @@ A function to be called whenever a valuator is reset.
 
 ## Libmarpa interface
 
+```
     --[==[ miranda: exec
+    local function c_type_of_libmarpa_type(libmarpa_type)
+        if (libmarpa_type == 'int') then return 'int' end
+        if (libmarpa_type == 'Marpa_Assertion_ID') then return 'int' end
+        if (libmarpa_type == 'Marpa_Earley_Item_ID') then return 'int' end
+        if (libmarpa_type == 'Marpa_AHM_ID') then return 'int' end
+        if (libmarpa_type == 'Marpa_IRL_ID') then return 'int' end
+        if (libmarpa_type == 'Marpa_NSY_ID') then return 'int' end
+        if (libmarpa_type == 'Marpa_Or_Node_ID') then return 'int' end
+        if (libmarpa_type == 'Marpa_And_Node_ID') then return 'int' end
+        if (libmarpa_type == 'Marpa_Rank') then return 'int' end
+        if (libmarpa_type == 'Marpa_Rule_ID') then return 'int' end
+        if (libmarpa_type == 'Marpa_Symbol_ID') then return 'int' end
+        if (libmarpa_type == 'Marpa_Earley_Set_ID') then return 'int' end
+        return "!UNIMPLEMENTED!";
+    end
+
+    local libmarpa_class_type = {
+      g = "Marpa_Grammar",
+      r = "Marpa_Recognizer",
+      b = "Marpa_Bocage",
+      o = "Marpa_Order",
+      t = "Marpa_Tree",
+      v = "Marpa_Value",
+    };
+
+    local libmarpa_class_name = {
+      g = "grammar",
+      r = "recce",
+      b = "bocage",
+      o = "order",
+      t = "tree",
+      v = "value",
+    };
+
     local check_for_table_template = [=[
     !!INDENT!!check_libmarpa_table(L,
     !!INDENT!!  "!!FUNCNAME!!",
@@ -1185,8 +1220,7 @@ A function to be called whenever a valuator is reset.
     !!INDENT!!);
     ]=]
 
-    for ix = 1, #c_fn_signatures do
-       local signature = c_fn_signatures[ix]
+    function wrap_libmarpa_method(signature)
        local arg_count = math.floor(#signature/2)
        local function_name = signature[1]
        local unprefixed_name = string.gsub(function_name, "^[_]?marpa_", "");
@@ -1292,6 +1326,187 @@ A function to be called whenever a valuator is reset.
 
     -- end of exec
     ]==]
+```
+
+### Standard template methods
+
+Here are the meta-programmed wrappers --
+This is Lua code which writes the C code based on
+a "signature" for the wrapper
+
+This meta-programming does not attempt to work for
+all of the wrappers.  It works only when
+1. The number of arguments is fixed.
+2. Their type is from a fixed list.
+3. Converting the return value to int is a good thing to do.
+4. Non-negative return values indicate success
+5. Return values less than -1 indicate failure
+6. Return values less than -1 set the error code
+7. Return value of -1 is "soft" and returning nil is
+      the right thing to do
+
+On those methods for which the wrapper requirements are "bent"
+a little bit:
+
+* marpa_r_alternative() -- generates events
+Returns an error code.  Since these are always non-negative, from
+the wrapper's point of view, marpa_r_alternative() always succeeds.
+
+* marpa_r_earleme_complete() -- generates events
+
+```
+
+  wrap_libmarpa_method{"marpa_g_completion_symbol_activate", "Marpa_Symbol_ID", "sym_id", "int", "activate"}
+  wrap_libmarpa_method{"marpa_g_error_clear"}
+  wrap_libmarpa_method{"marpa_g_event_count"}
+  wrap_libmarpa_method{"marpa_g_force_valued"}
+  wrap_libmarpa_method{"marpa_g_has_cycle"}
+  wrap_libmarpa_method{"marpa_g_highest_rule_id"}
+  wrap_libmarpa_method{"marpa_g_highest_symbol_id"}
+  wrap_libmarpa_method{"marpa_g_is_precomputed"}
+  wrap_libmarpa_method{"marpa_g_nulled_symbol_activate", "Marpa_Symbol_ID", "sym_id", "int", "activate"}
+  wrap_libmarpa_method{"marpa_g_precompute"}
+  wrap_libmarpa_method{"marpa_g_prediction_symbol_activate", "Marpa_Symbol_ID", "sym_id", "int", "activate"}
+  wrap_libmarpa_method{"marpa_g_rule_is_accessible", "Marpa_Rule_ID", "rule_id"}
+  wrap_libmarpa_method{"marpa_g_rule_is_loop", "Marpa_Rule_ID", "rule_id"}
+  wrap_libmarpa_method{"marpa_g_rule_is_nullable", "Marpa_Rule_ID", "rule_id"}
+  wrap_libmarpa_method{"marpa_g_rule_is_nulling", "Marpa_Rule_ID", "rule_id"}
+  wrap_libmarpa_method{"marpa_g_rule_is_productive", "Marpa_Rule_ID", "rule_id"}
+  wrap_libmarpa_method{"marpa_g_rule_is_proper_separation", "Marpa_Rule_ID", "rule_id"}
+  wrap_libmarpa_method{"marpa_g_rule_length", "Marpa_Rule_ID", "rule_id"}
+  wrap_libmarpa_method{"marpa_g_rule_lhs", "Marpa_Rule_ID", "rule_id"}
+  wrap_libmarpa_method{"marpa_g_rule_null_high", "Marpa_Rule_ID", "rule_id"}
+  wrap_libmarpa_method{"marpa_g_rule_null_high_set", "Marpa_Rule_ID", "rule_id", "int", "flag"}
+  wrap_libmarpa_method{"marpa_g_rule_rhs", "Marpa_Rule_ID", "rule_id", "int", "ix"}
+  wrap_libmarpa_method{"marpa_g_sequence_min", "Marpa_Rule_ID", "rule_id"}
+  wrap_libmarpa_method{"marpa_g_sequence_separator", "Marpa_Rule_ID", "rule_id"}
+  wrap_libmarpa_method{"marpa_g_start_symbol"}
+  wrap_libmarpa_method{"marpa_g_start_symbol_set", "Marpa_Symbol_ID", "id"}
+  wrap_libmarpa_method{"marpa_g_symbol_is_accessible", "Marpa_Symbol_ID", "symbol_id"}
+  wrap_libmarpa_method{"marpa_g_symbol_is_completion_event", "Marpa_Symbol_ID", "sym_id"}
+  wrap_libmarpa_method{"marpa_g_symbol_is_completion_event_set", "Marpa_Symbol_ID", "sym_id", "int", "value"}
+  wrap_libmarpa_method{"marpa_g_symbol_is_counted", "Marpa_Symbol_ID", "symbol_id"}
+  wrap_libmarpa_method{"marpa_g_symbol_is_nullable", "Marpa_Symbol_ID", "symbol_id"}
+  wrap_libmarpa_method{"marpa_g_symbol_is_nulled_event", "Marpa_Symbol_ID", "sym_id"}
+  wrap_libmarpa_method{"marpa_g_symbol_is_nulled_event_set", "Marpa_Symbol_ID", "sym_id", "int", "value"}
+  wrap_libmarpa_method{"marpa_g_symbol_is_nulling", "Marpa_Symbol_ID", "symbol_id"}
+  wrap_libmarpa_method{"marpa_g_symbol_is_prediction_event", "Marpa_Symbol_ID", "sym_id"}
+  wrap_libmarpa_method{"marpa_g_symbol_is_prediction_event_set", "Marpa_Symbol_ID", "sym_id", "int", "value"}
+  wrap_libmarpa_method{"marpa_g_symbol_is_productive", "Marpa_Symbol_ID", "symbol_id"}
+  wrap_libmarpa_method{"marpa_g_symbol_is_start", "Marpa_Symbol_ID", "symbol_id"}
+  wrap_libmarpa_method{"marpa_g_symbol_is_terminal", "Marpa_Symbol_ID", "symbol_id"}
+  wrap_libmarpa_method{"marpa_g_symbol_is_terminal_set", "Marpa_Symbol_ID", "symbol_id", "int", "boolean"}
+  wrap_libmarpa_method{"marpa_g_symbol_is_valued", "Marpa_Symbol_ID", "symbol_id"}
+  wrap_libmarpa_method{"marpa_g_symbol_is_valued_set", "Marpa_Symbol_ID", "symbol_id", "int", "boolean"}
+  wrap_libmarpa_method{"marpa_g_symbol_new"}
+  wrap_libmarpa_method{"marpa_g_zwa_new", "int", "default_value"}
+  wrap_libmarpa_method{"marpa_g_zwa_place", "Marpa_Assertion_ID", "zwaid", "Marpa_Rule_ID", "xrl_id", "int", "rhs_ix"}
+  wrap_libmarpa_method{"marpa_r_completion_symbol_activate", "Marpa_Symbol_ID", "sym_id", "int", "reactivate"}
+  wrap_libmarpa_method{"marpa_r_alternative", "Marpa_Symbol_ID", "token", "int", "value", "int", "length"}, -- See above
+  wrap_libmarpa_method{"marpa_r_current_earleme"}
+  wrap_libmarpa_method{"marpa_r_earleme_complete"}, -- See note above
+  wrap_libmarpa_method{"marpa_r_earleme", "Marpa_Earley_Set_ID", "ordinal"}
+  wrap_libmarpa_method{"marpa_r_earley_item_warning_threshold"}
+  wrap_libmarpa_method{"marpa_r_earley_item_warning_threshold_set", "int", "too_many_earley_items"}
+  wrap_libmarpa_method{"marpa_r_earley_set_value", "Marpa_Earley_Set_ID", "ordinal"}
+  wrap_libmarpa_method{"marpa_r_expected_symbol_event_set", "Marpa_Symbol_ID", "xsyid", "int", "value"}
+  wrap_libmarpa_method{"marpa_r_furthest_earleme"}
+  wrap_libmarpa_method{"marpa_r_is_exhausted"}
+  wrap_libmarpa_method{"marpa_r_latest_earley_set"}
+  wrap_libmarpa_method{"marpa_r_latest_earley_set_value_set", "int", "value"}
+  wrap_libmarpa_method{"marpa_r_nulled_symbol_activate", "Marpa_Symbol_ID", "sym_id", "int", "reactivate"}
+  wrap_libmarpa_method{"marpa_r_prediction_symbol_activate", "Marpa_Symbol_ID", "sym_id", "int", "reactivate"}
+  wrap_libmarpa_method{"marpa_r_progress_report_finish"}
+  wrap_libmarpa_method{"marpa_r_progress_report_start", "Marpa_Earley_Set_ID", "ordinal"}
+  wrap_libmarpa_method{"marpa_r_start_input"}
+  wrap_libmarpa_method{"marpa_r_terminal_is_expected", "Marpa_Symbol_ID", "xsyid"}
+  wrap_libmarpa_method{"marpa_r_zwa_default", "Marpa_Assertion_ID", "zwaid"}
+  wrap_libmarpa_method{"marpa_r_zwa_default_set", "Marpa_Assertion_ID", "zwaid", "int", "default_value"}
+  wrap_libmarpa_method{"marpa_b_ambiguity_metric"}
+  wrap_libmarpa_method{"marpa_b_is_null"}
+  wrap_libmarpa_method{"marpa_o_ambiguity_metric"}
+  wrap_libmarpa_method{"marpa_o_high_rank_only_set", "int", "flag"}
+  wrap_libmarpa_method{"marpa_o_high_rank_only"}
+  wrap_libmarpa_method{"marpa_o_is_null"}
+  wrap_libmarpa_method{"marpa_o_rank"}
+  wrap_libmarpa_method{"marpa_t_next"}
+  wrap_libmarpa_method{"marpa_t_parse_count"}
+  wrap_libmarpa_method{"marpa_v_valued_force"}
+  wrap_libmarpa_method{"marpa_v_rule_is_valued_set", "Marpa_Rule_ID", "symbol_id", "int", "value"}
+  wrap_libmarpa_method{"marpa_v_symbol_is_valued_set", "Marpa_Symbol_ID", "symbol_id", "int", "value"}
+  wrap_libmarpa_method{"_marpa_g_ahm_count"}
+  wrap_libmarpa_method{"_marpa_g_ahm_irl", "Marpa_AHM_ID", "item_id"}
+  wrap_libmarpa_method{"_marpa_g_ahm_position", "Marpa_AHM_ID", "item_id"}
+  wrap_libmarpa_method{"_marpa_g_ahm_postdot", "Marpa_AHM_ID", "item_id"}
+  wrap_libmarpa_method{"_marpa_g_irl_count"}
+  wrap_libmarpa_method{"_marpa_g_irl_is_virtual_rhs", "Marpa_IRL_ID", "irl_id"}
+  wrap_libmarpa_method{"_marpa_g_irl_length", "Marpa_IRL_ID", "irl_id"}
+  wrap_libmarpa_method{"_marpa_g_irl_lhs", "Marpa_IRL_ID", "irl_id"}
+  wrap_libmarpa_method{"_marpa_g_irl_rank", "Marpa_IRL_ID", "irl_id"}
+  wrap_libmarpa_method{"_marpa_g_irl_rhs", "Marpa_IRL_ID", "irl_id", "int", "ix"}
+  wrap_libmarpa_method{"_marpa_g_irl_semantic_equivalent", "Marpa_IRL_ID", "irl_id"}
+  wrap_libmarpa_method{"_marpa_g_nsy_count"}
+  wrap_libmarpa_method{"_marpa_g_nsy_is_lhs", "Marpa_NSY_ID", "nsy_id"}
+  wrap_libmarpa_method{"_marpa_g_nsy_is_nulling", "Marpa_NSY_ID", "nsy_id"}
+  wrap_libmarpa_method{"_marpa_g_nsy_is_semantic", "Marpa_NSY_ID", "nsy_id"}
+  wrap_libmarpa_method{"_marpa_g_nsy_is_start", "Marpa_NSY_ID", "nsy_id"}
+  wrap_libmarpa_method{"_marpa_g_nsy_lhs_xrl", "Marpa_NSY_ID", "nsy_id"}
+  wrap_libmarpa_method{"_marpa_g_nsy_rank", "Marpa_NSY_ID", "nsy_id"}
+  wrap_libmarpa_method{"_marpa_g_nsy_xrl_offset", "Marpa_NSY_ID", "nsy_id"}
+  wrap_libmarpa_method{"_marpa_g_real_symbol_count", "Marpa_IRL_ID", "irl_id"}
+  wrap_libmarpa_method{"_marpa_g_rule_is_keep_separation", "Marpa_Rule_ID", "rule_id"}
+  wrap_libmarpa_method{"_marpa_g_rule_is_used", "Marpa_Rule_ID", "rule_id"}
+  wrap_libmarpa_method{"_marpa_g_source_xrl", "Marpa_IRL_ID", "irl_id"}
+  wrap_libmarpa_method{"_marpa_g_source_xsy", "Marpa_NSY_ID", "nsy_id"}
+  wrap_libmarpa_method{"_marpa_g_virtual_end", "Marpa_IRL_ID", "irl_id"}
+  wrap_libmarpa_method{"_marpa_g_virtual_start", "Marpa_IRL_ID", "irl_id"}
+  wrap_libmarpa_method{"_marpa_g_xsy_nsy", "Marpa_Symbol_ID", "symid"}
+  wrap_libmarpa_method{"_marpa_g_xsy_nulling_nsy", "Marpa_Symbol_ID", "symid"}
+  wrap_libmarpa_method{"_marpa_r_earley_item_origin"}
+  wrap_libmarpa_method{"_marpa_r_earley_item_trace", "Marpa_Earley_Item_ID", "item_id"}
+  wrap_libmarpa_method{"_marpa_r_earley_set_size", "Marpa_Earley_Set_ID", "set_id"}
+  wrap_libmarpa_method{"_marpa_r_earley_set_trace", "Marpa_Earley_Set_ID", "set_id"}
+  wrap_libmarpa_method{"_marpa_r_first_completion_link_trace"}
+  wrap_libmarpa_method{"_marpa_r_first_leo_link_trace"}
+  wrap_libmarpa_method{"_marpa_r_first_postdot_item_trace"}
+  wrap_libmarpa_method{"_marpa_r_first_token_link_trace"}
+  wrap_libmarpa_method{"_marpa_r_is_use_leo"}
+  wrap_libmarpa_method{"_marpa_r_is_use_leo_set", "int", "value"}
+  wrap_libmarpa_method{"_marpa_r_leo_base_origin"}
+  wrap_libmarpa_method{"_marpa_r_leo_base_state"}
+  wrap_libmarpa_method{"_marpa_r_leo_predecessor_symbol"}
+  wrap_libmarpa_method{"_marpa_r_next_completion_link_trace"}
+  wrap_libmarpa_method{"_marpa_r_next_leo_link_trace"}
+  wrap_libmarpa_method{"_marpa_r_next_postdot_item_trace"}
+  wrap_libmarpa_method{"_marpa_r_next_token_link_trace"}
+  wrap_libmarpa_method{"_marpa_r_postdot_item_symbol"}
+  wrap_libmarpa_method{"_marpa_r_postdot_symbol_trace", "Marpa_Symbol_ID", "symid"}
+  wrap_libmarpa_method{"_marpa_r_source_leo_transition_symbol"}
+  wrap_libmarpa_method{"_marpa_r_source_middle"}
+  wrap_libmarpa_method{"_marpa_r_source_predecessor_state"}
+  -- wrap_libmarpa_method{"_marpa_r_source_token", "int", "*value_p"}
+  wrap_libmarpa_method{"_marpa_r_trace_earley_set"}
+  wrap_libmarpa_method{"_marpa_b_and_node_cause", "Marpa_And_Node_ID", "ordinal"}
+  wrap_libmarpa_method{"_marpa_b_and_node_count"}
+  wrap_libmarpa_method{"_marpa_b_and_node_middle", "Marpa_And_Node_ID", "and_node_id"}
+  wrap_libmarpa_method{"_marpa_b_and_node_parent", "Marpa_And_Node_ID", "and_node_id"}
+  wrap_libmarpa_method{"_marpa_b_and_node_predecessor", "Marpa_And_Node_ID", "ordinal"}
+  wrap_libmarpa_method{"_marpa_b_and_node_symbol", "Marpa_And_Node_ID", "and_node_id"}
+  wrap_libmarpa_method{"_marpa_b_or_node_and_count", "Marpa_Or_Node_ID", "or_node_id"}
+  wrap_libmarpa_method{"_marpa_b_or_node_first_and", "Marpa_Or_Node_ID", "ordinal"}
+  wrap_libmarpa_method{"_marpa_b_or_node_irl", "Marpa_Or_Node_ID", "ordinal"}
+  wrap_libmarpa_method{"_marpa_b_or_node_is_semantic", "Marpa_Or_Node_ID", "or_node_id"}
+  wrap_libmarpa_method{"_marpa_b_or_node_is_whole", "Marpa_Or_Node_ID", "or_node_id"}
+  wrap_libmarpa_method{"_marpa_b_or_node_last_and", "Marpa_Or_Node_ID", "ordinal"}
+  wrap_libmarpa_method{"_marpa_b_or_node_origin", "Marpa_Or_Node_ID", "ordinal"}
+  wrap_libmarpa_method{"_marpa_b_or_node_position", "Marpa_Or_Node_ID", "ordinal"}
+  wrap_libmarpa_method{"_marpa_b_or_node_set", "Marpa_Or_Node_ID", "ordinal"}
+  wrap_libmarpa_method{"_marpa_b_top_or_node"}
+  wrap_libmarpa_method{"_marpa_o_and_order_get", "Marpa_Or_Node_ID", "or_node_id", "int", "ix"}
+  wrap_libmarpa_method{"_marpa_o_or_node_and_node_count", "Marpa_Or_Node_ID", "or_node_id"}
+  wrap_libmarpa_method{"_marpa_o_or_node_and_node_id_by_ix", "Marpa_Or_Node_ID", "or_node_id", "int", "ix"}
+
+```
 
 ## Preliminaries to the main code
 
