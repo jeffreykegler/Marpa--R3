@@ -44,6 +44,8 @@ local file_ids = {}
 local outputs = {}
 local inputs = {}
 
+local user_code_env = { __index = _G }
+
 for arg_ix = 1,#arg do
     local this_arg = arg[arg_ix]
     if not this_arg:find("=") then
@@ -223,18 +225,24 @@ function parse_instruction(first_line_no, last_line_no)
         end
         instruction.tag = tag
         instruction.code = table.concat(code_lines);
-        local ok, msg = pcall(instruction.code)
+        local ok, result = load(instruction.code, tag, 't', user_code_env)
+        if not ok then
+            error(string.format(
+                'Load error for code in "exec" command at line %d\n%s',
+                first_line_no, result))
+        end
+        ok, result = pcall(user_code_f)
         if not ok then
             error(string.format(
                 'Error in "exec" command at line %d\n%s',
-                first_line_no, msg))
+                first_line_no, result))
         end
-        local msg_type = type(msg)
-        if msg_type == 'nil' then
+        local result_type = type(result)
+        if result_type == 'nil' then
             instruction.text = ''
-        elseif msg_type == 'string' then
-            instruction.text = msg
-        elseif msg_type == 'table' then
+        elseif result_type == 'string' then
+            instruction.text = result
+        elseif result_type == 'table' then
             error(string.format(
                 '"exec" command returned a table at line %d\n'
                 .. '    table returns values are not yet implemented\n',
@@ -243,7 +251,7 @@ function parse_instruction(first_line_no, last_line_no)
             error(string.format(
                 '"exec" command returned a value of type "%s" at line %d\n'
                 .. '    return value must be nil or a string\n',
-                msg_type, first_line_no))
+                result_type, first_line_no))
         end
         return instruction
     end
