@@ -44,7 +44,8 @@ local file_ids = {}
 local outputs = {}
 local inputs = {}
 
-local user_code_env = { __index = _G }
+local user_code_env = {}
+setmetatable(user_code_env, { __index = _G })
 
 for arg_ix = 1,#arg do
     local this_arg = arg[arg_ix]
@@ -221,7 +222,7 @@ function parse_instruction(first_line_no, last_line_no)
         while true do
             local line = line_iter()
             if not line then break end
-            code_lines[#code_lines+1] = line:sub(1, #prefix)
+            code_lines[#code_lines+1] = line:sub(#prefix+1)
         end
         if #code_lines <= 0 then
             error(string.format(
@@ -238,13 +239,14 @@ function parse_instruction(first_line_no, last_line_no)
             end
         end
         instruction.tag = tag
-        instruction.code = table.concat(code_lines);
+        instruction.code = table.concat(code_lines, '\n');
         local user_code_f, error_msg = load(instruction.code, tag, 't', user_code_env)
         if not user_code_f then
             error(string.format(
                 'Load error for code in "exec" command at line %d\n%s',
                 first_line_no, error_msg))
         end
+        print('calling', tag)
         local ok, result = pcall(user_code_f)
         if not ok then
             error(string.format(
@@ -252,6 +254,7 @@ function parse_instruction(first_line_no, last_line_no)
                 first_line_no, result))
         end
         local result_type = type(result)
+        print('tag, type, result', tag, result_type, result)
         if result_type == 'nil' then
             instruction.text = ''
         elseif result_type == 'string' then
@@ -285,7 +288,7 @@ end
 local function next_run_find(instruction_ix)
     while true do
         local instruction = instructions[instruction_ix]
-        print('instruction_ix', instruction_ix)
+        -- print('instruction_ix', instruction_ix)
         if not instruction then return nil end
         local itype = instruction.type
         -- print('itype=', itype)
@@ -510,8 +513,7 @@ function section_output(fh, language_arg, name, prefix_arg)
         )
      end
      section_on_stack[name] = true
-     print('looking for section, name:', name)
-     print('sections on stack:', inspect(section_on_stack))
+     -- print('sections on stack:', inspect(section_on_stack))
      local section = sections[name]
      local language = section.language or language_arg
      if language ~= 'c' and language ~= 'lua' then
@@ -544,6 +546,7 @@ function section_output(fh, language_arg, name, prefix_arg)
                    raw_instruction[#raw_instruction+1] = '\n'
               end
               local exec_text = instruction.text
+              print('exec_text:', exec_text)
               raw_instruction[#raw_instruction+1] = exec_text
               if exec_text:match('[^\n]$') then
                   raw_instruction[#raw_instruction+1] = '\n'
