@@ -1157,23 +1157,6 @@ A function to be called whenever a valuator is reset.
 
 ```
 
-# The main Lua code file
-
-```
-    -- miranda: section main
-    -- miranda: insert legal preliminaries
-    -- miranda: insert luacheck declarations
-    -- miranda: insert enforce strict globals
-    -- miranda: insert VM operations
-    -- miranda: insert value_init()
-    -- miranda: insert value_reset()
-    -- miranda: insert Utilities for Perl code
-
-    return "OK"
-
-    -- vim: set expandtab shiftwidth=4:
-```
-
 ## Libmarpa interface
 
 ```
@@ -1356,6 +1339,8 @@ the wrapper's point of view, marpa_r_alternative() always succeeds.
 
 ```
 
+  -- miranda: section standard libmarpa wrappers
+  --[==[ miranda: exec
   wrap_libmarpa_method{"marpa_g_completion_symbol_activate", "Marpa_Symbol_ID", "sym_id", "int", "activate"}
   wrap_libmarpa_method{"marpa_g_error_clear"}
   wrap_libmarpa_method{"marpa_g_event_count"}
@@ -1505,7 +1490,27 @@ the wrapper's point of view, marpa_r_alternative() always succeeds.
   wrap_libmarpa_method{"_marpa_o_and_order_get", "Marpa_Or_Node_ID", "or_node_id", "int", "ix"}
   wrap_libmarpa_method{"_marpa_o_or_node_and_node_count", "Marpa_Or_Node_ID", "or_node_id"}
   wrap_libmarpa_method{"_marpa_o_or_node_and_node_id_by_ix", "Marpa_Or_Node_ID", "or_node_id", "int", "ix"}
+  ]==]
+  -- end of exec
 
+```
+
+# The main Lua code file
+
+```
+    -- miranda: section main
+    -- miranda: insert legal preliminaries
+    -- miranda: insert luacheck declarations
+    -- miranda: insert enforce strict globals
+    -- miranda: insert VM operations
+    -- miranda: insert value_init()
+    -- miranda: insert value_reset()
+    -- miranda: insert Utilities for Perl code
+    -- miranda: insert standard libmarpa wrappers
+
+    return "OK"
+
+    -- vim: set expandtab shiftwidth=4:
 ```
 
 ## Preliminaries to the main code
