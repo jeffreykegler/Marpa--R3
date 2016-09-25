@@ -1203,8 +1203,6 @@ A function to be called whenever a valuator is reset.
     !!INDENT!!);
     ]=]
 
-    print('_G', inspect(_G))
-
     function wrap_libmarpa_method(signature)
        local arg_count = math.floor(#signature/2)
        local function_name = signature[1]

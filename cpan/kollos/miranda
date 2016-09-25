@@ -107,9 +107,9 @@ local function instruction_iter()
                         local first_line_no = line_no
                         while line_no do
                             local line = lines[line_no]
-                            print('#prefix', #prefix)
-                            print(string.format('line: %q', line))
-                            print(string.format('prefix: %q', prefix))
+                            -- print('#prefix', #prefix)
+                            -- print(string.format('line: %q', line))
+                            -- print(string.format('prefix: %q', prefix))
                             if #line > 0 and line:sub(1, #prefix) ~= prefix then
                                 error(string.format(
                                     'Problem in line %d: %s\n'
@@ -162,12 +162,12 @@ function parse_instruction(first_line_no, last_line_no)
     local prefix, body
     if last_line_no then
         local raw_instruction = table.concat(lines, '\n', first_line_no, last_line_no)
-        print(string.format('raw_instruction: %q', raw_instruction))
+        -- print(string.format('raw_instruction: %q', raw_instruction))
         local equals
         prefix, equals, body = raw_instruction:match('^( *)--%[(=*)%[ *miranda: *(.*)$')
-        print(string.format('prefix: %q', prefix))
-        print(string.format('equals: %q', equals))
-        print(string.format('body: %q', body))
+        -- print(string.format('prefix: %q', prefix))
+        -- print(string.format('equals: %q', equals))
+        -- print(string.format('body: %q', body))
         body = body:gsub('%]' .. equals .. '%]$', '', 1)
     else
         local raw_instruction = lines[first_line_no]
@@ -216,7 +216,7 @@ function parse_instruction(first_line_no, last_line_no)
         instruction.type = words[1]
         local line_iter = body:gmatch('[^\n]+')
         local tag = line_iter()
-        print('exec command', tag)
+        -- print('exec command', tag)
         tag = tag:gsub('^[ ]*exec[ ]*', '', 1):gsub('[ ]*$', '', 1)
         local code_lines = {}
         while true do
@@ -246,7 +246,7 @@ function parse_instruction(first_line_no, last_line_no)
                 'Load error for code in "exec" command at line %d\n%s',
                 first_line_no, error_msg))
         end
-        print('calling', tag)
+        -- print('calling', tag)
         local ok, result = pcall(user_code_f)
         if not ok then
             error(string.format(
@@ -254,7 +254,7 @@ function parse_instruction(first_line_no, last_line_no)
                 first_line_no, result))
         end
         local result_type = type(result)
-        print('tag, type, result', tag, result_type, result)
+        -- print('tag, type, result', tag, result_type, result)
         if result_type == 'nil' then
             instruction.text = ''
         elseif result_type == 'string' then
@@ -546,7 +546,7 @@ function section_output(fh, language_arg, name, prefix_arg)
                    raw_instruction[#raw_instruction+1] = '\n'
               end
               local exec_text = instruction.text
-              print('exec_text:', exec_text)
+              -- print('exec_text:', exec_text)
               raw_instruction[#raw_instruction+1] = exec_text
               if exec_text:match('[^\n]$') then
                   raw_instruction[#raw_instruction+1] = '\n'
