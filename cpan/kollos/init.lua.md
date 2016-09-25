@@ -1490,8 +1490,8 @@ the wrapper's point of view, marpa_r_alternative() always succeeds.
   wrap_libmarpa_method{"_marpa_o_and_order_get", "Marpa_Or_Node_ID", "or_node_id", "int", "ix"}
   wrap_libmarpa_method{"_marpa_o_or_node_and_node_count", "Marpa_Or_Node_ID", "or_node_id"}
   wrap_libmarpa_method{"_marpa_o_or_node_and_node_id_by_ix", "Marpa_Or_Node_ID", "or_node_id", "int", "ix"}
-  ]==]
   -- end of exec
+  ]==]
 
 ```
 
@@ -1506,7 +1506,6 @@ the wrapper's point of view, marpa_r_alternative() always succeeds.
     -- miranda: insert value_init()
     -- miranda: insert value_reset()
     -- miranda: insert Utilities for Perl code
-    -- miranda: insert standard libmarpa wrappers
 
     return "OK"
 
@@ -1603,6 +1602,7 @@ Set "strict" globals, using code taken from strict.lua.
     -- miranda: insert preliminaries to the c library code
     -- miranda: insert kollos Lua library
     -- miranda: insert Lua interpreter management
+    -- miranda: insert standard libmarpa wrappers
     /* vim: set expandtab shiftwidth=4: */
 ```
 

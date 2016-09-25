@@ -95,7 +95,7 @@ local function instruction_iter()
                     line_no = line_no+1
                     local line = lines[line_no]
                     if not line then return end
-                    local prefix, equals = line:match('^(%s*)[-][-]%[(=)%[ *miranda:')
+                    local prefix, equals = line:match('^(%s*)[-][-]%[(=*)%[ *miranda:')
                     if prefix then
                         if prefix:find('[^ ]') then
                             error(string.format(
@@ -106,7 +106,10 @@ local function instruction_iter()
                         local first_line_no = line_no
                         while line_no do
                             local line = lines[line_no]
-                            if not line:sub(1, #prefix) ~= prefix then
+                            print('#prefix', #prefix)
+                            print(string.format('line: %q', line))
+                            print(string.format('prefix: %q', prefix))
+                            if #line > 0 and line:sub(1, #prefix) ~= prefix then
                                 error(string.format(
                                     'Problem in line %d: %s\n'
                                     .. '    Lines does not have prefix of %d spaces\n'
@@ -157,9 +160,13 @@ function parse_instruction(first_line_no, last_line_no)
     local raw_instruction = table.concat(lines, '', first_line_no, last_line_no)
     local prefix, body
     if last_line_no then
-        local raw_instruction = table.concat(lines, '', first_line_no, last_line_no)
+        local raw_instruction = table.concat(lines, '\n', first_line_no, last_line_no)
+        print(string.format('raw_instruction: %q', raw_instruction))
         local equals
-        prefix, equals, body = raw_instruction.match('^( *)--(%[(=*)%[)? *miranda: *(.*)$')
+        prefix, equals, body = raw_instruction:match('^( *)--%[(=*)%[ *miranda: *(.*)$')
+        print(string.format('prefix: %q', prefix))
+        print(string.format('equals: %q', equals))
+        print(string.format('body: %q', body))
         body = body:gsub('%]' .. equals .. '%]$', '', 1)
     else
         local raw_instruction = lines[first_line_no]
@@ -208,9 +215,12 @@ function parse_instruction(first_line_no, last_line_no)
         instruction.type = words[1]
         local line_iter = body:gmatch('[^\n]+')
         local tag = line_iter()
+        print('exec command', tag)
         tag = tag:gsub('^[ ]*exec[ ]*', '', 1):gsub('[ ]*$', '', 1)
         local code_lines = {}
-        for line in line_iter() do
+        while true do
+            local line = line_iter()
+            if not line then break end
             code_lines[#code_lines+1] = line:sub(1, #prefix)
         end
         if #code_lines <= 0 then
@@ -219,7 +229,6 @@ function parse_instruction(first_line_no, last_line_no)
                 first_line_no))
         end
         if #tag <= 0 then
-            allowed_tag_length = 72 - (#prefix + string.len('-- exec "..."'))
             for line_no = 2, #code_lines do
                 local line = code_lines[line_no]
                 if line:find('[^%s]') then
@@ -230,13 +239,13 @@ function parse_instruction(first_line_no, last_line_no)
         end
         instruction.tag = tag
         instruction.code = table.concat(code_lines);
-        local ok, result = load(instruction.code, tag, 't', user_code_env)
-        if not ok then
+        local user_code_f, error_msg = load(instruction.code, tag, 't', user_code_env)
+        if not user_code_f then
             error(string.format(
                 'Load error for code in "exec" command at line %d\n%s',
-                first_line_no, result))
+                first_line_no, error_msg))
         end
-        ok, result = pcall(user_code_f)
+        local ok, result = pcall(user_code_f)
         if not ok then
             error(string.format(
                 'Error in "exec" command at line %d\n%s',
@@ -274,9 +283,9 @@ for instruction in instruction_iter() do
 end
 
 local function next_run_find(instruction_ix)
-    -- print('instruction_ix', instruction_ix)
     while true do
         local instruction = instructions[instruction_ix]
+        print('instruction_ix', instruction_ix)
         if not instruction then return nil end
         local itype = instruction.type
         -- print('itype=', itype)
@@ -302,13 +311,19 @@ local function next_run_find(instruction_ix)
             )
         end
 
-        -- Currently no instruction are allowed outside a run -- they
-        -- must either start a run or occur within one.
+        if itype == 'exec' then
+            goto NEXT_INSTRUCTION
+        end
+
+        -- Currently only 'exec' instruction is allowed outside a run --
+        -- other instructions must either start a run or occur within one.
         -- print('error instruction', inspect(instruction))
         error(problem_in_line(instruction:first_line())
             .. string.format("   '%s' command is only allowed inside a run\n",
                  itype)
         )
+        ::NEXT_INSTRUCTION::
+        instruction_ix = instruction_ix + 1
     end
     return nil
 end
@@ -495,7 +510,8 @@ function section_output(fh, language_arg, name, prefix_arg)
         )
      end
      section_on_stack[name] = true
-     -- print('sections on stack:', inspect(section_on_stack))
+     print('looking for section, name:', name)
+     print('sections on stack:', inspect(section_on_stack))
      local section = sections[name]
      local language = section.language or language_arg
      if language ~= 'c' and language ~= 'lua' then
@@ -518,13 +534,14 @@ function section_output(fh, language_arg, name, prefix_arg)
               if language == 'lua' then
                    raw_instruction[#raw_instruction+1] = string.rep(' ', current_prefix)
                    raw_instruction[#raw_instruction+1] = '-- exec '
-                   raw_instruction[#raw_instruction+1] = tag
+                   raw_instruction[#raw_instruction+1] = instruction.tag
                    raw_instruction[#raw_instruction+1] = '\n'
               else -- c language
                    raw_instruction[#raw_instruction+1] = string.rep(' ', current_prefix)
                    raw_instruction[#raw_instruction+1] = '/* exec '
-                   raw_instruction[#raw_instruction+1] = tag
+                   raw_instruction[#raw_instruction+1] = instruction.tag
                    raw_instruction[#raw_instruction+1] = ' */'
+                   raw_instruction[#raw_instruction+1] = '\n'
               end
               local exec_text = instruction.text
               raw_instruction[#raw_instruction+1] = exec_text
@@ -534,13 +551,14 @@ function section_output(fh, language_arg, name, prefix_arg)
               if language == 'lua' then
                    raw_instruction[#raw_instruction+1] = string.rep(' ', current_prefix)
                    raw_instruction[#raw_instruction+1] = '-- end exec '
-                   raw_instruction[#raw_instruction+1] = tag
+                   raw_instruction[#raw_instruction+1] = instruction.tag
                    raw_instruction[#raw_instruction+1] = '\n'
               else -- c language
                    raw_instruction[#raw_instruction+1] = string.rep(' ', current_prefix)
                    raw_instruction[#raw_instruction+1] = '/* end exec '
-                   raw_instruction[#raw_instruction+1] = tag
+                   raw_instruction[#raw_instruction+1] = instruction.tag
                    raw_instruction[#raw_instruction+1] = ' */'
+                   raw_instruction[#raw_instruction+1] = '\n'
               end
               local raw_instruction = table.concat(raw_instruction, '')
               fh:write(raw_instruction)
