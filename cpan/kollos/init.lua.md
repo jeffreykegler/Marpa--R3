@@ -331,6 +331,20 @@ Deletes the interpreter if the reference count drops to zero.
 
 ```
 
+## Utilities for inline code
+
+A pipe symbol is used when inlining code to separate the code's indentation
+from the indentation used to display the code in this document.
+The `pipe_dedent` method removes the display indentation.
+
+```
+    --[==[ miranda: exec utilties for inline code
+    function pipe_dedent(code)
+        return code:gsub('\n *|', '\n'):gsub('^ *|', '', 1)
+    end
+    ]==]
+```
+
 ## Kollos semantics
 
 Initially, Marpa's semantics were performed using a VM (virtual machine)
@@ -1160,7 +1174,8 @@ A function to be called whenever a valuator is reset.
 ## Libmarpa interface
 
 ```
-    --[==[ miranda: exec
+    --[==[ miranda: exec libmarpa interface globals
+
     local function c_type_of_libmarpa_type(libmarpa_type)
         if (libmarpa_type == 'int') then return 'int' end
         if (libmarpa_type == 'Marpa_Assertion_ID') then return 'int' end
@@ -1212,7 +1227,7 @@ A function to be called whenever a valuator is reset.
        local result = {}
        result[#result+1] = "static int " .. wrapper_name .. "(lua_State *L)\n"
        result[#result+1] = "{\n"
-       result[#result+1] = "  ", libmarpa_class_type[class_letter], " self;\n"
+       result[#result+1] = "  " .. libmarpa_class_type[class_letter] .. " self;\n"
        result[#result+1] = "  const int self_stack_ix = 1;\n"
        result[#result+1] = "  Marpa_Grammar grammar;\n"
        for arg_ix = 1, arg_count do
@@ -1269,7 +1284,7 @@ A function to be called whenever a valuator is reset.
        result[#result+1] = '  marpa_lua_getfield (L, -1, "_libmarpa");\n'
        -- stack is [ self, self_ud ]
        local cast_to_ptr_to_class_type = "(" ..  libmarpa_class_type[class_letter] .. "*)"
-       result[#result+1] = "  self = *", cast_to_ptr_to_class_type, "marpa_lua_touserdata (L, -1);\n"
+       result[#result+1] = "  self = *" .. cast_to_ptr_to_class_type .. "marpa_lua_touserdata (L, -1);\n"
        result[#result+1] = "  marpa_lua_pop(L, 1);\n"
        -- stack is [ self ]
 
@@ -1281,7 +1296,7 @@ A function to be called whenever a valuator is reset.
 
        -- assumes converting result to int is safe and right thing to do
        -- if that assumption is wrong, generate the wrapper by hand
-       result[#result+1] = "  result = (int)", function_name, "(self\n"
+       result[#result+1] = "  result = (int)" .. function_name .. "(self\n"
        for arg_ix = 1, arg_count do
          local arg_name = signature[1 + arg_ix*2]
          result[#result+1] = "     ," .. arg_name .. "\n"
@@ -1309,6 +1324,48 @@ A function to be called whenever a valuator is reset.
 
     -- end of exec
     ]==]
+```
+
+### Libmarpa interface utilities
+
+```
+  -- miranda: section standard libmarpa wrappers
+  --[==[ miranda: exec check_libmarpa_table
+    do
+       local code = [=[
+        |static void check_libmarpa_table(
+        |    lua_State* L, const char *function_name, int stack_ix, const char *expected_type)
+        |{
+        |  const char *actual_type;
+        |  /* stack is [ ... ] */
+        |  if (!marpa_lua_istable (L, stack_ix))
+        |    {
+        |      const char *typename = marpa_lua_typename (L, marpa_lua_type (L, stack_ix));
+        |      marpa_luaL_error (L, "%s arg #1 type is %s, expected table",
+        |                  function_name, typename);
+        |    }
+        |  marpa_lua_getfield (L, stack_ix, "_type");
+        |  /* stack is [ ..., field ] */
+        |  if (!marpa_lua_isstring (L, -1))
+        |    {
+        |      const char *typename = marpa_lua_typename (L, marpa_lua_type (L, -1));
+        |      marpa_luaL_error (L, "%s arg #1 field '_type' is %s, expected string",
+        |                  function_name, typename);
+        |    }
+        |  actual_type = marpa_lua_tostring (L, -1);
+        |  if (strcmp (actual_type, expected_type))
+        |    {
+        |      marpa_luaL_error (L, "%s arg #1 table is %s, expected %s",
+        |                  function_name, actual_type, expected_type);
+        |    }
+        |  /* stack is [ ..., field ] */
+        |  marpa_lua_pop (L, 1);
+        |  /* stack is [ ... ] */
+        |}
+        ]=]
+        return pipe_dedent(code)
+    end
+  ]==]
 ```
 
 ### Standard template methods
@@ -1339,7 +1396,7 @@ the wrapper's point of view, marpa_r_alternative() always succeeds.
 
 ```
 
-  -- miranda: section standard libmarpa wrappers
+  -- miranda: section+ standard libmarpa wrappers
   --[==[ miranda: exec
   local signatures = {
     -- {"marpa_g_completion_symbol_activate", "Marpa_Symbol_ID", "sym_id", "int", "activate"},
