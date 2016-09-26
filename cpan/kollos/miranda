@@ -221,6 +221,7 @@ function parse_instruction(first_line_no, last_line_no)
         phase = phase:match('^[ ]*exec[%s](.*)$')
         print('phase:', phase)
         phase = phase and parse_section_name(phase) or ''
+        instruction.phase = phase
         local code_lines = {}
         while true do
             local line = line_iter()
@@ -281,10 +282,29 @@ function parse_instruction(first_line_no, last_line_no)
     ))
 end
 
+-- In a pass over the input file, gather the instructions into
+-- an array, and perform their 'exec' commands
 local instructions = {}
-for instruction in instruction_iter() do
-    -- print(inspect(instruction))
-    instructions[#instructions+1] = instruction
+do
+    local instructions_by_phase = {}
+    for instruction in instruction_iter() do
+        -- print(inspect(instruction))
+        instructions[#instructions+1] = instruction
+        if instruction.type == 'exec' then
+            local phase = instruction.phase
+            local phase_instructions = instructions_by_phase[phase] or {}
+            phase_instructions[#phase_instructions+1] = instruction
+            instructions_by_phase[phase] = phase_instructions
+        end
+    end
+    -- execute instructions which has an order specified here
+    local sorted_instructions = {}
+    for phase, phase_instructions in pairs(instructions_by_phase) do
+        for ix = 1, #phase_instructions do
+            sorted_instructions[#sorted_instructions+1] = phase_instructions[ix]
+        end
+    end
+    table.sort(sorted_instructions, function (a, b) return a:first_line() < b:first_line() end)
 end
 
 local function next_run_find(instruction_ix)
