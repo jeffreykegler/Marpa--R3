@@ -139,6 +139,7 @@ local function instruction_iter()
     )
 end
 
+-- Also used to parse phase names
 function parse_section_name(raw_name)
     local text = raw_name:lower():gsub(' $', '', 1):gsub('^ ', '', 1):gsub('[^%w_]+', ' ')
     return text
@@ -215,28 +216,29 @@ function parse_instruction(first_line_no, last_line_no)
     if words[1] == 'exec' then
         instruction.type = words[1]
         local line_iter = body:gmatch('[^\n]+')
-        local tag = line_iter()
-        -- print('exec command', tag)
-        tag = tag:gsub('^[ ]*exec[ ]*', '', 1):gsub('[ ]*$', '', 1)
+        local phase = line_iter()
+        print('phase:', phase)
+        phase = phase:match('^[ ]*exec[%s](.*)$')
+        print('phase:', phase)
+        phase = phase and parse_section_name(phase) or ''
         local code_lines = {}
         while true do
             local line = line_iter()
             if not line then break end
             code_lines[#code_lines+1] = line:sub(#prefix+1)
         end
-        if #code_lines <= 0 then
+        local tag
+        for line_no = 2, #code_lines do
+            local line = code_lines[line_no]
+            if line:find('[^%s]') then
+                tag = line:gsub('^[%s]*', '', 1)
+                break
+            end
+        end
+        if not tag then
             error(string.format(
                 'Exec command contains no code at line %d\n',
                 first_line_no))
-        end
-        if #tag <= 0 then
-            for line_no = 2, #code_lines do
-                local line = code_lines[line_no]
-                if line:find('[^%s]') then
-                    tag = line:gsub('^[%s]*', '', 1)
-                    break
-                end
-            end
         end
         instruction.tag = tag
         instruction.code = table.concat(code_lines, '\n');
