@@ -47,6 +47,36 @@ local inputs = {}
 local user_code_env = {}
 setmetatable(user_code_env, { __index = _G })
 
+function exec_user_code(code, tag)
+    local user_code_f, error_msg = load(code, tag, 't', user_code_env)
+    if not user_code_f then
+        error(string.format(
+            'Load error for code in "exec" command at line %d\n%s',
+            first_line_no, error_msg))
+    end
+    -- print('calling', tag)
+    local ok, result = pcall(user_code_f)
+    if not ok then
+        error(string.format(
+            'Error in "exec" command at line %d\n%s',
+            first_line_no, result))
+    end
+    local result_type = type(result)
+    -- print('tag, type, result', tag, result_type, result)
+    if result_type == 'nil' then return '' end
+    if result_type == 'string' then return result end
+    if result_type == 'table' then
+        error(string.format(
+            '"exec" command returned a table at line %d\n'
+            .. '    table returns values are not yet implemented\n',
+            first_line_no))
+    end
+    error(string.format(
+        '"exec" command returned a value of type "%s" at line %d\n'
+        .. '    return value must be nil or a string\n',
+        result_type, first_line_no))
+end
+
 for arg_ix = 1,#arg do
     local this_arg = arg[arg_ix]
     if not this_arg:find("=") then
@@ -241,38 +271,10 @@ function parse_instruction(first_line_no, last_line_no)
                 'Exec command contains no code at line %d\n',
                 first_line_no))
         end
+        local code = table.concat(code_lines, '\n');
         instruction.tag = tag
-        instruction.code = table.concat(code_lines, '\n');
-        local user_code_f, error_msg = load(instruction.code, tag, 't', user_code_env)
-        if not user_code_f then
-            error(string.format(
-                'Load error for code in "exec" command at line %d\n%s',
-                first_line_no, error_msg))
-        end
-        -- print('calling', tag)
-        local ok, result = pcall(user_code_f)
-        if not ok then
-            error(string.format(
-                'Error in "exec" command at line %d\n%s',
-                first_line_no, result))
-        end
-        local result_type = type(result)
-        -- print('tag, type, result', tag, result_type, result)
-        if result_type == 'nil' then
-            instruction.text = ''
-        elseif result_type == 'string' then
-            instruction.text = result
-        elseif result_type == 'table' then
-            error(string.format(
-                '"exec" command returned a table at line %d\n'
-                .. '    table returns values are not yet implemented\n',
-                first_line_no))
-        else
-            error(string.format(
-                '"exec" command returned a value of type "%s" at line %d\n'
-                .. '    return value must be nil or a string\n',
-                result_type, first_line_no))
-        end
+        instruction.code = code
+        instruction.text = exec_user_code(code, tag)
         return instruction
     end
     error(string.format(
