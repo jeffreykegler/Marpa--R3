@@ -47,6 +47,8 @@ local inputs = {}
 local user_code_env = {}
 setmetatable(user_code_env, { __index = _G })
 
+local exec_phase_sequence = {}
+
 function exec_user_code(code, tag)
     local user_code_f, error_msg = load(code, tag, 't', user_code_env)
     if not user_code_f then
@@ -276,6 +278,24 @@ function parse_instruction(first_line_no, last_line_no)
         instruction.code = code
         return instruction
     end
+    if words[1] == 'sequence-exec' then
+        instruction.type = words[1]
+        local line_iter = body:gmatch('[^\n]+')
+        local first_line = line_iter()
+        phase = phase:match('^[ ]*exec[%s](.*)$')
+        if not phase then
+            error(string.format(
+                'sequence-exec command has bad format at line %d\n'
+                .. '   sequence-exec command must specify phase\n'
+                .. '   command was %q\n',
+                first_line_no,
+                first_line
+            ))
+        end
+        instruction.phase = phase
+        exec_phase_sequence[#exec_phase_sequence+1] = phase
+        return instruction
+    end
     error(string.format(
         'Cannot parse instruction starting at line %d\n'
         .. '    Instruction begins: %s',
@@ -298,7 +318,7 @@ do
             instructions_by_phase[phase] = phase_instructions
         end
     end
-    -- execute instructions which has an order specified here
+    -- execute instructions which have an order specified here
     local sorted_instructions = {}
     for phase, phase_instructions in pairs(instructions_by_phase) do
         for ix = 1, #phase_instructions do
@@ -342,6 +362,9 @@ local function next_run_find(instruction_ix)
         end
 
         if itype == 'exec' then
+            goto NEXT_INSTRUCTION
+        end
+        if itype == 'sequence-exec' then
             goto NEXT_INSTRUCTION
         end
 
