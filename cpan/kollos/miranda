@@ -274,7 +274,6 @@ function parse_instruction(first_line_no, last_line_no)
         local code = table.concat(code_lines, '\n');
         instruction.tag = tag
         instruction.code = code
-        instruction.text = exec_user_code(code, tag)
         return instruction
     end
     error(string.format(
@@ -307,6 +306,10 @@ do
         end
     end
     table.sort(sorted_instructions, function (a, b) return a:first_line() < b:first_line() end)
+    for ix = 1, #sorted_instructions do
+        local instruction = sorted_instructions[ix]
+        instruction.text = exec_user_code(instruction.code, instruction.tag)
+    end
 end
 
 local function next_run_find(instruction_ix)
