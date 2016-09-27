@@ -318,7 +318,19 @@ do
             instructions_by_phase[phase] = phase_instructions
         end
     end
-    -- execute instructions which have an order specified here
+    -- execute instructions which had their order specified in
+    -- a 'sequence-exec' command
+    for phase_ix = 1, #exec_phase_sequence do
+        local phase_instructions = instructions_by_phase[phase]
+        for ix = 1, #phase_instructions do
+            local instruction = phase_instructions[ix]
+            instruction.text = exec_user_code(instruction.code, instruction.tag)
+        end
+        -- delete phases once executed
+        instructions_by_phase[phase] = nil
+    end
+    -- now execute the instructions in the remaining phases,
+    -- in lexical order
     local sorted_instructions = {}
     for phase, phase_instructions in pairs(instructions_by_phase) do
         for ix = 1, #phase_instructions do
