@@ -1,0 +1,64 @@
+---
+abstract: 'Release 3 of Marpa'
+author:
+  - 'Jeffrey Kegler'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  CPAN::Meta::Converter: '2.120921'
+  Carp: '1.11'
+  Config::AutoConf: '0.22'
+  Cwd: '3.2501'
+  Data::Dumper: '2.125'
+  DynaLoader: '1.08'
+  English: '1.04'
+  Exporter: '5.62'
+  ExtUtils::CBuilder: '0.27'
+  ExtUtils::MakeMaker: '6.48'
+  ExtUtils::Manifest: 1.51_01
+  ExtUtils::Mkbootstrap: '6.42'
+  Fatal: '1.05'
+  File::Copy: '2.11'
+  File::Spec: '3.2501'
+  IPC::Cmd: 0.40_1
+  List::Util: '1.21'
+  Scalar::Util: '1.21'
+  Test::More: '0.94'
+  Time::Piece: '1.12'
+  XSLoader: '0.08'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Marpa-R3
+no_index:
+  directory:
+    - tool
+    - engine
+    - author.t
+  namespace:
+    - Marpa::R3::Value
+    - Marpa::R3::Perl
+    - Marpa::R3::Test
+    - Marpa::R3::Display
+    - Marpa::R3::Inner
+    - Marpa::R3::Internal
+    - Marpa::R3::MetaAST
+    - Marpa::R3::MetaG
+  package:
+    - Marpa::R3::Value
+    - Marpa::R3::Perl
+    - Marpa::R3::Test
+    - Marpa::R3::Display
+    - Marpa::R3::Inner
+    - Marpa::R3::Internal
+    - Marpa::R3::MetaAST
+    - Marpa::R3::MetaG
+    - Marpa::R3::Trace::G
+requires:
+  perl: '5.010001'
+resources:
+  repository: git://github.com/jeffreykegler/Marpa--R3.git
+version: 4.001_022

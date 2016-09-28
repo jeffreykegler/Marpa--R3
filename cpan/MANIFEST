@@ -20,6 +20,8 @@ LICENSES/Artistic_1_0
 LICENSES/GPL_2
 MANIFEST
 MANIFEST.SKIP
+META.json
+META.yml
 Makefile.PL
 README
 author.t/Makefile
@@ -301,6 +303,7 @@ t/zorro.t
 kollos/Makefile.PL
 kollos/init.lua.md
 kollos/inspect.lua
+kollos/strict.lua
 kollos/miranda
 xs/Makefile.PL
 xs/R3.xs

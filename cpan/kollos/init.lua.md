@@ -1328,43 +1328,76 @@ A function to be called whenever a valuator is reset.
 ### Libmarpa interface utilities
 
 ```
-  -- miranda: section standard libmarpa wrappers
-  --[==[ miranda: exec
-    do
-       local code = [=[
-        |static void check_libmarpa_table(
-        |    lua_State* L, const char *function_name, int stack_ix, const char *expected_type)
-        |{
-        |  const char *actual_type;
-        |  /* stack is [ ... ] */
-        |  if (!marpa_lua_istable (L, stack_ix))
-        |    {
-        |      const char *typename = marpa_lua_typename (L, marpa_lua_type (L, stack_ix));
-        |      marpa_luaL_error (L, "%s arg #1 type is %s, expected table",
-        |                  function_name, typename);
-        |    }
-        |  marpa_lua_getfield (L, stack_ix, "_type");
-        |  /* stack is [ ..., field ] */
-        |  if (!marpa_lua_isstring (L, -1))
-        |    {
-        |      const char *typename = marpa_lua_typename (L, marpa_lua_type (L, -1));
-        |      marpa_luaL_error (L, "%s arg #1 field '_type' is %s, expected string",
-        |                  function_name, typename);
-        |    }
-        |  actual_type = marpa_lua_tostring (L, -1);
-        |  if (strcmp (actual_type, expected_type))
-        |    {
-        |      marpa_luaL_error (L, "%s arg #1 table is %s, expected %s",
-        |                  function_name, actual_type, expected_type);
-        |    }
-        |  /* stack is [ ..., field ] */
-        |  marpa_lua_pop (L, 1);
-        |  /* stack is [ ... ] */
-        |}
-        ]=]
-        return pipe_dedent(code)
-    end
-  ]==]
+  -- miranda: section C wrapper utilities
+  static void check_libmarpa_table(
+      lua_State* L, const char *function_name, int stack_ix, const char *expected_type)
+  {
+    const char *actual_type;
+    /* stack is [ ... ] */
+    if (!marpa_lua_istable (L, stack_ix))
+      {
+        const char *typename = marpa_lua_typename (L, marpa_lua_type (L, stack_ix));
+        marpa_luaL_error (L, "%s arg #1 type is %s, expected table",
+                    function_name, typename);
+      }
+    marpa_lua_getfield (L, stack_ix, "_type");
+    /* stack is [ ..., field ] */
+    if (!marpa_lua_isstring (L, -1))
+      {
+        const char *typename = marpa_lua_typename (L, marpa_lua_type (L, -1));
+        marpa_luaL_error (L, "%s arg #1 field '_type' is %s, expected string",
+                    function_name, typename);
+      }
+    actual_type = marpa_lua_tostring (L, -1);
+    if (strcmp (actual_type, expected_type))
+      {
+        marpa_luaL_error (L, "%s arg #1 table is %s, expected %s",
+                    function_name, actual_type, expected_type);
+      }
+    /* stack is [ ..., field ] */
+    marpa_lua_pop (L, 1);
+    /* stack is [ ... ] */
+  }
+```
+
+#### `kollos_throw()` method
+
+Leaves the stack as before, except with the error object on top.
+
+```
+    -- miranda: section C wrapper error handling
+    static inline void kollos_error(lua_State* L,
+        lua_Integer code, const char* details)
+    {
+       const int error_object_stack_ix = marpa_lua_gettop(L)+1;
+       marpa_lua_newtable(L);
+       /* [ ..., error_object ] */
+       marpa_lua_rawgetp(L, LUA_REGISTRYINDEX, &kollos_error_mt_key);
+       /* [ ..., error_object, error_metatable ] */
+       marpa_lua_setmetatable(L, error_object_stack_ix);
+       /* [ ..., error_object ] */
+       marpa_lua_pushinteger(L, code);
+       marpa_lua_setfield(L, error_object_stack_ix, "code" );
+      if (0) printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
+      if (0) printf ("%s code = %ld\n", __PRETTY_FUNCTION__, (long)code);
+       /* [ ..., error_object ] */
+       marpa_lua_pushstring(L, details);
+       marpa_lua_setfield(L, error_object_stack_ix, "details" );
+       /* [ ..., error_object ] */
+    }
+```
+
+#### `kollos_throw()` method
+
+```
+    -- miranda: section+ C wrapper error handling
+    static inline int kollos_throw(lua_State* L,
+        lua_Integer code, const char* details)
+    {
+       kollos_error(L, code, details);
+       error_tostring(L);
+       return marpa_lua_error(L);
+    }
 ```
 
 ### Standard template methods
@@ -1395,7 +1428,7 @@ the wrapper's point of view, marpa_r_alternative() always succeeds.
 
 ```
 
-  -- miranda: section+ standard libmarpa wrappers
+  -- miranda: section standard libmarpa wrappers
   --[==[ miranda: exec
   local signatures = {
     -- {"marpa_g_completion_symbol_activate", "Marpa_Symbol_ID", "sym_id", "int", "activate"},
@@ -1404,7 +1437,7 @@ the wrapper's point of view, marpa_r_alternative() always succeeds.
     -- {"marpa_g_force_valued"},
     -- {"marpa_g_has_cycle"},
     -- {"marpa_g_highest_rule_id"},
-    -- {"marpa_g_highest_symbol_id"},
+    {"marpa_g_highest_symbol_id"},
     -- {"marpa_g_is_precomputed"},
     -- {"marpa_g_nulled_symbol_activate", "Marpa_Symbol_ID", "sym_id", "int", "activate"},
     -- {"marpa_g_precompute"},
@@ -1663,6 +1696,8 @@ Set "strict" globals, using code taken from strict.lua.
     -- miranda: section kollos_c
     -- miranda: language c
     -- miranda: insert preliminaries to the c library code
+    -- miranda: insert C wrapper error handling
+    -- miranda: insert C wrapper utilities
     -- miranda: insert kollos Lua library
     -- miranda: insert Lua interpreter management
     -- miranda: insert standard libmarpa wrappers
@@ -1671,12 +1706,209 @@ Set "strict" globals, using code taken from strict.lua.
 
 ```
     -- miranda: section kollos Lua library
-    static int marpa_luaopen_kollos(lua_State *L)
+    LUALIB_API int marpa_luaopen_kollos(lua_State *L);
+    LUALIB_API int marpa_luaopen_kollos(lua_State *L)
     {
         /* Create the main kollos object */
+        const int kollos_table_stack_ix = marpa_lua_gettop(L) + 1;
         marpa_lua_newtable(L);
+
+        /* Set up Kollos error handling metatable.
+           The metatable starts out empty.
+        */
+        marpa_lua_newtable(L);
+        /* [ kollos, error_mt ] */
+        marpa_lua_rawsetp(L, LUA_REGISTRYINDEX, &kollos_error_mt_key);
         /* [ kollos ] */
-        return 1;
+
+        /* Set up Kollos grammar userdata metatable */
+        marpa_lua_newtable(L);
+        /* [ kollos, mt_ud_g ] */
+        marpa_lua_pushcfunction(L, l_grammar_ud_mt_gc);
+        /* [ kollos, mt_g_ud, gc_function ] */
+        marpa_lua_setfield(L, -2, "__gc");
+        /* [ kollos, mt_g_ud ] */
+        marpa_lua_rawsetp(L, LUA_REGISTRYINDEX, &kollos_g_ud_mt_key);
+        /* [ kollos ] */
+
+        /* Set up Kollos recce userdata metatable */
+        marpa_lua_newtable(L);
+        /* [ kollos, mt_ud_r ] */
+        marpa_lua_pushcfunction(L, l_recce_ud_mt_gc);
+        /* [ kollos, mt_r_ud, gc_function ] */
+        marpa_lua_setfield(L, -2, "__gc");
+        /* [ kollos, mt_r_ud ] */
+        marpa_lua_rawsetp(L, LUA_REGISTRYINDEX, &kollos_r_ud_mt_key);
+        /* [ kollos ] */
+
+        /* Set up Kollos bocage userdata metatable */
+        marpa_lua_newtable(L);
+        /* [ kollos, mt_ud_bocage ] */
+        marpa_lua_pushcfunction(L, l_bocage_ud_mt_gc);
+        /* [ kollos, mt_b_ud, gc_function ] */
+        marpa_lua_setfield(L, -2, "__gc");
+        /* [ kollos, mt_b_ud ] */
+        marpa_lua_rawsetp(L, LUA_REGISTRYINDEX, &kollos_b_ud_mt_key);
+        /* [ kollos ] */
+
+        /* Set up Kollos order userdata metatable */
+        marpa_lua_newtable(L);
+        /* [ kollos, mt_ud_order ] */
+        marpa_lua_pushcfunction(L, l_order_ud_mt_gc);
+        /* [ kollos, mt_o_ud, gc_function ] */
+        marpa_lua_setfield(L, -2, "__gc");
+        /* [ kollos, mt_o_ud ] */
+        marpa_lua_rawsetp(L, LUA_REGISTRYINDEX, &kollos_o_ud_mt_key);
+        /* [ kollos ] */
+
+        /* Set up Kollos tree userdata metatable */
+        marpa_lua_newtable(L);
+        /* [ kollos, mt_ud_tree ] */
+        marpa_lua_pushcfunction(L, l_tree_ud_mt_gc);
+        /* [ kollos, mt_t_ud, gc_function ] */
+        marpa_lua_setfield(L, -2, "__gc");
+        /* [ kollos, mt_t_ud ] */
+        marpa_lua_rawsetp(L, LUA_REGISTRYINDEX, &kollos_t_ud_mt_key);
+        /* [ kollos ] */
+
+        /* Set up Kollos value userdata metatable */
+        marpa_lua_newtable(L);
+        /* [ kollos, mt_ud_value ] */
+        marpa_lua_pushcfunction(L, l_value_ud_mt_gc);
+        /* [ kollos, mt_v_ud, gc_function ] */
+        marpa_lua_setfield(L, -2, "__gc");
+        /* [ kollos, mt_v_ud ] */
+        marpa_lua_rawsetp(L, LUA_REGISTRYINDEX, &kollos_v_ud_mt_key);
+        /* [ kollos ] */
+
+        /* In alphabetical order by field name */
+
+        marpa_lua_pushcfunction(L, l_error_description_by_code);
+        /* [ kollos, function ] */
+        marpa_lua_setfield(L, kollos_table_stack_ix, "error_description");
+        /* [ kollos ] */
+
+        marpa_lua_pushcfunction(L, l_error_name_by_code);
+        marpa_lua_setfield(L, kollos_table_stack_ix, "error_name");
+
+        marpa_lua_pushcfunction(L, l_error_new);
+        marpa_lua_setfield(L, kollos_table_stack_ix, "error_new");
+
+        marpa_lua_pushcfunction(L, wrap_kollos_throw);
+        marpa_lua_setfield(L, kollos_table_stack_ix, "error_throw");
+
+        marpa_lua_pushcfunction(L, l_event_name_by_code);
+        marpa_lua_setfield(L, kollos_table_stack_ix, "event_name");
+
+        marpa_lua_pushcfunction(L, l_event_description_by_code);
+        marpa_lua_setfield(L, kollos_table_stack_ix, "event_description");
+
+        /* marpa_lua_pushcfunction(L, wrap_grammar_error); */
+        /* marpa_lua_setfield(L, kollos_table_stack_ix, "grammar_error"); */
+
+        /* marpa_lua_pushcfunction(L, wrap_grammar_event); */
+        /* marpa_lua_setfield(L, kollos_table_stack_ix, "grammar_event"); */
+
+        /* marpa_lua_pushcfunction(L, wrap_grammar_events); */
+        /* marpa_lua_setfield(L, kollos_table_stack_ix, "grammar_events"); */
+
+        /* marpa_lua_pushcfunction(L, wrap_grammar_new); */
+        /* marpa_lua_setfield(L, kollos_table_stack_ix, "grammar_new"); */
+
+        /* marpa_lua_pushcfunction(L, wrap_grammar_rule_new); */
+        /* marpa_lua_setfield(L, kollos_table_stack_ix, "grammar_rule_new"); */
+
+        /* marpa_lua_pushcfunction(L, wrap_recce_new); */
+        /* marpa_lua_setfield(L, kollos_table_stack_ix, "recce_new"); */
+
+        /* marpa_lua_pushcfunction(L, wrap_progress_item); */
+        /* marpa_lua_setfield(L, kollos_table_stack_ix, "recce_progress_item"); */
+
+        /* marpa_lua_pushcfunction(L, wrap_bocage_new); */
+        /* marpa_lua_setfield(L, kollos_table_stack_ix, "bocage_new"); */
+
+        /* marpa_lua_pushcfunction(L, wrap_order_new); */
+        /* marpa_lua_setfield(L, kollos_table_stack_ix, "order_new"); */
+
+        /* marpa_lua_pushcfunction(L, wrap_tree_new); */
+        /* marpa_lua_setfield(L, kollos_table_stack_ix, "tree_new"); */
+
+        /* marpa_lua_pushcfunction(L, wrap_value_new); */
+        /* marpa_lua_setfield(L, kollos_table_stack_ix, "value_new"); */
+
+        marpa_lua_newtable (L);
+        /* [ kollos, error_code_table ] */
+        {
+          const int name_table_stack_ix = marpa_lua_gettop (L);
+          int error_code;
+          for (error_code = LIBMARPA_MIN_ERROR_CODE;
+               error_code <= LIBMARPA_MAX_ERROR_CODE; error_code++)
+            {
+              marpa_lua_pushinteger (L, (lua_Integer) error_code);
+              marpa_lua_setfield (L, name_table_stack_ix,
+                            marpa_error_codes[error_code -
+                                                 LIBMARPA_MIN_ERROR_CODE].mnemonic);
+            }
+          for (error_code = KOLLOS_MIN_ERROR_CODE;
+               error_code <= KOLLOS_MAX_ERROR_CODE; error_code++)
+            {
+              marpa_lua_pushinteger (L, (lua_Integer) error_code);
+              marpa_lua_setfield (L, name_table_stack_ix,
+                            marpa_kollos_error_codes[error_code -
+                                               KOLLOS_MIN_ERROR_CODE].mnemonic);
+            }
+        }
+          /* if (1) dump_table(L, -1); */
+
+        /* [ kollos, error_code_table ] */
+        marpa_lua_setfield (L, kollos_table_stack_ix, "error_code_by_name");
+
+        marpa_lua_newtable (L);
+        /* [ kollos, event_code_table ] */
+        {
+          const int name_table_stack_ix = marpa_lua_gettop (L);
+          int event_code;
+          for (event_code = LIBMARPA_MIN_EVENT_CODE;
+               event_code <= LIBMARPA_MAX_EVENT_CODE; event_code++)
+            {
+              marpa_lua_pushinteger (L, (lua_Integer) event_code);
+              marpa_lua_setfield (L, name_table_stack_ix,
+                            marpa_event_codes[event_code -
+                                                 LIBMARPA_MIN_EVENT_CODE].mnemonic);
+            }
+        }
+          /* if (1) dump_table(L, -1); */
+
+        /* [ kollos, event_code_table ] */
+        marpa_lua_setfield (L, kollos_table_stack_ix, "event_code_by_name");
+
+    -- Place code here to go through the signatures table again,
+    -- to put the wrappers into kollos object fields
+    -- See okollos
+
+    /*
+        -- for ix = 1, #c_fn_signatures do
+           -- local signature = c_fn_signatures[ix]
+           -- local function_name = signature[1]
+           -- local unprefixed_name = function_name:gsub("^[_]?marpa_", "", 1);
+           -- local class_letter = unprefixed_name:gsub("_.*$", "", 1);
+           -- local wrapper_name = "wrap_" .. unprefixed_name;
+           -- io.write("  marpa_lua_pushcfunction(L, " .. wrapper_name .. ");\n")
+           -- local classless_name = function_name:gsub("^[_]?marpa_[^_]*_", "")
+           -- local initial_underscore = function_name:match('^_') and '_' or ''
+           -- local quoted_field_name = '"' .. initial_underscore .. libmarpa_class_name[class_letter] .. '_' .. classless_name .. '"'
+           -- io.write("  marpa_lua_setfield(L, kollos_table_stack_ix, " .. quoted_field_name .. ");\n")
+        -- end
+    */
+
+      /* [ kollos ] */
+      /* For debugging */
+      if (0) dump_table(L, -1);
+
+      /* Fail if not 5.1 ? */
+
+      /* [ kollos ] */
+      return 1;
     }
 ```
 
