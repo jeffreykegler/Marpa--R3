@@ -587,6 +587,9 @@ function section_output(fh, language_arg, name, prefix_arg)
      section_on_stack[name] = true
      -- print('sections on stack:', inspect(section_on_stack))
      local section = sections[name]
+     if not section then
+         error(string.format('Cannot find section name "%s"\n', name))
+     end
      local language = section.language or language_arg
      if language ~= 'c' and language ~= 'lua' then
          error(string.format('Bad language ("%s") for section "%s"', language, name))
