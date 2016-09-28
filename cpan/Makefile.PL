@@ -449,7 +449,6 @@ WriteMakefile(
         resources =>
             { repository => 'git://github.com/jeffreykegler/Marpa--R3.git', },
     },
-    NO_META  => 1,
     MAN1PODS => \%pod_files,
     LICENSE  => 'perl_5',
     OBJECT => 'xs/R3$(OBJ_EXT)',
