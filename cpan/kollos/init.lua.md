@@ -26,6 +26,8 @@ OTHER DEALINGS IN THE SOFTWARE.
 ../lua/lua toc.lua < init.lua.md
 -->
 * [About Kollos](#about-kollos)
+* [Kollos object](#kollos-object)
+* [Kollos Lua interpreter](#kollos-lua-interpreter)
 * [Kollos semantics](#kollos-semantics)
   * [VM operations](#vm-operations)
     * [VM debug operation](#vm-debug-operation)
@@ -65,7 +67,18 @@ OTHER DEALINGS IN THE SOFTWARE.
 * [The Kollos valuator](#the-kollos-valuator)
   * [Initialize a valuator](#initialize-a-valuator)
   * [Reset a valuator](#reset-a-valuator)
-* [Preliminaries to the main code](#preliminaries-to-the-main-code)
+* [Libmarpa interface](#libmarpa-interface)
+  * [Libmarpa interface utilities](#libmarpa-interface-utilities)
+  * [Standard template methods](#standard-template-methods)
+* [The main Lua code file](#the-main-lua-code-file)
+  * [Preliminaries to the main code](#preliminaries-to-the-main-code)
+* [The Kollos C code file](#the-kollos-c-code-file)
+  * [Preliminaries to the C library code](#preliminaries-to-the-c-library-code)
+* [The Kollos C header file](#the-kollos-c-header-file)
+  * [Preliminaries to the C header file](#preliminaries-to-the-c-header-file)
+* [Meta-coding utilities](#meta-coding-utilities)
+  * [Metacode execution sequence](#metacode-execution-sequence)
+  * [Dedent method](#dedent-method)
 
 ## About Kollos
 
@@ -1316,7 +1329,7 @@ A function to be called whenever a valuator is reset.
 
 ```
   -- miranda: section standard libmarpa wrappers
-  --[==[ miranda: exec check_libmarpa_table
+  --[==[ miranda: exec
     do
        local code = [=[
         |static void check_libmarpa_table(
@@ -1545,7 +1558,7 @@ the wrapper's point of view, marpa_r_alternative() always succeeds.
 
 ```
 
-# The main Lua code file
+## The main Lua code file
 
 ```
     -- miranda: section main
@@ -1562,7 +1575,7 @@ the wrapper's point of view, marpa_r_alternative() always succeeds.
     -- vim: set expandtab shiftwidth=4:
 ```
 
-## Preliminaries to the main code
+### Preliminaries to the main code
 
 Licensing, etc.
 
@@ -1644,7 +1657,7 @@ Set "strict" globals, using code taken from strict.lua.
 
 ```
 
-# The Kollos C code file
+## The Kollos C code file
 
 ```
     -- miranda: section kollos_c
@@ -1667,7 +1680,7 @@ Set "strict" globals, using code taken from strict.lua.
     }
 ```
 
-# Preliminaries to the C library code
+### Preliminaries to the C library code
 ```
     -- miranda: section preliminaries to the c library code
     /*
@@ -1715,7 +1728,7 @@ Set "strict" globals, using code taken from strict.lua.
     #endif
 ```
 
-# The Kollos C header file
+## The Kollos C header file
 
 ```
     -- miranda: section kollos_h
@@ -1736,7 +1749,7 @@ Set "strict" globals, using code taken from strict.lua.
     /* vim: set expandtab shiftwidth=4: */
 ```
 
-# Preliminaries to the C header file
+### Preliminaries to the C header file
 ```
     -- miranda: section preliminary comments of the c header file
 
@@ -1767,15 +1780,16 @@ Set "strict" globals, using code taken from strict.lua.
 
 ```
 
-# Meta-coding utilities
+## Meta-coding utilities
 
-## Metacode execution sequence
+### Metacode execution sequence
 
 ```
     -- miranda: sequence-exec metacode utilities
+    -- miranda: sequence-exec libmarpa interface globals
 ```
 
-## Dedent method
+### Dedent method
 
 A pipe symbol is used when inlining code to separate the code's indentation
 from the indentation used to display the code in this document.
