@@ -331,20 +331,6 @@ Deletes the interpreter if the reference count drops to zero.
 
 ```
 
-## Utilities for inline code
-
-A pipe symbol is used when inlining code to separate the code's indentation
-from the indentation used to display the code in this document.
-The `pipe_dedent` method removes the display indentation.
-
-```
-    --[==[ miranda: exec utilties for inline code
-    function pipe_dedent(code)
-        return code:gsub('\n *|', '\n'):gsub('^ *|', '', 1)
-    end
-    ]==]
-```
-
 ## Kollos semantics
 
 Initially, Marpa's semantics were performed using a VM (virtual machine)
@@ -1779,6 +1765,28 @@ Set "strict" globals, using code taken from strict.lua.
      * This file is auto-generated.
      */
 
+```
+
+# Meta-coding utilities
+
+## Metacode execution sequence
+
+```
+    -- miranda: sequence-exec metacode utilities
+```
+
+## Dedent method
+
+A pipe symbol is used when inlining code to separate the code's indentation
+from the indentation used to display the code in this document.
+The `pipe_dedent` method removes the display indentation.
+
+```
+    --[==[ miranda: exec metacode utilities
+    function pipe_dedent(code)
+        return code:gsub('\n *|', '\n'):gsub('^ *|', '', 1)
+    end
+    ]==]
 ```
 
 <!--

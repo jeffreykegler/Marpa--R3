@@ -49,34 +49,42 @@ setmetatable(user_code_env, { __index = _G })
 
 local exec_phase_sequence = {}
 
-function exec_user_code(code, tag)
+function exec_user_code(instruction)
+    local code = instruction.code
+    local tag = instruction.tag
+    print('exec_user_code: phase, tag', instruction.phase, tag)
     local user_code_f, error_msg = load(code, tag, 't', user_code_env)
     if not user_code_f then
         error(string.format(
             'Load error for code in "exec" command at line %d\n%s',
-            first_line_no, error_msg))
+            instruction:first_line(), error_msg))
     end
-    -- print('calling', tag)
     local ok, result = pcall(user_code_f)
     if not ok then
         error(string.format(
             'Error in "exec" command at line %d\n%s',
-            first_line_no, result))
+            instruction:first_line(), result))
     end
     local result_type = type(result)
     -- print('tag, type, result', tag, result_type, result)
-    if result_type == 'nil' then return '' end
-    if result_type == 'string' then return result end
+    if result_type == 'nil' then
+        instruction.text = ''
+        return
+    end
+    if result_type == 'string' then
+        instruction.text = result
+        return
+    end
     if result_type == 'table' then
         error(string.format(
             '"exec" command returned a table at line %d\n'
             .. '    table returns values are not yet implemented\n',
-            first_line_no))
+            instruction:first_line()))
     end
     error(string.format(
         '"exec" command returned a value of type "%s" at line %d\n'
         .. '    return value must be nil or a string\n',
-        result_type, first_line_no))
+        result_type, instruction:first_line()))
 end
 
 for arg_ix = 1,#arg do
@@ -282,7 +290,7 @@ function parse_instruction(first_line_no, last_line_no)
         instruction.type = words[1]
         local line_iter = body:gmatch('[^\n]+')
         local first_line = line_iter()
-        phase = phase:match('^[ ]*exec[%s](.*)$')
+        local phase = first_line:match('^[ ]*sequence[-]exec[%s](.*)$')
         if not phase then
             error(string.format(
                 'sequence-exec command has bad format at line %d\n'
@@ -294,6 +302,7 @@ function parse_instruction(first_line_no, last_line_no)
         end
         instruction.phase = phase
         exec_phase_sequence[#exec_phase_sequence+1] = phase
+        print('sequence-exec:', phase)
         return instruction
     end
     error(string.format(
@@ -321,10 +330,11 @@ do
     -- execute instructions which had their order specified in
     -- a 'sequence-exec' command
     for phase_ix = 1, #exec_phase_sequence do
+        local phase = exec_phase_sequence[phase_ix]
         local phase_instructions = instructions_by_phase[phase]
         for ix = 1, #phase_instructions do
             local instruction = phase_instructions[ix]
-            instruction.text = exec_user_code(instruction.code, instruction.tag)
+            exec_user_code(instruction)
         end
         -- delete phases once executed
         instructions_by_phase[phase] = nil
@@ -340,7 +350,7 @@ do
     table.sort(sorted_instructions, function (a, b) return a:first_line() < b:first_line() end)
     for ix = 1, #sorted_instructions do
         local instruction = sorted_instructions[ix]
-        instruction.text = exec_user_code(instruction.code, instruction.tag)
+        exec_user_code(instruction)
     end
 end
 
