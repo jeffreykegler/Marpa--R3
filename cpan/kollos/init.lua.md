@@ -1621,6 +1621,7 @@ Set "strict" globals, using code taken from strict.lua.
     -- miranda: section kollos_c
     -- miranda: language c
     -- miranda: insert preliminaries to the c library code
+    -- miranda: insert define event codes
     -- miranda: insert kollos Lua library
     -- miranda: insert Lua interpreter management
     -- miranda: insert standard libmarpa wrappers

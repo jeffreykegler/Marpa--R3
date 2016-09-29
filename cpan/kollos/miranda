@@ -127,6 +127,8 @@ for ix = 1,#inputs do
     first_line_by_file[input_file_name] = first_line_of_this_file
 end
 
+print(inspect(first_line_by_file))
+
 -- not terribly efficient for a large number of input files,
 -- but at this point I expect only a few
 local function show_file_line(line)
@@ -519,6 +521,8 @@ for start_instruction_ix, end_line in run_iter() do
     section[#section+1] = Run:new{ start_instruction_ix, end_line } 
     -- print(inspect(instruction), end_line)
 end
+
+print('sections:', inspect(sections))
 
 -- Returns an iterator of the instructions in a section.
 -- The optional second arg is the last line of the text run
