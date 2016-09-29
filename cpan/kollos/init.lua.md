@@ -1631,26 +1631,6 @@ Set "strict" globals, using code taken from strict.lua.
 
 ```
 
-    -- assumes that, when called, out_file to set to output file
-    local error_file
-    local event_file
-
-    local function c_safe_string (s)
-        s = string.gsub(s, '"', '\\034')
-        s = string.gsub(s, '\\', '\\092')
-        return '"' .. s .. '"'
-    end
-
-    for _,v in ipairs(arg) do
-       if not v:find("=")
-       then return nil, "Bad options: ", arg end
-       local id, val = v:match("^([^=]+)%=(.*)") -- no space around =
-       if id == "out" then io.output(val)
-       elseif id == "errors" then error_file = val
-       elseif id == "events" then event_file = val
-       else return nil, "Bad id in options: ", id end
-    end
-
     -- initial piece
     io.write[=[
     #define LUA_LIB
@@ -3570,6 +3550,7 @@ Set "strict" globals, using code taken from strict.lua.
 ### Metacode execution sequence
 
 ```
+    -- miranda: sequence-exec argument processing
     -- miranda: sequence-exec metacode utilities
     -- miranda: sequence-exec libmarpa interface globals
 ```
@@ -3584,6 +3565,42 @@ The `pipe_dedent` method removes the display indentation.
     --[==[ miranda: exec metacode utilities
     function pipe_dedent(code)
         return code:gsub('\n *|', '\n'):gsub('^ *|', '', 1)
+    end
+    ]==]
+```
+
+### `c_safe_string` method
+
+```
+    --[==[ miranda: exec metacode utilities
+    local function c_safe_string (s)
+        s = string.gsub(s, '"', '\\034')
+        s = string.gsub(s, '\\', '\\092')
+        return '"' .. s .. '"'
+    end
+    ]==]
+
+```
+
+### Meta code argument processing
+
+The arguments show where to find the files containing event
+and error codes.
+
+```
+    -- assumes that, when called, out_file to set to output file
+    --[==[ miranda: exec argument processing
+    local error_file
+    local event_file
+
+    for _,v in ipairs(arg) do
+       if not v:find("=")
+       then return nil, "Bad options: ", arg end
+       local id, val = v:match("^([^=]+)%=(.*)") -- no space around =
+       if id == "out" then io.output(val)
+       elseif id == "errors" then error_file = val
+       elseif id == "events" then event_file = val
+       else return nil, "Bad id in options: ", id end
     end
     ]==]
 ```

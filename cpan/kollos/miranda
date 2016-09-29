@@ -102,23 +102,45 @@ for arg_ix = 1,#arg do
     ::NEXT_ARG::
 end
 
-if #inputs ~= 1 then
-    error("There must be exactly one input file")
+local sections = {}
+local lines = {}
+local first_line_by_file = {}
+
+for ix = 1,#inputs do
+    local input_file_name = inputs[ix]
+    local input_handle
+    input_handle, error_message = io.open(input_file_name)
+    if not input_handle then error(error_message) end
+
+    local first_line_of_this_file = #lines+1
+
+    -- We need random access to the input, so we incur the
+    -- cost of reading the entire input into memory.
+    for line in input_handle:lines() do
+        if line:find('\t') then error("line contains tab: " .. line) end
+        if line:find(' $') then error("line has trailing space: " .. line) end
+        lines[#lines+1] = line
+    end
+    if (#lines < first_line_of_this_file) then
+        error("Empty input file: " .. input_file_name);
+    end
+    first_line_by_file[input_file_name] = first_line_of_this_file
 end
 
-local sections = {}
-
-local input_handle
-input_handle, error_message = io.open(inputs[1])
-if not input_handle then error(error_message) end
-
--- We need random access to the input, so we incur the
--- cost of reading the entire input into memory.
-local lines = {}
-for line in input_handle:lines() do
-    if line:find('\t') then error("line contains tab: " .. line) end
-    if line:find(' $') then error("line has trailing space: " .. line) end
-    lines[#lines+1] = line
+-- not terribly efficient for a large number of input files,
+-- but at this point I expect only a few
+local function show_file_line(line)
+   local closest_first_line = math.maxinteger()
+   local file_name = "???"
+   for this_file, this_first_line in pairs(first_line_by_file) do
+       if line < this_first_line then goto NEXT_FILE end
+       if this_first_line < closest_first_line then
+           closest_first_line = this_first_line
+           file_name = this_file
+       end
+       ::NEXT_FILE::
+    end
+    return file_name .. ':' .. (line - closest_first_line + 1)
 end
 
 local function problem_in_line(line_no)
