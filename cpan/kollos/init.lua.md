@@ -1175,7 +1175,7 @@ A function to be called whenever a valuator is reset.
 ```
     --[==[ miranda: exec libmarpa interface globals
 
-    local function c_type_of_libmarpa_type(libmarpa_type)
+    function c_type_of_libmarpa_type(libmarpa_type)
         if (libmarpa_type == 'int') then return 'int' end
         if (libmarpa_type == 'Marpa_Assertion_ID') then return 'int' end
         if (libmarpa_type == 'Marpa_Earley_Item_ID') then return 'int' end
@@ -1191,7 +1191,7 @@ A function to be called whenever a valuator is reset.
         return "!UNIMPLEMENTED!";
     end
 
-    local libmarpa_class_type = {
+    libmarpa_class_type = {
       g = "Marpa_Grammar",
       r = "Marpa_Recognizer",
       b = "Marpa_Bocage",
@@ -1200,7 +1200,7 @@ A function to be called whenever a valuator is reset.
       v = "Marpa_Value",
     };
 
-    local libmarpa_class_name = {
+    libmarpa_class_name = {
       g = "grammar",
       r = "recce",
       b = "bocage",
@@ -1354,8 +1354,8 @@ the wrapper's point of view, marpa_r_alternative() always succeeds.
 ```
 
   -- miranda: section standard libmarpa wrappers
-  --[==[ miranda: exec
-  local signatures = {
+  --[==[ miranda: exec declare standard libmarpa wrappers
+  signatures = {
     {"marpa_g_completion_symbol_activate", "Marpa_Symbol_ID", "sym_id", "int", "activate"},
     {"marpa_g_error_clear"},
     {"marpa_g_event_count"},
@@ -1514,6 +1514,24 @@ the wrapper's point of view, marpa_r_alternative() always succeeds.
   -- end of exec
   ]==]
 
+  -- miranda: section register standard libmarpa wrappers
+  --[==[ miranda: exec register standard libmarpa wrappers
+        local result = {}
+        for ix = 1, #signatures do
+           local signature = signatures[ix]
+           local function_name = signature[1]
+           local unprefixed_name = function_name:gsub("^[_]?marpa_", "", 1);
+           local class_letter = unprefixed_name:gsub("_.*$", "", 1);
+           local wrapper_name = "wrap_" .. unprefixed_name;
+           result[#result+1] = "  marpa_lua_pushcfunction(L, " .. wrapper_name .. ");\n"
+           local classless_name = function_name:gsub("^[_]?marpa_[^_]*_", "")
+           local initial_underscore = function_name:match('^_') and '_' or ''
+           local quoted_field_name = '"' .. initial_underscore .. libmarpa_class_name[class_letter] .. '_' .. classless_name .. '"'
+           result[#result+1] = "  marpa_lua_setfield(L, kollos_table_stack_ix, " .. quoted_field_name .. ");\n"
+        end
+        return table.concat(result)
+  ]==]
+
 ```
 
 ## The main Lua code file
@@ -1626,9 +1644,9 @@ Set "strict" globals, using code taken from strict.lua.
     -- miranda: insert declare event code structure
     -- miranda: insert define event codes
     -- miranda: insert stuff from okollos.c.lua
-    -- miranda: insert kollos Lua library
     -- miranda: insert Lua interpreter management
     -- miranda: insert standard libmarpa wrappers
+    -- miranda: insert define marpa_luaopen_kollos method
     /* vim: set expandtab shiftwidth=4: */
 ```
 
@@ -2967,7 +2985,7 @@ Set "strict" globals, using code taken from strict.lua.
 ### `marpa_luaopen_kollos`
 
 ```
-    -- miranda: section kollos Lua library
+    -- miranda: section define marpa_luaopen_kollos method
     LUALIB_API int marpa_luaopen_kollos(lua_State *L);
     LUALIB_API int marpa_luaopen_kollos(lua_State *L)
     {
@@ -3144,25 +3162,11 @@ Set "strict" globals, using code taken from strict.lua.
         /* [ kollos, event_code_table ] */
         marpa_lua_setfield (L, kollos_table_stack_ix, "event_code_by_name");
 
+    -- miranda: insert register standard libmarpa wrappers
     /* Place code here to go through the signatures table again,
      * to put the wrappers into kollos object fields
      * See okollos
      */
-
-    /*
-        -- for ix = 1, #c_fn_signatures do
-           -- local signature = c_fn_signatures[ix]
-           -- local function_name = signature[1]
-           -- local unprefixed_name = function_name:gsub("^[_]?marpa_", "", 1);
-           -- local class_letter = unprefixed_name:gsub("_.*$", "", 1);
-           -- local wrapper_name = "wrap_" .. unprefixed_name;
-           -- io.write("  marpa_lua_pushcfunction(L, " .. wrapper_name .. ");\n")
-           -- local classless_name = function_name:gsub("^[_]?marpa_[^_]*_", "")
-           -- local initial_underscore = function_name:match('^_') and '_' or ''
-           -- local quoted_field_name = '"' .. initial_underscore .. libmarpa_class_name[class_letter] .. '_' .. classless_name .. '"'
-           -- io.write("  marpa_lua_setfield(L, kollos_table_stack_ix, " .. quoted_field_name .. ");\n")
-        -- end
-    */
 
       /* [ kollos ] */
       /* For debugging */
@@ -3286,6 +3290,8 @@ Set "strict" globals, using code taken from strict.lua.
     -- miranda: sequence-exec argument processing
     -- miranda: sequence-exec metacode utilities
     -- miranda: sequence-exec libmarpa interface globals
+    -- miranda: sequence-exec declare standard libmarpa wrappers
+    -- miranda: sequence-exec register standard libmarpa wrappers
 ```
 
 ### Dedent method
