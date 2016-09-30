@@ -1635,26 +1635,6 @@ Set "strict" globals, using code taken from strict.lua.
 
     -- initial piece
     io.write[=[
-    #define LUA_LIB
-    #include "marpa.h"
-    #include "lua.h"
-    #include "lauxlib.h"
-
-    #undef UNUSED
-    #if     __GNUC__ >  2 || (__GNUC__ == 2 && __GNUC_MINOR__ >  4)
-    #define UNUSED __attribute__((__unused__))
-    #else
-    #define UNUSED
-    #endif
-
-    #if defined(_MSC_VER)
-    #define inline __inline
-    #define __PRETTY_FUNCTION__ __FUNCTION__
-    #endif
-
-    #define EXPECTED_LIBMARPA_MAJOR 8
-    #define EXPECTED_LIBMARPA_MINOR 3
-    #define EXPECTED_LIBMARPA_MICRO 0
 
     /* For debugging */
     static void dump_stack (lua_State *L) {
@@ -3298,8 +3278,6 @@ Set "strict" globals, using code taken from strict.lua.
      */
 
     #include "marpa.h"
-    #include "lua.h"
-    #include "lauxlib.h"
     #include "kollos.h"
 
     #undef UNUSED
@@ -3313,6 +3291,11 @@ Set "strict" globals, using code taken from strict.lua.
     #define inline __inline
     #define __PRETTY_FUNCTION__ __FUNCTION__
     #endif
+
+    #define EXPECTED_LIBMARPA_MAJOR 8
+    #define EXPECTED_LIBMARPA_MINOR 4
+    #define EXPECTED_LIBMARPA_MICRO 0
+
 ```
 
 ## The Kollos C header file
