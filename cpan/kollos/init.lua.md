@@ -1310,7 +1310,7 @@ A function to be called whenever a valuator is reset.
        -- stack is [ self, throw_flag ]
        result[#result+1] = "    throw_flag = marpa_lua_toboolean (L, -1);\n"
        result[#result+1] = '    if (throw_flag) {\n'
-       result[#result+1] = '        kollos_throw( L, marpa_error, ', wrapper_name_as_c_string, ');\n'
+       result[#result+1] = '        kollos_throw( L, marpa_error, ' .. wrapper_name_as_c_string .. ');\n'
        result[#result+1] = '    }\n'
        result[#result+1] = "  }\n"
        result[#result+1] = "  marpa_lua_pushinteger(L, (lua_Integer)result);\n"
@@ -1621,8 +1621,11 @@ Set "strict" globals, using code taken from strict.lua.
     -- miranda: section kollos_c
     -- miranda: language c
     -- miranda: insert preliminaries to the c library code
+    -- miranda: insert declare error code structure
     -- miranda: insert define error codes
+    -- miranda: insert declare event code structure
     -- miranda: insert define event codes
+    -- miranda: insert stuff from okollos.c.lua
     -- miranda: insert kollos Lua library
     -- miranda: insert Lua interpreter management
     -- miranda: insert standard libmarpa wrappers
@@ -1633,8 +1636,7 @@ Set "strict" globals, using code taken from strict.lua.
 
 ```
 
-    -- initial piece
-    io.write[=[
+    -- miranda: section stuff from okollos.c.lua
 
     /* For debugging */
     static void dump_stack (lua_State *L) {
@@ -1735,35 +1737,34 @@ Set "strict" globals, using code taken from strict.lua.
         /* Back to original stack: [ ... ] */
     }
 
-    ]=]
+    -- miranda: section declare error code structure
+    /* error codes */
 
-    -- error codes
-
-    io.write[=[
     struct s_libmarpa_error_code {
        lua_Integer code;
        const char* mnemonic;
        const char* description;
     };
 
-    ]=]
+    -- miranda: section+ stuff from okollos.c.lua
 
-    -- error objects
-    --
-    -- There are written in C, but not because of efficiency --
-    -- efficiency is not needed, and in any case, when the overhead
-    -- from the use of the debug calls is considered, is not really
-    -- gained.
-    --
-    -- The reason for the use of C is that the error routines
-    -- must be available for use inside both C and Lua, and must
-    -- also be available as early as possible during set up.
-    -- It's possible to run Lua code both inside C and early in
-    -- the set up, but the added unclarity, complexity from issues
-    -- of error reporting for the Lua code, etc., etc. mean that
-    -- it actually is easier to write them in C than in Lua.
+    /* error objects
+     *
+     * There are written in C, but not because of efficiency --
+     * efficiency is not needed, and in any case, when the overhead
+     * from the use of the debug calls is considered, is not really
+     * gained.
+     *
+     * The reason for the use of C is that the error routines
+     * must be available for use inside both C and Lua, and must
+     * also be available as early as possible during set up.
+     * It's possible to run Lua code both inside C and early in
+     * the set up, but the added unclarity, complexity from issues
+     * of error reporting for the Lua code, etc., etc. mean that
+     * it actually is easier to write them in C than in Lua.
+     */
 
-    io.write[=[
+    -- miranda: section+ stuff from okollos.c.lua
 
     static inline const char* error_description_by_code(lua_Integer error_code)
     {
@@ -1813,11 +1814,7 @@ Set "strict" globals, using code taken from strict.lua.
        return 1;
     }
 
-    ]=]
-
-    -- event codes
-
-    io.write[=[
+    -- miranda: section declare event code structure
 
     struct s_libmarpa_event_code {
        lua_Integer code;
@@ -1825,9 +1822,7 @@ Set "strict" globals, using code taken from strict.lua.
        const char* description;
     };
 
-    ]=]
-
-    io.write[=[
+    -- miranda: section+ stuff from okollos.c.lua
 
     static inline const char* event_description_by_code(lua_Integer event_code)
     {
@@ -1871,9 +1866,7 @@ Set "strict" globals, using code taken from strict.lua.
        return 1;
     }
 
-    ]=]
-
-    io.write[=[
+    -- miranda: section+ stuff from okollos.c.lua
 
     /* userdata metatable keys
        The contents of these locations are never examined.
@@ -2048,11 +2041,9 @@ Set "strict" globals, using code taken from strict.lua.
        /* NOTREACHED */
     }
 
-    ]=]
+    -- miranda: section+ stuff from okollos.c.lua
 
-    -- functions
-
-    io.write[=[
+    /* functions */
 
     static void luif_err_throw(lua_State *L, int error_code) {
 
@@ -2112,60 +2103,9 @@ Set "strict" globals, using code taken from strict.lua.
       /* stack is [ ... ] */
     }
 
-    ]=]
+    -- miranda: section+ stuff from okollos.c.lua
 
-    -- Here are the meta-programmed wrappers --
-    -- this is Lua code which writes the C code based on
-    -- a "signature" for the wrapper
-    --
-    -- This meta-programming does not attempt to work for
-    -- all of the wrappers.  It works only when
-    --   1.) The number of arguments is fixed.
-    --   2.) Their type is from a fixed list.
-    --   3.) Converting the return value to int is a good thing to do.
-    --   4.) Non-negative return values indicate success
-    --   5.) Return values less than -1 indicate failure
-    --   6.) Return values less than -1 set the error code
-    --   7.) Return value of -1 is "soft" and returning nil is
-    --       the right thing to do
-
-    local function c_type_of_libmarpa_type(libmarpa_type)
-        if (libmarpa_type == 'int') then return 'int' end
-        if (libmarpa_type == 'Marpa_Assertion_ID') then return 'int' end
-        if (libmarpa_type == 'Marpa_Earley_Item_ID') then return 'int' end
-        if (libmarpa_type == 'Marpa_AHM_ID') then return 'int' end
-        if (libmarpa_type == 'Marpa_IRL_ID') then return 'int' end
-        if (libmarpa_type == 'Marpa_NSY_ID') then return 'int' end
-        if (libmarpa_type == 'Marpa_Or_Node_ID') then return 'int' end
-        if (libmarpa_type == 'Marpa_And_Node_ID') then return 'int' end
-        if (libmarpa_type == 'Marpa_Rank') then return 'int' end
-        if (libmarpa_type == 'Marpa_Rule_ID') then return 'int' end
-        if (libmarpa_type == 'Marpa_Symbol_ID') then return 'int' end
-        if (libmarpa_type == 'Marpa_Earley_Set_ID') then return 'int' end
-        return "!UNIMPLEMENTED!";
-    end
-
-    local libmarpa_class_type = {
-      g = "Marpa_Grammar",
-      r = "Marpa_Recognizer",
-      b = "Marpa_Bocage",
-      o = "Marpa_Order",
-      t = "Marpa_Tree",
-      v = "Marpa_Value",
-    };
-
-    local libmarpa_class_name = {
-      g = "grammar",
-      r = "recce",
-      b = "bocage",
-      o = "order",
-      t = "tree",
-      v = "value",
-    };
-
-    -- grammar wrappers which need to be hand written
-
-    io.write[=[
+    /* grammar wrappers which need to be hand written */
 
     /* Handle libmarpa grammar errors in the most usual way.
        Uses 1 position on the stack, and throws the
@@ -2599,11 +2539,9 @@ Set "strict" globals, using code taken from strict.lua.
         return 1;
     }
 
-    ]=]
+    -- miranda: section+ stuff from okollos.c.lua
 
-    -- recognizer wrappers which need to be hand-written
-
-    io.write[=[
+    /* recognizer wrappers which need to be hand-written */
 
     static int
     wrap_recce_new (lua_State * L)
@@ -2691,11 +2629,9 @@ Set "strict" globals, using code taken from strict.lua.
       return 3;
     }
 
-    ]=]
+    -- miranda: section+ stuff from okollos.c.lua
 
-    -- bocage wrappers which need to be hand-written
-
-    io.write[=[
+    /* bocage wrappers which need to be hand-written */
 
     static int
     wrap_bocage_new (lua_State * L)
@@ -2788,11 +2724,9 @@ Set "strict" globals, using code taken from strict.lua.
         return 1;
     }
 
-    ]=]
+    -- miranda: section+ stuff from okollos.c.lua
 
-    -- order wrappers which need to be hand-written
-
-    io.write[=[
+    /* order wrappers which need to be hand-written */
 
     static int
     wrap_order_new (lua_State * L)
@@ -2849,11 +2783,9 @@ Set "strict" globals, using code taken from strict.lua.
       return 1;
     }
 
-    ]=]
+    -- miranda: section+ stuff from okollos.c.lua
 
-    -- tree wrappers which need to be hand-written
-
-    io.write[=[
+    /* tree wrappers which need to be hand-written */
 
     static int
     wrap_tree_new (lua_State * L)
@@ -2913,11 +2845,10 @@ Set "strict" globals, using code taken from strict.lua.
       return 1;
     }
 
-    ]=]
+    -- miranda: section+ stuff from okollos.c.lua
 
-    -- value wrappers which need to be hand-written
+    /* value wrappers which need to be hand-written */
 
-    io.write[=[
 
     static int
     wrap_value_new (lua_State * L)
@@ -2977,10 +2908,7 @@ Set "strict" globals, using code taken from strict.lua.
       return 1;
     }
 
-    ]=]
-
-
-    io.write[=[
+    -- miranda: section+ stuff from okollos.c.lua
 
     /*
      * Userdata metatable methods
@@ -3034,7 +2962,6 @@ Set "strict" globals, using code taken from strict.lua.
        return 0;
     }
 
-    ]=]
 ```
 
 ### `marpa_luaopen_kollos`
@@ -3217,9 +3144,10 @@ Set "strict" globals, using code taken from strict.lua.
         /* [ kollos, event_code_table ] */
         marpa_lua_setfield (L, kollos_table_stack_ix, "event_code_by_name");
 
-    -- Place code here to go through the signatures table again,
-    -- to put the wrappers into kollos object fields
-    -- See okollos
+    /* Place code here to go through the signatures table again,
+     * to put the wrappers into kollos object fields
+     * See okollos
+     */
 
     /*
         -- for ix = 1, #c_fn_signatures do
