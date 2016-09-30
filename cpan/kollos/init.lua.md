@@ -153,7 +153,7 @@ because it uses a lot of PERL/XS data structures.
     -- miranda: section+ C function declarations
     #define MT_NAME_RECCE "Marpa_recce"
     int kollos_recce_new(lua_State* L, void* slr);
-    -- miranda: section+ Lua interpreter management
+    -- miranda: section+ lua interpreter management
     int kollos_recce_new(lua_State* L, void* slr)
     {
         int lua_id;
@@ -190,7 +190,7 @@ because it uses a lot of PERL/XS data structures.
 ```
 
 ```
-    -- miranda: section+ Lua interpreter management
+    -- miranda: section+ lua interpreter management
     static int default_warn(const char *format, ...)
     {
        va_list args;
@@ -211,7 +211,7 @@ and takes ownership of it.
 
     -- miranda: section+ C function declarations
     void kollos_refinc(lua_State* L);
-    -- miranda: section+ Lua interpreter management
+    -- miranda: section+ lua interpreter management
     void kollos_refinc(lua_State* L)
     {
         struct kollos_extraspace *p_extra =
@@ -228,7 +228,7 @@ Deletes the interpreter if the reference count drops to zero.
 
     -- miranda: section+ C function declarations
     void kollos_refdec(lua_State* L);
-    -- miranda: section+ Lua interpreter management
+    -- miranda: section+ lua interpreter management
     void kollos_refdec(lua_State* L)
     {
         struct kollos_extraspace *p_extra =
@@ -248,7 +248,7 @@ Set the warning function of the Kollos interpreter.
 
     -- miranda: section+ C function declarations
     void kollos_warn_set(lua_State* L, int (*warn)(const char * format, ...));
-    -- miranda: section+ Lua interpreter management
+    -- miranda: section+ lua interpreter management
     void kollos_warn_set(lua_State* L, int (*warn)(const char * format, ...))
     {
        struct kollos_extraspace *p_extra =
@@ -264,7 +264,7 @@ Write a warning message using Kollos's warning handler.
 
     -- miranda: section+ C function declarations
     void kollos_warn(lua_State* L, const char * format, ...);
-    -- miranda: section+ Lua interpreter management
+    -- miranda: section+ lua interpreter management
     void kollos_warn(lua_State* L, const char * format, ...)
     {
        va_list args;
@@ -287,7 +287,7 @@ and takes ownership of it.
 
     -- miranda: section+ C function declarations
     void kollos_tblrefinc(lua_State* L, int lua_ref);
-    -- miranda: section+ Lua interpreter management
+    -- miranda: section+ lua interpreter management
     void kollos_tblrefinc(lua_State* L, int lua_ref)
     {
         const int base_of_stack = marpa_lua_gettop(L);
@@ -315,7 +315,7 @@ Deletes the interpreter if the reference count drops to zero.
 
     -- miranda: section+ C function declarations
     void kollos_tblrefdec(lua_State* L, int lua_ref);
-    -- miranda: section+ Lua interpreter management
+    -- miranda: section+ lua interpreter management
     void kollos_tblrefdec(lua_State* L, int lua_ref)
     {
         const int base_of_stack = marpa_lua_gettop(L);
@@ -1644,9 +1644,9 @@ Set "strict" globals, using code taken from strict.lua.
     -- miranda: insert declare event code structure
     -- miranda: insert define event codes
     -- miranda: insert stuff from okollos.c.lua
-    -- miranda: insert Lua interpreter management
     -- miranda: insert standard libmarpa wrappers
     -- miranda: insert define marpa_luaopen_kollos method
+    -- miranda: insert lua interpreter management
     /* vim: set expandtab shiftwidth=4: */
 ```
 
@@ -1657,6 +1657,7 @@ Set "strict" globals, using code taken from strict.lua.
     -- miranda: section stuff from okollos.c.lua
 
     /* For debugging */
+    static void dump_stack (lua_State *L) UNUSED;
     static void dump_stack (lua_State *L) {
           int i;
           int top = marpa_lua_gettop(L);
@@ -2986,8 +2987,7 @@ Set "strict" globals, using code taken from strict.lua.
 
 ```
     -- miranda: section define marpa_luaopen_kollos method
-    LUALIB_API int marpa_luaopen_kollos(lua_State *L);
-    LUALIB_API int marpa_luaopen_kollos(lua_State *L)
+    static int marpa_luaopen_kollos(lua_State *L)
     {
         /* Create the main kollos object */
         const int kollos_table_stack_ix = marpa_lua_gettop(L) + 1;
