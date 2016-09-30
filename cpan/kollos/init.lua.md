@@ -3065,38 +3065,38 @@ Set "strict" globals, using code taken from strict.lua.
         marpa_lua_pushcfunction(L, l_event_description_by_code);
         marpa_lua_setfield(L, kollos_table_stack_ix, "event_description");
 
-        /* marpa_lua_pushcfunction(L, wrap_grammar_error); */
-        /* marpa_lua_setfield(L, kollos_table_stack_ix, "grammar_error"); */
+        marpa_lua_pushcfunction(L, wrap_grammar_error);
+        marpa_lua_setfield(L, kollos_table_stack_ix, "grammar_error");
 
-        /* marpa_lua_pushcfunction(L, wrap_grammar_event); */
-        /* marpa_lua_setfield(L, kollos_table_stack_ix, "grammar_event"); */
+        marpa_lua_pushcfunction(L, wrap_grammar_event);
+        marpa_lua_setfield(L, kollos_table_stack_ix, "grammar_event");
 
-        /* marpa_lua_pushcfunction(L, wrap_grammar_events); */
-        /* marpa_lua_setfield(L, kollos_table_stack_ix, "grammar_events"); */
+        marpa_lua_pushcfunction(L, wrap_grammar_events);
+        marpa_lua_setfield(L, kollos_table_stack_ix, "grammar_events");
 
-        /* marpa_lua_pushcfunction(L, wrap_grammar_new); */
-        /* marpa_lua_setfield(L, kollos_table_stack_ix, "grammar_new"); */
+        marpa_lua_pushcfunction(L, wrap_grammar_new);
+        marpa_lua_setfield(L, kollos_table_stack_ix, "grammar_new");
 
-        /* marpa_lua_pushcfunction(L, wrap_grammar_rule_new); */
-        /* marpa_lua_setfield(L, kollos_table_stack_ix, "grammar_rule_new"); */
+        marpa_lua_pushcfunction(L, wrap_grammar_rule_new);
+        marpa_lua_setfield(L, kollos_table_stack_ix, "grammar_rule_new");
 
-        /* marpa_lua_pushcfunction(L, wrap_recce_new); */
-        /* marpa_lua_setfield(L, kollos_table_stack_ix, "recce_new"); */
+        marpa_lua_pushcfunction(L, wrap_recce_new);
+        marpa_lua_setfield(L, kollos_table_stack_ix, "recce_new");
 
-        /* marpa_lua_pushcfunction(L, wrap_progress_item); */
-        /* marpa_lua_setfield(L, kollos_table_stack_ix, "recce_progress_item"); */
+        marpa_lua_pushcfunction(L, wrap_progress_item);
+        marpa_lua_setfield(L, kollos_table_stack_ix, "recce_progress_item");
 
-        /* marpa_lua_pushcfunction(L, wrap_bocage_new); */
-        /* marpa_lua_setfield(L, kollos_table_stack_ix, "bocage_new"); */
+        marpa_lua_pushcfunction(L, wrap_bocage_new);
+        marpa_lua_setfield(L, kollos_table_stack_ix, "bocage_new");
 
-        /* marpa_lua_pushcfunction(L, wrap_order_new); */
-        /* marpa_lua_setfield(L, kollos_table_stack_ix, "order_new"); */
+        marpa_lua_pushcfunction(L, wrap_order_new);
+        marpa_lua_setfield(L, kollos_table_stack_ix, "order_new");
 
-        /* marpa_lua_pushcfunction(L, wrap_tree_new); */
-        /* marpa_lua_setfield(L, kollos_table_stack_ix, "tree_new"); */
+        marpa_lua_pushcfunction(L, wrap_tree_new);
+        marpa_lua_setfield(L, kollos_table_stack_ix, "tree_new");
 
-        /* marpa_lua_pushcfunction(L, wrap_value_new); */
-        /* marpa_lua_setfield(L, kollos_table_stack_ix, "value_new"); */
+        marpa_lua_pushcfunction(L, wrap_value_new);
+        marpa_lua_setfield(L, kollos_table_stack_ix, "value_new");
 
         marpa_lua_newtable (L);
         /* [ kollos, error_code_table ] */
