@@ -2064,6 +2064,7 @@ Set "strict" globals, using code taken from strict.lua.
 
     /* functions */
 
+    static void luif_err_throw(lua_State *L, int error_code) UNUSED;
     static void luif_err_throw(lua_State *L, int error_code) {
 
     #if 0
