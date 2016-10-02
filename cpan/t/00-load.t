@@ -47,7 +47,7 @@ Test::More::diag($libmarpa_version_desc);
 Test::More::diag('Libmarpa tag: ' . Marpa::R3::Thin::tag());
 
 my $grammar;
-my $eval_ok = eval { $grammar = Marpa::R3::Thin::G->new( { if => 1 } ); 1 };
+my $eval_ok = eval { $grammar = Marpa::R3::Thin::G->new( {} ); 1 };
 Test::More::diag($EVAL_ERROR) if not $eval_ok;
 Test::More::ok( ($eval_ok && $grammar), 'Thin grammar created' )
     or Test::More::BAIL_OUT('Could not create Marpa grammar');

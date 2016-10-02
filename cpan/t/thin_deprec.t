@@ -28,7 +28,7 @@ use English qw( -no_match_vars );
 use Fatal qw( close open );
 use Marpa::R3;
 
-my $grammar = Marpa::R3::Thin::G->new( { if => 1 } );
+my $grammar = Marpa::R3::Thin::G->new({});
 $grammar->force_valued();
 my $symbol_S = $grammar->symbol_new();
 my $symbol_E = $grammar->symbol_new();
@@ -148,7 +148,7 @@ for my $actual_value (@actual_values) {
 # For the error methods, start clean,
 # with a new, trivial grammar
 $grammar = $recce = $bocage = $order = $tree = undef;
-$grammar = Marpa::R3::Thin::G->new( { if => 1 } );
+$grammar = Marpa::R3::Thin::G->new({});
 $grammar->force_valued();
 
 my ( $error_code, $error_description ) = $grammar->error();

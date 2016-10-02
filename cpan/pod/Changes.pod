@@ -39,12 +39,14 @@ it now has little or now usage.
 The THIF is subject to major change, or outright removal,
 without further notice.
 
-=head2 The NAIF is deprecated
+The 'if' argument of the new() method for thin grammars
+has been eliminated.
 
-The NAIF is an older interface using hashes of named
+=head2 The NAIF has been removed
+
+The NAIF was an older interface using hashes of named
 variables, instead of a DSL.
-It is now severely deprecated.
-Expect it to be broken or removed shortly.
+It has been removed.
 
 =head2 LATM is now the default
 

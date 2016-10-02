@@ -639,41 +639,20 @@ name: Thin example
 partial: 1
 normalize-whitespace: 1
 
-    my $grammar = Marpa::R3::Thin::G->new( { if => 1 } );
+    my $grammar = Marpa::R3::Thin::G->new({});
 
 =for Marpa::R3::Display::End
 
 The one argument to the Marpa thin interface's
 grammar constructor,
 is a reference to a hash of named arguments.
+The hash argument is required, though it may be empty.
+At present, none of these named arguments are documented.
+
 On success,
 the return value is a thin interface grammar object.
 C<new()> does not obey the throw setting --
 errors are always thrown.
-
-At present the only named argument allowed is C<if>,
-the interface number.
-This argument is required and currently is required
-to have a value of 1,
-which specifies interface 1.
-The intent of the C<if> argument is to provide
-for backward compatibility in the future.
-
-Although there is no error message or warning if the hash
-ref argument
-is omitted, new code should treat
-the hash ref argument as a required argument.
-Calling C<new()> without an argument is deprecated.
-If the hash ref argument is omitted, the thin
-layer uses interface 0.
-Interface 0 cannot be specified directly,
-and is deprecated.
-The difference between interface 0 and interface 1
-is that, in interface 0, the default throw setting
-of the newly created grammar object
-is unspecified.
-(In fact, the interface 0 throw setting depends on an
-undocumented and deprecated global variable.)
 
 =head2 C<< $g->event() >>
 
@@ -1477,7 +1456,7 @@ L<above|"The general pattern">.
 name: Thin example
 normalize-whitespace: 1
 
-    my $grammar = Marpa::R3::Thin::G->new( { if => 1 } );
+    my $grammar = Marpa::R3::Thin::G->new({});
     $grammar->force_valued();
     my $symbol_S = $grammar->symbol_new();
     my $symbol_E = $grammar->symbol_new();

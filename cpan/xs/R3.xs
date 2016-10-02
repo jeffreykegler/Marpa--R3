@@ -3220,50 +3220,34 @@ PPCODE:
   Marpa_Grammar g;
   G_Wrapper *g_wrapper;
   int throw = 1;
-  IV interface = 0;
   Marpa_Config marpa_configuration;
   int error_code;
 
-  switch (items)
-    {
-    case 1:
+  if (items != 2) {
+      croak ("$g->new() must have one argument, a hash");
+  }
+  {
+    I32 retlen;
+    char *key;
+    SV *arg_value;
+    SV *arg = ST (1);
+    HV *named_args;
+    if (!SvROK (arg) || SvTYPE (SvRV (arg)) != SVt_PVHV)
+      croak ("Problem in $g->new(): argument is not hash ref");
+    named_args = (HV *) SvRV (arg);
+    hv_iterinit (named_args);
+    while ((arg_value = hv_iternextsv (named_args, &key, &retlen)))
       {
-        /* If we are using the (deprecated) interface 0,
-         * get the throw setting from a (deprecated) global variable
-         */
-        SV *throw_sv = get_sv ("Marpa::R3::Thin::C::THROW", 0);
-        throw = throw_sv && SvTRUE (throw_sv);
-      }
-      break;
-    case 2:
-      {
-        I32 retlen;
-        char *key;
-        SV *arg_value;
-        SV *arg = ST (1);
-        HV *named_args;
-        if (!SvROK (arg) || SvTYPE (SvRV (arg)) != SVt_PVHV)
-          croak ("Problem in $g->new(): argument is not hash ref");
-        named_args = (HV *) SvRV (arg);
-        hv_iterinit (named_args);
-        while ((arg_value = hv_iternextsv (named_args, &key, &retlen)))
+        if ((*key == 't') && strnEQ (key, "throw", (unsigned) retlen))
           {
-            if ((*key == 'i') && strnEQ (key, "if", (unsigned) retlen))
+            throw = SvIV (arg_value);
+            if (throw != 1 && throw != 0)
               {
-                interface = SvIV (arg_value);
-                if (interface != 1)
-                  {
-                    croak ("Problem in $g->new(): interface value must be 1");
-                  }
-                continue;
+                croak ("Problem in $g->new(): throw value must be 1 or 0");
               }
-            croak ("Problem in $g->new(): unknown named argument: %s", key);
+            continue;
           }
-        if (interface != 1)
-          {
-            croak
-              ("Problem in $g->new(): 'interface' named argument is required");
-          }
+        croak ("Problem in $g->new(): unknown named argument: %s", key);
       }
     }
 
