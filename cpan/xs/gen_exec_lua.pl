@@ -228,28 +228,6 @@ PPCODE:
 MODULE = Marpa::R3            PACKAGE = Marpa::R3::Lua
 
 void
-raw_exec( lua_wrapper, codestr, ... )
-   Marpa_Lua* lua_wrapper;
-   char* codestr;
-PPCODE:
-{
-    const int is_method = 0;
-    lua_State *const L = lua_wrapper->L;
-    const int base_of_stack = marpa_lua_gettop (L);
-    const int load_status =
-        marpa_luaL_loadbuffer (L, codestr, strlen (codestr), codestr);
-
-    if (load_status != 0) {
-        const char *error_string = marpa_lua_tostring (L, -1);
-        marpa_lua_pop (L, 1);
-        croak ("Marpa::R3::Lua error in luaL_loadbuffer: %s",
-            error_string);
-    }
-
-    === LUA EXEC BODY ===
-}
-
-void
 exec( lua_wrapper, codestr, ... )
    Marpa_Lua* lua_wrapper;
    char* codestr;
