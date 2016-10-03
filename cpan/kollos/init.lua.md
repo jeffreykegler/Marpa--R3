@@ -68,17 +68,20 @@ OTHER DEALINGS IN THE SOFTWARE.
   * [Initialize a valuator](#initialize-a-valuator)
   * [Reset a valuator](#reset-a-valuator)
 * [Libmarpa interface](#libmarpa-interface)
-  * [Libmarpa interface utilities](#libmarpa-interface-utilities)
   * [Standard template methods](#standard-template-methods)
 * [The main Lua code file](#the-main-lua-code-file)
   * [Preliminaries to the main code](#preliminaries-to-the-main-code)
 * [The Kollos C code file](#the-kollos-c-code-file)
+  * [Stuff from okollos](#stuff-from-okollos)
+  * [`marpa_luaopen_kollos`](#marpa-luaopen-kollos)
   * [Preliminaries to the C library code](#preliminaries-to-the-c-library-code)
 * [The Kollos C header file](#the-kollos-c-header-file)
   * [Preliminaries to the C header file](#preliminaries-to-the-c-header-file)
 * [Meta-coding utilities](#meta-coding-utilities)
   * [Metacode execution sequence](#metacode-execution-sequence)
   * [Dedent method](#dedent-method)
+  * [`c_safe_string` method](#c-safe-string-method)
+  * [Meta code argument processing](#meta-code-argument-processing)
 
 ## About Kollos
 
@@ -3169,14 +3172,50 @@ Set "strict" globals, using code taken from strict.lua.
      * See okollos
      */
 
-      /* [ kollos ] */
+    /* [ kollos ] */
+    -- miranda: insert create sandbox table
+
       /* For debugging */
       if (0) dump_table(L, -1);
 
-      /* Fail if not 5.1 ? */
-
       /* [ kollos ] */
       return 1;
+    }
+```
+
+### Create a sandbox
+
+Given a Lua state,
+create a table, which can be used
+as a "sandbox" for protect the global environment
+from user code.
+The table is named `sandbox` and itself *is*
+kept in the global environment.
+This code only creates the sandbox, it does not
+set it as an environment -- it is assumed that
+that will be done later,
+after to-be-sandboxed Lua code is loaded,
+but before it is executed.
+Not Lua-callable, but leaves the stack as before.
+
+```
+    -- miranda: section create sandbox table
+    {
+        const int base_of_stack = marpa_lua_gettop(L);
+        marpa_lua_newtable (L);
+        /* sandbox.__index = _G */
+        marpa_lua_pushglobaltable(L);
+        marpa_lua_setfield(L, -2, "__index");
+
+        /* sandbox metatable is itself */
+        marpa_lua_pushvalue(L, -1);
+        marpa_lua_setmetatable(L, -2);
+        marpa_lua_pushglobaltable(L);
+        /* [ sandbox, _G ] */
+        marpa_lua_insert(L, -2);
+        /* [ _G, sandbox ] */
+        marpa_lua_setfield(L, -2, "sandbox");
+        marpa_lua_settop (L, base_of_stack);
     }
 ```
 
