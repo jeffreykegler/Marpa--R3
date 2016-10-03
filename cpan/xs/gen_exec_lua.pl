@@ -35,6 +35,28 @@ if ( @ARGV == 1 ) {
    $out = *STDOUT;
 }
 
+my $lua_load_string = <<'END_OF_LOAD_STRING';
+    {
+        const int load_status = marpa_luaL_loadstring (L, codestr);
+        if (load_status != 0) {
+            /* The following is complex, because the error string
+             * must be copied before it is removed from the Lua stack.
+             * This is done with a Perl mortal SV.
+             */
+            const char *error_string = marpa_lua_tostring (L, -1);
+            SV *temp_sv = sv_newmortal ();
+            sv_setpvf (temp_sv, "Marpa::R3::Lua error in luaL_loadstring: %s",
+                error_string);
+            marpa_lua_settop (L, base_of_stack);
+            croak ("%s", SvPV_nolen (temp_sv));
+        }
+    }
+END_OF_LOAD_STRING
+
+# This is not a subtroutine because I use XS preprocessor
+# to deal with the Perl stack.  XS uses macros like XPUSHs(), and
+# these assume they are in a method using the top-level XS calling
+# protocol.  Putting this code in a C subroutine will confuse XS.
 my $lua_exec_body = <<'END_OF_EXEC_BODY';
     {
         const int function_stack_ix = marpa_lua_gettop (L);
@@ -112,20 +134,11 @@ PPCODE:
     const int is_method = 1;
     lua_State *const L = outer_slg->L;
     const int base_of_stack = marpa_lua_gettop (L);
-    int load_status;
 
     marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, outer_slg->lua_ref);
     /* Lua stack: [ grammar_table ] */
 
-    load_status = marpa_luaL_loadbuffer (L, codestr, strlen (codestr), codestr);
-    if (load_status != 0)
-    {
-      const char *error_string = marpa_lua_tostring (L, -1);
-      marpa_lua_pop (L, 1);
-      croak ("Marpa::R3::Lua error in luaL_loadbuffer: %s", error_string);
-    }
-    /* [ grammar_table, function ] */
-
+    === LUA LOAD STRING ===
     === LUA EXEC BODY ===
 }
 
@@ -184,20 +197,11 @@ PPCODE:
     const int is_method = 1;
     lua_State *const L = outer_slr->L;
     const int base_of_stack = marpa_lua_gettop (L);
-    int load_status;
 
     marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, outer_slr->lua_ref);
     /* Lua stack: [ recce_table ] */
 
-    load_status = marpa_luaL_loadbuffer (L, codestr, strlen (codestr), codestr);
-    if (load_status != 0)
-    {
-      const char *error_string = marpa_lua_tostring (L, -1);
-      marpa_lua_pop (L, 1);
-      croak ("Marpa::R3::Lua error in luaL_loadbuffer: %s", error_string);
-    }
-    /* [ recce_table, function ] */
-
+    === LUA LOAD STRING ===
     === LUA EXEC BODY ===
 }
 
@@ -236,16 +240,8 @@ PPCODE:
     const int is_method = 0;
     lua_State *const L = lua_wrapper->L;
     const int base_of_stack = marpa_lua_gettop (L);
-    const int load_status =
-        marpa_luaL_loadbuffer (L, codestr, strlen (codestr), codestr);
 
-    if (load_status != 0) {
-        const char *error_string = marpa_lua_tostring (L, -1);
-        marpa_lua_pop (L, 1);
-        croak ("Marpa::R3::Lua error in luaL_loadbuffer: %s",
-            error_string);
-    }
-
+    === LUA LOAD STRING ===
     === LUA EXEC BODY ===
 }
 
@@ -255,18 +251,22 @@ exec( lua_wrapper, codestr, ... )
    char* codestr;
 PPCODE:
 {
-  const int is_method = 0;
-  lua_State* const L = lua_wrapper->L;
+    const int is_method = 0;
+    lua_State *const L = lua_wrapper->L;
     const int base_of_stack = marpa_lua_gettop (L);
 
-  const int load_status =
-    marpa_luaL_loadbuffer (L, codestr, strlen (codestr), codestr);
-  if (load_status != 0)
-    {
-      const char *error_string = marpa_lua_tostring (L, -1);
-      marpa_lua_pop (L, 1);
-      croak ("Marpa::R3::Lua error in luaL_loadbuffer: %s", error_string);
+    === LUA LOAD STRING ===
+
+    /* At this point, the Lua function is on the top of the stack:
+     * [func]
+     * Set its first up value to the sandbox table.
+     */
+    marpa_lua_getglobal (L, "sandbox");
+    if (!marpa_lua_setupvalue (L, -2, 1)) {
+        marpa_lua_settop (L, base_of_stack);
+        croak ("Marpa::R3::Lua error -- lua_setupvalue() failed");
     }
+    /* [func] */
 
     === LUA EXEC BODY ===
 }
@@ -274,6 +274,7 @@ PPCODE:
 END_OF_MAIN_CODE
 
 $code =~ s/=== \s* LUA \s* EXEC \s* BODY \s* === \s /$lua_exec_body/xsmg;
+$code =~ s/=== \s* LUA \s* LOAD \s* STRING \s* === \s /$lua_load_string/xsmg;
 
 print {$out} $code;
 
