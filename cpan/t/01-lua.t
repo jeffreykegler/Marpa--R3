@@ -16,7 +16,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-use Test::More tests => 24;
+use Test::More tests => 30;
 use English qw( -no_match_vars );
 use lib 'inc';
 use Marpa::R3::Test;
@@ -24,6 +24,20 @@ use Marpa::R3;
 
 my $raw_salve = ' return [[salve, munde!]], ...';
 my $marpa_lua = Marpa::R3::Lua->new();
+
+do_raw_test($raw_salve, [], ['salve, munde!'], 'Salve, 0 args');
+do_raw_test($raw_salve, [qw{hi}], ['salve, munde!', 'hi'], 'Salve, 1 arg');
+do_raw_test($raw_salve, [qw{hi hi2}], ['salve, munde!', qw(hi hi2)], 'Salve, 2 args');
+do_raw_test('return 42', [], ['42']);
+do_raw_test('function taxicurry(fact2) return 9^3 + fact2 end', [], []);
+do_raw_test('return taxicurry(10^3)', [], [1729]);
+
+sub do_raw_test {
+    my ($code, $args, $expected, $test_name) = @_;
+    $test_name //= qq{"$code"};
+    my @actual = $marpa_lua->raw_exec($code, @{$args});
+    Test::More::is_deeply( \@actual, $expected, $test_name);
+}
 
 do_global_test($raw_salve, [], ['salve, munde!'], 'Salve, 0 args');
 do_global_test($raw_salve, [qw{hi}], ['salve, munde!', 'hi'], 'Salve, 1 arg');
@@ -44,7 +58,7 @@ sub do_global_test {
     Test::More::is_deeply( \@actual, $expected, $test_name);
 }
 
-$marpa_lua->exec("collectgarbage()");
+$marpa_lua->raw_exec("collectgarbage()");
 
 my $grammar = Marpa::R3::Scanless::G->new(
     {   
@@ -87,7 +101,7 @@ sub do_recce_test {
     Test::More::is_deeply( \@actual, $expected, $test_name);
 }
 
-# Marpa::R3::Lua::exec("collectgarbage()");
+# Marpa::R3::Lua::raw_exec("collectgarbage()");
 
 my $input = '42 * 1 + 7';
 $recce->read( \$input );
