@@ -3949,6 +3949,18 @@ PPCODE:
     Safefree( t_wrapper );
 }
 
+void
+dummyup_valuator( t_wrapper, lua, name )
+    T_Wrapper *t_wrapper;
+    Marpa_Lua *lua;
+    char *name;
+PPCODE:
+{
+  PERL_UNUSED_ARG(t_wrapper);
+  PERL_UNUSED_ARG(lua);
+  PERL_UNUSED_ARG(name);
+}
+
 MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::V
 
 void
