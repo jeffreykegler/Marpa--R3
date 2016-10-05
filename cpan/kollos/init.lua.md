@@ -1549,6 +1549,17 @@ the wrapper's point of view, marpa_r_alternative() always succeeds.
         return table.concat(result)
   ]==]
 
+  -- miranda: section create kollos class tables
+  --[==[ miranda: exec create kollos class tables
+        local result = {}
+        for class_letter, class in pairs(libmarpa_class_name) do
+           local class_table_name = 'class_' .. class
+           result[#result+1] = "  marpa_lua_newtable(L);\n"
+           result[#result+1] = string.format("  marpa_lua_setfield(L, -1, %q);\n", class_table_name);
+        end
+        return table.concat(result)
+  ]==]
+
 ```
 
 ## The main Lua code file
@@ -3021,6 +3032,8 @@ Set "strict" globals, using code taken from strict.lua.
         marpa_lua_setfield(L, kollos_table_stack_ix, "c");
         /* [ kollos, kollos_c ] */
 
+        -- miranda: insert create kollos class tables
+
         /* Set up Kollos error handling metatable.
            The metatable starts out empty.
         */
@@ -3357,6 +3370,7 @@ Not Lua-callable, but leaves the stack as before.
     -- miranda: sequence-exec libmarpa interface globals
     -- miranda: sequence-exec declare standard libmarpa wrappers
     -- miranda: sequence-exec register standard libmarpa wrappers
+    -- miranda: sequence-exec create kollos class tables
 ```
 
 ### Dedent method
