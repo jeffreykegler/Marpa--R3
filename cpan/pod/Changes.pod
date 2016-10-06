@@ -34,13 +34,13 @@ have been removed.
 Important in the development of Marpa,
 it now has little or now usage.
 
-=head2 The Thin interface (THIF) is deprecated
+=head2 The Thin interface (THIF) is being removed.
 
-The THIF is subject to major change, or outright removal,
-without further notice.
-
-The 'if' argument of the new() method for thin grammars
-has been eliminated.
+The THIF is being removed.
+This is being done piecemeal for the convenience
+of the Marpa::R3 developers.
+Nobody outside the Marpa::R3 development team
+should attempt to use the THIF.
 
 =head2 The NAIF has been removed
 
