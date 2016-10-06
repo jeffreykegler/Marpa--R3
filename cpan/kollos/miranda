@@ -397,11 +397,10 @@ local function next_run_find(instruction_ix)
         if itype == 'section+' then
             local run_name = instruction.name
             local section = sections[run_name]
-            if section then return instruction_ix end
-            error(problem_in_line(instruction:first_line())
-                .. "   'section+' command, but section does not exist\n"
-                .. "   A 'section+' command must continue an existing section\n"
-            )
+            if not section then
+                sections[run_name] = {}
+            end
+            return instruction_ix
         end
 
         if itype == 'exec' then

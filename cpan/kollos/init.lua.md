@@ -2343,7 +2343,7 @@ Set "strict" globals, using code taken from strict.lua.
       marpa_lua_pop(L, 1);
     }
 
-    -- miranda: section header stuff from okollos.c.lua
+    -- miranda: section+ header stuff from okollos.c.lua
     void marpa_gen_grammar_ud(lua_State* L, Marpa_Grammar g);
     -- miranda: section+ stuff from okollos.c.lua
     /* Caller must ensure enough stack space.
@@ -2925,6 +2925,25 @@ Set "strict" globals, using code taken from strict.lua.
 
     /* value wrappers which need to be hand-written */
 
+    -- miranda: section+ header stuff from okollos.c.lua
+    void marpa_gen_value_ud(lua_State* L, Marpa_Value g);
+    -- miranda: section+ stuff from okollos.c.lua
+    /* Caller must ensure enough stack space.
+     * Leaves a new userdata on top of the stack.
+     */
+    void marpa_gen_value_ud(lua_State* L, Marpa_Value v)
+    {
+        Marpa_Value* p_v;
+        p_v = (Marpa_Value *) marpa_lua_newuserdata (L, sizeof (Marpa_Value));
+        *p_v = v;
+        /* [ userdata ] */
+        marpa_lua_rawgetp (L, LUA_REGISTRYINDEX, &kollos_v_ud_mt_key);
+        /* [ userdata, metatable ] */
+        marpa_lua_setmetatable (L, -2);
+        /* [ userdata ] */
+    }
+
+    -- miranda: section+ stuff from okollos.c.lua
 
     static int
     wrap_value_new (lua_State * L)
