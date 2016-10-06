@@ -3950,15 +3950,34 @@ PPCODE:
 }
 
 void
-dummyup_valuator( t_wrapper, lua, name )
+dummyup_valuator( t_wrapper, lua_wrapper, name )
     T_Wrapper *t_wrapper;
-    Marpa_Lua *lua;
+    Marpa_Lua *lua_wrapper;
     char *name;
 PPCODE:
 {
-  PERL_UNUSED_ARG(t_wrapper);
-  PERL_UNUSED_ARG(lua);
-  PERL_UNUSED_ARG(name);
+  lua_State *const L = lua_wrapper->L;
+  int valuator_object_ix;
+  const int base_of_stack = marpa_lua_gettop(L);
+
+  marpa_luaL_checkstack(L, 20, "$tree->dummyup_valuator");
+  marpa_lua_newtable(L);
+  valuator_object_ix = marpa_lua_gettop(L);
+  marpa_lua_getglobal(L, "kollos");
+  marpa_lua_getfield(L, -1, "class_value");
+  marpa_lua_setmetatable(L, valuator_object_ix);
+  /* [ valuator_obj, kollos_tab ] */
+  marpa_lua_pushinteger(L, t_wrapper->base->throw);
+  marpa_lua_setfield(L, valuator_object_ix, "throw");
+
+  /* Add v and g userdatums here */
+
+  marpa_lua_getglobal(L, "sandbox");
+  /* [ valuator_obj, kollos_tab, sandbox ] */
+  marpa_lua_rotate(L, -3, -1);
+  /* [ kollos_tab, sandbox, valuator_obj ] */
+  marpa_lua_setfield(L, -2, name);
+  marpa_lua_settop(L, base_of_stack);
 }
 
 MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::V
