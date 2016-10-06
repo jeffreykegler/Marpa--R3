@@ -13,12 +13,20 @@
 
 Marpa::R3::Advanced::Thin - Direct access to Libmarpa
 
-=head1 About this document
+=head1 THIS INTERFACE IS BEING REMOVED
 
-THIS INTERFACE IS DEPRECATED.
-It may be altered in major ways,
-or deleted outright,
-without notice.
+THIS INTERFACE IS UNDERGOING REMOVAL.
+This document will eventually be removed.
+The interface itself is broken,
+will be totally unusable for those not on Marpa::R3's development
+team.
+
+The rest of this document is the pre-breakage original.
+It is being retained for the convenience
+of Marpa::R3's development team, which
+uses it for reference.
+
+=head1 About this document
 
 Most Marpa users can ignore this document.
 It describes Marpa's "thin" interface,
