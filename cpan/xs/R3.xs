@@ -3959,6 +3959,8 @@ PPCODE:
   lua_State *const L = lua_wrapper->L;
   int valuator_object_ix;
   const int base_of_stack = marpa_lua_gettop(L);
+  G_Wrapper* const g_wrapper = t_wrapper->base;
+  const Marpa_Grammar g = g_wrapper->g;
 
   marpa_luaL_checkstack(L, 20, "$tree->dummyup_valuator");
   marpa_lua_newtable(L);
@@ -3967,10 +3969,20 @@ PPCODE:
   marpa_lua_getfield(L, -1, "class_value");
   marpa_lua_setmetatable(L, valuator_object_ix);
   /* [ valuator_obj, kollos_tab ] */
-  marpa_lua_pushinteger(L, t_wrapper->base->throw);
+  marpa_lua_pushinteger(L, g_wrapper->throw);
   marpa_lua_setfield(L, valuator_object_ix, "throw");
 
-  /* Add v and g userdatums here */
+  /* Add new g userdatum --
+   * it must own a reference to the Libmarpa
+   * grammar.
+   */
+  marpa_gen_grammar_ud(L, g);
+  marpa_g_ref(g);
+  /* [ valuator_obj, kollos_tab, grammar_ud ] */
+  marpa_lua_setfield(L, valuator_object_ix, "_libmarpa_g");
+  /* [ valuator_obj, kollos_tab ] */
+
+  /* Add v userdatum here */
 
   marpa_lua_getglobal(L, "sandbox");
   /* [ valuator_obj, kollos_tab, sandbox ] */

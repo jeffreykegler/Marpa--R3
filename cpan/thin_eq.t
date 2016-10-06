@@ -266,10 +266,13 @@ $bocage        = Marpa::R3::Thin::B->new( $recce, $latest_earley_set_ID );
 $order         = Marpa::R3::Thin::O->new($bocage);
 
 my $marpa_lua = Marpa::R3::Lua->new();
+$marpa_lua->raw_exec($Marpa::R3::Lua::Inspect::load);
 
 $tree          = Marpa::R3::Thin::T->new($order);
 $tree->next();
 $tree->dummyup_valuator($marpa_lua, "value");
+# $marpa_lua->exec('print(inspect(_G))');
+$marpa_lua->exec('print(inspect(value))');
 exit(0);
 
 my $valuator = Marpa::R3::Thin::V->new($tree);
