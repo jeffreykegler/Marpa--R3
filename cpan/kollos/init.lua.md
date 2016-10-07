@@ -141,6 +141,9 @@ the interpreter (Kollos object) is destroyed.
         /* Lua stack: [ kollos_table ] */
         marpa_lua_setglobal(L, "kollos");
         /* Lua stack: [] */
+        marpa_lua_pushboolean(L, 1);
+        marpa_lua_setglobal(L, "throw");
+        /* Lua stack: [] */
         marpa_lua_settop(L, base_of_stack);
         return L;
     }

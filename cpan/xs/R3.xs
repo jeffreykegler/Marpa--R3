@@ -3961,16 +3961,20 @@ PPCODE:
   const int base_of_stack = marpa_lua_gettop(L);
   G_Wrapper* const g_wrapper = t_wrapper->base;
   const Marpa_Grammar g = g_wrapper->g;
+  const Marpa_Tree t = t_wrapper->t;
+  Marpa_Value v;
+  int throw;
 
   marpa_luaL_checkstack(L, 20, "$tree->dummyup_valuator");
+  marpa_lua_getglobal(L, "throw");
+  throw = marpa_lua_toboolean(L, -1);
+  /* Leave throw on stack to be popped at the end */
   marpa_lua_newtable(L);
   valuator_object_ix = marpa_lua_gettop(L);
   marpa_lua_getglobal(L, "kollos");
   marpa_lua_getfield(L, -1, "class_value");
   marpa_lua_setmetatable(L, valuator_object_ix);
   /* [ valuator_obj, kollos_tab ] */
-  marpa_lua_pushinteger(L, g_wrapper->throw);
-  marpa_lua_setfield(L, valuator_object_ix, "throw");
 
   /* Add new g userdatum --
    * it must own a reference to the Libmarpa
@@ -3983,6 +3987,19 @@ PPCODE:
   /* [ valuator_obj, kollos_tab ] */
 
   /* Add v userdatum here */
+  v = marpa_v_new (t);
+  if (!v)
+    {
+      if (!throw)
+        {
+          XSRETURN_UNDEF;
+        }
+      croak ("Problem in t->dummyup_valuator(): %s", xs_g_error (g_wrapper));
+    }
+  marpa_gen_value_ud(L, v);
+  /* [ valuator_obj, kollos_tab, grammar_ud ] */
+  marpa_lua_setfield(L, valuator_object_ix, "_libmarpa");
+  /* [ valuator_obj, kollos_tab ] */
 
   marpa_lua_getglobal(L, "sandbox");
   /* [ valuator_obj, kollos_tab, sandbox ] */
