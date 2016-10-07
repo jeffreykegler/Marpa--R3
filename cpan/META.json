@@ -44,7 +44,27 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "CPAN::Meta::Converter" : "2.120921",
+            "Carp" : "1.11",
+            "Config::AutoConf" : "0.22",
+            "Cwd" : "3.2501",
+            "Data::Dumper" : "2.125",
+            "DynaLoader" : "1.08",
+            "English" : "1.04",
+            "Exporter" : "5.62",
+            "ExtUtils::CBuilder" : "0.27",
+            "ExtUtils::MakeMaker" : "6.48",
+            "ExtUtils::Manifest" : "1.51_01",
+            "ExtUtils::Mkbootstrap" : "6.42",
+            "Fatal" : "1.05",
+            "File::Copy" : "2.11",
+            "File::Spec" : "3.2501",
+            "IPC::Cmd" : "0.40_1",
+            "List::Util" : "1.21",
+            "Scalar::Util" : "1.21",
+            "Test::More" : "0.94",
+            "Time::Piece" : "1.12",
+            "XSLoader" : "0.08"
          }
       },
       "configure" : {
@@ -74,6 +94,27 @@
       },
       "runtime" : {
          "requires" : {
+            "CPAN::Meta::Converter" : "2.120921",
+            "Carp" : "1.11",
+            "Config::AutoConf" : "0.22",
+            "Cwd" : "3.2501",
+            "Data::Dumper" : "2.125",
+            "DynaLoader" : "1.08",
+            "English" : "1.04",
+            "Exporter" : "5.62",
+            "ExtUtils::CBuilder" : "0.27",
+            "ExtUtils::MakeMaker" : "6.48",
+            "ExtUtils::Manifest" : "1.51_01",
+            "ExtUtils::Mkbootstrap" : "6.42",
+            "Fatal" : "1.05",
+            "File::Copy" : "2.11",
+            "File::Spec" : "3.2501",
+            "IPC::Cmd" : "0.40_1",
+            "List::Util" : "1.21",
+            "Scalar::Util" : "1.21",
+            "Test::More" : "0.94",
+            "Time::Piece" : "1.12",
+            "XSLoader" : "0.08",
             "perl" : "5.010001"
          }
       }

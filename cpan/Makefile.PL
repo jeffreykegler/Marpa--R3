@@ -410,6 +410,8 @@ WriteMakefile(
 
     # recommends         => \%recommends,
     CONFIGURE_REQUIRES => \%configure_requires,
+    BUILD_REQUIRES => \%configure_requires,
+    PREREQ_PM => \%configure_requires,
     PM                 => \%pm_files,
     MIN_PERL_VERSION => '5.10.1',
     DIR => [qw(engine lua kollos xs)],
