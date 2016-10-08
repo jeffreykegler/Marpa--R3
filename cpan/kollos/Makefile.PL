@@ -94,6 +94,12 @@ sub constants {
             File::Spec->updir(), qw{engine read_only events.table}
         )
     );
+    $constants .= sprintf(
+        "STEP_TABLE = %s\n",
+        File::Spec->catfile(
+            File::Spec->updir(), qw{engine read_only steps.table}
+        )
+    );
     $constants .= sprintf( "MY_CCFLAGS = %s\n", $my_ccflags);
 
     return $constants;
@@ -127,8 +133,12 @@ error_table.md:
 event_table.md:
 	$(LUA_INTERP) gen_event_table.lua $(EVENT_TABLE) > $@
 
-kollos.c: error_table.md event_table.md init.lua.md kollos.h
-	$(LUA_INTERP) miranda error_table.md event_table.md init.lua.md kollos_c=kollos.c
+step_table.md:
+	$(LUA_INTERP) gen_step_table.lua $(STEP_TABLE) > $@
+
+kollos.c: error_table.md event_table.md step_table.md init.lua.md kollos.h
+	$(LUA_INTERP) miranda error_table.md event_table.md step_table.md \
+	  init.lua.md kollos_c=kollos.c
 
 kollos.h: init.lua.md
 	$(LUA_INTERP) miranda init.lua.md kollos_h=kollos.h

@@ -1657,12 +1657,15 @@ Set "strict" globals, using code taken from strict.lua.
     -- miranda: insert define error codes
     -- miranda: insert private event code declarations
     -- miranda: insert define event codes
+    -- miranda: insert private step code declarations
+    -- miranda: insert define step codes
 
     -- miranda: insert utilities from okollos.c.lua
     -- miranda: insert error object code from okollos.c.lua
     -- miranda: insert base error handlers
     -- miranda: insert error handlers
     -- miranda: insert event related code from okollos.c.lua
+    -- miranda: insert step structure code
     -- miranda: insert metatable keys
     -- miranda: insert grammar object non-standard wrappers
     -- miranda: insert recognizer object non-standard wrappers
@@ -1911,6 +1914,41 @@ Set "strict" globals, using code taken from strict.lua.
            marpa_lua_pushstring(L, mnemonic);
        } else {
            marpa_lua_pushfstring(L, "Unknown event code (%d)", event_code);
+       }
+       return 1;
+    }
+
+    -- miranda: section private step code declarations
+
+    /* step codes */
+
+    struct s_libmarpa_step_code {
+       lua_Integer code;
+       const char* mnemonic;
+    };
+
+    -- miranda: section+ step structure code
+
+    static inline const char* step_name_by_code(lua_Integer step_code)
+    {
+       if (step_code >= LIBMARPA_MIN_STEP_CODE && step_code <= LIBMARPA_MAX_STEP_CODE) {
+           return marpa_step_codes[step_code-LIBMARPA_MIN_STEP_CODE].mnemonic;
+       }
+       if (step_code >= KOLLOS_MIN_STEP_CODE && step_code <= KOLLOS_MAX_STEP_CODE) {
+           return marpa_kollos_step_codes[step_code-KOLLOS_MIN_STEP_CODE].mnemonic;
+       }
+       return (const char *)0;
+    }
+
+    static inline int l_step_name_by_code(lua_State* L)
+    {
+       const lua_Integer step_code = marpa_luaL_checkinteger(L, 1);
+       const char* mnemonic = step_name_by_code(step_code);
+       if (mnemonic)
+       {
+           marpa_lua_pushstring(L, mnemonic);
+       } else {
+           marpa_lua_pushfstring(L, "Unknown step code (%d)", step_code);
        }
        return 1;
     }
@@ -2822,6 +2860,7 @@ Set "strict" globals, using code taken from strict.lua.
             return 0;
         }
 
+        result_string = step_name_by_code(step_type);
         /*
          * result_string =  (step_type);
          * if (!result_string) {
