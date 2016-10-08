@@ -278,9 +278,7 @@ function parse_instruction(first_line_no, last_line_no)
         instruction.type = words[1]
         local line_iter = body:gmatch('[^\n]+')
         local phase = line_iter()
-        print('phase:', phase)
         phase = phase:match('^[ ]*exec[%s](.*)$')
-        print('phase:', phase)
         phase = phase and parse_section_name(phase) or ''
         instruction.phase = phase
         local code_lines = {}

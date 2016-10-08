@@ -12,6 +12,8 @@
 
 # Temporary
 ^rr[.]txt$
+^lua[.]t$
+^thin_eq[.]t$
 
 # Permanent
 
@@ -120,6 +122,8 @@
 ^kollos/toc[.]lua$
 ^kollos/kollos[.]c$
 ^kollos/kollos[.]h$
+^kollos/error_table[.]md$
+^kollos/event_table[.]md$
 ^xs/MYMETA[.]
 ^xs/Makefile$
 ^xs/Makefile[.]old$

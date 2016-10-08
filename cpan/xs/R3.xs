@@ -3968,7 +3968,7 @@ PPCODE:
   marpa_luaL_checkstack(L, 20, "$tree->dummyup_valuator");
   marpa_lua_getglobal(L, "throw");
   throw = marpa_lua_toboolean(L, -1);
-  /* Leave throw on stack to be popped at the end */
+  /* Leaves throw on stack -- will be popped at the end */
   marpa_lua_newtable(L);
   valuator_object_ix = marpa_lua_gettop(L);
   marpa_lua_getglobal(L, "kollos");

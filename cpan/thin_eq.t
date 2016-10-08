@@ -273,6 +273,7 @@ $tree->next();
 $tree->dummyup_valuator($marpa_lua, "value");
 # $marpa_lua->exec('print(inspect(_G))');
 $marpa_lua->exec('print(inspect(value))');
+$marpa_lua->exec('print(inspect(throw))');
 exit(0);
 
 my $valuator = Marpa::R3::Thin::V->new($tree);

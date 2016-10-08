@@ -201,7 +201,7 @@ my @always_required            = qw(
     XSLoader
 );
 
-my %configure_requires =
+my %requires =
     map { ( $_, $version_for_config{$_} ) }
     qw( CPAN::Meta::Converter ),
     @always_required,
@@ -408,10 +408,11 @@ WriteMakefile(
     AUTHOR   => 'Jeffrey Kegler',
     ABSTRACT => 'Release 3 of Marpa',
 
-    # recommends         => \%recommends,
-    CONFIGURE_REQUIRES => \%configure_requires,
-    BUILD_REQUIRES => \%configure_requires,
-    PREREQ_PM => \%configure_requires,
+    # Let the three of these be the same.
+    CONFIGURE_REQUIRES => \%requires,
+    BUILD_REQUIRES => \%requires,
+    PREREQ_PM => \%requires,
+
     PM                 => \%pm_files,
     MIN_PERL_VERSION => '5.10.1',
     DIR => [qw(engine lua kollos xs)],

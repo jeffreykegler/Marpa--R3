@@ -1229,14 +1229,6 @@ A function to be called whenever a valuator is reset.
       v = "value",
     };
 
-    local check_for_table_template = [=[
-    !!INDENT!!check_libmarpa_table(L,
-    !!INDENT!!  "!!FUNCNAME!!",
-    !!INDENT!!  self_stack_ix,
-    !!INDENT!!  "!!CLASS_NAME!!"
-    !!INDENT!!);
-    ]=]
-
     function wrap_libmarpa_method(signature)
        local arg_count = math.floor(#signature/2)
        local function_name = signature[1]
@@ -1248,7 +1240,6 @@ A function to be called whenever a valuator is reset.
        result[#result+1] = "{\n"
        result[#result+1] = "  " .. libmarpa_class_type[class_letter] .. " self;\n"
        result[#result+1] = "  const int self_stack_ix = 1;\n"
-       result[#result+1] = "  Marpa_Grammar grammar;\n"
        for arg_ix = 1, arg_count do
          local arg_type = signature[arg_ix*2]
          local arg_name = signature[1 + arg_ix*2]
@@ -1264,13 +1255,7 @@ A function to be called whenever a valuator is reset.
        if (safe) then
           result[#result+1] = "  if (1) {\n"
 
-          local check_for_table =
-            string.gsub(check_for_table_template, "!!FUNCNAME!!", wrapper_name);
-          check_for_table =
-            string.gsub(check_for_table, "!!INDENT!!", "    ");
-          check_for_table =
-            string.gsub(check_for_table, "!!CLASS_NAME!!", libmarpa_class_name[class_letter])
-          result[#result+1] = check_for_table
+          result[#result+1] = "    marpa_luaL_checktype(L, self_stack_ix, LUA_TTABLE);"
           -- I do not get the values from the integer checks,
           -- because this code
           -- will be turned off most of the time
@@ -1307,12 +1292,6 @@ A function to be called whenever a valuator is reset.
        result[#result+1] = "  marpa_lua_pop(L, 1);\n"
        -- stack is [ self ]
 
-       result[#result+1] = '  marpa_lua_getfield (L, -1, "_libmarpa_g");\n'
-       -- stack is [ self, grammar_ud ]
-       result[#result+1] = "  grammar = *(Marpa_Grammar*)marpa_lua_touserdata (L, -1);\n"
-       result[#result+1] = "  marpa_lua_pop(L, 1);\n"
-       -- stack is [ self ]
-
        -- assumes converting result to int is safe and right thing to do
        -- if that assumption is wrong, generate the wrapper by hand
        result[#result+1] = "  result = (int)" .. function_name .. "(self\n"
@@ -1323,15 +1302,10 @@ A function to be called whenever a valuator is reset.
        result[#result+1] = "    );\n"
        result[#result+1] = "  if (result == -1) { marpa_lua_pushnil(L); return 1; }\n"
        result[#result+1] = "  if (result < -1) {\n"
-       result[#result+1] = "    Marpa_Error_Code marpa_error = marpa_g_error(grammar, NULL);\n"
-       result[#result+1] = "    int throw_flag;\n"
-       local wrapper_name_as_c_string = '"' .. wrapper_name .. '()"'
-       result[#result+1] = '    marpa_lua_getfield (L, -1, "throw");\n'
-       -- stack is [ self, throw_flag ]
-       result[#result+1] = "    throw_flag = marpa_lua_toboolean (L, -1);\n"
-       result[#result+1] = '    if (throw_flag) {\n'
-       result[#result+1] = '        kollos_throw( L, marpa_error, ' .. wrapper_name_as_c_string .. ');\n'
-       result[#result+1] = '    }\n'
+       result[#result+1] = string.format(
+                            "   libmarpa_error_handle(L, self_stack_ix, %q);\n",
+                            wrapper_name .. '()')
+       result[#result+1] = "    return 1;\n"
        result[#result+1] = "  }\n"
        result[#result+1] = "  marpa_lua_pushinteger(L, (lua_Integer)result);\n"
        result[#result+1] = "  return 1;\n"
@@ -1679,11 +1653,25 @@ Set "strict" globals, using code taken from strict.lua.
     -- miranda: section kollos_c
     -- miranda: language c
     -- miranda: insert preliminaries to the c library code
-    -- miranda: insert declare error code structure
+    -- miranda: insert private error code declarations
     -- miranda: insert define error codes
-    -- miranda: insert declare event code structure
+    -- miranda: insert private event code declarations
     -- miranda: insert define event codes
-    -- miranda: insert stuff from okollos.c.lua
+
+    -- miranda: insert utilities from okollos.c.lua
+    -- miranda: insert error object code from okollos.c.lua
+    -- miranda: insert base error handlers
+    -- miranda: insert error handlers
+    -- miranda: insert event related code from okollos.c.lua
+    -- miranda: insert metatable keys
+    -- miranda: insert grammar object non-standard wrappers
+    -- miranda: insert recognizer object non-standard wrappers
+    -- miranda: insert bocage object non-standard wrappers
+    -- miranda: insert order object non-standard wrappers
+    -- miranda: insert tree object non-standard wrappers
+    -- miranda: insert value object non-standard wrappers
+    -- miranda: insert object userdata gc methods
+
     -- miranda: insert standard libmarpa wrappers
     -- miranda: insert define marpa_luaopen_kollos method
     -- miranda: insert lua interpreter management
@@ -1694,7 +1682,7 @@ Set "strict" globals, using code taken from strict.lua.
 
 ```
 
-    -- miranda: section stuff from okollos.c.lua
+    -- miranda: section utilities from okollos.c.lua
 
     /* For debugging */
     static void dump_stack (lua_State *L) UNUSED;
@@ -1796,8 +1784,10 @@ Set "strict" globals, using code taken from strict.lua.
         /* Back to original stack: [ ... ] */
     }
 
-    -- miranda: section declare error code structure
+    -- miranda: section private error code declarations
     /* error codes */
+
+    static char kollos_error_mt_key;
 
     struct s_libmarpa_error_code {
        lua_Integer code;
@@ -1805,7 +1795,7 @@ Set "strict" globals, using code taken from strict.lua.
        const char* description;
     };
 
-    -- miranda: section+ stuff from okollos.c.lua
+    -- miranda: section+ error object code from okollos.c.lua
 
     /* error objects
      *
@@ -1823,7 +1813,7 @@ Set "strict" globals, using code taken from strict.lua.
      * it actually is easier to write them in C than in Lua.
      */
 
-    -- miranda: section+ stuff from okollos.c.lua
+    -- miranda: section+ error object code from okollos.c.lua
 
     static inline const char* error_description_by_code(lua_Integer error_code)
     {
@@ -1873,7 +1863,7 @@ Set "strict" globals, using code taken from strict.lua.
        return 1;
     }
 
-    -- miranda: section declare event code structure
+    -- miranda: section private event code declarations
 
     struct s_libmarpa_event_code {
        lua_Integer code;
@@ -1881,7 +1871,7 @@ Set "strict" globals, using code taken from strict.lua.
        const char* description;
     };
 
-    -- miranda: section+ stuff from okollos.c.lua
+    -- miranda: section+ event related code from okollos.c.lua
 
     static inline const char* event_description_by_code(lua_Integer event_code)
     {
@@ -1925,7 +1915,7 @@ Set "strict" globals, using code taken from strict.lua.
        return 1;
     }
 
-    -- miranda: section+ stuff from okollos.c.lua
+    -- miranda: section+ metatable keys
 
     /* userdata metatable keys
        The contents of these locations are never examined.
@@ -1933,7 +1923,6 @@ Set "strict" globals, using code taken from strict.lua.
        This guarantees that the key will be unique
        within the Lua state.
     */
-    static char kollos_error_mt_key;
     static char kollos_g_ud_mt_key;
     static char kollos_r_ud_mt_key;
     static char kollos_b_ud_mt_key;
@@ -1941,9 +1930,11 @@ Set "strict" globals, using code taken from strict.lua.
     static char kollos_t_ud_mt_key;
     static char kollos_v_ud_mt_key;
 
+    -- miranda: section+ base error handlers
+
     /* Leaves the stack as before,
        except with the error object on top */
-    static inline void kollos_error(lua_State* L,
+    static inline void push_error_object(lua_State* L,
         lua_Integer code, const char* details)
     {
        const int error_object_stack_ix = marpa_lua_gettop(L)+1;
@@ -1962,6 +1953,8 @@ Set "strict" globals, using code taken from strict.lua.
        marpa_lua_setfield(L, error_object_stack_ix, "details" );
        /* [ ..., error_object ] */
     }
+
+    -- miranda: section+ error handlers
 
     static int l_error_new(lua_State* L)
     {
@@ -1986,31 +1979,25 @@ Set "strict" globals, using code taken from strict.lua.
             const lua_Integer code = marpa_lua_tointeger (L, 1);
             const char *details = marpa_lua_tostring (L, 2);
             marpa_lua_pop (L, 2);
-            kollos_error (L, code, details);
+            push_error_object (L, code, details);
             return 1;
         }
         {
             /* Want a special code for this, eventually */
             const lua_Integer code = MARPA_ERR_DEVELOPMENT;
             const char *details = "Error code is not a number";
-            kollos_error (L, code, details);
+            push_error_object (L, code, details);
             return 1;
         }
     }
 
-    /* Replace an error object, on top of the stack,
-       with its string equivalent
+    /* Return string equivalent of error argument
      */
-    static inline void error_tostring(lua_State* L)
+    static inline int l_error_tostring(lua_State* L)
     {
       lua_Integer error_code = -1;
-      const int error_object_ix = marpa_lua_gettop (L);
+      const int error_object_ix = 1;
       const char *temp_string;
-
-      /* Room for details, code, mnemonic, description,
-       * plus separators before and after: 4*3 = 12
-       */
-      marpa_luaL_checkstack (L, 12, "not enough stack for error_tostring()");
 
       marpa_lua_getfield (L, error_object_ix, "string");
 
@@ -2021,7 +2008,7 @@ Set "strict" globals, using code taken from strict.lua.
       if (marpa_lua_isstring (L, -1))
         {
           marpa_lua_replace (L, error_object_ix);
-          return;
+          return 1;
         }
 
       /* [ ..., error_object, bad-string ] */
@@ -2079,14 +2066,7 @@ Set "strict" globals, using code taken from strict.lua.
       /* stack is [ ..., error_object, concatenated_result ] */
       marpa_lua_replace (L, error_object_ix);
       /* [ ..., concatenated_result ] */
-    }
-
-    static inline int kollos_throw(lua_State* L,
-        lua_Integer code, const char* details)
-    {
-       kollos_error(L, code, details);
-       error_tostring(L);
-       return marpa_lua_error(L);
+      return 1;
     }
 
     /* not safe - intended for internal use */
@@ -2096,11 +2076,12 @@ Set "strict" globals, using code taken from strict.lua.
        const char* details = marpa_lua_tostring(L, 2);
       if (0) printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
       if (0) printf ("%s code = %ld\n", __PRETTY_FUNCTION__, (long)code);
-       return kollos_throw(L, code, details);
+       libmarpa_error_code_handle(L, (int)code, details);
+       return 1;
        /* NOTREACHED */
     }
 
-    -- miranda: section+ stuff from okollos.c.lua
+    -- miranda: section+ error handlers
 
     /* functions */
 
@@ -2133,222 +2114,51 @@ Set "strict" globals, using code taken from strict.lua.
         marpa_luaL_error(L, "%s\n    %s", msg, marpa_error_codes[error_code].description);
     }
 
-    static void check_libmarpa_table(
-        lua_State* L, const char *function_name, int stack_ix, const char *expected_type)
-    {
-      const char *actual_type;
-      /* stack is [ ... ] */
-      if (!marpa_lua_istable (L, stack_ix))
-        {
-          const char *typename = marpa_lua_typename (L, marpa_lua_type (L, stack_ix));
-          marpa_luaL_error (L, "%s arg #1 type is %s, expected table",
-                      function_name, typename);
-        }
-      marpa_lua_getfield (L, stack_ix, "_type");
-      /* stack is [ ..., field ] */
-      if (!marpa_lua_isstring (L, -1))
-        {
-          const char *typename = marpa_lua_typename (L, marpa_lua_type (L, -1));
-          marpa_luaL_error (L, "%s arg #1 field '_type' is %s, expected string",
-                      function_name, typename);
-        }
-      actual_type = marpa_lua_tostring (L, -1);
-      if (strcmp (actual_type, expected_type))
-        {
-          marpa_luaL_error (L, "%s arg #1 table is %s, expected %s",
-                      function_name, actual_type, expected_type);
-        }
-      /* stack is [ ..., field ] */
-      marpa_lua_pop (L, 1);
-      /* stack is [ ... ] */
-    }
-
-    -- miranda: section+ stuff from okollos.c.lua
+    -- miranda: section+ base error handlers
 
     /* grammar wrappers which need to be hand written */
 
-    /* Handle libmarpa grammar errors in the most usual way.
-       Uses 1 position on the stack, and throws the
-       error, if so desired.
-       The error may not be thrown, and it expects the
-       caller to handle any non-thrown error.
-    */
     static void
-    common_g_error_handler (lua_State * L,
-                          Marpa_Grammar * p_g,
-                          int grammar_stack_ix, const char *description)
+    libmarpa_error_code_handle (lua_State * L,
+                            int error_code, const char *description)
     {
       int throw_flag;
-      const char *error_string = NULL;
-      const Marpa_Error_Code marpa_error = marpa_g_error (*p_g, &error_string);
-      /* Try to avoid any possiblity of stack overflow */
-      marpa_lua_getfield (L, grammar_stack_ix, "throw");
+      marpa_lua_getglobal (L, "throw");
       /* [ ..., throw_flag ] */
       throw_flag = marpa_lua_toboolean (L, -1);
-      if (throw_flag)
-        {
-          kollos_throw (L, marpa_error, description);
-        }
-      /* Leave the stack as we found it */
+      /* [ ..., throw_flag ] */
       marpa_lua_pop(L, 1);
+      push_error_object(L, error_code, description);
+      marpa_lua_pushvalue(L, -1);
+      marpa_lua_setglobal(L, "error_object");
+      /* [ ..., error_object ] */
+      if (!throw_flag) return;
+      marpa_lua_error(L);
     }
 
-    /* Handle libmarpa recce errors in the most usual way.
+    /* Handle libmarpa errors in the most usual way.
        Uses 1 position on the stack, and throws the
        error, if so desired.
        The error may not be thrown, and it expects the
        caller to handle any non-thrown error.
     */
     static void
-    common_r_error_handler (lua_State * L,
-                            int recce_stack_ix, const char *description)
+    libmarpa_error_handle (lua_State * L,
+                            int stack_ix, const char *description)
     {
-      int throw_flag;
-      Marpa_Error_Code marpa_error;
+      Marpa_Error_Code error_code;
       Marpa_Grammar *grammar_ud;
-      marpa_lua_getfield (L, recce_stack_ix, "_libmarpa_g");
+      marpa_lua_getfield (L, stack_ix, "_libmarpa_g");
       /* [ ..., grammar_ud ] */
       grammar_ud = (Marpa_Grammar *) marpa_lua_touserdata (L, -1);
       marpa_lua_pop(L, 1);
-      marpa_error = marpa_g_error (*grammar_ud, NULL);
-      marpa_lua_getfield (L, recce_stack_ix, "throw");
-      /* [ ..., throw_flag ] */
-      throw_flag = marpa_lua_toboolean (L, -1);
-      if (throw_flag)
-        {
-          kollos_throw (L, marpa_error, description);
-        }
-      /* Leave the stack as we found it */
-      marpa_lua_pop(L, 1);
+      error_code = marpa_g_error (*grammar_ud, NULL);
+      libmarpa_error_code_handle(L, error_code, description);
     }
 
-    /* Handle libmarpa bocage errors in the most usual way.
-       Uses 1 position on the stack, and throws the
-       error, if so desired.
-       The error may not be thrown, and it expects the
-       caller to handle any non-thrown error.
-    */
-    static void
-    common_b_error_handler (lua_State * L,
-                            int bocage_stack_ix, const char *description)
-    {
-      int throw_flag;
-      Marpa_Error_Code marpa_error;
-      Marpa_Grammar *grammar_ud;
-      marpa_lua_getfield (L, bocage_stack_ix, "_libmarpa_g");
-      /* [ ..., grammar_ud ] */
-      grammar_ud = (Marpa_Grammar *) marpa_lua_touserdata (L, -1);
-      marpa_lua_pop(L, 1);
-      marpa_error = marpa_g_error (*grammar_ud, NULL);
-      marpa_lua_getfield (L, bocage_stack_ix, "throw");
-      /* [ ..., throw_flag ] */
-      throw_flag = marpa_lua_toboolean (L, -1);
-      /* [ ..., throw_flag ] */
-      if (throw_flag)
-        {
-          kollos_throw (L, marpa_error, description);
-        }
-      /* [ ..., throw_flag ] */
-      /* Leave the stack as we found it */
-      marpa_lua_pop(L, 1);
-    }
-
-    /* Handle libmarpa order errors in the most usual way.
-       Uses 1 position on the stack, and throws the
-       error, if so desired.
-       The error may not be thrown, and it expects the
-       caller to handle any non-thrown error.
-    */
-    static void
-    common_o_error_handler (lua_State * L,
-                            int order_stack_ix, const char *description)
-    {
-      int throw_flag;
-      Marpa_Error_Code marpa_error;
-      Marpa_Grammar *grammar_ud;
-      marpa_lua_getfield (L, order_stack_ix, "_libmarpa_g");
-      /* [ ..., grammar_ud ] */
-      grammar_ud = (Marpa_Grammar *) marpa_lua_touserdata (L, -1);
-      marpa_lua_pop(L, 1);
-      marpa_error = marpa_g_error (*grammar_ud, NULL);
-      marpa_lua_getfield (L, order_stack_ix, "throw");
-      /* [ ..., throw_flag ] */
-      throw_flag = marpa_lua_toboolean (L, -1);
-      /* [ ..., throw_flag ] */
-      if (throw_flag)
-        {
-          kollos_throw (L, marpa_error, description);
-        }
-      /* [ ..., throw_flag ] */
-      /* Leave the stack as we found it */
-      marpa_lua_pop(L, 1);
-    }
-
-    /* Handle libmarpa tree errors in the most usual way.
-       Uses 1 position on the stack, and throws the
-       error, if so desired.
-       The error may not be thrown, and it expects the
-       caller to handle any non-thrown error.
-    */
-    static void
-    common_t_error_handler (lua_State * L,
-                            int tree_stack_ix, const char *description)
-    {
-      int throw_flag;
-      Marpa_Error_Code marpa_error;
-      Marpa_Grammar *grammar_ud;
-      marpa_lua_getfield (L, tree_stack_ix, "_libmarpa_g");
-      /* [ ..., grammar_ud ] */
-      grammar_ud = (Marpa_Grammar *) marpa_lua_touserdata (L, -1);
-      marpa_lua_pop(L, 1);
-      marpa_error = marpa_g_error (*grammar_ud, NULL);
-      marpa_lua_getfield (L, tree_stack_ix, "throw");
-      /* [ ..., throw_flag ] */
-      throw_flag = marpa_lua_toboolean (L, -1);
-      /* [ ..., throw_flag ] */
-      if (throw_flag)
-        {
-          kollos_throw (L, marpa_error, description);
-        }
-      /* [ ..., throw_flag ] */
-      /* Leave the stack as we found it */
-      marpa_lua_pop(L, 1);
-    }
-
-    /* Handle libmarpa value errors in the most usual way.
-       Uses 1 position on the stack, and throws the
-       error, if so desired.
-       The error may not be thrown, and it expects the
-       caller to handle any non-thrown error.
-    */
-    static void
-    common_v_error_handler (lua_State * L,
-                            int value_stack_ix, const char *description)
-    {
-      int throw_flag;
-      Marpa_Error_Code marpa_error;
-      Marpa_Grammar *grammar_ud;
-      marpa_lua_getfield (L, value_stack_ix, "_libmarpa_g");
-      /* [ ..., grammar_ud ] */
-      grammar_ud = (Marpa_Grammar *) marpa_lua_touserdata (L, -1);
-      marpa_lua_pop(L, 1);
-      marpa_error = marpa_g_error (*grammar_ud, NULL);
-      marpa_lua_getfield (L, value_stack_ix, "throw");
-      /* [ ..., throw_flag ] */
-      throw_flag = marpa_lua_toboolean (L, -1);
-      /* [ ..., throw_flag ] */
-      if (throw_flag)
-        {
-          kollos_throw (L, marpa_error, description);
-        }
-      /* [ ..., throw_flag ] */
-      /* Leave the stack as we found it */
-      marpa_lua_pop(L, 1);
-    }
-
-    -- miranda: section+ header stuff from okollos.c.lua
+    -- miranda: section+ C function declarations
     void marpa_gen_grammar_ud(lua_State* L, Marpa_Grammar g);
-    -- miranda: section+ stuff from okollos.c.lua
+    -- miranda: section+ grammar object non-standard wrappers
     /* Caller must ensure enough stack space.
      * Leaves a new userdata on top of the stack.
      */
@@ -2364,7 +2174,8 @@ Set "strict" globals, using code taken from strict.lua.
         /* [ userdata ] */
     }
 
-    -- miranda: section+ stuff from okollos.c.lua
+    -- miranda: section+ grammar object non-standard wrappers
+
     static int
     wrap_grammar_new (lua_State * L)
     {
@@ -2376,8 +2187,7 @@ Set "strict" globals, using code taken from strict.lua.
       /* expecting a table */
       if (1)
         {
-          check_libmarpa_table (L, "wrap_grammar_NEW()", grammar_stack_ix,
-                                "grammar");
+          marpa_luaL_checktype(L, grammar_stack_ix, LUA_TTABLE);
         }
 
       /* I have forked Libmarpa into Kollos, which makes version checking
@@ -2437,25 +2247,16 @@ Set "strict" globals, using code taken from strict.lua.
         *p_g = marpa_g_new (&marpa_config);
         if (!*p_g)
           {
-            int throw_flag;
-            Marpa_Error_Code marpa_error = marpa_c_error (&marpa_config, NULL);
-            marpa_lua_getfield (L, -1, "throw");
-            throw_flag = marpa_lua_toboolean (L, -1);
-            /* [ grammar_table, throw_flag ] */
-            if (throw_flag)
-              {
-                kollos_throw (L, marpa_error, "marpa_g_new()");
-              }
-            marpa_lua_pushnil (L);
-            return 1;
+            const Marpa_Error_Code marpa_error = marpa_c_error (&marpa_config, NULL);
+            libmarpa_error_code_handle(L, marpa_error, "marpa_g_new()");
+            return 0;
           }
         result = marpa_g_force_valued (*p_g);
         if (result < 0)
           {
-            common_g_error_handler (L, p_g, grammar_stack_ix,
+            libmarpa_error_handle(L, grammar_stack_ix,
                                     "marpa_g_force_valued()");
-            marpa_lua_pushnil (L);
-            return 1;
+            return 0;
           }
         if (0)
           printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
@@ -2499,7 +2300,7 @@ Set "strict" globals, using code taken from strict.lua.
       event_count = marpa_g_event_count (*p_g);
       if (event_count < 0)
         {
-          common_g_error_handler (L, p_g, grammar_stack_ix,
+          libmarpa_error_handle (L, grammar_stack_ix,
                                   "marpa_g_event_count()");
           return 0;
         }
@@ -2518,7 +2319,7 @@ Set "strict" globals, using code taken from strict.lua.
             event_type = marpa_g_event (*p_g, &event, event_ix);
             if (event_type <= -2)
               {
-                common_g_error_handler (L, p_g, grammar_stack_ix,
+                libmarpa_error_handle (L, grammar_stack_ix,
                                         "marpa_g_event()");
                 return 0;
               }
@@ -2558,7 +2359,7 @@ Set "strict" globals, using code taken from strict.lua.
       event_type = marpa_g_event (*p_g, &event, event_ix);
       if (event_type <= -2)
         {
-          common_g_error_handler (L, p_g, grammar_stack_ix, "marpa_g_event()");
+          libmarpa_error_handle (L, grammar_stack_ix, "marpa_g_event()");
           return 0;
         }
       marpa_lua_pushinteger (L, event_type);
@@ -2588,11 +2389,7 @@ Set "strict" globals, using code taken from strict.lua.
          * so eventually we will run unsafe.
          * This checking code is for debugging.
          */
-        if (1)
-          {
-            check_libmarpa_table (L, "wrap_grammar_rule_new()", grammar_stack_ix,
-                                  "grammar");
-          }
+        marpa_luaL_checktype(L, grammar_stack_ix, LUA_TTABLE);
 
         lhs = (Marpa_Symbol_ID)marpa_lua_tointeger(L, 2);
         /* Unsafe, no arg count checking */
@@ -2612,13 +2409,13 @@ Set "strict" globals, using code taken from strict.lua.
         p_g = (Marpa_Grammar *) marpa_lua_touserdata (L, -1);
 
         result = (Marpa_Rule_ID)marpa_g_rule_new(*p_g, lhs, rhs, rhs_length);
-        if (result <= -1) common_g_error_handler (L, p_g, grammar_stack_ix,
+        if (result <= -1) libmarpa_error_handle (L, grammar_stack_ix,
                                 "marpa_g_rule_new()");
         marpa_lua_pushinteger(L, (lua_Integer)result);
         return 1;
     }
 
-    -- miranda: section+ stuff from okollos.c.lua
+    -- miranda: section+ recognizer object non-standard wrappers
 
     /* recognizer wrappers which need to be hand-written */
 
@@ -2630,12 +2427,9 @@ Set "strict" globals, using code taken from strict.lua.
       if (0)
         printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
       /* [ recce_table, grammar_table ] */
-      if (1)
-        {
-          check_libmarpa_table (L, "wrap_recce_new()", recce_stack_ix, "recce");
-          check_libmarpa_table (L, "wrap_recce_new()", grammar_stack_ix,
-                                "grammar");
-        }
+
+      marpa_luaL_checktype(L, recce_stack_ix, LUA_TTABLE);
+      marpa_luaL_checktype(L, grammar_stack_ix, LUA_TTABLE);
 
       /* [ recce_table, grammar_table ] */
       {
@@ -2662,7 +2456,7 @@ Set "strict" globals, using code taken from strict.lua.
         *recce_ud = marpa_r_new (*grammar_ud);
         if (!*recce_ud)
           {
-            common_r_error_handler (L, recce_stack_ix, "marpa_r_new()");
+            libmarpa_error_handle (L, grammar_stack_ix, "marpa_r_new()");
             marpa_lua_pushnil (L);
             return 1;
           }
@@ -2691,7 +2485,7 @@ Set "strict" globals, using code taken from strict.lua.
       rule_id = marpa_r_progress_item (*p_r, &position, &origin);
       if (rule_id < -1)
         {
-          common_r_error_handler (L, recce_stack_ix, "marpa_r_progress_item()");
+          libmarpa_error_handle (L, recce_stack_ix, "marpa_r_progress_item()");
           marpa_lua_pushinteger (L, (lua_Integer) rule_id);
           return 1;
         }
@@ -2708,7 +2502,7 @@ Set "strict" globals, using code taken from strict.lua.
       return 3;
     }
 
-    -- miranda: section+ stuff from okollos.c.lua
+    -- miranda: section+ bocage object non-standard wrappers
 
     /* bocage wrappers which need to be hand-written */
 
@@ -2727,12 +2521,10 @@ Set "strict" globals, using code taken from strict.lua.
             printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
         /* [ bocage_table, recce_table ] */
         if (1) {
-            check_libmarpa_table (L, "wrap_bocage_new()", bocage_stack_ix,
-                "bocage");
-            check_libmarpa_table (L, "wrap_bocage_new()", recce_stack_ix,
-                "recce");
-            marpa_luaL_checktype (L, symbol_stack_ix, LUA_TNIL);
-            marpa_luaL_checktype (L, start_stack_ix, LUA_TNIL);
+          marpa_luaL_checktype(L, bocage_stack_ix, LUA_TTABLE);
+          marpa_luaL_checktype(L, recce_stack_ix, LUA_TTABLE);
+          marpa_luaL_checktype (L, symbol_stack_ix, LUA_TNIL);
+          marpa_luaL_checktype (L, start_stack_ix, LUA_TNIL);
         }
 
         if (marpa_lua_type (L, end_stack_ix) == LUA_TNIL) {
@@ -2781,7 +2573,7 @@ Set "strict" globals, using code taken from strict.lua.
                 end_earley_set = marpa_r_latest_earley_set (*recce_ud);
             } else {
                 if (end_earley_set < 0) {
-                    common_b_error_handler (L, bocage_stack_ix,
+                    libmarpa_error_handle (L, bocage_stack_ix,
                         "bocage_new(): end earley set arg is negative");
                     marpa_lua_pushnil (L);
                     return 1;
@@ -2790,7 +2582,7 @@ Set "strict" globals, using code taken from strict.lua.
 
             *bocage_ud = marpa_b_new (*recce_ud, end_earley_set);
             if (!*bocage_ud) {
-                common_b_error_handler (L, bocage_stack_ix, "marpa_b_new()");
+                libmarpa_error_handle (L, bocage_stack_ix, "marpa_b_new()");
                 marpa_lua_pushnil (L);
                 return 1;
             }
@@ -2803,7 +2595,7 @@ Set "strict" globals, using code taken from strict.lua.
         return 1;
     }
 
-    -- miranda: section+ stuff from okollos.c.lua
+    -- miranda: section+ order object non-standard wrappers
 
     /* order wrappers which need to be hand-written */
 
@@ -2818,8 +2610,8 @@ Set "strict" globals, using code taken from strict.lua.
       /* [ order_table, bocage_table ] */
       if (1)
         {
-          check_libmarpa_table (L, "wrap_order_new()", order_stack_ix, "order");
-          check_libmarpa_table (L, "wrap_order_new()", bocage_stack_ix, "bocage");
+          marpa_luaL_checktype(L, order_stack_ix, LUA_TTABLE);
+          marpa_luaL_checktype(L, bocage_stack_ix, LUA_TTABLE);
         }
 
       /* [ order_table, bocage_table ] */
@@ -2849,9 +2641,8 @@ Set "strict" globals, using code taken from strict.lua.
         *order_ud = marpa_o_new (*bocage_ud);
         if (!*order_ud)
           {
-            common_o_error_handler (L, order_stack_ix, "marpa_o_new()");
-            marpa_lua_pushnil (L);
-            return 1;
+            libmarpa_error_handle (L, order_stack_ix, "marpa_o_new()");
+            return 0;
           }
       }
       if (0)
@@ -2862,7 +2653,7 @@ Set "strict" globals, using code taken from strict.lua.
       return 1;
     }
 
-    -- miranda: section+ stuff from okollos.c.lua
+    -- miranda: section+ tree object non-standard wrappers
 
     /* tree wrappers which need to be hand-written */
 
@@ -2877,8 +2668,8 @@ Set "strict" globals, using code taken from strict.lua.
       /* [ tree_table, order_table ] */
       if (1)
         {
-          check_libmarpa_table (L, "wrap_tree_new()", tree_stack_ix, "tree");
-          check_libmarpa_table (L, "wrap_tree_new()", order_stack_ix, "order");
+          marpa_luaL_checktype(L, tree_stack_ix, LUA_TTABLE);
+          marpa_luaL_checktype(L, order_stack_ix, LUA_TTABLE);
         }
 
       /* [ tree_table, order_table ] */
@@ -2911,9 +2702,8 @@ Set "strict" globals, using code taken from strict.lua.
         *tree_ud = marpa_t_new (*order_ud);
         if (!*tree_ud)
           {
-            common_t_error_handler (L, tree_stack_ix, "marpa_t_new()");
-            marpa_lua_pushnil (L);
-            return 1;
+            libmarpa_error_handle (L, tree_stack_ix, "marpa_t_new()");
+            return 0;
           }
       }
       if (0)
@@ -2924,13 +2714,14 @@ Set "strict" globals, using code taken from strict.lua.
       return 1;
     }
 
-    -- miranda: section+ stuff from okollos.c.lua
+    -- miranda: section+ C function declarations
 
     /* value wrappers which need to be hand-written */
 
-    -- miranda: section+ header stuff from okollos.c.lua
     void marpa_gen_value_ud(lua_State* L, Marpa_Value g);
-    -- miranda: section+ stuff from okollos.c.lua
+
+    -- miranda: section+ value object non-standard wrappers
+
     /* Caller must ensure enough stack space.
      * Leaves a new userdata on top of the stack.
      */
@@ -2946,8 +2737,6 @@ Set "strict" globals, using code taken from strict.lua.
         /* [ userdata ] */
     }
 
-    -- miranda: section+ stuff from okollos.c.lua
-
     static int
     wrap_value_new (lua_State * L)
     {
@@ -2959,8 +2748,8 @@ Set "strict" globals, using code taken from strict.lua.
       /* [ value_table, tree_table ] */
       if (1)
         {
-          check_libmarpa_table (L, "wrap_value_new()", value_stack_ix, "value");
-          check_libmarpa_table (L, "wrap_value_new()", tree_stack_ix, "tree");
+          marpa_luaL_checktype(L, value_stack_ix, LUA_TTABLE);
+          marpa_luaL_checktype(L, tree_stack_ix, LUA_TTABLE);
         }
 
       /* [ value_table, tree_table ] */
@@ -2993,9 +2782,8 @@ Set "strict" globals, using code taken from strict.lua.
         *value_ud = marpa_v_new (*tree_ud);
         if (!*value_ud)
           {
-            common_v_error_handler (L, value_stack_ix, "marpa_v_new()");
-            marpa_lua_pushnil (L);
-            return 1;
+            libmarpa_error_handle (L, value_stack_ix, "marpa_v_new()");
+            return 0;
           }
       }
       if (0)
@@ -3006,7 +2794,70 @@ Set "strict" globals, using code taken from strict.lua.
       return 1;
     }
 
-    -- miranda: section+ stuff from okollos.c.lua
+    static int
+    wrap_v_step (lua_State * L)
+    {
+        Marpa_Value* value_ud;
+        Marpa_Step_Type step_type;
+        const int value_stack_ix = 1;
+        int throw = 1;
+
+        marpa_luaL_checktype(L, value_stack_ix, LUA_TTABLE);
+
+        marpa_lua_getglobal(L, "throw");
+        throw = marpa_lua_toboolean(L, -1);
+        /* `throw` left on stack */
+
+        marpa_lua_getfield (L, value_stack_ix, "_libmarpa");
+        /* [ value_table, value_ud ] */
+        value_ud = (Marpa_Value *) marpa_lua_touserdata (L, -1);
+        step_type = marpa_v_step (*value_ud);
+
+        if (step_type == MARPA_STEP_INACTIVE) {
+            return 0;
+        }
+
+        if (step_type < 0) {
+            libmarpa_error_handle (L, value_stack_ix, "marpa_v_step()");
+            return 0;
+        }
+
+        /*
+         * result_string =  (step_type);
+         * if (!result_string) {
+         *     char *error_message =
+         *         form ("Problem in v->step(): unknown step type %d", step_type);
+         *     set_error_from_string (v_wrapper->base, savepv (error_message));
+         *     if (v_wrapper->base->throw) {
+         *         croak ("%s", error_message);
+         *     }
+         *     XPUSHs (sv_2mortal (newSVpv (error_message, 0)));
+         *     XSRETURN (1);
+         * }
+         * XPUSHs (sv_2mortal (newSVpv (result_string, 0)));
+         * if (step_type == MARPA_STEP_TOKEN) {
+         *     token_id = marpa_v_token (v);
+         *     XPUSHs (sv_2mortal (newSViv (token_id)));
+         *     XPUSHs (sv_2mortal (newSViv (marpa_v_token_value (v))));
+         *     XPUSHs (sv_2mortal (newSViv (marpa_v_result (v))));
+         * }
+         * if (step_type == MARPA_STEP_NULLING_SYMBOL) {
+         *     token_id = marpa_v_token (v);
+         *     XPUSHs (sv_2mortal (newSViv (token_id)));
+         *     XPUSHs (sv_2mortal (newSViv (marpa_v_result (v))));
+         * }
+         * if (step_type == MARPA_STEP_RULE) {
+         *     rule_id = marpa_v_rule (v);
+         *     XPUSHs (sv_2mortal (newSViv (rule_id)));
+         *     XPUSHs (sv_2mortal (newSViv (marpa_v_arg_0 (v))));
+         *     XPUSHs (sv_2mortal (newSViv (marpa_v_arg_n (v))));
+         * }
+         */
+
+         return 1;
+    }
+
+    -- miranda: section+ object userdata gc methods
 
     /*
      * Userdata metatable methods
@@ -3083,6 +2934,10 @@ Set "strict" globals, using code taken from strict.lua.
            The metatable starts out empty.
         */
         marpa_lua_newtable(L);
+        /* [ kollos, error_mt ] */
+        marpa_lua_pushcfunction(L, l_error_tostring);
+        /* [ kollos, error_mt, tostring_fn ] */
+        marpa_lua_setfield(L, -2, "__tostring");
         /* [ kollos, error_mt ] */
         marpa_lua_rawsetp(L, LUA_REGISTRYINDEX, &kollos_error_mt_key);
         /* [ kollos ] */
@@ -3367,7 +3222,6 @@ Not Lua-callable, but leaves the stack as before.
     #include "lauxlib.h"
     #include "lualib.h"
 
-    -- miranda: insert header stuff from okollos.c.lua
     -- miranda: insert C function declarations
 
     #endif
