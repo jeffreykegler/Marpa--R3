@@ -1931,11 +1931,8 @@ Set "strict" globals, using code taken from strict.lua.
 
     static inline const char* step_name_by_code(lua_Integer step_code)
     {
-       if (step_code >= LIBMARPA_MIN_STEP_CODE && step_code <= LIBMARPA_MAX_STEP_CODE) {
-           return marpa_step_codes[step_code-LIBMARPA_MIN_STEP_CODE].mnemonic;
-       }
-       if (step_code >= KOLLOS_MIN_STEP_CODE && step_code <= KOLLOS_MAX_STEP_CODE) {
-           return marpa_kollos_step_codes[step_code-KOLLOS_MIN_STEP_CODE].mnemonic;
+       if (step_code >= MARPA_MIN_STEP_CODE && step_code <= MARPA_MAX_STEP_CODE) {
+           return marpa_step_codes[step_code-MARPA_MIN_STEP_CODE].mnemonic;
        }
        return (const char *)0;
     }
@@ -2156,9 +2153,13 @@ Set "strict" globals, using code taken from strict.lua.
 
     /* grammar wrappers which need to be hand written */
 
+    /* If the error is not thrown, these handlers leave
+     * the original items on the stack intact, and place
+     * an error object on top of the stack.
+     */
     static void
-    libmarpa_error_code_handle (lua_State * L,
-                            int error_code, const char *description)
+    development_error_handle (lua_State * L,
+                            const char *details)
     {
       int throw_flag;
       marpa_lua_getglobal (L, "throw");
@@ -2166,7 +2167,25 @@ Set "strict" globals, using code taken from strict.lua.
       throw_flag = marpa_lua_toboolean (L, -1);
       /* [ ..., throw_flag ] */
       marpa_lua_pop(L, 1);
-      push_error_object(L, error_code, description);
+      push_error_object(L, MARPA_ERR_DEVELOPMENT, details);
+      marpa_lua_pushvalue(L, -1);
+      marpa_lua_setglobal(L, "error_object");
+      /* [ ..., error_object ] */
+      if (!throw_flag) return;
+      marpa_lua_error(L);
+    }
+
+    static void
+    libmarpa_error_code_handle (lua_State * L,
+                            int error_code, const char *details)
+    {
+      int throw_flag;
+      marpa_lua_getglobal (L, "throw");
+      /* [ ..., throw_flag ] */
+      throw_flag = marpa_lua_toboolean (L, -1);
+      /* [ ..., throw_flag ] */
+      marpa_lua_pop(L, 1);
+      push_error_object(L, error_code, details);
       marpa_lua_pushvalue(L, -1);
       marpa_lua_setglobal(L, "error_object");
       /* [ ..., error_object ] */
@@ -2182,7 +2201,7 @@ Set "strict" globals, using code taken from strict.lua.
     */
     static void
     libmarpa_error_handle (lua_State * L,
-                            int stack_ix, const char *description)
+                            int stack_ix, const char *details)
     {
       Marpa_Error_Code error_code;
       Marpa_Grammar *grammar_ud;
@@ -2191,7 +2210,7 @@ Set "strict" globals, using code taken from strict.lua.
       grammar_ud = (Marpa_Grammar *) marpa_lua_touserdata (L, -1);
       marpa_lua_pop(L, 1);
       error_code = marpa_g_error (*grammar_ud, NULL);
-      libmarpa_error_code_handle(L, error_code, description);
+      libmarpa_error_code_handle(L, error_code, details);
     }
 
     -- miranda: section+ C function declarations
@@ -2832,68 +2851,100 @@ Set "strict" globals, using code taken from strict.lua.
       return 1;
     }
 
+    /* Returns ok, result,
+     * where ok is a boolean and
+     * on failure, result is an error object, while
+     * on success, result is an table
+     */
     static int
     wrap_v_step (lua_State * L)
     {
-        Marpa_Value* value_ud;
-        Marpa_Step_Type step_type;
-        const int value_stack_ix = 1;
-        int throw = 1;
+      const char *result_string;
+      Marpa_Value v;
+      Marpa_Step_Type step_type;
+      const int value_stack_ix = 1;
+      int throw = 1;
 
-        marpa_luaL_checktype(L, value_stack_ix, LUA_TTABLE);
+      marpa_luaL_checktype (L, value_stack_ix, LUA_TTABLE);
 
-        marpa_lua_getglobal(L, "throw");
-        throw = marpa_lua_toboolean(L, -1);
-        /* `throw` left on stack */
+      marpa_lua_getglobal (L, "throw");
+      throw = marpa_lua_toboolean (L, -1);
+      /* `throw` left on stack */
 
-        marpa_lua_getfield (L, value_stack_ix, "_libmarpa");
-        /* [ value_table, value_ud ] */
-        value_ud = (Marpa_Value *) marpa_lua_touserdata (L, -1);
-        step_type = marpa_v_step (*value_ud);
+      marpa_lua_getfield (L, value_stack_ix, "_libmarpa");
+      /* [ value_table, value_ud ] */
+      v = *(Marpa_Value *) marpa_lua_touserdata (L, -1);
+      step_type = marpa_v_step (v);
 
-        if (step_type == MARPA_STEP_INACTIVE) {
-            return 0;
+      if (step_type == MARPA_STEP_INACTIVE)
+        {
+          marpa_lua_pushboolean (L, 1);
+          marpa_lua_pushnil (L);
+          return 2;
         }
 
-        if (step_type < 0) {
-            libmarpa_error_handle (L, value_stack_ix, "marpa_v_step()");
-            return 0;
+      if (step_type < 0)
+        {
+          libmarpa_error_handle (L, value_stack_ix, "marpa_v_step()");
+          marpa_lua_pushboolean (L, 0);
+          marpa_lua_insert (L, -2);
+          return 2;
         }
 
-        result_string = step_name_by_code(step_type);
-        /*
-         * result_string =  (step_type);
-         * if (!result_string) {
-         *     char *error_message =
-         *         form ("Problem in v->step(): unknown step type %d", step_type);
-         *     set_error_from_string (v_wrapper->base, savepv (error_message));
-         *     if (v_wrapper->base->throw) {
-         *         croak ("%s", error_message);
-         *     }
-         *     XPUSHs (sv_2mortal (newSVpv (error_message, 0)));
-         *     XSRETURN (1);
-         * }
-         * XPUSHs (sv_2mortal (newSVpv (result_string, 0)));
-         * if (step_type == MARPA_STEP_TOKEN) {
-         *     token_id = marpa_v_token (v);
-         *     XPUSHs (sv_2mortal (newSViv (token_id)));
-         *     XPUSHs (sv_2mortal (newSViv (marpa_v_token_value (v))));
-         *     XPUSHs (sv_2mortal (newSViv (marpa_v_result (v))));
-         * }
-         * if (step_type == MARPA_STEP_NULLING_SYMBOL) {
-         *     token_id = marpa_v_token (v);
-         *     XPUSHs (sv_2mortal (newSViv (token_id)));
-         *     XPUSHs (sv_2mortal (newSViv (marpa_v_result (v))));
-         * }
-         * if (step_type == MARPA_STEP_RULE) {
-         *     rule_id = marpa_v_rule (v);
-         *     XPUSHs (sv_2mortal (newSViv (rule_id)));
-         *     XPUSHs (sv_2mortal (newSViv (marpa_v_arg_0 (v))));
-         *     XPUSHs (sv_2mortal (newSViv (marpa_v_arg_n (v))));
-         * }
-         */
+      result_string = step_name_by_code (step_type);
+      if (result_string)
+        {
 
-         return 1;
+          /* The table containing the return value */
+          marpa_lua_newtable (L);
+          marpa_lua_pushstring (L, result_string);
+          marpa_lua_seti (L, -1, 1);
+
+          if (step_type == MARPA_STEP_TOKEN)
+            {
+              marpa_lua_pushinteger (L, marpa_v_token (v));
+              marpa_lua_seti (L, -1, 2);
+              marpa_lua_pushinteger (L, marpa_v_token_value (v));
+              marpa_lua_seti (L, -1, 3);
+              marpa_lua_pushinteger (L, marpa_v_result (v));
+              marpa_lua_seti (L, -1, 4);
+              marpa_lua_pushboolean (L, 1);
+              marpa_lua_insert (L, -2);
+              return 2;
+            }
+
+          if (step_type == MARPA_STEP_NULLING_SYMBOL)
+            {
+              marpa_lua_pushinteger (L, marpa_v_token (v));
+              marpa_lua_seti (L, -1, 2);
+              marpa_lua_pushinteger (L, marpa_v_result (v));
+              marpa_lua_seti (L, -1, 3);
+              marpa_lua_pushboolean (L, 1);
+              marpa_lua_insert (L, -2);
+              return 2;
+            }
+
+          if (step_type == MARPA_STEP_RULE)
+            {
+              marpa_lua_pushinteger (L, marpa_v_rule (v));
+              marpa_lua_seti (L, -1, 2);
+              marpa_lua_pushinteger (L, marpa_v_arg_0 (v));
+              marpa_lua_seti (L, -1, 3);
+              marpa_lua_pushinteger (L, marpa_v_arg_n (v));
+              marpa_lua_seti (L, -1, 4);
+              marpa_lua_pushboolean (L, 1);
+              marpa_lua_insert (L, -2);
+              return 2;
+            }
+        }
+
+      marpa_lua_pushfstring (L, "Problem in v->step(): unknown step type %d",
+                             step_type);
+      development_error_handle (L, marpa_lua_tostring (L, -1));
+      marpa_lua_pushboolean (L, 0);
+      marpa_lua_insert (L, -2);
+      return 2;
+
     }
 
     -- miranda: section+ object userdata gc methods

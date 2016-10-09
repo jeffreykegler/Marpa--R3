@@ -65,8 +65,8 @@ end
 
 io.write('```\n');
 io.write('  -- miranda: section define step codes\n');
-io.write('  #define LIBMARPA_MIN_STEP_CODE 0\n')
-io.write('  #define LIBMARPA_MAX_STEP_CODE ' .. max_code .. '\n\n')
+io.write('  #define MARPA_MIN_STEP_CODE 0\n')
+io.write('  #define MARPA_MAX_STEP_CODE ' .. max_code .. '\n\n')
 
 for i = 0, max_code do
     local mnemonic = code_mnemonics[i]
@@ -77,7 +77,7 @@ for i = 0, max_code do
    end
 end
 io.write('\n')
-io.write('  struct s_libmarpa_step_code marpa_step_codes[LIBMARPA_MAX_STEP_CODE-LIBMARPA_MIN_STEP_CODE+1] = {\n')
+io.write('  struct s_libmarpa_step_code marpa_step_codes[MARPA_MAX_STEP_CODE-MARPA_MIN_STEP_CODE+1] = {\n')
 for i = 0, max_code do
     local code_line = code_lines[i]
     if code_line then

@@ -127,13 +127,13 @@ test_dynamic ::
 init.lua: init.lua.md
 	$(LUA_INTERP) miranda init.lua.md main=init.lua
 
-error_table.md:
+error_table.md: gen_error_table.lua
 	$(LUA_INTERP) gen_error_table.lua $(ERROR_TABLE) > $@
 
-event_table.md:
+event_table.md: gen_event_table.lua
 	$(LUA_INTERP) gen_event_table.lua $(EVENT_TABLE) > $@
 
-step_table.md:
+step_table.md: gen_step_table.lua
 	$(LUA_INTERP) gen_step_table.lua $(STEP_TABLE) > $@
 
 kollos.c: error_table.md event_table.md step_table.md init.lua.md kollos.h
