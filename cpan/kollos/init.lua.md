@@ -1538,7 +1538,8 @@ the wrapper's point of view, marpa_r_alternative() always succeeds.
         local result = {}
         for class_letter, class in pairs(libmarpa_class_name) do
            local class_table_name = 'class_' .. class
-           result[#result+1] = "  marpa_lua_newtable(L);\n"
+           local functions_to_register = class .. '_methods'
+           result[#result+1] = string.format("  marpa_luaL_newlib(L, %s);\n", functions_to_register)
            result[#result+1] = "  marpa_lua_pushvalue(L, -1);\n"
            result[#result+1] = '  marpa_lua_setfield(L, -2, "__index");\n'
            result[#result+1] = string.format("  marpa_lua_setfield(L, kollos_table_stack_ix, %q);\n", class_table_name);
@@ -2472,6 +2473,10 @@ Set "strict" globals, using code taken from strict.lua.
         return 1;
     }
 
+    static const struct luaL_Reg grammar_methods[] = {
+      { NULL, NULL },
+    };
+
     -- miranda: section+ recognizer object non-standard wrappers
 
     /* recognizer wrappers which need to be hand-written */
@@ -2558,6 +2563,10 @@ Set "strict" globals, using code taken from strict.lua.
        */
       return 3;
     }
+
+    static const struct luaL_Reg recce_methods[] = {
+      { NULL, NULL },
+    };
 
     -- miranda: section+ bocage object non-standard wrappers
 
@@ -2652,6 +2661,10 @@ Set "strict" globals, using code taken from strict.lua.
         return 1;
     }
 
+    static const struct luaL_Reg bocage_methods[] = {
+      { NULL, NULL },
+    };
+
     -- miranda: section+ order object non-standard wrappers
 
     /* order wrappers which need to be hand-written */
@@ -2709,6 +2722,10 @@ Set "strict" globals, using code taken from strict.lua.
       /* [ order_table ] */
       return 1;
     }
+
+    static const struct luaL_Reg order_methods[] = {
+      { NULL, NULL },
+    };
 
     -- miranda: section+ tree object non-standard wrappers
 
@@ -2770,6 +2787,10 @@ Set "strict" globals, using code taken from strict.lua.
       /* [ tree_table ] */
       return 1;
     }
+
+    static const struct luaL_Reg tree_methods[] = {
+      { NULL, NULL },
+    };
 
     -- miranda: section+ C function declarations
 
@@ -2876,6 +2897,8 @@ Set "strict" globals, using code taken from strict.lua.
       v = *(Marpa_Value *) marpa_lua_touserdata (L, -1);
       step_type = marpa_v_step (v);
 
+      if (1) printf("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
+
       if (step_type == MARPA_STEP_INACTIVE)
         {
           marpa_lua_pushboolean (L, 1);
@@ -2891,23 +2914,28 @@ Set "strict" globals, using code taken from strict.lua.
           return 2;
         }
 
+      if (1) printf("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
+
       result_string = step_name_by_code (step_type);
       if (result_string)
         {
 
+          int return_value_ix;
+
           /* The table containing the return value */
           marpa_lua_newtable (L);
+          return_value_ix = marpa_lua_gettop(L);
           marpa_lua_pushstring (L, result_string);
-          marpa_lua_seti (L, -1, 1);
+          marpa_lua_seti (L, return_value_ix, 1);
 
           if (step_type == MARPA_STEP_TOKEN)
             {
               marpa_lua_pushinteger (L, marpa_v_token (v));
-              marpa_lua_seti (L, -1, 2);
+              marpa_lua_seti (L, return_value_ix, 2);
               marpa_lua_pushinteger (L, marpa_v_token_value (v));
-              marpa_lua_seti (L, -1, 3);
+              marpa_lua_seti (L, return_value_ix, 3);
               marpa_lua_pushinteger (L, marpa_v_result (v));
-              marpa_lua_seti (L, -1, 4);
+              marpa_lua_seti (L, return_value_ix, 4);
               marpa_lua_pushboolean (L, 1);
               marpa_lua_insert (L, -2);
               return 2;
@@ -2916,9 +2944,9 @@ Set "strict" globals, using code taken from strict.lua.
           if (step_type == MARPA_STEP_NULLING_SYMBOL)
             {
               marpa_lua_pushinteger (L, marpa_v_token (v));
-              marpa_lua_seti (L, -1, 2);
+              marpa_lua_seti (L, return_value_ix, 2);
               marpa_lua_pushinteger (L, marpa_v_result (v));
-              marpa_lua_seti (L, -1, 3);
+              marpa_lua_seti (L, return_value_ix, 3);
               marpa_lua_pushboolean (L, 1);
               marpa_lua_insert (L, -2);
               return 2;
@@ -2927,16 +2955,18 @@ Set "strict" globals, using code taken from strict.lua.
           if (step_type == MARPA_STEP_RULE)
             {
               marpa_lua_pushinteger (L, marpa_v_rule (v));
-              marpa_lua_seti (L, -1, 2);
+              marpa_lua_seti (L, return_value_ix, 2);
               marpa_lua_pushinteger (L, marpa_v_arg_0 (v));
-              marpa_lua_seti (L, -1, 3);
+              marpa_lua_seti (L, return_value_ix, 3);
               marpa_lua_pushinteger (L, marpa_v_arg_n (v));
-              marpa_lua_seti (L, -1, 4);
+              marpa_lua_seti (L, return_value_ix, 4);
               marpa_lua_pushboolean (L, 1);
               marpa_lua_insert (L, -2);
               return 2;
             }
         }
+
+      if (1) printf("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
 
       marpa_lua_pushfstring (L, "Problem in v->step(): unknown step type %d",
                              step_type);
@@ -2946,6 +2976,11 @@ Set "strict" globals, using code taken from strict.lua.
       return 2;
 
     }
+
+    static const struct luaL_Reg value_methods[] = {
+      { "step", wrap_v_step },
+      { NULL, NULL },
+    };
 
     -- miranda: section+ object userdata gc methods
 
