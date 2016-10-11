@@ -2897,7 +2897,7 @@ Set "strict" globals, using code taken from strict.lua.
       v = *(Marpa_Value *) marpa_lua_touserdata (L, -1);
       step_type = marpa_v_step (v);
 
-      if (1) printf("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
+      if (0) printf("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
 
       if (step_type == MARPA_STEP_INACTIVE)
         {
@@ -2914,7 +2914,7 @@ Set "strict" globals, using code taken from strict.lua.
           return 2;
         }
 
-      if (1) printf("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
+      if (0) printf("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
 
       result_string = step_name_by_code (step_type);
       if (result_string)
@@ -2932,10 +2932,14 @@ Set "strict" globals, using code taken from strict.lua.
             {
               marpa_lua_pushinteger (L, marpa_v_token (v));
               marpa_lua_seti (L, return_value_ix, 2);
-              marpa_lua_pushinteger (L, marpa_v_token_value (v));
+              marpa_lua_pushinteger (L, marpa_v_token_start_es_id (v));
               marpa_lua_seti (L, return_value_ix, 3);
-              marpa_lua_pushinteger (L, marpa_v_result (v));
+              marpa_lua_pushinteger (L, marpa_v_es_id (v));
               marpa_lua_seti (L, return_value_ix, 4);
+              marpa_lua_pushinteger (L, marpa_v_result (v));
+              marpa_lua_seti (L, return_value_ix, 5);
+              marpa_lua_pushinteger (L, marpa_v_token_value (v));
+              marpa_lua_seti (L, return_value_ix, 6);
               marpa_lua_pushboolean (L, 1);
               marpa_lua_insert (L, -2);
               return 2;
@@ -2945,8 +2949,12 @@ Set "strict" globals, using code taken from strict.lua.
             {
               marpa_lua_pushinteger (L, marpa_v_token (v));
               marpa_lua_seti (L, return_value_ix, 2);
-              marpa_lua_pushinteger (L, marpa_v_result (v));
+              marpa_lua_pushinteger (L, marpa_v_rule_start_es_id (v));
               marpa_lua_seti (L, return_value_ix, 3);
+              marpa_lua_pushinteger (L, marpa_v_es_id (v));
+              marpa_lua_seti (L, return_value_ix, 4);
+              marpa_lua_pushinteger (L, marpa_v_result (v));
+              marpa_lua_seti (L, return_value_ix, 5);
               marpa_lua_pushboolean (L, 1);
               marpa_lua_insert (L, -2);
               return 2;
@@ -2956,17 +2964,23 @@ Set "strict" globals, using code taken from strict.lua.
             {
               marpa_lua_pushinteger (L, marpa_v_rule (v));
               marpa_lua_seti (L, return_value_ix, 2);
-              marpa_lua_pushinteger (L, marpa_v_arg_0 (v));
+              marpa_lua_pushinteger (L, marpa_v_rule_start_es_id (v));
               marpa_lua_seti (L, return_value_ix, 3);
-              marpa_lua_pushinteger (L, marpa_v_arg_n (v));
+              marpa_lua_pushinteger (L, marpa_v_es_id (v));
               marpa_lua_seti (L, return_value_ix, 4);
+              marpa_lua_pushinteger (L, marpa_v_result (v));
+              marpa_lua_seti (L, return_value_ix, 5);
+              marpa_lua_pushinteger (L, marpa_v_arg_0 (v));
+              marpa_lua_seti (L, return_value_ix, 6);
+              marpa_lua_pushinteger (L, marpa_v_arg_n (v));
+              marpa_lua_seti (L, return_value_ix, 7);
               marpa_lua_pushboolean (L, 1);
               marpa_lua_insert (L, -2);
               return 2;
             }
         }
 
-      if (1) printf("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
+      if (0) printf("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
 
       marpa_lua_pushfstring (L, "Problem in v->step(): unknown step type %d",
                              step_type);
