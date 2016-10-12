@@ -47,6 +47,9 @@ $grammar->precompute();
 my $recce = Marpa::R3::Thin::R->new($grammar);
 $recce->start_input();
 
+my $marpa_lua = Marpa::R3::Lua->new();
+$marpa_lua->raw_exec($Marpa::R3::Lua::Inspect::load);
+
 # The numbers from 1 to 3 are themselves --
 # that is, they index their own token value.
 # Important: zero cannot be itself!
@@ -56,6 +59,14 @@ my $zero                 = -1 + push @token_values, 0;
 my $minus_token_value    = -1 + push @token_values, q{-};
 my $plus_token_value     = -1 + push @token_values, q{+};
 my $multiply_token_value = -1 + push @token_values, q{*};
+
+# Make a copy of the token value array in Lua.
+# Note
+$marpa_lua->exec(<<'END_OF_LUA');
+local token_values = { 1, 2, 3, 0, '-', '+', '*' }
+-- Lua is 1-based so zero must be a special case.
+token_values[0] = 0
+END_OF_LUA
 
 $recce->alternative( $symbol_number, 2, 1 );
 $recce->earleme_complete();
@@ -75,9 +86,33 @@ $recce->earleme_complete();
 my $latest_earley_set_ID = $recce->latest_earley_set();
 my $bocage        = Marpa::R3::Thin::B->new( $recce, $latest_earley_set_ID );
 my $order         = Marpa::R3::Thin::O->new($bocage);
+
 my $tree          = Marpa::R3::Thin::T->new($order);
 my @actual_values = ();
 while ( $tree->next() ) {
+    # $tree->dummyup_valuator($marpa_lua, "value");
+
+#     my $result = $marpa_lua->exec(<<'END_OF_LUA');
+#     local stack = {}
+#     while true do
+#        -- print(inspect(value))
+#        local ok, step = value:step()
+#        if not ok then error_throw(step) end
+#        if not step then break end
+#        local type, symbol, start_loc, end_loc, result = table.unpack(step)
+#        if type == 'RULE' then
+#            -- result[#result+1] = string.format("Rule %s is from %d to %d\n", symbol, start_loc, end_loc)
+#        elseif type == 'TOKEN' then
+#            -- stack[result] = string.format("Token %s is from %d to %d\n", symbol, start_loc, end_loc)
+#        elseif type == 'NULLING_SYMBOL' then
+#            -- result[#result+1] = string.format("Nulling symbol %s is from %d to %d\n", symbol, start_loc, end_loc)
+#        else
+#            -- result[#result+1] = string.format("Unknown step type: %q\n", type)
+#        end
+#     end
+#     return 'TEST'
+# END_OF_LUA
+
     my $valuator = Marpa::R3::Thin::V->new($tree);
     my @stack = ();
     STEP: while ( 1 ) {
@@ -151,6 +186,9 @@ for my $actual_value (@actual_values) {
 
 # For the error methods, start clean,
 # with a new, trivial grammar
+
+$marpa_lua = undef;
+
 $grammar = $recce = $bocage = $order = $tree = undef;
 $grammar = Marpa::R3::Thin::G->new({});
 $grammar->force_valued();
@@ -265,7 +303,7 @@ $latest_earley_set_ID = $recce->latest_earley_set();
 $bocage        = Marpa::R3::Thin::B->new( $recce, $latest_earley_set_ID );
 $order         = Marpa::R3::Thin::O->new($bocage);
 
-my $marpa_lua = Marpa::R3::Lua->new();
+$marpa_lua = Marpa::R3::Lua->new();
 $marpa_lua->raw_exec($Marpa::R3::Lua::Inspect::load);
 
 $tree          = Marpa::R3::Thin::T->new($order);

@@ -292,7 +292,6 @@ t/salad.t
 t/seq.t
 t/syn.t
 t/taint.t
-t/thin_deprec.t
 t/thin_eq.t
 t/too_many_g1_yims.t
 t/too_many_l0_yims.t
