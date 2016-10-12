@@ -63,7 +63,7 @@ my $multiply_token_value = -1 + push @token_values, q{*};
 # Make a copy of the token value array in Lua.
 # Note
 $marpa_lua->exec(<<'END_OF_LUA');
-local token_values = { 1, 2, 3, 0, '-', '+', '*' }
+token_values = { 1, 2, 3, 0, '-', '+', '*' }
 -- Lua is 1-based so zero must be a special case.
 token_values[0] = 0
 END_OF_LUA
@@ -90,76 +90,74 @@ my $order         = Marpa::R3::Thin::O->new($bocage);
 my $tree          = Marpa::R3::Thin::T->new($order);
 my @actual_values = ();
 while ( $tree->next() ) {
-    # $tree->dummyup_valuator($marpa_lua, "value");
+    $tree->dummyup_valuator($marpa_lua, "value");
 
-#     my $result = $marpa_lua->exec(<<'END_OF_LUA');
-#     local stack = {}
-#     while true do
-#        -- print(inspect(value))
-#        local ok, step = value:step()
-#        if not ok then error_throw(step) end
-#        if not step then break end
-#        local type, symbol, start_loc, end_loc, result = table.unpack(step)
-#        if type == 'RULE' then
-#            -- result[#result+1] = string.format("Rule %s is from %d to %d\n", symbol, start_loc, end_loc)
-#        elseif type == 'TOKEN' then
-#            -- stack[result] = string.format("Token %s is from %d to %d\n", symbol, start_loc, end_loc)
-#        elseif type == 'NULLING_SYMBOL' then
-#            -- result[#result+1] = string.format("Nulling symbol %s is from %d to %d\n", symbol, start_loc, end_loc)
-#        else
-#            -- result[#result+1] = string.format("Unknown step type: %q\n", type)
-#        end
-#     end
-#     return 'TEST'
-# END_OF_LUA
+    my $result = $marpa_lua->exec(<<'END_OF_LUA', $start_rule_id, $number_rule_id, $op_rule_id);
+    local start_rule_id, number_rule_id, op_rule_id = ...
+    start_rule_id = start_rule_id+0
+    number_rule_id = number_rule_id+0
+    op_rule_id = op_rule_id+0
+    -- stack will be zero-based
+    local stack = {}
+    while true do
+       -- print(inspect(value))
+       local ok, step = value:step()
+       if not ok then error_throw(step) end
+       if not step then break end
+       local type = step[1]
+       if type == 'RULE' then
+           local _, rule_id, start_loc, end_loc, result, arg_0, arg_n = table.unpack(step)
+           rule_id = rule_id+0
+           if rule_id == start_rule_id then
+               local stack_at_n = stack[arg_n]
+               local string = stack_at_n[1]
+               local v = stack_at_n[2]
+               stack[arg_0] = string.format("%s == %s", string, v)
+               goto LAST_STEP
+           end
+           if rule_id == number_rule_id then
+               local number = stack[arg_0]
+               stack[arg_0] = { tostring(number), number }
+               goto NEXT_STEP
+           end
+           if rule_id == op_rule_id then
+               local op = stack[arg_0+1]
+               local stack_at_0 = stack[arg_0]
+               local stack_at_n = stack[arg_n]
+               local left_string = stack_at_0[1]
+               local left_v = stack_at_0[2]
+               local right_string = stack_at_n[1]
+               local right_v = stack_at_n[2]
+               local text = string.format("(%s%s%s)", left_string, op, right_string)
+               local new_stack_entry = { text }
+               stack[result] = new_stack_entry
+               if op == '+' then
+                  new_stack_entry[2] = left_v + right_v
+               elseif op == '-' then
+                  new_stack_entry[2] = left_v - right_v
+               elseif op == '*' then
+                  new_stack_entry[2] = left_v * right_v
+               else
+                  stack[result] = { string.format("Unknown op: %q", op), 0 }
+               end
+               goto NEXT_STEP
+           end
+           stack[result] = { string.format("Unknown rule ID: %d", rule_id), 0 }
+       elseif type == 'TOKEN' then
+           local _, symbol, start_loc, end_loc, result, token_value_ix = table.unpack(step)
+           stack[result] = token_values[token_value_ix]
+       else
+           stack[result] = { string.format("Unexpected step type: %q\n", type), 0 }
+       end
+       ::NEXT_STEP::
+    end
+    ::LAST_STEP::
+    value = nil
+    collectgarbage()
+    return stack[0]
+END_OF_LUA
 
-    my $valuator = Marpa::R3::Thin::V->new($tree);
-    my @stack = ();
-    STEP: while ( 1 ) {
-        my ( $type, @step_data ) = $valuator->step();
-        last STEP if not defined $type;
-        if ( $type eq 'MARPA_STEP_TOKEN' ) {
-            my ( undef, $token_value_ix, $arg_n ) = @step_data;
-            $stack[$arg_n] = $token_values[$token_value_ix];
-            next STEP;
-        }
-        if ( $type eq 'MARPA_STEP_RULE' ) {
-            my ( $rule_id, $arg_0, $arg_n ) = @step_data;
-            if ( $rule_id == $start_rule_id ) {
-                my ( $string, $value ) = @{ $stack[$arg_n] };
-                $stack[$arg_0] = "$string == $value";
-                next STEP;
-            }
-            if ( $rule_id == $number_rule_id ) {
-                my $number = $stack[$arg_0];
-                $stack[$arg_0] = [ $number, $number ];
-                next STEP;
-            }
-            if ( $rule_id == $op_rule_id ) {
-                my $op = $stack[ $arg_0 + 1 ];
-                my ( $right_string, $right_value ) = @{ $stack[$arg_n] };
-                my ( $left_string,  $left_value )  = @{ $stack[$arg_0] };
-                my $value;
-                my $text = '(' . $left_string . $op . $right_string . ')';
-                if ( $op eq q{+} ) {
-                    $stack[$arg_0] = [ $text, $left_value + $right_value ];
-                    next STEP;
-                }
-                if ( $op eq q{-} ) {
-                    $stack[$arg_0] = [ $text, $left_value - $right_value ];
-                    next STEP;
-                }
-                if ( $op eq q{*} ) {
-                    $stack[$arg_0] = [ $text, $left_value * $right_value ];
-                    next STEP;
-                }
-                die "Unknown op: $op";
-            } ## end if ( $rule_id == $op_rule_id )
-            die "Unknown rule $rule_id";
-        } ## end if ( $type eq 'MARPA_STEP_RULE' )
-        die "Unexpected step type: $type";
-    } ## end while ( my ( $type, @step_data ) = $valuator->step() )
-    push @actual_values, $stack[0];
+    push @actual_values, $result;
 } ## end while ( $tree->next() )
 
 # Marpa::R3::Display::End
