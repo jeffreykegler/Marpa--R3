@@ -4039,7 +4039,6 @@ PPCODE:
   }
   v_wrapper->base = t_wrapper->base;
   v_wrapper->v = v;
-  v_wrapper->mode = MARPA_XS_V_MODE_IS_INITIAL;
 
   v_wrapper->constants = newAV ();
   /* Reserve position 0 */
@@ -4090,18 +4089,11 @@ stack_mode_set( v_wrapper, outer_slr )
 PPCODE:
 {
   Scanless_R *slr = slr_inner_get(outer_slr);
-  if (v_wrapper->mode != MARPA_XS_V_MODE_IS_INITIAL)
-    {
-        croak ("Problem in v->stack_mode_set(): Cannot re-set stack mode");
-    }
   if (slr->v_wrapper) {
         croak ("SLR already has active valuator");
   }
-
   v_wrapper->outer_slr = outer_slr;
   slr->v_wrapper = v_wrapper;
-
-  v_wrapper->mode = MARPA_XS_V_MODE_IS_STACK;
 
   XSRETURN_YES;
 }
@@ -4112,11 +4104,6 @@ stack_step( v_wrapper )
 PPCODE:
 {
     Outer_R *outer_slr;
-
-    if (v_wrapper->mode != MARPA_XS_V_MODE_IS_STACK) {
-        croak
-            ("Problem in v->stack_step(): Cannot call unless valuator is in 'stack' mode");
-    }
 
     outer_slr = v_wrapper->outer_slr;
     xlua_sig_call (outer_slr->L,

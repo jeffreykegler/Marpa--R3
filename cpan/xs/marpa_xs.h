@@ -452,7 +452,6 @@ struct v_wrapper_s
   G_Wrapper *base;
   AV *values; /* for values accumulated by a semantic 'step' */
   IV trace_values;
-  int mode;                     /* 'raw' or 'stack' */
   AV *constants;
   Outer_R* outer_slr;
 };
