@@ -301,6 +301,7 @@ t/wall.t
 t/zorro.t
 kollos/gen_error_table.lua
 kollos/gen_event_table.lua
+kollos/gen_step_table.lua
 kollos/Makefile.PL
 kollos/init.lua.md
 kollos/inspect.lua

@@ -124,6 +124,7 @@
 ^kollos/kollos[.]h$
 ^kollos/error_table[.]md$
 ^kollos/event_table[.]md$
+^kollos/step_table[.]md$
 ^xs/MYMETA[.]
 ^xs/Makefile$
 ^xs/Makefile[.]old$
