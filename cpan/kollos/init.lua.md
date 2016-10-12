@@ -3002,53 +3002,28 @@ Set "strict" globals, using code taken from strict.lua.
      * Userdata metatable methods
      */
 
-    static int l_grammar_ud_mt_gc(lua_State *L) {
-        Marpa_Grammar *p_g;
-        if (0) printf("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
-        p_g = (Marpa_Grammar *) marpa_lua_touserdata (L, 1);
-        if (*p_g) marpa_g_unref(*p_g);
-       return 0;
-    }
-
-    static int l_recce_ud_mt_gc(lua_State *L) {
-        Marpa_Recognizer *p_recce;
-        if (0) printf("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
-        p_recce = (Marpa_Recognizer *) marpa_lua_touserdata (L, 1);
-        if (*p_recce) marpa_r_unref(*p_recce);
-       return 0;
-    }
-
-    static int l_bocage_ud_mt_gc(lua_State *L) {
-        Marpa_Bocage *p_bocage;
-        if (0) printf("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
-        p_bocage = (Marpa_Bocage *) marpa_lua_touserdata (L, 1);
-        if (*p_bocage) marpa_b_unref(*p_bocage);
-       return 0;
-    }
-
-    static int l_order_ud_mt_gc(lua_State *L) {
-        Marpa_Order *p_order;
-        if (0) printf("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
-        p_order = (Marpa_Order *) marpa_lua_touserdata (L, 1);
-        if (*p_order) marpa_o_unref(*p_order);
-       return 0;
-    }
-
-    static int l_tree_ud_mt_gc(lua_State *L) {
-        Marpa_Tree *p_tree;
-        if (0) printf("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
-        p_tree = (Marpa_Tree *) marpa_lua_touserdata (L, 1);
-        if (*p_tree) marpa_t_unref(*p_tree);
-       return 0;
-    }
-
-    static int l_value_ud_mt_gc(lua_State *L) {
-        Marpa_Value *p_value;
-        if (0) printf("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
-        p_value = (Marpa_Value *) marpa_lua_touserdata (L, 1);
-        if (*p_value) marpa_v_unref(*p_value);
-       return 0;
-    }
+    --[==[ miranda: exec object userdata gc methods
+        local result = {}
+        local template = [[
+        |static int l_!NAME!_ud_mt_gc(lua_State *L) {
+        |  !TYPE! *p_ud;
+        |  if (0) printf("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
+        |  p_ud = (!TYPE! *) marpa_lua_touserdata (L, 1);
+        |  if (*p_ud) marpa_!LETTER!_unref(*p_ud);
+        |  *p_ud = NULL;
+        |  return 0;
+        |}
+        ]]
+        for letter, class_name in pairs(libmarpa_class_name) do
+           local class_type = libmarpa_class_type[letter]
+           result[#result+1] =
+               pipe_dedent(template)
+                   :gsub("!NAME!", class_name)
+                   :gsub("!TYPE!", class_type)
+                   :gsub("!LETTER!", letter)
+        end
+        return table.concat(result)
+    ]==]
 
 ```
 
@@ -3410,6 +3385,7 @@ Not Lua-callable, but leaves the stack as before.
     -- miranda: sequence-exec declare standard libmarpa wrappers
     -- miranda: sequence-exec register standard libmarpa wrappers
     -- miranda: sequence-exec create kollos class tables
+    -- miranda: sequence-exec object userdata gc methods
 ```
 
 ### Dedent method
