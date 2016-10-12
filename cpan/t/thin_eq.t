@@ -264,38 +264,38 @@ $recce->earleme_complete();
 $latest_earley_set_ID = $recce->latest_earley_set();
 $bocage        = Marpa::R3::Thin::B->new( $recce, $latest_earley_set_ID );
 $order         = Marpa::R3::Thin::O->new($bocage);
+
+my $marpa_lua = Marpa::R3::Lua->new();
+$marpa_lua->raw_exec($Marpa::R3::Lua::Inspect::load);
+
 $tree          = Marpa::R3::Thin::T->new($order);
 $tree->next();
-my $valuator = Marpa::R3::Thin::V->new($tree);
-my $locations_report = q{};
-STEP: for ( ;; ) {
-    my ( $type, @step_data ) = $valuator->step();
-    last STEP if not defined $type;
+$tree->dummyup_valuator($marpa_lua, "value");
+# $marpa_lua->exec('print(inspect(_G))');
+# $marpa_lua->exec('print(inspect(value))');
 
-# Marpa::R3::Display
-# name: Thin location() example
+my $result = $marpa_lua->exec(<<'END_OF_LUA');
+local result = {}
+while true do
+   -- print(inspect(value))
+   local ok, step = value:step()
+   if not ok then error_throw(step) end
+   if not step then break end
+   local type, symbol, start_loc, end_loc = table.unpack(step)
+   if type == 'RULE' then
+       result[#result+1] = string.format("Rule %s is from %d to %d\n", symbol, start_loc, end_loc)
+   elseif type == 'TOKEN' then
+       result[#result+1] = string.format("Token %s is from %d to %d\n", symbol, start_loc, end_loc)
+   elseif type == 'NULLING_SYMBOL' then
+       result[#result+1] = string.format("Nulling symbol %s is from %d to %d\n", symbol, start_loc, end_loc)
+   else
+       result[#result+1] = string.format("Unknown step type: %q\n", type)
+   end
+end
+return table.concat(result)
+END_OF_LUA
 
-    $type = $valuator->step_type();
-    my ( $start, $end ) = $valuator->location();
-    if ( $type eq 'MARPA_STEP_RULE' ) {
-        my ($rule_id) = @step_data;
-        $locations_report .= "Rule $rule_id is from $start to $end\n";
-    }
-    if ( $type eq 'MARPA_STEP_TOKEN' ) {
-        my ($token_id) = @step_data;
-        $locations_report .= "Token $token_id is from $start to $end\n";
-    }
-    if ( $type eq 'MARPA_STEP_NULLING_SYMBOL' ) {
-        my ($symbol_id) = @step_data;
-        $locations_report
-            .= "Nulling symbol $symbol_id is from $start to $end\n";
-    }
-
-# Marpa::R3::Display::End
-
-} ## end STEP: for ( ;; )
-
-Test::More::is( $locations_report, <<'EXPECTED', 'Step locations' );
+Test::More::is( $result, <<'EXPECTED', 'Step locations' );
 Token 1 is from 0 to 1
 Token 2 is from 1 to 2
 Token 1 is from 2 to 3

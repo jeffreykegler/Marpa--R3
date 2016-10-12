@@ -48,13 +48,12 @@ while true do
     end
     if string.find(stripped, "%S") then
 	local raw_code
-	local raw_mnemonic
+	local mnemonic
 	local description
-	_, _, raw_code, raw_mnemonic = string.find(stripped, "^(%d+)%sMARPA_STEP_(%S+)$")
+	_, _, raw_code, mnemonic = string.find(stripped, "^(%d+)%sMARPA_STEP_(%S+)$")
 	local code = tonumber(raw_code)
-	if raw_mnemonic == nil then return nil, "Bad line in step code file ", line end
+	if mnemonic == nil then return nil, "Bad line in step code file ", line end
 	if code > max_code then max_code = code end
-	local mnemonic = 'LIBMARPA_STEP_' .. raw_mnemonic
 	code_mnemonics[code] = mnemonic
 	code_lines[code] = string.format( '   { %d, %s },',
 	    code,
