@@ -947,9 +947,8 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     }
 
   APPLY_DEFAULT_LEXEME_BLESSING: {
-        my $blessing = $lexeme_default_adverbs->{bless};
-        last APPLY_DEFAULT_LEXEME_BLESSING if not $blessing;
-        last APPLY_DEFAULT_LEXEME_BLESSING if $blessing eq '::undef';
+        my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
+        my $default_blessing = $lexeme_default_adverbs->{bless};
         my $xsy_by_isyid =
           $g1_tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID];
 
@@ -961,28 +960,59 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
             next LEXEME
               if $xsy->[Marpa::R3::Internal::XSY::NAME_SOURCE] ne 'lexical';
 
-            if ( $blessing eq '::name' ) {
-                if ( $lexeme_name =~ / [^ [:alnum:]] /xms ) {
-                    Marpa::R3::exception(
+            my $blessing = $xsy->[Marpa::R3::Internal::XSY::BLESSING]
+              // $default_blessing;
+            $blessing //= '::undef';
+
+          FIND_BASE_BLESSING: {
+                if ( $blessing eq '::undef' ) {
+                    last FIND_BASE_BLESSING;
+                }
+                if ( $blessing eq '::name' ) {
+                    if ( $lexeme_name =~ / [^ [:alnum:]] /xms ) {
+                        Marpa::R3::exception(
 qq{Lexeme blessing by '::name' only allowed if lexeme name is whitespace and alphanumerics\n},
+                            qq{   Problematic lexeme was <$lexeme_name>\n}
+                        );
+                    } ## end if ( $lexeme_name =~ / [^ [:alnum:]] /xms )
+                    $blessing = $lexeme_name;
+                    $blessing =~ s/[ ]/_/gxms;
+                    last FIND_BASE_BLESSING;
+                } ## end if ( $default_blessing eq '::name' )
+                if ( $blessing =~ /^ :: /xms ) {
+                    Marpa::R3::exception(
+                        qq{Blessing lexeme as '$blessing' is not allowed\n},
+qq{   It is in pseudo-blessing form, but there is no such psuedo-blessing\n},
                         qq{   Problematic lexeme was <$lexeme_name>\n}
                     );
-                } ## end if ( $lexeme_name =~ / [^ [:alnum:]] /xms )
-                my $blessing_by_name = $lexeme_name;
-                $blessing_by_name =~ s/[ ]/_/gxms;
-                $xsy->[Marpa::R3::Internal::XSY::BLESSING] = $blessing_by_name;
-                next LEXEME;
-            } ## end if ( $blessing eq '::name' )
-            if ( $blessing =~ / [\W] /xms ) {
-                Marpa::R3::exception(
-                    qq{Blessing lexeme as '$blessing' is not allowed\n},
-                    qq{   Problematic lexeme was <$lexeme_name>\n}
-                );
-            } ## end if ( $blessing =~ / [\W] /xms )
+                }
+                if ( $blessing =~ / [\W] /xms ) {
+                    Marpa::R3::exception(
+                        qq{Blessing lexeme as '$blessing' is not allowed\n},
+qq{   It contained non-word characters and that is not allowed\n},
+                        qq{   Problematic lexeme was <$lexeme_name>\n}
+                    );
+                } ## end if ( $default_blessing =~ / [\W] /xms )
+            }
+
+            if ( $blessing !~ / :: /xms ) {
+                my $bless_package =
+                  $slg->[Marpa::R3::Internal::Scanless::G::BLESS_PACKAGE];
+                if ( not defined $bless_package ) {
+                    my $lexeme_name = $tracer->symbol_name($g1_lexeme_id);
+                    Marpa::R3::exception(
+qq{Symbol "$lexeme_name" needs a blessing package, but grammar has none\n},
+                        qq{  The blessing for "$lexeme_name" was "$blessing"\n}
+                    );
+                } ## end if ( not defined $bless_package )
+                $blessing = $bless_package . q{::} . $blessing;
+            }
+
             $xsy->[Marpa::R3::Internal::XSY::BLESSING] = $blessing;
+
         } ## end LEXEME: for my $lexeme_name ( keys %g1_id_by_lexeme_name )
 
-    } ## end APPLY_DEFAULT_LEXEME_ADVERBS:
+    }
 
     return $slg;
 
