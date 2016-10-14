@@ -198,29 +198,7 @@ sub Marpa::R3::Scanless::R::lexeme_blessing_find {
     my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     my $xsy_by_isyid = $tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID];
     my $xsy   = $xsy_by_isyid->[$lexeme_id];
-    my $blessing = $xsy->[Marpa::R3::Internal::XSY::BLESSING];
-
-    return '::undef' if not defined $blessing;
-    return '::undef' if $blessing eq '::undef';
-    if ( $blessing =~ m/\A [:][:] /xms ) {
-        my $lexeme_name = $tracer->symbol_name($lexeme_id);
-        $slr->[Marpa::R3::Internal::Scanless::R::ERROR_MESSAGE] =
-            qq{Symbol "$lexeme_name" has unknown blessing: "$blessing"};
-        return;
-    } ## end if ( $blessing =~ m/\A [:][:] /xms )
-    if ( $blessing =~ m/ [:][:] /xms ) {
-        return $blessing;
-    }
-    my $bless_package =
-        $slg->[Marpa::R3::Internal::Scanless::G::BLESS_PACKAGE];
-    if ( not defined $bless_package ) {
-        my $lexeme_name = $tracer->symbol_name($lexeme_id);
-        $slr->[Marpa::R3::Internal::Scanless::R::ERROR_MESSAGE] =
-            qq{Symbol "$lexeme_name" needs a blessing package, but grammar has none\n}
-            . qq{  The blessing for "$lexeme_name" was "$blessing"\n};
-        return;
-    } ## end if ( not defined $bless_package )
-    return $bless_package . q{::} . $blessing;
+    return $xsy->[Marpa::R3::Internal::XSY::BLESSING] // '::undef';
 }
 
 # For diagnostics
