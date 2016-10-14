@@ -927,13 +927,8 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     $slg->[Marpa::R3::Internal::Scanless::G::CHARACTER_CLASS_TABLE] =
       $character_class_table;
 
-    # This section violates the NAIF interface, directly changing some
-    # of its internal structures.
-    #
     # Some lexeme default adverbs are applied in earlier phases.
-    #
-  APPLY_DEFAULT_LEXEME_ADVERBS: {
-        last APPLY_DEFAULT_LEXEME_ADVERBS if not $lexeme_default_adverbs;
+  {
 
         my $default_lexeme_action = $lexeme_default_adverbs->{action};
         my $xsy_by_isyid =
@@ -949,10 +944,14 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
             $xsy->[Marpa::R3::Internal::XSY::LEXEME_SEMANTICS] //=
               $default_lexeme_action;
         } ## end LEXEME: for my $lexeme_name ( keys %g1_id_by_lexeme_name )
+    }
 
+  APPLY_DEFAULT_LEXEME_BLESSING: {
         my $blessing = $lexeme_default_adverbs->{bless};
-        last APPLY_DEFAULT_LEXEME_ADVERBS if not $blessing;
-        last APPLY_DEFAULT_LEXEME_ADVERBS if $blessing eq '::undef';
+        last APPLY_DEFAULT_LEXEME_BLESSING if not $blessing;
+        last APPLY_DEFAULT_LEXEME_BLESSING if $blessing eq '::undef';
+        my $xsy_by_isyid =
+          $g1_tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID];
 
       LEXEME:
         for my $lexeme_name ( keys %g1_id_by_lexeme_name ) {
