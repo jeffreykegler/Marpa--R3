@@ -5221,7 +5221,7 @@ PPCODE:
    * will destroy the Lua state.  But someday grammars may share
    * Lua states, and then this will be necessary.
    */
-  marpa_luaL_unref(outer_slg->L, LUA_REGISTRYINDEX, outer_slg->lua_ref);
+  kollos_robrefdec(outer_slg->L, outer_slg->lua_ref);
   kollos_refdec(outer_slg->L);
   Safefree (outer_slg);
 }
@@ -5714,7 +5714,7 @@ DESTROY( outer_slr )
     Outer_R *outer_slr;
 PPCODE:
 {
-  kollos_tblrefdec(outer_slr->L, outer_slr->lua_ref);
+  kollos_robrefdec(outer_slr->L, outer_slr->lua_ref);
   kollos_refdec(outer_slr->L);
   SvREFCNT_dec (outer_slr->slg_sv);
   Safefree (outer_slr);

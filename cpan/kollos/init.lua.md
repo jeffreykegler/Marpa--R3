@@ -284,17 +284,17 @@ Write a warning message using Kollos's warning handler.
 
 ```
 
-`kollos_tblrefinc()`
+`kollos_robrefinc()`
 creates a new reference
-to a Kollos interpreter,
+to a Kollos registry object,
 and takes ownership of it.
 
 ```
 
     -- miranda: section+ C function declarations
-    void kollos_tblrefinc(lua_State* L, int lua_ref);
+    void kollos_robrefinc(lua_State* L, int lua_ref);
     -- miranda: section+ lua interpreter management
-    void kollos_tblrefinc(lua_State* L, int lua_ref)
+    void kollos_robrefinc(lua_State* L, int lua_ref)
     {
         const int base_of_stack = marpa_lua_gettop(L);
         lua_Integer refcount;
@@ -314,15 +314,15 @@ and takes ownership of it.
 
 ```
 
-Give up ownership of a reference to a Kollos interpreter.
+Give up ownership of a reference to a Kollos registry object.
 Deletes the interpreter if the reference count drops to zero.
 
 ```
 
     -- miranda: section+ C function declarations
-    void kollos_tblrefdec(lua_State* L, int lua_ref);
+    void kollos_robrefdec(lua_State* L, int lua_ref);
     -- miranda: section+ lua interpreter management
-    void kollos_tblrefdec(lua_State* L, int lua_ref)
+    void kollos_robrefdec(lua_State* L, int lua_ref)
     {
         const int base_of_stack = marpa_lua_gettop(L);
         lua_Integer refcount;
@@ -332,7 +332,7 @@ Deletes the interpreter if the reference count drops to zero.
         refcount = marpa_lua_tointeger(L, -1);
         /* Lua stack [ table, ref_count ] */
         if (refcount <= 1) {
-           /* default_warn("kollos_tblrefdec lua_ref %d ref_count %d, will unref", lua_ref, refcount); */
+           /* default_warn("kollos_robrefdec lua_ref %d ref_count %d, will unref", lua_ref, refcount); */
            marpa_luaL_unref(L, LUA_REGISTRYINDEX, lua_ref);
            /* marpa_lua_gc(L, LUA_GCCOLLECT, 0); */
            /* marpa_lua_gc(L, LUA_GCCOLLECT, 0); */
@@ -343,7 +343,7 @@ Deletes the interpreter if the reference count drops to zero.
         marpa_lua_pushinteger(L, refcount);
         /* Lua stack [ table, ref_count, new_ref_count ] */
         marpa_lua_setfield(L, -2, "ref_count");
-        /* default_warn("kollos_tblrefdec lua_ref %d to ref_count %d", lua_ref, refcount); */
+        /* default_warn("kollos_robrefdec lua_ref %d to ref_count %d", lua_ref, refcount); */
         marpa_lua_settop(L, base_of_stack);
         /* Lua stack [ ] */
     }
