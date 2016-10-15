@@ -5701,7 +5701,7 @@ PPCODE:
     outer_slr->L = L;
     /* Take ownership of a new reference to the Lua state */
     kollos_refinc(L);
-    outer_slr->lua_ref = kollos_recce_new(L, slr);
+    outer_slr->lua_ref = kollos_slr_new(L, slr);
   }
 
   new_sv = sv_newmortal ();

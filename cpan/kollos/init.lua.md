@@ -150,51 +150,6 @@ the interpreter (Kollos object) is destroyed.
 
 ```
 
-Add a recce to the Kollos object, returning its
-"lua_id".
-The inner SLR C structure is passed in for now,
-because it uses a lot of PERL/XS data structures.
-
-```
-    -- miranda: section+ C function declarations
-    #define MT_NAME_RECCE "Marpa_recce"
-    int kollos_recce_new(lua_State* L, void* slr);
-    -- miranda: section+ lua interpreter management
-    int kollos_recce_new(lua_State* L, void* slr)
-    {
-        int lua_id;
-        const int base_of_stack = marpa_lua_gettop(L);
-        marpa_lua_checkstack(L, 20);
-        /* Lua stack: [] */
-        /* Create a table for this recce */
-        marpa_lua_newtable(L);
-        /* Lua stack: [ recce_table ] */
-        /* No lock held -- SLR must delete recce table in its */
-        /*   destructor. */
-        /* Set the metatable for the recce table */
-        marpa_luaL_setmetatable(L, MT_NAME_RECCE);
-        /* Lua stack: [ recce_table ] */
-
-        /* recce_table.ref_count = 1 */
-        marpa_lua_pushinteger(L, 1);
-        /* Lua stack: [recce_table, ref_count ] */
-        marpa_lua_setfield(L, -2, "ref_count");
-        /* Lua stack: [ recce_table ] */
-
-        /* recce_table.lud = slr */
-        marpa_lua_pushlightuserdata(L, slr);
-        /* Lua stack: [ recce_table, lud ] */
-        marpa_lua_setfield(L, -2, "lud");
-        /* Lua stack: [ recce_table ] */
-        /* Set up a reference to this recce table in the Lua state
-         * registry.
-         */
-        lua_id = marpa_luaL_ref(L, LUA_REGISTRYINDEX);
-        marpa_lua_settop(L, base_of_stack);
-        return lua_id;
-    }
-```
-
 ```
     -- miranda: section+ lua interpreter management
     static int default_warn(const char *format, ...)
@@ -284,6 +239,26 @@ Write a warning message using Kollos's warning handler.
 
 ```
 
+## Kollos registry objects
+
+A Kollos registry object is an object kept in its
+registry.
+These generated ID's which allow them to be identified
+safely to non-Lua code.
+They have increment and decrement methods.
+
+These increment and decrement methods are intended only
+for non-Lua code.
+They make it possible
+for the non-Lua code to be sure that the Lua
+registry object exists for as long as they
+require it.
+
+Lua code should not use the reference counter.
+Lua code
+should simply copy the table object -- in Lua this
+is a reference and Lua's GC will do the right thing.
+
 `kollos_robrefinc()`
 creates a new reference
 to a Kollos registry object,
@@ -348,6 +323,53 @@ Deletes the interpreter if the reference count drops to zero.
         /* Lua stack [ ] */
     }
 
+```
+
+## Kollos recognizer registry object
+
+Add a recce to the Kollos object, returning its
+"lua_id".
+The inner SLR C structure is passed in for now,
+because it uses a lot of PERL/XS data structures.
+
+```
+    -- miranda: section+ C function declarations
+    #define MT_NAME_RECCE "Marpa_recce"
+    int kollos_slr_new(lua_State* L, void* slr);
+    -- miranda: section+ lua interpreter management
+    int kollos_slr_new(lua_State* L, void* slr)
+    {
+        int lua_id;
+        const int base_of_stack = marpa_lua_gettop(L);
+        marpa_lua_checkstack(L, 20);
+        /* Lua stack: [] */
+        /* Create a table for this recce */
+        marpa_lua_newtable(L);
+        /* Lua stack: [ recce_table ] */
+        /* No lock held -- SLR must delete recce table in its */
+        /*   destructor. */
+        /* Set the metatable for the recce table */
+        marpa_luaL_setmetatable(L, MT_NAME_RECCE);
+        /* Lua stack: [ recce_table ] */
+
+        /* recce_table.ref_count = 1 */
+        marpa_lua_pushinteger(L, 1);
+        /* Lua stack: [recce_table, ref_count ] */
+        marpa_lua_setfield(L, -2, "ref_count");
+        /* Lua stack: [ recce_table ] */
+
+        /* recce_table.lud = slr */
+        marpa_lua_pushlightuserdata(L, slr);
+        /* Lua stack: [ recce_table, lud ] */
+        marpa_lua_setfield(L, -2, "lud");
+        /* Lua stack: [ recce_table ] */
+        /* Set up a reference to this recce table in the Lua state
+         * registry.
+         */
+        lua_id = marpa_luaL_ref(L, LUA_REGISTRYINDEX);
+        marpa_lua_settop(L, base_of_stack);
+        return lua_id;
+    }
 ```
 
 ## Kollos semantics
