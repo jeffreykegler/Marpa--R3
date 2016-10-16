@@ -1,0 +1,240 @@
+/* Creates a userdata containing a Perl SV, and
+ * leaves the new userdata on top of the stack.
+ * The new Lua userdata takes ownership of one reference count.
+ * The caller must have a reference count whose ownership
+ * the caller is prepared to transfer to the Lua userdata.
+ */
+static void marpa_av_av_noinc (lua_State* L, AV* av) {
+    AV** p_av = (AV**)marpa_lua_newuserdata(L, sizeof(AV*));
+    *p_av = av;
+    /* warn("new ud %p, AV %p %s %d\n", p_av, av, __FILE__, __LINE__); */
+    marpa_luaL_getmetatable(L, MT_NAME_AV);
+    marpa_lua_setmetatable(L, -2);
+    /* [av_userdata] */
+}
+
+#define MARPA_SV_SV(L, sv) \
+    (marpa_sv_sv_noinc((L), (sv)), SvREFCNT_inc_simple_void_NN (sv))
+
+/* Creates a userdata containing a reference to a Perl AV, and
+ * leaves the new userdata on top of the stack.
+ * The new Lua userdata takes ownership of one reference count.
+ * The caller must have a reference count whose ownership
+ * the caller is prepared to transfer to the Lua userdata.
+ */
+static void marpa_sv_av_noinc (lua_State* L, AV* av) {
+    dTHX;
+    SV* av_ref = newRV_noinc((SV*)av);
+    SV** p_sv = (SV**)marpa_lua_newuserdata(L, sizeof(SV*));
+    *p_sv = av_ref;
+    /* warn("new ud %p, SV %p %s %d\n", p_sv, av_ref, __FILE__, __LINE__); */
+    marpa_luaL_getmetatable(L, MT_NAME_SV);
+    marpa_lua_setmetatable(L, -2);
+    /* [sv_userdata] */
+}
+
+#define MARPA_SV_AV(L, av) \
+    (SvREFCNT_inc_simple_void_NN (av), marpa_sv_av_noinc((L), (av)))
+
+static int marpa_sv_undef (lua_State* L) {
+    dTHX;
+    /* [] */
+    marpa_sv_sv_noinc( L, newSV(0) );
+    /* [sv_userdata] */
+    return 1;
+}
+
+static int marpa_sv_finalize_meth (lua_State* L) {
+    dTHX;
+    /* Is this check necessary after development? */
+    SV** p_sv = (SV**)marpa_luaL_checkudata(L, 1, MT_NAME_SV);
+    SV* sv = *p_sv;
+    /* warn("decrementing ud %p, SV %p, %s %d\n", p_sv, sv, __FILE__, __LINE__); */
+    SvREFCNT_dec (sv);
+    return 0;
+}
+
+/* Fetch from table at index key.
+ * The reference count is not changed, the caller must use this
+ * SV immediately, or increment the reference count.
+ * Will return 0, if there is no SV at that index.
+ */
+static SV** marpa_av_fetch(SV* table, lua_Integer key) {
+     dTHX;
+     AV* av;
+     if ( !SvROK(table) ) {
+        croak ("Attempt to fetch from an SV which is not a ref");
+     }
+     if ( SvTYPE(SvRV(table)) != SVt_PVAV) {
+        croak ("Attempt to fetch from an SV which is not an AV ref");
+     }
+     av = (AV*)SvRV(table);
+     return av_fetch(av, (int)key, 0);
+}
+
+static int marpa_av_fetch_meth(lua_State* L) {
+    SV** p_result_sv;
+    SV** p_table_sv = (SV**)marpa_luaL_checkudata(L, 1, MT_NAME_SV);
+    lua_Integer key = marpa_luaL_checkinteger(L, 2);
+
+    p_result_sv = marpa_av_fetch(*p_table_sv, key);
+    if (p_result_sv) {
+        SV* const sv = *p_result_sv;
+        /* Increment the reference count and put this SV on top of the stack */
+        MARPA_SV_SV(L, sv);
+    } else {
+        /* Put a new nil SV on top of the stack */
+        marpa_sv_undef(L);
+    }
+    return 1;
+}
+
+/* Basically a Lua wrapper for Perl's av_len()
+ */
+static int
+marpa_av_len_meth (lua_State * L)
+{
+    dTHX;
+    AV *av;
+    SV **const p_table_sv = (SV **) marpa_luaL_checkudata (L, 1, MT_NAME_SV);
+    SV* const table = *p_table_sv;
+
+    if (!SvROK (table))
+      {
+          croak ("Attempt to fetch from an SV which is not a ref");
+      }
+    if (SvTYPE (SvRV (table)) != SVt_PVAV)
+      {
+          croak ("Attempt to fetch from an SV which is not an AV ref");
+      }
+    av = (AV *) SvRV (table);
+    marpa_lua_pushinteger (L, av_len (av));
+    return 1;
+}
+
+static void marpa_av_store(SV* table, lua_Integer key, SV*value) {
+     dTHX;
+     AV* av;
+     if ( !SvROK(table) ) {
+        croak ("Attempt to index an SV which is not ref");
+     }
+     if ( SvTYPE(SvRV(table)) != SVt_PVAV) {
+        croak ("Attempt to index an SV which is not an AV ref");
+     }
+     av = (AV*)SvRV(table);
+     av_store(av, (int)key, value);
+}
+
+static int marpa_av_store_meth(lua_State* L) {
+    SV** p_table_sv = (SV**)marpa_luaL_checkudata(L, 1, MT_NAME_SV);
+    lua_Integer key = marpa_luaL_checkinteger(L, 2);
+    SV* value_sv = coerce_to_sv(L, 3);
+
+    /* coerce_to_sv transfered a reference count to us, which we
+     * pass on to the AV.
+     */
+    marpa_av_store(*p_table_sv, key, value_sv);
+    return 0;
+}
+
+static void
+marpa_av_fill (lua_State * L, SV * sv, int x)
+{
+  dTHX;
+  AV *av;
+  SV **p_sv = (SV **) marpa_lua_newuserdata (L, sizeof (SV *));
+     /* warn("%s %d\n", __FILE__, __LINE__); */
+  *p_sv = sv;
+     /* warn("%s %d\n", __FILE__, __LINE__); */
+  if (!SvROK (sv))
+    {
+      croak ("Attempt to fetch from an SV which is not a ref");
+    }
+     /* warn("%s %d\n", __FILE__, __LINE__); */
+  if (SvTYPE (SvRV (sv)) != SVt_PVAV)
+    {
+      croak ("Attempt to fill an SV which is not an AV ref");
+    }
+     /* warn("%s %d\n", __FILE__, __LINE__); */
+  av = (AV *) SvRV (sv);
+     /* warn("%s %d about to call av_file(..., %d)\n", __FILE__, __LINE__, x); */
+  av_fill (av, x);
+     /* warn("%s %d\n", __FILE__, __LINE__); */
+}
+
+static int marpa_av_fill_meth (lua_State* L) {
+    /* After development, check not needed */
+    /* I think this call is not used anywhere in the test suite */
+    SV** p_table_sv = (SV**)marpa_luaL_checkudata(L, 1, MT_NAME_SV);
+    /* warn("%s %d\n", __FILE__, __LINE__); */
+    lua_Integer index = marpa_luaL_checkinteger(L, 2);
+    /* warn("%s %d\n", __FILE__, __LINE__); */
+    marpa_av_fill(L, *p_table_sv, (int)index);
+    /* warn("%s %d\n", __FILE__, __LINE__); */
+    return 0;
+}
+
+static int marpa_av_bless_meth (lua_State* L) {
+    dTHX;
+    SV** p_ref_to_av = (SV**)marpa_luaL_checkudata(L, 1, MT_NAME_SV);
+    SV* blessing_sv = coerce_to_sv(L, 2);
+    STRLEN blessing_length;
+    char *classname;
+    if (!SvPOK(blessing_sv)) {
+       croak("Internal error: AV blessing must be string");
+    }
+    classname = SvPV (blessing_sv, blessing_length);
+    sv_bless (*p_ref_to_av, gv_stashpv (classname, 1));
+    return 0;
+}
+
+static int marpa_sv_svaddr_meth(lua_State* L) {
+    /* Lua stack: [ sv_userdata ] */
+    /* For debugging, so keep the check even after development */
+    SV** p_table_sv = (SV**)marpa_luaL_checkudata(L, 1, MT_NAME_SV);
+    marpa_lua_pushinteger (L, (lua_Integer)PTR2nat(*p_table_sv));
+    return 1;
+}
+
+static int marpa_sv_addr_meth(lua_State* L) {
+    /* Lua stack: [ sv_userdata ] */
+    /* For debugging, so keep the check even after development */
+    SV** p_table_sv = (SV**)marpa_luaL_checkudata(L, 1, MT_NAME_SV);
+    marpa_lua_pushinteger (L, (lua_Integer)PTR2nat(p_table_sv));
+    return 1;
+}
+
+static const struct luaL_Reg marpa_sv_meths[] = {
+    {"__gc", marpa_sv_finalize_meth},
+    {"__index", marpa_av_fetch_meth},
+    {"__newindex", marpa_av_store_meth},
+    {NULL, NULL},
+};
+
+static const struct luaL_Reg marpa_sv_funcs[] = {
+    {"fill", marpa_av_fill_meth},
+    {"top_index", marpa_av_len_meth},
+    {"bless", marpa_av_bless_meth},
+    {"undef", marpa_sv_undef},
+    {"svaddr", marpa_sv_svaddr_meth},
+    {"addr", marpa_sv_addr_meth},
+    {NULL, NULL},
+};
+
+/* create SV metatable */
+static void create_av_mt (lua_State* L) {
+    int base_of_stack = marpa_lua_gettop(L);
+    marpa_luaL_newmetatable(L, MT_NAME_AV);
+    /* Lua stack: [mt] */
+
+    /* metatable.__index = metatable */
+    marpa_lua_pushvalue(L, -1);
+    marpa_lua_setfield(L, -2, "__index");
+    /* Lua stack: [mt] */
+
+    /* register methods */
+    marpa_luaL_setfuncs(L, marpa_av_meths, 0);
+    /* Lua stack: [mt] */
+    marpa_lua_settop(L, base_of_stack);
+}
+

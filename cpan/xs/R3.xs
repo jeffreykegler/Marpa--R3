@@ -317,6 +317,7 @@ slr_es_span_to_literal_sv (Scanless_R * slr,
  */
 
 #define MT_NAME_SV "Marpa_sv"
+#define MT_NAME_AV "Marpa_av"
 #define MT_NAME_GRAMMAR "Marpa_grammar"
 #define MT_NAME_ARRAY "Marpa_array"
 
