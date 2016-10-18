@@ -919,7 +919,7 @@ static const struct luaL_Reg marpa_sv_funcs[] = {
     {"top_index", marpa_av_len_meth},
     {"bless", marpa_av_bless_meth},
     {"undef", marpa_sv_undef},
-    {"newav", marpa_av_new},
+    {"av_new", marpa_av_new},
     {"svaddr", marpa_sv_svaddr_meth},
     {"addr", marpa_sv_addr_meth},
     {NULL, NULL},
@@ -1514,7 +1514,7 @@ xlua_sig_call (lua_State * L, const char *codestr, const char *sig, ...)
                 *va_arg (vl, int *) = (int)n;
                 break;
             }
-        case 'S': /* SV -- caller becomes owner of 1 mortal ref count. */
+        case 'M': /* SV -- caller becomes owner of 1 mortal ref count. */
         {
             SV** av_ref_p = (SV**) marpa_lua_touserdata(L, nres);
             *va_arg (vl, SV**) = sv_mortalcopy(*av_ref_p);
@@ -4127,11 +4127,12 @@ PPCODE:
         int result;
         AV *values_av = newAV ();
         SV *ref_to_values_av = sv_2mortal (newRV_noinc ((SV *) values_av));
+        SV *new_values;
         v_wrapper->values = (AV *) SvRV (ref_to_values_av);
 
         xlua_sig_call (outer_slr->L,
             "local recce = ...; return find_and_do_ops(recce)\n",
-            "R>i", outer_slr->lua_ref, &result);
+            "R>iM", outer_slr->lua_ref, &result, &new_values);
 
         switch (result) {
         case 3:

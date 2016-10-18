@@ -95,6 +95,11 @@ in the Perl code or in the Perl XS, and not represented here.
 This document only contains those portions converted to Lua or
 to Lua-centeric C code.
 
+The intent is that eventually
+all the code in this file will be "pure"
+Kollos -- no Perl knowledge.
+That is not the case at the moment.
+
 ## Kollos object
 
 ```
@@ -923,10 +928,11 @@ with "trace" and "do not return" being special cases.
 ```
     -- miranda: section+ VM operations
     function find_and_do_ops(recce)
+        local new_values = marpa.sv.av_new()
         local ops = {}
         recce:step()
         if recce.v.step.type == 'MARPA_STEP_INACTIVE' then
-            return 0
+            return 0, new_values
         end
         if recce.v.step.type == 'MARPA_STEP_RULE' then
             ops = recce.rule_semantics[recce.v.step.rule]
@@ -949,7 +955,7 @@ with "trace" and "do not return" being special cases.
             end
             goto DO_OPS
         end
-        if true then return 1 end
+        if true then return 1, new_values end
         ::DO_OPS::
         if not ops then
             error(string.format('No semantics defined for %s', recce.v.step.type))
@@ -959,9 +965,9 @@ with "trace" and "do not return" being special cases.
         -- truncate stack
         local above_top = recce.v.step.result + 1
         for i = above_top,#stack do stack[i] = nil end
-        if do_ops_result > 0 then return 3 end
-        if #recce.trace_values_queue > 0 then return -1 end
-        return -2
+        if do_ops_result > 0 then return 3, new_values end
+        if #recce.trace_values_queue > 0 then return -1, new_values end
+        return -2, new_values
     end
 
 ```
