@@ -696,6 +696,14 @@ static int marpa_sv_undef (lua_State* L) {
     return 1;
 }
 
+static int marpa_av_new (lua_State* L) {
+    dTHX;
+    /* [] */
+    MARPA_SV_AV ( L, newAV() );
+    /* [sv_userdata] */
+    return 1;
+}
+
 static int marpa_sv_finalize_meth (lua_State* L) {
     dTHX;
     /* Is this check necessary after development? */
@@ -911,6 +919,7 @@ static const struct luaL_Reg marpa_sv_funcs[] = {
     {"top_index", marpa_av_len_meth},
     {"bless", marpa_av_bless_meth},
     {"undef", marpa_sv_undef},
+    {"newav", marpa_av_new},
     {"svaddr", marpa_sv_svaddr_meth},
     {"addr", marpa_sv_addr_meth},
     {NULL, NULL},
@@ -1415,6 +1424,7 @@ xlua_sig_call (lua_State * L, const char *codestr, const char *sig, ...)
     int status;
     const int base_of_stack = marpa_lua_gettop (L);
     const int msghandler_ix = base_of_stack+1;
+    dTHX;
 
     marpa_lua_pushcfunction(L, xlua_msghandler);
 
@@ -1504,9 +1514,11 @@ xlua_sig_call (lua_State * L, const char *codestr, const char *sig, ...)
                 *va_arg (vl, int *) = (int)n;
                 break;
             }
-        case 'S': /* SV -- caller becomes owner of 1 ref count. */
+        case 'S': /* SV -- caller becomes owner of 1 mortal ref count. */
         {
-            croak("not yet implemented");
+            SV** av_ref_p = (SV**) marpa_lua_touserdata(L, nres);
+            *va_arg (vl, SV**) = sv_mortalcopy(*av_ref_p);
+            break;
         }
         default:
             croak
