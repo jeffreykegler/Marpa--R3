@@ -622,10 +622,7 @@ Push an undef on the values array.
     -- miranda: section+ VM operations
 
     function op_fn_push_undef(recce, dummy, new_values)
-        local values = recce:values()
-        local next_ix = marpa.sv.top_index(values) + 1;
-        values[next_ix] = marpa.sv.undef()
-        next_ix = marpa.sv.top_index(new_values) + 1;
+        local next_ix = marpa.sv.top_index(new_values) + 1;
         new_values[next_ix] = marpa.sv.undef()
         return -2
     end
@@ -644,11 +641,8 @@ Push one of the RHS child values onto the values array.
           return op_fn_push_undef(recce, nil, new_values)
         end
         local stack = recce.v.stack
-        local values = recce:values()
         local result_ix = recce.v.step.result
-        local next_ix = marpa.sv.top_index(values) + 1;
-        values[next_ix] = stack[result_ix + rhs_ix]
-        next_ix = marpa.sv.top_index(new_values) + 1;
+        local next_ix = marpa.sv.top_index(new_values) + 1;
         new_values[next_ix] = stack[result_ix + rhs_ix]
         return -2
     end
@@ -692,11 +686,8 @@ Otherwise the values of the RHS children are pushed.
     -- miranda: section+ VM operations
 
     function op_fn_push_values(recce, increment, new_values)
-        local values = recce:values()
         if recce.v.step.type == 'MARPA_STEP_TOKEN' then
-            local next_ix = marpa.sv.top_index(values) + 1;
-            values[next_ix] = current_token_literal(recce)
-            next_ix = marpa.sv.top_index(new_values) + 1;
+            local next_ix = marpa.sv.top_index(new_values) + 1;
             new_values[next_ix] = current_token_literal(recce)
             return -2
         end
@@ -704,12 +695,7 @@ Otherwise the values of the RHS children are pushed.
             local stack = recce.v.stack
             local arg_n = recce.v.step.arg_n
             local result_ix = recce.v.step.result
-            local to_ix = marpa.sv.top_index(values) + 1;
-            for from_ix = result_ix,arg_n,increment do
-                values[to_ix] = stack[from_ix]
-                to_ix = to_ix + 1
-            end
-            to_ix = marpa.sv.top_index(new_values) + 1;
+            local to_ix = marpa.sv.top_index(new_values) + 1;
             for from_ix = result_ix,arg_n,increment do
                 new_values[to_ix] = stack[from_ix]
                 to_ix = to_ix + 1
@@ -730,15 +716,11 @@ in terms of the input string.
 ```
     -- miranda: section+ VM operations
     function op_fn_push_start(recce, dummy, new_values)
-        local values = recce:values()
         local start_es = recce.v.step.start_es_id
         local end_es = recce.v.step.es_id
-        local next_ix = marpa.sv.top_index(values) + 1;
         local start, l = recce:span(start_es, end_es)
+        local next_ix = marpa.sv.top_index(new_values) + 1;
         local _
-        values[next_ix], _ = recce:span(start_es, end_es)
-
-        next_ix = marpa.sv.top_index(new_values) + 1;
         new_values[next_ix], _ = recce:span(start_es, end_es)
         return -2
     end
@@ -753,14 +735,10 @@ that is, in terms of the input string
 ```
     -- miranda: section+ VM operations
     function op_fn_push_length(recce, dummy, new_values)
-        local values = recce:values()
         local start_es = recce.v.step.start_es_id
         local end_es = recce.v.step.es_id
-        local next_ix = marpa.sv.top_index(values) + 1;
+        local next_ix = marpa.sv.top_index(new_values) + 1;
         local _
-        _, values[next_ix] = recce:span(start_es, end_es)
-
-        next_ix = marpa.sv.top_index(new_values) + 1;
         _, new_values[next_ix] = recce:span(start_es, end_es)
         return -2
     end
@@ -775,10 +753,7 @@ in terms of G1 Earley sets.
 ```
     -- miranda: section+ VM operations
     function op_fn_push_g1_start(recce, dummy, new_values)
-        local values = recce:values()
-        local next_ix = marpa.sv.top_index(values) + 1;
-        values[next_ix] = recce.v.step.start_es_id
-        next_ix = marpa.sv.top_index(new_values) + 1;
+        local next_ix = marpa.sv.top_index(new_values) + 1;
         new_values[next_ix] = recce.v.step.start_es_id
         return -2
     end
@@ -793,11 +768,7 @@ that is, in terms of G1 Earley sets.
 ```
     -- miranda: section+ VM operations
     function op_fn_push_g1_length(recce, dummy, new_values)
-        local values = recce:values()
-        local next_ix = marpa.sv.top_index(values) + 1;
-        values[next_ix] = (recce.v.step.es_id
-            - recce.v.step.start_es_id) + 1
-        next_ix = marpa.sv.top_index(new_values) + 1;
+        local next_ix = marpa.sv.top_index(new_values) + 1;
         new_values[next_ix] = (recce.v.step.es_id
             - recce.v.step.start_es_id) + 1
         return -2
@@ -816,10 +787,7 @@ that is, in terms of G1 Earley sets.
         -- io.stderr:write('constants top ix: ', marpa.sv.top_index(constants), "\n")
 
         local constant = constants[constant_ix]
-        local values = recce:values()
-        local next_ix = marpa.sv.top_index(values) + 1;
-        values[next_ix] = constant
-        next_ix = marpa.sv.top_index(new_values) + 1;
+        local next_ix = marpa.sv.top_index(new_values) + 1;
         new_values[next_ix] = constant
         return -2
     end
