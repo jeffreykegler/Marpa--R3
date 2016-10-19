@@ -918,48 +918,49 @@ with "trace" and "do not return" being special cases.
 ```
     -- miranda: section+ VM operations
     function find_and_do_ops(recce)
-        local new_values = marpa.sv.av_new()
-        local ops = {}
-        recce:step()
-        if recce.v.step.type == 'MARPA_STEP_INACTIVE' then
-            return 0, new_values
-        end
-        if recce.v.step.type == 'MARPA_STEP_RULE' then
-            ops = recce.rule_semantics[recce.v.step.rule]
-            if not ops then
-                ops = recce.rule_semantics.default
+        while true do
+            local new_values = marpa.sv.av_new()
+            local ops = {}
+            recce:step()
+            if recce.v.step.type == 'MARPA_STEP_INACTIVE' then
+                return 0, new_values
             end
-            goto DO_OPS
-        end
-        if recce.v.step.type == 'MARPA_STEP_TOKEN' then
-            ops = recce.token_semantics[recce.v.step.symbol]
-            if not ops then
-                ops = recce.token_semantics.default
+            if recce.v.step.type == 'MARPA_STEP_RULE' then
+                ops = recce.rule_semantics[recce.v.step.rule]
+                if not ops then
+                    ops = recce.rule_semantics.default
+                end
+                goto DO_OPS
             end
-            goto DO_OPS
-        end
-        if recce.v.step.type == 'MARPA_STEP_NULLING_SYMBOL' then
-            ops = recce.nulling_semantics[recce.v.step.symbol]
-            if not ops then
-                ops = recce.nulling_semantics.default
+            if recce.v.step.type == 'MARPA_STEP_TOKEN' then
+                ops = recce.token_semantics[recce.v.step.symbol]
+                if not ops then
+                    ops = recce.token_semantics.default
+                end
+                goto DO_OPS
             end
-            goto DO_OPS
+            if recce.v.step.type == 'MARPA_STEP_NULLING_SYMBOL' then
+                ops = recce.nulling_semantics[recce.v.step.symbol]
+                if not ops then
+                    ops = recce.nulling_semantics.default
+                end
+                goto DO_OPS
+            end
+            if true then return 1, new_values end
+            ::DO_OPS::
+            if not ops then
+                error(string.format('No semantics defined for %s', recce.v.step.type))
+            end
+            local do_ops_result = do_ops(recce, ops, new_values)
+            local stack = recce.v.stack
+            -- truncate stack
+            local above_top = recce.v.step.result + 1
+            for i = above_top,#stack do stack[i] = nil end
+            if do_ops_result > 0 then
+                return 3, new_values
+            end
+            if #recce.trace_values_queue > 0 then return -1, new_values end
         end
-        if true then return 1, new_values end
-        ::DO_OPS::
-        if not ops then
-            error(string.format('No semantics defined for %s', recce.v.step.type))
-        end
-        local do_ops_result = do_ops(recce, ops, new_values)
-        local stack = recce.v.stack
-        -- truncate stack
-        local above_top = recce.v.step.result + 1
-        for i = above_top,#stack do stack[i] = nil end
-        if do_ops_result > 0 then
-            return 3, new_values
-        end
-        if #recce.trace_values_queue > 0 then return -1, new_values end
-        return -2, new_values
     end
 
 ```
