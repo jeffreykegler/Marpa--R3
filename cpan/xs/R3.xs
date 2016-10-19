@@ -4089,53 +4089,48 @@ stack_step( v_wrapper )
 PPCODE:
 {
     Outer_R *outer_slr;
+    int result;
+    SV *new_values;
 
     outer_slr = v_wrapper->outer_slr;
     xlua_sig_call (outer_slr->L,
         "local recce = ...; recce.trace_values_queue = {}", "R",
         outer_slr->lua_ref);
 
-    while (1) {
-        int result;
-        SV *new_values;
+    xlua_sig_call (outer_slr->L,
+        "local recce = ...; return find_and_do_ops(recce)\n",
+        "R>iM", outer_slr->lua_ref, &result, &new_values);
 
-        xlua_sig_call (outer_slr->L,
-            "local recce = ...; return find_and_do_ops(recce)\n",
-            "R>iM", outer_slr->lua_ref, &result, &new_values);
-
-        switch (result) {
-        case 3:
-            {
-                const int step_type = marpa_v_step_type (v_wrapper->v);
-                const char *step_type_string =
-                    step_type_to_string (step_type);
-                XPUSHs (sv_2mortal (newSVpv (step_type_string, 0)));
-                XPUSHs (sv_2mortal (newSViv (step_type ==
-                            MARPA_STEP_RULE ?
-                            marpa_v_rule (v_wrapper->v) :
-                            marpa_v_token (v_wrapper->v))));
-                XPUSHs (new_values);      /* already mortal */
-                XSRETURN (3);
-            }
-        default:
-        case 1:
-            {
-                const int step_type = marpa_v_step_type (v_wrapper->v);
-                const char *step_type_string =
-                    step_type_to_string (step_type);
-                if (!step_type_string) {
-                    step_type_string = "Unknown";
-                }
-                XPUSHs (sv_2mortal (newSVpv (step_type_string, 0)));
-                XSRETURN (1);
-            }
-        case 0:
-            XSRETURN_EMPTY;
-        case -1:
-            XSRETURN_PV ("trace");
+    switch (result) {
+    case 3:
+        {
+            const int step_type = marpa_v_step_type (v_wrapper->v);
+            const char *step_type_string =
+                step_type_to_string (step_type);
+            XPUSHs (sv_2mortal (newSVpv (step_type_string, 0)));
+            XPUSHs (sv_2mortal (newSViv (step_type ==
+                        MARPA_STEP_RULE ?
+                        marpa_v_rule (v_wrapper->v) :
+                        marpa_v_token (v_wrapper->v))));
+            XPUSHs (new_values);      /* already mortal */
+            XSRETURN (3);
         }
-
-
+    default:
+    case 1:
+        {
+            const int step_type = marpa_v_step_type (v_wrapper->v);
+            const char *step_type_string =
+                step_type_to_string (step_type);
+            if (!step_type_string) {
+                step_type_string = "Unknown";
+            }
+            XPUSHs (sv_2mortal (newSVpv (step_type_string, 0)));
+            XSRETURN (1);
+        }
+    case 0:
+        XSRETURN_EMPTY;
+    case -1:
+        XSRETURN_PV ("trace");
     }
 }
 
