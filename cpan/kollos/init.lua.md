@@ -621,10 +621,12 @@ Push an undef on the values array.
 ```
     -- miranda: section+ VM operations
 
-    function op_fn_push_undef(recce)
+    function op_fn_push_undef(recce, dummy, new_values)
         local values = recce:values()
         local next_ix = marpa.sv.top_index(values) + 1;
         values[next_ix] = marpa.sv.undef()
+        next_ix = marpa.sv.top_index(new_values) + 1;
+        new_values[next_ix] = marpa.sv.undef()
         return -2
     end
 
@@ -637,15 +639,17 @@ Push one of the RHS child values onto the values array.
 ```
     -- miranda: section+ VM operations
 
-    function op_fn_push_one(recce, rhs_ix)
+    function op_fn_push_one(recce, rhs_ix, new_values)
         if recce.v.step.type ~= 'MARPA_STEP_RULE' then
-          return op_fn_push_undef(recce)
+          return op_fn_push_undef(recce, nil, new_values)
         end
         local stack = recce.v.stack
         local values = recce:values()
         local result_ix = recce.v.step.result
         local next_ix = marpa.sv.top_index(values) + 1;
         values[next_ix] = stack[result_ix + rhs_ix]
+        next_ix = marpa.sv.top_index(new_values) + 1;
+        new_values[next_ix] = stack[result_ix + rhs_ix]
         return -2
     end
 
@@ -687,11 +691,13 @@ Otherwise the values of the RHS children are pushed.
 ```
     -- miranda: section+ VM operations
 
-    function op_fn_push_values(recce, increment)
+    function op_fn_push_values(recce, increment, new_values)
         local values = recce:values()
         if recce.v.step.type == 'MARPA_STEP_TOKEN' then
             local next_ix = marpa.sv.top_index(values) + 1;
             values[next_ix] = current_token_literal(recce)
+            next_ix = marpa.sv.top_index(new_values) + 1;
+            new_values[next_ix] = current_token_literal(recce)
             return -2
         end
         if recce.v.step.type == 'MARPA_STEP_RULE' then
@@ -701,6 +707,11 @@ Otherwise the values of the RHS children are pushed.
             local to_ix = marpa.sv.top_index(values) + 1;
             for from_ix = result_ix,arg_n,increment do
                 values[to_ix] = stack[from_ix]
+                to_ix = to_ix + 1
+            end
+            to_ix = marpa.sv.top_index(new_values) + 1;
+            for from_ix = result_ix,arg_n,increment do
+                new_values[to_ix] = stack[from_ix]
                 to_ix = to_ix + 1
             end
             return -2
@@ -718,7 +729,7 @@ in terms of the input string.
 
 ```
     -- miranda: section+ VM operations
-    function op_fn_push_start(recce)
+    function op_fn_push_start(recce, dummy, new_values)
         local values = recce:values()
         local start_es = recce.v.step.start_es_id
         local end_es = recce.v.step.es_id
@@ -726,6 +737,9 @@ in terms of the input string.
         local start, l = recce:span(start_es, end_es)
         local _
         values[next_ix], _ = recce:span(start_es, end_es)
+
+        next_ix = marpa.sv.top_index(new_values) + 1;
+        new_values[next_ix], _ = recce:span(start_es, end_es)
         return -2
     end
 
@@ -738,13 +752,16 @@ that is, in terms of the input string
 
 ```
     -- miranda: section+ VM operations
-    function op_fn_push_length(recce)
+    function op_fn_push_length(recce, dummy, new_values)
         local values = recce:values()
         local start_es = recce.v.step.start_es_id
         local end_es = recce.v.step.es_id
         local next_ix = marpa.sv.top_index(values) + 1;
         local _
         _, values[next_ix] = recce:span(start_es, end_es)
+
+        next_ix = marpa.sv.top_index(new_values) + 1;
+        _, new_values[next_ix] = recce:span(start_es, end_es)
         return -2
     end
 
@@ -757,10 +774,12 @@ in terms of G1 Earley sets.
 
 ```
     -- miranda: section+ VM operations
-    function op_fn_push_g1_start(recce)
+    function op_fn_push_g1_start(recce, dummy, new_values)
         local values = recce:values()
         local next_ix = marpa.sv.top_index(values) + 1;
         values[next_ix] = recce.v.step.start_es_id
+        next_ix = marpa.sv.top_index(new_values) + 1;
+        new_values[next_ix] = recce.v.step.start_es_id
         return -2
     end
 
@@ -773,10 +792,13 @@ that is, in terms of G1 Earley sets.
 
 ```
     -- miranda: section+ VM operations
-    function op_fn_push_g1_length(recce)
+    function op_fn_push_g1_length(recce, dummy, new_values)
         local values = recce:values()
         local next_ix = marpa.sv.top_index(values) + 1;
         values[next_ix] = (recce.v.step.es_id
+            - recce.v.step.start_es_id) + 1
+        next_ix = marpa.sv.top_index(new_values) + 1;
+        new_values[next_ix] = (recce.v.step.es_id
             - recce.v.step.start_es_id) + 1
         return -2
     end
@@ -787,7 +809,7 @@ that is, in terms of G1 Earley sets.
 
 ```
     -- miranda: section+ VM operations
-    function op_fn_push_constant(recce, constant_ix)
+    function op_fn_push_constant(recce, constant_ix, new_values)
         local constants = recce:constants()
         -- io.stderr:write('constants: ', inspect(constants), "\n")
         -- io.stderr:write('constant_ix: ', constant_ix, "\n")
@@ -797,6 +819,8 @@ that is, in terms of G1 Earley sets.
         local values = recce:values()
         local next_ix = marpa.sv.top_index(values) + 1;
         values[next_ix] = constant
+        next_ix = marpa.sv.top_index(new_values) + 1;
+        new_values[next_ix] = constant
         return -2
     end
 
@@ -824,17 +848,19 @@ is the result of this sequence of operations.
 
 ```
     -- miranda: section+ VM operations
-    function op_fn_result_is_array(recce)
+    function op_fn_result_is_array(recce, dummy, new_values)
         local blessing_ix = recce.v.step.blessing_ix
         local values = recce:values()
         if blessing_ix then
           local constants = recce:constants()
           local blessing = constants[blessing_ix]
           marpa.sv.bless(values, blessing)
+          marpa.sv.bless(new_values, blessing)
         end
         local stack = recce.v.stack
         local result_ix = recce.v.step.result
         stack[result_ix] = values
+        stack[result_ix] = new_values
         return -1
     end
 
@@ -850,7 +876,7 @@ implementation, which returned the size of the
 
 ```
     -- miranda: section+ VM operations
-    function op_fn_callback(recce)
+    function op_fn_callback(recce, dummy, new_values)
         local step_type = recce.v.step.type
         if step_type ~= 'MARPA_STEP_RULE'
             and step_type ~= 'MARPA_STEP_NULLING_SYMBOL'
@@ -867,6 +893,7 @@ implementation, which returned the size of the
           local constants = recce:constants()
           local blessing = constants[blessing_ix]
           marpa.sv.bless(values, blessing)
+          marpa.sv.bless(new_values, blessing)
         end
         return 3
     end
@@ -877,7 +904,7 @@ implementation, which returned the size of the
 
 ```
     -- miranda: section+ VM operations
-    function do_ops(recce, ops)
+    function do_ops(recce, ops, new_values)
         local op_ix = 1
         while op_ix <= #ops do
             local op_code = ops[op_ix]
@@ -900,7 +927,7 @@ implementation, which returned the size of the
               -- io.stderr:write('starting op: ', inspect(recce))
             end
             local op_fn = recce[fn_key]
-            local result = op_fn(recce, arg)
+            local result = op_fn(recce, arg, new_values)
             if result >= -1 then return result end
             op_ix = op_ix + 3
             end
@@ -960,12 +987,14 @@ with "trace" and "do not return" being special cases.
         if not ops then
             error(string.format('No semantics defined for %s', recce.v.step.type))
         end
-        local do_ops_result = do_ops(recce, ops)
+        local do_ops_result = do_ops(recce, ops, new_values)
         local stack = recce.v.stack
         -- truncate stack
         local above_top = recce.v.step.result + 1
         for i = above_top,#stack do stack[i] = nil end
-        if do_ops_result > 0 then return 3, new_values end
+        if do_ops_result > 0 then
+            return 3, new_values
+        end
         if #recce.trace_values_queue > 0 then return -1, new_values end
         return -2, new_values
     end

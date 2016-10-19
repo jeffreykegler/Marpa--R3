@@ -4145,7 +4145,7 @@ PPCODE:
                             MARPA_STEP_RULE ?
                             marpa_v_rule (v_wrapper->v) :
                             marpa_v_token (v_wrapper->v))));
-                XPUSHs (ref_to_values_av);      /* already mortal */
+                XPUSHs (new_values);      /* already mortal */
                 XSRETURN (3);
             }
         default:
