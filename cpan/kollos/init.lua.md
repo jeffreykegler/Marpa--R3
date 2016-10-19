@@ -850,16 +850,13 @@ is the result of this sequence of operations.
     -- miranda: section+ VM operations
     function op_fn_result_is_array(recce, dummy, new_values)
         local blessing_ix = recce.v.step.blessing_ix
-        local values = recce:values()
         if blessing_ix then
           local constants = recce:constants()
           local blessing = constants[blessing_ix]
-          marpa.sv.bless(values, blessing)
           marpa.sv.bless(new_values, blessing)
         end
         local stack = recce.v.stack
         local result_ix = recce.v.step.result
-        stack[result_ix] = values
         stack[result_ix] = new_values
         return -1
     end
@@ -889,10 +886,8 @@ implementation, which returned the size of the
         end
         local blessing_ix = recce.v.step.blessing_ix
         if blessing_ix then
-          local values = recce:values()
           local constants = recce:constants()
           local blessing = constants[blessing_ix]
-          marpa.sv.bless(values, blessing)
           marpa.sv.bless(new_values, blessing)
         end
         return 3
