@@ -4133,8 +4133,6 @@ PPCODE:
             XSRETURN_EMPTY;
         case -1:
             XSRETURN_PV ("trace");
-        case -2:
-            break;
         }
 
 
