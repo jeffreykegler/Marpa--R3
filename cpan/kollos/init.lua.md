@@ -918,6 +918,7 @@ with "trace" and "do not return" being special cases.
 ```
     -- miranda: section+ VM operations
     function find_and_do_ops(recce)
+        recce.trace_values_queue = {}
         while true do
             local new_values = marpa.sv.av_new()
             local ops = {}
