@@ -450,7 +450,6 @@ struct v_wrapper_s
   Marpa_Value v;
   SV *base_sv;
   G_Wrapper *base;
-  AV *values; /* for values accumulated by a semantic 'step' */
   AV *constants;
   Outer_R* outer_slr;
 };

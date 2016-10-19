@@ -969,33 +969,6 @@ static int xlua_recce_constants_meth(lua_State* L) {
     return 1;
 }
 
-static int xlua_recce_values_meth(lua_State* L) {
-    Scanless_R* slr;
-    V_Wrapper *v_wrapper;
-    AV* values;
-
-    marpa_luaL_checktype(L, 1, LUA_TTABLE);
-    /* Lua stack: [ recce_table ] */
-    marpa_lua_getfield(L, -1, "lud");
-    /* Lua stack: [ recce_table, lud ] */
-    slr = (Scanless_R*)marpa_lua_touserdata(L, -1);
-    /* the slr owns the recce table, so it doesn't */
-    /* need to own its components. */
-    v_wrapper = slr->v_wrapper;
-    if (!v_wrapper) {
-        /* A recoverable error?  Probably not */
-        croak("recce.values(): valuator is not yet active");
-    }
-    values = v_wrapper->values;
-    if (!values) {
-        /* I think this is an internal error */
-        croak("recce.values(): valuator has no values AV");
-    }
-    MARPA_SV_AV(L, values);
-    /* Lua stack: [ recce_table, recce_lud, values_ud ] */
-    return 1;
-}
-
 static int
 xlua_recce_step_meth (lua_State * L)
 {
@@ -1156,7 +1129,6 @@ xlua_recce_gc (lua_State * L)
 
 static const struct luaL_Reg marpa_recce_meths[] = {
     {"constants", xlua_recce_constants_meth},
-    {"values", xlua_recce_values_meth},
     {"step", xlua_recce_step_meth},
     {"literal_of_es_span", xlua_recce_literal_of_es_span_meth},
     {"span", xlua_recce_span_meth},
@@ -4125,10 +4097,7 @@ PPCODE:
 
     while (1) {
         int result;
-        AV *values_av = newAV ();
-        SV *ref_to_values_av = sv_2mortal (newRV_noinc ((SV *) values_av));
         SV *new_values;
-        v_wrapper->values = (AV *) SvRV (ref_to_values_av);
 
         xlua_sig_call (outer_slr->L,
             "local recce = ...; return find_and_do_ops(recce)\n",
