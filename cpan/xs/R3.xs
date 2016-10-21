@@ -997,8 +997,8 @@ xlua_recce_step_meth (lua_State * L)
     }
     v = v_wrapper->v;
     /* Lua stack: [ recce_table, lud, ] */
-    if (LUA_TTABLE != marpa_lua_getfield (L, recce_table, "v")) {
-        croak ("Internal error: recce.v table not set");
+    if (LUA_TTABLE != marpa_lua_getfield (L, recce_table, "lmw_v")) {
+        croak ("Internal error: recce.lmw_v table not set");
     }
     v_table = marpa_lua_gettop (L);
     /* Lua stack: [ recce_table, lud, v_table ] */
@@ -3960,6 +3960,8 @@ PPCODE:
   marpa_lua_getfield(L, -1, "class_value");
   marpa_lua_setmetatable(L, valuator_object_ix);
   /* [ valuator_obj, kollos_tab ] */
+  marpa_lua_pop(L, 1);
+  /* [ valuator_obj ] */
 
   /* Add new g userdatum --
    * it must own a reference to the Libmarpa
@@ -3967,9 +3969,9 @@ PPCODE:
    */
   marpa_gen_grammar_ud(L, g);
   marpa_g_ref(g);
-  /* [ valuator_obj, kollos_tab, grammar_ud ] */
+  /* [ valuator_obj, grammar_ud ] */
   marpa_lua_setfield(L, valuator_object_ix, "_libmarpa_g");
-  /* [ valuator_obj, kollos_tab ] */
+  /* [ valuator_obj ] */
 
   /* Add v userdatum here */
   v = marpa_v_new (t);
@@ -3982,14 +3984,14 @@ PPCODE:
       croak ("Problem in t->dummyup_valuator(): %s", xs_g_error (g_wrapper));
     }
   marpa_gen_value_ud(L, v);
-  /* [ valuator_obj, kollos_tab, grammar_ud ] */
+  /* [ valuator_obj, grammar_ud ] */
   marpa_lua_setfield(L, valuator_object_ix, "_libmarpa");
-  /* [ valuator_obj, kollos_tab ] */
+  /* [ valuator_obj ] */
 
   marpa_lua_getglobal(L, "sandbox");
-  /* [ valuator_obj, kollos_tab, sandbox ] */
-  marpa_lua_rotate(L, -3, -1);
-  /* [ kollos_tab, sandbox, valuator_obj ] */
+  /* [ valuator_obj, sandbox ] */
+  marpa_lua_rotate(L, -2, -1);
+  /* [ sandbox, valuator_obj ] */
   marpa_lua_setfield(L, -2, name);
   marpa_lua_settop(L, base_of_stack);
 }

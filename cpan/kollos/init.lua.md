@@ -470,7 +470,7 @@ fast fails with a clear message.
 If an operation in the VM returns -1, it is a
 "result operation".
 The actual result is expected to be in the stack
-at index `recce.v.step.result`.
+at index `recce.lmw_v.step.result`.
 
 The result operation is not required to be the
 last operation in a sequence,
@@ -484,7 +484,7 @@ If a sequence ends without encountering a result
 operation, an implicit "no-op" result operation
 is assumed and, as usual,
 the result is the value in the stack
-at index `recce.v.step.result`.
+at index `recce.lmw_v.step.result`.
 
 #### VM "result is undef" operation
 
@@ -495,8 +495,8 @@ The result of the semantics is a Perl undef.
     -- miranda: section+ VM operations
 
     function op_fn_result_is_undef(recce)
-        local stack = recce.v.stack
-        stack[recce.v.step.result] = marpa.sv.undef()
+        local stack = recce.lmw_v.stack
+        stack[recce.lmw_v.step.result] = marpa.sv.undef()
         return -1
     end
 
@@ -513,17 +513,17 @@ if not the value is an undef.
     -- miranda: section+ VM operations
 
     function op_fn_result_is_token_value(recce)
-        if recce.v.step.type ~= 'MARPA_STEP_TOKEN' then
+        if recce.lmw_v.step.type ~= 'MARPA_STEP_TOKEN' then
           return op_fn_result_is_undef(recce)
         end
-        local stack = recce.v.stack
-        local result_ix = recce.v.step.result
+        local stack = recce.lmw_v.stack
+        local result_ix = recce.lmw_v.step.result
         stack[result_ix] = current_token_literal(recce)
         if recce.trace_values > 0 then
           local top_of_queue = #recce.trace_values_queue;
           local tag, token_sv
           recce.trace_values_queue[top_of_queue+1] =
-             {tag, recce.v.step.type, recce.v.step.symbol, recce.v.step.value, token_sv};
+             {tag, recce.lmw_v.step.type, recce.lmw_v.step.symbol, recce.lmw_v.step.value, token_sv};
              -- io.stderr:write('[step_type]: ', inspect(recce))
         end
         return -1
@@ -536,15 +536,15 @@ if not the value is an undef.
 ```
     -- miranda: section+ VM operations
     function op_fn_result_is_n_of_rhs(recce, rhs_ix)
-        if recce.v.step.type ~= 'MARPA_STEP_RULE' then
+        if recce.lmw_v.step.type ~= 'MARPA_STEP_RULE' then
           return op_fn_result_is_undef(recce)
         end
-        local stack = recce.v.stack
-        local result_ix = recce.v.step.result
+        local stack = recce.lmw_v.stack
+        local result_ix = recce.lmw_v.step.result
         repeat
             if rhs_ix == 0 then break end
             local fetch_ix = result_ix + rhs_ix
-            if fetch_ix > recce.v.step.arg_n then
+            if fetch_ix > recce.lmw_v.step.arg_n then
                 stack[result_ix] = marpa.sv.undef()
                 break
             end
@@ -568,15 +568,15 @@ the "N of RHS" operation should be used.
 ```
     -- miranda: section+ VM operations
     function op_fn_result_is_n_of_sequence(recce, item_ix)
-        if recce.v.step.type ~= 'MARPA_STEP_RULE' then
+        if recce.lmw_v.step.type ~= 'MARPA_STEP_RULE' then
           return op_fn_result_is_undef(recce)
         end
-        local result_ix = recce.v.step.result
+        local result_ix = recce.lmw_v.step.result
         local fetch_ix = result_ix + item_ix * 2
-        if fetch_ix > recce.v.step.arg_n then
+        if fetch_ix > recce.lmw_v.step.arg_n then
           return op_fn_result_is_undef(recce)
         end
-        local stack = recce.v.stack
+        local stack = recce.lmw_v.stack
         if item_ix > 0 then
             stack[result_ix] = stack[fetch_ix]
         end
@@ -594,13 +594,13 @@ Returns a constant result.
     function op_fn_result_is_constant(recce, constant_ix)
         local constants = recce:constants()
         local constant = constants[constant_ix]
-        local stack = recce.v.stack
-        local result_ix = recce.v.step.result
+        local stack = recce.lmw_v.stack
+        local result_ix = recce.lmw_v.step.result
         stack[result_ix] = constant
-        if recce.trace_values > 0 and recce.v.step.type == 'MARPA_STEP_TOKEN' then
+        if recce.trace_values > 0 and recce.lmw_v.step.type == 'MARPA_STEP_TOKEN' then
             local top_of_queue = #recce.trace_values_queue
             recce.trace_values_queue[top_of_queue+1] =
-                { "valuator unknown step", recce.v.step.type, recce.token, constant}
+                { "valuator unknown step", recce.lmw_v.step.type, recce.token, constant}
                       -- io.stderr:write('valuator unknown step: ', inspect(recce))
         end
         return -1
@@ -637,11 +637,11 @@ Push one of the RHS child values onto the values array.
     -- miranda: section+ VM operations
 
     function op_fn_push_one(recce, rhs_ix, new_values)
-        if recce.v.step.type ~= 'MARPA_STEP_RULE' then
+        if recce.lmw_v.step.type ~= 'MARPA_STEP_RULE' then
           return op_fn_push_undef(recce, nil, new_values)
         end
-        local stack = recce.v.stack
-        local result_ix = recce.v.step.result
+        local stack = recce.lmw_v.stack
+        local result_ix = recce.lmw_v.step.result
         local next_ix = marpa.sv.top_index(new_values) + 1;
         new_values[next_ix] = stack[result_ix + rhs_ix]
         return -2
@@ -656,17 +656,17 @@ equivalent of the current token.
 It assumes that there *is* a current token,
 that is,
 it assumes that the caller has ensured that
-`recce.v.step.type ~= 'MARPA_STEP_TOKEN'`.
+`recce.lmw_v.step.type ~= 'MARPA_STEP_TOKEN'`.
 
 ```
     -- miranda: section+ VM operations
     function current_token_literal(recce)
-      if recce.token_is_literal == recce.v.step.value then
-          local start_es = recce.v.step.start_es_id
-          local end_es = recce.v.step.es_id
+      if recce.token_is_literal == recce.lmw_v.step.value then
+          local start_es = recce.lmw_v.step.start_es_id
+          local end_es = recce.lmw_v.step.es_id
           return recce:literal_of_es_span(start_es, end_es)
       end
-      return recce.token_values[recce.v.step.value]
+      return recce.token_values[recce.lmw_v.step.value]
     end
 
 ```
@@ -686,15 +686,15 @@ Otherwise the values of the RHS children are pushed.
     -- miranda: section+ VM operations
 
     function op_fn_push_values(recce, increment, new_values)
-        if recce.v.step.type == 'MARPA_STEP_TOKEN' then
+        if recce.lmw_v.step.type == 'MARPA_STEP_TOKEN' then
             local next_ix = marpa.sv.top_index(new_values) + 1;
             new_values[next_ix] = current_token_literal(recce)
             return -2
         end
-        if recce.v.step.type == 'MARPA_STEP_RULE' then
-            local stack = recce.v.stack
-            local arg_n = recce.v.step.arg_n
-            local result_ix = recce.v.step.result
+        if recce.lmw_v.step.type == 'MARPA_STEP_RULE' then
+            local stack = recce.lmw_v.stack
+            local arg_n = recce.lmw_v.step.arg_n
+            local result_ix = recce.lmw_v.step.result
             local to_ix = marpa.sv.top_index(new_values) + 1;
             for from_ix = result_ix,arg_n,increment do
                 new_values[to_ix] = stack[from_ix]
@@ -716,8 +716,8 @@ in terms of the input string.
 ```
     -- miranda: section+ VM operations
     function op_fn_push_start(recce, dummy, new_values)
-        local start_es = recce.v.step.start_es_id
-        local end_es = recce.v.step.es_id
+        local start_es = recce.lmw_v.step.start_es_id
+        local end_es = recce.lmw_v.step.es_id
         local start, l = recce:span(start_es, end_es)
         local next_ix = marpa.sv.top_index(new_values) + 1;
         local _
@@ -735,8 +735,8 @@ that is, in terms of the input string
 ```
     -- miranda: section+ VM operations
     function op_fn_push_length(recce, dummy, new_values)
-        local start_es = recce.v.step.start_es_id
-        local end_es = recce.v.step.es_id
+        local start_es = recce.lmw_v.step.start_es_id
+        local end_es = recce.lmw_v.step.es_id
         local next_ix = marpa.sv.top_index(new_values) + 1;
         local _
         _, new_values[next_ix] = recce:span(start_es, end_es)
@@ -754,7 +754,7 @@ in terms of G1 Earley sets.
     -- miranda: section+ VM operations
     function op_fn_push_g1_start(recce, dummy, new_values)
         local next_ix = marpa.sv.top_index(new_values) + 1;
-        new_values[next_ix] = recce.v.step.start_es_id
+        new_values[next_ix] = recce.lmw_v.step.start_es_id
         return -2
     end
 
@@ -769,8 +769,8 @@ that is, in terms of G1 Earley sets.
     -- miranda: section+ VM operations
     function op_fn_push_g1_length(recce, dummy, new_values)
         local next_ix = marpa.sv.top_index(new_values) + 1;
-        new_values[next_ix] = (recce.v.step.es_id
-            - recce.v.step.start_es_id) + 1
+        new_values[next_ix] = (recce.lmw_v.step.es_id
+            - recce.lmw_v.step.start_es_id) + 1
         return -2
     end
 
@@ -803,7 +803,7 @@ of every sequence of operations
 ```
     -- miranda: section+ VM operations
     function op_fn_bless(recce, blessing_ix)
-        recce.v.step.blessing_ix = blessing_ix
+        recce.lmw_v.step.blessing_ix = blessing_ix
         return -2
     end
 
@@ -817,14 +817,14 @@ is the result of this sequence of operations.
 ```
     -- miranda: section+ VM operations
     function op_fn_result_is_array(recce, dummy, new_values)
-        local blessing_ix = recce.v.step.blessing_ix
+        local blessing_ix = recce.lmw_v.step.blessing_ix
         if blessing_ix then
           local constants = recce:constants()
           local blessing = constants[blessing_ix]
           marpa.sv.bless(new_values, blessing)
         end
-        local stack = recce.v.stack
-        local result_ix = recce.v.step.result
+        local stack = recce.lmw_v.stack
+        local result_ix = recce.lmw_v.step.result
         stack[result_ix] = new_values
         return -1
     end
@@ -842,7 +842,7 @@ implementation, which returned the size of the
 ```
     -- miranda: section+ VM operations
     function op_fn_callback(recce, dummy, new_values)
-        local step_type = recce.v.step.type
+        local step_type = recce.lmw_v.step.type
         if step_type ~= 'MARPA_STEP_RULE'
             and step_type ~= 'MARPA_STEP_NULLING_SYMBOL'
         then
@@ -852,7 +852,7 @@ implementation, which returned the size of the
             )
             os.exit(false)
         end
-        local blessing_ix = recce.v.step.blessing_ix
+        local blessing_ix = recce.lmw_v.step.blessing_ix
         if blessing_ix then
           local constants = recce:constants()
           local blessing = constants[blessing_ix]
@@ -885,8 +885,8 @@ implementation, which returned the size of the
             if recce.trace_values >= 3 then
               local queue = recce.trace_values_queue
               local tag = 'starting lua op'
-              queue[#queue+1] = {'starting op', recce.v.step.type, 'lua'}
-              queue[#queue+1] = {tag, recce.v.step.type, recce.op_fn_key[fn_key]}
+              queue[#queue+1] = {'starting op', recce.lmw_v.step.type, 'lua'}
+              queue[#queue+1] = {tag, recce.lmw_v.step.type, recce.op_fn_key[fn_key]}
               -- io.stderr:write('starting op: ', inspect(recce))
             end
             local op_fn = recce[fn_key]
@@ -923,25 +923,25 @@ with "trace" and "do not return" being special cases.
             local new_values = marpa.sv.av_new()
             local ops = {}
             recce:step()
-            if recce.v.step.type == 'MARPA_STEP_INACTIVE' then
+            if recce.lmw_v.step.type == 'MARPA_STEP_INACTIVE' then
                 return 0, new_values
             end
-            if recce.v.step.type == 'MARPA_STEP_RULE' then
-                ops = recce.rule_semantics[recce.v.step.rule]
+            if recce.lmw_v.step.type == 'MARPA_STEP_RULE' then
+                ops = recce.rule_semantics[recce.lmw_v.step.rule]
                 if not ops then
                     ops = recce.rule_semantics.default
                 end
                 goto DO_OPS
             end
-            if recce.v.step.type == 'MARPA_STEP_TOKEN' then
-                ops = recce.token_semantics[recce.v.step.symbol]
+            if recce.lmw_v.step.type == 'MARPA_STEP_TOKEN' then
+                ops = recce.token_semantics[recce.lmw_v.step.symbol]
                 if not ops then
                     ops = recce.token_semantics.default
                 end
                 goto DO_OPS
             end
-            if recce.v.step.type == 'MARPA_STEP_NULLING_SYMBOL' then
-                ops = recce.nulling_semantics[recce.v.step.symbol]
+            if recce.lmw_v.step.type == 'MARPA_STEP_NULLING_SYMBOL' then
+                ops = recce.nulling_semantics[recce.lmw_v.step.symbol]
                 if not ops then
                     ops = recce.nulling_semantics.default
                 end
@@ -950,12 +950,12 @@ with "trace" and "do not return" being special cases.
             if true then return 1, new_values end
             ::DO_OPS::
             if not ops then
-                error(string.format('No semantics defined for %s', recce.v.step.type))
+                error(string.format('No semantics defined for %s', recce.lmw_v.step.type))
             end
             local do_ops_result = do_ops(recce, ops, new_values)
-            local stack = recce.v.stack
+            local stack = recce.lmw_v.stack
             -- truncate stack
-            local above_top = recce.v.step.result + 1
+            local above_top = recce.lmw_v.step.result + 1
             for i = above_top,#stack do stack[i] = nil end
             if do_ops_result > 0 then
                 return 3, new_values
@@ -1074,7 +1074,7 @@ whose id is `id`.
 ```
     -- miranda: section+ Utilities for Perl code
     function stack_top_index(recce)
-        return recce.v.step.result
+        return recce.lmw_v.step.result
     end
 
 ```
@@ -1084,7 +1084,7 @@ whose id is `id`.
 ```
     -- miranda: section+ Utilities for Perl code
     function stack_get(recce, ix)
-        local stack = recce.v.stack
+        local stack = recce.lmw_v.stack
         return stack[ix+0]
     end
 
@@ -1095,7 +1095,7 @@ whose id is `id`.
 ```
     -- miranda: section+ Utilities for Perl code
     function stack_set(recce, ix, v)
-        local stack = recce.v.stack
+        local stack = recce.lmw_v.stack
         stack[ix+0] = v
     end
 
@@ -1116,7 +1116,7 @@ Called when a valuator is set up.
 
     function value_init(recce, trace_values)
 
-        if recce.v then return end
+        if recce.lmw_v then return end
 
         recce.op_fn_key = {}
 
@@ -1169,8 +1169,8 @@ Called when a valuator is set up.
           }
         end
 
-        recce.v = {}
-        recce.v.stack = {}
+        recce.lmw_v = {}
+        recce.lmw_v.stack = {}
     end
 
 ```
@@ -1193,7 +1193,10 @@ A function to be called whenever a valuator is reset.
         recce.trace_values = 0;
         recce.trace_values_queue = {};
 
-        recce.v = nil
+        recce.lmw_b = nil
+        recce.lmw_o = nil
+        recce.lmw_t = nil
+        recce.lmw_v = nil
     end
 
 ```
