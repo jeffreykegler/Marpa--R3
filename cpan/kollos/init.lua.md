@@ -2257,10 +2257,17 @@ Set "strict" globals, using code taken from strict.lua.
         /* [ userdata ] */
     }
 
+`wrap_grammar_new()`'s second argument is for development.
+The intent is, eventually, for Kollos to create all its Libmarpa
+grammars inside `wrap_grammar_new()`.
+Kollos takes ownership of `g`, so the Libmarpa grammar must
+have a reference to transfer
+to `wrap_grammar_new()`.
+
     -- miranda: section+ grammar object non-standard wrappers
 
     static int
-    wrap_grammar_new (lua_State * L)
+    wrap_grammar_new (lua_State * L, Marpa_Grammar g)
     {
       /* [ grammar_table ] */
       const int grammar_stack_ix = 1;
@@ -2277,34 +2284,6 @@ Set "strict" globals, using code taken from strict.lua.
        * pointless.  But we may someday use the LuaJIT,
        * and version checking will be needed there.
        */
-
-      {
-        const char *const header_mismatch =
-          "Header version does not match expected version";
-        /* Make sure the header is from the version we want */
-        if (MARPA_MAJOR_VERSION != EXPECTED_LIBMARPA_MAJOR)
-          luif_err_throw2 (L, LUIF_ERR_MAJOR_VERSION_MISMATCH, header_mismatch);
-        if (MARPA_MINOR_VERSION != EXPECTED_LIBMARPA_MINOR)
-          luif_err_throw2 (L, LUIF_ERR_MINOR_VERSION_MISMATCH, header_mismatch);
-        if (MARPA_MICRO_VERSION != EXPECTED_LIBMARPA_MICRO)
-          luif_err_throw2 (L, LUIF_ERR_MICRO_VERSION_MISMATCH, header_mismatch);
-      }
-
-      {
-        /* Now make sure the library is from the version we want */
-        const char *const library_mismatch =
-          "Library version does not match expected version";
-        int version[3];
-        const Marpa_Error_Code error_code = marpa_version (version);
-        if (error_code != MARPA_ERR_NONE)
-          luif_err_throw2 (L, error_code, "marpa_version() failed");
-        if (version[0] != EXPECTED_LIBMARPA_MAJOR)
-          luif_err_throw2 (L, LUIF_ERR_MAJOR_VERSION_MISMATCH, library_mismatch);
-        if (version[1] != EXPECTED_LIBMARPA_MINOR)
-          luif_err_throw2 (L, LUIF_ERR_MINOR_VERSION_MISMATCH, library_mismatch);
-        if (version[2] != EXPECTED_LIBMARPA_MICRO)
-          luif_err_throw2 (L, LUIF_ERR_MICRO_VERSION_MISMATCH, library_mismatch);
-      }
 
       /* stack is [ grammar_table ] */
       {
@@ -3060,6 +3039,35 @@ Set "strict" globals, using code taken from strict.lua.
     {
         /* Create the main kollos object */
         const int kollos_table_stack_ix = marpa_lua_gettop(L) + 1;
+
+      {
+        const char *const header_mismatch =
+          "Header version does not match expected version";
+        /* Make sure the header is from the version we want */
+        if (MARPA_MAJOR_VERSION != EXPECTED_LIBMARPA_MAJOR)
+          luif_err_throw2 (L, LUIF_ERR_MAJOR_VERSION_MISMATCH, header_mismatch);
+        if (MARPA_MINOR_VERSION != EXPECTED_LIBMARPA_MINOR)
+          luif_err_throw2 (L, LUIF_ERR_MINOR_VERSION_MISMATCH, header_mismatch);
+        if (MARPA_MICRO_VERSION != EXPECTED_LIBMARPA_MICRO)
+          luif_err_throw2 (L, LUIF_ERR_MICRO_VERSION_MISMATCH, header_mismatch);
+      }
+
+      {
+        /* Now make sure the library is from the version we want */
+        const char *const library_mismatch =
+          "Library version does not match expected version";
+        int version[3];
+        const Marpa_Error_Code error_code = marpa_version (version);
+        if (error_code != MARPA_ERR_NONE)
+          luif_err_throw2 (L, error_code, "marpa_version() failed");
+        if (version[0] != EXPECTED_LIBMARPA_MAJOR)
+          luif_err_throw2 (L, LUIF_ERR_MAJOR_VERSION_MISMATCH, library_mismatch);
+        if (version[1] != EXPECTED_LIBMARPA_MINOR)
+          luif_err_throw2 (L, LUIF_ERR_MINOR_VERSION_MISMATCH, library_mismatch);
+        if (version[2] != EXPECTED_LIBMARPA_MICRO)
+          luif_err_throw2 (L, LUIF_ERR_MICRO_VERSION_MISMATCH, library_mismatch);
+      }
+
         marpa_lua_newtable(L);
         /* Create the main kollos_c object, to give the
          * C language Libmarpa wrappers their own namespace.
