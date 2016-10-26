@@ -1403,7 +1403,8 @@ qq{    Semantics were specified as "$original_semantics"\n}
     } ## end REGISTRATION: for my $registration ( @{ $recce->[...]})
 
   STEP: while (1) {
-        my ( $value_type, @value_data ) = $value->stack_step();
+        my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
+        my ( $value_type, @value_data ) = $thin_slr->stack_step();
 
         if ($trace_values) {
           EVENT: for ( my $event_ix = 0 ; ; $event_ix++ ) {

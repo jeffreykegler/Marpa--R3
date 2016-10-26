@@ -4086,53 +4086,6 @@ PPCODE:
 }
 
 void
-stack_step( v_wrapper )
-    V_Wrapper *v_wrapper;
-PPCODE:
-{
-    Outer_R *outer_slr;
-    int result;
-    SV *new_values;
-
-    outer_slr = v_wrapper->outer_slr;
-    xlua_sig_call (outer_slr->L,
-        "local recce = ...; return find_and_do_ops(recce)\n",
-        "R>iM", outer_slr->lua_ref, &result, &new_values);
-
-    switch (result) {
-    case 3:
-        {
-            const int step_type = marpa_v_step_type (v_wrapper->v);
-            const char *step_type_string =
-                step_type_to_string (step_type);
-            XPUSHs (sv_2mortal (newSVpv (step_type_string, 0)));
-            XPUSHs (sv_2mortal (newSViv (step_type ==
-                        MARPA_STEP_RULE ?
-                        marpa_v_rule (v_wrapper->v) :
-                        marpa_v_token (v_wrapper->v))));
-            XPUSHs (new_values);      /* already mortal */
-            XSRETURN (3);
-        }
-    default:
-    case 1:
-        {
-            const int step_type = marpa_v_step_type (v_wrapper->v);
-            const char *step_type_string =
-                step_type_to_string (step_type);
-            if (!step_type_string) {
-                step_type_string = "Unknown";
-            }
-            XPUSHs (sv_2mortal (newSVpv (step_type_string, 0)));
-            XSRETURN (1);
-        }
-    case 0:
-        XSRETURN_EMPTY;
-    case -1:
-        XSRETURN_PV ("trace");
-    }
-}
-
-void
 step_type( v_wrapper )
     V_Wrapper *v_wrapper;
 PPCODE:
@@ -5160,6 +5113,7 @@ PPCODE:
     }
     Newx (outer_slg, 1, Outer_G);
     slg = slg_inner_new (l0_sv, g1_sv);
+
     outer_slg->inner = slg;
     outer_slg->L = xlua_newstate ();
 
@@ -5179,6 +5133,24 @@ PPCODE:
         /* Lua stack: [ grammar_table ] */
         outer_slg->lua_ref = marpa_luaL_ref (L, LUA_REGISTRYINDEX);
         /* Lua stack: [] */
+    }
+
+    {
+        Marpa_Grammar g = slg->g1_wrapper->g;
+        marpa_g_ref (g);
+        if (!marpa_k_dummyup_grammar (outer_slg->L, g, outer_slg->lua_ref,
+                "lmw_g1g")) {
+            croak ("Problem in u->new(): G1 marpa_k_dummyup_grammar failed\n");
+        }
+    }
+
+    {
+        Marpa_Grammar g = slg->l0_wrapper->g;
+        marpa_g_ref (g);
+        if (!marpa_k_dummyup_grammar (outer_slg->L, g, outer_slg->lua_ref,
+                "lmw_l0g")) {
+            croak ("Problem in u->new(): L0 marpa_k_dummyup_grammar failed\n");
+        }
     }
 
     new_sv = sv_newmortal ();
@@ -5675,7 +5647,7 @@ PPCODE:
     outer_slr->L = L;
     /* Take ownership of a new reference to the Lua state */
     kollos_refinc(L);
-    outer_slr->lua_ref = kollos_slr_new(L, slr);
+    outer_slr->lua_ref = kollos_slr_new(L, slr, outer_slg->lua_ref);
   }
 
   new_sv = sv_newmortal ();
@@ -7050,6 +7022,53 @@ PPCODE:
   /* Lua stack: [ recce_table ] */
   marpa_luaL_unref (L, -1, fn_key);
   marpa_lua_settop (L, base_of_stack);
+}
+
+void
+stack_step( outer_slr )
+    Outer_R *outer_slr;
+PPCODE:
+{
+    Scanless_R *slr = slr_inner_get(outer_slr);
+    V_Wrapper *v_wrapper = slr->v_wrapper;
+    int result;
+    SV *new_values;
+
+    xlua_sig_call (outer_slr->L,
+        "local recce = ...; return find_and_do_ops(recce)\n",
+        "R>iM", outer_slr->lua_ref, &result, &new_values);
+
+    switch (result) {
+    case 3:
+        {
+            const int step_type = marpa_v_step_type (v_wrapper->v);
+            const char *step_type_string =
+                step_type_to_string (step_type);
+            XPUSHs (sv_2mortal (newSVpv (step_type_string, 0)));
+            XPUSHs (sv_2mortal (newSViv (step_type ==
+                        MARPA_STEP_RULE ?
+                        marpa_v_rule (v_wrapper->v) :
+                        marpa_v_token (v_wrapper->v))));
+            XPUSHs (new_values);      /* already mortal */
+            XSRETURN (3);
+        }
+    default:
+    case 1:
+        {
+            const int step_type = marpa_v_step_type (v_wrapper->v);
+            const char *step_type_string =
+                step_type_to_string (step_type);
+            if (!step_type_string) {
+                step_type_string = "Unknown";
+            }
+            XPUSHs (sv_2mortal (newSVpv (step_type_string, 0)));
+            XSRETURN (1);
+        }
+    case 0:
+        XSRETURN_EMPTY;
+    case -1:
+        XSRETURN_PV ("trace");
+    }
 }
 
 MODULE = Marpa::R3            PACKAGE = Marpa::R3::Lua

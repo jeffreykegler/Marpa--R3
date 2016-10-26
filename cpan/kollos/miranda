@@ -321,7 +321,7 @@ function parse_instruction(first_line_no, last_line_no)
         end
         instruction.phase = phase
         exec_phase_sequence[#exec_phase_sequence+1] = phase
-        print('sequence-exec:', phase)
+        -- print('sequence-exec:', phase)
         return instruction
     end
     error(string.format(

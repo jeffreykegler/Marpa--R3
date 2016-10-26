@@ -340,9 +340,9 @@ because it uses a lot of PERL/XS data structures.
 ```
     -- miranda: section+ C function declarations
     #define MT_NAME_RECCE "Marpa_recce"
-    int kollos_slr_new(lua_State* L, void* slr);
+    int kollos_slr_new(lua_State* L, void* slr, int slg_ref);
     -- miranda: section+ lua interpreter management
-    int kollos_slr_new(lua_State* L, void* slr)
+    int kollos_slr_new(lua_State* L, void* slr, int slg_ref)
     {
         int lua_id;
         const int base_of_stack = marpa_lua_gettop(L);
@@ -368,6 +368,13 @@ because it uses a lot of PERL/XS data structures.
         /* Lua stack: [ recce_table, lud ] */
         marpa_lua_setfield(L, -2, "lud");
         /* Lua stack: [ recce_table ] */
+
+        /* recce_table.slg = slg */
+        marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, slg_ref);
+        /* Lua stack: [ recce_table, slg_table ] */
+        marpa_lua_setfield(L, -2, "slg");
+        /* Lua stack: [ recce_table ] */
+
         /* Set up a reference to this recce table in the Lua state
          * registry.
          */
@@ -2257,6 +2264,9 @@ Set "strict" globals, using code taken from strict.lua.
         /* [ userdata ] */
     }
 
+I'm not sure I use this Libmarpa grammar wrapper constructor.
+It might be deleted after development.
+
 `wrap_grammar_new()`'s second argument is for development.
 The intent is, eventually, for Kollos to create all its Libmarpa
 grammars inside `wrap_grammar_new()`.
@@ -2267,7 +2277,7 @@ to `wrap_grammar_new()`.
     -- miranda: section+ grammar object non-standard wrappers
 
     static int
-    wrap_grammar_new (lua_State * L, Marpa_Grammar g)
+    wrap_grammar_new (lua_State * L)
     {
       /* [ grammar_table ] */
       const int grammar_stack_ix = 1;
@@ -2279,11 +2289,6 @@ to `wrap_grammar_new()`.
         {
           marpa_luaL_checktype(L, grammar_stack_ix, LUA_TTABLE);
         }
-
-      /* I have forked Libmarpa into Kollos, which makes version checking
-       * pointless.  But we may someday use the LuaJIT,
-       * and version checking will be needed there.
-       */
 
       /* stack is [ grammar_table ] */
       {
@@ -2326,6 +2331,78 @@ to `wrap_grammar_new()`.
         return 1;
       }
     }
+
+`dummyup_grammar` is not Lua C API.
+This may be the basis of the actual constructor.
+Takes ownership of a Libmarpa grammar reference,
+so the caller must make sure that one is available.
+
+    -- miranda: section+ C function declarations
+    int
+    marpa_k_dummyup_grammar (lua_State * L, Marpa_Grammar g, int slg_ref, const char *name);
+    -- miranda: section+ grammar object non-standard wrappers
+
+    int
+    marpa_k_dummyup_grammar (lua_State * L, Marpa_Grammar g, int slg_ref, const char *name)
+    {
+
+        int result;
+        Marpa_Grammar *p_g;
+        const int base_of_stack = marpa_lua_gettop (L);
+        int lmw_g_stack_ix;
+
+        marpa_lua_checkstack(L, 20);
+
+        marpa_lua_newtable (L);
+        lmw_g_stack_ix = marpa_lua_gettop (L);
+
+        if (0)
+            printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
+
+        /* [ ] */
+        p_g =
+            (Marpa_Grammar *) marpa_lua_newuserdata (L,
+            sizeof (Marpa_Grammar));
+        /* [ userdata ] */
+        marpa_lua_rawgetp (L, LUA_REGISTRYINDEX, &kollos_g_ud_mt_key);
+        marpa_lua_setmetatable (L, -2);
+        /* [ userdata ] */
+
+        /* dup top of stack */
+        marpa_lua_pushvalue (L, -1);
+        /* [ userdata, userdata ] */
+        marpa_lua_setfield (L, lmw_g_stack_ix, "_libmarpa");
+        /* [ userdata ] */
+
+        /* _libmarpa_g is just a dup of _libmarpa but is here for
+         * orthogonality with the other Kollos Libmarpa wrappers.
+         */
+        /* dup top of stack */
+        marpa_lua_pushvalue (L, -1);
+        /* [ userdata, userdata ] */
+        marpa_lua_setfield (L, lmw_g_stack_ix, "_libmarpa_g");
+        /* [ userdata ] */
+
+        *p_g = g;
+        result = marpa_g_force_valued (g);
+        if (result < 0) {
+            marpa_lua_settop (L, base_of_stack);
+            return 0;
+        }
+        if (0)
+            printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
+
+        marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, slg_ref);
+        /* [ userdata, slg_table ] */
+        marpa_lua_pushvalue (L, -2);
+        /* [ userdata, slg_table, userdata ] */
+        marpa_lua_setfield (L, -2, name);
+
+        marpa_lua_settop (L, base_of_stack);
+        return 1;
+    }
+
+    -- miranda: section+ grammar object non-standard wrappers
 
     /* The grammar error code */
     static int wrap_grammar_error(lua_State *L)
