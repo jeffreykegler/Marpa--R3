@@ -332,7 +332,7 @@ typedef struct
   int precomputed;
   struct symbol_g_properties *symbol_g_properties;
   struct l0_rule_g_properties *l0_rule_g_properties;
-
+  AV *constants;
 
 } Scanless_G;
 
@@ -450,7 +450,6 @@ struct v_wrapper_s
   Marpa_Value v;
   SV *base_sv;
   G_Wrapper *base;
-  AV *constants;
   Outer_R* outer_slr;
 };
 typedef struct v_wrapper_s V_Wrapper;

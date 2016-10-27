@@ -944,7 +944,6 @@ static void create_sv_mt (lua_State* L) {
 
 static int xlua_recce_constants_meth(lua_State* L) {
     Scanless_R* slr;
-    V_Wrapper *v_wrapper;
     AV* constants;
 
     marpa_luaL_checktype(L, 1, LUA_TTABLE);
@@ -952,18 +951,7 @@ static int xlua_recce_constants_meth(lua_State* L) {
     marpa_lua_getfield(L, -1, "lud");
     /* Lua stack: [ recce_table, lud ] */
     slr = (Scanless_R*)marpa_lua_touserdata(L, -1);
-    /* the slr owns the recce table, so it doesn't */
-    /* need to own its components. */
-    v_wrapper = slr->v_wrapper;
-    if (!v_wrapper) {
-        /* A recoverable error?  Probably not */
-        croak("recce.constants(): valuator is not yet active");
-    }
-    constants = v_wrapper->constants;
-    if (!constants) {
-        /* I think this is an internal error */
-        croak("recce.constants(): valuator has no constants array");
-    }
+    constants = slr->slg->constants;
     MARPA_SV_AV(L, constants);
     /* Lua stack: [ recce_table, recce_lud, constants_ud ] */
     return 1;
@@ -2113,6 +2101,11 @@ static Scanless_G* slg_inner_new (SV * l0_sv, SV * g1_sv)
                 0;
         }
     }
+
+    slg->constants = newAV ();
+    /* Reserve position 0 */
+    av_push (slg->constants, newSV(0));
+
     return slg;
 }
 
@@ -2128,6 +2121,7 @@ static void slg_inner_destroy(Scanless_G* slg) {
   for (i = 0; i < Dim(slg->per_codepoint_array); i++) {
     Safefree(slg->per_codepoint_array[i]);
   }
+  SvREFCNT_dec (slg->constants);
   Safefree (slg);
 }
 
@@ -4027,10 +4021,6 @@ PPCODE:
   v_wrapper->base = t_wrapper->base;
   v_wrapper->v = v;
 
-  v_wrapper->constants = newAV ();
-  /* Reserve position 0 */
-  av_push (v_wrapper->constants, newSV(0));
-
   v_wrapper->outer_slr = NULL;
   sv = sv_newmortal ();
   sv_setref_pv (sv, value_c_class_name, (void *) v_wrapper);
@@ -4044,7 +4034,6 @@ PPCODE:
 {
   const Marpa_Value v = v_wrapper->v;
   SvREFCNT_dec (v_wrapper->base_sv);
-  SvREFCNT_dec (v_wrapper->constants);
 
   /* These are "weak" cross-references, weak
    * meaning that the reference counts are not
