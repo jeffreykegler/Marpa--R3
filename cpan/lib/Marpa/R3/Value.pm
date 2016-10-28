@@ -613,6 +613,14 @@ sub Marpa::R3::Scanless::R::value {
 
     } ## end else [ if ($tree) ]
 
+    $slr->exec( << 'END_OF_LUA' );
+        recce = ...
+        recce.lmw_v = nil
+        print("About to collect garbage before $tree->next")
+        print(inspect(_G))
+        collectgarbage()
+END_OF_LUA
+
     return if not defined $tree->next();
 
     local $Marpa::R3::Context::rule = undef;

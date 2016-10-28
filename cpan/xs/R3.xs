@@ -3114,6 +3114,66 @@ get_mortalspace (size_t nbytes)
     return (void *) SvPVX (mortal);
 }
 
+  /* Takes ownership of a reference to v -- caller must have
+   * one available.
+   */
+static void
+dummyup_valuator(
+  lua_State* L,
+  int slr_lua_ref,
+  Marpa_Value v)
+{
+    int valuator_object_ix;
+    int slr_object_ix;
+    const int base_of_stack = marpa_lua_gettop (L);
+
+    marpa_luaL_checkstack (L, 20, "dummyup_valuator");
+
+    marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, slr_lua_ref);
+    /* Lua stack: [ slr_table ] */
+    slr_object_ix = marpa_lua_gettop (L);
+
+    marpa_lua_newtable (L);
+    valuator_object_ix = marpa_lua_gettop (L);
+    marpa_lua_getglobal (L, "kollos");
+    marpa_lua_getfield (L, -1, "class_value");
+    marpa_lua_setmetatable (L, valuator_object_ix);
+    /* [ slr_table, valuator_obj, kollos_tab ] */
+    marpa_lua_settop (L, valuator_object_ix);
+    /* [ slr_table, valuator_obj ] */
+
+    {
+        Scanless_R *slr;
+        Marpa_Grammar g;
+        marpa_lua_getfield (L, slr_object_ix, "lud");
+        /* Lua stack: [ slr_table, valuator_obj, lud ] */
+
+        slr = marpa_lua_touserdata (L, -1);
+        marpa_lua_settop (L, valuator_object_ix);
+        /* [ slr_table, valuator_obj ] */
+
+        g = slr->slg->g1;
+        /* Add new g userdatum --
+         * it must own a reference to the Libmarpa
+         * grammar.
+         */
+        marpa_g_ref (g);
+        marpa_gen_grammar_ud (L, g);
+        /* [ slr_table, valuator_obj, grammar_ud ] */
+        marpa_lua_setfield (L, valuator_object_ix, "_libmarpa_g");
+        /* [ slr_table, valuator_obj ] */
+    }
+
+    /* Add v userdatum here */
+    marpa_gen_value_ud (L, v);
+    /* [ slr_table, valuator_obj, value_ud ] */
+    marpa_lua_setfield (L, valuator_object_ix, "_libmarpa");
+    /* [ slr_table, valuator_obj ] */
+
+    marpa_lua_setfield (L, slr_object_ix, "lmw_v");
+    marpa_lua_settop (L, base_of_stack);
+}
+
 MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin
 
 PROTOTYPES: DISABLE
@@ -4065,12 +4125,15 @@ stack_mode_set( v_wrapper, outer_slr )
 PPCODE:
 {
   Scanless_R *slr = slr_inner_get(outer_slr);
+  Marpa_Value v;
   if (slr->v_wrapper) {
         croak ("SLR already has active valuator");
   }
   v_wrapper->outer_slr = outer_slr;
   slr->v_wrapper = v_wrapper;
-
+  v = v_wrapper->v;
+  marpa_v_ref (v);
+  dummyup_valuator(outer_slr->L, outer_slr->lua_ref, v);
   XSRETURN_YES;
 }
 
