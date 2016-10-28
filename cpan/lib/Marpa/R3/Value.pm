@@ -227,16 +227,15 @@ sub Marpa::R3::Context::bail { ## no critic (Subroutines::RequireArgUnpacking)
 ## use critic
 
 sub Marpa::R3::Context::g1_range {
-    my $valuator = $Marpa::R3::Internal::Context::VALUATOR;
-    Marpa::R3::exception(
-        'Marpa::R3::Context::g1_range called outside of a valuation context')
-        if not defined $valuator;
-    return $valuator->location();
+    my $slr = $Marpa::R3::Context::slr;
+    my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
+    return $thin_slr->location();
 } ## end sub Marpa::R3::Context::g1_range
 
 sub Marpa::R3::Context::g1_span {
-    my $valuator = $Marpa::R3::Internal::Context::VALUATOR;
-    my ($start, $end) = $valuator->location();
+    my $slr = $Marpa::R3::Context::slr;
+    my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
+    my ($start, $end) = $thin_slr->location();
     return $start, ($start - $end) + 1;
 }
 
@@ -624,7 +623,6 @@ sub Marpa::R3::Scanless::R::value {
 
     my $value = Marpa::R3::Thin::V->new($tree);
     $value->stack_mode_set( $slr->thin() );
-    local $Marpa::R3::Internal::Context::VALUATOR = $value;
 
     $value->_marpa_v_trace( $trace_values ? 1 : 0 );
     $slr->exec_name( 'value_init', $trace_values );

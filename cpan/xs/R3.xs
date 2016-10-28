@@ -4074,56 +4074,6 @@ PPCODE:
   XSRETURN_YES;
 }
 
-void
-step_type( v_wrapper )
-    V_Wrapper *v_wrapper;
-PPCODE:
-{
-  const Marpa_Value v = v_wrapper->v;
-  const Marpa_Step_Type status = marpa_v_step_type (v);
-  const char *result_string;
-  result_string = step_type_to_string (status);
-  if (!result_string)
-    {
-      result_string =
-        form ("Problem in v->step(): unknown step type %d", status);
-      set_error_from_string (v_wrapper->base, savepv (result_string));
-      if (v_wrapper->base->throw)
-        {
-          croak ("%s", result_string);
-        }
-    }
-  XPUSHs (sv_2mortal (newSVpv (result_string, 0)));
-}
-
-void
-location( v_wrapper )
-    V_Wrapper *v_wrapper;
-PPCODE:
-{
-  const Marpa_Value v = v_wrapper->v;
-  const Marpa_Step_Type status = marpa_v_step_type (v);
-  if (status == MARPA_STEP_RULE)
-    {
-      XPUSHs (sv_2mortal (newSViv (marpa_v_rule_start_es_id (v))));
-      XPUSHs (sv_2mortal (newSViv (marpa_v_es_id (v))));
-      XSRETURN (2);
-    }
-  if (status == MARPA_STEP_NULLING_SYMBOL)
-    {
-      XPUSHs (sv_2mortal (newSViv (marpa_v_token_start_es_id (v))));
-      XPUSHs (sv_2mortal (newSViv (marpa_v_es_id (v))));
-      XSRETURN (2);
-    }
-  if (status == MARPA_STEP_TOKEN)
-    {
-      XPUSHs (sv_2mortal (newSViv (marpa_v_token_start_es_id (v))));
-      XPUSHs (sv_2mortal (newSViv (marpa_v_es_id (v))));
-      XSRETURN (2);
-    }
-  XSRETURN_EMPTY;
-}
-
 MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::G
 
 void
@@ -7058,6 +7008,60 @@ PPCODE:
     case -1:
         XSRETURN_PV ("trace");
     }
+}
+
+void
+step_type( outer_slr )
+    Outer_R *outer_slr;
+PPCODE:
+{
+  Scanless_R *slr = slr_inner_get(outer_slr);
+  V_Wrapper *v_wrapper = slr->v_wrapper;
+  const Marpa_Value v = v_wrapper->v;
+  const Marpa_Step_Type status = marpa_v_step_type (v);
+  const char *result_string;
+  result_string = step_type_to_string (status);
+  if (!result_string)
+    {
+      result_string =
+        form ("Problem in v->step(): unknown step type %d", status);
+      set_error_from_string (v_wrapper->base, savepv (result_string));
+      if (v_wrapper->base->throw)
+        {
+          croak ("%s", result_string);
+        }
+    }
+  XPUSHs (sv_2mortal (newSVpv (result_string, 0)));
+}
+
+void
+location( outer_slr )
+    Outer_R *outer_slr;
+PPCODE:
+{
+  Scanless_R *slr = slr_inner_get(outer_slr);
+  V_Wrapper *v_wrapper = slr->v_wrapper;
+  const Marpa_Value v = v_wrapper->v;
+  const Marpa_Step_Type status = marpa_v_step_type (v);
+  if (status == MARPA_STEP_RULE)
+    {
+      XPUSHs (sv_2mortal (newSViv (marpa_v_rule_start_es_id (v))));
+      XPUSHs (sv_2mortal (newSViv (marpa_v_es_id (v))));
+      XSRETURN (2);
+    }
+  if (status == MARPA_STEP_NULLING_SYMBOL)
+    {
+      XPUSHs (sv_2mortal (newSViv (marpa_v_token_start_es_id (v))));
+      XPUSHs (sv_2mortal (newSViv (marpa_v_es_id (v))));
+      XSRETURN (2);
+    }
+  if (status == MARPA_STEP_TOKEN)
+    {
+      XPUSHs (sv_2mortal (newSViv (marpa_v_token_start_es_id (v))));
+      XPUSHs (sv_2mortal (newSViv (marpa_v_es_id (v))));
+      XSRETURN (2);
+    }
+  XSRETURN_EMPTY;
 }
 
 MODULE = Marpa::R3            PACKAGE = Marpa::R3::Lua
