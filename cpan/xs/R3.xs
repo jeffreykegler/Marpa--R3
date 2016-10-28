@@ -5599,6 +5599,11 @@ DESTROY( outer_slr )
     Outer_R *outer_slr;
 PPCODE:
 {
+  xlua_sig_call (outer_slr->L,
+      "local recce = ...\n"
+      "valuation_reset(recce)\n"
+      "return 0\n",
+      "R>", outer_slr->lua_ref);
   kollos_robrefdec(outer_slr->L, outer_slr->lua_ref);
   kollos_refdec(outer_slr->L);
   SvREFCNT_dec (outer_slr->slg_sv);

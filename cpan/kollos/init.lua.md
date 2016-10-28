@@ -1185,12 +1185,13 @@ Called when a valuator is set up.
 ### Reset a valuator
 
 A function to be called whenever a valuator is reset.
+It should free all memory associated with the valuation.
 
 ```
 
-    -- miranda: section value_reset()
+    -- miranda: section valuation_reset()
 
-    function value_reset(recce)
+    function valuation_reset(recce)
         recce.op_fn_key = nil
         -- io.stderr:write('Initializing rule semantics to nil\n')
         recce.rule_semantics = nil
@@ -1590,7 +1591,7 @@ the wrapper's point of view, marpa_r_alternative() always succeeds.
     -- miranda: insert enforce strict globals
     -- miranda: insert VM operations
     -- miranda: insert value_init()
-    -- miranda: insert value_reset()
+    -- miranda: insert valuation_reset()
     -- miranda: insert Utilities for Perl code
 
     return "OK"
