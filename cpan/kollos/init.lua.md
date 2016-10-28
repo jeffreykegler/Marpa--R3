@@ -1207,7 +1207,7 @@ It should free all memory associated with the valuation.
         recce.lmw_v = nil
         -- Libmarpa's tree pausing requires value objects to
         -- be destroyed quickly
-        print("About to collect garbage")
+        -- print("About to collect garbage")
         collectgarbage()
     end
 

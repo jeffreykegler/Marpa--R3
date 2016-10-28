@@ -4132,8 +4132,8 @@ PPCODE:
   v_wrapper->outer_slr = outer_slr;
   slr->v_wrapper = v_wrapper;
   v = v_wrapper->v;
-  marpa_v_ref (v);
-  dummyup_valuator(outer_slr->L, outer_slr->lua_ref, v);
+  /* marpa_v_ref (v); */
+  /* dummyup_valuator(outer_slr->L, outer_slr->lua_ref, v); */
   XSRETURN_YES;
 }
 

@@ -52,7 +52,7 @@ local exec_phase_sequence = {}
 function exec_user_code(instruction)
     local code = instruction.code
     local tag = instruction.tag
-    print('exec_user_code: phase, tag', instruction.phase, tag)
+    -- print('exec_user_code: phase, tag', instruction.phase, tag)
     local user_code_f, error_msg = load(code, tag, 't', user_code_env)
     if not user_code_f then
         error(string.format(

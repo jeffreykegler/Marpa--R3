@@ -616,8 +616,8 @@ sub Marpa::R3::Scanless::R::value {
     $slr->exec( << 'END_OF_LUA' );
         recce = ...
         recce.lmw_v = nil
-        print("About to collect garbage before $tree->next")
-        print(inspect(_G))
+        -- print("About to collect garbage before $tree->next")
+        -- print(inspect(_G))
         collectgarbage()
 END_OF_LUA
 
