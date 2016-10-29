@@ -80,7 +80,7 @@ my $lua_exec_body = <<'END_OF_EXEC_BODY';
             MARPA_SV_SV (L, arg_sv);
         }
 
-        status = marpa_lua_pcall (L, (items - 2) + is_method, LUA_MULTRET, 0);
+        status = marpa_lua_pcall (L, (items - 2) + is_method, LUA_MULTRET, msghandler_ix);
         if (status != 0) {
             const char *exception_string = handle_pcall_error(L, status);
             marpa_lua_settop (L, base_of_stack);
@@ -115,6 +115,10 @@ PPCODE:
     const int is_method = 1;
     lua_State *const L = outer_slg->L;
     const int base_of_stack = marpa_lua_gettop (L);
+    int msghandler_ix;
+
+    marpa_lua_pushcfunction(L, xlua_msghandler);
+    msghandler_ix = marpa_lua_gettop(L);
 
     marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, outer_slg->lua_ref);
     /* Lua stack: [ grammar_table ] */
@@ -134,6 +138,10 @@ PPCODE:
     const int is_method = 1;
     lua_State *const L = outer_slg->L;
     const int base_of_stack = marpa_lua_gettop (L);
+    int msghandler_ix;
+
+    marpa_lua_pushcfunction(L, xlua_msghandler);
+    msghandler_ix = marpa_lua_gettop(L);
 
     marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, outer_slg->lua_ref);
     /* Lua stack: [ grammar_table ] */
@@ -151,6 +159,10 @@ PPCODE:
     const int is_method = 1;
     lua_State *const L = outer_slg->L;
     const int base_of_stack = marpa_lua_gettop (L);
+    int msghandler_ix;
+
+    marpa_lua_pushcfunction(L, xlua_msghandler);
+    msghandler_ix = marpa_lua_gettop(L);
     int type;
 
     marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, outer_slg->lua_ref);
@@ -178,6 +190,10 @@ PPCODE:
     const int is_method = 1;
     lua_State *const L = outer_slr->L;
     const int base_of_stack = marpa_lua_gettop (L);
+    int msghandler_ix;
+
+    marpa_lua_pushcfunction(L, xlua_msghandler);
+    msghandler_ix = marpa_lua_gettop(L);
 
     marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, outer_slr->lua_ref);
     /* Lua stack: [ recce_table ] */
@@ -197,6 +213,10 @@ PPCODE:
     const int is_method = 1;
     lua_State *const L = outer_slr->L;
     const int base_of_stack = marpa_lua_gettop (L);
+    int msghandler_ix;
+
+    marpa_lua_pushcfunction(L, xlua_msghandler);
+    msghandler_ix = marpa_lua_gettop(L);
 
     marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, outer_slr->lua_ref);
     /* Lua stack: [ recce_table ] */
@@ -214,7 +234,11 @@ PPCODE:
     const int is_method = 1;
     lua_State *const L = outer_slr->L;
     const int base_of_stack = marpa_lua_gettop (L);
+    int msghandler_ix;
     int type;
+
+    marpa_lua_pushcfunction(L, xlua_msghandler);
+    msghandler_ix = marpa_lua_gettop(L);
 
     marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, outer_slr->lua_ref);
     /* Lua stack: [ recce_table ] */
@@ -240,6 +264,10 @@ PPCODE:
     const int is_method = 0;
     lua_State *const L = lua_wrapper->L;
     const int base_of_stack = marpa_lua_gettop (L);
+    int msghandler_ix;
+
+    marpa_lua_pushcfunction(L, xlua_msghandler);
+    msghandler_ix = marpa_lua_gettop(L);
 
     === LUA LOAD STRING ===
     === LUA EXEC BODY ===
@@ -254,6 +282,10 @@ PPCODE:
     const int is_method = 0;
     lua_State *const L = lua_wrapper->L;
     const int base_of_stack = marpa_lua_gettop (L);
+    int msghandler_ix;
+
+    marpa_lua_pushcfunction(L, xlua_msghandler);
+    msghandler_ix = marpa_lua_gettop(L);
 
     === LUA LOAD STRING ===
 

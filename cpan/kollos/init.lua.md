@@ -1123,7 +1123,9 @@ Called when a valuator is set up.
 
     function value_init(recce, trace_values)
 
-        if recce.lmw_v then return end
+        if not recce.lmw_v then
+            error('no recce.lmw_v in value_init()')
+        end
 
         recce.op_fn_key = {}
 

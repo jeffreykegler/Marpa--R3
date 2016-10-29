@@ -3164,6 +3164,7 @@ dummyup_valuator(
         /* [ slr_table, valuator_obj ] */
     }
 
+    marpa_v_ref (v);
     /* Add v userdatum here */
     marpa_gen_value_ud (L, v);
     /* [ slr_table, valuator_obj, value_ud ] */
@@ -4132,8 +4133,7 @@ PPCODE:
   v_wrapper->outer_slr = outer_slr;
   slr->v_wrapper = v_wrapper;
   v = v_wrapper->v;
-  /* marpa_v_ref (v); */
-  /* dummyup_valuator(outer_slr->L, outer_slr->lua_ref, v); */
+  dummyup_valuator(outer_slr->L, outer_slr->lua_ref, v);
   XSRETURN_YES;
 }
 
