@@ -691,7 +691,7 @@ function section_output(fh, language_arg, name, prefix_arg)
 end
 
 for section_name, filename in pairs(outputs) do
-        print('section_name,filename ', section_name,filename)
+        -- print('section_name,filename ', section_name,filename)
         local handle, error_message = io.open(filename, 'w')
         if not handle then  error(error_message) end
         section_output(handle, 'lua', section_name)

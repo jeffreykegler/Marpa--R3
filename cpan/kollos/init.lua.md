@@ -2972,12 +2972,11 @@ so the caller must make sure that one is available.
       Marpa_Value v;
       Marpa_Step_Type step_type;
       const int value_stack_ix = 1;
-      int throw = 1;
 
       marpa_luaL_checktype (L, value_stack_ix, LUA_TTABLE);
 
       marpa_lua_getglobal (L, "throw");
-      throw = marpa_lua_toboolean (L, -1);
+      marpa_lua_toboolean (L, -1);
       /* `throw` left on stack */
 
       marpa_lua_getfield (L, value_stack_ix, "_libmarpa");

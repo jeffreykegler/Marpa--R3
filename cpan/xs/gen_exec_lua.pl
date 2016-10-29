@@ -159,11 +159,11 @@ PPCODE:
     const int is_method = 1;
     lua_State *const L = outer_slg->L;
     const int base_of_stack = marpa_lua_gettop (L);
+    int type;
     int msghandler_ix;
 
     marpa_lua_pushcfunction(L, xlua_msghandler);
     msghandler_ix = marpa_lua_gettop(L);
-    int type;
 
     marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, outer_slg->lua_ref);
     /* Lua stack: [ grammar_table ] */
