@@ -1178,7 +1178,6 @@ Called when a valuator is set up.
           }
         end
 
-        recce.lmw_v = {}
         recce.lmw_v.stack = {}
     end
 
@@ -1220,11 +1219,12 @@ It should free all memory associated with the valuation.
 ```
   -- miranda: section create the thin valuator Lua class
 
-  value_class = {}
+  class_value = {}
   for k,v in pairs(kollos_c) do
+    print('k=', k)
     if k:match('^[_]?value') then
       local c_wrapper_name = k:gsub('value', '', 1)
-      value_class[c_wrapper_name] = v
+      class_value[c_wrapper_name] = v
     end
   end
 ```
@@ -1467,6 +1467,8 @@ the wrapper's point of view, marpa_r_alternative() always succeeds.
     {"marpa_v_valued_force"},
     {"marpa_v_rule_is_valued_set", "Marpa_Rule_ID", "symbol_id", "int", "value"},
     {"marpa_v_symbol_is_valued_set", "Marpa_Symbol_ID", "symbol_id", "int", "value"},
+    {"_marpa_v_nook"},
+    {"_marpa_v_trace", "int", "flag"},
     {"_marpa_g_ahm_count"},
     {"_marpa_g_ahm_irl", "Marpa_AHM_ID", "item_id"},
     {"_marpa_g_ahm_position", "Marpa_AHM_ID", "item_id"},

@@ -7079,30 +7079,6 @@ PPCODE:
 }
 
 void
-step_type( outer_slr )
-    Outer_R *outer_slr;
-PPCODE:
-{
-  Scanless_R *slr = slr_inner_get(outer_slr);
-  V_Wrapper *v_wrapper = slr->v_wrapper;
-  const Marpa_Value v = v_wrapper->v;
-  const Marpa_Step_Type status = marpa_v_step_type (v);
-  const char *result_string;
-  result_string = step_type_to_string (status);
-  if (!result_string)
-    {
-      result_string =
-        form ("Problem in v->step(): unknown step type %d", status);
-      set_error_from_string (v_wrapper->base, savepv (result_string));
-      if (v_wrapper->base->throw)
-        {
-          croak ("%s", result_string);
-        }
-    }
-  XPUSHs (sv_2mortal (newSVpv (result_string, 0)));
-}
-
-void
 location( outer_slr )
     Outer_R *outer_slr;
 PPCODE:

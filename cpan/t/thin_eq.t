@@ -307,13 +307,13 @@ $marpa_lua->raw_exec($Marpa::R3::Lua::Inspect::load);
 $tree          = Marpa::R3::Thin::T->new($order);
 $tree->next();
 $tree->dummyup_valuator($marpa_lua, "value");
+
 # $marpa_lua->exec('print(inspect(_G))');
 # $marpa_lua->exec('print(inspect(value))');
 
 my $result = $marpa_lua->exec(<<'END_OF_LUA');
 local result = {}
 while true do
-   -- print(inspect(value))
    local ok, step = value:step()
    if not ok then error_throw(step) end
    if not step then break end

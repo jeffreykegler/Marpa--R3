@@ -632,7 +632,12 @@ END_OF_LUA
     my $value = Marpa::R3::Thin::V->new($tree);
     $value->stack_mode_set( $slr->thin() );
 
-    $value->_marpa_v_trace( $trace_values ? 1 : 0 );
+    # $value->_marpa_v_trace( $trace_values ? 1 : 0 );
+    $slr->exec( << 'END_OF_LUA', ($trace_values ? 1 : 0 ));
+    recce, flag = ...
+    return recce.lmw_v:_trace(flag+0)
+END_OF_LUA
+
     $slr->exec_name( 'value_init', $trace_values );
 
     if ( not $slr->[Marpa::R3::Internal::Scanless::R::REGISTRATIONS] ) {
@@ -1631,7 +1636,10 @@ sub trace_token_evaluation {
     my $order   = $slr->[Marpa::R3::Internal::Scanless::R::O_C];
     my $tree    = $slr->[Marpa::R3::Internal::Scanless::R::T_C];
 
-    my $nook_ix = $value->_marpa_v_nook();
+    # my $nook_ix = $value->_marpa_v_nook()
+    my ($nook_ix) = $slr->exec(
+    'recce = ...; return recce.lmw_v:_marpa_v_nook()'
+    );
     if ( not defined $nook_ix ) {
         print {$trace_file_handle} "Nulling valuator\n"
             or Marpa::R3::exception('Could not print to trace file');
