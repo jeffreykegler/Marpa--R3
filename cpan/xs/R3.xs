@@ -5050,47 +5050,6 @@ PPCODE:
   XPUSHs (sv_2mortal (newSViv (result)));
 }
 
-MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::V
-
-void
-_marpa_v_trace( v_wrapper, flag )
-    V_Wrapper *v_wrapper;
-    int flag;
-PPCODE:
-{
-  const Marpa_Value v = v_wrapper->v;
-  int status;
-  status = _marpa_v_trace (v, flag);
-  if (status == -1)
-    {
-      XSRETURN_UNDEF;
-    }
-  if (status < 0)
-    {
-      croak ("Problem in v->trace(): %s", xs_g_error(v_wrapper->base));
-    }
-  XPUSHs (sv_2mortal (newSViv (status)));
-}
-
-void
-_marpa_v_nook( v_wrapper )
-    V_Wrapper *v_wrapper;
-PPCODE:
-{
-  const Marpa_Value v = v_wrapper->v;
-  int status;
-  status = _marpa_v_nook (v);
-  if (status == -1)
-    {
-      XSRETURN_UNDEF;
-    }
-  if (status < 0)
-    {
-      croak ("Problem in v->_marpa_v_nook(): %s", xs_g_error(v_wrapper->base));
-    }
-  XPUSHs (sv_2mortal (newSViv (status)));
-}
-
 MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::SLG
 
 void
