@@ -1214,21 +1214,6 @@ It should free all memory associated with the valuation.
 
 ```
 
-### Create the thin valuator Lua class
-
-```
-  -- miranda: section create the thin valuator Lua class
-
-  class_value = {}
-  for k,v in pairs(kollos_c) do
-    print('k=', k)
-    if k:match('^[_]?value') then
-      local c_wrapper_name = k:gsub('value', '', 1)
-      class_value[c_wrapper_name] = v
-    end
-  end
-```
-
 ## Libmarpa interface
 
 ```
