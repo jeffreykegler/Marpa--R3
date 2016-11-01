@@ -4074,12 +4074,6 @@ PPCODE:
       croak ("Problem in v->new(): %s", xs_g_error (t_wrapper->base));
     }
   Newx (v_wrapper, 1, V_Wrapper);
-  {
-    SV *base_sv = t_wrapper->base_sv;
-    SvREFCNT_inc (base_sv);
-    v_wrapper->base_sv = base_sv;
-  }
-  v_wrapper->base = t_wrapper->base;
   v_wrapper->v = v;
 
   v_wrapper->outer_slr = NULL;
@@ -4094,7 +4088,6 @@ DESTROY( v_wrapper )
 PPCODE:
 {
   const Marpa_Value v = v_wrapper->v;
-  SvREFCNT_dec (v_wrapper->base_sv);
 
   /* These are "weak" cross-references, weak
    * meaning that the reference counts are not

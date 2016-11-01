@@ -448,8 +448,6 @@ typedef struct {
 struct v_wrapper_s
 {
   Marpa_Value v;
-  SV *base_sv;
-  G_Wrapper *base;
   Outer_R* outer_slr;
 };
 typedef struct v_wrapper_s V_Wrapper;

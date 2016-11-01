@@ -235,14 +235,6 @@ print {$out} 'MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::T', "\n\n";
 say {$out} gp_generate(qw(next));
 say {$out} gp_generate(qw(parse_count));
 
-$main::CLASS_LETTER   = 'v';
-$main::LIBMARPA_CLASS = 'Marpa_Value';
-print {$out} 'MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::V', "\n\n";
-
-say {$out} gp_generate(qw(valued_force));
-say {$out} gp_generate(qw(rule_is_valued_set Marpa_Rule_ID symbol_id int value));
-say {$out} gp_generate(qw(symbol_is_valued_set Marpa_Symbol_ID symbol_id int value));
-
 $main::CLASS_LETTER   = 'g';
 $main::LIBMARPA_CLASS = 'Marpa_Grammar';
 print {$out} 'MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::G', "\n\n";
