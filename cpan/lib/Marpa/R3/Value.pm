@@ -1638,7 +1638,7 @@ sub trace_token_evaluation {
 
     # my $nook_ix = $value->_marpa_v_nook()
     my ($nook_ix) = $slr->exec(
-    'recce = ...; return recce.lmw_v:_marpa_v_nook()'
+    'recce = ...; return recce.lmw_v:_nook()'
     );
     if ( not defined $nook_ix ) {
         print {$trace_file_handle} "Nulling valuator\n"
@@ -1677,7 +1677,10 @@ sub trace_stack_1 {
     my $tree    = $slr->[Marpa::R3::Internal::Scanless::R::T_C];
 
     my $argc       = scalar @{$args};
-    my $nook_ix    = $value->_marpa_v_nook();
+    # my $nook_ix    = $value->_nook();
+    my ($nook_ix) = $slr->exec(
+    'recce = ...; return recce.lmw_v:_nook()'
+    );
     my $or_node_id = $tree->_marpa_t_nook_or_node($nook_ix);
     my $choice     = $tree->_marpa_t_nook_choice($nook_ix);
     my $and_node_id =
@@ -1707,7 +1710,10 @@ sub trace_op {
     my $order     = $slr->[Marpa::R3::Internal::Scanless::R::O_C];
     my $tree      = $slr->[Marpa::R3::Internal::Scanless::R::T_C];
 
-    my $nook_ix    = $value->_marpa_v_nook();
+    # my $nook_ix    = $value->_marpa_v_nook();
+    my ($nook_ix) = $slr->exec(
+    'recce = ...; return recce.lmw_v:_nook()'
+    );
     my $or_node_id = $tree->_marpa_t_nook_or_node($nook_ix);
     my $choice     = $tree->_marpa_t_nook_choice($nook_ix);
     my $and_node_id =
