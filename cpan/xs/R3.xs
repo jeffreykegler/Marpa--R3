@@ -994,7 +994,7 @@ xlua_recce_step_meth (lua_State * L)
     /* Lua stack: [ recce_table, lud, v_table, step_table ] */
     step_table = marpa_lua_gettop (L);
     marpa_lua_pushvalue (L, -1);
-    marpa_lua_setfield (L, v_table, "step");
+    marpa_lua_setfield (L, recce_table, "this_step");
     /* Lua stack: [ recce_table, lud, v_table, step_table ] */
 
     step_type = (lua_Integer) marpa_v_step (v);
