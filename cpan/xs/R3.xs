@@ -7035,28 +7035,21 @@ location( outer_slr )
     Outer_R *outer_slr;
 PPCODE:
 {
-  Scanless_R *slr = slr_inner_get(outer_slr);
-  V_Wrapper *v_wrapper = slr->v_wrapper;
-  const Marpa_Value v = v_wrapper->v;
-  const Marpa_Step_Type status = marpa_v_step_type (v);
-  if (status == MARPA_STEP_RULE)
-    {
-      XPUSHs (sv_2mortal (newSViv (marpa_v_rule_start_es_id (v))));
-      XPUSHs (sv_2mortal (newSViv (marpa_v_es_id (v))));
+  int start, end;
+
+  xlua_sig_call (outer_slr->L,
+      "local recce = ...;\n"
+      "local first, last = recce.lmw_v:location()\n"
+      "if not first then return -1, -1 end\n"
+      "return first, last\n",
+      "R>ii",
+      outer_slr->lua_ref, &start, &end);
+
+  if (start >= 0) {
+      XPUSHs (sv_2mortal (newSViv (start)));
+      XPUSHs (sv_2mortal (newSViv (end)));
       XSRETURN (2);
-    }
-  if (status == MARPA_STEP_NULLING_SYMBOL)
-    {
-      XPUSHs (sv_2mortal (newSViv (marpa_v_token_start_es_id (v))));
-      XPUSHs (sv_2mortal (newSViv (marpa_v_es_id (v))));
-      XSRETURN (2);
-    }
-  if (status == MARPA_STEP_TOKEN)
-    {
-      XPUSHs (sv_2mortal (newSViv (marpa_v_token_start_es_id (v))));
-      XPUSHs (sv_2mortal (newSViv (marpa_v_es_id (v))));
-      XSRETURN (2);
-    }
+  }
   XSRETURN_EMPTY;
 }
 

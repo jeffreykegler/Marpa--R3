@@ -2962,10 +2962,6 @@ so the caller must make sure that one is available.
 
       marpa_luaL_checktype (L, value_stack_ix, LUA_TTABLE);
 
-      marpa_lua_getglobal (L, "throw");
-      marpa_lua_toboolean (L, -1);
-      /* `throw` left on stack */
-
       marpa_lua_getfield (L, value_stack_ix, "_libmarpa");
       /* [ value_table, value_ud ] */
       v = *(Marpa_Value *) marpa_lua_touserdata (L, -1);
@@ -3065,7 +3061,46 @@ so the caller must make sure that one is available.
 
     }
 
+    /* Returns ok, result,
+     * where ok is a boolean and
+     * on failure, result is an error object, while
+     * on success, result is an table
+     */
+    static int
+    wrap_v_location (lua_State * L)
+    {
+      Marpa_Value v;
+      Marpa_Step_Type step_type;
+      const int value_stack_ix = 1;
+
+      marpa_luaL_checktype (L, value_stack_ix, LUA_TTABLE);
+
+      marpa_lua_getfield (L, value_stack_ix, "_libmarpa");
+      /* [ value_table, value_ud ] */
+      v = *(Marpa_Value *) marpa_lua_touserdata (L, -1);
+      step_type = marpa_v_step_type (v);
+
+      if (0) printf("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
+
+      switch(step_type) {
+      case MARPA_STEP_RULE:
+          marpa_lua_pushinteger(L, marpa_v_rule_start_es_id (v));
+          marpa_lua_pushinteger(L, marpa_v_es_id (v));
+          return 2;
+      case MARPA_STEP_NULLING_SYMBOL:
+          marpa_lua_pushinteger(L, marpa_v_token_start_es_id (v));
+          marpa_lua_pushinteger(L, marpa_v_es_id (v));
+          return 2;
+      case MARPA_STEP_TOKEN:
+          marpa_lua_pushinteger(L, marpa_v_token_start_es_id (v));
+          marpa_lua_pushinteger(L, marpa_v_es_id (v));
+          return 2;
+      }
+      return 0;
+    }
+
     static const struct luaL_Reg value_methods[] = {
+      { "location", wrap_v_location },
       { "step", wrap_v_step },
       { NULL, NULL },
     };
