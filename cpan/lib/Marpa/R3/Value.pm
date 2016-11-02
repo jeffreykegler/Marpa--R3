@@ -228,15 +228,22 @@ sub Marpa::R3::Context::bail { ## no critic (Subroutines::RequireArgUnpacking)
 
 sub Marpa::R3::Context::g1_range {
     my $slr = $Marpa::R3::Context::slr;
-    my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
-    return $thin_slr->location();
+    my ($start, $end) = $slr->exec( <<'END_OF_LUA' );
+recce = ...
+return recce.this_step.start_es_id, recce.this_step.es_id
+END_OF_LUA
+    return $start, $end;
 } ## end sub Marpa::R3::Context::g1_range
 
 sub Marpa::R3::Context::g1_span {
     my $slr = $Marpa::R3::Context::slr;
-    my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
-    my ($start, $end) = $thin_slr->location();
-    return $start, ($start - $end) + 1;
+    my ($start, $length) = $slr->exec( <<'END_OF_LUA' );
+recce = ...
+local start = recce.this_step.start_es_id + 0
+local length = (start - recce.this_step.es_id) + 1
+return start, length
+END_OF_LUA
+    return $start, $length;
 }
 
 sub code_problems {

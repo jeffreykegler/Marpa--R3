@@ -7030,29 +7030,6 @@ PPCODE:
     }
 }
 
-void
-location( outer_slr )
-    Outer_R *outer_slr;
-PPCODE:
-{
-  int start, end;
-
-  xlua_sig_call (outer_slr->L,
-      "local recce = ...;\n"
-      "local first, last = recce.lmw_v:location()\n"
-      "if not first then return -1, -1 end\n"
-      "return first, last\n",
-      "R>ii",
-      outer_slr->lua_ref, &start, &end);
-
-  if (start >= 0) {
-      XPUSHs (sv_2mortal (newSViv (start)));
-      XPUSHs (sv_2mortal (newSViv (end)));
-      XSRETURN (2);
-  }
-  XSRETURN_EMPTY;
-}
-
 MODULE = Marpa::R3            PACKAGE = Marpa::R3::Lua
 
 void
