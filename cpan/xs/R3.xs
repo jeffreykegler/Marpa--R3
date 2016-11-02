@@ -359,10 +359,11 @@ coerce_to_sv (lua_State * L, int idx)
    dTHX;
    SV *result;
    int visited_ix;
+   int absolute_index = marpa_lua_absindex(L, idx);
 
    marpa_lua_newtable(L);
    visited_ix = marpa_lua_gettop(L);
-   result = recursive_coerce_to_sv(L, visited_ix, idx);
+   result = recursive_coerce_to_sv(L, visited_ix, absolute_index);
    marpa_lua_settop(L, visited_ix-1);
    return result;
 }
@@ -1478,6 +1479,12 @@ xlua_sig_call (lua_State * L, const char *codestr, const char *sig, ...)
         {
             SV** av_ref_p = (SV**) marpa_lua_touserdata(L, nres);
             *va_arg (vl, SV**) = sv_mortalcopy(*av_ref_p);
+            break;
+        }
+        case 'C': /* SV -- caller becomes owner of 1 mortal ref count. */
+        {
+            SV* sv = sv_2mortal(coerce_to_sv(L, nres));
+            *va_arg (vl, SV**) = sv;
             break;
         }
         default:
@@ -7000,14 +7007,17 @@ PPCODE:
     switch (result) {
     case 3:
         {
-            const int step_type = marpa_v_step_type (v_wrapper->v);
-            const char *step_type_string =
-                step_type_to_string (step_type);
-            XPUSHs (sv_2mortal (newSVpv (step_type_string, 0)));
-            XPUSHs (sv_2mortal (newSViv (step_type ==
-                        MARPA_STEP_RULE ?
-                        marpa_v_rule (v_wrapper->v) :
-                        marpa_v_token (v_wrapper->v))));
+            SV* step_type;
+            int parm2;
+            xlua_sig_call (outer_slr->L,
+              "local recce = ...\n"
+              "local this = recce.this_step\n"
+              "local step_type = this.type\n"
+              "local parm2 = step_type == 'MARPA_STEP_RULE' and this.rule or this.symbol\n"
+              "return step_type, parm2\n",
+              "R>Ci", outer_slr->lua_ref, &step_type, &parm2);
+            XPUSHs (step_type); /* already mortal */
+            XPUSHs (sv_2mortal (newSViv (parm2)));
             XPUSHs (new_values);      /* already mortal */
             XSRETURN (3);
         }
