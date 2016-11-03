@@ -962,7 +962,6 @@ static int
 xlua_recce_step_meth (lua_State * L)
 {
     Scanless_R *slr;
-    V_Wrapper *v_wrapper;
     Marpa_Value v;
     lua_Integer step_type;
     const int recce_table = marpa_lua_gettop (L);
@@ -4108,24 +4107,6 @@ PPCODE:
   Safefree (v_wrapper);
 }
 
-void
-stack_mode_set( v_wrapper, outer_slr )
-    V_Wrapper *v_wrapper;
-    Outer_R *outer_slr;
-PPCODE:
-{
-  Scanless_R *slr = slr_inner_get(outer_slr);
-  Marpa_Value v;
-  if (slr->v_wrapper) {
-        croak ("SLR already has active valuator");
-  }
-  v_wrapper->outer_slr = outer_slr;
-  slr->v_wrapper = v_wrapper;
-  v = v_wrapper->v;
-  dummyup_valuator(outer_slr->L, outer_slr->lua_ref, v);
-  XSRETURN_YES;
-}
-
 MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::G
 
 void
@@ -7024,6 +7005,24 @@ PPCODE:
     case -1:
         XSRETURN_PV ("trace");
     }
+}
+
+void
+stack_mode_set( outer_slr, v_wrapper)
+    Outer_R *outer_slr;
+    V_Wrapper *v_wrapper;
+PPCODE:
+{
+  Scanless_R *slr = slr_inner_get(outer_slr);
+  Marpa_Value v;
+  if (slr->v_wrapper) {
+        croak ("SLR already has active valuator");
+  }
+  v_wrapper->outer_slr = outer_slr;
+  slr->v_wrapper = v_wrapper;
+  v = v_wrapper->v;
+  dummyup_valuator(outer_slr->L, outer_slr->lua_ref, v);
+  XSRETURN_YES;
 }
 
 MODULE = Marpa::R3            PACKAGE = Marpa::R3::Lua

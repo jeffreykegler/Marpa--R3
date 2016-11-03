@@ -637,7 +637,7 @@ END_OF_LUA
       if defined $slr;
 
     my $value = Marpa::R3::Thin::V->new($tree);
-    $value->stack_mode_set( $slr->thin() );
+    $slr->thin->stack_mode_set( $value );
 
     # $value->_marpa_v_trace( $trace_values ? 1 : 0 );
     $slr->exec( << 'END_OF_LUA', ($trace_values ? 1 : 0 ));
