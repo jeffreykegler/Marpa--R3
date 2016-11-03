@@ -180,7 +180,6 @@ static const char recce_c_class_name[] = "Marpa::R3::Thin::R";
 static const char bocage_c_class_name[] = "Marpa::R3::Thin::B";
 static const char order_c_class_name[] = "Marpa::R3::Thin::O";
 static const char tree_c_class_name[] = "Marpa::R3::Thin::T";
-static const char value_c_class_name[] = "Marpa::R3::Thin::V";
 static const char scanless_g_class_name[] = "Marpa::R3::Thin::SLG";
 static const char scanless_r_class_name[] = "Marpa::R3::Thin::SLR";
 static const char marpa_lua_class_name[] = "Marpa::R3::Lua";
@@ -2215,8 +2214,6 @@ static Scanless_R* marpa_inner_slr_new (
   slr->end_pos = 0;
   slr->too_many_earley_items = -1;
 
-  slr->v_wrapper = NULL;
-
   slr->t_count_of_deleted_events = 0;
   slr->t_event_count = 0;
   slr->t_event_capacity = (int)MAX (1024 / sizeof (union marpa_slr_event_s), 16);
@@ -2268,16 +2265,6 @@ static void slr_inner_destroy(Scanless_R* slr)
       SvREFCNT_dec ((SV *) slr->token_values);
     }
   SvREFCNT_dec (slr->input);
-  {
-     /* "Weak" cross-references
-      * See Thin::V destructor.
-      */
-     V_Wrapper* vw = slr->v_wrapper;
-     if (vw) {
-       vw->outer_slr = NULL;
-       slr->v_wrapper = NULL;
-     }
-  }
   Safefree (slr);
 }
 
@@ -4043,67 +4030,6 @@ PPCODE:
   /* [ sandbox, valuator_obj ] */
   marpa_lua_setfield(L, -2, name);
   marpa_lua_settop(L, base_of_stack);
-}
-
-MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::V
-
-void
-new( class, t_wrapper )
-    char * class;
-    T_Wrapper *t_wrapper;
-PPCODE:
-{
-  SV *sv;
-  Marpa_Tree t = t_wrapper->t;
-  V_Wrapper *v_wrapper;
-  Marpa_Value v = marpa_v_new (t);
-  PERL_UNUSED_ARG(class);
-
-  if (!v)
-    {
-      if (!t_wrapper->base->throw)
-        {
-          XSRETURN_UNDEF;
-        }
-      croak ("Problem in v->new(): %s", xs_g_error (t_wrapper->base));
-    }
-  Newx (v_wrapper, 1, V_Wrapper);
-  v_wrapper->v = v;
-
-  v_wrapper->outer_slr = NULL;
-  sv = sv_newmortal ();
-  sv_setref_pv (sv, value_c_class_name, (void *) v_wrapper);
-  XPUSHs (sv);
-}
-
-void
-DESTROY( v_wrapper )
-    V_Wrapper *v_wrapper;
-PPCODE:
-{
-  const Marpa_Value v = v_wrapper->v;
-
-  /* These are "weak" cross-references, weak
-   * meaning that the reference counts are not
-   * incremented.  The destructors set both pointers
-   * to null, and callers must check that
-   * for NULL before dereferencing.
-   *
-   * This is necessary because at startup, an SLR will
-   * not yet have a valuator, and a valuator can be "thin"
-   * and never have an SLR.  For the thin valuators to be
-   * independent is useful for the tracing and debugging
-   * methods.
-   */
-  if (v_wrapper->outer_slr) {
-      Outer_R* const outer_slr = v_wrapper->outer_slr;
-      Scanless_R * const slr = slr_inner_get(outer_slr);
-      slr->v_wrapper = NULL;
-      v_wrapper->outer_slr = NULL;
-  }
-
-  marpa_v_unref (v);
-  Safefree (v_wrapper);
 }
 
 MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::G

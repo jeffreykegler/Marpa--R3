@@ -626,7 +626,6 @@ sub Marpa::R3::Scanless::R::value {
         -- print("About to collect garbage before $tree->next")
         -- print(inspect(_G))
         collectgarbage()
-        collectgarbage()
 END_OF_LUA
 
     return if not defined $tree->next();
@@ -637,10 +636,8 @@ END_OF_LUA
       $slr->[Marpa::R3::Internal::Scanless::R::SLG]
       if defined $slr;
 
-    # my $value = Marpa::R3::Thin::V->new($tree);
     $slr->thin->stack_mode_set( $tree );
 
-    # $value->_marpa_v_trace( $trace_values ? 1 : 0 );
     $slr->exec( << 'END_OF_LUA', ($trace_values ? 1 : 0 ));
     recce, flag = ...
     return recce.lmw_v:_trace(flag+0)
