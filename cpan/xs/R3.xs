@@ -960,7 +960,6 @@ static int xlua_recce_constants_meth(lua_State* L) {
 static int
 xlua_recce_step_meth (lua_State * L)
 {
-    Scanless_R *slr;
     Marpa_Value v;
     lua_Integer step_type;
     const int recce_table = marpa_lua_gettop (L);
