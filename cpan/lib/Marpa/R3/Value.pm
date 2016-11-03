@@ -626,6 +626,7 @@ sub Marpa::R3::Scanless::R::value {
         -- print("About to collect garbage before $tree->next")
         -- print(inspect(_G))
         collectgarbage()
+        collectgarbage()
 END_OF_LUA
 
     return if not defined $tree->next();
@@ -636,8 +637,8 @@ END_OF_LUA
       $slr->[Marpa::R3::Internal::Scanless::R::SLG]
       if defined $slr;
 
-    my $value = Marpa::R3::Thin::V->new($tree);
-    $slr->thin->stack_mode_set( $value );
+    # my $value = Marpa::R3::Thin::V->new($tree);
+    $slr->thin->stack_mode_set( $tree );
 
     # $value->_marpa_v_trace( $trace_values ? 1 : 0 );
     $slr->exec( << 'END_OF_LUA', ($trace_values ? 1 : 0 ));
@@ -1442,7 +1443,7 @@ END_OF_LUA
                 if ( $event_type eq 'MARPA_STEP_TOKEN' ) {
                     my ( $token_id, $token_value_ix, $token_value ) =
                       @event_data;
-                    trace_token_evaluation( $slr, $value, $token_id,
+                    trace_token_evaluation( $slr, $token_id,
                         $token_value );
                     next EVENT;
                 } ## end if ( $event_type eq 'MARPA_STEP_TOKEN' )
@@ -1510,7 +1511,7 @@ END_OF_LUA
 
             my ($highest_index) = $slr->exec_name( 'stack_top_index' );
             $slr->exec_name( 'stack_set', $highest_index, $result);
-            trace_token_evaluation( $slr, $value, $token_id, \$result )
+            trace_token_evaluation( $slr, $token_id, \$result )
               if $trace_values;
             next STEP;
         } ## end if ( $value_type eq 'MARPA_STEP_NULLING_SYMBOL' )
@@ -1559,7 +1560,7 @@ END_OF_LUA
             $slr->exec_name( 'stack_set', $highest_index, $result);
             if ($trace_values) {
                 say {$trace_file_handle}
-                  trace_stack_1( $slr, $value, $values, $rule_id )
+                  trace_stack_1( $slr, $values, $rule_id )
                   or Marpa::R3::exception('Could not print to trace file');
                 print {$trace_file_handle}
                   'Calculated and pushed value: ',
@@ -1573,7 +1574,7 @@ END_OF_LUA
 
         if ( $value_type eq 'MARPA_STEP_TRACE' ) {
 
-            if ( my $trace_output = trace_op( $slr, $value ) ) {
+            if ( my $trace_output = trace_op( $slr ) ) {
                 print {$trace_file_handle} $trace_output
                   or Marpa::R3::exception('Could not print to trace file');
             }
@@ -1633,7 +1634,7 @@ sub Marpa::R3::Scanless::R::and_node_tag {
 }
 
 sub trace_token_evaluation {
-    my ( $slr, $value, $token_id, $token_value ) = @_;
+    my ( $slr, $token_id, $token_value ) = @_;
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $tracer =
         $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
@@ -1643,7 +1644,6 @@ sub trace_token_evaluation {
     my $order   = $slr->[Marpa::R3::Internal::Scanless::R::O_C];
     my $tree    = $slr->[Marpa::R3::Internal::Scanless::R::T_C];
 
-    # my $nook_ix = $value->_marpa_v_nook()
     my ($nook_ix) = $slr->exec(
     'recce = ...; return recce.lmw_v:_nook()'
     );
@@ -1674,7 +1674,7 @@ sub trace_token_evaluation {
 } ## end sub trace_token_evaluation
 
 sub trace_stack_1 {
-    my ( $slr, $value, $args, $rule_id ) = @_;
+    my ( $slr, $args, $rule_id ) = @_;
     my $recce_c = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $tracer =
@@ -1684,7 +1684,6 @@ sub trace_stack_1 {
     my $tree    = $slr->[Marpa::R3::Internal::Scanless::R::T_C];
 
     my $argc       = scalar @{$args};
-    # my $nook_ix    = $value->_nook();
     my ($nook_ix) = $slr->exec(
     'recce = ...; return recce.lmw_v:_nook()'
     );
@@ -1702,7 +1701,7 @@ sub trace_stack_1 {
 
 sub trace_op {
 
-    my ( $slr, $value ) = @_;
+    my ( $slr ) = @_;
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
 
@@ -1717,7 +1716,6 @@ sub trace_op {
     my $order     = $slr->[Marpa::R3::Internal::Scanless::R::O_C];
     my $tree      = $slr->[Marpa::R3::Internal::Scanless::R::T_C];
 
-    # my $nook_ix    = $value->_marpa_v_nook();
     my ($nook_ix) = $slr->exec(
     'recce = ...; return recce.lmw_v:_nook()'
     );

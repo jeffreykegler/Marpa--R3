@@ -3159,7 +3159,6 @@ dummyup_valuator(
         /* [ slr_table, valuator_obj ] */
     }
 
-    marpa_v_ref (v);
     /* Add v userdatum here */
     marpa_gen_value_ud (L, v);
     /* [ slr_table, valuator_obj, value_ud ] */
@@ -7008,19 +7007,24 @@ PPCODE:
 }
 
 void
-stack_mode_set( outer_slr, v_wrapper)
+stack_mode_set( outer_slr, t_wrapper)
     Outer_R *outer_slr;
-    V_Wrapper *v_wrapper;
+    T_Wrapper *t_wrapper;
 PPCODE:
 {
   Scanless_R *slr = slr_inner_get(outer_slr);
   Marpa_Value v;
-  if (slr->v_wrapper) {
-        croak ("SLR already has active valuator");
-  }
-  v_wrapper->outer_slr = outer_slr;
-  slr->v_wrapper = v_wrapper;
-  v = v_wrapper->v;
+  G_Wrapper* g_wrapper = slr->g1_wrapper;
+
+  v = marpa_v_new (t_wrapper->t);
+  if (!v)
+    {
+      if (!g_wrapper->throw)
+        {
+          XSRETURN_UNDEF;
+        }
+      croak ("Problem in t->dummyup_valuator(): %s", xs_g_error (g_wrapper));
+    }
   dummyup_valuator(outer_slr->L, outer_slr->lua_ref, v);
   XSRETURN_YES;
 }
