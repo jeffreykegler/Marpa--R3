@@ -6995,8 +6995,6 @@ stack_step( outer_slr )
     Outer_R *outer_slr;
 PPCODE:
 {
-    Scanless_R *slr = slr_inner_get(outer_slr);
-    V_Wrapper *v_wrapper = slr->v_wrapper;
     int result;
     SV *new_values;
 
@@ -7024,13 +7022,12 @@ PPCODE:
     default:
     case 1:
         {
-            const int step_type = marpa_v_step_type (v_wrapper->v);
-            const char *step_type_string =
-                step_type_to_string (step_type);
-            if (!step_type_string) {
-                step_type_string = "Unknown";
-            }
-            XPUSHs (sv_2mortal (newSVpv (step_type_string, 0)));
+            SV* step_type;
+            xlua_sig_call (outer_slr->L,
+              "local recce = ...\n"
+              "return recce.this_step.type\n",
+              "R>C", outer_slr->lua_ref, &step_type);
+            XPUSHs (step_type); /* already mortal */
             XSRETURN (1);
         }
     case 0:
