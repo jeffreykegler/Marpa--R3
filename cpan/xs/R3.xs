@@ -967,36 +967,25 @@ xlua_recce_step_meth (lua_State * L)
     lua_Integer step_type;
     const int recce_table = marpa_lua_gettop (L);
     int step_table;
-    int v_table;
 
     marpa_luaL_checktype (L, 1, LUA_TTABLE);
     /* Lua stack: [ recce_table ] */
-    marpa_luaL_argcheck (L, (LUA_TLIGHTUSERDATA == marpa_lua_getfield (L,
-                -1, "lud")), 1,
+    marpa_lua_getfield(L, recce_table, "lmw_v");
+    /* Lua stack: [ recce_table, lmw_v ] */
+    marpa_luaL_argcheck (L, (LUA_TUSERDATA == marpa_lua_getfield (L,
+                -1, "_libmarpa")), 1,
         "Internal error: recce.lud userdata not set");
-    /* Lua stack: [ recce_table, lud ] */
-    slr = (Scanless_R *) marpa_lua_touserdata (L, -1);
-    /* the slr owns the recce table, so it doesn't */
-    /* need to own its components. */
-
-    v_wrapper = slr->v_wrapper;
-    if (!v_wrapper) {
-        /* A recoverable error?  Probably not */
-        croak ("recce.stack(): valuator is not yet active");
-    }
-    v = v_wrapper->v;
-    /* Lua stack: [ recce_table, lud, ] */
-    if (LUA_TTABLE != marpa_lua_getfield (L, recce_table, "lmw_v")) {
-        croak ("Internal error: recce.lmw_v table not set");
-    }
-    v_table = marpa_lua_gettop (L);
-    /* Lua stack: [ recce_table, lud, v_table ] */
+    /* Lua stack: [ recce_table, lmw_v, v_ud ] */
+    v = *(Marpa_Value *) marpa_lua_touserdata (L, -1);
+    /* Lua stack: [ recce_table, lmw_v, v_ud ] */
+    marpa_lua_settop (L, recce_table);
+    /* Lua stack: [ recce_table ] */
     marpa_lua_newtable (L);
-    /* Lua stack: [ recce_table, lud, v_table, step_table ] */
+    /* Lua stack: [ recce_table, step_table ] */
     step_table = marpa_lua_gettop (L);
     marpa_lua_pushvalue (L, -1);
     marpa_lua_setfield (L, recce_table, "this_step");
-    /* Lua stack: [ recce_table, lud, v_table, step_table ] */
+    /* Lua stack: [ recce_table, step_table ] */
 
     step_type = (lua_Integer) marpa_v_step (v);
     marpa_lua_pushstring (L, step_type_to_string (step_type));
