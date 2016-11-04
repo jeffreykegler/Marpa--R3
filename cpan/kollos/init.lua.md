@@ -1221,17 +1221,18 @@ It should free all memory associated with the valuation.
 
     function c_type_of_libmarpa_type(libmarpa_type)
         if (libmarpa_type == 'int') then return 'int' end
+        if (libmarpa_type == 'Marpa_And_Node_ID') then return 'int' end
         if (libmarpa_type == 'Marpa_Assertion_ID') then return 'int' end
-        if (libmarpa_type == 'Marpa_Earley_Item_ID') then return 'int' end
         if (libmarpa_type == 'Marpa_AHM_ID') then return 'int' end
+        if (libmarpa_type == 'Marpa_Earley_Item_ID') then return 'int' end
+        if (libmarpa_type == 'Marpa_Earley_Set_ID') then return 'int' end
         if (libmarpa_type == 'Marpa_IRL_ID') then return 'int' end
+        if (libmarpa_type == 'Marpa_Nook_ID') then return 'int' end
         if (libmarpa_type == 'Marpa_NSY_ID') then return 'int' end
         if (libmarpa_type == 'Marpa_Or_Node_ID') then return 'int' end
-        if (libmarpa_type == 'Marpa_And_Node_ID') then return 'int' end
         if (libmarpa_type == 'Marpa_Rank') then return 'int' end
         if (libmarpa_type == 'Marpa_Rule_ID') then return 'int' end
         if (libmarpa_type == 'Marpa_Symbol_ID') then return 'int' end
-        if (libmarpa_type == 'Marpa_Earley_Set_ID') then return 'int' end
         return "!UNIMPLEMENTED!";
     end
 
@@ -1449,6 +1450,14 @@ the wrapper's point of view, marpa_r_alternative() always succeeds.
     {"marpa_o_rank"},
     {"marpa_t_next"},
     {"marpa_t_parse_count"},
+    {"_marpa_t_size" },
+    {"_marpa_t_nook_or_node", "Marpa_Nook_ID", "nook_id" },
+    {"_marpa_t_nook_choice", "Marpa_Nook_ID", "nook_id" },
+    {"_marpa_t_nook_parent", "Marpa_Nook_ID", "nook_id" },
+    {"_marpa_t_nook_is_cause", "Marpa_Nook_ID", "nook_id" },
+    {"_marpa_t_nook_cause_is_ready", "Marpa_Nook_ID", "nook_id" },
+    {"_marpa_t_nook_is_predecessor", "Marpa_Nook_ID", "nook_id" },
+    {"_marpa_t_nook_predecessor_is_ready", "Marpa_Nook_ID", "nook_id" },
     {"marpa_v_valued_force"},
     {"marpa_v_rule_is_valued_set", "Marpa_Rule_ID", "symbol_id", "int", "value"},
     {"marpa_v_symbol_is_valued_set", "Marpa_Symbol_ID", "symbol_id", "int", "value"},
@@ -2912,42 +2921,38 @@ so the caller must make sure that one is available.
     static int
     wrap_value_new (lua_State * L)
     {
-      const int value_stack_ix = 1;
-      const int tree_stack_ix = 2;
+      const int tree_stack_ix = 1;
+      int value_stack_ix;
 
       if (0)
         printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
       /* [ value_table, tree_table ] */
-      if (1)
-        {
-          marpa_luaL_checktype(L, value_stack_ix, LUA_TTABLE);
-          marpa_luaL_checktype(L, tree_stack_ix, LUA_TTABLE);
-        }
+      marpa_luaL_checktype(L, tree_stack_ix, LUA_TTABLE);
 
-      /* [ value_table, tree_table ] */
+      marpa_lua_newtable(L);
+      value_stack_ix = marpa_lua_gettop(L);
+      marpa_lua_getglobal (L, "kollos");
+      marpa_lua_getfield (L, -1, "class_value");
+      marpa_lua_setmetatable (L, value_stack_ix);
+
       {
         Marpa_Tree *tree_ud;
         /* Important: the value does *not* hold a reference to
              the recognizer, so it should not memoize the userdata
              pointing to it. */
 
-        /* [ value_table, tree_table ] */
         Marpa_Value* value_ud =
           (Marpa_Value *) marpa_lua_newuserdata (L, sizeof (Marpa_Value));
-        /* [ value_table, tree_table, value_ud ] */
+        /* [ ..., value_ud ] */
         marpa_lua_rawgetp (L, LUA_REGISTRYINDEX, &kollos_v_ud_mt_key);
-        /* [ value_table, tree_table, value_ud, value_ud_mt ] */
+        /* [ ..., value_ud, value_ud_mt ] */
         marpa_lua_setmetatable (L, -2);
-        /* [ value_table, tree_table, value_ud ] */
+        /* [ ..., value_ud ] */
 
         marpa_lua_setfield (L, value_stack_ix, "_libmarpa");
-        /* [ value_table, tree_table ] */
         marpa_lua_getfield (L, tree_stack_ix, "_libmarpa_g");
-        /* [ value_table, tree_table, g_ud ] */
         marpa_lua_setfield (L, value_stack_ix, "_libmarpa_g");
-        /* [ value_table, tree_table ] */
         marpa_lua_getfield (L, tree_stack_ix, "_libmarpa");
-        /* [ value_table, tree_table, tree_ud ] */
         tree_ud = (Marpa_Tree *) marpa_lua_touserdata (L, -1);
         /* [ value_table, tree_table, tree_ud ] */
 
@@ -2958,10 +2963,8 @@ so the caller must make sure that one is available.
             return 0;
           }
       }
-      if (0)
-        printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
-      /* [ value_table, tree_table, tree_ud ] */
-      marpa_lua_pop (L, 2);
+
+      marpa_lua_settop (L, value_stack_ix);
       /* [ value_table ] */
       return 1;
     }

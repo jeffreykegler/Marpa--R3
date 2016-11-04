@@ -86,13 +86,15 @@ $recce->earleme_complete();
 my $latest_earley_set_ID = $recce->latest_earley_set();
 my $bocage        = Marpa::R3::Thin::B->new( $recce, $latest_earley_set_ID );
 my $order         = Marpa::R3::Thin::O->new($bocage);
+$order->dummyup_tree($marpa_lua, "tree");
 
-my $tree          = Marpa::R3::Thin::T->new($order);
+# my $tree          = Marpa::R3::Thin::T->new($order);
 my @actual_values = ();
-while ( $tree->next() ) {
-    $tree->dummyup_valuator($marpa_lua, "value");
+VALUE: while ( 1 ) {
 
     my $result = $marpa_lua->exec(<<'END_OF_LUA', $start_rule_id, $number_rule_id, $op_rule_id);
+    if not tree:next() then return end
+    local value = kollos.value_new(tree)
     local start_rule_id, number_rule_id, op_rule_id = ...
     start_rule_id = start_rule_id+0
     number_rule_id = number_rule_id+0
@@ -157,8 +159,9 @@ while ( $tree->next() ) {
     return stack[0]
 END_OF_LUA
 
+    last VALUE if not $result;
     push @actual_values, $result;
-} ## end while ( $tree->next() )
+}
 
 # Marpa::R3::Display::End
 
@@ -187,7 +190,7 @@ for my $actual_value (@actual_values) {
 
 $marpa_lua = undef;
 
-$grammar = $recce = $bocage = $order = $tree = undef;
+$grammar = $recce = $bocage = $order = undef;
 $grammar = Marpa::R3::Thin::G->new({});
 $grammar->force_valued();
 
@@ -305,31 +308,27 @@ $marpa_lua->raw_exec($Marpa::R3::Lua::Inspect::load);
 
 $order         = Marpa::R3::Thin::O->new($bocage);
 $order->dummyup_tree($marpa_lua, "tree");
-$tree          = Marpa::R3::Thin::T->new($order);
-$tree->next();
-$tree->dummyup_valuator($marpa_lua, "value");
-
-# $marpa_lua->exec('print(inspect(_G))');
-# $marpa_lua->exec('print(inspect(value))');
 
 my $result = $marpa_lua->exec(<<'END_OF_LUA');
-local result = {}
-while true do
-   local ok, step = value:step()
-   if not ok then error_throw(step) end
-   if not step then break end
-   local type, symbol, start_loc, end_loc = table.unpack(step)
-   if type == 'RULE' then
-       result[#result+1] = string.format("Rule %s is from %d to %d\n", symbol, start_loc, end_loc)
-   elseif type == 'TOKEN' then
-       result[#result+1] = string.format("Token %s is from %d to %d\n", symbol, start_loc, end_loc)
-   elseif type == 'NULLING_SYMBOL' then
-       result[#result+1] = string.format("Nulling symbol %s is from %d to %d\n", symbol, start_loc, end_loc)
-   else
-       result[#result+1] = string.format("Unknown step type: %q\n", type)
-   end
-end
-return table.concat(result)
+    tree:next()
+    local value = kollos.value_new(tree)
+    local result = {}
+    while true do
+       local ok, step = value:step()
+       if not ok then error_throw(step) end
+       if not step then break end
+       local type, symbol, start_loc, end_loc = table.unpack(step)
+       if type == 'RULE' then
+           result[#result+1] = string.format("Rule %s is from %d to %d\n", symbol, start_loc, end_loc)
+       elseif type == 'TOKEN' then
+           result[#result+1] = string.format("Token %s is from %d to %d\n", symbol, start_loc, end_loc)
+       elseif type == 'NULLING_SYMBOL' then
+           result[#result+1] = string.format("Nulling symbol %s is from %d to %d\n", symbol, start_loc, end_loc)
+       else
+           result[#result+1] = string.format("Unknown step type: %q\n", type)
+       end
+    end
+    return table.concat(result)
 END_OF_LUA
 
 Test::More::is( $result, <<'EXPECTED', 'Step locations' );
