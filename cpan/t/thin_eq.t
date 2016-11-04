@@ -299,11 +299,12 @@ $recce->alternative( $symbol_a, 1, 1 );
 $recce->earleme_complete();
 $latest_earley_set_ID = $recce->latest_earley_set();
 $bocage        = Marpa::R3::Thin::B->new( $recce, $latest_earley_set_ID );
-$order         = Marpa::R3::Thin::O->new($bocage);
 
 $marpa_lua = Marpa::R3::Lua->new();
 $marpa_lua->raw_exec($Marpa::R3::Lua::Inspect::load);
 
+$order         = Marpa::R3::Thin::O->new($bocage);
+$order->dummyup_tree($marpa_lua, "tree");
 $tree          = Marpa::R3::Thin::T->new($order);
 $tree->next();
 $tree->dummyup_valuator($marpa_lua, "value");

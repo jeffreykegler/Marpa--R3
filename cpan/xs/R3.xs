@@ -4773,6 +4773,68 @@ PPCODE:
     }
 }
 
+void
+dummyup_tree( o_wrapper, lua_wrapper, name )
+    O_Wrapper *o_wrapper;
+    Marpa_Lua *lua_wrapper;
+    char *name;
+PPCODE:
+{
+  lua_State *const L = lua_wrapper->L;
+  int tree_object_ix;
+  const int base_of_stack = marpa_lua_gettop(L);
+  G_Wrapper* const g_wrapper = o_wrapper->base;
+  const Marpa_Grammar g = g_wrapper->g;
+  const Marpa_Order order = o_wrapper->o;
+  Marpa_Tree t;
+  int throw;
+
+  marpa_luaL_checkstack(L, 20, "$tree->dummyup_valuator");
+  marpa_lua_getglobal(L, "throw");
+  throw = marpa_lua_toboolean(L, -1);
+  /* Leaves throw on stack -- will be popped at the end */
+  marpa_lua_newtable(L);
+  tree_object_ix = marpa_lua_gettop(L);
+  marpa_lua_getglobal(L, "kollos");
+  marpa_lua_getfield(L, -1, "class_tree");
+  marpa_lua_setmetatable(L, tree_object_ix);
+  /* [ tree_obj, kollos_tab ] */
+  marpa_lua_pop(L, 1);
+  /* [ tree_obj ] */
+
+  /* Add new g userdatum --
+   * it must own a reference to the Libmarpa
+   * grammar.
+   */
+  marpa_gen_grammar_ud(L, g);
+  marpa_g_ref(g);
+  /* [ tree_obj, grammar_ud ] */
+  marpa_lua_setfield(L, tree_object_ix, "_libmarpa_g");
+  /* [ tree_obj ] */
+
+  /* Add v userdatum here */
+  t = marpa_t_new (order);
+  if (!t)
+    {
+      if (!throw)
+        {
+          XSRETURN_UNDEF;
+        }
+      croak ("Problem in t->dummyup_tree(): %s", xs_g_error (g_wrapper));
+    }
+  marpa_gen_tree_ud(L, t);
+  /* [ tree_obj, grammar_ud ] */
+  marpa_lua_setfield(L, tree_object_ix, "_libmarpa");
+  /* [ tree_obj ] */
+
+  marpa_lua_getglobal(L, "sandbox");
+  /* [ tree_obj, sandbox ] */
+  marpa_lua_rotate(L, -2, -1);
+  /* [ sandbox, tree_obj ] */
+  marpa_lua_setfield(L, -2, name);
+  marpa_lua_settop(L, base_of_stack);
+}
+
 MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::T
 
 # int

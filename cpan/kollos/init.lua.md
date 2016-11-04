@@ -2802,9 +2802,28 @@ so the caller must make sure that one is available.
       { NULL, NULL },
     };
 
-    -- miranda: section+ tree object non-standard wrappers
+    -- miranda: section+ C function declarations
 
     /* tree wrappers which need to be hand-written */
+
+    void marpa_gen_tree_ud(lua_State* L, Marpa_Tree t);
+
+    -- miranda: section+ tree object non-standard wrappers
+
+    /* Caller must ensure enough stack space.
+     * Leaves a new userdata on top of the stack.
+     */
+    void marpa_gen_tree_ud(lua_State* L, Marpa_Tree t)
+    {
+        Marpa_Tree* p_t;
+        p_t = (Marpa_Tree *) marpa_lua_newuserdata (L, sizeof (Marpa_Tree));
+        *p_t = t;
+        /* [ userdata ] */
+        marpa_lua_rawgetp (L, LUA_REGISTRYINDEX, &kollos_t_ud_mt_key);
+        /* [ userdata, metatable ] */
+        marpa_lua_setmetatable (L, -2);
+        /* [ userdata ] */
+    }
 
     static int
     wrap_tree_new (lua_State * L)
