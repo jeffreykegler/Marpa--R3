@@ -617,24 +617,27 @@ sub Marpa::R3::Scanless::R::value {
         return if not $order;
         $tree = $slr->[Marpa::R3::Internal::Scanless::R::T_C] =
           Marpa::R3::Thin::T->new($order);
+        my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
+        $thin_slr->associate_tree($tree)
 
     } ## end else [ if ($tree) ]
 
-    $slr->exec( << 'END_OF_LUA' );
+    my ($result) = $slr->exec( << 'END_OF_LUA' );
         recce = ...
+        -- io.stderr:write('tree:', inspect(recce.lmw_t))
         recce.lmw_v = nil
-        -- print("About to collect garbage before $tree->next")
         -- print(inspect(_G))
         collectgarbage()
+        local result = recce.lmw_t:next()
+        -- print('result:', result)
+        return result
 END_OF_LUA
 
-    return if not defined $tree->next();
+    return if not defined $result;
 
     local $Marpa::R3::Context::rule = undef;
     local $Marpa::R3::Context::slr  = $slr;
-    local $Marpa::R3::Context::slg =
-      $slr->[Marpa::R3::Internal::Scanless::R::SLG]
-      if defined $slr;
+    local $Marpa::R3::Context::slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
 
     $slr->thin->stack_mode_set( $tree );
 
@@ -1641,16 +1644,20 @@ sub trace_token_evaluation {
     my $order   = $slr->[Marpa::R3::Internal::Scanless::R::O_C];
     my $tree    = $slr->[Marpa::R3::Internal::Scanless::R::T_C];
 
-    my ($nook_ix) = $slr->exec(
-    'recce = ...; return recce.lmw_v:_nook()'
-    );
+    my ($nook_ix, $or_node_id, $choice) = $slr->exec( << 'END_OF_LUA' );
+    recce = ...
+    local nook_ix = recce.lmw_v:_nook()
+    local t = recce.lmw_t
+    return nook_ix, t:_nook_or_node(nook_ix), t:_nook_choice(nook_ix)
+END_OF_LUA
+
     if ( not defined $nook_ix ) {
         print {$trace_file_handle} "Nulling valuator\n"
             or Marpa::R3::exception('Could not print to trace file');
         return;
     }
-    my $or_node_id = $tree->_marpa_t_nook_or_node($nook_ix);
-    my $choice     = $tree->_marpa_t_nook_choice($nook_ix);
+    # my $or_node_id = $tree->_marpa_t_nook_or_node($nook_ix);
+    # my $choice     = $tree->_marpa_t_nook_choice($nook_ix);
     my $and_node_id =
         $order->_marpa_o_and_node_order_get( $or_node_id, $choice );
     my $token_name;
@@ -1681,11 +1688,15 @@ sub trace_stack_1 {
     my $tree    = $slr->[Marpa::R3::Internal::Scanless::R::T_C];
 
     my $argc       = scalar @{$args};
-    my ($nook_ix) = $slr->exec(
-    'recce = ...; return recce.lmw_v:_nook()'
-    );
-    my $or_node_id = $tree->_marpa_t_nook_or_node($nook_ix);
-    my $choice     = $tree->_marpa_t_nook_choice($nook_ix);
+    my ($nook_ix, $or_node_id, $choice) = $slr->exec( <<'END_OF_LUA' );
+    recce = ...
+    local nook_ix = recce.lmw_v:_nook()
+    local t = recce.lmw_t
+    return nook_ix, t:_nook_or_node(nook_ix), t:_nook_choice(nook_ix)
+END_OF_LUA
+
+    # my $or_node_id = $tree->_marpa_t_nook_or_node($nook_ix);
+    # my $choice     = $tree->_marpa_t_nook_choice($nook_ix);
     my $and_node_id =
         $order->_marpa_o_and_node_order_get( $or_node_id, $choice );
 
@@ -1713,11 +1724,15 @@ sub trace_op {
     my $order     = $slr->[Marpa::R3::Internal::Scanless::R::O_C];
     my $tree      = $slr->[Marpa::R3::Internal::Scanless::R::T_C];
 
-    my ($nook_ix) = $slr->exec(
-    'recce = ...; return recce.lmw_v:_nook()'
-    );
-    my $or_node_id = $tree->_marpa_t_nook_or_node($nook_ix);
-    my $choice     = $tree->_marpa_t_nook_choice($nook_ix);
+    my ($nook_ix, $or_node_id, $choice) = $slr->exec( <<'END_OF_LUA' );
+    recce = ...
+    local nook_ix = recce.lmw_v:_nook()
+    local t = recce.lmw_t
+    return nook_ix, t:_nook_or_node(nook_ix), t:_nook_choice(nook_ix)
+END_OF_LUA
+
+    # my $or_node_id = $tree->_marpa_t_nook_or_node($nook_ix);
+    # my $choice     = $tree->_marpa_t_nook_choice($nook_ix);
     my $and_node_id =
         $order->_marpa_o_and_node_order_get( $or_node_id, $choice );
     my $trace_irl_id = $bocage->_marpa_b_or_node_irl($or_node_id);
