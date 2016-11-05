@@ -1642,7 +1642,6 @@ sub trace_token_evaluation {
         $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
 
     my $order   = $slr->[Marpa::R3::Internal::Scanless::R::O_C];
-    my $tree    = $slr->[Marpa::R3::Internal::Scanless::R::T_C];
 
     my ($nook_ix, $or_node_id, $choice) = $slr->exec( << 'END_OF_LUA' );
     recce = ...
@@ -1683,7 +1682,6 @@ sub trace_stack_1 {
         $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     my $bocage  = $slr->[Marpa::R3::Internal::Scanless::R::B_C];
     my $order   = $slr->[Marpa::R3::Internal::Scanless::R::O_C];
-    my $tree    = $slr->[Marpa::R3::Internal::Scanless::R::T_C];
 
     my $argc       = scalar @{$args};
     my ($nook_ix, $or_node_id, $choice) = $slr->exec( <<'END_OF_LUA' );
@@ -1718,7 +1716,6 @@ sub trace_op {
     my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
     my $bocage    = $slr->[Marpa::R3::Internal::Scanless::R::B_C];
     my $order     = $slr->[Marpa::R3::Internal::Scanless::R::O_C];
-    my $tree      = $slr->[Marpa::R3::Internal::Scanless::R::T_C];
 
     my ($nook_ix, $or_node_id, $choice) = $slr->exec( <<'END_OF_LUA' );
     recce = ...
