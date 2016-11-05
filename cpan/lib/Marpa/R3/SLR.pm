@@ -2174,37 +2174,63 @@ sub Marpa::R3::Scanless::R::show_nook {
     my $order   = $slr->[Marpa::R3::Internal::Scanless::R::O_C];
     my $tree    = $slr->[Marpa::R3::Internal::Scanless::R::T_C];
 
-    my $or_node_id = $tree->_marpa_t_nook_or_node($nook_id);
+    # say STDERR 'nook_id', $nook_id;
+
+    my ($text, $or_node_id);
+    ($or_node_id, $text) = $slr->exec(<<'END_OF_LUA', $nook_id);
+    local recce, nook_id = ...
+    nook_id = nook_id + 0
+    local tree = recce.lmw_t
+    -- print('nook_id', nook_id)
+    local or_node_id = tree:_nook_or_node(nook_id)
+    if not or_node_id then return end
+    local text = 'o' .. or_node_id
+    local parent = tree:_nook_parent(nook_id) or '-'
+    -- print('nook_is_cause', tree:_nook_is_cause(nook_id))
+    if tree:_nook_is_cause(nook_id) ~= 0 then
+        text = text .. '[c' .. parent .. ']'
+        goto CHILD_TYPE_FOUND
+    end
+    if tree:_nook_is_predecessor(nook_id) ~= 0 then
+        text = text .. '[p' .. parent .. ']'
+        goto CHILD_TYPE_FOUND
+    end
+    text = text .. '[-]'
+    ::CHILD_TYPE_FOUND::
+    return or_node_id, text
+END_OF_LUA
+
     return if not defined $or_node_id;
 
-    my $text = "o$or_node_id";
-    my $parent = $tree->_marpa_t_nook_parent($nook_id) // q{-};
-    CHILD_TYPE: {
-        if ( $tree->_marpa_t_nook_is_cause($nook_id) ) {
-            $text .= "[c$parent]";
-            last CHILD_TYPE;
-        }
-        if ( $tree->_marpa_t_nook_is_predecessor($nook_id) ) {
-            $text .= "[p$parent]";
-            last CHILD_TYPE;
-        }
-        $text .= '[-]';
-    } ## end CHILD_TYPE:
     my $or_node_tag =
         $slr->or_node_tag( $or_node_id );
     $text .= " $or_node_tag";
 
-    $text .= ' p';
-    $text .=
-        $tree->_marpa_t_nook_predecessor_is_ready($nook_id)
-        ? q{=ok}
-        : q{-};
-    $text .= ' c';
-    $text .= $tree->_marpa_t_nook_cause_is_ready($nook_id) ? q{=ok} : q{-};
-    $text .= "\n";
+    ($text) = $slr->exec(<<'END_OF_LUA', $nook_id, $text);
+    local recce, nook_id, text = ...
+    local tree = recce.lmw_t
+    text = tostring(text) .. ' p'
+    if tree:_nook_predecessor_is_ready(nook_id+0) ~= 0 then
+        text = text .. '=ok'
+    else
+        text = text .. '-'
+    end
+    text = text .. ' c'
+    if tree:_nook_cause_is_ready(nook_id+0) ~= 0 then
+        text = text .. '=ok'
+    else
+        text = text .. '-'
+    end
+    text = text .. '\n'
+    return text
+END_OF_LUA
 
     DESCRIBE_CHOICES: {
-        my $this_choice = $tree->_marpa_t_nook_choice($nook_id);
+        my $this_choice;
+        ($this_choice) = $slr->exec(
+            ' recce, nook_id = ...; return recce.lmw_t:_nook_choice(nook_id+0)',
+            $nook_id
+        );
         CHOICE: for ( my $choice_ix = 0;; $choice_ix++ ) {
             my $and_node_id =
                 $order->_marpa_o_and_node_order_get( $or_node_id,

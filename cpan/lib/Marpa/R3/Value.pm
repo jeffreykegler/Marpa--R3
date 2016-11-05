@@ -1656,8 +1656,6 @@ END_OF_LUA
             or Marpa::R3::exception('Could not print to trace file');
         return;
     }
-    # my $or_node_id = $tree->_marpa_t_nook_or_node($nook_ix);
-    # my $choice     = $tree->_marpa_t_nook_choice($nook_ix);
     my $and_node_id =
         $order->_marpa_o_and_node_order_get( $or_node_id, $choice );
     my $token_name;
@@ -1695,8 +1693,6 @@ sub trace_stack_1 {
     return nook_ix, t:_nook_or_node(nook_ix), t:_nook_choice(nook_ix)
 END_OF_LUA
 
-    # my $or_node_id = $tree->_marpa_t_nook_or_node($nook_ix);
-    # my $choice     = $tree->_marpa_t_nook_choice($nook_ix);
     my $and_node_id =
         $order->_marpa_o_and_node_order_get( $or_node_id, $choice );
 
@@ -1731,8 +1727,6 @@ sub trace_op {
     return nook_ix, t:_nook_or_node(nook_ix), t:_nook_choice(nook_ix)
 END_OF_LUA
 
-    # my $or_node_id = $tree->_marpa_t_nook_or_node($nook_ix);
-    # my $choice     = $tree->_marpa_t_nook_choice($nook_ix);
     my $and_node_id =
         $order->_marpa_o_and_node_order_get( $or_node_id, $choice );
     my $trace_irl_id = $bocage->_marpa_b_or_node_irl($or_node_id);
