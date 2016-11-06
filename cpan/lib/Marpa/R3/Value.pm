@@ -601,17 +601,11 @@ sub Marpa::R3::Scanless::R::value {
 
     my $tree = $slr->[Marpa::R3::Internal::Scanless::R::T_C];
 
-    if ($tree) {
-
-        my $max_parses  = $slr->[Marpa::R3::Internal::Scanless::R::MAX_PARSES];
-        my $parse_count = $tree->parse_count();
-        if ( $max_parses and $parse_count > $max_parses ) {
-            Marpa::R3::exception("Maximum parse count ($max_parses) exceeded");
-        }
-
-    } ## end if ($tree)
-    else {
+    ENSURE_TREE: {
         # No tree, therefore not initialized
+
+        my ($lua_tree) = $slr->exec( 'recce=...; return recce.lmw_t' );
+        last ENSURE_TREE if $lua_tree;
 
         my $order = $slr->ordering_get();
         return if not $order;
@@ -621,6 +615,16 @@ sub Marpa::R3::Scanless::R::value {
         $thin_slr->associate_tree($tree)
 
     } ## end else [ if ($tree) ]
+
+    {
+
+        my $max_parses  = $slr->[Marpa::R3::Internal::Scanless::R::MAX_PARSES];
+        my $parse_count = $tree->parse_count();
+        if ( $max_parses and $parse_count > $max_parses ) {
+            Marpa::R3::exception("Maximum parse count ($max_parses) exceeded");
+        }
+
+    }
 
     my ($result) = $slr->exec( << 'END_OF_LUA' );
         recce = ...

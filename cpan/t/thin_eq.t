@@ -88,7 +88,6 @@ my $bocage        = Marpa::R3::Thin::B->new( $recce, $latest_earley_set_ID );
 my $order         = Marpa::R3::Thin::O->new($bocage);
 $order->dummyup_tree($marpa_lua, "tree");
 
-# my $tree          = Marpa::R3::Thin::T->new($order);
 my @actual_values = ();
 VALUE: while ( 1 ) {
 
