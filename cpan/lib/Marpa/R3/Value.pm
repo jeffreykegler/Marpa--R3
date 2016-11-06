@@ -382,6 +382,7 @@ sub Marpa::R3::Scanless::R::show_semantics {
 sub Marpa::R3::Scanless::R::ordering_get {
     my ($slr) = @_;
     return if $slr->[Marpa::R3::Internal::Scanless::R::NO_PARSE];
+    my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
     my $ordering = $slr->[Marpa::R3::Internal::Scanless::R::O_C];
     return $ordering if $ordering;
     my $parse_set_arg =
@@ -400,7 +401,7 @@ sub Marpa::R3::Scanless::R::ordering_get {
         return;
     }
     $ordering = $slr->[Marpa::R3::Internal::Scanless::R::O_C] =
-      Marpa::R3::Thin::O->new($bocage);
+      Marpa::R3::Thin::O->new($bocage, $thin_slr);
 
     GIVEN_RANKING_METHOD: {
         my $ranking_method =
@@ -609,10 +610,10 @@ sub Marpa::R3::Scanless::R::value {
 
         my $order = $slr->ordering_get();
         return if not $order;
-        $tree = $slr->[Marpa::R3::Internal::Scanless::R::T_C] =
-          Marpa::R3::Thin::T->new($order);
+        # $tree = $slr->[Marpa::R3::Internal::Scanless::R::T_C] =
+          # Marpa::R3::Thin::T->new($order);
         my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
-        $thin_slr->associate_tree($tree)
+        $thin_slr->associate_tree($order)
 
     } ## end else [ if ($tree) ]
 
@@ -634,7 +635,9 @@ sub Marpa::R3::Scanless::R::value {
         -- print(inspect(_G))
         collectgarbage()
         local result = recce.lmw_t:next()
+        if not result then return result end
         -- print('result:', result)
+        recce.lmw_v = kollos.value_new(recce.lmw_t)
         return result
 END_OF_LUA
 
@@ -644,7 +647,7 @@ END_OF_LUA
     local $Marpa::R3::Context::slr  = $slr;
     local $Marpa::R3::Context::slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
 
-    $slr->thin->stack_mode_set( $tree );
+    # $slr->thin->stack_mode_set();
 
     $slr->exec( << 'END_OF_LUA', ($trace_values ? 1 : 0 ));
     recce, flag = ...

@@ -2749,9 +2749,28 @@ so the caller must make sure that one is available.
       { NULL, NULL },
     };
 
-    -- miranda: section+ order object non-standard wrappers
+    -- miranda: section+ C function declarations
 
     /* order wrappers which need to be hand-written */
+
+    void marpa_gen_order_ud(lua_State* L, Marpa_Order order);
+
+    -- miranda: section+ order object non-standard wrappers
+
+    /* Caller must ensure enough stack space.
+     * Leaves a new userdata on top of the stack.
+     */
+    void marpa_gen_order_ud(lua_State* L, Marpa_Order order)
+    {
+        Marpa_Order* p_o;
+        p_o = (Marpa_Order *) marpa_lua_newuserdata (L, sizeof (Marpa_Order));
+        *p_o = order;
+        /* [ userdata ] */
+        marpa_lua_rawgetp (L, LUA_REGISTRYINDEX, &kollos_o_ud_mt_key);
+        /* [ userdata, metatable ] */
+        marpa_lua_setmetatable (L, -2);
+        /* [ userdata ] */
+    }
 
     static int
     wrap_order_new (lua_State * L)
@@ -2837,17 +2856,19 @@ so the caller must make sure that one is available.
     static int
     wrap_tree_new (lua_State * L)
     {
-      const int tree_stack_ix = 1;
-      const int order_stack_ix = 2;
+      const int order_stack_ix = 1;
+      int tree_stack_ix;
 
       if (0)
         printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
       /* [ tree_table, order_table ] */
-      if (1)
-        {
-          marpa_luaL_checktype(L, tree_stack_ix, LUA_TTABLE);
-          marpa_luaL_checktype(L, order_stack_ix, LUA_TTABLE);
-        }
+      marpa_luaL_checktype(L, order_stack_ix, LUA_TTABLE);
+
+      marpa_lua_newtable(L);
+      tree_stack_ix = marpa_lua_gettop(L);
+      marpa_lua_getglobal (L, "kollos");
+      marpa_lua_getfield (L, -1, "class_tree");
+      marpa_lua_setmetatable (L, tree_stack_ix);
 
       /* [ tree_table, order_table ] */
       {
@@ -2866,13 +2887,9 @@ so the caller must make sure that one is available.
         /* [ tree_table, order_table, tree_ud ] */
 
         marpa_lua_setfield (L, tree_stack_ix, "_libmarpa");
-        /* [ tree_table, order_table ] */
         marpa_lua_getfield (L, order_stack_ix, "_libmarpa_g");
-        /* [ tree_table, order_table, g_ud ] */
         marpa_lua_setfield (L, tree_stack_ix, "_libmarpa_g");
-        /* [ tree_table, order_table ] */
         marpa_lua_getfield (L, order_stack_ix, "_libmarpa");
-        /* [ tree_table, order_table, order_ud ] */
         order_ud = (Marpa_Order *) marpa_lua_touserdata (L, -1);
         /* [ tree_table, order_table, order_ud ] */
 

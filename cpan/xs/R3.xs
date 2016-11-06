@@ -3099,6 +3099,66 @@ get_mortalspace (size_t nbytes)
    * one available.
    */
 static void
+dummyup_order(
+  lua_State* L,
+  int slr_lua_ref,
+  Marpa_Order order)
+{
+    int order_object_ix;
+    int slr_object_ix;
+    const int base_of_stack = marpa_lua_gettop (L);
+
+    marpa_luaL_checkstack (L, 20, "dummyup_order");
+
+    marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, slr_lua_ref);
+    /* Lua stack: [ slr_table ] */
+    slr_object_ix = marpa_lua_gettop (L);
+
+    marpa_lua_newtable (L);
+    order_object_ix = marpa_lua_gettop (L);
+    marpa_lua_getglobal (L, "kollos");
+    marpa_lua_getfield (L, -1, "class_order");
+    marpa_lua_setmetatable (L, order_object_ix);
+    /* [ slr_table, order_obj, kollos_tab ] */
+    marpa_lua_settop (L, order_object_ix);
+    /* [ slr_table, order_obj ] */
+
+    {
+        Scanless_R *slr;
+        Marpa_Grammar g;
+        marpa_lua_getfield (L, slr_object_ix, "lud");
+        /* Lua stack: [ slr_table, order_obj, lud ] */
+
+        slr = marpa_lua_touserdata (L, -1);
+        marpa_lua_settop (L, order_object_ix);
+        /* [ slr_table, order_obj ] */
+
+        g = slr->slg->g1;
+        /* Add new g userdatum --
+         * it must own a reference to the Libmarpa
+         * grammar.
+         */
+        marpa_g_ref (g);
+        marpa_gen_grammar_ud (L, g);
+        /* [ slr_table, order_obj, grammar_ud ] */
+        marpa_lua_setfield (L, order_object_ix, "_libmarpa_g");
+        /* [ slr_table, order_obj ] */
+    }
+
+    /* Add t userdatum here */
+    marpa_gen_order_ud (L, order);
+    /* [ slr_table, order_obj, order_ud ] */
+    marpa_lua_setfield (L, order_object_ix, "_libmarpa");
+    /* [ slr_table, order_obj ] */
+
+    marpa_lua_setfield (L, slr_object_ix, "lmw_o");
+    marpa_lua_settop (L, base_of_stack);
+}
+
+  /* Takes ownership of a reference to v -- caller must have
+   * one available.
+   */
+static void
 dummyup_tree(
   lua_State* L,
   int slr_lua_ref,
@@ -3946,9 +4006,10 @@ PPCODE:
 MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::O
 
 void
-new( class, b_wrapper )
+new( class, b_wrapper, outer_slr )
     char * class;
     B_Wrapper *b_wrapper;
+    Outer_R *outer_slr;
 PPCODE:
 {
   SV *sv;
@@ -3970,6 +4031,9 @@ PPCODE:
   }
   o_wrapper->base = b_wrapper->base;
   o_wrapper->o = o;
+  marpa_o_ref(o);
+  dummyup_order(outer_slr->L, outer_slr->lua_ref, o);
+
   sv = sv_newmortal ();
   sv_setref_pv (sv, order_c_class_name, (void *) o_wrapper);
   XPUSHs (sv);
@@ -6844,16 +6908,14 @@ PPCODE:
 }
 
 void
-associate_tree( outer_slr, t_wrapper)
+associate_tree( outer_slr, o_wrapper)
     Outer_R *outer_slr;
-    T_Wrapper *t_wrapper;
+    O_Wrapper *o_wrapper;
 PPCODE:
 {
-  Scanless_R *slr = slr_inner_get(outer_slr);
-  Marpa_Tree t = t_wrapper->t;
-  G_Wrapper* g_wrapper = slr->g1_wrapper;
+  Marpa_Order o = o_wrapper->o;
+  Marpa_Tree t = marpa_t_new(o);
 
-  marpa_t_ref(t);
   dummyup_tree(outer_slr->L, outer_slr->lua_ref, t);
   XSRETURN_YES;
 }
