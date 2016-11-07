@@ -228,13 +228,6 @@ say {$out} gp_generate(qw(high_rank_only));
 say {$out} gp_generate(qw(is_null));
 say {$out} gp_generate(qw(rank));
 
-$main::CLASS_LETTER   = 't';
-$main::LIBMARPA_CLASS = 'Marpa_Tree';
-print {$out} 'MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::T', "\n\n";
-
-say {$out} gp_generate(qw(next));
-say {$out} gp_generate(qw(parse_count));
-
 $main::CLASS_LETTER   = 'g';
 $main::LIBMARPA_CLASS = 'Marpa_Grammar';
 print {$out} 'MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::G', "\n\n";

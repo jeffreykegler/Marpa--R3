@@ -292,7 +292,6 @@ __DATA__
     R_C { The thin version of the G1 recognizer }
     B_C { The Marpa bocage }
     O_C { The Marpa order object }
-    T_C { The Marpa tree iterator }
 
     P_INPUT_STRING
 

@@ -85,8 +85,9 @@ $recce->earleme_complete();
 
 my $latest_earley_set_ID = $recce->latest_earley_set();
 my $bocage        = Marpa::R3::Thin::B->new( $recce, $latest_earley_set_ID );
-my $order         = Marpa::R3::Thin::O->new($bocage);
-$order->dummyup_tree($marpa_lua, "tree");
+$bocage->dummyup_order($marpa_lua, "order");
+
+$marpa_lua->exec( 'tree = kollos.tree_new(order)' );
 
 my @actual_values = ();
 VALUE: while ( 1 ) {
@@ -189,7 +190,7 @@ for my $actual_value (@actual_values) {
 
 $marpa_lua = undef;
 
-$grammar = $recce = $bocage = $order = undef;
+$grammar = $recce = $bocage = undef;
 $grammar = Marpa::R3::Thin::G->new({});
 $grammar->force_valued();
 
@@ -305,10 +306,10 @@ $bocage        = Marpa::R3::Thin::B->new( $recce, $latest_earley_set_ID );
 $marpa_lua = Marpa::R3::Lua->new();
 $marpa_lua->raw_exec($Marpa::R3::Lua::Inspect::load);
 
-$order         = Marpa::R3::Thin::O->new($bocage);
-$order->dummyup_tree($marpa_lua, "tree");
+$bocage->dummyup_order($marpa_lua, "order");
 
 my $result = $marpa_lua->exec(<<'END_OF_LUA');
+    local tree = kollos.tree_new(order)
     tree:next()
     local value = kollos.value_new(tree)
     local result = {}

@@ -600,8 +600,6 @@ sub Marpa::R3::Scanless::R::value {
         "  Recognition done only as far as location $last_completed_earleme\n"
     ) if $furthest_earleme > $last_completed_earleme;
 
-    my $tree = $slr->[Marpa::R3::Internal::Scanless::R::T_C];
-
     ENSURE_TREE: {
         # No tree, therefore not initialized
 
@@ -610,17 +608,14 @@ sub Marpa::R3::Scanless::R::value {
 
         my $order = $slr->ordering_get();
         return if not $order;
-        # $tree = $slr->[Marpa::R3::Internal::Scanless::R::T_C] =
-          # Marpa::R3::Thin::T->new($order);
         my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
         $thin_slr->associate_tree($order)
 
-    } ## end else [ if ($tree) ]
+    }
 
     {
 
         my $max_parses  = $slr->[Marpa::R3::Internal::Scanless::R::MAX_PARSES];
-        # my $parse_count = $tree->parse_count();
         my ($parse_count) = $slr->exec( 'recce=...; return recce.lmw_t:parse_count()' );
         if ( $max_parses and $parse_count > $max_parses ) {
             Marpa::R3::exception("Maximum parse count ($max_parses) exceeded");
