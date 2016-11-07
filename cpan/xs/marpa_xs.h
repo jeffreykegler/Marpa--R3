@@ -439,19 +439,6 @@ typedef struct {
      G_Wrapper* base;
 } O_Wrapper;
 
-typedef struct {
-     Marpa_Tree t;
-     SV* base_sv;
-     G_Wrapper* base;
-} T_Wrapper;
-
-struct v_wrapper_s
-{
-  Marpa_Value v;
-  Outer_R* outer_slr;
-};
-typedef struct v_wrapper_s V_Wrapper;
-
 typedef struct
 {
   lua_State* L;

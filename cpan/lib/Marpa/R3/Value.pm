@@ -642,8 +642,6 @@ END_OF_LUA
     local $Marpa::R3::Context::slr  = $slr;
     local $Marpa::R3::Context::slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
 
-    # $slr->thin->stack_mode_set();
-
     $slr->exec( << 'END_OF_LUA', ($trace_values ? 1 : 0 ));
     recce, flag = ...
     return recce.lmw_v:_trace(flag+0)

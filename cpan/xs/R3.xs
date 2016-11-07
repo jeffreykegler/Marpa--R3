@@ -3214,66 +3214,6 @@ dummyup_tree(
     marpa_lua_settop (L, base_of_stack);
 }
 
-  /* Takes ownership of a reference to v -- caller must have
-   * one available.
-   */
-static void
-dummyup_valuator(
-  lua_State* L,
-  int slr_lua_ref,
-  Marpa_Value v)
-{
-    int valuator_object_ix;
-    int slr_object_ix;
-    const int base_of_stack = marpa_lua_gettop (L);
-
-    marpa_luaL_checkstack (L, 20, "dummyup_valuator");
-
-    marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, slr_lua_ref);
-    /* Lua stack: [ slr_table ] */
-    slr_object_ix = marpa_lua_gettop (L);
-
-    marpa_lua_newtable (L);
-    valuator_object_ix = marpa_lua_gettop (L);
-    marpa_lua_getglobal (L, "kollos");
-    marpa_lua_getfield (L, -1, "class_value");
-    marpa_lua_setmetatable (L, valuator_object_ix);
-    /* [ slr_table, valuator_obj, kollos_tab ] */
-    marpa_lua_settop (L, valuator_object_ix);
-    /* [ slr_table, valuator_obj ] */
-
-    {
-        Scanless_R *slr;
-        Marpa_Grammar g;
-        marpa_lua_getfield (L, slr_object_ix, "lud");
-        /* Lua stack: [ slr_table, valuator_obj, lud ] */
-
-        slr = marpa_lua_touserdata (L, -1);
-        marpa_lua_settop (L, valuator_object_ix);
-        /* [ slr_table, valuator_obj ] */
-
-        g = slr->slg->g1;
-        /* Add new g userdatum --
-         * it must own a reference to the Libmarpa
-         * grammar.
-         */
-        marpa_g_ref (g);
-        marpa_gen_grammar_ud (L, g);
-        /* [ slr_table, valuator_obj, grammar_ud ] */
-        marpa_lua_setfield (L, valuator_object_ix, "_libmarpa_g");
-        /* [ slr_table, valuator_obj ] */
-    }
-
-    /* Add v userdatum here */
-    marpa_gen_value_ud (L, v);
-    /* [ slr_table, valuator_obj, value_ud ] */
-    marpa_lua_setfield (L, valuator_object_ix, "_libmarpa");
-    /* [ slr_table, valuator_obj ] */
-
-    marpa_lua_setfield (L, slr_object_ix, "lmw_v");
-    marpa_lua_settop (L, base_of_stack);
-}
-
 MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin
 
 PROTOTYPES: DISABLE
@@ -6900,29 +6840,6 @@ PPCODE:
     case -1:
         XSRETURN_PV ("trace");
     }
-}
-
-void
-stack_mode_set( outer_slr, t_wrapper)
-    Outer_R *outer_slr;
-    T_Wrapper *t_wrapper;
-PPCODE:
-{
-  Scanless_R *slr = slr_inner_get(outer_slr);
-  Marpa_Value v;
-  G_Wrapper* g_wrapper = slr->g1_wrapper;
-
-  v = marpa_v_new (t_wrapper->t);
-  if (!v)
-    {
-      if (!g_wrapper->throw)
-        {
-          XSRETURN_UNDEF;
-        }
-      croak ("Problem in t->dummyup_valuator(): %s", xs_g_error (g_wrapper));
-    }
-  dummyup_valuator(outer_slr->L, outer_slr->lua_ref, v);
-  XSRETURN_YES;
 }
 
 void
