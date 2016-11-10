@@ -3094,6 +3094,66 @@ get_mortalspace (size_t nbytes)
     return (void *) SvPVX (mortal);
 }
 
+  /* Takes ownership of a reference to `bocage` -- caller must have
+   * one available.
+   */
+static void
+dummyup_bocage(
+  lua_State* L,
+  int slr_lua_ref,
+  Marpa_Bocage bocage)
+{
+    int bocage_object_ix;
+    int slr_object_ix;
+    const int base_of_stack = marpa_lua_gettop (L);
+
+    marpa_luaL_checkstack (L, 20, "dummyup_bocage");
+
+    marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, slr_lua_ref);
+    /* Lua stack: [ slr_table ] */
+    slr_object_ix = marpa_lua_gettop (L);
+
+    marpa_lua_newtable (L);
+    bocage_object_ix = marpa_lua_gettop (L);
+    marpa_lua_getglobal (L, "kollos");
+    marpa_lua_getfield (L, -1, "class_bocage");
+    marpa_lua_setmetatable (L, bocage_object_ix);
+    /* [ slr_table, bocage_obj, kollos_tab ] */
+    marpa_lua_settop (L, bocage_object_ix);
+    /* [ slr_table, bocage_obj ] */
+
+    {
+        Scanless_R *slr;
+        Marpa_Grammar g;
+        marpa_lua_getfield (L, slr_object_ix, "lud");
+        /* Lua stack: [ slr_table, bocage_obj, lud ] */
+
+        slr = marpa_lua_touserdata (L, -1);
+        marpa_lua_settop (L, bocage_object_ix);
+        /* [ slr_table, bocage_obj ] */
+
+        g = slr->slg->g1;
+        /* Add new g userdatum --
+         * it must own a reference to the Libmarpa
+         * grammar.
+         */
+        marpa_g_ref (g);
+        marpa_gen_grammar_ud (L, g);
+        /* [ slr_table, bocage_obj, grammar_ud ] */
+        marpa_lua_setfield (L, bocage_object_ix, "_libmarpa_g");
+        /* [ slr_table, bocage_obj ] */
+    }
+
+    /* Add t userdatum here */
+    marpa_gen_bocage_ud (L, bocage);
+    /* [ slr_table, bocage_obj, bocage_ud ] */
+    marpa_lua_setfield (L, bocage_object_ix, "_libmarpa");
+    /* [ slr_table, bocage_obj ] */
+
+    marpa_lua_setfield (L, slr_object_ix, "lmw_b");
+    marpa_lua_settop (L, base_of_stack);
+}
+
   /* Takes ownership of a reference to v -- caller must have
    * one available.
    */
@@ -3901,7 +3961,7 @@ PPCODE:
 MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::B
 
 void
-new( class, r_wrapper, ordinal )
+thin_new( class, r_wrapper, ordinal )
     char * class;
     R_Wrapper *r_wrapper;
     Marpa_Earley_Set_ID ordinal;
@@ -3926,6 +3986,40 @@ PPCODE:
   }
   b_wrapper->base = r_wrapper->base;
   b_wrapper->b = b;
+  sv = sv_newmortal ();
+  sv_setref_pv (sv, bocage_c_class_name, (void *) b_wrapper);
+  XPUSHs (sv);
+}
+
+void
+new( class, r_wrapper, ordinal, outer_slr )
+    char * class;
+    R_Wrapper *r_wrapper;
+    Marpa_Earley_Set_ID ordinal;
+    Outer_R *outer_slr;
+PPCODE:
+{
+  SV *sv;
+  Marpa_Recognizer r = r_wrapper->r;
+  B_Wrapper *b_wrapper;
+  Marpa_Bocage b = marpa_b_new (r, ordinal);
+  PERL_UNUSED_ARG(class);
+
+  if (!b)
+    {
+      if (!r_wrapper->base->throw) { XSRETURN_UNDEF; }
+      croak ("Problem in b->new(): %s", xs_g_error(r_wrapper->base));
+    }
+  Newx (b_wrapper, 1, B_Wrapper);
+  {
+    SV* base_sv = r_wrapper->base_sv;
+    SvREFCNT_inc (base_sv);
+    b_wrapper->base_sv = base_sv;
+  }
+  b_wrapper->base = r_wrapper->base;
+  b_wrapper->b = b;
+  marpa_b_ref(b);
+  dummyup_bocage(outer_slr->L, outer_slr->lua_ref, b);
   sv = sv_newmortal ();
   sv_setref_pv (sv, bocage_c_class_name, (void *) b_wrapper);
   XPUSHs (sv);
