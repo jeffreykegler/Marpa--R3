@@ -1565,10 +1565,12 @@ u_r0_clear (Scanless_R * slr)
   slr->r0 = NULL;
 }
 
+static Scanless_R* slr_inner_get(Outer_R* outer_slr);
+
 static Marpa_Recce
-u_r0_new (Scanless_R * slr)
+u_r0_new (Outer_R* outer_slr)
 {
-  dTHX;
+  Scanless_R *slr = slr_inner_get(outer_slr);
   Marpa_Recce r0 = slr->r0;
   const IV trace_lexers = slr->trace_lexers;
   G_Wrapper *lexer_wrapper = slr->slg->l0_wrapper;
@@ -1638,8 +1640,6 @@ u_r0_new (Scanless_R * slr)
   }
   return r0;
 }
-
-static Scanless_R* slr_inner_get(Outer_R* outer_slr);
 
 /* Assumes it is called
  after a successful marpa_r_earleme_complete()
@@ -1729,7 +1729,7 @@ u_read (Outer_R * outer_slr)
 
   if (!r)
     {
-      r = u_r0_new (slr);
+      r = u_r0_new (outer_slr);
       if (!r)
         croak ("Problem in u_read(): %s",
                xs_g_error (slr->slg->l0_wrapper));

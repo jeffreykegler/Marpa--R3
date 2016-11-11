@@ -2397,8 +2397,8 @@ so the caller must make sure that one is available.
 
         marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, slg_ref);
         /* [ userdata, slg_table ] */
-        marpa_lua_pushvalue (L, -2);
-        /* [ userdata, slg_table, userdata ] */
+        marpa_lua_pushvalue (L, lmw_g_stack_ix);
+        /* [ userdata, slg_table, lmw_g ] */
         marpa_lua_setfield (L, -2, name);
 
         marpa_lua_settop (L, base_of_stack);
