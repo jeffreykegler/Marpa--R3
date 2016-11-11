@@ -373,7 +373,7 @@ typedef struct
   int last_perl_pos;
   int perl_pos;
 
-  Marpa_Recce r0;
+  Marpa_Recce l0r;
   /* character position, taking into account Unicode
      Equivalent to Perl pos()
      One past last actual position indicates past-end-of-string

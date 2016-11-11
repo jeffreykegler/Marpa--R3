@@ -2561,7 +2561,28 @@ so the caller must make sure that one is available.
       { NULL, NULL },
     };
 
+    -- miranda: section+ C function declarations
+
+    /* recce wrappers which need to be hand-written */
+
+    void marpa_gen_recce_ud(lua_State* L, Marpa_Recce recce);
+
     -- miranda: section+ recognizer object non-standard wrappers
+
+    /* Caller must ensure enough stack space.
+     * Leaves a new userdata on top of the stack.
+     */
+    void marpa_gen_recce_ud(lua_State* L, Marpa_Recce recce)
+    {
+        Marpa_Recce* p_recce;
+        p_recce = (Marpa_Recce *) marpa_lua_newuserdata (L, sizeof (Marpa_Recce));
+        *p_recce = recce;
+        /* [ userdata ] */
+        marpa_lua_rawgetp (L, LUA_REGISTRYINDEX, &kollos_r_ud_mt_key);
+        /* [ userdata, metatable ] */
+        marpa_lua_setmetatable (L, -2);
+        /* [ userdata ] */
+    }
 
     /* recognizer wrappers which need to be hand-written */
 
