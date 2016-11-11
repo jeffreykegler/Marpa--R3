@@ -2358,6 +2358,10 @@ so the caller must make sure that one is available.
 
         marpa_lua_newtable (L);
         lmw_g_stack_ix = marpa_lua_gettop (L);
+        marpa_lua_getglobal (L, "kollos");
+        marpa_lua_getfield (L, -1, "class_grammar");
+        marpa_lua_setmetatable (L, lmw_g_stack_ix);
+        /* [ slr_table, lmw_g_tab, kollos_tab ] */
 
         if (0)
             printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
