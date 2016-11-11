@@ -1599,8 +1599,8 @@ u_l0r_new (Outer_R* outer_slr)
     }
   {
     int i;
-    Marpa_Symbol_ID *terminals_buffer = slr->r1_wrapper->terminals_buffer;
-    const int count = marpa_r_terminals_expected (slr->r1, terminals_buffer);
+    Marpa_Symbol_ID *terminals_buffer = slr->g1r_wrapper->terminals_buffer;
+    const int count = marpa_r_terminals_expected (slr->g1r, terminals_buffer);
     if (count < 0)
       {
         croak ("Problem in u_l0r_new() with terminals_expected: %s",
@@ -2127,7 +2127,7 @@ static void slg_inner_destroy(Scanless_G* slg) {
 
 static Scanless_R* marpa_inner_slr_new (
   Scanless_G *slg,
-    SV *r1_sv)
+    SV *g1r_sv)
 {
   dTHX;
   Scanless_R *slr;
@@ -2142,21 +2142,21 @@ static Scanless_R* marpa_inner_slr_new (
   /* Copy and take references to the "parent objects",
    * the ones responsible for holding references.
    */
-  slr->r1_sv = r1_sv;
-  SvREFCNT_inc (r1_sv);
+  slr->g1r_sv = g1r_sv;
+  SvREFCNT_inc (g1r_sv);
 
   /* These do not need references, because parent objects
    * hold references to them
    */
-  SET_R_WRAPPER_FROM_R_SV (slr->r1_wrapper, r1_sv);
+  SET_R_WRAPPER_FROM_R_SV (slr->g1r_wrapper, g1r_sv);
   if (!slg->precomputed)
     {
       croak
         ("Problem in u->new(): Attempted to create SLIF recce from unprecomputed SLIF grammar");
     }
   slr->slg = slg;
-  slr->r1 = slr->r1_wrapper->r;
-  SET_G_WRAPPER_FROM_G_SV (slr->g1_wrapper, slr->r1_wrapper->base_sv);
+  slr->g1r = slr->g1r_wrapper->r;
+  SET_G_WRAPPER_FROM_G_SV (slr->g1_wrapper, slr->g1r_wrapper->base_sv);
 
   slr->start_of_lexeme = 0;
   slr->end_of_lexeme = 0;
@@ -2205,7 +2205,7 @@ static Scanless_R* marpa_inner_slr_new (
 
   slr->lexer_start_pos = slr->perl_pos;
   slr->lexer_read_result = 0;
-  slr->r1_earleme_complete_result = 0;
+  slr->g1r_earleme_complete_result = 0;
   slr->start_of_pause_lexeme = -1;
   slr->end_of_pause_lexeme = -1;
 
@@ -2261,7 +2261,7 @@ static void slr_inner_destroy(Scanless_R* slr)
    Safefree(slr->t_lexemes);
 
   Safefree(slr->pos_db);
-  SvREFCNT_dec (slr->r1_sv);
+  SvREFCNT_dec (slr->g1r_sv);
   Safefree(slr->symbol_r_properties);
   Safefree(slr->l0_rule_r_properties);
   if (slr->token_values)
@@ -2367,7 +2367,7 @@ slr_discard (Scanless_R * slr)
                   new_event->t_lexeme_discarded.t_end_of_lexeme =
                     slr->end_of_lexeme;
                   new_event->t_lexeme_discarded.t_last_g1_location =
-                    marpa_r_latest_earley_set (slr->r1);
+                    marpa_r_latest_earley_set (slr->g1r);
                 }
               /* If there is discarded item, we are fine,
                * and can return success.
@@ -2428,7 +2428,7 @@ slr_convert_events (Scanless_R * slr)
 {
   dTHX;
   int event_ix;
-  Marpa_Grammar g = slr->r1_wrapper->base->g;
+  Marpa_Grammar g = slr->g1r_wrapper->base->g;
   const int event_count = marpa_g_event_count (g);
   for (event_ix = 0; event_ix < event_count; event_ix++)
     {
@@ -2595,7 +2595,7 @@ slr_alternatives (Scanless_R * slr)
 {
   dTHX;
   Marpa_Recce l0r;
-  Marpa_Recce r1 = slr->r1;
+  Marpa_Recce g1r = slr->g1r;
   Marpa_Earley_Set_ID earley_set;
   const Scanless_G *slg = slr->slg;
 
@@ -2684,7 +2684,7 @@ slr_alternatives (Scanless_R * slr)
           symbol_g_properties = slg->symbol_g_properties + g1_lexeme;
           l0_rule_g_properties = slg->l0_rule_g_properties + rule_id;
           symbol_r_properties = slr->symbol_r_properties + g1_lexeme;
-          is_expected = marpa_r_terminal_is_expected (r1, g1_lexeme);
+          is_expected = marpa_r_terminal_is_expected (g1r, g1_lexeme);
           if (!is_expected)
             {
               union marpa_slr_event_s *lexeme_entry =
@@ -2818,7 +2818,7 @@ slr_alternatives (Scanless_R * slr)
               new_event->t_lexeme_discarded.t_end_of_lexeme =
                 lexeme_stack_event->t_trace_lexeme_discarded.t_end_of_lexeme;
               new_event->t_lexeme_discarded.t_last_g1_location =
-                marpa_r_latest_earley_set (slr->r1);
+                marpa_r_latest_earley_set (slr->g1r);
             }
             goto NEXT_LEXEME_EVENT;
           }
@@ -2915,7 +2915,7 @@ slr_alternatives (Scanless_R * slr)
                 event->t_trace_attempting_lexeme.t_lexeme = g1_lexeme;
               }
             return_value =
-              marpa_r_alternative (r1, g1_lexeme, TOKEN_VALUE_IS_LITERAL, 1);
+              marpa_r_alternative (g1r, g1_lexeme, TOKEN_VALUE_IS_LITERAL, 1);
             switch (return_value)
               {
 
@@ -2985,8 +2985,8 @@ slr_alternatives (Scanless_R * slr)
       }
 
 
-    return_value = slr->r1_earleme_complete_result =
-      marpa_r_earleme_complete (r1);
+    return_value = slr->g1r_earleme_complete_result =
+      marpa_r_earleme_complete (g1r);
     if (return_value < 0)
       {
         croak ("Problem in marpa_r_earleme_complete(): %s",
@@ -2998,7 +2998,7 @@ slr_alternatives (Scanless_R * slr)
         slr_convert_events (slr);
       }
 
-    marpa_r_latest_earley_set_values_set (r1, slr->start_of_lexeme,
+    marpa_r_latest_earley_set_values_set (g1r, slr->start_of_lexeme,
                                           INT2PTR (void *,
                                                    (slr->end_of_lexeme -
                                                     slr->start_of_lexeme)));
@@ -3025,7 +3025,7 @@ slr_es_to_span (Scanless_R * slr, Marpa_Earley_Set_ID earley_set, int *p_start,
     {
       void *length_as_ptr;
       result =
-        marpa_r_earley_set_values (slr->r1, earley_set, p_start,
+        marpa_r_earley_set_values (slr->g1r, earley_set, p_start,
                                    &length_as_ptr);
       *p_length = (int) PTR2IV (length_as_ptr);
     }
@@ -3042,9 +3042,9 @@ slr_es_to_literal_span (Scanless_R * slr,
                         int *p_start, int *p_length)
 {
   dTHX;
-  const Marpa_Recce r1 = slr->r1;
+  const Marpa_Recce g1r = slr->g1r;
   const Marpa_Earley_Set_ID latest_earley_set =
-    marpa_r_latest_earley_set (r1);
+    marpa_r_latest_earley_set (g1r);
   if (start_earley_set >= latest_earley_set)
     {
       /* Should only happen if length == 0 */
@@ -5531,10 +5531,10 @@ PPCODE:
 MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::SLR
 
 void
-new( class, slg_sv, r1_sv )
+new( class, slg_sv, g1r_sv )
     char * class;
     SV *slg_sv;
-    SV *r1_sv;
+    SV *g1r_sv;
 PPCODE:
 {
   SV *new_sv;
@@ -5549,9 +5549,9 @@ PPCODE:
       croak
         ("Problem in u->new(): slg arg is not of type Marpa::R3::Thin::SLG");
     }
-  if (!sv_isa (r1_sv, "Marpa::R3::Thin::R"))
+  if (!sv_isa (g1r_sv, "Marpa::R3::Thin::R"))
     {
-      croak ("Problem in u->new(): r1 arg is not of type Marpa::R3::Thin::R");
+      croak ("Problem in u->new(): g1r arg is not of type Marpa::R3::Thin::R");
     }
   Newx (outer_slr, 1, Outer_R);
   /* Set slg and outer_slg from the SLG SV */
@@ -5561,10 +5561,11 @@ PPCODE:
   }
 
   slg = slg_inner_get(outer_slg);
-  slr = marpa_inner_slr_new(slg, r1_sv);
+  slr = marpa_inner_slr_new(slg, g1r_sv);
   /* Copy and take references to the "parent objects",
    * the ones responsible for holding references.
    */
+
   outer_slr->slg_sv = slg_sv;
   SvREFCNT_inc (slg_sv);
   outer_slr->outer_slg = outer_slg;
@@ -5576,6 +5577,9 @@ PPCODE:
     kollos_refinc(L);
     outer_slr->lua_ref = kollos_slr_new(L, slr, outer_slg->lua_ref);
   }
+
+  marpa_r_ref(slr->g1r);
+  dummyup_recce(outer_slr->L, outer_slr->lua_ref, slr->g1r, "lmw_g1r");
 
   new_sv = sv_newmortal ();
   sv_setref_pv (new_sv, scanless_r_class_name, (void *) outer_slr);
@@ -5665,7 +5669,7 @@ g1( outer_slr )
 PPCODE:
 {
   Scanless_R *slr = slr_inner_get(outer_slr);
-  XPUSHs (sv_2mortal (SvREFCNT_inc_NN ( slr->r1_wrapper->base_sv)));
+  XPUSHs (sv_2mortal (SvREFCNT_inc_NN ( slr->g1r_wrapper->base_sv)));
 }
 
 void
@@ -5717,9 +5721,9 @@ PPCODE:
   Scanless_R *slr = slr_inner_get(outer_slr);
   int literal_start;
   int literal_length;
-  const Marpa_Recce r1 = slr->r1;
+  const Marpa_Recce g1r = slr->g1r;
   const Marpa_Earley_Set_ID latest_earley_set =
-    marpa_r_latest_earley_set (r1);
+    marpa_r_latest_earley_set (g1r);
   if (start_earley_set < 0 || start_earley_set > latest_earley_set)
     {
       croak
@@ -5758,12 +5762,12 @@ PPCODE:
     }
 
   slr->lexer_read_result = 0;
-  slr->r1_earleme_complete_result = 0;
+  slr->g1r_earleme_complete_result = 0;
   slr->start_of_pause_lexeme = -1;
   slr->end_of_pause_lexeme = -1;
 
   /* Clear event queue */
-  av_clear (slr->r1_wrapper->event_queue);
+  av_clear (slr->g1r_wrapper->event_queue);
   marpa_slr_event_clear (slr);
 
   /* Application intervention resets perl_pos */
@@ -5814,7 +5818,7 @@ PPCODE:
         }
 
 
-      if (marpa_r_is_exhausted (slr->r1))
+      if (marpa_r_is_exhausted (slr->g1r))
         {
           int discard_result = slr_discard (slr);
           if (discard_result < 0)
@@ -5832,7 +5836,7 @@ PPCODE:
         }
 
       {
-        int event_count = av_len (slr->r1_wrapper->event_queue) + 1;
+        int event_count = av_len (slr->g1r_wrapper->event_queue) + 1;
         event_count += marpa_slr_event_count (slr);
         if (event_count)
           {
@@ -5861,12 +5865,12 @@ PPCODE:
 }
 
 void
-r1_earleme_complete_result (outer_slr)
+g1r_earleme_complete_result (outer_slr)
     Outer_R *outer_slr;
 PPCODE:
 {
   Scanless_R *slr = slr_inner_get(outer_slr);
-  XPUSHs (sv_2mortal (newSViv ((IV) slr->r1_earleme_complete_result)));
+  XPUSHs (sv_2mortal (newSViv ((IV) slr->g1r_earleme_complete_result)));
 }
 
 void
@@ -5893,7 +5897,7 @@ PPCODE:
   Scanless_R *slr = slr_inner_get(outer_slr);
   int i;
   int queue_length;
-  AV *const event_queue_av = slr->r1_wrapper->event_queue;
+  AV *const event_queue_av = slr->g1r_wrapper->event_queue;
 
   for (i = 0; i < slr->t_event_count; i++)
     {
@@ -6356,7 +6360,7 @@ PPCODE:
         ("Usage: Marpa::R3::Thin::SLR::g1_alternative(slr, symbol_id, [value])");
     }
 
-  result = marpa_r_alternative (slr->r1, symbol_id, token_ix, 1);
+  result = marpa_r_alternative (slr->g1r, symbol_id, token_ix, 1);
   if (result >= MARPA_ERR_NONE) {
     slr->is_external_scanning = 1;
   }
@@ -6407,15 +6411,15 @@ PPCODE:
     lexeme_length = end_pos - start_pos;
   }
 
-  av_clear (slr->r1_wrapper->event_queue);
+  av_clear (slr->g1r_wrapper->event_queue);
   marpa_slr_event_clear(slr);
 
-  result = marpa_r_earleme_complete (slr->r1);
+  result = marpa_r_earleme_complete (slr->g1r);
   slr->is_external_scanning = 0;
   if (result >= 0)
     {
-      r_convert_events (slr->r1_wrapper);
-      marpa_r_latest_earley_set_values_set (slr->r1, start_pos,
+      r_convert_events (slr->g1r_wrapper);
+      marpa_r_latest_earley_set_values_set (slr->g1r, start_pos,
                                             INT2PTR (void *, lexeme_length));
       slr->perl_pos = start_pos + lexeme_length;
       XSRETURN_IV (slr->perl_pos);

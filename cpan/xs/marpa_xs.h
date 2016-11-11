@@ -346,11 +346,11 @@ struct v_wrapper_s;
 
 typedef struct
 {
-  SV *r1_sv;
+  SV *g1r_sv;
 
   Scanless_G *slg;
-  R_Wrapper *r1_wrapper;
-  Marpa_Recce r1;
+  R_Wrapper *g1r_wrapper;
+  Marpa_Recce g1r;
   G_Wrapper *g1_wrapper;
   AV *token_values;
   IV trace_lexers;
@@ -363,7 +363,7 @@ typedef struct
    */
   int lexer_start_pos;
   int lexer_read_result;
-  int r1_earleme_complete_result;
+  int g1r_earleme_complete_result;
 
   /* A boolean to prevent the inappropriate mixing
    * of internal and external scanning
