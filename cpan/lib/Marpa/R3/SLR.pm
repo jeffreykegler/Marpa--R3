@@ -2229,9 +2229,12 @@ END_OF_LUA
             $nook_id
         );
         CHOICE: for ( my $choice_ix = 0;; $choice_ix++ ) {
-            my $and_node_id =
-                $order->_marpa_o_and_node_order_get( $or_node_id,
-                $choice_ix );
+
+                my ($and_node_id) = $slr->exec( <<'END_OF_LUA', $or_node_id, $choice_ix );
+                recce, or_node_id, choice_ix = ...
+                return recce.lmw_o:_and_order_get(or_node_id+0, choice_ix+0)
+END_OF_LUA
+            
             last CHOICE if not defined $and_node_id;
             $text .= " o$or_node_id" . '[' . $choice_ix . ']';
             if ( defined $this_choice and $this_choice == $choice_ix ) {

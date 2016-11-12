@@ -1644,11 +1644,16 @@ sub trace_token_evaluation {
 
     my $order   = $slr->[Marpa::R3::Internal::Scanless::R::O_C];
 
-    my ($nook_ix, $or_node_id, $choice) = $slr->exec( << 'END_OF_LUA' );
+    my ($nook_ix, $and_node_id)
+        = $slr->exec( << 'END_OF_LUA' );
     recce = ...
     local nook_ix = recce.lmw_v:_nook()
+    local o = recce.lmw_o
     local t = recce.lmw_t
-    return nook_ix, t:_nook_or_node(nook_ix), t:_nook_choice(nook_ix)
+    local or_node_id = t:_nook_or_node(nook_ix)
+    local choice = t:_nook_choice(nook_ix)
+    local and_node_id = o:_and_node_order_get( or_node_id, choice )
+    return nook_ix, and_node_id
 END_OF_LUA
 
     if ( not defined $nook_ix ) {
@@ -1656,8 +1661,6 @@ END_OF_LUA
             or Marpa::R3::exception('Could not print to trace file');
         return;
     }
-    my $and_node_id =
-        $order->_marpa_o_and_node_order_get( $or_node_id, $choice );
     my $token_name;
     if ( defined $token_id ) {
         $token_name = $tracer->symbol_name($token_id);
@@ -1681,19 +1684,19 @@ sub trace_stack_1 {
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $tracer =
         $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
-    my $bocage  = $slr->[Marpa::R3::Internal::Scanless::R::B_C];
-    my $order   = $slr->[Marpa::R3::Internal::Scanless::R::O_C];
 
     my $argc       = scalar @{$args};
-    my ($nook_ix, $or_node_id, $choice) = $slr->exec( <<'END_OF_LUA' );
+    my ($nook_ix, $and_node_id) = $slr->exec( <<'END_OF_LUA' );
+    -- in trace_stack_1
     recce = ...
     local nook_ix = recce.lmw_v:_nook()
+    local o = recce.lmw_o
     local t = recce.lmw_t
-    return nook_ix, t:_nook_or_node(nook_ix), t:_nook_choice(nook_ix)
+    local or_node_id = t:_nook_or_node(nook_ix)
+    local choice = t:_nook_choice(nook_ix)
+    local and_node_id = o:_and_order_get(or_node_id, choice)
+    return nook_ix, and_node_id
 END_OF_LUA
-
-    my $and_node_id =
-        $order->_marpa_o_and_node_order_get( $or_node_id, $choice );
 
     return 'Popping ', $argc,
         ' values to evaluate ',
@@ -1733,10 +1736,6 @@ sub trace_op {
             o:_and_order_get(or_node_id, choice), 
             b:_or_node_irl(or_node_id)
 END_OF_LUA
-
-    # my $and_node_id =
-        # $order->_marpa_o_and_node_order_get( $or_node_id, $choice );
-    # my $trace_irl_id = $bocage->_marpa_b_or_node_irl($or_node_id);
 
     my $virtual_rhs  = $grammar_c->_marpa_g_irl_is_virtual_rhs($trace_irl_id);
     my $virtual_lhs  = $grammar_c->_marpa_g_irl_is_virtual_lhs($trace_irl_id);
