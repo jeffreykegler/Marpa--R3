@@ -410,10 +410,7 @@ sub Marpa::R3::ASF::new {
     my $bocage   = $slr->[Marpa::R3::Internal::Scanless::R::B_C];
 
     my $or_nodes = $asf->[Marpa::R3::Internal::ASF::OR_NODES] = [];
-    use sort 'stable';
     OR_NODE: for ( my $or_node_id = 0;; $or_node_id++ ) {
-        # my @and_node_ids =
-            # $ordering->_marpa_o_or_node_and_node_ids($or_node_id);
 
         my ($and_node_ids) = $slr->exec( <<'END_OF_LUA', $or_node_id );
         -- assumes throw mode
@@ -431,10 +428,16 @@ sub Marpa::R3::ASF::new {
 END_OF_LUA
 
         last OR_NODE if not scalar @{$and_node_ids};
-        my @sorted_and_node_ids = map { $_->[-1] } sort { $a <=> $b } map {
-            [ ( $bocage->_marpa_b_and_node_predecessor($_) // -1 ), $_ ]
-        } @{$and_node_ids};
+
+        # Originally I had intended to sort the and node IDs by 
+        # MAJOR: and-node predecessor (or -1 if no predecessor) and
+        # MINOR: and_node ID
+        # Don't know why, and in fact I screwed up the implementation
+        # and left the and nodes unsorted,
+        # which is how they are in the current implementation.
+
         $or_nodes->[$or_node_id] = $and_node_ids;
+
     } ## end OR_NODE: for ( my $or_node_id = 0;; $or_node_id++ )
 
     blessings_set($asf);
