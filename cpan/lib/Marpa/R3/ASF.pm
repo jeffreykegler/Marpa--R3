@@ -412,13 +412,29 @@ sub Marpa::R3::ASF::new {
     my $or_nodes = $asf->[Marpa::R3::Internal::ASF::OR_NODES] = [];
     use sort 'stable';
     OR_NODE: for ( my $or_node_id = 0;; $or_node_id++ ) {
-        my @and_node_ids =
-            $ordering->_marpa_o_or_node_and_node_ids($or_node_id);
-        last OR_NODE if not scalar @and_node_ids;
+        # my @and_node_ids =
+            # $ordering->_marpa_o_or_node_and_node_ids($or_node_id);
+
+        my ($and_node_ids) = $slr->exec( <<'END_OF_LUA', $or_node_id );
+        -- assumes throw mode
+        local recce, raw_or_node_id = ...
+        local or_node_id = raw_or_node_id + 0
+        local and_node_ids = marpa.sv.av_new()
+        local order = recce.lmw_o
+        local count = order:_or_node_and_node_count(or_node_id)
+        if not count then return and_node_ids end
+        for ix = 0, count-1 do
+            and_node_ids[ix] =
+                order:_or_node_and_node_id_by_ix(or_node_id, ix);
+        end
+        return and_node_ids
+END_OF_LUA
+
+        last OR_NODE if not scalar @{$and_node_ids};
         my @sorted_and_node_ids = map { $_->[-1] } sort { $a <=> $b } map {
             [ ( $bocage->_marpa_b_and_node_predecessor($_) // -1 ), $_ ]
-        } @and_node_ids;
-        $or_nodes->[$or_node_id] = \@and_node_ids;
+        } @{$and_node_ids};
+        $or_nodes->[$or_node_id] = $and_node_ids;
     } ## end OR_NODE: for ( my $or_node_id = 0;; $or_node_id++ )
 
     blessings_set($asf);

@@ -1303,7 +1303,7 @@ It should free all memory associated with the valuation.
          -- do not change the value before the call gets it.
          -- We assume that all types involved are at least 32 bits and signed, so that
          -- values from -2^30 to 2^30 will be unchanged by any conversions.
-         result[#result+1] = [[  marpa_luaL_argcheck(L, (-(2^30) <= this_arg && this_arg <= (2^30)), -1, "argument out of range");]], "\n"
+         result[#result+1] = [[  marpa_luaL_argcheck(L, (-(1<<30) <= this_arg && this_arg <= (1<<30)), -1, "argument out of range");]], "\n"
 
          result[#result+1] = string.format("  %s = (%s)this_arg;\n", arg_name, arg_type)
          result[#result+1] = "  marpa_lua_pop(L, 1);\n"
@@ -2221,8 +2221,11 @@ Set "strict" globals, using code taken from strict.lua.
       throw_flag = marpa_lua_toboolean (L, -1);
       /* [ ..., throw_flag ] */
       marpa_lua_pop(L, 1);
+      /* [ ... ] */
       push_error_object(L, error_code, details);
+      /* [ ..., error_object ] */
       marpa_lua_pushvalue(L, -1);
+      /* [ ..., error_object, error_object ] */
       marpa_lua_setglobal(L, "error_object");
       /* [ ..., error_object ] */
       if (!throw_flag) return;
@@ -2232,8 +2235,8 @@ Set "strict" globals, using code taken from strict.lua.
     /* Handle libmarpa errors in the most usual way.
        Uses 1 position on the stack, and throws the
        error, if so desired.
-       The error may not be thrown, and it expects the
-       caller to handle any non-thrown error.
+       The error may be thrown or not thrown.
+       The caller is expected to handle any non-thrown error.
     */
     static void
     libmarpa_error_handle (lua_State * L,
@@ -2247,6 +2250,20 @@ Set "strict" globals, using code taken from strict.lua.
       marpa_lua_pop(L, 1);
       error_code = marpa_g_error (*grammar_ud, NULL);
       libmarpa_error_code_handle(L, error_code, details);
+    }
+
+    /* A wrapper for libmarpa_error_handle to conform with the
+     * Lua C API.  The only argument must be a Libmarpa wrapper
+     * object.  These all define the `_libmarpa_g` field.
+     */
+    static int
+    lca_libmarpa_error(lua_State* L)
+    {
+       const int lmw_stack_ix = 1;
+       const int details_stack_ix = 2;
+       const char* details = marpa_lua_tostring (L, details_stack_ix);
+       libmarpa_error_handle(L, lmw_stack_ix, details);
+       return 1;
     }
 
     -- miranda: section+ C function declarations
@@ -2562,6 +2579,7 @@ so the caller must make sure that one is available.
     }
 
     static const struct luaL_Reg grammar_methods[] = {
+      { "error", lca_libmarpa_error },
       { NULL, NULL },
     };
 
@@ -2674,6 +2692,7 @@ so the caller must make sure that one is available.
     }
 
     static const struct luaL_Reg recce_methods[] = {
+      { "error", lca_libmarpa_error },
       { NULL, NULL },
     };
 
@@ -2728,7 +2747,7 @@ so the caller must make sure that one is available.
             const lua_Integer es_arg =
                 marpa_luaL_checkinteger (L, end_stack_ix);
             marpa_luaL_argcheck (L, (0 <= es_arg
-                    && es_arg <= (2 ^ 30)), end_stack_ix,
+                    && es_arg <= (1<<30)), end_stack_ix,
                 "earley set index out of range");
             end_earley_set = (Marpa_Earley_Set_ID) es_arg;
         }
@@ -2791,6 +2810,7 @@ so the caller must make sure that one is available.
     }
 
     static const struct luaL_Reg bocage_methods[] = {
+      { "error", lca_libmarpa_error },
       { NULL, NULL },
     };
 
@@ -2872,6 +2892,7 @@ so the caller must make sure that one is available.
     }
 
     static const struct luaL_Reg order_methods[] = {
+      { "error", lca_libmarpa_error },
       { NULL, NULL },
     };
 
@@ -2954,6 +2975,7 @@ so the caller must make sure that one is available.
     }
 
     static const struct luaL_Reg tree_methods[] = {
+      { "error", lca_libmarpa_error },
       { NULL, NULL },
     };
 
