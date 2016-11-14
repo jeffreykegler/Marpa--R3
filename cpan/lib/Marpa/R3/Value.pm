@@ -406,16 +406,20 @@ sub Marpa::R3::Scanless::R::ordering_get {
     GIVEN_RANKING_METHOD: {
         my $ranking_method =
             $slr->[Marpa::R3::Internal::Scanless::R::RANKING_METHOD];
-        if ( $ranking_method eq 'high_rule_only' ) {
-            $ordering->high_rank_only_set(1);
-            $ordering->rank();
-            last GIVEN_RANKING_METHOD;
-        }
-        if ( $ranking_method eq 'rule' ) {
-            $ordering->high_rank_only_set(0);
-            $ordering->rank();
-            last GIVEN_RANKING_METHOD;
-        }
+
+        $slr->exec( <<'END_OF_LUA', $ranking_method );
+        local recce, raw_ranking_method = ...
+        local ranking_method = tostring(raw_ranking_method)
+        if ranking_method == 'high_rule_only' then
+            recce.lmw_o:high_rank_only_set(1)
+            recce.lmw_o:rank()
+        end
+        if ranking_method == 'rule' then
+            recce.lmw_o:high_rank_only_set(0)
+            recce.lmw_o:rank()
+        end
+END_OF_LUA
+
     } ## end GIVEN_RANKING_METHOD:
 
     return $ordering;

@@ -2169,7 +2169,6 @@ sub Marpa::R3::Scanless::R::show_tree {
 
 sub Marpa::R3::Scanless::R::show_nook {
     my ( $slr, $nook_id, $verbose ) = @_;
-    my $order   = $slr->[Marpa::R3::Internal::Scanless::R::O_C];
 
     # say STDERR 'nook_id', $nook_id;
 

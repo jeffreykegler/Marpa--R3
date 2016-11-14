@@ -398,14 +398,22 @@ sub Marpa::R3::ASF::new {
     my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
     my $recce_c   = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
 
-    my $ordering = $slr->ordering_get();
-    Marpa::R3::exception( "Parse failed\n") if not $ordering;
+    $slr->ordering_get();
 
-    Marpa::R3::exception(
-        "An attempt was make to create an ASF for a null parse\n",
-        "  A null parse is a successful parse of a zero-length string\n",
-        "  ASF's are not defined for null parses\n"
-    ) if $ordering->is_null();
+    my ($is_null) = $slr->exec( <<'END_OF_LUA' ) ;
+    recce = ...
+    local order = recce.lmw_o;
+    if not order then
+        error( 'Parse failed' )
+    end
+    if recce.lmw_o:is_null() == 1 then
+        error([[
+An attempt was make to create an ASF for a null parse
+  A null parse is a successful parse of a zero-length string
+  ASF's are not defined for null parses
+]])
+    end
+END_OF_LUA
 
     my $bocage   = $slr->[Marpa::R3::Internal::Scanless::R::B_C];
 

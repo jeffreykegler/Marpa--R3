@@ -223,10 +223,6 @@ $main::LIBMARPA_CLASS = 'Marpa_Order';
 print {$out} 'MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::O', "\n\n";
 
 say {$out} gp_generate(qw(ambiguity_metric));
-say {$out} gp_generate(qw(high_rank_only_set int flag));
-say {$out} gp_generate(qw(high_rank_only));
-say {$out} gp_generate(qw(is_null));
-say {$out} gp_generate(qw(rank));
 
 $main::CLASS_LETTER   = 'g';
 $main::LIBMARPA_CLASS = 'Marpa_Grammar';
