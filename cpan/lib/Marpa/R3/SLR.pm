@@ -1372,9 +1372,15 @@ sub Marpa::R3::Internal::Scanless::input_escape {
 
 sub Marpa::R3::Scanless::R::ambiguity_metric {
     my ($slr) = @_;
-    my $ordering = $slr->ordering_get();
-    my $metric = $ordering ? $ordering->ambiguity_metric() : 0;
-    my $bocage = $slr->[Marpa::R3::Internal::Scanless::R::B_C];
+    $slr->ordering_get();
+
+    my ($metric) = $slr->exec( <<'END__OF_LUA' );
+    local recce = ...
+    local order = recce.lmw_o
+    if not order then return 0 end
+    return order:ambiguity_metric()
+END__OF_LUA
+
     return $metric;
 } ## end sub Marpa::R3::Scanless::R::ambiguity_metric
 
