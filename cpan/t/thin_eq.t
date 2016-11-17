@@ -309,6 +309,7 @@ $marpa_lua->raw_exec($Marpa::R3::Lua::Inspect::load);
 $bocage->dummyup_order($marpa_lua, "order");
 
 my $result = $marpa_lua->exec(<<'END_OF_LUA');
+    print(inspect(_G))
     local tree = kollos.tree_new(order)
     tree:next()
     local value = kollos.value_new(tree)

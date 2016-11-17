@@ -617,18 +617,14 @@ sub Marpa::R3::Scanless::R::value {
 
     }
 
-    {
-
-        my $max_parses  = $slr->[Marpa::R3::Internal::Scanless::R::MAX_PARSES];
-        my ($parse_count) = $slr->exec( 'recce=...; return recce.lmw_t:parse_count()' );
-        if ( $max_parses and $parse_count > $max_parses ) {
-            Marpa::R3::exception("Maximum parse count ($max_parses) exceeded");
-        }
-
-    }
-
-    my ($result) = $slr->exec( << 'END_OF_LUA' );
-        recce = ...
+    my $max_parses  = $slr->[Marpa::R3::Internal::Scanless::R::MAX_PARSES];
+    my ($result) = $slr->exec( << 'END_OF_LUA', ($max_parses // 0));
+        recce, raw_max_parses = ...
+        local max_parses = math.tointeger(raw_max_parses + 0)
+        local parse_count = recce.lmw_t:parse_count()
+        if max_parses > 0 and parse_count > max_parses then
+            error(string.format("Maximum parse count (%d) exceeded", max_parses));
+        end
         -- io.stderr:write('tree:', inspect(recce.lmw_t))
         recce.lmw_v = nil
         -- print(inspect(_G))
