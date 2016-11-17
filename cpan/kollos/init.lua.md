@@ -2840,41 +2840,42 @@ so the caller must make sure that one is available.
     static int
     wrap_order_new (lua_State * L)
     {
-      const int order_stack_ix = 1;
-      const int bocage_stack_ix = 2;
+      const int bocage_stack_ix = 1;
+      int order_stack_ix;
 
       if (0)
         printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
       /* [ order_table, bocage_table ] */
       if (1)
         {
-          marpa_luaL_checktype(L, order_stack_ix, LUA_TTABLE);
           marpa_luaL_checktype(L, bocage_stack_ix, LUA_TTABLE);
         }
 
-      /* [ order_table, bocage_table ] */
+      marpa_lua_newtable(L);
+      /* [ order_table ] */
+      order_stack_ix = marpa_lua_gettop(L);
+      marpa_lua_getglobal (L, "kollos");
+      marpa_lua_getfield (L, -1, "class_order");
+      marpa_lua_setmetatable (L, order_stack_ix);
+      /* [ order_table ] */
+
       {
         Marpa_Bocage *bocage_ud;
 
-        /* [ order_table, bocage_table ] */
+        /* [ order_table ] */
         Marpa_Order* order_ud =
           (Marpa_Order *) marpa_lua_newuserdata (L, sizeof (Marpa_Order));
-        /* [ order_table, bocage_table, order_ud ] */
+        /* [ order_table, order_ud ] */
         marpa_lua_rawgetp (L, LUA_REGISTRYINDEX, &kollos_o_ud_mt_key);
-        /* [ order_table, bocage_table, order_ud, order_ud_mt ] */
+        /* [ order_table, order_ud, order_ud_mt ] */
         marpa_lua_setmetatable (L, -2);
-        /* [ order_table, bocage_table, order_ud ] */
+        /* [ order_table, order_ud ] */
 
         marpa_lua_setfield (L, order_stack_ix, "_libmarpa");
-        /* [ order_table, bocage_table ] */
         marpa_lua_getfield (L, bocage_stack_ix, "_libmarpa_g");
-        /* [ order_table, bocage_table, g_ud ] */
         marpa_lua_setfield (L, order_stack_ix, "_libmarpa_g");
-        /* [ order_table, bocage_table ] */
         marpa_lua_getfield (L, bocage_stack_ix, "_libmarpa");
-        /* [ order_table, bocage_table, bocage_ud ] */
         bocage_ud = (Marpa_Bocage *) marpa_lua_touserdata (L, -1);
-        /* [ order_table, bocage_table, bocage_ud ] */
 
         *order_ud = marpa_o_new (*bocage_ud);
         if (!*order_ud)
@@ -2883,11 +2884,11 @@ so the caller must make sure that one is available.
             return 0;
           }
       }
+
       if (0)
         printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
-      /* [ order_table, bocage_table, bocage_ud ] */
-      marpa_lua_pop (L, 2);
-      /* [ order_table ] */
+      marpa_lua_pushvalue(L, order_stack_ix );
+      /* [ ..., order_table ] */
       return 1;
     }
 

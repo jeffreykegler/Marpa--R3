@@ -402,7 +402,9 @@ sub Marpa::R3::Scanless::R::ordering_get {
         $slr->[Marpa::R3::Internal::Scanless::R::NO_PARSE] = 1;
         return;
     }
-    Marpa::R3::Thin::O->new($bocage, $thin_slr);
+
+    $slr->exec( 'recce = ...; recce.lmw_o = kollos.order_new(recce.lmw_b)');
+    # Marpa::R3::Thin::O->new($bocage, $thin_slr);
 
     GIVEN_RANKING_METHOD: {
         my $ranking_method =
