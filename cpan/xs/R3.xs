@@ -178,7 +178,6 @@ typedef struct marpa_v Value;
 static const char grammar_c_class_name[] = "Marpa::R3::Thin::G";
 static const char recce_c_class_name[] = "Marpa::R3::Thin::R";
 static const char bocage_c_class_name[] = "Marpa::R3::Thin::B";
-static const char order_c_class_name[] = "Marpa::R3::Thin::O";
 static const char scanless_g_class_name[] = "Marpa::R3::Thin::SLG";
 static const char scanless_r_class_name[] = "Marpa::R3::Thin::SLR";
 static const char marpa_lua_class_name[] = "Marpa::R3::Lua";
@@ -4043,53 +4042,6 @@ PPCODE:
     Safefree( b_wrapper );
 }
 
-MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::O
-
-void
-new( class, b_wrapper, outer_slr )
-    char * class;
-    B_Wrapper *b_wrapper;
-    Outer_R *outer_slr;
-PPCODE:
-{
-  SV *sv;
-  Marpa_Bocage b = b_wrapper->b;
-  O_Wrapper *o_wrapper;
-  Marpa_Order o = marpa_o_new (b);
-  PERL_UNUSED_ARG(class);
-
-  if (!o)
-    {
-      if (!b_wrapper->base->throw) { XSRETURN_UNDEF; }
-      croak ("Problem in o->new(): %s", xs_g_error(b_wrapper->base));
-    }
-  Newx (o_wrapper, 1, O_Wrapper);
-  {
-    SV* base_sv = b_wrapper->base_sv;
-    SvREFCNT_inc (base_sv);
-    o_wrapper->base_sv = base_sv;
-  }
-  o_wrapper->base = b_wrapper->base;
-  o_wrapper->o = o;
-  marpa_o_ref(o);
-  dummyup_order(outer_slr->L, outer_slr->lua_ref, o);
-
-  sv = sv_newmortal ();
-  sv_setref_pv (sv, order_c_class_name, (void *) o_wrapper);
-  XPUSHs (sv);
-}
-
-void
-DESTROY( o_wrapper )
-    O_Wrapper *o_wrapper;
-PPCODE:
-{
-    const Marpa_Order o = o_wrapper->o;
-    SvREFCNT_dec (o_wrapper->base_sv);
-    marpa_o_unref(o);
-    Safefree( o_wrapper );
-}
-
 MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::G
 
 void
@@ -4836,62 +4788,6 @@ PPCODE:
   /* [ sandbox, order_obj ] */
   marpa_lua_setfield(L, -2, name);
   marpa_lua_settop(L, base_of_stack);
-}
-
-MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::O
-
-# int
-void
-_marpa_o_and_node_order_get( o_wrapper, or_node_id, and_ix )
-    O_Wrapper *o_wrapper;
-    Marpa_Or_Node_ID or_node_id;
-    int and_ix;
-PPCODE:
-{
-    Marpa_Order o = o_wrapper->o;
-    int result;
-    result = _marpa_o_and_order_get(o, or_node_id, and_ix);
-    if (result == -1) { XSRETURN_UNDEF; }
-    if (result < 0) {
-      croak ("Problem in o->_marpa_o_and_node_order_get(): %s", xs_g_error(o_wrapper->base));
-    }
-    XPUSHs( sv_2mortal( newSViv(result) ) );
-}
-
-void
-_marpa_o_or_node_and_node_count( o_wrapper, or_node_id )
-    O_Wrapper *o_wrapper;
-    Marpa_Or_Node_ID or_node_id;
-PPCODE:
-{
-    Marpa_Order o = o_wrapper->o;
-    int count = _marpa_o_or_node_and_node_count(o, or_node_id);
-    if (count < 0) { croak("Invalid or node ID %d", or_node_id); }
-    XPUSHs( sv_2mortal( newSViv(count) ) );
-}
-
-void
-_marpa_o_or_node_and_node_ids( o_wrapper, or_node_id )
-    O_Wrapper *o_wrapper;
-    Marpa_Or_Node_ID or_node_id;
-PPCODE:
-{
-    Marpa_Order o = o_wrapper->o;
-    int count = _marpa_o_or_node_and_node_count(o, or_node_id);
-    if (count == -1) {
-      if (GIMME != G_ARRAY) { XSRETURN_NO; }
-      count = 0; /* will return an empty array */
-    }
-    if (count < 0) { croak("Invalid or node ID %d", or_node_id); }
-    {
-        int ix;
-        EXTEND(SP, count);
-        for (ix = 0; ix < count; ix++) {
-            Marpa_And_Node_ID and_node_id
-                = _marpa_o_or_node_and_node_id_by_ix(o, or_node_id, ix);
-            PUSHs( sv_2mortal( newSViv(and_node_id) ) );
-        }
-    }
 }
 
 MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::SLG
