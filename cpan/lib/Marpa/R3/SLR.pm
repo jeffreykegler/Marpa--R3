@@ -1492,7 +1492,6 @@ sub Marpa::R3::Scanless::R::reset_evaluation {
     my ($slr) = @_;
     $slr->[Marpa::R3::Internal::Scanless::R::NO_PARSE]              = undef;
     $slr->[Marpa::R3::Internal::Scanless::R::B_C]                   = undef;
-    $slr->[Marpa::R3::Internal::Scanless::R::O_C]                   = undef;
     $slr->[Marpa::R3::Internal::Scanless::R::SEMANTICS_PACKAGE]       = undef;
     $slr->[Marpa::R3::Internal::Scanless::R::NULL_VALUES]           = undef;
 

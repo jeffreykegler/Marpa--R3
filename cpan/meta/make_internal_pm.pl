@@ -291,7 +291,6 @@ __DATA__
     SLR_C { The thin version of this object }
     R_C { The thin version of the G1 recognizer }
     B_C { The Marpa bocage }
-    O_C { The Marpa order object }
 
     P_INPUT_STRING
 
