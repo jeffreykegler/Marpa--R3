@@ -378,13 +378,15 @@ sub Marpa::R3::Scanless::R::show_semantics {
 } ## end sub show_semantics
 
 # Return false if no ordering was created,
-# otherwise return the ordering.
+# true otherwise
 sub Marpa::R3::Scanless::R::ordering_get {
     my ($slr) = @_;
     return if $slr->[Marpa::R3::Internal::Scanless::R::NO_PARSE];
+
+    my ($has_ordering) = $slr->exec( 'recce = ...; return recce.lmw_o' );
+    return 1 if $has_ordering;
+
     my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
-    my $ordering = $slr->[Marpa::R3::Internal::Scanless::R::O_C];
-    return $ordering if $ordering;
     my $parse_set_arg =
         $slr->[Marpa::R3::Internal::Scanless::R::END_OF_PARSE];
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
@@ -400,7 +402,7 @@ sub Marpa::R3::Scanless::R::ordering_get {
         $slr->[Marpa::R3::Internal::Scanless::R::NO_PARSE] = 1;
         return;
     }
-    $ordering = $slr->[Marpa::R3::Internal::Scanless::R::O_C] =
+    $slr->[Marpa::R3::Internal::Scanless::R::O_C] =
       Marpa::R3::Thin::O->new($bocage, $thin_slr);
 
     GIVEN_RANKING_METHOD: {
@@ -422,7 +424,7 @@ END_OF_LUA
 
     } ## end GIVEN_RANKING_METHOD:
 
-    return $ordering;
+    return 1;
 }
 
 sub resolve_rule_by_id {
