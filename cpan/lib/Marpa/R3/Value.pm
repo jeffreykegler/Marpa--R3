@@ -402,8 +402,7 @@ sub Marpa::R3::Scanless::R::ordering_get {
         $slr->[Marpa::R3::Internal::Scanless::R::NO_PARSE] = 1;
         return;
     }
-    $slr->[Marpa::R3::Internal::Scanless::R::O_C] =
-      Marpa::R3::Thin::O->new($bocage, $thin_slr);
+    Marpa::R3::Thin::O->new($bocage, $thin_slr);
 
     GIVEN_RANKING_METHOD: {
         my $ranking_method =
@@ -612,8 +611,8 @@ sub Marpa::R3::Scanless::R::value {
         my ($lua_tree) = $slr->exec( 'recce=...; return recce.lmw_t' );
         last ENSURE_TREE if $lua_tree;
 
-        my $order = $slr->ordering_get();
-        return if not $order;
+        my $have_order = $slr->ordering_get();
+        return if not $have_order;
         $slr->exec( 'recce=...; recce.lmw_t = kollos.tree_new(recce.lmw_o)' );
 
     }
@@ -1643,8 +1642,6 @@ sub trace_token_evaluation {
     my $trace_file_handle =
         $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
 
-    my $order   = $slr->[Marpa::R3::Internal::Scanless::R::O_C];
-
     my ($nook_ix, $and_node_id)
         = $slr->exec( << 'END_OF_LUA' );
     recce = ...
@@ -1720,7 +1717,6 @@ sub trace_op {
 
     my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
     my $bocage    = $slr->[Marpa::R3::Internal::Scanless::R::B_C];
-    my $order     = $slr->[Marpa::R3::Internal::Scanless::R::O_C];
 
     my ($nook_ix, $or_node_id, $choice, $and_node_id, $trace_irl_id)
         = $slr->exec( <<'END_OF_LUA' );
