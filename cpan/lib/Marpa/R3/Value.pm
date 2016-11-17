@@ -613,8 +613,6 @@ sub Marpa::R3::Scanless::R::value {
         my $order = $slr->ordering_get();
         return if not $order;
         $slr->exec( 'recce=...; recce.lmw_t = kollos.tree_new(recce.lmw_o)' );
-        # my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
-        # $thin_slr->associate_tree($order)
 
     }
 

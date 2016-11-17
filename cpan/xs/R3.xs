@@ -3281,66 +3281,6 @@ dummyup_order(
     marpa_lua_settop (L, base_of_stack);
 }
 
-  /* Takes ownership of a reference to v -- caller must have
-   * one available.
-   */
-static void
-dummyup_tree(
-  lua_State* L,
-  int slr_lua_ref,
-  Marpa_Tree t)
-{
-    int tree_object_ix;
-    int slr_object_ix;
-    const int base_of_stack = marpa_lua_gettop (L);
-
-    marpa_luaL_checkstack (L, 20, "dummyup_tree");
-
-    marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, slr_lua_ref);
-    /* Lua stack: [ slr_table ] */
-    slr_object_ix = marpa_lua_gettop (L);
-
-    marpa_lua_newtable (L);
-    tree_object_ix = marpa_lua_gettop (L);
-    marpa_lua_getglobal (L, "kollos");
-    marpa_lua_getfield (L, -1, "class_tree");
-    marpa_lua_setmetatable (L, tree_object_ix);
-    /* [ slr_table, tree_obj, kollos_tab ] */
-    marpa_lua_settop (L, tree_object_ix);
-    /* [ slr_table, tree_obj ] */
-
-    {
-        Scanless_R *slr;
-        Marpa_Grammar g;
-        marpa_lua_getfield (L, slr_object_ix, "lud");
-        /* Lua stack: [ slr_table, tree_obj, lud ] */
-
-        slr = marpa_lua_touserdata (L, -1);
-        marpa_lua_settop (L, tree_object_ix);
-        /* [ slr_table, tree_obj ] */
-
-        g = slr->slg->g1;
-        /* Add new g userdatum --
-         * it must own a reference to the Libmarpa
-         * grammar.
-         */
-        marpa_g_ref (g);
-        marpa_gen_grammar_ud (L, g);
-        /* [ slr_table, tree_obj, grammar_ud ] */
-        marpa_lua_setfield (L, tree_object_ix, "_libmarpa_g");
-        /* [ slr_table, tree_obj ] */
-    }
-
-    /* Add t userdatum here */
-    marpa_gen_tree_ud (L, t);
-    /* [ slr_table, tree_obj, tree_ud ] */
-    marpa_lua_setfield (L, tree_object_ix, "_libmarpa");
-    /* [ slr_table, tree_obj ] */
-
-    marpa_lua_setfield (L, slr_object_ix, "lmw_t");
-    marpa_lua_settop (L, base_of_stack);
-}
-
 MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin
 
 PROTOTYPES: DISABLE
@@ -6944,20 +6884,6 @@ PPCODE:
         XSRETURN_PV ("trace");
     }
 }
-
-void
-associate_tree( outer_slr, o_wrapper)
-    Outer_R *outer_slr;
-    O_Wrapper *o_wrapper;
-PPCODE:
-{
-  Marpa_Order o = o_wrapper->o;
-  Marpa_Tree t = marpa_t_new(o);
-
-  dummyup_tree(outer_slr->L, outer_slr->lua_ref, t);
-  XSRETURN_YES;
-}
-
 
 MODULE = Marpa::R3            PACKAGE = Marpa::R3::Lua
 
