@@ -1587,6 +1587,16 @@ the wrapper's point of view, marpa_r_alternative() always succeeds.
         return table.concat(result)
   ]==]
 
+### Constructors
+
+The standard constructors are generated indirectly, from a template.
+This saves a lot of repetition, which makes for easier reading in the
+long run.
+In the short run, however, you may want first to look at the bocage
+constructor.
+It is specified directly, which can be easier for a first reading.
+
+
   -- miranda: section object constructors
   --[==[ miranda: exec object constructors
         local result = {}
@@ -1667,6 +1677,15 @@ the wrapper's point of view, marpa_r_alternative() always succeeds.
         return table.concat(result, "\n")
   ]==]
 
+The bocage constructor takes an extra argument, so it's a special
+case.
+It's close to the standard constructor.
+The standard constructors are generated indirectly, from a template.
+The template saves repetition, but is harder on a first reading.
+This bocage constructor is specified directly,
+so you may find it easer to read it first.
+
+    -- miranda: section+ object constructors
     static int
     wrap_bocage_new (lua_State * L)
     {
@@ -1735,6 +1754,56 @@ the wrapper's point of view, marpa_r_alternative() always succeeds.
       marpa_lua_settop(L, bocage_stack_ix );
       /* [ base_table, class_table ] */
       return 1;
+    }
+
+```
+
+The grammar constructor is a special case, because its argument is
+a special "configuration" argument.
+
+    -- miranda: section+ object constructors
+    static int
+    wrap_grammar_new (lua_State * L)
+    {
+        int grammar_stack_ix;
+
+        if (0)
+            printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
+
+        marpa_lua_newtable (L);
+        /* [ grammar_table ] */
+        grammar_stack_ix = marpa_lua_gettop (L);
+        marpa_lua_getglobal (L, "kollos");
+        marpa_lua_getfield (L, -1, "class_grammar");
+        marpa_lua_setmetatable (L, grammar_stack_ix);
+        /* [ grammar_table ] */
+
+        {
+            Marpa_Config marpa_configuration;
+            Marpa_Grammar *grammar_ud =
+                (Marpa_Grammar *) marpa_lua_newuserdata (L,
+                sizeof (Marpa_Grammar));
+            /* [ grammar_table, class_ud ] */
+            marpa_lua_rawgetp (L, LUA_REGISTRYINDEX, &kollos_g_ud_mt_key);
+            /* [ grammar_table, class_ud ] */
+            marpa_lua_setmetatable (L, -2);
+            /* [ grammar_table, class_ud ] */
+
+            marpa_lua_pushvalue (L, -1);
+            marpa_lua_setfield (L, grammar_stack_ix, "_libmarpa");
+            marpa_lua_setfield (L, grammar_stack_ix, "_libmarpa_g");
+
+            marpa_c_init (&marpa_configuration);
+            *grammar_ud = marpa_g_new (&marpa_configuration);
+            if (!*grammar_ud) {
+                libmarpa_error_handle (L, grammar_stack_ix, "marpa_g_new()");
+                return 0;
+            }
+        }
+
+        marpa_lua_settop (L, grammar_stack_ix);
+        /* [ grammar_table ] */
+        return 1;
     }
 
 ```
@@ -2438,74 +2507,6 @@ Set "strict" globals, using code taken from strict.lua.
         /* [ userdata, metatable ] */
         marpa_lua_setmetatable (L, -2);
         /* [ userdata ] */
-    }
-
-I'm not sure I use this Libmarpa grammar wrapper constructor.
-It might be deleted after development.
-
-`wrap_grammar_new()`'s second argument is for development.
-The intent is, eventually, for Kollos to create all its Libmarpa
-grammars inside `wrap_grammar_new()`.
-Kollos takes ownership of `g`, so the Libmarpa grammar must
-have a reference to transfer
-to `wrap_grammar_new()`.
-
-    -- miranda: section+ grammar object non-standard wrappers
-
-    static int
-    wrap_grammar_new (lua_State * L)
-    {
-      /* [ grammar_table ] */
-      const int grammar_stack_ix = 1;
-      if (0)
-        printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
-
-      /* expecting a table */
-      if (1)
-        {
-          marpa_luaL_checktype(L, grammar_stack_ix, LUA_TTABLE);
-        }
-
-      /* stack is [ grammar_table ] */
-      {
-        Marpa_Config marpa_config;
-        Marpa_Grammar *p_g;
-        int result;
-        /* [ grammar_table ] */
-        p_g = (Marpa_Grammar *) marpa_lua_newuserdata (L, sizeof (Marpa_Grammar));
-        /* [ grammar_table, userdata ] */
-        marpa_lua_rawgetp (L, LUA_REGISTRYINDEX, &kollos_g_ud_mt_key);
-        marpa_lua_setmetatable (L, -2);
-        /* [ grammar_table, userdata ] */
-
-        /* dup top of stack */
-        marpa_lua_pushvalue (L, -1);
-        /* [ grammar_table, userdata, userdata ] */
-        marpa_lua_setfield (L, grammar_stack_ix, "_libmarpa");
-        /* [ grammar_table, userdata ] */
-        marpa_lua_setfield (L, grammar_stack_ix, "_libmarpa_g");
-        /* [ grammar_table ] */
-
-        marpa_c_init (&marpa_config);
-        *p_g = marpa_g_new (&marpa_config);
-        if (!*p_g)
-          {
-            const Marpa_Error_Code marpa_error = marpa_c_error (&marpa_config, NULL);
-            libmarpa_error_code_handle(L, marpa_error, "marpa_g_new()");
-            return 0;
-          }
-        result = marpa_g_force_valued (*p_g);
-        if (result < 0)
-          {
-            libmarpa_error_handle(L, grammar_stack_ix,
-                                    "marpa_g_force_valued()");
-            return 0;
-          }
-        if (0)
-          printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
-        /* [ grammar_table ] */
-        return 1;
-      }
     }
 
 `dummyup_grammar` is not Lua C API.
