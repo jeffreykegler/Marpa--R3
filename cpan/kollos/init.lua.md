@@ -1257,6 +1257,8 @@ It should free all memory associated with the valuation.
       v = "value",
     };
 
+    libmarpa_class_sequence = { 'g', 'r', 'b', 'o', 't', 'v'}
+
     function wrap_libmarpa_method(signature)
        local arg_count = math.floor(#signature/2)
        local function_name = signature[1]
@@ -1585,6 +1587,156 @@ the wrapper's point of view, marpa_r_alternative() always succeeds.
         return table.concat(result)
   ]==]
 
+  -- miranda: section object constructors
+  --[==[ miranda: exec object constructors
+        local result = {}
+        local template = [[
+        |static int
+        |wrap_!NAME!_new (lua_State * L)
+        |{
+        |  const int !BASE_NAME!_stack_ix = 1;
+        |  int !NAME!_stack_ix;
+        |
+        |  if (0)
+        |    printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
+        |  if (1)
+        |    {
+        |      marpa_luaL_checktype(L, !BASE_NAME!_stack_ix, LUA_TTABLE);
+        |    }
+        |
+        |  marpa_lua_newtable(L);
+        |  /* [ base_table, class_table ] */
+        |  !NAME!_stack_ix = marpa_lua_gettop(L);
+        |  marpa_lua_getglobal (L, "kollos");
+        |  marpa_lua_getfield (L, -1, "class_!NAME!");
+        |  marpa_lua_setmetatable (L, !NAME!_stack_ix);
+        |  /* [ base_table, class_table ] */
+        |
+        |  {
+        |    !BASE_TYPE! *!BASE_NAME!_ud;
+        |
+        |    !TYPE! *!NAME!_ud =
+        |      (!TYPE! *) marpa_lua_newuserdata (L, sizeof (!TYPE!));
+        |    /* [ base_table, class_table, class_ud ] */
+        |    marpa_lua_rawgetp (L, LUA_REGISTRYINDEX, &kollos_!LETTER!_ud_mt_key);
+        |    /* [ class_table, class_ud, class_ud_mt ] */
+        |    marpa_lua_setmetatable (L, -2);
+        |    /* [ class_table, class_ud ] */
+        |
+        |    marpa_lua_setfield (L, !NAME!_stack_ix, "_libmarpa");
+        |    marpa_lua_getfield (L, !BASE_NAME!_stack_ix, "_libmarpa_g");
+        |    marpa_lua_setfield (L, !NAME!_stack_ix, "_libmarpa_g");
+        |    marpa_lua_getfield (L, !BASE_NAME!_stack_ix, "_libmarpa");
+        |    !BASE_NAME!_ud = (!BASE_TYPE! *) marpa_lua_touserdata (L, -1);
+        |
+        |    *!NAME!_ud = marpa_!LETTER!_new (*!BASE_NAME!_ud);
+        |    if (!*!NAME!_ud)
+        |      {
+        |        libmarpa_error_handle (L, !NAME!_stack_ix, "marpa_!LETTER!_new()");
+        |        return 0;
+        |      }
+        |  }
+        |
+        |  if (0)
+        |    printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
+        |  marpa_lua_settop(L, !NAME!_stack_ix );
+        |  /* [ base_table, class_table ] */
+        |  return 1;
+        |}
+        ]]
+        for class_ix = 1, (#libmarpa_class_sequence - 1) do
+            local class_letter = libmarpa_class_sequence[class_ix+1]
+            -- bocage constructor is special case
+            if class_letter == 'b' then goto NEXT_CLASS end
+            local class_name = libmarpa_class_name[class_letter]
+            local class_type = libmarpa_class_type[class_letter]
+            local base_class_letter = libmarpa_class_sequence[class_ix]
+            local base_class_name = libmarpa_class_name[base_class_letter]
+            local base_class_type = libmarpa_class_type[base_class_letter]
+            local this_piece =
+                pipe_dedent(template)
+                   :gsub("!BASE_NAME!", base_class_name)
+                   :gsub("!BASE_TYPE!", base_class_type)
+                   :gsub("!BASE_LETTER!", base_class_letter)
+                   :gsub("!NAME!", class_name)
+                   :gsub("!TYPE!", class_type)
+                   :gsub("!LETTER!", class_letter)
+            result[#result+1] = this_piece
+            ::NEXT_CLASS::
+        end
+        return table.concat(result, "\n")
+  ]==]
+
+    static int
+    wrap_bocage_new (lua_State * L)
+    {
+      const int recce_stack_ix = 1;
+      const int ordinal_stack_ix = 2;
+      int bocage_stack_ix;
+
+      if (0)
+        printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
+      if (1)
+        {
+          marpa_luaL_checktype(L, recce_stack_ix, LUA_TTABLE);
+        }
+
+      marpa_lua_newtable(L);
+      /* [ base_table, class_table ] */
+      bocage_stack_ix = marpa_lua_gettop(L);
+      marpa_lua_getglobal (L, "kollos");
+      marpa_lua_getfield (L, -1, "class_bocage");
+      marpa_lua_setmetatable (L, bocage_stack_ix);
+      /* [ base_table, class_table ] */
+
+      {
+        Marpa_Recognizer *recce_ud;
+
+        Marpa_Bocage *bocage_ud =
+          (Marpa_Bocage *) marpa_lua_newuserdata (L, sizeof (Marpa_Bocage));
+        /* [ base_table, class_table, class_ud ] */
+        marpa_lua_rawgetp (L, LUA_REGISTRYINDEX, &kollos_b_ud_mt_key);
+        /* [ class_table, class_ud, class_ud_mt ] */
+        marpa_lua_setmetatable (L, -2);
+        /* [ class_table, class_ud ] */
+
+        marpa_lua_setfield (L, bocage_stack_ix, "_libmarpa");
+        marpa_lua_getfield (L, recce_stack_ix, "_libmarpa_g");
+        marpa_lua_setfield (L, bocage_stack_ix, "_libmarpa_g");
+        marpa_lua_getfield (L, recce_stack_ix, "_libmarpa");
+        recce_ud = (Marpa_Recognizer *) marpa_lua_touserdata (L, -1);
+
+        {
+          int is_ok = 0;
+          lua_Integer ordinal = -1;
+          if (marpa_lua_isnil(L, ordinal_stack_ix)) {
+             is_ok = 1;
+          } else {
+             ordinal = marpa_lua_tointegerx(L, ordinal_stack_ix, &is_ok);
+          }
+          if (!is_ok) {
+              marpa_luaL_error(L,
+                  "problem with bocage_new() arg #2, type was %s",
+                  marpa_luaL_typename(L, ordinal_stack_ix)
+              );
+          }
+          *bocage_ud = marpa_b_new (*recce_ud, (int)ordinal);
+        }
+
+        if (!*bocage_ud)
+          {
+            libmarpa_error_handle (L, bocage_stack_ix, "marpa_b_new()");
+            return 0;
+          }
+      }
+
+      if (0)
+        printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
+      marpa_lua_settop(L, bocage_stack_ix );
+      /* [ base_table, class_table ] */
+      return 1;
+    }
+
 ```
 
 ## The main Lua code file
@@ -1713,6 +1865,7 @@ Set "strict" globals, using code taken from strict.lua.
     -- miranda: insert tree object non-standard wrappers
     -- miranda: insert value object non-standard wrappers
     -- miranda: insert object userdata gc methods
+    -- miranda: insert object constructors
 
     -- miranda: insert standard libmarpa wrappers
     -- miranda: insert define marpa_luaopen_kollos method
@@ -2611,56 +2764,6 @@ so the caller must make sure that one is available.
 
     /* recognizer wrappers which need to be hand-written */
 
-    static int
-    wrap_recce_new (lua_State * L)
-    {
-      const int recce_stack_ix = 1;
-      const int grammar_stack_ix = 2;
-      if (0)
-        printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
-      /* [ recce_table, grammar_table ] */
-
-      marpa_luaL_checktype(L, recce_stack_ix, LUA_TTABLE);
-      marpa_luaL_checktype(L, grammar_stack_ix, LUA_TTABLE);
-
-      /* [ recce_table, grammar_table ] */
-      {
-        Marpa_Recognizer *recce_ud;
-        Marpa_Grammar *grammar_ud;
-
-        /* [ recce_table, grammar_table ] */
-        recce_ud =
-          (Marpa_Recognizer *) marpa_lua_newuserdata (L, sizeof (Marpa_Recognizer));
-        /* [ recce_table, , grammar_table, recce_ud ] */
-        marpa_lua_rawgetp (L, LUA_REGISTRYINDEX, &kollos_r_ud_mt_key);
-        /* [ recce_table, grammar_table, recce_ud, recce_ud_mt ] */
-        marpa_lua_setmetatable (L, -2);
-        /* [ recce_table, grammar_table, recce_ud ] */
-
-        marpa_lua_setfield (L, recce_stack_ix, "_libmarpa");
-        /* [ recce_table, grammar_table ] */
-        marpa_lua_getfield (L, grammar_stack_ix, "_libmarpa_g");
-        /* [ recce_table, grammar_table, g_ud ] */
-        grammar_ud = (Marpa_Grammar *) marpa_lua_touserdata (L, -1);
-        marpa_lua_setfield (L, recce_stack_ix, "_libmarpa_g");
-        /* [ recce_table, grammar_table ] */
-
-        *recce_ud = marpa_r_new (*grammar_ud);
-        if (!*recce_ud)
-          {
-            libmarpa_error_handle (L, grammar_stack_ix, "marpa_r_new()");
-            marpa_lua_pushnil (L);
-            return 1;
-          }
-      }
-      if (0)
-        printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
-      /* [ recce_table, grammar_table ] */
-      marpa_lua_pop (L, 1);
-      /* [ recce_table ] */
-      return 1;
-    }
-
     /* The grammar error code */
     static int wrap_progress_item(lua_State *L)
     {
@@ -2723,95 +2826,6 @@ so the caller must make sure that one is available.
         /* [ userdata ] */
     }
 
-    static int
-    wrap_bocage_new (lua_State * L)
-    {
-        const int bocage_stack_ix = 1;
-        const int recce_stack_ix = 2;
-        const int symbol_stack_ix = 3;
-        const int start_stack_ix = 4;
-        const int end_stack_ix = 5;
-        Marpa_Earley_Set_ID end_earley_set = -1;
-        int end_earley_set_is_nil = 0;
-
-        if (0)
-            printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
-        /* [ bocage_table, recce_table ] */
-        if (1) {
-          marpa_luaL_checktype(L, bocage_stack_ix, LUA_TTABLE);
-          marpa_luaL_checktype(L, recce_stack_ix, LUA_TTABLE);
-          marpa_luaL_checktype (L, symbol_stack_ix, LUA_TNIL);
-          marpa_luaL_checktype (L, start_stack_ix, LUA_TNIL);
-        }
-
-        if (marpa_lua_type (L, end_stack_ix) == LUA_TNIL) {
-            end_earley_set_is_nil = 1;
-        } else {
-            const lua_Integer es_arg =
-                marpa_luaL_checkinteger (L, end_stack_ix);
-            marpa_luaL_argcheck (L, (0 <= es_arg
-                    && es_arg <= (1<<30)), end_stack_ix,
-                "earley set index out of range");
-            end_earley_set = (Marpa_Earley_Set_ID) es_arg;
-        }
-        /* Make some stack space */
-        marpa_lua_settop (L, recce_stack_ix);
-
-        /* [ bocage_table, recce_table ] */
-        {
-            Marpa_Recognizer *recce_ud;
-            /* Important: the bocage does *not* hold a reference to
-               the recognizer, so it should not memoize the userdata
-               pointing to it. */
-
-            /* [ bocage_table, recce_table ] */
-            Marpa_Bocage *bocage_ud =
-                (Marpa_Bocage *) marpa_lua_newuserdata (L,
-                sizeof (Marpa_Bocage));
-            /* [ bocage_table, recce_table, bocage_ud ] */
-            marpa_lua_rawgetp (L, LUA_REGISTRYINDEX, &kollos_b_ud_mt_key);
-            /* [ bocage_table, recce_table, bocage_ud, bocage_ud_mt ] */
-            marpa_lua_setmetatable (L, -2);
-            /* [ bocage_table, recce_table, bocage_ud ] */
-
-            marpa_lua_setfield (L, bocage_stack_ix, "_libmarpa");
-            /* [ bocage_table, recce_table ] */
-            marpa_lua_getfield (L, recce_stack_ix, "_libmarpa_g");
-            /* [ recce_table, recce_table, g_ud ] */
-            marpa_lua_setfield (L, bocage_stack_ix, "_libmarpa_g");
-            /* [ bocage_table, recce_table ] */
-            marpa_lua_getfield (L, recce_stack_ix, "_libmarpa");
-            /* [ recce_table, recce_table, recce_ud ] */
-            recce_ud = (Marpa_Recognizer *) marpa_lua_touserdata (L, -1);
-            /* [ bocage_table, recce_table, recce_ud ] */
-
-            if (end_earley_set_is_nil) {
-                /* No error check -- always succeeds, say libmarpa docs */
-                end_earley_set = marpa_r_latest_earley_set (*recce_ud);
-            } else {
-                if (end_earley_set < 0) {
-                    libmarpa_error_handle (L, bocage_stack_ix,
-                        "bocage_new(): end earley set arg is negative");
-                    marpa_lua_pushnil (L);
-                    return 1;
-                }
-            }
-
-            *bocage_ud = marpa_b_new (*recce_ud, end_earley_set);
-            if (!*bocage_ud) {
-                libmarpa_error_handle (L, bocage_stack_ix, "marpa_b_new()");
-                marpa_lua_pushnil (L);
-                return 1;
-            }
-        }
-        if (0)
-            printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
-        /* [ bocage_table, recce_table, recce_ud ] */
-        marpa_lua_pop (L, 2);
-        /* [ bocage_table ] */
-        return 1;
-    }
-
     static const struct luaL_Reg bocage_methods[] = {
       { "error", lca_libmarpa_error },
       { NULL, NULL },
@@ -2838,61 +2852,6 @@ so the caller must make sure that one is available.
         /* [ userdata, metatable ] */
         marpa_lua_setmetatable (L, -2);
         /* [ userdata ] */
-    }
-
-    static int
-    wrap_order_new (lua_State * L)
-    {
-      const int bocage_stack_ix = 1;
-      int order_stack_ix;
-
-      if (0)
-        printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
-      /* [ order_table, bocage_table ] */
-      if (1)
-        {
-          marpa_luaL_checktype(L, bocage_stack_ix, LUA_TTABLE);
-        }
-
-      marpa_lua_newtable(L);
-      /* [ order_table ] */
-      order_stack_ix = marpa_lua_gettop(L);
-      marpa_lua_getglobal (L, "kollos");
-      marpa_lua_getfield (L, -1, "class_order");
-      marpa_lua_setmetatable (L, order_stack_ix);
-      /* [ order_table ] */
-
-      {
-        Marpa_Bocage *bocage_ud;
-
-        /* [ order_table ] */
-        Marpa_Order* order_ud =
-          (Marpa_Order *) marpa_lua_newuserdata (L, sizeof (Marpa_Order));
-        /* [ order_table, order_ud ] */
-        marpa_lua_rawgetp (L, LUA_REGISTRYINDEX, &kollos_o_ud_mt_key);
-        /* [ order_table, order_ud, order_ud_mt ] */
-        marpa_lua_setmetatable (L, -2);
-        /* [ order_table, order_ud ] */
-
-        marpa_lua_setfield (L, order_stack_ix, "_libmarpa");
-        marpa_lua_getfield (L, bocage_stack_ix, "_libmarpa_g");
-        marpa_lua_setfield (L, order_stack_ix, "_libmarpa_g");
-        marpa_lua_getfield (L, bocage_stack_ix, "_libmarpa");
-        bocage_ud = (Marpa_Bocage *) marpa_lua_touserdata (L, -1);
-
-        *order_ud = marpa_o_new (*bocage_ud);
-        if (!*order_ud)
-          {
-            libmarpa_error_handle (L, order_stack_ix, "marpa_o_new()");
-            return 0;
-          }
-      }
-
-      if (0)
-        printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
-      marpa_lua_pushvalue(L, order_stack_ix );
-      /* [ ..., order_table ] */
-      return 1;
     }
 
     static const struct luaL_Reg order_methods[] = {
@@ -2923,61 +2882,6 @@ so the caller must make sure that one is available.
         /* [ userdata ] */
     }
 
-    static int
-    wrap_tree_new (lua_State * L)
-    {
-      const int order_stack_ix = 1;
-      int tree_stack_ix;
-
-      if (0)
-        printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
-      /* [ tree_table, order_table ] */
-      marpa_luaL_checktype(L, order_stack_ix, LUA_TTABLE);
-
-      marpa_lua_newtable(L);
-      tree_stack_ix = marpa_lua_gettop(L);
-      marpa_lua_getglobal (L, "kollos");
-      marpa_lua_getfield (L, -1, "class_tree");
-      marpa_lua_setmetatable (L, tree_stack_ix);
-
-      /* [ tree_table, order_table ] */
-      {
-        Marpa_Order *order_ud;
-        /* Important: the tree does *not* hold a reference to
-             the recognizer, so it should not memoize the userdata
-             pointing to it. */
-
-        /* [ tree_table, order_table ] */
-        Marpa_Tree* tree_ud =
-          (Marpa_Tree *) marpa_lua_newuserdata (L, sizeof (Marpa_Tree));
-        /* [ tree_table, order_table, tree_ud ] */
-        marpa_lua_rawgetp (L, LUA_REGISTRYINDEX, &kollos_t_ud_mt_key);
-        /* [ tree_table, order_table, tree_ud, tree_ud_mt ] */
-        marpa_lua_setmetatable (L, -2);
-        /* [ tree_table, order_table, tree_ud ] */
-
-        marpa_lua_setfield (L, tree_stack_ix, "_libmarpa");
-        marpa_lua_getfield (L, order_stack_ix, "_libmarpa_g");
-        marpa_lua_setfield (L, tree_stack_ix, "_libmarpa_g");
-        marpa_lua_getfield (L, order_stack_ix, "_libmarpa");
-        order_ud = (Marpa_Order *) marpa_lua_touserdata (L, -1);
-        /* [ tree_table, order_table, order_ud ] */
-
-        *tree_ud = marpa_t_new (*order_ud);
-        if (!*tree_ud)
-          {
-            libmarpa_error_handle (L, tree_stack_ix, "marpa_t_new()");
-            return 0;
-          }
-      }
-      if (0)
-        printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
-      /* [ tree_table, order_table, order_ud ] */
-      marpa_lua_pop (L, 2);
-      /* [ tree_table ] */
-      return 1;
-    }
-
     static const struct luaL_Reg tree_methods[] = {
       { "error", lca_libmarpa_error },
       { NULL, NULL },
@@ -3004,57 +2908,6 @@ so the caller must make sure that one is available.
         /* [ userdata, metatable ] */
         marpa_lua_setmetatable (L, -2);
         /* [ userdata ] */
-    }
-
-    static int
-    wrap_value_new (lua_State * L)
-    {
-      const int tree_stack_ix = 1;
-      int value_stack_ix;
-
-      if (0)
-        printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
-      /* [ value_table, tree_table ] */
-      marpa_luaL_checktype(L, tree_stack_ix, LUA_TTABLE);
-
-      marpa_lua_newtable(L);
-      value_stack_ix = marpa_lua_gettop(L);
-      marpa_lua_getglobal (L, "kollos");
-      marpa_lua_getfield (L, -1, "class_value");
-      marpa_lua_setmetatable (L, value_stack_ix);
-
-      {
-        Marpa_Tree *tree_ud;
-        /* Important: the value does *not* hold a reference to
-             the recognizer, so it should not memoize the userdata
-             pointing to it. */
-
-        Marpa_Value* value_ud =
-          (Marpa_Value *) marpa_lua_newuserdata (L, sizeof (Marpa_Value));
-        /* [ ..., value_ud ] */
-        marpa_lua_rawgetp (L, LUA_REGISTRYINDEX, &kollos_v_ud_mt_key);
-        /* [ ..., value_ud, value_ud_mt ] */
-        marpa_lua_setmetatable (L, -2);
-        /* [ ..., value_ud ] */
-
-        marpa_lua_setfield (L, value_stack_ix, "_libmarpa");
-        marpa_lua_getfield (L, tree_stack_ix, "_libmarpa_g");
-        marpa_lua_setfield (L, value_stack_ix, "_libmarpa_g");
-        marpa_lua_getfield (L, tree_stack_ix, "_libmarpa");
-        tree_ud = (Marpa_Tree *) marpa_lua_touserdata (L, -1);
-        /* [ value_table, tree_table, tree_ud ] */
-
-        *value_ud = marpa_v_new (*tree_ud);
-        if (!*value_ud)
-          {
-            libmarpa_error_handle (L, value_stack_ix, "marpa_v_new()");
-            return 0;
-          }
-      }
-
-      marpa_lua_settop (L, value_stack_ix);
-      /* [ value_table ] */
-      return 1;
     }
 
     /* Returns ok, result,
