@@ -62,9 +62,11 @@ sub load_me
     local test_builder_loader = tostring(raw_test_builder_loader)
     local test_more_loader = tostring(raw_test_more_loader)
     if not Test then Test = {} end
-    Test.Builder = load(test_builder_loader)
+    local load_fn = load(test_builder_loader)
+    Test.Builder = load_fn()
     package.loaded['Test.Builder'] = Test.Builder
-    Test.More = load(test_more_loader)
+    load_fn = load(test_more_loader)
+    Test.More = load_fn()
     package.loaded['Test.More'] = Test.More
 END_OF_LUA
     $lua_interp->raw_exec($script,

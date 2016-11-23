@@ -1979,75 +1979,6 @@ Set "strict" globals, using code taken from strict.lua.
           printf("\n");  /* end the listing */
     }
 
-    static void dump_table(lua_State *L, int raw_table_index)
-    {
-        /* Original stack: [ ... ] */
-        const int table_index = marpa_lua_absindex(L, raw_table_index);
-        marpa_lua_pushnil(L);
-        /* [ ..., nil ] */
-        while (marpa_lua_next(L, table_index))
-        {
-            /* [ ..., key, value ] */
-            const int value_stack_ix = marpa_lua_gettop(L);
-            const int key_stack_ix = marpa_lua_gettop(L)+1;
-            /* Copy the key, because marpa_lua_tostring() can be destructive */
-            marpa_lua_pushvalue(L, -2);
-            /* [ ..., key, value, key_copy ] */
-            switch (marpa_lua_type(L, key_stack_ix)) {
-
-              case LUA_TSTRING:  /* strings */
-                printf("`%s'", marpa_lua_tostring(L, key_stack_ix));
-                break;
-
-              case LUA_TBOOLEAN:  /* booleans */
-                printf(marpa_lua_toboolean(L, key_stack_ix) ? "true" : "false");
-                break;
-
-              case LUA_TNUMBER:  /* numbers */
-                printf("%g", marpa_lua_tonumber(L, key_stack_ix));
-                break;
-
-              case LUA_TTABLE:  /* numbers */
-                printf("table %s", marpa_lua_tostring(L, key_stack_ix));
-                break;
-
-              default:  /* other values */
-                printf("%s", marpa_lua_typename(L, marpa_lua_type(L, key_stack_ix)));
-                break;
-
-            }
-            printf(" -> ");  /* end the listing */
-            switch (marpa_lua_type(L, value_stack_ix)) {
-
-              case LUA_TSTRING:  /* strings */
-                printf("`%s'", marpa_lua_tostring(L, value_stack_ix));
-                break;
-
-              case LUA_TBOOLEAN:  /* booleans */
-                printf(marpa_lua_toboolean(L, value_stack_ix) ? "true" : "false");
-                break;
-
-              case LUA_TNUMBER:  /* numbers */
-                printf("%g", marpa_lua_tonumber(L, value_stack_ix));
-                break;
-
-              case LUA_TTABLE:  /* numbers */
-                printf("table %s", marpa_lua_tostring(L, value_stack_ix));
-                break;
-
-              default:  /* other values */
-                printf("%s", marpa_lua_typename(L, marpa_lua_type(L, value_stack_ix)));
-                break;
-
-            }
-            printf("\n");  /* end the listing */
-            /* [ ..., key, value, key_copy ] */
-            marpa_lua_pop(L, 2);
-            /* [ ..., key ] */
-        }
-        /* Back to original stack: [ ... ] */
-    }
-
     -- miranda: section private error code declarations
     /* error codes */
 
@@ -2285,6 +2216,15 @@ Set "strict" globals, using code taken from strict.lua.
             push_error_object (L, code, details);
             return 1;
         }
+    }
+
+    static int lca_throw_set(lua_State* L)
+    {
+        const int flag_stack_ix = 1;
+        const int flag = marpa_lua_toboolean(L, flag_stack_ix);
+        marpa_lua_pushboolean(L, flag);
+        marpa_lua_setglobal(L, "throw");
+        return 0;
     }
 
     /* Return string equivalent of error argument
@@ -2584,25 +2524,6 @@ so the caller must make sure that one is available.
     }
 
     -- miranda: section+ grammar object non-standard wrappers
-
-    /* The grammar error code */
-    static int wrap_grammar_error(lua_State *L)
-    {
-       /* [ grammar_object ] */
-      const int grammar_stack_ix = 1;
-      Marpa_Grammar *p_g;
-      Marpa_Error_Code marpa_error;
-      const char *error_string = NULL;
-
-      marpa_lua_getfield (L, grammar_stack_ix, "_libmarpa");
-      /* [ grammar_object, grammar_ud ] */
-      p_g = (Marpa_Grammar *) marpa_lua_touserdata (L, -1);
-      marpa_error = marpa_g_error(*p_g, &error_string);
-      marpa_lua_pushinteger(L, (lua_Integer)marpa_error);
-      marpa_lua_pushstring(L, error_string);
-      /* [ grammar_object, grammar_ud, error_code, error_string ] */
-      return 2;
-    }
 
     /* The C wrapper for Libmarpa event reading.
        It assumes we just want all of them.
@@ -3114,11 +3035,11 @@ so the caller must make sure that one is available.
           "Header version does not match expected version";
         /* Make sure the header is from the version we want */
         if (MARPA_MAJOR_VERSION != EXPECTED_LIBMARPA_MAJOR)
-          luif_err_throw2 (L, LUIF_ERR_MAJOR_VERSION_MISMATCH, header_mismatch);
+          luif_err_throw2 (L, KOLLOS_ERR_MAJOR_VERSION_MISMATCH, header_mismatch);
         if (MARPA_MINOR_VERSION != EXPECTED_LIBMARPA_MINOR)
-          luif_err_throw2 (L, LUIF_ERR_MINOR_VERSION_MISMATCH, header_mismatch);
+          luif_err_throw2 (L, KOLLOS_ERR_MINOR_VERSION_MISMATCH, header_mismatch);
         if (MARPA_MICRO_VERSION != EXPECTED_LIBMARPA_MICRO)
-          luif_err_throw2 (L, LUIF_ERR_MICRO_VERSION_MISMATCH, header_mismatch);
+          luif_err_throw2 (L, KOLLOS_ERR_MICRO_VERSION_MISMATCH, header_mismatch);
       }
 
       {
@@ -3130,11 +3051,11 @@ so the caller must make sure that one is available.
         if (error_code != MARPA_ERR_NONE)
           luif_err_throw2 (L, error_code, "marpa_version() failed");
         if (version[0] != EXPECTED_LIBMARPA_MAJOR)
-          luif_err_throw2 (L, LUIF_ERR_MAJOR_VERSION_MISMATCH, library_mismatch);
+          luif_err_throw2 (L, KOLLOS_ERR_MAJOR_VERSION_MISMATCH, library_mismatch);
         if (version[1] != EXPECTED_LIBMARPA_MINOR)
-          luif_err_throw2 (L, LUIF_ERR_MINOR_VERSION_MISMATCH, library_mismatch);
+          luif_err_throw2 (L, KOLLOS_ERR_MINOR_VERSION_MISMATCH, library_mismatch);
         if (version[2] != EXPECTED_LIBMARPA_MICRO)
-          luif_err_throw2 (L, LUIF_ERR_MICRO_VERSION_MISMATCH, library_mismatch);
+          luif_err_throw2 (L, KOLLOS_ERR_MICRO_VERSION_MISMATCH, library_mismatch);
       }
 
         marpa_lua_newtable(L);
@@ -3240,17 +3161,19 @@ so the caller must make sure that one is available.
         marpa_lua_pushcfunction(L, l_event_description_by_code);
         marpa_lua_setfield(L, kollos_table_stack_ix, "event_description");
 
-        marpa_lua_pushcfunction(L, wrap_grammar_error);
-        marpa_lua_setfield(L, kollos_table_stack_ix, "grammar_error");
+        marpa_lua_pushcfunction(L, lca_throw_set);
+        marpa_lua_setfield(L, kollos_table_stack_ix, "throw_set");
+
+        /* In Libmarpa object sequence order */
+
+        marpa_lua_pushcfunction(L, wrap_grammar_new);
+        marpa_lua_setfield(L, kollos_table_stack_ix, "grammar_new");
 
         marpa_lua_pushcfunction(L, wrap_grammar_event);
         marpa_lua_setfield(L, kollos_table_stack_ix, "grammar_event");
 
         marpa_lua_pushcfunction(L, wrap_grammar_events);
         marpa_lua_setfield(L, kollos_table_stack_ix, "grammar_events");
-
-        marpa_lua_pushcfunction(L, wrap_grammar_new);
-        marpa_lua_setfield(L, kollos_table_stack_ix, "grammar_new");
 
         marpa_lua_pushcfunction(L, wrap_grammar_rule_new);
         marpa_lua_setfield(L, kollos_table_stack_ix, "grammar_rule_new");
@@ -3295,7 +3218,6 @@ so the caller must make sure that one is available.
                                                KOLLOS_MIN_ERROR_CODE].mnemonic);
             }
         }
-          /* if (1) dump_table(L, -1); */
 
         /* [ kollos, error_code_table ] */
         marpa_lua_setfield (L, kollos_table_stack_ix, "error_code_by_name");
@@ -3314,7 +3236,6 @@ so the caller must make sure that one is available.
                                                  LIBMARPA_MIN_EVENT_CODE].mnemonic);
             }
         }
-          /* if (1) dump_table(L, -1); */
 
         /* [ kollos, event_code_table ] */
         marpa_lua_setfield (L, kollos_table_stack_ix, "event_code_by_name");
@@ -3327,9 +3248,6 @@ so the caller must make sure that one is available.
 
     /* [ kollos ] */
     -- miranda: insert create sandbox table
-
-      /* For debugging */
-      if (0) dump_table(L, -1);
 
       marpa_lua_settop(L, kollos_table_stack_ix);
       /* [ kollos ] */

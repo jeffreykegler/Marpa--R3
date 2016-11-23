@@ -86,7 +86,7 @@ for i = 0, max_code do
     else
        io.write(
 	   string.format(
-	       '    { %d, "LUIF_EVENT_RESERVED", "Unknown Libmarpa event %d" },\n',
+	       '    { %d, "KOLLOS_EVENT_RESERVED", "Unknown Libmarpa event %d" },\n',
 	       i, i
 	   )
        )

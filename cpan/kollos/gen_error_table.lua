@@ -55,7 +55,7 @@ do
 	  local code = tonumber(raw_code)
 	  if description == nil then return nil, "Bad line in error code file ", line end
 	  if code > max_code then max_code = code end
-	  local mnemonic = 'LUIF_ERR_' .. raw_mnemonic
+	  local mnemonic = 'KOLLOS_ERR_' .. raw_mnemonic
 	  code_mnemonics[code] = mnemonic
 	  code_lines[code] = string.format( '   { %d, %s, %s },',
 	      code,
@@ -87,7 +87,7 @@ do
       else
 	 io.write(
 	     string.format(
-		 '    { %d, "LUIF_ERROR_RESERVED", "Unknown Libmarpa error %d" },\n',
+		 '    { %d, "KOLLOS_ERROR_RESERVED", "Unknown Libmarpa error %d" },\n',
 		 i, i
 	     )
 	 )
@@ -118,11 +118,11 @@ do
       if code > max_code then max_code = code end
   end
 
-  -- LUIF_ERR_RESERVED_200 is a place-holder , not expected to be actually used
-  luif_error_add( 200, "LUIF_ERR_RESERVED_200", "Unexpected Kollos error: 200")
-  luif_error_add( 201, "LUIF_ERR_LUA_VERSION", "Bad Lua version")
-  luif_error_add( 202, "LUIF_ERR_LIBMARPA_HEADER_VERSION_MISMATCH", "Libmarpa header does not match expected version")
-  luif_error_add( 203, "LUIF_ERR_LIBMARPA_LIBRARY_VERSION_MISMATCH", "Libmarpa library does not match expected version")
+  -- KOLLOS_ERR_RESERVED_200 is a place-holder , not expected to be actually used
+  luif_error_add( 200, "KOLLOS_ERR_RESERVED_200", "Unexpected Kollos error: 200")
+  luif_error_add( 201, "KOLLOS_ERR_LUA_VERSION", "Bad Lua version")
+  luif_error_add( 202, "KOLLOS_ERR_LIBMARPA_HEADER_VERSION_MISMATCH", "Libmarpa header does not match expected version")
+  luif_error_add( 203, "KOLLOS_ERR_LIBMARPA_LIBRARY_VERSION_MISMATCH", "Libmarpa library does not match expected version")
 
   io.write('  #define KOLLOS_MIN_ERROR_CODE ' .. min_code .. '\n')
   io.write('  #define KOLLOS_MAX_ERROR_CODE ' .. max_code .. '\n\n')
@@ -145,7 +145,7 @@ do
       else
 	 io.write(
 	     string.format(
-		 '    { %d, "LUIF_ERROR_RESERVED", "Unknown Kollos error %d" },\n',
+		 '    { %d, "KOLLOS_ERROR_RESERVED", "Unknown Kollos error %d" },\n',
 		 i, i
 	     )
 	 )

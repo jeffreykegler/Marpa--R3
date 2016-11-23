@@ -195,31 +195,41 @@ Marpa::R3::Lua::Test::More::load_me($marpa_lua);
 
 
 $grammar = $recce = $bocage = undef;
-$grammar = Marpa::R3::Thin::G->new({});
-$grammar->force_valued();
 
-# Marpa::R3::Display
-# name: Thin throw_set() example
+my $result = $marpa_lua->exec(<<'END_OF_LUA');
+     local grammar = kollos.grammar_new()
+     grammar:force_valued()
+     kollos.throw_set()
+     -- print(inspect(_G))
+     local error_object = grammar:error()
+     kollos.throw_set(true)
+     local error_code = error_object.code
+     Test.More.is(error_object.code, 0, 'Grammar error code')
+     local error_name = kollos.error_name(error_code)
+     Test.More.is(error_name, 'KOLLOS_ERR_NONE', 'Grammar error name' )
+     local error_description = kollos.error_description(error_code)
+     Test.More.is(error_description, 'No error', 'Grammar error description' )
+     local S = grammar:symbol_new()
+     local a = grammar:symbol_new()
+     local sep = grammar:symbol_new()
+     grammar:start_symbol_set(S)
+END_OF_LUA
 
-$grammar->throw_set(0);
-
-# Marpa::R3::Display::End
-
-# Turn it right back on, for safety's sake
-$grammar->throw_set(1);
+# $grammar = Marpa::R3::Thin::G->new({});
+# $grammar->force_valued();
 
 # Marpa::R3::Display
 # name: Thin grammar error methods
 
-my ( $error_code, $error_description ) = $grammar->error();
-my @error_names = Marpa::R3::Thin::error_names();
-my $error_name = $error_names[$error_code];
+# my ( $error_code, $error_description ) = $grammar->error();
+# my @error_names = Marpa::R3::Thin::error_names();
+# my $error_name = $error_names[$error_code];
 
-# Marpa::R3::Display::End
+# Test::More::is( $error_code, 0, 'Grammar error code' );
+# Test::More::is( $error_name, 'MARPA_ERR_NONE', 'Grammar error name' );
+# Test::More::is( $error_description, 'No error', 'Grammar error description' );
 
-Test::More::is( $error_code, 0, 'Grammar error code' );
-Test::More::is( $error_name, 'MARPA_ERR_NONE', 'Grammar error name' );
-Test::More::is( $error_description, 'No error', 'Grammar error description' );
+exit(0);
 
 $symbol_S = $grammar->symbol_new();
 my $symbol_a = $grammar->symbol_new();
@@ -309,8 +319,8 @@ $bocage        = Marpa::R3::Thin::B->thin_new( $recce, $latest_earley_set_ID );
 
 $bocage->dummyup_order($marpa_lua, "order");
 
-my $result = $marpa_lua->exec(<<'END_OF_LUA');
-    print(inspect(_G))
+$result = $marpa_lua->exec(<<'END_OF_LUA');
+    -- print(inspect(_G))
     local tree = kollos.tree_new(order)
     tree:next()
     local value = kollos.value_new(tree)
