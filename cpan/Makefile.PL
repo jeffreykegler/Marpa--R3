@@ -363,11 +363,21 @@ all :: lib\Marpa\R3\Lua\Init.pm
 
 all :: lib\Marpa\R3\Lua\Inspect.pm
 
+all :: inc\Marpa\R3\Lua\Test\Builder.pm
+
+all :: inc\Marpa\R3\Lua\Test\More.pm
+
 lib\Marpa\R3\Lua\Inspect.pm: kollos\inspect.lua lib\Marpa\R3\Lua\Inspect.PL
 	$(PERLRUN) lib\Marpa\R3\Lua\Inspect.PL lib\Marpa\R3\Lua\Inspect.pm
 
 lib\Marpa\R3\Lua\Init.pm: kollos\init.lua lib\Marpa\R3\Lua\Init.PL
 	$(PERLRUN) lib\Marpa\R3\Lua\Init.PL lib\Marpa\R3\Lua\Init.pm
+
+inc\Marpa\R3\Lua\Test\Builder.pm: inc\Marpa\R3\Lua\Test\Builder.lua inc\Marpa\R3\Lua\Test\Builder.PL
+	$(PERLRUN) inc\Marpa\R3\Lua\Test\Builder.PL inc\Marpa\R3\Lua\Test\Builder.pm
+
+inc\Marpa\R3\Lua\Test\More.pm: inc\Marpa\R3\Lua\Test\More.lua inc\Marpa\R3\Lua\Test\More.PL
+	$(PERLRUN) inc\Marpa\R3\Lua\Test\More.PL inc\Marpa\R3\Lua\Test\More.pm
 
 END_OF_POSTAMBLE_PIECE
 }
@@ -377,11 +387,21 @@ all :: lib/Marpa/R3/Lua/Init.pm
 
 all :: lib/Marpa/R3/Lua/Inspect.pm
 
+all :: inc/Marpa/R3/Lua/Test/Builder.pm
+
+all :: inc/Marpa/R3/Lua/Test/More.pm
+
 lib/Marpa/R3/Lua/Inspect.pm: kollos/inspect.lua lib/Marpa/R3/Lua/Inspect.PL
 	$(PERLRUN) lib/Marpa/R3/Lua/Inspect.PL lib/Marpa/R3/Lua/Inspect.pm
 
 lib/Marpa/R3/Lua/Init.pm: kollos/init.lua lib/Marpa/R3/Lua/Init.PL
 	$(PERLRUN) lib/Marpa/R3/Lua/Init.PL lib/Marpa/R3/Lua/Init.pm
+
+inc/Marpa/R3/Lua/Test/Builder.pm: inc/Marpa/R3/Lua/Test/Builder.lua inc/Marpa/R3/Lua/Test/Builder.PL
+	$(PERLRUN) inc/Marpa/R3/Lua/Test/Builder.PL inc/Marpa/R3/Lua/Test/Builder.pm
+
+inc/Marpa/R3/Lua/Test/More.pm: inc/Marpa/R3/Lua/Test/More.lua inc/Marpa/R3/Lua/Test/More.PL
+	$(PERLRUN) inc/Marpa/R3/Lua/Test/More.PL inc/Marpa/R3/Lua/Test/More.pm
 
 END_OF_POSTAMBLE_PIECE
 }

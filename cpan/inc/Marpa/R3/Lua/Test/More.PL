@@ -35,6 +35,8 @@ use 5.010001;
 use warnings;
 use strict;
 
+use Marpa::R3::Lua::Test::Builder;
+
 use vars qw($VERSION $STRING_VERSION);
 $VERSION        = '4.001_024';
 $STRING_VERSION = $VERSION;

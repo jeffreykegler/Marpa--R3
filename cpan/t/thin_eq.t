@@ -24,6 +24,7 @@ use Test::More tests => 12;
 
 use lib 'inc';
 use Marpa::R3::Test;
+use Marpa::R3::Lua::Test::More;
 use English qw( -no_match_vars );
 use Fatal qw( close open );
 use Marpa::R3;
