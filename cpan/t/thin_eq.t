@@ -189,7 +189,10 @@ for my $actual_value (@actual_values) {
 # For the error methods, start clean,
 # with a new, trivial grammar
 
-$marpa_lua = undef;
+$marpa_lua = Marpa::R3::Lua->new();
+$marpa_lua->raw_exec($Marpa::R3::Lua::Inspect::load);
+Marpa::R3::Lua::Test::More::load_me($marpa_lua);
+
 
 $grammar = $recce = $bocage = undef;
 $grammar = Marpa::R3::Thin::G->new({});
@@ -303,9 +306,6 @@ $recce->alternative( $symbol_a, 1, 1 );
 $recce->earleme_complete();
 $latest_earley_set_ID = $recce->latest_earley_set();
 $bocage        = Marpa::R3::Thin::B->thin_new( $recce, $latest_earley_set_ID );
-
-$marpa_lua = Marpa::R3::Lua->new();
-$marpa_lua->raw_exec($Marpa::R3::Lua::Inspect::load);
 
 $bocage->dummyup_order($marpa_lua, "order");
 

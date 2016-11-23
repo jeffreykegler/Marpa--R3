@@ -40,7 +40,7 @@ $VERSION        = '4.001_024';
 $STRING_VERSION = $VERSION;
 $VERSION        = eval $VERSION;
 
-$Marpa::R3::Lua::Test::Builder::load = <<'END_OF_LUA';
+$Marpa::R3::Lua::Test::Builder::loader = <<'END_OF_LUA';
 END_OF_CHUNK
 
 my $lua_file_name  = File::Spec->catfile(qw(inc Marpa R3 Lua Test Builder.lua));

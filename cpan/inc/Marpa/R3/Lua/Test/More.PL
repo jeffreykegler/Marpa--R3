@@ -42,7 +42,7 @@ $VERSION        = '4.001_024';
 $STRING_VERSION = $VERSION;
 $VERSION        = eval $VERSION;
 
-$Marpa::R3::Lua::Test::More::load = <<'END_OF_LUA';
+$Marpa::R3::Lua::Test::More::loader = <<'END_OF_LUA';
 END_OF_CHUNK
 
 my $lua_file_name  = File::Spec->catfile(qw(inc Marpa R3 Lua Test More.lua));
@@ -53,6 +53,24 @@ close $in_fh;
 
 print {$out_fh} <<'END_OF_CHUNK';
 END_OF_LUA
+
+sub load_me
+{
+    my ($lua_interp) = @_;
+    state $script = <<'END_OF_LUA';
+    local raw_test_builder_loader, raw_test_more_loader = ...
+    local test_builder_loader = tostring(raw_test_builder_loader)
+    local test_more_loader = tostring(raw_test_more_loader)
+    if not Test then Test = {} end
+    Test.Builder = load(test_builder_loader)
+    package.loaded['Test.Builder'] = Test.Builder
+    Test.More = load(test_more_loader)
+    package.loaded['Test.More'] = Test.More
+END_OF_LUA
+    $lua_interp->raw_exec($script,
+    $Marpa::R3::Lua::Test::Builder::loader,
+    $Marpa::R3::Lua::Test::More::loader)
+}
 
 1;
 END_OF_CHUNK
