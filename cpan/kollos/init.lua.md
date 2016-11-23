@@ -1763,7 +1763,7 @@ a special "configuration" argument.
 
     -- miranda: section+ object constructors
     static int
-    wrap_grammar_new (lua_State * L)
+    lca_grammar_new (lua_State * L)
     {
         int grammar_stack_ix;
 
@@ -2528,7 +2528,7 @@ so the caller must make sure that one is available.
     /* The C wrapper for Libmarpa event reading.
        It assumes we just want all of them.
      */
-    static int wrap_grammar_events(lua_State *L)
+    static int lca_grammar_events(lua_State *L)
     {
       /* [ grammar_object ] */
       const int grammar_stack_ix = 1;
@@ -2583,7 +2583,7 @@ so the caller must make sure that one is available.
     /* Another C wrapper for Libmarpa event reading.
        It assumes we want them one by one.
      */
-    static int wrap_grammar_event(lua_State *L)
+    static int lca_grammar_event(lua_State *L)
     {
       /* [ grammar_object ] */
       const int grammar_stack_ix = 1;
@@ -2608,19 +2608,24 @@ so the caller must make sure that one is available.
       /* [ grammar_object, grammar_ud, event_type, event_value ] */
       return 2;
     }
-    /* Rule RHS limited to 7 symbols --
-     * 7 because I can encode dot position in 3 bit
-     */
-    static int wrap_grammar_rule_new(lua_State *L)
+
+`lca_grammar_rule_new` wraps the Libmarpa method `marpa_g_rule_new()`.
+If the rule is 7 symbols or fewer, I put it on the stack.  As an old
+kernel driver programmer, I was trained to avoid putting even small
+arrays on the stack, but one of this size should be safe on anything
+like close to a modern architecture.
+
+Perhaps I will eventually limit Libmarpa's
+rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
+
+    -- miranda: section+ grammar object non-standard wrappers
+
+    static int lca_grammar_rule_new(lua_State *L)
     {
         Marpa_Grammar *p_g;
         Marpa_Rule_ID result;
         Marpa_Symbol_ID lhs;
-        /* As an old kernel driver programmer, I
-         * don't like to put arrays on the stack,
-         * but one of this size should be safe on
-         * anything like a modern architecture.
-         */
+
         Marpa_Symbol_ID rhs[2];
         int rhs_length;
         /* [ grammar_object, lhs, rhs ... ] */
@@ -2656,8 +2661,146 @@ so the caller must make sure that one is available.
         return 1;
     }
 
+`lca_grammar_sequence_new` wraps the Libmarpa method `marpa_g_sequence_new()`.
+If the rule is 7 symbols or fewer, I put it on the stack.  As an old
+kernel driver programmer, I was trained to avoid putting even small
+arrays on the stack, but one of this size should be safe on anything
+like close to a modern architecture.
+
+Perhaps I will eventually limit Libmarpa's
+rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
+
+    -- miranda: section+ grammar object non-standard wrappers
+
+    static int lca_grammar_sequence_new(lua_State *L)
+    {
+        Marpa_Grammar *p_g;
+        Marpa_Rule_ID result;
+        lua_Integer lhs = -1;
+        lua_Integer rhs = -1;
+        lua_Integer separator = -1;
+        lua_Integer min = 1;
+        int proper = 0;
+        const int grammar_stack_ix = 1;
+        const int args_stack_ix = 2;
+
+        marpa_luaL_checktype (L, grammar_stack_ix, LUA_TTABLE);
+        marpa_luaL_checktype (L, args_stack_ix, LUA_TTABLE);
+
+        marpa_lua_pushnil (L);
+        /* [ ..., nil ] */
+        while (marpa_lua_next (L, args_stack_ix)) {
+            /* [ ..., key, value ] */
+            const char *string_key;
+            const int value_stack_ix = marpa_lua_gettop (L);
+            const int key_stack_ix = value_stack_ix - 1;
+            int is_int = 0;
+            switch (marpa_lua_type (L, key_stack_ix)) {
+
+            case LUA_TSTRING:      /* strings */
+                /* lua_tostring() is safe because arg is always a string */
+                string_key = marpa_lua_tostring (L, key_stack_ix);
+                if (!strcmp (string_key, "min")) {
+                    min = marpa_lua_tointegerx (L, value_stack_ix, &is_int);
+                    if (!is_int) {
+                        return marpa_luaL_error (L,
+                            "grammar:sequence_new() value of 'min' must be numeric");
+                    }
+                    goto NEXT_ELEMENT;
+                }
+                if (!strcmp (string_key, "proper")) {
+                    proper = marpa_lua_toboolean (L, value_stack_ix);
+                    goto NEXT_ELEMENT;
+                }
+                if (!strcmp (string_key, "separator")) {
+                    separator =
+                        marpa_lua_tointegerx (L, value_stack_ix, &is_int);
+                    if (!is_int) {
+                        return marpa_luaL_error (L,
+                            "grammar:sequence_new() value of 'separator' must be a symbol ID");
+                    }
+                    goto NEXT_ELEMENT;
+                }
+                return marpa_luaL_error (L,
+                    "grammar:sequence_new() bad string key (%s) in arg table",
+                    string_key);
+
+            case LUA_TNUMBER:      /* numbers */
+                {
+                    const lua_Integer ix =
+                        marpa_lua_tointeger (L, key_stack_ix);
+                    switch (ix) {
+                    case 1:
+                        lhs =
+                            marpa_lua_tointegerx (L, value_stack_ix, &is_int);
+                        if (!is_int || lhs < 0) {
+                            return marpa_luaL_error (L,
+                                "grammar:sequence_new() LHS must be a valid symbol ID");
+                        }
+                        goto NEXT_ELEMENT;
+                    case 2:
+                        rhs =
+                            marpa_lua_tointegerx (L, value_stack_ix, &is_int);
+                        if (!is_int || rhs < 0) {
+                            return marpa_luaL_error (L,
+                                "grammar:sequence_new() RHS must be a valid symbol ID");
+                        }
+                        goto NEXT_ELEMENT;
+                    default:
+                        return marpa_luaL_error (L,
+                            "grammar:sequence_new() bad numeric key (%d) in arg table",
+                            ix);
+                    }
+                }
+                goto NEXT_ELEMENT;
+
+            default:               /* other values */
+                return marpa_luaL_error (L,
+                    "grammar:sequence_new() bad key type (%s) in arg table",
+                     marpa_lua_typename (L, marpa_lua_type (L, key_stack_ix))
+                    );
+                goto NEXT_ELEMENT;
+
+            }
+
+          NEXT_ELEMENT:
+
+            /* [ ..., key, value, key_copy ] */
+            marpa_lua_settop (L, key_stack_ix);
+            /* [ ..., key ] */
+        }
+
+
+        if (lhs < 0) {
+            return marpa_luaL_error (L,
+                "grammar:sequence_new(): LHS argument is missing");
+        }
+        if (rhs < 0) {
+            return marpa_luaL_error (L,
+                "grammar:sequence_new(): RHS argument is missing");
+        }
+
+        marpa_lua_getfield (L, grammar_stack_ix, "_libmarpa");
+        p_g = (Marpa_Grammar *) marpa_lua_touserdata (L, -1);
+
+        result =
+            (Marpa_Rule_ID) marpa_g_sequence_new (*p_g,
+                (Marpa_Symbol_ID)lhs,
+                (Marpa_Symbol_ID)rhs,
+                (Marpa_Symbol_ID)separator,
+                (int)min,
+                (proper ? MARPA_PROPER_SEPARATION : 0)
+            );
+        if (result <= -1)
+        libmarpa_error_handle (L, grammar_stack_ix, "marpa_g_rule_new()");
+        marpa_lua_pushinteger (L, (lua_Integer) result);
+        return 1;
+    }
+
     static const struct luaL_Reg grammar_methods[] = {
       { "error", lca_libmarpa_error },
+      { "rule_new", lca_grammar_rule_new },
+      { "sequence_new", lca_grammar_sequence_new },
       { NULL, NULL },
     };
 
@@ -3166,16 +3309,16 @@ so the caller must make sure that one is available.
 
         /* In Libmarpa object sequence order */
 
-        marpa_lua_pushcfunction(L, wrap_grammar_new);
+        marpa_lua_pushcfunction(L, lca_grammar_new);
         marpa_lua_setfield(L, kollos_table_stack_ix, "grammar_new");
 
-        marpa_lua_pushcfunction(L, wrap_grammar_event);
+        marpa_lua_pushcfunction(L, lca_grammar_event);
         marpa_lua_setfield(L, kollos_table_stack_ix, "grammar_event");
 
-        marpa_lua_pushcfunction(L, wrap_grammar_events);
+        marpa_lua_pushcfunction(L, lca_grammar_events);
         marpa_lua_setfield(L, kollos_table_stack_ix, "grammar_events");
 
-        marpa_lua_pushcfunction(L, wrap_grammar_rule_new);
+        marpa_lua_pushcfunction(L, lca_grammar_rule_new);
         marpa_lua_setfield(L, kollos_table_stack_ix, "grammar_rule_new");
 
         marpa_lua_pushcfunction(L, wrap_recce_new);

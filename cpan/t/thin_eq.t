@@ -213,6 +213,8 @@ my $result = $marpa_lua->exec(<<'END_OF_LUA');
      local a = grammar:symbol_new()
      local sep = grammar:symbol_new()
      grammar:start_symbol_set(S)
+     grammar:sequence_new{S, a, separator = sep, proper = 0, min = 1}
+     grammar:precompute()
 END_OF_LUA
 
 # $grammar = Marpa::R3::Thin::G->new({});
@@ -231,26 +233,23 @@ END_OF_LUA
 
 exit(0);
 
-$symbol_S = $grammar->symbol_new();
+# $symbol_S = $grammar->symbol_new();
 my $symbol_a = $grammar->symbol_new();
 my $symbol_sep = $grammar->symbol_new();
-$grammar->start_symbol_set($symbol_S);
+# $grammar->start_symbol_set($symbol_S);
 
-# Marpa::R3::Display
-# name: Thin sequence_new() example
+# my $sequence_rule_id = $grammar->sequence_new(
+        # $symbol_S,
+        # $symbol_a,
+        # {   separator => $symbol_sep,
+            # proper    => 0,
+            # min       => 1
+        # }
+    # );
 
-my $sequence_rule_id = $grammar->sequence_new(
-        $symbol_S,
-        $symbol_a,
-        {   separator => $symbol_sep,
-            proper    => 0,
-            min       => 1
-        }
-    );
+# $grammar->precompute();
 
-# Marpa::R3::Display::End
 
-$grammar->precompute();
 my @events;
 my $event_ix = $grammar->event_count();
 while ( $event_ix-- ) {
