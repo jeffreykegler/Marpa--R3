@@ -105,11 +105,25 @@ That is not the case at the moment.
 
 ## Kollos object
 
+`ref_count` maintains a reference count that controls
+the destruction of Kollos interpreters.
+`warn` is for a warning callback -- it's not
+currently used.
+`buffer` is used by kollos internally, usually
+for buffering symbol ID's in the libmarpa wrappers.
+`buffer_capacity` is its current capacity.
+
+The buffer strategy currently is to set its capacity to the
+maximum symbol count of any of the grammars in the Kollos
+interpreter.
+
 ```
     -- miranda: section C function declarations
     struct kollos_extraspace {
         int ref_count;
         int (*warn)(const char* format, ...);
+        Marpa_Symbol_ID *buffer;
+        int buffer capacity;
     };
 
 ```
@@ -143,6 +157,8 @@ the interpreter (Kollos object) is destroyed.
         *(struct kollos_extraspace **)marpa_lua_getextraspace(L) = p_extra;
         p_extra->ref_count = 1;
         p_extra->warn = &default_warn;
+        p_extra->buffer_capacity = 1; /* TODO -- once tested, increase to 64 */
+        p_extra->buffer = malloc(p_extra->buffer_capacity * sizeof(*p_extra->buffer));
         marpa_luaL_openlibs (L);    /* open libraries */
         /* Lua stack: [] */
         marpa_luaopen_kollos(L); /* Open kollos library */
@@ -198,14 +214,21 @@ Deletes the interpreter if the reference count drops to zero.
     -- miranda: section+ C function declarations
     void kollos_refdec(lua_State* L);
     -- miranda: section+ lua interpreter management
+
+    static void kollos_destroy(lua_State* L)
+    {
+       marpa_lua_close(L);
+       free(p_extra->buffer);
+       free(p_extra);
+    }
+
     void kollos_refdec(lua_State* L)
     {
         struct kollos_extraspace *p_extra =
             *(struct kollos_extraspace **)marpa_lua_getextraspace(L);
         p_extra->ref_count--;
         if (p_extra->ref_count <= 0) {
-           marpa_lua_close(L);
-           free(p_extra);
+            kollos_destroy(L);
         }
     }
 

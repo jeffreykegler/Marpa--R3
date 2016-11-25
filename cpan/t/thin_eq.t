@@ -215,21 +215,14 @@ my $result = $marpa_lua->exec(<<'END_OF_LUA');
      grammar:start_symbol_set(S)
      grammar:sequence_new{S, a, separator = sep, proper = 0, min = 1}
      grammar:precompute()
+     local recce = kollos.recce_new(grammar)
+     recce:start_input()
+     kollos.throw_set()
+     recce:alternative(a, 1, 1)
+     kollos.throw_set(1)
+     recce:earleme_complete()
+     recce:terminals_expected()
 END_OF_LUA
-
-# $grammar = Marpa::R3::Thin::G->new({});
-# $grammar->force_valued();
-
-# Marpa::R3::Display
-# name: Thin grammar error methods
-
-# my ( $error_code, $error_description ) = $grammar->error();
-# my @error_names = Marpa::R3::Thin::error_names();
-# my $error_name = $error_names[$error_code];
-
-# Test::More::is( $error_code, 0, 'Grammar error code' );
-# Test::More::is( $error_name, 'MARPA_ERR_NONE', 'Grammar error name' );
-# Test::More::is( $error_description, 'No error', 'Grammar error description' );
 
 exit(0);
 
@@ -248,20 +241,6 @@ my $symbol_sep = $grammar->symbol_new();
     # );
 
 # $grammar->precompute();
-
-
-my @events;
-my $event_ix = $grammar->event_count();
-while ( $event_ix-- ) {
-
-# Marpa::R3::Display
-# name: Thin event() example
-
-    my ( $event_type, $value ) = $grammar->event( $event_ix++ );
-
-# Marpa::R3::Display::End
-
-}
 
 $recce = Marpa::R3::Thin::R->new($grammar);
 
