@@ -221,7 +221,9 @@ my $result = $marpa_lua->exec(<<'END_OF_LUA');
      recce:alternative(a, 1, 1)
      kollos.throw_set(1)
      recce:earleme_complete()
-     recce:terminals_expected()
+     local terminals_expected = recce:terminals_expected()
+     Test.More.is(#terminals_expected, 1, 'count of terminals expected')
+     Test.More.is(terminals_expected[1], sep, 'expected terminal')
 END_OF_LUA
 
 exit(0);
@@ -255,12 +257,7 @@ $recce->start_input();
 $recce->alternative( $symbol_a, 1, 1 );
 $recce->earleme_complete();
 
-# Marpa::R3::Display
-# name: Thin terminals_expected() example
-
    my @terminals = $recce->terminals_expected();
-
-# Marpa::R3::Display::End
 
 Test::More::is( (scalar @terminals), 1, 'count of terminals expected' );
 Test::More::is( $terminals[0], $symbol_sep, 'expected terminal' );

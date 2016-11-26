@@ -1351,9 +1351,8 @@ It should free all memory associated with the valuation.
        result[#result+1] = "  if (result == -1) { marpa_lua_pushnil(L); return 1; }\n"
        result[#result+1] = "  if (result < -1) {\n"
        result[#result+1] = string.format(
-                            "   libmarpa_error_handle(L, self_stack_ix, %q);\n",
+                            "   return libmarpa_error_handle(L, self_stack_ix, %q);\n",
                             wrapper_name .. '()')
-       result[#result+1] = "    return 1;\n"
        result[#result+1] = "  }\n"
        result[#result+1] = "  marpa_lua_pushinteger(L, (lua_Integer)result);\n"
        result[#result+1] = "  return 1;\n"
@@ -1659,8 +1658,7 @@ It is specified directly, which can be easier for a first reading.
         |    *!NAME!_ud = marpa_!LETTER!_new (*!BASE_NAME!_ud);
         |    if (!*!NAME!_ud)
         |      {
-        |        libmarpa_error_handle (L, !NAME!_stack_ix, "marpa_!LETTER!_new()");
-        |        return 0;
+        |        return libmarpa_error_handle (L, !NAME!_stack_ix, "marpa_!LETTER!_new()");
         |      }
         |  }
         |
@@ -1761,8 +1759,7 @@ so you may find it easer to read it first.
 
         if (!*bocage_ud)
           {
-            libmarpa_error_handle (L, bocage_stack_ix, "marpa_b_new()");
-            return 0;
+            return libmarpa_error_handle (L, bocage_stack_ix, "marpa_b_new()");
           }
       }
 
@@ -1813,8 +1810,7 @@ a special "configuration" argument.
             marpa_c_init (&marpa_configuration);
             *grammar_ud = marpa_g_new (&marpa_configuration);
             if (!*grammar_ud) {
-                libmarpa_error_handle (L, grammar_stack_ix, "marpa_g_new()");
-                return 0;
+                return libmarpa_error_handle (L, grammar_stack_ix, "marpa_g_new()");
             }
         }
 
@@ -2327,8 +2323,8 @@ Set "strict" globals, using code taken from strict.lua.
     {
        const lua_Integer code = marpa_lua_tointeger(L, 1);
        const char* details = marpa_lua_tostring(L, 2);
-      if (0) printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
-      if (0) printf ("%s code = %ld\n", __PRETTY_FUNCTION__, (long)code);
+       if (0) printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
+       if (0) printf ("%s code = %ld\n", __PRETTY_FUNCTION__, (long)code);
        libmarpa_error_code_handle(L, (int)code, details);
        return 1;
        /* NOTREACHED */
@@ -2397,7 +2393,10 @@ Set "strict" globals, using code taken from strict.lua.
         return marpa_luaL_error(L, "Kollos out of memory");
     }
 
-    static void
+    /* If error is not thrown, it leaves a nil, then
+     * the error object, on the stack.
+     */
+    static int
     libmarpa_error_code_handle (lua_State * L,
                             int error_code, const char *details)
     {
@@ -2408,14 +2407,15 @@ Set "strict" globals, using code taken from strict.lua.
       /* [ ..., throw_flag ] */
       marpa_lua_pop(L, 1);
       /* [ ... ] */
+      if (!throw_flag) {
+          marpa_lua_pushnil(L);
+      }
       push_error_object(L, error_code, details);
-      /* [ ..., error_object ] */
+      /* [ ..., nil, error_object ] */
       marpa_lua_pushvalue(L, -1);
-      /* [ ..., error_object, error_object ] */
       marpa_lua_setglobal(L, "error_object");
-      /* [ ..., error_object ] */
-      if (!throw_flag) return;
-      marpa_lua_error(L);
+      if (throw_flag) return marpa_lua_error(L);
+      else return 2;
     }
 
     /* Handle libmarpa errors in the most usual way.
@@ -2424,7 +2424,7 @@ Set "strict" globals, using code taken from strict.lua.
        The error may be thrown or not thrown.
        The caller is expected to handle any non-thrown error.
     */
-    static void
+    static int
     libmarpa_error_handle (lua_State * L,
                             int stack_ix, const char *details)
     {
@@ -2435,7 +2435,7 @@ Set "strict" globals, using code taken from strict.lua.
       grammar_ud = (Marpa_Grammar *) marpa_lua_touserdata (L, -1);
       marpa_lua_pop(L, 1);
       error_code = marpa_g_error (*grammar_ud, NULL);
-      libmarpa_error_code_handle(L, error_code, details);
+      return libmarpa_error_code_handle(L, error_code, details);
     }
 
     /* A wrapper for libmarpa_error_handle to conform with the
@@ -2449,6 +2449,10 @@ Set "strict" globals, using code taken from strict.lua.
        const int details_stack_ix = 2;
        const char* details = marpa_lua_tostring (L, details_stack_ix);
        libmarpa_error_handle(L, lmw_stack_ix, details);
+       /* Return only the error object,
+        * not the nil on the stack
+        * below it.
+        */
        return 1;
     }
 
@@ -2562,9 +2566,8 @@ so the caller must make sure that one is available.
       event_count = marpa_g_event_count (*p_g);
       if (event_count < 0)
         {
-          libmarpa_error_handle (L, grammar_stack_ix,
+          return libmarpa_error_handle (L, grammar_stack_ix,
                                   "marpa_g_event_count()");
-          return 0;
         }
       marpa_lua_pop (L, 1);
       /* [ grammar_object ] */
@@ -2581,9 +2584,8 @@ so the caller must make sure that one is available.
             event_type = marpa_g_event (*p_g, &event, event_ix);
             if (event_type <= -2)
               {
-                libmarpa_error_handle (L, grammar_stack_ix,
+                return libmarpa_error_handle (L, grammar_stack_ix,
                                         "marpa_g_event()");
-                return 0;
               }
             marpa_lua_pushinteger (L, event_ix*2 + 1);
             marpa_lua_pushinteger (L, event_type);
@@ -2621,8 +2623,7 @@ so the caller must make sure that one is available.
       event_type = marpa_g_event (*p_g, &event, event_ix);
       if (event_type <= -2)
         {
-          libmarpa_error_handle (L, grammar_stack_ix, "marpa_g_event()");
-          return 0;
+          return libmarpa_error_handle (L, grammar_stack_ix, "marpa_g_event()");
         }
       marpa_lua_pushinteger (L, event_type);
       marpa_lua_pushinteger (L, marpa_g_event_value (&event));
@@ -2676,7 +2677,7 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
         p_g = (Marpa_Grammar *) marpa_lua_touserdata (L, -1);
 
         result = (Marpa_Rule_ID)marpa_g_rule_new(*p_g, lhs, rhs, rhs_length);
-        if (result <= -1) libmarpa_error_handle (L, grammar_stack_ix,
+        if (result <= -1) return libmarpa_error_handle (L, grammar_stack_ix,
                                 "marpa_g_rule_new()");
         marpa_lua_pushinteger(L, (lua_Integer)result);
         return 1;
@@ -2813,7 +2814,7 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
                 (proper ? MARPA_PROPER_SEPARATION : 0)
             );
         if (result <= -1)
-        libmarpa_error_handle (L, grammar_stack_ix, "marpa_g_rule_new()");
+            return libmarpa_error_handle (L, grammar_stack_ix, "marpa_g_rule_new()");
         marpa_lua_pushinteger (L, (lua_Integer) result);
         return 1;
     }
@@ -2836,13 +2837,12 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
         );
       if (result == -1) { marpa_lua_pushnil(L); return 1; }
       if (result < -1) {
-       libmarpa_error_handle(L, self_stack_ix, "grammar:precompute; marpa_g_precompute");
-        return 1;
+        return libmarpa_error_handle(L, self_stack_ix, "grammar:precompute; marpa_g_precompute");
       }
 
       highest_symbol_id =  marpa_g_highest_symbol_id(self);
       if (highest_symbol_id < 0) {
-       libmarpa_error_handle(L, self_stack_ix, "grammar:precompute; marpa_g_highest_symbol_id");
+          return libmarpa_error_handle(L, self_stack_ix, "grammar:precompute; marpa_g_highest_symbol_id");
         return 1;
       }
       desired_buffer_capacity = 1 + (size_t)highest_symbol_id;
@@ -2895,7 +2895,7 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
     /* The grammar error code */
     static int wrap_progress_item(lua_State *L)
     {
-      /* [ grammar_object ] */
+      /* [ recce_object ] */
       const int recce_stack_ix = 1;
       Marpa_Recce *p_r;
       Marpa_Earley_Set_ID origin;
@@ -2908,8 +2908,7 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
       rule_id = marpa_r_progress_item (*p_r, &position, &origin);
       if (rule_id < -1)
         {
-          libmarpa_error_handle (L, recce_stack_ix, "marpa_r_progress_item()");
-          marpa_lua_pushinteger (L, (lua_Integer) rule_id);
+          return libmarpa_error_handle (L, recce_stack_ix, "marpa_r_progress_item()");
           return 1;
         }
       if (rule_id == -1)
@@ -2925,8 +2924,39 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
       return 3;
     }
 
+    static int lca_recce_terminals_expected( lua_State *L )
+    {
+      /* [ recce_object ] */
+      const int recce_stack_ix = 1;
+      int count;
+      int ix;
+      Marpa_Recce r;
+      struct kollos_extraspace *p_extra =
+          *(struct kollos_extraspace **)marpa_lua_getextraspace(L);
+      /* p_extra->terminals_buffer is guaranteed to have space for all the symbol IDS
+       * of the grammar.
+       */
+      Marpa_Symbol_ID* buffer = p_extra->buffer;
+
+      marpa_lua_getfield (L, recce_stack_ix, "_libmarpa");
+      /* [ recce_object, recce_ud ] */
+      r = *(Marpa_Recce *) marpa_lua_touserdata (L, -1);
+
+      count = marpa_r_terminals_expected (r, buffer);
+      if (count < 0) {
+          return libmarpa_error_handle(L, recce_stack_ix, "grammar:terminals_expected; marpa_g_terminals_expected");
+      }
+      marpa_lua_newtable(L);
+      for (ix = 0; ix < count; ix++) {
+          marpa_lua_pushinteger(L, buffer[ix]);
+          marpa_lua_rawseti(L, -2, ix+1);
+      }
+      return 1;
+    }
+
     static const struct luaL_Reg recce_methods[] = {
       { "error", lca_libmarpa_error },
+      { "terminals_expected", lca_recce_terminals_expected },
       { NULL, NULL },
     };
 
@@ -3069,10 +3099,7 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
 
       if (step_type < 0)
         {
-          libmarpa_error_handle (L, value_stack_ix, "marpa_v_step()");
-          marpa_lua_pushboolean (L, 0);
-          marpa_lua_insert (L, -2);
-          return 2;
+          return libmarpa_error_handle (L, value_stack_ix, "marpa_v_step()");
         }
 
       if (0) printf("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
