@@ -123,7 +123,7 @@ interpreter.
         int ref_count;
         int (*warn)(const char* format, ...);
         Marpa_Symbol_ID *buffer;
-        int buffer capacity;
+        size_t buffer_capacity;
     };
 
 ```
@@ -215,20 +215,15 @@ Deletes the interpreter if the reference count drops to zero.
     void kollos_refdec(lua_State* L);
     -- miranda: section+ lua interpreter management
 
-    static void kollos_destroy(lua_State* L)
-    {
-       marpa_lua_close(L);
-       free(p_extra->buffer);
-       free(p_extra);
-    }
-
     void kollos_refdec(lua_State* L)
     {
         struct kollos_extraspace *p_extra =
             *(struct kollos_extraspace **)marpa_lua_getextraspace(L);
         p_extra->ref_count--;
         if (p_extra->ref_count <= 0) {
-            kollos_destroy(L);
+           marpa_lua_close(L);
+           free(p_extra->buffer);
+           free(p_extra);
         }
     }
 
@@ -1412,7 +1407,6 @@ the wrapper's point of view, marpa_r_alternative() always succeeds.
     {"marpa_g_highest_symbol_id"},
     {"marpa_g_is_precomputed"},
     {"marpa_g_nulled_symbol_activate", "Marpa_Symbol_ID", "sym_id", "int", "activate"},
-    {"marpa_g_precompute"},
     {"marpa_g_prediction_symbol_activate", "Marpa_Symbol_ID", "sym_id", "int", "activate"},
     {"marpa_g_rule_is_accessible", "Marpa_Rule_ID", "rule_id"},
     {"marpa_g_rule_is_loop", "Marpa_Rule_ID", "rule_id"},
@@ -2399,6 +2393,10 @@ Set "strict" globals, using code taken from strict.lua.
       marpa_lua_error(L);
     }
 
+    static int out_of_memory(lua_State* L) {
+        return marpa_luaL_error(L, "Kollos out of memory");
+    }
+
     static void
     libmarpa_error_code_handle (lua_State * L,
                             int error_code, const char *details)
@@ -2820,8 +2818,50 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
         return 1;
     }
 
+    static int lca_grammar_precompute(lua_State *L)
+    {
+      Marpa_Grammar self;
+      const int self_stack_ix = 1;
+      size_t desired_buffer_capacity;
+      int highest_symbol_id;
+      int result;
+      struct kollos_extraspace *p_extra;
+
+      if (1) {
+        marpa_luaL_checktype(L, self_stack_ix, LUA_TTABLE);  }
+      marpa_lua_getfield (L, -1, "_libmarpa");
+      self = *(Marpa_Grammar*)marpa_lua_touserdata (L, -1);
+      marpa_lua_pop(L, 1);
+      result = (int)marpa_g_precompute(self
+        );
+      if (result == -1) { marpa_lua_pushnil(L); return 1; }
+      if (result < -1) {
+       libmarpa_error_handle(L, self_stack_ix, "grammar:precompute; marpa_g_precompute");
+        return 1;
+      }
+
+      highest_symbol_id =  marpa_g_highest_symbol_id(self);
+      if (highest_symbol_id < 0) {
+       libmarpa_error_handle(L, self_stack_ix, "grammar:precompute; marpa_g_highest_symbol_id");
+        return 1;
+      }
+      desired_buffer_capacity = 1 + (size_t)highest_symbol_id;
+      p_extra = *(struct kollos_extraspace **)marpa_lua_getextraspace(L);
+      if (desired_buffer_capacity < p_extra->buffer_capacity) {
+          p_extra->buffer_capacity = desired_buffer_capacity;
+          /* TODO: this optimizes for space, not speed.
+           * Insist capacity double on each realloc()?
+           */
+          p_extra->buffer = (Marpa_Symbol_ID*)realloc(p_extra->buffer, desired_buffer_capacity);
+          if (!p_extra->buffer) return out_of_memory(L);
+      }
+      marpa_lua_pushinteger(L, (lua_Integer)result);
+      return 1;
+    }
+
     static const struct luaL_Reg grammar_methods[] = {
       { "error", lca_libmarpa_error },
+      { "precompute", lca_grammar_precompute },
       { "rule_new", lca_grammar_rule_new },
       { "sequence_new", lca_grammar_sequence_new },
       { NULL, NULL },
