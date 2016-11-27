@@ -16,10 +16,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-use Test::More tests => 12;
-
 use lib 'inc';
-use Marpa::R3::Test;
 use Marpa::R3::Lua::Test::More;
 use English qw( -no_match_vars );
 use Fatal qw( close open );
@@ -30,6 +27,23 @@ $marpa_lua->raw_exec($Marpa::R3::Lua::Inspect::load);
 Marpa::R3::Lua::Test::More::load_me($marpa_lua);
 
 $marpa_lua->exec(<<'END_OF_LUA');
+     Test.More.plan(8)
+
+     function show_progress (recce)
+         local ordinal = recce:latest_earley_set()
+         recce:progress_report_start(ordinal)
+         local report = {string.format("Progress @%d", ordinal)}
+         while true do
+             local rule_id, dot_position, origin = recce:progress_item()
+             if not rule_id then break end
+             report[#report+1] = string.format("R%d D%d @%d",
+                 rule_id,
+                 dot_position,
+                 origin
+             )
+         end
+         io.stderr:write(table.concat(report, '\n'), "\n")
+     end
      function dump_rule (grammar, rule_id)
          local rhs = {}
          local length = grammar:rule_length(rule_id)
@@ -48,13 +62,6 @@ $marpa_lua->exec(<<'END_OF_LUA');
      local start_rule_id = grammar:rule_new{S, E}
      local op_rule_id = grammar:rule_new{E, E, op, E}
      local number_rule_id = grammar:rule_new{E, number}
-     print('start_rule_id:', start_rule_id, grammar:rule_length(start_rule_id))
-     print('op_rule_id:', op_rule_id, grammar:rule_length(op_rule_id))
-     print('number_rule_id:', number_rule_id, grammar:rule_length(number_rule_id))
-     print('Symbols:', S, E, op, number)
-     dump_rule(grammar, start_rule_id)
-     dump_rule(grammar, op_rule_id)
-     dump_rule(grammar, number_rule_id)
 
      grammar:start_symbol_set(S)
      grammar:precompute()
@@ -67,34 +74,24 @@ $marpa_lua->exec(<<'END_OF_LUA');
     raw_token_values = { '0', '1', '2', '3', '-', '+', '*' }
     for ix = 1, #raw_token_values do
          local token_string = tostring(raw_token_values[ix])
-         local token_id = ix-1
+         local token_id = ix
          token_strings[token_id] = token_string
          token_ids[token_string] = token_id
     end
     -- Lua is 1-based so zero must be a special case.
 
-    print('expected:', inspect(recce:terminals_expected()))
-    print("recce:alternative(number, token_ids['2'], 1)")
     recce:alternative(number, token_ids['2'], 1)
     recce:earleme_complete()
-    print('expected:', inspect(recce:terminals_expected()))
-    print("recce:alternative(op, token_ids['-'], 1)")
     recce:alternative(op, token_ids['-'], 1)
     recce:earleme_complete()
-    print('expected:', inspect(recce:terminals_expected()))
-    print("recce:alternative(number, token_ids['0'], 1)")
     recce:alternative(number, token_ids['0'], 1)
     recce:earleme_complete()
-    print('expected:', inspect(recce:terminals_expected()))
-    print("recce:alternative(op, token_ids['*'], 1)")
     recce:alternative(op, token_ids['*'], 1)
     recce:earleme_complete()
-    print("recce:alternative(number, token_ids['3'], 1)")
     recce:alternative(number, token_ids['3'], 1)
     recce:earleme_complete()
     recce:alternative(op, token_ids['+'], 1)
     recce:earleme_complete()
-    print("recce:alternative(number, token_ids['1'], 1)")
     recce:alternative(number, token_ids['1'], 1)
     recce:earleme_complete()
 
@@ -105,6 +102,8 @@ $marpa_lua->exec(<<'END_OF_LUA');
 
     -- print(inspect(_G))
     local tree = kollos.tree_new(order)
+
+    local actual_values = {}
     while true do
         local has_next = tree:next()
         if not has_next then break end
@@ -130,7 +129,7 @@ $marpa_lua->exec(<<'END_OF_LUA');
                end
                if rule_id == number_rule_id then
                    local number = stack[arg_0]
-                   stack[arg_0] = { tostring(number), number }
+                   stack[arg_0] = { tostring(number), math.tointeger(number) }
                    goto NEXT_STEP
                end
                if rule_id == op_rule_id then
@@ -158,7 +157,7 @@ $marpa_lua->exec(<<'END_OF_LUA');
                stack[result] = { string.format("Unknown rule ID: %d", rule_id), 0 }
            elseif type == 'TOKEN' then
                local _, symbol, start_loc, end_loc, result, token_value_ix = table.unpack(step)
-               stack[result] = token_values[token_value_ix]
+               stack[result] = token_strings[token_value_ix]
            else
                stack[result] = { string.format("Unexpected step type: %q\n", type), 0 }
            end
@@ -170,34 +169,17 @@ $marpa_lua->exec(<<'END_OF_LUA');
         actual_values[#actual_values+1] = stack[0]
     end
 
-    print(inspect(actual_values))
+    table.sort(actual_values)
+    actual_values[#actual_values+1] = '' -- to get final '\n'
+    actual_values_string = table.concat(actual_values, '\n')
+    Test.More.is(actual_values_string, [[
+(2-((0*3)+1)) == 1
+(2-(0*(3+1))) == 2
+((2-(0*3))+1) == 3
+(((2-0)*3)+1) == 7
+((2-0)*(3+1)) == 8
+]], 'expected values')
 
-END_OF_LUA
-
-my %expected_value = (
-    '(2-(0*(3+1))) == 2' => 1,
-    '(((2-0)*3)+1) == 7' => 1,
-    '((2-(0*3))+1) == 3' => 1,
-    '((2-0)*(3+1)) == 8' => 1,
-    '(2-((0*3)+1)) == 1' => 1,
-);
-
-# my $i = 0;
-# for my $actual_value (@actual_values) {
-    # if ( defined $expected_value{$actual_value} ) {
-        # delete $expected_value{$actual_value};
-        # Test::More::pass("Expected Value $i: $actual_value");
-    # }
-    # else {
-        # Test::More::fail("Unexpected Value $i: $actual_value");
-    # }
-    # $i++;
-# } ## end for my $actual_value (@actual_values)
-
-# For the error methods, start clean,
-# with a new, trivial grammar
-
-$marpa_lua->exec(<<'END_OF_LUA');
      -- Test phase 2
 
      -- Reinitialize
