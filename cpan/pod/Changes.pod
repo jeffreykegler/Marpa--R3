@@ -34,13 +34,10 @@ have been removed.
 Important in the development of Marpa,
 it now has little or now usage.
 
-=head2 The Thin interface (THIF) is being removed.
+=head2 The Thin interface (THIF) has been removed.
 
-The THIF is being removed.
-This is being done piecemeal for the convenience
-of the Marpa::R3 developers.
-Nobody outside the Marpa::R3 development team
-should attempt to use the THIF.
+The THIF was a "thin" Perl interface.
+It has been removed.
 
 =head2 The NAIF has been removed
 

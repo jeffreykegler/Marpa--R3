@@ -29,6 +29,7 @@ Marpa::R3::Lua::Test::More::load_me($marpa_lua);
 $marpa_lua->exec(<<'END_OF_LUA');
      Test.More.plan(8)
 
+     -- for debugging
      function show_progress (recce)
          local ordinal = recce:latest_earley_set()
          recce:progress_report_start(ordinal)
@@ -44,6 +45,8 @@ $marpa_lua->exec(<<'END_OF_LUA');
          end
          io.stderr:write(table.concat(report, '\n'), "\n")
      end
+
+     -- for debugging
      function dump_rule (grammar, rule_id)
          local rhs = {}
          local length = grammar:rule_length(rule_id)
@@ -53,6 +56,9 @@ $marpa_lua->exec(<<'END_OF_LUA');
          print(string.format("%d: %d ::= %s", rule_id, grammar:rule_lhs(rule_id),
             table.concat(rhs, " ")))
      end
+
+     -- Test phase 1
+
      local grammar = kollos.grammar_new()
      grammar:force_valued()
      local S = grammar:symbol_new()
