@@ -2644,39 +2644,64 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
 
     static int lca_grammar_rule_new(lua_State *L)
     {
-        Marpa_Grammar *p_g;
+        Marpa_Grammar g;
         Marpa_Rule_ID result;
         Marpa_Symbol_ID lhs;
 
-        Marpa_Symbol_ID rhs[2];
-        int rhs_length;
+        Marpa_Symbol_ID *rhs;
         /* [ grammar_object, lhs, rhs ... ] */
         const int grammar_stack_ix = 1;
+        const int args_stack_ix = 2;
+        struct kollos_extraspace * const p_extra
+            = *(struct kollos_extraspace **)marpa_lua_getextraspace(L);
+        int overflow = 0;
+        lua_Integer arg_count;
+        lua_Integer table_ix;
 
         /* This will not be an external interface,
          * so eventually we will run unsafe.
          * This checking code is for debugging.
          */
         marpa_luaL_checktype(L, grammar_stack_ix, LUA_TTABLE);
+        marpa_luaL_checktype(L, args_stack_ix, LUA_TTABLE);
 
-        lhs = (Marpa_Symbol_ID)marpa_lua_tointeger(L, 2);
-        /* Unsafe, no arg count checking */
-        rhs_length = marpa_lua_isnumber(L, 4) ? 2 : 1;
-        {
-          int rhs_ix;
-          for (rhs_ix = 0; rhs_ix < rhs_length; rhs_ix++)
-            {
-              rhs[rhs_ix] = (Marpa_Symbol_ID) marpa_lua_tointeger (L, rhs_ix + 3);
-            }
+        marpa_lua_len(L, args_stack_ix);
+        arg_count = marpa_lua_tointeger(L, -1);
+        if (arg_count > 1<<30) {
+            marpa_luaL_error(L,
+                "grammar:rule_new() arg table length too long");
         }
-        marpa_lua_pop(L, marpa_lua_gettop(L)-1);
-        /* [ grammar_object ] */
+        if (arg_count < 1) {
+            marpa_luaL_error(L,
+                "grammar:rule_new() arg table length must be at least 1");
+        }
 
-        marpa_lua_getfield (L, -1, "_libmarpa");
+        if (arg_count > p_extra->buffer_capacity) {
+           /* Treat "overflow" arg counts as freaks.
+            * We do not optimize for them, but do a custom
+            * malloc/free pair for each.
+            */
+           rhs = malloc(sizeof(Marpa_Symbol_ID) * (size_t)arg_count);
+           overflow = 1;
+        } else {
+           rhs = p_extra->buffer;
+        }
+
+        marpa_lua_geti(L, args_stack_ix, 1);
+        lhs = (Marpa_Symbol_ID)marpa_lua_tointeger(L, -1);
+        for (table_ix = 2; table_ix <= arg_count; table_ix++)
+        {
+            marpa_lua_geti(L, args_stack_ix, table_ix);
+            rhs[table_ix - 2] = (Marpa_Symbol_ID)marpa_lua_tointeger(L, -1);
+            marpa_lua_settop(L, args_stack_ix);
+        }
+
+        marpa_lua_getfield (L, grammar_stack_ix, "_libmarpa");
         /* [ grammar_object, grammar_ud ] */
-        p_g = (Marpa_Grammar *) marpa_lua_touserdata (L, -1);
+        g = *(Marpa_Grammar *) marpa_lua_touserdata (L, -1);
 
-        result = (Marpa_Rule_ID)marpa_g_rule_new(*p_g, lhs, rhs, rhs_length);
+        result = (Marpa_Rule_ID)marpa_g_rule_new(g, lhs, rhs, ((int)arg_count - 1));
+        if (overflow) free(rhs);
         if (result <= -1) return libmarpa_error_handle (L, grammar_stack_ix,
                                 "marpa_g_rule_new()");
         marpa_lua_pushinteger(L, (lua_Integer)result);
@@ -2893,23 +2918,22 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
     /* recognizer wrappers which need to be hand-written */
 
     /* The grammar error code */
-    static int wrap_progress_item(lua_State *L)
+    static int lca_recce_progress_item(lua_State *L)
     {
       /* [ recce_object ] */
       const int recce_stack_ix = 1;
-      Marpa_Recce *p_r;
+      Marpa_Recce r;
       Marpa_Earley_Set_ID origin;
       int position;
       Marpa_Rule_ID rule_id;
 
       marpa_lua_getfield (L, recce_stack_ix, "_libmarpa");
       /* [ recce_object, recce_ud ] */
-      p_r = (Marpa_Recce *) marpa_lua_touserdata (L, -1);
-      rule_id = marpa_r_progress_item (*p_r, &position, &origin);
+      r = *(Marpa_Recce *) marpa_lua_touserdata (L, -1);
+      rule_id = marpa_r_progress_item (r, &position, &origin);
       if (rule_id < -1)
         {
-          return libmarpa_error_handle (L, recce_stack_ix, "marpa_r_progress_item()");
-          return 1;
+          return libmarpa_error_handle (L, recce_stack_ix, "recce:progress_item()");
         }
       if (rule_id == -1)
         {
@@ -2918,9 +2942,6 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
       marpa_lua_pushinteger (L, (lua_Integer) rule_id);
       marpa_lua_pushinteger (L, (lua_Integer) position);
       marpa_lua_pushinteger (L, (lua_Integer) origin);
-      /* [ recce_object, recce_ud,
-       *     rule_id, position, origin ]
-       */
       return 3;
     }
 
@@ -2957,6 +2978,7 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
     static const struct luaL_Reg recce_methods[] = {
       { "error", lca_libmarpa_error },
       { "terminals_expected", lca_recce_terminals_expected },
+      { "progress_item", lca_recce_progress_item },
       { NULL, NULL },
     };
 
@@ -3408,14 +3430,8 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
         marpa_lua_pushcfunction(L, lca_grammar_events);
         marpa_lua_setfield(L, kollos_table_stack_ix, "grammar_events");
 
-        marpa_lua_pushcfunction(L, lca_grammar_rule_new);
-        marpa_lua_setfield(L, kollos_table_stack_ix, "grammar_rule_new");
-
         marpa_lua_pushcfunction(L, wrap_recce_new);
         marpa_lua_setfield(L, kollos_table_stack_ix, "recce_new");
-
-        marpa_lua_pushcfunction(L, wrap_progress_item);
-        marpa_lua_setfield(L, kollos_table_stack_ix, "recce_progress_item");
 
         marpa_lua_pushcfunction(L, wrap_bocage_new);
         marpa_lua_setfield(L, kollos_table_stack_ix, "bocage_new");
