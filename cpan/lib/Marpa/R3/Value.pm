@@ -1599,40 +1599,43 @@ END_OF_LUA
 
 sub Marpa::R3::Scanless::R::and_node_tag {
     my ( $slr, $and_node_id ) = @_;
-    my $bocage            = $slr->[Marpa::R3::Internal::Scanless::R::B_C];
-    my $recce_c           = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
-    my $parent_or_node_id = $bocage->_marpa_b_and_node_parent($and_node_id);
-    my $origin         = $bocage->_marpa_b_or_node_origin($parent_or_node_id);
-    my $origin_earleme = $recce_c->earleme($origin);
-    my $current_earley_set =
-        $bocage->_marpa_b_or_node_set($parent_or_node_id);
-    my $current_earleme = $recce_c->earleme($current_earley_set);
-    my $cause_id        = $bocage->_marpa_b_and_node_cause($and_node_id);
-    my $predecessor_id = $bocage->_marpa_b_and_node_predecessor($and_node_id);
 
-    my $middle_earley_set = $bocage->_marpa_b_and_node_middle($and_node_id);
-    my $middle_earleme    = $recce_c->earleme($middle_earley_set);
+    my ($tag) = $slr->exec( <<'END_OF_LUA', $and_node_id );
+    local recce, raw_and_node_id = ...
+    local and_node_id = math.tointeger(raw_and_node_id+0)
+    local bocage = recce.lmw_b
+    local parent_or_node_id = bocage:_and_node_parent(and_node_id)
+    local origin = bocage:_or_node_origin(parent_or_node_id)
+    local origin_earleme = recce.lmw_g1r:earleme(origin)
 
-    my $position = $bocage->_marpa_b_or_node_position($parent_or_node_id);
-    my $irl_id   = $bocage->_marpa_b_or_node_irl($parent_or_node_id);
+    local current_earley_set = bocage:_or_node_set(parent_or_node_id)
+    local current_earleme = recce.lmw_g1r:earleme(current_earley_set)
 
-#<<<  perltidy introduces trailing space on this
-    my $tag =
-          'R'
-        . $irl_id . q{:}
-        . $position . q{@}
-        . $origin_earleme . q{-}
-        . $current_earleme;
-#>>>
-    if ( defined $cause_id ) {
-        my $cause_irl_id = $bocage->_marpa_b_or_node_irl($cause_id);
-        $tag .= 'C' . $cause_irl_id;
+    local cause_id = bocage:_and_node_cause(and_node_id)
+    local predecessor_id = bocage:_and_node_predecessor(and_node_id)
+
+    local middle_earley_set = bocage:_and_node_middle(and_node_id)
+    local middle_earleme = recce.lmw_g1r:earleme(middle_earley_set)
+
+    local position = bocage:_or_node_position(parent_or_node_id)
+    local irl_id = bocage:_or_node_irl(parent_or_node_id)
+
+    local tag = { string.format("R%d:%d@%d-%d",
+        irl_id,
+        position,
+        origin_earleme,
+        current_earleme)
     }
-    else {
-        my $symbol = $bocage->_marpa_b_and_node_symbol($and_node_id);
-        $tag .= 'S' . $symbol;
-    }
-    $tag .= q{@} . $middle_earleme;
+
+    if cause_id then
+        tag[#tag+1] = string.format("C%d", bocage:_or_node_irl(cause_id))
+    else
+        tag[#tag+1] = string.format("S%d", bocage:_and_node_symbol(and_node_id))
+    end
+    tag[#tag+1] = string.format("@%d", middle_earleme)
+    return table.concat(tag)
+END_OF_LUA
+
     return $tag;
 }
 
