@@ -120,11 +120,18 @@ my $lua_exec_sig_body = <<'END_OF_EXEC_SIG_BODY';
         }
 
         /* warn("signature: %s", signature); */
+        if ((size_t)items < 2 + strlen(signature)) {
+            croak
+                ("Internal error: signature specified %ld items, but only %ld arguments in xlua EXEC_SIG_BODY",
+                    (long)strlen(signature), (long)items - 2);
+        }
 
         /* the remaining arguments are those passed to the Perl call */
         for (i = 0; ; i++) {
             const char this_sig = signature[i];
-            SV *arg_sv = ST (3+i);
+            SV *arg_sv;
+
+            arg_sv = ST (3+i);
 
             /* warn("this_sig: %c", this_sig); */
             switch (this_sig) {
