@@ -176,19 +176,23 @@ sub set_last_choice {
     if ( nook_has_semantic_cause( $asf, $nook ) ) {
         my $slr       = $asf->[Marpa::R3::Internal::ASF::SLR];
         my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-        my $tracer =
-            $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
-        my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
-        my $bocage    = $slr->[Marpa::R3::Internal::Scanless::R::B_C];
         my $and_node_id = $and_nodes->[$choice];
-        my $current_predecessor =
-            $bocage->_marpa_b_and_node_predecessor($and_node_id) // -1;
+        my ($current_predecessor) = $slr->exec_sig(<<'END_OF_LUA',
+            recce, id = ...
+            local current = recce.lmw_b:_and_node_predecessor(id)
+            return current and current or -1
+END_OF_LUA
+            'i', $and_node_id);
         AND_NODE: while (1) {
             $choice++;
             $and_node_id = $and_nodes->[$choice];
             last AND_NODE if not defined $and_node_id;
-            my $next_predecessor =
-                $bocage->_marpa_b_and_node_predecessor($and_node_id) // -1;
+            my ($next_predecessor) = $slr->exec_sig(<<'END_OF_LUA',
+                recce, id = ...
+                local next = recce.lmw_b:_and_node_predecessor(id)
+                return next and next or -1
+END_OF_LUA
+                'i', ($and_node_id // -1));
             last AND_NODE if $current_predecessor != $next_predecessor;
         } ## end AND_NODE: while (1)
         $choice--;
@@ -220,17 +224,15 @@ sub nook_has_semantic_cause {
     my ( $asf, $nook ) = @_;
     my $or_node   = $nook->[Marpa::R3::Internal::Nook::OR_NODE];
     my $slr       = $asf->[Marpa::R3::Internal::ASF::SLR];
-    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $tracer =
-        $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
-    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
-    my $bocage    = $slr->[Marpa::R3::Internal::Scanless::R::B_C];
 
-    my $irl_id          = $bocage->_marpa_b_or_node_irl($or_node);
-    my $predot_position = $bocage->_marpa_b_or_node_position($or_node) - 1;
-    my $predot_isyid =
-        $grammar_c->_marpa_g_irl_rhs( $irl_id, $predot_position );
-    return $grammar_c->_marpa_g_nsy_is_semantic($predot_isyid);
+    my ($result) = $slr->exec_sig(<<'END_OF_LUA', 'i', $or_node);
+    local recce, or_node = ...
+    local irl_id = recce.lmw_b:_or_node_irl(or_node)
+    local predot_position = recce.lmw_b:_or_node_position(or_node) - 1
+    local predot_isyid = recce.slg.lmw_g1g:_irl_rhs(irl_id, predot_position)
+    return recce.slg.lmw_g1g:_nsy_is_semantic(predot_isyid)
+END_OF_LUA
+     return $result;
 } ## end sub nook_has_semantic_cause
 
 # No check for conflicting usage -- value(), asf(), etc.
