@@ -2161,10 +2161,9 @@ sub Marpa::R3::Scanless::R::show_earley_set {
 }
 
 sub Marpa::R3::Scanless::R::show_or_nodes {
-    my ( $slr, $verbose ) = @_;
-    my $recce_c                = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
-    my $bocage = $slr->[Marpa::R3::Internal::Scanless::R::B_C];
-    return $recce_c->show_or_nodes($bocage, $verbose);
+    my ( $slr ) = @_;
+    my ($result) = $slr->exec_sig_name('show_or_nodes', '');
+    return $result;
 }
 
 sub Marpa::R3::Scanless::R::show_and_nodes {

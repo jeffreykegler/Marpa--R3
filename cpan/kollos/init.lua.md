@@ -1328,19 +1328,56 @@ It should free all memory associated with the valuation.
         -- print('data:', inspect(data))
 
         local function cmp_data(i, j)
-            if i[1] < j[1] then return true end
-            if i[1] > j[1] then return false end
-            if i[2] < j[2] then return true end
-            if i[2] > j[2] then return false end
-            if i[3] < j[3] then return true end
-            if i[3] > j[3] then return false end
-            if i[4] < j[4] then return true end
-            if i[4] > j[4] then return false end
-            if i[5] < j[5] then return true end
-            if i[5] > j[5] then return false end
-            if i[6] < j[6] then return true end
-            if i[6] > j[6] then return false end
-            if i[7] < j[7] then return true end
+            for ix = 1, #i do
+                if i[ix] < j[ix] then return true end
+                if i[ix] > j[ix] then return false end
+            end
+            return false
+        end
+
+        table.sort(data, cmp_data)
+        local result = {}
+        for _,datum in pairs(data) do
+            result[#result+1] = datum[#datum]
+        end
+        result[#result+1] = '' -- so concat adds a final '\n'
+        return table.concat(result, '\n')
+    end
+
+    function show_or_nodes(recce)
+        local bocage = recce.lmw_b
+        local g1r = recce.lmw_g1r
+        local data = {}
+        local id = -1
+        while true do
+            id = id + 1
+            local origin = bocage:_or_node_origin(id)
+            if not origin then break end
+            local set = bocage:_or_node_set(id)
+            local irl_id = bocage:_or_node_irl(id)
+            local position = bocage:_or_node_position(id)
+            local origin_earleme = g1r:earleme(origin)
+            local current_earleme = g1r:earleme(set)
+
+            local desc = {string.format(
+                "R%d:%d@%d-%d",
+                irl_id,
+                position,
+                origin_earleme,
+                current_earleme)}
+            data[#data+1] = {
+                origin_earleme,
+                current_earleme,
+                irl_id,
+                table.concat(desc)
+            }
+        end
+
+        local function cmp_data(i, j)
+            for ix = 1, #i do
+                if i[ix] < j[ix] then return true end
+                if i[ix] > j[ix] then return false end
+            end
             return false
         end
 
