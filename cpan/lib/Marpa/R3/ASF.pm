@@ -517,22 +517,27 @@ sub nid_rule_id {
     my ( $asf, $nid ) = @_;
     return if $nid < 0;
     my $slr       = $asf->[Marpa::R3::Internal::ASF::SLR];
-    my $bocage    = $slr->[Marpa::R3::Internal::Scanless::R::B_C];
-    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $tracer =
-        $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
-    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
-    my $irl_id    = $bocage->_marpa_b_or_node_irl($nid);
-    my $xrl_id    = $grammar_c->_marpa_g_source_xrl($irl_id);
+
+    my ($xrl_id) = $slr->exec_sig(<<'END_OF_LUA', 'i', $nid);
+    local recce, nid = ...
+    local irl_id = recce.lmw_b:_or_node_irl(nid)
+    local xrl_id = recce.slg.lmw_g1g:_source_xrl(irl_id)
+    return xrl_id
+END_OF_LUA
     return $xrl_id;
 }
 
 sub or_node_es_span {
     my ( $asf, $choicepoint ) = @_;
     my $slr        = $asf->[Marpa::R3::Internal::ASF::SLR];
-    my $bocage     = $slr->[Marpa::R3::Internal::Scanless::R::B_C];
-    my $origin_es  = $bocage->_marpa_b_or_node_origin($choicepoint);
-    my $current_es = $bocage->_marpa_b_or_node_set($choicepoint);
+
+    my ($origin_es, $current_es) = $slr->exec_sig(<<'END_OF_LUA', 'i', $choicepoint);
+    local recce, choicepoint = ...
+    local origin_es = recce.lmw_b:_or_node_origin(choicepoint)
+    local current_es = recce.lmw_b:_or_node_set(choicepoint)
+    return origin_es, current_es
+END_OF_LUA
+
     return $origin_es, $current_es - $origin_es;
 } ## end sub or_node_es_span
 
