@@ -107,39 +107,63 @@ END_OF_EXEC_BODY
 # protocol.  Putting this code in a C subroutine will confuse XS.
 my $lua_exec_sig_body = <<'END_OF_EXEC_SIG_BODY';
     {
-        const int function_stack_ix = marpa_lua_gettop (L);
+        const int signature_stack_ix = marpa_lua_gettop (L);
         int i, status;
         int top_after;
 
-        marpa_luaL_checkstack(L, items+20, "xlua EXEC_BODY");
+        marpa_luaL_checkstack(L, items+20, "xlua EXEC_SIG_BODY");
 
         if (is_method) {
-            /* first argument is recce table */
-            marpa_lua_pushvalue (L, -2);
-            /* [ object_table, function, object_table ] */
+            /* first argument is table for object */
+            marpa_lua_pushvalue (L, object_stack_ix);
+            /* [ object_table, function, signature, object_table ] */
         }
+
+        /* warn("signature: %s", signature); */
 
         /* the remaining arguments are those passed to the Perl call */
-        for (i = 2; i < items; i++) {
-            SV *arg_sv = ST (i);
-            if (!SvOK (arg_sv)) {
-                croak ("Marpa::R3::Lua::exec arg %d is not an SV", i);
-            }
-            MARPA_SV_SV (L, arg_sv);
-        }
+        for (i = 0; ; i++) {
+            const char this_sig = signature[i];
+            SV *arg_sv = ST (3+i);
 
-        status = marpa_lua_pcall (L, (items - 2) + is_method, LUA_MULTRET, msghandler_ix);
+            /* warn("this_sig: %c", this_sig); */
+            switch (this_sig) {
+            case 'n':
+                marpa_lua_pushnumber (L, (lua_Number)SvNV(arg_sv));
+                break;
+            case 'i':
+                marpa_lua_pushinteger (L, (lua_Integer)SvIV(arg_sv));
+                break;
+            case 's':
+                marpa_lua_pushstring (L, SvPV_nolen(arg_sv));
+                break;
+            case 'S':
+                SvREFCNT_inc_simple_void_NN (arg_sv);
+                marpa_sv_sv_noinc(L, arg_sv);
+                break;
+            case '>':              /* end of arguments */
+            case 0:              /* end of arguments */
+                goto endargs;
+            default:
+                croak
+                    ("Internal error: invalid sig option %c in xlua EXEC_SIG_BODY", this_sig);
+            }
+            /* warn("%s %d narg=%d *sig=%c", __FILE__, __LINE__, narg, *sig); */
+        }
+      endargs:;
+
+        status = marpa_lua_pcall (L, (items - 3) + is_method, LUA_MULTRET, msghandler_ix);
         if (status != 0) {
             const char *exception_string = handle_pcall_error(L, status);
             marpa_lua_settop (L, base_of_stack);
             croak(exception_string);
         }
 
-        marpa_luaL_checkstack(L, 20, "xlua EXEC_BODY");
+        marpa_luaL_checkstack(L, 20, "xlua EXEC_SIG_BODY");
 
         /* return args to caller */
         top_after = marpa_lua_gettop (L);
-        for (i = function_stack_ix; i <= top_after; i++) {
+        for (i = signature_stack_ix; i <= top_after; i++) {
             SV *sv_result = coerce_to_sv (L, i);
             /* Took ownership of sv_result, we now need to mortalize it */
             XPUSHs (sv_2mortal (sv_result));
@@ -233,6 +257,29 @@ PPCODE:
 MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::SLR
 
 void
+exec( outer_slr, codestr, ... )
+   Outer_R *outer_slr;
+   char* codestr;
+PPCODE:
+{
+    int object_stack_ix;
+    const int is_method = 1;
+    lua_State *const L = outer_slr->L;
+    const int base_of_stack = marpa_lua_gettop (L);
+    int msghandler_ix;
+
+    marpa_lua_pushcfunction(L, xlua_msghandler);
+    msghandler_ix = marpa_lua_gettop(L);
+
+    marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, outer_slr->lua_ref);
+    /* Lua stack: [ recce_table ] */
+    object_stack_ix = marpa_lua_gettop (L);
+
+    === LUA LOAD STRING ===
+    === LUA EXEC BODY ===
+}
+
+void
 exec_key( outer_slr, fn_key, ... )
    Outer_R *outer_slr;
    int fn_key;
@@ -253,29 +300,6 @@ PPCODE:
     marpa_lua_rawgeti (L, object_stack_ix, fn_key);
     /* [ recce_table, function ] */
 
-    === LUA EXEC BODY ===
-}
-
-void
-exec( outer_slr, codestr, ... )
-   Outer_R *outer_slr;
-   char* codestr;
-PPCODE:
-{
-    int object_stack_ix;
-    const int is_method = 1;
-    lua_State *const L = outer_slr->L;
-    const int base_of_stack = marpa_lua_gettop (L);
-    int msghandler_ix;
-
-    marpa_lua_pushcfunction(L, xlua_msghandler);
-    msghandler_ix = marpa_lua_gettop(L);
-
-    marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, outer_slr->lua_ref);
-    /* Lua stack: [ recce_table ] */
-    object_stack_ix = marpa_lua_gettop (L);
-
-    === LUA LOAD STRING ===
     === LUA EXEC BODY ===
 }
 
@@ -307,6 +331,61 @@ PPCODE:
     /* [ recce_table, function ] */
 
     === LUA EXEC BODY ===
+}
+
+void
+exec_sig( outer_slr, codestr, signature, ... )
+   Outer_R *outer_slr;
+   char* codestr;
+   char* signature;
+PPCODE:
+{
+    int object_stack_ix;
+    const int is_method = 1;
+    lua_State *const L = outer_slr->L;
+    const int base_of_stack = marpa_lua_gettop (L);
+    int msghandler_ix;
+
+    marpa_lua_pushcfunction(L, xlua_msghandler);
+    msghandler_ix = marpa_lua_gettop(L);
+
+    marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, outer_slr->lua_ref);
+    /* Lua stack: [ recce_table ] */
+    object_stack_ix = marpa_lua_gettop (L);
+
+    === LUA LOAD STRING ===
+    === LUA EXEC SIG BODY ===
+}
+
+void
+exec_sig_name( outer_slr, name, signature, ... )
+   Outer_R *outer_slr;
+   char* name;
+   char *signature;
+PPCODE:
+{
+    int object_stack_ix;
+    const int is_method = 1;
+    lua_State *const L = outer_slr->L;
+    const int base_of_stack = marpa_lua_gettop (L);
+    int msghandler_ix;
+    int type;
+
+    marpa_lua_pushcfunction(L, xlua_msghandler);
+    msghandler_ix = marpa_lua_gettop(L);
+
+    marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, outer_slr->lua_ref);
+    /* Lua stack: [ recce_table ] */
+    object_stack_ix = marpa_lua_gettop (L);
+
+    type = marpa_lua_getglobal (L, name);
+    if (type != LUA_TFUNCTION)
+    {
+      croak ("exec_name: global %s name is not a function", name);
+    }
+    /* [ recce_table, function ] */
+
+    === LUA EXEC SIG BODY ===
 }
 
 MODULE = Marpa::R3            PACKAGE = Marpa::R3::Lua
@@ -366,6 +445,7 @@ PPCODE:
 END_OF_MAIN_CODE
 
 $code =~ s/=== \s* LUA \s* EXEC \s* BODY \s* === \s /$lua_exec_body/xsmg;
+$code =~ s/=== \s* LUA \s* EXEC \s* SIG \s* BODY \s* === \s /$lua_exec_sig_body/xsmg;
 $code =~ s/=== \s* LUA \s* LOAD \s* STRING \s* === \s /$lua_load_string/xsmg;
 
 print {$out} $code;

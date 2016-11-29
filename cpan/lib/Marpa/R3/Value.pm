@@ -644,12 +644,12 @@ END_OF_LUA
     local $Marpa::R3::Context::slr  = $slr;
     local $Marpa::R3::Context::slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
 
-    $slr->exec( << 'END_OF_LUA', ($trace_values ? 1 : 0 ));
+    $slr->exec_sig( << 'END_OF_LUA', 'i', ($trace_values ? 1 : 0 ));
     recce, flag = ...
-    return recce.lmw_v:_trace(flag+0)
+    return recce.lmw_v:_trace(flag)
 END_OF_LUA
 
-    $slr->exec_name( 'value_init', $trace_values );
+    $slr->exec_sig_name( 'value_init', 'i', $trace_values );
 
     if ( not $slr->[Marpa::R3::Internal::Scanless::R::REGISTRATIONS] ) {
         my $trace_file_handle =
@@ -1599,7 +1599,7 @@ END_OF_LUA
 
 sub Marpa::R3::Scanless::R::and_node_tag {
     my ( $slr, $and_node_id ) = @_;
-    my ($tag) = $slr->exec_name( 'and_node_tag', $and_node_id );
+    my ($tag) = $slr->exec_sig_name( 'and_node_tag', 'i', $and_node_id );
     return $tag;
 }
 

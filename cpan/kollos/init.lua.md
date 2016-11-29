@@ -1189,7 +1189,7 @@ Called when a valuator is set up.
         recce.token_semantics.default = { marpa.ops.lua, result_is_token_value_key, op_bail_key, 0 }
         recce.rule_semantics.default = { marpa.ops.lua, result_is_undef_key, op_bail_key, 0 }
 
-        recce.trace_values = trace_values + 0;
+        recce.trace_values = trace_values;
         recce.trace_values_queue = {};
         if recce.trace_values > 0 then
           local top_of_queue = #recce.trace_values_queue;
@@ -1239,8 +1239,7 @@ It should free all memory associated with the valuation.
 
 ```
     -- miranda: section diagnostics
-    function and_node_tag(recce, raw_and_node_id)
-        local and_node_id = math.tointeger(raw_and_node_id+0)
+    function and_node_tag(recce, and_node_id)
         local bocage = recce.lmw_b
         local parent_or_node_id = bocage:_and_node_parent(and_node_id)
         local origin = bocage:_or_node_origin(parent_or_node_id)
