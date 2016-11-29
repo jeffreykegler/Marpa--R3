@@ -242,12 +242,20 @@ sub Marpa::R3::ASF::peak {
     my $or_nodes = $asf->[Marpa::R3::Internal::ASF::OR_NODES];
     my $slr      = $asf->[Marpa::R3::Internal::ASF::SLR];
 
-    my $bocage = $slr->[Marpa::R3::Internal::Scanless::R::B_C];
-    die 'No Bocage' if not $bocage;
-    my $augment_or_node_id  = $bocage->_marpa_b_top_or_node();
+    my ($augment_or_node_id) = $slr->exec_sig(<<'END_OF_LUA', '');
+        local recce = ...
+        local bocage = recce.lmw_b
+        if not bocage then error('No Bocage') end
+        return bocage:_top_or_node()
+END_OF_LUA
+
     my $augment_and_node_id = $or_nodes->[$augment_or_node_id]->[0];
-    my $start_or_node_id =
-        $bocage->_marpa_b_and_node_cause($augment_and_node_id);
+    my ($start_or_node_id)
+        = $slr->exec_sig(
+            'local recce, id = ...; return recce.lmw_b:_and_node_cause(id)',
+            'i',
+            $augment_and_node_id
+            );
 
     my $base_nidset = Marpa::R3::Nidset->obtain( $asf, $start_or_node_id );
     my $glade_id = $base_nidset->id();
