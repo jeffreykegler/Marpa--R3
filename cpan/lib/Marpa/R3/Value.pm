@@ -404,7 +404,6 @@ sub Marpa::R3::Scanless::R::ordering_get {
     }
 
     $slr->exec( 'recce = ...; recce.lmw_o = kollos.order_new(recce.lmw_b)');
-    # Marpa::R3::Thin::O->new($bocage, $thin_slr);
 
     GIVEN_RANKING_METHOD: {
         my $ranking_method =
@@ -1685,10 +1684,10 @@ sub trace_op {
     return $trace_output if not $trace_values >= 2;
 
     my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
-    my $bocage    = $slr->[Marpa::R3::Internal::Scanless::R::B_C];
 
-    my ($nook_ix, $or_node_id, $choice, $and_node_id, $trace_irl_id)
-        = $slr->exec( <<'END_OF_LUA' );
+    my ($nook_ix, $or_node_id, $choice, $and_node_id, $trace_irl_id, $or_node_position)
+        = $slr->exec_sig( <<'END_OF_LUA' , '');
+    -- in trace_op()
     recce = ...
     local nook_ix = recce.lmw_v:_nook()
     local b = recce.lmw_b
@@ -1700,15 +1699,15 @@ sub trace_op {
     return
         nook_ix, or_node_id, choice,
             o:_and_order_get(or_node_id, choice), 
-            b:_or_node_irl(or_node_id)
+            b:_or_node_irl(or_node_id),
+            b:_or_node_position(or_node_id)
 END_OF_LUA
 
     my $virtual_rhs  = $grammar_c->_marpa_g_irl_is_virtual_rhs($trace_irl_id);
     my $virtual_lhs  = $grammar_c->_marpa_g_irl_is_virtual_lhs($trace_irl_id);
 
     return $trace_output
-        if $bocage->_marpa_b_or_node_position($or_node_id)
-        != $grammar_c->_marpa_g_irl_length($trace_irl_id);
+        if $or_node_position != $grammar_c->_marpa_g_irl_length($trace_irl_id);
 
     return $trace_output if not $virtual_rhs and not $virtual_lhs;
 

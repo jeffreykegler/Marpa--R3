@@ -249,61 +249,6 @@ sub Marpa::R3::Thin::R::show_earley_set {
     return join q{}, @sorted_data;
 }
 
-sub Marpa::R3::Thin::R::show_and_nodes {
-    my ($recce_c, $bocage) = @_;
-    my $text;
-    my @data = ();
-    AND_NODE: for ( my $id = 0;; $id++ ) {
-        my $parent      = $bocage->_marpa_b_and_node_parent($id);
-        my $predecessor = $bocage->_marpa_b_and_node_predecessor($id);
-        my $cause       = $bocage->_marpa_b_and_node_cause($id);
-        my $symbol      = $bocage->_marpa_b_and_node_symbol($id);
-        last AND_NODE if not defined $parent;
-        my $origin            = $bocage->_marpa_b_or_node_origin($parent);
-        my $set               = $bocage->_marpa_b_or_node_set($parent);
-        my $irl_id            = $bocage->_marpa_b_or_node_irl($parent);
-        my $position          = $bocage->_marpa_b_or_node_position($parent);
-        my $origin_earleme    = $recce_c->earleme($origin);
-        my $current_earleme   = $recce_c->earleme($set);
-        my $middle_earley_set = $bocage->_marpa_b_and_node_middle($id);
-        my $middle_earleme    = $recce_c->earleme($middle_earley_set);
-
-#<<<  perltidy introduces trailing space on this
-        my $desc =
-              "And-node #$id: R"
-            . $irl_id . q{:}
-            . $position . q{@}
-            . $origin_earleme . q{-}
-            . $current_earleme;
-#>>>
-        my $cause_rule = -1;
-        if ( defined $cause ) {
-            my $cause_irl_id = $bocage->_marpa_b_or_node_irl($cause);
-            $desc .= 'C' . $cause_irl_id;
-        }
-        else {
-            $desc .= 'S' . $symbol;
-        }
-        $desc .= q{@} . $middle_earleme;
-        push @data,
-            [
-            $origin_earleme, $current_earleme, $irl_id,
-            $position,       $middle_earleme,  $cause_rule,
-            ( $symbol // -1 ), $desc
-            ];
-    } ## end AND_NODE: for ( my $id = 0;; $id++ )
-    my @sorted_data = map { $_->[-1] } sort {
-               $a->[0] <=> $b->[0]
-            or $a->[1] <=> $b->[1]
-            or $a->[2] <=> $b->[2]
-            or $a->[3] <=> $b->[3]
-            or $a->[4] <=> $b->[4]
-            or $a->[5] <=> $b->[5]
-            or $a->[6] <=> $b->[6]
-    } @data;
-    return ( join "\n", @sorted_data ) . "\n";
-}
-
 sub Marpa::R3::Thin::R::show_or_nodes {
     my ( $recce_c, $bocage, $verbose ) = @_;
     my $text;

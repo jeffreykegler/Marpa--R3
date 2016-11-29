@@ -353,12 +353,12 @@ And-node #0: R2:1@0-0S1@0
 And-node #3: R0:1@0-1C9@0
 And-node #2: R3:1@0-1C9@0
 And-node #1: R9:1@0-1S6@0
-And-node #20: R0:2@0-3C5@1
 And-node #21: R0:2@0-3C3@1
+And-node #20: R0:2@0-3C5@1
 And-node #16: R2:2@0-3C3@0
 And-node #15: R3:2@0-3C6@1
-And-node #17: R10:1@0-3C2@0
 And-node #18: R10:1@0-3C0@0
+And-node #17: R10:1@0-3C2@0
 And-node #19: R11:1@0-3C10@0
 And-node #4: R5:1@1-1S1@1
 And-node #6: R3:1@1-2C9@1

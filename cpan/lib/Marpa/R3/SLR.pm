@@ -2169,10 +2169,141 @@ sub Marpa::R3::Scanless::R::show_or_nodes {
 
 sub Marpa::R3::Scanless::R::show_and_nodes {
     my ( $slr ) = @_;
-    my $recce_c                = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
-    my $bocage = $slr->[Marpa::R3::Internal::Scanless::R::B_C];
-    return $recce_c->show_and_nodes($bocage);
+    my ($result) = $slr->exec_sig(<<'END_OF_LUA', '');
+    -- show_and_nodes
+    local recce = ...
+    local bocage = recce.lmw_b
+    local g1r = recce.lmw_g1r
+    local data = {}
+    local id = -1
+    while true do
+        id = id + 1
+        local parent = bocage:_and_node_parent(id)
+        -- print('parent:', parent)
+        if not parent then break end
+        local predecessor = bocage:_and_node_predecessor(id)
+        local cause = bocage:_and_node_cause(id)
+        local symbol = bocage:_and_node_symbol(id)
+        local origin = bocage:_or_node_origin(parent)
+        local set = bocage:_or_node_set(parent)
+        local irl_id = bocage:_or_node_irl(parent)
+        local position = bocage:_or_node_position(parent)
+        local origin_earleme = g1r:earleme(origin)
+        local current_earleme = g1r:earleme(set)
+        local middle_earley_set = bocage:_and_node_middle(id)
+        local middle_earleme = g1r:earleme(middle_earley_set)
+        local desc = {string.format(
+            "And-node #%d: R%d:%d@%d-%d",
+            id,
+            irl_id,
+            position,
+            origin_earleme,
+            current_earleme)}
+        -- Marpa::R2's show_and_nodes() had a minor bug:
+        -- cause_irl_id was not set properly and therefore
+        -- not used in the sort.  That problem is fixed
+        -- here.
+        local cause_irl_id = -1
+        if cause then
+            cause_irl_id = bocage:_or_node_irl(cause)
+            desc[#desc+1] = 'C' .. cause_irl_id
+        else
+            desc[#desc+1] = 'S' .. symbol
+        end
+        desc[#desc+1] = '@' .. middle_earleme
+        if not symbol then symbol = -1 end
+        data[#data+1] = {
+            origin_earleme,
+            current_earleme,
+            irl_id,
+            position,
+            middle_earleme,
+            symbol,
+            cause_irl_id,
+            table.concat(desc)
+        }
+    end
+    -- print('data:', inspect(data))
+
+    local function cmp_data(i, j)
+        if i[1] < j[1] then return true end
+        if i[1] > j[1] then return false end
+        if i[2] < j[2] then return true end
+        if i[2] > j[2] then return false end
+        if i[3] < j[3] then return true end
+        if i[3] > j[3] then return false end
+        if i[4] < j[4] then return true end
+        if i[4] > j[4] then return false end
+        if i[5] < j[5] then return true end
+        if i[5] > j[5] then return false end
+        if i[6] < j[6] then return true end
+        if i[6] > j[6] then return false end
+        if i[7] < j[7] then return true end
+        return false
+    end
+
+    table.sort(data, cmp_data)
+    local result = {}
+    for _,datum in pairs(data) do
+        result[#result+1] = datum[#datum]
+    end
+    result[#result+1] = '' -- so concat adds a final '\n'
+    return table.concat(result, '\n')
+END_OF_LUA
+
+    return $result;
+
+#     AND_NODE: for ( my $id = 0;; $id++ ) {
+#         my $parent      = $bocage->_marpa_b_and_node_parent($id);
+#         my $predecessor = $bocage->_marpa_b_and_node_predecessor($id);
+#         my $cause       = $bocage->_marpa_b_and_node_cause($id);
+#         my $symbol      = $bocage->_marpa_b_and_node_symbol($id);
+#         last AND_NODE if not defined $parent;
+#         my $origin            = $bocage->_marpa_b_or_node_origin($parent);
+#         my $set               = $bocage->_marpa_b_or_node_set($parent);
+#         my $irl_id            = $bocage->_marpa_b_or_node_irl($parent);
+#         my $position          = $bocage->_marpa_b_or_node_position($parent);
+#         my $origin_earleme    = $recce_c->earleme($origin);
+#         my $current_earleme   = $recce_c->earleme($set);
+#         my $middle_earley_set = $bocage->_marpa_b_and_node_middle($id);
+#         my $middle_earleme    = $recce_c->earleme($middle_earley_set);
+# 
+# #<<<  perltidy introduces trailing space on this
+#         my $desc =
+#               "And-node #$id: R"
+#             . $irl_id . q{:}
+#             . $position . q{@}
+#             . $origin_earleme . q{-}
+#             . $current_earleme;
+# #>>>
+#         my $cause_rule = -1;
+#         if ( defined $cause ) {
+#             my $cause_irl_id = $bocage->_marpa_b_or_node_irl($cause);
+#             $desc .= 'C' . $cause_irl_id;
+#         }
+#         else {
+#             $desc .= 'S' . $symbol;
+#         }
+#         $desc .= q{@} . $middle_earleme;
+#         push @data,
+#             [
+#             $origin_earleme, $current_earleme, $irl_id,
+#             $position,       $middle_earleme,  $cause_rule,
+#             ( $symbol // -1 ), $desc
+#             ];
+#     } ## end AND_NODE: for ( my $id = 0;; $id++ )
+#     my @sorted_data = map { $_->[-1] } sort {
+#                $a->[0] <=> $b->[0]
+#             or $a->[1] <=> $b->[1]
+#             or $a->[2] <=> $b->[2]
+#             or $a->[3] <=> $b->[3]
+#             or $a->[4] <=> $b->[4]
+#             or $a->[5] <=> $b->[5]
+#             or $a->[6] <=> $b->[6]
+#     } @data;
+#     return ( join "\n", @sorted_data ) . "\n";
 }
+
 
 sub Marpa::R3::Scanless::R::show_tree {
     my ( $slr, $verbose ) = @_;
