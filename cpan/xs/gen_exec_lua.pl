@@ -66,8 +66,8 @@ my $lua_exec_body = <<'END_OF_EXEC_BODY';
         marpa_luaL_checkstack(L, items+20, "xlua EXEC_BODY");
 
         if (is_method) {
-            /* first argument is recce table */
-            marpa_lua_pushvalue (L, -2);
+            /* first argument is object table */
+            marpa_lua_pushvalue (L, object_stack_ix);
             /* [ object_table, function, object_table ] */
         }
 
@@ -101,6 +101,54 @@ my $lua_exec_body = <<'END_OF_EXEC_BODY';
     }
 END_OF_EXEC_BODY
 
+# This is not a subtroutine because I use XS preprocessor
+# to deal with the Perl stack.  XS uses macros like XPUSHs(), and
+# these assume they are in a method using the top-level XS calling
+# protocol.  Putting this code in a C subroutine will confuse XS.
+my $lua_exec_sig_body = <<'END_OF_EXEC_SIG_BODY';
+    {
+        const int function_stack_ix = marpa_lua_gettop (L);
+        int i, status;
+        int top_after;
+
+        marpa_luaL_checkstack(L, items+20, "xlua EXEC_BODY");
+
+        if (is_method) {
+            /* first argument is recce table */
+            marpa_lua_pushvalue (L, -2);
+            /* [ object_table, function, object_table ] */
+        }
+
+        /* the remaining arguments are those passed to the Perl call */
+        for (i = 2; i < items; i++) {
+            SV *arg_sv = ST (i);
+            if (!SvOK (arg_sv)) {
+                croak ("Marpa::R3::Lua::exec arg %d is not an SV", i);
+            }
+            MARPA_SV_SV (L, arg_sv);
+        }
+
+        status = marpa_lua_pcall (L, (items - 2) + is_method, LUA_MULTRET, msghandler_ix);
+        if (status != 0) {
+            const char *exception_string = handle_pcall_error(L, status);
+            marpa_lua_settop (L, base_of_stack);
+            croak(exception_string);
+        }
+
+        marpa_luaL_checkstack(L, 20, "xlua EXEC_BODY");
+
+        /* return args to caller */
+        top_after = marpa_lua_gettop (L);
+        for (i = function_stack_ix; i <= top_after; i++) {
+            SV *sv_result = coerce_to_sv (L, i);
+            /* Took ownership of sv_result, we now need to mortalize it */
+            XPUSHs (sv_2mortal (sv_result));
+        }
+
+        marpa_lua_settop (L, base_of_stack);
+    }
+END_OF_EXEC_SIG_BODY
+
 my $code = <<'END_OF_MAIN_CODE';
 
 MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::SLG
@@ -111,7 +159,7 @@ exec_key( outer_slg, fn_key, ... )
    int fn_key;
 PPCODE:
 {
-    int recce_object;
+    int object_stack_ix;
     const int is_method = 1;
     lua_State *const L = outer_slg->L;
     const int base_of_stack = marpa_lua_gettop (L);
@@ -122,8 +170,8 @@ PPCODE:
 
     marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, outer_slg->lua_ref);
     /* Lua stack: [ grammar_table ] */
-    recce_object = marpa_lua_gettop (L);
-    marpa_lua_rawgeti (L, recce_object, fn_key);
+    object_stack_ix = marpa_lua_gettop (L);
+    marpa_lua_rawgeti (L, object_stack_ix, fn_key);
     /* [ grammar_table, function ] */
 
     === LUA EXEC BODY ===
@@ -135,6 +183,7 @@ exec( outer_slg, codestr, ... )
    char* codestr;
 PPCODE:
 {
+    int object_stack_ix;
     const int is_method = 1;
     lua_State *const L = outer_slg->L;
     const int base_of_stack = marpa_lua_gettop (L);
@@ -145,6 +194,7 @@ PPCODE:
 
     marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, outer_slg->lua_ref);
     /* Lua stack: [ grammar_table ] */
+    object_stack_ix = marpa_lua_gettop (L);
 
     === LUA LOAD STRING ===
     === LUA EXEC BODY ===
@@ -156,6 +206,7 @@ exec_name( outer_slg, name, ... )
    char* name;
 PPCODE:
 {
+    int object_stack_ix;
     const int is_method = 1;
     lua_State *const L = outer_slg->L;
     const int base_of_stack = marpa_lua_gettop (L);
@@ -167,6 +218,7 @@ PPCODE:
 
     marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, outer_slg->lua_ref);
     /* Lua stack: [ grammar_table ] */
+    object_stack_ix = marpa_lua_gettop (L);
 
     type = marpa_lua_getglobal (L, name);
     if (type != LUA_TFUNCTION)
@@ -186,7 +238,7 @@ exec_key( outer_slr, fn_key, ... )
    int fn_key;
 PPCODE:
 {
-    int recce_object;
+    int object_stack_ix;
     const int is_method = 1;
     lua_State *const L = outer_slr->L;
     const int base_of_stack = marpa_lua_gettop (L);
@@ -197,8 +249,8 @@ PPCODE:
 
     marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, outer_slr->lua_ref);
     /* Lua stack: [ recce_table ] */
-    recce_object = marpa_lua_gettop (L);
-    marpa_lua_rawgeti (L, recce_object, fn_key);
+    object_stack_ix = marpa_lua_gettop (L);
+    marpa_lua_rawgeti (L, object_stack_ix, fn_key);
     /* [ recce_table, function ] */
 
     === LUA EXEC BODY ===
@@ -210,6 +262,7 @@ exec( outer_slr, codestr, ... )
    char* codestr;
 PPCODE:
 {
+    int object_stack_ix;
     const int is_method = 1;
     lua_State *const L = outer_slr->L;
     const int base_of_stack = marpa_lua_gettop (L);
@@ -220,6 +273,7 @@ PPCODE:
 
     marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, outer_slr->lua_ref);
     /* Lua stack: [ recce_table ] */
+    object_stack_ix = marpa_lua_gettop (L);
 
     === LUA LOAD STRING ===
     === LUA EXEC BODY ===
@@ -231,6 +285,7 @@ exec_name( outer_slr, name, ... )
    char* name;
 PPCODE:
 {
+    int object_stack_ix;
     const int is_method = 1;
     lua_State *const L = outer_slr->L;
     const int base_of_stack = marpa_lua_gettop (L);
@@ -242,6 +297,7 @@ PPCODE:
 
     marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, outer_slr->lua_ref);
     /* Lua stack: [ recce_table ] */
+    object_stack_ix = marpa_lua_gettop (L);
 
     type = marpa_lua_getglobal (L, name);
     if (type != LUA_TFUNCTION)
@@ -261,6 +317,8 @@ raw_exec( lua_wrapper, codestr, ... )
    char* codestr;
 PPCODE:
 {
+    /* object_stack_ix is actually never used */
+    const int object_stack_ix = -1;
     const int is_method = 0;
     lua_State *const L = lua_wrapper->L;
     const int base_of_stack = marpa_lua_gettop (L);
@@ -279,6 +337,8 @@ exec( lua_wrapper, codestr, ... )
    char* codestr;
 PPCODE:
 {
+    /* object_stack_ix is actually never used */
+    const int object_stack_ix = -1;
     const int is_method = 0;
     lua_State *const L = lua_wrapper->L;
     const int base_of_stack = marpa_lua_gettop (L);
