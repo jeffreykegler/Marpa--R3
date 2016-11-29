@@ -484,20 +484,26 @@ sub Marpa::R3::ASF::glade_visited_clear {
 sub nid_sort_ix {
     my ( $asf, $nid ) = @_;
     my $slr       = $asf->[Marpa::R3::Internal::ASF::SLR];
-    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
-    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
-    my $bocage    = $slr->[Marpa::R3::Internal::Scanless::R::B_C];
-    if ( $nid >= 0 ) {
-        my $irl_id = $bocage->_marpa_b_or_node_irl($nid);
-        return $grammar_c->_marpa_g_source_xrl($irl_id);
-    }
-    my $and_node_id  = nid_to_and_node($nid);
-    my $token_nsy_id = $bocage->_marpa_b_and_node_symbol($and_node_id);
-    my $token_id     = $grammar_c->_marpa_g_source_xsy($token_nsy_id);
 
-    # -2 is reserved for 'end of data'
-    return -$token_id - 3;
+    if ( $nid >= 0 ) {
+        my ($result) = $slr->exec_sig(<<'END_OF_LUA', 'i', $nid);
+        recce, nid = ...
+        local irl_id = recce.lmw_b:_or_node_irl(nid)
+        return recce.slg.lmw_g1g:_source_xrl(irl_id)
+END_OF_LUA
+        return $result;
+    }
+
+    my $and_node_id  = nid_to_and_node($nid);
+
+    my ($result) = $slr->exec_sig(<<'END_OF_LUA', 'i', $and_node_id);
+    recce, and_node_id = ...
+    local token_nsy_id = recce.lmw_b:_and_node_symbol(and_node_id)
+    local token_id = recce.slg.lmw_g1g:_source_xsy(token_nsy_id)
+    -- -2 is reserved for 'end of data'
+    return -token_id - 3
+END_OF_LUA
+    return $result;
 } ## end sub nid_sort_ix
 
 sub Marpa::R3::ASF::grammar {
