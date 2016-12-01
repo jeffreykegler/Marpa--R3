@@ -1344,6 +1344,19 @@ It should free all memory associated with the valuation.
         return table.concat(result, '\n')
     end
 
+    function or_node_tag(recce, or_node_id)
+        local bocage = recce.lmw_b
+        local set = bocage:_or_node_set(or_node_id)
+        local irl_id = bocage:_or_node_irl(or_node_id)
+        local origin = bocage:_or_node_origin(or_node_id)
+        local position = bocage:_or_node_position(or_node_id)
+        return string.format("R%d:%d@%d-%d",
+            irl_id,
+            position,
+            origin,
+            set)
+    end
+
     function show_or_nodes(recce)
         local bocage = recce.lmw_b
         local g1r = recce.lmw_g1r

@@ -2265,14 +2265,11 @@ END_OF_LUA
     return $text;
 }
 
+# Eventually replace with the Lua version of or_node_tag
 sub Marpa::R3::Scanless::R::or_node_tag {
     my ( $slr, $or_node_id ) = @_;
-    my $bocage   = $slr->[Marpa::R3::Internal::Scanless::R::B_C];
-    my $set      = $bocage->_marpa_b_or_node_set($or_node_id);
-    my $irl_id   = $bocage->_marpa_b_or_node_irl($or_node_id);
-    my $origin   = $bocage->_marpa_b_or_node_origin($or_node_id);
-    my $position = $bocage->_marpa_b_or_node_position($or_node_id);
-    return 'R' . $irl_id . q{:} . $position . q{@} . $origin . q{-} . $set;
+    my ($result) = $slr->exec_sig_name('or_node_tag', 'i', $or_node_id);
+    return $result;
 }
 
 sub Marpa::R3::Scanless::R::show_bocage {
