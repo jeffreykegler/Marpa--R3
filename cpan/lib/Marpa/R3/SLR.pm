@@ -2187,12 +2187,8 @@ sub Marpa::R3::Scanless::R::show_tree {
 sub Marpa::R3::Scanless::R::show_nook {
     my ( $slr, $nook_id, $verbose ) = @_;
 
-    # say STDERR 'nook_id', $nook_id;
-
-    my ($text, $or_node_id);
-    ($or_node_id, $text) = $slr->exec(<<'END_OF_LUA', $nook_id);
+    my ($or_node_id, $text) = $slr->exec_sig(<<'END_OF_LUA', 'i', $nook_id);
     local recce, nook_id = ...
-    nook_id = nook_id + 0
     local tree = recce.lmw_t
     -- print('nook_id', nook_id)
     local or_node_id = tree:_nook_or_node(nook_id)
@@ -2210,39 +2206,33 @@ sub Marpa::R3::Scanless::R::show_nook {
     end
     text = text .. '[-]'
     ::CHILD_TYPE_FOUND::
-    return or_node_id, text
-END_OF_LUA
 
-    return if not defined $or_node_id;
+    if not or_node_id then return end
 
-    my $or_node_tag =
-        $slr->or_node_tag( $or_node_id );
-    $text .= " $or_node_tag";
-
-    ($text) = $slr->exec(<<'END_OF_LUA', $nook_id, $text);
-    local recce, nook_id, text = ...
     local tree = recce.lmw_t
-    text = tostring(text) .. ' p'
-    if tree:_nook_predecessor_is_ready(nook_id+0) ~= 0 then
+    text = text .. " " .. or_node_tag(recce, or_node_id) .. ' p'
+    if tree:_nook_predecessor_is_ready(nook_id) ~= 0 then
         text = text .. '=ok'
     else
         text = text .. '-'
     end
     text = text .. ' c'
-    if tree:_nook_cause_is_ready(nook_id+0) ~= 0 then
+    if tree:_nook_cause_is_ready(nook_id) ~= 0 then
         text = text .. '=ok'
     else
         text = text .. '-'
     end
     text = text .. '\n'
-    return text
+    return or_node_id, text
 END_OF_LUA
+
+    return if not defined $or_node_id;
 
     DESCRIBE_CHOICES: {
         my $this_choice;
-        ($this_choice) = $slr->exec(
-            ' recce, nook_id = ...; return recce.lmw_t:_nook_choice(nook_id+0)',
-            $nook_id
+        ($this_choice) = $slr->exec_sig(
+            ' recce, nook_id = ...; return recce.lmw_t:_nook_choice(nook_id)',
+            'i', $nook_id
         );
         CHOICE: for ( my $choice_ix = 0;; $choice_ix++ ) {
 
