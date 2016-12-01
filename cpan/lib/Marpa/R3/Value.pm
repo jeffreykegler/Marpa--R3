@@ -382,23 +382,23 @@ sub Marpa::R3::Scanless::R::show_semantics {
 sub Marpa::R3::Scanless::R::ordering_get {
     my ($slr) = @_;
     return if $slr->[Marpa::R3::Internal::Scanless::R::NO_PARSE];
-
-    my ($has_ordering) = $slr->exec( 'recce = ...; return recce.lmw_o' );
-    return 1 if $has_ordering;
-
-    my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
     my $parse_set_arg =
         $slr->[Marpa::R3::Internal::Scanless::R::END_OF_PARSE];
-    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
-    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
-    my $recce_c   = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
 
-    $grammar_c->throw_set(0);
-    my $bocage =
-      Marpa::R3::Thin::B->new( $recce_c, ( $parse_set_arg // -1 ), $thin_slr );
-    $grammar_c->throw_set(1);
-    if ( not $bocage ) {
+    my ($has_bocage)
+        = $slr->exec_sig(<<'END_OF_LUA', 'i', ( $parse_set_arg // -1 ));
+    -- inside $slr->ordering_get()
+    local recce, end_of_parse = ...
+    if recce.lmw_o then return 1 end
+    kollos.throw_set()
+    local bocage = kollos.bocage_new(recce.lmw_g1r, end_of_parse)
+    kollos.throw_set(1)
+    recce.lmw_b = bocage
+    if not bocage then return end
+    return 1
+END_OF_LUA
+
+    if ( not $has_bocage ) {
         $slr->[Marpa::R3::Internal::Scanless::R::NO_PARSE] = 1;
         return;
     }
