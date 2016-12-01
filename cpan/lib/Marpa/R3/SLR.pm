@@ -467,7 +467,10 @@ sub common_set {
     if ( defined( my $value = $flat_args->{'end'} ) ) {
 
         # Not allowed once evaluation is started
-        if ( defined $slr->[Marpa::R3::Internal::Scanless::R::B_C] ) {
+        my ($has_bocage) = $slr->exec_sig(
+            'local recce = ...; return recce.lmw_b', ''
+        );
+        if ( $has_bocage ) {
             Marpa::R3::exception(
                 q{Cannot reset end once evaluation has started});
         }

@@ -395,7 +395,7 @@ sub Marpa::R3::Scanless::R::ordering_get {
     my $recce_c   = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
 
     $grammar_c->throw_set(0);
-    my $bocage = $slr->[Marpa::R3::Internal::Scanless::R::B_C] =
+    my $bocage =
       Marpa::R3::Thin::B->new( $recce_c, ( $parse_set_arg // -1 ), $thin_slr );
     $grammar_c->throw_set(1);
     if ( not $bocage ) {
