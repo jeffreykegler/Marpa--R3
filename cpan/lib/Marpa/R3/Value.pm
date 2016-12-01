@@ -384,47 +384,37 @@ sub Marpa::R3::Scanless::R::ordering_get {
     return if $slr->[Marpa::R3::Internal::Scanless::R::NO_PARSE];
     my $parse_set_arg =
         $slr->[Marpa::R3::Internal::Scanless::R::END_OF_PARSE];
+    my $ranking_method =
+        $slr->[Marpa::R3::Internal::Scanless::R::RANKING_METHOD];
 
-    my ($has_bocage)
-        = $slr->exec_sig(<<'END_OF_LUA', 'i', ( $parse_set_arg // -1 ));
+    my ($has_parse) = $slr->exec_sig(<<'END_OF_LUA',
     -- inside $slr->ordering_get()
-    local recce, end_of_parse = ...
-    if recce.lmw_o then return 1 end
+    local recce, end_of_parse, ranking_method = ...
+    if recce.lmw_o then return true end
     kollos.throw_set()
     local bocage = kollos.bocage_new(recce.lmw_g1r, end_of_parse)
     kollos.throw_set(1)
     recce.lmw_b = bocage
-    if not bocage then return end
-    return 1
+    if not bocage then return false end
+    recce.lmw_o = kollos.order_new(bocage)
+
+    if ranking_method == 'high_rule_only' then
+        recce.lmw_o:high_rank_only_set(1)
+        recce.lmw_o:rank()
+    end
+    if ranking_method == 'rule' then
+        recce.lmw_o:high_rank_only_set(0)
+        recce.lmw_o:rank()
+    end
+    return true
 END_OF_LUA
+        'is',
+        ( $parse_set_arg // -1 ),
+        $ranking_method
+    );
 
-    if ( not $has_bocage ) {
-        $slr->[Marpa::R3::Internal::Scanless::R::NO_PARSE] = 1;
-        return;
-    }
-
-    $slr->exec( 'recce = ...; recce.lmw_o = kollos.order_new(recce.lmw_b)');
-
-    GIVEN_RANKING_METHOD: {
-        my $ranking_method =
-            $slr->[Marpa::R3::Internal::Scanless::R::RANKING_METHOD];
-
-        $slr->exec( <<'END_OF_LUA', $ranking_method );
-        local recce, raw_ranking_method = ...
-        local ranking_method = tostring(raw_ranking_method)
-        if ranking_method == 'high_rule_only' then
-            recce.lmw_o:high_rank_only_set(1)
-            recce.lmw_o:rank()
-        end
-        if ranking_method == 'rule' then
-            recce.lmw_o:high_rank_only_set(0)
-            recce.lmw_o:rank()
-        end
-END_OF_LUA
-
-    } ## end GIVEN_RANKING_METHOD:
-
-    return 1;
+    $slr->[Marpa::R3::Internal::Scanless::R::NO_PARSE] = not $has_parse;
+    return $has_parse;
 }
 
 sub resolve_rule_by_id {
