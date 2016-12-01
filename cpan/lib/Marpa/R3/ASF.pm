@@ -544,19 +544,30 @@ END_OF_LUA
 sub token_es_span {
     my ( $asf, $and_node_id ) = @_;
     my $slr       = $asf->[Marpa::R3::Internal::ASF::SLR];
-    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $tracer =
-        $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
-    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
-    my $bocage    = $slr->[Marpa::R3::Internal::Scanless::R::B_C];
-    my $predecessor_id = $bocage->_marpa_b_and_node_predecessor($and_node_id);
-    my $parent_or_node_id = $bocage->_marpa_b_and_node_parent($and_node_id);
+
+    my ($predecessor_id, $parent_or_node_id) = $slr->exec_sig(<<'END_OF_LUA',
+        recce, and_node_id = ...
+        local b = recce.lmw_b
+        return
+            b:_and_node_predecessor(and_node_id),
+            b:_and_node_parent(and_node_id)
+END_OF_LUA
+        'i', $and_node_id);
 
     if ( defined $predecessor_id ) {
-        my $origin_es  = $bocage->_marpa_b_or_node_set($predecessor_id);
-        my $current_es = $bocage->_marpa_b_or_node_set($parent_or_node_id);
+
+        my ($origin_es, $current_es) = $slr->exec_sig(<<'END_OF_LUA',
+            recce, predecessor_id, parent_or_node_id = ...
+            local b = recce.lmw_b
+            return
+                b:_or_node_set(predecessor_id),
+                b:_or_node_set(parent_or_node_id)
+END_OF_LUA
+            'ii', $predecessor_id, $parent_or_node_id);
+
         return ( $origin_es, $current_es - $origin_es );
     }
+
     return or_node_es_span( $asf, $parent_or_node_id );
 } ## end sub token_es_span
 
