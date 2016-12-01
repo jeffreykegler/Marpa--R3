@@ -2255,38 +2255,11 @@ END_OF_LUA
     return $text;
 }
 
-# Eventually replace with the Lua version of or_node_tag
-sub Marpa::R3::Scanless::R::or_node_tag {
-    my ( $slr, $or_node_id ) = @_;
-    my ($result) = $slr->exec_sig_name('or_node_tag', 'i', $or_node_id);
-    return $result;
-}
-
 sub Marpa::R3::Scanless::R::show_bocage {
     my ($slr)     = @_;
     my ($result) = $slr->exec_sig_name('show_bocage', '');
     return $result;
 }
-
-# These were not sorted and therefore were not suitable for test suite
-# This code has not been updated from Marpa::R2.
-# I keep it in case I'll want to for some very in-depth diagnostics
-# some day
-
-# sub Marpa::R3::Recognizer::verbose_or_nodes {
-#     my ($recce) = @_;
-#     my $text = q{};
-#     OR_NODE:
-#     for (
-#         my $or_node_id = 0;
-#         defined( my $or_node_desc = $recce->verbose_or_node($or_node_id) );
-#         $or_node_id++
-#         )
-#     {
-#         $text .= $or_node_desc;
-#     } ## end OR_NODE: for ( my $or_node_id = 0; defined( my $or_node_desc =...))
-#     return $text;
-# }
 
 sub Marpa::R3::Scanless::R::verbose_or_node {
     my ( $slr, $or_node_id ) = @_;
