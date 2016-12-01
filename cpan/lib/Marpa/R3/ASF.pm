@@ -606,13 +606,15 @@ sub nid_token_id {
     return if $nid > $NID_LEAF_BASE;
     my $and_node_id  = nid_to_and_node($nid);
     my $slr          = $asf->[Marpa::R3::Internal::ASF::SLR];
-    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $tracer =
-        $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
-    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
-    my $bocage       = $slr->[Marpa::R3::Internal::Scanless::R::B_C];
-    my $token_nsy_id = $bocage->_marpa_b_and_node_symbol($and_node_id);
-    my $token_id     = $grammar_c->_marpa_g_source_xsy($token_nsy_id);
+
+    my ($token_id) = $slr->exec_sig(<<'END_OF_LUA',
+        recce, and_node_id = ...
+        local token_nsy_id = recce.lmw_b:_and_node_symbol(and_node_id)
+        local token_id = recce.slg.lmw_g1g:_source_xsy(token_nsy_id)
+        return token_id
+END_OF_LUA
+        'i', $and_node_id);
+
     return $token_id;
 }
 
