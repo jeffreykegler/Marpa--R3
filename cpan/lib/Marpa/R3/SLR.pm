@@ -2263,23 +2263,32 @@ sub Marpa::R3::Scanless::R::show_bocage {
 
 sub Marpa::R3::Scanless::R::verbose_or_node {
     my ( $slr, $or_node_id ) = @_;
-    my $recce_c = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
-    my $bocage  = $slr->[Marpa::R3::Internal::Scanless::R::B_C];
-    my $origin  = $bocage->_marpa_b_or_node_origin($or_node_id);
-    return if not defined $origin;
+    my ($text, $irl_id, $position)
+        = $slr->exec_sig(<<'END_OF_LUA', 'i', $or_node_id);
+        local recce, or_node_id = ...
+        local bocage = recce.lmw_b
+        local origin = bocage:_or_node_origin(or_node_id)
+        if not origin then return end
+        local set = bocage:_or_node_set(or_node_id)
+        local irl_id = bocage:_or_node_irl(or_node_id)
+        local position = bocage:_or_node_position(or_node_id)
+        local g1r = recce.lmw_g1r
+        local origin_earleme = g1r:earleme(origin)
+        local current_earleme = g1r:earleme(set)
+        local text = string.format(
+            'OR-node #%d: R%d:@%d-%d\n',
+            or_node_id,
+            position,
+            origin_earleme,
+            current_earleme,
+            )
+
+END_OF_LUA
+    return if not $text;
+
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $tracer =
         $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
-    my $set             = $bocage->_marpa_b_or_node_set($or_node_id);
-    my $irl_id          = $bocage->_marpa_b_or_node_irl($or_node_id);
-    my $position        = $bocage->_marpa_b_or_node_position($or_node_id);
-    my $origin_earleme  = $recce_c->earleme($origin);
-    my $current_earleme = $recce_c->earleme($set);
-    my $text =
-          "OR-node #$or_node_id: R$irl_id" . q{:}
-        . $position . q{@}
-        . $origin_earleme . q{-}
-        . $current_earleme . "\n";
     $text .= ( q{ } x 4 )
         . $tracer->show_dotted_irl( $irl_id, $position ) . "\n";
     return $text;
