@@ -792,8 +792,10 @@ sub factoring_finish {
             if ( !$work_nook->[Marpa::R3::Internal::Nook::CAUSE_IS_EXPANDED] )
             {
                 if ( not nook_has_semantic_cause( $asf, $work_nook ) ) {
-                    $child_or_node =
-                        $bocage->_marpa_b_and_node_cause($work_and_node_id);
+                    ($child_or_node) = $slr->exec_sig(
+                        'recce, work_and_node_id = ...; return recce.lmw_b:_and_node_cause(work_and_node_id)',
+                        'i',
+                        $work_and_node_id);
                     $child_is_cause = 1;
                     last FIND_CHILD_OR_NODE;
                 } ## end if ( not nook_has_semantic_cause( $asf, $work_nook ))
@@ -802,8 +804,10 @@ sub factoring_finish {
             if ( !$work_nook
                 ->[Marpa::R3::Internal::Nook::PREDECESSOR_IS_EXPANDED] )
             {
-                $child_or_node =
-                    $bocage->_marpa_b_and_node_predecessor($work_and_node_id);
+                ($child_or_node) = $slr->exec_sig(
+                    'recce, work_and_node_id = ...; return recce.lmw_b:_and_node_predecessor(work_and_node_id)',
+                    'i',
+                    $work_and_node_id);
                 if ( defined $child_or_node ) {
                     $child_is_predecessor = 1;
                     last FIND_CHILD_OR_NODE;
