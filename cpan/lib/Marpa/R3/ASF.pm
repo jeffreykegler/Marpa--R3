@@ -425,8 +425,6 @@ An attempt was make to create an ASF for a null parse
     end
 END_OF_LUA
 
-    my $bocage   = $slr->[Marpa::R3::Internal::Scanless::R::B_C];
-
     my $or_nodes = $asf->[Marpa::R3::Internal::ASF::OR_NODES] = [];
     OR_NODE: for ( my $or_node_id = 0;; $or_node_id++ ) {
 
@@ -773,7 +771,6 @@ sub factoring_finish {
     my $tracer =
         $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
-    my $bocage    = $slr->[Marpa::R3::Internal::Scanless::R::B_C];
 
     my @worklist = ( 0 .. $#{$factoring_stack} );
 
@@ -850,11 +847,13 @@ sub factoring_finish {
 sub and_nodes_to_cause_nids {
     my ( $asf, @and_node_ids ) = @_;
     my $slr    = $asf->[Marpa::R3::Internal::ASF::SLR];
-    my $bocage = $slr->[Marpa::R3::Internal::Scanless::R::B_C];
     my %causes = ();
     for my $and_node_id (@and_node_ids) {
-        my $cause_nid = $bocage->_marpa_b_and_node_cause($and_node_id)
-            // and_node_to_nid($and_node_id);
+        my ($cause_nid) = $slr->exec_sig(
+            'local recce, and_node_id = ...; return recce.lmw_b:_and_node_cause(and_node_id)',
+            'i',
+            $and_node_id);
+        $cause_nid //= and_node_to_nid($and_node_id);
         $causes{$cause_nid} = 1;
     }
     return [ keys %causes ];
@@ -868,7 +867,6 @@ sub glade_id_factors {
     my $tracer =
         $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
-    my $bocage        = $slr->[Marpa::R3::Internal::Scanless::R::B_C];
     my $or_nodes      = $asf->[Marpa::R3::Internal::ASF::OR_NODES];
 
     my @result;
