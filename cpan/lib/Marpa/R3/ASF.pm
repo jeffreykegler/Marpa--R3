@@ -626,14 +626,16 @@ sub nid_symbol_id {
 
     # Not a token, so return the LHS of the rule
     my $slr       = $asf->[Marpa::R3::Internal::ASF::SLR];
-    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $tracer =
-        $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
-    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
-    my $bocage    = $slr->[Marpa::R3::Internal::Scanless::R::B_C];
-    my $irl_id    = $bocage->_marpa_b_or_node_irl($nid);
-    my $xrl_id    = $grammar_c->_marpa_g_source_xrl($irl_id);
-    my $lhs_id    = $grammar_c->rule_lhs($xrl_id);
+    my ($lhs_id) = $slr->exec_sig(<<'END_OF_LUA',
+        recce, nid = ...
+        local irl_id = recce.lmw_b:_or_node_irl(nid)
+        local g1g = recce.slg.lmw_g1g
+        local xrl_id = g1g:_source_xrl(irl_id)
+        local lhs_id = g1g:rule_lhs(xrl_id)
+        return lhs_id
+END_OF_LUA
+        'i', $nid);
+
     return $lhs_id;
 }
 
