@@ -1238,7 +1238,7 @@ It should free all memory associated with the valuation.
 ## Diagnostics
 
 ```
-    -- miranda: section diagnostics
+    -- miranda: section+ diagnostics
     function and_node_tag(recce, and_node_id)
         local bocage = recce.lmw_b
         local parent_or_node_id = bocage:_and_node_parent(and_node_id)
@@ -1401,6 +1401,70 @@ It should free all memory associated with the valuation.
         end
         result[#result+1] = '' -- so concat adds a final '\n'
         return table.concat(result, '\n')
+    end
+
+`show_bocage` returns a string which describes the bocage.
+
+    -- miranda: section+ diagnostics
+    function show_bocage(recce)
+        local bocage = recce.lmw_b
+        local data = {}
+        local or_node_id = -1
+        while true do
+            or_node_id = or_node_id + 1
+            local irl_id = bocage:_or_node_irl(or_node_id)
+            if not irl_id then goto LAST_OR_NODE end
+            local position = bocage:_or_node_position(or_node_id)
+            local or_origin = bocage:_or_node_origin(or_node_id)
+            local origin_earleme = recce.lmw_g1r:earleme(or_origin)
+            local or_set = bocage:_or_node_set(or_node_id)
+            local current_earleme = recce.lmw_g1r:earleme(or_set)
+            local and_node_ids = {}
+            local first_and_id = bocage:_or_node_first_and(or_node_id)
+            local last_and_id = bocage:_or_node_last_and(or_node_id)
+            for and_node_id = first_and_id, last_and_id do
+                local symbol = bocage:_and_node_symbol(and_node_id)
+                local cause_tag
+                if symbol then cause_tag = 'S' .. symbol end
+                local cause_id = bocage:_and_node_cause(and_node_id)
+                local cause_irl_id
+                if cause_id then
+                    cause_irl_id = bocage:_or_node_irl(cause_id)
+                    cause_tag = or_node_tag(recce, cause_id)
+                end
+                local parent_tag = or_node_tag(recce, or_node_id)
+                local predecessor_id = bocage:_and_node_predecessor(and_node_id)
+                local predecessor_tag = "-"
+                if predecessor_id then
+                    predecessor_tag = or_node_tag(recce, predecessor_id)
+                end
+                local tag = string.format(
+                    "%d: %d=%s %s %s",
+                    and_node_id,
+                    or_node_id,
+                    parent_tag,
+                    predecessor_tag,
+                    cause_tag
+                )
+                data[#data+1] = { and_node_id, tag }
+            end
+            ::LAST_AND_NODE::
+        end
+        ::LAST_OR_NODE::
+
+        local function cmp_data(i, j)
+            if i[1] < j[1] then return true end
+            return false
+        end
+
+        table.sort(data, cmp_data)
+        local result = {}
+        for _,datum in pairs(data) do
+            result[#result+1] = datum[#datum]
+        end
+        result[#result+1] = '' -- so concat adds a final '\n'
+        return table.concat(result, '\n')
+
     end
 
 ```

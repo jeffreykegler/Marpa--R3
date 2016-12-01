@@ -2274,57 +2274,8 @@ sub Marpa::R3::Scanless::R::or_node_tag {
 
 sub Marpa::R3::Scanless::R::show_bocage {
     my ($slr)     = @_;
-    my @data      = ();
-    my $id        = 0;
-    my $slg       = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $tracer   = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
-    my $recce_c   = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
-    my $bocage    = $slr->[Marpa::R3::Internal::Scanless::R::B_C];
-    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
-  OR_NODE: for ( my $or_node_id = 0 ; ; $or_node_id++ ) {
-        my $irl_id = $bocage->_marpa_b_or_node_irl($or_node_id);
-        last OR_NODE if not defined $irl_id;
-        my $position        = $bocage->_marpa_b_or_node_position($or_node_id);
-        my $or_origin       = $bocage->_marpa_b_or_node_origin($or_node_id);
-        my $origin_earleme  = $recce_c->earleme($or_origin);
-        my $or_set          = $bocage->_marpa_b_or_node_set($or_node_id);
-        my $current_earleme = $recce_c->earleme($or_set);
-        my @and_node_ids =
-          ( $bocage->_marpa_b_or_node_first_and($or_node_id)
-              .. $bocage->_marpa_b_or_node_last_and($or_node_id) );
-      AND_NODE:
-
-        for my $and_node_id (@and_node_ids) {
-            my $symbol = $bocage->_marpa_b_and_node_symbol($and_node_id);
-            my $cause_tag;
-
-            if ( defined $symbol ) {
-                $cause_tag = "S$symbol";
-            }
-            my $cause_id = $bocage->_marpa_b_and_node_cause($and_node_id);
-            my $cause_irl_id;
-            if ( defined $cause_id ) {
-                $cause_irl_id = $bocage->_marpa_b_or_node_irl($cause_id);
-                $cause_tag =
-                  $slr->or_node_tag( $cause_id );
-            }
-            my $parent_tag =
-              $slr->or_node_tag( $or_node_id );
-            my $predecessor_id =
-              $bocage->_marpa_b_and_node_predecessor($and_node_id);
-            my $predecessor_tag = q{-};
-            if ( defined $predecessor_id ) {
-                $predecessor_tag =
-                  $slr->or_node_tag( $predecessor_id );
-            }
-            my $tag = join q{ }, "$and_node_id:", "$or_node_id=$parent_tag",
-              $predecessor_tag, $cause_tag;
-
-            push @data, [ $and_node_id, $tag ];
-        } ## end AND_NODE: for my $and_node_id (@and_node_ids)
-    } ## end OR_NODE: for ( my $or_node_id = 0;; $or_node_id++ )
-    my @sorted_data = map { $_->[-1] } sort { $a->[0] <=> $b->[0] } @data;
-    return ( join "\n", @sorted_data ) . "\n";
+    my ($result) = $slr->exec_sig_name('show_bocage', '');
+    return $result;
 }
 
 # These were not sorted and therefore were not suitable for test suite
