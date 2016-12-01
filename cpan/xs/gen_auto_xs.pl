@@ -187,6 +187,7 @@ say {$out} gp_generate(qw(symbol_is_valued_set Marpa_Symbol_ID symbol_id int boo
 say {$out} gp_generate(qw(symbol_new));
 say {$out} gp_generate(qw(zwa_new int default_value));
 say {$out} gp_generate(qw(zwa_place Marpa_Assertion_ID zwaid Marpa_Rule_ID xrl_id int rhs_ix));
+
 $main::CLASS_LETTER   = 'r';
 $main::LIBMARPA_CLASS = 'Marpa_Recognizer';
 print {$out} 'MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::R', "\n\n";
@@ -211,13 +212,6 @@ say {$out} gp_generate(qw(terminal_is_expected Marpa_Symbol_ID xsyid));
 say {$out} gp_generate(qw(zwa_default Marpa_Assertion_ID zwaid));
 say {$out} gp_generate(qw(zwa_default_set Marpa_Assertion_ID zwaid int default_value));
 
-$main::CLASS_LETTER   = 'b';
-$main::LIBMARPA_CLASS = 'Marpa_Bocage';
-print {$out} 'MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::B', "\n\n";
-
-say {$out} gp_generate(qw(ambiguity_metric));
-say {$out} gp_generate(qw(is_null));
-
 $main::CLASS_LETTER   = 'g';
 $main::LIBMARPA_CLASS = 'Marpa_Grammar';
 print {$out} 'MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::G', "\n\n";
@@ -229,25 +223,4 @@ say {$out} gp_generate(qw(_marpa_g_irl_length Marpa_IRL_ID rule_id));
 say {$out} gp_generate(qw(_marpa_g_irl_rank Marpa_IRL_ID irl_id));
 say {$out} gp_generate(qw(_marpa_g_nsy_rank Marpa_NSY_ID nsy_id));
 say {$out} gp_generate(qw(_marpa_g_nsy_is_semantic Marpa_NSY_ID nsy_id));
-
-$main::CLASS_LETTER   = 'b';
-$main::LIBMARPA_CLASS = 'Marpa_Bocage';
-print {$out} 'MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::B', "\n\n";
-
-say {$out} gp_generate(qw(_marpa_b_and_node_cause Marpa_And_Node_ID ordinal));
-say {$out} gp_generate(qw(_marpa_b_and_node_count));
-say {$out} gp_generate(qw(_marpa_b_and_node_middle Marpa_And_Node_ID and_node_id));
-say {$out} gp_generate(qw(_marpa_b_and_node_parent Marpa_And_Node_ID and_node_id));
-say {$out} gp_generate(qw(_marpa_b_and_node_predecessor Marpa_And_Node_ID ordinal));
-say {$out} gp_generate(qw(_marpa_b_and_node_symbol Marpa_And_Node_ID and_node_id));
-say {$out} gp_generate(qw(_marpa_b_or_node_and_count Marpa_Or_Node_ID or_node_id));
-say {$out} gp_generate(qw(_marpa_b_or_node_first_and Marpa_Or_Node_ID ordinal));
-say {$out} gp_generate(qw(_marpa_b_or_node_irl Marpa_Or_Node_ID ordinal));
-say {$out} gp_generate(qw(_marpa_b_or_node_is_semantic Marpa_Or_Node_ID or_node_id));
-say {$out} gp_generate(qw(_marpa_b_or_node_is_whole Marpa_Or_Node_ID or_node_id));
-say {$out} gp_generate(qw(_marpa_b_or_node_last_and Marpa_Or_Node_ID ordinal));
-say {$out} gp_generate(qw(_marpa_b_or_node_origin Marpa_Or_Node_ID ordinal));
-say {$out} gp_generate(qw(_marpa_b_or_node_position Marpa_Or_Node_ID ordinal));
-say {$out} gp_generate(qw(_marpa_b_or_node_set Marpa_Or_Node_ID ordinal));
-say {$out} gp_generate(qw(_marpa_b_top_or_node));
 

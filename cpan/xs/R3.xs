@@ -177,7 +177,6 @@ typedef struct marpa_v Value;
 
 static const char grammar_c_class_name[] = "Marpa::R3::Thin::G";
 static const char recce_c_class_name[] = "Marpa::R3::Thin::R";
-static const char bocage_c_class_name[] = "Marpa::R3::Thin::B";
 static const char scanless_g_class_name[] = "Marpa::R3::Thin::SLG";
 static const char scanless_r_class_name[] = "Marpa::R3::Thin::SLR";
 static const char marpa_lua_class_name[] = "Marpa::R3::Lua";
@@ -3904,84 +3903,6 @@ PPCODE:
   XPUSHs (sv_2mortal (newSViv (origin)));
 }
 
-MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::B
-
-void
-thin_new( class, r_wrapper, ordinal )
-    char * class;
-    R_Wrapper *r_wrapper;
-    Marpa_Earley_Set_ID ordinal;
-PPCODE:
-{
-  SV *sv;
-  Marpa_Recognizer r = r_wrapper->r;
-  B_Wrapper *b_wrapper;
-  Marpa_Bocage b = marpa_b_new (r, ordinal);
-  PERL_UNUSED_ARG(class);
-
-  if (!b)
-    {
-      if (!r_wrapper->base->throw) { XSRETURN_UNDEF; }
-      croak ("Problem in b->new(): %s", xs_g_error(r_wrapper->base));
-    }
-  Newx (b_wrapper, 1, B_Wrapper);
-  {
-    SV* base_sv = r_wrapper->base_sv;
-    SvREFCNT_inc (base_sv);
-    b_wrapper->base_sv = base_sv;
-  }
-  b_wrapper->base = r_wrapper->base;
-  b_wrapper->b = b;
-  sv = sv_newmortal ();
-  sv_setref_pv (sv, bocage_c_class_name, (void *) b_wrapper);
-  XPUSHs (sv);
-}
-
-void
-new( class, r_wrapper, ordinal, outer_slr )
-    char * class;
-    R_Wrapper *r_wrapper;
-    Marpa_Earley_Set_ID ordinal;
-    Outer_R *outer_slr;
-PPCODE:
-{
-  SV *sv;
-  Marpa_Recognizer r = r_wrapper->r;
-  B_Wrapper *b_wrapper;
-  Marpa_Bocage b = marpa_b_new (r, ordinal);
-  PERL_UNUSED_ARG(class);
-
-  if (!b)
-    {
-      if (!r_wrapper->base->throw) { XSRETURN_UNDEF; }
-      croak ("Problem in b->new(): %s", xs_g_error(r_wrapper->base));
-    }
-  Newx (b_wrapper, 1, B_Wrapper);
-  {
-    SV* base_sv = r_wrapper->base_sv;
-    SvREFCNT_inc (base_sv);
-    b_wrapper->base_sv = base_sv;
-  }
-  b_wrapper->base = r_wrapper->base;
-  b_wrapper->b = b;
-  marpa_b_ref(b);
-  dummyup_bocage(outer_slr->L, outer_slr->lua_ref, b);
-  sv = sv_newmortal ();
-  sv_setref_pv (sv, bocage_c_class_name, (void *) b_wrapper);
-  XPUSHs (sv);
-}
-
-void
-DESTROY( b_wrapper )
-    B_Wrapper *b_wrapper;
-PPCODE:
-{
-    const Marpa_Bocage b = b_wrapper->b;
-    SvREFCNT_dec (b_wrapper->base_sv);
-    marpa_b_unref(b);
-    Safefree( b_wrapper );
-}
-
 MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::G
 
 void
@@ -4643,92 +4564,6 @@ PPCODE:
         }
       XPUSHs (sv_2mortal (newSViv (leo_predecessor_symbol)));
     }
-
-MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::B
-
-void
-_marpa_b_and_node_token( b_wrapper, and_node_id )
-     B_Wrapper *b_wrapper;
-     Marpa_And_Node_ID and_node_id;
-PPCODE:
-{
-  Marpa_Bocage b = b_wrapper->b;
-  int value = -1;
-  int result = _marpa_b_and_node_token (b, and_node_id, &value);
-  if (result == -1)
-    {
-      XSRETURN_UNDEF;
-    }
-  if (result < 0)
-    {
-      croak ("Problem in b->_marpa_b_and_node_symbol(): %s",
-             xs_g_error(b_wrapper->base));
-    }
-  XPUSHs (sv_2mortal (newSViv (result)));
-  XPUSHs (sv_2mortal (newSViv (value)));
-}
-
-void
-dummyup_order( b_wrapper, lua_wrapper, name )
-    B_Wrapper *b_wrapper;
-    Marpa_Lua *lua_wrapper;
-    char *name;
-PPCODE:
-{
-  lua_State *const L = lua_wrapper->L;
-  int order_object_ix;
-  const int base_of_stack = marpa_lua_gettop(L);
-  G_Wrapper* const g_wrapper = b_wrapper->base;
-  const Marpa_Grammar g = g_wrapper->g;
-  const Marpa_Bocage bocage = b_wrapper->b;
-  Marpa_Order order;
-  int throw;
-
-  marpa_luaL_checkstack(L, 20, "$bocage->dummyup_order");
-  marpa_lua_getglobal(L, "throw");
-  throw = marpa_lua_toboolean(L, -1);
-  /* Leaves throw on stack -- will be popped at the end */
-  marpa_lua_newtable(L);
-  order_object_ix = marpa_lua_gettop(L);
-  marpa_lua_getglobal(L, "kollos");
-  marpa_lua_getfield(L, -1, "class_order");
-  marpa_lua_setmetatable(L, order_object_ix);
-  /* [ order_obj, kollos_tab ] */
-  marpa_lua_pop(L, 1);
-  /* [ order_obj ] */
-
-  /* Add new g userdatum --
-   * it must own a reference to the Libmarpa
-   * grammar.
-   */
-  marpa_gen_grammar_ud(L, g);
-  marpa_g_ref(g);
-  /* [ order_obj, grammar_ud ] */
-  marpa_lua_setfield(L, order_object_ix, "_libmarpa_g");
-  /* [ order_obj ] */
-
-  /* Add v userdatum here */
-  order = marpa_o_new (bocage);
-  if (!order)
-    {
-      if (!throw)
-        {
-          XSRETURN_UNDEF;
-        }
-      croak ("Problem in t->dummyup_order(): %s", xs_g_error (g_wrapper));
-    }
-  marpa_gen_order_ud(L, order);
-  /* [ order_obj, grammar_ud ] */
-  marpa_lua_setfield(L, order_object_ix, "_libmarpa");
-  /* [ order_obj ] */
-
-  marpa_lua_getglobal(L, "sandbox");
-  /* [ order_obj, sandbox ] */
-  marpa_lua_rotate(L, -2, -1);
-  /* [ sandbox, order_obj ] */
-  marpa_lua_setfield(L, -2, name);
-  marpa_lua_settop(L, base_of_stack);
-}
 
 MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::SLG
 
