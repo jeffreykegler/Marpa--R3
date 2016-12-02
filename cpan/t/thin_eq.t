@@ -29,6 +29,10 @@ Marpa::R3::Lua::Test::More::load_me($marpa_lua);
 $marpa_lua->exec(<<'END_OF_LUA');
      Test.More.plan(8)
 
+     -- enforce "C" locale so that tests using
+     -- string sorts are predictable on all platforms
+     os.setlocale("C")
+
      -- for debugging
      function show_progress (recce)
          local ordinal = recce:latest_earley_set()
@@ -179,11 +183,11 @@ $marpa_lua->exec(<<'END_OF_LUA');
     actual_values[#actual_values+1] = '' -- to get final '\n'
     actual_values_string = table.concat(actual_values, '\n')
     Test.More.is(actual_values_string, [[
+(((2-0)*3)+1) == 7
+((2-(0*3))+1) == 3
+((2-0)*(3+1)) == 8
 (2-((0*3)+1)) == 1
 (2-(0*(3+1))) == 2
-((2-(0*3))+1) == 3
-(((2-0)*3)+1) == 7
-((2-0)*(3+1)) == 8
 ]], 'expected values')
 
      -- Test phase 2
