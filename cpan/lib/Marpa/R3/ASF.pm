@@ -17,7 +17,7 @@ use warnings;
 no warnings qw(recursion);
 
 use vars qw($VERSION $STRING_VERSION);
-$VERSION        = '4.001_025';
+$VERSION        = '4.001_026';
 $STRING_VERSION = $VERSION;
 ## no critic(BuiltinFunctions::ProhibitStringyEval)
 $VERSION = eval $VERSION;
