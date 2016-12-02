@@ -3159,66 +3159,6 @@ dummyup_recce(
     marpa_lua_settop (L, base_of_stack);
 }
 
-  /* Takes ownership of a reference to `bocage` -- caller must have
-   * one available.
-   */
-static void
-dummyup_bocage(
-  lua_State* L,
-  int slr_lua_ref,
-  Marpa_Bocage bocage)
-{
-    int bocage_object_ix;
-    int slr_object_ix;
-    const int base_of_stack = marpa_lua_gettop (L);
-
-    marpa_luaL_checkstack (L, 20, "dummyup_bocage");
-
-    marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, slr_lua_ref);
-    /* Lua stack: [ slr_table ] */
-    slr_object_ix = marpa_lua_gettop (L);
-
-    marpa_lua_newtable (L);
-    bocage_object_ix = marpa_lua_gettop (L);
-    marpa_lua_getglobal (L, "kollos");
-    marpa_lua_getfield (L, -1, "class_bocage");
-    marpa_lua_setmetatable (L, bocage_object_ix);
-    /* [ slr_table, bocage_obj, kollos_tab ] */
-    marpa_lua_settop (L, bocage_object_ix);
-    /* [ slr_table, bocage_obj ] */
-
-    {
-        Scanless_R *slr;
-        Marpa_Grammar g;
-        marpa_lua_getfield (L, slr_object_ix, "lud");
-        /* Lua stack: [ slr_table, bocage_obj, lud ] */
-
-        slr = marpa_lua_touserdata (L, -1);
-        marpa_lua_settop (L, bocage_object_ix);
-        /* [ slr_table, bocage_obj ] */
-
-        g = slr->slg->g1;
-        /* Add new g userdatum --
-         * it must own a reference to the Libmarpa
-         * grammar.
-         */
-        marpa_g_ref (g);
-        marpa_gen_grammar_ud (L, g);
-        /* [ slr_table, bocage_obj, grammar_ud ] */
-        marpa_lua_setfield (L, bocage_object_ix, "_libmarpa_g");
-        /* [ slr_table, bocage_obj ] */
-    }
-
-    /* Add t userdatum here */
-    marpa_gen_bocage_ud (L, bocage);
-    /* [ slr_table, bocage_obj, bocage_ud ] */
-    marpa_lua_setfield (L, bocage_object_ix, "_libmarpa");
-    /* [ slr_table, bocage_obj ] */
-
-    marpa_lua_setfield (L, slr_object_ix, "lmw_b");
-    marpa_lua_settop (L, base_of_stack);
-}
-
 MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin
 
 PROTOTYPES: DISABLE
