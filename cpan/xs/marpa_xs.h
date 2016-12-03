@@ -44,7 +44,6 @@ typedef struct {
 
 struct symbol_g_properties {
      int priority;
-     unsigned int latm:1;
      unsigned int is_lexeme:1;
      unsigned int t_pause_before:1;
      unsigned int t_pause_before_active:1;

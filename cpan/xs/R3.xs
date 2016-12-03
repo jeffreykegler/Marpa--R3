@@ -2075,7 +2075,6 @@ static Scanless_G* slg_inner_new (SV * l0_sv, SV * g1_sv)
             struct symbol_g_properties);
         for (symbol_id = 0; symbol_id < g1_symbol_count; symbol_id++) {
             slg->symbol_g_properties[symbol_id].priority = 0;
-            slg->symbol_g_properties[symbol_id].latm = 0;
             slg->symbol_g_properties[symbol_id].is_lexeme = 0;
             slg->symbol_g_properties[symbol_id].t_pause_before = 0;
             slg->symbol_g_properties[symbol_id].t_pause_before_active = 0;
@@ -2683,30 +2682,12 @@ slr_alternatives (Scanless_R * slr)
           l0_rule_g_properties = slg->l0_rule_g_properties + rule_id;
           symbol_r_properties = slr->symbol_r_properties + g1_lexeme;
           is_expected = marpa_r_terminal_is_expected (g1r, g1_lexeme);
-          if (!is_expected)
-            {
-              union marpa_slr_event_s *lexeme_entry =
-                marpa_slr_lexeme_push (slr);
-              if (symbol_g_properties->latm)
-                {
-                  croak
-                    ("Internal error: Marpa recognized unexpected token @%ld-%ld: lexeme=%ld",
-                     (long) slr->start_of_lexeme, (long) slr->end_of_lexeme,
-                     (long) g1_lexeme);
-                }
-              else
-                {
-                  MARPA_SLREV_TYPE (lexeme_entry) =
-                    MARPA_SLRTR_LEXEME_REJECTED;
-                  lexeme_entry->t_trace_lexeme_rejected.t_start_of_lexeme =
-                    slr->start_of_lexeme;
-                  lexeme_entry->t_trace_lexeme_rejected.t_end_of_lexeme =
-                    slr->end_of_lexeme;
-                  lexeme_entry->t_trace_lexeme_rejected.t_lexeme = g1_lexeme;
-                  rejected++;
-                }
-              goto NEXT_PASS1_REPORT_ITEM;
-            }
+          if (!is_expected) {
+              croak
+                  ("Internal error: Marpa recognized unexpected token @%ld-%ld: lexeme=%ld",
+                  (long) slr->start_of_lexeme, (long) slr->end_of_lexeme,
+                  (long) g1_lexeme);
+          }
 
           /* If we are here, the lexeme will be accepted  by the grammar,
            * but we do not yet know about priority
@@ -4946,52 +4927,6 @@ PPCODE:
       croak
         ("Problem in slg->discard_event_activate(%ld, %ld): discard event is not enabled",
          (long) l0_rule_id, (long) activate);
-    }
-  XSRETURN_YES;
-}
-
-void
-g1_lexeme_latm_set( outer_slg, g1_lexeme, latm )
-    Outer_G *outer_slg;
-    Marpa_Symbol_ID g1_lexeme;
-    int latm;
-PPCODE:
-{
-  Scanless_G* slg = slg_inner_get(outer_slg);
-  Marpa_Symbol_ID highest_g1_symbol_id = marpa_g_highest_symbol_id (slg->g1);
-    struct symbol_g_properties * g_properties = slg->symbol_g_properties + g1_lexeme;
-    if (slg->precomputed)
-      {
-        croak
-          ("slg->lexeme_latm_set(%ld, %ld) called after SLG is precomputed",
-           (long) g1_lexeme, (long) latm);
-      }
-    if (g1_lexeme > highest_g1_symbol_id)
-    {
-      croak
-        ("Problem in slg->g1_lexeme_latm(%ld, %ld): symbol ID was %ld, but highest G1 symbol ID = %ld",
-         (long) g1_lexeme,
-         (long) latm,
-         (long) g1_lexeme,
-         (long) highest_g1_symbol_id
-         );
-    }
-    if (g1_lexeme < 0) {
-      croak
-        ("Problem in slg->lexeme_latm(%ld, %ld): symbol ID was %ld, a disallowed value",
-         (long) g1_lexeme,
-         (long) latm,
-         (long) g1_lexeme);
-    }
-    switch (latm) {
-    case 0: case 1:
-        g_properties->latm = latm ? 1 : 0;
-        break;
-    default:
-      croak
-        ("Problem in slg->lexeme_latm(%ld, %ld): value of latm must be 0 or 1",
-         (long) g1_lexeme,
-         (long) latm);
     }
   XSRETURN_YES;
 }
