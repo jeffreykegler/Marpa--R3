@@ -427,18 +427,6 @@ typedef struct
 #undef OFFSET_IN_INPUT
 #define OFFSET_IN_INPUT(slr) POS_TO_OFFSET((slr), (slr)->perl_pos)
 
-typedef struct {
-     Marpa_Bocage b;
-     SV* base_sv;
-     G_Wrapper* base;
-} B_Wrapper;
-
-typedef struct {
-     Marpa_Order o;
-     SV* base_sv;
-     G_Wrapper* base;
-} O_Wrapper;
-
 typedef struct
 {
   lua_State* L;
