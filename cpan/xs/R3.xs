@@ -2766,12 +2766,6 @@ slr_alternatives (Scanless_R * slr)
                   }
               }
             goto NEXT_LEXEME_EVENT;
-          case MARPA_SLRTR_LEXEME_REJECTED:
-            if (slr->trace_terminals || !is_priority_set)
-              {
-                *(marpa_slr_event_push (slr)) = *lexeme_stack_event;
-              }
-            goto NEXT_LEXEME_EVENT;
           case MARPA_SLRTR_LEXEME_DISCARDED:
             if (slr->trace_terminals)
               {
@@ -5453,18 +5447,6 @@ PPCODE:
             break;
           }
 
-        case MARPA_SLRTR_LEXEME_REJECTED:
-          {
-            AV *event_av = newAV ();
-            av_push (event_av, newSVpvs ("'trace"));
-            av_push (event_av, newSVpvs ("rejected lexeme"));
-            av_push (event_av, newSViv ((IV) slr_event->t_trace_lexeme_rejected.t_start_of_lexeme));    /* start */
-            av_push (event_av, newSViv ((IV) slr_event->t_trace_lexeme_rejected.t_end_of_lexeme));      /* end */
-            av_push (event_av, newSViv ((IV) slr_event->t_trace_lexeme_rejected.t_lexeme));     /* lexeme */
-            XPUSHs (sv_2mortal (newRV_noinc ((SV *) event_av)));
-            break;
-          }
-
         case MARPA_SLRTR_LEXEME_EXPECTED:
           {
             AV *event_av = newAV ();
@@ -5711,7 +5693,6 @@ PPCODE:
  # MARPA_SLRTR_BEFORE_LEXEME
  #
  # Yes, at trace level > 0
- # MARPA_SLRTR_LEXEME_REJECTED
  # MARPA_SLRTR_G1_DUPLICATE_LEXEME
  # MARPA_SLRTR_G1_ACCEPTED_LEXEME
  #
