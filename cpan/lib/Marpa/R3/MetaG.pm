@@ -3874,9 +3874,9 @@ $hashed_metag = {
                                                                      'rhs' => [
                                                                                 'Perl name'
                                                                               ],
-                                                                     'start' => 4685,
+                                                                     'start' => 4553,
                                                                      'subkey' => 1,
-                                                                     'xrlid' => 'action name@4685+29'
+                                                                     'xrlid' => 'action name@4553+29'
                                                                    },
                                         'action name,array descriptor' => {
                                                                             'action' => '[start,length,values]',
@@ -3890,9 +3890,9 @@ $hashed_metag = {
                                                                             'rhs' => [
                                                                                        'array descriptor'
                                                                                      ],
-                                                                            'start' => 4756,
+                                                                            'start' => 4624,
                                                                             'subkey' => 1,
-                                                                            'xrlid' => 'action name@4756+36'
+                                                                            'xrlid' => 'action name@4624+36'
                                                                           },
                                         'action name,reserved action name' => {
                                                                                 'action' => '[start,length,values]',
@@ -3906,9 +3906,9 @@ $hashed_metag = {
                                                                                 'rhs' => [
                                                                                            'reserved action name'
                                                                                          ],
-                                                                                'start' => 4715,
+                                                                                'start' => 4583,
                                                                                 'subkey' => 1,
-                                                                                'xrlid' => 'action name@4715+40'
+                                                                                'xrlid' => 'action name@4583+40'
                                                                               },
                                         'action,[Lex-33],[Lex-34],action name' => {
                                                                                     'action' => '[start,length,values]',
@@ -3926,14 +3926,14 @@ $hashed_metag = {
                                                                                                '[Lex-34]',
                                                                                                'action name'
                                                                                              ],
-                                                                                    'start' => 2897,
+                                                                                    'start' => 2868,
                                                                                     'subkey' => 1,
-                                                                                    'xrlid' => 'action@2897+40'
+                                                                                    'xrlid' => 'action@2868+40'
                                                                                   },
                                         'adverb item,action' => {
                                                                   'action' => '[start,length,values]',
                                                                   'bless' => 'adverb_item',
-                                                                  'length' => 362,
+                                                                  'length' => 333,
                                                                   'lhs' => 'adverb item',
                                                                   'mask' => [
                                                                               1
@@ -3944,7 +3944,7 @@ $hashed_metag = {
                                                                            ],
                                                                   'start' => 2511,
                                                                   'subkey' => 1,
-                                                                  'xrlid' => 'adverb item@2511+362'
+                                                                  'xrlid' => 'adverb item@2511+333'
                                                                 },
                                         'adverb item,blessing' => {
                                                                     'action' => '[start,length,values]',
@@ -3958,9 +3958,9 @@ $hashed_metag = {
                                                                     'rhs' => [
                                                                                'blessing'
                                                                              ],
-                                                                    'start' => 2840,
+                                                                    'start' => 2811,
                                                                     'subkey' => 12,
-                                                                    'xrlid' => 'adverb item@2511+362'
+                                                                    'xrlid' => 'adverb item@2511+333'
                                                                   },
                                         'adverb item,event specification' => {
                                                                                'action' => '[start,length,values]',
@@ -3976,7 +3976,7 @@ $hashed_metag = {
                                                                                         ],
                                                                                'start' => 2783,
                                                                                'subkey' => 11,
-                                                                               'xrlid' => 'adverb item@2511+362'
+                                                                               'xrlid' => 'adverb item@2511+333'
                                                                              },
                                         'adverb item,group association' => {
                                                                              'action' => '[start,length,values]',
@@ -3992,7 +3992,7 @@ $hashed_metag = {
                                                                                       ],
                                                                              'start' => 2591,
                                                                              'subkey' => 4,
-                                                                             'xrlid' => 'adverb item@2511+362'
+                                                                             'xrlid' => 'adverb item@2511+333'
                                                                            },
                                         'adverb item,left association' => {
                                                                             'action' => '[start,length,values]',
@@ -4008,7 +4008,7 @@ $hashed_metag = {
                                                                                      ],
                                                                             'start' => 2548,
                                                                             'subkey' => 2,
-                                                                            'xrlid' => 'adverb item@2511+362'
+                                                                            'xrlid' => 'adverb item@2511+333'
                                                                           },
                                         'adverb item,naming' => {
                                                                   'action' => '[start,length,values]',
@@ -4022,9 +4022,9 @@ $hashed_metag = {
                                                                   'rhs' => [
                                                                              'naming'
                                                                            ],
-                                                                  'start' => 2851,
+                                                                  'start' => 2822,
                                                                   'subkey' => 13,
-                                                                  'xrlid' => 'adverb item@2511+362'
+                                                                  'xrlid' => 'adverb item@2511+333'
                                                                 },
                                         'adverb item,null adverb' => {
                                                                        'action' => '[start,length,values]',
@@ -4038,9 +4038,9 @@ $hashed_metag = {
                                                                        'rhs' => [
                                                                                   'null adverb'
                                                                                 ],
-                                                                       'start' => 2860,
+                                                                       'start' => 2831,
                                                                        'subkey' => 14,
-                                                                       'xrlid' => 'adverb item@2511+362'
+                                                                       'xrlid' => 'adverb item@2511+333'
                                                                      },
                                         'adverb item,null ranking specification' => {
                                                                                       'action' => '[start,length,values]',
@@ -4056,7 +4056,7 @@ $hashed_metag = {
                                                                                                ],
                                                                                       'start' => 2697,
                                                                                       'subkey' => 8,
-                                                                                      'xrlid' => 'adverb item@2511+362'
+                                                                                      'xrlid' => 'adverb item@2511+333'
                                                                                     },
                                         'adverb item,pause specification' => {
                                                                                'action' => '[start,length,values]',
@@ -4072,7 +4072,7 @@ $hashed_metag = {
                                                                                         ],
                                                                                'start' => 2759,
                                                                                'subkey' => 10,
-                                                                               'xrlid' => 'adverb item@2511+362'
+                                                                               'xrlid' => 'adverb item@2511+333'
                                                                              },
                                         'adverb item,priority specification' => {
                                                                                   'action' => '[start,length,values]',
@@ -4088,7 +4088,7 @@ $hashed_metag = {
                                                                                            ],
                                                                                   'start' => 2732,
                                                                                   'subkey' => 9,
-                                                                                  'xrlid' => 'adverb item@2511+362'
+                                                                                  'xrlid' => 'adverb item@2511+333'
                                                                                 },
                                         'adverb item,proper specification' => {
                                                                                 'action' => '[start,length,values]',
@@ -4104,7 +4104,7 @@ $hashed_metag = {
                                                                                          ],
                                                                                 'start' => 2645,
                                                                                 'subkey' => 6,
-                                                                                'xrlid' => 'adverb item@2511+362'
+                                                                                'xrlid' => 'adverb item@2511+333'
                                                                               },
                                         'adverb item,rank specification' => {
                                                                               'action' => '[start,length,values]',
@@ -4120,7 +4120,7 @@ $hashed_metag = {
                                                                                        ],
                                                                               'start' => 2674,
                                                                               'subkey' => 7,
-                                                                              'xrlid' => 'adverb item@2511+362'
+                                                                              'xrlid' => 'adverb item@2511+333'
                                                                             },
                                         'adverb item,right association' => {
                                                                              'action' => '[start,length,values]',
@@ -4136,7 +4136,7 @@ $hashed_metag = {
                                                                                       ],
                                                                              'start' => 2569,
                                                                              'subkey' => 3,
-                                                                             'xrlid' => 'adverb item@2511+362'
+                                                                             'xrlid' => 'adverb item@2511+333'
                                                                            },
                                         'adverb item,separator specification' => {
                                                                                    'action' => '[start,length,values]',
@@ -4152,7 +4152,7 @@ $hashed_metag = {
                                                                                             ],
                                                                                    'start' => 2617,
                                                                                    'subkey' => 5,
-                                                                                   'xrlid' => 'adverb item@2511+362'
+                                                                                   'xrlid' => 'adverb item@2511+333'
                                                                                  },
                                         'adverb list items,adverb item' => {
                                                                              'action' => '[start,length,values]',
@@ -4196,9 +4196,9 @@ $hashed_metag = {
                                                                                    'rhs' => [
                                                                                               'single quoted name'
                                                                                             ],
-                                                                                   'start' => 4038,
+                                                                                   'start' => 3906,
                                                                                    'subkey' => 2,
-                                                                                   'xrlid' => 'alternative name@3997+61'
+                                                                                   'xrlid' => 'alternative name@3865+61'
                                                                                  },
                                         'alternative name,standard name' => {
                                                                               'action' => '[start,length,values]',
@@ -4212,9 +4212,9 @@ $hashed_metag = {
                                                                               'rhs' => [
                                                                                          'standard name'
                                                                                        ],
-                                                                              'start' => 3997,
+                                                                              'start' => 3865,
                                                                               'subkey' => 1,
-                                                                              'xrlid' => 'alternative name@3997+61'
+                                                                              'xrlid' => 'alternative name@3865+61'
                                                                             },
                                         'alternative,rhs,adverb list' => {
                                                                            'action' => '[start,length,values]',
@@ -4262,9 +4262,9 @@ $hashed_metag = {
                                                                                     'rhs' => [
                                                                                                'reserved blessing name'
                                                                                              ],
-                                                                                    'start' => 4219,
+                                                                                    'start' => 4087,
                                                                                     'subkey' => 1,
-                                                                                    'xrlid' => 'blessing name@4219+44'
+                                                                                    'xrlid' => 'blessing name@4087+44'
                                                                                   },
                                         'blessing name,standard name' => {
                                                                            'action' => '[start,length,values]',
@@ -4278,9 +4278,9 @@ $hashed_metag = {
                                                                            'rhs' => [
                                                                                       'standard name'
                                                                                     ],
-                                                                           'start' => 4183,
+                                                                           'start' => 4051,
                                                                            'subkey' => 1,
-                                                                           'xrlid' => 'blessing name@4183+35'
+                                                                           'xrlid' => 'blessing name@4051+35'
                                                                          },
                                         'blessing,[Lex-66],[Lex-67],blessing name' => {
                                                                                         'action' => '[start,length,values]',
@@ -4298,9 +4298,9 @@ $hashed_metag = {
                                                                                                    '[Lex-67]',
                                                                                                    'blessing name'
                                                                                                  ],
-                                                                                        'start' => 3904,
+                                                                                        'start' => 3772,
                                                                                         'subkey' => 1,
-                                                                                        'xrlid' => 'blessing@3904+45'
+                                                                                        'xrlid' => 'blessing@3772+45'
                                                                                       },
                                         'completion event declaration,[Lex-16],event initialization,[Lex-17],[Lex-18],symbol name' => {
                                                                                                                                         'action' => '[start,length,values]',
@@ -4424,9 +4424,9 @@ $hashed_metag = {
                                                                                                             'event name',
                                                                                                             'event initializer'
                                                                                                           ],
-                                                                                                 'start' => 3637,
+                                                                                                 'start' => 3608,
                                                                                                  'subkey' => 1,
-                                                                                                 'xrlid' => 'event initialization@3637+59'
+                                                                                                 'xrlid' => 'event initialization@3608+59'
                                                                                                },
                                         'event initializer' => {
                                                                  'action' => '[start,length,values]',
@@ -4435,9 +4435,9 @@ $hashed_metag = {
                                                                  'lhs' => 'event initializer',
                                                                  'name' => 'event initializer',
                                                                  'rhs' => [],
-                                                                 'start' => 3768,
+                                                                 'start' => 3739,
                                                                  'subkey' => 0,
-                                                                 'xrlid' => 'event initializer@3768+23'
+                                                                 'xrlid' => 'event initializer@3739+23'
                                                                },
                                         'event initializer,[Lex-63],on or off' => {
                                                                                     'action' => '[start,length,values]',
@@ -4453,9 +4453,9 @@ $hashed_metag = {
                                                                                                '[Lex-63]',
                                                                                                'on or off'
                                                                                              ],
-                                                                                    'start' => 3697,
+                                                                                    'start' => 3668,
                                                                                     'subkey' => 1,
-                                                                                    'xrlid' => 'event initializer@3697+41'
+                                                                                    'xrlid' => 'event initializer@3668+41'
                                                                                   },
                                         'event name,reserved event name' => {
                                                                               'action' => '[start,length,values]',
@@ -4469,9 +4469,9 @@ $hashed_metag = {
                                                                               'rhs' => [
                                                                                          'reserved event name'
                                                                                        ],
-                                                                              'start' => 4126,
+                                                                              'start' => 3994,
                                                                               'subkey' => 3,
-                                                                              'xrlid' => 'event name@4060+87'
+                                                                              'xrlid' => 'event name@3928+87'
                                                                             },
                                         'event name,single quoted name' => {
                                                                              'action' => '[start,length,values]',
@@ -4485,9 +4485,9 @@ $hashed_metag = {
                                                                              'rhs' => [
                                                                                         'single quoted name'
                                                                                       ],
-                                                                             'start' => 4099,
+                                                                             'start' => 3967,
                                                                              'subkey' => 2,
-                                                                             'xrlid' => 'event name@4060+87'
+                                                                             'xrlid' => 'event name@3928+87'
                                                                            },
                                         'event name,standard name' => {
                                                                         'action' => '[start,length,values]',
@@ -4501,9 +4501,9 @@ $hashed_metag = {
                                                                         'rhs' => [
                                                                                    'standard name'
                                                                                  ],
-                                                                        'start' => 4060,
+                                                                        'start' => 3928,
                                                                         'subkey' => 1,
-                                                                        'xrlid' => 'event name@4060+87'
+                                                                        'xrlid' => 'event name@3928+87'
                                                                       },
                                         'event specification,[Lex-61],[Lex-62],event initialization' => {
                                                                                                           'action' => '[start,length,values]',
@@ -4521,9 +4521,9 @@ $hashed_metag = {
                                                                                                                      '[Lex-62]',
                                                                                                                      'event initialization'
                                                                                                                    ],
-                                                                                                          'start' => 3573,
+                                                                                                          'start' => 3544,
                                                                                                           'subkey' => 1,
-                                                                                                          'xrlid' => 'event specification@3573+63'
+                                                                                                          'xrlid' => 'event specification@3544+63'
                                                                                                         },
                                         'group association,[Lex-41],[Lex-42],[Lex-43]' => {
                                                                                             'action' => '[start,length,values]',
@@ -4541,9 +4541,9 @@ $hashed_metag = {
                                                                                                        '[Lex-42]',
                                                                                                        '[Lex-43]'
                                                                                                      ],
-                                                                                            'start' => 3030,
+                                                                                            'start' => 3001,
                                                                                             'subkey' => 1,
-                                                                                            'xrlid' => 'group association@3030+46'
+                                                                                            'xrlid' => 'group association@3001+46'
                                                                                           },
                                         'inaccessible statement,[Lex-25],[Lex-26],inaccessible treatment,[Lex-27],[Lex-28]' => {
                                                                                                                                  'action' => '[start,length,values]',
@@ -4633,9 +4633,9 @@ $hashed_metag = {
                                                                                                       '[Lex-36]',
                                                                                                       '[Lex-37]'
                                                                                                     ],
-                                                                                           'start' => 2938,
+                                                                                           'start' => 2909,
                                                                                            'subkey' => 1,
-                                                                                           'xrlid' => 'left association@2938+44'
+                                                                                           'xrlid' => 'left association@2909+44'
                                                                                          },
                                         'lexeme default statement,[Lex-8],[Lex-9],[Lex-10],adverb list' => {
                                                                                                              'action' => '[start,length,values]',
@@ -4693,9 +4693,9 @@ $hashed_metag = {
                                                                'rhs' => [
                                                                           'symbol name'
                                                                         ],
-                                                               'start' => 4265,
+                                                               'start' => 4133,
                                                                'subkey' => 1,
-                                                               'xrlid' => 'lhs@4265+21'
+                                                               'xrlid' => 'lhs@4133+21'
                                                              },
                                         'naming,[Lex-68],[Lex-69],alternative name' => {
                                                                                          'action' => '[start,length,values]',
@@ -4713,9 +4713,9 @@ $hashed_metag = {
                                                                                                     '[Lex-69]',
                                                                                                     'alternative name'
                                                                                                   ],
-                                                                                         'start' => 3950,
+                                                                                         'start' => 3818,
                                                                                          'subkey' => 1,
-                                                                                         'xrlid' => 'naming@3950+45'
+                                                                                         'xrlid' => 'naming@3818+45'
                                                                                        },
                                         'null adverb,[Lex-32]' => {
                                                                     'action' => '[start,length,values]',
@@ -4729,9 +4729,9 @@ $hashed_metag = {
                                                                     'rhs' => [
                                                                                '[Lex-32]'
                                                                              ],
-                                                                    'start' => 2875,
+                                                                    'start' => 2846,
                                                                     'subkey' => 1,
-                                                                    'xrlid' => 'null adverb@2875+21'
+                                                                    'xrlid' => 'null adverb@2846+21'
                                                                   },
                                         'null ranking constant,[Lex-55]' => {
                                                                               'action' => '[start,length,values]',
@@ -4745,9 +4745,9 @@ $hashed_metag = {
                                                                               'rhs' => [
                                                                                          '[Lex-55]'
                                                                                        ],
-                                                                              'start' => 3406,
+                                                                              'start' => 3377,
                                                                               'subkey' => 1,
-                                                                              'xrlid' => 'null ranking constant@3406+42'
+                                                                              'xrlid' => 'null ranking constant@3377+42'
                                                                             },
                                         'null ranking constant,[Lex-56]' => {
                                                                               'action' => '[start,length,values]',
@@ -4761,9 +4761,9 @@ $hashed_metag = {
                                                                               'rhs' => [
                                                                                          '[Lex-56]'
                                                                                        ],
-                                                                              'start' => 3442,
+                                                                              'start' => 3413,
                                                                               'subkey' => 2,
-                                                                              'xrlid' => 'null ranking constant@3406+42'
+                                                                              'xrlid' => 'null ranking constant@3377+42'
                                                                             },
                                         'null ranking specification,[Lex-50],[Lex-51],null ranking constant' => {
                                                                                                                   'action' => '[start,length,values]',
@@ -4781,9 +4781,9 @@ $hashed_metag = {
                                                                                                                              '[Lex-51]',
                                                                                                                              'null ranking constant'
                                                                                                                            ],
-                                                                                                                  'start' => 3249,
+                                                                                                                  'start' => 3220,
                                                                                                                   'subkey' => 1,
-                                                                                                                  'xrlid' => 'null ranking specification@3249+78'
+                                                                                                                  'xrlid' => 'null ranking specification@3220+78'
                                                                                                                 },
                                         'null ranking specification,[Lex-52],[Lex-53],[Lex-54],null ranking constant' => {
                                                                                                                            'action' => '[start,length,values]',
@@ -4803,9 +4803,9 @@ $hashed_metag = {
                                                                                                                                       '[Lex-54]',
                                                                                                                                       'null ranking constant'
                                                                                                                                     ],
-                                                                                                                           'start' => 3328,
+                                                                                                                           'start' => 3299,
                                                                                                                            'subkey' => 1,
-                                                                                                                           'xrlid' => 'null ranking specification@3328+77'
+                                                                                                                           'xrlid' => 'null ranking specification@3299+77'
                                                                                                                          },
                                         'null statement,[Lex-0]' => {
                                                                       'action' => '[start,length,values]',
@@ -4859,9 +4859,9 @@ $hashed_metag = {
                                                                   'rhs' => [
                                                                              '[Lex-64]'
                                                                            ],
-                                                                  'start' => 3739,
+                                                                  'start' => 3710,
                                                                   'subkey' => 1,
-                                                                  'xrlid' => 'on or off@3739+28'
+                                                                  'xrlid' => 'on or off@3710+28'
                                                                 },
                                         'on or off,[Lex-65]' => {
                                                                   'action' => '[start,length,values]',
@@ -4875,9 +4875,9 @@ $hashed_metag = {
                                                                   'rhs' => [
                                                                              '[Lex-65]'
                                                                            ],
-                                                                  'start' => 3762,
+                                                                  'start' => 3733,
                                                                   'subkey' => 2,
-                                                                  'xrlid' => 'on or off@3739+28'
+                                                                  'xrlid' => 'on or off@3710+28'
                                                                 },
                                         'op declare,op declare bnf' => {
                                                                          'action' => '[start,length,values]',
@@ -4927,9 +4927,9 @@ $hashed_metag = {
                                                                                                                             'rhs primary list',
                                                                                                                             '[Lex-71]'
                                                                                                                           ],
-                                                                                                                 'start' => 4436,
+                                                                                                                 'start' => 4304,
                                                                                                                  'subkey' => 1,
-                                                                                                                 'xrlid' => 'parenthesized rhs primary list@4436+67'
+                                                                                                                 'xrlid' => 'parenthesized rhs primary list@4304+67'
                                                                                                                },
                                         'pause specification,[Lex-59],[Lex-60],before or after' => {
                                                                                                      'action' => '[start,length,values]',
@@ -4947,9 +4947,9 @@ $hashed_metag = {
                                                                                                                 '[Lex-60]',
                                                                                                                 'before or after'
                                                                                                               ],
-                                                                                                     'start' => 3513,
+                                                                                                     'start' => 3484,
                                                                                                      'subkey' => 1,
-                                                                                                     'xrlid' => 'pause specification@3513+58'
+                                                                                                     'xrlid' => 'pause specification@3484+58'
                                                                                                    },
                                         'prediction event declaration,[Lex-22],event initialization,[Lex-23],[Lex-24],symbol name' => {
                                                                                                                                         'action' => '[start,length,values]',
@@ -5027,9 +5027,9 @@ $hashed_metag = {
                                                                                                                   '[Lex-58]',
                                                                                                                   'signed integer'
                                                                                                                 ],
-                                                                                                       'start' => 3449,
+                                                                                                       'start' => 3420,
                                                                                                        'subkey' => 1,
-                                                                                                       'xrlid' => 'priority specification@3449+63'
+                                                                                                       'xrlid' => 'priority specification@3420+63'
                                                                                                      },
                                         'proper specification,[Lex-46],[Lex-47],boolean' => {
                                                                                               'action' => '[start,length,values]',
@@ -5047,9 +5047,9 @@ $hashed_metag = {
                                                                                                          '[Lex-47]',
                                                                                                          'boolean'
                                                                                                        ],
-                                                                                              'start' => 3142,
+                                                                                              'start' => 3113,
                                                                                               'subkey' => 1,
-                                                                                              'xrlid' => 'proper specification@3142+50'
+                                                                                              'xrlid' => 'proper specification@3113+50'
                                                                                             },
                                         'quantified rule,lhs,op declare,single symbol,quantifier,adverb list' => {
                                                                                                                    'action' => '[start,length,values]',
@@ -5087,9 +5087,9 @@ $hashed_metag = {
                                                                    'rhs' => [
                                                                               '[Lex-72]'
                                                                             ],
-                                                                   'start' => 5359,
+                                                                   'start' => 5227,
                                                                    'subkey' => 1,
-                                                                   'xrlid' => 'quantifier@5359+24'
+                                                                   'xrlid' => 'quantifier@5227+24'
                                                                  },
                                         'quantifier,[Lex-73]' => {
                                                                    'action' => '[start,length,values]',
@@ -5103,9 +5103,9 @@ $hashed_metag = {
                                                                    'rhs' => [
                                                                               '[Lex-73]'
                                                                             ],
-                                                                   'start' => 5380,
+                                                                   'start' => 5248,
                                                                    'subkey' => 2,
-                                                                   'xrlid' => 'quantifier@5359+24'
+                                                                   'xrlid' => 'quantifier@5227+24'
                                                                  },
                                         'rank specification,[Lex-48],[Lex-49],signed integer' => {
                                                                                                    'action' => '[start,length,values]',
@@ -5123,9 +5123,9 @@ $hashed_metag = {
                                                                                                               '[Lex-49]',
                                                                                                               'signed integer'
                                                                                                             ],
-                                                                                                   'start' => 3193,
+                                                                                                   'start' => 3164,
                                                                                                    'subkey' => 1,
-                                                                                                   'xrlid' => 'rank specification@3193+55'
+                                                                                                   'xrlid' => 'rank specification@3164+55'
                                                                                                  },
                                         'rhs primary list,rhs primary' => {
                                                                             'action' => '[start,length,values]',
@@ -5137,9 +5137,9 @@ $hashed_metag = {
                                                                             'rhs' => [
                                                                                        'rhs primary'
                                                                                      ],
-                                                                            'start' => 4504,
+                                                                            'start' => 4372,
                                                                             'subkey' => 0,
-                                                                            'xrlid' => 'rhs primary list@4504+37'
+                                                                            'xrlid' => 'rhs primary list@4372+37'
                                                                           },
                                         'rhs primary,parenthesized rhs primary list' => {
                                                                                           'action' => '[start,length,values]',
@@ -5153,9 +5153,9 @@ $hashed_metag = {
                                                                                           'rhs' => [
                                                                                                      'parenthesized rhs primary list'
                                                                                                    ],
-                                                                                          'start' => 4385,
+                                                                                          'start' => 4253,
                                                                                           'subkey' => 1,
-                                                                                          'xrlid' => 'rhs primary@4385+50'
+                                                                                          'xrlid' => 'rhs primary@4253+50'
                                                                                         },
                                         'rhs primary,single quoted string' => {
                                                                                 'action' => '[start,length,values]',
@@ -5169,9 +5169,9 @@ $hashed_metag = {
                                                                                 'rhs' => [
                                                                                            'single quoted string'
                                                                                          ],
-                                                                                'start' => 4344,
+                                                                                'start' => 4212,
                                                                                 'subkey' => 1,
-                                                                                'xrlid' => 'rhs primary@4344+40'
+                                                                                'xrlid' => 'rhs primary@4212+40'
                                                                               },
                                         'rhs primary,single symbol' => {
                                                                          'action' => '[start,length,values]',
@@ -5185,9 +5185,9 @@ $hashed_metag = {
                                                                          'rhs' => [
                                                                                     'single symbol'
                                                                                   ],
-                                                                         'start' => 4310,
+                                                                         'start' => 4178,
                                                                          'subkey' => 1,
-                                                                         'xrlid' => 'rhs primary@4310+33'
+                                                                         'xrlid' => 'rhs primary@4178+33'
                                                                        },
                                         'rhs,rhs primary' => {
                                                                'action' => '[start,length,values]',
@@ -5199,9 +5199,9 @@ $hashed_metag = {
                                                                'rhs' => [
                                                                           'rhs primary'
                                                                         ],
-                                                               'start' => 4287,
+                                                               'start' => 4155,
                                                                'subkey' => 0,
-                                                               'xrlid' => 'rhs@4287+22'
+                                                               'xrlid' => 'rhs@4155+22'
                                                              },
                                         'right association,[Lex-38],[Lex-39],[Lex-40]' => {
                                                                                             'action' => '[start,length,values]',
@@ -5219,9 +5219,9 @@ $hashed_metag = {
                                                                                                        '[Lex-39]',
                                                                                                        '[Lex-40]'
                                                                                                      ],
-                                                                                            'start' => 2983,
+                                                                                            'start' => 2954,
                                                                                             'subkey' => 1,
-                                                                                            'xrlid' => 'right association@2983+46'
+                                                                                            'xrlid' => 'right association@2954+46'
                                                                                           },
                                         'separator specification,[Lex-44],[Lex-45],single symbol' => {
                                                                                                        'action' => '[start,length,values]',
@@ -5239,9 +5239,9 @@ $hashed_metag = {
                                                                                                                   '[Lex-45]',
                                                                                                                   'single symbol'
                                                                                                                 ],
-                                                                                                       'start' => 3077,
+                                                                                                       'start' => 3048,
                                                                                                        'subkey' => 1,
-                                                                                                       'xrlid' => 'separator specification@3077+64'
+                                                                                                       'xrlid' => 'separator specification@3048+64'
                                                                                                      },
                                         'single symbol,character class' => {
                                                                              'action' => '[start,length,values]',
@@ -5255,9 +5255,9 @@ $hashed_metag = {
                                                                              'rhs' => [
                                                                                         'character class'
                                                                                       ],
-                                                                             'start' => 4577,
+                                                                             'start' => 4445,
                                                                              'subkey' => 2,
-                                                                             'xrlid' => 'single symbol@4542+52'
+                                                                             'xrlid' => 'single symbol@4410+52'
                                                                            },
                                         'single symbol,symbol' => {
                                                                     'action' => '[start,length,values]',
@@ -5271,9 +5271,9 @@ $hashed_metag = {
                                                                     'rhs' => [
                                                                                'symbol'
                                                                              ],
-                                                                    'start' => 4542,
+                                                                    'start' => 4410,
                                                                     'subkey' => 1,
-                                                                    'xrlid' => 'single symbol@4542+52'
+                                                                    'xrlid' => 'single symbol@4410+52'
                                                                   },
                                         'start rule,[Lex-3],op declare bnf,symbol' => {
                                                                                         'action' => '[start,length,values]',
@@ -5603,9 +5603,9 @@ $hashed_metag = {
                                                                      'rhs' => [
                                                                                 'bare name'
                                                                               ],
-                                                                     'start' => 4620,
+                                                                     'start' => 4488,
                                                                      'subkey' => 1,
-                                                                     'xrlid' => 'symbol name@4620+29'
+                                                                     'xrlid' => 'symbol name@4488+29'
                                                                    },
                                         'symbol name,bracketed name' => {
                                                                           'action' => '[start,length,values]',
@@ -5619,9 +5619,9 @@ $hashed_metag = {
                                                                           'rhs' => [
                                                                                      'bracketed name'
                                                                                    ],
-                                                                          'start' => 4650,
+                                                                          'start' => 4518,
                                                                           'subkey' => 1,
-                                                                          'xrlid' => 'symbol name@4650+34'
+                                                                          'xrlid' => 'symbol name@4518+34'
                                                                         },
                                         'symbol,symbol name' => {
                                                                   'action' => '[start,length,values]',
@@ -5635,9 +5635,9 @@ $hashed_metag = {
                                                                   'rhs' => [
                                                                              'symbol name'
                                                                            ],
-                                                                  'start' => 4595,
+                                                                  'start' => 4463,
                                                                   'subkey' => 1,
-                                                                  'xrlid' => 'symbol@4595+24'
+                                                                  'xrlid' => 'symbol@4463+24'
                                                                 }
                                       },
                               'L0' => {
@@ -5649,9 +5649,9 @@ $hashed_metag = {
                                                                        'rhs' => [
                                                                                   '[[\\w]]'
                                                                                 ],
-                                                                       'start' => 5868,
+                                                                       'start' => 5736,
                                                                        'subkey' => 0,
-                                                                       'xrlid' => 'Perl identifier@5868+25'
+                                                                       'xrlid' => 'Perl identifier@5736+25'
                                                                      },
                                         'Perl name,Perl identifier' => {
                                                                          'length' => 72,
@@ -5663,9 +5663,9 @@ $hashed_metag = {
                                                                                     'Perl identifier'
                                                                                   ],
                                                                          'separator' => 'double colon',
-                                                                         'start' => 5916,
+                                                                         'start' => 5784,
                                                                          'subkey' => 0,
-                                                                         'xrlid' => 'Perl name@5916+72'
+                                                                         'xrlid' => 'Perl name@5784+72'
                                                                        },
                                         '[:discard],hash comment' => {
                                                                        'length' => 25,
@@ -5673,7 +5673,7 @@ $hashed_metag = {
                                                                        'rhs' => [
                                                                                   'hash comment'
                                                                                 ],
-                                                                       'start' => 4853,
+                                                                       'start' => 4721,
                                                                        'subkey' => 0,
                                                                        'symbol_as_event' => 'hash comment'
                                                                      },
@@ -5683,7 +5683,7 @@ $hashed_metag = {
                                                                      'rhs' => [
                                                                                 'whitespace'
                                                                               ],
-                                                                     'start' => 4794,
+                                                                     'start' => 4662,
                                                                      'subkey' => 0,
                                                                      'symbol_as_event' => 'whitespace'
                                                                    },
@@ -6166,7 +6166,7 @@ $hashed_metag = {
                                                                 'rhs' => [
                                                                            '[[\\,]]'
                                                                          ],
-                                                                'start' => 2893,
+                                                                'start' => 2864,
                                                                 'subkey' => 0
                                                               },
                                         '[Lex-33],[[a]],[[c]],[[t]],[[i]],[[o]],[[n]]' => {
@@ -6188,7 +6188,7 @@ $hashed_metag = {
                                                                                                        '[[o]]',
                                                                                                        '[[n]]'
                                                                                                      ],
-                                                                                            'start' => 2909,
+                                                                                            'start' => 2880,
                                                                                             'subkey' => 0
                                                                                           },
                                         '[Lex-34],[[\\=]],[[\\>]]' => {
@@ -6202,7 +6202,7 @@ $hashed_metag = {
                                                                                    '[[\\=]]',
                                                                                    '[[\\>]]'
                                                                                  ],
-                                                                        'start' => 2918,
+                                                                        'start' => 2889,
                                                                         'subkey' => 0
                                                                       },
                                         '[Lex-35],[[a]],[[s]],[[s]],[[o]],[[c]]' => {
@@ -6222,7 +6222,7 @@ $hashed_metag = {
                                                                                                  '[[o]]',
                                                                                                  '[[c]]'
                                                                                                ],
-                                                                                      'start' => 2962,
+                                                                                      'start' => 2933,
                                                                                       'subkey' => 0
                                                                                     },
                                         '[Lex-36],[[\\=]],[[\\>]]' => {
@@ -6236,7 +6236,7 @@ $hashed_metag = {
                                                                                    '[[\\=]]',
                                                                                    '[[\\>]]'
                                                                                  ],
-                                                                        'start' => 2970,
+                                                                        'start' => 2941,
                                                                         'subkey' => 0
                                                                       },
                                         '[Lex-37],[[l]],[[e]],[[f]],[[t]]' => {
@@ -6254,7 +6254,7 @@ $hashed_metag = {
                                                                                            '[[f]]',
                                                                                            '[[t]]'
                                                                                          ],
-                                                                                'start' => 2975,
+                                                                                'start' => 2946,
                                                                                 'subkey' => 0
                                                                               },
                                         '[Lex-38],[[a]],[[s]],[[s]],[[o]],[[c]]' => {
@@ -6274,7 +6274,7 @@ $hashed_metag = {
                                                                                                  '[[o]]',
                                                                                                  '[[c]]'
                                                                                                ],
-                                                                                      'start' => 3008,
+                                                                                      'start' => 2979,
                                                                                       'subkey' => 0
                                                                                     },
                                         '[Lex-39],[[\\=]],[[\\>]]' => {
@@ -6288,7 +6288,7 @@ $hashed_metag = {
                                                                                    '[[\\=]]',
                                                                                    '[[\\>]]'
                                                                                  ],
-                                                                        'start' => 3016,
+                                                                        'start' => 2987,
                                                                         'subkey' => 0
                                                                       },
                                         '[Lex-3],[[\\:]],[[s]],[[t]],[[a]],[[r]],[[t]]' => {
@@ -6330,7 +6330,7 @@ $hashed_metag = {
                                                                                                  '[[h]]',
                                                                                                  '[[t]]'
                                                                                                ],
-                                                                                      'start' => 3021,
+                                                                                      'start' => 2992,
                                                                                       'subkey' => 0
                                                                                     },
                                         '[Lex-41],[[a]],[[s]],[[s]],[[o]],[[c]]' => {
@@ -6350,7 +6350,7 @@ $hashed_metag = {
                                                                                                  '[[o]]',
                                                                                                  '[[c]]'
                                                                                                ],
-                                                                                      'start' => 3055,
+                                                                                      'start' => 3026,
                                                                                       'subkey' => 0
                                                                                     },
                                         '[Lex-42],[[\\=]],[[\\>]]' => {
@@ -6364,7 +6364,7 @@ $hashed_metag = {
                                                                                    '[[\\=]]',
                                                                                    '[[\\>]]'
                                                                                  ],
-                                                                        'start' => 3063,
+                                                                        'start' => 3034,
                                                                         'subkey' => 0
                                                                       },
                                         '[Lex-43],[[g]],[[r]],[[o]],[[u]],[[p]]' => {
@@ -6384,7 +6384,7 @@ $hashed_metag = {
                                                                                                  '[[u]]',
                                                                                                  '[[p]]'
                                                                                                ],
-                                                                                      'start' => 3068,
+                                                                                      'start' => 3039,
                                                                                       'subkey' => 0
                                                                                     },
                                         '[Lex-44],[[s]],[[e]],[[p]],[[a]],[[r]],[[a]],[[t]],[[o]],[[r]]' => {
@@ -6412,7 +6412,7 @@ $hashed_metag = {
                                                                                                                          '[[o]]',
                                                                                                                          '[[r]]'
                                                                                                                        ],
-                                                                                                              'start' => 3108,
+                                                                                                              'start' => 3079,
                                                                                                               'subkey' => 0
                                                                                                             },
                                         '[Lex-45],[[\\=]],[[\\>]]' => {
@@ -6426,7 +6426,7 @@ $hashed_metag = {
                                                                                    '[[\\=]]',
                                                                                    '[[\\>]]'
                                                                                  ],
-                                                                        'start' => 3120,
+                                                                        'start' => 3091,
                                                                         'subkey' => 0
                                                                       },
                                         '[Lex-46],[[p]],[[r]],[[o]],[[p]],[[e]],[[r]]' => {
@@ -6448,7 +6448,7 @@ $hashed_metag = {
                                                                                                        '[[e]]',
                                                                                                        '[[r]]'
                                                                                                      ],
-                                                                                            'start' => 3170,
+                                                                                            'start' => 3141,
                                                                                             'subkey' => 0
                                                                                           },
                                         '[Lex-47],[[\\=]],[[\\>]]' => {
@@ -6462,7 +6462,7 @@ $hashed_metag = {
                                                                                    '[[\\=]]',
                                                                                    '[[\\>]]'
                                                                                  ],
-                                                                        'start' => 3179,
+                                                                        'start' => 3150,
                                                                         'subkey' => 0
                                                                       },
                                         '[Lex-48],[[r]],[[a]],[[n]],[[k]]' => {
@@ -6480,7 +6480,7 @@ $hashed_metag = {
                                                                                            '[[n]]',
                                                                                            '[[k]]'
                                                                                          ],
-                                                                                'start' => 3219,
+                                                                                'start' => 3190,
                                                                                 'subkey' => 0
                                                                               },
                                         '[Lex-49],[[\\=]],[[\\>]]' => {
@@ -6494,7 +6494,7 @@ $hashed_metag = {
                                                                                    '[[\\=]]',
                                                                                    '[[\\>]]'
                                                                                  ],
-                                                                        'start' => 3226,
+                                                                        'start' => 3197,
                                                                         'subkey' => 0
                                                                       },
                                         '[Lex-4],[[s]],[[t]],[[a]],[[r]],[[t]]' => {
@@ -6548,7 +6548,7 @@ $hashed_metag = {
                                                                                                                                              '[[n]]',
                                                                                                                                              '[[g]]'
                                                                                                                                            ],
-                                                                                                                                  'start' => 3283,
+                                                                                                                                  'start' => 3254,
                                                                                                                                   'subkey' => 0
                                                                                                                                 },
                                         '[Lex-51],[[\\=]],[[\\>]]' => {
@@ -6562,7 +6562,7 @@ $hashed_metag = {
                                                                                    '[[\\=]]',
                                                                                    '[[\\>]]'
                                                                                  ],
-                                                                        'start' => 3298,
+                                                                        'start' => 3269,
                                                                         'subkey' => 0
                                                                       },
                                         '[Lex-52],[[n]],[[u]],[[l]],[[l]]' => {
@@ -6580,7 +6580,7 @@ $hashed_metag = {
                                                                                            '[[l]]',
                                                                                            '[[l]]'
                                                                                          ],
-                                                                                'start' => 3362,
+                                                                                'start' => 3333,
                                                                                 'subkey' => 0
                                                                               },
                                         '[Lex-53],[[r]],[[a]],[[n]],[[k]]' => {
@@ -6598,7 +6598,7 @@ $hashed_metag = {
                                                                                            '[[n]]',
                                                                                            '[[k]]'
                                                                                          ],
-                                                                                'start' => 3369,
+                                                                                'start' => 3340,
                                                                                 'subkey' => 0
                                                                               },
                                         '[Lex-54],[[\\=]],[[\\>]]' => {
@@ -6612,7 +6612,7 @@ $hashed_metag = {
                                                                                    '[[\\=]]',
                                                                                    '[[\\>]]'
                                                                                  ],
-                                                                        'start' => 3376,
+                                                                        'start' => 3347,
                                                                         'subkey' => 0
                                                                       },
                                         '[Lex-55],[[l]],[[o]],[[w]]' => {
@@ -6628,7 +6628,7 @@ $hashed_metag = {
                                                                                      '[[o]]',
                                                                                      '[[w]]'
                                                                                    ],
-                                                                          'start' => 3434,
+                                                                          'start' => 3405,
                                                                           'subkey' => 0
                                                                         },
                                         '[Lex-56],[[h]],[[i]],[[g]],[[h]]' => {
@@ -6646,7 +6646,7 @@ $hashed_metag = {
                                                                                            '[[g]]',
                                                                                            '[[h]]'
                                                                                          ],
-                                                                                'start' => 3442,
+                                                                                'start' => 3413,
                                                                                 'subkey' => 0
                                                                               },
                                         '[Lex-57],[[p]],[[r]],[[i]],[[o]],[[r]],[[i]],[[t]],[[y]]' => {
@@ -6672,7 +6672,7 @@ $hashed_metag = {
                                                                                                                    '[[t]]',
                                                                                                                    '[[y]]'
                                                                                                                  ],
-                                                                                                        'start' => 3479,
+                                                                                                        'start' => 3450,
                                                                                                         'subkey' => 0
                                                                                                       },
                                         '[Lex-58],[[\\=]],[[\\>]]' => {
@@ -6686,7 +6686,7 @@ $hashed_metag = {
                                                                                    '[[\\=]]',
                                                                                    '[[\\>]]'
                                                                                  ],
-                                                                        'start' => 3490,
+                                                                        'start' => 3461,
                                                                         'subkey' => 0
                                                                       },
                                         '[Lex-59],[[p]],[[a]],[[u]],[[s]],[[e]]' => {
@@ -6706,7 +6706,7 @@ $hashed_metag = {
                                                                                                  '[[s]]',
                                                                                                  '[[e]]'
                                                                                                ],
-                                                                                      'start' => 3540,
+                                                                                      'start' => 3511,
                                                                                       'subkey' => 0
                                                                                     },
                                         '[Lex-5],[[s]],[[y]],[[m]],[[b]],[[o]],[[l]]' => {
@@ -6742,7 +6742,7 @@ $hashed_metag = {
                                                                                    '[[\\=]]',
                                                                                    '[[\\>]]'
                                                                                  ],
-                                                                        'start' => 3548,
+                                                                        'start' => 3519,
                                                                         'subkey' => 0
                                                                       },
                                         '[Lex-61],[[e]],[[v]],[[e]],[[n]],[[t]]' => {
@@ -6762,7 +6762,7 @@ $hashed_metag = {
                                                                                                  '[[n]]',
                                                                                                  '[[t]]'
                                                                                                ],
-                                                                                      'start' => 3600,
+                                                                                      'start' => 3571,
                                                                                       'subkey' => 0
                                                                                     },
                                         '[Lex-62],[[\\=]],[[\\>]]' => {
@@ -6776,7 +6776,7 @@ $hashed_metag = {
                                                                                    '[[\\=]]',
                                                                                    '[[\\>]]'
                                                                                  ],
-                                                                        'start' => 3608,
+                                                                        'start' => 3579,
                                                                         'subkey' => 0
                                                                       },
                                         '[Lex-63],[[\\=]]' => {
@@ -6788,7 +6788,7 @@ $hashed_metag = {
                                                                 'rhs' => [
                                                                            '[[\\=]]'
                                                                          ],
-                                                                'start' => 3722,
+                                                                'start' => 3693,
                                                                 'subkey' => 0
                                                               },
                                         '[Lex-64],[[o]],[[n]]' => {
@@ -6802,7 +6802,7 @@ $hashed_metag = {
                                                                                '[[o]]',
                                                                                '[[n]]'
                                                                              ],
-                                                                    'start' => 3755,
+                                                                    'start' => 3726,
                                                                     'subkey' => 0
                                                                   },
                                         '[Lex-65],[[o]],[[f]],[[f]]' => {
@@ -6818,7 +6818,7 @@ $hashed_metag = {
                                                                                      '[[f]]',
                                                                                      '[[f]]'
                                                                                    ],
-                                                                          'start' => 3762,
+                                                                          'start' => 3733,
                                                                           'subkey' => 0
                                                                         },
                                         '[Lex-66],[[b]],[[l]],[[e]],[[s]],[[s]]' => {
@@ -6838,7 +6838,7 @@ $hashed_metag = {
                                                                                                  '[[s]]',
                                                                                                  '[[s]]'
                                                                                                ],
-                                                                                      'start' => 3920,
+                                                                                      'start' => 3788,
                                                                                       'subkey' => 0
                                                                                     },
                                         '[Lex-67],[[\\=]],[[\\>]]' => {
@@ -6852,7 +6852,7 @@ $hashed_metag = {
                                                                                    '[[\\=]]',
                                                                                    '[[\\>]]'
                                                                                  ],
-                                                                        'start' => 3928,
+                                                                        'start' => 3796,
                                                                         'subkey' => 0
                                                                       },
                                         '[Lex-68],[[n]],[[a]],[[m]],[[e]]' => {
@@ -6870,7 +6870,7 @@ $hashed_metag = {
                                                                                            '[[m]]',
                                                                                            '[[e]]'
                                                                                          ],
-                                                                                'start' => 3964,
+                                                                                'start' => 3832,
                                                                                 'subkey' => 0
                                                                               },
                                         '[Lex-69],[[\\=]],[[\\>]]' => {
@@ -6884,7 +6884,7 @@ $hashed_metag = {
                                                                                    '[[\\=]]',
                                                                                    '[[\\>]]'
                                                                                  ],
-                                                                        'start' => 3971,
+                                                                        'start' => 3839,
                                                                         'subkey' => 0
                                                                       },
                                         '[Lex-6],[[i]],[[s]]' => {
@@ -6910,7 +6910,7 @@ $hashed_metag = {
                                                                 'rhs' => [
                                                                            '[[\\(]]'
                                                                          ],
-                                                                'start' => 4474,
+                                                                'start' => 4342,
                                                                 'subkey' => 0
                                                               },
                                         '[Lex-71],[[\\)]]' => {
@@ -6922,7 +6922,7 @@ $hashed_metag = {
                                                                 'rhs' => [
                                                                            '[[\\)]]'
                                                                          ],
-                                                                'start' => 4499,
+                                                                'start' => 4367,
                                                                 'subkey' => 0
                                                               },
                                         '[Lex-72],[[\\*]]' => {
@@ -6934,7 +6934,7 @@ $hashed_metag = {
                                                                 'rhs' => [
                                                                            '[[\\*]]'
                                                                          ],
-                                                                'start' => 5374,
+                                                                'start' => 5242,
                                                                 'subkey' => 0
                                                               },
                                         '[Lex-73],[[\\+]]' => {
@@ -6946,7 +6946,7 @@ $hashed_metag = {
                                                                 'rhs' => [
                                                                            '[[\\+]]'
                                                                          ],
-                                                                'start' => 5380,
+                                                                'start' => 5248,
                                                                 'subkey' => 0
                                                               },
                                         '[Lex-7],[[\\:]],[[d]],[[e]],[[f]],[[a]],[[u]],[[l]],[[t]]' => {
@@ -7031,9 +7031,9 @@ $hashed_metag = {
                                                                                      'rhs' => [
                                                                                                 '[[\\[]]'
                                                                                               ],
-                                                                                     'start' => 6270,
+                                                                                     'start' => 6138,
                                                                                      'subkey' => 1,
-                                                                                     'xrlid' => 'array descriptor left bracket@6270+37'
+                                                                                     'xrlid' => 'array descriptor left bracket@6138+37'
                                                                                    },
                                         'array descriptor left bracket,[[\\[]],whitespace' => {
                                                                                                 'length' => 48,
@@ -7047,9 +7047,9 @@ $hashed_metag = {
                                                                                                            '[[\\[]]',
                                                                                                            'whitespace'
                                                                                                          ],
-                                                                                                'start' => 6309,
+                                                                                                'start' => 6177,
                                                                                                 'subkey' => 1,
-                                                                                                'xrlid' => 'array descriptor left bracket@6309+48'
+                                                                                                'xrlid' => 'array descriptor left bracket@6177+48'
                                                                                               },
                                         'array descriptor right bracket,[[\\]]]' => {
                                                                                       'length' => 38,
@@ -7061,9 +7061,9 @@ $hashed_metag = {
                                                                                       'rhs' => [
                                                                                                  '[[\\]]]'
                                                                                                ],
-                                                                                      'start' => 6358,
+                                                                                      'start' => 6226,
                                                                                       'subkey' => 1,
-                                                                                      'xrlid' => 'array descriptor right bracket@6358+38'
+                                                                                      'xrlid' => 'array descriptor right bracket@6226+38'
                                                                                     },
                                         'array descriptor right bracket,whitespace,[[\\]]]' => {
                                                                                                  'length' => 49,
@@ -7077,9 +7077,9 @@ $hashed_metag = {
                                                                                                             'whitespace',
                                                                                                             '[[\\]]]'
                                                                                                           ],
-                                                                                                 'start' => 6398,
+                                                                                                 'start' => 6266,
                                                                                                  'subkey' => 1,
-                                                                                                 'xrlid' => 'array descriptor right bracket@6398+49'
+                                                                                                 'xrlid' => 'array descriptor right bracket@6266+49'
                                                                                                },
                                         'array descriptor,array descriptor left bracket,result item descriptor list,array descriptor right bracket' => {
                                                                                                                                                          'length' => 115,
@@ -7095,9 +7095,9 @@ $hashed_metag = {
                                                                                                                                                                     'result item descriptor list',
                                                                                                                                                                     'array descriptor right bracket'
                                                                                                                                                                   ],
-                                                                                                                                                         'start' => 6154,
+                                                                                                                                                         'start' => 6022,
                                                                                                                                                          'subkey' => 1,
-                                                                                                                                                         'xrlid' => 'array descriptor@6154+115'
+                                                                                                                                                         'xrlid' => 'array descriptor@6022+115'
                                                                                                                                                        },
                                         'bare name,[[\\w]]' => {
                                                                  'length' => 19,
@@ -7107,9 +7107,9 @@ $hashed_metag = {
                                                                  'rhs' => [
                                                                             '[[\\w]]'
                                                                           ],
-                                                                 'start' => 5990,
+                                                                 'start' => 5858,
                                                                  'subkey' => 0,
-                                                                 'xrlid' => 'bare name@5990+19'
+                                                                 'xrlid' => 'bare name@5858+19'
                                                                },
                                         'before or after,[[a]],[[f]],[[t]],[[e]],[[r]]' => {
                                                                                              'length' => 7,
@@ -7129,9 +7129,9 @@ $hashed_metag = {
                                                                                                         '[[e]]',
                                                                                                         '[[r]]'
                                                                                                       ],
-                                                                                             'start' => 5415,
+                                                                                             'start' => 5283,
                                                                                              'subkey' => 2,
-                                                                                             'xrlid' => 'before or after@5384+38'
+                                                                                             'xrlid' => 'before or after@5252+38'
                                                                                            },
                                         'before or after,[[b]],[[e]],[[f]],[[o]],[[r]],[[e]]' => {
                                                                                                    'length' => 38,
@@ -7153,9 +7153,9 @@ $hashed_metag = {
                                                                                                               '[[r]]',
                                                                                                               '[[e]]'
                                                                                                             ],
-                                                                                                   'start' => 5384,
+                                                                                                   'start' => 5252,
                                                                                                    'subkey' => 1,
-                                                                                                   'xrlid' => 'before or after@5384+38'
+                                                                                                   'xrlid' => 'before or after@5252+38'
                                                                                                  },
                                         'boolean,[[01]]' => {
                                                               'length' => 14,
@@ -7167,9 +7167,9 @@ $hashed_metag = {
                                                               'rhs' => [
                                                                          '[[01]]'
                                                                        ],
-                                                              'start' => 5505,
+                                                              'start' => 5373,
                                                               'subkey' => 1,
-                                                              'xrlid' => 'boolean@5505+14'
+                                                              'xrlid' => 'boolean@5373+14'
                                                             },
                                         'bracketed name string,[[\\s\\w]]' => {
                                                                                 'length' => 33,
@@ -7179,9 +7179,9 @@ $hashed_metag = {
                                                                                 'rhs' => [
                                                                                            '[[\\s\\w]]'
                                                                                          ],
-                                                                                'start' => 6119,
+                                                                                'start' => 5987,
                                                                                 'subkey' => 0,
-                                                                                'xrlid' => 'bracketed name string@6119+33'
+                                                                                'xrlid' => 'bracketed name string@5987+33'
                                                                               },
                                         'bracketed name,[[\\<]],bracketed name string,[[\\>]]' => {
                                                                                                     'length' => 50,
@@ -7197,9 +7197,9 @@ $hashed_metag = {
                                                                                                                'bracketed name string',
                                                                                                                '[[\\>]]'
                                                                                                              ],
-                                                                                                    'start' => 6068,
+                                                                                                    'start' => 5936,
                                                                                                     'subkey' => 1,
-                                                                                                    'xrlid' => 'bracketed name@6068+50'
+                                                                                                    'xrlid' => 'bracketed name@5936+50'
                                                                                                   },
                                         'cc element,escaped cc character' => {
                                                                                'length' => 37,
@@ -7211,9 +7211,9 @@ $hashed_metag = {
                                                                                'rhs' => [
                                                                                           'escaped cc character'
                                                                                         ],
-                                                                               'start' => 7438,
+                                                                               'start' => 7306,
                                                                                'subkey' => 1,
-                                                                               'xrlid' => 'cc element@7438+37'
+                                                                               'xrlid' => 'cc element@7306+37'
                                                                              },
                                         'cc element,negated posix char class' => {
                                                                                    'length' => 41,
@@ -7225,9 +7225,9 @@ $hashed_metag = {
                                                                                    'rhs' => [
                                                                                               'negated posix char class'
                                                                                             ],
-                                                                                   'start' => 7562,
+                                                                                   'start' => 7430,
                                                                                    'subkey' => 1,
-                                                                                   'xrlid' => 'cc element@7562+41'
+                                                                                   'xrlid' => 'cc element@7430+41'
                                                                                  },
                                         'cc element,posix char class' => {
                                                                            'length' => 33,
@@ -7239,9 +7239,9 @@ $hashed_metag = {
                                                                            'rhs' => [
                                                                                       'posix char class'
                                                                                     ],
-                                                                           'start' => 7528,
+                                                                           'start' => 7396,
                                                                            'subkey' => 1,
-                                                                           'xrlid' => 'cc element@7528+33'
+                                                                           'xrlid' => 'cc element@7396+33'
                                                                          },
                                         'cc element,safe cc character' => {
                                                                             'length' => 34,
@@ -7253,9 +7253,9 @@ $hashed_metag = {
                                                                             'rhs' => [
                                                                                        'safe cc character'
                                                                                      ],
-                                                                            'start' => 7290,
+                                                                            'start' => 7158,
                                                                             'subkey' => 1,
-                                                                            'xrlid' => 'cc element@7290+34'
+                                                                            'xrlid' => 'cc element@7158+34'
                                                                           },
                                         'cc elements,cc element' => {
                                                                       'length' => 29,
@@ -7265,9 +7265,9 @@ $hashed_metag = {
                                                                       'rhs' => [
                                                                                  'cc element'
                                                                                ],
-                                                                      'start' => 7260,
+                                                                      'start' => 7128,
                                                                       'subkey' => 0,
-                                                                      'xrlid' => 'cc elements@7260+29'
+                                                                      'xrlid' => 'cc elements@7128+29'
                                                                     },
                                         'character class modifier,[[\\:]],[[i]]' => {
                                                                                       'length' => 33,
@@ -7281,9 +7281,9 @@ $hashed_metag = {
                                                                                                  '[[\\:]]',
                                                                                                  '[[i]]'
                                                                                                ],
-                                                                                      'start' => 7697,
+                                                                                      'start' => 7565,
                                                                                       'subkey' => 1,
-                                                                                      'xrlid' => 'character class modifier@7697+33'
+                                                                                      'xrlid' => 'character class modifier@7565+33'
                                                                                     },
                                         'character class modifier,[[\\:]],[[i]],[[c]]' => {
                                                                                             'length' => 34,
@@ -7299,9 +7299,9 @@ $hashed_metag = {
                                                                                                        '[[i]]',
                                                                                                        '[[c]]'
                                                                                                      ],
-                                                                                            'start' => 7662,
+                                                                                            'start' => 7530,
                                                                                             'subkey' => 1,
-                                                                                            'xrlid' => 'character class modifier@7662+34'
+                                                                                            'xrlid' => 'character class modifier@7530+34'
                                                                                           },
                                         'character class modifiers,character class modifier' => {
                                                                                                   'length' => 57,
@@ -7311,9 +7311,9 @@ $hashed_metag = {
                                                                                                   'rhs' => [
                                                                                                              'character class modifier'
                                                                                                            ],
-                                                                                                  'start' => 7604,
+                                                                                                  'start' => 7472,
                                                                                                   'subkey' => 0,
-                                                                                                  'xrlid' => 'character class modifiers@7604+57'
+                                                                                                  'xrlid' => 'character class modifiers@7472+57'
                                                                                                 },
                                         'character class,[[\\[]],cc elements,[[\\]]],character class modifiers' => {
                                                                                                                      'length' => 69,
@@ -7331,9 +7331,9 @@ $hashed_metag = {
                                                                                                                                 '[[\\]]]',
                                                                                                                                 'character class modifiers'
                                                                                                                               ],
-                                                                                                                     'start' => 7190,
+                                                                                                                     'start' => 7058,
                                                                                                                      'subkey' => 1,
-                                                                                                                     'xrlid' => 'character class@7190+69'
+                                                                                                                     'xrlid' => 'character class@7058+69'
                                                                                                                    },
                                         'double colon,[[\\:]],[[\\:]]' => {
                                                                             'length' => 21,
@@ -7347,9 +7347,9 @@ $hashed_metag = {
                                                                                        '[[\\:]]',
                                                                                        '[[\\:]]'
                                                                                      ],
-                                                                            'start' => 5894,
+                                                                            'start' => 5762,
                                                                             'subkey' => 1,
-                                                                            'xrlid' => 'double colon@5894+21'
+                                                                            'xrlid' => 'double colon@5762+21'
                                                                           },
                                         'escaped cc character,[[\\\\]],horizontal character' => {
                                                                                                   'length' => 51,
@@ -7363,9 +7363,9 @@ $hashed_metag = {
                                                                                                              '[[\\\\]]',
                                                                                                              'horizontal character'
                                                                                                            ],
-                                                                                                  'start' => 7476,
+                                                                                                  'start' => 7344,
                                                                                                   'subkey' => 1,
-                                                                                                  'xrlid' => 'escaped cc character@7476+51'
+                                                                                                  'xrlid' => 'escaped cc character@7344+51'
                                                                                                 },
                                         'hash comment body,hash comment char' => {
                                                                                    'length' => 42,
@@ -7375,9 +7375,9 @@ $hashed_metag = {
                                                                                    'rhs' => [
                                                                                               'hash comment char'
                                                                                             ],
-                                                                                   'start' => 5095,
+                                                                                   'start' => 4963,
                                                                                    'subkey' => 0,
-                                                                                   'xrlid' => 'hash comment body@5095+42'
+                                                                                   'xrlid' => 'hash comment body@4963+42'
                                                                                  },
                                         'hash comment char,[[^\\x{A}\\x{B}\\x{C}\\x{D}\\x{2028}\\x{2029}]]' => {
                                                                                                                  'length' => 61,
@@ -7389,9 +7389,9 @@ $hashed_metag = {
                                                                                                                  'rhs' => [
                                                                                                                             '[[^\\x{A}\\x{B}\\x{C}\\x{D}\\x{2028}\\x{2029}]]'
                                                                                                                           ],
-                                                                                                                 'start' => 5201,
+                                                                                                                 'start' => 5069,
                                                                                                                  'subkey' => 1,
-                                                                                                                 'xrlid' => 'hash comment char@5201+61'
+                                                                                                                 'xrlid' => 'hash comment char@5069+61'
                                                                                                                },
                                         'hash comment,terminated hash comment' => {
                                                                                     'length' => 81,
@@ -7403,9 +7403,9 @@ $hashed_metag = {
                                                                                     'rhs' => [
                                                                                                'terminated hash comment'
                                                                                              ],
-                                                                                    'start' => 4879,
+                                                                                    'start' => 4747,
                                                                                     'subkey' => 1,
-                                                                                    'xrlid' => 'hash comment@4879+81'
+                                                                                    'xrlid' => 'hash comment@4747+81'
                                                                                   },
                                         'hash comment,unterminated final hash comment' => {
                                                                                             'length' => 36,
@@ -7417,9 +7417,9 @@ $hashed_metag = {
                                                                                             'rhs' => [
                                                                                                        'unterminated final hash comment'
                                                                                                      ],
-                                                                                            'start' => 4924,
+                                                                                            'start' => 4792,
                                                                                             'subkey' => 2,
-                                                                                            'xrlid' => 'hash comment@4879+81'
+                                                                                            'xrlid' => 'hash comment@4747+81'
                                                                                           },
                                         'horizontal character,[[^\\x{A}\\x{B}\\x{C}\\x{D}\\x{2028}\\x{2029}]]' => {
                                                                                                                     'length' => 64,
@@ -7431,9 +7431,9 @@ $hashed_metag = {
                                                                                                                     'rhs' => [
                                                                                                                                '[[^\\x{A}\\x{B}\\x{C}\\x{D}\\x{2028}\\x{2029}]]'
                                                                                                                              ],
-                                                                                                                    'start' => 8138,
+                                                                                                                    'start' => 8006,
                                                                                                                     'subkey' => 1,
-                                                                                                                    'xrlid' => 'horizontal character@8138+64'
+                                                                                                                    'xrlid' => 'horizontal character@8006+64'
                                                                                                                   },
                                         'integer,[[\\d]]' => {
                                                                'length' => 17,
@@ -7443,9 +7443,9 @@ $hashed_metag = {
                                                                'rhs' => [
                                                                           '[[\\d]]'
                                                                         ],
-                                                               'start' => 5486,
+                                                               'start' => 5354,
                                                                'subkey' => 0,
-                                                               'xrlid' => 'integer@5486+17'
+                                                               'xrlid' => 'integer@5354+17'
                                                              },
                                         'negated posix char class,[[\\[]],[[\\:]],[[\\^]],posix char class name,[[\\:]],[[\\]]]' => {
                                                                                                                                       'length' => 63,
@@ -7467,9 +7467,9 @@ $hashed_metag = {
                                                                                                                                                  '[[\\:]]',
                                                                                                                                                  '[[\\]]]'
                                                                                                                                                ],
-                                                                                                                                      'start' => 7965,
+                                                                                                                                      'start' => 7833,
                                                                                                                                       'subkey' => 1,
-                                                                                                                                      'xrlid' => 'negated posix char class@7965+63'
+                                                                                                                                      'xrlid' => 'negated posix char class@7833+63'
                                                                                                                                     },
                                         'one or more word characters,[[\\w]]' => {
                                                                                    'length' => 37,
@@ -7479,9 +7479,9 @@ $hashed_metag = {
                                                                                    'rhs' => [
                                                                                               '[[\\w]]'
                                                                                             ],
-                                                                                   'start' => 5643,
+                                                                                   'start' => 5511,
                                                                                    'subkey' => 0,
-                                                                                   'xrlid' => 'one or more word characters@5643+37'
+                                                                                   'xrlid' => 'one or more word characters@5511+37'
                                                                                  },
                                         'op declare bnf,[[\\:]],[[\\:]],[[\\=]]' => {
                                                                                       'length' => 24,
@@ -7497,9 +7497,9 @@ $hashed_metag = {
                                                                                                  '[[\\:]]',
                                                                                                  '[[\\=]]'
                                                                                                ],
-                                                                                      'start' => 5264,
+                                                                                      'start' => 5132,
                                                                                       'subkey' => 1,
-                                                                                      'xrlid' => 'op declare bnf@5264+24'
+                                                                                      'xrlid' => 'op declare bnf@5132+24'
                                                                                     },
                                         'op declare match,[[\\~]]' => {
                                                                         'length' => 24,
@@ -7511,9 +7511,9 @@ $hashed_metag = {
                                                                         'rhs' => [
                                                                                    '[[\\~]]'
                                                                                  ],
-                                                                        'start' => 5289,
+                                                                        'start' => 5157,
                                                                         'subkey' => 1,
-                                                                        'xrlid' => 'op declare match@5289+24'
+                                                                        'xrlid' => 'op declare match@5157+24'
                                                                       },
                                         'op equal priority,[[\\|]]' => {
                                                                          'length' => 25,
@@ -7525,9 +7525,9 @@ $hashed_metag = {
                                                                          'rhs' => [
                                                                                     '[[\\|]]'
                                                                                   ],
-                                                                         'start' => 5333,
+                                                                         'start' => 5201,
                                                                          'subkey' => 1,
-                                                                         'xrlid' => 'op equal priority@5333+25'
+                                                                         'xrlid' => 'op equal priority@5201+25'
                                                                        },
                                         'op loosen,[[\\|]],[[\\|]]' => {
                                                                          'length' => 18,
@@ -7541,9 +7541,9 @@ $hashed_metag = {
                                                                                     '[[\\|]]',
                                                                                     '[[\\|]]'
                                                                                   ],
-                                                                         'start' => 5314,
+                                                                         'start' => 5182,
                                                                          'subkey' => 1,
-                                                                         'xrlid' => 'op loosen@5314+18'
+                                                                         'xrlid' => 'op loosen@5182+18'
                                                                        },
                                         'posix char class name,[[[:alnum:]]]' => {
                                                                                    'length' => 38,
@@ -7553,9 +7553,9 @@ $hashed_metag = {
                                                                                    'rhs' => [
                                                                                               '[[[:alnum:]]]'
                                                                                             ],
-                                                                                   'start' => 8029,
+                                                                                   'start' => 7897,
                                                                                    'subkey' => 0,
-                                                                                   'xrlid' => 'posix char class name@8029+38'
+                                                                                   'xrlid' => 'posix char class name@7897+38'
                                                                                  },
                                         'posix char class,[[\\[]],[[\\:]],posix char class name,[[\\:]],[[\\]]]' => {
                                                                                                                       'length' => 54,
@@ -7575,9 +7575,9 @@ $hashed_metag = {
                                                                                                                                  '[[\\:]]',
                                                                                                                                  '[[\\]]]'
                                                                                                                                ],
-                                                                                                                      'start' => 7910,
+                                                                                                                      'start' => 7778,
                                                                                                                       'subkey' => 1,
-                                                                                                                      'xrlid' => 'posix char class@7910+54'
+                                                                                                                      'xrlid' => 'posix char class@7778+54'
                                                                                                                     },
                                         'reserved action name,[[\\:]],[[\\:]],one or more word characters' => {
                                                                                                                 'length' => 59,
@@ -7593,9 +7593,9 @@ $hashed_metag = {
                                                                                                                            '[[\\:]]',
                                                                                                                            'one or more word characters'
                                                                                                                          ],
-                                                                                                                'start' => 5521,
+                                                                                                                'start' => 5389,
                                                                                                                 'subkey' => 1,
-                                                                                                                'xrlid' => 'reserved action name@5521+59'
+                                                                                                                'xrlid' => 'reserved action name@5389+59'
                                                                                                               },
                                         'reserved blessing name,[[\\:]],[[\\:]],one or more word characters' => {
                                                                                                                   'length' => 61,
@@ -7611,9 +7611,9 @@ $hashed_metag = {
                                                                                                                              '[[\\:]]',
                                                                                                                              'one or more word characters'
                                                                                                                            ],
-                                                                                                                  'start' => 5581,
+                                                                                                                  'start' => 5449,
                                                                                                                   'subkey' => 1,
-                                                                                                                  'xrlid' => 'reserved blessing name@5581+61'
+                                                                                                                  'xrlid' => 'reserved blessing name@5449+61'
                                                                                                                 },
                                         'reserved event name,[[\\:]],[[s]],[[y]],[[m]],[[b]],[[o]],[[l]]' => {
                                                                                                                'length' => 33,
@@ -7637,9 +7637,9 @@ $hashed_metag = {
                                                                                                                           '[[o]]',
                                                                                                                           '[[l]]'
                                                                                                                         ],
-                                                                                                               'start' => 4148,
+                                                                                                               'start' => 4016,
                                                                                                                'subkey' => 1,
-                                                                                                               'xrlid' => 'reserved event name@4148+33'
+                                                                                                               'xrlid' => 'reserved event name@4016+33'
                                                                                                              },
                                         'result item descriptor list,result item descriptor' => {
                                                                                                   'length' => 105,
@@ -7650,9 +7650,9 @@ $hashed_metag = {
                                                                                                              'result item descriptor'
                                                                                                            ],
                                                                                                   'separator' => 'result item descriptor separator',
-                                                                                                  'start' => 6449,
+                                                                                                  'start' => 6317,
                                                                                                   'subkey' => 0,
-                                                                                                  'xrlid' => 'result item descriptor list@6449+105'
+                                                                                                  'xrlid' => 'result item descriptor list@6317+105'
                                                                                                 },
                                         'result item descriptor separator,[[,]]' => {
                                                                                       'length' => 40,
@@ -7664,9 +7664,9 @@ $hashed_metag = {
                                                                                       'rhs' => [
                                                                                                  '[[,]]'
                                                                                                ],
-                                                                                      'start' => 6555,
+                                                                                      'start' => 6423,
                                                                                       'subkey' => 1,
-                                                                                      'xrlid' => 'result item descriptor separator@6555+40'
+                                                                                      'xrlid' => 'result item descriptor separator@6423+40'
                                                                                     },
                                         'result item descriptor separator,[[,]],whitespace' => {
                                                                                                  'length' => 51,
@@ -7680,9 +7680,9 @@ $hashed_metag = {
                                                                                                             '[[,]]',
                                                                                                             'whitespace'
                                                                                                           ],
-                                                                                                 'start' => 6596,
+                                                                                                 'start' => 6464,
                                                                                                  'subkey' => 1,
-                                                                                                 'xrlid' => 'result item descriptor separator@6596+51'
+                                                                                                 'xrlid' => 'result item descriptor separator@6464+51'
                                                                                                },
                                         'result item descriptor,[[g]],[[1]],[[l]],[[e]],[[n]],[[g]],[[t]],[[h]]' => {
                                                                                                                       'length' => 10,
@@ -7708,9 +7708,9 @@ $hashed_metag = {
                                                                                                                                  '[[t]]',
                                                                                                                                  '[[h]]'
                                                                                                                                ],
-                                                                                                                      'start' => 6710,
+                                                                                                                      'start' => 6578,
                                                                                                                       'subkey' => 4,
-                                                                                                                      'xrlid' => 'result item descriptor@6648+135'
+                                                                                                                      'xrlid' => 'result item descriptor@6516+135'
                                                                                                                     },
                                         'result item descriptor,[[g]],[[1]],[[s]],[[t]],[[a]],[[r]],[[t]]' => {
                                                                                                                 'length' => 9,
@@ -7734,9 +7734,9 @@ $hashed_metag = {
                                                                                                                            '[[r]]',
                                                                                                                            '[[t]]'
                                                                                                                          ],
-                                                                                                                'start' => 6698,
+                                                                                                                'start' => 6566,
                                                                                                                 'subkey' => 3,
-                                                                                                                'xrlid' => 'result item descriptor@6648+135'
+                                                                                                                'xrlid' => 'result item descriptor@6516+135'
                                                                                                               },
                                         'result item descriptor,[[l]],[[e]],[[n]],[[g]],[[t]],[[h]]' => {
                                                                                                           'length' => 8,
@@ -7758,9 +7758,9 @@ $hashed_metag = {
                                                                                                                      '[[t]]',
                                                                                                                      '[[h]]'
                                                                                                                    ],
-                                                                                                          'start' => 6685,
+                                                                                                          'start' => 6553,
                                                                                                           'subkey' => 2,
-                                                                                                          'xrlid' => 'result item descriptor@6648+135'
+                                                                                                          'xrlid' => 'result item descriptor@6516+135'
                                                                                                         },
                                         'result item descriptor,[[l]],[[h]],[[s]]' => {
                                                                                         'length' => 5,
@@ -7776,9 +7776,9 @@ $hashed_metag = {
                                                                                                    '[[h]]',
                                                                                                    '[[s]]'
                                                                                                  ],
-                                                                                        'start' => 6734,
+                                                                                        'start' => 6602,
                                                                                         'subkey' => 6,
-                                                                                        'xrlid' => 'result item descriptor@6648+135'
+                                                                                        'xrlid' => 'result item descriptor@6516+135'
                                                                                       },
                                         'result item descriptor,[[n]],[[a]],[[m]],[[e]]' => {
                                                                                               'length' => 6,
@@ -7796,9 +7796,9 @@ $hashed_metag = {
                                                                                                          '[[m]]',
                                                                                                          '[[e]]'
                                                                                                        ],
-                                                                                              'start' => 6725,
+                                                                                              'start' => 6593,
                                                                                               'subkey' => 5,
-                                                                                              'xrlid' => 'result item descriptor@6648+135'
+                                                                                              'xrlid' => 'result item descriptor@6516+135'
                                                                                             },
                                         'result item descriptor,[[r]],[[u]],[[l]],[[e]]' => {
                                                                                               'length' => 6,
@@ -7816,9 +7816,9 @@ $hashed_metag = {
                                                                                                          '[[l]]',
                                                                                                          '[[e]]'
                                                                                                        ],
-                                                                                              'start' => 6753,
+                                                                                              'start' => 6621,
                                                                                               'subkey' => 8,
-                                                                                              'xrlid' => 'result item descriptor@6648+135'
+                                                                                              'xrlid' => 'result item descriptor@6516+135'
                                                                                             },
                                         'result item descriptor,[[s]],[[t]],[[a]],[[r]],[[t]]' => {
                                                                                                     'length' => 135,
@@ -7838,9 +7838,9 @@ $hashed_metag = {
                                                                                                                '[[r]]',
                                                                                                                '[[t]]'
                                                                                                              ],
-                                                                                                    'start' => 6648,
+                                                                                                    'start' => 6516,
                                                                                                     'subkey' => 1,
-                                                                                                    'xrlid' => 'result item descriptor@6648+135'
+                                                                                                    'xrlid' => 'result item descriptor@6516+135'
                                                                                                   },
                                         'result item descriptor,[[s]],[[y]],[[m]],[[b]],[[o]],[[l]]' => {
                                                                                                           'length' => 8,
@@ -7862,9 +7862,9 @@ $hashed_metag = {
                                                                                                                      '[[o]]',
                                                                                                                      '[[l]]'
                                                                                                                    ],
-                                                                                                          'start' => 6742,
+                                                                                                          'start' => 6610,
                                                                                                           'subkey' => 7,
-                                                                                                          'xrlid' => 'result item descriptor@6648+135'
+                                                                                                          'xrlid' => 'result item descriptor@6516+135'
                                                                                                         },
                                         'result item descriptor,[[v]],[[a]],[[l]],[[u]],[[e]]' => {
                                                                                                     'length' => 7,
@@ -7884,9 +7884,9 @@ $hashed_metag = {
                                                                                                                '[[u]]',
                                                                                                                '[[e]]'
                                                                                                              ],
-                                                                                                    'start' => 6765,
+                                                                                                    'start' => 6633,
                                                                                                     'subkey' => 9,
-                                                                                                    'xrlid' => 'result item descriptor@6648+135'
+                                                                                                    'xrlid' => 'result item descriptor@6516+135'
                                                                                                   },
                                         'result item descriptor,[[v]],[[a]],[[l]],[[u]],[[e]],[[s]]' => {
                                                                                                           'length' => 8,
@@ -7908,9 +7908,9 @@ $hashed_metag = {
                                                                                                                      '[[e]]',
                                                                                                                      '[[s]]'
                                                                                                                    ],
-                                                                                                          'start' => 6775,
+                                                                                                          'start' => 6643,
                                                                                                           'subkey' => 10,
-                                                                                                          'xrlid' => 'result item descriptor@6648+135'
+                                                                                                          'xrlid' => 'result item descriptor@6516+135'
                                                                                                         },
                                         'safe cc character,[[^\\x{5d}\\x{0A}\\x{0B}\\x{0C}\\x{0D}\\x{0085}\\x{2028}\\x{2029}]]' => {
                                                                                                                                      'length' => 79,
@@ -7922,9 +7922,9 @@ $hashed_metag = {
                                                                                                                                      'rhs' => [
                                                                                                                                                 '[[^\\x{5d}\\x{0A}\\x{0B}\\x{0C}\\x{0D}\\x{0085}\\x{2028}\\x{2029}]]'
                                                                                                                                               ],
-                                                                                                                                     'start' => 7358,
+                                                                                                                                     'start' => 7226,
                                                                                                                                      'subkey' => 1,
-                                                                                                                                     'xrlid' => 'safe cc character@7358+79'
+                                                                                                                                     'xrlid' => 'safe cc character@7226+79'
                                                                                                                                    },
                                         'sign,[[+-]]' => {
                                                            'length' => 13,
@@ -7936,9 +7936,9 @@ $hashed_metag = {
                                                            'rhs' => [
                                                                       '[[+-]]'
                                                                     ],
-                                                           'start' => 5472,
+                                                           'start' => 5340,
                                                            'subkey' => 1,
-                                                           'xrlid' => 'sign@5472+13'
+                                                           'xrlid' => 'sign@5340+13'
                                                          },
                                         'signed integer,integer' => {
                                                                       'length' => 47,
@@ -7950,9 +7950,9 @@ $hashed_metag = {
                                                                       'rhs' => [
                                                                                  'integer'
                                                                                ],
-                                                                      'start' => 5424,
+                                                                      'start' => 5292,
                                                                       'subkey' => 1,
-                                                                      'xrlid' => 'signed integer@5424+47'
+                                                                      'xrlid' => 'signed integer@5292+47'
                                                                     },
                                         'signed integer,sign,integer' => {
                                                                            'length' => 16,
@@ -7966,9 +7966,9 @@ $hashed_metag = {
                                                                                       'sign',
                                                                                       'integer'
                                                                                     ],
-                                                                           'start' => 5455,
+                                                                           'start' => 5323,
                                                                            'subkey' => 2,
-                                                                           'xrlid' => 'signed integer@5424+47'
+                                                                           'xrlid' => 'signed integer@5292+47'
                                                                          },
                                         'single quoted name,[[\']],string without single quote or vertical space,[[\']]' => {
                                                                                                                               'length' => 78,
@@ -7984,9 +7984,9 @@ $hashed_metag = {
                                                                                                                                          'string without single quote or vertical space',
                                                                                                                                          '[[\']]'
                                                                                                                                        ],
-                                                                                                                              'start' => 7006,
+                                                                                                                              'start' => 6874,
                                                                                                                               'subkey' => 1,
-                                                                                                                              'xrlid' => 'single quoted name@7006+78'
+                                                                                                                              'xrlid' => 'single quoted name@6874+78'
                                                                                                                             },
                                         'single quoted string,[[\']],string without single quote or vertical space,[[\']],character class modifiers' => {
                                                                                                                                                           'length' => 108,
@@ -8004,9 +8004,9 @@ $hashed_metag = {
                                                                                                                                                                      '[[\']]',
                                                                                                                                                                      'character class modifiers'
                                                                                                                                                                    ],
-                                                                                                                                                          'start' => 6897,
+                                                                                                                                                          'start' => 6765,
                                                                                                                                                           'subkey' => 1,
-                                                                                                                                                          'xrlid' => 'single quoted string@6897+108'
+                                                                                                                                                          'xrlid' => 'single quoted string@6765+108'
                                                                                                                                                         },
                                         'standard name,[[a-zA-Z]],zero or more word characters' => {
                                                                                                      'length' => 57,
@@ -8020,9 +8020,9 @@ $hashed_metag = {
                                                                                                                 '[[a-zA-Z]]',
                                                                                                                 'zero or more word characters'
                                                                                                               ],
-                                                                                                     'start' => 6010,
+                                                                                                     'start' => 5878,
                                                                                                      'subkey' => 1,
-                                                                                                     'xrlid' => 'standard name@6010+57'
+                                                                                                     'xrlid' => 'standard name@5878+57'
                                                                                                    },
                                         'string without single quote or vertical space,[[^\'\\x{0A}\\x{0B}\\x{0C}\\x{0D}\\x{0085}\\x{2028}\\x{2029}]]' => {
                                                                                                                                                             'length' => 103,
@@ -8032,9 +8032,9 @@ $hashed_metag = {
                                                                                                                                                             'rhs' => [
                                                                                                                                                                        '[[^\'\\x{0A}\\x{0B}\\x{0C}\\x{0D}\\x{0085}\\x{2028}\\x{2029}]]'
                                                                                                                                                                      ],
-                                                                                                                                                            'start' => 7085,
+                                                                                                                                                            'start' => 6953,
                                                                                                                                                             'subkey' => 0,
-                                                                                                                                                            'xrlid' => 'string without single quote or vertical space@7085+103'
+                                                                                                                                                            'xrlid' => 'string without single quote or vertical space@6953+103'
                                                                                                                                                           },
                                         'terminated hash comment,[[\\#]],hash comment body,vertical space char' => {
                                                                                                                      'length' => 73,
@@ -8050,9 +8050,9 @@ $hashed_metag = {
                                                                                                                                 'hash comment body',
                                                                                                                                 'vertical space char'
                                                                                                                               ],
-                                                                                                                     'start' => 4961,
+                                                                                                                     'start' => 4829,
                                                                                                                      'subkey' => 1,
-                                                                                                                     'xrlid' => 'terminated hash comment@4961+73'
+                                                                                                                     'xrlid' => 'terminated hash comment@4829+73'
                                                                                                                    },
                                         'unterminated final hash comment,[[\\#]],hash comment body' => {
                                                                                                          'length' => 59,
@@ -8066,9 +8066,9 @@ $hashed_metag = {
                                                                                                                     '[[\\#]]',
                                                                                                                     'hash comment body'
                                                                                                                   ],
-                                                                                                         'start' => 5035,
+                                                                                                         'start' => 4903,
                                                                                                          'subkey' => 1,
-                                                                                                         'xrlid' => 'unterminated final hash comment@5035+59'
+                                                                                                         'xrlid' => 'unterminated final hash comment@4903+59'
                                                                                                        },
                                         'vertical space char,[[\\x{A}\\x{B}\\x{C}\\x{D}\\x{2028}\\x{2029}]]' => {
                                                                                                                   'length' => 62,
@@ -8080,9 +8080,9 @@ $hashed_metag = {
                                                                                                                   'rhs' => [
                                                                                                                              '[[\\x{A}\\x{B}\\x{C}\\x{D}\\x{2028}\\x{2029}]]'
                                                                                                                            ],
-                                                                                                                  'start' => 5138,
+                                                                                                                  'start' => 5006,
                                                                                                                   'subkey' => 1,
-                                                                                                                  'xrlid' => 'vertical space char@5138+62'
+                                                                                                                  'xrlid' => 'vertical space char@5006+62'
                                                                                                                 },
                                         'whitespace,[[\\s]]' => {
                                                                   'length' => 18,
@@ -8092,9 +8092,9 @@ $hashed_metag = {
                                                                   'rhs' => [
                                                                              '[[\\s]]'
                                                                            ],
-                                                                  'start' => 4816,
+                                                                  'start' => 4684,
                                                                   'subkey' => 0,
-                                                                  'xrlid' => 'whitespace@4816+18'
+                                                                  'xrlid' => 'whitespace@4684+18'
                                                                 },
                                         'zero or more word characters,[[\\w]]' => {
                                                                                     'length' => 38,
@@ -8104,51 +8104,51 @@ $hashed_metag = {
                                                                                     'rhs' => [
                                                                                                '[[\\w]]'
                                                                                              ],
-                                                                                    'start' => 5681,
+                                                                                    'start' => 5549,
                                                                                     'subkey' => 0,
-                                                                                    'xrlid' => 'zero or more word characters@5681+38'
+                                                                                    'xrlid' => 'zero or more word characters@5549+38'
                                                                                   }
                                       }
                             },
                   'xrl' => {
-                             'Perl identifier@5868+25' => {
+                             'Perl identifier@5736+25' => {
                                                             'length' => 25,
                                                             'lhs' => 'Perl identifier',
                                                             'precedence_count' => 1,
-                                                            'start' => 5868
+                                                            'start' => 5736
                                                           },
-                             'Perl name@5916+72' => {
+                             'Perl name@5784+72' => {
                                                       'length' => 72,
                                                       'lhs' => 'Perl name',
                                                       'precedence_count' => 1,
-                                                      'start' => 5916
+                                                      'start' => 5784
                                                     },
-                             'action name@4685+29' => {
+                             'action name@4553+29' => {
                                                         'length' => 29,
                                                         'lhs' => 'action name',
                                                         'precedence_count' => 1,
-                                                        'start' => 4685
+                                                        'start' => 4553
                                                       },
-                             'action name@4715+40' => {
+                             'action name@4583+40' => {
                                                         'length' => 40,
                                                         'lhs' => 'action name',
                                                         'precedence_count' => 1,
-                                                        'start' => 4715
+                                                        'start' => 4583
                                                       },
-                             'action name@4756+36' => {
+                             'action name@4624+36' => {
                                                         'length' => 36,
                                                         'lhs' => 'action name',
                                                         'precedence_count' => 1,
-                                                        'start' => 4756
+                                                        'start' => 4624
                                                       },
-                             'action@2897+40' => {
+                             'action@2868+40' => {
                                                    'length' => 40,
                                                    'lhs' => 'action',
                                                    'precedence_count' => 1,
-                                                   'start' => 2897
+                                                   'start' => 2868
                                                  },
-                             'adverb item@2511+362' => {
-                                                         'length' => 362,
+                             'adverb item@2511+333' => {
+                                                         'length' => 333,
                                                          'lhs' => 'adverb item',
                                                          'precedence_count' => 1,
                                                          'start' => 2511
@@ -8165,11 +8165,11 @@ $hashed_metag = {
                                                         'precedence_count' => 1,
                                                         'start' => 2434
                                                       },
-                             'alternative name@3997+61' => {
+                             'alternative name@3865+61' => {
                                                              'length' => 61,
                                                              'lhs' => 'alternative name',
                                                              'precedence_count' => 1,
-                                                             'start' => 3997
+                                                             'start' => 3865
                                                            },
                              'alternative@2399+33' => {
                                                         'length' => 33,
@@ -8183,137 +8183,137 @@ $hashed_metag = {
                                                          'precedence_count' => 1,
                                                          'start' => 2320
                                                        },
-                             'array descriptor left bracket@6270+37' => {
+                             'array descriptor left bracket@6138+37' => {
                                                                           'length' => 37,
                                                                           'lhs' => 'array descriptor left bracket',
                                                                           'precedence_count' => 1,
-                                                                          'start' => 6270
+                                                                          'start' => 6138
                                                                         },
-                             'array descriptor left bracket@6309+48' => {
+                             'array descriptor left bracket@6177+48' => {
                                                                           'length' => 48,
                                                                           'lhs' => 'array descriptor left bracket',
                                                                           'precedence_count' => 1,
-                                                                          'start' => 6309
+                                                                          'start' => 6177
                                                                         },
-                             'array descriptor right bracket@6358+38' => {
+                             'array descriptor right bracket@6226+38' => {
                                                                            'length' => 38,
                                                                            'lhs' => 'array descriptor right bracket',
                                                                            'precedence_count' => 1,
-                                                                           'start' => 6358
+                                                                           'start' => 6226
                                                                          },
-                             'array descriptor right bracket@6398+49' => {
+                             'array descriptor right bracket@6266+49' => {
                                                                            'length' => 49,
                                                                            'lhs' => 'array descriptor right bracket',
                                                                            'precedence_count' => 1,
-                                                                           'start' => 6398
+                                                                           'start' => 6266
                                                                          },
-                             'array descriptor@6154+115' => {
+                             'array descriptor@6022+115' => {
                                                               'length' => 115,
                                                               'lhs' => 'array descriptor',
                                                               'precedence_count' => 1,
-                                                              'start' => 6154
+                                                              'start' => 6022
                                                             },
-                             'bare name@5990+19' => {
+                             'bare name@5858+19' => {
                                                       'length' => 19,
                                                       'lhs' => 'bare name',
                                                       'precedence_count' => 1,
-                                                      'start' => 5990
+                                                      'start' => 5858
                                                     },
-                             'before or after@5384+38' => {
+                             'before or after@5252+38' => {
                                                             'length' => 38,
                                                             'lhs' => 'before or after',
                                                             'precedence_count' => 1,
-                                                            'start' => 5384
+                                                            'start' => 5252
                                                           },
-                             'blessing name@4183+35' => {
+                             'blessing name@4051+35' => {
                                                           'length' => 35,
                                                           'lhs' => 'blessing name',
                                                           'precedence_count' => 1,
-                                                          'start' => 4183
+                                                          'start' => 4051
                                                         },
-                             'blessing name@4219+44' => {
+                             'blessing name@4087+44' => {
                                                           'length' => 44,
                                                           'lhs' => 'blessing name',
                                                           'precedence_count' => 1,
-                                                          'start' => 4219
+                                                          'start' => 4087
                                                         },
-                             'blessing@3904+45' => {
+                             'blessing@3772+45' => {
                                                      'length' => 45,
                                                      'lhs' => 'blessing',
                                                      'precedence_count' => 1,
-                                                     'start' => 3904
+                                                     'start' => 3772
                                                    },
-                             'boolean@5505+14' => {
+                             'boolean@5373+14' => {
                                                     'length' => 14,
                                                     'lhs' => 'boolean',
                                                     'precedence_count' => 1,
-                                                    'start' => 5505
+                                                    'start' => 5373
                                                   },
-                             'bracketed name string@6119+33' => {
+                             'bracketed name string@5987+33' => {
                                                                   'length' => 33,
                                                                   'lhs' => 'bracketed name string',
                                                                   'precedence_count' => 1,
-                                                                  'start' => 6119
+                                                                  'start' => 5987
                                                                 },
-                             'bracketed name@6068+50' => {
+                             'bracketed name@5936+50' => {
                                                            'length' => 50,
                                                            'lhs' => 'bracketed name',
                                                            'precedence_count' => 1,
-                                                           'start' => 6068
+                                                           'start' => 5936
                                                          },
-                             'cc element@7290+34' => {
+                             'cc element@7158+34' => {
                                                        'length' => 34,
                                                        'lhs' => 'cc element',
                                                        'precedence_count' => 1,
-                                                       'start' => 7290
+                                                       'start' => 7158
                                                      },
-                             'cc element@7438+37' => {
+                             'cc element@7306+37' => {
                                                        'length' => 37,
                                                        'lhs' => 'cc element',
                                                        'precedence_count' => 1,
-                                                       'start' => 7438
+                                                       'start' => 7306
                                                      },
-                             'cc element@7528+33' => {
+                             'cc element@7396+33' => {
                                                        'length' => 33,
                                                        'lhs' => 'cc element',
                                                        'precedence_count' => 1,
-                                                       'start' => 7528
+                                                       'start' => 7396
                                                      },
-                             'cc element@7562+41' => {
+                             'cc element@7430+41' => {
                                                        'length' => 41,
                                                        'lhs' => 'cc element',
                                                        'precedence_count' => 1,
-                                                       'start' => 7562
+                                                       'start' => 7430
                                                      },
-                             'cc elements@7260+29' => {
+                             'cc elements@7128+29' => {
                                                         'length' => 29,
                                                         'lhs' => 'cc elements',
                                                         'precedence_count' => 1,
-                                                        'start' => 7260
+                                                        'start' => 7128
                                                       },
-                             'character class modifier@7662+34' => {
+                             'character class modifier@7530+34' => {
                                                                      'length' => 34,
                                                                      'lhs' => 'character class modifier',
                                                                      'precedence_count' => 1,
-                                                                     'start' => 7662
+                                                                     'start' => 7530
                                                                    },
-                             'character class modifier@7697+33' => {
+                             'character class modifier@7565+33' => {
                                                                      'length' => 33,
                                                                      'lhs' => 'character class modifier',
                                                                      'precedence_count' => 1,
-                                                                     'start' => 7697
+                                                                     'start' => 7565
                                                                    },
-                             'character class modifiers@7604+57' => {
+                             'character class modifiers@7472+57' => {
                                                                       'length' => 57,
                                                                       'lhs' => 'character class modifiers',
                                                                       'precedence_count' => 1,
-                                                                      'start' => 7604
+                                                                      'start' => 7472
                                                                     },
-                             'character class@7190+69' => {
+                             'character class@7058+69' => {
                                                             'length' => 69,
                                                             'lhs' => 'character class',
                                                             'precedence_count' => 1,
-                                                            'start' => 7190
+                                                            'start' => 7058
                                                           },
                              'completion event declaration@1754+99' => {
                                                                          'length' => 99,
@@ -8339,11 +8339,11 @@ $hashed_metag = {
                                                          'precedence_count' => 1,
                                                          'start' => 1603
                                                        },
-                             'double colon@5894+21' => {
+                             'double colon@5762+21' => {
                                                          'length' => 21,
                                                          'lhs' => 'double colon',
                                                          'precedence_count' => 1,
-                                                         'start' => 5894
+                                                         'start' => 5762
                                                        },
                              'empty rule@1475+47' => {
                                                        'length' => 47,
@@ -8351,71 +8351,71 @@ $hashed_metag = {
                                                        'precedence_count' => 1,
                                                        'start' => 1475
                                                      },
-                             'escaped cc character@7476+51' => {
+                             'escaped cc character@7344+51' => {
                                                                  'length' => 51,
                                                                  'lhs' => 'escaped cc character',
                                                                  'precedence_count' => 1,
-                                                                 'start' => 7476
+                                                                 'start' => 7344
                                                                },
-                             'event initialization@3637+59' => {
+                             'event initialization@3608+59' => {
                                                                  'length' => 59,
                                                                  'lhs' => 'event initialization',
                                                                  'precedence_count' => 1,
-                                                                 'start' => 3637
+                                                                 'start' => 3608
                                                                },
-                             'event initializer@3697+41' => {
+                             'event initializer@3668+41' => {
                                                               'length' => 41,
                                                               'lhs' => 'event initializer',
                                                               'precedence_count' => 1,
-                                                              'start' => 3697
+                                                              'start' => 3668
                                                             },
-                             'event initializer@3768+23' => {
+                             'event initializer@3739+23' => {
                                                               'length' => 23,
                                                               'lhs' => 'event initializer',
                                                               'precedence_count' => 1,
-                                                              'start' => 3768
+                                                              'start' => 3739
                                                             },
-                             'event name@4060+87' => {
+                             'event name@3928+87' => {
                                                        'length' => 87,
                                                        'lhs' => 'event name',
                                                        'precedence_count' => 1,
-                                                       'start' => 4060
+                                                       'start' => 3928
                                                      },
-                             'event specification@3573+63' => {
+                             'event specification@3544+63' => {
                                                                 'length' => 63,
                                                                 'lhs' => 'event specification',
                                                                 'precedence_count' => 1,
-                                                                'start' => 3573
+                                                                'start' => 3544
                                                               },
-                             'group association@3030+46' => {
+                             'group association@3001+46' => {
                                                               'length' => 46,
                                                               'lhs' => 'group association',
                                                               'precedence_count' => 1,
-                                                              'start' => 3030
+                                                              'start' => 3001
                                                             },
-                             'hash comment body@5095+42' => {
+                             'hash comment body@4963+42' => {
                                                               'length' => 42,
                                                               'lhs' => 'hash comment body',
                                                               'precedence_count' => 1,
-                                                              'start' => 5095
+                                                              'start' => 4963
                                                             },
-                             'hash comment char@5201+61' => {
+                             'hash comment char@5069+61' => {
                                                               'length' => 61,
                                                               'lhs' => 'hash comment char',
                                                               'precedence_count' => 1,
-                                                              'start' => 5201
+                                                              'start' => 5069
                                                             },
-                             'hash comment@4879+81' => {
+                             'hash comment@4747+81' => {
                                                          'length' => 81,
                                                          'lhs' => 'hash comment',
                                                          'precedence_count' => 1,
-                                                         'start' => 4879
+                                                         'start' => 4747
                                                        },
-                             'horizontal character@8138+64' => {
+                             'horizontal character@8006+64' => {
                                                                  'length' => 64,
                                                                  'lhs' => 'horizontal character',
                                                                  'precedence_count' => 1,
-                                                                 'start' => 8138
+                                                                 'start' => 8006
                                                                },
                              'inaccessible statement@2048+92' => {
                                                                    'length' => 92,
@@ -8429,17 +8429,17 @@ $hashed_metag = {
                                                                    'precedence_count' => 1,
                                                                    'start' => 2141
                                                                  },
-                             'integer@5486+17' => {
+                             'integer@5354+17' => {
                                                     'length' => 17,
                                                     'lhs' => 'integer',
                                                     'precedence_count' => 1,
-                                                    'start' => 5486
+                                                    'start' => 5354
                                                   },
-                             'left association@2938+44' => {
+                             'left association@2909+44' => {
                                                              'length' => 44,
                                                              'lhs' => 'left association',
                                                              'precedence_count' => 1,
-                                                             'start' => 2938
+                                                             'start' => 2909
                                                            },
                              'lexeme default statement@1285+69' => {
                                                                      'length' => 69,
@@ -8453,47 +8453,47 @@ $hashed_metag = {
                                                         'precedence_count' => 1,
                                                         'start' => 1684
                                                       },
-                             'lhs@4265+21' => {
+                             'lhs@4133+21' => {
                                                 'length' => 21,
                                                 'lhs' => 'lhs',
                                                 'precedence_count' => 1,
-                                                'start' => 4265
+                                                'start' => 4133
                                               },
-                             'naming@3950+45' => {
+                             'naming@3818+45' => {
                                                    'length' => 45,
                                                    'lhs' => 'naming',
                                                    'precedence_count' => 1,
-                                                   'start' => 3950
+                                                   'start' => 3818
                                                  },
-                             'negated posix char class@7965+63' => {
+                             'negated posix char class@7833+63' => {
                                                                      'length' => 63,
                                                                      'lhs' => 'negated posix char class',
                                                                      'precedence_count' => 1,
-                                                                     'start' => 7965
+                                                                     'start' => 7833
                                                                    },
-                             'null adverb@2875+21' => {
+                             'null adverb@2846+21' => {
                                                         'length' => 21,
                                                         'lhs' => 'null adverb',
                                                         'precedence_count' => 1,
-                                                        'start' => 2875
+                                                        'start' => 2846
                                                       },
-                             'null ranking constant@3406+42' => {
+                             'null ranking constant@3377+42' => {
                                                                   'length' => 42,
                                                                   'lhs' => 'null ranking constant',
                                                                   'precedence_count' => 1,
-                                                                  'start' => 3406
+                                                                  'start' => 3377
                                                                 },
-                             'null ranking specification@3249+78' => {
+                             'null ranking specification@3220+78' => {
                                                                        'length' => 78,
                                                                        'lhs' => 'null ranking specification',
                                                                        'precedence_count' => 1,
-                                                                       'start' => 3249
+                                                                       'start' => 3220
                                                                      },
-                             'null ranking specification@3328+77' => {
+                             'null ranking specification@3299+77' => {
                                                                        'length' => 77,
                                                                        'lhs' => 'null ranking specification',
                                                                        'precedence_count' => 1,
-                                                                       'start' => 3328
+                                                                       'start' => 3299
                                                                      },
                              'null statement@1056+24' => {
                                                            'length' => 24,
@@ -8507,29 +8507,29 @@ $hashed_metag = {
                                                                      'precedence_count' => 1,
                                                                      'start' => 1854
                                                                    },
-                             'on or off@3739+28' => {
+                             'on or off@3710+28' => {
                                                       'length' => 28,
                                                       'lhs' => 'on or off',
                                                       'precedence_count' => 1,
-                                                      'start' => 3739
+                                                      'start' => 3710
                                                     },
-                             'one or more word characters@5643+37' => {
+                             'one or more word characters@5511+37' => {
                                                                         'length' => 37,
                                                                         'lhs' => 'one or more word characters',
                                                                         'precedence_count' => 1,
-                                                                        'start' => 5643
+                                                                        'start' => 5511
                                                                       },
-                             'op declare bnf@5264+24' => {
+                             'op declare bnf@5132+24' => {
                                                            'length' => 24,
                                                            'lhs' => 'op declare bnf',
                                                            'precedence_count' => 1,
-                                                           'start' => 5264
+                                                           'start' => 5132
                                                          },
-                             'op declare match@5289+24' => {
+                             'op declare match@5157+24' => {
                                                              'length' => 24,
                                                              'lhs' => 'op declare match',
                                                              'precedence_count' => 1,
-                                                             'start' => 5289
+                                                             'start' => 5157
                                                            },
                              'op declare@2195+54' => {
                                                        'length' => 54,
@@ -8537,41 +8537,41 @@ $hashed_metag = {
                                                        'precedence_count' => 1,
                                                        'start' => 2195
                                                      },
-                             'op equal priority@5333+25' => {
+                             'op equal priority@5201+25' => {
                                                               'length' => 25,
                                                               'lhs' => 'op equal priority',
                                                               'precedence_count' => 1,
-                                                              'start' => 5333
+                                                              'start' => 5201
                                                             },
-                             'op loosen@5314+18' => {
+                             'op loosen@5182+18' => {
                                                       'length' => 18,
                                                       'lhs' => 'op loosen',
                                                       'precedence_count' => 1,
-                                                      'start' => 5314
+                                                      'start' => 5182
                                                     },
-                             'parenthesized rhs primary list@4436+67' => {
+                             'parenthesized rhs primary list@4304+67' => {
                                                                            'length' => 67,
                                                                            'lhs' => 'parenthesized rhs primary list',
                                                                            'precedence_count' => 1,
-                                                                           'start' => 4436
+                                                                           'start' => 4304
                                                                          },
-                             'pause specification@3513+58' => {
+                             'pause specification@3484+58' => {
                                                                 'length' => 58,
                                                                 'lhs' => 'pause specification',
                                                                 'precedence_count' => 1,
-                                                                'start' => 3513
+                                                                'start' => 3484
                                                               },
-                             'posix char class name@8029+38' => {
+                             'posix char class name@7897+38' => {
                                                                   'length' => 38,
                                                                   'lhs' => 'posix char class name',
                                                                   'precedence_count' => 1,
-                                                                  'start' => 8029
+                                                                  'start' => 7897
                                                                 },
-                             'posix char class@7910+54' => {
+                             'posix char class@7778+54' => {
                                                              'length' => 54,
                                                              'lhs' => 'posix char class',
                                                              'precedence_count' => 1,
-                                                             'start' => 7910
+                                                             'start' => 7778
                                                            },
                              'prediction event declaration@1947+99' => {
                                                                          'length' => 99,
@@ -8591,17 +8591,17 @@ $hashed_metag = {
                                                           'precedence_count' => 1,
                                                           'start' => 1427
                                                         },
-                             'priority specification@3449+63' => {
+                             'priority specification@3420+63' => {
                                                                    'length' => 63,
                                                                    'lhs' => 'priority specification',
                                                                    'precedence_count' => 1,
-                                                                   'start' => 3449
+                                                                   'start' => 3420
                                                                  },
-                             'proper specification@3142+50' => {
+                             'proper specification@3113+50' => {
                                                                  'length' => 50,
                                                                  'lhs' => 'proper specification',
                                                                  'precedence_count' => 1,
-                                                                 'start' => 3142
+                                                                 'start' => 3113
                                                                },
                              'quantified rule@1523+79' => {
                                                             'length' => 79,
@@ -8609,143 +8609,143 @@ $hashed_metag = {
                                                             'precedence_count' => 1,
                                                             'start' => 1523
                                                           },
-                             'quantifier@5359+24' => {
+                             'quantifier@5227+24' => {
                                                        'length' => 24,
                                                        'lhs' => 'quantifier',
                                                        'precedence_count' => 1,
-                                                       'start' => 5359
+                                                       'start' => 5227
                                                      },
-                             'rank specification@3193+55' => {
+                             'rank specification@3164+55' => {
                                                                'length' => 55,
                                                                'lhs' => 'rank specification',
                                                                'precedence_count' => 1,
-                                                               'start' => 3193
+                                                               'start' => 3164
                                                              },
-                             'reserved action name@5521+59' => {
+                             'reserved action name@5389+59' => {
                                                                  'length' => 59,
                                                                  'lhs' => 'reserved action name',
                                                                  'precedence_count' => 1,
-                                                                 'start' => 5521
+                                                                 'start' => 5389
                                                                },
-                             'reserved blessing name@5581+61' => {
+                             'reserved blessing name@5449+61' => {
                                                                    'length' => 61,
                                                                    'lhs' => 'reserved blessing name',
                                                                    'precedence_count' => 1,
-                                                                   'start' => 5581
+                                                                   'start' => 5449
                                                                  },
-                             'reserved event name@4148+33' => {
+                             'reserved event name@4016+33' => {
                                                                 'length' => 33,
                                                                 'lhs' => 'reserved event name',
                                                                 'precedence_count' => 1,
-                                                                'start' => 4148
+                                                                'start' => 4016
                                                               },
-                             'result item descriptor list@6449+105' => {
+                             'result item descriptor list@6317+105' => {
                                                                          'length' => 105,
                                                                          'lhs' => 'result item descriptor list',
                                                                          'precedence_count' => 1,
-                                                                         'start' => 6449
+                                                                         'start' => 6317
                                                                        },
-                             'result item descriptor separator@6555+40' => {
+                             'result item descriptor separator@6423+40' => {
                                                                              'length' => 40,
                                                                              'lhs' => 'result item descriptor separator',
                                                                              'precedence_count' => 1,
-                                                                             'start' => 6555
+                                                                             'start' => 6423
                                                                            },
-                             'result item descriptor separator@6596+51' => {
+                             'result item descriptor separator@6464+51' => {
                                                                              'length' => 51,
                                                                              'lhs' => 'result item descriptor separator',
                                                                              'precedence_count' => 1,
-                                                                             'start' => 6596
+                                                                             'start' => 6464
                                                                            },
-                             'result item descriptor@6648+135' => {
+                             'result item descriptor@6516+135' => {
                                                                     'length' => 135,
                                                                     'lhs' => 'result item descriptor',
                                                                     'precedence_count' => 1,
-                                                                    'start' => 6648
+                                                                    'start' => 6516
                                                                   },
-                             'rhs primary list@4504+37' => {
+                             'rhs primary list@4372+37' => {
                                                              'length' => 37,
                                                              'lhs' => 'rhs primary list',
                                                              'precedence_count' => 1,
-                                                             'start' => 4504
+                                                             'start' => 4372
                                                            },
-                             'rhs primary@4310+33' => {
+                             'rhs primary@4178+33' => {
                                                         'length' => 33,
                                                         'lhs' => 'rhs primary',
                                                         'precedence_count' => 1,
-                                                        'start' => 4310
+                                                        'start' => 4178
                                                       },
-                             'rhs primary@4344+40' => {
+                             'rhs primary@4212+40' => {
                                                         'length' => 40,
                                                         'lhs' => 'rhs primary',
                                                         'precedence_count' => 1,
-                                                        'start' => 4344
+                                                        'start' => 4212
                                                       },
-                             'rhs primary@4385+50' => {
+                             'rhs primary@4253+50' => {
                                                         'length' => 50,
                                                         'lhs' => 'rhs primary',
                                                         'precedence_count' => 1,
-                                                        'start' => 4385
+                                                        'start' => 4253
                                                       },
-                             'rhs@4287+22' => {
+                             'rhs@4155+22' => {
                                                 'length' => 22,
                                                 'lhs' => 'rhs',
                                                 'precedence_count' => 1,
-                                                'start' => 4287
+                                                'start' => 4155
                                               },
-                             'right association@2983+46' => {
+                             'right association@2954+46' => {
                                                               'length' => 46,
                                                               'lhs' => 'right association',
                                                               'precedence_count' => 1,
-                                                              'start' => 2983
+                                                              'start' => 2954
                                                             },
-                             'safe cc character@7358+79' => {
+                             'safe cc character@7226+79' => {
                                                               'length' => 79,
                                                               'lhs' => 'safe cc character',
                                                               'precedence_count' => 1,
-                                                              'start' => 7358
+                                                              'start' => 7226
                                                             },
-                             'separator specification@3077+64' => {
+                             'separator specification@3048+64' => {
                                                                     'length' => 64,
                                                                     'lhs' => 'separator specification',
                                                                     'precedence_count' => 1,
-                                                                    'start' => 3077
+                                                                    'start' => 3048
                                                                   },
-                             'sign@5472+13' => {
+                             'sign@5340+13' => {
                                                  'length' => 13,
                                                  'lhs' => 'sign',
                                                  'precedence_count' => 1,
-                                                 'start' => 5472
+                                                 'start' => 5340
                                                },
-                             'signed integer@5424+47' => {
+                             'signed integer@5292+47' => {
                                                            'length' => 47,
                                                            'lhs' => 'signed integer',
                                                            'precedence_count' => 1,
-                                                           'start' => 5424
+                                                           'start' => 5292
                                                          },
-                             'single quoted name@7006+78' => {
+                             'single quoted name@6874+78' => {
                                                                'length' => 78,
                                                                'lhs' => 'single quoted name',
                                                                'precedence_count' => 1,
-                                                               'start' => 7006
+                                                               'start' => 6874
                                                              },
-                             'single quoted string@6897+108' => {
+                             'single quoted string@6765+108' => {
                                                                   'length' => 108,
                                                                   'lhs' => 'single quoted string',
                                                                   'precedence_count' => 1,
-                                                                  'start' => 6897
+                                                                  'start' => 6765
                                                                 },
-                             'single symbol@4542+52' => {
+                             'single symbol@4410+52' => {
                                                           'length' => 52,
                                                           'lhs' => 'single symbol',
                                                           'precedence_count' => 1,
-                                                          'start' => 4542
+                                                          'start' => 4410
                                                         },
-                             'standard name@6010+57' => {
+                             'standard name@5878+57' => {
                                                           'length' => 57,
                                                           'lhs' => 'standard name',
                                                           'precedence_count' => 1,
-                                                          'start' => 6010
+                                                          'start' => 5878
                                                         },
                              'start rule@1124+51' => {
                                                        'length' => 51,
@@ -8777,59 +8777,59 @@ $hashed_metag = {
                                                       'precedence_count' => 1,
                                                       'start' => 659
                                                     },
-                             'string without single quote or vertical space@7085+103' => {
+                             'string without single quote or vertical space@6953+103' => {
                                                                                            'length' => 103,
                                                                                            'lhs' => 'string without single quote or vertical space',
                                                                                            'precedence_count' => 1,
-                                                                                           'start' => 7085
+                                                                                           'start' => 6953
                                                                                          },
-                             'symbol name@4620+29' => {
+                             'symbol name@4488+29' => {
                                                         'length' => 29,
                                                         'lhs' => 'symbol name',
                                                         'precedence_count' => 1,
-                                                        'start' => 4620
+                                                        'start' => 4488
                                                       },
-                             'symbol name@4650+34' => {
+                             'symbol name@4518+34' => {
                                                         'length' => 34,
                                                         'lhs' => 'symbol name',
                                                         'precedence_count' => 1,
-                                                        'start' => 4650
+                                                        'start' => 4518
                                                       },
-                             'symbol@4595+24' => {
+                             'symbol@4463+24' => {
                                                    'length' => 24,
                                                    'lhs' => 'symbol',
                                                    'precedence_count' => 1,
-                                                   'start' => 4595
+                                                   'start' => 4463
                                                  },
-                             'terminated hash comment@4961+73' => {
+                             'terminated hash comment@4829+73' => {
                                                                     'length' => 73,
                                                                     'lhs' => 'terminated hash comment',
                                                                     'precedence_count' => 1,
-                                                                    'start' => 4961
+                                                                    'start' => 4829
                                                                   },
-                             'unterminated final hash comment@5035+59' => {
+                             'unterminated final hash comment@4903+59' => {
                                                                             'length' => 59,
                                                                             'lhs' => 'unterminated final hash comment',
                                                                             'precedence_count' => 1,
-                                                                            'start' => 5035
+                                                                            'start' => 4903
                                                                           },
-                             'vertical space char@5138+62' => {
+                             'vertical space char@5006+62' => {
                                                                 'length' => 62,
                                                                 'lhs' => 'vertical space char',
                                                                 'precedence_count' => 1,
-                                                                'start' => 5138
+                                                                'start' => 5006
                                                               },
-                             'whitespace@4816+18' => {
+                             'whitespace@4684+18' => {
                                                        'length' => 18,
                                                        'lhs' => 'whitespace',
                                                        'precedence_count' => 1,
-                                                       'start' => 4816
+                                                       'start' => 4684
                                                      },
-                             'zero or more word characters@5681+38' => {
+                             'zero or more word characters@5549+38' => {
                                                                          'length' => 38,
                                                                          'lhs' => 'zero or more word characters',
                                                                          'precedence_count' => 1,
-                                                                         'start' => 5681
+                                                                         'start' => 5549
                                                                        }
                            },
                   'xsy' => {
