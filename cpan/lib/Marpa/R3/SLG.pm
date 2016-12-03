@@ -555,19 +555,11 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     my $discard_default_adverbs = $hashed_source->{discard_default_adverbs};
     my $lexeme_declarations     = $hashed_source->{lexeme_declarations};
     my $lexeme_default_adverbs  = $hashed_source->{lexeme_default_adverbs} // {};
-    my $latm_default_value      = $lexeme_default_adverbs->{latm} // 1;
 
     # Current lexeme data is spread out in many places.
     # Change so that it all resides in this hash, indexed by
     # name
     my %lexeme_data = ();
-
-    # Determine "latm" status
-  LEXEME: for my $lexeme_name ( keys %g1_id_by_lexeme_name ) {
-        my $declarations = $lexeme_declarations->{$lexeme_name};
-        my $latm_value = $declarations->{latm} // $latm_default_value;
-        $lexeme_data{$lexeme_name}{latm} = $latm_value;
-    }
 
     # Lexers
 
@@ -726,9 +718,6 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
         next RULE_ID if $lexeme_id < 0;
         my $lexeme_name = $g1_tracer->symbol_name($lexeme_id);
 
-        # If 1 is the default, we don't need an assertion
-        next RULE_ID if not $lexeme_data{$lexeme_name}{latm};
-
         my $trace_terminals =
           $slg->[Marpa::R3::Internal::Scanless::G::TRACE_TERMINALS];
         my $assertion_id =
@@ -867,15 +856,12 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     } ## end for my $symbol_name ( keys %{$nulled_events_by_name} )
 
     # Mark the lexemes, and set their data
-    # Now that we have created the SLG, we can set the latm value,
     # already determined above.
   LEXEME: for my $lexeme_name ( keys %g1_id_by_lexeme_name ) {
         my $g1_lexeme_id = $g1_id_by_lexeme_name{$lexeme_name};
         my $declarations = $lexeme_declarations->{$lexeme_name};
         my $priority     = $declarations->{priority} // 0;
         $thin_slg->g1_lexeme_set( $g1_lexeme_id, $priority );
-        my $latm_value = $lexeme_data{$lexeme_name}{latm} // 0;
-        $thin_slg->g1_lexeme_latm_set( $g1_lexeme_id, $latm_value );
         my $pause_value = $declarations->{pause};
         if ( defined $pause_value ) {
             $thin_slg->g1_lexeme_pause_set( $g1_lexeme_id, $pause_value );

@@ -399,12 +399,6 @@ sub Marpa::R3::Internal::MetaAST_Nodes::proper_specification::evaluate {
     return bless { proper => $child->value() }, $PROTO_ALTERNATIVE;
 }
 
-sub Marpa::R3::Internal::MetaAST_Nodes::latm_specification::evaluate {
-    my ($values) = @_;
-    my $child = $values->[2];
-    return bless { latm => $child->value() }, $PROTO_ALTERNATIVE;
-}
-
 sub Marpa::R3::Internal::MetaAST_Nodes::pause_specification::evaluate {
     my ($values) = @_;
     my $child = $values->[2];
@@ -543,10 +537,6 @@ sub Marpa::R3::Internal::MetaAST_Nodes::lexeme_default_statement::evaluate {
             next ADVERB;
         }
         if ( $key eq 'bless' ) {
-            $parse->{lexeme_default_adverbs}->{$key} = $value;
-            next ADVERB;
-        }
-        if ( $key eq 'latm' ) {
             $parse->{lexeme_default_adverbs}->{$key} = $value;
             next ADVERB;
         }
