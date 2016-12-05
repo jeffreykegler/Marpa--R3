@@ -109,7 +109,8 @@ my $lua_exec_sig_body = <<'END_OF_EXEC_SIG_BODY';
     {
         const int signature_stack_ix = marpa_lua_gettop (L);
         int i, status;
-        int top_after;
+        char default_return_sig[] = "*";
+        char* return_signature = default_return_sig;
 
         marpa_luaL_checkstack(L, items+20, "xlua EXEC_SIG_BODY");
 
@@ -149,6 +150,8 @@ my $lua_exec_sig_body = <<'END_OF_EXEC_SIG_BODY';
                 marpa_sv_sv_noinc(L, arg_sv);
                 break;
             case '>':              /* end of arguments */
+                return_signature = signature+i+1;
+                goto endargs;
             case 0:              /* end of arguments */
                 goto endargs;
             default:
@@ -169,11 +172,34 @@ my $lua_exec_sig_body = <<'END_OF_EXEC_SIG_BODY';
         marpa_luaL_checkstack(L, 20, "xlua EXEC_SIG_BODY");
 
         /* return args to caller */
-        top_after = marpa_lua_gettop (L);
-        for (i = signature_stack_ix; i <= top_after; i++) {
-            SV *sv_result = coerce_to_sv (L, i);
-            /* Took ownership of sv_result, we now need to mortalize it */
-            XPUSHs (sv_2mortal (sv_result));
+        {
+            const int top_after = marpa_lua_gettop (L);
+            SV *sv_result;
+            int stack_ix;
+            int signature_ix = 0;
+            for (stack_ix = signature_stack_ix;
+                    stack_ix <= top_after;
+                    stack_ix++) {
+                const char this_sig = return_signature[signature_ix];
+                switch (this_sig) {
+                    case '-':
+                    case '*':
+                        sv_result = coerce_to_sv (L, stack_ix);
+                        /* Took ownership of sv_result, we now need to mortalize it */
+                        XPUSHs (sv_2mortal (sv_result));
+                        if (this_sig == '-') signature_ix++;
+                        break;
+                    case 'A':
+                    default:
+                        croak
+                            ("Internal error: invalid return sig option %c in xlua EXEC_SIG_BODY",
+                            this_sig);
+                    case 0:
+                        croak
+                            ("Internal error: return sig too short ('%s') in xlua EXEC_SIG_BODY",
+                            signature);
+                }
+            }
         }
 
         marpa_lua_settop (L, base_of_stack);
