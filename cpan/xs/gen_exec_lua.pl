@@ -185,30 +185,6 @@ my $code = <<'END_OF_MAIN_CODE';
 MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::SLG
 
 void
-exec_key( outer_slg, fn_key, ... )
-   Outer_G *outer_slg;
-   int fn_key;
-PPCODE:
-{
-    int object_stack_ix;
-    const int is_method = 1;
-    lua_State *const L = outer_slg->L;
-    const int base_of_stack = marpa_lua_gettop (L);
-    int msghandler_ix;
-
-    marpa_lua_pushcfunction(L, xlua_msghandler);
-    msghandler_ix = marpa_lua_gettop(L);
-
-    marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, outer_slg->lua_ref);
-    /* Lua stack: [ grammar_table ] */
-    object_stack_ix = marpa_lua_gettop (L);
-    marpa_lua_rawgeti (L, object_stack_ix, fn_key);
-    /* [ grammar_table, function ] */
-
-    === LUA EXEC BODY ===
-}
-
-void
 exec( outer_slg, codestr, ... )
    Outer_G *outer_slg;
    char* codestr;
@@ -283,30 +259,6 @@ PPCODE:
     object_stack_ix = marpa_lua_gettop (L);
 
     === LUA LOAD STRING ===
-    === LUA EXEC BODY ===
-}
-
-void
-exec_key( outer_slr, fn_key, ... )
-   Outer_R *outer_slr;
-   int fn_key;
-PPCODE:
-{
-    int object_stack_ix;
-    const int is_method = 1;
-    lua_State *const L = outer_slr->L;
-    const int base_of_stack = marpa_lua_gettop (L);
-    int msghandler_ix;
-
-    marpa_lua_pushcfunction(L, xlua_msghandler);
-    msghandler_ix = marpa_lua_gettop(L);
-
-    marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, outer_slr->lua_ref);
-    /* Lua stack: [ recce_table ] */
-    object_stack_ix = marpa_lua_gettop (L);
-    marpa_lua_rawgeti (L, object_stack_ix, fn_key);
-    /* [ recce_table, function ] */
-
     === LUA EXEC BODY ===
 }
 

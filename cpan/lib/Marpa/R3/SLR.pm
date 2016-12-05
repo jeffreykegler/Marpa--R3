@@ -1833,29 +1833,13 @@ sub Marpa::R3::Scanless::R::lexeme_priority_set {
 
 # Lua method(s), not documented at this stage of their development
 
-sub Marpa::R3::Scanless::R::register_fn {
-    my ( $slr, $codestr ) = @_;
-    my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
-    return $thin_slr->register_fn($codestr);
-}
-
-sub Marpa::R3::Scanless::R::unregister_fn {
-    my ( $slr, $fn_key ) = @_;
-    my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
-    return $thin_slr->unregister_fn($fn_key);
-}
+# Sun Dec  4 18:03:15 PST 2016 -- at this point, I don't think
+# I ever will document these -- I'll keep them internal.
 
 sub Marpa::R3::Scanless::R::exec {
     my ( $slr, $codestr, @args ) = @_;
     my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
     return $thin_slr->exec($codestr, @args);
-}
-
-sub Marpa::R3::Scanless::R::exec_key {
-    my ( $slr, $key, @args ) = @_;
-    my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
-    my @results = $thin_slr->exec_key($key, @args);
-    return @results;
 }
 
 sub Marpa::R3::Scanless::R::exec_name {

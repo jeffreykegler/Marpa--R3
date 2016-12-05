@@ -2634,7 +2634,6 @@ slr_alternatives (Scanless_R * slr)
 
       while (!end_of_earley_items)
         {
-          struct symbol_g_properties *symbol_g_properties;
           struct l0_rule_g_properties *l0_rule_g_properties;
           struct symbol_r_properties *symbol_r_properties;
           Marpa_Symbol_ID g1_lexeme;
@@ -2678,7 +2677,6 @@ slr_alternatives (Scanless_R * slr)
 
               goto NEXT_PASS1_REPORT_ITEM;
             }
-          symbol_g_properties = slg->symbol_g_properties + g1_lexeme;
           l0_rule_g_properties = slg->l0_rule_g_properties + rule_id;
           symbol_r_properties = slr->symbol_r_properties + g1_lexeme;
           is_expected = marpa_r_terminal_is_expected (g1r, g1_lexeme);
@@ -6319,50 +6317,6 @@ PPCODE:
       XSRETURN_PV(error_message);
     }
   XPUSHs (sv_2mortal (SvREFCNT_inc_simple_NN (*p_token_value_sv)));
-}
-
-void
-register_fn(outer_slr, codestr)
-    Outer_R *outer_slr;
-    char* codestr;
-PPCODE:
-{
-  int status;
-  int time_object_registry;
-  int function_ref;
-  lua_State* const L = outer_slr->L;
-
-  marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, outer_slr->lua_ref);
-  /* Lua stack: [ recce_table ] */
-  time_object_registry = marpa_lua_gettop (L);
-
-  status = marpa_luaL_loadbuffer (L, codestr, strlen (codestr), codestr);
-  if (status != 0)
-    {
-      const char *error_string = marpa_lua_tostring (L, -1);
-      marpa_lua_pop (L, 1);
-      croak ("Marpa::R3::SLR::register_fn -- error lua code: %s", error_string);
-    }
-  /* [ recce_table, function ] */
-
-  function_ref = marpa_luaL_ref (L, time_object_registry);
-  marpa_lua_pop(L, (marpa_lua_gettop(L) - time_object_registry) + 1);
-  XPUSHs (sv_2mortal (newSViv (function_ref)));
-}
-
-void
-unregister_fn(outer_slr, fn_key)
-    Outer_R *outer_slr;
-    int fn_key;
-PPCODE:
-{
-  lua_State* const L = outer_slr->L;
-  const int base_of_stack = marpa_lua_gettop(L);
-
-  marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, outer_slr->lua_ref);
-  /* Lua stack: [ recce_table ] */
-  marpa_luaL_unref (L, -1, fn_key);
-  marpa_lua_settop (L, base_of_stack);
 }
 
 void

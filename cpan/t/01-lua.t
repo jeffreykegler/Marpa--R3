@@ -16,7 +16,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-use Test::More tests => 30;
+use Test::More tests => 27;
 use English qw( -no_match_vars );
 use lib 'inc';
 use Marpa::R3::Test;
@@ -75,29 +75,23 @@ END_OF_SOURCE
     }
 );
 
-my $salve = 'local args = {...}; table.remove(args, 1); return [[salve, munde!]], select(2, ...)';
-
 my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
 
-do_recce_test($salve, [], ['salve, munde!'], 'Salve, 0 args');
-do_recce_test($salve, [qw{hi}], ['salve, munde!', 'hi'], 'Salve, 1 arg');
-do_recce_test($salve, [qw{hi hi2}], ['salve, munde!', qw(hi hi2)], 'Salve, 2 args');
-do_recce_test('return 42', [], ['42']);
-do_recce_test('function taxicurry(fact2) return 9^3 + fact2 end', [], []);
-do_recce_test('return taxicurry(10^3)', [], [1729]);
-do_recce_test("local recce, x = ...; x[0] = 42; return x", [[]], [[42]]);
-do_recce_test("local recce, x = ...; local tmp = x[1]; x[1] = x[0]; x[0] = tmp; return x", [[42, 7]], [[7, 42]], "Swap array elements #1");
-do_recce_test("local recce, x = ...; x[1], x[0] = x[0], x[1]; return x", [[42, 7]], [[7, 42]], "Swap array elements #2");
-do_recce_test("local recce, x = ...; marpa.sv.fill(x, 1); return x", [[1, 2, 3, 4]], [[1, 2]], "Fill method #1");
-do_recce_test("local recce, x = ...; marpa.sv.fill(x, 4); return x", [[1, 2, 3, 4]], [[1, 2, 3, 4, undef]], "Fill method #2");
-do_recce_test("local recce, x = ...; marpa.sv.fill(x, -1); return x", [[1, 2, 3, 4]], [[]], "Fill method #2");
+do_recce_test('return 42', '', [], ['42']);
+do_recce_test('function taxicurry(fact2) return 9^3 + fact2 end', '', [], []);
+do_recce_test('return taxicurry(10^3)', '', [], [1729]);
+do_recce_test("local recce, x = ...; x[0] = 42; return x", 'S', [[]], [[42]]);
+do_recce_test("local recce, x = ...; local tmp = x[1]; x[1] = x[0]; x[0] = tmp; return x", 'S', [[42, 7]], [[7, 42]], "Swap array elements #1");
+do_recce_test("local recce, x = ...; x[1], x[0] = x[0], x[1]; return x", 'S', [[42, 7]], [[7, 42]], "Swap array elements #2");
+do_recce_test("local recce, x = ...; marpa.sv.fill(x, 1); return x", 'S', [[1, 2, 3, 4]], [[1, 2]], "Fill method #1");
+do_recce_test("local recce, x = ...; marpa.sv.fill(x, 4); return x", 'S', [[1, 2, 3, 4]], [[1, 2, 3, 4, undef]], "Fill method #2");
+do_recce_test("local recce, x = ...; marpa.sv.fill(x, -1); return x", 'S', [[1, 2, 3, 4]], [[]], "Fill method #2");
 
 sub do_recce_test {
-    my ($code, $args, $expected, $test_name) = @_;
+    my ($code, $signature, $args, $expected, $test_name) = @_;
     $test_name //= qq{"$code"};
     $test_name = "Recce: $test_name";
-    my $fn_key = $recce->register_fn($code);
-    my @actual = $recce->exec_key($fn_key, @{$args});
+    my @actual = $recce->exec_sig($code, $signature, @{$args});
     Test::More::is_deeply( \@actual, $expected, $test_name);
 }
 
