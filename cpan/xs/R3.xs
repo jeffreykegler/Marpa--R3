@@ -457,7 +457,7 @@ coerce_to_hv (lua_State * L, int visited_ix, int table_ix)
     /* Lua stack: [table_ix] */
     visited_type = marpa_lua_gettable(L, visited_ix);
     /* Lua stack: [] */
-    if (visited_type != LUA_TTABLE) {
+    if (visited_type == LUA_TTABLE) {
         result = newSVpvs ("[cycle in lua table]");
         /* Lua stack: [] */
         /* No need to reset stack yet */
