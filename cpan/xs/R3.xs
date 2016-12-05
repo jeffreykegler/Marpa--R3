@@ -339,7 +339,7 @@ xlua_unref(lua_State* L)
 }
 
 static SV*
-recursive_coerce_to_sv (lua_State * L, int visited_ix, int idx);
+recursive_coerce_to_sv (lua_State * L, int visited_ix, int idx, char sig);
 static SV*
 coerce_to_hv (lua_State * L, int visited_ix, int table_ix);
 
@@ -350,7 +350,7 @@ coerce_to_hv (lua_State * L, int visited_ix, int table_ix);
  * The Lua stack is left as is.
  */
 static SV*
-coerce_to_sv (lua_State * L, int idx)
+coerce_to_sv (lua_State * L, int idx, char sig)
 {
    dTHX;
    SV *result;
@@ -359,13 +359,13 @@ coerce_to_sv (lua_State * L, int idx)
 
    marpa_lua_newtable(L);
    visited_ix = marpa_lua_gettop(L);
-   result = recursive_coerce_to_sv(L, visited_ix, absolute_index);
+   result = recursive_coerce_to_sv(L, visited_ix, absolute_index, sig);
    marpa_lua_settop(L, visited_ix-1);
    return result;
 }
 
 static SV*
-recursive_coerce_to_sv (lua_State * L, int visited_ix, int idx)
+recursive_coerce_to_sv (lua_State * L, int visited_ix, int idx, char sig)
 {
     dTHX;
     SV *result;
@@ -499,7 +499,7 @@ coerce_to_hv (lua_State * L, int visited_ix, int table_ix)
                 uniq_id++;
                 continue;
             }
-            entry_value = recursive_coerce_to_sv(L, visited_ix, value);
+            entry_value = recursive_coerce_to_sv(L, visited_ix, value, '-');
             ownership_taken = hv_store(hv, keystr, (I32)keylen, entry_value, 0);
             if (!ownership_taken) {
               SvREFCNT_dec (entry_value);
@@ -810,7 +810,7 @@ static void marpa_av_store(SV* table, lua_Integer key, SV*value) {
 static int marpa_av_store_meth(lua_State* L) {
     SV** p_table_sv = (SV**)marpa_luaL_checkudata(L, 1, MT_NAME_SV);
     lua_Integer key = marpa_luaL_checkinteger(L, 2);
-    SV* value_sv = coerce_to_sv(L, 3);
+    SV* value_sv = coerce_to_sv(L, 3, '-');
 
     /* coerce_to_sv transfered a reference count to us, which we
      * pass on to the AV.
@@ -859,7 +859,7 @@ static int marpa_av_fill_meth (lua_State* L) {
 static int marpa_av_bless_meth (lua_State* L) {
     dTHX;
     SV** p_ref_to_av = (SV**)marpa_luaL_checkudata(L, 1, MT_NAME_SV);
-    SV* blessing_sv = coerce_to_sv(L, 2);
+    SV* blessing_sv = coerce_to_sv(L, 2, '-');
     STRLEN blessing_length;
     char *classname;
     if (!SvPOK(blessing_sv)) {
@@ -1466,7 +1466,7 @@ xlua_sig_call (lua_State * L, const char *codestr, const char *sig, ...)
         }
         case 'C': /* SV -- caller becomes owner of 1 mortal ref count. */
         {
-            SV* sv = sv_2mortal(coerce_to_sv(L, nres));
+            SV* sv = sv_2mortal(coerce_to_sv(L, nres, '-'));
             *va_arg (vl, SV**) = sv;
             break;
         }

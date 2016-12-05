@@ -92,7 +92,7 @@ my $lua_exec_body = <<'END_OF_EXEC_BODY';
         /* return args to caller */
         top_after = marpa_lua_gettop (L);
         for (i = function_stack_ix; i <= top_after; i++) {
-            SV *sv_result = coerce_to_sv (L, i);
+            SV *sv_result = coerce_to_sv (L, i, '-');
             /* Took ownership of sv_result, we now need to mortalize it */
             XPUSHs (sv_2mortal (sv_result));
         }
@@ -184,7 +184,7 @@ my $lua_exec_sig_body = <<'END_OF_EXEC_SIG_BODY';
                 switch (this_sig) {
                     case '-':
                     case '*':
-                        sv_result = coerce_to_sv (L, stack_ix);
+                        sv_result = coerce_to_sv (L, stack_ix, '-');
                         /* Took ownership of sv_result, we now need to mortalize it */
                         XPUSHs (sv_2mortal (sv_result));
                         if (this_sig == '-') signature_ix++;
