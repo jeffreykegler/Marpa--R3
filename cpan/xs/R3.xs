@@ -342,6 +342,8 @@ static SV*
 recursive_coerce_to_sv (lua_State * L, int visited_ix, int idx, char sig);
 static SV*
 coerce_to_hv (lua_State * L, int visited_ix, int table_ix);
+static SV*
+coerce_to_av (lua_State * L, int visited_ix, int table_ix, char signature);
 
 /* Coerce a Lua value to a Perl SV, if necessary one that
  * is simply a string with an error message.
@@ -365,7 +367,7 @@ coerce_to_sv (lua_State * L, int idx, char sig)
 }
 
 static SV*
-recursive_coerce_to_sv (lua_State * L, int visited_ix, int idx, char sig)
+recursive_coerce_to_sv (lua_State * L, int visited_ix, int idx, char signature)
 {
     dTHX;
     SV *result;
@@ -399,7 +401,14 @@ recursive_coerce_to_sv (lua_State * L, int visited_ix, int idx, char sig)
         break;
     case LUA_TTABLE:
         {
-            result = coerce_to_hv(L, visited_ix, idx);
+            switch (signature) {
+            case '0':
+            case '1':
+              result = coerce_to_av(L, visited_ix, idx, signature);
+              break;
+            default:
+              result = coerce_to_hv(L, visited_ix, idx);
+            }
         }
         break;
     case LUA_TUSERDATA:
@@ -479,8 +488,8 @@ coerce_to_hv (lua_State * L, int visited_ix, int table_ix)
         const char *key_base;
         const char *keystr;
         size_t keylen;
-        const int value = marpa_lua_gettop(L);
-        const int key = value - 1;
+        const int value_ix = marpa_lua_gettop(L);
+        const int key = value_ix - 1;
         marpa_lua_pushvalue(L, tostring_ix);
         marpa_lua_pushvalue(L, key);
         marpa_lua_call(L, 1, 1);
@@ -499,7 +508,7 @@ coerce_to_hv (lua_State * L, int visited_ix, int table_ix)
                 uniq_id++;
                 continue;
             }
-            entry_value = recursive_coerce_to_sv(L, visited_ix, value, '-');
+            entry_value = recursive_coerce_to_sv(L, visited_ix, value_ix, '-');
             ownership_taken = hv_store(hv, keystr, (I32)keylen, entry_value, 0);
             if (!ownership_taken) {
               SvREFCNT_dec (entry_value);
@@ -508,6 +517,77 @@ coerce_to_hv (lua_State * L, int visited_ix, int table_ix)
         }
         marpa_lua_settop(L, key);
     }
+    /* Demortalize the result, now that we know we will not
+     * abend.
+     */
+    SvREFCNT_inc_simple_void_NN (result);
+    marpa_lua_settop(L, base_of_stack);
+    return result;
+}
+
+/* Coerce a Lua table to an AV.  Cycles are checked for
+ * and cut off with a string marking the cutoff point.
+ * Only numeric keys in a Lua "sequence" are considered:
+ * that is, keys 1 .. N where N is the length of the sequence
+ * and none of the values are nil.  If the signature is '0',
+ * the sequence will converted to a zero-based Perl array,
+ * so that a conventional Lua sequence is converted to a
+ * convention-compliant Perl array.  If the signature is '1' 
+ * the keys in the Perl array will be exactly those of the
+ * Lua sequence.
+ */
+static SV*
+coerce_to_av (lua_State * L, int visited_ix, int table_ix, char signature)
+{
+    dTHX;
+    SV *result;
+    AV *av;
+    int visited_type;
+    lua_Integer seq_length;
+    lua_Integer seq_ix;
+    const int base_of_stack = marpa_lua_gettop(L);
+    const int ix_offset = (signature - '0') - 1;
+
+    /* We call this recursively, so we need to make sure we have enough stack */
+    marpa_luaL_checkstack(L, 20, "coerce_to_av");
+    /* Lua stack: [] */
+    marpa_lua_pushvalue(L, table_ix);
+    /* Lua stack: [table_ix] */
+    visited_type = marpa_lua_gettable(L, visited_ix);
+    /* Lua stack: [] */
+    if (visited_type == LUA_TTABLE) {
+        result = newSVpvs ("[cycle in lua table]");
+        /* Lua stack: [] */
+        /* No need to reset stack yet */
+        return result;
+    }
+    marpa_lua_pushvalue(L, table_ix);
+    marpa_lua_pushvalue(L, table_ix);
+    marpa_lua_settable(L, visited_ix);
+
+    marpa_lua_len(L, table_ix);
+    seq_length = marpa_lua_tointeger(L, -1);
+
+    av = newAV();
+    /* mortalize it, so it is garbage collected if we abend */
+    result = sv_2mortal (newRV_noinc ((SV *) av));
+    av_fill(av, (int)seq_length + ix_offset);
+
+    for (seq_ix = 1; seq_ix <= seq_length; seq_ix++)
+    {
+        int value_ix;
+	SV *entry_value;
+	SV** ownership_taken;
+        marpa_lua_geti(L, table_ix, seq_ix);
+        value_ix = marpa_lua_gettop(L); /* We need an absolute index, not -1 */
+	entry_value = recursive_coerce_to_sv(L, visited_ix, value_ix, signature);
+	ownership_taken = av_store(av, (int)seq_ix + ix_offset, entry_value);
+	if (!ownership_taken) {
+	  SvREFCNT_dec (entry_value);
+	  break;
+	}
+    }
+
     /* Demortalize the result, now that we know we will not
      * abend.
      */
