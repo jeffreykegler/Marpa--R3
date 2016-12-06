@@ -120,19 +120,27 @@ my $lua_exec_sig_body = <<'END_OF_EXEC_SIG_BODY';
             /* [ object_table, function, signature, object_table ] */
         }
 
-        /* warn("signature: %s", signature); */
-        if ((size_t)items < 2 + strlen(signature)) {
-            croak
-                ("Internal error: signature specified %ld items, but only %ld arguments in xlua EXEC_SIG_BODY",
-                    (long)strlen(signature), (long)items - 2);
-        }
-
         /* the remaining arguments are those passed to the Perl call */
         for (i = 0; ; i++) {
             const char this_sig = signature[i];
+            const int arg_ix = 3 + i;
             SV *arg_sv;
 
-            arg_sv = ST (3+i);
+            switch (this_sig) {
+            case '>':              /* end of arguments */
+                return_signature = signature+i+1;
+                goto endargs;
+            case 0:              /* end of arguments */
+                goto endargs;
+            }
+
+            if ((size_t)arg_ix >= (size_t)items) {
+                croak
+                    ("Internal error: signature ('%s') wants %ld items, but only %ld arguments in xlua EXEC_SIG_BODY",
+                        signature, (long)arg_ix, (long)items - 2);
+            }
+
+            arg_sv = ST (arg_ix);
 
             /* warn("this_sig: %c", this_sig); */
             switch (this_sig) {
@@ -149,11 +157,6 @@ my $lua_exec_sig_body = <<'END_OF_EXEC_SIG_BODY';
                 SvREFCNT_inc_simple_void_NN (arg_sv);
                 marpa_sv_sv_noinc(L, arg_sv);
                 break;
-            case '>':              /* end of arguments */
-                return_signature = signature+i+1;
-                goto endargs;
-            case 0:              /* end of arguments */
-                goto endargs;
             default:
                 croak
                     ("Internal error: invalid sig option %c in xlua EXEC_SIG_BODY", this_sig);
@@ -189,7 +192,12 @@ my $lua_exec_sig_body = <<'END_OF_EXEC_SIG_BODY';
                         XPUSHs (sv_2mortal (sv_result));
                         if (this_sig == '-') signature_ix++;
                         break;
-                    case 'A':
+                    case '0':
+                        sv_result = coerce_to_sv (L, stack_ix, this_sig);
+                        /* Took ownership of sv_result, we now need to mortalize it */
+                        XPUSHs (sv_2mortal (sv_result));
+                        signature_ix++;
+                        break;
                     default:
                         croak
                             ("Internal error: invalid return sig option %c in xlua EXEC_SIG_BODY",

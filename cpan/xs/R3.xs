@@ -5077,6 +5077,11 @@ PPCODE:
   marpa_r_ref(slr->g1r);
   dummyup_recce(outer_slr->L, outer_slr->lua_ref, slr->g1r, "lmw_g1r");
 
+  xlua_sig_call (outer_slr->L,
+      "local recce = ...\n"
+      "recce.event_queue = {}\n",
+      "R>", outer_slr->lua_ref);
+
   new_sv = sv_newmortal ();
   sv_setref_pv (new_sv, scanless_r_class_name, (void *) outer_slr);
   XPUSHs (new_sv);
@@ -5265,6 +5270,10 @@ PPCODE:
   /* Clear event queue */
   av_clear (slr->g1r_wrapper->event_queue);
   marpa_slr_event_clear (slr);
+  xlua_sig_call (outer_slr->L,
+      "local recce = ...\n"
+      "recce.event_queue = {}\n",
+      "R>", outer_slr->lua_ref);
 
   /* Application intervention resets perl_pos */
   slr->last_perl_pos = -1;
@@ -5896,6 +5905,10 @@ PPCODE:
 
   av_clear (slr->g1r_wrapper->event_queue);
   marpa_slr_event_clear(slr);
+  xlua_sig_call (outer_slr->L,
+      "local recce = ...\n"
+      "recce.event_queue = {}\n",
+      "R>", outer_slr->lua_ref);
 
   result = marpa_r_earleme_complete (slr->g1r);
   slr->is_external_scanning = 0;

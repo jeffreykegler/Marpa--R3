@@ -911,7 +911,12 @@ sub Marpa::R3::Internal::Scanless::convert_libmarpa_events {
     my ($slr)    = @_;
     my $pause    = 0;
     my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
-    EVENT: for my $event ( $thin_slr->events() ) {
+    my @events = $thin_slr->events();
+    my ($event_queue) = $thin_slr->exec_sig(
+        'recce = ...; return recce.event_queue',
+        '>0');
+    push @events, @{$event_queue};
+    EVENT: for my $event ( @events ) {
         my ($event_type) = @{$event};
         my $handler = $libmarpa_event_handlers->{$event_type};
         Marpa::R3::exception( ( join q{ }, 'Unknown event:', @{$event} ) )
