@@ -3006,12 +3006,16 @@ slr_alternatives ( Outer_R *outer_slr)
                         }
 
                         {
-                            union marpa_slr_event_s *event =
-                                marpa_slr_event_push (slr);
-                            MARPA_SLREV_TYPE (event) =
-                                MARPA_SLREV_AFTER_LEXEME;
-                            event->t_after_lexeme.t_lexeme = g1_lexeme;
+                            xlua_sig_call (outer_slr->L,
+                                "recce, lexeme = ...\n"
+                                "local q = recce.event_queue\n"
+                                "q[#q+1] = { 'after lexeme', lexeme}\n",
+                                "Ri>",
+                                outer_slr->lua_ref,
+                                g1_lexeme
+                            );
                         }
+
                     }
                     break;
 
@@ -5590,15 +5594,6 @@ PPCODE:
             av_push (event_av, newSViv ((IV) slr_event->t_trace_accepted_lexeme.t_start_of_lexeme));    /* start */
             av_push (event_av, newSViv ((IV) slr_event->t_trace_accepted_lexeme.t_end_of_lexeme));      /* end */
             av_push (event_av, newSViv ((IV) slr_event->t_trace_accepted_lexeme.t_lexeme));     /* lexeme */
-            XPUSHs (sv_2mortal (newRV_noinc ((SV *) event_av)));
-            break;
-          }
-
-        case MARPA_SLREV_AFTER_LEXEME:
-          {
-            AV *event_av = newAV ();;
-            av_push (event_av, newSVpvs ("after lexeme"));
-            av_push (event_av, newSViv ((IV) slr_event->t_after_lexeme.t_lexeme));        /* lexeme */
             XPUSHs (sv_2mortal (newRV_noinc ((SV *) event_av)));
             break;
           }

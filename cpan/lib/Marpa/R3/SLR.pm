@@ -849,10 +849,12 @@ my $libmarpa_event_handlers = {
     'before lexeme' => sub {
         my ( $slr,  $event )     = @_;
         my ( undef, $lexeme_id ) = @{$event};
+        say STDERR "lexeme_id = $lexeme_id";
         my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
         my $lexeme_event =
             $slg->[Marpa::R3::Internal::Scanless::G::LEXEME_EVENT_BY_ID]
             ->[$lexeme_id];
+        say STDERR "lexeme_event = $lexeme_event";
         push @{ $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] },
             [$lexeme_event]
             if defined $lexeme_event;
@@ -912,8 +914,11 @@ sub Marpa::R3::Internal::Scanless::convert_libmarpa_events {
     my $pause    = 0;
     my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
     my @events = $thin_slr->events();
-    my ($event_queue) = $thin_slr->exec_sig(
-        'recce = ...; return recce.event_queue',
+    my ($event_queue) = $thin_slr->exec_sig(<<'END_OF_LUA',
+        recce = ...
+        print(inspect(recce.event_queue))
+        return recce.event_queue
+END_OF_LUA
         '>0');
     push @events, @{$event_queue};
     EVENT: for my $event ( @events ) {
