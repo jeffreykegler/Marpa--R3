@@ -3825,24 +3825,6 @@ PPCODE:
 }
 
 void
-alternative( r_wrapper, symbol_id, value, length )
-    R_Wrapper *r_wrapper;
-    Marpa_Symbol_ID symbol_id;
-    int value;
-    int length;
-PPCODE:
-{
-  struct marpa_r *r = r_wrapper->r;
-  const G_Wrapper *base = r_wrapper->base;
-  const int result = marpa_r_alternative (r, symbol_id, value, length);
-  if (result == MARPA_ERR_NONE || r_wrapper->ruby_slippers || !base->throw)
-    {
-      XSRETURN_IV (result);
-    }
-  croak ("Problem in r->alternative(): %s", xs_g_error (r_wrapper->base));
-}
-
-void
 terminals_expected( r_wrapper )
     R_Wrapper *r_wrapper;
 PPCODE:
