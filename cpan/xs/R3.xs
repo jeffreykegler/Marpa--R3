@@ -1632,20 +1632,25 @@ r_unwrap (R_Wrapper * r_wrapper)
   return r;
 }
 
+static Scanless_R* slr_inner_get(Outer_R* outer_slr);
+static void dummyup_recce(
+  lua_State* L, int slr_lua_ref, Marpa_Recce recce, const char *name);
+
 static void
-u_l0r_clear (Scanless_R * slr)
+u_l0r_clear (Outer_R* outer_slr)
 {
   dTHX;
+  Scanless_R *slr = slr_inner_get(outer_slr);
   Marpa_Recce l0r = slr->l0r;
   if (!l0r)
     return;
   marpa_r_unref (l0r);
   slr->l0r = NULL;
+  xlua_sig_call (outer_slr->L,
+    "recce=...; recce.lmw_l0r = nil",
+    "R>",
+    outer_slr->lua_ref);
 }
-
-static Scanless_R* slr_inner_get(Outer_R* outer_slr);
-static void dummyup_recce(
-  lua_State* L, int slr_lua_ref, Marpa_Recce recce, const char *name);
 
 static Marpa_Recce
 u_l0r_new (Outer_R* outer_slr)
@@ -1656,9 +1661,7 @@ u_l0r_new (Outer_R* outer_slr)
     G_Wrapper *lexer_wrapper = slr->slg->l0_wrapper;
     const int too_many_earley_items = slr->too_many_earley_items;
 
-    if (l0r) {
-        marpa_r_unref (l0r);
-    }
+    u_l0r_clear(outer_slr);
     slr->l0r = l0r = marpa_r_new (lexer_wrapper->g);
     if (!l0r) {
         if (!lexer_wrapper->throw)
@@ -5263,7 +5266,7 @@ PPCODE:
 
           slr->start_of_lexeme = slr->perl_pos = slr->lexer_start_pos;
           slr->lexer_start_pos = -1;
-          u_l0r_clear (slr);
+          u_l0r_clear (outer_slr);
           if (trace_lexers >= 1)
             {
               union marpa_slr_event_s *event =
