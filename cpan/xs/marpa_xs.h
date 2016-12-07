@@ -336,7 +336,7 @@ typedef struct
 } Scanless_G;
 
 typedef struct {
-  int lua_ref;
+  lua_Integer lua_ref;
   lua_State* L;
   Scanless_G* inner;
 } Outer_G;
@@ -414,7 +414,7 @@ typedef struct
 typedef struct
 {
   /* Lua "reference" to this object */
-  int lua_ref;
+  lua_Integer lua_ref;
   lua_State* L;
   Outer_G* outer_slg;
   SV *slg_sv;

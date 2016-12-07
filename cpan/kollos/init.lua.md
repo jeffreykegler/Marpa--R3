@@ -293,9 +293,9 @@ and takes ownership of it.
 ```
 
     -- miranda: section+ C function declarations
-    void kollos_robrefinc(lua_State* L, int lua_ref);
+    void kollos_robrefinc(lua_State* L, lua_Integer lua_ref);
     -- miranda: section+ lua interpreter management
-    void kollos_robrefinc(lua_State* L, int lua_ref)
+    void kollos_robrefinc(lua_State* L, lua_Integer lua_ref)
     {
         const int base_of_stack = marpa_lua_gettop(L);
         lua_Integer refcount;
@@ -321,9 +321,9 @@ Deletes the interpreter if the reference count drops to zero.
 ```
 
     -- miranda: section+ C function declarations
-    void kollos_robrefdec(lua_State* L, int lua_ref);
+    void kollos_robrefdec(lua_State* L, lua_Integer lua_ref);
     -- miranda: section+ lua interpreter management
-    void kollos_robrefdec(lua_State* L, int lua_ref)
+    void kollos_robrefdec(lua_State* L, lua_Integer lua_ref)
     {
         const int base_of_stack = marpa_lua_gettop(L);
         lua_Integer refcount;
@@ -334,7 +334,7 @@ Deletes the interpreter if the reference count drops to zero.
         /* Lua stack [ table, ref_count ] */
         if (refcount <= 1) {
            /* default_warn("kollos_robrefdec lua_ref %d ref_count %d, will unref", lua_ref, refcount); */
-           marpa_luaL_unref(L, LUA_REGISTRYINDEX, lua_ref);
+           marpa_luaL_unref(L, LUA_REGISTRYINDEX, (int)lua_ref);
            /* marpa_lua_gc(L, LUA_GCCOLLECT, 0); */
            /* marpa_lua_gc(L, LUA_GCCOLLECT, 0); */
            marpa_lua_settop(L, base_of_stack);
@@ -361,9 +361,9 @@ because it uses a lot of PERL/XS data structures.
 ```
     -- miranda: section+ C function declarations
     #define MT_NAME_RECCE "Marpa_recce"
-    int kollos_slr_new(lua_State* L, void* slr, int slg_ref);
+    int kollos_slr_new(lua_State* L, void* slr, lua_Integer slg_ref);
     -- miranda: section+ lua interpreter management
-    int kollos_slr_new(lua_State* L, void* slr, int slg_ref)
+    int kollos_slr_new(lua_State* L, void* slr, lua_Integer slg_ref)
     {
         int lua_id;
         const int base_of_stack = marpa_lua_gettop(L);
@@ -2716,11 +2716,11 @@ so the caller must make sure that one is available.
 
     -- miranda: section+ C function declarations
     int
-    marpa_k_dummyup_grammar (lua_State * L, Marpa_Grammar g, int slg_ref, const char *name);
+    marpa_k_dummyup_grammar (lua_State * L, Marpa_Grammar g, lua_Integer slg_ref, const char *name);
     -- miranda: section+ grammar object non-standard wrappers
 
     int
-    marpa_k_dummyup_grammar (lua_State * L, Marpa_Grammar g, int slg_ref, const char *name)
+    marpa_k_dummyup_grammar (lua_State * L, Marpa_Grammar g, lua_Integer slg_ref, const char *name)
     {
 
         int result;

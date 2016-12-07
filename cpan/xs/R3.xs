@@ -1493,7 +1493,7 @@ xlua_sig_call (lua_State * L, const char *codestr, const char *sig, ...)
             /* warn("%s %d narg=%d", __FILE__, __LINE__, narg, *sig); */
             break;
         case 'R':              /* argument is ref key of recce table */
-            marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, (lua_Integer)va_arg (vl, int));
+            marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, (lua_Integer)va_arg (vl, lua_Integer));
             break;
         case '>':              /* end of arguments */
             goto endargs;
@@ -1634,7 +1634,7 @@ r_unwrap (R_Wrapper * r_wrapper)
 
 static Scanless_R* slr_inner_get(Outer_R* outer_slr);
 static void dummyup_recce(
-  lua_State* L, int slr_lua_ref, Marpa_Recce recce, const char *name);
+  lua_State* L, lua_Integer slr_lua_ref, Marpa_Recce recce, const char *name);
 
 static void
 u_l0r_clear (Outer_R* outer_slr)
@@ -2307,7 +2307,7 @@ static Scanless_R* marpa_inner_slr_new (
 
 static Scanless_R* slr_inner_get(Outer_R* outer_slr) {
     lua_State* const L = outer_slr->L;
-    const int lua_ref = outer_slr->lua_ref;
+    const lua_Integer lua_ref = outer_slr->lua_ref;
     const int base_of_stack = marpa_lua_gettop(L);
     Scanless_R *slr;
     /* Necessary every time to check stack ?? */
@@ -3152,7 +3152,7 @@ get_mortalspace (size_t nbytes)
 static void
 dummyup_recce(
   lua_State* L,
-  int slr_lua_ref,
+  lua_Integer slr_lua_ref,
   Marpa_Recce recce,
   const char *name)
 {
