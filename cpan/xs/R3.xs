@@ -5333,7 +5333,12 @@ PPCODE:
         }
 
       {
-        int event_count = av_len (slr->g1r_wrapper->event_queue) + 1;
+        int event_count;
+        xlua_sig_call (outer_slr->L,
+            "local recce = ...\n"
+            "return #recce.event_queue\n",
+            "R>i", outer_slr->lua_ref, &event_count);
+        event_count += av_len (slr->g1r_wrapper->event_queue) + 1;
         event_count += marpa_slr_event_count (slr);
         if (event_count)
           {
@@ -5387,7 +5392,7 @@ PPCODE:
 }
 
 void
-events(outer_slr)
+old_events(outer_slr)
     Outer_R *outer_slr;
 PPCODE:
 {

@@ -849,12 +849,10 @@ my $libmarpa_event_handlers = {
     'before lexeme' => sub {
         my ( $slr,  $event )     = @_;
         my ( undef, $lexeme_id ) = @{$event};
-        say STDERR "lexeme_id = $lexeme_id";
         my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
         my $lexeme_event =
             $slg->[Marpa::R3::Internal::Scanless::G::LEXEME_EVENT_BY_ID]
             ->[$lexeme_id];
-        say STDERR "lexeme_event = $lexeme_event";
         push @{ $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] },
             [$lexeme_event]
             if defined $lexeme_event;
@@ -912,22 +910,14 @@ $libmarpa_event_handlers->{'after lexeme'} = $libmarpa_event_handlers->{'before 
 sub Marpa::R3::Internal::Scanless::convert_libmarpa_events {
     my ($slr)    = @_;
     my $pause    = 0;
-    my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
-    my @events = $thin_slr->events();
-    my ($event_queue) = $thin_slr->exec_sig(<<'END_OF_LUA',
-        recce = ...
-        print(inspect(recce.event_queue))
-        return recce.event_queue
-END_OF_LUA
-        '>0');
-    push @events, @{$event_queue};
+    my @events = $slr->xs_events();
     EVENT: for my $event ( @events ) {
         my ($event_type) = @{$event};
         my $handler = $libmarpa_event_handlers->{$event_type};
         Marpa::R3::exception( ( join q{ }, 'Unknown event:', @{$event} ) )
             if not defined $handler;
         $pause = 1 if $handler->( $slr, $event );
-    } ## end EVENT: for my $event ( $thin_slr->events() )
+    }
     return $pause;
 } ## end sub Marpa::R3::Internal::Scanless::convert_libmarpa_events
 
@@ -1070,6 +1060,20 @@ sub Marpa::R3::Scanless::R::events {
     return $self->[Marpa::R3::Internal::Scanless::R::EVENTS];
 }
 
+sub Marpa::R3::Scanless::R::xs_events {
+    my ($slr) = @_;
+    my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
+    my @events = $thin_slr->old_events();
+    my ($event_queue) = $thin_slr->exec_sig(<<'END_OF_LUA',
+        recce = ...
+        -- print(inspect(recce.event_queue))
+        return recce.event_queue
+END_OF_LUA
+        '>0');
+    push @events, @{$event_queue};
+    return @events;
+}
+
 ## From here, recovery is a matter for the caller,
 ## if it is possible at all
 sub Marpa::R3::Scanless::R::read_problem {
@@ -1117,7 +1121,7 @@ sub Marpa::R3::Scanless::R::read_problem {
             my ( $line, $column ) = $slr->line_column($problem_pos);
             my @details    = ();
             my %rejections = ();
-            my @events     = $thin_slr->events();
+            my @events     = $slr->xs_events();
             if ( scalar @events > 100 ) {
                 my $omitted = scalar @events - 100;
                 push @details,

@@ -138,7 +138,7 @@ sub do_test {
             push @actual_events, $event_name;
         } ## end for my $event ( @{ $slr->events() } )
         if (@actual_events) {
-            $actual_events .= join q{ }, $pos, @actual_events;
+            $actual_events .= join q{ }, $pos, sort @actual_events;
             $actual_events .= "\n";
             my ( $start_of_lexeme, $length_of_lexeme ) = $slr->pause_span();
             $pos = $start_of_lexeme + $length_of_lexeme;

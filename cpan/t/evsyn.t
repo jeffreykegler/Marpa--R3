@@ -41,9 +41,9 @@ e ::= <real e> | <null e>
 <null e> ::=
 g ::= g1 | g3
 g1 ::= g2
-g2 ::= 
+g2 ::=
 g3 ::= g4
-g4 ::= 
+g4 ::=
 d ::= <real d> | <insert d>
 ambig1 ::= start1 mid1 z
 ambig2 ::= start2 mid2 z
@@ -127,7 +127,7 @@ READ: while (1) {
     }
 
     if (@actual_events) {
-        $actual_events .= join q{ }, "Events at position $pos:", @actual_events;
+        $actual_events .= join q{ }, "Events at position $pos:", sort @actual_events;
         $actual_events .= "\n";
     }
 
@@ -146,13 +146,13 @@ READ: while (1) {
 my $expected_events = <<'=== EOS ===';
 Events at position 0: ^a ^test
 Events at position 1: "a" ^b ^start1 ^start2
-Events at position 3: "b" start1$ ^c ^mid1
-Events at position 5: "c" start2$ ^d ^mid2
+Events at position 3: "b" ^c ^mid1 start1$
+Events at position 5: "c" ^d ^mid2 start2$
 Events at position 6: insert d
-Events at position 21: d$ mid1$ mid2$ e[] ^e ^f
-Events at position 23: "e" e$ e[] ^e ^f
-Events at position 25: "e" e$ ^f
-Events at position 27: "f" g[] g1[] g2[] g3[] g4[] ^h
+Events at position 21: ^e ^f d$ e[] mid1$ mid2$
+Events at position 23: "e" ^e ^f e$ e[]
+Events at position 25: "e" ^f e$
+Events at position 27: "f" ^h g1[] g2[] g3[] g4[] g[]
 Events at position 29: "h" test$
 === EOS ===
 
