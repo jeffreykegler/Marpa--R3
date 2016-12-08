@@ -80,7 +80,6 @@ typedef struct {
      Marpa_Recce r;
      Marpa_Symbol_ID* terminals_buffer;
      SV* base_sv;
-     AV* event_queue;
      G_Wrapper* base;
      unsigned int ruby_slippers:1;
 } R_Wrapper;

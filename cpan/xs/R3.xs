@@ -1611,7 +1611,6 @@ r_wrap( Marpa_Recce r, SV* g_sv)
     SvREFCNT_inc (g_sv);
     r_wrapper->base_sv = g_sv;
     r_wrapper->base = g_wrapper;
-    r_wrapper->event_queue = newAV ();
     return r_wrapper;
 }
 
@@ -1625,7 +1624,6 @@ r_unwrap (R_Wrapper * r_wrapper)
   Marpa_Recce r = r_wrapper->r;
   /* The wrapper should always have had a ref to its base grammar's SV */
   SvREFCNT_dec (r_wrapper->base_sv);
-  SvREFCNT_dec ((SV *) r_wrapper->event_queue);
   Safefree (r_wrapper->terminals_buffer);
   Safefree (r_wrapper);
   /* The wrapper should always have had a ref to the Libmarpa recce */
@@ -2590,38 +2588,44 @@ r_convert_events ( Outer_R *outer_slr)
             break;
         case MARPA_EVENT_SYMBOL_COMPLETED:
             {
-              AV *event;
-              SV *event_data[2];
               Marpa_Symbol_ID completed_symbol =
                 marpa_g_event_value (&marpa_event);
-              event_data[0] = newSVpvs ("symbol completed");
-              event_data[1] = newSViv (completed_symbol);
-              event = av_make (Dim (event_data), event_data);
-              av_push (r_wrapper->event_queue, newRV_noinc ((SV *) event));
+              xlua_sig_call (outer_slr->L,
+                  "recce, completed_symbol = ...\n"
+                  "local q = recce.event_queue\n"
+                  "q[#q+1] = { 'symbol completed', completed_symbol}\n",
+                  "Ri>",
+                  outer_slr->lua_ref,
+                  completed_symbol
+              );
             }
             break;
         case MARPA_EVENT_SYMBOL_NULLED:
             {
-              AV *event;
-              SV *event_data[2];
               Marpa_Symbol_ID nulled_symbol =
                 marpa_g_event_value (&marpa_event);
-              event_data[0] = newSVpvs ("symbol nulled");
-              event_data[1] = newSViv (nulled_symbol);
-              event = av_make (Dim (event_data), event_data);
-              av_push (r_wrapper->event_queue, newRV_noinc ((SV *) event));
+              xlua_sig_call (outer_slr->L,
+                  "recce, nulled_symbol = ...\n"
+                  "local q = recce.event_queue\n"
+                  "q[#q+1] = { 'symbol nulled', nulled_symbol}\n",
+                  "Ri>",
+                  outer_slr->lua_ref,
+                  nulled_symbol
+              );
             }
             break;
         case MARPA_EVENT_SYMBOL_PREDICTED:
             {
-              AV *event;
-              SV *event_data[2];
               Marpa_Symbol_ID predicted_symbol =
                 marpa_g_event_value (&marpa_event);
-              event_data[0] = newSVpvs ("symbol predicted");
-              event_data[1] = newSViv (predicted_symbol);
-              event = av_make (Dim (event_data), event_data);
-              av_push (r_wrapper->event_queue, newRV_noinc ((SV *) event));
+              xlua_sig_call (outer_slr->L,
+                  "recce, predicted_symbol = ...\n"
+                  "local q = recce.event_queue\n"
+                  "q[#q+1] = { 'symbol predicted', predicted_symbol}\n",
+                  "Ri>",
+                  outer_slr->lua_ref,
+                  predicted_symbol
+              );
             }
             break;
         case MARPA_EVENT_EARLEY_ITEM_THRESHOLD:
@@ -2641,19 +2645,23 @@ r_convert_events ( Outer_R *outer_slr)
             break;
         default:
             {
-              AV *event;
               const char *result_string = event_type_to_string (event_type);
-              SV *event_data[2];
-              event_data[0] = newSVpvs ("unknown event");
-              if (!result_string)
-                {
-                  result_string =
-                    form ("event(%d): unknown event code, %d", event_ix,
-                          event_type);
-                }
-              event_data[1] = newSVpv (result_string, 0);
-              event = av_make (Dim (event_data), event_data);
-              av_push (r_wrapper->event_queue, newRV_noinc ((SV *) event));
+              xlua_sig_call (outer_slr->L,
+                  "recce, result_string, event_ix, event_type = ...\n"
+                  "if result_string == '' then\n"
+                  "    result_string = string.format(\n"
+                  "        'event(%d): unknown event code, %d',\n"
+                  "        event_ix, event_type\n"
+                  "        )\n"
+                  "end\n"
+                  "local q = recce.event_queue\n"
+                  "q[#q+1] = { 'unknown_event', result_string}\n",
+                  "Rsii>",
+                  outer_slr->lua_ref,
+                  (result_string ? result_string : ""),
+                  event_ix,
+                  event_type
+              );
             }
             break;
           }
@@ -5231,7 +5239,6 @@ PPCODE:
   slr->end_of_pause_lexeme = -1;
 
   /* Clear event queue */
-  av_clear (slr->g1r_wrapper->event_queue);
   marpa_slr_event_clear (slr);
   xlua_sig_call (outer_slr->L,
       "local recce = ...\n"
@@ -5309,7 +5316,6 @@ PPCODE:
             "local recce = ...\n"
             "return #recce.event_queue\n",
             "R>i", outer_slr->lua_ref, &event_count);
-        event_count += av_len (slr->g1r_wrapper->event_queue) + 1;
         event_count += marpa_slr_event_count (slr);
         if (event_count)
           {
@@ -5370,7 +5376,6 @@ PPCODE:
   Scanless_R *slr = slr_inner_get(outer_slr);
   int i;
   int queue_length;
-  AV *const event_queue_av = slr->g1r_wrapper->event_queue;
 
   for (i = 0; i < slr->t_event_count; i++)
     {
@@ -5626,13 +5631,6 @@ PPCODE:
           }
         }
     }
-
-  queue_length = av_len (event_queue_av);
-  for (i = 0; i <= queue_length; i++)
-    {
-      SV *event = av_shift (event_queue_av);
-      XPUSHs (sv_2mortal (event));
-    }
 }
 
 void
@@ -5840,7 +5838,6 @@ PPCODE:
     lexeme_length = end_pos - start_pos;
   }
 
-  av_clear (slr->g1r_wrapper->event_queue);
   marpa_slr_event_clear(slr);
   xlua_sig_call (outer_slr->L,
       "local recce = ...\n"
