@@ -2569,10 +2569,12 @@ MARPA_SLREV_TYPE(slr_event) = MARPA_SLREV_MARPA_R_UNKNOWN;
  * marpa_r_earleme_complete().
  */
 static void
-r_convert_events (R_Wrapper * r_wrapper)
+r_convert_events ( Outer_R *outer_slr)
 {
   dTHX;
   int event_ix;
+  Scanless_R *slr = slr_inner_get(outer_slr);
+  R_Wrapper* r_wrapper = (slr->g1r_wrapper);
   Marpa_Grammar g = r_wrapper->base->g;
   const int event_count = marpa_g_event_count (g);
   for (event_ix = 0; event_ix < event_count; event_ix++)
@@ -3809,22 +3811,6 @@ PPCODE:
     }
   r_wrapper->ruby_slippers = boolean ? 1 : 0;
   XPUSHs (sv_2mortal (newSViv (boolean)));
-}
-
-void
-start_input( r_wrapper )
-    R_Wrapper *r_wrapper;
-PPCODE:
-{
-  Marpa_Recognizer self = r_wrapper->r;
-  int gp_result = marpa_r_start_input(self);
-  if ( gp_result == -1 ) { XSRETURN_UNDEF; }
-  if ( gp_result < 0 && r_wrapper->base->throw ) {
-    croak( "Problem in r->start_input(): %s",
-     xs_g_error( r_wrapper->base ));
-  }
-  r_convert_events(r_wrapper);
-  XPUSHs (sv_2mortal (newSViv (gp_result)));
 }
 
 void
@@ -5865,7 +5851,7 @@ PPCODE:
   slr->is_external_scanning = 0;
   if (result >= 0)
     {
-      r_convert_events (slr->g1r_wrapper);
+      r_convert_events (outer_slr);
       marpa_r_latest_earley_set_values_set (slr->g1r, start_pos,
                                             INT2PTR (void *, lexeme_length));
       slr->perl_pos = start_pos + lexeme_length;
@@ -6408,6 +6394,24 @@ PPCODE:
     case -1:
         XSRETURN_PV ("trace");
     }
+}
+
+void
+start_input( outer_slr )
+    Outer_R *outer_slr;
+PPCODE:
+{
+  Scanless_R *slr = slr_inner_get(outer_slr);
+  R_Wrapper *r_wrapper = slr->g1r_wrapper;
+  Marpa_Recognizer g1r = r_wrapper->r;
+  int gp_result = marpa_r_start_input(g1r);
+  if ( gp_result == -1 ) { XSRETURN_UNDEF; }
+  if ( gp_result < 0 && r_wrapper->base->throw ) {
+    croak( "Problem in r->start_input(): %s",
+     xs_g_error( r_wrapper->base ));
+  }
+  r_convert_events(outer_slr);
+  XPUSHs (sv_2mortal (newSViv (gp_result)));
 }
 
 MODULE = Marpa::R3            PACKAGE = Marpa::R3::Lua

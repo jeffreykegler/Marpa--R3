@@ -277,7 +277,7 @@ sub Marpa::R3::Scanless::R::new {
             for @{$symbol_ids};
     } ## end EVENT: for my $event_name ( keys %{$event_is_active_arg} )
 
-    if ( not $recce_c->start_input() ) {
+    if ( not $thin_slr->start_input() ) {
         my $error = $grammar_c->error();
         Marpa::R3::exception( 'Recognizer start of input failed: ', $error );
     }
