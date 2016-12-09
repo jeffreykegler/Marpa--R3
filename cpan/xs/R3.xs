@@ -3822,29 +3822,6 @@ PPCODE:
 }
 
 void
-terminals_expected( r_wrapper )
-    R_Wrapper *r_wrapper;
-PPCODE:
-{
-  int i;
-  struct marpa_r *r = r_wrapper->r;
-  const int count =
-    marpa_r_terminals_expected (r, r_wrapper->terminals_buffer);
-  if (count < 0)
-    {
-      G_Wrapper* base = r_wrapper->base;
-      if (!base->throw) { XSRETURN_UNDEF; }
-      croak ("Problem in r->terminals_expected(): %s",
-             xs_g_error (base));
-    }
-  EXTEND (SP, count);
-  for (i = 0; i < count; i++)
-    {
-      PUSHs (sv_2mortal (newSViv (r_wrapper->terminals_buffer[i])));
-    }
-}
-
-void
 progress_item( r_wrapper )
      R_Wrapper *r_wrapper;
 PPCODE:
