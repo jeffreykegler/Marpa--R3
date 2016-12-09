@@ -4540,10 +4540,14 @@ PPCODE:
 {
     SV *new_sv;
     Outer_G *outer_slg;
-    Scanless_G* slg;
+    Scanless_G *slg;
+    lua_State *L;
+    Marpa_Grammar l0g;
+    Marpa_Grammar g1g;
     PERL_UNUSED_ARG (class);
 
-    if (!sv_isa (l0_sv, "Marpa::R3::Thin::G")) {
+    if (!sv_isa (l0_sv, "Marpa::R3::Thin::G"))
+    {
         croak
             ("Problem in u->new(): L0 arg is not of type Marpa::R3::Thin::G");
     }
@@ -4557,40 +4561,44 @@ PPCODE:
     outer_slg->inner = slg;
     outer_slg->L = xlua_newstate ();
 
-    {
-        lua_State *L = outer_slg->L;
-        kollos_refinc (L);
-        /* Lua stack: [] */
-        marpa_lua_newtable (L);
-        /* Lua stack: [ grammar_table ] */
-        /* No lock held -- SLG must delete grammar table in its */
-        /*   destructor. */
-        marpa_luaL_setmetatable (L, MT_NAME_GRAMMAR);
-        /* Lua stack: [ grammar_table ] */
-        marpa_lua_pushlightuserdata (L, slg);
-        /* Lua stack: [ grammar_table, lud ] */
-        marpa_lua_setfield (L, -2, "lud");
-        /* Lua stack: [ grammar_table ] */
-        outer_slg->lua_ref = marpa_luaL_ref (L, LUA_REGISTRYINDEX);
-        /* Lua stack: [] */
+    L = outer_slg->L;
+    kollos_refinc (L);
+    /* Lua stack: [] */
+    marpa_lua_newtable (L);
+    /* Lua stack: [ grammar_table ] */
+    /* No lock held -- SLG must delete grammar table in its */
+    /*   destructor. */
+    marpa_luaL_setmetatable (L, MT_NAME_GRAMMAR);
+    /* Lua stack: [ grammar_table ] */
+    marpa_lua_pushlightuserdata (L, slg);
+    /* Lua stack: [ grammar_table, lud ] */
+    marpa_lua_setfield (L, -2, "lud");
+    /* Lua stack: [ grammar_table ] */
+    outer_slg->lua_ref = marpa_luaL_ref (L, LUA_REGISTRYINDEX);
+    /* Lua stack: [] */
+
+    g1g = slg->g1_wrapper->g;
+    marpa_g_ref (g1g);
+    if (!marpa_k_dummyup_grammar (outer_slg->L, g1g, outer_slg->lua_ref,
+            "lmw_g1g")) {
+        croak ("Problem in u->new(): G1 marpa_k_dummyup_grammar failed\n");
+    }
+
+    l0g = slg->l0_wrapper->g;
+    marpa_g_ref (l0g);
+    if (!marpa_k_dummyup_grammar (outer_slg->L, l0g, outer_slg->lua_ref,
+            "lmw_l0g")) {
+        croak ("Problem in u->new(): L0 marpa_k_dummyup_grammar failed\n");
     }
 
     {
-        Marpa_Grammar g = slg->g1_wrapper->g;
-        marpa_g_ref (g);
-        if (!marpa_k_dummyup_grammar (outer_slg->L, g, outer_slg->lua_ref,
-                "lmw_g1g")) {
-            croak ("Problem in u->new(): G1 marpa_k_dummyup_grammar failed\n");
-        }
-    }
-
-    {
-        Marpa_Grammar g = slg->l0_wrapper->g;
-        marpa_g_ref (g);
-        if (!marpa_k_dummyup_grammar (outer_slg->L, g, outer_slg->lua_ref,
-                "lmw_l0g")) {
-            croak ("Problem in u->new(): L0 marpa_k_dummyup_grammar failed\n");
-        }
+        const int highest_g1g_symbol_id = marpa_g_highest_symbol_id (g1g);
+        const int highest_l0g_symbol_id = marpa_g_highest_symbol_id (l0g);
+        const int highest_symbol_id =
+            highest_g1g_symbol_id >
+            highest_l0g_symbol_id ? highest_g1g_symbol_id :
+            highest_l0g_symbol_id;
+        (void) kollos_extraspace_buffer_resize (L, (size_t)highest_symbol_id + 1);
     }
 
     new_sv = sv_newmortal ();
@@ -5375,7 +5383,6 @@ PPCODE:
 {
   Scanless_R *slr = slr_inner_get(outer_slr);
   int i;
-  int queue_length;
 
   for (i = 0; i < slr->t_event_count; i++)
     {

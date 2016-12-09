@@ -1698,9 +1698,14 @@ sub Marpa::R3::Scanless::R::progress {
 
 sub Marpa::R3::Scanless::R::terminals_expected {
     my ($slr)      = @_;
-    my $recce_c    = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
     my $slg        = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    return [ map { $slg->symbol_name($_) } $recce_c->terminals_expected() ];
+    my ($terminals_expected) = $slr->exec_sig(<<'END_OF_LUA', '>0');
+    local recce = ...
+    local terminals_expected = recce.lmw_g1r:terminals_expected()
+    return terminals_expected
+END_OF_LUA
+
+    return [ map { $slg->symbol_name($_) } @{$terminals_expected} ];
 }
 
 sub Marpa::R3::Scanless::R::exhausted {

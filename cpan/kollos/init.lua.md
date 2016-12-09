@@ -118,13 +118,49 @@ maximum symbol count of any of the grammars in the Kollos
 interpreter.
 
 ```
-    -- miranda: section C function declarations
+    -- miranda: section C structure declarations
     struct kollos_extraspace {
         int ref_count;
         int (*warn)(const char* format, ...);
         Marpa_Symbol_ID *buffer;
         size_t buffer_capacity;
     };
+
+    -- miranda: section utility function definitions
+
+    /* I assume this will be inlined by the compiler */
+    static struct kollos_extraspace *extraspace_get(lua_State* L)
+    {
+        return *(struct kollos_extraspace **)marpa_lua_getextraspace(L);
+    }
+
+    -- miranda: section C function declarations
+    /* I probably will, in the final version, want this to be a
+     * static utility, internal to Kollos
+     */
+    Marpa_Symbol_ID* kollos_extraspace_buffer_resize(
+        lua_State* L,
+        size_t desired_capacity);
+
+    -- miranda: section external C function definitions
+    Marpa_Symbol_ID* kollos_extraspace_buffer_resize(
+        lua_State* L,
+        size_t desired_capacity)
+    {
+        struct kollos_extraspace *p_extra = extraspace_get(L);
+        if (desired_capacity > p_extra->buffer_capacity) {
+            p_extra->buffer_capacity = desired_capacity;
+            /* TODO: this optimizes for space, not speed.
+             * Insist capacity double on each realloc()?
+             */
+            p_extra->buffer = (Marpa_Symbol_ID *) realloc (p_extra->buffer,
+                desired_capacity * sizeof (*p_extra->buffer)
+                );
+        if (!p_extra->buffer)
+            (void)out_of_memory (L);
+        }
+        return p_extra->buffer;
+    }
 
 ```
 
@@ -158,7 +194,9 @@ the interpreter (Kollos object) is destroyed.
         p_extra->ref_count = 1;
         p_extra->warn = &default_warn;
         p_extra->buffer_capacity = 1; /* TODO -- once tested, increase to 64 */
-        p_extra->buffer = malloc(p_extra->buffer_capacity * sizeof(*p_extra->buffer));
+        p_extra->buffer =
+            (Marpa_Symbol_ID *) malloc (p_extra->buffer_capacity *
+            sizeof (*p_extra->buffer));
         marpa_luaL_openlibs (L);    /* open libraries */
         /* Lua stack: [] */
         marpa_luaopen_kollos(L); /* Open kollos library */
@@ -199,8 +237,7 @@ and takes ownership of it.
     -- miranda: section+ lua interpreter management
     void kollos_refinc(lua_State* L)
     {
-        struct kollos_extraspace *p_extra =
-            *(struct kollos_extraspace **)marpa_lua_getextraspace(L);
+        struct kollos_extraspace *p_extra = extraspace_get(L);
         p_extra->ref_count++;
     }
 
@@ -217,8 +254,7 @@ Deletes the interpreter if the reference count drops to zero.
 
     void kollos_refdec(lua_State* L)
     {
-        struct kollos_extraspace *p_extra =
-            *(struct kollos_extraspace **)marpa_lua_getextraspace(L);
+        struct kollos_extraspace *p_extra = extraspace_get(L);
         p_extra->ref_count--;
         if (p_extra->ref_count <= 0) {
            marpa_lua_close(L);
@@ -238,9 +274,8 @@ Set the warning function of the Kollos interpreter.
     -- miranda: section+ lua interpreter management
     void kollos_warn_set(lua_State* L, int (*warn)(const char * format, ...))
     {
-       struct kollos_extraspace *p_extra =
-           *(struct kollos_extraspace **)marpa_lua_getextraspace(L);
-       p_extra->warn = warn;
+        struct kollos_extraspace *p_extra = extraspace_get(L);
+        p_extra->warn = warn;
     }
 
 ```
@@ -258,7 +293,7 @@ Write a warning message using Kollos's warning handler.
        struct kollos_extraspace *p_extra;
        va_start (args, format);
 
-       p_extra = *(struct kollos_extraspace **)marpa_lua_getextraspace(L);
+       p_extra = extraspace_get(L);
        (*p_extra->warn)(format, args);
        va_end (args);
     }
@@ -2169,6 +2204,7 @@ Set "strict" globals, using code taken from strict.lua.
     -- miranda: insert define step codes
 
     -- miranda: insert utilities from okollos.c.lua
+    -- miranda: insert utility function definitions
     -- miranda: insert error object code from okollos.c.lua
     -- miranda: insert base error handlers
     -- miranda: insert error handlers
@@ -2187,6 +2223,8 @@ Set "strict" globals, using code taken from strict.lua.
     -- miranda: insert standard libmarpa wrappers
     -- miranda: insert define marpa_luaopen_kollos method
     -- miranda: insert lua interpreter management
+
+    -- miranda: insert  external C function definitions
     /* vim: set expandtab shiftwidth=4: */
 ```
 
@@ -2887,8 +2925,7 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
         /* [ grammar_object, lhs, rhs ... ] */
         const int grammar_stack_ix = 1;
         const int args_stack_ix = 2;
-        struct kollos_extraspace * const p_extra
-            = *(struct kollos_extraspace **)marpa_lua_getextraspace(L);
+        struct kollos_extraspace* const p_extra = extraspace_get(L);
         int overflow = 0;
         lua_Integer arg_count;
         lua_Integer table_ix;
@@ -3081,42 +3118,36 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
 
     static int lca_grammar_precompute(lua_State *L)
     {
-      Marpa_Grammar self;
-      const int self_stack_ix = 1;
-      size_t desired_buffer_capacity;
-      int highest_symbol_id;
-      int result;
-      struct kollos_extraspace *p_extra;
+        Marpa_Grammar self;
+        const int self_stack_ix = 1;
+        int highest_symbol_id;
+        int result;
 
-      if (1) {
-        marpa_luaL_checktype(L, self_stack_ix, LUA_TTABLE);  }
-      marpa_lua_getfield (L, -1, "_libmarpa");
-      self = *(Marpa_Grammar*)marpa_lua_touserdata (L, -1);
-      marpa_lua_pop(L, 1);
-      result = (int)marpa_g_precompute(self
-        );
-      if (result == -1) { marpa_lua_pushnil(L); return 1; }
-      if (result < -1) {
-        return libmarpa_error_handle(L, self_stack_ix, "grammar:precompute; marpa_g_precompute");
-      }
+        if (1) {
+            marpa_luaL_checktype (L, self_stack_ix, LUA_TTABLE);
+        }
+        marpa_lua_getfield (L, -1, "_libmarpa");
+        self = *(Marpa_Grammar *) marpa_lua_touserdata (L, -1);
+        marpa_lua_pop (L, 1);
+        result = (int) marpa_g_precompute (self);
+        if (result == -1) {
+            marpa_lua_pushnil (L);
+            return 1;
+        }
+        if (result < -1) {
+            return libmarpa_error_handle (L, self_stack_ix,
+                "grammar:precompute; marpa_g_precompute");
+        }
 
-      highest_symbol_id =  marpa_g_highest_symbol_id(self);
-      if (highest_symbol_id < 0) {
-          return libmarpa_error_handle(L, self_stack_ix, "grammar:precompute; marpa_g_highest_symbol_id");
+        highest_symbol_id = marpa_g_highest_symbol_id (self);
+        if (highest_symbol_id < 0) {
+            return libmarpa_error_handle (L, self_stack_ix,
+                "grammar:precompute; marpa_g_highest_symbol_id");
+            return 1;
+        }
+        (void)kollos_extraspace_buffer_resize(L, (size_t) highest_symbol_id+1);
+        marpa_lua_pushinteger (L, (lua_Integer) result);
         return 1;
-      }
-      desired_buffer_capacity = 1 + (size_t)highest_symbol_id;
-      p_extra = *(struct kollos_extraspace **)marpa_lua_getextraspace(L);
-      if (desired_buffer_capacity < p_extra->buffer_capacity) {
-          p_extra->buffer_capacity = desired_buffer_capacity;
-          /* TODO: this optimizes for space, not speed.
-           * Insist capacity double on each realloc()?
-           */
-          p_extra->buffer = (Marpa_Symbol_ID*)realloc(p_extra->buffer, desired_buffer_capacity);
-          if (!p_extra->buffer) return out_of_memory(L);
-      }
-      marpa_lua_pushinteger(L, (lua_Integer)result);
-      return 1;
     }
 
     static const struct luaL_Reg grammar_methods[] = {
@@ -3187,8 +3218,7 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
       int count;
       int ix;
       Marpa_Recce r;
-      struct kollos_extraspace *p_extra =
-          *(struct kollos_extraspace **)marpa_lua_getextraspace(L);
+      struct kollos_extraspace* const p_extra = extraspace_get(L);
       /* p_extra->terminals_buffer is guaranteed to have space for all the symbol IDS
        * of the grammar.
        */
@@ -3840,6 +3870,7 @@ Not Lua-callable, but leaves the stack as before.
     #include "lauxlib.h"
     #include "lualib.h"
 
+    -- miranda: insert C structure declarations
     -- miranda: insert C function declarations
 
     #endif
