@@ -78,7 +78,6 @@ typedef struct {
 
 typedef struct {
      Marpa_Recce r;
-     Marpa_Symbol_ID* terminals_buffer;
      SV* base_sv;
      G_Wrapper* base;
      unsigned int ruby_slippers:1;

@@ -1605,8 +1605,6 @@ r_wrap( Marpa_Recce r, SV* g_sv)
     };
     Newx (r_wrapper, 1, R_Wrapper);
     r_wrapper->r = r;
-    Newx (r_wrapper->terminals_buffer,
-        (unsigned int) (highest_symbol_id + 1), Marpa_Symbol_ID);
     r_wrapper->ruby_slippers = 0;
     SvREFCNT_inc (g_sv);
     r_wrapper->base_sv = g_sv;
@@ -1624,7 +1622,6 @@ r_unwrap (R_Wrapper * r_wrapper)
   Marpa_Recce r = r_wrapper->r;
   /* The wrapper should always have had a ref to its base grammar's SV */
   SvREFCNT_dec (r_wrapper->base_sv);
-  Safefree (r_wrapper->terminals_buffer);
   Safefree (r_wrapper);
   /* The wrapper should always have had a ref to the Libmarpa recce */
   return r;
