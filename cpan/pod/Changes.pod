@@ -152,10 +152,12 @@ and to ensure that the
 G1 variants
 have C<g1> somewhere in their name.
 Accordingly,
-C<$slr->substring()> has been renamed
-C<$slr->g1_literal()>;
+C<<$slr->substring()>> has been renamed
+C<<$slr->g1_literal()>>;
 and
-$slr->current_g1_location() is now $slr->g1_pos().
+C<<$slr->current_g1_location()>>
+is now
+C<<$slr->g1_pos()>>.
 
 =head2 Marpa::R2::Scanless::R methods removed in Marpa::R3
 
