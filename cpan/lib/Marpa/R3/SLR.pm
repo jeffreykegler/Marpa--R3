@@ -220,8 +220,6 @@ sub Marpa::R3::Scanless::R::new {
         Marpa::R3::exception( $grammar_c->error() );
     }
 
-    $recce_c->ruby_slippers_set(1);
-
     my $thin_slr = Marpa::R3::Thin::SLR->new(
         $slg->[Marpa::R3::Internal::Scanless::G::C],
         $slr->[Marpa::R3::Internal::Scanless::R::R_C]

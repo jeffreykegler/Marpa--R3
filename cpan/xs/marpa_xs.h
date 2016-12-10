@@ -80,7 +80,6 @@ typedef struct {
      Marpa_Recce r;
      SV* base_sv;
      G_Wrapper* base;
-     unsigned int ruby_slippers:1;
 } R_Wrapper;
 
 union marpa_slr_event_s;

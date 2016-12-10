@@ -1605,7 +1605,6 @@ r_wrap( Marpa_Recce r, SV* g_sv)
     };
     Newx (r_wrapper, 1, R_Wrapper);
     r_wrapper->r = r;
-    r_wrapper->ruby_slippers = 0;
     SvREFCNT_inc (g_sv);
     r_wrapper->base_sv = g_sv;
     r_wrapper->base = g_wrapper;
@@ -3809,21 +3808,6 @@ PPCODE:
 {
     Marpa_Recce r = r_unwrap(r_wrapper);
     marpa_r_unref (r);
-}
-
-void
-ruby_slippers_set( r_wrapper, boolean )
-    R_Wrapper *r_wrapper;
-    int boolean;
-PPCODE:
-{
-  if (boolean < 0 || boolean > 1)
-    {
-      /* Always thrown */
-      croak ("Problem in g->ruby_slippers_set(%d): argument must be 0 or 1", boolean);
-    }
-  r_wrapper->ruby_slippers = boolean ? 1 : 0;
-  XPUSHs (sv_2mortal (newSViv (boolean)));
 }
 
 void
