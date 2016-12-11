@@ -1164,6 +1164,51 @@ whose id is `id`.
 
 ```
 
+## The Kollos recognizer
+
+Given a scanless
+recognizer and a symbol,
+`last_completed()`
+returns the start earley set
+and length
+of the last such symbol completed,
+or nil if there was none.
+
+```
+    -- miranda: section+ recognizer methods
+    function last_completed(recce, symbol_id)
+         local g1r = recce.lmw_g1r
+         local g1g = recce.slg.lmw_g1g
+         local latest_earley_set = g1r:latest_earley_set()
+         local first_origin = latest_earley_set + 1
+         local earley_set = latest_earley_set
+         while earley_set >= 0 do
+             g1r:progress_report_start(earley_set)
+             while true do
+                 local rule_id, dot_position, origin = g1r:progress_item()
+                 if not rule_id then goto LAST_ITEM end
+                 if dot_position ~= -1 then goto NEXT_ITEM end
+                 local lhs_id = g1g:rule_lhs(rule_id)
+                 if symbol_id ~= lhs_id then goto NEXT_ITEM end
+                 if origin < first_origin then
+                     first_origin = origin
+                 end
+                 ::NEXT_ITEM::
+             end
+             ::LAST_ITEM::
+             g1r:progress_report_finish()
+             if first_origin <= latest_earley_set then
+                 goto LAST_EARLEY_SET
+             end
+             earley_set = earley_set - 1
+         end
+         ::LAST_EARLEY_SET::
+         if earley_set < 0 then return end
+         return first_origin, earley_set - first_origin
+    end
+
+```
+
 ## The Kollos valuator
 
 The "valuator" portion of Kollos produces the
@@ -2098,6 +2143,7 @@ a special "configuration" argument.
     -- miranda: insert luacheck declarations
     -- miranda: insert enforce strict globals
     -- miranda: insert VM operations
+    -- miranda: insert recognizer methods
     -- miranda: insert value_init()
     -- miranda: insert valuation_reset()
     -- miranda: insert diagnostics

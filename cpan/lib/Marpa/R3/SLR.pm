@@ -37,49 +37,17 @@ our $PACKAGE = 'Marpa::R3::Scanless::R';
 # undef if there was none.
 sub Marpa::R3::Scanless::R::last_completed {
     my ( $slr, $symbol_name ) = @_;
-    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+    my $slg  = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $g1_tracer =
         $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
-    my $thin_g1_recce = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
-    my $sought_rules =
-        $slg->[Marpa::R3::Internal::Scanless::G::CACHE_G1_IRLIDS_BY_LHS_NAME]
-        ->{$symbol_name};
-    if ( not defined $sought_rules ) {
-        my $thin_g1_grammar = $g1_tracer->[Marpa::R3::Internal::Trace::G::C];
-        my $symbol_id       = $g1_tracer->symbol_by_name($symbol_name);
-        Marpa::R3::exception("Bad symbol in last_completed(): $symbol_name")
-            if not defined $symbol_id;
-        $sought_rules =
-            $slg->[Marpa::R3::Internal::Scanless::G::CACHE_G1_IRLIDS_BY_LHS_NAME]
-            ->{$symbol_name} =
-            [ grep { $thin_g1_grammar->rule_lhs($_) == $symbol_id; }
-                0 .. $thin_g1_grammar->highest_rule_id() ];
-        Marpa::R3::exception(
-            "Looking for completion of non-existent rule lhs: $symbol_name")
-            if not scalar @{$sought_rules};
-    } ## end if ( not defined $sought_rules )
-    my $latest_earley_set = $thin_g1_recce->latest_earley_set();
-    my $earley_set        = $latest_earley_set;
-
-    # Initialize to one past the end, so we can tell if there were no hits
-    my $first_origin = $latest_earley_set + 1;
-    EARLEY_SET: while ( $earley_set >= 0 ) {
-        $thin_g1_recce->progress_report_start($earley_set);
-        ITEM: while (1) {
-            my ( $rule_id, $dot_position, $origin ) =
-                $thin_g1_recce->progress_item();
-            last ITEM if not defined $rule_id;
-            next ITEM if $dot_position != -1;
-            next ITEM if not scalar grep { $_ == $rule_id } @{$sought_rules};
-            next ITEM if $origin >= $first_origin;
-            $first_origin = $origin;
-        } ## end ITEM: while (1)
-        $thin_g1_recce->progress_report_finish();
-        last EARLEY_SET if $first_origin <= $latest_earley_set;
-        $earley_set--;
-    } ## end EARLEY_SET: while ( $earley_set >= 0 )
-    return if $earley_set < 0;
-    return ( $first_origin, ( $earley_set - $first_origin ) );
+    my $symbol_id       = $g1_tracer->symbol_by_name($symbol_name);
+    my ($start, $length) = $slr->exec_sig_name(
+        'last_completed',
+        'i>*',
+        $symbol_id
+        );
+    return if not defined $start;
+    return $start, $length;
 } ## end sub Marpa::R3::Scanless::R::last_completed
 
 # Returns most input stream span for symbol.
