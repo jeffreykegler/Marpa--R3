@@ -266,9 +266,6 @@ __DATA__
     LEXEME_EVENT_BY_ID
     SYMBOL_IDS_BY_EVENT_NAME_AND_TYPE
 
-    { This saves a lot of time at points }
-    CACHE_G1_IRLIDS_BY_LHS_NAME
-
     BLESS_PACKAGE { Default package into which nodes are blessed }
     IF_INACCESSIBLE { default for symbols }
 

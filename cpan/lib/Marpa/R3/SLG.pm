@@ -404,8 +404,6 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
         }
     }
 
-    $slg->[Marpa::R3::Internal::Scanless::G::CACHE_G1_IRLIDS_BY_LHS_NAME] = {};
-
     my $if_inaccessible_default_arg =
       $hashed_source->{defaults}->{if_inaccessible};
     if ( defined $if_inaccessible_default_arg ) {
