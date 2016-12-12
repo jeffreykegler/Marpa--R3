@@ -156,8 +156,22 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     my $trace_fh = $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE];
     my $trace_terminals =
       $slg->[Marpa::R3::Internal::Scanless::G::TRACE_TERMINALS];
-
     # Pre-lexer G1 processing
+
+    my $thin_slg = $slg->[Marpa::R3::Internal::Scanless::G::C] =
+      Marpa::R3::Thin::SLG->new();
+
+    # Stuff in Lua
+    my $load_result;
+    ($load_result) = $thin_slg->exec($Marpa::R3::Lua::Init::load);
+    $load_result //= "[undef]";
+    Marpa::R3::exception("Init::load failed: $load_result") if $load_result ne 'OK';
+    ($load_result) = $thin_slg->exec($Marpa::R3::Lua::Inspect::load);
+    $load_result //= "[undef]";
+    Marpa::R3::exception("Inspect::load failed: $load_result") if $load_result ne 'OK';
+
+    state $op_lua = Marpa::R3::Thin::op('lua');
+    $thin_slg->exec("local grammar, arg = ...; op_lua = arg+0", $op_lua);
 
     my @xsy_names = keys %{ $hashed_source->{xsy} };
 
@@ -806,20 +820,7 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     # Post-lexer G1 processing
 
     my $thin_L0  = $lex_tracer->[Marpa::R3::Internal::Trace::G::C];
-    my $thin_slg = $slg->[Marpa::R3::Internal::Scanless::G::C] =
-      Marpa::R3::Thin::SLG->new( $thin_L0, $g1_tracer->grammar() );
-
-    # Stuff in Lua
-    my $load_result;
-    ($load_result) = $thin_slg->exec($Marpa::R3::Lua::Init::load);
-    $load_result //= "[undef]";
-    Marpa::R3::exception("Init::load failed: $load_result") if $load_result ne 'OK';
-    ($load_result) = $thin_slg->exec($Marpa::R3::Lua::Inspect::load);
-    $load_result //= "[undef]";
-    Marpa::R3::exception("Inspect::load failed: $load_result") if $load_result ne 'OK';
-
-    state $op_lua = Marpa::R3::Thin::op('lua');
-    $thin_slg->exec("local grammar, arg = ...; op_lua = arg+0", $op_lua);
+    $thin_slg->associate( $thin_L0, $g1_tracer->grammar() );
 
   LEXEME: for my $lexeme_name ( keys %g1_id_by_lexeme_name ) {
         Marpa::R3::exception(

@@ -2102,15 +2102,51 @@ u_substring (Scanless_R * slr, const char *name, int start_pos_arg,
 /* Static SLG methods */
 
 static Scanless_G* slg_inner_get(Outer_G* outer_slg) {
+    dTHX;
+    Scanless_G *slg = outer_slg->inner;
+    if (!slg->is_associated) {
+        croak("SLG does not yet have associated subgrammars");
+    }
     return outer_slg->inner;
 }
 
-static Scanless_G* slg_inner_new (SV * l0_sv, SV * g1_sv)
+static Scanless_G* slg_inner_new (void)
 {
     Scanless_G *slg;
     dTHX;
 
     Newx (slg, 1, Scanless_G);
+
+    slg->is_associated = 0;
+    slg->g1_sv = NULL;
+    slg->g1_wrapper = NULL;
+    slg->g1 = NULL;
+    slg->precomputed = 0;
+    slg->l0_sv = NULL;
+    slg->l0_wrapper = NULL;
+
+    {
+        int i;
+        slg->per_codepoint_hash = newHV ();
+        for (i = 0; i < (int) Dim (slg->per_codepoint_array); i++) {
+            slg->per_codepoint_array[i] = NULL;
+        }
+    }
+
+    slg->g1_lexeme_to_assertion = NULL;
+    slg->symbol_g_properties = NULL;
+    slg->l0_rule_g_properties = NULL;
+    slg->constants = newAV ();
+    /* Reserve position 0 */
+    av_push (slg->constants, newSV(0));
+
+    return slg;
+}
+
+static Scanless_G* slg_inner_associate (
+  Scanless_G* slg, SV * l0_sv, SV * g1_sv)
+{
+    dTHX;
 
     slg->g1_sv = g1_sv;
     SvREFCNT_inc (g1_sv);
@@ -2129,14 +2165,6 @@ static Scanless_G* slg_inner_new (SV * l0_sv, SV * g1_sv)
      * holds references to it.
      */
     SET_G_WRAPPER_FROM_G_SV (slg->l0_wrapper, l0_sv);
-
-    {
-        int i;
-        slg->per_codepoint_hash = newHV ();
-        for (i = 0; i < (int) Dim (slg->per_codepoint_array); i++) {
-            slg->per_codepoint_array[i] = NULL;
-        }
-    }
 
     {
         int symbol_ix;
@@ -2177,10 +2205,7 @@ static Scanless_G* slg_inner_new (SV * l0_sv, SV * g1_sv)
         }
     }
 
-    slg->constants = newAV ();
-    /* Reserve position 0 */
-    av_push (slg->constants, newSV(0));
-
+    slg->is_associated = 1;
     return slg;
 }
 
@@ -4475,31 +4500,18 @@ PPCODE:
 MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::SLG
 
 void
-new( class, l0_sv, g1_sv )
+new( class )
     char * class;
-    SV *l0_sv;
-    SV *g1_sv;
 PPCODE:
 {
     SV *new_sv;
     Outer_G *outer_slg;
     Scanless_G *slg;
     lua_State *L;
-    Marpa_Grammar l0g;
-    Marpa_Grammar g1g;
     PERL_UNUSED_ARG (class);
 
-    if (!sv_isa (l0_sv, "Marpa::R3::Thin::G"))
-    {
-        croak
-            ("Problem in u->new(): L0 arg is not of type Marpa::R3::Thin::G");
-    }
-    if (!sv_isa (g1_sv, "Marpa::R3::Thin::G")) {
-        croak
-            ("Problem in u->new(): G1 arg is not of type Marpa::R3::Thin::G");
-    }
     Newx (outer_slg, 1, Outer_G);
-    slg = slg_inner_new (l0_sv, g1_sv);
+    slg = slg_inner_new ();
 
     outer_slg->inner = slg;
     outer_slg->L = xlua_newstate ();
@@ -4520,30 +4532,6 @@ PPCODE:
     outer_slg->lua_ref = marpa_luaL_ref (L, LUA_REGISTRYINDEX);
     /* Lua stack: [] */
 
-    g1g = slg->g1_wrapper->g;
-    marpa_g_ref (g1g);
-    if (!marpa_k_dummyup_grammar (outer_slg->L, g1g, outer_slg->lua_ref,
-            "lmw_g1g")) {
-        croak ("Problem in u->new(): G1 marpa_k_dummyup_grammar failed\n");
-    }
-
-    l0g = slg->l0_wrapper->g;
-    marpa_g_ref (l0g);
-    if (!marpa_k_dummyup_grammar (outer_slg->L, l0g, outer_slg->lua_ref,
-            "lmw_l0g")) {
-        croak ("Problem in u->new(): L0 marpa_k_dummyup_grammar failed\n");
-    }
-
-    {
-        const int highest_g1g_symbol_id = marpa_g_highest_symbol_id (g1g);
-        const int highest_l0g_symbol_id = marpa_g_highest_symbol_id (l0g);
-        const int highest_symbol_id =
-            highest_g1g_symbol_id >
-            highest_l0g_symbol_id ? highest_g1g_symbol_id :
-            highest_l0g_symbol_id;
-        (void) kollos_extraspace_buffer_resize (L, (size_t)highest_symbol_id + 1);
-    }
-
     new_sv = sv_newmortal ();
     sv_setref_pv (new_sv, scanless_g_class_name, (void *) outer_slg);
     XPUSHs (new_sv);
@@ -4561,6 +4549,55 @@ PPCODE:
   kollos_robrefdec(outer_slg->L, outer_slg->lua_ref);
   kollos_refdec(outer_slg->L);
   Safefree (outer_slg);
+}
+
+void
+associate( outer_slg, l0_sv, g1_sv )
+    Outer_G *outer_slg;
+    SV *l0_sv;
+    SV *g1_sv;
+PPCODE:
+{
+    Scanless_G *slg = outer_slg->inner;
+    lua_State *L = outer_slg->L;
+    lua_Integer lua_ref = outer_slg->lua_ref;
+    Marpa_Grammar l0g;
+    Marpa_Grammar g1g;
+
+    if (!sv_isa (l0_sv, "Marpa::R3::Thin::G"))
+    {
+        croak
+            ("Problem in u->new(): L0 arg is not of type Marpa::R3::Thin::G");
+    }
+    if (!sv_isa (g1_sv, "Marpa::R3::Thin::G")) {
+        croak
+            ("Problem in u->new(): G1 arg is not of type Marpa::R3::Thin::G");
+    }
+    slg_inner_associate (slg, l0_sv, g1_sv);
+
+    g1g = slg->g1_wrapper->g;
+    marpa_g_ref (g1g);
+    if (!marpa_k_dummyup_grammar (L, g1g, lua_ref, "lmw_g1g")) {
+        croak ("Problem in u->new(): G1 marpa_k_dummyup_grammar failed\n");
+    }
+
+    l0g = slg->l0_wrapper->g;
+    marpa_g_ref (l0g);
+    if (!marpa_k_dummyup_grammar (L, l0g, lua_ref, "lmw_l0g")) {
+        croak ("Problem in u->new(): L0 marpa_k_dummyup_grammar failed\n");
+    }
+
+    {
+        const int highest_g1g_symbol_id = marpa_g_highest_symbol_id (g1g);
+        const int highest_l0g_symbol_id = marpa_g_highest_symbol_id (l0g);
+        const int highest_symbol_id =
+            highest_g1g_symbol_id >
+            highest_l0g_symbol_id ? highest_g1g_symbol_id :
+            highest_l0g_symbol_id;
+        (void) kollos_extraspace_buffer_resize (L, (size_t)highest_symbol_id + 1);
+    }
+
+    XSRETURN_YES;
 }
 
  #  it does not create a new one

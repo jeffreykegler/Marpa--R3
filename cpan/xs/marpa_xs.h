@@ -330,6 +330,9 @@ typedef struct
   struct l0_rule_g_properties *l0_rule_g_properties;
   AV *constants;
 
+  /* Does it have L0 and G1 yet? */
+  int is_associated;
+
 } Scanless_G;
 
 typedef struct {
