@@ -3810,29 +3810,6 @@ PPCODE:
     marpa_r_unref (r);
 }
 
-void
-progress_item( r_wrapper )
-     R_Wrapper *r_wrapper;
-PPCODE:
-{
-  struct marpa_r *const r = r_wrapper->r;
-  int position = -1;
-  Marpa_Earley_Set_ID origin = -1;
-  Marpa_Rule_ID rule_id = marpa_r_progress_item (r, &position, &origin);
-  if (rule_id == -1)
-    {
-      XSRETURN_UNDEF;
-    }
-  if (rule_id < 0 && r_wrapper->base->throw)
-    {
-      croak ("Problem in r->progress_item(): %s",
-             xs_g_error (r_wrapper->base));
-    }
-  XPUSHs (sv_2mortal (newSViv (rule_id)));
-  XPUSHs (sv_2mortal (newSViv (position)));
-  XPUSHs (sv_2mortal (newSViv (origin)));
-}
-
 MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::G
 
 void
