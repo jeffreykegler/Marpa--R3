@@ -1209,6 +1209,47 @@ or nil if there was none.
 
 ```
 
+```
+    -- miranda: section+ recognizer methods
+    function progress(recce, ordinal_arg)
+        local g1r = recce.lmw_g1r
+        local latest_earley_set = g1r:latest_earley_set()
+        local ordinal = latest_earley_set
+        if ordinal_arg then
+            if ordinal_arg > latest_earley_set then
+                error(
+                    "Argument out of bounds in recce->progress($ordinal_arg)\n"
+                    .. "   Argument specifies Earley set after the latest Earley set 0\n"
+                    .. "   The latest Earley set is Earley set $latest_earley_set\n"
+                    )
+            elseif ordinal_arg >= 0 then
+                 ordinal = ordinal_arg
+                 goto ORDINAL_SET
+            end
+            -- if we are here, ordinal_arg < 0
+            ordinal = latest_earley_set + 1 + ordinal_arg
+            if ordinal < 0 then
+                error(
+                    "Argument out of bounds in recce->progress($ordinal_arg)\n"
+                    .. "   Argument specifies Earley set before Earley set 0\n"
+                )
+            end
+        end
+        ::ORDINAL_SET::
+        local result = {}
+        g1r:progress_report_start(ordinal)
+        while true do
+            local rule_id, dot_position, origin = g1r:progress_item()
+            if not rule_id then goto LAST_ITEM end
+            result[#result+1] = { rule_id, dot_position, origin }
+        end
+        ::LAST_ITEM::
+        g1r:progress_report_finish()
+        return result
+    end
+
+```
+
 ## The Kollos valuator
 
 The "valuator" portion of Kollos produces the

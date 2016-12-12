@@ -1623,44 +1623,13 @@ sub Marpa::R3::Scanless::R::show_progress {
 
 sub Marpa::R3::Scanless::R::progress {
     my ( $slr, $ordinal_arg ) = @_;
-    my $recce_c = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
-    my $latest_earley_set = $recce_c->latest_earley_set();
-    my $ordinal;
-    SET_ORDINAL: {
-        if ( not defined $ordinal_arg ) {
-            $ordinal = $latest_earley_set;
-            last SET_ORDINAL;
-        }
-        if ( $ordinal_arg > $latest_earley_set ) {
-            Marpa::R3::exception(
-                qq{Argument out of bounds in recce->progress($ordinal_arg)\n},
-                qq{   Argument specifies Earley set after the latest Earley set 0\n},
-                qq{   The latest Earley set is Earley set $latest_earley_set\n}
-            );
-        } ## end if ( $ordinal_arg > $latest_earley_set )
-        if ( $ordinal_arg >= 0 ) {
-            $ordinal = $ordinal_arg;
-            last SET_ORDINAL;
-        }
-
-        # If we are here, $ordinal_arg < 0
-        $ordinal = $latest_earley_set + 1 + $ordinal_arg;
-        Marpa::R3::exception(
-            qq{Argument out of bounds in recce->progress($ordinal_arg)\n},
-            qq{   Argument specifies Earley set before Earley set 0\n}
-        ) if $ordinal < 0;
-    } ## end SET_ORDINAL:
-    my $result = [];
-    $recce_c->progress_report_start($ordinal);
-    ITEM: while (1) {
-        my @item = $recce_c->progress_item();
-        last ITEM if not defined $item[0];
-        push @{$result}, [@item];
-    }
-    $recce_c->progress_report_finish();
+    my ($result) = $slr->exec_sig_name(
+        'progress',
+        'i>0',
+        ($ordinal_arg // -1)
+        );
     return $result;
 }
-
 
 sub Marpa::R3::Scanless::R::terminals_expected {
     my ($slr)      = @_;
