@@ -1213,29 +1213,25 @@ or nil if there was none.
     -- miranda: section+ recognizer methods
     function progress(recce, ordinal_arg)
         local g1r = recce.lmw_g1r
+        local ordinal = ordinal_arg
         local latest_earley_set = g1r:latest_earley_set()
-        local ordinal = latest_earley_set
-        if ordinal_arg then
-            if ordinal_arg > latest_earley_set then
-                error(
-                    "Argument out of bounds in recce->progress($ordinal_arg)\n"
-                    .. "   Argument specifies Earley set after the latest Earley set 0\n"
-                    .. "   The latest Earley set is Earley set $latest_earley_set\n"
-                    )
-            elseif ordinal_arg >= 0 then
-                 ordinal = ordinal_arg
-                 goto ORDINAL_SET
-            end
-            -- if we are here, ordinal_arg < 0
-            ordinal = latest_earley_set + 1 + ordinal_arg
+        if ordinal > latest_earley_set then
+            error(string.format(
+                "Argument out of bounds in recce->progress(%d)\n"
+                .. "   Argument specifies Earley set after the latest Earley set 0\n"
+                .. "   The latest Earley set is Earley set $latest_earley_set\n",
+                ordinal_arg
+                ))
+        elseif ordinal < 0 then
+            ordinal = latest_earley_set + 1 + ordinal
             if ordinal < 0 then
-                error(
-                    "Argument out of bounds in recce->progress($ordinal_arg)\n"
-                    .. "   Argument specifies Earley set before Earley set 0\n"
-                )
+                error(string.format(
+                    "Argument out of bounds in recce->progress(%d)\n"
+                    .. "   Argument specifies Earley set before Earley set 0\n",
+                    ordinal_arg
+                ))
             end
-        end
-        ::ORDINAL_SET::
+            end
         local result = {}
         g1r:progress_report_start(ordinal)
         while true do
