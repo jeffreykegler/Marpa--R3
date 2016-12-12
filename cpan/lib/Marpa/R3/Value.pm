@@ -159,7 +159,6 @@ sub Marpa::R3::Internal::Scanless::R::resolve_action {
 # Find the semantics for a lexeme.
 sub Marpa::R3::Internal::Scanless::R::lexeme_semantics_find {
     my ( $slr, $lexeme_id ) = @_;
-    my $recce_c                = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     my $xsy_by_isyid =
@@ -648,7 +647,6 @@ END_OF_LUA
         my $xbnf_by_irlid =
           $tracer->[Marpa::R3::Internal::Trace::G::XBNF_BY_IRLID];
         my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
-        my $recce_c   = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
         my $trace_actions =
           $slr->[Marpa::R3::Internal::Scanless::R::TRACE_ACTIONS] // 0;
 
@@ -1636,7 +1634,6 @@ END_OF_LUA
 
 sub trace_stack_1 {
     my ( $slr, $args, $rule_id ) = @_;
-    my $recce_c = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $tracer =
         $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];

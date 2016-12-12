@@ -406,7 +406,6 @@ sub Marpa::R3::ASF::new {
     my $tracer =
         $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
-    my $recce_c   = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
 
     $slr->ordering_get();
 
