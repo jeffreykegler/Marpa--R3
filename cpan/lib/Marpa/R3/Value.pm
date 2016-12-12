@@ -587,13 +587,21 @@ sub Marpa::R3::Scanless::R::value {
         );
     }
 
-    my $furthest_earleme       = $recce_c->furthest_earleme();
-    my $last_completed_earleme = $recce_c->current_earleme();
-    Marpa::R3::exception(
-        "Attempt to evaluate incompletely recognized parse:\n",
-        "  Last token ends at location $furthest_earleme\n",
-        "  Recognition done only as far as location $last_completed_earleme\n"
-    ) if $furthest_earleme > $last_completed_earleme;
+    $slr->exec_sig(<<'END_OF_LUA', '');
+    recce = ...
+    local g1r = recce.lmw_g1r
+    local furthest_earleme = g1r:furthest_earleme()
+    local last_completed_earleme = g1r:current_earleme()
+    if furthest_earleme ~= last_completed_earleme then
+        error(string.format(
+            "Attempt to evaluate incompletely recognized parse:\n"
+            .. "  Last token ends at location %d\n"
+            .. "  Recognition done only as far as location %d\n",
+            furthest_earleme,
+            last_completed_earleme
+        ))
+    end
+END_OF_LUA
 
     ENSURE_TREE: {
         # No tree, therefore not initialized
