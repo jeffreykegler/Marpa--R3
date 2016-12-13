@@ -3335,6 +3335,8 @@ PPCODE:
     G_Wrapper *g_wrapper;
     Marpa_Config marpa_configuration;
     int error_code;
+    lua_State* L = outer_slg->L;
+    lua_Integer lua_ref = outer_slg->lua_ref;
     PERL_UNUSED_ARG(class);
 
     /* Make sure the header is from the version we want */
@@ -3388,6 +3390,11 @@ PPCODE:
             error_description = marpa_error_description[error_code].name;
         }
         croak ("Problem in Marpa::R3->new(): %s", error_description);
+    }
+
+    marpa_g_ref (g);
+    if (!marpa_k_dummyup_grammar (L, g, lua_ref, name)) {
+        croak ("Problem in u->new(): G1 marpa_k_dummyup_grammar failed\n");
     }
 }
 
@@ -4520,10 +4527,7 @@ associate( outer_slg, l0_sv, g1_sv )
 PPCODE:
 {
     Scanless_G *slg = outer_slg->inner;
-    lua_State *L = outer_slg->L;
-    lua_Integer lua_ref = outer_slg->lua_ref;
-    Marpa_Grammar l0g;
-    Marpa_Grammar g1g;
+    lua_State* L = outer_slg->L;
 
     if (!sv_isa (l0_sv, "Marpa::R3::Thin::G"))
     {
@@ -4536,26 +4540,18 @@ PPCODE:
     }
     slg_inner_associate (slg, l0_sv, g1_sv);
 
-    g1g = slg->g1_wrapper->g;
-    marpa_g_ref (g1g);
-    if (!marpa_k_dummyup_grammar (L, g1g, lua_ref, "lmw_g1g")) {
-        croak ("Problem in u->new(): G1 marpa_k_dummyup_grammar failed\n");
-    }
-
-    l0g = slg->l0_wrapper->g;
-    marpa_g_ref (l0g);
-    if (!marpa_k_dummyup_grammar (L, l0g, lua_ref, "lmw_l0g")) {
-        croak ("Problem in u->new(): L0 marpa_k_dummyup_grammar failed\n");
-    }
 
     {
+        Marpa_Grammar l0g = slg->l0_wrapper->g;
+        Marpa_Grammar g1g = slg->g1_wrapper->g;
         const int highest_g1g_symbol_id = marpa_g_highest_symbol_id (g1g);
         const int highest_l0g_symbol_id = marpa_g_highest_symbol_id (l0g);
         const int highest_symbol_id =
             highest_g1g_symbol_id >
             highest_l0g_symbol_id ? highest_g1g_symbol_id :
             highest_l0g_symbol_id;
-        (void) kollos_extraspace_buffer_resize (L, (size_t)highest_symbol_id + 1);
+        (void) kollos_extraspace_buffer_resize (L,
+            (size_t) highest_symbol_id + 1);
     }
 
     XSRETURN_YES;
