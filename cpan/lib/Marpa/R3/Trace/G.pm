@@ -28,7 +28,7 @@ sub new {
     $self->[Marpa::R3::Internal::Trace::G::SLG_C] = $thin_slg;
     $self->[Marpa::R3::Internal::Trace::G::NAME] = $name;
 
-    my $grammar_c = Marpa::R3::Thin::G->new({});
+    my $grammar_c = Marpa::R3::Thin::G->new($thin_slg, $name);
     $self->[Marpa::R3::Internal::Trace::G::C] = $grammar_c;
     return $self;
 } ## end sub new
