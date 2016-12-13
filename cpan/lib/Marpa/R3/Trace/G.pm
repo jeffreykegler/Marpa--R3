@@ -21,12 +21,15 @@ $STRING_VERSION = $VERSION;
 $VERSION        = eval $VERSION;
 
 sub new {
-    my ( $class ) = @_;
+    my ( $class, $thin_slg, $name ) = @_;
     my $self = bless [], $class;
-    my $grammar_c = Marpa::R3::Thin::G->new({});
-    $self->[Marpa::R3::Internal::Trace::G::C] = $grammar_c;
     $self->[Marpa::R3::Internal::Trace::G::ISYID_BY_NAME] = {};
     $self->[Marpa::R3::Internal::Trace::G::NAME_BY_ISYID] = [];
+    $self->[Marpa::R3::Internal::Trace::G::SLG_C] = $thin_slg;
+    $self->[Marpa::R3::Internal::Trace::G::NAME] = $name;
+
+    my $grammar_c = Marpa::R3::Thin::G->new({});
+    $self->[Marpa::R3::Internal::Trace::G::C] = $grammar_c;
     return $self;
 } ## end sub new
 

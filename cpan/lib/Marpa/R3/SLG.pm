@@ -440,10 +440,9 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     }
 
     my $g1_tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER] =
-      Marpa::R3::Trace::G->new();
+      Marpa::R3::Trace::G->new($thin_slg, "G1");
     $g1_tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID] = [];
     $g1_tracer->[Marpa::R3::Internal::Trace::G::START_NAME]   = '[:start]';
-    $g1_tracer->[Marpa::R3::Internal::Trace::G::NAME]         = 'G1';
 
     for my $symbol ( sort keys %{ $hashed_source->{symbols}->{G1} } ) {
         assign_symbol( $slg, $g1_tracer, $symbol,
@@ -665,11 +664,10 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     } sort keys %is_lexeme_in_this_lexer;
 
     my $lex_tracer = $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER] =
-      Marpa::R3::Trace::G->new();
+      Marpa::R3::Trace::G->new($thin_slg, "L0");
     $lex_tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID] = [];
     $lex_tracer->[Marpa::R3::Internal::Trace::G::START_NAME] =
       $lex_start_symbol_name;
-    $lex_tracer->[Marpa::R3::Internal::Trace::G::NAME] = 'L0';
 
     for my $symbol ( sort keys %this_lexer_symbols ) {
         my $properties = $this_lexer_symbols{$symbol};
