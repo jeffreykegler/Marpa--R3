@@ -462,7 +462,6 @@ WriteMakefile(
         q[lib/Marpa/R3/Lua/Inspect.pm] =>
           q[$(INST_LIB)/Marpa/R3/Lua/Inspect.pm],
         q[lib/Marpa/R3/Thin/G.pm]  => q[$(INST_LIB)/Marpa/R3/Thin/G.pm],
-        q[lib/Marpa/R3/Thin/R.pm]  => q[$(INST_LIB)/Marpa/R3/Thin/R.pm],
         q[lib/Marpa/R3/Trace/G.pm] => q[$(INST_LIB)/Marpa/R3/Trace/G.pm],
         q[lib/Marpa/R3/Value.pm]   => q[$(INST_LIB)/Marpa/R3/Value.pm],
         q[lib/Marpa/R3/Version.pm] => q[$(INST_LIB)/Marpa/R3/Version.pm],
