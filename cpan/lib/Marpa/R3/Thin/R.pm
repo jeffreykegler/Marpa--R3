@@ -22,32 +22,6 @@ $VERSION        = eval $VERSION;
 
 # Additional Perl methods for the XS package Marpa::R3::Thin::R
 
-sub Marpa::R3::Thin::R::show_leo_item {
-    my ($recce_c, $tracer)        = @_;
-    my $grammar_c = $tracer->grammar();
-    my $leo_base_state = $recce_c->_marpa_r_leo_base_state();
-    return if not defined $leo_base_state;
-    my $trace_earley_set      = $recce_c->_marpa_r_trace_earley_set();
-    my $trace_earleme         = $recce_c->earleme($trace_earley_set);
-    my $postdot_symbol_id     = $recce_c->_marpa_r_postdot_item_symbol();
-    my $postdot_symbol_name   = $tracer->isy_name($postdot_symbol_id);
-    my $predecessor_symbol_id = $recce_c->_marpa_r_leo_predecessor_symbol();
-    my $base_origin_set_id    = $recce_c->_marpa_r_leo_base_origin();
-    my $base_origin_earleme   = $recce_c->earleme($base_origin_set_id);
-
-    my $text = sprintf 'L%d@%d', $postdot_symbol_id, $trace_earleme;
-    my @link_texts = qq{"$postdot_symbol_name"};
-    if ( defined $predecessor_symbol_id ) {
-        push @link_texts, sprintf 'L%d@%d', $predecessor_symbol_id,
-            $base_origin_earleme;
-    }
-    push @link_texts, sprintf 'S%d@%d-%d', $leo_base_state,
-        $base_origin_earleme,
-        $trace_earleme;
-    $text .= ' [' . ( join '; ', @link_texts ) . ']';
-    return $text;
-}
-
 # Assumes trace token source link set by caller
 sub Marpa::R3::Thin::R::show_token_link_choice {
     my ( $recce_c, $tracer, $current_earleme, $token_values ) = @_;
@@ -214,39 +188,6 @@ sub Marpa::R3::Thin::R::show_earley_item {
     } @sort_data;
     push @lines, q{  } . join q{ }, @pieces if @pieces;
     return join "\n", @lines, q{};
-}
-
-sub Marpa::R3::Thin::R::show_earley_set {
-    my ( $recce_c, $tracer, $traced_set_id, $token_values ) = @_;
-    my $text      = q{};
-    my @sorted_data = ();
-    if ( not defined $recce_c->_marpa_r_earley_set_trace($traced_set_id) ) {
-        return $text;
-    }
-    EARLEY_ITEM: for ( my $item_id = 0;; $item_id++ ) {
-        my $item_desc = $recce_c->Marpa::R3::Thin::R::show_earley_item( $tracer, $traced_set_id, $item_id, $token_values );
-        last EARLEY_ITEM if not defined $item_desc;
-        # We do not sort these any more
-        push @sorted_data, $item_desc;
-    } ## end EARLEY_ITEM: for ( my $item_id = 0;; $item_id++ )
-    my @sort_data = ();
-    POSTDOT_ITEM:
-    for (
-        my $postdot_symbol_id = $recce_c->_marpa_r_first_postdot_item_trace();
-        defined $postdot_symbol_id;
-        $postdot_symbol_id = $recce_c->_marpa_r_next_postdot_item_trace()
-        )
-    {
-
-        # If there is no base Earley item,
-        # then this is not a Leo item, so we skip it
-        my $leo_item_desc = $recce_c->Marpa::R3::Thin::R::show_leo_item($tracer);
-        next POSTDOT_ITEM if not defined $leo_item_desc;
-        push @sort_data, [ $postdot_symbol_id, $leo_item_desc ];
-    } ## end POSTDOT_ITEM: for ( my $postdot_symbol_id = $recce_c...)
-    push @sorted_data, join q{},
-        map { $_->[-1] . "\n" } sort { $a->[0] <=> $b->[0] } @sort_data;
-    return join q{}, @sorted_data;
 }
 
 1;

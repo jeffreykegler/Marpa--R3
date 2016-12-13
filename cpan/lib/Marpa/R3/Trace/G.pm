@@ -31,6 +31,14 @@ sub new {
     my $field_name = 'lmw_' . (lc $name) . 'g';
     my $grammar_c = Marpa::R3::Thin::G->new($thin_slg, $field_name);
     $self->[Marpa::R3::Internal::Trace::G::C] = $grammar_c;
+
+    $thin_slg->exec_sig(<<'END_OF_LUA', 's', $field_name);
+    local g, lmw_g_name = ...
+    local lmw_g = g[lmw_g_name]
+    lmw_g.isyid_by_name = {}
+    lmw_g.name_by_isyid = {}
+END_OF_LUA
+
     return $self;
 } ## end sub new
 
@@ -62,9 +70,20 @@ sub formatted_symbol_name {
 }
 
 sub symbol_name_set {
-    my ( $self, $name, $symbol_id ) = @_;
-    $self->[Marpa::R3::Internal::Trace::G::NAME_BY_ISYID]->[$symbol_id] = $name;
-    $self->[Marpa::R3::Internal::Trace::G::ISYID_BY_NAME]->{$name} = $symbol_id;
+    my ( $self, $sym_name, $symbol_id ) = @_;
+    $self->[Marpa::R3::Internal::Trace::G::NAME_BY_ISYID]->[$symbol_id] = $sym_name;
+    $self->[Marpa::R3::Internal::Trace::G::ISYID_BY_NAME]->{$sym_name} = $symbol_id;
+    my $thin_slg = $self->[Marpa::R3::Internal::Trace::G::SLG_C];
+    my $short_lmw_g_name = $self->[Marpa::R3::Internal::Trace::G::NAME];
+    my $lmw_g_name = 'lmw_' . (lc $short_lmw_g_name) . 'g';
+
+    $thin_slg->exec_sig(<<'END_OF_LUA', 's', $lmw_g_name);
+    local g, lmw_g_name = ...
+    local lmw_g = g[lmw_g_name]
+    lmw_g.isyid_by_name = {}
+    lmw_g.name_by_isyid = {}
+END_OF_LUA
+
     return $symbol_id;
 } ## end sub symbol_name_set
 
