@@ -1246,6 +1246,39 @@ or nil if there was none.
 
 ```
 
+```
+    -- miranda: section+ recognizer methods
+    function show_leo_item(recce)
+        local g1r = recce.lmw_g1r
+        local g1g = recce.slg.lmw_g1g
+        local leo_base_state = g1r:_leo_base_state()
+        if not leo_base_state then return '' end
+        local trace_earley_set = g1r:_trace_earley_set()
+        local trace_earleme = recce:earleme(trace_earley_set)
+        local postdot_symbol_id = g1r:_postdot_item_symbol()
+        local postdot_symbol_name = g1g:isy_name(postdot_symbol_id)
+        local predecessor_symbol_id = g1r:_leo_predecessor_symbol()
+        local base_origin_set_id = g1r:_leo_base_origin()
+        local base_origin_earleme = recce:earleme(base_origin_set_id)
+        local link_texts = { postdot_symbol_name }
+        if predecessor_symbol_id then
+            link_texts[#link_texts+1] = string.format(
+                'L%d@%d', predecessor_symbol_id, base_origin_earleme
+            );
+        end
+        link_texts[#link_texts+1] = string.format(
+            'S%d@%d-%d',
+            leo_base_state,
+            base_origin_earleme,
+            trace_earleme
+        );
+        return string.format('L%d@%d [%s]',
+             postdot_symbol_id, trace_earleme,
+             table.concat(link_texts, '; '));
+    end
+
+```
+
 ## The Kollos valuator
 
 The "valuator" portion of Kollos produces the
