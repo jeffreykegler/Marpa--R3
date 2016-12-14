@@ -23,7 +23,6 @@ $VERSION        = eval $VERSION;
 sub new {
     my ( $class, $thin_slg, $name ) = @_;
     my $self = bless [], $class;
-    $self->[Marpa::R3::Internal::Trace::G::ISYID_BY_NAME] = {};
     $self->[Marpa::R3::Internal::Trace::G::SLG_C] = $thin_slg;
     $self->[Marpa::R3::Internal::Trace::G::NAME] = $name;
 
@@ -88,7 +87,6 @@ sub formatted_symbol_name {
 
 sub symbol_name_set {
     my ( $self, $symbol_name, $symbol_id ) = @_;
-    $self->[Marpa::R3::Internal::Trace::G::ISYID_BY_NAME]->{$symbol_name} = $symbol_id;
     my $thin_slg = $self->[Marpa::R3::Internal::Trace::G::SLG_C];
     my $short_lmw_g_name = $self->[Marpa::R3::Internal::Trace::G::NAME];
     my $lmw_g_name = 'lmw_' . (lc $short_lmw_g_name) . 'g';

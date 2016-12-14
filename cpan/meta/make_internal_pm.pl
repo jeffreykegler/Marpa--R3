@@ -146,8 +146,6 @@ __DATA__
     SLG_C
 
     C { A C structure }
-    NAME_BY_ISYID
-    ISYID_BY_NAME
     XSY_BY_ISYID { Array mapping ISYID to XSY }
     XBNF_BY_IRLID { Array mapping IRLID to XBNF }
     ACTION_BY_IRLID
