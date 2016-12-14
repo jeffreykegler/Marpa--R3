@@ -54,9 +54,19 @@ sub symbol_by_name {
 
 sub symbol_name {
     my ( $self, $symbol_id ) = @_;
-    my $symbol_name = $self->[Marpa::R3::Internal::Trace::G::NAME_BY_ISYID]->[$symbol_id];
-    $symbol_name = 'R' . $symbol_id if not defined $symbol_name;
-    return $symbol_name;
+    my $thin_slg = $self->[Marpa::R3::Internal::Trace::G::SLG_C];
+
+    my $short_lmw_g_name = $self->[Marpa::R3::Internal::Trace::G::NAME];
+    my $lmw_g_name = 'lmw_' . (lc $short_lmw_g_name) . 'g';
+    my ($sym_name) = $thin_slg->exec_sig(<<'END_OF_LUA', 'si', $lmw_g_name, $symbol_id);
+    local g, lmw_g_name, symbol_id = ...
+    local lmw_g = g[lmw_g_name]
+    local symbol_name = lmw_g.name_by_isyid[symbol_id]
+    if symbol_name then return symbol_name end
+    return string.format('R%d', symbol_id)
+END_OF_LUA
+    return $sym_name;
+
 } ## end sub symbol_name
 
 sub formatted_symbol_name {
@@ -70,18 +80,19 @@ sub formatted_symbol_name {
 }
 
 sub symbol_name_set {
-    my ( $self, $sym_name, $symbol_id ) = @_;
-    $self->[Marpa::R3::Internal::Trace::G::NAME_BY_ISYID]->[$symbol_id] = $sym_name;
-    $self->[Marpa::R3::Internal::Trace::G::ISYID_BY_NAME]->{$sym_name} = $symbol_id;
+    my ( $self, $symbol_name, $symbol_id ) = @_;
+    $self->[Marpa::R3::Internal::Trace::G::NAME_BY_ISYID]->[$symbol_id] = $symbol_name;
+    $self->[Marpa::R3::Internal::Trace::G::ISYID_BY_NAME]->{$symbol_name} = $symbol_id;
     my $thin_slg = $self->[Marpa::R3::Internal::Trace::G::SLG_C];
     my $short_lmw_g_name = $self->[Marpa::R3::Internal::Trace::G::NAME];
     my $lmw_g_name = 'lmw_' . (lc $short_lmw_g_name) . 'g';
 
-    $thin_slg->exec_sig(<<'END_OF_LUA', 's', $lmw_g_name);
-    local g, lmw_g_name = ...
+    $thin_slg->exec_sig(
+      <<'END_OF_LUA', 'ssi', $lmw_g_name, $symbol_name, $symbol_id);
+    local g, lmw_g_name, symbol_name, symbol_id = ...
     local lmw_g = g[lmw_g_name]
-    lmw_g.isyid_by_name = {}
-    lmw_g.name_by_isyid = {}
+    lmw_g.isyid_by_name[symbol_name] = symbol_id
+    lmw_g.name_by_isyid[symbol_id] = symbol_name
 END_OF_LUA
 
     return $symbol_id;
