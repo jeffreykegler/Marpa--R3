@@ -24,7 +24,6 @@ sub new {
     my ( $class, $thin_slg, $name ) = @_;
     my $self = bless [], $class;
     $self->[Marpa::R3::Internal::Trace::G::ISYID_BY_NAME] = {};
-    $self->[Marpa::R3::Internal::Trace::G::NAME_BY_ISYID] = [];
     $self->[Marpa::R3::Internal::Trace::G::SLG_C] = $thin_slg;
     $self->[Marpa::R3::Internal::Trace::G::NAME] = $name;
 
@@ -48,8 +47,16 @@ sub grammar {
 }
 
 sub symbol_by_name {
-    my ( $self, $name ) = @_;
-    return $self->[Marpa::R3::Internal::Trace::G::ISYID_BY_NAME]->{$name};
+    my ( $self, $symbol_name ) = @_;
+    my $thin_slg = $self->[Marpa::R3::Internal::Trace::G::SLG_C];
+    my $short_lmw_g_name = $self->[Marpa::R3::Internal::Trace::G::NAME];
+    my $lmw_g_name = 'lmw_' . (lc $short_lmw_g_name) . 'g';
+    my ($symbol_id) = $thin_slg->exec_sig(<<'END_OF_LUA', 'ss', $lmw_g_name, $symbol_name);
+    local g, lmw_g_name, symbol_name = ...
+    local lmw_g = g[lmw_g_name]
+    return lmw_g.isyid_by_name[symbol_name]
+END_OF_LUA
+    return $symbol_id;
 }
 
 sub symbol_name {
@@ -81,7 +88,6 @@ sub formatted_symbol_name {
 
 sub symbol_name_set {
     my ( $self, $symbol_name, $symbol_id ) = @_;
-    $self->[Marpa::R3::Internal::Trace::G::NAME_BY_ISYID]->[$symbol_id] = $symbol_name;
     $self->[Marpa::R3::Internal::Trace::G::ISYID_BY_NAME]->{$symbol_name} = $symbol_id;
     my $thin_slg = $self->[Marpa::R3::Internal::Trace::G::SLG_C];
     my $short_lmw_g_name = $self->[Marpa::R3::Internal::Trace::G::NAME];
@@ -102,11 +108,6 @@ sub symbol_new {
     my ( $self, $name ) = @_;
     return $self->symbol_name_set( $name,
         $self->[Marpa::R3::Internal::Trace::G::C]->symbol_new() );
-}
-
-sub symbol_force {
-    my ( $self, $name ) = @_;
-    return $self->[Marpa::R3::Internal::Trace::G::ISYID_BY_NAME]->{$name} // $self->symbol_new($name);
 }
 
 sub rule {
