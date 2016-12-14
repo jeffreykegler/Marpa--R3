@@ -562,7 +562,6 @@ sub Marpa::R3::Scanless::R::value {
     my $slg       = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $tracer    = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
-    my $recce_c   = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
 
     my $trace_actions =
       $slr->[Marpa::R3::Internal::Scanless::R::TRACE_ACTIONS] // 0;

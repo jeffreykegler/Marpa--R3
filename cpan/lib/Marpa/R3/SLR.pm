@@ -1821,9 +1821,14 @@ sub Marpa::R3::Scanless::R::exec_sig_name {
 # not to be documented
 sub Marpa::R3::Scanless::R::earley_set_size {
     my ($slr, $set_id) = @_;
-    my $recce_c = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
-    $set_id //= $recce_c->latest_earley_set();
-    return $recce_c->_marpa_r_earley_set_size($set_id);
+    my ($size) = $slr->exec_sig(
+        <<'END_OF_LUA', 'i', ($set_id // -1));
+    local recce, set_id = ...
+    local g1r = recce.lmw_g1r
+    if set_id < 0 then set_id = g1r:lastest_earley_set() end
+    return g1r:_earley_set_size(set_id)
+END_OF_LUA
+    return $size;
 }
 
 sub Marpa::R3::Scanless::R::show_earley_sets {
