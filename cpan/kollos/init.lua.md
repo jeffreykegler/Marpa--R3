@@ -460,7 +460,7 @@ of the last such symbol completed,
 or nil if there was none.
 
 ```
-    -- miranda: section+ recognizer methods
+    -- miranda: section+ SLIF recognizer Lua functions
     function last_completed(recce, symbol_id)
          local g1r = recce.lmw_g1r
          local g1g = recce.slg.lmw_g1g
@@ -495,7 +495,7 @@ or nil if there was none.
 ```
 
 ```
-    -- miranda: section+ recognizer methods
+    -- miranda: section+ SLIF recognizer Lua functions
     function progress(recce, ordinal_arg)
         local g1r = recce.lmw_g1r
         local ordinal = ordinal_arg
@@ -532,7 +532,7 @@ or nil if there was none.
 ```
 
 ```
-    -- miranda: section+ recognizer methods
+    -- miranda: section+ SLIF recognizer Lua functions
     function show_leo_item(recce)
         local g1r = recce.lmw_g1r
         local g1g = recce.slg.lmw_g1g
@@ -1293,8 +1293,7 @@ whose id is `id`.
 ```
     -- miranda: section+ grammar Libmarpa wrapper Lua functions
 
-    function class_grammar.symbol_name(lmw_g, symbol_id)
-        local lmw_g, symbol_id = ...
+    function kollos.class_grammar.symbol_name(lmw_g, symbol_id)
         local symbol_name = lmw_g.name_by_isyid[symbol_id]
         if symbol_name then return symbol_name end
         return string.format('R%d', symbol_id)
@@ -2238,7 +2237,8 @@ a special "configuration" argument.
     -- miranda: insert luacheck declarations
     -- miranda: insert enforce strict globals
     -- miranda: insert VM operations
-    -- miranda: insert recognizer methods
+    -- miranda: insert SLIF recognizer Lua functions
+    -- miranda: insert grammar Libmarpa wrapper Lua functions
     -- miranda: insert valuator Libmarpa wrapper Lua functions
     -- miranda: insert diagnostics
     -- miranda: insert Utilities for Perl code
