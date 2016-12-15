@@ -29,7 +29,8 @@ OTHER DEALINGS IN THE SOFTWARE.
 * [Kollos object](#kollos-object)
 * [Kollos Lua interpreter](#kollos-lua-interpreter)
 * [Kollos registry objects](#kollos-registry-objects)
-* [Kollos recognizer registry object](#kollos-recognizer-registry-object)
+* [Kollos SLIF grammar object](#kollos-slif-grammar-object)
+* [Kollos SLIF recognizer object](#kollos-slif-recognizer-object)
 * [Kollos semantics](#kollos-semantics)
   * [VM operations](#vm-operations)
     * [VM debug operation](#vm-debug-operation)
@@ -66,11 +67,15 @@ OTHER DEALINGS IN THE SOFTWARE.
     * [Return the top index of the stack](#return-the-top-index-of-the-stack)
     * [Return the value of a stack entry](#return-the-value-of-a-stack-entry)
     * [Set the value of a stack entry](#set-the-value-of-a-stack-entry)
+* [The Kollos grammar](#the-kollos-grammar)
+* [The Kollos recognizer](#the-kollos-recognizer)
 * [The Kollos valuator](#the-kollos-valuator)
   * [Initialize a valuator](#initialize-a-valuator)
   * [Reset a valuator](#reset-a-valuator)
+* [Diagnostics](#diagnostics)
 * [Libmarpa interface](#libmarpa-interface)
   * [Standard template methods](#standard-template-methods)
+  * [Constructors](#constructors)
 * [The main Lua code file](#the-main-lua-code-file)
   * [Preliminaries to the main code](#preliminaries-to-the-main-code)
 * [The Kollos C code file](#the-kollos-c-code-file)
@@ -386,7 +391,13 @@ Deletes the interpreter if the reference count drops to zero.
 
 ```
 
-## Kollos recognizer registry object
+## Kollos SLIF grammar object
+
+This is a registry object.
+
+## Kollos SLIF recognizer object
+
+This is a registry object.
 
 Add a recce to the Kollos object, returning its
 "lua_id".
@@ -438,6 +449,119 @@ because it uses a lot of PERL/XS data structures.
         marpa_lua_settop(L, base_of_stack);
         return lua_id;
     }
+```
+
+Given a scanless
+recognizer and a symbol,
+`last_completed()`
+returns the start earley set
+and length
+of the last such symbol completed,
+or nil if there was none.
+
+```
+    -- miranda: section+ recognizer methods
+    function last_completed(recce, symbol_id)
+         local g1r = recce.lmw_g1r
+         local g1g = recce.slg.lmw_g1g
+         local latest_earley_set = g1r:latest_earley_set()
+         local first_origin = latest_earley_set + 1
+         local earley_set = latest_earley_set
+         while earley_set >= 0 do
+             g1r:progress_report_start(earley_set)
+             while true do
+                 local rule_id, dot_position, origin = g1r:progress_item()
+                 if not rule_id then goto LAST_ITEM end
+                 if dot_position ~= -1 then goto NEXT_ITEM end
+                 local lhs_id = g1g:rule_lhs(rule_id)
+                 if symbol_id ~= lhs_id then goto NEXT_ITEM end
+                 if origin < first_origin then
+                     first_origin = origin
+                 end
+                 ::NEXT_ITEM::
+             end
+             ::LAST_ITEM::
+             g1r:progress_report_finish()
+             if first_origin <= latest_earley_set then
+                 goto LAST_EARLEY_SET
+             end
+             earley_set = earley_set - 1
+         end
+         ::LAST_EARLEY_SET::
+         if earley_set < 0 then return end
+         return first_origin, earley_set - first_origin
+    end
+
+```
+
+```
+    -- miranda: section+ recognizer methods
+    function progress(recce, ordinal_arg)
+        local g1r = recce.lmw_g1r
+        local ordinal = ordinal_arg
+        local latest_earley_set = g1r:latest_earley_set()
+        if ordinal > latest_earley_set then
+            error(string.format(
+                "Argument out of bounds in recce->progress(%d)\n"
+                .. "   Argument specifies Earley set after the latest Earley set 0\n"
+                .. "   The latest Earley set is Earley set $latest_earley_set\n",
+                ordinal_arg
+                ))
+        elseif ordinal < 0 then
+            ordinal = latest_earley_set + 1 + ordinal
+            if ordinal < 0 then
+                error(string.format(
+                    "Argument out of bounds in recce->progress(%d)\n"
+                    .. "   Argument specifies Earley set before Earley set 0\n",
+                    ordinal_arg
+                ))
+            end
+            end
+        local result = {}
+        g1r:progress_report_start(ordinal)
+        while true do
+            local rule_id, dot_position, origin = g1r:progress_item()
+            if not rule_id then goto LAST_ITEM end
+            result[#result+1] = { rule_id, dot_position, origin }
+        end
+        ::LAST_ITEM::
+        g1r:progress_report_finish()
+        return result
+    end
+
+```
+
+```
+    -- miranda: section+ recognizer methods
+    function show_leo_item(recce)
+        local g1r = recce.lmw_g1r
+        local g1g = recce.slg.lmw_g1g
+        local leo_base_state = g1r:_leo_base_state()
+        if not leo_base_state then return '' end
+        local trace_earley_set = g1r:_trace_earley_set()
+        local trace_earleme = recce:earleme(trace_earley_set)
+        local postdot_symbol_id = g1r:_postdot_item_symbol()
+        local postdot_symbol_name = g1g:isy_name(postdot_symbol_id)
+        local predecessor_symbol_id = g1r:_leo_predecessor_symbol()
+        local base_origin_set_id = g1r:_leo_base_origin()
+        local base_origin_earleme = recce:earleme(base_origin_set_id)
+        local link_texts = { postdot_symbol_name }
+        if predecessor_symbol_id then
+            link_texts[#link_texts+1] = string.format(
+                'L%d@%d', predecessor_symbol_id, base_origin_earleme
+            );
+        end
+        link_texts[#link_texts+1] = string.format(
+            'S%d@%d-%d',
+            leo_base_state,
+            base_origin_earleme,
+            trace_earleme
+        );
+        return string.format('L%d@%d [%s]',
+             postdot_symbol_id, trace_earleme,
+             table.concat(link_texts, '; '));
+    end
+
 ```
 
 ## Kollos semantics
@@ -1164,122 +1288,23 @@ whose id is `id`.
 
 ```
 
-## The Kollos recognizer
-
-Given a scanless
-recognizer and a symbol,
-`last_completed()`
-returns the start earley set
-and length
-of the last such symbol completed,
-or nil if there was none.
+## The grammar Libmarpa wrapper
 
 ```
-    -- miranda: section+ recognizer methods
-    function last_completed(recce, symbol_id)
-         local g1r = recce.lmw_g1r
-         local g1g = recce.slg.lmw_g1g
-         local latest_earley_set = g1r:latest_earley_set()
-         local first_origin = latest_earley_set + 1
-         local earley_set = latest_earley_set
-         while earley_set >= 0 do
-             g1r:progress_report_start(earley_set)
-             while true do
-                 local rule_id, dot_position, origin = g1r:progress_item()
-                 if not rule_id then goto LAST_ITEM end
-                 if dot_position ~= -1 then goto NEXT_ITEM end
-                 local lhs_id = g1g:rule_lhs(rule_id)
-                 if symbol_id ~= lhs_id then goto NEXT_ITEM end
-                 if origin < first_origin then
-                     first_origin = origin
-                 end
-                 ::NEXT_ITEM::
-             end
-             ::LAST_ITEM::
-             g1r:progress_report_finish()
-             if first_origin <= latest_earley_set then
-                 goto LAST_EARLEY_SET
-             end
-             earley_set = earley_set - 1
-         end
-         ::LAST_EARLEY_SET::
-         if earley_set < 0 then return end
-         return first_origin, earley_set - first_origin
+    -- miranda: section+ grammar Libmarpa wrapper Lua functions
+
+    function class_grammar.symbol_name(lmw_g, symbol_id)
+        local lmw_g, symbol_id = ...
+        local symbol_name = lmw_g.name_by_isyid[symbol_id]
+        if symbol_name then return symbol_name end
+        return string.format('R%d', symbol_id)
     end
 
 ```
 
-```
-    -- miranda: section+ recognizer methods
-    function progress(recce, ordinal_arg)
-        local g1r = recce.lmw_g1r
-        local ordinal = ordinal_arg
-        local latest_earley_set = g1r:latest_earley_set()
-        if ordinal > latest_earley_set then
-            error(string.format(
-                "Argument out of bounds in recce->progress(%d)\n"
-                .. "   Argument specifies Earley set after the latest Earley set 0\n"
-                .. "   The latest Earley set is Earley set $latest_earley_set\n",
-                ordinal_arg
-                ))
-        elseif ordinal < 0 then
-            ordinal = latest_earley_set + 1 + ordinal
-            if ordinal < 0 then
-                error(string.format(
-                    "Argument out of bounds in recce->progress(%d)\n"
-                    .. "   Argument specifies Earley set before Earley set 0\n",
-                    ordinal_arg
-                ))
-            end
-            end
-        local result = {}
-        g1r:progress_report_start(ordinal)
-        while true do
-            local rule_id, dot_position, origin = g1r:progress_item()
-            if not rule_id then goto LAST_ITEM end
-            result[#result+1] = { rule_id, dot_position, origin }
-        end
-        ::LAST_ITEM::
-        g1r:progress_report_finish()
-        return result
-    end
+## The recognizer Libmarpa wrapper
 
-```
-
-```
-    -- miranda: section+ recognizer methods
-    function show_leo_item(recce)
-        local g1r = recce.lmw_g1r
-        local g1g = recce.slg.lmw_g1g
-        local leo_base_state = g1r:_leo_base_state()
-        if not leo_base_state then return '' end
-        local trace_earley_set = g1r:_trace_earley_set()
-        local trace_earleme = recce:earleme(trace_earley_set)
-        local postdot_symbol_id = g1r:_postdot_item_symbol()
-        local postdot_symbol_name = g1g:isy_name(postdot_symbol_id)
-        local predecessor_symbol_id = g1r:_leo_predecessor_symbol()
-        local base_origin_set_id = g1r:_leo_base_origin()
-        local base_origin_earleme = recce:earleme(base_origin_set_id)
-        local link_texts = { postdot_symbol_name }
-        if predecessor_symbol_id then
-            link_texts[#link_texts+1] = string.format(
-                'L%d@%d', predecessor_symbol_id, base_origin_earleme
-            );
-        end
-        link_texts[#link_texts+1] = string.format(
-            'S%d@%d-%d',
-            leo_base_state,
-            base_origin_earleme,
-            trace_earleme
-        );
-        return string.format('L%d@%d [%s]',
-             postdot_symbol_id, trace_earleme,
-             table.concat(link_texts, '; '));
-    end
-
-```
-
-## The Kollos valuator
+## The valuator Libmarpa wrapper
 
 The "valuator" portion of Kollos produces the
 value of a
@@ -1290,7 +1315,7 @@ Kollos parse.
 Called when a valuator is set up.
 
 ```
-    -- miranda: section value_init()
+    -- miranda: section+ valuator Libmarpa wrapper Lua functions
 
     function value_init(recce, trace_values)
 
@@ -1361,7 +1386,7 @@ It should free all memory associated with the valuation.
 
 ```
 
-    -- miranda: section valuation_reset()
+    -- miranda: section+ valuator Libmarpa wrapper Lua functions
 
     function valuation_reset(recce)
         recce.op_fn_key = nil
@@ -2214,8 +2239,7 @@ a special "configuration" argument.
     -- miranda: insert enforce strict globals
     -- miranda: insert VM operations
     -- miranda: insert recognizer methods
-    -- miranda: insert value_init()
-    -- miranda: insert valuation_reset()
+    -- miranda: insert valuator Libmarpa wrapper Lua functions
     -- miranda: insert diagnostics
     -- miranda: insert Utilities for Perl code
 
