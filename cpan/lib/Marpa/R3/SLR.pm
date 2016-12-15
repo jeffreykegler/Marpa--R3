@@ -1849,36 +1849,37 @@ sub Marpa::R3::Scanless::R::show_earley_sets {
 
 sub Marpa::R3::Scanless::R::show_leo_item {
     my ($slr) = @_;
-    if (0) {
-        my ($result) = $slr->exec_sig_name( 'show_leo_item', '' );
-        return if $result eq '';
-        return $result;
-    }
-    my $recce_c        = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
-    my $slg            = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $tracer         = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
-    my $grammar_c      = $tracer->[Marpa::R3::Internal::Trace::G::C];
-    my $leo_base_state = $recce_c->_marpa_r_leo_base_state();
-    return if not defined $leo_base_state;
-    my $trace_earley_set      = $recce_c->_marpa_r_trace_earley_set();
-    my $trace_earleme         = $recce_c->earleme($trace_earley_set);
-    my $postdot_symbol_id     = $recce_c->_marpa_r_postdot_item_symbol();
-    my $postdot_symbol_name   = $tracer->isy_name($postdot_symbol_id);
-    my $predecessor_symbol_id = $recce_c->_marpa_r_leo_predecessor_symbol();
-    my $base_origin_set_id    = $recce_c->_marpa_r_leo_base_origin();
-    my $base_origin_earleme   = $recce_c->earleme($base_origin_set_id);
+    my ($result) = $slr->exec_sig_name( 'show_leo_item', '' );
+    return if $result eq '';
+    return $result;
 
-    my $text = sprintf 'L%d@%d', $postdot_symbol_id, $trace_earleme;
-    my @link_texts = qq{"$postdot_symbol_name"};
-    if ( defined $predecessor_symbol_id ) {
-        push @link_texts, sprintf 'L%d@%d', $predecessor_symbol_id,
-          $base_origin_earleme;
+    if (0) {
+        my $recce_c   = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
+        my $slg       = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+        my $tracer    = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
+        my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
+        my $leo_base_state = $recce_c->_marpa_r_leo_base_state();
+        return if not defined $leo_base_state;
+        my $trace_earley_set      = $recce_c->_marpa_r_trace_earley_set();
+        my $trace_earleme         = $recce_c->earleme($trace_earley_set);
+        my $postdot_symbol_id     = $recce_c->_marpa_r_postdot_item_symbol();
+        my $postdot_symbol_name   = $tracer->isy_name($postdot_symbol_id);
+        my $predecessor_symbol_id = $recce_c->_marpa_r_leo_predecessor_symbol();
+        my $base_origin_set_id    = $recce_c->_marpa_r_leo_base_origin();
+        my $base_origin_earleme   = $recce_c->earleme($base_origin_set_id);
+
+        my $text = sprintf 'L%d@%d', $postdot_symbol_id, $trace_earleme;
+        my @link_texts = qq{"$postdot_symbol_name"};
+        if ( defined $predecessor_symbol_id ) {
+            push @link_texts, sprintf 'L%d@%d', $predecessor_symbol_id,
+              $base_origin_earleme;
+        }
+        push @link_texts, sprintf 'S%d@%d-%d', $leo_base_state,
+          $base_origin_earleme,
+          $trace_earleme;
+        $text .= ' [' . ( join '; ', @link_texts ) . ']';
+        return $text;
     }
-    push @link_texts, sprintf 'S%d@%d-%d', $leo_base_state,
-      $base_origin_earleme,
-      $trace_earleme;
-    $text .= ' [' . ( join '; ', @link_texts ) . ']';
-    return $text;
 }
 
 # Assumes trace token source link set by caller

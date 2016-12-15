@@ -539,13 +539,15 @@ or nil if there was none.
         local leo_base_state = g1r:_leo_base_state()
         if not leo_base_state then return '' end
         local trace_earley_set = g1r:_trace_earley_set()
-        local trace_earleme = recce:earleme(trace_earley_set)
+        local trace_earleme = g1r:earleme(trace_earley_set)
         local postdot_symbol_id = g1r:_postdot_item_symbol()
         local postdot_symbol_name = g1g:isy_name(postdot_symbol_id)
         local predecessor_symbol_id = g1r:_leo_predecessor_symbol()
         local base_origin_set_id = g1r:_leo_base_origin()
-        local base_origin_earleme = recce:earleme(base_origin_set_id)
-        local link_texts = { postdot_symbol_name }
+        local base_origin_earleme = g1r:earleme(base_origin_set_id)
+        local link_texts = {
+            string.format("%q", postdot_symbol_name)
+        }
         if predecessor_symbol_id then
             link_texts[#link_texts+1] = string.format(
                 'L%d@%d', predecessor_symbol_id, base_origin_earleme
@@ -1330,7 +1332,7 @@ whose id is `id`.
                  lhs_name, lhs_xrl, xrl_offset)
          end
 
-         -- real symbol or nulling equivalent
+         -- real, named symbol or its nulling equivalent
          local xsy_id = lmw_g:_source_xsy(nsy_id)
          local xsy_name = lmw_g:symbol_name(xsy_id)
          local is_nulling = 0 ~= lmw_g:_nsy_is_nulling(nsy_id)

@@ -267,8 +267,6 @@ sub show_ahms {
 
 sub isy_name {
     my ( $self, $symbol_id ) = @_;
-    my $grammar_c = $self->[Marpa::R3::Internal::Trace::G::C];
-
     my $thin_slg         = $self->[Marpa::R3::Internal::Trace::G::SLG_C];
     my $short_lmw_g_name = $self->[Marpa::R3::Internal::Trace::G::NAME];
     my $lmw_g_name       = 'lmw_' . ( lc $short_lmw_g_name ) . 'g';
@@ -280,48 +278,6 @@ sub isy_name {
 END_OF_LUA
     return $sym_name;
 
-    my $id;
-    if (0) {
-
-        # The next is a little roundabout to prevent auto-instantiation
-        my $name = '[ISY' . $id . ']';
-
-      GEN_NAME: {
-
-            if ( $grammar_c->_marpa_g_nsy_is_start($id) ) {
-                my $source_id = $grammar_c->_marpa_g_source_xsy($id);
-                $name = $self->symbol_name($source_id);
-                $name .= q<[']>;
-                last GEN_NAME;
-            } ## end if ( $grammar_c->_marpa_g_nsy_is_start($id) )
-
-            my $lhs_xrl = $grammar_c->_marpa_g_nsy_lhs_xrl($id);
-            if (    defined $lhs_xrl
-                and defined $grammar_c->sequence_min($lhs_xrl) )
-            {
-                my $original_lhs_id = $grammar_c->rule_lhs($lhs_xrl);
-                $name = $self->symbol_name($original_lhs_id) . '[Seq]';
-                last GEN_NAME;
-            } ## end if ( defined $lhs_xrl and defined $grammar_c->sequence_min...)
-
-            my $xrl_offset = $grammar_c->_marpa_g_nsy_xrl_offset($id);
-            if ($xrl_offset) {
-                my $original_lhs_id = $grammar_c->rule_lhs($lhs_xrl);
-                $name =
-                    $self->symbol_name($original_lhs_id) . '[R'
-                  . $lhs_xrl . q{:}
-                  . $xrl_offset . ']';
-                last GEN_NAME;
-            } ## end if ($xrl_offset)
-
-            my $source_id = $grammar_c->_marpa_g_source_xsy($id);
-            $name = $self->symbol_name($source_id);
-            $name .= '[]' if $grammar_c->_marpa_g_nsy_is_nulling($id);
-
-        } ## end GEN_NAME:
-
-        return $name;
-    }
 } ## end sub isy_name
 
 sub show_rule {
