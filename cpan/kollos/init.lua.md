@@ -1301,6 +1301,47 @@ whose id is `id`.
 
 ```
 
+```
+    -- miranda: section+ grammar Libmarpa wrapper Lua functions
+
+    function kollos.class_grammar.isy_name(lmw_g, nsy_id)
+         -- start symbol
+         local nsy_is_start = 0 ~= lmw_g:_nsy_is_start(nsy_id)
+         if nsy_is_start then
+             local xsy_id = lmw_g:_source_xsy(nsy_id)
+             local xsy_name = lmw_g:symbol_name(xsy_id)
+             return xsy_name .. "[']"
+         end
+
+         -- sequence LHS
+         local lhs_xrl = lmw_g:_nsy_lhs_xrl(nsy_id)
+         if lhs_xrl and lmw_g:sequence_min(lhs_xrl) then
+             local original_lhs_id = lmw_g:rule_lhs(lhs_xrl)
+             local lhs_name = lmw_g:symbol_name(original_lhs_id)
+             return lhs_name .. "[Seq]"
+         end
+
+         -- virtual symbol
+         local xrl_offset = lmw_g:_nsy_xrl_offset(nsy_id)
+         if xrl_offset and xrl_offset > 0 then
+             local original_lhs_id = lmw_g:rule_lhs(lhs_xrl)
+             local lhs_name = lmw_g:symbol_name(original_lhs_id)
+             return string.format("%s[R%d:%d]",
+                 lhs_name, lhs_xrl, xrl_offset)
+         end
+
+         -- real symbol or nulling equivalent
+         local xsy_id = lmw_g:_source_xsy(nsy_id)
+         local xsy_name = lmw_g:symbol_name(xsy_id)
+         local is_nulling = 0 ~= lmw_g:_nsy_is_nulling(nsy_id)
+         if is_nulling then
+             xsy_name = xsy_name .. "[]"
+         end
+         return xsy_name
+    end
+
+```
+
 ## The recognizer Libmarpa wrapper
 
 ## The valuator Libmarpa wrapper
