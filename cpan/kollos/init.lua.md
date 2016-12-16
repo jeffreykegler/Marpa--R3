@@ -3342,6 +3342,7 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
         return 1;
     }
 
+    /* -1 is a valid result, so ahm_position() is a special case */
     static int lca_grammar_ahm_position(lua_State *L)
     {
         Marpa_Grammar self;

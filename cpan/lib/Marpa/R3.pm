@@ -76,10 +76,6 @@ require Marpa::R3::MetaG;
 ( $version_result = version_ok($Marpa::R3::MetaG::VERSION) )
     and die 'Marpa::R3::MetaG::VERSION ', $version_result;
 
-require Marpa::R3::Thin::G;
-( $version_result = version_ok($Marpa::R3::Thin::G::VERSION) )
-    and die 'Marpa::R3::Thin::G::VERSION ', $version_result;
-
 require Marpa::R3::Trace::G;
 ( $version_result = version_ok($Marpa::R3::Trace::G::VERSION) )
     and die 'Marpa::R3::Trace::G::VERSION ', $version_result;
