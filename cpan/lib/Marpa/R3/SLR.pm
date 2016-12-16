@@ -1874,9 +1874,16 @@ sub Marpa::R3::Scanless::R::show_token_link_choice {
     if ( defined $predecessor_ahm ) {
         my $middle_set_id = $recce_c->_marpa_r_source_middle();
         $middle_earleme = $recce_c->earleme($middle_set_id);
+
+        my ($ahm_desc) = $slr->exec_sig(
+            <<'END_OF_LUA', 'i', $predecessor_ahm);
+        local recce, ahm_id = ...
+        return recce.slg.lmw_g1g:ahm_describe(ahm_id)
+END_OF_LUA
+
         push @pieces,
               'c='
-            . $grammar_c->ahm_describe($predecessor_ahm)
+            . $ahm_desc
             . q{@}
             . $origin_earleme . q{-}
             . $middle_earleme;
@@ -1914,15 +1921,28 @@ sub Marpa::R3::Scanless::R::show_completion_link_choice {
     my $middle_set_id     = $recce_c->_marpa_r_source_middle();
     my $middle_earleme    = $recce_c->earleme($middle_set_id);
 
+    my ($ahm_desc) = $slr->exec_sig(
+        <<'END_OF_LUA', 'i', $predecessor_state);
+    local recce, ahm_id = ...
+    return recce.slg.lmw_g1g:ahm_describe(ahm_id)
+END_OF_LUA
+
     if ( defined $predecessor_state ) {
         push @pieces,
               'p='
-            . $grammar_c->ahm_describe($predecessor_state) . q{@}
+            . $ahm_desc . '@'
             . $origin_earleme . q{-}
             . $middle_earleme;
     } ## end if ( defined $predecessor_state )
+
+    ($ahm_desc) = $slr->exec_sig(
+        <<'END_OF_LUA', 'i', $link_ahm_id);
+    local recce, ahm_id = ...
+    return recce.slg.lmw_g1g:ahm_describe(ahm_id)
+END_OF_LUA
+
     push @pieces,
-          'c=' . $grammar_c->ahm_describe($link_ahm_id) . q{@}
+          'c=' . $ahm_desc . q{@}
         . $middle_earleme . q{-}
         . $current_earleme;
     return '[' . ( join '; ', @pieces ) . ']';
@@ -1944,8 +1964,15 @@ sub Marpa::R3::Scanless::R::show_leo_link_choice {
     my $leo_transition_symbol =
         $recce_c->_marpa_r_source_leo_transition_symbol();
     push @pieces, 'l=L' . $leo_transition_symbol . q{@} . $middle_earleme;
+
+    my ($ahm_desc) = $slr->exec_sig(
+        <<'END_OF_LUA', 'i', $link_ahm_id);
+    local recce, ahm_id = ...
+    return recce.slg.lmw_g1g:ahm_describe(ahm_id)
+END_OF_LUA
+
     push @pieces,
-          'c=' . $grammar_c->ahm_describe($link_ahm_id)
+          'c=' . $ahm_desc
         . q{@}
         . $middle_earleme . q{-}
         . $current_earleme;
@@ -1968,14 +1995,28 @@ sub Marpa::R3::Scanless::R::show_earley_item {
     my $origin_set_id  = $recce_c->_marpa_r_earley_item_origin();
     my $earleme        = $recce_c->earleme($current_es);
     my $origin_earleme = $recce_c->earleme($origin_set_id);
+
+    my ($ahm_desc) = $slr->exec_sig(
+        <<'END_OF_LUA', 'i', $ahm_id_of_yim);
+    local recce, ahm_id = ...
+    return recce.slg.lmw_g1g:ahm_describe(ahm_id)
+END_OF_LUA
+
     $text .= sprintf "ahm%d: %s@%d-%d", $ahm_id_of_yim,
-        $grammar_c->ahm_describe($ahm_id_of_yim),
+        $ahm_desc,
         $origin_earleme, $earleme;
     my @lines    = $text;
     my $irl_id = $grammar_c->_marpa_g_ahm_irl($ahm_id_of_yim);
     my $dot_position = $grammar_c->_marpa_g_ahm_position($ahm_id_of_yim);
+
+    ($ahm_desc) = $slr->exec_sig(
+        <<'END_OF_LUA', 'i', $ahm_id_of_yim);
+    local recce, ahm_id = ...
+    return recce.slg.lmw_g1g:ahm_describe(ahm_id)
+END_OF_LUA
+
     push @lines, qq{  }
-        . $grammar_c->ahm_describe($ahm_id_of_yim)
+        . $ahm_desc
         . q{: }
         . $tracer->show_dotted_irl($irl_id, $dot_position);
     my @sort_data = ();

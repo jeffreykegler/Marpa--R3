@@ -67,9 +67,9 @@ OTHER DEALINGS IN THE SOFTWARE.
     * [Return the top index of the stack](#return-the-top-index-of-the-stack)
     * [Return the value of a stack entry](#return-the-value-of-a-stack-entry)
     * [Set the value of a stack entry](#set-the-value-of-a-stack-entry)
-* [The Kollos grammar](#the-kollos-grammar)
-* [The Kollos recognizer](#the-kollos-recognizer)
-* [The Kollos valuator](#the-kollos-valuator)
+* [The grammar Libmarpa wrapper](#the-grammar-libmarpa-wrapper)
+* [The recognizer Libmarpa wrapper](#the-recognizer-libmarpa-wrapper)
+* [The valuator Libmarpa wrapper](#the-valuator-libmarpa-wrapper)
   * [Initialize a valuator](#initialize-a-valuator)
   * [Reset a valuator](#reset-a-valuator)
 * [Diagnostics](#diagnostics)
@@ -1301,6 +1301,16 @@ whose id is `id`.
         return string.format('R%d', symbol_id)
     end
 
+
+    function kollos.class_grammar.ahm_describe(lmw_g, ahm_id)
+        local irl_id = lmw_g:_ahm_irl(ahm_id)
+        local dot_position = lmw_g:_ahm_position(ahm_id)
+        if dot_position < 0 then
+            return string.format('R%d$', irl_id)
+        end
+        return string.format('R%d:%d', irl_id, dot_position)
+    end
+
 ```
 
 ```
@@ -1937,7 +1947,6 @@ the wrapper's point of view, marpa_r_alternative() always succeeds.
     {"_marpa_v_trace", "int", "flag"},
     {"_marpa_g_ahm_count"},
     {"_marpa_g_ahm_irl", "Marpa_AHM_ID", "item_id"},
-    {"_marpa_g_ahm_position", "Marpa_AHM_ID", "item_id"},
     {"_marpa_g_ahm_postdot", "Marpa_AHM_ID", "item_id"},
     {"_marpa_g_irl_count"},
     {"_marpa_g_irl_is_virtual_rhs", "Marpa_IRL_ID", "irl_id"},
@@ -3333,11 +3342,42 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
         return 1;
     }
 
+    static int lca_grammar_ahm_position(lua_State *L)
+    {
+        Marpa_Grammar self;
+        const int self_stack_ix = 1;
+        Marpa_AHM_ID item_id;
+        int result;
+
+        if (1) {
+            marpa_luaL_checktype (L, self_stack_ix, LUA_TTABLE);
+            marpa_luaL_checkinteger (L, 2);
+        }
+        {
+            const lua_Integer this_arg = marpa_lua_tointeger (L, -1);
+            marpa_luaL_argcheck (L, (-(1 << 30) <= this_arg
+                    && this_arg <= (1 << 30)), -1, "argument out of range");
+            item_id = (Marpa_AHM_ID) this_arg;
+            marpa_lua_pop (L, 1);
+        }
+        marpa_lua_getfield (L, -1, "_libmarpa");
+        self = *(Marpa_Grammar *) marpa_lua_touserdata (L, -1);
+        marpa_lua_pop (L, 1);
+        result = (int) _marpa_g_ahm_position (self, item_id);
+        if (result < -1) {
+            return libmarpa_error_handle (L, self_stack_ix,
+                "lca_grammar_ahm_position()");
+        }
+        marpa_lua_pushinteger (L, (lua_Integer) result);
+        return 1;
+    }
+
     static const struct luaL_Reg grammar_methods[] = {
       { "error", lca_libmarpa_error },
       { "precompute", lca_grammar_precompute },
       { "rule_new", lca_grammar_rule_new },
       { "sequence_new", lca_grammar_sequence_new },
+      { "_ahm_position", lca_grammar_ahm_position },
       { NULL, NULL },
     };
 
