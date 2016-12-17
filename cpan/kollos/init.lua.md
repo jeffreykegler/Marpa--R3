@@ -1994,7 +1994,6 @@ the wrapper's point of view, marpa_r_alternative() always succeeds.
     {"_marpa_r_source_leo_transition_symbol"},
     {"_marpa_r_source_middle"},
     {"_marpa_r_source_predecessor_state"},
-    -- {"_marpa_r_source_token", "int", "*value_p"},
     {"_marpa_r_trace_earley_set"},
     {"_marpa_b_and_node_cause", "Marpa_And_Node_ID", "ordinal"},
     {"_marpa_b_and_node_count"},
@@ -3464,13 +3463,36 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
       return 1;
     }
 
+    /* special-cased because two return values */
+    static int lca_recce_source_token( lua_State *L )
+    {
+      Marpa_Recognizer self;
+      const int self_stack_ix = 1;
+      int result;
+      int value;
+
+      if (1) {
+        marpa_luaL_checktype(L, self_stack_ix, LUA_TTABLE);  }
+      marpa_lua_getfield (L, -1, "_libmarpa");
+      self = *(Marpa_Recognizer*)marpa_lua_touserdata (L, -1);
+      marpa_lua_pop(L, 1);
+      result = (int)_marpa_r_source_token(self, &value);
+      if (result == -1) { marpa_lua_pushnil(L); return 1; }
+      if (result < -1) {
+       return libmarpa_error_handle(L, self_stack_ix, "lca_recce_source_token()");
+      }
+      marpa_lua_pushinteger(L, (lua_Integer)result);
+      marpa_lua_pushinteger(L, (lua_Integer)value);
+      return 2;
+    }
+
     static const struct luaL_Reg recce_methods[] = {
       { "error", lca_libmarpa_error },
       { "terminals_expected", lca_recce_terminals_expected },
       { "progress_item", lca_recce_progress_item },
+      { "_source_token", lca_recce_source_token },
       { NULL, NULL },
     };
-
 
     -- miranda: section+ C function declarations
 

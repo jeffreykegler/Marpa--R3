@@ -1863,18 +1863,41 @@ sub Marpa::R3::Scanless::R::show_token_link_choice {
         $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
 
-    my $text    = q{};
+    my ($link_data) = $slr->exec_sig(<<'END_OF_LUA', '');
+    -- turn this into show_token_link_choice()
+    local recce = ...
+    local g1r = recce.lmw_g1r
+    local g1g = recce.slg.lmw_g1g
+    local result = {}
+    local token_id, value_ix = g1r:_source_token()
+    local predecessor_ahm = g1r:_source_predecessor_state()
+    local origin_set_id = g1r:_earley_item_origin()
+    local origin_earleme = g1r:earleme(origin_set_id)
+    local middle_earleme = origin_earleme
+    if predecessor_ahm then
+        local middle_set_id = g1r:_source_middle()
+        middle_earleme = g1r:earleme(middle_set_id)
+    end
+    local token_name = g1g:isy_name(token_id)
+    result.predecessor_ahm = predecessor_ahm
+    result.origin_earleme = origin_earleme
+    result.middle_earleme = middle_earleme
+    result.token_name = token_name
+    result.token_id = token_id
+    result.value_ix = value_ix
+    if value_ix ~= 2 then
+        result.value = recce.token_values[value_ix]
+    end
+    return result
+END_OF_LUA
+
+    my $middle_earleme = $link_data->{middle_earleme};
+    my $origin_earleme = $link_data->{origin_earleme};
+
     my @pieces  = ();
     my ( $token_id, $value_ix ) = $recce_c->_marpa_r_source_token();
-    my $predecessor_ahm = $recce_c->_marpa_r_source_predecessor_state();
-    my $origin_set_id     = $recce_c->_marpa_r_earley_item_origin();
-    my $origin_earleme    = $recce_c->earleme($origin_set_id);
-    my $middle_earleme    = $origin_earleme;
-
+    my $predecessor_ahm = $link_data->{predecessor_ahm};
     if ( defined $predecessor_ahm ) {
-        my $middle_set_id = $recce_c->_marpa_r_source_middle();
-        $middle_earleme = $recce_c->earleme($middle_set_id);
-
         my ($ahm_desc) = $slr->exec_sig(
             <<'END_OF_LUA', 'i', $predecessor_ahm);
         local recce, ahm_id = ...
@@ -1885,21 +1908,17 @@ END_OF_LUA
               'c='
             . $ahm_desc
             . q{@}
-            . $origin_earleme . q{-}
+            . $origin_earleme. q{-}
             . $middle_earleme;
     } ## end if ( defined $predecessor_ahm )
-    my $symbol_name = $tracer->isy_name($token_id);
-    push @pieces, 's=' . $symbol_name;
-    my $token_length = $current_earleme - $middle_earleme;
-    my $value;
-    if ($value_ix == 2) {
+
+    push @pieces, 's=' . $link_data->{token_name};
+
+    my $value = $link_data->{value};
+    if (not defined $value) {
         # Value is literal
+        my $token_length = $current_earleme - $middle_earleme;
         $value = $slr->g1_literal ( $middle_earleme, $token_length);
-    } else {
-        ($value) = $slr->exec_sig(<<'END_OF_LUA', $value_ix);
-        local recce, value_ix = ...
-        return recce.token_values[value_ix]
-END_OF_LUA
     }
     my $token_dump = Data::Dumper->new( [ \$value ] )->Terse(1)->Dump;
     chomp $token_dump;
