@@ -262,7 +262,7 @@ sub Marpa::R3::Scanless::R::new {
 
     Marpa::R3::Internal::Scanless::convert_libmarpa_events($slr);
 
-    $slr->exec(<<'END_OF_LUA');
+    $slr->exec_sig(<<'END_OF_LUA', '');
     local recce = ...
 
     recce.token_values = {}
@@ -1896,7 +1896,10 @@ END_OF_LUA
         # Value is literal
         $value = $slr->g1_literal ( $middle_earleme, $token_length);
     } else {
-        $value = $slr->[Marpa::R3::Internal::Scanless::R::R_C]->token_value($value_ix);
+        ($value) = $slr->exec_sig(<<'END_OF_LUA', $value_ix);
+        local recce, value_ix = ...
+        return recce.token_values[value_ix]
+END_OF_LUA
     }
     my $token_dump = Data::Dumper->new( [ \$value ] )->Terse(1)->Dump;
     chomp $token_dump;
