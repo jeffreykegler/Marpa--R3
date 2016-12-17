@@ -6272,25 +6272,6 @@ PPCODE:
 
 
 void
-token_value(outer_slr, token_ix)
-    Outer_R *outer_slr;
-    int token_ix;
-PPCODE:
-{
-  Scanless_R *slr = slr_inner_get(outer_slr);
-  SV **p_token_value_sv;
-  p_token_value_sv = av_fetch (slr->token_values, (I32) token_ix, 0);
-  if (!p_token_value_sv)
-    {
-      char *error_message =
-        form ( "$slr->token_value(): No token value for index %lu",
-         (unsigned long) token_ix);
-      XSRETURN_PV(error_message);
-    }
-  XPUSHs (sv_2mortal (SvREFCNT_inc_simple_NN (*p_token_value_sv)));
-}
-
-void
 stack_step( outer_slr )
     Outer_R *outer_slr;
 PPCODE:
