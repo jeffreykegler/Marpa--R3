@@ -1056,7 +1056,6 @@ sub Marpa::R3::Scanless::R::read_problem {
     my $trace_file_handle =
         $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
 
-    my $thin_g1_recce    = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
     my $g1_tracer =
         $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
 
@@ -1857,11 +1856,7 @@ sub Marpa::R3::Scanless::R::show_leo_item {
 # Assumes trace token source link set by caller
 sub Marpa::R3::Scanless::R::show_token_link_choice {
     my ( $slr, $current_earleme ) = @_;
-    my $recce_c                = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $tracer =
-        $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
-    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
 
     my ($link_data) = $slr->exec_sig(<<'END_OF_LUA', '');
     -- turn this into show_token_link_choice()
@@ -1895,7 +1890,6 @@ END_OF_LUA
     my $origin_earleme = $link_data->{origin_earleme};
 
     my @pieces  = ();
-    my ( $token_id, $value_ix ) = $recce_c->_marpa_r_source_token();
     my $predecessor_ahm = $link_data->{predecessor_ahm};
     if ( defined $predecessor_ahm ) {
         my ($ahm_desc) = $slr->exec_sig(
