@@ -214,7 +214,7 @@ sub Marpa::R3::Scanless::R::new {
     # Events are already initialized as described by
     # the DSL.  Here we override that with the recce arg, if
     # necessary.
-    
+
     EVENT: for my $event_name ( keys %{$event_is_active_arg} ) {
 
         my $is_active = $event_is_active_arg->{$event_name};
@@ -972,9 +972,9 @@ sub Marpa::R3::Scanless::R::resume {
             # Recover by registering character, if we can
             my $codepoint = $thin_slr->codepoint();
             # say STDERR ${$slr->[Marpa::R3::Internal::Scanless::R::P_INPUT_STRING]} ;
-            # say STDERR 
+            # say STDERR
                 # utf8::is_utf8( ${$slr->[Marpa::R3::Internal::Scanless::R::P_INPUT_STRING]} ) ? "is utf8" : "is NOT utf8";
-            my $character = 
+            my $character =
                 substr ${$slr->[Marpa::R3::Internal::Scanless::R::P_INPUT_STRING]},
                    $thin_slr->pos(), 1;
            # say STDERR join " ", "Character via string vs. codepoint:", $character, (ord $character), (chr $codepoint), $codepoint;
@@ -1923,75 +1923,77 @@ END_OF_LUA
 # Assumes trace completion source link set by caller
 sub Marpa::R3::Scanless::R::show_completion_link_choice {
     my ( $slr, $link_ahm_id, $current_earleme ) = @_;
-    my $recce_c                = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $tracer =
-        $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
-    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
- 
-    my $text    = q{};
-    my @pieces  = ();
-    my $predecessor_state = $recce_c->_marpa_r_source_predecessor_state();
-    my $origin_set_id     = $recce_c->_marpa_r_earley_item_origin();
-    my $origin_earleme    = $recce_c->earleme($origin_set_id);
-    my $middle_set_id     = $recce_c->_marpa_r_source_middle();
-    my $middle_earleme    = $recce_c->earleme($middle_set_id);
 
-    my ($ahm_desc) = $slr->exec_sig(
-        <<'END_OF_LUA', 'i', $predecessor_state);
+    my ($link_data) = $slr->exec_sig( <<'END_OF_LUA', 'i', $link_ahm_id );
+    local recce, ahm_id = ...
+    local g1r = recce.lmw_g1r
+    local predecessor_state = g1r:_source_predecessor_state()
+    local origin_set_id = g1r:_earley_item_origin()
+    local origin_earleme = g1r:earleme(origin_set_id)
+    local middle_set_id = g1r:_source_middle()
+    local middle_earleme = g1r:earleme(middle_set_id)
+    local result = {}
+    result.predecessor_state = predecessor_state
+    result.origin_earleme = origin_earleme
+    result.middle_earleme = middle_earleme
+    return result
+END_OF_LUA
+
+    my $predecessor_state = $link_data->{predecessor_state};
+    my $origin_earleme    = $link_data->{origin_earleme};
+    my $middle_earleme    = $link_data->{middle_earleme};
+
+    my ($ahm_desc) = $slr->exec_sig( <<'END_OF_LUA', 'i', $predecessor_state );
     local recce, ahm_id = ...
     return recce.slg.lmw_g1g:ahm_describe(ahm_id)
 END_OF_LUA
 
+    my @pieces = ();
     if ( defined $predecessor_state ) {
         push @pieces,
-              'p='
-            . $ahm_desc . '@'
-            . $origin_earleme . q{-}
-            . $middle_earleme;
+          'p=' . $ahm_desc . '@' . $origin_earleme . q{-} . $middle_earleme;
     } ## end if ( defined $predecessor_state )
 
-    ($ahm_desc) = $slr->exec_sig(
-        <<'END_OF_LUA', 'i', $link_ahm_id);
+    ($ahm_desc) = $slr->exec_sig( <<'END_OF_LUA', 'i', $link_ahm_id );
     local recce, ahm_id = ...
     return recce.slg.lmw_g1g:ahm_describe(ahm_id)
 END_OF_LUA
 
     push @pieces,
-          'c=' . $ahm_desc . q{@}
-        . $middle_earleme . q{-}
-        . $current_earleme;
+      'c=' . $ahm_desc . q{@} . $middle_earleme . q{-} . $current_earleme;
     return '[' . ( join '; ', @pieces ) . ']';
 }
 
 # Assumes trace completion source link set by caller
 sub Marpa::R3::Scanless::R::show_leo_link_choice {
     my ( $slr, $link_ahm_id, $current_earleme ) = @_;
-    my $recce_c                = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
-    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $tracer =
-        $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
-    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
 
-    my $text           = q{};
-    my @pieces         = ();
-    my $middle_set_id  = $recce_c->_marpa_r_source_middle();
-    my $middle_earleme = $recce_c->earleme($middle_set_id);
-    my $leo_transition_symbol =
-        $recce_c->_marpa_r_source_leo_transition_symbol();
+    my ($link_data) = $slr->exec_sig( <<'END_OF_LUA', '');
+    local recce = ...
+    local g1r = recce.lmw_g1r
+    local middle_set_id = g1r:_source_middle()
+    local middle_earleme = g1r:earleme(middle_set_id)
+    local leo_transition_symbol = g1r:_source_leo_transition_symbol()
+    local result = {}
+    result.middle_earleme = middle_earleme
+    result.leo_transition_symbol = leo_transition_symbol
+    return result
+END_OF_LUA
+
+    my $middle_earleme        = $link_data->{middle_earleme};
+    my $leo_transition_symbol = $link_data->{leo_transition_symbol};
+
+    my @pieces = ();
     push @pieces, 'l=L' . $leo_transition_symbol . q{@} . $middle_earleme;
 
-    my ($ahm_desc) = $slr->exec_sig(
-        <<'END_OF_LUA', 'i', $link_ahm_id);
+    my ($ahm_desc) = $slr->exec_sig( <<'END_OF_LUA', 'i', $link_ahm_id );
     local recce, ahm_id = ...
     return recce.slg.lmw_g1g:ahm_describe(ahm_id)
 END_OF_LUA
 
     push @pieces,
-          'c=' . $ahm_desc
-        . q{@}
-        . $middle_earleme . q{-}
-        . $current_earleme;
+      'c=' . $ahm_desc . q{@} . $middle_earleme . q{-} . $current_earleme;
     return '[' . ( join '; ', @pieces ) . ']';
 } ## end sub Marpa::R3::show_leo_link_choice
 
@@ -2219,7 +2221,7 @@ END_OF_LUA
                 recce, or_node_id, choice_ix = ...
                 return recce.lmw_o:_and_order_get(or_node_id+0, choice_ix+0)
 END_OF_LUA
-            
+
             last CHOICE if not defined $and_node_id;
             $text .= " o$or_node_id" . '[' . $choice_ix . ']';
             if ( defined $this_choice and $this_choice == $choice_ix ) {
