@@ -1356,6 +1356,20 @@ whose id is `id`.
 
 ## The recognizer Libmarpa wrapper
 
+```
+    -- miranda: section+ recognizer Libmarpa wrapper Lua functions
+    function earley_set_data(lmw_r, set_id)
+        local lmw_g = lmw_r.lmw_g
+        -- print(inspect(lmw_g))
+    end
+
+    function g1_earley_set_data(recce, set_id)
+        local lmw_r = recce.lmw_g1r
+        return earley_set_data(lmw_r, set_id)
+    end
+
+```
+
 ## The valuator Libmarpa wrapper
 
 The "valuator" portion of Kollos produces the
@@ -2111,6 +2125,8 @@ It is specified directly, which can be easier for a first reading.
         |    marpa_lua_setfield (L, !NAME!_stack_ix, "_libmarpa");
         |    marpa_lua_getfield (L, !BASE_NAME!_stack_ix, "_libmarpa_g");
         |    marpa_lua_setfield (L, !NAME!_stack_ix, "_libmarpa_g");
+        |    marpa_lua_getfield (L, !BASE_NAME!_stack_ix, "lmw_g");
+        |    marpa_lua_setfield (L, !NAME!_stack_ix, "lmw_g");
         |    marpa_lua_getfield (L, !BASE_NAME!_stack_ix, "_libmarpa");
         |    !BASE_NAME!_ud = (!BASE_TYPE! *) marpa_lua_touserdata (L, -1);
         |
@@ -2194,6 +2210,8 @@ so you may find it easer to read it first.
         /* [ class_table, class_ud ] */
 
         marpa_lua_setfield (L, bocage_stack_ix, "_libmarpa");
+        marpa_lua_getfield (L, recce_stack_ix, "lmw_g");
+        marpa_lua_setfield (L, bocage_stack_ix, "lmw_g");
         marpa_lua_getfield (L, recce_stack_ix, "_libmarpa_g");
         marpa_lua_setfield (L, bocage_stack_ix, "_libmarpa_g");
         marpa_lua_getfield (L, recce_stack_ix, "_libmarpa");
@@ -2290,6 +2308,7 @@ a special "configuration" argument.
     -- miranda: insert VM operations
     -- miranda: insert SLIF recognizer Lua functions
     -- miranda: insert grammar Libmarpa wrapper Lua functions
+    -- miranda: insert recognizer Libmarpa wrapper Lua functions
     -- miranda: insert valuator Libmarpa wrapper Lua functions
     -- miranda: insert diagnostics
     -- miranda: insert Utilities for Perl code

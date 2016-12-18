@@ -5117,7 +5117,8 @@ PPCODE:
 
   xlua_sig_call (outer_slr->L,
       "local recce = ...\n"
-      "recce.event_queue = {}\n",
+      "recce.event_queue = {}\n"
+      "recce.lmw_g1r.lmw_g = recce.slg.lmw_g1g\n",
       "R>", outer_slr->lua_ref);
 
   new_sv = sv_newmortal ();
