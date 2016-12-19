@@ -2291,6 +2291,10 @@ a special "configuration" argument.
             }
         }
 
+        /* Set my "lmw_g" field to myself */
+        marpa_lua_pushvalue (L, grammar_stack_ix);
+        marpa_lua_setfield (L, grammar_stack_ix, "lmw_g");
+
         marpa_lua_settop (L, grammar_stack_ix);
         /* [ grammar_table ] */
         return 1;
@@ -2902,7 +2906,7 @@ Set "strict" globals, using code taken from strict.lua.
     }
 
     /* Handle libmarpa errors in the most usual way.
-       Uses 1 position on the stack, and throws the
+       Uses 2 positions on the stack, and throws the
        error, if so desired.
        The error may be thrown or not thrown.
        The caller is expected to handle any non-thrown error.
@@ -2913,10 +2917,13 @@ Set "strict" globals, using code taken from strict.lua.
     {
       Marpa_Error_Code error_code;
       Marpa_Grammar *grammar_ud;
-      marpa_lua_getfield (L, stack_ix, "_libmarpa_g");
+      const int base_of_stack = marpa_lua_gettop(L);
+
+      marpa_lua_getfield (L, stack_ix, "lmw_g");
+      marpa_lua_getfield (L, -1, "_libmarpa");
       /* [ ..., grammar_ud ] */
       grammar_ud = (Marpa_Grammar *) marpa_lua_touserdata (L, -1);
-      marpa_lua_pop(L, 1);
+      marpa_lua_settop(L, base_of_stack);
       error_code = marpa_g_error (*grammar_ud, NULL);
       return libmarpa_error_code_handle(L, error_code, details);
     }
