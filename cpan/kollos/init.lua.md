@@ -1358,14 +1358,56 @@ whose id is `id`.
 
 ```
     -- miranda: section+ recognizer Libmarpa wrapper Lua functions
-    function earley_set_data(lmw_r, set_id)
+    function kollos.class_recce.earley_item_data(lmw_r, set_id, item_id)
+    end
+
+    function kollos.class_recce.leo_item_data(lmw_r)
         local lmw_g = lmw_r.lmw_g
-        -- print(inspect(lmw_g))
+        local leo_base_state = lmw_r:_leo_base_state()
+        if not leo_base_state then return {} end
+        local trace_earley_set = lmw_r:_trace_earley_set()
+        local trace_earleme = lmw_r:earleme(trace_earley_set)
+        local postdot_symbol_id = lmw_r:_postdot_item_symbol()
+        local postdot_symbol_name = lmw_g:isy_name(postdot_symbol_id)
+        local predecessor_symbol_id = lmw_r:_leo_predecessor_symbol()
+        local base_origin_set_id = lmw_r:_leo_base_origin()
+        local base_origin_earleme = lmw_r:earleme(base_origin_set_id)
+        return {
+            postdot_symbol_name = postdot_symbol_name,
+            predecessor_symbol_id = predecessor_symbol_id,
+            base_origin_earleme = base_origin_earleme,
+            leo_base_state = leo_base_state,
+            trace_earleme = trace_earleme
+        }
+    end
+
+    function kollos.class_recce.earley_set_data(lmw_r, set_id)
+        local lmw_g = lmw_r.lmw_g
+        local data = {}
+        local result = lmw_r:_earley_set_trace(set_id)
+        if not result then return '' end
+        local item_id = 0
+        while true do
+            local item_data = lmw_r:earley_item_data(set_id, item_id)
+            if not item_data then break end
+            data[#data+1] = item_data
+        end
+        data.leo = {}
+        local postdot_symbol_id = lmw_r:_first_postdot_item_trace();
+        while postdot_symbol_id do
+            -- If there is no base Earley item,
+            -- then this is not a Leo item, so we skip it
+            local leo_item_data = lmw_r:leo_item_data()
+            if leo_item_data then
+                data.leo[#data.leo+1] = leo_item_data
+            end
+            postdot_symbol_id = lmw_r:_next_postdot_item_trace()
+        end
     end
 
     function g1_earley_set_data(recce, set_id)
         local lmw_r = recce.lmw_g1r
-        return earley_set_data(lmw_r, set_id)
+        return lmw_r:earley_set_data(set_id)
     end
 
 ```
@@ -2123,8 +2165,6 @@ It is specified directly, which can be easier for a first reading.
         |    /* [ class_table, class_ud ] */
         |
         |    marpa_lua_setfield (L, !NAME!_stack_ix, "_libmarpa");
-        |    marpa_lua_getfield (L, !BASE_NAME!_stack_ix, "_libmarpa_g");
-        |    marpa_lua_setfield (L, !NAME!_stack_ix, "_libmarpa_g");
         |    marpa_lua_getfield (L, !BASE_NAME!_stack_ix, "lmw_g");
         |    marpa_lua_setfield (L, !NAME!_stack_ix, "lmw_g");
         |    marpa_lua_getfield (L, !BASE_NAME!_stack_ix, "_libmarpa");
@@ -2212,8 +2252,6 @@ so you may find it easer to read it first.
         marpa_lua_setfield (L, bocage_stack_ix, "_libmarpa");
         marpa_lua_getfield (L, recce_stack_ix, "lmw_g");
         marpa_lua_setfield (L, bocage_stack_ix, "lmw_g");
-        marpa_lua_getfield (L, recce_stack_ix, "_libmarpa_g");
-        marpa_lua_setfield (L, bocage_stack_ix, "_libmarpa_g");
         marpa_lua_getfield (L, recce_stack_ix, "_libmarpa");
         recce_ud = (Marpa_Recognizer *) marpa_lua_touserdata (L, -1);
 
@@ -2280,9 +2318,7 @@ a special "configuration" argument.
             marpa_lua_setmetatable (L, -2);
             /* [ grammar_table, class_ud ] */
 
-            marpa_lua_pushvalue (L, -1);
             marpa_lua_setfield (L, grammar_stack_ix, "_libmarpa");
-            marpa_lua_setfield (L, grammar_stack_ix, "_libmarpa_g");
 
             marpa_c_init (&marpa_configuration);
             *grammar_ud = marpa_g_new (&marpa_configuration);
@@ -2930,7 +2966,7 @@ Set "strict" globals, using code taken from strict.lua.
 
     /* A wrapper for libmarpa_error_handle to conform with the
      * Lua C API.  The only argument must be a Libmarpa wrapper
-     * object.  These all define the `_libmarpa_g` field.
+     * object.  These all define the `lmw_g` field.
      */
     static int
     lca_libmarpa_error(lua_State* L)
@@ -3008,15 +3044,6 @@ so the caller must make sure that one is available.
         marpa_lua_pushvalue (L, -1);
         /* [ userdata, userdata ] */
         marpa_lua_setfield (L, lmw_g_stack_ix, "_libmarpa");
-        /* [ userdata ] */
-
-        /* _libmarpa_g is just a dup of _libmarpa but is here for
-         * orthogonality with the other Kollos Libmarpa wrappers.
-         */
-        /* dup top of stack */
-        marpa_lua_pushvalue (L, -1);
-        /* [ userdata, userdata ] */
-        marpa_lua_setfield (L, lmw_g_stack_ix, "_libmarpa_g");
         /* [ userdata ] */
 
         *p_g = g;

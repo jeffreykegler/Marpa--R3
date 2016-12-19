@@ -3336,28 +3336,6 @@ dummyup_recce(
     marpa_lua_settop (L, recce_object_ix);
     /* [ slr_table, recce_obj ] */
 
-    {
-        Scanless_R *slr;
-        Marpa_Grammar g;
-        marpa_lua_getfield (L, slr_object_ix, "lud");
-        /* Lua stack: [ slr_table, recce_obj, lud ] */
-
-        slr = marpa_lua_touserdata (L, -1);
-        marpa_lua_settop (L, recce_object_ix);
-        /* [ slr_table, recce_obj ] */
-
-        g = slr->slg->g1;
-        /* Add new g userdatum --
-         * it must own a reference to the Libmarpa
-         * grammar.
-         */
-        marpa_g_ref (g);
-        marpa_gen_grammar_ud (L, g);
-        /* [ slr_table, recce_obj, grammar_ud ] */
-        marpa_lua_setfield (L, recce_object_ix, "_libmarpa_g");
-        /* [ slr_table, recce_obj ] */
-    }
-
     /* Add t userdatum here */
     marpa_gen_recce_ud (L, recce);
     /* [ slr_table, recce_obj, recce_ud ] */
