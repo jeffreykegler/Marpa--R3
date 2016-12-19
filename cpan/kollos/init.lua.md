@@ -1358,9 +1358,6 @@ whose id is `id`.
 
 ```
     -- miranda: section+ recognizer Libmarpa wrapper Lua functions
-    function kollos.class_recce.earley_item_data(lmw_r, set_id, item_id)
-    end
-
     function kollos.class_recce.leo_item_data(lmw_r)
         local lmw_g = lmw_r.lmw_g
         local leo_base_state = lmw_r:_leo_base_state()
@@ -1381,6 +1378,51 @@ whose id is `id`.
         }
     end
 
+    function kollos.class_recce.token_link_data(lmw_r)
+        local lmw_g = lmw_r.lmw_g
+        local result = {}
+        local token_id, value_ix = lmw_r:_source_token()
+        local predecessor_ahm = lmw_r:_source_predecessor_state()
+        local origin_set_id = lmw_r:_earley_item_origin()
+        local origin_earleme = lmw_r:earleme(origin_set_id)
+        local middle_earleme = origin_earleme
+        if predecessor_ahm then
+            local middle_set_id = lmw_r:_source_middle()
+            middle_earleme = lmw_r:earleme(middle_set_id)
+        end
+        local token_name = lmw_g:isy_name(token_id)
+        result.predecessor_ahm = predecessor_ahm
+        result.origin_earleme = origin_earleme
+        result.middle_earleme = middle_earleme
+        result.token_name = token_name
+        result.token_id = token_id
+        result.value_ix = value_ix
+        if value_ix ~= 2 then
+            result.value = recce.token_values[value_ix]
+        end
+        return result
+    end
+
+    function kollos.class_recce.earley_item_data(lmw_r, set_id, item_id)
+        local item_data = {}
+
+        local ahm_id_of_yim = lmw_r:_earley_item_trace(item_id)
+        if not ahm_id_of_yim then return end
+
+        do -- token links
+            local symbol_id = lmw_r:_first_token_link_trace()
+            local links = {}
+            while symbol_id do
+                    -- ?? $recce_c->_marpa_r_source_middle(),
+                    -- ?? $recce_c->_marpa_r_source_predecessor_state() // -1
+                links[#links+1] = lmw_r:token_link_data()
+                symbol_id = lmw_r:_next_token_link_trace()
+            end
+            item_data.token_links = links
+        end
+        return item_data
+    end
+
     function kollos.class_recce.earley_set_data(lmw_r, set_id)
         local lmw_g = lmw_r.lmw_g
         local data = {}
@@ -1391,6 +1433,7 @@ whose id is `id`.
             local item_data = lmw_r:earley_item_data(set_id, item_id)
             if not item_data then break end
             data[#data+1] = item_data
+            item_id = item_id + 1
         end
         data.leo = {}
         local postdot_symbol_id = lmw_r:_first_postdot_item_trace();
