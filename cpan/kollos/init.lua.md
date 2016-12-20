@@ -1301,7 +1301,6 @@ whose id is `id`.
         return string.format('R%d', symbol_id)
     end
 
-
     function kollos.class_grammar.ahm_describe(lmw_g, ahm_id)
         local irl_id = lmw_g:_ahm_irl(ahm_id)
         local dot_position = lmw_g:_ahm_position(ahm_id)
@@ -1490,6 +1489,7 @@ whose id is `id`.
     end
 
     function kollos.class_recce.earley_set_data(lmw_r, set_id)
+        -- print('earley_set_data(', set_id, ')')
         local lmw_g = lmw_r.lmw_g
         local data = {}
         local result = lmw_r:_earley_set_trace(set_id)
@@ -1512,6 +1512,8 @@ whose id is `id`.
             end
             postdot_symbol_id = lmw_r:_next_postdot_item_trace()
         end
+        -- print('earley_set_data() ->', inspect(data))
+        return data
     end
 
     function g1_earley_set_data(recce, set_id)
@@ -2461,6 +2463,7 @@ a special "configuration" argument.
     -- miranda: insert valuator Libmarpa wrapper Lua functions
     -- miranda: insert diagnostics
     -- miranda: insert Utilities for Perl code
+    -- miranda: insert most Lua function declarations
 
     return "OK"
 
@@ -4379,6 +4382,16 @@ and error codes.
        else return nil, "Bad id in options: ", id end
     end
     ]==]
+```
+
+## Kollos utilities
+
+```
+    -- miranda: section+ most Lua function declarations
+    function kollos.posix_lc(str)
+       return str:gsub('[A-Z]', function(str) return string.char(string.byte(str)) end)
+    end
+
 ```
 
 <!--

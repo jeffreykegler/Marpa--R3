@@ -2105,6 +2105,7 @@ sub Marpa::R3::Scanless::R::show_earley_set {
     my $recce_c                = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
 
     my ($result) = $slr->exec_sig_name('g1_earley_set_data', 'i', $traced_set_id);
+    # say STDERR Data::Dumper::Dumper($result);
 
     my $text      = q{};
     my @sorted_data = ();

@@ -30,9 +30,11 @@ sub new {
     my $grammar_c = Marpa::R3::Thin::G->new($thin_slg, $field_name);
     $self->[Marpa::R3::Internal::Trace::G::C] = $grammar_c;
 
-    $thin_slg->exec_sig(<<'END_OF_LUA', 's', $field_name);
-    local g, lmw_g_name = ...
+    $thin_slg->exec_sig(<<'END_OF_LUA', 's', (lc $name));
+    local g, short_name = ...
+    lmw_g_name = 'lmw_' .. short_name .. 'g'
     local lmw_g = g[lmw_g_name]
+    lmw_g.short_name = short_name
     lmw_g.isyid_by_name = {}
     lmw_g.name_by_isyid = {}
 END_OF_LUA
