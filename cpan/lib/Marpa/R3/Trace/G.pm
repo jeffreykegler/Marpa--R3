@@ -198,35 +198,20 @@ sub lexer_progress_report {
 
 sub show_dotted_irl {
     my ( $self, $irl_id, $dot_position ) = @_;
-    my $grammar_c     = $self->[Marpa::R3::Internal::Trace::G::C];
-    my $lhs_id     = $grammar_c->_marpa_g_irl_lhs($irl_id);
-    my $irl_length = $grammar_c->_marpa_g_irl_length($irl_id);
-
-    my $text = $self->isy_name($lhs_id) . q{ ::=};
-
-    if ( $dot_position < 0 ) {
-        $dot_position = $irl_length;
-    }
-
-    my @rhs_names = ();
-    for my $ix ( 0 .. $irl_length - 1 ) {
-        my $rhs_nsy_id = $grammar_c->_marpa_g_irl_rhs( $irl_id, $ix );
-        my $rhs_nsy_name = $self->isy_name($rhs_nsy_id);
-        push @rhs_names, $rhs_nsy_name;
-    }
-
-    POSITION: for my $position ( 0 .. scalar @rhs_names ) {
-        if ( $position == $dot_position ) {
-            $text .= q{ .};
-        }
-        my $name = $rhs_names[$position];
-        next POSITION if not defined $name;
-        $text .= " $name";
-    } ## end POSITION: for my $position ( 0 .. scalar @rhs_names )
-
-    return $text;
-
-} ## end sub show_dotted_irl
+    my $thin_slg         = $self->[Marpa::R3::Internal::Trace::G::SLG_C];
+    my $short_name = $self->[Marpa::R3::Internal::Trace::G::NAME];
+    my ($result) =
+      $thin_slg->exec_sig(
+	<<'END_OF_LUA', 'sii', (lc $short_name), $irl_id, $dot_position );
+    local g, short_name, irl_id, dot_position = ...
+    local lmw_g_field_name = 'lmw_' .. short_name .. 'g'
+    -- print('lmw_g_field_name', lmw_g_field_name)
+    local lmw_g = g[lmw_g_field_name]
+    return lmw_g:show_dotted_irl(irl_id, dot_position)
+END_OF_LUA
+    return $result;
+}
+ ## end sub show_dotted_irl
 
 sub show_ahm {
     my ( $self, $item_id ) = @_;

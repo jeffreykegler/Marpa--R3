@@ -1310,6 +1310,28 @@ whose id is `id`.
         return string.format('R%d:%d', irl_id, dot_position)
     end
 
+    function kollos.class_grammar.show_dotted_irl(lmw_g, irl_id, dot_position)
+        local lhs_id = lmw_g:_irl_lhs(irl_id)
+        local irl_length = lmw_g:_irl_length(irl_id)
+        local lhs_name = lmw_g:isy_name(lhs_id)
+        local pieces = { lhs_name, '::=' }
+        if dot_position < 0 then
+            dot_position = irl_length
+        end
+        for ix = 0, irl_length - 1 do
+            local rhs_nsy_id = lmw_g:_irl_rhs(irl_id, ix)
+            local rhs_nsy_name = lmw_g:isy_name(rhs_nsy_id)
+            if ix == dot_position then
+                pieces[#pieces+1] = '.'
+            end
+            pieces[#pieces+1] = rhs_nsy_name
+        end
+        if dot_position >= irl_length then
+            pieces[#pieces+1] = '.'
+        end
+        return table.concat(pieces, ' ')
+    end
+
 ```
 
 ```
