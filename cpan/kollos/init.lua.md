@@ -1403,11 +1403,52 @@ whose id is `id`.
         return result
     end
 
+    function kollos.class_recce.completion_link_data(lmw_r, ahm_id)
+        local lmw_g = lmw_r.lmw_g
+        local g1r = recce.lmw_g1r
+        local result = {}
+        local predecessor_state = g1r:_source_predecessor_state()
+        local origin_set_id = g1r:_earley_item_origin()
+        local origin_earleme = g1r:earleme(origin_set_id)
+        local middle_set_id = g1r:_source_middle()
+        local middle_earleme = g1r:earleme(middle_set_id)
+        result.predecessor_state = predecessor_state
+        result.origin_earleme = origin_earleme
+        result.middle_earleme = middle_earleme
+        return result
+    end
+
+    function kollos.class_recce.leo_link_data(lmw_r, ahm_id)
+        local lmw_g = lmw_r.lmw_g
+        local g1r = recce.lmw_g1r
+        local result = {}
+        local middle_set_id = g1r:_source_middle()
+        local middle_earleme = g1r:earleme(middle_set_id)
+        local leo_transition_symbol = g1r:_source_leo_transition_symbol()
+        result.middle_earleme = middle_earleme
+        result.leo_transition_symbol = leo_transition_symbol
+        return result
+    end
+
     function kollos.class_recce.earley_item_data(lmw_r, set_id, item_id)
         local item_data = {}
+        local lmw_g = lmw_r.lmw_g
 
         local ahm_id_of_yim = lmw_r:_earley_item_trace(item_id)
         if not ahm_id_of_yim then return end
+
+        local origin_set_id  = lmw_r:_earley_item_origin()
+        local earleme = lmw_r:earleme(set_id)
+        local origin_earleme = lmw_r:earleme(origin_set_id)
+
+        local irl_id = lmw_g:_ahm_irl(ahm_id_of_yim)
+        local dot_position = lmw_g:_ahm_position(ahm_id_of_yim)
+
+        item_data.ahm_id_of_yim = ahm_id_of_yim
+        item_data.origin_set_id = origin_set_id
+        item_data.origin_earleme = origin_earleme
+        item_data.irl_id = irl_id
+        item_data.dot_position = dot_position
 
         do -- token links
             local symbol_id = lmw_r:_first_token_link_trace()
@@ -1420,6 +1461,31 @@ whose id is `id`.
             end
             item_data.token_links = links
         end
+
+        do -- completion links
+            local ahm_id = lmw_r:_first_completion_link_trace()
+            local links = {}
+            while ahm_id do
+                    -- ?? $recce_c->_marpa_r_source_middle(),
+                    -- ?? $recce_c->_marpa_r_source_predecessor_state() // -1
+                links[#links+1] = lmw_r:completion_link_data(ahm_id)
+                ahm_id = lmw_r:_next_completion_link_trace()
+            end
+            item_data.completion_links = links
+        end
+
+        do -- leo links
+            local ahm_id = lmw_r:_first_leo_link_trace()
+            local links = {}
+            while ahm_id do
+                    -- ?? $recce_c->_marpa_r_source_middle(),
+                    -- ??  $recce_c->_marpa_r_source_leo_transition_symbol(),
+                links[#links+1] = lmw_r:leo_link_data(ahm_id)
+                ahm_id = lmw_r:_next_leo_link_trace()
+            end
+            item_data.leo_links = links
+        end
+
         return item_data
     end
 
