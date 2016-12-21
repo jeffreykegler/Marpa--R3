@@ -2002,33 +2002,10 @@ sub Marpa::R3::Scanless::R::show_earley_item {
     my $ahm_id_of_yim = $recce_c->_marpa_r_earley_item_trace($item_id);
     return if not defined $ahm_id_of_yim;
 
-    if (0) {
-        my $origin_set_id  = $recce_c->_marpa_r_earley_item_origin();
-        my $earleme        = $recce_c->earleme($current_es);
-        my $origin_earleme = $recce_c->earleme($origin_set_id);
-
-        my $irl_id       = $grammar_c->_marpa_g_ahm_irl($ahm_id_of_yim);
-        my $dot_position = $grammar_c->_marpa_g_ahm_position($ahm_id_of_yim);
-
-        my ($ahm_desc) = $slr->exec_sig( <<'END_OF_LUA', 'i', $ahm_id_of_yim );
-    local recce, ahm_id = ...
-    return recce.slg.lmw_g1g:ahm_describe(ahm_id)
-END_OF_LUA
-
-        my $text .= sprintf "ahm%d: %s@%d-%d", $ahm_id_of_yim,
-          $ahm_desc,
-          $origin_earleme, $earleme;
-        my @lines = $text;
-
-        push @lines,
-            qq{  }
-          . $ahm_desc . q{: }
-          . $tracer->show_dotted_irl( $irl_id, $dot_position );
-    }
-
     my $earleme        = $recce_c->earleme($current_es);
     my @sort_data = ();
     my @lines = ();
+    my @sorted_data = ();
 
     for (
         my $symbol_id = $recce_c->_marpa_r_first_token_link_trace();
@@ -2044,11 +2021,12 @@ END_OF_LUA
             $slr->Marpa::R3::Scanless::R::show_token_link_choice( $earleme )
             ];
     } ## end for ( my $symbol_id = $recce_c->_marpa_r_first_token_link_trace...)
-    my @pieces = map { $_->[-1] } sort {
+    push @sorted_data,  map { $_->[-1] } sort {
                $a->[0] <=> $b->[0]
             || $a->[1] <=> $b->[1]
             || $a->[2] <=> $b->[2]
     } @sort_data;
+
     @sort_data = ();
     for (
         my $cause_AHFA_id = $recce_c->_marpa_r_first_completion_link_trace();
@@ -2066,7 +2044,7 @@ END_OF_LUA
             )
             ];
     } ## end for ( my $cause_AHFA_id = $recce_c...)
-    push @pieces, map { $_->[-1] } sort {
+    push @sorted_data, map { $_->[-1] } sort {
                $a->[0] <=> $b->[0]
             || $a->[1] <=> $b->[1]
             || $a->[2] <=> $b->[2]
@@ -2088,12 +2066,12 @@ END_OF_LUA
             )
             ];
     } ## end for ( my $link_ahm_id = $recce_c...)
-    push @pieces, map { $_->[-1] } sort {
+    push @sorted_data, map { $_->[-1] } sort {
                $a->[0] <=> $b->[0]
             || $a->[1] <=> $b->[1]
             || $a->[2] <=> $b->[2]
     } @sort_data;
-    push @lines, q{  } . join q{ }, @pieces if @pieces;
+    push @lines, q{  } . join q{ }, @sorted_data if @sorted_data;
     return join "\n", @lines, q{};
 }
 
