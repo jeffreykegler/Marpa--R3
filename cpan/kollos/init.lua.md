@@ -1392,6 +1392,7 @@ whose id is `id`.
         local base_origin_earleme = lmw_r:earleme(base_origin_set_id)
         return {
             postdot_symbol_name = postdot_symbol_name,
+            postdot_symbol_id = postdot_symbol_id,
             predecessor_symbol_id = predecessor_symbol_id,
             base_origin_earleme = base_origin_earleme,
             leo_base_state = leo_base_state,

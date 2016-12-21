@@ -2158,23 +2158,45 @@ sub Marpa::R3::Scanless::R::show_earley_set {
         push @sorted_data, $item_desc;
     } ## end EARLEY_ITEM: for ( my $item_id = 0;; $item_id++ )
 
-    my @sort_data = ();
-    POSTDOT_ITEM:
-    for (
-        my $postdot_symbol_id = $recce_c->_marpa_r_first_postdot_item_trace();
-        defined $postdot_symbol_id;
-        $postdot_symbol_id = $recce_c->_marpa_r_next_postdot_item_trace()
-        )
     {
+        my $leo_data  = $set_data{leo};
+        my %leo_data  = @{$leo_data};
+        my @sort_data = ();
+      LEO_ITEM: for ( my $leo_item_id = 0 ; ; $leo_item_id++ ) {
 
-        # If there is no base Earley item,
-        # then this is not a Leo item, so we skip it
-        my $leo_item_desc = $slr->Marpa::R3::Scanless::R::show_leo_item();
-        next POSTDOT_ITEM if not defined $leo_item_desc;
-        push @sort_data, [ $postdot_symbol_id, $leo_item_desc ];
-    } ## end POSTDOT_ITEM: for ( my $postdot_symbol_id = $recce_c...)
-    push @sorted_data, join q{},
-        map { $_->[-1] . "\n" } sort { $a->[0] <=> $b->[0] } @sort_data;
+            my $leo_item_data = $leo_data{ $leo_item_id + 1 };
+            last LEO_ITEM if not defined $leo_item_data;
+
+            my %leo_item_data = @{$leo_item_data};
+            my $postdot_symbol_id      = $leo_item_data{postdot_symbol_id};
+            my $postdot_symbol_name    = $leo_item_data{postdot_symbol_name};
+            my $predecessor_symbol_id = $leo_item_data{predecessor_symbol_id};
+            my $base_origin_earleme   = $leo_item_data{base_origin_earleme};
+            my $leo_base_state        = $leo_item_data{leo_base_state};
+            my $trace_earleme         = $leo_item_data{trace_earleme};
+
+            # L2@8 ["Expression"; L2@6; S16@6-8]
+            my @link_texts = ( q{"} . $postdot_symbol_name . q{"} );
+            if ( defined $predecessor_symbol_id ) {
+                push @link_texts,
+                  sprintf( 'L%d@%d',
+                    $predecessor_symbol_id, $base_origin_earleme );
+            }
+            push @link_texts,
+              sprintf( 'S%d@%d-%d',
+                $leo_base_state, $base_origin_earleme, $trace_earleme );
+            my $leo_line = sprintf( 'L%d@%d [%s]',
+                $postdot_symbol_id, $trace_earleme,
+                ( join q{; }, @link_texts ) );
+            push @sort_data, [ $postdot_symbol_id, $leo_line ];
+            push @sorted_data,
+              (
+                join q{},
+                map { $_->[-1] . "\n" } sort { $a->[0] <=> $b->[0] } @sort_data
+              );
+        }
+    }
+
     return join q{}, @sorted_data;
 }
 
