@@ -1990,91 +1990,6 @@ END_OF_LUA
     return '[' . ( join '; ', @pieces ) . ']';
 } ## end sub Marpa::R3::show_leo_link_choice
 
-# Assumes trace earley item was set by caller
-sub Marpa::R3::Scanless::R::show_earley_item {
-    my ( $slr, $current_es, $item_id ) = @_;
-    my $recce_c                = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
-    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $tracer =
-        $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
-    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
-
-    my $ahm_id_of_yim = $recce_c->_marpa_r_earley_item_trace($item_id);
-    return if not defined $ahm_id_of_yim;
-
-    my $earleme        = $recce_c->earleme($current_es);
-    my @sort_data = ();
-    my @lines = ();
-    my @sorted_data = ();
-
-    for (
-        my $symbol_id = $recce_c->_marpa_r_first_token_link_trace();
-        defined $symbol_id;
-        $symbol_id = $recce_c->_marpa_r_next_token_link_trace()
-        )
-    {
-        push @sort_data,
-            [
-            $recce_c->_marpa_r_source_middle(),
-            $symbol_id,
-            ( $recce_c->_marpa_r_source_predecessor_state() // -1 ),
-            $slr->Marpa::R3::Scanless::R::show_token_link_choice( $earleme )
-            ];
-    } ## end for ( my $symbol_id = $recce_c->_marpa_r_first_token_link_trace...)
-    push @sorted_data,  map { $_->[-1] } sort {
-               $a->[0] <=> $b->[0]
-            || $a->[1] <=> $b->[1]
-            || $a->[2] <=> $b->[2]
-    } @sort_data;
-
-    @sort_data = ();
-    for (
-        my $cause_AHFA_id = $recce_c->_marpa_r_first_completion_link_trace();
-        defined $cause_AHFA_id;
-        $cause_AHFA_id = $recce_c->_marpa_r_next_completion_link_trace()
-        )
-    {
-        push @sort_data,
-            [
-            $recce_c->_marpa_r_source_middle(),
-            $cause_AHFA_id,
-            ( $recce_c->_marpa_r_source_predecessor_state() // -1 ),
-            $slr->Marpa::R3::Scanless::R::show_completion_link_choice(
-                $cause_AHFA_id, $earleme
-            )
-            ];
-    } ## end for ( my $cause_AHFA_id = $recce_c...)
-    push @sorted_data, map { $_->[-1] } sort {
-               $a->[0] <=> $b->[0]
-            || $a->[1] <=> $b->[1]
-            || $a->[2] <=> $b->[2]
-    } @sort_data;
-    @sort_data = ();
-    for (
-        my $link_ahm_id = $recce_c->_marpa_r_first_leo_link_trace();
-        defined $link_ahm_id;
-        $link_ahm_id = $recce_c->_marpa_r_next_leo_link_trace()
-        )
-    {
-        push @sort_data,
-            [
-            $recce_c->_marpa_r_source_middle(),
-            $link_ahm_id,
-            $recce_c->_marpa_r_source_leo_transition_symbol(),
-            $slr->Marpa::R3::Scanless::R::show_leo_link_choice(
-                $link_ahm_id, $earleme
-            )
-            ];
-    } ## end for ( my $link_ahm_id = $recce_c...)
-    push @sorted_data, map { $_->[-1] } sort {
-               $a->[0] <=> $b->[0]
-            || $a->[1] <=> $b->[1]
-            || $a->[2] <=> $b->[2]
-    } @sort_data;
-    push @lines, q{  } . join q{ }, @sorted_data if @sorted_data;
-    return join "\n", @lines, q{};
-}
-
 sub Marpa::R3::Scanless::R::show_earley_set {
     my ( $slr, $traced_set_id ) = @_;
     my $recce_c                = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
@@ -2121,11 +2036,79 @@ sub Marpa::R3::Scanless::R::show_earley_set {
             . q{: }
             . $tracer->show_dotted_irl($irl_id, $dot_position);
 
-        push @sorted_data, (join "\n", @lines, q{});
+        push @sorted_data, @lines;
 
-        my $item_desc = $slr->Marpa::R3::Scanless::R::show_earley_item( $traced_set_id, $item_id );
+        {
+                my $ahm_id_of_yim = $recce_c->_marpa_r_earley_item_trace($item_id);
+                my @sort_data = ();
+                my @lines = ();
 
-        push @sorted_data, $item_desc;
+                for (
+                    my $symbol_id = $recce_c->_marpa_r_first_token_link_trace();
+                    defined $symbol_id;
+                    $symbol_id = $recce_c->_marpa_r_next_token_link_trace()
+                    )
+                {
+                    push @sort_data,
+                        [
+                        $recce_c->_marpa_r_source_middle(),
+                        $symbol_id,
+                        ( $recce_c->_marpa_r_source_predecessor_state() // -1 ),
+                        $slr->Marpa::R3::Scanless::R::show_token_link_choice( $earleme )
+                        ];
+                } ## end for ( my $symbol_id = $recce_c->_marpa_r_first_token_link_trace...)
+                push @sorted_data,  map { qq{  } . $_->[-1] } sort {
+                           $a->[0] <=> $b->[0]
+                        || $a->[1] <=> $b->[1]
+                        || $a->[2] <=> $b->[2]
+                } @sort_data;
+
+                @sort_data = ();
+                for (
+                    my $cause_AHFA_id = $recce_c->_marpa_r_first_completion_link_trace();
+                    defined $cause_AHFA_id;
+                    $cause_AHFA_id = $recce_c->_marpa_r_next_completion_link_trace()
+                    )
+                {
+                    push @sort_data,
+                        [
+                        $recce_c->_marpa_r_source_middle(),
+                        $cause_AHFA_id,
+                        ( $recce_c->_marpa_r_source_predecessor_state() // -1 ),
+                        $slr->Marpa::R3::Scanless::R::show_completion_link_choice(
+                            $cause_AHFA_id, $earleme
+                        )
+                        ];
+                } ## end for ( my $cause_AHFA_id = $recce_c...)
+                push @sorted_data, map { q{  } . $_->[-1] } sort {
+                           $a->[0] <=> $b->[0]
+                        || $a->[1] <=> $b->[1]
+                        || $a->[2] <=> $b->[2]
+                } @sort_data;
+                @sort_data = ();
+                for (
+                    my $link_ahm_id = $recce_c->_marpa_r_first_leo_link_trace();
+                    defined $link_ahm_id;
+                    $link_ahm_id = $recce_c->_marpa_r_next_leo_link_trace()
+                    )
+                {
+                    push @sort_data,
+                        [
+                        $recce_c->_marpa_r_source_middle(),
+                        $link_ahm_id,
+                        $recce_c->_marpa_r_source_leo_transition_symbol(),
+                        $slr->Marpa::R3::Scanless::R::show_leo_link_choice(
+                            $link_ahm_id, $earleme
+                        )
+                        ];
+                } ## end for ( my $link_ahm_id = $recce_c...)
+                push @sorted_data, map { q{  } . $_->[-1] } sort {
+                           $a->[0] <=> $b->[0]
+                        || $a->[1] <=> $b->[1]
+                        || $a->[2] <=> $b->[2]
+                } @sort_data;
+            }
+
     } ## end EARLEY_ITEM: for ( my $item_id = 0;; $item_id++ )
 
     {
@@ -2162,12 +2145,12 @@ sub Marpa::R3::Scanless::R::show_earley_set {
             push @sorted_data,
               (
                 join q{},
-                map { $_->[-1] . "\n" } sort { $a->[0] <=> $b->[0] } @sort_data
+                map { $_->[-1] } sort { $a->[0] <=> $b->[0] } @sort_data
               );
         }
     }
 
-    return join q{}, @sorted_data;
+    return join "\n", @sorted_data, q{};
 }
 
 sub Marpa::R3::Scanless::R::show_or_nodes {
