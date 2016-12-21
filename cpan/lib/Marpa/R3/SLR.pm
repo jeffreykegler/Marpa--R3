@@ -1846,13 +1846,6 @@ sub Marpa::R3::Scanless::R::show_earley_sets {
     return $text;
 }
 
-sub Marpa::R3::Scanless::R::show_leo_item {
-    my ($slr) = @_;
-    my ($result) = $slr->exec_sig_name( 'show_leo_item', '' );
-    return if $result eq '';
-    return $result;
-}
-
 # Assumes trace token source link set by caller
 sub Marpa::R3::Scanless::R::show_token_link_choice {
     my ( $slr, $current_earleme ) = @_;

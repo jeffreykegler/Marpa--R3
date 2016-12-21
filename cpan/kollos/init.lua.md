@@ -531,6 +531,11 @@ or nil if there was none.
 
 ```
 
+This is not currently used.
+It was created for developed,
+and is being kept for use as
+part of a "Pure Lua" implementation.
+
 ```
     -- miranda: section+ SLIF recognizer Lua functions
     function show_leo_item(recce)
