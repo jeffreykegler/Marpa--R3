@@ -2124,8 +2124,7 @@ sub Marpa::R3::Scanless::R::show_earley_set {
         push @sorted_data, (join "\n", @lines, q{});
 
         my $item_desc = $slr->Marpa::R3::Scanless::R::show_earley_item( $traced_set_id, $item_id );
-        last EARLEY_ITEM if not defined $item_desc;
-        # We do not sort these any more
+
         push @sorted_data, $item_desc;
     } ## end EARLEY_ITEM: for ( my $item_id = 0;; $item_id++ )
 
