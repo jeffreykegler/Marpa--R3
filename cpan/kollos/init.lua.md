@@ -1413,13 +1413,14 @@ whose id is `id`.
         local origin_set_id = lmw_r:_earley_item_origin()
         local origin_earleme = lmw_r:earleme(origin_set_id)
         local middle_earleme = origin_earleme
+        local middle_set_id = lmw_r:_source_middle()
         if predecessor_ahm then
-            local middle_set_id = lmw_r:_source_middle()
             middle_earleme = lmw_r:earleme(middle_set_id)
         end
         local token_name = lmw_g:isy_name(token_id)
         result.predecessor_ahm = predecessor_ahm
         result.origin_earleme = origin_earleme
+        result.middle_set_id = middle_set_id
         result.middle_earleme = middle_earleme
         result.token_name = token_name
         result.token_id = token_id

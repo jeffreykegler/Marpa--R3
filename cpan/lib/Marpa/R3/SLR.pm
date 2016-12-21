@@ -2040,30 +2040,71 @@ sub Marpa::R3::Scanless::R::show_earley_set {
 
         {
                 my $ahm_id_of_yim = $recce_c->_marpa_r_earley_item_trace($item_id);
-                my @sort_data = ();
-                my @lines = ();
 
-                for (
-                    my $symbol_id = $recce_c->_marpa_r_first_token_link_trace();
-                    defined $symbol_id;
-                    $symbol_id = $recce_c->_marpa_r_next_token_link_trace()
-                    )
+                # Token links
                 {
-                    push @sort_data,
-                        [
-                        $recce_c->_marpa_r_source_middle(),
-                        $symbol_id,
-                        ( $recce_c->_marpa_r_source_predecessor_state() // -1 ),
-                        $slr->Marpa::R3::Scanless::R::show_token_link_choice( $earleme )
-                        ];
-                } ## end for ( my $symbol_id = $recce_c->_marpa_r_first_token_link_trace...)
-                push @sorted_data,  map { qq{  } . $_->[-1] } sort {
-                           $a->[0] <=> $b->[0]
-                        || $a->[1] <=> $b->[1]
-                        || $a->[2] <=> $b->[2]
-                } @sort_data;
+                    my @sort_data   = ();
+                    my @lines       = ();
+                    my $token_links = $item_data{token_links};
+                    my %token_links = @{$token_links};
+                    TOKEN_LINK: for ( my $token_link_ix = 0 ; ; $token_link_ix++ ) {
+                        my $token_link_data =
+                          $token_links{ $token_link_ix + 1 };
+                        last TOKEN_LINK if not $token_link_data;
+                        my %token_link_data = @{$token_link_data};
 
-                @sort_data = ();
+                        my $predecessor_ahm = $token_link_data{predecessor_ahm};
+                        my $origin_earleme  = $token_link_data{origin_earleme};
+                        my $middle_earleme  = $token_link_data{middle_earleme};
+                        my $middle_set_id   = $token_link_data{middle_set_id};
+                        my $token_name      = $token_link_data{token_name};
+                        my $token_id        = $token_link_data{token_id};
+                        my $value_ix        = $token_link_data{value_ix};
+                        my $value           = $token_link_data{value};
+                        my $source_predecessor_state =
+                          $token_link_data{source_predecessor_state};
+
+                        my @pieces = ();
+                        if ( defined $predecessor_ahm ) {
+                            my $ahm_desc =
+                              $tracer->show_briefer_ahm($predecessor_ahm);
+                            push @pieces,
+                                'c='
+                              . $ahm_desc . q{@}
+                              . $origin_earleme . q{-}
+                              . $middle_earleme;
+                        } ## end if ( defined $predecessor_ahm )
+
+                        push @pieces, 's=' . $token_name;
+
+                        if ( not defined $value ) {
+
+                            # Value is literal
+                            my $token_length = $earleme - $middle_earleme;
+                            $value =
+                              $slr->g1_literal( $middle_earleme,
+                                $token_length );
+                        }
+                        my $token_dump =
+                          Data::Dumper->new( [ \$value ] )->Terse(1)->Dump;
+                        chomp $token_dump;
+                        push @pieces, "t=$token_dump";
+                        my $token_link_desc =
+                          '[' . ( join '; ', @pieces ) . ']';
+                        push @sort_data,
+                          [
+                            $middle_set_id,   $token_id,
+                            $predecessor_ahm, $token_link_desc
+                          ];
+                    }
+                    push @sorted_data, map { qq{  } . $_->[-1] } sort {
+                             $a->[0] <=> $b->[0]
+                          || $a->[1] <=> $b->[1]
+                          || $a->[2] <=> $b->[2]
+                    } @sort_data;
+                }
+
+                my @sort_data = ();
                 for (
                     my $cause_AHFA_id = $recce_c->_marpa_r_first_completion_link_trace();
                     defined $cause_AHFA_id;

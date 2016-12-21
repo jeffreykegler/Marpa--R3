@@ -235,11 +235,21 @@ sub show_ahm {
 sub show_brief_ahm {
     my ( $self, $item_id ) = @_;
     my $grammar_c     = $self->[Marpa::R3::Internal::Trace::G::C];
-    my $postdot_id = $grammar_c->_marpa_g_ahm_postdot($item_id);
     my $irl_id     = $grammar_c->_marpa_g_ahm_irl($item_id);
     my $position   = $grammar_c->_marpa_g_ahm_position($item_id);
     return $self->show_dotted_irl( $irl_id, $position );
 } ## end sub show_brief_ahm
+
+sub show_briefer_ahm {
+    my ( $self, $item_id ) = @_;
+    my $grammar_c     = $self->[Marpa::R3::Internal::Trace::G::C];
+    my $irl_id     = $grammar_c->_marpa_g_ahm_irl($item_id);
+    my $dot_position   = $grammar_c->_marpa_g_ahm_position($item_id);
+    if ($dot_position < 0) {
+	return sprintf('R%d$', $irl_id);
+    }
+    return sprintf('R%d:%d', $irl_id, $dot_position);
+}
 
 sub show_ahms {
     my ($self)    = @_;
