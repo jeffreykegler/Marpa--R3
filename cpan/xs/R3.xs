@@ -614,7 +614,6 @@ coerce_to_pairs (lua_State * L, int visited_ix, int table_ix)
     AV *av;
     int visited_type;
     lua_Integer seq_length;
-    int seq_ix;
     int av_ix = 0;
     const int base_of_stack = marpa_lua_gettop(L);
 
@@ -639,35 +638,41 @@ coerce_to_pairs (lua_State * L, int visited_ix, int table_ix)
     /* mortalize it, so it is garbage collected if we abend */
     result = sv_2mortal (newRV_noinc ((SV *) av));
 
-    av_ix = 0;
-    for (seq_ix = 1; 1; seq_ix++)
     {
-	SV *entry_value;
-	SV** ownership_taken;
-        const int value_ix = marpa_lua_gettop(L); /* We need an absolute index, not -1 */
+        const int base_of_loop_stack = marpa_lua_gettop (L);
+        const int loop_value_ix = base_of_loop_stack + 1;
+        int seq_ix;
+        for (seq_ix = 1; 1; seq_ix++) {
+            SV *entry_value;
+            SV **ownership_taken;
 
-        const int type_pushed = marpa_lua_geti(L, table_ix, seq_ix);
+            const int type_pushed = marpa_lua_geti (L, table_ix, seq_ix);
 
-        if (type_pushed == LUA_TNIL) { break; }
+            if (type_pushed == LUA_TNIL) {
+                break;
+            }
 
-        entry_value = newSViv (seq_ix);
-	ownership_taken = av_store(av, (int)av_ix, entry_value);
-	if (!ownership_taken) {
-	  SvREFCNT_dec (entry_value);
-          croak("av_store failed in coerce_to_pairs()");
-	}
-        av_ix++;
 
-	entry_value = recursive_coerce_to_sv(L, visited_ix, value_ix, '2');
-	ownership_taken = av_store(av, (int)av_ix, entry_value);
-	if (!ownership_taken) {
-	  SvREFCNT_dec (entry_value);
-          croak("av_store failed in coerce_to_pairs()");
-	}
-        av_ix++;
+            entry_value = newSViv (seq_ix);
+            ownership_taken = av_store (av, (int) av_ix, entry_value);
+            if (!ownership_taken) {
+                SvREFCNT_dec (entry_value);
+                croak ("av_store failed in coerce_to_pairs()");
+            }
+            av_ix++;
+
+            entry_value =
+                recursive_coerce_to_sv (L, visited_ix, loop_value_ix, '2');
+            ownership_taken = av_store (av, (int) av_ix, entry_value);
+            if (!ownership_taken) {
+                SvREFCNT_dec (entry_value);
+                croak ("av_store failed in coerce_to_pairs()");
+            }
+            av_ix++;
+            marpa_lua_settop (L, base_of_loop_stack);
+        }
+        seq_length = seq_ix - 1;
     }
-
-    seq_length = seq_ix - 1;
 
     /* Now do the key-value pairs that were *NOT* part
      * of the sequence
@@ -687,7 +692,7 @@ coerce_to_pairs (lua_State * L, int visited_ix, int table_ix)
             int isnum;
             lua_Integer key_value = marpa_lua_tointegerx(L, key_ix, &isnum);
             if (!isnum) goto NEXT_ELEMENT;
-            if (key_value < 1 || key_value > seq_length) goto NEXT_ELEMENT;
+            if (key_value >= 1 && key_value <= seq_length) goto NEXT_ELEMENT;
         }
 
 	entry_value = recursive_coerce_to_sv(L, visited_ix, key_ix, '2');

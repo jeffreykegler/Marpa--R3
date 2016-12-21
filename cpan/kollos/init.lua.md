@@ -1382,7 +1382,7 @@ whose id is `id`.
     function kollos.class_recce.leo_item_data(lmw_r)
         local lmw_g = lmw_r.lmw_g
         local leo_base_state = lmw_r:_leo_base_state()
-        if not leo_base_state then return {} end
+        if not leo_base_state then return end
         local trace_earley_set = lmw_r:_trace_earley_set()
         local trace_earleme = lmw_r:earleme(trace_earley_set)
         local postdot_symbol_id = lmw_r:_postdot_item_symbol()
@@ -1459,7 +1459,6 @@ whose id is `id`.
         if not ahm_id_of_yim then return end
 
         local origin_set_id  = lmw_r:_earley_item_origin()
-        local earleme = lmw_r:earleme(set_id)
         local origin_earleme = lmw_r:earleme(origin_set_id)
 
         local irl_id = lmw_g:_ahm_irl(ahm_id_of_yim)
@@ -1514,8 +1513,13 @@ whose id is `id`.
         -- print('earley_set_data(', set_id, ')')
         local lmw_g = lmw_r.lmw_g
         local data = {}
+
         local result = lmw_r:_earley_set_trace(set_id)
-        if not result then return '' end
+        if not result then return end
+
+        local earleme = lmw_r:earleme(set_id)
+        data.earleme = earleme
+
         local item_id = 0
         while true do
             local item_data = lmw_r:earley_item_data(set_id, item_id)
@@ -1540,7 +1544,8 @@ whose id is `id`.
 
     function g1_earley_set_data(recce, set_id)
         local lmw_r = recce.lmw_g1r
-        return lmw_r:earley_set_data(set_id)
+        local result = lmw_r:earley_set_data(set_id)
+        return result
     end
 
 ```

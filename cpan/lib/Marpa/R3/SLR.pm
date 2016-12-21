@@ -2009,29 +2009,33 @@ sub Marpa::R3::Scanless::R::show_earley_item {
     my $ahm_id_of_yim = $recce_c->_marpa_r_earley_item_trace($item_id);
     return if not defined $ahm_id_of_yim;
 
-    my $origin_set_id  = $recce_c->_marpa_r_earley_item_origin();
-    my $earleme        = $recce_c->earleme($current_es);
-    my $origin_earleme = $recce_c->earleme($origin_set_id);
+    if (0) {
+        my $origin_set_id  = $recce_c->_marpa_r_earley_item_origin();
+        my $earleme        = $recce_c->earleme($current_es);
+        my $origin_earleme = $recce_c->earleme($origin_set_id);
 
-    my $irl_id = $grammar_c->_marpa_g_ahm_irl($ahm_id_of_yim);
-    my $dot_position = $grammar_c->_marpa_g_ahm_position($ahm_id_of_yim);
+        my $irl_id       = $grammar_c->_marpa_g_ahm_irl($ahm_id_of_yim);
+        my $dot_position = $grammar_c->_marpa_g_ahm_position($ahm_id_of_yim);
 
-    my ($ahm_desc) = $slr->exec_sig(
-        <<'END_OF_LUA', 'i', $ahm_id_of_yim);
+        my ($ahm_desc) = $slr->exec_sig( <<'END_OF_LUA', 'i', $ahm_id_of_yim );
     local recce, ahm_id = ...
     return recce.slg.lmw_g1g:ahm_describe(ahm_id)
 END_OF_LUA
 
-    my $text .= sprintf "ahm%d: %s@%d-%d", $ahm_id_of_yim,
-        $ahm_desc,
-        $origin_earleme, $earleme;
-    my @lines    = $text;
+        my $text .= sprintf "ahm%d: %s@%d-%d", $ahm_id_of_yim,
+          $ahm_desc,
+          $origin_earleme, $earleme;
+        my @lines = $text;
 
-    push @lines, qq{  }
-        . $ahm_desc
-        . q{: }
-        . $tracer->show_dotted_irl($irl_id, $dot_position);
+        push @lines,
+            qq{  }
+          . $ahm_desc . q{: }
+          . $tracer->show_dotted_irl( $irl_id, $dot_position );
+    }
+
+    my $earleme        = $recce_c->earleme($current_es);
     my @sort_data = ();
+    my @lines = ();
 
     for (
         my $symbol_id = $recce_c->_marpa_r_first_token_link_trace();
@@ -2103,21 +2107,57 @@ END_OF_LUA
 sub Marpa::R3::Scanless::R::show_earley_set {
     my ( $slr, $traced_set_id ) = @_;
     my $recce_c                = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
+    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+    my $tracer =
+        $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
 
-    my ($result) = $slr->exec_sig_name('g1_earley_set_data', 'i', $traced_set_id);
-    # say STDERR Data::Dumper::Dumper($result);
+    my ($set_data) = $slr->exec_sig_name('g1_earley_set_data', 'i>2', $traced_set_id);
+    return if not $set_data;
+    my %set_data = @{$set_data};
 
-    my $text      = q{};
+    my $earleme = $set_data{earleme};
+
     my @sorted_data = ();
     if ( not defined $recce_c->_marpa_r_earley_set_trace($traced_set_id) ) {
-        return $text;
+        return q{};
     }
+
     EARLEY_ITEM: for ( my $item_id = 0;; $item_id++ ) {
+
+        my $item_data = $set_data{$item_id+1};
+        last EARLEY_ITEM if not defined $item_data;
+
+        my %item_data = @{$item_data};
+
+        my $irl_id = $item_data{irl_id};
+        my $dot_position = $item_data{dot_position};
+        my $ahm_desc;
+        if ($dot_position < 0) {
+            $ahm_desc = sprintf('R%d$', $irl_id);
+        } else {
+            $ahm_desc = sprintf('R%d:%d', $irl_id, $dot_position);
+        }
+        my $ahm_id_of_yim = $item_data{ahm_id_of_yim};
+        my $origin_earleme = $item_data{origin_earleme};
+
+        my $text .= sprintf "ahm%d: %s@%d-%d", $ahm_id_of_yim,
+            $ahm_desc,
+            $origin_earleme, $earleme;
+
+        my @lines    = $text;
+        push @lines, qq{  }
+            . $ahm_desc
+            . q{: }
+            . $tracer->show_dotted_irl($irl_id, $dot_position);
+
+        push @sorted_data, (join "\n", @lines, q{});
+
         my $item_desc = $slr->Marpa::R3::Scanless::R::show_earley_item( $traced_set_id, $item_id );
         last EARLEY_ITEM if not defined $item_desc;
         # We do not sort these any more
         push @sorted_data, $item_desc;
     } ## end EARLEY_ITEM: for ( my $item_id = 0;; $item_id++ )
+
     my @sort_data = ();
     POSTDOT_ITEM:
     for (

@@ -185,14 +185,14 @@ my $lua_exec_sig_body = <<'END_OF_EXEC_SIG_BODY';
                     stack_ix++) {
                 const char this_sig = return_signature[signature_ix];
                 switch (this_sig) {
-                    case '-':
                     case '*':
                         sv_result = coerce_to_sv (L, stack_ix, '-');
                         /* Took ownership of sv_result, we now need to mortalize it */
                         XPUSHs (sv_2mortal (sv_result));
-                        if (this_sig == '-') signature_ix++;
                         break;
+                    case '-':
                     case '0':
+                    case '2':
                         sv_result = coerce_to_sv (L, stack_ix, this_sig);
                         /* Took ownership of sv_result, we now need to mortalize it */
                         XPUSHs (sv_2mortal (sv_result));
