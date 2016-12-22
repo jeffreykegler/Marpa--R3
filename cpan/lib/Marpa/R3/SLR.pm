@@ -1847,51 +1847,6 @@ sub Marpa::R3::Scanless::R::show_earley_sets {
 }
 
 # Assumes trace completion source link set by caller
-sub Marpa::R3::Scanless::R::show_completion_link_choice {
-    my ( $slr, $link_ahm_id, $current_earleme ) = @_;
-    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-
-    my ($link_data) = $slr->exec_sig( <<'END_OF_LUA', 'i', $link_ahm_id );
-    local recce, ahm_id = ...
-    local g1r = recce.lmw_g1r
-    local predecessor_state = g1r:_source_predecessor_state()
-    local origin_set_id = g1r:_earley_item_origin()
-    local origin_earleme = g1r:earleme(origin_set_id)
-    local middle_set_id = g1r:_source_middle()
-    local middle_earleme = g1r:earleme(middle_set_id)
-    local result = {}
-    result.predecessor_state = predecessor_state
-    result.origin_earleme = origin_earleme
-    result.middle_earleme = middle_earleme
-    return result
-END_OF_LUA
-
-    my $predecessor_state = $link_data->{predecessor_state};
-    my $origin_earleme    = $link_data->{origin_earleme};
-    my $middle_earleme    = $link_data->{middle_earleme};
-
-    my ($ahm_desc) = $slr->exec_sig( <<'END_OF_LUA', 'i', $predecessor_state );
-    local recce, ahm_id = ...
-    return recce.slg.lmw_g1g:ahm_describe(ahm_id)
-END_OF_LUA
-
-    my @pieces = ();
-    if ( defined $predecessor_state ) {
-        push @pieces,
-          'p=' . $ahm_desc . '@' . $origin_earleme . q{-} . $middle_earleme;
-    } ## end if ( defined $predecessor_state )
-
-    ($ahm_desc) = $slr->exec_sig( <<'END_OF_LUA', 'i', $link_ahm_id );
-    local recce, ahm_id = ...
-    return recce.slg.lmw_g1g:ahm_describe(ahm_id)
-END_OF_LUA
-
-    push @pieces,
-      'c=' . $ahm_desc . q{@} . $middle_earleme . q{-} . $current_earleme;
-    return '[' . ( join '; ', @pieces ) . ']';
-}
-
-# Assumes trace completion source link set by caller
 sub Marpa::R3::Scanless::R::show_leo_link_choice {
     my ( $slr, $link_ahm_id, $current_earleme ) = @_;
 
@@ -1934,7 +1889,7 @@ sub Marpa::R3::Scanless::R::show_earley_set {
     return if not $set_data;
     my %set_data = @{$set_data};
 
-    my $earleme = $set_data{earleme};
+    my $current_earleme = $set_data{earleme};
 
     my @sorted_data = ();
     if ( not defined $recce_c->_marpa_r_earley_set_trace($traced_set_id) ) {
@@ -1962,7 +1917,7 @@ sub Marpa::R3::Scanless::R::show_earley_set {
 
         my $text .= sprintf "ahm%d: %s@%d-%d", $ahm_id_of_yim,
           $ahm_desc,
-          $origin_earleme, $earleme;
+          $origin_earleme, $current_earleme;
 
         my @lines = $text;
         push @lines,
@@ -2009,7 +1964,7 @@ sub Marpa::R3::Scanless::R::show_earley_set {
                 if ( not defined $value ) {
 
                     # Value is literal
-                    my $token_length = $earleme - $middle_earleme;
+                    my $token_length = $current_earleme - $middle_earleme;
                     $value = $slr->g1_literal( $middle_earleme, $token_length );
                 }
                 my $token_dump =
@@ -2029,8 +1984,6 @@ sub Marpa::R3::Scanless::R::show_earley_set {
                   || $a->[2] <=> $b->[2]
             } @sort_data;
         }
-
-        $recce_c->_marpa_r_earley_item_trace($item_id);
 
         # Completion links
         {
@@ -2064,7 +2017,7 @@ sub Marpa::R3::Scanless::R::show_earley_set {
                 }
 
                 push @pieces,
-                  'c=' . $ahm_desc . q{@} . $middle_earleme . q{-} . $earleme;
+                  'c=' . $ahm_desc . q{@} . $middle_earleme . q{-} . $current_earleme;
                 my $link_desc = '[' . ( join '; ', @pieces ) . ']';
 
                 push @sort_data,
@@ -2079,6 +2032,8 @@ sub Marpa::R3::Scanless::R::show_earley_set {
                   || $a->[2] <=> $b->[2]
             } @sort_data;
         }
+
+        $recce_c->_marpa_r_earley_item_trace($item_id);
 
         # Leo links
         {
@@ -2095,7 +2050,7 @@ sub Marpa::R3::Scanless::R::show_earley_set {
                     $link_ahm_id,
                     $recce_c->_marpa_r_source_leo_transition_symbol(),
                     $slr->Marpa::R3::Scanless::R::show_leo_link_choice(
-                        $link_ahm_id, $earleme
+                        $link_ahm_id, $current_earleme
                     )
                   ];
             } ## end for ( my $link_ahm_id = $recce_c...)
