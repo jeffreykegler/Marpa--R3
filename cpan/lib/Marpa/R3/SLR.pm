@@ -1644,34 +1644,56 @@ END_OF_LUA
 
 sub Marpa::R3::Scanless::R::exhausted {
     my ($slr) = @_;
-    return $slr->[Marpa::R3::Internal::Scanless::R::R_C]
-        ->is_exhausted();
+    my ($is_exhausted) = $slr->exec_sig(<<'END_OF_LUA', '');
+    local recce = ...
+    local is_exhausted = recce.lmw_g1r:is_exhausted()
+    return is_exhausted
+END_OF_LUA
+    return $is_exhausted;
 }
 
 # Latest and current G1 location are the same
 sub Marpa::R3::Scanless::R::g1_pos {
     my ($slr) = @_;
-    return $slr->[Marpa::R3::Internal::Scanless::R::R_C]
-        ->latest_earley_set();
+    my ($latest_earley_set) = $slr->exec_sig(<<'END_OF_LUA', '');
+    local recce = ...
+    local latest_earley_set = recce.lmw_g1r:latest_earley_set()
+    return latest_earley_set
+END_OF_LUA
+    return $latest_earley_set;
 }
 
 sub Marpa::R3::Scanless::R::current_earleme {
     my ($slr) = @_;
-    my $recce_c = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
-    return $recce_c->current_earleme();
+    my ($current_earleme) = $slr->exec_sig(<<'END_OF_LUA', '');
+    local recce = ...
+    local current_earleme = recce.lmw_g1r:current_earleme()
+    return current_earleme
+END_OF_LUA
+    return $current_earleme;
 }
 
 # Not documented, I think
 sub Marpa::R3::Scanless::R::furthest_earleme {
     my ($slr) = @_;
-    my $recce_c = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
-    return $recce_c->furthest_earleme();
+    my ($furthest_earleme) = $slr->exec_sig(
+        <<'END_OF_LUA', '');
+    local recce = ...
+    local furthest_earleme = recce.lmw_g1r:furthest_earleme()
+    return furthest_earleme
+END_OF_LUA
+    return $furthest_earleme;
 }
 
 sub Marpa::R3::Scanless::R::earleme {
     my ( $slr, $earley_set_id ) = @_;
-    my $recce_c = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
-    return $recce_c->earleme($earley_set_id);
+    my ($earleme) = $slr->exec_sig(
+        <<'END_OF_LUA', 'i', $earley_set_id);
+    local recce, earley_set_id = ...
+    local earleme = recce.lmw_g1r:earleme(earley_set_id)
+    return earleme
+END_OF_LUA
+    return $earleme;
 }
 
 sub Marpa::R3::Scanless::R::lexeme_alternative {
