@@ -1846,41 +1846,8 @@ sub Marpa::R3::Scanless::R::show_earley_sets {
     return $text;
 }
 
-# Assumes trace completion source link set by caller
-sub Marpa::R3::Scanless::R::show_leo_link_choice {
-    my ( $slr, $link_ahm_id, $current_earleme ) = @_;
-
-    my ($link_data) = $slr->exec_sig( <<'END_OF_LUA', '');
-    local recce = ...
-    local g1r = recce.lmw_g1r
-    local middle_set_id = g1r:_source_middle()
-    local middle_earleme = g1r:earleme(middle_set_id)
-    local leo_transition_symbol = g1r:_source_leo_transition_symbol()
-    local result = {}
-    result.middle_earleme = middle_earleme
-    result.leo_transition_symbol = leo_transition_symbol
-    return result
-END_OF_LUA
-
-    my $middle_earleme        = $link_data->{middle_earleme};
-    my $leo_transition_symbol = $link_data->{leo_transition_symbol};
-
-    my @pieces = ();
-    push @pieces, 'l=L' . $leo_transition_symbol . q{@} . $middle_earleme;
-
-    my ($ahm_desc) = $slr->exec_sig( <<'END_OF_LUA', 'i', $link_ahm_id );
-    local recce, ahm_id = ...
-    return recce.slg.lmw_g1g:ahm_describe(ahm_id)
-END_OF_LUA
-
-    push @pieces,
-      'c=' . $ahm_desc . q{@} . $middle_earleme . q{-} . $current_earleme;
-    return '[' . ( join '; ', @pieces ) . ']';
-} ## end sub Marpa::R3::show_leo_link_choice
-
 sub Marpa::R3::Scanless::R::show_earley_set {
     my ( $slr, $traced_set_id ) = @_;
-    my $recce_c = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
     my $slg     = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $tracer  = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
 
@@ -1892,9 +1859,6 @@ sub Marpa::R3::Scanless::R::show_earley_set {
     my $current_earleme = $set_data{earleme};
 
     my @sorted_data = ();
-    if ( not defined $recce_c->_marpa_r_earley_set_trace($traced_set_id) ) {
-        return q{};
-    }
 
   EARLEY_ITEM: for ( my $item_id = 0 ; ; $item_id++ ) {
 
@@ -2003,7 +1967,7 @@ sub Marpa::R3::Scanless::R::show_earley_set {
                 my $ahm_id         = $completion_link_data{ahm_id};
                 my $origin_earleme = $completion_link_data{origin_earleme};
                 my $middle_earleme = $completion_link_data{middle_earleme};
-                my $ahm_desc = $tracer->show_briefer_ahm($ahm_id);
+                my $ahm_desc       = $tracer->show_briefer_ahm($ahm_id);
 
                 my @pieces = ();
                 if ( defined $predecessor_ahm_id ) {
@@ -2017,7 +1981,10 @@ sub Marpa::R3::Scanless::R::show_earley_set {
                 }
 
                 push @pieces,
-                  'c=' . $ahm_desc . q{@} . $middle_earleme . q{-} . $current_earleme;
+                    'c='
+                  . $ahm_desc . q{@}
+                  . $middle_earleme . q{-}
+                  . $current_earleme;
                 my $link_desc = '[' . ( join '; ', @pieces ) . ']';
 
                 push @sort_data,
@@ -2033,36 +2000,50 @@ sub Marpa::R3::Scanless::R::show_earley_set {
             } @sort_data;
         }
 
-        $recce_c->_marpa_r_earley_item_trace($item_id);
-
         # Leo links
         {
             my @sort_data = ();
-            for (
-                my $link_ahm_id = $recce_c->_marpa_r_first_leo_link_trace() ;
-                defined $link_ahm_id ;
-                $link_ahm_id = $recce_c->_marpa_r_next_leo_link_trace()
-              )
-            {
+            my @lines     = ();
+            my $leo_links = $item_data{leo_links};
+            my %leo_links = @{$leo_links};
+          LEO_LINK:
+            for ( my $leo_link_ix = 0 ; ; $leo_link_ix++ ) {
+                my $leo_link_data = $leo_links{ $leo_link_ix + 1 };
+                last LEO_LINK if not $leo_link_data;
+                my %leo_link_data = @{$leo_link_data};
+
+                my $middle_earleme = $leo_link_data{middle_earleme};
+                my $middle_set_id  = $leo_link_data{middle_set_id};
+                my $leo_transition_symbol =
+                  $leo_link_data{leo_transition_symbol};
+                my $ahm_id   = $leo_link_data{ahm_id};
+                my $ahm_desc = $tracer->show_briefer_ahm($ahm_id);
+
+                my @pieces = ();
+                push @pieces,
+                  'l=L' . $leo_transition_symbol . q{@} . $middle_earleme;
+                push @pieces,
+                    'c='
+                  . $ahm_desc . q{@}
+                  . $middle_earleme . q{-}
+                  . $current_earleme;
+                my $link_desc = '[' . ( join '; ', @pieces ) . ']';
+
                 push @sort_data,
                   [
-                    $recce_c->_marpa_r_source_middle(),
-                    $link_ahm_id,
-                    $recce_c->_marpa_r_source_leo_transition_symbol(),
-                    $slr->Marpa::R3::Scanless::R::show_leo_link_choice(
-                        $link_ahm_id, $current_earleme
-                    )
+                    $middle_set_id,         $ahm_id,
+                    $leo_transition_symbol, $link_desc,
                   ];
-            } ## end for ( my $link_ahm_id = $recce_c...)
+            }
             push @sorted_data, map { q{  } . $_->[-1] } sort {
                      $a->[0] <=> $b->[0]
                   || $a->[1] <=> $b->[1]
                   || $a->[2] <=> $b->[2]
             } @sort_data;
         }
+    }
 
-    } ## end EARLEY_ITEM: for ( my $item_id = 0;; $item_id++ )
-
+    # Leo items
     {
         my $leo_data  = $set_data{leo};
         my %leo_data  = @{$leo_data};

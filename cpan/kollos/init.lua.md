@@ -1457,6 +1457,7 @@ whose id is `id`.
         local leo_transition_symbol = g1r:_source_leo_transition_symbol()
         result.middle_earleme = middle_earleme
         result.leo_transition_symbol = leo_transition_symbol
+        result.ahm_id = ahm_id
         return result
     end
 
