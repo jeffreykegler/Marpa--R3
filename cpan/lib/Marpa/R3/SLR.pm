@@ -1526,11 +1526,12 @@ sub input_range_describe {
 sub Marpa::R3::Scanless::R::show_progress {
     my ( $slr, $start_ordinal, $end_ordinal ) = @_;
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $recce_c = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
     my $tracer  = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
 
-    my $last_ordinal = $recce_c->latest_earley_set();
+    my ($last_ordinal) = $slr->exec_sig(
+            'local recce = ...; return recce.lmw_g1r:latest_earley_set()',
+            '');
 
     if ( not defined $start_ordinal ) {
         $start_ordinal = $last_ordinal;
@@ -1878,9 +1879,14 @@ END_OF_LUA
 
 sub Marpa::R3::Scanless::R::show_earley_sets {
     my ($slr)                = @_;
-    my $recce_c                = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
-    my $last_completed_earleme = $recce_c->current_earleme();
-    my $furthest_earleme       = $recce_c->furthest_earleme();
+
+    my ($last_completed_earleme, $furthest_earleme) = $slr->exec_sig(
+        <<'END_OF_LUA', '');
+        local recce = ...
+        local g1r = recce.lmw_g1r
+        return g1r:current_earleme(), g1r:furthest_earleme()
+END_OF_LUA
+
     my $text                   = "Last Completed: $last_completed_earleme; "
         . "Furthest: $furthest_earleme\n";
     LIST: for ( my $ix = 0;; $ix++ ) {
