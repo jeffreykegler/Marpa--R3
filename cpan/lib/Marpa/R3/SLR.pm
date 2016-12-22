@@ -302,8 +302,6 @@ sub common_set {
 
     my ( $slr, $method, $flat_args ) = @_;
 
-    my $recce_c = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
-
     # These recce args are allowed in all contexts
     state $common_recce_args = {
         map { ( $_, 1 ); }
@@ -430,7 +428,11 @@ sub common_set {
     } ## end if ( defined( my $value = $flat_args->{'trace_values'} ) )
 
     if ( defined( my $value = $flat_args->{'too_many_earley_items'} ) ) {
-        $recce_c->earley_item_warning_threshold_set($value);
+        $slr->exec_sig(
+            'local recce, value = ...; recce.lmw_g1r:earley_item_warning_threshold_set(value)',
+            'i',
+            $value
+        );
     }
 
     if ( defined( my $value = $flat_args->{'end'} ) ) {
