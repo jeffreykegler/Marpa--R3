@@ -188,34 +188,6 @@ say {$out} gp_generate(qw(symbol_new));
 say {$out} gp_generate(qw(zwa_new int default_value));
 say {$out} gp_generate(qw(zwa_place Marpa_Assertion_ID zwaid Marpa_Rule_ID xrl_id int rhs_ix));
 
-$main::CLASS_LETTER   = 'r';
-$main::LIBMARPA_CLASS = 'Marpa_Recognizer';
-print {$out} 'MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::R', "\n\n";
-
-say {$out} gp_generate(qw(completion_symbol_activate Marpa_Symbol_ID sym_id int reactivate));
-say {$out} gp_generate(qw(current_earleme));
-say {$out} gp_generate(qw(earleme Marpa_Earley_Set_ID ordinal));
-say {$out} gp_generate(qw(earleme_complete));
-say {$out} gp_generate(qw(earley_item_warning_threshold));
-say {$out} gp_generate(qw(earley_item_warning_threshold_set int too_many_earley_items));
-say {$out} gp_generate(qw(earley_set_value Marpa_Earley_Set_ID ordinal));
-say {$out} gp_generate(qw(expected_symbol_event_set Marpa_Symbol_ID xsyid int value));
-say {$out} gp_generate(qw(furthest_earleme));
-say {$out} gp_generate(qw(is_exhausted));
-say {$out} gp_generate(qw(latest_earley_set));
-say {$out} gp_generate(qw(latest_earley_set_value_set int value));
-say {$out} gp_generate(qw(nulled_symbol_activate Marpa_Symbol_ID sym_id int reactivate));
-say {$out} gp_generate(qw(prediction_symbol_activate Marpa_Symbol_ID sym_id int reactivate));
-say {$out} gp_generate(qw(progress_report_finish));
-say {$out} gp_generate(qw(progress_report_start Marpa_Earley_Set_ID ordinal));
-say {$out} gp_generate(qw(terminal_is_expected Marpa_Symbol_ID xsyid));
-say {$out} gp_generate(qw(zwa_default Marpa_Assertion_ID zwaid));
-say {$out} gp_generate(qw(zwa_default_set Marpa_Assertion_ID zwaid int default_value));
-
-$main::CLASS_LETTER   = 'g';
-$main::LIBMARPA_CLASS = 'Marpa_Grammar';
-print {$out} 'MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::G', "\n\n";
-
 say {$out} gp_generate(qw(_marpa_g_rule_is_keep_separation Marpa_Rule_ID rule_id));
 say {$out} gp_generate(qw(_marpa_g_irl_lhs Marpa_IRL_ID rule_id));
 say {$out} gp_generate(qw(_marpa_g_irl_rhs Marpa_IRL_ID rule_id int ix));

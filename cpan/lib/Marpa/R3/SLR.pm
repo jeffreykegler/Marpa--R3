@@ -234,16 +234,33 @@ sub Marpa::R3::Scanless::R::new {
         $symbol_ids =
             $symbol_ids_by_event_name_and_type->{$event_name}->{completion}
             // [];
-        $recce_c->completion_symbol_activate( $_, $is_active )
-            for @{$symbol_ids};
+        for my $symbol_id ( @{ $symbol_ids } ) {
+            $slr->exec_sig( <<'END_OF_LUA', 'ii', $symbol_id, $is_active );
+            local recce, symbol_id, activate = ...
+            recce.lmw_g1r:completion_symbol_activate(symbol_id, activate)
+END_OF_LUA
+        }
+
         $symbol_ids =
             $symbol_ids_by_event_name_and_type->{$event_name}->{nulled} // [];
-        $recce_c->nulled_symbol_activate( $_, $is_active ) for @{$symbol_ids};
+        # $recce_c->nulled_symbol_activate( $_, $is_active ) for @{$symbol_ids};
+        for my $symbol_id ( @{ $symbol_ids } ) {
+            $slr->exec_sig( <<'END_OF_LUA', 'ii', $symbol_id, $is_active );
+            local recce, symbol_id, activate = ...
+            recce.lmw_g1r:nulled_symbol_activate(symbol_id, activate)
+END_OF_LUA
+        }
+
         $symbol_ids =
             $symbol_ids_by_event_name_and_type->{$event_name}->{prediction}
             // [];
-        $recce_c->prediction_symbol_activate( $_, $is_active )
-            for @{$symbol_ids};
+        for my $symbol_id ( @{ $symbol_ids } ) {
+            $slr->exec_sig( <<'END_OF_LUA', 'ii', $symbol_id, $is_active );
+            local recce, symbol_id, activate = ...
+            recce.lmw_g1r:prediction_symbol_activate(symbol_id, activate)
+END_OF_LUA
+        }
+
     } ## end EVENT: for my $event_name ( keys %{$event_is_active_arg} )
 
     if ( not $thin_slr->start_input() ) {
@@ -1788,24 +1805,21 @@ sub Marpa::R3::Scanless::R::activate {
       ->{$event_name};
 
     for my $event ( @{ $event_symbol_ids_by_type->{completion} } ) {
-        my ($earleme) =
-          $slr->exec_sig( <<'END_OF_LUA', 'ii', $event, $activate );
+        $slr->exec_sig( <<'END_OF_LUA', 'ii', $event, $activate );
         local recce, event, activate = ...
         recce.lmw_g1r:completion_symbol_activate(event, activate)
 END_OF_LUA
     }
 
     for my $event ( @{ $event_symbol_ids_by_type->{nulled} } ) {
-        my ($earleme) =
-          $slr->exec_sig( <<'END_OF_LUA', 'ii', $event, $activate );
+        $slr->exec_sig( <<'END_OF_LUA', 'ii', $event, $activate );
         local recce, event, activate = ...
         recce.lmw_g1r:nulled_symbol_activate(event, activate)
 END_OF_LUA
     }
 
     for my $event ( @{ $event_symbol_ids_by_type->{prediction} } ) {
-        my ($earleme) =
-          $slr->exec_sig( <<'END_OF_LUA', 'ii', $event, $activate );
+        $slr->exec_sig( <<'END_OF_LUA', 'ii', $event, $activate );
         local recce, event, activate = ...
         recce.lmw_g1r:prediction_symbol_activate(event, activate)
 END_OF_LUA
