@@ -1443,6 +1443,8 @@ whose id is `id`.
         result.predecessor_state = predecessor_state
         result.origin_earleme = origin_earleme
         result.middle_earleme = middle_earleme
+        result.middle_set_id = middle_set_id
+        result.ahm_id = ahm_id
         return result
     end
 
@@ -1481,8 +1483,6 @@ whose id is `id`.
             local symbol_id = lmw_r:_first_token_link_trace()
             local links = {}
             while symbol_id do
-                    -- ?? $recce_c->_marpa_r_source_middle(),
-                    -- ?? $recce_c->_marpa_r_source_predecessor_state() // -1
                 links[#links+1] = lmw_r:token_link_data()
                 symbol_id = lmw_r:_next_token_link_trace()
             end
@@ -1493,8 +1493,6 @@ whose id is `id`.
             local ahm_id = lmw_r:_first_completion_link_trace()
             local links = {}
             while ahm_id do
-                    -- ?? $recce_c->_marpa_r_source_middle(),
-                    -- ?? $recce_c->_marpa_r_source_predecessor_state() // -1
                 links[#links+1] = lmw_r:completion_link_data(ahm_id)
                 ahm_id = lmw_r:_next_completion_link_trace()
             end
@@ -1505,8 +1503,6 @@ whose id is `id`.
             local ahm_id = lmw_r:_first_leo_link_trace()
             local links = {}
             while ahm_id do
-                    -- ?? $recce_c->_marpa_r_source_middle(),
-                    -- ??  $recce_c->_marpa_r_source_leo_transition_symbol(),
                 links[#links+1] = lmw_r:leo_link_data(ahm_id)
                 ahm_id = lmw_r:_next_leo_link_trace()
             end

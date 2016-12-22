@@ -2034,24 +2034,45 @@ sub Marpa::R3::Scanless::R::show_earley_set {
 
         # Completion links
         {
-            my @sort_data = ();
-            for (
-                my $cause_AHFA_id =
-                $recce_c->_marpa_r_first_completion_link_trace() ;
-                defined $cause_AHFA_id ;
-                $cause_AHFA_id = $recce_c->_marpa_r_next_completion_link_trace()
-              )
-            {
+            my @sort_data        = ();
+            my @lines            = ();
+            my $completion_links = $item_data{completion_links};
+            my %completion_links = @{$completion_links};
+          TOKEN_LINK:
+            for ( my $completion_link_ix = 0 ; ; $completion_link_ix++ ) {
+                my $completion_link_data =
+                  $completion_links{ $completion_link_ix + 1 };
+                last TOKEN_LINK if not $completion_link_data;
+                my %completion_link_data = @{$completion_link_data};
+
+                my $predecessor_ahm_id =
+                  $completion_link_data{predecessor_state};
+                my $ahm_id         = $completion_link_data{ahm_id};
+                my $origin_earleme = $completion_link_data{origin_earleme};
+                my $middle_earleme = $completion_link_data{middle_earleme};
+                my $ahm_desc = $tracer->show_briefer_ahm($ahm_id);
+
+                my @pieces = ();
+                if ( defined $predecessor_ahm_id ) {
+                    my $predecessor_ahm_desc =
+                      $tracer->show_briefer_ahm($predecessor_ahm_id);
+                    push @pieces,
+                        'p='
+                      . $predecessor_ahm_desc . '@'
+                      . $origin_earleme . q{-}
+                      . $middle_earleme;
+                }
+
+                push @pieces,
+                  'c=' . $ahm_desc . q{@} . $middle_earleme . q{-} . $earleme;
+                my $link_desc = '[' . ( join '; ', @pieces ) . ']';
+
                 push @sort_data,
                   [
-                    $recce_c->_marpa_r_source_middle(),
-                    $cause_AHFA_id,
-                    ( $recce_c->_marpa_r_source_predecessor_state() // -1 ),
-                    $slr->Marpa::R3::Scanless::R::show_completion_link_choice(
-                        $cause_AHFA_id, $earleme
-                    )
+                    $middle_earleme, $ahm_id,
+                    ( $predecessor_ahm_id // -1 ), $link_desc
                   ];
-            } ## end for ( my $cause_AHFA_id = $recce_c...)
+            }
             push @sorted_data, map { q{  } . $_->[-1] } sort {
                      $a->[0] <=> $b->[0]
                   || $a->[1] <=> $b->[1]
