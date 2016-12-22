@@ -1846,73 +1846,6 @@ sub Marpa::R3::Scanless::R::show_earley_sets {
     return $text;
 }
 
-# Assumes trace token source link set by caller
-sub Marpa::R3::Scanless::R::show_token_link_choice {
-    my ( $slr, $current_earleme ) = @_;
-    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-
-    my ($link_data) = $slr->exec_sig(<<'END_OF_LUA', '');
-    -- turn this into show_token_link_choice()
-    local recce = ...
-    local g1r = recce.lmw_g1r
-    local g1g = recce.slg.lmw_g1g
-    local result = {}
-    local token_id, value_ix = g1r:_source_token()
-    local predecessor_ahm = g1r:_source_predecessor_state()
-    local origin_set_id = g1r:_earley_item_origin()
-    local origin_earleme = g1r:earleme(origin_set_id)
-    local middle_earleme = origin_earleme
-    if predecessor_ahm then
-        local middle_set_id = g1r:_source_middle()
-        middle_earleme = g1r:earleme(middle_set_id)
-    end
-    local token_name = g1g:isy_name(token_id)
-    result.predecessor_ahm = predecessor_ahm
-    result.origin_earleme = origin_earleme
-    result.middle_earleme = middle_earleme
-    result.token_name = token_name
-    result.token_id = token_id
-    result.value_ix = value_ix
-    if value_ix ~= 2 then
-        result.value = recce.token_values[value_ix]
-    end
-    return result
-END_OF_LUA
-
-    my $middle_earleme = $link_data->{middle_earleme};
-    my $origin_earleme = $link_data->{origin_earleme};
-
-    my @pieces  = ();
-    my $predecessor_ahm = $link_data->{predecessor_ahm};
-    if ( defined $predecessor_ahm ) {
-        my ($ahm_desc) = $slr->exec_sig(
-            <<'END_OF_LUA', 'i', $predecessor_ahm);
-        local recce, ahm_id = ...
-        return recce.slg.lmw_g1g:ahm_describe(ahm_id)
-END_OF_LUA
-
-        push @pieces,
-              'c='
-            . $ahm_desc
-            . q{@}
-            . $origin_earleme. q{-}
-            . $middle_earleme;
-    } ## end if ( defined $predecessor_ahm )
-
-    push @pieces, 's=' . $link_data->{token_name};
-
-    my $value = $link_data->{value};
-    if (not defined $value) {
-        # Value is literal
-        my $token_length = $current_earleme - $middle_earleme;
-        $value = $slr->g1_literal ( $middle_earleme, $token_length);
-    }
-    my $token_dump = Data::Dumper->new( [ \$value ] )->Terse(1)->Dump;
-    chomp $token_dump;
-    push @pieces, "t=$token_dump";
-    return '[' . ( join '; ', @pieces ) . ']';
-}
-
 # Assumes trace completion source link set by caller
 sub Marpa::R3::Scanless::R::show_completion_link_choice {
     my ( $slr, $link_ahm_id, $current_earleme ) = @_;
@@ -1992,12 +1925,12 @@ END_OF_LUA
 
 sub Marpa::R3::Scanless::R::show_earley_set {
     my ( $slr, $traced_set_id ) = @_;
-    my $recce_c                = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
-    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $tracer =
-        $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
+    my $recce_c = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
+    my $slg     = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+    my $tracer  = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
 
-    my ($set_data) = $slr->exec_sig_name('g1_earley_set_data', 'i>2', $traced_set_id);
+    my ($set_data) =
+      $slr->exec_sig_name( 'g1_earley_set_data', 'i>2', $traced_set_id );
     return if not $set_data;
     my %set_data = @{$set_data};
 
@@ -2008,147 +1941,149 @@ sub Marpa::R3::Scanless::R::show_earley_set {
         return q{};
     }
 
-    EARLEY_ITEM: for ( my $item_id = 0;; $item_id++ ) {
+  EARLEY_ITEM: for ( my $item_id = 0 ; ; $item_id++ ) {
 
-        my $item_data = $set_data{$item_id+1};
+        my $item_data = $set_data{ $item_id + 1 };
         last EARLEY_ITEM if not defined $item_data;
 
         my %item_data = @{$item_data};
 
-        my $irl_id = $item_data{irl_id};
+        my $irl_id       = $item_data{irl_id};
         my $dot_position = $item_data{dot_position};
         my $ahm_desc;
-        if ($dot_position < 0) {
-            $ahm_desc = sprintf('R%d$', $irl_id);
-        } else {
-            $ahm_desc = sprintf('R%d:%d', $irl_id, $dot_position);
+        if ( $dot_position < 0 ) {
+            $ahm_desc = sprintf( 'R%d$', $irl_id );
         }
-        my $ahm_id_of_yim = $item_data{ahm_id_of_yim};
+        else {
+            $ahm_desc = sprintf( 'R%d:%d', $irl_id, $dot_position );
+        }
+        my $ahm_id_of_yim  = $item_data{ahm_id_of_yim};
         my $origin_earleme = $item_data{origin_earleme};
 
         my $text .= sprintf "ahm%d: %s@%d-%d", $ahm_id_of_yim,
-            $ahm_desc,
-            $origin_earleme, $earleme;
+          $ahm_desc,
+          $origin_earleme, $earleme;
 
-        my @lines    = $text;
-        push @lines, qq{  }
-            . $ahm_desc
-            . q{: }
-            . $tracer->show_dotted_irl($irl_id, $dot_position);
+        my @lines = $text;
+        push @lines,
+            qq{  }
+          . $ahm_desc . q{: }
+          . $tracer->show_dotted_irl( $irl_id, $dot_position );
 
         push @sorted_data, @lines;
 
+        # Token links
         {
-                my $ahm_id_of_yim = $recce_c->_marpa_r_earley_item_trace($item_id);
+            my @sort_data   = ();
+            my @lines       = ();
+            my $token_links = $item_data{token_links};
+            my %token_links = @{$token_links};
+          TOKEN_LINK: for ( my $token_link_ix = 0 ; ; $token_link_ix++ ) {
+                my $token_link_data = $token_links{ $token_link_ix + 1 };
+                last TOKEN_LINK if not $token_link_data;
+                my %token_link_data = @{$token_link_data};
 
-                # Token links
-                {
-                    my @sort_data   = ();
-                    my @lines       = ();
-                    my $token_links = $item_data{token_links};
-                    my %token_links = @{$token_links};
-                    TOKEN_LINK: for ( my $token_link_ix = 0 ; ; $token_link_ix++ ) {
-                        my $token_link_data =
-                          $token_links{ $token_link_ix + 1 };
-                        last TOKEN_LINK if not $token_link_data;
-                        my %token_link_data = @{$token_link_data};
+                my $predecessor_ahm = $token_link_data{predecessor_ahm};
+                my $origin_earleme  = $token_link_data{origin_earleme};
+                my $middle_earleme  = $token_link_data{middle_earleme};
+                my $middle_set_id   = $token_link_data{middle_set_id};
+                my $token_name      = $token_link_data{token_name};
+                my $token_id        = $token_link_data{token_id};
+                my $value_ix        = $token_link_data{value_ix};
+                my $value           = $token_link_data{value};
+                my $source_predecessor_state =
+                  $token_link_data{source_predecessor_state};
 
-                        my $predecessor_ahm = $token_link_data{predecessor_ahm};
-                        my $origin_earleme  = $token_link_data{origin_earleme};
-                        my $middle_earleme  = $token_link_data{middle_earleme};
-                        my $middle_set_id   = $token_link_data{middle_set_id};
-                        my $token_name      = $token_link_data{token_name};
-                        my $token_id        = $token_link_data{token_id};
-                        my $value_ix        = $token_link_data{value_ix};
-                        my $value           = $token_link_data{value};
-                        my $source_predecessor_state =
-                          $token_link_data{source_predecessor_state};
+                my @pieces = ();
+                if ( defined $predecessor_ahm ) {
+                    my $ahm_desc = $tracer->show_briefer_ahm($predecessor_ahm);
+                    push @pieces,
+                        'c='
+                      . $ahm_desc . q{@}
+                      . $origin_earleme . q{-}
+                      . $middle_earleme;
+                } ## end if ( defined $predecessor_ahm )
 
-                        my @pieces = ();
-                        if ( defined $predecessor_ahm ) {
-                            my $ahm_desc =
-                              $tracer->show_briefer_ahm($predecessor_ahm);
-                            push @pieces,
-                                'c='
-                              . $ahm_desc . q{@}
-                              . $origin_earleme . q{-}
-                              . $middle_earleme;
-                        } ## end if ( defined $predecessor_ahm )
+                push @pieces, 's=' . $token_name;
 
-                        push @pieces, 's=' . $token_name;
+                if ( not defined $value ) {
 
-                        if ( not defined $value ) {
-
-                            # Value is literal
-                            my $token_length = $earleme - $middle_earleme;
-                            $value =
-                              $slr->g1_literal( $middle_earleme,
-                                $token_length );
-                        }
-                        my $token_dump =
-                          Data::Dumper->new( [ \$value ] )->Terse(1)->Dump;
-                        chomp $token_dump;
-                        push @pieces, "t=$token_dump";
-                        my $token_link_desc =
-                          '[' . ( join '; ', @pieces ) . ']';
-                        push @sort_data,
-                          [
-                            $middle_set_id,   $token_id,
-                            $predecessor_ahm, $token_link_desc
-                          ];
-                    }
-                    push @sorted_data, map { qq{  } . $_->[-1] } sort {
-                             $a->[0] <=> $b->[0]
-                          || $a->[1] <=> $b->[1]
-                          || $a->[2] <=> $b->[2]
-                    } @sort_data;
+                    # Value is literal
+                    my $token_length = $earleme - $middle_earleme;
+                    $value = $slr->g1_literal( $middle_earleme, $token_length );
                 }
-
-                my @sort_data = ();
-                for (
-                    my $cause_AHFA_id = $recce_c->_marpa_r_first_completion_link_trace();
-                    defined $cause_AHFA_id;
-                    $cause_AHFA_id = $recce_c->_marpa_r_next_completion_link_trace()
-                    )
-                {
-                    push @sort_data,
-                        [
-                        $recce_c->_marpa_r_source_middle(),
-                        $cause_AHFA_id,
-                        ( $recce_c->_marpa_r_source_predecessor_state() // -1 ),
-                        $slr->Marpa::R3::Scanless::R::show_completion_link_choice(
-                            $cause_AHFA_id, $earleme
-                        )
-                        ];
-                } ## end for ( my $cause_AHFA_id = $recce_c...)
-                push @sorted_data, map { q{  } . $_->[-1] } sort {
-                           $a->[0] <=> $b->[0]
-                        || $a->[1] <=> $b->[1]
-                        || $a->[2] <=> $b->[2]
-                } @sort_data;
-                @sort_data = ();
-                for (
-                    my $link_ahm_id = $recce_c->_marpa_r_first_leo_link_trace();
-                    defined $link_ahm_id;
-                    $link_ahm_id = $recce_c->_marpa_r_next_leo_link_trace()
-                    )
-                {
-                    push @sort_data,
-                        [
-                        $recce_c->_marpa_r_source_middle(),
-                        $link_ahm_id,
-                        $recce_c->_marpa_r_source_leo_transition_symbol(),
-                        $slr->Marpa::R3::Scanless::R::show_leo_link_choice(
-                            $link_ahm_id, $earleme
-                        )
-                        ];
-                } ## end for ( my $link_ahm_id = $recce_c...)
-                push @sorted_data, map { q{  } . $_->[-1] } sort {
-                           $a->[0] <=> $b->[0]
-                        || $a->[1] <=> $b->[1]
-                        || $a->[2] <=> $b->[2]
-                } @sort_data;
+                my $token_dump =
+                  Data::Dumper->new( [ \$value ] )->Terse(1)->Dump;
+                chomp $token_dump;
+                push @pieces, "t=$token_dump";
+                my $token_link_desc = '[' . ( join '; ', @pieces ) . ']';
+                push @sort_data,
+                  [
+                    $middle_set_id,   $token_id,
+                    $predecessor_ahm, $token_link_desc
+                  ];
             }
+            push @sorted_data, map { qq{  } . $_->[-1] } sort {
+                     $a->[0] <=> $b->[0]
+                  || $a->[1] <=> $b->[1]
+                  || $a->[2] <=> $b->[2]
+            } @sort_data;
+        }
+
+        $recce_c->_marpa_r_earley_item_trace($item_id);
+
+        # Completion links
+        {
+            my @sort_data = ();
+            for (
+                my $cause_AHFA_id =
+                $recce_c->_marpa_r_first_completion_link_trace() ;
+                defined $cause_AHFA_id ;
+                $cause_AHFA_id = $recce_c->_marpa_r_next_completion_link_trace()
+              )
+            {
+                push @sort_data,
+                  [
+                    $recce_c->_marpa_r_source_middle(),
+                    $cause_AHFA_id,
+                    ( $recce_c->_marpa_r_source_predecessor_state() // -1 ),
+                    $slr->Marpa::R3::Scanless::R::show_completion_link_choice(
+                        $cause_AHFA_id, $earleme
+                    )
+                  ];
+            } ## end for ( my $cause_AHFA_id = $recce_c...)
+            push @sorted_data, map { q{  } . $_->[-1] } sort {
+                     $a->[0] <=> $b->[0]
+                  || $a->[1] <=> $b->[1]
+                  || $a->[2] <=> $b->[2]
+            } @sort_data;
+        }
+
+        # Leo links
+        {
+            my @sort_data = ();
+            for (
+                my $link_ahm_id = $recce_c->_marpa_r_first_leo_link_trace() ;
+                defined $link_ahm_id ;
+                $link_ahm_id = $recce_c->_marpa_r_next_leo_link_trace()
+              )
+            {
+                push @sort_data,
+                  [
+                    $recce_c->_marpa_r_source_middle(),
+                    $link_ahm_id,
+                    $recce_c->_marpa_r_source_leo_transition_symbol(),
+                    $slr->Marpa::R3::Scanless::R::show_leo_link_choice(
+                        $link_ahm_id, $earleme
+                    )
+                  ];
+            } ## end for ( my $link_ahm_id = $recce_c...)
+            push @sorted_data, map { q{  } . $_->[-1] } sort {
+                     $a->[0] <=> $b->[0]
+                  || $a->[1] <=> $b->[1]
+                  || $a->[2] <=> $b->[2]
+            } @sort_data;
+        }
 
     } ## end EARLEY_ITEM: for ( my $item_id = 0;; $item_id++ )
 
@@ -2161,9 +2096,9 @@ sub Marpa::R3::Scanless::R::show_earley_set {
             my $leo_item_data = $leo_data{ $leo_item_id + 1 };
             last LEO_ITEM if not defined $leo_item_data;
 
-            my %leo_item_data = @{$leo_item_data};
-            my $postdot_symbol_id      = $leo_item_data{postdot_symbol_id};
-            my $postdot_symbol_name    = $leo_item_data{postdot_symbol_name};
+            my %leo_item_data         = @{$leo_item_data};
+            my $postdot_symbol_id     = $leo_item_data{postdot_symbol_id};
+            my $postdot_symbol_name   = $leo_item_data{postdot_symbol_name};
             my $predecessor_symbol_id = $leo_item_data{predecessor_symbol_id};
             my $base_origin_earleme   = $leo_item_data{base_origin_earleme};
             my $leo_base_state        = $leo_item_data{leo_base_state};
