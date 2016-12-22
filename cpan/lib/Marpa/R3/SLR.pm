@@ -69,8 +69,11 @@ sub Marpa::R3::Scanless::R::g1_input_span {
     return
         if not defined $start_earley_set
         or not defined $length_in_parse_locations;
-    my $thin_g1_recce     = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
-    my $latest_earley_set = $thin_g1_recce->latest_earley_set();
+
+    my ($latest_earley_set) = $slr->exec_sig(<<'END_OF_LUA', '');
+    local recce = ...
+    return recce.lmw_g1r:latest_earley_set()
+END_OF_LUA
 
     my $earley_set_for_first_position = $start_earley_set + 1;
     my $earley_set_for_last_position =
