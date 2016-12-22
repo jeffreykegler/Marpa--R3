@@ -1774,30 +1774,41 @@ sub Marpa::R3::Scanless::R::input_length {
 # no return value documented
 sub Marpa::R3::Scanless::R::activate {
     my ( $slr, $event_name, $activate ) = @_;
-    my $slg      = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
+    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     $activate //= 1;
-    my $thin_g1_recce = $slr->[Marpa::R3::Internal::Scanless::R::R_C];
     my $event_symbol_ids_by_type =
-        $slg
-        ->[Marpa::R3::Internal::Scanless::G::SYMBOL_IDS_BY_EVENT_NAME_AND_TYPE]
-        ->{$event_name};
+      $slg
+      ->[Marpa::R3::Internal::Scanless::G::SYMBOL_IDS_BY_EVENT_NAME_AND_TYPE]
+      ->{$event_name};
 
-    # $thin_g1_recce->completion_symbol_activate( $_, $activate )
-    for my $event (@{ $event_symbol_ids_by_type->{completion} }) {
-        my ($earleme) = $slr->exec_sig(
-            <<'END_OF_LUA', 'ii', $event, $activate);
+    for my $event ( @{ $event_symbol_ids_by_type->{completion} } ) {
+        my ($earleme) =
+          $slr->exec_sig( <<'END_OF_LUA', 'ii', $event, $activate );
         local recce, event, activate = ...
         recce.lmw_g1r:completion_symbol_activate(event, activate)
 END_OF_LUA
     }
 
-    $thin_g1_recce->nulled_symbol_activate( $_, $activate )
-        for @{ $event_symbol_ids_by_type->{nulled} };
-    $thin_g1_recce->prediction_symbol_activate( $_, $activate )
-        for @{ $event_symbol_ids_by_type->{prediction} };
+    for my $event ( @{ $event_symbol_ids_by_type->{nulled} } ) {
+        my ($earleme) =
+          $slr->exec_sig( <<'END_OF_LUA', 'ii', $event, $activate );
+        local recce, event, activate = ...
+        recce.lmw_g1r:nulled_symbol_activate(event, activate)
+END_OF_LUA
+    }
+
+    for my $event ( @{ $event_symbol_ids_by_type->{prediction} } ) {
+        my ($earleme) =
+          $slr->exec_sig( <<'END_OF_LUA', 'ii', $event, $activate );
+        local recce, event, activate = ...
+        recce.lmw_g1r:prediction_symbol_activate(event, activate)
+END_OF_LUA
+    }
+
+    my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
     $thin_slr->lexeme_event_activate( $_, $activate )
-        for @{ $event_symbol_ids_by_type->{lexeme} };
+      for @{ $event_symbol_ids_by_type->{lexeme} };
+
     return 1;
 } ## end sub Marpa::R3::Scanless::R::activate
 
