@@ -1782,8 +1782,16 @@ sub Marpa::R3::Scanless::R::activate {
         $slg
         ->[Marpa::R3::Internal::Scanless::G::SYMBOL_IDS_BY_EVENT_NAME_AND_TYPE]
         ->{$event_name};
-    $thin_g1_recce->completion_symbol_activate( $_, $activate )
-        for @{ $event_symbol_ids_by_type->{completion} };
+
+    # $thin_g1_recce->completion_symbol_activate( $_, $activate )
+    for my $event (@{ $event_symbol_ids_by_type->{completion} }) {
+        my ($earleme) = $slr->exec_sig(
+            <<'END_OF_LUA', 'ii', $event, $activate);
+        local recce, event, activate = ...
+        recce.lmw_g1r:completion_symbol_activate(event, activate)
+END_OF_LUA
+    }
+
     $thin_g1_recce->nulled_symbol_activate( $_, $activate )
         for @{ $event_symbol_ids_by_type->{nulled} };
     $thin_g1_recce->prediction_symbol_activate( $_, $activate )
