@@ -2373,6 +2373,8 @@ static Scanless_R* marpa_inner_slr_new (
    */
   slr->g1r_sv = g1r_sv;
   SvREFCNT_inc (g1r_sv);
+  slr->g1g_sv = slg->g1_sv;
+  SvREFCNT_inc (slr->g1g_sv);
 
   /* These do not need references, because parent objects
    * hold references to them
@@ -2385,7 +2387,7 @@ static Scanless_R* marpa_inner_slr_new (
     }
   slr->slg = slg;
   slr->g1r = slr->g1r_wrapper->r;
-  SET_G_WRAPPER_FROM_G_SV (slr->g1_wrapper, slr->g1r_wrapper->base_sv);
+  slr->g1_wrapper = slg->g1_wrapper;
 
   slr->start_of_lexeme = 0;
   slr->end_of_lexeme = 0;
@@ -2491,6 +2493,7 @@ static void slr_inner_destroy(Scanless_R* slr)
 
   Safefree(slr->pos_db);
   SvREFCNT_dec (slr->g1r_sv);
+  SvREFCNT_dec (slr->g1g_sv);
   Safefree(slr->symbol_r_properties);
   Safefree(slr->l0_rule_r_properties);
   if (slr->token_values)
@@ -2657,7 +2660,7 @@ slr_convert_events (Scanless_R * slr)
 {
   dTHX;
   int event_ix;
-  Marpa_Grammar g = slr->g1r_wrapper->base->g;
+  Marpa_Grammar g = slr->g1_wrapper->g;
   const int event_count = marpa_g_event_count (g);
   for (event_ix = 0; event_ix < event_count; event_ix++)
     {
@@ -2728,8 +2731,7 @@ r_convert_events ( Outer_R *outer_slr)
   dTHX;
   int event_ix;
   Scanless_R *slr = slr_inner_get(outer_slr);
-  R_Wrapper* r_wrapper = (slr->g1r_wrapper);
-  Marpa_Grammar g = r_wrapper->base->g;
+  Marpa_Grammar g = slr->g1_wrapper->g;
   const int event_count = marpa_g_event_count (g);
   for (event_ix = 0; event_ix < event_count; event_ix++)
     {
@@ -6097,13 +6099,13 @@ start_input( outer_slr )
 PPCODE:
 {
   Scanless_R *slr = slr_inner_get(outer_slr);
-  R_Wrapper *r_wrapper = slr->g1r_wrapper;
-  Marpa_Recognizer g1r = r_wrapper->r;
+  G_Wrapper *g1_wrapper = slr->g1_wrapper;
+  Marpa_Recognizer g1r = slr->g1r;
   int gp_result = marpa_r_start_input(g1r);
   if ( gp_result == -1 ) { XSRETURN_UNDEF; }
-  if ( gp_result < 0 && r_wrapper->base->throw ) {
+  if ( gp_result < 0 && g1_wrapper->throw ) {
     croak( "Problem in r->start_input(): %s",
-     xs_g_error( r_wrapper->base ));
+     xs_g_error( g1_wrapper ));
   }
   r_convert_events(outer_slr);
   XPUSHs (sv_2mortal (newSViv (gp_result)));

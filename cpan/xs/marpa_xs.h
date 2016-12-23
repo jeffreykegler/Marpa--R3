@@ -346,6 +346,7 @@ struct v_wrapper_s;
 typedef struct
 {
   SV *g1r_sv;
+  SV *g1g_sv;
 
   Scanless_G *slg;
   R_Wrapper *g1r_wrapper;
