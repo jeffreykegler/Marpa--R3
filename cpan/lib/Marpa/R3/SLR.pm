@@ -1224,7 +1224,7 @@ sub Marpa::R3::Scanless::R::read_problem {
             last DESC;
         } ## end if ($g1_status)
         if ( $g1_status < 0 ) {
-            $desc = 'G1 error: ' . $thin_slr->g1()->error();
+            $desc = 'G1 error: ' . $thin_slr->error();
             chomp $desc;
             last DESC;
         }
@@ -1757,7 +1757,7 @@ sub Marpa::R3::Scanless::R::lexeme_complete {
     $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] = [];
     my $return_value = $thin_slr->g1_lexeme_complete( $start, $length );
     Marpa::R3::Internal::Scanless::convert_libmarpa_events($slr);
-    die q{} . $thin_slr->g1()->error() if $return_value == 0;
+    die q{} . $thin_slr->error() if $return_value == 0;
     return $return_value;
 } ## end sub Marpa::R3::Scanless::R::lexeme_complete
 

@@ -6132,6 +6132,42 @@ PPCODE:
   XPUSHs (sv_2mortal (newSViv (gp_result)));
 }
 
+void
+error( outer_slr )
+    Outer_R *outer_slr;
+PPCODE:
+{
+  Scanless_R * const slr = slr_inner_get(outer_slr);
+  G_Wrapper * const g_wrapper = slr->g1_wrapper;
+  Marpa_Grammar g = g_wrapper->g;
+  const char *error_message =
+    "Problem in $g->error(): Nothing in message buffer";
+  SV *error_code_sv = 0;
+
+  g_wrapper->libmarpa_error_code =
+    marpa_g_error (g, &g_wrapper->libmarpa_error_string);
+  /* A new Libmarpa error overrides any thin interface error */
+  if (g_wrapper->libmarpa_error_code != MARPA_ERR_NONE)
+    g_wrapper->message_is_marpa_thin_error = 0;
+  if (g_wrapper->message_is_marpa_thin_error)
+    {
+      error_message = g_wrapper->message_buffer;
+    }
+  else
+    {
+      error_message = error_description_generate (g_wrapper);
+      error_code_sv = sv_2mortal (newSViv (g_wrapper->libmarpa_error_code));
+    }
+  if (GIMME == G_ARRAY)
+    {
+      if (!error_code_sv) {
+        error_code_sv = sv_2mortal (newSV (0));
+      }
+      XPUSHs (error_code_sv);
+    }
+  XPUSHs (sv_2mortal (newSVpv (error_message, 0)));
+}
+
 MODULE = Marpa::R3            PACKAGE = Marpa::R3::Lua
 
 void
