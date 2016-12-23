@@ -1081,6 +1081,8 @@ sub Marpa::R3::Scanless::R::read_problem {
     my $g1_tracer =
         $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
 
+    my $thin_g1 = $g1_tracer->[Marpa::R3::Internal::Trace::G::C];
+
     my $pos      = $thin_slr->pos();
     my $problem_pos = $pos;
     my $p_string = $slr->[Marpa::R3::Internal::Scanless::R::P_INPUT_STRING];
@@ -1192,7 +1194,7 @@ sub Marpa::R3::Scanless::R::read_problem {
             last DESC;
         }
         if ($g1_status) {
-            my $true_event_count = $thin_slr->g1()->event_count();
+            my $true_event_count = $thin_g1->event_count();
             EVENT:
             for (
                 my $event_ix = 0;
@@ -1201,7 +1203,7 @@ sub Marpa::R3::Scanless::R::read_problem {
                 )
             {
                 my ( $event_type, $value ) =
-                    $thin_slr->g1()->event($event_ix);
+                    $thin_g1->event($event_ix);
                 if ( $event_type eq 'MARPA_EVENT_EARLEY_ITEM_THRESHOLD' ) {
                     $desc = join "\n", $desc,
                         "G1 grammar: Earley item count ($value) exceeds warning threshold\n";
@@ -1224,7 +1226,7 @@ sub Marpa::R3::Scanless::R::read_problem {
             last DESC;
         } ## end if ($g1_status)
         if ( $g1_status < 0 ) {
-            $desc = 'G1 error: ' . $thin_slr->error();
+            $desc = 'G1 error: ' . $thin_g1->error();
             chomp $desc;
             last DESC;
         }
