@@ -1756,10 +1756,15 @@ sub Marpa::R3::Scanless::R::lexeme_alternative {
 sub Marpa::R3::Scanless::R::lexeme_complete {
     my ( $slr, $start, $length ) = @_;
     my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
+    my $slg  = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+    my $g1_tracer =
+        $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
+    my $thin_g1 = $g1_tracer->[Marpa::R3::Internal::Trace::G::C];
+
     $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] = [];
     my $return_value = $thin_slr->g1_lexeme_complete( $start, $length );
     Marpa::R3::Internal::Scanless::convert_libmarpa_events($slr);
-    die q{} . $thin_slr->error() if $return_value == 0;
+    die q{} . $thin_g1->error() if $return_value == 0;
     return $return_value;
 } ## end sub Marpa::R3::Scanless::R::lexeme_complete
 

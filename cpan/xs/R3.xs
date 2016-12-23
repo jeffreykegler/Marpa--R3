@@ -4352,17 +4352,6 @@ PPCODE:
     XSRETURN_YES;
 }
 
- #  it does not create a new one
- #
-void
-g1( outer_slg )
-    Outer_G *outer_slg;
-PPCODE:
-{
-  Scanless_G *slg = slg_inner_get(outer_slg);
-  XPUSHs (sv_2mortal (SvREFCNT_inc_NN (slg->g1_sv)));
-}
-
 void
 lexer_rule_to_g1_lexeme_set( outer_slg, lexer_rule, g1_lexeme, assertion_id )
     Outer_G *outer_slg;
@@ -4871,18 +4860,6 @@ PPCODE:
 {
   Scanless_R *slr = slr_inner_get(outer_slr);
   slr->too_many_earley_items = too_many_earley_items;
-}
-
- #  Always returns the same SV for a given Scanless recce object --
- #  it does not create a new one
- #
-void
-g1( outer_slr )
-    Outer_R *outer_slr;
-PPCODE:
-{
-  Scanless_R *slr = slr_inner_get(outer_slr);
-  XPUSHs (sv_2mortal (SvREFCNT_inc_NN ( slr->g1r_wrapper->base_sv)));
 }
 
 void
@@ -6130,42 +6107,6 @@ PPCODE:
   }
   r_convert_events(outer_slr);
   XPUSHs (sv_2mortal (newSViv (gp_result)));
-}
-
-void
-error( outer_slr )
-    Outer_R *outer_slr;
-PPCODE:
-{
-  Scanless_R * const slr = slr_inner_get(outer_slr);
-  G_Wrapper * const g_wrapper = slr->g1_wrapper;
-  Marpa_Grammar g = g_wrapper->g;
-  const char *error_message =
-    "Problem in $g->error(): Nothing in message buffer";
-  SV *error_code_sv = 0;
-
-  g_wrapper->libmarpa_error_code =
-    marpa_g_error (g, &g_wrapper->libmarpa_error_string);
-  /* A new Libmarpa error overrides any thin interface error */
-  if (g_wrapper->libmarpa_error_code != MARPA_ERR_NONE)
-    g_wrapper->message_is_marpa_thin_error = 0;
-  if (g_wrapper->message_is_marpa_thin_error)
-    {
-      error_message = g_wrapper->message_buffer;
-    }
-  else
-    {
-      error_message = error_description_generate (g_wrapper);
-      error_code_sv = sv_2mortal (newSViv (g_wrapper->libmarpa_error_code));
-    }
-  if (GIMME == G_ARRAY)
-    {
-      if (!error_code_sv) {
-        error_code_sv = sv_2mortal (newSV (0));
-      }
-      XPUSHs (error_code_sv);
-    }
-  XPUSHs (sv_2mortal (newSVpv (error_message, 0)));
 }
 
 MODULE = Marpa::R3            PACKAGE = Marpa::R3::Lua
