@@ -2010,11 +2010,18 @@ u_read (Outer_R * outer_slr)
                     slr->input_symbol_id = symbol_id;
                     if (trace_lexers >= 1)
                       {
-                        union marpa_slr_event_s *slr_event = marpa_slr_event_push(slr);
-                        MARPA_SLREV_TYPE(slr_event) = MARPA_SLRTR_CODEPOINT_REJECTED;
-                        slr_event->t_trace_codepoint_rejected.t_codepoint = codepoint;
-                        slr_event->t_trace_codepoint_rejected.t_perl_pos = slr->perl_pos;
-                        slr_event->t_trace_codepoint_rejected.t_symbol_id = symbol_id;
+
+              xlua_sig_call (outer_slr->L,
+                  "recce, codepoint, perl_pos, symbol_id = ...\n"
+                  "local q = recce.event_queue\n"
+                  "q[#q+1] = { '!trace', 'lexer rejected codepoint', codepoint, perl_pos, symbol_id}\n",
+                  "Riii>",
+                  outer_slr->lua_ref,
+                  codepoint,
+                  slr->perl_pos,
+                  symbol_id
+              );
+
                       }
                     break;
                   case MARPA_ERR_NONE:
@@ -5021,20 +5028,6 @@ PPCODE:
       const int event_type = MARPA_SLREV_TYPE (slr_event);
       switch (event_type)
         {
-        case MARPA_SLREV_DELETED:
-          break;
-
-        case MARPA_SLRTR_CODEPOINT_REJECTED:
-          {
-            AV *event_av = newAV ();
-            av_push (event_av, newSVpvs ("!trace"));
-            av_push (event_av, newSVpvs ("lexer rejected codepoint"));
-            av_push (event_av, newSViv ((IV) slr_event->t_trace_codepoint_rejected.t_codepoint));
-            av_push (event_av, newSViv ((IV) slr_event->t_trace_codepoint_rejected.t_perl_pos));
-            av_push (event_av, newSViv ((IV) slr_event->t_trace_codepoint_rejected.t_symbol_id));
-            XPUSHs (sv_2mortal (newRV_noinc ((SV *) event_av)));
-            break;
-          }
 
         case MARPA_SLRTR_CODEPOINT_ACCEPTED:
           {
