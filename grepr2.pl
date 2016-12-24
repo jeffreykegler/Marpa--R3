@@ -2,6 +2,8 @@ use 5.010;
 
 use Data::Dumper;
 use Marpa::R2;
+use strict;
+use warnings;
 
 my $grammar = Marpa::R2::Scanless::G->new(
     {   source        => \(<<'END_OF_DSL'),
@@ -23,6 +25,17 @@ END_OF_DSL
     }
 );
 
+my $target_rule_id;
+RULE: for my $rule_id ($grammar->rule_ids()) {
+  my ($lhs_id) = $grammar->rule_expand($rule_id);
+  my $lhs_name = $grammar->symbol_name($lhs_id);
+  if ($lhs_name eq 'target') {
+     $target_rule_id = $rule_id;
+     # say "LHS of rule $rule_id is $lhs_name";
+     last RULE;
+  }
+}
+
 sub My_Actions::top {
     my ($ppo, @children) = @_;
     return [grep { $_ } @children ];
@@ -32,16 +45,24 @@ my $recce = Marpa::R2::Scanless::R->new( { grammar => $grammar } );
 
 my $input = 'yyyxxxyyyyyxxxxxyyyyxyyyyxxyyyyxxxxyyy';
 my $length = length $input;
+my @hits = ();
 for (
     my $pos = $recce->read( \$input );
     $pos < $length;
     $pos = $recce->resume()
     )
 {
-  EVENT:
-    for my $event ( @{ $recce->events() } ) {
-	my ($name) = @{$event};
-	say "Event $name at $pos";
-    }
+  my $hit = scalar @{ $recce->events() };
+  if ($hit) {
+      my $items = $recce->progress();
+      push @hits,
+	map { [ $pos, $_->[2] ] }
+	grep { $_->[0] == $target_rule_id and $_->[1] == -1 }
+	@{$items};
+  }
 }
 
+for my $hit (sort { $a->[0] <=> $b->[0] or $a->[1] <=> $b->[1] } @hits) {
+   my ($start, $end) = @{$hit};
+   say "Target found: start = $start, end = $end";
+}
