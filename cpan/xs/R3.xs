@@ -2356,7 +2356,9 @@ static void slg_inner_destroy(Scanless_G* slg) {
 
 static Scanless_R* marpa_inner_slr_new (
   Scanless_G *slg,
-    SV *g1r_sv)
+    SV *g1r_sv,
+    Marpa_Recce g1r
+    )
 {
   dTHX;
   Scanless_R *slr;
@@ -2379,14 +2381,13 @@ static Scanless_R* marpa_inner_slr_new (
   /* These do not need references, because parent objects
    * hold references to them
    */
-  SET_R_WRAPPER_FROM_R_SV (slr->g1r_wrapper, g1r_sv);
   if (!slg->precomputed)
     {
       croak
         ("Problem in u->new(): Attempted to create SLIF recce from unprecomputed SLIF grammar");
     }
   slr->slg = slg;
-  slr->g1r = slr->g1r_wrapper->r;
+  slr->g1r = g1r;
   slr->g1_wrapper = slg->g1_wrapper;
 
   slr->start_of_lexeme = 0;
@@ -4740,6 +4741,8 @@ PPCODE:
   Outer_R *outer_slr;
   Scanless_R *slr;
   Scanless_G *slg;
+  Marpa_Grammar g1g;
+  Marpa_Recce g1r;
   PERL_UNUSED_ARG(class);
 
   if (!sv_isa (slg_sv, "Marpa::R3::Thin::SLG"))
@@ -4759,7 +4762,14 @@ PPCODE:
   }
 
   slg = slg_inner_get(outer_slg);
-  slr = marpa_inner_slr_new(slg, g1r_sv);
+  g1g = slg->g1_wrapper->g;
+
+  g1r = marpa_r_new (g1g);
+  if (!g1r) {
+      croak ("failure in marpa_r_new(): %s", xs_g_error (slg->g1_wrapper));
+  };
+
+  slr = marpa_inner_slr_new(slg, g1r_sv, g1r);
   /* Copy and take references to the "parent objects",
    * the ones responsible for holding references.
    */
