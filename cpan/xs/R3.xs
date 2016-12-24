@@ -3093,13 +3093,18 @@ slr_alternatives ( Outer_R *outer_slr)
 
                 case MARPA_ERR_NONE:
                     if (slr->trace_terminals) {
-                        union marpa_slr_event_s *event =
-                            marpa_slr_event_push (slr);
-                        MARPA_SLREV_TYPE (event) =
-                            MARPA_SLRTR_G1_ACCEPTED_LEXEME;
-                        event->t_trace_accepted_lexeme.t_start_of_lexeme = slr->start_of_lexeme;        /* start */
-                        event->t_trace_accepted_lexeme.t_end_of_lexeme = slr->end_of_lexeme;    /* end */
-                        event->t_trace_accepted_lexeme.t_lexeme = g1_lexeme;    /* lexeme */
+
+                            xlua_sig_call (outer_slr->L,
+                                "recce, lexeme_start, lexeme_end, lexeme = ...\n"
+                                "local q = recce.event_queue\n"
+                                "q[#q+1] = { '\\'trace', 'g1 accepted lexeme', lexeme_start, lexeme_end, lexeme}\n",
+                                "Riii>",
+                                outer_slr->lua_ref,
+                                slr->start_of_lexeme,
+                                slr->end_of_lexeme,
+                                g1_lexeme
+                            );
+
                     }
                     if (symbol_r_properties->t_pause_after_active) {
                         slr->start_of_pause_lexeme =
@@ -3112,7 +3117,7 @@ slr_alternatives ( Outer_R *outer_slr)
                             xlua_sig_call (outer_slr->L,
                                 "recce, lexeme_start, lexeme_end, lexeme = ...\n"
                                 "local q = recce.event_queue\n"
-                                "q[#q+1] = { 'trace', 'g1 pausing after lexeme', lexeme_start, lexeme_end, lexeme}\n",
+                                "q[#q+1] = { '\\'trace', 'g1 pausing after lexeme', lexeme_start, lexeme_end, lexeme}\n",
                                 "Riii>",
                                 outer_slr->lua_ref,
                                 slr->start_of_pause_lexeme,
@@ -5188,18 +5193,6 @@ PPCODE:
             break;
           }
 
-        case MARPA_SLRTR_G1_ACCEPTED_LEXEME:
-          {
-            AV *event_av = newAV ();
-            av_push (event_av, newSVpvs ("'trace"));
-            av_push (event_av, newSVpvs ("g1 accepted lexeme"));
-            av_push (event_av, newSViv ((IV) slr_event->t_trace_accepted_lexeme.t_start_of_lexeme));    /* start */
-            av_push (event_av, newSViv ((IV) slr_event->t_trace_accepted_lexeme.t_end_of_lexeme));      /* end */
-            av_push (event_av, newSViv ((IV) slr_event->t_trace_accepted_lexeme.t_lexeme));     /* lexeme */
-            XPUSHs (sv_2mortal (newRV_noinc ((SV *) event_av)));
-            break;
-          }
-
         case MARPA_SLREV_LEXER_RESTARTED_RECCE:
           {
             AV *event_av = newAV ();
@@ -5336,7 +5329,7 @@ PPCODE:
  #
  # Yes, at trace level > 0
  # MARPA_SLRTR_G1_DUPLICATE_LEXEME
- # MARPA_SLRTR_G1_ACCEPTED_LEXEME
+ # { 'trace', 'g1 accepted lexeme', lexeme_start, lexeme_end, lexeme}\n",
  #
  # Yes, at trace level > 0
  # MARPA_SLRTR_G1_ATTEMPTING_LEXEME
