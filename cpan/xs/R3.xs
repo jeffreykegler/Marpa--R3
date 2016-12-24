@@ -2027,11 +2027,18 @@ u_read (Outer_R * outer_slr)
                   case MARPA_ERR_NONE:
                     if (trace_lexers >= 1)
                       {
-                        union marpa_slr_event_s *slr_event = marpa_slr_event_push(slr);
-                        MARPA_SLREV_TYPE(slr_event) = MARPA_SLRTR_CODEPOINT_ACCEPTED;
-                        slr_event->t_trace_codepoint_accepted.t_codepoint = codepoint;
-                        slr_event->t_trace_codepoint_accepted.t_perl_pos = slr->perl_pos;
-                        slr_event->t_trace_codepoint_accepted.t_symbol_id = symbol_id;
+
+              xlua_sig_call (outer_slr->L,
+                  "recce, codepoint, perl_pos, symbol_id = ...\n"
+                  "local q = recce.event_queue\n"
+                  "q[#q+1] = { '!trace', 'lexer accepted codepoint', codepoint, perl_pos, symbol_id}\n",
+                  "Riii>",
+                  outer_slr->lua_ref,
+                  codepoint,
+                  slr->perl_pos,
+                  symbol_id
+              );
+
                       }
                     tokens_accepted++;
                     break;
@@ -5029,18 +5036,6 @@ PPCODE:
       switch (event_type)
         {
 
-        case MARPA_SLRTR_CODEPOINT_ACCEPTED:
-          {
-            AV *event_av = newAV ();
-            av_push (event_av, newSVpvs ("!trace"));
-            av_push (event_av, newSVpvs ("lexer accepted codepoint"));
-            av_push (event_av, newSViv ((IV) slr_event->t_trace_codepoint_accepted.t_codepoint));
-            av_push (event_av, newSViv ((IV) slr_event->t_trace_codepoint_accepted.t_perl_pos));
-            av_push (event_av, newSViv ((IV) slr_event->t_trace_codepoint_accepted.t_symbol_id));
-            XPUSHs (sv_2mortal (newRV_noinc ((SV *) event_av)));
-            break;
-          }
-
         case MARPA_SLRTR_LEXEME_DISCARDED:
           {
             AV *event_av = newAV ();
@@ -5450,15 +5445,18 @@ PPCODE:
       XSRETURN_IV (slr->perl_pos);
     }
   if (result == -2)
-    {
+  {
       const int error = marpa_g_error (slr->g1_wrapper->g, NULL);
-      if (error == MARPA_ERR_PARSE_EXHAUSTED)
-        {
-          union marpa_slr_event_s *event = marpa_slr_event_push(slr);
-          MARPA_SLREV_TYPE (event) = MARPA_SLREV_NO_ACCEPTABLE_INPUT;
-        }
+      if (error == MARPA_ERR_PARSE_EXHAUSTED) {
+          xlua_sig_call (outer_slr->L,
+              "recce, = ...\n"
+              "local q = recce.event_queue\n"
+              "q[#q+1] = { 'no acceptable input' }\n",
+              "R>", outer_slr->lua_ref);
+
+      }
       XSRETURN_IV (0);
-    }
+  }
   if (slr->throw)
     {
       croak ("Problem in slr->g1_lexeme_complete(): %s",
