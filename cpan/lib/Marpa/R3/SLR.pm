@@ -184,16 +184,8 @@ sub Marpa::R3::Scanless::R::new {
 
     my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
 
-    my $recce_c =
-        $slr->[Marpa::R3::Internal::Scanless::R::R_C] =
-        Marpa::R3::Thin::R->new($grammar_c);
-    if ( not defined $recce_c ) {
-        Marpa::R3::exception( $grammar_c->error() );
-    }
-
     my $thin_slr = Marpa::R3::Thin::SLR->new(
-        $slg->[Marpa::R3::Internal::Scanless::G::C],
-        $slr->[Marpa::R3::Internal::Scanless::R::R_C]
+        $slg->[Marpa::R3::Internal::Scanless::G::C]
     );
     $slr->[Marpa::R3::Internal::Scanless::R::SLR_C]      = $thin_slr;
 

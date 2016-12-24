@@ -4726,10 +4726,9 @@ PPCODE:
 MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::SLR
 
 void
-new( class, slg_sv, g1r_sv )
+new( class, slg_sv )
     char * class;
     SV *slg_sv;
-    SV *g1r_sv;
 PPCODE:
 {
   SV *new_sv;
@@ -4745,10 +4744,6 @@ PPCODE:
     {
       croak
         ("Problem in u->new(): slg arg is not of type Marpa::R3::Thin::SLG");
-    }
-  if (!sv_isa (g1r_sv, "Marpa::R3::Thin::R"))
-    {
-      croak ("Problem in u->new(): g1r arg is not of type Marpa::R3::Thin::R");
     }
   Newx (outer_slr, 1, Outer_R);
   /* Set slg and outer_slg from the SLG SV */
