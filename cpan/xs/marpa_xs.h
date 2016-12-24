@@ -335,8 +335,6 @@ typedef struct {
   Scanless_G* inner;
 } Outer_G;
 
-struct v_wrapper_s;
-
 typedef struct
 {
   SV *g1g_sv;
@@ -386,12 +384,6 @@ typedef struct
   int end_pos;
   SV* input;
   int too_many_earley_items;
-
-
-  /* A "weak" reference to the v_wrapper.
-   * See the explanation under the v_wrapper destructor
-   */
-  struct v_wrapper_s* v_wrapper;
 
   union marpa_slr_event_s* t_lexemes;
   int t_lexeme_capacity;
