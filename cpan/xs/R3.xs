@@ -3081,13 +3081,18 @@ slr_alternatives ( Outer_R *outer_slr)
 
                 case MARPA_ERR_DUPLICATE_TOKEN:
                     if (slr->trace_terminals) {
-                        union marpa_slr_event_s *event =
-                            marpa_slr_event_push (slr);
-                        MARPA_SLREV_TYPE (event) =
-                            MARPA_SLRTR_G1_DUPLICATE_LEXEME;
-                        event->t_trace_duplicate_lexeme.t_start_of_lexeme = slr->start_of_lexeme;       /* start */
-                        event->t_trace_duplicate_lexeme.t_end_of_lexeme = slr->end_of_lexeme;   /* end */
-                        event->t_trace_duplicate_lexeme.t_lexeme = g1_lexeme;   /* lexeme */
+
+                            xlua_sig_call (outer_slr->L,
+                                "recce, lexeme_start, lexeme_end, lexeme = ...\n"
+                                "local q = recce.event_queue\n"
+                                "q[#q+1] = { '!trace', 'g1 duplicate lexeme', lexeme_start, lexeme_end, lexeme}\n",
+                                "Riii>",
+                                outer_slr->lua_ref,
+                                slr->start_of_lexeme,
+                                slr->end_of_lexeme,
+                                g1_lexeme
+                            );
+
                     }
                     break;
 
