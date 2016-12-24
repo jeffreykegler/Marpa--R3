@@ -2356,7 +2356,6 @@ static void slg_inner_destroy(Scanless_G* slg) {
 
 static Scanless_R* marpa_inner_slr_new (
   Scanless_G *slg,
-    SV *g1r_sv,
     Marpa_Recce g1r
     )
 {
@@ -2373,8 +2372,6 @@ static Scanless_R* marpa_inner_slr_new (
   /* Copy and take references to the "parent objects",
    * the ones responsible for holding references.
    */
-  slr->g1r_sv = g1r_sv;
-  SvREFCNT_inc (g1r_sv);
   slr->g1g_sv = slg->g1_sv;
   SvREFCNT_inc (slr->g1g_sv);
 
@@ -2493,7 +2490,6 @@ static void slr_inner_destroy(Scanless_R* slr)
    Safefree(slr->t_lexemes);
 
   Safefree(slr->pos_db);
-  SvREFCNT_dec (slr->g1r_sv);
   SvREFCNT_dec (slr->g1g_sv);
   Safefree(slr->symbol_r_properties);
   Safefree(slr->l0_rule_r_properties);
@@ -4769,7 +4765,7 @@ PPCODE:
       croak ("failure in marpa_r_new(): %s", xs_g_error (slg->g1_wrapper));
   };
 
-  slr = marpa_inner_slr_new(slg, g1r_sv, g1r);
+  slr = marpa_inner_slr_new(slg, g1r);
   /* Copy and take references to the "parent objects",
    * the ones responsible for holding references.
    */
