@@ -285,7 +285,6 @@ __DATA__
       interfaces
     }
     SLR_C { The thin version of this object }
-    R_C { The thin version of the G1 recognizer }
 
     P_INPUT_STRING
 

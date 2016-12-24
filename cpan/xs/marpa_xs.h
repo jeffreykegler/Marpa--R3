@@ -76,12 +76,6 @@ typedef struct {
      unsigned int message_is_marpa_thin_error:1;
 } G_Wrapper;
 
-typedef struct {
-     Marpa_Recce r;
-     SV* base_sv;
-     G_Wrapper* base;
-} R_Wrapper;
-
 union marpa_slr_event_s;
 
 #define MARPA_SLREV_AFTER_LEXEME 1
@@ -348,7 +342,6 @@ typedef struct
   SV *g1g_sv;
 
   Scanless_G *slg;
-  R_Wrapper *g1r_wrapper;
   Marpa_Recce g1r;
   G_Wrapper *g1_wrapper;
   AV *token_values;

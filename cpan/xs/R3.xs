@@ -1700,58 +1700,7 @@ xlua_sig_call (lua_State * L, const char *codestr, const char *sig, ...)
 
 /* Static recognizer methods */
 
-#define SET_R_WRAPPER_FROM_R_SV(r_wrapper, r_sv) { \
-    IV tmp = SvIV ((SV *) SvRV (r_sv)); \
-    (r_wrapper) = INT2PTR (R_Wrapper *, tmp); \
-}
-
 /* Maybe inline some of these */
-
-/* Assumes caller has checked that g_sv is blessed into right type.
-   Assumes caller holds a ref to the recce.
-*/
-static R_Wrapper*
-r_wrap( Marpa_Recce r, SV* g_sv)
-{
-    dTHX;
-    int highest_symbol_id;
-    R_Wrapper *r_wrapper;
-    G_Wrapper *g_wrapper;
-    Marpa_Grammar g;
-
-    SET_G_WRAPPER_FROM_G_SV (g_wrapper, g_sv);
-    g = g_wrapper->g;
-
-    highest_symbol_id = marpa_g_highest_symbol_id (g);
-    if (highest_symbol_id < 0) {
-        if (!g_wrapper->throw) {
-            return 0;
-        }
-        croak ("failure in marpa_g_highest_symbol_id: %s",
-            xs_g_error (g_wrapper));
-    };
-    Newx (r_wrapper, 1, R_Wrapper);
-    r_wrapper->r = r;
-    SvREFCNT_inc (g_sv);
-    r_wrapper->base_sv = g_sv;
-    r_wrapper->base = g_wrapper;
-    return r_wrapper;
-}
-
-/* It is up to the caller to deal with the Libmarpa recce's
- * reference count
- */
-static Marpa_Recce
-r_unwrap (R_Wrapper * r_wrapper)
-{
-  dTHX;
-  Marpa_Recce r = r_wrapper->r;
-  /* The wrapper should always have had a ref to its base grammar's SV */
-  SvREFCNT_dec (r_wrapper->base_sv);
-  Safefree (r_wrapper);
-  /* The wrapper should always have had a ref to the Libmarpa recce */
-  return r;
-}
 
 static Scanless_R* slr_inner_get(Outer_R* outer_slr);
 static void dummyup_recce(
@@ -3857,54 +3806,6 @@ PPCODE:
       XPUSHs (error_code_sv);
     }
   XPUSHs (sv_2mortal (newSVpv (error_message, 0)));
-}
-
-MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::R
-
-void
-new( class, g_sv )
-    char * class;
-    SV* g_sv;
-PPCODE:
-{
-  SV *sv_to_return;
-  G_Wrapper *g_wrapper;
-  Marpa_Recce r;
-  Marpa_Grammar g;
-  PERL_UNUSED_ARG(class);
-
-  if (!sv_isa (g_sv, "Marpa::R3::Thin::G"))
-    {
-      croak
-        ("Problem in Marpa::R3->new(): arg is not of type Marpa::R3::Thin::G");
-    }
-  SET_G_WRAPPER_FROM_G_SV (g_wrapper, g_sv);
-  g = g_wrapper->g;
-  r = marpa_r_new (g);
-  if (!r)
-    {
-      if (!g_wrapper->throw)
-        {
-          XSRETURN_UNDEF;
-        }
-      croak ("failure in marpa_r_new(): %s", xs_g_error (g_wrapper));
-    };
-
-  {
-    R_Wrapper *r_wrapper = r_wrap (r, g_sv);
-    sv_to_return = sv_newmortal ();
-    sv_setref_pv (sv_to_return, recce_c_class_name, (void *) r_wrapper);
-  }
-  XPUSHs (sv_to_return);
-}
-
-void
-DESTROY( r_wrapper )
-    R_Wrapper *r_wrapper;
-PPCODE:
-{
-    Marpa_Recce r = r_unwrap(r_wrapper);
-    marpa_r_unref (r);
 }
 
 MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::G
