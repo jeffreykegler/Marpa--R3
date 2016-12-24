@@ -777,7 +777,7 @@ my $libmarpa_trace_event_handlers = {
 };
 
 my $libmarpa_event_handlers = {
-    q{'trace} => sub {
+    q{!trace} => sub {
         my ( $slr, $event ) = @_;
         my $handler = $libmarpa_trace_event_handlers->{ $event->[1] };
         if ( defined $handler ) {

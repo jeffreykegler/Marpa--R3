@@ -3097,7 +3097,7 @@ slr_alternatives ( Outer_R *outer_slr)
                             xlua_sig_call (outer_slr->L,
                                 "recce, lexeme_start, lexeme_end, lexeme = ...\n"
                                 "local q = recce.event_queue\n"
-                                "q[#q+1] = { '\\'trace', 'g1 accepted lexeme', lexeme_start, lexeme_end, lexeme}\n",
+                                "q[#q+1] = { '!trace', 'g1 accepted lexeme', lexeme_start, lexeme_end, lexeme}\n",
                                 "Riii>",
                                 outer_slr->lua_ref,
                                 slr->start_of_lexeme,
@@ -3117,7 +3117,7 @@ slr_alternatives ( Outer_R *outer_slr)
                             xlua_sig_call (outer_slr->L,
                                 "recce, lexeme_start, lexeme_end, lexeme = ...\n"
                                 "local q = recce.event_queue\n"
-                                "q[#q+1] = { '\\'trace', 'g1 pausing after lexeme', lexeme_start, lexeme_end, lexeme}\n",
+                                "q[#q+1] = { '!trace', 'g1 pausing after lexeme', lexeme_start, lexeme_end, lexeme}\n",
                                 "Riii>",
                                 outer_slr->lua_ref,
                                 slr->start_of_pause_lexeme,
@@ -5017,7 +5017,7 @@ PPCODE:
           {
             AV *event_av = newAV ();
 
-            av_push (event_av, newSVpvs ("'trace"));
+            av_push (event_av, newSVpvs ("!trace"));
             av_push (event_av, newSVpvs ("lexer reading codepoint"));
             av_push (event_av, newSViv ((IV) slr_event->t_trace_codepoint_read.t_codepoint));
             av_push (event_av, newSViv ((IV) slr_event->t_trace_codepoint_read.t_perl_pos));
@@ -5028,7 +5028,7 @@ PPCODE:
         case MARPA_SLRTR_CODEPOINT_REJECTED:
           {
             AV *event_av = newAV ();
-            av_push (event_av, newSVpvs ("'trace"));
+            av_push (event_av, newSVpvs ("!trace"));
             av_push (event_av, newSVpvs ("lexer rejected codepoint"));
             av_push (event_av, newSViv ((IV) slr_event->t_trace_codepoint_rejected.t_codepoint));
             av_push (event_av, newSViv ((IV) slr_event->t_trace_codepoint_rejected.t_perl_pos));
@@ -5040,7 +5040,7 @@ PPCODE:
         case MARPA_SLRTR_CODEPOINT_ACCEPTED:
           {
             AV *event_av = newAV ();
-            av_push (event_av, newSVpvs ("'trace"));
+            av_push (event_av, newSVpvs ("!trace"));
             av_push (event_av, newSVpvs ("lexer accepted codepoint"));
             av_push (event_av, newSViv ((IV) slr_event->t_trace_codepoint_accepted.t_codepoint));
             av_push (event_av, newSViv ((IV) slr_event->t_trace_codepoint_accepted.t_perl_pos));
@@ -5052,7 +5052,7 @@ PPCODE:
         case MARPA_SLRTR_LEXEME_DISCARDED:
           {
             AV *event_av = newAV ();
-            av_push (event_av, newSVpvs ("'trace"));
+            av_push (event_av, newSVpvs ("!trace"));
             av_push (event_av, newSVpvs ("discarded lexeme"));
             /* We do not have the lexeme, but we have the
              * lexer rule.
@@ -5068,7 +5068,7 @@ PPCODE:
         case MARPA_SLRTR_LEXEME_IGNORED:
           {
             AV *event_av = newAV ();
-            av_push (event_av, newSVpvs ("'trace"));
+            av_push (event_av, newSVpvs ("!trace"));
             av_push (event_av, newSVpvs ("ignored lexeme"));
             av_push (event_av, newSViv ((IV) slr_event->t_trace_lexeme_ignored.t_lexeme));
             av_push (event_av, newSViv ((IV) slr_event->t_trace_lexeme_ignored.t_start_of_lexeme));
@@ -5137,7 +5137,7 @@ PPCODE:
           {
             /* Uses same structure as "acceptable" lexeme */
             AV *event_av = newAV ();
-            av_push (event_av, newSVpvs ("'trace"));
+            av_push (event_av, newSVpvs ("!trace"));
             av_push (event_av, newSVpvs ("outprioritized lexeme"));
             av_push (event_av, newSViv ((IV) slr_event->t_trace_lexeme_acceptable.t_start_of_lexeme));  /* start */
             av_push (event_av, newSViv ((IV) slr_event->t_trace_lexeme_acceptable.t_end_of_lexeme));    /* end */
@@ -5151,7 +5151,7 @@ PPCODE:
         case MARPA_SLRTR_BEFORE_LEXEME:
           {
             AV *event_av = newAV ();
-            av_push (event_av, newSVpvs ("'trace"));
+            av_push (event_av, newSVpvs ("!trace"));
             av_push (event_av, newSVpvs ("g1 before lexeme event"));
             av_push (event_av, newSViv ((IV) slr_event->t_trace_before_lexeme.t_start_of_pause_lexeme));        /* start */
             av_push (event_av, newSViv ((IV) slr_event->t_trace_before_lexeme.t_end_of_pause_lexeme));  /* end */
@@ -5172,7 +5172,7 @@ PPCODE:
         case MARPA_SLRTR_G1_ATTEMPTING_LEXEME:
           {
             AV *event_av = newAV ();
-            av_push (event_av, newSVpvs ("'trace"));
+            av_push (event_av, newSVpvs ("!trace"));
             av_push (event_av, newSVpvs ("g1 attempting lexeme"));
             av_push (event_av, newSViv ((IV) slr_event->t_trace_attempting_lexeme.t_start_of_lexeme));  /* start */
             av_push (event_av, newSViv ((IV) slr_event->t_trace_attempting_lexeme.t_end_of_lexeme));    /* end */
@@ -5184,7 +5184,7 @@ PPCODE:
         case MARPA_SLRTR_G1_DUPLICATE_LEXEME:
           {
             AV *event_av = newAV ();
-            av_push (event_av, newSVpvs ("'trace"));
+            av_push (event_av, newSVpvs ("!trace"));
             av_push (event_av, newSVpvs ("g1 duplicate lexeme"));
             av_push (event_av, newSViv ((IV) slr_event->t_trace_duplicate_lexeme.t_start_of_lexeme));   /* start */
             av_push (event_av, newSViv ((IV) slr_event->t_trace_duplicate_lexeme.t_end_of_lexeme));     /* end */
@@ -5196,7 +5196,7 @@ PPCODE:
         case MARPA_SLREV_LEXER_RESTARTED_RECCE:
           {
             AV *event_av = newAV ();
-            av_push (event_av, newSVpvs ("'trace"));
+            av_push (event_av, newSVpvs ("!trace"));
             av_push (event_av, newSVpv ("lexer restarted recognizer", 0));
             av_push (event_av,
                      newSViv ((IV) slr_event->t_lexer_restarted_recce.
