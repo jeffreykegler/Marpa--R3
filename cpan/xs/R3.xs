@@ -1834,10 +1834,15 @@ u_convert_events (Outer_R * outer_slr)
              */
             {
               const int yim_count = (long) marpa_g_event_value (&marpa_event);
-              union marpa_slr_event_s *event = marpa_slr_event_push (slr);
-              MARPA_SLREV_TYPE (event) = MARPA_SLREV_L0_YIM_THRESHOLD_EXCEEDED;
-              event->t_l0_yim_threshold_exceeded.t_yim_count = yim_count;
-              event->t_l0_yim_threshold_exceeded.t_perl_pos = slr->perl_pos;
+              xlua_sig_call (outer_slr->L,
+                  "recce, perl_pos, yim_count = ...\n"
+                  "local q = recce.event_queue\n"
+                  "q[#q+1] = { 'l0 earley item threshold exceeded', perl_pos, yim_count }\n",
+                  "Rii>",
+                  outer_slr->lua_ref,
+                  slr->perl_pos,
+                  yim_count
+              );
             }
             break;
         default:
@@ -1953,13 +1958,14 @@ u_read (Outer_R * outer_slr)
           ops = (UV *) SvPV (*p_ops_sv, dummy);
         }
 
-if (trace_lexers >= 1)
-  {
-    union marpa_slr_event_s *event = marpa_slr_event_push(slr);
-    MARPA_SLREV_TYPE(event) = MARPA_SLRTR_CODEPOINT_READ;
-    event->t_trace_codepoint_read.t_codepoint = codepoint;
-    event->t_trace_codepoint_read.t_perl_pos = slr->perl_pos;
-  }
+        if (trace_lexers >= 1) {
+
+            xlua_sig_call (outer_slr->L,
+                "recce, codepoint, perl_pos = ...\n"
+                "local q = recce.event_queue\n"
+                "q[#q+1] = { '!trace', 'lexer reading codepoint', codepoint, perl_pos}\n",
+                "Rii>", outer_slr->lua_ref, (int) codepoint, (int) slr->perl_pos);
+        }
 
       /* ops[0] is codepoint */
       op_count = ops[1];
@@ -5018,18 +5024,6 @@ PPCODE:
         case MARPA_SLREV_DELETED:
           break;
 
-        case MARPA_SLRTR_CODEPOINT_READ:
-          {
-            AV *event_av = newAV ();
-
-            av_push (event_av, newSVpvs ("!trace"));
-            av_push (event_av, newSVpvs ("lexer reading codepoint"));
-            av_push (event_av, newSViv ((IV) slr_event->t_trace_codepoint_read.t_codepoint));
-            av_push (event_av, newSViv ((IV) slr_event->t_trace_codepoint_read.t_perl_pos));
-            XPUSHs (sv_2mortal (newRV_noinc ((SV *) event_av)));
-            break;
-          }
-
         case MARPA_SLRTR_CODEPOINT_REJECTED:
           {
             AV *event_av = newAV ();
@@ -5217,17 +5211,6 @@ PPCODE:
             XPUSHs (sv_2mortal (newRV_noinc ((SV *) event_av)));
             break;
           }
-
-        case MARPA_SLREV_L0_YIM_THRESHOLD_EXCEEDED:
-        {
-            /* YIM count updated from SLR field, which is cleared */
-            AV *event_av = newAV ();
-            av_push (event_av, newSVpvs ("l0 earley item threshold exceeded"));
-            av_push (event_av, newSViv ((IV) slr_event->t_l0_yim_threshold_exceeded.t_perl_pos));
-            av_push (event_av, newSViv ((IV) slr_event->t_l0_yim_threshold_exceeded.t_yim_count));
-            XPUSHs (sv_2mortal (newRV_noinc ((SV *) event_av)));
-            break;
-        }
 
         case MARPA_SLREV_G1_YIM_THRESHOLD_EXCEEDED:
         {
