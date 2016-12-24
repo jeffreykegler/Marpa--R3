@@ -9,9 +9,8 @@ my $grammar = Marpa::R3::Scanless::G->new(
 lexeme default = action => [ start, length, value ]
 
 # standard part of grammar
-top ::= prefix target suffix action => My_Actions::top
+top ::= prefix target action => My_Actions::top
 prefix ::= any* action => ::undef
-suffix ::= any* action => ::undef
 any ~ [\D\d]
 
 # custom part of grammar
@@ -29,14 +28,15 @@ sub My_Actions::top {
 my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
 
 my $piece = 'yyyxxxyyyyyxxxxxyyyyxyyyyxxyyyyxxxxyyy';
-my $input = $piece x 2;
+my $input = $piece x 3;
 $recce->read(\$input);
 say $recce->show_earley_sets();
-# my $length = length $input;
-# TOKEN: for ( my $i = 0; $i < $length; $i++ ) {
-    # my $size = $recce->earley_set_size($i);
-    # say "Set $i, size=$size";
-# }
+my $length = length $input;
+TOKEN: for ( my $i = 0; $i < $length; $i++ ) {
+    my $size = $recce->earley_set_size($i);
+    say "Set $i, size=$size";
+}
+exit 0;
 
 VALUE: while (1) {
   my $value_ref = $recce->value();
