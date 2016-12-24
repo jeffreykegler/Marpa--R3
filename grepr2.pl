@@ -43,7 +43,7 @@ sub My_Actions::top {
 
 my $recce = Marpa::R2::Scanless::R->new( { grammar => $grammar } );
 
-my $input = 'yyyxxxyyyyyxxxxxyyyyxyyyyxxyyyyxxxxyyy';
+my $input = '012xxx67890xxxxx6789x1234xx7890xxxx567';
 my $length = length $input;
 my @hits = ();
 for (
@@ -56,13 +56,15 @@ for (
   if ($hit) {
       my $items = $recce->progress();
       push @hits,
-	map { [ $pos, $_->[2] ] }
+	map { [ $_->[2], $pos ] }
 	grep { $_->[0] == $target_rule_id and $_->[1] == -1 }
 	@{$items};
   }
 }
 
+say "Target: (xx)*";
+say "Input: ", $input;
 for my $hit (sort { $a->[0] <=> $b->[0] or $a->[1] <=> $b->[1] } @hits) {
    my ($start, $end) = @{$hit};
-   say "Target found: start = $start, end = $end";
+   say sprintf "Target found: start = %d, end = %d", $start, $end-1;
 }
