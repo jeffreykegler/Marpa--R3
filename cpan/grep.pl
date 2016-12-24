@@ -1,13 +1,12 @@
 use 5.010;
 
 use Data::Dumper;
-use Marpa::R2;
+use Marpa::R3;
 
-my $grammar = Marpa::R2::Scanless::G->new(
+my $grammar = Marpa::R3::Scanless::G->new(
     {   source        => \(<<'END_OF_DSL'),
 :default ::= action => [name,values]
 lexeme default = action => [ start, length, value ]
-    latm => 1
 
 # standard part of grammar
 top ::= prefix target suffix action => My_Actions::top
@@ -23,20 +22,28 @@ END_OF_DSL
 );
 
 sub My_Actions::top {
-    my ($ppo, @children) = @_;
-    return [grep { $_ } @children ];
+    my ($ppo, $children) = @_;
+    return [grep { $_ } @{$children} ];
 }
 
-my $recce = Marpa::R2::Scanless::R->new( { grammar => $grammar } );
+my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
 
-my $input = 'yyyxxxyyyyyxxxxxyyyyxyyyyxxyyyyxxxxyyy';
+my $piece = 'yyyxxxyyyyyxxxxxyyyyxyyyyxxyyyyxxxxyyy';
+my $input = $piece x 2;
 $recce->read(\$input);
+say $recce->show_earley_sets();
+# my $length = length $input;
+# TOKEN: for ( my $i = 0; $i < $length; $i++ ) {
+    # my $size = $recce->earley_set_size($i);
+    # say "Set $i, size=$size";
+# }
+
 VALUE: while (1) {
   my $value_ref = $recce->value();
   last VALUE if not $value_ref;
   my $value = $$value_ref;
+  # die Data::Dumper::Dumper($value);
   my @target_desc = @{$value};
-  # say Data::Dumper::Dumper(\@target_desc);
   my ($start, $length) = @{$target_desc[0]};
   say "Match found at $start, length=$length";
 }
