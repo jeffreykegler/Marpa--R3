@@ -2556,18 +2556,19 @@ slr_discard ( Outer_R *outer_slr)
                 }
               if (slr->l0_rule_r_properties[rule_id].
                   t_event_on_discard_active)
-                {
-                  union marpa_slr_event_s *new_event;
-                  new_event = marpa_slr_event_push (slr);
-                  MARPA_SLREV_TYPE (new_event) = MARPA_SLREV_LEXEME_DISCARDED;
-                  new_event->t_lexeme_discarded.t_rule_id = rule_id;
-                  new_event->t_lexeme_discarded.t_start_of_lexeme =
-                    slr->start_of_lexeme;
-                  new_event->t_lexeme_discarded.t_end_of_lexeme =
-                    slr->end_of_lexeme;
-                  new_event->t_lexeme_discarded.t_last_g1_location =
-                    marpa_r_latest_earley_set (slr->g1r);
-                }
+              {
+                  xlua_sig_call (outer_slr->L,
+                      "recce, rule_id, lexeme_start, lexeme_end, last_g1_location = ...\n"
+                      "local q = recce.event_queue\n"
+                      "q[#q+1] = { 'discarded lexeme',\n"
+                      "    rule_id, lexeme_start, lexeme_end, last_g1_location}\n",
+                      "Riiii>",
+                      outer_slr->lua_ref,
+                      rule_id,
+                      slr->start_of_lexeme,
+                      slr->end_of_lexeme, marpa_r_latest_earley_set (slr->g1r)
+                      );
+              }
               /* If there is discarded item, we are fine,
                * and can return success.
                */
@@ -3003,27 +3004,25 @@ slr_alternatives ( Outer_R *outer_slr)
                     *(marpa_slr_event_push (slr)) = *lexeme_stack_event;
                 }
                 if (pass1_result == discard) {
-                    union marpa_slr_event_s *new_event;
                     const Marpa_Rule_ID l0_rule_id =
-                        lexeme_stack_event->t_trace_lexeme_discarded.
-                        t_rule_id;
+                        lexeme_stack_event->t_trace_lexeme_discarded.t_rule_id;
                     struct l0_rule_r_properties *l0_rule_r_properties =
                         slr->l0_rule_r_properties + l0_rule_id;
                     if (!l0_rule_r_properties->t_event_on_discard_active) {
                         goto NEXT_LEXEME_EVENT;
                     }
-                    new_event = marpa_slr_event_push (slr);
-                    MARPA_SLREV_TYPE (new_event) =
-                        MARPA_SLREV_LEXEME_DISCARDED;
-                    new_event->t_lexeme_discarded.t_rule_id = l0_rule_id;
-                    new_event->t_lexeme_discarded.t_start_of_lexeme =
-                        lexeme_stack_event->t_trace_lexeme_discarded.
-                        t_start_of_lexeme;
-                    new_event->t_lexeme_discarded.t_end_of_lexeme =
-                        lexeme_stack_event->t_trace_lexeme_discarded.
-                        t_end_of_lexeme;
-                    new_event->t_lexeme_discarded.t_last_g1_location =
-                        marpa_r_latest_earley_set (slr->g1r);
+                    xlua_sig_call (outer_slr->L,
+                        "recce, rule_id, lexeme_start, lexeme_end, last_g1_location = ...\n"
+                        "local q = recce.event_queue\n"
+                        "q[#q+1] = { 'discarded lexeme',\n"
+                        "    rule_id, lexeme_start, lexeme_end, last_g1_location}\n",
+                        "Riiii>",
+                        outer_slr->lua_ref,
+                        l0_rule_id,
+                        lexeme_stack_event->t_trace_lexeme_discarded.t_start_of_lexeme,
+                        lexeme_stack_event->t_trace_lexeme_discarded.t_end_of_lexeme,
+                        marpa_r_latest_earley_set (slr->g1r)
+                        );
                 }
                 goto NEXT_LEXEME_EVENT;
             }
@@ -5081,18 +5080,6 @@ PPCODE:
             av_push (event_av, newSViv ((IV) slr_event->t_trace_lexeme_discarded.t_rule_id));
             av_push (event_av, newSViv ((IV) slr_event->t_trace_lexeme_discarded.t_start_of_lexeme));
             av_push (event_av, newSViv ((IV) slr_event->t_trace_lexeme_discarded.t_end_of_lexeme));
-            XPUSHs (sv_2mortal (newRV_noinc ((SV *) event_av)));
-            break;
-          }
-
-        case MARPA_SLREV_LEXEME_DISCARDED:
-          {
-            AV *event_av = newAV ();
-            av_push (event_av, newSVpvs ("discarded lexeme"));
-            av_push (event_av, newSViv ((IV) slr_event->t_lexeme_discarded.t_rule_id));
-            av_push (event_av, newSViv ((IV) slr_event->t_lexeme_discarded.t_start_of_lexeme));
-            av_push (event_av, newSViv ((IV) slr_event->t_lexeme_discarded.t_end_of_lexeme));
-            av_push (event_av, newSViv ((IV) slr_event->t_lexeme_discarded.t_last_g1_location));
             XPUSHs (sv_2mortal (newRV_noinc ((SV *) event_av)));
             break;
           }
