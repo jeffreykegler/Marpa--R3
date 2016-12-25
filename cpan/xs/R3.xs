@@ -2674,19 +2674,28 @@ slr_convert_events ( Outer_R *outer_slr)
              * can be turned off by raising
              * the Earley item warning threshold.
              */
-            {
-              const int yim_count = marpa_g_event_value (&marpa_event);
-              union marpa_slr_event_s *event = marpa_slr_event_push (slr);
-              MARPA_SLREV_TYPE (event) = MARPA_SLREV_G1_YIM_THRESHOLD_EXCEEDED;
-              event->t_g1_yim_threshold_exceeded.t_yim_count = yim_count;
-              event->t_g1_yim_threshold_exceeded.t_perl_pos = slr->perl_pos;
-            }
+            xlua_sig_call (outer_slr->L,
+                "recce, perl_pos, yim_count = ...\n"
+                "local q = recce.event_queue\n"
+                "q[#q+1] = { 'g1 earley item threshold exceeded', perl_pos, yim_count}\n",
+                "Rii>",
+                outer_slr->lua_ref,
+                slr->perl_pos,
+                marpa_g_event_value (&marpa_event)
+            );
             break;
         default:
             {
-              union marpa_slr_event_s *slr_event = marpa_slr_event_push(slr);
-MARPA_SLREV_TYPE(slr_event) = MARPA_SLREV_MARPA_R_UNKNOWN;
-              slr_event->t_marpa_r_unknown.t_event = event_type;
+                const char *result_string = event_type_to_string (event_type);
+                if (!result_string) {
+                    result_string =
+                        form ("unknown marpa_r event code, %d", event_type);
+                }
+                xlua_sig_call (outer_slr->L,
+                    "recce, result_string = ...\n"
+                    "local q = recce.event_queue\n"
+                    "q[#q+1] = { 'unknown marpa_r event', result_string}\n",
+                    "Rs>", outer_slr->lua_ref, result_string);
             }
             break;
           }
@@ -5118,17 +5127,6 @@ PPCODE:
             XPUSHs (sv_2mortal (newRV_noinc ((SV *) event_av)));
             break;
           }
-
-        case MARPA_SLREV_G1_YIM_THRESHOLD_EXCEEDED:
-        {
-            /* YIM count updated from SLR field, which is cleared */
-            AV *event_av = newAV ();
-            av_push (event_av, newSVpvs ("g1 earley item threshold exceeded"));
-            av_push (event_av, newSViv ((IV) slr_event->t_g1_yim_threshold_exceeded.t_perl_pos));
-            av_push (event_av, newSViv ((IV) slr_event->t_g1_yim_threshold_exceeded.t_yim_count));
-            XPUSHs (sv_2mortal (newRV_noinc ((SV *) event_av)));
-            break;
-        }
 
         default:
           {
