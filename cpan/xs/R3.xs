@@ -114,28 +114,6 @@ static void populate_ops(lua_State* L)
     marpa_lua_settop(L, marpa_table);
 }
 
-static void marpa_slr_event_clear( Scanless_R* slr )
-{
-  slr->t_event_count = 0;
-  slr->t_count_of_deleted_events = 0;
-}
-
-static int marpa_slr_event_count( Scanless_R* slr )
-{
-  const int event_count = slr->t_event_count;
-  return event_count - slr->t_count_of_deleted_events;
-}
-
-static union marpa_slr_event_s * marpa_slr_event_push( Scanless_R* slr )
-{
-  if (slr->t_event_count >= slr->t_event_capacity)
-    {
-      slr->t_event_capacity *= 2;
-      Renew (slr->t_events, (unsigned int)slr->t_event_capacity, union marpa_slr_event_s);
-    }
-  return slr->t_events + (slr->t_event_count++);
-}
-
 static void marpa_slr_lexeme_clear( Scanless_R* slr )
 {
   slr->t_lexeme_count = 0;
@@ -2416,11 +2394,6 @@ static Scanless_R* marpa_inner_slr_new (
   slr->end_pos = 0;
   slr->too_many_earley_items = -1;
 
-  slr->t_count_of_deleted_events = 0;
-  slr->t_event_count = 0;
-  slr->t_event_capacity = (int)MAX (1024 / sizeof (union marpa_slr_event_s), 16);
-  Newx (slr->t_events, (unsigned int)slr->t_event_capacity, union marpa_slr_event_s);
-
   slr->t_lexeme_count = 0;
   slr->t_lexeme_capacity = (int)MAX (1024 / sizeof (union marpa_slr_event_s), 16);
   Newx (slr->t_lexemes, (unsigned int)slr->t_lexeme_capacity, union marpa_slr_event_s);
@@ -2455,7 +2428,6 @@ static void slr_inner_destroy(Scanless_R* slr)
       marpa_r_unref (l0r);
     }
 
-   Safefree(slr->t_events);
    Safefree(slr->t_lexemes);
 
   Safefree(slr->pos_db);
@@ -4930,7 +4902,6 @@ PPCODE:
   slr->end_of_pause_lexeme = -1;
 
   /* Clear event queue */
-  marpa_slr_event_clear (slr);
   xlua_sig_call (outer_slr->L,
       "local recce = ...\n"
       "recce.event_queue = {}\n",
@@ -5012,7 +4983,6 @@ PPCODE:
             "local recce = ...\n"
             "return #recce.event_queue\n",
             "R>i", outer_slr->lua_ref, &event_count);
-        event_count += marpa_slr_event_count (slr);
         if (event_count)
           {
             XSRETURN_PV ("event");
@@ -5062,34 +5032,6 @@ PPCODE:
   XPUSHs (sv_2mortal
           (newSViv
            ((IV) slr->end_of_pause_lexeme - slr->start_of_pause_lexeme)));
-}
-
-void
-old_events(outer_slr)
-    Outer_R *outer_slr;
-PPCODE:
-{
-  Scanless_R *slr = slr_inner_get(outer_slr);
-  int i;
-
-  for (i = 0; i < slr->t_event_count; i++)
-    {
-        union marpa_slr_event_s *const slr_event = slr->t_events + i;
-
-      const int event_type = MARPA_SLREV_TYPE (slr_event);
-      switch (event_type)
-        {
-
-        default:
-          {
-            AV *event_av = newAV ();
-            av_push (event_av, newSVpvs ("unknown SLR event"));
-            av_push (event_av, newSViv ((IV) event_type));
-            XPUSHs (sv_2mortal (newRV_noinc ((SV *) event_av)));
-            break;
-          }
-        }
-    }
 }
 
 void
@@ -5295,7 +5237,6 @@ PPCODE:
     lexeme_length = end_pos - start_pos;
   }
 
-  marpa_slr_event_clear(slr);
   xlua_sig_call (outer_slr->L,
       "local recce = ...\n"
       "recce.event_queue = {}\n",

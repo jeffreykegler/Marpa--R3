@@ -213,11 +213,6 @@ typedef struct
   int t_lexeme_capacity;
   int t_lexeme_count;
 
-  union marpa_slr_event_s* t_events;
-  int t_event_capacity;
-  int t_event_count;
-  int t_count_of_deleted_events;
-
 } Scanless_R;
 
 typedef struct

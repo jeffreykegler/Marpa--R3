@@ -1043,15 +1043,13 @@ sub Marpa::R3::Scanless::R::events {
 sub Marpa::R3::Scanless::R::xs_events {
     my ($slr) = @_;
     my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
-    my @events = $thin_slr->old_events();
     my ($event_queue) = $thin_slr->exec_sig(<<'END_OF_LUA',
         recce = ...
         -- print(inspect(recce.event_queue))
         return recce.event_queue
 END_OF_LUA
         '>0');
-    push @events, @{$event_queue};
-    return @events;
+    return @{$event_queue};
 }
 
 ## From here, recovery is a matter for the caller,
