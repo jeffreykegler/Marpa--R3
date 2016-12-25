@@ -2977,11 +2977,24 @@ slr_alternatives ( Outer_R *outer_slr)
                     high_lexeme_priority) {
                     MARPA_SLREV_TYPE (lexeme_stack_event) =
                         MARPA_SLRTR_LEXEME_OUTPRIORITIZED;
-                    lexeme_stack_event->t_lexeme_acceptable.
-                        t_required_priority = high_lexeme_priority;
+                    lexeme_stack_event->t_lexeme_acceptable.t_required_priority =
+                        high_lexeme_priority;
                     if (slr->trace_terminals) {
-                        *(marpa_slr_event_push (slr)) =
-                            *lexeme_stack_event;
+                        xlua_sig_call (outer_slr->L,
+                            "recce, lexeme_start, lexeme_end,\n"
+                            "    g1_lexeme, priority, required_priority = ...\n"
+                            "local q = recce.event_queue\n"
+                            "q[#q+1] = { '!trace', 'outprioritized lexeme',\n"
+                            "   lexeme_start, lexeme_end, g1_lexeme, priority, required_priority}\n",
+                            "Riiiii>",
+                            outer_slr->lua_ref,
+                            lexeme_stack_event->t_trace_lexeme_acceptable.
+                            t_start_of_lexeme,
+                            lexeme_stack_event->t_trace_lexeme_acceptable.t_end_of_lexeme,
+                            lexeme_stack_event->t_trace_lexeme_acceptable.t_lexeme,
+                            lexeme_stack_event->t_trace_lexeme_acceptable.t_priority,
+                            lexeme_stack_event->t_trace_lexeme_acceptable.
+                            t_required_priority);
                     }
                 }
                 goto NEXT_LEXEME_EVENT;
@@ -5084,21 +5097,6 @@ PPCODE:
             break;
           }
 
-        case MARPA_SLRTR_LEXEME_OUTPRIORITIZED:
-          {
-            /* Uses same structure as "acceptable" lexeme */
-            AV *event_av = newAV ();
-            av_push (event_av, newSVpvs ("!trace"));
-            av_push (event_av, newSVpvs ("outprioritized lexeme"));
-            av_push (event_av, newSViv ((IV) slr_event->t_trace_lexeme_acceptable.t_start_of_lexeme));  /* start */
-            av_push (event_av, newSViv ((IV) slr_event->t_trace_lexeme_acceptable.t_end_of_lexeme));    /* end */
-            av_push (event_av, newSViv ((IV) slr_event->t_trace_lexeme_acceptable.t_lexeme));   /* lexeme */
-            av_push (event_av, newSViv ((IV) slr_event->t_trace_lexeme_acceptable.t_priority));
-            av_push (event_av, newSViv ((IV) slr_event->t_trace_lexeme_acceptable.t_required_priority));
-            XPUSHs (sv_2mortal (newRV_noinc ((SV *) event_av)));
-            break;
-          }
-
         default:
           {
             AV *event_av = newAV ();
@@ -5199,19 +5197,17 @@ PPCODE:
  # { '!trace', 'g1 attempting lexeme', lexeme_start, lexeme_end, lexeme}
  #
  # Irrelevant, cannot happen
- # MARPA_SLRTR_LEXEME_DISCARDED
+ # { "!trace", "discarded lexeme" }
  #
  # Irrelevant?  Need to investigate.
  # { '!trace', 'ignored lexeme', g1_lexeme, lexeme_start, lexeme_end}
  #
  # Irrelevant, because this call overrides priorities
- # MARPA_SLRTR_LEXEME_OUTPRIORITIZED
+ # { "!trace", "outprioritized lexeme" }
  #
  # These are about lexeme expectations, which are
  # regarded as known before this call (or alternatively non-
  # acceptance is caught here via rejection).  Ignore
- #
- # MARPA_SLRTR_LEXEME_ACCEPTABLE
  # { '!trace', 'expected lexeme', perl_pos, lexeme, assertion }
 
  # Variable arg as opposed to a ref,
