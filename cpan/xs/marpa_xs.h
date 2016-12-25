@@ -95,38 +95,6 @@ union marpa_slr_event_s
   struct
   {
     int event_type;
-    UV t_codepoint;
-    int t_perl_pos;
-  } t_trace_codepoint_read;
-
-  struct
-  {
-    int event_type;
-    UV t_codepoint;
-    int t_perl_pos;
-    int t_symbol_id;
-  } t_trace_codepoint_rejected;
-
-  struct
-  {
-    int event_type;
-    UV t_codepoint;
-    int t_perl_pos;
-    int t_symbol_id;
-  } t_trace_codepoint_accepted;
-
-  struct
-  {
-    int event_type;
-    int t_event_type;
-    int t_lexeme;
-    int t_start_of_lexeme;
-    int t_end_of_lexeme;
-  } t_trace_lexeme_ignored;
-
-  struct
-  {
-    int event_type;
     int t_rule_id;
     int t_start_of_lexeme;
     int t_end_of_lexeme;
@@ -144,39 +112,6 @@ union marpa_slr_event_s
   struct
   {
     int event_type;
-    int t_symbol;
-  } t_symbol_completed;
-
-  struct
-  {
-    int event_type;
-    int t_symbol;
-  } t_symbol_nulled;
-
-  struct
-  {
-    int event_type;
-    int t_symbol;
-  } t_symbol_predicted;
-
-  struct
-  {
-    int event_type;
-    int t_event;
-  } t_marpa_r_unknown;
-
-  struct
-  {
-    int event_type;
-    int t_start_of_lexeme;
-    int t_end_of_lexeme;
-    int t_lexeme;
-  }
-  t_trace_lexeme_rejected;
-
-  struct
-  {
-    int event_type;
     int t_start_of_lexeme;
     int t_end_of_lexeme;
     int t_lexeme;
@@ -184,60 +119,6 @@ union marpa_slr_event_s
     int t_required_priority;
   } t_trace_lexeme_acceptable;
 
-  struct
-  {
-    int event_type;
-    int t_start_of_pause_lexeme;
-    int t_end_of_pause_lexeme;
-    int t_pause_lexeme;
-  } t_trace_before_lexeme;
-
-  struct
-  {
-    int event_type;
-    int t_pause_lexeme;
-  } t_before_lexeme;
-
-  struct
-  {
-    int event_type;
-    int t_start_of_lexeme;
-    int t_end_of_lexeme;
-    int t_lexeme;
-  } t_trace_after_lexeme;
-
-  struct
-  {
-    int event_type;
-    int t_lexeme;
-  } t_after_lexeme;
-
-  struct
-  {
-    int event_type;
-    int t_start_of_lexeme;
-    int t_end_of_lexeme;
-    int t_lexeme;
-  }
-  t_trace_attempting_lexeme;
-
-  struct
-  {
-    int event_type;
-    int t_start_of_lexeme;
-    int t_end_of_lexeme;
-    int t_lexeme;
-  }
-  t_trace_duplicate_lexeme;
-
-  struct
-  {
-    int event_type;
-    int t_start_of_lexeme;
-    int t_end_of_lexeme;
-    int t_lexeme;
-  }
-  t_trace_accepted_lexeme;
 
   struct
   {
@@ -248,34 +129,6 @@ union marpa_slr_event_s
     int t_priority;
     int t_required_priority;
   } t_lexeme_acceptable;
-  struct
-  {
-    int event_type;
-  } t_no_acceptable_input;
-  struct
-  {
-    int event_type;
-    int t_perl_pos;
-  } t_lexer_restarted_recce;
-  struct
-  {
-    int event_type;
-    int t_perl_pos;
-    Marpa_Symbol_ID t_lexeme;
-    Marpa_Assertion_ID t_assertion;
-  } t_trace_lexeme_expected;
-  struct
-  {
-    int event_type;
-    int t_perl_pos;
-    int t_yim_count;
-  } t_l0_yim_threshold_exceeded;
-  struct
-  {
-    int event_type;
-    int t_perl_pos;
-    int t_yim_count;
-  } t_g1_yim_threshold_exceeded;
 
 };
 
