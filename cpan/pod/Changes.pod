@@ -198,6 +198,16 @@ the values of the child nodes, in lexical order.
 If there were no child nodes visible to the semantics,
 then the second argument is an empty array.
 
+=head2 
+
+Under Marpa::R2,
+the C<events()> method returned events in a specified
+order, by type of event.
+Under Marpa::R3, the order of events
+returned by
+the C<events()> method
+is completely arbitrary.
+
 =head1 COPYRIGHT AND LICENSE
 
 =for Marpa::R3::Display

@@ -79,9 +79,9 @@ END_OF_GRAMMAR
 # so that order is non-arbitrary
 my $location_0_events = qq{0 !a !b !c !d ^a ^b ^c ^d\n};
 my $after_0_events = <<'END_OF_EVENTS';
-1 a !b !c !d ^b ^c ^d
-2 b !c !d ^c ^d
-3 c !d ^d
+1 !b !c !d ^b ^c ^d a
+2 !c !d ^c ^d b
+3 !d ^d c
 4 d
 END_OF_EVENTS
 
@@ -90,29 +90,57 @@ my $grammar = Marpa::R3::Scanless::G->new( { source => \$rules } );
 my @events = map { ( '!' . $_, '^' . $_, $_ ) } qw(a b c d);
 
 # Test of all events
-my $events_expected = $location_0_events . $after_0_events ;
-$events_expected =~ s/ [!^]? b \s //xmsg; # Eliminate b events
+my $events_expected = <<'EOS';
+0 !a !c !d ^a ^c ^d
+1 !c !d ^c ^d a
+2 !c !d ^c ^d
+3 !d ^d c
+4 d
+EOS
 do_test( "all events", $grammar, q{abcd}, $events_expected );
 
-$events_expected = $location_0_events . join "\n", ( 1 .. 4 ), q{};
-$events_expected =~ s/ [!^]? b \s //xmsg; # Eliminate b events
+$events_expected = <<'EOS';
+0 !a !c !d ^a ^c ^d
+1
+2
+3
+4
+EOS
 do_test( "all events deactivated",
     $grammar, q{abcd}, $events_expected, [] );
 
 # Add events for symbol b
 my %event_is_active = map { ( $_, 1 ) } @events;
 my $extra_recce_arg = { 'event_is_active' => \%event_is_active };
-$events_expected = $location_0_events . $after_0_events ;
+$events_expected = <<'EOS';
+0 !a !b !c !d ^a ^b ^c ^d
+1 !b !c !d ^b ^c ^d a
+2 !c !d ^c ^d b
+3 !d ^d c
+4 d
+EOS
 do_test( 'all events activated in $recce->new()', $grammar, q{abcd}, $events_expected, undef,
     $extra_recce_arg );
 
-$events_expected = $location_0_events . join "\n", ( 1 .. 4 ), q{};
+$events_expected = <<'EOS';
+0 !a !b !c !d ^a ^b ^c ^d
+1
+2
+3
+4
+EOS
 do_test( 'all events activated in $recce->new(), then deactivated',
     $grammar, q{abcd}, $events_expected, [], $extra_recce_arg );
 
 $event_is_active{$_} = 0 for keys %event_is_active;
 
-$events_expected = join "\n", (0 .. 4), q{};
+$events_expected = <<'EOS';
+0
+1
+2
+3
+4
+EOS
 do_test( 'all events deactivated in $recce->new(), then deactivated again',
     $grammar, q{abcd}, $events_expected, [], $extra_recce_arg );
 
@@ -164,7 +192,7 @@ sub do_test {
     my $actual_events = q{};
     for (my $i = 0; $i <= $length; $i++) {
         my $events = $actual_events[$i] // [];
-        $actual_events .= join " ", $i, @{$events};
+        $actual_events .= join " ", $i, sort @{$events};
         $actual_events .= "\n";
     }
     Test::More::is( $actual_value, q{1792}, qq{Value for $test} );

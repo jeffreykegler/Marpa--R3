@@ -1525,23 +1525,8 @@ an application interested in events
 will call
 the C<events()> method immediately after the
 event-triggering event.
-
-Named events are returned in order by type:
-
-=over 4
-
-=item * Lexeme events
-
-=item * Completion events
-
-=item * Nulling events
-
-=item * Prediction events
-
-=back
-
-Within each type,
-the order of events is arbitrary.
+the C<events()> method returns
+events in arbitrary order.
 
 =head2 exhausted()
 

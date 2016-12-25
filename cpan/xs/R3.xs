@@ -2479,9 +2479,10 @@ static void slr_inner_destroy(Scanless_R* slr)
  * -4: Exhausted, but lexemes remain.
  */
 static IV
-slr_discard (Scanless_R * slr)
+slr_discard ( Outer_R *outer_slr)
 {
   dTHX;
+  Scanless_R *slr = slr_inner_get(outer_slr);
   int lexemes_discarded = 0;
   int lexemes_found = 0;
   Marpa_Recce l0r;
@@ -2579,18 +2580,15 @@ slr_discard (Scanless_R * slr)
            * We don't try to read lexemes into an exhausted
            * R1 -- we only are looking for discardable tokens.
            */
-          if (slr->trace_terminals)
-            {
-              union marpa_slr_event_s *slr_event =
-                marpa_slr_event_push (slr);
-              MARPA_SLREV_TYPE (slr_event) = MARPA_SLRTR_LEXEME_IGNORED;
-
-              slr_event->t_trace_lexeme_ignored.t_lexeme = g1_lexeme;
-              slr_event->t_trace_lexeme_ignored.t_start_of_lexeme =
-                slr->start_of_lexeme;
-              slr_event->t_trace_lexeme_ignored.t_end_of_lexeme =
-                slr->end_of_lexeme;
-            }
+        if (slr->trace_terminals) {
+            xlua_sig_call (outer_slr->L,
+                "recce, g1_lexeme, lexeme_start, lexeme_end = ...\n"
+                "local q = recce.event_queue\n"
+                "q[#q+1] = { '!trace', 'ignored lexeme', g1_lexeme, lexeme_start, lexeme_end}\n",
+                "Riii>",
+                outer_slr->lua_ref,
+                g1_lexeme, slr->start_of_pause_lexeme, slr->end_of_pause_lexeme);
+        }
         NEXT_REPORT_ITEM:;
         }
     NO_MORE_REPORT_ITEMS:;
@@ -2622,9 +2620,10 @@ slr_discard (Scanless_R * slr)
  at which point I will add a parameter
  */
 static void
-slr_convert_events (Scanless_R * slr)
+slr_convert_events ( Outer_R *outer_slr)
 {
   dTHX;
+  Scanless_R *slr = slr_inner_get(outer_slr);
   int event_ix;
   Marpa_Grammar g = slr->g1_wrapper->g;
   const int event_count = marpa_g_event_count (g);
@@ -2639,12 +2638,15 @@ slr_convert_events (Scanless_R * slr)
             /* Do nothing about exhaustion on success */
             break;
         case MARPA_EVENT_SYMBOL_COMPLETED:
-            {
-              union marpa_slr_event_s *slr_event = marpa_slr_event_push(slr);
-                MARPA_SLREV_TYPE(slr_event) = MARPA_SLREV_SYMBOL_COMPLETED;
-              slr_event->t_symbol_completed.t_symbol = marpa_g_event_value (&marpa_event);
-            }
+            xlua_sig_call (outer_slr->L,
+                "recce, symbol = ...\n"
+                "local q = recce.event_queue\n"
+                "q[#q+1] = { 'symbol completed', symbol}\n",
+                "Ri>",
+                outer_slr->lua_ref, marpa_g_event_value (&marpa_event)
+            );
             break;
+
         case MARPA_EVENT_SYMBOL_NULLED:
             {
               union marpa_slr_event_s *slr_event = marpa_slr_event_push(slr);
@@ -3187,7 +3189,7 @@ slr_alternatives ( Outer_R *outer_slr)
         }
         slr->lexer_start_pos = slr->perl_pos = slr->end_of_lexeme;
         if (return_value > 0) {
-            slr_convert_events (slr);
+            slr_convert_events (outer_slr);
         }
 
         marpa_r_latest_earley_set_values_set (g1r, slr->start_of_lexeme,
@@ -4952,7 +4954,7 @@ PPCODE:
 
       if (marpa_r_is_exhausted (slr->g1r))
         {
-          int discard_result = slr_discard (slr);
+          int discard_result = slr_discard (outer_slr);
           if (discard_result < 0)
             {
               XSRETURN_PV ("R1 exhausted before end");
@@ -5057,18 +5059,6 @@ PPCODE:
             break;
           }
 
-        case MARPA_SLRTR_LEXEME_IGNORED:
-          {
-            AV *event_av = newAV ();
-            av_push (event_av, newSVpvs ("!trace"));
-            av_push (event_av, newSVpvs ("ignored lexeme"));
-            av_push (event_av, newSViv ((IV) slr_event->t_trace_lexeme_ignored.t_lexeme));
-            av_push (event_av, newSViv ((IV) slr_event->t_trace_lexeme_ignored.t_start_of_lexeme));
-            av_push (event_av, newSViv ((IV) slr_event->t_trace_lexeme_ignored.t_end_of_lexeme));
-            XPUSHs (sv_2mortal (newRV_noinc ((SV *) event_av)));
-            break;
-          }
-
         case MARPA_SLREV_LEXEME_DISCARDED:
           {
             AV *event_av = newAV ();
@@ -5077,15 +5067,6 @@ PPCODE:
             av_push (event_av, newSViv ((IV) slr_event->t_lexeme_discarded.t_start_of_lexeme));
             av_push (event_av, newSViv ((IV) slr_event->t_lexeme_discarded.t_end_of_lexeme));
             av_push (event_av, newSViv ((IV) slr_event->t_lexeme_discarded.t_last_g1_location));
-            XPUSHs (sv_2mortal (newRV_noinc ((SV *) event_av)));
-            break;
-          }
-
-        case MARPA_SLREV_SYMBOL_COMPLETED:
-          {
-            AV *event_av = newAV ();
-            av_push (event_av, newSVpvs ("symbol completed"));
-            av_push (event_av, newSViv ((IV) slr_event->t_symbol_completed.t_symbol));
             XPUSHs (sv_2mortal (newRV_noinc ((SV *) event_av)));
             break;
           }
@@ -5266,7 +5247,7 @@ PPCODE:
  # MARPA_SLRTR_LEXEME_DISCARDED
  #
  # Irrelevant?  Need to investigate.
- # MARPA_SLRTR_LEXEME_IGNORED
+ # { '!trace', 'ignored lexeme', g1_lexeme, lexeme_start, lexeme_end}
  #
  # Irrelevant, because this call overrides priorities
  # MARPA_SLRTR_LEXEME_OUTPRIORITIZED
