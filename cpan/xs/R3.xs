@@ -5084,23 +5084,6 @@ PPCODE:
             break;
           }
 
-        case MARPA_SLREV_MARPA_R_UNKNOWN:
-          {
-            /* An unknown Marpa_Recce event */
-            AV *event_av = newAV ();
-            const int r_event_ix = slr_event->t_marpa_r_unknown.t_event;
-            const char *result_string = event_type_to_string (r_event_ix);
-            if (!result_string)
-              {
-                result_string =
-                  form ("unknown marpa_r event code, %d", r_event_ix);
-              }
-            av_push (event_av, newSVpvs ("unknown marpa_r event"));
-            av_push (event_av, newSVpv (result_string, 0));
-            XPUSHs (sv_2mortal (newRV_noinc ((SV *) event_av)));
-            break;
-          }
-
         case MARPA_SLRTR_LEXEME_OUTPRIORITIZED:
           {
             /* Uses same structure as "acceptable" lexeme */
@@ -5112,18 +5095,6 @@ PPCODE:
             av_push (event_av, newSViv ((IV) slr_event->t_trace_lexeme_acceptable.t_lexeme));   /* lexeme */
             av_push (event_av, newSViv ((IV) slr_event->t_trace_lexeme_acceptable.t_priority));
             av_push (event_av, newSViv ((IV) slr_event->t_trace_lexeme_acceptable.t_required_priority));
-            XPUSHs (sv_2mortal (newRV_noinc ((SV *) event_av)));
-            break;
-          }
-
-        case MARPA_SLRTR_G1_DUPLICATE_LEXEME:
-          {
-            AV *event_av = newAV ();
-            av_push (event_av, newSVpvs ("!trace"));
-            av_push (event_av, newSVpvs ("g1 duplicate lexeme"));
-            av_push (event_av, newSViv ((IV) slr_event->t_trace_duplicate_lexeme.t_start_of_lexeme));   /* start */
-            av_push (event_av, newSViv ((IV) slr_event->t_trace_duplicate_lexeme.t_end_of_lexeme));     /* end */
-            av_push (event_av, newSViv ((IV) slr_event->t_trace_duplicate_lexeme.t_lexeme));    /* lexeme */
             XPUSHs (sv_2mortal (newRV_noinc ((SV *) event_av)));
             break;
           }
@@ -5221,7 +5192,7 @@ PPCODE:
  # { '!trace', 'g1 before lexeme event', g1_lexeme}
  #
  # Yes, at trace level > 0
- # MARPA_SLRTR_G1_DUPLICATE_LEXEME
+ # { "!trace", "g1 duplicate lexeme" ...
  # { '!trace', 'g1 accepted lexeme', lexeme_start, lexeme_end, lexeme}
  #
  # Yes, at trace level > 0
