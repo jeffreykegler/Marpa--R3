@@ -2999,7 +2999,21 @@ slr_alternatives ( Outer_R *outer_slr)
                 goto NEXT_LEXEME_EVENT;
             case MARPA_SLRTR_LEXEME_DISCARDED:
                 if (slr->trace_terminals) {
-                    *(marpa_slr_event_push (slr)) = *lexeme_stack_event;
+                    /* We do not have the lexeme, but we have the
+                     * lexer rule.
+                     * The upper level will have to figure things out.
+                     */
+                    xlua_sig_call (outer_slr->L,
+                        "recce, rule_id, lexeme_start, lexeme_end = ...\n"
+                        "local q = recce.event_queue\n"
+                        "q[#q+1] = { '!trace', 'discarded lexeme',\n"
+                        "    rule_id, lexeme_start, lexeme_end}\n",
+                        "Riii>",
+                        outer_slr->lua_ref,
+                        lexeme_stack_event->t_trace_lexeme_discarded.t_rule_id,
+                        lexeme_stack_event->t_trace_lexeme_discarded.t_start_of_lexeme,
+                        lexeme_stack_event->t_trace_lexeme_discarded.t_end_of_lexeme);
+
                 }
                 if (pass1_result == discard) {
                     const Marpa_Rule_ID l0_rule_id =
@@ -5065,22 +5079,6 @@ PPCODE:
       const int event_type = MARPA_SLREV_TYPE (slr_event);
       switch (event_type)
         {
-
-        case MARPA_SLRTR_LEXEME_DISCARDED:
-          {
-            AV *event_av = newAV ();
-            av_push (event_av, newSVpvs ("!trace"));
-            av_push (event_av, newSVpvs ("discarded lexeme"));
-            /* We do not have the lexeme, but we have the
-             * lexer rule.
-             * The upper level will have to figure things out.
-             */
-            av_push (event_av, newSViv ((IV) slr_event->t_trace_lexeme_discarded.t_rule_id));
-            av_push (event_av, newSViv ((IV) slr_event->t_trace_lexeme_discarded.t_start_of_lexeme));
-            av_push (event_av, newSViv ((IV) slr_event->t_trace_lexeme_discarded.t_end_of_lexeme));
-            XPUSHs (sv_2mortal (newRV_noinc ((SV *) event_av)));
-            break;
-          }
 
         default:
           {
