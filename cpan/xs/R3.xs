@@ -2538,22 +2538,20 @@ slr_discard ( Outer_R *outer_slr)
             {
               lexemes_discarded++;
               if (slr->trace_terminals)
-                {
-                  union marpa_slr_event_s *slr_event =
-                    marpa_slr_event_push (slr);
-                  MARPA_SLREV_TYPE (slr_event) = MARPA_SLRTR_LEXEME_DISCARDED;
-
+              {
                   /* We do not have the lexeme, but we have the
                    * lexer rule.
                    * The upper level will have to figure things out.
                    */
-                  slr_event->t_trace_lexeme_discarded.t_rule_id = rule_id;
-                  slr_event->t_trace_lexeme_discarded.t_start_of_lexeme =
-                    slr->start_of_lexeme;
-                  slr_event->t_trace_lexeme_discarded.t_end_of_lexeme =
-                    slr->end_of_lexeme;
-
-                }
+                  xlua_sig_call (outer_slr->L,
+                      "recce, rule_id, lexeme_start, lexeme_end = ...\n"
+                      "local q = recce.event_queue\n"
+                      "q[#q+1] = { '!trace', 'discarded lexeme',\n"
+                      "    rule_id, lexeme_start, lexeme_end}\n",
+                      "Riii>",
+                      outer_slr->lua_ref,
+                      rule_id, slr->start_of_lexeme, slr->end_of_lexeme);
+              }
               if (slr->l0_rule_r_properties[rule_id].
                   t_event_on_discard_active)
               {
