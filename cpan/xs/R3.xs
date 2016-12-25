@@ -2648,18 +2648,22 @@ slr_convert_events ( Outer_R *outer_slr)
             break;
 
         case MARPA_EVENT_SYMBOL_NULLED:
-            {
-              union marpa_slr_event_s *slr_event = marpa_slr_event_push(slr);
-MARPA_SLREV_TYPE(slr_event) =MARPA_SLREV_SYMBOL_NULLED;
-              slr_event->t_symbol_nulled.t_symbol = marpa_g_event_value (&marpa_event);
-            }
+            xlua_sig_call (outer_slr->L,
+                "recce, symbol = ...\n"
+                "local q = recce.event_queue\n"
+                "q[#q+1] = { 'symbol nulled', symbol}\n",
+                "Ri>",
+                outer_slr->lua_ref, marpa_g_event_value (&marpa_event)
+            );
             break;
         case MARPA_EVENT_SYMBOL_PREDICTED:
-            {
-              union marpa_slr_event_s *slr_event = marpa_slr_event_push(slr);
-MARPA_SLREV_TYPE(slr_event) = MARPA_SLREV_SYMBOL_PREDICTED;
-              slr_event->t_symbol_predicted.t_symbol = marpa_g_event_value (&marpa_event);
-            }
+            xlua_sig_call (outer_slr->L,
+                "recce, symbol = ...\n"
+                "local q = recce.event_queue\n"
+                "q[#q+1] = { 'symbol predicted', symbol}\n",
+                "Ri>",
+                outer_slr->lua_ref, marpa_g_event_value (&marpa_event)
+            );
             break;
         case MARPA_EVENT_EARLEY_ITEM_THRESHOLD:
             /* All events are ignored on failure
@@ -5067,24 +5071,6 @@ PPCODE:
             av_push (event_av, newSViv ((IV) slr_event->t_lexeme_discarded.t_start_of_lexeme));
             av_push (event_av, newSViv ((IV) slr_event->t_lexeme_discarded.t_end_of_lexeme));
             av_push (event_av, newSViv ((IV) slr_event->t_lexeme_discarded.t_last_g1_location));
-            XPUSHs (sv_2mortal (newRV_noinc ((SV *) event_av)));
-            break;
-          }
-
-        case MARPA_SLREV_SYMBOL_NULLED:
-          {
-            AV *event_av = newAV ();
-            av_push (event_av, newSVpvs ("symbol nulled"));
-            av_push (event_av, newSViv ((IV) slr_event->t_symbol_nulled.t_symbol));
-            XPUSHs (sv_2mortal (newRV_noinc ((SV *) event_av)));
-            break;
-          }
-
-        case MARPA_SLREV_SYMBOL_PREDICTED:
-          {
-            AV *event_av = newAV ();
-            av_push (event_av, newSVpvs ("symbol predicted"));
-            av_push (event_av, newSViv ((IV) slr_event->t_symbol_predicted.t_symbol));
             XPUSHs (sv_2mortal (newRV_noinc ((SV *) event_av)));
             break;
           }
