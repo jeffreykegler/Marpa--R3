@@ -3121,24 +3121,6 @@ Set "strict" globals, using code taken from strict.lua.
        return 1;
     }
 
-    -- miranda: section+ C function declarations
-    void marpa_gen_grammar_ud(lua_State* L, Marpa_Grammar g);
-    -- miranda: section+ non-standard wrappers
-    /* Caller must ensure enough stack space.
-     * Leaves a new userdata on top of the stack.
-     */
-    void marpa_gen_grammar_ud(lua_State* L, Marpa_Grammar g)
-    {
-        Marpa_Grammar* p_g;
-        p_g = (Marpa_Grammar *) marpa_lua_newuserdata (L, sizeof (Marpa_Grammar));
-        *p_g = g;
-        /* [ userdata ] */
-        marpa_lua_rawgetp (L, LUA_REGISTRYINDEX, &kollos_g_ud_mt_key);
-        /* [ userdata, metatable ] */
-        marpa_lua_setmetatable (L, -2);
-        /* [ userdata ] */
-    }
-
 `dummyup_grammar` is not Lua C API.
 This may be the basis of the actual constructor.
 Takes ownership of a Libmarpa grammar reference,
