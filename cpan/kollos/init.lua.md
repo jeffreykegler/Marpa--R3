@@ -2611,6 +2611,7 @@ Set "strict" globals, using code taken from strict.lua.
     -- miranda: insert tree object non-standard wrappers
     -- miranda: insert value object non-standard wrappers
     -- miranda: insert object userdata gc methods
+    -- miranda: insert luaL_reg definitions
     -- miranda: insert object constructors
 
     -- miranda: insert standard libmarpa wrappers
@@ -3567,6 +3568,8 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
         marpa_lua_pushinteger (L, (lua_Integer) result);
         return 1;
     }
+
+    -- miranda: section+ luaL_Reg definitions
 
     static const struct luaL_Reg grammar_methods[] = {
       { "error", lca_libmarpa_error },
