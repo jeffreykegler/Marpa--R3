@@ -2604,12 +2604,7 @@ Set "strict" globals, using code taken from strict.lua.
     -- miranda: insert event related code from okollos.c.lua
     -- miranda: insert step structure code
     -- miranda: insert metatable keys
-    -- miranda: insert grammar object non-standard wrappers
-    -- miranda: insert recognizer object non-standard wrappers
-    -- miranda: insert bocage object non-standard wrappers
-    -- miranda: insert order object non-standard wrappers
-    -- miranda: insert tree object non-standard wrappers
-    -- miranda: insert value object non-standard wrappers
+    -- miranda: insert non-standard wrappers
     -- miranda: insert object userdata gc methods
     -- miranda: insert luaL_reg definitions
     -- miranda: insert object constructors
@@ -3128,7 +3123,7 @@ Set "strict" globals, using code taken from strict.lua.
 
     -- miranda: section+ C function declarations
     void marpa_gen_grammar_ud(lua_State* L, Marpa_Grammar g);
-    -- miranda: section+ grammar object non-standard wrappers
+    -- miranda: section+ non-standard wrappers
     /* Caller must ensure enough stack space.
      * Leaves a new userdata on top of the stack.
      */
@@ -3152,7 +3147,7 @@ so the caller must make sure that one is available.
     -- miranda: section+ C function declarations
     int
     marpa_k_dummyup_grammar (lua_State * L, Marpa_Grammar g, lua_Integer slg_ref, const char *name);
-    -- miranda: section+ grammar object non-standard wrappers
+    -- miranda: section+ non-standard wrappers
 
     int
     marpa_k_dummyup_grammar (lua_State * L, Marpa_Grammar g, lua_Integer slg_ref, const char *name)
@@ -3209,7 +3204,7 @@ so the caller must make sure that one is available.
         return 1;
     }
 
-    -- miranda: section+ grammar object non-standard wrappers
+    -- miranda: section+ non-standard wrappers
 
     /* The C wrapper for Libmarpa event reading.
        It assumes we just want all of them.
@@ -3301,7 +3296,7 @@ like close to a modern architecture.
 Perhaps I will eventually limit Libmarpa's
 rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
 
-    -- miranda: section+ grammar object non-standard wrappers
+    -- miranda: section+ non-standard wrappers
 
     static int lca_grammar_rule_new(lua_State *L)
     {
@@ -3377,7 +3372,7 @@ like close to a modern architecture.
 Perhaps I will eventually limit Libmarpa's
 rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
 
-    -- miranda: section+ grammar object non-standard wrappers
+    -- miranda: section+ non-standard wrappers
 
     static int lca_grammar_sequence_new(lua_State *L)
     {
@@ -3586,7 +3581,7 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
 
     void marpa_gen_recce_ud(lua_State* L, Marpa_Recce recce);
 
-    -- miranda: section+ recognizer object non-standard wrappers
+    -- miranda: section+ non-standard wrappers
 
     /* Caller must ensure enough stack space.
      * Leaves a new userdata on top of the stack.
@@ -3685,6 +3680,8 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
       return 2;
     }
 
+    -- miranda: section+ luaL_Reg definitions
+
     static const struct luaL_Reg recce_methods[] = {
       { "error", lca_libmarpa_error },
       { "terminals_expected", lca_recce_terminals_expected },
@@ -3697,7 +3694,7 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
 
     /* bocage wrappers which need to be hand-written */
 
-    -- miranda: section+ bocage object non-standard wrappers
+    -- miranda: section+ luaL_Reg definitions
 
     static const struct luaL_Reg bocage_methods[] = {
       { "error", lca_libmarpa_error },
@@ -3710,7 +3707,7 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
 
     void marpa_gen_order_ud(lua_State* L, Marpa_Order order);
 
-    -- miranda: section+ order object non-standard wrappers
+    -- miranda: section+ non-standard wrappers
 
     /* Caller must ensure enough stack space.
      * Leaves a new userdata on top of the stack.
@@ -3727,6 +3724,8 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
         /* [ userdata ] */
     }
 
+    -- miranda: section+ luaL_Reg definitions
+
     static const struct luaL_Reg order_methods[] = {
       { "error", lca_libmarpa_error },
       { NULL, NULL },
@@ -3738,7 +3737,7 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
 
     void marpa_gen_tree_ud(lua_State* L, Marpa_Tree t);
 
-    -- miranda: section+ tree object non-standard wrappers
+    -- miranda: section+ non-standard wrappers
 
     /* Caller must ensure enough stack space.
      * Leaves a new userdata on top of the stack.
@@ -3755,6 +3754,8 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
         /* [ userdata ] */
     }
 
+    -- miranda: section+ luaL_Reg definitions
+
     static const struct luaL_Reg tree_methods[] = {
       { "error", lca_libmarpa_error },
       { NULL, NULL },
@@ -3766,7 +3767,7 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
 
     void marpa_gen_value_ud(lua_State* L, Marpa_Value g);
 
-    -- miranda: section+ value object non-standard wrappers
+    -- miranda: section+ non-standard wrappers
 
     /* Caller must ensure enough stack space.
      * Leaves a new userdata on top of the stack.
@@ -3931,6 +3932,8 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
       }
       return 0;
     }
+
+    -- miranda: section+ luaL_Reg definitions
 
     static const struct luaL_Reg value_methods[] = {
       { "location", wrap_v_location },
