@@ -3701,28 +3701,7 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
       { NULL, NULL },
     };
 
-    -- miranda: section+ C function declarations
-
     /* order wrappers which need to be hand-written */
-
-    void marpa_gen_order_ud(lua_State* L, Marpa_Order order);
-
-    -- miranda: section+ non-standard wrappers
-
-    /* Caller must ensure enough stack space.
-     * Leaves a new userdata on top of the stack.
-     */
-    void marpa_gen_order_ud(lua_State* L, Marpa_Order order)
-    {
-        Marpa_Order* p_o;
-        p_o = (Marpa_Order *) marpa_lua_newuserdata (L, sizeof (Marpa_Order));
-        *p_o = order;
-        /* [ userdata ] */
-        marpa_lua_rawgetp (L, LUA_REGISTRYINDEX, &kollos_o_ud_mt_key);
-        /* [ userdata, metatable ] */
-        marpa_lua_setmetatable (L, -2);
-        /* [ userdata ] */
-    }
 
     -- miranda: section+ luaL_Reg definitions
 
@@ -3735,25 +3714,6 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
 
     /* tree wrappers which need to be hand-written */
 
-    void marpa_gen_tree_ud(lua_State* L, Marpa_Tree t);
-
-    -- miranda: section+ non-standard wrappers
-
-    /* Caller must ensure enough stack space.
-     * Leaves a new userdata on top of the stack.
-     */
-    void marpa_gen_tree_ud(lua_State* L, Marpa_Tree t)
-    {
-        Marpa_Tree* p_t;
-        p_t = (Marpa_Tree *) marpa_lua_newuserdata (L, sizeof (Marpa_Tree));
-        *p_t = t;
-        /* [ userdata ] */
-        marpa_lua_rawgetp (L, LUA_REGISTRYINDEX, &kollos_t_ud_mt_key);
-        /* [ userdata, metatable ] */
-        marpa_lua_setmetatable (L, -2);
-        /* [ userdata ] */
-    }
-
     -- miranda: section+ luaL_Reg definitions
 
     static const struct luaL_Reg tree_methods[] = {
@@ -3761,28 +3721,9 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
       { NULL, NULL },
     };
 
-    -- miranda: section+ C function declarations
-
     /* value wrappers which need to be hand-written */
 
-    void marpa_gen_value_ud(lua_State* L, Marpa_Value g);
-
     -- miranda: section+ non-standard wrappers
-
-    /* Caller must ensure enough stack space.
-     * Leaves a new userdata on top of the stack.
-     */
-    void marpa_gen_value_ud(lua_State* L, Marpa_Value v)
-    {
-        Marpa_Value* p_v;
-        p_v = (Marpa_Value *) marpa_lua_newuserdata (L, sizeof (Marpa_Value));
-        *p_v = v;
-        /* [ userdata ] */
-        marpa_lua_rawgetp (L, LUA_REGISTRYINDEX, &kollos_v_ud_mt_key);
-        /* [ userdata, metatable ] */
-        marpa_lua_setmetatable (L, -2);
-        /* [ userdata ] */
-    }
 
     /* Returns ok, result,
      * where ok is a boolean and
