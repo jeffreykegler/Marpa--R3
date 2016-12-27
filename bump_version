@@ -52,8 +52,6 @@ cpan/lib/Marpa/R3/MetaG.pm
 cpan/lib/Marpa/R3.pm
 cpan/lib/Marpa/R3/SLG.pm
 cpan/lib/Marpa/R3/SLR.pm
-cpan/lib/Marpa/R3/Thin/G.pm
-cpan/lib/Marpa/R3/Thin/R.pm
 cpan/lib/Marpa/R3/Trace/G.pm
 cpan/lib/Marpa/R3/Value.pm
 cpan/lib/Marpa/R3/X.pm
