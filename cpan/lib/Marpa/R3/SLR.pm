@@ -152,7 +152,6 @@ sub Marpa::R3::Scanless::R::new {
     # Set recognizer args to default
     $slr->[Marpa::R3::Internal::Scanless::R::EXHAUSTION_ACTION] = 'fatal';
     $slr->[Marpa::R3::Internal::Scanless::R::REJECTION_ACTION] = 'fatal';
-    $slr->[Marpa::R3::Internal::Scanless::R::TRACE_LEXERS] = 0;
     $slr->[Marpa::R3::Internal::Scanless::R::TRACE_TERMINALS] = 0;
     $slr->[Marpa::R3::Internal::Scanless::R::RANKING_METHOD] = 'none';
     $slr->[Marpa::R3::Internal::Scanless::R::MAX_PARSES]     = 0;
@@ -314,7 +313,7 @@ sub common_set {
     # These recce args are allowed in all contexts
     state $common_recce_args = {
         map { ( $_, 1 ); }
-          qw(trace_lexers trace_terminals trace_file_handle rejection exhaustion
+          qw(trace_terminals trace_file_handle rejection exhaustion
           end max_parses too_many_earley_items
           trace_actions trace_values)
     };
@@ -355,17 +354,6 @@ sub common_set {
           $normalized_value;
         if ($normalized_value) {
             say {$trace_file_handle} qq{Setting trace_terminals option};
-        }
-    }
-
-    if ( exists $flat_args->{'trace_lexers'} ) {
-        my $value = $flat_args->{'trace_lexers'};
-        my $normalized_value =
-          Scalar::Util::looks_like_number($value) ? $value : 0;
-        $slr->[Marpa::R3::Internal::Scanless::R::TRACE_LEXERS] =
-          $normalized_value;
-        if ($normalized_value) {
-            say {$trace_file_handle} qq{Setting trace_lexers option};
         }
     }
 
@@ -502,9 +490,7 @@ sub Marpa::R3::Scanless::R::read {
 
     my $thin_slr = $self->[Marpa::R3::Internal::Scanless::R::SLR_C];
     my $trace_terminals = $self->[Marpa::R3::Internal::Scanless::R::TRACE_TERMINALS];
-    my $trace_lexers = $self->[Marpa::R3::Internal::Scanless::R::TRACE_LEXERS];
     $thin_slr->trace_terminals($trace_terminals) if $trace_terminals;
-    $thin_slr->trace_lexers($trace_lexers)       if $trace_lexers;
 
     $thin_slr->string_set($p_string);
 
@@ -912,7 +898,6 @@ sub Marpa::R3::Scanless::R::resume {
     my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
     my $trace_terminals =
         $slr->[Marpa::R3::Internal::Scanless::R::TRACE_TERMINALS];
-    my $trace_lexers = $slr->[Marpa::R3::Internal::Scanless::R::TRACE_LEXERS];
 
     $thin_slr->pos_set( $start_pos, $length );
     $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] = [];
@@ -925,20 +910,6 @@ sub Marpa::R3::Scanless::R::resume {
         last OUTER_READ if not $problem_code;
         my $pause =
             Marpa::R3::Internal::Scanless::convert_libmarpa_events($slr);
-
-        if ( $trace_lexers > 2 ) {
-            my $stream_pos = $thin_slr->pos();
-            my $trace_file_handle =
-                $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
-            my $lex_tracer =
-                $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER];
-            my ( $line, $column ) = $slr->line_column($stream_pos);
-            print {$trace_file_handle}
-                qq{\n=== Progress report at line $line, column $column\n},
-                $lex_tracer->lexer_progress_report($slr),
-                qq{=== End of progress report at line $line, column $column\n},
-                or Marpa::R3::exception("Cannot print(): $ERRNO");
-        } ## end if ( $trace_lexers > 2 )
 
         last OUTER_READ if $pause;
         next OUTER_READ if $problem_code eq 'event';
@@ -1248,19 +1219,6 @@ sub Marpa::R3::Scanless::R::read_problem {
             . '* String before error: '
             . Marpa::R3::escape_string( ${$p_string}, -50 ) . "\n";
     } ## end else [ if ($g1_status) ]
-
-    if ( $slr->[Marpa::R3::Internal::Scanless::R::TRACE_LEXERS] ) {
-        my $stream_pos = $thin_slr->pos();
-        my $trace_file_handle =
-            $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
-        my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-        my $lex_tracer =
-            $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER];
-        my ( $line, $column ) = $slr->line_column($stream_pos);
-        $read_string_error .=
-            qq{\n=== Progress report for lexer at line $line, column $column\n} .
-            $lex_tracer->lexer_progress_report($slr);
-    }
 
     $slr->[Marpa::R3::Internal::Scanless::R::READ_STRING_ERROR] =
         $read_string_error;
