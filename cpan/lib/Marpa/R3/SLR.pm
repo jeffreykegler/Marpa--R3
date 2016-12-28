@@ -594,7 +594,7 @@ my $libmarpa_trace_event_handlers = {
             input_range_describe( $slr, $lexeme_start_pos,
             $lexeme_end_pos - 1 ),
             q{: },
-            $tracer->symbol_in_display_form($slg, $g1_lexeme),
+            $tracer->symbol_in_display_form($g1_lexeme),
             qq{; value="$raw_token_value"; },
             qq{priority was $lexeme_priority, but $required_priority was required}
             or Marpa::R3::exception("Could not say(): $ERRNO");
@@ -616,7 +616,7 @@ my $libmarpa_trace_event_handlers = {
             input_range_describe( $slr, $lexeme_start_pos,
             $lexeme_end_pos - 1 ),
             q{: },
-            $tracer->symbol_in_display_form($slg, $g1_lexeme),
+            $tracer->symbol_in_display_form($g1_lexeme),
             qq{; value="$raw_token_value"}
             or Marpa::R3::exception("Could not say(): $ERRNO");
     },
@@ -638,7 +638,7 @@ my $libmarpa_trace_event_handlers = {
             $lexeme_end_pos - 1 ),
             q{ e}, $slr->g1_pos(),
             q{: },
-            $tracer->symbol_in_display_form($slg, $g1_lexeme),
+            $tracer->symbol_in_display_form($g1_lexeme),
             qq{; value="$raw_token_value"}
             or Marpa::R3::exception("Could not say(): $ERRNO");
     },
@@ -673,8 +673,8 @@ my $libmarpa_trace_event_handlers = {
         my $lex_tracer =
             $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER];
         my $symbol_in_display_form =
-            $lex_tracer->symbol_in_display_form($slg, $token_id),
-            my ( $line, $column ) = $slr->line_column($position);
+            $lex_tracer->symbol_in_display_form($token_id);
+        my ( $line, $column ) = $slr->line_column($position);
         my $trace_file_handle =
             $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
         say {$trace_file_handle}
@@ -695,8 +695,8 @@ my $libmarpa_trace_event_handlers = {
         my $lex_tracer =
             $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER];
         my $symbol_in_display_form =
-            $lex_tracer->symbol_in_display_form($slg, $token_id),
-            my ( $line, $column ) = $slr->line_column($position);
+            $lex_tracer->symbol_in_display_form($token_id);
+        my ( $line, $column ) = $slr->line_column($position);
         my $trace_file_handle =
             $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
         say {$trace_file_handle}

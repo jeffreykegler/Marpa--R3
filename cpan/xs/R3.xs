@@ -1705,7 +1705,7 @@ u_l0r_new (Outer_R* outer_slr)
 {
     Scanless_R *slr = slr_inner_get (outer_slr);
     Marpa_Recce l0r = slr->l0r;
-    const IV trace_lexers = slr->trace_lexers;
+    const IV trace_terminals = slr->trace_terminals;
     G_Wrapper *lexer_wrapper = slr->slg->l0_wrapper;
     const int too_many_earley_items = slr->too_many_earley_items;
 
@@ -1753,11 +1753,11 @@ u_l0r_new (Outer_R* outer_slr)
                     (long) assertion, (long) terminal,
                     xs_g_error (lexer_wrapper));
             }
-            if (trace_lexers >= 1) {
+            if (trace_terminals >= 3) {
                 xlua_sig_call (outer_slr->L,
                     "recce, perl_pos, lexeme, assertion = ...\n"
                     "local q = recce.event_queue\n"
-                    "q[#q+1] = { 'trace', 'expected lexeme', perl_pos, lexeme, assertion }\n",
+                    "q[#q+1] = { '!trace', 'expected lexeme', perl_pos, lexeme, assertion }\n",
                     "Riii>",
                     outer_slr->lua_ref, slr->perl_pos, terminal, assertion);
             }
@@ -1867,7 +1867,7 @@ u_read (Outer_R * outer_slr)
   STRLEN len;
   int input_is_utf8;
 
-  const IV trace_lexers = slr->trace_lexers;
+  const IV trace_terminals = slr->trace_terminals;
   Marpa_Recognizer r = slr->l0r;
 
   if (!r)
@@ -1936,10 +1936,11 @@ u_read (Outer_R * outer_slr)
           ops = (UV *) SvPV (*p_ops_sv, dummy);
         }
 
-        if (trace_lexers >= 1) {
+        if (trace_terminals >= 1) {
 
             xlua_sig_call (outer_slr->L,
-                "recce, codepoint, perl_pos = ...\n"
+                "-- " STRLOC "\n"
+                "local recce, codepoint, perl_pos = ...\n"
                 "local q = recce.event_queue\n"
                 "q[#q+1] = { '!trace', 'lexer reading codepoint', codepoint, perl_pos}\n",
                 "Rii>", outer_slr->lua_ref, (int) codepoint, (int) slr->perl_pos);
@@ -1986,7 +1987,7 @@ u_read (Outer_R * outer_slr)
                      * we have one of them as an example
                      */
                     slr->input_symbol_id = symbol_id;
-                    if (trace_lexers >= 1)
+                    if (trace_terminals >= 1)
                       {
 
               xlua_sig_call (outer_slr->L,
@@ -2003,7 +2004,7 @@ u_read (Outer_R * outer_slr)
                       }
                     break;
                   case MARPA_ERR_NONE:
-                    if (trace_lexers >= 1)
+                    if (trace_terminals >= 1)
                       {
 
               xlua_sig_call (outer_slr->L,
@@ -2082,7 +2083,7 @@ u_read (Outer_R * outer_slr)
         }
     ADVANCE_ONE_CHAR:;
       slr->perl_pos++;
-      if (trace_lexers)
+      if (trace_terminals)
         {
           return U_READ_TRACING;
         }
@@ -2312,7 +2313,6 @@ static Scanless_R* marpa_inner_slr_new (
   Newx (slr, 1, Scanless_R);
 
   slr->throw = 1;
-  slr->trace_lexers = 0;
   slr->trace_terminals = 0;
   slr->l0r = NULL;
 
@@ -2440,149 +2440,6 @@ static void slr_inner_destroy(Scanless_R* slr)
     }
   SvREFCNT_dec (slr->input);
   Safefree (slr);
-}
-
-/*
- * Try to discard lexemes.
- * It is assumed this is because R1 is exhausted and we
- * are checking for unconsumed text.
- * Return values:
- * 0 OK.
- * -4: Exhausted, but lexemes remain.
- */
-static IV
-slr_discard ( Outer_R *outer_slr)
-{
-  dTHX;
-  Scanless_R *slr = slr_inner_get(outer_slr);
-  int lexemes_discarded = 0;
-  int lexemes_found = 0;
-  Marpa_Recce l0r;
-  Marpa_Earley_Set_ID earley_set;
-  const Scanless_G *slg = slr->slg;
-
-  l0r = slr->l0r;
-  if (!l0r)
-    {
-      croak ("Problem in slr->read(): No R0 at %s %d", __FILE__, __LINE__);
-    }
-  earley_set = marpa_r_latest_earley_set (l0r);
-  /* Zero length lexemes are not of interest, so we do *not*
-   * search the 0'th Earley set.
-   */
-  while (earley_set > 0)
-    {
-      int return_value;
-      const int working_pos = slr->start_of_lexeme + earley_set;
-      return_value = marpa_r_progress_report_start (l0r, earley_set);
-      if (return_value < 0)
-        {
-          croak ("Problem in marpa_r_progress_report_start(%p, %ld): %s",
-                 (void *) l0r, (unsigned long) earley_set,
-                 xs_g_error (slg->l0_wrapper));
-        }
-      while (1)
-        {
-          Marpa_Symbol_ID g1_lexeme;
-          int dot_position;
-          Marpa_Earley_Set_ID origin;
-          Marpa_Rule_ID rule_id =
-            marpa_r_progress_item (l0r, &dot_position, &origin);
-          if (rule_id <= -2)
-            {
-              croak ("Problem in marpa_r_progress_item(): %s",
-                     xs_g_error (slg->l0_wrapper));
-            }
-          if (rule_id == -1)
-            goto NO_MORE_REPORT_ITEMS;
-          if (origin != 0)
-            goto NEXT_REPORT_ITEM;
-          if (dot_position != -1)
-            goto NEXT_REPORT_ITEM;
-          g1_lexeme = slg->l0_rule_g_properties[rule_id].g1_lexeme;
-          if (g1_lexeme == -1)
-            goto NEXT_REPORT_ITEM;
-          lexemes_found++;
-          slr->end_of_lexeme = working_pos;
-
-          /* -2 means a discarded item */
-          if (g1_lexeme <= -2)
-            {
-              lexemes_discarded++;
-              if (slr->trace_terminals)
-              {
-                  /* We do not have the lexeme, but we have the
-                   * lexer rule.
-                   * The upper level will have to figure things out.
-                   */
-                  xlua_sig_call (outer_slr->L,
-                      "recce, rule_id, lexeme_start, lexeme_end = ...\n"
-                      "local q = recce.event_queue\n"
-                      "q[#q+1] = { '!trace', 'discarded lexeme',\n"
-                      "    rule_id, lexeme_start, lexeme_end}\n",
-                      "Riii>",
-                      outer_slr->lua_ref,
-                      rule_id, slr->start_of_lexeme, slr->end_of_lexeme);
-              }
-              if (slr->l0_rule_r_properties[rule_id].
-                  t_event_on_discard_active)
-              {
-                  xlua_sig_call (outer_slr->L,
-                      "recce, rule_id, lexeme_start, lexeme_end, last_g1_location = ...\n"
-                      "local q = recce.event_queue\n"
-                      "q[#q+1] = { 'discarded lexeme',\n"
-                      "    rule_id, lexeme_start, lexeme_end, last_g1_location}\n",
-                      "Riiii>",
-                      outer_slr->lua_ref,
-                      rule_id,
-                      slr->start_of_lexeme,
-                      slr->end_of_lexeme, marpa_r_latest_earley_set (slr->g1r)
-                      );
-              }
-              /* If there is discarded item, we are fine,
-               * and can return success.
-               */
-              slr->lexer_start_pos = slr->perl_pos = working_pos;
-              return 0;
-            }
-
-          /*
-           * Ignore everything else.
-           * We don't try to read lexemes into an exhausted
-           * R1 -- we only are looking for discardable tokens.
-           */
-        if (slr->trace_terminals) {
-            xlua_sig_call (outer_slr->L,
-                "recce, g1_lexeme, lexeme_start, lexeme_end = ...\n"
-                "local q = recce.event_queue\n"
-                "q[#q+1] = { '!trace', 'ignored lexeme', g1_lexeme, lexeme_start, lexeme_end}\n",
-                "Riii>",
-                outer_slr->lua_ref,
-                g1_lexeme, slr->start_of_pause_lexeme, slr->end_of_pause_lexeme);
-        }
-        NEXT_REPORT_ITEM:;
-        }
-    NO_MORE_REPORT_ITEMS:;
-      if (lexemes_found)
-        {
-          /* We found a lexeme at this location and we are not allowed
-           * to discard this input.
-           * Return failure.
-           */
-          slr->perl_pos = slr->problem_pos = slr->lexer_start_pos =
-            slr->start_of_lexeme;
-          return -4;
-        }
-      earley_set--;
-    }
-
-  /* If we are here we found no lexemes anywhere in the input,
-   * and therefore none which can be discarded.
-   * Return failure.
-   */
-  slr->perl_pos = slr->problem_pos = slr->lexer_start_pos =
-    slr->start_of_lexeme;
-  return -4;
 }
 
 /* Assumes it is called
@@ -4764,24 +4621,6 @@ PPCODE:
 }
 
 void
-trace_lexers( outer_slr, new_level )
-    Outer_R *outer_slr;
-    int new_level;
-PPCODE:
-{
-  Scanless_R *slr = slr_inner_get(outer_slr);
-  IV old_level = slr->trace_lexers;
-  slr->trace_lexers = new_level;
-  if (new_level)
-    {
-      warn
-        ("Setting trace_lexers to %ld; was %ld",
-         (long) new_level, (long) old_level);
-    }
-  XSRETURN_IV (old_level);
-}
-
-void
 trace_terminals( outer_slr, new_level )
     Outer_R *outer_slr;
     int new_level;
@@ -4894,7 +4733,7 @@ PPCODE:
 {
   Scanless_R *slr = slr_inner_get(outer_slr);
   int lexer_read_result = 0;
-  const int trace_lexers = slr->trace_lexers;
+  const int trace_terminals = slr->trace_terminals;
 
   if (slr->is_external_scanning)
     {
@@ -4917,8 +4756,6 @@ PPCODE:
 
   while (1)
     {
-      int discard_mode = 0;
-
       if (slr->lexer_start_pos >= 0)
         {
           if (slr->lexer_start_pos >= slr->end_pos)
@@ -4929,10 +4766,10 @@ PPCODE:
           slr->start_of_lexeme = slr->perl_pos = slr->lexer_start_pos;
           slr->lexer_start_pos = -1;
           u_l0r_clear (outer_slr);
-          if (trace_lexers >= 1)
+          if (trace_terminals >= 1)
             {
                             xlua_sig_call (outer_slr->L,
-                                "recce, perl_pos, = ...\n"
+                                "local recce, perl_pos = ...\n"
                                 "local q = recce.event_queue\n"
                                 "q[#q+1] = { '!trace', 'lexer restarted recognizer', perl_pos}\n",
                                 "Ri>",
@@ -4967,17 +4804,8 @@ PPCODE:
         }
 
 
-      discard_mode = marpa_r_is_exhausted (slr->g1r);
-      if ((0) && discard_mode)
         {
-          int discard_result = slr_discard (outer_slr);
-          if (discard_result < 0)
-            {
-              XSRETURN_PV ("R1 exhausted before end");
-            }
-        }
-      else
-        {
+          const int discard_mode = marpa_r_is_exhausted (slr->g1r);
           const char *result_string = slr_alternatives (outer_slr, discard_mode);
           if (result_string)
             {
@@ -4997,7 +4825,7 @@ PPCODE:
           }
       }
 
-      if (slr->trace_terminals || slr->trace_lexers)
+      if (slr->trace_terminals)
         {
           XSRETURN_PV ("trace");
         }

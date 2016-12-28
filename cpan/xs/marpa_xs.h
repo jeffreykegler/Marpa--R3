@@ -167,7 +167,6 @@ typedef struct
   Marpa_Recce g1r;
   G_Wrapper *g1_wrapper;
   AV *token_values;
-  IV trace_lexers;
   int trace_terminals;
   int start_of_lexeme;
   int end_of_lexeme;
