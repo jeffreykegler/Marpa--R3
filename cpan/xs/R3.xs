@@ -2786,7 +2786,7 @@ r_convert_events ( Outer_R *outer_slr)
  * The string must be a constant in static space.
  */
 static const char *
-slr_alternatives ( Outer_R *outer_slr)
+slr_alternatives ( Outer_R *outer_slr, int discard_mode)
 {
     dTHX;
     Scanless_R *slr = slr_inner_get(outer_slr);
@@ -3015,8 +3015,13 @@ slr_alternatives ( Outer_R *outer_slr)
     }
 
     if (pass1_result == discard) {
+        /* slr->problem_pos? */
         slr->perl_pos = slr->lexer_start_pos = working_pos;
         return 0;
+    }
+
+    if (discard_mode) {
+        return "R1 exhausted before end";
     }
 
     if (pass1_result != accept) {
@@ -4912,6 +4917,8 @@ PPCODE:
 
   while (1)
     {
+      int discard_mode = 0;
+
       if (slr->lexer_start_pos >= 0)
         {
           if (slr->lexer_start_pos >= slr->end_pos)
@@ -4960,7 +4967,8 @@ PPCODE:
         }
 
 
-      if (marpa_r_is_exhausted (slr->g1r))
+      discard_mode = marpa_r_is_exhausted (slr->g1r);
+      if ((0) && discard_mode)
         {
           int discard_result = slr_discard (outer_slr);
           if (discard_result < 0)
@@ -4970,7 +4978,7 @@ PPCODE:
         }
       else
         {
-          const char *result_string = slr_alternatives (outer_slr);
+          const char *result_string = slr_alternatives (outer_slr, discard_mode);
           if (result_string)
             {
               XSRETURN_PV (result_string);
