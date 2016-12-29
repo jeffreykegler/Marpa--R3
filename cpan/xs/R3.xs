@@ -1721,7 +1721,6 @@ u_l0r_new (Outer_R* outer_slr)
 {
     Scanless_R *slr = slr_inner_get (outer_slr);
     Marpa_Recce l0r = slr->l0r;
-    const IV trace_terminals = slr->trace_terminals;
     G_Wrapper *lexer_wrapper = slr->slg->l0_wrapper;
     const int too_many_earley_items = slr->too_many_earley_items;
 
@@ -1885,7 +1884,6 @@ u_read (Outer_R * outer_slr)
     STRLEN len;
     int input_is_utf8;
 
-    const IV trace_terminals = slr->trace_terminals;
     Marpa_Recognizer r = slr->l0r;
 
     if (!r) {
@@ -2312,7 +2310,6 @@ static Scanless_R* marpa_inner_slr_new (
   Newx (slr, 1, Scanless_R);
 
   slr->throw = 1;
-  slr->trace_terminals = 0;
   slr->l0r = NULL;
 
   /* Copy and take references to the "parent objects",
@@ -4609,7 +4606,6 @@ PPCODE:
 {
   int old_level;
   Scanless_R *slr = slr_inner_get(outer_slr);
-  slr->trace_terminals = new_level;
   call_by_tag (outer_slr->L, STRLOC,
       "local recce, new_level = ...\n"
       "local old_level = recce.trace_terminals\n"
@@ -4721,7 +4717,6 @@ PPCODE:
 {
   Scanless_R *slr = slr_inner_get(outer_slr);
   int lexer_read_result = 0;
-  const int trace_terminals = slr->trace_terminals;
 
   if (slr->is_external_scanning)
     {
