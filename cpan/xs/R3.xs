@@ -4645,9 +4645,16 @@ trace_terminals( outer_slr, new_level )
     int new_level;
 PPCODE:
 {
+  int old_level;
   Scanless_R *slr = slr_inner_get(outer_slr);
-  IV old_level = slr->trace_terminals;
   slr->trace_terminals = new_level;
+  call_by_tag (outer_slr->L, STRLOC,
+      "local recce, new_level = ...\n"
+      "local old_level = recce.trace_terminals or 0\n"
+      "recce.trace_terminals = new_level\n"
+      "return old_level\n",
+      "Ri>i", outer_slr->lua_ref,
+      new_level, &old_level);
   XSRETURN_IV(old_level);
 }
 
