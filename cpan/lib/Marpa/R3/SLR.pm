@@ -526,7 +526,6 @@ my $libmarpa_trace_event_handlers = {
     'expected lexeme' => sub {
         my ( $slr, $event ) = @_;
         # Necessary to check, because this one can be returned when not tracing
-        return if not $slr->[Marpa::R3::Internal::Scanless::R::TRACE_TERMINALS];
         my ( undef, undef, $position, $g1_lexeme, $assertion_id)
             = @{$event};
         my ( $line, $column ) = $slr->line_column($position);
