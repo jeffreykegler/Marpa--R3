@@ -1771,16 +1771,15 @@ u_l0r_new (Outer_R* outer_slr)
                     (long) assertion, (long) terminal,
                     xs_g_error (lexer_wrapper));
             }
-            if (trace_terminals >= 3) {
                 call_by_tag (outer_slr->L,
                     STRLOC,
                     "recce, perl_pos, lexeme, assertion = ...\n"
-                    "local q = recce.event_queue\n"
-                    "q[#q+1] = { '!trace', 'expected lexeme', perl_pos, lexeme, assertion }\n",
+                    "if recce.trace_terminals >= 3 then\n"
+                    "    local q = recce.event_queue\n"
+                    "    q[#q+1] = { '!trace', 'expected lexeme', perl_pos, lexeme, assertion }\n"
+                    "end\n",
                     "Riii>",
                     outer_slr->lua_ref, slr->perl_pos, terminal, assertion);
-            }
-
         }
     }
     {
@@ -1955,15 +1954,13 @@ u_read (Outer_R * outer_slr)
           ops = (UV *) SvPV (*p_ops_sv, dummy);
         }
 
-        if (trace_terminals >= 1) {
-
             call_by_tag (outer_slr->L, STRLOC,
-                "-- " STRLOC "\n"
                 "local recce, codepoint, perl_pos = ...\n"
-                "local q = recce.event_queue\n"
-                "q[#q+1] = { '!trace', 'lexer reading codepoint', codepoint, perl_pos}\n",
+                "if recce.trace_terminals >= 1 then\n"
+                "   local q = recce.event_queue\n"
+                "   q[#q+1] = { '!trace', 'lexer reading codepoint', codepoint, perl_pos}\n"
+                "end\n",
                 "Rii>", outer_slr->lua_ref, (int) codepoint, (int) slr->perl_pos);
-        }
 
       /* ops[0] is codepoint */
       op_count = ops[1];
@@ -4606,7 +4603,8 @@ PPCODE:
   call_by_tag (outer_slr->L, STRLOC,
       "local recce = ...\n"
       "recce.event_queue = {}\n"
-      "recce.lmw_g1r.lmw_g = recce.slg.lmw_g1g\n",
+      "recce.lmw_g1r.lmw_g = recce.slg.lmw_g1g\n"
+      "recce.trace_terminals = 0\n",
       "R>", outer_slr->lua_ref);
 
   new_sv = sv_newmortal ();
@@ -4650,7 +4648,7 @@ PPCODE:
   slr->trace_terminals = new_level;
   call_by_tag (outer_slr->L, STRLOC,
       "local recce, new_level = ...\n"
-      "local old_level = recce.trace_terminals or 0\n"
+      "local old_level = recce.trace_terminals\n"
       "recce.trace_terminals = new_level\n"
       "return old_level\n",
       "Ri>i", outer_slr->lua_ref,
@@ -4792,18 +4790,17 @@ PPCODE:
           slr->start_of_lexeme = slr->perl_pos = slr->lexer_start_pos;
           slr->lexer_start_pos = -1;
           u_l0r_clear (outer_slr);
-          if (trace_terminals >= 1)
-            {
                             call_by_tag (outer_slr->L, STRLOC,
                                 "local recce, perl_pos = ...\n"
-                                "local q = recce.event_queue\n"
-                                "q[#q+1] = { '!trace', 'lexer restarted recognizer', perl_pos}\n",
+                                "if recce.trace_terminals >= 1 then\n"
+                                "    local q = recce.event_queue\n"
+                                "    q[#q+1] = { '!trace', 'lexer restarted recognizer', perl_pos}\n"
+                                "end\n",
                                 "Ri>",
                                 outer_slr->lua_ref,
                                 slr->perl_pos
                             );
 
-            }
         }
 
       lexer_read_result = slr->lexer_read_result = u_read (outer_slr);
