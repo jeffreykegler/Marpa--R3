@@ -83,13 +83,48 @@ if (0) {
 #    }
 }
 
-my $ccflags = join q{ }, $Config{'ccflags'}, @new_ccflags;
+my $my_ccflags = join q{ }, $Config{'ccflags'}, @new_ccflags;
 
 
-undef &MY::top_targets; # suppress warning
-*MY::top_targets = sub {
+WriteMakefile(
+    INC     => '-I. -I../engine/read_only -I../lua -I../kollos',
+    NAME    => 'Marpa::R3',
+    VERSION => $STRING_VERSION,
+    DEFINE  => $define,
+    SKIP    => [qw(test test_dynamic dynamic dynamic_lib dlsyms)],
+    XS      => { 'R3.xs' => 'R3.c' },
+    # OBJECT  => 'R3.o',
+);
+
+package MY;
+
+no warnings "redefine";
+
+sub constants {
+
+    my $self      = shift;
+    my $constants = $self->SUPER::constants(@_);
+
+    $constants .= "\n";
+    $constants .= sprintf( "LUA_INTERP = %s\n",
+        File::Spec->catfile( File::Spec->updir(), qw{lua lua} ) );
+    my $my_lua_path = File::Spec->catfile( File::Spec->updir(), qw{kollos XXX} );
+    $my_lua_path =~ s/XXX$/?.lua/;
+    $constants .=
+      'LUA_PATH = ' . $self->quote_literal( (';;' . $my_lua_path ),
+        { allow_variables => undef } ) . "\n";
+    $constants .= sprintf( "MIRANDA = %s\n",
+        File::Spec->catfile( File::Spec->updir(), qw{kollos miranda} ) );
+
+    $constants .= sprintf( "MY_CCFLAGS = %s\n", $my_ccflags );
+
+    return $constants;
+
+}
+
+sub top_targets {
     my $r = '
-all :: R3$(OBJ_EXT)
+all :: R3$(OBJ_EXT) glue.lua
 	$(NOECHO) $(NOOP)
 	$(NOECHO) $(ECHO) Executing all target in xs directory
 
@@ -108,10 +143,9 @@ test_dynamic ::
 
 ';
     return $r;
-};
+}
 
-undef &MY::postamble; # suppress warning
-*MY::postamble = sub {
+sub postamble {
     my ($self) = @_;
     my @postamble_pieces = (".NOTPARALLEL:\n");
 
@@ -127,19 +161,10 @@ exec_lua.xs: gen_exec_lua.pl
 marpa_slifop.h: create_ops.pl
 	$(PERLRUN) create_ops.pl > marpa_slifop.h
 
+glue.lua: glue.lua.md
+	LUA_PATH=$(LUA_PATH) $(LUA_INTERP) $(MIRANDA) glue.lua.md main=glue.lua
+
 END_OF_POSTAMBLE_PIECE
 
     return join "\n", @postamble_pieces;
 };
-
-WriteMakefile(
-    INC     => '-I. -I../engine/read_only -I../lua -I../kollos',
-    NAME    => 'Marpa::R3',
-    VERSION => $STRING_VERSION,
-    DEFINE  => $define,
-    SKIP    => [qw(test test_dynamic dynamic dynamic_lib dlsyms)],
-    CCFLAGS => $ccflags,
-    XS      => { 'R3.xs' => 'R3.c' },
-    # OBJECT  => 'R3.o',
-);
-

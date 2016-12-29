@@ -359,6 +359,8 @@ END_OF_POSTAMBLE_PIECE
 
 if ($^O eq 'MSWin32'){
     push @postamble_pieces, <<'END_OF_POSTAMBLE_PIECE';
+all :: lib\Marpa\R3\Lua\Glue.pm
+
 all :: lib\Marpa\R3\Lua\Init.pm
 
 all :: lib\Marpa\R3\Lua\Inspect.pm
@@ -369,6 +371,9 @@ all :: inc\Marpa\R3\Lua\Test\More.pm
 
 lib\Marpa\R3\Lua\Inspect.pm: kollos\inspect.lua lib\Marpa\R3\Lua\Inspect.PL
 	$(PERLRUN) lib\Marpa\R3\Lua\Inspect.PL lib\Marpa\R3\Lua\Inspect.pm
+
+lib\Marpa\R3\Lua\Glue.pm: xs\glue.lua lib\Marpa\R3\Lua\Glue.PL
+	$(PERLRUN) lib\Marpa\R3\Lua\Glue.PL lib\Marpa\R3\Lua\Glue.pm
 
 lib\Marpa\R3\Lua\Init.pm: kollos\init.lua lib\Marpa\R3\Lua\Init.PL
 	$(PERLRUN) lib\Marpa\R3\Lua\Init.PL lib\Marpa\R3\Lua\Init.pm
@@ -393,6 +398,9 @@ all :: inc/Marpa/R3/Lua/Test/More.pm
 
 lib/Marpa/R3/Lua/Inspect.pm: kollos/inspect.lua lib/Marpa/R3/Lua/Inspect.PL
 	$(PERLRUN) lib/Marpa/R3/Lua/Inspect.PL lib/Marpa/R3/Lua/Inspect.pm
+
+lib/Marpa/R3/Lua/Glue.pm: xs/glue.lua lib/Marpa/R3/Lua/Glue.PL
+	$(PERLRUN) lib/Marpa/R3/Lua/Glue.PL lib/Marpa/R3/Lua/Glue.pm
 
 lib/Marpa/R3/Lua/Init.pm: kollos/init.lua lib/Marpa/R3/Lua/Init.PL
 	$(PERLRUN) lib/Marpa/R3/Lua/Init.PL lib/Marpa/R3/Lua/Init.pm
@@ -458,6 +466,7 @@ WriteMakefile(
         q[lib/Marpa/R3/MetaG.pm]     => q[$(INST_LIB)/Marpa/R3/MetaG.pm],
         q[lib/Marpa/R3/SLG.pm]       => q[$(INST_LIB)/Marpa/R3/SLG.pm],
         q[lib/Marpa/R3/SLR.pm]       => q[$(INST_LIB)/Marpa/R3/SLR.pm],
+        q[lib/Marpa/R3/Lua/Glue.pm]  => q[$(INST_LIB)/Marpa/R3/Lua/Glue.pm],
         q[lib/Marpa/R3/Lua/Init.pm]  => q[$(INST_LIB)/Marpa/R3/Lua/Init.pm],
         q[lib/Marpa/R3/Lua/Inspect.pm] =>
           q[$(INST_LIB)/Marpa/R3/Lua/Inspect.pm],

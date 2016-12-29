@@ -96,6 +96,10 @@ require Marpa::R3::ASF;
 ( $version_result = version_ok($Marpa::R3::ASF::VERSION) )
     and die 'Marpa::R3::ASF::VERSION ', $version_result;
 
+require Marpa::R3::Lua::Glue;
+( $version_result = version_ok($Marpa::R3::Lua::Glue::VERSION) )
+    and die 'Marpa::R3::Lua::Glue::VERSION ', $version_result;
+
 require Marpa::R3::Lua::Init;
 ( $version_result = version_ok($Marpa::R3::Lua::Init::VERSION) )
     and die 'Marpa::R3::Lua::Init::VERSION ', $version_result;

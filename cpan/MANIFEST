@@ -126,6 +126,7 @@ lib/Marpa/R3.pm
 lib/Marpa/R3/ASF.pm
 lib/Marpa/R3/Common.pm
 lib/Marpa/R3/Internal.pm
+lib/Marpa/R3/Lua/Glue.PL
 lib/Marpa/R3/Lua/Init.PL
 lib/Marpa/R3/Lua/Inspect.PL
 lib/Marpa/R3/MetaAST.pm
