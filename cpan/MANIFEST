@@ -314,6 +314,7 @@ xs/R3.xs
 xs/create_ops.pl
 xs/gen_auto_xs.pl
 xs/gen_exec_lua.pl
+xs/glue.lua.md
 xs/marpa_xs.h
 xs/ppport.h
 xs/typemap

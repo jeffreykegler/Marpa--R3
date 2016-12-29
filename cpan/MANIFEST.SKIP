@@ -71,6 +71,7 @@
 ^lib/Marpa/pm_to_blib$
 ^lib/Marpa/R3[.]c
 ^lib/Marpa/R3/Installed.pm$
+^lib/Marpa/R3/Lua/Glue[.]pm$
 ^lib/Marpa/R3/Lua/Init[.]pm$
 ^lib/Marpa/R3/Lua/Inspect[.]pm$
 ^lib/Marpa/R3/Lua/Lua[.]c$
@@ -126,6 +127,7 @@
 ^TOUCH$
 ^xs/auto[.]xs
 ^xs/exec_lua[.]xs
+^xs/glue[.]lua$
 ^xs/Makefile$
 ^xs/Makefile[.]old$
 ^xs/marpa

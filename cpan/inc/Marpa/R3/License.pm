@@ -371,8 +371,11 @@ my %files_by_type = (
     'engine/read_only/config.h.in' =>
         check_tag( 'Generated from configure.ac by autoheader', 250 ),
 
-    # Leave inspect.lua licensing as is
+    # Leave licensing in adopted Lua packages as is
     'kollos/inspect.lua' => \&ignored,
+    'kollos/strict.lua' => \&ignored,
+    'inc/Marpa/R3/Lua/Test/Builder.lua' => \&ignored,
+    'inc/Marpa/R3/Lua/Test/More.lua' => \&ignored,
 
     # Leave GNU obstack licensing as is
     'engine/read_only/marpa_obs.c' => \&ignored,
