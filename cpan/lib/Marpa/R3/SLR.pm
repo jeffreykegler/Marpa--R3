@@ -523,28 +523,6 @@ my $libmarpa_trace_event_handlers = {
             qq{; value="$raw_token_value"}
             or Marpa::R3::exception("Could not say(): $ERRNO");
     },
-    'rejected lexeme' => sub {
-        my ( $slr, $event ) = @_;
-        # Necessary to check, because this one can be returned when not tracing
-        return if not $slr->[Marpa::R3::Internal::Scanless::R::TRACE_TERMINALS];
-        my ( undef, undef, $lexeme_start_pos, $lexeme_end_pos, $g1_lexeme)
-            = @{$event};
-        my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
-        my $raw_token_value =
-            $thin_slr->substring( $lexeme_start_pos,
-            $lexeme_end_pos - $lexeme_start_pos );
-        my $trace_file_handle =
-            $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
-        my $slg              = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-        my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
-        say {$trace_file_handle} qq{Rejected lexeme },
-            input_range_describe( $slr, $lexeme_start_pos,
-            $lexeme_end_pos - 1 ),
-            q{: },
-            $tracer->symbol_in_display_form($g1_lexeme),
-            qq{; value="$raw_token_value"}
-            or Marpa::R3::exception("Could not say(): $ERRNO");
-    },
     'expected lexeme' => sub {
         my ( $slr, $event ) = @_;
         # Necessary to check, because this one can be returned when not tracing
