@@ -309,6 +309,7 @@ sub Marpa::R3::Scanless::R::set {
 sub common_set {
 
     my ( $slr, $method, $flat_args ) = @_;
+    my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
 
     # These recce args are allowed in all contexts
     state $common_recce_args = {
@@ -355,6 +356,11 @@ sub common_set {
         if ($normalized_value) {
             say {$trace_file_handle} qq{Setting trace_terminals option};
         }
+        my ($event_queue) = $thin_slr->exec_sig(<<'END_OF_LUA',
+            local recce, trace_terminals = ...
+            recce.trace_terminals = trace_terminals
+END_OF_LUA
+            'i', $normalized_value);
     }
 
     if ( exists $flat_args->{'exhaustion'} ) {
