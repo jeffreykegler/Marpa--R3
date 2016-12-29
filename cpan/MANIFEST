@@ -118,7 +118,7 @@ kollos/Makefile.PL
 kollos/gen_error_table.lua
 kollos/gen_event_table.lua
 kollos/gen_step_table.lua
-kollos/init.lua.md
+kollos/kollos.lua.md
 kollos/inspect.lua
 kollos/miranda
 kollos/strict.lua
@@ -127,7 +127,7 @@ lib/Marpa/R3/ASF.pm
 lib/Marpa/R3/Common.pm
 lib/Marpa/R3/Internal.pm
 lib/Marpa/R3/Lua/Glue.PL
-lib/Marpa/R3/Lua/Init.PL
+lib/Marpa/R3/Lua/Kollos.PL
 lib/Marpa/R3/Lua/Inspect.PL
 lib/Marpa/R3/MetaAST.pm
 lib/Marpa/R3/MetaG.pm

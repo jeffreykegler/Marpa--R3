@@ -361,7 +361,7 @@ if ($^O eq 'MSWin32'){
     push @postamble_pieces, <<'END_OF_POSTAMBLE_PIECE';
 all :: lib\Marpa\R3\Lua\Glue.pm
 
-all :: lib\Marpa\R3\Lua\Init.pm
+all :: lib\Marpa\R3\Lua\Kollos.pm
 
 all :: lib\Marpa\R3\Lua\Inspect.pm
 
@@ -375,8 +375,8 @@ lib\Marpa\R3\Lua\Inspect.pm: kollos\inspect.lua lib\Marpa\R3\Lua\Inspect.PL
 lib\Marpa\R3\Lua\Glue.pm: xs\glue.lua lib\Marpa\R3\Lua\Glue.PL
 	$(PERLRUN) lib\Marpa\R3\Lua\Glue.PL lib\Marpa\R3\Lua\Glue.pm
 
-lib\Marpa\R3\Lua\Init.pm: kollos\init.lua lib\Marpa\R3\Lua\Init.PL
-	$(PERLRUN) lib\Marpa\R3\Lua\Init.PL lib\Marpa\R3\Lua\Init.pm
+lib\Marpa\R3\Lua\Kollos.pm: kollos\kollos.lua lib\Marpa\R3\Lua\Kollos.PL
+	$(PERLRUN) lib\Marpa\R3\Lua\Kollos.PL lib\Marpa\R3\Lua\Kollos.pm
 
 inc\Marpa\R3\Lua\Test\Builder.pm: inc\Marpa\R3\Lua\Test\Builder.lua inc\Marpa\R3\Lua\Test\Builder.PL
 	$(PERLRUN) inc\Marpa\R3\Lua\Test\Builder.PL inc\Marpa\R3\Lua\Test\Builder.pm
@@ -388,7 +388,7 @@ END_OF_POSTAMBLE_PIECE
 }
 else{
     push @postamble_pieces, <<'END_OF_POSTAMBLE_PIECE';
-all :: lib/Marpa/R3/Lua/Init.pm
+all :: lib/Marpa/R3/Lua/Kollos.pm
 
 all :: lib/Marpa/R3/Lua/Inspect.pm
 
@@ -402,8 +402,8 @@ lib/Marpa/R3/Lua/Inspect.pm: kollos/inspect.lua lib/Marpa/R3/Lua/Inspect.PL
 lib/Marpa/R3/Lua/Glue.pm: xs/glue.lua lib/Marpa/R3/Lua/Glue.PL
 	$(PERLRUN) lib/Marpa/R3/Lua/Glue.PL lib/Marpa/R3/Lua/Glue.pm
 
-lib/Marpa/R3/Lua/Init.pm: kollos/init.lua lib/Marpa/R3/Lua/Init.PL
-	$(PERLRUN) lib/Marpa/R3/Lua/Init.PL lib/Marpa/R3/Lua/Init.pm
+lib/Marpa/R3/Lua/Kollos.pm: kollos/kollos.lua lib/Marpa/R3/Lua/Kollos.PL
+	$(PERLRUN) lib/Marpa/R3/Lua/Kollos.PL lib/Marpa/R3/Lua/Kollos.pm
 
 inc/Marpa/R3/Lua/Test/Builder.pm: inc/Marpa/R3/Lua/Test/Builder.lua inc/Marpa/R3/Lua/Test/Builder.PL
 	$(PERLRUN) inc/Marpa/R3/Lua/Test/Builder.PL inc/Marpa/R3/Lua/Test/Builder.pm
@@ -414,7 +414,7 @@ inc/Marpa/R3/Lua/Test/More.pm: inc/Marpa/R3/Lua/Test/More.lua inc/Marpa/R3/Lua/T
 END_OF_POSTAMBLE_PIECE
 }
     push @postamble_pieces, sprintf <<'END_OF_POSTAMBLE_PIECE',
-kollos/init.lua: lua/lua kollos/init.lua.md
+kollos/kollos.lua: lua/lua kollos/kollos.lua.md
 	%s
 END_OF_POSTAMBLE_PIECE
 	$self->cd(File::Spec->catdir(qw(kollos)), '$(MAKE)');
@@ -467,7 +467,7 @@ WriteMakefile(
         q[lib/Marpa/R3/SLG.pm]       => q[$(INST_LIB)/Marpa/R3/SLG.pm],
         q[lib/Marpa/R3/SLR.pm]       => q[$(INST_LIB)/Marpa/R3/SLR.pm],
         q[lib/Marpa/R3/Lua/Glue.pm]  => q[$(INST_LIB)/Marpa/R3/Lua/Glue.pm],
-        q[lib/Marpa/R3/Lua/Init.pm]  => q[$(INST_LIB)/Marpa/R3/Lua/Init.pm],
+        q[lib/Marpa/R3/Lua/Kollos.pm]  => q[$(INST_LIB)/Marpa/R3/Lua/Kollos.pm],
         q[lib/Marpa/R3/Lua/Inspect.pm] =>
           q[$(INST_LIB)/Marpa/R3/Lua/Inspect.pm],
         q[lib/Marpa/R3/Trace/G.pm] => q[$(INST_LIB)/Marpa/R3/Trace/G.pm],

@@ -100,9 +100,9 @@ require Marpa::R3::Lua::Glue;
 ( $version_result = version_ok($Marpa::R3::Lua::Glue::VERSION) )
     and die 'Marpa::R3::Lua::Glue::VERSION ', $version_result;
 
-require Marpa::R3::Lua::Init;
-( $version_result = version_ok($Marpa::R3::Lua::Init::VERSION) )
-    and die 'Marpa::R3::Lua::Init::VERSION ', $version_result;
+require Marpa::R3::Lua::Kollos;
+( $version_result = version_ok($Marpa::R3::Lua::Kollos::VERSION) )
+    and die 'Marpa::R3::Lua::Kollos::VERSION ', $version_result;
 
 require Marpa::R3::Lua::Inspect;
 ( $version_result = version_ok($Marpa::R3::Lua::Inspect::VERSION) )

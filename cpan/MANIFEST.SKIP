@@ -53,7 +53,7 @@
 /junk2$
 ^kollos/error_table[.]md$
 ^kollos/event_table[.]md$
-^kollos/init[.]lua$
+^kollos/kollos[.]lua$
 ^kollos/kollos[.]c$
 ^kollos/kollos[.]h$
 ^kollos/Makefile$
@@ -72,7 +72,7 @@
 ^lib/Marpa/R3[.]c
 ^lib/Marpa/R3/Installed.pm$
 ^lib/Marpa/R3/Lua/Glue[.]pm$
-^lib/Marpa/R3/Lua/Init[.]pm$
+^lib/Marpa/R3/Lua/Kollos[.]pm$
 ^lib/Marpa/R3/Lua/Inspect[.]pm$
 ^lib/Marpa/R3/Lua/Lua[.]c$
 ^lib/Marpa/R3/Lua/Lua[.]o$
