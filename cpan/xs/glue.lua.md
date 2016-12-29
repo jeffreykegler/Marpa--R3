@@ -23,8 +23,12 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 # Table of contents
 <!--
-../lua/lua ../lua/toc.lua < glue.lua.md
+../lua/lua ../kollos/toc.lua < glue.lua.md
 -->
+* [About the glue code](#about-the-glue-code)
+* [The by-tag code cache](#the-by-tag-code-cache)
+* [The main Lua code file](#the-main-lua-code-file)
+  * [Preliminaries to the main code](#preliminaries-to-the-main-code)
 
 ## About the glue code
 
@@ -36,6 +40,28 @@ This document is evolving.
 In particular, the boundard between Kollos and its glue
 code has not solidified yet.
 
+Also undetermined is how to deal with Lua name space.
+Can I assume this "glue" code is in charge of the global
+namespace, or should it be organized as a package?
+For now, I am just dumping everything into the global namespace.
+
+## The by-tag code cache
+
+Caches functions by "tag".
+This is done to avoid the overhead of repeatedly compiling
+the Lua code.
+Eventually all such code should be named and
+moved into Kollos,
+or into these "glue" routines.
+But that may take a while, and in the meantime
+we may want meaningful performance numbers.
+
+```
+    -- miranda: section+ Lua declarations
+    code_by_tag = {}
+
+```
+
 ## The main Lua code file
 
 ```
@@ -43,6 +69,7 @@ code has not solidified yet.
     -- miranda: insert legal preliminaries
     -- miranda: insert luacheck declarations
     -- miranda: insert enforce strict globals
+    -- miranda: insert Lua declarations
     -- comment out miranda: insert most Lua function declarations
 
     return "OK"

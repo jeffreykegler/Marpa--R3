@@ -1557,8 +1557,6 @@ xlua_sig_call (lua_State * L, const char *codestr, const char *sig, ...)
 
     marpa_lua_pushcfunction(L, xlua_msghandler);
 
-    va_start (vl, sig);
-
     /* warn("%s %d", __FILE__, __LINE__); */
     status = marpa_luaL_loadbuffer (L, codestr, strlen (codestr), codestr);
     /* warn("%s %d", __FILE__, __LINE__); */
@@ -1569,6 +1567,8 @@ xlua_sig_call (lua_State * L, const char *codestr, const char *sig, ...)
     }
     /* warn("%s %d", __FILE__, __LINE__); */
     /* Lua stack: [ function ] */
+
+    va_start (vl, sig);
 
     for (narg = 0; *sig; narg++) {
         const char this_sig = *sig++;
@@ -1658,6 +1658,145 @@ xlua_sig_call (lua_State * L, const char *codestr, const char *sig, ...)
         default:
             croak
                 ("Internal error: invalid sig option %c in xlua_sig_call", this_sig);
+        }
+    }
+
+    /* Results *must* be copied at this point, because
+     * now we expose them to Lua GC
+     */
+    marpa_lua_settop (L, base_of_stack);
+    /* warn("%s %d", __FILE__, __LINE__); */
+    va_end (vl);
+}
+
+static void
+call_by_tag (lua_State * L, const char* tag, const char *codestr,
+  const char *sig, ...)
+{
+    va_list vl;
+    int narg, nres;
+    int status;
+    int type;
+    const int base_of_stack = marpa_lua_gettop (L);
+    const int msghandler_ix = base_of_stack + 1;
+    const int cache_ix = base_of_stack + 2;
+    dTHX;
+
+    marpa_lua_pushcfunction (L, xlua_msghandler);
+
+    marpa_lua_getglobal (L, "cache_by_tag");
+    type = marpa_lua_getfield (L, cache_ix, tag);
+
+    if (type != LUA_TFUNCTION) {
+
+        /* warn("%s %d", __FILE__, __LINE__); */
+        const int status =
+            marpa_luaL_loadbuffer (L, codestr, strlen (codestr), tag);
+        if (status != 0) {
+            const char *error_string = marpa_lua_tostring (L, -1);
+            marpa_lua_pop (L, 1);
+            croak ("Marpa::R3 error in call_by_tag(): %s", error_string);
+        }
+        marpa_lua_pushvalue (L, -1);
+        marpa_lua_setfield (L, cache_ix, tag);
+    }
+
+    /* Lua stack: [ function ] */
+
+    va_start (vl, sig);
+
+    for (narg = 0; *sig; narg++) {
+        const char this_sig = *sig++;
+        /* warn("%s %d narg=%d", __FILE__, __LINE__, narg); */
+        if (!marpa_lua_checkstack (L, LUA_MINSTACK + 1)) {
+            /* This error is not considered recoverable */
+            croak ("Marpa::R3 error: could not grow Lua stack");
+        }
+        /* warn("%s %d narg=%d *sig=%c", __FILE__, __LINE__, narg, *sig); */
+        switch (this_sig) {
+        case 'd':
+            marpa_lua_pushnumber (L, (lua_Number) va_arg (vl, double));
+            break;
+        case 'i':
+            marpa_lua_pushinteger (L, (lua_Integer) va_arg (vl, int));
+            break;
+        case 's':
+            marpa_lua_pushstring (L, va_arg (vl, char *));
+            break;
+        case 'S':              /* argument is SV -- ownership is taken of
+                                 * a reference count, so caller is responsible
+                                 * for making sure a reference count is
+                                 * available for the taking.
+                                 */
+            /* warn("%s %d narg=%d", __FILE__, __LINE__, narg, *sig); */
+            marpa_sv_sv_noinc (L, va_arg (vl, SV *));
+            /* warn("%s %d narg=%d", __FILE__, __LINE__, narg, *sig); */
+            break;
+        case 'R':              /* argument is ref key of recce table */
+            marpa_lua_rawgeti (L, LUA_REGISTRYINDEX,
+                (lua_Integer) va_arg (vl, lua_Integer));
+            break;
+        case '>':              /* end of arguments */
+            goto endargs;
+        default:
+            croak
+                ("Internal error: invalid sig option %c in call_by_tag()",
+                this_sig);
+        }
+        /* warn("%s %d narg=%d *sig=%c", __FILE__, __LINE__, narg, *sig); */
+    }
+  endargs:;
+
+    nres = (int) strlen (sig);
+
+    /* warn("%s %d", __FILE__, __LINE__); */
+    status = marpa_lua_pcall (L, narg, nres, msghandler_ix);
+    if (status != 0) {
+        const char *exception_string = handle_pcall_error (L, status);
+        marpa_lua_settop (L, base_of_stack);
+        croak (exception_string);
+    }
+
+    for (nres = -nres; *sig; nres++) {
+        const char this_sig = *sig++;
+        switch (this_sig) {
+        case 'd':
+            {
+                int isnum;
+                const double n = marpa_lua_tonumberx (L, nres, &isnum);
+                if (!isnum)
+                    croak
+                        ("Internal error: call_by_tag(): result type is not double");
+                *va_arg (vl, double *) = n;
+                break;
+            }
+        case 'i':
+            {
+                int isnum;
+                const lua_Integer n =
+                    marpa_lua_tointegerx (L, nres, &isnum);
+                if (!isnum)
+                    croak
+                        ("Internal error: call_by_tag(): result type is not integer");
+                *va_arg (vl, int *) = (int) n;
+                break;
+            }
+        case 'M':              /* SV -- caller becomes owner of 1 mortal ref count. */
+            {
+                SV **av_ref_p = (SV **) marpa_lua_touserdata (L, nres);
+                *va_arg (vl, SV **) = sv_mortalcopy (*av_ref_p);
+                break;
+            }
+        case 'C':              /* SV -- caller becomes owner of 1 mortal ref count. */
+            {
+                SV *sv = sv_2mortal (coerce_to_sv (L, nres, '-'));
+                *va_arg (vl, SV **) = sv;
+                break;
+            }
+        default:
+            croak
+                ("Internal error: invalid sig option %c in call_by_tag()",
+                this_sig);
         }
     }
 
