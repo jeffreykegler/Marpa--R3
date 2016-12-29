@@ -152,7 +152,6 @@ sub Marpa::R3::Scanless::R::new {
     # Set recognizer args to default
     $slr->[Marpa::R3::Internal::Scanless::R::EXHAUSTION_ACTION] = 'fatal';
     $slr->[Marpa::R3::Internal::Scanless::R::REJECTION_ACTION] = 'fatal';
-    $slr->[Marpa::R3::Internal::Scanless::R::TRACE_TERMINALS] = 0;
     $slr->[Marpa::R3::Internal::Scanless::R::RANKING_METHOD] = 'none';
     $slr->[Marpa::R3::Internal::Scanless::R::MAX_PARSES]     = 0;
     $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] = [];
@@ -259,15 +258,24 @@ END_OF_LUA
         Marpa::R3::exception( 'Recognizer start of input failed: ', $error );
     }
 
-    if ( $slr->[Marpa::R3::Internal::Scanless::R::TRACE_TERMINALS] > 1 ) {
-        my $terminals_expected = $slr->terminals_expected();
-        for my $terminal ( sort @{$terminals_expected} ) {
+    {
+        my ($trace_terminals) = $thin_slr->exec_sig(
+            <<'END_OF_LUA', '');
+        local recce = ...
+        return recce.trace_terminals
+END_OF_LUA
 
-           # We may have set and reset the trace file handle during this method,
-           # so we do not memoize its value, bjut get it directly
-            say { $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE] }
-              qq{Expecting "$terminal" at earleme 0}
-              or Marpa::R3::exception("Cannot print: $ERRNO");
+        if ( $trace_terminals > 1 ) {
+            my $terminals_expected = $slr->terminals_expected();
+            for my $terminal ( sort @{$terminals_expected} ) {
+
+       # We may have set and reset the trace file handle during this method,
+       # so we do not memoize its value, bjut get it directly
+                say { $slr->[
+                      Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE] }
+                  qq{Expecting "$terminal" at earleme 0}
+                  or Marpa::R3::exception("Cannot print: $ERRNO");
+            }
         }
     }
 
@@ -351,8 +359,6 @@ sub common_set {
         my $value = $flat_args->{'trace_terminals'};
         my $normalized_value =
           Scalar::Util::looks_like_number($value) ? $value : 0;
-        $slr->[Marpa::R3::Internal::Scanless::R::TRACE_TERMINALS] =
-          $normalized_value;
         if ($normalized_value) {
             say {$trace_file_handle} qq{Setting trace_terminals option};
         }
