@@ -1684,7 +1684,7 @@ call_by_tag (lua_State * L, const char* tag, const char *codestr,
 
     marpa_lua_pushcfunction (L, xlua_msghandler);
 
-    marpa_lua_getglobal (L, "cache_by_tag");
+    marpa_lua_getglobal (L, "code_by_tag");
     type = marpa_lua_getfield (L, cache_ix, tag);
 
     if (type != LUA_TFUNCTION) {
@@ -1833,7 +1833,8 @@ u_l0r_clear (Outer_R* outer_slr)
     return;
   marpa_r_unref (l0r);
   slr->l0r = NULL;
-  xlua_sig_call (outer_slr->L,
+  call_by_tag (outer_slr->L,
+    STRLOC,
     "recce=...; recce.lmw_l0r = nil",
     "R>",
     outer_slr->lua_ref);
