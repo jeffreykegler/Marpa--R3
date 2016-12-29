@@ -4599,24 +4599,6 @@ PPCODE:
 }
 
 void
-trace_terminals( outer_slr, new_level )
-    Outer_R *outer_slr;
-    int new_level;
-PPCODE:
-{
-  int old_level;
-  Scanless_R *slr = slr_inner_get(outer_slr);
-  call_by_tag (outer_slr->L, STRLOC,
-      "local recce, new_level = ...\n"
-      "local old_level = recce.trace_terminals\n"
-      "recce.trace_terminals = new_level\n"
-      "return old_level\n",
-      "Ri>i", outer_slr->lua_ref,
-      new_level, &old_level);
-  XSRETURN_IV(old_level);
-}
-
-void
 earley_item_warning_threshold( outer_slr )
     Outer_R *outer_slr;
 PPCODE:

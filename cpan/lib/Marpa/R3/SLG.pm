@@ -34,7 +34,6 @@ sub Marpa::R3::Internal::Scanless::meta_grammar {
 
     my $meta_slg = bless [], 'Marpa::R3::Scanless::G';
     state $hashed_metag = Marpa::R3::Internal::MetaG::hashed_grammar();
-    $meta_slg->[Marpa::R3::Internal::Scanless::G::TRACE_TERMINALS] = 0;
     $meta_slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE] = \*STDERR;
     Marpa::R3::Internal::Scanless::G::hash_to_runtime( $meta_slg,
         $hashed_metag,
@@ -42,7 +41,6 @@ sub Marpa::R3::Internal::Scanless::meta_grammar {
 
     my $tracer =
         $meta_slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
-    $meta_slg->[Marpa::R3::Internal::Scanless::G::TRACE_TERMINALS] = 0;
 
     return $meta_slg;
 
@@ -54,7 +52,6 @@ sub Marpa::R3::Scanless::G::new {
     my $slg = [];
     bless $slg, $class;
 
-    $slg->[Marpa::R3::Internal::Scanless::G::TRACE_TERMINALS]   = 0;
     $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE] = \*STDERR;
     $slg->[Marpa::R3::Internal::Scanless::G::WARNINGS]          = 1;
     $slg->[Marpa::R3::Internal::Scanless::G::IF_INACCESSIBLE]   = 'warn';
@@ -80,23 +77,7 @@ sub Marpa::R3::Scanless::G::set {
     Marpa::R3::exception( sprintf $error_message, '$slg->set' )
       if not $flat_args;
 
-    my $value = $flat_args->{trace_terminals};
-    if ( defined $value ) {
-        if ( Scalar::Util::looks_like_number($value) ) {
-            Marpa::R3::exception(
-"trace_terminals named argument is $value; must have a value > 0"
-            ) if $value < 0;
-        }
-        else {
-            Marpa::R3::exception(
-"trace_terminals named argument is $value; must have a numeric value"
-            );
-        }
-        $slg->[Marpa::R3::Internal::Scanless::G::TRACE_TERMINALS] = $value;
-        delete $flat_args->{trace_terminals};
-    }
-
-    $value = $flat_args->{trace_file_handle};
+    my $value = $flat_args->{trace_file_handle};
     if ( defined $value ) {
         $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE] = $value;
         delete $flat_args->{trace_file_handle};
@@ -140,12 +121,6 @@ qq{'source' name argument to Marpa::R3::Scanless::G->new() is a ref to a an unde
         delete $flat_args->{'trace_file_handle'};
     }
 
-    $value = $flat_args->{trace_terminals};
-    if ( defined $value ) {
-        $slg->[Marpa::R3::Internal::Scanless::G::TRACE_TERMINALS] = $value;
-        delete $flat_args->{'trace_terminals'};
-    }
-
     return ( $dsl, $flat_args );
 
 } ## end sub Marpa::R3::Internal::Scanless::G::set
@@ -154,8 +129,6 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     my ( $slg, $hashed_source, $g1_args ) = @_;
 
     my $trace_fh = $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE];
-    my $trace_terminals =
-      $slg->[Marpa::R3::Internal::Scanless::G::TRACE_TERMINALS];
     # Pre-lexer G1 processing
 
     my $thin_slg = $slg->[Marpa::R3::Internal::Scanless::G::C] =
@@ -734,26 +707,14 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
         next RULE_ID if $lexeme_id < 0;
         my $lexeme_name = $g1_tracer->symbol_name($lexeme_id);
 
-        my $trace_terminals =
-          $slg->[Marpa::R3::Internal::Scanless::G::TRACE_TERMINALS];
         my $assertion_id =
           $lexeme_data{$lexeme_name}{lexer}{'assertion'};
         if ( not defined $assertion_id ) {
             $assertion_id = $lex_thin->zwa_new(0);
-
-            if ( $trace_terminals >= 2 ) {
-                say {$trace_fh} "Assertion $assertion_id defaults to 0";
-            }
-
             $lexeme_data{$lexeme_name}{lexer}{'assertion'} =
               $assertion_id;
         } ## end if ( not defined $assertion_id )
         $lex_thin->zwa_place( $assertion_id, $rule_id, 0 );
-        if ( $trace_terminals >= 2 ) {
-            say {$trace_fh}
-              "Assertion $assertion_id applied to L0 rule ",
-              slg_rule_show( $lex_tracer, $rule_id );
-        }
     } ## end RULE_ID: for my $rule_id ( 0 .. $lex_thin->highest_rule_id() )
 
     my $lex_precompute_error =

@@ -270,7 +270,6 @@ __DATA__
 
     WARNINGS { print warnings about grammar? }
     TRACE_FILE_HANDLE
-    TRACE_TERMINALS
 
     CHARACTER_CLASSES { an hash of
     character class regex by symbol name.
