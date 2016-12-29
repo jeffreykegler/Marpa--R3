@@ -2806,13 +2806,15 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
                         MARPA_SLRTR_LEXEME_OUTPRIORITIZED;
                     lexeme_stack_event->t_lexeme_acceptable.t_required_priority =
                         high_lexeme_priority;
-                    if (slr->trace_terminals) {
                         call_by_tag (outer_slr->L, STRLOC,
                             "recce, lexeme_start, lexeme_end,\n"
                             "    g1_lexeme, priority, required_priority = ...\n"
-                            "local q = recce.event_queue\n"
-                            "q[#q+1] = { '!trace', 'outprioritized lexeme',\n"
-                            "   lexeme_start, lexeme_end, g1_lexeme, priority, required_priority}\n",
+                            "if recce.trace_terminals > 0 then\n"
+                            "    local q = recce.event_queue\n"
+                            "    q[#q+1] = { '!trace', 'outprioritized lexeme',\n"
+                            "   lexeme_start, lexeme_end, g1_lexeme, priority, required_priority}\n"
+                            "end\n"
+                            ,
                             "Riiiii>",
                             outer_slr->lua_ref,
                             lexeme_stack_event->t_trace_lexeme_acceptable.
@@ -2822,27 +2824,26 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
                             lexeme_stack_event->t_trace_lexeme_acceptable.t_priority,
                             lexeme_stack_event->t_trace_lexeme_acceptable.
                             t_required_priority);
-                    }
                 }
                 goto NEXT_LEXEME_EVENT;
             case MARPA_SLRTR_LEXEME_DISCARDED:
-                if (slr->trace_terminals) {
                     /* We do not have the lexeme, but we have the
                      * lexer rule.
                      * The upper level will have to figure things out.
                      */
                     call_by_tag (outer_slr->L, STRLOC,
                         "recce, rule_id, lexeme_start, lexeme_end = ...\n"
+                        "if recce.trace_terminals > 0 then\n"
                         "local q = recce.event_queue\n"
                         "q[#q+1] = { '!trace', 'discarded lexeme',\n"
-                        "    rule_id, lexeme_start, lexeme_end}\n",
+                        "    rule_id, lexeme_start, lexeme_end}\n"
+                        "end\n",
                         "Riii>",
                         outer_slr->lua_ref,
                         lexeme_stack_event->t_trace_lexeme_discarded.t_rule_id,
                         lexeme_stack_event->t_trace_lexeme_discarded.t_start_of_lexeme,
                         lexeme_stack_event->t_trace_lexeme_discarded.t_end_of_lexeme);
 
-                }
                 if (pass1_result == discard) {
                     const Marpa_Rule_ID l0_rule_id =
                         lexeme_stack_event->t_trace_lexeme_discarded.t_rule_id;
@@ -2910,23 +2911,18 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
                         lexeme_entry->t_lexeme_acceptable.t_start_of_lexeme;
                     slr->end_of_pause_lexeme =
                         lexeme_entry->t_lexeme_acceptable.t_end_of_lexeme;
-                    if (slr->trace_terminals > 2) {
                         call_by_tag (outer_slr->L, STRLOC,
                             "recce, lexeme_start, lexeme_end, g1_lexeme = ...\n"
                             "local q = recce.event_queue\n"
-                            "q[#q+1] = { '!trace', 'g1 before lexeme event', g1_lexeme}\n",
+                            "if recce.trace_terminals > 2 then\n"
+                            "    q[#q+1] = { '!trace', 'g1 before lexeme event', g1_lexeme}\n"
+                            "end\n"
+                            "q[#q+1] = { 'before lexeme', g1_lexeme}\n"
+                            ,
                             "Riii>",
                             outer_slr->lua_ref,
                             slr->start_of_pause_lexeme,
                             slr->end_of_pause_lexeme, g1_lexeme);
-                    }
-                    {
-                        call_by_tag (outer_slr->L, STRLOC,
-                            "recce, g1_lexeme = ...\n"
-                            "local q = recce.event_queue\n"
-                            "q[#q+1] = { 'before lexeme', g1_lexeme}\n",
-                            "Ri>", outer_slr->lua_ref, g1_lexeme);
-                    }
                 }
             }
         }
