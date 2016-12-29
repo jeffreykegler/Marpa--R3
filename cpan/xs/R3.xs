@@ -2003,13 +2003,13 @@ u_read (Outer_R * outer_slr)
                      * we have one of them as an example
                      */
                     slr->input_symbol_id = symbol_id;
-                    if (trace_terminals >= 1)
-                      {
 
               call_by_tag (outer_slr->L, STRLOC,
                   "recce, codepoint, perl_pos, symbol_id = ...\n"
-                  "local q = recce.event_queue\n"
-                  "q[#q+1] = { '!trace', 'lexer rejected codepoint', codepoint, perl_pos, symbol_id}\n",
+                  "if recce.trace_terminals >= 1 then\n"
+                  "    local q = recce.event_queue\n"
+                  "    q[#q+1] = { '!trace', 'lexer rejected codepoint', codepoint, perl_pos, symbol_id}\n"
+                  "end\n",
                   "Riii>",
                   outer_slr->lua_ref,
                   codepoint,
@@ -2017,16 +2017,15 @@ u_read (Outer_R * outer_slr)
                   symbol_id
               );
 
-                      }
                     break;
                   case MARPA_ERR_NONE:
-                    if (trace_terminals >= 1)
-                      {
 
               call_by_tag (outer_slr->L, STRLOC,
                   "recce, codepoint, perl_pos, symbol_id = ...\n"
-                  "local q = recce.event_queue\n"
-                  "q[#q+1] = { '!trace', 'lexer accepted codepoint', codepoint, perl_pos, symbol_id}\n",
+                  "if recce.trace_terminals >= 1 then\n"
+                  "   local q = recce.event_queue\n"
+                  "   q[#q+1] = { '!trace', 'lexer accepted codepoint', codepoint, perl_pos, symbol_id}\n"
+                  "end\n" ,
                   "Riii>",
                   outer_slr->lua_ref,
                   codepoint,
@@ -2034,7 +2033,6 @@ u_read (Outer_R * outer_slr)
                   symbol_id
               );
 
-                      }
                     tokens_accepted++;
                     break;
                   default:
@@ -2098,10 +2096,20 @@ u_read (Outer_R * outer_slr)
             }
         }
     ADVANCE_ONE_CHAR:;
+    {
+      int trace_terminals;
       slr->perl_pos++;
+              call_by_tag (outer_slr->L, STRLOC,
+                  "recce = ...\n"
+                  "return recce.trace_terminals\n",
+                  "R>i",
+                  outer_slr->lua_ref,
+                  &trace_terminals
+              );
       if (trace_terminals)
         {
           return U_READ_TRACING;
+        }
         }
     }
   return U_READ_OK;
