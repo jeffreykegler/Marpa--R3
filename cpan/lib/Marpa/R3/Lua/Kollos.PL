@@ -29,7 +29,7 @@ END_OF_CHUNK
 
 print {$out_fh} <<'END_OF_CHUNK';
 
-package Marpa::R3::Lua::Init;
+package Marpa::R3::Lua::Kollos;
 
 use 5.010001;
 use warnings;
@@ -40,10 +40,10 @@ $VERSION        = '4.001_028';
 $STRING_VERSION = $VERSION;
 $VERSION        = eval $VERSION;
 
-$Marpa::R3::Lua::Init::load = <<'END_OF_LUA';
+$Marpa::R3::Lua::Kollos::load = <<'END_OF_LUA';
 END_OF_CHUNK
 
-my $lua_file_name  = File::Spec->catfile(qw(kollos init.lua));
+my $lua_file_name  = File::Spec->catfile(qw(kollos kollos.lua));
 open my $in_fh, '<', $lua_file_name;
 my $lua_file = do { local $RS = undef; <$in_fh>; };
 print {$out_fh} $lua_file;
