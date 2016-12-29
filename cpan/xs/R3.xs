@@ -1879,240 +1879,215 @@ u_convert_events (Outer_R * outer_slr)
 static int
 u_read (Outer_R * outer_slr)
 {
-  dTHX;
-  Scanless_R *slr = slr_inner_get(outer_slr);
-  U8 *input;
-  STRLEN len;
-  int input_is_utf8;
+    dTHX;
+    Scanless_R *slr = slr_inner_get (outer_slr);
+    U8 *input;
+    STRLEN len;
+    int input_is_utf8;
 
-  const IV trace_terminals = slr->trace_terminals;
-  Marpa_Recognizer r = slr->l0r;
+    const IV trace_terminals = slr->trace_terminals;
+    Marpa_Recognizer r = slr->l0r;
 
-  if (!r)
-    {
-      r = u_l0r_new (outer_slr);
-      if (!r)
-        croak ("Problem in u_read(): %s",
-               xs_g_error (slr->slg->l0_wrapper));
+    if (!r) {
+        r = u_l0r_new (outer_slr);
+        if (!r)
+            croak ("Problem in u_read(): %s",
+                xs_g_error (slr->slg->l0_wrapper));
     }
-  input_is_utf8 = SvUTF8 (slr->input);
-  input = (U8 *) SvPV (slr->input, len);
-  for (;;)
-    {
-      UV codepoint;
-      STRLEN codepoint_length = 1;
-      UV op_ix;
-      UV op_count;
-      UV *ops;
-      int tokens_accepted = 0;
-      if (slr->perl_pos >= slr->end_pos)
-        break;
+    input_is_utf8 = SvUTF8 (slr->input);
+    input = (U8 *) SvPV (slr->input, len);
+    for (;;) {
+        UV codepoint;
+        STRLEN codepoint_length = 1;
+        UV op_ix;
+        UV op_count;
+        UV *ops;
+        int tokens_accepted = 0;
+        if (slr->perl_pos >= slr->end_pos)
+            break;
 
-      if (input_is_utf8)
-        {
+        if (input_is_utf8) {
 
-          codepoint =
-            utf8_to_uvchr_buf (input + OFFSET_IN_INPUT (slr),
-                               input + len, &codepoint_length);
+            codepoint =
+                utf8_to_uvchr_buf (input + OFFSET_IN_INPUT (slr),
+                input + len, &codepoint_length);
 
-          /* Perl API documents that return value is 0 and length is -1 on error,
-           * "if possible".  length can be, and is, in fact unsigned.
-           * I deal with this by noting that 0 is a valid UTF8 char but should
-           * have a length of 1, when valid.
-           */
-          if (codepoint == 0 && codepoint_length != 1)
-            {
-              croak ("Problem in r->read_string(): invalid UTF8 character");
+            /* Perl API documents that return value is 0 and length is -1 on error,
+             * "if possible".  length can be, and is, in fact unsigned.
+             * I deal with this by noting that 0 is a valid UTF8 char but should
+             * have a length of 1, when valid.
+             */
+            if (codepoint == 0 && codepoint_length != 1) {
+                croak
+                    ("Problem in r->read_string(): invalid UTF8 character");
             }
-        }
-      else
-        {
-          codepoint = (UV) input[OFFSET_IN_INPUT (slr)];
-          codepoint_length = 1;
+        } else {
+            codepoint = (UV) input[OFFSET_IN_INPUT (slr)];
+            codepoint_length = 1;
         }
 
-      if (codepoint < Dim (slr->slg->per_codepoint_array))
-        {
-          ops = slr->slg->per_codepoint_array[codepoint];
-          if (!ops)
-            {
-              slr->codepoint = codepoint;
-              return U_READ_UNREGISTERED_CHAR;
+        if (codepoint < Dim (slr->slg->per_codepoint_array)) {
+            ops = slr->slg->per_codepoint_array[codepoint];
+            if (!ops) {
+                slr->codepoint = codepoint;
+                return U_READ_UNREGISTERED_CHAR;
             }
-        }
-      else
-        {
-          STRLEN dummy;
-          SV **p_ops_sv =
-            hv_fetch (slr->slg->per_codepoint_hash, (char *) &codepoint,
-                      (I32) sizeof (codepoint), 0);
-          if (!p_ops_sv)
-            {
-              slr->codepoint = codepoint;
-              return U_READ_UNREGISTERED_CHAR;
+        } else {
+            STRLEN dummy;
+            SV **p_ops_sv =
+                hv_fetch (slr->slg->per_codepoint_hash,
+                (char *) &codepoint,
+                (I32) sizeof (codepoint), 0);
+            if (!p_ops_sv) {
+                slr->codepoint = codepoint;
+                return U_READ_UNREGISTERED_CHAR;
             }
-          ops = (UV *) SvPV (*p_ops_sv, dummy);
+            ops = (UV *) SvPV (*p_ops_sv, dummy);
         }
 
-            call_by_tag (outer_slr->L, STRLOC,
-                "local recce, codepoint, perl_pos = ...\n"
-                "if recce.trace_terminals >= 1 then\n"
-                "   local q = recce.event_queue\n"
-                "   q[#q+1] = { '!trace', 'lexer reading codepoint', codepoint, perl_pos}\n"
-                "end\n",
-                "Rii>", outer_slr->lua_ref, (int) codepoint, (int) slr->perl_pos);
+        call_by_tag (outer_slr->L, STRLOC,
+            "local recce, codepoint, perl_pos = ...\n"
+            "if recce.trace_terminals >= 1 then\n"
+            "   local q = recce.event_queue\n"
+            "   q[#q+1] = { '!trace', 'lexer reading codepoint', codepoint, perl_pos}\n"
+            "end\n",
+            "Rii>", outer_slr->lua_ref, (int) codepoint,
+            (int) slr->perl_pos);
 
-      /* ops[0] is codepoint */
-      op_count = ops[1];
-      for (op_ix = 2; op_ix < op_count; op_ix++)
-        {
-          const UV op_code = ops[op_ix];
-          switch (op_code)
-            {
+        /* ops[0] is codepoint */
+        op_count = ops[1];
+        for (op_ix = 2; op_ix < op_count; op_ix++) {
+            const UV op_code = ops[op_ix];
+            switch (op_code) {
             case MARPA_OP_ALTERNATIVE:
-              {
-                int result;
-                int symbol_id;
-                int length;
-                int value;
+                {
+                    int result;
+                    int symbol_id;
+                    int length;
+                    int value;
 
-                op_ix++;
-                if (op_ix >= op_count)
-                  {
-                    croak
-                      ("Missing operand for op code (0x%lx); codepoint=0x%lx, op_ix=0x%lx",
-                       (unsigned long) op_code, (unsigned long) codepoint,
-                       (unsigned long) op_ix);
-                  }
-                symbol_id = (int) ops[op_ix];
-                if (op_ix + 2 >= op_count)
-                  {
-                    croak
-                      ("Missing operand for op code (0x%lx); codepoint=0x%lx, op_ix=0x%lx",
-                       (unsigned long) op_code, (unsigned long) codepoint,
-                       (unsigned long) op_ix);
-                  }
-                value = (int) ops[++op_ix];
-                length = (int) ops[++op_ix];
-                result = marpa_r_alternative (r, symbol_id, value, length);
-                switch (result)
-                  {
-                  case MARPA_ERR_UNEXPECTED_TOKEN_ID:
-                    /* This guarantees that later, if we fall below
-                     * the minimum number of tokens accepted,
-                     * we have one of them as an example
-                     */
-                    slr->input_symbol_id = symbol_id;
+                    op_ix++;
+                    if (op_ix >= op_count) {
+                        croak
+                            ("Missing operand for op code (0x%lx); codepoint=0x%lx, op_ix=0x%lx",
+                            (unsigned long) op_code,
+                            (unsigned long) codepoint,
+                            (unsigned long) op_ix);
+                    }
+                    symbol_id = (int) ops[op_ix];
+                    if (op_ix + 2 >= op_count) {
+                        croak
+                            ("Missing operand for op code (0x%lx); codepoint=0x%lx, op_ix=0x%lx",
+                            (unsigned long) op_code,
+                            (unsigned long) codepoint,
+                            (unsigned long) op_ix);
+                    }
+                    value = (int) ops[++op_ix];
+                    length = (int) ops[++op_ix];
+                    result =
+                        marpa_r_alternative (r, symbol_id, value, length);
+                    switch (result) {
+                    case MARPA_ERR_UNEXPECTED_TOKEN_ID:
+                        /* This guarantees that later, if we fall below
+                         * the minimum number of tokens accepted,
+                         * we have one of them as an example
+                         */
+                        slr->input_symbol_id = symbol_id;
 
-              call_by_tag (outer_slr->L, STRLOC,
-                  "recce, codepoint, perl_pos, symbol_id = ...\n"
-                  "if recce.trace_terminals >= 1 then\n"
-                  "    local q = recce.event_queue\n"
-                  "    q[#q+1] = { '!trace', 'lexer rejected codepoint', codepoint, perl_pos, symbol_id}\n"
-                  "end\n",
-                  "Riii>",
-                  outer_slr->lua_ref,
-                  codepoint,
-                  slr->perl_pos,
-                  symbol_id
-              );
+                        call_by_tag (outer_slr->L, STRLOC,
+                            "recce, codepoint, perl_pos, symbol_id = ...\n"
+                            "if recce.trace_terminals >= 1 then\n"
+                            "    local q = recce.event_queue\n"
+                            "    q[#q+1] = { '!trace', 'lexer rejected codepoint', codepoint, perl_pos, symbol_id}\n"
+                            "end\n",
+                            "Riii>",
+                            outer_slr->lua_ref,
+                            codepoint, slr->perl_pos, symbol_id);
 
-                    break;
-                  case MARPA_ERR_NONE:
+                        break;
+                    case MARPA_ERR_NONE:
 
-              call_by_tag (outer_slr->L, STRLOC,
-                  "recce, codepoint, perl_pos, symbol_id = ...\n"
-                  "if recce.trace_terminals >= 1 then\n"
-                  "   local q = recce.event_queue\n"
-                  "   q[#q+1] = { '!trace', 'lexer accepted codepoint', codepoint, perl_pos, symbol_id}\n"
-                  "end\n" ,
-                  "Riii>",
-                  outer_slr->lua_ref,
-                  codepoint,
-                  slr->perl_pos,
-                  symbol_id
-              );
+                        call_by_tag (outer_slr->L, STRLOC,
+                            "recce, codepoint, perl_pos, symbol_id = ...\n"
+                            "if recce.trace_terminals >= 1 then\n"
+                            "   local q = recce.event_queue\n"
+                            "   q[#q+1] = { '!trace', 'lexer accepted codepoint', codepoint, perl_pos, symbol_id}\n"
+                            "end\n",
+                            "Riii>",
+                            outer_slr->lua_ref,
+                            codepoint, slr->perl_pos, symbol_id);
 
-                    tokens_accepted++;
-                    break;
-                  default:
-                    slr->codepoint = codepoint;
-                    slr->input_symbol_id = symbol_id;
-                    croak
-                      ("Problem alternative() failed at char ix %ld; symbol id %ld; codepoint 0x%lx value %ld\n"
-                       "Problem in u_read(), alternative() failed: %s",
-                       (long) slr->perl_pos, (long) symbol_id,
-                       (unsigned long) codepoint,
-                       (long) value,
-                       xs_g_error (slr->slg->l0_wrapper));
-                  }
-              }
-              break;
+                        tokens_accepted++;
+                        break;
+                    default:
+                        slr->codepoint = codepoint;
+                        slr->input_symbol_id = symbol_id;
+                        croak
+                            ("Problem alternative() failed at char ix %ld; symbol id %ld; codepoint 0x%lx value %ld\n"
+                            "Problem in u_read(), alternative() failed: %s",
+                            (long) slr->perl_pos, (long) symbol_id,
+                            (unsigned long) codepoint,
+                            (long) value,
+                            xs_g_error (slr->slg->l0_wrapper));
+                    }
+                }
+                break;
 
             case MARPA_OP_INVALID_CHAR:
-              slr->codepoint = codepoint;
-              return U_READ_INVALID_CHAR;
+                slr->codepoint = codepoint;
+                return U_READ_INVALID_CHAR;
 
             case MARPA_OP_EARLEME_COMPLETE:
-              {
-                int result;
-                if (tokens_accepted < 1)
-                  {
-                    slr->codepoint = codepoint;
-                    return U_READ_REJECTED_CHAR;
-                  }
-                result = marpa_r_earleme_complete (r);
-                if (result > 0)
-                  {
-                    u_convert_events (outer_slr);
-                    /* Advance one character before returning */
-                    if (marpa_r_is_exhausted (r))
-                      {
-                        return U_READ_EXHAUSTED_ON_SUCCESS;
-                      }
-                    goto ADVANCE_ONE_CHAR;
-                  }
-                if (result == -2)
-                  {
-                    const int error =
-                      marpa_g_error (slr->slg->l0_wrapper->g, NULL);
-                    if (error == MARPA_ERR_PARSE_EXHAUSTED)
-                      {
-                        return U_READ_EXHAUSTED_ON_FAILURE;
-                      }
-                  }
-                if (result < 0)
-                  {
-                    croak
-                      ("Problem in r->u_read(), earleme_complete() failed: %s",
-                       xs_g_error (slr->slg->l0_wrapper));
-                  }
-              }
-              break;
+                {
+                    int result;
+                    if (tokens_accepted < 1) {
+                        slr->codepoint = codepoint;
+                        return U_READ_REJECTED_CHAR;
+                    }
+                    result = marpa_r_earleme_complete (r);
+                    if (result > 0) {
+                        u_convert_events (outer_slr);
+                        /* Advance one character before returning */
+                        if (marpa_r_is_exhausted (r)) {
+                            return U_READ_EXHAUSTED_ON_SUCCESS;
+                        }
+                        goto ADVANCE_ONE_CHAR;
+                    }
+                    if (result == -2) {
+                        const int error =
+                            marpa_g_error (slr->slg->l0_wrapper->g, NULL);
+                        if (error == MARPA_ERR_PARSE_EXHAUSTED) {
+                            return U_READ_EXHAUSTED_ON_FAILURE;
+                        }
+                    }
+                    if (result < 0) {
+                        croak
+                            ("Problem in r->u_read(), earleme_complete() failed: %s",
+                            xs_g_error (slr->slg->l0_wrapper));
+                    }
+                }
+                break;
             default:
-              croak ("Unknown op code (0x%lx); codepoint=0x%lx, op_ix=0x%lx",
-                     (unsigned long) op_code, (unsigned long) codepoint,
-                     (unsigned long) op_ix);
+                croak
+                    ("Unknown op code (0x%lx); codepoint=0x%lx, op_ix=0x%lx",
+                    (unsigned long) op_code, (unsigned long) codepoint,
+                    (unsigned long) op_ix);
             }
         }
-    ADVANCE_ONE_CHAR:;
-    {
-      int trace_terminals;
-      slr->perl_pos++;
-              call_by_tag (outer_slr->L, STRLOC,
-                  "recce = ...\n"
-                  "return recce.trace_terminals\n",
-                  "R>i",
-                  outer_slr->lua_ref,
-                  &trace_terminals
-              );
-      if (trace_terminals)
+      ADVANCE_ONE_CHAR:;
         {
-          return U_READ_TRACING;
-        }
+            int trace_terminals;
+            slr->perl_pos++;
+            call_by_tag (outer_slr->L, STRLOC,
+                "recce = ...\n"
+                "return recce.trace_terminals\n",
+                "R>i", outer_slr->lua_ref, &trace_terminals);
+            if (trace_terminals) {
+                return U_READ_TRACING;
+            }
         }
     }
-  return U_READ_OK;
+    return U_READ_OK;
 }
 
 /* It is OK to set pos to last codepoint + 1 */
