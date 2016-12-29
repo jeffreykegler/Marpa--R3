@@ -121,7 +121,7 @@ END_OF_POSTAMBLE_PIECE
 perl_ac_build/Makefile: perl_ac_build/Makefile.PL
 	%s
 END_OF_POSTAMBLE_PIECE
-	$self->cd(File::Spec->catdir(qw(perl_ac_build)), '$(PERLRUN) Makefile.PL');
+	$self->cd(File::Spec->catdir(qw(perl_ac_build)), '$(PERLRUN) Makefile.PL $(ARGV)');
 
 # == Logic to compile and build library for GNU autoconf
     push @postamble_pieces, sprintf <<'END_OF_POSTAMBLE_PIECE',
