@@ -1546,130 +1546,6 @@ static int xlua_msghandler (lua_State *L) {
 }
 
 static void
-xlua_sig_call (lua_State * L, const char *codestr, const char *sig, ...)
-{
-    va_list vl;
-    int narg, nres;
-    int status;
-    const int base_of_stack = marpa_lua_gettop (L);
-    const int msghandler_ix = base_of_stack+1;
-    dTHX;
-
-    marpa_lua_pushcfunction(L, xlua_msghandler);
-
-    /* warn("%s %d", __FILE__, __LINE__); */
-    status = marpa_luaL_loadbuffer (L, codestr, strlen (codestr), codestr);
-    /* warn("%s %d", __FILE__, __LINE__); */
-    if (status != 0) {
-        const char *error_string = marpa_lua_tostring (L, -1);
-        marpa_lua_pop (L, 1);
-        croak ("Marpa::R3 error in xlua_sig_call: %s", error_string);
-    }
-    /* warn("%s %d", __FILE__, __LINE__); */
-    /* Lua stack: [ function ] */
-
-    va_start (vl, sig);
-
-    for (narg = 0; *sig; narg++) {
-        const char this_sig = *sig++;
-        /* warn("%s %d narg=%d", __FILE__, __LINE__, narg); */
-        if (!marpa_lua_checkstack (L, LUA_MINSTACK + 1)) {
-            /* This error is not considered recoverable */
-            croak ("Marpa::R3 error: could not grow Lua stack");
-        }
-        /* warn("%s %d narg=%d *sig=%c", __FILE__, __LINE__, narg, *sig); */
-        switch (this_sig) {
-        case 'd':
-            marpa_lua_pushnumber (L, (lua_Number)va_arg (vl, double));
-            break;
-        case 'i':
-            marpa_lua_pushinteger (L, (lua_Integer)va_arg (vl, int));
-            break;
-        case 's':
-            marpa_lua_pushstring (L, va_arg (vl, char *));
-            break;
-        case 'S':              /* argument is SV -- ownership is taken of
-                                 * a reference count, so caller is responsible
-                                 * for making sure a reference count is
-                                 * available for the taking.
-                                 */
-            /* warn("%s %d narg=%d", __FILE__, __LINE__, narg, *sig); */
-            marpa_sv_sv_noinc (L, va_arg (vl, SV *));
-            /* warn("%s %d narg=%d", __FILE__, __LINE__, narg, *sig); */
-            break;
-        case 'R':              /* argument is ref key of recce table */
-            marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, (lua_Integer)va_arg (vl, lua_Integer));
-            break;
-        case '>':              /* end of arguments */
-            goto endargs;
-        default:
-            croak
-                ("Internal error: invalid sig option %c in xlua_sig_call", this_sig);
-        }
-        /* warn("%s %d narg=%d *sig=%c", __FILE__, __LINE__, narg, *sig); */
-    }
-  endargs:;
-
-    nres = (int)strlen (sig);
-
-    /* warn("%s %d", __FILE__, __LINE__); */
-    status = marpa_lua_pcall (L, narg, nres, msghandler_ix);
-    if (status != 0) {
-        const char *exception_string = handle_pcall_error(L, status);
-        marpa_lua_settop (L, base_of_stack);
-        croak(exception_string);
-    }
-
-    for (nres = -nres; *sig; nres++) {
-        const char this_sig = *sig++;
-        switch (this_sig) {
-        case 'd':
-            {
-                int isnum;
-                const double n = marpa_lua_tonumberx (L, nres, &isnum);
-                if (!isnum)
-                    croak
-                        ("Internal error: xlua_sig_call: result type is not double");
-                *va_arg (vl, double *) = n;
-                break;
-            }
-        case 'i':
-            {
-                int isnum;
-                const lua_Integer n = marpa_lua_tointegerx (L, nres, &isnum);
-                if (!isnum)
-                    croak
-                        ("Internal error: xlua_sig_call: result type is not integer");
-                *va_arg (vl, int *) = (int)n;
-                break;
-            }
-        case 'M': /* SV -- caller becomes owner of 1 mortal ref count. */
-        {
-            SV** av_ref_p = (SV**) marpa_lua_touserdata(L, nres);
-            *va_arg (vl, SV**) = sv_mortalcopy(*av_ref_p);
-            break;
-        }
-        case 'C': /* SV -- caller becomes owner of 1 mortal ref count. */
-        {
-            SV* sv = sv_2mortal(coerce_to_sv(L, nres, '-'));
-            *va_arg (vl, SV**) = sv;
-            break;
-        }
-        default:
-            croak
-                ("Internal error: invalid sig option %c in xlua_sig_call", this_sig);
-        }
-    }
-
-    /* Results *must* be copied at this point, because
-     * now we expose them to Lua GC
-     */
-    marpa_lua_settop (L, base_of_stack);
-    /* warn("%s %d", __FILE__, __LINE__); */
-    va_end (vl);
-}
-
-static void
 call_by_tag (lua_State * L, const char* tag, const char *codestr,
   const char *sig, ...)
 {
@@ -1867,7 +1743,8 @@ u_l0r_new (Outer_R* outer_slr)
     {
         int i;
         int count;
-        xlua_sig_call (outer_slr->L,
+        call_by_tag (outer_slr->L,
+            STRLOC,
             "recce = ...\n"
             " -- for now use a per-recce field\n"
             " -- later replace with a local\n"
@@ -1881,7 +1758,8 @@ u_l0r_new (Outer_R* outer_slr)
         for (i = 0; i < count; i++) {
             Marpa_Assertion_ID assertion;
             int terminal;
-            xlua_sig_call (outer_slr->L,
+            call_by_tag (outer_slr->L,
+              STRLOC,
               "recce, ix = ...\n"
               "return recce.terminals_expected[ix]\n",
               "Ri>i", outer_slr->lua_ref, i+1, &terminal);
@@ -1894,7 +1772,8 @@ u_l0r_new (Outer_R* outer_slr)
                     xs_g_error (lexer_wrapper));
             }
             if (trace_terminals >= 3) {
-                xlua_sig_call (outer_slr->L,
+                call_by_tag (outer_slr->L,
+                    STRLOC,
                     "recce, perl_pos, lexeme, assertion = ...\n"
                     "local q = recce.event_queue\n"
                     "q[#q+1] = { '!trace', 'expected lexeme', perl_pos, lexeme, assertion }\n",
@@ -1952,7 +1831,7 @@ u_convert_events (Outer_R * outer_slr)
              */
             {
               const int yim_count = (long) marpa_g_event_value (&marpa_event);
-              xlua_sig_call (outer_slr->L,
+              call_by_tag (outer_slr->L, STRLOC,
                   "recce, perl_pos, yim_count = ...\n"
                   "local q = recce.event_queue\n"
                   "q[#q+1] = { 'l0 earley item threshold exceeded', perl_pos, yim_count }\n",
@@ -2078,7 +1957,7 @@ u_read (Outer_R * outer_slr)
 
         if (trace_terminals >= 1) {
 
-            xlua_sig_call (outer_slr->L,
+            call_by_tag (outer_slr->L, STRLOC,
                 "-- " STRLOC "\n"
                 "local recce, codepoint, perl_pos = ...\n"
                 "local q = recce.event_queue\n"
@@ -2130,7 +2009,7 @@ u_read (Outer_R * outer_slr)
                     if (trace_terminals >= 1)
                       {
 
-              xlua_sig_call (outer_slr->L,
+              call_by_tag (outer_slr->L, STRLOC,
                   "recce, codepoint, perl_pos, symbol_id = ...\n"
                   "local q = recce.event_queue\n"
                   "q[#q+1] = { '!trace', 'lexer rejected codepoint', codepoint, perl_pos, symbol_id}\n",
@@ -2147,7 +2026,7 @@ u_read (Outer_R * outer_slr)
                     if (trace_terminals >= 1)
                       {
 
-              xlua_sig_call (outer_slr->L,
+              call_by_tag (outer_slr->L, STRLOC,
                   "recce, codepoint, perl_pos, symbol_id = ...\n"
                   "local q = recce.event_queue\n"
                   "q[#q+1] = { '!trace', 'lexer accepted codepoint', codepoint, perl_pos, symbol_id}\n",
@@ -2606,7 +2485,7 @@ slr_convert_events ( Outer_R *outer_slr)
             /* Do nothing about exhaustion on success */
             break;
         case MARPA_EVENT_SYMBOL_COMPLETED:
-            xlua_sig_call (outer_slr->L,
+            call_by_tag (outer_slr->L, STRLOC,
                 "recce, symbol = ...\n"
                 "local q = recce.event_queue\n"
                 "q[#q+1] = { 'symbol completed', symbol}\n",
@@ -2616,7 +2495,7 @@ slr_convert_events ( Outer_R *outer_slr)
             break;
 
         case MARPA_EVENT_SYMBOL_NULLED:
-            xlua_sig_call (outer_slr->L,
+            call_by_tag (outer_slr->L, STRLOC,
                 "recce, symbol = ...\n"
                 "local q = recce.event_queue\n"
                 "q[#q+1] = { 'symbol nulled', symbol}\n",
@@ -2625,7 +2504,7 @@ slr_convert_events ( Outer_R *outer_slr)
             );
             break;
         case MARPA_EVENT_SYMBOL_PREDICTED:
-            xlua_sig_call (outer_slr->L,
+            call_by_tag (outer_slr->L, STRLOC,
                 "recce, symbol = ...\n"
                 "local q = recce.event_queue\n"
                 "q[#q+1] = { 'symbol predicted', symbol}\n",
@@ -2642,7 +2521,7 @@ slr_convert_events ( Outer_R *outer_slr)
              * can be turned off by raising
              * the Earley item warning threshold.
              */
-            xlua_sig_call (outer_slr->L,
+            call_by_tag (outer_slr->L, STRLOC,
                 "recce, perl_pos, yim_count = ...\n"
                 "local q = recce.event_queue\n"
                 "q[#q+1] = { 'g1 earley item threshold exceeded', perl_pos, yim_count}\n",
@@ -2659,7 +2538,7 @@ slr_convert_events ( Outer_R *outer_slr)
                     result_string =
                         form ("unknown marpa_r event code, %d", event_type);
                 }
-                xlua_sig_call (outer_slr->L,
+                call_by_tag (outer_slr->L, STRLOC,
                     "recce, result_string = ...\n"
                     "local q = recce.event_queue\n"
                     "q[#q+1] = { 'unknown marpa_r event', result_string}\n",
@@ -2697,7 +2576,7 @@ r_convert_events ( Outer_R *outer_slr)
             {
               Marpa_Symbol_ID completed_symbol =
                 marpa_g_event_value (&marpa_event);
-              xlua_sig_call (outer_slr->L,
+              call_by_tag (outer_slr->L, STRLOC,
                   "recce, completed_symbol = ...\n"
                   "local q = recce.event_queue\n"
                   "q[#q+1] = { 'symbol completed', completed_symbol}\n",
@@ -2711,7 +2590,7 @@ r_convert_events ( Outer_R *outer_slr)
             {
               Marpa_Symbol_ID nulled_symbol =
                 marpa_g_event_value (&marpa_event);
-              xlua_sig_call (outer_slr->L,
+              call_by_tag (outer_slr->L, STRLOC,
                   "recce, nulled_symbol = ...\n"
                   "local q = recce.event_queue\n"
                   "q[#q+1] = { 'symbol nulled', nulled_symbol}\n",
@@ -2725,7 +2604,7 @@ r_convert_events ( Outer_R *outer_slr)
             {
               Marpa_Symbol_ID predicted_symbol =
                 marpa_g_event_value (&marpa_event);
-              xlua_sig_call (outer_slr->L,
+              call_by_tag (outer_slr->L, STRLOC,
                   "recce, predicted_symbol = ...\n"
                   "local q = recce.event_queue\n"
                   "q[#q+1] = { 'symbol predicted', predicted_symbol}\n",
@@ -2753,7 +2632,7 @@ r_convert_events ( Outer_R *outer_slr)
         default:
             {
               const char *result_string = event_type_to_string (event_type);
-              xlua_sig_call (outer_slr->L,
+              call_by_tag (outer_slr->L, STRLOC,
                   "recce, result_string, event_ix, event_type = ...\n"
                   "if result_string == '' then\n"
                   "    result_string = string.format(\n"
@@ -2948,7 +2827,7 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
                     lexeme_stack_event->t_lexeme_acceptable.t_required_priority =
                         high_lexeme_priority;
                     if (slr->trace_terminals) {
-                        xlua_sig_call (outer_slr->L,
+                        call_by_tag (outer_slr->L, STRLOC,
                             "recce, lexeme_start, lexeme_end,\n"
                             "    g1_lexeme, priority, required_priority = ...\n"
                             "local q = recce.event_queue\n"
@@ -2972,7 +2851,7 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
                      * lexer rule.
                      * The upper level will have to figure things out.
                      */
-                    xlua_sig_call (outer_slr->L,
+                    call_by_tag (outer_slr->L, STRLOC,
                         "recce, rule_id, lexeme_start, lexeme_end = ...\n"
                         "local q = recce.event_queue\n"
                         "q[#q+1] = { '!trace', 'discarded lexeme',\n"
@@ -2992,7 +2871,7 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
                     if (!l0_rule_r_properties->t_event_on_discard_active) {
                         goto NEXT_LEXEME_EVENT;
                     }
-                    xlua_sig_call (outer_slr->L,
+                    call_by_tag (outer_slr->L, STRLOC,
                         "recce, rule_id, lexeme_start, lexeme_end, last_g1_location = ...\n"
                         "local q = recce.event_queue\n"
                         "q[#q+1] = { 'discarded lexeme',\n"
@@ -3052,7 +2931,7 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
                     slr->end_of_pause_lexeme =
                         lexeme_entry->t_lexeme_acceptable.t_end_of_lexeme;
                     if (slr->trace_terminals > 2) {
-                        xlua_sig_call (outer_slr->L,
+                        call_by_tag (outer_slr->L, STRLOC,
                             "recce, lexeme_start, lexeme_end, g1_lexeme = ...\n"
                             "local q = recce.event_queue\n"
                             "q[#q+1] = { '!trace', 'g1 before lexeme event', g1_lexeme}\n",
@@ -3062,7 +2941,7 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
                             slr->end_of_pause_lexeme, g1_lexeme);
                     }
                     {
-                        xlua_sig_call (outer_slr->L,
+                        call_by_tag (outer_slr->L, STRLOC,
                             "recce, g1_lexeme = ...\n"
                             "local q = recce.event_queue\n"
                             "q[#q+1] = { 'before lexeme', g1_lexeme}\n",
@@ -3091,7 +2970,7 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
                     slr->symbol_r_properties + g1_lexeme;
 
                 if (slr->trace_terminals > 2) {
-                            xlua_sig_call (outer_slr->L,
+                            call_by_tag (outer_slr->L, STRLOC,
                                 "recce, lexeme_start, lexeme_end, lexeme = ...\n"
                                 "local q = recce.event_queue\n"
                                 "q[#q+1] = { '!trace', 'g1 attempting lexeme', lexeme_start, lexeme_end, lexeme}\n",
@@ -3115,7 +2994,7 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
                 case MARPA_ERR_DUPLICATE_TOKEN:
                     if (slr->trace_terminals) {
 
-                            xlua_sig_call (outer_slr->L,
+                            call_by_tag (outer_slr->L, STRLOC,
                                 "recce, lexeme_start, lexeme_end, lexeme = ...\n"
                                 "local q = recce.event_queue\n"
                                 "q[#q+1] = { '!trace', 'g1 duplicate lexeme', lexeme_start, lexeme_end, lexeme}\n",
@@ -3132,7 +3011,7 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
                 case MARPA_ERR_NONE:
                     if (slr->trace_terminals) {
 
-                            xlua_sig_call (outer_slr->L,
+                            call_by_tag (outer_slr->L, STRLOC,
                                 "recce, lexeme_start, lexeme_end, lexeme = ...\n"
                                 "local q = recce.event_queue\n"
                                 "q[#q+1] = { '!trace', 'g1 accepted lexeme', lexeme_start, lexeme_end, lexeme}\n",
@@ -3152,7 +3031,7 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
 
                         if (slr->trace_terminals > 2) {
 
-                            xlua_sig_call (outer_slr->L,
+                            call_by_tag (outer_slr->L, STRLOC,
                                 "recce, lexeme_start, lexeme_end, lexeme = ...\n"
                                 "local q = recce.event_queue\n"
                                 "q[#q+1] = { '!trace', 'g1 pausing after lexeme', lexeme_start, lexeme_end, lexeme}\n",
@@ -3166,7 +3045,7 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
                         }
 
                         {
-                            xlua_sig_call (outer_slr->L,
+                            call_by_tag (outer_slr->L, STRLOC,
                                 "recce, lexeme = ...\n"
                                 "local q = recce.event_queue\n"
                                 "q[#q+1] = { 'after lexeme', lexeme}\n",
@@ -4724,7 +4603,7 @@ PPCODE:
   marpa_r_ref(slr->g1r);
   dummyup_recce(outer_slr->L, outer_slr->lua_ref, slr->g1r, "lmw_g1r");
 
-  xlua_sig_call (outer_slr->L,
+  call_by_tag (outer_slr->L, STRLOC,
       "local recce = ...\n"
       "recce.event_queue = {}\n"
       "recce.lmw_g1r.lmw_g = recce.slg.lmw_g1g\n",
@@ -4740,7 +4619,7 @@ DESTROY( outer_slr )
     Outer_R *outer_slr;
 PPCODE:
 {
-  xlua_sig_call (outer_slr->L,
+  call_by_tag (outer_slr->L, STRLOC,
       "local recce = ...\n"
       "valuation_reset(recce)\n"
       "return 0\n",
@@ -4886,7 +4765,7 @@ PPCODE:
   slr->end_of_pause_lexeme = -1;
 
   /* Clear event queue */
-  xlua_sig_call (outer_slr->L,
+  call_by_tag (outer_slr->L, STRLOC,
       "local recce = ...\n"
       "recce.event_queue = {}\n",
       "R>", outer_slr->lua_ref);
@@ -4908,7 +4787,7 @@ PPCODE:
           u_l0r_clear (outer_slr);
           if (trace_terminals >= 1)
             {
-                            xlua_sig_call (outer_slr->L,
+                            call_by_tag (outer_slr->L, STRLOC,
                                 "local recce, perl_pos = ...\n"
                                 "local q = recce.event_queue\n"
                                 "q[#q+1] = { '!trace', 'lexer restarted recognizer', perl_pos}\n",
@@ -4955,7 +4834,7 @@ PPCODE:
 
       {
         int event_count;
-        xlua_sig_call (outer_slr->L,
+        call_by_tag (outer_slr->L, STRLOC,
             "local recce = ...\n"
             "return #recce.event_queue\n",
             "R>i", outer_slr->lua_ref, &event_count);
@@ -5148,7 +5027,7 @@ PPCODE:
         }
         av_push (slr->token_values, newSVsv (token_value));
         token_ix = av_len (slr->token_values);
-        xlua_sig_call (outer_slr->L,
+        call_by_tag (outer_slr->L, STRLOC,
             "local recce, token_sv = ...;\n"
             "local new_token_ix = #recce.token_values + 1\n"
             "recce.token_values[new_token_ix] = token_sv\n"
@@ -5213,7 +5092,7 @@ PPCODE:
     lexeme_length = end_pos - start_pos;
   }
 
-  xlua_sig_call (outer_slr->L,
+  call_by_tag (outer_slr->L, STRLOC,
       "local recce = ...\n"
       "recce.event_queue = {}\n",
       "R>", outer_slr->lua_ref);
@@ -5232,7 +5111,7 @@ PPCODE:
   {
       const int error = marpa_g_error (slr->g1_wrapper->g, NULL);
       if (error == MARPA_ERR_PARSE_EXHAUSTED) {
-          xlua_sig_call (outer_slr->L,
+          call_by_tag (outer_slr->L, STRLOC,
               "recce, = ...\n"
               "local q = recce.event_queue\n"
               "q[#q+1] = { 'no acceptable input' }\n",
@@ -5712,7 +5591,7 @@ PPCODE:
     int result;
     SV *new_values;
 
-    xlua_sig_call (outer_slr->L,
+    call_by_tag (outer_slr->L, STRLOC,
         "local recce = ...; return find_and_do_ops(recce)\n",
         "R>iM", outer_slr->lua_ref, &result, &new_values);
 
@@ -5721,7 +5600,7 @@ PPCODE:
         {
             SV* step_type;
             int parm2;
-            xlua_sig_call (outer_slr->L,
+            call_by_tag (outer_slr->L, STRLOC,
               "local recce = ...\n"
               "local this = recce.this_step\n"
               "local step_type = this.type\n"
@@ -5737,7 +5616,7 @@ PPCODE:
     case 1:
         {
             SV* step_type;
-            xlua_sig_call (outer_slr->L,
+            call_by_tag (outer_slr->L, STRLOC,
               "local recce = ...\n"
               "return recce.this_step.type\n",
               "R>C", outer_slr->lua_ref, &step_type);
