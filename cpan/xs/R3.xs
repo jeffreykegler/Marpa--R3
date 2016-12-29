@@ -2945,18 +2945,19 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
                 const struct symbol_r_properties *symbol_r_properties =
                     slr->symbol_r_properties + g1_lexeme;
 
-                if (slr->trace_terminals > 2) {
                             call_by_tag (outer_slr->L, STRLOC,
                                 "recce, lexeme_start, lexeme_end, lexeme = ...\n"
-                                "local q = recce.event_queue\n"
-                                "q[#q+1] = { '!trace', 'g1 attempting lexeme', lexeme_start, lexeme_end, lexeme}\n",
+                                "if recce.trace_terminals > 2 then\n"
+                                "    local q = recce.event_queue\n"
+                                "    q[#q+1] = { '!trace', 'g1 attempting lexeme', lexeme_start, lexeme_end, lexeme}\n"
+                                "end\n"
+                                ,
                                 "Riii>",
                                 outer_slr->lua_ref,
                                 slr->start_of_lexeme,
                                 slr->end_of_lexeme,
                                 g1_lexeme
                             );
-                }
                 return_value =
                     marpa_r_alternative (g1r, g1_lexeme,
                     TOKEN_VALUE_IS_LITERAL, 1);
@@ -2968,69 +2969,53 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
                     break;
 
                 case MARPA_ERR_DUPLICATE_TOKEN:
-                    if (slr->trace_terminals) {
-
                             call_by_tag (outer_slr->L, STRLOC,
                                 "recce, lexeme_start, lexeme_end, lexeme = ...\n"
-                                "local q = recce.event_queue\n"
-                                "q[#q+1] = { '!trace', 'g1 duplicate lexeme', lexeme_start, lexeme_end, lexeme}\n",
+                                "if recce.trace_terminals > 0 then\n"
+                                "    local q = recce.event_queue\n"
+                                "    q[#q+1] = { '!trace', 'g1 duplicate lexeme', lexeme_start, lexeme_end, lexeme}\n"
+                                "end\n"
+                                ,
                                 "Riii>",
                                 outer_slr->lua_ref,
                                 slr->start_of_lexeme,
                                 slr->end_of_lexeme,
                                 g1_lexeme
                             );
-
-                    }
                     break;
 
                 case MARPA_ERR_NONE:
-                    if (slr->trace_terminals) {
-
                             call_by_tag (outer_slr->L, STRLOC,
                                 "recce, lexeme_start, lexeme_end, lexeme = ...\n"
-                                "local q = recce.event_queue\n"
-                                "q[#q+1] = { '!trace', 'g1 accepted lexeme', lexeme_start, lexeme_end, lexeme}\n",
+                                "if recce.trace_terminals > 0 then\n"
+                                "    local q = recce.event_queue\n"
+                                "    q[#q+1] = { '!trace', 'g1 accepted lexeme', lexeme_start, lexeme_end, lexeme}\n"
+                                "end\n",
                                 "Riii>",
                                 outer_slr->lua_ref,
                                 slr->start_of_lexeme,
                                 slr->end_of_lexeme,
                                 g1_lexeme
                             );
-
-                    }
                     if (symbol_r_properties->t_pause_after_active) {
                         slr->start_of_pause_lexeme =
                             event->t_lexeme_acceptable.t_start_of_lexeme;
                         slr->end_of_pause_lexeme =
                             event->t_lexeme_acceptable.t_end_of_lexeme;
 
-                        if (slr->trace_terminals > 2) {
-
                             call_by_tag (outer_slr->L, STRLOC,
                                 "recce, lexeme_start, lexeme_end, lexeme = ...\n"
                                 "local q = recce.event_queue\n"
-                                "q[#q+1] = { '!trace', 'g1 pausing after lexeme', lexeme_start, lexeme_end, lexeme}\n",
+                                "if recce.trace_terminals > 2 then\n"
+                                "    q[#q+1] = { '!trace', 'g1 pausing after lexeme', lexeme_start, lexeme_end, lexeme}\n"
+                                "end\n"
+                                "q[#q+1] = { 'after lexeme', lexeme}\n",
                                 "Riii>",
                                 outer_slr->lua_ref,
                                 slr->start_of_pause_lexeme,
                                 slr->end_of_pause_lexeme,
                                 g1_lexeme
                             );
-
-                        }
-
-                        {
-                            call_by_tag (outer_slr->L, STRLOC,
-                                "recce, lexeme = ...\n"
-                                "local q = recce.event_queue\n"
-                                "q[#q+1] = { 'after lexeme', lexeme}\n",
-                                "Ri>",
-                                outer_slr->lua_ref,
-                                g1_lexeme
-                            );
-                        }
-
                     }
                     break;
 
@@ -4827,9 +4812,16 @@ PPCODE:
           }
       }
 
-      if (slr->trace_terminals)
         {
-          XSRETURN_PV ("trace");
+            int trace_terminals;
+            call_by_tag (outer_slr->L, STRLOC,
+                "recce = ...\n"
+                "return recce.trace_terminals\n",
+                "R>i", outer_slr->lua_ref, &trace_terminals);
+            if (trace_terminals)
+              {
+                XSRETURN_PV ("trace");
+              }
         }
 
     }
