@@ -54,7 +54,9 @@ sub symbol_by_name {
     my $thin_slg = $self->[Marpa::R3::Internal::Trace::G::SLG_C];
     my $short_lmw_g_name = $self->[Marpa::R3::Internal::Trace::G::NAME];
     my $lmw_g_name = 'lmw_' . (lc $short_lmw_g_name) . 'g';
-    my ($symbol_id) = $thin_slg->exec_sig(<<'END_OF_LUA', 'ss', $lmw_g_name, $symbol_name);
+    my ($symbol_id) = $thin_slg->call_by_tag(
+      (join q{:}, __FILE__, __LINE__),
+      <<'END_OF_LUA', 'ss', $lmw_g_name, $symbol_name);
     local g, lmw_g_name, symbol_name = ...
     local lmw_g = g[lmw_g_name]
     return lmw_g.isyid_by_name[symbol_name]
@@ -68,7 +70,9 @@ sub symbol_name {
 
     my $short_lmw_g_name = $self->[Marpa::R3::Internal::Trace::G::NAME];
     my $lmw_g_name = 'lmw_' . (lc $short_lmw_g_name) . 'g';
-    my ($sym_name) = $thin_slg->exec_sig(<<'END_OF_LUA', 'si', $lmw_g_name, $symbol_id);
+    my ($sym_name) = $thin_slg->call_by_tag(
+      (join q{:}, __FILE__, __LINE__),
+      <<'END_OF_LUA', 'si', $lmw_g_name, $symbol_id);
     local g, lmw_g_name, symbol_id = ...
     local lmw_g = g[lmw_g_name]
     return lmw_g:symbol_name(symbol_id)
@@ -93,7 +97,8 @@ sub symbol_name_set {
     my $short_lmw_g_name = $self->[Marpa::R3::Internal::Trace::G::NAME];
     my $lmw_g_name = 'lmw_' . (lc $short_lmw_g_name) . 'g';
 
-    $thin_slg->exec_sig(
+    $thin_slg->call_by_tag(
+      (join q{:}, __FILE__, __LINE__),
       <<'END_OF_LUA', 'ssi', $lmw_g_name, $symbol_name, $symbol_id);
     local g, lmw_g_name, symbol_name, symbol_id = ...
     local lmw_g = g[lmw_g_name]
@@ -203,7 +208,8 @@ sub show_dotted_irl {
     my $thin_slg         = $self->[Marpa::R3::Internal::Trace::G::SLG_C];
     my $short_name = $self->[Marpa::R3::Internal::Trace::G::NAME];
     my ($result) =
-      $thin_slg->exec_sig(
+      $thin_slg->call_by_tag(
+	(join q{:}, __FILE__, __LINE__),
 	<<'END_OF_LUA', 'sii', (lc $short_name), $irl_id, $dot_position );
     local g, short_name, irl_id, dot_position = ...
     local lmw_g_field_name = 'lmw_' .. short_name .. 'g'
@@ -270,7 +276,9 @@ sub isy_name {
     my $short_lmw_g_name = $self->[Marpa::R3::Internal::Trace::G::NAME];
     my $lmw_g_name       = 'lmw_' . ( lc $short_lmw_g_name ) . 'g';
     my ($sym_name) =
-      $thin_slg->exec_sig( <<'END_OF_LUA', 'si', $lmw_g_name, $symbol_id );
+      $thin_slg->call_by_tag(
+	(join q{:}, __FILE__, __LINE__),
+	<<'END_OF_LUA', 'si', $lmw_g_name, $symbol_id );
     local g, lmw_g_name, symbol_id = ...
     local lmw_g = g[lmw_g_name]
     return lmw_g:isy_name(symbol_id)

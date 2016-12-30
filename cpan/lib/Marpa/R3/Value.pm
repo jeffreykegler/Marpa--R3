@@ -386,7 +386,9 @@ sub Marpa::R3::Scanless::R::ordering_get {
     my $ranking_method =
         $slr->[Marpa::R3::Internal::Scanless::R::RANKING_METHOD];
 
-    my ($has_parse) = $slr->exec_sig(<<'END_OF_LUA',
+    my ($has_parse) = $slr->call_by_tag(
+    (join q{:}, __FILE__, __LINE__),
+    <<'END_OF_LUA',
     -- inside $slr->ordering_get()
     local recce, end_of_parse, ranking_method = ...
     if recce.lmw_o then return true end
@@ -586,7 +588,9 @@ sub Marpa::R3::Scanless::R::value {
         );
     }
 
-    $slr->exec_sig(<<'END_OF_LUA', '');
+    $slr->call_by_tag(
+    (join q{:}, __FILE__, __LINE__),
+    <<'END_OF_LUA', '');
     recce = ...
     local g1r = recce.lmw_g1r
     local furthest_earleme = g1r:furthest_earleme()
@@ -639,7 +643,9 @@ END_OF_LUA
     local $Marpa::R3::Context::slr  = $slr;
     local $Marpa::R3::Context::slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
 
-    $slr->exec_sig( << 'END_OF_LUA', 'i', ($trace_values ? 1 : 0 ));
+    $slr->call_by_tag(
+    (join q{:}, __FILE__, __LINE__),
+    << 'END_OF_LUA', 'i', ($trace_values ? 1 : 0 ));
     recce, flag = ...
     return recce.lmw_v:_trace(flag)
 END_OF_LUA
@@ -1685,7 +1691,9 @@ sub trace_op {
     my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
 
     my ($nook_ix, $or_node_id, $choice, $and_node_id, $trace_irl_id, $or_node_position)
-        = $slr->exec_sig( <<'END_OF_LUA' , '');
+        = $slr->call_by_tag(
+        (join q{:}, __FILE__, __LINE__),
+        <<'END_OF_LUA' , '');
     -- in trace_op()
     recce = ...
     local nook_ix = recce.lmw_v:_nook()

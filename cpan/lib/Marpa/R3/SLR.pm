@@ -1815,6 +1815,13 @@ sub Marpa::R3::Scanless::R::call_by_name {
     return @results;
 }
 
+sub Marpa::R3::Scanless::R::call_by_tag {
+    my ( $slr, $tag, $codestr, $signature, @args ) = @_;
+    my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
+    my @results = $thin_slr->call_by_tag($tag, $codestr, $signature, @args);
+    return @results;
+}
+
 # Internal methods, not to be documented
 
 # not to be documented
