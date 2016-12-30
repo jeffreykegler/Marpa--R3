@@ -1470,12 +1470,6 @@ sub Marpa::R3::Scanless::G::l0_rule_show
     return slg_rule_show($tracer, $rule_id);
 }
 
-sub Marpa::R3::Scanless::G::exec {
-    my ( $slg, $codestr, @args ) = @_;
-    my $thin_slg = $slg->[Marpa::R3::Internal::Scanless::G::C];
-    return $thin_slg->exec($codestr, @args);
-}
-
 sub Marpa::R3::Scanless::G::call_by_tag {
     my ( $slg, $tag, $codestr, $sig, @args ) = @_;
     my $thin_slg = $slg->[Marpa::R3::Internal::Scanless::G::C];
