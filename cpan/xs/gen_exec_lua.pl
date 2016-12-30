@@ -326,6 +326,52 @@ PPCODE:
     === LUA EXEC SIG BODY ===
 }
 
+void
+call_by_tag( outer_slg, tag, codestr, signature, ... )
+   Outer_G *outer_slg;
+   const char* tag;
+   const char* codestr;
+   char *signature;
+PPCODE:
+{
+    int object_stack_ix;
+    const int is_method = 1;
+    lua_State *const L = outer_slg->L;
+    const int base_of_stack = marpa_lua_gettop (L);
+    int msghandler_ix;
+    int cache_ix;
+    int type;
+
+    marpa_lua_pushcfunction(L, xlua_msghandler);
+    msghandler_ix = marpa_lua_gettop(L);
+
+    marpa_lua_getglobal (L, "code_by_tag");
+    cache_ix = marpa_lua_gettop(L);
+    type = marpa_lua_getfield (L, cache_ix, tag);
+
+    marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, outer_slg->lua_ref);
+    /* Lua stack: [ grammar_table ] */
+    object_stack_ix = marpa_lua_gettop (L);
+
+    if (type != LUA_TFUNCTION) {
+
+        /* warn("%s %d", __FILE__, __LINE__); */
+        const int status =
+            marpa_luaL_loadbuffer (L, codestr, strlen (codestr), tag);
+        if (status != 0) {
+            const char *error_string = marpa_lua_tostring (L, -1);
+            marpa_lua_pop (L, 1);
+            croak ("Marpa::R3 error in call_by_tag(): %s", error_string);
+        }
+        marpa_lua_pushvalue (L, -1);
+        marpa_lua_setfield (L, cache_ix, tag);
+    }
+
+    /* [ grammar_table, function ] */
+
+    === LUA EXEC SIG BODY ===
+}
+
 MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::SLR
 
 void
