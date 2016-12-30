@@ -358,7 +358,7 @@ sub Marpa::R3::Scanless::R::show_semantics {
         my $op_name = Marpa::R3::Thin::op_name($op);
         push @op_descs, $op_name;
         if ( $op_name eq 'lua' ) {
-            my ($lua_op_name) = $slr->exec_name( 'get_op_fn_name_by_key', $ops[$op_ix] );
+            my ($lua_op_name) = $slr->call_by_name( 'get_op_fn_name_by_key', 'i', $ops[$op_ix] );
             push @op_descs, $lua_op_name;
             $op_ix++;
             push @op_descs, $ops[$op_ix];
@@ -921,42 +921,42 @@ qq{Cannot bless rule when the semantics are "$semantics"},
         state $op_lua = Marpa::R3::Thin::op('lua');
 
         my ($op_debug_key) =
-          $slr->exec_name( 'get_op_fn_key_by_name', "debug" );
-        my ($op_noop_key) = $slr->exec_name( 'get_op_fn_key_by_name', "noop" );
+          $slr->call_by_name( 'get_op_fn_key_by_name', 's', "debug" );
+        my ($op_noop_key) = $slr->call_by_name( 'get_op_fn_key_by_name', 's', "noop" );
         my ($op_bail_key) =
-          $slr->exec_name( 'get_op_fn_key_by_name', "bail" );
+          $slr->call_by_name( 'get_op_fn_key_by_name', 's', "bail" );
         my ($op_bless_key) =
-          $slr->exec_name( 'get_op_fn_key_by_name', "bless" );
+          $slr->call_by_name( 'get_op_fn_key_by_name', 's', "bless" );
         my ($op_callback_key) =
-          $slr->exec_name( 'get_op_fn_key_by_name', "callback" );
+          $slr->call_by_name( 'get_op_fn_key_by_name', 's', "callback" );
         my ($result_is_undef_key) =
-          $slr->exec_name( 'get_op_fn_key_by_name', 'result_is_undef' );
+          $slr->call_by_name( 'get_op_fn_key_by_name', 's', 'result_is_undef' );
         my ($result_is_constant_key) =
-          $slr->exec_name( 'get_op_fn_key_by_name', 'result_is_constant' );
+          $slr->call_by_name( 'get_op_fn_key_by_name', 's', 'result_is_constant' );
         my ($result_is_token_value_key) =
-          $slr->exec_name( 'get_op_fn_key_by_name', "result_is_token_value" );
+          $slr->call_by_name( 'get_op_fn_key_by_name', 's', "result_is_token_value" );
         my ($result_is_n_of_rhs_key) =
-          $slr->exec_name( 'get_op_fn_key_by_name', "result_is_n_of_rhs" );
+          $slr->call_by_name( 'get_op_fn_key_by_name', 's', "result_is_n_of_rhs" );
         my ($result_is_n_of_sequence_key) =
-          $slr->exec_name( 'get_op_fn_key_by_name', "result_is_n_of_sequence" );
+          $slr->call_by_name( 'get_op_fn_key_by_name', 's', "result_is_n_of_sequence" );
         my ($result_is_array_key) =
-          $slr->exec_name( 'get_op_fn_key_by_name', "result_is_array" );
+          $slr->call_by_name( 'get_op_fn_key_by_name', 's', "result_is_array" );
         my ($op_push_constant_key) =
-          $slr->exec_name( 'get_op_fn_key_by_name', 'push_constant' );
+          $slr->call_by_name( 'get_op_fn_key_by_name', 's', 'push_constant' );
         my ($op_push_undef_key) =
-          $slr->exec_name( 'get_op_fn_key_by_name', 'push_undef' );
+          $slr->call_by_name( 'get_op_fn_key_by_name', 's', 'push_undef' );
         my ($op_push_one_key) =
-          $slr->exec_name( 'get_op_fn_key_by_name', 'push_one' );
+          $slr->call_by_name( 'get_op_fn_key_by_name', 's', 'push_one' );
         my ($op_push_values_key) =
-          $slr->exec_name( 'get_op_fn_key_by_name', 'push_values' );
+          $slr->call_by_name( 'get_op_fn_key_by_name', 's', 'push_values' );
         my ($op_push_g1_start_key) =
-          $slr->exec_name( 'get_op_fn_key_by_name', 'push_g1_start' );
+          $slr->call_by_name( 'get_op_fn_key_by_name', 's', 'push_g1_start' );
         my ($op_push_g1_length_key) =
-          $slr->exec_name( 'get_op_fn_key_by_name', 'push_g1_length' );
+          $slr->call_by_name( 'get_op_fn_key_by_name', 's', 'push_g1_length' );
         my ($op_push_start_key) =
-          $slr->exec_name( 'get_op_fn_key_by_name', 'push_start' );
+          $slr->call_by_name( 'get_op_fn_key_by_name', 's', 'push_start' );
         my ($op_push_length_key) =
-          $slr->exec_name( 'get_op_fn_key_by_name', 'push_length' );
+          $slr->call_by_name( 'get_op_fn_key_by_name', 's', 'push_length' );
 
         my @nulling_symbol_by_semantic_rule;
       NULLING_SYMBOL: for my $nulling_symbol ( 0 .. $#{$null_values} ) {
