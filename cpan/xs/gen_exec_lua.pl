@@ -264,7 +264,7 @@ PPCODE:
     type = marpa_lua_getglobal (L, name);
     if (type != LUA_TFUNCTION)
     {
-      croak ("exec_name: global %s name is not a function", name);
+      croak ("call_by_name: global %s name is not a function", name);
     }
     /* [ grammar_table, function ] */
 
@@ -423,7 +423,7 @@ PPCODE:
     type = marpa_lua_getglobal (L, name);
     if (type != LUA_TFUNCTION)
     {
-      croak ("exec_name: global %s name is not a function", name);
+      croak ("call_by_name: global %s name is not a function", name);
     }
     /* [ recce_table, function ] */
 
