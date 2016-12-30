@@ -1394,7 +1394,7 @@ qq{    Semantics were specified as "$original_semantics"\n}
 
       OP: for my $raw_op (@raw_ops) {
             if ( ref $raw_op ) {
-                my ($constant_ix) = $slr->exec_name( 'constant_register', ${$raw_op});
+                my ($constant_ix) = $slr->call_by_name( 'constant_register', 'S>*', ${$raw_op});
                 push @ops, $constant_ix;
                 next OP;
             }
