@@ -1802,13 +1802,6 @@ sub Marpa::R3::Scanless::R::exec {
     return $thin_slr->exec($codestr, @args);
 }
 
-sub Marpa::R3::Scanless::R::exec_name {
-    my ( $slr, $name, @args ) = @_;
-    my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
-    my @results = $thin_slr->exec_name($name, @args);
-    return @results;
-}
-
 sub Marpa::R3::Scanless::R::exec_sig {
     my ( $slr, $codestr, $signature, @args ) = @_;
     my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];

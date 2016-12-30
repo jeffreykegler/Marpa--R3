@@ -371,36 +371,6 @@ PPCODE:
 }
 
 void
-exec_name( outer_slr, name, ... )
-   Outer_R *outer_slr;
-   char* name;
-PPCODE:
-{
-    int object_stack_ix;
-    const int is_method = 1;
-    lua_State *const L = outer_slr->L;
-    const int base_of_stack = marpa_lua_gettop (L);
-    int msghandler_ix;
-    int type;
-
-    marpa_lua_pushcfunction(L, xlua_msghandler);
-    msghandler_ix = marpa_lua_gettop(L);
-
-    marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, outer_slr->lua_ref);
-    /* Lua stack: [ recce_table ] */
-    object_stack_ix = marpa_lua_gettop (L);
-
-    type = marpa_lua_getglobal (L, name);
-    if (type != LUA_TFUNCTION)
-    {
-      croak ("call_by_name: global %s name is not a function", name);
-    }
-    /* [ recce_table, function ] */
-
-    === LUA_EXEC_BODY ===
-}
-
-void
 exec_sig( outer_slr, codestr, signature, ... )
    Outer_R *outer_slr;
    char* codestr;
@@ -450,7 +420,7 @@ PPCODE:
     type = marpa_lua_getglobal (L, name);
     if (type != LUA_TFUNCTION)
     {
-      croak ("exec_name: global %s name is not a function", name);
+      croak ("call_by_name(): global %s name is not a function", name);
     }
     /* [ recce_table, function ] */
 
