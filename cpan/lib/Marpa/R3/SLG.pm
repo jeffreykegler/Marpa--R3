@@ -151,7 +151,8 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     Marpa::R3::exception("Glue::load failed: $load_result") if $load_result ne 'OK';
 
     state $op_lua = Marpa::R3::Thin::op('lua');
-    $thin_slg->exec("local grammar, arg = ...; op_lua = arg+0", $op_lua);
+    $thin_slg->call_by_tag((join q{:}, __FILE__, __LINE__),
+        "local grammar, arg = ...; op_lua = arg", 'i', $op_lua);
 
     my @xsy_names = keys %{ $hashed_source->{xsy} };
 

@@ -110,7 +110,7 @@ my $lua_exec_sig_body = <<'END_OF_EXEC_SIG_BODY';
         const int signature_stack_ix = marpa_lua_gettop (L);
         int i, status;
         char default_return_sig[] = "*";
-        char* return_signature = default_return_sig;
+        const char* return_signature = default_return_sig;
 
         marpa_luaL_checkstack(L, items+20, "xlua EXEC_SIG_BODY");
 
@@ -123,7 +123,7 @@ my $lua_exec_sig_body = <<'END_OF_EXEC_SIG_BODY';
         /* the remaining arguments are those passed to the Perl call */
         for (i = 0; ; i++) {
             const char this_sig = signature[i];
-            const int arg_ix = 3 + i;
+            const int arg_ix = first_optional_arg + i;
             SV *arg_sv;
 
             switch (this_sig) {
@@ -165,7 +165,7 @@ my $lua_exec_sig_body = <<'END_OF_EXEC_SIG_BODY';
         }
       endargs:;
 
-        status = marpa_lua_pcall (L, (items - 3) + is_method, LUA_MULTRET, msghandler_ix);
+        status = marpa_lua_pcall (L, (items - first_optional_arg) + is_method, LUA_MULTRET, msghandler_ix);
         if (status != 0) {
             const char *exception_string = handle_pcall_error(L, status);
             marpa_lua_settop (L, base_of_stack);
@@ -237,8 +237,8 @@ PPCODE:
     /* Lua stack: [ grammar_table ] */
     object_stack_ix = marpa_lua_gettop (L);
 
-    === LUA LOAD STRING ===
-    === LUA EXEC BODY ===
+    === LUA_LOAD_STRING ===
+    === LUA_EXEC_BODY ===
 }
 
 void
@@ -268,7 +268,7 @@ PPCODE:
     }
     /* [ grammar_table, function ] */
 
-    === LUA EXEC BODY ===
+    === LUA_EXEC_BODY ===
 }
 
 void
@@ -279,6 +279,7 @@ exec_sig( outer_slg, codestr, signature, ... )
 PPCODE:
 {
     int object_stack_ix;
+    const int first_optional_arg = 3;
     const int is_method = 1;
     lua_State *const L = outer_slg->L;
     const int base_of_stack = marpa_lua_gettop (L);
@@ -291,8 +292,8 @@ PPCODE:
     /* Lua stack: [ grammar_table ] */
     object_stack_ix = marpa_lua_gettop (L);
 
-    === LUA LOAD STRING ===
-    === LUA EXEC SIG BODY ===
+    === LUA_LOAD_STRING ===
+    === LUA_EXEC_SIG_BODY ===
 }
 
 void
@@ -303,6 +304,7 @@ exec_sig_name( outer_slg, name, signature, ... )
 PPCODE:
 {
     int object_stack_ix;
+    const int first_optional_arg = 3;
     const int is_method = 1;
     lua_State *const L = outer_slg->L;
     const int base_of_stack = marpa_lua_gettop (L);
@@ -323,7 +325,7 @@ PPCODE:
     }
     /* [ grammar_table, function ] */
 
-    === LUA EXEC SIG BODY ===
+    === LUA_EXEC_SIG_BODY ===
 }
 
 void
@@ -331,10 +333,11 @@ call_by_tag( outer_slg, tag, codestr, signature, ... )
    Outer_G *outer_slg;
    const char* tag;
    const char* codestr;
-   char *signature;
+   const char *signature;
 PPCODE:
 {
     int object_stack_ix;
+    const int first_optional_arg = 4;
     const int is_method = 1;
     lua_State *const L = outer_slg->L;
     const int base_of_stack = marpa_lua_gettop (L);
@@ -369,7 +372,7 @@ PPCODE:
 
     /* [ grammar_table, function ] */
 
-    === LUA EXEC SIG BODY ===
+    === LUA_EXEC_SIG_BODY ===
 }
 
 MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::SLR
@@ -393,8 +396,8 @@ PPCODE:
     /* Lua stack: [ recce_table ] */
     object_stack_ix = marpa_lua_gettop (L);
 
-    === LUA LOAD STRING ===
-    === LUA EXEC BODY ===
+    === LUA_LOAD_STRING ===
+    === LUA_EXEC_BODY ===
 }
 
 void
@@ -424,7 +427,7 @@ PPCODE:
     }
     /* [ recce_table, function ] */
 
-    === LUA EXEC BODY ===
+    === LUA_EXEC_BODY ===
 }
 
 void
@@ -435,6 +438,7 @@ exec_sig( outer_slr, codestr, signature, ... )
 PPCODE:
 {
     int object_stack_ix;
+    const int first_optional_arg = 3;
     const int is_method = 1;
     lua_State *const L = outer_slr->L;
     const int base_of_stack = marpa_lua_gettop (L);
@@ -447,8 +451,8 @@ PPCODE:
     /* Lua stack: [ recce_table ] */
     object_stack_ix = marpa_lua_gettop (L);
 
-    === LUA LOAD STRING ===
-    === LUA EXEC SIG BODY ===
+    === LUA_LOAD_STRING ===
+    === LUA_EXEC_SIG_BODY ===
 }
 
 void
@@ -459,6 +463,7 @@ exec_sig_name( outer_slr, name, signature, ... )
 PPCODE:
 {
     int object_stack_ix;
+    const int first_optional_arg = 3;
     const int is_method = 1;
     lua_State *const L = outer_slr->L;
     const int base_of_stack = marpa_lua_gettop (L);
@@ -479,7 +484,7 @@ PPCODE:
     }
     /* [ recce_table, function ] */
 
-    === LUA EXEC SIG BODY ===
+    === LUA_EXEC_SIG_BODY ===
 }
 
 MODULE = Marpa::R3            PACKAGE = Marpa::R3::Lua
@@ -500,8 +505,8 @@ PPCODE:
     marpa_lua_pushcfunction(L, xlua_msghandler);
     msghandler_ix = marpa_lua_gettop(L);
 
-    === LUA LOAD STRING ===
-    === LUA EXEC BODY ===
+    === LUA_LOAD_STRING ===
+    === LUA_EXEC_BODY ===
 }
 
 void
@@ -520,7 +525,7 @@ PPCODE:
     marpa_lua_pushcfunction(L, xlua_msghandler);
     msghandler_ix = marpa_lua_gettop(L);
 
-    === LUA LOAD STRING ===
+    === LUA_LOAD_STRING ===
 
     /* At this point, the Lua function is on the top of the stack:
      * [func]
@@ -533,14 +538,14 @@ PPCODE:
     }
     /* [func] */
 
-    === LUA EXEC BODY ===
+    === LUA_EXEC_BODY ===
 }
 
 END_OF_MAIN_CODE
 
-$code =~ s/=== \s* LUA \s* EXEC \s* BODY \s* === \s /$lua_exec_body/xsmg;
-$code =~ s/=== \s* LUA \s* EXEC \s* SIG \s* BODY \s* === \s /$lua_exec_sig_body/xsmg;
-$code =~ s/=== \s* LUA \s* LOAD \s* STRING \s* === \s /$lua_load_string/xsmg;
+$code =~ s/=== \s* LUA_EXEC_BODY \s* === \s /$lua_exec_body/xsmg;
+$code =~ s/=== \s* LUA_EXEC_SIG_BODY \s* === \s /$lua_exec_sig_body/xsmg;
+$code =~ s/=== \s* LUA_LOAD_STRING \s* === \s /$lua_load_string/xsmg;
 
 print {$out} $code;
 
