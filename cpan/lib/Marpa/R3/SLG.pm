@@ -138,15 +138,15 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     # Stuff in Lua
     my $load_result;
 
-    ($load_result) = $thin_slg->exec($Marpa::R3::Lua::Kollos::load);
+    ($load_result) = $kollos->raw_exec($Marpa::R3::Lua::Kollos::load);
     $load_result //= "[undef]";
     Marpa::R3::exception("Kollos::load failed: $load_result") if $load_result ne 'OK';
 
-    ($load_result) = $thin_slg->exec($Marpa::R3::Lua::Inspect::load);
+    ($load_result) = $kollos->raw_exec($Marpa::R3::Lua::Inspect::load);
     $load_result //= "[undef]";
     Marpa::R3::exception("Inspect::load failed: $load_result") if $load_result ne 'OK';
 
-    ($load_result) = $thin_slg->exec($Marpa::R3::Lua::Glue::load);
+    ($load_result) = $kollos->raw_exec($Marpa::R3::Lua::Glue::load);
     $load_result //= "[undef]";
     Marpa::R3::exception("Glue::load failed: $load_result") if $load_result ne 'OK';
 
