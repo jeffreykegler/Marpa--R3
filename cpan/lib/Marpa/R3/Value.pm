@@ -1558,8 +1558,8 @@ END_OF_LUA
             else {
                 $result = ${$closure};
             }
-            my ($highest_index) = $slr->exec_name( 'stack_top_index' );
-            $slr->exec_name( 'stack_set', $highest_index, $result);
+            my ($highest_index) = $slr->call_by_name( 'stack_top_index', '>*' );
+            $slr->call_by_name( 'stack_set', 'iS', $highest_index, $result);
             if ($trace_values) {
                 say {$trace_file_handle}
                   trace_stack_1( $slr, $values, $rule_id )
@@ -1589,7 +1589,7 @@ END_OF_LUA
 
     } ## end STEP: while (1)
 
-    my ($final_value) = $slr->exec_name( 'stack_get', 1);
+    my ($final_value) = $slr->call_by_name( 'stack_get', 'i>*', 1);
     return \( $final_value );
 
 }
