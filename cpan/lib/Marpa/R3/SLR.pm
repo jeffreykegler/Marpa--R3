@@ -41,7 +41,7 @@ sub Marpa::R3::Scanless::R::last_completed {
     my $g1_tracer =
         $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     my $symbol_id       = $g1_tracer->symbol_by_name($symbol_name);
-    my ($start, $length) = $slr->exec_sig_name(
+    my ($start, $length) = $slr->call_by_name(
         'last_completed',
         'i>*',
         $symbol_id
@@ -1586,7 +1586,7 @@ sub Marpa::R3::Scanless::R::show_progress {
 
 sub Marpa::R3::Scanless::R::progress {
     my ( $slr, $ordinal_arg ) = @_;
-    my ($result) = $slr->exec_sig_name(
+    my ($result) = $slr->call_by_name(
         'progress',
         'i>0',
         ($ordinal_arg // -1)
@@ -1815,10 +1815,10 @@ sub Marpa::R3::Scanless::R::exec_sig {
     return $thin_slr->exec_sig($codestr, $signature, @args);
 }
 
-sub Marpa::R3::Scanless::R::exec_sig_name {
+sub Marpa::R3::Scanless::R::call_by_name {
     my ( $slr, $name, $signature, @args ) = @_;
     my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
-    my @results = $thin_slr->exec_sig_name($name, $signature, @args);
+    my @results = $thin_slr->call_by_name($name, $signature, @args);
     return @results;
 }
 
@@ -1864,7 +1864,7 @@ sub Marpa::R3::Scanless::R::show_earley_set {
     my $tracer  = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
 
     my ($set_data) =
-      $slr->exec_sig_name( 'g1_earley_set_data', 'i>2', $traced_set_id );
+      $slr->call_by_name( 'g1_earley_set_data', 'i>2', $traced_set_id );
     return if not $set_data;
     my %set_data = @{$set_data};
 
@@ -2100,13 +2100,13 @@ sub Marpa::R3::Scanless::R::show_earley_set {
 
 sub Marpa::R3::Scanless::R::show_or_nodes {
     my ( $slr ) = @_;
-    my ($result) = $slr->exec_sig_name('show_or_nodes', '');
+    my ($result) = $slr->call_by_name('show_or_nodes', '');
     return $result;
 }
 
 sub Marpa::R3::Scanless::R::show_and_nodes {
     my ( $slr ) = @_;
-    my ($result) = $slr->exec_sig_name('show_and_nodes', '');
+    my ($result) = $slr->call_by_name('show_and_nodes', '');
     return $result;
 }
 
@@ -2195,7 +2195,7 @@ END_OF_LUA
 
 sub Marpa::R3::Scanless::R::show_bocage {
     my ($slr)     = @_;
-    my ($result) = $slr->exec_sig_name('show_bocage', '');
+    my ($result) = $slr->call_by_name('show_bocage', '');
     return $result;
 }
 

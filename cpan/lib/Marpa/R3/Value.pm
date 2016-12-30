@@ -644,7 +644,7 @@ END_OF_LUA
     return recce.lmw_v:_trace(flag)
 END_OF_LUA
 
-    $slr->exec_sig_name( 'value_init', 'i', $trace_values );
+    $slr->call_by_name( 'value_init', 'i', $trace_values );
 
     if ( not $slr->[Marpa::R3::Internal::Scanless::R::REGISTRATIONS] ) {
         my $trace_file_handle =
@@ -1593,7 +1593,7 @@ END_OF_LUA
 
 sub Marpa::R3::Scanless::R::and_node_tag {
     my ( $slr, $and_node_id ) = @_;
-    my ($tag) = $slr->exec_sig_name( 'and_node_tag', 'i', $and_node_id );
+    my ($tag) = $slr->call_by_name( 'and_node_tag', 'i', $and_node_id );
     return $tag;
 }
 

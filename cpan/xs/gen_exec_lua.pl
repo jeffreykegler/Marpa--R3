@@ -297,7 +297,7 @@ PPCODE:
 }
 
 void
-exec_sig_name( outer_slg, name, signature, ... )
+call_by_name( outer_slg, name, signature, ... )
    Outer_G *outer_slg;
    char* name;
    char *signature;
@@ -456,7 +456,7 @@ PPCODE:
 }
 
 void
-exec_sig_name( outer_slr, name, signature, ... )
+call_by_name( outer_slr, name, signature, ... )
    Outer_R *outer_slr;
    char* name;
    char *signature;
