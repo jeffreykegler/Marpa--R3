@@ -348,17 +348,17 @@ PPCODE:
     marpa_lua_pushcfunction(L, xlua_msghandler);
     msghandler_ix = marpa_lua_gettop(L);
 
-    marpa_lua_getglobal (L, "code_by_tag");
-    cache_ix = marpa_lua_gettop(L);
-    type = marpa_lua_getfield (L, cache_ix, tag);
-
     marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, outer_slg->lua_ref);
     /* Lua stack: [ grammar_table ] */
     object_stack_ix = marpa_lua_gettop (L);
 
+    marpa_lua_getglobal (L, "code_by_tag");
+    cache_ix = marpa_lua_gettop(L);
+    type = marpa_lua_getfield (L, cache_ix, tag);
+
+    /*    warn("%s %d", __FILE__, __LINE__); */
     if (type != LUA_TFUNCTION) {
 
-        /* warn("%s %d", __FILE__, __LINE__); */
         const int status =
             marpa_luaL_loadbuffer (L, codestr, strlen (codestr), tag);
         if (status != 0) {
