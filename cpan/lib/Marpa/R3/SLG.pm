@@ -1483,6 +1483,13 @@ sub Marpa::R3::Scanless::G::exec_name {
     return @results;
 }
 
+sub Marpa::R3::Scanless::G::call_by_tag {
+    my ( $slg, $tag, $codestr, $sig, @args ) = @_;
+    my $thin_slg = $slg->[Marpa::R3::Internal::Scanless::G::C];
+    my @results = $thin_slg->call_by_tag($tag, $codestr, $sig, @args);
+    return @results;
+}
+
 sub slg_rule_show {
     my ( $tracer, $rule_id ) = @_;
     my $subgrammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
