@@ -1462,7 +1462,7 @@ END_OF_LUA
 
                 my ($highest_index) = $slr->call_by_name( 'stack_top_index', '>*' );
                 for my $i ( reverse 1 .. $highest_index ) {
-                    my ($value) = $slr->exec_name( 'stack_get', $i);
+                    my ($value) = $slr->call_by_name( 'stack_get', 'i>*', $i);
                     printf {$trace_file_handle} "Stack position %3d:\n", $i,
                       or Marpa::R3::exception('print to trace handle failed');
                     print {$trace_file_handle} q{ },
@@ -1511,8 +1511,8 @@ END_OF_LUA
                 );
             } ## end if ( not $eval_ok or @warnings )
 
-            my ($highest_index) = $slr->exec_name( 'stack_top_index' );
-            $slr->exec_name( 'stack_set', $highest_index, $result);
+            my ($highest_index) = $slr->call_by_name( 'stack_top_index', '>*' );
+            $slr->call_by_name( 'stack_set', 'iS', $highest_index, $result);
             trace_token_evaluation( $slr, $token_id, \$result )
               if $trace_values;
             next STEP;
