@@ -4043,24 +4043,24 @@ PPCODE:
 MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::SLG
 
 void
-new( class )
+new( class, lua_wrapper )
     char * class;
+    Marpa_Lua* lua_wrapper;
 PPCODE:
 {
     SV *new_sv;
     Outer_G *outer_slg;
     Scanless_G *slg;
-    lua_State *L;
+    lua_State *L = lua_wrapper->L;
     PERL_UNUSED_ARG (class);
 
     Newx (outer_slg, 1, Outer_G);
     slg = slg_inner_new ();
 
     outer_slg->inner = slg;
-    outer_slg->L = xlua_newstate ();
-
-    L = outer_slg->L;
+    outer_slg->L = L;
     kollos_refinc (L);
+
     /* Lua stack: [] */
     marpa_lua_newtable (L);
     /* Lua stack: [ grammar_table ] */

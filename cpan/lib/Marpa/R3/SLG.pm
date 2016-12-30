@@ -131,8 +131,9 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     my $trace_fh = $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE];
     # Pre-lexer G1 processing
 
+    my $kollos = Marpa::R3::Lua->new();
     my $thin_slg = $slg->[Marpa::R3::Internal::Scanless::G::C] =
-      Marpa::R3::Thin::SLG->new();
+      Marpa::R3::Thin::SLG->new($kollos);
 
     # Stuff in Lua
     my $load_result;

@@ -11,7 +11,6 @@
 # of the licenses in the directory LICENSES.
 
 G_Wrapper * T_MARPA_G_W
-R_Wrapper * T_MARPA_R_W
 Outer_G * T_OUTER_G
 Outer_R * T_OUTER_R
 Marpa_Lua * T_MARPA_LUA
@@ -38,15 +37,6 @@ T_MARPA_G_W
             $var = INT2PTR(G_Wrapper *, tmp);
         } else
             Perl_croak(aTHX_ \"%s: %s is not of type Marpa::R3::Thin::G\",
-                        ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-                        \"$var\")
-
-T_MARPA_R_W
-        if (sv_isa($arg, \"Marpa::R3::Thin::R\")) {
-            IV tmp = SvIV((SV*)SvRV($arg));
-            $var = INT2PTR(R_Wrapper *, tmp);
-        } else
-            Perl_croak(aTHX_ \"%s: %s is not of type Marpa::R3::Thin::R\",
                         ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
                         \"$var\")
 
