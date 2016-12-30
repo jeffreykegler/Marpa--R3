@@ -1400,16 +1400,21 @@ qq{    Semantics were specified as "$original_semantics"\n}
             }
             push @ops, $raw_op;
         } ## end OP: for my $raw_op (@raw_ops)
+        # The business with the signatures below is very
+        # hackish, but it will suffice until all this logic is converted to Lua
         if ( $type eq 'token' ) {
-            $slr->exec_name( 'token_register', $id, @ops);
+            my $signature = 'i' x (1 + scalar @ops);
+            $slr->call_by_name( 'token_register', $signature, $id, @ops);
             next REGISTRATION;
         }
         if ( $type eq 'nulling' ) {
-            $slr->exec_name( 'nulling_register', $id, @ops);
+            my $signature = 'i' x (1 + scalar @ops);
+            $slr->call_by_name( 'nulling_register', $signature, $id, @ops);
             next REGISTRATION;
         }
         if ( $type eq 'rule' ) {
-            $slr->exec_name( 'rule_register', $id, @ops);
+            my $signature = 'i' x (1 + scalar @ops);
+            $slr->call_by_name( 'rule_register', $signature, $id, @ops);
             next REGISTRATION;
         }
         Marpa::R3::exception(
@@ -1455,7 +1460,7 @@ END_OF_LUA
 
             if ( $trace_values >= 9 ) {
 
-                my ($highest_index) = $slr->exec_name( 'stack_top_index' );
+                my ($highest_index) = $slr->call_by_name( 'stack_top_index', '>*' );
                 for my $i ( reverse 1 .. $highest_index ) {
                     my ($value) = $slr->exec_name( 'stack_get', $i);
                     printf {$trace_file_handle} "Stack position %3d:\n", $i,
