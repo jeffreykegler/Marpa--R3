@@ -1476,13 +1476,6 @@ sub Marpa::R3::Scanless::G::exec {
     return $thin_slg->exec($codestr, @args);
 }
 
-sub Marpa::R3::Scanless::G::exec_name {
-    my ( $slg, $name, @args ) = @_;
-    my $thin_slg = $slg->[Marpa::R3::Internal::Scanless::G::C];
-    my @results = $thin_slg->exec_name($name, @args);
-    return @results;
-}
-
 sub Marpa::R3::Scanless::G::call_by_tag {
     my ( $slg, $tag, $codestr, $sig, @args ) = @_;
     my $thin_slg = $slg->[Marpa::R3::Internal::Scanless::G::C];

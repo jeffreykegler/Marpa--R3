@@ -1445,7 +1445,7 @@ sub Marpa::R3::Scanless::R::reset_evaluation {
 
     $slr->[Marpa::R3::Internal::Scanless::R::TREE_MODE] = undef;
 
-    $slr->exec_name('valuation_reset');
+    $slr->call_by_name('valuation_reset', '');
     return;
 }
 
