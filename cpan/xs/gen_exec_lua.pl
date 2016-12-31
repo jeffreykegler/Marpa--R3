@@ -219,31 +219,6 @@ my $code = <<'END_OF_MAIN_CODE';
 MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::SLG
 
 void
-exec_sig( outer_slg, codestr, signature, ... )
-   Outer_G *outer_slg;
-   char* codestr;
-   char* signature;
-PPCODE:
-{
-    int object_stack_ix;
-    const int first_optional_arg = 3;
-    const int is_method = 1;
-    lua_State *const L = outer_slg->L;
-    const int base_of_stack = marpa_lua_gettop (L);
-    int msghandler_ix;
-
-    marpa_lua_pushcfunction(L, xlua_msghandler);
-    msghandler_ix = marpa_lua_gettop(L);
-
-    marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, outer_slg->lua_ref);
-    /* Lua stack: [ grammar_table ] */
-    object_stack_ix = marpa_lua_gettop (L);
-
-    === LUA_LOAD_STRING ===
-    === LUA_EXEC_SIG_BODY ===
-}
-
-void
 call_by_name( outer_slg, name, signature, ... )
    Outer_G *outer_slg;
    char* name;
@@ -345,31 +320,6 @@ PPCODE:
 
     === LUA_LOAD_STRING ===
     === LUA_EXEC_BODY ===
-}
-
-void
-exec_sig( outer_slr, codestr, signature, ... )
-   Outer_R *outer_slr;
-   char* codestr;
-   char* signature;
-PPCODE:
-{
-    int object_stack_ix;
-    const int first_optional_arg = 3;
-    const int is_method = 1;
-    lua_State *const L = outer_slr->L;
-    const int base_of_stack = marpa_lua_gettop (L);
-    int msghandler_ix;
-
-    marpa_lua_pushcfunction(L, xlua_msghandler);
-    msghandler_ix = marpa_lua_gettop(L);
-
-    marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, outer_slr->lua_ref);
-    /* Lua stack: [ recce_table ] */
-    object_stack_ix = marpa_lua_gettop (L);
-
-    === LUA_LOAD_STRING ===
-    === LUA_EXEC_SIG_BODY ===
 }
 
 void
