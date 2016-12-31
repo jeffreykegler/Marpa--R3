@@ -533,7 +533,7 @@ my $libmarpa_trace_event_handlers = {
             = @{$event};
         my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
         my $raw_token_value =
-            $thin_slr->substring( $lexeme_start_pos,
+            $slr->literal( $lexeme_start_pos,
             $lexeme_end_pos - $lexeme_start_pos );
         my $trace_file_handle =
             $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
