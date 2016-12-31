@@ -2144,33 +2144,6 @@ u_pos_span_to_literal_sv (Scanless_R * slr,
   return new_sv;
 }
 
-static SV*
-u_substring (Scanless_R * slr, const char *name, int start_pos_arg,
-             int length_arg)
-{
-  dTHX;
-  int start_pos;
-  int end_pos;
-  const int input_length = slr->pos_db_logical_size;
-  int substring_length;
-
-  start_pos =
-    start_pos_arg < 0 ? input_length + start_pos_arg : start_pos_arg;
-  if (start_pos < 0 || start_pos > input_length)
-    {
-      croak ("Bad start position in %s: %ld", name, (long) start_pos_arg);
-    }
-
-  end_pos =
-    length_arg < 0 ? input_length + length_arg + 1 : start_pos + length_arg;
-  if (end_pos < 0 || end_pos > input_length)
-    {
-      croak ("Bad length in %s: %ld", name, (long) length_arg);
-    }
-  substring_length = end_pos - start_pos;
-  return u_pos_span_to_literal_sv (slr, start_pos, substring_length);
-}
-
 /* Static SLG methods */
 
 static Scanless_G* slg_inner_get(Outer_G* outer_slg) {
@@ -4639,18 +4612,6 @@ PPCODE:
   u_pos_set(slr, "slr->pos_set", start_pos, length);
   slr->lexer_start_pos = slr->perl_pos;
   XSRETURN_YES;
-}
-
-void
-substring(outer_slr, start_pos, length)
-    Outer_R *outer_slr;
-    int start_pos;
-    int length;
-PPCODE:
-{
-  Scanless_R *slr = slr_inner_get(outer_slr);
-  SV* literal_sv = u_substring(slr, "slr->substring()", start_pos, length);
-  XPUSHs (sv_2mortal (literal_sv));
 }
 
  # An internal function for converting an Earley set span to
