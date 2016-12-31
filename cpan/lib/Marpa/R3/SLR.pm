@@ -1338,7 +1338,9 @@ sub Marpa::R3::Scanless::R::ambiguity_metric {
     my ($slr) = @_;
     $slr->ordering_get();
 
-    my ($metric) = $slr->exec( <<'END__OF_LUA' );
+    my ($metric) = $slr->call_by_tag(
+    (__FILE__ . ':' . __LINE__),
+    <<'END__OF_LUA', '>*' );
     local recce = ...
     local order = recce.lmw_o
     if not order then return 0 end
@@ -2209,7 +2211,9 @@ END_OF_LUA
         );
         CHOICE: for ( my $choice_ix = 0;; $choice_ix++ ) {
 
-                my ($and_node_id) = $slr->exec( <<'END_OF_LUA', $or_node_id, $choice_ix );
+                my ($and_node_id) = $slr->call_by_tag(
+    (__FILE__ . ':' . __LINE__),
+                <<'END_OF_LUA', 'ii>*', $or_node_id, $choice_ix );
                 recce, or_node_id, choice_ix = ...
                 return recce.lmw_o:_and_order_get(or_node_id+0, choice_ix+0)
 END_OF_LUA
