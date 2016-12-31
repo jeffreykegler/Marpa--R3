@@ -531,7 +531,6 @@ my $libmarpa_trace_event_handlers = {
         my ( $slr, $event ) = @_;
         my ( undef, undef, $lexeme_start_pos, $lexeme_end_pos, $g1_lexeme)
             = @{$event};
-        my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
         my $raw_token_value =
             $slr->literal( $lexeme_start_pos,
             $lexeme_end_pos - $lexeme_start_pos );
@@ -554,7 +553,6 @@ my $libmarpa_trace_event_handlers = {
         my ( undef, undef, $position, $g1_lexeme, $assertion_id)
             = @{$event};
         my ( $line, $column ) = $slr->line_column($position);
-        my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
         my $trace_file_handle =
             $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
         my $slg              = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
@@ -569,9 +567,8 @@ my $libmarpa_trace_event_handlers = {
         my ( undef, undef, $lexeme_start_pos, $lexeme_end_pos, $g1_lexeme,
             $lexeme_priority, $required_priority )
             = @{$event};
-        my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
         my $raw_token_value =
-            $thin_slr->substring( $lexeme_start_pos,
+            $slr->literal( $lexeme_start_pos,
             $lexeme_end_pos - $lexeme_start_pos );
         my $trace_file_handle =
             $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
@@ -591,9 +588,8 @@ my $libmarpa_trace_event_handlers = {
         my ( $slr, $event ) = @_;
         my ( undef, undef, $lexeme_start_pos, $lexeme_end_pos, $g1_lexeme ) =
             @{$event};
-        my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
         my $raw_token_value =
-            $thin_slr->substring( $lexeme_start_pos,
+            $slr->literal( $lexeme_start_pos,
             $lexeme_end_pos - $lexeme_start_pos );
         my $trace_file_handle =
             $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
@@ -612,9 +608,8 @@ my $libmarpa_trace_event_handlers = {
         my ( $slr, $event ) = @_;
         my ( undef, undef, $lexeme_start_pos, $lexeme_end_pos, $g1_lexeme ) =
             @{$event};
-        my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
         my $raw_token_value =
-            $thin_slr->substring( $lexeme_start_pos,
+            $slr->literal( $lexeme_start_pos,
             $lexeme_end_pos - $lexeme_start_pos );
         my $trace_file_handle =
             $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
@@ -1096,9 +1091,8 @@ sub Marpa::R3::Scanless::R::read_problem {
                 next EVENT
                   if $event_type ne q{'trace}
                   or $trace_event_type ne 'rejected lexeme';
-                my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
                 my $raw_token_value =
-                  $thin_slr->substring( $lexeme_start_pos,
+                  $slr->literal( $lexeme_start_pos,
                     $lexeme_end_pos - $lexeme_start_pos );
                 my $trace_file_handle =
                   $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
