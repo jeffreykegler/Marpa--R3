@@ -177,7 +177,9 @@ sub set_last_choice {
         my $slr       = $asf->[Marpa::R3::Internal::ASF::SLR];
         my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
         my $and_node_id = $and_nodes->[$choice];
-        my ($current_predecessor) = $slr->exec_sig(<<'END_OF_LUA',
+        my ($current_predecessor) = $slr->call_by_tag(
+        (__FILE__ . ':' . __LINE__),
+        <<'END_OF_LUA',
             recce, id = ...
             local current = recce.lmw_b:_and_node_predecessor(id)
             return current and current or -1
@@ -187,7 +189,9 @@ END_OF_LUA
             $choice++;
             $and_node_id = $and_nodes->[$choice];
             last AND_NODE if not defined $and_node_id;
-            my ($next_predecessor) = $slr->exec_sig(<<'END_OF_LUA',
+            my ($next_predecessor) = $slr->call_by_tag(
+        (__FILE__ . ':' . __LINE__),
+            <<'END_OF_LUA',
                 recce, id = ...
                 local next = recce.lmw_b:_and_node_predecessor(id)
                 return next and next or -1
@@ -225,7 +229,9 @@ sub nook_has_semantic_cause {
     my $or_node   = $nook->[Marpa::R3::Internal::Nook::OR_NODE];
     my $slr       = $asf->[Marpa::R3::Internal::ASF::SLR];
 
-    my ($result) = $slr->exec_sig(<<'END_OF_LUA', 'i', $or_node);
+    my ($result) = $slr->call_by_tag(
+        (__FILE__ . ':' . __LINE__),
+    <<'END_OF_LUA', 'i', $or_node);
     local recce, or_node = ...
     local irl_id = recce.lmw_b:_or_node_irl(or_node)
     local predot_position = recce.lmw_b:_or_node_position(or_node) - 1
@@ -242,7 +248,9 @@ sub Marpa::R3::ASF::peak {
     my $or_nodes = $asf->[Marpa::R3::Internal::ASF::OR_NODES];
     my $slr      = $asf->[Marpa::R3::Internal::ASF::SLR];
 
-    my ($augment_or_node_id) = $slr->exec_sig(<<'END_OF_LUA', '');
+    my ($augment_or_node_id) = $slr->call_by_tag(
+        (__FILE__ . ':' . __LINE__),
+    <<'END_OF_LUA', '');
         local recce = ...
         local bocage = recce.lmw_b
         if not bocage then error('No Bocage') end
@@ -251,7 +259,8 @@ END_OF_LUA
 
     my $augment_and_node_id = $or_nodes->[$augment_or_node_id]->[0];
     my ($start_or_node_id)
-        = $slr->exec_sig(
+        = $slr->call_by_tag(
+        (__FILE__ . ':' . __LINE__),
             'local recce, id = ...; return recce.lmw_b:_and_node_cause(id)',
             'i',
             $augment_and_node_id
@@ -483,7 +492,9 @@ sub nid_sort_ix {
     my $slr       = $asf->[Marpa::R3::Internal::ASF::SLR];
 
     if ( $nid >= 0 ) {
-        my ($result) = $slr->exec_sig(<<'END_OF_LUA', 'i', $nid);
+        my ($result) = $slr->call_by_tag(
+        (__FILE__ . ':' . __LINE__),
+        <<'END_OF_LUA', 'i', $nid);
         recce, nid = ...
         local irl_id = recce.lmw_b:_or_node_irl(nid)
         return recce.slg.lmw_g1g:_source_xrl(irl_id)
@@ -493,7 +504,9 @@ END_OF_LUA
 
     my $and_node_id  = nid_to_and_node($nid);
 
-    my ($result) = $slr->exec_sig(<<'END_OF_LUA', 'i', $and_node_id);
+    my ($result) = $slr->call_by_tag(
+        (__FILE__ . ':' . __LINE__),
+    <<'END_OF_LUA', 'i', $and_node_id);
     recce, and_node_id = ...
     local token_nsy_id = recce.lmw_b:_and_node_symbol(and_node_id)
     local token_id = recce.slg.lmw_g1g:_source_xsy(token_nsy_id)
@@ -515,7 +528,9 @@ sub nid_rule_id {
     return if $nid < 0;
     my $slr       = $asf->[Marpa::R3::Internal::ASF::SLR];
 
-    my ($xrl_id) = $slr->exec_sig(<<'END_OF_LUA', 'i', $nid);
+    my ($xrl_id) = $slr->call_by_tag(
+        (__FILE__ . ':' . __LINE__),
+    <<'END_OF_LUA', 'i', $nid);
     local recce, nid = ...
     local irl_id = recce.lmw_b:_or_node_irl(nid)
     local xrl_id = recce.slg.lmw_g1g:_source_xrl(irl_id)
@@ -528,7 +543,9 @@ sub or_node_es_span {
     my ( $asf, $choicepoint ) = @_;
     my $slr        = $asf->[Marpa::R3::Internal::ASF::SLR];
 
-    my ($origin_es, $current_es) = $slr->exec_sig(<<'END_OF_LUA', 'i', $choicepoint);
+    my ($origin_es, $current_es) = $slr->call_by_tag(
+        (__FILE__ . ':' . __LINE__),
+    <<'END_OF_LUA', 'i', $choicepoint);
     local recce, choicepoint = ...
     local origin_es = recce.lmw_b:_or_node_origin(choicepoint)
     local current_es = recce.lmw_b:_or_node_set(choicepoint)
@@ -542,7 +559,9 @@ sub token_es_span {
     my ( $asf, $and_node_id ) = @_;
     my $slr       = $asf->[Marpa::R3::Internal::ASF::SLR];
 
-    my ($predecessor_id, $parent_or_node_id) = $slr->exec_sig(<<'END_OF_LUA',
+    my ($predecessor_id, $parent_or_node_id) = $slr->call_by_tag(
+        (__FILE__ . ':' . __LINE__),
+    <<'END_OF_LUA',
         recce, and_node_id = ...
         local b = recce.lmw_b
         return
@@ -553,7 +572,9 @@ END_OF_LUA
 
     if ( defined $predecessor_id ) {
 
-        my ($origin_es, $current_es) = $slr->exec_sig(<<'END_OF_LUA',
+        my ($origin_es, $current_es) = $slr->call_by_tag(
+        (__FILE__ . ':' . __LINE__),
+        <<'END_OF_LUA',
             recce, predecessor_id, parent_or_node_id = ...
             local b = recce.lmw_b
             return
@@ -604,7 +625,9 @@ sub nid_token_id {
     my $and_node_id  = nid_to_and_node($nid);
     my $slr          = $asf->[Marpa::R3::Internal::ASF::SLR];
 
-    my ($token_id) = $slr->exec_sig(<<'END_OF_LUA',
+    my ($token_id) = $slr->call_by_tag(
+        (__FILE__ . ':' . __LINE__),
+    <<'END_OF_LUA',
         recce, and_node_id = ...
         local token_nsy_id = recce.lmw_b:_and_node_symbol(and_node_id)
         local token_id = recce.slg.lmw_g1g:_source_xsy(token_nsy_id)
@@ -623,7 +646,9 @@ sub nid_symbol_id {
 
     # Not a token, so return the LHS of the rule
     my $slr       = $asf->[Marpa::R3::Internal::ASF::SLR];
-    my ($lhs_id) = $slr->exec_sig(<<'END_OF_LUA',
+    my ($lhs_id) = $slr->call_by_tag(
+        (__FILE__ . ':' . __LINE__),
+    <<'END_OF_LUA',
         recce, nid = ...
         local irl_id = recce.lmw_b:_or_node_irl(nid)
         local g1g = recce.slg.lmw_g1g
@@ -788,7 +813,8 @@ sub factoring_finish {
             if ( !$work_nook->[Marpa::R3::Internal::Nook::CAUSE_IS_EXPANDED] )
             {
                 if ( not nook_has_semantic_cause( $asf, $work_nook ) ) {
-                    ($child_or_node) = $slr->exec_sig(
+                    ($child_or_node) = $slr->call_by_tag(
+        (__FILE__ . ':' . __LINE__),
                         'recce, work_and_node_id = ...; return recce.lmw_b:_and_node_cause(work_and_node_id)',
                         'i',
                         $work_and_node_id);
@@ -800,7 +826,8 @@ sub factoring_finish {
             if ( !$work_nook
                 ->[Marpa::R3::Internal::Nook::PREDECESSOR_IS_EXPANDED] )
             {
-                ($child_or_node) = $slr->exec_sig(
+                ($child_or_node) = $slr->call_by_tag(
+        (__FILE__ . ':' . __LINE__),
                     'recce, work_and_node_id = ...; return recce.lmw_b:_and_node_predecessor(work_and_node_id)',
                     'i',
                     $work_and_node_id);
@@ -848,7 +875,8 @@ sub and_nodes_to_cause_nids {
     my $slr    = $asf->[Marpa::R3::Internal::ASF::SLR];
     my %causes = ();
     for my $and_node_id (@and_node_ids) {
-        my ($cause_nid) = $slr->exec_sig(
+        my ($cause_nid) = $slr->call_by_tag(
+        (__FILE__ . ':' . __LINE__),
             'local recce, and_node_id = ...; return recce.lmw_b:_and_node_cause(and_node_id)',
             'i',
             $and_node_id);
