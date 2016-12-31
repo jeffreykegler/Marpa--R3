@@ -45,8 +45,8 @@ my $lua_load_string = <<'END_OF_LOAD_STRING';
              */
             const char *error_string = marpa_lua_tostring (L, -1);
             SV *temp_sv = sv_newmortal ();
-            sv_setpvf (temp_sv, "Marpa::R3::Lua error in luaL_loadstring: %s",
-                error_string);
+            sv_setpvf (temp_sv, "Marpa::R3::Lua error in luaL_loadstring for %s: %s",
+                error_tag, error_string);
             marpa_lua_settop (L, base_of_stack);
             croak ("%s", SvPV_nolen (temp_sv));
         }
@@ -305,6 +305,7 @@ exec( outer_slr, codestr, ... )
    char* codestr;
 PPCODE:
 {
+    const char * const error_tag = "obsolete exec";
     int object_stack_ix;
     const int is_method = 1;
     lua_State *const L = outer_slr->L;
@@ -329,6 +330,7 @@ call_by_name( outer_slr, name, signature, ... )
    char *signature;
 PPCODE:
 {
+    const char * const error_tag = name;
     int object_stack_ix;
     const int first_optional_arg = 3;
     const int is_method = 1;
@@ -362,6 +364,7 @@ call_by_tag( outer_slr, tag, codestr, signature, ... )
    const char *signature;
 PPCODE:
 {
+    const char * const error_tag = tag;
     int object_stack_ix;
     const int first_optional_arg = 4;
     const int is_method = 1;
@@ -409,6 +412,7 @@ raw_exec( lua_wrapper, codestr, ... )
    char* codestr;
 PPCODE:
 {
+    const char * const error_tag = "Marpa::R3::Lua raw_exec()";
     /* object_stack_ix is actually never used */
     const int object_stack_ix = -1;
     const int is_method = 0;
@@ -429,6 +433,7 @@ exec( lua_wrapper, codestr, ... )
    char* codestr;
 PPCODE:
 {
+    const char * const error_tag = "Marpa::R3::Lua exec()";
     /* object_stack_ix is actually never used */
     const int object_stack_ix = -1;
     const int is_method = 0;

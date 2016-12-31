@@ -418,7 +418,9 @@ sub Marpa::R3::ASF::new {
 
     $slr->ordering_get();
 
-    my ($is_null) = $slr->exec( <<'END_OF_LUA' ) ;
+    my ($is_null) = $slr->call_by_tag(
+    (__FILE__ . ':' . __LINE__),
+    <<'END_OF_LUA', '>*' ) ;
     recce = ...
     local order = recce.lmw_o;
     if not order then
@@ -436,7 +438,9 @@ END_OF_LUA
     my $or_nodes = $asf->[Marpa::R3::Internal::ASF::OR_NODES] = [];
     OR_NODE: for ( my $or_node_id = 0;; $or_node_id++ ) {
 
-        my ($and_node_ids) = $slr->exec( <<'END_OF_LUA', $or_node_id );
+        my ($and_node_ids) = $slr->call_by_tag(
+    (__FILE__ . ':' . __LINE__),
+        <<'END_OF_LUA', 'i>*', $or_node_id );
         -- assumes throw mode
         local recce, raw_or_node_id = ...
         local or_node_id = raw_or_node_id + 0
