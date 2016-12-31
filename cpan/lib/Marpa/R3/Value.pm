@@ -227,7 +227,9 @@ sub Marpa::R3::Context::bail { ## no critic (Subroutines::RequireArgUnpacking)
 
 sub Marpa::R3::Context::g1_range {
     my $slr = $Marpa::R3::Context::slr;
-    my ($start, $end) = $slr->exec( <<'END_OF_LUA' );
+    my ($start, $end) = $slr->call_by_tag(
+    (__FILE__ . ':' . __LINE__),
+    <<'END_OF_LUA', '>*' );
 recce = ...
 return recce.this_step.start_es_id, recce.this_step.es_id
 END_OF_LUA
@@ -236,7 +238,9 @@ END_OF_LUA
 
 sub Marpa::R3::Context::g1_span {
     my $slr = $Marpa::R3::Context::slr;
-    my ($start, $length) = $slr->exec( <<'END_OF_LUA' );
+    my ($start, $length) = $slr->call_by_tag(
+    (__FILE__ . ':' . __LINE__),
+    <<'END_OF_LUA', '>*' );
 recce = ...
 local start = recce.this_step.start_es_id + 0
 local length = (start - recce.this_step.es_id) + 1
@@ -609,12 +613,16 @@ END_OF_LUA
     ENSURE_TREE: {
         # No tree, therefore not initialized
 
-        my ($lua_tree) = $slr->exec( 'recce=...; return recce.lmw_t' );
+        my ($lua_tree) = $slr->call_by_tag(
+    (__FILE__ . ':' . __LINE__),
+        'recce=...; return recce.lmw_t', '>*' );
         last ENSURE_TREE if $lua_tree;
 
         my $have_order = $slr->ordering_get();
         return if not $have_order;
-        $slr->exec( 'recce=...; recce.lmw_t = kollos.tree_new(recce.lmw_o)' );
+        $slr->call_by_tag(
+    (__FILE__ . ':' . __LINE__),
+        'recce=...; recce.lmw_t = kollos.tree_new(recce.lmw_o)', '' );
 
     }
 
