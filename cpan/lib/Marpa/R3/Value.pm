@@ -1625,7 +1625,9 @@ sub trace_token_evaluation {
         $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
 
     my ($nook_ix, $and_node_id)
-        = $slr->exec( << 'END_OF_LUA' );
+        = $slr->call_by_tag(
+    (__FILE__ . ':' . __LINE__),
+        << 'END_OF_LUA', '>*' );
     recce = ...
     local nook_ix = recce.lmw_v:_nook()
     local o = recce.lmw_o
@@ -1665,7 +1667,9 @@ sub trace_stack_1 {
         $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
 
     my $argc       = scalar @{$args};
-    my ($nook_ix, $and_node_id) = $slr->exec( <<'END_OF_LUA' );
+    my ($nook_ix, $and_node_id) = $slr->call_by_tag(
+    (__FILE__ . ':' . __LINE__),
+    <<'END_OF_LUA', '>*' );
     -- in trace_stack_1
     recce = ...
     local nook_ix = recce.lmw_v:_nook()

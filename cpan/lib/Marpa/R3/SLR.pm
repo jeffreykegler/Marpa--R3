@@ -1829,17 +1829,9 @@ sub Marpa::R3::Scanless::R::lexeme_priority_set {
     return $thin_slr->lexeme_priority_set( $lexeme_id, $new_priority );
 }
 
-# Lua method(s), not documented at this stage of their development
+# Internal methods, not to be documented
 
-# Sun Dec  4 18:03:15 PST 2016 -- at this point, I don't think
-# I ever will document these -- I'll keep them internal.
-
-sub Marpa::R3::Scanless::R::exec {
-    my ( $slr, $codestr, @args ) = @_;
-    my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
-    return $thin_slr->exec($codestr, @args);
-}
-
+# not to be documented
 sub Marpa::R3::Scanless::R::call_by_name {
     my ( $slr, $name, $signature, @args ) = @_;
     my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
@@ -1847,14 +1839,13 @@ sub Marpa::R3::Scanless::R::call_by_name {
     return @results;
 }
 
+# not to be documented
 sub Marpa::R3::Scanless::R::call_by_tag {
     my ( $slr, $tag, $codestr, $signature, @args ) = @_;
     my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
     my @results = $thin_slr->call_by_tag($tag, $codestr, $signature, @args);
     return @results;
 }
-
-# Internal methods, not to be documented
 
 # not to be documented
 sub Marpa::R3::Scanless::R::earley_set_size {
@@ -1870,6 +1861,7 @@ END_OF_LUA
     return $size;
 }
 
+# not to be documented
 sub Marpa::R3::Scanless::R::show_earley_sets {
     my ($slr)                = @_;
 
@@ -1892,6 +1884,7 @@ END_OF_LUA
     return $text;
 }
 
+# not to be documented
 sub Marpa::R3::Scanless::R::show_earley_set {
     my ( $slr, $traced_set_id ) = @_;
     my $slg     = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
@@ -2132,19 +2125,21 @@ sub Marpa::R3::Scanless::R::show_earley_set {
     return join "\n", @sorted_data, q{};
 }
 
+# not to be documented
 sub Marpa::R3::Scanless::R::show_or_nodes {
     my ( $slr ) = @_;
     my ($result) = $slr->call_by_name('show_or_nodes', '');
     return $result;
 }
 
+# not to be documented
 sub Marpa::R3::Scanless::R::show_and_nodes {
     my ( $slr ) = @_;
     my ($result) = $slr->call_by_name('show_and_nodes', '');
     return $result;
 }
 
-
+# not to be documented
 sub Marpa::R3::Scanless::R::show_tree {
     my ( $slr, $verbose ) = @_;
     my $text = q{};
@@ -2156,6 +2151,7 @@ sub Marpa::R3::Scanless::R::show_tree {
     return $text;
 }
 
+# not to be documented
 sub Marpa::R3::Scanless::R::show_nook {
     my ( $slr, $nook_id, $verbose ) = @_;
 
@@ -2232,12 +2228,14 @@ END_OF_LUA
     return $text;
 }
 
+# not to be documented
 sub Marpa::R3::Scanless::R::show_bocage {
     my ($slr)     = @_;
     my ($result) = $slr->call_by_name('show_bocage', '');
     return $result;
 }
 
+# not to be documented
 sub Marpa::R3::Scanless::R::verbose_or_node {
     my ( $slr, $or_node_id ) = @_;
     my ($text, $irl_id, $position)
