@@ -77,24 +77,24 @@ END_OF_SOURCE
 
 my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
 
-do_recce_test( ( join q{:}, __FILE__, __LINE__ ), 'return 42', '', [], ['42'] );
+do_recce_test( ( __FILE__ . ':' . __LINE__ ), 'return 42', '', [], ['42'] );
 do_recce_test(
-    ( join q{:}, __FILE__, __LINE__ ),
+    ( __FILE__ . ':' . __LINE__ ),
     'function taxicurry(fact2) return 9^3 + fact2 end',
     '', [], []
 );
 do_recce_test(
-    ( join q{:}, __FILE__, __LINE__ ),
+    ( __FILE__ . ':' . __LINE__ ),
     'return taxicurry(10^3)',
     '', [], [1729]
 );
 do_recce_test(
-    ( join q{:}, __FILE__, __LINE__ ),
+    ( __FILE__ . ':' . __LINE__ ),
     "local recce, x = ...; x[0] = 42; return x",
     'S', [ [] ], [ [42] ]
 );
 do_recce_test(
-    ( join q{:}, __FILE__, __LINE__ ),
+    ( __FILE__ . ':' . __LINE__ ),
     "local recce, x = ...; local tmp = x[1]; x[1] = x[0]; x[0] = tmp; return x",
     'S',
     [ [ 42, 7 ] ],
@@ -102,7 +102,7 @@ do_recce_test(
     "Swap array elements #1"
 );
 do_recce_test(
-    ( join q{:}, __FILE__, __LINE__ ),
+    ( __FILE__ . ':' . __LINE__ ),
     "local recce, x = ...; x[1], x[0] = x[0], x[1]; return x",
     'S',
     [ [ 42, 7 ] ],
@@ -110,7 +110,7 @@ do_recce_test(
     "Swap array elements #2"
 );
 do_recce_test(
-    ( join q{:}, __FILE__, __LINE__ ),
+    ( __FILE__ . ':' . __LINE__ ),
     "local recce, x = ...; marpa.sv.fill(x, 1); return x",
     'S',
     [ [ 1, 2, 3, 4 ] ],
@@ -118,7 +118,7 @@ do_recce_test(
     "Fill method #1"
 );
 do_recce_test(
-    ( join q{:}, __FILE__, __LINE__ ),
+    ( __FILE__ . ':' . __LINE__ ),
     "local recce, x = ...; marpa.sv.fill(x, 4); return x",
     'S',
     [ [ 1, 2, 3, 4 ] ],
@@ -126,7 +126,7 @@ do_recce_test(
     "Fill method #2"
 );
 do_recce_test(
-    ( join q{:}, __FILE__, __LINE__ ),
+    ( __FILE__ . ':' . __LINE__ ),
     "local recce, x = ...; marpa.sv.fill(x, -1); return x",
     'S', [ [ 1, 2, 3, 4 ] ],
     [ [] ], "Fill method #2"

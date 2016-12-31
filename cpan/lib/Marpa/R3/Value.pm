@@ -387,7 +387,7 @@ sub Marpa::R3::Scanless::R::ordering_get {
         $slr->[Marpa::R3::Internal::Scanless::R::RANKING_METHOD];
 
     my ($has_parse) = $slr->call_by_tag(
-    (join q{:}, __FILE__, __LINE__),
+        (__FILE__ . ':' .  __LINE__),
     <<'END_OF_LUA',
     -- inside $slr->ordering_get()
     local recce, end_of_parse, ranking_method = ...
@@ -589,7 +589,7 @@ sub Marpa::R3::Scanless::R::value {
     }
 
     $slr->call_by_tag(
-    (join q{:}, __FILE__, __LINE__),
+        (__FILE__ . ':' .  __LINE__),
     <<'END_OF_LUA', '');
     recce = ...
     local g1r = recce.lmw_g1r
@@ -644,7 +644,7 @@ END_OF_LUA
     local $Marpa::R3::Context::slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
 
     $slr->call_by_tag(
-    (join q{:}, __FILE__, __LINE__),
+        (__FILE__ . ':' .  __LINE__),
     << 'END_OF_LUA', 'i', ($trace_values ? 1 : 0 ));
     recce, flag = ...
     return recce.lmw_v:_trace(flag)
@@ -1692,7 +1692,7 @@ sub trace_op {
 
     my ($nook_ix, $or_node_id, $choice, $and_node_id, $trace_irl_id, $or_node_position)
         = $slr->call_by_tag(
-        (join q{:}, __FILE__, __LINE__),
+        (__FILE__ . ':' .  __LINE__),
         <<'END_OF_LUA' , '');
     -- in trace_op()
     recce = ...
