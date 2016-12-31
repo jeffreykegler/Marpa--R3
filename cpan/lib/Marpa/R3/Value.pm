@@ -627,7 +627,9 @@ END_OF_LUA
     }
 
     my $max_parses  = $slr->[Marpa::R3::Internal::Scanless::R::MAX_PARSES];
-    my ($result) = $slr->exec( << 'END_OF_LUA', ($max_parses // 0));
+    my ($result) = $slr->call_by_tag(
+    (__FILE__ . ':' . __LINE__),
+    << 'END_OF_LUA', 'i>*', ($max_parses // 0));
         recce, raw_max_parses = ...
         local max_parses = math.tointeger(raw_max_parses + 0)
         local parse_count = recce.lmw_t:parse_count()
@@ -1443,11 +1445,11 @@ qq{    Semantics were specified as "$original_semantics"\n}
 
         if ($trace_values) {
           EVENT: for ( my $event_ix = 0 ; ; $event_ix++ ) {
-                my @event = $slr->exec( <<'END_OF_LUA', $event_ix );
-local recce, event_ix_sv = ...;
--- io.stderr:write(inspect(event_ix_sv), [[\n]])
-local event_ix = event_ix_sv+1;
-local entry = recce.trace_values_queue[event_ix]
+                my @event = $slr->call_by_tag(
+    (__FILE__ . ':' . __LINE__),
+                <<'END_OF_LUA', 'i>*', $event_ix );
+local recce, event_ix = ...;
+local entry = recce.trace_values_queue[event_ix+1]
 if entry == nil then return end
 return table.unpack(entry)
 END_OF_LUA
@@ -1463,8 +1465,6 @@ END_OF_LUA
                         $token_value );
                     next EVENT;
                 } ## end if ( $event_type eq 'MARPA_STEP_TOKEN' )
-
-# $slr->exec( "local recce = ...; io.stderr:write('Value.pm: ', inspect(recce))");
 
                 say {$trace_file_handle} join q{ },
                   'value event:',
