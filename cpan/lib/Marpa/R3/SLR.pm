@@ -126,8 +126,8 @@ sub Marpa::R3::Scanless::R::g1_location_to_span {
 # This is the one users will be most interested in.
 sub Marpa::R3::Scanless::R::literal {
     my ( $slr, $start_pos, $length ) = @_;
-    my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
-    return $thin_slr->substring( $start_pos, $length );
+    my $p_input = $slr->[Marpa::R3::Internal::Scanless::R::P_INPUT_STRING];
+    return substr ${$p_input}, $start_pos, $length;
 } ## end sub Marpa::R3::Scanless::R::literal
 
 sub Marpa::R3::Internal::Scanless::meta_recce {
