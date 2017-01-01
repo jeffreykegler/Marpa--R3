@@ -319,8 +319,6 @@ xlua_unref(lua_State* L)
 static SV*
 recursive_coerce_to_sv (lua_State * L, int visited_ix, int idx, char sig);
 static SV*
-coerce_to_hv (lua_State * L, int visited_ix, int table_ix);
-static SV*
 coerce_to_av (lua_State * L, int visited_ix, int table_ix, char signature);
 static SV*
 coerce_to_pairs (lua_State * L, int visited_ix, int table_ix);
@@ -382,6 +380,7 @@ recursive_coerce_to_sv (lua_State * L, int visited_ix, int idx, char signature)
     case LUA_TTABLE:
         {
             switch (signature) {
+            default:
             case '0':
             case '1':
               result = coerce_to_av(L, visited_ix, idx, signature);
@@ -389,8 +388,6 @@ recursive_coerce_to_sv (lua_State * L, int visited_ix, int idx, char signature)
             case '2':
               result = coerce_to_pairs(L, visited_ix, idx);
               break;
-            default:
-              result = coerce_to_hv(L, visited_ix, idx);
             }
         }
         break;
@@ -418,94 +415,6 @@ recursive_coerce_to_sv (lua_State * L, int visited_ix, int idx, char signature)
         break;
     }
     /* warn("%s %d\n", __FILE__, __LINE__); */
-    return result;
-}
-
-/* Coerce a Lua table to an HV.  Cycles are checked for
- * and cut off with a string marking the cutoff point.
- * HV keys must be strings, while Lua keys need not be,
- * so there is an issue with duplicates.  Duplicates are
- * indicated by "[N]key", where N is an integer and "key"
- * is the original key string.  N is per-hash, not per-key,
- * because checking per-key goes quadratic in worst cases,
- * while per-hash involves at most 2 hash attempts for every
- * uniq ID N.
- */
-static SV*
-coerce_to_hv (lua_State * L, int visited_ix, int table_ix)
-{
-    dTHX;
-    SV *result;
-    HV *hv;
-    int visited_type;
-    int tostring_ix;
-    lua_Integer uniq_id = 0;
-    const int base_of_stack = marpa_lua_gettop(L);
-
-    /* We call this recursively, so we need to make sure we have enough stack */
-    marpa_luaL_checkstack(L, 20, "coerce_to_hv");
-    /* Lua stack: [] */
-    marpa_lua_pushvalue(L, table_ix);
-    /* Lua stack: [table_ix] */
-    visited_type = marpa_lua_gettable(L, visited_ix);
-    /* Lua stack: [] */
-    if (visited_type == LUA_TTABLE) {
-        result = newSVpvs ("[cycle in lua table]");
-        /* Lua stack: [] */
-        /* No need to reset stack yet */
-        return result;
-    }
-    marpa_lua_pushvalue(L, table_ix);
-    marpa_lua_pushvalue(L, table_ix);
-    marpa_lua_settable(L, visited_ix);
-
-    hv = newHV();
-    /* mortalize it, so it is garbage collected if we abend */
-    result = sv_2mortal (newRV_noinc ((SV *) hv));
-
-    marpa_lua_getglobal(L, "tostring");
-    tostring_ix = marpa_lua_gettop(L);
-    /* traverse the table */
-    marpa_lua_pushnil(L);
-    while (marpa_lua_next(L, table_ix) != 0) {
-        const char *key_base;
-        const char *keystr;
-        size_t keylen;
-        const int value_ix = marpa_lua_gettop(L);
-        const int key = value_ix - 1;
-        marpa_lua_pushvalue(L, tostring_ix);
-        marpa_lua_pushvalue(L, key);
-        marpa_lua_call(L, 1, 1);
-        key_base = keystr = marpa_lua_tolstring(L, -1, &keylen);
-        if (!key_base) {
-           marpa_lua_settop(L, key);
-           croak("lua constant could not be converted to key of hv");
-        }
-        while (1) {
-            SV** ownership_taken;
-            SV *entry_value;
-            const int exists = hv_exists(hv, keystr, (I32)keylen);
-            if (exists) {
-                keystr = marpa_lua_pushfstring(L, "[%I]%s", uniq_id, key_base);
-                marpa_lua_tolstring(L, -1, &keylen);
-                uniq_id++;
-                continue;
-            }
-            entry_value = recursive_coerce_to_sv(L, visited_ix, value_ix, '-');
-            ownership_taken = hv_store(hv, keystr, (I32)keylen, entry_value, 0);
-            if (!ownership_taken) {
-              SvREFCNT_dec (entry_value);
-            }
-            break;
-        }
-        marpa_lua_settop(L, key);
-    }
-
-    /* Demortalize the result, now that we know we will not
-     * abend.
-     */
-    SvREFCNT_inc_simple_void_NN (result);
-    marpa_lua_settop(L, base_of_stack);
     return result;
 }
 
