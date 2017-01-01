@@ -1160,6 +1160,49 @@ with "trace" and "do not return" being special cases.
 
 ```
 
+### Tree export operations
+
+The "tree export operations" are performed when a tree is transformed
+from Kollos form to a form
+suitable for its parent layer.
+Currently the only parent layer is Marpa::R3.
+
+The tree export operations
+are defined as light userdata referring to a dedicated global
+constant, which guarantees they will never collide with user data.
+The global constants are defined only for the purpose of creating
+a unique address --
+their contents are never used.
+
+These operations are always the first element of a sequence.
+They tell
+Kollos how to transform the rest of the sequence.
+
+The "asis" operation simply passes on the 2nd element of the sequence
+as an SV.
+It probably will not be needed much
+
+```
+    -- miranda: section+ C global constant variables
+    static int tree_op_asis;
+    -- miranda: section+ create tree export operations
+    marpa_lua_pushlightuserdata(L, (void *)&tree_op_asis);
+    marpa_lua_setfield(L, kollos_table_stack_ix, "tree_op_asis");
+
+```
+
+The "bless" operation passes on the 2nd element of the sequence,
+blessed using the 3rd element.
+The 3rd element must be a string.
+
+```
+    -- miranda: section+ C global constant variables
+    static int tree_op_bless;
+    -- miranda: section+ create tree export operations
+    marpa_lua_pushlightuserdata(L, (void *)&tree_op_bless);
+    marpa_lua_setfield(L, kollos_table_stack_ix, "tree_op_bless");
+
+```
 
 ### VM-related utilities for use in the Perl code
 
@@ -2589,6 +2632,9 @@ Set "strict" globals, using code taken from strict.lua.
     -- miranda: section kollos_c
     -- miranda: language c
     -- miranda: insert preliminaries to the c library code
+
+    -- miranda: insert C global constant variables
+
     -- miranda: insert private error code declarations
     -- miranda: insert define error codes
     -- miranda: insert private event code declarations
@@ -4116,6 +4162,8 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
 
     /* [ kollos ] */
     -- miranda: insert create sandbox table
+
+    -- miranda: insert create tree export operations
 
       marpa_lua_settop(L, kollos_table_stack_ix);
       /* [ kollos ] */
