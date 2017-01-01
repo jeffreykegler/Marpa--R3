@@ -327,8 +327,8 @@ coerce_to_pairs (lua_State * L, int visited_ix, int table_ix);
 
 /* Coerce a Lua value to a Perl SV, if necessary one that
  * is simply a string with an error message.
- * The call transfers ownership of one of the SV's reference
- * counts to the caller.
+ * The caller gets ownership of one of the SV's reference
+ * counts.
  * The Lua stack is left as is.
  */
 static SV*
