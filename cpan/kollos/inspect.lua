@@ -1,4 +1,3 @@
-local do_load, error = load([==========[
 local inspect ={
   _VERSION = 'inspect.lua 3.1.0',
   _URL     = 'http://github.com/kikito/inspect.lua',
@@ -340,13 +339,3 @@ setmetatable(inspect, { __call = function(_, ...) return inspect.inspect(...) en
 
 return inspect
 
-]==========]);
-if do_load then
-    inspect = do_load()
-    if inspect then return "OK" end
-    return "Load of inspect failed"
-else
-    return "Compile of inspect failed"
-end
-
--- vim: set expandtab shiftwidth=4:
