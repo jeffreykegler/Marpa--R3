@@ -115,6 +115,8 @@ sub constants {
         { allow_variables => undef } ) . "\n";
     $constants .= sprintf( "MIRANDA = %s\n",
         File::Spec->catfile( File::Spec->updir(), qw{kollos miranda} ) );
+    $constants .= sprintf( "INSPECT_LUA = %s\n",
+        File::Spec->catfile( File::Spec->updir(), qw{kollos inspect.lua} ) );
 
     $constants .= sprintf( "MY_CCFLAGS = %s\n", $my_ccflags );
 
@@ -150,7 +152,8 @@ sub postamble {
     my @postamble_pieces = (".NOTPARALLEL:\n");
 
     push @postamble_pieces, <<'END_OF_POSTAMBLE_PIECE';
-R3.c: marpa_slifop.h marpa_xs.h auto.xs exec_lua.xs ../kollos/kollos.h
+R3.c: marpa_slifop.h marpa_xs.h auto.xs exec_lua.xs \
+      ../kollos/kollos.h inspect.c
 
 auto.xs: gen_auto_xs.pl
 	$(PERLRUN) gen_auto_xs.pl $@
@@ -163,6 +166,9 @@ marpa_slifop.h: create_ops.pl
 
 glue.lua: glue.lua.md
 	LUA_PATH=$(LUA_PATH) $(LUA_INTERP) $(MIRANDA) glue.lua.md main=glue.lua
+
+inspect.c: $(INSPECT_LUA)
+	LUA_PATH=$(LUA_PATH) $(LUA_INTERP) string2h.lua inspect < $? > $@
 
 END_OF_POSTAMBLE_PIECE
 

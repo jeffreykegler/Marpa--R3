@@ -144,9 +144,6 @@ kollos.c: error_table.md event_table.md step_table.md kollos.lua.md \
 kollos.h: kollos.lua.md
 	$(LUA_INTERP) miranda kollos.lua.md kollos_h=kollos.h
 
-inspect.c: inspect.lua
-	$(LUA_INTERP) string2h.lua inspect < $? > $@
-
 };
 
     if ( $^O eq 'MSWin32' ) {

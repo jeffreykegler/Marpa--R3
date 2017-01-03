@@ -61,10 +61,8 @@ local header = [[
  */
 ]]
 
-local trailer = "/* vim: set expandtab shiftwidth=4: */"
-
 io.write(header)
-io.write(string.format("char %s_string[] =\n", string_name))
+io.write(string.format("static char %s_string[] =\n", string_name))
 for line in io.input():lines("L") do
     local line_out = line:gsub('[%c%"\\]',
         function (str)
@@ -77,7 +75,6 @@ for line in io.input():lines("L") do
     )
     io.write(string.format('  "%s"\n', line_out))
 end
-io.write("  ;\n\n")
-io.write(trailer)
+io.write("  ;\n")
 
 -- vim: expandtab shiftwidth=4:
