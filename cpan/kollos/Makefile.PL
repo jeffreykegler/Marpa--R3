@@ -65,7 +65,7 @@ elsif ( $Config{'ccname'} eq 'cl' ) {
 my $my_ccflags = join q{ }, @my_ccflags;
 
 WriteMakefile(
-    INC     => '-I../lua -I../engine/read_only',
+    INC     => '-I. -I../lua -I../engine/read_only',
     NAME    => 'Marpa::R3',
     VERSION => $STRING_VERSION,
     SKIP   => [qw(test test_dynamic dynamic dynamic_lib dlsyms)],
@@ -136,12 +136,16 @@ event_table.md: gen_event_table.lua
 step_table.md: gen_step_table.lua
 	$(LUA_INTERP) gen_step_table.lua $(STEP_TABLE) > $@
 
-kollos.c: error_table.md event_table.md step_table.md kollos.lua.md kollos.h
+kollos.c: error_table.md event_table.md step_table.md kollos.lua.md \
+	  kollos.h inspect.h
 	$(LUA_INTERP) miranda error_table.md event_table.md step_table.md \
 	  kollos.lua.md kollos_c=kollos.c
 
 kollos.h: kollos.lua.md
 	$(LUA_INTERP) miranda kollos.lua.md kollos_h=kollos.h
+
+inspect.c: inspect.lua
+	$(LUA_INTERP) string2h.lua inspect < $? > $@
 
 };
 

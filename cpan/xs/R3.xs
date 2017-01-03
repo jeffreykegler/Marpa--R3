@@ -3063,6 +3063,8 @@ dummyup_recce(
     marpa_lua_settop (L, base_of_stack);
 }
 
+#include "inspect.c"
+
 MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin
 
 PROTOTYPES: DISABLE

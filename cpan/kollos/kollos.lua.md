@@ -4238,6 +4238,7 @@ Not Lua-callable, but leaves the stack as before.
      */
 
     #include "marpa.h"
+    #include "inspect.h"
     #include "kollos.h"
 
     #undef UNUSED
