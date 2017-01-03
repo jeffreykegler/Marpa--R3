@@ -137,7 +137,7 @@ step_table.md: gen_step_table.lua
 	$(LUA_INTERP) gen_step_table.lua $(STEP_TABLE) > $@
 
 kollos.c: error_table.md event_table.md step_table.md kollos.lua.md \
-	  kollos.h inspect.h
+	  kollos.h
 	$(LUA_INTERP) miranda error_table.md event_table.md step_table.md \
 	  kollos.lua.md kollos_c=kollos.c
 
