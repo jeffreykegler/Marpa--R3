@@ -58,7 +58,7 @@ we may want meaningful performance numbers.
 
 ```
     -- miranda: section+ Lua declarations
-    code_by_tag = {}
+    pkglue.code_by_tag = {}
 
 ```
 
@@ -69,10 +69,14 @@ we may want meaningful performance numbers.
     -- miranda: insert legal preliminaries
     -- miranda: insert luacheck declarations
     -- miranda: insert enforce strict globals
+
+    -- pkglue, that is, Perl-to-Kollos Glue
+    local pkglue = {}
+
     -- miranda: insert Lua declarations
     -- comment out miranda: insert most Lua function declarations
 
-    return "OK"
+    return pkglue
 
     -- vim: set expandtab shiftwidth=4:
 ```

@@ -1464,12 +1464,14 @@ call_by_tag (lua_State * L, const char* tag, const char *codestr,
     int type;
     const int base_of_stack = marpa_lua_gettop (L);
     const int msghandler_ix = base_of_stack + 1;
-    const int cache_ix = base_of_stack + 2;
+    int cache_ix;
     dTHX;
 
     marpa_lua_pushcfunction (L, xlua_msghandler);
 
-    marpa_lua_getglobal (L, "code_by_tag");
+    marpa_lua_getglobal (L, "glue");
+    marpa_lua_getfield (L, -1, "code_by_tag");
+    cache_ix = marpa_lua_gettop (L);
     type = marpa_lua_getfield (L, cache_ix, tag);
 
     if (type != LUA_TFUNCTION) {

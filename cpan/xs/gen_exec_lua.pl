@@ -274,7 +274,8 @@ PPCODE:
     /* Lua stack: [ grammar_table ] */
     object_stack_ix = marpa_lua_gettop (L);
 
-    marpa_lua_getglobal (L, "code_by_tag");
+    marpa_lua_getglobal (L, "glue");
+    marpa_lua_getfield (L, -1, "code_by_tag");
     cache_ix = marpa_lua_gettop(L);
     type = marpa_lua_getfield (L, cache_ix, tag);
 
@@ -357,7 +358,8 @@ PPCODE:
     /* Lua stack: [ recce_table ] */
     object_stack_ix = marpa_lua_gettop (L);
 
-    marpa_lua_getglobal (L, "code_by_tag");
+    marpa_lua_getglobal (L, "glue");
+    marpa_lua_getfield (L, -1, "code_by_tag");
     cache_ix = marpa_lua_gettop(L);
     type = marpa_lua_getfield (L, cache_ix, tag);
 
