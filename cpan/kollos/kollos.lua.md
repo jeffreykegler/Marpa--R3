@@ -23,9 +23,12 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 # Table of contents
 <!--
-../lua/lua toc.lua < init.lua.md
+../lua/lua toc.lua < kollos.lua.md
 -->
 * [About Kollos](#about-kollos)
+* [Development Notes](#development-notes)
+  * [To Do](#to-do)
+    * [TODO notes](#todo-notes)
 * [Kollos object](#kollos-object)
 * [Kollos Lua interpreter](#kollos-lua-interpreter)
 * [Kollos registry objects](#kollos-registry-objects)
@@ -57,6 +60,7 @@ OTHER DEALINGS IN THE SOFTWARE.
     * [VM operation: callback](#vm-operation-callback)
   * [Run the virtual machine](#run-the-virtual-machine)
   * [Find and perform the VM operations](#find-and-perform-the-vm-operations)
+  * [Tree export operations](#tree-export-operations)
   * [VM-related utilities for use in the Perl code](#vm-related-utilities-for-use-in-the-perl-code)
     * [Return operation key given its name](#return-operation-key-given-its-name)
     * [Return operation name given its key](#return-operation-name-given-its-key)
@@ -90,6 +94,7 @@ OTHER DEALINGS IN THE SOFTWARE.
   * [Dedent method](#dedent-method)
   * [`c_safe_string` method](#c-safe-string-method)
   * [Meta code argument processing](#meta-code-argument-processing)
+* [Kollos utilities](#kollos-utilities)
 
 ## About Kollos
 
@@ -107,6 +112,23 @@ The intent is that eventually
 all the code in this file will be "pure"
 Kollos -- no Perl knowledge.
 That is not the case at the moment.
+
+## Development Notes
+
+This section is first for the convenience of the
+active developers.
+Readers trying to familiarize themselves with Kollos
+may want to skip it or skim it
+in their first readings.
+
+### To Do
+
+#### TODO notes
+
+Throughout the code, the string "TODO" marks notes
+for action during or after development.
+Not all of these are included or mentioned
+in these "Development Notes".
 
 ## Kollos object
 
