@@ -4018,8 +4018,19 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
         /* [ kollos ] */
 
         /* Create the shared upvalue table */
-        marpa_lua_newtable(L);
-        upvalue_stack_ix = marpa_lua_gettop(L);
+        {
+            /* TODO increase initial buffer capacity
+             * after testing.
+             */
+            const size_t initial_buffer_capacity = 1;
+            marpa_lua_newtable (L);
+            upvalue_stack_ix = marpa_lua_gettop (L);
+            marpa_lua_newuserdata (L,
+                sizeof (Marpa_Symbol_ID) * initial_buffer_capacity);
+            marpa_lua_setfield (L, upvalue_stack_ix, "buffer");
+            marpa_lua_pushinteger(L, (lua_Integer)initial_buffer_capacity);
+            marpa_lua_setfield (L, upvalue_stack_ix, "buffer_capacity");
+        }
 
         -- miranda: insert create kollos class tables
 
