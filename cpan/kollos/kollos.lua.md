@@ -4123,33 +4123,42 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
         marpa_lua_pushcclosure(L, l_event_description_by_code, 1);
         marpa_lua_setfield(L, kollos_table_stack_ix, "event_description");
 
-        marpa_lua_pushcfunction(L, lca_throw_set);
+        marpa_lua_pushvalue(L, upvalue_stack_ix);
+        marpa_lua_pushcclosure(L, lca_throw_set, 1);
         marpa_lua_setfield(L, kollos_table_stack_ix, "throw_set");
 
         /* In Libmarpa object sequence order */
 
-        marpa_lua_pushcfunction(L, lca_grammar_new);
+        marpa_lua_pushvalue(L, upvalue_stack_ix);
+        marpa_lua_pushcclosure(L, lca_grammar_new, 1);
         marpa_lua_setfield(L, kollos_table_stack_ix, "grammar_new");
 
-        marpa_lua_pushcfunction(L, lca_grammar_event);
+        marpa_lua_pushvalue(L, upvalue_stack_ix);
+        marpa_lua_pushcclosure(L, lca_grammar_event, 1);
         marpa_lua_setfield(L, kollos_table_stack_ix, "grammar_event");
 
-        marpa_lua_pushcfunction(L, lca_grammar_events);
+        marpa_lua_pushvalue(L, upvalue_stack_ix);
+        marpa_lua_pushcclosure(L, lca_grammar_events, 1);
         marpa_lua_setfield(L, kollos_table_stack_ix, "grammar_events");
 
-        marpa_lua_pushcfunction(L, wrap_recce_new);
+        marpa_lua_pushvalue(L, upvalue_stack_ix);
+        marpa_lua_pushcclosure(L, wrap_recce_new, 1);
         marpa_lua_setfield(L, kollos_table_stack_ix, "recce_new");
 
-        marpa_lua_pushcfunction(L, wrap_bocage_new);
+        marpa_lua_pushvalue(L, upvalue_stack_ix);
+        marpa_lua_pushcclosure(L, wrap_bocage_new, 1);
         marpa_lua_setfield(L, kollos_table_stack_ix, "bocage_new");
 
-        marpa_lua_pushcfunction(L, wrap_order_new);
+        marpa_lua_pushvalue(L, upvalue_stack_ix);
+        marpa_lua_pushcclosure(L, wrap_order_new, 1);
         marpa_lua_setfield(L, kollos_table_stack_ix, "order_new");
 
-        marpa_lua_pushcfunction(L, wrap_tree_new);
+        marpa_lua_pushvalue(L, upvalue_stack_ix);
+        marpa_lua_pushcclosure(L, wrap_tree_new, 1);
         marpa_lua_setfield(L, kollos_table_stack_ix, "tree_new");
 
-        marpa_lua_pushcfunction(L, wrap_value_new);
+        marpa_lua_pushvalue(L, upvalue_stack_ix);
+        marpa_lua_pushcclosure(L, wrap_value_new, 1);
         marpa_lua_setfield(L, kollos_table_stack_ix, "value_new");
 
         marpa_lua_newtable (L);
