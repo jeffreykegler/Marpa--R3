@@ -165,16 +165,55 @@ interpreter.
     /* I probably will, in the final version, want this to be a
      * static utility, internal to Kollos
      */
-    Marpa_Symbol_ID* kollos_extraspace_buffer_resize(
+    void kollos_extraspace_buffer_resize(
         lua_State* L,
         size_t desired_capacity);
+    void kollos_shared_buffer_resize(
+        lua_State* L,
+        size_t desired_capacity);
+```
 
+Not Lua C API.
+Manipulates Lua stack,
+leaving it as is.
+
+```
     -- miranda: section external C function definitions
-    Marpa_Symbol_ID* kollos_extraspace_buffer_resize(
+    void kollos_shared_buffer_resize(
+        lua_State* L,
+        size_t desired_capacity)
+    {
+        size_t buffer_capacity;
+        const int base_of_stack = marpa_lua_gettop(L);
+        const int upvalue_ix = base_of_stack + 1;
+
+        marpa_lua_pushvalue(L, marpa_lua_upvalueindex(1));
+        marpa_lua_getfield(L, upvalue_ix, "buffer_capacity");
+        buffer_capacity = (size_t)marpa_lua_tointeger(L, -1);
+        if (desired_capacity > buffer_capacity) {
+            /* TODO: this optimizes for space, not speed.
+             * Insist capacity double on each realloc()?
+             */
+            (void)marpa_lua_newuserdata (L,
+                desired_capacity * sizeof (Marpa_Symbol_ID));
+            marpa_lua_setfield(L, upvalue_ix, "buffer");
+            marpa_lua_pushinteger(L, desired_capacity);
+            marpa_lua_setfield(L, upvalue_ix, "buffer_capacity");
+        }
+        marpa_lua_settop(L, base_of_stack);
+    }
+
+    void kollos_extraspace_buffer_resize(
         lua_State* L,
         size_t desired_capacity)
     {
         struct kollos_extraspace *p_extra = extraspace_get(L);
+
+        if (0) {
+            fprintf (stderr, "%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
+            fprintf (stderr, "kollos_extraspace_buffer_resize(...,%ld)", (long)desired_capacity);
+        }
+
         if (desired_capacity > p_extra->buffer_capacity) {
             p_extra->buffer_capacity = desired_capacity;
             /* TODO: this optimizes for space, not speed.
@@ -186,7 +225,6 @@ interpreter.
         if (!p_extra->buffer)
             (void)out_of_memory (L);
         }
-        return p_extra->buffer;
     }
 
 ```
@@ -3361,11 +3399,12 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
         Marpa_Rule_ID result;
         Marpa_Symbol_ID lhs;
 
-        Marpa_Symbol_ID *rhs;
         /* [ grammar_object, lhs, rhs ... ] */
         const int grammar_stack_ix = 1;
         const int args_stack_ix = 2;
-        struct kollos_extraspace* const p_extra = extraspace_get(L);
+        /* 7 should be enough, almost always */
+        Marpa_Symbol_ID rhs_buffer[7];
+        Marpa_Symbol_ID *rhs;
         int overflow = 0;
         lua_Integer arg_count;
         lua_Integer table_ix;
@@ -3388,7 +3427,11 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
                 "grammar:rule_new() arg table length must be at least 1");
         }
 
-        if (arg_count > p_extra->buffer_capacity) {
+        /* arg_count - 2 == rhs_ix
+         * For example, arg_count of 3, has one arg for LHS,
+         * and 2 for RHS, so max rhs_ix == 1
+         */
+        if (((size_t)arg_count - 2) >= (sizeof(rhs_buffer)/sizeof(*rhs_buffer))) {
            /* Treat "overflow" arg counts as freaks.
             * We do not optimize for them, but do a custom
             * malloc/free pair for each.
@@ -3396,15 +3439,17 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
            rhs = malloc(sizeof(Marpa_Symbol_ID) * (size_t)arg_count);
            overflow = 1;
         } else {
-           rhs = p_extra->buffer;
+           rhs = rhs_buffer;
         }
 
         marpa_lua_geti(L, args_stack_ix, 1);
         lhs = (Marpa_Symbol_ID)marpa_lua_tointeger(L, -1);
         for (table_ix = 2; table_ix <= arg_count; table_ix++)
         {
+            /* Calculated as above */
+            const int rhs_ix = (int)table_ix - 2;
             marpa_lua_geti(L, args_stack_ix, table_ix);
-            rhs[table_ix - 2] = (Marpa_Symbol_ID)marpa_lua_tointeger(L, -1);
+            rhs[rhs_ix] = (Marpa_Symbol_ID)marpa_lua_tointeger(L, -1);
             marpa_lua_settop(L, args_stack_ix);
         }
 
@@ -3585,6 +3630,12 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
                 "grammar:precompute; marpa_g_highest_symbol_id");
             return 1;
         }
+
+        if (0) {
+            printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
+            printf ("About to resize buffer to %ld", (long) ( highest_symbol_id+1));
+        }
+
         (void)kollos_extraspace_buffer_resize(L, (size_t) highest_symbol_id+1);
         marpa_lua_pushinteger (L, (lua_Integer) result);
         return 1;
@@ -4008,7 +4059,7 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
           luif_err_throw2 (L, KOLLOS_ERR_MICRO_VERSION_MISMATCH, library_mismatch);
       }
 
-        /* Create the main kollos object */
+        /* Create the kollos class */
         marpa_lua_newtable(L);
         kollos_table_stack_ix = marpa_lua_gettop(L);
         /* Create the main kollos_c object, to give the
@@ -4031,6 +4082,10 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
             marpa_lua_pushinteger(L, (lua_Integer)initial_buffer_capacity);
             marpa_lua_setfield (L, upvalue_stack_ix, "buffer_capacity");
         }
+
+        /* Also keep the upvalues in an element of the class */
+        marpa_lua_pushvalue(L, upvalue_stack_ix);
+        marpa_lua_setfield(L, kollos_table_stack_ix, "upvalues");
 
         -- miranda: insert create kollos class tables
 
