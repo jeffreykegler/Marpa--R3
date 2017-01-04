@@ -3969,8 +3969,9 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
     -- miranda: section define marpa_luaopen_kollos method
     static int marpa_luaopen_kollos(lua_State *L)
     {
-        /* Create the main kollos object */
-        const int kollos_table_stack_ix = marpa_lua_gettop(L) + 1;
+        /* The main kollos object */
+        int kollos_table_stack_ix;
+        int upvalue_stack_ix;
 
       {
         const char *const header_mismatch =
@@ -4000,12 +4001,18 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
           luif_err_throw2 (L, KOLLOS_ERR_MICRO_VERSION_MISMATCH, library_mismatch);
       }
 
+        /* Create the main kollos object */
         marpa_lua_newtable(L);
+        kollos_table_stack_ix = marpa_lua_gettop(L);
         /* Create the main kollos_c object, to give the
          * C language Libmarpa wrappers their own namespace.
          *
          */
         /* [ kollos ] */
+
+        /* Create the shared upvalue table */
+        marpa_lua_newtable(L);
+        upvalue_stack_ix = marpa_lua_gettop(L);
 
         -- miranda: insert create kollos class tables
 
@@ -4014,7 +4021,8 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
         */
         marpa_lua_newtable(L);
         /* [ kollos, error_mt ] */
-        marpa_lua_pushcfunction(L, l_error_tostring);
+        marpa_lua_pushvalue(L, upvalue_stack_ix);
+        marpa_lua_pushcclosure(L, l_error_tostring, 1);
         /* [ kollos, error_mt, tostring_fn ] */
         marpa_lua_setfield(L, -2, "__tostring");
         /* [ kollos, error_mt ] */
@@ -4024,7 +4032,8 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
         /* Set up Kollos grammar userdata metatable */
         marpa_lua_newtable(L);
         /* [ kollos, mt_ud_g ] */
-        marpa_lua_pushcfunction(L, l_grammar_ud_mt_gc);
+        marpa_lua_pushvalue(L, upvalue_stack_ix);
+        marpa_lua_pushcclosure(L, l_grammar_ud_mt_gc, 1);
         /* [ kollos, mt_g_ud, gc_function ] */
         marpa_lua_setfield(L, -2, "__gc");
         /* [ kollos, mt_g_ud ] */
@@ -4034,7 +4043,8 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
         /* Set up Kollos recce userdata metatable */
         marpa_lua_newtable(L);
         /* [ kollos, mt_ud_r ] */
-        marpa_lua_pushcfunction(L, l_recce_ud_mt_gc);
+        marpa_lua_pushvalue(L, upvalue_stack_ix);
+        marpa_lua_pushcclosure(L, l_recce_ud_mt_gc, 1);
         /* [ kollos, mt_r_ud, gc_function ] */
         marpa_lua_setfield(L, -2, "__gc");
         /* [ kollos, mt_r_ud ] */
@@ -4044,7 +4054,8 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
         /* Set up Kollos bocage userdata metatable */
         marpa_lua_newtable(L);
         /* [ kollos, mt_ud_bocage ] */
-        marpa_lua_pushcfunction(L, l_bocage_ud_mt_gc);
+        marpa_lua_pushvalue(L, upvalue_stack_ix);
+        marpa_lua_pushcclosure(L, l_bocage_ud_mt_gc, 1);
         /* [ kollos, mt_b_ud, gc_function ] */
         marpa_lua_setfield(L, -2, "__gc");
         /* [ kollos, mt_b_ud ] */
@@ -4054,7 +4065,8 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
         /* Set up Kollos order userdata metatable */
         marpa_lua_newtable(L);
         /* [ kollos, mt_ud_order ] */
-        marpa_lua_pushcfunction(L, l_order_ud_mt_gc);
+        marpa_lua_pushvalue(L, upvalue_stack_ix);
+        marpa_lua_pushcclosure(L, l_order_ud_mt_gc, 1);
         /* [ kollos, mt_o_ud, gc_function ] */
         marpa_lua_setfield(L, -2, "__gc");
         /* [ kollos, mt_o_ud ] */
@@ -4064,7 +4076,8 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
         /* Set up Kollos tree userdata metatable */
         marpa_lua_newtable(L);
         /* [ kollos, mt_ud_tree ] */
-        marpa_lua_pushcfunction(L, l_tree_ud_mt_gc);
+        marpa_lua_pushvalue(L, upvalue_stack_ix);
+        marpa_lua_pushcclosure(L, l_tree_ud_mt_gc, 1);
         /* [ kollos, mt_t_ud, gc_function ] */
         marpa_lua_setfield(L, -2, "__gc");
         /* [ kollos, mt_t_ud ] */
@@ -4074,7 +4087,8 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
         /* Set up Kollos value userdata metatable */
         marpa_lua_newtable(L);
         /* [ kollos, mt_ud_value ] */
-        marpa_lua_pushcfunction(L, l_value_ud_mt_gc);
+        marpa_lua_pushvalue(L, upvalue_stack_ix);
+        marpa_lua_pushcclosure(L, l_value_ud_mt_gc, 1);
         /* [ kollos, mt_v_ud, gc_function ] */
         marpa_lua_setfield(L, -2, "__gc");
         /* [ kollos, mt_v_ud ] */
@@ -4083,24 +4097,30 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
 
         /* In alphabetical order by field name */
 
-        marpa_lua_pushcfunction(L, l_error_description_by_code);
+        marpa_lua_pushvalue(L, upvalue_stack_ix);
+        marpa_lua_pushcclosure(L, l_error_description_by_code, 1);
         /* [ kollos, function ] */
         marpa_lua_setfield(L, kollos_table_stack_ix, "error_description");
         /* [ kollos ] */
 
-        marpa_lua_pushcfunction(L, l_error_name_by_code);
+        marpa_lua_pushvalue(L, upvalue_stack_ix);
+        marpa_lua_pushcclosure(L, l_error_name_by_code, 1);
         marpa_lua_setfield(L, kollos_table_stack_ix, "error_name");
 
-        marpa_lua_pushcfunction(L, l_error_new);
+        marpa_lua_pushvalue(L, upvalue_stack_ix);
+        marpa_lua_pushcclosure(L, l_error_new, 1);
         marpa_lua_setfield(L, kollos_table_stack_ix, "error_new");
 
-        marpa_lua_pushcfunction(L, wrap_kollos_throw);
+        marpa_lua_pushvalue(L, upvalue_stack_ix);
+        marpa_lua_pushcclosure(L, wrap_kollos_throw, 1);
         marpa_lua_setfield(L, kollos_table_stack_ix, "error_throw");
 
-        marpa_lua_pushcfunction(L, l_event_name_by_code);
+        marpa_lua_pushvalue(L, upvalue_stack_ix);
+        marpa_lua_pushcclosure(L, l_event_name_by_code, 1);
         marpa_lua_setfield(L, kollos_table_stack_ix, "event_name");
 
-        marpa_lua_pushcfunction(L, l_event_description_by_code);
+        marpa_lua_pushvalue(L, upvalue_stack_ix);
+        marpa_lua_pushcclosure(L, l_event_description_by_code, 1);
         marpa_lua_setfield(L, kollos_table_stack_ix, "event_description");
 
         marpa_lua_pushcfunction(L, lca_throw_set);
