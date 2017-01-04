@@ -2296,17 +2296,24 @@ the wrapper's point of view, marpa_r_alternative() always succeeds.
            local class_letter = unprefixed_name:gsub("_.*$", "", 1)
            local class_name = libmarpa_class_name[class_letter]
            local class_table_name = 'class_' .. class_name
-           -- for example: marpa_lua_getfield(L, kollos_table_stack_ix, "class_grammar")
+
            result[#result+1] = string.format("  marpa_lua_getfield(L, kollos_table_stack_ix, %q);\n", class_table_name)
+           -- for example: marpa_lua_getfield(L, kollos_table_stack_ix, "class_grammar")
+
+           result[#result+1] = "marpa_lua_pushvalue(L, upvalue_stack_ix);\n";
+
            local wrapper_name = "wrap_" .. unprefixed_name;
-           -- for example: marpa_lua_pushcfunction(L, wrap_g_highest_rule_id)
-           result[#result+1] = string.format("  marpa_lua_pushcfunction(L, %s);\n", wrapper_name)
+           result[#result+1] = string.format("  marpa_lua_pushcclosure(L, %s, 1);\n", wrapper_name)
+           -- for example: marpa_lua_pushcclosure(L, wrap_g_highest_rule_id, 1)
+
            local classless_name = function_name:gsub("^[_]?marpa_[^_]*_", "")
            local initial_underscore = function_name:match('^_') and '_' or ''
            local field_name = initial_underscore .. classless_name
-           -- for example: marpa_lua_setfield(L, -2, "highest_rule_id")
            result[#result+1] = string.format("  marpa_lua_setfield(L, -2, %q);\n", field_name)
+           -- for example: marpa_lua_setfield(L, -2, "highest_rule_id")
+
            result[#result+1] = string.format("  marpa_lua_pop(L, 1);\n", field_name)
+
         end
         return table.concat(result)
   ]==]
