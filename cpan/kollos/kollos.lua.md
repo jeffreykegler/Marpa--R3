@@ -3403,7 +3403,8 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
         const int grammar_stack_ix = 1;
         const int args_stack_ix = 2;
         /* 7 should be enough, almost always */
-        Marpa_Symbol_ID rhs_buffer[7];
+        const int rhs_buffer_size = 7;
+        Marpa_Symbol_ID rhs_buffer[rhs_buffer_size];
         Marpa_Symbol_ID *rhs;
         int overflow = 0;
         lua_Integer arg_count;
