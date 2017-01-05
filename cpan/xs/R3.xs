@@ -1659,8 +1659,7 @@ u_l0r_new (Outer_R* outer_slr)
             " -- later replace with a local\n"
             "recce.terminals_expected = recce.lmw_g1r:terminals_expected()\n"
             "return #recce.terminals_expected",
-            "R>i", outer_slr->lua_ref, &count
-          );
+            "R>i", outer_slr->lua_ref, &count);
         if (count < 0) {
             croak ("Problem in u_l0r_new() with terminals_expected: %s",
                 xs_g_error (slr->g1_wrapper));
@@ -1669,27 +1668,33 @@ u_l0r_new (Outer_R* outer_slr)
             Marpa_Assertion_ID assertion;
             int terminal;
             call_by_tag (outer_slr->L,
-              STRLOC,
-              "recce, ix = ...\n"
-              "return recce.terminals_expected[ix]\n",
-              "Ri>i", outer_slr->lua_ref, i+1, &terminal);
+                STRLOC,
+                "recce, ix = ...\n"
+                "return recce.terminals_expected[ix]\n",
+                "Ri>i", outer_slr->lua_ref, i + 1, &terminal);
+
             assertion = slr->slg->g1_lexeme_to_assertion[terminal];
-            if (assertion >= 0
-                && marpa_r_zwa_default_set (l0r, assertion, 1) < 0) {
-                croak
-                    ("Problem in u_l0r_new() with assertion ID %ld and lexeme ID %ld: %s",
-                    (long) assertion, (long) terminal,
-                    xs_g_error (lexer_wrapper));
-            }
-                call_by_tag (outer_slr->L,
-                    STRLOC,
-                    "recce, perl_pos, lexeme, assertion = ...\n"
-                    "if recce.trace_terminals >= 3 then\n"
-                    "    local q = recce.event_queue\n"
-                    "    q[#q+1] = { '!trace', 'expected lexeme', perl_pos, lexeme, assertion }\n"
-                    "end\n",
-                    "Riii>",
-                    outer_slr->lua_ref, slr->perl_pos, terminal, assertion);
+
+            call_by_tag (outer_slr->L,
+                STRLOC,
+                "recce, perl_pos, lexeme, assertion = ...\n"
+                "if assertion >= 0 then\n"
+                "    local result = recce.lmw_l0r:zwa_default_set(assertion, 1)\n"
+                "    if result < 0 then\n"
+                "        local error = recce.lmw_l0g:error()\n"
+                "        local error_code = error_object.code\n"
+                "        local error_description = kollos.error_description(error_code)\n"
+                "        error('Problem in u_l0r_new() with assertion ID %ld and lexeme ID %ld: %s',"
+                "            assertion, terminal, error_description\n"
+                "        )\n"
+                "    end\n"
+                "end\n"
+                "if recce.trace_terminals >= 3 then\n"
+                "    local q = recce.event_queue\n"
+                "    q[#q+1] = { '!trace', 'expected lexeme', perl_pos, lexeme, assertion }\n"
+                "end\n",
+                "Riii>", outer_slr->lua_ref, slr->perl_pos, terminal,
+                assertion);
         }
     }
     {
