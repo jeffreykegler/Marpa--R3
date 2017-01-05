@@ -330,41 +330,6 @@ Deletes the interpreter if the reference count drops to zero.
 
 ```
 
-Set the warning function of the Kollos interpreter.
-
-```
-
-    -- miranda: section+ C function declarations
-    void kollos_warn_set(lua_State* L, int (*warn)(const char * format, ...));
-    -- miranda: section+ lua interpreter management
-    void kollos_warn_set(lua_State* L, int (*warn)(const char * format, ...))
-    {
-        struct kollos_extraspace *p_extra = extraspace_get(L);
-        p_extra->warn = warn;
-    }
-
-```
-
-Write a warning message using Kollos's warning handler.
-
-```
-
-    -- miranda: section+ C function declarations
-    void kollos_warn(lua_State* L, const char * format, ...);
-    -- miranda: section+ lua interpreter management
-    void kollos_warn(lua_State* L, const char * format, ...)
-    {
-       va_list args;
-       struct kollos_extraspace *p_extra;
-       va_start (args, format);
-
-       p_extra = extraspace_get(L);
-       (*p_extra->warn)(format, args);
-       va_end (args);
-    }
-
-```
-
 ## Kollos registry objects
 
 A Kollos registry object is an object kept in its
