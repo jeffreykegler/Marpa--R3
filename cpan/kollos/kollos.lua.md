@@ -3165,7 +3165,7 @@ Set "strict" globals, using code taken from strict.lua.
       marpa_lua_pushvalue(L, -1);
       marpa_lua_setglobal(L, "error_object");
       if (throw_flag) return marpa_lua_error(L);
-      else return 2;
+      return 2;
     }
 
     /* Handle libmarpa errors in the most usual way.
@@ -3254,6 +3254,10 @@ so the caller must make sure that one is available.
         /* [ userdata, userdata ] */
         marpa_lua_setfield (L, lmw_g_stack_ix, "_libmarpa");
         /* [ userdata ] */
+
+        /* Set my "lmw_g" field to myself */
+        marpa_lua_pushvalue (L, lmw_g_stack_ix);
+        marpa_lua_setfield (L, lmw_g_stack_ix, "lmw_g");
 
         *p_g = g;
         result = marpa_g_force_valued (g);

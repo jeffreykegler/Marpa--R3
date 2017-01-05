@@ -49,6 +49,11 @@ sub grammar {
     return $self->[Marpa::R3::Internal::Trace::G::C];
 }
 
+sub name {
+    my ($self) = @_;
+    return $self->[Marpa::R3::Internal::Trace::G::NAME];
+}
+
 sub symbol_by_name {
     my ( $self, $symbol_name ) = @_;
     my $thin_slg = $self->[Marpa::R3::Internal::Trace::G::SLG_C];

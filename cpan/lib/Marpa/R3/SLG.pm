@@ -974,6 +974,8 @@ qq{Symbol "$lexeme_name" needs a blessing package, but grammar has none\n},
 sub Marpa::R3::Internal::Scanless::G::precompute {
     my ($slg, $tracer) = @_;
 
+    my $lmw_name = 'lmw_' . (lc $tracer->name()) . 'g';
+    my $thin_slg = $slg->[Marpa::R3::Internal::Scanless::G::C];
     my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
     my $xsy_by_isyid     = $tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID];
 
@@ -988,13 +990,19 @@ sub Marpa::R3::Internal::Scanless::G::precompute {
     set_start_symbol($tracer);
 
     # Catch errors in precomputation
-    my $precompute_error_code = $Marpa::R3::Error::NONE;
-    $grammar_c->throw_set(0);
-    my $precompute_result = $grammar_c->precompute();
-    $grammar_c->throw_set(1);
+    my ($precompute_result, $precompute_error_code) =
+      $thin_slg->call_by_tag( ( __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 's', $lmw_name );
+    local g, lmw_name = ...
+    local lmw_g = g[lmw_name]
+    kollos.throw_set()
+    local result, error = lmw_g:precompute()
+    kollos.throw_set(1)
+    if result then return result, 0 end
+    return -1, error.code
+END_OF_LUA
 
     if ( $precompute_result < 0 ) {
-        ($precompute_error_code) = $grammar_c->error();
         if ( not defined $precompute_error_code ) {
             Marpa::R3::exception(
                 'libmarpa error, but no error code returned');
