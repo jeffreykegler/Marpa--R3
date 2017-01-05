@@ -203,9 +203,6 @@ lua/lzio.h
 lua/one.c
 meta/Makefile
 meta/make_internal_pm.pl
-okollos/Makefile.PL
-okollos/okollos.c.lua
-okollos/okollos.h
 pod/ASF.pod
 pod/Acknowledgements.pod
 pod/Changes.pod
@@ -317,4 +314,5 @@ xs/gen_exec_lua.pl
 xs/glue.lua.md
 xs/marpa_xs.h
 xs/ppport.h
+xs/string2h.lua
 xs/typemap

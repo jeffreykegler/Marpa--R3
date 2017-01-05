@@ -1698,7 +1698,12 @@ u_l0r_new (Outer_R* outer_slr)
         }
     }
     {
-        int gp_result = marpa_r_start_input (l0r);
+        int gp_result;
+        call_by_tag (outer_slr->L,
+            STRLOC,
+            "recce = ...\n"
+            "return recce.lmw_l0r:start_input()\n",
+            "R>i", outer_slr->lua_ref, &gp_result);
         if (gp_result == -1)
             return 0;
         if (gp_result < 0) {
@@ -1898,8 +1903,13 @@ u_read (Outer_R * outer_slr)
                     }
                     value = (int) ops[++op_ix];
                     length = (int) ops[++op_ix];
-                    result =
-                        marpa_r_alternative (l0r, symbol_id, value, length);
+                    call_by_tag (outer_slr->L, STRLOC,
+                            "recce, symbol_id, value, length = ...\n"
+                            "return recce.lmw_l0r:alternative(symbol_id, value, length)\n",
+                            "Riii>i",
+                            outer_slr->lua_ref,
+                            symbol_id, value, length, &result
+                    );
                     switch (result) {
                     case MARPA_ERR_UNEXPECTED_TOKEN_ID:
                         /* This guarantees that later, if we fall below

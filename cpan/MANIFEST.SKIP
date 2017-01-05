@@ -113,9 +113,6 @@
 ^nytprof/
 ^nytprof[.]out$
 [.]o$
-^okollos/Makefile
-^okollos/MYMETA[.]
-^okollos/okollos[.]c
 [.]pdf$
 ^pm_to_blib$
 ^pod2htmd[.]tmp
@@ -128,6 +125,7 @@
 ^xs/auto[.]xs
 ^xs/exec_lua[.]xs
 ^xs/glue[.]lua$
+^xs/inspect[.]c$
 ^xs/Makefile$
 ^xs/Makefile[.]old$
 ^xs/marpa
