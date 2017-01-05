@@ -2569,6 +2569,9 @@ a special "configuration" argument.
     -- miranda: insert legal preliminaries
     -- miranda: insert luacheck declarations
     -- miranda: insert enforce strict globals
+
+    local kollos = kollos
+
     -- miranda: insert VM operations
     -- miranda: insert SLIF recognizer Lua functions
     -- miranda: insert grammar Libmarpa wrapper Lua functions
@@ -2578,7 +2581,7 @@ a special "configuration" argument.
     -- miranda: insert Utilities for Perl code
     -- miranda: insert most Lua function declarations
 
-    return "OK"
+    return kollos
 
     -- vim: set expandtab shiftwidth=4:
 ```
