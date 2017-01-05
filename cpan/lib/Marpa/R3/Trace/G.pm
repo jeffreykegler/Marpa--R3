@@ -168,41 +168,6 @@ sub brief_rule {
     return join q{ }, $lhs, q{::=}, @rhs, @quantifier;
 } ## end sub dotted_rule
 
-sub progress_report {
-    my ( $self, $recce, $ordinal ) = @_;
-    my $result = q{};
-    $ordinal //= $recce->latest_earley_set();
-    $recce->progress_report_start($ordinal);
-    ITEM: while (1) {
-        my ( $rule_id, $dot_position, $origin ) = $recce->progress_item();
-        last ITEM if not defined $rule_id;
-        $result
-            .= q{@}
-            . $origin . q{: }
-            . $self->dotted_rule( $rule_id, $dot_position ) . "\n";
-    } ## end ITEM: while (1)
-    $recce->progress_report_finish();
-    return $result;
-} ## end sub progress_report
-
-sub lexer_progress_report {
-    my ( $self, $slr, $ordinal ) = @_;
-    my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
-    my $result = q{};
-    $ordinal //= $thin_slr->lexer_latest_earley_set();
-    $thin_slr->lexer_progress_report_start($ordinal);
-    ITEM: while (1) {
-        my ( $rule_id, $dot_position, $origin ) = $thin_slr->lexer_progress_item();
-        last ITEM if not defined $rule_id;
-        $result
-            .= q{@}
-            . $origin . q{: }
-            . $self->dotted_rule( $rule_id, $dot_position ) . "\n";
-    } ## end ITEM: while (1)
-    $thin_slr->lexer_progress_report_finish();
-    return $result;
-} ## end sub progress_report
-
 sub show_dotted_irl {
     my ( $self, $irl_id, $dot_position ) = @_;
     my $thin_slg         = $self->[Marpa::R3::Internal::Trace::G::SLG_C];

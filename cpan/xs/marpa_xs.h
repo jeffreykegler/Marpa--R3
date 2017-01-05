@@ -205,7 +205,6 @@ typedef struct
   UV codepoint;                 /* For error returns */
   int end_pos;
   SV* input;
-  int too_many_earley_items;
 
   union marpa_slr_event_s* t_lexemes;
   int t_lexeme_capacity;
