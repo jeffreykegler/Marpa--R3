@@ -1800,11 +1800,11 @@ u_read (Outer_R * outer_slr)
     STRLEN len;
     int input_is_utf8;
 
-    Marpa_Recognizer r = slr->l0r;
+    Marpa_Recognizer l0r = slr->l0r;
 
-    if (!r) {
-        r = u_l0r_new (outer_slr);
-        if (!r)
+    if (!l0r) {
+        l0r = u_l0r_new (outer_slr);
+        if (!l0r)
             croak ("Problem in u_read(): %s",
                 xs_g_error (slr->slg->l0_wrapper));
     }
@@ -1899,7 +1899,7 @@ u_read (Outer_R * outer_slr)
                     value = (int) ops[++op_ix];
                     length = (int) ops[++op_ix];
                     result =
-                        marpa_r_alternative (r, symbol_id, value, length);
+                        marpa_r_alternative (l0r, symbol_id, value, length);
                     switch (result) {
                     case MARPA_ERR_UNEXPECTED_TOKEN_ID:
                         /* This guarantees that later, if we fall below
@@ -1958,11 +1958,11 @@ u_read (Outer_R * outer_slr)
                         slr->codepoint = codepoint;
                         return U_READ_REJECTED_CHAR;
                     }
-                    result = marpa_r_earleme_complete (r);
+                    result = marpa_r_earleme_complete (l0r);
                     if (result > 0) {
                         u_convert_events (outer_slr);
                         /* Advance one character before returning */
-                        if (marpa_r_is_exhausted (r)) {
+                        if (marpa_r_is_exhausted (l0r)) {
                             return U_READ_EXHAUSTED_ON_SUCCESS;
                         }
                         goto ADVANCE_ONE_CHAR;
