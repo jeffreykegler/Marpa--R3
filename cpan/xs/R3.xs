@@ -1633,7 +1633,6 @@ u_l0r_new (Outer_R* outer_slr)
     Scanless_R *slr = slr_inner_get (outer_slr);
     Marpa_Recce l0r = slr->l0r;
     G_Wrapper *lexer_wrapper = slr->slg->l0_wrapper;
-    const int too_many_earley_items = slr->too_many_earley_items;
 
     u_l0r_clear(outer_slr);
     slr->l0r = l0r = marpa_r_new (lexer_wrapper->g);
@@ -1646,21 +1645,22 @@ u_l0r_new (Outer_R* outer_slr)
     marpa_r_ref (l0r);
     dummyup_recce (outer_slr->L, outer_slr->lua_ref, l0r, "lmw_l0r");
 
-    if (too_many_earley_items >= 0) {
-        marpa_r_earley_item_warning_threshold_set (l0r,
-            too_many_earley_items);
-    }
     {
         int i;
         int count;
         call_by_tag (outer_slr->L,
             STRLOC,
             "recce = ...\n"
+            "local too_many_earley_items = recce.too_many_earley_items\n"
+            "if too_many_earley_items >= 0 then\n"
+            "    recce.lmw_l0r:earley_item_warning_threshold_set(too_many_earley_items)\n"
+            "end\n"
             " -- for now use a per-recce field\n"
             " -- later replace with a local\n"
             "recce.terminals_expected = recce.lmw_g1r:terminals_expected()\n"
             "return #recce.terminals_expected",
-            "R>i", outer_slr->lua_ref, &count);
+            "R>i", outer_slr->lua_ref, &count
+          );
         if (count < 0) {
             croak ("Problem in u_l0r_new() with terminals_expected: %s",
                 xs_g_error (slr->g1_wrapper));
@@ -2272,7 +2272,6 @@ static Scanless_R* marpa_inner_slr_new (
   slr->input_symbol_id = -1;
   slr->input = newSVpvn ("", 0);
   slr->end_pos = 0;
-  slr->too_many_earley_items = -1;
 
   slr->t_lexeme_count = 0;
   slr->t_lexeme_capacity = (int)MAX (1024 / sizeof (union marpa_slr_event_s), 16);
@@ -4449,6 +4448,7 @@ PPCODE:
 
   call_by_tag (outer_slr->L, STRLOC,
       "local recce = ...\n"
+      "recce.too_many_earley_items = -1\n"
       "recce.event_queue = {}\n"
       "recce.lmw_g1r.lmw_g = recce.slg.lmw_g1g\n"
       "recce.trace_terminals = 0\n",
@@ -4482,25 +4482,6 @@ PPCODE:
 {
   Scanless_R *slr = slr_inner_get(outer_slr);
   slr->throw = throw_setting;
-}
-
-void
-earley_item_warning_threshold( outer_slr )
-    Outer_R *outer_slr;
-PPCODE:
-{
-  Scanless_R *slr = slr_inner_get(outer_slr);
-  XSRETURN_IV(slr->too_many_earley_items);
-}
-
-void
-earley_item_warning_threshold_set( outer_slr, too_many_earley_items )
-    Outer_R *outer_slr;
-    int too_many_earley_items;
-PPCODE:
-{
-  Scanless_R *slr = slr_inner_get(outer_slr);
-  slr->too_many_earley_items = too_many_earley_items;
 }
 
 void

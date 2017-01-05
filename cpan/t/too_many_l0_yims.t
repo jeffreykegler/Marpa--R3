@@ -59,6 +59,24 @@ $recce->set( { trace_file_handle => \*STDOUT } );
 close $trace_fh;
 
 my $expected_trace_output = <<'END_OF_TRACE';
+L0 exceeded earley item threshold at pos 1: 14 Earley items
+L0 exceeded earley item threshold at pos 2: 18 Earley items
+L0 exceeded earley item threshold at pos 3: 23 Earley items
+L0 exceeded earley item threshold at pos 4: 28 Earley items
+L0 exceeded earley item threshold at pos 5: 33 Earley items
+L0 exceeded earley item threshold at pos 6: 38 Earley items
+L0 exceeded earley item threshold at pos 7: 43 Earley items
+L0 exceeded earley item threshold at pos 8: 48 Earley items
+L0 exceeded earley item threshold at pos 9: 53 Earley items
+L0 exceeded earley item threshold at pos 10: 58 Earley items
+L0 exceeded earley item threshold at pos 11: 63 Earley items
+L0 exceeded earley item threshold at pos 12: 68 Earley items
+L0 exceeded earley item threshold at pos 13: 73 Earley items
+L0 exceeded earley item threshold at pos 14: 78 Earley items
+L0 exceeded earley item threshold at pos 15: 83 Earley items
+L0 exceeded earley item threshold at pos 16: 88 Earley items
+L0 exceeded earley item threshold at pos 17: 93 Earley items
+L0 exceeded earley item threshold at pos 18: 98 Earley items
 L0 exceeded earley item threshold at pos 19: 103 Earley items
 END_OF_TRACE
 

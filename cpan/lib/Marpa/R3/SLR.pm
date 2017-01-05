@@ -451,10 +451,12 @@ END_OF_LUA
 
     if ( defined( my $value = $flat_args->{'too_many_earley_items'} ) ) {
         $slr->call_by_tag(
-    (__FILE__ . ':' . __LINE__),
-            'local recce, value = ...; recce.lmw_g1r:earley_item_warning_threshold_set(value)',
-            'i',
-            $value
+            ( __FILE__ . ':' . __LINE__ ),
+            <<'END_OF_LUA', 'i', $value
+    local recce, value = ...
+    recce.too_many_earley_items = value
+    recce.lmw_g1r:earley_item_warning_threshold_set(value)
+END_OF_LUA
         );
     }
 

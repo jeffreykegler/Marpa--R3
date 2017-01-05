@@ -130,6 +130,13 @@ for action during or after development.
 Not all of these are included or mentioned
 in these "Development Notes".
 
+### Factoring out Kollos packages
+
+Current Kollos assumes a dedicated Lua interpreter,
+an interpreter whose namespace it controls completely.
+This must change to allow Kollos to loaded as an ordinary
+Lua package.
+
 ## Kollos object
 
 `ref_count` maintains a reference count that controls
