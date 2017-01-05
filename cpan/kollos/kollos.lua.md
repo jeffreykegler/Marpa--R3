@@ -1375,13 +1375,13 @@ whose id is `id`.
 ```
     -- miranda: section+ grammar Libmarpa wrapper Lua functions
 
-    function kollos.class_grammar.symbol_name(lmw_g, symbol_id)
+    function _M.class_grammar.symbol_name(lmw_g, symbol_id)
         local symbol_name = lmw_g.name_by_isyid[symbol_id]
         if symbol_name then return symbol_name end
         return string.format('R%d', symbol_id)
     end
 
-    function kollos.class_grammar.ahm_describe(lmw_g, ahm_id)
+    function _M.class_grammar.ahm_describe(lmw_g, ahm_id)
         local irl_id = lmw_g:_ahm_irl(ahm_id)
         local dot_position = lmw_g:_ahm_position(ahm_id)
         if dot_position < 0 then
@@ -1390,7 +1390,7 @@ whose id is `id`.
         return string.format('R%d:%d', irl_id, dot_position)
     end
 
-    function kollos.class_grammar.show_dotted_irl(lmw_g, irl_id, dot_position)
+    function _M.class_grammar.show_dotted_irl(lmw_g, irl_id, dot_position)
         local lhs_id = lmw_g:_irl_lhs(irl_id)
         local irl_length = lmw_g:_irl_length(irl_id)
         local lhs_name = lmw_g:isy_name(lhs_id)
@@ -1417,7 +1417,7 @@ whose id is `id`.
 ```
     -- miranda: section+ grammar Libmarpa wrapper Lua functions
 
-    function kollos.class_grammar.isy_name(lmw_g, nsy_id)
+    function _M.class_grammar.isy_name(lmw_g, nsy_id)
          -- start symbol
          local nsy_is_start = 0 ~= lmw_g:_nsy_is_start(nsy_id)
          if nsy_is_start then
@@ -1459,7 +1459,7 @@ whose id is `id`.
 
 ```
     -- miranda: section+ recognizer Libmarpa wrapper Lua functions
-    function kollos.class_recce.leo_item_data(lmw_r)
+    function _M.class_recce.leo_item_data(lmw_r)
         local lmw_g = lmw_r.lmw_g
         local leo_base_state = lmw_r:_leo_base_state()
         if not leo_base_state then return end
@@ -1480,7 +1480,7 @@ whose id is `id`.
         }
     end
 
-    function kollos.class_recce.token_link_data(lmw_r)
+    function _M.class_recce.token_link_data(lmw_r)
         local lmw_g = lmw_r.lmw_g
         local result = {}
         local token_id, value_ix = lmw_r:_source_token()
@@ -1506,7 +1506,7 @@ whose id is `id`.
         return result
     end
 
-    function kollos.class_recce.completion_link_data(lmw_r, ahm_id)
+    function _M.class_recce.completion_link_data(lmw_r, ahm_id)
         local lmw_g = lmw_r.lmw_g
         local g1r = recce.lmw_g1r
         local result = {}
@@ -1523,7 +1523,7 @@ whose id is `id`.
         return result
     end
 
-    function kollos.class_recce.leo_link_data(lmw_r, ahm_id)
+    function _M.class_recce.leo_link_data(lmw_r, ahm_id)
         local lmw_g = lmw_r.lmw_g
         local g1r = recce.lmw_g1r
         local result = {}
@@ -1536,7 +1536,7 @@ whose id is `id`.
         return result
     end
 
-    function kollos.class_recce.earley_item_data(lmw_r, set_id, item_id)
+    function _M.class_recce.earley_item_data(lmw_r, set_id, item_id)
         local item_data = {}
         local lmw_g = lmw_r.lmw_g
 
@@ -1588,7 +1588,7 @@ whose id is `id`.
         return item_data
     end
 
-    function kollos.class_recce.earley_set_data(lmw_r, set_id)
+    function _M.class_recce.earley_set_data(lmw_r, set_id)
         -- print('earley_set_data(', set_id, ')')
         local lmw_g = lmw_r.lmw_g
         local data = {}
@@ -2570,7 +2570,7 @@ a special "configuration" argument.
     -- miranda: insert luacheck declarations
     -- miranda: insert enforce strict globals
 
-    local kollos = kollos
+    local _M = kollos
 
     -- miranda: insert VM operations
     -- miranda: insert SLIF recognizer Lua functions
@@ -2581,7 +2581,7 @@ a special "configuration" argument.
     -- miranda: insert Utilities for Perl code
     -- miranda: insert most Lua function declarations
 
-    return kollos
+    return _M
 
     -- vim: set expandtab shiftwidth=4:
 ```
@@ -4479,7 +4479,7 @@ and error codes.
 
 ```
     -- miranda: section+ most Lua function declarations
-    function kollos.posix_lc(str)
+    function _M.posix_lc(str)
        return str:gsub('[A-Z]', function(str) return string.char(string.byte(str)) end)
     end
 
