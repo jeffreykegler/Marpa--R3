@@ -58,7 +58,7 @@ $Marpa::R3::Lua::Glue::load = <<'END_OF_LUA';
 local do_load, error = load(
 END_OF_HEADER
 
-my $lua_file_name  = File::Spec->catfile(qw(xs glue.lua));
+my $lua_file_name  = File::Spec->catfile(qw(glue glue.lua));
 open my $in_fh, '<', $lua_file_name;
 my $lua_file = do { local $RS = undef; <$in_fh>; };
 close $in_fh;

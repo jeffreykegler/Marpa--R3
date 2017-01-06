@@ -61,6 +61,12 @@
 ^engine/perl_ac_build/
 ^errs$
 ^etc/track[.]list
+^glue/MYMETA.
+^glue/Makefile$
+^glue/Makefile[.]old$
+^glue/glue[.]c$
+^glue/glue[.]h$
+^glue/glue[.]lua$
 ^glue/glue[.]lua$
 ^hide/
 ^inc/Marpa/R3/Lua/Test/Builder[.]pm$

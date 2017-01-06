@@ -106,6 +106,7 @@ etc/pod_errors.pl
 etc/pod_inlinks.pl
 etc/pod_links.pl
 etc/reserved_check.sh
+glue/Makefile.PL
 glue/glue.lua.md
 inc/Marpa/R3/Config.pm
 inc/Marpa/R3/Display.pm

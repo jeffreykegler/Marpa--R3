@@ -437,7 +437,7 @@ END_OF_POSTAMBLE_PIECE
 glue/glue.lua: lua/lua glue/glue.lua.md
 	%s
 END_OF_POSTAMBLE_PIECE
-	$self->cd(File::Spec->catdir(qw(xs)), '$(MAKE)');
+	$self->cd(File::Spec->catdir(qw(glue)), '$(MAKE)');
 
     return join "\n", @postamble_pieces;
 
