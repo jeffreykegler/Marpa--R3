@@ -151,7 +151,6 @@ say {$out} gp_generate(qw(highest_rule_id));
 say {$out} gp_generate(qw(highest_symbol_id));
 say {$out} gp_generate(qw(is_precomputed));
 say {$out} gp_generate(qw(nulled_symbol_activate Marpa_Symbol_ID sym_id int activate));
-say {$out} gp_generate(qw(precompute));
 say {$out} gp_generate(qw(prediction_symbol_activate Marpa_Symbol_ID sym_id int activate));
 say {$out} gp_generate(qw(rule_is_accessible Marpa_Rule_ID rule_id));
 say {$out} gp_generate(qw(rule_is_loop Marpa_Rule_ID rule_id));
