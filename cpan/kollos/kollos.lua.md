@@ -3238,6 +3238,35 @@ The "throw" flag is ignored.
        return 1;
     }
 
+```
+
+Return the current error_description
+Lua C API.  The only argument must be a Libmarpa wrapper
+object.  These all define the `lmw_g` field.
+
+
+```
+    -- miranda: section+ base error handlers
+
+    static int
+    lca_libmarpa_error_description(lua_State* L)
+    {
+        Marpa_Error_Code error_code;
+        Marpa_Grammar *grammar_ud;
+        const char* description;
+        const int lmw_stack_ix = 1;
+
+        marpa_lua_getfield (L, lmw_stack_ix, "lmw_g");
+        marpa_lua_getfield (L, -1, "_libmarpa");
+        grammar_ud = (Marpa_Grammar *) marpa_lua_touserdata (L, -1);
+        error_code = marpa_g_error (*grammar_ud, NULL);
+        description = error_description_by_code (error_code);
+        marpa_lua_pushstring (L, description);
+        return 1;
+    }
+
+```
+
 `dummyup_grammar` is not Lua C API.
 This may be the basis of the actual constructor.
 Takes ownership of a Libmarpa grammar reference,
@@ -3801,6 +3830,7 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
 
     static const struct luaL_Reg recce_methods[] = {
       { "error", lca_libmarpa_error },
+      { "error_description", lca_libmarpa_error_description },
       { "terminals_expected", lca_recce_terminals_expected },
       { "progress_item", lca_recce_progress_item },
       { "_source_token", lca_recce_source_token },

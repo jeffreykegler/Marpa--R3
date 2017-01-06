@@ -2579,21 +2579,31 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
 
     marpa_slr_lexeme_clear (slr);
 
+
+    call_by_tag (outer_slr->L, STRLOC,
+        "recce = ...\n"
+        "return recce.lmw_l0r:latest_earley_set()\n",
+        "R>i",
+        outer_slr->lua_ref, &earley_set);
+
     /* Zero length lexemes are not of interest, so we do NOT
      * search the 0'th Earley set.
      */
-    for (earley_set = marpa_r_latest_earley_set (l0r); earley_set > 0;
-        earley_set--) {
+    for ( ; earley_set > 0; earley_set--) {
         int return_value;
         int end_of_earley_items = 0;
         working_pos = slr->start_of_lexeme + earley_set;
 
-        return_value = marpa_r_progress_report_start (l0r, earley_set);
-        if (return_value < 0) {
-            croak ("Problem in marpa_r_progress_report_start(%p, %ld): %s",
-                (void *) l0r, (unsigned long) earley_set,
-                xs_g_error (slr->slg->l0_wrapper));
-        }
+        call_by_tag (outer_slr->L, STRLOC,
+            "recce, earley_set = ...\n"
+            "local return_value = recce.lmw_l0r:progress_report_start(earley_set)\n"
+            "if return_value < 0 then\n"
+            "    error(string.format('Problem in recce:progress_report_start(...,%d): %s'),\n"
+            "        earley_set, recce:error_description())\n"
+            "end\n"
+            "return return_value\n" ,
+            "Ri>i",
+            outer_slr->lua_ref, earley_set, &return_value);
 
         while (!end_of_earley_items) {
             struct l0_rule_g_properties *l0_rule_g_properties;
