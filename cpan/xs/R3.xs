@@ -1968,11 +1968,25 @@ u_read (Outer_R * outer_slr)
                         slr->codepoint = codepoint;
                         return U_READ_REJECTED_CHAR;
                     }
-                    result = marpa_r_earleme_complete (l0r);
+
+                    call_by_tag (outer_slr->L, STRLOC,
+                        "recce = ...\n"
+                        "return recce.lmw_l0r:earleme_complete()\n",
+                        "R>i",
+                        outer_slr->lua_ref, &result);
+
                     if (result > 0) {
+                        int is_exhausted;
                         u_convert_events (outer_slr);
                         /* Advance one character before returning */
-                        if (marpa_r_is_exhausted (l0r)) {
+
+                      call_by_tag (outer_slr->L, STRLOC,
+                          "recce = ...\n"
+                          "return recce.lmw_l0r:is_exhausted()\n",
+                          "R>i",
+                          outer_slr->lua_ref, &is_exhausted);
+
+                        if (is_exhausted) {
                             return U_READ_EXHAUSTED_ON_SUCCESS;
                         }
                         goto ADVANCE_ONE_CHAR;
