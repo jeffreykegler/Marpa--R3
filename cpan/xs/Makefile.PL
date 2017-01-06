@@ -126,7 +126,7 @@ sub constants {
 
 sub top_targets {
     my $r = '
-all :: R3$(OBJ_EXT) glue.lua
+all :: R3$(OBJ_EXT)
 	$(NOECHO) $(NOOP)
 	$(NOECHO) $(ECHO) Executing all target in xs directory
 
@@ -163,9 +163,6 @@ exec_lua.xs: gen_exec_lua.pl
 
 marpa_slifop.h: create_ops.pl
 	$(PERLRUN) create_ops.pl > marpa_slifop.h
-
-glue.lua: glue.lua.md
-	LUA_PATH=$(LUA_PATH) $(LUA_INTERP) $(MIRANDA) glue.lua.md main=glue.lua
 
 inspect.c: $(INSPECT_LUA)
 	LUA_PATH=$(LUA_PATH) $(LUA_INTERP) string2h.lua inspect < $? > $@

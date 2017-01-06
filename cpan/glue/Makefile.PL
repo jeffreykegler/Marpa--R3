@@ -80,8 +80,17 @@ sub constants {
     my $constants = $self->SUPER::constants(@_);
 
     $constants .= "\n";
+
+    my $my_lua_path = File::Spec->catfile( File::Spec->updir(), qw{kollos XXX} );
+    $my_lua_path =~ s/XXX$/?.lua/;
+    $constants .=
+      'LUA_PATH = ' . $self->quote_literal( (';;' . $my_lua_path ),
+        { allow_variables => undef } ) . "\n";
+
     $constants .= sprintf( "LUA_INTERP = %s\n",
         File::Spec->catfile( File::Spec->updir(), qw{lua lua} ) );
+    $constants .= sprintf( "MIRANDA = %s\n",
+        File::Spec->catfile( File::Spec->updir(), qw{kollos miranda} ) );
     $constants .= sprintf( "MY_CCFLAGS = %s\n", $my_ccflags);
 
     return $constants;
@@ -107,14 +116,14 @@ test_dynamic ::
 	$(NOECHO) $(NOOP)
 
 glue.lua: glue.lua.md
-	$(LUA_INTERP) miranda glue.lua.md main=glue.lua
+	LUA_PATH=$(LUA_PATH) $(LUA_INTERP) $(MIRANDA) glue.lua.md main=glue.lua
 
 glue.c: glue.lua.md \
 	  glue.h
-	$(LUA_INTERP) miranda glue.lua.md glue_c=glue.c
+	LUA_PATH=$(LUA_PATH) $(LUA_INTERP) $(MIRANDA) glue.lua.md glue_c=glue.c
 
 glue.h: glue.lua.md
-	$(LUA_INTERP) miranda glue.lua.md glue_h=glue.h
+	LUA_PATH=$(LUA_PATH) $(LUA_INTERP) $(MIRANDA) glue.lua.md glue_h=glue.h
 
 };
 

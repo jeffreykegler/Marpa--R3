@@ -58,7 +58,7 @@ we may want meaningful performance numbers.
 
 ```
     -- miranda: section+ Lua declarations
-    pkglue.code_by_tag = {}
+    _M.code_by_tag = {}
 
 ```
 
@@ -70,13 +70,12 @@ we may want meaningful performance numbers.
     -- miranda: insert luacheck declarations
     -- miranda: insert enforce strict globals
 
-    -- pkglue, that is, Perl-to-Kollos Glue
-    local pkglue = {}
+    local _M = {}
 
     -- miranda: insert Lua declarations
-    -- comment out miranda: insert most Lua function declarations
+    -- miranda: insert most Lua function declarations
 
-    return pkglue
+    return _M
 
     -- vim: set expandtab shiftwidth=4:
 ```
@@ -159,6 +158,203 @@ Set "strict" globals, using code taken from strict.lua.
           end
           return rawget(t, n)
         end
+    end
+
+```
+
+## Dummy C code
+
+```
+    -- miranda: section C structure declarations
+    struct glue_dummy {
+        int dummy;
+    };
+
+    -- miranda: section C structure definitions
+
+    /* For now something so that the file isn't empty */
+    struct glue_dummy marpa_glue_dummy;
+
+```
+
+## The Perl-to-Kollos Glue C code file
+
+```
+    -- miranda: section glue_c
+    -- miranda: language c
+    -- miranda: insert preliminaries to the c library code
+
+    -- miranda: insert C structure definitions
+
+    /* vim: set expandtab shiftwidth=4: */
+```
+
+### Preliminaries to the C library code
+
+```
+    -- miranda: section preliminaries to the c library code
+    /*
+    ** Permission is hereby granted, free of charge, to any person obtaining
+    ** a copy of this software and associated documentation files (the
+    ** "Software"), to deal in the Software without restriction, including
+    ** without limitation the rights to use, copy, modify, merge, publish,
+    ** distribute, sublicense, and/or sell copies of the Software, and to
+    ** permit persons to whom the Software is furnished to do so, subject to
+    ** the following conditions:
+    **
+    ** The above copyright notice and this permission notice shall be
+    ** included in all copies or substantial portions of the Software.
+    **
+    ** THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+    ** EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    ** MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+    ** IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+    ** CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+    ** TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+    ** SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+    **
+    ** [ MIT license: http://www.opensource.org/licenses/mit-license.php ]
+    */
+
+    /* EDITS IN THIS FILE WILL BE LOST
+     * This file is auto-generated.
+     */
+
+    #include "marpa.h"
+    #include "glue.h"
+
+    #undef UNUSED
+    #if     __GNUC__ >  2 || (__GNUC__ == 2 && __GNUC_MINOR__ >  4)
+    #define UNUSED __attribute__((__unused__))
+    #else
+    #define UNUSED
+    #endif
+
+    #if defined(_MSC_VER)
+    #define inline __inline
+    #define __PRETTY_FUNCTION__ __FUNCTION__
+    #endif
+
+    #define EXPECTED_LIBMARPA_MAJOR 8
+    #define EXPECTED_LIBMARPA_MINOR 4
+    #define EXPECTED_LIBMARPA_MICRO 0
+
+```
+
+## The Perl-to-Kollos Glue C header file
+
+```
+    -- miranda: section glue_h
+    -- miranda: language c
+    -- miranda: insert preliminary comments of the c header file
+
+    #ifndef GLUE_H
+    #define GLUE_H
+
+    #include "lua.h"
+    #include "lauxlib.h"
+    #include "lualib.h"
+
+    -- miranda: insert C structure declarations
+
+    #endif
+
+    /* vim: set expandtab shiftwidth=4: */
+```
+
+### Preliminaries to the C header file
+
+```
+    -- miranda: section preliminary comments of the c header file
+
+    /*
+     * Copyright 2016 Jeffrey Kegler
+     * Permission is hereby granted, free of charge, to any person obtaining a
+     * copy of this software and associated documentation files (the "Software"),
+     * to deal in the Software without restriction, including without limitation
+     * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+     * and/or sell copies of the Software, and to permit persons to whom the
+     * Software is furnished to do so, subject to the following conditions:
+     *
+     * The above copyright notice and this permission notice shall be included
+     * in all copies or substantial portions of the Software.
+     *
+     * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+     * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+     * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+     * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+     * OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+     * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+     * OTHER DEALINGS IN THE SOFTWARE.
+     */
+
+    /* EDITS IN THIS FILE WILL BE LOST
+     * This file is auto-generated.
+     */
+
+```
+
+## Meta-coding utilities
+
+### Metacode execution sequence
+Nothing here, for now.
+```
+    -- miranda: sequence-exec argument processing
+    -- miranda: sequence-exec metacode utilities
+```
+
+### Dedent method
+
+A pipe symbol is used when inlining code to separate the code's indentation
+from the indentation used to display the code in this document.
+The `pipe_dedent` method removes the display indentation.
+
+```
+    --[==[ miranda: exec metacode utilities
+    function pipe_dedent(code)
+        return code:gsub('\n *|', '\n'):gsub('^ *|', '', 1)
+    end
+    ]==]
+```
+
+### `c_safe_string` method
+
+```
+    --[==[ miranda: exec metacode utilities
+    local function c_safe_string (s)
+        s = string.gsub(s, '"', '\\034')
+        s = string.gsub(s, '\\', '\\092')
+        return '"' .. s .. '"'
+    end
+    ]==]
+
+```
+
+### Meta code argument processing
+
+The arguments show where to find the files containing event
+and error codes.
+
+```
+    -- assumes that, when called, out_file to set to output file
+    --[==[ miranda: exec argument processing
+
+    for _,v in ipairs(arg) do
+       if not v:find("=")
+       then return nil, "Bad options: ", arg end
+       local id, val = v:match("^([^=]+)%=(.*)") -- no space around =
+       if id == "out" then io.output(val)
+       else return nil, "Bad id in options: ", id end
+    end
+    ]==]
+```
+
+## Kollos utilities
+
+```
+    -- miranda: section+ most Lua function declarations
+    function _M.posix_lc(str)
+       return str:gsub('[A-Z]', function(str) return string.char(string.byte(str)) end)
     end
 
 ```

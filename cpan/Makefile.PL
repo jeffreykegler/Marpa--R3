@@ -457,7 +457,7 @@ WriteMakefile(
 
     PM                 => \%pm_files,
     MIN_PERL_VERSION => '5.10.1',
-    DIR => [qw(engine lua kollos xs)],
+    DIR => [qw(engine lua kollos glue xs)],
     META_ADD => {
         no_index => {
             directory => [

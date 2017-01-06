@@ -106,6 +106,7 @@ etc/pod_errors.pl
 etc/pod_inlinks.pl
 etc/pod_links.pl
 etc/reserved_check.sh
+glue/glue.lua.md
 inc/Marpa/R3/Config.pm
 inc/Marpa/R3/Display.pm
 inc/Marpa/R3/License.pm
@@ -118,8 +119,8 @@ kollos/Makefile.PL
 kollos/gen_error_table.lua
 kollos/gen_event_table.lua
 kollos/gen_step_table.lua
-kollos/kollos.lua.md
 kollos/inspect.lua
+kollos/kollos.lua.md
 kollos/miranda
 kollos/strict.lua
 lib/Marpa/R3.pm
@@ -127,8 +128,8 @@ lib/Marpa/R3/ASF.pm
 lib/Marpa/R3/Common.pm
 lib/Marpa/R3/Internal.pm
 lib/Marpa/R3/Lua/Glue.PL
-lib/Marpa/R3/Lua/Kollos.PL
 lib/Marpa/R3/Lua/Inspect.PL
+lib/Marpa/R3/Lua/Kollos.PL
 lib/Marpa/R3/MetaAST.pm
 lib/Marpa/R3/MetaG.pm
 lib/Marpa/R3/SLG.pm
@@ -311,7 +312,6 @@ xs/R3.xs
 xs/create_ops.pl
 xs/gen_auto_xs.pl
 xs/gen_exec_lua.pl
-xs/glue.lua.md
 xs/marpa_xs.h
 xs/ppport.h
 xs/string2h.lua
