@@ -45,8 +45,8 @@ my @versioned_files = split /\n/xms, <<'END_OF_LIST';
 cpan/engine/Makefile.PL
 cpan/lib/Marpa/R3/ASF.pm
 cpan/lib/Marpa/R3/Common.pm
-cpan/lib/Marpa/R3/Lua/GLue.PL
-cpan/lib/Marpa/R3/Lua/Init.PL
+cpan/lib/Marpa/R3/Lua/Glue.PL
+cpan/lib/Marpa/R3/Lua/Kollos.PL
 cpan/lib/Marpa/R3/Lua/Inspect.PL
 cpan/lib/Marpa/R3/MetaAST.pm
 cpan/lib/Marpa/R3/MetaG.pm
@@ -91,7 +91,7 @@ for my $versioned_file (@versioned_files) {
 
 {
     # Update the version of Libmarpa that XS is expecting
-    my $expecting_file = 'cpan/kollos/init.lua.md';
+    my $expecting_file = 'cpan/kollos/kollos.lua.md';
     say STDERR $expecting_file;
     my $file = do { local ( @ARGV, $/ ) = ($expecting_file); <> };
     $file =~ s{
