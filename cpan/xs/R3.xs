@@ -4015,20 +4015,6 @@ PPCODE:
     }
     slg_inner_associate (slg, l0_sv, g1_sv);
 
-
-    {
-        Marpa_Grammar l0g = slg->l0_wrapper->g;
-        Marpa_Grammar g1g = slg->g1_wrapper->g;
-        const int highest_g1g_symbol_id = marpa_g_highest_symbol_id (g1g);
-        const int highest_l0g_symbol_id = marpa_g_highest_symbol_id (l0g);
-        const int highest_symbol_id =
-            highest_g1g_symbol_id >
-            highest_l0g_symbol_id ? highest_g1g_symbol_id :
-            highest_l0g_symbol_id;
-        (void) kollos_extraspace_buffer_resize (L,
-            (size_t) highest_symbol_id + 1);
-    }
-
     XSRETURN_YES;
 }
 

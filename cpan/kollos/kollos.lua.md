@@ -155,12 +155,25 @@ interpreter.
     -- miranda: section C structure declarations
     struct kollos_extraspace {
         int ref_count;
-        int (*warn)(const char* format, ...);
-        Marpa_Symbol_ID *buffer;
-        size_t buffer_capacity;
     };
 
     -- miranda: section utility function definitions
+
+    /* I assume this will be inlined by the compiler */
+    static Marpa_Symbol_ID *shared_buffer_get(lua_State* L)
+    {
+        Marpa_Symbol_ID* buffer;
+        const int base_of_stack = marpa_lua_gettop(L);
+        marpa_lua_pushvalue(L, marpa_lua_upvalueindex(1));
+        if (!marpa_lua_istable(L, -1)) {
+            internal_error_handle(L, "missing upvalue table",
+            __PRETTY_FUNCTION__, __FILE__, __LINE__);
+        }
+        marpa_lua_getfield(L, -1, "buffer");
+        buffer = marpa_lua_touserdata(L, -1);
+        marpa_lua_settop(L, base_of_stack);
+        return buffer;
+    }
 
     /* I assume this will be inlined by the compiler */
     static struct kollos_extraspace *extraspace_get(lua_State* L)
@@ -172,9 +185,6 @@ interpreter.
     /* I probably will, in the final version, want this to be a
      * static utility, internal to Kollos
      */
-    void kollos_extraspace_buffer_resize(
-        lua_State* L,
-        size_t desired_capacity);
     void kollos_shared_buffer_resize(
         lua_State* L,
         size_t desired_capacity);
@@ -195,8 +205,17 @@ leaving it as is.
         const int upvalue_ix = base_of_stack + 1;
 
         marpa_lua_pushvalue(L, marpa_lua_upvalueindex(1));
+        if (!marpa_lua_istable(L, -1)) {
+            internal_error_handle(L, "missing upvalue table",
+            __PRETTY_FUNCTION__, __FILE__, __LINE__);
+        }
         marpa_lua_getfield(L, upvalue_ix, "buffer_capacity");
         buffer_capacity = (size_t)marpa_lua_tointeger(L, -1);
+        /* Is this test needed after development? */
+        if (buffer_capacity < 1) {
+            internal_error_handle(L, "bad buffer capacity",
+            __PRETTY_FUNCTION__, __FILE__, __LINE__);
+        }
         if (desired_capacity > buffer_capacity) {
             /* TODO: this optimizes for space, not speed.
              * Insist capacity double on each realloc()?
@@ -208,30 +227,6 @@ leaving it as is.
             marpa_lua_setfield(L, upvalue_ix, "buffer_capacity");
         }
         marpa_lua_settop(L, base_of_stack);
-    }
-
-    void kollos_extraspace_buffer_resize(
-        lua_State* L,
-        size_t desired_capacity)
-    {
-        struct kollos_extraspace *p_extra = extraspace_get(L);
-
-        if (0) {
-            fprintf (stderr, "%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
-            fprintf (stderr, "kollos_extraspace_buffer_resize(...,%ld)", (long)desired_capacity);
-        }
-
-        if (desired_capacity > p_extra->buffer_capacity) {
-            p_extra->buffer_capacity = desired_capacity;
-            /* TODO: this optimizes for space, not speed.
-             * Insist capacity double on each realloc()?
-             */
-            p_extra->buffer = (Marpa_Symbol_ID *) realloc (p_extra->buffer,
-                desired_capacity * sizeof (*p_extra->buffer)
-                );
-        if (!p_extra->buffer)
-            (void)out_of_memory (L);
-        }
     }
 
 ```
@@ -251,8 +246,8 @@ the interpreter (Kollos object) is destroyed.
 
     -- miranda: section+ C function declarations
     lua_State* kollos_newstate(void);
+
     -- miranda: section Lua interpreter management
-    static int default_warn(const char *format, ...);
     lua_State* kollos_newstate(void)
     {
         int base_of_stack;
@@ -264,11 +259,6 @@ the interpreter (Kollos object) is destroyed.
         p_extra = malloc(sizeof(struct kollos_extraspace));
         *(struct kollos_extraspace **)marpa_lua_getextraspace(L) = p_extra;
         p_extra->ref_count = 1;
-        p_extra->warn = &default_warn;
-        p_extra->buffer_capacity = 1; /* TODO -- once tested, increase to 64 */
-        p_extra->buffer =
-            (Marpa_Symbol_ID *) malloc (p_extra->buffer_capacity *
-            sizeof (*p_extra->buffer));
         marpa_luaL_openlibs (L);    /* open libraries */
         /* Lua stack: [] */
         marpa_luaopen_kollos(L); /* Open kollos library */
@@ -286,6 +276,7 @@ the interpreter (Kollos object) is destroyed.
 
 ```
     -- miranda: section+ lua interpreter management
+    static int default_warn(const char *format, ...) UNUSED;
     static int default_warn(const char *format, ...)
     {
        va_list args;
@@ -330,7 +321,6 @@ Deletes the interpreter if the reference count drops to zero.
         p_extra->ref_count--;
         if (p_extra->ref_count <= 0) {
            marpa_lua_close(L);
-           free(p_extra->buffer);
            free(p_extra);
         }
     }
@@ -2334,7 +2324,9 @@ the wrapper's point of view, marpa_r_alternative() always succeeds.
         for class_letter, class in pairs(libmarpa_class_name) do
            local class_table_name = 'class_' .. class
            local functions_to_register = class .. '_methods'
-           result[#result+1] = string.format("  marpa_luaL_newlib(L, %s);\n", functions_to_register)
+           result[#result+1] = string.format("  marpa_luaL_newlibtable(L, %s);\n", functions_to_register)
+           result[#result+1] = "  marpa_lua_pushvalue(L, upvalue_stack_ix);\n"
+           result[#result+1] = string.format("  marpa_luaL_setfuncs(L, %s, 1);\n", functions_to_register)
            result[#result+1] = "  marpa_lua_pushvalue(L, -1);\n"
            result[#result+1] = '  marpa_lua_setfield(L, -2, "__index");\n'
            result[#result+1] = string.format("  marpa_lua_setfield(L, kollos_table_stack_ix, %q);\n", class_table_name);
@@ -2684,11 +2676,13 @@ Set "strict" globals, using code taken from strict.lua.
     -- miranda: insert private step code declarations
     -- miranda: insert define step codes
 
-    -- miranda: insert utilities from okollos.c.lua
-    -- miranda: insert utility function definitions
     -- miranda: insert error object code from okollos.c.lua
     -- miranda: insert base error handlers
     -- miranda: insert error handlers
+
+    -- miranda: insert utilities from okollos.c.lua
+    -- miranda: insert utility function definitions
+
     -- miranda: insert event related code from okollos.c.lua
     -- miranda: insert step structure code
     -- miranda: insert metatable keys
@@ -3139,6 +3133,41 @@ Set "strict" globals, using code taken from strict.lua.
       marpa_lua_error(L);
     }
 
+```
+
+Internal errors are those which "should not happen".
+Often they were be caused by bugs.
+Under the description, an exact and specific description
+of the cause is not possible.
+Instead,  information pinpointing the location in the
+source code is provided.
+The "throw" flag is ignored.
+
+```
+    -- miranda: section+ base error handlers
+    static void
+    internal_error_handle (lua_State * L,
+                            const char *details,
+                            const char *function,
+                            const char *file,
+                            int line
+                            )
+    {
+      int error_object_ix;
+      push_error_object(L, MARPA_ERR_INTERNAL, details);
+      error_object_ix = marpa_lua_gettop(L);
+      marpa_lua_pushstring(L, function);
+      marpa_lua_setfield(L, error_object_ix, "function");
+      marpa_lua_pushstring(L, file);
+      marpa_lua_setfield(L, error_object_ix, "file");
+      marpa_lua_pushinteger(L, line);
+      marpa_lua_setfield(L, error_object_ix, "line");
+      marpa_lua_pushvalue(L, error_object_ix);
+      marpa_lua_setglobal(L, "error_object");
+      marpa_lua_error(L);
+    }
+
+    static int out_of_memory(lua_State* L) UNUSED;
     static int out_of_memory(lua_State* L) {
         return marpa_luaL_error(L, "Kollos out of memory");
     }
@@ -3616,7 +3645,7 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
             printf ("About to resize buffer to %ld", (long) ( highest_symbol_id+1));
         }
 
-        (void)kollos_extraspace_buffer_resize(L, (size_t) highest_symbol_id+1);
+        (void)kollos_shared_buffer_resize(L, (size_t) highest_symbol_id+1);
         marpa_lua_pushinteger (L, (lua_Integer) result);
         return 1;
     }
@@ -3723,11 +3752,11 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
       int count;
       int ix;
       Marpa_Recce r;
-      struct kollos_extraspace* const p_extra = extraspace_get(L);
-      /* p_extra->terminals_buffer is guaranteed to have space for all the symbol IDS
+
+      /* The shared buffer is guaranteed to have space for all the symbol IDS
        * of the grammar.
        */
-      Marpa_Symbol_ID* buffer = p_extra->buffer;
+      Marpa_Symbol_ID* const buffer = shared_buffer_get(L);
 
       marpa_lua_getfield (L, recce_stack_ix, "_libmarpa");
       /* [ recce_object, recce_ud ] */
