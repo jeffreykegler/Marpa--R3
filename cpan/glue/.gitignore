@@ -1,0 +1,9 @@
+glue[.]lua
+glue[.]a
+glue[.]c
+glue[.]h
+glue[.]o
+Makefile
+Makefile[.]old
+MYMETA[.]json
+MYMETA[.]yml

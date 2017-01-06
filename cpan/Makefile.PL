@@ -295,7 +295,7 @@ my $libmarpa_in_build_dir =
   :  $libmarpa_build_dir . q{/.libs/libmarpa$(LIB_EXT)};
 
 my $myextlib = join q{ }, $libmarpa_in_build_dir, 'lua/marpa_lua$(LIB_EXT)',
-  'kollos/kollos$(LIB_EXT)';
+  'glue/glue$(LIB_EXT)', 'kollos/kollos$(LIB_EXT)';
 
 # my $ccflags = $Config{ccflags} . " -Iengine/read_only -Ixs";
 
@@ -347,6 +347,14 @@ lua/marpa_lua$(LIB_EXT):
 END_OF_POSTAMBLE_PIECE
 	$self->cd(File::Spec->catdir(qw(lua)), '$(MAKE) ');
 
+# == Logic to build in glue directory:
+
+    push @postamble_pieces, sprintf <<'END_OF_POSTAMBLE_PIECE',
+glue/glue$(LIB_EXT):
+	%s
+END_OF_POSTAMBLE_PIECE
+	$self->cd(File::Spec->catdir(qw(glue)), '$(MAKE) ');
+
 # == Logic to build in kollos directory:
 
     push @postamble_pieces, sprintf <<'END_OF_POSTAMBLE_PIECE',
@@ -372,7 +380,7 @@ all :: inc\Marpa\R3\Lua\Test\More.pm
 lib\Marpa\R3\Lua\Inspect.pm: kollos\inspect.lua lib\Marpa\R3\Lua\Inspect.PL
 	$(PERLRUN) lib\Marpa\R3\Lua\Inspect.PL lib\Marpa\R3\Lua\Inspect.pm
 
-lib\Marpa\R3\Lua\Glue.pm: xs\glue.lua lib\Marpa\R3\Lua\Glue.PL
+lib\Marpa\R3\Lua\Glue.pm: glue\glue.lua lib\Marpa\R3\Lua\Glue.PL
 	$(PERLRUN) lib\Marpa\R3\Lua\Glue.PL lib\Marpa\R3\Lua\Glue.pm
 
 lib\Marpa\R3\Lua\Kollos.pm: kollos\kollos.lua lib\Marpa\R3\Lua\Kollos.PL
@@ -399,7 +407,7 @@ all :: inc/Marpa/R3/Lua/Test/More.pm
 lib/Marpa/R3/Lua/Inspect.pm: kollos/inspect.lua lib/Marpa/R3/Lua/Inspect.PL
 	$(PERLRUN) lib/Marpa/R3/Lua/Inspect.PL lib/Marpa/R3/Lua/Inspect.pm
 
-lib/Marpa/R3/Lua/Glue.pm: xs/glue.lua lib/Marpa/R3/Lua/Glue.PL
+lib/Marpa/R3/Lua/Glue.pm: glue/glue.lua lib/Marpa/R3/Lua/Glue.PL
 	$(PERLRUN) lib/Marpa/R3/Lua/Glue.PL lib/Marpa/R3/Lua/Glue.pm
 
 lib/Marpa/R3/Lua/Kollos.pm: kollos/kollos.lua lib/Marpa/R3/Lua/Kollos.PL
@@ -424,6 +432,12 @@ lua/lua:
 	%s
 END_OF_POSTAMBLE_PIECE
 	$self->cd(File::Spec->catdir(qw(lua)), '$(MAKE)');
+
+    push @postamble_pieces, sprintf <<'END_OF_POSTAMBLE_PIECE',
+glue/glue.lua: lua/lua glue/glue.lua.md
+	%s
+END_OF_POSTAMBLE_PIECE
+	$self->cd(File::Spec->catdir(qw(xs)), '$(MAKE)');
 
     return join "\n", @postamble_pieces;
 
