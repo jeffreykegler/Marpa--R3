@@ -1520,6 +1520,7 @@ call_by_tag (lua_State * L, const char* tag, const char *codestr,
             /* warn("%s %d narg=%d", __FILE__, __LINE__, narg, *sig); */
             break;
         case 'R':              /* argument is ref key of recce table */
+        case 'G':
             marpa_lua_rawgeti (L, LUA_REGISTRYINDEX,
                 (lua_Integer) va_arg (vl, lua_Integer));
             break;
@@ -2595,7 +2596,6 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
             struct symbol_r_properties *symbol_r_properties;
             Marpa_Symbol_ID g1_lexeme;
             int this_lexeme_priority;
-            int is_expected;
             int dot_position;
             int origin;
             int rule_id;
@@ -2642,13 +2642,16 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
             }
             l0_rule_g_properties = slg->l0_rule_g_properties + rule_id;
             symbol_r_properties = slr->symbol_r_properties + g1_lexeme;
-            is_expected = marpa_r_terminal_is_expected (g1r, g1_lexeme);
-            if (!is_expected) {
-                croak
-                    ("Internal error: Marpa recognized unexpected token @%ld-%ld: lexeme=%ld",
-                    (long) slr->start_of_lexeme, (long) slr->end_of_lexeme,
-                    (long) g1_lexeme);
-            }
+
+            call_by_tag (outer_slr->L, STRLOC,
+                "recce, g1_lexeme, start_of_lexeme, end_of_lexeme = ...\n"
+                "local is_expected = recce.lmw_g1r:terminal_is_expected(g1_lexeme)\n"
+                "if not is_expected then\n"
+                "    error(string.format('Internnal error: Marpa recognized unexpected token @%d-%d: lexme=%d',\n"
+                "        start_of_lexeme, end_of_lexeme, g1_lexeme))\n"
+                "end\n",
+                "Riii>",
+                outer_slr->lua_ref, g1_lexeme, slr->start_of_lexeme, slr->end_of_lexeme);
 
             /* If we are here, the lexeme will be accepted  by the grammar,
              * but we do not yet know about priority
@@ -2765,16 +2768,17 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
                         goto NEXT_LEXEME_EVENT;
                     }
                     call_by_tag (outer_slr->L, STRLOC,
-                        "recce, rule_id, lexeme_start, lexeme_end, last_g1_location = ...\n"
+                        "recce, rule_id, lexeme_start, lexeme_end = ...\n"
                         "local q = recce.event_queue\n"
+                        "local g1r = recce.lmw_g1r\n"
+                        "local last_g1_location = g1r:latest_earley_set()\n"
                         "q[#q+1] = { 'discarded lexeme',\n"
                         "    rule_id, lexeme_start, lexeme_end, last_g1_location}\n",
-                        "Riiii>",
+                        "Riii>",
                         outer_slr->lua_ref,
                         l0_rule_id,
                         lexeme_stack_event->t_trace_lexeme_discarded.t_start_of_lexeme,
-                        lexeme_stack_event->t_trace_lexeme_discarded.t_end_of_lexeme,
-                        marpa_r_latest_earley_set (slr->g1r)
+                        lexeme_stack_event->t_trace_lexeme_discarded.t_end_of_lexeme
                         );
                 }
                 goto NEXT_LEXEME_EVENT;
