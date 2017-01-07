@@ -1805,15 +1805,29 @@ u_read (Outer_R * outer_slr)
     U8 *input;
     STRLEN len;
     int input_is_utf8;
+    int has_l0r;
 
     Marpa_Recognizer l0r = slr->l0r;
 
-    if (!l0r) {
+  call_by_tag (outer_slr->L,
+    STRLOC,
+    "recce=...; return recce.lmw_l0r and 1 or 0",
+    "R>i", outer_slr->lua_ref, &has_l0r);
+
+    if (!has_l0r) {
         l0r = u_l0r_new (outer_slr);
-        if (!l0r)
-            croak ("Problem in u_read(): %s",
-                xs_g_error (slr->slg->l0_wrapper));
     }
+
+  call_by_tag (outer_slr->L,
+    STRLOC,
+    "recce=...\n"
+    "local l0r = recce.lmw_l0r\n"
+    "if not l0r then\n"
+    "    error('Internal error: No l0r: %s',\n"
+    "        recce:error_description())\n"
+    "end\n",
+    "R>", outer_slr->lua_ref);
+
     input_is_utf8 = SvUTF8 (slr->input);
     input = (U8 *) SvPV (slr->input, len);
     for (;;) {
@@ -2556,7 +2570,6 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
 {
     dTHX;
     Scanless_R *slr = slr_inner_get(outer_slr);
-    Marpa_Recce l0r;
     Marpa_Recce g1r = slr->g1r;
     Marpa_Earley_Set_ID earley_set;
     const Scanless_G *slg = slr->slg;
@@ -2572,11 +2585,15 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
     { none, discard, no_lexeme, accept };
     enum pass1_result_type pass1_result = none;
 
-    l0r = slr->l0r;
-    if (!l0r) {
-        croak ("Problem in slr->read(): No R0 at %s %d", __FILE__,
-            __LINE__);
-    }
+  call_by_tag (outer_slr->L,
+    STRLOC,
+    "recce=...\n"
+    "local l0r = recce.lmw_l0r\n"
+    "if not l0r then\n"
+    "    error('Internal error: No l0r iin slr_alternatives: %s',\n"
+    "        recce:error_description())\n"
+    "end\n",
+    "R>", outer_slr->lua_ref);
 
     marpa_slr_lexeme_clear (slr);
 
