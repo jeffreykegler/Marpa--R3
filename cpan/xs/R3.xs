@@ -1553,28 +1553,29 @@ call_by_tag (lua_State * L, const char* tag, const char *codestr,
                 const double n = marpa_lua_tonumberx (L, nres, &isnum);
                 if (!isnum)
                     croak
-                        ("Internal error: call_by_tag(): result type is not double");
+                        ("Internal error: call_by_tag(%s ...): result type is not double",
+                        tag);
                 *va_arg (vl, double *) = n;
                 break;
             }
         case 'i':
             {
                 int isnum;
-                const lua_Integer n =
-                    marpa_lua_tointegerx (L, nres, &isnum);
+                const lua_Integer n = marpa_lua_tointegerx (L, nres, &isnum);
                 if (!isnum)
                     croak
-                        ("Internal error: call_by_tag(): result type is not integer");
+                        ("Internal error: call_by_tag(%s ...): result type is not integer",
+                        tag);
                 *va_arg (vl, int *) = (int) n;
                 break;
             }
-        case 'M':              /* SV -- caller becomes owner of 1 mortal ref count. */
+        case 'M':                  /* SV -- caller becomes owner of 1 mortal ref count. */
             {
                 SV **av_ref_p = (SV **) marpa_lua_touserdata (L, nres);
                 *va_arg (vl, SV **) = sv_mortalcopy (*av_ref_p);
                 break;
             }
-        case 'C':              /* SV -- caller becomes owner of 1 mortal ref count. */
+        case 'C':                  /* SV -- caller becomes owner of 1 mortal ref count. */
             {
                 SV *sv = sv_2mortal (coerce_to_sv (L, nres, '-'));
                 *va_arg (vl, SV **) = sv;
@@ -2612,13 +2613,21 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
             int this_lexeme_priority;
             int is_expected;
             int dot_position;
-            Marpa_Earley_Set_ID origin;
-            Marpa_Rule_ID rule_id =
-                marpa_r_progress_item (l0r, &dot_position, &origin);
-            if (rule_id <= -2) {
-                croak ("Problem in marpa_r_progress_item(): %s",
-                    xs_g_error (slr->slg->l0_wrapper));
-            }
+            int origin;
+            int rule_id;
+
+            call_by_tag (outer_slr->L, STRLOC,
+                "recce = ...\n"
+                "local rule_id, dot_position, origin = recce.lmw_l0r:progress_item()\n"
+                "if not rule_id then return -1, 0, 0 end\n"
+                "if rule_id <= -2 then\n"
+                "    error(string.format('Problem in recce:progress_item(): %s'),\n"
+                "        recce:error_description())\n"
+                "end\n"
+                "return rule_id, dot_position, origin\n",
+                "R>iii",
+                outer_slr->lua_ref, &rule_id, &dot_position, &origin);
+
             if (rule_id == -1) {
                 end_of_earley_items = 1;
                 goto NEXT_PASS1_REPORT_ITEM;
