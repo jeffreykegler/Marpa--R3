@@ -1612,39 +1612,22 @@ static void dummyup_recce(
   lua_State* L, lua_Integer slr_lua_ref, Marpa_Recce recce, const char *name);
 
 static void
-u_l0r_clear (Outer_R* outer_slr)
-{
-  dTHX;
-  Scanless_R *slr = slr_inner_get(outer_slr);
-  Marpa_Recce l0r = slr->l0r;
-  if (!l0r)
-    return;
-  marpa_r_unref (l0r);
-  slr->l0r = NULL;
-  call_by_tag (outer_slr->L,
-    STRLOC,
-    "recce=...; recce.lmw_l0r = nil",
-    "R>",
-    outer_slr->lua_ref);
-}
-
-static Marpa_Recce
 u_l0r_new (Outer_R* outer_slr)
 {
     Scanless_R *slr = slr_inner_get (outer_slr);
-    Marpa_Recce l0r = slr->l0r;
     G_Wrapper *lexer_wrapper = slr->slg->l0_wrapper;
 
-    u_l0r_clear(outer_slr);
-    slr->l0r = l0r = marpa_r_new (lexer_wrapper->g);
-    if (!l0r) {
-        if (!lexer_wrapper->throw)
-            return 0;
-        croak ("failure in marpa_r_new(): %s", xs_g_error (lexer_wrapper));
-    };
-
-    marpa_r_ref (l0r);
-    dummyup_recce (outer_slr->L, outer_slr->lua_ref, l0r, "lmw_l0r");
+  call_by_tag (outer_slr->L,
+    STRLOC,
+    "recce= ...\n"
+    "local l0r = kollos.recce_new(recce.slg.lmw_l0g)\n"
+    "if not l0r then\n"
+    "    error('Internal error: kollos.recce_new() failed %s',"
+    "        recce:error_description())\n"
+    "end\n"
+    "recce.lmw_l0r = l0r\n" ,
+    "R>",
+    outer_slr->lua_ref);
 
     {
         int i;
@@ -1698,24 +1681,16 @@ u_l0r_new (Outer_R* outer_slr)
                 assertion);
         }
     }
-    {
-        int gp_result;
+
         call_by_tag (outer_slr->L,
             STRLOC,
             "recce = ...\n"
-            "return recce.lmw_l0r:start_input()\n",
-            "R>i", outer_slr->lua_ref, &gp_result);
-        if (gp_result == -1)
-            return 0;
-        if (gp_result < 0) {
-            if (lexer_wrapper->throw) {
-                croak ("Problem in r->start_input(): %s",
-                    xs_g_error (lexer_wrapper));
-            }
-            return 0;
-        }
-    }
-    return l0r;
+            "local result = recce.lmw_l0r:start_input()\n"
+            "if result and result <= -2 then\n"
+            "    error('Internal error: problem with recce:start_input(l0r): %s',\n"
+            "        recce:error_description())\n"
+            "end\n",
+            "R>", outer_slr->lua_ref);
 }
 
 /* Assumes it is called
@@ -1807,15 +1782,13 @@ u_read (Outer_R * outer_slr)
     int input_is_utf8;
     int has_l0r;
 
-    Marpa_Recognizer l0r = slr->l0r;
-
   call_by_tag (outer_slr->L,
     STRLOC,
     "recce=...; return recce.lmw_l0r and 1 or 0",
     "R>i", outer_slr->lua_ref, &has_l0r);
 
     if (!has_l0r) {
-        l0r = u_l0r_new (outer_slr);
+        u_l0r_new (outer_slr);
     }
 
   call_by_tag (outer_slr->L,
@@ -2238,7 +2211,6 @@ static Scanless_R* marpa_inner_slr_new (
   Newx (slr, 1, Scanless_R);
 
   slr->throw = 1;
-  slr->l0r = NULL;
 
   /* Copy and take references to the "parent objects",
    * the ones responsible for holding references.
@@ -2343,13 +2315,8 @@ static Scanless_R* slr_inner_get(Outer_R* outer_slr) {
 static void slr_inner_destroy(Scanless_R* slr)
 {
   dTHX;
-  const Marpa_Recce l0r = slr->l0r;
 
   /* marpa_r3_warn("SLR inner destroy"); */
-  if (l0r)
-    {
-      marpa_r_unref (l0r);
-    }
 
    Safefree(slr->t_lexemes);
 
@@ -2590,7 +2557,7 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
     "recce=...\n"
     "local l0r = recce.lmw_l0r\n"
     "if not l0r then\n"
-    "    error('Internal error: No l0r iin slr_alternatives: %s',\n"
+    "    error('Internal error: No l0r in slr_alternatives(): %s',\n"
     "        recce:error_description())\n"
     "end\n",
     "R>", outer_slr->lua_ref);
@@ -4636,9 +4603,9 @@ PPCODE:
 
           slr->start_of_lexeme = slr->perl_pos = slr->lexer_start_pos;
           slr->lexer_start_pos = -1;
-          u_l0r_clear (outer_slr);
                             call_by_tag (outer_slr->L, STRLOC,
                                 "local recce, perl_pos = ...\n"
+                                "recce.lmw_l0r = nil\n"
                                 "if recce.trace_terminals >= 1 then\n"
                                 "    local q = recce.event_queue\n"
                                 "    q[#q+1] = { '!trace', 'lexer restarted recognizer', perl_pos}\n"
