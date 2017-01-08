@@ -138,9 +138,6 @@ typedef struct marpa_g Grammar;
 
 typedef struct marpa_r Recce;
 
-#define TOKEN_VALUE_IS_UNDEF (1)
-#define TOKEN_VALUE_IS_LITERAL (2)
-
 typedef struct marpa_b Bocage;
 
 typedef struct marpa_o Order;
@@ -4872,10 +4869,23 @@ PPCODE:
       {
         SV *token_value = ST (2);
         if (IS_PERL_UNDEF (token_value))
-          {
-            token_ix = TOKEN_VALUE_IS_UNDEF;    /* default */
+          { int value_is_undef;
+            call_by_tag (outer_slr->L, STRLOC,
+                "recce = ...\n"
+                "local g1r = recce.lmw_g1r\n"
+                "local kollos = getmetatable(g1r).kollos\n"
+                "local defines = kollos.defines\n"
+                "return defines.TOKEN_VALUE_IS_UNDEF\n",
+                "R>i",
+                outer_slr->lua_ref,
+                &value_is_undef
+            );
+
+
+            token_ix = value_is_undef;    /* default */
             break;
           }
+
         /* Fail fast with a tainted input token value */
         if (SvTAINTED(token_value)) {
             croak
