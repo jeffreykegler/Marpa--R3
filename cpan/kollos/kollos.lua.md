@@ -2324,12 +2324,20 @@ the wrapper's point of view, marpa_r_alternative() always succeeds.
         for class_letter, class in pairs(libmarpa_class_name) do
            local class_table_name = 'class_' .. class
            local functions_to_register = class .. '_methods'
+           -- class_xyz = {}
            result[#result+1] = string.format("  marpa_luaL_newlibtable(L, %s);\n", functions_to_register)
+           -- add functions and upvalue to class_xyz
            result[#result+1] = "  marpa_lua_pushvalue(L, upvalue_stack_ix);\n"
            result[#result+1] = string.format("  marpa_luaL_setfuncs(L, %s, 1);\n", functions_to_register)
+           -- class_xyz.__index = class_xyz
            result[#result+1] = "  marpa_lua_pushvalue(L, -1);\n"
            result[#result+1] = '  marpa_lua_setfield(L, -2, "__index");\n'
+           -- kollos[class_xyz] = class_xyz
+           result[#result+1] = "  marpa_lua_pushvalue(L, -1);\n"
            result[#result+1] = string.format("  marpa_lua_setfield(L, kollos_table_stack_ix, %q);\n", class_table_name);
+           -- class_xyz[kollos] = kollos
+           result[#result+1] = "  marpa_lua_pushvalue(L, kollos_table_stack_ix);\n"
+           result[#result+1] = '  marpa_lua_setfield(L, -2, "kollos");\n'
         end
         return table.concat(result)
   ]==]
