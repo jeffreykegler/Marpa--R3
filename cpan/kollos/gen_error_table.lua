@@ -173,7 +173,7 @@ for index, element in pairs(lua_code_data) do
 	     index, element[1], element[2], element[3])
 	 goto NEXT_INDEX
      end
-     by_mnemonic[#by_mnemonic+1] = string.format("    _M.err[%q] = _M.err[%d]\n",
+     by_mnemonic[#by_mnemonic+1] = string.format("    _M.err[%q] = %d\n",
 	 tostring(index), element[1])
      ::NEXT_INDEX::
 end
