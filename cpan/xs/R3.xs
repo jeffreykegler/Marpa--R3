@@ -5440,7 +5440,19 @@ PPCODE:
   Scanless_R *slr = slr_inner_get(outer_slr);
   G_Wrapper *g1_wrapper = slr->g1_wrapper;
   Marpa_Recognizer g1r = slr->g1r;
-  int gp_result = marpa_r_start_input(g1r);
+  int gp_result;
+
+    call_by_tag (outer_slr->L, STRLOC,
+        "recce = ...\n"
+        "local g1r = recce.lmw_g1r\n"
+        "local return_value = g1r:start_input()\n"
+        "return return_value\n"
+        ,
+        "R>i",
+        outer_slr->lua_ref,
+        &gp_result
+    );
+
   if ( gp_result == -1 ) { XSRETURN_UNDEF; }
   if ( gp_result < 0 && g1_wrapper->throw ) {
     croak( "Problem in r->start_input(): %s",
