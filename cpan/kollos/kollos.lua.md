@@ -1619,6 +1619,13 @@ whose id is `id`.
 
 ```
 
+```
+    -- miranda: section+ various Kollos lua defines
+    _M.defines.TOKEN_VALUE_IS_UNDEF = 1
+    _M.defines.TOKEN_VALUE_IS_LITERAL = 2
+
+```
+
 ## The valuator Libmarpa wrapper
 
 The "valuator" portion of Kollos produces the
@@ -2581,7 +2588,8 @@ a special "configuration" argument.
     -- miranda: insert Utilities for Perl code
     -- miranda: insert most Lua function declarations
     -- miranda: insert most Lua function declarations
-    -- miranda: insert define Lua error codes
+    -- miranda: insert define Kollos Lua error codes
+    -- miranda: insert various Kollos Lua defines
 
     return _M
 
@@ -4078,6 +4086,7 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
     {
         /* The main kollos object */
         int kollos_table_stack_ix;
+        int kollos_defines_ix;
         int upvalue_stack_ix;
 
       {
@@ -4135,6 +4144,11 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
         /* Also keep the upvalues in an element of the class */
         marpa_lua_pushvalue(L, upvalue_stack_ix);
         marpa_lua_setfield(L, kollos_table_stack_ix, "upvalues");
+
+        /* Create the defines table */
+        marpa_lua_newtable (L);
+        kollos_defines_ix = marpa_lua_gettop(L);
+        marpa_lua_setfield(L, kollos_table_stack_ix, "defines");
 
         -- miranda: insert create kollos class tables
 

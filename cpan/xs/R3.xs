@@ -2201,100 +2201,110 @@ static void slg_inner_destroy(Scanless_G* slg) {
 
 /* Static SLR methods */
 
-static Scanless_R* marpa_inner_slr_new (
-  Scanless_G *slg,
-    Marpa_Recce g1r
-    )
+static Scanless_R *
+marpa_inner_slr_new (Outer_G* outer_slg, Marpa_Recce g1r)
 {
-  dTHX;
-  Scanless_R *slr;
+    dTHX;
+    Scanless_R *slr;
+    Scanless_G *slg = slg_inner_get (outer_slg);
+    int value_is_literal;
 
-  Newx (slr, 1, Scanless_R);
+    Newx (slr, 1, Scanless_R);
 
-  slr->throw = 1;
+    slr->throw = 1;
 
-  /* Copy and take references to the "parent objects",
-   * the ones responsible for holding references.
-   */
-  slr->g1g_sv = slg->g1_sv;
-  SvREFCNT_inc (slr->g1g_sv);
+    /* Copy and take references to the "parent objects",
+     * the ones responsible for holding references.
+     */
+    slr->g1g_sv = slg->g1_sv;
+    SvREFCNT_inc (slr->g1g_sv);
 
-  /* These do not need references, because parent objects
-   * hold references to them
-   */
-  if (!slg->precomputed)
-    {
-      croak
-        ("Problem in u->new(): Attempted to create SLIF recce from unprecomputed SLIF grammar");
+    /* These do not need references, because parent objects
+     * hold references to them
+     */
+    if (!slg->precomputed) {
+        croak
+            ("Problem in u->new(): Attempted to create SLIF recce from unprecomputed SLIF grammar");
     }
-  slr->slg = slg;
-  slr->g1r = g1r;
-  slr->g1_wrapper = slg->g1_wrapper;
+    slr->slg = slg;
+    slr->g1r = g1r;
+    slr->g1_wrapper = slg->g1_wrapper;
 
-  slr->start_of_lexeme = 0;
-  slr->end_of_lexeme = 0;
-  slr->is_external_scanning = 0;
+    slr->start_of_lexeme = 0;
+    slr->end_of_lexeme = 0;
+    slr->is_external_scanning = 0;
 
-  slr->perl_pos = 0;
-  slr->last_perl_pos = -1;
-  slr->problem_pos = -1;
+    slr->perl_pos = 0;
+    slr->last_perl_pos = -1;
+    slr->problem_pos = -1;
 
-  slr->token_values = newAV ();
-  av_fill (slr->token_values, TOKEN_VALUE_IS_LITERAL);
+    slr->token_values = newAV ();
 
-  {
-    Marpa_Symbol_ID symbol_id;
-    const Marpa_Symbol_ID g1_symbol_count =
-      marpa_g_highest_symbol_id (slg->g1) + 1;
-    Newx (slr->symbol_r_properties, ((unsigned int)g1_symbol_count),
-          struct symbol_r_properties);
-    for (symbol_id = 0; symbol_id < g1_symbol_count; symbol_id++)
-      {
-        const struct symbol_g_properties *g_properties =
-          slg->symbol_g_properties + symbol_id;
-        slr->symbol_r_properties[symbol_id].lexeme_priority =
-          g_properties->priority;
-        slr->symbol_r_properties[symbol_id].t_pause_before_active =
-          g_properties->t_pause_before_active;
-        slr->symbol_r_properties[symbol_id].t_pause_after_active =
-          g_properties->t_pause_after_active;
-      }
-  }
+    call_by_tag (outer_slg->L, STRLOC,
+        "grammar = ...\n"
+        "local g1g = grammar.lmw_g1g\n"
+        "local kollos = getmetatable(g1g).kollos\n"
+        "local defines = kollos.defines\n"
+        "return defines.TOKEN_VALUE_IS_LITERAL\n"
+        ,
+        "G>i", outer_slg->lua_ref, &value_is_literal);
 
-  {
-    Marpa_Rule_ID l0_rule_id;
-    const Marpa_Rule_ID l0_rule_count =
-      marpa_g_highest_rule_id (slg->l0_wrapper->g) + 1;
-    Newx (slr->l0_rule_r_properties, (unsigned)l0_rule_count,
-          struct l0_rule_r_properties);
-    for (l0_rule_id = 0; l0_rule_id < l0_rule_count; l0_rule_id++)
-      {
-        const struct l0_rule_g_properties *g_properties =
-          slg->l0_rule_g_properties + l0_rule_id;
-        slr->l0_rule_r_properties[l0_rule_id].t_event_on_discard_active =
-          g_properties->t_event_on_discard_active;
-      }
-  }
+    av_fill (slr->token_values, value_is_literal);
 
-  slr->lexer_start_pos = slr->perl_pos;
-  slr->lexer_read_result = 0;
-  slr->g1r_earleme_complete_result = 0;
-  slr->start_of_pause_lexeme = -1;
-  slr->end_of_pause_lexeme = -1;
+    {
+        Marpa_Symbol_ID symbol_id;
+        const Marpa_Symbol_ID g1_symbol_count =
+            marpa_g_highest_symbol_id (slg->g1) + 1;
+        Newx (slr->symbol_r_properties, ((unsigned int) g1_symbol_count),
+            struct symbol_r_properties);
+        for (symbol_id = 0; symbol_id < g1_symbol_count; symbol_id++) {
+            const struct symbol_g_properties *g_properties =
+                slg->symbol_g_properties + symbol_id;
+            slr->symbol_r_properties[symbol_id].lexeme_priority =
+                g_properties->priority;
+            slr->symbol_r_properties[symbol_id].t_pause_before_active =
+                g_properties->t_pause_before_active;
+            slr->symbol_r_properties[symbol_id].t_pause_after_active =
+                g_properties->t_pause_after_active;
+        }
+    }
 
-  slr->pos_db = 0;
-  slr->pos_db_logical_size = -1;
-  slr->pos_db_physical_size = -1;
+    {
+        Marpa_Rule_ID l0_rule_id;
+        const Marpa_Rule_ID l0_rule_count =
+            marpa_g_highest_rule_id (slg->l0_wrapper->g) + 1;
+        Newx (slr->l0_rule_r_properties, (unsigned) l0_rule_count,
+            struct l0_rule_r_properties);
+        for (l0_rule_id = 0; l0_rule_id < l0_rule_count; l0_rule_id++) {
+            const struct l0_rule_g_properties *g_properties =
+                slg->l0_rule_g_properties + l0_rule_id;
+            slr->l0_rule_r_properties[l0_rule_id].
+                t_event_on_discard_active =
+                g_properties->t_event_on_discard_active;
+        }
+    }
 
-  slr->input_symbol_id = -1;
-  slr->input = newSVpvn ("", 0);
-  slr->end_pos = 0;
+    slr->lexer_start_pos = slr->perl_pos;
+    slr->lexer_read_result = 0;
+    slr->g1r_earleme_complete_result = 0;
+    slr->start_of_pause_lexeme = -1;
+    slr->end_of_pause_lexeme = -1;
 
-  slr->t_lexeme_count = 0;
-  slr->t_lexeme_capacity = (int)MAX (1024 / sizeof (union marpa_slr_event_s), 16);
-  Newx (slr->t_lexemes, (unsigned int)slr->t_lexeme_capacity, union marpa_slr_event_s);
+    slr->pos_db = 0;
+    slr->pos_db_logical_size = -1;
+    slr->pos_db_physical_size = -1;
 
-  return slr;
+    slr->input_symbol_id = -1;
+    slr->input = newSVpvn ("", 0);
+    slr->end_pos = 0;
+
+    slr->t_lexeme_count = 0;
+    slr->t_lexeme_capacity =
+        (int) MAX (1024 / sizeof (union marpa_slr_event_s), 16);
+    Newx (slr->t_lexemes, (unsigned int) slr->t_lexeme_capacity,
+        union marpa_slr_event_s);
+
+    return slr;
 }
 
 static Scanless_R* slr_inner_get(Outer_R* outer_slr) {
@@ -2862,21 +2872,26 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
                     slr->symbol_r_properties + g1_lexeme;
 
                             call_by_tag (outer_slr->L, STRLOC,
-                                "recce, lexeme_start, lexeme_end, lexeme = ...\n"
+                                "recce, lexeme_start, lexeme_end, g1_lexeme = ...\n"
                                 "if recce.trace_terminals > 2 then\n"
                                 "    local q = recce.event_queue\n"
-                                "    q[#q+1] = { '!trace', 'g1 attempting lexeme', lexeme_start, lexeme_end, lexeme}\n"
+                                "    q[#q+1] = { '!trace', 'g1 attempting lexeme', lexeme_start, lexeme_end, g1_lexeme}\n"
                                 "end\n"
+                                "local g1r = recce.lmw_g1r\n"
+                                "local kollos = getmetatable(g1r).kollos\n"
+                                "local value_is_literal = kollos.defines.TOKEN_VALUE_IS_LITERAL\n"
+                                "local return_value = g1r:alternative(g1_lexeme, value_is_literal, 1)\n"
+                                "-- print('return value = ', inspect(return_value))\n"
+                                "return return_value\n"
                                 ,
-                                "Riii>",
+                                "Riii>i",
                                 outer_slr->lua_ref,
                                 slr->start_of_lexeme,
                                 slr->end_of_lexeme,
-                                g1_lexeme
+                                g1_lexeme,
+                                &return_value
                             );
-                return_value =
-                    marpa_r_alternative (g1r, g1_lexeme,
-                    TOKEN_VALUE_IS_LITERAL, 1);
+
                 switch (return_value) {
 
                 case MARPA_ERR_UNEXPECTED_TOKEN_ID:
@@ -4448,7 +4463,7 @@ PPCODE:
       croak ("failure in marpa_r_new(): %s", xs_g_error (slg->g1_wrapper));
   };
 
-  slr = marpa_inner_slr_new(slg, g1r);
+  slr = marpa_inner_slr_new(outer_slg, g1r);
   /* Copy and take references to the "parent objects",
    * the ones responsible for holding references.
    */
@@ -4838,7 +4853,20 @@ PPCODE:
   switch (items)
     {
     case 2:
-      token_ix = TOKEN_VALUE_IS_LITERAL;        /* default */
+    { int value_is_literal;
+            call_by_tag (outer_slr->L, STRLOC,
+                "recce = ...\n"
+                "local g1r = recce.lmw_g1r\n"
+                "local kollos = getmetatable(g1r).kollos\n"
+                "local defines = kollos.defines\n"
+                "return defines.TOKEN_VALUE_IS_LITERAL\n",
+                "R>i",
+                outer_slr->lua_ref,
+                &value_is_literal
+            );
+
+      token_ix = value_is_literal;        /* default */
+      }
       break;
     case 3:
       {

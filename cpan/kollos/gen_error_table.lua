@@ -179,7 +179,7 @@ for index, element in pairs(lua_code_data) do
 end
 
 io.write('```\n');
-io.write('    -- miranda: section define Lua error codes\n');
+io.write('    -- miranda: section define Kollos Lua error codes\n');
 io.write('    _M.err = {}\n')
 io.write(table.concat(by_code, ''))
 io.write(table.concat(by_mnemonic, ''))
