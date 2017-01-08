@@ -2960,8 +2960,14 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
         }
 
 
-        return_value = slr->g1r_earleme_complete_result =
-            marpa_r_earleme_complete (g1r);
+
+        call_by_tag (outer_slr->L, STRLOC,
+            "local recce = ...\n"
+            "local g1r = recce.lmw_g1r\n"
+            "return g1r:earleme_complete()\n"
+            ,
+            "R>i", outer_slr->lua_ref, &return_value);
+
         if (return_value < 0) {
             croak ("Problem in marpa_r_earleme_complete(): %s",
                 xs_g_error (slr->g1_wrapper));
@@ -4658,7 +4664,15 @@ PPCODE:
 
 
         {
-          const int discard_mode = marpa_r_is_exhausted (slr->g1r);
+          int discard_mode;
+
+          call_by_tag (outer_slr->L, STRLOC,
+              "local recce = ...\n"
+              "local g1r = recce.lmw_g1r\n"
+              "return g1r:is_exhausted()\n"
+              ,
+              "R>i", outer_slr->lua_ref, &discard_mode);
+
           const char *result_string = slr_alternatives (outer_slr, discard_mode);
           if (result_string)
             {
@@ -4908,7 +4922,20 @@ PPCODE:
         ("Usage: Marpa::R3::Thin::SLR::g1_alternative(slr, symbol_id, [value])");
     }
 
-  result = marpa_r_alternative (slr->g1r, symbol_id, token_ix, 1);
+
+    call_by_tag (outer_slr->L, STRLOC,
+        "recce, symbol_id, token_ix = ...\n"
+        "local g1r = recce.lmw_g1r\n"
+        "local return_value = g1r:alternative(symbol_id, token_ix, 1)\n"
+        "return return_value\n"
+        ,
+        "Rii>i",
+        outer_slr->lua_ref,
+        symbol_id,
+        token_ix,
+        &result
+    );
+
   if (result >= MARPA_ERR_NONE) {
     slr->is_external_scanning = 1;
   }
