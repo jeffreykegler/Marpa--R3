@@ -4561,9 +4561,18 @@ PPCODE:
   Scanless_R *slr = slr_inner_get(outer_slr);
   int literal_start;
   int literal_length;
-  const Marpa_Recce g1r = slr->g1r;
-  const Marpa_Earley_Set_ID latest_earley_set =
-    marpa_r_latest_earley_set (g1r);
+  int latest_earley_set;
+
+    call_by_tag (outer_slr->L, STRLOC,
+        "recce = ...\n"
+        "local g1r = recce.lmw_g1r\n"
+        "return g1r:latest_earley_set()\n"
+        ,
+        "R>i",
+        outer_slr->lua_ref,
+        &latest_earley_set
+    );
+
   if (start_earley_set < 0 || start_earley_set > latest_earley_set)
     {
       croak
