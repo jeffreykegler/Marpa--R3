@@ -4988,10 +4988,13 @@ PPCODE:
 
   call_by_tag (outer_slr->L, STRLOC,
       "local recce = ...\n"
-      "recce.event_queue = {}\n",
-      "R>", outer_slr->lua_ref);
+      "local g1r = recce.lmw_g1r\n"
+      "recce.event_queue = {}\n"
+      "local result = g1r:earleme_complete()\n"
+      "return result\n"
+      ,
+      "R>i", outer_slr->lua_ref, &result);
 
-  result = marpa_r_earleme_complete (slr->g1r);
   slr->is_external_scanning = 0;
   if (result >= 0)
     {
@@ -5439,7 +5442,6 @@ PPCODE:
 {
   Scanless_R *slr = slr_inner_get(outer_slr);
   G_Wrapper *g1_wrapper = slr->g1_wrapper;
-  Marpa_Recognizer g1r = slr->g1r;
   int gp_result;
 
     call_by_tag (outer_slr->L, STRLOC,
