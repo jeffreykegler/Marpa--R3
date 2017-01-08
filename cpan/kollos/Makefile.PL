@@ -124,8 +124,9 @@ test ::
 test_dynamic ::
 	$(NOECHO) $(NOOP)
 
-kollos.lua: kollos.lua.md
-	$(LUA_INTERP) miranda kollos.lua.md main=kollos.lua
+kollos.lua: kollos.lua.md error_table.md event_table.md step_table.md
+	$(LUA_INTERP) miranda error_table.md event_table.md step_table.md \
+	  kollos.lua.md main=kollos.lua
 
 error_table.md: gen_error_table.lua
 	$(LUA_INTERP) gen_error_table.lua $(ERROR_TABLE) > $@
@@ -136,7 +137,7 @@ event_table.md: gen_event_table.lua
 step_table.md: gen_step_table.lua
 	$(LUA_INTERP) gen_step_table.lua $(STEP_TABLE) > $@
 
-kollos.c: error_table.md event_table.md step_table.md kollos.lua.md \
+kollos.c: kollos.lua.md error_table.md event_table.md step_table.md \
 	  kollos.h
 	$(LUA_INTERP) miranda error_table.md event_table.md step_table.md \
 	  kollos.lua.md kollos_c=kollos.c

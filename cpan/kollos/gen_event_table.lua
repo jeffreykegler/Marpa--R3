@@ -27,6 +27,7 @@ local input_file_name = arg[1]
 local function c_safe_string (s)
     s = string.gsub(s, '"', '\\034')
     s = string.gsub(s, '\\', '\\092')
+    s = string.gsub(s, '\n', '\\n')
     return '"' .. s .. '"'
 end
 

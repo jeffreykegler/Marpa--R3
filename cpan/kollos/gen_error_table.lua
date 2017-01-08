@@ -20,19 +20,22 @@
 -- [ MIT license: http://www.opensource.org/licenses/mit-license.php ]
 
 require 'strict'
-require 'inspect' -- delete after development
+inspect = require 'inspect' -- delete after development
 
 local input_file_name = arg[1]
 
 local function c_safe_string (s)
     s = string.gsub(s, '"', '\\034')
     s = string.gsub(s, '\\', '\\092')
+    s = string.gsub(s, '\n', '\\n')
     return '"' .. s .. '"'
 end
 
 if not input_file_name then
     error("usage: gen_error_table.pl input_file > output_file\n");
 end
+
+local lua_code_data = {}
 
 do
   local f = assert(io.open(input_file_name, "r"))
@@ -62,6 +65,8 @@ do
 	      c_safe_string(mnemonic),
 	      c_safe_string(description)
 	      )
+	  lua_code_data[code] = { code, raw_mnemonic, description }
+	  lua_code_data[raw_mnemonic] = lua_code_data[code]
       end
   end
 
@@ -115,14 +120,16 @@ do
 	  c_safe_string(mnemonic),
 	  c_safe_string(description)
 	  )
+      lua_code_data[code] = { code, mnemonic, description }
+      lua_code_data[mnemonic] = lua_code_data[code]
       if code > max_code then max_code = code end
   end
 
   -- KOLLOS_ERR_RESERVED_200 is a place-holder , not expected to be actually used
-  luif_error_add( 200, "KOLLOS_ERR_RESERVED_200", "Unexpected Kollos error: 200")
-  luif_error_add( 201, "KOLLOS_ERR_LUA_VERSION", "Bad Lua version")
-  luif_error_add( 202, "KOLLOS_ERR_LIBMARPA_HEADER_VERSION_MISMATCH", "Libmarpa header does not match expected version")
-  luif_error_add( 203, "KOLLOS_ERR_LIBMARPA_LIBRARY_VERSION_MISMATCH", "Libmarpa library does not match expected version")
+  luif_error_add( 200, "ERR_RESERVED_200", "Unexpected Kollos error: 200")
+  luif_error_add( 201, "ERR_LUA_VERSION", "Bad Lua version")
+  luif_error_add( 202, "ERR_LIBMARPA_HEADER_VERSION_MISMATCH", "Libmarpa header does not match expected version")
+  luif_error_add( 203, "ERR_LIBMARPA_LIBRARY_VERSION_MISMATCH", "Libmarpa library does not match expected version")
 
   io.write('  #define KOLLOS_MIN_ERROR_CODE ' .. min_code .. '\n')
   io.write('  #define KOLLOS_MAX_ERROR_CODE ' .. max_code .. '\n\n')
@@ -131,7 +138,7 @@ do
       local mnemonic = code_mnemonics[i]
       if mnemonic then
 	  io.write(
-		 string.format('  #define %s %d\n', mnemonic, i)
+		 string.format('  #define KOLLOS_%s %d\n', mnemonic, i)
 	 )
      end
   end
@@ -154,3 +161,27 @@ do
   io.write('  };\n\n');
   io.write('```\n');
 end
+
+-- print(inspect(lua_code_data))
+
+local by_code = {}
+local by_mnemonic = {}
+for index, element in pairs(lua_code_data) do
+     if type(index) == "number" then
+         by_code[#by_code+1] = string.format(
+	 "    _M.err[%d] = { code = %d, name=%q,\n        description=%q}\n",
+	     index, element[1], element[2], element[3])
+	 goto NEXT_INDEX
+     end
+     by_mnemonic[#by_mnemonic+1] = string.format("    _M.err[%q] = _M.err[%d]\n",
+	 tostring(index), element[1])
+     ::NEXT_INDEX::
+end
+
+io.write('```\n');
+io.write('    -- miranda: section define Lua error codes\n');
+io.write('    _M.err = {}\n')
+io.write(table.concat(by_code, ''))
+io.write(table.concat(by_mnemonic, ''))
+io.write('\n');
+io.write('```\n');

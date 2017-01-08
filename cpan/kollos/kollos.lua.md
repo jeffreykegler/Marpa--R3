@@ -2572,6 +2572,8 @@ a special "configuration" argument.
     -- miranda: insert diagnostics
     -- miranda: insert Utilities for Perl code
     -- miranda: insert most Lua function declarations
+    -- miranda: insert most Lua function declarations
+    -- miranda: insert define Lua error codes
 
     return _M
 
@@ -4509,6 +4511,7 @@ The `pipe_dedent` method removes the display indentation.
     local function c_safe_string (s)
         s = string.gsub(s, '"', '\\034')
         s = string.gsub(s, '\\', '\\092')
+        s = string.gsub(s, '\n', '\\n')
         return '"' .. s .. '"'
     end
     ]==]
