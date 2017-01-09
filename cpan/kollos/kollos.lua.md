@@ -144,6 +144,18 @@ core libraries are loaded.
 Going forward, it needs to "require" then,
 like an ordinary Lua library.
 
+### Kollos assumes core libraries are loaded
+
+The Kollos methods now assume that the kollos
+class can be found as a global named "kollos".
+Namespace hygiene and preserving the ability to
+load multiple kollos packages (for debugging, say),
+requires that this be changed.
+Going forward, we will store kollos as a field
+in all libmarpa wrapper and Kollos registry object metatables,
+and use that in all methods.
+like an ordinary Lua library.
+
 ## Kollos object
 
 `ref_count` maintains a reference count that controls
@@ -437,11 +449,13 @@ Eventually we need to separate it out.
     int kollos_slr_new(lua_State* L, void* slr, lua_Integer slg_ref)
     {
         int lua_id;
+        int recce_ix;
         const int base_of_stack = marpa_lua_gettop(L);
         marpa_luaL_checkstack(L, 20, "cannot grow stack");
         /* Lua stack: [] */
         /* Create a table for this recce */
         marpa_lua_newtable(L);
+        recce_ix = marpa_lua_gettop(L);
         /* Lua stack: [ recce_table ] */
         /* No lock held -- SLR must delete recce table in its */
         /*   destructor. */
@@ -449,22 +463,22 @@ Eventually we need to separate it out.
         marpa_luaL_setmetatable(L, MT_NAME_RECCE);
         /* Lua stack: [ recce_table ] */
 
-        /* recce_table.ref_count = 1 */
+        /* recce.ref_count = 1 */
         marpa_lua_pushinteger(L, 1);
         /* Lua stack: [recce_table, ref_count ] */
-        marpa_lua_setfield(L, -2, "ref_count");
+        marpa_lua_setfield(L, recce_ix, "ref_count");
         /* Lua stack: [ recce_table ] */
 
-        /* recce_table.lud = slr */
+        /* recce.lud = slr */
         marpa_lua_pushlightuserdata(L, slr);
         /* Lua stack: [ recce_table, lud ] */
-        marpa_lua_setfield(L, -2, "lud");
+        marpa_lua_setfield(L, recce_ix, "lud");
         /* Lua stack: [ recce_table ] */
 
-        /* recce_table.slg = slg */
+        /* recce.slg = slg */
         marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, slg_ref);
         /* Lua stack: [ recce_table, slg_table ] */
-        marpa_lua_setfield(L, -2, "slg");
+        marpa_lua_setfield(L, recce_ix, "slg");
         /* Lua stack: [ recce_table ] */
 
         /* Set up a reference to this recce table in the Lua state
