@@ -137,6 +137,13 @@ an interpreter whose namespace it controls completely.
 This must change to allow Kollos to loaded as an ordinary
 Lua package.
 
+### Kollos assumes core libraries are loaded
+
+Currently Kollos assumes that the
+core libraries are loaded.
+Going forward, it needs to "require" then,
+like an ordinary Lua library.
+
 ## Kollos object
 
 `ref_count` maintains a reference count that controls
@@ -245,17 +252,14 @@ the interpreter (Kollos object) is destroyed.
 ```
 
     -- miranda: section+ C function declarations
-    lua_State* kollos_newstate(void);
+    void kollos_newstate(lua_State* L);
 
     -- miranda: section Lua interpreter management
-    lua_State* kollos_newstate(void)
+    void kollos_newstate(lua_State* L)
     {
-        int base_of_stack;
         struct kollos_extraspace *p_extra;
-        lua_State *const L = marpa_luaL_newstate ();
+        const int base_of_stack = marpa_lua_gettop(L);
 
-        if (!L) return NULL;
-        base_of_stack = marpa_lua_gettop(L);
         p_extra = malloc(sizeof(struct kollos_extraspace));
         *(struct kollos_extraspace **)marpa_lua_getextraspace(L) = p_extra;
         p_extra->ref_count = 1;
@@ -269,7 +273,6 @@ the interpreter (Kollos object) is destroyed.
         marpa_lua_setglobal(L, "throw");
         /* Lua stack: [] */
         marpa_lua_settop(L, base_of_stack);
-        return L;
     }
 
 ```

@@ -1380,60 +1380,6 @@ static void create_array_mt (lua_State* L) {
     marpa_lua_settop(L, base_of_stack);
 }
 
-/* Returns a new Lua state, set up for Marpa, with
- * a reference count of 1.
- */
-static lua_State* xlua_newstate(void)
-{
-    int marpa_table;
-    int base_of_stack;
-    lua_State *const L = kollos_newstate ();
-    if (!L)
-      {
-          croak
-              ("Marpa::R3 internal error: Lua interpreter failed to start");
-      }
-
-    base_of_stack = marpa_lua_gettop(L);
-
-    /* create metatables */
-    create_sv_mt(L);
-    create_grammar_mt(L);
-    create_recce_mt(L);
-    create_array_mt(L);
-
-    marpa_luaL_newlib(L, marpa_funcs);
-    /* Lua stack: [ marpa_table ] */
-    marpa_table = marpa_lua_gettop (L);
-    /* Lua stack: [ marpa_table ] */
-    marpa_lua_pushvalue (L, -1);
-    /* Lua stack: [ marpa_table, marpa_table ] */
-    marpa_lua_setglobal (L, "marpa");
-    /* Lua stack: [ marpa_table ] */
-
-    marpa_luaL_newlib(L, marpa_sv_funcs);
-    /* Lua stack: [ marpa_table, sv_table ] */
-    marpa_lua_setfield (L, marpa_table, "sv");
-    /* Lua stack: [ marpa_table ] */
-
-    marpa_luaL_newlib(L, marpa_array_funcs);
-    /* Lua stack: [ marpa_table, sv_table ] */
-    marpa_lua_setfield (L, marpa_table, "array");
-    /* Lua stack: [ marpa_table ] */
-
-    marpa_lua_newtable (L);
-    /* Lua stack: [ marpa_table, context_table ] */
-    marpa_lua_setfield (L, marpa_table, "context");
-    /* Lua stack: [ marpa_table ] */
-
-    populate_ops(L);
-    /* Lua stack: [ marpa_table ] */
-
-    marpa_lua_settop (L, base_of_stack);
-    /* Lua stack: [] */
-    return L;
-}
-
 /*
  * Message handler used to run all chunks
  */
@@ -5500,9 +5446,60 @@ PPCODE:
 {
     SV *new_sv;
     Marpa_Lua *lua_wrapper;
+    int marpa_table;
+    int base_of_stack;
+    lua_State *L;
 
     Newx (lua_wrapper, 1, Marpa_Lua);
-    lua_wrapper->L = xlua_newstate();
+
+    L = marpa_luaL_newstate ();
+    if (!L)
+      {
+          croak
+              ("Marpa::R3 internal error: Lua interpreter failed to start");
+      }
+
+    base_of_stack = marpa_lua_gettop(L);
+
+    kollos_newstate (L);
+
+    /* create metatables */
+    create_sv_mt(L);
+    create_grammar_mt(L);
+    create_recce_mt(L);
+    create_array_mt(L);
+
+    marpa_luaL_newlib(L, marpa_funcs);
+    /* Lua stack: [ marpa_table ] */
+    marpa_table = marpa_lua_gettop (L);
+    /* Lua stack: [ marpa_table ] */
+    marpa_lua_pushvalue (L, -1);
+    /* Lua stack: [ marpa_table, marpa_table ] */
+    marpa_lua_setglobal (L, "marpa");
+    /* Lua stack: [ marpa_table ] */
+
+    marpa_luaL_newlib(L, marpa_sv_funcs);
+    /* Lua stack: [ marpa_table, sv_table ] */
+    marpa_lua_setfield (L, marpa_table, "sv");
+    /* Lua stack: [ marpa_table ] */
+
+    marpa_luaL_newlib(L, marpa_array_funcs);
+    /* Lua stack: [ marpa_table, sv_table ] */
+    marpa_lua_setfield (L, marpa_table, "array");
+    /* Lua stack: [ marpa_table ] */
+
+    marpa_lua_newtable (L);
+    /* Lua stack: [ marpa_table, context_table ] */
+    marpa_lua_setfield (L, marpa_table, "context");
+    /* Lua stack: [ marpa_table ] */
+
+    populate_ops(L);
+    /* Lua stack: [ marpa_table ] */
+
+    marpa_lua_settop (L, base_of_stack);
+    /* Lua stack: [] */
+    lua_wrapper->L = L;
+
     new_sv = sv_newmortal ();
     sv_setref_pv (new_sv, marpa_lua_class_name, (void *) lua_wrapper);
     XPUSHs (new_sv);
