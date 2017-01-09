@@ -2977,6 +2977,16 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
             slr_convert_events (outer_slr);
         }
 
+      call_by_tag (outer_slr->L, STRLOC,
+          "local recce, start_pos, lexeme_length = ...\n"
+          "local g1r = recce.lmw_g1r\n"
+          "local latest_earley_set = g1r:latest_earley_set()\n"
+          "recce.es_data[latest_earley_set] = { start_pos, lexeme_length }\n"
+          , "Rii>", outer_slr->lua_ref,
+          slr->start_of_lexeme,
+          (slr->end_of_lexeme - slr->start_of_lexeme)
+          );
+
         marpa_r_latest_earley_set_values_set (g1r, slr->start_of_lexeme,
             INT2PTR (void *, (slr->end_of_lexeme - slr->start_of_lexeme)));
     }
@@ -4490,6 +4500,7 @@ PPCODE:
       "local recce = ...\n"
       "recce.too_many_earley_items = -1\n"
       "recce.event_queue = {}\n"
+      "recce.es_data = { [0] = { 0, 0 }}\n"
       "recce.lmw_g1r.lmw_g = recce.slg.lmw_g1g\n"
       "recce.trace_terminals = 0\n",
       "R>", outer_slr->lua_ref);
@@ -5008,6 +5019,14 @@ PPCODE:
   if (result >= 0)
     {
       r_convert_events (outer_slr);
+
+      call_by_tag (outer_slr->L, STRLOC,
+          "local recce, start_pos, lexeme_length = ...\n"
+          "local g1r = recce.lmw_g1r\n"
+          "local latest_earley_set = g1r:latest_earley_set()\n"
+          "recce.es_data[latest_earley_set] = { start_pos, lexeme_length }\n"
+          , "Rii>", outer_slr->lua_ref, start_pos, lexeme_length);
+
       marpa_r_latest_earley_set_values_set (slr->g1r, start_pos,
                                             INT2PTR (void *, lexeme_length));
       slr->perl_pos = start_pos + lexeme_length;

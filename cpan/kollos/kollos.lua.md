@@ -423,8 +423,11 @@ This is a registry object.
 
 Add a recce to the Kollos object, returning its
 "lua_id".
-The inner SLR C structure is passed in for now,
-because it uses a lot of PERL/XS data structures.
+Right now this is not a "pure" Kollos function,
+because
+the inner SLR C structure from the Perl/XS code
+is passed in.
+Eventually we need to separate it out.
 
 ```
     -- miranda: section+ C function declarations
@@ -554,7 +557,7 @@ or nil if there was none.
 ```
 
 This is not currently used.
-It was created for developed,
+It was created for development,
 and is being kept for use as
 part of a "Pure Lua" implementation.
 
@@ -1447,6 +1450,8 @@ whose id is `id`.
 
 ## The recognizer Libmarpa wrapper
 
+Functions for tracing Earley sets
+
 ```
     -- miranda: section+ recognizer Libmarpa wrapper Lua functions
     function _M.class_recce.leo_item_data(lmw_r)
@@ -2325,8 +2330,8 @@ the wrapper's point of view, marpa_r_alternative() always succeeds.
         return table.concat(result)
   ]==]
 
-  -- miranda: section create kollos class tables
-  --[==[ miranda: exec create kollos class tables
+  -- miranda: section create kollos libmarpa wrapper class tables
+  --[==[ miranda: exec create kollos libmarpa wrapper class tables
         local result = {}
         for class_letter, class in pairs(libmarpa_class_name) do
            local class_table_name = 'class_' .. class
@@ -4150,7 +4155,7 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
         kollos_defines_ix = marpa_lua_gettop(L);
         marpa_lua_setfield(L, kollos_table_stack_ix, "defines");
 
-        -- miranda: insert create kollos class tables
+        -- miranda: insert create kollos libmarpa wrapper class tables
 
         /* Set up Kollos error handling metatable.
            The metatable starts out empty.
@@ -4508,7 +4513,7 @@ Not Lua-callable, but leaves the stack as before.
     -- miranda: sequence-exec libmarpa interface globals
     -- miranda: sequence-exec declare standard libmarpa wrappers
     -- miranda: sequence-exec register standard libmarpa wrappers
-    -- miranda: sequence-exec create kollos class tables
+    -- miranda: sequence-exec create kollos libmarpa wrapper class tables
     -- miranda: sequence-exec object userdata gc methods
 ```
 
