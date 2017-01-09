@@ -995,9 +995,9 @@ sub Marpa::R3::Internal::Scanless::G::precompute {
         <<'END_OF_LUA', 's', $lmw_name );
     local g, lmw_name = ...
     local lmw_g = g[lmw_name]
-    kollos.throw_set()
+    kollos.throw = false
     local result, error = lmw_g:precompute()
-    kollos.throw_set(1)
+    kollos.throw = true
     if result then return result, 0 end
     return -1, error.code
 END_OF_LUA

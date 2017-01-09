@@ -202,10 +202,10 @@ $marpa_lua->exec(<<'END_OF_LUA');
 
      local grammar = kollos.grammar_new()
      grammar:force_valued()
-     kollos.throw_set()
+     kollos.throw = false
      -- print(inspect(_G))
      local error_object = grammar:error()
-     kollos.throw_set(true)
+     kollos.throw = true
      local error_code = error_object.code
      Test.More.is(error_object.code, 0, 'Grammar error code')
      local error_name = kollos.error_name(error_code)
@@ -220,9 +220,9 @@ $marpa_lua->exec(<<'END_OF_LUA');
      grammar:precompute()
      local recce = kollos.recce_new(grammar)
      recce:start_input()
-     kollos.throw_set()
+     kollos.throw = false
      recce:alternative(a, 1, 1)
-     kollos.throw_set(1)
+     kollos.throw = true
      recce:earleme_complete()
      local terminals_expected = recce:terminals_expected()
      Test.More.is(#terminals_expected, 1, 'count of terminals expected')

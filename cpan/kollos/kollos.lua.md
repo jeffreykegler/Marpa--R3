@@ -269,9 +269,6 @@ the interpreter (Kollos object) is destroyed.
         /* Lua stack: [ kollos_table ] */
         marpa_lua_setglobal(L, "kollos");
         /* Lua stack: [] */
-        marpa_lua_pushboolean(L, 1);
-        marpa_lua_setglobal(L, "throw");
-        /* Lua stack: [] */
         marpa_lua_settop(L, base_of_stack);
     }
 
@@ -441,7 +438,7 @@ Eventually we need to separate it out.
     {
         int lua_id;
         const int base_of_stack = marpa_lua_gettop(L);
-        marpa_lua_checkstack(L, 20);
+        marpa_luaL_checkstack(L, 20, "cannot grow stack");
         /* Lua stack: [] */
         /* Create a table for this recce */
         marpa_lua_newtable(L);
@@ -3001,15 +2998,6 @@ Set "strict" globals, using code taken from strict.lua.
         }
     }
 
-    static int lca_throw_set(lua_State* L)
-    {
-        const int flag_stack_ix = 1;
-        const int flag = marpa_lua_toboolean(L, flag_stack_ix);
-        marpa_lua_pushboolean(L, flag);
-        marpa_lua_setglobal(L, "throw");
-        return 0;
-    }
-
     /* Return string equivalent of error argument
      */
     static inline int l_error_tostring(lua_State* L)
@@ -3088,74 +3076,41 @@ Set "strict" globals, using code taken from strict.lua.
       return 1;
     }
 
-    /* not safe - intended for internal use */
-    static inline int wrap_kollos_throw(lua_State* L)
-    {
-       const lua_Integer code = marpa_lua_tointeger(L, 1);
-       const char* details = marpa_lua_tostring(L, 2);
-       if (0) printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
-       if (0) printf ("%s code = %ld\n", __PRETTY_FUNCTION__, (long)code);
-       libmarpa_error_code_handle(L, (int)code, details);
-       return 1;
-       /* NOTREACHED */
-    }
-
-    -- miranda: section+ error handlers
-
-    /* functions */
-
-    static void luif_err_throw(lua_State *L, int error_code) UNUSED;
-    static void luif_err_throw(lua_State *L, int error_code) {
-
-    #if 0
-        const char *where;
-        marpa_luaL_where(L, 1);
-        where = marpa_lua_tostring(L, -1);
-    #endif
-
-        if (error_code < LIBMARPA_MIN_ERROR_CODE || error_code > LIBMARPA_MAX_ERROR_CODE) {
-            marpa_luaL_error(L, "Libmarpa returned invalid error code %d", error_code);
-        }
-        marpa_luaL_error(L, "%s", marpa_error_codes[error_code].description );
-    }
-
-    static void luif_err_throw2(lua_State *L, int error_code, const char *msg) {
-
-    #if 0
-        const char *where;
-        marpa_luaL_where(L, 1);
-        where = marpa_lua_tostring(L, -1);
-    #endif
-
-        if (error_code < 0 || error_code > LIBMARPA_MAX_ERROR_CODE) {
-            marpa_luaL_error(L, "%s\n    Libmarpa returned invalid error code %d", msg, error_code);
-        }
-        marpa_luaL_error(L, "%s\n    %s", msg, marpa_error_codes[error_code].description);
-    }
-
     -- miranda: section+ base error handlers
 
     /* grammar wrappers which need to be hand written */
 
-    /* If the error is not thrown, these handlers leave
-     * the original items on the stack intact, and place
-     * an error object on top of the stack.
+    /* Get the throw flag from a libmarpa_wrapper.
+     */
+    static int get_throw_flag(lua_State* L, int lmw_stack_ix)
+    {
+        int result;
+        const int base_of_stack = marpa_lua_gettop (L);
+        marpa_luaL_checkstack (L, 10, "cannot grow stack");
+        marpa_lua_pushvalue (L, lmw_stack_ix);
+        if (!marpa_lua_getmetatable (L, lmw_stack_ix))
+            goto FAILURE;
+        if (marpa_lua_getfield (L, -1, "kollos") != LUA_TTABLE)
+            goto FAILURE;
+        if (marpa_lua_getfield (L, -1, "throw") != LUA_TBOOLEAN)
+            goto FAILURE;
+        result = marpa_lua_toboolean (L, -1);
+        marpa_lua_settop (L, base_of_stack);
+        return result;
+      FAILURE:
+        push_error_object (L, MARPA_ERR_DEVELOPMENT, "Bad throw flag");
+        return marpa_lua_error (L);
+    }
+
+    /* Development errors are always thrown.
      */
     static void
     development_error_handle (lua_State * L,
                             const char *details)
     {
-      int throw_flag;
-      marpa_lua_getglobal (L, "throw");
-      /* [ ..., throw_flag ] */
-      throw_flag = marpa_lua_toboolean (L, -1);
-      /* [ ..., throw_flag ] */
-      marpa_lua_pop(L, 1);
       push_error_object(L, MARPA_ERR_DEVELOPMENT, details);
       marpa_lua_pushvalue(L, -1);
       marpa_lua_setglobal(L, "error_object");
-      /* [ ..., error_object ] */
-      if (!throw_flag) return;
       marpa_lua_error(L);
     }
 
@@ -3203,15 +3158,10 @@ The "throw" flag is ignored.
      */
     static int
     libmarpa_error_code_handle (lua_State * L,
+                            int lmw_stack_ix,
                             int error_code, const char *details)
     {
-      int throw_flag;
-      marpa_lua_getglobal (L, "throw");
-      /* [ ..., throw_flag ] */
-      throw_flag = marpa_lua_toboolean (L, -1);
-      /* [ ..., throw_flag ] */
-      marpa_lua_pop(L, 1);
-      /* [ ... ] */
+      int throw_flag = get_throw_flag(L, lmw_stack_ix);
       if (!throw_flag) {
           marpa_lua_pushnil(L);
       }
@@ -3243,7 +3193,7 @@ The "throw" flag is ignored.
       grammar_ud = (Marpa_Grammar *) marpa_lua_touserdata (L, -1);
       marpa_lua_settop(L, base_of_stack);
       error_code = marpa_g_error (*grammar_ud, NULL);
-      return libmarpa_error_code_handle(L, error_code, details);
+      return libmarpa_error_code_handle(L, stack_ix, error_code, details);
     }
 
     /* A wrapper for libmarpa_error_handle to conform with the
@@ -3312,7 +3262,7 @@ so the caller must make sure that one is available.
         const int base_of_stack = marpa_lua_gettop (L);
         int lmw_g_stack_ix;
 
-        marpa_lua_checkstack(L, 20);
+        marpa_luaL_checkstack(L, 20, "cannot_grow_stack");
 
         marpa_lua_newtable (L);
         lmw_g_stack_ix = marpa_lua_gettop (L);
@@ -4092,38 +4042,51 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
     -- miranda: section define marpa_luaopen_kollos method
     static int marpa_luaopen_kollos(lua_State *L)
     {
-        /* The main kollos object */
-        int kollos_table_stack_ix;
-        int kollos_defines_ix;
-        int upvalue_stack_ix;
+    /* The main kollos object */
+    int kollos_table_stack_ix;
+    int kollos_defines_ix;
+    int upvalue_stack_ix;
 
-      {
-        const char *const header_mismatch =
-          "Header version does not match expected version";
         /* Make sure the header is from the version we want */
-        if (MARPA_MAJOR_VERSION != EXPECTED_LIBMARPA_MAJOR)
-          luif_err_throw2 (L, KOLLOS_ERR_MAJOR_VERSION_MISMATCH, header_mismatch);
-        if (MARPA_MINOR_VERSION != EXPECTED_LIBMARPA_MINOR)
-          luif_err_throw2 (L, KOLLOS_ERR_MINOR_VERSION_MISMATCH, header_mismatch);
-        if (MARPA_MICRO_VERSION != EXPECTED_LIBMARPA_MICRO)
-          luif_err_throw2 (L, KOLLOS_ERR_MICRO_VERSION_MISMATCH, header_mismatch);
-      }
+        if (MARPA_MAJOR_VERSION != EXPECTED_LIBMARPA_MAJOR ||
+            MARPA_MINOR_VERSION != EXPECTED_LIBMARPA_MINOR ||
+            MARPA_MICRO_VERSION != EXPECTED_LIBMARPA_MICRO) {
+            const char *message;
+            marpa_lua_pushfstring
+                (L, "Libmarpa header version mismatch: want %ld.%ld.%ld, have %ld.%ld.%ld",
+                EXPECTED_LIBMARPA_MAJOR, EXPECTED_LIBMARPA_MINOR,
+                EXPECTED_LIBMARPA_MICRO, MARPA_MAJOR_VERSION,
+                MARPA_MINOR_VERSION, MARPA_MICRO_VERSION);
+            message = marpa_lua_tostring (L, -1);
+            internal_error_handle (L, message,
+                __PRETTY_FUNCTION__, __FILE__, __LINE__);
+        }
 
-      {
         /* Now make sure the library is from the version we want */
-        const char *const library_mismatch =
-          "Library version does not match expected version";
-        int version[3];
-        const Marpa_Error_Code error_code = marpa_version (version);
-        if (error_code != MARPA_ERR_NONE)
-          luif_err_throw2 (L, error_code, "marpa_version() failed");
-        if (version[0] != EXPECTED_LIBMARPA_MAJOR)
-          luif_err_throw2 (L, KOLLOS_ERR_MAJOR_VERSION_MISMATCH, library_mismatch);
-        if (version[1] != EXPECTED_LIBMARPA_MINOR)
-          luif_err_throw2 (L, KOLLOS_ERR_MINOR_VERSION_MISMATCH, library_mismatch);
-        if (version[2] != EXPECTED_LIBMARPA_MICRO)
-          luif_err_throw2 (L, KOLLOS_ERR_MICRO_VERSION_MISMATCH, library_mismatch);
-      }
+        {
+            int version[3];
+            const Marpa_Error_Code error_code = marpa_version (version);
+            if (error_code != MARPA_ERR_NONE) {
+                const char* description = error_description_by_code (error_code);
+                const char *message;
+                marpa_lua_pushfstring (L, "marpa_version() failed: %s", description);
+                message = marpa_lua_tostring (L, -1);
+                internal_error_handle (L, message, __PRETTY_FUNCTION__, __FILE__,
+                    __LINE__);
+            }
+            if (version[0] != EXPECTED_LIBMARPA_MAJOR ||
+                version[1] != EXPECTED_LIBMARPA_MINOR ||
+                version[2] != EXPECTED_LIBMARPA_MICRO) {
+                const char *message;
+                marpa_lua_pushfstring
+                    (L, "Libmarpa library version mismatch: want %ld.%ld.%ld, have %ld.%ld.%ld",
+                    EXPECTED_LIBMARPA_MAJOR, EXPECTED_LIBMARPA_MINOR,
+                    EXPECTED_LIBMARPA_MICRO, version[0], version[1], version[2]);
+                message = marpa_lua_tostring (L, -1);
+                internal_error_handle (L, message, __PRETTY_FUNCTION__, __FILE__,
+                    __LINE__);
+            }
+        }
 
         /* Create the kollos class */
         marpa_lua_newtable(L);
@@ -4133,6 +4096,10 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
          *
          */
         /* [ kollos ] */
+
+        /* kollos.throw = true */
+        marpa_lua_pushboolean(L, 1);
+        marpa_lua_setfield(L, kollos_table_stack_ix, "throw");
 
         /* Create the shared upvalue table */
         {
@@ -4256,20 +4223,12 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
         marpa_lua_setfield(L, kollos_table_stack_ix, "error_new");
 
         marpa_lua_pushvalue(L, upvalue_stack_ix);
-        marpa_lua_pushcclosure(L, wrap_kollos_throw, 1);
-        marpa_lua_setfield(L, kollos_table_stack_ix, "error_throw");
-
-        marpa_lua_pushvalue(L, upvalue_stack_ix);
         marpa_lua_pushcclosure(L, l_event_name_by_code, 1);
         marpa_lua_setfield(L, kollos_table_stack_ix, "event_name");
 
         marpa_lua_pushvalue(L, upvalue_stack_ix);
         marpa_lua_pushcclosure(L, l_event_description_by_code, 1);
         marpa_lua_setfield(L, kollos_table_stack_ix, "event_description");
-
-        marpa_lua_pushvalue(L, upvalue_stack_ix);
-        marpa_lua_pushcclosure(L, lca_throw_set, 1);
-        marpa_lua_setfield(L, kollos_table_stack_ix, "throw_set");
 
         /* In Libmarpa object sequence order */
 
@@ -4364,6 +4323,7 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
       /* [ kollos ] */
       return 1;
     }
+
 ```
 
 ### Create a sandbox

@@ -396,9 +396,9 @@ sub Marpa::R3::Scanless::R::ordering_get {
     -- inside $slr->ordering_get()
     local recce, end_of_parse, ranking_method = ...
     if recce.lmw_o then return true end
-    kollos.throw_set()
+    kollos.throw = false
     local bocage = kollos.bocage_new(recce.lmw_g1r, end_of_parse)
-    kollos.throw_set(1)
+    kollos.throw = true
     recce.lmw_b = bocage
     if not bocage then return false end
     recce.lmw_o = kollos.order_new(bocage)
