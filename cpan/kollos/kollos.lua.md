@@ -29,8 +29,11 @@ OTHER DEALINGS IN THE SOFTWARE.
 * [Development Notes](#development-notes)
   * [To Do](#to-do)
     * [TODO notes](#todo-notes)
+  * [Factoring out Kollos packages](#factoring-out-kollos-packages)
+  * [Kollos assumes core libraries are loaded](#kollos-assumes-core-libraries-are-loaded)
+  * [Kollos assumes global name "kollos"](#kollos-assumes-global-name-kollos)
+  * [New lexer features](#new-lexer-features)
 * [Kollos object](#kollos-object)
-* [Kollos Lua interpreter](#kollos-lua-interpreter)
 * [Kollos registry objects](#kollos-registry-objects)
 * [Kollos SLIF grammar object](#kollos-slif-grammar-object)
 * [Kollos SLIF recognizer object](#kollos-slif-recognizer-object)
@@ -144,9 +147,9 @@ core libraries are loaded.
 Going forward, it needs to "require" then,
 like an ordinary Lua library.
 
-### Kollos assumes core libraries are loaded
+### Kollos assumes global name "kollos"
 
-The Kollos methods now assume that the kollos
+The Kollos methods now often assume that the kollos
 class can be found as a global named "kollos".
 Namespace hygiene and preserving the ability to
 load multiple kollos packages (for debugging, say),
@@ -155,6 +158,17 @@ Going forward, we will store kollos as a field
 in all libmarpa wrapper and Kollos registry object metatables,
 and use that in all methods.
 like an ordinary Lua library.
+
+### New lexer features
+
+* "Eager" tokens (currently all tokens are "greedy")
+
+*  Changing priorities to be "non-local".  Current priorities only break
+ties for tokens at the same location.  "Non-local" means if there is a
+priority 2 lexeme of any length and/or eagerness, you will get that
+lexeme, and not any lexeme of priority 1 or lower.
+
+* Lookahead.
 
 ## Kollos object
 
