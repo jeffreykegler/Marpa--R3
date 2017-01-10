@@ -315,7 +315,6 @@ slr_es_span_to_literal_sv (Scanless_R * slr,
 
 #define MT_NAME_SV "Marpa_sv"
 #define MT_NAME_AV "Marpa_av"
-#define MT_NAME_GRAMMAR "Marpa_grammar"
 #define MT_NAME_ARRAY "Marpa_array"
 
 /* Make the Lua reference facility available from
@@ -1216,7 +1215,7 @@ xlua_recce_gc (lua_State * L)
     return 0;
 }
 
-static const struct luaL_Reg marpa_recce_meths[] = {
+static const struct luaL_Reg marpa_slr_meths[] = {
     {"constants", xlua_recce_constants_meth},
     {"step", xlua_recce_step_meth},
     {"literal_of_es_span", xlua_recce_literal_of_es_span_meth},
@@ -1228,26 +1227,9 @@ static const struct luaL_Reg marpa_recce_meths[] = {
 };
 
 /* create SV metatable */
-static void create_recce_mt (lua_State* L) {
-    int base_of_stack = marpa_lua_gettop(L);
-    marpa_luaL_newmetatable(L, MT_NAME_RECCE);
-    /* Lua stack: [mt] */
-
-    /* metatable.__index = metatable */
-    marpa_lua_pushvalue(L, -1);
-    marpa_lua_setfield(L, -2, "__index");
-    /* Lua stack: [mt] */
-
-    /* register methods */
-    marpa_luaL_setfuncs(L, marpa_recce_meths, 0);
-    /* Lua stack: [mt] */
-    marpa_lua_settop(L, base_of_stack);
-}
-
 static void slg_inner_destroy(Scanless_G* slg);
 
-static int
-xlua_grammar_gc (lua_State * L)
+static int slg_gc (lua_State * L)
 {
     Scanless_G *slg;
     int lud_type;
@@ -1263,27 +1245,10 @@ xlua_grammar_gc (lua_State * L)
     return 0;
 }
 
-static const struct luaL_Reg marpa_grammar_meths[] = {
-    {"__gc", xlua_grammar_gc},
+static const struct luaL_Reg marpa_slg_meths[] = {
+    {"__gc", slg_gc},
     {NULL, NULL},
 };
-
-/* create SV metatable */
-static void create_grammar_mt (lua_State* L) {
-    int base_of_stack = marpa_lua_gettop(L);
-    marpa_luaL_newmetatable(L, MT_NAME_GRAMMAR);
-    /* Lua stack: [mt] */
-
-    /* metatable.__index = metatable */
-    marpa_lua_pushvalue(L, -1);
-    marpa_lua_setfield(L, -2, "__index");
-    /* Lua stack: [mt] */
-
-    /* register methods */
-    marpa_luaL_setfuncs(L, marpa_grammar_meths, 0);
-    /* Lua stack: [mt] */
-    marpa_lua_settop(L, base_of_stack);
-}
 
 static int xlua_recce_func(lua_State* L)
 {
@@ -3973,6 +3938,8 @@ PPCODE:
     Outer_G *outer_slg;
     Scanless_G *slg;
     lua_State *L = lua_wrapper->L;
+    int base_of_stack;
+    int grammar_ix;
     PERL_UNUSED_ARG (class);
 
     Newx (outer_slg, 1, Outer_G);
@@ -3980,21 +3947,24 @@ PPCODE:
 
     outer_slg->inner = slg;
     outer_slg->L = L;
+    base_of_stack = marpa_lua_gettop(L);
     lua_refinc (L);
 
-    /* Lua stack: [] */
-    marpa_lua_newtable (L);
-    /* Lua stack: [ grammar_table ] */
     /* No lock held -- SLG must delete grammar table in its */
     /*   destructor. */
-    marpa_luaL_setmetatable (L, MT_NAME_GRAMMAR);
-    /* Lua stack: [ grammar_table ] */
+    marpa_lua_newtable (L);
+    grammar_ix = marpa_lua_gettop(L);
+
+    marpa_lua_getglobal(L, "kollos");
+    marpa_lua_getfield(L, -1, "class_slg");
+    marpa_lua_setmetatable (L, grammar_ix);
     marpa_lua_pushlightuserdata (L, slg);
-    /* Lua stack: [ grammar_table, lud ] */
-    marpa_lua_setfield (L, -2, "lud");
-    /* Lua stack: [ grammar_table ] */
+    marpa_lua_setfield (L, grammar_ix, "lud");
+    marpa_lua_pushinteger(L, 1);
+    marpa_lua_setfield (L, grammar_ix, "ref_count");
+    marpa_lua_pushvalue (L, grammar_ix);
     outer_slg->lua_ref = marpa_luaL_ref (L, LUA_REGISTRYINDEX);
-    /* Lua stack: [] */
+    marpa_lua_settop(L, base_of_stack);
 
     new_sv = sv_newmortal ();
     sv_setref_pv (new_sv, scanless_g_class_name, (void *) outer_slg);
@@ -4459,10 +4429,28 @@ PPCODE:
 
   {
     lua_State* const L = outer_slr->outer_slg->L;
+    const int base_of_stack = marpa_lua_gettop(L);
+    int slr_ix;
+
+    marpa_luaL_checkstack(L, 20, "out of stack in slr->new()");
     outer_slr->L = L;
     /* Take ownership of a new reference to the Lua state */
     lua_refinc(L);
-    outer_slr->lua_ref = kollos_slr_new(L, slr, outer_slg->lua_ref);
+
+    marpa_lua_newtable (L);
+    slr_ix = marpa_lua_gettop(L);
+    marpa_lua_getglobal(L, "kollos");
+    marpa_lua_getfield(L, -1, "class_slr");
+    marpa_lua_setmetatable (L, slr_ix);
+    marpa_lua_pushlightuserdata (L, slr);
+    marpa_lua_setfield (L, slr_ix, "lud");
+    marpa_lua_pushinteger(L, 1);
+    marpa_lua_setfield (L, slr_ix, "ref_count");
+    marpa_lua_pushvalue (L, slr_ix);
+    marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, outer_slg->lua_ref);
+    marpa_lua_setfield(L, slr_ix, "slg");
+    outer_slr->lua_ref = marpa_luaL_ref (L, LUA_REGISTRYINDEX);
+    marpa_lua_settop(L, base_of_stack);
   }
 
   marpa_r_ref(slr->g1r);
@@ -5476,6 +5464,7 @@ PPCODE:
     int base_of_stack;
     lua_State *L;
     struct lua_extraspace *p_extra;
+    int kollos_ix;
 
     Newx (lua_wrapper, 1, Marpa_Lua);
 
@@ -5486,23 +5475,32 @@ PPCODE:
               ("Marpa::R3 internal error: Lua interpreter failed to start");
       }
 
+    base_of_stack = marpa_lua_gettop(L);
+
     Newx( p_extra, 1, struct lua_extraspace);
     *(struct lua_extraspace **)marpa_lua_getextraspace(L) = p_extra;
     p_extra->ref_count = 1;
 
     marpa_luaL_openlibs (L);    /* open libraries */
 
-    base_of_stack = marpa_lua_gettop(L);
-
     marpa_luaopen_kollos(L); /* Open kollos library */
     /* Lua stack: [ kollos_table ] */
+    kollos_ix = marpa_lua_gettop(L);
+
+    /* _G.kollos = kollos */
+    marpa_lua_pushvalue(L, kollos_ix);
     marpa_lua_setglobal(L, "kollos");
-    /* Lua stack: [] */
+
+    marpa_lua_getfield(L, kollos_ix, "class_slg");
+    marpa_lua_getfield(L, kollos_ix, "upvalues");
+    marpa_luaL_setfuncs(L, marpa_slg_meths, 1);
+
+    marpa_lua_getfield(L, kollos_ix, "class_slr");
+    marpa_lua_getfield(L, kollos_ix, "upvalues");
+    marpa_luaL_setfuncs(L, marpa_slr_meths, 1);
 
     /* create metatables */
     create_sv_mt(L);
-    create_grammar_mt(L);
-    create_recce_mt(L);
     create_array_mt(L);
 
     marpa_luaL_newlib(L, marpa_funcs);

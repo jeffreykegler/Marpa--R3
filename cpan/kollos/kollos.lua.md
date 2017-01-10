@@ -329,65 +329,24 @@ Deletes the interpreter if the reference count drops to zero.
 
 This is a registry object.
 
+```
+    -- miranda: section+ luaL_Reg definitions
+    static const struct luaL_Reg slg_methods[] = {
+      { NULL, NULL },
+    };
+
+```
+
 ## Kollos SLIF recognizer object
 
 This is a registry object.
 
-Add a recce to the Kollos object, returning its
-"lua_id".
-Right now this is not a "pure" Kollos function,
-because
-the inner SLR C structure from the Perl/XS code
-is passed in.
-Eventually we need to separate it out.
-
 ```
-    -- miranda: section+ C function declarations
-    #define MT_NAME_RECCE "Marpa_recce"
-    int kollos_slr_new(lua_State* L, void* slr, lua_Integer slg_ref);
-    -- miranda: section+ lua interpreter management
-    int kollos_slr_new(lua_State* L, void* slr, lua_Integer slg_ref)
-    {
-        int lua_id;
-        int recce_ix;
-        const int base_of_stack = marpa_lua_gettop(L);
-        marpa_luaL_checkstack(L, 20, "cannot grow stack");
-        /* Lua stack: [] */
-        /* Create a table for this recce */
-        marpa_lua_newtable(L);
-        recce_ix = marpa_lua_gettop(L);
-        /* Lua stack: [ recce_table ] */
-        /* No lock held -- SLR must delete recce table in its */
-        /*   destructor. */
-        /* Set the metatable for the recce table */
-        marpa_luaL_setmetatable(L, MT_NAME_RECCE);
-        /* Lua stack: [ recce_table ] */
+    -- miranda: section+ luaL_Reg definitions
+    static const struct luaL_Reg slr_methods[] = {
+      { NULL, NULL },
+    };
 
-        /* recce.ref_count = 1 */
-        marpa_lua_pushinteger(L, 1);
-        /* Lua stack: [recce_table, ref_count ] */
-        marpa_lua_setfield(L, recce_ix, "ref_count");
-        /* Lua stack: [ recce_table ] */
-
-        /* recce.lud = slr */
-        marpa_lua_pushlightuserdata(L, slr);
-        /* Lua stack: [ recce_table, lud ] */
-        marpa_lua_setfield(L, recce_ix, "lud");
-        /* Lua stack: [ recce_table ] */
-
-        /* recce.slg = slg */
-        marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, slg_ref);
-        /* Lua stack: [ recce_table, slg_table ] */
-        marpa_lua_setfield(L, recce_ix, "slg");
-        /* Lua stack: [ recce_table ] */
-
-        /* Set up a reference to this recce table in the Lua state
-         * registry.
-         */
-        lua_id = marpa_luaL_ref(L, LUA_REGISTRYINDEX);
-        marpa_lua_settop(L, base_of_stack);
-        return lua_id;
-    }
 ```
 
 Given a scanless
@@ -4048,6 +4007,28 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
 
         --miranda: insert create kollos libmarpa wrapper class tables
 
+          /* Create the SLIF grammar metatable */
+          marpa_luaL_newlibtable(L, slg_methods);
+          marpa_lua_pushvalue(L, upvalue_stack_ix);
+          marpa_luaL_setfuncs(L, slg_methods, 1);
+          marpa_lua_pushvalue(L, -1);
+          marpa_lua_setfield(L, -2, "__index");
+          marpa_lua_pushvalue(L, -1);
+          marpa_lua_setfield(L, kollos_table_stack_ix, "class_slg");
+          marpa_lua_pushvalue(L, kollos_table_stack_ix);
+          marpa_lua_setfield(L, -2, "kollos");
+
+          /* Create the SLIF grammar metatable */
+          marpa_luaL_newlibtable(L, slr_methods);
+          marpa_lua_pushvalue(L, upvalue_stack_ix);
+          marpa_luaL_setfuncs(L, slr_methods, 1);
+          marpa_lua_pushvalue(L, -1);
+          marpa_lua_setfield(L, -2, "__index");
+          marpa_lua_pushvalue(L, -1);
+          marpa_lua_setfield(L, kollos_table_stack_ix, "class_slr");
+          marpa_lua_pushvalue(L, kollos_table_stack_ix);
+          marpa_lua_setfield(L, -2, "kollos");
+
         /* Set up Kollos error handling metatable.
            The metatable starts out empty.
          */
@@ -4227,11 +4208,6 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
         marpa_lua_setfield (L, kollos_table_stack_ix, "event_code_by_name");
 
         -- miranda: insert register standard libmarpa wrappers
-
-            /* Place code here to go through the signatures table again,
-             * to put the wrappers into kollos object fields
-             * See okollos
-             */
 
             /* [ kollos ] */
 
