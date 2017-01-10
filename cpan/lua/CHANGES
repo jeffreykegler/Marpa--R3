@@ -1,0 +1,5 @@
+For definitive changes, we'll need to diff with the original Lua 5.3.2, but here's
+an outline:
+
+Changed all extern's visible to the linker to conform to marpa's namespace,
+by prefixing "marpa_".

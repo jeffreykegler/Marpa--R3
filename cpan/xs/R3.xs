@@ -50,6 +50,32 @@ typedef UV Marpa_Op;
 
 struct op_data_s { const char *name; Marpa_Op op; };
 
+struct lua_extraspace {
+    int ref_count;
+};
+
+/* I assume this will be inlined by the compiler */
+static struct lua_extraspace *extraspace_get(lua_State* L)
+{
+    return *(struct lua_extraspace **)marpa_lua_getextraspace(L);
+}
+
+static void lua_refinc(lua_State* L)
+{
+    struct lua_extraspace *p_extra = extraspace_get(L);
+    p_extra->ref_count++;
+}
+
+static void lua_refdec(lua_State* L)
+{
+    struct lua_extraspace *p_extra = extraspace_get(L);
+    p_extra->ref_count--;
+    if (p_extra->ref_count <= 0) {
+       marpa_lua_close(L);
+       free(p_extra);
+    }
+}
+
 #include "marpa_slifop.h"
 
 static const char*
@@ -3954,7 +3980,7 @@ PPCODE:
 
     outer_slg->inner = slg;
     outer_slg->L = L;
-    kollos_refinc (L);
+    lua_refinc (L);
 
     /* Lua stack: [] */
     marpa_lua_newtable (L);
@@ -3985,7 +4011,7 @@ PPCODE:
    * Lua states, and then this will be necessary.
    */
   kollos_robrefdec(outer_slg->L, outer_slg->lua_ref);
-  kollos_refdec(outer_slg->L);
+  lua_refdec(outer_slg->L);
   Safefree (outer_slg);
 }
 
@@ -4435,7 +4461,7 @@ PPCODE:
     lua_State* const L = outer_slr->outer_slg->L;
     outer_slr->L = L;
     /* Take ownership of a new reference to the Lua state */
-    kollos_refinc(L);
+    lua_refinc(L);
     outer_slr->lua_ref = kollos_slr_new(L, slr, outer_slg->lua_ref);
   }
 
@@ -4467,7 +4493,7 @@ PPCODE:
       "return 0\n",
       "R>", outer_slr->lua_ref);
   kollos_robrefdec(outer_slr->L, outer_slr->lua_ref);
-  kollos_refdec(outer_slr->L);
+  lua_refdec(outer_slr->L);
   SvREFCNT_dec (outer_slr->slg_sv);
   Safefree (outer_slr);
 }
@@ -5449,6 +5475,7 @@ PPCODE:
     int marpa_table;
     int base_of_stack;
     lua_State *L;
+    struct lua_extraspace *p_extra;
 
     Newx (lua_wrapper, 1, Marpa_Lua);
 
@@ -5459,9 +5486,18 @@ PPCODE:
               ("Marpa::R3 internal error: Lua interpreter failed to start");
       }
 
+    Newx( p_extra, 1, struct lua_extraspace);
+    *(struct lua_extraspace **)marpa_lua_getextraspace(L) = p_extra;
+    p_extra->ref_count = 1;
+
+    marpa_luaL_openlibs (L);    /* open libraries */
+
     base_of_stack = marpa_lua_gettop(L);
 
-    kollos_newstate (L);
+    marpa_luaopen_kollos(L); /* Open kollos library */
+    /* Lua stack: [ kollos_table ] */
+    marpa_lua_setglobal(L, "kollos");
+    /* Lua stack: [] */
 
     /* create metatables */
     create_sv_mt(L);
@@ -5510,7 +5546,7 @@ DESTROY( lua_wrapper )
     Marpa_Lua *lua_wrapper;
 PPCODE:
 {
-  kollos_refdec(lua_wrapper->L);
+  lua_refdec(lua_wrapper->L);
   Safefree (lua_wrapper);
 }
 
