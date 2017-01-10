@@ -363,6 +363,32 @@ This is a registry object.
 
 ```
 
+Given a G1 span return an L0 span.
+Note that the data for Earley set `n` is kept in
+`es_data[n+1]`.
+
+```
+    -- miranda: section+ SLIF recognizer Lua functions
+    function _M.class_slr.g1_to_l0_span(slr, es1, count)
+         local es_data = slr.es_data
+         local es1_data = es_data[es1+1]
+         local l0_start = es1_data[1]
+         if not count or count == 1 then
+             return l0_start, es1_data[2]
+         end
+         if count == 0 then
+             return l0_start, 0
+         end
+         local end_es_data = es_data[es1+count]
+         local end_es_start = end_es_data[1]
+         local end_es_length = end_es_data[2]
+         local l0_length = end_es_start + end_es_length - l0_start
+         if l0_length < 0 then l0_length = 0 end
+         return l0_start, l0_length
+    end
+
+```
+
 Given a scanless
 recognizer and a symbol,
 `last_completed()`

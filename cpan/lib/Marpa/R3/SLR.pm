@@ -65,44 +65,28 @@ sub Marpa::R3::Scanless::R::last_completed_span {
 }
 
 sub Marpa::R3::Scanless::R::g1_input_span {
-    my ( $slr, $start_earley_set, $length_in_parse_locations ) = @_;
-    return
-        if not defined $start_earley_set
-        or not defined $length_in_parse_locations;
-
-    my ($latest_earley_set) = $slr->call_by_tag(
+    my ( $slr, $g1_start, $g1_count ) = @_;
+    my ($l0_start, $l0_count) = $slr->call_by_tag(
     (__FILE__ . ':' . __LINE__),
-    <<'END_OF_LUA', '');
-    local recce = ...
-    return recce.lmw_g1r:latest_earley_set()
+    <<'END_OF_LUA', 'ii', $g1_start, $g1_count);
+    local recce, g1_start, g1_count = ...
+    local latest_earley_set = recce.lmw_g1r:latest_earley_set()
+    local es_end = g1_start + g1_count
+    if g1_count < 0 then
+        error(string.format(
+            "Error in $slr->g1_input_span(%d, %d): count < 0\n",
+            g1_start, g1_count))
+    end
+    if g1_start + g1_count > latest_earley_set then
+        error(string.format(
+            "Error in $slr->g1_input_span(%d, %d)\n"
+            .. "  end G1 location (%d) is at or after latest G1 location (%d)\n",
+            g1_start, g1_count, g1_start, latest_earley_set))
+    end
+    return recce:g1_to_l0_span(g1_start, g1_count)
 END_OF_LUA
 
-    my $earley_set_for_first_position = $start_earley_set + 1;
-    my $earley_set_for_last_position =
-        $start_earley_set + $length_in_parse_locations;
-
-    die 'Error in $slr->g1_literal(',
-        "$start_earley_set, $length_in_parse_locations", '): ',
-        "start ($start_earley_set) is at or after latest_earley_set ($latest_earley_set)"
-        if $earley_set_for_first_position > $latest_earley_set;
-    die 'Error in $slr->g1_literal(',
-        "$start_earley_set, $length_in_parse_locations", '): ',
-        "end ( $start_earley_set + $length_in_parse_locations ) is after latest_earley_set ($latest_earley_set)"
-        if $earley_set_for_last_position > $latest_earley_set;
-
-    my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
-    my ($first_start_position) =
-        $thin_slr->span($earley_set_for_first_position);
-    my ( $last_start_position, $last_length ) =
-        $thin_slr->span($earley_set_for_last_position);
-    my $length_in_characters =
-        ( $last_start_position + $last_length ) - $first_start_position;
-
-    # Negative lengths are quite possible if the application has jumped around in
-    # the input.
-    $length_in_characters = 0 if $length_in_characters <= 0;
-    return ( $first_start_position, $length_in_characters );
-
+    return ($l0_start, $l0_count);
 }
 
 # Given a scanless recognizer and

@@ -72,7 +72,7 @@ if do_load then
     if kollos then return "OK" end
     return "Load of kollos failed"
 else
-    return "Compile of kollos failed"
+    return "Compile of kollos failed", error
 end
 END_OF_LUA
 
