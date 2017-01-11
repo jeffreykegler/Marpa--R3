@@ -154,7 +154,7 @@ P1 @11-11 L1c19 Calculation -> . Expression
 F1 @0-11 L1c1-19 Calculation -> Expression .
 P2 @11-11 L1c19 Calculation -> . 'say' Expression
 P3 @11-11 L1c19 Expression -> . Number
-F3 @10-11 L1c17-19 Expression -> Number .
+F3 @10-11 L1c19 Expression -> Number .
 P4 @11-11 L1c19 Expression -> . '+' Expression Expression
 F4 x2 @0,6-11 L1c1-19 Expression -> '+' Expression Expression .
 F5 @0-11 L1c1-19 [:start] -> Script .

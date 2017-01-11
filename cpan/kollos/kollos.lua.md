@@ -371,6 +371,11 @@ Note that the data for Earley set `n` is kept in
     -- miranda: section+ SLIF recognizer Lua functions
     function _M.class_slr.g1_to_l0_span(slr, es1, count)
          local es_data = slr.es_data
+         if es1 == #es_data then
+             -- last earley set is special case
+             local last_es_data = es_data[#es_data]
+             return (last_es_data[1] + last_es_data[2] - 1), 0
+         end
          local es1_data = es_data[es1+1]
          local l0_start = es1_data[1]
          if not count or count == 1 then

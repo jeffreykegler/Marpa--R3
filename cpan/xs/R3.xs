@@ -4460,7 +4460,7 @@ PPCODE:
       "local recce = ...\n"
       "recce.too_many_earley_items = -1\n"
       "recce.event_queue = {}\n"
-      "recce.es_data = { [0] = { 0, 0 }}\n"
+      "recce.es_data = {}\n"
       "recce.lmw_g1r.lmw_g = recce.slg.lmw_g1g\n"
       "recce.trace_terminals = 0\n",
       "R>", outer_slr->lua_ref);

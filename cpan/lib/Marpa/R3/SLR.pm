@@ -1456,16 +1456,27 @@ sub Marpa::R3::Scanless::R::reset_evaluation {
 # when the parse is initialized.
 sub g1_locations_to_input_range {
     my ( $slr, @g1_locations ) = @_;
-    my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
+    my $thin_slr  = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
     my $first_pos = $thin_slr->input_length();
-    my $last_pos = 0;
+    my $last_pos  = 0;
     for my $g1_location (@g1_locations) {
-        my ( $input_start, $input_length ) = $thin_slr->span($g1_location);
-        my $input_end = $input_length ? $input_start + $input_length - 1 : $input_start;
+
+        my ( $input_start, $input_end ) =
+          $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+            <<'END_OF_LUA', 'i', $g1_location );
+    local recce, g1_start = ...
+    local input_start, input_length = recce:g1_to_l0_span(g1_start, 1)
+    local input_end = input_start
+    if input_length > 0 then
+        input_end = input_start + input_length - 1
+    end
+    return input_start, input_end
+END_OF_LUA
+
         $first_pos = $input_start if $input_start < $first_pos;
-        $last_pos = $input_end if $input_end > $last_pos;
+        $last_pos  = $input_end   if $input_end > $last_pos;
     } ## end for my $g1_location (@other_g1_locations)
-    return ($first_pos, $last_pos);
+    return ( $first_pos, $last_pos );
 }
 
 sub input_range_describe {
