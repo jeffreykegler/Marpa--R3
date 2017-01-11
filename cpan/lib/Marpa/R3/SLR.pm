@@ -66,6 +66,8 @@ sub Marpa::R3::Scanless::R::last_completed_span {
 
 sub Marpa::R3::Scanless::R::g1_input_span {
     my ( $slr, $g1_start, $g1_count ) = @_;
+    $DB::single = 1 if $g1_start <= 0;
+    $DB::single = 1 if $g1_count <= 0;
     my ($l0_start, $l0_count) = $slr->call_by_tag(
     (__FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', 'ii', $g1_start, $g1_count);
@@ -1450,35 +1452,6 @@ sub Marpa::R3::Scanless::R::reset_evaluation {
     return;
 }
 
-# Given a list of G1 locations, return the minimum span in the input string
-# that includes them all
-# Caller must ensure that there is an input, which is not the case
-# when the parse is initialized.
-sub g1_locations_to_input_range {
-    my ( $slr, @g1_locations ) = @_;
-    my $thin_slr  = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
-    my $first_pos = $thin_slr->input_length();
-    my $last_pos  = 0;
-    for my $g1_location (@g1_locations) {
-
-        my ( $input_start, $input_end ) =
-          $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-            <<'END_OF_LUA', 'i', $g1_location );
-    local recce, g1_start = ...
-    local input_start, input_length = recce:g1_to_l0_span(g1_start, 1)
-    local input_end = input_start
-    if input_length > 0 then
-        input_end = input_start + input_length - 1
-    end
-    return input_start, input_end
-END_OF_LUA
-
-        $first_pos = $input_start if $input_start < $first_pos;
-        $last_pos  = $input_end   if $input_end > $last_pos;
-    } ## end for my $g1_location (@other_g1_locations)
-    return ( $first_pos, $last_pos );
-}
-
 sub input_range_describe {
     my ( $slr, $first_pos,  $last_pos )     = @_;
     my ( $first_line, $first_column ) = $slr->line_column($first_pos);
@@ -1576,14 +1549,20 @@ sub Marpa::R3::Scanless::R::show_progress {
                 push @item_text, q{@} . $origin_desc . q{-} . $current_earleme;
 
                 if ( $current_earleme > 0 ) {
-                    my $input_range = input_range_describe(
-                        $slr,
-                        g1_locations_to_input_range(
-                            $slr, $current_earleme, @origins
-                        )
-                    );
+                    # -1 to convert earley set to G1, then
+                    # +1 one because it is an origin and the character
+                    # don't begin until the next Earley set
+                    my $g1_start = $origins[0];
+
+                    # -1 to convert earley set to G1, then
+                    # +1 to convert from last element range to count
+                    my $g1_count = $current_earleme - $g1_start;
+                    my ($l0_start, $l0_count) = $slr->g1_input_span( $g1_start, $g1_count );
+                    my $input_range = input_range_describe( $slr,
+                        $l0_start, ($l0_start + $l0_count - 1));
                     push @item_text, $input_range;
-                }  else {
+                }
+                else {
                     push @item_text, 'L0c0';
                 }
 
