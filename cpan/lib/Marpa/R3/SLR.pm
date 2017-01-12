@@ -66,7 +66,6 @@ sub Marpa::R3::Scanless::R::last_completed_span {
 
 sub Marpa::R3::Scanless::R::g1_input_span {
     my ( $slr, $g1_start, $g1_count ) = @_;
-    $DB::single = 1 if $g1_start == 5 and $g1_count == 0;
     my ($l0_start, $l0_count) = $slr->call_by_tag(
     (__FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', 'ii', $g1_start, $g1_count);
@@ -77,12 +76,6 @@ sub Marpa::R3::Scanless::R::g1_input_span {
         error(string.format(
             "Error in $slr->g1_input_span(%d, %d): count < 0\n",
             g1_start, g1_count))
-    end
-    if g1_start + g1_count > latest_earley_set then
-        error(string.format(
-            "Error in $slr->g1_input_span(%d, %d)\n"
-            .. "  end G1 location (%d) is at or after latest G1 location (%d)\n",
-            g1_start, g1_count, g1_start, latest_earley_set))
     end
     return recce:g1_to_l0_span(g1_start, g1_count)
 END_OF_LUA
@@ -102,9 +95,9 @@ sub Marpa::R3::Scanless::R::g1_literal {
 } ## end sub Marpa::R3::Scanless::R::g1_literal
 
 sub Marpa::R3::Scanless::R::g1_location_to_span {
-    my ( $self, $g1_location ) = @_;
-    my $thin_self = $self->[Marpa::R3::Internal::Scanless::R::SLR_C];
-    return $thin_self->span($g1_location);
+    my ( $slr, $g1_location ) = @_;
+    my $thin_self = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
+    return $slr->g1_input_span( $g1_location, 1 );
 }
 
 # Substring in terms of locations in the input stream

@@ -443,7 +443,7 @@ END_OF_OUTPUT
     # One result for each unique G1 location in progress report
     # Format of each result is [g1_location, span_start, span_length]
     my $expected_spans =
-        [ [ 0, 0, 0 ], [ 6, 8, 1 ], [ 10, 16, 1 ], [ 11, 18, 1 ] ];
+        [ [ 0, 0, 1 ], [ 6, 10, 1 ], [ 10, 18, 1 ], [ 11, 18, 1 ] ];
     Test::More::is_deeply( \@spans, $expected_spans,
         qq{Scanless g1_location_to_span()} );
 
