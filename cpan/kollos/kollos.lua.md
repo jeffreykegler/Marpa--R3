@@ -897,9 +897,18 @@ that is, in terms of the input string
     function op_fn_push_length(recce, dummy, new_values)
         local start_es = recce.this_step.start_es_id
         local end_es = recce.this_step.es_id
-        local _, old_l0_length = recce:span(start_es, end_es)
+        local es_data = recce.es_data
+        local l0_length = 0
+        start_es = start_es + 1
+        local start_es_entry = es_data[start_es]
+        if start_es_entry then
+            local l0_start = start_es_entry[1]
+            local end_es_entry = es_data[end_es]
+            l0_length =
+                end_es_entry[1] + end_es_entry[2] - l0_start
+        end
         local next_ix = marpa.sv.top_index(new_values) + 1;
-        new_values[next_ix] = old_l0_length
+        new_values[next_ix] = l0_length
         return -2
     end
 

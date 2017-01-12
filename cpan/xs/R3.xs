@@ -1170,32 +1170,6 @@ xlua_recce_literal_of_es_span_meth (lua_State * L)
     return 1;
 }
 
-static int
-xlua_recce_span_meth (lua_State * L)
-{
-    Scanless_R *slr;
-    int lud_type;
-    lua_Integer start_earley_set;
-    lua_Integer end_earley_set;
-    lua_Integer g1_length;
-    int length_in_positions;
-    int start_position;
-
-    marpa_luaL_checktype (L, 1, LUA_TTABLE);
-    lud_type = marpa_lua_getfield (L, 1, "lud");
-    marpa_luaL_argcheck (L, (lud_type == LUA_TLIGHTUSERDATA), 1,
-        "recce userdata not set");
-    slr = (Scanless_R *) marpa_lua_touserdata (L, -1);
-    start_earley_set = marpa_luaL_checkinteger (L, 2);
-    end_earley_set = marpa_luaL_checkinteger (L, 3);
-    g1_length = end_earley_set - start_earley_set;
-    slr_es_to_literal_span (slr,
-        (Marpa_Earley_Set_ID)start_earley_set, (int)g1_length, &start_position, &length_in_positions);
-    marpa_lua_pushinteger (L, start_position);
-    marpa_lua_pushinteger (L, length_in_positions);
-    return 2;
-}
-
 static void slr_inner_destroy(Scanless_R* slr);
 
 static int
@@ -1219,7 +1193,6 @@ static const struct luaL_Reg marpa_slr_meths[] = {
     {"constants", xlua_recce_constants_meth},
     {"step", xlua_recce_step_meth},
     {"literal_of_es_span", xlua_recce_literal_of_es_span_meth},
-    {"span", xlua_recce_span_meth},
     {"ref", xlua_ref},
     {"unref", xlua_unref},
     {"__gc", xlua_recce_gc},
