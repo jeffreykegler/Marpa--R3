@@ -175,7 +175,6 @@ typedef struct
    */
   int lexer_start_pos;
   int lexer_read_result;
-  int g1r_earleme_complete_result;
 
   /* A boolean to prevent the inappropriate mixing
    * of internal and external scanning

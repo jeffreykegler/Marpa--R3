@@ -2220,7 +2220,6 @@ marpa_inner_slr_new (Outer_G* outer_slg, Marpa_Recce g1r)
 
     slr->lexer_start_pos = slr->perl_pos;
     slr->lexer_read_result = 0;
-    slr->g1r_earleme_complete_result = 0;
     slr->start_of_pause_lexeme = -1;
     slr->end_of_pause_lexeme = -1;
 
@@ -4581,7 +4580,6 @@ PPCODE:
     }
 
   slr->lexer_read_result = 0;
-  slr->g1r_earleme_complete_result = 0;
   slr->start_of_pause_lexeme = -1;
   slr->end_of_pause_lexeme = -1;
 
@@ -4697,15 +4695,6 @@ PPCODE:
 {
   Scanless_R *slr = slr_inner_get(outer_slr);
   XPUSHs (sv_2mortal (newSViv ((IV) slr->lexer_read_result)));
-}
-
-void
-g1r_earleme_complete_result (outer_slr)
-    Outer_R *outer_slr;
-PPCODE:
-{
-  Scanless_R *slr = slr_inner_get(outer_slr);
-  XPUSHs (sv_2mortal (newSViv ((IV) slr->g1r_earleme_complete_result)));
 }
 
 void

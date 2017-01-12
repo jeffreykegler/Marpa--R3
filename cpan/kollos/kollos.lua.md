@@ -869,7 +869,6 @@ in terms of the input string.
     function op_fn_push_start(recce, dummy, new_values)
         local start_es = recce.this_step.start_es_id
         local end_es = recce.this_step.es_id
-        local start, l = recce:span(start_es, end_es)
         local next_ix = marpa.sv.top_index(new_values) + 1;
         local _
         new_values[next_ix], _ = recce:span(start_es, end_es)
