@@ -4725,20 +4725,6 @@ PPCODE:
 }
 
 void
-span(outer_slr, earley_set)
-    Outer_R *outer_slr;
-    IV earley_set;
-PPCODE:
-{
-  Scanless_R *slr = slr_inner_get(outer_slr);
-  int start_position;
-  int length;
-  slr_es_to_span(slr, earley_set, &start_position, &length);
-  XPUSHs (sv_2mortal (newSViv ((IV) start_position)));
-  XPUSHs (sv_2mortal (newSViv ((IV) length)));
-}
-
-void
 lexeme_span (outer_slr)
     Outer_R *outer_slr;
 PPCODE:
