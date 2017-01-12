@@ -105,11 +105,11 @@ F0 @0-1 L1c1-2 Expression -> Factor .
 F2 @0-1 L1c1-2 Factor -> Number .
 R4:1 @0-1 L1c1-2 Factor -> Factor . Multiply Factor
 F5 @0-1 L1c1-2 [:start] -> Expression .
-P2 @2-2 L1c3 Factor -> . Number
-P4 @2-2 L1c3 Factor -> . Factor Multiply Factor
+P2 @2-2 L1c4 Factor -> . Number
+P4 @2-2 L1c4 Factor -> . Factor Multiply Factor
 R4:2 @0-2 L1c1-3 Factor -> Factor Multiply . Factor
 F0 @0-3 L1c1-4 Expression -> Factor .
-F2 @2-3 L1c3-4 Factor -> Number .
+F2 @2-3 L1c4 Factor -> Number .
 R4:1 x2 @0,2-3 L1c1-4 Factor -> Factor . Multiply Factor
 F4 @0-3 L1c1-4 Factor -> Factor Multiply Factor .
 F5 @0-3 L1c1-4 [:start] -> Expression .

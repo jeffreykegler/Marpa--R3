@@ -66,8 +66,7 @@ sub Marpa::R3::Scanless::R::last_completed_span {
 
 sub Marpa::R3::Scanless::R::g1_input_span {
     my ( $slr, $g1_start, $g1_count ) = @_;
-    $DB::single = 1 if $g1_start <= 0;
-    $DB::single = 1 if $g1_count <= 0;
+    $DB::single = 1 if $g1_start == 5 and $g1_count == 0;
     my ($l0_start, $l0_count) = $slr->call_by_tag(
     (__FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', 'ii', $g1_start, $g1_count);
@@ -1457,8 +1456,11 @@ sub input_range_describe {
     my ( $first_line, $first_column ) = $slr->line_column($first_pos);
     my ( $last_line,  $last_column )  = $slr->line_column($last_pos);
     if ( $first_line == $last_line ) {
+        # zero length spans sometimes produce range with last
+        # column before 1st column -- print these same as
+        # ranges of length 1.  E.g., L2c3
         return join q{}, 'L', $first_line, 'c', $first_column
-            if $first_column == $last_column;
+            if $last_column <= $first_column;
         return join q{}, 'L', $first_line, 'c', $first_column, '-',
             $last_column;
     } ## end if ( $first_line == $last_line )
@@ -1553,11 +1555,19 @@ sub Marpa::R3::Scanless::R::show_progress {
                     # +1 one because it is an origin and the character
                     # don't begin until the next Earley set
                     my $g1_start = $origins[0];
+                    # Special case: Earley set 0 == G1 location 0
+                    # $g1_start = 0 if $g1_start < 0;
 
                     # -1 to convert earley set to G1, then
                     # +1 to convert from last element range to count
                     my $g1_count = $current_earleme - $g1_start;
                     my ($l0_start, $l0_count) = $slr->g1_input_span( $g1_start, $g1_count );
+
+                    # say STDERR sprintf "es=%d,%d g1=%d,%d l0=%d,%d",
+                        # $origins[0], $current_earleme,
+                        # $g1_start, $g1_count,
+                        # $l0_start, $l0_count;
+
                     my $input_range = input_range_describe( $slr,
                         $l0_start, ($l0_start + $l0_count - 1));
                     push @item_text, $input_range;
