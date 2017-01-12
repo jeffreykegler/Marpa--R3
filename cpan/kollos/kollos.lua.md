@@ -868,10 +868,20 @@ in terms of the input string.
     -- miranda: section+ VM operations
     function op_fn_push_start(recce, dummy, new_values)
         local start_es = recce.this_step.start_es_id
-        local end_es = recce.this_step.es_id
+        local es_data = recce.es_data
+        local l0_start
+        start_es = start_es + 1
+        if start_es > #es_data then
+             local es_entry = es_data[#es_data]
+             l0_start = es_entry[1] + es_entry[2]
+        elseif start_es < 1 then
+             l0_start = 0
+        else
+             local es_entry = es_data[start_es]
+             l0_start = es_entry[1]
+        end
         local next_ix = marpa.sv.top_index(new_values) + 1;
-        local _
-        new_values[next_ix], _ = recce:span(start_es, end_es)
+        new_values[next_ix] = l0_start
         return -2
     end
 
