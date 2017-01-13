@@ -208,6 +208,11 @@ typedef struct
   int t_lexeme_capacity;
   int t_lexeme_count;
 
+  /* We need a copy of the outer_slr lua_ref,
+   * but hopefully only while refactoring
+   */
+  lua_Integer outer_slr_lua_ref;
+
 } Scanless_R;
 
 typedef struct

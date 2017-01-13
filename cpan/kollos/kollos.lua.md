@@ -285,20 +285,23 @@ and takes ownership of it.
     -- miranda: section+ lua interpreter management
     void kollos_robrefinc(lua_State* L, lua_Integer lua_ref)
     {
+        int rob_ix;
         const int base_of_stack = marpa_lua_gettop(L);
         lua_Integer refcount;
-        /* Lua stack [] */
-        marpa_lua_geti(L, LUA_REGISTRYINDEX, lua_ref);
-        /* Lua stack [ table ] */
-        marpa_lua_getfield(L, -1, "ref_count");
-        /* Lua stack [ table, ref_count ] */
+        if (marpa_lua_geti(L, LUA_REGISTRYINDEX, lua_ref) != LUA_TTABLE) {
+            internal_error_handle (L, "registry object is not a table",
+                __PRETTY_FUNCTION__, __FILE__, __LINE__);
+        }
+        rob_ix = marpa_lua_gettop(L);
+        if (marpa_lua_getfield(L, rob_ix, "ref_count") != LUA_TNUMBER) {
+            internal_error_handle (L, "rob ref_count is not a number",
+                __PRETTY_FUNCTION__, __FILE__, __LINE__);
+        }
         refcount = marpa_lua_tointeger(L, -1);
         refcount += 1;
         marpa_lua_pushinteger(L, refcount);
-        /* Lua stack [ table, ref_count, new_ref_count ] */
-        marpa_lua_setfield(L, -2, "ref_count");
+        marpa_lua_setfield(L, rob_ix, "ref_count");
         marpa_lua_settop(L, base_of_stack);
-        /* Lua stack [ ] */
     }
 
 ```
@@ -313,28 +316,28 @@ Deletes the interpreter if the reference count drops to zero.
     -- miranda: section+ lua interpreter management
     void kollos_robrefdec(lua_State* L, lua_Integer lua_ref)
     {
+        int rob_ix;
         const int base_of_stack = marpa_lua_gettop(L);
         lua_Integer refcount;
-        marpa_lua_geti(L, LUA_REGISTRYINDEX, lua_ref);
-        /* Lua stack [ table ] */
-        marpa_lua_getfield(L, -1, "ref_count");
+        if (marpa_lua_geti(L, LUA_REGISTRYINDEX, lua_ref) != LUA_TTABLE) {
+            internal_error_handle (L, "registry object is not a table",
+                __PRETTY_FUNCTION__, __FILE__, __LINE__);
+        }
+        rob_ix = marpa_lua_gettop(L);
+        if (marpa_lua_getfield(L, rob_ix, "ref_count") != LUA_TNUMBER) {
+            internal_error_handle (L, "rob ref_count is not a number",
+                __PRETTY_FUNCTION__, __FILE__, __LINE__);
+        }
         refcount = marpa_lua_tointeger(L, -1);
-        /* Lua stack [ table, ref_count ] */
         if (refcount <= 1) {
-           /* default_warn("kollos_robrefdec lua_ref %d ref_count %d, will unref", lua_ref, refcount); */
            marpa_luaL_unref(L, LUA_REGISTRYINDEX, (int)lua_ref);
-           /* marpa_lua_gc(L, LUA_GCCOLLECT, 0); */
-           /* marpa_lua_gc(L, LUA_GCCOLLECT, 0); */
            marpa_lua_settop(L, base_of_stack);
            return;
         }
         refcount -= 1;
         marpa_lua_pushinteger(L, refcount);
-        /* Lua stack [ table, ref_count, new_ref_count ] */
-        marpa_lua_setfield(L, -2, "ref_count");
-        /* default_warn("kollos_robrefdec lua_ref %d to ref_count %d", lua_ref, refcount); */
+        marpa_lua_setfield(L, rob_ix, "ref_count");
         marpa_lua_settop(L, base_of_stack);
-        /* Lua stack [ ] */
     }
 
 ```

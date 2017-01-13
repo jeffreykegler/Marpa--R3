@@ -306,8 +306,10 @@ slr_es_to_literal_span (Scanless_R * slr,
                         Marpa_Earley_Set_ID start_earley_set, int length,
                         int *p_start, int *p_length);
 static SV*
-slr_es_span_to_literal_sv (Scanless_R * slr,
-                        Marpa_Earley_Set_ID start_earley_set, int length);
+slr_es_span_to_literal_sv (Scanless_R * slr, lua_State* L,
+                        Marpa_Earley_Set_ID start_earley_set,
+                        Marpa_Earley_Set_ID end_earley_set
+                        );
 
 /* Xlua, that is, the eXtension of Lua for Marpa::XS.
  * Portions of this code adopted from Inline::Lua
@@ -1162,15 +1164,15 @@ xlua_recce_literal_of_es_span_meth (lua_State * L)
     end_earley_set = marpa_luaL_checkinteger (L, 3);
 
     literal_sv =
-        slr_es_span_to_literal_sv (slr,
+        slr_es_span_to_literal_sv (slr, L,
         (Marpa_Earley_Set_ID) start_earley_set,
-        (int)(end_earley_set - start_earley_set));
+        (Marpa_Earley_Set_ID) end_earley_set);
     marpa_sv_sv_noinc (L, literal_sv);
     /* Lua stack: [ recce_table, recce_lud, stack_ud ] */
     return 1;
 }
 
-static void slr_inner_destroy(Scanless_R* slr);
+static void slr_inner_destroy(lua_State* L, Scanless_R* slr);
 
 static int
 xlua_recce_gc (lua_State * L)
@@ -1185,7 +1187,7 @@ xlua_recce_gc (lua_State * L)
     marpa_luaL_argcheck (L, (lud_type == LUA_TLIGHTUSERDATA), 1,
         "recce userdata not set");
     slr = (Scanless_R *) marpa_lua_touserdata (L, -1);
-    slr_inner_destroy(slr);
+    slr_inner_destroy(L, slr);
     return 0;
 }
 
@@ -2229,11 +2231,12 @@ static Scanless_R* slr_inner_get(Outer_R* outer_slr) {
     return slr;
 }
 
-static void slr_inner_destroy(Scanless_R* slr)
+static void slr_inner_destroy(lua_State* L, Scanless_R* slr)
 {
   dTHX;
 
   /* marpa_r3_warn("SLR inner destroy"); */
+  kollos_robrefdec(L, slr->outer_slr_lua_ref);
 
    Safefree(slr->t_lexemes);
 
@@ -2962,12 +2965,14 @@ slr_es_to_literal_span (Scanless_R * slr,
 }
 
 static SV*
-slr_es_span_to_literal_sv (Scanless_R * slr,
-                        Marpa_Earley_Set_ID start_earley_set, int length)
+slr_es_span_to_literal_sv (Scanless_R * slr, lua_State* L,
+                        Marpa_Earley_Set_ID start_earley_set,
+                        Marpa_Earley_Set_ID end_earley_set)
 {
   dTHX;
-  if (length > 0)
+  if (end_earley_set > start_earley_set)
     {
+      const int length = start_earley_set - end_earley_set;
       int length_in_positions;
       int start_position;
       slr_es_to_literal_span (slr,
@@ -4361,6 +4366,7 @@ new( class, slg_sv )
     SV *slg_sv;
 PPCODE:
 {
+  lua_State* L;
   SV *new_sv;
   Outer_G *outer_slg;
   Outer_R *outer_slr;
@@ -4381,6 +4387,7 @@ PPCODE:
     IV tmp = SvIV ((SV *) SvRV (slg_sv));
     outer_slg = INT2PTR (Outer_G *, tmp);
   }
+  L = outer_slg->L;
 
   slg = slg_inner_get(outer_slg);
   g1g = slg->g1_wrapper->g;
@@ -4400,7 +4407,6 @@ PPCODE:
   outer_slr->outer_slg = outer_slg;
 
   {
-    lua_State* const L = outer_slr->outer_slg->L;
     const int base_of_stack = marpa_lua_gettop(L);
     int slr_ix;
 
@@ -4426,7 +4432,10 @@ PPCODE:
   }
 
   marpa_r_ref(slr->g1r);
-  dummyup_recce(outer_slr->L, outer_slr->lua_ref, slr->g1r, "lmw_g1r");
+  dummyup_recce(L, outer_slr->lua_ref, slr->g1r, "lmw_g1r");
+
+  slr->outer_slr_lua_ref = outer_slr->lua_ref;
+  kollos_robrefinc(L, outer_slr->lua_ref);
 
   call_by_tag (outer_slr->L, STRLOC,
       "local recce = ...\n"
