@@ -1702,9 +1702,11 @@ sub trace_op {
 
     my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
 
-    my ($nook_ix, $or_node_id, $choice, $and_node_id, $trace_irl_id, $or_node_position)
+    my ($nook_ix, $or_node_id, $choice, $and_node_id, $trace_irl_id, $or_node_position,
+            $virtual_rhs, $virtual_lhs, $irl_length
+        )
         = $slr->call_by_tag(
-        (__FILE__ . ':' .  __LINE__),
+        ('@' . __FILE__ . ':' .  __LINE__),
         <<'END_OF_LUA' , '');
     -- in trace_op()
     recce = ...
@@ -1715,19 +1717,18 @@ sub trace_op {
     local g1g = recce.slg.lmw_g1g
     local or_node_id = t:_nook_or_node(nook_ix)
     local choice = t:_nook_choice(nook_ix)
+    local trace_irl_id = b:_or_node_irl(or_node_id)
     return
         nook_ix, or_node_id, choice,
             o:_and_order_get(or_node_id, choice), 
-            b:_or_node_irl(or_node_id),
-            b:_or_node_position(or_node_id)
+            trace_irl_id,
+            b:_or_node_position(or_node_id),
+            g1g:_irl_is_virtual_rhs(trace_irl_id),
+            g1g:_irl_is_virtual_lhs(trace_irl_id),
+            g1g:_irl_length(trace_irl_id)
 END_OF_LUA
 
-    my $virtual_rhs  = $grammar_c->_marpa_g_irl_is_virtual_rhs($trace_irl_id);
-    my $virtual_lhs  = $grammar_c->_marpa_g_irl_is_virtual_lhs($trace_irl_id);
-
-    return $trace_output
-        if $or_node_position != $grammar_c->_marpa_g_irl_length($trace_irl_id);
-
+    return $trace_output if $or_node_position != $irl_length;
     return $trace_output if not $virtual_rhs and not $virtual_lhs;
 
     if ( $virtual_rhs and not $virtual_lhs ) {
