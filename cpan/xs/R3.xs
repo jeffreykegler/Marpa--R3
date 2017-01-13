@@ -2105,7 +2105,7 @@ static void slg_inner_destroy(Scanless_G* slg) {
 /* Static SLR methods */
 
 static Scanless_R *
-marpa_inner_slr_new (Outer_G* outer_slg, Marpa_Recce g1r)
+marpa_inner_slr_new (Outer_G* outer_slg)
 {
     dTHX;
     Scanless_R *slr;
@@ -2130,7 +2130,6 @@ marpa_inner_slr_new (Outer_G* outer_slg, Marpa_Recce g1r)
             ("Problem in u->new(): Attempted to create SLIF recce from unprecomputed SLIF grammar");
     }
     slr->slg = slg;
-    slr->g1r = g1r;
     slr->g1_wrapper = slg->g1_wrapper;
 
     slr->start_of_lexeme = 0;
@@ -2451,7 +2450,6 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
 {
     dTHX;
     Scanless_R *slr = slr_inner_get(outer_slr);
-    Marpa_Recce g1r = slr->g1r;
     Marpa_Earley_Set_ID earley_set;
     const Scanless_G *slg = slr->slg;
 
@@ -4363,7 +4361,7 @@ PPCODE:
       croak ("failure in marpa_r_new(): %s", xs_g_error (slg->g1_wrapper));
   };
 
-  slr = marpa_inner_slr_new(outer_slg, g1r);
+  slr = marpa_inner_slr_new(outer_slg);
   /* Copy and take references to the "parent objects",
    * the ones responsible for holding references.
    */
@@ -4397,8 +4395,8 @@ PPCODE:
     marpa_lua_settop(L, base_of_stack);
   }
 
-  marpa_r_ref(slr->g1r);
-  dummyup_recce(L, outer_slr->lua_ref, slr->g1r, "lmw_g1r");
+  marpa_r_ref(g1r);
+  dummyup_recce(L, outer_slr->lua_ref, g1r, "lmw_g1r");
 
   slr->outer_slr_lua_ref = outer_slr->lua_ref;
   kollos_robrefinc(L, outer_slr->lua_ref);

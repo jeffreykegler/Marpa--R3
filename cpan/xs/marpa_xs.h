@@ -164,7 +164,6 @@ typedef struct
   SV *g1g_sv;
 
   Scanless_G *slg;
-  Marpa_Recce g1r;
   G_Wrapper *g1_wrapper;
   AV *token_values;
   int start_of_lexeme;
