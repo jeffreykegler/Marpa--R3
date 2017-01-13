@@ -2959,6 +2959,39 @@ slr_es_span_to_literal_sv (Scanless_R * slr, lua_State* L,
                         Marpa_Earley_Set_ID end_earley_set)
 {
   dTHX;
+  int l0_start;
+  int l0_length;
+
+  call_by_tag (L, STRLOC,
+      "-- this logic is careless about the l0_start when l0_length == 0\n"
+      "-- because the purpose is to find a literal and all zero length literals\n"
+      "-- are the same\n"
+      "local recce, start_earley_set, end_earley_set = ...\n"
+      "start_earley_set = start_earley_set + 1\n"
+      "-- normalize start_earley_set\n"
+      "if start_earley_set < 1 then start_earley_set = 1 end\n"
+      "if end_earley_set < start_earley_set then\n"
+      "    return 0, 0\n"
+      "end\n"
+      "local es_data = recce.es_data\n"
+      "if end_earley_set > #es_data then\n"
+      "    end_earley_set = #es_data\n"
+      "end\n"
+      "local start_entry = es_data[start_earley_set]\n"
+      "if not start_entry then\n"
+      "    return 0, 0\n"
+      "end\n"
+      "local l0_start = -1\n"
+      "local l0_length = -1\n"
+      "return l0_start, l0_length\n"
+      ,
+      "Rii>ii", slr->outer_slr_lua_ref,
+      start_earley_set,
+      end_earley_set,
+      &l0_start,
+      &l0_length
+      );
+
   const Marpa_Recce g1r = slr->g1r;
   const Marpa_Earley_Set_ID latest_earley_set =
     marpa_r_latest_earley_set (g1r);
