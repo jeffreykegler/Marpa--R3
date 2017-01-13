@@ -4491,54 +4491,6 @@ PPCODE:
   XSRETURN_YES;
 }
 
- # An internal function for converting an Earley set span to
- # one in terms of the input locations.
- # This is only meaningful in the context of an SLR
-void
-_es_to_literal_span(outer_slr, start_earley_set, length)
-    Outer_R *outer_slr;
-    Marpa_Earley_Set_ID start_earley_set;
-    int length;
-PPCODE:
-{
-  Scanless_R *slr = slr_inner_get(outer_slr);
-  int literal_start;
-  int literal_length;
-  int latest_earley_set;
-
-    call_by_tag (outer_slr->L, STRLOC,
-        "recce = ...\n"
-        "local g1r = recce.lmw_g1r\n"
-        "return g1r:latest_earley_set()\n"
-        ,
-        "R>i",
-        outer_slr->lua_ref,
-        &latest_earley_set
-    );
-
-  if (start_earley_set < 0 || start_earley_set > latest_earley_set)
-    {
-      croak
-        ("_es_to_literal_span: earley set is %d, must be between 0 and %d",
-         start_earley_set, latest_earley_set);
-    }
-  if (length < 0)
-    {
-      croak ("_es_to_literal_span: length is %d, cannot be negative", length);
-    }
-  if (start_earley_set + length > latest_earley_set)
-    {
-      croak
-        ("_es_to_literal_span: final earley set is %d, must be no greater than %d",
-         start_earley_set + length, latest_earley_set);
-    }
-  slr_es_to_literal_span (slr,
-                          start_earley_set, length,
-                          &literal_start, &literal_length);
-  XPUSHs (sv_2mortal (newSViv ((IV) literal_start)));
-  XPUSHs (sv_2mortal (newSViv ((IV) literal_length)));
-}
-
 void
 read(outer_slr)
     Outer_R *outer_slr;
