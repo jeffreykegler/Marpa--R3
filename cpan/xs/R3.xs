@@ -4337,7 +4337,7 @@ PPCODE:
   Scanless_R *slr;
   Scanless_G *slg;
   Marpa_Grammar g1g;
-  Marpa_Recce g1r;
+  /* Marpa_Recce g1r; */
   PERL_UNUSED_ARG(class);
 
   if (!sv_isa (slg_sv, "Marpa::R3::Thin::SLG"))
@@ -4356,10 +4356,11 @@ PPCODE:
   slg = slg_inner_get(outer_slg);
   g1g = slg->g1_wrapper->g;
 
-  g1r = marpa_r_new (g1g);
-  if (!g1r) {
+  /* g1r = marpa_r_new (g1g);
+    if (!g1r) {
       croak ("failure in marpa_r_new(): %s", xs_g_error (slg->g1_wrapper));
-  };
+    };
+  */
 
   slr = marpa_inner_slr_new(outer_slg);
   /* Copy and take references to the "parent objects",
@@ -4395,14 +4396,15 @@ PPCODE:
     marpa_lua_settop(L, base_of_stack);
   }
 
-  marpa_r_ref(g1r);
-  dummyup_recce(L, outer_slr->lua_ref, g1r, "lmw_g1r");
+  /* marpa_r_ref(g1r); */
+  /* dummyup_recce(L, outer_slr->lua_ref, g1r, "lmw_g1r"); */
 
   slr->outer_slr_lua_ref = outer_slr->lua_ref;
   kollos_robrefinc(L, outer_slr->lua_ref);
 
   call_by_tag (outer_slr->L, STRLOC,
       "local recce = ...\n"
+      "recce.lmw_g1r = kollos.recce_new(recce.slg.lmw_g1g)\n"
       "recce.too_many_earley_items = -1\n"
       "recce.event_queue = {}\n"
       "recce.es_data = {}\n"
