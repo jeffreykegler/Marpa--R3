@@ -1512,8 +1512,6 @@ call_by_tag (lua_State * L, const char* tag, const char *codestr,
 /* Maybe inline some of these */
 
 static Scanless_R* slr_inner_get(Outer_R* outer_slr);
-static void dummyup_recce(
-  lua_State* L, lua_Integer slr_lua_ref, Marpa_Recce recce, const char *name);
 
 static void
 u_l0r_new (Outer_R* outer_slr)
@@ -2965,45 +2963,6 @@ get_mortalspace (size_t nbytes)
     return (void *) SvPVX (mortal);
 }
 
-  /* Takes ownership of a reference to `recce` -- caller must have
-   * one available.
-   */
-static void
-dummyup_recce(
-  lua_State* L,
-  lua_Integer slr_lua_ref,
-  Marpa_Recce recce,
-  const char *name)
-{
-    int recce_object_ix;
-    int slr_object_ix;
-    const int base_of_stack = marpa_lua_gettop (L);
-
-    marpa_luaL_checkstack (L, 20, "dummyup_recce");
-
-    marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, slr_lua_ref);
-    /* Lua stack: [ slr_table ] */
-    slr_object_ix = marpa_lua_gettop (L);
-
-    marpa_lua_newtable (L);
-    recce_object_ix = marpa_lua_gettop (L);
-    marpa_lua_getglobal (L, "kollos");
-    marpa_lua_getfield (L, -1, "class_recce");
-    marpa_lua_setmetatable (L, recce_object_ix);
-    /* [ slr_table, recce_obj, kollos_tab ] */
-    marpa_lua_settop (L, recce_object_ix);
-    /* [ slr_table, recce_obj ] */
-
-    /* Add t userdatum here */
-    marpa_gen_recce_ud (L, recce);
-    /* [ slr_table, recce_obj, recce_ud ] */
-    marpa_lua_setfield (L, recce_object_ix, "_libmarpa");
-    /* [ slr_table, recce_obj ] */
-
-    marpa_lua_setfield (L, slr_object_ix, name);
-    marpa_lua_settop (L, base_of_stack);
-}
-
 #include "inspect.c"
 
 MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin
@@ -4337,7 +4296,6 @@ PPCODE:
   Scanless_R *slr;
   Scanless_G *slg;
   Marpa_Grammar g1g;
-  /* Marpa_Recce g1r; */
   PERL_UNUSED_ARG(class);
 
   if (!sv_isa (slg_sv, "Marpa::R3::Thin::SLG"))
@@ -4355,12 +4313,6 @@ PPCODE:
 
   slg = slg_inner_get(outer_slg);
   g1g = slg->g1_wrapper->g;
-
-  /* g1r = marpa_r_new (g1g);
-    if (!g1r) {
-      croak ("failure in marpa_r_new(): %s", xs_g_error (slg->g1_wrapper));
-    };
-  */
 
   slr = marpa_inner_slr_new(outer_slg);
   /* Copy and take references to the "parent objects",
@@ -4395,9 +4347,6 @@ PPCODE:
     outer_slr->lua_ref = marpa_luaL_ref (L, LUA_REGISTRYINDEX);
     marpa_lua_settop(L, base_of_stack);
   }
-
-  /* marpa_r_ref(g1r); */
-  /* dummyup_recce(L, outer_slr->lua_ref, g1r, "lmw_g1r"); */
 
   slr->outer_slr_lua_ref = outer_slr->lua_ref;
   kollos_robrefinc(L, outer_slr->lua_ref);
