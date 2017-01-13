@@ -2981,8 +2981,12 @@ slr_es_span_to_literal_sv (Scanless_R * slr, lua_State* L,
       "if not start_entry then\n"
       "    return 0, 0\n"
       "end\n"
-      "local l0_start = -1\n"
-      "local l0_length = -1\n"
+      "local end_entry = es_data[end_earley_set]\n"
+      "if not end_entry then\n"
+      "    end_entry = es_data[#es_data]\n"
+      "end\n"
+      "local l0_start = start_entry[1]\n"
+      "local l0_length = end_entry[1] + end_entry[2] - l0_start\n"
       "return l0_start, l0_length\n"
       ,
       "Rii>ii", slr->outer_slr_lua_ref,
@@ -2992,21 +2996,11 @@ slr_es_span_to_literal_sv (Scanless_R * slr, lua_State* L,
       &l0_length
       );
 
-  const Marpa_Recce g1r = slr->g1r;
-  const Marpa_Earley_Set_ID latest_earley_set =
-    marpa_r_latest_earley_set (g1r);
-  if (end_earley_set >= start_earley_set
-     && start_earley_set < latest_earley_set
-  )
-    {
-      int length_in_positions;
-      int start_position;
-      slr_es_to_literal_span (slr,
-                              start_earley_set, end_earley_set,
-                              &start_position, &length_in_positions);
-      return u_pos_span_to_literal_sv(slr, start_position, length_in_positions);
-    }
-  return newSVpvn ("", 0);
+  if (l0_length == 0) {
+    return newSVpvn ("", 0);
+  }
+
+  return u_pos_span_to_literal_sv(slr, l0_start, l0_length);
 }
 
 #define EXPECTED_LIBMARPA_MAJOR 8
