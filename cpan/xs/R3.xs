@@ -2942,18 +2942,7 @@ slr_es_to_literal_span (Scanless_R * slr,
                         int *p_start, int *p_length)
 {
   dTHX;
-  const Marpa_Recce g1r = slr->g1r;
-  const Marpa_Earley_Set_ID latest_earley_set =
-    marpa_r_latest_earley_set (g1r);
-  if (start_earley_set >= latest_earley_set)
-    {
-      *p_start = slr->pos_db_logical_size;
-      *p_length = 0;
-      return;
-    }
   slr_es_to_span (slr, start_earley_set + 1, p_start, p_length);
-  if (start_earley_set == end_earley_set)
-    *p_length = 0;
   if ((end_earley_set - start_earley_set) > 1)
     {
       int last_lexeme_start_position;
@@ -2970,7 +2959,12 @@ slr_es_span_to_literal_sv (Scanless_R * slr, lua_State* L,
                         Marpa_Earley_Set_ID end_earley_set)
 {
   dTHX;
-  if (end_earley_set > start_earley_set)
+  const Marpa_Recce g1r = slr->g1r;
+  const Marpa_Earley_Set_ID latest_earley_set =
+    marpa_r_latest_earley_set (g1r);
+  if (end_earley_set >= start_earley_set
+     && start_earley_set < latest_earley_set
+  )
     {
       int length_in_positions;
       int start_position;
