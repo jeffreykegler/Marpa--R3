@@ -299,12 +299,6 @@ static int marpa_r3_warn(const char* format, ...)
    return 1;
 }
 
-static void slr_es_to_span (Scanless_R * slr, Marpa_Earley_Set_ID earley_set,
-                           int *p_start, int *p_length);
-static void
-slr_es_to_literal_span (Scanless_R * slr,
-                        Marpa_Earley_Set_ID start_earley_set, int length,
-                        int *p_start, int *p_length);
 static SV*
 slr_es_span_to_literal_sv (Scanless_R * slr, lua_State* L,
                         Marpa_Earley_Set_ID start_earley_set,
@@ -2905,52 +2899,6 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
 
     return 0;
 
-}
-
-static void
-slr_es_to_span (Scanless_R * slr, Marpa_Earley_Set_ID earley_set, int *p_start,
-               int *p_length)
-{
-  dTHX;
-  int result = 0;
-  /* We fake the values for Earley set 0,
-   */
-  if (earley_set <= 0)
-    {
-      *p_start = 0;
-      *p_length = 0;
-    }
-  else
-    {
-      void *length_as_ptr;
-      result =
-        marpa_r_earley_set_values (slr->g1r, earley_set, p_start,
-                                   &length_as_ptr);
-      *p_length = (int) PTR2IV (length_as_ptr);
-    }
-  if (result < 0)
-    {
-      croak ("failure in slr->span(%d): %s", earley_set,
-             xs_g_error (slr->g1_wrapper));
-    }
-}
-
-static void
-slr_es_to_literal_span (Scanless_R * slr,
-                        Marpa_Earley_Set_ID start_earley_set,
-                        Marpa_Earley_Set_ID end_earley_set,
-                        int *p_start, int *p_length)
-{
-  dTHX;
-  slr_es_to_span (slr, start_earley_set + 1, p_start, p_length);
-  if ((end_earley_set - start_earley_set) > 1)
-    {
-      int last_lexeme_start_position;
-      int last_lexeme_length;
-      slr_es_to_span (slr, end_earley_set,
-        &last_lexeme_start_position, &last_lexeme_length);
-      *p_length = last_lexeme_start_position + last_lexeme_length - *p_start;
-    }
 }
 
 static SV*
