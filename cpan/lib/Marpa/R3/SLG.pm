@@ -152,8 +152,15 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
 
     state $op_lua = Marpa::R3::Thin::op('lua');
     $thin_slg->call_by_tag(
-        (__FILE__ . ':' .  __LINE__),
-        "local grammar, arg = ...; op_lua = arg", 'i', $op_lua);
+        ('@' .__FILE__ . ':' .  __LINE__),
+        <<'END_OF_LUA', 'i', $op_lua);
+        local grammar, arg = ...
+        op_lua = arg
+        grammar.l0_rules = {}
+        grammar.l0_symbols = {}
+        grammar.g1_rules = {}
+        grammar.g1_symbols = {}
+END_OF_LUA
 
     my @xsy_names = keys %{ $hashed_source->{xsy} };
 
@@ -855,6 +862,12 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
         my $assertion_id = $lexeme_data{$lexeme_name}{lexer}{'assertion'} // -1;
         $thin_slg->lexer_rule_to_g1_lexeme_set( $lexer_rule_id,
             $g1_lexeme_id, $assertion_id );
+
+      $thin_slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 'iii', $lexer_rule_id, $g1_lexeme_id, $assertion_id );
+    local g, lexer_rule_id, g1_lexeme_id, assertion_id = ...
+END_OF_LUA
+
         my $discard_event = $discard_event_by_lexer_rule_id[$lexer_rule_id];
         if ( defined $discard_event ) {
             my ( $event_name, $is_active ) = @{$discard_event};
@@ -991,7 +1004,7 @@ sub Marpa::R3::Internal::Scanless::G::precompute {
 
     # Catch errors in precomputation
     my ($precompute_result, $precompute_error_code) =
-      $thin_slg->call_by_tag( ( __FILE__ . ':' . __LINE__ ),
+      $thin_slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 's', $lmw_name );
     local g, lmw_name = ...
     local lmw_g = g[lmw_name]
