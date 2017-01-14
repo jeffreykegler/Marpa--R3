@@ -297,8 +297,12 @@ sub Marpa::R3::Trace::G::show_rules {
     my $text     = q{};
     $verbose    //= 0;
 
-    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
+    my $thin_slg         = $tracer->[Marpa::R3::Internal::Trace::G::SLG_C];
     my $grammar_name = $tracer->[Marpa::R3::Internal::Trace::G::NAME];
+    my $short_lmw_g_name = $tracer->[Marpa::R3::Internal::Trace::G::NAME];
+    my $lmw_g_name       = 'lmw_' . ( lc $short_lmw_g_name ) . 'g';
+
+    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
     my $xbnf_by_irlid = $tracer->[Marpa::R3::Internal::Trace::G::XBNF_BY_IRLID];
 
     for my $irlid ( 0 .. $grammar_c->highest_rule_id() ) {
@@ -323,8 +327,16 @@ sub Marpa::R3::Trace::G::show_rules {
             my @comment = ();
             $grammar_c->rule_length($irlid) == 0
               and push @comment, 'empty';
-            $grammar_c->_marpa_g_rule_is_used($irlid)
-              or push @comment, '!used';
+
+    my ($rule_is_used) = $thin_slg->call_by_tag(
+        ('@' . __FILE__ . ':' .  __LINE__),
+	<<'END_OF_LUA', 'si', $lmw_g_name, $irlid );
+    local g, lmw_g_name, irl_id = ...
+    local lmw_g = g[lmw_g_name]
+    return lmw_g:_rule_is_used(irl_id)
+END_OF_LUA
+
+            $rule_is_used or push @comment, '!used';
             $grammar_c->rule_is_productive($irlid)
               or push @comment, 'unproductive';
             $grammar_c->rule_is_accessible($irlid)
@@ -445,17 +457,31 @@ sub Marpa::R3::Trace::G::symbol_ids {
 }
 
 sub Marpa::R3::Trace::G::brief_irl {
-    my ( $tracer, $irl_id ) = @_;
-    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
-    my $lhs_id    = $grammar_c->_marpa_g_irl_lhs($irl_id);
-    my $text = $irl_id . ': ' . $tracer->isy_name($lhs_id) . ' ->';
-    if ( my $rh_length = $grammar_c->_marpa_g_irl_length($irl_id) ) {
-        my @rhs_ids = ();
-        for my $ix ( 0 .. $rh_length - 1 ) {
-            push @rhs_ids, $grammar_c->_marpa_g_irl_rhs( $irl_id, $ix );
-        }
-        $text .= q{ } . ( join q{ }, map { $tracer->isy_name($_) } @rhs_ids );
-    } ## end if ( my $rh_length = $grammar_c->_marpa_g_irl_length...)
+    my ( $self, $irl_id ) = @_;
+    my $thin_slg         = $self->[Marpa::R3::Internal::Trace::G::SLG_C];
+    my $short_lmw_g_name = $self->[Marpa::R3::Internal::Trace::G::NAME];
+    my $lmw_g_name       = 'lmw_' . ( lc $short_lmw_g_name ) . 'g';
+
+    my ($text) = $thin_slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 'si', $lmw_g_name, $irl_id );
+    local g, lmw_g_name, irl_id = ...
+    local lmw_g = g[lmw_g_name]
+    local pieces = { string.format("%d: ", irl_id) }
+    local lhs_id = lmw_g:_irl_lhs(irl_id)
+    pieces[#pieces+1] = lmw_g:isy_name(lhs_id)
+    pieces[#pieces+1] = " ->"
+    local rh_length = lmw_g:_irl_length(irl_id)
+    if rh_length > 0 then
+       local rhs_names = {}
+       for rhs_ix = 0, rh_length - 1 do
+	  local this_rhs_id = lmw_g:_irl_rhs(irl_id, rhs_ix)
+	  rhs_names[#rhs_names+1] = lmw_g:isy_name(this_rhs_id)
+       end
+       pieces[#pieces+1] = " " .. table.concat(rhs_names, " ")
+    end
+    return table.concat(pieces)
+END_OF_LUA
+
     return $text;
 }
 
