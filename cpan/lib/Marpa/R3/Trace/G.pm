@@ -193,40 +193,57 @@ END_OF_LUA
 
 sub show_ahm {
     my ( $self, $item_id ) = @_;
-    my $grammar_c     = $self->[Marpa::R3::Internal::Trace::G::C];
-    my $postdot_id = $grammar_c->_marpa_g_ahm_postdot($item_id);
-    my $text       = "AHM $item_id: ";
-    my @properties = ();
-    if ( $postdot_id < 0 ) {
-        push @properties, 'completion';
-    }
-    else {
-        my $postdot_symbol_name = $self->isy_name($postdot_id);
-        push @properties, qq{postdot = "$postdot_symbol_name"};
-    }
-    $text .= join q{; }, @properties;
-    $text .= "\n" . ( q{ } x 4 );
-    $text .= $self->show_brief_ahm($item_id) . "\n";
+    my $thin_slg         = $self->[Marpa::R3::Internal::Trace::G::SLG_C];
+    my $short_lmw_g_name = $self->[Marpa::R3::Internal::Trace::G::NAME];
+    my $lmw_g_name       = 'lmw_' . ( lc $short_lmw_g_name ) . 'g';
+
+    my ($text) = $thin_slg->call_by_tag(
+        ('@' . __FILE__ . ':' .  __LINE__),
+	<<'END_OF_LUA', 'si', $lmw_g_name, $item_id );
+    local g, lmw_g_name, item_id = ...
+    local lmw_g = g[lmw_g_name]
+    local postdot_id = lmw_g:_ahm_postdot(item_id)
+    local pieces = { "AHM " .. item_id .. ': ' }
+    local properties = {}
+    if not postdot_id then
+        properties[#properties+1] = 'completion'
+    else
+        properties[#properties+1] =
+	   'postdot = "' ..  lmw_g:isy_name(postdot_id) .. '"'
+    end
+    pieces[#pieces+1] = table.concat(properties, '; ')
+    pieces[#pieces+1] = "\n    "
+    local irl_id = lmw_g:_ahm_irl(item_id)
+    local dot_position = lmw_g:_ahm_position(item_id)
+    pieces[#pieces+1] = lmw_g:show_dotted_irl(irl_id, dot_position)
+    pieces[#pieces+1] = '\n'
+    return table.concat(pieces)
+END_OF_LUA
+
     return $text;
 } ## end sub show_ahm
 
-sub show_brief_ahm {
-    my ( $self, $item_id ) = @_;
-    my $grammar_c     = $self->[Marpa::R3::Internal::Trace::G::C];
-    my $irl_id     = $grammar_c->_marpa_g_ahm_irl($item_id);
-    my $position   = $grammar_c->_marpa_g_ahm_position($item_id);
-    return $self->show_dotted_irl( $irl_id, $position );
-} ## end sub show_brief_ahm
-
 sub show_briefer_ahm {
     my ( $self, $item_id ) = @_;
-    my $grammar_c     = $self->[Marpa::R3::Internal::Trace::G::C];
-    my $irl_id     = $grammar_c->_marpa_g_ahm_irl($item_id);
-    my $dot_position   = $grammar_c->_marpa_g_ahm_position($item_id);
-    if ($dot_position < 0) {
-	return sprintf('R%d$', $irl_id);
-    }
-    return sprintf('R%d:%d', $irl_id, $dot_position);
+    my $thin_slg         = $self->[Marpa::R3::Internal::Trace::G::SLG_C];
+    my $short_lmw_g_name = $self->[Marpa::R3::Internal::Trace::G::NAME];
+    my $lmw_g_name       = 'lmw_' . ( lc $short_lmw_g_name ) . 'g';
+
+    my ($text) = $thin_slg->call_by_tag(
+        ('@' . __FILE__ . ':' .  __LINE__),
+	<<'END_OF_LUA', 'si', $lmw_g_name, $item_id );
+    local g, lmw_g_name, item_id = ...
+    local lmw_g = g[lmw_g_name]
+    local irl_id = lmw_g:_ahm_irl(item_id)
+    local dot_position = lmw_g:_ahm_position(item_id)
+    if (dot_position < 0 ) then
+        return string.format("R%d$", irl_id)
+    end
+    return string.format("R%d:%d", irl_id, dot_position)
+END_OF_LUA
+
+    return $text;
+
 }
 
 sub show_ahms {
