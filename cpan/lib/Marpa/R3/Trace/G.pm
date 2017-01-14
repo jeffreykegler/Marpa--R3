@@ -202,22 +202,7 @@ sub show_ahm {
 	<<'END_OF_LUA', 'si', $lmw_g_name, $item_id );
     local g, lmw_g_name, item_id = ...
     local lmw_g = g[lmw_g_name]
-    local postdot_id = lmw_g:_ahm_postdot(item_id)
-    local pieces = { "AHM " .. item_id .. ': ' }
-    local properties = {}
-    if not postdot_id then
-        properties[#properties+1] = 'completion'
-    else
-        properties[#properties+1] =
-	   'postdot = "' ..  lmw_g:isy_name(postdot_id) .. '"'
-    end
-    pieces[#pieces+1] = table.concat(properties, '; ')
-    pieces[#pieces+1] = "\n    "
-    local irl_id = lmw_g:_ahm_irl(item_id)
-    local dot_position = lmw_g:_ahm_position(item_id)
-    pieces[#pieces+1] = lmw_g:show_dotted_irl(irl_id, dot_position)
-    pieces[#pieces+1] = '\n'
-    return table.concat(pieces)
+    return lmw_g:show_ahm(item_id)
 END_OF_LUA
 
     return $text;
@@ -247,14 +232,26 @@ END_OF_LUA
 }
 
 sub show_ahms {
-    my ($self)    = @_;
-    my $grammar_c     = $self->[Marpa::R3::Internal::Trace::G::C];
-    my $text      = q{};
-    my $count     = $grammar_c->_marpa_g_ahm_count();
-    for my $AHFA_item_id ( 0 .. $count - 1 ) {
-        $text .= $self->show_ahm($AHFA_item_id);
-    }
+    my ( $self ) = @_;
+    my $thin_slg         = $self->[Marpa::R3::Internal::Trace::G::SLG_C];
+    my $short_lmw_g_name = $self->[Marpa::R3::Internal::Trace::G::NAME];
+    my $lmw_g_name       = 'lmw_' . ( lc $short_lmw_g_name ) . 'g';
+
+    my ($text) = $thin_slg->call_by_tag(
+        ('@' . __FILE__ . ':' .  __LINE__),
+	<<'END_OF_LUA', 's', $lmw_g_name );
+    local g, lmw_g_name, item_id = ...
+    local lmw_g = g[lmw_g_name]
+    local pieces = {}
+    local count = lmw_g:_ahm_count()
+    for i = 0, count -1 do
+        pieces[#pieces+1] = lmw_g:show_ahm(i)
+    end
+    return table.concat(pieces)
+END_OF_LUA
+
     return $text;
+
 } ## end sub show_ahms
 
 sub isy_name {

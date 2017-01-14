@@ -1399,6 +1399,25 @@ whose id is `id`.
          return xsy_name
     end
 
+    function _M.class_grammar.show_ahm(lmw_g, item_id)
+        local postdot_id = lmw_g:_ahm_postdot(item_id)
+        local pieces = { "AHM " .. item_id .. ': ' }
+        local properties = {}
+        if not postdot_id then
+            properties[#properties+1] = 'completion'
+        else
+            properties[#properties+1] =
+               'postdot = "' ..  lmw_g:isy_name(postdot_id) .. '"'
+        end
+        pieces[#pieces+1] = table.concat(properties, '; ')
+        pieces[#pieces+1] = "\n    "
+        local irl_id = lmw_g:_ahm_irl(item_id)
+        local dot_position = lmw_g:_ahm_position(item_id)
+        pieces[#pieces+1] = lmw_g:show_dotted_irl(irl_id, dot_position)
+        pieces[#pieces+1] = '\n'
+        return table.concat(pieces)
+    end
+
 ```
 
 ## The recognizer Libmarpa wrapper
