@@ -1703,7 +1703,8 @@ sub trace_op {
     my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
 
     my ($nook_ix, $or_node_id, $choice, $and_node_id, $trace_irl_id, $or_node_position,
-            $virtual_rhs, $virtual_lhs, $irl_length
+            $virtual_rhs, $virtual_lhs, $irl_length,
+            $real_symbol_count
         )
         = $slr->call_by_tag(
         ('@' . __FILE__ . ':' .  __LINE__),
@@ -1725,7 +1726,8 @@ sub trace_op {
             b:_or_node_position(or_node_id),
             g1g:_irl_is_virtual_rhs(trace_irl_id),
             g1g:_irl_is_virtual_lhs(trace_irl_id),
-            g1g:_irl_length(trace_irl_id)
+            g1g:_irl_length(trace_irl_id),
+            g1g:_real_symbol_count(trace_irl_id)
 END_OF_LUA
 
     return $trace_output if $or_node_position != $irl_length;
@@ -1739,7 +1741,7 @@ END_OF_LUA
             ', rule: ', $tracer->brief_irl($trace_irl_id),
             "\n",
             'Incrementing virtual rule by ',
-            $grammar_c->_marpa_g_real_symbol_count($trace_irl_id), ' symbols',
+            $real_symbol_count, ' symbols',
             "\n"
             or Marpa::R3::exception('Could not print to trace file');
 
@@ -1754,7 +1756,7 @@ END_OF_LUA
             $slr->and_node_tag( $and_node_id ),
             ', rule: ', $tracer->brief_irl($trace_irl_id),
             "\nAdding ",
-            $grammar_c->_marpa_g_real_symbol_count($trace_irl_id),
+            $real_symbol_count,
             "\n";
 
         return $trace_output;
@@ -1768,7 +1770,7 @@ END_OF_LUA
             $slr->and_node_tag( $and_node_id ),
             ', rule: ', $tracer->brief_irl($trace_irl_id),
             "\nReal symbol count is ",
-            $grammar_c->_marpa_g_real_symbol_count($trace_irl_id),
+            $real_symbol_count,
             "\n";
 
         return $trace_output;
