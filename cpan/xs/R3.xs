@@ -1957,19 +1957,30 @@ u_pos_set (Scanless_R * slr, const char* name, int start_pos_arg, int length_arg
 
 static SV *
 u_pos_span_to_literal_sv (Scanless_R * slr,
-                          int start_pos, int length_in_positions)
+                          int start_pos, int pos_length)
 {
   dTHX;
-  STRLEN dummy;
-  char *input = SvPV (slr->input, dummy);
+  STRLEN byte_length;
+  SV* input_sv = slr->input;
+  char *input = SvPV (input_sv, byte_length);
   SV* new_sv;
-  size_t start_offset = POS_TO_OFFSET (slr, start_pos);
-  const STRLEN length_in_bytes =
-    POS_TO_OFFSET (slr,
-                   start_pos + length_in_positions) - start_offset;
-  new_sv = newSVpvn (input + start_offset, length_in_bytes);
+
   if (SvUTF8(slr->input)) {
+     char *start_byte_p;
+     char *end_byte_p;
+     const int utf8_length = sv_len_utf8(input_sv);
+     if (start_pos + pos_length > utf8_length) {
+      croak ("Bad length in u_pos_span_to_literal_sv: %ld", (long)pos_length);
+     }
+     start_byte_p = utf8_hop(input, start_pos);
+     end_byte_p = utf8_hop(start_byte_p, pos_length);
+     new_sv = newSVpvn (start_byte_p, end_byte_p - start_byte_p);
      SvUTF8_on(new_sv);
+  } else {
+     if (start_pos + pos_length > byte_length) {
+      croak ("Bad length in u_pos_span_to_literal_sv: %ld", (long)pos_length);
+     }
+     new_sv = newSVpvn (input + start_pos, pos_length);
   }
   return new_sv;
 }
