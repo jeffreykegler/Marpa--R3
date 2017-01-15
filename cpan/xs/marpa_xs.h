@@ -34,12 +34,7 @@ extern const struct marpa_step_type_description_s
 
 typedef struct {
     size_t next_offset; /* Offset of *NEXT* codepoint */
-    int linecol;
-    /* Lines are 1-based, columns are zero-based and negated.
-     * In the first column (column 0), linecol is the 1-based line number.
-     * In subsequent columns, linecol is -n, where n is the 0-based column
-     * number.
-     */
+    lua_Unsigned codepoint;
 } Pos_Entry;
 
 struct symbol_g_properties {

@@ -4905,14 +4905,6 @@ PPCODE:
   U8 *end_of_string;
   int input_is_utf8;
 
-  /* Initialized to a Unicode non-character.  In fact, anything
-   * but a CR would work here.
-   */
-  UV previous_codepoint = 0xFDD0;
-  /* Counts are 1-based */
-  int this_line = 1;
-  int this_column = 1;
-
   STRLEN pv_length;
 
   /* Fail fast with a tainted input string */
@@ -4972,46 +4964,8 @@ PPCODE:
         }
       p += codepoint_length;
       slr->pos_db[slr->pos_db_logical_size].next_offset = (size_t)(p - start_of_string);
-
-      /* The definition of newline here follows the Unicode standard TR13 */
-      if (codepoint == 0x0a && previous_codepoint == 0x0d)
-        {
-          /* Set the next column to one after the last column,
-           * instead of using the next line and column.
-           * Delay using those until the next pass through this
-           * loop.
-           */
-          const int pos = slr->pos_db_logical_size - 1;
-          const int previous_linecol = slr->pos_db[pos].linecol;
-          if (previous_linecol < 0)
-          {
-            slr->pos_db[slr->pos_db_logical_size].linecol = previous_linecol-1;
-          } else {
-            slr->pos_db[slr->pos_db_logical_size].linecol = -1;
-          }
-        }
-      else
-        {
-          slr->pos_db[slr->pos_db_logical_size].linecol =
-            this_column > 1 ? 1-this_column : this_line;
-          switch (codepoint)
-            {
-            case 0x0a:
-            case 0x0b:
-            case 0x0c:
-            case 0x0d:
-            case 0x85:
-            case 0x2028:
-            case 0x2029:
-              this_line++;
-              this_column = 1;
-              break;
-            default:
-              this_column++;
-            }
-        }
+      slr->pos_db[slr->pos_db_logical_size].codepoint = codepoint;
       slr->pos_db_logical_size++;
-      previous_codepoint = codepoint;
     }
   XSRETURN_YES;
 }
