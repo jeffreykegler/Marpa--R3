@@ -141,6 +141,7 @@ lib/Marpa/R3/X.pm
 lib/Marpa/R3/meta/Makefile
 lib/Marpa/R3/meta/metag.bnf
 lib/Marpa/R3/meta/sl_to_hash.pl
+lua/CHANGES
 lua/Makefile.PL
 lua/lapi.c.h
 lua/lapi.h

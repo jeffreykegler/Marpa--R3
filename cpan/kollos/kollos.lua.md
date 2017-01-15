@@ -4019,7 +4019,6 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
     {
         /* The main kollos object */
         int kollos_table_stack_ix;
-        int kollos_defines_ix;
         int upvalue_stack_ix;
 
         /* Make sure the header is from the version we want */
@@ -4102,7 +4101,6 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
 
         /* Create the defines table */
         marpa_lua_newtable (L);
-        kollos_defines_ix = marpa_lua_gettop (L);
         marpa_lua_setfield (L, kollos_table_stack_ix, "defines");
 
         --miranda: insert create kollos libmarpa wrapper class tables

@@ -309,6 +309,7 @@ my %files_by_type = (
     'META.yml' =>
         \&ignored,    # not source, and not clear how to add license at top
     'README'                            => \&trivial,
+    'lua/CHANGES'                       => \&trivial,
     'ABOUT_ME'                          => \&trivial,
     'INSTALL'                           => \&trivial,
     'TODO'                              => \&trivial,
