@@ -31,7 +31,7 @@ sub new {
     $self->[Marpa::R3::Internal::Trace::G::C] = $grammar_c;
 
     $thin_slg->call_by_tag(
-        (__FILE__ . ':' .  __LINE__),
+        ('@' . __FILE__ . ':' .  __LINE__),
       <<'END_OF_LUA', 's', (lc $name));
     local g, short_name = ...
     lmw_g_name = 'lmw_' .. short_name .. 'g'
@@ -60,7 +60,7 @@ sub symbol_by_name {
     my $short_lmw_g_name = $self->[Marpa::R3::Internal::Trace::G::NAME];
     my $lmw_g_name = 'lmw_' . (lc $short_lmw_g_name) . 'g';
     my ($symbol_id) = $thin_slg->call_by_tag(
-        (__FILE__ . ':' .  __LINE__),
+        ('@' . __FILE__ . ':' .  __LINE__),
       <<'END_OF_LUA', 'ss', $lmw_g_name, $symbol_name);
     local g, lmw_g_name, symbol_name = ...
     local lmw_g = g[lmw_g_name]
@@ -76,7 +76,7 @@ sub symbol_name {
     my $short_lmw_g_name = $self->[Marpa::R3::Internal::Trace::G::NAME];
     my $lmw_g_name = 'lmw_' . (lc $short_lmw_g_name) . 'g';
     my ($sym_name) = $thin_slg->call_by_tag(
-        (__FILE__ . ':' .  __LINE__),
+        ('@' . __FILE__ . ':' .  __LINE__),
       <<'END_OF_LUA', 'si', $lmw_g_name, $symbol_id);
     local g, lmw_g_name, symbol_id = ...
     local lmw_g = g[lmw_g_name]
@@ -103,7 +103,7 @@ sub symbol_name_set {
     my $lmw_g_name = 'lmw_' . (lc $short_lmw_g_name) . 'g';
 
     $thin_slg->call_by_tag(
-        (__FILE__ . ':' .  __LINE__),
+        ('@' . __FILE__ . ':' .  __LINE__),
       <<'END_OF_LUA', 'ssi', $lmw_g_name, $symbol_name, $symbol_id);
     local g, lmw_g_name, symbol_name, symbol_id = ...
     local lmw_g = g[lmw_g_name]
@@ -179,7 +179,7 @@ sub show_dotted_irl {
     my $short_name = $self->[Marpa::R3::Internal::Trace::G::NAME];
     my ($result) =
       $thin_slg->call_by_tag(
-        (__FILE__ . ':' .  __LINE__),
+        ('@' . __FILE__ . ':' .  __LINE__),
 	<<'END_OF_LUA', 'sii', (lc $short_name), $irl_id, $dot_position );
     local g, short_name, irl_id, dot_position = ...
     local lmw_g_field_name = 'lmw_' .. short_name .. 'g'
@@ -261,7 +261,7 @@ sub isy_name {
     my $lmw_g_name       = 'lmw_' . ( lc $short_lmw_g_name ) . 'g';
     my ($sym_name) =
       $thin_slg->call_by_tag(
-        (__FILE__ . ':' .  __LINE__),
+        ('@' . __FILE__ . ':' .  __LINE__),
 	<<'END_OF_LUA', 'si', $lmw_g_name, $symbol_id );
     local g, lmw_g_name, symbol_id = ...
     local lmw_g = g[lmw_g_name]
@@ -497,21 +497,29 @@ sub Marpa::R3::Trace::G::show_isys {
 
 sub Marpa::R3::Trace::G::show_isy {
     my ( $tracer, $isy_id ) = @_;
-    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
-    my $text      = q{};
-
-    my $name = $tracer->isy_name($isy_id);
-    $text .= "$isy_id: $name";
-
-    my @tag_list = ();
-    $grammar_c->_marpa_g_nsy_is_nulling($isy_id)
-        and push @tag_list, 'nulling';
-
-    $text .= join q{ }, q{,}, @tag_list if scalar @tag_list;
-    $text .= "\n";
-
-    return $text;
-
+    my $thin_slg         = $tracer->[Marpa::R3::Internal::Trace::G::SLG_C];
+    my $short_lmw_g_name = $tracer->[Marpa::R3::Internal::Trace::G::NAME];
+    my $lmw_g_name       = 'lmw_' . ( lc $short_lmw_g_name ) . 'g';
+    my ($result) =
+      $thin_slg->call_by_tag(
+        ('@' . __FILE__ . ':' .  __LINE__),
+	<<'END_OF_LUA', 'si', $lmw_g_name, $isy_id );
+    local g, lmw_g_name, isy_id = ...
+    local lmw_g = g[lmw_g_name]
+    local name = lmw_g:isy_name(isy_id)
+    local pieces = { string.format("%d: %s", isy_id, name) }
+    local tags = {}
+    local is_nulling = 0 ~= lmw_g:_nsy_is_nulling(isy_id)
+    if is_nulling then
+        tags[#tags+1] = 'nulling'
+    end
+    if #tags > 0 then
+        pieces[#pieces+1] = ', ' .. table.concat(tags, ' ')
+    end
+    pieces[#pieces+1] = '\n'
+    return table.concat(pieces)
+END_OF_LUA
+    return $result;
 }
 
 sub Marpa::R3::Trace::G::show_irls {
