@@ -5017,7 +5017,8 @@ input_length( outer_slr )
 PPCODE:
 {
   Scanless_R *slr = slr_inner_get(outer_slr);
-  XSRETURN_IV(slr->pos_db_logical_size);
+  const int length = sv_len(slr->input);
+  XSRETURN_IV(length);
 }
 
 void
