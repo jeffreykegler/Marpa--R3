@@ -1741,8 +1741,7 @@ sub Marpa::R3::Scanless::R::pos {
 
 sub Marpa::R3::Scanless::R::input_length {
     my ( $slr ) = @_;
-    my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
-    return $thin_slr->input_length();
+    return length ${$slr->[Marpa::R3::Internal::Scanless::R::P_INPUT_STRING]};
 }
 
 # no return value documented
