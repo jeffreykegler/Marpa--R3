@@ -1679,9 +1679,6 @@ u_read (Outer_R * outer_slr)
 {
     dTHX;
     Scanless_R *slr = slr_inner_get (outer_slr);
-    U8 *input;
-    STRLEN len;
-    int input_is_utf8;
     int has_l0r;
 
   call_by_tag (outer_slr->L,
@@ -1703,11 +1700,8 @@ u_read (Outer_R * outer_slr)
     "end\n",
     "R>", outer_slr->lua_ref);
 
-    input_is_utf8 = SvUTF8 (slr->input);
-    input = (U8 *) SvPV (slr->input, len);
     for (;;) {
         UV codepoint;
-        STRLEN codepoint_length = 1;
         UV op_ix;
         UV op_count;
         UV *ops;
@@ -1715,25 +1709,7 @@ u_read (Outer_R * outer_slr)
         if (slr->perl_pos >= slr->end_pos)
             break;
 
-        if (input_is_utf8) {
-
-            codepoint =
-                utf8_to_uvchr_buf (input + OFFSET_IN_INPUT (slr),
-                input + len, &codepoint_length);
-
-            /* Perl API documents that return value is 0 and length is -1 on error,
-             * "if possible".  length can be, and is, in fact unsigned.
-             * I deal with this by noting that 0 is a valid UTF8 char but should
-             * have a length of 1, when valid.
-             */
-            if (codepoint == 0 && codepoint_length != 1) {
-                croak
-                    ("Problem in r->read_string(): invalid UTF8 character");
-            }
-        } else {
-            codepoint = (UV) input[OFFSET_IN_INPUT (slr)];
-            codepoint_length = 1;
-        }
+        codepoint = slr->pos_db[slr->perl_pos].codepoint;
 
         if (codepoint < Dim (slr->slg->per_codepoint_array)) {
             ops = slr->slg->per_codepoint_array[codepoint];
