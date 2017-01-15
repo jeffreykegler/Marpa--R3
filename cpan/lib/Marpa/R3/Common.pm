@@ -104,12 +104,14 @@ sub Marpa::R3::exception {
     Carp::croak($exception, q{Marpa::R3 exception});
 }
 
+# Could/should this be made more efficient by caching line starts,
+# then binary searching?
 sub Marpa::R3::Internal::line_column {
     my ( $p_string, $pos ) = @_;
     state $EOL = "\n";
     my $line = () = substr( ${$p_string}, 0, $pos ) =~ /$EOL/g;
     my $column = $line ? $pos - $+[0] + 1 : $pos + 1;
-    return [$line, $column];
+    return [$line+1, $column];
 }
 
 # Returns a one-line string that is the escaped equivalent

@@ -10,17 +10,12 @@
 # or implied warranties. For details, see the full text of
 # of the licenses in the directory LICENSES.
 
-# CENSUS: ASIS
-# Note: SLIF TEST
-
-# Tests which require only grammar, input, and an output with no
-# semantics -- usually just an AST
-
 use 5.010001;
 use strict;
 use warnings;
 
-use Test::More tests => 1;
+# use Test::More tests => 1;
+use Test::More skip_all => 'Switch to using Perl, instead of Unicode newlines';
 use English qw( -no_match_vars );
 use lib 'inc';
 use Marpa::R3::Test;

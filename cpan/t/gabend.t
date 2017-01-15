@@ -88,9 +88,9 @@ END_OF_DSL
             $duplicate_rule_grammar, <<'EOS');
 ========= Marpa::R3 Fatal error =========
 Duplicate rules:
-First rule is at line 1, column 5:
+First rule is at line 2, column 5:
   Dup ::= Item
-Second rule is at line 2, column 5:
+Second rule is at line 3, column 5:
   Dup ::= Item
 =========================================
 EOS
@@ -106,9 +106,9 @@ END_OF_DSL
         test_grammar( 'unique_lhs', $unique_lhs_grammar, <<'EOS');
 ========= Marpa::R3 Fatal error =========
 Duplicate rules:
-First rule is at line 1, column 5:
+First rule is at line 2, column 5:
   Dup ::= Item*
-Second rule is at line 2, column 5:
+Second rule is at line 3, column 5:
   Dup ::= Item
 =========================================
 EOS
@@ -127,9 +127,9 @@ END_OF_DSL
         test_grammar( 'dup precedenced lhs', $unique_lhs_grammar, <<'EOS');
 ========= Marpa::R3 Fatal error =========
 Precedenced LHS not unique
-First precedenced rule is at line 1, column 5:
+First precedenced rule is at line 2, column 5:
   Dup ::= Dup '+' Dup || Dup '-' Dup || Item1
-Second precedenced rule is at line 2, column 5:
+Second precedenced rule is at line 3, column 5:
   Dup ::= Dup '*' Dup || Dup '/' Dup || Item2
 =========================================
 EOS
@@ -147,9 +147,9 @@ END_OF_DSL
         test_grammar( 'LHS empty, then precedenced', $unique_lhs_grammar, <<'EOS');
 ========= Marpa::R3 Fatal error =========
 Precedenced LHS not unique
-First rule is at line 1, column 5:
+First rule is at line 2, column 5:
   Dup ::=
-Second precedenced rule is at line 2, column 5:
+Second precedenced rule is at line 3, column 5:
   Dup ::= Dup '+' Dup || Dup '-' Dup || Item
 =========================================
 EOS
@@ -167,9 +167,9 @@ END_OF_DSL
         test_grammar( 'LHS precedenced, then empty', $unique_lhs_grammar, <<'EOS');
 ========= Marpa::R3 Fatal error =========
 Precedenced LHS not unique
-First precedenced rule is at line 1, column 5:
+First precedenced rule is at line 2, column 5:
   Dup ::= Dup '+' Dup || Dup '-' Dup || Item1
-Second rule is at line 2, column 5:
+Second rule is at line 3, column 5:
   Dup ::=
 =========================================
 EOS

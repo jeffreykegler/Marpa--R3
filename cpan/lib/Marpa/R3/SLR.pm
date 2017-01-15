@@ -1180,7 +1180,7 @@ sub Marpa::R3::Scanless::R::read_problem {
     if ( $problem_pos < $length_of_string) {
         my $char = substr ${$p_string}, $problem_pos, 1;
         my $char_desc = character_describe($char);
-        my ( $line, $column ) = $thin_slr->line_column($problem_pos);
+        my ( $line, $column ) = $slr->line_column($problem_pos);
         my $prefix =
             $problem_pos >= 50
             ? ( substr ${$p_string}, $problem_pos - 50, 50 )
@@ -1728,9 +1728,9 @@ sub Marpa::R3::Scanless::R::pause_span {
 
 sub Marpa::R3::Scanless::R::line_column {
     my ( $slr, $pos ) = @_;
-    my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
-    $pos //= $thin_slr->pos();
-    return $thin_slr->line_column($pos);
+    my $p_input = $slr->[Marpa::R3::Internal::Scanless::R::P_INPUT_STRING];
+    $pos //= $slr->[Marpa::R3::Internal::Scanless::R::SLR_C]->pos();
+    return @{Marpa::R3::Internal::line_column($p_input, $pos)};
 } ## end sub Marpa::R3::Scanless::R::line_column
 
 sub Marpa::R3::Scanless::R::pos {

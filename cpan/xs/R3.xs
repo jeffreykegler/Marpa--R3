@@ -4573,52 +4573,6 @@ PPCODE:
   XPUSHs (sv_2mortal (newSViv ((IV) length)));
 }
 
- # Return values are 1-based, as is the tradition
- # EOF is reported as the last line, last column plus one.
-void
-line_column(outer_slr, pos)
-    Outer_R *outer_slr;
-     IV pos;
-PPCODE:
-{
-  Scanless_R *slr = slr_inner_get(outer_slr);
-  int line = 1;
-  int column = 1;
-  int linecol;
-  int at_eof = 0;
-  const int logical_size = slr->pos_db_logical_size;
-
-  if (pos < 0)
-    {
-      pos = slr->perl_pos;
-    }
-  if (pos > logical_size)
-    {
-      if (logical_size < 0) {
-          croak ("Problem in slr->line_column(%ld): line/column information not available",
-                 (long) pos);
-      }
-      croak ("Problem in slr->line_column(%ld): position out of range",
-             (long) pos);
-    }
-
-  /* At EOF, find data for position - 1 */
-  if (pos == logical_size) { at_eof = 1; pos--; }
-  linecol = slr->pos_db[pos].linecol;
-  if (linecol >= 0)
-    {                           /* Zero should not happen */
-      line = linecol;
-    }
-  else
-    {
-      line = slr->pos_db[pos + linecol].linecol;
-      column = -linecol + 1;
-    }
-  if (at_eof) { column++; }
-  XPUSHs (sv_2mortal (newSViv ((IV) line)));
-  XPUSHs (sv_2mortal (newSViv ((IV) column)));
-}
-
  # TODO: Currently end location is not known at this
  # point.  Once it is, add tracing:
  # Don't bother with lexeme events as unnecessary
