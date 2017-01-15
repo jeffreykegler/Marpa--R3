@@ -4948,7 +4948,6 @@ PPCODE:
           Renew (slr->pos_db, (unsigned int)slr->pos_db_physical_size, Pos_Entry);
         }
       p += codepoint_length;
-      slr->pos_db[slr->pos_db_logical_size].next_offset = (size_t)(p - start_of_string);
       slr->pos_db[slr->pos_db_logical_size].codepoint = codepoint;
       slr->pos_db_logical_size++;
     }

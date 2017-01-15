@@ -33,7 +33,6 @@ extern const struct marpa_step_type_description_s
   marpa_step_type_description[];
 
 typedef struct {
-    size_t next_offset; /* Offset of *NEXT* codepoint */
     lua_Unsigned codepoint;
 } Pos_Entry;
 
@@ -217,12 +216,6 @@ typedef struct
   Outer_G* outer_slg;
   SV *slg_sv;
 } Outer_R;
-
-#undef POS_TO_OFFSET
-#define POS_TO_OFFSET(slr, pos) \
-  ((pos) > 0 ? (slr)->pos_db[(pos) - 1].next_offset : 0)
-#undef OFFSET_IN_INPUT
-#define OFFSET_IN_INPUT(slr) POS_TO_OFFSET((slr), (slr)->perl_pos)
 
 typedef struct
 {
