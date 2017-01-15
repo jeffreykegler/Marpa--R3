@@ -4915,18 +4915,16 @@ PPCODE:
          "Marpa::R3 is insecure for use with tainted data\n");
     }
 
-  /* Get our own copy and coerce it to a PV.
-   * Stealing is OK, magic is not.
+  /* Get our own copy.
    */
   SvSetSV (slr->input, string);
-  if (!SvPOK (slr->input))
-    {
-      croak
-        ("Problem in v->string_set(): Input is not a string\n");
-    }
+  p = SvPV( string, pv_length);
+  input_is_utf8 = SvUTF8 (slr->input);
+  slr->input = newSVpvn(p, pv_length);
+  if (input_is_utf8) { SvUTF8_on(slr->input); }
+
   start_of_string = (U8 *) SvPV (slr->input, pv_length);
   end_of_string = start_of_string + pv_length;
-  input_is_utf8 = SvUTF8 (slr->input);
 
   slr->pos_db_logical_size = 0;
   /* This original buffer size my be too small.
