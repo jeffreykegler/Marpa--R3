@@ -4971,16 +4971,6 @@ PPCODE:
 }
 
 void
-input_length( outer_slr )
-     Outer_R *outer_slr;
-PPCODE:
-{
-  Scanless_R *slr = slr_inner_get(outer_slr);
-  const int length = sv_len(slr->input);
-  XSRETURN_IV(length);
-}
-
-void
 codepoint( outer_slr )
     Outer_R *outer_slr;
 PPCODE:
