@@ -1932,7 +1932,7 @@ u_pos_set (Scanless_R * slr, const char* name, int start_pos_arg, int length_arg
   } else {
       new_perl_pos = start_pos_arg;
   }
-  if (new_perl_pos < 0 || new_perl_pos > slr->pos_db_logical_size)
+  if (new_perl_pos < 0 || new_perl_pos > input_length)
   {
       croak ("Bad start position in %s(): %ld", name, (long)start_pos_arg);
   }
@@ -1942,7 +1942,7 @@ u_pos_set (Scanless_R * slr, const char* name, int start_pos_arg, int length_arg
   } else {
     new_end_pos = new_perl_pos + length_arg;
   }
-  if (new_end_pos < 0 || new_end_pos > slr->pos_db_logical_size)
+  if (new_end_pos < 0 || new_end_pos > input_length)
   {
       croak ("Bad length in %s(): %ld", name, (long)length_arg);
   }
@@ -4927,7 +4927,12 @@ PPCODE:
    * Stealing is OK, magic is not.
    */
   SvSetSV (slr->input, string);
-  start_of_string = (U8 *) SvPV_force_nomg (slr->input, pv_length);
+  if (!SvPOK (slr->input))
+    {
+      croak
+        ("Problem in v->string_set(): Input is not a string\n");
+    }
+  start_of_string = (U8 *) SvPV (slr->input, pv_length);
   end_of_string = start_of_string + pv_length;
   input_is_utf8 = SvUTF8 (slr->input);
 
