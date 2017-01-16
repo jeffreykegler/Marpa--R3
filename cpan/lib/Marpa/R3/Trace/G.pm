@@ -466,57 +466,28 @@ sub Marpa::R3::Trace::G::brief_irl {
         <<'END_OF_LUA', 'si', $lmw_g_name, $irl_id );
     local g, lmw_g_name, irl_id = ...
     local lmw_g = g[lmw_g_name]
-    local pieces = { string.format("%d: ", irl_id) }
-    local lhs_id = lmw_g:_irl_lhs(irl_id)
-    pieces[#pieces+1] = lmw_g:isy_name(lhs_id)
-    pieces[#pieces+1] = " ->"
-    local rh_length = lmw_g:_irl_length(irl_id)
-    if rh_length > 0 then
-       local rhs_names = {}
-       for rhs_ix = 0, rh_length - 1 do
-	  local this_rhs_id = lmw_g:_irl_rhs(irl_id, rhs_ix)
-	  rhs_names[#rhs_names+1] = lmw_g:isy_name(this_rhs_id)
-       end
-       pieces[#pieces+1] = " " .. table.concat(rhs_names, " ")
-    end
-    return table.concat(pieces)
+    return lmw_g:brief_irl(irl_id)
 END_OF_LUA
 
     return $text;
 }
 
 sub Marpa::R3::Trace::G::show_isys {
-    my ($tracer) = @_;
-    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
-    my $text      = q{};
-    for my $isy_id ( 0 .. $grammar_c->_marpa_g_nsy_count() - 1 ) {
-        $text .= $tracer->show_isy($isy_id);
-    }
-    return $text;
-}
-
-sub Marpa::R3::Trace::G::show_isy {
-    my ( $tracer, $isy_id ) = @_;
+    my ( $tracer ) = @_;
     my $thin_slg         = $tracer->[Marpa::R3::Internal::Trace::G::SLG_C];
     my $short_lmw_g_name = $tracer->[Marpa::R3::Internal::Trace::G::NAME];
     my $lmw_g_name       = 'lmw_' . ( lc $short_lmw_g_name ) . 'g';
     my ($result) =
       $thin_slg->call_by_tag(
         ('@' . __FILE__ . ':' .  __LINE__),
-	<<'END_OF_LUA', 'si', $lmw_g_name, $isy_id );
-    local g, lmw_g_name, isy_id = ...
+	<<'END_OF_LUA', 's', $lmw_g_name );
+    local g, lmw_g_name = ...
     local lmw_g = g[lmw_g_name]
-    local name = lmw_g:isy_name(isy_id)
-    local pieces = { string.format("%d: %s", isy_id, name) }
-    local tags = {}
-    local is_nulling = 0 ~= lmw_g:_nsy_is_nulling(isy_id)
-    if is_nulling then
-        tags[#tags+1] = 'nulling'
+    local nsy_count = lmw_g:_nsy_count()
+    local pieces = {}
+    for isy_id = 0, nsy_count - 1 do
+        pieces[#pieces+1] = lmw_g:show_isy(isy_id)
     end
-    if #tags > 0 then
-        pieces[#pieces+1] = ', ' .. table.concat(tags, ' ')
-    end
-    pieces[#pieces+1] = '\n'
     return table.concat(pieces)
 END_OF_LUA
     return $result;
@@ -524,12 +495,24 @@ END_OF_LUA
 
 sub Marpa::R3::Trace::G::show_irls {
     my ($tracer) = @_;
-    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
-    my $text      = q{};
-    for my $irl_id ( 0 .. $grammar_c->_marpa_g_irl_count() - 1 ) {
-        $text .= $tracer->brief_irl($irl_id) . "\n";
-    }
-    return $text;
+    my $thin_slg         = $tracer->[Marpa::R3::Internal::Trace::G::SLG_C];
+    my $short_lmw_g_name = $tracer->[Marpa::R3::Internal::Trace::G::NAME];
+    my $lmw_g_name       = 'lmw_' . ( lc $short_lmw_g_name ) . 'g';
+    my ($result) =
+      $thin_slg->call_by_tag(
+        ('@' . __FILE__ . ':' .  __LINE__),
+	<<'END_OF_LUA', 's', $lmw_g_name );
+    local g, lmw_g_name = ...
+    local lmw_g = g[lmw_g_name]
+    local irl_count = lmw_g:_irl_count()
+    local pieces = {}
+    for irl_id = 0, irl_count - 1 do
+        pieces[#pieces+1] = lmw_g:brief_irl(irl_id)
+    end
+    pieces[#pieces+1] = ''
+    return table.concat(pieces, '\n')
+END_OF_LUA
+    return $result;
 }
 
 sub Marpa::R3::Trace::G::error {

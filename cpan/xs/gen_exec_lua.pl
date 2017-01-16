@@ -137,7 +137,7 @@ my $lua_exec_sig_body = <<'END_OF_EXEC_SIG_BODY';
             if ((size_t)arg_ix >= (size_t)items) {
                 croak
                     ("Internal error: signature ('%s') wants %ld items, but only %ld arguments in xlua EXEC_SIG_BODY",
-                        signature, (long)arg_ix, (long)items - 2);
+                        signature, (long)(i + 1), (long)(items - first_optional_arg));
             }
 
             arg_sv = ST (arg_ix);

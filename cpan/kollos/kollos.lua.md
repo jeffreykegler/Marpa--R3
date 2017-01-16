@@ -1418,6 +1418,38 @@ whose id is `id`.
         return table.concat(pieces)
     end
 
+    function _M.class_grammar.show_isy(lmw_g, isy_id)
+        local name = lmw_g:isy_name(isy_id)
+        local pieces = { string.format("%d: %s", isy_id, name) }
+        local tags = {}
+        local is_nulling = 0 ~= lmw_g:_nsy_is_nulling(isy_id)
+        if is_nulling then
+        tags[#tags+1] = 'nulling'
+        end
+        if #tags > 0 then
+            pieces[#pieces+1] = ', ' .. table.concat(tags, ' ')
+        end
+        pieces[#pieces+1] = '\n'
+        return table.concat(pieces)
+    end
+
+    function _M.class_grammar.brief_irl(lmw_g, irl_id)
+        local pieces = { string.format("%d: ", irl_id) }
+        local lhs_id = lmw_g:_irl_lhs(irl_id)
+        pieces[#pieces+1] = lmw_g:isy_name(lhs_id)
+        pieces[#pieces+1] = " ->"
+        local rh_length = lmw_g:_irl_length(irl_id)
+        if rh_length > 0 then
+           local rhs_names = {}
+           for rhs_ix = 0, rh_length - 1 do
+              local this_rhs_id = lmw_g:_irl_rhs(irl_id, rhs_ix)
+              rhs_names[#rhs_names+1] = lmw_g:isy_name(this_rhs_id)
+           end
+           pieces[#pieces+1] = " " .. table.concat(rhs_names, " ")
+        end
+        return table.concat(pieces)
+    end
+
 ```
 
 ## The recognizer Libmarpa wrapper
