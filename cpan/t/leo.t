@@ -10,15 +10,15 @@
 # or implied warranties. For details, see the full text of
 # of the licenses in the directory LICENSES.
 
-# CENSUS: ASIS
-# Note: SLIF TEST
-
 # The example from p. 166 of Leo's paper,
 # augmented to test Leo prediction items.
 
 use 5.010001;
 use strict;
 use warnings;
+use POSIX qw(setlocale LC_ALL);
+
+POSIX::setlocale(LC_ALL, "C");
 
 use Test::More tests => 2;
 

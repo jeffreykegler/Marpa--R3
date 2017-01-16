@@ -10,9 +10,6 @@
 # or implied warranties. For details, see the full text of
 # of the licenses in the directory LICENSES.
 
-# CENSUS: ASIS
-# Note: SLIF TEST
-
 # This example parses ambiguous English sentences.  The target annotation
 # is Penn Treebank's syntactic bracketing tags.  For details, see
 # http://www.cis.upenn.edu/~treebank/
@@ -21,6 +18,9 @@ use 5.010001;
 use strict;
 use warnings;
 use English qw( -no_match_vars );
+use POSIX qw(setlocale LC_ALL);
+
+POSIX::setlocale(LC_ALL, "C");
 
 use Test::More tests => 3;
 use lib 'inc';

@@ -10,9 +10,6 @@
 # or implied warranties. For details, see the full text of
 # of the licenses in the directory LICENSES.
 
-# CENSUS: ASIS
-# Note: SLIF TEST
-
 # Tests requiring a grammar, an input and the expected events --
 # no semantics required and output is not tested.
 
@@ -20,6 +17,10 @@ use 5.010001;
 use strict;
 use warnings;
 use English qw( -no_match_vars );
+use POSIX qw(setlocale LC_ALL);
+
+POSIX::setlocale(LC_ALL, "C");
+
 use Test::More tests => 8;
 
 use lib 'inc';

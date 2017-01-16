@@ -10,16 +10,17 @@
 # or implied warranties. For details, see the full text of
 # of the licenses in the directory LICENSES.
 
-# CENSUS: ASIS
-# Note: SLIF TEST
-
 use 5.010001;
 use strict;
 use warnings;
-use Marpa::R3;
 use Data::Dumper;
-use Test::More tests => 3;
 use Getopt::Long ();
+use POSIX qw(setlocale LC_ALL);
+
+POSIX::setlocale(LC_ALL, "C");
+
+use Test::More tests => 3;
+use Marpa::R3;
 
 my $verbose;
 die if not Getopt::Long::GetOptions( verbose => \$verbose );

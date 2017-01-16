@@ -10,7 +10,6 @@
 # or implied warranties. For details, see the full text of
 # of the licenses in the directory LICENSES.
 
-# CENSUS: ASIS
 # Note: Converted to SLIF from equation.t
 
 # An ambiguous equation
@@ -25,6 +24,10 @@ use lib 'inc';
 use Marpa::R3::Test;
 use English qw( -no_match_vars );
 use Fatal qw( close open );
+use POSIX qw(setlocale LC_ALL);
+
+POSIX::setlocale(LC_ALL, "C");
+
 use Marpa::R3;
 
 ## no critic (InputOutput::RequireBriefOpen)

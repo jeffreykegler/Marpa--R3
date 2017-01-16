@@ -10,7 +10,6 @@
 # or implied warranties. For details, see the full text of
 # of the licenses in the directory LICENSES.
 
-# CENSUS: ASIS
 # Note: Converted to SLIF from leo_unit.t
 
 # Test of Leo logic for unit rule.
@@ -20,6 +19,10 @@ use strict;
 use warnings;
 
 use List::Util;
+use POSIX qw(setlocale LC_ALL);
+
+POSIX::setlocale(LC_ALL, "C");
+
 use Test::More tests => 5;
 
 use lib 'inc';

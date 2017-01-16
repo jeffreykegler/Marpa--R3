@@ -10,17 +10,17 @@
 # or implied warranties. For details, see the full text of
 # of the licenses in the directory LICENSES.
 
-# CENSUS: ASIS
-# Note: SLIF TEST
-
 # Synopsis for Scannerless version of Stuizand interface
 
 use 5.010001;
 use strict;
 use warnings;
-use Test::More tests => 5;
 use English qw( -no_match_vars );
+use POSIX qw(setlocale LC_ALL);
 
+POSIX::setlocale(LC_ALL, "C");
+
+use Test::More tests => 5;
 use lib 'inc';
 use Marpa::R3::Test;
 

@@ -10,13 +10,15 @@
 # or implied warranties. For details, see the full text of
 # of the licenses in the directory LICENSES.
 
-# CENSUS: ASIS
 # Note: Converted to SLIF from minus.t
 
 use 5.010001;
 
 use strict;
 use warnings;
+use POSIX qw(setlocale LC_ALL);
+
+POSIX::setlocale(LC_ALL, "C");
 
 use Test::More tests => 10;
 

@@ -10,15 +10,16 @@
 # or implied warranties. For details, see the full text of
 # of the licenses in the directory LICENSES.
 
-# CENSUS: ASIS
-# Note: SLIF TEST
-
 # Test using a JSON parser
 # Inspired by a parser written by Peter Stuifzand
 
 use 5.010001;
 use strict;
 use warnings;
+use POSIX qw(setlocale LC_ALL);
+
+POSIX::setlocale(LC_ALL, "C");
+
 use Test::More tests => 15;
 
 ## no critic (ErrorHandling::RequireCarping);

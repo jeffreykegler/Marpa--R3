@@ -14,6 +14,9 @@ use 5.010001;
 use warnings;
 use strict;
 use English qw( -no_match_vars );
+use POSIX qw(setlocale LC_ALL);
+
+POSIX::setlocale(LC_ALL, "C");
 
 use Test::More tests => 3;
 

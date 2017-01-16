@@ -56,9 +56,11 @@ my %version_for_config = (
     'English'               => '1.04',
     'Exporter'              => '5.62',
     'ExtUtils::CBuilder'    => '0.27',
+
     # ExtUtils::MakeMaker must be 6.48 so that MIN_PERL_VERSION
     # is supported
     'ExtUtils::MakeMaker'   => '6.48',
+
     'ExtUtils::Manifest'    => '1.51_01',
     'ExtUtils::Mkbootstrap' => '6.42',
     'Fatal'                 => '1.05',
@@ -67,6 +69,10 @@ my %version_for_config = (
     'File::Find'            => '1.12',
     'IPC::Cmd'              => '0.40_1',
     'List::Util'            => '1.21',
+
+    # 1.17 shipped with Perl 5.10.1
+    'POSIX'                 => '1.17',
+
     'Scalar::Util'          => '1.21',
     'Test::More'            => '0.94',
     'Time::Piece'           => '1.12',

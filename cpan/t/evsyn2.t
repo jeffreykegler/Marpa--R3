@@ -10,9 +10,6 @@
 # or implied warranties. For details, see the full text of
 # of the licenses in the directory LICENSES.
 
-# CENSUS: ASIS
-# Note: SLIF TEST
-
 # Synopsis tests
 
 # Test SLIF -- predicted, nulled and completed events with 
@@ -25,6 +22,10 @@ use warnings;
 
 use Test::More tests => 10;
 use English qw( -no_match_vars );
+use POSIX qw(setlocale LC_ALL);
+
+POSIX::setlocale(LC_ALL, "C");
+
 use lib 'inc';
 use Marpa::R3::Test;
 use Marpa::R3;

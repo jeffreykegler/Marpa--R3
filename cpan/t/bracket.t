@@ -10,9 +10,6 @@
 # or implied warranties. For details, see the full text of
 # of the licenses in the directory LICENSES.
 
-# CENSUS: ASIS
-# Note: SLIF TEST
-
 # This utility searches for mismatched braces --
 # curly, square and round.
 
@@ -34,6 +31,10 @@ use Marpa::R3;
 use Data::Dumper;
 use English qw( -no_match_vars );
 use Getopt::Long ();
+use POSIX qw(setlocale LC_ALL);
+
+POSIX::setlocale(LC_ALL, "C");
+
 use Test::More;
 
 sub usage {

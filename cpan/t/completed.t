@@ -21,6 +21,10 @@ use warnings;
 
 use Test::More tests => 10;
 use English qw( -no_match_vars );
+use POSIX qw(setlocale LC_ALL);
+
+POSIX::setlocale(LC_ALL, "C");
+
 use lib 'inc';
 use Marpa::R3::Test;
 use Marpa::R3;

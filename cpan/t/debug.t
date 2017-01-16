@@ -18,12 +18,16 @@ use warnings;
 
 use Test::More tests => 26;
 
+use Data::Dumper;
 use English qw( -no_match_vars );
 use Fatal qw( open close );
+use POSIX qw(setlocale LC_ALL);
+
+POSIX::setlocale(LC_ALL, "C");
+
 use lib 'inc';
 use Marpa::R3::Test;
 use Marpa::R3;
-use Data::Dumper;
 
 my $progress_report = q{};
 

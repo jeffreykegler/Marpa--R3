@@ -10,9 +10,6 @@
 # or implied warranties. For details, see the full text of
 # of the licenses in the directory LICENSES.
 
-# CENSUS: ASIS
-# Note: SLIF TEST
-
 # Tests that include a grammar, an input, and an resolution
 # error message, but no (or minimal?) semantics.
 #
@@ -23,12 +20,16 @@ use 5.010001;
 use strict;
 use warnings;
 
-use Test::More tests => 6;
+use Data::Dumper;
 use English qw( -no_match_vars );
+use POSIX qw(setlocale LC_ALL);
+
+POSIX::setlocale(LC_ALL, "C");
+
+use Test::More tests => 6;
 use lib 'inc';
 use Marpa::R3::Test;
 use Marpa::R3;
-use Data::Dumper;
 
 our $DEBUG = 0;
 my @tests_data = ();

@@ -24,6 +24,10 @@ use warnings;
 # so now these are simply Leo-oriented regression tests.
 
 use Fatal qw(open close);
+use POSIX qw(setlocale LC_ALL);
+
+POSIX::setlocale(LC_ALL, "C");
+
 use Test::More tests => 6;
 
 use lib 'inc';

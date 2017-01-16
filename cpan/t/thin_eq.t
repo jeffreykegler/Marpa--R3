@@ -21,6 +21,9 @@ use Marpa::R3::Lua::Test::More;
 use English qw( -no_match_vars );
 use Fatal qw( close open );
 use Marpa::R3;
+use POSIX qw(setlocale LC_ALL);
+
+POSIX::setlocale(LC_ALL, "C");
 
 my $marpa_lua = Marpa::R3::Lua->new();
 $marpa_lua->raw_exec($Marpa::R3::Lua::Inspect::load);
@@ -28,10 +31,6 @@ Marpa::R3::Lua::Test::More::load_me($marpa_lua);
 
 $marpa_lua->exec(<<'END_OF_LUA');
      Test.More.plan(8)
-
-     -- enforce "C" locale so that tests using
-     -- string sorts are predictable on all platforms
-     os.setlocale("C")
 
      -- for debugging
      function show_progress (recce)

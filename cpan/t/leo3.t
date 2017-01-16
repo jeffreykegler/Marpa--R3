@@ -10,7 +10,6 @@
 # or implied warranties. For details, see the full text of
 # of the licenses in the directory LICENSES.
 
-# CENSUS: ASIS
 # Note: This is leo3.t converted to the SLIF
 
 # The example from p. 166 of Leo's paper,
@@ -24,6 +23,9 @@ use strict;
 use warnings;
 
 use Test::More tests => 5;
+use POSIX qw(setlocale LC_ALL);
+
+POSIX::setlocale(LC_ALL, "C");
 
 use lib 'inc';
 use Marpa::R3::Test;

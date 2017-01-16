@@ -10,7 +10,6 @@
 # or implied warranties. For details, see the full text of
 # of the licenses in the directory LICENSES.
 
-# CENSUS: ASIS
 # Converted to SLIF from naif.t
 
 # Regression test of ref to undef as token value
@@ -21,12 +20,15 @@ use 5.010001;
 
 use strict;
 use warnings;
+use Data::Dumper;
+use POSIX qw(setlocale LC_ALL);
+
+POSIX::setlocale(LC_ALL, "C");
 
 use Test::More tests => 1;
 use lib 'inc';
 use Marpa::R3::Test;
 use Marpa::R3;
-use Data::Dumper;
 
 my $dsl = <<'END_OF_DSL';
 :default ::= action => My_Actions::dwim

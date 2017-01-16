@@ -10,8 +10,6 @@
 # or implied warranties. For details, see the full text of
 # of the licenses in the directory LICENSES.
 
-# CENSUS: ASIS
-# Note: SLIF TEST
 # Note: version of sl_timeflies.t with AST semantics
 
 # This example parses ambiguous English sentences.  The target annotation
@@ -46,8 +44,11 @@ use 5.010001;
 use strict;
 use warnings;
 use English qw( -no_match_vars );
-
+use POSIX qw(setlocale LC_ALL);
 use Test::More tests => 1;
+
+POSIX::setlocale(LC_ALL, "C");
+
 use lib 'inc';
 use Marpa::R3::Test;
 use Marpa::R3;

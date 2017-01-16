@@ -10,8 +10,6 @@
 # or implied warranties. For details, see the full text of
 # of the licenses in the directory LICENSES.
 
-# CENSUS: ASIS
-# Note: SLIF TEST
 
 # Test of the actions, focusing on the various types --
 # CODE, ref to scalar/hash/array, etc.
@@ -24,6 +22,10 @@ use Test::More tests => 2;
 
 use English qw( -no_match_vars );
 use Fatal qw( open close );
+use POSIX qw(setlocale LC_ALL);
+
+POSIX::setlocale(LC_ALL, "C");
+
 use lib 'inc';
 use Marpa::R3::Test;
 use Marpa::R3;

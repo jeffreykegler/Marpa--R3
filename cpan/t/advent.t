@@ -23,6 +23,9 @@ use warnings;
 use English qw( -no_match_vars );
 use utf8;
 use open ':std', ':encoding(utf8)';
+use POSIX qw(setlocale LC_ALL);
+
+POSIX::setlocale(LC_ALL, "C");
 
 use Test::More tests => 54;
 use lib 'inc';

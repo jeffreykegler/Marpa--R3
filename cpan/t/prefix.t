@@ -10,17 +10,18 @@
 # or implied warranties. For details, see the full text of
 # of the licenses in the directory LICENSES.
 
-# CENSUS: ASIS
-# Note: SLIF TEST
-
 # Test of scannerless parsing -- prefix addition
 
 use 5.010001;
 use strict;
 use warnings;
 
-use Test::More tests => 30;
 use English qw( -no_match_vars );
+use POSIX qw(setlocale LC_ALL);
+
+POSIX::setlocale(LC_ALL, "C");
+
+use Test::More tests => 30;
 use lib 'inc';
 use Marpa::R3::Test;
 use Marpa::R3;

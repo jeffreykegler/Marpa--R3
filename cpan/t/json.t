@@ -10,9 +10,6 @@
 # or implied warranties. For details, see the full text of
 # of the licenses in the directory LICENSES.
 
-# CENSUS: ASIS
-# Note: SLIF TEST
-
 # Test using a JSON parser
 # Inspired by a parser written by Peter Stuifzand
 
@@ -22,6 +19,9 @@ use warnings;
 use Test::More tests => 14;
 use English qw( -no_match_vars );
 use Scalar::Util qw(blessed);
+use POSIX qw(setlocale LC_ALL);
+
+POSIX::setlocale(LC_ALL, "C");
 
 use lib 'inc';
 use Marpa::R3::Test;

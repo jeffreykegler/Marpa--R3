@@ -10,9 +10,6 @@
 # or implied warranties. For details, see the full text of
 # of the licenses in the directory LICENSES.
 
-# CENSUS: ASIS
-# Note: SLIF TEST
-
 # This test was originally based on Marpa::R2 Github issue #254 --
 # constructor invoked on per-parse argument, which should not happen.
 #
@@ -26,12 +23,16 @@ use 5.010001;
 use strict;
 use warnings;
 
+use Data::Dumper;
 use English qw( -no_match_vars );
 use Test::More tests => 8;
+use POSIX qw(setlocale LC_ALL);
+
+POSIX::setlocale(LC_ALL, "C");
+
 use lib 'inc';
 use Marpa::R3::Test;
 use Marpa::R3;
-use Data::Dumper;
 
 package Class_Actions;
 

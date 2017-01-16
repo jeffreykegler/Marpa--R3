@@ -10,9 +10,6 @@
 # or implied warranties. For details, see the full text of
 # of the licenses in the directory LICENSES.
 
-# CENSUS: ASIS
-# Note: SLIF TEST
-
 # Tests which require only a GIF combination-- a grammar (G),
 # input (I), and an (F) ASF output, with no semantics
 
@@ -20,12 +17,16 @@ use 5.010001;
 use strict;
 use warnings;
 
-use Test::More tests => 22;
+use Data::Dumper;
 use English qw( -no_match_vars );
+use POSIX qw(setlocale LC_ALL);
+use Test::More tests => 22;
+
+POSIX::setlocale(LC_ALL, "C");
+
 use lib 'inc';
 use Marpa::R3::Test;
 use Marpa::R3;
-use Data::Dumper;
 
 my @tests_data = ();
 

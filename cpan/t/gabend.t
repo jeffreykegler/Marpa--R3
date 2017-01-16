@@ -10,7 +10,6 @@
 # or implied warranties. For details, see the full text of
 # of the licenses in the directory LICENSES.
 
-# CENSUS: ASIS
 # Note: Converted from gabend.t
 
 # Test grammar exceptions -- make sure problems actually
@@ -23,6 +22,9 @@ use warnings;
 use English qw( -no_match_vars );
 use Test::More tests => 9;
 use Fatal qw(open close);
+use POSIX qw(setlocale LC_ALL);
+
+POSIX::setlocale(LC_ALL, "C");
 
 use lib 'inc';
 use Marpa::R3::Test;

@@ -10,7 +10,6 @@
 # or implied warranties. For details, see the full text of
 # of the licenses in the directory LICENSES.
 
-# CENSUS: ASIS
 # Note: This test is duplicate_parse.t and final_nonnullable.t, ...
 # Note: converted to the SLIF
 
@@ -23,6 +22,9 @@ use strict;
 use warnings;
 
 use Test::More tests => 10;
+use POSIX qw(setlocale LC_ALL);
+
+POSIX::setlocale(LC_ALL, "C");
 
 use lib 'inc';
 use Marpa::R3::Test;

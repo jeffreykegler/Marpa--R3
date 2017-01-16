@@ -10,7 +10,6 @@
 # or implied warranties. For details, see the full text of
 # of the licenses in the directory LICENSES.
 
-# CENSUS: ASIS
 # Note: ah2.t and bocage.t folded into this test
 
 # the example grammar in Aycock/Horspool "Practical Earley Parsing",
@@ -22,6 +21,10 @@ use strict;
 use warnings;
 
 use Test::More tests => 42;
+use POSIX qw(setlocale LC_ALL);
+
+POSIX::setlocale(LC_ALL, "C");
+
 use lib 'inc';
 use Marpa::R3::Test;
 use Marpa::R3;
