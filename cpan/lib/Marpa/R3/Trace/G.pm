@@ -54,6 +54,14 @@ sub name {
     return $self->[Marpa::R3::Internal::Trace::G::NAME];
 }
 
+# A development hack -- I will delete this once tracers
+# are eliminated
+sub lmw_name {
+    my ($tracer) = @_;
+    my $short_lmw_g_name = $tracer->[Marpa::R3::Internal::Trace::G::NAME];
+    return 'lmw_' . (lc $short_lmw_g_name) . 'g';
+}
+
 sub symbol_by_name {
     my ( $self, $symbol_name ) = @_;
     my $thin_slg = $self->[Marpa::R3::Internal::Trace::G::SLG_C];
