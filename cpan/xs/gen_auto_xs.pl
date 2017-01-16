@@ -187,11 +187,3 @@ say {$out} gp_generate(qw(symbol_new));
 say {$out} gp_generate(qw(zwa_new int default_value));
 say {$out} gp_generate(qw(zwa_place Marpa_Assertion_ID zwaid Marpa_Rule_ID xrl_id int rhs_ix));
 
-say {$out} gp_generate(qw(_marpa_g_rule_is_keep_separation Marpa_Rule_ID rule_id));
-say {$out} gp_generate(qw(_marpa_g_irl_lhs Marpa_IRL_ID rule_id));
-say {$out} gp_generate(qw(_marpa_g_irl_rhs Marpa_IRL_ID rule_id int ix));
-say {$out} gp_generate(qw(_marpa_g_irl_length Marpa_IRL_ID rule_id));
-say {$out} gp_generate(qw(_marpa_g_irl_rank Marpa_IRL_ID irl_id));
-say {$out} gp_generate(qw(_marpa_g_nsy_rank Marpa_NSY_ID nsy_id));
-say {$out} gp_generate(qw(_marpa_g_nsy_is_semantic Marpa_NSY_ID nsy_id));
-
