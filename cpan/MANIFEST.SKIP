@@ -92,7 +92,6 @@
 ^lib/Marpa/Makefile[.]old$
 ^lib/Marpa/R3/Installed.pm$
 ^lib/Marpa/R3/Lua/Glue[.]pm$
-^lib/Marpa/R3/Lua/Inspect[.]pm$
 ^lib/Marpa/R3/Lua/Kollos[.]pm$
 ^lib/Marpa/R3/Lua/Lua[.]c$
 ^lib/Marpa/R3/Lua/Lua[.]o$

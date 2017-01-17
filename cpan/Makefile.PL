@@ -377,14 +377,9 @@ all :: lib\Marpa\R3\Lua\Glue.pm
 
 all :: lib\Marpa\R3\Lua\Kollos.pm
 
-all :: lib\Marpa\R3\Lua\Inspect.pm
-
 all :: inc\Marpa\R3\Lua\Test\Builder.pm
 
 all :: inc\Marpa\R3\Lua\Test\More.pm
-
-lib\Marpa\R3\Lua\Inspect.pm: kollos\inspect.lua lib\Marpa\R3\Lua\Inspect.PL
-	$(PERLRUN) lib\Marpa\R3\Lua\Inspect.PL lib\Marpa\R3\Lua\Inspect.pm
 
 lib\Marpa\R3\Lua\Glue.pm: glue\glue.lua lib\Marpa\R3\Lua\Glue.PL
 	$(PERLRUN) lib\Marpa\R3\Lua\Glue.PL lib\Marpa\R3\Lua\Glue.pm
@@ -404,14 +399,9 @@ else{
     push @postamble_pieces, <<'END_OF_POSTAMBLE_PIECE';
 all :: lib/Marpa/R3/Lua/Kollos.pm
 
-all :: lib/Marpa/R3/Lua/Inspect.pm
-
 all :: inc/Marpa/R3/Lua/Test/Builder.pm
 
 all :: inc/Marpa/R3/Lua/Test/More.pm
-
-lib/Marpa/R3/Lua/Inspect.pm: kollos/inspect.lua lib/Marpa/R3/Lua/Inspect.PL
-	$(PERLRUN) lib/Marpa/R3/Lua/Inspect.PL lib/Marpa/R3/Lua/Inspect.pm
 
 lib/Marpa/R3/Lua/Glue.pm: glue/glue.lua lib/Marpa/R3/Lua/Glue.PL
 	$(PERLRUN) lib/Marpa/R3/Lua/Glue.PL lib/Marpa/R3/Lua/Glue.pm
@@ -488,8 +478,6 @@ WriteMakefile(
         q[lib/Marpa/R3/SLR.pm]       => q[$(INST_LIB)/Marpa/R3/SLR.pm],
         q[lib/Marpa/R3/Lua/Glue.pm]  => q[$(INST_LIB)/Marpa/R3/Lua/Glue.pm],
         q[lib/Marpa/R3/Lua/Kollos.pm]  => q[$(INST_LIB)/Marpa/R3/Lua/Kollos.pm],
-        q[lib/Marpa/R3/Lua/Inspect.pm] =>
-          q[$(INST_LIB)/Marpa/R3/Lua/Inspect.pm],
         q[lib/Marpa/R3/Trace/G.pm] => q[$(INST_LIB)/Marpa/R3/Trace/G.pm],
         q[lib/Marpa/R3/Value.pm]   => q[$(INST_LIB)/Marpa/R3/Value.pm],
         q[lib/Marpa/R3/Version.pm] => q[$(INST_LIB)/Marpa/R3/Version.pm],

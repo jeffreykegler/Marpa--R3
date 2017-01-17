@@ -3,7 +3,7 @@
 /auto[.]xs
 /exec_lua[.]xs
 /glue[.]lua
-/inspect[.]c
+/inspect_inc[.]c
 /libmarpa[.]a
 /Makefile
 /Makefile[.]old
