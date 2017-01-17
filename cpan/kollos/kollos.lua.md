@@ -2587,7 +2587,7 @@ a special "configuration" argument.
     -- miranda: insert luacheck declarations
     -- miranda: insert enforce strict globals
 
-    local _M = kollos
+    local _M = require "kollos.metal"
 
     -- miranda: insert VM operations
     -- miranda: insert SLIF recognizer Lua functions

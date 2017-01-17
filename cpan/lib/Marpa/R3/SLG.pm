@@ -135,15 +135,6 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     my $thin_slg = $slg->[Marpa::R3::Internal::Scanless::G::C] =
       Marpa::R3::Thin::SLG->new($kollos);
 
-    # Stuff in Lua
-    my ($load_result, $error);
-
-    $kollos->raw_exec(<<'END_OF_LUA');
-    inspect = require 'inspect'
-    kollos = require 'kollos'
-    glue = require 'glue'
-END_OF_LUA
-
     state $op_lua = Marpa::R3::Thin::op('lua');
     $thin_slg->call_by_tag(
         ('@' .__FILE__ . ':' .  __LINE__),

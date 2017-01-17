@@ -4834,6 +4834,11 @@ PPCODE:
     struct lua_extraspace *p_extra;
     int kollos_ix;
     int preload_ix;
+    int package_ix;
+    int loaded_ix;
+    int msghandler_ix;
+    lua_CFunction loader;
+    int status;
 
     Newx (lua_wrapper, 1, Marpa_Lua);
 
@@ -4856,36 +4861,76 @@ PPCODE:
         croak ("Internal Marpa::R3 error; could not grow stack: " LUA_TAG);
     }
 
+    marpa_lua_pushcfunction (L, xlua_msghandler);
+    msghandler_ix = marpa_lua_gettop(L);
+
     Newx( p_extra, 1, struct lua_extraspace);
     *(struct lua_extraspace **)marpa_lua_getextraspace(L) = p_extra;
     p_extra->ref_count = 1;
 
     marpa_luaL_openlibs (L);    /* open libraries */
 
-    kollos_metal_loader(L); /* Open kollos library */
-    /* Lua stack: [ kollos_table ] */
-    kollos_ix = marpa_lua_gettop(L);
-
-    /* _G.kollos = kollos */
-    marpa_lua_pushvalue(L, kollos_ix);
-    marpa_lua_setglobal(L, "kollos");
-
     /* Get the preload table and leave it on the stack */
     marpa_lua_getglobal(L, "package");
-    marpa_lua_getfield(L, -1, "preload");
+    package_ix = marpa_lua_gettop(L);
+    marpa_lua_getfield(L, package_ix, "preload");
     preload_ix = marpa_lua_gettop(L);
+    marpa_lua_getfield(L, package_ix, "loaded");
+    loaded_ix = marpa_lua_gettop(L);
 
-    /* Set up preload of inspect package */
-    marpa_luaL_loadstring(L, loader_inspect);
-    marpa_lua_setfield(L, preload_ix, "inspect");
+    /* Load the inspect package */
+    if (marpa_luaL_loadstring(L, loader_inspect) != LUA_OK) {
+      const char* msg = marpa_lua_tostring(L, -1);
+      croak(msg);
+    }
+    status = marpa_lua_pcall (L, 0, 1, msghandler_ix);
+    if (status != 0) {
+        const char *exception_string = handle_pcall_error (L, status);
+        marpa_lua_settop (L, base_of_stack);
+        croak (exception_string);
+    }
+    /* Dup the module on top of the stack */
+    marpa_lua_pushvalue(L, -1);
+    marpa_lua_setfield(L, loaded_ix, "inspect");
+    marpa_lua_setglobal(L, "inspect");
 
-    /* Set up preload of kollos package */
-    marpa_luaL_loadstring(L, loader_kollos);
-    marpa_lua_setfield(L, preload_ix, "kollos");
+    /* Set up preload of kollos metal package */
+    marpa_lua_pushcfunction(L, kollos_metal_loader);
+    marpa_lua_setfield(L, preload_ix, "kollos.metal");
 
-    /* Set up preload of glue package */
-    marpa_luaL_loadstring(L, loader_glue);
-    marpa_lua_setfield(L, preload_ix, "glue");
+    /* Load kollos package */
+    if (marpa_luaL_loadstring(L, loader_kollos) != LUA_OK) {
+      const char* msg = marpa_lua_tostring(L, -1);
+      croak(msg);
+    }
+    status = marpa_lua_pcall (L, 0, 1, msghandler_ix);
+    if (status != 0) {
+        const char *exception_string = handle_pcall_error (L, status);
+        marpa_lua_settop (L, base_of_stack);
+        croak (exception_string);
+    }
+    kollos_ix = marpa_lua_gettop(L);
+    /* Dup the module on top of the stack */
+    marpa_lua_pushvalue(L, -1);
+    marpa_lua_pushvalue(L, -1);
+    marpa_lua_setfield(L, loaded_ix, "kollos");
+    marpa_lua_setglobal(L, "kollos");
+
+    /* Load glue package */
+    if (marpa_luaL_loadstring(L, loader_glue) != LUA_OK) {
+      const char* msg = marpa_lua_tostring(L, -1);
+      croak(msg);
+    }
+    status = marpa_lua_pcall (L, 0, 1, msghandler_ix);
+    if (status != 0) {
+        const char *exception_string = handle_pcall_error (L, status);
+        marpa_lua_settop (L, base_of_stack);
+        croak (exception_string);
+    }
+    /* Dup the module on top of the stack */
+    marpa_lua_pushvalue(L, -1);
+    marpa_lua_setfield(L, loaded_ix, "glue");
+    marpa_lua_setglobal(L, "glue");
 
     marpa_lua_getfield(L, kollos_ix, "class_slg");
     marpa_lua_getfield(L, kollos_ix, "upvalues");
