@@ -4879,7 +4879,8 @@ PPCODE:
     loaded_ix = marpa_lua_gettop(L);
 
     /* Set up preload of inspect package */
-    if (marpa_luaL_loadstring(L, inspect_loader) != LUA_OK) {
+    if (marpa_luaL_loadbuffer(L, inspect_loader, inspect_loader_length, LUA_TAG)
+      != LUA_OK) {
       const char* msg = marpa_lua_tostring(L, -1);
       croak(msg);
     }

@@ -108,6 +108,9 @@ sub constants {
     $constants .= "\n";
     $constants .= sprintf( "LUA_INTERP = %s\n",
         File::Spec->catfile( File::Spec->updir(), qw{lua lua} ) );
+    $constants .= sprintf( "LUAC = %s\n",
+        File::Spec->catfile( File::Spec->updir(), qw{lua luac} ) );
+
     my $my_lua_path = File::Spec->catfile( File::Spec->updir(), qw{kollos XXX} );
     $my_lua_path =~ s/XXX$/?.lua/;
     $constants .=
@@ -125,6 +128,8 @@ sub constants {
 
     $constants .= sprintf( "STRING2H_LUA = %s\n",
         File::Spec->catfile( File::Spec->updir(), qw{glue string2h.lua} ) );
+    $constants .= sprintf( "HEX2H_LUA = %s\n",
+        File::Spec->catfile( File::Spec->updir(), qw{glue hex2h.lua} ) );
 
     $constants .= sprintf( "MY_CCFLAGS = %s\n", $my_ccflags );
 
@@ -172,14 +177,17 @@ exec_lua.xs: gen_exec_lua.pl
 marpa_slifop.h: create_ops.pl
 	$(PERLRUN) create_ops.pl > marpa_slifop.h
 
-inspect_inc.c: $(INSPECT_LUA) $(STRING2H_LUA)
-	LUA_PATH=$(LUA_PATH) $(LUA_INTERP) $(STRING2H_LUA) inspect < $? > $@
+inspect.out: $(INSPECT_LUA)
+	LUA_PATH=$(LUA_PATH) $(LUAC) -o inspect.out $(INSPECT_LUA)
+
+inspect_inc.c: inspect.out $(HEX2H_LUA)
+	LUA_PATH=$(LUA_PATH) $(LUA_INTERP) $(HEX2H_LUA) inspect < inspect.out > $@
 
 glue_inc.c: $(GLUE_LUA) $(STRING2H_LUA)
-	LUA_PATH=$(LUA_PATH) $(LUA_INTERP) $(STRING2H_LUA) glue < $? > $@
+	LUA_PATH=$(LUA_PATH) $(LUA_INTERP) $(STRING2H_LUA) glue < $(GLUE_LUA) > $@
 
 kollos_inc.c: $(KOLLOS_LUA) $(STRING2H_LUA)
-	LUA_PATH=$(LUA_PATH) $(LUA_INTERP) $(STRING2H_LUA) kollos < $? > $@
+	LUA_PATH=$(LUA_PATH) $(LUA_INTERP) $(STRING2H_LUA) kollos < $(KOLLOS_LUA) > $@
 
 END_OF_POSTAMBLE_PIECE
 
