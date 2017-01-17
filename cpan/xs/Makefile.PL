@@ -183,11 +183,17 @@ inspect.out: $(INSPECT_LUA)
 inspect_inc.c: inspect.out $(HEX2H_LUA)
 	LUA_PATH=$(LUA_PATH) $(LUA_INTERP) $(HEX2H_LUA) inspect < inspect.out > $@
 
-glue_inc.c: $(GLUE_LUA) $(STRING2H_LUA)
-	LUA_PATH=$(LUA_PATH) $(LUA_INTERP) $(STRING2H_LUA) glue < $(GLUE_LUA) > $@
+glue.out: $(GLUE_LUA)
+	LUA_PATH=$(LUA_PATH) $(LUAC) -o glue.out $(GLUE_LUA)
 
-kollos_inc.c: $(KOLLOS_LUA) $(STRING2H_LUA)
-	LUA_PATH=$(LUA_PATH) $(LUA_INTERP) $(STRING2H_LUA) kollos < $(KOLLOS_LUA) > $@
+glue_inc.c: glue.out $(HEX2H_LUA)
+	LUA_PATH=$(LUA_PATH) $(LUA_INTERP) $(HEX2H_LUA) glue < glue.out > $@
+
+kollos.out: $(KOLLOS_LUA)
+	LUA_PATH=$(LUA_PATH) $(LUAC) -o kollos.out $(KOLLOS_LUA)
+
+kollos_inc.c: kollos.out $(HEX2H_LUA)
+	LUA_PATH=$(LUA_PATH) $(LUA_INTERP) $(HEX2H_LUA) kollos < kollos.out > $@
 
 END_OF_POSTAMBLE_PIECE
 

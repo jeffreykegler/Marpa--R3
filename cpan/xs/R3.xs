@@ -4891,7 +4891,8 @@ PPCODE:
     marpa_lua_setfield(L, preload_ix, "kollos.metal");
 
     /* Set up preload of kollos package */
-    if (marpa_luaL_loadstring(L, kollos_loader) != LUA_OK) {
+    if (marpa_luaL_loadbuffer(L, kollos_loader, kollos_loader_length, LUA_TAG)
+      != LUA_OK) {
       const char* msg = marpa_lua_tostring(L, -1);
       croak(msg);
     }
@@ -4901,7 +4902,8 @@ PPCODE:
      * This will load the inspect, kollos.metal and kollos
      * packages.
      */
-    if (marpa_luaL_loadstring(L, glue_loader) != LUA_OK) {
+    if (marpa_luaL_loadbuffer(L, glue_loader, glue_loader_length, LUA_TAG)
+      != LUA_OK) {
       const char* msg = marpa_lua_tostring(L, -1);
       croak(msg);
     }
