@@ -26,7 +26,8 @@ use POSIX qw(setlocale LC_ALL);
 POSIX::setlocale(LC_ALL, "C");
 
 my $marpa_lua = Marpa::R3::Lua->new();
-$marpa_lua->raw_exec($Marpa::R3::Lua::Inspect::load);
+$marpa_lua->exec('inspect = require"inspect"');
+
 Marpa::R3::Lua::Test::More::load_me($marpa_lua);
 
 $marpa_lua->exec(<<'END_OF_LUA');
@@ -109,7 +110,6 @@ $marpa_lua->exec(<<'END_OF_LUA');
     local bocage = kollos.bocage_new(recce, latest_earley_set_ID)
     local order = kollos.order_new(bocage)
 
-    -- print(inspect(_G))
     local tree = kollos.tree_new(order)
 
     local actual_values = {}
