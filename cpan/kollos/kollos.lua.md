@@ -87,7 +87,7 @@ OTHER DEALINGS IN THE SOFTWARE.
   * [Preliminaries to the main code](#preliminaries-to-the-main-code)
 * [The Kollos C code file](#the-kollos-c-code-file)
   * [Stuff from okollos](#stuff-from-okollos)
-  * [`marpa_luaopen_kollos`](#marpa-luaopen-kollos)
+  * [Kollos metal loader](#kollos-metal-loader)
   * [Create a sandbox](#create-a-sandbox)
   * [Preliminaries to the C library code](#preliminaries-to-the-c-library-code)
 * [The Kollos C header file](#the-kollos-c-header-file)
@@ -2720,7 +2720,7 @@ Set "strict" globals, using code taken from strict.lua.
     -- miranda: insert object constructors
 
     -- miranda: insert standard libmarpa wrappers
-    -- miranda: insert define marpa_luaopen_kollos method
+    -- miranda: insert define kollos_metal_loader method
     -- miranda: insert lua interpreter management
 
     -- miranda: insert  external C function definitions
@@ -4041,13 +4041,16 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
 
 ```
 
-### `marpa_luaopen_kollos`
+### Kollos metal loader
+
+To make this a real module, this fuction must be named "luaopen_kollos_metal".
+This might be accomplished via a "#define".
 
 ```
     -- miranda: section+ C function declarations
-    int marpa_luaopen_kollos(lua_State *L);
-    -- miranda: section define marpa_luaopen_kollos method
-    int marpa_luaopen_kollos(lua_State *L)
+    int kollos_metal_loader(lua_State *L);
+    -- miranda: section define kollos_metal_loader method
+    int kollos_metal_loader(lua_State *L)
     {
         /* The main kollos object */
         int kollos_table_stack_ix;

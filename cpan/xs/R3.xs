@@ -4862,7 +4862,7 @@ PPCODE:
 
     marpa_luaL_openlibs (L);    /* open libraries */
 
-    marpa_luaopen_kollos(L); /* Open kollos library */
+    kollos_metal_loader(L); /* Open kollos library */
     /* Lua stack: [ kollos_table ] */
     kollos_ix = marpa_lua_gettop(L);
 
