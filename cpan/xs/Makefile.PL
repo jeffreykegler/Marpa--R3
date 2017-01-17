@@ -115,8 +115,16 @@ sub constants {
         { allow_variables => undef } ) . "\n";
     $constants .= sprintf( "MIRANDA = %s\n",
         File::Spec->catfile( File::Spec->updir(), qw{kollos miranda} ) );
+
     $constants .= sprintf( "INSPECT_LUA = %s\n",
         File::Spec->catfile( File::Spec->updir(), qw{kollos inspect.lua} ) );
+    $constants .= sprintf( "GLUE_LUA = %s\n",
+        File::Spec->catfile( File::Spec->updir(), qw{glue glue.lua} ) );
+    $constants .= sprintf( "KOLLOS_LUA = %s\n",
+        File::Spec->catfile( File::Spec->updir(), qw{kollos kollos.lua} ) );
+
+    $constants .= sprintf( "STRING2H_LUA = %s\n",
+        File::Spec->catfile( File::Spec->updir(), qw{glue string2h.lua} ) );
 
     $constants .= sprintf( "MY_CCFLAGS = %s\n", $my_ccflags );
 
@@ -152,8 +160,8 @@ sub postamble {
     my @postamble_pieces = (".NOTPARALLEL:\n");
 
     push @postamble_pieces, <<'END_OF_POSTAMBLE_PIECE';
-R3.c: marpa_slifop.h marpa_xs.h auto.xs exec_lua.xs \
-      ../kollos/kollos.h inspect_inc.c
+R3.c: marpa_slifop.h marpa_xs.h auto.xs exec_lua.xs ../kollos/kollos.h \
+      inspect_inc.c glue_inc.c kollos_inc.c
 
 auto.xs: gen_auto_xs.pl
 	$(PERLRUN) gen_auto_xs.pl $@
@@ -165,7 +173,13 @@ marpa_slifop.h: create_ops.pl
 	$(PERLRUN) create_ops.pl > marpa_slifop.h
 
 inspect_inc.c: $(INSPECT_LUA)
-	LUA_PATH=$(LUA_PATH) $(LUA_INTERP) string2h.lua inspect < $? > $@
+	LUA_PATH=$(LUA_PATH) $(LUA_INTERP) $(STRING2H_LUA) inspect < $? > $@
+
+glue_inc.c: $(GLUE_LUA)
+	LUA_PATH=$(LUA_PATH) $(LUA_INTERP) $(STRING2H_LUA) glue < $? > $@
+
+kollos_inc.c: $(KOLLOS_LUA)
+	LUA_PATH=$(LUA_PATH) $(LUA_INTERP) $(STRING2H_LUA) kollos < $? > $@
 
 END_OF_POSTAMBLE_PIECE
 

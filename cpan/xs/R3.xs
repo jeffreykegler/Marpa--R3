@@ -2956,6 +2956,8 @@ get_mortalspace (size_t nbytes)
 }
 
 #include "inspect_inc.c"
+#include "kollos_inc.c"
+#include "glue_inc.c"
 
 MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin
 
