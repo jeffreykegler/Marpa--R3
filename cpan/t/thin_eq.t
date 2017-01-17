@@ -26,8 +26,6 @@ use POSIX qw(setlocale LC_ALL);
 POSIX::setlocale(LC_ALL, "C");
 
 my $marpa_lua = Marpa::R3::Lua->new();
-$marpa_lua->exec('inspect = require"inspect"');
-
 Marpa::R3::Lua::Test::More::load_me($marpa_lua);
 
 $marpa_lua->exec(<<'END_OF_LUA');
