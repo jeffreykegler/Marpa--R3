@@ -4871,6 +4871,10 @@ PPCODE:
     marpa_luaL_loadstring(L, loader_inspect);
     marpa_lua_setfield(L, preload_ix, "inspect");
 
+    /* Set up preload of kollos package */
+    marpa_luaL_loadstring(L, loader_kollos);
+    marpa_lua_setfield(L, preload_ix, "kollos");
+
     /* Set up preload of glue package */
     marpa_luaL_loadstring(L, loader_glue);
     marpa_lua_setfield(L, preload_ix, "glue");
