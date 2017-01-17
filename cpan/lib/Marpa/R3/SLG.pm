@@ -144,9 +144,7 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     $load_result //= "[undef]";
     Marpa::R3::exception("Kollos::load failed: $load_result\n$error") if $load_result ne 'OK';
 
-    ($load_result) = $kollos->raw_exec($Marpa::R3::Lua::Glue::load);
-    $load_result //= "[undef]";
-    Marpa::R3::exception("Glue::load failed: $load_result") if $load_result ne 'OK';
+    $kollos->raw_exec("glue = require'glue'");
 
     state $op_lua = Marpa::R3::Thin::op('lua');
     $thin_slg->call_by_tag(
