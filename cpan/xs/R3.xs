@@ -4862,6 +4862,14 @@ PPCODE:
 
     marpa_luaL_openlibs (L);    /* open libraries */
 
+    marpa_luaopen_kollos(L); /* Open kollos library */
+    /* Lua stack: [ kollos_table ] */
+    kollos_ix = marpa_lua_gettop(L);
+
+    /* _G.kollos = kollos */
+    marpa_lua_pushvalue(L, kollos_ix);
+    marpa_lua_setglobal(L, "kollos");
+
     /* Get the preload table and leave it on the stack */
     marpa_lua_getglobal(L, "package");
     marpa_lua_getfield(L, -1, "preload");
@@ -4878,14 +4886,6 @@ PPCODE:
     /* Set up preload of glue package */
     marpa_luaL_loadstring(L, loader_glue);
     marpa_lua_setfield(L, preload_ix, "glue");
-
-    marpa_luaopen_kollos(L); /* Open kollos library */
-    /* Lua stack: [ kollos_table ] */
-    kollos_ix = marpa_lua_gettop(L);
-
-    /* _G.kollos = kollos */
-    marpa_lua_pushvalue(L, kollos_ix);
-    marpa_lua_setglobal(L, "kollos");
 
     marpa_lua_getfield(L, kollos_ix, "class_slg");
     marpa_lua_getfield(L, kollos_ix, "upvalues");
