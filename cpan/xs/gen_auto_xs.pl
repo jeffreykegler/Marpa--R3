@@ -183,7 +183,6 @@ say {$out} gp_generate(qw(symbol_is_terminal Marpa_Symbol_ID symbol_id));
 say {$out} gp_generate(qw(symbol_is_terminal_set Marpa_Symbol_ID symbol_id int boolean));
 say {$out} gp_generate(qw(symbol_is_valued Marpa_Symbol_ID symbol_id));
 say {$out} gp_generate(qw(symbol_is_valued_set Marpa_Symbol_ID symbol_id int boolean));
-say {$out} gp_generate(qw(symbol_new));
 say {$out} gp_generate(qw(zwa_new int default_value));
 say {$out} gp_generate(qw(zwa_place Marpa_Assertion_ID zwaid Marpa_Rule_ID xrl_id int rhs_ix));
 

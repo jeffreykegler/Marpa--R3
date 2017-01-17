@@ -29,6 +29,9 @@
 #define STRINGIFY(macro_or_string)        STRINGIFY_ARG (macro_or_string)
 #define STRLOC        __FILE__ ":" STRINGIFY (__LINE__)
 
+#undef LUA_TAG
+#define LUA_TAG "@" STRLOC
+
 #undef MAX
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 
@@ -459,7 +462,7 @@ coerce_to_av (lua_State * L, int visited_ix, int table_ix, char signature)
     const int ix_offset = (signature - '0') - 1;
 
     /* We call this recursively, so we need to make sure we have enough stack */
-    marpa_luaL_checkstack(L, 20, "coerce_to_av");
+    marpa_luaL_checkstack(L, 20, LUA_TAG);
     /* Lua stack: [] */
     marpa_lua_pushvalue(L, table_ix);
     /* Lua stack: [table_ix] */
@@ -523,7 +526,7 @@ coerce_to_pairs (lua_State * L, int visited_ix, int table_ix)
     const int base_of_stack = marpa_lua_gettop(L);
 
     /* We call this recursively, so we need to make sure we have enough stack */
-    marpa_luaL_checkstack(L, 20, "coerce_to_pairs");
+    marpa_luaL_checkstack(L, 20, LUA_TAG);
     /* Lua stack: [] */
     marpa_lua_pushvalue(L, table_ix);
     /* Lua stack: [table_ix] */
@@ -667,7 +670,7 @@ static const char* handle_pcall_error (lua_State* L, int status) {
      * about having enough Lua stack.
      */
     /* Lua stack: [ exception_object ] */
-    marpa_lua_checkstack(L, 20);
+    marpa_luaL_checkstack(L, 20, LUA_TAG);
     marpa_lua_pushvalue(L, exception_object);
     marpa_lua_setglobal(L, "last_exception");
     /* Lua stack: [ exception_object ] */
@@ -1400,7 +1403,7 @@ call_by_tag (lua_State * L, const char* tag, const char *codestr,
         /* warn("%s %d narg=%d", __FILE__, __LINE__, narg); */
         if (!marpa_lua_checkstack (L, LUA_MINSTACK + 1)) {
             /* This error is not considered recoverable */
-            croak ("Marpa::R3 error: could not grow Lua stack");
+            croak ("Internal Marpa::R3 error; could not grow stack: " LUA_TAG);
         }
         /* warn("%s %d narg=%d *sig=%c", __FILE__, __LINE__, narg, *sig); */
         switch (this_sig) {
@@ -1520,7 +1523,7 @@ u_l0r_new (Outer_R* outer_slr)
     G_Wrapper *lexer_wrapper = slr->slg->l0_wrapper;
 
   call_by_tag (outer_slr->L,
-    STRLOC,
+    LUA_TAG,
     "recce= ...\n"
     "local l0r = kollos.recce_new(recce.slg.lmw_l0g)\n"
     "if not l0r then\n"
@@ -1535,7 +1538,7 @@ u_l0r_new (Outer_R* outer_slr)
         int i;
         int count;
         call_by_tag (outer_slr->L,
-            STRLOC,
+            LUA_TAG,
             "recce = ...\n"
             "local too_many_earley_items = recce.too_many_earley_items\n"
             "if too_many_earley_items >= 0 then\n"
@@ -1554,7 +1557,7 @@ u_l0r_new (Outer_R* outer_slr)
             Marpa_Assertion_ID assertion;
             int terminal;
             call_by_tag (outer_slr->L,
-                STRLOC,
+                LUA_TAG,
                 "recce, ix = ...\n"
                 "return recce.terminals_expected[ix]\n",
                 "Ri>i", outer_slr->lua_ref, i + 1, &terminal);
@@ -1562,7 +1565,7 @@ u_l0r_new (Outer_R* outer_slr)
             assertion = slr->slg->g1_lexeme_to_assertion[terminal];
 
             call_by_tag (outer_slr->L,
-                STRLOC,
+                LUA_TAG,
                 "recce, perl_pos, lexeme, assertion = ...\n"
                 "if assertion >= 0 then\n"
                 "    local result = recce.lmw_l0r:zwa_default_set(assertion, 1)\n"
@@ -1585,7 +1588,7 @@ u_l0r_new (Outer_R* outer_slr)
     }
 
         call_by_tag (outer_slr->L,
-            STRLOC,
+            LUA_TAG,
             "recce = ...\n"
             "local result = recce.lmw_l0r:start_input()\n"
             "if result and result <= -2 then\n"
@@ -1628,7 +1631,7 @@ u_convert_events (Outer_R * outer_slr)
              */
             {
               const int yim_count = (long) marpa_g_event_value (&marpa_event);
-              call_by_tag (outer_slr->L, STRLOC,
+              call_by_tag (outer_slr->L, LUA_TAG,
                   "recce, perl_pos, yim_count = ...\n"
                   "local q = recce.event_queue\n"
                   "q[#q+1] = { 'l0 earley item threshold exceeded', perl_pos, yim_count }\n",
@@ -1682,7 +1685,7 @@ u_read (Outer_R * outer_slr)
     int has_l0r;
 
   call_by_tag (outer_slr->L,
-    STRLOC,
+    LUA_TAG,
     "recce=...; return recce.lmw_l0r and 1 or 0",
     "R>i", outer_slr->lua_ref, &has_l0r);
 
@@ -1691,7 +1694,7 @@ u_read (Outer_R * outer_slr)
     }
 
   call_by_tag (outer_slr->L,
-    STRLOC,
+    LUA_TAG,
     "recce=...\n"
     "local l0r = recce.lmw_l0r\n"
     "if not l0r then\n"
@@ -1730,7 +1733,7 @@ u_read (Outer_R * outer_slr)
             ops = (UV *) SvPV (*p_ops_sv, dummy);
         }
 
-        call_by_tag (outer_slr->L, STRLOC,
+        call_by_tag (outer_slr->L, LUA_TAG,
             "local recce, codepoint, perl_pos = ...\n"
             "if recce.trace_terminals >= 1 then\n"
             "   local q = recce.event_queue\n"
@@ -1769,7 +1772,7 @@ u_read (Outer_R * outer_slr)
                     }
                     value = (int) ops[++op_ix];
                     length = (int) ops[++op_ix];
-                    call_by_tag (outer_slr->L, STRLOC,
+                    call_by_tag (outer_slr->L, LUA_TAG,
                             "recce, symbol_id, value, length = ...\n"
                             "return recce.lmw_l0r:alternative(symbol_id, value, length)\n",
                             "Riii>i",
@@ -1784,7 +1787,7 @@ u_read (Outer_R * outer_slr)
                          */
                         slr->input_symbol_id = symbol_id;
 
-                        call_by_tag (outer_slr->L, STRLOC,
+                        call_by_tag (outer_slr->L, LUA_TAG,
                             "recce, codepoint, perl_pos, symbol_id = ...\n"
                             "if recce.trace_terminals >= 1 then\n"
                             "    local q = recce.event_queue\n"
@@ -1797,7 +1800,7 @@ u_read (Outer_R * outer_slr)
                         break;
                     case MARPA_ERR_NONE:
 
-                        call_by_tag (outer_slr->L, STRLOC,
+                        call_by_tag (outer_slr->L, LUA_TAG,
                             "recce, codepoint, perl_pos, symbol_id = ...\n"
                             "if recce.trace_terminals >= 1 then\n"
                             "   local q = recce.event_queue\n"
@@ -1835,7 +1838,7 @@ u_read (Outer_R * outer_slr)
                         return U_READ_REJECTED_CHAR;
                     }
 
-                    call_by_tag (outer_slr->L, STRLOC,
+                    call_by_tag (outer_slr->L, LUA_TAG,
                         "recce = ...\n"
                         "return recce.lmw_l0r:earleme_complete()\n",
                         "R>i",
@@ -1846,7 +1849,7 @@ u_read (Outer_R * outer_slr)
                         u_convert_events (outer_slr);
                         /* Advance one character before returning */
 
-                      call_by_tag (outer_slr->L, STRLOC,
+                      call_by_tag (outer_slr->L, LUA_TAG,
                           "recce = ...\n"
                           "return recce.lmw_l0r:is_exhausted()\n",
                           "R>i",
@@ -1882,7 +1885,7 @@ u_read (Outer_R * outer_slr)
         {
             int trace_terminals;
             slr->perl_pos++;
-            call_by_tag (outer_slr->L, STRLOC,
+            call_by_tag (outer_slr->L, LUA_TAG,
                 "recce = ...\n"
                 "return recce.trace_terminals\n",
                 "R>i", outer_slr->lua_ref, &trace_terminals);
@@ -2127,7 +2130,7 @@ marpa_inner_slr_new (Outer_G* outer_slg)
 
     slr->token_values = newAV ();
 
-    call_by_tag (outer_slg->L, STRLOC,
+    call_by_tag (outer_slg->L, LUA_TAG,
         "grammar = ...\n"
         "local g1g = grammar.lmw_g1g\n"
         "local kollos = getmetatable(g1g).kollos\n"
@@ -2199,7 +2202,9 @@ static Scanless_R* slr_inner_get(Outer_R* outer_slr) {
     const int base_of_stack = marpa_lua_gettop(L);
     Scanless_R *slr;
     /* Necessary every time to check stack ?? */
-    marpa_lua_checkstack(L, 20);
+    if (!marpa_lua_checkstack(L, 20)) {
+        croak ("Internal Marpa::R3 error; could not grow stack: " LUA_TAG);
+    }
     marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, lua_ref);
     /* Lua stack: [ recce_table ] */
     marpa_lua_getfield(L, -1, "lud");
@@ -2254,7 +2259,7 @@ slr_convert_events ( Outer_R *outer_slr)
             /* Do nothing about exhaustion on success */
             break;
         case MARPA_EVENT_SYMBOL_COMPLETED:
-            call_by_tag (outer_slr->L, STRLOC,
+            call_by_tag (outer_slr->L, LUA_TAG,
                 "recce, symbol = ...\n"
                 "local q = recce.event_queue\n"
                 "q[#q+1] = { 'symbol completed', symbol}\n",
@@ -2264,7 +2269,7 @@ slr_convert_events ( Outer_R *outer_slr)
             break;
 
         case MARPA_EVENT_SYMBOL_NULLED:
-            call_by_tag (outer_slr->L, STRLOC,
+            call_by_tag (outer_slr->L, LUA_TAG,
                 "recce, symbol = ...\n"
                 "local q = recce.event_queue\n"
                 "q[#q+1] = { 'symbol nulled', symbol}\n",
@@ -2273,7 +2278,7 @@ slr_convert_events ( Outer_R *outer_slr)
             );
             break;
         case MARPA_EVENT_SYMBOL_PREDICTED:
-            call_by_tag (outer_slr->L, STRLOC,
+            call_by_tag (outer_slr->L, LUA_TAG,
                 "recce, symbol = ...\n"
                 "local q = recce.event_queue\n"
                 "q[#q+1] = { 'symbol predicted', symbol}\n",
@@ -2290,7 +2295,7 @@ slr_convert_events ( Outer_R *outer_slr)
              * can be turned off by raising
              * the Earley item warning threshold.
              */
-            call_by_tag (outer_slr->L, STRLOC,
+            call_by_tag (outer_slr->L, LUA_TAG,
                 "recce, perl_pos, yim_count = ...\n"
                 "local q = recce.event_queue\n"
                 "q[#q+1] = { 'g1 earley item threshold exceeded', perl_pos, yim_count}\n",
@@ -2307,7 +2312,7 @@ slr_convert_events ( Outer_R *outer_slr)
                     result_string =
                         form ("unknown marpa_r event code, %d", event_type);
                 }
-                call_by_tag (outer_slr->L, STRLOC,
+                call_by_tag (outer_slr->L, LUA_TAG,
                     "recce, result_string = ...\n"
                     "local q = recce.event_queue\n"
                     "q[#q+1] = { 'unknown marpa_r event', result_string}\n",
@@ -2345,7 +2350,7 @@ r_convert_events ( Outer_R *outer_slr)
             {
               Marpa_Symbol_ID completed_symbol =
                 marpa_g_event_value (&marpa_event);
-              call_by_tag (outer_slr->L, STRLOC,
+              call_by_tag (outer_slr->L, LUA_TAG,
                   "recce, completed_symbol = ...\n"
                   "local q = recce.event_queue\n"
                   "q[#q+1] = { 'symbol completed', completed_symbol}\n",
@@ -2359,7 +2364,7 @@ r_convert_events ( Outer_R *outer_slr)
             {
               Marpa_Symbol_ID nulled_symbol =
                 marpa_g_event_value (&marpa_event);
-              call_by_tag (outer_slr->L, STRLOC,
+              call_by_tag (outer_slr->L, LUA_TAG,
                   "recce, nulled_symbol = ...\n"
                   "local q = recce.event_queue\n"
                   "q[#q+1] = { 'symbol nulled', nulled_symbol}\n",
@@ -2373,7 +2378,7 @@ r_convert_events ( Outer_R *outer_slr)
             {
               Marpa_Symbol_ID predicted_symbol =
                 marpa_g_event_value (&marpa_event);
-              call_by_tag (outer_slr->L, STRLOC,
+              call_by_tag (outer_slr->L, LUA_TAG,
                   "recce, predicted_symbol = ...\n"
                   "local q = recce.event_queue\n"
                   "q[#q+1] = { 'symbol predicted', predicted_symbol}\n",
@@ -2401,7 +2406,7 @@ r_convert_events ( Outer_R *outer_slr)
         default:
             {
               const char *result_string = event_type_to_string (event_type);
-              call_by_tag (outer_slr->L, STRLOC,
+              call_by_tag (outer_slr->L, LUA_TAG,
                   "recce, result_string, event_ix, event_type = ...\n"
                   "if result_string == '' then\n"
                   "    result_string = string.format(\n"
@@ -2450,7 +2455,7 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
     enum pass1_result_type pass1_result = none;
 
   call_by_tag (outer_slr->L,
-    STRLOC,
+    LUA_TAG,
     "recce=...\n"
     "local l0r = recce.lmw_l0r\n"
     "if not l0r then\n"
@@ -2462,7 +2467,7 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
     marpa_slr_lexeme_clear (slr);
 
 
-    call_by_tag (outer_slr->L, STRLOC,
+    call_by_tag (outer_slr->L, LUA_TAG,
         "recce = ...\n"
         "return recce.lmw_l0r:latest_earley_set()\n",
         "R>i",
@@ -2476,7 +2481,7 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
         int end_of_earley_items = 0;
         working_pos = slr->start_of_lexeme + earley_set;
 
-        call_by_tag (outer_slr->L, STRLOC,
+        call_by_tag (outer_slr->L, LUA_TAG,
             "recce, earley_set = ...\n"
             "local return_value = recce.lmw_l0r:progress_report_start(earley_set)\n"
             "if return_value < 0 then\n"
@@ -2496,7 +2501,7 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
             int origin;
             int rule_id;
 
-            call_by_tag (outer_slr->L, STRLOC,
+            call_by_tag (outer_slr->L, LUA_TAG,
                 "recce = ...\n"
                 "local rule_id, dot_position, origin = recce.lmw_l0r:progress_item()\n"
                 "if not rule_id then return -1, 0, 0 end\n"
@@ -2539,7 +2544,7 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
             l0_rule_g_properties = slg->l0_rule_g_properties + rule_id;
             symbol_r_properties = slr->symbol_r_properties + g1_lexeme;
 
-            call_by_tag (outer_slr->L, STRLOC,
+            call_by_tag (outer_slr->L, LUA_TAG,
                 "recce, g1_lexeme, start_of_lexeme, end_of_lexeme = ...\n"
                 "local is_expected = recce.lmw_g1r:terminal_is_expected(g1_lexeme)\n"
                 "if not is_expected then\n"
@@ -2617,7 +2622,7 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
                         MARPA_SLRTR_LEXEME_OUTPRIORITIZED;
                     lexeme_stack_event->t_lexeme_acceptable.t_required_priority =
                         high_lexeme_priority;
-                        call_by_tag (outer_slr->L, STRLOC,
+                        call_by_tag (outer_slr->L, LUA_TAG,
                             "recce, lexeme_start, lexeme_end,\n"
                             "    g1_lexeme, priority, required_priority = ...\n"
                             "if recce.trace_terminals > 0 then\n"
@@ -2642,7 +2647,7 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
                      * lexer rule.
                      * The upper level will have to figure things out.
                      */
-                    call_by_tag (outer_slr->L, STRLOC,
+                    call_by_tag (outer_slr->L, LUA_TAG,
                         "recce, rule_id, lexeme_start, lexeme_end = ...\n"
                         "if recce.trace_terminals > 0 then\n"
                         "local q = recce.event_queue\n"
@@ -2663,7 +2668,7 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
                     if (!l0_rule_r_properties->t_event_on_discard_active) {
                         goto NEXT_LEXEME_EVENT;
                     }
-                    call_by_tag (outer_slr->L, STRLOC,
+                    call_by_tag (outer_slr->L, LUA_TAG,
                         "recce, rule_id, lexeme_start, lexeme_end = ...\n"
                         "local q = recce.event_queue\n"
                         "local g1r = recce.lmw_g1r\n"
@@ -2723,7 +2728,7 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
                         lexeme_entry->t_lexeme_acceptable.t_start_of_lexeme;
                     slr->end_of_pause_lexeme =
                         lexeme_entry->t_lexeme_acceptable.t_end_of_lexeme;
-                        call_by_tag (outer_slr->L, STRLOC,
+                        call_by_tag (outer_slr->L, LUA_TAG,
                             "recce, lexeme_start, lexeme_end, g1_lexeme = ...\n"
                             "local q = recce.event_queue\n"
                             "if recce.trace_terminals > 2 then\n"
@@ -2757,7 +2762,7 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
                 const struct symbol_r_properties *symbol_r_properties =
                     slr->symbol_r_properties + g1_lexeme;
 
-                            call_by_tag (outer_slr->L, STRLOC,
+                            call_by_tag (outer_slr->L, LUA_TAG,
                                 "recce, lexeme_start, lexeme_end, g1_lexeme = ...\n"
                                 "if recce.trace_terminals > 2 then\n"
                                 "    local q = recce.event_queue\n"
@@ -2786,7 +2791,7 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
                     break;
 
                 case MARPA_ERR_DUPLICATE_TOKEN:
-                            call_by_tag (outer_slr->L, STRLOC,
+                            call_by_tag (outer_slr->L, LUA_TAG,
                                 "recce, lexeme_start, lexeme_end, lexeme = ...\n"
                                 "if recce.trace_terminals > 0 then\n"
                                 "    local q = recce.event_queue\n"
@@ -2802,7 +2807,7 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
                     break;
 
                 case MARPA_ERR_NONE:
-                            call_by_tag (outer_slr->L, STRLOC,
+                            call_by_tag (outer_slr->L, LUA_TAG,
                                 "recce, lexeme_start, lexeme_end, lexeme = ...\n"
                                 "if recce.trace_terminals > 0 then\n"
                                 "    local q = recce.event_queue\n"
@@ -2820,7 +2825,7 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
                         slr->end_of_pause_lexeme =
                             event->t_lexeme_acceptable.t_end_of_lexeme;
 
-                            call_by_tag (outer_slr->L, STRLOC,
+                            call_by_tag (outer_slr->L, LUA_TAG,
                                 "recce, lexeme_start, lexeme_end, lexeme = ...\n"
                                 "local q = recce.event_queue\n"
                                 "if recce.trace_terminals > 2 then\n"
@@ -2850,7 +2855,7 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
 
 
 
-        call_by_tag (outer_slr->L, STRLOC,
+        call_by_tag (outer_slr->L, LUA_TAG,
             "local recce = ...\n"
             "local g1r = recce.lmw_g1r\n"
             "return g1r:earleme_complete()\n"
@@ -2866,7 +2871,7 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
             slr_convert_events (outer_slr);
         }
 
-      call_by_tag (outer_slr->L, STRLOC,
+      call_by_tag (outer_slr->L, LUA_TAG,
           "local recce, start_pos, lexeme_length = ...\n"
           "local g1r = recce.lmw_g1r\n"
           "local latest_earley_set = g1r:latest_earley_set()\n"
@@ -2891,7 +2896,7 @@ slr_es_span_to_literal_sv (Scanless_R * slr, lua_State* L,
   int l0_start;
   int l0_length;
 
-  call_by_tag (L, STRLOC,
+  call_by_tag (L, LUA_TAG,
       "-- this logic is careless about the l0_start when l0_length == 0\n"
       "-- because the purpose is to find a literal and all zero length literals\n"
       "-- are the same\n"
@@ -3962,7 +3967,10 @@ PPCODE:
     const int base_of_stack = marpa_lua_gettop(L);
     int slr_ix;
 
-    marpa_luaL_checkstack(L, 20, "out of stack in slr->new()");
+    if (!marpa_lua_checkstack(L, 20))
+    {
+        croak ("Internal Marpa::R3 error; could not grow stack: " LUA_TAG);
+    }
     outer_slr->L = L;
     /* Take ownership of a new reference to the Lua state */
     lua_refinc(L);
@@ -3986,7 +3994,7 @@ PPCODE:
   slr->outer_slr_lua_ref = outer_slr->lua_ref;
   kollos_robrefinc(L, outer_slr->lua_ref);
 
-  call_by_tag (outer_slr->L, STRLOC,
+  call_by_tag (outer_slr->L, LUA_TAG,
       "local recce = ...\n"
       "recce.lmw_g1r = kollos.recce_new(recce.slg.lmw_g1g)\n"
       "recce.too_many_earley_items = -1\n"
@@ -4006,7 +4014,7 @@ DESTROY( outer_slr )
     Outer_R *outer_slr;
 PPCODE:
 {
-  call_by_tag (outer_slr->L, STRLOC,
+  call_by_tag (outer_slr->L, LUA_TAG,
       "local recce = ...\n"
       "valuation_reset(recce)\n"
       "return 0\n",
@@ -4068,7 +4076,7 @@ PPCODE:
   slr->end_of_pause_lexeme = -1;
 
   /* Clear event queue */
-  call_by_tag (outer_slr->L, STRLOC,
+  call_by_tag (outer_slr->L, LUA_TAG,
       "local recce = ...\n"
       "recce.event_queue = {}\n",
       "R>", outer_slr->lua_ref);
@@ -4087,7 +4095,7 @@ PPCODE:
 
           slr->start_of_lexeme = slr->perl_pos = slr->lexer_start_pos;
           slr->lexer_start_pos = -1;
-                            call_by_tag (outer_slr->L, STRLOC,
+                            call_by_tag (outer_slr->L, LUA_TAG,
                                 "local recce, perl_pos = ...\n"
                                 "recce.lmw_l0r = nil\n"
                                 "if recce.trace_terminals >= 1 then\n"
@@ -4128,7 +4136,7 @@ PPCODE:
         {
           int discard_mode;
 
-          call_by_tag (outer_slr->L, STRLOC,
+          call_by_tag (outer_slr->L, LUA_TAG,
               "local recce = ...\n"
               "local g1r = recce.lmw_g1r\n"
               "return g1r:is_exhausted()\n"
@@ -4144,7 +4152,7 @@ PPCODE:
 
       {
         int event_count;
-        call_by_tag (outer_slr->L, STRLOC,
+        call_by_tag (outer_slr->L, LUA_TAG,
             "local recce = ...\n"
             "return #recce.event_queue\n",
             "R>i", outer_slr->lua_ref, &event_count);
@@ -4156,7 +4164,7 @@ PPCODE:
 
         {
             int trace_terminals;
-            call_by_tag (outer_slr->L, STRLOC,
+            call_by_tag (outer_slr->L, LUA_TAG,
                 "recce = ...\n"
                 "return recce.trace_terminals\n",
                 "R>i", outer_slr->lua_ref, &trace_terminals);
@@ -4258,7 +4266,7 @@ PPCODE:
     {
     case 2:
     { int value_is_literal;
-            call_by_tag (outer_slr->L, STRLOC,
+            call_by_tag (outer_slr->L, LUA_TAG,
                 "recce = ...\n"
                 "local g1r = recce.lmw_g1r\n"
                 "local kollos = getmetatable(g1r).kollos\n"
@@ -4277,7 +4285,7 @@ PPCODE:
         SV *token_value = ST (2);
         if (IS_PERL_UNDEF (token_value))
           { int value_is_undef;
-            call_by_tag (outer_slr->L, STRLOC,
+            call_by_tag (outer_slr->L, LUA_TAG,
                 "recce = ...\n"
                 "local g1r = recce.lmw_g1r\n"
                 "local kollos = getmetatable(g1r).kollos\n"
@@ -4301,7 +4309,7 @@ PPCODE:
         }
         av_push (slr->token_values, newSVsv (token_value));
         token_ix = av_len (slr->token_values);
-        call_by_tag (outer_slr->L, STRLOC,
+        call_by_tag (outer_slr->L, LUA_TAG,
             "local recce, token_sv = ...;\n"
             "local new_token_ix = #recce.token_values + 1\n"
             "recce.token_values[new_token_ix] = token_sv\n"
@@ -4316,7 +4324,7 @@ PPCODE:
     }
 
 
-    call_by_tag (outer_slr->L, STRLOC,
+    call_by_tag (outer_slr->L, LUA_TAG,
         "recce, symbol_id, token_ix = ...\n"
         "local g1r = recce.lmw_g1r\n"
         "local return_value = g1r:alternative(symbol_id, token_ix, 1)\n"
@@ -4379,7 +4387,7 @@ PPCODE:
     lexeme_length = end_pos - start_pos;
   }
 
-  call_by_tag (outer_slr->L, STRLOC,
+  call_by_tag (outer_slr->L, LUA_TAG,
       "local recce = ...\n"
       "local g1r = recce.lmw_g1r\n"
       "recce.event_queue = {}\n"
@@ -4393,7 +4401,7 @@ PPCODE:
     {
       r_convert_events (outer_slr);
 
-      call_by_tag (outer_slr->L, STRLOC,
+      call_by_tag (outer_slr->L, LUA_TAG,
           "local recce, start_pos, lexeme_length = ...\n"
           "local g1r = recce.lmw_g1r\n"
           "local latest_earley_set = g1r:latest_earley_set()\n"
@@ -4407,7 +4415,7 @@ PPCODE:
   {
       const int error = marpa_g_error (slr->g1_wrapper->g, NULL);
       if (error == MARPA_ERR_PARSE_EXHAUSTED) {
-          call_by_tag (outer_slr->L, STRLOC,
+          call_by_tag (outer_slr->L, LUA_TAG,
               "recce, = ...\n"
               "local q = recce.event_queue\n"
               "q[#q+1] = { 'no acceptable input' }\n",
@@ -4742,7 +4750,7 @@ PPCODE:
     int result;
     SV *new_values;
 
-    call_by_tag (outer_slr->L, STRLOC,
+    call_by_tag (outer_slr->L, LUA_TAG,
         "local recce = ...; return find_and_do_ops(recce)\n",
         "R>iM", outer_slr->lua_ref, &result, &new_values);
 
@@ -4751,7 +4759,7 @@ PPCODE:
         {
             SV* step_type;
             int parm2;
-            call_by_tag (outer_slr->L, STRLOC,
+            call_by_tag (outer_slr->L, LUA_TAG,
               "local recce = ...\n"
               "local this = recce.this_step\n"
               "local step_type = this.type\n"
@@ -4767,7 +4775,7 @@ PPCODE:
     case 1:
         {
             SV* step_type;
-            call_by_tag (outer_slr->L, STRLOC,
+            call_by_tag (outer_slr->L, LUA_TAG,
               "local recce = ...\n"
               "return recce.this_step.type\n",
               "R>C", outer_slr->lua_ref, &step_type);
@@ -4790,7 +4798,7 @@ PPCODE:
   G_Wrapper *g1_wrapper = slr->g1_wrapper;
   int gp_result;
 
-    call_by_tag (outer_slr->L, STRLOC,
+    call_by_tag (outer_slr->L, LUA_TAG,
         "recce = ...\n"
         "local g1r = recce.lmw_g1r\n"
         "local return_value = g1r:start_input()\n"
@@ -4823,6 +4831,7 @@ PPCODE:
     lua_State *L;
     struct lua_extraspace *p_extra;
     int kollos_ix;
+    int preload_ix;
 
     Newx (lua_wrapper, 1, Marpa_Lua);
 
@@ -4835,11 +4844,26 @@ PPCODE:
 
     base_of_stack = marpa_lua_gettop(L);
 
+    /* Get lots of stack,
+     * 1.) to avoid a lot of minor lua_pop()'s
+     * 2.) to allow us to freely store things in fixed locations
+     *     on the stack.
+     */
+    if (!marpa_lua_checkstack(L, 50))
+    {
+        croak ("Internal Marpa::R3 error; could not grow stack: " LUA_TAG);
+    }
+
     Newx( p_extra, 1, struct lua_extraspace);
     *(struct lua_extraspace **)marpa_lua_getextraspace(L) = p_extra;
     p_extra->ref_count = 1;
 
     marpa_luaL_openlibs (L);    /* open libraries */
+
+    /* Get the preload table and leave it on the stack */
+    marpa_lua_getglobal(L, "package");
+    marpa_lua_getfield(L, -1, "preload");
+    preload_ix = marpa_lua_gettop(L);
 
     marpa_luaopen_kollos(L); /* Open kollos library */
     /* Lua stack: [ kollos_table ] */

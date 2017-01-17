@@ -62,7 +62,7 @@ local header = [[
 ]]
 
 io.write(header)
-io.write(string.format("static char %s_string[] =\n", string_name))
+io.write(string.format("static char loader_%s[] =\n", string_name))
 for line in io.input():lines("L") do
     local line_out = line:gsub('[%c%"\\]',
         function (str)

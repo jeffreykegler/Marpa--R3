@@ -153,7 +153,7 @@ sub postamble {
 
     push @postamble_pieces, <<'END_OF_POSTAMBLE_PIECE';
 R3.c: marpa_slifop.h marpa_xs.h auto.xs exec_lua.xs \
-      ../kollos/kollos.h inspect.c
+      ../kollos/kollos.h inspect_inc.c
 
 auto.xs: gen_auto_xs.pl
 	$(PERLRUN) gen_auto_xs.pl $@
@@ -164,7 +164,7 @@ exec_lua.xs: gen_exec_lua.pl
 marpa_slifop.h: create_ops.pl
 	$(PERLRUN) create_ops.pl > marpa_slifop.h
 
-inspect.c: $(INSPECT_LUA)
+inspect_inc.c: $(INSPECT_LUA)
 	LUA_PATH=$(LUA_PATH) $(LUA_INTERP) string2h.lua inspect < $? > $@
 
 END_OF_POSTAMBLE_PIECE
