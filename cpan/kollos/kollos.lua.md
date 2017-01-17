@@ -2585,7 +2585,8 @@ a special "configuration" argument.
     -- miranda: section main
     -- miranda: insert legal preliminaries
     -- miranda: insert luacheck declarations
-    -- miranda: insert enforce strict globals
+
+    require "strict"
 
     local _M = require "kollos.metal"
 
@@ -2645,46 +2646,6 @@ Luacheck declarations
     -- luacheck: std lua53
     -- luacheck: globals bit
     -- luacheck: globals __FILE__ __LINE__
-
-```
-
-Set "strict" globals, using code taken from strict.lua.
-
-```
-
-    -- miranda: section enforce strict globals
-    do
-        local mt = getmetatable(_G)
-        if mt == nil then
-          mt = {}
-          setmetatable(_G, mt)
-        end
-
-        mt.__declared = {}
-
-        local function what ()
-          local d = debug.getinfo(3, "S")
-          return d and d.what or "C"
-        end
-
-        mt.__newindex = function (t, n, v)
-          if not mt.__declared[n] then
-            local w = what()
-            if w ~= "main" and w ~= "C" then
-              error("assign to undeclared variable '"..n.."'", 2)
-            end
-            mt.__declared[n] = true
-          end
-          rawset(t, n, v)
-        end
-
-        mt.__index = function (t, n)
-          if not mt.__declared[n] and what() ~= "C" then
-            error("variable '"..n.."' is not declared", 2)
-          end
-          return rawget(t, n)
-        end
-    end
 
 ```
 
