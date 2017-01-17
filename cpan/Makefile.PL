@@ -373,19 +373,10 @@ END_OF_POSTAMBLE_PIECE
 
 if ($^O eq 'MSWin32'){
     push @postamble_pieces, <<'END_OF_POSTAMBLE_PIECE';
-all :: lib\Marpa\R3\Lua\Glue.pm
-
-all :: lib\Marpa\R3\Lua\Kollos.pm
 
 all :: inc\Marpa\R3\Lua\Test\Builder.pm
 
 all :: inc\Marpa\R3\Lua\Test\More.pm
-
-lib\Marpa\R3\Lua\Glue.pm: glue\glue.lua lib\Marpa\R3\Lua\Glue.PL
-	$(PERLRUN) lib\Marpa\R3\Lua\Glue.PL lib\Marpa\R3\Lua\Glue.pm
-
-lib\Marpa\R3\Lua\Kollos.pm: kollos\kollos.lua lib\Marpa\R3\Lua\Kollos.PL
-	$(PERLRUN) lib\Marpa\R3\Lua\Kollos.PL lib\Marpa\R3\Lua\Kollos.pm
 
 inc\Marpa\R3\Lua\Test\Builder.pm: inc\Marpa\R3\Lua\Test\Builder.lua inc\Marpa\R3\Lua\Test\Builder.PL
 	$(PERLRUN) inc\Marpa\R3\Lua\Test\Builder.PL inc\Marpa\R3\Lua\Test\Builder.pm
@@ -397,17 +388,10 @@ END_OF_POSTAMBLE_PIECE
 }
 else{
     push @postamble_pieces, <<'END_OF_POSTAMBLE_PIECE';
-all :: lib/Marpa/R3/Lua/Kollos.pm
 
 all :: inc/Marpa/R3/Lua/Test/Builder.pm
 
 all :: inc/Marpa/R3/Lua/Test/More.pm
-
-lib/Marpa/R3/Lua/Glue.pm: glue/glue.lua lib/Marpa/R3/Lua/Glue.PL
-	$(PERLRUN) lib/Marpa/R3/Lua/Glue.PL lib/Marpa/R3/Lua/Glue.pm
-
-lib/Marpa/R3/Lua/Kollos.pm: kollos/kollos.lua lib/Marpa/R3/Lua/Kollos.PL
-	$(PERLRUN) lib/Marpa/R3/Lua/Kollos.PL lib/Marpa/R3/Lua/Kollos.pm
 
 inc/Marpa/R3/Lua/Test/Builder.pm: inc/Marpa/R3/Lua/Test/Builder.lua inc/Marpa/R3/Lua/Test/Builder.PL
 	$(PERLRUN) inc/Marpa/R3/Lua/Test/Builder.PL inc/Marpa/R3/Lua/Test/Builder.pm
@@ -476,8 +460,6 @@ WriteMakefile(
         q[lib/Marpa/R3/MetaG.pm]     => q[$(INST_LIB)/Marpa/R3/MetaG.pm],
         q[lib/Marpa/R3/SLG.pm]       => q[$(INST_LIB)/Marpa/R3/SLG.pm],
         q[lib/Marpa/R3/SLR.pm]       => q[$(INST_LIB)/Marpa/R3/SLR.pm],
-        q[lib/Marpa/R3/Lua/Glue.pm]  => q[$(INST_LIB)/Marpa/R3/Lua/Glue.pm],
-        q[lib/Marpa/R3/Lua/Kollos.pm]  => q[$(INST_LIB)/Marpa/R3/Lua/Kollos.pm],
         q[lib/Marpa/R3/Trace/G.pm] => q[$(INST_LIB)/Marpa/R3/Trace/G.pm],
         q[lib/Marpa/R3/Value.pm]   => q[$(INST_LIB)/Marpa/R3/Value.pm],
         q[lib/Marpa/R3/Version.pm] => q[$(INST_LIB)/Marpa/R3/Version.pm],

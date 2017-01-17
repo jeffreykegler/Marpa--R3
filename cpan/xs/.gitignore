@@ -2,8 +2,9 @@
 /auto[.]o
 /auto[.]xs
 /exec_lua[.]xs
-/glue[.]lua
+/glue_inc[.]c
 /inspect_inc[.]c
+/kollos_inc[.]c
 /libmarpa[.]a
 /Makefile
 /Makefile[.]old
