@@ -130,10 +130,11 @@ Set "strict" globals, using code taken from strict.lua.
 ```
 
     -- miranda: section enforce strict globals
+    local strict_mt = {}
     do
         local mt = getmetatable(_G)
         if mt == nil then
-          mt = {}
+          mt = strict_mt
           setmetatable(_G, mt)
         end
 
@@ -161,9 +162,28 @@ Set "strict" globals, using code taken from strict.lua.
           end
           return rawget(t, n)
         end
+
+        function strict_on()
+            local G_mt = getmetatable(_G)
+            if G_mt == nil then
+              setmetatable(_G, strict_mt)
+            end
+        end
+
+        function strict_off()
+            local G_mt = getmetatable(_G)
+            if G_mt == strict_mt then
+              setmetatable(_G, nil)
+            end
+        end
+
+        package.loaded["strict"] = {
+            on = strict_on,
+            off = strict_off
+        }
+
     end
 
-    package.loaded["strict"] = {}
 
 ```
 
