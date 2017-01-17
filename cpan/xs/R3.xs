@@ -2955,7 +2955,7 @@ get_mortalspace (size_t nbytes)
     return (void *) SvPVX (mortal);
 }
 
-#include "inspect.c"
+#include "inspect_inc.c"
 
 MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin
 
@@ -4864,6 +4864,10 @@ PPCODE:
     marpa_lua_getglobal(L, "package");
     marpa_lua_getfield(L, -1, "preload");
     preload_ix = marpa_lua_gettop(L);
+
+    /* Set up preload of inspect package */
+    marpa_luaL_loadstring(L, loader_inspect);
+    marpa_lua_setfield(L, preload_ix, "inspect");
 
     marpa_luaopen_kollos(L); /* Open kollos library */
     /* Lua stack: [ kollos_table ] */

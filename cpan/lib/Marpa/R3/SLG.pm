@@ -138,9 +138,7 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     # Stuff in Lua
     my ($load_result, $error);
 
-    ($load_result, $error) = $kollos->raw_exec($Marpa::R3::Lua::Inspect::load);
-    $load_result //= "[undef]";
-    Marpa::R3::exception("Inspect::load failed: $load_result\n$error") if $load_result ne 'OK';
+    $kollos->raw_exec("inspect = require'inspect'");
 
     ($load_result, $error) = $kollos->raw_exec($Marpa::R3::Lua::Kollos::load);
     $load_result //= "[undef]";
