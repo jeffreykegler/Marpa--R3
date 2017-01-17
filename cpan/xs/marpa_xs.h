@@ -23,6 +23,8 @@
 #include <lualib.h>
 #include <lauxlib.h>
 
+#undef LUAOPEN_KOLLOS_METAL
+#define LUAOPEN_KOLLOS_METAL kollos_metal_loader
 #include <kollos.h>
 
 typedef unsigned int Marpa_Codepoint;

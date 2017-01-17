@@ -4005,13 +4005,18 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
 ### Kollos metal loader
 
 To make this a real module, this fuction must be named "luaopen_kollos_metal".
-This might be accomplished via a "#define".
+The LUAOPEN_KOLLOS_METAL define allows us to override this for a declaration
+compatible with static loading and namespace requirements like those of
+Marpa::R3.
 
 ```
     -- miranda: section+ C function declarations
-    int kollos_metal_loader(lua_State *L);
+    #if !defined(LUAOPEN_KOLLOS_METAL)
+    #define LUAOPEN_KOLLOS_METAL luaopen_kollos_metal
+    #endif
+    int LUAOPEN_KOLLOS_METAL(lua_State *L);
     -- miranda: section define kollos_metal_loader method
-    int kollos_metal_loader(lua_State *L)
+    int LUAOPEN_KOLLOS_METAL(lua_State *L)
     {
         /* The main kollos object */
         int kollos_table_stack_ix;

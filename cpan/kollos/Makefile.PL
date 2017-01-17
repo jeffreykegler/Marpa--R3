@@ -153,7 +153,9 @@ kollos.h: kollos.lua.md
 kollos$(LIB_EXT): kollos.c
 	$(RM_RF) $@
 	$(CC) -c $(PASTHRU_INC) $(INC) $(CCFLAGS) $(MY_CCFLAGS) $(OPTIMIZE) \
-	  $(CCCDLFLAGS) $(PASTHRU_DEFINE) $(DEFINE) -DMAKE_LIB kollos.c
+	  $(CCCDLFLAGS) $(PASTHRU_DEFINE) $(DEFINE) -DMAKE_LIB \
+	  -DLUAOPEN_KOLLOS_METAL=kollos_metal_loader \
+	  kollos.c
 	$(AR) -out:$@ kollos$(OBJ_EXT)
 	$(CHMOD) $(PERM_RWX) $@
 
@@ -169,7 +171,9 @@ kollos$(LIB_EXT): kollos$(OBJ_EXT)
 
 kollos$(OBJ_EXT): kollos.c
 	$(CC) -c $(PASTHRU_INC) $(INC) $(CCFLAGS) $(MY_CCFLAGS) $(OPTIMIZE) \
-	  $(CCCDLFLAGS) $(PASTHRU_DEFINE) $(DEFINE) -DMAKE_LIB kollos.c
+	  $(CCCDLFLAGS) $(PASTHRU_DEFINE) $(DEFINE) \
+	  -DLUAOPEN_KOLLOS_METAL=kollos_metal_loader \
+	  -DMAKE_LIB kollos.c
 
 ];
     }
