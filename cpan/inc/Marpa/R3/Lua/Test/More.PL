@@ -61,8 +61,7 @@ sub load_me
     local raw_test_builder_loader, raw_test_more_loader = ...
     local test_builder_loader = tostring(raw_test_builder_loader)
     local test_more_loader = tostring(raw_test_more_loader)
-    Test = {}
-    _G["loadstring"] = load
+    if not Test then Test = {} end
     local load_fn = load(test_builder_loader)
     Test.Builder = load_fn()
     package.loaded['Test.Builder'] = Test.Builder

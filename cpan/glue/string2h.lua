@@ -61,9 +61,7 @@ local header = [[
  */
 ]]
 
-io.write(header)
-io.write(string.format("static char loader_%s[] =\n", string_name))
-for line in io.input():lines("L") do
+function write_quoted_line(line)
     local line_out = line:gsub('[%c%"\\]',
         function (str)
             if str == "\n" then return "\\n" end
@@ -74,6 +72,13 @@ for line in io.input():lines("L") do
         end
     )
     io.write(string.format('  "%s"\n', line_out))
+end
+
+io.write(header)
+io.write(string.format("static char %s_loader[] =\n", string_name))
+write_quoted_line(string.format("-- %q loaded by string2h\n", string_name))
+for line in io.input():lines("L") do
+    write_quoted_line(line)
 end
 io.write("  ;\n")
 

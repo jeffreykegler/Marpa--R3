@@ -70,6 +70,9 @@ we may want meaningful performance numbers.
     -- miranda: insert luacheck declarations
     -- miranda: insert enforce strict globals
 
+    inspect = require "inspect"
+    kollos = require "kollos"
+
     local _M = {}
 
     -- miranda: insert Lua declarations
@@ -159,6 +162,8 @@ Set "strict" globals, using code taken from strict.lua.
           return rawget(t, n)
         end
     end
+
+    package.loaded["strict"] = {}
 
 ```
 

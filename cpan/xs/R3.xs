@@ -4878,46 +4878,29 @@ PPCODE:
     marpa_lua_getfield(L, package_ix, "loaded");
     loaded_ix = marpa_lua_gettop(L);
 
-    /* Load the inspect package */
-    if (marpa_luaL_loadstring(L, loader_inspect) != LUA_OK) {
+    /* Set up preload of inspect package */
+    if (marpa_luaL_loadstring(L, inspect_loader) != LUA_OK) {
       const char* msg = marpa_lua_tostring(L, -1);
       croak(msg);
     }
-    status = marpa_lua_pcall (L, 0, 1, msghandler_ix);
-    if (status != 0) {
-        const char *exception_string = handle_pcall_error (L, status);
-        marpa_lua_settop (L, base_of_stack);
-        croak (exception_string);
-    }
-    /* Dup the module on top of the stack */
-    marpa_lua_pushvalue(L, -1);
-    marpa_lua_setfield(L, loaded_ix, "inspect");
-    marpa_lua_setglobal(L, "inspect");
+    marpa_lua_setfield(L, preload_ix, "inspect");
 
     /* Set up preload of kollos metal package */
     marpa_lua_pushcfunction(L, kollos_metal_loader);
     marpa_lua_setfield(L, preload_ix, "kollos.metal");
 
-    /* Load kollos package */
-    if (marpa_luaL_loadstring(L, loader_kollos) != LUA_OK) {
+    /* Set up preload of kollos package */
+    if (marpa_luaL_loadstring(L, kollos_loader) != LUA_OK) {
       const char* msg = marpa_lua_tostring(L, -1);
       croak(msg);
     }
-    status = marpa_lua_pcall (L, 0, 1, msghandler_ix);
-    if (status != 0) {
-        const char *exception_string = handle_pcall_error (L, status);
-        marpa_lua_settop (L, base_of_stack);
-        croak (exception_string);
-    }
-    kollos_ix = marpa_lua_gettop(L);
-    /* Dup the module on top of the stack */
-    marpa_lua_pushvalue(L, -1);
-    marpa_lua_pushvalue(L, -1);
-    marpa_lua_setfield(L, loaded_ix, "kollos");
-    marpa_lua_setglobal(L, "kollos");
+    marpa_lua_setfield(L, preload_ix, "kollos");
 
-    /* Load glue package */
-    if (marpa_luaL_loadstring(L, loader_glue) != LUA_OK) {
+    /* Actually load glue package
+     * This will load the inspect, kollos.metal and kollos
+     * packages.
+     */
+    if (marpa_luaL_loadstring(L, glue_loader) != LUA_OK) {
       const char* msg = marpa_lua_tostring(L, -1);
       croak(msg);
     }
@@ -4931,6 +4914,12 @@ PPCODE:
     marpa_lua_pushvalue(L, -1);
     marpa_lua_setfield(L, loaded_ix, "glue");
     marpa_lua_setglobal(L, "glue");
+
+    /* We will need the kollos table in what follows,
+     * so get it from the global.
+     */
+    marpa_lua_getglobal(L, "kollos");
+    kollos_ix = marpa_lua_gettop(L);
 
     marpa_lua_getfield(L, kollos_ix, "class_slg");
     marpa_lua_getfield(L, kollos_ix, "upvalues");

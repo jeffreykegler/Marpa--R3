@@ -172,13 +172,13 @@ exec_lua.xs: gen_exec_lua.pl
 marpa_slifop.h: create_ops.pl
 	$(PERLRUN) create_ops.pl > marpa_slifop.h
 
-inspect_inc.c: $(INSPECT_LUA)
+inspect_inc.c: $(INSPECT_LUA) $(STRING2H_LUA)
 	LUA_PATH=$(LUA_PATH) $(LUA_INTERP) $(STRING2H_LUA) inspect < $? > $@
 
-glue_inc.c: $(GLUE_LUA)
+glue_inc.c: $(GLUE_LUA) $(STRING2H_LUA)
 	LUA_PATH=$(LUA_PATH) $(LUA_INTERP) $(STRING2H_LUA) glue < $? > $@
 
-kollos_inc.c: $(KOLLOS_LUA)
+kollos_inc.c: $(KOLLOS_LUA) $(STRING2H_LUA)
 	LUA_PATH=$(LUA_PATH) $(LUA_INTERP) $(STRING2H_LUA) kollos < $? > $@
 
 END_OF_POSTAMBLE_PIECE
