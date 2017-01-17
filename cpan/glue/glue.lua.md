@@ -177,10 +177,12 @@ Set "strict" globals, using code taken from strict.lua.
             end
         end
 
-        package.loaded["strict"] = {
+        strict = {
             on = strict_on,
             off = strict_off
         }
+
+        package.loaded["strict"] = strict
 
     end
 

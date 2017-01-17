@@ -27,12 +27,9 @@ POSIX::setlocale(LC_ALL, "C");
 
 my $marpa_lua = Marpa::R3::Lua->new();
 
-$marpa_lua->exec(<<'END_OF_LUA');
-     Test = nil
-     loadstring = nil
-END_OF_LUA
-
+$marpa_lua->exec('strict.off()');
 Marpa::R3::Lua::Test::More::load_me($marpa_lua);
+$marpa_lua->exec('strict.on()');
 
 $marpa_lua->exec(<<'END_OF_LUA');
      Test.More.plan(8)
