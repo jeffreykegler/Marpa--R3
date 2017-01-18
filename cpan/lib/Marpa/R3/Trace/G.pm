@@ -147,20 +147,6 @@ sub rule_expand {
             ( 0 .. $rule_length - 1 ) );
 } ## end sub rule_expand
 
-sub dotted_rule {
-    my ( $self, $rule_id, $dot_position ) = @_;
-    my $grammar_c     = $self->[Marpa::R3::Internal::Trace::G::C];
-    my $rule_length = $grammar_c->rule_length($rule_id);
-    $dot_position = $rule_length if $dot_position < 0;
-    my $lhs = $self->formatted_symbol_name( $grammar_c->rule_lhs($rule_id) );
-    my @rhs =
-        map { $self->formatted_symbol_name( $grammar_c->rule_rhs( $rule_id, $_ ) ) }
-        ( 0 .. $rule_length - 1 );
-    $dot_position = 0 if $dot_position < 0;
-    splice( @rhs, $dot_position, 0, q{.} );
-    return join q{ }, $lhs, q{::=}, @rhs;
-} ## end sub dotted_rule
-
 sub brief_rule {
     my ( $self, $rule_id ) = @_;
     my $grammar_c     = $self->[Marpa::R3::Internal::Trace::G::C];
@@ -175,7 +161,7 @@ sub brief_rule {
          push @quantifier, ($minimum <= 0 ? q{ *} : q{ +});
     }
     return join q{ }, $lhs, q{::=}, @rhs, @quantifier;
-} ## end sub dotted_rule
+}
 
 sub show_dotted_irl {
     my ( $self, $irl_id, $dot_position ) = @_;
