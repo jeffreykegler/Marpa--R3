@@ -1319,6 +1319,17 @@ whose id is `id`.
 ## The grammar Libmarpa wrapper
 
 ```
+    -- miranda: section+ copy metal tables
+    _M.metal_grammar.symbol_new = _M.class_grammar.symbol_new
+    -- miranda: section+ most Lua function definitions
+    function _M.class_grammar.symbol_new(lmw_g, symbol_name)
+        local symbol_id = _M.metal_grammar.symbol_new(lmw_g)
+        lmw_g.isyid_by_name[symbol_name] = symbol_id
+        lmw_g.name_by_isyid[symbol_id] = symbol_name
+        return symbol_id
+    end
+
+```
     -- miranda: section+ grammar Libmarpa wrapper Lua functions
 
     function _M.class_grammar.symbol_name(lmw_g, symbol_id)
@@ -2610,6 +2621,7 @@ a special "configuration" argument.
     local _M = require "kollos.metal"
 
     -- miranda: insert create metal tables
+    -- miranda: insert copy metal tables
 
     -- miranda: insert VM operations
     -- miranda: insert grammar Libmarpa wrapper Lua functions

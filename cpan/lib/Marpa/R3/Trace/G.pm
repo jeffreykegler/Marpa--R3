@@ -115,9 +115,7 @@ sub symbol_new {
         <<'END_OF_LUA', 'ss', $lmw_g_name, $symbol_name );
     local g, lmw_g_name, symbol_name = ...
     local lmw_g = g[lmw_g_name]
-    local symbol_id = lmw_g:symbol_new()
-    lmw_g.isyid_by_name[symbol_name] = symbol_id
-    lmw_g.name_by_isyid[symbol_id] = symbol_name
+    local symbol_id = lmw_g:symbol_new(symbol_name)
     return symbol_id
 END_OF_LUA
 
