@@ -23,7 +23,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 # Table of contents
 <!--
-../lua/lua toc.lua < kollos.lua.md
+cd kollos && ../lua/lua toc.lua < kollos.lua.md
 -->
 * [About Kollos](#about-kollos)
 * [Development Notes](#development-notes)
@@ -375,7 +375,7 @@ the L0 span is zero-count iff the count of the G1
 span is zero or less.
 
 ```
-    -- miranda: section+ SLIF recognizer Lua functions
+    -- miranda: section+ most Lua function definitions
     function _M.class_slr.g1_to_l0_span(slr, g1_start, g1_count)
          local es_data = slr.es_data
          if g1_count <= 0 then
@@ -420,7 +420,7 @@ of the last such symbol completed,
 or nil if there was none.
 
 ```
-    -- miranda: section+ SLIF recognizer Lua functions
+    -- miranda: section+ most Lua function definitions
     function last_completed(recce, symbol_id)
          local g1r = recce.lmw_g1r
          local g1g = recce.slg.lmw_g1g
@@ -455,7 +455,7 @@ or nil if there was none.
 ```
 
 ```
-    -- miranda: section+ SLIF recognizer Lua functions
+    -- miranda: section+ most Lua function definitions
     function progress(recce, ordinal_arg)
         local g1r = recce.lmw_g1r
         local ordinal = ordinal_arg
@@ -497,7 +497,7 @@ and is being kept for use as
 part of a "Pure Lua" implementation.
 
 ```
-    -- miranda: section+ SLIF recognizer Lua functions
+    -- miranda: section+ most Lua function definitions
     function show_leo_item(recce)
         local g1r = recce.lmw_g1r
         local g1g = recce.slg.lmw_g1g
@@ -1312,6 +1312,18 @@ whose id is `id`.
     function stack_set(recce, ix, v)
         local stack = recce.lmw_v.stack
         stack[ix+0] = v
+    end
+
+```
+
+## Kollos error handling
+
+```
+    -- miranda: section+ metal "do not copy" entries
+    do_not_copy["throw"] = true
+    -- miranda: section+ most Lua function definitions
+    function _M.throw(flag)
+         _M.metal.throw = flag
     end
 
 ```
@@ -2588,17 +2600,26 @@ a special "configuration" argument.
 
     require "strict"
 
-    local _M = require "kollos.metal"
+    local _M = {}
+
+    local do_not_copy = {}
+
+    -- miranda: insert metal "do not copy" entries
+
+    _M.metal = require "kollos.metal"
+    for key, value in pairs(_M.metal) do
+        if not do_not_copy[key] then
+            _M[key] = value
+        end
+    end
 
     -- miranda: insert VM operations
-    -- miranda: insert SLIF recognizer Lua functions
     -- miranda: insert grammar Libmarpa wrapper Lua functions
     -- miranda: insert recognizer Libmarpa wrapper Lua functions
     -- miranda: insert valuator Libmarpa wrapper Lua functions
     -- miranda: insert diagnostics
     -- miranda: insert Utilities for Perl code
-    -- miranda: insert most Lua function declarations
-    -- miranda: insert most Lua function declarations
+    -- miranda: insert most Lua function definitions
     -- miranda: insert define Kollos Lua error codes
     -- miranda: insert various Kollos Lua defines
 
@@ -4527,7 +4548,7 @@ and error codes.
 ## Kollos utilities
 
 ```
-    -- miranda: section+ most Lua function declarations
+    -- miranda: section+ most Lua function definitions
     function _M.posix_lc(str)
        return str:gsub('[A-Z]', function(str) return string.char(string.byte(str)) end)
     end

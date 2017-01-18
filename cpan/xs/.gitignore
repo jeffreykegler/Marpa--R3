@@ -2,6 +2,9 @@
 /auto[.]o
 /auto[.]xs
 /exec_lua[.]xs
+/glue[.]out
+/inspect[.]out
+/kollos[.]out
 /glue_inc[.]c
 /inspect_inc[.]c
 /kollos_inc[.]c

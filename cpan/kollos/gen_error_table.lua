@@ -19,8 +19,7 @@
 --
 -- [ MIT license: http://www.opensource.org/licenses/mit-license.php ]
 
-require 'strict'
-inspect = require 'inspect' -- delete after development
+inspect = require 'inspect' -- delete after development?
 
 local input_file_name = arg[1]
 

@@ -391,14 +391,13 @@ sub Marpa::R3::Scanless::R::ordering_get {
         $slr->[Marpa::R3::Internal::Scanless::R::RANKING_METHOD];
 
     my ($has_parse) = $slr->call_by_tag(
-        (__FILE__ . ':' .  __LINE__),
+        ('@' . __FILE__ . ':' .  __LINE__),
     <<'END_OF_LUA',
-    -- inside $slr->ordering_get()
     local recce, end_of_parse, ranking_method = ...
     if recce.lmw_o then return true end
-    kollos.throw = false
+    kollos.throw(false)
     local bocage = kollos.bocage_new(recce.lmw_g1r, end_of_parse)
-    kollos.throw = true
+    kollos.throw(true)
     recce.lmw_b = bocage
     if not bocage then return false end
     recce.lmw_o = kollos.order_new(bocage)
