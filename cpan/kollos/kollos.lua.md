@@ -1316,18 +1316,6 @@ whose id is `id`.
 
 ```
 
-## Kollos error handling
-
-```
-    -- miranda: section+ metal "do not copy" entries
-    do_not_copy["throw"] = true
-    -- miranda: section+ most Lua function definitions
-    function _M.throw(flag)
-         _M.metal.throw = flag
-    end
-
-```
-
 ## The grammar Libmarpa wrapper
 
 ```
@@ -2347,6 +2335,10 @@ the wrapper's point of view, marpa_r_alternative() always succeeds.
         return table.concat(result)
   ]==]
 
+```
+
+```
+
   -- miranda: section create kollos libmarpa wrapper class tables
   --[==[ miranda: exec create kollos libmarpa wrapper class tables
         local result = {}
@@ -2370,6 +2362,8 @@ the wrapper's point of view, marpa_r_alternative() always succeeds.
         end
         return table.concat(result)
   ]==]
+
+```
 
 ### Constructors
 
@@ -2594,24 +2588,28 @@ a special "configuration" argument.
 ## The main Lua code file
 
 ```
+  -- miranda: section create metal tables
+  --[==[ miranda: exec create metal tables
+        local result = {}
+        for _, class in pairs(libmarpa_class_name) do
+           local metal_table_name = 'metal_' .. class
+           result[#result+1] = string.format("  _M[%q] = {}\n", metal_table_name);
+        end
+        return table.concat(result)
+  ]==]
+
+```
+
+```
     -- miranda: section main
     -- miranda: insert legal preliminaries
     -- miranda: insert luacheck declarations
 
     require "strict"
 
-    local _M = {}
+    local _M = require "kollos.metal"
 
-    local do_not_copy = {}
-
-    -- miranda: insert metal "do not copy" entries
-
-    _M.metal = require "kollos.metal"
-    for key, value in pairs(_M.metal) do
-        if not do_not_copy[key] then
-            _M[key] = value
-        end
-    end
+    -- miranda: insert create metal tables
 
     -- miranda: insert VM operations
     -- miranda: insert grammar Libmarpa wrapper Lua functions
@@ -4492,6 +4490,7 @@ Not Lua-callable, but leaves the stack as before.
     -- miranda: sequence-exec register standard libmarpa wrappers
     -- miranda: sequence-exec create kollos libmarpa wrapper class tables
     -- miranda: sequence-exec object userdata gc methods
+    -- miranda: sequence-exec create metal tables
 ```
 
 ### Dedent method
