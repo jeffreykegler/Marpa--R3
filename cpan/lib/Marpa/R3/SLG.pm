@@ -423,7 +423,7 @@ END_OF_LUA
             $hashed_source->{symbols}->{G1}->{$symbol} );
     }
 
-    add_user_rules( $slg, $g1_tracer, $hashed_source->{rules}->{G1} );
+    add_G1_user_rules( $slg, $hashed_source->{rules}->{G1} );
 
     my @bad_arguments = keys %{$g1_args};
     if ( scalar @bad_arguments ) {
@@ -648,7 +648,7 @@ END_OF_LUA
         assign_symbol( $slg, $lex_tracer, $symbol, $properties );
     }
 
-    add_user_rules( $slg, $lex_tracer, $lexer_rules );
+    add_L0_user_rules( $slg, $lexer_rules );
 
     my $lex_thin = $lex_tracer->grammar();
 
@@ -1205,21 +1205,161 @@ sub assign_symbol {
 
 } ## end sub assign_symbol
 
-# add one or more rules
-sub add_user_rules {
-    my ( $slg, $tracer, $rules ) = @_;
+sub add_G1_user_rules {
+    my ( $slg, $rules ) = @_;
 
     for my $rule (@{$rules}) {
-        add_user_rule( $slg, $tracer, $rule );
+        add_G1_user_rule( $slg, $rule );
     }
 
     return;
 
-} ## end sub add_user_rules
+}
 
-sub add_user_rule {
-    my ( $slg, $tracer, $options ) = @_;
+sub add_L0_user_rules {
+    my ( $slg, $rules ) = @_;
 
+    for my $rule (@{$rules}) {
+        add_L0_user_rule( $slg, $rule );
+    }
+
+    return;
+
+}
+
+sub add_G1_user_rule {
+    my ( $slg, $options ) = @_;
+
+    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
+    my $subgrammar = $tracer->[Marpa::R3::Internal::Trace::G::NAME];
+    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
+    my $default_rank = $grammar_c->default_rank();
+
+    my ( $lhs_name, $rhs_names, $action, $blessing );
+    my ( $min, $separator_name );
+    my $rank;
+    my $null_ranking;
+    my $xbnf;
+    my $proper_separation = 0;
+
+  OPTION: for my $option ( keys %{$options} ) {
+        my $value = $options->{$option};
+        if ( $option eq 'xbnfid' ) {
+            $xbnf = $slg->[
+              $subgrammar eq 'L0'
+              ? Marpa::R3::Internal::Scanless::G::L0_XBNF_BY_NAME
+              : Marpa::R3::Internal::Scanless::G::G1_XBNF_BY_NAME
+            ]->{$value};
+            next OPTION;
+        }
+        if ( $option eq 'rhs' )    { $rhs_names = $value; next OPTION }
+        if ( $option eq 'lhs' )    { $lhs_name  = $value; next OPTION }
+        if ( $option eq 'action' ) { $action    = $value; next OPTION }
+        if ( $option eq 'rank' )   { $rank      = $value; next OPTION }
+        if ( $option eq 'null_ranking' ) {
+            $null_ranking = $value;
+            next OPTION;
+        }
+        if ( $option eq 'min' ) { $min = $value; next OPTION }
+        if ( $option eq 'separator' ) {
+            $separator_name = $value;
+            next OPTION;
+        }
+        if ( $option eq 'proper' ) {
+            $proper_separation = $value;
+            next OPTION;
+        }
+        Marpa::R3::exception("Unknown user rule option: $option");
+    } ## end OPTION: for my $option ( keys %{$options} )
+
+
+    $rhs_names //= [];
+    $rank //= $default_rank;
+    $null_ranking //= 'low';
+
+    # Is this is an ordinary, non-counted rule?
+    my $is_ordinary_rule = scalar @{$rhs_names} == 0 || !defined $min;
+    if ( defined $separator_name and $is_ordinary_rule ) {
+        if ( defined $separator_name ) {
+            Marpa::R3::exception(
+                'separator defined for rule without repetitions');
+        }
+    } ## end if ( defined $separator_name and $is_ordinary_rule )
+
+    my @rhs_ids = map {
+                assign_symbol( $slg, $tracer, $_ )
+        } @{$rhs_names};
+    my $lhs_id = assign_symbol( $slg, $tracer, $lhs_name );
+
+    my $base_rule_id;
+    my $separator_id = -1;
+
+    if ($is_ordinary_rule) {
+
+        # Capture errors
+        $grammar_c->throw_set(0);
+        $base_rule_id = $grammar_c->rule_new( $lhs_id, \@rhs_ids );
+        $grammar_c->throw_set(1);
+
+    } ## end if ($is_ordinary_rule)
+    else {
+        Marpa::R3::exception('Only one rhs symbol allowed for counted rule')
+          if scalar @{$rhs_names} != 1;
+
+        # create the separator symbol, if we're using one
+        if ( defined $separator_name ) {
+            $separator_id = assign_symbol( $slg, $tracer, $separator_name );
+        } ## end if ( defined $separator_name )
+
+        $grammar_c->throw_set(0);
+
+        # The original rule for a sequence rule is
+        # not actually used in parsing,
+        # but some of the rewritten sequence rules are its
+        # semantic equivalents.
+
+        $base_rule_id = $grammar_c->sequence_new(
+            $lhs_id,
+            $rhs_ids[0],
+            {
+                separator => $separator_id,
+                proper    => $proper_separation,
+                min       => $min,
+            }
+        );
+        $grammar_c->throw_set(1);
+    } ## end else [ if ($is_ordinary_rule) ]
+
+    if ( not defined $base_rule_id or $base_rule_id < 0 ) {
+        my $rule_description = rule_describe( $lhs_name, $rhs_names );
+        my ( $error_code, $error_string ) = $grammar_c->error();
+        $error_code //= -1;
+        my $problem_description =
+            $error_code == $Marpa::R3::Error::DUPLICATE_RULE
+            ? 'Duplicate rule'
+            : $error_string;
+        Marpa::R3::exception("$problem_description: $rule_description");
+    } ## end if ( not defined $base_rule_id or $base_rule_id < 0 )
+    $tracer->[Marpa::R3::Internal::Trace::G::XBNF_BY_IRLID]->[$base_rule_id] = $xbnf;
+
+    # Later on we will need per-IRL actions and masks
+    $tracer->[Marpa::R3::Internal::Trace::G::ACTION_BY_IRLID]->[$base_rule_id] =
+        $xbnf->[Marpa::R3::Internal::XBNF::ACTION_NAME];
+    $tracer->[Marpa::R3::Internal::Trace::G::MASK_BY_IRLID]->[$base_rule_id] =
+        $xbnf->[Marpa::R3::Internal::XBNF::MASK];
+
+    $grammar_c->rule_null_high_set( $base_rule_id,
+        ( $null_ranking eq 'high' ? 1 : 0 ) );
+    $grammar_c->rule_rank_set( $base_rule_id, $rank );
+
+    return;
+
+}
+
+sub add_L0_user_rule {
+    my ( $slg, $options ) = @_;
+
+    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER];
     my $subgrammar = $tracer->[Marpa::R3::Internal::Trace::G::NAME];
     my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
     my $default_rank = $grammar_c->default_rank();

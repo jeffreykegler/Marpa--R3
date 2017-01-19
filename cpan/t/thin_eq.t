@@ -19,8 +19,9 @@
 #     Lua interface.
 #
 # At present, I'm not sure exactly if this interface will ever
-# be formally specified, never mind any details of that
-# specification
+# have a formal specification.  I keep it because I feel more
+# secure if the test suite has a non-DSL dependent interface to
+# full facilities of Libmarpa.
 
 use 5.010001;
 use strict;
