@@ -2532,8 +2532,19 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
                 goto NEXT_PASS1_REPORT_ITEM;
             if (dot_position != -1)
                 goto NEXT_PASS1_REPORT_ITEM;
-            l0_rule_g_properties = slg->l0_rule_g_properties + rule_id;
-            g1_lexeme = l0_rule_g_properties->g1_lexeme;
+            /* l0_rule_g_properties = slg->l0_rule_g_properties + rule_id; */
+            /* g1_lexeme = l0_rule_g_properties->g1_lexeme; */
+
+            call_by_tag (outer_slr->L,
+                LUA_TAG,
+                "local recce, rule_id = ...\n"
+                "local g1_lexeme = recce.slg.l0_rules[rule_id].g1_lexeme\n"
+                "g1_lexeme = g1_lexeme or -1\n"
+                "return g1_lexeme\n"
+                ,
+                "Ri>i", outer_slr->lua_ref, rule_id,
+                  &g1_lexeme);
+
             if (g1_lexeme == -1)
                 goto NEXT_PASS1_REPORT_ITEM;
             slr->end_of_lexeme = working_pos;
