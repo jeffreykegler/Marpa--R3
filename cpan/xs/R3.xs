@@ -1554,15 +1554,26 @@ u_l0r_new (Outer_R* outer_slr)
                 xs_g_error (slr->g1_wrapper));
         }
         for (i = 0; i < count; i++) {
-            Marpa_Assertion_ID assertion;
+            int assertion;
             int terminal;
             call_by_tag (outer_slr->L,
                 LUA_TAG,
                 "recce, ix = ...\n"
-                "return recce.terminals_expected[ix]\n",
-                "Ri>i", outer_slr->lua_ref, i + 1, &terminal);
+                "local terminal = recce.terminals_expected[ix]\n"
+                "local assertion = recce.slg.g1_symbols[terminal].assertion\n"
+                "assertion = assertion or -1\n"
+                "return terminal, assertion\n"
+                ,
+                "Ri>ii", outer_slr->lua_ref, i + 1,
+                  &terminal, &assertion);
 
-            assertion = slr->slg->g1_lexeme_to_assertion[terminal];
+                  {
+                  const int old_assertion = slr->slg->g1_lexeme_to_assertion[terminal];
+                  if (old_assertion != assertion) {
+            croak ("assertion mismatch, old (%ld) vs. new (%ld)",
+                (long)old_assertion, (long)assertion);
+                  }
+                  }
 
             call_by_tag (outer_slr->L,
                 LUA_TAG,
