@@ -103,24 +103,6 @@ sub formatted_symbol_name {
     return '<' . $symbol_name . '>';
 }
 
-sub symbol_new {
-    my ( $tracer, $symbol_name ) = @_;
-    my $thin_slg         = $tracer->[Marpa::R3::Internal::Trace::G::SLG_C];
-    my $short_lmw_g_name = $tracer->[Marpa::R3::Internal::Trace::G::NAME];
-    my $lmw_g_name       = 'lmw_' . ( lc $short_lmw_g_name ) . 'g';
-
-    my ($symbol_id) =
-      $thin_slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 'ss', $lmw_g_name, $symbol_name );
-    local g, lmw_g_name, symbol_name = ...
-    local lmw_g = g[lmw_g_name]
-    local symbol_id = lmw_g:symbol_new(symbol_name)
-    return symbol_id
-END_OF_LUA
-
-    return $symbol_id;
-}
-
 sub rule {
     my ( $self, $rule_id ) = @_;
     my $grammar_c     = $self->[Marpa::R3::Internal::Trace::G::C];

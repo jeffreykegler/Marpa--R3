@@ -851,6 +851,11 @@ END_OF_LUA
       $thin_slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'iii', $lexer_rule_id, $g1_lexeme_id, $assertion_id );
     local g, lexer_rule_id, g1_lexeme_id, assertion_id = ...
+    -- print('g1_lexeme_id: ', inspect(g1_lexeme_id))
+    -- print('g: ', inspect(g.g1_symbols[g1_lexeme_id]))
+    if g1_lexeme_id >= 0 then
+        g.g1_symbols[g1_lexeme_id].assertion = assertion_id
+    end
 END_OF_LUA
 
         my $discard_event = $discard_event_by_lexer_rule_id[$lexer_rule_id];
@@ -1181,6 +1186,7 @@ sub assign_G1_symbol {
     local g, symbol_name = ...
     local lmw_g = g.lmw_g1g
     local symbol_id = lmw_g:symbol_new(symbol_name)
+    g.g1_symbols[symbol_id] = { id = symbol_id }
     return symbol_id
 END_OF_LUA
 
@@ -1233,6 +1239,7 @@ sub assign_L0_symbol {
     local g, symbol_name = ...
     local lmw_g = g.lmw_l0g
     local symbol_id = lmw_g:symbol_new(symbol_name)
+    g.l0_symbols[symbol_id] = { id = symbol_id }
     return symbol_id
 END_OF_LUA
 
@@ -1291,6 +1298,7 @@ sub add_L0_user_rules {
 
 sub add_G1_user_rule {
     my ( $slg, $options ) = @_;
+    my $thin_slg = $slg->[Marpa::R3::Internal::Scanless::G::C];
 
     my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     my $subgrammar = $tracer->[Marpa::R3::Internal::Trace::G::NAME];
@@ -1361,6 +1369,15 @@ sub add_G1_user_rule {
         $base_rule_id = $grammar_c->rule_new( $lhs_id, \@rhs_ids );
         $grammar_c->throw_set(1);
 
+      $thin_slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 'i', ($base_rule_id // -1));
+    local g, base_rule_id = ...
+    -- remove the test for nil or less than zero
+    -- once refactoring is complete?
+    if base_rule_id < 0 then return end
+    g.g1_rules[base_rule_id] = { id = base_rule_id }
+END_OF_LUA
+
     } ## end if ($is_ordinary_rule)
     else {
         Marpa::R3::exception('Only one rhs symbol allowed for counted rule')
@@ -1388,6 +1405,16 @@ sub add_G1_user_rule {
             }
         );
         $grammar_c->throw_set(1);
+
+      $thin_slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 'i', ($base_rule_id // -1));
+    local g, base_rule_id = ...
+    -- remove the test for nil or less than zero
+    -- once refactoring is complete?
+    if base_rule_id < 0 then return end
+    g.g1_rules[base_rule_id] = { id = base_rule_id }
+END_OF_LUA
+
     } ## end else [ if ($is_ordinary_rule) ]
 
     if ( not defined $base_rule_id or $base_rule_id < 0 ) {
@@ -1418,6 +1445,7 @@ sub add_G1_user_rule {
 
 sub add_L0_user_rule {
     my ( $slg, $options ) = @_;
+    my $thin_slg = $slg->[Marpa::R3::Internal::Scanless::G::C];
 
     my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER];
     my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
@@ -1487,6 +1515,15 @@ sub add_L0_user_rule {
         $base_rule_id = $grammar_c->rule_new( $lhs_id, \@rhs_ids );
         $grammar_c->throw_set(1);
 
+      $thin_slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 'i', ($base_rule_id // -1));
+    local g, base_rule_id = ...
+    -- remove the test for nil or less than zero
+    -- once refactoring is complete?
+    if base_rule_id < 0 then return end
+    g.l0_rules[base_rule_id] = { id = base_rule_id }
+END_OF_LUA
+
     } ## end if ($is_ordinary_rule)
     else {
         Marpa::R3::exception('Only one rhs symbol allowed for counted rule')
@@ -1514,6 +1551,16 @@ sub add_L0_user_rule {
             }
         );
         $grammar_c->throw_set(1);
+
+      $thin_slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 'i', ($base_rule_id // -1));
+    local g, base_rule_id = ...
+    -- remove the test for nil or less than zero
+    -- once refactoring is complete?
+    if base_rule_id < 0 then return end
+    g.l0_rules[base_rule_id] = { id = base_rule_id }
+END_OF_LUA
+
     } ## end else [ if ($is_ordinary_rule) ]
 
     if ( not defined $base_rule_id or $base_rule_id < 0 ) {
