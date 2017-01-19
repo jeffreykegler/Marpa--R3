@@ -37,8 +37,7 @@ sub new {
     lmw_g_name = 'lmw_' .. short_name .. 'g'
     local lmw_g = g[lmw_g_name]
     lmw_g.short_name = short_name
-    lmw_g.isyid_by_name = {}
-    lmw_g.name_by_isyid = {}
+    lmw_g:post_metal()
 END_OF_LUA
 
     return $self;

@@ -1318,6 +1318,36 @@ whose id is `id`.
 
 ## The grammar Libmarpa wrapper
 
+The "post-metal" function handles things that need
+to be done after a "metal" Libmarpa grammar is created,
+but which are part of the Libmarpa wrapper.
+It's a separate function so that the "dummy up" logic
+can also use it.
+Hopefully, this will make it easier to phase out the
+"dummy up" logic.
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_grammar.post_metal(lmw_g)
+        lmw_g.isyid_by_name = {}
+        lmw_g.name_by_isyid = {}
+        return lmw_g
+    end
+
+```
+
+```
+    -- miranda: section+ copy metal tables
+    _M.metal.grammar_new = _M.grammar_new
+    -- miranda: section+ most Lua function definitions
+    function _M.grammar_new()
+        local lmw_g = _M.metal.grammar_new()
+        lmw_g:post_metal()
+        return lmw_g
+    end
+
+```
+
 ```
     -- miranda: section+ copy metal tables
     _M.metal_grammar.symbol_new = _M.class_grammar.symbol_new
@@ -1328,6 +1358,8 @@ whose id is `id`.
         lmw_g.name_by_isyid[symbol_id] = symbol_name
         return symbol_id
     end
+
+```
 
 ```
     -- miranda: section+ grammar Libmarpa wrapper Lua functions

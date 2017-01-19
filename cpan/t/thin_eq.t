@@ -10,7 +10,17 @@
 # of the licenses in the directory LICENSES.
 
 # Testing an ambiguous equation
-# using the thin interface
+# The interface used here is a successor to Marpa::R2's THIF.
+# It is not fully designed and in fact vague in conception.
+# There are two design principles:
+# 1.  Support only a single Libmarpa grammar, so that lexing
+#     is up to the up.
+# 2.  Use only Libmarpa with an "as thin as reasonably possible"
+#     Lua interface.
+#
+# At present, I'm not sure exactly if this interface will ever
+# be formally specified, never mind any details of that
+# specification
 
 use 5.010001;
 use strict;
@@ -66,10 +76,10 @@ $marpa_lua->exec(<<'END_OF_LUA');
 
      local grammar = kollos.grammar_new()
      grammar:force_valued()
-     local S = grammar:symbol_new()
-     local E = grammar:symbol_new()
-     local op = grammar:symbol_new()
-     local number = grammar:symbol_new()
+     local S = grammar:symbol_new("S")
+     local E = grammar:symbol_new("E")
+     local op = grammar:symbol_new("op")
+     local number = grammar:symbol_new("number")
      local start_rule_id = grammar:rule_new{S, E}
      local op_rule_id = grammar:rule_new{E, E, op, E}
      local number_rule_id = grammar:rule_new{E, number}
@@ -211,9 +221,9 @@ $marpa_lua->exec(<<'END_OF_LUA');
      Test.More.is(error_name, 'KOLLOS_ERR_NONE', 'Grammar error name' )
      local error_description = kollos.error_description(error_code)
      Test.More.is(error_description, 'No error', 'Grammar error description' )
-     local S = grammar:symbol_new()
-     local a = grammar:symbol_new()
-     local sep = grammar:symbol_new()
+     local S = grammar:symbol_new("S")
+     local a = grammar:symbol_new("a")
+     local sep = grammar:symbol_new("sep")
      grammar:start_symbol_set(S)
      grammar:sequence_new{S, a, separator = sep, proper = 0, min = 1}
      grammar:precompute()
