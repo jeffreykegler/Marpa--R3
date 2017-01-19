@@ -845,8 +845,6 @@ END_OF_LUA
         my $g1_lexeme_id = $lex_rule_to_g1_lexeme[$lexer_rule_id];
         my $lexeme_name  = $g1_tracer->symbol_name($g1_lexeme_id);
         my $assertion_id = $lexeme_data{$lexeme_name}{lexer}{'assertion'} // -1;
-        $thin_slg->lexer_rule_to_g1_lexeme_set( $lexer_rule_id,
-            $g1_lexeme_id, $assertion_id );
 
       $thin_slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'iii', $lexer_rule_id, $g1_lexeme_id, $assertion_id );

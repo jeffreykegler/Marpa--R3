@@ -1567,7 +1567,7 @@ u_l0r_new (Outer_R* outer_slr)
                 "Ri>ii", outer_slr->lua_ref, i + 1,
                   &terminal, &assertion);
 
-                  {
+                  if (0) {
                   const int old_assertion = slr->slg->g1_lexeme_to_assertion[terminal];
                   if (old_assertion != assertion) {
             croak ("assertion mismatch, old (%ld) vs. new (%ld)",
@@ -3571,83 +3571,6 @@ PPCODE:
     slg_inner_associate (slg, l0_sv, g1_sv);
 
     XSRETURN_YES;
-}
-
-void
-lexer_rule_to_g1_lexeme_set( outer_slg, lexer_rule, g1_lexeme, assertion_id )
-    Outer_G *outer_slg;
-    Marpa_Rule_ID lexer_rule;
-    Marpa_Symbol_ID g1_lexeme;
-    Marpa_Assertion_ID assertion_id;
-PPCODE:
-{
-  Scanless_G* slg = slg_inner_get(outer_slg);
-  Marpa_Rule_ID highest_lexer_rule_id;
-  Marpa_Symbol_ID highest_g1_symbol_id;
-  Marpa_Assertion_ID highest_assertion_id;
-
-  highest_lexer_rule_id = marpa_g_highest_rule_id (slg->l0_wrapper->g);
-  highest_g1_symbol_id = marpa_g_highest_symbol_id (slg->g1);
-  highest_assertion_id = marpa_g_highest_zwa_id (slg->l0_wrapper->g);
-  if (slg->precomputed)
-    {
-      croak
-        ("slg->lexer_rule_to_g1_lexeme_set(%ld, %ld) called after SLG is precomputed",
-         (long) lexer_rule, (long) g1_lexeme);
-    }
-  if (lexer_rule > highest_lexer_rule_id)
-    {
-      croak
-        ("Problem in slg->lexer_rule_to_g1_lexeme_set(%ld, %ld): rule ID was %ld, but highest lexer rule ID = %ld",
-         (long) lexer_rule,
-         (long) g1_lexeme, (long) lexer_rule, (long) highest_lexer_rule_id);
-    }
-  if (g1_lexeme > highest_g1_symbol_id)
-    {
-      croak
-        ("Problem in slg->lexer_rule_to_g1_lexeme_set(%ld, %ld): symbol ID was %ld, but highest G1 symbol ID = %ld",
-         (long) lexer_rule,
-         (long) g1_lexeme, (long) lexer_rule, (long) highest_g1_symbol_id);
-    }
-  if (assertion_id > highest_assertion_id)
-    {
-      croak
-        ("Problem in slg->lexer_rule_to_g1_lexeme_set(%ld, %ld, %ld):"
-        "assertion ID was %ld, but highest assertion ID = %ld",
-         (long) lexer_rule,
-         (long) g1_lexeme, (long) lexer_rule,
-         (long) assertion_id,
-         (long) highest_assertion_id);
-    }
-  if (lexer_rule < -2)
-    {
-      croak
-        ("Problem in slg->lexer_rule_to_g1_lexeme_set(%ld, %ld): rule ID was %ld, a disallowed value",
-         (long) lexer_rule, (long) g1_lexeme,
-         (long) lexer_rule);
-    }
-  if (g1_lexeme < -2)
-    {
-      croak
-        ("Problem in slg->lexer_rule_to_g1_lexeme_set(%ld, %ld): symbol ID was %ld, a disallowed value",
-         (long) lexer_rule, (long) g1_lexeme,
-         (long) g1_lexeme);
-    }
-  if (assertion_id < -2)
-    {
-      croak
-        ("Problem in slg->lexer_rule_to_g1_lexeme_set(%ld, %ld, %ld): assertion ID was %ld, a disallowed value",
-         (long) lexer_rule, (long) g1_lexeme,
-         (long) g1_lexeme, (long)assertion_id);
-    }
-  if (lexer_rule >= 0) {
-      struct l0_rule_g_properties * const l0_rule_g_properties = slg->l0_rule_g_properties + lexer_rule;
-      l0_rule_g_properties->g1_lexeme = g1_lexeme;
-  }
-  if (g1_lexeme >= 0) {
-      slg->g1_lexeme_to_assertion[g1_lexeme] = assertion_id;
-  }
-  XSRETURN_YES;
 }
 
  # Mark the symbol as a lexeme.
