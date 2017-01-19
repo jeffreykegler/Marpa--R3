@@ -1262,60 +1262,9 @@ sub add_user_rule {
     } ## end OPTION: for my $option ( keys %{$options} )
 
 
-    if ( defined $min and not Scalar::Util::looks_like_number($min) ) {
-        Marpa::R3::exception(
-            q{"min" must be undefined or a valid Perl number});
-    }
-
     $rhs_names //= [];
-
-    my @rule_problems = ();
-
-    my $rhs_ref_type = ref $rhs_names;
-    if ( not $rhs_ref_type or $rhs_ref_type ne 'ARRAY' ) {
-        my $problem =
-              "RHS is not ref to ARRAY\n"
-            . '  Type of rhs is '
-            . ( $rhs_ref_type ? $rhs_ref_type : 'not a ref' ) . "\n";
-        my $d = Data::Dumper->new( [$rhs_names], ['rhs'] );
-        $problem .= $d->Dump();
-        push @rule_problems, $problem;
-    } ## end if ( not $rhs_ref_type or $rhs_ref_type ne 'ARRAY' )
-    if ( not defined $lhs_name ) {
-        push @rule_problems, "Missing LHS\n";
-    }
-
-    if ( defined $rank
-        and
-        ( not Scalar::Util::looks_like_number($rank) or int($rank) != $rank )
-        )
-    {
-        push @rule_problems, "Rank must be undefined or an integer\n";
-    } ## end if ( defined $rank and ( not Scalar::Util::looks_like_number...))
     $rank //= $default_rank;
-
     $null_ranking //= 'low';
-    if ( $null_ranking ne 'high' and $null_ranking ne 'low' ) {
-        push @rule_problems,
-            "Null Ranking must be undefined, 'high' or 'low'\n";
-    }
-
-    if ( scalar @rule_problems ) {
-        my %dump_options = %{$options};
-        delete $dump_options{grammar};
-        my $msg = ( scalar @rule_problems )
-            . " problem(s) in the following rule:\n";
-        my $d = Data::Dumper->new( [ \%dump_options ], ['rule'] );
-        $msg .= $d->Dump();
-        for my $problem_number ( 0 .. $#rule_problems ) {
-            $msg
-                .= 'Problem '
-                . ( $problem_number + 1 ) . q{: }
-                . $rule_problems[$problem_number] . "\n";
-        } ## end for my $problem_number ( 0 .. $#rule_problems )
-        Marpa::R3::exception($msg);
-    } ## end if ( scalar @rule_problems )
-
 
     # Is this is an ordinary, non-counted rule?
     my $is_ordinary_rule = scalar @{$rhs_names} == 0 || !defined $min;

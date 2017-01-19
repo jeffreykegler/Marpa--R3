@@ -2601,12 +2601,13 @@ a special "configuration" argument.
 ```
   -- miranda: section create metal tables
   --[==[ miranda: exec create metal tables
-        local result = {}
+        local result = { "  _M.metal = {}" }
         for _, class in pairs(libmarpa_class_name) do
            local metal_table_name = 'metal_' .. class
-           result[#result+1] = string.format("  _M[%q] = {}\n", metal_table_name);
+           result[#result+1] = string.format("  _M[%q] = {}", metal_table_name);
         end
-        return table.concat(result)
+       result[#result+1] = ""
+       return table.concat(result, "\n")
   ]==]
 
 ```
