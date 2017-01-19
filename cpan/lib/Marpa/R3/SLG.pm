@@ -1166,6 +1166,7 @@ qq{Internal error: Start symbol $start_name missing from grammar\n}
 sub assign_G1_symbol {
     # $slg will be needed for the XSY's
     my ( $slg, $name, $options ) = @_;
+    my $thin_slg = $slg->[Marpa::R3::Internal::Scanless::G::C];
     my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
 
     my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
@@ -1173,7 +1174,15 @@ sub assign_G1_symbol {
     if ( defined $symbol_id ) {
         return $symbol_id;
     }
-    $symbol_id = $tracer->symbol_new($name);
+
+    ($symbol_id) =
+      $thin_slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 's', $name );
+    local g, symbol_name = ...
+    local lmw_g = g.lmw_g1g
+    local symbol_id = lmw_g:symbol_new(symbol_name)
+    return symbol_id
+END_OF_LUA
 
     PROPERTY: for my $property ( sort keys %{$options} ) {
         if ( $property eq 'wsyid' ) {
@@ -1209,6 +1218,7 @@ sub assign_G1_symbol {
 sub assign_L0_symbol {
     # $slg will be needed for the XSY's
     my ( $slg, $name, $options ) = @_;
+    my $thin_slg = $slg->[Marpa::R3::Internal::Scanless::G::C];
     my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER];
 
     my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
@@ -1216,7 +1226,15 @@ sub assign_L0_symbol {
     if ( defined $symbol_id ) {
         return $symbol_id;
     }
-    $symbol_id = $tracer->symbol_new($name);
+
+    ($symbol_id) =
+      $thin_slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 's', $name );
+    local g, symbol_name = ...
+    local lmw_g = g.lmw_l0g
+    local symbol_id = lmw_g:symbol_new(symbol_name)
+    return symbol_id
+END_OF_LUA
 
     PROPERTY: for my $property ( sort keys %{$options} ) {
         if ( $property eq 'wsyid' ) {
@@ -1290,9 +1308,7 @@ sub add_G1_user_rule {
         my $value = $options->{$option};
         if ( $option eq 'xbnfid' ) {
             $xbnf = $slg->[
-              $subgrammar eq 'L0'
-              ? Marpa::R3::Internal::Scanless::G::L0_XBNF_BY_NAME
-              : Marpa::R3::Internal::Scanless::G::G1_XBNF_BY_NAME
+              Marpa::R3::Internal::Scanless::G::G1_XBNF_BY_NAME
             ]->{$value};
             next OPTION;
         }
@@ -1404,7 +1420,6 @@ sub add_L0_user_rule {
     my ( $slg, $options ) = @_;
 
     my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER];
-    my $subgrammar = $tracer->[Marpa::R3::Internal::Trace::G::NAME];
     my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
     my $default_rank = $grammar_c->default_rank();
 
@@ -1419,9 +1434,7 @@ sub add_L0_user_rule {
         my $value = $options->{$option};
         if ( $option eq 'xbnfid' ) {
             $xbnf = $slg->[
-              $subgrammar eq 'L0'
-              ? Marpa::R3::Internal::Scanless::G::L0_XBNF_BY_NAME
-              : Marpa::R3::Internal::Scanless::G::G1_XBNF_BY_NAME
+              Marpa::R3::Internal::Scanless::G::L0_XBNF_BY_NAME
             ]->{$value};
             next OPTION;
         }
