@@ -419,7 +419,7 @@ END_OF_LUA
     $g1_tracer->[Marpa::R3::Internal::Trace::G::START_NAME]   = '[:start]';
 
     for my $symbol ( sort keys %{ $hashed_source->{symbols}->{G1} } ) {
-        assign_symbol( $slg, $g1_tracer, $symbol,
+        assign_G1_symbol( $slg, $symbol,
             $hashed_source->{symbols}->{G1}->{$symbol} );
     }
 
@@ -645,7 +645,7 @@ END_OF_LUA
 
     for my $symbol ( sort keys %this_lexer_symbols ) {
         my $properties = $this_lexer_symbols{$symbol};
-        assign_symbol( $slg, $lex_tracer, $symbol, $properties );
+        assign_L0_symbol( $slg, $symbol, $properties );
     }
 
     add_L0_user_rules( $slg, $lexer_rules );
@@ -1163,9 +1163,10 @@ qq{Internal error: Start symbol $start_name missing from grammar\n}
 } ## end sub set_start_symbol
 
 
-sub assign_symbol {
+sub assign_G1_symbol {
     # $slg will be needed for the XSY's
-    my ( $slg, $tracer, $name, $options ) = @_;
+    my ( $slg, $name, $options ) = @_;
+    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
 
     my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
     my $symbol_id = $tracer->symbol_by_name($name);
@@ -1203,7 +1204,50 @@ sub assign_symbol {
 
     return $symbol_id;
 
-} ## end sub assign_symbol
+}
+
+sub assign_L0_symbol {
+    # $slg will be needed for the XSY's
+    my ( $slg, $name, $options ) = @_;
+    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER];
+
+    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
+    my $symbol_id = $tracer->symbol_by_name($name);
+    if ( defined $symbol_id ) {
+        return $symbol_id;
+    }
+    $symbol_id = $tracer->symbol_new($name);
+
+    PROPERTY: for my $property ( sort keys %{$options} ) {
+        if ( $property eq 'wsyid' ) {
+            next PROPERTY;
+        }
+        if ( $property eq 'xsy' ) {
+            my $xsy_name = $options->{$property};
+            my $xsy = $slg->[Marpa::R3::Internal::Scanless::G::XSY_BY_NAME]->{$xsy_name};
+            $tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID]->[$symbol_id] =
+                $xsy;
+            next PROPERTY;
+        }
+        if ( $property eq 'terminal' ) {
+            my $value = $options->{$property};
+            $grammar_c->symbol_is_terminal_set( $symbol_id, $value );
+            next PROPERTY;
+        }
+        if ( $property eq 'rank' ) {
+            my $value = $options->{$property};
+            Marpa::R3::exception(qq{Symbol "$name": rank must be an integer})
+                if not Scalar::Util::looks_like_number($value)
+                    or int($value) != $value;
+            $grammar_c->symbol_rank_set($symbol_id) = $value;
+            next PROPERTY;
+        } ## end if ( $property eq 'rank' )
+        Marpa::R3::exception(qq{Unknown symbol property "$property"});
+    } ## end PROPERTY: for my $property ( keys %{$options} )
+
+    return $symbol_id;
+
+}
 
 sub add_G1_user_rules {
     my ( $slg, $rules ) = @_;
@@ -1287,9 +1331,9 @@ sub add_G1_user_rule {
     } ## end if ( defined $separator_name and $is_ordinary_rule )
 
     my @rhs_ids = map {
-                assign_symbol( $slg, $tracer, $_ )
+                assign_G1_symbol( $slg, $_ )
         } @{$rhs_names};
-    my $lhs_id = assign_symbol( $slg, $tracer, $lhs_name );
+    my $lhs_id = assign_G1_symbol( $slg, $lhs_name );
 
     my $base_rule_id;
     my $separator_id = -1;
@@ -1308,7 +1352,7 @@ sub add_G1_user_rule {
 
         # create the separator symbol, if we're using one
         if ( defined $separator_name ) {
-            $separator_id = assign_symbol( $slg, $tracer, $separator_name );
+            $separator_id = assign_G1_symbol( $slg, $separator_name );
         } ## end if ( defined $separator_name )
 
         $grammar_c->throw_set(0);
@@ -1416,9 +1460,9 @@ sub add_L0_user_rule {
     } ## end if ( defined $separator_name and $is_ordinary_rule )
 
     my @rhs_ids = map {
-                assign_symbol( $slg, $tracer, $_ )
+                assign_L0_symbol( $slg, $_ )
         } @{$rhs_names};
-    my $lhs_id = assign_symbol( $slg, $tracer, $lhs_name );
+    my $lhs_id = assign_L0_symbol( $slg, $lhs_name );
 
     my $base_rule_id;
     my $separator_id = -1;
@@ -1437,7 +1481,7 @@ sub add_L0_user_rule {
 
         # create the separator symbol, if we're using one
         if ( defined $separator_name ) {
-            $separator_id = assign_symbol( $slg, $tracer, $separator_name );
+            $separator_id = assign_L0_symbol( $slg, $separator_name );
         } ## end if ( defined $separator_name )
 
         $grammar_c->throw_set(0);
