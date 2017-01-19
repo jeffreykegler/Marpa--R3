@@ -48,7 +48,6 @@ struct symbol_g_properties {
 };
 
 struct l0_rule_g_properties {
-     Marpa_Symbol_ID g1_lexeme;
      unsigned int t_event_on_discard:1;
      unsigned int t_event_on_discard_active:1;
 };
@@ -136,7 +135,6 @@ typedef struct
 
   SV *l0_sv;
   G_Wrapper *l0_wrapper;
-  Marpa_Assertion_ID *g1_lexeme_to_assertion;
   HV *per_codepoint_hash;
   UV *per_codepoint_array[128];
   int precomputed;

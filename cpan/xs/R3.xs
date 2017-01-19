@@ -1567,14 +1567,6 @@ u_l0r_new (Outer_R* outer_slr)
                 "Ri>ii", outer_slr->lua_ref, i + 1,
                   &terminal, &assertion);
 
-                  if (0) {
-                  const int old_assertion = slr->slg->g1_lexeme_to_assertion[terminal];
-                  if (old_assertion != assertion) {
-            croak ("assertion mismatch, old (%ld) vs. new (%ld)",
-                (long)old_assertion, (long)assertion);
-                  }
-                  }
-
             call_by_tag (outer_slr->L,
                 LUA_TAG,
                 "recce, perl_pos, lexeme, assertion = ...\n"
@@ -2009,7 +2001,6 @@ static Scanless_G* slg_inner_new (void)
         }
     }
 
-    slg->g1_lexeme_to_assertion = NULL;
     slg->symbol_g_properties = NULL;
     slg->l0_rule_g_properties = NULL;
     slg->constants = newAV ();
@@ -2043,16 +2034,6 @@ static Scanless_G* slg_inner_associate (
     SET_G_WRAPPER_FROM_G_SV (slg->l0_wrapper, l0_sv);
 
     {
-        int symbol_ix;
-        int g1_symbol_count = marpa_g_highest_symbol_id (slg->g1) + 1;
-        Newx (slg->g1_lexeme_to_assertion, (unsigned int) g1_symbol_count,
-            Marpa_Assertion_ID);
-        for (symbol_ix = 0; symbol_ix < g1_symbol_count; symbol_ix++) {
-            slg->g1_lexeme_to_assertion[symbol_ix] = -1;
-        }
-    }
-
-    {
         Marpa_Symbol_ID symbol_id;
         int g1_symbol_count = marpa_g_highest_symbol_id (slg->g1) + 1;
         Newx (slg->symbol_g_properties, (unsigned int) g1_symbol_count,
@@ -2074,7 +2055,6 @@ static Scanless_G* slg_inner_associate (
         Newx (slg->l0_rule_g_properties, ((unsigned int) g1_rule_count),
             struct l0_rule_g_properties);
         for (rule_id = 0; rule_id < g1_rule_count; rule_id++) {
-            slg->l0_rule_g_properties[rule_id].g1_lexeme = -1;
             slg->l0_rule_g_properties[rule_id].t_event_on_discard = 0;
             slg->l0_rule_g_properties[rule_id].t_event_on_discard_active =
                 0;
@@ -2092,7 +2072,6 @@ static void slg_inner_destroy(Scanless_G* slg) {
   SvREFCNT_dec (slg->l0_sv);
   Safefree (slg->symbol_g_properties);
   Safefree (slg->l0_rule_g_properties);
-  Safefree (slg->g1_lexeme_to_assertion);
   SvREFCNT_dec (slg->per_codepoint_hash);
   for (i = 0; i < Dim(slg->per_codepoint_array); i++) {
     Safefree(slg->per_codepoint_array[i]);
@@ -2532,8 +2511,6 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
                 goto NEXT_PASS1_REPORT_ITEM;
             if (dot_position != -1)
                 goto NEXT_PASS1_REPORT_ITEM;
-            /* l0_rule_g_properties = slg->l0_rule_g_properties + rule_id; */
-            /* g1_lexeme = l0_rule_g_properties->g1_lexeme; */
 
             call_by_tag (outer_slr->L,
                 LUA_TAG,
