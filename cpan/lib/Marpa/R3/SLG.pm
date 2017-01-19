@@ -852,7 +852,11 @@ END_OF_LUA
         <<'END_OF_LUA', 'iii', $lexer_rule_id, $g1_lexeme_id, $assertion_id );
     local g, lexer_rule_id, g1_lexeme_id, assertion_id = ...
     -- print('g1_lexeme_id: ', inspect(g1_lexeme_id))
-    -- print('g: ', inspect(g.g1_symbols[g1_lexeme_id]))
+    -- print('lexer_rule_id: ', inspect(lexer_rule_id))
+    -- print('g: ', inspect(g.g1_rules[lexer_rule_id]))
+    if lexer_rule_id >= 0 then
+        g.l0_rules[lexer_rule_id].g1_lexeme = g1_lexeme_id
+    end
     if g1_lexeme_id >= 0 then
         g.g1_symbols[g1_lexeme_id].assertion = assertion_id
     end
