@@ -1516,61 +1516,6 @@ call_by_tag (lua_State * L, const char* tag, const char *codestr,
 
 static Scanless_R* slr_inner_get(Outer_R* outer_slr);
 
-static void
-u_l0r_new (Outer_R* outer_slr)
-{
-    Scanless_R *slr = slr_inner_get (outer_slr);
-
-    call_by_tag (outer_slr->L,
-        LUA_TAG,
-        "local recce, perl_pos = ...\n"
-        "local l0r = kollos.recce_new(recce.slg.lmw_l0g)\n"
-        "if not l0r then\n"
-        "    error('Internal error: kollos.recce_new() failed %s',"
-        "        recce.slg.lmw_l0g:error_description())\n"
-        "end\n"
-        "recce.lmw_l0r = l0r\n"
-        "local too_many_earley_items = recce.too_many_earley_items\n"
-        "if too_many_earley_items >= 0 then\n"
-        "    recce.lmw_l0r:earley_item_warning_threshold_set(too_many_earley_items)\n"
-        "end\n"
-        " -- for now use a per-recce field\n"
-        " -- later replace with a local\n"
-        "recce.terminals_expected = recce.lmw_g1r:terminals_expected()\n"
-        "local count = #recce.terminals_expected\n"
-        "if not count or count < 0 then\n"
-        "    local error_description = recce.lmw_g1r:error_description()\n"
-        "    error('Internal error: terminals_expected() failed in u_l0r_new(); %s',\n"
-        "            error_description)\n"
-        "end\n"
-        "for i = 0, count -1 do\n"
-        "local ix = i + 1\n"
-        "local terminal = recce.terminals_expected[ix]\n"
-        "local assertion = recce.slg.g1_symbols[terminal].assertion\n"
-        "assertion = assertion or -1\n"
-        "if assertion >= 0 then\n"
-        "    local result = recce.lmw_l0r:zwa_default_set(assertion, 1)\n"
-        "    if result < 0 then\n"
-        "        local error_description = recce.lmw_l0r:error_description()\n"
-        "        error('Problem in u_l0r_new() with assertion ID %ld and lexeme ID %ld: %s',"
-        "            assertion, terminal, error_description\n"
-        "        )\n"
-        "    end\n"
-        "end\n"
-        "if recce.trace_terminals >= 3 then\n"
-        "    local q = recce.event_queue\n"
-        "    q[#q+1] = { '!trace', 'expected lexeme', perl_pos, terminal, assertion }\n"
-        "end\n"
-        "end\n"
-        "local result = recce.lmw_l0r:start_input()\n"
-        "if result and result <= -2 then\n"
-        "    local error_description = recce.lmw_l0r:error_description()\n"
-        "    error('Internal error: problem with recce:start_input(l0r): %s',\n"
-        "        error_description)\n"
-        "end\n",
-        "Ri>", outer_slr->lua_ref, slr->perl_pos);
-}
-
 /* Assumes it is called
  after a successful marpa_r_earleme_complete()
  */
