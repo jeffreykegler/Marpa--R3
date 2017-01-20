@@ -1547,12 +1547,15 @@ u_l0r_new (Outer_R* outer_slr)
             " -- for now use a per-recce field\n"
             " -- later replace with a local\n"
             "recce.terminals_expected = recce.lmw_g1r:terminals_expected()\n"
-            "return #recce.terminals_expected",
+            "local count = #recce.terminals_expected\n"
+            "if not count or count < 0 then\n"
+            "    local error_description = recce.lmw_g1r:error_description()\n"
+            "    error('Internal error: terminals_expected() failed in u_l0r_new(); %s',\n"
+            "            error_description)\n"
+            "end\n"
+            "return count\n"
+            ,
             "R>i", outer_slr->lua_ref, &count);
-        if (count < 0) {
-            croak ("Problem in u_l0r_new() with terminals_expected: %s",
-                xs_g_error (slr->g1_wrapper));
-        }
         for (i = 0; i < count; i++) {
             call_by_tag (outer_slr->L,
                 LUA_TAG,
