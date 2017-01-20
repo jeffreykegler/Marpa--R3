@@ -1554,22 +1554,12 @@ u_l0r_new (Outer_R* outer_slr)
                 xs_g_error (slr->g1_wrapper));
         }
         for (i = 0; i < count; i++) {
-            int assertion;
-            int terminal;
             call_by_tag (outer_slr->L,
                 LUA_TAG,
-                "recce, ix = ...\n"
+                "recce, ix, perl_pos = ...\n"
                 "local terminal = recce.terminals_expected[ix]\n"
                 "local assertion = recce.slg.g1_symbols[terminal].assertion\n"
                 "assertion = assertion or -1\n"
-                "return terminal, assertion\n"
-                ,
-                "Ri>ii", outer_slr->lua_ref, i + 1,
-                  &terminal, &assertion);
-
-            call_by_tag (outer_slr->L,
-                LUA_TAG,
-                "recce, perl_pos, lexeme, assertion = ...\n"
                 "if assertion >= 0 then\n"
                 "    local result = recce.lmw_l0r:zwa_default_set(assertion, 1)\n"
                 "    if result < 0 then\n"
@@ -1583,10 +1573,10 @@ u_l0r_new (Outer_R* outer_slr)
                 "end\n"
                 "if recce.trace_terminals >= 3 then\n"
                 "    local q = recce.event_queue\n"
-                "    q[#q+1] = { '!trace', 'expected lexeme', perl_pos, lexeme, assertion }\n"
+                "    q[#q+1] = { '!trace', 'expected lexeme', perl_pos, terminal, assertion }\n"
                 "end\n",
-                "Riii>", outer_slr->lua_ref, slr->perl_pos, terminal,
-                assertion);
+                "Rii>", outer_slr->lua_ref, i + 1, slr->perl_pos
+                );
         }
     }
 
