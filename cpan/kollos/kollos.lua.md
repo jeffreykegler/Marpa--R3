@@ -3720,6 +3720,7 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
 
     static const struct luaL_Reg grammar_methods[] = {
       { "error", lca_libmarpa_error },
+      { "error_description", lca_libmarpa_error_description },
       { "precompute", lca_grammar_precompute },
       { "rule_new", lca_grammar_rule_new },
       { "sequence_new", lca_grammar_sequence_new },

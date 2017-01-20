@@ -1528,7 +1528,7 @@ u_l0r_new (Outer_R* outer_slr)
     "local l0r = kollos.recce_new(recce.slg.lmw_l0g)\n"
     "if not l0r then\n"
     "    error('Internal error: kollos.recce_new() failed %s',"
-    "        recce:error_description())\n"
+    "        recce.slg.lmw_l0g:error_description())\n"
     "end\n"
     "recce.lmw_l0r = l0r\n" ,
     "R>",
@@ -1566,9 +1566,7 @@ u_l0r_new (Outer_R* outer_slr)
                 "if assertion >= 0 then\n"
                 "    local result = recce.lmw_l0r:zwa_default_set(assertion, 1)\n"
                 "    if result < 0 then\n"
-                "        local error = recce.lmw_l0g:error()\n"
-                "        local error_code = error_object.code\n"
-                "        local error_description = kollos.error_description(error_code)\n"
+                "        local error_description = recce.lmw_l0r:error_description()\n"
                 "        error('Problem in u_l0r_new() with assertion ID %ld and lexeme ID %ld: %s',"
                 "            assertion, terminal, error_description\n"
                 "        )\n"
@@ -1588,8 +1586,9 @@ u_l0r_new (Outer_R* outer_slr)
             "recce = ...\n"
             "local result = recce.lmw_l0r:start_input()\n"
             "if result and result <= -2 then\n"
+            "    local error_description = recce.lmw_l0r:error_description()\n"
             "    error('Internal error: problem with recce:start_input(l0r): %s',\n"
-            "        recce:error_description())\n"
+            "        error_description)\n"
             "end\n",
             "R>", outer_slr->lua_ref);
 }
@@ -1688,16 +1687,6 @@ u_read (Outer_R * outer_slr)
     if (!has_l0r) {
         u_l0r_new (outer_slr);
     }
-
-  call_by_tag (outer_slr->L,
-    LUA_TAG,
-    "recce=...\n"
-    "local l0r = recce.lmw_l0r\n"
-    "if not l0r then\n"
-    "    error('Internal error: No l0r: %s',\n"
-    "        recce:error_description())\n"
-    "end\n",
-    "R>", outer_slr->lua_ref);
 
     for (;;) {
         UV codepoint;
@@ -2443,7 +2432,7 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
     "local l0r = recce.lmw_l0r\n"
     "if not l0r then\n"
     "    error('Internal error: No l0r in slr_alternatives(): %s',\n"
-    "        recce:error_description())\n"
+    "        recce.slg.lmw_l0g:error_description())\n"
     "end\n",
     "R>", outer_slr->lua_ref);
 
@@ -2469,7 +2458,7 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
             "local return_value = recce.lmw_l0r:progress_report_start(earley_set)\n"
             "if return_value < 0 then\n"
             "    error(string.format('Problem in recce:progress_report_start(...,%d): %s'),\n"
-            "        earley_set, recce:error_description())\n"
+            "        earley_set, recce.lmw_l0r:error_description())\n"
             "end\n"
             "return return_value\n" ,
             "Ri>i",
@@ -2490,7 +2479,7 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
                 "if not rule_id then return -1, 0, 0 end\n"
                 "if rule_id <= -2 then\n"
                 "    error(string.format('Problem in recce:progress_item(): %s'),\n"
-                "        recce:error_description())\n"
+                "        recce.lmw_l0r:error_description())\n"
                 "end\n"
                 "return rule_id, dot_position, origin\n",
                 "R>iii",
