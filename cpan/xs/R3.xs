@@ -1523,14 +1523,13 @@ u_l0r_new (Outer_R* outer_slr)
 
     call_by_tag (outer_slr->L,
         LUA_TAG,
-        "recce= ...\n"
+        "local recce, perl_pos = ...\n"
         "local l0r = kollos.recce_new(recce.slg.lmw_l0g)\n"
         "if not l0r then\n"
         "    error('Internal error: kollos.recce_new() failed %s',"
         "        recce.slg.lmw_l0g:error_description())\n"
         "end\n"
         "recce.lmw_l0r = l0r\n"
-        "local recce, perl_pos = ...\n"
         "local too_many_earley_items = recce.too_many_earley_items\n"
         "if too_many_earley_items >= 0 then\n"
         "    recce.lmw_l0r:earley_item_warning_threshold_set(too_many_earley_items)\n"
