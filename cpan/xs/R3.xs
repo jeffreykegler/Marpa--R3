@@ -1655,16 +1655,15 @@ u_read (Outer_R * outer_slr)
 {
     dTHX;
     Scanless_R *slr = slr_inner_get (outer_slr);
-    int has_l0r;
 
   call_by_tag (outer_slr->L,
     LUA_TAG,
-    "recce=...; return recce.lmw_l0r and 1 or 0",
-    "R>i", outer_slr->lua_ref, &has_l0r);
-
-    if (!has_l0r) {
-        u_l0r_new (outer_slr);
-    }
+    "local recce, perl_pos = ...\n"
+    "if not recce.lmw_l0r then\n"
+    "    recce:l0r_new(perl_pos)\n"    
+    "end\n"
+    ,
+    "Ri>", outer_slr->lua_ref, slr->perl_pos);
 
     for (;;) {
         UV codepoint;
