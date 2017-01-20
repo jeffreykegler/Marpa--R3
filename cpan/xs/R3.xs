@@ -1520,7 +1520,6 @@ static void
 u_l0r_new (Outer_R* outer_slr)
 {
     Scanless_R *slr = slr_inner_get (outer_slr);
-    G_Wrapper *lexer_wrapper = slr->slg->l0_wrapper;
 
   call_by_tag (outer_slr->L,
     LUA_TAG,
@@ -1534,12 +1533,9 @@ u_l0r_new (Outer_R* outer_slr)
     "R>",
     outer_slr->lua_ref);
 
-    {
-        int i;
-        int count;
         call_by_tag (outer_slr->L,
             LUA_TAG,
-            "recce = ...\n"
+            "local recce, perl_pos = ...\n"
             "local too_many_earley_items = recce.too_many_earley_items\n"
             "if too_many_earley_items >= 0 then\n"
             "    recce.lmw_l0r:earley_item_warning_threshold_set(too_many_earley_items)\n"
@@ -1553,13 +1549,8 @@ u_l0r_new (Outer_R* outer_slr)
             "    error('Internal error: terminals_expected() failed in u_l0r_new(); %s',\n"
             "            error_description)\n"
             "end\n"
-            "return count\n"
-            ,
-            "R>i", outer_slr->lua_ref, &count);
-        for (i = 0; i < count; i++) {
-            call_by_tag (outer_slr->L,
-                LUA_TAG,
-                "recce, ix, perl_pos = ...\n"
+            "for i = 0, count -1 do\n"
+            "local ix = i + 1\n"
                 "local terminal = recce.terminals_expected[ix]\n"
                 "local assertion = recce.slg.g1_symbols[terminal].assertion\n"
                 "assertion = assertion or -1\n"
@@ -1575,11 +1566,11 @@ u_l0r_new (Outer_R* outer_slr)
                 "if recce.trace_terminals >= 3 then\n"
                 "    local q = recce.event_queue\n"
                 "    q[#q+1] = { '!trace', 'expected lexeme', perl_pos, terminal, assertion }\n"
-                "end\n",
-                "Rii>", outer_slr->lua_ref, i + 1, slr->perl_pos
-                );
-        }
-    }
+                "end\n"
+                "end\n"
+                ,
+                "Ri>", outer_slr->lua_ref, slr->perl_pos
+            );
 
         call_by_tag (outer_slr->L,
             LUA_TAG,
