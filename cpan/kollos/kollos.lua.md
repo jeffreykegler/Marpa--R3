@@ -366,6 +366,56 @@ This is a registry object.
 
 ```
 
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slr.l0r_new(recce, perl_pos)
+        local l0r = kollos.recce_new(recce.slg.lmw_l0g)
+        if not l0r then
+            error('Internal error: l0r_new() failed %s',
+                recce.slg.lmw_l0g:error_description())
+        end
+        recce.lmw_l0r = l0r
+        local too_many_earley_items = recce.too_many_earley_items
+        if too_many_earley_items >= 0 then
+            recce.lmw_l0r:earley_item_warning_threshold_set(too_many_earley_items)
+        end
+         -- for now use a per-recce field
+         -- later replace with a local
+        recce.terminals_expected = recce.lmw_g1r:terminals_expected()
+        local count = #recce.terminals_expected
+        if not count or count < 0 then
+            local error_description = recce.lmw_g1r:error_description()
+            error('Internal error: terminals_expected() failed in u_l0r_new(); %s',
+                    error_description)
+        end
+        for i = 0, count -1 do
+            local ix = i + 1
+            local terminal = recce.terminals_expected[ix]
+            local assertion = recce.slg.g1_symbols[terminal].assertion
+            assertion = assertion or -1
+            if assertion >= 0 then
+                local result = recce.lmw_l0r:zwa_default_set(assertion, 1)
+                if result < 0 then
+                    local error_description = recce.lmw_l0r:error_description()
+                    error('Problem in u_l0r_new() with assertion ID %ld and lexeme ID %ld: %s',
+                        assertion, terminal, error_description
+                    )
+                end
+            end
+            if recce.trace_terminals >= 3 then
+                local q = recce.event_queue
+                q[#q+1] = { '!trace', 'expected lexeme', perl_pos, terminal, assertion }
+            end
+        end
+        local result = recce.lmw_l0r:start_input()
+        if result and result <= -2 then
+            local error_description = recce.lmw_l0r:error_description()
+            error('Internal error: problem with recce:start_input(l0r): %s',
+                error_description)
+        end
+    end
+
+```
 Given a G1 span return an L0 span.
 Note that the data for G1 location `n` is kept in
 `es_data[n+1]`, the data for Earley set `n+1`.
