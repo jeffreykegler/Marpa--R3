@@ -1503,6 +1503,57 @@ call_by_tag (lua_State * L, const char* tag, const char *codestr,
     va_end (vl);
 }
 
+static void recursive_coerce_to_lua(
+  lua_State* L, int visited_ix, SV *sv, char sig);
+
+static void
+coerce_to_lua (lua_State * L, SV *sv, char sig)
+{
+   dTHX;
+   SV *result;
+   int visited_ix;
+
+   marpa_lua_newtable(L);
+   visited_ix = marpa_lua_gettop(L);
+   recursive_coerce_to_lua(L, visited_ix, sv, sig);
+   marpa_lua_settop(L, visited_ix-1);
+   return;
+}
+
+/* Coerce an SV to Lua, leaving it on the stack */
+static void recursive_coerce_to_lua(
+  lua_State* L, int visited_ix, SV *sv, char sig)
+{
+    dTHX;
+
+    switch(sig) {
+    case 'S':
+        SvREFCNT_inc_simple_void_NN (sv);
+        marpa_sv_sv_noinc (L, sv);
+        return;
+    case 'i':
+        if (SvIOK(sv)) {
+          marpa_lua_pushinteger (L, (lua_Integer) SvIV (sv));
+          return;
+        }
+        break;
+    case 'n':
+        if (SvNIOK(sv)) {
+          marpa_lua_pushnumber (L, (lua_Number) SvNV (sv));
+          return;
+        }
+        break;
+    case 's': break;
+    default:
+        croak
+            ("Internal error: invalid sig option %c in xlua EXEC_SIG_BODY", sig);
+    }
+
+    /* If here, we are coercing to a string */
+    marpa_lua_pushstring (L, SvPV_nolen (sv));
+    return;
+}
+
 /* Static grammar methods */
 
 #define SET_G_WRAPPER_FROM_G_SV(g_wrapper, g_sv) { \
