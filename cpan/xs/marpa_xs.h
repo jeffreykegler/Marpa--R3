@@ -35,7 +35,7 @@ extern const struct marpa_step_type_description_s
   marpa_step_type_description[];
 
 typedef struct {
-    lua_Unsigned codepoint;
+    lua_Integer codepoint;
 } Pos_Entry;
 
 struct symbol_g_properties {
@@ -193,7 +193,7 @@ typedef struct
   int pos_db_physical_size;
 
   Marpa_Symbol_ID input_symbol_id;
-  UV codepoint;                 /* For error returns */
+  lua_Integer codepoint;                 /* For error returns */
   int end_pos;
   SV* input;
 

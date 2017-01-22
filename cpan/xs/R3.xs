@@ -1752,7 +1752,7 @@ u_read (Outer_R * outer_slr)
     "Ri>", outer_slr->lua_ref, (lua_Integer)slr->perl_pos);
 
     for (;;) {
-        UV codepoint;
+        lua_Integer codepoint;
         UV op_ix;
         UV op_count;
         UV *ops;
@@ -4546,7 +4546,7 @@ PPCODE:
   for (p = start_of_string; p < end_of_string;)
     {
       STRLEN codepoint_length;
-      UV codepoint;
+      lua_Integer codepoint;
       if (input_is_utf8)
         {
           codepoint = utf8_to_uvchr_buf (p, end_of_string, &codepoint_length);
@@ -4562,7 +4562,7 @@ PPCODE:
         }
       else
         {
-          codepoint = (UV) * p;
+          codepoint = (lua_Integer) *p;
           codepoint_length = 1;
         }
       /* Ensure that there is enough space */
@@ -4584,7 +4584,7 @@ codepoint( outer_slr )
 PPCODE:
 {
   Scanless_R *slr = slr_inner_get(outer_slr);
-  XSRETURN_UV(slr->codepoint);
+  XSRETURN_UV((UV)slr->codepoint);
 }
 
 void
@@ -4597,9 +4597,9 @@ PPCODE:
 }
 
 void
-char_register( outer_slr, codepoint, ... )
+char_register( outer_slr, codepoint_arg, ... )
     Outer_R *outer_slr;
-    UV codepoint;
+    UV codepoint_arg;
 PPCODE:
 {
   Scanless_R *slr = slr_inner_get(outer_slr);
@@ -4608,6 +4608,7 @@ PPCODE:
   UV op_ix;
   UV *ops;
   SV *ops_sv = NULL;
+  const lua_Integer codepoint = (lua_Integer)codepoint_arg;
 
   if ( codepoint < (int)Dim (slr->slg->per_codepoint_array))
     {
