@@ -494,8 +494,6 @@ coerce_to_av (lua_State * L, int visited_ix, int table_ix, char signature)
     marpa_lua_pushvalue(L, table_ix);
     if (!visitee_on(L, visited_ix, table_ix)) {
         result = newSVpvs ("[cycle in lua table]");
-        /* Lua stack: [] */
-        /* No need to reset stack yet */
         goto RESET_STACK;
     }
 
@@ -557,8 +555,6 @@ coerce_to_pairs (lua_State * L, int visited_ix, int table_ix)
     marpa_lua_pushvalue(L, table_ix);
     if (!visitee_on(L, visited_ix, table_ix)) {
         result = newSVpvs ("[cycle in lua table]");
-        /* Lua stack: [] */
-        /* No need to reset stack yet */
         goto RESET_STACK;
     }
 
@@ -1549,17 +1545,81 @@ coerce_to_lua (lua_State * L, SV *sv, char sig)
    return;
 }
 
+/* Caller must ensure that `av` is in fact
+ * an AV.
+ */
+static void coerce_to_lua_array(
+  lua_State* L, int visited_ix, AV *av, char sig)
+{
+    dTHX;
+    SSize_t last_perl_ix;
+    SSize_t perl_ix;
+    int lud_ix;
+    int result_ix;
+
+    /* A light user data is used to provide a unique
+     * value for the "visited table".  This address is
+     * TOS+1, where TOS is the top of stack when this
+     * function was called.  This location will also
+     * contain the return value
+     */
+
+    marpa_lua_pushlightuserdata(L, (void*)av);
+    lud_ix = marpa_lua_gettop(L);
+    if (!visitee_on(L, visited_ix, lud_ix)) {
+        marpa_lua_pushliteral(L, "[cycle in Perl array]");
+        goto RESET_STACK;
+    }
+
+    /* Below we will call this recursively,
+     * so we need to make sure we have enough stack
+     */
+    marpa_luaL_checkstack(L, 20, LUA_TAG);
+
+    marpa_lua_newtable(L);
+    result_ix = marpa_lua_gettop(L);
+    last_perl_ix = av_len(av);
+    for (perl_ix = 0; perl_ix <= last_perl_ix; perl_ix++) {
+       SV** p_sv = av_fetch(av, perl_ix, 0);
+       if (p_sv) {
+           recursive_coerce_to_lua(L, visited_ix, *p_sv, sig);
+       } else {
+           marpa_lua_pushboolean(L, 0);
+       }
+       marpa_lua_seti(L, result_ix, perl_ix+1);
+    }
+
+    visitee_off(L, visited_ix, lud_ix);
+
+    RESET_STACK:
+
+    /* Replaces the lud with the result */
+    marpa_lua_copy(L, result_ix, lud_ix);
+    marpa_lua_settop(L, lud_ix);
+}
+
 /* Coerce an SV to Lua, leaving it on the stack */
 static void recursive_coerce_to_lua(
   lua_State* L, int visited_ix, SV *sv, char sig)
 {
     dTHX;
 
-    switch(sig) {
-    case 'S':
+    if (sig == 'S') {
         SvREFCNT_inc_simple_void_NN (sv);
         marpa_sv_sv_noinc (L, sv);
         return;
+    }
+
+    if (SvROK(sv)) {
+        SV* referent = SvRV(sv);
+        if (SvTYPE(referent) == SVt_PVAV) {
+            coerce_to_lua_array(L, visited_ix, (AV*)referent, sig);
+            return;
+        }
+        goto DEFAULT_TO_STRING;
+    }
+
+    switch(sig) {
     case 'i':
         if (SvIOK(sv)) {
           marpa_lua_pushinteger (L, (lua_Integer) SvIV (sv));
@@ -1578,6 +1638,7 @@ static void recursive_coerce_to_lua(
             ("Internal error: invalid sig option %c in xlua EXEC_SIG_BODY", sig);
     }
 
+    DEFAULT_TO_STRING:
     /* If here, we are coercing to a string */
     marpa_lua_pushstring (L, SvPV_nolen (sv));
     return;
