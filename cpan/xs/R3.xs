@@ -1760,8 +1760,6 @@ u_read (Outer_R * outer_slr)
         if (slr->perl_pos >= slr->end_pos)
             break;
 
-        /* codepoint = slr->pos_db[slr->perl_pos].codepoint; */
-
   call_by_tag (outer_slr->L,
     LUA_TAG,
     "local recce, perl_pos = ...\n"
@@ -2230,10 +2228,6 @@ marpa_inner_slr_new (Outer_G* outer_slg)
     slr->start_of_pause_lexeme = -1;
     slr->end_of_pause_lexeme = -1;
 
-    slr->pos_db = 0;
-    slr->pos_db_logical_size = -1;
-    slr->pos_db_physical_size = -1;
-
     slr->input_symbol_id = -1;
     slr->input = newSVpvn ("", 0);
     slr->end_pos = 0;
@@ -2274,7 +2268,6 @@ static void slr_inner_destroy(lua_State* L, Scanless_R* slr)
 
    Safefree(slr->t_lexemes);
 
-  Safefree(slr->pos_db);
   SvREFCNT_dec (slr->g1g_sv);
   Safefree(slr->symbol_r_properties);
   Safefree(slr->l0_rule_r_properties);
@@ -4532,9 +4525,7 @@ string_set( outer_slr, string )
 PPCODE:
 {
   Scanless_R *slr = slr_inner_get(outer_slr);
-  U8 *p;
-  U8 *start_of_string;
-  U8 *end_of_string;
+  char* p;
   int input_is_utf8;
 
   STRLEN pv_length;
@@ -4555,47 +4546,7 @@ PPCODE:
   slr->input = newSVpvn(p, pv_length);
   if (input_is_utf8) { SvUTF8_on(slr->input); }
 
-  start_of_string = (U8 *) SvPV (slr->input, pv_length);
-  end_of_string = start_of_string + pv_length;
 
-  slr->pos_db_logical_size = 0;
-  /* This original buffer size my be too small.
-   */
-  slr->pos_db_physical_size = 1024;
-  Newx (slr->pos_db, (unsigned int)slr->pos_db_physical_size, Pos_Entry);
-
-  for (p = start_of_string; p < end_of_string;)
-    {
-      STRLEN codepoint_length;
-      lua_Integer codepoint;
-      if (input_is_utf8)
-        {
-          codepoint = utf8_to_uvchr_buf (p, end_of_string, &codepoint_length);
-          /* Perl API documents that return value is 0 and length is -1 on error,
-           * "if possible".  length can be, and is, in fact unsigned.
-           * I deal with this by noting that 0 is a valid UTF8 char but should
-           * have a length of 1, when valid.
-           */
-          if (codepoint == 0 && codepoint_length != 1)
-            {
-              croak ("Problem in slr->string_set(): invalid UTF8 character");
-            }
-        }
-      else
-        {
-          codepoint = (lua_Integer) *p;
-          codepoint_length = 1;
-        }
-      /* Ensure that there is enough space */
-      if (slr->pos_db_logical_size >= slr->pos_db_physical_size)
-        {
-          slr->pos_db_physical_size *= 2;
-          Renew (slr->pos_db, (unsigned int)slr->pos_db_physical_size, Pos_Entry);
-        }
-      p += codepoint_length;
-      slr->pos_db[slr->pos_db_logical_size].codepoint = codepoint;
-      slr->pos_db_logical_size++;
-    }
   XSRETURN_YES;
 }
 

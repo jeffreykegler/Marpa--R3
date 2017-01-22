@@ -34,10 +34,6 @@ extern const struct marpa_event_description_s marpa_event_description[];
 extern const struct marpa_step_type_description_s
   marpa_step_type_description[];
 
-typedef struct {
-    lua_Integer codepoint;
-} Pos_Entry;
-
 struct symbol_g_properties {
      int priority;
      unsigned int is_lexeme:1;
@@ -188,9 +184,6 @@ typedef struct
   int end_of_pause_lexeme;
   struct symbol_r_properties *symbol_r_properties;
   struct l0_rule_r_properties *l0_rule_r_properties;
-  Pos_Entry *pos_db;
-  int pos_db_logical_size;
-  int pos_db_physical_size;
 
   Marpa_Symbol_ID input_symbol_id;
   lua_Integer codepoint;                 /* For error returns */
