@@ -1542,7 +1542,10 @@ coerce_to_lua (lua_State * L, SV *sv, char sig)
    marpa_lua_newtable(L);
    visited_ix = marpa_lua_gettop(L);
    recursive_coerce_to_lua(L, visited_ix, sv, sig);
-   marpa_lua_settop(L, visited_ix-1);
+   /* Replaces the visited table with the result */
+   marpa_lua_copy(L, -1, visited_ix);
+   /* Leaves the result on top of the stack */
+   marpa_lua_settop(L, visited_ix);
    return;
 }
 

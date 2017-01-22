@@ -141,27 +141,7 @@ my $lua_exec_sig_body = <<'END_OF_EXEC_SIG_BODY';
             }
 
             arg_sv = ST (arg_ix);
-
-            /* warn("this_sig: %c", this_sig); */
-            switch (this_sig) {
-            case 'n':
-                marpa_lua_pushnumber (L, (lua_Number)SvNV(arg_sv));
-                break;
-            case 'i':
-                marpa_lua_pushinteger (L, (lua_Integer)SvIV(arg_sv));
-                break;
-            case 's':
-                marpa_lua_pushstring (L, SvPV_nolen(arg_sv));
-                break;
-            case 'S':
-                SvREFCNT_inc_simple_void_NN (arg_sv);
-                marpa_sv_sv_noinc(L, arg_sv);
-                break;
-            default:
-                croak
-                    ("Internal error: invalid sig option %c in xlua EXEC_SIG_BODY", this_sig);
-            }
-            /* warn("%s %d narg=%d *sig=%c", __FILE__, __LINE__, narg, *sig); */
+            coerce_to_lua(L, arg_sv, this_sig);
         }
       endargs:;
 
