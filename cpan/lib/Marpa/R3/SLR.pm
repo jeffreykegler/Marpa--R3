@@ -498,6 +498,13 @@ sub Marpa::R3::Scanless::R::read {
     my $thin_slr = $self->[Marpa::R3::Internal::Scanless::R::SLR_C];
 
     $thin_slr->string_set($p_string);
+        $thin_slr->call_by_tag(
+    ('@' . __FILE__ . ':' . __LINE__),
+        <<'END_OF_LUA', 'i', [unpack('C*', ${$p_string})],
+            local recce, codepoints = ...
+            recce.codepoints = codepoints
+END_OF_LUA
+            );
 
     return 0 if @{ $self->[Marpa::R3::Internal::Scanless::R::EVENTS] };
 

@@ -1433,7 +1433,7 @@ call_by_tag (lua_State * L, const char* tag, const char *codestr,
             marpa_lua_pushnumber (L, (lua_Number) va_arg (vl, double));
             break;
         case 'i':
-            marpa_lua_pushinteger (L, (lua_Integer) va_arg (vl, int));
+            marpa_lua_pushinteger (L, va_arg (vl, lua_Integer));
             break;
         case 's':
             marpa_lua_pushstring (L, va_arg (vl, char *));
@@ -1495,7 +1495,7 @@ call_by_tag (lua_State * L, const char* tag, const char *codestr,
                     croak
                         ("Internal error: call_by_tag(%s ...): result type is not integer",
                         tag);
-                *va_arg (vl, int *) = (int) n;
+                *va_arg (vl, lua_Integer *) = n;
                 break;
             }
         case 'M':                  /* SV -- caller becomes owner of 1 mortal ref count. */
@@ -1689,14 +1689,14 @@ u_convert_events (Outer_R * outer_slr)
              * the Earley item warning threshold.
              */
             {
-              const int yim_count = (long) marpa_g_event_value (&marpa_event);
+              const lua_Integer yim_count = (long) marpa_g_event_value (&marpa_event);
               call_by_tag (outer_slr->L, LUA_TAG,
                   "recce, perl_pos, yim_count = ...\n"
                   "local q = recce.event_queue\n"
                   "q[#q+1] = { 'l0 earley item threshold exceeded', perl_pos, yim_count }\n",
                   "Rii>",
                   outer_slr->lua_ref,
-                  slr->perl_pos,
+                  (lua_Integer)slr->perl_pos,
                   yim_count
               );
             }
@@ -1749,7 +1749,7 @@ u_read (Outer_R * outer_slr)
     "    recce:l0r_new(perl_pos)\n"    
     "end\n"
     ,
-    "Ri>", outer_slr->lua_ref, slr->perl_pos);
+    "Ri>", outer_slr->lua_ref, (lua_Integer)slr->perl_pos);
 
     for (;;) {
         UV codepoint;
@@ -1787,8 +1787,8 @@ u_read (Outer_R * outer_slr)
             "   local q = recce.event_queue\n"
             "   q[#q+1] = { '!trace', 'lexer reading codepoint', codepoint, perl_pos}\n"
             "end\n",
-            "Rii>", outer_slr->lua_ref, (int) codepoint,
-            (int) slr->perl_pos);
+            "Rii>", outer_slr->lua_ref, (lua_Integer)codepoint,
+            (lua_Integer) slr->perl_pos);
 
         /* ops[0] is codepoint */
         op_count = ops[1];
@@ -1797,7 +1797,7 @@ u_read (Outer_R * outer_slr)
             switch (op_code) {
             case MARPA_OP_ALTERNATIVE:
                 {
-                    int result;
+                    lua_Integer result;
                     int symbol_id;
                     int length;
                     int value;
@@ -1825,7 +1825,7 @@ u_read (Outer_R * outer_slr)
                             "return recce.lmw_l0r:alternative(symbol_id, value, length)\n",
                             "Riii>i",
                             outer_slr->lua_ref,
-                            symbol_id, value, length, &result
+                            (lua_Integer)symbol_id, (lua_Integer)value, (lua_Integer)length, &result
                     );
                     switch (result) {
                     case MARPA_ERR_UNEXPECTED_TOKEN_ID:
@@ -1843,7 +1843,7 @@ u_read (Outer_R * outer_slr)
                             "end\n",
                             "Riii>",
                             outer_slr->lua_ref,
-                            codepoint, slr->perl_pos, symbol_id);
+                            (lua_Integer)codepoint, (lua_Integer)slr->perl_pos, (lua_Integer)symbol_id);
 
                         break;
                     case MARPA_ERR_NONE:
@@ -1856,7 +1856,7 @@ u_read (Outer_R * outer_slr)
                             "end\n",
                             "Riii>",
                             outer_slr->lua_ref,
-                            codepoint, slr->perl_pos, symbol_id);
+                            (lua_Integer)codepoint, (lua_Integer)slr->perl_pos, (lua_Integer)symbol_id);
 
                         tokens_accepted++;
                         break;
@@ -1880,7 +1880,7 @@ u_read (Outer_R * outer_slr)
 
             case MARPA_OP_EARLEME_COMPLETE:
                 {
-                    int result;
+                    lua_Integer result;
                     if (tokens_accepted < 1) {
                         slr->codepoint = codepoint;
                         return U_READ_REJECTED_CHAR;
@@ -1893,7 +1893,7 @@ u_read (Outer_R * outer_slr)
                         outer_slr->lua_ref, &result);
 
                     if (result > 0) {
-                        int is_exhausted;
+                        lua_Integer is_exhausted;
                         u_convert_events (outer_slr);
                         /* Advance one character before returning */
 
@@ -1931,7 +1931,7 @@ u_read (Outer_R * outer_slr)
         }
       ADVANCE_ONE_CHAR:;
         {
-            int trace_terminals;
+            lua_Integer trace_terminals;
             slr->perl_pos++;
             call_by_tag (outer_slr->L, LUA_TAG,
                 "recce = ...\n"
@@ -2133,7 +2133,7 @@ marpa_inner_slr_new (Outer_G* outer_slg)
     dTHX;
     Scanless_R *slr;
     Scanless_G *slg = slg_inner_get (outer_slg);
-    int value_is_literal;
+    lua_Integer value_is_literal;
 
     Newx (slr, 1, Scanless_R);
 
@@ -2299,7 +2299,7 @@ slr_convert_events ( Outer_R *outer_slr)
                 "local q = recce.event_queue\n"
                 "q[#q+1] = { 'symbol completed', symbol}\n",
                 "Ri>",
-                outer_slr->lua_ref, marpa_g_event_value (&marpa_event)
+                outer_slr->lua_ref, (lua_Integer)marpa_g_event_value (&marpa_event)
             );
             break;
 
@@ -2309,7 +2309,7 @@ slr_convert_events ( Outer_R *outer_slr)
                 "local q = recce.event_queue\n"
                 "q[#q+1] = { 'symbol nulled', symbol}\n",
                 "Ri>",
-                outer_slr->lua_ref, marpa_g_event_value (&marpa_event)
+                outer_slr->lua_ref, (lua_Integer)marpa_g_event_value (&marpa_event)
             );
             break;
         case MARPA_EVENT_SYMBOL_PREDICTED:
@@ -2318,7 +2318,7 @@ slr_convert_events ( Outer_R *outer_slr)
                 "local q = recce.event_queue\n"
                 "q[#q+1] = { 'symbol predicted', symbol}\n",
                 "Ri>",
-                outer_slr->lua_ref, marpa_g_event_value (&marpa_event)
+                outer_slr->lua_ref, (lua_Integer)marpa_g_event_value (&marpa_event)
             );
             break;
         case MARPA_EVENT_EARLEY_ITEM_THRESHOLD:
@@ -2336,8 +2336,8 @@ slr_convert_events ( Outer_R *outer_slr)
                 "q[#q+1] = { 'g1 earley item threshold exceeded', perl_pos, yim_count}\n",
                 "Rii>",
                 outer_slr->lua_ref,
-                slr->perl_pos,
-                marpa_g_event_value (&marpa_event)
+                (lua_Integer)slr->perl_pos,
+                (lua_Integer)marpa_g_event_value (&marpa_event)
             );
             break;
         default:
@@ -2391,7 +2391,7 @@ r_convert_events ( Outer_R *outer_slr)
                   "q[#q+1] = { 'symbol completed', completed_symbol}\n",
                   "Ri>",
                   outer_slr->lua_ref,
-                  completed_symbol
+                  (lua_Integer)completed_symbol
               );
             }
             break;
@@ -2405,7 +2405,7 @@ r_convert_events ( Outer_R *outer_slr)
                   "q[#q+1] = { 'symbol nulled', nulled_symbol}\n",
                   "Ri>",
                   outer_slr->lua_ref,
-                  nulled_symbol
+                  (lua_Integer)nulled_symbol
               );
             }
             break;
@@ -2419,7 +2419,7 @@ r_convert_events ( Outer_R *outer_slr)
                   "q[#q+1] = { 'symbol predicted', predicted_symbol}\n",
                   "Ri>",
                   outer_slr->lua_ref,
-                  predicted_symbol
+                  (lua_Integer)predicted_symbol
               );
             }
             break;
@@ -2454,8 +2454,8 @@ r_convert_events ( Outer_R *outer_slr)
                   "Rsii>",
                   outer_slr->lua_ref,
                   (result_string ? result_string : ""),
-                  event_ix,
-                  event_type
+                  (lua_Integer)event_ix,
+                  (lua_Integer)event_type
               );
             }
             break;
@@ -2475,7 +2475,7 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
 {
     dTHX;
     Scanless_R *slr = slr_inner_get(outer_slr);
-    Marpa_Earley_Set_ID earley_set;
+    lua_Integer earley_set;
     const Scanless_G *slg = slr->slg;
 
     /* |high_lexeme_priority| is not valid unless |is_priority_set| is set. */
@@ -2512,7 +2512,7 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
      * search the 0'th Earley set.
      */
     for ( ; earley_set > 0; earley_set--) {
-        int return_value;
+        lua_Integer return_value;
         int end_of_earley_items = 0;
         working_pos = slr->start_of_lexeme + earley_set;
 
@@ -2525,16 +2525,16 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
             "end\n"
             "return return_value\n" ,
             "Ri>i",
-            outer_slr->lua_ref, earley_set, &return_value);
+            outer_slr->lua_ref, (lua_Integer)earley_set, &return_value);
 
         while (!end_of_earley_items) {
             struct l0_rule_g_properties *l0_rule_g_properties;
             struct symbol_r_properties *symbol_r_properties;
-            Marpa_Symbol_ID g1_lexeme;
+            lua_Integer g1_lexeme;
             int this_lexeme_priority;
-            int dot_position;
-            int origin;
-            int rule_id;
+            lua_Integer dot_position;
+            lua_Integer origin;
+            lua_Integer rule_id;
 
             call_by_tag (outer_slr->L, LUA_TAG,
                 "recce = ...\n"
@@ -2564,7 +2564,7 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
                 "g1_lexeme = g1_lexeme or -1\n"
                 "return g1_lexeme\n"
                 ,
-                "Ri>i", outer_slr->lua_ref, rule_id,
+                "Ri>i", outer_slr->lua_ref, (lua_Integer)rule_id,
                   &g1_lexeme);
 
             if (g1_lexeme == -1)
@@ -2596,7 +2596,7 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
                 "        start_of_lexeme, end_of_lexeme, g1_lexeme))\n"
                 "end\n",
                 "Riii>",
-                outer_slr->lua_ref, g1_lexeme, slr->start_of_lexeme, slr->end_of_lexeme);
+                outer_slr->lua_ref, (lua_Integer)g1_lexeme, (lua_Integer)slr->start_of_lexeme, (lua_Integer)slr->end_of_lexeme);
 
             /* If we are here, the lexeme will be accepted  by the grammar,
              * but we do not yet know about priority
@@ -2677,13 +2677,12 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
                             ,
                             "Riiiii>",
                             outer_slr->lua_ref,
-                            lexeme_stack_event->t_trace_lexeme_acceptable.
-                            t_start_of_lexeme,
-                            lexeme_stack_event->t_trace_lexeme_acceptable.t_end_of_lexeme,
-                            lexeme_stack_event->t_trace_lexeme_acceptable.t_lexeme,
-                            lexeme_stack_event->t_trace_lexeme_acceptable.t_priority,
-                            lexeme_stack_event->t_trace_lexeme_acceptable.
-                            t_required_priority);
+                            (lua_Integer)lexeme_stack_event->t_trace_lexeme_acceptable.  t_start_of_lexeme,
+                            (lua_Integer)lexeme_stack_event->t_trace_lexeme_acceptable.t_end_of_lexeme,
+                            (lua_Integer)lexeme_stack_event->t_trace_lexeme_acceptable.t_lexeme,
+                            (lua_Integer)lexeme_stack_event->t_trace_lexeme_acceptable.t_priority,
+                            (lua_Integer)lexeme_stack_event->t_trace_lexeme_acceptable.t_required_priority
+                          );
                 }
                 goto NEXT_LEXEME_EVENT;
             case MARPA_SLRTR_LEXEME_DISCARDED:
@@ -2700,9 +2699,9 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
                         "end\n",
                         "Riii>",
                         outer_slr->lua_ref,
-                        lexeme_stack_event->t_trace_lexeme_discarded.t_rule_id,
-                        lexeme_stack_event->t_trace_lexeme_discarded.t_start_of_lexeme,
-                        lexeme_stack_event->t_trace_lexeme_discarded.t_end_of_lexeme);
+                        (lua_Integer)lexeme_stack_event->t_trace_lexeme_discarded.t_rule_id,
+                        (lua_Integer)lexeme_stack_event->t_trace_lexeme_discarded.t_start_of_lexeme,
+                        (lua_Integer)lexeme_stack_event->t_trace_lexeme_discarded.t_end_of_lexeme);
 
                 if (pass1_result == discard) {
                     const Marpa_Rule_ID l0_rule_id =
@@ -2721,9 +2720,9 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
                         "    rule_id, lexeme_start, lexeme_end, last_g1_location}\n",
                         "Riii>",
                         outer_slr->lua_ref,
-                        l0_rule_id,
-                        lexeme_stack_event->t_trace_lexeme_discarded.t_start_of_lexeme,
-                        lexeme_stack_event->t_trace_lexeme_discarded.t_end_of_lexeme
+                        (lua_Integer)l0_rule_id,
+                        (lua_Integer)lexeme_stack_event->t_trace_lexeme_discarded.t_start_of_lexeme,
+                        (lua_Integer)lexeme_stack_event->t_trace_lexeme_discarded.t_end_of_lexeme
                         );
                 }
                 goto NEXT_LEXEME_EVENT;
@@ -2782,8 +2781,8 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
                             ,
                             "Riii>",
                             outer_slr->lua_ref,
-                            slr->start_of_pause_lexeme,
-                            slr->end_of_pause_lexeme, g1_lexeme);
+                            (lua_Integer)slr->start_of_pause_lexeme,
+                            (lua_Integer)slr->end_of_pause_lexeme, (lua_Integer)g1_lexeme);
                 }
             }
         }
@@ -2795,7 +2794,7 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
     }
 
     {
-        int return_value;
+        lua_Integer return_value;
         int i;
         for (i = 0; i < slr->t_lexeme_count; i++) {
             union marpa_slr_event_s *const event = slr->t_lexemes + i;
@@ -2821,9 +2820,9 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
                                 ,
                                 "Riii>i",
                                 outer_slr->lua_ref,
-                                slr->start_of_lexeme,
-                                slr->end_of_lexeme,
-                                g1_lexeme,
+                                (lua_Integer)slr->start_of_lexeme,
+                                (lua_Integer)slr->end_of_lexeme,
+                                (lua_Integer)g1_lexeme,
                                 &return_value
                             );
 
@@ -2844,9 +2843,9 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
                                 ,
                                 "Riii>",
                                 outer_slr->lua_ref,
-                                slr->start_of_lexeme,
-                                slr->end_of_lexeme,
-                                g1_lexeme
+                                (lua_Integer)slr->start_of_lexeme,
+                                (lua_Integer)slr->end_of_lexeme,
+                                (lua_Integer)g1_lexeme
                             );
                     break;
 
@@ -2859,9 +2858,9 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
                                 "end\n",
                                 "Riii>",
                                 outer_slr->lua_ref,
-                                slr->start_of_lexeme,
-                                slr->end_of_lexeme,
-                                g1_lexeme
+                                (lua_Integer)slr->start_of_lexeme,
+                                (lua_Integer)slr->end_of_lexeme,
+                                (lua_Integer)g1_lexeme
                             );
                     if (symbol_r_properties->t_pause_after_active) {
                         slr->start_of_pause_lexeme =
@@ -2878,9 +2877,9 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
                                 "q[#q+1] = { 'after lexeme', lexeme}\n",
                                 "Riii>",
                                 outer_slr->lua_ref,
-                                slr->start_of_pause_lexeme,
-                                slr->end_of_pause_lexeme,
-                                g1_lexeme
+                                (lua_Integer)slr->start_of_pause_lexeme,
+                                (lua_Integer)slr->end_of_pause_lexeme,
+                                (lua_Integer)g1_lexeme
                             );
                     }
                     break;
@@ -2921,8 +2920,8 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
           "local latest_earley_set = g1r:latest_earley_set()\n"
           "recce.es_data[latest_earley_set] = { start_pos, lexeme_length }\n"
           , "Rii>", outer_slr->lua_ref,
-          slr->start_of_lexeme,
-          (slr->end_of_lexeme - slr->start_of_lexeme)
+          (lua_Integer)slr->start_of_lexeme,
+          (lua_Integer)(slr->end_of_lexeme - slr->start_of_lexeme)
           );
 
     }
@@ -2937,8 +2936,8 @@ slr_es_span_to_literal_sv (Scanless_R * slr, lua_State* L,
                         Marpa_Earley_Set_ID end_earley_set)
 {
   dTHX;
-  int l0_start;
-  int l0_length;
+  lua_Integer l0_start;
+  lua_Integer l0_length;
 
   call_by_tag (L, LUA_TAG,
       "-- this logic is careless about the l0_start when l0_length == 0\n"
@@ -2968,8 +2967,8 @@ slr_es_span_to_literal_sv (Scanless_R * slr, lua_State* L,
       "return l0_start, l0_length\n"
       ,
       "Rii>ii", slr->outer_slr_lua_ref,
-      start_earley_set,
-      end_earley_set,
+      (lua_Integer)start_earley_set,
+      (lua_Integer)end_earley_set,
       &l0_start,
       &l0_length
       );
@@ -4073,7 +4072,7 @@ PPCODE:
                                 "end\n",
                                 "Ri>",
                                 outer_slr->lua_ref,
-                                slr->perl_pos
+                                (lua_Integer)slr->perl_pos
                             );
 
         }
@@ -4103,7 +4102,7 @@ PPCODE:
 
 
         {
-          int discard_mode;
+          lua_Integer discard_mode;
 
           call_by_tag (outer_slr->L, LUA_TAG,
               "local recce = ...\n"
@@ -4120,7 +4119,7 @@ PPCODE:
         }
 
       {
-        int event_count;
+        lua_Integer event_count;
         call_by_tag (outer_slr->L, LUA_TAG,
             "local recce = ...\n"
             "return #recce.event_queue\n",
@@ -4132,7 +4131,7 @@ PPCODE:
       }
 
         {
-            int trace_terminals;
+            lua_Integer trace_terminals;
             call_by_tag (outer_slr->L, LUA_TAG,
                 "recce = ...\n"
                 "return recce.trace_terminals\n",
@@ -4229,12 +4228,12 @@ g1_alternative (outer_slr, symbol_id, ...)
 PPCODE:
 {
   Scanless_R *slr = slr_inner_get(outer_slr);
-  int result;
-  int token_ix;
+  lua_Integer result;
+  lua_Integer token_ix;
   switch (items)
     {
     case 2:
-    { int value_is_literal;
+    { lua_Integer value_is_literal;
             call_by_tag (outer_slr->L, LUA_TAG,
                 "recce = ...\n"
                 "local g1r = recce.lmw_g1r\n"
@@ -4253,7 +4252,7 @@ PPCODE:
       {
         SV *token_value = ST (2);
         if (IS_PERL_UNDEF (token_value))
-          { int value_is_undef;
+          { lua_Integer value_is_undef;
             call_by_tag (outer_slr->L, LUA_TAG,
                 "recce = ...\n"
                 "local g1r = recce.lmw_g1r\n"
@@ -4301,8 +4300,8 @@ PPCODE:
         ,
         "Rii>i",
         outer_slr->lua_ref,
-        symbol_id,
-        token_ix,
+        (lua_Integer)symbol_id,
+        (lua_Integer)token_ix,
         &result
     );
 
@@ -4321,7 +4320,7 @@ g1_lexeme_complete (outer_slr, start_pos_sv, length_sv)
 PPCODE:
 {
   Scanless_R *slr = slr_inner_get(outer_slr);
-  int result;
+  lua_Integer result;
   const int input_length = slr->pos_db_logical_size;
 
   int start_pos = SvIOK (start_pos_sv) ? SvIV (start_pos_sv) : slr->perl_pos;
@@ -4375,7 +4374,7 @@ PPCODE:
           "local g1r = recce.lmw_g1r\n"
           "local latest_earley_set = g1r:latest_earley_set()\n"
           "recce.es_data[latest_earley_set] = { start_pos, lexeme_length }\n"
-          , "Rii>", outer_slr->lua_ref, start_pos, lexeme_length);
+          , "Rii>", outer_slr->lua_ref, (lua_Integer)start_pos, (lua_Integer)lexeme_length);
 
       slr->perl_pos = start_pos + lexeme_length;
       XSRETURN_IV (slr->perl_pos);
@@ -4716,7 +4715,7 @@ stack_step( outer_slr )
     Outer_R *outer_slr;
 PPCODE:
 {
-    int result;
+    lua_Integer result;
     SV *new_values;
 
     call_by_tag (outer_slr->L, LUA_TAG,
@@ -4727,7 +4726,7 @@ PPCODE:
     case 3:
         {
             SV* step_type;
-            int parm2;
+            lua_Integer parm2;
             call_by_tag (outer_slr->L, LUA_TAG,
               "local recce = ...\n"
               "local this = recce.this_step\n"
@@ -4765,7 +4764,7 @@ PPCODE:
 {
   Scanless_R *slr = slr_inner_get(outer_slr);
   G_Wrapper *g1_wrapper = slr->g1_wrapper;
-  int gp_result;
+  lua_Integer gp_result;
 
     call_by_tag (outer_slr->L, LUA_TAG,
         "recce = ...\n"
