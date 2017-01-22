@@ -502,6 +502,7 @@ sub Marpa::R3::Scanless::R::read {
     ('@' . __FILE__ . ':' . __LINE__),
         <<'END_OF_LUA', 'i', [unpack('C*', ${$p_string})],
             local recce, codepoints = ...
+            -- print("codepoints:", inspect(codepoints))
             recce.codepoints = codepoints
 END_OF_LUA
             );

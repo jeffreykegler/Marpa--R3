@@ -1760,7 +1760,16 @@ u_read (Outer_R * outer_slr)
         if (slr->perl_pos >= slr->end_pos)
             break;
 
-        codepoint = slr->pos_db[slr->perl_pos].codepoint;
+        /* codepoint = slr->pos_db[slr->perl_pos].codepoint; */
+
+  call_by_tag (outer_slr->L,
+    LUA_TAG,
+    "local recce, perl_pos = ...\n"
+    "-- print('codepoints:', inspect(recce.codepoints))\n"
+    "-- print('perl_pos:', inspect(perl_pos))\n"
+    "return recce.codepoints[perl_pos+1]\n"
+    ,
+    "Ri>i", outer_slr->lua_ref, (lua_Integer)slr->perl_pos, &codepoint);
 
         if (codepoint < Dim (slr->slg->per_codepoint_array)) {
             ops = slr->slg->per_codepoint_array[codepoint];
@@ -1947,10 +1956,17 @@ u_read (Outer_R * outer_slr)
 
 /* It is OK to set pos to last codepoint + 1 */
 static void
-u_pos_set (Scanless_R * slr, const char* name, int start_pos_arg, int length_arg)
+u_pos_set (Outer_R * outer_slr, const char* name, int start_pos_arg, int length_arg)
 {
   dTHX;
-  const int input_length = slr->pos_db_logical_size;
+  Scanless_R *slr = slr_inner_get(outer_slr);
+  lua_Integer input_length;
+
+  call_by_tag (outer_slr->L, LUA_TAG,
+      "recce = ...\n"
+      "return #recce.codepoints\n",
+      "R>i", outer_slr->lua_ref, &input_length);
+
   int new_perl_pos;
   int new_end_pos;
 
@@ -4021,7 +4037,7 @@ PPCODE:
   Scanless_R *slr = slr_inner_get(outer_slr);
   int start_pos = SvIOK(start_pos_sv) ? SvIV(start_pos_sv) : slr->perl_pos;
   int length = SvIOK(length_sv) ? SvIV(length_sv) : -1;
-  u_pos_set(slr, "slr->pos_set", start_pos, length);
+  u_pos_set(outer_slr, "slr->pos_set", start_pos, length);
   slr->lexer_start_pos = slr->perl_pos;
   XSRETURN_YES;
 }
@@ -4321,7 +4337,12 @@ PPCODE:
 {
   Scanless_R *slr = slr_inner_get(outer_slr);
   lua_Integer result;
-  const int input_length = slr->pos_db_logical_size;
+  lua_Integer input_length;
+
+  call_by_tag (outer_slr->L, LUA_TAG,
+      "recce = ...\n"
+      "return #recce.codepoints\n",
+      "R>i", outer_slr->lua_ref, &input_length);
 
   int start_pos = SvIOK (start_pos_sv) ? SvIV (start_pos_sv) : slr->perl_pos;
 
