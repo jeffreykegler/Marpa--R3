@@ -1,0 +1,10 @@
+# A 2nd Makefile, to keep developer targets from cluttering
+# the EU::MM Makefile, which is for installation
+
+dummy:
+	echo No default target
+
+debug:
+	make clean
+	perl Makefile.PL OPTIMIZE=-g
+	make OPTIMIZE=-g
