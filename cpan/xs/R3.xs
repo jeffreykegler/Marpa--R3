@@ -337,6 +337,37 @@ xlua_unref(lua_State* L)
     return 0;
 }
 
+/* Returns 0 if visitee_ix "thing" is already "seen",
+ * otherwise, sets it "seen" and returns 1.
+ * A small fixed number of stack entries are used
+ * -- stack hygiene is left to the caller.
+ */
+static int visitee_on(
+  lua_State* L, int seen_ix, int visitee_ix)
+{
+    marpa_lua_pushvalue(L, visitee_ix);
+    if (marpa_lua_gettable(L, seen_ix) != LUA_TNIL) {
+        return 0;
+    }
+    marpa_lua_pushvalue(L, visitee_ix);
+    marpa_lua_pushboolean(L, 1);
+    marpa_lua_settable(L, seen_ix);
+    return 1;
+}
+
+/* Unsets "seen" for Lua "thing" at visitee_ix in
+ * the table at seen_ix.
+ * A small fixed number of stack entries are used
+ * -- stack hygiene is left to the caller.
+ */
+static void visitee_off(
+  lua_State* L, int seen_ix, int visitee_ix)
+{
+    marpa_lua_pushvalue(L, visitee_ix);
+    marpa_lua_pushnil(L);
+    marpa_lua_settable(L, seen_ix);
+}
+
 static SV*
 recursive_coerce_to_sv (lua_State * L, int visited_ix, int idx, char sig);
 static SV*
@@ -456,27 +487,23 @@ coerce_to_av (lua_State * L, int visited_ix, int table_ix, char signature)
     dTHX;
     SV *result;
     AV *av;
-    int visited_type;
     int seq_ix;
     const int base_of_stack = marpa_lua_gettop(L);
     const int ix_offset = (signature - '0') - 1;
 
-    /* We call this recursively, so we need to make sure we have enough stack */
-    marpa_luaL_checkstack(L, 20, LUA_TAG);
     /* Lua stack: [] */
     marpa_lua_pushvalue(L, table_ix);
-    /* Lua stack: [table_ix] */
-    visited_type = marpa_lua_gettable(L, visited_ix);
-    /* Lua stack: [] */
-    if (visited_type == LUA_TTABLE) {
+    if (!visitee_on(L, visited_ix, table_ix)) {
         result = newSVpvs ("[cycle in lua table]");
         /* Lua stack: [] */
         /* No need to reset stack yet */
-        return result;
+        goto RESET_STACK;
     }
-    marpa_lua_pushvalue(L, table_ix);
-    marpa_lua_pushvalue(L, table_ix);
-    marpa_lua_settable(L, visited_ix);
+
+    /* Below we will call this recursively,
+     * so we need to make sure we have enough stack
+     */
+    marpa_luaL_checkstack(L, 20, LUA_TAG);
 
     av = newAV();
     /* mortalize it, so it is garbage collected if we abend */
@@ -503,6 +530,9 @@ coerce_to_av (lua_State * L, int visited_ix, int table_ix, char signature)
      * abend.
      */
     SvREFCNT_inc_simple_void_NN (result);
+    visitee_off(L, visited_ix, table_ix);
+
+    RESET_STACK:
     marpa_lua_settop(L, base_of_stack);
     return result;
 }
