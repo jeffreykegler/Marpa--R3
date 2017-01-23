@@ -1391,34 +1391,36 @@ END_OF_LUA
             $separator_id = assign_G1_symbol( $slg, $separator_name );
         } ## end if ( defined $separator_name )
 
-        $grammar_c->throw_set(0);
-
         # The original rule for a sequence rule is
         # not actually used in parsing,
         # but some of the rewritten sequence rules are its
         # semantic equivalents.
 
-        $base_rule_id = $grammar_c->sequence_new(
-            $lhs_id,
-            $rhs_ids[0],
-            {
-                separator => $separator_id,
-                proper    => $proper_separation,
-                min       => $min,
-            }
-        );
-        $grammar_c->throw_set(1);
+        my $arg_hash = {
+            lhs => $lhs_id,
+            rhs => $rhs_ids[0],
+            separator => $separator_id,
+            proper    => $proper_separation,
+            min       => $min,
+        };
 
+      ($base_rule_id) = 
       $thin_slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 'i', ($base_rule_id // -1));
-    local g, base_rule_id = ...
+        <<'END_OF_LUA', 'i', $arg_hash);
+    local g, arg_hash = ...
+    -- print('arg_hash: ', inspect(arg_hash))
+    arg_hash.proper = (arg_hash.proper ~= 0)
+    kollos.throw = false
+    base_rule_id = g.lmw_g1g:sequence_new(arg_hash)
+    kollos.throw = true
     -- remove the test for nil or less than zero
     -- once refactoring is complete?
-    if base_rule_id < 0 then return end
+    if not base_rule_id or base_rule_id < 0 then return end
     g.g1_rules[base_rule_id] = { id = base_rule_id }
+    return base_rule_id
 END_OF_LUA
 
-    } ## end else [ if ($is_ordinary_rule) ]
+    }
 
     if ( not defined $base_rule_id or $base_rule_id < 0 ) {
         my $rule_description = rule_describe( $lhs_name, $rhs_names );
