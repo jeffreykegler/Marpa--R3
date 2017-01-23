@@ -784,6 +784,7 @@ push_val (lua_State * L, SV * val)
   return;
 }
 
+/* [0, +1]
 /* Creates a userdata containing a Perl SV, and
  * leaves the new userdata on top of the stack.
  * The new Lua userdata takes ownership of one reference count.
@@ -1548,7 +1549,7 @@ coerce_to_lua (lua_State * L, SV *sv, char sig)
 /* Caller must ensure that `av` is in fact
  * an AV.
  */
-static void coerce_to_lua_array(
+static void coerce_to_lua_sequence(
   lua_State* L, int visited_ix, AV *av, char sig)
 {
     dTHX;
@@ -1598,6 +1599,61 @@ static void coerce_to_lua_array(
     marpa_lua_settop(L, lud_ix);
 }
 
+/* [0, +1]
+/* Caller must ensure that `hv` is in fact
+ * an HV.
+ * All Perl hash keys are converted to Lua
+ * string keys, and the values are converted
+ * recursively according to "sig".
+ */
+static void coerce_to_lua_table(
+  lua_State* L, int visited_ix, HV *hv, char sig)
+{
+    dTHX;
+    int lud_ix;
+    int result_ix;
+
+    /* A light user data is used to provide a unique
+     * value for the "visited table".  This address is
+     * TOS+1, where TOS is the top of stack when this
+     * function was called.  This location will also
+     * contain the return value
+     */
+    marpa_lua_pushlightuserdata (L, (void *) hv);
+    lud_ix = marpa_lua_gettop (L);
+    if (!visitee_on (L, visited_ix, lud_ix)) {
+        marpa_lua_pushliteral (L, "[cycle in Perl hash]");
+        goto RESET_STACK;
+    }
+
+    /* Below we will call this recursively,
+     * so we need to make sure we have enough stack
+     */
+    marpa_luaL_checkstack (L, 20, LUA_TAG);
+
+    marpa_lua_newtable (L);
+    result_ix = marpa_lua_gettop (L);
+    hv_iterinit (hv);
+    {
+        char *key;
+        I32 klen;
+        SV *val;
+        while ((val = hv_iternextsv (hv, (char **) &key, &klen))) {
+            marpa_lua_pushlstring (L, key, klen);
+            recursive_coerce_to_lua (L, visited_ix, val, sig);
+            marpa_lua_settable (L, result_ix);
+        }
+    }
+
+    visitee_off (L, visited_ix, lud_ix);
+
+  RESET_STACK:
+
+    /* Replaces the lud with the result */
+    marpa_lua_copy (L, result_ix, lud_ix);
+    marpa_lua_settop (L, lud_ix);
+}
+
 /* Coerce an SV to Lua, leaving it on the stack */
 static void recursive_coerce_to_lua(
   lua_State* L, int visited_ix, SV *sv, char sig)
@@ -1613,7 +1669,11 @@ static void recursive_coerce_to_lua(
     if (SvROK(sv)) {
         SV* referent = SvRV(sv);
         if (SvTYPE(referent) == SVt_PVAV) {
-            coerce_to_lua_array(L, visited_ix, (AV*)referent, sig);
+            coerce_to_lua_sequence(L, visited_ix, (AV*)referent, sig);
+            return;
+        }
+        if (SvTYPE(referent) == SVt_PVHV) {
+            coerce_to_lua_table(L, visited_ix, (HV*)referent, sig);
             return;
         }
         goto DEFAULT_TO_STRING;
@@ -3205,46 +3265,6 @@ PPCODE:
     }
   XPUSHs (sv_2mortal (newSVpv (result_string, 0)));
   XPUSHs (sv_2mortal (newSViv (marpa_g_event_value (&event))));
-}
-
- # Actually returns Marpa_Rule_ID, void is here to eliminate RETVAL
- # that remains unused with PPCODE. The same applies to all void's below
- # when preceded with a return type commented out, e.g.
- #    # int
- #    void
-void
-rule_new( g_wrapper, lhs, rhs_av )
-    G_Wrapper *g_wrapper;
-    Marpa_Symbol_ID lhs;
-    AV *rhs_av;
-PPCODE:
-{
-  Marpa_Grammar g = g_wrapper->g;
-    int length;
-    Marpa_Symbol_ID* rhs;
-    Marpa_Rule_ID new_rule_id;
-    length = av_len(rhs_av)+1;
-    if (length <= 0) {
-        rhs = (Marpa_Symbol_ID*)NULL;
-    } else {
-        int i;
-        Newx(rhs, (unsigned int)length, Marpa_Symbol_ID);
-        for (i = 0; i < length; i++) {
-            SV** elem = av_fetch(rhs_av, i, 0);
-            if (elem == NULL) {
-                Safefree(rhs);
-                XSRETURN_UNDEF;
-            } else {
-                rhs[i] = (Marpa_Symbol_ID)SvIV(*elem);
-            }
-        }
-    }
-    new_rule_id = marpa_g_rule_new(g, lhs, rhs, length);
-    Safefree(rhs);
-    if (new_rule_id < 0 && g_wrapper->throw ) {
-      croak ("Problem in g->rule_new(%d, ...): %s", lhs, xs_g_error (g_wrapper));
-    }
-    XPUSHs( sv_2mortal( newSViv(new_rule_id) ) );
 }
 
  # This function invalidates any current iteration on
