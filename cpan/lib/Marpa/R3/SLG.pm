@@ -1366,18 +1366,19 @@ sub add_G1_user_rule {
 
     if ($is_ordinary_rule) {
 
-        # Capture errors
-        $grammar_c->throw_set(0);
-        $base_rule_id = $grammar_c->rule_new( $lhs_id, \@rhs_ids );
-        $grammar_c->throw_set(1);
-
-      $thin_slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 'i', ($base_rule_id // -1));
-    local g, base_rule_id = ...
+        ($base_rule_id) =
+          $thin_slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+            <<'END_OF_LUA', 'i', [ $lhs_id, @rhs_ids ] );
+    local g, rule  = ...
     -- remove the test for nil or less than zero
     -- once refactoring is complete?
-    if base_rule_id < 0 then return end
+    kollos.throw = false
+    local base_rule_id = g.lmw_g1g:rule_new(rule)
+    -- print('base_rule_id: ', inspect(base_rule_id))
+    kollos.throw = true
+    if not base_rule_id or base_rule_id < 0 then return -1 end
     g.g1_rules[base_rule_id] = { id = base_rule_id }
+    return base_rule_id
 END_OF_LUA
 
     } ## end if ($is_ordinary_rule)
@@ -1512,18 +1513,19 @@ sub add_L0_user_rule {
 
     if ($is_ordinary_rule) {
 
-        # Capture errors
-        $grammar_c->throw_set(0);
-        $base_rule_id = $grammar_c->rule_new( $lhs_id, \@rhs_ids );
-        $grammar_c->throw_set(1);
-
-      $thin_slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 'i', ($base_rule_id // -1));
-    local g, base_rule_id = ...
+        ($base_rule_id) =
+          $thin_slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+            <<'END_OF_LUA', 'i', [ $lhs_id, @rhs_ids ] );
+    local g, rule  = ...
     -- remove the test for nil or less than zero
     -- once refactoring is complete?
-    if base_rule_id < 0 then return end
+    kollos.throw = false
+    local base_rule_id = g.lmw_l0g:rule_new(rule)
+    -- print('base_rule_id: ', inspect(base_rule_id))
+    kollos.throw = true
+    if not base_rule_id or base_rule_id < 0 then return -1 end
     g.l0_rules[base_rule_id] = { id = base_rule_id }
+    return base_rule_id
 END_OF_LUA
 
     } ## end if ($is_ordinary_rule)

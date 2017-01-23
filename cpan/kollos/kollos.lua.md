@@ -3479,7 +3479,7 @@ so the caller must make sure that one is available.
 If the rule is 7 symbols or fewer, I put it on the stack.  As an old
 kernel driver programmer, I was trained to avoid putting even small
 arrays on the stack, but one of this size should be safe on anything
-like close to a modern architecture.
+close to a modern architecture.
 
 Perhaps I will eventually limit Libmarpa's
 rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
