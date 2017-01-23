@@ -33,6 +33,7 @@
 ^MANIFEST[.]SKIP$
 ^MYMETA.
 ^Makefile$
+^Makefile[.]doit$
 ^Makefile[.]old$
 ^Marpa-R3-[0-9]+[.][0-9]{3}_[0-9]{3}/
 ^Marpa-R3-[0-9]+[.][0-9]{6}/
@@ -52,6 +53,7 @@
 ^author.t/tidy.errs$
 ^blib/
 ^blib_shared/
+^doit$
 ^dovg[.]log$
 ^engine/MYMETA.
 ^engine/Makefile$
@@ -132,7 +134,13 @@
 ^xs/R3[.]c$
 ^xs/auto[.]xs
 ^xs/exec_lua[.]xs
+^xs/glue[.]out$
+^xs/glue_inc[.]c$
 ^xs/inspect[.]c$
+^xs/inspect[.]out$
+^xs/inspect_inc[.]c$
+^xs/kollos[.]out$
+^xs/kollos_inc[.]c$
 ^xs/marpa
 ^xs/marpa[.]h$
 ^xs/marpa_codes[.]h$
