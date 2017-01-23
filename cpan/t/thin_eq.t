@@ -226,7 +226,7 @@ $marpa_lua->exec(<<'END_OF_LUA');
      local a = grammar:symbol_new("a")
      local sep = grammar:symbol_new("sep")
      grammar:start_symbol_set(S)
-     grammar:sequence_new{S, a, separator = sep, proper = 0, min = 1}
+     grammar:sequence_new{lhs = S, rhs = a, separator = sep, proper = 0, min = 1}
      grammar:precompute()
      local recce = kollos.recce_new(grammar)
      recce:start_input()

@@ -3619,45 +3619,31 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
                     }
                     goto NEXT_ELEMENT;
                 }
+                if (!strcmp (string_key, "lhs")) {
+                    lhs = marpa_lua_tointegerx (L, value_stack_ix, &is_int);
+                    if (!is_int || lhs < 0) {
+                        return marpa_luaL_error (L,
+                            "grammar:sequence_new() LHS must be a valid symbol ID");
+                    }
+                    goto NEXT_ELEMENT;
+                }
+                if (!strcmp (string_key, "rhs")) {
+                    rhs = marpa_lua_tointegerx (L, value_stack_ix, &is_int);
+                    if (!is_int || rhs < 0) {
+                        return marpa_luaL_error (L,
+                            "grammar:sequence_new() RHS must be a valid symbol ID");
+                    }
+                    goto NEXT_ELEMENT;
+                }
                 return marpa_luaL_error (L,
                     "grammar:sequence_new() bad string key (%s) in arg table",
                     string_key);
 
-            case LUA_TNUMBER:      /* numbers */
-                {
-                    const lua_Integer ix =
-                        marpa_lua_tointeger (L, key_stack_ix);
-                    switch (ix) {
-                    case 1:
-                        lhs =
-                            marpa_lua_tointegerx (L, value_stack_ix, &is_int);
-                        if (!is_int || lhs < 0) {
-                            return marpa_luaL_error (L,
-                                "grammar:sequence_new() LHS must be a valid symbol ID");
-                        }
-                        goto NEXT_ELEMENT;
-                    case 2:
-                        rhs =
-                            marpa_lua_tointegerx (L, value_stack_ix, &is_int);
-                        if (!is_int || rhs < 0) {
-                            return marpa_luaL_error (L,
-                                "grammar:sequence_new() RHS must be a valid symbol ID");
-                        }
-                        goto NEXT_ELEMENT;
-                    default:
-                        return marpa_luaL_error (L,
-                            "grammar:sequence_new() bad numeric key (%d) in arg table",
-                            ix);
-                    }
-                }
-                goto NEXT_ELEMENT;
-
             default:               /* other values */
                 return marpa_luaL_error (L,
                     "grammar:sequence_new() bad key type (%s) in arg table",
-                     marpa_lua_typename (L, marpa_lua_type (L, key_stack_ix))
+                    marpa_lua_typename (L, marpa_lua_type (L, key_stack_ix))
                     );
-                goto NEXT_ELEMENT;
 
             }
 
@@ -3683,14 +3669,14 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
 
         result =
             (Marpa_Rule_ID) marpa_g_sequence_new (*p_g,
-                (Marpa_Symbol_ID)lhs,
-                (Marpa_Symbol_ID)rhs,
-                (Marpa_Symbol_ID)separator,
-                (int)min,
-                (proper ? MARPA_PROPER_SEPARATION : 0)
+            (Marpa_Symbol_ID) lhs,
+            (Marpa_Symbol_ID) rhs,
+            (Marpa_Symbol_ID) separator,
+            (int) min, (proper ? MARPA_PROPER_SEPARATION : 0)
             );
         if (result <= -1)
-            return libmarpa_error_handle (L, grammar_stack_ix, "marpa_g_rule_new()");
+            return libmarpa_error_handle (L, grammar_stack_ix,
+                "marpa_g_rule_new()");
         marpa_lua_pushinteger (L, (lua_Integer) result);
         return 1;
     }
