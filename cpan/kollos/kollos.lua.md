@@ -3026,9 +3026,9 @@ tree op.
 
 ```
     -- miranda: section+ C extern variables
-    extern char tree_op_mt_key;
+    extern char kollos_tree_op_mt_key;
     -- miranda: section+ metatable keys
-    char tree_op_mt_key;
+    char kollos_tree_op_mt_key;
 ```
 
 ```
@@ -4328,7 +4328,7 @@ Marpa::R3.
         /* tree_op_metatable = {} */
         marpa_lua_newtable (L);
         marpa_lua_pushvalue (L, -1);
-        marpa_lua_rawsetp (L, LUA_REGISTRYINDEX, &tree_op_mt_key);
+        marpa_lua_rawsetp (L, LUA_REGISTRYINDEX, &kollos_tree_op_mt_key);
         /* kollos.mt_tree_op = tree_op_metatable */
         marpa_lua_setfield (L, kollos_table_stack_ix, "mt_tree_op");
         /* [ kollos ] */

@@ -391,9 +391,17 @@ coerce_to_sv (lua_State * L, int idx, char sig)
 
    marpa_lua_newtable(L);
    visited_ix = marpa_lua_gettop(L);
+   /* The tree op metatable is at visited_ix + 1 */
+   marpa_lua_rawgetp (L, LUA_REGISTRYINDEX, (void*)&kollos_tree_op_mt_key);
    result = recursive_coerce_to_sv(L, visited_ix, absolute_index, sig);
    marpa_lua_settop(L, visited_ix-1);
    return result;
+}
+
+static SV*
+do_lua_tree_op (lua_State * L, int visited_ix, int idx, char signature)
+{
+          croak("Tree ops not yet implemented" LUA_TAG);
 }
 
 static SV*
@@ -431,17 +439,29 @@ recursive_coerce_to_sv (lua_State * L, int visited_ix, int idx, char signature)
         break;
     case LUA_TTABLE:
         {
-            switch (signature) {
-            default:
-            case '0':
-            case '1':
-              result = coerce_to_av(L, visited_ix, idx, signature);
-              break;
-            case '2':
-              result = coerce_to_pairs(L, visited_ix, idx);
-              break;
+          /* If table at idx has a metatable, compare it with the
+           * tree op metatable.  If equal, do the tree ops.
+           */
+          if (marpa_lua_getmetatable (L, idx)
+              && marpa_lua_compare (L, visited_ix + 1, -1, LUA_OPEQ))
+            {
+              result = do_lua_tree_op (L, visited_ix, idx, signature);
             }
-        }
+          else
+            {
+              switch (signature)
+                {
+                default:
+                case '0':
+                case '1':
+                  result = coerce_to_av (L, visited_ix, idx, signature);
+                  break;
+                case '2':
+                  result = coerce_to_pairs (L, visited_ix, idx);
+	  break;
+	}
+    }
+}
         break;
     case LUA_TUSERDATA:
         {
