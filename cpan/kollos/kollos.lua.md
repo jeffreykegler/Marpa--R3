@@ -3025,8 +3025,13 @@ is used to determine if a table contains a
 tree op.
 
 ```
+    -- miranda: section+ C extern variables
+    extern char tree_op_mt_key;
     -- miranda: section+ metatable keys
-    static char tree_op_mt_key;
+    char tree_op_mt_key;
+```
+
+```
 
     -- miranda: section+ base error handlers
 
@@ -4542,6 +4547,7 @@ Not Lua-callable, but leaves the stack as before.
     #include "lauxlib.h"
     #include "lualib.h"
 
+    -- miranda: insert C extern variables
     -- miranda: insert C function declarations
 
     #endif
