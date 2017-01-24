@@ -554,6 +554,44 @@ qq{Attempt to bless, but improper semantics: "$semantics"\n},
     return ( $rule_resolutions, \@lexeme_resolutions );
 } ## end sub resolve_recce
 
+sub do_tree_ops {
+    my ( $slr, $tree ) = @_;
+    my $blessing = Scalar::Util::blessed $tree;
+    if (not defined $blessing) {
+        my $ref = ref $tree;
+        # say STDERR "ref_type = $ref";
+        if ($ref eq 'ARRAY') {
+            # say STDERR "Recursing into unblessed array";
+            return [ map { do_tree_ops($slr, $_) } @{$tree} ];
+        }
+        if ($ref eq 'REF') {
+            # say STDERR "Recursing into unblessed ref";
+            return \(do_tree_ops($slr, ${$tree}));
+        }
+        return $tree;
+    }
+    if ($blessing ne "Marpa::R3::Tree_Op") {
+        my $ref_type = Scalar::Util::reftype $tree;
+        # say STDERR "ref_type = $ref_type";
+        if ($ref_type eq 'ARRAY)') {
+            # say STDERR "Recursing into blessed array";
+            return bless [ map { do_tree_ops($slr, $_) } @{$tree} ], $blessing;
+        }
+        if ($ref_type eq 'REF)') {
+            # say STDERR "Recursing into blessed ref";
+            return bless \(do_tree_ops($slr, ${$tree})), $blessing;
+        }
+        return $tree;
+    }
+    my $tree_op = $tree->[0];
+    Marpa::R3::exception("Tree op missing") if not defined $tree_op;
+    if ($tree_op eq 'asis') {
+        # say STDERR "Removing asis wrapper";
+        return $tree->[1];
+    }
+    Marpa::R3::exception(qq{Unknown tree op ("$tree_op")});
+}
+
 # Returns false if no parse
 sub Marpa::R3::Scanless::R::value {
     my ( $slr, $per_parse_arg ) = @_;
@@ -1498,8 +1536,10 @@ END_OF_LUA
                 );
             } ## end if ( not $eval_ok or @warnings )
 
+            my $wrapped_result = bless [ 'asis', $result ], "Marpa::R3::Tree_Op";
+            # my $wrapped_result = $result;
             my ($highest_index) = $slr->call_by_name( 'stack_top_index', '>*' );
-            $slr->call_by_name( 'stack_set', 'iS', $highest_index, $result);
+            $slr->call_by_name( 'stack_set', 'iS', $highest_index, $wrapped_result);
             trace_token_evaluation( $slr, $token_id, \$result )
               if $trace_values;
             next STEP;
@@ -1519,6 +1559,10 @@ END_OF_LUA
                     push @warnings, [ $_[0], ( caller 0 ) ];
                 };
                 local $Marpa::R3::Context::rule = $rule_id;
+
+                # say STDERR "Before tree ops: ", Data::Dumper::Dumper($values);
+                $values = do_tree_ops($slr, $values);
+                # say STDERR "After tree ops: ", Data::Dumper::Dumper($values);
 
                 $eval_ok = eval {
                     $result = $closure->( $semantics_arg0, $values );
@@ -1540,8 +1584,11 @@ END_OF_LUA
                 } ## end if ( not $eval_ok or @warnings )
             }
 
+            # say STDERR "Before wrapping: ", Data::Dumper::Dumper($result);
+            my $wrapped_result = bless [ 'asis', $result ], "Marpa::R3::Tree_Op";
+            # my $wrapped_result = $result;
             my ($highest_index) = $slr->call_by_name( 'stack_top_index', '>*' );
-            $slr->call_by_name( 'stack_set', 'iS', $highest_index, $result);
+            $slr->call_by_name( 'stack_set', 'iS', $highest_index, $wrapped_result);
             if ($trace_values) {
                 say {$trace_file_handle}
                   trace_stack_1( $slr, $values, $rule_id )
@@ -1572,7 +1619,8 @@ END_OF_LUA
     } ## end STEP: while (1)
 
     my ($final_value) = $slr->call_by_name( 'stack_get', 'i>*', 1);
-    return \( $final_value );
+    # say "final value: ", Data::Dumper::Dumper( \(do_tree_ops($slr, $final_value)) );
+    return do_tree_ops($slr, \($final_value));
 
 }
 

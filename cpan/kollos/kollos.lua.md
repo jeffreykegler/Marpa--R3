@@ -245,7 +245,7 @@ leaving it as is.
             (void)marpa_lua_newuserdata (L,
                 desired_capacity * sizeof (Marpa_Symbol_ID));
             marpa_lua_setfield(L, upvalue_ix, "buffer");
-            marpa_lua_pushinteger(L, desired_capacity);
+            marpa_lua_pushinteger(L, (lua_Integer)desired_capacity);
             marpa_lua_setfield(L, upvalue_ix, "buffer_capacity");
         }
         marpa_lua_settop(L, base_of_stack);
