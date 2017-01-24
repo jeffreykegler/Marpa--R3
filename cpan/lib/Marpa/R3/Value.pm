@@ -101,16 +101,9 @@ sub Marpa::R3::Internal::Scanless::R::resolve_action {
         # behavior is said to be subject to change in perlref
         if ( defined $closure and defined ${$closure} ) {
             $type = 'SCALAR';
+            Marpa::R3::exception("$closure_name resolves to SCALAR, which is not yet implemented");
             last TYPE;
         }
-
-        # Re other symbol tables entries:
-        # We ignore ARRAY and HASH because they anything
-        # we resolve to is a potential array entry, something
-        # that not possible for arrays and hashes except
-        # indirectly, via references.
-        # FORMAT is deprecated.
-        # IO and GLOB seem too abstruse at the moment.
 
         $closure = undef;
     } ## end TYPE:

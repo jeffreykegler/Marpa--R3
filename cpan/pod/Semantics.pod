@@ -710,20 +710,10 @@ it on for processing as a fully qualified Perl name.
 =head1 Resolving Perl names to Perl variables
 
 Once Marpa has a fully qualified Perl name, it looks in Perl's symbol tables for
-a Perl variable with that name,
-either the name of a subroutine, or of a scalar.
-It is important to note that for the purposes of Perl's symbol tables,
-and therefore for the purposes of Marpa's resolution of Perl names,
-references are scalars.
-
+a Perl subroutine with that name.
 If Marpa finds a Perl subroutine with that fully qualified Perl name,
 the action name is resolved to that subroutine,
 which then becomes a B<rule evaluation closure>.
-If Marpa does not find
-a Perl subroutine with that name,
-but does find a Perl scalar with that name,
-the action name is resolved to that Perl scalar.
-(Again, for this purpose a Perl reference is a kind of Perl scalar.)
 
 =head1 Executing rule evaluation closures
 
@@ -846,63 +836,6 @@ concatenating them,
 and prepending them with a message indicating
 the file and line number at which the
 C<Marpa::R3::Context::bail()> method was called.
-
-=head1 Perl scalars as actions
-
-If a Perl scalar is the action,
-it becomes the value of the node, as is.
-References are scalars in this context so that,
-for example, the value of the node could be a reference to an array.
-
-Another possibility is that the Perl scalar action is a reference to code.
-What happens in this case is very different from the case where the action
-is a rule evaluation closure.
-A rule evaluation closure is executed to produce the value of the node.
-In contrast, the reference to a subroutine is B<NOT> executed -- it becomes the
-value of the node directly.
-
-Assuming no trickery, such as use of Perl's C<local> keyword, takes place,
-resolution to a Perl scalar will always resolve to a single, global scalar.
-Any modification of this scalar will be seen
-by other nodes of the current parse,
-and by other parses.
-All this suggests that,
-as a matter of good practice,
-Perl scalar actions should only be used as constants.
-
-For example,
-assume that actions are in a package named C<My_Actions>,
-which contains a hash reference named C<empty_hash>,
-
-=for Marpa::R3::Display
-ignore: 1
-
-        package My_Actions;
-        our $empty_hash = {};
-
-=for Marpa::R3::Display::End
-
-It can be tempting, in building objects which are hashes,
-to start with a left node whose action is C<empty_hash>
-and to add contents to it as the object is passed up the evaluation
-tree.
-But C<$empty_hash> points to a single hash object.
-This single hash object will shared by all nodes,
-with all nodes seeing each other's changes.
-Worse, all Marpa parsers which use the same C<My_Actions>
-namespace will share the same hash object.
-The correct way to define an
-C<empty_hash> action that
-initializes an empty hash is as a rule
-evaluation closure
-that returns C<{}>.
-
-=for Marpa::R3::Display
-ignore: 1
-
-        sub My_Actions::empty_hash { return {}; }
-
-=for Marpa::R3::Display::End
 
 =head1 Visibility of Perl object actions
 

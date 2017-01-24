@@ -28,8 +28,8 @@ POSIX::setlocale(LC_ALL, "C");
 
 use Marpa::R3;
 
-our $DEFAULT_NULL_DESC = '[default null]';
-our $NULL_DESC         = '[null]';
+sub DEFAULT_NULL_DESC { return '[default null]'; }
+sub NULL_DESC         { return '[null]'; }
 
 my @features = qw(
     E_OP_ACTION_FEATURE DEFAULT_ACTION_FEATURE

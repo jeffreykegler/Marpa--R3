@@ -27,6 +27,12 @@ and tools to Marpa::R3.
 
 =head1 Changes
 
+=head2 Actions that are Perl names must resolve to subroutines
+
+It was a little noticed feature of Marpa::R2, that actions specified
+as Perl names (like "My_Action::doit") could resolve to scalars.
+In Marpa::R3 they must resolve to Perl subroutines.
+
 =head2 Newlines now obey Perl standards
 
 In Marpa::R3 newlines are defined as in Perl.

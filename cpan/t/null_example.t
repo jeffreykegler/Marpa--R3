@@ -66,14 +66,12 @@ sub do_S {
 sub do_X { return 'X(' . $_[1]->[0] . ')'; }
 sub do_Y { return 'Y(' . $_[1]->[0] . ')'; }
 
-## no critic (Variables::ProhibitPackageVars)
-our $null_A = 'null A';
-our $null_B = 'null B';
-our $null_L = 'null L';
-our $null_R = 'null R';
-our $null_X = 'null X';
-our $null_Y = 'null Y';
-## use critic
+sub null_A { return 'null A'; }
+sub null_B { return 'null B'; }
+sub null_L { return 'null L'; }
+sub null_R { return 'null R'; }
+sub null_X { return 'null X'; }
+sub null_Y { return 'null Y'; }
 
 my $slg = Marpa::R3::Scanless::G->new(
     {   source => \<<'END_OF_DSL',
