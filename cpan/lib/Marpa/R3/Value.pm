@@ -1512,10 +1512,7 @@ END_OF_LUA
             next STEP if not defined $closure;
             my $result;
 
-            # TODO: DELETE THIS
-            die if ref $values ne 'ARRAY';
-
-            if ( ref $closure eq 'CODE' ) {
+            {
                 my @warnings;
                 my $eval_ok;
                 local $SIG{__WARN__} = sub {
@@ -1541,10 +1538,8 @@ END_OF_LUA
                         }
                     );
                 } ## end if ( not $eval_ok or @warnings )
-            } ## end if ( ref $closure eq 'CODE' )
-            else {
-                $result = ${$closure};
             }
+
             my ($highest_index) = $slr->call_by_name( 'stack_top_index', '>*' );
             $slr->call_by_name( 'stack_set', 'iS', $highest_index, $result);
             if ($trace_values) {
