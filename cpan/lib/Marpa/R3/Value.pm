@@ -1045,10 +1045,10 @@ qq{Cannot bless rule when the semantics are "$semantics"},
                     last SET_OPS;
                 }
 
-              DO_CONSTANT: {
-                    last DO_CONSTANT if not defined $irlid;
+              CHECK_TYPE: {
+                    last CHECK_TYPE if not defined $irlid;
                     my $thingy_ref = $closure_by_irlid[$irlid];
-                    last DO_CONSTANT if not defined $thingy_ref;
+                    last CHECK_TYPE if not defined $thingy_ref;
                     my $ref_type = Scalar::Util::reftype $thingy_ref;
                     if ( $ref_type eq q{} ) {
                         my $rule_desc = $slr->rule_show($irlid);
@@ -1066,27 +1066,8 @@ qq{Cannot bless rule when the semantics are "$semantics"},
                         $nulling_closures[$nulling_symbol_id] = $thingy_ref
                           if defined $nulling_symbol_id
                           and defined $irlid;
-                        last DO_CONSTANT;
+                        last CHECK_TYPE;
                     } ## end if ( $ref_type eq 'CODE' )
-                    if ( $ref_type eq 'SCALAR' ) {
-                        my $thingy = ${$thingy_ref};
-                        if ( not defined $thingy ) {
-                            @ops =
-                              ( $op_lua, $result_is_undef_key, $op_bail_key );
-                            last SET_OPS;
-                        }
-                        @ops = ( $op_lua, $result_is_constant_key, $thingy_ref );
-                        last SET_OPS;
-                    } ## end if ( $ref_type eq 'SCALAR' )
-
-        # No test for 'ARRAY' or 'HASH' --
-        # The ref is currenly only to scalar and code slots in the symbol table,
-        # and therefore cannot be to (among other things) an ARRAY or HASH
-
-                    if ( $ref_type eq 'REF' ) {
-                        @ops = ( $op_lua, $result_is_constant_key, $thingy_ref );
-                        last SET_OPS;
-                    }
 
                     my $rule_desc = $slr->rule_show($irlid);
                     Marpa::R3::exception(
@@ -1094,7 +1075,7 @@ qq{Cannot bless rule when the semantics are "$semantics"},
                         qq{  It was of type reference to $ref_type.\n},
                         qq{  Rule was $rule_desc\n}
                     );
-                } ## end DO_CONSTANT:
+                }
 
                 # After this point, any closure will be a ref to 'CODE'
 
