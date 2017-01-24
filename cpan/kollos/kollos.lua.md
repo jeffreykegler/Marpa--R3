@@ -3017,6 +3017,17 @@ Luacheck declarations
     static char kollos_t_ud_mt_key;
     static char kollos_v_ud_mt_key;
 
+```
+
+The metatable for tree ops is actually empty.
+The presence or absence of the metatable itself
+is used to determine if a table contains a
+tree op.
+
+```
+    -- miranda: section+ metatable keys
+    static char tree_op_mt_key;
+
     -- miranda: section+ base error handlers
 
     /* Leaves the stack as before,
@@ -4306,6 +4317,15 @@ Marpa::R3.
         marpa_lua_setfield (L, -2, "__gc");
         /* [ kollos, mt_v_ud ] */
         marpa_lua_rawsetp (L, LUA_REGISTRYINDEX, &kollos_v_ud_mt_key);
+        /* [ kollos ] */
+
+        /* Set up tree op metatable */
+        /* tree_op_metatable = {} */
+        marpa_lua_newtable (L);
+        marpa_lua_pushvalue (L, -1);
+        marpa_lua_rawsetp (L, LUA_REGISTRYINDEX, &tree_op_mt_key);
+        /* kollos.mt_tree_op = tree_op_metatable */
+        marpa_lua_setfield (L, kollos_table_stack_ix, "mt_tree_op");
         /* [ kollos ] */
 
         /* In alphabetical order by field name */

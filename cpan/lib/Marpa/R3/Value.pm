@@ -589,6 +589,9 @@ sub do_tree_ops {
         # say STDERR "Removing asis wrapper";
         return $tree->[1];
     }
+    if ($tree_op eq 'bless') {
+        return bless do_tree_ops($slr, $tree->[1]), $tree->[2];
+    }
     Marpa::R3::exception(qq{Unknown tree op ("$tree_op")});
 }
 
