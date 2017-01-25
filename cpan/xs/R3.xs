@@ -401,20 +401,21 @@ coerce_to_sv (lua_State * L, int idx, char sig)
 static SV*
 do_lua_tree_op (lua_State * L, int visited_ix, int idx, char signature)
 {
-          const char *lua_tree_op;
-          marpa_lua_geti(L, idx, 1);
-          if (marpa_lua_type(L, -1) != LUA_TSTRING) {
-              croak(R3ERR "Lua tree op is not a string; " LUA_TAG);
-          }
-          lua_tree_op = marpa_lua_tostring(L, -1);
-          if (!strcmp(lua_tree_op, "perl")) {
-                SV* av_ref = coerce_to_av(L, visited_ix, idx, signature);
-                sv_bless (av_ref, gv_stashpv ("Marpa::R3::Tree_Op", 1));
-                return av_ref;
-          }
-          croak(R3ERR "tree op (%s) not implemented; " LUA_TAG, lua_tree_op);
-          /* NOTREACHED */
-          return 0;
+    dTHX;
+    const char *lua_tree_op;
+    marpa_lua_geti (L, idx, 1);
+    if (marpa_lua_type (L, -1) != LUA_TSTRING) {
+        croak (R3ERR "Lua tree op is not a string; " LUA_TAG);
+    }
+    lua_tree_op = marpa_lua_tostring (L, -1);
+    if (!strcmp (lua_tree_op, "perl")) {
+        SV *av_ref = coerce_to_av (L, visited_ix, idx, signature);
+        sv_bless (av_ref, gv_stashpv ("Marpa::R3::Tree_Op", 1));
+        return av_ref;
+    }
+    croak (R3ERR "tree op (%s) not implemented; " LUA_TAG, lua_tree_op);
+    /* NOTREACHED */
+    return 0;
 }
 
 static SV*
