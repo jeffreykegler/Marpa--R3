@@ -306,12 +306,6 @@ static int marpa_r3_warn(const char* format, ...)
    return 1;
 }
 
-static SV*
-slr_es_span_to_literal_sv (Scanless_R * slr, lua_State* L,
-                        Marpa_Earley_Set_ID start_earley_set,
-                        Marpa_Earley_Set_ID end_earley_set
-                        );
-
 /* Xlua, that is, the eXtension of Lua for Marpa::XS.
  * Portions of this code adopted from Inline::Lua
  */
@@ -1205,32 +1199,6 @@ xlua_recce_step_meth (lua_State * L)
     return 0;
 }
 
-static int
-xlua_recce_literal_of_es_span_meth (lua_State * L)
-{
-    Scanless_R *slr;
-    int lud_type;
-    lua_Integer start_earley_set;
-    lua_Integer end_earley_set;
-    SV *literal_sv;
-
-    marpa_luaL_checktype (L, 1, LUA_TTABLE);
-    lud_type = marpa_lua_getfield (L, 1, "lud");
-    marpa_luaL_argcheck (L, (lud_type == LUA_TLIGHTUSERDATA), 1,
-        "recce userdata not set");
-    slr = (Scanless_R *) marpa_lua_touserdata (L, -1);
-    start_earley_set = marpa_luaL_checkinteger (L, 2);
-    end_earley_set = marpa_luaL_checkinteger (L, 3);
-
-    literal_sv =
-        slr_es_span_to_literal_sv (slr, L,
-        (Marpa_Earley_Set_ID) start_earley_set,
-        (Marpa_Earley_Set_ID) end_earley_set);
-    marpa_sv_sv_noinc (L, literal_sv);
-    /* Lua stack: [ recce_table, recce_lud, stack_ud ] */
-    return 1;
-}
-
 static void slr_inner_destroy(lua_State* L, Scanless_R* slr);
 
 static int
@@ -1253,7 +1221,6 @@ xlua_recce_gc (lua_State * L)
 static const struct luaL_Reg marpa_slr_meths[] = {
     {"constants", xlua_recce_constants_meth},
     {"step", xlua_recce_step_meth},
-    {"literal_of_es_span", xlua_recce_literal_of_es_span_meth},
     {"ref", xlua_ref},
     {"unref", xlua_unref},
     {"__gc", xlua_recce_gc},
@@ -2093,36 +2060,6 @@ u_pos_set (Outer_R * outer_slr, const char* name, int start_pos_arg, int length_
   slr->perl_pos = new_perl_pos;
   new_end_pos = new_end_pos;
   slr->end_pos = new_end_pos;
-}
-
-static SV *
-u_pos_span_to_literal_sv (Scanless_R * slr,
-                          int start_pos, int pos_length)
-{
-  dTHX;
-  STRLEN byte_length;
-  SV* input_sv = slr->input;
-  char *input = SvPV (input_sv, byte_length);
-  SV* new_sv;
-
-  if (SvUTF8(slr->input)) {
-     char *start_byte_p;
-     char *end_byte_p;
-     const int utf8_length = sv_len_utf8(input_sv);
-     if (start_pos + pos_length > utf8_length) {
-      croak ("Bad length in u_pos_span_to_literal_sv: %ld", (long)pos_length);
-     }
-     start_byte_p = utf8_hop(input, start_pos);
-     end_byte_p = utf8_hop(start_byte_p, pos_length);
-     new_sv = newSVpvn (start_byte_p, end_byte_p - start_byte_p);
-     SvUTF8_on(new_sv);
-  } else {
-     if (start_pos + pos_length > byte_length) {
-      croak ("Bad length in u_pos_span_to_literal_sv: %ld", (long)pos_length);
-     }
-     new_sv = newSVpvn (input + start_pos, pos_length);
-  }
-  return new_sv;
 }
 
 /* Static SLG methods */
@@ -3036,34 +2973,6 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
 
     return 0;
 
-}
-
-static SV*
-slr_es_span_to_literal_sv (Scanless_R * slr, lua_State* L,
-                        Marpa_Earley_Set_ID start_earley_set,
-                        Marpa_Earley_Set_ID end_earley_set)
-{
-  dTHX;
-  lua_Integer l0_start;
-  lua_Integer l0_length;
-
-  call_by_tag (L, LUA_TAG,
-      "local recce, start_earley_set, end_earley_set = ...\n"
-      "-- print(inspect(start_earley_set))\n"
-      "return kollos.earley_sets_to_L0_span(recce, start_earley_set, end_earley_set)\n"
-      ,
-      "Rii>ii", slr->outer_slr_lua_ref,
-      (lua_Integer)start_earley_set,
-      (lua_Integer)end_earley_set,
-      &l0_start,
-      &l0_length
-      );
-
-  if (l0_length == 0) {
-    return newSVpvn ("", 0);
-  }
-
-  return u_pos_span_to_literal_sv(slr, l0_start, l0_length);
 }
 
 #define EXPECTED_LIBMARPA_MAJOR 8
