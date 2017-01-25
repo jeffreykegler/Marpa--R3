@@ -1247,7 +1247,7 @@ to set and discover various Lua values.
 #### Return operation key given its name
 
 ```
-    -- miranda: section Utilities for Perl code
+    -- miranda: section Utilities for semantics
     function get_op_fn_key_by_name(recce, op_name_sv)
         local op_name = tostring(op_name_sv)
         return recce.op_fn_key[op_name]
@@ -1258,7 +1258,7 @@ to set and discover various Lua values.
 #### Return operation name given its key
 
 ```
-    -- miranda: section+ Utilities for Perl code
+    -- miranda: section+ Utilities for semantics
     function get_op_fn_name_by_key(recce, op_key_sv)
         local op_key = op_key_sv + 0
         return recce.op_fn_key[op_key]
@@ -1271,7 +1271,7 @@ to set and discover various Lua values.
 Register a constant, returning its key.
 
 ```
-    -- miranda: section+ Utilities for Perl code
+    -- miranda: section+ Utilities for semantics
     function constant_register(recce, constant_sv)
         local constants = recce:constants()
         local next_constant_key = marpa.sv.top_index(constants) + 1
@@ -1287,7 +1287,7 @@ Register the semantic operations, `ops`, for the token
 whose id is `id`.
 
 ```
-    -- miranda: section+ Utilities for Perl code
+    -- miranda: section+ Utilities for semantics
     function token_register(...)
         local args = {...}
         local recce = args[1]
@@ -1307,7 +1307,7 @@ Register the semantic operations, `ops`, for the nulling symbol
 whose id is `id`.
 
 ```
-    -- miranda: section+ Utilities for Perl code
+    -- miranda: section+ Utilities for semantics
     function nulling_register(...)
         local args = {...}
         local recce = args[1]
@@ -1327,7 +1327,7 @@ Register the semantic operations, `ops`, for the rule
 whose id is `id`.
 
 ```
-    -- miranda: section+ Utilities for Perl code
+    -- miranda: section+ Utilities for semantics
     function rule_register(...)
         local args = {...}
         local recce = args[1]
@@ -1344,7 +1344,7 @@ whose id is `id`.
 #### Return the top index of the stack
 
 ```
-    -- miranda: section+ Utilities for Perl code
+    -- miranda: section+ Utilities for semantics
     function stack_top_index(recce)
         return recce.this_step.result
     end
@@ -1354,7 +1354,7 @@ whose id is `id`.
 #### Return the value of a stack entry
 
 ```
-    -- miranda: section+ Utilities for Perl code
+    -- miranda: section+ Utilities for semantics
     function stack_get(recce, ix)
         local stack = recce.lmw_v.stack
         return stack[ix+0]
@@ -1365,10 +1365,45 @@ whose id is `id`.
 #### Set the value of a stack entry
 
 ```
-    -- miranda: section+ Utilities for Perl code
+    -- miranda: section+ Utilities for semantics
     function stack_set(recce, ix, v)
         local stack = recce.lmw_v.stack
         stack[ix+0] = v
+    end
+
+```
+
+#### Convert current, origin Earley set to L0 span
+
+Given a current Earley set and an origin Earley set,
+return a span in L0 terms.
+The purpose is assumed to be a find a literal
+equivalent.
+All zero length literals are alike,
+so the logic is careless about the l0_start when l0_length
+is zero.
+
+```
+    -- miranda: section+ Utilities for semantics
+    function _M.earley_sets_to_L0_span(recce, start_earley_set, end_earley_set)
+      start_earley_set = start_earley_set + 1
+      -- normalize start_earley_set
+      if start_earley_set < 1 then start_earley_set = 1 end
+      if end_earley_set < start_earley_set then
+          return 0, 0
+      end
+      local es_data = recce.es_data
+      local start_entry = es_data[start_earley_set]
+      if not start_entry then
+          return 0, 0
+      end
+      local end_entry = es_data[end_earley_set]
+      if not end_entry then
+          end_entry = es_data[#es_data]
+      end
+      local l0_start = start_entry[1]
+      local l0_length = end_entry[1] + end_entry[2] - l0_start
+      return l0_start, l0_length
     end
 
 ```
@@ -2718,7 +2753,7 @@ a special "configuration" argument.
     -- miranda: insert recognizer Libmarpa wrapper Lua functions
     -- miranda: insert valuator Libmarpa wrapper Lua functions
     -- miranda: insert diagnostics
-    -- miranda: insert Utilities for Perl code
+    -- miranda: insert Utilities for semantics
     -- miranda: insert most Lua function definitions
     -- miranda: insert define Kollos Lua error codes
     -- miranda: insert various Kollos Lua defines

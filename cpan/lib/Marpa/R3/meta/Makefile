@@ -11,8 +11,9 @@
 # of the licenses in the directory LICENSES.
 
 dummy:
+	@echo 'The main target is "meta"'
 
-doit:
+meta:
 	-test -r metag-g3.pl && mv metag-g3.pl metag-g4.pl
 	-test -r metag-g2.pl && mv metag-g2.pl metag-g3.pl
 	-test -r metag-g1.pl && mv metag-g1.pl metag-g2.pl
