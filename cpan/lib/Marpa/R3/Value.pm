@@ -592,7 +592,7 @@ sub do_tree_ops {
     if ($tree_op eq 'perl') {
         my $lua_to_perl_tree_op = $tree->[1];
         if ($lua_to_perl_tree_op eq 'bless') {
-        return bless do_tree_ops($slr, $tree->[2]), $tree->[3];
+            return bless do_tree_ops($slr, $tree->[2]), $tree->[3];
         }
         Marpa::R3::exception(qq{Unknown Lua-to-Perl tree op ("$lua_to_perl_tree_op")});
     }

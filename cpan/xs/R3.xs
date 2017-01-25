@@ -402,20 +402,23 @@ coerce_to_sv (lua_State * L, int idx, char sig)
    return result;
 }
 
+/* Stack hygiene is left to the caller and to coerce_to_av()
+ */
 static SV*
 do_lua_tree_op (lua_State * L, int visited_ix, int idx, char signature)
 {
           const char *lua_tree_op;
-          if (marpa_lua_type(L, idx) != LUA_TSTRING) {
-              croak(R3ERR "Lua tree op is not a string" LUA_TAG);
+          marpa_lua_geti(L, idx, 1);
+          if (marpa_lua_type(L, -1) != LUA_TSTRING) {
+              croak(R3ERR "Lua tree op is not a string; " LUA_TAG);
           }
-          lua_tree_op = marpa_lua_tostring(L, idx);
+          lua_tree_op = marpa_lua_tostring(L, -1);
           if (!strcmp(lua_tree_op, "perl")) {
                 SV* av_ref = coerce_to_av(L, visited_ix, idx, signature);
                 sv_bless (av_ref, gv_stashpv ("Marpa::R3::Tree_Op", 1));
                 return av_ref;
           }
-          croak(R3ERR "tree op (%s) not implemented" LUA_TAG, lua_tree_op);
+          croak(R3ERR "tree op (%s) not implemented; " LUA_TAG, lua_tree_op);
           /* NOTREACHED */
           return 0;
 }
@@ -525,7 +528,7 @@ coerce_to_av (lua_State * L, int visited_ix, int table_ix, char signature)
     AV *av;
     int seq_ix;
     const int base_of_stack = marpa_lua_gettop(L);
-    const int ix_offset = (signature - '0') - 1;
+    const int ix_offset = signature == '1' ? 0 : -1;
 
     marpa_lua_pushvalue(L, table_ix);
     if (!visitee_on(L, visited_ix, table_ix)) {
@@ -555,7 +558,7 @@ coerce_to_av (lua_State * L, int visited_ix, int table_ix, char signature)
 	ownership_taken = av_store(av, (int)seq_ix + ix_offset, entry_value);
 	if (!ownership_taken) {
 	  SvREFCNT_dec (entry_value);
-          croak("av_store failed in coerce_to_av()");
+          croak (R3ERR "av_store failed; " LUA_TAG);
 	}
     }
 
@@ -620,7 +623,7 @@ coerce_to_pairs (lua_State * L, int visited_ix, int table_ix)
             ownership_taken = av_store (av, (int) av_ix, entry_value);
             if (!ownership_taken) {
                 SvREFCNT_dec (entry_value);
-                croak ("av_store failed in coerce_to_pairs()");
+                croak (R3ERR "av_store failed; " LUA_TAG);
             }
             av_ix++;
 
@@ -629,7 +632,7 @@ coerce_to_pairs (lua_State * L, int visited_ix, int table_ix)
             ownership_taken = av_store (av, (int) av_ix, entry_value);
             if (!ownership_taken) {
                 SvREFCNT_dec (entry_value);
-                croak ("av_store failed in coerce_to_pairs()");
+                croak (R3ERR "av_store failed; " LUA_TAG);
             }
             av_ix++;
             marpa_lua_settop (L, base_of_loop_stack);
@@ -662,7 +665,7 @@ coerce_to_pairs (lua_State * L, int visited_ix, int table_ix)
 	ownership_taken = av_store(av, (int)av_ix, entry_value);
 	if (!ownership_taken) {
 	  SvREFCNT_dec (entry_value);
-          croak("av_store failed in coerce_to_pairs()");
+          croak (R3ERR "av_store failed; " LUA_TAG);
 	}
         av_ix ++;
 
@@ -670,7 +673,7 @@ coerce_to_pairs (lua_State * L, int visited_ix, int table_ix)
 	ownership_taken = av_store(av, (int)av_ix, entry_value);
 	if (!ownership_taken) {
 	  SvREFCNT_dec (entry_value);
-          croak("av_store failed in coerce_to_pairs()");
+          croak (R3ERR "av_store failed; " LUA_TAG);
 	}
         av_ix ++;
 
@@ -4639,7 +4642,7 @@ PPCODE:
 
     call_by_tag (outer_slr->L, LUA_TAG,
         "local recce = ...; return find_and_do_ops(recce)\n",
-        "R>iM", outer_slr->lua_ref, &result, &new_values);
+        "R>iC", outer_slr->lua_ref, &result, &new_values);
 
     switch (result) {
     case 3:

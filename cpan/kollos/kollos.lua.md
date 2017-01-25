@@ -826,7 +826,7 @@ Push an undef on the values array.
     -- miranda: section+ VM operations
 
     function op_fn_push_undef(recce, dummy, new_values)
-        local next_ix = marpa.sv.top_index(new_values) + 1;
+        local next_ix = #new_values + 1;
         new_values[next_ix] = marpa.sv.undef()
         return -2
     end
@@ -846,7 +846,7 @@ Push one of the RHS child values onto the values array.
         end
         local stack = recce.lmw_v.stack
         local result_ix = recce.this_step.result
-        local next_ix = marpa.sv.top_index(new_values) + 1;
+        local next_ix = #new_values + 1;
         new_values[next_ix] = stack[result_ix + rhs_ix]
         return -2
     end
@@ -891,7 +891,7 @@ Otherwise the values of the RHS children are pushed.
 
     function op_fn_push_values(recce, increment, new_values)
         if recce.this_step.type == 'MARPA_STEP_TOKEN' then
-            local next_ix = marpa.sv.top_index(new_values) + 1;
+            local next_ix = #new_values + 1;
             new_values[next_ix] = current_token_literal(recce)
             return -2
         end
@@ -899,7 +899,7 @@ Otherwise the values of the RHS children are pushed.
             local stack = recce.lmw_v.stack
             local arg_n = recce.this_step.arg_n
             local result_ix = recce.this_step.result
-            local to_ix = marpa.sv.top_index(new_values) + 1;
+            local to_ix = #new_values + 1;
             for from_ix = result_ix,arg_n,increment do
                 new_values[to_ix] = stack[from_ix]
                 to_ix = to_ix + 1
@@ -933,7 +933,7 @@ in terms of the input string.
              local es_entry = es_data[start_es]
              l0_start = es_entry[1]
         end
-        local next_ix = marpa.sv.top_index(new_values) + 1;
+        local next_ix = #new_values + 1;
         new_values[next_ix] = l0_start
         return -2
     end
@@ -960,7 +960,7 @@ that is, in terms of the input string
             l0_length =
                 end_es_entry[1] + end_es_entry[2] - l0_start
         end
-        local next_ix = marpa.sv.top_index(new_values) + 1;
+        local next_ix = #new_values + 1;
         new_values[next_ix] = l0_length
         return -2
     end
@@ -975,7 +975,7 @@ in terms of G1 Earley sets.
 ```
     -- miranda: section+ VM operations
     function op_fn_push_g1_start(recce, dummy, new_values)
-        local next_ix = marpa.sv.top_index(new_values) + 1;
+        local next_ix = #new_values + 1;
         new_values[next_ix] = recce.this_step.start_es_id
         return -2
     end
@@ -990,7 +990,7 @@ that is, in terms of G1 Earley sets.
 ```
     -- miranda: section+ VM operations
     function op_fn_push_g1_length(recce, dummy, new_values)
-        local next_ix = marpa.sv.top_index(new_values) + 1;
+        local next_ix = #new_values + 1;
         new_values[next_ix] = (recce.this_step.es_id
             - recce.this_step.start_es_id) + 1
         return -2
@@ -1009,7 +1009,7 @@ that is, in terms of G1 Earley sets.
         -- io.stderr:write('constants top ix: ', marpa.sv.top_index(constants), "\n")
 
         local constant = constants[constant_ix]
-        local next_ix = marpa.sv.top_index(new_values) + 1;
+        local next_ix = #new_values + 1;
         new_values[next_ix] = constant
         return -2
     end
@@ -1043,7 +1043,9 @@ is the result of this sequence of operations.
         if blessing_ix then
           local constants = recce:constants()
           local blessing = constants[blessing_ix]
-          marpa.sv.bless(new_values, blessing)
+          new_values = { 'perl', 'bless', new_values, blessing }
+          setmetatable(new_values, _M.mt_tree_op)
+          -- marpa.sv.bless(new_values, blessing)
         end
         local stack = recce.lmw_v.stack
         local result_ix = recce.this_step.result
@@ -1078,7 +1080,9 @@ implementation, which returned the size of the
         if blessing_ix then
           local constants = recce:constants()
           local blessing = constants[blessing_ix]
-          marpa.sv.bless(new_values, blessing)
+          new_values = { 'perl', 'bless', new_values, blessing }
+          setmetatable(new_values, _M.mt_tree_op)
+          -- marpa.sv.bless(new_values, blessing)
         end
         return 3
     end
@@ -1142,7 +1146,7 @@ with "trace" and "do not return" being special cases.
     function find_and_do_ops(recce)
         recce.trace_values_queue = {}
         while true do
-            local new_values = marpa.sv.av_new()
+            local new_values = {}
             local ops = {}
             recce:step()
             if recce.this_step.type == 'MARPA_STEP_INACTIVE' then
