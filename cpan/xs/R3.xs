@@ -32,6 +32,10 @@
 #undef LUA_TAG
 #define LUA_TAG "@" STRLOC
 
+/* Start all Marpa::R3 internal errors with the same string */
+#undef R3ERR
+#define R3ERR "Marpa::R3 internal error: "
+
 #undef MAX
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 
@@ -401,7 +405,19 @@ coerce_to_sv (lua_State * L, int idx, char sig)
 static SV*
 do_lua_tree_op (lua_State * L, int visited_ix, int idx, char signature)
 {
-          croak("Tree ops not yet implemented" LUA_TAG);
+          const char *lua_tree_op;
+          if (marpa_lua_type(L, idx) != LUA_TSTRING) {
+              croak(R3ERR "Lua tree op is not a string" LUA_TAG);
+          }
+          lua_tree_op = marpa_lua_tostring(L, idx);
+          if (!strcmp(lua_tree_op, "perl")) {
+                SV* av_ref = coerce_to_av(L, visited_ix, idx, signature);
+                sv_bless (av_ref, gv_stashpv ("Marpa::R3::Tree_Op", 1));
+                return av_ref;
+          }
+          croak(R3ERR "tree op (%s) not implemented" LUA_TAG, lua_tree_op);
+          /* NOTREACHED */
+          return 0;
 }
 
 static SV*
