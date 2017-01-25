@@ -870,7 +870,7 @@ it assumes that the caller has ensured that
           local end_es = recce.this_step.es_id
           local g1_count = end_es - start_es + 1
           local l0_start, l0_length =
-            _M.earley_sets_to_L0_span(recce, start_es, end_es)
+              recce:earley_sets_to_L0_span(start_es, end_es)
           if l0_length <= 0 then return '' end
           local tree_op = { 'perl', 'literal', l0_start, l0_length }
           setmetatable(tree_op, _M.mt_tree_op)
@@ -1388,7 +1388,7 @@ is zero.
 
 ```
     -- miranda: section+ Utilities for semantics
-    function _M.earley_sets_to_L0_span(recce, start_earley_set, end_earley_set)
+    function _M.class_slr.earley_sets_to_L0_span(recce, start_earley_set, end_earley_set)
       start_earley_set = start_earley_set + 1
       -- normalize start_earley_set
       if start_earley_set < 1 then start_earley_set = 1 end
