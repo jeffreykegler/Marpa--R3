@@ -869,6 +869,9 @@ it assumes that the caller has ensured that
           local start_es = recce.this_step.start_es_id
           local end_es = recce.this_step.es_id
           return recce:literal_of_es_span(start_es, end_es)
+          -- local tree_op = { 'perl', 'bless', new_values, blessing }
+          -- setmetatable(tree_op, _M.mt_tree_op)
+          -- return tree_op
       end
       return recce.token_values[recce.this_step.value]
     end
