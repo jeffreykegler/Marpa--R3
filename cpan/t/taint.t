@@ -42,8 +42,8 @@ else {
     my $eval_error = $EVAL_ERROR;
     Test::More::like(
         $eval_error,
-        qr/Attempt \s+ to \s+ use \s+ a \s+ tainted \s+ input \s+ string \s+ with \s+ Marpa::R3
-    \s+ Marpa::R3 \s+ is \s+ insecure \s+ for \s+ use \s+ with \s+ tainted \s+ data/xms,
+qr/Attempt \s+ to \s+ use \s+ a \s+ tainted \s+ input \s+ string \s+ in \s+ .*read.*
+ \s+ Marpa::R3 \s+ is \s+ insecure \s+ for \s+ use \s+ with \s+ tainted \s+ data/xms,
         "Tainted grammar detected and rejected"
     );
 } ## end else [ if ($eval_ok) ]

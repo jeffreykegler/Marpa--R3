@@ -24,7 +24,7 @@ $VERSION = eval $VERSION;
 
 package Marpa::R3::Internal::Scanless::R;
 
-use Scalar::Util 'blessed';
+use Scalar::Util qw(blessed tainted);
 use English qw( -no_match_vars );
 
 our $PACKAGE = 'Marpa::R3::Scanless::R';
@@ -473,6 +473,11 @@ sub Marpa::R3::Scanless::R::error {
 sub Marpa::R3::Scanless::R::read {
     my ( $self, $p_string, $start_pos, $length ) = @_;
 
+    Marpa::R3::exception(
+    q{Attempt to use a tainted input string in $slr->read()},
+    qq{\n  Marpa::R3 is insecure for use with tainted data\n}
+    ) if Scalar::Util::tainted(${$p_string});
+
     $start_pos //= 0;
     $length    //= -1;
     Marpa::R3::exception(
@@ -497,7 +502,6 @@ sub Marpa::R3::Scanless::R::read {
 
     my $thin_slr = $self->[Marpa::R3::Internal::Scanless::R::SLR_C];
 
-    $thin_slr->string_set($p_string);
         $thin_slr->call_by_tag(
     ('@' . __FILE__ . ':' . __LINE__),
         <<'END_OF_LUA', 'i', [unpack('C*', ${$p_string})],

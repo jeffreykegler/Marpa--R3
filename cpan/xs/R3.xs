@@ -2265,7 +2265,6 @@ marpa_inner_slr_new (Outer_G* outer_slg)
     slr->end_of_pause_lexeme = -1;
 
     slr->input_symbol_id = -1;
-    slr->input = newSVpvn ("", 0);
     slr->end_pos = 0;
 
     slr->t_lexeme_count = 0;
@@ -2311,7 +2310,6 @@ static void slr_inner_destroy(lua_State* L, Scanless_R* slr)
     {
       SvREFCNT_dec ((SV *) slr->token_values);
     }
-  SvREFCNT_dec (slr->input);
   Safefree (slr);
 }
 
@@ -4352,38 +4350,6 @@ PPCODE:
      XSRETURN_UNDEF;
   }
   XSRETURN_IV(slr->problem_pos);
-}
-
-void
-string_set( outer_slr, string )
-     Outer_R *outer_slr;
-     SVREF string;
-PPCODE:
-{
-  Scanless_R *slr = slr_inner_get(outer_slr);
-  char* p;
-  int input_is_utf8;
-
-  STRLEN pv_length;
-
-  /* Fail fast with a tainted input string */
-  if (SvTAINTED (string))
-    {
-      croak
-        ("Problem in v->string_set(): Attempt to use a tainted input string with Marpa::R3\n"
-         "Marpa::R3 is insecure for use with tainted data\n");
-    }
-
-  /* Get our own copy.
-   */
-  SvSetSV (slr->input, string);
-  p = SvPV( string, pv_length);
-  input_is_utf8 = SvUTF8 (slr->input);
-  slr->input = newSVpvn(p, pv_length);
-  if (input_is_utf8) { SvUTF8_on(slr->input); }
-
-
-  XSRETURN_YES;
 }
 
 void

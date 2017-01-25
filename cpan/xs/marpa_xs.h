@@ -188,7 +188,6 @@ typedef struct
   Marpa_Symbol_ID input_symbol_id;
   lua_Integer codepoint;                 /* For error returns */
   int end_pos;
-  SV* input;
 
   union marpa_slr_event_s* t_lexemes;
   int t_lexeme_capacity;
