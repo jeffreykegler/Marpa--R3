@@ -8,3 +8,6 @@ debug:
 	make clean
 	perl Makefile.PL OPTIMIZE=-g
 	make OPTIMIZE=-g
+
+license:
+	perl etc/check_license.pl

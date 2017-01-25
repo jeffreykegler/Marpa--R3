@@ -16,7 +16,7 @@ use strict;
 use warnings;
 
 use vars qw($VERSION $STRING_VERSION);
-$VERSION        = '4.001_032';
+$VERSION        = '4.001_033';
 $STRING_VERSION = $VERSION;
 ## no critic(BuiltinFunctions::ProhibitStringyEval)
 $VERSION = eval $VERSION;
@@ -70,6 +70,7 @@ sub Marpa::R3::Scanless::R::g1_input_span {
     (__FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', 'ii', $g1_start, $g1_count);
     local recce, g1_start, g1_count = ...
+    -- TODO Delete next 2 lines?
     local latest_earley_set = recce.lmw_g1r:latest_earley_set()
     local es_end = g1_start + g1_count
     if g1_count < 0 then

@@ -868,10 +868,13 @@ it assumes that the caller has ensured that
       if recce.token_is_literal == recce.this_step.value then
           local start_es = recce.this_step.start_es_id
           local end_es = recce.this_step.es_id
-          return recce:literal_of_es_span(start_es, end_es)
-          -- local tree_op = { 'perl', 'bless', new_values, blessing }
-          -- setmetatable(tree_op, _M.mt_tree_op)
-          -- return tree_op
+          local g1_count = end_es - start_es + 1
+          local l0_start, l0_length =
+            _M.earley_sets_to_L0_span(recce, start_es, end_es)
+          if l0_length <= 0 then return '' end
+          local tree_op = { 'perl', 'literal', l0_start, l0_length }
+          setmetatable(tree_op, _M.mt_tree_op)
+          return tree_op
       end
       return recce.token_values[recce.this_step.value]
     end
