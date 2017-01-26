@@ -30,20 +30,26 @@ use English qw( -no_match_vars );
 # names of packages for strings
 our $PACKAGE = 'Marpa::R3::Scanless::G';
 
+# The bare mininum Scanless grammer, suitable as a base
+# for both metagrammar and user grammars.
+sub pre_construct {
+    my ($class) = @_;
+    my $pre_slg = bless [], $class;
+    $pre_slg->[Marpa::R3::Internal::Scanless::G::EXHAUSTION_ACTION] = 'fatal';
+    $pre_slg->[Marpa::R3::Internal::Scanless::G::REJECTION_ACTION] = 'fatal';
+    $pre_slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE] = \*STDERR;
+    return $pre_slg;
+}
+
 sub Marpa::R3::Internal::Scanless::meta_grammar {
 
-    my $meta_slg = bless [], 'Marpa::R3::Scanless::G';
-    $meta_slg->[Marpa::R3::Internal::Scanless::G::EXHAUSTION_ACTION] = 'fatal';
-    $meta_slg->[Marpa::R3::Internal::Scanless::G::REJECTION_ACTION] = 'fatal';
+    my $meta_slg = pre_construct('Marpa::R3::Scanless::G');
 
     state $hashed_metag = Marpa::R3::Internal::MetaG::hashed_grammar();
-    $meta_slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE] = \*STDERR;
-    Marpa::R3::Internal::Scanless::G::hash_to_runtime( $meta_slg,
-        $hashed_metag,
+    Marpa::R3::Internal::Scanless::G::hash_to_runtime( $meta_slg, $hashed_metag,
         { bless_package => 'Marpa::R3::Internal::MetaAST_Nodes' } );
 
-    my $tracer =
-        $meta_slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
+    my $tracer = $meta_slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
 
     return $meta_slg;
 
@@ -52,14 +58,10 @@ sub Marpa::R3::Internal::Scanless::meta_grammar {
 sub Marpa::R3::Scanless::G::new {
     my ( $class, @hash_ref_args ) = @_;
 
-    my $slg = [];
-    bless $slg, $class;
+    my $slg = pre_construct($class);
 
-    $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE] = \*STDERR;
-    $slg->[Marpa::R3::Internal::Scanless::G::WARNINGS]          = 1;
-    $slg->[Marpa::R3::Internal::Scanless::G::IF_INACCESSIBLE]   = 'warn';
-    $slg->[Marpa::R3::Internal::Scanless::G::EXHAUSTION_ACTION] = 'fatal';
-    $slg->[Marpa::R3::Internal::Scanless::G::REJECTION_ACTION] = 'fatal';
+    $slg->[Marpa::R3::Internal::Scanless::G::WARNINGS]        = 1;
+    $slg->[Marpa::R3::Internal::Scanless::G::IF_INACCESSIBLE] = 'warn';
 
     my ( $flat_args, $error_message ) =
       Marpa::R3::flatten_hash_args( \@hash_ref_args );
