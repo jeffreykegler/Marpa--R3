@@ -52,9 +52,13 @@ event 'expecting text' = predicted <text>
 text ~ [\d\D]
 END_OF_DSL
 
-my $grammar = Marpa::R3::Scanless::G->new( { source => \$dsl } );
-my $recce = Marpa::R3::Scanless::R->new(
-    { grammar => $grammar, semantics_package => 'My_Actions' } );
+my $grammar = Marpa::R3::Scanless::G->new(
+    {
+        semantics_package => 'My_Actions',
+        source            => \$dsl
+    }
+);
+my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
 
 my $input = 'A2(A2(S3(Hey)S13(Hello, World!))S5(Ciao!))';
 

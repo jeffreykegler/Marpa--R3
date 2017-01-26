@@ -107,7 +107,8 @@ for my $event_line  (split /\n/xms, $all_events_expected)
     push @events, @pos_events;
 }
 
-my $grammar = Marpa::R3::Scanless::G->new( { source => \$rules } );
+my $grammar = Marpa::R3::Scanless::G->new(
+    { semantics_package => 'My_Actions', source => \$rules } );
 
 # Test of all events
 my %active_events = map { ( $_, 1 ) } @events;
@@ -138,10 +139,8 @@ sub do_test {
     $extra_recce_args = { event_is_active => $active_events }
         if defined $active_events;
 
-    my $recce = Marpa::R3::Scanless::R->new(
-        { grammar => $grammar, semantics_package => 'My_Actions' },
-        $extra_recce_args
-        );
+    my $recce =
+      Marpa::R3::Scanless::R->new( { grammar => $grammar }, $extra_recce_args );
 
     my $length = length $string;
     my $pos    = $recce->read( \$string );

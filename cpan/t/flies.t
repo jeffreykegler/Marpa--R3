@@ -63,6 +63,7 @@ sub do_preposition       { my @v = @{$_[1]}; return "pr(${$v[0]})" }
 
 my $grammar = Marpa::R3::Scanless::G->new(
     {
+        semantics_package => 'main',
         source => \<<'END_OF_DSL',
 sentence    ::= subject verb adjunct    action => do_sva_sentence
 sentence    ::= subject verb object     action => do_svo_sentence
@@ -108,10 +109,7 @@ for my $lexical_class (keys %lexical_class) {
 
 for my $data ( 'time flies like an arrow', 'fruit flies like a banana' ) {
 
-    my $recce = Marpa::R3::Scanless::R->new( {
-        grammar => $grammar,
-        semantics_package => 'main',
-    } );
+    my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
     die 'Failed to create recognizer' if not $recce;
 
     my $lexeme_start = 0;

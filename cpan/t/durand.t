@@ -54,9 +54,13 @@ Expression ::= Number
       whitespace ~ [\s]+
 END_OF_SOURCE
 
-$grammar = Marpa::R3::Scanless::G->new( { source => \$dsl } );
-$recce = Marpa::R3::Scanless::R->new(
-    { grammar => $grammar, semantics_package => 'My_Actions' } );
+$grammar = Marpa::R3::Scanless::G->new(
+    {
+        semantics_package => 'My_Actions',
+        source            => \$dsl
+    }
+);
+$recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
 $input = '2*1+3*4+5';
 $pos   = 0;
 $recce->read( \$input, 0, 0 );

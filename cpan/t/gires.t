@@ -113,12 +113,16 @@ for my $test_data (@tests_data) {
     my ( $actual_value, $actual_result );
     PROCESSING: {
         my $grammar;
-        if (not defined eval {
-                $grammar =
-                    Marpa::R3::Scanless::G->new( { source => $source } );
-                1;
-            }
-            )
+        my $eval_ok = eval {
+            $grammar = Marpa::R3::Scanless::G->new(
+                {
+                    source            => $source,
+                    semantics_package => 'My_Semantics'
+                }
+            );
+            1;
+        };
+        if (not defined $eval_ok)
         {
             say $EVAL_ERROR if $DEBUG;
             my $abbreviated_error = $EVAL_ERROR;
@@ -130,7 +134,8 @@ for my $test_data (@tests_data) {
             last PROCESSING;
         } ## end if ( not defined eval { $grammar = Marpa::R3::Scanless::G...})
         my $recce = Marpa::R3::Scanless::R->new(
-            { grammar => $grammar, semantics_package => 'My_Semantics' } );
+            { grammar => $grammar,
+            } );
 
         if ( not defined eval { $recce->read( \$input ); 1 } ) {
             say $EVAL_ERROR if $DEBUG;

@@ -41,9 +41,24 @@ END_OF_SOURCE
 (my $source_plus = $source_template) =~ s/ %QUANTIFIER% / + /xms;
 (my $source_star = $source_template) =~ s/ %QUANTIFIER% / * /xms;
 
-my $grammar_bare = Marpa::R3::Scanless::G->new( { source => \$source_bare } );
-my $grammar_plus = Marpa::R3::Scanless::G->new( { source => \$source_plus } );
-my $grammar_star = Marpa::R3::Scanless::G->new( { source => \$source_star } );
+my $grammar_bare = Marpa::R3::Scanless::G->new(
+    {
+        semantics_package => 'My_Actions',
+        source            => \$source_bare
+    }
+);
+my $grammar_plus = Marpa::R3::Scanless::G->new(
+    {
+        semantics_package => 'My_Actions',
+        source            => \$source_plus
+    }
+);
+my $grammar_star = Marpa::R3::Scanless::G->new(
+    {
+        semantics_package => 'My_Actions',
+        source            => \$source_star
+    }
+);
 
 package My_Actions;
 sub do_list {
@@ -66,10 +81,7 @@ sub my_parser {
 
     my $self = bless { grammar => $grammar }, 'My_Actions';
 
-    my $recce = Marpa::R3::Scanless::R->new( {
-        grammar => $grammar,
-        semantics_package => 'My_Actions'
-    } );
+    my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
     $self->{slr} = $recce;
     my ( $parse_value, $parse_status, $last_expression );
 

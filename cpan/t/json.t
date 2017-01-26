@@ -225,6 +225,7 @@ sub new {
 
     $parser->{grammar} = Marpa::R3::Scanless::G->new(
         {
+            semantics_package => 'MarpaX::JSON::Actions',
             source         => \(<<'END_OF_SOURCE'),
 :default ::= action => ::first
 
@@ -303,11 +304,7 @@ sub parse {
 # Marpa::R3::Display
 # name: SLIF read/resume example
 
-    my $re = Marpa::R3::Scanless::R->new(
-        {   grammar           => $parser->{grammar},
-            semantics_package => 'MarpaX::JSON::Actions'
-        }
-    );
+    my $re = Marpa::R3::Scanless::R->new( { grammar => $parser->{grammar} } );
     my $length = length $string;
     for (
         my $pos = $re->read( \$string );

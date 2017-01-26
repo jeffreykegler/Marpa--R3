@@ -101,9 +101,13 @@ event '^h' = predicted h
 whitespace ~ [\s]+
 END_OF_DSL
 
-my $grammar = Marpa::R3::Scanless::G->new( { source => \$dsl } );
-my $slr = Marpa::R3::Scanless::R->new(
-    { grammar => $grammar, semantics_package => 'My_Actions' } );
+my $grammar = Marpa::R3::Scanless::G->new(
+    {
+        source            => \$dsl,
+        semantics_package => 'My_Actions'
+    }
+);
+my $slr = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
 
 my $input = q{a b c "insert d here" e e f h};
 my $length = length $input;

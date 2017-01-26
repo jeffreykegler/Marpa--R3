@@ -86,7 +86,8 @@ my $after_0_events = <<'END_OF_EVENTS';
 4 d
 END_OF_EVENTS
 
-my $grammar = Marpa::R3::Scanless::G->new( { source => \$rules } );
+my $grammar = Marpa::R3::Scanless::G->new(
+    { semantics_package => 'My_Actions', source => \$rules } );
 
 my @events = map { ( '!' . $_, '^' . $_, $_ ) } qw(a b c d);
 
@@ -155,8 +156,8 @@ sub show_last_subtext {
 sub do_test {
     my ( $test, $slg, $string, $expected_events, $reactivate_events, $recce_args ) = @_;
     $recce_args //= {};
-    my $recce = Marpa::R3::Scanless::R->new(
-        { grammar => $grammar, semantics_package => 'My_Actions' }, $recce_args );
+    my $recce =
+      Marpa::R3::Scanless::R->new( { grammar => $grammar }, $recce_args );
     if (defined $reactivate_events) {
 
 # Marpa::R3::Display

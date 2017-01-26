@@ -32,8 +32,9 @@ use Marpa::R3::Test;
 use Marpa::R3;
 
 my $grammar = Marpa::R3::Scanless::G->new(
-    {   
-        source          => \(<<'END_OF_SOURCE'),
+    {
+        semantics_package => 'My_Actions',
+        source            => \(<<'END_OF_SOURCE'),
 :default ::= action => do_first_arg
 :start ::= Script
 Script ::= Expression+ separator => comma action => do_script
@@ -64,7 +65,7 @@ END_OF_SOURCE
 );
 
 my $input = '42 * 1 + 7';
-my $value_ref = $grammar->parse( \$input, 'My_Actions' );
+my $value_ref = $grammar->parse( \$input );
 
 # Marpa::R3::Display::End
 
@@ -125,10 +126,7 @@ sub my_parser {
 # Marpa::R3::Display
 # name: Scanless recognizer synopsis
 
-    my $recce = Marpa::R3::Scanless::R->new( {
-        grammar => $grammar,
-        semantics_package => 'My_Actions'
-        } );
+    my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
     my $self = bless { grammar => $grammar }, 'My_Actions';
     $self->{recce} = $recce;
 

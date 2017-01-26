@@ -107,7 +107,8 @@ for my $pos_events  (split /\n/xms, $all_events_expected)
     push @events, @pos_events;
 }
 
-my $grammar = Marpa::R3::Scanless::G->new( { source => \$rules } );
+my $grammar = Marpa::R3::Scanless::G->new(
+    { semantics_package => 'My_Actions', source => \$rules } );
 
 my $location_0_event = qq{0 ^a\n} ;
 
@@ -134,8 +135,7 @@ sub show_last_subtext {
 sub do_test {
     my ( $test, $slg, $string, $expected_events, $reactivate_events ) = @_;
     my $actual_events = q{};
-    my $recce = Marpa::R3::Scanless::R->new(
-        { grammar => $grammar, semantics_package => 'My_Actions' } );
+    my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
     if (defined $reactivate_events) {
 
 # Marpa::R3::Display
