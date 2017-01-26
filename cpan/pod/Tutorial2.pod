@@ -37,10 +37,14 @@ normalize-whitespace: 1
     whitespace ~ [\s]+
     END_OF_DSL
 
-    my $grammar = Marpa::R3::Scanless::G->new( { source => \$dsl } );
-    my $recce = Marpa::R3::Scanless::R->new(
-        { grammar => $grammar, semantics_package => 'My_Actions' } );
-    my $input = '42 * 1 + 7';
+    my $grammar = Marpa::R3::Scanless::G->new(
+        {
+            semantics_package => 'My_Actions',
+            source            => \$dsl
+        }
+    );
+    my $recce       = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
+    my $input       = '42 * 1 + 7';
     my $length_read = $recce->read( \$input );
 
     die "Read ended after $length_read of ", length $input, " characters"
@@ -110,8 +114,7 @@ name: Tutorial 2 synopsis
 partial: 1
 normalize-whitespace: 1
 
-    my $recce = Marpa::R3::Scanless::R->new(
-        { grammar => $grammar, semantics_package => 'My_Actions' } );
+    my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
 
 =for Marpa::R3::Display::End
 

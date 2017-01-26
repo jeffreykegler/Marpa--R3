@@ -38,9 +38,14 @@ normalize-whitespace: 1
     whitespace ~ [\s]+
     END_OF_DSL
 
-    my $grammar = Marpa::R3::Scanless::G->new( { source => \$dsl } );
-    my $input = '42 * 1 + 7';
-    my $value_ref = $grammar->parse( \$input, 'My_Actions' );
+    my $grammar = Marpa::R3::Scanless::G->new(
+        {
+            semantics_package => 'My_Actions',
+            source            => \$dsl
+        }
+    );
+    my $input     = '42 * 1 + 7';
+    my $value_ref = $grammar->parse( \$input );
 
     sub My_Actions::do_add {
         my ( undef, $values ) = @_;
@@ -121,7 +126,12 @@ normalize-whitespace: 1
     whitespace ~ [\s]+
     END_OF_DSL
 
-    my $grammar = Marpa::R3::Scanless::G->new( { source => \$dsl } );
+    my $grammar = Marpa::R3::Scanless::G->new(
+        {
+            semantics_package => 'My_Actions',
+            source            => \$dsl
+        }
+    );
 
 =for Marpa::R3::Display::End
 
@@ -146,13 +156,20 @@ hash value
 is the
 value of the named argument.
 
-In the example, there is only one named argument to the SLIF grammar constructor:
-C<source>.
+In the example, there are two named arguments to the SLIF grammar constructor:
+C<source> and C<semantics_pacakge>.
 The value of C<source> must be a reference to a string in the
 L<SLIF's domain-specific language|Marpa::R3::Scanless::DSL>
 (DSL).
 In this example, the DSL consists of several rules
 and pseudo-rules.
+
+The second argument is
+a string specifying the "semantics package".
+The "C<semantics_package>"
+tells Marpa the name of the Perl package that contains
+the closures implementing the semantics for this grammar.
+We will talk more about this below.
 
 =head2 A G1 rule
 
@@ -357,7 +374,7 @@ partial: 1
 normalize-whitespace: 1
 
     my $input = '42 * 1 + 7';
-    my $value_ref = $grammar->parse( \$input, 'My_Actions' );
+    my $value_ref = $grammar->parse( \$input );
 
 =for Marpa::R3::Display::End
 
@@ -366,12 +383,6 @@ we use
 the C<Marpa::R3::Scanless::G::parse()> method.
 C<Marpa::R3::Scanless::G::parse()> requires a reference
 to a string as its first argument.
-Optionally, the second argument is
-another string specifying the "semantics package".
-The "C<semantics_package>"
-tells Marpa the name of the Perl package that contains
-the closures implementing the semantics for this grammar.
-We will talk more about this below.
 
 =head2 Semantics
 
@@ -452,7 +463,7 @@ name: Landing page synopsis
 partial: 1
 normalize-whitespace: 1
 
-    my $value_ref = $grammar->parse( \$input, 'My_Actions' );
+    my $value_ref = $grammar->parse( \$input );
 
 =for Marpa::R3::Display::End
 

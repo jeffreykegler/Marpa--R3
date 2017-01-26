@@ -35,9 +35,12 @@ In Marpa::R3, semantics will be fully settled in the grammar.
 
 =head2 Options moved from recognizer to grammar
 
-The C<exhaustion> and C<rejection> options, which were
-recognizer options in Marpa::R2,
+The C<exhaustion> and C<rejection>
+C<semantics_package>
+named arguments
 are grammar options in Marpa::R3.
+They were
+recognizer name arguments in Marpa::R2,
 
 =head2 Actions that are Perl names must resolve to subroutines
 
@@ -204,12 +207,12 @@ In Marpa::R3, there is no per-parse constructor.
 
 =head2 The per-parse argument never affects the semantics package
 
+As of Marpa::R3, the per-parse argument has no effect on
+the semantics package.
 In Marpa::R2, if the c<semantics_package> named argument was
 not used and the per-parse argument was blessed,
 then the package into which the per-parse argument was blessed
 became the semantics package.
-In Marpa::R3, the per-parse argument has no effect on
-the semantics package.
 
 =head2 The semantic closure now always receives exactly 2 arguments
 

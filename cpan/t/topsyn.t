@@ -55,7 +55,7 @@ my $grammar = Marpa::R3::Scanless::G->new(
     }
 );
 my $input     = '42 * 1 + 7';
-my $value_ref = $grammar->parse( \$input, );
+my $value_ref = $grammar->parse( \$input );
 
 sub My_Actions::do_add {
     my ( undef, $values ) = @_;

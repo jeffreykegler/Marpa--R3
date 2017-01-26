@@ -679,8 +679,8 @@ L<as described below|/"Resolving Perl names to Perl variables">.
 To resolve Perl identifiers to Perl names,
 a semantics package must be defined.
 The semantics package can be defined using the
-L<SLIF recognizer's C<semantics_package> named
-argument|Marpa::R3::Scanless::R/"semantics_package">.
+L<SLIF grammar's C<semantics_package> named
+argument|Marpa::R3::Scanless::G/"semantics_package">.
 
 If the user wants the Perl variables implementing the semantics
 in the C<main> namespace,

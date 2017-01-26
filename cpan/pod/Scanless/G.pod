@@ -22,6 +22,7 @@ normalize-whitespace: 1
 
     my $grammar = Marpa::R3::Scanless::G->new(
         {
+            semantics_package => 'My_Actions',
             source          => \(<<'END_OF_SOURCE'),
     :default ::= action => do_first_arg
     :start ::= Script
@@ -75,7 +76,7 @@ in conjunction with the
 L<C<bless> adverb|Marpa::R3::Scanless::DSL/"bless">.
 C<bless_package> should not be confused with the
 L<SLIF's
-C<semantics_package> recognizer setting|Marpa::R3::Scanless::R/"semantics_package">.
+C<semantics_package> grammar setting|Marpa::R3::Scanless::G/"semantics_package">.
 The two are not closely related.
 
 =head2 exhaustion
@@ -119,6 +120,22 @@ an event occurs
 as described in the
 L<section on rejection parse events|Marpa::R3::Event/"Rejection events">.
 
+=head2 semantics_package
+
+Sets the semantic package for the grammar.
+The C<semantics_package> grammar setting
+is used when resolving action names to
+fully qualified Perl names.
+For more details on the SLIF semantics,
+see the L<document on SLIF
+semantics|Marpa::R3::Semantics>.
+
+The C<semantics_package> grammar setting
+should not be confused with the
+L<SLIF's
+C<bless_package> grammar setting|Marpa::R3::Scanless::G/"bless_package">.
+The two are not closely related.
+
 =head2 source
 
 The value of the C<source> named argument must be a reference
@@ -143,7 +160,12 @@ name: Landing page synopsis
 normalize-whitespace: 1
 partial: 1
 
-    my $grammar   = Marpa::R3::Scanless::G->new( { source => \$dsl } );
+    my $grammar = Marpa::R3::Scanless::G->new(
+        {
+            semantics_package => 'My_Actions',
+            source            => \$dsl
+        }
+    );
     my $input     = '42 * 1 + 7';
     my $value_ref = $grammar->parse( \$input );
 
