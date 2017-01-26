@@ -38,7 +38,9 @@ sub default_action {
 ## use critic
 
 my $grammar = Marpa::R3::Scanless::G->new(
-    {   source => \<<'END_OF_DSL'
+    {
+        semantics_package => 'main',
+        source            => \<<'END_OF_DSL'
 :default ::= action => default_action
 S ::= A B B B C C
 A ::= 'a'
@@ -58,8 +60,7 @@ G1 R4 C ::=
 G1 R5 [:start] ::= S
 EOS
 
-my $recce = Marpa::R3::Scanless::R->new(
-        { grammar => $grammar, semantics_package => 'main' } );
+my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
 
 $recce->read( \q{a} );
 

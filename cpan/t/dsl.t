@@ -67,8 +67,9 @@ whitespace ~ [\s]+
 END_OF_GRAMMAR
 
 my $grammar = Marpa::R3::Scanless::G->new(
-    {   
-        source          => \$rules,
+    {
+        semantics_package => 'My_Actions',
+        source            => \$rules
     }
 );
 
@@ -100,12 +101,7 @@ sub calculate {
 
     %symbol_table = ();
 
-    my $recce = Marpa::R3::Scanless::R->new(
-        {
-            grammar           => $grammar,
-            semantics_package => 'My_Actions'
-        }
-    );
+    my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
 
     my $self = bless { grammar => $grammar }, 'My_Actions';
     $self->{slr} = $recce;

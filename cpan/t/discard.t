@@ -34,7 +34,8 @@ use Marpa::R3;
 
 my $grammar = Marpa::R3::Scanless::G->new(
     {
-        source        => \(<<'END_OF_SOURCE'),
+        semantics_package => 'My_Nodes',
+        source            => \(<<'END_OF_SOURCE'),
 :default ::= action => [g1start, g1length, values]
 
 Script ::= Expression+ separator => comma action => do_expression
@@ -81,9 +82,7 @@ my $output_re =
 
 
     my $length = length $input;
-    my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar,
-    semantics_package => 'My_Nodes',
-    } );
+    my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
 
     my $pos = $recce->read(\$input);
 

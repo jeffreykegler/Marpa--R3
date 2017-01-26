@@ -53,7 +53,8 @@ END_OF_DSL
 open my $trace_fh, q{>}, \( my $trace_output = q{} );
 ## use critic
 
-my $grammar = Marpa::R3::Scanless::G->new( { source => \$dsl } );
+my $grammar = Marpa::R3::Scanless::G->new(
+    { semantics_package => 'My_Actions', source => \$dsl } );
 
 $grammar->set( { trace_file_handle => $trace_fh } );
 
@@ -72,7 +73,6 @@ sub My_Actions::do_multiply {
 my $recce = Marpa::R3::Scanless::R->new(
     {
         grammar           => $grammar,
-        semantics_package => 'My_Actions',
         trace_terminals   => 99
     }
 );

@@ -43,9 +43,10 @@ sub My_Actions::join_contents {
     return join '', @elements;
 }
 
-my $grammar   = Marpa::R3::Scanless::G->new(
+my $grammar = Marpa::R3::Scanless::G->new(
     {
-    source => \<<'END_OF_SOURCE',
+        semantics_package => 'My_Actions',
+        source            => \<<'END_OF_SOURCE',
 :default ::= action => ::array
 :start ::= S
 S ::= <array ref>  <hash ref>  <ref ref>  <code ref>
@@ -63,11 +64,11 @@ S ::= <array ref>  <hash ref>  <ref ref>  <code ref>
 <array ref 2>  ::= 'a'
 <code ref 2>  ::= 'a'
 END_OF_SOURCE
-});
+    }
+);
 
 sub do_parse {
-    my $slr = Marpa::R3::Scanless::R->new(
-        { grammar => $grammar, semantics_package => 'My_Actions', } );
+    my $slr = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
     $slr->read( \'aaaaaaaaaa' );
     return $slr->value();
 } ## end sub do_parse

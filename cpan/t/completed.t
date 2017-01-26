@@ -43,7 +43,8 @@ word ~ [\w]+
 whitespace ~ [\s]+
 END_OF_GRAMMAR
 
-my $grammar = Marpa::R3::Scanless::G->new( { source => \$rules } );
+my $grammar = Marpa::R3::Scanless::G->new(
+    { semantics_package => 'My_Actions', source => \$rules } );
 
 
 do_test($grammar, q{42 ( hi 42 hi ) 7 11}, [ '( hi 42 hi )' ]);
@@ -62,8 +63,7 @@ sub show_last_subtext {
 sub do_test {
     my ( $grammar, $string, $expected_events ) = @_;
     my @actual_events;
-    my $recce = Marpa::R3::Scanless::R->new(
-        { grammar => $grammar, semantics_package => 'My_Actions' } );
+    my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
     my $length = length $string;
     my $pos    = $recce->read( \$string );
   READ: while (1) {

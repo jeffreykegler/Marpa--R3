@@ -48,7 +48,8 @@ whitespace ~ [\s]+
 <hash comment char> ~ [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
 END_OF_RULES
 
-my $grammar = Marpa::R3::Scanless::G->new( { source => \$dsl, });
+my $grammar = Marpa::R3::Scanless::G->new(
+    { semantics_package => 'My_Actions', source => \$dsl, } );
 
 package My_Actions;
 # The SELF object is a very awkward way of specifying the per-parse
@@ -88,7 +89,6 @@ sub my_parser {
     open my $trace_fh, q{>}, \$trace_output;
     my $recce = Marpa::R3::Scanless::R->new(
         {   grammar               => $grammar,
-            semantics_package => 'My_Actions',
             trace_terminals       => 3,
             trace_file_handle     => $trace_fh,
             too_many_earley_items => 100,         # test this
