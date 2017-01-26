@@ -83,7 +83,18 @@ rsquare ~ <deep rsquare>
 
 === GRAMMAR ===
 
-my $g = Marpa::R3::Scanless::G->new( { source => \($grammar) } );
+# Marpa::R3::Display
+# name: SLIF exhaustion grammar setting synopsis part 1
+
+my $g = Marpa::R3::Scanless::G->new(
+    {
+        source     => \($grammar),
+        exhaustion => 'event',
+        rejection  => 'event',
+    }
+);
+
+# Marpa::R3::Display::End
 
 my @tests = (
     [ 'z}ab)({[]})))(([]))zz', ( join "\n", '({[]})', '(([]))', '' ) ],
@@ -121,15 +132,11 @@ sub test {
         # No prefix should go beyond the first location of the shortest span.
 
 # Marpa::R3::Display
-# name: SLIF exhaustion recognizer setting synopsis
+# name: SLIF exhaustion grammar setting synopsis part 2
 
         my @shortest_span = ();
-        my $recce         = Marpa::R3::Scanless::R->new(
-            {   grammar    => $g,
-                exhaustion => 'event',
-            },
-            $recce_debug_args
-        );
+        my $recce =
+          Marpa::R3::Scanless::R->new( { grammar => $g, }, $recce_debug_args );
         my $pos = $recce->read( \$string, $target_start );
 
         EVENT:
@@ -164,8 +171,6 @@ sub test {
         my $prefix_end = $shortest_span[0];
         $recce = Marpa::R3::Scanless::R->new(
             {   grammar    => $g,
-                exhaustion => 'event',
-                rejection => 'event',
             },
             $recce_debug_args
         );

@@ -43,7 +43,17 @@ semi ~ ';'
 
 === GRAMMAR ===
 
-my $g = Marpa::R3::Scanless::G->new( { source => \($grammar) } );
+# Marpa::R3::Display
+# name: SLIF rejection grammar setting synopsis part 1
+
+my $g = Marpa::R3::Scanless::G->new(
+    {
+        source    => \($grammar),
+        rejection => 'event'
+    }
+);
+
+# Marpa::R3::Display::End
 
 my @tests = (
     [ '1+2+3*4',                '15' ],
@@ -54,7 +64,7 @@ my @tests = (
 for my $test (@tests) {
     my ( $string, $expected_result ) = @{$test};
     my $actual_result = test( $g, $string );
-    say "Input: $string";
+    # say "Input: $string";
     Test::More::is( $actual_result, $expected_result,
         qq{Result of "$string"} );
 } ## end for my $test (@tests)
@@ -72,14 +82,10 @@ sub test {
     state $recce_debug_args = {};
 
 # Marpa::R3::Display
-# name: SLIF rejection recognizer setting synopsis
+# name: SLIF rejection grammar setting synopsis part 2
 
-    my $recce = Marpa::R3::Scanless::R->new(
-        {   grammar   => $g,
-            rejection => 'event',
-        },
-        $recce_debug_args
-    );
+    my $recce =
+      Marpa::R3::Scanless::R->new( { grammar => $g, }, $recce_debug_args );
     my $pos = $recce->read( \$suffixed_string, 0, $original_length );
 
     READ_LOOP: while (1) {

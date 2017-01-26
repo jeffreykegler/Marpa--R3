@@ -127,8 +127,8 @@ a location at which parse exhaustion occurs.
 
 How parse exhaustion is handled depends on the setting
 of the
-L<SLIF's C<exhaustion> recognizer
-setting|Marpa::R3::Scanless::R/"exhaustion">.
+L<SLIF's C<exhaustion> grammar
+setting|Marpa::R3::Scanless::G/"exhaustion">.
 The value of this may be "C<fatal>" or
 "C<event>".
 ("C<fatal>" is the default.)
@@ -153,7 +153,7 @@ L<lexeme_complete()|Marpa::R3::Scanless::R/"lexeme_complete()">,
 and L<lexeme_read()|Marpa::R3::Scanless::R/"lexeme_read()">,
 always ignore
 parse exhaustion,
-regardless of the C<exhaustion> recognizer setting.
+regardless of the C<exhaustion> grammar setting.
 This is because these methods
 read input only at a single location,
 so that every parse exhaustion is synchronous.
@@ -290,7 +290,7 @@ Completion parse events may be a cleaner way to deal with this.
 Applications which do want to use parse exhaustion as part of
 a strategy for finding the EOP
 can set the
-L<SLIF's C<exhaustion> recognizer setting|Marpa::R3::Scanless::R/"exhaustion">
+L<SLIF's C<exhaustion> grammar setting|Marpa::R3::Scanless::G/"exhaustion">
 to "C<event>", so that a parse event occurs at parse exhaustion.
 When the event-triggering method returns, the application
 can then

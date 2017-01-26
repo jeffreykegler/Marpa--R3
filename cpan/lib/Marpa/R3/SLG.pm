@@ -33,6 +33,9 @@ our $PACKAGE = 'Marpa::R3::Scanless::G';
 sub Marpa::R3::Internal::Scanless::meta_grammar {
 
     my $meta_slg = bless [], 'Marpa::R3::Scanless::G';
+    $meta_slg->[Marpa::R3::Internal::Scanless::G::EXHAUSTION_ACTION] = 'fatal';
+    $meta_slg->[Marpa::R3::Internal::Scanless::G::REJECTION_ACTION] = 'fatal';
+
     state $hashed_metag = Marpa::R3::Internal::MetaG::hashed_grammar();
     $meta_slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE] = \*STDERR;
     Marpa::R3::Internal::Scanless::G::hash_to_runtime( $meta_slg,
@@ -55,6 +58,8 @@ sub Marpa::R3::Scanless::G::new {
     $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE] = \*STDERR;
     $slg->[Marpa::R3::Internal::Scanless::G::WARNINGS]          = 1;
     $slg->[Marpa::R3::Internal::Scanless::G::IF_INACCESSIBLE]   = 'warn';
+    $slg->[Marpa::R3::Internal::Scanless::G::EXHAUSTION_ACTION] = 'fatal';
+    $slg->[Marpa::R3::Internal::Scanless::G::REJECTION_ACTION] = 'fatal';
 
     my ( $flat_args, $error_message ) =
       Marpa::R3::flatten_hash_args( \@hash_ref_args );
@@ -119,6 +124,36 @@ qq{'source' name argument to Marpa::R3::Scanless::G->new() is a ref to a an unde
     if ( defined $value ) {
         $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE] = $value;
         delete $flat_args->{'trace_file_handle'};
+    }
+
+    if ( exists $flat_args->{'exhaustion'} ) {
+
+        state $exhaustion_actions = { map { ( $_, 0 ) } qw(fatal event) };
+        my $value = $flat_args->{'exhaustion'} // 'undefined';
+        Marpa::R3::exception(
+            qq{'exhaustion' named arg value is $value (should be one of },
+            (
+                join q{, }, map { q{'} . $_ . q{'} } keys %{$exhaustion_actions}
+            ),
+            ')'
+        ) if not exists $exhaustion_actions->{$value};
+        $slg->[Marpa::R3::Internal::Scanless::G::EXHAUSTION_ACTION] = $value;
+        delete $flat_args->{'exhaustion'};
+
+    }
+
+    if ( exists $flat_args->{'rejection'} ) {
+
+        state $rejection_actions = { map { ( $_, 0 ) } qw(fatal event) };
+        my $value = $flat_args->{'rejection'} // 'undefined';
+        Marpa::R3::exception(
+            qq{'rejection' named arg value is $value (should be one of },
+            ( join q{, }, map { q{'} . $_ . q{'} } keys %{$rejection_actions} ),
+            ')'
+        ) if not exists $rejection_actions->{$value};
+        $slg->[Marpa::R3::Internal::Scanless::G::REJECTION_ACTION] = $value;
+        delete $flat_args->{'rejection'};
+
     }
 
     return ( $dsl, $flat_args );

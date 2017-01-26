@@ -78,6 +78,47 @@ L<SLIF's
 C<semantics_package> recognizer setting|Marpa::R3::Scanless::R/"semantics_package">.
 The two are not closely related.
 
+=head2 exhaustion
+
+The C<exhaustion> grammar setting
+determines what happens when asynchronous parse exhaustion occurs.
+Intuitively, "asynchronous" parse exhaustion is parse
+exhaustion at a point when control would not normally
+return to the application.
+For details
+see the
+L<description of exhaustion parse events|Marpa::R3::Event/"Exhaustion events">.
+
+The value
+of the C<exhaustion> grammar setting
+must be either "C<fatal>"
+or "C<event>".
+"C<fatal>" is the default.
+If the value is "C<fatal>",
+asynchronous parse exhaustion is treated as an error,
+and an exception is thrown.
+If the value is "C<event>",
+an event occurs
+as described in the
+L<section on exhaustion parse events|Marpa::R3::Event/"Exhaustion events">.
+
+=head2 rejection
+
+The C<rejection> grammar setting
+determines what happens when all tokens are rejected by the
+G1 parser.
+The value must be either "C<fatal>"
+or "C<event>".
+"C<fatal>" is the default.
+
+If the value is "C<fatal>",
+rejection of all tokens is treated as an error,
+and an exception is thrown.
+If the value is "C<event>",
+an event occurs
+as described in the
+L<section on rejection parse events|Marpa::R3::Event/"Rejection events">.
+
 =head2 source
 
 The value of the C<source> named argument must be a reference

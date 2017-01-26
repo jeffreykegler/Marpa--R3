@@ -98,7 +98,13 @@ my %token_by_name = (
     rparen  => $tokens{')'},
 );
 
-my $g = Marpa::R3::Scanless::G->new( { source => \($grammar) } );
+my $g = Marpa::R3::Scanless::G->new(
+    {
+        source => \($grammar),
+        ## Ask Marpa to generate an event on rejection
+        rejection => 'event',
+    }
+);
 
 my @tests = ();
 
@@ -182,8 +188,6 @@ sub test {
 
     my $recce = Marpa::R3::Scanless::R->new(
         {   grammar => $g,
-            ## Ask Marpa to generate an event on rejection
-            rejection => 'event',
         },
         $recce_debug_args
     );

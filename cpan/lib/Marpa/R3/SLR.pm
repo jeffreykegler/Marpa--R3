@@ -128,8 +128,6 @@ sub Marpa::R3::Scanless::R::new {
     bless $slr, $class;
 
     # Set recognizer args to default
-    $slr->[Marpa::R3::Internal::Scanless::R::EXHAUSTION_ACTION] = 'fatal';
-    $slr->[Marpa::R3::Internal::Scanless::R::REJECTION_ACTION] = 'fatal';
     $slr->[Marpa::R3::Internal::Scanless::R::RANKING_METHOD] = 'none';
     $slr->[Marpa::R3::Internal::Scanless::R::MAX_PARSES]     = 0;
     $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] = [];
@@ -309,7 +307,7 @@ sub common_set {
     # These recce args are allowed in all contexts
     state $common_recce_args = {
         map { ( $_, 1 ); }
-          qw(trace_terminals trace_file_handle rejection exhaustion
+          qw(trace_terminals trace_file_handle
           end max_parses too_many_earley_items
           trace_actions trace_values)
     };
@@ -356,34 +354,6 @@ sub common_set {
             recce.trace_terminals = trace_terminals
 END_OF_LUA
             'i', $normalized_value);
-    }
-
-    if ( exists $flat_args->{'exhaustion'} ) {
-
-        state $exhaustion_actions = { map { ( $_, 0 ) } qw(fatal event) };
-        my $value = $flat_args->{'exhaustion'} // 'undefined';
-        Marpa::R3::exception(
-            qq{'exhaustion' named arg value is $value (should be one of },
-            (
-                join q{, }, map { q{'} . $_ . q{'} } keys %{$exhaustion_actions}
-            ),
-            ')'
-        ) if not exists $exhaustion_actions->{$value};
-        $slr->[Marpa::R3::Internal::Scanless::R::EXHAUSTION_ACTION] = $value;
-
-    }
-
-    if ( exists $flat_args->{'rejection'} ) {
-
-        state $rejection_actions = { map { ( $_, 0 ) } qw(fatal event) };
-        my $value = $flat_args->{'rejection'} // 'undefined';
-        Marpa::R3::exception(
-            qq{'rejection' named arg value is $value (should be one of },
-            ( join q{, }, map { q{'} . $_ . q{'} } keys %{$rejection_actions} ),
-            ')'
-        ) if not exists $rejection_actions->{$value};
-        $slr->[Marpa::R3::Internal::Scanless::R::REJECTION_ACTION] = $value;
-
     }
 
     if ( exists $flat_args->{'ranking_method'} ) {
@@ -908,7 +878,7 @@ sub Marpa::R3::Scanless::R::resume {
         # that it will not conflict with any user-defined event name.
 
         if (    $problem_code eq 'R1 exhausted before end'
-            and $slr->[Marpa::R3::Internal::Scanless::R::EXHAUSTION_ACTION]
+            and $slg->[Marpa::R3::Internal::Scanless::G::EXHAUSTION_ACTION]
             eq 'event' )
         {
             push @{ $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] },
@@ -917,7 +887,7 @@ sub Marpa::R3::Scanless::R::resume {
         } ## end if ( $problem_code eq 'R1 exhausted before end' and ...)
 
         if (    $problem_code eq 'no lexeme'
-            and $slr->[Marpa::R3::Internal::Scanless::R::REJECTION_ACTION]
+            and $slg->[Marpa::R3::Internal::Scanless::G::REJECTION_ACTION]
             eq 'event' )
         {
             push @{ $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] },
@@ -1409,9 +1379,6 @@ sub Marpa::R3::Scanless::G::parse {
 
 sub Marpa::R3::Scanless::R::series_restart {
     my ( $slr , @args ) = @_;
-
-    $slr->[Marpa::R3::Internal::Scanless::R::EXHAUSTION_ACTION] = 'fatal';
-    $slr->[Marpa::R3::Internal::Scanless::R::REJECTION_ACTION] = 'fatal';
 
     $slr->reset_evaluation();
 

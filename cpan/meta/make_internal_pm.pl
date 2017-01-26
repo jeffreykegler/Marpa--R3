@@ -275,6 +275,10 @@ __DATA__
     character class regex by symbol name.
     Used before precomputation. }
 
+    { Semantics }
+    EXHAUSTION_ACTION
+    REJECTION_ACTION
+
     :package=Marpa::R3::Internal::Scanless::R
 
     SLG
@@ -287,8 +291,6 @@ __DATA__
 
     P_INPUT_STRING
 
-    EXHAUSTION_ACTION
-    REJECTION_ACTION
     TRACE_FILE_HANDLE
     TRACE_VALUES
     TRACE_ACTIONS
