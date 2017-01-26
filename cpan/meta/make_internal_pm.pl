@@ -279,6 +279,7 @@ __DATA__
     EXHAUSTION_ACTION
     REJECTION_ACTION
     SEMANTICS_PACKAGE
+    RANKING_METHOD
 
     :package=Marpa::R3::Internal::Scanless::R
 
@@ -304,7 +305,6 @@ __DATA__
     }
 
     MAX_PARSES
-    RANKING_METHOD
 
     { The following fields must be reinitialized when
     evaluation is reset }

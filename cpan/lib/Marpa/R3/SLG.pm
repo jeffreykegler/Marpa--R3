@@ -38,6 +38,7 @@ sub pre_construct {
     $pre_slg->[Marpa::R3::Internal::Scanless::G::EXHAUSTION_ACTION] = 'fatal';
     $pre_slg->[Marpa::R3::Internal::Scanless::G::REJECTION_ACTION] = 'fatal';
     $pre_slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE] = \*STDERR;
+    $pre_slg->[Marpa::R3::Internal::Scanless::G::RANKING_METHOD] = 'none';
     return $pre_slg;
 }
 
@@ -162,6 +163,21 @@ qq{'source' name argument to Marpa::R3::Scanless::G->new() is a ref to a an unde
         my $value = $flat_args->{'semantics_package'};
         $slg->[Marpa::R3::Internal::Scanless::G::SEMANTICS_PACKAGE] = $value;
         delete $flat_args->{'semantics_package'};
+    }
+
+    if ( exists $flat_args->{'ranking_method'} ) {
+
+        # Only allowed in new method
+        state $ranking_methods =
+          { map { ( $_, 0 ) } qw(high_rule_only rule none) };
+        my $value = $flat_args->{'ranking_method'} // 'undefined';
+        Marpa::R3::exception(
+            qq{ranking_method value is $value (should be one of },
+            ( join q{, }, map { q{'} . $_ . q{'} } keys %{$ranking_methods} ),
+            ')' )
+          if not exists $ranking_methods->{$value};
+        $slg->[Marpa::R3::Internal::Scanless::G::RANKING_METHOD] = $value;
+        delete $flat_args->{'ranking_method'};
     }
 
     return ( $dsl, $flat_args );

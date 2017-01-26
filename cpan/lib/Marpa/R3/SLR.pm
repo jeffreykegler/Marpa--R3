@@ -128,7 +128,6 @@ sub Marpa::R3::Scanless::R::new {
     bless $slr, $class;
 
     # Set recognizer args to default
-    $slr->[Marpa::R3::Internal::Scanless::R::RANKING_METHOD] = 'none';
     $slr->[Marpa::R3::Internal::Scanless::R::MAX_PARSES]     = 0;
     $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] = [];
 
@@ -314,7 +313,7 @@ sub common_set {
     state $set_method_args = { map { ( $_, 1 ); } keys %{$common_recce_args} };
     state $new_method_args = {
         map { ( $_, 1 ); }
-          qw(grammar ranking_method event_is_active),
+          qw(grammar event_is_active),
         keys %{$set_method_args}
     };
     state $series_restart_method_args =
@@ -354,20 +353,6 @@ sub common_set {
             recce.trace_terminals = trace_terminals
 END_OF_LUA
             'i', $normalized_value);
-    }
-
-    if ( exists $flat_args->{'ranking_method'} ) {
-
-        # Only allowed in new method
-        state $ranking_methods =
-          { map { ( $_, 0 ) } qw(high_rule_only rule none) };
-        my $value = $flat_args->{'ranking_method'} // 'undefined';
-        Marpa::R3::exception(
-            qq{ranking_method value is $value (should be one of },
-            ( join q{, }, map { q{'} . $_ . q{'} } keys %{$ranking_methods} ),
-            ')' )
-          if not exists $ranking_methods->{$value};
-        $slr->[Marpa::R3::Internal::Scanless::R::RANKING_METHOD] = $value;
     }
 
     if ( defined $flat_args->{'max_parses'} ) {

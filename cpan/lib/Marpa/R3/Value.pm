@@ -380,8 +380,9 @@ sub Marpa::R3::Scanless::R::ordering_get {
     return if $slr->[Marpa::R3::Internal::Scanless::R::NO_PARSE];
     my $parse_set_arg =
         $slr->[Marpa::R3::Internal::Scanless::R::END_OF_PARSE];
+    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $ranking_method =
-        $slr->[Marpa::R3::Internal::Scanless::R::RANKING_METHOD];
+        $slg->[Marpa::R3::Internal::Scanless::G::RANKING_METHOD];
 
     my ($has_parse) = $slr->call_by_tag(
         ('@' . __FILE__ . ':' .  __LINE__),
