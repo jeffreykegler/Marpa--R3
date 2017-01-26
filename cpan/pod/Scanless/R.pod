@@ -725,29 +725,6 @@ there to be no limit.
 The C<max_parses> setting is valid in all
 calls of the recognizer setting-aware methods.
 
-=head2 ranking_method
-
-The C<ranking_method>
-is only allowed in
-calls of the L<C<new()>|/"Constructor"> method.
-The value must be a string:
-one of "C<none>",
-"C<rule>",
-or "C<high_rule_only>".
-When the value is "C<none>", Marpa returns the parse results
-in arbitrary order.
-This is the default.
-
-The "C<rule>"
-and "C<high_rule_only>" ranking methods
-allows the user
-to control the order
-in which parse results are returned by
-the C<value> method,
-and to exclude some parse results from the parse series.
-For details, see L<the document
-on parse order|Marpa::R3::Semantics::Order>.
-
 =head2 too_many_earley_items
 
 The C<too_many_earley_items> setting is optional,
