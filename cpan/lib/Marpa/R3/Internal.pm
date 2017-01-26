@@ -161,6 +161,7 @@ use constant TRACE_FILE_HANDLE => 21;
 use constant CHARACTER_CLASSES => 22;
 use constant EXHAUSTION_ACTION => 23;
 use constant REJECTION_ACTION => 24;
+use constant SEMANTICS_PACKAGE => 25;
 
 package Marpa::R3::Internal::Scanless::R;
 use constant SLG => 0;
@@ -178,9 +179,8 @@ use constant NO_PARSE => 11;
 use constant NULL_VALUES => 12;
 use constant TREE_MODE => 13;
 use constant END_OF_PARSE => 14;
-use constant SEMANTICS_PACKAGE => 15;
-use constant REGISTRATIONS => 16;
-use constant CLOSURE_BY_SYMBOL_ID => 17;
-use constant CLOSURE_BY_RULE_ID => 18;
+use constant REGISTRATIONS => 15;
+use constant CLOSURE_BY_SYMBOL_ID => 16;
+use constant CLOSURE_BY_RULE_ID => 17;
 
 1;

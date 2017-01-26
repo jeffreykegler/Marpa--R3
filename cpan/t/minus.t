@@ -82,7 +82,8 @@ sub default_action {
 
 my $grammar = Marpa::R3::Scanless::G->new(
     {
-        source => \<<'END_OF_DSL',
+        semantics_package => 'main',
+        source            => \<<'END_OF_DSL',
 :default ::= action => default_action
 E ::= E Minus E action => subtraction
 E ::= E MinusMinus action => postfix_decr
@@ -93,13 +94,14 @@ MinusMinus ::= Minus Minus action => minusminus
 Minus ~ '-'
 Number ~ [\d]+
 END_OF_DSL
-        }
+    }
 );
 
-my $recce = Marpa::R3::Scanless::R->new( {
-        grammar => $grammar,
-        semantics_package => 'main',
-} );
+my $recce = Marpa::R3::Scanless::R->new(
+    {
+        grammar => $grammar
+    }
+);
 
 Marpa::R3::Test::is( $grammar->show_rules,
     <<'END_RULES', 'Minuses Equation Rules' );

@@ -107,14 +107,18 @@ my @test_data = (
     ]
 );
 
-my $g = Marpa::R3::Scanless::G->new( { source => \$dsl } );
+my $g = Marpa::R3::Scanless::G->new(
+    {
+        semantics_package => 'main',
+        source            => \$dsl
+    }
+);
 
 TEST: for my $test_data (@test_data) {
 
     my ( $test_name, $test_input, $test_results ) = @{$test_data};
 
-    my $recce = Marpa::R3::Scanless::R->new(
-        { grammar => $g, semantics_package => 'main' } );
+    my $recce = Marpa::R3::Scanless::R->new( { grammar => $g, } );
 
     $recce->read( \$test_input );
 

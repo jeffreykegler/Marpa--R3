@@ -83,7 +83,9 @@ sub My_Actions::default_action {
 ## use critic
 
 my $g = Marpa::R3::Scanless::G->new(
-    {   source => \(<<'END_OF_SOURCE'),
+    {
+        semantics_package => 'My_Actions',
+        source            => \(<<'END_OF_SOURCE'),
 :start ::= E
 :default ::= action => default_action
 E ::= 
@@ -106,7 +108,6 @@ for my $n ( 1 .. 12 ) {
     # This is for debugging, after all
     my $recce = Marpa::R3::Scanless::R->new(
         {   grammar           => $g,
-            semantics_package => 'My_Actions',
             max_parses        => 300
         }
     );

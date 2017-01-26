@@ -314,11 +314,11 @@ sub common_set {
     state $set_method_args = { map { ( $_, 1 ); } keys %{$common_recce_args} };
     state $new_method_args = {
         map { ( $_, 1 ); }
-          qw(grammar semantics_package ranking_method event_is_active),
+          qw(grammar ranking_method event_is_active),
         keys %{$set_method_args}
     };
     state $series_restart_method_args =
-      { map { ( $_, 1 ); } qw(semantics_package), keys %{$common_recce_args} };
+      { map { ( $_, 1 ); } keys %{$common_recce_args} };
 
     my $ok_args = $set_method_args;
     $ok_args = $new_method_args            if $method eq 'new';
@@ -374,10 +374,6 @@ END_OF_LUA
         my $value = $flat_args->{'max_parses'};
         $slr->[Marpa::R3::Internal::Scanless::R::MAX_PARSES] = $value;
     }
-
-    if ( defined( my $value = $flat_args->{'semantics_package'} ) ) {
-        $slr->[Marpa::R3::Internal::Scanless::R::SEMANTICS_PACKAGE] = $value;
-    } ## end if ( defined( my $value = $flat_args->{'semantics_package'...}))
 
     if ( defined( my $value = $flat_args->{'trace_actions'} ) ) {
         $slr->[Marpa::R3::Internal::Scanless::R::TRACE_ACTIONS] = $value;
@@ -1320,41 +1316,18 @@ sub Marpa::R3::Scanless::R::ambiguous {
 # This is a Marpa Scanless::G method, but is included in this
 # file because internally it is all about the recognizer.
 sub Marpa::R3::Scanless::G::parse {
-    my ( $slg, $input_ref, $arg1, @more_args ) = @_;
+    my ( $slg, $input_ref, @more_args ) = @_;
     if ( not defined $input_ref or ref $input_ref ne 'SCALAR' ) {
         Marpa::R3::exception(
             q{$slr->parse(): first argument must be a ref to string});
     }
     my @recce_args = ( { grammar => $slg } );
-    my @semantics_package_arg = ();
-    DO_ARG1: {
-        last if not defined $arg1;
-        my $reftype = ref $arg1;
-        if ( $reftype eq 'HASH' ) {
-
-            # if second arg is ref to hash, it is the first set
-            # of named args for
-            # the recognizer
-            push @recce_args, $arg1;
-            last DO_ARG1;
-        } ## end if ( $reftype eq 'HASH' )
-        if ( $reftype eq q{} ) {
-
-            # if second arg is a string, it is the semantic package
-            push @semantics_package_arg, { semantics_package => $arg1 };
-        }
-        if ( ref $arg1 and ref $input_ref ne 'HASH' ) {
-            Marpa::R3::exception(
-                q{$slr->parse(): second argument must be a package name or a ref to HASH}
-            );
-        }
-    } ## end DO_ARG1:
     if ( grep { ref $_ ne 'HASH' } @more_args ) {
         Marpa::R3::exception(
-            q{$slr->parse(): third and later arguments must be ref to HASH});
+            q{$slr->parse(): second and later arguments must be ref to HASH});
     }
     my $slr = Marpa::R3::Scanless::R->new( @recce_args, @more_args,
-        @semantics_package_arg );
+        );
     my $input_length = ${$input_ref};
     my $length_read  = $slr->read($input_ref);
     if ( $length_read != length $input_length ) {
@@ -1408,7 +1381,6 @@ sub Marpa::R3::Scanless::R::series_restart {
 sub Marpa::R3::Scanless::R::reset_evaluation {
     my ($slr) = @_;
     $slr->[Marpa::R3::Internal::Scanless::R::NO_PARSE]              = undef;
-    $slr->[Marpa::R3::Internal::Scanless::R::SEMANTICS_PACKAGE]       = undef;
     $slr->[Marpa::R3::Internal::Scanless::R::NULL_VALUES]           = undef;
 
     $slr->[Marpa::R3::Internal::Scanless::R::REGISTRATIONS]         = undef;

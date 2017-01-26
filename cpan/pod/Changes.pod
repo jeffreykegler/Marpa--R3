@@ -27,6 +27,18 @@ and tools to Marpa::R3.
 
 =head1 Changes
 
+=head2 Semantics moved from recognizer to grammar
+
+In Marpa::R2, the semantics was not finally settled
+until the C<< $recce->value() >> call.
+In Marpa::R3, semantics will be fully settled in the grammar.
+
+=head2 Options moved from recognizer to grammar
+
+The C<exhaustion> and C<rejection> options, which were
+recognizer options in Marpa::R2,
+are grammar options in Marpa::R3.
+
 =head2 Actions that are Perl names must resolve to subroutines
 
 It was a little noticed feature of Marpa::R2, that actions specified

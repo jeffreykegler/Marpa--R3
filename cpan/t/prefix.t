@@ -28,7 +28,8 @@ use Marpa::R3;
 
 my $prefix_grammar = Marpa::R3::Scanless::G->new(
     {
-        source          => \(<<'END_OF_RULES'),
+        semantics_package => 'My_Actions',
+        source            => \(<<'END_OF_RULES'),
 :default ::= action => do_arg0
 :start ::= Script
 Script ::= Calculation* action => do_list
@@ -72,12 +73,7 @@ sub My_Actions::show_last_expression {
 sub my_parser {
     my ( $grammar, $string ) = @_;
 
-    my $recce = Marpa::R3::Scanless::R->new(
-        {
-            grammar           => $grammar,
-            semantics_package => 'My_Actions'
-        }
-    );
+    my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar, } );
     my $self = bless { grammar => $grammar, recce => $recce }, 'My_Actions';
     my ( $parse_value, $parse_status, $last_expression );
 

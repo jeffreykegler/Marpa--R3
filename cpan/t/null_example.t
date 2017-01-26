@@ -74,7 +74,9 @@ sub null_X { return 'null X'; }
 sub null_Y { return 'null Y'; }
 
 my $slg = Marpa::R3::Scanless::G->new(
-    {   source => \<<'END_OF_DSL',
+    {
+        semantics_package => 'main',
+        source            => \<<'END_OF_DSL',
 :start ::= S
 S ::= L R action => do_S
 L ::= A B X action => do_L
@@ -91,11 +93,7 @@ END_OF_DSL
     }
 );
 
-my $slr = Marpa::R3::Scanless::R->new(
-    {   grammar           => $slg,
-        semantics_package => 'main',
-    }
-);
+my $slr = Marpa::R3::Scanless::R->new( { grammar => $slg } );
 
 $slr->read( \'x' );
 

@@ -145,7 +145,7 @@ partial: 1
 
     my $grammar   = Marpa::R3::Scanless::G->new( { source => \$dsl } );
     my $input     = '42 * 1 + 7';
-    my $value_ref = $grammar->parse( \$input, 'My_Actions' );
+    my $value_ref = $grammar->parse( \$input );
 
 =for Marpa::R3::Display::End
 
@@ -168,10 +168,7 @@ using low-level calls in L<Marpa::R3::Tutorial2>.
 
 The C<parse()> method takes one or more arguments.
 The first argument, which is required, is a ref to an input string.
-Optionally, the second argument may be a string specifying the package name
-for the semantics.
 The remaining arguments
-(including the second argument if it exists, but is not a string)
 must be references to hashes of named arguments.
 These hash references will be
 passed, as is,

@@ -278,6 +278,7 @@ __DATA__
     { Semantics }
     EXHAUSTION_ACTION
     REJECTION_ACTION
+    SEMANTICS_PACKAGE
 
     :package=Marpa::R3::Internal::Scanless::R
 
@@ -315,7 +316,6 @@ __DATA__
 
     { Fields for new SLIF resolution logic
     -- must be reinitialized when evaluation is reset }
-    SEMANTICS_PACKAGE
     REGISTRATIONS
     CLOSURE_BY_SYMBOL_ID
     CLOSURE_BY_RULE_ID

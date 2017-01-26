@@ -59,7 +59,8 @@ $rules =~ s/=off$//gxms;
 my $events_expected = <<'END_OF_EVENTS';
 END_OF_EVENTS
 
-my $grammar = Marpa::R3::Scanless::G->new( { source => \$rules } );
+my $grammar = Marpa::R3::Scanless::G->new(
+    { semantics_package => 'My_Actions', source => \$rules } );
 
 my %base_expected_events;
 $base_expected_events{'all'} = <<'END_OF_EVENTS';
@@ -160,34 +161,44 @@ sub do_test {
         qq{Events for test "$test"} );
 } ## end sub do_test
 
-my $slr = Marpa::R3::Scanless::R->new( { grammar => $grammar, semantics_package => 'My_Actions' } );
-do_test($slr, 'all');
-$slr = Marpa::R3::Scanless::R->new( { grammar => $grammar, semantics_package => 'My_Actions' } );
-do_test($slr, 'once');
-$slr = Marpa::R3::Scanless::R->new( { grammar => $grammar, semantics_package => 'My_Actions' } );
-do_test($slr, 'seq');
+my $slr = Marpa::R3::Scanless::R->new( { grammar => $grammar, } );
+do_test( $slr, 'all' );
+$slr = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
+do_test( $slr, 'once' );
+$slr = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
+do_test( $slr, 'seq' );
 
 # Yet another time, with initializers
 %expected_events = %base_expected_events;
 $expected_events{'all'} =~ s/^\d+ \s before \s c \n//gxms;
-$rules = $base_rules;
-$grammar = Marpa::R3::Scanless::G->new( { source => \$rules } );
-$slr = Marpa::R3::Scanless::R->new( { grammar => $grammar, semantics_package => 'My_Actions' } );
-do_test($slr, 'all');
+$rules   = $base_rules;
+$grammar = Marpa::R3::Scanless::G->new(
+    {
+        semantics_package => 'My_Actions',
+        source            => \$rules
+    }
+);
+$slr = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
+do_test( $slr, 'all' );
 
 # Yet another time, with initializers
 %expected_events = %base_expected_events;
 $expected_events{'all'} =~ s/^\d+ \s after \s b \n//gxms;
-$rules = $base_rules;
-$grammar = Marpa::R3::Scanless::G->new( { source => \$rules } );
+$rules   = $base_rules;
+$grammar = Marpa::R3::Scanless::G->new(
+    {
+        semantics_package => 'My_Actions',
+        source            => \$rules
+    }
+);
 
 # Marpa::R3::Display
 # name: SLIF recce event_is_active named arg example
 
 $slr = Marpa::R3::Scanless::R->new(
-    {   grammar           => $grammar,
-        semantics_package => 'My_Actions',
-        event_is_active   => { 'before c' => 1, 'after b' => 0 }
+    {
+        grammar         => $grammar,
+        event_is_active => { 'before c' => 1, 'after b' => 0 }
     }
 );
 

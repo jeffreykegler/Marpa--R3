@@ -43,8 +43,9 @@ sub My_Actions::start_rule_action {
 ## use critic
 
     my $grammar = Marpa::R3::Scanless::G->new(
-    {
-    source => \(<<'END_OF_GRAMMAR'),
+        {
+            semantics_package => 'My_Actions',
+            source            => \(<<'END_OF_GRAMMAR'),
 :start ::= S
 S ::= digit digit digit digit action => start_rule_action
 digit ::=
@@ -53,7 +54,7 @@ digit ::=
 zero ~ 't'
 one ~ 't'
 END_OF_GRAMMAR
-}
+        }
     );
 
 my @counting_up =
@@ -61,7 +62,6 @@ my @counting_up =
 
 my $recce = Marpa::R3::Scanless::R->new(
     {   grammar           => $grammar,
-        semantics_package => 'My_Actions',
         ranking_method    => 'rule'
     }
 );

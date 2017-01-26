@@ -48,9 +48,14 @@ digits ~ [\d]+
 whitespace ~ [\s]+
 END_OF_DSL
 
-my $grammar = Marpa::R3::Scanless::G->new( { source => \$dsl } );
-my $input = '42 * 1 + 7';
-my $value_ref = $grammar->parse( \$input, 'My_Actions' );
+my $grammar = Marpa::R3::Scanless::G->new(
+    {
+        semantics_package => 'My_Actions',
+        source            => \$dsl
+    }
+);
+my $input     = '42 * 1 + 7';
+my $value_ref = $grammar->parse( \$input, );
 
 sub My_Actions::do_add {
     my ( undef, $values ) = @_;

@@ -50,10 +50,14 @@ digits ~ [\d]+
 whitespace ~ [\s]+
 END_OF_DSL
 
-my $grammar = Marpa::R3::Scanless::G->new( { source => \$dsl } );
-my $recce = Marpa::R3::Scanless::R->new(
-    { grammar => $grammar, semantics_package => 'My_Actions' } );
-my $input = '42 * 1 + 7';
+my $grammar = Marpa::R3::Scanless::G->new(
+    {
+        source            => \$dsl,
+        semantics_package => 'My_Actions'
+    }
+);
+my $recce       = Marpa::R3::Scanless::R->new( { grammar => $grammar, } );
+my $input       = '42 * 1 + 7';
 my $length_read = $recce->read( \$input );
 
 die "Read ended after $length_read of ", length $input, " characters"
@@ -83,7 +87,7 @@ sub My_Actions::do_multiply {
 
 Test::More::is( $value, 49, 'Tutorial 2 synopsis value' );
 
-$recce->series_restart( {  semantics_package => 'My_Actions' } );
+$recce->series_restart();
 
 my $show_symbols_output = $grammar->show_symbols();
 
@@ -354,7 +358,7 @@ END_TRACE_OUTPUT
 Marpa::R3::Test::is( $trace_output, $expected_trace_output,
     'Implementation Example Trace Output' );
 
-$recce->series_restart( {  semantics_package => 'My_Actions' } );
+$recce->series_restart();
 
 $value_ref = $recce->value();
 $value = $value_ref ? ${$value_ref} : 'No Parse';

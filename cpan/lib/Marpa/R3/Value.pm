@@ -70,7 +70,7 @@ sub Marpa::R3::Internal::Scanless::R::resolve_action {
 
     if ( not $fully_qualified_name ) {
         my $resolve_package =
-            $slr->[Marpa::R3::Internal::Scanless::R::SEMANTICS_PACKAGE];
+            $slg->[Marpa::R3::Internal::Scanless::G::SEMANTICS_PACKAGE];
         if ( not defined $resolve_package ) {
             ${$p_error} = Marpa::R3::Internal::X->new(
                 {   message =>

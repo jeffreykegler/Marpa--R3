@@ -156,6 +156,12 @@ qq{'source' name argument to Marpa::R3::Scanless::G->new() is a ref to a an unde
 
     }
 
+    if ( exists $flat_args->{'semantics_package'} ) {
+        my $value = $flat_args->{'semantics_package'};
+        $slg->[Marpa::R3::Internal::Scanless::G::SEMANTICS_PACKAGE] = $value;
+        delete $flat_args->{'semantics_package'};
+    }
+
     return ( $dsl, $flat_args );
 
 } ## end sub Marpa::R3::Internal::Scanless::G::set

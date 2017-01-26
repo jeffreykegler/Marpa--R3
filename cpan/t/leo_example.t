@@ -53,13 +53,13 @@ MultiplyAssignOp ~ '*='
 END_OF_DSL
 
 my $grammar = Marpa::R3::Scanless::G->new(
-    {   source => \$dsl
+    {
+        semantics_package => 'My_Actions',
+        source            => \$dsl
     }
 );
 
-my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar,
-semantics_package => 'My_Actions'
-} );
+my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
 
 $recce->read( \'a=b+=c-=d*=e' );
 
