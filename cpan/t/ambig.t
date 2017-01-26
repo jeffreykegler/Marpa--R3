@@ -148,16 +148,14 @@ B2 ~ 'b'
 ws ~ [\s]+
 END_OF_SOURCE
 
-$grammar = Marpa::R3::Scanless::G->new({ source => $source });
-
 $input = q{a b};
 
 for my $ranking_method ('none', 'rule', 'high_rule_only'){
 
-    $recce = Marpa::R3::Scanless::R->new({
-        grammar => $grammar,
-        ranking_method => $ranking_method,
-    } );
+    my $ranking_grammar = Marpa::R3::Scanless::G->new(
+        { ranking_method => $ranking_method, source => $source } );
+
+    $recce = Marpa::R3::Scanless::R->new( { grammar => $ranking_grammar } );
 
     $recce->read(\$input);
 

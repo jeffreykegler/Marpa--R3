@@ -45,6 +45,7 @@ sub My_Actions::start_rule_action {
     my $grammar = Marpa::R3::Scanless::G->new(
         {
             semantics_package => 'My_Actions',
+            ranking_method    => 'rule',
             source            => \(<<'END_OF_GRAMMAR'),
 :start ::= S
 S ::= digit digit digit digit action => start_rule_action
@@ -60,11 +61,7 @@ END_OF_GRAMMAR
 my @counting_up =
     qw{ 0000 0001 0010 0011 0100 0101 0110 0111 1000 1001 1010 1011 1100 1101 1110 1111 };
 
-my $recce = Marpa::R3::Scanless::R->new(
-    {   grammar           => $grammar,
-        ranking_method    => 'rule'
-    }
-);
+my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
 
 $recce->read(\'tttt');
 
