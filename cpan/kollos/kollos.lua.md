@@ -722,7 +722,7 @@ if not the value is an undef.
         end
         local stack = recce.lmw_v.stack
         local result_ix = recce.this_step.result
-        stack[result_ix] = current_token_literal(recce)
+        stack[result_ix] = recce:current_token_literal()
         if recce.trace_values > 0 then
           local top_of_queue = #recce.trace_values_queue;
           local tag, token_sv
@@ -864,7 +864,7 @@ it assumes that the caller has ensured that
 
 ```
     -- miranda: section+ VM operations
-    function current_token_literal(recce)
+    function _M.class_slr.current_token_literal(recce)
       if recce.token_is_literal == recce.this_step.value then
           local start_es = recce.this_step.start_es_id
           local end_es = recce.this_step.es_id
@@ -898,7 +898,7 @@ Otherwise the values of the RHS children are pushed.
     function op_fn_push_values(recce, increment, new_values)
         if recce.this_step.type == 'MARPA_STEP_TOKEN' then
             local next_ix = #new_values + 1;
-            new_values[next_ix] = current_token_literal(recce)
+            new_values[next_ix] = recce:current_token_literal()
             return -2
         end
         if recce.this_step.type == 'MARPA_STEP_RULE' then
@@ -1099,7 +1099,7 @@ implementation, which returned the size of the
 
 ```
     -- miranda: section+ VM operations
-    function do_ops(recce, ops, new_values)
+    function _M.class_slr.do_ops(recce, ops, new_values)
         local op_ix = 1
         while op_ix <= #ops do
             local op_code = ops[op_ix]
@@ -1184,7 +1184,7 @@ with "trace" and "do not return" being special cases.
             if not ops then
                 error(string.format('No semantics defined for %s', recce.this_step.type))
             end
-            local do_ops_result = do_ops(recce, ops, new_values)
+            local do_ops_result = recce:do_ops(ops, new_values)
             local stack = recce.lmw_v.stack
             -- truncate stack
             local above_top = recce.this_step.result + 1
