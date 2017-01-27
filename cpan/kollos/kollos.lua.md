@@ -611,9 +611,29 @@ A return value of -2 or less indicates that the reading of VM operations
 should continue.
 
 Note the use of tails calls in the Lua code.
-Maintainters should be aware that these are finicky.
+Maintainers should be aware that these are finicky.
 In particular, while `return f(x)` is turned into a tail call,
 `return (f(x))` is not.
+
+The next function is a utility to set
+up the VM table.
+
+#### VM debug operation
+
+```
+    -- miranda: section VM utilities
+
+        _M.vm_ops = {}
+        local function op_fn_add(name, fn)
+            local ops = _M.vm_ops
+            local next_ix = #ops
+            ops[next_ix] = fn
+            ops[name] = fn
+            return next_ix
+        end
+
+```
+
 
 #### VM debug operation
 
@@ -1797,7 +1817,7 @@ It should free all memory associated with the valuation.
 
     -- miranda: section+ valuator Libmarpa wrapper Lua functions
 
-    function valuation_reset(recce)
+    function _M.class_slr.valuation_reset(recce)
         recce.op_fn_key = nil
         -- io.stderr:write('Initializing rule semantics to nil\n')
         recce.rule_semantics = nil
@@ -2691,6 +2711,13 @@ a special "configuration" argument.
     -- miranda: insert create metal tables
     -- miranda: insert copy metal tables
 
+    -- set up various tables
+    _M.upvalues.kollos = _M
+    _M.defines = {}
+
+    -- miranda: insert create sandbox table
+
+    -- miranda: insert VM utilities
     -- miranda: insert VM operations
     -- miranda: insert grammar Libmarpa wrapper Lua functions
     -- miranda: insert recognizer Libmarpa wrapper Lua functions
@@ -4202,10 +4229,6 @@ Marpa::R3.
         marpa_lua_pushvalue (L, upvalue_stack_ix);
         marpa_lua_setfield (L, kollos_table_stack_ix, "upvalues");
 
-        /* Create the defines table */
-        marpa_lua_newtable (L);
-        marpa_lua_setfield (L, kollos_table_stack_ix, "defines");
-
         --miranda: insert create kollos libmarpa wrapper class tables
 
           /* Create the SLIF grammar metatable */
@@ -4421,7 +4444,6 @@ Marpa::R3.
 
             /* [ kollos ] */
 
-        -- miranda: insert create sandbox table
         -- miranda: insert create tree export operations
 
         marpa_lua_settop (L, kollos_table_stack_ix);
@@ -4433,34 +4455,23 @@ Marpa::R3.
 
 ### Create a sandbox
 
-Given a Lua state,
-create a table, which can be used
+Create a table, which can be used
 as a "sandbox" for protect the global environment
 from user code.
-The table is named `sandbox`.
 This code only creates the sandbox, it does not
 set it as an environment -- it is assumed that
 that will be done later,
 after to-be-sandboxed Lua code is loaded,
 but before it is executed.
-Not Lua-callable, but leaves the stack as before.
 
 ```
     -- miranda: section create sandbox table
-    {
-        const int base_of_stack = marpa_lua_gettop(L);
-        marpa_lua_newtable (L);
-        /* sandbox.__index = _G */
-        marpa_lua_pushglobaltable(L);
-        marpa_lua_setfield(L, -2, "__index");
 
-        /* sandbox metatable is itself */
-        marpa_lua_pushvalue(L, -1);
-        marpa_lua_setmetatable(L, -2);
-        /* [ sandbox ] */
-        marpa_lua_setfield(L, kollos_table_stack_ix, "sandbox");
-        marpa_lua_settop (L, base_of_stack);
-    }
+    local sandbox = {}
+    _M.sandbox = sandbox
+    sandbox.__index = _G
+    setmetatable(sandbox, sandbox)
+
 ```
 
 ### Preliminaries to the C library code

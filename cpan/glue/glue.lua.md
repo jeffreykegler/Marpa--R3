@@ -73,9 +73,11 @@ we may want meaningful performance numbers.
     inspect = require "inspect"
     kollos = require "kollos"
 
-    -- TODO delete following 2 lines
     -- print('_G: ', inspect(_G, { depth = 1 }))
     -- print('kollos: ', inspect(kollos, { depth = 1 }))
+
+    -- create globals from selection Kollos variables
+    valuation_reset = kollos.class_slr.valuation_reset
 
     local _M = {}
 

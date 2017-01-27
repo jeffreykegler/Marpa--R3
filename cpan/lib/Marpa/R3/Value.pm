@@ -716,15 +716,9 @@ END_OF_LUA
 
     $slr->call_by_tag(
         ('@' . __FILE__ . ':' .  __LINE__),
-    << 'END_OF_LUA', 'i', ($trace_values ? 1 : 0 ));
+    << 'END_OF_LUA', 'i', ($trace_values ? $trace_values : 0 ));
     recce, flag = ...
-    return recce.lmw_v:_trace(flag)
-END_OF_LUA
-
-    $slr->call_by_tag(
-        ('@' . __FILE__ . ':' .  __LINE__),
-    << 'END_OF_LUA', 'i', $trace_values);
-    recce, flag = ...
+    recce.lmw_v:_trace(flag)
     recce:value_init(flag)
 END_OF_LUA
 
