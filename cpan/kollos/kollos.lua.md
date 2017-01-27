@@ -1726,7 +1726,7 @@ Called when a valuator is set up.
 ```
     -- miranda: section+ valuator Libmarpa wrapper Lua functions
 
-    function value_init(recce, trace_values)
+    function _M.class_slr.value_init(recce, trace_values)
 
         if not recce.lmw_v then
             error('no recce.lmw_v in value_init()')

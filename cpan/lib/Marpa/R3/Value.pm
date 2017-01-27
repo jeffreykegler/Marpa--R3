@@ -715,13 +715,18 @@ END_OF_LUA
     local $Marpa::R3::Context::slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
 
     $slr->call_by_tag(
-        (__FILE__ . ':' .  __LINE__),
+        ('@' . __FILE__ . ':' .  __LINE__),
     << 'END_OF_LUA', 'i', ($trace_values ? 1 : 0 ));
     recce, flag = ...
     return recce.lmw_v:_trace(flag)
 END_OF_LUA
 
-    $slr->call_by_name( 'value_init', 'i', $trace_values );
+    $slr->call_by_tag(
+        ('@' . __FILE__ . ':' .  __LINE__),
+    << 'END_OF_LUA', 'i', $trace_values);
+    recce, flag = ...
+    recce:value_init(flag)
+END_OF_LUA
 
     if ( not $slr->[Marpa::R3::Internal::Scanless::R::REGISTRATIONS] ) {
         my $trace_file_handle =
