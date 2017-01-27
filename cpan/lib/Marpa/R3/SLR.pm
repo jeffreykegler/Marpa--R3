@@ -1510,11 +1510,14 @@ sub Marpa::R3::Scanless::R::show_progress {
 
 sub Marpa::R3::Scanless::R::progress {
     my ( $slr, $ordinal_arg ) = @_;
-    my ($result) = $slr->call_by_name(
-        'progress',
-        'i>0',
-        ($ordinal_arg // -1)
-        );
+
+    my ($result) = $slr->call_by_tag(
+        ('@' . __FILE__ . ':' . __LINE__),
+    <<'END_OF_LUA', 'i>0', ($ordinal_arg // -1));
+    local recce, ordinal_arg = ...
+    return recce:progress(ordinal_arg)
+END_OF_LUA
+
     return $result;
 }
 
@@ -1522,7 +1525,7 @@ sub Marpa::R3::Scanless::R::terminals_expected {
     my ($slr)      = @_;
     my $slg        = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my ($terminals_expected) = $slr->call_by_tag(
-    (__FILE__ . ':' . __LINE__),
+    ('@' . __FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', '>0');
     local recce = ...
     local terminals_expected = recce.lmw_g1r:terminals_expected()
@@ -2035,14 +2038,27 @@ END_OF_LUA
 # not to be documented
 sub Marpa::R3::Scanless::R::show_or_nodes {
     my ( $slr ) = @_;
-    my ($result) = $slr->call_by_name('show_or_nodes', '');
+
+    my ($result) = $slr->call_by_tag(
+    ('@' . __FILE__ . ':' . __LINE__),
+    <<'END_OF_LUA', '');
+    local recce = ...
+    return recce:show_or_nodes()
+END_OF_LUA
+
     return $result;
 }
 
 # not to be documented
 sub Marpa::R3::Scanless::R::show_and_nodes {
     my ( $slr ) = @_;
-    my ($result) = $slr->call_by_name('show_and_nodes', '');
+    my ($result) = $slr->call_by_tag(
+    ('@' . __FILE__ . ':' . __LINE__),
+    <<'END_OF_LUA', '');
+    local recce = ...
+    return recce:show_and_nodes()
+END_OF_LUA
+
     return $result;
 }
 
@@ -2087,7 +2103,7 @@ sub Marpa::R3::Scanless::R::show_nook {
     if not or_node_id then return end
 
     local tree = recce.lmw_t
-    text = text .. " " .. or_node_tag(recce, or_node_id) .. ' p'
+    text = text .. " " .. recce:or_node_tag(or_node_id) .. ' p'
     if tree:_nook_predecessor_is_ready(nook_id) ~= 0 then
         text = text .. '=ok'
     else

@@ -506,7 +506,7 @@ or nil if there was none.
 
 ```
     -- miranda: section+ most Lua function definitions
-    function progress(recce, ordinal_arg)
+    function _M.class_slr.progress(recce, ordinal_arg)
         local g1r = recce.lmw_g1r
         local ordinal = ordinal_arg
         local latest_earley_set = g1r:latest_earley_set()
@@ -1857,7 +1857,7 @@ It should free all memory associated with the valuation.
         return table.concat(tag)
     end
 
-    function show_and_nodes(recce)
+    function _M.class_slr.show_and_nodes(recce)
         local bocage = recce.lmw_b
         local g1r = recce.lmw_g1r
         local data = {}
@@ -1928,7 +1928,7 @@ It should free all memory associated with the valuation.
         return table.concat(result, '\n')
     end
 
-    function or_node_tag(recce, or_node_id)
+    function _M.class_slr.or_node_tag(recce, or_node_id)
         local bocage = recce.lmw_b
         local set = bocage:_or_node_set(or_node_id)
         local irl_id = bocage:_or_node_irl(or_node_id)
@@ -1941,7 +1941,7 @@ It should free all memory associated with the valuation.
             set)
     end
 
-    function show_or_nodes(recce)
+    function _M.class_slr.show_or_nodes(recce)
         local bocage = recce.lmw_b
         local g1r = recce.lmw_g1r
         local data = {}
@@ -2014,13 +2014,13 @@ It should free all memory associated with the valuation.
                 local cause_irl_id
                 if cause_id then
                     cause_irl_id = bocage:_or_node_irl(cause_id)
-                    cause_tag = or_node_tag(recce, cause_id)
+                    cause_tag = recce:or_node_tag(cause_id)
                 end
-                local parent_tag = or_node_tag(recce, or_node_id)
+                local parent_tag = recce:or_node_tag(or_node_id)
                 local predecessor_id = bocage:_and_node_predecessor(and_node_id)
                 local predecessor_tag = "-"
                 if predecessor_id then
-                    predecessor_tag = or_node_tag(recce, predecessor_id)
+                    predecessor_tag = recce:or_node_tag(predecessor_id)
                 end
                 local tag = string.format(
                     "%d: %d=%s %s %s",
