@@ -45,7 +45,7 @@ sub Marpa::R3::Internal::Scanless::R::resolve_action {
         $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $trace_actions =
-        $slr->[Marpa::R3::Internal::Scanless::R::TRACE_ACTIONS];
+        $slg->[Marpa::R3::Internal::Scanless::G::TRACE_ACTIONS];
 
     # A reserved closure name;
     return [ q{}, undef, '::!default' ] if not defined $closure_name;
@@ -445,7 +445,7 @@ sub resolve_recce {
     my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
 
     my $trace_actions =
-        $slr->[Marpa::R3::Internal::Scanless::R::TRACE_ACTIONS] // 0;
+        $slg->[Marpa::R3::Internal::Scanless::G::TRACE_ACTIONS] // 0;
     my $trace_file_handle =
         $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
 
@@ -612,7 +612,7 @@ sub Marpa::R3::Scanless::R::value {
     my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
 
     my $trace_actions =
-      $slr->[Marpa::R3::Internal::Scanless::R::TRACE_ACTIONS] // 0;
+      $slg->[Marpa::R3::Internal::Scanless::G::TRACE_ACTIONS] // 0;
     my $trace_values =
       $slr->[Marpa::R3::Internal::Scanless::R::TRACE_VALUES] // 0;
     my $trace_file_handle =
@@ -713,7 +713,7 @@ END_OF_LUA
           $tracer->[Marpa::R3::Internal::Trace::G::XBNF_BY_IRLID];
         my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
         my $trace_actions =
-          $slr->[Marpa::R3::Internal::Scanless::R::TRACE_ACTIONS] // 0;
+          $slg->[Marpa::R3::Internal::Scanless::G::TRACE_ACTIONS] // 0;
 
         my @closure_by_irlid   = ();
         my @semantics_by_irlid = ();

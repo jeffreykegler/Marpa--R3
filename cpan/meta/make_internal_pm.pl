@@ -280,6 +280,7 @@ __DATA__
     REJECTION_ACTION
     SEMANTICS_PACKAGE
     RANKING_METHOD
+    TRACE_ACTIONS
 
     :package=Marpa::R3::Internal::Scanless::R
 
@@ -295,7 +296,6 @@ __DATA__
 
     TRACE_FILE_HANDLE
     TRACE_VALUES
-    TRACE_ACTIONS
     READ_STRING_ERROR
     EVENTS
 

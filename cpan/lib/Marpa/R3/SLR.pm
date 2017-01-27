@@ -308,7 +308,7 @@ sub common_set {
         map { ( $_, 1 ); }
           qw(trace_terminals trace_file_handle
           end max_parses too_many_earley_items
-          trace_actions trace_values)
+          trace_values)
     };
     state $set_method_args = { map { ( $_, 1 ); } keys %{$common_recce_args} };
     state $new_method_args = {
@@ -359,14 +359,6 @@ END_OF_LUA
         my $value = $flat_args->{'max_parses'};
         $slr->[Marpa::R3::Internal::Scanless::R::MAX_PARSES] = $value;
     }
-
-    if ( defined( my $value = $flat_args->{'trace_actions'} ) ) {
-        $slr->[Marpa::R3::Internal::Scanless::R::TRACE_ACTIONS] = $value;
-        if ($value) {
-            say {$trace_file_handle} 'Setting trace_actions option'
-              or Marpa::R3::exception("Cannot print: $ERRNO");
-        }
-    } ## end if ( defined( my $value = $flat_args->{'trace_actions'} ))
 
     if ( defined( my $value = $flat_args->{'trace_values'} ) ) {
         $slr->[Marpa::R3::Internal::Scanless::R::TRACE_VALUES] = $value;

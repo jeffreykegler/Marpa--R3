@@ -129,6 +129,19 @@ qq{'source' name argument to Marpa::R3::Scanless::G->new() is a ref to a an unde
         delete $flat_args->{'trace_file_handle'};
     }
 
+    my $trace_file_handle = 
+        $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE];
+
+    if ( exists $flat_args->{'trace_actions'} ) {
+        my $value = $flat_args->{'trace_actions'};
+        $slg->[Marpa::R3::Internal::Scanless::G::TRACE_ACTIONS] = $value;
+        if ($value) {
+            say {$trace_file_handle} 'Setting trace_actions option'
+              or Marpa::R3::exception("Cannot print: $ERRNO");
+        }
+        delete $flat_args->{'trace_actions'};
+    }
+
     if ( exists $flat_args->{'exhaustion'} ) {
 
         state $exhaustion_actions = { map { ( $_, 0 ) } qw(fatal event) };
