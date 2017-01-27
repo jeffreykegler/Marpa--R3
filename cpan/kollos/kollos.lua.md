@@ -1883,7 +1883,7 @@ It should free all memory associated with the valuation.
 
 ```
     -- miranda: section+ diagnostics
-    function and_node_tag(recce, and_node_id)
+    function _M.class_slr.and_node_tag(recce, and_node_id)
         local bocage = recce.lmw_b
         local parent_or_node_id = bocage:_and_node_parent(and_node_id)
         local origin = bocage:_or_node_origin(parent_or_node_id)
@@ -4497,8 +4497,7 @@ Given a Lua state,
 create a table, which can be used
 as a "sandbox" for protect the global environment
 from user code.
-The table is named `sandbox` and itself *is*
-kept in the global environment.
+The table is named `sandbox`.
 This code only creates the sandbox, it does not
 set it as an environment -- it is assumed that
 that will be done later,
@@ -4518,11 +4517,8 @@ Not Lua-callable, but leaves the stack as before.
         /* sandbox metatable is itself */
         marpa_lua_pushvalue(L, -1);
         marpa_lua_setmetatable(L, -2);
-        marpa_lua_pushglobaltable(L);
-        /* [ sandbox, _G ] */
-        marpa_lua_insert(L, -2);
-        /* [ _G, sandbox ] */
-        marpa_lua_setfield(L, -2, "sandbox");
+        /* [ sandbox ] */
+        marpa_lua_setfield(L, kollos_table_stack_ix, "sandbox");
         marpa_lua_settop (L, base_of_stack);
     }
 ```

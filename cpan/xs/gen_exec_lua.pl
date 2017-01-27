@@ -398,9 +398,12 @@ PPCODE:
     lua_State *const L = lua_wrapper->L;
     const int base_of_stack = marpa_lua_gettop (L);
     int msghandler_ix;
+    int kollos_ix;
 
     marpa_lua_pushcfunction(L, xlua_msghandler);
     msghandler_ix = marpa_lua_gettop(L);
+    marpa_lua_getglobal (L, "kollos");
+    kollos_ix = marpa_lua_gettop(L);
 
     === LUA_LOAD_STRING ===
 
@@ -408,7 +411,7 @@ PPCODE:
      * [func]
      * Set its first up value to the sandbox table.
      */
-    marpa_lua_getglobal (L, "sandbox");
+    marpa_lua_getfield (L, kollos_ix, "sandbox");
     if (!marpa_lua_setupvalue (L, -2, 1)) {
         marpa_lua_settop (L, base_of_stack);
         croak ("Marpa::R3::Lua error -- lua_setupvalue() failed");

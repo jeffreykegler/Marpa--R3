@@ -1640,7 +1640,12 @@ END_OF_LUA
 
 sub Marpa::R3::Scanless::R::and_node_tag {
     my ( $slr, $and_node_id ) = @_;
-    my ($tag) = $slr->call_by_name( 'and_node_tag', 'i', $and_node_id );
+    my ($tag) = $slr->call_by_tag(
+    ('@' . __FILE__ . ':' . __LINE__),
+        << 'END_OF_LUA', 'i', $and_node_id);
+    local recce,and_node_id=...
+    return recce:and_node_tag(and_node_id)
+END_OF_LUA
     return $tag;
 }
 
@@ -1654,7 +1659,7 @@ sub trace_token_evaluation {
 
     my ($nook_ix, $and_node_id)
         = $slr->call_by_tag(
-    (__FILE__ . ':' . __LINE__),
+    ('@' . __FILE__ . ':' . __LINE__),
         << 'END_OF_LUA', '>*' );
     recce = ...
     local nook_ix = recce.lmw_v:_nook()

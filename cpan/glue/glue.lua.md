@@ -73,6 +73,10 @@ we may want meaningful performance numbers.
     inspect = require "inspect"
     kollos = require "kollos"
 
+    -- TODO delete following 2 lines
+    -- print('_G: ', inspect(_G, { depth = 1 }))
+    -- print('kollos: ', inspect(kollos, { depth = 1 }))
+
     local _M = {}
 
     -- miranda: insert Lua declarations
