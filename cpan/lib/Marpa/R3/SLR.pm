@@ -1789,7 +1789,13 @@ sub Marpa::R3::Scanless::R::show_earley_set {
     my $tracer  = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
 
     my ($set_data) =
-      $slr->call_by_name( 'g1_earley_set_data', 'i>2', $traced_set_id );
+      $slr->call_by_tag(
+    ('@' . __FILE__ . ':' . __LINE__),
+    <<'END_OF_LUA', 'i>2', $traced_set_id );
+      local recce, traced_set_id = ...
+      return recce:g1_earley_set_data(traced_set_id)
+END_OF_LUA
+
     return if not $set_data;
     my %set_data = @{$set_data};
 
@@ -2054,7 +2060,7 @@ sub Marpa::R3::Scanless::R::show_nook {
     my ( $slr, $nook_id, $verbose ) = @_;
 
     my ($or_node_id, $text) = $slr->call_by_tag(
-    (__FILE__ . ':' . __LINE__),
+    ('@' . __FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', 'i', $nook_id);
     local recce, nook_id = ...
     local tree = recce.lmw_t

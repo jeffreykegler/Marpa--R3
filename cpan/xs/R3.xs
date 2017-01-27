@@ -4495,7 +4495,7 @@ PPCODE:
     SV *new_values;
 
     call_by_tag (outer_slr->L, LUA_TAG,
-        "local recce = ...; return find_and_do_ops(recce)\n",
+        "local recce = ...; return recce:find_and_do_ops()\n",
         "R>iC", outer_slr->lua_ref, &result, &new_values);
 
     switch (result) {

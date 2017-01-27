@@ -1149,7 +1149,7 @@ with "trace" and "do not return" being special cases.
 
 ```
     -- miranda: section+ VM operations
-    function find_and_do_ops(recce)
+    function _M.class_slr.find_and_do_ops(recce)
         recce.trace_values_queue = {}
         while true do
             local new_values = {}
@@ -1251,7 +1251,7 @@ to set and discover various Lua values.
 
 ```
     -- miranda: section Utilities for semantics
-    function get_op_fn_key_by_name(recce, op_name_sv)
+    function _M.class_slr.get_op_fn_key_by_name(recce, op_name_sv)
         local op_name = tostring(op_name_sv)
         return recce.op_fn_key[op_name]
     end
@@ -1262,7 +1262,7 @@ to set and discover various Lua values.
 
 ```
     -- miranda: section+ Utilities for semantics
-    function get_op_fn_name_by_key(recce, op_key_sv)
+    function _M.class_slr.get_op_fn_name_by_key(recce, op_key_sv)
         local op_key = op_key_sv + 0
         return recce.op_fn_key[op_key]
     end
@@ -1758,7 +1758,7 @@ Functions for tracing Earley sets
         return data
     end
 
-    function g1_earley_set_data(recce, set_id)
+    function _M.class_slr.g1_earley_set_data(recce, set_id)
         local lmw_r = recce.lmw_g1r
         local result = lmw_r:earley_set_data(set_id)
         return result
