@@ -1291,11 +1291,7 @@ whose id is `id`.
 
 ```
     -- miranda: section+ Utilities for semantics
-    function token_register(...)
-        local args = {...}
-        local recce = args[1]
-        local id = args[2]+0
-        local ops = {}
+    function token_register(recce, id, ops)
         for ix = 3, #args do
             ops[#ops+1] = args[ix]+0
         end
