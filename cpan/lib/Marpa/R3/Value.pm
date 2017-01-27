@@ -1581,7 +1581,7 @@ END_OF_LUA
 
                       $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
                         << 'END_OF_LUA', 'S', $wrapped_result);
-    local recce, ix, sv =...
+    local recce, sv =...
     local ix = recce:stack_top_index()
     return recce:stack_set(ix, sv)
 END_OF_LUA
