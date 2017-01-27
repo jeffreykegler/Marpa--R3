@@ -471,7 +471,7 @@ or nil if there was none.
 
 ```
     -- miranda: section+ most Lua function definitions
-    function last_completed(recce, symbol_id)
+    function _M.class_slr.last_completed(recce, symbol_id)
          local g1r = recce.lmw_g1r
          local g1g = recce.slg.lmw_g1g
          local latest_earley_set = g1r:latest_earley_set()
@@ -1280,62 +1280,6 @@ Register a constant, returning its key.
         local next_constant_key = marpa.sv.top_index(constants) + 1
         constants[next_constant_key] = constant_sv
         return next_constant_key
-    end
-
-```
-
-#### Register semantics for a token
-
-Register the semantic operations, `ops`, for the token
-whose id is `id`.
-
-```
-    -- miranda: section+ Utilities for semantics
-    function token_register(recce, id, ops)
-        for ix = 3, #args do
-            ops[#ops+1] = args[ix]+0
-        end
-        recce.token_semantics[id] = ops
-    end
-
-```
-
-#### Register semantics for a nulling symbol
-
-Register the semantic operations, `ops`, for the nulling symbol
-whose id is `id`.
-
-```
-    -- miranda: section+ Utilities for semantics
-    function nulling_register(...)
-        local args = {...}
-        local recce = args[1]
-        local id = args[2]+0
-        local ops = {}
-        for ix = 3, #args do
-            ops[#ops+1] = args[ix]+0
-        end
-        recce.nulling_semantics[id] = ops
-    end
-
-```
-
-#### Register semantics for a rule
-
-Register the semantic operations, `ops`, for the rule
-whose id is `id`.
-
-```
-    -- miranda: section+ Utilities for semantics
-    function rule_register(...)
-        local args = {...}
-        local recce = args[1]
-        local id = args[2]+0
-        local ops = {}
-        for ix = 3, #args do
-            ops[#ops+1] = args[ix]+0
-        end
-        recce.rule_semantics[id] = ops
     end
 
 ```

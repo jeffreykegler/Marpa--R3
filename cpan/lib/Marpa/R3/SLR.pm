@@ -41,11 +41,14 @@ sub Marpa::R3::Scanless::R::last_completed {
     my $g1_tracer =
         $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     my $symbol_id       = $g1_tracer->symbol_by_name($symbol_name);
-    my ($start, $length) = $slr->call_by_name(
-        'last_completed',
-        'i>*',
-        $symbol_id
-        );
+
+    my ($start, $length) = $slr->call_by_tag(
+        ('@' . __FILE__ . ':' . __LINE__),
+    <<'END_OF_LUA', 'i>*', $symbol_id);
+        local recce, symbol_id  = ...
+        return recce:last_completed(symbol_id)
+END_OF_LUA
+
     return if not defined $start;
     return $start, $length;
 } ## end sub Marpa::R3::Scanless::R::last_completed
@@ -67,7 +70,7 @@ sub Marpa::R3::Scanless::R::last_completed_span {
 sub Marpa::R3::Scanless::R::g1_input_span {
     my ( $slr, $g1_start, $g1_count ) = @_;
     my ($l0_start, $l0_count) = $slr->call_by_tag(
-    (__FILE__ . ':' . __LINE__),
+    ('@' . __FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', 'ii', $g1_start, $g1_count);
     local recce, g1_start, g1_count = ...
     if g1_count < 0 then

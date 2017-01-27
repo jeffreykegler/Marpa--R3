@@ -1454,31 +1454,23 @@ END_OF_LUA
             }
             push @ops, $raw_op;
         } ## end OP: for my $raw_op (@raw_ops)
-        # The business with the signatures below is very
-        # hackish, but it will suffice until all this logic is converted to Lua
-        if ( $type eq 'token' ) {
-            my $signature = 'i' x (1 + scalar @ops);
 
             # $slr->call_by_name( 'token_register', $signature, $id, @ops);
+
                 my ($constant_ix) = $slr->call_by_tag(
         (__FILE__ . ':' .  __LINE__),
-    << 'END_OF_LUA', 'ii', $id, \@ops);
-                local recce, id, ops = ...
-                recce.token_semantics[id] = ops
+    << 'END_OF_LUA', 'sii', $type, $id, \@ops);
+                local recce, type, id, ops = ...
+                if type == 'token' then
+                    recce.token_semantics[id] = ops
+                elseif type == 'nulling' then
+                    recce.nulling_semantics[id] = ops
+                elseif type == 'rule' then
+                    recce.rule_semantics[id] = ops
+                end
 END_OF_LUA
 
             next REGISTRATION;
-        }
-        if ( $type eq 'nulling' ) {
-            my $signature = 'i' x (1 + scalar @ops);
-            $slr->call_by_name( 'nulling_register', $signature, $id, @ops);
-            next REGISTRATION;
-        }
-        if ( $type eq 'rule' ) {
-            my $signature = 'i' x (1 + scalar @ops);
-            $slr->call_by_name( 'rule_register', $signature, $id, @ops);
-            next REGISTRATION;
-        }
         Marpa::R3::exception(
             'Registration: with unknown type: ',
             Data::Dumper::Dumper($registration)
