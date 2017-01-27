@@ -1512,9 +1512,22 @@ END_OF_LUA
 
             if ( $trace_values >= 9 ) {
 
-                my ($highest_index) = $slr->call_by_name( 'stack_top_index', '>*' );
+                my ($highest_index) =
+                      $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+                        << 'END_OF_LUA', '');
+    local recce =...
+    return recce:stack_top_index()
+END_OF_LUA
+
                 for my $i ( reverse 1 .. $highest_index ) {
-                    my ($value) = $slr->call_by_name( 'stack_get', 'i>*', $i);
+
+                    my ($value) =
+                      $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+                        << 'END_OF_LUA', 'i>*', $i );
+    local recce, ix =...
+    return recce:stack_get(ix)
+END_OF_LUA
+
                     printf {$trace_file_handle} "Stack position %3d:\n", $i,
                       or Marpa::R3::exception('print to trace handle failed');
                     print {$trace_file_handle} q{ },
@@ -1565,8 +1578,14 @@ END_OF_LUA
 
             my $wrapped_result = bless [ 'asis', $result ], "Marpa::R3::Tree_Op";
             # my $wrapped_result = $result;
-            my ($highest_index) = $slr->call_by_name( 'stack_top_index', '>*' );
-            $slr->call_by_name( 'stack_set', 'iS', $highest_index, $wrapped_result);
+
+                      $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+                        << 'END_OF_LUA', 'S', $wrapped_result);
+    local recce, ix, sv =...
+    local ix = recce:stack_top_index()
+    return recce:stack_set(ix, sv)
+END_OF_LUA
+
             trace_token_evaluation( $slr, $token_id, \$result )
               if $trace_values;
             next STEP;
@@ -1614,8 +1633,14 @@ END_OF_LUA
             # say STDERR "Before wrapping: ", Data::Dumper::Dumper($result);
             my $wrapped_result = bless [ 'asis', $result ], "Marpa::R3::Tree_Op";
             # my $wrapped_result = $result;
-            my ($highest_index) = $slr->call_by_name( 'stack_top_index', '>*' );
-            $slr->call_by_name( 'stack_set', 'iS', $highest_index, $wrapped_result);
+
+                      $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+                        << 'END_OF_LUA', 'S', $wrapped_result);
+    local recce, sv =...
+    local index = recce:stack_top_index()
+    return recce:stack_set(index, sv)
+END_OF_LUA
+
             if ($trace_values) {
                 say {$trace_file_handle}
                   trace_stack_1( $slr, $values, $rule_id )
@@ -1645,7 +1670,11 @@ END_OF_LUA
 
     } ## end STEP: while (1)
 
-    my ($final_value) = $slr->call_by_name( 'stack_get', 'i>*', 1);
+    my ($final_value) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ), << 'END_OF_LUA', '', );
+    local recce =...
+    return recce:stack_get(1)
+END_OF_LUA
+
     # say "final value: ", Data::Dumper::Dumper( \(do_tree_ops($slr, $final_value)) );
     return do_tree_ops($slr, \($final_value));
 
@@ -1655,12 +1684,14 @@ END_OF_LUA
 
 sub Marpa::R3::Scanless::R::and_node_tag {
     my ( $slr, $and_node_id ) = @_;
+
     my ($tag) = $slr->call_by_tag(
     ('@' . __FILE__ . ':' . __LINE__),
         << 'END_OF_LUA', 'i', $and_node_id);
     local recce,and_node_id=...
     return recce:and_node_tag(and_node_id)
 END_OF_LUA
+
     return $tag;
 }
 

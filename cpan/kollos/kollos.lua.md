@@ -548,7 +548,7 @@ part of a "Pure Lua" implementation.
 
 ```
     -- miranda: section+ most Lua function definitions
-    function show_leo_item(recce)
+    function _M.class_slr.show_leo_item(recce)
         local g1r = recce.lmw_g1r
         local g1g = recce.slg.lmw_g1g
         local leo_base_state = g1r:_leo_base_state()
@@ -1288,7 +1288,7 @@ Register a constant, returning its key.
 
 ```
     -- miranda: section+ Utilities for semantics
-    function stack_top_index(recce)
+    function _M.class_slr.stack_top_index(recce)
         return recce.this_step.result
     end
 
@@ -1298,7 +1298,7 @@ Register a constant, returning its key.
 
 ```
     -- miranda: section+ Utilities for semantics
-    function stack_get(recce, ix)
+    function _M.class_slr.stack_get(recce, ix)
         local stack = recce.lmw_v.stack
         return stack[ix+0]
     end
@@ -1309,7 +1309,7 @@ Register a constant, returning its key.
 
 ```
     -- miranda: section+ Utilities for semantics
-    function stack_set(recce, ix, v)
+    function _M.class_slr.stack_set(recce, ix, v)
         local stack = recce.lmw_v.stack
         stack[ix+0] = v
     end
@@ -1990,7 +1990,7 @@ It should free all memory associated with the valuation.
 `show_bocage` returns a string which describes the bocage.
 
     -- miranda: section+ diagnostics
-    function show_bocage(recce)
+    function _M.class_slr.show_bocage(recce)
         local bocage = recce.lmw_b
         local data = {}
         local or_node_id = -1

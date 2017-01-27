@@ -2154,7 +2154,14 @@ END_OF_LUA
 # not to be documented
 sub Marpa::R3::Scanless::R::show_bocage {
     my ($slr)     = @_;
-    my ($result) = $slr->call_by_name('show_bocage', '');
+
+    my ($result) = $slr->call_by_tag(
+    ('@' . __FILE__ . ':' . __LINE__),
+        <<'END_OF_LUA', '');
+        local recce = ...
+        return recce:show_bocage()
+END_OF_LUA
+
     return $result;
 }
 
@@ -2163,7 +2170,7 @@ sub Marpa::R3::Scanless::R::verbose_or_node {
     my ( $slr, $or_node_id ) = @_;
     my ($text, $irl_id, $position)
         = $slr->call_by_tag(
-    (__FILE__ . ':' . __LINE__),
+    ('@' . __FILE__ . ':' . __LINE__),
         <<'END_OF_LUA', 'i', $or_node_id);
         local recce, or_node_id = ...
         local bocage = recce.lmw_b
