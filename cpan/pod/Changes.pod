@@ -35,8 +35,11 @@ In Marpa::R3, semantics will be fully settled in the grammar.
 
 =head2 Options moved from recognizer to grammar
 
-The C<exhaustion> and C<rejection>
-C<semantics_package>
+The C<exhaustion>,
+C<ranking_method>,
+C<rejection>,
+C<semantics_package>,
+and C<trace_actions>
 named arguments
 are grammar options in Marpa::R3.
 They were
