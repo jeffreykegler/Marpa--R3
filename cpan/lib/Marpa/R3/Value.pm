@@ -1433,7 +1433,12 @@ qq{    Semantics were specified as "$original_semantics"\n}
 
       OP: for my $raw_op (@raw_ops) {
             if ( ref $raw_op ) {
-                my ($constant_ix) = $slr->call_by_name( 'constant_register', 'S>*', ${$raw_op});
+                my ($constant_ix) = $slr->call_by_tag(
+        (__FILE__ . ':' .  __LINE__),
+    << 'END_OF_LUA', 'S>*', ${$raw_op});
+                local recce, sv = ...
+                return recce:constant_register(sv)
+END_OF_LUA
                 push @ops, $constant_ix;
                 next OP;
             }

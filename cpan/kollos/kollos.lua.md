@@ -1275,7 +1275,7 @@ Register a constant, returning its key.
 
 ```
     -- miranda: section+ Utilities for semantics
-    function constant_register(recce, constant_sv)
+    function _M.class_slr.constant_register(recce, constant_sv)
         local constants = recce:constants()
         local next_constant_key = marpa.sv.top_index(constants) + 1
         constants[next_constant_key] = constant_sv
