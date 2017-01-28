@@ -148,40 +148,6 @@ sub resolve_action {
 
 }
 
-# Find the semantics for a lexeme.
-sub Marpa::R3::Internal::Scanless::R::lexeme_semantics_find {
-    my ( $slr, $lexeme_id ) = @_;
-    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
-    my $xsy_by_isyid =
-        $tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID];
-    my $xsy = $xsy_by_isyid->[$lexeme_id];
-    my $semantics = $xsy->[Marpa::R3::Internal::XSY::LEXEME_SEMANTICS];
-    return '::!default' if not defined $semantics;
-    return $semantics;
-}
-
-# Find the blessing for a rule.
-sub Marpa::R3::Internal::Scanless::R::rule_blessing_find {
-    my ( $slr, $irlid ) = @_;
-    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
-    my $xbnf_by_irlid = $tracer->[Marpa::R3::Internal::Trace::G::XBNF_BY_IRLID];
-    my $xbnf = $xbnf_by_irlid->[$irlid];
-    my $blessing = $xbnf->[Marpa::R3::Internal::XBNF::BLESSING];
-    $blessing = '::undef' if not defined $blessing;
-    return $blessing if $blessing eq '::undef';
-    my $bless_package =
-        $slg->[Marpa::R3::Internal::Scanless::G::BLESS_PACKAGE];
-
-    if ( not defined $bless_package ) {
-        Marpa::R3::exception(
-                  qq{A blessed rule is in a grammar with no bless_package\n}
-                . qq{  The rule was blessed as "$blessing"\n} );
-    }
-    return join q{}, $bless_package, q{::}, $blessing;
-}
-
 our $CONTEXT_EXCEPTION_CLASS = __PACKAGE__ . '::Context_Exception';
 
 sub Marpa::R3::Context::bail { ## no critic (Subroutines::RequireArgUnpacking)
@@ -419,6 +385,39 @@ sub resolve_rule_by_id {
     return $resolution;
 } ## end sub resolve_rule_by_id
 
+# Find the semantics for a lexeme.
+sub Marpa::R3::Internal::Scanless::R::lexeme_semantics_find {
+    my ( $slr, $lexeme_id ) = @_;
+    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
+    my $xsy_by_isyid =
+        $tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID];
+    my $xsy = $xsy_by_isyid->[$lexeme_id];
+    my $semantics = $xsy->[Marpa::R3::Internal::XSY::LEXEME_SEMANTICS];
+    return '::!default' if not defined $semantics;
+    return $semantics;
+}
+
+# Find the blessing for a rule.
+sub rule_blessing_find {
+    my ( $slg, $irlid ) = @_;
+    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
+    my $xbnf_by_irlid = $tracer->[Marpa::R3::Internal::Trace::G::XBNF_BY_IRLID];
+    my $xbnf = $xbnf_by_irlid->[$irlid];
+    my $blessing = $xbnf->[Marpa::R3::Internal::XBNF::BLESSING];
+    $blessing = '::undef' if not defined $blessing;
+    return $blessing if $blessing eq '::undef';
+    my $bless_package =
+        $slg->[Marpa::R3::Internal::Scanless::G::BLESS_PACKAGE];
+
+    if ( not defined $bless_package ) {
+        Marpa::R3::exception(
+                  qq{A blessed rule is in a grammar with no bless_package\n}
+                . qq{  The rule was blessed as "$blessing"\n} );
+    }
+    return join q{}, $bless_package, q{::}, $blessing;
+}
+
 sub resolve_recce {
 
     my ( $slr ) = @_;
@@ -429,7 +428,7 @@ sub resolve_recce {
     my $trace_actions =
         $slg->[Marpa::R3::Internal::Scanless::G::TRACE_ACTIONS] // 0;
     my $trace_file_handle =
-        $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
+        $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE];
 
     my $resolve_error;
 
@@ -462,7 +461,7 @@ sub resolve_recce {
       DETERMINE_BLESSING: {
 
             my $blessing =
-              Marpa::R3::Internal::Scanless::R::rule_blessing_find( $slr,
+              rule_blessing_find( $slg,
                 $irlid );
             my ( $closure_name, $closure, $semantics ) = @{$rule_resolution};
 
