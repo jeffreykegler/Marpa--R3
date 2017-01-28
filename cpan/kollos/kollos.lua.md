@@ -654,6 +654,7 @@ Perhaps I should delete this.
         end
         return -2
     end
+    op_fn_add("debug", op_fn_debug)
 
 ```
 
@@ -669,6 +670,7 @@ It may be useful in debugging.
     function op_fn_noop (recce)
         return -2
     end
+    op_fn_add("noop", op_fn_noop)
 
 ```
 
@@ -686,6 +688,7 @@ fast fails with a clear message.
     function op_fn_bail (recce)
         error('executing VM op "bail"')
     end
+    op_fn_add("bail", op_fn_bail)
 
 ```
 
@@ -723,6 +726,7 @@ The result of the semantics is a Perl undef.
         stack[recce.this_step.result] = marpa.sv.undef()
         return -1
     end
+    op_fn_add("result_is_undef", op_fn_result_is_undef)
 
 ```
 
@@ -752,6 +756,7 @@ if not the value is an undef.
         end
         return -1
     end
+    op_fn_add("result_is_token_value", op_fn_result_is_token_value)
 
 ```
 
@@ -776,6 +781,7 @@ if not the value is an undef.
         until 1
         return -1
     end
+    op_fn_add("result_is_n_of_rhs", op_fn_result_is_n_of_rhs)
 
 ```
 
@@ -806,6 +812,7 @@ the "N of RHS" operation should be used.
         end
         return -1
     end
+    op_fn_add("result_is_n_of_sequence", op_fn_result_is_n_of_sequence)
 
 ```
 
@@ -829,6 +836,7 @@ Returns a constant result.
         end
         return -1
     end
+    op_fn_add("result_is_constant", op_fn_result_is_constant)
 
 ```
 
@@ -850,6 +858,7 @@ Push an undef on the values array.
         new_values[next_ix] = marpa.sv.undef()
         return -2
     end
+    op_fn_add("push_undef", op_fn_push_undef)
 
 ```
 
@@ -870,6 +879,7 @@ Push one of the RHS child values onto the values array.
         new_values[next_ix] = stack[result_ix + rhs_ix]
         return -2
     end
+    op_fn_add("push_one", op_fn_push_one)
 
 ```
 
@@ -935,6 +945,7 @@ Otherwise the values of the RHS children are pushed.
         -- if 'MARPA_STEP_NULLING_SYMBOL', or unrecogized type
         return -2
     end
+    op_fn_add("push_values", op_fn_push_values)
 
 ```
 
@@ -963,6 +974,8 @@ in terms of the input string.
         new_values[next_ix] = l0_start
         return -2
     end
+    op_fn_add("push_start", op_fn_push_start)
+
 
 ```
 
@@ -990,6 +1003,7 @@ that is, in terms of the input string
         new_values[next_ix] = l0_length
         return -2
     end
+    op_fn_add("push_length", op_fn_push_length)
 
 ```
 
@@ -1005,6 +1019,7 @@ in terms of G1 Earley sets.
         new_values[next_ix] = recce.this_step.start_es_id
         return -2
     end
+    op_fn_add("push_g1_start", op_fn_push_g1_start)
 
 ```
 
@@ -1021,6 +1036,7 @@ that is, in terms of G1 Earley sets.
             - recce.this_step.start_es_id) + 1
         return -2
     end
+    op_fn_add("push_g1_length", op_fn_push_g1_length)
 
 ```
 
@@ -1039,6 +1055,7 @@ that is, in terms of G1 Earley sets.
         new_values[next_ix] = constant
         return -2
     end
+    op_fn_add("push_constant", op_fn_push_constant)
 
 ```
 
@@ -1054,6 +1071,7 @@ of every sequence of operations
         recce.this_step.blessing_ix = blessing_ix
         return -2
     end
+    op_fn_add("bless", op_fn_bless)
 
 ```
 
@@ -1078,6 +1096,7 @@ is the result of this sequence of operations.
         stack[result_ix] = new_values
         return -1
     end
+    op_fn_add("result_is_array", op_fn_result_is_array)
 
 ```
 
@@ -1112,6 +1131,7 @@ implementation, which returned the size of the
         end
         return 3
     end
+    op_fn_add("callback", op_fn_callback)
 
 ```
 
