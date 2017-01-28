@@ -183,26 +183,6 @@ sub Marpa::R3::Internal::Scanless::R::rule_blessing_find {
     return join q{}, $bless_package, q{::}, $blessing;
 }
 
-# Find the blessing for a lexeme.
-sub Marpa::R3::Scanless::R::lexeme_blessing_find {
-    my ( $slr, $lexeme_id ) = @_;
-    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
-    my $xsy_by_isyid = $tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID];
-    my $xsy   = $xsy_by_isyid->[$lexeme_id];
-    return $xsy->[Marpa::R3::Internal::XSY::BLESSING] // '::undef';
-}
-
-# For diagnostics
-sub Marpa::R3::Internal::Scanless::R::brief_rule_list {
-    my ( $slr, $rule_ids ) = @_;
-    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $tracer =
-        $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
-    my @brief_rules = map { $tracer->brief_rule($_) } @{$rule_ids};
-    return join q{}, map { q{    } . $_ . "\n" } @brief_rules;
-}
-
 our $CONTEXT_EXCEPTION_CLASS = __PACKAGE__ . '::Context_Exception';
 
 sub Marpa::R3::Context::bail { ## no critic (Subroutines::RequireArgUnpacking)
@@ -536,7 +516,7 @@ qq{Attempt to bless, but improper semantics: "$semantics"\n},
                 . $tracer->symbol_name($lexeme_id) . "\n";
             Marpa::R3::exception($message);
         } ## end if ( not defined $semantics )
-        my $blessing = $slr->lexeme_blessing_find( $lexeme_id );
+        my $blessing = lexeme_blessing_find( $slg, $lexeme_id );
         if ( not defined $blessing ) {
             my $message =
                   "Could not determine lexeme's blessing\n"
@@ -622,6 +602,24 @@ sub op_fn_name_by_key {
 END_OF_LUA
 
     return $name;
+}
+
+# Find the blessing for a lexeme.
+sub lexeme_blessing_find {
+    my ( $slg, $lexeme_id ) = @_;
+    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
+    my $xsy_by_isyid = $tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID];
+    my $xsy   = $xsy_by_isyid->[$lexeme_id];
+    return $xsy->[Marpa::R3::Internal::XSY::BLESSING] // '::undef';
+}
+
+# For diagnostics
+sub brief_rule_list {
+    my ( $slg, $rule_ids ) = @_;
+    my $tracer =
+        $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
+    my @brief_rules = map { $tracer->brief_rule($_) } @{$rule_ids};
+    return join q{}, map { q{    } . $_ . "\n" } @brief_rules;
 }
 
 sub find_registrations {
@@ -804,9 +802,7 @@ qq{  Cannot bless rule when it resolves to a scalar constant},
                     qq{  can have more than one semantics\n},
                     qq{  Marpa needs there to be only one semantics\n},
                     qq{  The rules involved are:\n},
-                    Marpa::R3::Internal::Scanless::R::brief_rule_list(
-                        $slr, $irlids
-                    )
+                       brief_rule_list( $slg, $irlids)
                 );
             } ## end if ( $first_closure_name ne $other_closure_name or ...)
         } ## end OTHER_RESOLUTION: for my $other_resolution (@other_resolutions)
