@@ -1770,42 +1770,11 @@ Called when a valuator is set up.
             error('no recce.lmw_v in value_init()')
         end
 
-        recce.op_fn_key = {}
-
-        local function op_fn_create(name, fn)
-            local ref = recce:ref(fn);
-            recce.op_fn_key[name] = ref;
-            recce.op_fn_key[ref] = name;
-            return ref
-        end
-
         -- we record these values to set the defaults, below
         local op_bail_key = _M.vm_op_keys["bail"]
         local result_is_constant_key = _M.vm_op_keys["result_is_constant"]
         local result_is_undef_key = _M.vm_op_keys["result_is_undef"]
         local result_is_token_value_key = _M.vm_op_keys["result_is_token_value"]
-
-         op_fn_create("bail", op_fn_bail)
-         op_fn_create("result_is_constant", op_fn_result_is_constant)
-         op_fn_create("result_is_undef", op_fn_result_is_undef)
-         op_fn_create("result_is_token_value", op_fn_result_is_token_value)
-
-        -- these values are accessed only by name
-        op_fn_create("debug", op_fn_debug)
-        op_fn_create("noop", op_fn_noop)
-        op_fn_create("bless", op_fn_bless)
-        op_fn_create("callback", op_fn_callback)
-        op_fn_create("result_is_n_of_rhs", op_fn_result_is_n_of_rhs)
-        op_fn_create("result_is_n_of_sequence", op_fn_result_is_n_of_sequence)
-        op_fn_create("result_is_array", op_fn_result_is_array)
-        op_fn_create("push_constant", op_fn_push_constant)
-        op_fn_create("push_g1_length", op_fn_push_g1_length)
-        op_fn_create("push_g1_start", op_fn_push_g1_start)
-        op_fn_create("push_length", op_fn_push_length)
-        op_fn_create("push_start", op_fn_push_start)
-        op_fn_create("push_one", op_fn_push_one)
-        op_fn_create("push_undef", op_fn_push_undef)
-        op_fn_create("push_values", op_fn_push_values)
 
         -- io.stderr:write('Initializing rule semantics to {}\n')
         recce.rule_semantics = {}
@@ -1841,7 +1810,6 @@ It should free all memory associated with the valuation.
     -- miranda: section+ valuator Libmarpa wrapper Lua functions
 
     function _M.class_slr.valuation_reset(recce)
-        recce.op_fn_key = nil
         -- io.stderr:write('Initializing rule semantics to nil\n')
         recce.rule_semantics = nil
         recce.token_semantics = nil
