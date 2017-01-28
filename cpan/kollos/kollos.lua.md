@@ -2576,12 +2576,10 @@ so you may find it easer to read it first.
         }
 
       marpa_lua_newtable(L);
-      /* [ base_table, class_table ] */
       bocage_stack_ix = marpa_lua_gettop(L);
-      marpa_lua_getglobal (L, "kollos");
-      marpa_lua_getfield (L, -1, "class_bocage");
+      /* push "class_bocage" metatable */
+      marpa_lua_pushvalue(L, marpa_lua_upvalueindex(2));
       marpa_lua_setmetatable (L, bocage_stack_ix);
-      /* [ base_table, class_table ] */
 
       {
         Marpa_Recognizer *recce_ud;
@@ -4384,7 +4382,8 @@ Marpa::R3.
         marpa_lua_setfield (L, kollos_table_stack_ix, "recce_new");
 
         marpa_lua_pushvalue (L, upvalue_stack_ix);
-        marpa_lua_pushcclosure (L, wrap_bocage_new, 1);
+        marpa_lua_getfield (L, kollos_table_stack_ix, "class_bocage");
+        marpa_lua_pushcclosure (L, wrap_bocage_new, 2);
         marpa_lua_setfield (L, kollos_table_stack_ix, "bocage_new");
 
         marpa_lua_pushvalue (L, upvalue_stack_ix);
