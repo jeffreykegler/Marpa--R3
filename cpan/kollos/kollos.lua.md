@@ -4388,15 +4388,18 @@ Marpa::R3.
         marpa_lua_setfield (L, kollos_table_stack_ix, "bocage_new");
 
         marpa_lua_pushvalue (L, upvalue_stack_ix);
-        marpa_lua_pushcclosure (L, wrap_order_new, 1);
+        marpa_lua_getfield (L, kollos_table_stack_ix, "class_order");
+        marpa_lua_pushcclosure (L, wrap_order_new, 2);
         marpa_lua_setfield (L, kollos_table_stack_ix, "order_new");
 
         marpa_lua_pushvalue (L, upvalue_stack_ix);
-        marpa_lua_pushcclosure (L, wrap_tree_new, 1);
+        marpa_lua_getfield (L, kollos_table_stack_ix, "class_tree");
+        marpa_lua_pushcclosure (L, wrap_tree_new, 2);
         marpa_lua_setfield (L, kollos_table_stack_ix, "tree_new");
 
         marpa_lua_pushvalue (L, upvalue_stack_ix);
-        marpa_lua_pushcclosure (L, wrap_value_new, 1);
+        marpa_lua_getfield (L, kollos_table_stack_ix, "class_value");
+        marpa_lua_pushcclosure (L, wrap_value_new, 2);
         marpa_lua_setfield (L, kollos_table_stack_ix, "value_new");
 
         marpa_lua_newtable (L);
