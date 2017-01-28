@@ -2493,8 +2493,7 @@ It is specified directly, which can be easier for a first reading.
         |  marpa_lua_newtable(L);
         |  /* [ base_table, class_table ] */
         |  !NAME!_stack_ix = marpa_lua_gettop(L);
-        |  marpa_lua_getglobal (L, "kollos");
-        |  marpa_lua_getfield (L, -1, "class_!NAME!");
+        |  marpa_lua_pushvalue(L, marpa_lua_upvalueindex(2));
         |  marpa_lua_setmetatable (L, !NAME!_stack_ix);
         |  /* [ base_table, class_table ] */
         |
