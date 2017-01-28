@@ -444,7 +444,7 @@ sub resolve_rule_by_id {
 
 sub resolve_recce {
 
-    my ( $slr, $per_parse_arg ) = @_;
+    my ( $slr ) = @_;
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
@@ -634,7 +634,7 @@ END_OF_LUA
 }
 
 sub find_registrations {
-    my ($slr, $per_parse_arg) = @_;
+    my ($slr ) = @_;
     my $trace_file_handle =
       $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
     my $slg           = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
@@ -649,7 +649,7 @@ sub find_registrations {
     my @blessing_by_irlid  = ();
 
     my ( $rule_resolutions, $lexeme_resolutions ) =
-      resolve_recce( $slr, $per_parse_arg );
+      resolve_recce( $slr );
 
     # Set the arrays, and perform various checks on the resolutions
     # we received
@@ -1385,7 +1385,7 @@ END_OF_LUA
 END_OF_LUA
 
     if ( not $slr->[Marpa::R3::Internal::Scanless::R::REGISTRATIONS] ) {
-        find_registrations($slr, $per_parse_arg);
+        find_registrations($slr );
     }
 
     my $semantics_arg0 = $per_parse_arg // {};
