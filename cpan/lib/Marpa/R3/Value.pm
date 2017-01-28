@@ -479,9 +479,6 @@ sub resolve_recce {
               ->[$irlid];
             $message .= qq{  Action was specified as "$action"\n}
               if defined $action;
-            my $recce_error =
-              $slr->[Marpa::R3::Internal::Scanless::R::ERROR_MESSAGE];
-            $message .= q{  } . $recce_error if defined $recce_error;
             Marpa::R3::exception($message);
         } ## end if ( not $rule_resolution )
 
@@ -537,9 +534,6 @@ qq{Attempt to bless, but improper semantics: "$semantics"\n},
                   "Could not determine lexeme's semantics\n"
                 . q{  Lexeme was }
                 . $tracer->symbol_name($lexeme_id) . "\n";
-            $message
-                .= q{  }
-                . $slr->[Marpa::R3::Internal::Scanless::R::ERROR_MESSAGE];
             Marpa::R3::exception($message);
         } ## end if ( not defined $semantics )
         my $blessing = $slr->lexeme_blessing_find( $lexeme_id );
@@ -548,9 +542,6 @@ qq{Attempt to bless, but improper semantics: "$semantics"\n},
                   "Could not determine lexeme's blessing\n"
                 . q{  Lexeme was }
                 . $tracer->symbol_name($lexeme_id) . "\n";
-            $message
-                .= q{  }
-                . $slr->[Marpa::R3::Internal::Scanless::R::ERROR_MESSAGE];
             Marpa::R3::exception($message);
         } ## end if ( not defined $blessing )
         $lexeme_resolutions[$lexeme_id] = [ $semantics, $blessing ];

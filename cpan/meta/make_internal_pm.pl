@@ -304,11 +304,6 @@ __DATA__
     READ_STRING_ERROR
     EVENTS
 
-    ERROR_MESSAGE { Temporary place to put an error message for later use.
-    One use is when the error occurs in a subroutine, but you want the bail message
-    to have the benefit of a higher-level context.
-    }
-
     MAX_PARSES
 
     { The following fields must be reinitialized when

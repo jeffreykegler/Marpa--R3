@@ -177,10 +177,9 @@ use constant TRACE_FILE_HANDLE => 3;
 use constant TRACE_VALUES => 4;
 use constant READ_STRING_ERROR => 5;
 use constant EVENTS => 6;
-use constant ERROR_MESSAGE => 7;
-use constant MAX_PARSES => 8;
-use constant NO_PARSE => 9;
-use constant TREE_MODE => 10;
-use constant END_OF_PARSE => 11;
+use constant MAX_PARSES => 7;
+use constant NO_PARSE => 8;
+use constant TREE_MODE => 9;
+use constant END_OF_PARSE => 10;
 
 1;
