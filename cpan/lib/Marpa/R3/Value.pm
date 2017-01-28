@@ -616,10 +616,9 @@ sub brief_rule_list {
 }
 
 sub find_registrations {
-    my ($slr ) = @_;
+    my ($slg ) = @_;
     my $trace_file_handle =
-      $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
-    my $slg           = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+      $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE];
     my $tracer        = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     my $xbnf_by_irlid = $tracer->[Marpa::R3::Internal::Trace::G::XBNF_BY_IRLID];
     my $grammar_c     = $tracer->[Marpa::R3::Internal::Trace::G::C];
@@ -1363,7 +1362,7 @@ END_OF_LUA
 END_OF_LUA
 
     if ( not $slg->[Marpa::R3::Internal::Scanless::G::REGISTRATIONS] ) {
-        find_registrations($slr );
+        find_registrations($slg );
     }
 
     my $semantics_arg0 = $per_parse_arg // {};
