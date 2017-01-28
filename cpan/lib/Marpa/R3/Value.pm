@@ -840,7 +840,7 @@ qq{  Cannot bless rule when it resolves to a scalar constant},
     # Do consistency checks
 
     # Set the object values
-    $slr->[Marpa::R3::Internal::Scanless::R::NULL_VALUES] =
+    my $null_values = $slr->[Marpa::R3::Internal::Scanless::R::NULL_VALUES] =
       \@null_symbol_closures;
 
     my @semantics_by_lexeme_id = ();
@@ -895,8 +895,6 @@ qq{  Cannot bless rule when it resolves to a scalar constant},
         }
 
     }
-
-    my $null_values = $slr->[Marpa::R3::Internal::Scanless::R::NULL_VALUES];
 
     state $op_lua = Marpa::R3::Thin::op('lua');
 
