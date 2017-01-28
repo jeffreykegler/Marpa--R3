@@ -356,16 +356,14 @@ sub Marpa::R3::Scanless::R::show_semantics {
         push @op_descs, $op_name;
         if ( $op_name eq 'lua' ) {
 
-            my ($lua_op_name) = $slr->call_by_tag(
-        ('@' . __FILE__ . ':' .  __LINE__),
-    <<'END_OF_LUA', 'i', $ops[$op_ix] );
-            local recce, key = ...
-            return recce:get_op_fn_name_by_key(key)
-END_OF_LUA
-
+            my ($lua_op_name) = op_fn_name_by_key( $slr, $ops[$op_ix]);
             push @op_descs, $lua_op_name;
             $op_ix++;
-            push @op_descs, $ops[$op_ix];
+            if ($lua_op_name eq 'callback') {
+                push @op_descs, op_fn_name_by_key( $slr, $ops[$op_ix]);
+            } else {
+                push @op_descs, $ops[$op_ix];
+            }
             $op_ix++;
             next OP;
         }
@@ -617,10 +615,22 @@ sub op_fn_key_by_name {
         ('@' . __FILE__ . ':' .  __LINE__),
     <<'END_OF_LUA', 's', $name);
       local recce, name = ...
-      return recce:get_op_fn_key_by_name(name)
+      return kollos.get_op_fn_key_by_name(name)
 END_OF_LUA
 
-    return $key
+    return $key;
+}
+
+sub op_fn_name_by_key {
+    my ( $slr, $key ) = @_;
+    my ($name) = $slr->call_by_tag(
+        ('@' . __FILE__ . ':' .  __LINE__),
+    <<'END_OF_LUA', 'i', $key);
+      local recce, key = ...
+      return kollos.get_op_fn_name_by_key(key)
+END_OF_LUA
+
+    return $name;
 }
 
 # Returns false if no parse

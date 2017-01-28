@@ -296,11 +296,11 @@ Registering semantics for rule: Calculator ::= Expression
 Registering semantics for rule: Factor ::= Number
   Semantics are lua result_is_n_of_rhs 0
 Registering semantics for rule: Term ::= Term [Lex-0] Factor
-  Semantics are lua push_one 0 lua push_one 1 lua push_one 2 lua callback 20
+  Semantics are lua push_one 0 lua push_one 1 lua push_one 2 lua callback bail
 Registering semantics for rule: Term ::= Factor
   Semantics are lua result_is_n_of_rhs 0
 Registering semantics for rule: Expression ::= Expression [Lex-1] Term
-  Semantics are lua push_one 0 lua push_one 1 lua push_one 2 lua callback 20
+  Semantics are lua push_one 0 lua push_one 1 lua push_one 2 lua callback bail
 Registering semantics for rule: Expression ::= Term
   Semantics are lua result_is_n_of_rhs 0
 Registering semantics for rule: [:start] ::= Calculator

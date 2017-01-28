@@ -624,12 +624,16 @@ up the VM table.
     -- miranda: section VM utilities
 
         _M.vm_ops = {}
+        _M.vm_op_names = {}
+        _M.vm_op_keys = {}
         local function op_fn_add(name, fn)
             local ops = _M.vm_ops
-            local next_ix = #ops
-            ops[next_ix] = fn
+            local new_ix = #ops + 1
+            ops[new_ix] = fn
             ops[name] = fn
-            return next_ix
+            _M.vm_op_names[new_ix] = name
+            _M.vm_op_keys[name] = new_ix
+            return new_ix
         end
 
 ```
@@ -1146,22 +1150,18 @@ implementation, which returned the size of the
             if op_code == 0 then return -1 end
             if op_code ~= op_lua then
             end
-            -- io.stderr:write('op_code: ', inspect(op_code), '\\n')
-            -- io.stderr:write('op_lua: ', inspect(op_lua), '\\n')
             local fn_key = ops[op_ix+1]
-            -- io.stderr:write('ops: ', inspect(ops), '\\n')
-            -- io.stderr:write('fn_key: ', inspect(fn_key), '\\n')
-            -- io.stderr:write('fn name: ', recce.op_fn_key[fn_key], '\\n')
             local arg = ops[op_ix+2]
-            -- io.stderr:write('arg: ', inspect(arg), '\\n')
             if recce.trace_values >= 3 then
               local queue = recce.trace_values_queue
               local tag = 'starting lua op'
               queue[#queue+1] = {'starting op', recce.this_step.type, 'lua'}
-              queue[#queue+1] = {tag, recce.this_step.type, recce.op_fn_key[fn_key]}
+              queue[#queue+1] = {tag, recce.this_step.type, _M.vm_op_names[fn_key]}
               -- io.stderr:write('starting op: ', inspect(recce))
             end
-            local op_fn = recce[fn_key]
+            -- io.stderr:write('ops: ', inspect(_M.vm_ops), '\n')
+            -- io.stderr:write('fn_key: ', inspect(fn_key), '\n')
+            local op_fn = _M.vm_ops[fn_key]
             local result = op_fn(recce, arg, new_values)
             if result >= -1 then return result end
             op_ix = op_ix + 3
@@ -1291,9 +1291,8 @@ to set and discover various Lua values.
 
 ```
     -- miranda: section Utilities for semantics
-    function _M.class_slr.get_op_fn_key_by_name(recce, op_name_sv)
-        local op_name = tostring(op_name_sv)
-        return recce.op_fn_key[op_name]
+    function _M.get_op_fn_key_by_name(op_name)
+        return _M.vm_op_keys[op_name]
     end
 
 ```
@@ -1302,9 +1301,8 @@ to set and discover various Lua values.
 
 ```
     -- miranda: section+ Utilities for semantics
-    function _M.class_slr.get_op_fn_name_by_key(recce, op_key_sv)
-        local op_key = op_key_sv + 0
-        return recce.op_fn_key[op_key]
+    function _M.get_op_fn_name_by_key(op_key)
+        return _M.vm_op_names[op_key]
     end
 
 ```
@@ -1782,10 +1780,15 @@ Called when a valuator is set up.
         end
 
         -- we record these values to set the defaults, below
-        local op_bail_key = op_fn_create("bail", op_fn_bail)
-        local result_is_constant_key = op_fn_create("result_is_constant", op_fn_result_is_constant)
-        local result_is_undef_key = op_fn_create("result_is_undef", op_fn_result_is_undef)
-        local result_is_token_value_key = op_fn_create("result_is_token_value", op_fn_result_is_token_value)
+        local op_bail_key = _M.vm_op_keys["bail"]
+        local result_is_constant_key = _M.vm_op_keys["result_is_constant"]
+        local result_is_undef_key = _M.vm_op_keys["result_is_undef"]
+        local result_is_token_value_key = _M.vm_op_keys["result_is_token_value"]
+
+         op_fn_create("bail", op_fn_bail)
+         op_fn_create("result_is_constant", op_fn_result_is_constant)
+         op_fn_create("result_is_undef", op_fn_result_is_undef)
+         op_fn_create("result_is_token_value", op_fn_result_is_token_value)
 
         -- these values are accessed only by name
         op_fn_create("debug", op_fn_debug)
