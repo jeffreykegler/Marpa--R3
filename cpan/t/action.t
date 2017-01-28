@@ -69,8 +69,7 @@ sub do_bail_with_object_if_A {
 # Marpa::R3::Display::End
 
 my @terminals = qw/A B C D/;
-my $grammar   = Marpa::R3::Scanless::G->new(
-    {   source => \<<'END_OF_SOURCE',
+my $dsl = <<'END_OF_SOURCE';
 :start ::= S
 S ::= A B C D action => main::do_S
 A ~ 'A'
@@ -78,13 +77,13 @@ B ~ 'B'
 C ~ 'C'
 D ~ 'D'
 END_OF_SOURCE
-});
 
 sub do_parse {
-    my $slr = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
+    my $grammar = Marpa::R3::Scanless::G->new( { source  => \$dsl } );
+    my $slr     = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
     $slr->read( \'ABCD' );
     return $slr->value();
-} ## end sub do_parse
+}
 
 my $value_ref;
 $value_ref = do_parse();

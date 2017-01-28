@@ -282,6 +282,11 @@ __DATA__
     RANKING_METHOD
     TRACE_ACTIONS
 
+    REGISTRATIONS
+    NULL_VALUES
+    CLOSURE_BY_SYMBOL_ID
+    CLOSURE_BY_RULE_ID
+
     :package=Marpa::R3::Internal::Scanless::R
 
     SLG
@@ -310,15 +315,8 @@ __DATA__
     evaluation is reset }
 
     NO_PARSE { no parse found in parse series -- memoized }
-    NULL_VALUES
     TREE_MODE { 'tree' or 'forest' or undef }
     END_OF_PARSE
-
-    { Fields for new SLIF resolution logic
-    -- must be reinitialized when evaluation is reset }
-    REGISTRATIONS
-    CLOSURE_BY_SYMBOL_ID
-    CLOSURE_BY_RULE_ID
 
     { This is the end of the list of fields which
     must be reinitialized when evaluation is reset }

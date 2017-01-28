@@ -840,7 +840,7 @@ qq{  Cannot bless rule when it resolves to a scalar constant},
     # Do consistency checks
 
     # Set the object values
-    my $null_values = $slr->[Marpa::R3::Internal::Scanless::R::NULL_VALUES] =
+    my $null_values = $slg->[Marpa::R3::Internal::Scanless::G::NULL_VALUES] =
       \@null_symbol_closures;
 
     my @semantics_by_lexeme_id = ();
@@ -1275,10 +1275,10 @@ qq{    Semantics were specified as "$original_semantics"\n}
         } ## end REGISTRATION: for my $registration (@registrations)
     } ## end SLR_NULLING_GRAMMAR_HACK:
 
-    $slr->[Marpa::R3::Internal::Scanless::R::REGISTRATIONS] = \@registrations;
-    $slr->[Marpa::R3::Internal::Scanless::R::CLOSURE_BY_SYMBOL_ID] =
+    $slg->[Marpa::R3::Internal::Scanless::G::REGISTRATIONS] = \@registrations;
+    $slg->[Marpa::R3::Internal::Scanless::G::CLOSURE_BY_SYMBOL_ID] =
       \@nulling_closures;
-    $slr->[Marpa::R3::Internal::Scanless::R::CLOSURE_BY_RULE_ID] =
+    $slg->[Marpa::R3::Internal::Scanless::G::CLOSURE_BY_RULE_ID] =
       \@closure_by_irlid;
 
 }
@@ -1382,20 +1382,20 @@ END_OF_LUA
     recce:value_init(flag)
 END_OF_LUA
 
-    if ( not $slr->[Marpa::R3::Internal::Scanless::R::REGISTRATIONS] ) {
+    if ( not $slg->[Marpa::R3::Internal::Scanless::G::REGISTRATIONS] ) {
         find_registrations($slr );
     }
 
     my $semantics_arg0 = $per_parse_arg // {};
 
-    my $null_values = $slr->[Marpa::R3::Internal::Scanless::R::NULL_VALUES];
+    my $null_values = $slg->[Marpa::R3::Internal::Scanless::G::NULL_VALUES];
     my $nulling_closures =
-      $slr->[Marpa::R3::Internal::Scanless::R::CLOSURE_BY_SYMBOL_ID];
+      $slg->[Marpa::R3::Internal::Scanless::G::CLOSURE_BY_SYMBOL_ID];
     my $rule_closures =
-      $slr->[Marpa::R3::Internal::Scanless::R::CLOSURE_BY_RULE_ID];
+      $slg->[Marpa::R3::Internal::Scanless::G::CLOSURE_BY_RULE_ID];
   REGISTRATION:
     for my $registration (
-        @{ $slr->[Marpa::R3::Internal::Scanless::R::REGISTRATIONS] } )
+        @{ $slg->[Marpa::R3::Internal::Scanless::G::REGISTRATIONS] } )
     {
         my ( $type, $id, @raw_ops ) = @{$registration};
         my @ops = ();

@@ -164,6 +164,10 @@ use constant REJECTION_ACTION => 24;
 use constant SEMANTICS_PACKAGE => 25;
 use constant RANKING_METHOD => 26;
 use constant TRACE_ACTIONS => 27;
+use constant REGISTRATIONS => 28;
+use constant NULL_VALUES => 29;
+use constant CLOSURE_BY_SYMBOL_ID => 30;
+use constant CLOSURE_BY_RULE_ID => 31;
 
 package Marpa::R3::Internal::Scanless::R;
 use constant SLG => 0;
@@ -176,11 +180,7 @@ use constant EVENTS => 6;
 use constant ERROR_MESSAGE => 7;
 use constant MAX_PARSES => 8;
 use constant NO_PARSE => 9;
-use constant NULL_VALUES => 10;
-use constant TREE_MODE => 11;
-use constant END_OF_PARSE => 12;
-use constant REGISTRATIONS => 13;
-use constant CLOSURE_BY_SYMBOL_ID => 14;
-use constant CLOSURE_BY_RULE_ID => 15;
+use constant TREE_MODE => 10;
+use constant END_OF_PARSE => 11;
 
 1;
