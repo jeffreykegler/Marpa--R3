@@ -2529,13 +2529,15 @@ It is specified directly, which can be easier for a first reading.
         |  return 1;
         |}
         ]]
-        for class_ix = 1, (#libmarpa_class_sequence - 1) do
-            local class_letter = libmarpa_class_sequence[class_ix+1]
+        -- for every class with a base,
+        -- so that grammar constructor is special case
+        for class_ix = 2, #libmarpa_class_sequence do
+            local class_letter = libmarpa_class_sequence[class_ix]
             -- bocage constructor is special case
             if class_letter == 'b' then goto NEXT_CLASS end
             local class_name = libmarpa_class_name[class_letter]
             local class_type = libmarpa_class_type[class_letter]
-            local base_class_letter = libmarpa_class_sequence[class_ix]
+            local base_class_letter = libmarpa_class_sequence[class_ix-1]
             local base_class_name = libmarpa_class_name[base_class_letter]
             local base_class_type = libmarpa_class_type[base_class_letter]
             local this_piece =
