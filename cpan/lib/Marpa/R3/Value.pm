@@ -400,8 +400,7 @@ END_OF_LUA
 }
 
 sub resolve_rule_by_id {
-    my ( $slr, $irlid ) = @_;
-    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+    my ( $slg, $irlid ) = @_;
     my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     my $action_name = $tracer->[Marpa::R3::Internal::Trace::G::ACTION_BY_IRLID]->[$irlid];
     my $resolve_error;
@@ -409,7 +408,7 @@ sub resolve_rule_by_id {
     my $resolution = resolve_action( $slg, $action_name, \$resolve_error );
 
     if ( not $resolution ) {
-        my $rule_desc = $slr->rule_show( $irlid );
+        my $rule_desc = $slg->rule_show( $irlid );
         Marpa::R3::exception(
             "Could not resolve rule action named '$action_name'\n",
             "  Rule was $rule_desc\n",
@@ -445,11 +444,11 @@ sub resolve_recce {
 
   RULE: for my $irlid ( $tracer->rule_ids() ) {
 
-        my $rule_resolution = resolve_rule_by_id( $slr, $irlid );
+        my $rule_resolution = resolve_rule_by_id( $slg, $irlid );
         $rule_resolution //= $default_action_resolution;
 
         if ( not $rule_resolution ) {
-            my $rule_desc = $slr->rule_show($irlid);
+            my $rule_desc = $slg->rule_show($irlid);
             my $message   = "Could not resolve action\n  Rule was $rule_desc\n";
 
             my $action =
@@ -991,7 +990,7 @@ qq{  Cannot bless rule when it resolves to a scalar constant},
                 last CHECK_TYPE if not defined $thingy_ref;
                 my $ref_type = Scalar::Util::reftype $thingy_ref;
                 if ( $ref_type eq q{} ) {
-                    my $rule_desc = $slr->rule_show($irlid);
+                    my $rule_desc = $slg->rule_show($irlid);
                     Marpa::R3::exception(
                         qq{An action resolved to a scalar.\n},
                         qq{  This is not allowed.\n},
@@ -1009,7 +1008,7 @@ qq{  Cannot bless rule when it resolves to a scalar constant},
                     last CHECK_TYPE;
                 } ## end if ( $ref_type eq 'CODE' )
 
-                my $rule_desc = $slr->rule_show($irlid);
+                my $rule_desc = $slg->rule_show($irlid);
                 Marpa::R3::exception(
                     qq{Constant action is not of an allowed type.\n},
                     qq{  It was of type reference to $ref_type.\n},
