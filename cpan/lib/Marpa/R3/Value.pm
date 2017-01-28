@@ -39,11 +39,10 @@ package Marpa::R3::Internal::Value;
 
 # Given the grammar and an action name, resolve it to a closure,
 # or return undef
-sub Marpa::R3::Internal::Scanless::R::resolve_action {
-    my ( $slr, $closure_name, $p_error ) = @_;
+sub resolve_action {
+    my ( $slg, $closure_name, $p_error ) = @_;
     my $trace_file_handle =
-        $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
-    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+        $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE];
     my $trace_actions =
         $slg->[Marpa::R3::Internal::Scanless::G::TRACE_ACTIONS];
 
@@ -407,8 +406,7 @@ sub resolve_rule_by_id {
     my $action_name = $tracer->[Marpa::R3::Internal::Trace::G::ACTION_BY_IRLID]->[$irlid];
     my $resolve_error;
     return if not defined $action_name;
-    my $resolution = Marpa::R3::Internal::Scanless::R::resolve_action( $slr,
-        $action_name, \$resolve_error );
+    my $resolution = resolve_action( $slg, $action_name, \$resolve_error );
 
     if ( not $resolution ) {
         my $rule_desc = $slr->rule_show( $irlid );
@@ -437,7 +435,7 @@ sub resolve_recce {
     my $resolve_error;
 
     my $default_action_resolution =
-        Marpa::R3::Internal::Scanless::R::resolve_action( $slr, undef, \$resolve_error );
+        resolve_action( $slg, undef, \$resolve_error );
     Marpa::R3::exception(
         "Could not resolve default action\n",
         q{  }, ( $resolve_error // 'Failed to resolve action' ) )
