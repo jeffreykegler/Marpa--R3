@@ -386,9 +386,8 @@ sub resolve_rule_by_id {
 } ## end sub resolve_rule_by_id
 
 # Find the semantics for a lexeme.
-sub Marpa::R3::Internal::Scanless::R::lexeme_semantics_find {
-    my ( $slr, $lexeme_id ) = @_;
-    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+sub lexeme_semantics_find {
+    my ( $slg, $lexeme_id ) = @_;
     my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     my $xsy_by_isyid =
         $tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID];
@@ -418,10 +417,9 @@ sub rule_blessing_find {
     return join q{}, $bless_package, q{::}, $blessing;
 }
 
-sub resolve_recce {
+sub resolve_grammar {
 
-    my ( $slr ) = @_;
-    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+    my ( $slg ) = @_;
     my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
 
@@ -502,9 +500,7 @@ qq{Attempt to bless, but improper semantics: "$semantics"\n},
     my @lexeme_resolutions = ();
     SYMBOL: for my $lexeme_id ( 0 .. $grammar_c->highest_symbol_id()) {
 
-        my $semantics =
-            Marpa::R3::Internal::Scanless::R::lexeme_semantics_find( $slr,
-            $lexeme_id );
+        my $semantics = lexeme_semantics_find( $slg, $lexeme_id );
         if ( not defined $semantics ) {
             my $message =
                   "Could not determine lexeme's semantics\n"
@@ -525,7 +521,7 @@ qq{Attempt to bless, but improper semantics: "$semantics"\n},
     }
 
     return ( $rule_resolutions, \@lexeme_resolutions );
-} ## end sub resolve_recce
+}
 
 sub do_tree_ops {
     my ( $slr, $tree ) = @_;
@@ -634,7 +630,7 @@ sub find_registrations {
     my @blessing_by_irlid  = ();
 
     my ( $rule_resolutions, $lexeme_resolutions ) =
-      resolve_recce( $slr );
+      resolve_grammar( $slg );
 
     # Set the arrays, and perform various checks on the resolutions
     # we received

@@ -376,6 +376,12 @@ sub Marpa::R3::ASF::new {
     $asf->[Marpa::R3::Internal::ASF::SLR] = $slr;
     $asf->[Marpa::R3::Internal::ASF::FACTORING_MAX] //= 42;
 
+    my $slg       = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+    my $thin_slr  = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
+    my $tracer =
+        $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
+    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
+
     if ( defined $slr->[Marpa::R3::Internal::Scanless::R::TREE_MODE] ) {
 
         # If we already in ASF mode, or are in valuation mode, we cannot create an ASF
@@ -391,7 +397,7 @@ sub Marpa::R3::ASF::new {
 
     (   $asf->[Marpa::R3::Internal::ASF::RULE_RESOLUTIONS],
         $asf->[Marpa::R3::Internal::ASF::LEXEME_RESOLUTIONS]
-    ) = Marpa::R3::Internal::Value::resolve_recce( $slr );
+    ) = Marpa::R3::Internal::Value::resolve_grammar( $slg );
 
     $asf->[Marpa::R3::Internal::ASF::SYMCH_BLESSING_PACKAGE] = 'My_Symch';
     $asf->[Marpa::R3::Internal::ASF::FACTORING_BLESSING_PACKAGE] =
@@ -409,12 +415,6 @@ sub Marpa::R3::ASF::new {
     $asf->[Marpa::R3::Internal::ASF::POWERSET_BY_ID] = [];
 
     $asf->[Marpa::R3::Internal::ASF::GLADES] = [];
-
-    my $slg       = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $thin_slr  = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
-    my $tracer =
-        $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
-    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
 
     $slr->ordering_get();
 
