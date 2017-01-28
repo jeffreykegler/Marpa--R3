@@ -3384,6 +3384,9 @@ PPCODE:
     marpa_lua_newtable (L);
     grammar_ix = marpa_lua_gettop(L);
 
+    /* When this moves into the kollos library, we
+     * *CANNOT* use the "kollos" global.
+     */
     marpa_lua_getglobal(L, "kollos");
     marpa_lua_getfield(L, -1, "class_slg");
     marpa_lua_setmetatable (L, grammar_ix);
@@ -3789,6 +3792,10 @@ PPCODE:
 
     marpa_lua_newtable (L);
     slr_ix = marpa_lua_gettop(L);
+
+    /* When this moves into the kollos library, we
+     * *CANNOT* use the "kollos" global.
+     */
     marpa_lua_getglobal(L, "kollos");
     marpa_lua_getfield(L, -1, "class_slr");
     marpa_lua_setmetatable (L, slr_ix);

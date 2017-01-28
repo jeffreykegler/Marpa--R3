@@ -3373,7 +3373,13 @@ so the caller must make sure that one is available.
 
         marpa_lua_newtable (L);
         lmw_g_stack_ix = marpa_lua_gettop (L);
+
+        /* Once development is over, this use of the "kollos"
+         * global *MUST* be eliminated.  Deleting this entire
+         * function would be one way to do that.
+         */
         marpa_lua_getglobal (L, "kollos");
+
         marpa_lua_getfield (L, -1, "class_grammar");
         marpa_lua_setmetatable (L, lmw_g_stack_ix);
         /* [ slr_table, lmw_g_tab, kollos_tab ] */
