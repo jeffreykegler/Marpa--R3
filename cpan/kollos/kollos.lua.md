@@ -2647,8 +2647,8 @@ a special "configuration" argument.
         marpa_lua_newtable (L);
         /* [ grammar_table ] */
         grammar_stack_ix = marpa_lua_gettop (L);
-        marpa_lua_getglobal (L, "kollos");
-        marpa_lua_getfield (L, -1, "class_grammar");
+        /* push "class_grammar" metatable */
+        marpa_lua_pushvalue(L, marpa_lua_upvalueindex(2));
         marpa_lua_setmetatable (L, grammar_stack_ix);
         /* [ grammar_table ] */
 
@@ -3218,7 +3218,7 @@ tree op.
     {
       push_error_object(L, MARPA_ERR_DEVELOPMENT, details);
       marpa_lua_pushvalue(L, -1);
-      marpa_lua_setglobal(L, "error_object");
+      marpa_lua_setfield(L, marpa_lua_upvalueindex(1), "error_object");
       marpa_lua_error(L);
     }
 
@@ -3252,7 +3252,7 @@ The "throw" flag is ignored.
       marpa_lua_pushinteger(L, line);
       marpa_lua_setfield(L, error_object_ix, "line");
       marpa_lua_pushvalue(L, error_object_ix);
-      marpa_lua_setglobal(L, "error_object");
+      marpa_lua_setfield(L, marpa_lua_upvalueindex(1), "error_object");
       marpa_lua_error(L);
     }
 
@@ -3276,7 +3276,7 @@ The "throw" flag is ignored.
       push_error_object(L, error_code, details);
       /* [ ..., nil, error_object ] */
       marpa_lua_pushvalue(L, -1);
-      marpa_lua_setglobal(L, "error_object");
+      marpa_lua_setfield(L, marpa_lua_upvalueindex(1), "error_object");
       if (throw_flag) return marpa_lua_error(L);
       return 2;
     }
@@ -4368,10 +4368,12 @@ Marpa::R3.
         /* In Libmarpa object sequence order */
 
         marpa_lua_pushvalue (L, upvalue_stack_ix);
-        marpa_lua_pushcclosure (L, lca_grammar_new, 1);
+        marpa_lua_getfield (L, kollos_table_stack_ix, "class_grammar");
+        marpa_lua_pushcclosure (L, lca_grammar_new, 2);
         marpa_lua_setfield (L, kollos_table_stack_ix, "grammar_new");
 
         marpa_lua_pushvalue (L, upvalue_stack_ix);
+        marpa_lua_getfield (L, kollos_table_stack_ix, "class_recce");
         marpa_lua_pushcclosure (L, lca_grammar_event, 1);
         marpa_lua_setfield (L, kollos_table_stack_ix, "grammar_event");
 
@@ -4380,7 +4382,8 @@ Marpa::R3.
         marpa_lua_setfield (L, kollos_table_stack_ix, "grammar_events");
 
         marpa_lua_pushvalue (L, upvalue_stack_ix);
-        marpa_lua_pushcclosure (L, wrap_recce_new, 1);
+        marpa_lua_getfield (L, kollos_table_stack_ix, "class_recce");
+        marpa_lua_pushcclosure (L, wrap_recce_new, 2);
         marpa_lua_setfield (L, kollos_table_stack_ix, "recce_new");
 
         marpa_lua_pushvalue (L, upvalue_stack_ix);
