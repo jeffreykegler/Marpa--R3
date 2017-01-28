@@ -647,7 +647,7 @@ Perhaps I should delete this.
 ```
     -- miranda: section VM operations
 
-    function op_fn_debug (recce)
+    local function op_fn_debug (recce)
         for k,v in pairs(recce) do
             print(k, v)
         end
@@ -671,7 +671,7 @@ It may be useful in debugging.
 ```
     -- miranda: section+ VM operations
 
-    function op_fn_noop (recce)
+    local function op_fn_noop (recce)
         return -2
     end
     op_fn_add("noop", op_fn_noop)
@@ -689,7 +689,7 @@ fast fails with a clear message.
 ```
     -- miranda: section+ VM operations
 
-    function op_fn_bail (recce)
+    local function op_fn_bail (recce)
         error('executing VM op "bail"')
     end
     op_fn_add("bail", op_fn_bail)
@@ -725,7 +725,7 @@ The result of the semantics is a Perl undef.
 ```
     -- miranda: section+ VM operations
 
-    function op_fn_result_is_undef(recce)
+    local function op_fn_result_is_undef(recce)
         local stack = recce.lmw_v.stack
         stack[recce.this_step.result] = marpa.sv.undef()
         return -1
@@ -744,7 +744,7 @@ if not the value is an undef.
 ```
     -- miranda: section+ VM operations
 
-    function op_fn_result_is_token_value(recce)
+    local function op_fn_result_is_token_value(recce)
         if recce.this_step.type ~= 'MARPA_STEP_TOKEN' then
           return op_fn_result_is_undef(recce)
         end
@@ -768,7 +768,7 @@ if not the value is an undef.
 
 ```
     -- miranda: section+ VM operations
-    function op_fn_result_is_n_of_rhs(recce, rhs_ix)
+    local function op_fn_result_is_n_of_rhs(recce, rhs_ix)
         if recce.this_step.type ~= 'MARPA_STEP_RULE' then
           return op_fn_result_is_undef(recce)
         end
@@ -801,7 +801,7 @@ the "N of RHS" operation should be used.
 
 ```
     -- miranda: section+ VM operations
-    function op_fn_result_is_n_of_sequence(recce, item_ix)
+    local function op_fn_result_is_n_of_sequence(recce, item_ix)
         if recce.this_step.type ~= 'MARPA_STEP_RULE' then
           return op_fn_result_is_undef(recce)
         end
@@ -826,7 +826,7 @@ Returns a constant result.
 
 ```
     -- miranda: section+ VM operations
-    function op_fn_result_is_constant(recce, constant_ix)
+    local function op_fn_result_is_constant(recce, constant_ix)
         local constants = recce:constants()
         local constant = constants[constant_ix]
         local stack = recce.lmw_v.stack
@@ -857,7 +857,7 @@ Push an undef on the values array.
 ```
     -- miranda: section+ VM operations
 
-    function op_fn_push_undef(recce, dummy, new_values)
+    local function op_fn_push_undef(recce, dummy, new_values)
         local next_ix = #new_values + 1;
         new_values[next_ix] = marpa.sv.undef()
         return -2
@@ -873,7 +873,7 @@ Push one of the RHS child values onto the values array.
 ```
     -- miranda: section+ VM operations
 
-    function op_fn_push_one(recce, rhs_ix, new_values)
+    local function op_fn_push_one(recce, rhs_ix, new_values)
         if recce.this_step.type ~= 'MARPA_STEP_RULE' then
           return op_fn_push_undef(recce, nil, new_values)
         end
@@ -929,7 +929,7 @@ Otherwise the values of the RHS children are pushed.
 ```
     -- miranda: section+ VM operations
 
-    function op_fn_push_values(recce, increment, new_values)
+    local function op_fn_push_values(recce, increment, new_values)
         if recce.this_step.type == 'MARPA_STEP_TOKEN' then
             local next_ix = #new_values + 1;
             new_values[next_ix] = recce:current_token_literal()
@@ -960,7 +960,7 @@ in terms of the input string.
 
 ```
     -- miranda: section+ VM operations
-    function op_fn_push_start(recce, dummy, new_values)
+    local function op_fn_push_start(recce, dummy, new_values)
         local start_es = recce.this_step.start_es_id
         local es_data = recce.es_data
         local l0_start
@@ -990,7 +990,7 @@ that is, in terms of the input string
 
 ```
     -- miranda: section+ VM operations
-    function op_fn_push_length(recce, dummy, new_values)
+    local function op_fn_push_length(recce, dummy, new_values)
         local start_es = recce.this_step.start_es_id
         local end_es = recce.this_step.es_id
         local es_data = recce.es_data
@@ -1018,7 +1018,7 @@ in terms of G1 Earley sets.
 
 ```
     -- miranda: section+ VM operations
-    function op_fn_push_g1_start(recce, dummy, new_values)
+    local function op_fn_push_g1_start(recce, dummy, new_values)
         local next_ix = #new_values + 1;
         new_values[next_ix] = recce.this_step.start_es_id
         return -2
@@ -1034,7 +1034,7 @@ that is, in terms of G1 Earley sets.
 
 ```
     -- miranda: section+ VM operations
-    function op_fn_push_g1_length(recce, dummy, new_values)
+    local function op_fn_push_g1_length(recce, dummy, new_values)
         local next_ix = #new_values + 1;
         new_values[next_ix] = (recce.this_step.es_id
             - recce.this_step.start_es_id) + 1
@@ -1048,7 +1048,7 @@ that is, in terms of G1 Earley sets.
 
 ```
     -- miranda: section+ VM operations
-    function op_fn_push_constant(recce, constant_ix, new_values)
+    local function op_fn_push_constant(recce, constant_ix, new_values)
         local constants = recce:constants()
         -- io.stderr:write('constants: ', inspect(constants), "\n")
         -- io.stderr:write('constant_ix: ', constant_ix, "\n")
@@ -1071,7 +1071,7 @@ of every sequence of operations
 
 ```
     -- miranda: section+ VM operations
-    function op_fn_bless(recce, blessing_ix)
+    local function op_fn_bless(recce, blessing_ix)
         recce.this_step.blessing_ix = blessing_ix
         return -2
     end
@@ -1086,7 +1086,7 @@ is the result of this sequence of operations.
 
 ```
     -- miranda: section+ VM operations
-    function op_fn_result_is_array(recce, dummy, new_values)
+    local function op_fn_result_is_array(recce, dummy, new_values)
         local blessing_ix = recce.this_step.blessing_ix
         if blessing_ix then
           local constants = recce:constants()
@@ -1114,7 +1114,7 @@ implementation, which returned the size of the
 
 ```
     -- miranda: section+ VM operations
-    function op_fn_callback(recce, dummy, new_values)
+    local function op_fn_callback(recce, dummy, new_values)
         local step_type = recce.this_step.type
         if step_type ~= 'MARPA_STEP_RULE'
             and step_type ~= 'MARPA_STEP_NULLING_SYMBOL'
