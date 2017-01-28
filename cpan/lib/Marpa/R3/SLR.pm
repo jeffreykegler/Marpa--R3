@@ -1361,12 +1361,6 @@ sub Marpa::R3::Scanless::R::series_restart {
 sub Marpa::R3::Scanless::R::reset_evaluation {
     my ($slr) = @_;
     $slr->[Marpa::R3::Internal::Scanless::R::NO_PARSE]              = undef;
-    $slr->[Marpa::R3::Internal::Scanless::R::NULL_VALUES]           = undef;
-
-    $slr->[Marpa::R3::Internal::Scanless::R::REGISTRATIONS]         = undef;
-    $slr->[Marpa::R3::Internal::Scanless::R::CLOSURE_BY_SYMBOL_ID] = undef;
-    $slr->[Marpa::R3::Internal::Scanless::R::CLOSURE_BY_RULE_ID]   = undef;
-
     $slr->[Marpa::R3::Internal::Scanless::R::TREE_MODE] = undef;
 
     $slr->call_by_name('valuation_reset', '');
