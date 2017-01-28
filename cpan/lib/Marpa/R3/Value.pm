@@ -293,6 +293,7 @@ sub code_problems {
 # Dump semantics for diagnostics
 sub Marpa::R3::Scanless::R::show_semantics {
     my ( $slr, @ops ) = @_;
+    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my @op_descs = ();
     my $op_ix    = 0;
   OP: while ( $op_ix < scalar @ops ) {
@@ -301,11 +302,11 @@ sub Marpa::R3::Scanless::R::show_semantics {
         push @op_descs, $op_name;
         if ( $op_name eq 'lua' ) {
 
-            my ($lua_op_name) = op_fn_name_by_key( $slr, $ops[$op_ix]);
+            my ($lua_op_name) = op_fn_name_by_key( $slg, $ops[$op_ix]);
             push @op_descs, $lua_op_name;
             $op_ix++;
             if ($lua_op_name eq 'callback') {
-                push @op_descs, op_fn_name_by_key( $slr, $ops[$op_ix]);
+                push @op_descs, op_fn_name_by_key( $slg, $ops[$op_ix]);
             } else {
                 push @op_descs, $ops[$op_ix];
             }
@@ -573,8 +574,8 @@ sub do_tree_ops {
 }
 
 sub op_fn_key_by_name {
-    my ( $slr, $name ) = @_;
-    my ($key) = $slr->call_by_tag(
+    my ( $slg, $name ) = @_;
+    my ($key) = $slg->call_by_tag(
         ('@' . __FILE__ . ':' .  __LINE__),
     <<'END_OF_LUA', 's', $name);
       local recce, name = ...
@@ -585,8 +586,8 @@ END_OF_LUA
 }
 
 sub op_fn_name_by_key {
-    my ( $slr, $key ) = @_;
-    my ($name) = $slr->call_by_tag(
+    my ( $slg, $key ) = @_;
+    my ($name) = $slg->call_by_tag(
         ('@' . __FILE__ . ':' .  __LINE__),
     <<'END_OF_LUA', 'i', $key);
       local recce, key = ...
@@ -877,29 +878,29 @@ qq{  Cannot bless rule when it resolves to a scalar constant},
 
     state $op_lua = Marpa::R3::Thin::op('lua');
 
-    my ($op_debug_key)        = op_fn_key_by_name( $slr, "debug" );
-    my ($op_noop_key)         = op_fn_key_by_name( $slr, "noop" );
-    my ($op_bail_key)         = op_fn_key_by_name( $slr, "bail" );
-    my ($op_bless_key)        = op_fn_key_by_name( $slr, "bless" );
-    my ($op_callback_key)     = op_fn_key_by_name( $slr, "callback" );
-    my ($result_is_undef_key) = op_fn_key_by_name( $slr, 'result_is_undef' );
+    my ($op_debug_key)        = op_fn_key_by_name( $slg, "debug" );
+    my ($op_noop_key)         = op_fn_key_by_name( $slg, "noop" );
+    my ($op_bail_key)         = op_fn_key_by_name( $slg, "bail" );
+    my ($op_bless_key)        = op_fn_key_by_name( $slg, "bless" );
+    my ($op_callback_key)     = op_fn_key_by_name( $slg, "callback" );
+    my ($result_is_undef_key) = op_fn_key_by_name( $slg, 'result_is_undef' );
     my ($result_is_constant_key) =
-      op_fn_key_by_name( $slr, 'result_is_constant' );
+      op_fn_key_by_name( $slg, 'result_is_constant' );
     my ($result_is_token_value_key) =
-      op_fn_key_by_name( $slr, "result_is_token_value" );
+      op_fn_key_by_name( $slg, "result_is_token_value" );
     my ($result_is_n_of_rhs_key) =
-      op_fn_key_by_name( $slr, "result_is_n_of_rhs" );
+      op_fn_key_by_name( $slg, "result_is_n_of_rhs" );
     my ($result_is_n_of_sequence_key) =
-      op_fn_key_by_name( $slr, "result_is_n_of_sequence" );
-    my ($result_is_array_key)   = op_fn_key_by_name( $slr, "result_is_array" );
-    my ($op_push_constant_key)  = op_fn_key_by_name( $slr, 'push_constant' );
-    my ($op_push_undef_key)     = op_fn_key_by_name( $slr, 'push_undef' );
-    my ($op_push_one_key)       = op_fn_key_by_name( $slr, 'push_one' );
-    my ($op_push_values_key)    = op_fn_key_by_name( $slr, 'push_values' );
-    my ($op_push_g1_start_key)  = op_fn_key_by_name( $slr, 'push_g1_start' );
-    my ($op_push_g1_length_key) = op_fn_key_by_name( $slr, 'push_g1_length' );
-    my ($op_push_start_key)     = op_fn_key_by_name( $slr, 'push_start' );
-    my ($op_push_length_key)    = op_fn_key_by_name( $slr, 'push_length' );
+      op_fn_key_by_name( $slg, "result_is_n_of_sequence" );
+    my ($result_is_array_key)   = op_fn_key_by_name( $slg, "result_is_array" );
+    my ($op_push_constant_key)  = op_fn_key_by_name( $slg, 'push_constant' );
+    my ($op_push_undef_key)     = op_fn_key_by_name( $slg, 'push_undef' );
+    my ($op_push_one_key)       = op_fn_key_by_name( $slg, 'push_one' );
+    my ($op_push_values_key)    = op_fn_key_by_name( $slg, 'push_values' );
+    my ($op_push_g1_start_key)  = op_fn_key_by_name( $slg, 'push_g1_start' );
+    my ($op_push_g1_length_key) = op_fn_key_by_name( $slg, 'push_g1_length' );
+    my ($op_push_start_key)     = op_fn_key_by_name( $slg, 'push_start' );
+    my ($op_push_length_key)    = op_fn_key_by_name( $slg, 'push_length' );
 
     my @nulling_symbol_by_semantic_rule;
   NULLING_SYMBOL: for my $nulling_symbol ( 0 .. $#{$null_values} ) {
