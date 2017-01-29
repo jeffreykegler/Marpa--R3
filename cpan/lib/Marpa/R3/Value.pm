@@ -292,8 +292,7 @@ sub code_problems {
 
 # Dump semantics for diagnostics
 sub Marpa::R3::Scanless::R::show_semantics {
-    my ( $slr, @ops ) = @_;
-    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+    my ( $slg, @ops ) = @_;
     my @op_descs = ();
     my $op_ix    = 0;
   OP: while ( $op_ix < scalar @ops ) {
@@ -624,8 +623,7 @@ sub brief_rule_list {
 
 sub registrations_set
 {
-  my ( $slr) = @_;
-  my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+  my ( $slg) = @_;
   my $tracer        = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
   my $trace_file_handle =
       $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE];
@@ -649,7 +647,7 @@ END_OF_LUA
                 say {$trace_file_handle}
                   "Registering semantics for nulling symbol: ",
                   $tracer->symbol_name($id),
-                  "\n", '  Semantics are ', $slr->show_semantics(@raw_ops)
+                  "\n", '  Semantics are ', $slg->show_semantics(@raw_ops)
                   or Marpa::R3::exception('Cannot say to trace file handle');
                 last PRINT_TRACES;
             } ## end if ( $type eq 'nulling' )
@@ -657,7 +655,7 @@ END_OF_LUA
                 say {$trace_file_handle}
                   "Registering semantics for $type: ",
                   $tracer->show_rule($id),
-                  '  Semantics are ', $slr->show_semantics(@raw_ops)
+                  '  Semantics are ', $slg->show_semantics(@raw_ops)
                   or Marpa::R3::exception('Cannot say to trace file handle');
                 last PRINT_TRACES;
             }
@@ -665,7 +663,7 @@ END_OF_LUA
                 say {$trace_file_handle}
                   "Registering semantics for $type: ",
                   $tracer->symbol_name($id),
-                  "\n", '  Semantics are ', $slr->show_semantics(@raw_ops)
+                  "\n", '  Semantics are ', $slg->show_semantics(@raw_ops)
                   or Marpa::R3::exception('Cannot say to trace file handle');
                 last PRINT_TRACES;
             }
@@ -688,8 +686,6 @@ END_OF_LUA
             }
             push @ops, $raw_op;
         } ## end OP: for my $raw_op (@raw_ops)
-
-            # $slr->call_by_name( 'token_register', $signature, $id, @ops);
 
                 my ($constant_ix) = $slg->call_by_tag(
         (__FILE__ . ':' .  __LINE__),
@@ -1464,7 +1460,7 @@ END_OF_LUA
     recce:value_init(flag)
 END_OF_LUA
 
-    registrations_set($slr );
+    registrations_set($slg );
 
   STEP: while (1) {
         my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
