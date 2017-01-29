@@ -1445,9 +1445,6 @@ END_OF_LUA
     recce:value_init(flag)
 END_OF_LUA
 
-    if ( not $slg->[Marpa::R3::Internal::Scanless::G::REGISTRATIONS] ) {
-        registrations_find($slg );
-    }
     registrations_set($slr );
 
   STEP: while (1) {

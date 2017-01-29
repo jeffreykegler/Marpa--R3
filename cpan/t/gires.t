@@ -45,7 +45,7 @@ test   ::= 'X'       action => nowhere
 END_OF_SOURCE
 
     push @tests_data, [ $grammar, 'X',
-    'Failure in value() method',
+    'SLIF grammar failed',
     <<'END_OF_MESSAGE',
 Could not resolve rule action named 'nowhere'
   Rule was test ::= 'X'

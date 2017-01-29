@@ -1044,6 +1044,8 @@ qq{Symbol "$lexeme_name" needs a blessing package, but grammar has none\n},
 
     }
 
+    Marpa::R3::Internal::Value::registrations_find($slg );
+
     return $slg;
 
 } ## end sub Marpa::R3::Internal::Scanless::G::hash_to_runtime
