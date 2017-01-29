@@ -1047,21 +1047,6 @@ static void create_sv_mt (lua_State* L) {
     marpa_lua_settop(L, base_of_stack);
 }
 
-static int xlua_recce_constants_meth(lua_State* L) {
-    Scanless_R* slr;
-    AV* constants;
-
-    marpa_luaL_checktype(L, 1, LUA_TTABLE);
-    /* Lua stack: [ recce_table ] */
-    marpa_lua_getfield(L, -1, "lud");
-    /* Lua stack: [ recce_table, lud ] */
-    slr = (Scanless_R*)marpa_lua_touserdata(L, -1);
-    constants = slr->slg->constants;
-    MARPA_SV_AV(L, constants);
-    /* Lua stack: [ recce_table, recce_lud, constants_ud ] */
-    return 1;
-}
-
 static int
 xlua_recce_step_meth (lua_State * L)
 {
@@ -1156,7 +1141,6 @@ xlua_recce_gc (lua_State * L)
 }
 
 static const struct luaL_Reg marpa_slr_meths[] = {
-    {"constants", xlua_recce_constants_meth},
     {"step", xlua_recce_step_meth},
     {"ref", xlua_ref},
     {"unref", xlua_unref},
@@ -2035,9 +2019,6 @@ static Scanless_G* slg_inner_new (void)
 
     slg->symbol_g_properties = NULL;
     slg->l0_rule_g_properties = NULL;
-    slg->constants = newAV ();
-    /* Reserve position 0 */
-    av_push (slg->constants, newSV(0));
 
     return slg;
 }
@@ -2108,7 +2089,6 @@ static void slg_inner_destroy(Scanless_G* slg) {
   for (i = 0; i < Dim(slg->per_codepoint_array); i++) {
     Safefree(slg->per_codepoint_array[i]);
   }
-  SvREFCNT_dec (slg->constants);
   Safefree (slg);
 }
 
