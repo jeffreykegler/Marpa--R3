@@ -1255,6 +1255,7 @@ Set up the default VM operations
     -- miranda: section+ VM default operations
     do
         -- we record these values to set the defaults, below
+        local op_lua =  _M.defines.MARPA_OP_LUA
         local op_bail_key = _M.vm_op_keys["bail"]
         local result_is_constant_key = _M.vm_op_keys["result_is_constant"]
         local result_is_undef_key = _M.vm_op_keys["result_is_undef"]
@@ -1265,10 +1266,9 @@ Set up the default VM operations
         _M.token_semantics = {}
         _M.nulling_semantics = {}
 
-        -- _M.nulling_semantics.default = { marpa.ops.lua, result_is_undef_key, op_bail_key, 0 }
-        -- _M.token_semantics.default = { marpa.ops.lua, result_is_token_value_key, op_bail_key, 0 }
-        -- _M.rule_semantics.default = { marpa.ops.lua, result_is_undef_key, op_bail_key, 0 }
-
+        -- _M.nulling_semantics.default = { op_lua, result_is_undef_key, op_bail_key, 0 }
+        -- _M.token_semantics.default = { op_lua, result_is_token_value_key, op_bail_key, 0 }
+        -- _M.rule_semantics.default = { op_lua, result_is_undef_key, op_bail_key, 0 }
 
     end
 
@@ -1785,6 +1785,20 @@ Functions for tracing Earley sets
     -- miranda: section+ various Kollos lua defines
     _M.defines.TOKEN_VALUE_IS_UNDEF = 1
     _M.defines.TOKEN_VALUE_IS_LITERAL = 2
+
+    _M.defines.MARPA_OP_ALTERNATIVE = 0
+    _M.defines.MARPA_OP_EARLEME_COMPLETE = 1
+    _M.defines.MARPA_OP_INVALID_CHAR = 2
+    _M.defines.MARPA_OP_LUA = 3
+    _M.defines.MARPA_OP_NOOP = 4
+
+    -- miranda: section+ temporary defines
+    /* TODO: Delete after development */
+    #define MARPA_OP_ALTERNATIVE 0
+    #define MARPA_OP_EARLEME_COMPLETE 1
+    #define MARPA_OP_INVALID_CHAR 2
+    #define MARPA_OP_LUA 3
+    #define MARPA_OP_NOOP 4
 
 ```
 
@@ -4580,6 +4594,7 @@ but before it is executed.
     #include "lauxlib.h"
     #include "lualib.h"
 
+    -- miranda: insert temporary defines
     -- miranda: insert C extern variables
     -- miranda: insert C function declarations
 

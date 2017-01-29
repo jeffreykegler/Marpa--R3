@@ -287,6 +287,8 @@ __DATA__
     CLOSURE_BY_SYMBOL_ID
     CLOSURE_BY_RULE_ID
 
+    CONSTANTS
+
     :package=Marpa::R3::Internal::Scanless::R
 
     SLG
