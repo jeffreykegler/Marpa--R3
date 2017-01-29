@@ -111,14 +111,7 @@ L<C<resume()> method|Marpa::R3::Scanless::R/"resume()">.
 
 =item *
 
-Within a parse series,
-the semantics package cannot change.
-But you can specify a new semantics package
-after starting a new parse series.
-
-=item *
-
-Certain other SLIF recognizer settings can be
+Some SLIF recognizer settings can be
 changed
 after starting a new parse series.
 These include the SLIF recognizer's
@@ -210,7 +203,7 @@ The C<read()> method can be called only once for a SLIF recognizer.
 But, while a Reading Phase continues,
 the C<resume()> method may be called multiple times to continue reading
 input.
-The C<resume()> method should only be called except during the
+The C<resume()> method should only be called during the
 Reading Phase of a parse series.
 
 A Reading Phase is always part of a parse series.
@@ -271,28 +264,10 @@ each rule node.  It is not a separate phase.
 The Parse Tree Setup Subphase
 occurs during during the first call
 to the C<value()> method of every series.
-In the Parse Tree Setup Subphase, the following happens:
-
-=over 4
-
-=item *
-
 If a per-parse argument was not supplied in the
 C<value()> method, the
 default per-parse argument is created.
-
-=item *
-
-All action names are resolved to
-actions --
-Perl scalars
-or rule evaluation closures.
-The rule evaluation closures are not called in the Parse Tree Setup Subphase.
-They will be called later,
-in the Parse Tree Traversal Subphase.
-
-=back
-
+in the Parse Tree Setup Subphase,
 Exactly one Parse Tree Setup Subphase occurs
 for each parse tree.
 

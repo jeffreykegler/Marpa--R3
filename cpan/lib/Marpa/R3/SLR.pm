@@ -133,6 +133,7 @@ sub Marpa::R3::Scanless::R::new {
     # Set recognizer args to default
     $slr->[Marpa::R3::Internal::Scanless::R::MAX_PARSES]     = 0;
     $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] = [];
+    $slr->[Marpa::R3::Internal::Scanless::R::PHASE] = "initial";
 
     my ($flat_args, $error_message) = Marpa::R3::flatten_hash_args(\@args);
     Marpa::R3::exception( sprintf $error_message, '$slr->new' ) if not $flat_args;
@@ -441,6 +442,8 @@ sub Marpa::R3::Scanless::R::read {
             qq{Arg to Marpa::R3::Scanless::R::read() is a ref to an undef\n},
             '  It should be a ref to a defined scalar' );
     } ## end if ( ( my $ref_type = ref $p_string ) ne 'SCALAR' )
+
+    $slr->[Marpa::R3::Internal::Scanless::R::PHASE] = "read";
 
     $slr->[Marpa::R3::Internal::Scanless::R::P_INPUT_STRING] = $p_string;
 
@@ -825,6 +828,19 @@ sub Marpa::R3::Scanless::R::resume {
         '  The string should be set first using read()'
         )
         if not defined $slr->[Marpa::R3::Internal::Scanless::R::P_INPUT_STRING];
+
+    if ($slr->[Marpa::R3::Internal::Scanless::R::PHASE] ne "read") {
+        if ($slr->[Marpa::R3::Internal::Scanless::R::PHASE] eq "value") {
+        Marpa::R3::exception(
+            "Attempt to resume an SLIF recce while the parse is being evaluated\n",
+            '   The resume() method is not allowed once value() is called'
+            );
+        }
+        Marpa::R3::exception(
+            "Attempt to resume an SLIF recce which is not in the Read Phase\n",
+            '   The resume() method is only allowed in the Read Phase'
+            );
+    }
 
     my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
 
@@ -1335,6 +1351,7 @@ sub Marpa::R3::Scanless::G::parse {
 sub Marpa::R3::Scanless::R::series_restart {
     my ( $slr , @args ) = @_;
 
+    $slr->[Marpa::R3::Internal::Scanless::R::PHASE] = "read";
     $slr->reset_evaluation();
 
     my ($flat_args, $error_message) = Marpa::R3::flatten_hash_args(\@args);

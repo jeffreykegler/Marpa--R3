@@ -839,22 +839,17 @@ C<Marpa::R3::Context::bail()> method was called.
 
 =head1 Visibility of Perl object actions
 
-Most applications do not manipulate the Perl symbol table at runtime,
-and do not make use of Perl's C<local> keyword for declarations.
-Applications which use the Perl global namespace in conventional ways,
-and which use the same names to point to the same variables
-throughout Marpa execution,
-can ignore questions about the visibility
-of the Perl variables used in actions.
-
-Less conventional applications should be aware that,
-for resolution from a Perl name to a Perl variable to take place,
-that Perl name must
-refer to the intended variable,
-and this variable must be visible,
-at the time when actions are resolved.
-The timing of action resolution
-is specified in
+Resolution from a Perl name to a Perl function takes place
+when the grammar is created
+by the grammar's
+L<C<new()>|Marpa::R3::Scanless::G/"Constructor"> method.
+The action functions are called during the Evaluation
+Phase, by the
+by the recognizer's
+L<C<value()>|Marpa::R3::Scanless::R/"value()"> method.
+More details about timing of action resolution and 
+call
+are given in
 L<a separate document|Marpa::R3::Semantics::Phases>.
 
 =head1 The per-parse argument

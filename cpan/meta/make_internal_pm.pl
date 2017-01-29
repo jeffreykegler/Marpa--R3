@@ -292,6 +292,10 @@ __DATA__
 
     SLG
 
+    PHASE {
+        "initial", "read", "value"
+    }
+
     { "Thin" interfaces,
       that is, objects for the C language Perl/XS
       interfaces

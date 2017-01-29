@@ -1388,6 +1388,8 @@ sub Marpa::R3::Scanless::R::value {
         );
     }
 
+    $slr->[Marpa::R3::Internal::Scanless::R::PHASE] = "value";
+
     $slr->call_by_tag(
         (__FILE__ . ':' .  __LINE__),
     <<'END_OF_LUA', '');
