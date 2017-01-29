@@ -623,7 +623,7 @@ sub brief_rule_list {
 
 sub registrations_set
 {
-  my ( $slg) = @_;
+  my ( $slg, $registrations) = @_;
   my $tracer        = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
   my $trace_file_handle =
       $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE];
@@ -635,10 +635,7 @@ sub registrations_set
                 grammar.constants = {}
 END_OF_LUA
 
-  REGISTRATION:
-    for my $registration (
-        @{ $slg->[Marpa::R3::Internal::Scanless::G::REGISTRATIONS] } )
-    {
+  REGISTRATION: for my $registration ( @{$registrations} ) {
         my ( $type, $id, @raw_ops ) = @{$registration};
         my @ops = ();
       PRINT_TRACES: {
@@ -674,9 +671,9 @@ END_OF_LUA
       OP: for my $raw_op (@raw_ops) {
             if ( ref $raw_op ) {
 
-                my ($constant_ix) = $slg->call_by_tag(
-        (__FILE__ . ':' .  __LINE__),
-    << 'END_OF_LUA', 'S>*', ${$raw_op});
+                my ($constant_ix) =
+                  $slg->call_by_tag( ( __FILE__ . ':' . __LINE__ ),
+                    << 'END_OF_LUA', 'S>*', ${$raw_op} );
                 local grammar, sv = ...
                 return grammar:constant_register(sv)
 END_OF_LUA
@@ -687,9 +684,8 @@ END_OF_LUA
             push @ops, $raw_op;
         } ## end OP: for my $raw_op (@raw_ops)
 
-                my ($constant_ix) = $slg->call_by_tag(
-        (__FILE__ . ':' .  __LINE__),
-    << 'END_OF_LUA', 'sii', $type, $id, \@ops);
+        my ($constant_ix) = $slg->call_by_tag( ( __FILE__ . ':' . __LINE__ ),
+            << 'END_OF_LUA', 'sii', $type, $id, \@ops );
                 local grammar, type, id, ops = ...
                 if type == 'token' then
                     grammar.token_semantics[id] = ops
@@ -700,7 +696,7 @@ END_OF_LUA
                 end
 END_OF_LUA
 
-            next REGISTRATION;
+        next REGISTRATION;
         Marpa::R3::exception(
             'Registration: with unknown type: ',
             Data::Dumper::Dumper($registration)
@@ -1353,11 +1349,12 @@ qq{    Semantics were specified as "$original_semantics"\n}
         } ## end REGISTRATION: for my $registration (@registrations)
     } ## end SLR_NULLING_GRAMMAR_HACK:
 
-    $slg->[Marpa::R3::Internal::Scanless::G::REGISTRATIONS] = \@registrations;
     $slg->[Marpa::R3::Internal::Scanless::G::CLOSURE_BY_SYMBOL_ID] =
       \@nulling_closures;
     $slg->[Marpa::R3::Internal::Scanless::G::CLOSURE_BY_RULE_ID] =
       \@closure_by_irlid;
+
+  return \@registrations;
 
 }
 
@@ -1459,8 +1456,6 @@ END_OF_LUA
     recce.lmw_v:_trace(flag)
     recce:value_init(flag)
 END_OF_LUA
-
-    registrations_set($slg );
 
   STEP: while (1) {
         my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
