@@ -354,6 +354,17 @@ This is a registry object.
 
 ```
 
+This "post-new" method will become the latter part of the
+`slg_new()` method.
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slg.post_new(grammar)
+        return
+    end
+
+```
+
 ## Kollos SLIF recognizer object
 
 This is a registry object.

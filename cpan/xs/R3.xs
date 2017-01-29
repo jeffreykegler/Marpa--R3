@@ -3398,6 +3398,13 @@ PPCODE:
     outer_slg->lua_ref = marpa_luaL_ref (L, LUA_REGISTRYINDEX);
     marpa_lua_settop(L, base_of_stack);
 
+
+    call_by_tag (outer_slg->L, LUA_TAG,
+        "slg = ...\n"
+        "slg:post_new()\n"
+        ,
+        "G>", outer_slg->lua_ref);
+
     new_sv = sv_newmortal ();
     sv_setref_pv (new_sv, scanless_g_class_name, (void *) outer_slg);
     XPUSHs (new_sv);
