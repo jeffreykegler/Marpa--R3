@@ -1365,13 +1365,6 @@ END_OF_LUA
         find_registrations($slg );
     }
 
-    my $semantics_arg0 = $per_parse_arg // {};
-
-    my $null_values = $slg->[Marpa::R3::Internal::Scanless::G::NULL_VALUES];
-    my $nulling_closures =
-      $slg->[Marpa::R3::Internal::Scanless::G::CLOSURE_BY_SYMBOL_ID];
-    my $rule_closures =
-      $slg->[Marpa::R3::Internal::Scanless::G::CLOSURE_BY_RULE_ID];
   REGISTRATION:
     for my $registration (
         @{ $slg->[Marpa::R3::Internal::Scanless::G::REGISTRATIONS] } )
@@ -1509,6 +1502,13 @@ END_OF_LUA
 
         last STEP if not defined $value_type;
         next STEP if $value_type eq 'trace';
+
+        my $semantics_arg0 = $per_parse_arg // {};
+        my $null_values = $slg->[Marpa::R3::Internal::Scanless::G::NULL_VALUES];
+        my $nulling_closures =
+          $slg->[Marpa::R3::Internal::Scanless::G::CLOSURE_BY_SYMBOL_ID];
+        my $rule_closures =
+          $slg->[Marpa::R3::Internal::Scanless::G::CLOSURE_BY_RULE_ID];
 
         if ( $value_type eq 'MARPA_STEP_NULLING_SYMBOL' ) {
             my ($token_id) = @value_data;
