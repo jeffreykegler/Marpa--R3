@@ -363,6 +363,7 @@ This "post-new" method will become the latter part of the
         grammar.nulling_semantics = {}
         grammar.rule_semantics = {}
         grammar.token_semantics = {}
+        grammar.constants = {}
         return
     end
 
@@ -841,7 +842,8 @@ Returns a constant result.
 ```
     -- miranda: section+ VM operations
     local function op_fn_result_is_constant(recce, constant_ix)
-        local constants = recce:constants()
+        local grammar = recce.slg
+        local constants = grammar.constants
         local constant = constants[constant_ix]
         local stack = recce.lmw_v.stack
         local result_ix = recce.this_step.result
@@ -1063,7 +1065,8 @@ that is, in terms of G1 Earley sets.
 ```
     -- miranda: section+ VM operations
     local function op_fn_push_constant(recce, constant_ix, new_values)
-        local constants = recce:constants()
+        local grammar = recce.slg
+        local constants = grammar.constants
         -- io.stderr:write('constants: ', inspect(constants), "\n")
         -- io.stderr:write('constant_ix: ', constant_ix, "\n")
         -- io.stderr:write('constants top ix: ', marpa.sv.top_index(constants), "\n")
@@ -1101,9 +1104,10 @@ is the result of this sequence of operations.
 ```
     -- miranda: section+ VM operations
     local function op_fn_result_is_array(recce, dummy, new_values)
+        local grammar = recce.slg
         local blessing_ix = recce.this_step.blessing_ix
         if blessing_ix then
-          local constants = recce:constants()
+          local constants = grammar.constants
           local blessing = constants[blessing_ix]
           new_values = { 'perl', 'bless', new_values, blessing }
           setmetatable(new_values, _M.mt_tree_op)
@@ -1129,6 +1133,8 @@ implementation, which returned the size of the
 ```
     -- miranda: section+ VM operations
     local function op_fn_callback(recce, dummy, new_values)
+        local grammar = recce.slg
+        local blessing_ix = recce.this_step.blessing_ix
         local step_type = recce.this_step.type
         if step_type ~= 'MARPA_STEP_RULE'
             and step_type ~= 'MARPA_STEP_NULLING_SYMBOL'
@@ -1141,7 +1147,7 @@ implementation, which returned the size of the
         end
         local blessing_ix = recce.this_step.blessing_ix
         if blessing_ix then
-          local constants = recce:constants()
+          local constants = grammar.constants
           local blessing = constants[blessing_ix]
           new_values = { 'perl', 'bless', new_values, blessing }
           setmetatable(new_values, _M.mt_tree_op)
@@ -1349,9 +1355,9 @@ Register a constant, returning its key.
 
 ```
     -- miranda: section+ Utilities for semantics
-    function _M.class_slr.constant_register(recce, constant_sv)
-        local constants = recce:constants()
-        local next_constant_key = marpa.sv.top_index(constants) + 1
+    function _M.class_slg.constant_register(grammar, constant_sv)
+        local constants = grammar.constants
+        local next_constant_key = #constants + 1
         constants[next_constant_key] = constant_sv
         return next_constant_key
     end

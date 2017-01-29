@@ -631,6 +631,12 @@ sub registrations_set
       $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE];
   my $trace_actions =
       $slg->[Marpa::R3::Internal::Scanless::G::TRACE_ACTIONS] // 0;
+
+    $slg->call_by_tag( (__FILE__ . ':' .  __LINE__), << 'END_OF_LUA', '');
+                local grammar = ...
+                grammar.constants = {}
+END_OF_LUA
+
   REGISTRATION:
     for my $registration (
         @{ $slg->[Marpa::R3::Internal::Scanless::G::REGISTRATIONS] } )
@@ -670,11 +676,11 @@ sub registrations_set
       OP: for my $raw_op (@raw_ops) {
             if ( ref $raw_op ) {
 
-                my ($constant_ix) = $slr->call_by_tag(
+                my ($constant_ix) = $slg->call_by_tag(
         (__FILE__ . ':' .  __LINE__),
     << 'END_OF_LUA', 'S>*', ${$raw_op});
-                local recce, sv = ...
-                return recce:constant_register(sv)
+                local grammar, sv = ...
+                return grammar:constant_register(sv)
 END_OF_LUA
 
                 push @ops, $constant_ix;
