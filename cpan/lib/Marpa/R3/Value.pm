@@ -298,7 +298,14 @@ sub Marpa::R3::Scanless::R::show_semantics {
     my $op_ix    = 0;
   OP: while ( $op_ix < scalar @ops ) {
         my $op      = $ops[ $op_ix++ ];
-        my $op_name = Marpa::R3::Thin::op_name($op);
+
+        my $op_name = $slg->call_by_tag(
+        ('@' . __FILE__ . ':' .  __LINE__),
+    <<'END_OF_LUA', 'i', $op);
+    local grammar, op = ...
+    return _M.op_names[op]
+END_OF_LUA
+
         push @op_descs, $op_name;
         if ( $op_name eq 'lua' ) {
 
@@ -701,6 +708,7 @@ END_OF_LUA
 
 sub registrations_find {
     my ($slg ) = @_;
+    my $thin_slg = $slg->[Marpa::R3::Internal::Scanless::G::C];
     my $trace_file_handle =
       $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE];
     my $tracer        = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
@@ -959,7 +967,12 @@ qq{  Cannot bless rule when it resolves to a scalar constant},
 
     }
 
-    state $op_lua = Marpa::R3::Thin::op('lua');
+    # state $op_lua = Marpa::R3::Thin::op('lua');
+    my ($op_lua) = $thin_slg->call_by_tag(
+        ('@' .__FILE__ . ':' .  __LINE__),
+        <<'END_OF_LUA', '');
+        return kollos.defines.MARPA_OP_LUA
+END_OF_LUA
 
     my ($op_debug_key)        = op_fn_key_by_name( $slg, "debug" );
     my ($op_noop_key)         = op_fn_key_by_name( $slg, "noop" );

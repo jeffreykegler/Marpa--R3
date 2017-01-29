@@ -1159,7 +1159,7 @@ implementation, which returned the size of the
         while op_ix <= #ops do
             local op_code = ops[op_ix]
             if op_code == 0 then return -1 end
-            if op_code ~= op_lua then
+            if op_code ~= _M.defines.op_lua then
             end
             local fn_key = ops[op_ix+1]
             local arg = ops[op_ix+2]
@@ -1791,6 +1791,13 @@ Functions for tracing Earley sets
     _M.defines.MARPA_OP_INVALID_CHAR = 2
     _M.defines.MARPA_OP_LUA = 3
     _M.defines.MARPA_OP_NOOP = 4
+    _M.op_names = {
+        [_M.defines.MARPA_OP_ALTERNATIVE] = "alternative",
+        [_M.defines.MARPA_OP_EARLEME_COMPLETE ] = "earleme_complete",
+        [_M.defines.MARPA_OP_INVALID_CHAR] = "invalid_char",
+        [_M.defines.MARPA_OP_LUA] = "lua",
+        [_M.defines.MARPA_OP_NOOP] = "noop",
+    }
 
     -- miranda: section+ temporary defines
     /* TODO: Delete after development */
@@ -1822,6 +1829,7 @@ Called when a valuator is set up.
         end
 
         -- we record these values to set the defaults, below
+        local op_lua = _M.defines.MARPA_OP_LUA
         local op_bail_key = _M.vm_op_keys["bail"]
         local result_is_constant_key = _M.vm_op_keys["result_is_constant"]
         local result_is_undef_key = _M.vm_op_keys["result_is_undef"]
@@ -1832,9 +1840,9 @@ Called when a valuator is set up.
         recce.token_semantics = {}
         recce.nulling_semantics = {}
 
-        recce.nulling_semantics.default = { marpa.ops.lua, result_is_undef_key, op_bail_key, 0 }
-        recce.token_semantics.default = { marpa.ops.lua, result_is_token_value_key, op_bail_key, 0 }
-        recce.rule_semantics.default = { marpa.ops.lua, result_is_undef_key, op_bail_key, 0 }
+        recce.nulling_semantics.default = { op_lua, result_is_undef_key, op_bail_key, 0 }
+        recce.token_semantics.default = { op_lua, result_is_token_value_key, op_bail_key, 0 }
+        recce.rule_semantics.default = { op_lua, result_is_undef_key, op_bail_key, 0 }
 
         recce.trace_values = trace_values;
         recce.trace_values_queue = {};

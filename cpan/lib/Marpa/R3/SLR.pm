@@ -243,7 +243,7 @@ END_OF_LUA
     }
 
     {
-        my ($trace_terminals) = $thin_slr->call_by_tag(
+        my ($trace_terminals) = $slr->call_by_tag(
     (__FILE__ . ':' . __LINE__),
             <<'END_OF_LUA', '');
         local recce = ...
@@ -349,7 +349,7 @@ sub common_set {
         if ($normalized_value) {
             say {$trace_file_handle} qq{Setting trace_terminals option};
         }
-        $thin_slr->call_by_tag(
+        $slr->call_by_tag(
     (__FILE__ . ':' . __LINE__),
         <<'END_OF_LUA',
             local recce, trace_terminals = ...
@@ -415,7 +415,7 @@ sub Marpa::R3::Scanless::R::error {
 }
 
 sub Marpa::R3::Scanless::R::read {
-    my ( $self, $p_string, $start_pos, $length ) = @_;
+    my ( $slr, $p_string, $start_pos, $length ) = @_;
 
     Marpa::R3::exception(
     q{Attempt to use a tainted input string in $slr->read()},
@@ -427,7 +427,7 @@ sub Marpa::R3::Scanless::R::read {
     Marpa::R3::exception(
         "Multiple read()'s tried on a scannerless recognizer\n",
         '  Currently the string cannot be changed once set'
-    ) if defined $self->[Marpa::R3::Internal::Scanless::R::P_INPUT_STRING];
+    ) if defined $slr->[Marpa::R3::Internal::Scanless::R::P_INPUT_STRING];
 
     if ( ( my $ref_type = ref $p_string ) ne 'SCALAR' ) {
         my $desc = $ref_type ? "a ref to $ref_type" : 'not a ref';
@@ -442,11 +442,9 @@ sub Marpa::R3::Scanless::R::read {
             '  It should be a ref to a defined scalar' );
     } ## end if ( ( my $ref_type = ref $p_string ) ne 'SCALAR' )
 
-    $self->[Marpa::R3::Internal::Scanless::R::P_INPUT_STRING] = $p_string;
+    $slr->[Marpa::R3::Internal::Scanless::R::P_INPUT_STRING] = $p_string;
 
-    my $thin_slr = $self->[Marpa::R3::Internal::Scanless::R::SLR_C];
-
-        $thin_slr->call_by_tag(
+    $slr->call_by_tag(
     ('@' . __FILE__ . ':' . __LINE__),
         <<'END_OF_LUA', 'i', [unpack('C*', ${$p_string})],
             local recce, codepoints = ...
@@ -455,9 +453,9 @@ sub Marpa::R3::Scanless::R::read {
 END_OF_LUA
             );
 
-    return 0 if @{ $self->[Marpa::R3::Internal::Scanless::R::EVENTS] };
+    return 0 if @{ $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] };
 
-    return $self->resume( $start_pos, $length );
+    return $slr->resume( $start_pos, $length );
 
 } ## end sub Marpa::R3::Scanless::R::read
 
@@ -880,10 +878,14 @@ sub Marpa::R3::Scanless::R::resume {
 
         if ( $problem_code eq 'unregistered char' ) {
 
-            state $op_alternative  = Marpa::R3::Thin::op('alternative');
-            state $op_invalid_char = Marpa::R3::Thin::op('invalid_char');
-            state $op_earleme_complete =
-                Marpa::R3::Thin::op('earleme_complete');
+            my ( $op_alternative , $op_invalid_char , $op_earleme_complete ) = $slg->call_by_tag(
+    (__FILE__ . ':' . __LINE__),
+        <<'END_OF_LUA',
+            return kollos.defines.MARPA_OP_ALTERNATIVE,
+            kollos.defines.MARPA_OP_INVALID_CHAR,
+            kollos.defines.MARPA_OP_EARLEME_COMPLETE
+END_OF_LUA
+            '');
 
             # Recover by registering character, if we can
             my $codepoint = $thin_slr->codepoint();
@@ -901,7 +903,7 @@ sub Marpa::R3::Scanless::R::resume {
                 my ( $symbol_id, $re ) = @{$entry};
                 if ( $character =~ $re ) {
 
-        my ($trace_terminals) = $thin_slr->call_by_tag(
+        my ($trace_terminals) = $slr->call_by_tag(
     (__FILE__ . ':' . __LINE__),
         <<'END_OF_LUA',
             local recce = ...
@@ -953,7 +955,7 @@ sub Marpa::R3::Scanless::R::events {
 sub Marpa::R3::Scanless::R::xs_events {
     my ($slr) = @_;
     my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
-    my ($event_queue) = $thin_slr->call_by_tag(
+    my ($event_queue) = $slr->call_by_tag(
     (__FILE__ . ':' . __LINE__),
     <<'END_OF_LUA',
         recce = ...

@@ -83,70 +83,6 @@ static void lua_refdec(lua_State* L)
     }
 }
 
-#include "marpa_slifop.h"
-
-static const char*
-marpa_slif_op_name (Marpa_Op op_id)
-{
-  if (op_id >= (int)Dim(op_name_by_id_object)) return "unknown";
-  return op_name_by_id_object[op_id];
-}
-
-static int
-marpa_slif_op_id (const char *name)
-{
-  int lo = 0;
-  int hi = Dim (op_by_name_object) - 1;
-  while (hi >= lo)
-    {
-      const int trial = lo + (hi - lo) / 2;
-      const char *trial_name = op_by_name_object[trial].name;
-      int cmp = strcmp (name, trial_name);
-      if (!cmp)
-        return (int)op_by_name_object[trial].op;
-      if (cmp < 0)
-        {
-          hi = trial - 1;
-        }
-      else
-        {
-          lo = trial + 1;
-        }
-    }
-  return -1;
-}
-
-/* Assumes the marpa table is on the top of the stack,
- * and leaves it there.
- */
-static void populate_ops(lua_State* L)
-{
-    int op_table;
-    lua_Integer i;
-    const int marpa_table = marpa_lua_gettop(L);
-
-    marpa_lua_newtable(L);
-    /* [ marpa_table, op_table ] */
-    marpa_lua_pushvalue(L, -1);
-    /* [ marpa_table, op_table, op_table ] */
-    marpa_lua_setfield(L, marpa_table, "ops");
-    /* [ marpa_table, op_table ] */
-    op_table = marpa_lua_gettop(L);
-    for (i = 0; i < (lua_Integer)Dim(op_by_name_object); i++) {
-        /* [ marpa_table, op_table ] */
-        marpa_lua_pushinteger(L, i);
-        /* [ marpa_table, op_table, i ] */
-        marpa_lua_setfield(L, op_table, op_by_name_object[i].name);
-        /* [ marpa_table, op_table ] */
-        marpa_lua_pushinteger(L, i);
-        marpa_lua_pushstring(L, op_by_name_object[i].name);
-        /* [ marpa_table, op_table, i, name ] */
-        marpa_lua_settable(L, op_table);
-        /* [ marpa_table, op_table ] */
-    }
-    marpa_lua_settop(L, marpa_table);
-}
-
 static void marpa_slr_lexeme_clear( Scanless_R* slr )
 {
   slr->t_lexeme_count = 0;
@@ -3024,34 +2960,6 @@ PPCODE:
     }
 }
 
- # This search is not optimized.  This list is short
- # and the data is constant, so that
- # and lookup is expected to be done once by an application
- # and memoized.
-void
-op( op_name )
-     char *op_name;
-PPCODE:
-{
-  const int op_id = marpa_slif_op_id (op_name);
-  if (op_id >= 0)
-    {
-      XSRETURN_IV ((IV) op_id);
-    }
-  croak ("Problem with Marpa::R3::Thin->op('%s'): No such op", op_name);
-}
-
- # This search is not optimized.  This list is short
- # and the data is constant.  It is expected this lookup
- # will be done mainly for error messages.
-void
-op_name( op )
-     UV op;
-PPCODE:
-{
-  XSRETURN_PV (marpa_slif_op_name(op));
-}
-
 void
 version()
 PPCODE:
@@ -4711,12 +4619,10 @@ PPCODE:
     marpa_lua_setfield (L, marpa_table, "array");
     /* Lua stack: [ marpa_table ] */
 
+    /* TODO: Delete this? */
     marpa_lua_newtable (L);
     /* Lua stack: [ marpa_table, context_table ] */
     marpa_lua_setfield (L, marpa_table, "context");
-    /* Lua stack: [ marpa_table ] */
-
-    populate_ops(L);
     /* Lua stack: [ marpa_table ] */
 
     marpa_lua_settop (L, base_of_stack);

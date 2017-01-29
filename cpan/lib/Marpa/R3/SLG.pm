@@ -207,12 +207,10 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     my $thin_slg = $slg->[Marpa::R3::Internal::Scanless::G::C] =
       Marpa::R3::Thin::SLG->new($kollos);
 
-    state $op_lua = Marpa::R3::Thin::op('lua');
-    $thin_slg->call_by_tag(
+    $slg->call_by_tag(
         ('@' .__FILE__ . ':' .  __LINE__),
-        <<'END_OF_LUA', 'i', $op_lua);
-        local grammar, arg = ...
-        op_lua = arg
+        <<'END_OF_LUA', '');
+        local grammar = ...
         grammar.l0_rules = {}
         grammar.l0_symbols = {}
         grammar.g1_rules = {}
