@@ -685,16 +685,16 @@ END_OF_LUA
 
             # $slr->call_by_name( 'token_register', $signature, $id, @ops);
 
-                my ($constant_ix) = $slr->call_by_tag(
+                my ($constant_ix) = $slg->call_by_tag(
         (__FILE__ . ':' .  __LINE__),
     << 'END_OF_LUA', 'sii', $type, $id, \@ops);
-                local recce, type, id, ops = ...
+                local grammar, type, id, ops = ...
                 if type == 'token' then
-                    recce.token_semantics[id] = ops
+                    grammar.token_semantics[id] = ops
                 elseif type == 'nulling' then
-                    recce.nulling_semantics[id] = ops
+                    grammar.nulling_semantics[id] = ops
                 elseif type == 'rule' then
-                    recce.rule_semantics[id] = ops
+                    grammar.rule_semantics[id] = ops
                 end
 END_OF_LUA
 

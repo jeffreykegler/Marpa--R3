@@ -168,6 +168,7 @@ use constant REGISTRATIONS => 28;
 use constant NULL_VALUES => 29;
 use constant CLOSURE_BY_SYMBOL_ID => 30;
 use constant CLOSURE_BY_RULE_ID => 31;
+use constant CONSTANTS => 32;
 
 package Marpa::R3::Internal::Scanless::R;
 use constant SLG => 0;

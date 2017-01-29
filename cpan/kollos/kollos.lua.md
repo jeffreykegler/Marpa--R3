@@ -360,6 +360,9 @@ This "post-new" method will become the latter part of the
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_slg.post_new(grammar)
+        grammar.nulling_semantics = {}
+        grammar.rule_semantics = {}
+        grammar.token_semantics = {}
         return
     end
 
@@ -1202,6 +1205,7 @@ with "trace" and "do not return" being special cases.
     -- miranda: section+ VM operations
     function _M.class_slr.find_and_do_ops(recce)
         recce.trace_values_queue = {}
+        local grammar = recce.slg
         while true do
             local new_values = {}
             local ops = {}
@@ -1210,23 +1214,23 @@ with "trace" and "do not return" being special cases.
                 return 0, new_values
             end
             if recce.this_step.type == 'MARPA_STEP_RULE' then
-                ops = recce.rule_semantics[recce.this_step.rule]
+                ops = grammar.rule_semantics[recce.this_step.rule]
                 if not ops then
-                    ops = recce.rule_semantics.default
+                    ops = _M.rule_semantics_default
                 end
                 goto DO_OPS
             end
             if recce.this_step.type == 'MARPA_STEP_TOKEN' then
-                ops = recce.token_semantics[recce.this_step.symbol]
+                ops = grammar.token_semantics[recce.this_step.symbol]
                 if not ops then
-                    ops = recce.token_semantics.default
+                    ops = _M.token_semantics_default
                 end
                 goto DO_OPS
             end
             if recce.this_step.type == 'MARPA_STEP_NULLING_SYMBOL' then
-                ops = recce.nulling_semantics[recce.this_step.symbol]
+                ops = grammar.nulling_semantics[recce.this_step.symbol]
                 if not ops then
-                    ops = recce.nulling_semantics.default
+                    ops = _M.nulling_semantics_default
                 end
                 goto DO_OPS
             end
@@ -1261,14 +1265,9 @@ Set up the default VM operations
         local result_is_undef_key = _M.vm_op_keys["result_is_undef"]
         local result_is_token_value_key = _M.vm_op_keys["result_is_token_value"]
 
-        -- io.stderr:write('Initializing rule semantics to {}\n')
-        _M.rule_semantics = {}
-        _M.token_semantics = {}
-        _M.nulling_semantics = {}
-
-        -- _M.nulling_semantics.default = { op_lua, result_is_undef_key, op_bail_key, 0 }
-        -- _M.token_semantics.default = { op_lua, result_is_token_value_key, op_bail_key, 0 }
-        -- _M.rule_semantics.default = { op_lua, result_is_undef_key, op_bail_key, 0 }
+        _M.nulling_semantics_default = { op_lua, result_is_undef_key, op_bail_key, 0 }
+        _M.token_semantics_default = { op_lua, result_is_token_value_key, op_bail_key, 0 }
+        _M.rule_semantics_default = { op_lua, result_is_undef_key, op_bail_key, 0 }
 
     end
 
@@ -1828,22 +1827,6 @@ Called when a valuator is set up.
             error('no recce.lmw_v in value_init()')
         end
 
-        -- we record these values to set the defaults, below
-        local op_lua = _M.defines.MARPA_OP_LUA
-        local op_bail_key = _M.vm_op_keys["bail"]
-        local result_is_constant_key = _M.vm_op_keys["result_is_constant"]
-        local result_is_undef_key = _M.vm_op_keys["result_is_undef"]
-        local result_is_token_value_key = _M.vm_op_keys["result_is_token_value"]
-
-        -- io.stderr:write('Initializing rule semantics to {}\n')
-        recce.rule_semantics = {}
-        recce.token_semantics = {}
-        recce.nulling_semantics = {}
-
-        recce.nulling_semantics.default = { op_lua, result_is_undef_key, op_bail_key, 0 }
-        recce.token_semantics.default = { op_lua, result_is_token_value_key, op_bail_key, 0 }
-        recce.rule_semantics.default = { op_lua, result_is_undef_key, op_bail_key, 0 }
-
         recce.trace_values = trace_values;
         recce.trace_values_queue = {};
         if recce.trace_values > 0 then
@@ -1870,9 +1853,6 @@ It should free all memory associated with the valuation.
 
     function _M.class_slr.valuation_reset(recce)
         -- io.stderr:write('Initializing rule semantics to nil\n')
-        recce.rule_semantics = nil
-        recce.token_semantics = nil
-        recce.nulling_semantics = nil
 
         recce.trace_values = 0;
         recce.trace_values_queue = {};
