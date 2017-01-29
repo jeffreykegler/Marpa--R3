@@ -1249,6 +1249,32 @@ with "trace" and "do not return" being special cases.
 
 ```
 
+Set up the default VM operations
+
+```
+    -- miranda: section+ VM default operations
+    do
+        -- we record these values to set the defaults, below
+        local op_bail_key = _M.vm_op_keys["bail"]
+        local result_is_constant_key = _M.vm_op_keys["result_is_constant"]
+        local result_is_undef_key = _M.vm_op_keys["result_is_undef"]
+        local result_is_token_value_key = _M.vm_op_keys["result_is_token_value"]
+
+        -- io.stderr:write('Initializing rule semantics to {}\n')
+        _M.rule_semantics = {}
+        _M.token_semantics = {}
+        _M.nulling_semantics = {}
+
+        -- _M.nulling_semantics.default = { marpa.ops.lua, result_is_undef_key, op_bail_key, 0 }
+        -- _M.token_semantics.default = { marpa.ops.lua, result_is_token_value_key, op_bail_key, 0 }
+        -- _M.rule_semantics.default = { marpa.ops.lua, result_is_undef_key, op_bail_key, 0 }
+
+
+    end
+
+
+```
+
 ### Tree export operations
 
 The "tree export operations" are performed when a tree is transformed
@@ -2720,6 +2746,7 @@ a special "configuration" argument.
 
     -- miranda: insert VM utilities
     -- miranda: insert VM operations
+    -- miranda: insert VM default operations
     -- miranda: insert grammar Libmarpa wrapper Lua functions
     -- miranda: insert recognizer Libmarpa wrapper Lua functions
     -- miranda: insert valuator Libmarpa wrapper Lua functions
