@@ -444,6 +444,7 @@ END_OF_TEXT
     while ( my $value_ref = $recce->value() ) {
 
         my $value = $value_ref ? ${$value_ref} : 'No parse';
+        $value //= '[undef]';
         if ( defined $expected->{$value} ) {
             delete $expected->{$value};
             Test::More::pass(qq{Expected result for length=$i, "$value"});

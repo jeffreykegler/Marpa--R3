@@ -291,20 +291,6 @@ Marpa::R3::Test::is( 49, $value, 'Implementation Example Value 2' );
 
 my $expected_trace_output = <<'END_TRACE_OUTPUT';
 Setting trace_values option to 3
-Registering semantics for rule: Calculator ::= Expression
-  Semantics are lua result_is_n_of_rhs 0
-Registering semantics for rule: Factor ::= Number
-  Semantics are lua result_is_n_of_rhs 0
-Registering semantics for rule: Term ::= Term [Lex-0] Factor
-  Semantics are lua push_one 0 lua push_one 1 lua push_one 2 lua callback bail
-Registering semantics for rule: Term ::= Factor
-  Semantics are lua result_is_n_of_rhs 0
-Registering semantics for rule: Expression ::= Expression [Lex-1] Term
-  Semantics are lua push_one 0 lua push_one 1 lua push_one 2 lua callback bail
-Registering semantics for rule: Expression ::= Term
-  Semantics are lua result_is_n_of_rhs 0
-Registering semantics for rule: [:start] ::= Calculator
-  Semantics are lua result_is_n_of_rhs 0
 value event: starting op MARPA_STEP_TOKEN lua
 value event: starting lua op MARPA_STEP_TOKEN result_is_token_value
 value event: starting op MARPA_STEP_RULE lua

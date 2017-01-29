@@ -615,7 +615,91 @@ sub brief_rule_list {
     return join q{}, map { q{    } . $_ . "\n" } @brief_rules;
 }
 
-sub find_registrations {
+sub registrations_set
+{
+  my ( $slr) = @_;
+  my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+  my $tracer        = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
+  my $trace_file_handle =
+      $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE];
+  my $trace_actions =
+      $slg->[Marpa::R3::Internal::Scanless::G::TRACE_ACTIONS] // 0;
+  REGISTRATION:
+    for my $registration (
+        @{ $slg->[Marpa::R3::Internal::Scanless::G::REGISTRATIONS] } )
+    {
+        my ( $type, $id, @raw_ops ) = @{$registration};
+        my @ops = ();
+      PRINT_TRACES: {
+            last PRINT_TRACES if $trace_actions <= 2;
+            if ( $type eq 'nulling' ) {
+                say {$trace_file_handle}
+                  "Registering semantics for nulling symbol: ",
+                  $tracer->symbol_name($id),
+                  "\n", '  Semantics are ', $slr->show_semantics(@raw_ops)
+                  or Marpa::R3::exception('Cannot say to trace file handle');
+                last PRINT_TRACES;
+            } ## end if ( $type eq 'nulling' )
+            if ( $type eq 'rule' ) {
+                say {$trace_file_handle}
+                  "Registering semantics for $type: ",
+                  $tracer->show_rule($id),
+                  '  Semantics are ', $slr->show_semantics(@raw_ops)
+                  or Marpa::R3::exception('Cannot say to trace file handle');
+                last PRINT_TRACES;
+            }
+            if ( $type eq 'token' ) {
+                say {$trace_file_handle}
+                  "Registering semantics for $type: ",
+                  $tracer->symbol_name($id),
+                  "\n", '  Semantics are ', $slr->show_semantics(@raw_ops)
+                  or Marpa::R3::exception('Cannot say to trace file handle');
+                last PRINT_TRACES;
+            }
+            say {$trace_file_handle} "Registration has unknown type: $type"
+              or Marpa::R3::exception('Cannot say to trace file handle');
+        } ## end PRINT_TRACES:
+
+      OP: for my $raw_op (@raw_ops) {
+            if ( ref $raw_op ) {
+
+                my ($constant_ix) = $slr->call_by_tag(
+        (__FILE__ . ':' .  __LINE__),
+    << 'END_OF_LUA', 'S>*', ${$raw_op});
+                local recce, sv = ...
+                return recce:constant_register(sv)
+END_OF_LUA
+
+                push @ops, $constant_ix;
+                next OP;
+            }
+            push @ops, $raw_op;
+        } ## end OP: for my $raw_op (@raw_ops)
+
+            # $slr->call_by_name( 'token_register', $signature, $id, @ops);
+
+                my ($constant_ix) = $slr->call_by_tag(
+        (__FILE__ . ':' .  __LINE__),
+    << 'END_OF_LUA', 'sii', $type, $id, \@ops);
+                local recce, type, id, ops = ...
+                if type == 'token' then
+                    recce.token_semantics[id] = ops
+                elseif type == 'nulling' then
+                    recce.nulling_semantics[id] = ops
+                elseif type == 'rule' then
+                    recce.rule_semantics[id] = ops
+                end
+END_OF_LUA
+
+            next REGISTRATION;
+        Marpa::R3::exception(
+            'Registration: with unknown type: ',
+            Data::Dumper::Dumper($registration)
+        );
+    } ## end REGISTRATION: for my $registration ( @{ $recce->[...]})
+}
+
+sub registrations_find {
     my ($slg ) = @_;
     my $trace_file_handle =
       $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE];
@@ -1362,82 +1446,9 @@ END_OF_LUA
 END_OF_LUA
 
     if ( not $slg->[Marpa::R3::Internal::Scanless::G::REGISTRATIONS] ) {
-        find_registrations($slg );
+        registrations_find($slg );
     }
-
-  REGISTRATION:
-    for my $registration (
-        @{ $slg->[Marpa::R3::Internal::Scanless::G::REGISTRATIONS] } )
-    {
-        my ( $type, $id, @raw_ops ) = @{$registration};
-        my @ops = ();
-      PRINT_TRACES: {
-            last PRINT_TRACES if $trace_values <= 2;
-            if ( $type eq 'nulling' ) {
-                say {$trace_file_handle}
-                  "Registering semantics for nulling symbol: ",
-                  $tracer->symbol_name($id),
-                  "\n", '  Semantics are ', $slr->show_semantics(@raw_ops)
-                  or Marpa::R3::exception('Cannot say to trace file handle');
-                last PRINT_TRACES;
-            } ## end if ( $type eq 'nulling' )
-            if ( $type eq 'rule' ) {
-                say {$trace_file_handle}
-                  "Registering semantics for $type: ",
-                  $tracer->show_rule($id),
-                  '  Semantics are ', $slr->show_semantics(@raw_ops)
-                  or Marpa::R3::exception('Cannot say to trace file handle');
-                last PRINT_TRACES;
-            }
-            if ( $type eq 'token' ) {
-                say {$trace_file_handle}
-                  "Registering semantics for $type: ",
-                  $tracer->symbol_name($id),
-                  "\n", '  Semantics are ', $slr->show_semantics(@raw_ops)
-                  or Marpa::R3::exception('Cannot say to trace file handle');
-                last PRINT_TRACES;
-            }
-            say {$trace_file_handle} "Registration has unknown type: $type"
-              or Marpa::R3::exception('Cannot say to trace file handle');
-        } ## end PRINT_TRACES:
-
-      OP: for my $raw_op (@raw_ops) {
-            if ( ref $raw_op ) {
-
-                my ($constant_ix) = $slr->call_by_tag(
-        (__FILE__ . ':' .  __LINE__),
-    << 'END_OF_LUA', 'S>*', ${$raw_op});
-                local recce, sv = ...
-                return recce:constant_register(sv)
-END_OF_LUA
-
-                push @ops, $constant_ix;
-                next OP;
-            }
-            push @ops, $raw_op;
-        } ## end OP: for my $raw_op (@raw_ops)
-
-            # $slr->call_by_name( 'token_register', $signature, $id, @ops);
-
-                my ($constant_ix) = $slr->call_by_tag(
-        (__FILE__ . ':' .  __LINE__),
-    << 'END_OF_LUA', 'sii', $type, $id, \@ops);
-                local recce, type, id, ops = ...
-                if type == 'token' then
-                    recce.token_semantics[id] = ops
-                elseif type == 'nulling' then
-                    recce.nulling_semantics[id] = ops
-                elseif type == 'rule' then
-                    recce.rule_semantics[id] = ops
-                end
-END_OF_LUA
-
-            next REGISTRATION;
-        Marpa::R3::exception(
-            'Registration: with unknown type: ',
-            Data::Dumper::Dumper($registration)
-        );
-    } ## end REGISTRATION: for my $registration ( @{ $recce->[...]})
+    registrations_set($slr );
 
   STEP: while (1) {
         my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
