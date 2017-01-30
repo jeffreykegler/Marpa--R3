@@ -3829,6 +3829,7 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
     static const struct luaL_Reg grammar_methods[] = {
       { "error", lca_libmarpa_error },
       { "error_description", lca_libmarpa_error_description },
+      { "events", lca_grammar_events },
       { "precompute", lca_grammar_precompute },
       { "rule_new", lca_grammar_rule_new },
       { "sequence_new", lca_grammar_sequence_new },
@@ -4420,10 +4421,6 @@ Marpa::R3.
         marpa_lua_getfield (L, kollos_table_stack_ix, "class_recce");
         marpa_lua_pushcclosure (L, lca_grammar_event, 1);
         marpa_lua_setfield (L, kollos_table_stack_ix, "grammar_event");
-
-        marpa_lua_pushvalue (L, upvalue_stack_ix);
-        marpa_lua_pushcclosure (L, lca_grammar_events, 1);
-        marpa_lua_setfield (L, kollos_table_stack_ix, "grammar_events");
 
         marpa_lua_pushvalue (L, upvalue_stack_ix);
         marpa_lua_getfield (L, kollos_table_stack_ix, "class_recce");

@@ -1175,6 +1175,7 @@ END_OF_LUA
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'si', $lmw_name, $precompute_error_code );
     local grammar, lmw_name, error_code = ...
+    local lmw_g = grammar[lmw_name]
     local grammar, error_code = ...
     if error_code == kollos.err["START_NOT_LHS"] then
         error( "Start symbol " .. lmw_g.start_name .. " not on LHS of any rule");
@@ -1195,20 +1196,38 @@ END_OF_LUA
     # Above I went through the error events
     # Here I go through the events for situations where there was no
     # hard error returned from libmarpa
-    my $loop_rule_count = 0;
-    {
-        my $event_count = $grammar_c->event_count();
-        EVENT:
-        for ( my $event_ix = 0; $event_ix < $event_count; $event_ix++ ) {
-            my ( $event_type, $value ) = $grammar_c->event($event_ix);
-            if ( $event_type ne 'MARPA_EVENT_LOOP_RULES' ) {
-                Marpa::R3::exception(
-                    qq{Unknown grammar precomputation event; type="$event_type"}
-                );
-            }
-            $loop_rule_count = $value;
-        } ## end EVENT: for ( my $event_ix = 0; $event_ix < $event_count; ...)
-    }
+    # my $loop_rule_count = 0;
+    # if (0) {
+        # my $event_count = $grammar_c->event_count();
+        # EVENT:
+        # for ( my $event_ix = 0; $event_ix < $event_count; $event_ix++ ) {
+            # my ( $event_type, $value ) = $grammar_c->event($event_ix);
+            # if ( $event_type ne 'MARPA_EVENT_LOOP_RULES' ) {
+                # Marpa::R3::exception(
+                    # qq{Unknown grammar precomputation event; type="$event_type"}
+                # );
+            # }
+            # $loop_rule_count = $value;
+        # } ## end EVENT: for ( my $event_ix = 0; $event_ix < $event_count; ...)
+    # }
+
+      my ($loop_rule_count) = 
+      $thin_slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 's', $lmw_name );
+        local grammar, lmw_name = ...
+        local loop_rule_count = 0
+        local lmw_g = grammar[lmw_name]
+        local events = lmw_g:events()
+        for i = 1, #events, 2 do
+            local event_type = events[i]
+            if event_type == kollos.event["LOOP_RULES"] then
+                error(string.format(
+                   "Unknown grammar precomputation event; type=%q"))
+            end
+            loop_rule_count = events[i+1]
+        end
+        return loop_rule_count
+END_OF_LUA
 
     if ( $loop_rule_count ) {
         my @loop_rules =
