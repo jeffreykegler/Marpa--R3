@@ -2272,6 +2272,8 @@ the wrapper's point of view, marpa_r_alternative() always succeeds.
   --[==[ miranda: exec declare standard libmarpa wrappers
   signatures = {
     {"marpa_g_completion_symbol_activate", "Marpa_Symbol_ID", "sym_id", "int", "activate"},
+    {"marpa_g_default_rank"},
+    {"marpa_g_default_rank_set", "Marpa_Rank", "rank" },
     {"marpa_g_error_clear"},
     {"marpa_g_event_count"},
     {"marpa_g_force_valued"},

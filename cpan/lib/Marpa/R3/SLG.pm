@@ -1391,7 +1391,6 @@ sub add_G1_user_rule {
     my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     my $subgrammar = $tracer->[Marpa::R3::Internal::Trace::G::NAME];
     my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
-    my $default_rank = $grammar_c->default_rank();
 
     my ( $lhs_name, $rhs_names, $action, $blessing );
     my ( $min, $separator_name );
@@ -1430,6 +1429,13 @@ sub add_G1_user_rule {
 
 
     $rhs_names //= [];
+
+    my ($default_rank) =
+          $thin_slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ), <<'END_OF_LUA', '');
+    local grammar = ...
+    return grammar.lmw_g1g:default_rank()
+END_OF_LUA
+
     $rank //= $default_rank;
     $null_ranking //= 'low';
 
@@ -1540,7 +1546,6 @@ sub add_L0_user_rule {
 
     my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER];
     my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
-    my $default_rank = $grammar_c->default_rank();
 
     my ( $lhs_name, $rhs_names, $action, $blessing );
     my ( $min, $separator_name );
@@ -1579,6 +1584,12 @@ sub add_L0_user_rule {
 
 
     $rhs_names //= [];
+
+    my ($default_rank) =
+          $thin_slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ), <<'END_OF_LUA', '');
+    local grammar = ...
+    return grammar.lmw_l0g:default_rank()
+END_OF_LUA
     $rank //= $default_rank;
     $null_ranking //= 'low';
 
