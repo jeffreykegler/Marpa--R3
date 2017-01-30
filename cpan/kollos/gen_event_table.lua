@@ -38,6 +38,7 @@ end
 local f = assert(io.open(input_file_name, "r"))
 local code_lines = {}
 local code_mnemonics = {}
+local code_raw_mnemonics = {}
 local max_code = 0
 while true do
     local line = f:read()
@@ -57,6 +58,7 @@ while true do
 	if code > max_code then max_code = code end
 	local mnemonic = 'LIBMARPA_EVENT_' .. raw_mnemonic
 	code_mnemonics[code] = mnemonic
+	code_raw_mnemonics[code] = raw_mnemonic
 	code_lines[code] = string.format( '   { %d, %s, %s },',
 	    code,
 	    c_safe_string(mnemonic),
@@ -100,7 +102,7 @@ io.write('```\n');
 
 local by_code = {}
 local by_mnemonic = {}
-for code, mnemonic in pairs(code_mnemonics) do
+for code, mnemonic in pairs(code_raw_mnemonics) do
      by_code[#by_code+1] = string.format(
        "    _M.event[%d] = { code = %d, name=%q }\n",
 	   code, code, mnemonic)

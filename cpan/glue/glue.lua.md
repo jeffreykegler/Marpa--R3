@@ -73,8 +73,11 @@ we may want meaningful performance numbers.
     inspect = require "inspect"
     kollos = require "kollos"
 
+    -- This is a useful point to check the namespaces
     -- print('_G: ', inspect(_G, { depth = 1 }))
     -- print('kollos: ', inspect(kollos, { depth = 1 }))
+    -- print('kollos.event: ', inspect(kollos.event ))
+    -- print('kollos.step: ', inspect(kollos.step ))
 
     -- create globals from selection Kollos variables
     valuation_reset = kollos.class_slr.valuation_reset
