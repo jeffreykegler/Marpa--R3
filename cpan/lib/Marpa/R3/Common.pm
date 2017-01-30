@@ -81,16 +81,6 @@ sub Marpa::R3::flatten_hash_args {
     return \%flat_args;
 }
 
-sub Marpa::R3::uncaught_error {
-    my ($error) = @_;
-
-    # This would be Carp::confess, but in the testing
-    # the stack trace includes the hoped for error
-    # message, which causes spurious success reports.
-    Carp::croak( "libmarpa reported an error which Marpa::R3 did not catch\n",
-        $error );
-} ## end sub Marpa::R3::uncaught_error
-
 sub Marpa::R3::exception {
     my $exception = join q{}, @_;
     $exception =~ s/ \n* \z /\n/xms;

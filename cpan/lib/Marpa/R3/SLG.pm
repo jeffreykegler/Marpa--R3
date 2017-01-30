@@ -488,6 +488,14 @@ END_OF_LUA
     $g1_tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID] = [];
     $g1_tracer->[Marpa::R3::Internal::Trace::G::START_NAME]   = '[:start]';
 
+    $slg->call_by_tag(
+        ('@' .__FILE__ . ':' .  __LINE__),
+        <<'END_OF_LUA', '');
+        local grammar = ...
+        local g1g = grammar.lmw_g1g
+        g1g.start_name = '[:start]'
+END_OF_LUA
+
     for my $symbol ( sort keys %{ $hashed_source->{symbols}->{G1} } ) {
         assign_G1_symbol( $slg, $symbol,
             $hashed_source->{symbols}->{G1}->{$symbol} );
@@ -712,6 +720,14 @@ END_OF_LUA
     $lex_tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID] = [];
     $lex_tracer->[Marpa::R3::Internal::Trace::G::START_NAME] =
       $lex_start_symbol_name;
+
+    $slg->call_by_tag(
+        ('@' .__FILE__ . ':' .  __LINE__),
+        <<'END_OF_LUA', 's', $lex_start_symbol_name);
+        local grammar, start_name = ...
+        local l0g = grammar.lmw_l0g
+        l0g.start_name = start_name
+END_OF_LUA
 
     for my $symbol ( sort keys %this_lexer_symbols ) {
         my $properties = $this_lexer_symbols{$symbol};
