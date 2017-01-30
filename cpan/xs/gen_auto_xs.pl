@@ -144,7 +144,6 @@ print {$out} 'MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::G', "\n\n";
 
 say {$out} gp_generate(qw(completion_symbol_activate Marpa_Symbol_ID sym_id int activate));
 say {$out} gp_generate(qw(error_clear));
-say {$out} gp_generate(qw(event_count));
 say {$out} gp_generate(qw(force_valued));
 say {$out} gp_generate(qw(has_cycle));
 say {$out} gp_generate(qw(highest_rule_id));

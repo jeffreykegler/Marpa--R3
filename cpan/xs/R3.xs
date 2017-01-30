@@ -3249,36 +3249,6 @@ PPCODE:
 
 
 void
-event( g_wrapper, ix )
-    G_Wrapper *g_wrapper;
-    int ix;
-PPCODE:
-{
-  Marpa_Grammar g = g_wrapper->g;
-  Marpa_Event event;
-  const char *result_string = NULL;
-  Marpa_Event_Type result = marpa_g_event (g, &event, ix);
-  if (result < 0)
-    {
-      if (!g_wrapper->throw)
-        {
-          XSRETURN_UNDEF;
-        }
-      croak ("Problem in g->event(): %s", xs_g_error (g_wrapper));
-    }
-  result_string = event_type_to_string (result);
-  if (!result_string)
-    {
-      char *error_message =
-        form ("event(%d): unknown event code, %d", ix, result);
-      set_error_from_string (g_wrapper, savepv(error_message));
-      XSRETURN_UNDEF;
-    }
-  XPUSHs (sv_2mortal (newSVpv (result_string, 0)));
-  XPUSHs (sv_2mortal (newSViv (marpa_g_event_value (&event))));
-}
-
-void
 default_rank( g_wrapper )
     G_Wrapper *g_wrapper;
 PPCODE:
