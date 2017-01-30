@@ -1130,34 +1130,29 @@ END_OF_LUA
 
     if ( $precompute_error_code != $Marpa::R3::Error::NONE ) {
 
-        # Report the errors, then return failure
-
-        if ( $precompute_error_code == $Marpa::R3::Error::NO_RULES ) {
-            Marpa::R3::exception(
-                'Attempted to precompute grammar with no rules');
-        }
-        if ( $precompute_error_code == $Marpa::R3::Error::NULLING_TERMINAL ) {
-            my @nulling_terminals = ();
-            my $event_count       = $grammar_c->event_count();
-            EVENT:
-            for ( my $event_ix = 0; $event_ix < $event_count; $event_ix++ ) {
-                my ( $event_type, $value ) = $grammar_c->event($event_ix);
-                if ( $event_type eq 'MARPA_EVENT_NULLING_TERMINAL' ) {
-                    push @nulling_terminals, $tracer->symbol_name($value);
-                }
-            } ## end EVENT: for ( my $event_ix = 0; $event_ix < $event_count; ...)
-            my @nulling_terminal_messages =
-                map {qq{Nulling symbol "$_" is also a terminal\n}}
-                @nulling_terminals;
-            Marpa::R3::exception( @nulling_terminal_messages,
-                'A terminal symbol cannot also be a nulling symbol' );
-        } ## end if ( $precompute_error_code == ...)
-
       my ($ok, $result) =
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'si', $lmw_name, $precompute_error_code );
     local grammar, lmw_name, error_code = ...
     local lmw_g = grammar[lmw_name]
+    if error_code == kollos.err["NO_RULES"] then
+        return "fail", 'Attempted to precompute grammar with no rules'
+    end
+    if error_code == kollos.err["NULLING_TERMINAL"] then
+        local msgs = {}
+        local events = lmw_g:events()
+        for i = 1, #events, 2 do
+            local event_type = events[i]
+            if event_type == kollos.event["NULLING_TERMINAL"] then
+                msgs[#msgs+1] =
+                   string.format("Nullable symbol %q is also a terminal\n",
+                       lmw_g:symbol_name(events[i+1])
+                   )
+            end
+        end
+        msgs[#msgs+1] = 'A terminal symbol cannot also be a nulling symbol'
+        return "fail", table.concat(msgs)
+    end
     if error_code == kollos.err["COUNTED_NULLABLE"] then
         local msgs = {}
         local events = lmw_g:events()
