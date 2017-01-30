@@ -1112,44 +1112,51 @@ sub Marpa::R3::Scanless::R::read_problem {
             $desc = 'Unexpected return value from lexer: Parse exhausted';
             last DESC;
         }
+
         if ($g1_status) {
-            my $true_event_count = $thin_g1->event_count();
-            EVENT:
-            for (
-                my $event_ix = 0;
-                $event_ix < $true_event_count;
-                $event_ix++
-                )
-            {
-                my ( $event_type, $value ) =
-                    $thin_g1->event($event_ix);
-                if ( $event_type eq 'MARPA_EVENT_EARLEY_ITEM_THRESHOLD' ) {
-                    $desc = join "\n", $desc,
-                        "G1 grammar: Earley item count ($value) exceeds warning threshold\n";
-                    next EVENT;
-                }
-                if ( $event_type eq 'MARPA_EVENT_SYMBOL_EXPECTED' ) {
-                    $desc = join "\n", $desc,
-                        "Unexpected G1 grammar event: $event_type "
-                        . $g1_tracer->symbol_name($value);
-                    next EVENT;
-                } ## end if ( $event_type eq 'MARPA_EVENT_SYMBOL_EXPECTED' )
-                if ( $event_type eq 'MARPA_EVENT_EXHAUSTED' ) {
-                    $desc = join "\n", $desc, 'Parse exhausted';
-                    next EVENT;
-                }
-                Marpa::R3::exception( $desc, "\n",
-                    qq{Unknown event: "$event_type"; event value = $value\n}
-                );
-            } ## end EVENT: for ( my $event_ix = 0; $event_ix < ...)
-            last DESC;
-        } ## end if ($g1_status)
-        if ( $g1_status < 0 ) {
-            $desc = 'G1 error: ' . $thin_g1->error();
-            chomp $desc;
-            last DESC;
-        }
-    } ## end DESC:
+
+      my ($desc) = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ), <<'END_OF_LUA', '');
+    local grammar = ...
+    local g1g = grammar.lmw_g1g
+        local msgs = {}
+        local events = lmw_g:events()
+        for i = 1, #events, 2 do
+            local event_type = events[i]
+            local event_value = events[i+1]
+            if event_type == kollos.event["EARLEY_ITEM_THRESHOLD"] then
+                msgs[#msgs+1] =
+                   string.format(
+                        "G1 grammar: Earley item count (%d) exceeds warning threshold\n",
+                       event_value
+                   )
+               goto NEXT_EVENT
+            end
+            if event_type == kollos.event["EXHAUSTED"] then
+               msgs[#msgs+1] = 'Parse exhausted'
+               goto NEXT_EVENT
+            end
+            local event_mnemonic = kollos.event[event_type]
+            if mnemonic then
+               msgs[#msgs+1] =
+                   string.format( "Unexpected G1 grammar event: %q", mnemonic)
+               goto NEXT_EVENT
+            end
+            msgs[#msgs+1] = string.format("Unknown G1 grammar event: code = %d\n"
+            ::NEXT_EVENT::
+        end
+        msgs[#msgs+1] = 'A terminal symbol cannot also be a nulling symbol'
+        return table.concat(msgs)
+END_OF_LUA
+
+            } ## end if ($g1_status)
+            if ( $g1_status < 0 ) {
+                $desc = 'G1 error: ' . $thin_g1->error();
+                chomp $desc;
+                last DESC;
+            }
+        } ## end DESC:
+
+
     my $read_string_error;
     if ( $problem_pos < $length_of_string) {
         my $char = substr ${$p_string}, $problem_pos, 1;
