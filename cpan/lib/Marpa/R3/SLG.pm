@@ -1152,65 +1152,48 @@ END_OF_LUA
             Marpa::R3::exception( @nulling_terminal_messages,
                 'A terminal symbol cannot also be a nulling symbol' );
         } ## end if ( $precompute_error_code == ...)
-        if ( $precompute_error_code == $Marpa::R3::Error::COUNTED_NULLABLE ) {
-            my @counted_nullables = ();
-            my $event_count       = $grammar_c->event_count();
-            EVENT:
-            for ( my $event_ix = 0; $event_ix < $event_count; $event_ix++ ) {
-                my ( $event_type, $value ) = $grammar_c->event($event_ix);
-                if ( $event_type eq 'MARPA_EVENT_COUNTED_NULLABLE' ) {
-                    push @counted_nullables, $tracer->symbol_name($value);
-                }
-            } ## end EVENT: for ( my $event_ix = 0; $event_ix < $event_count; ...)
-            my @counted_nullable_messages = map {
-                      q{Nullable symbol "}
-                    . $_
-                    . qq{" is on rhs of counted rule\n}
-            } @counted_nullables;
-            Marpa::R3::exception( @counted_nullable_messages,
-                'Counted nullables confuse Marpa -- please rewrite the grammar'
-            );
-        } ## end if ( $precompute_error_code == ...)
 
+      my ($ok, $result) =
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'si', $lmw_name, $precompute_error_code );
     local grammar, lmw_name, error_code = ...
     local lmw_g = grammar[lmw_name]
-    local grammar, error_code = ...
+    if error_code == kollos.err["COUNTED_NULLABLE"] then
+        local msgs = {}
+        local events = lmw_g:events()
+        for i = 1, #events, 2 do
+            local event_type = events[i]
+            if event_type == kollos.event["COUNTED_NULLABLE"] then
+                msgs[#msgs+1] =
+                   string.format("Nullable symbol %q is on RHS of counted rule\n",
+                       lmw_g:symbol_name(events[i+1])
+                   )
+            end
+        end
+        msgs[#msgs+1] = 'Counted nullables confuse Marpa -- please rewrite the grammar'
+        return "fail", table.concat(msgs)
+    end
     if error_code == kollos.err["START_NOT_LHS"] then
         error( "Start symbol " .. lmw_g.start_name .. " not on LHS of any rule");
     end
     if error_code == kollos.err["NO_START_SYMBOL"] then
             error('No start symbol')
     end
+    if error_code ~= kollos.err["UNPRODUCTIVE_START"] then
+            return "fail", lmw_g:error_description()
+    end
+    return "ok"
 END_OF_LUA
 
-        return $precompute_error_code
-            if $precompute_error_code
-            == $Marpa::R3::Error::UNPRODUCTIVE_START;
+    if ($ok ne "ok") { Marpa::R3::exception( $result ); }
 
-        Marpa::R3::uncaught_error( scalar $grammar_c->error() );
+    return $precompute_error_code;
 
     } ## end if ( $precompute_error_code != $Marpa::R3::Error::NONE)
 
     # Above I went through the error events
     # Here I go through the events for situations where there was no
     # hard error returned from libmarpa
-    # my $loop_rule_count = 0;
-    # if (0) {
-        # my $event_count = $grammar_c->event_count();
-        # EVENT:
-        # for ( my $event_ix = 0; $event_ix < $event_count; $event_ix++ ) {
-            # my ( $event_type, $value ) = $grammar_c->event($event_ix);
-            # if ( $event_type ne 'MARPA_EVENT_LOOP_RULES' ) {
-                # Marpa::R3::exception(
-                    # qq{Unknown grammar precomputation event; type="$event_type"}
-                # );
-            # }
-            # $loop_rule_count = $value;
-        # } ## end EVENT: for ( my $event_ix = 0; $event_ix < $event_count; ...)
-    # }
-
       my ($loop_rule_count) = 
       $thin_slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 's', $lmw_name );

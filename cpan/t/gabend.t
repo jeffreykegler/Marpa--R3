@@ -74,7 +74,7 @@ END_OF_DSL
     test_grammar(
         'counted nullable',
         $counted_nullable_grammar,
-        qq{Nullable symbol "Seq" is on rhs of counted rule\n}
+        qq{Nullable symbol "Seq" is on RHS of counted rule\n}
           . qq{Counted nullables confuse Marpa -- please rewrite the grammar\n}
     );
 }
