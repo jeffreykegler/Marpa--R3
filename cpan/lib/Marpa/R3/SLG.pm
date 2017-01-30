@@ -1081,7 +1081,25 @@ sub Marpa::R3::Internal::Scanless::G::precompute {
         Marpa::R3::uncaught_error( scalar $grammar_c->error() );
     }
 
-    set_start_symbol($tracer);
+      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 's', $lmw_name );
+    local grammar, lmw_name = ...
+    local lmw_g = grammar[lmw_name]
+    local start_name = lmw_g.start_name
+    local start_id = lmw_g.isyid_by_name[start_name]
+    if not start_id then
+        error(string.format(
+"Internal error: Start symbol %q missing from grammar", start_name))
+    end
+    local result = lmw_g:start_symbol_set(start_id)
+    if result < 0 then
+        error(string.format(
+            "Internal error: start_symbol_set() of %q failed; %s",
+                start_name,
+                lmw_g:error_description()
+        ))
+    end
+END_OF_LUA
 
     # Catch errors in precomputation
     my ($precompute_result, $precompute_error_code) =
@@ -1157,24 +1175,17 @@ END_OF_LUA
             );
         } ## end if ( $precompute_error_code == ...)
 
-        # if ( $precompute_error_code == $Marpa::R3::Error::NO_START_SYMBOL ) {
-            # Marpa::R3::exception('No start symbol');
-        # }
-
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 'i', $precompute_error_code );
+        <<'END_OF_LUA', 'si', $lmw_name, $precompute_error_code );
+    local grammar, lmw_name, error_code = ...
     local grammar, error_code = ...
+    if error_code == kollos.err["START_NOT_LHS"] then
+        error( "Start symbol " .. lmw_g.start_name .. " not on LHS of any rule");
+    end
     if error_code == kollos.err["NO_START_SYMBOL"] then
             error('No start symbol')
     end
 END_OF_LUA
-
-
-        if ( $precompute_error_code == $Marpa::R3::Error::START_NOT_LHS ) {
-            my $name = $tracer->[Marpa::R3::Internal::Trace::G::START_NAME];
-            Marpa::R3::exception(
-                qq{Start symbol "$name" not on LHS of any rule});
-        }
 
         return $precompute_error_code
             if $precompute_error_code
@@ -1249,24 +1260,6 @@ END_OF_LUA
     return ;
 
 }
-
-sub set_start_symbol {
-    my $tracer = shift;
-
-    my $grammar_c        = $tracer->[Marpa::R3::Internal::Trace::G::C];
-    my $start_name = $tracer->[Marpa::R3::Internal::Trace::G::START_NAME];
-    my $start_id = $tracer->symbol_by_name($start_name);
-    if ( not defined $start_id ) {
-        Marpa::R3::exception(
-qq{Internal error: Start symbol $start_name missing from grammar\n}
-        );
-    }
-
-    if ( not defined $grammar_c->start_symbol_set($start_id) ) {
-        Marpa::R3::uncaught_error( $grammar_c->error() );
-    }
-    return 1;
-} ## end sub set_start_symbol
 
 
 sub assign_G1_symbol {
