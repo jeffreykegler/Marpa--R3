@@ -93,4 +93,23 @@ for i = 0, max_code do
 end
 io.write('  };\n');
 io.write('```\n');
-f:close()
+
+-- print(inspect(code_mnemonics))
+
+local by_code = {}
+local by_mnemonic = {}
+for code, mnemonic in pairs(code_mnemonics) do
+     by_code[#by_code+1] = string.format(
+       "    _M.step[%d] = { code = %d, name=%q }\n",
+	   code, code, mnemonic)
+     by_mnemonic[#by_mnemonic+1] = string.format("    _M.step[%q] = %d\n",
+	 tostring(mnemonic), code)
+end
+
+io.write('```\n');
+io.write('    -- miranda: section define Lua step codes\n');
+io.write('    _M.step = {}\n')
+io.write(table.concat(by_code, ''))
+io.write(table.concat(by_mnemonic, ''))
+io.write('\n');
+io.write('```\n');

@@ -2761,7 +2761,9 @@ a special "configuration" argument.
     -- miranda: insert diagnostics
     -- miranda: insert Utilities for semantics
     -- miranda: insert most Lua function definitions
-    -- miranda: insert define Kollos Lua error codes
+    -- miranda: insert define Lua error codes
+    -- miranda: insert define Lua event codes
+    -- miranda: insert define Lua step codes
     -- miranda: insert various Kollos Lua defines
 
     return _M

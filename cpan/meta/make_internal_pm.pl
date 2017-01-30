@@ -150,7 +150,6 @@ __DATA__
     XBNF_BY_IRLID { Array mapping IRLID to XBNF }
     ACTION_BY_IRLID
     MASK_BY_IRLID
-    START_NAME
 
     :package=Marpa::R3::Internal::Progress_Report
 

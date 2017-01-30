@@ -486,7 +486,6 @@ END_OF_LUA
     my $g1_tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER] =
       Marpa::R3::Trace::G->new($thin_slg, "G1");
     $g1_tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID] = [];
-    $g1_tracer->[Marpa::R3::Internal::Trace::G::START_NAME]   = '[:start]';
 
     $slg->call_by_tag(
         ('@' .__FILE__ . ':' .  __LINE__),
@@ -718,8 +717,6 @@ END_OF_LUA
     my $lex_tracer = $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER] =
       Marpa::R3::Trace::G->new($thin_slg, "L0");
     $lex_tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID] = [];
-    $lex_tracer->[Marpa::R3::Internal::Trace::G::START_NAME] =
-      $lex_start_symbol_name;
 
     $slg->call_by_tag(
         ('@' .__FILE__ . ':' .  __LINE__),
