@@ -1532,9 +1532,14 @@ END_OF_LUA
     $tracer->[Marpa::R3::Internal::Trace::G::MASK_BY_IRLID]->[$base_rule_id] =
         $xbnf->[Marpa::R3::Internal::XBNF::MASK];
 
-    $grammar_c->rule_null_high_set( $base_rule_id,
-        ( $null_ranking eq 'high' ? 1 : 0 ) );
-    $grammar_c->rule_rank_set( $base_rule_id, $rank );
+      $thin_slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 'iii',
+        local grammar, rule_id, ranking_is_high, rank = ...
+        local g1g = grammar.lmw_g1g
+        g1g:rule_null_high_set(rule_id, ranking_is_high)
+        g1g:rule_rank_set(rule_id, rank)
+END_OF_LUA
+            $base_rule_id, ( $null_ranking eq 'high' ? 1 : 0 ), $rank);
 
     return;
 
