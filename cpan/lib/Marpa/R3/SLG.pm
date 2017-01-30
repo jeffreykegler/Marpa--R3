@@ -1141,9 +1141,19 @@ END_OF_LUA
             );
         } ## end if ( $precompute_error_code == ...)
 
-        if ( $precompute_error_code == $Marpa::R3::Error::NO_START_SYMBOL ) {
-            Marpa::R3::exception('No start symbol');
-        }
+        # if ( $precompute_error_code == $Marpa::R3::Error::NO_START_SYMBOL ) {
+            # Marpa::R3::exception('No start symbol');
+        # }
+
+      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 'i', $precompute_error_code );
+    local grammar, error_code = ...
+    if error_code == kollos.err["NO_START_SYMBOL"] then
+            error('No start symbol')
+    end
+END_OF_LUA
+
+
         if ( $precompute_error_code == $Marpa::R3::Error::START_NOT_LHS ) {
             my $name = $tracer->[Marpa::R3::Internal::Trace::G::START_NAME];
             Marpa::R3::exception(
