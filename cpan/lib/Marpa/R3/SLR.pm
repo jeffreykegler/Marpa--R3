@@ -154,12 +154,8 @@ sub Marpa::R3::Scanless::R::new {
             "  It should be a ref to $slg_class\n" );
     } ## end if ( not blessed $slg or not $slg->isa($slg_class) )
 
-    my $tracer =
-        $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE] =
          $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE];
-
-    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
 
     my $thin_slr = Marpa::R3::Thin::SLR->new(
         $slg->[Marpa::R3::Internal::Scanless::G::C]
@@ -239,8 +235,12 @@ END_OF_LUA
     } ## end EVENT: for my $event_name ( keys %{$event_is_active_arg} )
 
     if ( not $thin_slr->start_input() ) {
-        my $error = $grammar_c->error();
-        Marpa::R3::exception( 'Recognizer start of input failed: ', $error );
+        $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', '' );
+        local grammar = ...
+        error( string.format('Recognizer start of input failed: %s',
+            grammar.lmw_g1g.error_description()))
+END_OF_LUA
     }
 
     {
