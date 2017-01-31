@@ -641,11 +641,8 @@ my $libmarpa_trace_event_handlers = {
         my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
         my $tracer =
             $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER];
-        my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
-        my $rule_length = $grammar_c->rule_length($lex_rule_id);
-        my @rhs_ids =
-            map { $grammar_c->rule_rhs( $lex_rule_id, $_ ) }
-            ( 0 .. $rule_length - 1 );
+        my @rhs_ids = $slg->l0_rule_symbols($lex_rule_id);
+        shift @rhs_ids;
         my @rhs =
             map { $tracer->symbol_in_display_form($_) } @rhs_ids;
         my $trace_file_handle =

@@ -1583,7 +1583,6 @@ sub add_L0_user_rule {
     my $thin_slg = $slg->[Marpa::R3::Internal::Scanless::G::C];
 
     my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER];
-    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
 
     my ( $lhs_name, $rhs_names, $action, $blessing );
     my ( $min, $separator_name );
@@ -1957,7 +1956,7 @@ sub Marpa::R3::Scanless::G::rule_symbols {
     local g1g = grammar.lmw_g1g
     return g1g:rule_symbols(irlid)
 END_OF_LUA
-    return $symbols;
+    return @{$symbols};
 }
 
 sub Marpa::R3::Scanless::G::l0_rule_symbols {
@@ -1969,7 +1968,7 @@ sub Marpa::R3::Scanless::G::l0_rule_symbols {
     local l0g = grammar.lmw_l0g
     return l0g:rule_symbols(irlid)
 END_OF_LUA
-    return $symbols;
+    return @{$symbols};
 }
 
 sub Marpa::R3::Scanless::G::show_irls {
