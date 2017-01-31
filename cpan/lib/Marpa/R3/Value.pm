@@ -873,6 +873,8 @@ END_OF_LUA
             next LHS;
         } ## end if ( $rule_count == 1 )
 
+        # More than one rule?  Are any empty?
+        # If so, use the semantics of the empty rule
     my ($empty_rules) = $slg->call_by_tag(
     ('@' .__FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', 'i>*', $irlids ) ;
@@ -889,8 +891,6 @@ END_OF_LUA
     return empty_rules
 END_OF_LUA
 
-        # More than one rule?  Are any empty?
-        # If so, use the semantics of the empty rule
         if ( scalar @{$empty_rules} ) {
             $resolution_rule = $empty_rules->[0];
             my ( $resolution_name, $closure ) =
@@ -919,7 +919,6 @@ END_OF_LUA
             my ( $other_closure_name, undef, $other_semantics, $other_blessing )
               = @{$other_resolution};
 
-          grep { $grammar_c->rule_length($_) <= 0 } @{$irlids};
             if (   $first_closure_name ne $other_closure_name
                 or $first_semantics ne $other_semantics
                 or $first_blessing ne $other_blessing )
