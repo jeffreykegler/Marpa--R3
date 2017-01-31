@@ -830,9 +830,17 @@ qq{  Cannot bless rule when it resolves to a scalar constant},
     # the nullable symbol.  This logic deals with that.
     my @nullable_rule_ids_by_lhs = ();
   RULE: for my $irlid ( $tracer->rule_ids() ) {
-        my $lhs_id = $grammar_c->rule_lhs($irlid);
+
+    my ($lhs_id, $rule_is_nullable) = $slg->call_by_tag(
+    ('@' .__FILE__ . ':' . __LINE__),
+    <<'END_OF_LUA', 'i>*', $irlid ) ;
+    local grammar, irlid = ...
+    local g1g = grammar.lmw_g1g
+    return g1g:rule_lhs(irlid), g1g:rule_is_nullable(irlid)
+END_OF_LUA
+
         push @{ $nullable_rule_ids_by_lhs[$lhs_id] }, $irlid
-          if $grammar_c->rule_is_nullable($irlid);
+          if $rule_is_nullable;
     }
 
     my @null_symbol_closures;
@@ -865,12 +873,26 @@ qq{  Cannot bless rule when it resolves to a scalar constant},
             next LHS;
         } ## end if ( $rule_count == 1 )
 
+    my ($empty_rules) = $slg->call_by_tag(
+    ('@' .__FILE__ . ':' . __LINE__),
+    <<'END_OF_LUA', 'i>*', $irlids ) ;
+    local grammar, irlids = ...
+    local g1g = grammar.lmw_g1g
+    local empty_rules = {}
+    for ix = 1, #irlids do
+        local irlid = irlids[ix]
+        local rule_length = g1g:rule_length(irlid)
+        if rule_length and rule_length == 0 then
+           empty_rules[#empty_rules+1] = irlid
+        end
+    end
+    return empty_rules
+END_OF_LUA
+
         # More than one rule?  Are any empty?
         # If so, use the semantics of the empty rule
-        my @empty_rules =
-          grep { $grammar_c->rule_length($_) <= 0 } @{$irlids};
-        if ( scalar @empty_rules ) {
-            $resolution_rule = $empty_rules[0];
+        if ( scalar @{$empty_rules} ) {
+            $resolution_rule = $empty_rules->[0];
             my ( $resolution_name, $closure ) =
               @{ $rule_resolutions->[$resolution_rule] };
             if ($trace_actions) {
@@ -883,7 +905,7 @@ qq{  Cannot bless rule when it resolves to a scalar constant},
             } ## end if ($trace_actions)
             $null_symbol_closures[$lhs_id] = $resolution_rule;
             next LHS;
-        } ## end if ( scalar @empty_rules )
+        }
 
         # Multiple rules, none of them empty.
         my ( $first_resolution, @other_resolutions ) =
@@ -897,6 +919,7 @@ qq{  Cannot bless rule when it resolves to a scalar constant},
             my ( $other_closure_name, undef, $other_semantics, $other_blessing )
               = @{$other_resolution};
 
+          grep { $grammar_c->rule_length($_) <= 0 } @{$irlids};
             if (   $first_closure_name ne $other_closure_name
                 or $first_semantics ne $other_semantics
                 or $first_blessing ne $other_blessing )
