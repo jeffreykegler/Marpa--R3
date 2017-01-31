@@ -40,6 +40,7 @@ cd kollos && ../lua/lua toc.lua < kollos.lua.md
 * [Kollos semantics](#kollos-semantics)
   * [VM operations](#vm-operations)
     * [VM debug operation](#vm-debug-operation)
+    * [VM debug operation](#vm-debug-operation)
     * [VM no-op operation](#vm-no-op-operation)
     * [VM bail operation](#vm-bail-operation)
     * [VM result operations](#vm-result-operations)
@@ -68,12 +69,10 @@ cd kollos && ../lua/lua toc.lua < kollos.lua.md
     * [Return operation key given its name](#return-operation-key-given-its-name)
     * [Return operation name given its key](#return-operation-name-given-its-key)
     * [Register a constant](#register-a-constant)
-    * [Register semantics for a token](#register-semantics-for-a-token)
-    * [Register semantics for a nulling symbol](#register-semantics-for-a-nulling-symbol)
-    * [Register semantics for a rule](#register-semantics-for-a-rule)
     * [Return the top index of the stack](#return-the-top-index-of-the-stack)
     * [Return the value of a stack entry](#return-the-value-of-a-stack-entry)
     * [Set the value of a stack entry](#set-the-value-of-a-stack-entry)
+    * [Convert current, origin Earley set to L0 span](#convert-current-origin-earley-set-to-l0-span)
 * [The grammar Libmarpa wrapper](#the-grammar-libmarpa-wrapper)
 * [The recognizer Libmarpa wrapper](#the-recognizer-libmarpa-wrapper)
 * [The valuator Libmarpa wrapper](#the-valuator-libmarpa-wrapper)
@@ -1483,6 +1482,14 @@ Hopefully, this will make it easier to phase out the
         local symbol_name = lmw_g.name_by_isyid[symbol_id]
         if symbol_name then return symbol_name end
         return string.format('R%d', symbol_id)
+    end
+
+    function _M.class_grammar.rule_symbols(lmw_g, rule_id)
+        local symbols = { lmw_g:rule_lhs(rule_id) }
+        for rhsix = 0, lmw_g:rule_length(rule_id) - 1 do
+             symbols[#symbols+1] = lmw_g:rule_rhs(rule_id, rhsix)
+        end
+        return symbols
     end
 
     function _M.class_grammar.ahm_describe(lmw_g, ahm_id)

@@ -1074,14 +1074,17 @@ sub Marpa::R3::Internal::Scanless::G::precompute {
         $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE];
 
     return if $grammar_c->is_precomputed();
-    if ($grammar_c->force_valued() < 0) {
-        Marpa::R3::uncaught_error( scalar $grammar_c->error() );
-    }
+    # if ($grammar_c->force_valued() < 0) {
+        # Marpa::R3::uncaught_error( scalar $grammar_c->error() );
+    # }
 
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 's', $lmw_name );
     local grammar, lmw_name = ...
     local lmw_g = grammar[lmw_name]
+    if lmw_g:force_valued() < 0 then
+        error( lmw_g:error_description() )
+    end
     local start_name = lmw_g.start_name
     local start_id = lmw_g.isyid_by_name[start_name]
     if not start_id then
@@ -1935,6 +1938,30 @@ sub Marpa::R3::Scanless::G::l0_symbol_ids {
 }
 
 # Internal methods, not to be documented
+
+sub Marpa::R3::Scanless::G::rule_symbols {
+    my ($slg, $irlid) = @_;
+    my ($symbols) = $slg->call_by_tag(
+    ('@' .__FILE__ . ':' . __LINE__),
+    <<'END_OF_LUA', 'i>*', $irlid ) ;
+    local grammar, irlid = ...
+    local g1g = grammar.lmw_g1g
+    return g1g:rule_symbols(irlid)
+END_OF_LUA
+    return $symbols;
+}
+
+sub Marpa::R3::Scanless::G::l0_rule_symbols {
+    my ($slg, $irlid) = @_;
+    my ($symbols) = $slg->call_by_tag(
+    ('@' .__FILE__ . ':' . __LINE__),
+    <<'END_OF_LUA', 'i>*', $irlid ) ;
+    local grammar, irlid = ...
+    local l0g = grammar.lmw_l0g
+    return l0g:rule_symbols(irlid)
+END_OF_LUA
+    return $symbols;
+}
 
 sub Marpa::R3::Scanless::G::show_irls {
     my ($slg) = @_;
