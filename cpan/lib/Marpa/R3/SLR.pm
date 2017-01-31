@@ -1411,7 +1411,6 @@ sub Marpa::R3::Scanless::R::show_progress {
     my ( $slr, $start_ordinal, $end_ordinal ) = @_;
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $tracer  = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
-    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
 
     my ($last_ordinal) = $slr->call_by_tag(
     (__FILE__ . ':' . __LINE__),
@@ -1455,7 +1454,11 @@ sub Marpa::R3::Scanless::R::show_progress {
         for my $progress_item ( @{ $slr->progress($current_ordinal) } ) {
             my ( $rule_id, $position, $origin ) = @{$progress_item};
             if ( $position < 0 ) {
-                $position = $grammar_c->rule_length($rule_id);
+                ($position) = $slg->call_by_tag(
+                    ( __FILE__ . ':' . __LINE__ ),
+                    'local grammar, rule_id = ...; return grammar.lmw_g1g:rule_length(rule_id)',
+                    'i', $rule_id
+                );
             }
             $by_rule_by_position{$rule_id}->{$position}->{$origin}++;
         } ## end for my $progress_item ( @{ $recce->progress($current_ordinal...)})
@@ -1474,7 +1477,10 @@ sub Marpa::R3::Scanless::R::show_progress {
                     $origin_desc = $origins[0] . q{...} . $origins[-1];
                 }
 
-                my $rhs_length = $grammar_c->rule_length($rule_id);
+                my ($rhs_length) = $slg->call_by_tag(
+                (__FILE__ . ':' . __LINE__),
+                        'local grammar, rule_id = ...; return grammar.lmw_g1g:rule_length(rule_id)',
+                        'i', $rule_id);
                 my @item_text;
 
                 if ( $position >= $rhs_length ) {
