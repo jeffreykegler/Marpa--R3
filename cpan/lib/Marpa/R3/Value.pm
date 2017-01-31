@@ -746,7 +746,13 @@ sub registrations_find {
         for my $irlid ( $tracer->rule_ids() ) {
             my ( $new_resolution, $closure, $semantics, $blessing ) =
               @{ $rule_resolutions->[$irlid] };
-            my $lhs_id = $grammar_c->rule_lhs($irlid);
+    my ($lhs_id) = $slg->call_by_tag(
+    ('@' .__FILE__ . ':' . __LINE__),
+    <<'END_OF_LUA', 'i>*', $irlid ) ;
+    local grammar, irlid = ...
+    local g1g = grammar.lmw_g1g
+    return g1g:rule_lhs(irlid)
+END_OF_LUA
 
           REFINE_SEMANTICS: {
 
@@ -1282,8 +1288,14 @@ END_OF_LUA
 
                 if ( $result_descriptor eq 'symbol' ) {
                     if ( defined $irlid ) {
-                        my $lhs_id = $grammar_c->rule_lhs($irlid);
-                        my $name   = $tracer->symbol_name($lhs_id);
+    my ($name) = $slg->call_by_tag(
+    ('@' .__FILE__ . ':' . __LINE__),
+    <<'END_OF_LUA', 'i>*', $irlid ) ;
+    local grammar, irlid = ...
+    local g1g = grammar.lmw_g1g
+    local lhs_id = g1g:rule_lhs(irlid)
+    return g1g:symbol_name(lhs_id)
+END_OF_LUA
                         push @push_ops, $op_lua, $op_push_constant_key, \$name;
                         next RESULT_DESCRIPTOR;
                     } ## end if ( defined $irlid )
