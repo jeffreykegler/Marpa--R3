@@ -1947,26 +1947,26 @@ sub Marpa::R3::Scanless::G::l0_symbol_ids {
 
 # Internal methods, not to be documented
 
-sub Marpa::R3::Scanless::G::rule_symbols {
+sub Marpa::R3::Scanless::G::irl_isyids {
     my ($slg, $irlid) = @_;
     my ($symbols) = $slg->call_by_tag(
     ('@' .__FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', 'i>*', $irlid ) ;
     local grammar, irlid = ...
     local g1g = grammar.lmw_g1g
-    return g1g:rule_symbols(irlid)
+    return g1g:irl_isyids(irlid)
 END_OF_LUA
     return @{$symbols};
 }
 
-sub Marpa::R3::Scanless::G::l0_rule_symbols {
+sub Marpa::R3::Scanless::G::l0_irl_isyids {
     my ($slg, $irlid) = @_;
     my ($symbols) = $slg->call_by_tag(
     ('@' .__FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', 'i>*', $irlid ) ;
     local grammar, irlid = ...
     local l0g = grammar.lmw_l0g
-    return l0g:rule_symbols(irlid)
+    return l0g:irl_isyids(irlid)
 END_OF_LUA
     return @{$symbols};
 }
