@@ -995,11 +995,6 @@ sub Marpa::R3::Scanless::R::read_problem {
     my $trace_file_handle =
         $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
 
-    my $g1_tracer =
-        $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
-
-    my $thin_g1 = $g1_tracer->[Marpa::R3::Internal::Trace::G::C];
-
     my $pos      = $thin_slr->pos();
     my $problem_pos = $pos;
     my $p_string = $slr->[Marpa::R3::Internal::Scanless::R::P_INPUT_STRING];
@@ -1147,7 +1142,13 @@ END_OF_LUA
 
             } ## end if ($g1_status)
             if ( $g1_status < 0 ) {
-                $desc = 'G1 error: ' . $thin_g1->error();
+                my ($error_description) =
+                  $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+                    <<'END_OF_LUA', '' );
+        local grammar = ...
+        return grammar.lmw_g1g.error_description()
+END_OF_LUA
+                $desc = 'G1 error: ' . $error_description;
                 chomp $desc;
                 last DESC;
             }
