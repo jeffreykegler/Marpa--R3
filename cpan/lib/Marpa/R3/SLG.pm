@@ -1289,9 +1289,18 @@ END_OF_LUA
                 $xsy;
             next PROPERTY;
         }
+
+
         if ( $property eq 'terminal' ) {
             my $value = $options->{$property};
-            $grammar_c->symbol_is_terminal_set( $symbol_id, $value );
+
+      $thin_slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 's', $symbol_id, ($value ? 1 : 0));
+    local g, symbol_id, value = ...
+    local g1g = g.lmw_g1g
+    gig:symbol_is_terminal_set(symbol_id, value)
+END_OF_LUA
+
             next PROPERTY;
         }
         if ( $property eq 'rank' ) {
@@ -1299,9 +1308,16 @@ END_OF_LUA
             Marpa::R3::exception(qq{Symbol "$name": rank must be an integer})
                 if not Scalar::Util::looks_like_number($value)
                     or int($value) != $value;
-            $grammar_c->symbol_rank_set($symbol_id) = $value;
+
+      $thin_slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 's', $symbol_id, $value);
+    local g, symbol_id, value = ...
+    local g1g = g.lmw_g1g
+    g1g:symbol_rank_set(symbol_id, value)
+END_OF_LUA
             next PROPERTY;
-        } ## end if ( $property eq 'rank' )
+        }
+
         Marpa::R3::exception(qq{Unknown symbol property "$property"});
     } ## end PROPERTY: for my $property ( keys %{$options} )
 
@@ -1344,7 +1360,14 @@ END_OF_LUA
         }
         if ( $property eq 'terminal' ) {
             my $value = $options->{$property};
-            $grammar_c->symbol_is_terminal_set( $symbol_id, $value );
+
+      $thin_slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 's', $symbol_id, ($value ? 1 : 0));
+    local g, symbol_id, value = ...
+    local l0g = g.lmw_l0g
+    l0g:symbol_is_terminal_set(symbol_id, value)
+END_OF_LUA
+
             next PROPERTY;
         }
         if ( $property eq 'rank' ) {
@@ -1352,7 +1375,14 @@ END_OF_LUA
             Marpa::R3::exception(qq{Symbol "$name": rank must be an integer})
                 if not Scalar::Util::looks_like_number($value)
                     or int($value) != $value;
-            $grammar_c->symbol_rank_set($symbol_id) = $value;
+
+      $thin_slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 's', $symbol_id, $value);
+    local g, symbol_id, value = ...
+    local l0g = g.lmw_l0g
+    l0g:symbol_rank_set(symbol_id, value)
+END_OF_LUA
+
             next PROPERTY;
         } ## end if ( $property eq 'rank' )
         Marpa::R3::exception(qq{Unknown symbol property "$property"});
