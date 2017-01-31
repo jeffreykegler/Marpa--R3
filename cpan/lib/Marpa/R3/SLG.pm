@@ -1073,10 +1073,8 @@ sub Marpa::R3::Internal::Scanless::G::precompute {
     my $trace_fh =
         $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE];
 
-    # return if $grammar_c->is_precomputed();
-
-      my ($do_return) =
-      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+    my ($do_return, $precompute_result, $precompute_error_code)
+      = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 's', $lmw_name );
     local grammar, lmw_name = ...
     local lmw_g = grammar[lmw_name]
@@ -1100,18 +1098,6 @@ sub Marpa::R3::Internal::Scanless::G::precompute {
                 lmw_g:error_description()
         ))
     end
-    return "no"
-END_OF_LUA
-
-    return if $do_return eq "false";
-
-    # Catch errors in precomputation
-    my ($precompute_result, $precompute_error_code);
-    ($do_return, $precompute_result, $precompute_error_code) =
-      $thin_slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 's', $lmw_name );
-    local g, lmw_name = ...
-    local lmw_g = g[lmw_name]
     kollos.throw = false
     local result, error = lmw_g:precompute()
     kollos.throw = true
