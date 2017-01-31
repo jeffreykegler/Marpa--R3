@@ -1069,14 +1069,15 @@ END_OF_LUA
             $closure           = $closure_by_irlid[$irlid];
             $xbnf              = $xbnf_by_irlid->[$irlid];
 
-    ($rule_length) = $slg->call_by_tag(
+    ($rule_length, $is_sequence_rule) = $slg->call_by_tag(
         ('@' .__FILE__ . ':' .  __LINE__),
         <<'END_OF_LUA', 'i', $irlid);
         local grammar, irlid = ...
-        return grammar.lmw_g1g:rule_length(irlid)
+        local g1g = grammar.lmw_g1g
+        return g1g:rule_length(irlid), (g1g:sequence_min(irlid) and 1 or 0)
+           
 END_OF_LUA
 
-            $is_sequence_rule  = defined $grammar_c->sequence_min($irlid);
             $is_discard_sequence_rule = $is_sequence_rule
               && $xbnf->[Marpa::R3::Internal::XBNF::DISCARD_SEPARATION];
         } ## end if ( defined $irlid )
@@ -1238,7 +1239,14 @@ qq{    Semantics were specified as "$original_semantics"\n}
 
                 if ( $result_descriptor eq 'lhs' ) {
                     if ( defined $irlid ) {
-                        my $lhs_id = $grammar_c->rule_lhs($irlid);
+
+    my ($lhs_id) = $slg->call_by_tag(
+    ('@' .__FILE__ . ':' . __LINE__),
+    <<'END_OF_LUA', 'i>*', $irlid ) ;
+    local grammar, irlid = ...
+    local g1g = grammar.lmw_g1g
+    return g1g:rule_lhs(irlid)
+END_OF_LUA
                         push @push_ops, $op_lua, $op_push_constant_key,
                           \$lhs_id;
                         next RESULT_DESCRIPTOR;
