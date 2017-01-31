@@ -42,16 +42,15 @@ package Marpa::R3::Internal::Value;
 sub resolve_action {
     my ( $slg, $closure_name, $p_error ) = @_;
     my $trace_file_handle =
-        $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE];
-    my $trace_actions =
-        $slg->[Marpa::R3::Internal::Scanless::G::TRACE_ACTIONS];
+      $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE];
+    my $trace_actions = $slg->[Marpa::R3::Internal::Scanless::G::TRACE_ACTIONS];
 
     # A reserved closure name;
     return [ q{}, undef, '::!default' ] if not defined $closure_name;
 
     if ( $closure_name eq q{} ) {
         ${$p_error} = q{The action string cannot be the empty string}
-            if defined $p_error;
+          if defined $p_error;
         return;
     }
 
@@ -69,11 +68,12 @@ sub resolve_action {
 
     if ( not $fully_qualified_name ) {
         my $resolve_package =
-            $slg->[Marpa::R3::Internal::Scanless::G::SEMANTICS_PACKAGE];
+          $slg->[Marpa::R3::Internal::Scanless::G::SEMANTICS_PACKAGE];
         if ( not defined $resolve_package ) {
             ${$p_error} = Marpa::R3::Internal::X->new(
-                {   message =>
-                        qq{Could not fully qualify "$closure_name": no semantics package},
+                {
+                    message =>
+qq{Could not fully qualify "$closure_name": no semantics package},
                     name => 'NO RESOLVE PACKAGE'
                 }
             );
@@ -84,7 +84,7 @@ sub resolve_action {
 
     my $closure;
     my $type;
-    TYPE: {
+  TYPE: {
         no strict 'refs';
         $closure = *{$fully_qualified_name}{'CODE'};
         use strict;
@@ -100,7 +100,9 @@ sub resolve_action {
         # behavior is said to be subject to change in perlref
         if ( defined $closure and defined ${$closure} ) {
             $type = 'SCALAR';
-            Marpa::R3::exception("$closure_name resolves to SCALAR, which is not yet implemented");
+            Marpa::R3::exception(
+                "$closure_name resolves to SCALAR, which is not yet implemented"
+            );
             last TYPE;
         }
 
@@ -110,9 +112,9 @@ sub resolve_action {
     if ( defined $closure ) {
         if ($trace_actions) {
             print {$trace_file_handle}
-                qq{Successful resolution of action "$closure_name" as $type },
-                'to ', $fully_qualified_name, "\n"
-                or Marpa::R3::exception('Could not print to trace file');
+              qq{Successful resolution of action "$closure_name" as $type },
+              'to ', $fully_qualified_name, "\n"
+              or Marpa::R3::exception('Could not print to trace file');
         } ## end if ($trace_actions)
         return [ $fully_qualified_name, $closure, '::array' ];
     } ## end if ( defined $closure )
@@ -122,12 +124,11 @@ sub resolve_action {
             no strict 'refs';
             if ( defined *{$fully_qualified_name}{$slot} ) {
                 my $error =
-                    qq{Failed resolution of action "$closure_name" to $fully_qualified_name\n}
-                    . qq{  $fully_qualified_name is present as a $slot, but a $slot is not an acceptable resolution\n};
+qq{Failed resolution of action "$closure_name" to $fully_qualified_name\n}
+                  . qq{  $fully_qualified_name is present as a $slot, but a $slot is not an acceptable resolution\n};
                 if ($trace_actions) {
                     print {$trace_file_handle} $error
-                        or
-                        Marpa::R3::exception('Could not print to trace file');
+                      or Marpa::R3::exception('Could not print to trace file');
                 }
                 ${$p_error} = $error if defined $p_error;
                 return;
@@ -137,11 +138,11 @@ sub resolve_action {
 
     {
         my $error =
-            qq{Failed resolution of action "$closure_name" to $fully_qualified_name\n};
+qq{Failed resolution of action "$closure_name" to $fully_qualified_name\n};
         ${$p_error} = $error if defined $p_error;
         if ($trace_actions) {
             print {$trace_file_handle} $error
-                or Marpa::R3::exception('Could not print to trace file');
+              or Marpa::R3::exception('Could not print to trace file');
         }
     }
     return;
@@ -150,7 +151,7 @@ sub resolve_action {
 
 our $CONTEXT_EXCEPTION_CLASS = __PACKAGE__ . '::Context_Exception';
 
-sub Marpa::R3::Context::bail { ## no critic (Subroutines::RequireArgUnpacking)
+sub Marpa::R3::Context::bail {   ## no critic (Subroutines::RequireArgUnpacking)
     if ( scalar @_ == 1 and ref $_[0] ) {
         die bless { exception_object => $_[0] }, $CONTEXT_EXCEPTION_CLASS;
     }
@@ -158,16 +159,15 @@ sub Marpa::R3::Context::bail { ## no critic (Subroutines::RequireArgUnpacking)
     my ( $package, $filename, $line ) = caller;
     chomp $error_string;
     die bless { message => qq{User bailed at line $line in file "$filename"\n}
-            . $error_string
-            . "\n" }, $CONTEXT_EXCEPTION_CLASS;
+          . $error_string
+          . "\n" }, $CONTEXT_EXCEPTION_CLASS;
 } ## end sub Marpa::R3::Context::bail
 ## use critic
 
 sub Marpa::R3::Context::g1_range {
     my $slr = $Marpa::R3::Context::slr;
-    my ($start, $end) = $slr->call_by_tag(
-    (__FILE__ . ':' . __LINE__),
-    <<'END_OF_LUA', '>*' );
+    my ( $start, $end ) =
+      $slr->call_by_tag( ( __FILE__ . ':' . __LINE__ ), <<'END_OF_LUA', '>*' );
 recce = ...
 return recce.this_step.start_es_id, recce.this_step.es_id
 END_OF_LUA
@@ -176,9 +176,8 @@ END_OF_LUA
 
 sub Marpa::R3::Context::g1_span {
     my $slr = $Marpa::R3::Context::slr;
-    my ($start, $length) = $slr->call_by_tag(
-    (__FILE__ . ':' . __LINE__),
-    <<'END_OF_LUA', '>*' );
+    my ( $start, $length ) =
+      $slr->call_by_tag( ( __FILE__ . ':' . __LINE__ ), <<'END_OF_LUA', '>*' );
 recce = ...
 local start = recce.this_step.start_es_id + 0
 local length = (start - recce.this_step.es_id) + 1
@@ -200,7 +199,7 @@ sub code_problems {
     my $eval_given = 0;
 
     push @msg, q{=} x 60, "\n";
-    ARG: for my $arg ( keys %{$args} ) {
+  ARG: for my $arg ( keys %{$args} ) {
         my $value = $args->{$arg};
         if ( $arg eq 'fatal_error' ) { $fatal_error = $value; next ARG }
         if ( $arg eq 'grammar' )     { $grammar     = $value; next ARG }
@@ -215,7 +214,7 @@ sub code_problems {
         push @msg, "Unknown argument to code_problems: $arg";
     } ## end ARG: for my $arg ( keys %{$args} )
 
-    GIVEN_FATAL_ERROR_REF_TYPE: {
+  GIVEN_FATAL_ERROR_REF_TYPE: {
         my $fatal_error_ref_type = ref $fatal_error;
         last GIVEN_FATAL_ERROR_REF_TYPE if not $fatal_error_ref_type;
         if ( $fatal_error_ref_type eq $CONTEXT_EXCEPTION_CLASS ) {
@@ -226,18 +225,17 @@ sub code_problems {
             die "Internal error: bad $CONTEXT_EXCEPTION_CLASS object";
         } ## end if ( $fatal_error_ref_type eq $CONTEXT_EXCEPTION_CLASS)
         $fatal_error =
-              "Exception thrown as object inside Marpa closure\n"
-            . ( q{ } x 4 )
-            . "This is not allowed\n"
-            . ( q{ } x 4 )
-            . qq{Exception as string is "$fatal_error"};
+            "Exception thrown as object inside Marpa closure\n"
+          . ( q{ } x 4 )
+          . "This is not allowed\n"
+          . ( q{ } x 4 )
+          . qq{Exception as string is "$fatal_error"};
     } ## end GIVEN_FATAL_ERROR_REF_TYPE:
 
     my @problem_line     = ();
     my $max_problem_line = -1;
     for my $warning_data ( @{$warnings} ) {
-        my ( $warning, $package, $filename, $problem_line ) =
-            @{$warning_data};
+        my ( $warning, $package, $filename, $problem_line ) = @{$warning_data};
         $problem_line[$problem_line] = 1;
         $max_problem_line = List::Util::max $problem_line, $max_problem_line;
     } ## end for my $warning_data ( @{$warnings} )
@@ -250,15 +248,15 @@ sub code_problems {
         my $false_eval = $eval_given && !$eval_value && !$fatal_error;
         if ($false_eval) {
             push @problems, '* THE MARPA SEMANTICS RETURNED A PERL FALSE',
-                'Marpa::R3 requires its semantics to return a true value';
+              'Marpa::R3 requires its semantics to return a true value';
         }
         if ($fatal_error) {
             push @problems, '* THE MARPA SEMANTICS PRODUCED A FATAL ERROR';
         }
         if ($warnings_count) {
             push @problems,
-                "* THERE WERE $warnings_count WARNING(S) IN THE MARPA SEMANTICS:",
-                'Marpa treats warnings as fatal errors';
+              "* THERE WERE $warnings_count WARNING(S) IN THE MARPA SEMANTICS:",
+              'Marpa treats warnings as fatal errors';
         }
         if ( not scalar @problems ) {
             push @msg, '* THERE WAS A FATAL PROBLEM IN THE MARPA SEMANTICS';
@@ -267,7 +265,7 @@ sub code_problems {
     }
 
     push @msg, "* THIS IS WHAT MARPA WAS DOING WHEN THE PROBLEM OCCURRED:\n"
-        . $long_where . "\n";
+      . $long_where . "\n";
 
     for my $warning_ix ( 0 .. ( $warnings_count - 1 ) ) {
         push @msg, "* WARNING MESSAGE NUMBER $warning_ix:\n";
@@ -296,11 +294,10 @@ sub Marpa::R3::Scanless::R::show_semantics {
     my @op_descs = ();
     my $op_ix    = 0;
   OP: while ( $op_ix < scalar @ops ) {
-        my $op      = $ops[ $op_ix++ ];
+        my $op = $ops[ $op_ix++ ];
 
-        my $op_name = $slg->call_by_tag(
-        ('@' . __FILE__ . ':' .  __LINE__),
-    <<'END_OF_LUA', 'i', $op);
+        my $op_name = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+            <<'END_OF_LUA', 'i', $op );
     local grammar, op = ...
     return _M.op_names[op]
 END_OF_LUA
@@ -308,12 +305,13 @@ END_OF_LUA
         push @op_descs, $op_name;
         if ( $op_name eq 'lua' ) {
 
-            my ($lua_op_name) = op_fn_name_by_key( $slg, $ops[$op_ix]);
+            my ($lua_op_name) = op_fn_name_by_key( $slg, $ops[$op_ix] );
             push @op_descs, $lua_op_name;
             $op_ix++;
-            if ($lua_op_name eq 'callback') {
-                push @op_descs, op_fn_name_by_key( $slg, $ops[$op_ix]);
-            } else {
+            if ( $lua_op_name eq 'callback' ) {
+                push @op_descs, op_fn_name_by_key( $slg, $ops[$op_ix] );
+            }
+            else {
                 push @op_descs, $ops[$op_ix];
             }
             $op_ix++;
@@ -335,15 +333,14 @@ END_OF_LUA
 sub Marpa::R3::Scanless::R::ordering_get {
     my ($slr) = @_;
     return if $slr->[Marpa::R3::Internal::Scanless::R::NO_PARSE];
-    my $parse_set_arg =
-        $slr->[Marpa::R3::Internal::Scanless::R::END_OF_PARSE];
-    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+    my $parse_set_arg = $slr->[Marpa::R3::Internal::Scanless::R::END_OF_PARSE];
+    my $slg           = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $ranking_method =
-        $slg->[Marpa::R3::Internal::Scanless::G::RANKING_METHOD];
+      $slg->[Marpa::R3::Internal::Scanless::G::RANKING_METHOD];
 
     my ($has_parse) = $slr->call_by_tag(
-        ('@' . __FILE__ . ':' .  __LINE__),
-    <<'END_OF_LUA',
+        ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA',
     local recce, end_of_parse, ranking_method = ...
     if recce.lmw_o then return true end
     kollos.throw = false
@@ -375,13 +372,14 @@ END_OF_LUA
 sub resolve_rule_by_id {
     my ( $slg, $irlid ) = @_;
     my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
-    my $action_name = $tracer->[Marpa::R3::Internal::Trace::G::ACTION_BY_IRLID]->[$irlid];
+    my $action_name =
+      $tracer->[Marpa::R3::Internal::Trace::G::ACTION_BY_IRLID]->[$irlid];
     my $resolve_error;
     return if not defined $action_name;
     my $resolution = resolve_action( $slg, $action_name, \$resolve_error );
 
     if ( not $resolution ) {
-        my $rule_desc = $slg->rule_show( $irlid );
+        my $rule_desc = $slg->rule_show($irlid);
         Marpa::R3::exception(
             "Could not resolve rule action named '$action_name'\n",
             "  Rule was $rule_desc\n",
@@ -395,11 +393,10 @@ sub resolve_rule_by_id {
 # Find the semantics for a lexeme.
 sub lexeme_semantics_find {
     my ( $slg, $lexeme_id ) = @_;
-    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
-    my $xsy_by_isyid =
-        $tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID];
-    my $xsy = $xsy_by_isyid->[$lexeme_id];
-    my $semantics = $xsy->[Marpa::R3::Internal::XSY::LEXEME_SEMANTICS];
+    my $tracer       = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
+    my $xsy_by_isyid = $tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID];
+    my $xsy          = $xsy_by_isyid->[$lexeme_id];
+    my $semantics    = $xsy->[Marpa::R3::Internal::XSY::LEXEME_SEMANTICS];
     return '::!default' if not defined $semantics;
     return $semantics;
 }
@@ -407,41 +404,39 @@ sub lexeme_semantics_find {
 # Find the blessing for a rule.
 sub rule_blessing_find {
     my ( $slg, $irlid ) = @_;
-    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
+    my $tracer        = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     my $xbnf_by_irlid = $tracer->[Marpa::R3::Internal::Trace::G::XBNF_BY_IRLID];
-    my $xbnf = $xbnf_by_irlid->[$irlid];
-    my $blessing = $xbnf->[Marpa::R3::Internal::XBNF::BLESSING];
+    my $xbnf          = $xbnf_by_irlid->[$irlid];
+    my $blessing      = $xbnf->[Marpa::R3::Internal::XBNF::BLESSING];
     $blessing = '::undef' if not defined $blessing;
     return $blessing if $blessing eq '::undef';
-    my $bless_package =
-        $slg->[Marpa::R3::Internal::Scanless::G::BLESS_PACKAGE];
+    my $bless_package = $slg->[Marpa::R3::Internal::Scanless::G::BLESS_PACKAGE];
 
     if ( not defined $bless_package ) {
         Marpa::R3::exception(
-                  qq{A blessed rule is in a grammar with no bless_package\n}
-                . qq{  The rule was blessed as "$blessing"\n} );
+                qq{A blessed rule is in a grammar with no bless_package\n}
+              . qq{  The rule was blessed as "$blessing"\n} );
     }
     return join q{}, $bless_package, q{::}, $blessing;
 }
 
 sub resolve_grammar {
 
-    my ( $slg ) = @_;
+    my ($slg) = @_;
     my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
 
     my $trace_actions =
-        $slg->[Marpa::R3::Internal::Scanless::G::TRACE_ACTIONS] // 0;
+      $slg->[Marpa::R3::Internal::Scanless::G::TRACE_ACTIONS] // 0;
     my $trace_file_handle =
-        $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE];
+      $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE];
 
     my $resolve_error;
 
     my $default_action_resolution =
-        resolve_action( $slg, undef, \$resolve_error );
-    Marpa::R3::exception(
-        "Could not resolve default action\n",
+      resolve_action( $slg, undef, \$resolve_error );
+    Marpa::R3::exception( "Could not resolve default action\n",
         q{  }, ( $resolve_error // 'Failed to resolve action' ) )
-        if not $default_action_resolution;
+      if not $default_action_resolution;
 
     my $rule_resolutions = [];
 
@@ -464,9 +459,7 @@ sub resolve_grammar {
 
       DETERMINE_BLESSING: {
 
-            my $blessing =
-              rule_blessing_find( $slg,
-                $irlid );
+            my $blessing = rule_blessing_find( $slg, $irlid );
             my ( $closure_name, $closure, $semantics ) = @{$rule_resolution};
 
             if ( $blessing ne '::undef' ) {
@@ -494,50 +487,50 @@ qq{Attempt to bless, but improper semantics: "$semantics"\n},
 
     if ( $trace_actions >= 2 ) {
 
-    my ($highest_irlid) = $slg->call_by_tag(
-    ('@' .__FILE__ . ':' . __LINE__),
-    <<'END_OF_LUA', '>*' ) ;
+        my ($highest_irlid) =
+          $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+            <<'END_OF_LUA', '>*' );
     local grammar = ...
     local g1g = grammar.lmw_g1g
     return g1g:highest_rule_id()
 END_OF_LUA
 
-        RULE: for my $rule_id ( 0 .. $highest_irlid ) {
+      RULE: for my $rule_id ( 0 .. $highest_irlid ) {
             my ( $resolution_name, $closure ) =
-                @{ $rule_resolutions->[$rule_id] };
+              @{ $rule_resolutions->[$rule_id] };
             say {$trace_file_handle} 'Rule ',
-                $tracer->brief_rule($rule_id),
-                qq{ resolves to "$resolution_name"}
-                or Marpa::R3::exception('print to trace handle failed');
+              $tracer->brief_rule($rule_id),
+              qq{ resolves to "$resolution_name"}
+              or Marpa::R3::exception('print to trace handle failed');
         }
     }
 
     my @lexeme_resolutions = ();
 
-    my ($highest_symbol_id) = $slg->call_by_tag(
-    ('@' .__FILE__ . ':' . __LINE__),
-    <<'END_OF_LUA', '>*' ) ;
+    my ($highest_symbol_id) =
+      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', '>*' );
     local grammar = ...
     local g1g = grammar.lmw_g1g
     return g1g:highest_symbol_id()
 END_OF_LUA
 
-    SYMBOL: for my $lexeme_id ( 0 .. $highest_symbol_id) {
+  SYMBOL: for my $lexeme_id ( 0 .. $highest_symbol_id ) {
 
         my $semantics = lexeme_semantics_find( $slg, $lexeme_id );
         if ( not defined $semantics ) {
             my $message =
-                  "Could not determine lexeme's semantics\n"
-                . q{  Lexeme was }
-                . $tracer->symbol_name($lexeme_id) . "\n";
+                "Could not determine lexeme's semantics\n"
+              . q{  Lexeme was }
+              . $tracer->symbol_name($lexeme_id) . "\n";
             Marpa::R3::exception($message);
         } ## end if ( not defined $semantics )
         my $blessing = lexeme_blessing_find( $slg, $lexeme_id );
         if ( not defined $blessing ) {
             my $message =
-                  "Could not determine lexeme's blessing\n"
-                . q{  Lexeme was }
-                . $tracer->symbol_name($lexeme_id) . "\n";
+                "Could not determine lexeme's blessing\n"
+              . q{  Lexeme was }
+              . $tracer->symbol_name($lexeme_id) . "\n";
             Marpa::R3::exception($message);
         } ## end if ( not defined $blessing )
         $lexeme_resolutions[$lexeme_id] = [ $semantics, $blessing ];
@@ -550,57 +543,67 @@ END_OF_LUA
 sub do_tree_ops {
     my ( $slr, $tree ) = @_;
     my $blessing = Scalar::Util::blessed $tree;
-    if (not defined $blessing) {
+    if ( not defined $blessing ) {
         my $ref = ref $tree;
+
         # say STDERR "ref_type = $ref";
-        if ($ref eq 'ARRAY') {
+        if ( $ref eq 'ARRAY' ) {
+
             # say STDERR "Recursing into unblessed array";
-            return [ map { do_tree_ops($slr, $_) } @{$tree} ];
+            return [ map { do_tree_ops( $slr, $_ ) } @{$tree} ];
         }
-        if ($ref eq 'REF') {
+        if ( $ref eq 'REF' ) {
+
             # say STDERR "Recursing into unblessed ref";
-            return \(do_tree_ops($slr, ${$tree}));
+            return \( do_tree_ops( $slr, ${$tree} ) );
         }
         return $tree;
     }
-    if ($blessing ne "Marpa::R3::Tree_Op") {
+    if ( $blessing ne "Marpa::R3::Tree_Op" ) {
         my $ref_type = Scalar::Util::reftype $tree;
+
         # say STDERR "ref_type = $ref_type";
-        if ($ref_type eq 'ARRAY)') {
+        if ( $ref_type eq 'ARRAY)' ) {
+
             # say STDERR "Recursing into blessed array";
-            return bless [ map { do_tree_ops($slr, $_) } @{$tree} ], $blessing;
+            return bless [ map { do_tree_ops( $slr, $_ ) } @{$tree} ],
+              $blessing;
         }
-        if ($ref_type eq 'REF)') {
+        if ( $ref_type eq 'REF)' ) {
+
             # say STDERR "Recursing into blessed ref";
-            return bless \(do_tree_ops($slr, ${$tree})), $blessing;
+            return bless \( do_tree_ops( $slr, ${$tree} ) ), $blessing;
         }
         return $tree;
     }
     my $tree_op = $tree->[0];
     Marpa::R3::exception("Tree op missing") if not defined $tree_op;
-    if ($tree_op eq 'asis') {
+    if ( $tree_op eq 'asis' ) {
+
         # say STDERR "Removing asis wrapper";
         return $tree->[1];
     }
-    if ($tree_op eq 'perl') {
+    if ( $tree_op eq 'perl' ) {
         my $lua_to_perl_tree_op = $tree->[1];
-        if ($lua_to_perl_tree_op eq 'bless') {
-            return bless do_tree_ops($slr, $tree->[2]), $tree->[3];
+        if ( $lua_to_perl_tree_op eq 'bless' ) {
+            return bless do_tree_ops( $slr, $tree->[2] ), $tree->[3];
         }
-        if ($lua_to_perl_tree_op eq 'literal') {
-            return substr ${$slr->[Marpa::R3::Internal::Scanless::R::P_INPUT_STRING]},
-                   $tree->[2], $tree->[3];
+        if ( $lua_to_perl_tree_op eq 'literal' ) {
+            return
+              substr
+              ${ $slr->[Marpa::R3::Internal::Scanless::R::P_INPUT_STRING] },
+              $tree->[2], $tree->[3];
         }
-        Marpa::R3::exception(qq{Unknown Lua-to-Perl tree op ("$lua_to_perl_tree_op")});
+        Marpa::R3::exception(
+            qq{Unknown Lua-to-Perl tree op ("$lua_to_perl_tree_op")});
     }
     Marpa::R3::exception(qq{Unknown tree op ("$tree_op")});
 }
 
 sub op_fn_key_by_name {
     my ( $slg, $name ) = @_;
-    my ($key) = $slg->call_by_tag(
-        ('@' . __FILE__ . ':' .  __LINE__),
-    <<'END_OF_LUA', 's', $name);
+    my ($key) = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 's', $name );
       local recce, name = ...
       return kollos.get_op_fn_key_by_name(name)
 END_OF_LUA
@@ -610,9 +613,8 @@ END_OF_LUA
 
 sub op_fn_name_by_key {
     my ( $slg, $key ) = @_;
-    my ($name) = $slg->call_by_tag(
-        ('@' . __FILE__ . ':' .  __LINE__),
-    <<'END_OF_LUA', 'i', $key);
+    my ($name) = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 'i', $key );
       local recce, key = ...
       return kollos.get_op_fn_name_by_key(key)
 END_OF_LUA
@@ -623,31 +625,29 @@ END_OF_LUA
 # Find the blessing for a lexeme.
 sub lexeme_blessing_find {
     my ( $slg, $lexeme_id ) = @_;
-    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
+    my $tracer       = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     my $xsy_by_isyid = $tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID];
-    my $xsy   = $xsy_by_isyid->[$lexeme_id];
+    my $xsy          = $xsy_by_isyid->[$lexeme_id];
     return $xsy->[Marpa::R3::Internal::XSY::BLESSING] // '::undef';
 }
 
 # For diagnostics
 sub brief_rule_list {
     my ( $slg, $rule_ids ) = @_;
-    my $tracer =
-        $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
+    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     my @brief_rules = map { $tracer->brief_rule($_) } @{$rule_ids};
     return join q{}, map { q{    } . $_ . "\n" } @brief_rules;
 }
 
-sub registrations_set
-{
-  my ( $slg, $registrations) = @_;
-  my $tracer        = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
-  my $trace_file_handle =
+sub registrations_set {
+    my ( $slg, $registrations ) = @_;
+    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
+    my $trace_file_handle =
       $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE];
-  my $trace_actions =
+    my $trace_actions =
       $slg->[Marpa::R3::Internal::Scanless::G::TRACE_ACTIONS] // 0;
 
-    $slg->call_by_tag( (__FILE__ . ':' .  __LINE__), << 'END_OF_LUA', '');
+    $slg->call_by_tag( ( __FILE__ . ':' . __LINE__ ), << 'END_OF_LUA', '' );
                 local grammar = ...
                 grammar.constants = {}
 END_OF_LUA
@@ -722,13 +722,12 @@ END_OF_LUA
 }
 
 sub registrations_find {
-    my ($slg ) = @_;
+    my ($slg) = @_;
     my $thin_slg = $slg->[Marpa::R3::Internal::Scanless::G::C];
     my $trace_file_handle =
       $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE];
     my $tracer        = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     my $xbnf_by_irlid = $tracer->[Marpa::R3::Internal::Trace::G::XBNF_BY_IRLID];
-    my $grammar_c     = $tracer->[Marpa::R3::Internal::Trace::G::C];
     my $trace_actions =
       $slg->[Marpa::R3::Internal::Scanless::G::TRACE_ACTIONS] // 0;
 
@@ -736,8 +735,7 @@ sub registrations_find {
     my @semantics_by_irlid = ();
     my @blessing_by_irlid  = ();
 
-    my ( $rule_resolutions, $lexeme_resolutions ) =
-      resolve_grammar( $slg );
+    my ( $rule_resolutions, $lexeme_resolutions ) = resolve_grammar($slg);
 
     # Set the arrays, and perform various checks on the resolutions
     # we received
@@ -746,9 +744,9 @@ sub registrations_find {
         for my $irlid ( $tracer->rule_ids() ) {
             my ( $new_resolution, $closure, $semantics, $blessing ) =
               @{ $rule_resolutions->[$irlid] };
-    my ($lhs_id) = $slg->call_by_tag(
-    ('@' .__FILE__ . ':' . __LINE__),
-    <<'END_OF_LUA', 'i>*', $irlid ) ;
+            my ($lhs_id) =
+              $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+                <<'END_OF_LUA', 'i>*', $irlid );
     local grammar, irlid = ...
     local g1g = grammar.lmw_g1g
     return g1g:rule_lhs(irlid)
@@ -831,9 +829,9 @@ qq{  Cannot bless rule when it resolves to a scalar constant},
     my @nullable_rule_ids_by_lhs = ();
   RULE: for my $irlid ( $tracer->rule_ids() ) {
 
-    my ($lhs_id, $rule_is_nullable) = $slg->call_by_tag(
-    ('@' .__FILE__ . ':' . __LINE__),
-    <<'END_OF_LUA', 'i>*', $irlid ) ;
+        my ( $lhs_id, $rule_is_nullable ) =
+          $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+            <<'END_OF_LUA', 'i>*', $irlid );
     local grammar, irlid = ...
     local g1g = grammar.lmw_g1g
     return g1g:rule_lhs(irlid), g1g:rule_is_nullable(irlid)
@@ -875,9 +873,9 @@ END_OF_LUA
 
         # More than one rule?  Are any empty?
         # If so, use the semantics of the empty rule
-    my ($empty_rules) = $slg->call_by_tag(
-    ('@' .__FILE__ . ':' . __LINE__),
-    <<'END_OF_LUA', 'i>*', $irlids ) ;
+        my ($empty_rules) =
+          $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+            <<'END_OF_LUA', 'i>*', $irlids );
     local grammar, irlids = ...
     local g1g = grammar.lmw_g1g
     local empty_rules = {}
@@ -929,7 +927,7 @@ END_OF_LUA
                     qq{  can have more than one semantics\n},
                     qq{  Marpa needs there to be only one semantics\n},
                     qq{  The rules involved are:\n},
-                       brief_rule_list( $slg, $irlids)
+                    brief_rule_list( $slg, $irlids )
                 );
             } ## end if ( $first_closure_name ne $other_closure_name or ...)
         } ## end OTHER_RESOLUTION: for my $other_resolution (@other_resolutions)
@@ -962,7 +960,15 @@ END_OF_LUA
 
     # Check the lexeme semantics
     {
-      LEXEME: for my $lexeme_id ( 0 .. $grammar_c->highest_symbol_id() ) {
+        my ($highest_symbol_id) =
+          $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+            <<'END_OF_LUA', '>*' );
+    local grammar = ...
+    local g1g = grammar.lmw_g1g
+    return g1g:highest_symbol_id()
+END_OF_LUA
+
+      LEXEME: for my $lexeme_id ( 0 .. $highest_symbol_id ) {
 
             my ( $semantics, $blessing ) =
               @{ $lexeme_resolutions->[$lexeme_id] };
@@ -1011,9 +1017,8 @@ END_OF_LUA
     }
 
     # state $op_lua = Marpa::R3::Thin::op('lua');
-    my ($op_lua) = $thin_slg->call_by_tag(
-        ('@' .__FILE__ . ':' .  __LINE__),
-        <<'END_OF_LUA', '');
+    my ($op_lua) = $thin_slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', '' );
         return kollos.defines.MARPA_OP_LUA
 END_OF_LUA
 
@@ -1061,9 +1066,9 @@ END_OF_LUA
         push @work_list, [ $irlid, undef, $semantics, $blessing ];
     }
 
-    my ($highest_symbol_id) = $slg->call_by_tag(
-        ('@' .__FILE__ . ':' .  __LINE__),
-        <<'END_OF_LUA', '');
+    my ($highest_symbol_id) =
+      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', '' );
         local grammar = ...
         return grammar.lmw_g1g:highest_symbol_id()
 END_OF_LUA
@@ -1097,9 +1102,9 @@ END_OF_LUA
             $closure           = $closure_by_irlid[$irlid];
             $xbnf              = $xbnf_by_irlid->[$irlid];
 
-    ($rule_length, $is_sequence_rule) = $slg->call_by_tag(
-        ('@' .__FILE__ . ':' .  __LINE__),
-        <<'END_OF_LUA', 'i', $irlid);
+            ( $rule_length, $is_sequence_rule ) =
+              $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+                <<'END_OF_LUA', 'i', $irlid );
         local grammar, irlid = ...
         local g1g = grammar.lmw_g1g
         return g1g:rule_length(irlid), (g1g:sequence_min(irlid) and 1 or 0)
@@ -1268,9 +1273,9 @@ qq{    Semantics were specified as "$original_semantics"\n}
                 if ( $result_descriptor eq 'lhs' ) {
                     if ( defined $irlid ) {
 
-    my ($lhs_id) = $slg->call_by_tag(
-    ('@' .__FILE__ . ':' . __LINE__),
-    <<'END_OF_LUA', 'i>*', $irlid ) ;
+                        my ($lhs_id) = $slg->call_by_tag(
+                            ( '@' . __FILE__ . ':' . __LINE__ ),
+                            <<'END_OF_LUA', 'i>*', $irlid );
     local grammar, irlid = ...
     local g1g = grammar.lmw_g1g
     return g1g:rule_lhs(irlid)
@@ -1310,9 +1315,9 @@ END_OF_LUA
 
                 if ( $result_descriptor eq 'symbol' ) {
                     if ( defined $irlid ) {
-    my ($name) = $slg->call_by_tag(
-    ('@' .__FILE__ . ':' . __LINE__),
-    <<'END_OF_LUA', 'i>*', $irlid ) ;
+                        my ($name) = $slg->call_by_tag(
+                            ( '@' . __FILE__ . ':' . __LINE__ ),
+                            <<'END_OF_LUA', 'i>*', $irlid );
     local grammar, irlid = ...
     local g1g = grammar.lmw_g1g
     local lhs_id = g1g:rule_lhs(irlid)
@@ -1399,9 +1404,9 @@ END_OF_LUA
 
         my $start_symbol_id = $tracer->symbol_by_name('[:start]');
 
-    my ($symbol_is_nullable) = $slg->call_by_tag(
-    ('@' .__FILE__ . ':' . __LINE__),
-    <<'END_OF_LUA', 'i>*', $start_symbol_id ) ;
+        my ($symbol_is_nullable) =
+          $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+            <<'END_OF_LUA', 'i>*', $start_symbol_id );
     local grammar, irlid = ...
     local g1g = grammar.lmw_g1g
     return (g1g:symbol_is_nullable(irlid) and 1 or 0)
@@ -1435,15 +1440,15 @@ END_OF_LUA
     $slg->[Marpa::R3::Internal::Scanless::G::CLOSURE_BY_RULE_ID] =
       \@closure_by_irlid;
 
-  return \@registrations;
+    return \@registrations;
 
 }
 
 # Returns false if no parse
 sub Marpa::R3::Scanless::R::value {
     my ( $slr, $per_parse_arg ) = @_;
-    my $slg       = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $tracer    = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
+    my $slg    = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
 
     my $trace_actions =
       $slg->[Marpa::R3::Internal::Scanless::G::TRACE_ACTIONS] // 0;
@@ -1470,9 +1475,7 @@ sub Marpa::R3::Scanless::R::value {
 
     $slr->[Marpa::R3::Internal::Scanless::R::PHASE] = "value";
 
-    $slr->call_by_tag(
-        (__FILE__ . ':' .  __LINE__),
-    <<'END_OF_LUA', '');
+    $slr->call_by_tag( ( __FILE__ . ':' . __LINE__ ), <<'END_OF_LUA', '' );
     recce = ...
     local g1r = recce.lmw_g1r
     local furthest_earleme = g1r:furthest_earleme()
@@ -1488,26 +1491,24 @@ sub Marpa::R3::Scanless::R::value {
     end
 END_OF_LUA
 
-    ENSURE_TREE: {
+  ENSURE_TREE: {
+
         # No tree, therefore not initialized
 
-        my ($lua_tree) = $slr->call_by_tag(
-    (__FILE__ . ':' . __LINE__),
-        'recce=...; return recce.lmw_t', '>*' );
+        my ($lua_tree) = $slr->call_by_tag( ( __FILE__ . ':' . __LINE__ ),
+            'recce=...; return recce.lmw_t', '>*' );
         last ENSURE_TREE if $lua_tree;
 
         my $have_order = $slr->ordering_get();
         return if not $have_order;
-        $slr->call_by_tag(
-    (__FILE__ . ':' . __LINE__),
-        'recce=...; recce.lmw_t = kollos.tree_new(recce.lmw_o)', '' );
+        $slr->call_by_tag( ( __FILE__ . ':' . __LINE__ ),
+            'recce=...; recce.lmw_t = kollos.tree_new(recce.lmw_o)', '' );
 
     }
 
-    my $max_parses  = $slr->[Marpa::R3::Internal::Scanless::R::MAX_PARSES];
-    my ($result) = $slr->call_by_tag(
-    (__FILE__ . ':' . __LINE__),
-    << 'END_OF_LUA', 'i>*', ($max_parses // 0));
+    my $max_parses = $slr->[Marpa::R3::Internal::Scanless::R::MAX_PARSES];
+    my ($result) = $slr->call_by_tag( ( __FILE__ . ':' . __LINE__ ),
+        << 'END_OF_LUA', 'i>*', ( $max_parses // 0 ) );
         recce, raw_max_parses = ...
         local max_parses = math.tointeger(raw_max_parses + 0)
         local parse_count = recce.lmw_t:parse_count()
@@ -1529,11 +1530,11 @@ END_OF_LUA
 
     local $Marpa::R3::Context::rule = undef;
     local $Marpa::R3::Context::slr  = $slr;
-    local $Marpa::R3::Context::slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+    local $Marpa::R3::Context::slg =
+      $slr->[Marpa::R3::Internal::Scanless::R::SLG];
 
-    $slr->call_by_tag(
-        ('@' . __FILE__ . ':' .  __LINE__),
-    << 'END_OF_LUA', 'i', ($trace_values ? $trace_values : 0 ));
+    $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        << 'END_OF_LUA', 'i', ( $trace_values ? $trace_values : 0 ) );
     recce, flag = ...
     recce.lmw_v:_trace(flag)
     recce:value_init(flag)
@@ -1545,9 +1546,8 @@ END_OF_LUA
 
         if ($trace_values) {
           EVENT: for ( my $event_ix = 0 ; ; $event_ix++ ) {
-                my @event = $slr->call_by_tag(
-    (__FILE__ . ':' . __LINE__),
-                <<'END_OF_LUA', 'i>*', $event_ix );
+                my @event = $slr->call_by_tag( ( __FILE__ . ':' . __LINE__ ),
+                    <<'END_OF_LUA', 'i>*', $event_ix );
 local recce, event_ix = ...;
 local entry = recce.trace_values_queue[event_ix+1]
 if entry == nil then return end
@@ -1561,8 +1561,7 @@ END_OF_LUA
                 if ( $event_type eq 'MARPA_STEP_TOKEN' ) {
                     my ( $token_id, $token_value_ix, $token_value ) =
                       @event_data;
-                    trace_token_evaluation( $slr, $token_id,
-                        $token_value );
+                    trace_token_evaluation( $slr, $token_id, $token_value );
                     next EVENT;
                 } ## end if ( $event_type eq 'MARPA_STEP_TOKEN' )
 
@@ -1575,8 +1574,8 @@ END_OF_LUA
             if ( $trace_values >= 9 ) {
 
                 my ($highest_index) =
-                      $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-                        << 'END_OF_LUA', '');
+                  $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+                    << 'END_OF_LUA', '' );
     local recce =...
     return recce:stack_top_index()
 END_OF_LUA
@@ -1645,11 +1644,13 @@ END_OF_LUA
                 );
             } ## end if ( not $eval_ok or @warnings )
 
-            my $wrapped_result = bless [ 'asis', $result ], "Marpa::R3::Tree_Op";
+            my $wrapped_result = bless [ 'asis', $result ],
+              "Marpa::R3::Tree_Op";
+
             # my $wrapped_result = $result;
 
-                      $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-                        << 'END_OF_LUA', 'S', $wrapped_result);
+            $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+                << 'END_OF_LUA', 'S', $wrapped_result );
     local recce, sv =...
     local ix = recce:stack_top_index()
     return recce:stack_set(ix, sv)
@@ -1676,7 +1677,8 @@ END_OF_LUA
                 local $Marpa::R3::Context::rule = $rule_id;
 
                 # say STDERR "Before tree ops: ", Data::Dumper::Dumper($values);
-                $values = do_tree_ops($slr, $values);
+                $values = do_tree_ops( $slr, $values );
+
                 # say STDERR "After tree ops: ", Data::Dumper::Dumper($values);
 
                 $eval_ok = eval {
@@ -1700,11 +1702,13 @@ END_OF_LUA
             }
 
             # say STDERR "Before wrapping: ", Data::Dumper::Dumper($result);
-            my $wrapped_result = bless [ 'asis', $result ], "Marpa::R3::Tree_Op";
+            my $wrapped_result = bless [ 'asis', $result ],
+              "Marpa::R3::Tree_Op";
+
             # my $wrapped_result = $result;
 
-                      $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-                        << 'END_OF_LUA', 'S', $wrapped_result);
+            $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+                << 'END_OF_LUA', 'S', $wrapped_result );
     local recce, sv =...
     local index = recce:stack_top_index()
     return recce:stack_set(index, sv)
@@ -1726,7 +1730,7 @@ END_OF_LUA
 
         if ( $value_type eq 'MARPA_STEP_TRACE' ) {
 
-            if ( my $trace_output = trace_op( $slr ) ) {
+            if ( my $trace_output = trace_op($slr) ) {
                 print {$trace_file_handle} $trace_output
                   or Marpa::R3::exception('Could not print to trace file');
             }
@@ -1739,13 +1743,14 @@ END_OF_LUA
 
     } ## end STEP: while (1)
 
-    my ($final_value) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ), << 'END_OF_LUA', '', );
+    my ($final_value) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        << 'END_OF_LUA', '', );
     local recce =...
     return recce:stack_get(1)
 END_OF_LUA
 
-    # say "final value: ", Data::Dumper::Dumper( \(do_tree_ops($slr, $final_value)) );
-    return do_tree_ops($slr, \($final_value));
+# say "final value: ", Data::Dumper::Dumper( \(do_tree_ops($slr, $final_value)) );
+    return do_tree_ops( $slr, \($final_value) );
 
 }
 
@@ -1754,9 +1759,8 @@ END_OF_LUA
 sub Marpa::R3::Scanless::R::and_node_tag {
     my ( $slr, $and_node_id ) = @_;
 
-    my ($tag) = $slr->call_by_tag(
-    ('@' . __FILE__ . ':' . __LINE__),
-        << 'END_OF_LUA', 'i', $and_node_id);
+    my ($tag) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        << 'END_OF_LUA', 'i', $and_node_id );
     local recce,and_node_id=...
     return recce:and_node_tag(and_node_id)
 END_OF_LUA
@@ -1766,15 +1770,13 @@ END_OF_LUA
 
 sub trace_token_evaluation {
     my ( $slr, $token_id, $token_value ) = @_;
-    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $tracer =
-        $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
+    my $slg    = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     my $trace_file_handle =
-        $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
+      $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
 
-    my ($nook_ix, $and_node_id)
-        = $slr->call_by_tag(
-    ('@' . __FILE__ . ':' . __LINE__),
+    my ( $nook_ix, $and_node_id ) =
+      $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         << 'END_OF_LUA', '>*' );
     recce = ...
     local nook_ix = recce.lmw_v:_nook()
@@ -1788,7 +1790,7 @@ END_OF_LUA
 
     if ( not defined $nook_ix ) {
         print {$trace_file_handle} "Nulling valuator\n"
-            or Marpa::R3::exception('Could not print to trace file');
+          or Marpa::R3::exception('Could not print to trace file');
         return;
     }
     my $token_name;
@@ -1797,12 +1799,12 @@ END_OF_LUA
     }
 
     print {$trace_file_handle}
-        'Pushed value from ',
-        $slr->and_node_tag( $and_node_id ),
-        ': ',
-        ( $token_name ? qq{$token_name = } : q{} ),
-        Data::Dumper->new( [ \$token_value ] )->Terse(1)->Dump
-        or Marpa::R3::exception('print to trace handle failed');
+      'Pushed value from ',
+      $slr->and_node_tag($and_node_id),
+      ': ',
+      ( $token_name ? qq{$token_name = } : q{} ),
+      Data::Dumper->new( [ \$token_value ] )->Terse(1)->Dump
+      or Marpa::R3::exception('print to trace handle failed');
 
     return;
 
@@ -1810,14 +1812,12 @@ END_OF_LUA
 
 sub trace_stack_1 {
     my ( $slr, $args, $rule_id ) = @_;
-    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $tracer =
-        $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
+    my $slg    = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
 
-    my $argc       = scalar @{$args};
-    my ($nook_ix, $and_node_id) = $slr->call_by_tag(
-    (__FILE__ . ':' . __LINE__),
-    <<'END_OF_LUA', '>*' );
+    my $argc = scalar @{$args};
+    my ( $nook_ix, $and_node_id ) =
+      $slr->call_by_tag( ( __FILE__ . ':' . __LINE__ ), <<'END_OF_LUA', '>*' );
     -- in trace_stack_1
     recce = ...
     local nook_ix = recce.lmw_v:_nook()
@@ -1830,31 +1830,31 @@ sub trace_stack_1 {
 END_OF_LUA
 
     return 'Popping ', $argc,
-        ' values to evaluate ',
-        $slr->and_node_tag( $and_node_id ),
-        ', rule: ', $tracer->brief_rule($rule_id);
+      ' values to evaluate ',
+      $slr->and_node_tag($and_node_id),
+      ', rule: ', $tracer->brief_rule($rule_id);
 
 } ## end sub trace_stack_1
 
 sub trace_op {
 
-    my ( $slr ) = @_;
-    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+    my ($slr)  = @_;
+    my $slg    = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
 
     my $trace_output = q{};
     my $trace_values =
-        $slr->[Marpa::R3::Internal::Scanless::R::TRACE_VALUES] // 0;
+      $slr->[Marpa::R3::Internal::Scanless::R::TRACE_VALUES] // 0;
 
     return $trace_output if not $trace_values >= 2;
 
-    my ($nook_ix, $or_node_id, $choice, $and_node_id, $trace_irl_id, $or_node_position,
-            $virtual_rhs, $virtual_lhs, $irl_length,
-            $real_symbol_count
-        )
-        = $slr->call_by_tag(
-        ('@' . __FILE__ . ':' .  __LINE__),
-        <<'END_OF_LUA' , '');
+    my (
+        $nook_ix,      $or_node_id,       $choice,      $and_node_id,
+        $trace_irl_id, $or_node_position, $virtual_rhs, $virtual_lhs,
+        $irl_length,   $real_symbol_count
+      )
+      = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA' , '' );
     -- in trace_op()
     recce = ...
     local nook_ix = recce.lmw_v:_nook()
@@ -1882,14 +1882,12 @@ END_OF_LUA
     if ( $virtual_rhs and not $virtual_lhs ) {
 
         $trace_output .= join q{},
-            'Head of Virtual Rule: ',
-            $slr->and_node_tag( $and_node_id ),
-            ', rule: ', $tracer->brief_irl($trace_irl_id),
-            "\n",
-            'Incrementing virtual rule by ',
-            $real_symbol_count, ' symbols',
-            "\n"
-            or Marpa::R3::exception('Could not print to trace file');
+          'Head of Virtual Rule: ',
+          $slr->and_node_tag($and_node_id),
+          ', rule: ', $tracer->brief_irl($trace_irl_id),
+          "\n",
+          'Incrementing virtual rule by ', $real_symbol_count, ' symbols', "\n"
+          or Marpa::R3::exception('Could not print to trace file');
 
         return $trace_output;
 
@@ -1898,12 +1896,12 @@ END_OF_LUA
     if ( $virtual_lhs and $virtual_rhs ) {
 
         $trace_output .= join q{},
-            'Virtual Rule: ',
-            $slr->and_node_tag( $and_node_id ),
-            ', rule: ', $tracer->brief_irl($trace_irl_id),
-            "\nAdding ",
-            $real_symbol_count,
-            "\n";
+          'Virtual Rule: ',
+          $slr->and_node_tag($and_node_id),
+          ', rule: ', $tracer->brief_irl($trace_irl_id),
+          "\nAdding ",
+          $real_symbol_count,
+          "\n";
 
         return $trace_output;
 
@@ -1912,12 +1910,12 @@ END_OF_LUA
     if ( not $virtual_rhs and $virtual_lhs ) {
 
         $trace_output .= join q{},
-            'New Virtual Rule: ',
-            $slr->and_node_tag( $and_node_id ),
-            ', rule: ', $tracer->brief_irl($trace_irl_id),
-            "\nReal symbol count is ",
-            $real_symbol_count,
-            "\n";
+          'New Virtual Rule: ',
+          $slr->and_node_tag($and_node_id),
+          ', rule: ', $tracer->brief_irl($trace_irl_id),
+          "\nReal symbol count is ",
+          $real_symbol_count,
+          "\n";
 
         return $trace_output;
 
