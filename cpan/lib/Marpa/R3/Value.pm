@@ -1376,8 +1376,16 @@ END_OF_LUA
         # so copy them.
 
         my $start_symbol_id = $tracer->symbol_by_name('[:start]');
-        last SLR_NULLING_GRAMMAR_HACK
-          if not $grammar_c->symbol_is_nullable($start_symbol_id);
+
+    my ($symbol_is_nullable) = $slg->call_by_tag(
+    ('@' .__FILE__ . ':' . __LINE__),
+    <<'END_OF_LUA', 'i>*', $start_symbol_id ) ;
+    local grammar, irlid = ...
+    local g1g = grammar.lmw_g1g
+    return (g1g:symbol_is_nullable(irlid) and 1 or 0)
+END_OF_LUA
+
+        last SLR_NULLING_GRAMMAR_HACK if not $symbol_is_nullable;
 
         my $start_rhs_symbol_id;
       RULE: for my $irlid ( $tracer->rule_ids() ) {
@@ -1817,8 +1825,6 @@ sub trace_op {
         $slr->[Marpa::R3::Internal::Scanless::R::TRACE_VALUES] // 0;
 
     return $trace_output if not $trace_values >= 2;
-
-    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
 
     my ($nook_ix, $or_node_id, $choice, $and_node_id, $trace_irl_id, $or_node_position,
             $virtual_rhs, $virtual_lhs, $irl_length,
