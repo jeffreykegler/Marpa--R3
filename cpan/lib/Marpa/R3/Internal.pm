@@ -20,7 +20,7 @@ use warnings;
 use Carp;
 
 use vars qw($VERSION $STRING_VERSION);
-$VERSION        = '4.001_034';
+$VERSION        = '4.001_035';
 $STRING_VERSION = $VERSION;
 $VERSION = eval $VERSION;
 
@@ -70,7 +70,6 @@ use constant XSY_BY_ISYID => 3;
 use constant XBNF_BY_IRLID => 4;
 use constant ACTION_BY_IRLID => 5;
 use constant MASK_BY_IRLID => 6;
-use constant START_NAME => 7;
 
 package Marpa::R3::Internal::Progress_Report;
 use constant RULE_ID => 0;
