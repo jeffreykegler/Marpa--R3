@@ -1554,9 +1554,9 @@ END_OF_LUA
             return "abend", (problem_description .. ': ' .. rule_description)
 END_OF_LUA
 
-    Marpa::R3::exception($problem) if $ok ne 'fail'
+        Marpa::R3::exception($problem) if $ok ne 'fail'
+    }
 
-    } ## end if ( not defined $base_rule_id or $base_rule_id < 0 )
     $tracer->[Marpa::R3::Internal::Trace::G::XBNF_BY_IRLID]->[$base_rule_id] = $xbnf;
 
     # Later on we will need per-IRL actions and masks
@@ -1709,14 +1709,23 @@ END_OF_LUA
 
     if ( not defined $base_rule_id or $base_rule_id < 0 ) {
         my $rule_description = rule_describe( $lhs_name, $rhs_names );
-        my ( $error_code, $error_string ) = $grammar_c->error();
-        $error_code //= -1;
-        my $problem_description =
-            $error_code == $Marpa::R3::Error::DUPLICATE_RULE
-            ? 'Duplicate rule'
-            : $error_string;
-        Marpa::R3::exception("$problem_description: $rule_description");
-    } ## end if ( not defined $base_rule_id or $base_rule_id < 0 )
+        my ($ok, $problem) =
+        $thin_slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+            <<'END_OF_LUA', 's', $rule_description );
+            local grammar, rule_description = ...
+            local l0g = grammar.lmw_l0g
+            local error_code = l0g:error_code()
+            if error_code == kollos.err.DUPLICATE_RULE then
+                problem_description = "Duplicate rule"
+            else
+                problem_description = kollos.err[error_code].description
+            end
+            return "abend", (problem_description .. ': ' .. rule_description)
+END_OF_LUA
+
+        Marpa::R3::exception($problem) if $ok ne 'fail';
+    }
+
     $tracer->[Marpa::R3::Internal::Trace::G::XBNF_BY_IRLID]->[$base_rule_id] = $xbnf;
 
     # Later on we will need per-IRL actions and masks
