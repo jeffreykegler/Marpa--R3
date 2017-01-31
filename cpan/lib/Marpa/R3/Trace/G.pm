@@ -103,17 +103,6 @@ sub formatted_symbol_name {
     return '<' . $symbol_name . '>';
 }
 
-sub rule {
-    my ( $self, $rule_id ) = @_;
-    my $grammar_c     = $self->[Marpa::R3::Internal::Trace::G::C];
-    my $rule_length = $grammar_c->rule_length($rule_id);
-    my $lhs = $self->symbol_name( $grammar_c->rule_lhs($rule_id) );
-    my @rhs =
-        map { $self->symbol_name( $grammar_c->rule_rhs( $rule_id, $_ ) ) }
-        ( 0 .. $rule_length - 1 );
-    return ($lhs, @rhs);
-}
-
 # Expand a rule into a list of symbol IDs
 sub rule_expand {
     my ( $self, $rule_id ) = @_;
