@@ -3377,9 +3377,8 @@ The "throw" flag is ignored.
 
 Return the current error_description
 Lua C API.  The only argument must be a Libmarpa wrapper
-object.  These all define the `lmw_g` field.
-
-
+object.
+All such objects define the `lmw_g` field.
 ```
     -- miranda: section+ base error handlers
 
@@ -3397,6 +3396,33 @@ object.  These all define the `lmw_g` field.
         error_code = marpa_g_error (*grammar_ud, NULL);
         description = error_description_by_code (error_code);
         marpa_lua_pushstring (L, description);
+        return 1;
+    }
+
+```
+
+Return the current error data:
+code, mnemonic and description.
+Lua C API.  The only argument must be a Libmarpa wrapper
+object.
+All such objects define the `lmw_g` field.
+
+
+```
+    -- miranda: section+ base error handlers
+
+    static int
+    lca_libmarpa_error_code(lua_State* L)
+    {
+        Marpa_Error_Code error_code;
+        Marpa_Grammar *grammar_ud;
+        const int lmw_stack_ix = 1;
+
+        marpa_lua_getfield (L, lmw_stack_ix, "lmw_g");
+        marpa_lua_getfield (L, -1, "_libmarpa");
+        grammar_ud = (Marpa_Grammar *) marpa_lua_touserdata (L, -1);
+        error_code = marpa_g_error (*grammar_ud, NULL);
+        marpa_lua_pushinteger (L, error_code);
         return 1;
     }
 
@@ -3841,6 +3867,7 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
 
     static const struct luaL_Reg grammar_methods[] = {
       { "error", lca_libmarpa_error },
+      { "error_code", lca_libmarpa_error_code },
       { "error_description", lca_libmarpa_error_description },
       { "events", lca_grammar_events },
       { "precompute", lca_grammar_precompute },
@@ -3959,6 +3986,7 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
 
     static const struct luaL_Reg recce_methods[] = {
       { "error", lca_libmarpa_error },
+      { "error_code", lca_libmarpa_error_code },
       { "error_description", lca_libmarpa_error_description },
       { "terminals_expected", lca_recce_terminals_expected },
       { "progress_item", lca_recce_progress_item },
@@ -3974,6 +4002,8 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
 
     static const struct luaL_Reg bocage_methods[] = {
       { "error", lca_libmarpa_error },
+      { "error_code", lca_libmarpa_error_code },
+      { "error_description", lca_libmarpa_error_description },
       { NULL, NULL },
     };
 
@@ -3983,6 +4013,8 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
 
     static const struct luaL_Reg order_methods[] = {
       { "error", lca_libmarpa_error },
+      { "error_code", lca_libmarpa_error_code },
+      { "error_description", lca_libmarpa_error_description },
       { NULL, NULL },
     };
 
@@ -3994,6 +4026,8 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
 
     static const struct luaL_Reg tree_methods[] = {
       { "error", lca_libmarpa_error },
+      { "error_code", lca_libmarpa_error_code },
+      { "error_description", lca_libmarpa_error_description },
       { NULL, NULL },
     };
 
@@ -4401,24 +4435,29 @@ Marpa::R3.
 
         /* In alphabetical order by field name */
 
+        /* TODO: Check this.  Needed?  In the right table? */
         marpa_lua_pushvalue (L, upvalue_stack_ix);
         marpa_lua_pushcclosure (L, l_error_description_by_code, 1);
         /* [ kollos, function ] */
         marpa_lua_setfield (L, kollos_table_stack_ix, "error_description");
         /* [ kollos ] */
 
+        /* TODO: Check this.  Needed?  In the right table? */
         marpa_lua_pushvalue (L, upvalue_stack_ix);
         marpa_lua_pushcclosure (L, l_error_name_by_code, 1);
         marpa_lua_setfield (L, kollos_table_stack_ix, "error_name");
 
+        /* TODO: Check this.  Needed?  In the right table? */
         marpa_lua_pushvalue (L, upvalue_stack_ix);
         marpa_lua_pushcclosure (L, l_error_new, 1);
         marpa_lua_setfield (L, kollos_table_stack_ix, "error_new");
 
+        /* TODO: Check this.  Needed?  In the right table? */
         marpa_lua_pushvalue (L, upvalue_stack_ix);
         marpa_lua_pushcclosure (L, l_event_name_by_code, 1);
         marpa_lua_setfield (L, kollos_table_stack_ix, "event_name");
 
+        /* TODO: Check this.  Needed?  In the right table? */
         marpa_lua_pushvalue (L, upvalue_stack_ix);
         marpa_lua_pushcclosure (L, l_event_description_by_code, 1);
         marpa_lua_setfield (L, kollos_table_stack_ix, "event_description");

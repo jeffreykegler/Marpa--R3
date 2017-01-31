@@ -1258,7 +1258,6 @@ sub assign_G1_symbol {
     my $thin_slg = $slg->[Marpa::R3::Internal::Scanless::G::C];
     my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
 
-    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
     my $symbol_id = $tracer->symbol_by_name($name);
     if ( defined $symbol_id ) {
         return $symbol_id;
@@ -1327,7 +1326,6 @@ sub assign_L0_symbol {
     my $thin_slg = $slg->[Marpa::R3::Internal::Scanless::G::C];
     my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER];
 
-    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
     my $symbol_id = $tracer->symbol_by_name($name);
     if ( defined $symbol_id ) {
         return $symbol_id;
@@ -1542,13 +1540,22 @@ END_OF_LUA
 
     if ( not defined $base_rule_id or $base_rule_id < 0 ) {
         my $rule_description = rule_describe( $lhs_name, $rhs_names );
-        my ( $error_code, $error_string ) = $grammar_c->error();
-        $error_code //= -1;
-        my $problem_description =
-            $error_code == $Marpa::R3::Error::DUPLICATE_RULE
-            ? 'Duplicate rule'
-            : $error_string;
-        Marpa::R3::exception("$problem_description: $rule_description");
+        my ($ok, $problem) =
+        $thin_slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+            <<'END_OF_LUA', 's', $rule_description );
+            local grammar, rule_description = ...
+            local g1g = grammar.lmw_g1g
+            local error_code = g1g:error_code()
+            if error_code == kollos.err.DUPLICATE_RULE then
+                problem_description = "Duplicate rule"
+            else
+                problem_description = kollos.err[error_code].description
+            end
+            return "abend", (problem_description .. ': ' .. rule_description)
+END_OF_LUA
+
+    Marpa::R3::exception($problem) if $ok ne 'fail'
+
     } ## end if ( not defined $base_rule_id or $base_rule_id < 0 )
     $tracer->[Marpa::R3::Internal::Trace::G::XBNF_BY_IRLID]->[$base_rule_id] = $xbnf;
 
