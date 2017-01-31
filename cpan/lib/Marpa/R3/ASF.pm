@@ -298,7 +298,6 @@ sub Marpa::R3::Internal::ASF::blessings_set {
     my $tracer =
         $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     my $xbnf_by_irlid = $tracer->[Marpa::R3::Internal::Trace::G::XBNF_BY_IRLID];
-    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
     my $xsy_by_isyid   = $tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID];
 
     my $default_token_blessing_package =
@@ -404,9 +403,6 @@ sub Marpa::R3::ASF::new {
 
     my $slg       = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $thin_slr  = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
-    my $tracer =
-        $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
-    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
 
     if ( defined $slr->[Marpa::R3::Internal::Scanless::R::TREE_MODE] ) {
 
@@ -822,9 +818,6 @@ sub factoring_finish {
 
     my $slr       = $asf->[Marpa::R3::Internal::ASF::SLR];
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $tracer =
-        $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
-    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
 
     my @worklist = ( 0 .. $#{$factoring_stack} );
 
@@ -921,9 +914,6 @@ sub glade_id_factors {
     my $asf           = $choicepoint->[Marpa::R3::Internal::Choicepoint::ASF];
     my $slr           = $asf->[Marpa::R3::Internal::ASF::SLR];
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $tracer =
-        $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
-    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
     my $or_nodes      = $asf->[Marpa::R3::Internal::ASF::OR_NODES];
 
     my @result;

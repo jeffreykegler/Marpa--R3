@@ -428,7 +428,6 @@ sub resolve_grammar {
 
     my ( $slg ) = @_;
     my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
-    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
 
     my $trace_actions =
         $slg->[Marpa::R3::Internal::Scanless::G::TRACE_ACTIONS] // 0;
@@ -494,7 +493,16 @@ qq{Attempt to bless, but improper semantics: "$semantics"\n},
     } ## end RULE: for my $rule_id ( $tracer->rule_ids() )
 
     if ( $trace_actions >= 2 ) {
-        RULE: for my $rule_id ( 0 .. $grammar_c->highest_rule_id() ) {
+
+    my ($highest_irlid) = $slg->call_by_tag(
+    ('@' .__FILE__ . ':' . __LINE__),
+    <<'END_OF_LUA', '>*' ) ;
+    local grammar = ...
+    local g1g = grammar.lmw_g1g
+    return g1g:highest_rule_id()
+END_OF_LUA
+
+        RULE: for my $rule_id ( 0 .. $highest_irlid ) {
             my ( $resolution_name, $closure ) =
                 @{ $rule_resolutions->[$rule_id] };
             say {$trace_file_handle} 'Rule ',
@@ -505,7 +513,16 @@ qq{Attempt to bless, but improper semantics: "$semantics"\n},
     }
 
     my @lexeme_resolutions = ();
-    SYMBOL: for my $lexeme_id ( 0 .. $grammar_c->highest_symbol_id()) {
+
+    my ($highest_symbol_id) = $slg->call_by_tag(
+    ('@' .__FILE__ . ':' . __LINE__),
+    <<'END_OF_LUA', '>*' ) ;
+    local grammar = ...
+    local g1g = grammar.lmw_g1g
+    return g1g:highest_symbol_id()
+END_OF_LUA
+
+    SYMBOL: for my $lexeme_id ( 0 .. $highest_symbol_id) {
 
         my $semantics = lexeme_semantics_find( $slg, $lexeme_id );
         if ( not defined $semantics ) {
@@ -1363,7 +1380,6 @@ sub Marpa::R3::Scanless::R::value {
     my ( $slr, $per_parse_arg ) = @_;
     my $slg       = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $tracer    = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
-    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
 
     my $trace_actions =
       $slg->[Marpa::R3::Internal::Scanless::G::TRACE_ACTIONS] // 0;
