@@ -1033,7 +1033,14 @@ END_OF_LUA
         push @work_list, [ $irlid, undef, $semantics, $blessing ];
     }
 
-  LEXEME: for my $lexeme_id ( 0 .. $grammar_c->highest_symbol_id() ) {
+    my ($highest_symbol_id) = $slg->call_by_tag(
+        ('@' .__FILE__ . ':' .  __LINE__),
+        <<'END_OF_LUA', '');
+        local grammar = ...
+        return grammar.lmw_g1g:highest_symbol_id()
+END_OF_LUA
+
+  LEXEME: for my $lexeme_id ( 0 .. $highest_symbol_id ) {
 
         my $semantics = $semantics_by_lexeme_id[$lexeme_id];
         my $blessing  = $blessing_by_lexeme_id[$lexeme_id];
@@ -1061,7 +1068,14 @@ END_OF_LUA
             $nulling_symbol_id = $nulling_symbol_by_semantic_rule[$irlid];
             $closure           = $closure_by_irlid[$irlid];
             $xbnf              = $xbnf_by_irlid->[$irlid];
-            $rule_length       = $grammar_c->rule_length($irlid);
+
+    ($rule_length) = $slg->call_by_tag(
+        ('@' .__FILE__ . ':' .  __LINE__),
+        <<'END_OF_LUA', 'i', $irlid);
+        local grammar, irlid = ...
+        return grammar.lmw_g1g:rule_length(irlid)
+END_OF_LUA
+
             $is_sequence_rule  = defined $grammar_c->sequence_min($irlid);
             $is_discard_sequence_rule = $is_sequence_rule
               && $xbnf->[Marpa::R3::Internal::XBNF::DISCARD_SEPARATION];
