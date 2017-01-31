@@ -307,7 +307,15 @@ sub Marpa::R3::Internal::ASF::blessings_set {
         $asf->[Marpa::R3::Internal::ASF::DEFAULT_RULE_BLESSING_PACKAGE];
 
     my @rule_blessing   = ();
-    my $highest_irlid = $grammar_c->highest_rule_id();
+    my ($highest_irlid) = $slr->call_by_tag(
+    ('@' .__FILE__ . ':' . __LINE__),
+    <<'END_OF_LUA', '>*' ) ;
+    local recce = ...
+    local grammar = recce.slg
+    local g1g = slg.lmw_g1g
+    return g1g:highest_rule_id()
+END_OF_LUA
+
     RULE: for ( my $irlid = 0; $irlid <= $highest_irlid; $irlid++ ) {
         my $xbnf = $xbnf_by_irlid->[$irlid];
         # In theory, there could be gaps in the IRL ids
@@ -317,14 +325,32 @@ sub Marpa::R3::Internal::ASF::blessings_set {
             $rule_blessing[$irlid] = $blessing;
             next RULE;
         }
-        my $lhs_id = $grammar_c->rule_lhs($irlid);
-        my $name   = $tracer->symbol_name($lhs_id);
+
+    my ($name) = $slr->call_by_tag(
+    ('@' .__FILE__ . ':' . __LINE__),
+    <<'END_OF_LUA', 'i>*', $irlid ) ;
+    local recce, irlid = ...
+    local grammar = recce.slg
+    local g1g = slg.lmw_g1g
+    local lhs_id = g1g:rule_lhs(irlid)
+    return g1g:symbol_name(lhs_id)
+END_OF_LUA
+
         $rule_blessing[$irlid] = join q{::}, $default_rule_blessing_package,
             normalize_asf_blessing($name);
     }
 
     my @symbol_blessing   = ();
-    my $highest_symbol_id = $grammar_c->highest_symbol_id();
+
+    my ($highest_symbol_id) = $slr->call_by_tag(
+    ('@' .__FILE__ . ':' . __LINE__),
+    <<'END_OF_LUA', '>*' ) ;
+    local recce = ...
+    local grammar = recce.slg
+    local g1g = slg.lmw_g1g
+    return g1g:highest_symbol_id()
+END_OF_LUA
+
     SYMBOL:
     for ( my $symbol_id = 0; $symbol_id <= $highest_symbol_id; $symbol_id++ )
     {
