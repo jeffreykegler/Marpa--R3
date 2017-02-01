@@ -1209,7 +1209,7 @@ END_OF_LUA
         for my $rule_id (@loop_rules) {
             print {$trace_fh}
                 'Cycle found involving rule: ',
-                $tracer->brief_rule($rule_id), "\n"
+                $slg->brief_rule($rule_id), "\n"
                 or Marpa::R3::exception("Could not print: $ERRNO");
         } ## end for my $rule_id (@loop_rules)
         Marpa::R3::exception('Cycles in grammar, fatal error');
@@ -1988,14 +1988,13 @@ sub Marpa::R3::Scanless::G::formatted_symbol_name {
 }
 
 sub Marpa::R3::Scanless::G::brief_rule {
-    my ($slg) = @_;
-    return $slg->lmg_symbol_ids('lmw_g1g');
+    my ($slg, $irlid) = @_;
+    return $slg->lmg_brief_rule('lmw_g1g', $irlid);
 }
 
 sub Marpa::R3::Scanless::G::lmg_brief_rule {
     my ( $slg, $lmw_name, $irlid ) = @_;
     my $grammar_c     = $slg->[Marpa::R3::Internal::Trace::G::C];
-    my $rule_length = $grammar_c->rule_length($irlid);
     my ($lhs_id, @rhs_ids) = $slg->irl_isyids($irlid);
     my $lhs = $slg->formatted_symbol_name( $lhs_id );
     my @rhs = map { $slg->formatted_symbol_name( $_ ) } @rhs_ids;

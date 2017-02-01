@@ -97,32 +97,6 @@ END_OF_LUA
 
 } ## end sub symbol_name
 
-sub formatted_symbol_name {
-    my ( $self, $symbol_id ) = @_;
-    my $symbol_name = $self->symbol_name($symbol_id);
-    # As-is if all word characters
-    return $symbol_name if $symbol_name =~ m/ \A \w* \z/xms;
-    # As-is if ends in right bracket
-    return $symbol_name if $symbol_name =~ m/ \] \z/xms;
-    return '<' . $symbol_name . '>';
-}
-
-sub brief_rule {
-    my ( $self, $rule_id ) = @_;
-    my $grammar_c     = $self->[Marpa::R3::Internal::Trace::G::C];
-    my $rule_length = $grammar_c->rule_length($rule_id);
-    my $lhs = $self->formatted_symbol_name( $grammar_c->rule_lhs($rule_id) );
-    my @rhs =
-        map { $self->formatted_symbol_name( $grammar_c->rule_rhs( $rule_id, $_ ) ) }
-        ( 0 .. $rule_length - 1 );
-    my $minimum = $grammar_c->sequence_min($rule_id);
-    my @quantifier = ();
-    if (defined $minimum) {
-         push @quantifier, ($minimum <= 0 ? q{ *} : q{ +});
-    }
-    return join q{ }, $lhs, q{::=}, @rhs, @quantifier;
-}
-
 sub show_dotted_irl {
     my ( $self, $irl_id, $dot_position ) = @_;
     my $thin_slg         = $self->[Marpa::R3::Internal::Trace::G::SLG_C];
