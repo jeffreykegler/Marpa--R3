@@ -1977,6 +1977,45 @@ sub Marpa::R3::Scanless::G::l0_symbol_ids {
 
 # Internal methods, not to be documented
 
+sub Marpa::R3::Scanless::G::formatted_symbol_name {
+    my ( $slg, $symbol_id ) = @_;
+    my $symbol_name = $slg->symbol_name($symbol_id);
+    # As-is if all word characters
+    return $symbol_name if $symbol_name =~ m/ \A \w* \z/xms;
+    # As-is if ends in right bracket
+    return $symbol_name if $symbol_name =~ m/ \] \z/xms;
+    return '<' . $symbol_name . '>';
+}
+
+sub Marpa::R3::Scanless::G::brief_rule {
+    my ($slg) = @_;
+    return $slg->lmg_symbol_ids('lmw_g1g');
+}
+
+sub Marpa::R3::Scanless::G::lmg_brief_rule {
+    my ( $slg, $lmw_name, $irlid ) = @_;
+    my $grammar_c     = $slg->[Marpa::R3::Internal::Trace::G::C];
+    my $rule_length = $grammar_c->rule_length($irlid);
+    my ($lhs_id, @rhs_ids) = $slg->irl_isyids($irlid);
+    my $lhs = $slg->formatted_symbol_name( $lhs_id );
+    my @rhs = map { $slg->formatted_symbol_name( $_ ) } @rhs_ids;
+    my ($has_minimum, $minimum) = $slg->call_by_tag(
+    ('@' .__FILE__ . ':' . __LINE__),
+    <<'END_OF_LUA', 'si>*', $lmw_name, $irlid ) ;
+    local grammar, lmw_name, irlid = ...
+    local lmw_g = grammar[lmw_name]
+    local minimum = lmw_g:sequence_min(irlid)
+    if not minimum then return 0, -1 end
+    return 1, minimum
+END_OF_LUA
+
+    my @quantifier = ();
+    if ($has_minimum) {
+         push @quantifier, ($minimum <= 0 ? q{ *} : q{ +});
+    }
+    return join q{ }, $lhs, q{::=}, @rhs, @quantifier;
+}
+
 # This logic deals with gaps in the rule numbering.
 # Currently there are none, but Libmarpa does not
 # guarantee this.
