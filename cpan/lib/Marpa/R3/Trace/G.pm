@@ -460,10 +460,3 @@ sub Marpa::R3::Trace::G::show_irls {
 END_OF_LUA
     return $result;
 }
-
-sub Marpa::R3::Trace::G::error {
-    my ($tracer) = @_;
-    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
-    return $grammar_c->error();
-}
-

@@ -1648,8 +1648,11 @@ sub Marpa::R3::Scanless::R::lexeme_alternative {
             || $result == $Marpa::R3::Error::NO_TOKEN_EXPECTED_HERE
             || $result == $Marpa::R3::Error::INACCESSIBLE_TOKEN;
 
+    my ($error_description)
+    = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        'local grammar = ...; return grammar.lmw_g1g:error_description()', '');
     Marpa::R3::exception( qq{Problem reading symbol "$symbol_name": },
-        ( scalar $g1_tracer->error() ) );
+        $error_description );
 } ## end sub Marpa::R3::Scanless::R::lexeme_alternative
 
 # Returns 0 on unthrown failure, current location on success
