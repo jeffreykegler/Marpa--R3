@@ -667,7 +667,7 @@ END_OF_LUA
             if ( $type eq 'rule' ) {
                 say {$trace_file_handle}
                   "Registering semantics for $type: ",
-                  $tracer->show_rule($id),
+                  $slg->brief_rule($id),
                   '  Semantics are ', $slg->show_semantics(@raw_ops)
                   or Marpa::R3::exception('Cannot say to trace file handle');
                 last PRINT_TRACES;
