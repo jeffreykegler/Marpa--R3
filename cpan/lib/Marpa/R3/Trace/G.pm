@@ -58,13 +58,6 @@ sub name {
     return $self->[Marpa::R3::Internal::Trace::G::NAME];
 }
 
-# A development hack -- I will delete this once tracers
-# are eliminated
-sub lmw_name {
-    my ($tracer) = @_;
-    return $tracer->[Marpa::R3::Internal::Trace::G::LMW_NAME];
-}
-
 # TODO: Convert to SLG method and delete
 sub symbol_name {
     my ( $self, $symbol_id ) = @_;
@@ -180,85 +173,6 @@ END_OF_LUA
     return $sym_name;
 
 } ## end sub isy_name
-
-sub Marpa::R3::Trace::G::show_rules {
-    my ( $tracer, $verbose ) = @_;
-    my $text     = q{};
-    $verbose    //= 0;
-
-    my $thin_slg         = $tracer->[Marpa::R3::Internal::Trace::G::SLG_C];
-    my $grammar_name = $tracer->[Marpa::R3::Internal::Trace::G::NAME];
-    my $short_lmw_g_name = $tracer->[Marpa::R3::Internal::Trace::G::NAME];
-    my $lmw_g_name       = 'lmw_' . ( lc $short_lmw_g_name ) . 'g';
-
-    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
-    my $xbnf_by_irlid = $tracer->[Marpa::R3::Internal::Trace::G::XBNF_BY_IRLID];
-
-    for my $irlid ( 0 .. $grammar_c->highest_rule_id() ) {
-
-        my $xbnf    = $xbnf_by_irlid->[$irlid];
-        my $minimum = $grammar_c->sequence_min($irlid);
-        my @quantifier =
-          defined $minimum ? $minimum <= 0 ? (q{*}) : (q{+}) : ();
-        my $lhs_id      = $grammar_c->rule_lhs($irlid);
-        my $rule_length = $grammar_c->rule_length($irlid);
-        my @rhs_ids =
-          map { $grammar_c->rule_rhs( $irlid, $_ ) } ( 0 .. $rule_length - 1 );
-        $text .= join q{ }, $grammar_name, "R$irlid",
-          $tracer->symbol_in_display_form($lhs_id),
-          '::=',
-          ( map { $tracer->symbol_in_display_form($_) } @rhs_ids ),
-          @quantifier;
-        $text .= "\n";
-
-        if ( $verbose >= 2 ) {
-
-            my @comment = ();
-            $grammar_c->rule_length($irlid) == 0
-              and push @comment, 'empty';
-
-    my ($rule_is_used) = $thin_slg->call_by_tag(
-        ('@' . __FILE__ . ':' .  __LINE__),
-	<<'END_OF_LUA', 'si', $lmw_g_name, $irlid );
-    local g, lmw_g_name, irl_id = ...
-    local lmw_g = g[lmw_g_name]
-    return lmw_g:_rule_is_used(irl_id)
-END_OF_LUA
-
-            $rule_is_used or push @comment, '!used';
-            $grammar_c->rule_is_productive($irlid)
-              or push @comment, 'unproductive';
-            $grammar_c->rule_is_accessible($irlid)
-              or push @comment, 'inaccessible';
-            $xbnf->[Marpa::R3::Internal::XBNF::DISCARD_SEPARATION]
-              and push @comment, 'discard_sep';
-
-            if (@comment) {
-                $text .= q{  } . ( join q{ }, q{/*}, @comment, q{*/} ) . "\n";
-            }
-
-            $text .= "  Symbol IDs: <$lhs_id> ::= "
-              . ( join q{ }, map { "<$_>" } @rhs_ids ) . "\n";
-
-        } ## end if ( $verbose >= 2 )
-
-        if ( $verbose >= 3 ) {
-
-            $text .=
-                "  Internal symbols: <"
-              . $tracer->symbol_name($lhs_id)
-              . q{> ::= }
-              . (
-                join q{ },
-                map { '<' . $tracer->symbol_name($_) . '>' } @rhs_ids
-              ) . "\n";
-
-        } ## end if ( $verbose >= 3 )
-
-    } ## end for my $rule ( @{$rules} )
-
-    return $text;
-}
 
 # TODO: Convert to SLG method and delete
 # Return DSL form of symbol
