@@ -143,6 +143,7 @@ __DATA__
     :package=Marpa::R3::Internal::Trace::G
 
     NAME { Name of the grammar -- 'l0' or 'g1' }
+    LMW_NAME
     SLG_C
 
     C { A C structure }
@@ -242,8 +243,11 @@ __DATA__
 
     C { The thin version of this object }
 
-    { The "tracers", are objects
-       which wrap the "thin" C structure.  }
+    { The "per libmarpa grammar objects", aka "tracers", are objects
+       which currently wrap the "thin" C structure,
+       and which will hold the data specific to each Libmarpa
+       grammar object.  }
+    PER_LMG
     L0_TRACER
     G1_TRACER
 

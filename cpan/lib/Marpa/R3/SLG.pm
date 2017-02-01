@@ -484,7 +484,7 @@ END_OF_LUA
     }
 
     my $g1_tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER] =
-      Marpa::R3::Trace::G->new($thin_slg, "G1");
+      Marpa::R3::Trace::G->new($slg, "G1");
     $g1_tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID] = [];
 
     $slg->call_by_tag(
@@ -715,7 +715,7 @@ END_OF_LUA
     } sort keys %is_lexeme_in_this_lexer;
 
     my $lex_tracer = $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER] =
-      Marpa::R3::Trace::G->new($thin_slg, "L0");
+      Marpa::R3::Trace::G->new($slg, "L0");
     $lex_tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID] = [];
 
     $slg->call_by_tag(
@@ -1969,17 +1969,31 @@ sub Marpa::R3::Scanless::G::l0_rule_ids {
 
 sub Marpa::R3::Scanless::G::symbol_ids {
     my ($slg) = @_;
-    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
-    return $tracer->symbol_ids();
+    return $slg->lmg_symbol_ids('lmw_g1g');
 }
 
 sub Marpa::R3::Scanless::G::l0_symbol_ids {
     my ($slg) = @_;
-    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER];
-    return $tracer->symbol_ids();
+    return $slg->lmg_symbol_ids('lmw_l0g');
 }
 
 # Internal methods, not to be documented
+
+# This logic deals with gaps in the symbol numbering.
+# Currently there are none, but Libmarpa does not
+# guarantee this.
+sub Marpa::R3::Scanless::G::lmg_symbol_ids {
+    my ($slg, $lmw_name) = @_;
+    my ($highest_symbol_id) = $slg->call_by_tag(
+    ('@' .__FILE__ . ':' . __LINE__),
+    <<'END_OF_LUA', 's>*', $lmw_name ) ;
+    local grammar, lmw_name = ...
+    local lmw_g = grammar[lmw_name]
+    return lmw_g:highest_symbol_id()
+END_OF_LUA
+
+    return 0 .. $highest_symbol_id;
+}
 
 sub Marpa::R3::Scanless::G::irl_isyids {
     my ($slg, $irlid) = @_;

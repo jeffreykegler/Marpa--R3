@@ -21,14 +21,19 @@ $STRING_VERSION = $VERSION;
 $VERSION        = eval $VERSION;
 
 sub new {
-    my ( $class, $thin_slg, $name ) = @_;
-    my $self = bless [], $class;
-    $self->[Marpa::R3::Internal::Trace::G::SLG_C] = $thin_slg;
-    $self->[Marpa::R3::Internal::Trace::G::NAME] = $name;
+    my ( $class, $slg, $name ) = @_;
+    my $tracer = bless [], $class;
+    my $thin_slg = $slg->[Marpa::R3::Internal::Scanless::G::C];
+    $tracer->[Marpa::R3::Internal::Trace::G::SLG_C] = $thin_slg;
+    $tracer->[Marpa::R3::Internal::Trace::G::NAME] = $name;
+    my $lmw_name = 'lmw_' . (lc $name) . 'g';
+    $tracer->[Marpa::R3::Internal::Trace::G::LMW_NAME]
+      = $lmw_name;
+    $slg->[Marpa::R3::Internal::Scanless::G::PER_LMG]->{$lmw_name} = $tracer;
 
     my $field_name = 'lmw_' . (lc $name) . 'g';
     my $grammar_c = Marpa::R3::Thin::G->new($thin_slg, $field_name);
-    $self->[Marpa::R3::Internal::Trace::G::C] = $grammar_c;
+    $tracer->[Marpa::R3::Internal::Trace::G::C] = $grammar_c;
 
     $thin_slg->call_by_tag(
         ('@' . __FILE__ . ':' .  __LINE__),
@@ -40,7 +45,7 @@ sub new {
     lmw_g:post_metal()
 END_OF_LUA
 
-    return $self;
+    return $tracer;
 } ## end sub new
 
 sub grammar {
@@ -57,8 +62,7 @@ sub name {
 # are eliminated
 sub lmw_name {
     my ($tracer) = @_;
-    my $short_lmw_g_name = $tracer->[Marpa::R3::Internal::Trace::G::NAME];
-    return 'lmw_' . (lc $short_lmw_g_name) . 'g';
+    return $tracer->[Marpa::R3::Internal::Trace::G::LMW_NAME];
 }
 
 sub symbol_by_name {
@@ -391,15 +395,6 @@ sub Marpa::R3::Trace::G::rule_ids {
     my ($tracer) = @_;
     my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
     return 0 .. $grammar_c->highest_rule_id();
-}
-
-# This logic deals with gaps in the symbol numbering.
-# Currently there are none, but Libmarpa does not
-# guarantee this.
-sub Marpa::R3::Trace::G::symbol_ids {
-    my ($tracer) = @_;
-    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
-    return 0 .. $grammar_c->highest_symbol_id();
 }
 
 sub Marpa::R3::Trace::G::brief_irl {
