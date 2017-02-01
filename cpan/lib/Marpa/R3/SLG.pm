@@ -1753,9 +1753,14 @@ sub rule_describe {
 } ## end sub rule_describe
 
 sub Marpa::R3::Scanless::G::start_symbol_id {
-    my ( $slg, $rule_id ) = @_;
-    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
-    return $tracer->start_symbol();
+    my ( $slg ) = @_;
+    my ($start_symbol) = $slg->call_by_tag(
+    ('@' .__FILE__ . ':' . __LINE__),
+    <<'END_OF_LUA', '>*' ) ;
+    local grammar = ...
+    return grammar.lmw_g1g:start_symbol()
+END_OF_LUA
+    return $start_symbol;
 }
 
 sub Marpa::R3::Scanless::G::rule_name {

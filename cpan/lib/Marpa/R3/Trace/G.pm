@@ -467,12 +467,3 @@ sub Marpa::R3::Trace::G::error {
     return $grammar_c->error();
 }
 
-# Internal, for use with in coordinating thin and thick
-# interfaces.  NOT DOCUMENTED.
-sub Marpa::R3::Trace::G::start_symbol {
-    my ( $tracer ) = @_;
-    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
-    return $grammar_c->start_symbol();
-}
-
-1;
