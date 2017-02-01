@@ -1787,14 +1787,12 @@ sub Marpa::R3::Scanless::G::l0_rule_expand {
 
 sub Marpa::R3::Scanless::G::symbol_name {
     my ( $slg, $symbol_id ) = @_;
-    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
-    return $tracer->symbol_name($symbol_id);
+    return $slg->lmg_symbol_name('lmw_g1g', $symbol_id);
 }
 
 sub Marpa::R3::Scanless::G::l0_symbol_name {
     my ( $slg, $symbol_id ) = @_;
-    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER];
-    return $tracer->symbol_name($symbol_id);
+    return $slg->lmg_symbol_name('lmw_l0g', $symbol_id);
 }
 
 sub Marpa::R3::Scanless::G::symbol_display_form {
@@ -1976,6 +1974,21 @@ sub Marpa::R3::Scanless::G::l0_symbol_ids {
 }
 
 # Internal methods, not to be documented
+
+sub Marpa::R3::Scanless::G::lmg_symbol_name {
+    my ( $slg, $lmw_name, $symbol_id ) = @_;
+
+    my ($name) = $slg->call_by_tag(
+        ('@' . __FILE__ . ':' .  __LINE__),
+      <<'END_OF_LUA', 'si', $lmw_name, $symbol_id);
+    local g, lmw_name, symbol_id = ...
+    local lmw_g = g[lmw_name]
+    return lmw_g:symbol_name(symbol_id)
+END_OF_LUA
+
+    return $name;
+
+} ## end sub symbol_name
 
 sub Marpa::R3::Scanless::G::formatted_symbol_name {
     my ( $slg, $symbol_id ) = @_;

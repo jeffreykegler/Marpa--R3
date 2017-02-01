@@ -80,6 +80,7 @@ END_OF_LUA
     return $symbol_id;
 }
 
+# TODO: Convert to SLG method and delete
 sub symbol_name {
     my ( $self, $symbol_id ) = @_;
     my $thin_slg = $self->[Marpa::R3::Internal::Trace::G::SLG_C];
@@ -194,27 +195,6 @@ END_OF_LUA
     return $sym_name;
 
 } ## end sub isy_name
-
-sub show_rule {
-    my ( $self, $rule_id ) = @_;
-
-    my $grammar_c     = $self->[Marpa::R3::Internal::Trace::G::C];
-    my @comment   = ();
-
-    $grammar_c->rule_length($rule_id) == 0 and push @comment, 'empty';
-    $grammar_c->rule_is_productive($rule_id) or push @comment, 'unproductive';
-    $grammar_c->rule_is_accessible($rule_id) or push @comment, 'inaccessible';
-
-    my $text = $self->brief_rule($rule_id);
-
-
-    if (@comment) {
-        $text .= q{ } . ( join q{ }, q{/*}, @comment, q{*/} );
-    }
-
-    return $text .= "\n";
-
-}    # sub show_rule
 
 sub Marpa::R3::Trace::G::show_rules {
     my ( $tracer, $verbose ) = @_;
