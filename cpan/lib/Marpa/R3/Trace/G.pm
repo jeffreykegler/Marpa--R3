@@ -65,21 +65,6 @@ sub lmw_name {
     return $tracer->[Marpa::R3::Internal::Trace::G::LMW_NAME];
 }
 
-sub symbol_by_name {
-    my ( $self, $symbol_name ) = @_;
-    my $thin_slg = $self->[Marpa::R3::Internal::Trace::G::SLG_C];
-    my $short_lmw_g_name = $self->[Marpa::R3::Internal::Trace::G::NAME];
-    my $lmw_g_name = 'lmw_' . (lc $short_lmw_g_name) . 'g';
-    my ($symbol_id) = $thin_slg->call_by_tag(
-        ('@' . __FILE__ . ':' .  __LINE__),
-      <<'END_OF_LUA', 'ss', $lmw_g_name, $symbol_name);
-    local g, lmw_g_name, symbol_name = ...
-    local lmw_g = g[lmw_g_name]
-    return lmw_g.isyid_by_name[symbol_name]
-END_OF_LUA
-    return $symbol_id;
-}
-
 # TODO: Convert to SLG method and delete
 sub symbol_name {
     my ( $self, $symbol_id ) = @_;

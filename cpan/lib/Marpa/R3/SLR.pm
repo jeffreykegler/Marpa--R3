@@ -40,7 +40,7 @@ sub Marpa::R3::Scanless::R::last_completed {
     my $slg  = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $g1_tracer =
         $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
-    my $symbol_id       = $g1_tracer->symbol_by_name($symbol_name);
+    my $symbol_id       = $slg->symbol_by_name($symbol_name);
 
     my ($start, $length) = $slr->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__),
@@ -1632,7 +1632,7 @@ sub Marpa::R3::Scanless::R::lexeme_alternative {
 
     my $slg        = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $g1_tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
-    my $symbol_id  = $g1_tracer->symbol_by_name($symbol_name);
+    my $symbol_id  = $slg->symbol_by_name($symbol_name);
     if ( not defined $symbol_id ) {
         Marpa::R3::exception(
             qq{slr->alternative(): symbol "$symbol_name" does not exist});
@@ -1756,7 +1756,7 @@ sub Marpa::R3::Scanless::R::lexeme_priority_set {
     my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
     my $slg      = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $g1_tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
-    my $lexeme_id = $g1_tracer->symbol_by_name($lexeme_name);
+    my $lexeme_id = $slg->symbol_by_name($lexeme_name);
     Marpa::R3::exception("Bad symbol in lexeme_priority_set(): $lexeme_name")
       if not defined $lexeme_id;
     return $thin_slr->lexeme_priority_set( $lexeme_id, $new_priority );

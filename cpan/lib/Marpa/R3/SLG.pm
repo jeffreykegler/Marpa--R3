@@ -523,7 +523,7 @@ END_OF_LUA
     for my $symbol_name ( keys %{$completion_events_by_name} ) {
         my ( $event_name, $is_active ) =
           @{ $completion_events_by_name->{$symbol_name} };
-        my $symbol_id = $g1_tracer->symbol_by_name($symbol_name);
+        my $symbol_id = $slg->symbol_by_name($symbol_name);
         if ( not defined $symbol_id ) {
             Marpa::R3::exception(
 "Completion event defined for non-existent symbol: $symbol_name\n"
@@ -546,7 +546,7 @@ END_OF_LUA
     for my $symbol_name ( keys %{$nulled_events_by_name} ) {
         my ( $event_name, $is_active ) =
           @{ $nulled_events_by_name->{$symbol_name} };
-        my $symbol_id = $g1_tracer->symbol_by_name($symbol_name);
+        my $symbol_id = $slg->symbol_by_name($symbol_name);
         if ( not defined $symbol_id ) {
             Marpa::R3::exception(
                 "nulled event defined for non-existent symbol: $symbol_name\n"
@@ -568,7 +568,7 @@ END_OF_LUA
     for my $symbol_name ( keys %{$prediction_events_by_name} ) {
         my ( $event_name, $is_active ) =
           @{ $prediction_events_by_name->{$symbol_name} };
-        my $symbol_id = $g1_tracer->symbol_by_name($symbol_name);
+        my $symbol_id = $slg->symbol_by_name($symbol_name);
         if ( not defined $symbol_id ) {
             Marpa::R3::exception(
 "prediction event defined for non-existent symbol: $symbol_name\n"
@@ -736,7 +736,7 @@ END_OF_LUA
     my $lex_thin = $lex_tracer->grammar();
 
     my $lex_discard_symbol_id =
-      $lex_tracer->symbol_by_name($discard_symbol_name) // -1;
+      $slg->l0_symbol_by_name($discard_symbol_name) // -1;
     my @lex_lexeme_to_g1_symbol;
     $lex_lexeme_to_g1_symbol[$_] = -1 for 0 .. $g1_thin->highest_symbol_id();
 
@@ -756,7 +756,7 @@ END_OF_LUA
             Marpa::R3::exception($message)
               if $if_inaccessible_default eq 'fatal';
         } ## end if ( not $g1_thin->symbol_is_accessible($g1_symbol_id...))
-        my $lex_symbol_id = $lex_tracer->symbol_by_name($lexeme_name);
+        my $lex_symbol_id = $slg->l0_symbol_by_name($lexeme_name);
         $lexeme_data{$lexeme_name}{lexer}{'id'} =
           $lex_symbol_id;
         $lex_lexeme_to_g1_symbol[$lex_symbol_id] = $g1_symbol_id;
@@ -764,7 +764,7 @@ END_OF_LUA
 
     my @lex_rule_to_g1_lexeme;
     my $lex_start_symbol_id =
-      $lex_tracer->symbol_by_name($lex_start_symbol_name);
+      $slg->l0_symbol_by_name($lex_start_symbol_name);
   RULE_ID: for my $rule_id ( 0 .. $lex_thin->highest_rule_id() ) {
         my $lhs_id = $lex_thin->rule_lhs($rule_id);
         if ( $lhs_id == $lex_discard_symbol_id ) {
@@ -808,7 +808,7 @@ END_OF_LUA
 
   CLASS_SYMBOL:
     for my $class_symbol ( sort keys %{$character_class_hash} ) {
-        my $symbol_id = $lex_tracer->symbol_by_name($class_symbol);
+        my $symbol_id = $slg->l0_symbol_by_name($class_symbol);
         next CLASS_SYMBOL if not defined $symbol_id;
         my $cc_components = $character_class_hash->{$class_symbol};
         my ( $compiled_re, $error ) =
@@ -1239,7 +1239,6 @@ END_OF_LUA
         my $symbol_name = $tracer->symbol_name($symbol_id);
         my $message = "Inaccessible symbol: $symbol_name";
         Marpa::R3::exception($message) if $treatment eq 'fatal';
-        $DB::single = 1;
         say {$trace_fh} $message
             or Marpa::R3::exception("Could not print: $ERRNO");
     } ## end for my $symbol_id ( grep { !$grammar_c->...})
@@ -1258,7 +1257,7 @@ sub assign_G1_symbol {
     my $thin_slg = $slg->[Marpa::R3::Internal::Scanless::G::C];
     my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
 
-    my $symbol_id = $tracer->symbol_by_name($name);
+    my $symbol_id = $slg->symbol_by_name($name);
     if ( defined $symbol_id ) {
         return $symbol_id;
     }
@@ -1326,7 +1325,7 @@ sub assign_L0_symbol {
     my $thin_slg = $slg->[Marpa::R3::Internal::Scanless::G::C];
     my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER];
 
-    my $symbol_id = $tracer->symbol_by_name($name);
+    my $symbol_id = $slg->l0_symbol_by_name($name);
     if ( defined $symbol_id ) {
         return $symbol_id;
     }
@@ -1836,6 +1835,10 @@ sub Marpa::R3::Scanless::G::l0_rule_show
 sub Marpa::R3::Scanless::G::call_by_tag {
     my ( $slg, $tag, $codestr, $sig, @args ) = @_;
     my $thin_slg = $slg->[Marpa::R3::Internal::Scanless::G::C];
+    $DB::single = 1 if not defined $tag;
+    $DB::single = 1 if not defined $codestr;
+    $DB::single = 1 if not defined $sig;
+    $DB::single = 1 if grep { not defined $_ } @args;
     my @results = $thin_slg->call_by_tag($tag, $codestr, $sig, @args);
     return @results;
 }
@@ -1973,7 +1976,31 @@ sub Marpa::R3::Scanless::G::l0_symbol_ids {
     return $slg->lmg_symbol_ids('lmw_l0g');
 }
 
+sub Marpa::R3::Scanless::G::symbol_by_name {
+    my ($slg, $name) = @_;
+    return $slg->lmg_symbol_by_name('lmw_g1g', $name);
+}
+
+sub Marpa::R3::Scanless::G::l0_symbol_by_name {
+    my ($slg, $name) = @_;
+    return $slg->lmg_symbol_by_name('lmw_l0g', $name);
+}
+
 # Internal methods, not to be documented
+
+sub Marpa::R3::Scanless::G::lmg_symbol_by_name {
+    my ( $slg, $lmw_name, $symbol_name ) = @_;
+
+    my ($symbol_id) = $slg->call_by_tag(
+        ('@' . __FILE__ . ':' .  __LINE__),
+      <<'END_OF_LUA', 'ss', $lmw_name, $symbol_name);
+    local g, lmw_name, symbol_name = ...
+    local lmw_g = g[lmw_name]
+    return lmw_g.isyid_by_name[symbol_name]
+END_OF_LUA
+
+    return $symbol_id;
+}
 
 sub Marpa::R3::Scanless::G::lmg_symbol_name {
     my ( $slg, $lmw_name, $symbol_id ) = @_;

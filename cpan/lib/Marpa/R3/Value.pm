@@ -1401,7 +1401,7 @@ END_OF_LUA
         # RHS of the start rule --
         # so copy them.
 
-        my $start_symbol_id = $tracer->symbol_by_name('[:start]');
+        my $start_symbol_id = $slg->symbol_by_name('[:start]');
 
         my ($symbol_is_nullable) =
           $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
