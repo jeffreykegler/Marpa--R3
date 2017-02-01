@@ -1957,14 +1957,12 @@ END_OF_LUA
 
 sub Marpa::R3::Scanless::G::rule_ids {
     my ($slg) = @_;
-    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
-    return $tracer->rule_ids();
+    return $slg->lmg_rule_ids('lmw_g1g');
 }
 
 sub Marpa::R3::Scanless::G::l0_rule_ids {
     my ($slg) = @_;
-    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER];
-    return $tracer->rule_ids();
+    return $slg->lmg_rule_ids('lmw_l0g');
 }
 
 sub Marpa::R3::Scanless::G::symbol_ids {
@@ -1978,6 +1976,22 @@ sub Marpa::R3::Scanless::G::l0_symbol_ids {
 }
 
 # Internal methods, not to be documented
+
+# This logic deals with gaps in the rule numbering.
+# Currently there are none, but Libmarpa does not
+# guarantee this.
+sub Marpa::R3::Scanless::G::lmg_rule_ids {
+    my ($slg, $lmw_name) = @_;
+    my ($highest_rule_id) = $slg->call_by_tag(
+    ('@' .__FILE__ . ':' . __LINE__),
+    <<'END_OF_LUA', 's>*', $lmw_name ) ;
+    local grammar, lmw_name = ...
+    local lmw_g = grammar[lmw_name]
+    return lmw_g:highest_rule_id()
+END_OF_LUA
+
+    return 0 .. $highest_rule_id;
+}
 
 # This logic deals with gaps in the symbol numbering.
 # Currently there are none, but Libmarpa does not

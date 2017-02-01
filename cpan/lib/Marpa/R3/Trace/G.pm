@@ -388,15 +388,6 @@ sub Marpa::R3::Trace::G::show_symbols {
     return $text;
 }
 
-# This logic deals with gaps in the rule numbering.
-# Currently there are none, but Libmarpa does not
-# guarantee this.
-sub Marpa::R3::Trace::G::rule_ids {
-    my ($tracer) = @_;
-    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
-    return 0 .. $grammar_c->highest_rule_id();
-}
-
 sub Marpa::R3::Trace::G::brief_irl {
     my ( $self, $irl_id ) = @_;
     my $thin_slg         = $self->[Marpa::R3::Internal::Trace::G::SLG_C];
