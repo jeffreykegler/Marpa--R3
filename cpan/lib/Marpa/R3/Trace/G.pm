@@ -260,6 +260,7 @@ END_OF_LUA
     return $text;
 }
 
+# TODO: Convert to SLG method and delete
 # Return DSL form of symbol
 # Does no checking
 sub Marpa::R3::Trace::G::symbol_dsl_form {
@@ -270,6 +271,7 @@ sub Marpa::R3::Trace::G::symbol_dsl_form {
     return $xsy->[Marpa::R3::Internal::XSY::DSL_FORM];
 }
 
+# TODO: Convert to SLG method and delete
 # Return display form of symbol
 # Does lots of checking and makes use of alternatives.
 sub Marpa::R3::Trace::G::symbol_in_display_form {

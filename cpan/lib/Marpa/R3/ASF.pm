@@ -361,7 +361,7 @@ END_OF_LUA
             $symbol_blessing[$symbol_id] = $blessing;
             next SYMBOL;
         }
-        my $name = $tracer->symbol_name($symbol_id);
+        my $name = $slg->symbol_name($symbol_id);
         $symbol_blessing[$symbol_id] = join q{::},
             $default_token_blessing_package,
             normalize_asf_blessing($name);
@@ -691,19 +691,17 @@ sub nid_symbol_name {
     my ( $asf, $nid ) = @_;
     my $slr       = $asf->[Marpa::R3::Internal::ASF::SLR];
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     my $symbol_id = nid_symbol_id($asf, $nid);
-    return $tracer->symbol_name($symbol_id);
+    return $slg->symbol_name($symbol_id);
 }
 
 sub nid_token_name {
     my ( $asf, $nid ) = @_;
     my $slr      = $asf->[Marpa::R3::Internal::ASF::SLR];
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     my $token_id = nid_token_id($asf, $nid);
     return if not defined $token_id;
-    return $tracer->symbol_name($token_id);
+    return $slg->symbol_name($token_id);
 }
 
 # Memoization is heavily used -- it needs to be to keep the worst cases from

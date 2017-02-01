@@ -474,13 +474,12 @@ my $libmarpa_trace_event_handlers = {
         my $trace_file_handle =
             $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
         my $slg              = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-        my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
         say {$trace_file_handle} qq{Accepted lexeme },
             input_range_describe( $slr, $lexeme_start_pos,
             $lexeme_end_pos - 1 ),
             q{ e}, $slr->g1_pos(),
             q{: },
-            $tracer->symbol_in_display_form($g1_lexeme),
+            $slg->symbol_display_form($g1_lexeme),
             qq{; value="$raw_token_value"}
             or Marpa::R3::exception("Could not say(): $ERRNO");
     },
@@ -493,9 +492,8 @@ my $libmarpa_trace_event_handlers = {
         my $trace_file_handle =
             $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
         my $slg              = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-        my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
         say {$trace_file_handle} qq{Expected lexeme },
-            $tracer->symbol_in_display_form($g1_lexeme),
+            $slg->symbol_display_form($g1_lexeme),
             " at line $line, column $column; assertion ID = $assertion_id"
             or Marpa::R3::exception("Could not say(): $ERRNO");
     },
@@ -510,13 +508,12 @@ my $libmarpa_trace_event_handlers = {
         my $trace_file_handle =
             $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
         my $slg              = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-        my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
         say {$trace_file_handle}
             qq{Outprioritized lexeme },
             input_range_describe( $slr, $lexeme_start_pos,
             $lexeme_end_pos - 1 ),
             q{: },
-            $tracer->symbol_in_display_form($g1_lexeme),
+            $slg->symbol_display_form($g1_lexeme),
             qq{; value="$raw_token_value"; },
             qq{priority was $lexeme_priority, but $required_priority was required}
             or Marpa::R3::exception("Could not say(): $ERRNO");
@@ -531,13 +528,12 @@ my $libmarpa_trace_event_handlers = {
         my $trace_file_handle =
             $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
         my $slg              = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-        my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
         say {$trace_file_handle}
             'Rejected as duplicate lexeme ',
             input_range_describe( $slr, $lexeme_start_pos,
             $lexeme_end_pos - 1 ),
             q{: },
-            $tracer->symbol_in_display_form($g1_lexeme),
+            $slg->symbol_display_form($g1_lexeme),
             qq{; value="$raw_token_value"}
             or Marpa::R3::exception("Could not say(): $ERRNO");
     },
@@ -551,14 +547,13 @@ my $libmarpa_trace_event_handlers = {
         my $trace_file_handle =
             $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
         my $slg              = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-        my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
         say {$trace_file_handle}
             'Attempting to read lexeme ',
             input_range_describe( $slr, $lexeme_start_pos,
             $lexeme_end_pos - 1 ),
             q{ e}, $slr->g1_pos(),
             q{: },
-            $tracer->symbol_in_display_form($g1_lexeme),
+            $slg->symbol_display_form($g1_lexeme),
             qq{; value="$raw_token_value"}
             or Marpa::R3::exception("Could not say(): $ERRNO");
     },
@@ -590,15 +585,12 @@ my $libmarpa_trace_event_handlers = {
         push @char_desc, ( sprintf '0x%04x', $codepoint );
         my $char_desc = join q{ }, @char_desc;
         my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-        my $lex_tracer =
-            $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER];
-        my $symbol_in_display_form =
-            $lex_tracer->symbol_in_display_form($token_id);
+        my $symbol_display_form = $slg->l0_symbol_display_form($token_id);
         my ( $line, $column ) = $slr->line_column($position);
         my $trace_file_handle =
             $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
         say {$trace_file_handle}
-            qq{Codepoint $char_desc accepted as $symbol_in_display_form at line $line, column $column}
+            qq{Codepoint $char_desc accepted as $symbol_display_form at line $line, column $column}
             or Marpa::R3::exception("Could not say(): $ERRNO");
     },
     'lexer rejected codepoint' => sub {
@@ -612,15 +604,13 @@ my $libmarpa_trace_event_handlers = {
         push @char_desc, ( sprintf '0x%04x', $codepoint );
         my $char_desc = join q{ }, @char_desc;
         my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-        my $lex_tracer =
-            $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER];
-        my $symbol_in_display_form =
-            $lex_tracer->symbol_in_display_form($token_id);
+        my $symbol_display_form =
+            $slg->l0_symbol_display_form($token_id);
         my ( $line, $column ) = $slr->line_column($position);
         my $trace_file_handle =
             $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
         say {$trace_file_handle}
-            qq{Codepoint $char_desc rejected as $symbol_in_display_form at line $line, column $column}
+            qq{Codepoint $char_desc rejected as $symbol_display_form at line $line, column $column}
             or Marpa::R3::exception("Could not say(): $ERRNO");
     },
     'lexer restarted recognizer' => sub {
@@ -639,12 +629,10 @@ my $libmarpa_trace_event_handlers = {
         my ( undef, undef, $lex_rule_id, $start, $end ) =
             @{$event};
         my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-        my $tracer =
-            $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER];
         my @rhs_ids = $slg->l0_irl_isyids($lex_rule_id);
         shift @rhs_ids;
         my @rhs =
-            map { $tracer->symbol_in_display_form($_) } @rhs_ids;
+            map { $slg->l0_symbol_display_form($_) } @rhs_ids;
         my $trace_file_handle =
             $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
         say {$trace_file_handle} qq{Discarded lexeme },
@@ -656,9 +644,8 @@ my $libmarpa_trace_event_handlers = {
         my ( $slr, $event ) = @_;
         my ( undef, undef, $start, $end, $lexeme_id ) = @{$event};
         my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-        my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
         my $lexeme_name =
-            $tracer->symbol_in_display_form($lexeme_id);
+            $slg->symbol_display_form($lexeme_id);
         my $trace_file_handle =
             $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
         say {$trace_file_handle} 'Paused before lexeme ',
@@ -669,9 +656,7 @@ my $libmarpa_trace_event_handlers = {
         my ( $slr, $event ) = @_;
         my ( undef, undef, $start, $end, $lexeme_id ) = @{$event};
         my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-        my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
-        my $lexeme_name =
-            $tracer->symbol_in_display_form($lexeme_id);
+        my $lexeme_name = $slg->symbol_display_form($lexeme_id);
         my $trace_file_handle =
             $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
         say {$trace_file_handle} 'Paused after lexeme ',
@@ -682,9 +667,7 @@ my $libmarpa_trace_event_handlers = {
         my ( $slr, $event ) = @_;
         my ( undef, undef, $g1_symbol_id, $start, $end ) = @{$event};
         my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-        my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
-        my $lexeme_name =
-            $tracer->symbol_in_display_form($g1_symbol_id);
+        my $lexeme_name = $slg->symbol_display_form($g1_symbol_id);
         my $trace_file_handle =
             $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
         say {$trace_file_handle} 'Ignored lexeme ',
@@ -937,7 +920,7 @@ END_OF_LUA
                         }
                         say {$trace_file_handle}
 qq{Registering character $char_desc as symbol $symbol_id: },
-                          $lex_tracer->symbol_in_display_form($symbol_id )
+                          $slg->l0_symbol_display_form($symbol_id )
                           or Marpa::R3::exception("Could not say(): $ERRNO");
                     } ## end if ( $trace_terminals >= 2 )
                     push @ops, $op_alternative, $symbol_id, 1, 1;
@@ -1053,7 +1036,7 @@ sub Marpa::R3::Scanless::R::read_problem {
        # internally.
 
                 $rejections{
-                    $tracer->symbol_in_display_form( $g1_lexeme )
+                    $slg->symbol_display_form( $g1_lexeme )
                       . qq{; value="$raw_token_value"; length = }
                       . ( $lexeme_end_pos - $lexeme_start_pos )
                 } = 1;

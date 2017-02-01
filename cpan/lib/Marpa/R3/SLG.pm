@@ -608,7 +608,7 @@ END_OF_LUA
         # Not a lexeme, according to G1
         next SYMBOL if not $g1_thin->symbol_is_terminal($symbol_id);
 
-        my $symbol_name = $g1_tracer->symbol_name($symbol_id);
+        my $symbol_name = $slg->symbol_name($symbol_id);
         $g1_id_by_lexeme_name{$symbol_name} = $symbol_id;
 
     } ## end SYMBOL: for my $symbol_id ( 0 .. $g1_thin->highest_symbol_id(...))
@@ -783,7 +783,7 @@ END_OF_LUA
         my $lexeme_id = $lex_lexeme_to_g1_symbol[$lexer_lexeme_id] // -1;
         $lex_rule_to_g1_lexeme[$rule_id] = $lexeme_id;
         next RULE_ID if $lexeme_id < 0;
-        my $lexeme_name = $g1_tracer->symbol_name($lexeme_id);
+        my $lexeme_name = $slg->symbol_name($lexeme_id);
 
         my $assertion_id =
           $lexeme_data{$lexeme_name}{lexer}{'assertion'};
@@ -926,7 +926,7 @@ END_OF_LUA
     # Second phase of lexer processing
   RULE_ID: for my $lexer_rule_id ( 0 .. $#lex_rule_to_g1_lexeme ) {
         my $g1_lexeme_id = $lex_rule_to_g1_lexeme[$lexer_rule_id];
-        my $lexeme_name  = $g1_tracer->symbol_name($g1_lexeme_id);
+        my $lexeme_name  = $slg->symbol_name($g1_lexeme_id);
         my $assertion_id = $lexeme_data{$lexeme_name}{lexer}{'assertion'} // -1;
 
       $thin_slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
@@ -1040,7 +1040,7 @@ qq{   It contained non-word characters and that is not allowed\n},
                 my $bless_package =
                   $slg->[Marpa::R3::Internal::Scanless::G::BLESS_PACKAGE];
                 if ( not defined $bless_package ) {
-                    my $lexeme_name = $tracer->symbol_name($g1_lexeme_id);
+                    my $lexeme_name = $slg->symbol_name($g1_lexeme_id);
                     Marpa::R3::exception(
 qq{Symbol "$lexeme_name" needs a blessing package, but grammar has none\n},
                         qq{  The blessing for "$lexeme_name" was "$blessing"\n}
@@ -1236,7 +1236,7 @@ END_OF_LUA
             $xsy->[Marpa::R3::Internal::XSY::IF_INACCESSIBLE] //
             $default_if_inaccessible;
         next SYMBOL if $treatment eq 'ok';
-        my $symbol_name = $tracer->symbol_name($symbol_id);
+        my $symbol_name = $slg->lmg_symbol_name($lmw_name, $symbol_id);
         my $message = "Inaccessible symbol: $symbol_name";
         Marpa::R3::exception($message) if $treatment eq 'fatal';
         say {$trace_fh} $message
@@ -1771,7 +1771,7 @@ sub Marpa::R3::Scanless::G::rule_name {
     my $name = $xbnf->[Marpa::R3::Internal::XBNF::NAME];
     return $name if defined $name;
     my ( $lhs_id ) = $slg->rule_expand($rule_id);
-    return $tracer->symbol_name($lhs_id);
+    return $slg->symbol_name($lhs_id);
 }
 
 sub Marpa::R3::Scanless::G::rule_expand {
@@ -1796,26 +1796,22 @@ sub Marpa::R3::Scanless::G::l0_symbol_name {
 
 sub Marpa::R3::Scanless::G::symbol_display_form {
     my ( $slg, $symbol_id ) = @_;
-    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
-    return $tracer->symbol_in_display_form($symbol_id);
+    return $slg->lmg_symbol_display_form('lmw_g1g', $symbol_id);
 }
 
 sub Marpa::R3::Scanless::G::l0_symbol_display_form {
     my ( $slg, $symbol_id ) = @_;
-    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER];
-    return $tracer->symbol_in_display_form($symbol_id);
+    return $slg->lmg_symbol_display_form('lmw_l0g', $symbol_id);
 }
 
 sub Marpa::R3::Scanless::G::symbol_dsl_form {
     my ( $slg, $symbol_id ) = @_;
-    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
-    return $tracer->symbol_dsl_form($symbol_id);
+    return $slg->lmg_symbol_dsl_form('lmw_g1g', $symbol_id);
 }
 
 sub Marpa::R3::Scanless::G::l0_symbol_dsl_form {
     my ( $slg, $symbol_id ) = @_;
-    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER];
-    return $tracer->symbol_dsl_form($symbol_id);
+    return $slg->lmg_symbol_dsl_form('lmw_l0g', $symbol_id);
 }
 
 sub Marpa::R3::Scanless::G::rule_show
@@ -1856,7 +1852,7 @@ END_OF_LUA
 
     return if not scalar @{$symbol_ids};
     my ( $lhs, @rhs ) =
-        map { $tracer->symbol_in_display_form($_) } @{$symbol_ids};
+        map { $slg->lmg_symbol_display_form($lmw_name, $_) } @{$symbol_ids};
 
     my ($has_minimum, $minimum) = $slg->call_by_tag(
     ('@' .__FILE__ . ':' . __LINE__),
@@ -1930,7 +1926,7 @@ sub Marpa::R3::Scanless::G::show_dotted_rule {
     my $tracer =  $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     my $lmw_name = 'lmw_' . (lc $tracer->name()) . 'g';
     my ( $lhs, @rhs ) =
-    map { $tracer->symbol_in_display_form($_) } $slg->irl_isyids($irlid);
+    map { $slg->lmg_symbol_display_form($lmw_name, $_) } $slg->irl_isyids($irlid);
     my $rhs_length = scalar @rhs;
 
     my ($has_minimum, $minimum) = $slg->call_by_tag(
@@ -2085,6 +2081,27 @@ sub Marpa::R3::Scanless::G::lmg_symbol_ids {
 END_OF_LUA
 
     return 0 .. $highest_symbol_id;
+}
+
+# Return DSL form of symbol
+# Does no checking
+sub Marpa::R3::Scanless::G::lmg_symbol_dsl_form {
+    my ( $slg, $lmw_name, $isyid ) = @_;
+    my $per_lmg = $slg->[Marpa::R3::Internal::Scanless::G::PER_LMG]->{$lmw_name};
+    my $xsy_by_isyid   = $per_lmg->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID];
+    my $xsy = $xsy_by_isyid->[$isyid];
+    return if not defined $xsy;
+    return $xsy->[Marpa::R3::Internal::XSY::DSL_FORM];
+}
+
+# Return display form of symbol
+# Does lots of checking and makes use of alternatives.
+sub Marpa::R3::Scanless::G::lmg_symbol_display_form {
+    my ( $slg, $lmw_name, $isyid ) = @_;
+    my $text = $slg->lmg_symbol_dsl_form( $lmw_name, $isyid )
+      // $slg->lmg_symbol_name($lmw_name, $isyid);
+    return "<!No symbol with ID $isyid!>" if not defined $text;
+    return ( $text =~ m/\s/xms ) ? "<$text>" : $text;
 }
 
 sub Marpa::R3::Scanless::G::irl_isyids {
