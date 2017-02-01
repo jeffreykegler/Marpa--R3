@@ -103,18 +103,6 @@ sub formatted_symbol_name {
     return '<' . $symbol_name . '>';
 }
 
-# Expand a rule into a list of symbol IDs
-sub rule_expand {
-    my ( $self, $rule_id ) = @_;
-    my $grammar_c     = $self->[Marpa::R3::Internal::Trace::G::C];
-    my $rule_length = $grammar_c->rule_length($rule_id);
-    return if not defined $rule_length;
-    my $lhs         = ( $grammar_c->rule_lhs($rule_id) );
-    return ( $lhs,
-        map { $grammar_c->rule_rhs( $rule_id, $_ ) }
-            ( 0 .. $rule_length - 1 ) );
-} ## end sub rule_expand
-
 sub brief_rule {
     my ( $self, $rule_id ) = @_;
     my $grammar_c     = $self->[Marpa::R3::Internal::Trace::G::C];
@@ -485,17 +473,6 @@ sub Marpa::R3::Trace::G::start_symbol {
     my ( $tracer ) = @_;
     my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
     return $grammar_c->start_symbol();
-}
-
-sub Marpa::R3::Trace::G::rule_name {
-    my ( $tracer, $rule_id ) = @_;
-    my $xbnf_by_irlid = $tracer->[Marpa::R3::Internal::Trace::G::XBNF_BY_IRLID];
-    my $xbnf  = $xbnf_by_irlid->[$rule_id];
-    return "Non-existent rule $rule_id" if not defined $xbnf;
-    my $name = $xbnf->[Marpa::R3::Internal::XBNF::NAME];
-    return $name if defined $name;
-    my ( $lhs_id ) = $tracer->rule_expand($rule_id);
-    return $tracer->symbol_name($lhs_id);
 }
 
 1;

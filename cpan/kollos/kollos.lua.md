@@ -1485,7 +1485,9 @@ Hopefully, this will make it easier to phase out the
     end
 
     function _M.class_grammar.irl_isyids(lmw_g, rule_id)
-        local symbols = { lmw_g:rule_lhs(rule_id) }
+        local lhs = lmw_g:rule_lhs(rule_id)
+        if not lhs then return {} end
+        local symbols = { lhs }
         for rhsix = 0, lmw_g:rule_length(rule_id) - 1 do
              symbols[#symbols+1] = lmw_g:rule_rhs(rule_id, rhsix)
         end

@@ -1414,7 +1414,6 @@ sub add_G1_user_rule {
 
     my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     my $subgrammar = $tracer->[Marpa::R3::Internal::Trace::G::NAME];
-    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
 
     my ( $lhs_name, $rhs_names, $action, $blessing );
     my ( $min, $separator_name );
@@ -1762,19 +1761,23 @@ sub Marpa::R3::Scanless::G::start_symbol_id {
 sub Marpa::R3::Scanless::G::rule_name {
     my ( $slg, $rule_id ) = @_;
     my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
-    return $tracer->rule_name($rule_id);
+    my $xbnf_by_irlid = $tracer->[Marpa::R3::Internal::Trace::G::XBNF_BY_IRLID];
+    my $xbnf  = $xbnf_by_irlid->[$rule_id];
+    return "Non-existent rule $rule_id" if not defined $xbnf;
+    my $name = $xbnf->[Marpa::R3::Internal::XBNF::NAME];
+    return $name if defined $name;
+    my ( $lhs_id ) = $slg->rule_expand($rule_id);
+    return $tracer->symbol_name($lhs_id);
 }
 
 sub Marpa::R3::Scanless::G::rule_expand {
     my ( $slg, $rule_id ) = @_;
-    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
-    return $tracer->rule_expand($rule_id);
+    return $slg->irl_isyids($rule_id);
 }
 
 sub Marpa::R3::Scanless::G::l0_rule_expand {
     my ( $slg, $rule_id ) = @_;
-    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER];
-    return $tracer->rule_expand($rule_id);
+    return $slg->l0_irl_isyids($rule_id);
 }
 
 sub Marpa::R3::Scanless::G::symbol_name {
@@ -1817,14 +1820,14 @@ sub Marpa::R3::Scanless::G::rule_show
 {
     my ( $slg, $rule_id ) = @_;
     my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
-    return slg_rule_show($tracer, $rule_id);
+    return slg_rule_show($slg, $tracer, $rule_id);
 }
 
 sub Marpa::R3::Scanless::G::l0_rule_show
 {
     my ( $slg, $rule_id ) = @_;
     my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER];
-    return slg_rule_show($tracer, $rule_id);
+    return slg_rule_show($slg, $tracer, $rule_id);
 }
 
 sub Marpa::R3::Scanless::G::call_by_tag {
@@ -1835,16 +1838,33 @@ sub Marpa::R3::Scanless::G::call_by_tag {
 }
 
 sub slg_rule_show {
-    my ( $tracer, $rule_id ) = @_;
-    my $subgrammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
-    my @symbol_ids   = $tracer->rule_expand($rule_id);
-    return if not scalar @symbol_ids;
+    my ( $slg, $tracer, $irlid ) = @_;
+    my $lmw_name = 'lmw_' . (lc $tracer->name()) . 'g';
+    my ($symbol_ids) = $slg->call_by_tag(
+    ('@' .__FILE__ . ':' . __LINE__),
+    <<'END_OF_LUA', 'si>*', $lmw_name, $irlid ) ;
+    local grammar, lmw_name, irlid = ...
+    local lmw_g = grammar[lmw_name]
+    return lmw_g:irl_isyids(irlid)
+END_OF_LUA
+
+    return if not scalar @{$symbol_ids};
     my ( $lhs, @rhs ) =
-        map { $tracer->symbol_in_display_form($_) } @symbol_ids;
-    my $minimum    = $subgrammar_c->sequence_min($rule_id);
+        map { $tracer->symbol_in_display_form($_) } @{$symbol_ids};
+
+    my ($has_minimum, $minimum) = $slg->call_by_tag(
+    ('@' .__FILE__ . ':' . __LINE__),
+    <<'END_OF_LUA', 'si>*', $lmw_name, $irlid ) ;
+    local grammar, lmw_name, irlid = ...
+    local lmw_g = grammar[lmw_name]
+    local minimum = lmw_g:sequence_min(irlid)
+    if not minimum then return 0, -1 end
+    return 1, minimum
+END_OF_LUA
+
     my @quantifier = ();
 
-    if ( defined $minimum ) {
+    if ( $has_minimum ) {
         @quantifier = ( $minimum <= 0 ? q{*} : q{+} );
     }
     return join q{ }, $lhs, q{::=}, @rhs, @quantifier;
@@ -1900,16 +1920,25 @@ sub Marpa::R3::Scanless::G::symid_is_nulling {
 }
 
 sub Marpa::R3::Scanless::G::show_dotted_rule {
-    my ( $slg, $rule_id, $dot_position ) = @_;
+    my ( $slg, $irlid, $dot_position ) = @_;
     my $tracer =  $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
-    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
+    my $lmw_name = 'lmw_' . (lc $tracer->name()) . 'g';
     my ( $lhs, @rhs ) =
-    map { $tracer->symbol_in_display_form($_) } $tracer->rule_expand($rule_id);
+    map { $tracer->symbol_in_display_form($_) } $slg->irl_isyids($irlid);
     my $rhs_length = scalar @rhs;
 
-    my $minimum = $grammar_c->sequence_min($rule_id);
+    my ($has_minimum, $minimum) = $slg->call_by_tag(
+    ('@' .__FILE__ . ':' . __LINE__),
+    <<'END_OF_LUA', 'si>*', $lmw_name, $irlid ) ;
+    local grammar, lmw_name, irlid = ...
+    local g1g = grammar.lmw_g1g
+    local minimum = g1g:sequence_min(irlid)
+    if not minimum then return 0, -1 end
+    return 1, minimum
+END_OF_LUA
+
     my @quantifier = ();
-    if (defined $minimum) {
+    if ($has_minimum) {
         @quantifier = ($minimum <= 0 ? q{*} : q{+} );
     }
     $dot_position = 0 if $dot_position < 0;

@@ -313,7 +313,7 @@ name: $grammar->rule_name() example
 
 =for Marpa::R3::Display::End
 
-Given a rule ID, returns the rule name.
+Given a G1 rule ID, returns the rule name.
 A rule name is as defined by
 L<the C<name> adverb|Marpa::R3::Scanless::DSL/"name">.
 If no rule name was defined, the rule name is the name of

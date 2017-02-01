@@ -1141,7 +1141,11 @@ for my $rule_id ( $grammar->rule_ids() ) {
 
 # Marpa::R3::Display::End
 
-    $text .= "$rule_description\n";
+    if (not defined $rule_description) {
+        $text .= "[No such rule, ID #$rule_id]\n";
+    } else {
+        $text .= "$rule_description\n";
+    }
 
 }
 
@@ -1178,7 +1182,12 @@ for my $rule_id ( $grammar->l0_rule_ids() ) {
     my $rule_description = $grammar->l0_rule_show($rule_id);
 
 # Marpa::R3::Display::End
-    $text .= "$rule_description\n";
+
+    if (not defined $rule_description) {
+        $text .= "[No such rule, ID #$rule_id]\n";
+    } else {
+        $text .= "$rule_description\n";
+    }
 
 }
 

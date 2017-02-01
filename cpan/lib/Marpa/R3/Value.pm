@@ -1295,7 +1295,7 @@ END_OF_LUA
 
                 if ( $result_descriptor eq 'name' ) {
                     if ( defined $irlid ) {
-                        my $name = $tracer->rule_name($irlid);
+                        my $name = $slg->rule_name($irlid);
                         push @push_ops, $op_lua, $op_push_constant_key, \$name;
                         next RESULT_DESCRIPTOR;
                     }
@@ -1416,7 +1416,7 @@ END_OF_LUA
 
         my $start_rhs_symbol_id;
       RULE: for my $irlid ( $tracer->rule_ids() ) {
-            my ( $lhs, $rhs0 ) = $tracer->rule_expand($irlid);
+            my ( $lhs, $rhs0 ) = $slg->irl_isyids($irlid);
             if ( $start_symbol_id == $lhs ) {
                 $start_rhs_symbol_id = $rhs0;
                 last RULE;
