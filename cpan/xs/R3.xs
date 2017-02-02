@@ -3005,7 +3005,7 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
                     croak
                         ("Problem SLR->read() failed on symbol id %d at position %d: %s",
                         g1_lexeme, (int) slr->perl_pos,
-                        xs_g_error (slr->g1_wrapper));
+                        slr_g1_error (outer_slr));
                     /* NOTREACHED */
 
                 }
@@ -3024,7 +3024,7 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
 
         if (return_value < 0) {
             croak ("Problem in marpa_r_earleme_complete(): %s",
-                xs_g_error (slr->g1_wrapper));
+                slr_g1_error (outer_slr));
         }
         slr->lexer_start_pos = slr->perl_pos = slr->end_of_lexeme;
         if (return_value > 0) {
@@ -4109,7 +4109,7 @@ PPCODE:
   if (slr->throw)
     {
       croak ("Problem in slr->g1_lexeme_complete(): %s",
-             xs_g_error (slr->g1_wrapper));
+            slr_g1_error (outer_slr));
     }
   XSRETURN_IV (0);
 }
@@ -4421,7 +4421,7 @@ PPCODE:
   if ( gp_result == -1 ) { XSRETURN_UNDEF; }
   if ( gp_result < 0 && g1_wrapper->throw ) {
     croak( "Problem in r->start_input(): %s",
-     xs_g_error( g1_wrapper ));
+      slr_g1_error (outer_slr));
   }
   g1_convert_events(outer_slr);
   XPUSHs (sv_2mortal (newSViv (gp_result)));
