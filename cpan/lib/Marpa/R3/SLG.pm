@@ -531,9 +531,18 @@ END_OF_LUA
         }
 
         # Must be done before precomputation
-        $g1_thin->symbol_is_completion_event_set( $symbol_id, 1 );
-        $g1_thin->completion_symbol_activate( $symbol_id, 0 )
-          if not $is_active;
+
+    $slg->call_by_tag(
+        ('@' .__FILE__ . ':' .  __LINE__),
+        <<'END_OF_LUA', 'ii', $symbol_id, ($is_active ? 1 : 0));
+        local grammar, symbol_id, is_active = ...
+        local g1g = grammar.lmw_g1g
+        g1g:symbol_is_completion_event_set(symbol_id, 1)
+        if is_active == 0 then
+            g1g:completion_symbol_activate(symbol_id, 0)
+        end
+END_OF_LUA
+
         $slg->[Marpa::R3::Internal::Scanless::G::COMPLETION_EVENT_BY_ID]
           ->[$symbol_id] = $event_name;
         push @{ $symbol_ids_by_event_name_and_type->{$event_name}->{completion}
@@ -554,8 +563,17 @@ END_OF_LUA
         }
 
         # Must be done before precomputation
-        $g1_thin->symbol_is_nulled_event_set( $symbol_id, 1 );
-        $g1_thin->nulled_symbol_activate( $symbol_id, 0 ) if not $is_active;
+    $slg->call_by_tag(
+        ('@' .__FILE__ . ':' .  __LINE__),
+        <<'END_OF_LUA', 'ii', $symbol_id, ($is_active ? 1 : 0));
+        local grammar, symbol_id, is_active = ...
+        local g1g = grammar.lmw_g1g
+        g1g:symbol_is_nulled_event_set(symbol_id, 1)
+        if is_active == 0 then
+            g1g:nulled_symbol_activate(symbol_id, 0)
+        end
+END_OF_LUA
+
         $slg->[Marpa::R3::Internal::Scanless::G::NULLED_EVENT_BY_ID]
           ->[$symbol_id] = $event_name;
         push @{ $symbol_ids_by_event_name_and_type->{$event_name}->{nulled} },
@@ -576,9 +594,17 @@ END_OF_LUA
         }
 
         # Must be done before precomputation
-        $g1_thin->symbol_is_prediction_event_set( $symbol_id, 1 );
-        $g1_thin->prediction_symbol_activate( $symbol_id, 0 )
-          if not $is_active;
+    $slg->call_by_tag(
+        ('@' .__FILE__ . ':' .  __LINE__),
+        <<'END_OF_LUA', 'ii', $symbol_id, ($is_active ? 1 : 0));
+        local grammar, symbol_id, is_active = ...
+        local g1g = grammar.lmw_g1g
+        g1g:symbol_is_prediction_event_set(symbol_id, 1)
+        if is_active == 0 then
+            g1g:prediction_symbol_activate(symbol_id, 0)
+        end
+END_OF_LUA
+
         $slg->[Marpa::R3::Internal::Scanless::G::PREDICTION_EVENT_BY_ID]
           ->[$symbol_id] = $event_name;
         push @{ $symbol_ids_by_event_name_and_type->{$event_name}->{prediction}
@@ -611,7 +637,7 @@ END_OF_LUA
         my $symbol_name = $slg->symbol_name($symbol_id);
         $g1_id_by_lexeme_name{$symbol_name} = $symbol_id;
 
-    } ## end SYMBOL: for my $symbol_id ( 0 .. $g1_thin->highest_symbol_id(...))
+    }
 
     # A first phase of applying defaults
     my $discard_default_adverbs = $hashed_source->{discard_default_adverbs};
@@ -755,7 +781,7 @@ END_OF_LUA
               if $if_inaccessible_default eq 'warn';
             Marpa::R3::exception($message)
               if $if_inaccessible_default eq 'fatal';
-        } ## end if ( not $g1_thin->symbol_is_accessible($g1_symbol_id...))
+        }
         my $lex_symbol_id = $slg->l0_symbol_by_name($lexeme_name);
         $lexeme_data{$lexeme_name}{lexer}{'id'} =
           $lex_symbol_id;
