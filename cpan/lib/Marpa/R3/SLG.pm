@@ -798,7 +798,15 @@ END_OF_LUA
     my $lex_start_symbol_id =
       $slg->l0_symbol_by_name($lex_start_symbol_name);
   RULE_ID: for my $rule_id ( $slg->l0_rule_ids() ) {
-        my $lhs_id = $lex_thin->rule_lhs($rule_id);
+
+    my ($lhs_id) = $slg->call_by_tag(
+    ('@' .__FILE__ . ':' . __LINE__),
+    <<'END_OF_LUA', 'i>*', $rule_id ) ;
+    local grammar, rule_id = ...
+    local l0g = grammar.lmw_l0g
+    return l0g:rule_lhs(rule_id)
+END_OF_LUA
+
         if ( $lhs_id == $lex_discard_symbol_id ) {
             $lex_rule_to_g1_lexeme[$rule_id] = -2;
             next RULE_ID;
@@ -869,7 +877,14 @@ END_OF_LUA
       FIND_EVENT: {
             $event = $xbnf->[Marpa::R3::Internal::XBNF::EVENT];
             last FIND_EVENT if defined $event;
-            my $lhs_id = $lex_thin->rule_lhs($irlid);
+
+    my ($lhs_id) = $slg->call_by_tag(
+    ('@' .__FILE__ . ':' . __LINE__),
+    <<'END_OF_LUA', 'i>*', $irlid ) ;
+    local grammar, irlid = ...
+    local l0g = grammar.lmw_l0g
+    return l0g:rule_lhs(irlid)
+END_OF_LUA
             last FIND_EVENT if $lhs_id != $lex_discard_symbol_id;
             $event = $default_discard_event;
         } ## end FIND_EVENT:
