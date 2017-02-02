@@ -511,8 +511,6 @@ END_OF_LUA
         );
     }
 
-    my $g1_thin = $g1_tracer->grammar();
-
     my $symbol_ids_by_event_name_and_type = {};
     $slg->[Marpa::R3::Internal::Scanless::G::SYMBOL_IDS_BY_EVENT_NAME_AND_TYPE]
       = $symbol_ids_by_event_name_and_type;
@@ -631,8 +629,16 @@ END_OF_LUA
     my %g1_id_by_lexeme_name = ();
   SYMBOL: for my $symbol_id ( $slg->symbol_ids() ) {
 
+    my ($is_terminal) = $slg->call_by_tag(
+        ('@' .__FILE__ . ':' .  __LINE__),
+        <<'END_OF_LUA', 'i', $symbol_id);
+        local grammar, symbol_id = ...
+        local g1g = grammar.lmw_g1g
+        return g1g:symbol_is_terminal(symbol_id)
+END_OF_LUA
+
         # Not a lexeme, according to G1
-        next SYMBOL if not $g1_thin->symbol_is_terminal($symbol_id);
+        next SYMBOL if not $is_terminal;
 
         my $symbol_name = $slg->symbol_name($symbol_id);
         $g1_id_by_lexeme_name{$symbol_name} = $symbol_id;
