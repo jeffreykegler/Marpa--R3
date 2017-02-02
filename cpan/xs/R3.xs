@@ -2582,7 +2582,7 @@ r_convert_events ( Outer_R *outer_slr)
             }
             break;
         case MARPA_EVENT_EARLEY_ITEM_THRESHOLD:
-            /* All events are ignored on faiulre
+            /* All events are ignored on failure
              * On success, all except MARPA_EVENT_EARLEY_ITEM_THRESHOLD
              * are ignored.
              *
@@ -2590,11 +2590,15 @@ r_convert_events ( Outer_R *outer_slr)
              * can be turned off by raising
              * the Earley item warning threshold.
              */
-            {
-              warn
-                ("Marpa: Scanless G1 Earley item count (%ld) exceeds warning threshold",
-                 (long) marpa_g_event_value (&marpa_event));
-            }
+            call_by_tag (outer_slr->L, LUA_TAG,
+                "recce, perl_pos, yim_count = ...\n"
+                "local q = recce.event_queue\n"
+                "q[#q+1] = { 'g1 earley item threshold exceeded', perl_pos, yim_count}\n",
+                "Rii>",
+                outer_slr->lua_ref,
+                (lua_Integer)slr->perl_pos,
+                (lua_Integer)marpa_g_event_value (&marpa_event)
+            );
             break;
         default:
             {
