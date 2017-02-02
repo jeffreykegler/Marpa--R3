@@ -797,7 +797,7 @@ END_OF_LUA
     my @lex_rule_to_g1_lexeme;
     my $lex_start_symbol_id =
       $slg->l0_symbol_by_name($lex_start_symbol_name);
-  RULE_ID: for my $rule_id ( 0 .. $lex_thin->highest_rule_id() ) {
+  RULE_ID: for my $rule_id ( $slg->l0_rule_ids() ) {
         my $lhs_id = $lex_thin->rule_lhs($rule_id);
         if ( $lhs_id == $lex_discard_symbol_id ) {
             $lex_rule_to_g1_lexeme[$rule_id] = -2;
@@ -825,7 +825,7 @@ END_OF_LUA
               $assertion_id;
         } ## end if ( not defined $assertion_id )
         $lex_thin->zwa_place( $assertion_id, $rule_id, 0 );
-    } ## end RULE_ID: for my $rule_id ( 0 .. $lex_thin->highest_rule_id() )
+    }
 
     my $lex_precompute_error =
       Marpa::R3::Internal::Scanless::G::precompute( $slg, $lex_tracer );
@@ -860,7 +860,7 @@ END_OF_LUA
     my $l0_xbnfs_by_irlid =
       $lex_tracer->[Marpa::R3::Internal::Trace::G::XBNF_BY_IRLID];
     my $default_discard_event = $discard_default_adverbs->{event};
-  RULE_ID: for my $irlid ( 0 .. $lex_thin->highest_rule_id() ) {
+  RULE_ID: for my $irlid ( $slg->l0_rule_ids() ) {
         my $xbnf = $l0_xbnfs_by_irlid->[$irlid];
 
         # There may be gaps in the IRLIDs
@@ -890,7 +890,7 @@ END_OF_LUA
         }
         Marpa::R3::exception(qq{Discard event has unknown name: "$event_name"});
 
-    } ## end RULE_ID: for my $rule_id ( 0 .. $lex_thin->highest_rule_id() )
+    }
 
     # Post-lexer G1 processing
 
