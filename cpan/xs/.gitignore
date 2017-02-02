@@ -1,6 +1,3 @@
-/auto[.]c
-/auto[.]o
-/auto[.]xs
 /exec_lua[.]xs
 /glue_inc[.]c
 /glue[.]out

@@ -236,15 +236,6 @@ typedef struct
 #undef MAX
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 
-/* utf8_to_uvchr is deprecated in 5.16, but
- * utf8_to_uvchr_buf is not available before 5.16
- * If I need to get fancier, I should look at Dumper.xs
- * in Data::Dumper
- */
-#if PERL_VERSION <= 15 && ! defined(utf8_to_uvchr_buf)
-#define utf8_to_uvchr_buf(s, send, p_length) (utf8_to_uvchr(s, p_length))
-#endif
-
 typedef SV* SVREF;
 
 #undef Dim
@@ -340,65 +331,6 @@ step_type_to_string (const lua_Integer step_type)
       step_type_name = marpa_step_type_description[step_type].name;
   }
   return step_type_name;
-}
-
-/* This routine is for the handling exceptions
-   from libmarpa.  It is used when in the general
-   cases, for those exception which are not singled
-   out for special handling by the XS logic.
-   It returns a buffer which must be Safefree()'d.
-*/
-static char *
-error_description_generate (G_Wrapper *g_wrapper)
-{
-  dTHX;
-  const int error_code = g_wrapper->libmarpa_error_code;
-  const char *error_string = g_wrapper->libmarpa_error_string;
-  const char *suggested_description = NULL;
-  /*
-   * error_name should always be set when suggested_description is,
-   * so this initialization should never be used.
-   */
-  const char *error_name = "not libmarpa error";
-  const char *output_string;
-  switch (error_code)
-    {
-    case MARPA_ERR_DEVELOPMENT:
-      output_string = form ("(development) %s",
-                              (error_string ? error_string : "(null)"));
-                            goto COPY_STRING;
-    case MARPA_ERR_INTERNAL:
-      output_string = form ("Internal error (%s)",
-                              (error_string ? error_string : "(null)"));
-                            goto COPY_STRING;
-    }
-  if (error_code >= 0 && error_code < MARPA_ERROR_COUNT) {
-      suggested_description = marpa_error_description[error_code].suggested;
-      error_name = marpa_error_description[error_code].name;
-  }
-  if (!suggested_description)
-    {
-      if (error_string)
-        {
-          output_string = form ("libmarpa error %d %s: %s",
-          error_code, error_name, error_string);
-          goto COPY_STRING;
-        }
-      output_string = form ("libmarpa error %d %s", error_code, error_name);
-          goto COPY_STRING;
-    }
-  if (error_string)
-    {
-      output_string = form ("%s%s%s", suggested_description, "; ", error_string);
-          goto COPY_STRING;
-    }
-  output_string = suggested_description;
-  COPY_STRING:
-  {
-      char* buffer = g_wrapper->message_buffer;
-      if (buffer) Safefree(buffer);
-      return g_wrapper->message_buffer = savepv(output_string);
-    }
 }
 
 static void

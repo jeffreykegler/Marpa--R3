@@ -132,7 +132,6 @@
 ^xs/Makefile$
 ^xs/Makefile[.]old$
 ^xs/R3[.]c$
-^xs/auto[.]xs
 ^xs/exec_lua[.]xs
 ^xs/glue[.]out$
 ^xs/glue_inc[.]c$

@@ -308,7 +308,6 @@ t/wall.t
 t/zorro.t
 xs/Makefile.PL
 xs/R3.xs
-xs/gen_auto_xs.pl
 xs/gen_exec_lua.pl
 xs/marpa_xs.h
 xs/ppport.h
