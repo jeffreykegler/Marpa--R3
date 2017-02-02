@@ -799,9 +799,8 @@ END_OF_LUA
       $slg->l0_symbol_by_name($lex_start_symbol_name);
   RULE_ID: for my $rule_id ( $slg->l0_rule_ids() ) {
 
-    my ($lhs_id) = $slg->call_by_tag(
-    ('@' .__FILE__ . ':' . __LINE__),
-    <<'END_OF_LUA', 'i>*', $rule_id ) ;
+        my ($lhs_id) = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+            <<'END_OF_LUA', 'i>*', $rule_id );
     local grammar, rule_id = ...
     local l0g = grammar.lmw_l0g
     return l0g:rule_lhs(rule_id)
@@ -815,7 +814,14 @@ END_OF_LUA
             $lex_rule_to_g1_lexeme[$rule_id] = -1;
             next RULE_ID;
         }
-        my $lexer_lexeme_id = $lex_thin->rule_rhs( $rule_id, 0 );
+        my ($lexer_lexeme_id) =
+          $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+            <<'END_OF_LUA', 'i>*', $rule_id );
+    local grammar, rule_id = ...
+    local l0g = grammar.lmw_l0g
+    return l0g:rule_rhs(rule_id, 0)
+END_OF_LUA
+
         if ( $lexer_lexeme_id == $lex_discard_symbol_id ) {
             $lex_rule_to_g1_lexeme[$rule_id] = -1;
             next RULE_ID;
@@ -828,11 +834,27 @@ END_OF_LUA
         my $assertion_id =
           $lexeme_data{$lexeme_name}{lexer}{'assertion'};
         if ( not defined $assertion_id ) {
-            $assertion_id = $lex_thin->zwa_new(0);
+
+            ($assertion_id) =
+              $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+                <<'END_OF_LUA', '>*' );
+    local grammar = ...
+    local l0g = grammar.lmw_l0g
+    return l0g:zwa_new(0)
+END_OF_LUA
+
             $lexeme_data{$lexeme_name}{lexer}{'assertion'} =
               $assertion_id;
         } ## end if ( not defined $assertion_id )
-        $lex_thin->zwa_place( $assertion_id, $rule_id, 0 );
+
+        # $lex_thin->zwa_place( $assertion_id, $rule_id, 0 );
+        $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+            <<'END_OF_LUA', 'ii>*', $assertion_id, $rule_id );
+    local grammar, assertion_id, rule_id = ...
+    local l0g = grammar.lmw_l0g
+    l0g:zwa_place(assertion_id, rule_id, 0)
+END_OF_LUA
+
     }
 
     my $lex_precompute_error =
