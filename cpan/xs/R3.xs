@@ -401,17 +401,6 @@ error_description_generate (G_Wrapper *g_wrapper)
     }
 }
 
-/* Return value must be Safefree()'d */
-static const char *
-xs_g_error (G_Wrapper * g_wrapper)
-{
-  Marpa_Grammar g = g_wrapper->g;
-  g_wrapper->libmarpa_error_code =
-    marpa_g_error (g, &g_wrapper->libmarpa_error_string);
-  g_wrapper->message_is_marpa_thin_error = 0;
-  return error_description_generate (g_wrapper);
-}
-
 static void
 call_by_tag (lua_State * L, const char* tag, const char *codestr,
   const char *sig, ...);
@@ -4587,8 +4576,6 @@ PPCODE:
 }
 
 INCLUDE: exec_lua.xs
-
-INCLUDE: auto.xs
 
 BOOT:
 

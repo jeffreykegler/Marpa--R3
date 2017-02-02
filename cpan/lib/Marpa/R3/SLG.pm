@@ -765,8 +765,6 @@ END_OF_LUA
 
     add_L0_user_rules( $slg, $lexer_rules );
 
-    my $lex_thin = $lex_tracer->grammar();
-
     my $lex_discard_symbol_id =
       $slg->l0_symbol_by_name($discard_symbol_name) // -1;
     my @lex_lexeme_to_g1_symbol;
@@ -847,7 +845,6 @@ END_OF_LUA
               $assertion_id;
         } ## end if ( not defined $assertion_id )
 
-        # $lex_thin->zwa_place( $assertion_id, $rule_id, 0 );
         $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
             <<'END_OF_LUA', 'ii>*', $assertion_id, $rule_id );
     local grammar, assertion_id, rule_id = ...
