@@ -1898,23 +1898,41 @@ sub Marpa::R3::Scanless::G::l0_show_symbols {
 
 sub Marpa::R3::Scanless::G::symid_is_accessible {
     my ( $slg, $symid ) = @_;
-    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
-    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
-    return $grammar_c->symbol_is_accessible($symid)
+    my ($is_accessible) = $slg->call_by_tag(
+    ('@' .__FILE__ . ':' . __LINE__),
+    <<'END_OF_LUA', 'i>*', $symid ) ;
+    local grammar, symid = ...
+    local g1g = grammar.lmw_g1g
+    return g1g:symbol_is_accessible(symid)
+END_OF_LUA
+
+    return $is_accessible;
 }
 
 sub Marpa::R3::Scanless::G::symid_is_productive {
     my ( $slg, $symid ) = @_;
-    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
-    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
-    return $grammar_c->symbol_is_productive($symid)
+    my ($is_productive) = $slg->call_by_tag(
+    ('@' .__FILE__ . ':' . __LINE__),
+    <<'END_OF_LUA', 'i>*', $symid ) ;
+    local grammar, symid = ...
+    local g1g = grammar.lmw_g1g
+    return g1g:symbol_is_productive(symid)
+END_OF_LUA
+
+    return $is_productive;
 }
 
 sub Marpa::R3::Scanless::G::symid_is_nulling {
     my ( $slg, $symid ) = @_;
-    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
-    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
-    return $grammar_c->symbol_is_nulling($symid)
+    my ($is_nulling) = $slg->call_by_tag(
+    ('@' .__FILE__ . ':' . __LINE__),
+    <<'END_OF_LUA', 'i>*', $symid ) ;
+    local grammar, symid = ...
+    local g1g = grammar.lmw_g1g
+    return g1g:symbol_is_nulling(symid)
+END_OF_LUA
+
+    return $is_nulling;
 }
 
 sub Marpa::R3::Scanless::G::show_dotted_rule {
@@ -1927,8 +1945,8 @@ sub Marpa::R3::Scanless::G::show_dotted_rule {
 
     my ($has_minimum, $minimum) = $slg->call_by_tag(
     ('@' .__FILE__ . ':' . __LINE__),
-    <<'END_OF_LUA', 'si>*', $lmw_name, $irlid ) ;
-    local grammar, lmw_name, irlid = ...
+    <<'END_OF_LUA', 'i>*', $irlid ) ;
+    local grammar, irlid = ...
     local g1g = grammar.lmw_g1g
     local minimum = g1g:sequence_min(irlid)
     if not minimum then return 0, -1 end
