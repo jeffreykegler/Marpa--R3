@@ -1887,15 +1887,13 @@ sub Marpa::R3::Scanless::G::l0_show_rules {
 sub Marpa::R3::Scanless::G::show_symbols {
     my ( $slg, $verbose ) = @_;
     $verbose //= 0;
-    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
-    return $tracer->show_symbols($verbose);
+    return $slg->lmg_show_symbols('lmw_g1g', $verbose);
 }
 
 sub Marpa::R3::Scanless::G::l0_show_symbols {
     my ( $slg, $verbose ) = @_;
     $verbose //= 0;
-    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER];
-    return $tracer->show_symbols($verbose);
+    return $slg->lmg_show_symbols('lmw_l0g', $verbose);
 }
 
 sub Marpa::R3::Scanless::G::symid_is_accessible {
@@ -2099,6 +2097,75 @@ sub Marpa::R3::Scanless::G::lmg_symbol_display_form {
       // $slg->lmg_symbol_name($lmw_name, $isyid);
     return "<!No symbol with ID $isyid!>" if not defined $text;
     return ( $text =~ m/\s/xms ) ? "<$text>" : $text;
+}
+
+sub Marpa::R3::Scanless::G::lmg_show_symbols {
+    my ( $slg, $lmw_name, $verbose ) = @_;
+    my $per_lmg =
+      $slg->[Marpa::R3::Internal::Scanless::G::PER_LMG]->{$lmw_name};
+    my $text = q{};
+    $verbose //= 0;
+
+    my $grammar_name = $per_lmg->[Marpa::R3::Internal::Trace::G::NAME];
+
+    my ($highest_symbol_id) =
+      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 's>*', $lmw_name );
+    local grammar, lmw_name = ...
+    local lmw_g = grammar[lmw_name]
+    return lmw_g:highest_symbol_id()
+END_OF_LUA
+
+    for my $symbol_id ( 0 .. $highest_symbol_id ) {
+
+        $text .= join q{ }, $grammar_name, "S$symbol_id",
+          $slg->lmg_symbol_display_form( $lmw_name, $symbol_id );
+        $text .= "\n";
+
+        if ( $verbose >= 2 ) {
+
+            ($text) = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+                <<'END_OF_LUA', 'sis', $lmw_name, $symbol_id, $text );
+    local g, lmw_name, symbol_id, text = ...
+    local pieces = { text }
+    local tags = { '/*' }
+    local lmw_g = g[lmw_name]
+    if lmw_g:symbol_is_productive(symbol_id) == 0 then
+        tags[#tags+1] = 'unproductive'
+    end
+    if lmw_g:symbol_is_accessible(symbol_id) == 0 then
+        tags[#tags+1] = 'inaccessible'
+    end
+    if lmw_g:symbol_is_nulling(symbol_id) ~= 0 then
+        tags[#tags+1] = 'nulling'
+    end
+    if lmw_g:symbol_is_terminal(symbol_id) ~= 0 then
+        tags[#tags+1] = 'terminal'
+    end
+    if #tags >= 2 then
+        tags[#tags+1] = '*/'
+        pieces[#pieces+1] = ' '
+        pieces[#pieces+1] = table.concat(tags, ' ')
+        pieces[#pieces+1] =  '\n'
+    end
+    pieces[#pieces+1] =  "  Internal name: <" 
+    pieces[#pieces+1] =  "  Internal name: <" 
+    pieces[#pieces+1] =  ">\n"
+    return table.concat(pieces)
+END_OF_LUA
+
+        } ## end if ( $verbose >= 2 )
+
+        if ( $verbose >= 3 ) {
+
+            my $dsl_form = $slg->lmg_symbol_dsl_form( $lmw_name, $symbol_id );
+            if ($dsl_form) { $text .= qq{  SLIF name: $dsl_form\n}; }
+
+        } ## end if ( $verbose >= 3 )
+
+    }
+
+    return $text;
 }
 
 sub Marpa::R3::Scanless::G::lmg_show_rules {
