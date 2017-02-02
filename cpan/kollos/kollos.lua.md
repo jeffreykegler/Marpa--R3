@@ -2935,27 +2935,40 @@ Luacheck declarations
 
     -- miranda: section+ error object code from okollos.c.lua
 
-    static inline const char* error_description_by_code(lua_Integer error_code)
+    static inline const char *
+    error_description_by_code (lua_Integer error_code)
     {
-       if (error_code >= LIBMARPA_MIN_ERROR_CODE && error_code <= LIBMARPA_MAX_ERROR_CODE) {
-           return marpa_error_codes[error_code-LIBMARPA_MIN_ERROR_CODE].description;
-       }
-       if (error_code >= KOLLOS_MIN_ERROR_CODE && error_code <= KOLLOS_MAX_ERROR_CODE) {
-           return marpa_kollos_error_codes[error_code-KOLLOS_MIN_ERROR_CODE].description;
-       }
-       return (const char *)0;
+        if (error_code >= LIBMARPA_MIN_ERROR_CODE
+            && error_code <= LIBMARPA_MAX_ERROR_CODE) {
+            return marpa_error_codes[error_code -
+                LIBMARPA_MIN_ERROR_CODE].description;
+        }
+        if (error_code >= KOLLOS_MIN_ERROR_CODE
+            && error_code <= KOLLOS_MAX_ERROR_CODE) {
+            return marpa_kollos_error_codes[error_code -
+                KOLLOS_MIN_ERROR_CODE].description;
+        }
+        return (const char *) 0;
     }
 
-    static inline int l_error_description_by_code(lua_State* L)
+    static inline void
+    push_error_description_by_code (lua_State * L,
+        lua_Integer error_code)
+    {
+        const char *description =
+            error_description_by_code (error_code);
+        if (description) {
+            marpa_lua_pushstring (L, description);
+        } else {
+            marpa_lua_pushfstring (L, "Unknown error code (%d)",
+                error_code);
+        }
+    }
+
+    static inline int lca_error_description_by_code(lua_State* L)
     {
        const lua_Integer error_code = marpa_luaL_checkinteger(L, 1);
-       const char* description = error_description_by_code(error_code);
-       if (description)
-       {
-           marpa_lua_pushstring(L, description);
-       } else {
-           marpa_lua_pushfstring(L, "Unknown error code (%d)", error_code);
-       }
+       push_error_description_by_code(L, error_code);
        return 1;
     }
 
@@ -2970,7 +2983,7 @@ Luacheck declarations
        return (const char *)0;
     }
 
-    static inline int l_error_name_by_code(lua_State* L)
+    static inline int lca_error_name_by_code(lua_State* L)
     {
        const lua_Integer error_code = marpa_luaL_checkinteger(L, 1);
        const char* mnemonic = error_name_by_code(error_code);
@@ -3124,7 +3137,7 @@ tree op.
 
     -- miranda: section+ error handlers
 
-    static int l_error_new(lua_State* L)
+    static int lca_error_new(lua_State* L)
     {
         if (marpa_lua_istable (L, 1)) {
             const int table_ix = 1;
@@ -3161,7 +3174,7 @@ tree op.
 
     /* Return string equivalent of error argument
      */
-    static inline int l_error_tostring(lua_State* L)
+    static inline int lca_error_tostring(lua_State* L)
     {
       lua_Integer error_code = -1;
       const int error_object_ix = 1;
@@ -3225,8 +3238,8 @@ tree op.
         }
       marpa_lua_pushstring (L, " ");        /* Add space separator */
 
-      temp_string = error_description_by_code (error_code);
-      marpa_lua_pushstring (L, temp_string ? temp_string : "[no description]");
+      /* Push the error description string */
+      push_error_description_by_code(L, error_code);
       marpa_lua_pushstring (L, "\n");        /* Add space separator */
 
       if (0) printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
@@ -3389,15 +3402,13 @@ All such objects define the `lmw_g` field.
     {
         Marpa_Error_Code error_code;
         Marpa_Grammar *grammar_ud;
-        const char* description;
         const int lmw_stack_ix = 1;
 
         marpa_lua_getfield (L, lmw_stack_ix, "lmw_g");
         marpa_lua_getfield (L, -1, "_libmarpa");
         grammar_ud = (Marpa_Grammar *) marpa_lua_touserdata (L, -1);
         error_code = marpa_g_error (*grammar_ud, NULL);
-        description = error_description_by_code (error_code);
-        marpa_lua_pushstring (L, description);
+        push_error_description_by_code(L, error_code);
         return 1;
     }
 
@@ -4353,7 +4364,7 @@ Marpa::R3.
         marpa_lua_newtable (L);
         /* [ kollos, error_mt ] */
         marpa_lua_pushvalue (L, upvalue_stack_ix);
-        marpa_lua_pushcclosure (L, l_error_tostring, 1);
+        marpa_lua_pushcclosure (L, lca_error_tostring, 1);
         /* [ kollos, error_mt, tostring_fn ] */
         marpa_lua_setfield (L, -2, "__tostring");
         /* [ kollos, error_mt ] */
@@ -4439,19 +4450,19 @@ Marpa::R3.
 
         /* TODO: Check this.  Needed?  In the right table? */
         marpa_lua_pushvalue (L, upvalue_stack_ix);
-        marpa_lua_pushcclosure (L, l_error_description_by_code, 1);
+        marpa_lua_pushcclosure (L, lca_error_description_by_code, 1);
         /* [ kollos, function ] */
         marpa_lua_setfield (L, kollos_table_stack_ix, "error_description");
         /* [ kollos ] */
 
         /* TODO: Check this.  Needed?  In the right table? */
         marpa_lua_pushvalue (L, upvalue_stack_ix);
-        marpa_lua_pushcclosure (L, l_error_name_by_code, 1);
+        marpa_lua_pushcclosure (L, lca_error_name_by_code, 1);
         marpa_lua_setfield (L, kollos_table_stack_ix, "error_name");
 
         /* TODO: Check this.  Needed?  In the right table? */
         marpa_lua_pushvalue (L, upvalue_stack_ix);
-        marpa_lua_pushcclosure (L, l_error_new, 1);
+        marpa_lua_pushcclosure (L, lca_error_new, 1);
         marpa_lua_setfield (L, kollos_table_stack_ix, "error_new");
 
         /* TODO: Check this.  Needed?  In the right table? */

@@ -2428,100 +2428,11 @@ static void slr_inner_destroy(lua_State* L, Scanless_R* slr)
   Safefree (slr);
 }
 
-/* Assumes it is called
- after a successful marpa_r_earleme_complete().
- At some point it may need optional SLR information,
- at which point I will add a parameter
- */
-static void
-slr_convert_events ( Outer_R *outer_slr)
-{
-  dTHX;
-  Scanless_R *slr = slr_inner_get(outer_slr);
-  int event_ix;
-  Marpa_Grammar g = slr->g1_wrapper->g;
-  const int event_count = marpa_g_event_count (g);
-  for (event_ix = 0; event_ix < event_count; event_ix++)
-    {
-      Marpa_Event marpa_event;
-      Marpa_Event_Type event_type = marpa_g_event (g, &marpa_event, event_ix);
-      switch (event_type)
-        {
-          {
-        case MARPA_EVENT_EXHAUSTED:
-            /* Do nothing about exhaustion on success */
-            break;
-        case MARPA_EVENT_SYMBOL_COMPLETED:
-            call_by_tag (outer_slr->L, LUA_TAG,
-                "recce, symbol = ...\n"
-                "local q = recce.event_queue\n"
-                "q[#q+1] = { 'symbol completed', symbol}\n",
-                "Ri>",
-                outer_slr->lua_ref, (lua_Integer)marpa_g_event_value (&marpa_event)
-            );
-            break;
-
-        case MARPA_EVENT_SYMBOL_NULLED:
-            call_by_tag (outer_slr->L, LUA_TAG,
-                "recce, symbol = ...\n"
-                "local q = recce.event_queue\n"
-                "q[#q+1] = { 'symbol nulled', symbol}\n",
-                "Ri>",
-                outer_slr->lua_ref, (lua_Integer)marpa_g_event_value (&marpa_event)
-            );
-            break;
-        case MARPA_EVENT_SYMBOL_PREDICTED:
-            call_by_tag (outer_slr->L, LUA_TAG,
-                "recce, symbol = ...\n"
-                "local q = recce.event_queue\n"
-                "q[#q+1] = { 'symbol predicted', symbol}\n",
-                "Ri>",
-                outer_slr->lua_ref, (lua_Integer)marpa_g_event_value (&marpa_event)
-            );
-            break;
-        case MARPA_EVENT_EARLEY_ITEM_THRESHOLD:
-            /* All events are ignored on failure
-             * On success, all except MARPA_EVENT_EARLEY_ITEM_THRESHOLD
-             * are ignored.
-             *
-             * The warning raised for MARPA_EVENT_EARLEY_ITEM_THRESHOLD
-             * can be turned off by raising
-             * the Earley item warning threshold.
-             */
-            call_by_tag (outer_slr->L, LUA_TAG,
-                "recce, perl_pos, yim_count = ...\n"
-                "local q = recce.event_queue\n"
-                "q[#q+1] = { 'g1 earley item threshold exceeded', perl_pos, yim_count}\n",
-                "Rii>",
-                outer_slr->lua_ref,
-                (lua_Integer)slr->perl_pos,
-                (lua_Integer)marpa_g_event_value (&marpa_event)
-            );
-            break;
-        default:
-            {
-                const char *result_string = event_type_to_string (event_type);
-                if (!result_string) {
-                    result_string =
-                        form ("unknown marpa_r event code, %d", event_type);
-                }
-                call_by_tag (outer_slr->L, LUA_TAG,
-                    "recce, result_string = ...\n"
-                    "local q = recce.event_queue\n"
-                    "q[#q+1] = { 'unknown marpa_r event', result_string}\n",
-                    "Rs>", outer_slr->lua_ref, result_string);
-            }
-            break;
-          }
-        }
-    }
-}
-
 /* Called after marpa_r_start_input() and
  * marpa_r_earleme_complete().
  */
 static void
-r_convert_events ( Outer_R *outer_slr)
+g1_convert_events ( Outer_R *outer_slr)
 {
   dTHX;
   int event_ix;
@@ -3073,7 +2984,7 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
         }
         slr->lexer_start_pos = slr->perl_pos = slr->end_of_lexeme;
         if (return_value > 0) {
-            slr_convert_events (outer_slr);
+            g1_convert_events (outer_slr);
         }
 
       call_by_tag (outer_slr->L, LUA_TAG,
@@ -4126,7 +4037,7 @@ PPCODE:
   slr->is_external_scanning = 0;
   if (result >= 0)
     {
-      r_convert_events (outer_slr);
+      g1_convert_events (outer_slr);
 
       call_by_tag (outer_slr->L, LUA_TAG,
           "local recce, start_pos, lexeme_length = ...\n"
@@ -4468,7 +4379,7 @@ PPCODE:
     croak( "Problem in r->start_input(): %s",
      xs_g_error( g1_wrapper ));
   }
-  r_convert_events(outer_slr);
+  g1_convert_events(outer_slr);
   XPUSHs (sv_2mortal (newSViv (gp_result)));
 }
 
