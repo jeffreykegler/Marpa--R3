@@ -416,6 +416,23 @@ static void
 call_by_tag (lua_State * L, const char* tag, const char *codestr,
   const char *sig, ...);
 
+/* Note: returned string is in a mortal SV --
+ * copy it if you want want to save it.
+ */
+static const char *slg_l0_error(Outer_G* outer_slg)
+{
+  dTHX;
+    SV *error_description;
+    call_by_tag (outer_slg->L, LUA_TAG,
+        "slg = ...\n"
+        "local l0g = slg.lmw_l0g\n"
+        "return l0g:error_description\n", "G>C", outer_slg->lua_ref);
+    return SvPV_nolen (error_description);
+}
+
+/* Note: returned string is in a mortal SV --
+ * copy it if you want want to save it.
+ */
 static const char *slr_l0_error(Outer_R* outer_slr)
 {
   dTHX;
@@ -424,6 +441,34 @@ static const char *slr_l0_error(Outer_R* outer_slr)
         "recce = ...\n"
         "local l0g = recce.slg.lmw_l0g\n"
         "return l0g:error_description\n", "R>C", outer_slr->lua_ref);
+    return SvPV_nolen (error_description);
+}
+
+/* Note: returned string is in a mortal SV --
+ * copy it if you want want to save it.
+ */
+static const char *slg_g1_error(Outer_G* outer_slg)
+{
+  dTHX;
+    SV *error_description;
+    call_by_tag (outer_slg->L, LUA_TAG,
+        "slg = ...\n"
+        "local g1g = slg.lmw_g1g\n"
+        "return g1g:error_description\n", "G>C", outer_slg->lua_ref);
+    return SvPV_nolen (error_description);
+}
+
+/* Note: returned string is in a mortal SV --
+ * copy it if you want want to save it.
+ */
+static const char *slr_g1_error(Outer_R* outer_slr)
+{
+  dTHX;
+    SV *error_description;
+    call_by_tag (outer_slr->L, LUA_TAG,
+        "recce = ...\n"
+        "local g1g = recce.slg.lmw_g1g\n"
+        "return g1g:error_description\n", "R>C", outer_slr->lua_ref);
     return SvPV_nolen (error_description);
 }
 
