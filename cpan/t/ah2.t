@@ -99,17 +99,17 @@ Marpa::R3::Test::is( $grammar->show_irls,
 EOS
 
 my $nulling_symbols = join q{ }, sort map { $grammar->symbol_name($_) }
-  grep { $grammar->symid_is_nulling($_) } $grammar->symbol_ids();
+  grep { $grammar->symbol_is_nulling($_) } $grammar->symbol_ids();
 Marpa::R3::Test::is( $nulling_symbols, q{},
     'Aycock/Horspool Nulling Symbols' );
 
 my $productive_symbols = join q{ }, sort map { $grammar->symbol_name($_) }
-  grep { $grammar->symid_is_productive($_) } $grammar->symbol_ids();
+  grep { $grammar->symbol_is_productive($_) } $grammar->symbol_ids();
 Marpa::R3::Test::is( $productive_symbols, q{A S [:start] [Lex-0]},
     'Aycock/Horspool Productive Symbols' );
 
 my $accessible_symbols = join q{ }, sort map { $grammar->symbol_name($_) }
-  grep { $grammar->symid_is_accessible($_) } $grammar->symbol_ids();
+  grep { $grammar->symbol_is_accessible($_) } $grammar->symbol_ids();
 Marpa::R3::Test::is( $accessible_symbols, q{A S [:start] [Lex-0]},
     'Aycock/Horspool Accessible Symbols' );
 

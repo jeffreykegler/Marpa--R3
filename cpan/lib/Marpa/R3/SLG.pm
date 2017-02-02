@@ -774,7 +774,7 @@ END_OF_LUA
             Marpa::R3::exception(
                 "A lexeme in L0 is not a lexeme in G1: $lexeme_name");
         }
-        if ( not $g1_thin->symbol_is_accessible($g1_symbol_id) ) {
+        if ( not $slg->symbol_is_accessible($g1_symbol_id) ) {
             my $message =
 "A lexeme in L0 is not accessible from the G1 start symbol: $lexeme_name";
             say {$trace_fh} $message
@@ -1093,7 +1093,6 @@ sub Marpa::R3::Internal::Scanless::G::precompute {
 
     my $lmw_name = 'lmw_' . (lc $tracer->name()) . 'g';
     my $thin_slg = $slg->[Marpa::R3::Internal::Scanless::G::C];
-    my $grammar_c = $tracer->[Marpa::R3::Internal::Trace::G::C];
     my $xsy_by_isyid     = $tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID];
 
     my $trace_fh =
@@ -1229,14 +1228,21 @@ END_OF_LUA
         return loop_rule_count
 END_OF_LUA
 
-    if ( $loop_rule_count ) {
-        my @loop_rules =
-            grep { $grammar_c->rule_is_loop($_) } ( 0 .. $grammar_c->highest_rule_id() );
-        for my $rule_id (@loop_rules) {
+    if ($loop_rule_count) {
+      RULE:
+        for my $rule_id ( $slg->lmg_rule_ids($lmw_name) ) {
+            my ($rule_is_loop) =
+              $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+                <<'END_OF_LUA', 'si', $lmw_name, $rule_id );
+        local grammar, lmw_name, rule_id = ...
+        local lmw_g = grammar[lmw_name]
+        return lmw_g:rule_is_loop(rule_id)
+END_OF_LUA
+
+            next RULE unless $rule_is_loop;
             print {$trace_fh}
-                'Cycle found involving rule: ',
-                $slg->brief_rule($rule_id), "\n"
-                or Marpa::R3::exception("Could not print: $ERRNO");
+              'Cycle found involving rule: ', $slg->brief_rule($rule_id), "\n"
+              or Marpa::R3::exception("Could not print: $ERRNO");
         } ## end for my $rule_id (@loop_rules)
         Marpa::R3::exception('Cycles in grammar, fatal error');
     }
@@ -1245,9 +1251,17 @@ END_OF_LUA
         $slg->[Marpa::R3::Internal::Scanless::G::IF_INACCESSIBLE]
         // 'warn';
     SYMBOL:
-    for my $symbol_id ( grep { !$grammar_c->symbol_is_accessible($_) }
-        ( 0 .. $grammar_c->highest_symbol_id() ) )
+    for my $symbol_id ( $slg->lmg_symbol_ids($lmw_name))
     {
+        my ($is_accessible) = $slg->call_by_tag(
+        ('@' .__FILE__ . ':' .  __LINE__),
+        <<'END_OF_LUA', 'si', $lmw_name, $symbol_id);
+        local grammar, lmw_name, symbol_id = ...
+        local lmw_g = grammar[lmw_name]
+        return lmw_g:symbol_is_accessible(symbol_id)
+END_OF_LUA
+        next SYMBOL if $is_accessible;
+
         my $xsy      = $xsy_by_isyid->[$symbol_id];
 
         # Inaccessible internal symbols may be created
@@ -1267,7 +1281,7 @@ END_OF_LUA
         Marpa::R3::exception($message) if $treatment eq 'fatal';
         say {$trace_fh} $message
             or Marpa::R3::exception("Could not print: $ERRNO");
-    } ## end for my $symbol_id ( grep { !$grammar_c->...})
+    }
 
     # Save some memory
     $slg->[Marpa::R3::Internal::Scanless::G::CHARACTER_CLASSES] = undef;
@@ -1922,7 +1936,7 @@ sub Marpa::R3::Scanless::G::l0_show_symbols {
     return $slg->lmg_show_symbols('lmw_l0g', $verbose);
 }
 
-sub Marpa::R3::Scanless::G::symid_is_accessible {
+sub Marpa::R3::Scanless::G::symbol_is_accessible {
     my ( $slg, $symid ) = @_;
     my ($is_accessible) = $slg->call_by_tag(
     ('@' .__FILE__ . ':' . __LINE__),
@@ -1935,7 +1949,7 @@ END_OF_LUA
     return $is_accessible;
 }
 
-sub Marpa::R3::Scanless::G::symid_is_productive {
+sub Marpa::R3::Scanless::G::symbol_is_productive {
     my ( $slg, $symid ) = @_;
     my ($is_productive) = $slg->call_by_tag(
     ('@' .__FILE__ . ':' . __LINE__),
@@ -1948,7 +1962,7 @@ END_OF_LUA
     return $is_productive;
 }
 
-sub Marpa::R3::Scanless::G::symid_is_nulling {
+sub Marpa::R3::Scanless::G::symbol_is_nulling {
     my ( $slg, $symid ) = @_;
     my ($is_nulling) = $slg->call_by_tag(
     ('@' .__FILE__ . ':' . __LINE__),
