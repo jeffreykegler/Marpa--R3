@@ -629,7 +629,7 @@ END_OF_LUA
 
     # Find out the list of lexemes according to G1
     my %g1_id_by_lexeme_name = ();
-  SYMBOL: for my $symbol_id ( 0 .. $g1_thin->highest_symbol_id() ) {
+  SYMBOL: for my $symbol_id ( $slg->symbol_ids() ) {
 
         # Not a lexeme, according to G1
         next SYMBOL if not $g1_thin->symbol_is_terminal($symbol_id);
@@ -764,7 +764,7 @@ END_OF_LUA
     my $lex_discard_symbol_id =
       $slg->l0_symbol_by_name($discard_symbol_name) // -1;
     my @lex_lexeme_to_g1_symbol;
-    $lex_lexeme_to_g1_symbol[$_] = -1 for 0 .. $g1_thin->highest_symbol_id();
+    $lex_lexeme_to_g1_symbol[$_] = -1 for $slg->symbol_ids();
 
   LEXEME_NAME: for my $lexeme_name (@lex_lexeme_names) {
         next LEXEME_NAME if $lexeme_name eq $discard_symbol_name;
