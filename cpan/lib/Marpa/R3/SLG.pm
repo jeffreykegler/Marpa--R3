@@ -2128,7 +2128,7 @@ END_OF_LUA
                 <<'END_OF_LUA', 'sis', $lmw_name, $symbol_id, $text );
     local g, lmw_name, symbol_id, text = ...
     local pieces = { text }
-    local tags = { '/*' }
+    local tags = { ' /*' }
     local lmw_g = g[lmw_name]
     if lmw_g:symbol_is_productive(symbol_id) == 0 then
         tags[#tags+1] = 'unproductive'
@@ -2144,12 +2144,12 @@ END_OF_LUA
     end
     if #tags >= 2 then
         tags[#tags+1] = '*/'
-        pieces[#pieces+1] = ' '
+        pieces[#pieces+1] = " "
         pieces[#pieces+1] = table.concat(tags, ' ')
         pieces[#pieces+1] =  '\n'
     end
     pieces[#pieces+1] =  "  Internal name: <" 
-    pieces[#pieces+1] =  "  Internal name: <" 
+    pieces[#pieces+1] =  lmw_g:symbol_name(symbol_id)
     pieces[#pieces+1] =  ">\n"
     return table.concat(pieces)
 END_OF_LUA
