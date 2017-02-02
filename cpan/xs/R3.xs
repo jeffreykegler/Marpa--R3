@@ -401,22 +401,6 @@ error_description_generate (G_Wrapper *g_wrapper)
     }
 }
 
-/* Argument must be something that can be Safefree()'d */
-static const char *
-set_error_from_string (G_Wrapper * g_wrapper, char *string)
-{
-  dTHX;
-  Marpa_Grammar g = g_wrapper->g;
-  char *buffer = g_wrapper->message_buffer;
-  if (buffer) Safefree(buffer);
-  g_wrapper->message_buffer = string;
-  g_wrapper->message_is_marpa_thin_error = 1;
-  marpa_g_error_clear(g);
-  g_wrapper->libmarpa_error_code = MARPA_ERR_NONE;
-  g_wrapper->libmarpa_error_string = NULL;
-  return buffer;
-}
-
 /* Return value must be Safefree()'d */
 static const char *
 xs_g_error (G_Wrapper * g_wrapper)
@@ -426,6 +410,21 @@ xs_g_error (G_Wrapper * g_wrapper)
     marpa_g_error (g, &g_wrapper->libmarpa_error_string);
   g_wrapper->message_is_marpa_thin_error = 0;
   return error_description_generate (g_wrapper);
+}
+
+static void
+call_by_tag (lua_State * L, const char* tag, const char *codestr,
+  const char *sig, ...);
+
+static const char *slr_l0_error(Outer_R* outer_slr)
+{
+  dTHX;
+    SV *error_description;
+    call_by_tag (outer_slr->L, LUA_TAG,
+        "recce = ...\n"
+        "local l0g = recce.slg.lmw_l0g\n"
+        "return l0g:error_description\n", "R>C", outer_slr->lua_ref);
+    return SvPV_nolen (error_description);
 }
 
 /* Wrapper to use vwarn with libmarpa */
@@ -2061,7 +2060,7 @@ u_read (Outer_R * outer_slr)
                             (long) slr->perl_pos, (long) symbol_id,
                             (unsigned long) codepoint,
                             (long) value,
-                            xs_g_error (slr->slg->l0_wrapper));
+                            slr_l0_error (outer_slr));
                     }
                 }
                 break;
@@ -2110,7 +2109,7 @@ u_read (Outer_R * outer_slr)
                     if (result < 0) {
                         croak
                             ("Problem in r->u_read(), earleme_complete() failed: %s",
-                            xs_g_error (slr->slg->l0_wrapper));
+                            slr_l0_error (outer_slr));
                     }
                 }
                 break;
