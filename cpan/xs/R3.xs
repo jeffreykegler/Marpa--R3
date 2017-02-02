@@ -61,11 +61,6 @@ struct l0_rule_r_properties {
 
 typedef struct {
      Marpa_Grammar g;
-     char *message_buffer;
-     int libmarpa_error_code;
-     const char *libmarpa_error_string;
-     unsigned int throw:1;
-     unsigned int message_is_marpa_thin_error:1;
 } G_Wrapper;
 
 union marpa_slr_event_s;
@@ -3087,12 +3082,7 @@ PPCODE:
     if (g) {
         SV *sv;
         Newx (g_wrapper, 1, G_Wrapper);
-        g_wrapper->throw = 1;
         g_wrapper->g = g;
-        g_wrapper->message_buffer = NULL;
-        g_wrapper->libmarpa_error_code = MARPA_ERR_NONE;
-        g_wrapper->libmarpa_error_string = NULL;
-        g_wrapper->message_is_marpa_thin_error = 0;
         sv = sv_newmortal ();
         sv_setref_pv (sv, grammar_c_class_name, (void *) g_wrapper);
         XPUSHs (sv);
@@ -3120,8 +3110,6 @@ DESTROY( g_wrapper )
 PPCODE:
 {
     Marpa_Grammar grammar;
-    if (g_wrapper->message_buffer)
-        Safefree(g_wrapper->message_buffer);
     grammar = g_wrapper->g;
     marpa_g_unref( grammar );
     Safefree( g_wrapper );
@@ -3529,7 +3517,6 @@ PPCODE:
   Outer_R *outer_slr;
   Scanless_R *slr;
   Scanless_G *slg;
-  Marpa_Grammar g1g;
   PERL_UNUSED_ARG(class);
 
   if (!sv_isa (slg_sv, "Marpa::R3::Thin::SLG"))
@@ -3546,7 +3533,6 @@ PPCODE:
   L = outer_slg->L;
 
   slg = slg_inner_get(outer_slg);
-  g1g = slg->g1_wrapper->g;
 
   slr = marpa_inner_slr_new(outer_slg);
   /* Copy and take references to the "parent objects",
@@ -4325,7 +4311,6 @@ start_input( outer_slr )
 PPCODE:
 {
   Scanless_R *slr = slr_inner_get(outer_slr);
-  G_Wrapper *g1_wrapper = slr->g1_wrapper;
   lua_Integer gp_result;
 
     call_by_tag (outer_slr->L, LUA_TAG,
@@ -4340,7 +4325,7 @@ PPCODE:
     );
 
   if ( gp_result == -1 ) { XSRETURN_UNDEF; }
-  if ( gp_result < 0 && g1_wrapper->throw ) {
+  if ( gp_result < 0 ) {
     croak( "Problem in r->start_input(): %s",
       slr_g1_error (outer_slr));
   }
