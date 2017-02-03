@@ -144,7 +144,6 @@ __DATA__
 
     NAME { Name of the grammar -- 'l0' or 'g1' }
     LMW_NAME
-    SLG_C
 
     C { A C structure }
     XSY_BY_ISYID { Array mapping ISYID to XSY }

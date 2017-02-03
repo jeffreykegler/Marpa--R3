@@ -24,7 +24,6 @@ sub new {
     my ( $class, $slg, $name ) = @_;
     my $tracer = bless [], $class;
     my $thin_slg = $slg->[Marpa::R3::Internal::Scanless::G::C];
-    $tracer->[Marpa::R3::Internal::Trace::G::SLG_C] = $thin_slg;
     $tracer->[Marpa::R3::Internal::Trace::G::NAME] = $name;
     my $lmw_name = 'lmw_' . (lc $name) . 'g';
     $tracer->[Marpa::R3::Internal::Trace::G::LMW_NAME]
@@ -35,7 +34,7 @@ sub new {
     my $grammar_c = Marpa::R3::Thin::G->new($thin_slg, $field_name);
     $tracer->[Marpa::R3::Internal::Trace::G::C] = $grammar_c;
 
-    $thin_slg->call_by_tag(
+    $slg->call_by_tag(
         ('@' . __FILE__ . ':' .  __LINE__),
       <<'END_OF_LUA', 's', (lc $name));
     local g, short_name = ...
