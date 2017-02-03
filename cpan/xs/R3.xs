@@ -4019,14 +4019,14 @@ PPCODE:
   slr->is_external_scanning = 0;
   if (result >= 0)
     {
-      g1_convert_events (outer_slr);
-
       call_by_tag (outer_slr->L, LUA_TAG,
-          "local recce, start_pos, lexeme_length = ...\n"
+          "local recce, start_pos, lexeme_length, perl_pos = ...\n"
+          "recce:g1_convert_events(perl_pos)\n"
           "local g1r = recce.lmw_g1r\n"
           "local latest_earley_set = g1r:latest_earley_set()\n"
           "recce.es_data[latest_earley_set] = { start_pos, lexeme_length }\n"
-          , "Rii>", outer_slr->lua_ref, (lua_Integer)start_pos, (lua_Integer)lexeme_length);
+          , "Riii>", outer_slr->lua_ref, (lua_Integer)start_pos, (lua_Integer)lexeme_length,
+            slr->perl_pos );
 
       slr->perl_pos = start_pos + lexeme_length;
       XSRETURN_IV (slr->perl_pos);
