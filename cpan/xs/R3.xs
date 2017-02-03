@@ -2001,9 +2001,14 @@ u_read (Outer_R * outer_slr)
                         goto ADVANCE_ONE_CHAR;
                     }
                     if (result == -2) {
-                        const int error =
-                            marpa_g_error (slr->slg->l0_wrapper->g, NULL);
-                        if (error == MARPA_ERR_PARSE_EXHAUSTED) {
+                        lua_Integer error_code;
+                      call_by_tag (outer_slr->L, LUA_TAG,
+                          "recce = ...\n"
+                          "return recce.slg.lmw_l0g:error_code()\n",
+                          "R>i",
+                          outer_slr->lua_ref, &error_code);
+
+                        if (error_code == MARPA_ERR_PARSE_EXHAUSTED) {
                             return U_READ_EXHAUSTED_ON_FAILURE;
                         }
                     }
