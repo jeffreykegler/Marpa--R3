@@ -511,7 +511,7 @@ span is zero or less.
             end
             if event_type == kollos.event["EARLEY_ITEM_THRESHOLD"] then
                 q[#q+1] = { 'g1 earley item threshold exceeded',
-                    recce.perl_pos, event_value}
+                    perl_pos, event_value}
                 goto NEXT_EVENT
             end
             local event_data = _M.event[event_type]

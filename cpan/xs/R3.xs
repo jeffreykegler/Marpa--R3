@@ -2395,115 +2395,6 @@ static void slr_inner_destroy(lua_State* L, Scanless_R* slr)
   Safefree (slr);
 }
 
-/* Called after marpa_r_start_input() and
- * marpa_r_earleme_complete().
- */
-static void
-g1_convert_events ( Outer_R *outer_slr)
-{
-  dTHX;
-  int event_ix;
-  Scanless_R *slr = slr_inner_get(outer_slr);
-  Marpa_Grammar g = slr->g1_wrapper->g;
-  const int event_count = marpa_g_event_count (g);
-  for (event_ix = 0; event_ix < event_count; event_ix++)
-    {
-      Marpa_Event marpa_event;
-      Marpa_Event_Type event_type =
-        marpa_g_event (g, &marpa_event, event_ix);
-      switch (event_type)
-        {
-          {
-        case MARPA_EVENT_EXHAUSTED:
-            /* Do nothing about exhaustion on success */
-            break;
-        case MARPA_EVENT_SYMBOL_COMPLETED:
-            {
-              Marpa_Symbol_ID completed_symbol =
-                marpa_g_event_value (&marpa_event);
-              call_by_tag (outer_slr->L, LUA_TAG,
-                  "recce, completed_symbol = ...\n"
-                  "local q = recce.event_queue\n"
-                  "q[#q+1] = { 'symbol completed', completed_symbol}\n",
-                  "Ri>",
-                  outer_slr->lua_ref,
-                  (lua_Integer)completed_symbol
-              );
-            }
-            break;
-        case MARPA_EVENT_SYMBOL_NULLED:
-            {
-              Marpa_Symbol_ID nulled_symbol =
-                marpa_g_event_value (&marpa_event);
-              call_by_tag (outer_slr->L, LUA_TAG,
-                  "recce, nulled_symbol = ...\n"
-                  "local q = recce.event_queue\n"
-                  "q[#q+1] = { 'symbol nulled', nulled_symbol}\n",
-                  "Ri>",
-                  outer_slr->lua_ref,
-                  (lua_Integer)nulled_symbol
-              );
-            }
-            break;
-        case MARPA_EVENT_SYMBOL_PREDICTED:
-            {
-              Marpa_Symbol_ID predicted_symbol =
-                marpa_g_event_value (&marpa_event);
-              call_by_tag (outer_slr->L, LUA_TAG,
-                  "recce, predicted_symbol = ...\n"
-                  "local q = recce.event_queue\n"
-                  "q[#q+1] = { 'symbol predicted', predicted_symbol}\n",
-                  "Ri>",
-                  outer_slr->lua_ref,
-                  (lua_Integer)predicted_symbol
-              );
-            }
-            break;
-        case MARPA_EVENT_EARLEY_ITEM_THRESHOLD:
-            /* All events are ignored on failure
-             * On success, all except MARPA_EVENT_EARLEY_ITEM_THRESHOLD
-             * are ignored.
-             *
-             * The warning raised for MARPA_EVENT_EARLEY_ITEM_THRESHOLD
-             * can be turned off by raising
-             * the Earley item warning threshold.
-             */
-            call_by_tag (outer_slr->L, LUA_TAG,
-                "recce, perl_pos, yim_count = ...\n"
-                "local q = recce.event_queue\n"
-                "q[#q+1] = { 'g1 earley item threshold exceeded', perl_pos, yim_count}\n",
-                "Rii>",
-                outer_slr->lua_ref,
-                (lua_Integer)slr->perl_pos,
-                (lua_Integer)marpa_g_event_value (&marpa_event)
-            );
-            break;
-        default:
-            {
-              const char *result_string = event_type_to_string (event_type);
-              call_by_tag (outer_slr->L, LUA_TAG,
-                  "recce, result_string, event_ix, event_type = ...\n"
-                  "if result_string == '' then\n"
-                  "    result_string = string.format(\n"
-                  "        'event(%d): unknown event code, %d',\n"
-                  "        event_ix, event_type\n"
-                  "        )\n"
-                  "end\n"
-                  "local q = recce.event_queue\n"
-                  "q[#q+1] = { 'unknown_event', result_string}\n",
-                  "Rsii>",
-                  outer_slr->lua_ref,
-                  (result_string ? result_string : ""),
-                  (lua_Integer)event_ix,
-                  (lua_Integer)event_type
-              );
-            }
-            break;
-          }
-        }
-    }
-}
-
 /*
  * Return values:
  * NULL OK.
@@ -2514,7 +2405,7 @@ static const char *
 slr_alternatives ( Outer_R *outer_slr, int discard_mode)
 {
     dTHX;
-    Scanless_R *slr = slr_inner_get(outer_slr);
+    Scanless_R *slr = slr_inner_get (outer_slr);
     lua_Integer earley_set;
     const Scanless_G *slg = slr->slg;
 
@@ -2529,15 +2420,14 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
     { none, discard, no_lexeme, accept };
     enum pass1_result_type pass1_result = none;
 
-  call_by_tag (outer_slr->L,
-    LUA_TAG,
-    "recce=...\n"
-    "local l0r = recce.lmw_l0r\n"
-    "if not l0r then\n"
-    "    error('Internal error: No l0r in slr_alternatives(): %s',\n"
-    "        recce.slg.lmw_l0g:error_description())\n"
-    "end\n",
-    "R>", outer_slr->lua_ref);
+    call_by_tag (outer_slr->L,
+        LUA_TAG,
+        "recce=...\n"
+        "local l0r = recce.lmw_l0r\n"
+        "if not l0r then\n"
+        "    error('Internal error: No l0r in slr_alternatives(): %s',\n"
+        "        recce.slg.lmw_l0g:error_description())\n"
+        "end\n", "R>", outer_slr->lua_ref);
 
     marpa_slr_lexeme_clear (slr);
 
@@ -2545,13 +2435,12 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
     call_by_tag (outer_slr->L, LUA_TAG,
         "recce = ...\n"
         "return recce.lmw_l0r:latest_earley_set()\n",
-        "R>i",
-        outer_slr->lua_ref, &earley_set);
+        "R>i", outer_slr->lua_ref, &earley_set);
 
     /* Zero length lexemes are not of interest, so we do NOT
      * search the 0'th Earley set.
      */
-    for ( ; earley_set > 0; earley_set--) {
+    for (; earley_set > 0; earley_set--) {
         lua_Integer return_value;
         int end_of_earley_items = 0;
         working_pos = slr->start_of_lexeme + earley_set;
@@ -2563,9 +2452,9 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
             "    error(string.format('Problem in recce:progress_report_start(...,%d): %s'),\n"
             "        earley_set, recce.lmw_l0r:error_description())\n"
             "end\n"
-            "return return_value\n" ,
+            "return return_value\n",
             "Ri>i",
-            outer_slr->lua_ref, (lua_Integer)earley_set, &return_value);
+            outer_slr->lua_ref, (lua_Integer) earley_set, &return_value);
 
         while (!end_of_earley_items) {
             struct l0_rule_g_properties *l0_rule_g_properties;
@@ -2602,10 +2491,9 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
                 "local recce, rule_id = ...\n"
                 "local g1_lexeme = recce.slg.l0_rules[rule_id].g1_lexeme\n"
                 "g1_lexeme = g1_lexeme or -1\n"
-                "return g1_lexeme\n"
-                ,
-                "Ri>i", outer_slr->lua_ref, (lua_Integer)rule_id,
-                  &g1_lexeme);
+                "return g1_lexeme\n",
+                "Ri>i", outer_slr->lua_ref, (lua_Integer) rule_id,
+                &g1_lexeme);
 
             if (g1_lexeme == -1)
                 goto NEXT_PASS1_REPORT_ITEM;
@@ -2636,7 +2524,9 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
                 "        start_of_lexeme, end_of_lexeme, g1_lexeme))\n"
                 "end\n",
                 "Riii>",
-                outer_slr->lua_ref, (lua_Integer)g1_lexeme, (lua_Integer)slr->start_of_lexeme, (lua_Integer)slr->end_of_lexeme);
+                outer_slr->lua_ref, (lua_Integer) g1_lexeme,
+                (lua_Integer) slr->start_of_lexeme,
+                (lua_Integer) slr->end_of_lexeme);
 
             /* If we are here, the lexeme will be accepted  by the grammar,
              * but we do not yet know about priority
@@ -2704,48 +2594,53 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
                     high_lexeme_priority) {
                     MARPA_SLREV_TYPE (lexeme_stack_event) =
                         MARPA_SLRTR_LEXEME_OUTPRIORITIZED;
-                    lexeme_stack_event->t_lexeme_acceptable.t_required_priority =
-                        high_lexeme_priority;
-                        call_by_tag (outer_slr->L, LUA_TAG,
-                            "recce, lexeme_start, lexeme_end,\n"
-                            "    g1_lexeme, priority, required_priority = ...\n"
-                            "if recce.trace_terminals > 0 then\n"
-                            "    local q = recce.event_queue\n"
-                            "    q[#q+1] = { '!trace', 'outprioritized lexeme',\n"
-                            "   lexeme_start, lexeme_end, g1_lexeme, priority, required_priority}\n"
-                            "end\n"
-                            ,
-                            "Riiiii>",
-                            outer_slr->lua_ref,
-                            (lua_Integer)lexeme_stack_event->t_trace_lexeme_acceptable.  t_start_of_lexeme,
-                            (lua_Integer)lexeme_stack_event->t_trace_lexeme_acceptable.t_end_of_lexeme,
-                            (lua_Integer)lexeme_stack_event->t_trace_lexeme_acceptable.t_lexeme,
-                            (lua_Integer)lexeme_stack_event->t_trace_lexeme_acceptable.t_priority,
-                            (lua_Integer)lexeme_stack_event->t_trace_lexeme_acceptable.t_required_priority
-                          );
+                    lexeme_stack_event->t_lexeme_acceptable.
+                        t_required_priority = high_lexeme_priority;
+                    call_by_tag (outer_slr->L, LUA_TAG,
+                        "recce, lexeme_start, lexeme_end,\n"
+                        "    g1_lexeme, priority, required_priority = ...\n"
+                        "if recce.trace_terminals > 0 then\n"
+                        "    local q = recce.event_queue\n"
+                        "    q[#q+1] = { '!trace', 'outprioritized lexeme',\n"
+                        "   lexeme_start, lexeme_end, g1_lexeme, priority, required_priority}\n"
+                        "end\n", "Riiiii>", outer_slr->lua_ref,
+                        (lua_Integer) lexeme_stack_event->
+                        t_trace_lexeme_acceptable.t_start_of_lexeme,
+                        (lua_Integer) lexeme_stack_event->
+                        t_trace_lexeme_acceptable.t_end_of_lexeme,
+                        (lua_Integer) lexeme_stack_event->
+                        t_trace_lexeme_acceptable.t_lexeme,
+                        (lua_Integer) lexeme_stack_event->
+                        t_trace_lexeme_acceptable.t_priority,
+                        (lua_Integer) lexeme_stack_event->
+                        t_trace_lexeme_acceptable.t_required_priority);
                 }
                 goto NEXT_LEXEME_EVENT;
             case MARPA_SLRTR_LEXEME_DISCARDED:
-                    /* We do not have the lexeme, but we have the
-                     * lexer rule.
-                     * The upper level will have to figure things out.
-                     */
-                    call_by_tag (outer_slr->L, LUA_TAG,
-                        "recce, rule_id, lexeme_start, lexeme_end = ...\n"
-                        "if recce.trace_terminals > 0 then\n"
-                        "local q = recce.event_queue\n"
-                        "q[#q+1] = { '!trace', 'discarded lexeme',\n"
-                        "    rule_id, lexeme_start, lexeme_end}\n"
-                        "end\n",
-                        "Riii>",
-                        outer_slr->lua_ref,
-                        (lua_Integer)lexeme_stack_event->t_trace_lexeme_discarded.t_rule_id,
-                        (lua_Integer)lexeme_stack_event->t_trace_lexeme_discarded.t_start_of_lexeme,
-                        (lua_Integer)lexeme_stack_event->t_trace_lexeme_discarded.t_end_of_lexeme);
+                /* We do not have the lexeme, but we have the
+                 * lexer rule.
+                 * The upper level will have to figure things out.
+                 */
+                call_by_tag (outer_slr->L, LUA_TAG,
+                    "recce, rule_id, lexeme_start, lexeme_end = ...\n"
+                    "if recce.trace_terminals > 0 then\n"
+                    "local q = recce.event_queue\n"
+                    "q[#q+1] = { '!trace', 'discarded lexeme',\n"
+                    "    rule_id, lexeme_start, lexeme_end}\n"
+                    "end\n",
+                    "Riii>",
+                    outer_slr->lua_ref,
+                    (lua_Integer) lexeme_stack_event->
+                    t_trace_lexeme_discarded.t_rule_id,
+                    (lua_Integer) lexeme_stack_event->
+                    t_trace_lexeme_discarded.t_start_of_lexeme,
+                    (lua_Integer) lexeme_stack_event->
+                    t_trace_lexeme_discarded.t_end_of_lexeme);
 
                 if (pass1_result == discard) {
                     const Marpa_Rule_ID l0_rule_id =
-                        lexeme_stack_event->t_trace_lexeme_discarded.t_rule_id;
+                        lexeme_stack_event->t_trace_lexeme_discarded.
+                        t_rule_id;
                     struct l0_rule_r_properties *l0_rule_r_properties =
                         slr->l0_rule_r_properties + l0_rule_id;
                     if (!l0_rule_r_properties->t_event_on_discard_active) {
@@ -2760,10 +2655,11 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
                         "    rule_id, lexeme_start, lexeme_end, last_g1_location}\n",
                         "Riii>",
                         outer_slr->lua_ref,
-                        (lua_Integer)l0_rule_id,
-                        (lua_Integer)lexeme_stack_event->t_trace_lexeme_discarded.t_start_of_lexeme,
-                        (lua_Integer)lexeme_stack_event->t_trace_lexeme_discarded.t_end_of_lexeme
-                        );
+                        (lua_Integer) l0_rule_id,
+                        (lua_Integer) lexeme_stack_event->
+                        t_trace_lexeme_discarded.t_start_of_lexeme,
+                        (lua_Integer) lexeme_stack_event->
+                        t_trace_lexeme_discarded.t_end_of_lexeme);
                 }
                 goto NEXT_LEXEME_EVENT;
             }
@@ -2808,21 +2704,21 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
                 if (symbol_r_properties->t_pause_before_active) {
                     g1_lexeme = lexeme_id;
                     slr->start_of_pause_lexeme =
-                        lexeme_entry->t_lexeme_acceptable.t_start_of_lexeme;
+                        lexeme_entry->t_lexeme_acceptable.
+                        t_start_of_lexeme;
                     slr->end_of_pause_lexeme =
                         lexeme_entry->t_lexeme_acceptable.t_end_of_lexeme;
-                        call_by_tag (outer_slr->L, LUA_TAG,
-                            "recce, lexeme_start, lexeme_end, g1_lexeme = ...\n"
-                            "local q = recce.event_queue\n"
-                            "if recce.trace_terminals > 2 then\n"
-                            "    q[#q+1] = { '!trace', 'g1 before lexeme event', g1_lexeme}\n"
-                            "end\n"
-                            "q[#q+1] = { 'before lexeme', g1_lexeme}\n"
-                            ,
-                            "Riii>",
-                            outer_slr->lua_ref,
-                            (lua_Integer)slr->start_of_pause_lexeme,
-                            (lua_Integer)slr->end_of_pause_lexeme, (lua_Integer)g1_lexeme);
+                    call_by_tag (outer_slr->L, LUA_TAG,
+                        "recce, lexeme_start, lexeme_end, g1_lexeme = ...\n"
+                        "local q = recce.event_queue\n"
+                        "if recce.trace_terminals > 2 then\n"
+                        "    q[#q+1] = { '!trace', 'g1 before lexeme event', g1_lexeme}\n"
+                        "end\n"
+                        "q[#q+1] = { 'before lexeme', g1_lexeme}\n",
+                        "Riii>", outer_slr->lua_ref,
+                        (lua_Integer) slr->start_of_pause_lexeme,
+                        (lua_Integer) slr->end_of_pause_lexeme,
+                        (lua_Integer) g1_lexeme);
                 }
             }
         }
@@ -2845,26 +2741,23 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
                 const struct symbol_r_properties *symbol_r_properties =
                     slr->symbol_r_properties + g1_lexeme;
 
-                            call_by_tag (outer_slr->L, LUA_TAG,
-                                "recce, lexeme_start, lexeme_end, g1_lexeme = ...\n"
-                                "if recce.trace_terminals > 2 then\n"
-                                "    local q = recce.event_queue\n"
-                                "    q[#q+1] = { '!trace', 'g1 attempting lexeme', lexeme_start, lexeme_end, g1_lexeme}\n"
-                                "end\n"
-                                "local g1r = recce.lmw_g1r\n"
-                                "local kollos = getmetatable(g1r).kollos\n"
-                                "local value_is_literal = kollos.defines.TOKEN_VALUE_IS_LITERAL\n"
-                                "local return_value = g1r:alternative(g1_lexeme, value_is_literal, 1)\n"
-                                "-- print('return value = ', inspect(return_value))\n"
-                                "return return_value\n"
-                                ,
-                                "Riii>i",
-                                outer_slr->lua_ref,
-                                (lua_Integer)slr->start_of_lexeme,
-                                (lua_Integer)slr->end_of_lexeme,
-                                (lua_Integer)g1_lexeme,
-                                &return_value
-                            );
+                call_by_tag (outer_slr->L, LUA_TAG,
+                    "recce, lexeme_start, lexeme_end, g1_lexeme = ...\n"
+                    "if recce.trace_terminals > 2 then\n"
+                    "    local q = recce.event_queue\n"
+                    "    q[#q+1] = { '!trace', 'g1 attempting lexeme', lexeme_start, lexeme_end, g1_lexeme}\n"
+                    "end\n"
+                    "local g1r = recce.lmw_g1r\n"
+                    "local kollos = getmetatable(g1r).kollos\n"
+                    "local value_is_literal = kollos.defines.TOKEN_VALUE_IS_LITERAL\n"
+                    "local return_value = g1r:alternative(g1_lexeme, value_is_literal, 1)\n"
+                    "-- print('return value = ', inspect(return_value))\n"
+                    "return return_value\n",
+                    "Riii>i",
+                    outer_slr->lua_ref,
+                    (lua_Integer) slr->start_of_lexeme,
+                    (lua_Integer) slr->end_of_lexeme,
+                    (lua_Integer) g1_lexeme, &return_value);
 
                 switch (return_value) {
 
@@ -2874,53 +2767,49 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
                     break;
 
                 case MARPA_ERR_DUPLICATE_TOKEN:
-                            call_by_tag (outer_slr->L, LUA_TAG,
-                                "recce, lexeme_start, lexeme_end, lexeme = ...\n"
-                                "if recce.trace_terminals > 0 then\n"
-                                "    local q = recce.event_queue\n"
-                                "    q[#q+1] = { '!trace', 'g1 duplicate lexeme', lexeme_start, lexeme_end, lexeme}\n"
-                                "end\n"
-                                ,
-                                "Riii>",
-                                outer_slr->lua_ref,
-                                (lua_Integer)slr->start_of_lexeme,
-                                (lua_Integer)slr->end_of_lexeme,
-                                (lua_Integer)g1_lexeme
-                            );
+                    call_by_tag (outer_slr->L, LUA_TAG,
+                        "recce, lexeme_start, lexeme_end, lexeme = ...\n"
+                        "if recce.trace_terminals > 0 then\n"
+                        "    local q = recce.event_queue\n"
+                        "    q[#q+1] = { '!trace', 'g1 duplicate lexeme', lexeme_start, lexeme_end, lexeme}\n"
+                        "end\n",
+                        "Riii>",
+                        outer_slr->lua_ref,
+                        (lua_Integer) slr->start_of_lexeme,
+                        (lua_Integer) slr->end_of_lexeme,
+                        (lua_Integer) g1_lexeme);
                     break;
 
                 case MARPA_ERR_NONE:
-                            call_by_tag (outer_slr->L, LUA_TAG,
-                                "recce, lexeme_start, lexeme_end, lexeme = ...\n"
-                                "if recce.trace_terminals > 0 then\n"
-                                "    local q = recce.event_queue\n"
-                                "    q[#q+1] = { '!trace', 'g1 accepted lexeme', lexeme_start, lexeme_end, lexeme}\n"
-                                "end\n",
-                                "Riii>",
-                                outer_slr->lua_ref,
-                                (lua_Integer)slr->start_of_lexeme,
-                                (lua_Integer)slr->end_of_lexeme,
-                                (lua_Integer)g1_lexeme
-                            );
+                    call_by_tag (outer_slr->L, LUA_TAG,
+                        "recce, lexeme_start, lexeme_end, lexeme = ...\n"
+                        "if recce.trace_terminals > 0 then\n"
+                        "    local q = recce.event_queue\n"
+                        "    q[#q+1] = { '!trace', 'g1 accepted lexeme', lexeme_start, lexeme_end, lexeme}\n"
+                        "end\n",
+                        "Riii>",
+                        outer_slr->lua_ref,
+                        (lua_Integer) slr->start_of_lexeme,
+                        (lua_Integer) slr->end_of_lexeme,
+                        (lua_Integer) g1_lexeme);
                     if (symbol_r_properties->t_pause_after_active) {
                         slr->start_of_pause_lexeme =
                             event->t_lexeme_acceptable.t_start_of_lexeme;
                         slr->end_of_pause_lexeme =
                             event->t_lexeme_acceptable.t_end_of_lexeme;
 
-                            call_by_tag (outer_slr->L, LUA_TAG,
-                                "recce, lexeme_start, lexeme_end, lexeme = ...\n"
-                                "local q = recce.event_queue\n"
-                                "if recce.trace_terminals > 2 then\n"
-                                "    q[#q+1] = { '!trace', 'g1 pausing after lexeme', lexeme_start, lexeme_end, lexeme}\n"
-                                "end\n"
-                                "q[#q+1] = { 'after lexeme', lexeme}\n",
-                                "Riii>",
-                                outer_slr->lua_ref,
-                                (lua_Integer)slr->start_of_pause_lexeme,
-                                (lua_Integer)slr->end_of_pause_lexeme,
-                                (lua_Integer)g1_lexeme
-                            );
+                        call_by_tag (outer_slr->L, LUA_TAG,
+                            "recce, lexeme_start, lexeme_end, lexeme = ...\n"
+                            "local q = recce.event_queue\n"
+                            "if recce.trace_terminals > 2 then\n"
+                            "    q[#q+1] = { '!trace', 'g1 pausing after lexeme', lexeme_start, lexeme_end, lexeme}\n"
+                            "end\n"
+                            "q[#q+1] = { 'after lexeme', lexeme}\n",
+                            "Riii>",
+                            outer_slr->lua_ref,
+                            (lua_Integer) slr->start_of_pause_lexeme,
+                            (lua_Integer) slr->end_of_pause_lexeme,
+                            (lua_Integer) g1_lexeme);
                     }
                     break;
 
@@ -2941,8 +2830,7 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
         call_by_tag (outer_slr->L, LUA_TAG,
             "local recce = ...\n"
             "local g1r = recce.lmw_g1r\n"
-            "return g1r:earleme_complete()\n"
-            ,
+            "return g1r:earleme_complete()\n",
             "R>i", outer_slr->lua_ref, &return_value);
 
         if (return_value < 0) {
@@ -2951,18 +2839,20 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
         }
         slr->lexer_start_pos = slr->perl_pos = slr->end_of_lexeme;
         if (return_value > 0) {
-            g1_convert_events (outer_slr);
+            call_by_tag (outer_slr->L, LUA_TAG,
+                "local recce, perl_pos = ...\n"
+                "recce:g1_convert_events(perl_pos)\n",
+                "Ri>", outer_slr->lua_ref, slr->perl_pos);
         }
 
-      call_by_tag (outer_slr->L, LUA_TAG,
-          "local recce, start_pos, lexeme_length = ...\n"
-          "local g1r = recce.lmw_g1r\n"
-          "local latest_earley_set = g1r:latest_earley_set()\n"
-          "recce.es_data[latest_earley_set] = { start_pos, lexeme_length }\n"
-          , "Rii>", outer_slr->lua_ref,
-          (lua_Integer)slr->start_of_lexeme,
-          (lua_Integer)(slr->end_of_lexeme - slr->start_of_lexeme)
-          );
+        call_by_tag (outer_slr->L, LUA_TAG,
+            "local recce, start_pos, lexeme_length = ...\n"
+            "local g1r = recce.lmw_g1r\n"
+            "local latest_earley_set = g1r:latest_earley_set()\n"
+            "recce.es_data[latest_earley_set] = { start_pos, lexeme_length }\n",
+            "Rii>", outer_slr->lua_ref, (lua_Integer) slr->start_of_lexeme,
+            (lua_Integer) (slr->end_of_lexeme - slr->start_of_lexeme)
+            );
 
     }
 
