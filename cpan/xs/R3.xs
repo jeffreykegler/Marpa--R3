@@ -1655,6 +1655,7 @@ static void coerce_to_lua_sequence(
     lud_ix = marpa_lua_gettop(L);
     if (!visitee_on(L, visited_ix, lud_ix)) {
         marpa_lua_pushliteral(L, "[cycle in Perl array]");
+        result_ix = marpa_lua_gettop (L);
         goto RESET_STACK;
     }
 
@@ -1709,6 +1710,7 @@ static void coerce_to_lua_table(
     lud_ix = marpa_lua_gettop (L);
     if (!visitee_on (L, visited_ix, lud_ix)) {
         marpa_lua_pushliteral (L, "[cycle in Perl hash]");
+        result_ix = marpa_lua_gettop (L);
         goto RESET_STACK;
     }
 
