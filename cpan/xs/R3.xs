@@ -2204,6 +2204,15 @@ static Scanless_G* slg_inner_associate (
      */
     SET_G_WRAPPER_FROM_G_SV (slg->l0_wrapper, l0_sv);
 
+    slg->is_associated = 1;
+    return slg;
+}
+
+static void slg_inner_init_properties (
+  Scanless_G* slg)
+{
+    dTHX;
+
     {
         Marpa_Symbol_ID symbol_id;
         int g1_symbol_count = marpa_g_highest_symbol_id (slg->g1) + 1;
@@ -2232,8 +2241,6 @@ static Scanless_G* slg_inner_associate (
         }
     }
 
-    slg->is_associated = 1;
-    return slg;
 }
 
 static void slg_inner_destroy(Scanless_G* slg) {
@@ -3205,6 +3212,16 @@ PPCODE:
     }
     slg_inner_associate (slg, l0_sv, g1_sv);
 
+    XSRETURN_YES;
+}
+
+void
+init_properties( outer_slg)
+    Outer_G *outer_slg;
+PPCODE:
+{
+    Scanless_G *slg = outer_slg->inner;
+    slg_inner_init_properties (slg);
     XSRETURN_YES;
 }
 

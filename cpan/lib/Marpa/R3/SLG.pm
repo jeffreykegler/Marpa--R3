@@ -930,6 +930,7 @@ END_OF_LUA
 
     my $thin_L0  = $lex_tracer->[Marpa::R3::Internal::Trace::G::C];
     $thin_slg->associate( $thin_L0, $g1_tracer->grammar() );
+    $thin_slg->init_properties();
 
   LEXEME: for my $lexeme_name ( keys %g1_id_by_lexeme_name ) {
         Marpa::R3::exception(
