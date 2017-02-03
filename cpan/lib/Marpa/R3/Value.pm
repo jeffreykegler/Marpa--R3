@@ -640,7 +640,6 @@ sub brief_rule_list {
 
 sub registrations_set {
     my ( $slg, $registrations ) = @_;
-    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     my $trace_file_handle =
       $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE];
     my $trace_actions =
@@ -1447,7 +1446,6 @@ END_OF_LUA
 sub Marpa::R3::Scanless::R::value {
     my ( $slr, $per_parse_arg ) = @_;
     my $slg    = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
 
     my $trace_actions =
       $slg->[Marpa::R3::Internal::Scanless::G::TRACE_ACTIONS] // 0;
@@ -1770,7 +1768,6 @@ END_OF_LUA
 sub trace_token_evaluation {
     my ( $slr, $token_id, $token_value ) = @_;
     my $slg    = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     my $trace_file_handle =
       $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
 
@@ -1812,7 +1809,6 @@ END_OF_LUA
 sub trace_stack_1 {
     my ( $slr, $args, $rule_id ) = @_;
     my $slg    = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
 
     my $argc = scalar @{$args};
     my ( $nook_ix, $and_node_id ) =
@@ -1839,7 +1835,6 @@ sub trace_op {
 
     my ($slr)  = @_;
     my $slg    = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
 
     my $trace_output = q{};
     my $trace_values =
@@ -1883,7 +1878,7 @@ END_OF_LUA
         $trace_output .= join q{},
           'Head of Virtual Rule: ',
           $slr->and_node_tag($and_node_id),
-          ', rule: ', $tracer->brief_irl($trace_irl_id),
+          ', rule: ', $slg->brief_irl($trace_irl_id),
           "\n",
           'Incrementing virtual rule by ', $real_symbol_count, ' symbols', "\n"
           or Marpa::R3::exception('Could not print to trace file');
@@ -1897,7 +1892,7 @@ END_OF_LUA
         $trace_output .= join q{},
           'Virtual Rule: ',
           $slr->and_node_tag($and_node_id),
-          ', rule: ', $tracer->brief_irl($trace_irl_id),
+          ', rule: ', $slg->brief_irl($trace_irl_id),
           "\nAdding ",
           $real_symbol_count,
           "\n";
@@ -1911,7 +1906,7 @@ END_OF_LUA
         $trace_output .= join q{},
           'New Virtual Rule: ',
           $slr->and_node_tag($and_node_id),
-          ', rule: ', $tracer->brief_irl($trace_irl_id),
+          ', rule: ', $slg->brief_irl($trace_irl_id),
           "\nReal symbol count is ",
           $real_symbol_count,
           "\n";
