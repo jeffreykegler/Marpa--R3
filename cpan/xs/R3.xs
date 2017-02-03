@@ -3487,20 +3487,34 @@ precompute( outer_slg )
     Outer_G *outer_slg;
 PPCODE:
 {
-  Scanless_G* slg = slg_inner_get(outer_slg);
-  /* Currently this routine does nothing except set a flag to
-   * enforce the * separation of the precomputation phase
-   * from the main processing.
-   */
-  if (!slg->precomputed)
-    {
-      /*
-       * Ensure that I can call this multiple times safely, even
-       * if I do some real processing here.
-       */
-      slg->precomputed = 1;
+    Scanless_G *slg = slg_inner_get (outer_slg);
+    /* Currently this routine does nothing except
+     * enforce the separation of the precomputation phase
+     * from the main processing.
+     */
+    /*
+     * Ensure that I can call this multiple times safely
+     */
+    if (!slg->precomputed) {
+        /* After development and/or once this code is
+         * merge with other Lua, these checks may not be
+         * needed.
+         */
+        call_by_tag (outer_slg->L, LUA_TAG,
+            "slg = ...\n"
+            "local l0g = slg.lmw_l0g\n"
+            "if not l0g then error('No l0g') end\n"
+            "local g1g = slg.lmw_g1g\n"
+            "if not g1g then error('No g1g') end\n"
+            "local l0g_ok = (l0g:is_precomputed() ~= 0)\n"
+            "if not l0g then error('l0g not precomputed') end\n"
+            "local g1g_ok = (g1g:is_precomputed() ~= 0)\n"
+            "if not g1g then error('g1g not precomputed') end\n",
+            "G>", outer_slg->lua_ref);
+
+        slg->precomputed = 1;
     }
-  XSRETURN_IV (1);
+    XSRETURN_IV (1);
 }
 
 MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::SLR
