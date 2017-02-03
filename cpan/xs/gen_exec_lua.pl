@@ -296,7 +296,7 @@ PPCODE:
     int msghandler_ix;
     int type;
 
-    PERL_UNUSED_VAR(error_tag);
+    PERL_UNUSED_VAR(error_tag); /* Silence warning */
 
     marpa_lua_pushcfunction(L, xlua_msghandler);
     msghandler_ix = marpa_lua_gettop(L);
@@ -332,6 +332,8 @@ PPCODE:
     int msghandler_ix;
     int cache_ix;
     int type;
+
+    PERL_UNUSED_VAR(error_tag); /* Silence warning */
 
     marpa_lua_pushcfunction(L, xlua_msghandler);
     msghandler_ix = marpa_lua_gettop(L);

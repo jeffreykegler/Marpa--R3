@@ -2059,7 +2059,7 @@ u_pos_set (Outer_R * outer_slr, const char* name, int start_pos_arg, int length_
       "R>i", outer_slr->lua_ref, &input_length);
 
   if (start_pos_arg < 0) {
-      new_perl_pos = input_length + start_pos_arg;
+      new_perl_pos = (int)input_length + start_pos_arg;
   } else {
       new_perl_pos = start_pos_arg;
   }
@@ -2069,7 +2069,7 @@ u_pos_set (Outer_R * outer_slr, const char* name, int start_pos_arg, int length_
   }
 
   if (length_arg < 0) {
-      new_end_pos = input_length + length_arg + 1;
+      new_end_pos = (int)input_length + length_arg + 1;
   } else {
     new_end_pos = new_perl_pos + length_arg;
   }
@@ -2352,7 +2352,6 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
     dTHX;
     Scanless_R *slr = slr_inner_get (outer_slr);
     lua_Integer earley_set;
-    const Scanless_G *slg = slr->slg;
 
     /* |high_lexeme_priority| is not valid unless |is_priority_set| is set. */
     int is_priority_set = 0;
@@ -2402,7 +2401,6 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
             outer_slr->lua_ref, (lua_Integer) earley_set, &return_value);
 
         while (!end_of_earley_items) {
-            struct l0_rule_g_properties *l0_rule_g_properties;
             struct symbol_r_properties *symbol_r_properties;
             lua_Integer g1_lexeme;
             int this_lexeme_priority;
@@ -2449,7 +2447,7 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
                     marpa_slr_lexeme_push (slr);
                 MARPA_SLREV_TYPE (lexeme_entry) =
                     MARPA_SLRTR_LEXEME_DISCARDED;
-                lexeme_entry->t_trace_lexeme_discarded.t_rule_id = rule_id;
+                lexeme_entry->t_trace_lexeme_discarded.t_rule_id = (int)rule_id;
                 lexeme_entry->t_trace_lexeme_discarded.t_start_of_lexeme =
                     slr->start_of_lexeme;
                 lexeme_entry->t_trace_lexeme_discarded.t_end_of_lexeme =
@@ -2458,7 +2456,6 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
 
                 goto NEXT_PASS1_REPORT_ITEM;
             }
-            l0_rule_g_properties = slg->l0_rule_g_properties + rule_id;
             symbol_r_properties = slr->symbol_r_properties + g1_lexeme;
 
             call_by_tag (outer_slr->L, LUA_TAG,
@@ -2493,7 +2490,7 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
                     slr->start_of_lexeme;
                 lexeme_entry->t_lexeme_acceptable.t_end_of_lexeme =
                     slr->end_of_lexeme;
-                lexeme_entry->t_lexeme_acceptable.t_lexeme = g1_lexeme;
+                lexeme_entry->t_lexeme_acceptable.t_lexeme = (int)g1_lexeme;
                 lexeme_entry->t_lexeme_acceptable.t_priority =
                     this_lexeme_priority;
                 /* Default to this symbol's priority, since we don't
@@ -3034,7 +3031,6 @@ associate( outer_slg, l0_sv, g1_sv )
 PPCODE:
 {
     Scanless_G *slg = outer_slg->inner;
-    lua_State* L = outer_slg->L;
 
     if (!sv_isa (l0_sv, "Marpa::R3::Thin::G"))
     {
@@ -3382,7 +3378,6 @@ PPCODE:
   Outer_G *outer_slg;
   Outer_R *outer_slr;
   Scanless_R *slr;
-  Scanless_G *slg;
   PERL_UNUSED_ARG(class);
 
   if (!sv_isa (slg_sv, "Marpa::R3::Thin::SLG"))
@@ -3398,7 +3393,7 @@ PPCODE:
   }
   L = outer_slg->L;
 
-  slg = slg_inner_get(outer_slg);
+  slg_inner_get(outer_slg);
 
   slr = marpa_inner_slr_new(outer_slg);
   /* Copy and take references to the "parent objects",
@@ -3585,6 +3580,7 @@ PPCODE:
 
         {
           lua_Integer discard_mode;
+          const char *result_string;
 
           call_by_tag (outer_slr->L, LUA_TAG,
               "local recce = ...\n"
@@ -3593,7 +3589,7 @@ PPCODE:
               ,
               "R>i", outer_slr->lua_ref, &discard_mode);
 
-          const char *result_string = slr_alternatives (outer_slr, discard_mode);
+          result_string = slr_alternatives (outer_slr, discard_mode);
           if (result_string)
             {
               XSRETURN_PV (result_string);
@@ -3790,7 +3786,7 @@ PPCODE:
   if (result >= MARPA_ERR_NONE) {
     slr->is_external_scanning = 1;
   }
-  XSRETURN_IV (result);
+  XSRETURN_IV ((IV)result);
 }
 
  # Returns current position on success, 0 on unthrown failure
