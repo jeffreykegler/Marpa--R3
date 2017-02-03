@@ -2421,6 +2421,27 @@ END_OF_LUA
     return $result;
 }
 
+# not to be documented
+sub Marpa::R3::Scanless::G::show_briefer_ahm {
+    my ( $slg, $item_id ) = @_;
+
+    my ($text) = $slg->call_by_tag(
+        ('@' . __FILE__ . ':' .  __LINE__),
+	<<'END_OF_LUA', 'i', $item_id );
+    local grammar, item_id = ...
+    local g1g = grammar.lmw_g1g
+    local irl_id = g1g:_ahm_irl(item_id)
+    local dot_position = g1g:_ahm_position(item_id)
+    if (dot_position < 0 ) then
+        return string.format("R%d$", irl_id)
+    end
+    return string.format("R%d:%d", irl_id, dot_position)
+END_OF_LUA
+
+    return $text;
+
+}
+
 1;
 
 # vim: expandtab shiftwidth=4:

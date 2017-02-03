@@ -58,46 +58,6 @@ sub name {
     return $self->[Marpa::R3::Internal::Trace::G::NAME];
 }
 
-sub show_ahm {
-    my ( $self, $item_id ) = @_;
-    my $thin_slg         = $self->[Marpa::R3::Internal::Trace::G::SLG_C];
-    my $short_lmw_g_name = $self->[Marpa::R3::Internal::Trace::G::NAME];
-    my $lmw_g_name       = 'lmw_' . ( lc $short_lmw_g_name ) . 'g';
-
-    my ($text) = $thin_slg->call_by_tag(
-        ('@' . __FILE__ . ':' .  __LINE__),
-	<<'END_OF_LUA', 'si', $lmw_g_name, $item_id );
-    local g, lmw_g_name, item_id = ...
-    local lmw_g = g[lmw_g_name]
-    return lmw_g:show_ahm(item_id)
-END_OF_LUA
-
-    return $text;
-} ## end sub show_ahm
-
-sub show_briefer_ahm {
-    my ( $self, $item_id ) = @_;
-    my $thin_slg         = $self->[Marpa::R3::Internal::Trace::G::SLG_C];
-    my $short_lmw_g_name = $self->[Marpa::R3::Internal::Trace::G::NAME];
-    my $lmw_g_name       = 'lmw_' . ( lc $short_lmw_g_name ) . 'g';
-
-    my ($text) = $thin_slg->call_by_tag(
-        ('@' . __FILE__ . ':' .  __LINE__),
-	<<'END_OF_LUA', 'si', $lmw_g_name, $item_id );
-    local g, lmw_g_name, item_id = ...
-    local lmw_g = g[lmw_g_name]
-    local irl_id = lmw_g:_ahm_irl(item_id)
-    local dot_position = lmw_g:_ahm_position(item_id)
-    if (dot_position < 0 ) then
-        return string.format("R%d$", irl_id)
-    end
-    return string.format("R%d:%d", irl_id, dot_position)
-END_OF_LUA
-
-    return $text;
-
-}
-
 sub show_ahms {
     my ( $self ) = @_;
     my $thin_slg         = $self->[Marpa::R3::Internal::Trace::G::SLG_C];

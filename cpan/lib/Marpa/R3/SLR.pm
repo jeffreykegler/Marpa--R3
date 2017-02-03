@@ -1876,7 +1876,7 @@ END_OF_LUA
 
                 my @pieces = ();
                 if ( defined $predecessor_ahm ) {
-                    my $ahm_desc = $tracer->show_briefer_ahm($predecessor_ahm);
+                    my $ahm_desc = $slg->show_briefer_ahm($predecessor_ahm);
                     push @pieces,
                         'c='
                       . $ahm_desc . q{@}
@@ -1928,12 +1928,12 @@ END_OF_LUA
                 my $ahm_id         = $completion_link_data{ahm_id};
                 my $origin_earleme = $completion_link_data{origin_earleme};
                 my $middle_earleme = $completion_link_data{middle_earleme};
-                my $ahm_desc       = $tracer->show_briefer_ahm($ahm_id);
+                my $ahm_desc       = $slg->show_briefer_ahm($ahm_id);
 
                 my @pieces = ();
                 if ( defined $predecessor_ahm_id ) {
                     my $predecessor_ahm_desc =
-                      $tracer->show_briefer_ahm($predecessor_ahm_id);
+                      $slg->show_briefer_ahm($predecessor_ahm_id);
                     push @pieces,
                         'p='
                       . $predecessor_ahm_desc . '@'
@@ -1978,7 +1978,7 @@ END_OF_LUA
                 my $leo_transition_symbol =
                   $leo_link_data{leo_transition_symbol};
                 my $ahm_id   = $leo_link_data{ahm_id};
-                my $ahm_desc = $tracer->show_briefer_ahm($ahm_id);
+                my $ahm_desc = $slg->show_briefer_ahm($ahm_id);
 
                 my @pieces = ();
                 push @pieces,
