@@ -1396,7 +1396,7 @@ xlua_array_index_meth (lua_State * L)
     const lua_Integer ix = marpa_luaL_checkinteger (L, 2);
     marpa_luaL_argcheck (L, (ix >= 0 && (size_t)ix < p_array->size), 2,
         "index out of bounds");
-    marpa_lua_pushinteger(L, p_array->array[ix]);
+    marpa_lua_pushinteger(L, (lua_Integer)p_array->array[ix]);
     return 1;
 }
 
@@ -1418,7 +1418,7 @@ xlua_array_len_meth (lua_State * L)
 {
     Xlua_Array * const p_array =
         (Xlua_Array *) marpa_luaL_checkudata (L, 1, MT_NAME_ARRAY);
-    marpa_lua_pushinteger(L, p_array->size);
+    marpa_lua_pushinteger(L, (lua_Integer)(lua_Unsigned)p_array->size);
     return 1;
 }
 
@@ -1640,7 +1640,7 @@ static void coerce_to_lua_sequence(
 {
     dTHX;
     SSize_t last_perl_ix;
-    SSize_t perl_ix;
+    I32 perl_ix;
     int lud_ix;
     int result_ix;
 
@@ -1856,7 +1856,7 @@ u_read (Outer_R * outer_slr)
     ,
     "Ri>i", outer_slr->lua_ref, (lua_Integer)slr->perl_pos, &codepoint);
 
-        if (codepoint < Dim (slr->slg->per_codepoint_array)) {
+        if (codepoint < (lua_Integer)Dim (slr->slg->per_codepoint_array)) {
             ops = slr->slg->per_codepoint_array[codepoint];
             if (!ops) {
                 slr->codepoint = codepoint;
@@ -3498,8 +3498,8 @@ pos_set( outer_slr, start_pos_sv, length_sv )
 PPCODE:
 {
   Scanless_R *slr = slr_inner_get(outer_slr);
-  int start_pos = SvIOK(start_pos_sv) ? SvIV(start_pos_sv) : slr->perl_pos;
-  int length = SvIOK(length_sv) ? SvIV(length_sv) : -1;
+  int start_pos = SvIOK(start_pos_sv) ? (int)SvIV(start_pos_sv) : slr->perl_pos;
+  int length = SvIOK(length_sv) ? (int)SvIV(length_sv) : -1;
   u_pos_set(outer_slr, "slr->pos_set", start_pos, length);
   slr->lexer_start_pos = slr->perl_pos;
   XSRETURN_YES;
@@ -3803,9 +3803,9 @@ PPCODE:
     lua_Integer result;
     lua_Integer input_length;
     int start_pos =
-        SvIOK (start_pos_sv) ? SvIV (start_pos_sv) : slr->perl_pos;
+        SvIOK (start_pos_sv) ? (int)SvIV (start_pos_sv) : slr->perl_pos;
 
-    int lexeme_length = SvIOK (length_sv) ? SvIV (length_sv)
+    int lexeme_length = SvIOK (length_sv) ? (int)SvIV (length_sv)
         : slr->perl_pos ==
         slr->start_of_pause_lexeme ? (slr->end_of_pause_lexeme -
         slr->start_of_pause_lexeme) : -1;
