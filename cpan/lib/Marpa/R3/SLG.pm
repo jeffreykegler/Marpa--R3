@@ -2401,11 +2401,26 @@ sub Marpa::R3::Scanless::G::show_isys {
     return $tracer->show_isys();
 }
 
+# not to be documented
 sub Marpa::R3::Scanless::G::show_ahms {
-    my ( $slg, $verbose ) = @_;
-    my $g1_tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
-    return $g1_tracer->show_ahms($verbose);
-}
+    my ( $slg ) = @_;
+
+    my ($text) = $slg->call_by_tag(
+        ('@' . __FILE__ . ':' .  __LINE__),
+	<<'END_OF_LUA', '' );
+    local grammar = ...
+    local g1g = grammar.lmw_g1g
+    local pieces = {}
+    local count = g1g:_ahm_count()
+    for i = 0, count -1 do
+        pieces[#pieces+1] = g1g:show_ahm(i)
+    end
+    return table.concat(pieces)
+END_OF_LUA
+
+    return $text;
+
+} ## end sub show_ahms
 
 # not to be documented
 sub Marpa::R3::Scanless::G::show_dotted_irl {
