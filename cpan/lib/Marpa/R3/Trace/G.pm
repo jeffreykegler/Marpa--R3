@@ -58,37 +58,7 @@ sub name {
     return $self->[Marpa::R3::Internal::Trace::G::NAME];
 }
 
-sub isy_name {
-    my ( $self, $symbol_id ) = @_;
-    my $thin_slg         = $self->[Marpa::R3::Internal::Trace::G::SLG_C];
-    my $short_lmw_g_name = $self->[Marpa::R3::Internal::Trace::G::NAME];
-    my $lmw_g_name       = 'lmw_' . ( lc $short_lmw_g_name ) . 'g';
-    my ($sym_name) =
-      $thin_slg->call_by_tag(
-        ('@' . __FILE__ . ':' .  __LINE__),
-	<<'END_OF_LUA', 'si', $lmw_g_name, $symbol_id );
-    local g, lmw_g_name, symbol_id = ...
-    local lmw_g = g[lmw_g_name]
-    return lmw_g:isy_name(symbol_id)
-END_OF_LUA
-    return $sym_name;
+1;
 
-} ## end sub isy_name
-
-
-sub Marpa::R3::Trace::G::brief_irl {
-    my ( $self, $irl_id ) = @_;
-    my $thin_slg         = $self->[Marpa::R3::Internal::Trace::G::SLG_C];
-    my $short_lmw_g_name = $self->[Marpa::R3::Internal::Trace::G::NAME];
-    my $lmw_g_name       = 'lmw_' . ( lc $short_lmw_g_name ) . 'g';
-
-    my ($text) = $thin_slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 'si', $lmw_g_name, $irl_id );
-    local g, lmw_g_name, irl_id = ...
-    local lmw_g = g[lmw_g_name]
-    return lmw_g:brief_irl(irl_id)
-END_OF_LUA
-
-    return $text;
-}
+# vim: expandtab shiftwidth=4:
 

@@ -2484,6 +2484,19 @@ END_OF_LUA
 
 }
 
+# not to be documented
+sub Marpa::R3::Scanless::G::brief_irl {
+    my ( $slg, $irl_id ) = @_;
+    my ($text) = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 'i', $irl_id );
+    local grammar, irl_id = ...
+    local g1g = grammar.lmw_g1g
+    return g1g:brief_irl(irl_id)
+END_OF_LUA
+
+    return $text;
+}
+
 1;
 
 # vim: expandtab shiftwidth=4:
