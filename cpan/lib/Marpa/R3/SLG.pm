@@ -221,6 +221,10 @@ END_OF_LUA
       Marpa::R3::Trace::G->new($slg, "G1");
     $g1_tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID] = [];
 
+    my $lex_tracer = $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER] =
+      Marpa::R3::Trace::G->new($slg, "L0");
+    $lex_tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID] = [];
+
     my @xsy_names = keys %{ $hashed_source->{xsy} };
 
     my $xsy_by_id = $slg->[Marpa::R3::Internal::Scanless::G::XSY_BY_ID] = [];
@@ -745,10 +749,6 @@ END_OF_LUA
             rhs => [$_]
         }
     } sort keys %is_lexeme_in_this_lexer;
-
-    my $lex_tracer = $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER] =
-      Marpa::R3::Trace::G->new($slg, "L0");
-    $lex_tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID] = [];
 
     $slg->call_by_tag(
         ('@' .__FILE__ . ':' .  __LINE__),
