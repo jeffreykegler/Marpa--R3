@@ -527,6 +527,36 @@ span is zero or less.
         end
     end
 
+    -- TODO: perl_pos arg is development hack --
+    -- eventually use recce.perl_pos
+    function _M.class_slr.l0_convert_events(recce, perl_pos)
+        local l0g = recce.slg.lmw_l0g
+        local q = recce.event_queue
+        local events = l0g:events()
+        for i = 1, #events, 2 do
+            local event_type = events[i]
+            local event_value = events[i+1]
+            if event_type == kollos.event["EXHAUSTED"] then
+                goto NEXT_EVENT
+            end
+            if event_type == kollos.event["EARLEY_ITEM_THRESHOLD"] then
+                q[#q+1] = { 'l0 earley item threshold exceeded',
+                    perl_pos, event_value}
+                goto NEXT_EVENT
+            end
+            local event_data = _M.event[event_type]
+            if not event_data then
+                result_string = string.format(
+                    'unknown event code, %d', event_type
+                )
+            else
+                result_string = event_data.name
+            end
+            q[#q+1] = { 'unknown_event', result_string}
+            ::NEXT_EVENT::
+        end
+    end
+
 ```
 
 # Progress reporting

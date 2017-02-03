@@ -1802,67 +1802,6 @@ static void recursive_coerce_to_lua(
 
 static Scanless_R* slr_inner_get(Outer_R* outer_slr);
 
-/* Assumes it is called
- after a successful marpa_r_earleme_complete()
- */
-static void
-l0_convert_events (Outer_R * outer_slr)
-{
-  dTHX;
-  Scanless_R *slr = slr_inner_get(outer_slr);
-  int event_ix;
-  Marpa_Grammar g = slr->slg->l0_wrapper->g;
-  const int event_count = marpa_g_event_count (g);
-  for (event_ix = 0; event_ix < event_count; event_ix++)
-    {
-      Marpa_Event marpa_event;
-      Marpa_Event_Type event_type =
-        marpa_g_event (g, &marpa_event, event_ix);
-      switch (event_type)
-        {
-          {
-        case MARPA_EVENT_EXHAUSTED:
-            /* Do nothing about exhaustion on success */
-            break;
-        case MARPA_EVENT_EARLEY_ITEM_THRESHOLD:
-            /* All events are ignored on failure
-             * On success, all except MARPA_EVENT_EARLEY_ITEM_THRESHOLD
-             * are ignored.
-             *
-             * The warning raised for MARPA_EVENT_EARLEY_ITEM_THRESHOLD
-             * can be turned off by raising
-             * the Earley item warning threshold.
-             */
-            {
-              const lua_Integer yim_count = (long) marpa_g_event_value (&marpa_event);
-              call_by_tag (outer_slr->L, LUA_TAG,
-                  "recce, perl_pos, yim_count = ...\n"
-                  "local q = recce.event_queue\n"
-                  "q[#q+1] = { 'l0 earley item threshold exceeded', perl_pos, yim_count }\n",
-                  "Rii>",
-                  outer_slr->lua_ref,
-                  (lua_Integer)slr->perl_pos,
-                  yim_count
-              );
-            }
-            break;
-        default:
-            {
-              const char *result_string = event_type_to_string (event_type);
-              if (result_string)
-                {
-                  croak ("unexpected lexer grammar event: %s",
-                         result_string);
-                }
-              croak ("lexer grammar event with unknown event code, %d",
-                     event_type);
-            }
-            break;
-          }
-        }
-    }
-}
-
 #define U_READ_OK 0
 #define U_READ_REJECTED_CHAR -1
 #define U_READ_UNREGISTERED_CHAR -2
@@ -2046,14 +1985,15 @@ u_read (Outer_R * outer_slr)
 
                     if (result > 0) {
                         lua_Integer is_exhausted;
-                        l0_convert_events (outer_slr);
+
                         /* Advance one character before returning */
 
                       call_by_tag (outer_slr->L, LUA_TAG,
-                          "recce = ...\n"
+                          "recce, perl_pos = ...\n"
+                          "recce:l0_convert_events(perl_pos)\n"
                           "return recce.lmw_l0r:is_exhausted()\n",
-                          "R>i",
-                          outer_slr->lua_ref, &is_exhausted);
+                          "Ri>i",
+                          outer_slr->lua_ref, (lua_Integer)slr->perl_pos, &is_exhausted);
 
                         if (is_exhausted) {
                             return U_READ_EXHAUSTED_ON_SUCCESS;
