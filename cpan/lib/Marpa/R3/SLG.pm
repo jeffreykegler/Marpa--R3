@@ -2389,16 +2389,43 @@ END_OF_LUA
     return @{$symbols};
 }
 
+# not to be documented
 sub Marpa::R3::Scanless::G::show_irls {
     my ($slg) = @_;
-    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
-    return $tracer->show_irls();
+    my ($result) =
+      $slg->call_by_tag(
+        ('@' . __FILE__ . ':' .  __LINE__),
+	<<'END_OF_LUA', '' );
+    local grammar = ...
+    local g1g = grammar.lmw_g1g
+    local irl_count = g1g:_irl_count()
+    local pieces = {}
+    for irl_id = 0, irl_count - 1 do
+        pieces[#pieces+1] = g1g:brief_irl(irl_id)
+    end
+    pieces[#pieces+1] = ''
+    return table.concat(pieces, '\n')
+END_OF_LUA
+    return $result;
 }
 
+# not to be documented
 sub Marpa::R3::Scanless::G::show_isys {
     my ($slg) = @_;
-    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
-    return $tracer->show_isys();
+    my ($result) =
+      $slg->call_by_tag(
+        ('@' . __FILE__ . ':' .  __LINE__),
+	<<'END_OF_LUA', '' );
+    local grammar = ...
+    local g1g = grammar.lmw_g1g
+    local nsy_count = g1g:_nsy_count()
+    local pieces = {}
+    for isy_id = 0, nsy_count - 1 do
+        pieces[#pieces+1] = g1g:show_isy(isy_id)
+    end
+    return table.concat(pieces)
+END_OF_LUA
+    return $result;
 }
 
 # not to be documented
