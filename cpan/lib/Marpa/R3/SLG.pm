@@ -217,6 +217,10 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
         grammar.g1_symbols = {}
 END_OF_LUA
 
+    my $g1_tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER] =
+      Marpa::R3::Trace::G->new($slg, "G1");
+    $g1_tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID] = [];
+
     my @xsy_names = keys %{ $hashed_source->{xsy} };
 
     my $xsy_by_id = $slg->[Marpa::R3::Internal::Scanless::G::XSY_BY_ID] = [];
@@ -482,10 +486,6 @@ END_OF_LUA
         $slg->[Marpa::R3::Internal::Scanless::G::WARNINGS] = $value;
         delete $g1_args->{'warnings'};
     }
-
-    my $g1_tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER] =
-      Marpa::R3::Trace::G->new($slg, "G1");
-    $g1_tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID] = [];
 
     $slg->call_by_tag(
         ('@' .__FILE__ . ':' .  __LINE__),
