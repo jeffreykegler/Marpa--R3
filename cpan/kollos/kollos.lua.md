@@ -380,6 +380,8 @@ This is a registry object.
 
 ```
 
+### Constructor
+
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.l0r_new(recce, perl_pos)
@@ -430,6 +432,9 @@ This is a registry object.
     end
 
 ```
+
+### Locations
+
 Given a G1 span return an L0 span.
 Note that the data for G1 location `n` is kept in
 `es_data[n+1]`, the data for Earley set `n+1`.
@@ -474,6 +479,54 @@ span is zero or less.
     end
 
 ```
+
+# Events
+
+```
+    -- -- miranda: section+ most Lua function definitions
+    -- miranda: section+ do not use until perl_pos
+    function _M.class_slr.g1_convert_events(recce)
+        local g1g = recce.slg.lmw_g1g
+        local q = recce.event_queue
+        local events = g1g:events()
+        for i = 1, #events, 2 do
+            local event_type = events[i]
+            local event_value = events[i+1]
+            if event_type == kollos.event["EXHAUSTED"] then
+                goto NEXT_EVENT
+            end
+            if event_type == kollos.event["SYMBOL_COMPLETED"] then
+                q[#q+1] = { 'symbol completed', event_value}
+                goto NEXT_EVENT
+            end
+            if event_type == kollos.event["SYMBOL_NULLED"] then
+                q[#q+1] = { 'symbol nulled', event_value}
+                goto NEXT_EVENT
+            end
+            if event_type == kollos.event["SYMBOL_PREDICTED"] then
+                q[#q+1] = { 'symbol predicted', event_value}
+                goto NEXT_EVENT
+            end
+                q[#q+1] = { 'g1 earley item threshold exceeded',
+                    recce.perl_pos, event_value}
+                goto NEXT_EVENT
+            end
+            local event_data = _M.event[event_type]
+            if not event_data then
+                result_string = string.format(
+                    'unknown event code, %d', event_type
+                )
+            else
+                result_string = event_data.name
+            end
+            q[#q+1] = { 'unknown_event', result_string}
+            ::NEXT_EVENT::
+        end
+    end
+
+```
+
+# Progress reporting
 
 Given a scanless
 recognizer and a symbol,
@@ -554,6 +607,8 @@ or nil if there was none.
     end
 
 ```
+
+### Diagnostics
 
 This is not currently used.
 It was created for development,

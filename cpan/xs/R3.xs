@@ -1806,7 +1806,7 @@ static Scanless_R* slr_inner_get(Outer_R* outer_slr);
  after a successful marpa_r_earleme_complete()
  */
 static void
-u_convert_events (Outer_R * outer_slr)
+l0_convert_events (Outer_R * outer_slr)
 {
   dTHX;
   Scanless_R *slr = slr_inner_get(outer_slr);
@@ -2046,7 +2046,7 @@ u_read (Outer_R * outer_slr)
 
                     if (result > 0) {
                         lua_Integer is_exhausted;
-                        u_convert_events (outer_slr);
+                        l0_convert_events (outer_slr);
                         /* Advance one character before returning */
 
                       call_by_tag (outer_slr->L, LUA_TAG,
