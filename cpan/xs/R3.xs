@@ -4360,7 +4360,16 @@ PPCODE:
     croak( "Problem in r->start_input(): %s",
       slr_g1_error (outer_slr));
   }
-  g1_convert_events(outer_slr);
+
+    call_by_tag (outer_slr->L, LUA_TAG,
+        "recce, perl_pos = ...\n"
+        "recce:g1_convert_events(perl_pos)\n"
+        ,
+        "Ri>",
+        outer_slr->lua_ref,
+        slr->perl_pos
+    );
+
   XPUSHs (sv_2mortal (newSViv (gp_result)));
 }
 

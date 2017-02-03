@@ -483,9 +483,11 @@ span is zero or less.
 # Events
 
 ```
-    -- -- miranda: section+ most Lua function definitions
-    -- miranda: section+ do not use until perl_pos
-    function _M.class_slr.g1_convert_events(recce)
+    -- miranda: section+ most Lua function definitions
+
+    -- TODO: perl_pos arg is development hack --
+    -- eventually use recce.perl_pos
+    function _M.class_slr.g1_convert_events(recce, perl_pos)
         local g1g = recce.slg.lmw_g1g
         local q = recce.event_queue
         local events = g1g:events()
@@ -507,6 +509,7 @@ span is zero or less.
                 q[#q+1] = { 'symbol predicted', event_value}
                 goto NEXT_EVENT
             end
+            if event_type == kollos.event["EARLEY_ITEM_THRESHOLD"] then
                 q[#q+1] = { 'g1 earley item threshold exceeded',
                     recce.perl_pos, event_value}
                 goto NEXT_EVENT
