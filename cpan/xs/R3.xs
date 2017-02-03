@@ -3796,90 +3796,84 @@ g1_lexeme_complete (outer_slr, start_pos_sv, length_sv)
      SV* length_sv;
 PPCODE:
 {
-  Scanless_R *slr = slr_inner_get(outer_slr);
-  lua_Integer result;
-  lua_Integer input_length;
+    Scanless_R *slr = slr_inner_get (outer_slr);
+    lua_Integer result;
+    lua_Integer input_length;
 
-  call_by_tag (outer_slr->L, LUA_TAG,
-      "recce = ...\n"
-      "return #recce.codepoints\n",
-      "R>i", outer_slr->lua_ref, &input_length);
+    call_by_tag (outer_slr->L, LUA_TAG,
+        "recce = ...\n"
+        "return #recce.codepoints\n",
+        "R>i", outer_slr->lua_ref, &input_length);
 
-  int start_pos = SvIOK (start_pos_sv) ? SvIV (start_pos_sv) : slr->perl_pos;
+    int start_pos =
+        SvIOK (start_pos_sv) ? SvIV (start_pos_sv) : slr->perl_pos;
 
-  int lexeme_length = SvIOK (length_sv) ? SvIV (length_sv)
-    : slr->perl_pos ==
-    slr->start_of_pause_lexeme ? (slr->end_of_pause_lexeme -
-                                  slr->start_of_pause_lexeme) : -1;
+    int lexeme_length = SvIOK (length_sv) ? SvIV (length_sv)
+        : slr->perl_pos ==
+        slr->start_of_pause_lexeme ? (slr->end_of_pause_lexeme -
+        slr->start_of_pause_lexeme) : -1;
 
-  /* User intervention resets last |perl_pos| */
-  slr->last_perl_pos = -1;
+    /* User intervention resets last |perl_pos| */
+    slr->last_perl_pos = -1;
 
-  start_pos = start_pos < 0 ? input_length + start_pos : start_pos;
-  if (start_pos < 0 || start_pos > input_length)
-    {
-      /* Undef start_pos_sv should not cause error */
-      croak ("Bad start position in slr->g1_lexeme_complete(): %ld",
-             (long) (SvIOK (start_pos_sv) ? SvIV (start_pos_sv) : -1));
+    start_pos = start_pos < 0 ? input_length + start_pos : start_pos;
+    if (start_pos < 0 || start_pos > input_length) {
+        /* Undef start_pos_sv should not cause error */
+        croak ("Bad start position in slr->g1_lexeme_complete(): %ld",
+            (long) (SvIOK (start_pos_sv) ? SvIV (start_pos_sv) : -1));
     }
-  slr->perl_pos = start_pos;
+    slr->perl_pos = start_pos;
 
-  {
-    const int end_pos =
-      lexeme_length <
-      0 ? input_length + lexeme_length + 1 : start_pos + lexeme_length;
-    if (end_pos < 0 || end_pos > input_length)
-      {
-        /* Undef length_sv should not cause error */
-        croak ("Bad length in slr->g1_lexeme_complete(): %ld",
-               (long) (SvIOK (length_sv) ? SvIV (length_sv) : -1));
-      }
-    lexeme_length = end_pos - start_pos;
-  }
-
-  call_by_tag (outer_slr->L, LUA_TAG,
-      "local recce = ...\n"
-      "local g1r = recce.lmw_g1r\n"
-      "recce.event_queue = {}\n"
-      "local result = g1r:earleme_complete()\n"
-      "return result\n"
-      ,
-      "R>i", outer_slr->lua_ref, &result);
-
-  slr->is_external_scanning = 0;
-  if (result >= 0)
     {
-      call_by_tag (outer_slr->L, LUA_TAG,
-          "local recce, start_pos, lexeme_length, perl_pos = ...\n"
-          "recce:g1_convert_events(perl_pos)\n"
-          "local g1r = recce.lmw_g1r\n"
-          "local latest_earley_set = g1r:latest_earley_set()\n"
-          "recce.es_data[latest_earley_set] = { start_pos, lexeme_length }\n"
-          , "Riii>", outer_slr->lua_ref, (lua_Integer)start_pos, (lua_Integer)lexeme_length,
-            slr->perl_pos );
-
-      slr->perl_pos = start_pos + lexeme_length;
-      XSRETURN_IV (slr->perl_pos);
+        const int end_pos =
+            lexeme_length <
+            0 ? input_length + lexeme_length + 1 : start_pos +
+            lexeme_length;
+        if (end_pos < 0 || end_pos > input_length) {
+            /* Undef length_sv should not cause error */
+            croak ("Bad length in slr->g1_lexeme_complete(): %ld",
+                (long) (SvIOK (length_sv) ? SvIV (length_sv) : -1));
+        }
+        lexeme_length = end_pos - start_pos;
     }
-  if (result == -2)
-  {
-      const int error = marpa_g_error (slr->g1_wrapper->g, NULL);
-      if (error == MARPA_ERR_PARSE_EXHAUSTED) {
-          call_by_tag (outer_slr->L, LUA_TAG,
-              "recce, = ...\n"
-              "local q = recce.event_queue\n"
-              "q[#q+1] = { 'no acceptable input' }\n",
-              "R>", outer_slr->lua_ref);
 
-      }
-      XSRETURN_IV (0);
-  }
-  if (slr->throw)
-    {
-      croak ("Problem in slr->g1_lexeme_complete(): %s",
+    call_by_tag (outer_slr->L, LUA_TAG,
+        "local recce = ...\n"
+        "local g1r = recce.lmw_g1r\n"
+        "recce.event_queue = {}\n"
+        "local result = g1r:earleme_complete()\n"
+        "return result\n", "R>i", outer_slr->lua_ref, &result);
+
+    slr->is_external_scanning = 0;
+    if (result >= 0) {
+        call_by_tag (outer_slr->L, LUA_TAG,
+            "local recce, start_pos, lexeme_length, perl_pos = ...\n"
+            "recce:g1_convert_events(perl_pos)\n"
+            "local g1r = recce.lmw_g1r\n"
+            "local latest_earley_set = g1r:latest_earley_set()\n"
+            "recce.es_data[latest_earley_set] = { start_pos, lexeme_length }\n",
+            "Riii>", outer_slr->lua_ref, (lua_Integer) start_pos,
+            (lua_Integer) lexeme_length, slr->perl_pos);
+
+        slr->perl_pos = start_pos + lexeme_length;
+        XSRETURN_IV (slr->perl_pos);
+    }
+    if (result == -2) {
+        call_by_tag (outer_slr->L, LUA_TAG,
+            "recce = ...\n"
+            "local error_code = recce.slg.lmw_g1g:error_code()\n"
+            "if error_code == kollos.err.PARSE_EXHAUSTED then\n"
+            "    local q = recce.event_queue\n"
+            "    q[#q+1] = { 'no acceptable input' }\n"
+            "end\n", "R>", outer_slr->lua_ref);
+
+        XSRETURN_IV (0);
+    }
+    if (slr->throw) {
+        croak ("Problem in slr->g1_lexeme_complete(): %s",
             slr_g1_error (outer_slr));
     }
-  XSRETURN_IV (0);
+    XSRETURN_IV (0);
 }
 
 void
