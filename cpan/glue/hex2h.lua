@@ -82,6 +82,6 @@ while true do
 end
 io.write("  ;\n")
 io.write(string.format(
-    "  static int %s_loader_length = %d;\n", string_name, loader_length))
+    "  static size_t %s_loader_length = %d;\n", string_name, loader_length))
 
 -- vim: expandtab shiftwidth=4:

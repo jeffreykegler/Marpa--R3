@@ -309,16 +309,6 @@ static const char scanless_r_class_name[] = "Marpa::R3::Thin::SLR";
 static const char marpa_lua_class_name[] = "Marpa::R3::Lua";
 
 static const char *
-event_type_to_string (Marpa_Event_Type event_code)
-{
-  const char *event_name = NULL;
-  if (event_code >= 0 && event_code < MARPA_ERROR_COUNT) {
-      event_name = marpa_event_description[event_code].name;
-  }
-  return event_name;
-}
-
-static const char *
 step_type_to_string (const lua_Integer step_type)
 {
   const char *step_type_name = NULL;
@@ -335,56 +325,68 @@ call_by_tag (lua_State * L, const char* tag, const char *codestr,
 /* Note: returned string is in a mortal SV --
  * copy it if you want want to save it.
  */
-static const char *slg_l0_error(Outer_G* outer_slg)
+static const char *
+slg_l0_error (Outer_G * outer_slg) PERL_UNUSED_DECL;
+static const char *
+slg_l0_error (Outer_G * outer_slg)
 {
-  dTHX;
+    dTHX;
     SV *error_description;
     call_by_tag (outer_slg->L, LUA_TAG,
         "slg = ...\n"
         "local l0g = slg.lmw_l0g\n"
-        "return l0g:error_description\n", "G>C", outer_slg->lua_ref);
+        "return l0g:error_description\n", "G>C",
+        outer_slg->lua_ref, &error_description);
     return SvPV_nolen (error_description);
 }
 
 /* Note: returned string is in a mortal SV --
  * copy it if you want want to save it.
  */
-static const char *slr_l0_error(Outer_R* outer_slr)
+static const char *
+slr_l0_error (Outer_R * outer_slr)
 {
-  dTHX;
+    dTHX;
     SV *error_description;
     call_by_tag (outer_slr->L, LUA_TAG,
         "recce = ...\n"
         "local l0g = recce.slg.lmw_l0g\n"
-        "return l0g:error_description\n", "R>C", outer_slr->lua_ref);
+        "return l0g:error_description\n", "R>C",
+        outer_slr->lua_ref, &error_description);
     return SvPV_nolen (error_description);
 }
 
 /* Note: returned string is in a mortal SV --
  * copy it if you want want to save it.
  */
-static const char *slg_g1_error(Outer_G* outer_slg)
+static const char *
+slg_g1_error (Outer_G * outer_slg) PERL_UNUSED_DECL;
+static const char *
+slg_g1_error (Outer_G * outer_slg)
 {
-  dTHX;
+    dTHX;
     SV *error_description;
     call_by_tag (outer_slg->L, LUA_TAG,
         "slg = ...\n"
         "local g1g = slg.lmw_g1g\n"
-        "return g1g:error_description\n", "G>C", outer_slg->lua_ref);
+        "return g1g:error_description\n", "G>C",
+        outer_slg->lua_ref, &error_description);
     return SvPV_nolen (error_description);
 }
 
 /* Note: returned string is in a mortal SV --
  * copy it if you want want to save it.
  */
-static const char *slr_g1_error(Outer_R* outer_slr)
+static const char *
+slr_g1_error (Outer_R * outer_slr)
 {
-  dTHX;
+    dTHX;
     SV *error_description;
     call_by_tag (outer_slr->L, LUA_TAG,
         "recce = ...\n"
         "local g1g = recce.slg.lmw_g1g\n"
-        "return g1g:error_description\n", "R>C", outer_slr->lua_ref);
+        "return g1g:error_description\n", "R>C",
+        outer_slr->lua_ref, &error_description);
     return SvPV_nolen (error_description);
 }
 
@@ -911,7 +913,7 @@ push_val (lua_State * L, SV * val)
   return;
 }
 
-/* [0, +1]
+/* [0, +1] */
 /* Creates a userdata containing a Perl SV, and
  * leaves the new userdata on top of the stack.
  * The new Lua userdata takes ownership of one reference count.
@@ -1618,7 +1620,6 @@ static void
 coerce_to_lua (lua_State * L, SV *sv, char sig)
 {
    dTHX;
-   SV *result;
    int visited_ix;
 
    marpa_lua_newtable(L);
@@ -1684,7 +1685,7 @@ static void coerce_to_lua_sequence(
     marpa_lua_settop(L, lud_ix);
 }
 
-/* [0, +1]
+/* [0, +1] */
 /* Caller must ensure that `hv` is in fact
  * an HV.
  * All Perl hash keys are converted to Lua
@@ -1724,7 +1725,7 @@ static void coerce_to_lua_table(
         I32 klen;
         SV *val;
         while ((val = hv_iternextsv (hv, (char **) &key, &klen))) {
-            marpa_lua_pushlstring (L, key, klen);
+            marpa_lua_pushlstring (L, key, (size_t)klen);
             recursive_coerce_to_lua (L, visited_ix, val, sig);
             marpa_lua_settable (L, result_ix);
         }
@@ -2049,14 +2050,13 @@ u_pos_set (Outer_R * outer_slr, const char* name, int start_pos_arg, int length_
   dTHX;
   Scanless_R *slr = slr_inner_get(outer_slr);
   lua_Integer input_length;
+  int new_perl_pos;
+  int new_end_pos;
 
   call_by_tag (outer_slr->L, LUA_TAG,
       "recce = ...\n"
       "return #recce.codepoints\n",
       "R>i", outer_slr->lua_ref, &input_length);
-
-  int new_perl_pos;
-  int new_end_pos;
 
   if (start_pos_arg < 0) {
       new_perl_pos = input_length + start_pos_arg;
@@ -2251,7 +2251,7 @@ marpa_inner_slr_new (Outer_G* outer_slg)
         ,
         "G>i", outer_slg->lua_ref, &value_is_literal);
 
-    av_fill (slr->token_values, value_is_literal);
+    av_fill (slr->token_values, (I32)value_is_literal);
 
     {
         Marpa_Symbol_ID symbol_id;
@@ -2347,7 +2347,7 @@ static void slr_inner_destroy(lua_State* L, Scanless_R* slr)
  * The string must be a constant in static space.
  */
 static const char *
-slr_alternatives ( Outer_R *outer_slr, int discard_mode)
+slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
 {
     dTHX;
     Scanless_R *slr = slr_inner_get (outer_slr);
@@ -2388,7 +2388,7 @@ slr_alternatives ( Outer_R *outer_slr, int discard_mode)
     for (; earley_set > 0; earley_set--) {
         lua_Integer return_value;
         int end_of_earley_items = 0;
-        working_pos = slr->start_of_lexeme + earley_set;
+        working_pos = slr->start_of_lexeme + (int)earley_set;
 
         call_by_tag (outer_slr->L, LUA_TAG,
             "recce, earley_set = ...\n"
@@ -3804,12 +3804,6 @@ PPCODE:
     Scanless_R *slr = slr_inner_get (outer_slr);
     lua_Integer result;
     lua_Integer input_length;
-
-    call_by_tag (outer_slr->L, LUA_TAG,
-        "recce = ...\n"
-        "return #recce.codepoints\n",
-        "R>i", outer_slr->lua_ref, &input_length);
-
     int start_pos =
         SvIOK (start_pos_sv) ? SvIV (start_pos_sv) : slr->perl_pos;
 
@@ -3818,10 +3812,15 @@ PPCODE:
         slr->start_of_pause_lexeme ? (slr->end_of_pause_lexeme -
         slr->start_of_pause_lexeme) : -1;
 
+    call_by_tag (outer_slr->L, LUA_TAG,
+        "recce = ...\n"
+        "return #recce.codepoints\n",
+        "R>i", outer_slr->lua_ref, &input_length);
+
     /* User intervention resets last |perl_pos| */
     slr->last_perl_pos = -1;
 
-    start_pos = start_pos < 0 ? input_length + start_pos : start_pos;
+    start_pos = start_pos < 0 ? (int)input_length + start_pos : start_pos;
     if (start_pos < 0 || start_pos > input_length) {
         /* Undef start_pos_sv should not cause error */
         croak ("Bad start position in slr->g1_lexeme_complete(): %ld",
@@ -3832,7 +3831,7 @@ PPCODE:
     {
         const int end_pos =
             lexeme_length <
-            0 ? input_length + lexeme_length + 1 : start_pos +
+            0 ? (int)input_length + lexeme_length + 1 : start_pos +
             lexeme_length;
         if (end_pos < 0 || end_pos > input_length) {
             /* Undef length_sv should not cause error */
@@ -4030,7 +4029,7 @@ PPCODE:
       SvPOK_on (ops_sv);
       ops = (UV *) SvPV (ops_sv, dummy);
     }
-  ops[0] = codepoint;
+  ops[0] = (UV)codepoint;
   ops[1] = op_count;
   for (op_ix = 2; op_ix < op_count; op_ix++)
     {
@@ -4143,7 +4142,7 @@ PPCODE:
               "return step_type, parm2\n",
               "R>Ci", outer_slr->lua_ref, &step_type, &parm2);
             XPUSHs (step_type); /* already mortal */
-            XPUSHs (sv_2mortal (newSViv (parm2)));
+            XPUSHs (sv_2mortal (newSViv ((IV)parm2)));
             XPUSHs (new_values);      /* already mortal */
             XSRETURN (3);
         }
@@ -4199,7 +4198,7 @@ PPCODE:
         slr->perl_pos
     );
 
-  XPUSHs (sv_2mortal (newSViv (gp_result)));
+  XPUSHs (sv_2mortal (newSViv ((IV)gp_result)));
 }
 
 MODULE = Marpa::R3            PACKAGE = Marpa::R3::Lua
@@ -4219,7 +4218,6 @@ PPCODE:
     int package_ix;
     int loaded_ix;
     int msghandler_ix;
-    lua_CFunction loader;
     int status;
 
     Newx (lua_wrapper, 1, Marpa_Lua);

@@ -93,6 +93,7 @@ WriteMakefile(
     DEFINE  => $define,
     SKIP    => [qw(test test_dynamic dynamic dynamic_lib dlsyms)],
     XS      => { 'R3.xs' => 'R3.c' },
+    CCFLAGS => $my_ccflags,
     # OBJECT  => 'R3.o',
 );
 
