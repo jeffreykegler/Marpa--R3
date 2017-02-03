@@ -1848,7 +1848,7 @@ END_OF_LUA
         push @lines,
             qq{  }
           . $ahm_desc . q{: }
-          . $tracer->show_dotted_irl( $irl_id, $dot_position );
+          . $slg->show_dotted_irl( $irl_id, $dot_position );
 
         push @sorted_data, @lines;
 
@@ -2206,10 +2206,8 @@ END_OF_LUA
     return if not $text;
 
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $tracer =
-        $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     $text .= ( q{ } x 4 )
-        . $tracer->show_dotted_irl( $irl_id, $position ) . "\n";
+        . $slg->show_dotted_irl( $irl_id, $position ) . "\n";
     return $text;
 }
 

@@ -2407,6 +2407,20 @@ sub Marpa::R3::Scanless::G::show_ahms {
     return $g1_tracer->show_ahms($verbose);
 }
 
+# not to be documented
+sub Marpa::R3::Scanless::G::show_dotted_irl {
+    my ( $slg, $irl_id, $dot_position ) = @_;
+    my ($result) =
+      $slg->call_by_tag(
+        ('@' . __FILE__ . ':' .  __LINE__),
+	<<'END_OF_LUA', 'ii', $irl_id, $dot_position );
+    local grammar, irl_id, dot_position = ...
+    local g1g = grammar.lmw_g1g
+    return g1g:show_dotted_irl(irl_id, dot_position)
+END_OF_LUA
+    return $result;
+}
+
 1;
 
 # vim: expandtab shiftwidth=4:

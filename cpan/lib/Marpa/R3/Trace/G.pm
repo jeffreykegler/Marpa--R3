@@ -58,42 +58,6 @@ sub name {
     return $self->[Marpa::R3::Internal::Trace::G::NAME];
 }
 
-# TODO: Convert to SLG method and delete
-sub symbol_name {
-    my ( $self, $symbol_id ) = @_;
-    my $thin_slg = $self->[Marpa::R3::Internal::Trace::G::SLG_C];
-
-    my $short_lmw_g_name = $self->[Marpa::R3::Internal::Trace::G::NAME];
-    my $lmw_g_name = 'lmw_' . (lc $short_lmw_g_name) . 'g';
-    my ($sym_name) = $thin_slg->call_by_tag(
-        ('@' . __FILE__ . ':' .  __LINE__),
-      <<'END_OF_LUA', 'si', $lmw_g_name, $symbol_id);
-    local g, lmw_g_name, symbol_id = ...
-    local lmw_g = g[lmw_g_name]
-    return lmw_g:symbol_name(symbol_id)
-END_OF_LUA
-    return $sym_name;
-
-} ## end sub symbol_name
-
-sub show_dotted_irl {
-    my ( $self, $irl_id, $dot_position ) = @_;
-    my $thin_slg         = $self->[Marpa::R3::Internal::Trace::G::SLG_C];
-    my $short_name = $self->[Marpa::R3::Internal::Trace::G::NAME];
-    my ($result) =
-      $thin_slg->call_by_tag(
-        ('@' . __FILE__ . ':' .  __LINE__),
-	<<'END_OF_LUA', 'sii', (lc $short_name), $irl_id, $dot_position );
-    local g, short_name, irl_id, dot_position = ...
-    local lmw_g_field_name = 'lmw_' .. short_name .. 'g'
-    -- print('lmw_g_field_name', lmw_g_field_name)
-    local lmw_g = g[lmw_g_field_name]
-    return lmw_g:show_dotted_irl(irl_id, dot_position)
-END_OF_LUA
-    return $result;
-}
- ## end sub show_dotted_irl
-
 sub show_ahm {
     my ( $self, $item_id ) = @_;
     my $thin_slg         = $self->[Marpa::R3::Internal::Trace::G::SLG_C];
