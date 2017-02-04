@@ -2148,12 +2148,11 @@ static void slg_inner_init_properties (
         Marpa_Symbol_ID symbol_id;
         lua_Integer g1_symbol_count;
 
-    call_by_tag (outer_slg->L, LUA_TAG,
-        "grammar = ...\n"
-        "local g1g = grammar.lmw_g1g\n"
-        "return g1g:highest_symbol_id()+1\n"
-        ,
-        "G>i", outer_slg->lua_ref, &g1_symbol_count);
+        call_by_tag (outer_slg->L, LUA_TAG,
+            "grammar = ...\n"
+            "local g1g = grammar.lmw_g1g\n"
+            "return g1g:highest_symbol_id()+1\n",
+            "G>i", outer_slg->lua_ref, &g1_symbol_count);
 
         Newx (slg->symbol_g_properties, (unsigned int) g1_symbol_count,
             struct symbol_g_properties);
@@ -2169,11 +2168,16 @@ static void slg_inner_init_properties (
 
     {
         Marpa_Rule_ID rule_id;
-        int g1_rule_count =
-            marpa_g_highest_rule_id (slg->l0_wrapper->g) + 1;
-        Newx (slg->l0_rule_g_properties, ((unsigned int) g1_rule_count),
+        lua_Integer l0_rule_count;
+        call_by_tag (outer_slg->L, LUA_TAG,
+            "grammar = ...\n"
+            "local l0g = grammar.lmw_l0g\n"
+            "return l0g:highest_rule_id()+1\n",
+            "G>i", outer_slg->lua_ref, &l0_rule_count);
+
+        Newx (slg->l0_rule_g_properties, ((unsigned int) l0_rule_count),
             struct l0_rule_g_properties);
-        for (rule_id = 0; rule_id < g1_rule_count; rule_id++) {
+        for (rule_id = 0; rule_id < l0_rule_count; rule_id++) {
             slg->l0_rule_g_properties[rule_id].t_event_on_discard = 0;
             slg->l0_rule_g_properties[rule_id].t_event_on_discard_active =
                 0;
