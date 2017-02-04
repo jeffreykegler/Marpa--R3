@@ -2062,8 +2062,6 @@ u_pos_set (Outer_R * outer_slr, const char* name, int start_pos_arg, int length_
 /* Static SLG methods */
 
 static Scanless_G* slg_inner_get(Outer_G* outer_slg) {
-    dTHX;
-    Scanless_G *slg = outer_slg->inner;
     return outer_slg->inner;
 }
 
@@ -2087,18 +2085,6 @@ static Scanless_G* slg_inner_new (void)
     slg->symbol_g_properties = NULL;
     slg->l0_rule_g_properties = NULL;
 
-    return slg;
-}
-
-static Scanless_G* slg_inner_associate (
-  Scanless_G* slg)
-{
-    dTHX;
-
-    /* These do not need references, because parent objects
-     * hold references to them.
-     */
-    slg->precomputed = 0;
     return slg;
 }
 
@@ -2900,20 +2886,6 @@ PPCODE:
   kollos_robrefdec(outer_slg->L, outer_slg->lua_ref);
   lua_refdec(outer_slg->L);
   Safefree (outer_slg);
-}
-
-void
-associate( outer_slg, l0_sv, g1_sv )
-    Outer_G *outer_slg;
-    SV *l0_sv;
-    SV *g1_sv;
-PPCODE:
-{
-    Scanless_G *slg = outer_slg->inner;
-
-    slg_inner_associate (slg);
-
-    XSRETURN_YES;
 }
 
 void
