@@ -197,7 +197,6 @@ typedef struct
   /* Lua "reference" to this object */
   lua_Integer lua_ref;
   lua_State* L;
-  Outer_G* outer_slg;
   SV *slg_sv;
 } Outer_R;
 
@@ -3437,7 +3436,6 @@ PPCODE:
 
   outer_slr->slg_sv = slg_sv;
   SvREFCNT_inc (slg_sv);
-  outer_slr->outer_slg = outer_slg;
 
   {
     const int base_of_stack = marpa_lua_gettop(L);
