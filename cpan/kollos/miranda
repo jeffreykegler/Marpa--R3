@@ -37,7 +37,7 @@
 -- and only one input argument.
 
 require 'strict'
-require 'inspect' -- delete after development
+require 'inspect'
 
 local file_ids = {}
 

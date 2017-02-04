@@ -641,6 +641,19 @@ or nil if there was none.
 
 ```
 
+### Exceptions
+
+```
+    -- miranda: section+ C extern variables
+    extern char kollos_X_proto_asis_mt_key;
+    extern char kollos_X_proto_mt_key;
+    extern char kollos_X_mt_key;
+    -- miranda: section+ metatable keys
+    char kollos_X_proto_asis_mt_key;
+    char kollos_X_proto_mt_key;
+    char kollos_X_mt_key;
+```
+
 ### Diagnostics
 
 This is not currently used.
@@ -3087,7 +3100,7 @@ Luacheck declarations
        return (const char *)0;
     }
 
-    static inline int l_event_description_by_code(lua_State* L)
+    static inline int lca_event_description_by_code(lua_State* L)
     {
        const lua_Integer event_code = marpa_luaL_checkinteger(L, 1);
        const char* description = event_description_by_code(event_code);
@@ -3108,7 +3121,7 @@ Luacheck declarations
        return (const char *)0;
     }
 
-    static inline int l_event_name_by_code(lua_State* L)
+    static inline int lca_event_name_by_code(lua_State* L)
     {
        const lua_Integer event_code = marpa_luaL_checkinteger(L, 1);
        const char* mnemonic = event_name_by_code(event_code);
@@ -3180,6 +3193,15 @@ tree op.
     extern char kollos_tree_op_mt_key;
     -- miranda: section+ metatable keys
     char kollos_tree_op_mt_key;
+    -- miranda: section+ set up empty metatables
+    /* Set up tree op metatable, initially empty */
+    /* tree_op_metatable = {} */
+    marpa_lua_newtable (L);
+    marpa_lua_pushvalue (L, -1);
+    marpa_lua_rawsetp (L, LUA_REGISTRYINDEX, &kollos_tree_op_mt_key);
+    /* kollos.mt_tree_op = tree_op_metatable */
+    marpa_lua_setfield (L, kollos_table_stack_ix, "mt_tree_op");
+
 ```
 
 ```
@@ -3209,41 +3231,6 @@ tree op.
     }
 
     -- miranda: section+ error handlers
-
-    static int lca_error_new(lua_State* L)
-    {
-        if (marpa_lua_istable (L, 1)) {
-            const int table_ix = 1;
-            marpa_lua_getfield (L, table_ix, "code");
-            /* [ error_table,  code ] */
-            if (!marpa_lua_isnumber (L, -1)) {
-                /* Want a special code for this, eventually */
-                const Marpa_Error_Code code = MARPA_ERR_DEVELOPMENT;
-                marpa_lua_pushinteger (L, (lua_Integer) code);
-                marpa_lua_setfield (L, table_ix, "code");
-            }
-            marpa_lua_pop (L, 1);
-            marpa_lua_rawgetp (L, LUA_REGISTRYINDEX, &kollos_error_mt_key);
-            /* [ error_table, error_metatable ] */
-            marpa_lua_setmetatable (L, table_ix);
-            /* [ error_table ] */
-            return 1;
-        }
-        if (marpa_lua_isnumber (L, 1)) {
-            const lua_Integer code = marpa_lua_tointeger (L, 1);
-            const char *details = marpa_lua_tostring (L, 2);
-            marpa_lua_pop (L, 2);
-            push_error_object (L, code, details);
-            return 1;
-        }
-        {
-            /* Want a special code for this, eventually */
-            const lua_Integer code = MARPA_ERR_DEVELOPMENT;
-            const char *details = "Error code is not a number";
-            push_error_object (L, code, details);
-            return 1;
-        }
-    }
 
     /* Return string equivalent of error argument
      */
@@ -4432,42 +4419,26 @@ Marpa::R3.
         marpa_lua_rawsetp (L, LUA_REGISTRYINDEX, &kollos_v_ud_mt_key);
         /* [ kollos ] */
 
-        /* Set up tree op metatable */
-        /* tree_op_metatable = {} */
-        marpa_lua_newtable (L);
-        marpa_lua_pushvalue (L, -1);
-        marpa_lua_rawsetp (L, LUA_REGISTRYINDEX, &kollos_tree_op_mt_key);
-        /* kollos.mt_tree_op = tree_op_metatable */
-        marpa_lua_setfield (L, kollos_table_stack_ix, "mt_tree_op");
-        /* [ kollos ] */
+        -- miranda: insert set up empty metatables
 
         /* In alphabetical order by field name */
 
-        /* TODO: Check this.  Needed?  In the right table? */
         marpa_lua_pushvalue (L, upvalue_stack_ix);
         marpa_lua_pushcclosure (L, lca_error_description_by_code, 1);
         /* [ kollos, function ] */
         marpa_lua_setfield (L, kollos_table_stack_ix, "error_description");
         /* [ kollos ] */
 
-        /* TODO: Check this.  Needed?  In the right table? */
         marpa_lua_pushvalue (L, upvalue_stack_ix);
         marpa_lua_pushcclosure (L, lca_error_name_by_code, 1);
         marpa_lua_setfield (L, kollos_table_stack_ix, "error_name");
 
-        /* TODO: Check this.  Needed?  In the right table? */
         marpa_lua_pushvalue (L, upvalue_stack_ix);
-        marpa_lua_pushcclosure (L, lca_error_new, 1);
-        marpa_lua_setfield (L, kollos_table_stack_ix, "error_new");
-
-        /* TODO: Check this.  Needed?  In the right table? */
-        marpa_lua_pushvalue (L, upvalue_stack_ix);
-        marpa_lua_pushcclosure (L, l_event_name_by_code, 1);
+        marpa_lua_pushcclosure (L, lca_event_name_by_code, 1);
         marpa_lua_setfield (L, kollos_table_stack_ix, "event_name");
 
-        /* TODO: Check this.  Needed?  In the right table? */
         marpa_lua_pushvalue (L, upvalue_stack_ix);
-        marpa_lua_pushcclosure (L, l_event_description_by_code, 1);
+        marpa_lua_pushcclosure (L, lca_event_description_by_code, 1);
         marpa_lua_setfield (L, kollos_table_stack_ix, "event_description");
 
         /* In Libmarpa object sequence order */
