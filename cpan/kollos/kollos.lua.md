@@ -1520,23 +1520,7 @@ is zero.
 
 ## The grammar Libmarpa wrapper
 
-The "post-metal" function handles things that need
-to be done after a "metal" Libmarpa grammar is created,
-but which are part of the Libmarpa wrapper.
-It's a separate function so that the "dummy up" logic
-can also use it.
-Hopefully, this will make it easier to phase out the
-"dummy up" logic.
-
-```
-    -- miranda: section+ most Lua function definitions
-    function _M.class_grammar.post_metal(lmw_g)
-        lmw_g.isyid_by_name = {}
-        lmw_g.name_by_isyid = {}
-        return lmw_g
-    end
-
-```
+Constructor
 
 ```
     -- miranda: section+ copy metal tables
@@ -1544,7 +1528,8 @@ Hopefully, this will make it easier to phase out the
     -- miranda: section+ most Lua function definitions
     function _M.grammar_new()
         local lmw_g = _M.metal.grammar_new()
-        lmw_g:post_metal()
+        lmw_g.isyid_by_name = {}
+        lmw_g.name_by_isyid = {}
         return lmw_g
     end
 

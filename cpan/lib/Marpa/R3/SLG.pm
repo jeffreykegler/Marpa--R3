@@ -197,6 +197,29 @@ qq{'source' name argument to Marpa::R3::Scanless::G->new() is a ref to a an unde
 
 } ## end sub Marpa::R3::Internal::Scanless::G::set
 
+# not to be documented
+sub per_lmg_init {
+    my ( $slg, $name ) = @_;
+    my $per_lmg = [];
+    $per_lmg->[Marpa::R3::Internal::Trace::G::NAME] = $name;
+    my $lmw_name = 'lmw_' . ( lc $name ) . 'g';
+    $per_lmg->[Marpa::R3::Internal::Trace::G::LMW_NAME]            = $lmw_name;
+    $per_lmg->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID]        = [];
+    $slg->[Marpa::R3::Internal::Scanless::G::PER_LMG]->{$lmw_name} = $per_lmg;
+
+    $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 's', ( lc $name ) );
+    local g, short_name = ...
+    lmw_g_name = 'lmw_' .. short_name .. 'g'
+    g[lmw_g_name] = kollos.grammar_new()
+    local lmw_g = g[lmw_g_name]
+    lmw_g:force_valued()
+    lmw_g.short_name = short_name
+END_OF_LUA
+
+    return $per_lmg;
+} ## end sub new
+
 sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     my ( $slg, $hashed_source, $g1_args ) = @_;
 
@@ -218,9 +241,9 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
 END_OF_LUA
 
     my $g1_tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER] =
-      $slg->per_lmg_init("G1");
+      per_lmg_init($slg, "G1");
     my $lex_tracer = $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER] =
-      $slg->per_lmg_init("L0");
+      per_lmg_init($slg, "L0");
 
     my @xsy_names = keys %{ $hashed_source->{xsy} };
 
@@ -2492,30 +2515,6 @@ END_OF_LUA
 
     return $text;
 }
-
-# not to be documented
-sub Marpa::R3::Scanless::G::per_lmg_init {
-    my ( $slg, $name ) = @_;
-    my $per_lmg = [];
-    $per_lmg->[Marpa::R3::Internal::Trace::G::NAME] = $name;
-    my $lmw_name = 'lmw_' . ( lc $name ) . 'g';
-    $per_lmg->[Marpa::R3::Internal::Trace::G::LMW_NAME]            = $lmw_name;
-    $per_lmg->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID]        = [];
-    $slg->[Marpa::R3::Internal::Scanless::G::PER_LMG]->{$lmw_name} = $per_lmg;
-
-    $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 's', ( lc $name ) );
-    local g, short_name = ...
-    lmw_g_name = 'lmw_' .. short_name .. 'g'
-    g[lmw_g_name] = kollos.grammar_new()
-    local lmw_g = g[lmw_g_name]
-    lmw_g:force_valued();
-    lmw_g.short_name = short_name
-    lmw_g:post_metal()
-END_OF_LUA
-
-    return $per_lmg;
-} ## end sub new
 
 1;
 
