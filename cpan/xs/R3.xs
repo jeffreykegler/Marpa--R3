@@ -121,8 +121,6 @@ union marpa_slr_event_s
 
 typedef struct
 {
-  SV *l0_sv;
-  G_Wrapper *l0_wrapper;
   HV *per_codepoint_hash;
   UV *per_codepoint_array[128];
   int precomputed;
@@ -2099,8 +2097,6 @@ static Scanless_G* slg_inner_new (void)
 
     slg->is_associated = 0;
     slg->precomputed = 0;
-    slg->l0_sv = NULL;
-    slg->l0_wrapper = NULL;
 
     {
         int i;
@@ -2117,7 +2113,7 @@ static Scanless_G* slg_inner_new (void)
 }
 
 static Scanless_G* slg_inner_associate (
-  Scanless_G* slg, SV * l0_sv)
+  Scanless_G* slg)
 {
     dTHX;
 
@@ -2125,15 +2121,6 @@ static Scanless_G* slg_inner_associate (
      * hold references to them.
      */
     slg->precomputed = 0;
-
-    slg->l0_sv = l0_sv;
-    SvREFCNT_inc (l0_sv);
-
-    /* Wrapper does not need reference, because parent objects
-     * holds references to it.
-     */
-    SET_G_WRAPPER_FROM_G_SV (slg->l0_wrapper, l0_sv);
-
     slg->is_associated = 1;
     return slg;
 }
@@ -2189,7 +2176,6 @@ static void slg_inner_init_properties (
 static void slg_inner_destroy(Scanless_G* slg) {
   unsigned int i = 0;
   dTHX;
-  SvREFCNT_dec (slg->l0_sv);
   Safefree (slg->symbol_g_properties);
   Safefree (slg->l0_rule_g_properties);
   SvREFCNT_dec (slg->per_codepoint_hash);
@@ -3030,12 +3016,7 @@ PPCODE:
 {
     Scanless_G *slg = outer_slg->inner;
 
-    if (!sv_isa (l0_sv, "Marpa::R3::Thin::G"))
-    {
-        croak
-            ("Problem in u->new(): L0 arg is not of type Marpa::R3::Thin::G");
-    }
-    slg_inner_associate (slg, l0_sv);
+    slg_inner_associate (slg);
 
     XSRETURN_YES;
 }
