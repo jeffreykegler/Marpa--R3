@@ -222,10 +222,6 @@ typedef SV* SVREF;
 #undef Dim
 #define Dim(x) (sizeof(x)/sizeof(*x))
 
-typedef UV Marpa_Op;
-
-struct op_data_s { const char *name; Marpa_Op op; };
-
 struct lua_extraspace {
     int ref_count;
 };
