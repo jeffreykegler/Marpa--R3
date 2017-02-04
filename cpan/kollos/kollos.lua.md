@@ -3508,7 +3508,6 @@ Lua C API.  The only argument must be a Libmarpa wrapper
 object.
 All such objects define the `lmw_g` field.
 
-
 ```
     -- miranda: section+ base error handlers
 
@@ -3524,83 +3523,6 @@ All such objects define the `lmw_g` field.
         grammar_ud = (Marpa_Grammar *) marpa_lua_touserdata (L, -1);
         error_code = marpa_g_error (*grammar_ud, NULL);
         marpa_lua_pushinteger (L, error_code);
-        return 1;
-    }
-
-```
-
-`dummyup_grammar` is not Lua C API.
-This may be the basis of the actual constructor.
-Takes ownership of a Libmarpa grammar reference,
-so the caller must make sure that one is available.
-
-    -- miranda: section+ C function declarations
-    int
-    marpa_k_dummyup_grammar (lua_State * L, Marpa_Grammar g, lua_Integer slg_ref, const char *name);
-    -- miranda: section+ non-standard wrappers
-
-    int
-    marpa_k_dummyup_grammar (lua_State * L, Marpa_Grammar g, lua_Integer slg_ref, const char *name)
-    {
-
-        int result;
-        Marpa_Grammar *p_g;
-        const int base_of_stack = marpa_lua_gettop (L);
-        int lmw_g_stack_ix;
-
-        marpa_luaL_checkstack(L, 20, "cannot_grow_stack");
-
-        marpa_lua_newtable (L);
-        lmw_g_stack_ix = marpa_lua_gettop (L);
-
-        /* Once development is over, this use of the "kollos"
-         * global *MUST* be eliminated.  Deleting this entire
-         * function would be one way to do that.
-         */
-        marpa_lua_getglobal (L, "kollos");
-
-        marpa_lua_getfield (L, -1, "class_grammar");
-        marpa_lua_setmetatable (L, lmw_g_stack_ix);
-        /* [ slr_table, lmw_g_tab, kollos_tab ] */
-
-        if (0)
-            printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
-
-        /* [ ] */
-        p_g =
-            (Marpa_Grammar *) marpa_lua_newuserdata (L,
-            sizeof (Marpa_Grammar));
-        /* [ userdata ] */
-        marpa_lua_rawgetp (L, LUA_REGISTRYINDEX, &kollos_g_ud_mt_key);
-        marpa_lua_setmetatable (L, -2);
-        /* [ userdata ] */
-
-        /* dup top of stack */
-        marpa_lua_pushvalue (L, -1);
-        /* [ userdata, userdata ] */
-        marpa_lua_setfield (L, lmw_g_stack_ix, "_libmarpa");
-        /* [ userdata ] */
-
-        /* Set my "lmw_g" field to myself */
-        marpa_lua_pushvalue (L, lmw_g_stack_ix);
-        marpa_lua_setfield (L, lmw_g_stack_ix, "lmw_g");
-
-        *p_g = g;
-        result = marpa_g_force_valued (g);
-        if (result < 0) {
-            marpa_lua_settop (L, base_of_stack);
-            return 0;
-        }
-        if (0)
-            printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
-
-        marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, slg_ref);
-        /* [ userdata, slg_table ] */
-        marpa_lua_pushvalue (L, lmw_g_stack_ix);
-        /* [ userdata, slg_table, lmw_g ] */
-        marpa_lua_setfield (L, -2, name);
-
-        marpa_lua_settop (L, base_of_stack);
         return 1;
     }
 

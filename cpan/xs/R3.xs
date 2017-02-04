@@ -59,10 +59,6 @@ struct l0_rule_r_properties {
      unsigned int t_event_on_discard_active:1;
 };
 
-typedef struct {
-     Marpa_Grammar g;
-} G_Wrapper;
-
 union marpa_slr_event_s;
 
 #define MARPA_SLREV_LEXEME_DISCARDED 3
@@ -1774,13 +1770,6 @@ static void recursive_coerce_to_lua(
     return;
 }
 
-/* Static grammar methods */
-
-#define SET_G_WRAPPER_FROM_G_SV(g_wrapper, g_sv) { \
-    IV tmp = SvIV ((SV *) SvRV (g_sv)); \
-    (g_wrapper) = INT2PTR (G_Wrapper *, tmp); \
-}
-
 /* Static recognizer methods */
 
 /* Maybe inline some of these */
@@ -2842,88 +2831,6 @@ PPCODE:
 {
    const char* tag = _marpa_tag();
    XSRETURN_PV(tag);
-}
-
-MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::G
-
-void
-new( class, outer_slg, name )
-    char * class;
-    Outer_G *outer_slg;
-    char *name;
-PPCODE:
-{
-    Marpa_Grammar g;
-    G_Wrapper *g_wrapper;
-    Marpa_Config marpa_configuration;
-    int error_code;
-    lua_State* L = outer_slg->L;
-    lua_Integer lua_ref = outer_slg->lua_ref;
-    PERL_UNUSED_ARG(class);
-
-    /* Make sure the header is from the version we want */
-    if (MARPA_MAJOR_VERSION != EXPECTED_LIBMARPA_MAJOR
-        || MARPA_MINOR_VERSION != EXPECTED_LIBMARPA_MINOR
-        || MARPA_MICRO_VERSION != EXPECTED_LIBMARPA_MICRO) {
-        croak
-            ("Problem in $g->new(): want Libmarpa %d.%d.%d, header was from Libmarpa %d.%d.%d",
-            EXPECTED_LIBMARPA_MAJOR, EXPECTED_LIBMARPA_MINOR,
-            EXPECTED_LIBMARPA_MICRO,
-            MARPA_MAJOR_VERSION, MARPA_MINOR_VERSION, MARPA_MICRO_VERSION);
-    }
-
-    {
-        /* Now make sure the library is from the version we want */
-        int version[3];
-        error_code = marpa_version (version);
-        if (error_code != MARPA_ERR_NONE
-            || version[0] != EXPECTED_LIBMARPA_MAJOR
-            || version[1] != EXPECTED_LIBMARPA_MINOR
-            || version[2] != EXPECTED_LIBMARPA_MICRO) {
-            croak
-                ("Problem in $g->new(): want Libmarpa %d.%d.%d, using Libmarpa %d.%d.%d",
-                EXPECTED_LIBMARPA_MAJOR, EXPECTED_LIBMARPA_MINOR,
-                EXPECTED_LIBMARPA_MICRO, version[0], version[1],
-                version[2]);
-        }
-    }
-
-    marpa_c_init (&marpa_configuration);
-    g = marpa_g_new (&marpa_configuration);
-    if (g) {
-        SV *sv;
-        Newx (g_wrapper, 1, G_Wrapper);
-        g_wrapper->g = g;
-        sv = sv_newmortal ();
-        sv_setref_pv (sv, grammar_c_class_name, (void *) g_wrapper);
-        XPUSHs (sv);
-    } else {
-        error_code = marpa_c_error (&marpa_configuration, NULL);
-    }
-
-    if (error_code != MARPA_ERR_NONE) {
-        const char *error_description = "Error code out of bounds";
-        if (error_code >= 0 && error_code < MARPA_ERROR_COUNT) {
-            error_description = marpa_error_description[error_code].name;
-        }
-        croak ("Problem in Marpa::R3->new(): %s", error_description);
-    }
-
-    marpa_g_ref (g);
-    if (!marpa_k_dummyup_grammar (L, g, lua_ref, name)) {
-        croak ("Problem in u->new(): G1 marpa_k_dummyup_grammar failed\n");
-    }
-}
-
-void
-DESTROY( g_wrapper )
-    G_Wrapper *g_wrapper;
-PPCODE:
-{
-    Marpa_Grammar grammar;
-    grammar = g_wrapper->g;
-    marpa_g_unref( grammar );
-    Safefree( g_wrapper );
 }
 
 MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::SLG
