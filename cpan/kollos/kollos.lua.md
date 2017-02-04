@@ -645,13 +645,46 @@ or nil if there was none.
 
 ```
     -- miranda: section+ C extern variables
+    extern char kollos_X_fallback_mt_key;
     extern char kollos_X_proto_asis_mt_key;
     extern char kollos_X_proto_mt_key;
     extern char kollos_X_mt_key;
     -- miranda: section+ metatable keys
+    char kollos_X_fallback_mt_key;
     char kollos_X_proto_asis_mt_key;
     char kollos_X_proto_mt_key;
     char kollos_X_mt_key;
+    -- miranda: section+ set up empty metatables
+
+    /* mt_X_fallback = {} */
+    marpa_lua_newtable (L);
+    marpa_lua_pushvalue (L, -1);
+    marpa_lua_rawsetp (L, LUA_REGISTRYINDEX, &kollos_X_fallback_mt_key);
+    /* kollos.mt_X_fallback = mt_X_fallback */
+    marpa_lua_setfield (L, kollos_table_stack_ix, "mt_X_fallback");
+
+    /* mt_X_proto = {} */
+    marpa_lua_newtable (L);
+    marpa_lua_pushvalue (L, -1);
+    marpa_lua_rawsetp (L, LUA_REGISTRYINDEX, &kollos_X_proto_mt_key);
+    /* kollos.mt_X_proto = mt_X_proto */
+    marpa_lua_setfield (L, kollos_table_stack_ix, "mt_X_proto");
+
+    /* mt_X_proto_asis = {} */
+    marpa_lua_newtable (L);
+    marpa_lua_pushvalue (L, -1);
+    marpa_lua_rawsetp (L, LUA_REGISTRYINDEX, &kollos_X_proto_asis_mt_key);
+    /* kollos.mt_X_proto_asis = mt_X_proto_asis */
+    marpa_lua_setfield (L, kollos_table_stack_ix, "mt_X_proto_asis");
+
+    /* Set up exception metatables, initially empty */
+    /* mt_X = {} */
+    marpa_lua_newtable (L);
+    marpa_lua_pushvalue (L, -1);
+    marpa_lua_rawsetp (L, LUA_REGISTRYINDEX, &kollos_X_mt_key);
+    /* kollos.mt_X = mt_X */
+    marpa_lua_setfield (L, kollos_table_stack_ix, "mt_X");
+
 ```
 
 ### Diagnostics
