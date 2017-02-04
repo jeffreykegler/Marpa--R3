@@ -2269,8 +2269,13 @@ marpa_inner_slr_new (Outer_G* outer_slg)
 
     {
         Marpa_Rule_ID l0_rule_id;
-        const Marpa_Rule_ID l0_rule_count =
-            marpa_g_highest_rule_id (slg->l0_wrapper->g) + 1;
+        lua_Integer l0_rule_count;
+        call_by_tag (outer_slg->L, LUA_TAG,
+            "grammar = ...\n"
+            "local l0g = grammar.lmw_l0g\n"
+            "return l0g:highest_rule_id()+1\n",
+            "G>i", outer_slg->lua_ref, &l0_rule_count);
+
         Newx (slr->l0_rule_r_properties, (unsigned) l0_rule_count,
             struct l0_rule_r_properties);
         for (l0_rule_id = 0; l0_rule_id < l0_rule_count; l0_rule_id++) {
@@ -3257,9 +3262,16 @@ discard_event_set( outer_slg, l0_rule_id, boolean )
     int boolean;
 PPCODE:
 {
-  Scanless_G* slg = slg_inner_get(outer_slg);
-  Marpa_Rule_ID highest_l0_rule_id = marpa_g_highest_rule_id (slg->l0_wrapper->g);
+    Scanless_G* slg = slg_inner_get(outer_slg);
     struct l0_rule_g_properties * g_properties = slg->l0_rule_g_properties + l0_rule_id;
+    lua_Integer highest_l0_rule_id;
+
+    call_by_tag (outer_slg->L, LUA_TAG,
+        "grammar = ...\n"
+        "local l0g = grammar.lmw_l0g\n"
+        "return l0g:highest_rule_id()+1\n",
+        "G>i", outer_slg->lua_ref, &highest_l0_rule_id);
+
     if (slg->precomputed)
       {
         croak
