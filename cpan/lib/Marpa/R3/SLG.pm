@@ -219,11 +219,8 @@ END_OF_LUA
 
     my $g1_tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER] =
       $slg->per_lmg_init("G1");
-    $g1_tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID] = [];
-
     my $lex_tracer = $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER] =
       $slg->per_lmg_init("L0");
-    $lex_tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID] = [];
 
     my @xsy_names = keys %{ $hashed_source->{xsy} };
 
@@ -2501,14 +2498,13 @@ sub Marpa::R3::Scanless::G::per_lmg_init {
     my ( $slg, $name ) = @_;
     my $per_lmg = [];
     $per_lmg->[Marpa::R3::Internal::Trace::G::NAME] = $name;
-    my $lmw_name = 'lmw_' . (lc $name) . 'g';
-    $per_lmg->[Marpa::R3::Internal::Trace::G::LMW_NAME]
-      = $lmw_name;
+    my $lmw_name = 'lmw_' . ( lc $name ) . 'g';
+    $per_lmg->[Marpa::R3::Internal::Trace::G::LMW_NAME]            = $lmw_name;
+    $per_lmg->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID]        = [];
     $slg->[Marpa::R3::Internal::Scanless::G::PER_LMG]->{$lmw_name} = $per_lmg;
 
-    $slg->call_by_tag(
-        ('@' . __FILE__ . ':' .  __LINE__),
-      <<'END_OF_LUA', 's', (lc $name));
+    $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 's', ( lc $name ) );
     local g, short_name = ...
     lmw_g_name = 'lmw_' .. short_name .. 'g'
     g[lmw_g_name] = kollos.grammar_new()
