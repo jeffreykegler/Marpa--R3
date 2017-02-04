@@ -762,9 +762,8 @@ coerce_to_pairs (lua_State * L, int visited_ix, int table_ix)
 
 /* Called after pcall error -- assumes that "status" is
  * the non-zero return value of lua_pcall() and that the
- * error object is on top of the stack.  Does *NOT* clean up
- * the Lua stack -- since this is an error condition, we assume
- * the caller is about to do this.
+ * error object is on top of the stack.  Leaves the exception
+ * object on top of the stack.  Does stack hygiene.
  *
  * The return value is a string which is either a C constant string
  * in static space, or in Perl mortal space.
@@ -772,7 +771,7 @@ coerce_to_pairs (lua_State * L, int visited_ix, int table_ix)
 static const char* handle_pcall_error (lua_State* L, int status) {
     dTHX;
     /* Lua stack: [ exception_object ] */
-    const int exception_object = marpa_lua_gettop(L);
+    const int exception_object_ix = marpa_lua_gettop(L);
 
     /* The best way to get a self-expanding sprintf buffer is to use a
      * Perl SV.  We set it mortal, so that Perl makes sure that it is
@@ -804,10 +803,11 @@ static const char* handle_pcall_error (lua_State* L, int status) {
 
     {
         size_t len;
-        const char *lua_exception_string = marpa_luaL_tolstring(L, exception_object, &len);
+        const char *lua_exception_string = marpa_luaL_tolstring(L, exception_object_ix, &len);
         sv_setpvn(temp_sv, lua_exception_string, (STRLEN)len);
     }
 
+    marpa_lua_settop(L, exception_object_ix);
     return SvPV_nolen(temp_sv);
 }
 
@@ -1402,8 +1402,6 @@ static void create_array_mt (lua_State* L) {
  */
 static int xlua_msghandler (lua_State *L) {
   const char *msg;
-  marpa_lua_pushvalue(L, 1);
-  marpa_lua_setglobal(L, "last_exception");
   msg = marpa_luaL_tolstring(L, 1, NULL);
   /* ADD_TRACEBACK: ; */
   marpa_luaL_traceback(L, L, msg, 1);  /* append a standard traceback */
@@ -4206,12 +4204,6 @@ PPCODE:
     marpa_luaL_newlib(L, marpa_array_funcs);
     /* Lua stack: [ marpa_table, sv_table ] */
     marpa_lua_setfield (L, marpa_table, "array");
-    /* Lua stack: [ marpa_table ] */
-
-    /* TODO: Delete this? */
-    marpa_lua_newtable (L);
-    /* Lua stack: [ marpa_table, context_table ] */
-    marpa_lua_setfield (L, marpa_table, "context");
     /* Lua stack: [ marpa_table ] */
 
     marpa_lua_settop (L, base_of_stack);
