@@ -128,9 +128,6 @@ typedef struct
   struct l0_rule_g_properties *l0_rule_g_properties;
   AV *constants;
 
-  /* Does it have L0 and G1 yet? */
-  int is_associated;
-
 } Scanless_G;
 
 typedef struct {
@@ -2082,9 +2079,6 @@ u_pos_set (Outer_R * outer_slr, const char* name, int start_pos_arg, int length_
 static Scanless_G* slg_inner_get(Outer_G* outer_slg) {
     dTHX;
     Scanless_G *slg = outer_slg->inner;
-    if (!slg->is_associated) {
-        croak("SLG does not yet have associated subgrammars");
-    }
     return outer_slg->inner;
 }
 
@@ -2095,7 +2089,6 @@ static Scanless_G* slg_inner_new (void)
 
     Newx (slg, 1, Scanless_G);
 
-    slg->is_associated = 0;
     slg->precomputed = 0;
 
     {
@@ -2121,7 +2114,6 @@ static Scanless_G* slg_inner_associate (
      * hold references to them.
      */
     slg->precomputed = 0;
-    slg->is_associated = 1;
     return slg;
 }
 

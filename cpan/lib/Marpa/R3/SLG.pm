@@ -225,9 +225,6 @@ END_OF_LUA
       Marpa::R3::Trace::G->new($slg, "L0");
     $lex_tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID] = [];
 
-    my $thin_L0  = $lex_tracer->[Marpa::R3::Internal::Trace::G::C];
-    $thin_slg->associate( $thin_L0, $g1_tracer->grammar() );
-
     my @xsy_names = keys %{ $hashed_source->{xsy} };
 
     my $xsy_by_id = $slg->[Marpa::R3::Internal::Scanless::G::XSY_BY_ID] = [];
