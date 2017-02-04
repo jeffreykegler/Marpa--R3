@@ -121,7 +121,6 @@ union marpa_slr_event_s
 
 typedef struct
 {
-  Marpa_Grammar g1;
   SV *g1_sv;
   G_Wrapper *g1_wrapper;
 
@@ -2108,7 +2107,6 @@ static Scanless_G* slg_inner_new (void)
     slg->is_associated = 0;
     slg->g1_sv = NULL;
     slg->g1_wrapper = NULL;
-    slg->g1 = NULL;
     slg->precomputed = 0;
     slg->l0_sv = NULL;
     slg->l0_wrapper = NULL;
@@ -2139,7 +2137,6 @@ static Scanless_G* slg_inner_associate (
      * hold references to them.
      */
     SET_G_WRAPPER_FROM_G_SV (slg->g1_wrapper, g1_sv)
-        slg->g1 = slg->g1_wrapper->g;
     slg->precomputed = 0;
 
     slg->l0_sv = l0_sv;
