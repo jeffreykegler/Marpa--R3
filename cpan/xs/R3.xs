@@ -2266,8 +2266,14 @@ marpa_inner_slr_new (Outer_G* outer_slg)
 
     {
         Marpa_Symbol_ID symbol_id;
-        const Marpa_Symbol_ID g1_symbol_count =
-            marpa_g_highest_symbol_id (slg->g1) + 1;
+        lua_Integer g1_symbol_count;
+    call_by_tag (outer_slg->L, LUA_TAG,
+        "grammar = ...\n"
+        "local g1g = grammar.lmw_g1g\n"
+        "return g1g:highest_symbol_id()+1\n"
+        ,
+        "G>i", outer_slg->lua_ref, &g1_symbol_count);
+
         Newx (slr->symbol_r_properties, ((unsigned int) g1_symbol_count),
             struct symbol_r_properties);
         for (symbol_id = 0; symbol_id < g1_symbol_count; symbol_id++) {
@@ -3077,7 +3083,15 @@ g1_lexeme_set( outer_slg, g1_lexeme, priority )
 PPCODE:
 {
   Scanless_G* slg = slg_inner_get(outer_slg);
-  Marpa_Symbol_ID highest_g1_symbol_id = marpa_g_highest_symbol_id (slg->g1);
+  lua_Integer highest_g1_symbol_id;
+
+    call_by_tag (outer_slg->L, LUA_TAG,
+        "grammar = ...\n"
+        "local g1g = grammar.lmw_g1g\n"
+        "return g1g:highest_symbol_id()\n"
+        ,
+        "G>i", outer_slg->lua_ref, &highest_g1_symbol_id);
+
     if (slg->precomputed)
       {
         croak
