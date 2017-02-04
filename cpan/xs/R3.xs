@@ -192,7 +192,6 @@ typedef struct
   /* We need a copy of the outer_slr lua_ref,
    * but hopefully only while refactoring
    */
-  lua_Integer outer_slr_lua_ref;
 
 } Scanless_R;
 
@@ -2341,9 +2340,7 @@ static Scanless_R* slr_inner_get(Outer_R* outer_slr) {
 static void slr_inner_destroy(lua_State* L, Scanless_R* slr)
 {
   dTHX;
-
-  /* marpa_r3_warn("SLR inner destroy"); */
-  kollos_robrefdec(L, slr->outer_slr_lua_ref);
+    PERL_UNUSED_ARG(L);
 
    Safefree(slr->t_lexemes);
 
@@ -3127,7 +3124,14 @@ g1_lexeme_priority( outer_slg, g1_lexeme )
 PPCODE:
 {
   Scanless_G* slg = slg_inner_get(outer_slg);
-  Marpa_Symbol_ID highest_g1_symbol_id = marpa_g_highest_symbol_id (slg->g1);
+  lua_Integer highest_g1_symbol_id;
+    call_by_tag (outer_slg->L, LUA_TAG,
+        "grammar = ...\n"
+        "local g1g = grammar.lmw_g1g\n"
+        "return g1g:highest_symbol_id()\n"
+        ,
+        "G>i", outer_slg->lua_ref, &highest_g1_symbol_id);
+
     if (g1_lexeme > highest_g1_symbol_id)
     {
       croak
@@ -3154,8 +3158,15 @@ g1_lexeme_pause_set( outer_slg, g1_lexeme, pause )
 PPCODE:
 {
   Scanless_G* slg = slg_inner_get(outer_slg);
-  Marpa_Symbol_ID highest_g1_symbol_id = marpa_g_highest_symbol_id (slg->g1);
+  lua_Integer highest_g1_symbol_id;
     struct symbol_g_properties * g_properties = slg->symbol_g_properties + g1_lexeme;
+    call_by_tag (outer_slg->L, LUA_TAG,
+        "grammar = ...\n"
+        "local g1g = grammar.lmw_g1g\n"
+        "return g1g:highest_symbol_id()\n"
+        ,
+        "G>i", outer_slg->lua_ref, &highest_g1_symbol_id);
+
     if (slg->precomputed)
       {
         croak
@@ -3209,9 +3220,17 @@ g1_lexeme_pause_activate( outer_slg, g1_lexeme, activate )
 PPCODE:
 {
   Scanless_G* slg = slg_inner_get(outer_slg);
-  Marpa_Symbol_ID highest_g1_symbol_id = marpa_g_highest_symbol_id (slg->g1);
+  lua_Integer highest_g1_symbol_id;
   struct symbol_g_properties *g_properties =
     slg->symbol_g_properties + g1_lexeme;
+
+    call_by_tag (outer_slg->L, LUA_TAG,
+        "grammar = ...\n"
+        "local g1g = grammar.lmw_g1g\n"
+        "return g1g:highest_symbol_id()\n"
+        ,
+        "G>i", outer_slg->lua_ref, &highest_g1_symbol_id);
+
   if (slg->precomputed)
     {
       croak
@@ -3460,9 +3479,6 @@ PPCODE:
     marpa_lua_settop(L, base_of_stack);
   }
 
-  slr->outer_slr_lua_ref = outer_slr->lua_ref;
-  kollos_robrefinc(L, outer_slr->lua_ref);
-
   call_by_tag (outer_slr->L, LUA_TAG,
       "local recce = ...\n"
       "recce.lmw_g1r = kollos.recce_new(recce.slg.lmw_g1g)\n"
@@ -3488,7 +3504,6 @@ PPCODE:
       "valuation_reset(recce)\n"
       "return 0\n",
       "R>", outer_slr->lua_ref);
-  kollos_robrefdec(outer_slr->L, outer_slr->lua_ref);
   lua_refdec(outer_slr->L);
   SvREFCNT_dec (outer_slr->slg_sv);
   Safefree (outer_slr);
@@ -3955,7 +3970,16 @@ PPCODE:
   Scanless_R *slr = slr_inner_get(outer_slr);
   struct symbol_r_properties *symbol_r_properties;
   const Scanless_G *slg = slr->slg;
-  const Marpa_Symbol_ID highest_g1_symbol_id = marpa_g_highest_symbol_id (slg->g1);
+  lua_Integer highest_g1_symbol_id;
+
+    call_by_tag (outer_slr->L, LUA_TAG,
+        "recce = ...\n"
+        "grammar = recce.slg\n"
+        "local g1g = grammar.lmw_g1g\n"
+        "return g1g:highest_symbol_id()\n"
+        ,
+        "R>i", outer_slr->lua_ref, &highest_g1_symbol_id);
+
   if (g1_lexeme_id > highest_g1_symbol_id)
     {
       croak
@@ -4074,7 +4098,16 @@ PPCODE:
 {
   Scanless_R *slr = slr_inner_get(outer_slr);
   const Scanless_G *slg = slr->slg;
-  Marpa_Symbol_ID highest_g1_symbol_id = marpa_g_highest_symbol_id (slg->g1);
+  lua_Integer highest_g1_symbol_id;
+
+    call_by_tag (outer_slr->L, LUA_TAG,
+        "recce = ...\n"
+        "grammar = recce.slg\n"
+        "local g1g = grammar.lmw_g1g\n"
+        "return g1g:highest_symbol_id()\n"
+        ,
+        "R>i", outer_slr->lua_ref, &highest_g1_symbol_id);
+
     if (g1_lexeme > highest_g1_symbol_id)
     {
       croak
@@ -4109,7 +4142,16 @@ PPCODE:
   Scanless_R *slr = slr_inner_get(outer_slr);
   int old_priority;
   const Scanless_G *slg = slr->slg;
-  Marpa_Symbol_ID highest_g1_symbol_id = marpa_g_highest_symbol_id (slg->g1);
+  lua_Integer highest_g1_symbol_id;
+
+    call_by_tag (outer_slr->L, LUA_TAG,
+        "recce = ...\n"
+        "grammar = recce.slg\n"
+        "local g1g = grammar.lmw_g1g\n"
+        "return g1g:highest_symbol_id()\n"
+        ,
+        "R>i", outer_slr->lua_ref, &highest_g1_symbol_id);
+
     if (g1_lexeme > highest_g1_symbol_id)
     {
       croak
