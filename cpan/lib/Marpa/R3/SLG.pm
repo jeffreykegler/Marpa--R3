@@ -1128,11 +1128,11 @@ qq{Symbol "$lexeme_name" needs a blessing package, but grammar has none\n},
 } ## end sub Marpa::R3::Internal::Scanless::G::hash_to_runtime
 
 sub Marpa::R3::Internal::Scanless::G::precompute {
-    my ($slg, $tracer) = @_;
+    my ($slg, $per_lmg) = @_;
 
-    my $lmw_name = 'lmw_' . (lc $tracer->name()) . 'g';
     my $thin_slg = $slg->[Marpa::R3::Internal::Scanless::G::C];
-    my $xsy_by_isyid     = $tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID];
+    my $xsy_by_isyid     = $per_lmg->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID];
+    my $lmw_name     = $per_lmg->[Marpa::R3::Internal::Trace::G::LMW_NAME];
 
     my $trace_fh =
         $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE];
@@ -1920,7 +1920,7 @@ sub Marpa::R3::Scanless::G::call_by_tag {
 
 sub slg_rule_show {
     my ( $slg, $tracer, $irlid ) = @_;
-    my $lmw_name = 'lmw_' . (lc $tracer->name()) . 'g';
+    my $lmw_name     = $tracer->[Marpa::R3::Internal::Trace::G::LMW_NAME];
     my ($symbol_ids) = $slg->call_by_tag(
     ('@' .__FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', 'si>*', $lmw_name, $irlid ) ;
@@ -2017,7 +2017,7 @@ END_OF_LUA
 sub Marpa::R3::Scanless::G::show_dotted_rule {
     my ( $slg, $irlid, $dot_position ) = @_;
     my $tracer =  $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
-    my $lmw_name = 'lmw_' . (lc $tracer->name()) . 'g';
+    my $lmw_name     = $tracer->[Marpa::R3::Internal::Trace::G::LMW_NAME];
     my ( $lhs, @rhs ) =
     map { $slg->lmg_symbol_display_form($lmw_name, $_) } $slg->irl_isyids($irlid);
     my $rhs_length = scalar @rhs;
