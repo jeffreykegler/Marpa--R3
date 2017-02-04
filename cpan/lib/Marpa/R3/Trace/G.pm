@@ -31,8 +31,7 @@ sub new {
     $slg->[Marpa::R3::Internal::Scanless::G::PER_LMG]->{$lmw_name} = $tracer;
 
     my $field_name = 'lmw_' . (lc $name) . 'g';
-    my $grammar_c = Marpa::R3::Thin::G->new($thin_slg, $field_name);
-    $tracer->[Marpa::R3::Internal::Trace::G::C] = $grammar_c;
+    Marpa::R3::Thin::G->new($thin_slg, $field_name);
 
     $slg->call_by_tag(
         ('@' . __FILE__ . ':' .  __LINE__),
@@ -46,11 +45,6 @@ END_OF_LUA
 
     return $tracer;
 } ## end sub new
-
-sub grammar {
-    my ($self) = @_;
-    return $self->[Marpa::R3::Internal::Trace::G::C];
-}
 
 sub name {
     my ($self) = @_;
