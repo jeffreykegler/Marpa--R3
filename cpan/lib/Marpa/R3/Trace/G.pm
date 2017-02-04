@@ -23,22 +23,24 @@ $VERSION        = eval $VERSION;
 sub new {
     my ( $class, $slg, $name ) = @_;
     my $tracer = bless [], $class;
-    my $thin_slg = $slg->[Marpa::R3::Internal::Scanless::G::C];
+    # my $thin_slg = $slg->[Marpa::R3::Internal::Scanless::G::C];
     $tracer->[Marpa::R3::Internal::Trace::G::NAME] = $name;
     my $lmw_name = 'lmw_' . (lc $name) . 'g';
     $tracer->[Marpa::R3::Internal::Trace::G::LMW_NAME]
       = $lmw_name;
     $slg->[Marpa::R3::Internal::Scanless::G::PER_LMG]->{$lmw_name} = $tracer;
 
-    my $field_name = 'lmw_' . (lc $name) . 'g';
-    Marpa::R3::Thin::G->new($thin_slg, $field_name);
+    # my $field_name = 'lmw_' . (lc $name) . 'g';
+    # Marpa::R3::Thin::G->new($thin_slg, $field_name);
 
     $slg->call_by_tag(
         ('@' . __FILE__ . ':' .  __LINE__),
       <<'END_OF_LUA', 's', (lc $name));
     local g, short_name = ...
     lmw_g_name = 'lmw_' .. short_name .. 'g'
+    g[lmw_g_name] = kollos.grammar_new()
     local lmw_g = g[lmw_g_name]
+    lmw_g:force_valued();
     lmw_g.short_name = short_name
     lmw_g:post_metal()
 END_OF_LUA
