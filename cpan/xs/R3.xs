@@ -783,13 +783,13 @@ static const char* handle_pcall_error (lua_State* L, int status) {
 
     switch (status) {
     case LUA_ERRERR:
-        return "Internal error: pcall(): error running the message handler";
+        return R3ERR "pcall(); error running the message handler";
     case LUA_ERRMEM:
-        return "Internal error: pcall(): error running the message handler";
+        return R3ERR "pcall(); error running the message handler";
     case LUA_ERRGCMM:
-        return "Internal error: pcall(): error running a gc_ metamethod";
+        return R3ERR "pcall(); error running a gc_ metamethod";
     default:
-        sv_setpvf(temp_sv, "Internal error: pcall(): bad status %d", status);
+        sv_setpvf(temp_sv, R3ERR "pcall(); bad status %d", status);
         return SvPV_nolen(temp_sv);
     case LUA_ERRRUN:
         break;
@@ -800,48 +800,15 @@ static const char* handle_pcall_error (lua_State* L, int status) {
      */
     /* Lua stack: [ exception_object ] */
     marpa_luaL_checkstack(L, 20, LUA_TAG);
-    marpa_lua_pushvalue(L, exception_object);
-    marpa_lua_setglobal(L, "last_exception");
     /* Lua stack: [ exception_object ] */
 
-    /* This is probably more efficient, but the real object is to avoid
-     * handling the errors from one lua_pcall() by using a 2nd lua_pcall()
-     */
-    if (marpa_lua_isstring(L, exception_object)) {
-        const char *lua_exception_string = marpa_lua_tostring(L, exception_object);
-        sv_setpvf(temp_sv, "%s", lua_exception_string);
-        return SvPV_nolen(temp_sv);
+    {
+        size_t len;
+        const char *lua_exception_string = marpa_luaL_tolstring(L, exception_object, &len);
+        sv_setpvn(temp_sv, lua_exception_string, (STRLEN)len);
     }
 
-    /* 
-     * At this point we know that the first pcall() failed due
-     * to a runtime error, so that another more limited use of pcall() should be
-     * safe.
-     */
-    marpa_lua_getglobal(L, "tostring");
-    marpa_lua_pushvalue(L, exception_object);
-    status = marpa_lua_pcall(L, 1, 1, 0);
-    switch (status) {
-    case LUA_ERRERR:
-        return "Internal error: pcall(tostring): error running the message handler";
-    case LUA_ERRMEM:
-        return "Internal error: pcall(tostring): memory allocation error";
-    case LUA_ERRGCMM:
-        return "Internal error: pcall(tostring): error running a gc_ metamethod";
-    default:
-        sv_setpvf(temp_sv, "Internal error: pcall(tostring): bad status %d", status);
-        return SvPV_nolen(temp_sv);
-    case LUA_ERRRUN:
-        sv_setpvf(temp_sv, "pcall(tostring) %s", marpa_lua_tostring(L, -1));
-        return SvPV_nolen(temp_sv);
-    case 0:
-        break;
-    }
-
-    /* Lua stack: [ exception_object, tostring(exception_object) ] */
-    sv_setpvf(temp_sv, "%s", marpa_lua_tostring(L, -1));
     return SvPV_nolen(temp_sv);
-    /* We return *WITHOUT* cleaning up the Lua stack */
 }
 
 /* Push a Perl value onto the Lua stack. */
@@ -1434,16 +1401,11 @@ static void create_array_mt (lua_State* L) {
  * Message handler used to run all chunks
  */
 static int xlua_msghandler (lua_State *L) {
-  const char *msg = marpa_lua_tostring(L, 1);
-  if (msg == NULL) {  /* is error object not a string? */
-    if (marpa_luaL_callmeta(L, 1, "__tostring") &&  /* does it have a metamethod */
-        marpa_lua_type(L, -1) == LUA_TSTRING)  /* that produces a string? */
-        goto ADD_TRACEBACK;
-    else
-      msg = marpa_lua_pushfstring(L, "(error object is a %s value)",
-                               marpa_luaL_typename(L, 1));
-  }
-  ADD_TRACEBACK: ;
+  const char *msg;
+  marpa_lua_pushvalue(L, 1);
+  marpa_lua_setglobal(L, "last_exception");
+  msg = marpa_luaL_tolstring(L, 1, NULL);
+  /* ADD_TRACEBACK: ; */
   marpa_luaL_traceback(L, L, msg, 1);  /* append a standard traceback */
   return 1;  /* return the traceback */
 }
