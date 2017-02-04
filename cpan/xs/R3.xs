@@ -122,7 +122,6 @@ union marpa_slr_event_s
 typedef struct
 {
   SV *g1_sv;
-  G_Wrapper *g1_wrapper;
 
   SV *l0_sv;
   G_Wrapper *l0_wrapper;
@@ -149,7 +148,6 @@ typedef struct
   SV *g1g_sv;
 
   Scanless_G *slg;
-  G_Wrapper *g1_wrapper;
   AV *token_values;
   int start_of_lexeme;
   int end_of_lexeme;
@@ -2106,7 +2104,6 @@ static Scanless_G* slg_inner_new (void)
 
     slg->is_associated = 0;
     slg->g1_sv = NULL;
-    slg->g1_wrapper = NULL;
     slg->precomputed = 0;
     slg->l0_sv = NULL;
     slg->l0_wrapper = NULL;
@@ -2136,7 +2133,6 @@ static Scanless_G* slg_inner_associate (
     /* These do not need references, because parent objects
      * hold references to them.
      */
-    SET_G_WRAPPER_FROM_G_SV (slg->g1_wrapper, g1_sv)
     slg->precomputed = 0;
 
     slg->l0_sv = l0_sv;
@@ -2237,7 +2233,6 @@ marpa_inner_slr_new (Outer_G* outer_slg)
             ("Problem in u->new(): Attempted to create SLIF recce from unprecomputed SLIF grammar");
     }
     slr->slg = slg;
-    slr->g1_wrapper = slg->g1_wrapper;
 
     slr->start_of_lexeme = 0;
     slr->end_of_lexeme = 0;
