@@ -121,8 +121,6 @@ union marpa_slr_event_s
 
 typedef struct
 {
-  SV *g1_sv;
-
   SV *l0_sv;
   G_Wrapper *l0_wrapper;
   HV *per_codepoint_hash;
@@ -145,8 +143,6 @@ typedef struct {
 
 typedef struct
 {
-  SV *g1g_sv;
-
   Scanless_G *slg;
   AV *token_values;
   int start_of_lexeme;
@@ -2102,7 +2098,6 @@ static Scanless_G* slg_inner_new (void)
     Newx (slg, 1, Scanless_G);
 
     slg->is_associated = 0;
-    slg->g1_sv = NULL;
     slg->precomputed = 0;
     slg->l0_sv = NULL;
     slg->l0_wrapper = NULL;
@@ -2122,12 +2117,9 @@ static Scanless_G* slg_inner_new (void)
 }
 
 static Scanless_G* slg_inner_associate (
-  Scanless_G* slg, SV * l0_sv, SV * g1_sv)
+  Scanless_G* slg, SV * l0_sv)
 {
     dTHX;
-
-    slg->g1_sv = g1_sv;
-    SvREFCNT_inc (g1_sv);
 
     /* These do not need references, because parent objects
      * hold references to them.
@@ -2193,7 +2185,6 @@ static void slg_inner_init_properties (
 static void slg_inner_destroy(Scanless_G* slg) {
   unsigned int i = 0;
   dTHX;
-  SvREFCNT_dec (slg->g1_sv);
   SvREFCNT_dec (slg->l0_sv);
   Safefree (slg->symbol_g_properties);
   Safefree (slg->l0_rule_g_properties);
@@ -2217,12 +2208,6 @@ marpa_inner_slr_new (Outer_G* outer_slg)
     Newx (slr, 1, Scanless_R);
 
     slr->throw = 1;
-
-    /* Copy and take references to the "parent objects",
-     * the ones responsible for holding references.
-     */
-    slr->g1g_sv = slg->g1_sv;
-    SvREFCNT_inc (slr->g1g_sv);
 
     /* These do not need references, because parent objects
      * hold references to them
@@ -2335,7 +2320,6 @@ static void slr_inner_destroy(lua_State* L, Scanless_R* slr)
 
    Safefree(slr->t_lexemes);
 
-  SvREFCNT_dec (slr->g1g_sv);
   Safefree(slr->symbol_r_properties);
   Safefree(slr->l0_rule_r_properties);
   if (slr->token_values)
@@ -3042,11 +3026,7 @@ PPCODE:
         croak
             ("Problem in u->new(): L0 arg is not of type Marpa::R3::Thin::G");
     }
-    if (!sv_isa (g1_sv, "Marpa::R3::Thin::G")) {
-        croak
-            ("Problem in u->new(): G1 arg is not of type Marpa::R3::Thin::G");
-    }
-    slg_inner_associate (slg, l0_sv, g1_sv);
+    slg_inner_associate (slg, l0_sv);
 
     XSRETURN_YES;
 }
