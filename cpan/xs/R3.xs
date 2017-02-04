@@ -2156,13 +2156,22 @@ static Scanless_G* slg_inner_associate (
 }
 
 static void slg_inner_init_properties (
-  Scanless_G* slg)
+  Outer_G* outer_slg)
 {
     dTHX;
+    Scanless_G *slg = slg_inner_get (outer_slg);
 
     {
         Marpa_Symbol_ID symbol_id;
-        int g1_symbol_count = marpa_g_highest_symbol_id (slg->g1) + 1;
+        lua_Integer g1_symbol_count;
+
+    call_by_tag (outer_slg->L, LUA_TAG,
+        "grammar = ...\n"
+        "local g1g = grammar.lmw_g1g\n"
+        "return g1g:highest_symbol_id()+1\n"
+        ,
+        "G>i", outer_slg->lua_ref, &g1_symbol_count);
+
         Newx (slg->symbol_g_properties, (unsigned int) g1_symbol_count,
             struct symbol_g_properties);
         for (symbol_id = 0; symbol_id < g1_symbol_count; symbol_id++) {
@@ -3053,8 +3062,7 @@ init_properties( outer_slg)
     Outer_G *outer_slg;
 PPCODE:
 {
-    Scanless_G *slg = outer_slg->inner;
-    slg_inner_init_properties (slg);
+    slg_inner_init_properties (outer_slg);
     XSRETURN_YES;
 }
 
