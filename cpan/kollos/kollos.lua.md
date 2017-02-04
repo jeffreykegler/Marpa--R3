@@ -687,6 +687,29 @@ or nil if there was none.
 
 ```
 
+The "fallback" for converting an exception is make it part
+of a table with a fallback __tostring method, which uses the
+inspect package to dump it.
+
+```
+    -- miranda: section+ populate metatables
+    local function X_fallback_tostring(self)
+        return inspect(self, { depth = 3 })
+    end
+
+    local function X_tostring(self)
+         local string = self.string
+         if string then return string end
+         return X_fallback_tostring(self)
+    end
+
+    _M.mt_X.__tostring = X_tostring
+    _M.mt_X_proto.__tostring = X_tostring
+    _M.mt_X_proto_asis.__tostring = X_tostring
+    _M.mt_X_fallback.__tostring = X_fallback_tostring
+
+```
+
 ### Diagnostics
 
 This is not currently used.
@@ -2879,6 +2902,7 @@ a special "configuration" argument.
 
     -- miranda: insert create metal tables
     -- miranda: insert copy metal tables
+    -- miranda: insert populate metatables
 
     -- set up various tables
     _M.upvalues.kollos = _M
