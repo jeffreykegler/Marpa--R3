@@ -203,8 +203,21 @@ typedef struct
 #define STRINGIFY(macro_or_string)        STRINGIFY_ARG (macro_or_string)
 #define STRLOC        __FILE__ ":" STRINGIFY (__LINE__)
 
-#undef LUA_TAG
-#define LUA_TAG "@" STRLOC
+#undef MYLUA_TAG
+#define MYLUA_TAG "@" STRLOC
+
+/* The usual lua_checkstack argument.
+ * It's generous so I can defer stack hygiene --
+ * that is, not clean up the stack immediately,
+ * but leave things that I know will be cleaned up
+ * shortly.
+ *
+ * If you're counting, don't forget that the error
+ * handlers will want a few extra stack slots, if
+ * invoked.
+ */
+#undef MYLUA_STACK_INCR
+#define MYLUA_STACK_INCR 30
 
 /* Start all Marpa::R3 internal errors with the same string */
 #undef R3ERR
@@ -310,7 +323,7 @@ slg_l0_error (Outer_G * outer_slg)
 {
     dTHX;
     SV *error_description;
-    call_by_tag (outer_slg->L, LUA_TAG,
+    call_by_tag (outer_slg->L, MYLUA_TAG,
         "slg = ...\n"
         "local l0g = slg.lmw_l0g\n"
         "return l0g:error_description\n", "G>C",
@@ -326,7 +339,7 @@ slr_l0_error (Outer_R * outer_slr)
 {
     dTHX;
     SV *error_description;
-    call_by_tag (outer_slr->L, LUA_TAG,
+    call_by_tag (outer_slr->L, MYLUA_TAG,
         "recce = ...\n"
         "local l0g = recce.slg.lmw_l0g\n"
         "return l0g:error_description\n", "R>C",
@@ -344,7 +357,7 @@ slg_g1_error (Outer_G * outer_slg)
 {
     dTHX;
     SV *error_description;
-    call_by_tag (outer_slg->L, LUA_TAG,
+    call_by_tag (outer_slg->L, MYLUA_TAG,
         "slg = ...\n"
         "local g1g = slg.lmw_g1g\n"
         "return g1g:error_description\n", "G>C",
@@ -360,7 +373,7 @@ slr_g1_error (Outer_R * outer_slr)
 {
     dTHX;
     SV *error_description;
-    call_by_tag (outer_slr->L, LUA_TAG,
+    call_by_tag (outer_slr->L, MYLUA_TAG,
         "recce = ...\n"
         "local g1g = recce.slg.lmw_g1g\n"
         "return g1g:error_description\n", "R>C",
@@ -478,7 +491,7 @@ do_lua_tree_op (lua_State * L, int visited_ix, int idx, char signature)
     const char *lua_tree_op;
     marpa_lua_geti (L, idx, 1);
     if (marpa_lua_type (L, -1) != LUA_TSTRING) {
-        croak (R3ERR "Lua tree op is not a string; " LUA_TAG);
+        croak (R3ERR "Lua tree op is not a string; " MYLUA_TAG);
     }
     lua_tree_op = marpa_lua_tostring (L, -1);
     if (!strcmp (lua_tree_op, "perl")) {
@@ -486,7 +499,7 @@ do_lua_tree_op (lua_State * L, int visited_ix, int idx, char signature)
         sv_bless (av_ref, gv_stashpv ("Marpa::R3::Tree_Op", 1));
         return av_ref;
     }
-    croak (R3ERR "tree op (%s) not implemented; " LUA_TAG, lua_tree_op);
+    croak (R3ERR "tree op (%s) not implemented; " MYLUA_TAG, lua_tree_op);
     /* NOTREACHED */
     return 0;
 }
@@ -607,7 +620,7 @@ coerce_to_av (lua_State * L, int visited_ix, int table_ix, char signature)
     /* Below we will call this recursively,
      * so we need to make sure we have enough stack
      */
-    marpa_luaL_checkstack(L, 20, LUA_TAG);
+    marpa_luaL_checkstack(L, MYLUA_STACK_INCR, MYLUA_TAG);
 
     av = newAV();
     /* mortalize it, so it is garbage collected if we abend */
@@ -626,7 +639,7 @@ coerce_to_av (lua_State * L, int visited_ix, int table_ix, char signature)
 	ownership_taken = av_store(av, (int)seq_ix + ix_offset, entry_value);
 	if (!ownership_taken) {
 	  SvREFCNT_dec (entry_value);
-          croak (R3ERR "av_store failed; " LUA_TAG);
+          croak (R3ERR "av_store failed; " MYLUA_TAG);
 	}
     }
 
@@ -666,7 +679,7 @@ coerce_to_pairs (lua_State * L, int visited_ix, int table_ix)
     }
 
     /* We call this recursively, so we need to make sure we have enough stack */
-    marpa_luaL_checkstack(L, 20, LUA_TAG);
+    marpa_luaL_checkstack(L, MYLUA_STACK_INCR, MYLUA_TAG);
 
     av = newAV();
     /* mortalize it, so it is garbage collected if we abend */
@@ -691,7 +704,7 @@ coerce_to_pairs (lua_State * L, int visited_ix, int table_ix)
             ownership_taken = av_store (av, (int) av_ix, entry_value);
             if (!ownership_taken) {
                 SvREFCNT_dec (entry_value);
-                croak (R3ERR "av_store failed; " LUA_TAG);
+                croak (R3ERR "av_store failed; " MYLUA_TAG);
             }
             av_ix++;
 
@@ -700,7 +713,7 @@ coerce_to_pairs (lua_State * L, int visited_ix, int table_ix)
             ownership_taken = av_store (av, (int) av_ix, entry_value);
             if (!ownership_taken) {
                 SvREFCNT_dec (entry_value);
-                croak (R3ERR "av_store failed; " LUA_TAG);
+                croak (R3ERR "av_store failed; " MYLUA_TAG);
             }
             av_ix++;
             marpa_lua_settop (L, base_of_loop_stack);
@@ -733,7 +746,7 @@ coerce_to_pairs (lua_State * L, int visited_ix, int table_ix)
 	ownership_taken = av_store(av, (int)av_ix, entry_value);
 	if (!ownership_taken) {
 	  SvREFCNT_dec (entry_value);
-          croak (R3ERR "av_store failed; " LUA_TAG);
+          croak (R3ERR "av_store failed; " MYLUA_TAG);
 	}
         av_ix ++;
 
@@ -741,7 +754,7 @@ coerce_to_pairs (lua_State * L, int visited_ix, int table_ix)
 	ownership_taken = av_store(av, (int)av_ix, entry_value);
 	if (!ownership_taken) {
 	  SvREFCNT_dec (entry_value);
-          croak (R3ERR "av_store failed; " LUA_TAG);
+          croak (R3ERR "av_store failed; " MYLUA_TAG);
 	}
         av_ix ++;
 
@@ -790,7 +803,6 @@ static void X_fallback_wrap(lua_State* L)
  * Does *NOT* do stack hygiene.
  */
 static void coerce_pcall_error (lua_State* L, int status) {
-    int original_type;
     switch (status) {
     case LUA_ERRERR:
         marpa_lua_pushliteral(L, R3ERR "pcall(); error running the message handler");
@@ -833,7 +845,7 @@ static const char* handle_pcall_error (lua_State* L, int status) {
     /* This is in the context of an error, so we have to be careful
      * about having enough Lua stack.
      */
-    marpa_luaL_checkstack(L, 20, LUA_TAG);
+    marpa_luaL_checkstack(L, MYLUA_STACK_INCR, MYLUA_TAG);
 
     coerce_pcall_error(L, status);
     marpa_lua_pushvalue(L, -1);
@@ -1441,13 +1453,37 @@ static void create_array_mt (lua_State* L) {
  * Here I try to do the minimum necessary to grab the traceback
  * data.
  */
-static int xlua_msghandler (lua_State *L) {
-  if (marpa_lua_type(L, -1) == LUA_TSTRING) {
+static int glue_msghandler (lua_State *L) {
+  const int original_type = marpa_lua_type(L, -1);
+  int traceback_type;
+  int result_ix;
+  int is_X = 0;
+  if (original_type == LUA_TSTRING) {
     const char *msg = marpa_lua_tolstring(L, 1, NULL);
     marpa_luaL_traceback(L, L, msg, 1);  /* append a standard traceback */
     return 1;
   }
-  X_fallback_wrap(L);
+  /* Is this an exception object table */
+  if (original_type == LUA_TTABLE) {
+     marpa_lua_getmetatable(L, -1);
+     marpa_lua_rawgetp (L, LUA_REGISTRYINDEX, &kollos_X_mt_key);
+     is_X = marpa_lua_compare (L, -2, -1, LUA_OPEQ);
+  }
+  if (!is_X) {
+    X_fallback_wrap(L);
+  }
+  /* At this point the exception table that will be
+   * the result is the top of stack
+   */
+  result_ix = marpa_lua_gettop(L);
+  traceback_type = marpa_lua_getfield(L, -1, "traceback");
+  /* Default (i.e, nil) is "true" */
+  if (traceback_type == LUA_TNIL || marpa_lua_toboolean(L, -1)) {
+    /* result.where = debug.traceback() */
+    marpa_luaL_traceback(L, L, NULL, 1);
+    marpa_lua_setfield(L, result_ix, "where");
+  }
+  marpa_lua_settop(L, result_ix);
   return 1;
 }
 
@@ -1464,7 +1500,7 @@ call_by_tag (lua_State * L, const char* tag, const char *codestr,
     int cache_ix;
     dTHX;
 
-    marpa_lua_pushcfunction (L, xlua_msghandler);
+    marpa_lua_pushcfunction (L, glue_msghandler);
 
     marpa_lua_getglobal (L, "glue");
     marpa_lua_getfield (L, -1, "code_by_tag");
@@ -1494,7 +1530,7 @@ call_by_tag (lua_State * L, const char* tag, const char *codestr,
         /* warn("%s %d narg=%d", __FILE__, __LINE__, narg); */
         if (!marpa_lua_checkstack (L, LUA_MINSTACK + 1)) {
             /* This error is not considered recoverable */
-            croak ("Internal Marpa::R3 error; could not grow stack: " LUA_TAG);
+            croak ("Internal Marpa::R3 error; could not grow stack: " MYLUA_TAG);
         }
         /* warn("%s %d narg=%d *sig=%c", __FILE__, __LINE__, narg, *sig); */
         switch (this_sig) {
@@ -1643,7 +1679,7 @@ static void coerce_to_lua_sequence(
     /* Below we will call this recursively,
      * so we need to make sure we have enough stack
      */
-    marpa_luaL_checkstack(L, 20, LUA_TAG);
+    marpa_luaL_checkstack(L, MYLUA_STACK_INCR, MYLUA_TAG);
 
     marpa_lua_newtable(L);
     result_ix = marpa_lua_gettop(L);
@@ -1698,7 +1734,7 @@ static void coerce_to_lua_table(
     /* Below we will call this recursively,
      * so we need to make sure we have enough stack
      */
-    marpa_luaL_checkstack (L, 20, LUA_TAG);
+    marpa_luaL_checkstack (L, MYLUA_STACK_INCR, MYLUA_TAG);
 
     marpa_lua_newtable (L);
     result_ix = marpa_lua_gettop (L);
@@ -1804,7 +1840,7 @@ u_read (Outer_R * outer_slr)
     Scanless_R *slr = slr_inner_get (outer_slr);
 
   call_by_tag (outer_slr->L,
-    LUA_TAG,
+    MYLUA_TAG,
     "local recce, perl_pos = ...\n"
     "if not recce.lmw_l0r then\n"
     "    recce:l0r_new(perl_pos)\n"    
@@ -1822,7 +1858,7 @@ u_read (Outer_R * outer_slr)
             break;
 
   call_by_tag (outer_slr->L,
-    LUA_TAG,
+    MYLUA_TAG,
     "local recce, perl_pos = ...\n"
     "-- print('codepoints:', inspect(recce.codepoints))\n"
     "-- print('perl_pos:', inspect(perl_pos))\n"
@@ -1849,7 +1885,7 @@ u_read (Outer_R * outer_slr)
             ops = (UV *) SvPV (*p_ops_sv, dummy);
         }
 
-        call_by_tag (outer_slr->L, LUA_TAG,
+        call_by_tag (outer_slr->L, MYLUA_TAG,
             "local recce, codepoint, perl_pos = ...\n"
             "if recce.trace_terminals >= 1 then\n"
             "   local q = recce.event_queue\n"
@@ -1888,7 +1924,7 @@ u_read (Outer_R * outer_slr)
                     }
                     value = (int) ops[++op_ix];
                     length = (int) ops[++op_ix];
-                    call_by_tag (outer_slr->L, LUA_TAG,
+                    call_by_tag (outer_slr->L, MYLUA_TAG,
                             "recce, symbol_id, value, length = ...\n"
                             "return recce.lmw_l0r:alternative(symbol_id, value, length)\n",
                             "Riii>i",
@@ -1903,7 +1939,7 @@ u_read (Outer_R * outer_slr)
                          */
                         slr->input_symbol_id = symbol_id;
 
-                        call_by_tag (outer_slr->L, LUA_TAG,
+                        call_by_tag (outer_slr->L, MYLUA_TAG,
                             "recce, codepoint, perl_pos, symbol_id = ...\n"
                             "if recce.trace_terminals >= 1 then\n"
                             "    local q = recce.event_queue\n"
@@ -1916,7 +1952,7 @@ u_read (Outer_R * outer_slr)
                         break;
                     case MARPA_ERR_NONE:
 
-                        call_by_tag (outer_slr->L, LUA_TAG,
+                        call_by_tag (outer_slr->L, MYLUA_TAG,
                             "recce, codepoint, perl_pos, symbol_id = ...\n"
                             "if recce.trace_terminals >= 1 then\n"
                             "   local q = recce.event_queue\n"
@@ -1954,7 +1990,7 @@ u_read (Outer_R * outer_slr)
                         return U_READ_REJECTED_CHAR;
                     }
 
-                    call_by_tag (outer_slr->L, LUA_TAG,
+                    call_by_tag (outer_slr->L, MYLUA_TAG,
                         "recce = ...\n"
                         "return recce.lmw_l0r:earleme_complete()\n",
                         "R>i",
@@ -1965,7 +2001,7 @@ u_read (Outer_R * outer_slr)
 
                         /* Advance one character before returning */
 
-                      call_by_tag (outer_slr->L, LUA_TAG,
+                      call_by_tag (outer_slr->L, MYLUA_TAG,
                           "recce, perl_pos = ...\n"
                           "recce:l0_convert_events(perl_pos)\n"
                           "return recce.lmw_l0r:is_exhausted()\n",
@@ -1979,7 +2015,7 @@ u_read (Outer_R * outer_slr)
                     }
                     if (result == -2) {
                         lua_Integer error_code;
-                      call_by_tag (outer_slr->L, LUA_TAG,
+                      call_by_tag (outer_slr->L, MYLUA_TAG,
                           "recce = ...\n"
                           "return recce.slg.lmw_l0g:error_code()\n",
                           "R>i",
@@ -2007,7 +2043,7 @@ u_read (Outer_R * outer_slr)
         {
             lua_Integer trace_terminals;
             slr->perl_pos++;
-            call_by_tag (outer_slr->L, LUA_TAG,
+            call_by_tag (outer_slr->L, MYLUA_TAG,
                 "recce = ...\n"
                 "return recce.trace_terminals\n",
                 "R>i", outer_slr->lua_ref, &trace_terminals);
@@ -2029,7 +2065,7 @@ u_pos_set (Outer_R * outer_slr, const char* name, int start_pos_arg, int length_
   int new_perl_pos;
   int new_end_pos;
 
-  call_by_tag (outer_slr->L, LUA_TAG,
+  call_by_tag (outer_slr->L, MYLUA_TAG,
       "recce = ...\n"
       "return #recce.codepoints\n",
       "R>i", outer_slr->lua_ref, &input_length);
@@ -2101,7 +2137,7 @@ static void slg_inner_init_properties (
         Marpa_Symbol_ID symbol_id;
         lua_Integer g1_symbol_count;
 
-        call_by_tag (outer_slg->L, LUA_TAG,
+        call_by_tag (outer_slg->L, MYLUA_TAG,
             "grammar = ...\n"
             "local g1g = grammar.lmw_g1g\n"
             "return g1g:highest_symbol_id()+1\n",
@@ -2122,7 +2158,7 @@ static void slg_inner_init_properties (
     {
         Marpa_Rule_ID rule_id;
         lua_Integer l0_rule_count;
-        call_by_tag (outer_slg->L, LUA_TAG,
+        call_by_tag (outer_slg->L, MYLUA_TAG,
             "grammar = ...\n"
             "local l0g = grammar.lmw_l0g\n"
             "return l0g:highest_rule_id()+1\n",
@@ -2184,7 +2220,7 @@ marpa_inner_slr_new (Outer_G* outer_slg)
 
     slr->token_values = newAV ();
 
-    call_by_tag (outer_slg->L, LUA_TAG,
+    call_by_tag (outer_slg->L, MYLUA_TAG,
         "grammar = ...\n"
         "local g1g = grammar.lmw_g1g\n"
         "local kollos = getmetatable(g1g).kollos\n"
@@ -2198,7 +2234,7 @@ marpa_inner_slr_new (Outer_G* outer_slg)
     {
         Marpa_Symbol_ID symbol_id;
         lua_Integer g1_symbol_count;
-    call_by_tag (outer_slg->L, LUA_TAG,
+    call_by_tag (outer_slg->L, MYLUA_TAG,
         "grammar = ...\n"
         "local g1g = grammar.lmw_g1g\n"
         "return g1g:highest_symbol_id()+1\n"
@@ -2222,7 +2258,7 @@ marpa_inner_slr_new (Outer_G* outer_slg)
     {
         Marpa_Rule_ID l0_rule_id;
         lua_Integer l0_rule_count;
-        call_by_tag (outer_slg->L, LUA_TAG,
+        call_by_tag (outer_slg->L, MYLUA_TAG,
             "grammar = ...\n"
             "local l0g = grammar.lmw_l0g\n"
             "return l0g:highest_rule_id()+1\n",
@@ -2262,8 +2298,8 @@ static Scanless_R* slr_inner_get(Outer_R* outer_slr) {
     const int base_of_stack = marpa_lua_gettop(L);
     Scanless_R *slr;
     /* Necessary every time to check stack ?? */
-    if (!marpa_lua_checkstack(L, 20)) {
-        croak ("Internal Marpa::R3 error; could not grow stack: " LUA_TAG);
+    if (!marpa_lua_checkstack(L, MYLUA_STACK_INCR)) {
+        croak ("Internal Marpa::R3 error; could not grow stack: " MYLUA_TAG);
     }
     marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, lua_ref);
     /* Lua stack: [ recce_table ] */
@@ -2315,7 +2351,7 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
     enum pass1_result_type pass1_result = none;
 
     call_by_tag (outer_slr->L,
-        LUA_TAG,
+        MYLUA_TAG,
         "recce=...\n"
         "local l0r = recce.lmw_l0r\n"
         "if not l0r then\n"
@@ -2326,7 +2362,7 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
     marpa_slr_lexeme_clear (slr);
 
 
-    call_by_tag (outer_slr->L, LUA_TAG,
+    call_by_tag (outer_slr->L, MYLUA_TAG,
         "recce = ...\n"
         "return recce.lmw_l0r:latest_earley_set()\n",
         "R>i", outer_slr->lua_ref, &earley_set);
@@ -2339,7 +2375,7 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
         int end_of_earley_items = 0;
         working_pos = slr->start_of_lexeme + (int)earley_set;
 
-        call_by_tag (outer_slr->L, LUA_TAG,
+        call_by_tag (outer_slr->L, MYLUA_TAG,
             "recce, earley_set = ...\n"
             "local return_value = recce.lmw_l0r:progress_report_start(earley_set)\n"
             "if return_value < 0 then\n"
@@ -2358,7 +2394,7 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
             lua_Integer origin;
             lua_Integer rule_id;
 
-            call_by_tag (outer_slr->L, LUA_TAG,
+            call_by_tag (outer_slr->L, MYLUA_TAG,
                 "recce = ...\n"
                 "local rule_id, dot_position, origin = recce.lmw_l0r:progress_item()\n"
                 "if not rule_id then return -1, 0, 0 end\n"
@@ -2380,7 +2416,7 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
                 goto NEXT_PASS1_REPORT_ITEM;
 
             call_by_tag (outer_slr->L,
-                LUA_TAG,
+                MYLUA_TAG,
                 "local recce, rule_id = ...\n"
                 "local g1_lexeme = recce.slg.l0_rules[rule_id].g1_lexeme\n"
                 "g1_lexeme = g1_lexeme or -1\n"
@@ -2408,7 +2444,7 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
             }
             symbol_r_properties = slr->symbol_r_properties + g1_lexeme;
 
-            call_by_tag (outer_slr->L, LUA_TAG,
+            call_by_tag (outer_slr->L, MYLUA_TAG,
                 "recce, g1_lexeme, start_of_lexeme, end_of_lexeme = ...\n"
                 "local is_expected = recce.lmw_g1r:terminal_is_expected(g1_lexeme)\n"
                 "if not is_expected then\n"
@@ -2488,7 +2524,7 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
                         MARPA_SLRTR_LEXEME_OUTPRIORITIZED;
                     lexeme_stack_event->t_lexeme_acceptable.
                         t_required_priority = high_lexeme_priority;
-                    call_by_tag (outer_slr->L, LUA_TAG,
+                    call_by_tag (outer_slr->L, MYLUA_TAG,
                         "recce, lexeme_start, lexeme_end,\n"
                         "    g1_lexeme, priority, required_priority = ...\n"
                         "if recce.trace_terminals > 0 then\n"
@@ -2513,7 +2549,7 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
                  * lexer rule.
                  * The upper level will have to figure things out.
                  */
-                call_by_tag (outer_slr->L, LUA_TAG,
+                call_by_tag (outer_slr->L, MYLUA_TAG,
                     "recce, rule_id, lexeme_start, lexeme_end = ...\n"
                     "if recce.trace_terminals > 0 then\n"
                     "local q = recce.event_queue\n"
@@ -2538,7 +2574,7 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
                     if (!l0_rule_r_properties->t_event_on_discard_active) {
                         goto NEXT_LEXEME_EVENT;
                     }
-                    call_by_tag (outer_slr->L, LUA_TAG,
+                    call_by_tag (outer_slr->L, MYLUA_TAG,
                         "recce, rule_id, lexeme_start, lexeme_end = ...\n"
                         "local q = recce.event_queue\n"
                         "local g1r = recce.lmw_g1r\n"
@@ -2600,7 +2636,7 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
                         t_start_of_lexeme;
                     slr->end_of_pause_lexeme =
                         lexeme_entry->t_lexeme_acceptable.t_end_of_lexeme;
-                    call_by_tag (outer_slr->L, LUA_TAG,
+                    call_by_tag (outer_slr->L, MYLUA_TAG,
                         "recce, lexeme_start, lexeme_end, g1_lexeme = ...\n"
                         "local q = recce.event_queue\n"
                         "if recce.trace_terminals > 2 then\n"
@@ -2633,7 +2669,7 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
                 const struct symbol_r_properties *symbol_r_properties =
                     slr->symbol_r_properties + g1_lexeme;
 
-                call_by_tag (outer_slr->L, LUA_TAG,
+                call_by_tag (outer_slr->L, MYLUA_TAG,
                     "recce, lexeme_start, lexeme_end, g1_lexeme = ...\n"
                     "if recce.trace_terminals > 2 then\n"
                     "    local q = recce.event_queue\n"
@@ -2659,7 +2695,7 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
                     break;
 
                 case MARPA_ERR_DUPLICATE_TOKEN:
-                    call_by_tag (outer_slr->L, LUA_TAG,
+                    call_by_tag (outer_slr->L, MYLUA_TAG,
                         "recce, lexeme_start, lexeme_end, lexeme = ...\n"
                         "if recce.trace_terminals > 0 then\n"
                         "    local q = recce.event_queue\n"
@@ -2673,7 +2709,7 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
                     break;
 
                 case MARPA_ERR_NONE:
-                    call_by_tag (outer_slr->L, LUA_TAG,
+                    call_by_tag (outer_slr->L, MYLUA_TAG,
                         "recce, lexeme_start, lexeme_end, lexeme = ...\n"
                         "if recce.trace_terminals > 0 then\n"
                         "    local q = recce.event_queue\n"
@@ -2690,7 +2726,7 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
                         slr->end_of_pause_lexeme =
                             event->t_lexeme_acceptable.t_end_of_lexeme;
 
-                        call_by_tag (outer_slr->L, LUA_TAG,
+                        call_by_tag (outer_slr->L, MYLUA_TAG,
                             "recce, lexeme_start, lexeme_end, lexeme = ...\n"
                             "local q = recce.event_queue\n"
                             "if recce.trace_terminals > 2 then\n"
@@ -2719,7 +2755,7 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
 
 
 
-        call_by_tag (outer_slr->L, LUA_TAG,
+        call_by_tag (outer_slr->L, MYLUA_TAG,
             "local recce = ...\n"
             "local g1r = recce.lmw_g1r\n"
             "return g1r:earleme_complete()\n",
@@ -2731,13 +2767,13 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
         }
         slr->lexer_start_pos = slr->perl_pos = slr->end_of_lexeme;
         if (return_value > 0) {
-            call_by_tag (outer_slr->L, LUA_TAG,
+            call_by_tag (outer_slr->L, MYLUA_TAG,
                 "local recce, perl_pos = ...\n"
                 "recce:g1_convert_events(perl_pos)\n",
                 "Ri>", outer_slr->lua_ref, slr->perl_pos);
         }
 
-        call_by_tag (outer_slr->L, LUA_TAG,
+        call_by_tag (outer_slr->L, MYLUA_TAG,
             "local recce, start_pos, lexeme_length = ...\n"
             "local g1r = recce.lmw_g1r\n"
             "local latest_earley_set = g1r:latest_earley_set()\n"
@@ -2866,7 +2902,7 @@ PPCODE:
     marpa_lua_settop(L, base_of_stack);
 
 
-    call_by_tag (outer_slg->L, LUA_TAG,
+    call_by_tag (outer_slg->L, MYLUA_TAG,
         "slg = ...\n"
         "slg:post_new()\n"
         ,
@@ -2913,7 +2949,7 @@ PPCODE:
   Scanless_G* slg = slg_inner_get(outer_slg);
   lua_Integer highest_g1_symbol_id;
 
-    call_by_tag (outer_slg->L, LUA_TAG,
+    call_by_tag (outer_slg->L, MYLUA_TAG,
         "grammar = ...\n"
         "local g1g = grammar.lmw_g1g\n"
         "return g1g:highest_symbol_id()\n"
@@ -2956,7 +2992,7 @@ PPCODE:
 {
   Scanless_G* slg = slg_inner_get(outer_slg);
   lua_Integer highest_g1_symbol_id;
-    call_by_tag (outer_slg->L, LUA_TAG,
+    call_by_tag (outer_slg->L, MYLUA_TAG,
         "grammar = ...\n"
         "local g1g = grammar.lmw_g1g\n"
         "return g1g:highest_symbol_id()\n"
@@ -2991,7 +3027,7 @@ PPCODE:
   Scanless_G* slg = slg_inner_get(outer_slg);
   lua_Integer highest_g1_symbol_id;
     struct symbol_g_properties * g_properties = slg->symbol_g_properties + g1_lexeme;
-    call_by_tag (outer_slg->L, LUA_TAG,
+    call_by_tag (outer_slg->L, MYLUA_TAG,
         "grammar = ...\n"
         "local g1g = grammar.lmw_g1g\n"
         "return g1g:highest_symbol_id()\n"
@@ -3055,7 +3091,7 @@ PPCODE:
   struct symbol_g_properties *g_properties =
     slg->symbol_g_properties + g1_lexeme;
 
-    call_by_tag (outer_slg->L, LUA_TAG,
+    call_by_tag (outer_slg->L, MYLUA_TAG,
         "grammar = ...\n"
         "local g1g = grammar.lmw_g1g\n"
         "return g1g:highest_symbol_id()\n"
@@ -3117,7 +3153,7 @@ PPCODE:
     struct l0_rule_g_properties * g_properties = slg->l0_rule_g_properties + l0_rule_id;
     lua_Integer highest_l0_rule_id;
 
-    call_by_tag (outer_slg->L, LUA_TAG,
+    call_by_tag (outer_slg->L, MYLUA_TAG,
         "grammar = ...\n"
         "local l0g = grammar.lmw_l0g\n"
         "return l0g:highest_rule_id()+1\n",
@@ -3172,7 +3208,7 @@ PPCODE:
     slg->l0_rule_g_properties + l0_rule_id;
   lua_Integer highest_l0_rule_id;
 
-    call_by_tag (outer_slg->L, LUA_TAG,
+    call_by_tag (outer_slg->L, MYLUA_TAG,
         "grammar = ...\n"
         "local l0g = grammar.lmw_l0g\n"
         "return l0g:highest_rule_id()+1\n",
@@ -3236,7 +3272,7 @@ PPCODE:
          * merge with other Lua, these checks may not be
          * needed.
          */
-        call_by_tag (outer_slg->L, LUA_TAG,
+        call_by_tag (outer_slg->L, MYLUA_TAG,
             "slg = ...\n"
             "local l0g = slg.lmw_l0g\n"
             "if not l0g then error('No l0g') end\n"
@@ -3295,9 +3331,9 @@ PPCODE:
     const int base_of_stack = marpa_lua_gettop(L);
     int slr_ix;
 
-    if (!marpa_lua_checkstack(L, 20))
+    if (!marpa_lua_checkstack(L, MYLUA_STACK_INCR))
     {
-        croak ("Internal Marpa::R3 error; could not grow stack: " LUA_TAG);
+        croak ("Internal Marpa::R3 error; could not grow stack: " MYLUA_TAG);
     }
     outer_slr->L = L;
     /* Take ownership of a new reference to the Lua state */
@@ -3323,7 +3359,7 @@ PPCODE:
     marpa_lua_settop(L, base_of_stack);
   }
 
-  call_by_tag (outer_slr->L, LUA_TAG,
+  call_by_tag (outer_slr->L, MYLUA_TAG,
       "local recce = ...\n"
       "recce.lmw_g1r = kollos.recce_new(recce.slg.lmw_g1g)\n"
       "recce.too_many_earley_items = -1\n"
@@ -3343,7 +3379,7 @@ DESTROY( outer_slr )
     Outer_R *outer_slr;
 PPCODE:
 {
-  call_by_tag (outer_slr->L, LUA_TAG,
+  call_by_tag (outer_slr->L, MYLUA_TAG,
       "local recce = ...\n"
       "valuation_reset(recce)\n"
       "return 0\n",
@@ -3404,7 +3440,7 @@ PPCODE:
   slr->end_of_pause_lexeme = -1;
 
   /* Clear event queue */
-  call_by_tag (outer_slr->L, LUA_TAG,
+  call_by_tag (outer_slr->L, MYLUA_TAG,
       "local recce = ...\n"
       "recce.event_queue = {}\n",
       "R>", outer_slr->lua_ref);
@@ -3423,7 +3459,7 @@ PPCODE:
 
           slr->start_of_lexeme = slr->perl_pos = slr->lexer_start_pos;
           slr->lexer_start_pos = -1;
-                            call_by_tag (outer_slr->L, LUA_TAG,
+                            call_by_tag (outer_slr->L, MYLUA_TAG,
                                 "local recce, perl_pos = ...\n"
                                 "recce.lmw_l0r = nil\n"
                                 "if recce.trace_terminals >= 1 then\n"
@@ -3465,7 +3501,7 @@ PPCODE:
           lua_Integer discard_mode;
           const char *result_string;
 
-          call_by_tag (outer_slr->L, LUA_TAG,
+          call_by_tag (outer_slr->L, MYLUA_TAG,
               "local recce = ...\n"
               "local g1r = recce.lmw_g1r\n"
               "return g1r:is_exhausted()\n"
@@ -3481,7 +3517,7 @@ PPCODE:
 
       {
         lua_Integer event_count;
-        call_by_tag (outer_slr->L, LUA_TAG,
+        call_by_tag (outer_slr->L, MYLUA_TAG,
             "local recce = ...\n"
             "return #recce.event_queue\n",
             "R>i", outer_slr->lua_ref, &event_count);
@@ -3493,7 +3529,7 @@ PPCODE:
 
         {
             lua_Integer trace_terminals;
-            call_by_tag (outer_slr->L, LUA_TAG,
+            call_by_tag (outer_slr->L, MYLUA_TAG,
                 "recce = ...\n"
                 "return recce.trace_terminals\n",
                 "R>i", outer_slr->lua_ref, &trace_terminals);
@@ -3595,7 +3631,7 @@ PPCODE:
     {
     case 2:
     { lua_Integer value_is_literal;
-            call_by_tag (outer_slr->L, LUA_TAG,
+            call_by_tag (outer_slr->L, MYLUA_TAG,
                 "recce = ...\n"
                 "local g1r = recce.lmw_g1r\n"
                 "local kollos = getmetatable(g1r).kollos\n"
@@ -3614,7 +3650,7 @@ PPCODE:
         SV *token_value = ST (2);
         if (IS_PERL_UNDEF (token_value))
           { lua_Integer value_is_undef;
-            call_by_tag (outer_slr->L, LUA_TAG,
+            call_by_tag (outer_slr->L, MYLUA_TAG,
                 "recce = ...\n"
                 "local g1r = recce.lmw_g1r\n"
                 "local kollos = getmetatable(g1r).kollos\n"
@@ -3638,7 +3674,7 @@ PPCODE:
         }
         av_push (slr->token_values, newSVsv (token_value));
         token_ix = av_len (slr->token_values);
-        call_by_tag (outer_slr->L, LUA_TAG,
+        call_by_tag (outer_slr->L, MYLUA_TAG,
             "local recce, token_sv = ...;\n"
             "local new_token_ix = #recce.token_values + 1\n"
             "recce.token_values[new_token_ix] = token_sv\n"
@@ -3653,7 +3689,7 @@ PPCODE:
     }
 
 
-    call_by_tag (outer_slr->L, LUA_TAG,
+    call_by_tag (outer_slr->L, MYLUA_TAG,
         "recce, symbol_id, token_ix = ...\n"
         "local g1r = recce.lmw_g1r\n"
         "local return_value = g1r:alternative(symbol_id, token_ix, 1)\n"
@@ -3691,7 +3727,7 @@ PPCODE:
         slr->start_of_pause_lexeme ? (slr->end_of_pause_lexeme -
         slr->start_of_pause_lexeme) : -1;
 
-    call_by_tag (outer_slr->L, LUA_TAG,
+    call_by_tag (outer_slr->L, MYLUA_TAG,
         "recce = ...\n"
         "return #recce.codepoints\n",
         "R>i", outer_slr->lua_ref, &input_length);
@@ -3720,7 +3756,7 @@ PPCODE:
         lexeme_length = end_pos - start_pos;
     }
 
-    call_by_tag (outer_slr->L, LUA_TAG,
+    call_by_tag (outer_slr->L, MYLUA_TAG,
         "local recce = ...\n"
         "local g1r = recce.lmw_g1r\n"
         "recce.event_queue = {}\n"
@@ -3729,7 +3765,7 @@ PPCODE:
 
     slr->is_external_scanning = 0;
     if (result >= 0) {
-        call_by_tag (outer_slr->L, LUA_TAG,
+        call_by_tag (outer_slr->L, MYLUA_TAG,
             "local recce, start_pos, lexeme_length, perl_pos = ...\n"
             "recce:g1_convert_events(perl_pos)\n"
             "local g1r = recce.lmw_g1r\n"
@@ -3742,7 +3778,7 @@ PPCODE:
         XSRETURN_IV (slr->perl_pos);
     }
     if (result == -2) {
-        call_by_tag (outer_slr->L, LUA_TAG,
+        call_by_tag (outer_slr->L, MYLUA_TAG,
             "recce = ...\n"
             "local error_code = recce.slg.lmw_g1g:error_code()\n"
             "if error_code == kollos.err.PARSE_EXHAUSTED then\n"
@@ -3771,7 +3807,7 @@ PPCODE:
   const Scanless_G *slg = slr->slg;
   lua_Integer highest_l0_rule_id;
 
-    call_by_tag (outer_slr->L, LUA_TAG,
+    call_by_tag (outer_slr->L, MYLUA_TAG,
         "recce = ...\n"
         "grammar = recce.slg\n"
         "local l0g = grammar.lmw_l0g\n"
@@ -3824,7 +3860,7 @@ PPCODE:
   const Scanless_G *slg = slr->slg;
   lua_Integer highest_g1_symbol_id;
 
-    call_by_tag (outer_slr->L, LUA_TAG,
+    call_by_tag (outer_slr->L, MYLUA_TAG,
         "recce = ...\n"
         "grammar = recce.slg\n"
         "local g1g = grammar.lmw_g1g\n"
@@ -3952,7 +3988,7 @@ PPCODE:
   const Scanless_G *slg = slr->slg;
   lua_Integer highest_g1_symbol_id;
 
-    call_by_tag (outer_slr->L, LUA_TAG,
+    call_by_tag (outer_slr->L, MYLUA_TAG,
         "recce = ...\n"
         "grammar = recce.slg\n"
         "local g1g = grammar.lmw_g1g\n"
@@ -3996,7 +4032,7 @@ PPCODE:
   const Scanless_G *slg = slr->slg;
   lua_Integer highest_g1_symbol_id;
 
-    call_by_tag (outer_slr->L, LUA_TAG,
+    call_by_tag (outer_slr->L, MYLUA_TAG,
         "recce = ...\n"
         "grammar = recce.slg\n"
         "local g1g = grammar.lmw_g1g\n"
@@ -4039,7 +4075,7 @@ PPCODE:
     lua_Integer result;
     SV *new_values;
 
-    call_by_tag (outer_slr->L, LUA_TAG,
+    call_by_tag (outer_slr->L, MYLUA_TAG,
         "local recce = ...; return recce:find_and_do_ops()\n",
         "R>iC", outer_slr->lua_ref, &result, &new_values);
 
@@ -4048,7 +4084,7 @@ PPCODE:
         {
             SV* step_type;
             lua_Integer parm2;
-            call_by_tag (outer_slr->L, LUA_TAG,
+            call_by_tag (outer_slr->L, MYLUA_TAG,
               "local recce = ...\n"
               "local this = recce.this_step\n"
               "local step_type = this.type\n"
@@ -4064,7 +4100,7 @@ PPCODE:
     case 1:
         {
             SV* step_type;
-            call_by_tag (outer_slr->L, LUA_TAG,
+            call_by_tag (outer_slr->L, MYLUA_TAG,
               "local recce = ...\n"
               "return recce.this_step.type\n",
               "R>C", outer_slr->lua_ref, &step_type);
@@ -4086,7 +4122,7 @@ PPCODE:
   Scanless_R *slr = slr_inner_get(outer_slr);
   lua_Integer gp_result;
 
-    call_by_tag (outer_slr->L, LUA_TAG,
+    call_by_tag (outer_slr->L, MYLUA_TAG,
         "recce = ...\n"
         "local g1r = recce.lmw_g1r\n"
         "local return_value = g1r:start_input()\n"
@@ -4103,7 +4139,7 @@ PPCODE:
       slr_g1_error (outer_slr));
   }
 
-    call_by_tag (outer_slr->L, LUA_TAG,
+    call_by_tag (outer_slr->L, MYLUA_TAG,
         "recce, perl_pos = ...\n"
         "recce:g1_convert_events(perl_pos)\n"
         ,
@@ -4152,10 +4188,10 @@ PPCODE:
      */
     if (!marpa_lua_checkstack(L, 50))
     {
-        croak ("Internal Marpa::R3 error; could not grow stack: " LUA_TAG);
+        croak ("Internal Marpa::R3 error; could not grow stack: " MYLUA_TAG);
     }
 
-    marpa_lua_pushcfunction (L, xlua_msghandler);
+    marpa_lua_pushcfunction (L, glue_msghandler);
     msghandler_ix = marpa_lua_gettop(L);
 
     Newx( p_extra, 1, struct lua_extraspace);
@@ -4173,7 +4209,7 @@ PPCODE:
     loaded_ix = marpa_lua_gettop(L);
 
     /* Set up preload of inspect package */
-    if (marpa_luaL_loadbuffer(L, inspect_loader, inspect_loader_length, LUA_TAG)
+    if (marpa_luaL_loadbuffer(L, inspect_loader, inspect_loader_length, MYLUA_TAG)
       != LUA_OK) {
       const char* msg = marpa_lua_tostring(L, -1);
       croak(msg);
@@ -4185,7 +4221,7 @@ PPCODE:
     marpa_lua_setfield(L, preload_ix, "kollos.metal");
 
     /* Set up preload of kollos package */
-    if (marpa_luaL_loadbuffer(L, kollos_loader, kollos_loader_length, LUA_TAG)
+    if (marpa_luaL_loadbuffer(L, kollos_loader, kollos_loader_length, MYLUA_TAG)
       != LUA_OK) {
       const char* msg = marpa_lua_tostring(L, -1);
       croak(msg);
@@ -4196,7 +4232,7 @@ PPCODE:
      * This will load the inspect, kollos.metal and kollos
      * packages.
      */
-    if (marpa_luaL_loadbuffer(L, glue_loader, glue_loader_length, LUA_TAG)
+    if (marpa_luaL_loadbuffer(L, glue_loader, glue_loader_length, MYLUA_TAG)
       != LUA_OK) {
       const char* msg = marpa_lua_tostring(L, -1);
       croak(msg);

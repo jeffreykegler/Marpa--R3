@@ -703,7 +703,7 @@ inspect package to dump it.
          local nl = ''
          local where = self.where
          if where then
-             if desc:substr(-1) ~= '\n' then nl = '\n' end
+             if desc:sub(-1) ~= '\n' then nl = '\n' end
          else
              where = ''
          end
@@ -723,7 +723,7 @@ inspect package to dump it.
          local nl = ''
          local where = self.where
          if where then
-             if desc:substr(-1) ~= '\n' then nl = '\n' end
+             if desc:sub(-1) ~= '\n' then nl = '\n' end
          else
              where = ''
          end

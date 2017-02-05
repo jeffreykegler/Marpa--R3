@@ -213,7 +213,7 @@ PPCODE:
     int msghandler_ix;
     int type;
 
-    marpa_lua_pushcfunction(L, xlua_msghandler);
+    marpa_lua_pushcfunction(L, glue_msghandler);
     msghandler_ix = marpa_lua_gettop(L);
 
     marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, outer_slg->lua_ref);
@@ -247,7 +247,7 @@ PPCODE:
     int cache_ix;
     int type;
 
-    marpa_lua_pushcfunction(L, xlua_msghandler);
+    marpa_lua_pushcfunction(L, glue_msghandler);
     msghandler_ix = marpa_lua_gettop(L);
 
     marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, outer_slg->lua_ref);
@@ -298,7 +298,7 @@ PPCODE:
 
     PERL_UNUSED_VAR(error_tag); /* Silence warning */
 
-    marpa_lua_pushcfunction(L, xlua_msghandler);
+    marpa_lua_pushcfunction(L, glue_msghandler);
     msghandler_ix = marpa_lua_gettop(L);
 
     marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, outer_slr->lua_ref);
@@ -335,7 +335,7 @@ PPCODE:
 
     PERL_UNUSED_VAR(error_tag); /* Silence warning */
 
-    marpa_lua_pushcfunction(L, xlua_msghandler);
+    marpa_lua_pushcfunction(L, glue_msghandler);
     msghandler_ix = marpa_lua_gettop(L);
 
     marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, outer_slr->lua_ref);
@@ -382,7 +382,7 @@ PPCODE:
     const int base_of_stack = marpa_lua_gettop (L);
     int msghandler_ix;
 
-    marpa_lua_pushcfunction(L, xlua_msghandler);
+    marpa_lua_pushcfunction(L, glue_msghandler);
     msghandler_ix = marpa_lua_gettop(L);
 
     === LUA_LOAD_STRING ===
@@ -404,7 +404,7 @@ PPCODE:
     int msghandler_ix;
     int kollos_ix;
 
-    marpa_lua_pushcfunction(L, xlua_msghandler);
+    marpa_lua_pushcfunction(L, glue_msghandler);
     msghandler_ix = marpa_lua_gettop(L);
     marpa_lua_getglobal (L, "kollos");
     kollos_ix = marpa_lua_gettop(L);
