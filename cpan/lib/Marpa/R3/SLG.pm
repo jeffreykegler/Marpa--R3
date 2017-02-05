@@ -1245,7 +1245,7 @@ END_OF_LUA
                    )
             end
         end
-        msgs[#msgs+1] = 'Counted nullables confuse Marpa -- please rewrite the grammar'
+        msgs[#msgs+1] = 'Counted nullables confuse Marpa -- please rewrite the grammar\n'
         kollos.userX( table.concat(msgs) )
     end
     if error_code == kollos.err["START_NOT_LHS"] then

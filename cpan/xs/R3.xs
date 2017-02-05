@@ -1463,6 +1463,7 @@ static int glue_msghandler (lua_State *L) {
     marpa_luaL_traceback(L, L, msg, 1);  /* append a standard traceback */
     return 1;
   }
+  result_ix = marpa_lua_gettop(L);
   /* Is this an exception object table */
   if (original_type == LUA_TTABLE) {
      marpa_lua_getmetatable(L, -1);
@@ -1471,12 +1472,12 @@ static int glue_msghandler (lua_State *L) {
   }
   if (!is_X) {
     X_fallback_wrap(L);
+    result_ix = marpa_lua_gettop(L);
   }
   /* At this point the exception table that will be
    * the result is the top of stack
    */
-  result_ix = marpa_lua_gettop(L);
-  traceback_type = marpa_lua_getfield(L, -1, "traceback");
+  traceback_type = marpa_lua_getfield(L, result_ix, "traceback");
   /* Default (i.e, nil) is "true" */
   if (traceback_type == LUA_TNIL || marpa_lua_toboolean(L, -1)) {
     /* result.where = debug.traceback() */
