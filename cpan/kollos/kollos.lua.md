@@ -696,7 +696,9 @@ inspect package to dump it.
     local function X_fallback_tostring(self)
          -- print("in X_fallback_tostring")
          local object = self.object
-         if not object then return "Kollos internal error: No object in X_fallback_tostring" end
+         if not object then
+             return debug.traceback("Kollos internal error: No object in X_fallback_tostring")
+         end
         return inspect(object, { depth = 3 })
     end
 
@@ -704,7 +706,7 @@ inspect package to dump it.
          -- print("in X_tostring")
          local string = self.string
          if string then return string end
-         return X_fallback_tostring(self)
+         return debug.traceback("Kollos internal error: No string in X_tostring")
     end
 
     _M.mt_X.__tostring = X_tostring
