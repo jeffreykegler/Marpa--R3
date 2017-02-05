@@ -694,10 +694,14 @@ inspect package to dump it.
 ```
     -- miranda: section+ populate metatables
     local function X_fallback_tostring(self)
-        return inspect(self, { depth = 3 })
+         -- print("in X_fallback_tostring")
+         local object = self.object
+         if not object then return "Kollos internal error: No object in X_fallback_tostring" end
+        return inspect(object, { depth = 3 })
     end
 
     local function X_tostring(self)
+         -- print("in X_tostring")
          local string = self.string
          if string then return string end
          return X_fallback_tostring(self)
