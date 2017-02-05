@@ -1397,6 +1397,26 @@ static void create_array_mt (lua_State* L) {
     marpa_lua_settop(L, base_of_stack);
 }
 
+/* [ -1, +1 ]
+ * Wraps the object on top of the stack in an
+ * X_fallback object.  Removes the original object
+ * from the stack, and leaves the wrapper on top
+ * of the stack.
+ */
+static void X_fallback_wrap(lua_State* L)
+{
+     /* [ object ] */
+     marpa_lua_newtable(L);
+     /* [ object, wrapper ] */
+     marpa_lua_rawgetp (L, LUA_REGISTRYINDEX, (void*)&kollos_X_fallback_mt_key);
+     marpa_lua_setmetatable(L, -2);
+     /* [ object, wrapper ] */
+     marpa_lua_rotate(L, -2, 1);
+     /* [ wrapper, object ] */
+     marpa_lua_setfield(L, -2, "object");
+     /* [ wrapper ] */
+}
+
 /*
  * Message handler used to run all chunks
  */
