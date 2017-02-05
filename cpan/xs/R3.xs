@@ -1419,13 +1419,17 @@ static void X_fallback_wrap(lua_State* L)
 
 /*
  * Message handler used to run all chunks
+ * The message processing can be significant.
+ * Here I try to do the minimum necessary to grab the traceback
+ * data.
  */
 static int xlua_msghandler (lua_State *L) {
-  const char *msg;
-  msg = marpa_luaL_tolstring(L, 1, NULL);
-  /* ADD_TRACEBACK: ; */
-  marpa_luaL_traceback(L, L, msg, 1);  /* append a standard traceback */
-  return 1;  /* return the traceback */
+  if (marpa_lua_type(L, -1) == LUA_TSTRING) {
+    const char *msg = marpa_lua_tolstring(L, 1, NULL);
+    marpa_luaL_traceback(L, L, msg, 1);  /* append a standard traceback */
+    return 1;
+  }
+  return 1;  /* return the original object */
 }
 
 static void
