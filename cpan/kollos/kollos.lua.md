@@ -747,7 +747,7 @@ but that is not necessarily the case.)
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.exception(msg)
+    function _M.userX(msg)
         local X = { desc = msg, traceback = false }
         setmetatable(X, _M.mt_X)
         error(X)

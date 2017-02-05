@@ -1216,7 +1216,7 @@ END_OF_LUA
     local grammar, lmw_name, error_code = ...
     local lmw_g = grammar[lmw_name]
     if error_code == kollos.err["NO_RULES"] then
-        return "fail", 'Attempted to precompute grammar with no rules'
+        kollos.userX('Attempted to precompute grammar with no rules')
     end
     if error_code == kollos.err["NULLING_TERMINAL"] then
         local msgs = {}
@@ -1231,7 +1231,7 @@ END_OF_LUA
             end
         end
         msgs[#msgs+1] = 'A terminal symbol cannot also be a nulling symbol'
-        return "fail", table.concat(msgs)
+        kollos.userX( table.concat(msgs) )
     end
     if error_code == kollos.err["COUNTED_NULLABLE"] then
         local msgs = {}
@@ -1246,16 +1246,16 @@ END_OF_LUA
             end
         end
         msgs[#msgs+1] = 'Counted nullables confuse Marpa -- please rewrite the grammar'
-        return "fail", table.concat(msgs)
+        kollos.userX( table.concat(msgs) )
     end
     if error_code == kollos.err["START_NOT_LHS"] then
-        error( "Start symbol " .. lmw_g.start_name .. " not on LHS of any rule");
+        kollos.userX( "Start symbol " .. lmw_g.start_name .. " not on LHS of any rule");
     end
     if error_code == kollos.err["NO_START_SYMBOL"] then
-            error('No start symbol')
+            kollos.userX('No start symbol')
     end
     if error_code ~= kollos.err["UNPRODUCTIVE_START"] then
-            return "fail", lmw_g:error_description()
+            kollos.userX( lmw_g:error_description() )
     end
     return "ok"
 END_OF_LUA
