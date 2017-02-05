@@ -737,6 +737,23 @@ inspect package to dump it.
 
 ```
 
+A function to throw exceptions which do not carry a
+traceback.  This is for "user" errors, where "user"
+means the error can be explained in user-friendly terms
+and things like stack traces are unnecessary.
+(These errors are also usually "user" errors in the sense
+that the user caused them,
+but that is not necessarily the case.)
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.exception(msg)
+        local X = { desc = msg, traceback = false }
+        setmetatable(X, _M.mt_X)
+        error(X)
+    end
+```
+
 ### Diagnostics
 
 This is not currently used.
