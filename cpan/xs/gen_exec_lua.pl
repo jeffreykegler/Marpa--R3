@@ -84,7 +84,6 @@ my $lua_exec_body = <<'END_OF_EXEC_BODY';
         if (status != 0) {
             const char *exception_string = handle_pcall_error(L, status);
             /* An exception object is on top of the stack */
-            marpa_lua_setglobal(L, "last_exception");
             marpa_lua_settop (L, base_of_stack);
             croak(exception_string);
         }
@@ -151,7 +150,6 @@ my $lua_exec_sig_body = <<'END_OF_EXEC_SIG_BODY';
         if (status != 0) {
             const char *exception_string = handle_pcall_error(L, status);
             /* An exception object is on top of the stack */
-            marpa_lua_setglobal(L, "last_exception");
             marpa_lua_settop (L, base_of_stack);
             croak(exception_string);
         }

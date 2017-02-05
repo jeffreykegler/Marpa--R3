@@ -760,6 +760,59 @@ coerce_to_pairs (lua_State * L, int visited_ix, int table_ix)
     return result;
 }
 
+/* [ -1, +1 ]
+ * Wraps the object on top of the stack in an
+ * X_fallback object.  Removes the original object
+ * from the stack, and leaves the wrapper on top
+ * of the stack.  Obeys stack hygiene.
+ */
+static void X_fallback_wrap(lua_State* L)
+{
+     /* [ object ] */
+     marpa_lua_newtable(L);
+     /* [ object, wrapper ] */
+     marpa_lua_rawgetp (L, LUA_REGISTRYINDEX, (void*)&kollos_X_fallback_mt_key);
+     marpa_lua_setmetatable(L, -2);
+     /* [ object, wrapper ] */
+     marpa_lua_rotate(L, -2, 1);
+     /* [ wrapper, object ] */
+     marpa_lua_setfield(L, -2, "object");
+     /* [ wrapper ] */
+}
+
+/* Called after pcall error -- assumes that "status" is
+ * the non-zero return value of lua_pcall() and that the
+ * error object is on top of the stack.  Leaves an
+ * "exception object" on top of the stack, and in
+ * a global.  At this point, the "exception object"
+ * might simply be a string.
+ *
+ * Does *NOT* do stack hygiene.
+ */
+static void coerce_pcall_error (lua_State* L, int status) {
+    int original_type;
+    switch (status) {
+    case LUA_ERRERR:
+        marpa_lua_pushliteral(L, R3ERR "pcall(); error running the message handler");
+        return;
+    case LUA_ERRMEM:
+        marpa_lua_pushliteral(L, R3ERR "pcall(); error running the message handler");
+        return;
+    case LUA_ERRGCMM:
+        marpa_lua_pushliteral(L, R3ERR "pcall(); error running a gc_ metamethod");
+        return;
+    default:
+        marpa_lua_pushfstring(L, R3ERR "pcall(); bad status %d", status);
+        return;
+    case LUA_ERRRUN:
+        break;
+    }
+
+    original_type = marpa_lua_type(L, -1);
+    if (original_type == LUA_TSTRING) { return; }
+    X_fallback_wrap(L);
+}
+
 /* Called after pcall error -- assumes that "status" is
  * the non-zero return value of lua_pcall() and that the
  * error object is on top of the stack.  Leaves the exception
@@ -775,39 +828,26 @@ static const char* handle_pcall_error (lua_State* L, int status) {
 
     /* The best way to get a self-expanding sprintf buffer is to use a
      * Perl SV.  We set it mortal, so that Perl makes sure that it is
-     * garbage collected after the next context switch.  Note 'temp_sv' is not
-     * used in some cases, for which we do not optimize.
+     * garbage collected after the next context switch.
      */
-    SV*temp_sv = sv_newmortal();
-
-    switch (status) {
-    case LUA_ERRERR:
-        return R3ERR "pcall(); error running the message handler";
-    case LUA_ERRMEM:
-        return R3ERR "pcall(); error running the message handler";
-    case LUA_ERRGCMM:
-        return R3ERR "pcall(); error running a gc_ metamethod";
-    default:
-        sv_setpvf(temp_sv, R3ERR "pcall(); bad status %d", status);
-        return SvPV_nolen(temp_sv);
-    case LUA_ERRRUN:
-        break;
-    }
+    SV* temp_sv = sv_newmortal();
 
     /* This is in the context of an error, so we have to be careful
      * about having enough Lua stack.
      */
-    /* Lua stack: [ exception_object ] */
     marpa_luaL_checkstack(L, 20, LUA_TAG);
-    /* Lua stack: [ exception_object ] */
+
+    coerce_pcall_error(L, status);
+    marpa_lua_pushvalue(L, -1);
+    marpa_lua_setglobal(L, "last_exception");
 
     {
         size_t len;
-        const char *lua_exception_string = marpa_luaL_tolstring(L, exception_object_ix, &len);
+        const char *lua_exception_string = marpa_luaL_tolstring(L, -1, &len);
         sv_setpvn(temp_sv, lua_exception_string, (STRLEN)len);
     }
 
-    marpa_lua_settop(L, exception_object_ix);
+    marpa_lua_settop(L, exception_object_ix-1);
     return SvPV_nolen(temp_sv);
 }
 
@@ -1395,26 +1435,6 @@ static void create_array_mt (lua_State* L) {
     marpa_luaL_setfuncs(L, marpa_array_meths, 0);
     /* Lua stack: [mt] */
     marpa_lua_settop(L, base_of_stack);
-}
-
-/* [ -1, +1 ]
- * Wraps the object on top of the stack in an
- * X_fallback object.  Removes the original object
- * from the stack, and leaves the wrapper on top
- * of the stack.
- */
-static void X_fallback_wrap(lua_State* L)
-{
-     /* [ object ] */
-     marpa_lua_newtable(L);
-     /* [ object, wrapper ] */
-     marpa_lua_rawgetp (L, LUA_REGISTRYINDEX, (void*)&kollos_X_fallback_mt_key);
-     marpa_lua_setmetatable(L, -2);
-     /* [ object, wrapper ] */
-     marpa_lua_rotate(L, -2, 1);
-     /* [ wrapper, object ] */
-     marpa_lua_setfield(L, -2, "object");
-     /* [ wrapper ] */
 }
 
 /*
