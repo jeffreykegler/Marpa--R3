@@ -699,14 +699,35 @@ inspect package to dump it.
          if not object then
              return debug.traceback("Kollos internal error: No object in X_fallback_tostring")
          end
-        return inspect(object, { depth = 3 })
+         local desc = inspect(object, { depth = 3 })
+         local nl = ''
+         local where = self.where
+         if where then
+             if desc:substr(-1) ~= '\n' then nl = '\n' end
+         else
+             where = ''
+         end
+         return desc .. nl .. where
     end
 
     local function X_tostring(self)
          -- print("in X_tostring")
-         local string = self.string
-         if string then return string end
-         return debug.traceback("Kollos internal error: No string in X_tostring")
+         local desc = self.desc
+         local desc_type = type(desc)
+         if desc_type ~= "string" then
+             return debug.traceback(
+                 "Kollos internal error: Wrong type for string in X_tostring: "
+                 .. desc_type
+             )
+         end
+         local nl = ''
+         local where = self.where
+         if where then
+             if desc:substr(-1) ~= '\n' then nl = '\n' end
+         else
+             where = ''
+         end
+         return desc .. nl .. where
     end
 
     _M.mt_X.__tostring = X_tostring
