@@ -794,23 +794,21 @@ static void coerce_pcall_error (lua_State* L, int status) {
     switch (status) {
     case LUA_ERRERR:
         marpa_lua_pushliteral(L, R3ERR "pcall(); error running the message handler");
-        return;
+        break;
     case LUA_ERRMEM:
         marpa_lua_pushliteral(L, R3ERR "pcall(); error running the message handler");
-        return;
+        break;
     case LUA_ERRGCMM:
         marpa_lua_pushliteral(L, R3ERR "pcall(); error running a gc_ metamethod");
-        return;
+        break;
     default:
         marpa_lua_pushfstring(L, R3ERR "pcall(); bad status %d", status);
-        return;
+        break;
     case LUA_ERRRUN:
+        /* Just leave the original object on top of the stack */
         break;
     }
-
-    original_type = marpa_lua_type(L, -1);
-    if (original_type == LUA_TSTRING) { return; }
-    X_fallback_wrap(L);
+    return;
 }
 
 /* Called after pcall error -- assumes that "status" is
@@ -1449,7 +1447,8 @@ static int xlua_msghandler (lua_State *L) {
     marpa_luaL_traceback(L, L, msg, 1);  /* append a standard traceback */
     return 1;
   }
-  return 1;  /* return the original object */
+  X_fallback_wrap(L);
+  return 1;
 }
 
 static void
