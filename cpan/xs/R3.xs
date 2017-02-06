@@ -953,14 +953,6 @@ static int marpa_sv_undef (lua_State* L) {
     return 1;
 }
 
-static int marpa_av_new (lua_State* L) {
-    dTHX;
-    /* [] */
-    MARPA_SV_AV ( L, newAV() );
-    /* [sv_userdata] */
-    return 1;
-}
-
 static int marpa_sv_finalize_meth (lua_State* L) {
     dTHX;
     /* Is this check necessary after development? */
@@ -1116,20 +1108,6 @@ static int marpa_av_fill_meth (lua_State* L) {
     return 0;
 }
 
-static int marpa_av_bless_meth (lua_State* L) {
-    dTHX;
-    SV** p_ref_to_av = (SV**)marpa_luaL_checkudata(L, 1, MT_NAME_SV);
-    SV* blessing_sv = coerce_to_sv(L, 2, '-');
-    STRLEN blessing_length;
-    char *classname;
-    if (!SvPOK(blessing_sv)) {
-       croak("Internal error: AV blessing must be string");
-    }
-    classname = SvPV (blessing_sv, blessing_length);
-    sv_bless (*p_ref_to_av, gv_stashpv (classname, 1));
-    return 0;
-}
-
 static int marpa_sv_tostring_meth(lua_State* L) {
     /* Lua stack: [ sv_userdata ] */
     /* After development, check not needed */
@@ -1174,9 +1152,7 @@ static const struct luaL_Reg marpa_sv_meths[] = {
 static const struct luaL_Reg marpa_sv_funcs[] = {
     {"fill", marpa_av_fill_meth},
     {"top_index", marpa_av_len_meth},
-    {"bless", marpa_av_bless_meth},
     {"undef", marpa_sv_undef},
-    {"av_new", marpa_av_new},
     {"svaddr", marpa_sv_svaddr_meth},
     {"addr", marpa_sv_addr_meth},
     {NULL, NULL},

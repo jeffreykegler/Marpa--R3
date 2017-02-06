@@ -201,7 +201,7 @@ sub Marpa::R3::Scanless::R::new {
             // [];
         for my $symbol_id ( @{ $symbol_ids } ) {
             $slr->call_by_tag(
-    (__FILE__ . ':' . __LINE__),
+    ('@' . __FILE__ . ':' . __LINE__),
             <<'END_OF_LUA', 'ii', $symbol_id, $is_active );
             local recce, symbol_id, activate = ...
             recce.lmw_g1r:completion_symbol_activate(symbol_id, activate)
@@ -213,7 +213,7 @@ END_OF_LUA
         # $recce_c->nulled_symbol_activate( $_, $is_active ) for @{$symbol_ids};
         for my $symbol_id ( @{ $symbol_ids } ) {
             $slr->call_by_tag(
-    (__FILE__ . ':' . __LINE__),
+    ('@' . __FILE__ . ':' . __LINE__),
             <<'END_OF_LUA', 'ii', $symbol_id, $is_active );
             local recce, symbol_id, activate = ...
             recce.lmw_g1r:nulled_symbol_activate(symbol_id, activate)
@@ -225,7 +225,7 @@ END_OF_LUA
             // [];
         for my $symbol_id ( @{ $symbol_ids } ) {
             $slr->call_by_tag(
-    (__FILE__ . ':' . __LINE__),
+    ('@' . __FILE__ . ':' . __LINE__),
             <<'END_OF_LUA', 'ii', $symbol_id, $is_active );
             local recce, symbol_id, activate = ...
             recce.lmw_g1r:prediction_symbol_activate(symbol_id, activate)
@@ -245,7 +245,7 @@ END_OF_LUA
 
     {
         my ($trace_terminals) = $slr->call_by_tag(
-    (__FILE__ . ':' . __LINE__),
+    ('@' . __FILE__ . ':' . __LINE__),
             <<'END_OF_LUA', '');
         local recce = ...
         return recce.trace_terminals
@@ -268,7 +268,7 @@ END_OF_LUA
     Marpa::R3::Internal::Scanless::convert_libmarpa_events($slr);
 
     $slr->call_by_tag(
-    (__FILE__ . ':' . __LINE__),
+    ('@' . __FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', '');
     local recce = ...
 
@@ -351,7 +351,7 @@ sub common_set {
             say {$trace_file_handle} qq{Setting trace_terminals option};
         }
         $slr->call_by_tag(
-    (__FILE__ . ':' . __LINE__),
+    ('@' . __FILE__ . ':' . __LINE__),
         <<'END_OF_LUA',
             local recce, trace_terminals = ...
             recce.trace_terminals = trace_terminals
@@ -387,7 +387,7 @@ END_OF_LUA
 
         # Not allowed once evaluation is started
         my ($has_bocage) = $slr->call_by_tag(
-    (__FILE__ . ':' . __LINE__),
+    ('@' . __FILE__ . ':' . __LINE__),
             'local recce = ...; return recce.lmw_b', ''
         );
         if ( $has_bocage ) {
@@ -969,7 +969,7 @@ sub Marpa::R3::Scanless::R::xs_events {
     my ($slr) = @_;
     my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
     my ($event_queue) = $slr->call_by_tag(
-    (__FILE__ . ':' . __LINE__),
+    ('@' . __FILE__ . ':' . __LINE__),
     <<'END_OF_LUA',
         recce = ...
         -- print(inspect(recce.event_queue))
@@ -1292,7 +1292,7 @@ sub Marpa::R3::Scanless::R::ambiguity_metric {
     $slr->ordering_get();
 
     my ($metric) = $slr->call_by_tag(
-    (__FILE__ . ':' . __LINE__),
+    ('@' . __FILE__ . ':' . __LINE__),
     <<'END__OF_LUA', '>*' );
     local recce = ...
     local order = recce.lmw_o
@@ -1414,7 +1414,7 @@ sub Marpa::R3::Scanless::R::show_progress {
     my $tracer  = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
 
     my ($last_ordinal) = $slr->call_by_tag(
-    (__FILE__ . ':' . __LINE__),
+    ('@' . __FILE__ . ':' . __LINE__),
             'local recce = ...; return recce.lmw_g1r:latest_earley_set()',
             '');
 
@@ -1479,7 +1479,7 @@ sub Marpa::R3::Scanless::R::show_progress {
                 }
 
                 my ($rhs_length) = $slg->call_by_tag(
-                (__FILE__ . ':' . __LINE__),
+                ('@' . __FILE__ . ':' . __LINE__),
                         'local grammar, rule_id = ...; return grammar.lmw_g1g:rule_length(rule_id)',
                         'i', $rule_id);
                 my @item_text;
@@ -1562,7 +1562,7 @@ END_OF_LUA
 sub Marpa::R3::Scanless::R::exhausted {
     my ($slr) = @_;
     my ($is_exhausted) = $slr->call_by_tag(
-    (__FILE__ . ':' . __LINE__),
+    ('@' . __FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', '');
     local recce = ...
     local is_exhausted = recce.lmw_g1r:is_exhausted()
@@ -1575,7 +1575,7 @@ END_OF_LUA
 sub Marpa::R3::Scanless::R::g1_pos {
     my ($slr) = @_;
     my ($latest_earley_set) = $slr->call_by_tag(
-    (__FILE__ . ':' . __LINE__),
+    ('@' . __FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', '');
     local recce = ...
     local latest_earley_set = recce.lmw_g1r:latest_earley_set()
@@ -1587,7 +1587,7 @@ END_OF_LUA
 sub Marpa::R3::Scanless::R::current_earleme {
     my ($slr) = @_;
     my ($current_earleme) = $slr->call_by_tag(
-    (__FILE__ . ':' . __LINE__),
+    ('@' . __FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', '');
     local recce = ...
     local current_earleme = recce.lmw_g1r:current_earleme()
@@ -1600,7 +1600,7 @@ END_OF_LUA
 sub Marpa::R3::Scanless::R::furthest_earleme {
     my ($slr) = @_;
     my ($furthest_earleme) = $slr->call_by_tag(
-    (__FILE__ . ':' . __LINE__),
+    ('@' . __FILE__ . ':' . __LINE__),
         <<'END_OF_LUA', '');
     local recce = ...
     local furthest_earleme = recce.lmw_g1r:furthest_earleme()
@@ -1612,7 +1612,7 @@ END_OF_LUA
 sub Marpa::R3::Scanless::R::earleme {
     my ( $slr, $earley_set_id ) = @_;
     my ($earleme) = $slr->call_by_tag(
-    (__FILE__ . ':' . __LINE__),
+    ('@' . __FILE__ . ':' . __LINE__),
         <<'END_OF_LUA', 'i', $earley_set_id);
     local recce, earley_set_id = ...
     local earleme = recce.lmw_g1r:earleme(earley_set_id)
@@ -1717,7 +1717,7 @@ sub Marpa::R3::Scanless::R::activate {
 
     for my $event ( @{ $event_symbol_ids_by_type->{completion} } ) {
         $slr->call_by_tag(
-    (__FILE__ . ':' . __LINE__),
+    ('@' . __FILE__ . ':' . __LINE__),
         <<'END_OF_LUA', 'ii', $event, $activate );
         local recce, event, activate = ...
         recce.lmw_g1r:completion_symbol_activate(event, activate)
@@ -1726,7 +1726,7 @@ END_OF_LUA
 
     for my $event ( @{ $event_symbol_ids_by_type->{nulled} } ) {
         $slr->call_by_tag(
-    (__FILE__ . ':' . __LINE__),
+    ('@' . __FILE__ . ':' . __LINE__),
         <<'END_OF_LUA', 'ii', $event, $activate );
         local recce, event, activate = ...
         recce.lmw_g1r:nulled_symbol_activate(event, activate)
@@ -1735,7 +1735,7 @@ END_OF_LUA
 
     for my $event ( @{ $event_symbol_ids_by_type->{prediction} } ) {
         $slr->call_by_tag(
-    (__FILE__ . ':' . __LINE__),
+    ('@' . __FILE__ . ':' . __LINE__),
         <<'END_OF_LUA', 'ii', $event, $activate );
         local recce, event, activate = ...
         recce.lmw_g1r:prediction_symbol_activate(event, activate)
@@ -1784,7 +1784,7 @@ sub Marpa::R3::Scanless::R::call_by_tag {
 sub Marpa::R3::Scanless::R::earley_set_size {
     my ($slr, $set_id) = @_;
     my ($size) = $slr->call_by_tag(
-    (__FILE__ . ':' . __LINE__),
+    ('@' . __FILE__ . ':' . __LINE__),
         <<'END_OF_LUA', 'i', ($set_id // -1));
     local recce, set_id = ...
     local g1r = recce.lmw_g1r
@@ -1799,7 +1799,7 @@ sub Marpa::R3::Scanless::R::show_earley_sets {
     my ($slr)                = @_;
 
     my ($last_completed_earleme, $furthest_earleme) = $slr->call_by_tag(
-    (__FILE__ . ':' . __LINE__),
+    ('@' . __FILE__ . ':' . __LINE__),
         <<'END_OF_LUA', '');
         local recce = ...
         local g1r = recce.lmw_g1r
@@ -2153,14 +2153,14 @@ END_OF_LUA
     DESCRIBE_CHOICES: {
         my $this_choice;
         ($this_choice) = $slr->call_by_tag(
-    (__FILE__ . ':' . __LINE__),
+    ('@' . __FILE__ . ':' . __LINE__),
             ' recce, nook_id = ...; return recce.lmw_t:_nook_choice(nook_id)',
             'i', $nook_id
         );
         CHOICE: for ( my $choice_ix = 0;; $choice_ix++ ) {
 
                 my ($and_node_id) = $slr->call_by_tag(
-    (__FILE__ . ':' . __LINE__),
+    ('@' . __FILE__ . ':' . __LINE__),
                 <<'END_OF_LUA', 'ii>*', $or_node_id, $choice_ix );
                 recce, or_node_id, choice_ix = ...
                 return recce.lmw_o:_and_order_get(or_node_id+0, choice_ix+0)
