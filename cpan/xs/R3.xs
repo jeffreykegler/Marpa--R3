@@ -1719,7 +1719,8 @@ u_read (Outer_R * outer_slr)
     for (;;) {
         lua_Integer codepoint;
         lua_Integer op_count;
-        lua_Integer op_ix;
+        lua_Integer old_op_count;
+        lua_Integer old_op_ix;
         lua_Integer *ops;
         int tokens_accepted = 0;
         if (slr->perl_pos >= slr->end_pos)
@@ -1775,9 +1776,9 @@ u_read (Outer_R * outer_slr)
             (lua_Integer) slr->perl_pos);
 
         /* ops[0] is codepoint */
-        op_count = ops[1];
-        for (op_ix = 2; op_ix < op_count; op_ix++) {
-            const lua_Integer op_code = ops[op_ix];
+        old_op_count = ops[1];
+        for (old_op_ix = 2; old_op_ix < old_op_count; old_op_ix++) {
+            const lua_Integer op_code = ops[old_op_ix];
             switch (op_code) {
             case MARPA_OP_ALTERNATIVE:
                 {
@@ -1786,24 +1787,24 @@ u_read (Outer_R * outer_slr)
                     lua_Integer length;
                     lua_Integer value;
 
-                    op_ix++;
-                    if (op_ix >= op_count) {
+                    old_op_ix++;
+                    if (old_op_ix >= old_op_count) {
                         croak
-                            ("Missing operand for op code (0x%lx); codepoint=0x%lx, op_ix=0x%lx",
+                            ("Missing operand for op code (0x%lx); codepoint=0x%lx, old_op_ix=0x%lx",
                             (unsigned long) op_code,
                             (unsigned long) codepoint,
-                            (unsigned long) op_ix);
+                            (unsigned long) old_op_ix);
                     }
-                    symbol_id = (int) ops[op_ix];
-                    if (op_ix + 2 >= op_count) {
+                    symbol_id = (int) ops[old_op_ix];
+                    if (old_op_ix + 2 >= old_op_count) {
                         croak
-                            ("Missing operand for op code (0x%lx); codepoint=0x%lx, op_ix=0x%lx",
+                            ("Missing operand for op code (0x%lx); codepoint=0x%lx, old_op_ix=0x%lx",
                             (unsigned long) op_code,
                             (unsigned long) codepoint,
-                            (unsigned long) op_ix);
+                            (unsigned long) old_op_ix);
                     }
-                    value = (int) ops[++op_ix];
-                    length = (int) ops[++op_ix];
+                    value = (int) ops[++old_op_ix];
+                    length = (int) ops[++old_op_ix];
                     call_by_tag (outer_slr->L, MYLUA_TAG,
                             "recce, symbol_id, value, length = ...\n"
                             "return recce.lmw_l0r:alternative(symbol_id, value, length)\n",
@@ -1914,9 +1915,9 @@ u_read (Outer_R * outer_slr)
                 break;
             default:
                 croak
-                    ("Unknown op code (0x%lx); codepoint=0x%lx, op_ix=0x%lx",
+                    ("Unknown op code (0x%lx); codepoint=0x%lx, old_op_ix=0x%lx",
                     (unsigned long) op_code, (unsigned long) codepoint,
-                    (unsigned long) op_ix);
+                    (unsigned long) old_op_ix);
             }
         }
       ADVANCE_ONE_CHAR:;
