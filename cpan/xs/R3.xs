@@ -118,7 +118,7 @@ union marpa_slr_event_s
 typedef struct
 {
   HV *per_codepoint_hash;
-  UV *per_codepoint_array[128];
+  lua_Integer *per_codepoint_array[128];
   struct symbol_g_properties *symbol_g_properties;
   struct l0_rule_g_properties *l0_rule_g_properties;
 
@@ -1340,10 +1340,10 @@ static const struct luaL_Reg marpa_funcs[] = {
 
 /* === LUA ARRAY CLASS === */
 
-/* Array must be UV because it is used for VM ops */
+/* Array must be lua_Integer because it is used for VM ops */
 typedef struct Xlua_Array {
     size_t size;
-    UV array[1];
+    lua_Integer array[1];
 } Xlua_Array;
 
 /* Leaves new userdata on top of stack */
@@ -1351,7 +1351,7 @@ static void
 xlua_array_new (lua_State * L, lua_Integer size)
 {
     marpa_lua_newuserdata (L,
-        sizeof (Xlua_Array) + ((size_t)size - 1) * sizeof (UV));
+        sizeof (Xlua_Array) + ((size_t)size - 1) * sizeof (lua_Integer));
     marpa_luaL_setmetatable (L, MT_NAME_ARRAY);
 }
 
@@ -1374,7 +1374,7 @@ xlua_array_from_list_func (lua_State * L)
     p_array = (Xlua_Array *) marpa_lua_touserdata (L, -1);
     for (ix = 1; ix <= last_arg; ix++) {
         const lua_Integer value = marpa_luaL_checkinteger (L, ix);
-        p_array->array[ix - 1] = (UV)value;
+        p_array->array[ix - 1] = (lua_Integer)value;
     }
     p_array->size = (size_t)last_arg;
     /* [ array_ud ] */
@@ -1402,7 +1402,7 @@ xlua_array_new_index_meth (lua_State * L)
     const lua_Integer value = marpa_luaL_checkinteger (L, 3);
     marpa_luaL_argcheck (L, (ix < 0 || (size_t)ix >= p_array->size), 2,
         "index out of bounds");
-    p_array->array[ix] = (UV)value;
+    p_array->array[ix] = (lua_Integer)value;
     return 1;
 }
 
@@ -1850,8 +1850,8 @@ u_read (Outer_R * outer_slr)
     for (;;) {
         lua_Integer codepoint;
         lua_Integer op_count;
-        UV op_ix;
-        UV *ops;
+        lua_Integer op_ix;
+        lua_Integer *ops;
         int tokens_accepted = 0;
         if (slr->perl_pos >= slr->end_pos)
             break;
@@ -1893,7 +1893,7 @@ u_read (Outer_R * outer_slr)
                 slr->codepoint = codepoint;
                 return U_READ_UNREGISTERED_CHAR;
             }
-            ops = (UV *) SvPV (*p_ops_sv, dummy);
+            ops = (lua_Integer *) SvPV (*p_ops_sv, dummy);
         }
 
         call_by_tag (outer_slr->L, MYLUA_TAG,
@@ -1908,14 +1908,14 @@ u_read (Outer_R * outer_slr)
         /* ops[0] is codepoint */
         op_count = ops[1];
         for (op_ix = 2; op_ix < op_count; op_ix++) {
-            const UV op_code = ops[op_ix];
+            const lua_Integer op_code = ops[op_ix];
             switch (op_code) {
             case MARPA_OP_ALTERNATIVE:
                 {
                     lua_Integer result;
-                    int symbol_id;
-                    int length;
-                    int value;
+                    lua_Integer symbol_id;
+                    lua_Integer length;
+                    lua_Integer value;
 
                     op_ix++;
                     if (op_ix >= op_count) {
@@ -3884,16 +3884,16 @@ PPCODE:
 {
   Scanless_R *slr = slr_inner_get(outer_slr);
   /* OP Count is args less two, then plus two for codepoint and length fields */
-  const UV op_count = (UV)items;
-  UV op_ix;
-  UV *ops;
+  const lua_Integer op_count = (lua_Integer)items;
+  lua_Integer op_ix;
+  lua_Integer *ops;
   SV *ops_sv = NULL;
   const lua_Integer codepoint = (lua_Integer)codepoint_arg;
 
   if ( codepoint < (int)Dim (slr->slg->per_codepoint_array))
     {
       ops = slr->slg->per_codepoint_array[codepoint];
-      Renew (ops, (unsigned int)op_count, UV);
+      Renew (ops, (unsigned int)op_count, lua_Integer);
       slr->slg->per_codepoint_array[codepoint] = ops;
     }
   else
@@ -3901,9 +3901,9 @@ PPCODE:
       STRLEN dummy;
       ops_sv = newSV ((size_t)op_count * sizeof (ops[0]));
       SvPOK_on (ops_sv);
-      ops = (UV *) SvPV (ops_sv, dummy);
+      ops = (lua_Integer *) SvPV (ops_sv, dummy);
     }
-  ops[0] = (UV)codepoint;
+  ops[0] = (lua_Integer)codepoint;
   ops[1] = op_count;
   for (op_ix = 2; op_ix < op_count; op_ix++)
     {
