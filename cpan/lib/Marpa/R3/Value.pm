@@ -588,10 +588,6 @@ sub do_tree_ops {
     }
     my $lua_to_perl_tree_op = $tree->[1];
     if ( $lua_to_perl_tree_op eq 'bless' ) {
-        my $blessing = $tree->[3];
-        return bless do_tree_ops( $slr, $tree->[2] ), $tree->[3];
-    }
-    if ( $lua_to_perl_tree_op eq 'bless_ix' ) {
         my $constant_ix = $tree->[3];
         my $slg         = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
         my $blessing = $slg->[Marpa::R3::Internal::Scanless::G::CONSTANTS]
@@ -608,6 +604,11 @@ sub do_tree_ops {
         my $slg         = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
         return $slg->[Marpa::R3::Internal::Scanless::G::CONSTANTS]
           ->[$constant_ix];
+    }
+    if ( $lua_to_perl_tree_op eq 'undef' ) {
+        my $constant_ix = $tree->[2];
+        my $slg         = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+        return undef;
     }
     Marpa::R3::exception(
         qq{Unknown Lua-to-Perl tree op ("$lua_to_perl_tree_op")});

@@ -947,7 +947,9 @@ The result of the semantics is a Perl undef.
 
     local function op_fn_result_is_undef(recce)
         local stack = recce.lmw_v.stack
-        stack[recce.this_step.result] = marpa.sv.undef()
+        local undef_tree_op = { 'perl', 'undef' }
+        setmetatable(undef_tree_op, _M.mt_tree_op)
+        stack[recce.this_step.result] = undef_tree_op
         return -1
     end
     op_fn_add("result_is_undef", op_fn_result_is_undef)
@@ -998,7 +1000,9 @@ if not the value is an undef.
             if rhs_ix == 0 then break end
             local fetch_ix = result_ix + rhs_ix
             if fetch_ix > recce.this_step.arg_n then
-                stack[result_ix] = marpa.sv.undef()
+                local undef_tree_op = { 'perl', 'undef' }
+                setmetatable(undef_tree_op, _M.mt_tree_op)
+                stack[result_ix] = undef_tree_op
                 break
             end
             stack[result_ix] = stack[fetch_ix]
@@ -1079,7 +1083,9 @@ Push an undef on the values array.
 
     local function op_fn_push_undef(recce, dummy, new_values)
         local next_ix = #new_values + 1;
-        new_values[next_ix] = marpa.sv.undef()
+        local undef_tree_op = { 'perl', 'undef' }
+        setmetatable(undef_tree_op, _M.mt_tree_op)
+        new_values[next_ix] = undef_tree_op
         return -2
     end
     op_fn_add("push_undef", op_fn_push_undef)
@@ -1306,7 +1312,7 @@ is the result of this sequence of operations.
     local function op_fn_result_is_array(recce, dummy, new_values)
         local blessing_ix = recce.this_step.blessing_ix
         if blessing_ix then
-          new_values = { 'perl', 'bless_ix', new_values, blessing_ix }
+          new_values = { 'perl', 'bless', new_values, blessing_ix }
           setmetatable(new_values, _M.mt_tree_op)
         end
         local stack = recce.lmw_v.stack
@@ -1342,7 +1348,7 @@ implementation, which returned the size of the
         end
         local blessing_ix = recce.this_step.blessing_ix
         if blessing_ix then
-          new_values = { 'perl', 'bless_ix', new_values, blessing_ix }
+          new_values = { 'perl', 'bless', new_values, blessing_ix }
           setmetatable(new_values, _M.mt_tree_op)
         end
         return 3
