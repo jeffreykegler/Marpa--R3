@@ -466,13 +466,13 @@ END_OF_LUA
         <<'END_OF_LUA', 'i>*', $or_node_id );
         -- assumes throw mode
         local recce, or_node_id = ...
-        local and_node_ids = marpa.sv.av_new()
+        local and_node_ids = {}
         local order = recce.lmw_o
         local count = order:_or_node_and_node_count(or_node_id)
         if not count then return and_node_ids end
-        for ix = 0, count-1 do
+        for ix = 1, count do
             and_node_ids[ix] =
-                order:_or_node_and_node_id_by_ix(or_node_id, ix);
+                order:_or_node_and_node_id_by_ix(or_node_id, ix-1);
         end
         return and_node_ids
 END_OF_LUA
