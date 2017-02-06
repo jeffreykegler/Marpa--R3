@@ -39,6 +39,7 @@ sub pre_construct {
     $pre_slg->[Marpa::R3::Internal::Scanless::G::REJECTION_ACTION] = 'fatal';
     $pre_slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE] = \*STDERR;
     $pre_slg->[Marpa::R3::Internal::Scanless::G::RANKING_METHOD] = 'none';
+    $pre_slg->[Marpa::R3::Internal::Scanless::G::CONSTANTS] = [];
     return $pre_slg;
 }
 
@@ -218,7 +219,7 @@ sub per_lmg_init {
 END_OF_LUA
 
     return $per_lmg;
-} ## end sub new
+}
 
 sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     my ( $slg, $hashed_source, $g1_args ) = @_;

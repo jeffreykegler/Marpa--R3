@@ -362,7 +362,6 @@ This "post-new" method will become the latter part of the
         grammar.nulling_semantics = {}
         grammar.rule_semantics = {}
         grammar.token_semantics = {}
-        grammar.constants = {}
         return
     end
 
@@ -1532,21 +1531,6 @@ to set and discover various Lua values.
     -- miranda: section+ Utilities for semantics
     function _M.get_op_fn_name_by_key(op_key)
         return _M.vm_op_names[op_key]
-    end
-
-```
-
-#### Register a constant
-
-Register a constant, returning its key.
-
-```
-    -- miranda: section+ Utilities for semantics
-    function _M.class_slg.constant_register(grammar, constant_sv)
-        local constants = grammar.constants
-        local next_constant_key = #constants + 1
-        constants[next_constant_key] = constant_sv
-        return next_constant_key
     end
 
 ```

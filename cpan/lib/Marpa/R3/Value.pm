@@ -699,15 +699,10 @@ END_OF_LUA
       OP: for my $raw_op (@raw_ops) {
             if ( ref $raw_op ) {
 
-                my ($constant_ix) =
-                  $slg->call_by_tag( ( __FILE__ . ':' . __LINE__ ),
-                    << 'END_OF_LUA', 'S>*', ${$raw_op} );
-                local grammar, sv = ...
-                return grammar:constant_register(sv)
-END_OF_LUA
-
-                push @ops, $constant_ix;
-                $slg->[Marpa::R3::Internal::Scanless::G::CONSTANTS]->[$constant_ix]
+                my $constants = $slg->[Marpa::R3::Internal::Scanless::G::CONSTANTS];
+                my $next_ix = scalar @{$constants};
+                push @ops, $next_ix;
+                $slg->[Marpa::R3::Internal::Scanless::G::CONSTANTS]->[$next_ix]
                     = ${$raw_op};
                 next OP;
             }
