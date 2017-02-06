@@ -1778,7 +1778,7 @@ u_read (Outer_R * outer_slr)
 
         /* ops[0] is codepoint */
         old_op_count = ops[1];
-        for (op_ix = 1, old_op_ix = 2; old_op_ix < old_op_count; op_ix++, old_op_ix++) {
+        for (op_ix = 1, old_op_ix = 2; op_ix <= op_count; op_ix++, old_op_ix++) {
             lua_Integer op_code;
 
                     call_by_tag (outer_slr->L, MYLUA_TAG,
