@@ -1721,6 +1721,7 @@ u_read (Outer_R * outer_slr)
         lua_Integer op_count;
         lua_Integer old_op_count;
         lua_Integer old_op_ix;
+        lua_Integer op_ix;
         lua_Integer *ops;
         int tokens_accepted = 0;
         if (slr->perl_pos >= slr->end_pos)
@@ -1777,8 +1778,30 @@ u_read (Outer_R * outer_slr)
 
         /* ops[0] is codepoint */
         old_op_count = ops[1];
-        for (old_op_ix = 2; old_op_ix < old_op_count; old_op_ix++) {
+        for (op_ix = 1, old_op_ix = 2; old_op_ix < old_op_count; op_ix++, old_op_ix++) {
             const lua_Integer op_code = ops[old_op_ix];
+
+                    if (0) {
+                    call_by_tag (outer_slr->L, MYLUA_TAG,
+                            "recce, op_code, codepoint, op_ix, old_op_ix = ...\n"
+                            "print(inspect(recce.per_codepoint[codepoint]))\n"
+                            "print('op_ix: ', inspect(op_ix))\n"
+                            "local new_op_code = recce.per_codepoint[codepoint][op_ix]\n"
+                            "print('new_op_code: ', inspect(new_op_code))\n"
+                            "if op_code ~= new_op_code then\n"
+                            "    error(string.format(\n"
+                            "        'new_op_code vs. op_code, op_ix vs. old_op_ix; %d vs. %d; %d vs. %d',\n"
+                            "        new_op_code, op_code,\n"
+                            "        op_ix, old_op_ix\n"
+                            "    ))\n"
+                            "end\n"
+                            ,
+                            "Riii>",
+                            outer_slr->lua_ref,
+                            op_code, codepoint, op_ix, old_op_ix
+                    );
+                    }
+
             switch (op_code) {
             case MARPA_OP_ALTERNATIVE:
                 {
@@ -1788,6 +1811,7 @@ u_read (Outer_R * outer_slr)
                     lua_Integer value;
 
                     old_op_ix++;
+                    op_ix++;
                     if (old_op_ix >= old_op_count) {
                         croak
                             ("Missing operand for op code (0x%lx); codepoint=0x%lx, old_op_ix=0x%lx",
@@ -1803,8 +1827,12 @@ u_read (Outer_R * outer_slr)
                             (unsigned long) codepoint,
                             (unsigned long) old_op_ix);
                     }
-                    value = (int) ops[++old_op_ix];
-                    length = (int) ops[++old_op_ix];
+                    ++old_op_ix;
+                    op_ix++;
+                    value = (int) ops[old_op_ix];
+                    ++old_op_ix;
+                    op_ix++;
+                    length = (int) ops[old_op_ix];
                     call_by_tag (outer_slr->L, MYLUA_TAG,
                             "recce, symbol_id, value, length = ...\n"
                             "return recce.lmw_l0r:alternative(symbol_id, value, length)\n",
