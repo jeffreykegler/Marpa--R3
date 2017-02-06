@@ -1043,11 +1043,10 @@ Returns a constant result.
     -- miranda: section+ VM operations
     local function op_fn_result_is_constant(recce, constant_ix)
         local grammar = recce.slg
-        local constants = grammar.constants
-        local constant = constants[constant_ix]
+        local constant_tree_op = { 'perl', 'constant', constant_ix }
         local stack = recce.lmw_v.stack
         local result_ix = recce.this_step.result
-        stack[result_ix] = constant
+        stack[result_ix] = constant_tree_op
         if recce.trace_values > 0 and recce.this_step.type == 'MARPA_STEP_TOKEN' then
             local top_of_queue = #recce.trace_values_queue
             recce.trace_values_queue[top_of_queue+1] =

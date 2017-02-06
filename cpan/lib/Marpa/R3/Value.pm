@@ -542,7 +542,6 @@ END_OF_LUA
 
 sub do_tree_ops {
     my ( $slr, $tree ) = @_;
-    my $slg           = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $blessing = Scalar::Util::blessed $tree;
     if ( not defined $blessing ) {
         my $ref = ref $tree;
@@ -584,25 +583,26 @@ sub do_tree_ops {
         # say STDERR "Removing asis wrapper";
         return $tree->[1];
     }
-    if ( $tree_op eq 'perl' ) {
-        my $lua_to_perl_tree_op = $tree->[1];
-        if ( $lua_to_perl_tree_op eq 'bless' ) {
-            return bless do_tree_ops( $slr, $tree->[2] ), $tree->[3];
-        }
-        if ( $lua_to_perl_tree_op eq 'literal' ) {
-            return
-              substr
-              ${ $slr->[Marpa::R3::Internal::Scanless::R::P_INPUT_STRING] },
-              $tree->[2], $tree->[3];
-        }
-        Marpa::R3::exception(
-            qq{Unknown Lua-to-Perl tree op ("$lua_to_perl_tree_op")});
+    if ( $tree_op ne 'perl' ) {
+        Marpa::R3::exception(qq{Unknown tree op ("$tree_op")});
     }
-    if ( $tree_op eq 'constant' ) {
-        my $constant_ix = $tree->[1];
-        return $slg->[Marpa::R3::Internal::Scanless::G::CONSTANTS]->[$constant_ix]
+    my $lua_to_perl_tree_op = $tree->[1];
+    if ( $lua_to_perl_tree_op eq 'bless' ) {
+        return bless do_tree_ops( $slr, $tree->[2] ), $tree->[3];
     }
-    Marpa::R3::exception(qq{Unknown tree op ("$tree_op")});
+    if ( $lua_to_perl_tree_op eq 'literal' ) {
+        return
+          substr ${ $slr->[Marpa::R3::Internal::Scanless::R::P_INPUT_STRING] },
+          $tree->[2], $tree->[3];
+    }
+    if ( $lua_to_perl_tree_op eq 'constant' ) {
+        my $constant_ix = $tree->[2];
+        my $slg         = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+        return $slg->[Marpa::R3::Internal::Scanless::G::CONSTANTS]
+          ->[$constant_ix];
+    }
+    Marpa::R3::exception(
+        qq{Unknown Lua-to-Perl tree op ("$lua_to_perl_tree_op")});
 }
 
 sub op_fn_key_by_name {
