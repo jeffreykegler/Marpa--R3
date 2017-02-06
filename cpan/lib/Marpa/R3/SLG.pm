@@ -1045,8 +1045,9 @@ END_OF_LUA
     }
 
     # Second phase of G1 processing
-
-    $thin_slg->precompute();
+    # The grammar can be thought to be "precomputed" at this point,
+    # although I don't think the concept is as relevant as it is
+    # for the Libmarpa grammars.
 
     # More lexer processing
     # Determine events by lexer rule, applying the defaults

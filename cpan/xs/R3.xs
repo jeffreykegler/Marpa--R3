@@ -119,7 +119,6 @@ typedef struct
 {
   HV *per_codepoint_hash;
   UV *per_codepoint_array[128];
-  int precomputed;
   struct symbol_g_properties *symbol_g_properties;
   struct l0_rule_g_properties *l0_rule_g_properties;
 
@@ -2111,8 +2110,6 @@ static Scanless_G* slg_inner_new (void)
 
     Newx (slg, 1, Scanless_G);
 
-    slg->precomputed = 0;
-
     {
         int i;
         slg->per_codepoint_hash = newHV ();
@@ -2204,10 +2201,6 @@ marpa_inner_slr_new (Outer_G* outer_slg)
     /* These do not need references, because parent objects
      * hold references to them
      */
-    if (!slg->precomputed) {
-        croak
-            ("Problem in u->new(): Attempted to create SLIF recce from unprecomputed SLIF grammar");
-    }
     slr->slg = slg;
 
     slr->start_of_lexeme = 0;
@@ -2956,12 +2949,6 @@ PPCODE:
         ,
         "G>i", outer_slg->lua_ref, &highest_g1_symbol_id);
 
-    if (slg->precomputed)
-      {
-        croak
-          ("slg->lexeme_priority_set(%ld, %ld) called after SLG is precomputed",
-           (long) g1_lexeme, (long) priority);
-      }
     if (g1_lexeme > highest_g1_symbol_id)
     {
       croak
@@ -3034,12 +3021,6 @@ PPCODE:
         ,
         "G>i", outer_slg->lua_ref, &highest_g1_symbol_id);
 
-    if (slg->precomputed)
-      {
-        croak
-          ("slg->lexeme_pause_set(%ld, %ld) called after SLG is precomputed",
-           (long) g1_lexeme, (long) pause);
-      }
     if (g1_lexeme > highest_g1_symbol_id)
     {
       croak
@@ -3098,12 +3079,6 @@ PPCODE:
         ,
         "G>i", outer_slg->lua_ref, &highest_g1_symbol_id);
 
-  if (slg->precomputed)
-    {
-      croak
-        ("slg->lexeme_pause_activate(%ld, %ld) called after SLG is precomputed",
-         (long) g1_lexeme, (long) activate);
-    }
   if (g1_lexeme > highest_g1_symbol_id)
     {
       croak
@@ -3159,12 +3134,6 @@ PPCODE:
         "return l0g:highest_rule_id()+1\n",
         "G>i", outer_slg->lua_ref, &highest_l0_rule_id);
 
-    if (slg->precomputed)
-      {
-        croak
-          ("slg->discard_event_set(%ld, %ld) called after SLG is precomputed",
-           (long) l0_rule_id, (long) boolean);
-      }
     if (l0_rule_id > highest_l0_rule_id)
     {
       croak
@@ -3214,12 +3183,6 @@ PPCODE:
         "return l0g:highest_rule_id()+1\n",
         "G>i", outer_slg->lua_ref, &highest_l0_rule_id);
 
-  if (slg->precomputed)
-    {
-      croak
-        ("slg->discard_event_activate(%ld, %ld) called after SLG is precomputed",
-         (long) l0_rule_id, (long) activate);
-    }
   if (l0_rule_id > highest_l0_rule_id)
     {
       croak
@@ -3252,41 +3215,6 @@ PPCODE:
          (long) l0_rule_id, (long) activate);
     }
   XSRETURN_YES;
-}
-
-void
-precompute( outer_slg )
-    Outer_G *outer_slg;
-PPCODE:
-{
-    Scanless_G *slg = slg_inner_get (outer_slg);
-    /* Currently this routine does nothing except
-     * enforce the separation of the precomputation phase
-     * from the main processing.
-     */
-    /*
-     * Ensure that I can call this multiple times safely
-     */
-    if (!slg->precomputed) {
-        /* After development and/or once this code is
-         * merge with other Lua, these checks may not be
-         * needed.
-         */
-        call_by_tag (outer_slg->L, MYLUA_TAG,
-            "slg = ...\n"
-            "local l0g = slg.lmw_l0g\n"
-            "if not l0g then error('No l0g') end\n"
-            "local g1g = slg.lmw_g1g\n"
-            "if not g1g then error('No g1g') end\n"
-            "local l0g_ok = (l0g:is_precomputed() ~= 0)\n"
-            "if not l0g then error('l0g not precomputed') end\n"
-            "local g1g_ok = (g1g:is_precomputed() ~= 0)\n"
-            "if not g1g then error('g1g not precomputed') end\n",
-            "G>", outer_slg->lua_ref);
-
-        slg->precomputed = 1;
-    }
-    XSRETURN_IV (1);
 }
 
 MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::SLR
