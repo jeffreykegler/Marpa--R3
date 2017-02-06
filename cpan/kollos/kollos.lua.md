@@ -712,7 +712,7 @@ inspect package to dump it.
 
     local function X_tostring(self)
          -- print("in X_tostring")
-         local desc = self.desc
+         local desc = self.msg
          local desc_type = type(desc)
          if desc_type ~= "string" then
              return debug.traceback(
@@ -748,7 +748,7 @@ but that is not necessarily the case.)
 ```
     -- miranda: section+ most Lua function definitions
     function _M.userX(msg)
-        local X = { desc = msg, traceback = false }
+        local X = { msg = msg, traceback = false }
         setmetatable(X, _M.mt_X)
         error(X)
     end
