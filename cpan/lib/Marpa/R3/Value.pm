@@ -542,6 +542,7 @@ END_OF_LUA
 
 sub do_tree_ops {
     my ( $slr, $tree ) = @_;
+    my $slg           = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $blessing = Scalar::Util::blessed $tree;
     if ( not defined $blessing ) {
         my $ref = ref $tree;
@@ -596,6 +597,10 @@ sub do_tree_ops {
         }
         Marpa::R3::exception(
             qq{Unknown Lua-to-Perl tree op ("$lua_to_perl_tree_op")});
+    }
+    if ( $tree_op eq 'constant' ) {
+        my $constant_ix = $tree->[1];
+        return $slg->[Marpa::R3::Internal::Scanless::G::CONSTANTS]->[$constant_ix]
     }
     Marpa::R3::exception(qq{Unknown tree op ("$tree_op")});
 }
@@ -694,6 +699,8 @@ END_OF_LUA
 END_OF_LUA
 
                 push @ops, $constant_ix;
+                $slg->[Marpa::R3::Internal::Scanless::G::CONSTANTS]->[$constant_ix]
+                    = ${$raw_op};
                 next OP;
             }
             push @ops, $raw_op;
