@@ -1042,8 +1042,8 @@ Returns a constant result.
 ```
     -- miranda: section+ VM operations
     local function op_fn_result_is_constant(recce, constant_ix)
-        local grammar = recce.slg
         local constant_tree_op = { 'perl', 'constant', constant_ix }
+        setmetatable(constant_tree_op, _M.mt_tree_op)
         local stack = recce.lmw_v.stack
         local result_ix = recce.this_step.result
         stack[result_ix] = constant_tree_op
@@ -1264,15 +1264,11 @@ that is, in terms of G1 Earley sets.
 ```
     -- miranda: section+ VM operations
     local function op_fn_push_constant(recce, constant_ix, new_values)
-        local grammar = recce.slg
-        local constants = grammar.constants
-        -- io.stderr:write('constants: ', inspect(constants), "\n")
+        local constant_tree_op = { 'perl', 'constant', constant_ix }
+        setmetatable(constant_tree_op, _M.mt_tree_op)
         -- io.stderr:write('constant_ix: ', constant_ix, "\n")
-        -- io.stderr:write('constants top ix: ', marpa.sv.top_index(constants), "\n")
-
-        local constant = constants[constant_ix]
         local next_ix = #new_values + 1;
-        new_values[next_ix] = constant
+        new_values[next_ix] = constant_tree_op
         return -2
     end
     op_fn_add("push_constant", op_fn_push_constant)
@@ -1310,7 +1306,6 @@ is the result of this sequence of operations.
           local blessing = constants[blessing_ix]
           new_values = { 'perl', 'bless', new_values, blessing }
           setmetatable(new_values, _M.mt_tree_op)
-          -- marpa.sv.bless(new_values, blessing)
         end
         local stack = recce.lmw_v.stack
         local result_ix = recce.this_step.result
