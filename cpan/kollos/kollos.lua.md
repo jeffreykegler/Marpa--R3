@@ -37,6 +37,12 @@ cd kollos && ../lua/lua toc.lua < kollos.lua.md
 * [Kollos registry objects](#kollos-registry-objects)
 * [Kollos SLIF grammar object](#kollos-slif-grammar-object)
 * [Kollos SLIF recognizer object](#kollos-slif-recognizer-object)
+  * [Constructor](#constructor)
+  * [Locations](#locations)
+  * [Events](#events)
+  * [Progress reporting](#progress-reporting)
+  * [Exceptions](#exceptions)
+  * [Diagnostics](#diagnostics)
 * [Kollos semantics](#kollos-semantics)
   * [VM operations](#vm-operations)
     * [VM debug operation](#vm-debug-operation)
@@ -68,7 +74,6 @@ cd kollos && ../lua/lua toc.lua < kollos.lua.md
   * [VM-related utilities for use in the Perl code](#vm-related-utilities-for-use-in-the-perl-code)
     * [Return operation key given its name](#return-operation-key-given-its-name)
     * [Return operation name given its key](#return-operation-name-given-its-key)
-    * [Register a constant](#register-a-constant)
     * [Return the top index of the stack](#return-the-top-index-of-the-stack)
     * [Return the value of a stack entry](#return-the-value-of-a-stack-entry)
     * [Set the value of a stack entry](#set-the-value-of-a-stack-entry)
@@ -362,6 +367,7 @@ This "post-new" method will become the latter part of the
         grammar.nulling_semantics = {}
         grammar.rule_semantics = {}
         grammar.token_semantics = {}
+        grammar.per_codepoint = {}
         return
     end
 
@@ -479,7 +485,7 @@ span is zero or less.
 
 ```
 
-# Events
+### Events
 
 ```
     -- miranda: section+ most Lua function definitions
@@ -558,7 +564,7 @@ span is zero or less.
 
 ```
 
-# Progress reporting
+### Progress reporting
 
 Given a scanless
 recognizer and a symbol,

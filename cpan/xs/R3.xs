@@ -1849,8 +1849,8 @@ u_read (Outer_R * outer_slr)
 
     for (;;) {
         lua_Integer codepoint;
+        lua_Integer op_count;
         UV op_ix;
-        UV op_count;
         UV *ops;
         int tokens_accepted = 0;
         if (slr->perl_pos >= slr->end_pos)
@@ -1861,9 +1861,24 @@ u_read (Outer_R * outer_slr)
     "local recce, perl_pos = ...\n"
     "-- print('codepoints:', inspect(recce.codepoints))\n"
     "-- print('perl_pos:', inspect(perl_pos))\n"
-    "return recce.codepoints[perl_pos+1]\n"
+    "local codepoint = recce.codepoints[perl_pos+1]\n"
+    "local ops = recce.per_codepoint[codepoint]\n"
+    "local op_count = -1\n"
+    "if ops then\n"
+    "    op_count = ops[1]\n"
+    "end\n"
+    "if not op_count then\n"
+    "    error(string.format('Bad op count for codepoint %d'), codepoint)\n"
+    "end\n"
+    "return codepoint, op_count\n"
     ,
-    "Ri>i", outer_slr->lua_ref, (lua_Integer)slr->perl_pos, &codepoint);
+    "Ri>ii", outer_slr->lua_ref,
+    (lua_Integer)slr->perl_pos, &codepoint, &op_count);
+
+    if (op_count < 0) {
+                slr->codepoint = codepoint;
+                return U_READ_UNREGISTERED_CHAR;
+    }
 
         if (codepoint < (lua_Integer)Dim (slr->slg->per_codepoint_array)) {
             ops = slr->slg->per_codepoint_array[codepoint];
@@ -3294,7 +3309,9 @@ PPCODE:
       "recce.event_queue = {}\n"
       "recce.es_data = {}\n"
       "recce.lmw_g1r.lmw_g = recce.slg.lmw_g1g\n"
-      "recce.trace_terminals = 0\n",
+      "recce.trace_terminals = 0\n"
+      "recce.per_codepoint = {}\n"
+      ,
       "R>", outer_slr->lua_ref);
 
   new_sv = sv_newmortal ();

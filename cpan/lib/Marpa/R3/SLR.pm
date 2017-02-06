@@ -803,38 +803,58 @@ sub Marpa::R3::Internal::Scanless::convert_libmarpa_events {
 
 sub Marpa::R3::Scanless::R::resume {
     my ( $slr, $start_pos, $length ) = @_;
+
     Marpa::R3::exception(
         "Attempt to resume an SLIF recce which has no string set\n",
         '  The string should be set first using read()'
-        )
-        if not defined $slr->[Marpa::R3::Internal::Scanless::R::P_INPUT_STRING];
+    ) if not defined $slr->[Marpa::R3::Internal::Scanless::R::P_INPUT_STRING];
 
-    if ($slr->[Marpa::R3::Internal::Scanless::R::PHASE] ne "read") {
-        if ($slr->[Marpa::R3::Internal::Scanless::R::PHASE] eq "value") {
-        Marpa::R3::exception(
-            "Attempt to resume an SLIF recce while the parse is being evaluated\n",
-            '   The resume() method is not allowed once value() is called'
+    if ( $slr->[Marpa::R3::Internal::Scanless::R::PHASE] ne "read" ) {
+        if ( $slr->[Marpa::R3::Internal::Scanless::R::PHASE] eq "value" ) {
+            Marpa::R3::exception(
+"Attempt to resume an SLIF recce while the parse is being evaluated\n",
+                '   The resume() method is not allowed once value() is called'
             );
         }
         Marpa::R3::exception(
             "Attempt to resume an SLIF recce which is not in the Read Phase\n",
             '   The resume() method is only allowed in the Read Phase'
-            );
+        );
     }
 
     my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
 
     $thin_slr->pos_set( $start_pos, $length );
     $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] = [];
-    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+    my $slg      = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $thin_slg = $slg->[Marpa::R3::Internal::Scanless::G::C];
 
-    OUTER_READ: while (1) {
+    my ( $op_alternative, $op_invalid_char, $op_earleme_complete ) =
+      $slg->call_by_tag(
+        ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA',
+            return kollos.defines.MARPA_OP_ALTERNATIVE,
+            kollos.defines.MARPA_OP_INVALID_CHAR,
+            kollos.defines.MARPA_OP_EARLEME_COMPLETE
+END_OF_LUA
+        ''
+      );
+
+    my ($trace_terminals) = $slr->call_by_tag(
+        ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA',
+            local recce = ...
+            return recce.trace_terminals
+END_OF_LUA
+        ''
+    );
+
+  OUTER_READ: while (1) {
 
         my $problem_code = $thin_slr->read();
         last OUTER_READ if not $problem_code;
         my $pause =
-            Marpa::R3::Internal::Scanless::convert_libmarpa_events($slr);
+          Marpa::R3::Internal::Scanless::convert_libmarpa_events($slr);
 
         last OUTER_READ if $pause;
         next OUTER_READ if $problem_code eq 'event';
@@ -848,20 +868,20 @@ sub Marpa::R3::Scanless::R::resume {
         # that it will not conflict with any user-defined event name.
 
         if (    $problem_code eq 'R1 exhausted before end'
-            and $slg->[Marpa::R3::Internal::Scanless::G::EXHAUSTION_ACTION]
-            eq 'event' )
+            and $slg->[Marpa::R3::Internal::Scanless::G::EXHAUSTION_ACTION] eq
+            'event' )
         {
             push @{ $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] },
-                [q{'exhausted}];
+              [q{'exhausted}];
             last OUTER_READ;
         } ## end if ( $problem_code eq 'R1 exhausted before end' and ...)
 
         if (    $problem_code eq 'no lexeme'
-            and $slg->[Marpa::R3::Internal::Scanless::G::REJECTION_ACTION]
-            eq 'event' )
+            and $slg->[Marpa::R3::Internal::Scanless::G::REJECTION_ACTION] eq
+            'event' )
         {
             push @{ $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] },
-                [q{'rejected}];
+              [q{'rejected}];
             last OUTER_READ;
         }
 
@@ -869,49 +889,35 @@ sub Marpa::R3::Scanless::R::resume {
             my $codepoint = $thin_slr->codepoint();
             Marpa::R3::exception(
                 qq{Failed at unacceptable character },
-                character_describe( chr $codepoint ) );
+                character_describe( chr $codepoint )
+            );
         } ## end if ( $problem_code eq 'invalid char' )
 
         if ( $problem_code eq 'unregistered char' ) {
 
-            my ( $op_alternative , $op_invalid_char , $op_earleme_complete ) = $slg->call_by_tag(
-    (__FILE__ . ':' . __LINE__),
-        <<'END_OF_LUA',
-            return kollos.defines.MARPA_OP_ALTERNATIVE,
-            kollos.defines.MARPA_OP_INVALID_CHAR,
-            kollos.defines.MARPA_OP_EARLEME_COMPLETE
-END_OF_LUA
-            '');
-
             # Recover by registering character, if we can
             my $codepoint = $thin_slr->codepoint();
-            # say STDERR ${$slr->[Marpa::R3::Internal::Scanless::R::P_INPUT_STRING]} ;
-            # say STDERR
-                # utf8::is_utf8( ${$slr->[Marpa::R3::Internal::Scanless::R::P_INPUT_STRING]} ) ? "is utf8" : "is NOT utf8";
+
+# say STDERR ${$slr->[Marpa::R3::Internal::Scanless::R::P_INPUT_STRING]} ;
+# say STDERR
+# utf8::is_utf8( ${$slr->[Marpa::R3::Internal::Scanless::R::P_INPUT_STRING]} ) ? "is utf8" : "is NOT utf8";
             my $character =
-                substr ${$slr->[Marpa::R3::Internal::Scanless::R::P_INPUT_STRING]},
-                   $thin_slr->pos(), 1;
-           # say STDERR join " ", "Character via string vs. codepoint:", $character, (ord $character), (chr $codepoint), $codepoint;
-            my $character_class_table = $slg->[Marpa::R3::Internal::Scanless::G::CHARACTER_CLASS_TABLE];
+              substr
+              ${ $slr->[Marpa::R3::Internal::Scanless::R::P_INPUT_STRING] },
+              $thin_slr->pos(), 1;
+
+# say STDERR join " ", "Character via string vs. codepoint:", $character, (ord $character), (chr $codepoint), $codepoint;
+            my $character_class_table =
+              $slg->[Marpa::R3::Internal::Scanless::G::CHARACTER_CLASS_TABLE];
             my @ops;
             for my $entry ( @{$character_class_table} ) {
 
                 my ( $symbol_id, $re ) = @{$entry};
                 if ( $character =~ $re ) {
 
-        my ($trace_terminals) = $slr->call_by_tag(
-    (__FILE__ . ':' . __LINE__),
-        <<'END_OF_LUA',
-            local recce = ...
-            return recce.trace_terminals
-END_OF_LUA
-            '');
-
                     if ( $trace_terminals >= 2 ) {
                         my $lex_tracer =
-                          $slg
-                          ->[Marpa::R3::Internal::Scanless::G::L0_TRACER
-                          ];
+                          $slg->[ Marpa::R3::Internal::Scanless::G::L0_TRACER ];
                         my $trace_file_handle = $slr->[
                           Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
                         my $char_desc = sprintf 'U+%04x', $codepoint;
@@ -920,19 +926,30 @@ END_OF_LUA
                         }
                         say {$trace_file_handle}
 qq{Registering character $char_desc as symbol $symbol_id: },
-                          $slg->l0_symbol_display_form($symbol_id )
+                          $slg->l0_symbol_display_form($symbol_id)
                           or Marpa::R3::exception("Could not say(): $ERRNO");
                     } ## end if ( $trace_terminals >= 2 )
+
                     push @ops, $op_alternative, $symbol_id, 1, 1;
+
                 } ## end if ( $character =~ $re )
             } ## end for my $entry ( @{$character_class_table} )
+
+            $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+                <<'END_OF_LUA', 'ii', $codepoint, \@ops );
+        local recce, codepoint, ops = ...
+        if #ops <= 0 then
+             recce.per_codepoint[codepoint] = { kollos.defines.MARPA_OP_INVALID_CHAR }
+        else
+             recce.per_codepoint[codepoint] = ops
+        end
+END_OF_LUA
 
             if ( not @ops ) {
                 $thin_slr->char_register( $codepoint, $op_invalid_char );
                 next OUTER_READ;
             }
-            $thin_slr->char_register( $codepoint, @ops,
-                $op_earleme_complete );
+            $thin_slr->char_register( $codepoint, @ops, $op_earleme_complete );
             next OUTER_READ;
         } ## end if ( $problem_code eq 'unregistered char' )
 
