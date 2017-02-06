@@ -324,7 +324,7 @@ slg_l0_error (Outer_G * outer_slg)
     call_by_tag (outer_slg->L, MYLUA_TAG,
         "slg = ...\n"
         "local l0g = slg.lmw_l0g\n"
-        "return l0g:error_description\n", "G>C",
+        "return l0g:error_description()\n", "G>C",
         outer_slg->lua_ref, &error_description);
     return SvPV_nolen (error_description);
 }
@@ -340,7 +340,7 @@ slr_l0_error (Outer_R * outer_slr)
     call_by_tag (outer_slr->L, MYLUA_TAG,
         "recce = ...\n"
         "local l0g = recce.slg.lmw_l0g\n"
-        "return l0g:error_description\n", "R>C",
+        "return l0g:error_description()\n", "R>C",
         outer_slr->lua_ref, &error_description);
     return SvPV_nolen (error_description);
 }
@@ -358,7 +358,7 @@ slg_g1_error (Outer_G * outer_slg)
     call_by_tag (outer_slg->L, MYLUA_TAG,
         "slg = ...\n"
         "local g1g = slg.lmw_g1g\n"
-        "return g1g:error_description\n", "G>C",
+        "return g1g:error_description()\n", "G>C",
         outer_slg->lua_ref, &error_description);
     return SvPV_nolen (error_description);
 }
@@ -374,7 +374,7 @@ slr_g1_error (Outer_R * outer_slr)
     call_by_tag (outer_slr->L, MYLUA_TAG,
         "recce = ...\n"
         "local g1g = recce.slg.lmw_g1g\n"
-        "return g1g:error_description\n", "R>C",
+        "return g1g:error_description()\n", "R>C",
         outer_slr->lua_ref, &error_description);
     return SvPV_nolen (error_description);
 }
@@ -1865,10 +1865,7 @@ u_read (Outer_R * outer_slr)
     "local ops = recce.per_codepoint[codepoint]\n"
     "local op_count = -1\n"
     "if ops then\n"
-    "    op_count = ops[1]\n"
-    "end\n"
-    "if not op_count then\n"
-    "    error(string.format('Bad op count for codepoint %d'), codepoint)\n"
+    "    op_count = #ops\n"
     "end\n"
     "return codepoint, op_count\n"
     ,
