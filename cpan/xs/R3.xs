@@ -1338,113 +1338,6 @@ static const struct luaL_Reg marpa_funcs[] = {
     {NULL, NULL},
 };
 
-/* === LUA ARRAY CLASS === */
-
-/* Array must be lua_Integer because it is used for VM ops */
-typedef struct Xlua_Array {
-    size_t size;
-    lua_Integer array[1];
-} Xlua_Array;
-
-/* Leaves new userdata on top of stack */
-static void
-xlua_array_new (lua_State * L, lua_Integer size)
-{
-    marpa_lua_newuserdata (L,
-        sizeof (Xlua_Array) + ((size_t)size - 1) * sizeof (lua_Integer));
-    marpa_luaL_setmetatable (L, MT_NAME_ARRAY);
-}
-
-static int xlua_array_new_func(lua_State* L)
-{
-   const lua_Integer size = marpa_luaL_checkinteger(L, 1);
-   xlua_array_new(L, size);
-   return 1;
-}
-
-static int
-xlua_array_from_list_func (lua_State * L)
-{
-    int ix;
-    Xlua_Array *p_array;
-    const int last_arg = marpa_lua_gettop (L);
-
-    xlua_array_new(L, last_arg);
-    /* [ array_ud ] */
-    p_array = (Xlua_Array *) marpa_lua_touserdata (L, -1);
-    for (ix = 1; ix <= last_arg; ix++) {
-        const lua_Integer value = marpa_luaL_checkinteger (L, ix);
-        p_array->array[ix - 1] = (lua_Integer)value;
-    }
-    p_array->size = (size_t)last_arg;
-    /* [ array_ud ] */
-    return 1;
-}
-
-static int
-xlua_array_index_meth (lua_State * L)
-{
-    Xlua_Array * const p_array =
-        (Xlua_Array *) marpa_luaL_checkudata (L, 1, MT_NAME_ARRAY);
-    const lua_Integer ix = marpa_luaL_checkinteger (L, 2);
-    marpa_luaL_argcheck (L, (ix >= 0 && (size_t)ix < p_array->size), 2,
-        "index out of bounds");
-    marpa_lua_pushinteger(L, (lua_Integer)p_array->array[ix]);
-    return 1;
-}
-
-static int
-xlua_array_new_index_meth (lua_State * L)
-{
-    Xlua_Array * const p_array =
-        (Xlua_Array *) marpa_luaL_checkudata (L, 1, MT_NAME_ARRAY);
-    const lua_Integer ix = marpa_luaL_checkinteger (L, 2);
-    const lua_Integer value = marpa_luaL_checkinteger (L, 3);
-    marpa_luaL_argcheck (L, (ix < 0 || (size_t)ix >= p_array->size), 2,
-        "index out of bounds");
-    p_array->array[ix] = (lua_Integer)value;
-    return 1;
-}
-
-static int
-xlua_array_len_meth (lua_State * L)
-{
-    Xlua_Array * const p_array =
-        (Xlua_Array *) marpa_luaL_checkudata (L, 1, MT_NAME_ARRAY);
-    marpa_lua_pushinteger(L, (lua_Integer)(lua_Unsigned)p_array->size);
-    return 1;
-}
-
-static const struct luaL_Reg marpa_array_meths[] = {
-    {"__index", xlua_array_index_meth},
-    {"__newindex", xlua_array_new_index_meth},
-    {"__len", xlua_array_len_meth},
-    {NULL, NULL},
-};
-
-static const struct luaL_Reg marpa_array_funcs[] = {
-    {"from_list", xlua_array_from_list_func},
-    {"new", xlua_array_new_func},
-    {NULL, NULL},
-};
-
-/* create SV metatable */
-static void create_array_mt (lua_State* L) {
-    int base_of_stack = marpa_lua_gettop(L);
-    marpa_luaL_newmetatable(L, MT_NAME_ARRAY);
-    /* Lua stack: [mt] */
-
-    /* metatable.__index = metatable */
-    marpa_lua_pushvalue(L, -1);
-    marpa_lua_setfield(L, -2, "__index");
-    /* Lua stack: [mt] */
-
-    /* register methods */
-    marpa_luaL_setfuncs(L, marpa_array_meths, 0);
-    /* Lua stack: [mt] */
-    marpa_lua_settop(L, base_of_stack);
-}
-
 /*
  * Message handler used to run all chunks
  * The message processing can be significant.
@@ -4206,7 +4099,6 @@ PPCODE:
 
     /* create metatables */
     create_sv_mt(L);
-    create_array_mt(L);
 
     marpa_luaL_newlib(L, marpa_funcs);
     /* Lua stack: [ marpa_table ] */
@@ -4220,11 +4112,6 @@ PPCODE:
     marpa_luaL_newlib(L, marpa_sv_funcs);
     /* Lua stack: [ marpa_table, sv_table ] */
     marpa_lua_setfield (L, marpa_table, "sv");
-    /* Lua stack: [ marpa_table ] */
-
-    marpa_luaL_newlib(L, marpa_array_funcs);
-    /* Lua stack: [ marpa_table, sv_table ] */
-    marpa_lua_setfield (L, marpa_table, "array");
     /* Lua stack: [ marpa_table ] */
 
     marpa_lua_settop (L, base_of_stack);
