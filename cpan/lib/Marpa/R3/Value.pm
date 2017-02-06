@@ -588,7 +588,15 @@ sub do_tree_ops {
     }
     my $lua_to_perl_tree_op = $tree->[1];
     if ( $lua_to_perl_tree_op eq 'bless' ) {
+        my $blessing = $tree->[3];
         return bless do_tree_ops( $slr, $tree->[2] ), $tree->[3];
+    }
+    if ( $lua_to_perl_tree_op eq 'bless_ix' ) {
+        my $constant_ix = $tree->[3];
+        my $slg         = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+        my $blessing = $slg->[Marpa::R3::Internal::Scanless::G::CONSTANTS]
+          ->[$constant_ix];
+        return bless do_tree_ops( $slr, $tree->[2] ), $blessing;
     }
     if ( $lua_to_perl_tree_op eq 'literal' ) {
         return

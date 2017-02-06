@@ -1299,12 +1299,9 @@ is the result of this sequence of operations.
 ```
     -- miranda: section+ VM operations
     local function op_fn_result_is_array(recce, dummy, new_values)
-        local grammar = recce.slg
         local blessing_ix = recce.this_step.blessing_ix
         if blessing_ix then
-          local constants = grammar.constants
-          local blessing = constants[blessing_ix]
-          new_values = { 'perl', 'bless', new_values, blessing }
+          new_values = { 'perl', 'bless_ix', new_values, blessing_ix }
           setmetatable(new_values, _M.mt_tree_op)
         end
         local stack = recce.lmw_v.stack
@@ -1327,7 +1324,6 @@ implementation, which returned the size of the
 ```
     -- miranda: section+ VM operations
     local function op_fn_callback(recce, dummy, new_values)
-        local grammar = recce.slg
         local blessing_ix = recce.this_step.blessing_ix
         local step_type = recce.this_step.type
         if step_type ~= 'MARPA_STEP_RULE'
@@ -1341,11 +1337,8 @@ implementation, which returned the size of the
         end
         local blessing_ix = recce.this_step.blessing_ix
         if blessing_ix then
-          local constants = grammar.constants
-          local blessing = constants[blessing_ix]
-          new_values = { 'perl', 'bless', new_values, blessing }
+          new_values = { 'perl', 'bless_ix', new_values, blessing_ix }
           setmetatable(new_values, _M.mt_tree_op)
-          -- marpa.sv.bless(new_values, blessing)
         end
         return 3
     end
