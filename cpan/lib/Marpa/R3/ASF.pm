@@ -465,8 +465,7 @@ END_OF_LUA
     ('@' . __FILE__ . ':' . __LINE__),
         <<'END_OF_LUA', 'i>*', $or_node_id );
         -- assumes throw mode
-        local recce, raw_or_node_id = ...
-        local or_node_id = raw_or_node_id + 0
+        local recce, or_node_id = ...
         local and_node_ids = marpa.sv.av_new()
         local order = recce.lmw_o
         local count = order:_or_node_and_node_count(or_node_id)
