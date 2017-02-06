@@ -1779,25 +1779,18 @@ u_read (Outer_R * outer_slr)
         /* ops[0] is codepoint */
         old_op_count = ops[1];
         for (op_ix = 1, old_op_ix = 2; old_op_ix < old_op_count; op_ix++, old_op_ix++) {
-            const lua_Integer op_code = ops[old_op_ix];
+            lua_Integer op_code;
 
                     call_by_tag (outer_slr->L, MYLUA_TAG,
-                            "recce, op_code, codepoint, op_ix, old_op_ix = ...\n"
+                            "recce, codepoint, op_ix = ...\n"
                             "-- print(inspect(recce.per_codepoint[codepoint]))\n"
                             "-- print('op_ix: ', inspect(op_ix))\n"
-                            "local new_op_code = recce.per_codepoint[codepoint][op_ix]\n"
-                            "-- print('new_op_code: ', inspect(new_op_code))\n"
-                            "if op_code ~= new_op_code then\n"
-                            "    error(string.format(\n"
-                            "        'new_op_code vs. op_code, op_ix vs. old_op_ix; %d vs. %d; %d vs. %d',\n"
-                            "        new_op_code, op_code,\n"
-                            "        op_ix, old_op_ix\n"
-                            "    ))\n"
-                            "end\n"
+                            "local op_code = recce.per_codepoint[codepoint][op_ix]\n"
+                            "return op_code\n"
                             ,
-                            "Riii>",
+                            "Rii>i",
                             outer_slr->lua_ref,
-                            op_code, codepoint, op_ix, old_op_ix
+                            codepoint, op_ix, &op_code
                     );
 
             switch (op_code) {
