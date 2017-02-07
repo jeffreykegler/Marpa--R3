@@ -1717,10 +1717,7 @@ u_read (Outer_R * outer_slr)
     for (;;) {
         lua_Integer codepoint;
         lua_Integer op_count;
-        lua_Integer old_op_count;
-        lua_Integer old_op_ix;
         lua_Integer op_ix;
-        lua_Integer *ops;
         int tokens_accepted = 0;
         if (slr->perl_pos >= slr->end_pos)
             break;
@@ -1756,8 +1753,7 @@ u_read (Outer_R * outer_slr)
             (lua_Integer) slr->perl_pos);
 
         /* ops[0] is codepoint */
-        old_op_count = ops[1];
-        for (op_ix = 1, old_op_ix = 2; op_ix <= op_count; op_ix++, old_op_ix++) {
+        for (op_ix = 1; op_ix <= op_count; op_ix++) {
             lua_Integer op_code;
 
                     call_by_tag (outer_slr->L, MYLUA_TAG,
@@ -1800,7 +1796,6 @@ u_read (Outer_R * outer_slr)
                             &symbol_id, &value, &length, &result
                     );
                     op_ix+=3;
-                    old_op_ix+=3;
                     switch (result) {
                     case MARPA_ERR_UNEXPECTED_TOKEN_ID:
                         /* This guarantees that later, if we fall below
@@ -1904,9 +1899,9 @@ u_read (Outer_R * outer_slr)
                 break;
             default:
                 croak
-                    ("Unknown op code (0x%lx); codepoint=0x%lx, old_op_ix=0x%lx",
+                    ("Unknown op code (0x%lx); codepoint=0x%lx, op_ix=0x%lx",
                     (unsigned long) op_code, (unsigned long) codepoint,
-                    (unsigned long) old_op_ix);
+                    (unsigned long) op_ix);
             }
         }
       ADVANCE_ONE_CHAR:;
@@ -2018,10 +2013,15 @@ static void slg_inner_init_properties (
     {
         Marpa_Rule_ID rule_id;
         lua_Integer l0_rule_count;
+        /* this can be deleted on conversion to Lua --
+         * all properties default to false
+         */
         call_by_tag (outer_slg->L, MYLUA_TAG,
             "grammar = ...\n"
             "local l0g = grammar.lmw_l0g\n"
-            "return l0g:highest_rule_id()+1\n",
+            "local highest_l0_rule = l0g:highest_rule_id()\n"
+            "return highest_l0_rule+1\n"
+            ,
             "G>i", outer_slg->lua_ref, &l0_rule_count);
 
         Newx (slg->l0_rule_g_properties, ((unsigned int) l0_rule_count),
@@ -2036,7 +2036,6 @@ static void slg_inner_init_properties (
 }
 
 static void slg_inner_destroy(Scanless_G* slg) {
-  unsigned int i = 0;
   dTHX;
   Safefree (slg->symbol_g_properties);
   Safefree (slg->l0_rule_g_properties);
@@ -2108,12 +2107,18 @@ marpa_inner_slr_new (Outer_G* outer_slg)
     }
 
     {
+        /* Delete this on conversion to Lua
+         * Lua values init'd later, after creation
+         * of outer_slr->lua_ref
+         */
         Marpa_Rule_ID l0_rule_id;
         lua_Integer l0_rule_count;
         call_by_tag (outer_slg->L, MYLUA_TAG,
-            "grammar = ...\n"
+            "local grammar = ...\n"
             "local l0g = grammar.lmw_l0g\n"
-            "return l0g:highest_rule_id()+1\n",
+            "local max_l0_rule_id = l0g:highest_rule_id()\n"
+            "return max_l0_rule_id+1\n"
+            ,
             "G>i", outer_slg->lua_ref, &l0_rule_count);
 
         Newx (slr->l0_rule_r_properties, (unsigned) l0_rule_count,
@@ -3148,13 +3153,27 @@ PPCODE:
 
   call_by_tag (outer_slr->L, MYLUA_TAG,
       "local recce = ...\n"
-      "recce.lmw_g1r = kollos.recce_new(recce.slg.lmw_g1g)\n"
+      "local grammar = recce.slg\n"
+      "local l0g = grammar.lmw_l0g\n"
+      "local g1g = grammar.lmw_g1g\n"
+      "recce.lmw_g1r = kollos.recce_new(g1g)\n"
       "recce.too_many_earley_items = -1\n"
       "recce.event_queue = {}\n"
       "recce.es_data = {}\n"
-      "recce.lmw_g1r.lmw_g = recce.slg.lmw_g1g\n"
+      "recce.lmw_g1r.lmw_g = g1g\n"
       "recce.trace_terminals = 0\n"
       "recce.per_codepoint = {}\n"
+      "recce.l0_rules = {}\n"
+      "local r_l0_rules = recce.l0_rules\n"
+      "local g_l0_rules = grammar.l0_rules\n"
+      "-- print('g_l0_rules: ', inspect(g_l0_rules))\n"
+      "local max_l0_rule_id = l0g:highest_rule_id()\n"
+      "for rule_id = 0, max_l0_rule_id do\n"
+      "    r_l0_rules[rule_id] = {\n"
+      "        event_on_discard_active =\n"
+      "            g_l0_rules[rule_id].event_on_discard_active\n"
+      "    }\n"
+      "end\n"
       ,
       "R>", outer_slr->lua_ref);
 
