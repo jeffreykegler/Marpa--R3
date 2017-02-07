@@ -196,6 +196,17 @@ sub Marpa::R3::Scanless::R::new {
         $thin_slr->discard_event_activate( $_, $is_active )
             for @{$lexer_rule_ids};
 
+      $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 'ii', $lexer_rule_ids, ($is_active ? 1 : 0) );
+        local slr, lexer_rule_ids, is_active_arg = ...
+        local is_active = is_active_arg and true or nil
+        local l0_rules = slr.l0_rules
+        for ix = 1, #lexer_rule_ids do
+            local lexer_rule_id = lexer_rule_ids[ix]
+            l0_rules[lexer_rule_id].event_on_discard_active = is_active
+        end
+END_OF_LUA
+
         $symbol_ids =
             $symbol_ids_by_event_name_and_type->{$event_name}->{completion}
             // [];

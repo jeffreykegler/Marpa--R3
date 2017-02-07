@@ -1038,6 +1038,16 @@ END_OF_LUA
             push
               @{ $symbol_ids_by_event_name_and_type->{$event_name}->{discard} },
               $lexer_rule_id;
+
+      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 'ii', $lexer_rule_id, ($is_active ? 1 : 0) );
+        local slg, lexer_rule_id, is_active_arg = ...
+        local is_active = is_active_arg ~= 0 and true or nil
+        local l0_rules = slg.l0_rules
+        l0_rules[lexer_rule_id].event_on_discard = true
+        l0_rules[lexer_rule_id].event_on_discard_active = is_active
+END_OF_LUA
+
             $thin_slg->discard_event_set( $lexer_rule_id, 1 );
             $thin_slg->discard_event_activate( $lexer_rule_id, 1 )
               if $is_active;
