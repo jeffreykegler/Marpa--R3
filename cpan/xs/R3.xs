@@ -117,8 +117,6 @@ union marpa_slr_event_s
 
 typedef struct
 {
-  HV *per_codepoint_hash;
-  lua_Integer *per_codepoint_array[128];
   struct symbol_g_properties *symbol_g_properties;
   struct l0_rule_g_properties *l0_rule_g_properties;
 
@@ -1748,25 +1746,6 @@ u_read (Outer_R * outer_slr)
                 return U_READ_UNREGISTERED_CHAR;
     }
 
-        if (codepoint < (lua_Integer)Dim (slr->slg->per_codepoint_array)) {
-            ops = slr->slg->per_codepoint_array[codepoint];
-            if (!ops) {
-                slr->codepoint = codepoint;
-                return U_READ_UNREGISTERED_CHAR;
-            }
-        } else {
-            STRLEN dummy;
-            SV **p_ops_sv =
-                hv_fetch (slr->slg->per_codepoint_hash,
-                (char *) &codepoint,
-                (I32) sizeof (codepoint), 0);
-            if (!p_ops_sv) {
-                slr->codepoint = codepoint;
-                return U_READ_UNREGISTERED_CHAR;
-            }
-            ops = (lua_Integer *) SvPV (*p_ops_sv, dummy);
-        }
-
         call_by_tag (outer_slr->L, MYLUA_TAG,
             "local recce, codepoint, perl_pos = ...\n"
             "if recce.trace_terminals >= 1 then\n"
@@ -2002,14 +1981,6 @@ static Scanless_G* slg_inner_new (void)
 
     Newx (slg, 1, Scanless_G);
 
-    {
-        int i;
-        slg->per_codepoint_hash = newHV ();
-        for (i = 0; i < (int) Dim (slg->per_codepoint_array); i++) {
-            slg->per_codepoint_array[i] = NULL;
-        }
-    }
-
     slg->symbol_g_properties = NULL;
     slg->l0_rule_g_properties = NULL;
 
@@ -2069,10 +2040,6 @@ static void slg_inner_destroy(Scanless_G* slg) {
   dTHX;
   Safefree (slg->symbol_g_properties);
   Safefree (slg->l0_rule_g_properties);
-  SvREFCNT_dec (slg->per_codepoint_hash);
-  for (i = 0; i < Dim(slg->per_codepoint_array); i++) {
-    Safefree(slg->per_codepoint_array[i]);
-  }
   Safefree (slg);
 }
 
@@ -3754,49 +3721,6 @@ PPCODE:
 {
   Scanless_R *slr = slr_inner_get(outer_slr);
   XSRETURN_IV(slr->input_symbol_id);
-}
-
-void
-char_register( outer_slr, codepoint_arg, ... )
-    Outer_R *outer_slr;
-    UV codepoint_arg;
-PPCODE:
-{
-  Scanless_R *slr = slr_inner_get(outer_slr);
-  /* OP Count is args less two, then plus two for codepoint and length fields */
-  const lua_Integer op_count = (lua_Integer)items;
-  lua_Integer op_ix;
-  lua_Integer *ops;
-  SV *ops_sv = NULL;
-  const lua_Integer codepoint = (lua_Integer)codepoint_arg;
-
-  if ( codepoint < (int)Dim (slr->slg->per_codepoint_array))
-    {
-      ops = slr->slg->per_codepoint_array[codepoint];
-      Renew (ops, (unsigned int)op_count, lua_Integer);
-      slr->slg->per_codepoint_array[codepoint] = ops;
-    }
-  else
-    {
-      STRLEN dummy;
-      ops_sv = newSV ((size_t)op_count * sizeof (ops[0]));
-      SvPOK_on (ops_sv);
-      ops = (lua_Integer *) SvPV (ops_sv, dummy);
-    }
-  ops[0] = (lua_Integer)codepoint;
-  ops[1] = op_count;
-  for (op_ix = 2; op_ix < op_count; op_ix++)
-    {
-      /* By coincidence, offset of individual ops is 2 both in the
-       * method arguments and in the op_list, so that arg IX == op_ix
-       */
-      ops[op_ix] = SvUV (ST ((int)op_ix));
-    }
-  if (ops_sv)
-    {
-      (void)hv_store (slr->slg->per_codepoint_hash, (char *) &codepoint,
-                sizeof (codepoint), ops_sv, 0);
-    }
 }
 
   # Untested

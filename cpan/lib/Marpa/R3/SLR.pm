@@ -829,13 +829,10 @@ sub Marpa::R3::Scanless::R::resume {
     my $slg      = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $thin_slg = $slg->[Marpa::R3::Internal::Scanless::G::C];
 
-    my ( $op_alternative, $op_invalid_char, $op_earleme_complete ) =
-      $slg->call_by_tag(
+    my ( $op_alternative ) = $slg->call_by_tag(
         ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA',
-            return kollos.defines.MARPA_OP_ALTERNATIVE,
-            kollos.defines.MARPA_OP_INVALID_CHAR,
-            kollos.defines.MARPA_OP_EARLEME_COMPLETE
+            return kollos.defines.MARPA_OP_ALTERNATIVE
 END_OF_LUA
         ''
       );
@@ -946,11 +943,6 @@ qq{Registering character $char_desc as symbol $symbol_id: },
         end
 END_OF_LUA
 
-            if ( not @ops ) {
-                $thin_slr->char_register( $codepoint, $op_invalid_char );
-                next OUTER_READ;
-            }
-            $thin_slr->char_register( $codepoint, @ops, $op_earleme_complete );
             next OUTER_READ;
         } ## end if ( $problem_code eq 'unregistered char' )
 
