@@ -1801,36 +1801,27 @@ u_read (Outer_R * outer_slr)
                     lua_Integer length;
                     lua_Integer value;
 
-                    old_op_ix++;
-                    op_ix++;
-                    if (old_op_ix >= old_op_count) {
-                        croak
-                            ("Missing operand for op code (0x%lx); codepoint=0x%lx, old_op_ix=0x%lx",
-                            (unsigned long) op_code,
-                            (unsigned long) codepoint,
-                            (unsigned long) old_op_ix);
-                    }
-                    symbol_id = (int) ops[old_op_ix];
-                    if (old_op_ix + 2 >= old_op_count) {
-                        croak
-                            ("Missing operand for op code (0x%lx); codepoint=0x%lx, old_op_ix=0x%lx",
-                            (unsigned long) op_code,
-                            (unsigned long) codepoint,
-                            (unsigned long) old_op_ix);
-                    }
-                    ++old_op_ix;
-                    op_ix++;
-                    value = (int) ops[old_op_ix];
-                    ++old_op_ix;
-                    op_ix++;
-                    length = (int) ops[old_op_ix];
                     call_by_tag (outer_slr->L, MYLUA_TAG,
-                            "recce, symbol_id, value, length = ...\n"
-                            "return recce.lmw_l0r:alternative(symbol_id, value, length)\n",
-                            "Riii>i",
-                            outer_slr->lua_ref,
-                            (lua_Integer)symbol_id, (lua_Integer)value, (lua_Integer)length, &result
+                            "recce, op_ix = ...\n"
+                            "local ops = recce.per_codepoint[codepoint]\n"
+                            "local symbol_id = ops[op_ix+1]\n"
+                            "local value = ops[op_ix+2]\n"
+                            "local length = ops[op_ix+3]\n"
+                            "if not length then\n"
+                            "    error(string.format(\n"
+                            "        'Missing OP_ALTERNATIVE operands, codepoint=%d, op_ix=%d',\n"
+                            "        codepoint, op_ix\n"
+                            "    ))\n"
+                            "end\n"
+                            "return symbol_id, value, length,\n"
+                            "    recce.lmw_l0r:alternative(symbol_id, value, length)\n"
+                            ,
+                            "Ri>iiii",
+                            outer_slr->lua_ref, op_ix,
+                            &symbol_id, &value, &length, &result
                     );
+                    op_ix+=3;
+                    old_op_ix+=3;
                     switch (result) {
                     case MARPA_ERR_UNEXPECTED_TOKEN_ID:
                         /* This guarantees that later, if we fall below
