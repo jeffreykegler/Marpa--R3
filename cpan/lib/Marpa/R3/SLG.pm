@@ -1048,9 +1048,6 @@ END_OF_LUA
         l0_rules[lexer_rule_id].event_on_discard_active = is_active
 END_OF_LUA
 
-            $thin_slg->discard_event_set( $lexer_rule_id, 1 );
-            $thin_slg->discard_event_activate( $lexer_rule_id, 1 )
-              if $is_active;
         } ## end if ( defined $discard_event )
     }
 

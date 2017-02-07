@@ -192,17 +192,12 @@ sub Marpa::R3::Scanless::R::new {
         $thin_slr->lexeme_event_activate( $_, $is_active )
             for @{$symbol_ids};
         my $lexer_rule_ids =
-            $symbol_ids_by_event_name_and_type->{$event_name}->{discard};
-
-            # say STDERR "is_active: ", ($is_active // 'undef');
-
-        $thin_slr->discard_event_activate( $_, $is_active )
-            for @{$lexer_rule_ids};
+            $symbol_ids_by_event_name_and_type->{$event_name}->{discard}
+            // [];
 
       $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'ii', $lexer_rule_ids, ($is_active ? 1 : 0) );
         local slr, lexer_rule_ids, is_active_arg = ...
-        -- print('is_active_arg: ', inspect(is_active_arg))
         local slg = slr.slg
         local is_active = (is_active_arg ~= 0 and true or nil)
         local g_l0_rules = slg.l0_rules
@@ -215,10 +210,6 @@ sub Marpa::R3::Scanless::R::new {
                     error("Attempt to activate non-existent discard event")
                 end
             end
-            -- print(string.format(
-                -- "Setting L0 rule %d event on discard to %s",
-                 -- lexer_rule_id,
-                 -- inspect(is_active)))
             r_l0_rules[lexer_rule_id].event_on_discard_active = is_active
         end
 END_OF_LUA
@@ -1796,6 +1787,7 @@ sub Marpa::R3::Scanless::R::call_by_name {
 sub Marpa::R3::Scanless::R::call_by_tag {
     my ( $slr, $tag, $codestr, $signature, @args ) = @_;
     my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
+    $DB::single = 1 if grep { not defined $_ } @args;
     my @results = $thin_slr->call_by_tag($tag, $codestr, $signature, @args);
     return @results;
 }

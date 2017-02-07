@@ -44,19 +44,10 @@ struct symbol_g_properties {
      unsigned int t_pause_after_active:1;
 };
 
-struct l0_rule_g_properties {
-     unsigned int t_event_on_discard:1;
-     unsigned int t_event_on_discard_active:1;
-};
-
 struct symbol_r_properties {
      int lexeme_priority;
      unsigned int t_pause_before_active:1;
      unsigned int t_pause_after_active:1;
-};
-
-struct l0_rule_r_properties {
-     unsigned int t_event_on_discard_active:1;
 };
 
 union marpa_slr_event_s;
@@ -118,8 +109,6 @@ union marpa_slr_event_s
 typedef struct
 {
   struct symbol_g_properties *symbol_g_properties;
-  struct l0_rule_g_properties *l0_rule_g_properties;
-
 } Scanless_G;
 
 typedef struct {
@@ -159,7 +148,6 @@ typedef struct
   int start_of_pause_lexeme;
   int end_of_pause_lexeme;
   struct symbol_r_properties *symbol_r_properties;
-  struct l0_rule_r_properties *l0_rule_r_properties;
 
   Marpa_Symbol_ID input_symbol_id;
   lua_Integer codepoint;                 /* For error returns */
@@ -1977,7 +1965,6 @@ static Scanless_G* slg_inner_new (void)
     Newx (slg, 1, Scanless_G);
 
     slg->symbol_g_properties = NULL;
-    slg->l0_rule_g_properties = NULL;
 
     return slg;
 }
@@ -2010,35 +1997,11 @@ static void slg_inner_init_properties (
         }
     }
 
-    {
-        Marpa_Rule_ID rule_id;
-        lua_Integer l0_rule_count;
-        /* this can be deleted on conversion to Lua --
-         * all properties default to false
-         */
-        call_by_tag (outer_slg->L, MYLUA_TAG,
-            "grammar = ...\n"
-            "local l0g = grammar.lmw_l0g\n"
-            "local highest_l0_rule = l0g:highest_rule_id()\n"
-            "return highest_l0_rule+1\n"
-            ,
-            "G>i", outer_slg->lua_ref, &l0_rule_count);
-
-        Newx (slg->l0_rule_g_properties, ((unsigned int) l0_rule_count),
-            struct l0_rule_g_properties);
-        for (rule_id = 0; rule_id < l0_rule_count; rule_id++) {
-            slg->l0_rule_g_properties[rule_id].t_event_on_discard = 0;
-            slg->l0_rule_g_properties[rule_id].t_event_on_discard_active =
-                0;
-        }
-    }
-
 }
 
 static void slg_inner_destroy(Scanless_G* slg) {
   dTHX;
   Safefree (slg->symbol_g_properties);
-  Safefree (slg->l0_rule_g_properties);
   Safefree (slg);
 }
 
@@ -2106,32 +2069,6 @@ marpa_inner_slr_new (Outer_G* outer_slg)
         }
     }
 
-    {
-        /* Delete this on conversion to Lua
-         * Lua values init'd later, after creation
-         * of outer_slr->lua_ref
-         */
-        Marpa_Rule_ID l0_rule_id;
-        lua_Integer l0_rule_count;
-        call_by_tag (outer_slg->L, MYLUA_TAG,
-            "local grammar = ...\n"
-            "local l0g = grammar.lmw_l0g\n"
-            "local max_l0_rule_id = l0g:highest_rule_id()\n"
-            "return max_l0_rule_id+1\n"
-            ,
-            "G>i", outer_slg->lua_ref, &l0_rule_count);
-
-        Newx (slr->l0_rule_r_properties, (unsigned) l0_rule_count,
-            struct l0_rule_r_properties);
-        for (l0_rule_id = 0; l0_rule_id < l0_rule_count; l0_rule_id++) {
-            const struct l0_rule_g_properties *g_properties =
-                slg->l0_rule_g_properties + l0_rule_id;
-            slr->l0_rule_r_properties[l0_rule_id].
-                t_event_on_discard_active =
-                g_properties->t_event_on_discard_active;
-        }
-    }
-
     slr->lexer_start_pos = slr->perl_pos;
     slr->lexer_read_result = 0;
     slr->start_of_pause_lexeme = -1;
@@ -2175,7 +2112,6 @@ static void slr_inner_destroy(lua_State* L, Scanless_R* slr)
    Safefree(slr->t_lexemes);
 
   Safefree(slr->symbol_r_properties);
-  Safefree(slr->l0_rule_r_properties);
   if (slr->token_values)
     {
       SvREFCNT_dec ((SV *) slr->token_values);
@@ -2426,17 +2362,12 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
                     const Marpa_Rule_ID l0_rule_id =
                         lexeme_stack_event->t_trace_lexeme_discarded.
                         t_rule_id;
-                    struct l0_rule_r_properties *l0_rule_r_properties =
-                        slr->l0_rule_r_properties + l0_rule_id;
                     call_by_tag (outer_slr->L, MYLUA_TAG,
-                        "recce, rule_id, lexeme_start, lexeme_end, old_is_active = ...\n"
+                        "recce, rule_id, lexeme_start, lexeme_end = ...\n"
                         "local q = recce.event_queue\n"
                         "local g1r = recce.lmw_g1r\n"
                         "local event_on_discard_active =\n"
                         "    recce.l0_rules[rule_id].event_on_discard_active\n"
-                        "-- print(string.format('event_on_discard_active; event, old vs. new: %s, %s vs. %s',\n"
-                        "     -- inspect(recce.slg.l0_rules[rule_id].event_on_discard),\n"
-                        "     -- inspect(old_is_active), inspect(event_on_discard_active)))\n"
                         "if event_on_discard_active then\n"
                         "   local last_g1_location = g1r:latest_earley_set()\n"
                         "   q[#q+1] = { 'discarded lexeme',\n"
@@ -2449,8 +2380,7 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
                         (lua_Integer) lexeme_stack_event->
                         t_trace_lexeme_discarded.t_start_of_lexeme,
                         (lua_Integer) lexeme_stack_event->
-                        t_trace_lexeme_discarded.t_end_of_lexeme,
-                    (lua_Integer)(l0_rule_r_properties->t_event_on_discard_active ? 1 : 0)
+                        t_trace_lexeme_discarded.t_end_of_lexeme
                     );
                 }
                 goto NEXT_LEXEME_EVENT;
@@ -2988,106 +2918,6 @@ PPCODE:
   XSRETURN_YES;
 }
 
-void
-discard_event_set( outer_slg, l0_rule_id, boolean )
-    Outer_G *outer_slg;
-    Marpa_Rule_ID l0_rule_id;
-    int boolean;
-PPCODE:
-{
-    Scanless_G* slg = slg_inner_get(outer_slg);
-    struct l0_rule_g_properties * g_properties = slg->l0_rule_g_properties + l0_rule_id;
-    lua_Integer highest_l0_rule_id;
-
-    call_by_tag (outer_slg->L, MYLUA_TAG,
-        "grammar = ...\n"
-        "local l0g = grammar.lmw_l0g\n"
-        "return l0g:highest_rule_id()+1\n",
-        "G>i", outer_slg->lua_ref, &highest_l0_rule_id);
-
-    if (l0_rule_id > highest_l0_rule_id)
-    {
-      croak
-        ("Problem in slg->discard_event_set(%ld, %ld): rule ID was %ld, but highest L0 rule ID = %ld",
-         (long) l0_rule_id,
-         (long) boolean,
-         (long) l0_rule_id,
-         (long) highest_l0_rule_id
-         );
-    }
-    if (l0_rule_id < 0) {
-      croak
-        ("Problem in slg->discard_event_set(%ld, %ld): rule ID was %ld, a disallowed value",
-         (long) l0_rule_id,
-         (long) boolean,
-         (long) l0_rule_id);
-    }
-    switch (boolean) {
-    case 0:
-    case 1:
-        g_properties->t_event_on_discard = boolean ? 1 : 0;
-        break;
-    default:
-      croak
-        ("Problem in slg->discard_event_set(%ld, %ld): value must be 0 or 1",
-         (long) l0_rule_id,
-         (long) boolean);
-    }
-  XSRETURN_YES;
-}
-
-void
-discard_event_activate( outer_slg, l0_rule_id, activate )
-    Outer_G *outer_slg;
-    Marpa_Rule_ID l0_rule_id;
-    int activate;
-PPCODE:
-{
-  Scanless_G* slg = slg_inner_get(outer_slg);
-  struct l0_rule_g_properties *g_properties =
-    slg->l0_rule_g_properties + l0_rule_id;
-  lua_Integer highest_l0_rule_id;
-
-    call_by_tag (outer_slg->L, MYLUA_TAG,
-        "grammar = ...\n"
-        "local l0g = grammar.lmw_l0g\n"
-        "return l0g:highest_rule_id()+1\n",
-        "G>i", outer_slg->lua_ref, &highest_l0_rule_id);
-
-  if (l0_rule_id > highest_l0_rule_id)
-    {
-      croak
-        ("Problem in slg->discard_event_activate(%ld, %ld): rule ID was %ld, but highest L0 rule ID = %ld",
-         (long) l0_rule_id,
-         (long) activate, (long) l0_rule_id, (long) highest_l0_rule_id);
-    }
-  if (l0_rule_id < 0)
-    {
-      croak
-        ("Problem in slg->discard_event_activate(%ld, %ld): rule ID was %ld, a disallowed value",
-         (long) l0_rule_id, (long) activate, (long) l0_rule_id);
-    }
-
-  if (activate != 0 && activate != 1)
-    {
-      croak
-        ("Problem in slg->discard_event_activate(%ld, %ld): value of activate must be 0 or 1",
-         (long) l0_rule_id, (long) activate);
-    }
-
-  if (g_properties->t_event_on_discard)
-    {
-      g_properties->t_event_on_discard_active = activate ? 1 : 0;
-    }
-  else
-    {
-      croak
-        ("Problem in slg->discard_event_activate(%ld, %ld): discard event is not enabled",
-         (long) l0_rule_id, (long) activate);
-    }
-  XSRETURN_YES;
-}
-
 MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::SLR
 
 void
@@ -3608,59 +3438,6 @@ PPCODE:
             slr_g1_error (outer_slr));
     }
     XSRETURN_IV (0);
-}
-
-void
-discard_event_activate( outer_slr, l0_rule_id, reactivate )
-    Outer_R *outer_slr;
-    Marpa_Rule_ID l0_rule_id;
-    int reactivate;
-PPCODE:
-{
-  Scanless_R *slr = slr_inner_get(outer_slr);
-  struct l0_rule_r_properties *l0_rule_r_properties;
-  const Scanless_G *slg = slr->slg;
-  lua_Integer highest_l0_rule_id;
-
-    call_by_tag (outer_slr->L, MYLUA_TAG,
-        "recce = ...\n"
-        "grammar = recce.slg\n"
-        "local l0g = grammar.lmw_l0g\n"
-        "return l0g:highest_rule_id()+1\n",
-        "G>i", outer_slr->lua_ref, &highest_l0_rule_id);
-
-  if (l0_rule_id > highest_l0_rule_id)
-    {
-      croak
-        ("Problem in slr->discard_event_activate(..., %ld, %ld): rule ID was %ld, but highest L0 rule ID = %ld",
-         (long) l0_rule_id, (long) reactivate,
-         (long) l0_rule_id, (long) highest_l0_rule_id);
-    }
-  if (l0_rule_id < 0)
-    {
-      croak
-        ("Problem in slr->discard_event_activate(..., %ld, %ld): rule ID was %ld, a disallowed value",
-         (long) l0_rule_id, (long) reactivate, (long) l0_rule_id);
-    }
-  l0_rule_r_properties = slr->l0_rule_r_properties + l0_rule_id;
-  switch (reactivate)
-    {
-    case 0:
-      l0_rule_r_properties->t_event_on_discard_active = 0;
-      break;
-    case 1:
-      {
-        const struct l0_rule_g_properties* g_properties = slg->l0_rule_g_properties + l0_rule_id;
-        /* Only activate events which are enabled */
-        l0_rule_r_properties->t_event_on_discard_active = g_properties->t_event_on_discard;
-      }
-      break;
-    default:
-      croak
-        ("Problem in slr->discard_event_activate(..., %ld, %ld): reactivate flag is %ld, a disallowed value",
-         (long) l0_rule_id, (long) reactivate, (long) reactivate);
-    }
-  XPUSHs (sv_2mortal (newSViv (reactivate)));
 }
 
 void
