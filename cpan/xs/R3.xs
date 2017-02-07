@@ -2426,25 +2426,34 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
                     const Marpa_Rule_ID l0_rule_id =
                         lexeme_stack_event->t_trace_lexeme_discarded.
                         t_rule_id;
+                    struct l0_rule_r_properties *l0_rule_r_properties =
+                        slr->l0_rule_r_properties + l0_rule_id;
+                    if (!l0_rule_r_properties->t_event_on_discard_active) {
+                        goto NEXT_LEXEME_EVENT;
+                    }
                     call_by_tag (outer_slr->L, MYLUA_TAG,
-                        "recce, rule_id, lexeme_start, lexeme_end = ...\n"
+                        "recce, rule_id, lexeme_start, lexeme_end, old_is_active = ...\n"
                         "local q = recce.event_queue\n"
                         "local g1r = recce.lmw_g1r\n"
                         "local event_on_discard_active =\n"
                         "    recce.l0_rules[rule_id].event_on_discard_active\n"
+                        "-- print(string.format('event_on_discard_active; old vs. new: %d vs. %s',\n"
+                        "     -- old_is_active, inspect(event_on_discard_active)))\n"
                         "if event_on_discard_active then\n"
-                        "    local last_g1_location = g1r:latest_earley_set()\n"
-                        "    q[#q+1] = { 'discarded lexeme',\n"
-                        "        rule_id, lexeme_start, lexeme_end, last_g1_location}\n"
+                        "   local last_g1_location = g1r:latest_earley_set()\n"
+                        "   q[#q+1] = { 'discarded lexeme',\n"
+                        "      rule_id, lexeme_start, lexeme_end, last_g1_location}\n"
                         "end\n"
                         ,
-                        "Riii>",
+                        "Riiii>",
                         outer_slr->lua_ref,
                         (lua_Integer) l0_rule_id,
                         (lua_Integer) lexeme_stack_event->
                         t_trace_lexeme_discarded.t_start_of_lexeme,
                         (lua_Integer) lexeme_stack_event->
-                        t_trace_lexeme_discarded.t_end_of_lexeme);
+                        t_trace_lexeme_discarded.t_end_of_lexeme,
+                    (l0_rule_r_properties->t_event_on_discard_active ? 1 : 0)
+                    );
                 }
                 goto NEXT_LEXEME_EVENT;
             }
