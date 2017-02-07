@@ -193,17 +193,33 @@ sub Marpa::R3::Scanless::R::new {
             for @{$symbol_ids};
         my $lexer_rule_ids =
             $symbol_ids_by_event_name_and_type->{$event_name}->{discard};
+
+            # say STDERR "is_active: ", ($is_active // 'undef');
+
         $thin_slr->discard_event_activate( $_, $is_active )
             for @{$lexer_rule_ids};
 
       $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'ii', $lexer_rule_ids, ($is_active ? 1 : 0) );
         local slr, lexer_rule_ids, is_active_arg = ...
-        local is_active = is_active_arg and true or nil
-        local l0_rules = slr.l0_rules
+        -- print('is_active_arg: ', inspect(is_active_arg))
+        local slg = slr.slg
+        local is_active = (is_active_arg ~= 0 and true or nil)
+        local g_l0_rules = slg.l0_rules
+        local r_l0_rules = slr.l0_rules
         for ix = 1, #lexer_rule_ids do
             local lexer_rule_id = lexer_rule_ids[ix]
-            l0_rules[lexer_rule_id].event_on_discard_active = is_active
+            if is_active then
+                if not g_l0_rules[lexer_rule_id].event_on_discard then
+                    -- TODO: Can this be a user error?
+                    error("Attempt to activate non-existent discard event")
+                end
+            end
+            -- print(string.format(
+                -- "Setting L0 rule %d event on discard to %s",
+                 -- lexer_rule_id,
+                 -- inspect(is_active)))
+            r_l0_rules[lexer_rule_id].event_on_discard_active = is_active
         end
 END_OF_LUA
 

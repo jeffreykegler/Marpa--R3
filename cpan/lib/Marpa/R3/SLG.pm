@@ -1042,7 +1042,7 @@ END_OF_LUA
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'ii', $lexer_rule_id, ($is_active ? 1 : 0) );
         local slg, lexer_rule_id, is_active_arg = ...
-        local is_active = is_active_arg ~= 0 and true or nil
+        local is_active = (is_active_arg ~= 0 and true or nil)
         local l0_rules = slg.l0_rules
         l0_rules[lexer_rule_id].event_on_discard = true
         l0_rules[lexer_rule_id].event_on_discard_active = is_active
