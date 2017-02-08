@@ -36,8 +36,6 @@ extern const struct marpa_step_type_description_s
   marpa_step_type_description[];
 
 struct symbol_g_properties {
-     lua_Integer priority;
-     unsigned int is_lexeme:1;
      unsigned int t_pause_before:1;
      unsigned int t_pause_before_active:1;
      unsigned int t_pause_after:1;
@@ -45,7 +43,6 @@ struct symbol_g_properties {
 };
 
 struct symbol_r_properties {
-     lua_Integer lexeme_priority;
      unsigned int t_pause_before_active:1;
      unsigned int t_pause_after_active:1;
 };
@@ -1988,8 +1985,6 @@ static void slg_inner_init_properties (
         Newx (slg->symbol_g_properties, (unsigned int) g1_symbol_count,
             struct symbol_g_properties);
         for (symbol_id = 0; symbol_id < g1_symbol_count; symbol_id++) {
-            slg->symbol_g_properties[symbol_id].priority = 0;
-            slg->symbol_g_properties[symbol_id].is_lexeme = 0;
             slg->symbol_g_properties[symbol_id].t_pause_before = 0;
             slg->symbol_g_properties[symbol_id].t_pause_before_active = 0;
             slg->symbol_g_properties[symbol_id].t_pause_after = 0;
@@ -2064,8 +2059,6 @@ marpa_inner_slr_new (Outer_G* outer_slg)
         for (symbol_id = 0; symbol_id < g1_symbol_count; symbol_id++) {
             const struct symbol_g_properties *g_properties =
                 slg->symbol_g_properties + symbol_id;
-            slr->symbol_r_properties[symbol_id].lexeme_priority =
-                g_properties->priority;
             slr->symbol_r_properties[symbol_id].t_pause_before_active =
                 g_properties->t_pause_before_active;
             slr->symbol_r_properties[symbol_id].t_pause_after_active =
@@ -2261,7 +2254,6 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
              * but we do not yet know about priority
              */
 
-            /* this_lexeme_priority = symbol_r_properties->lexeme_priority; */
             if (!is_priority_set
                 || this_lexeme_priority > high_lexeme_priority) {
                 high_lexeme_priority = this_lexeme_priority;
@@ -2736,48 +2728,6 @@ PPCODE:
 {
     slg_inner_init_properties (outer_slg);
     XSRETURN_YES;
-}
-
- # Mark the symbol as a lexeme.
- # A priority is required.
- #
-void
-g1_lexeme_set( outer_slg, g1_lexeme, priority )
-    Outer_G *outer_slg;
-    Marpa_Symbol_ID g1_lexeme;
-    int priority;
-PPCODE:
-{
-  Scanless_G* slg = slg_inner_get(outer_slg);
-  lua_Integer highest_g1_symbol_id;
-
-    call_by_tag (outer_slg->L, MYLUA_TAG,
-        "grammar = ...\n"
-        "local g1g = grammar.lmw_g1g\n"
-        "return g1g:highest_symbol_id()\n"
-        ,
-        "G>i", outer_slg->lua_ref, &highest_g1_symbol_id);
-
-    if (g1_lexeme > highest_g1_symbol_id)
-    {
-      croak
-        ("Problem in slg->g1_lexeme_priority_set(%ld, %ld): symbol ID was %ld, but highest G1 symbol ID = %ld",
-         (long) g1_lexeme,
-         (long) priority,
-         (long) g1_lexeme,
-         (long) highest_g1_symbol_id
-         );
-    }
-    if (g1_lexeme < 0) {
-      croak
-        ("Problem in slg->g1_lexeme_priority(%ld, %ld): symbol ID was %ld, a disallowed value",
-         (long) g1_lexeme,
-         (long) priority,
-         (long) g1_lexeme);
-    }
-  slg->symbol_g_properties[g1_lexeme].priority = priority;
-  slg->symbol_g_properties[g1_lexeme].is_lexeme = 1;
-  XSRETURN_YES;
 }
 
 void
@@ -3514,53 +3464,6 @@ PPCODE:
   Scanless_R *slr = slr_inner_get(outer_slr);
   XSRETURN_IV(slr->input_symbol_id);
 }
-
-void
-lexeme_priority_set( outer_slr, g1_lexeme, new_priority )
-    Outer_R *outer_slr;
-    Marpa_Symbol_ID g1_lexeme;
-    int new_priority;
-PPCODE:
-{
-  Scanless_R *slr = slr_inner_get(outer_slr);
-  int old_priority;
-  const Scanless_G *slg = slr->slg;
-  lua_Integer highest_g1_symbol_id;
-
-    call_by_tag (outer_slr->L, MYLUA_TAG,
-        "recce = ...\n"
-        "grammar = recce.slg\n"
-        "local g1g = grammar.lmw_g1g\n"
-        "return g1g:highest_symbol_id()\n"
-        ,
-        "R>i", outer_slr->lua_ref, &highest_g1_symbol_id);
-
-    if (g1_lexeme > highest_g1_symbol_id)
-    {
-      croak
-        ("Problem in slr->g1_lexeme_priority(%ld): symbol ID was %ld, but highest G1 symbol ID = %ld",
-         (long) g1_lexeme,
-         (long) g1_lexeme,
-         (long) highest_g1_symbol_id
-         );
-    }
-    if (g1_lexeme < 0) {
-      croak
-        ("Problem in slr->g1_lexeme_priority(%ld): symbol ID was %ld, a disallowed value",
-         (long) g1_lexeme,
-         (long) g1_lexeme);
-    }
-  if ( ! slg->symbol_g_properties[g1_lexeme].is_lexeme ) {
-      croak
-        ("Problem in slr->g1_lexeme_priority(%ld): symbol ID %ld is not a lexeme",
-         (long) g1_lexeme,
-         (long) g1_lexeme);
-  }
-  old_priority = slr->symbol_r_properties[g1_lexeme].lexeme_priority;
-  slr->symbol_r_properties[g1_lexeme].lexeme_priority = new_priority;
-  XSRETURN_IV( old_priority );
-}
-
 
 void
 stack_step( outer_slr )

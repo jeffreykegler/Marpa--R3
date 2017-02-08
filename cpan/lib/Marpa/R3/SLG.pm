@@ -989,7 +989,6 @@ END_OF_LUA
         my $g1_lexeme_id = $g1_id_by_lexeme_name{$lexeme_name};
         my $declarations = $lexeme_declarations->{$lexeme_name};
         my $priority     = $declarations->{priority} // 0;
-        $thin_slg->g1_lexeme_set( $g1_lexeme_id, $priority );
 
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'ii', $g1_lexeme_id, $priority );

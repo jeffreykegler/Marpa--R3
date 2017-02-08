@@ -1764,10 +1764,6 @@ END_OF_LUA
 # Failures are thrown.
 sub Marpa::R3::Scanless::R::lexeme_priority_set {
     my ( $slr, $lexeme_name, $new_priority ) = @_;
-    my $slg      = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $lexeme_id = $slg->symbol_by_name($lexeme_name);
-    Marpa::R3::exception("Bad symbol in lexeme_priority_set(): $lexeme_name")
-      if not defined $lexeme_id;
     my ($old_priority) = $slr->call_by_tag(
     ('@' . __FILE__ . ':' . __LINE__),
         <<'END_OF_LUA', 'si>*', $lexeme_name, $new_priority );
@@ -1801,8 +1797,7 @@ sub Marpa::R3::Scanless::R::lexeme_priority_set {
         return old_priority
 END_OF_LUA
 
-    my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
-    return $thin_slr->lexeme_priority_set( $lexeme_id, $new_priority );
+    return $old_priority;
 }
 
 # Internal methods, not to be documented
