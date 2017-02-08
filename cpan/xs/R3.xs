@@ -36,7 +36,7 @@ extern const struct marpa_step_type_description_s
   marpa_step_type_description[];
 
 struct symbol_g_properties {
-     int priority;
+     lua_Integer priority;
      unsigned int is_lexeme:1;
      unsigned int t_pause_before:1;
      unsigned int t_pause_before_active:1;
@@ -45,7 +45,7 @@ struct symbol_g_properties {
 };
 
 struct symbol_r_properties {
-     int lexeme_priority;
+     lua_Integer lexeme_priority;
      unsigned int t_pause_before_active:1;
      unsigned int t_pause_after_active:1;
 };
@@ -2138,7 +2138,7 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
 
     /* |high_lexeme_priority| is not valid unless |is_priority_set| is set. */
     int is_priority_set = 0;
-    int high_lexeme_priority = 0;
+    lua_Integer high_lexeme_priority = 0;
 
     int discarded = 0;
     int rejected = 0;
@@ -2186,7 +2186,7 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
         while (!end_of_earley_items) {
             struct symbol_r_properties *symbol_r_properties;
             lua_Integer g1_lexeme;
-            int this_lexeme_priority;
+            lua_Integer this_lexeme_priority;
             lua_Integer dot_position;
             lua_Integer origin;
             lua_Integer rule_id;
