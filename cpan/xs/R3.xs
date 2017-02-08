@@ -2996,8 +2996,6 @@ PPCODE:
               ("Problem in Marpa::R3: Attempt to use a tainted token value\n"
               "Marpa::R3 is insecure for use with tainted data\n");
         }
-        av_push (slr->token_values, newSVsv (token_value));
-        token_ix = av_len (slr->token_values);
         call_by_tag (outer_slr->L, MYLUA_TAG,
             "local recce, token_sv = ...;\n"
             "local new_token_ix = #recce.token_values + 1\n"
