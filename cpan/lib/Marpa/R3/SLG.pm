@@ -949,8 +949,6 @@ END_OF_LUA
 
     # Post-lexer G1 processing
 
-    $thin_slg->init_properties();
-
   LEXEME: for my $lexeme_name ( keys %g1_id_by_lexeme_name ) {
         Marpa::R3::exception(
             "A lexeme in G1 is not a lexeme in L0: $lexeme_name")

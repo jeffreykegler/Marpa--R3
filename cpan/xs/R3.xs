@@ -91,20 +91,13 @@ union marpa_slr_event_s
 
 };
 
-typedef struct
-{
-  int dummy;
-} Scanless_G;
-
 typedef struct {
   lua_Integer lua_ref;
   lua_State* L;
-  Scanless_G* inner;
 } Outer_G;
 
 typedef struct
 {
-  Scanless_G *slg;
   AV *token_values;
   int start_of_lexeme;
   int end_of_lexeme;
@@ -1246,27 +1239,7 @@ static const struct luaL_Reg marpa_slr_meths[] = {
     {NULL, NULL},
 };
 
-/* create SV metatable */
-static void slg_inner_destroy(Scanless_G* slg);
-
-static int slg_gc (lua_State * L)
-{
-    Scanless_G *slg;
-    int lud_type;
-
-    /* marpa_r3_warn("xlua_grammar_gc"); */
-    /* Checks needed after development ?? */
-    marpa_luaL_checktype (L, 1, LUA_TTABLE);
-    lud_type = marpa_lua_getfield (L, 1, "lud");
-    marpa_luaL_argcheck (L, (lud_type == LUA_TLIGHTUSERDATA), 1,
-        "grammar userdata not set");
-    slg = (Scanless_G *) marpa_lua_touserdata (L, -1);
-    slg_inner_destroy(slg);
-    return 0;
-}
-
 static const struct luaL_Reg marpa_slg_meths[] = {
-    {"__gc", slg_gc},
     {NULL, NULL},
 };
 
@@ -1935,33 +1908,6 @@ u_pos_set (Outer_R * outer_slr, const char* name, int start_pos_arg, int length_
   slr->end_pos = new_end_pos;
 }
 
-/* Static SLG methods */
-
-static Scanless_G* slg_inner_get(Outer_G* outer_slg) {
-    return outer_slg->inner;
-}
-
-static Scanless_G* slg_inner_new (void)
-{
-    Scanless_G *slg;
-    dTHX;
-
-    Newx (slg, 1, Scanless_G);
-    return slg;
-}
-
-static void slg_inner_init_properties (
-  Outer_G* outer_slg)
-{
-    dTHX;
-    Scanless_G *slg = slg_inner_get (outer_slg);
-}
-
-static void slg_inner_destroy(Scanless_G* slg) {
-  dTHX;
-  Safefree (slg);
-}
-
 /* Static SLR methods */
 
 static Scanless_R *
@@ -1969,17 +1915,11 @@ marpa_inner_slr_new (Outer_G* outer_slg)
 {
     dTHX;
     Scanless_R *slr;
-    Scanless_G *slg = slg_inner_get (outer_slg);
     lua_Integer value_is_literal;
 
     Newx (slr, 1, Scanless_R);
 
     slr->throw = 1;
-
-    /* These do not need references, because parent objects
-     * hold references to them
-     */
-    slr->slg = slg;
 
     slr->start_of_lexeme = 0;
     slr->end_of_lexeme = 0;
@@ -2597,16 +2537,12 @@ PPCODE:
 {
     SV *new_sv;
     Outer_G *outer_slg;
-    Scanless_G *slg;
     lua_State *L = lua_wrapper->L;
     int base_of_stack;
     int grammar_ix;
     PERL_UNUSED_ARG (class);
 
     Newx (outer_slg, 1, Outer_G);
-    slg = slg_inner_new ();
-
-    outer_slg->inner = slg;
     outer_slg->L = L;
     base_of_stack = marpa_lua_gettop(L);
     lua_refinc (L);
@@ -2622,8 +2558,6 @@ PPCODE:
     marpa_lua_getglobal(L, "kollos");
     marpa_lua_getfield(L, -1, "class_slg");
     marpa_lua_setmetatable (L, grammar_ix);
-    marpa_lua_pushlightuserdata (L, slg);
-    marpa_lua_setfield (L, grammar_ix, "lud");
     marpa_lua_pushinteger(L, 1);
     marpa_lua_setfield (L, grammar_ix, "ref_count");
     marpa_lua_pushvalue (L, grammar_ix);
@@ -2656,15 +2590,6 @@ PPCODE:
   Safefree (outer_slg);
 }
 
-void
-init_properties( outer_slg)
-    Outer_G *outer_slg;
-PPCODE:
-{
-    slg_inner_init_properties (outer_slg);
-    XSRETURN_YES;
-}
-
 MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::SLR
 
 void
@@ -2692,8 +2617,6 @@ PPCODE:
     outer_slg = INT2PTR (Outer_G *, tmp);
   }
   L = outer_slg->L;
-
-  slg_inner_get(outer_slg);
 
   slr = marpa_inner_slr_new(outer_slg);
   /* Copy and take references to the "parent objects",
