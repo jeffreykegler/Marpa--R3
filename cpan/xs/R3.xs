@@ -74,8 +74,8 @@ union marpa_slr_event_s
     int t_start_of_lexeme;
     int t_end_of_lexeme;
     int t_lexeme;
-    int t_priority;
-    int t_required_priority;
+    lua_Integer t_priority;
+    lua_Integer t_required_priority;
   } t_trace_lexeme_acceptable;
 
 
@@ -85,8 +85,8 @@ union marpa_slr_event_s
     int t_start_of_lexeme;
     int t_end_of_lexeme;
     int t_lexeme;
-    int t_priority;
-    int t_required_priority;
+    lua_Integer t_priority;
+    lua_Integer t_required_priority;
   } t_lexeme_acceptable;
 
 };
@@ -891,6 +891,8 @@ static void marpa_sv_sv_noinc (lua_State* L, SV* sv) {
  * The caller must have a reference count whose ownership
  * the caller is prepared to transfer to the Lua userdata.
  */
+/* TODO: Will I need this? */
+static void marpa_sv_av_noinc (lua_State* L, AV* av) PERL_UNUSED_DECL;
 static void marpa_sv_av_noinc (lua_State* L, AV* av) {
     dTHX;
     SV* av_ref = newRV_noinc((SV*)av);
