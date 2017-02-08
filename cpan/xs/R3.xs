@@ -105,7 +105,6 @@ typedef struct
      -1 means no restart.
    */
   int lexer_start_pos;
-  int lexer_read_result;
 
   /* A boolean to prevent the inappropriate mixing
    * of internal and external scanning
@@ -1625,13 +1624,13 @@ static void recursive_coerce_to_lua(
 
 static Scanless_R* slr_inner_get(Outer_R* outer_slr);
 
-#define U_READ_OK 0
-#define U_READ_REJECTED_CHAR -1
-#define U_READ_UNREGISTERED_CHAR -2
-#define U_READ_EXHAUSTED_ON_FAILURE -3
-#define U_READ_TRACING -4
-#define U_READ_EXHAUSTED_ON_SUCCESS -5
-#define U_READ_INVALID_CHAR -6
+#define U_READ_OK "ok"
+#define U_READ_REJECTED_CHAR "rejected char"
+#define U_READ_UNREGISTERED_CHAR "unregistered char"
+#define U_READ_EXHAUSTED_ON_FAILURE "exhausted on failure"
+#define U_READ_TRACING "tracing"
+#define U_READ_EXHAUSTED_ON_SUCCESS "exhausted on success"
+#define U_READ_INVALID_CHAR "invalid char"
 
 /* Return values:
  * 1 or greater: reserved for an event count, to deal with multiple events
@@ -1643,7 +1642,7 @@ static Scanless_R* slr_inner_get(Outer_R* outer_slr);
  * -4: we are tracing, character by character
  * -5: earleme_complete() reported an exhausted parse on success
  */
-static int
+static const char *
 u_read (Outer_R * outer_slr)
 {
     dTHX;
@@ -1935,7 +1934,6 @@ marpa_inner_slr_new (Outer_G* outer_slg)
         "G>i", outer_slg->lua_ref, &value_is_literal);
 
     slr->lexer_start_pos = slr->perl_pos;
-    slr->lexer_read_result = 0;
     slr->start_of_pause_lexeme = -1;
     slr->end_of_pause_lexeme = -1;
 
@@ -2739,105 +2737,77 @@ read(outer_slr)
     Outer_R *outer_slr;
 PPCODE:
 {
-  Scanless_R *slr = slr_inner_get(outer_slr);
-  int lexer_read_result = 0;
+    Scanless_R *slr = slr_inner_get (outer_slr);
 
-  if (slr->is_external_scanning)
-    {
-      XSRETURN_PV ("unpermitted mix of external and internal scanning");
+    if (slr->is_external_scanning) {
+        XSRETURN_PV ("unpermitted mix of external and internal scanning");
     }
 
-  slr->lexer_read_result = 0;
-  slr->start_of_pause_lexeme = -1;
-  slr->end_of_pause_lexeme = -1;
+    slr->start_of_pause_lexeme = -1;
+    slr->end_of_pause_lexeme = -1;
 
-  /* Clear event queue */
-  call_by_tag (outer_slr->L, MYLUA_TAG,
-      "local recce = ...\n"
-      "recce.event_queue = {}\n",
-      "R>", outer_slr->lua_ref);
+    /* Clear event queue */
+    call_by_tag (outer_slr->L, MYLUA_TAG,
+        "local recce = ...\n"
+        "recce.event_queue = {}\n", "R>", outer_slr->lua_ref);
 
-  /* Application intervention resets perl_pos */
-  slr->last_perl_pos = -1;
+    /* Application intervention resets perl_pos */
+    slr->last_perl_pos = -1;
 
-  while (1)
-    {
-      if (slr->lexer_start_pos >= 0)
-        {
-          if (slr->lexer_start_pos >= slr->end_pos)
-            {
-              XSRETURN_PV ("");
+    while (1) {
+        if (slr->lexer_start_pos >= 0) {
+            if (slr->lexer_start_pos >= slr->end_pos) {
+                XSRETURN_PV ("");
             }
 
-          slr->start_of_lexeme = slr->perl_pos = slr->lexer_start_pos;
-          slr->lexer_start_pos = -1;
-                            call_by_tag (outer_slr->L, MYLUA_TAG,
-                                "local recce, perl_pos = ...\n"
-                                "recce.lmw_l0r = nil\n"
-                                "if recce.trace_terminals >= 1 then\n"
-                                "    local q = recce.event_queue\n"
-                                "    q[#q+1] = { '!trace', 'lexer restarted recognizer', perl_pos}\n"
-                                "end\n",
-                                "Ri>",
-                                outer_slr->lua_ref,
-                                (lua_Integer)slr->perl_pos
-                            );
+            slr->start_of_lexeme = slr->perl_pos = slr->lexer_start_pos;
+            slr->lexer_start_pos = -1;
+            call_by_tag (outer_slr->L, MYLUA_TAG,
+                "local recce, perl_pos = ...\n"
+                "recce.lmw_l0r = nil\n"
+                "if recce.trace_terminals >= 1 then\n"
+                "    local q = recce.event_queue\n"
+                "    q[#q+1] = { '!trace', 'lexer restarted recognizer', perl_pos}\n"
+                "end\n",
+                "Ri>", outer_slr->lua_ref, (lua_Integer) slr->perl_pos);
 
         }
 
-      lexer_read_result = slr->lexer_read_result = u_read (outer_slr);
-      switch (lexer_read_result)
         {
-        case U_READ_TRACING:
-          XSRETURN_PV ("trace");
-        case U_READ_UNREGISTERED_CHAR:
-          XSRETURN_PV ("unregistered char");
-        default:
-          if (lexer_read_result < 0)
-            {
-              croak
-                ("Internal Marpa SLIF error: u_read returned unknown code: %ld",
-                 (long) lexer_read_result);
-            }
-          break;
-        case U_READ_OK:
-        case U_READ_INVALID_CHAR:
-        case U_READ_REJECTED_CHAR:
-        case U_READ_EXHAUSTED_ON_FAILURE:
-        case U_READ_EXHAUSTED_ON_SUCCESS:
-          break;
-        }
-
-
-        {
-          lua_Integer discard_mode;
-          const char *result_string;
-
-          call_by_tag (outer_slr->L, MYLUA_TAG,
-              "local recce = ...\n"
-              "local g1r = recce.lmw_g1r\n"
-              "return g1r:is_exhausted()\n"
-              ,
-              "R>i", outer_slr->lua_ref, &discard_mode);
-
-          result_string = slr_alternatives (outer_slr, discard_mode);
-          if (result_string)
-            {
-              XSRETURN_PV (result_string);
+            const char *result = u_read (outer_slr);
+            if (!strcmp (result, U_READ_TRACING)) {
+                XSRETURN_PV ("trace");
+            } else if (!strcmp (result, U_READ_UNREGISTERED_CHAR)) {
+                XSRETURN_PV ("unregistered char");
             }
         }
 
-      {
-        lua_Integer event_count;
-        call_by_tag (outer_slr->L, MYLUA_TAG,
-            "local recce = ...\n"
-            "return #recce.event_queue\n",
-            "R>i", outer_slr->lua_ref, &event_count);
-        if (event_count)
-          {
-            XSRETURN_PV ("event");
-          }
-      }
+        {
+            lua_Integer discard_mode;
+            const char *result_string;
+
+            call_by_tag (outer_slr->L, MYLUA_TAG,
+                "local recce = ...\n"
+                "local g1r = recce.lmw_g1r\n"
+                "return g1r:is_exhausted()\n",
+                "R>i", outer_slr->lua_ref, &discard_mode);
+
+            result_string = slr_alternatives (outer_slr, discard_mode);
+            if (result_string) {
+                XSRETURN_PV (result_string);
+            }
+        }
+
+        {
+            lua_Integer event_count;
+            call_by_tag (outer_slr->L, MYLUA_TAG,
+                "local recce = ...\n"
+                "return #recce.event_queue\n",
+                "R>i", outer_slr->lua_ref, &event_count);
+            if (event_count) {
+                XSRETURN_PV ("event");
+            }
+        }
 
         {
             lua_Integer trace_terminals;
@@ -2845,25 +2815,15 @@ PPCODE:
                 "recce = ...\n"
                 "return recce.trace_terminals\n",
                 "R>i", outer_slr->lua_ref, &trace_terminals);
-            if (trace_terminals)
-              {
+            if (trace_terminals) {
                 XSRETURN_PV ("trace");
-              }
+            }
         }
 
     }
 
-  /* Never reached */
-  XSRETURN_PV ("");
-}
-
-void
-lexer_read_result (outer_slr)
-    Outer_R *outer_slr;
-PPCODE:
-{
-  Scanless_R *slr = slr_inner_get(outer_slr);
-  XPUSHs (sv_2mortal (newSViv ((IV) slr->lexer_read_result)));
+    /* Never reached */
+    XSRETURN_PV ("");
 }
 
 void
