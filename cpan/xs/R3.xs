@@ -2247,17 +2247,21 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
                 "if not is_expected then\n"
                 "    error(string.format('Internnal error: Marpa recognized unexpected token @%d-%d: lexme=%d',\n"
                 "        start_of_lexeme, end_of_lexeme, g1_lexeme))\n"
-                "end\n",
-                "Riii>",
+                "end\n"
+                "return recce.g1_symbols[g1_lexeme].lexeme_priority\n"
+                ,
+                "Riii>i",
                 outer_slr->lua_ref, (lua_Integer) g1_lexeme,
                 (lua_Integer) slr->start_of_lexeme,
-                (lua_Integer) slr->end_of_lexeme);
+                (lua_Integer) slr->end_of_lexeme,
+                &this_lexeme_priority
+                );
 
             /* If we are here, the lexeme will be accepted  by the grammar,
              * but we do not yet know about priority
              */
 
-            this_lexeme_priority = symbol_r_properties->lexeme_priority;
+            /* this_lexeme_priority = symbol_r_properties->lexeme_priority; */
             if (!is_priority_set
                 || this_lexeme_priority > high_lexeme_priority) {
                 high_lexeme_priority = this_lexeme_priority;
