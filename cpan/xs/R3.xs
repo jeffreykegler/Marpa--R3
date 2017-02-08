@@ -145,7 +145,6 @@ typedef struct
   /* Lua "reference" to this object */
   lua_Integer lua_ref;
   lua_State* L;
-  SV *slg_sv;
 } Outer_R;
 
 typedef struct
@@ -2623,9 +2622,6 @@ PPCODE:
    * the ones responsible for holding references.
    */
 
-  outer_slr->slg_sv = slg_sv;
-  SvREFCNT_inc (slg_sv);
-
   {
     const int base_of_stack = marpa_lua_gettop(L);
     int slr_ix;
@@ -2714,7 +2710,6 @@ PPCODE:
       "return 0\n",
       "R>", outer_slr->lua_ref);
   lua_refdec(outer_slr->L);
-  SvREFCNT_dec (outer_slr->slg_sv);
   Safefree (outer_slr);
 }
 
