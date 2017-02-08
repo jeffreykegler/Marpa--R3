@@ -98,7 +98,6 @@ typedef struct {
 
 typedef struct
 {
-  AV *token_values;
   int start_of_lexeme;
   int end_of_lexeme;
 
@@ -1928,8 +1927,6 @@ marpa_inner_slr_new (Outer_G* outer_slg)
     slr->last_perl_pos = -1;
     slr->problem_pos = -1;
 
-    slr->token_values = newAV ();
-
     call_by_tag (outer_slg->L, MYLUA_TAG,
         "grammar = ...\n"
         "local g1g = grammar.lmw_g1g\n"
@@ -1938,8 +1935,6 @@ marpa_inner_slr_new (Outer_G* outer_slg)
         "return defines.TOKEN_VALUE_IS_LITERAL\n"
         ,
         "G>i", outer_slg->lua_ref, &value_is_literal);
-
-    av_fill (slr->token_values, (I32)value_is_literal);
 
     slr->lexer_start_pos = slr->perl_pos;
     slr->lexer_read_result = 0;
@@ -1982,10 +1977,6 @@ static void slr_inner_destroy(lua_State* L, Scanless_R* slr)
     PERL_UNUSED_ARG(L);
 
    Safefree(slr->t_lexemes);
-  if (slr->token_values)
-    {
-      SvREFCNT_dec ((SV *) slr->token_values);
-    }
   Safefree (slr);
 }
 
