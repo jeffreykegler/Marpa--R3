@@ -125,7 +125,6 @@ typedef struct
   int start_of_pause_lexeme;
   int end_of_pause_lexeme;
 
-  Marpa_Symbol_ID input_symbol_id;
   lua_Integer codepoint;                 /* For error returns */
   int end_pos;
 
@@ -1745,8 +1744,6 @@ u_read (Outer_R * outer_slr)
                          * the minimum number of tokens accepted,
                          * we have one of them as an example
                          */
-                        slr->input_symbol_id = symbol_id;
-
                         call_by_tag (outer_slr->L, MYLUA_TAG,
                             "recce, codepoint, perl_pos, symbol_id = ...\n"
                             "if recce.trace_terminals >= 1 then\n"
@@ -1774,7 +1771,6 @@ u_read (Outer_R * outer_slr)
                         break;
                     default:
                         slr->codepoint = codepoint;
-                        slr->input_symbol_id = symbol_id;
                         croak
                             ("Problem alternative() failed at char ix %ld; symbol id %ld; codepoint 0x%lx value %ld\n"
                             "Problem in u_read(), alternative() failed: %s",
@@ -1941,7 +1937,6 @@ marpa_inner_slr_new (Outer_G* outer_slg)
     slr->start_of_pause_lexeme = -1;
     slr->end_of_pause_lexeme = -1;
 
-    slr->input_symbol_id = -1;
     slr->end_pos = 0;
 
     slr->t_lexeme_count = 0;
@@ -3127,15 +3122,6 @@ PPCODE:
 {
   Scanless_R *slr = slr_inner_get(outer_slr);
   XSRETURN_UV((UV)slr->codepoint);
-}
-
-void
-symbol_id( outer_slr )
-    Outer_R *outer_slr;
-PPCODE:
-{
-  Scanless_R *slr = slr_inner_get(outer_slr);
-  XSRETURN_IV(slr->input_symbol_id);
 }
 
 void
