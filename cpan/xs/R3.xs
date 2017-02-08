@@ -1643,7 +1643,7 @@ static Scanless_R* slr_inner_get(Outer_R* outer_slr);
  * -5: earleme_complete() reported an exhausted parse on success
  */
 static const char *
-u_read (Outer_R * outer_slr)
+l0_read (Outer_R * outer_slr)
 {
     dTHX;
     Scanless_R *slr = slr_inner_get (outer_slr);
@@ -1774,7 +1774,7 @@ u_read (Outer_R * outer_slr)
                         slr->codepoint = codepoint;
                         croak
                             ("Problem alternative() failed at char ix %ld; symbol id %ld; codepoint 0x%lx value %ld\n"
-                            "Problem in u_read(), alternative() failed: %s",
+                            "Problem in l0_read(), alternative() failed: %s",
                             (long) slr->perl_pos, (long) symbol_id,
                             (unsigned long) codepoint,
                             (long) value,
@@ -1832,7 +1832,7 @@ u_read (Outer_R * outer_slr)
                     }
                     if (result < 0) {
                         croak
-                            ("Problem in r->u_read(), earleme_complete() failed: %s",
+                            ("Problem in r->l0_read(), earleme_complete() failed: %s",
                             slr_l0_error (outer_slr));
                     }
                 }
@@ -2774,7 +2774,7 @@ PPCODE:
         }
 
         {
-            const char *result = u_read (outer_slr);
+            const char *result = l0_read (outer_slr);
             if (!strcmp (result, U_READ_TRACING)) {
                 XSRETURN_PV ("trace");
             } else if (!strcmp (result, U_READ_UNREGISTERED_CHAR)) {
