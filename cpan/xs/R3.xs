@@ -2522,11 +2522,15 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
 
                         call_by_tag (outer_slr->L, MYLUA_TAG,
                             "recce, lexeme_start, lexeme_end, lexeme = ...\n"
-                            "local q = recce.event_queue\n"
-                            "if recce.trace_terminals > 2 then\n"
-                            "    q[#q+1] = { '!trace', 'g1 pausing after lexeme', lexeme_start, lexeme_end, lexeme}\n"
+                            "local pause_after_active = recce.g1_symbols[g1_lexeme].pause_after_active\n"
+                            "if pause_after_active then\n"
+                            "    local q = recce.event_queue\n"
+                            "    if recce.trace_terminals > 2 then\n"
+                            "        q[#q+1] = { '!trace', 'g1 pausing after lexeme', lexeme_start, lexeme_end, lexeme}\n"
+                            "    end\n"
+                            "q[#q+1] = { 'after lexeme', lexeme}\n"
                             "end\n"
-                            "q[#q+1] = { 'after lexeme', lexeme}\n",
+                            ,
                             "Riii>",
                             outer_slr->lua_ref,
                             (lua_Integer) slr->start_of_pause_lexeme,
