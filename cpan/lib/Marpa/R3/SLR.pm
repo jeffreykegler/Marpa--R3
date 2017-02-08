@@ -1764,12 +1764,44 @@ END_OF_LUA
 # Failures are thrown.
 sub Marpa::R3::Scanless::R::lexeme_priority_set {
     my ( $slr, $lexeme_name, $new_priority ) = @_;
-    my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
     my $slg      = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $g1_tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     my $lexeme_id = $slg->symbol_by_name($lexeme_name);
     Marpa::R3::exception("Bad symbol in lexeme_priority_set(): $lexeme_name")
       if not defined $lexeme_id;
+    my ($old_priority) = $slr->call_by_tag(
+    ('@' . __FILE__ . ':' . __LINE__),
+        <<'END_OF_LUA', 'si>*', $lexeme_name, $new_priority );
+        local recce, lexeme_name, new_priority = ...
+        local slg = recce.slg
+        local g1g = slg.lmw_g1g
+        local lexeme_id = g1g.isyid_by_name[lexeme_name]
+        if not lexeme_id then
+            kollos.userX(string.format(
+                "lexeme_priority_set(): no such symbol as %q",
+                lexeme_name
+            ))
+        end
+        if type(new_priority) ~= 'number' then
+            kollos.userX(string.format(
+                "lexeme_priority_set(): priority is not a number, it is %s",
+                new_priority
+            ))
+        end
+        local g_lexeme_data = slg.g1_symbols[lexeme_id]
+        local r_lexeme_data = recce.g1_symbols[lexeme_id]
+        if not g_lexeme_data.is_lexeme then
+            print(inspect(lexeme_data))
+            kollos.userX(string.format(
+                "lexeme_priority_set(): %q is not a lexeme",
+                lexeme_name
+            ))
+        end
+        local old_priority = r_lexeme_data.lexeme_priority
+        r_lexeme_data.lexeme_priority = new_priority
+        return old_priority
+END_OF_LUA
+
+    my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
     return $thin_slr->lexeme_priority_set( $lexeme_id, $new_priority );
 }
 
