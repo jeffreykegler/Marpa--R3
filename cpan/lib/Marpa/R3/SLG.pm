@@ -990,8 +990,8 @@ END_OF_LUA
         my $declarations = $lexeme_declarations->{$lexeme_name};
         my $priority     = $declarations->{priority} // 0;
 
-      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 'ii', $g1_lexeme_id, $priority );
+        $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+            <<'END_OF_LUA', 'ii', $g1_lexeme_id, $priority );
     local slg, g1_lexeme_id, priority = ...
     local lexeme_data = slg.g1_symbols[g1_lexeme_id]
     lexeme_data.is_lexeme = true
@@ -1001,6 +1001,17 @@ END_OF_LUA
         my $pause_value = $declarations->{pause};
         if ( defined $pause_value ) {
             $thin_slg->g1_lexeme_pause_set( $g1_lexeme_id, $pause_value );
+
+            $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+                <<'END_OF_LUA', 'ii', $g1_lexeme_id, $pause_value );
+    local slg, g1_lexeme_id, pause_value = ...
+    local lexeme_data = slg.g1_symbols[g1_lexeme_id]
+    if pause_value == 1 then
+         lexeme_data.pause_after = true
+    elseif pause_value == -1 then
+         lexeme_data.pause_before = true
+    end
+END_OF_LUA
 
             my $is_active = 1;
 
@@ -1012,6 +1023,21 @@ END_OF_LUA
                   @{ $symbol_ids_by_event_name_and_type->{$event_name}->{lexeme}
                   }, $g1_lexeme_id;
             } ## end if ( defined( my $event_data = $declarations->{'event'...}))
+
+            $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+                <<'END_OF_LUA', 'ii', $g1_lexeme_id, $is_active );
+    local slg, g1_lexeme_id, is_active_arg = ...
+    local is_active = (is_active_arg ~= 0 and true or nil)
+    local lexeme_data = slg.g1_symbols[g1_lexeme_id]
+    if is_active then
+        -- activate only if event is enabled
+        lexeme_data.pause_after_active = lexeme_data.pause_after
+        lexeme_data.pause_before_active = lexeme_data.pause_before
+    else
+        lexeme_data.pause_after_active = nil
+        lexeme_data.pause_before_active = nil
+    end
+END_OF_LUA
 
             $thin_slg->g1_lexeme_pause_activate( $g1_lexeme_id, $is_active );
         } ## end if ( defined $pause_value )

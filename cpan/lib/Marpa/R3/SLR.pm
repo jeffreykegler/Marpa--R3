@@ -189,8 +189,31 @@ sub Marpa::R3::Scanless::R::new {
 
         my $symbol_ids =
             $symbol_ids_by_event_name_and_type->{$event_name}->{lexeme};
+
         $thin_slr->lexeme_event_activate( $_, $is_active )
             for @{$symbol_ids};
+
+      $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 'ii', $symbol_ids, ($is_active ? 1 : 0) );
+        local slr, symbol_ids, is_active_arg = ...
+        local slg = slr.slg
+        local is_active = (is_active_arg ~= 0 and true or nil)
+        local g_g1_symbols = slg.g1_symbols
+        local r_g1_symbols = slr.g1_symbols
+        for ix = 1, #symbol_ids do
+            local symbol_id = symbol_ids[ix]
+            if is_active then
+                r_g1_symbols[symbol_id].pause_after_active
+                    = g_g1_symbols[symbol_id].pause_after
+                r_g1_symbols[symbol_id].pause_before_active
+                    = g_g1_symbols[symbol_id].pause_before
+            else
+                r_g1_symbols[symbol_id].pause_after_active = nil
+                r_g1_symbols[symbol_id].pause_before_active = nil
+            end
+        end
+END_OF_LUA
+
         my $lexer_rule_ids =
             $symbol_ids_by_event_name_and_type->{$event_name}->{discard}
             // [];
@@ -1754,8 +1777,31 @@ END_OF_LUA
     }
 
     my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
+
     $thin_slr->lexeme_event_activate( $_, $activate )
       for @{ $event_symbol_ids_by_type->{lexeme} };
+
+      $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA',
+        local slr, symbol_ids, is_active_arg = ...
+        local slg = slr.slg
+        local is_active = (is_active_arg ~= 0 and true or nil)
+        local g_g1_symbols = slg.g1_symbols
+        local r_g1_symbols = slr.g1_symbols
+        for ix = 1, #symbol_ids do
+            local symbol_id = symbol_ids[ix]
+            if is_active then
+                r_g1_symbols[symbol_id].pause_after_active
+                    = g_g1_symbols[symbol_id].pause_after
+                r_g1_symbols[symbol_id].pause_before_active
+                    = g_g1_symbols[symbol_id].pause_before
+            else
+                r_g1_symbols[symbol_id].pause_after_active = nil
+                r_g1_symbols[symbol_id].pause_before_active = nil
+            end
+        end
+END_OF_LUA
+        'ii', $event_symbol_ids_by_type->{lexeme}, ($activate ? 1 : 0) );
 
     return 1;
 } ## end sub Marpa::R3::Scanless::R::activate
