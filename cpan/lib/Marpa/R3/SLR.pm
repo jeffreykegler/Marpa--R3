@@ -188,10 +188,7 @@ sub Marpa::R3::Scanless::R::new {
         my $is_active = $event_is_active_arg->{$event_name};
 
         my $symbol_ids =
-            $symbol_ids_by_event_name_and_type->{$event_name}->{lexeme};
-
-        $thin_slr->lexeme_event_activate( $_, $is_active )
-            for @{$symbol_ids};
+            $symbol_ids_by_event_name_and_type->{$event_name}->{lexeme} // [];
 
       $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'ii', $symbol_ids, ($is_active ? 1 : 0) );
@@ -1750,27 +1747,24 @@ sub Marpa::R3::Scanless::R::activate {
       ->{$event_name};
 
     for my $event ( @{ $event_symbol_ids_by_type->{completion} } ) {
-        $slr->call_by_tag(
-    ('@' . __FILE__ . ':' . __LINE__),
-        <<'END_OF_LUA', 'ii', $event, $activate );
+        $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+            <<'END_OF_LUA', 'ii', $event, $activate );
         local recce, event, activate = ...
         recce.lmw_g1r:completion_symbol_activate(event, activate)
 END_OF_LUA
     }
 
     for my $event ( @{ $event_symbol_ids_by_type->{nulled} } ) {
-        $slr->call_by_tag(
-    ('@' . __FILE__ . ':' . __LINE__),
-        <<'END_OF_LUA', 'ii', $event, $activate );
+        $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+            <<'END_OF_LUA', 'ii', $event, $activate );
         local recce, event, activate = ...
         recce.lmw_g1r:nulled_symbol_activate(event, activate)
 END_OF_LUA
     }
 
     for my $event ( @{ $event_symbol_ids_by_type->{prediction} } ) {
-        $slr->call_by_tag(
-    ('@' . __FILE__ . ':' . __LINE__),
-        <<'END_OF_LUA', 'ii', $event, $activate );
+        $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+            <<'END_OF_LUA', 'ii', $event, $activate );
         local recce, event, activate = ...
         recce.lmw_g1r:prediction_symbol_activate(event, activate)
 END_OF_LUA
@@ -1778,11 +1772,10 @@ END_OF_LUA
 
     my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
 
-    $thin_slr->lexeme_event_activate( $_, $activate )
-      for @{ $event_symbol_ids_by_type->{lexeme} };
-
-      $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA',
+    {
+        my $symbol_ids = $event_symbol_ids_by_type->{lexeme} // [];
+        $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+            <<'END_OF_LUA', 'ii', $symbol_ids, ( $activate ? 1 : 0 ) );
         local slr, symbol_ids, is_active_arg = ...
         local slg = slr.slg
         local is_active = (is_active_arg ~= 0 and true or nil)
@@ -1801,10 +1794,10 @@ END_OF_LUA
             end
         end
 END_OF_LUA
-        'ii', $event_symbol_ids_by_type->{lexeme}, ($activate ? 1 : 0) );
+    }
 
     return 1;
-} ## end sub Marpa::R3::Scanless::R::activate
+}
 
 # On success, returns the old priority value.
 # Failures are thrown.

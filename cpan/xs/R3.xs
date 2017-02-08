@@ -35,18 +35,6 @@ extern const struct marpa_event_description_s marpa_event_description[];
 extern const struct marpa_step_type_description_s
   marpa_step_type_description[];
 
-struct symbol_g_properties {
-     unsigned int t_pause_before:1;
-     unsigned int t_pause_before_active:1;
-     unsigned int t_pause_after:1;
-     unsigned int t_pause_after_active:1;
-};
-
-struct symbol_r_properties {
-     unsigned int t_pause_before_active:1;
-     unsigned int t_pause_after_active:1;
-};
-
 union marpa_slr_event_s;
 
 #define MARPA_SLREV_LEXEME_DISCARDED 3
@@ -105,7 +93,7 @@ union marpa_slr_event_s
 
 typedef struct
 {
-  struct symbol_g_properties *symbol_g_properties;
+  int dummy;
 } Scanless_G;
 
 typedef struct {
@@ -144,7 +132,6 @@ typedef struct
   int throw;
   int start_of_pause_lexeme;
   int end_of_pause_lexeme;
-  struct symbol_r_properties *symbol_r_properties;
 
   Marpa_Symbol_ID input_symbol_id;
   lua_Integer codepoint;                 /* For error returns */
@@ -1960,9 +1947,6 @@ static Scanless_G* slg_inner_new (void)
     dTHX;
 
     Newx (slg, 1, Scanless_G);
-
-    slg->symbol_g_properties = NULL;
-
     return slg;
 }
 
@@ -1971,32 +1955,10 @@ static void slg_inner_init_properties (
 {
     dTHX;
     Scanless_G *slg = slg_inner_get (outer_slg);
-
-    {
-        Marpa_Symbol_ID symbol_id;
-        lua_Integer g1_symbol_count;
-
-        call_by_tag (outer_slg->L, MYLUA_TAG,
-            "grammar = ...\n"
-            "local g1g = grammar.lmw_g1g\n"
-            "return g1g:highest_symbol_id()+1\n",
-            "G>i", outer_slg->lua_ref, &g1_symbol_count);
-
-        Newx (slg->symbol_g_properties, (unsigned int) g1_symbol_count,
-            struct symbol_g_properties);
-        for (symbol_id = 0; symbol_id < g1_symbol_count; symbol_id++) {
-            slg->symbol_g_properties[symbol_id].t_pause_before = 0;
-            slg->symbol_g_properties[symbol_id].t_pause_before_active = 0;
-            slg->symbol_g_properties[symbol_id].t_pause_after = 0;
-            slg->symbol_g_properties[symbol_id].t_pause_after_active = 0;
-        }
-    }
-
 }
 
 static void slg_inner_destroy(Scanless_G* slg) {
   dTHX;
-  Safefree (slg->symbol_g_properties);
   Safefree (slg);
 }
 
@@ -2040,32 +2002,6 @@ marpa_inner_slr_new (Outer_G* outer_slg)
 
     av_fill (slr->token_values, (I32)value_is_literal);
 
-    {
-        /* Delete this once g_properties are converted to Lua.
-         * The Lua values must be init'd after the SLR lua_ref
-         * is created.
-         */ 
-        Marpa_Symbol_ID symbol_id;
-        lua_Integer g1_symbol_count;
-    call_by_tag (outer_slg->L, MYLUA_TAG,
-        "grammar = ...\n"
-        "local g1g = grammar.lmw_g1g\n"
-        "return g1g:highest_symbol_id()+1\n"
-        ,
-        "G>i", outer_slg->lua_ref, &g1_symbol_count);
-
-        Newx (slr->symbol_r_properties, ((unsigned int) g1_symbol_count),
-            struct symbol_r_properties);
-        for (symbol_id = 0; symbol_id < g1_symbol_count; symbol_id++) {
-            const struct symbol_g_properties *g_properties =
-                slg->symbol_g_properties + symbol_id;
-            slr->symbol_r_properties[symbol_id].t_pause_before_active =
-                g_properties->t_pause_before_active;
-            slr->symbol_r_properties[symbol_id].t_pause_after_active =
-                g_properties->t_pause_after_active;
-        }
-    }
-
     slr->lexer_start_pos = slr->perl_pos;
     slr->lexer_read_result = 0;
     slr->start_of_pause_lexeme = -1;
@@ -2107,8 +2043,6 @@ static void slr_inner_destroy(lua_State* L, Scanless_R* slr)
     PERL_UNUSED_ARG(L);
 
    Safefree(slr->t_lexemes);
-
-  Safefree(slr->symbol_r_properties);
   if (slr->token_values)
     {
       SvREFCNT_dec ((SV *) slr->token_values);
@@ -2177,7 +2111,6 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
             outer_slr->lua_ref, (lua_Integer) earley_set, &return_value);
 
         while (!end_of_earley_items) {
-            struct symbol_r_properties *symbol_r_properties;
             lua_Integer g1_lexeme;
             lua_Integer this_lexeme_priority;
             lua_Integer dot_position;
@@ -2232,7 +2165,6 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
 
                 goto NEXT_PASS1_REPORT_ITEM;
             }
-            symbol_r_properties = slr->symbol_r_properties + g1_lexeme;
 
             call_by_tag (outer_slr->L, MYLUA_TAG,
                 "recce, g1_lexeme, start_of_lexeme, end_of_lexeme = ...\n"
@@ -2462,9 +2394,6 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
             if (event_type == MARPA_SLRTR_LEXEME_ACCEPTABLE) {
                 const Marpa_Symbol_ID g1_lexeme =
                     event->t_lexeme_acceptable.t_lexeme;
-                const struct symbol_r_properties *symbol_r_properties =
-                    slr->symbol_r_properties + g1_lexeme;
-
                 call_by_tag (outer_slr->L, MYLUA_TAG,
                     "recce, lexeme_start, lexeme_end, g1_lexeme = ...\n"
                     "if recce.trace_terminals > 2 then\n"
@@ -2734,119 +2663,6 @@ PPCODE:
 {
     slg_inner_init_properties (outer_slg);
     XSRETURN_YES;
-}
-
-void
-g1_lexeme_pause_set( outer_slg, g1_lexeme, pause )
-    Outer_G *outer_slg;
-    Marpa_Symbol_ID g1_lexeme;
-    int pause;
-PPCODE:
-{
-  Scanless_G* slg = slg_inner_get(outer_slg);
-  lua_Integer highest_g1_symbol_id;
-    struct symbol_g_properties * g_properties = slg->symbol_g_properties + g1_lexeme;
-    call_by_tag (outer_slg->L, MYLUA_TAG,
-        "grammar = ...\n"
-        "local g1g = grammar.lmw_g1g\n"
-        "return g1g:highest_symbol_id()\n"
-        ,
-        "G>i", outer_slg->lua_ref, &highest_g1_symbol_id);
-
-    if (g1_lexeme > highest_g1_symbol_id)
-    {
-      croak
-        ("Problem in slg->g1_lexeme_pause_set(%ld, %ld): symbol ID was %ld, but highest G1 symbol ID = %ld",
-         (long) g1_lexeme,
-         (long) pause,
-         (long) g1_lexeme,
-         (long) highest_g1_symbol_id
-         );
-    }
-    if (g1_lexeme < 0) {
-      croak
-        ("Problem in slg->lexeme_pause_set(%ld, %ld): symbol ID was %ld, a disallowed value",
-         (long) g1_lexeme,
-         (long) pause,
-         (long) g1_lexeme);
-    }
-    switch (pause) {
-    case 0: /* No pause */
-        g_properties->t_pause_after = 0;
-        g_properties->t_pause_before = 0;
-        break;
-    case 1: /* Pause after */
-        g_properties->t_pause_after = 1;
-        g_properties->t_pause_before = 0;
-        break;
-    case -1: /* Pause before */
-        g_properties->t_pause_after = 0;
-        g_properties->t_pause_before = 1;
-        break;
-    default:
-      croak
-        ("Problem in slg->lexeme_pause_set(%ld, %ld): value of pause must be -1,0 or 1",
-         (long) g1_lexeme,
-         (long) pause);
-    }
-  XSRETURN_YES;
-}
-
-void
-g1_lexeme_pause_activate( outer_slg, g1_lexeme, activate )
-    Outer_G *outer_slg;
-    Marpa_Symbol_ID g1_lexeme;
-    int activate;
-PPCODE:
-{
-  Scanless_G* slg = slg_inner_get(outer_slg);
-  lua_Integer highest_g1_symbol_id;
-  struct symbol_g_properties *g_properties =
-    slg->symbol_g_properties + g1_lexeme;
-
-    call_by_tag (outer_slg->L, MYLUA_TAG,
-        "grammar = ...\n"
-        "local g1g = grammar.lmw_g1g\n"
-        "return g1g:highest_symbol_id()\n"
-        ,
-        "G>i", outer_slg->lua_ref, &highest_g1_symbol_id);
-
-  if (g1_lexeme > highest_g1_symbol_id)
-    {
-      croak
-        ("Problem in slg->g1_lexeme_pause_activate(%ld, %ld): symbol ID was %ld, but highest G1 symbol ID = %ld",
-         (long) g1_lexeme,
-         (long) activate, (long) g1_lexeme, (long) highest_g1_symbol_id);
-    }
-  if (g1_lexeme < 0)
-    {
-      croak
-        ("Problem in slg->lexeme_pause_activate(%ld, %ld): symbol ID was %ld, a disallowed value",
-         (long) g1_lexeme, (long) activate, (long) g1_lexeme);
-    }
-
-  if (activate != 0 && activate != 1)
-    {
-      croak
-        ("Problem in slg->lexeme_pause_activate(%ld, %ld): value of activate must be 0 or 1",
-         (long) g1_lexeme, (long) activate);
-    }
-
-  if (g_properties->t_pause_before)
-    {
-      g_properties->t_pause_before_active = activate ? 1 : 0;
-    }
-  else if (g_properties->t_pause_after)
-    {
-      g_properties->t_pause_after_active = activate ? 1 : 0;
-    }
-  else
-    {
-      croak
-        ("Problem in slg->lexeme_pause_activate(%ld, %ld): no pause event is enabled",
-         (long) g1_lexeme, (long) activate);
-    }
-  XSRETURN_YES;
 }
 
 MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::SLR
@@ -3383,62 +3199,6 @@ PPCODE:
             slr_g1_error (outer_slr));
     }
     XSRETURN_IV (0);
-}
-
-void
-lexeme_event_activate( outer_slr, g1_lexeme_id, reactivate )
-    Outer_R *outer_slr;
-    Marpa_Symbol_ID g1_lexeme_id;
-    int reactivate;
-PPCODE:
-{
-  Scanless_R *slr = slr_inner_get(outer_slr);
-  struct symbol_r_properties *symbol_r_properties;
-  const Scanless_G *slg = slr->slg;
-  lua_Integer highest_g1_symbol_id;
-
-    call_by_tag (outer_slr->L, MYLUA_TAG,
-        "recce = ...\n"
-        "grammar = recce.slg\n"
-        "local g1g = grammar.lmw_g1g\n"
-        "return g1g:highest_symbol_id()\n"
-        ,
-        "R>i", outer_slr->lua_ref, &highest_g1_symbol_id);
-
-  if (g1_lexeme_id > highest_g1_symbol_id)
-    {
-      croak
-        ("Problem in slr->lexeme_event_activate(..., %ld, %ld): symbol ID was %ld, but highest G1 symbol ID = %ld",
-         (long) g1_lexeme_id, (long) reactivate,
-         (long) g1_lexeme_id, (long) highest_g1_symbol_id);
-    }
-  if (g1_lexeme_id < 0)
-    {
-      croak
-        ("Problem in slr->lexeme_event_activate(..., %ld, %ld): symbol ID was %ld, a disallowed value",
-         (long) g1_lexeme_id, (long) reactivate, (long) g1_lexeme_id);
-    }
-  symbol_r_properties = slr->symbol_r_properties + g1_lexeme_id;
-  switch (reactivate)
-    {
-    case 0:
-      symbol_r_properties->t_pause_after_active = 0;
-      symbol_r_properties->t_pause_before_active = 0;
-      break;
-    case 1:
-      {
-        const struct symbol_g_properties* g_properties = slg->symbol_g_properties + g1_lexeme_id;
-        /* Only activate events which are enabled */
-        symbol_r_properties->t_pause_after_active = g_properties->t_pause_after;
-        symbol_r_properties->t_pause_before_active = g_properties->t_pause_before;
-      }
-      break;
-    default:
-      croak
-        ("Problem in slr->lexeme_event_activate(..., %ld, %ld): reactivate flag is %ld, a disallowed value",
-         (long) g1_lexeme_id, (long) reactivate, (long) reactivate);
-    }
-  XPUSHs (sv_2mortal (newSViv (reactivate)));
 }
 
 void

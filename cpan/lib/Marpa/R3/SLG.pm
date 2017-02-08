@@ -1000,7 +1000,6 @@ END_OF_LUA
 
         my $pause_value = $declarations->{pause};
         if ( defined $pause_value ) {
-            $thin_slg->g1_lexeme_pause_set( $g1_lexeme_id, $pause_value );
 
             $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
                 <<'END_OF_LUA', 'ii', $g1_lexeme_id, $pause_value );
@@ -1039,7 +1038,6 @@ END_OF_LUA
     end
 END_OF_LUA
 
-            $thin_slg->g1_lexeme_pause_activate( $g1_lexeme_id, $is_active );
         } ## end if ( defined $pause_value )
 
     } ## end LEXEME: for my $lexeme_name ( keys %g1_id_by_lexeme_name )
