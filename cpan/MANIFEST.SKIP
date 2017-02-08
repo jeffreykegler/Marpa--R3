@@ -125,7 +125,6 @@
 ^nytprof/
 ^nytprof[.]out$
 ^pm_to_blib$
-^pod/Semantics/Order[.]pod[.]save$
 ^pod2htmd[.]tmp
 ^pod2htmi[.]tmp
 ^xs/MYMETA[.]
@@ -135,14 +134,10 @@
 ^xs/exec_lua[.]xs
 ^xs/glue[.]out$
 ^xs/glue_inc[.]c$
-^xs/inspect[.]c$
 ^xs/inspect[.]out$
 ^xs/inspect_inc[.]c$
 ^xs/kollos[.]out$
 ^xs/kollos_inc[.]c$
 ^xs/marpa
 ^xs/marpa[.]h$
-^xs/marpa_codes[.]h$
-^xs/marpa_slifop[.]h
-^xs/marpa_xs[.]h
 ^xs/ppport[.]h
