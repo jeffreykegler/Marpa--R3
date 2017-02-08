@@ -990,9 +990,19 @@ END_OF_LUA
         my $declarations = $lexeme_declarations->{$lexeme_name};
         my $priority     = $declarations->{priority} // 0;
         $thin_slg->g1_lexeme_set( $g1_lexeme_id, $priority );
+
+      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 'ii', $g1_lexeme_id, $priority );
+    local slg, g1_lexeme_id, priority = ...
+    local lexeme_data = slg.g1_symbols[g1_lexeme_id]
+    lexeme_data.is_lexeme = true
+    lexeme_data.priority = priority
+END_OF_LUA
+
         my $pause_value = $declarations->{pause};
         if ( defined $pause_value ) {
             $thin_slg->g1_lexeme_pause_set( $g1_lexeme_id, $pause_value );
+
             my $is_active = 1;
 
             if ( defined( my $event_data = $declarations->{'event'} ) ) {
@@ -1018,9 +1028,6 @@ END_OF_LUA
       $thin_slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'iii', $lexer_rule_id, $g1_lexeme_id, $assertion_id );
     local g, lexer_rule_id, g1_lexeme_id, assertion_id = ...
-    -- print('g1_lexeme_id: ', inspect(g1_lexeme_id))
-    -- print('lexer_rule_id: ', inspect(lexer_rule_id))
-    -- print('g: ', inspect(g.g1_rules[lexer_rule_id]))
     if lexer_rule_id >= 0 then
         g.l0_rules[lexer_rule_id].g1_lexeme = g1_lexeme_id
     end
