@@ -2514,7 +2514,7 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
                         (lua_Integer) slr->start_of_lexeme,
                         (lua_Integer) slr->end_of_lexeme,
                         (lua_Integer) g1_lexeme);
-                    if (symbol_r_properties->t_pause_after_active) {
+                    {
                         slr->start_of_pause_lexeme =
                             event->t_lexeme_acceptable.t_start_of_lexeme;
                         slr->end_of_pause_lexeme =
