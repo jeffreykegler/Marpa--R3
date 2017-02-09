@@ -1434,7 +1434,7 @@ call_by_tag (lua_State * L, const char* tag, const char *codestr,
                 size_t length;
                 const char *result_string = marpa_luaL_tolstring(L, nres, &length);
                 sv_setpvn(temp_sv, result_string, (STRLEN)length);
-                *va_arg (vl, char **) = SvPV_nolen(temp_sv);
+                *va_arg (vl, const char **) = SvPV_nolen(temp_sv);
                 break;
             }
         default:
