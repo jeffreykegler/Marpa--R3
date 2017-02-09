@@ -1691,10 +1691,9 @@ l0_read (Outer_R * outer_slr)
 
   call_by_tag (outer_slr->L,
     MYLUA_TAG,
-    "local recce, perl_pos = ...\n"
-    "-- print('codepoints:', inspect(recce.codepoints))\n"
+    "local recce = ...\n"
     "-- print('perl_pos:', inspect(perl_pos))\n"
-    "local codepoint = recce.codepoints[perl_pos+1]\n"
+    "local codepoint = recce.codepoints[recce.perl_pos+1]\n"
     "local ops = recce.per_codepoint[codepoint]\n"
     "local op_count = -1\n"
     "if ops then\n"
@@ -1702,8 +1701,7 @@ l0_read (Outer_R * outer_slr)
     "end\n"
     "return codepoint, op_count\n"
     ,
-    "Ri>ii", outer_slr->lua_ref,
-    (lua_Integer)slr->perl_pos, &codepoint, &op_count);
+    "R>ii", outer_slr->lua_ref, &codepoint, &op_count);
 
     if (op_count < 0) {
                 slr->codepoint = codepoint;
@@ -1711,13 +1709,12 @@ l0_read (Outer_R * outer_slr)
     }
 
         call_by_tag (outer_slr->L, MYLUA_TAG,
-            "local recce, codepoint, perl_pos = ...\n"
+            "local recce, codepoint = ...\n"
             "if recce.trace_terminals >= 1 then\n"
             "   local q = recce.event_queue\n"
-            "   q[#q+1] = { '!trace', 'lexer reading codepoint', codepoint, perl_pos}\n"
+            "   q[#q+1] = { '!trace', 'lexer reading codepoint', codepoint, recce.perl_pos}\n"
             "end\n",
-            "Rii>", outer_slr->lua_ref, (lua_Integer)codepoint,
-            (lua_Integer) slr->perl_pos);
+            "Rii>", outer_slr->lua_ref, (lua_Integer)codepoint);
 
         /* ops[0] is codepoint */
         for (op_ix = 1; op_ix <= op_count; op_ix++) {
@@ -1770,27 +1767,28 @@ l0_read (Outer_R * outer_slr)
                          * we have one of them as an example
                          */
                         call_by_tag (outer_slr->L, MYLUA_TAG,
-                            "recce, codepoint, perl_pos, symbol_id = ...\n"
+                            "recce, codepoint, symbol_id = ...\n"
                             "if recce.trace_terminals >= 1 then\n"
                             "    local q = recce.event_queue\n"
-                            "    q[#q+1] = { '!trace', 'lexer rejected codepoint', codepoint, perl_pos, symbol_id}\n"
+                            "    q[#q+1] = { '!trace', 'lexer rejected codepoint', codepoint,\n"
+                            "        recce.perl_pos, symbol_id}\n"
                             "end\n",
                             "Riii>",
-                            outer_slr->lua_ref,
-                            (lua_Integer)codepoint, (lua_Integer)slr->perl_pos, (lua_Integer)symbol_id);
+                            outer_slr->lua_ref, (lua_Integer)codepoint, (lua_Integer)symbol_id);
 
                         break;
                     case MARPA_ERR_NONE:
 
                         call_by_tag (outer_slr->L, MYLUA_TAG,
-                            "recce, codepoint, perl_pos, symbol_id = ...\n"
+                            "recce, codepoint, symbol_id = ...\n"
                             "if recce.trace_terminals >= 1 then\n"
                             "   local q = recce.event_queue\n"
-                            "   q[#q+1] = { '!trace', 'lexer accepted codepoint', codepoint, perl_pos, symbol_id}\n"
+                            "   q[#q+1] = { '!trace', 'lexer accepted codepoint', codepoint,\n"
+                            "       recce.perl_pos, symbol_id}\n"
                             "end\n",
                             "Riii>",
                             outer_slr->lua_ref,
-                            (lua_Integer)codepoint, (lua_Integer)slr->perl_pos, (lua_Integer)symbol_id);
+                            (lua_Integer)codepoint, (lua_Integer)symbol_id);
 
                         tokens_accepted++;
                         break;
