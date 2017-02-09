@@ -1666,12 +1666,12 @@ l0_read (Outer_R * outer_slr)
 
   call_by_tag (outer_slr->L,
     MYLUA_TAG,
-    "local recce, perl_pos = ...\n"
+    "local recce = ...\n"
     "if not recce.lmw_l0r then\n"
-    "    recce:l0r_new(perl_pos)\n"    
+    "    recce:l0r_new(recce.perl_pos)\n"    
     "end\n"
     ,
-    "Ri>", outer_slr->lua_ref, (lua_Integer)slr->perl_pos);
+    "R>", outer_slr->lua_ref);
 
     for (;;) {
         lua_Integer codepoint;
