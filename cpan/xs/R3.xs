@@ -2862,14 +2862,14 @@ PPCODE:
             slr->lexer_start_pos = -1;
 
             call_by_tag (outer_slr->L, MYLUA_TAG,
-                "local recce, perl_pos = ...\n"
+                "local recce = ...\n"
                 "recce.lmw_l0r = nil\n"
                 "if recce.trace_terminals >= 1 then\n"
                 "    local q = recce.event_queue\n"
-                "    q[#q+1] = { '!trace', 'lexer restarted recognizer', perl_pos}\n"
+                "    q[#q+1] = { '!trace', 'lexer restarted recognizer', recce.perl_pos}\n"
                 "end\n"
                 ,
-                "Ri>", outer_slr->lua_ref, (lua_Integer) slr->perl_pos);
+                "Ri>", outer_slr->lua_ref );
 
         }
 
@@ -3087,13 +3087,22 @@ g1_lexeme_complete (outer_slr, start_pos_sv, length_sv)
 PPCODE:
 {
     Scanless_R *slr = slr_inner_get (outer_slr);
+    lua_Integer perl_pos;
     lua_Integer result;
     lua_Integer input_length;
-    lua_Integer start_pos =
-        SvIOK (start_pos_sv) ? (lua_Integer)SvIV (start_pos_sv) : slr->perl_pos;
+    lua_Integer start_pos;
+    lua_Integer lexeme_length;
 
-    lua_Integer lexeme_length = SvIOK (length_sv) ? (lua_Integer)SvIV (length_sv)
-        : slr->perl_pos ==
+  call_by_tag (outer_slr->L, MYLUA_TAG,
+      "local recce = ...\n"
+      "return recce.perl_pos\n",
+      "R>i", outer_slr->lua_ref, &perl_pos);
+
+    start_pos =
+        SvIOK (start_pos_sv) ? (lua_Integer)SvIV (start_pos_sv) : perl_pos;
+
+    lexeme_length = SvIOK (length_sv) ? (lua_Integer)SvIV (length_sv)
+        : perl_pos ==
         slr->start_of_pause_lexeme ? (slr->end_of_pause_lexeme -
         slr->start_of_pause_lexeme) : -1;
 
