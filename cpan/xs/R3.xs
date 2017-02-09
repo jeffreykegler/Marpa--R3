@@ -112,7 +112,6 @@ typedef struct
   int is_external_scanning;
 
   lua_Integer last_perl_pos;
-  lua_Integer end_pos;
 
   /* character position, taking into account Unicode
      Equivalent to Perl pos()
@@ -1929,7 +1928,6 @@ u_pos_set (Outer_R * outer_slr, const char* name, lua_Integer start_pos_arg, lua
 
   /* Application level intervention resets |perl_pos| */
   slr->last_perl_pos = -1;
-  slr->end_pos = new_end_pos;
     call_by_tag (outer_slr->L, MYLUA_TAG,
         "local recce, new_perl_pos, new_end_pos = ...\n"
         "recce.perl_pos = new_perl_pos\n"
@@ -1956,7 +1954,6 @@ marpa_inner_slr_new (Outer_G* outer_slg)
     slr->is_external_scanning = 0;
 
     /* Lua setting done in caller */
-    slr->end_pos = 0;
     slr->last_perl_pos = -1;
     slr->lexer_start_pos = 0;
 
@@ -2845,7 +2842,15 @@ PPCODE:
 
     while (1) {
         if (slr->lexer_start_pos >= 0) {
-            if (slr->lexer_start_pos >= slr->end_pos) {
+             lua_Integer end_pos;
+
+    call_by_tag (outer_slr->L, MYLUA_TAG,
+        "local recce = ...\n"
+        "return recce.end_pos\n"
+        ,
+        "R>i", outer_slr->lua_ref, &end_pos);
+
+            if (slr->lexer_start_pos >= end_pos) {
                 XSRETURN_PV ("");
             }
 
