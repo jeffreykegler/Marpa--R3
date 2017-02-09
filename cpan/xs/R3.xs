@@ -55,24 +55,24 @@ union marpa_slr_event_s
   {
     int event_type;
     int t_rule_id;
-    int t_start_of_lexeme;
-    int t_end_of_lexeme;
+    lua_Integer t_start_of_lexeme;
+    lua_Integer t_end_of_lexeme;
   } t_trace_lexeme_discarded;
 
   struct
   {
     int event_type;
     int t_rule_id;
-    int t_start_of_lexeme;
-    int t_end_of_lexeme;
+    lua_Integer t_start_of_lexeme;
+    lua_Integer t_end_of_lexeme;
     int t_last_g1_location;
   } t_lexeme_discarded;
 
   struct
   {
     int event_type;
-    int t_start_of_lexeme;
-    int t_end_of_lexeme;
+    lua_Integer t_start_of_lexeme;
+    lua_Integer t_end_of_lexeme;
     int t_lexeme;
     lua_Integer t_priority;
     lua_Integer t_required_priority;
@@ -82,8 +82,8 @@ union marpa_slr_event_s
   struct
   {
     int event_type;
-    int t_start_of_lexeme;
-    int t_end_of_lexeme;
+    lua_Integer t_start_of_lexeme;
+    lua_Integer t_end_of_lexeme;
     int t_lexeme;
     lua_Integer t_priority;
     lua_Integer t_required_priority;
@@ -98,34 +98,34 @@ typedef struct {
 
 typedef struct
 {
-  int start_of_lexeme;
-  int end_of_lexeme;
+  lua_Integer start_of_lexeme;
+  lua_Integer end_of_lexeme;
 
   /* Input position at which to start the lexer.
      -1 means no restart.
    */
-  int lexer_start_pos;
+  lua_Integer lexer_start_pos;
 
   /* A boolean to prevent the inappropriate mixing
    * of internal and external scanning
    */
   int is_external_scanning;
 
-  int last_perl_pos;
-  int perl_pos;
+  lua_Integer last_perl_pos;
+  lua_Integer perl_pos;
+  lua_Integer end_pos;
 
   /* character position, taking into account Unicode
      Equivalent to Perl pos()
      One past last actual position indicates past-end-of-string
    */
   /* Position of problem -- unspecifed if not returning a problem */
-  int problem_pos;
+  lua_Integer problem_pos;
   int throw;
-  int start_of_pause_lexeme;
-  int end_of_pause_lexeme;
+  lua_Integer start_of_pause_lexeme;
+  lua_Integer end_of_pause_lexeme;
 
   lua_Integer codepoint;                 /* For error returns */
-  int end_pos;
 
   union marpa_slr_event_s* t_lexemes;
   int t_lexeme_capacity;
@@ -1877,13 +1877,13 @@ l0_read (Outer_R * outer_slr)
 
 /* It is OK to set pos to last codepoint + 1 */
 static void
-u_pos_set (Outer_R * outer_slr, const char* name, int start_pos_arg, int length_arg)
+u_pos_set (Outer_R * outer_slr, const char* name, lua_Integer start_pos_arg, int length_arg)
 {
   dTHX;
   Scanless_R *slr = slr_inner_get(outer_slr);
   lua_Integer input_length;
-  int new_perl_pos;
-  int new_end_pos;
+  lua_Integer new_perl_pos;
+  lua_Integer new_end_pos;
 
   call_by_tag (outer_slr->L, MYLUA_TAG,
       "recce = ...\n"
@@ -1939,9 +1939,12 @@ marpa_inner_slr_new (Outer_G* outer_slg)
     slr->end_of_lexeme = 0;
     slr->is_external_scanning = 0;
 
+    /* Lua setting done in caller */
     slr->perl_pos = 0;
     slr->end_pos = 0;
     slr->last_perl_pos = -1;
+    slr->lexer_start_pos = 0;
+
     slr->problem_pos = -1;
 
     call_by_tag (outer_slg->L, MYLUA_TAG,
@@ -1953,10 +1956,8 @@ marpa_inner_slr_new (Outer_G* outer_slg)
         ,
         "G>i", outer_slg->lua_ref, &value_is_literal);
 
-    slr->lexer_start_pos = slr->perl_pos;
     slr->start_of_pause_lexeme = -1;
     slr->end_of_pause_lexeme = -1;
-
 
     slr->t_lexeme_count = 0;
     slr->t_lexeme_capacity =
@@ -2013,7 +2014,7 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
 
     int discarded = 0;
     int rejected = 0;
-    int working_pos = slr->start_of_lexeme;
+    lua_Integer working_pos = slr->start_of_lexeme;
     enum pass1_result_type
     { none, discard, no_lexeme, accept };
     enum pass1_result_type pass1_result = none;
@@ -2268,6 +2269,11 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
     if (pass1_result == discard) {
         /* slr->problem_pos? */
         slr->perl_pos = slr->lexer_start_pos = working_pos;
+    call_by_tag (outer_slr->L, MYLUA_TAG,
+        "local recce, perl_pos = ...\n"
+        "recce.perl_pos = perl_pos\n"
+        ,
+        "Ri>", outer_slr->lua_ref, (lua_Integer)working_pos);
         return 0;
     }
 
@@ -2278,6 +2284,11 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
     if (pass1_result != accept) {
         slr->perl_pos = slr->problem_pos = slr->lexer_start_pos =
             slr->start_of_lexeme;
+    call_by_tag (outer_slr->L, MYLUA_TAG,
+        "local recce, perl_pos = ...\n"
+        "recce.perl_pos = perl_pos\n"
+        ,
+        "Ri>", outer_slr->lua_ref, (lua_Integer)slr->start_of_lexeme);
         return "no lexeme";
     }
 
@@ -2325,6 +2336,11 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
 
         if (event_lexeme >= 0) {
             slr->lexer_start_pos = slr->perl_pos = slr->start_of_lexeme;
+    call_by_tag (outer_slr->L, MYLUA_TAG,
+        "local recce, perl_pos = ...\n"
+        "recce.perl_pos = perl_pos\n"
+        ,
+        "Ri>", outer_slr->lua_ref, (lua_Integer)slr->start_of_lexeme);
             return 0;
         }
     }
@@ -2439,6 +2455,11 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
                 slr_g1_error (outer_slr));
         }
         slr->lexer_start_pos = slr->perl_pos = slr->end_of_lexeme;
+    call_by_tag (outer_slr->L, MYLUA_TAG,
+        "local recce, perl_pos = ...\n"
+        "recce.perl_pos = perl_pos\n"
+        ,
+        "Ri>", outer_slr->lua_ref, (lua_Integer)slr->end_of_lexeme);
         if (return_value > 0) {
             call_by_tag (outer_slr->L, MYLUA_TAG,
                 "local recce, perl_pos = ...\n"
@@ -2735,7 +2756,7 @@ pos( outer_slr )
 PPCODE:
 {
   Scanless_R *slr = slr_inner_get(outer_slr);
-  XSRETURN_IV(slr->perl_pos);
+  XSRETURN_IV((IV)slr->perl_pos);
 }
 
 void
@@ -2746,7 +2767,7 @@ pos_set( outer_slr, start_pos_sv, length_sv )
 PPCODE:
 {
   Scanless_R *slr = slr_inner_get(outer_slr);
-  int start_pos = SvIOK(start_pos_sv) ? (int)SvIV(start_pos_sv) : slr->perl_pos;
+  lua_Integer start_pos = SvIOK(start_pos_sv) ? (lua_Integer)SvIV(start_pos_sv) : slr->perl_pos;
   int length = SvIOK(length_sv) ? (int)SvIV(length_sv) : -1;
   u_pos_set(outer_slr, "slr->pos_set", start_pos, length);
   slr->lexer_start_pos = slr->perl_pos;
@@ -2782,14 +2803,23 @@ PPCODE:
             }
 
             slr->start_of_lexeme = slr->perl_pos = slr->lexer_start_pos;
+
+            call_by_tag (outer_slr->L, MYLUA_TAG,
+                "local recce, lexer_start_pos = ...\n"
+                "recce.perl_pos = lexer_start_pos\n"
+                ,
+                "Ri>", outer_slr->lua_ref, (lua_Integer) slr->lexer_start_pos);
+
             slr->lexer_start_pos = -1;
+
             call_by_tag (outer_slr->L, MYLUA_TAG,
                 "local recce, perl_pos = ...\n"
                 "recce.lmw_l0r = nil\n"
                 "if recce.trace_terminals >= 1 then\n"
                 "    local q = recce.event_queue\n"
                 "    q[#q+1] = { '!trace', 'lexer restarted recognizer', perl_pos}\n"
-                "end\n",
+                "end\n"
+                ,
                 "Ri>", outer_slr->lua_ref, (lua_Integer) slr->perl_pos);
 
         }
@@ -2860,7 +2890,7 @@ PPCODE:
   XPUSHs (sv_2mortal (newSViv ((IV) slr->start_of_pause_lexeme)));
   XPUSHs (sv_2mortal
           (newSViv
-           ((IV) slr->end_of_pause_lexeme - slr->start_of_pause_lexeme)));
+           ((IV)(slr->end_of_pause_lexeme - slr->start_of_pause_lexeme))));
 }
 
 void
@@ -2869,7 +2899,7 @@ lexeme_span (outer_slr)
 PPCODE:
 {
   Scanless_R *slr = slr_inner_get(outer_slr);
-  int length = slr->end_of_lexeme - slr->start_of_lexeme;
+  lua_Integer length = slr->end_of_lexeme - slr->start_of_lexeme;
   XPUSHs (sv_2mortal (newSViv ((IV) slr->start_of_lexeme)));
   XPUSHs (sv_2mortal (newSViv ((IV) length)));
 }
@@ -3010,10 +3040,10 @@ PPCODE:
     Scanless_R *slr = slr_inner_get (outer_slr);
     lua_Integer result;
     lua_Integer input_length;
-    int start_pos =
-        SvIOK (start_pos_sv) ? (int)SvIV (start_pos_sv) : slr->perl_pos;
+    lua_Integer start_pos =
+        SvIOK (start_pos_sv) ? (lua_Integer)SvIV (start_pos_sv) : slr->perl_pos;
 
-    int lexeme_length = SvIOK (length_sv) ? (int)SvIV (length_sv)
+    lua_Integer lexeme_length = SvIOK (length_sv) ? (lua_Integer)SvIV (length_sv)
         : slr->perl_pos ==
         slr->start_of_pause_lexeme ? (slr->end_of_pause_lexeme -
         slr->start_of_pause_lexeme) : -1;
@@ -3033,11 +3063,16 @@ PPCODE:
             (long) (SvIOK (start_pos_sv) ? SvIV (start_pos_sv) : -1));
     }
     slr->perl_pos = start_pos;
+    call_by_tag (outer_slr->L, MYLUA_TAG,
+        "local recce, perl_pos = ...\n"
+        "recce.perl_pos = perl_pos\n"
+        ,
+        "Ri>", outer_slr->lua_ref, (lua_Integer)start_pos);
 
     {
-        const int end_pos =
+        const lua_Integer end_pos =
             lexeme_length <
-            0 ? (int)input_length + lexeme_length + 1 : start_pos +
+            0 ? input_length + lexeme_length + 1 : start_pos +
             lexeme_length;
         if (end_pos < 0 || end_pos > input_length) {
             /* Undef length_sv should not cause error */
@@ -3061,12 +3096,15 @@ PPCODE:
             "recce:g1_convert_events(perl_pos)\n"
             "local g1r = recce.lmw_g1r\n"
             "local latest_earley_set = g1r:latest_earley_set()\n"
-            "recce.es_data[latest_earley_set] = { start_pos, lexeme_length }\n",
+            "recce.es_data[latest_earley_set] = { start_pos, lexeme_length }\n"
+            "recce.perl_pos = start_pos + lexeme_length\n"
+            ,
             "Riii>", outer_slr->lua_ref, (lua_Integer) start_pos,
             (lua_Integer) lexeme_length, slr->perl_pos);
 
+        /* TODO: Lua is above */
         slr->perl_pos = start_pos + lexeme_length;
-        XSRETURN_IV (slr->perl_pos);
+        XSRETURN_IV ((IV)slr->perl_pos);
     }
     if (result == -2) {
         call_by_tag (outer_slr->L, MYLUA_TAG,
@@ -3095,7 +3133,7 @@ PPCODE:
   if (slr->problem_pos < 0) {
      XSRETURN_UNDEF;
   }
-  XSRETURN_IV(slr->problem_pos);
+  XSRETURN_IV((IV)slr->problem_pos);
 }
 
 void
