@@ -1803,7 +1803,7 @@ l0_read (Outer_R * outer_slr)
                             "     Problem in l0_read(), alternative() failed: %s\n"
                             "]],\n"
                             "    recce.perl_pos, symbol_id, codepoint, value, l0r:error_description()\n"
-                            ")\n"
+                            "))\n"
                             ,
                             "Riii>",
                             outer_slr->lua_ref,
@@ -1837,11 +1837,11 @@ l0_read (Outer_R * outer_slr)
                         /* Advance one character before returning */
 
                       call_by_tag (outer_slr->L, MYLUA_TAG,
-                          "recce, perl_pos = ...\n"
-                          "recce:l0_convert_events(perl_pos)\n"
+                          "recce = ...\n"
+                          "recce:l0_convert_events(recce.perl_pos)\n"
                           "return recce.lmw_l0r:is_exhausted()\n",
-                          "Ri>i",
-                          outer_slr->lua_ref, (lua_Integer)slr->perl_pos, &is_exhausted);
+                          "R>i",
+                          outer_slr->lua_ref, &is_exhausted);
 
                         if (is_exhausted) {
                             return U_READ_EXHAUSTED_ON_SUCCESS;
@@ -2452,6 +2452,20 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
                         ("Problem SLR->read() failed on symbol id %d at position %d: %s",
                         g1_lexeme, (int) slr->perl_pos,
                         slr_g1_error (outer_slr));
+
+                        call_by_tag (outer_slr->L, MYLUA_TAG,
+                            "recce, g1_lexeme = ...\n"
+                            "local l0r = recce.lmw_l0r\n"
+                            "error(string.format([[\n"
+                            "     'Problem SLR->read() failed on symbol id %d at position %d: %s'\n"
+                            "]],\n"
+                            "    symbol_id, recce.perl_pos, l0r:error_description()\n"
+                            "))\n"
+                            ,
+                            "Rii>",
+                            outer_slr->lua_ref,
+                            (lua_Integer)g1_lexeme);
+
                     /* NOTREACHED */
 
                 }
