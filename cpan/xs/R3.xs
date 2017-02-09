@@ -1424,6 +1424,19 @@ call_by_tag (lua_State * L, const char* tag, const char *codestr,
                 *va_arg (vl, SV **) = sv;
                 break;
             }
+        case 's':
+            {
+                /* String will be in mortal space, so it will be garbage collected after
+                 * return to Perl control.  Copy it if you need it for longer than
+                 * that.
+                 */
+                SV* temp_sv = sv_newmortal();
+                size_t length;
+                const char *result_string = marpa_luaL_tolstring(L, nres, &length);
+                sv_setpvn(temp_sv, result_string, (STRLEN)length);
+                *va_arg (vl, char **) = SvPV_nolen(temp_sv);
+                break;
+            }
         default:
             croak
                 ("Internal error: invalid sig option %c in call_by_tag()",
@@ -1850,7 +1863,9 @@ l0_read (Outer_R * outer_slr)
             slr->perl_pos++;
             call_by_tag (outer_slr->L, MYLUA_TAG,
                 "recce = ...\n"
-                "return recce.trace_terminals\n",
+                "recce.perl_pos = recce.perl_pos + 1\n"
+                "return recce.trace_terminals\n"
+                ,
                 "R>i", outer_slr->lua_ref, &trace_terminals);
             if (trace_terminals) {
                 return U_READ_TRACING;
@@ -1897,10 +1912,14 @@ u_pos_set (Outer_R * outer_slr, const char* name, int start_pos_arg, int length_
 
   /* Application level intervention resets |perl_pos| */
   slr->last_perl_pos = -1;
-  new_perl_pos = new_perl_pos;
   slr->perl_pos = new_perl_pos;
-  new_end_pos = new_end_pos;
   slr->end_pos = new_end_pos;
+    call_by_tag (outer_slr->L, MYLUA_TAG,
+        "local recce, new_perl_pos, new_end_pos = ...\n"
+        "recce.perl_pos = new_perl_pos\n"
+        "recce.end_pos = new_end_pos\n"
+        ,
+        "Rii>", outer_slr->lua_ref, new_perl_pos, new_end_pos);
 }
 
 /* Static SLR methods */
@@ -1921,6 +1940,7 @@ marpa_inner_slr_new (Outer_G* outer_slg)
     slr->is_external_scanning = 0;
 
     slr->perl_pos = 0;
+    slr->end_pos = 0;
     slr->last_perl_pos = -1;
     slr->problem_pos = -1;
 
@@ -1937,7 +1957,6 @@ marpa_inner_slr_new (Outer_G* outer_slg)
     slr->start_of_pause_lexeme = -1;
     slr->end_of_pause_lexeme = -1;
 
-    slr->end_pos = 0;
 
     slr->t_lexeme_count = 0;
     slr->t_lexeme_capacity =
@@ -2646,13 +2665,15 @@ PPCODE:
       "local l0g = grammar.lmw_l0g\n"
       "local g1g = grammar.lmw_g1g\n"
       "recce.lmw_g1r = kollos.recce_new(g1g)\n"
-      "recce.too_many_earley_items = -1\n"
-      "recce.event_queue = {}\n"
-      "recce.es_data = {}\n"
       "recce.lmw_g1r.lmw_g = g1g\n"
-      "recce.trace_terminals = 0\n"
-      "recce.per_codepoint = {}\n"
+      "recce.es_data = {}\n"
+      "recce.event_queue = {}\n"
       "recce.l0_rules = {}\n"
+      "recce.per_codepoint = {}\n"
+      "recce.end_pos = 0\n"
+      "recce.perl_pos = 0\n"
+      "recce.too_many_earley_items = -1\n"
+      "recce.trace_terminals = 0\n"
       "local r_l0_rules = recce.l0_rules\n"
       "local g_l0_rules = grammar.l0_rules\n"
       "-- print('g_l0_rules: ', inspect(g_l0_rules))\n"
