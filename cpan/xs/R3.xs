@@ -1794,13 +1794,21 @@ l0_read (Outer_R * outer_slr)
                         break;
                     default:
                         slr->codepoint = codepoint;
-                        croak
-                            ("Problem alternative() failed at char ix %ld; symbol id %ld; codepoint 0x%lx value %ld\n"
-                            "Problem in l0_read(), alternative() failed: %s",
-                            (long) slr->perl_pos, (long) symbol_id,
-                            (unsigned long) codepoint,
-                            (long) value,
-                            slr_l0_error (outer_slr));
+
+                        call_by_tag (outer_slr->L, MYLUA_TAG,
+                            "recce, symbol_id, codepoint, value = ...\n"
+                            "local l0r = recce.lmw_l0r\n"
+                            "error(string.format([[\n"
+                            "     Problem alternative() failed at char ix %d; symbol id %d; codepoint 0x%x value %d\n"
+                            "     Problem in l0_read(), alternative() failed: %s\n"
+                            "]],\n"
+                            "    recce.perl_pos, symbol_id, codepoint, value, l0r:error_description()\n"
+                            ")\n"
+                            ,
+                            "Riii>",
+                            outer_slr->lua_ref,
+                            (lua_Integer)codepoint, (lua_Integer)symbol_id, (lua_Integer)value);
+
                     }
                 }
                 break;
