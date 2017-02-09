@@ -2448,10 +2448,6 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
                     break;
 
                 default:
-                    croak
-                        ("Problem SLR->read() failed on symbol id %d at position %d: %s",
-                        g1_lexeme, (int) slr->perl_pos,
-                        slr_g1_error (outer_slr));
 
                         call_by_tag (outer_slr->L, MYLUA_TAG,
                             "recce, g1_lexeme = ...\n"
