@@ -123,8 +123,6 @@ typedef struct
   lua_Integer start_of_pause_lexeme;
   lua_Integer end_of_pause_lexeme;
 
-  lua_Integer codepoint;                 /* For error returns */
-
   union marpa_slr_event_s* t_lexemes;
   int t_lexeme_capacity;
   int t_lexeme_count;
@@ -1705,7 +1703,6 @@ l0_read (Outer_R * outer_slr)
     "R>ii", outer_slr->lua_ref, &codepoint, &op_count);
 
     if (op_count < 0) {
-                slr->codepoint = codepoint;
                 return U_READ_UNREGISTERED_CHAR;
     }
 
@@ -1793,9 +1790,8 @@ l0_read (Outer_R * outer_slr)
 
                         tokens_accepted++;
                         break;
-                    default:
-                        slr->codepoint = codepoint;
 
+                    default:
                         call_by_tag (outer_slr->L, MYLUA_TAG,
                             "recce, symbol_id, codepoint, value = ...\n"
                             "recce.codepoint = codepoint\n"
@@ -1816,7 +1812,6 @@ l0_read (Outer_R * outer_slr)
                 break;
 
             case MARPA_OP_INVALID_CHAR:
-                slr->codepoint = codepoint;
                         call_by_tag (outer_slr->L, MYLUA_TAG,
                             "recce, codepoint = ...\n"
                             "recce.codepoint = codepoint\n"
@@ -1830,7 +1825,6 @@ l0_read (Outer_R * outer_slr)
                 {
                     lua_Integer result;
                     if (tokens_accepted < 1) {
-                        slr->codepoint = codepoint;
                         call_by_tag (outer_slr->L, MYLUA_TAG,
                             "recce, codepoint = ...\n"
                             "recce.codepoint = codepoint\n"
@@ -3217,16 +3211,11 @@ codepoint( outer_slr )
     Outer_R *outer_slr;
 PPCODE:
 {
-  lua_Integer codepoint;
-  Scanless_R *slr = slr_inner_get(outer_slr);
-                        call_by_tag (outer_slr->L, MYLUA_TAG,
-                            "recce = ...\n"
-                            "return recce.codepoint\n"
-                            ,
-                            "R>i",
-                            outer_slr->lua_ref,
-                            &codepoint);
-  XSRETURN_UV((UV)codepoint);
+    lua_Integer codepoint;
+    call_by_tag (outer_slr->L, MYLUA_TAG,
+        "recce = ...\n"
+        "return recce.codepoint\n", "R>i", outer_slr->lua_ref, &codepoint);
+    XSRETURN_UV ((UV) codepoint);
 }
 
 void
