@@ -1396,7 +1396,8 @@ call_by_tag (lua_State * L, const char* tag, const char *codestr,
                 const double n = marpa_lua_tonumberx (L, nres, &isnum);
                 if (!isnum)
                     croak
-                        ("Internal error: call_by_tag(%s ...): result type is not double",
+                        (R3ERR "call_by_tag(%s ...); result type is not double\n"
+                        "    Stopped at",
                         tag);
                 *va_arg (vl, double *) = n;
                 break;
@@ -1407,7 +1408,8 @@ call_by_tag (lua_State * L, const char* tag, const char *codestr,
                 const lua_Integer n = marpa_lua_tointegerx (L, nres, &isnum);
                 if (!isnum)
                     croak
-                        ("Internal error: call_by_tag(%s ...): result type is not integer",
+                        (R3ERR "call_by_tag(%s ...); result type is not integer\n"
+                        "    Stopped at",
                         tag);
                 *va_arg (vl, lua_Integer *) = n;
                 break;
@@ -3150,19 +3152,20 @@ PPCODE:
     slr->is_external_scanning = 0;
     if (result >= 0) {
         call_by_tag (outer_slr->L, MYLUA_TAG,
-            "local recce, start_pos, lexeme_length, perl_pos = ...\n"
-            "recce:g1_convert_events(perl_pos)\n"
+            "local recce, start_pos, lexeme_length = ...\n"
+            "recce:g1_convert_events(recce.perl_pos)\n"
             "local g1r = recce.lmw_g1r\n"
             "local latest_earley_set = g1r:latest_earley_set()\n"
             "recce.es_data[latest_earley_set] = { start_pos, lexeme_length }\n"
             "recce.perl_pos = start_pos + lexeme_length\n"
+            "return recce.perl_pos\n"
             ,
-            "Riii>", outer_slr->lua_ref, (lua_Integer) start_pos,
-            (lua_Integer) lexeme_length, slr->perl_pos);
+            "Rii>i", outer_slr->lua_ref, (lua_Integer) start_pos,
+            (lua_Integer) lexeme_length, &perl_pos);
 
         /* TODO: Lua is above */
         slr->perl_pos = start_pos + lexeme_length;
-        XSRETURN_IV ((IV)slr->perl_pos);
+        XSRETURN_IV ((IV)perl_pos);
     }
     if (result == -2) {
         call_by_tag (outer_slr->L, MYLUA_TAG,
