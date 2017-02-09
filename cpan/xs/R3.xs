@@ -1678,8 +1678,6 @@ l0_read (Outer_R * outer_slr)
         lua_Integer op_count;
         lua_Integer op_ix;
         int tokens_accepted = 0;
-        if (slr->perl_pos >= slr->end_pos)
-            break;
 
   call_by_tag (outer_slr->L,
     MYLUA_TAG,
@@ -1690,6 +1688,8 @@ l0_read (Outer_R * outer_slr)
     "return ''\n"
     ,
     "R>s", outer_slr->lua_ref, &cmd);
+
+    if (!strcmp(cmd, "break")) { break; }
 
   call_by_tag (outer_slr->L,
     MYLUA_TAG,
@@ -3279,12 +3279,11 @@ PPCODE:
   }
 
     call_by_tag (outer_slr->L, MYLUA_TAG,
-        "recce, perl_pos = ...\n"
-        "recce:g1_convert_events(perl_pos)\n"
+        "recce = ...\n"
+        "recce:g1_convert_events(recce.perl_pos)\n"
         ,
-        "Ri>",
-        outer_slr->lua_ref,
-        slr->perl_pos
+        "R>",
+        outer_slr->lua_ref
     );
 
   XPUSHs (sv_2mortal (newSViv ((IV)gp_result)));
