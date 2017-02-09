@@ -1699,6 +1699,7 @@ l0_read (Outer_R * outer_slr)
     "if ops then\n"
     "    op_count = #ops\n"
     "end\n"
+    "recce.codepoint = codepoint\n"
     "return codepoint, op_count\n"
     ,
     "R>ii", outer_slr->lua_ref, &codepoint, &op_count);
@@ -1797,6 +1798,7 @@ l0_read (Outer_R * outer_slr)
 
                         call_by_tag (outer_slr->L, MYLUA_TAG,
                             "recce, symbol_id, codepoint, value = ...\n"
+                            "recce.codepoint = codepoint\n"
                             "local l0r = recce.lmw_l0r\n"
                             "error(string.format([[\n"
                             "     Problem alternative() failed at char ix %d; symbol id %d; codepoint 0x%x value %d\n"
@@ -1815,6 +1817,13 @@ l0_read (Outer_R * outer_slr)
 
             case MARPA_OP_INVALID_CHAR:
                 slr->codepoint = codepoint;
+                        call_by_tag (outer_slr->L, MYLUA_TAG,
+                            "recce, codepoint = ...\n"
+                            "recce.codepoint = codepoint\n"
+                            ,
+                            "Ri>",
+                            outer_slr->lua_ref,
+                            (lua_Integer)codepoint);
                 return U_READ_INVALID_CHAR;
 
             case MARPA_OP_EARLEME_COMPLETE:
@@ -1822,6 +1831,13 @@ l0_read (Outer_R * outer_slr)
                     lua_Integer result;
                     if (tokens_accepted < 1) {
                         slr->codepoint = codepoint;
+                        call_by_tag (outer_slr->L, MYLUA_TAG,
+                            "recce, codepoint = ...\n"
+                            "recce.codepoint = codepoint\n"
+                            ,
+                            "Ri>",
+                            outer_slr->lua_ref,
+                            (lua_Integer)codepoint);
                         return U_READ_REJECTED_CHAR;
                     }
 
@@ -2709,6 +2725,7 @@ PPCODE:
       "local g1g = grammar.lmw_g1g\n"
       "recce.lmw_g1r = kollos.recce_new(g1g)\n"
       "recce.lmw_g1r.lmw_g = g1g\n"
+      "recce.codepoint = nil\n"
       "recce.es_data = {}\n"
       "recce.event_queue = {}\n"
       "recce.l0_rules = {}\n"
@@ -3200,8 +3217,16 @@ codepoint( outer_slr )
     Outer_R *outer_slr;
 PPCODE:
 {
+  lua_Integer codepoint;
   Scanless_R *slr = slr_inner_get(outer_slr);
-  XSRETURN_UV((UV)slr->codepoint);
+                        call_by_tag (outer_slr->L, MYLUA_TAG,
+                            "recce = ...\n"
+                            "return recce.codepoint\n"
+                            ,
+                            "R>i",
+                            outer_slr->lua_ref,
+                            &codepoint);
+  XSRETURN_UV((UV)codepoint);
 }
 
 void
