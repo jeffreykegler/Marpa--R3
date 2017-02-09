@@ -112,7 +112,6 @@ typedef struct
   int is_external_scanning;
 
   lua_Integer last_perl_pos;
-  lua_Integer perl_pos;
   lua_Integer end_pos;
 
   /* character position, taking into account Unicode
@@ -1879,7 +1878,6 @@ l0_read (Outer_R * outer_slr)
       ADVANCE_ONE_CHAR:;
         {
             lua_Integer trace_terminals;
-            slr->perl_pos++;
             call_by_tag (outer_slr->L, MYLUA_TAG,
                 "recce = ...\n"
                 "recce.perl_pos = recce.perl_pos + 1\n"
@@ -1931,7 +1929,6 @@ u_pos_set (Outer_R * outer_slr, const char* name, lua_Integer start_pos_arg, lua
 
   /* Application level intervention resets |perl_pos| */
   slr->last_perl_pos = -1;
-  slr->perl_pos = new_perl_pos;
   slr->end_pos = new_end_pos;
     call_by_tag (outer_slr->L, MYLUA_TAG,
         "local recce, new_perl_pos, new_end_pos = ...\n"
@@ -1959,7 +1956,6 @@ marpa_inner_slr_new (Outer_G* outer_slg)
     slr->is_external_scanning = 0;
 
     /* Lua setting done in caller */
-    slr->perl_pos = 0;
     slr->end_pos = 0;
     slr->last_perl_pos = -1;
     slr->lexer_start_pos = 0;
@@ -2287,7 +2283,7 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
 
     if (pass1_result == discard) {
         /* slr->problem_pos? */
-        slr->perl_pos = slr->lexer_start_pos = working_pos;
+        slr->lexer_start_pos = working_pos;
     call_by_tag (outer_slr->L, MYLUA_TAG,
         "local recce, perl_pos = ...\n"
         "recce.perl_pos = perl_pos\n"
@@ -2301,7 +2297,7 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
     }
 
     if (pass1_result != accept) {
-        slr->perl_pos = slr->problem_pos = slr->lexer_start_pos =
+        slr->problem_pos = slr->lexer_start_pos =
             slr->start_of_lexeme;
     call_by_tag (outer_slr->L, MYLUA_TAG,
         "local recce, perl_pos = ...\n"
@@ -2354,7 +2350,7 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
         }
 
         if (event_lexeme >= 0) {
-            slr->lexer_start_pos = slr->perl_pos = slr->start_of_lexeme;
+            slr->lexer_start_pos = slr->start_of_lexeme;
     call_by_tag (outer_slr->L, MYLUA_TAG,
         "local recce, perl_pos = ...\n"
         "recce.perl_pos = perl_pos\n"
@@ -2483,7 +2479,7 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
             croak ("Problem in marpa_r_earleme_complete(): %s",
                 slr_g1_error (outer_slr));
         }
-        slr->lexer_start_pos = slr->perl_pos = slr->end_of_lexeme;
+        slr->lexer_start_pos = slr->end_of_lexeme;
     call_by_tag (outer_slr->L, MYLUA_TAG,
         "local recce, perl_pos = ...\n"
         "recce.perl_pos = perl_pos\n"
@@ -2853,7 +2849,7 @@ PPCODE:
                 XSRETURN_PV ("");
             }
 
-            slr->start_of_lexeme = slr->perl_pos = slr->lexer_start_pos;
+            slr->start_of_lexeme = slr->lexer_start_pos;
 
             call_by_tag (outer_slr->L, MYLUA_TAG,
                 "local recce, lexer_start_pos = ...\n"
@@ -3122,7 +3118,6 @@ PPCODE:
         croak ("Bad start position in slr->g1_lexeme_complete(): %ld",
             (long) (SvIOK (start_pos_sv) ? SvIV (start_pos_sv) : -1));
     }
-    slr->perl_pos = start_pos;
     call_by_tag (outer_slr->L, MYLUA_TAG,
         "local recce, perl_pos = ...\n"
         "recce.perl_pos = perl_pos\n"
@@ -3163,8 +3158,6 @@ PPCODE:
             "Rii>i", outer_slr->lua_ref, (lua_Integer) start_pos,
             (lua_Integer) lexeme_length, &perl_pos);
 
-        /* TODO: Lua is above */
-        slr->perl_pos = start_pos + lexeme_length;
         XSRETURN_IV ((IV)perl_pos);
     }
     if (result == -2) {
