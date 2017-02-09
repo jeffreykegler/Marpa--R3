@@ -1894,7 +1894,7 @@ l0_read (Outer_R * outer_slr)
 
 /* It is OK to set pos to last codepoint + 1 */
 static void
-u_pos_set (Outer_R * outer_slr, const char* name, lua_Integer start_pos_arg, int length_arg)
+u_pos_set (Outer_R * outer_slr, const char* name, lua_Integer start_pos_arg, lua_Integer length_arg)
 {
   dTHX;
   Scanless_R *slr = slr_inner_get(outer_slr);
@@ -1918,7 +1918,7 @@ u_pos_set (Outer_R * outer_slr, const char* name, lua_Integer start_pos_arg, int
   }
 
   if (length_arg < 0) {
-      new_end_pos = (int)input_length + length_arg + 1;
+      new_end_pos = input_length + length_arg + 1;
   } else {
     new_end_pos = new_perl_pos + length_arg;
   }
@@ -2489,9 +2489,9 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
         "Ri>", outer_slr->lua_ref, (lua_Integer)slr->end_of_lexeme);
         if (return_value > 0) {
             call_by_tag (outer_slr->L, MYLUA_TAG,
-                "local recce, perl_pos = ...\n"
-                "recce:g1_convert_events(perl_pos)\n",
-                "Ri>", outer_slr->lua_ref, slr->perl_pos);
+                "local recce = ...\n"
+                "recce:g1_convert_events(recce.perl_pos)\n",
+                "Ri>", outer_slr->lua_ref);
         }
 
         call_by_tag (outer_slr->L, MYLUA_TAG,
@@ -2782,8 +2782,15 @@ pos( outer_slr )
     Outer_R *outer_slr;
 PPCODE:
 {
+  lua_Integer perl_pos;
   Scanless_R *slr = slr_inner_get(outer_slr);
-  XSRETURN_IV((IV)slr->perl_pos);
+
+  call_by_tag (outer_slr->L, MYLUA_TAG,
+      "local recce = ...\n"
+      "return recce.perl_pos\n",
+      "R>i", outer_slr->lua_ref, &perl_pos);
+
+  XSRETURN_IV((IV)perl_pos);
 }
 
 void
@@ -2793,11 +2800,26 @@ pos_set( outer_slr, start_pos_sv, length_sv )
      SV* length_sv;
 PPCODE:
 {
+  lua_Integer perl_pos;
+  lua_Integer start_pos;
+  lua_Integer length;
   Scanless_R *slr = slr_inner_get(outer_slr);
-  lua_Integer start_pos = SvIOK(start_pos_sv) ? (lua_Integer)SvIV(start_pos_sv) : slr->perl_pos;
-  int length = SvIOK(length_sv) ? (int)SvIV(length_sv) : -1;
+
+  call_by_tag (outer_slr->L, MYLUA_TAG,
+      "local recce = ...\n"
+      "return recce.perl_pos\n",
+      "R>i", outer_slr->lua_ref, &perl_pos);
+
+  start_pos = SvIOK(start_pos_sv) ? (lua_Integer)SvIV(start_pos_sv) : perl_pos;
+  length = SvIOK(length_sv) ? (lua_Integer)SvIV(length_sv) : -1;
   u_pos_set(outer_slr, "slr->pos_set", start_pos, length);
-  slr->lexer_start_pos = slr->perl_pos;
+
+  call_by_tag (outer_slr->L, MYLUA_TAG,
+      "local recce = ...\n"
+      "return recce.perl_pos\n",
+      "R>i", outer_slr->lua_ref, &perl_pos);
+
+  slr->lexer_start_pos = perl_pos;
   XSRETURN_YES;
 }
 
