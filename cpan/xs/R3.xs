@@ -1678,7 +1678,7 @@ l0_read (Outer_R * outer_slr)
         lua_Integer codepoint;
         lua_Integer op_count;
         lua_Integer op_ix;
-        int tokens_accepted = 0;
+        lua_Integer tokens_accepted = 0;
 
         call_by_tag (outer_slr->L,
             MYLUA_TAG,
@@ -1699,6 +1699,10 @@ l0_read (Outer_R * outer_slr)
             "if op_count < 0 then\n"
             "    return 'unregistered char', codepoint, op_count\n"
             "end\n"
+            "if recce.trace_terminals >= 1 then\n"
+            "   local q = recce.event_queue\n"
+            "   q[#q+1] = { '!trace', 'lexer reading codepoint', codepoint, recce.perl_pos}\n"
+            "end\n"
             "return '', codepoint, op_count\n"
             /* end of lua */ ,
             "R>sii", outer_slr->lua_ref, &cmd, &codepoint, &op_count);
@@ -1709,13 +1713,6 @@ l0_read (Outer_R * outer_slr)
         if (!strcmp (cmd, "unregistered char")) {
             return U_READ_UNREGISTERED_CHAR;
         }
-
-        call_by_tag (outer_slr->L, MYLUA_TAG,
-            "local recce, codepoint = ...\n"
-            "if recce.trace_terminals >= 1 then\n"
-            "   local q = recce.event_queue\n"
-            "   q[#q+1] = { '!trace', 'lexer reading codepoint', codepoint, recce.perl_pos}\n"
-            "end\n", "Rii>", outer_slr->lua_ref, (lua_Integer) codepoint);
 
         /* ops[0] is codepoint */
         for (op_ix = 1; op_ix <= op_count; op_ix++) {
@@ -1879,9 +1876,12 @@ l0_read (Outer_R * outer_slr)
             call_by_tag (outer_slr->L, MYLUA_TAG,
                 "recce = ...\n"
                 "recce.perl_pos = recce.perl_pos + 1\n"
-                "return recce.trace_terminals\n",
-                "R>i", outer_slr->lua_ref, &trace_terminals);
-            if (trace_terminals) {
+                "if recce.trace_terminals > 0 then\n"
+                "   return 'tracing'\n"
+                "end\n"
+                /* end of lua */ ,
+                "R>s", outer_slr->lua_ref, &cmd);
+            if (!strcmp (cmd, "tracing")) {
                 return U_READ_TRACING;
             }
         }
