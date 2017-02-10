@@ -288,6 +288,8 @@ slg_l0_error (Outer_G * outer_slg)
  * copy it if you want want to save it.
  */
 static const char *
+slr_l0_error (Outer_R * outer_slr) PERL_UNUSED_DECL;
+static const char *
 slr_l0_error (Outer_R * outer_slr)
 {
     dTHX;
@@ -1816,7 +1818,6 @@ l0_read (Outer_R * outer_slr)
 
             case MARPA_OP_EARLEME_COMPLETE:
                 {
-                    lua_Integer result;
                     if (tokens_accepted < 1) {
                         call_by_tag (outer_slr->L, MYLUA_TAG,
                             "recce, codepoint = ...\n"
@@ -1832,7 +1833,7 @@ l0_read (Outer_R * outer_slr)
                         "local complete_result = recce.lmw_l0r:earleme_complete()\n"
                         "if complete_result == -2 then\n"
                         "    if l0r:error_code() == kollos.err.PARSE_EXHAUSTED then\n"
-                        "        return 'exhausted on failure', complete_result\n"
+                        "        return 'exhausted on failure'\n"
                         "    end\n"
                         "end\n"
                         "if complete_result < 0 then\n"
@@ -1843,12 +1844,11 @@ l0_read (Outer_R * outer_slr)
                         "    recce:l0_convert_events(recce.perl_pos)\n"
                         "    local is_exhausted = recce.lmw_l0r:is_exhausted()\n"
                         "    if is_exhausted ~= 0 then\n"
-                        "        return 'exhausted on success', complete_result\n"
+                        "        return 'exhausted on success'\n"
                         "    end\n"
-                        "    return 'next_char', complete_result\n"
-                        "end\n" "return '', complete_result\n"
+                        "end\n" "return ''\n"
                         /* end of lua */ ,
-                        "R>si", outer_slr->lua_ref, &cmd, &result);
+                        "R>s", outer_slr->lua_ref, &cmd);
 
                     if (!strcmp (cmd, "exhausted on failure")) {
                         return U_READ_EXHAUSTED_ON_FAILURE;
@@ -1856,12 +1856,9 @@ l0_read (Outer_R * outer_slr)
                     if (!strcmp (cmd, "exhausted on success")) {
                         return U_READ_EXHAUSTED_ON_SUCCESS;
                     }
-                    if (!strcmp (cmd, "next char")) {
-                        goto NEXT_CHAR;
-                    }
 
                 }
-                goto NEXT_OP;
+                goto NEXT_CHAR;
             default:
                 croak
                     ("Unknown op code (0x%lx); codepoint=0x%lx, op_ix=0x%lx",
@@ -1872,7 +1869,6 @@ l0_read (Outer_R * outer_slr)
         }
       NEXT_CHAR:;
         {
-            lua_Integer trace_terminals;
             call_by_tag (outer_slr->L, MYLUA_TAG,
                 "recce = ...\n"
                 "recce.perl_pos = recce.perl_pos + 1\n"
@@ -3260,7 +3256,6 @@ start_input( outer_slr )
     Outer_R *outer_slr;
 PPCODE:
 {
-  Scanless_R *slr = slr_inner_get(outer_slr);
   lua_Integer gp_result;
 
     call_by_tag (outer_slr->L, MYLUA_TAG,
