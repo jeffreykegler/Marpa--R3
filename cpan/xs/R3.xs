@@ -1721,12 +1721,21 @@ l0_read (Outer_R * outer_slr)
             lua_Integer op_code;
 
             call_by_tag (outer_slr->L, MYLUA_TAG,
-                "local recce, codepoint, op_ix = ...\n"
+                "local recce, op_ix = ...\n"
                 "-- print(inspect(recce.per_codepoint[codepoint]))\n"
-                "-- print('op_ix: ', inspect(op_ix))\n"
-                "local op_code = recce.per_codepoint[codepoint][op_ix]\n"
-                "return op_code\n",
-                "Rii>i", outer_slr->lua_ref, codepoint, op_ix, &op_code);
+                "local op_code = recce.per_codepoint[recce.codepoint][op_ix]\n"
+                "if op_code == kollos.defines.MARPA_OP_INVALID_CHAR then\n"
+                "    return 'invalid char', op_code\n"
+                "end\n"
+                "return '', op_code\n",
+                "Ri>si", outer_slr->lua_ref, op_ix, &cmd, &op_code);
+
+            if (!strcmp (cmd, "invalid char")) {
+                return U_READ_INVALID_CHAR;
+            }
+            if (!strcmp (cmd, "next op")) {
+                goto NEXT_OP;
+            }
 
             switch (op_code) {
             case MARPA_OP_ALTERNATIVE:
@@ -1747,13 +1756,6 @@ l0_read (Outer_R * outer_slr)
                     if (was_accepted) { tokens_accepted ++; }
                 }
                 goto NEXT_OP;
-
-            case MARPA_OP_INVALID_CHAR:
-                call_by_tag (outer_slr->L, MYLUA_TAG,
-                    "recce, codepoint = ...\n"
-                    "recce.codepoint = codepoint\n",
-                    "Ri>", outer_slr->lua_ref, (lua_Integer) codepoint);
-                return U_READ_INVALID_CHAR;
 
             case MARPA_OP_EARLEME_COMPLETE:
                 {
