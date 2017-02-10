@@ -1721,7 +1721,7 @@ l0_read (Outer_R * outer_slr)
             lua_Integer op_code;
 
             call_by_tag (outer_slr->L, MYLUA_TAG,
-                "recce, codepoint, op_ix = ...\n"
+                "local recce, codepoint, op_ix = ...\n"
                 "-- print(inspect(recce.per_codepoint[codepoint]))\n"
                 "-- print('op_ix: ', inspect(op_ix))\n"
                 "local op_code = recce.per_codepoint[codepoint][op_ix]\n"
@@ -1737,7 +1737,8 @@ l0_read (Outer_R * outer_slr)
                     lua_Integer value;
 
                     call_by_tag (outer_slr->L, MYLUA_TAG,
-                        "recce, op_ix = ...\n"
+                        "local recce, codepoint, op_ix = ...\n"
+                        "local l0r = recce.lmw_l0r\n"
                         "local ops = recce.per_codepoint[codepoint]\n"
                         "local symbol_id = ops[op_ix+1]\n"
                         "local value = ops[op_ix+2]\n"
@@ -1748,11 +1749,13 @@ l0_read (Outer_R * outer_slr)
                         "        codepoint, op_ix\n"
                         "    ))\n"
                         "end\n"
-                        "local result = recce.lmw_l0r:alternative(symbol_id, value, length)\n"
+                        "local result = l0r:alternative(symbol_id, value, length)\n"
+                        "if result == kollos.err.UNEXPECTED_TOKEN_ID then\n"
+                        "end\n"
                         "return '', symbol_id, value, length, result\n"
                         ,
-                        "Ri>siiii",
-                        outer_slr->lua_ref, op_ix,
+                        "Rii>siiii",
+                        outer_slr->lua_ref, codepoint, op_ix,
                         &cmd, &symbol_id, &value, &length, &result);
                     op_ix += 3;
                     if (!strcmp (cmd, "next op")) {
