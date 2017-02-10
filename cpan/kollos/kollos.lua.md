@@ -476,16 +476,10 @@ which will be 1 or 0.
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slr.l0_alternative(recce, symbol_id, value, length)
+    function _M.class_slr.l0_alternative(recce, symbol_id)
         local l0r = recce.lmw_l0r
         local codepoint = recce.codepoint
-        if not length then
-            error(string.format(
-                'Missing OP_ALTERNATIVE operands, codepoint=%d, op_ix=%d',
-                codepoint, op_ix
-            ))
-        end
-        local result = l0r:alternative(symbol_id, value, length)
+        local result = l0r:alternative(symbol_id, 1, 1)
         if result == _M.err.UNEXPECTED_TOKEN_ID then
             if recce.trace_terminals >= 1 then
                 local q = recce.event_queue
@@ -503,10 +497,10 @@ which will be 1 or 0.
             return 1
         end
         error(string.format([[
-             Problem alternative() failed at char ix %d; symbol id %d; codepoint 0x%x value %d
+             Problem alternative() failed at char ix %d; symbol id %d; codepoint 0x%x
              Problem in l0_read(), alternative() failed: %s
         ]],
-            recce.perl_pos, symbol_id, codepoint, value, l0r:error_description()
+            recce.perl_pos, symbol_id, codepoint, l0r:error_description()
         ))
     end
 

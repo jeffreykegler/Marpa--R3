@@ -1749,9 +1749,7 @@ l0_read (Outer_R * outer_slr)
                         "local recce, codepoint, op_ix = ...\n"
                         "local ops = recce.per_codepoint[codepoint]\n"
                         "local symbol_id = ops[op_ix+1]\n"
-                        "local value = ops[op_ix+2]\n"
-                        "local length = ops[op_ix+3]\n"
-                        "return recce:l0_alternative(symbol_id, value, length)\n"
+                        "return recce:l0_alternative(symbol_id)\n"
                         ,
                         "Rii>i",
                         outer_slr->lua_ref, codepoint, op_ix, &was_accepted);
