@@ -1683,21 +1683,15 @@ l0_read (Outer_R * outer_slr)
         call_by_tag (outer_slr->L,
             MYLUA_TAG,
             "local recce = ...\n"
-            "if recce.perl_pos >= recce.end_pos then\n"
-            "    return 'ok'\n"
-            "end\n" "return ''\n", "R>s", outer_slr->lua_ref, &cmd);
-
-        if (!strcmp (cmd, "ok")) {
-            return U_READ_OK;
-        }
-
-        call_by_tag (outer_slr->L,
-            MYLUA_TAG,
-            "local recce = ...\n"
-            "-- print('perl_pos:', inspect(perl_pos))\n"
-            "local codepoint = recce.codepoints[recce.perl_pos+1]\n"
-            "local ops = recce.per_codepoint[codepoint]\n"
             "local op_count = -1\n"
+            "-- this initialization is for call_by_tag()\n"
+            "-- they can be removed when the caller is Lua\n"
+            "local codepoint = -1\n"
+            "if recce.perl_pos >= recce.end_pos then\n"
+            "    return 'ok', codepoint, op_count\n"
+            "end\n"
+            "codepoint = recce.codepoints[recce.perl_pos+1]\n"
+            "local ops = recce.per_codepoint[codepoint]\n"
             "if ops then\n"
             "    op_count = #ops\n"
             "end\n"
@@ -1709,6 +1703,9 @@ l0_read (Outer_R * outer_slr)
             /* end of lua */ ,
             "R>sii", outer_slr->lua_ref, &cmd, &codepoint, &op_count);
 
+        if (!strcmp (cmd, "ok")) {
+            return U_READ_OK;
+        }
         if (!strcmp (cmd, "unregistered char")) {
             return U_READ_UNREGISTERED_CHAR;
         }
