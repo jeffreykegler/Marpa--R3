@@ -1384,6 +1384,7 @@ call_by_tag (lua_State * L, const char* tag, const char *codestr,
     }
 
     for (nres = -nres; *sig; nres++) {
+              /* warn("hi " MYLUA_TAG ": nres=%d, sig=%s", nres, sig); */
         const char this_sig = *sig++;
         switch (this_sig) {
         case 'd':
@@ -1392,9 +1393,9 @@ call_by_tag (lua_State * L, const char* tag, const char *codestr,
                 const double n = marpa_lua_tonumberx (L, nres, &isnum);
                 if (!isnum)
                     croak
-                        (R3ERR "call_by_tag(%s ...); result type is not double\n"
+                        (R3ERR "call_by_tag(%s ...); result type is %s, not double\n"
                         "    Stopped at",
-                        tag);
+                        tag, marpa_luaL_typename(L, nres));
                 *va_arg (vl, double *) = n;
                 break;
             }
@@ -1402,23 +1403,26 @@ call_by_tag (lua_State * L, const char* tag, const char *codestr,
             {
                 int isnum;
                 const lua_Integer n = marpa_lua_tointegerx (L, nres, &isnum);
+                /* warn("hi " MYLUA_TAG); */
                 if (!isnum)
                     croak
-                        (R3ERR "call_by_tag(%s ...); result type is not integer\n"
+                        (R3ERR "call_by_tag(%s ...); result type is %s, not integer\n"
                         "    Stopped at",
-                        tag);
+                        tag, marpa_luaL_typename(L, nres));
                 *va_arg (vl, lua_Integer *) = n;
                 break;
             }
         case 'M':                  /* SV -- caller becomes owner of 1 mortal ref count. */
             {
                 SV **av_ref_p = (SV **) marpa_lua_touserdata (L, nres);
+                /* warn("hi " MYLUA_TAG); */
                 *va_arg (vl, SV **) = sv_mortalcopy (*av_ref_p);
                 break;
             }
         case 'C':                  /* SV -- caller becomes owner of 1 mortal ref count. */
             {
                 SV *sv = sv_2mortal (coerce_to_sv (L, nres, '-'));
+                /* warn("hi " MYLUA_TAG); */
                 *va_arg (vl, SV **) = sv;
                 break;
             }
@@ -1431,7 +1435,10 @@ call_by_tag (lua_State * L, const char* tag, const char *codestr,
                 SV* temp_sv = sv_newmortal();
                 size_t length;
                 const char *result_string = marpa_luaL_tolstring(L, nres, &length);
+                /* warn("hi " MYLUA_TAG " result=%s", result_string); */
                 sv_setpvn(temp_sv, result_string, (STRLEN)length);
+                /* luaL_tolstring() left its result on top of the stack */
+                marpa_lua_pop(L, 1);
                 *va_arg (vl, const char **) = SvPV_nolen(temp_sv);
                 break;
             }
@@ -1836,10 +1843,12 @@ l0_read (Outer_R * outer_slr)
                     }
 
                     call_by_tag (outer_slr->L, MYLUA_TAG,
-                        "recce = ...\n"
-                        "return recce.lmw_l0r:earleme_complete()\n",
-                        "R>i",
-                        outer_slr->lua_ref, &result);
+                        "local recce = ...\n"
+                        "local complete_result = recce.lmw_l0r:earleme_complete()\n"
+                        "return '', complete_result\n"
+                        ,
+                        "R>si",
+                        outer_slr->lua_ref, &cmd, &result);
 
                     if (result > 0) {
                         lua_Integer is_exhausted;
