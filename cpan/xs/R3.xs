@@ -1748,12 +1748,17 @@ l0_read (Outer_R * outer_slr)
                         "        codepoint, op_ix\n"
                         "    ))\n"
                         "end\n"
-                        "return symbol_id, value, length,\n"
-                        "    recce.lmw_l0r:alternative(symbol_id, value, length)\n",
-                        "Ri>iiii",
+                        "local result = recce.lmw_l0r:alternative(symbol_id, value, length)\n"
+                        "return '', symbol_id, value, length, result\n"
+                        ,
+                        "Ri>siiii",
                         outer_slr->lua_ref, op_ix,
-                        &symbol_id, &value, &length, &result);
+                        &cmd, &symbol_id, &value, &length, &result);
                     op_ix += 3;
+                    if (!strcmp (cmd, "next op")) {
+                        goto NEXT_OP;
+                    }
+
                     switch (result) {
                     case MARPA_ERR_UNEXPECTED_TOKEN_ID:
                         /* This guarantees that later, if we fall below
@@ -1829,24 +1834,9 @@ l0_read (Outer_R * outer_slr)
 
                     call_by_tag (outer_slr->L, MYLUA_TAG,
                         "local recce = ...\n"
-                        "local l0r = recce.lmw_l0r\n"
-                        "local complete_result = recce.lmw_l0r:earleme_complete()\n"
-                        "if complete_result == -2 then\n"
-                        "    if l0r:error_code() == kollos.err.PARSE_EXHAUSTED then\n"
-                        "        return 'exhausted on failure'\n"
-                        "    end\n"
-                        "end\n"
-                        "if complete_result < 0 then\n"
-                        "    error('Problem in r->l0_read(), earleme_complete() failed: ',\n"
-                        "    l0r:error_description())\n"
-                        "end\n"
-                        "if complete_result > 0 then\n"
-                        "    recce:l0_convert_events(recce.perl_pos)\n"
-                        "    local is_exhausted = recce.lmw_l0r:is_exhausted()\n"
-                        "    if is_exhausted ~= 0 then\n"
-                        "        return 'exhausted on success'\n"
-                        "    end\n"
-                        "end\n" "return ''\n"
+                        "local complete_result = recce:l0_earleme_complete()\n"
+                        "if complete_result then return complete_result end\n"
+                        "return ''\n"
                         /* end of lua */ ,
                         "R>s", outer_slr->lua_ref, &cmd);
 
