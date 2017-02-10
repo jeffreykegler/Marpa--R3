@@ -1686,13 +1686,13 @@ l0_read (Outer_R * outer_slr)
     MYLUA_TAG,
     "local recce = ...\n"
     "if recce.perl_pos >= recce.end_pos then\n"
-    "    return 'break'\n"
+    "    return 'ok'\n"
     "end\n"
     "return ''\n"
     ,
     "R>s", outer_slr->lua_ref, &cmd);
 
-    if (!strcmp(cmd, "break")) { break; }
+    if (!strcmp(cmd, "ok")) { return U_READ_OK; }
 
   call_by_tag (outer_slr->L,
     MYLUA_TAG,
