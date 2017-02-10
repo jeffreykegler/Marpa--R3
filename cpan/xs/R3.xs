@@ -1851,6 +1851,10 @@ l0_read (Outer_R * outer_slr)
                         "        return 'parse exhausted', complete_result\n"
                         "    end\n"
                         "end\n"
+                        "if complete_result < 0 then\n"
+                        "    error('Problem in r->l0_read(), earleme_complete() failed: ',\n"
+                        "    l0r:error_description())\n"
+                        "end\n"
                         "return '', complete_result\n"
                         ,
                         "R>si",
@@ -1874,11 +1878,6 @@ l0_read (Outer_R * outer_slr)
                             return U_READ_EXHAUSTED_ON_SUCCESS;
                         }
                         goto ADVANCE_ONE_CHAR;
-                    }
-                    if (result < 0) {
-                        croak
-                            ("Problem in r->l0_read(), earleme_complete() failed: %s",
-                            slr_l0_error (outer_slr));
                     }
                 }
                 break;
