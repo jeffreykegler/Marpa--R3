@@ -1781,7 +1781,7 @@ l0_read (Outer_R * outer_slr)
                             "Riii>",
                             outer_slr->lua_ref, (lua_Integer)codepoint, (lua_Integer)symbol_id);
 
-                        break;
+                        goto NEXT_OP;
                     case MARPA_ERR_NONE:
 
                         call_by_tag (outer_slr->L, MYLUA_TAG,
@@ -1796,7 +1796,7 @@ l0_read (Outer_R * outer_slr)
                             (lua_Integer)codepoint, (lua_Integer)symbol_id);
 
                         tokens_accepted++;
-                        break;
+                        goto NEXT_OP;
 
                     default:
                         call_by_tag (outer_slr->L, MYLUA_TAG,
@@ -1816,7 +1816,7 @@ l0_read (Outer_R * outer_slr)
 
                     }
                 }
-                break;
+                goto NEXT_OP;
 
             case MARPA_OP_INVALID_CHAR:
                         call_by_tag (outer_slr->L, MYLUA_TAG,
@@ -1889,7 +1889,6 @@ l0_read (Outer_R * outer_slr)
             }
             NEXT_OP:;
         }
-      ADVANCE_ONE_CHAR:;
       NEXT_CHAR:;
         {
             lua_Integer trace_terminals;
@@ -1904,7 +1903,12 @@ l0_read (Outer_R * outer_slr)
             }
         }
     }
-    return U_READ_OK;
+                    call_by_tag (outer_slr->L, MYLUA_TAG,
+                            "error('Unexpected fall through in l0_read()')\n"
+                            ,
+                            "R>",
+                            outer_slr->lua_ref
+                    );
 }
 
 /* It is OK to set pos to last codepoint + 1 */
