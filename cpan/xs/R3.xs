@@ -1725,22 +1725,20 @@ l0_read (Outer_R * outer_slr)
         }
 
         /* ops[0] is codepoint */
-        for (op_ix = 1; op_ix <= op_count; op_ix++) {
-            lua_Integer symbol_id;
-            lua_Integer was_accepted;
+        {
 
             call_by_tag (outer_slr->L, MYLUA_TAG,
-                "local recce, op_ix = ...\n"
-                "-- print(inspect(recce.per_codepoint[codepoint]))\n"
-                "local symbol_id = recce.per_codepoint[recce.codepoint][op_ix]\n"
-                "return recce:l0_alternative(symbol_id)\n"
+                "local recce, op_count = ...\n"
+                "local tokens_accepted = 0\n"
+                "for ix = 1, op_count do\n"
+                "    local symbol_id = recce.per_codepoint[recce.codepoint][ix]\n"
+                "    tokens_accepted = tokens_accepted +\n"
+                "         recce:l0_alternative(symbol_id)\n"
+                "end\n"
+                "return tokens_accepted\n"
                 /* end of lua */ ,
-                "Ri>i", outer_slr->lua_ref, op_ix, &was_accepted);
-            if (was_accepted) {
-                tokens_accepted++;
-            }
-        }
-        {
+                "Ri>i", outer_slr->lua_ref, op_count, &tokens_accepted);
+
             if (tokens_accepted < 1) {
                 call_by_tag (outer_slr->L, MYLUA_TAG,
                     "recce, codepoint = ...\n"
