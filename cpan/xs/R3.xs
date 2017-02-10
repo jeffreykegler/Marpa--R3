@@ -1727,44 +1727,23 @@ l0_read (Outer_R * outer_slr)
 
         /* ops[0] is codepoint */
         for (op_ix = 1; op_ix <= op_count; op_ix++) {
-            lua_Integer op_code;
+            lua_Integer symbol_id;
+            lua_Integer was_accepted;
 
             call_by_tag (outer_slr->L, MYLUA_TAG,
                 "local recce, op_ix = ...\n"
                 "-- print(inspect(recce.per_codepoint[codepoint]))\n"
-                "local op_code = recce.per_codepoint[recce.codepoint][op_ix]\n"
-                "return '', op_code\n",
-                "Ri>si", outer_slr->lua_ref, op_ix, &cmd, &op_code);
-
-            if (!strcmp (cmd, "next op")) {
-                goto NEXT_OP;
-            }
-
-            switch (op_code) {
-            case MARPA_OP_ALTERNATIVE:
-                {
-                    lua_Integer was_accepted;
+                "local symbol_id = recce.per_codepoint[recce.codepoint][op_ix]\n"
+                "return '', symbol_id\n",
+                "Ri>si", outer_slr->lua_ref, op_ix, &cmd, &symbol_id);
 
                     call_by_tag (outer_slr->L, MYLUA_TAG,
-                        "local recce, codepoint, op_ix = ...\n"
-                        "local ops = recce.per_codepoint[codepoint]\n"
-                        "local symbol_id = ops[op_ix+1]\n"
+                        "local recce, codepoint, symbol_id = ...\n"
                         "return recce:l0_alternative(symbol_id)\n"
                         ,
                         "Rii>i",
-                        outer_slr->lua_ref, codepoint, op_ix, &was_accepted);
-                    op_ix += 3;
+                        outer_slr->lua_ref, codepoint, symbol_id, &was_accepted);
                     if (was_accepted) { tokens_accepted ++; }
-                }
-                goto NEXT_OP;
-
-            default:
-                croak
-                    ("Unknown op code (0x%lx); codepoint=0x%lx, op_ix=0x%lx",
-                    (unsigned long) op_code, (unsigned long) codepoint,
-                    (unsigned long) op_ix);
-            }
-          NEXT_OP:;
         }
       NEXT_CHAR:;
                 {

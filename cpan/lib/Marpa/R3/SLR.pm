@@ -867,14 +867,6 @@ sub Marpa::R3::Scanless::R::resume {
     my $slg      = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $thin_slg = $slg->[Marpa::R3::Internal::Scanless::G::C];
 
-    my ( $op_alternative ) = $slg->call_by_tag(
-        ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA',
-            return kollos.defines.MARPA_OP_ALTERNATIVE
-END_OF_LUA
-        ''
-      );
-
     my ($trace_terminals) = $slr->call_by_tag(
         ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA',
@@ -965,7 +957,7 @@ qq{Registering character $char_desc as symbol $symbol_id: },
                           or Marpa::R3::exception("Could not say(): $ERRNO");
                     } ## end if ( $trace_terminals >= 2 )
 
-                    push @ops, $op_alternative, $symbol_id, 1, 1;
+                    push @ops, $symbol_id;
 
                 } ## end if ( $character =~ $re )
             } ## end for my $entry ( @{$character_class_table} )
