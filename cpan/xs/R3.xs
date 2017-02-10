@@ -1844,11 +1844,19 @@ l0_read (Outer_R * outer_slr)
 
                     call_by_tag (outer_slr->L, MYLUA_TAG,
                         "local recce = ...\n"
+                        "local l0r = recce.lmw_l0r\n"
                         "local complete_result = recce.lmw_l0r:earleme_complete()\n"
+                        "if complete_result == -2 then\n"
+                        "    if l0r:error_code() == kollos.err.PARSE_EXHAUSTED then\n"
+                        "        return 'parse exhausted', complete_result\n"
+                        "    end\n"
+                        "end\n"
                         "return '', complete_result\n"
                         ,
                         "R>si",
                         outer_slr->lua_ref, &cmd, &result);
+
+    if (!strcmp(cmd, "parse exhausted")) { return U_READ_EXHAUSTED_ON_SUCCESS; }
 
                     if (result > 0) {
                         lua_Integer is_exhausted;
@@ -1866,18 +1874,6 @@ l0_read (Outer_R * outer_slr)
                             return U_READ_EXHAUSTED_ON_SUCCESS;
                         }
                         goto ADVANCE_ONE_CHAR;
-                    }
-                    if (result == -2) {
-                        lua_Integer error_code;
-                      call_by_tag (outer_slr->L, MYLUA_TAG,
-                          "recce = ...\n"
-                          "return recce.slg.lmw_l0g:error_code()\n",
-                          "R>i",
-                          outer_slr->lua_ref, &error_code);
-
-                        if (error_code == MARPA_ERR_PARSE_EXHAUSTED) {
-                            return U_READ_EXHAUSTED_ON_FAILURE;
-                        }
                     }
                     if (result < 0) {
                         croak
