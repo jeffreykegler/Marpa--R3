@@ -1710,8 +1710,7 @@ l0_read (Outer_R * outer_slr)
             "if recce.trace_terminals >= 1 then\n"
             "   local q = recce.event_queue\n"
             "   q[#q+1] = { '!trace', 'lexer reading codepoint', codepoint, recce.perl_pos}\n"
-            "end\n"
-            "return '', codepoint, op_count\n"
+            "end\n" "return '', codepoint, op_count\n"
             /* end of lua */ ,
             "R>sii", outer_slr->lua_ref, &cmd, &codepoint, &op_count);
 
@@ -1734,51 +1733,44 @@ l0_read (Outer_R * outer_slr)
                 "local recce, op_ix = ...\n"
                 "-- print(inspect(recce.per_codepoint[codepoint]))\n"
                 "local symbol_id = recce.per_codepoint[recce.codepoint][op_ix]\n"
-                "return '', symbol_id\n",
-                "Ri>si", outer_slr->lua_ref, op_ix, &cmd, &symbol_id);
-
-                    call_by_tag (outer_slr->L, MYLUA_TAG,
-                        "local recce, codepoint, symbol_id = ...\n"
-                        "return recce:l0_alternative(symbol_id)\n"
-                        ,
-                        "Rii>i",
-                        outer_slr->lua_ref, codepoint, symbol_id, &was_accepted);
-                    if (was_accepted) { tokens_accepted ++; }
+                "return recce:l0_alternative(symbol_id)\n"
+                /* end of lua */ ,
+                "Ri>i", outer_slr->lua_ref, op_ix, &was_accepted);
+            if (was_accepted) {
+                tokens_accepted++;
+            }
         }
-      NEXT_CHAR:;
-                {
-                    if (tokens_accepted < 1) {
-                        call_by_tag (outer_slr->L, MYLUA_TAG,
-                            "recce, codepoint = ...\n"
-                            "recce.codepoint = codepoint\n",
-                            "Ri>",
-                            outer_slr->lua_ref, (lua_Integer) codepoint);
-                        return U_READ_REJECTED_CHAR;
-                    }
+        {
+            if (tokens_accepted < 1) {
+                call_by_tag (outer_slr->L, MYLUA_TAG,
+                    "recce, codepoint = ...\n"
+                    "recce.codepoint = codepoint\n",
+                    "Ri>", outer_slr->lua_ref, (lua_Integer) codepoint);
+                return U_READ_REJECTED_CHAR;
+            }
 
-                    call_by_tag (outer_slr->L, MYLUA_TAG,
-                        "local recce = ...\n"
-                        "local complete_result = recce:l0_earleme_complete()\n"
-                        "if complete_result then return complete_result end\n"
-                        "return ''\n"
-                        /* end of lua */ ,
-                        "R>s", outer_slr->lua_ref, &cmd);
+            call_by_tag (outer_slr->L, MYLUA_TAG,
+                "local recce = ...\n"
+                "local complete_result = recce:l0_earleme_complete()\n"
+                "if complete_result then return complete_result end\n"
+                "return ''\n"
+                /* end of lua */ ,
+                "R>s", outer_slr->lua_ref, &cmd);
 
-                    if (!strcmp (cmd, "exhausted on failure")) {
-                        return U_READ_EXHAUSTED_ON_FAILURE;
-                    }
-                    if (!strcmp (cmd, "exhausted on success")) {
-                        return U_READ_EXHAUSTED_ON_SUCCESS;
-                    }
+            if (!strcmp (cmd, "exhausted on failure")) {
+                return U_READ_EXHAUSTED_ON_FAILURE;
+            }
+            if (!strcmp (cmd, "exhausted on success")) {
+                return U_READ_EXHAUSTED_ON_SUCCESS;
+            }
 
-                }
+        }
         {
             call_by_tag (outer_slr->L, MYLUA_TAG,
                 "recce = ...\n"
                 "recce.perl_pos = recce.perl_pos + 1\n"
                 "if recce.trace_terminals > 0 then\n"
-                "   return 'tracing'\n"
-                "end\n"
+                "   return 'tracing'\n" "end\n"
                 /* end of lua */ ,
                 "R>s", outer_slr->lua_ref, &cmd);
             if (!strcmp (cmd, "tracing")) {
