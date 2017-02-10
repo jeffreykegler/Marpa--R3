@@ -1848,7 +1848,7 @@ l0_read (Outer_R * outer_slr)
                         "local complete_result = recce.lmw_l0r:earleme_complete()\n"
                         "if complete_result == -2 then\n"
                         "    if l0r:error_code() == kollos.err.PARSE_EXHAUSTED then\n"
-                        "        return 'parse exhausted', complete_result\n"
+                        "        return 'exhausted on failure', complete_result\n"
                         "    end\n"
                         "end\n"
                         "if complete_result < 0 then\n"
@@ -1860,7 +1860,7 @@ l0_read (Outer_R * outer_slr)
                         "R>si",
                         outer_slr->lua_ref, &cmd, &result);
 
-    if (!strcmp(cmd, "parse exhausted")) { return U_READ_EXHAUSTED_ON_SUCCESS; }
+    if (!strcmp(cmd, "exhausted on failure")) { return U_READ_EXHAUSTED_ON_FAILURE; }
 
                     if (result > 0) {
                         lua_Integer is_exhausted;
@@ -1877,18 +1877,20 @@ l0_read (Outer_R * outer_slr)
                         if (is_exhausted) {
                             return U_READ_EXHAUSTED_ON_SUCCESS;
                         }
-                        goto ADVANCE_ONE_CHAR;
+                        goto NEXT_CHAR;
                     }
                 }
-                break;
+                goto NEXT_OP;
             default:
                 croak
                     ("Unknown op code (0x%lx); codepoint=0x%lx, op_ix=0x%lx",
                     (unsigned long) op_code, (unsigned long) codepoint,
                     (unsigned long) op_ix);
             }
+            NEXT_OP:;
         }
       ADVANCE_ONE_CHAR:;
+      NEXT_CHAR:;
         {
             lua_Integer trace_terminals;
             call_by_tag (outer_slr->L, MYLUA_TAG,
