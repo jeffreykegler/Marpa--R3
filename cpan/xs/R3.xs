@@ -1735,6 +1735,7 @@ l0_read (Outer_R * outer_slr)
                     lua_Integer symbol_id;
                     lua_Integer length;
                     lua_Integer value;
+                    lua_Integer was_accepted;
 
                     call_by_tag (outer_slr->L, MYLUA_TAG,
                         "local recce, codepoint, op_ix = ...\n"
@@ -1756,35 +1757,28 @@ l0_read (Outer_R * outer_slr)
                         "        q[#q+1] = { '!trace', 'lexer rejected codepoint', codepoint,\n"
                         "             recce.perl_pos, symbol_id}\n"
                         "    end\n"
-                        "    return 'next op', symbol_id, value, length, result\n"
+                        "    return 'next op', symbol_id, value, length, result, 0\n"
                         "end\n"
-                        "return '', symbol_id, value, length, result\n"
+                        "if result == kollos.err.NONE then\n"
+                        "    if recce.trace_terminals >= 1 then\n"
+                        "    local q = recce.event_queue\n"
+                        "    q[#q+1] = { '!trace', 'lexer accepted codepoint', codepoint,\n"
+                        "        recce.perl_pos, symbol_id}\n"
+                        "    end\n"
+                        "    return 'next op', symbol_id, value, length, result, 1\n"
+                        "end\n"
+                        "return '', symbol_id, value, length, result, 0\n"
                         ,
-                        "Rii>siiii",
+                        "Rii>siiiii",
                         outer_slr->lua_ref, codepoint, op_ix,
-                        &cmd, &symbol_id, &value, &length, &result);
+                        &cmd, &symbol_id, &value, &length, &result, &was_accepted);
                     op_ix += 3;
+                    if (was_accepted) { tokens_accepted ++; }
                     if (!strcmp (cmd, "next op")) {
                         goto NEXT_OP;
                     }
 
                     switch (result) {
-                    case MARPA_ERR_NONE:
-
-                        call_by_tag (outer_slr->L, MYLUA_TAG,
-                            "recce, codepoint, symbol_id = ...\n"
-                            "if recce.trace_terminals >= 1 then\n"
-                            "   local q = recce.event_queue\n"
-                            "   q[#q+1] = { '!trace', 'lexer accepted codepoint', codepoint,\n"
-                            "       recce.perl_pos, symbol_id}\n"
-                            "end\n",
-                            "Riii>",
-                            outer_slr->lua_ref,
-                            (lua_Integer) codepoint,
-                            (lua_Integer) symbol_id);
-
-                        tokens_accepted++;
-                        goto NEXT_OP;
 
                     default:
                         call_by_tag (outer_slr->L, MYLUA_TAG,
