@@ -1841,29 +1841,28 @@ l0_read (Outer_R * outer_slr)
                         "    error('Problem in r->l0_read(), earleme_complete() failed: ',\n"
                         "    l0r:error_description())\n"
                         "end\n"
-                        "return '', complete_result\n",
+                        "if complete_result > 0 then\n"
+                        "    recce:l0_convert_events(recce.perl_pos)\n"
+                        "    local is_exhausted = recce.lmw_l0r:is_exhausted()\n"
+                        "    if is_exhausted ~= 0 then\n"
+                        "        return 'exhausted on success', complete_result\n"
+                        "    end\n"
+                        "    return 'next_char', complete_result\n"
+                        "end\n"
+                        "return '', complete_result\n"
+                        /* end of lua */,
                         "R>si", outer_slr->lua_ref, &cmd, &result);
 
                     if (!strcmp (cmd, "exhausted on failure")) {
                         return U_READ_EXHAUSTED_ON_FAILURE;
                     }
-
-                    if (result > 0) {
-                        lua_Integer is_exhausted;
-
-                        /* Advance one character before returning */
-
-                        call_by_tag (outer_slr->L, MYLUA_TAG,
-                            "recce = ...\n"
-                            "recce:l0_convert_events(recce.perl_pos)\n"
-                            "return recce.lmw_l0r:is_exhausted()\n",
-                            "R>i", outer_slr->lua_ref, &is_exhausted);
-
-                        if (is_exhausted) {
-                            return U_READ_EXHAUSTED_ON_SUCCESS;
-                        }
+                    if (!strcmp (cmd, "exhausted on success")) {
+                        return U_READ_EXHAUSTED_ON_SUCCESS;
+                    }
+                    if (!strcmp (cmd, "next char")) {
                         goto NEXT_CHAR;
                     }
+
                 }
                 goto NEXT_OP;
             default:
