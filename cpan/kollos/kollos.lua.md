@@ -390,7 +390,7 @@ This is a registry object.
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.l0r_new(recce, perl_pos)
-        local l0r = kollos.recce_new(recce.slg.lmw_l0g)
+        local l0r = _M.recce_new(recce.slg.lmw_l0g)
         if not l0r then
             error('Internal error: l0r_new() failed %s',
                 recce.slg.lmw_l0g:error_description())
@@ -440,6 +440,10 @@ This is a registry object.
 
 ### Reading
 
+"Complete" an earleme in L0.
+Return nil on success,
+otherwise a failure code.
+
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.l0_earleme_complete(recce)
@@ -463,6 +467,49 @@ This is a registry object.
         end
         return
     end
+
+```
+
+Read an alternative.
+Returns the number of alternatives accepted,
+which will be 1 or 0.
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slr.l0_alternative(recce, symbol_id, value, length)
+        local l0r = recce.lmw_l0r
+        local codepoint = recce.codepoint
+        if not length then
+            error(string.format(
+                'Missing OP_ALTERNATIVE operands, codepoint=%d, op_ix=%d',
+                codepoint, op_ix
+            ))
+        end
+        local result = l0r:alternative(symbol_id, value, length)
+        if result == _M.err.UNEXPECTED_TOKEN_ID then
+            if recce.trace_terminals >= 1 then
+                local q = recce.event_queue
+                q[#q+1] = { '!trace', 'lexer rejected codepoint', codepoint,
+                     recce.perl_pos, symbol_id}
+            end
+            return 0
+        end
+        if result == _M.err.NONE then
+            if recce.trace_terminals >= 1 then
+            local q = recce.event_queue
+            q[#q+1] = { '!trace', 'lexer accepted codepoint', codepoint,
+                recce.perl_pos, symbol_id}
+            end
+            return 1
+        end
+        error(string.format([[
+             Problem alternative() failed at char ix %d; symbol id %d; codepoint 0x%x value %d
+             Problem in l0_read(), alternative() failed: %s
+        ]],
+            recce.perl_pos, symbol_id, codepoint, value, l0r:error_description()
+        ))
+    end
+
 
 ```
 
@@ -527,22 +574,22 @@ span is zero or less.
         for i = 1, #events, 2 do
             local event_type = events[i]
             local event_value = events[i+1]
-            if event_type == kollos.event["EXHAUSTED"] then
+            if event_type == _M.event["EXHAUSTED"] then
                 goto NEXT_EVENT
             end
-            if event_type == kollos.event["SYMBOL_COMPLETED"] then
+            if event_type == _M.event["SYMBOL_COMPLETED"] then
                 q[#q+1] = { 'symbol completed', event_value}
                 goto NEXT_EVENT
             end
-            if event_type == kollos.event["SYMBOL_NULLED"] then
+            if event_type == _M.event["SYMBOL_NULLED"] then
                 q[#q+1] = { 'symbol nulled', event_value}
                 goto NEXT_EVENT
             end
-            if event_type == kollos.event["SYMBOL_PREDICTED"] then
+            if event_type == _M.event["SYMBOL_PREDICTED"] then
                 q[#q+1] = { 'symbol predicted', event_value}
                 goto NEXT_EVENT
             end
-            if event_type == kollos.event["EARLEY_ITEM_THRESHOLD"] then
+            if event_type == _M.event["EARLEY_ITEM_THRESHOLD"] then
                 q[#q+1] = { 'g1 earley item threshold exceeded',
                     perl_pos, event_value}
                 goto NEXT_EVENT
@@ -569,10 +616,10 @@ span is zero or less.
         for i = 1, #events, 2 do
             local event_type = events[i]
             local event_value = events[i+1]
-            if event_type == kollos.event["EXHAUSTED"] then
+            if event_type == _M.event["EXHAUSTED"] then
                 goto NEXT_EVENT
             end
-            if event_type == kollos.event["EARLEY_ITEM_THRESHOLD"] then
+            if event_type == _M.event["EARLEY_ITEM_THRESHOLD"] then
                 q[#q+1] = { 'l0 earley item threshold exceeded',
                     perl_pos, event_value}
                 goto NEXT_EVENT
