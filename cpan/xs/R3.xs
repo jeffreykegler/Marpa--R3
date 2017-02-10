@@ -1667,14 +1667,12 @@ l0_read (Outer_R * outer_slr)
     Scanless_R *slr = slr_inner_get (outer_slr);
     char *cmd;
 
-  call_by_tag (outer_slr->L,
-    MYLUA_TAG,
-    "local recce = ...\n"
-    "if not recce.lmw_l0r then\n"
-    "    recce:l0r_new(recce.perl_pos)\n"    
-    "end\n"
-    ,
-    "R>", outer_slr->lua_ref);
+    call_by_tag (outer_slr->L,
+        MYLUA_TAG,
+        "local recce = ...\n"
+        "if not recce.lmw_l0r then\n"
+        "    recce:l0r_new(recce.perl_pos)\n"
+        "end\n", "R>", outer_slr->lua_ref);
 
     for (;;) {
         lua_Integer codepoint;
@@ -1682,60 +1680,53 @@ l0_read (Outer_R * outer_slr)
         lua_Integer op_ix;
         int tokens_accepted = 0;
 
-  call_by_tag (outer_slr->L,
-    MYLUA_TAG,
-    "local recce = ...\n"
-    "if recce.perl_pos >= recce.end_pos then\n"
-    "    return 'ok'\n"
-    "end\n"
-    "return ''\n"
-    ,
-    "R>s", outer_slr->lua_ref, &cmd);
+        call_by_tag (outer_slr->L,
+            MYLUA_TAG,
+            "local recce = ...\n"
+            "if recce.perl_pos >= recce.end_pos then\n"
+            "    return 'ok'\n"
+            "end\n" "return ''\n", "R>s", outer_slr->lua_ref, &cmd);
 
-    if (!strcmp(cmd, "ok")) { return U_READ_OK; }
+        if (!strcmp (cmd, "ok")) {
+            return U_READ_OK;
+        }
 
-  call_by_tag (outer_slr->L,
-    MYLUA_TAG,
-    "local recce = ...\n"
-    "-- print('perl_pos:', inspect(perl_pos))\n"
-    "local codepoint = recce.codepoints[recce.perl_pos+1]\n"
-    "local ops = recce.per_codepoint[codepoint]\n"
-    "local op_count = -1\n"
-    "if ops then\n"
-    "    op_count = #ops\n"
-    "end\n"
-    "recce.codepoint = codepoint\n"
-    "return codepoint, op_count\n"
-    ,
-    "R>ii", outer_slr->lua_ref, &codepoint, &op_count);
+        call_by_tag (outer_slr->L,
+            MYLUA_TAG,
+            "local recce = ...\n"
+            "-- print('perl_pos:', inspect(perl_pos))\n"
+            "local codepoint = recce.codepoints[recce.perl_pos+1]\n"
+            "local ops = recce.per_codepoint[codepoint]\n"
+            "local op_count = -1\n"
+            "if ops then\n"
+            "    op_count = #ops\n"
+            "end\n"
+            "recce.codepoint = codepoint\n"
+            "return codepoint, op_count\n",
+            "R>ii", outer_slr->lua_ref, &codepoint, &op_count);
 
-    if (op_count < 0) {
-                return U_READ_UNREGISTERED_CHAR;
-    }
+        if (op_count < 0) {
+            return U_READ_UNREGISTERED_CHAR;
+        }
 
         call_by_tag (outer_slr->L, MYLUA_TAG,
             "local recce, codepoint = ...\n"
             "if recce.trace_terminals >= 1 then\n"
             "   local q = recce.event_queue\n"
             "   q[#q+1] = { '!trace', 'lexer reading codepoint', codepoint, recce.perl_pos}\n"
-            "end\n",
-            "Rii>", outer_slr->lua_ref, (lua_Integer)codepoint);
+            "end\n", "Rii>", outer_slr->lua_ref, (lua_Integer) codepoint);
 
         /* ops[0] is codepoint */
         for (op_ix = 1; op_ix <= op_count; op_ix++) {
             lua_Integer op_code;
 
-                    call_by_tag (outer_slr->L, MYLUA_TAG,
-                            "recce, codepoint, op_ix = ...\n"
-                            "-- print(inspect(recce.per_codepoint[codepoint]))\n"
-                            "-- print('op_ix: ', inspect(op_ix))\n"
-                            "local op_code = recce.per_codepoint[codepoint][op_ix]\n"
-                            "return op_code\n"
-                            ,
-                            "Rii>i",
-                            outer_slr->lua_ref,
-                            codepoint, op_ix, &op_code
-                    );
+            call_by_tag (outer_slr->L, MYLUA_TAG,
+                "recce, codepoint, op_ix = ...\n"
+                "-- print(inspect(recce.per_codepoint[codepoint]))\n"
+                "-- print('op_ix: ', inspect(op_ix))\n"
+                "local op_code = recce.per_codepoint[codepoint][op_ix]\n"
+                "return op_code\n",
+                "Rii>i", outer_slr->lua_ref, codepoint, op_ix, &op_code);
 
             switch (op_code) {
             case MARPA_OP_ALTERNATIVE:
@@ -1746,25 +1737,23 @@ l0_read (Outer_R * outer_slr)
                     lua_Integer value;
 
                     call_by_tag (outer_slr->L, MYLUA_TAG,
-                            "recce, op_ix = ...\n"
-                            "local ops = recce.per_codepoint[codepoint]\n"
-                            "local symbol_id = ops[op_ix+1]\n"
-                            "local value = ops[op_ix+2]\n"
-                            "local length = ops[op_ix+3]\n"
-                            "if not length then\n"
-                            "    error(string.format(\n"
-                            "        'Missing OP_ALTERNATIVE operands, codepoint=%d, op_ix=%d',\n"
-                            "        codepoint, op_ix\n"
-                            "    ))\n"
-                            "end\n"
-                            "return symbol_id, value, length,\n"
-                            "    recce.lmw_l0r:alternative(symbol_id, value, length)\n"
-                            ,
-                            "Ri>iiii",
-                            outer_slr->lua_ref, op_ix,
-                            &symbol_id, &value, &length, &result
-                    );
-                    op_ix+=3;
+                        "recce, op_ix = ...\n"
+                        "local ops = recce.per_codepoint[codepoint]\n"
+                        "local symbol_id = ops[op_ix+1]\n"
+                        "local value = ops[op_ix+2]\n"
+                        "local length = ops[op_ix+3]\n"
+                        "if not length then\n"
+                        "    error(string.format(\n"
+                        "        'Missing OP_ALTERNATIVE operands, codepoint=%d, op_ix=%d',\n"
+                        "        codepoint, op_ix\n"
+                        "    ))\n"
+                        "end\n"
+                        "return symbol_id, value, length,\n"
+                        "    recce.lmw_l0r:alternative(symbol_id, value, length)\n",
+                        "Ri>iiii",
+                        outer_slr->lua_ref, op_ix,
+                        &symbol_id, &value, &length, &result);
+                    op_ix += 3;
                     switch (result) {
                     case MARPA_ERR_UNEXPECTED_TOKEN_ID:
                         /* This guarantees that later, if we fall below
@@ -1779,7 +1768,8 @@ l0_read (Outer_R * outer_slr)
                             "        recce.perl_pos, symbol_id}\n"
                             "end\n",
                             "Riii>",
-                            outer_slr->lua_ref, (lua_Integer)codepoint, (lua_Integer)symbol_id);
+                            outer_slr->lua_ref, (lua_Integer) codepoint,
+                            (lua_Integer) symbol_id);
 
                         goto NEXT_OP;
                     case MARPA_ERR_NONE:
@@ -1793,7 +1783,8 @@ l0_read (Outer_R * outer_slr)
                             "end\n",
                             "Riii>",
                             outer_slr->lua_ref,
-                            (lua_Integer)codepoint, (lua_Integer)symbol_id);
+                            (lua_Integer) codepoint,
+                            (lua_Integer) symbol_id);
 
                         tokens_accepted++;
                         goto NEXT_OP;
@@ -1808,24 +1799,21 @@ l0_read (Outer_R * outer_slr)
                             "     Problem in l0_read(), alternative() failed: %s\n"
                             "]],\n"
                             "    recce.perl_pos, symbol_id, codepoint, value, l0r:error_description()\n"
-                            "))\n"
-                            ,
+                            "))\n",
                             "Riii>",
                             outer_slr->lua_ref,
-                            (lua_Integer)codepoint, (lua_Integer)symbol_id, (lua_Integer)value);
+                            (lua_Integer) codepoint,
+                            (lua_Integer) symbol_id, (lua_Integer) value);
 
                     }
                 }
                 goto NEXT_OP;
 
             case MARPA_OP_INVALID_CHAR:
-                        call_by_tag (outer_slr->L, MYLUA_TAG,
-                            "recce, codepoint = ...\n"
-                            "recce.codepoint = codepoint\n"
-                            ,
-                            "Ri>",
-                            outer_slr->lua_ref,
-                            (lua_Integer)codepoint);
+                call_by_tag (outer_slr->L, MYLUA_TAG,
+                    "recce, codepoint = ...\n"
+                    "recce.codepoint = codepoint\n",
+                    "Ri>", outer_slr->lua_ref, (lua_Integer) codepoint);
                 return U_READ_INVALID_CHAR;
 
             case MARPA_OP_EARLEME_COMPLETE:
@@ -1834,11 +1822,9 @@ l0_read (Outer_R * outer_slr)
                     if (tokens_accepted < 1) {
                         call_by_tag (outer_slr->L, MYLUA_TAG,
                             "recce, codepoint = ...\n"
-                            "recce.codepoint = codepoint\n"
-                            ,
+                            "recce.codepoint = codepoint\n",
                             "Ri>",
-                            outer_slr->lua_ref,
-                            (lua_Integer)codepoint);
+                            outer_slr->lua_ref, (lua_Integer) codepoint);
                         return U_READ_REJECTED_CHAR;
                     }
 
@@ -1855,24 +1841,23 @@ l0_read (Outer_R * outer_slr)
                         "    error('Problem in r->l0_read(), earleme_complete() failed: ',\n"
                         "    l0r:error_description())\n"
                         "end\n"
-                        "return '', complete_result\n"
-                        ,
-                        "R>si",
-                        outer_slr->lua_ref, &cmd, &result);
+                        "return '', complete_result\n",
+                        "R>si", outer_slr->lua_ref, &cmd, &result);
 
-    if (!strcmp(cmd, "exhausted on failure")) { return U_READ_EXHAUSTED_ON_FAILURE; }
+                    if (!strcmp (cmd, "exhausted on failure")) {
+                        return U_READ_EXHAUSTED_ON_FAILURE;
+                    }
 
                     if (result > 0) {
                         lua_Integer is_exhausted;
 
                         /* Advance one character before returning */
 
-                      call_by_tag (outer_slr->L, MYLUA_TAG,
-                          "recce = ...\n"
-                          "recce:l0_convert_events(recce.perl_pos)\n"
-                          "return recce.lmw_l0r:is_exhausted()\n",
-                          "R>i",
-                          outer_slr->lua_ref, &is_exhausted);
+                        call_by_tag (outer_slr->L, MYLUA_TAG,
+                            "recce = ...\n"
+                            "recce:l0_convert_events(recce.perl_pos)\n"
+                            "return recce.lmw_l0r:is_exhausted()\n",
+                            "R>i", outer_slr->lua_ref, &is_exhausted);
 
                         if (is_exhausted) {
                             return U_READ_EXHAUSTED_ON_SUCCESS;
@@ -1887,7 +1872,7 @@ l0_read (Outer_R * outer_slr)
                     (unsigned long) op_code, (unsigned long) codepoint,
                     (unsigned long) op_ix);
             }
-            NEXT_OP:;
+          NEXT_OP:;
         }
       NEXT_CHAR:;
         {
@@ -1895,20 +1880,16 @@ l0_read (Outer_R * outer_slr)
             call_by_tag (outer_slr->L, MYLUA_TAG,
                 "recce = ...\n"
                 "recce.perl_pos = recce.perl_pos + 1\n"
-                "return recce.trace_terminals\n"
-                ,
+                "return recce.trace_terminals\n",
                 "R>i", outer_slr->lua_ref, &trace_terminals);
             if (trace_terminals) {
                 return U_READ_TRACING;
             }
         }
     }
-                    call_by_tag (outer_slr->L, MYLUA_TAG,
-                            "error('Unexpected fall through in l0_read()')\n"
-                            ,
-                            "R>",
-                            outer_slr->lua_ref
-                    );
+    call_by_tag (outer_slr->L, MYLUA_TAG,
+        "error('Unexpected fall through in l0_read()')\n",
+        "R>", outer_slr->lua_ref);
 }
 
 /* It is OK to set pos to last codepoint + 1 */
