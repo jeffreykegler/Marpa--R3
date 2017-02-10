@@ -1733,15 +1733,9 @@ l0_read (Outer_R * outer_slr)
                 "local recce, op_ix = ...\n"
                 "-- print(inspect(recce.per_codepoint[codepoint]))\n"
                 "local op_code = recce.per_codepoint[recce.codepoint][op_ix]\n"
-                "if op_code == kollos.defines.MARPA_OP_INVALID_CHAR then\n"
-                "    return 'invalid char', op_code\n"
-                "end\n"
                 "return '', op_code\n",
                 "Ri>si", outer_slr->lua_ref, op_ix, &cmd, &op_code);
 
-            if (!strcmp (cmd, "invalid char")) {
-                return U_READ_INVALID_CHAR;
-            }
             if (!strcmp (cmd, "next op")) {
                 goto NEXT_OP;
             }
@@ -1766,7 +1760,15 @@ l0_read (Outer_R * outer_slr)
                 }
                 goto NEXT_OP;
 
-            case MARPA_OP_EARLEME_COMPLETE:
+            default:
+                croak
+                    ("Unknown op code (0x%lx); codepoint=0x%lx, op_ix=0x%lx",
+                    (unsigned long) op_code, (unsigned long) codepoint,
+                    (unsigned long) op_ix);
+            }
+          NEXT_OP:;
+        }
+      NEXT_CHAR:;
                 {
                     if (tokens_accepted < 1) {
                         call_by_tag (outer_slr->L, MYLUA_TAG,
@@ -1793,16 +1795,6 @@ l0_read (Outer_R * outer_slr)
                     }
 
                 }
-                goto NEXT_CHAR;
-            default:
-                croak
-                    ("Unknown op code (0x%lx); codepoint=0x%lx, op_ix=0x%lx",
-                    (unsigned long) op_code, (unsigned long) codepoint,
-                    (unsigned long) op_ix);
-            }
-          NEXT_OP:;
-        }
-      NEXT_CHAR:;
         {
             call_by_tag (outer_slr->L, MYLUA_TAG,
                 "recce = ...\n"

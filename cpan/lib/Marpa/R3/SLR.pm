@@ -976,7 +976,6 @@ qq{Registering character $char_desc as symbol $symbol_id: },
         if #ops <= 0 then
              recce.per_codepoint[codepoint] = false
         else
-             ops[#ops+1] = kollos.defines.MARPA_OP_EARLEME_COMPLETE
              recce.per_codepoint[codepoint] = ops
         end
 END_OF_LUA
