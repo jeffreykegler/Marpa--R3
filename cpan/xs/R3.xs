@@ -1702,10 +1702,14 @@ l0_read (Outer_R * outer_slr)
             "    op_count = #ops\n"
             "end\n"
             "recce.codepoint = codepoint\n"
-            "return codepoint, op_count\n",
-            "R>ii", outer_slr->lua_ref, &codepoint, &op_count);
+            "if op_count < 0 then\n"
+            "    return 'unregistered char', codepoint, op_count\n"
+            "end\n"
+            "return '', codepoint, op_count\n"
+            /* end of lua */ ,
+            "R>sii", outer_slr->lua_ref, &cmd, &codepoint, &op_count);
 
-        if (op_count < 0) {
+        if (!strcmp (cmd, "unregistered char")) {
             return U_READ_UNREGISTERED_CHAR;
         }
 
@@ -1848,9 +1852,8 @@ l0_read (Outer_R * outer_slr)
                         "        return 'exhausted on success', complete_result\n"
                         "    end\n"
                         "    return 'next_char', complete_result\n"
-                        "end\n"
-                        "return '', complete_result\n"
-                        /* end of lua */,
+                        "end\n" "return '', complete_result\n"
+                        /* end of lua */ ,
                         "R>si", outer_slr->lua_ref, &cmd, &result);
 
                     if (!strcmp (cmd, "exhausted on failure")) {
