@@ -1751,6 +1751,12 @@ l0_read (Outer_R * outer_slr)
                         "end\n"
                         "local result = l0r:alternative(symbol_id, value, length)\n"
                         "if result == kollos.err.UNEXPECTED_TOKEN_ID then\n"
+                        "    if recce.trace_terminals >= 1 then\n"
+                        "        local q = recce.event_queue\n"
+                        "        q[#q+1] = { '!trace', 'lexer rejected codepoint', codepoint,\n"
+                        "             recce.perl_pos, symbol_id}\n"
+                        "    end\n"
+                        "    return 'next op', symbol_id, value, length, result\n"
                         "end\n"
                         "return '', symbol_id, value, length, result\n"
                         ,
@@ -1763,23 +1769,6 @@ l0_read (Outer_R * outer_slr)
                     }
 
                     switch (result) {
-                    case MARPA_ERR_UNEXPECTED_TOKEN_ID:
-                        /* This guarantees that later, if we fall below
-                         * the minimum number of tokens accepted,
-                         * we have one of them as an example
-                         */
-                        call_by_tag (outer_slr->L, MYLUA_TAG,
-                            "recce, codepoint, symbol_id = ...\n"
-                            "if recce.trace_terminals >= 1 then\n"
-                            "    local q = recce.event_queue\n"
-                            "    q[#q+1] = { '!trace', 'lexer rejected codepoint', codepoint,\n"
-                            "        recce.perl_pos, symbol_id}\n"
-                            "end\n",
-                            "Riii>",
-                            outer_slr->lua_ref, (lua_Integer) codepoint,
-                            (lua_Integer) symbol_id);
-
-                        goto NEXT_OP;
                     case MARPA_ERR_NONE:
 
                         call_by_tag (outer_slr->L, MYLUA_TAG,
