@@ -1731,10 +1731,6 @@ l0_read (Outer_R * outer_slr)
             switch (op_code) {
             case MARPA_OP_ALTERNATIVE:
                 {
-                    lua_Integer result;
-                    lua_Integer symbol_id;
-                    lua_Integer length;
-                    lua_Integer value;
                     lua_Integer was_accepted;
 
                     call_by_tag (outer_slr->L, MYLUA_TAG,
@@ -1757,7 +1753,7 @@ l0_read (Outer_R * outer_slr)
                         "        q[#q+1] = { '!trace', 'lexer rejected codepoint', codepoint,\n"
                         "             recce.perl_pos, symbol_id}\n"
                         "    end\n"
-                        "    return 'next op', symbol_id, value, length, result, 0\n"
+                        "    return 0\n"
                         "end\n"
                         "if result == kollos.err.NONE then\n"
                         "    if recce.trace_terminals >= 1 then\n"
@@ -1765,7 +1761,7 @@ l0_read (Outer_R * outer_slr)
                         "    q[#q+1] = { '!trace', 'lexer accepted codepoint', codepoint,\n"
                         "        recce.perl_pos, symbol_id}\n"
                         "    end\n"
-                        "    return 'next op', symbol_id, value, length, result, 1\n"
+                        "    return 1\n"
                         "end\n"
                         "error(string.format([[\n"
                         "     Problem alternative() failed at char ix %d; symbol id %d; codepoint 0x%x value %d\n"
@@ -1774,9 +1770,8 @@ l0_read (Outer_R * outer_slr)
                         "    recce.perl_pos, symbol_id, codepoint, value, l0r:error_description()\n"
                         "))\n"
                         ,
-                        "Rii>siiiii",
-                        outer_slr->lua_ref, codepoint, op_ix,
-                        &cmd, &symbol_id, &value, &length, &result, &was_accepted);
+                        "Rii>i",
+                        outer_slr->lua_ref, codepoint, op_ix, &was_accepted);
                     op_ix += 3;
                     if (was_accepted) { tokens_accepted ++; }
                 }
