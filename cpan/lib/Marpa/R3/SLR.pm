@@ -974,7 +974,7 @@ qq{Registering character $char_desc as symbol $symbol_id: },
                 <<'END_OF_LUA', 'ii', $codepoint, \@ops );
         local recce, codepoint, ops = ...
         if #ops <= 0 then
-             recce.per_codepoint[codepoint] = { kollos.defines.MARPA_OP_INVALID_CHAR }
+             recce.per_codepoint[codepoint] = false
         else
              ops[#ops+1] = kollos.defines.MARPA_OP_EARLEME_COMPLETE
              recce.per_codepoint[codepoint] = ops

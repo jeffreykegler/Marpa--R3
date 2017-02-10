@@ -1685,20 +1685,26 @@ l0_read (Outer_R * outer_slr)
         call_by_tag (outer_slr->L,
             MYLUA_TAG,
             "local recce = ...\n"
-            "local op_count = -1\n"
             "-- this initialization is for call_by_tag()\n"
             "-- they can be removed when the caller is Lua\n"
             "local codepoint = -1\n"
             "if recce.perl_pos >= recce.end_pos then\n"
-            "    return 'ok', codepoint, op_count\n"
+            "    return 'ok', codepoint, -1\n"
             "end\n"
             "codepoint = recce.codepoints[recce.perl_pos+1]\n"
-            "local ops = recce.per_codepoint[codepoint]\n"
-            "if ops then\n"
-            "    op_count = #ops\n"
-            "end\n"
             "recce.codepoint = codepoint\n"
-            "if op_count < 0 then\n"
+            "local ops = recce.per_codepoint[codepoint]\n"
+            "if ops == nil then\n"
+            "    -- print( '1 unregistered char', codepoint, -1)\n"
+            "    return 'unregistered char', codepoint, -1\n"
+            "end\n"
+            "if ops == false then\n"
+            "    -- print( 'invalid char', codepoint, -1)\n"
+            "    return 'invalid char', codepoint, -1\n"
+            "end\n"
+            "local op_count = #ops\n"
+            "if op_count <= 0 then\n"
+            "    -- print( '2 unregistered char', codepoint, op_count)\n"
             "    return 'unregistered char', codepoint, op_count\n"
             "end\n"
             "if recce.trace_terminals >= 1 then\n"
@@ -1714,6 +1720,9 @@ l0_read (Outer_R * outer_slr)
         }
         if (!strcmp (cmd, "unregistered char")) {
             return U_READ_UNREGISTERED_CHAR;
+        }
+        if (!strcmp (cmd, "invalid char")) {
+            return U_READ_INVALID_CHAR;
         }
 
         /* ops[0] is codepoint */
