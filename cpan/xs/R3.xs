@@ -1644,14 +1644,6 @@ static void recursive_coerce_to_lua(
 
 static Scanless_R* slr_inner_get(Outer_R* outer_slr);
 
-#define U_READ_OK "ok"
-#define U_READ_REJECTED_CHAR "rejected char"
-#define U_READ_UNREGISTERED_CHAR "unregistered char"
-#define U_READ_EXHAUSTED_ON_FAILURE "exhausted on failure"
-#define U_READ_TRACING "tracing"
-#define U_READ_EXHAUSTED_ON_SUCCESS "exhausted on success"
-#define U_READ_INVALID_CHAR "invalid char"
-
 /* Return values:
  * 1 or greater: reserved for an event count, to deal with multiple events
  *   when and if necessary
@@ -1662,22 +1654,15 @@ static Scanless_R* slr_inner_get(Outer_R* outer_slr);
  * -4: we are tracing, character by character
  * -5: earleme_complete() reported an exhausted parse on success
  */
-static const char *
-l0_read (Outer_R * outer_slr)
-{
-    dTHX;
-    char *cmd;
 
-    call_by_tag (outer_slr->L,
-        MYLUA_TAG,
-        "local recce = ...\n"
-        "return recce:l0_read_lexeme()\n"
-        /* end of lua */ ,
-        "R>s", outer_slr->lua_ref, &cmd);
+#define U_READ_OK "ok"
+#define U_READ_REJECTED_CHAR "rejected char"
+#define U_READ_UNREGISTERED_CHAR "unregistered char"
+#define U_READ_EXHAUSTED_ON_FAILURE "exhausted on failure"
+#define U_READ_TRACING "tracing"
+#define U_READ_EXHAUSTED_ON_SUCCESS "exhausted on success"
+#define U_READ_INVALID_CHAR "invalid char"
 
-    return cmd;
-
-}
 
 /* It is OK to set pos to last codepoint + 1 */
 static void
@@ -2666,10 +2651,16 @@ PPCODE:
         }
 
         {
-            const char *result = l0_read (outer_slr);
-            if (!strcmp (result, U_READ_TRACING)) {
+           char *cmd;
+           call_by_tag (outer_slr->L,
+              MYLUA_TAG,
+              "local recce = ...\n"
+              "return recce:l0_read_lexeme()\n"
+              /* end of lua */ ,
+              "R>s", outer_slr->lua_ref, &cmd);
+            if (!strcmp (cmd, U_READ_TRACING)) {
                 XSRETURN_PV ("trace");
-            } else if (!strcmp (result, U_READ_UNREGISTERED_CHAR)) {
+            } else if (!strcmp (cmd, U_READ_UNREGISTERED_CHAR)) {
                 XSRETURN_PV ("unregistered char");
             }
         }
