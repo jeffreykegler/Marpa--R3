@@ -547,6 +547,32 @@ otherwise an error code string.
 
 ```
 
+Read a lexeme from the L0 recognizer.
+Returns a status string.
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slr.l0_read_lexeme(recce)
+        if not recce.lmw_l0r then
+            recce:l0r_new(recce.perl_pos)
+        end
+        while true do
+            local codepoint = -1
+            if recce.perl_pos >= recce.end_pos then
+                return 'ok'
+            end
+            local codepoint = recce.codepoints[recce.perl_pos+1]
+            recce.codepoint = codepoint
+            local errmsg = recce:l0_read_codepoint()
+            if errmsg then return errmsg end
+            recce.perl_pos = recce.perl_pos + 1
+            if recce.trace_terminals > 0 then
+               return 'tracing'
+            end
+        end
+        error('Unexpected fall through in l0_read()')
+    end
+
 ### Locations
 
 Given a G1 span return an L0 span.

@@ -1671,23 +1671,7 @@ l0_read (Outer_R * outer_slr)
     call_by_tag (outer_slr->L,
         MYLUA_TAG,
         "local recce = ...\n"
-        "if not recce.lmw_l0r then\n"
-        "    recce:l0r_new(recce.perl_pos)\n"
-        "end\n"
-        "while true do\n"
-        "    local codepoint = -1\n"
-        "    if recce.perl_pos >= recce.end_pos then\n"
-        "        return 'ok'\n"
-        "    end\n"
-        "    local codepoint = recce.codepoints[recce.perl_pos+1]\n"
-        "    recce.codepoint = codepoint\n"
-        "    local errmsg = recce:l0_read_codepoint()\n"
-        "    if errmsg then return errmsg end\n"
-        "    recce.perl_pos = recce.perl_pos + 1\n"
-        "    if recce.trace_terminals > 0 then\n"
-        "       return 'tracing'\n"
-        "    end\n"
-        "end\n" "error('Unexpected fall through in l0_read()')\n"
+        "return recce:l0_read_lexeme()\n"
         /* end of lua */ ,
         "R>s", outer_slr->lua_ref, &cmd);
 
