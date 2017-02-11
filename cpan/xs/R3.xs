@@ -1673,56 +1673,26 @@ l0_read (Outer_R * outer_slr)
         "local recce = ...\n"
         "if not recce.lmw_l0r then\n"
         "    recce:l0r_new(recce.perl_pos)\n"
-        "end\n", "R>", outer_slr->lua_ref);
+        "end\n"
+        "while true do\n"
+        "    local codepoint = -1\n"
+        "    if recce.perl_pos >= recce.end_pos then\n"
+        "        return 'ok'\n"
+        "    end\n"
+        "    local codepoint = recce.codepoints[recce.perl_pos+1]\n"
+        "    recce.codepoint = codepoint\n"
+        "    local errmsg = recce:l0_read_codepoint()\n"
+        "    if errmsg then return errmsg end\n"
+        "    recce.perl_pos = recce.perl_pos + 1\n"
+        "    if recce.trace_terminals > 0 then\n"
+        "       return 'tracing'\n"
+        "    end\n"
+        "end\n" "error('Unexpected fall through in l0_read()')\n"
+        /* end of lua */ ,
+        "R>s", outer_slr->lua_ref, &cmd);
 
-    for (;;) {
+    return cmd;
 
-        call_by_tag (outer_slr->L,
-            MYLUA_TAG,
-            "local recce = ...\n"
-            "-- this initialization is for call_by_tag()\n"
-            "-- they can be removed when the caller is Lua\n"
-            "local codepoint = -1\n"
-            "if recce.perl_pos >= recce.end_pos then\n"
-            "    return 'ok'\n"
-            "end\n"
-            "codepoint = recce.codepoints[recce.perl_pos+1]\n"
-            "recce.codepoint = codepoint\n"
-            "local errmsg = recce:l0_read_codepoint()\n"
-            "if errmsg then return errmsg end\n"
-            "recce.perl_pos = recce.perl_pos + 1\n"
-            "if recce.trace_terminals > 0 then\n"
-            "   return 'tracing'\n"
-            "end\n"
-            /* end of lua */ ,
-            "R>s", outer_slr->lua_ref, &cmd );
-
-        if (!strcmp (cmd, "ok")) {
-            return U_READ_OK;
-        }
-        if (!strcmp (cmd, "unregistered char")) {
-            return U_READ_UNREGISTERED_CHAR;
-        }
-        if (!strcmp (cmd, "invalid char")) {
-            return U_READ_INVALID_CHAR;
-        }
-            if (!strcmp (cmd, "rejected char")) {
-                return U_READ_REJECTED_CHAR;
-            }
-            if (!strcmp (cmd, "exhausted on failure")) {
-                return U_READ_EXHAUSTED_ON_FAILURE;
-            }
-            if (!strcmp (cmd, "exhausted on success")) {
-                return U_READ_EXHAUSTED_ON_SUCCESS;
-            }
-            if (!strcmp (cmd, "tracing")) {
-                return U_READ_TRACING;
-            }
-
-    }
-    call_by_tag (outer_slr->L, MYLUA_TAG,
-        "error('Unexpected fall through in l0_read()')\n",
-        "R>", outer_slr->lua_ref);
 }
 
 /* It is OK to set pos to last codepoint + 1 */
