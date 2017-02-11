@@ -561,6 +561,7 @@ Returns a status string.
             if recce.perl_pos >= recce.end_pos then
                 return 'ok'
             end
+            -- +1 because codepoints array is 1-based
             local codepoint = recce.codepoints[recce.perl_pos+1]
             recce.codepoint = codepoint
             local errmsg = recce:l0_read_codepoint()
@@ -2104,24 +2105,15 @@ Functions for tracing Earley sets
     _M.defines.TOKEN_VALUE_IS_UNDEF = 1
     _M.defines.TOKEN_VALUE_IS_LITERAL = 2
 
-    _M.defines.MARPA_OP_ALTERNATIVE = 0
-    _M.defines.MARPA_OP_EARLEME_COMPLETE = 1
-    _M.defines.MARPA_OP_INVALID_CHAR = 2
     _M.defines.MARPA_OP_LUA = 3
     _M.defines.MARPA_OP_NOOP = 4
     _M.op_names = {
-        [_M.defines.MARPA_OP_ALTERNATIVE] = "alternative",
-        [_M.defines.MARPA_OP_EARLEME_COMPLETE ] = "earleme_complete",
-        [_M.defines.MARPA_OP_INVALID_CHAR] = "invalid_char",
         [_M.defines.MARPA_OP_LUA] = "lua",
         [_M.defines.MARPA_OP_NOOP] = "noop",
     }
 
     -- miranda: section+ temporary defines
     /* TODO: Delete after development */
-    #define MARPA_OP_ALTERNATIVE 0
-    #define MARPA_OP_EARLEME_COMPLETE 1
-    #define MARPA_OP_INVALID_CHAR 2
     #define MARPA_OP_LUA 3
     #define MARPA_OP_NOOP 4
 
