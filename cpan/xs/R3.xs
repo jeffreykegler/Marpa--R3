@@ -1680,7 +1680,6 @@ l0_read (Outer_R * outer_slr)
         lua_Integer codepoint;
         lua_Integer op_count;
         lua_Integer op_ix;
-        lua_Integer tokens_accepted = 0;
 
         call_by_tag (outer_slr->L,
             MYLUA_TAG,
@@ -1710,7 +1709,8 @@ l0_read (Outer_R * outer_slr)
             "if recce.trace_terminals >= 1 then\n"
             "   local q = recce.event_queue\n"
             "   q[#q+1] = { '!trace', 'lexer reading codepoint', codepoint, recce.perl_pos}\n"
-            "end\n" "return '', codepoint, op_count\n"
+            "end\n"
+            "return '', codepoint, op_count\n"
             /* end of lua */ ,
             "R>sii", outer_slr->lua_ref, &cmd, &codepoint, &op_count);
 
@@ -1735,26 +1735,16 @@ l0_read (Outer_R * outer_slr)
                 "    tokens_accepted = tokens_accepted +\n"
                 "         recce:l0_alternative(symbol_id)\n"
                 "end\n"
-                "return tokens_accepted\n"
-                /* end of lua */ ,
-                "Ri>i", outer_slr->lua_ref, op_count, &tokens_accepted);
-
-            if (tokens_accepted < 1) {
-                call_by_tag (outer_slr->L, MYLUA_TAG,
-                    "recce, codepoint = ...\n"
-                    "recce.codepoint = codepoint\n",
-                    "Ri>", outer_slr->lua_ref, (lua_Integer) codepoint);
-                return U_READ_REJECTED_CHAR;
-            }
-
-            call_by_tag (outer_slr->L, MYLUA_TAG,
-                "local recce = ...\n"
+                "if tokens_accepted < 1 then return 'rejected char' end\n"
                 "local complete_result = recce:l0_earleme_complete()\n"
                 "if complete_result then return complete_result end\n"
                 "return ''\n"
                 /* end of lua */ ,
-                "R>s", outer_slr->lua_ref, &cmd);
+                "Ri>s", outer_slr->lua_ref, op_count, &cmd);
 
+            if (!strcmp (cmd, "rejected char")) {
+                return U_READ_REJECTED_CHAR;
+            }
             if (!strcmp (cmd, "exhausted on failure")) {
                 return U_READ_EXHAUSTED_ON_FAILURE;
             }
