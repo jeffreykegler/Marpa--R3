@@ -1666,7 +1666,6 @@ static const char *
 l0_read (Outer_R * outer_slr)
 {
     dTHX;
-    Scanless_R *slr = slr_inner_get (outer_slr);
     char *cmd;
 
     call_by_tag (outer_slr->L,
@@ -1689,35 +1688,7 @@ l0_read (Outer_R * outer_slr)
             "end\n"
             "codepoint = recce.codepoints[recce.perl_pos+1]\n"
             "recce.codepoint = codepoint\n"
-            "local ops = recce.per_codepoint[codepoint]\n"
-            "if ops == nil then\n"
-            "    -- print( '1 unregistered char', codepoint, -1)\n"
-            "    return 'unregistered char'\n"
-            "end\n"
-            "if ops == false then\n"
-            "    -- print( 'invalid char', codepoint, -1)\n"
-            "    return 'invalid char'\n"
-            "end\n"
-            "local op_count = #ops\n"
-            "if op_count <= 0 then\n"
-            "    -- print( '2 unregistered char', codepoint, op_count)\n"
-            "    return 'unregistered char'\n"
-            "end\n"
-            "if recce.trace_terminals >= 1 then\n"
-            "   local q = recce.event_queue\n"
-            "   q[#q+1] = { '!trace', 'lexer reading codepoint', codepoint, recce.perl_pos}\n"
-            "end\n"
-
-                "local tokens_accepted = 0\n"
-                "for ix = 1, op_count do\n"
-                "    local symbol_id = recce.per_codepoint[recce.codepoint][ix]\n"
-                "    tokens_accepted = tokens_accepted +\n"
-                "         recce:l0_alternative(symbol_id)\n"
-                "end\n"
-                "if tokens_accepted < 1 then return 'rejected char' end\n"
-                "local complete_result = recce:l0_earleme_complete()\n"
-                "if complete_result then return complete_result end\n"
-                "return ''\n"
+            "return recce:l0_read_codepoint()\n"
             /* end of lua */ ,
             "R>s", outer_slr->lua_ref, &cmd );
 

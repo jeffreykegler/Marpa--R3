@@ -507,6 +507,46 @@ which will be 1 or 0.
 
 ```
 
+Read the current codepoint in L0.
+Returns nil on success,
+otherwise an error code string.
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slr.l0_read_codepoint(recce)
+        local codepoint = recce.codepoint
+        local ops = recce.per_codepoint[codepoint]
+        if ops == nil then
+            -- print( '1 unregistered char', codepoint, -1)
+            return 'unregistered char'
+        end
+        if ops == false then
+            -- print( 'invalid char', codepoint, -1)
+            return 'invalid char'
+        end
+        local op_count = #ops
+        if op_count <= 0 then
+            -- print( '2 unregistered char', codepoint, op_count)
+            return 'unregistered char'
+        end
+        if recce.trace_terminals >= 1 then
+           local q = recce.event_queue
+           q[#q+1] = { '!trace', 'lexer reading codepoint', codepoint, recce.perl_pos}
+        end
+        local tokens_accepted = 0
+        for ix = 1, op_count do
+            local symbol_id = recce.per_codepoint[codepoint][ix]
+            tokens_accepted = tokens_accepted +
+                 recce:l0_alternative(symbol_id)
+        end
+        if tokens_accepted < 1 then return 'rejected char' end
+        local complete_result = recce:l0_earleme_complete()
+        if complete_result then return complete_result end
+        return
+    end
+
+```
+
 ### Locations
 
 Given a G1 span return an L0 span.
