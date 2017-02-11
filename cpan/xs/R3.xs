@@ -1688,7 +1688,12 @@ l0_read (Outer_R * outer_slr)
             "end\n"
             "codepoint = recce.codepoints[recce.perl_pos+1]\n"
             "recce.codepoint = codepoint\n"
-            "return recce:l0_read_codepoint()\n"
+            "local errmsg = recce:l0_read_codepoint()\n"
+            "if errmsg then return errmsg end\n"
+            "recce.perl_pos = recce.perl_pos + 1\n"
+            "if recce.trace_terminals > 0 then\n"
+            "   return 'tracing'\n"
+            "end\n"
             /* end of lua */ ,
             "R>s", outer_slr->lua_ref, &cmd );
 
@@ -1710,19 +1715,10 @@ l0_read (Outer_R * outer_slr)
             if (!strcmp (cmd, "exhausted on success")) {
                 return U_READ_EXHAUSTED_ON_SUCCESS;
             }
-
-        {
-            call_by_tag (outer_slr->L, MYLUA_TAG,
-                "recce = ...\n"
-                "recce.perl_pos = recce.perl_pos + 1\n"
-                "if recce.trace_terminals > 0 then\n"
-                "   return 'tracing'\n" "end\n"
-                /* end of lua */ ,
-                "R>s", outer_slr->lua_ref, &cmd);
             if (!strcmp (cmd, "tracing")) {
                 return U_READ_TRACING;
             }
-        }
+
     }
     call_by_tag (outer_slr->L, MYLUA_TAG,
         "error('Unexpected fall through in l0_read()')\n",
