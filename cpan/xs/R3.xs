@@ -1677,9 +1677,6 @@ l0_read (Outer_R * outer_slr)
         "end\n", "R>", outer_slr->lua_ref);
 
     for (;;) {
-        lua_Integer codepoint;
-        lua_Integer op_count;
-        lua_Integer op_ix;
 
         call_by_tag (outer_slr->L,
             MYLUA_TAG,
@@ -1688,47 +1685,29 @@ l0_read (Outer_R * outer_slr)
             "-- they can be removed when the caller is Lua\n"
             "local codepoint = -1\n"
             "if recce.perl_pos >= recce.end_pos then\n"
-            "    return 'ok', codepoint, -1\n"
+            "    return 'ok'\n"
             "end\n"
             "codepoint = recce.codepoints[recce.perl_pos+1]\n"
             "recce.codepoint = codepoint\n"
             "local ops = recce.per_codepoint[codepoint]\n"
             "if ops == nil then\n"
             "    -- print( '1 unregistered char', codepoint, -1)\n"
-            "    return 'unregistered char', codepoint, -1\n"
+            "    return 'unregistered char'\n"
             "end\n"
             "if ops == false then\n"
             "    -- print( 'invalid char', codepoint, -1)\n"
-            "    return 'invalid char', codepoint, -1\n"
+            "    return 'invalid char'\n"
             "end\n"
             "local op_count = #ops\n"
             "if op_count <= 0 then\n"
             "    -- print( '2 unregistered char', codepoint, op_count)\n"
-            "    return 'unregistered char', codepoint, op_count\n"
+            "    return 'unregistered char'\n"
             "end\n"
             "if recce.trace_terminals >= 1 then\n"
             "   local q = recce.event_queue\n"
             "   q[#q+1] = { '!trace', 'lexer reading codepoint', codepoint, recce.perl_pos}\n"
             "end\n"
-            "return '', codepoint, op_count\n"
-            /* end of lua */ ,
-            "R>sii", outer_slr->lua_ref, &cmd, &codepoint, &op_count);
 
-        if (!strcmp (cmd, "ok")) {
-            return U_READ_OK;
-        }
-        if (!strcmp (cmd, "unregistered char")) {
-            return U_READ_UNREGISTERED_CHAR;
-        }
-        if (!strcmp (cmd, "invalid char")) {
-            return U_READ_INVALID_CHAR;
-        }
-
-        /* ops[0] is codepoint */
-        {
-
-            call_by_tag (outer_slr->L, MYLUA_TAG,
-                "local recce, op_count = ...\n"
                 "local tokens_accepted = 0\n"
                 "for ix = 1, op_count do\n"
                 "    local symbol_id = recce.per_codepoint[recce.codepoint][ix]\n"
@@ -1739,9 +1718,18 @@ l0_read (Outer_R * outer_slr)
                 "local complete_result = recce:l0_earleme_complete()\n"
                 "if complete_result then return complete_result end\n"
                 "return ''\n"
-                /* end of lua */ ,
-                "Ri>s", outer_slr->lua_ref, op_count, &cmd);
+            /* end of lua */ ,
+            "R>s", outer_slr->lua_ref, &cmd );
 
+        if (!strcmp (cmd, "ok")) {
+            return U_READ_OK;
+        }
+        if (!strcmp (cmd, "unregistered char")) {
+            return U_READ_UNREGISTERED_CHAR;
+        }
+        if (!strcmp (cmd, "invalid char")) {
+            return U_READ_INVALID_CHAR;
+        }
             if (!strcmp (cmd, "rejected char")) {
                 return U_READ_REJECTED_CHAR;
             }
@@ -1752,7 +1740,6 @@ l0_read (Outer_R * outer_slr)
                 return U_READ_EXHAUSTED_ON_SUCCESS;
             }
 
-        }
         {
             call_by_tag (outer_slr->L, MYLUA_TAG,
                 "recce = ...\n"
