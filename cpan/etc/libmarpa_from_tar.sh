@@ -22,15 +22,15 @@ else
    echo Are you running this script in the cpan/ directory\?) 1>&2
    exit 1
 fi
-if test -r "engine/LIB_VERSION"
+if test -r "libmarpa/LIB_VERSION"
 then :
 else
-   (echo engine/LIB_VERSION is not a readable file;
+   (echo libmarpa/LIB_VERSION is not a readable file;
    echo Are you running this script in the cpan/ directory\?) 1>&2
    exit 1
 fi
-lib_version=`cat engine/LIB_VERSION`
-(cd engine; tar -xvzf $1)
+lib_version=`cat libmarpa/LIB_VERSION`
+cat $1 | (cd engine; tar -xvzf -)
 (cd engine; test -d read_only && rm -rf read_only)
 (cd engine; mv libmarpa-$lib_version read_only)
 date > engine/read_only/stamp-h1

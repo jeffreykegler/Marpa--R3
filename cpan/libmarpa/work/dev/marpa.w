@@ -4831,7 +4831,7 @@ the successor can be found by decrementing it,
 and AHM pointers can be portably compared.
 A lot of code relies on these facts.
 @d AHM_by_ID(id) (g->t_ahms+(id))
-@d ID_of_AHM(ahm) ((ahm) - g->t_ahms)
+@d ID_of_AHM(ahm) (Marpa_AHM_ID)((ahm) - g->t_ahms)
 @ These require the caller to make sure all the |AHM|'s
 involved exist.
 @d Next_AHM_of_AHM(ahm) ((ahm)+1)
@@ -5062,7 +5062,7 @@ Marpa_Symbol_ID _marpa_g_ahm_postdot(Marpa_Grammar g,
     }
   @<Create an AHM for a completion@>@;
   current_item++;
-  AHM_Count_of_IRL(irl) = current_item - first_ahm_of_irl;
+  AHM_Count_of_IRL(irl) = (int)(current_item - first_ahm_of_irl);
 }
 
 @ @<Count the AHMs in a rule@> =
@@ -5104,7 +5104,7 @@ Marpa_Symbol_ID _marpa_g_ahm_postdot(Marpa_Grammar g,
 {
   IRL_of_AHM (current_item) = irl;
   Null_Count_of_AHM (current_item) = leading_nulls;
-  Quasi_Position_of_AHM (current_item) = current_item - first_ahm_of_irl;
+  Quasi_Position_of_AHM (current_item) = (int)(current_item - first_ahm_of_irl);
   if (Quasi_Position_of_AHM (current_item) == 0) {
      if (ID_of_IRL(irl) == ID_of_IRL (g->t_start_irl))
      {

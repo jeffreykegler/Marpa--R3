@@ -31,6 +31,7 @@ libmarpa_la_SOURCES = marpa.c marpa.h \
     marpa_ami.c marpa_ami.h \
     marpa_codes.c
 EXTRA_DIST = LIB_VERSION README.INSTALL \
+  error_codes.table events.table steps.table \
   win32/marpa.def Makefile.win32 win32/do_config_h.pl
 libmarpa_la_LIBADD = $(LIBOBJS)
 libmarpa_la_LDFLAGS = -release $(RELEASE)

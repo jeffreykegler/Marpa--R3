@@ -183,7 +183,7 @@ ID_of_XSY(Source_XSY_of_NSYID(nsyid) )
 #define First_AHM_of_IRL(irl) ((irl) ->t_first_ahm) 
 #define First_AHM_of_IRLID(irlid) (IRL_by_ID(irlid) ->t_first_ahm) 
 #define AHM_by_ID(id) (g->t_ahms+(id) ) 
-#define ID_of_AHM(ahm) ((ahm) -g->t_ahms) 
+#define ID_of_AHM(ahm) (Marpa_AHM_ID) ((ahm) -g->t_ahms) 
 #define Next_AHM_of_AHM(ahm) ((ahm) +1) 
 #define Prev_AHM_of_AHM(ahm) ((ahm) -1)  \
 
@@ -9096,7 +9096,7 @@ Last_Proper_SYMI_of_IRL(irl)= symbol_instance_of_next_rule+rhs_ix;
 {
 IRL_of_AHM(current_item)= irl;
 Null_Count_of_AHM(current_item)= leading_nulls;
-Quasi_Position_of_AHM(current_item)= current_item-first_ahm_of_irl;
+Quasi_Position_of_AHM(current_item)= (int)(current_item-first_ahm_of_irl);
 if(Quasi_Position_of_AHM(current_item)==0){
 if(ID_of_IRL(irl)==ID_of_IRL(g->t_start_irl))
 {
@@ -9188,7 +9188,7 @@ leading_nulls++;
 {
 IRL_of_AHM(current_item)= irl;
 Null_Count_of_AHM(current_item)= leading_nulls;
-Quasi_Position_of_AHM(current_item)= current_item-first_ahm_of_irl;
+Quasi_Position_of_AHM(current_item)= (int)(current_item-first_ahm_of_irl);
 if(Quasi_Position_of_AHM(current_item)==0){
 if(ID_of_IRL(irl)==ID_of_IRL(g->t_start_irl))
 {
@@ -9258,7 +9258,7 @@ XRL_Position_of_AHM(current_item)= xrl_position;
 #line 5063 "./marpa.w"
 
 current_item++;
-AHM_Count_of_IRL(irl)= current_item-first_ahm_of_irl;
+AHM_Count_of_IRL(irl)= (int)(current_item-first_ahm_of_irl);
 }
 
 /*:482*/
