@@ -1,6 +1,8 @@
 # A 2nd Makefile, to keep developer targets from cluttering
 # the EU::MM Makefile, which is for installation
 
+.PHONY: dummy debug license meta
+
 dummy:
 	echo No default target
 
@@ -11,3 +13,12 @@ debug:
 
 license:
 	perl etc/check_license.pl
+
+libmarpa/dists.time-stamp:
+	(cd libmarpa; make dists)
+
+engine/read_only.time-stamp: libmarpa/dists.time-stamp
+	sh -x etc/libmarpa_from_tar.sh libmarpa/libmarpa-8.4.0.tar.gz
+
+meta: engine/read_only.time-stamp
+	make

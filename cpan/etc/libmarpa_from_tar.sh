@@ -31,6 +31,7 @@ else
 fi
 lib_version=`cat libmarpa/LIB_VERSION`
 cat $1 | (cd engine; tar -xvzf -)
-(cd engine; test -d read_only && rm -rf read_only)
+(cd engine; test -d read_only.bak && rm -rf read_only.bak)
+(cd engine; test -d read_only && mv read_only read_only.bak)
 (cd engine; mv libmarpa-$lib_version read_only)
-date > engine/read_only/stamp-h1
+date > engine/read_only.time-stamp

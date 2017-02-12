@@ -4831,7 +4831,7 @@ the successor can be found by decrementing it,
 and AHM pointers can be portably compared.
 A lot of code relies on these facts.
 @d AHM_by_ID(id) (g->t_ahms+(id))
-@d ID_of_AHM(ahm) (Marpa_AHM_ID)((ahm) - g->t_ahms)
+@d ID_of_AHM(ahm) (AHMID)((ahm) - g->t_ahms)
 @ These require the caller to make sure all the |AHM|'s
 involved exist.
 @d Next_AHM_of_AHM(ahm) ((ahm)+1)
@@ -7603,7 +7603,7 @@ PRIVATE int alternative_insert(RECCE r, ALT new_alternative)
     @t}\comment{@>
   /* base will not change after this */
   base_of_stack = MARPA_DSTACK_BASE(*alternatives, ALT_Object);
-   for (ix = end_of_stack-base_of_stack; ix > insertion_point; ix--) {
+   for (ix = (int)(end_of_stack-base_of_stack); ix > insertion_point; ix--) {
        base_of_stack[ix] = base_of_stack[ix-1];
    }
    base_of_stack[insertion_point] = *new_alternative;
@@ -11717,7 +11717,7 @@ int marpa_o_rank( Marpa_Order o)
             *order++ = and_node_id;
         }
       {
-        int final_count = (order - order_base) - 1;
+        int final_count = (int)(order - order_base) - 1;
         *order_base = final_count;
         marpa_obs_confirm_fast (obs, (int)sizeof (ANDID) * (final_count + 1));
         and_node_orderings[or_node_id] = marpa_obs_finish (obs);
@@ -13113,7 +13113,7 @@ typedef LBW* LBV;
 @<Function definitions@> =
 PRIVATE int lbv_bits_to_size(int bits)
 {
-  const LBW result = ((LBW) bits + (lbv_wordbits - 1)) / lbv_wordbits;
+  const LBW result = (LBW)(((unsigned int)bits + (lbv_wordbits - 1)) / lbv_wordbits);
   return (int) result;
 }
 
@@ -13236,7 +13236,7 @@ by |bv_hiddenwords|.
 PRIVATE Bit_Vector bv_create(int bits)
 {
     LBW size = bv_bits_to_size(bits);
-    LBW bytes = (size + bv_hiddenwords) * sizeof(Bit_Vector_Word);
+    LBW bytes = (size + (LBW)bv_hiddenwords) * (LBW)sizeof(Bit_Vector_Word);
     LBW* addr = (Bit_Vector) my_malloc0((size_t) bytes);
     *addr++ = (LBW)bits;
     *addr++ = size;
@@ -13255,7 +13255,7 @@ PRIVATE Bit_Vector
 bv_obs_create (struct marpa_obstack *obs, int bits)
 {
   LBW size = bv_bits_to_size (bits);
-  LBW bytes = (size + bv_hiddenwords) * sizeof (Bit_Vector_Word);
+  LBW bytes = (size + (LBW)bv_hiddenwords) * sizeof (Bit_Vector_Word);
   LBW *addr = (Bit_Vector) marpa__obs_alloc (obs, (size_t) bytes, ALIGNOF(LBW));
   *addr++ = (LBW)bits;
   *addr++ = size;
@@ -13760,7 +13760,7 @@ PRIVATE size_t matrix_sizeof(int rows, int columns)
 {
   const LBW bv_data_words = bv_bits_to_size (columns);
   const LBW row_bytes =
-    (bv_data_words + bv_hiddenwords) * sizeof (Bit_Vector_Word);
+    (LBW)(bv_data_words + bv_hiddenwords) * sizeof (Bit_Vector_Word);
   return offsetof (struct s_bit_matrix, t_row_data) +((size_t)rows) * row_bytes;
 }
 

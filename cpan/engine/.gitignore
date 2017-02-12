@@ -1,5 +1,9 @@
 /gnu_ac_build/
+/read_only.bak/
 /Makefile
 /Makefile[.]old
 /MYMETA[.]*
 /perl_ac_build/
+/gnu_ac_build[.]time-stamp
+/read_only[.]time-stamp
+

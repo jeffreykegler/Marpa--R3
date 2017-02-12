@@ -25,6 +25,7 @@ dummy:
 	@echo The target to make the distributions is '"dists"'
 
 dists: dist doc_dist doc1_dist cm_dist
+	date > dists.time-stamp
 
 work_install:
 	(cd work; make install)

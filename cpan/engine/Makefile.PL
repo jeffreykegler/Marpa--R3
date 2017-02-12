@@ -58,7 +58,6 @@ undef &MY::top_targets; # suppress warning
     my $r = '
 all :: $(LIBMARPA_IN_BUILD_DIR)
 	$(NOECHO) $(NOOP)
-	$(ECHO) hello from engine/Makefile.PL all target
 
 config ::
 	$(NOECHO) $(NOOP)
@@ -88,12 +87,14 @@ undef &MY::postamble; # suppress warning
       );
 
     push @postamble_pieces, <<'END_OF_POSTAMBLE_PIECE';
-gnu_ac_build/configure: read_only/stamp-h1
+gnu_ac_build.time-stamp: read_only.time-stamp
+	$(RM_RF) gnu_ac_build
 	$(LIBMARPA_INSTALL) read_only gnu_ac_build
+	date > gnu_ac_build.time-stamp
 END_OF_POSTAMBLE_PIECE
 
     push @postamble_pieces, <<'END_OF_POSTAMBLE_PIECE';
-perl_ac_build/Makefile.PL: read_only/stamp-h1 cf/perl_ac_makefile.PL
+perl_ac_build/Makefile.PL: read_only.time-stamp cf/perl_ac_makefile.PL
 	$(RM_RF) perl_ac_build
 	$(LIBMARPA_INSTALL) read_only perl_ac_build
 	$(CP) cf/perl_ac_makefile.PL perl_ac_build/Makefile.PL
@@ -102,7 +103,7 @@ END_OF_POSTAMBLE_PIECE
 
 # == Logic to create Makefile for GNU autoconf
     push @postamble_pieces, sprintf <<'END_OF_POSTAMBLE_PIECE',
-gnu_ac_build/Makefile: gnu_ac_build/configure
+gnu_ac_build/Makefile: gnu_ac_build.time-stamp
 	%s
 END_OF_POSTAMBLE_PIECE
         $self->cd( File::Spec->catdir(qw(gnu_ac_build)),
@@ -127,7 +128,6 @@ END_OF_POSTAMBLE_PIECE
     push @postamble_pieces, sprintf <<'END_OF_POSTAMBLE_PIECE',
 gnu_ac_build/.libs/libmarpa$(LIB_EXT): gnu_ac_build/Makefile
 	%s
-	$(ECHO) hello from Perl AC libmarpa.a target
 END_OF_POSTAMBLE_PIECE
 	$self->cd(File::Spec->catdir(qw(gnu_ac_build)), '$(MAKE)');
 
@@ -138,7 +138,6 @@ END_OF_POSTAMBLE_PIECE
     push @postamble_pieces, sprintf <<'END_OF_POSTAMBLE_PIECE',
 perl_ac_build/libmarpa$(LIB_EXT): perl_ac_build/Makefile
 	%s
-	$(ECHO) hello from Perl AC libmarpa.a target
 END_OF_POSTAMBLE_PIECE
 	$self->cd(File::Spec->catdir(qw(perl_ac_build)), '$(MAKE)');
 

@@ -167,7 +167,8 @@ sub postamble {
 
     push @postamble_pieces, <<'END_OF_POSTAMBLE_PIECE';
 R3.c: exec_lua.xs ../kollos/kollos.h \
-      inspect_inc.c glue_inc.c kollos_inc.c
+      inspect_inc.c glue_inc.c kollos_inc.c \
+      ../engine/gnu_ac_build/stamp-h1
 
 exec_lua.xs: gen_exec_lua.pl
 	$(PERLRUN) gen_exec_lua.pl $@

@@ -183,7 +183,7 @@ ID_of_XSY(Source_XSY_of_NSYID(nsyid) )
 #define First_AHM_of_IRL(irl) ((irl) ->t_first_ahm) 
 #define First_AHM_of_IRLID(irlid) (IRL_by_ID(irlid) ->t_first_ahm) 
 #define AHM_by_ID(id) (g->t_ahms+(id) ) 
-#define ID_of_AHM(ahm) (Marpa_AHM_ID) ((ahm) -g->t_ahms) 
+#define ID_of_AHM(ahm) (AHMID) ((ahm) -g->t_ahms) 
 #define Next_AHM_of_AHM(ahm) ((ahm) +1) 
 #define Prev_AHM_of_AHM(ahm) ((ahm) -1)  \
 
@@ -11752,7 +11752,7 @@ end_of_stack= MARPA_DSTACK_PUSH(*alternatives,ALT_Object);
 
 
 base_of_stack= MARPA_DSTACK_BASE(*alternatives,ALT_Object);
-for(ix= end_of_stack-base_of_stack;ix> insertion_point;ix--){
+for(ix= (int)(end_of_stack-base_of_stack);ix> insertion_point;ix--){
 base_of_stack[ix]= base_of_stack[ix-1];
 }
 base_of_stack[insertion_point]= *new_alternative;
@@ -16080,7 +16080,7 @@ if(and_node_rank>=high_rank_so_far)
 *order++= and_node_id;
 }
 {
-int final_count= (order-order_base)-1;
+int final_count= (int)(order-order_base)-1;
 *order_base= final_count;
 marpa_obs_confirm_fast(obs,(int)sizeof(ANDID)*(final_count+1));
 and_node_orderings[or_node_id]= marpa_obs_finish(obs);
@@ -18017,7 +18017,7 @@ return Step_Type_of_V(v)= MARPA_STEP_INACTIVE;
 
 PRIVATE int lbv_bits_to_size(int bits)
 {
-const LBW result= ((LBW)bits+(lbv_wordbits-1))/lbv_wordbits;
+const LBW result= (LBW)(((unsigned int)bits+(lbv_wordbits-1))/lbv_wordbits);
 return(int)result;
 }
 
@@ -18109,7 +18109,7 @@ return(mask);
 PRIVATE Bit_Vector bv_create(int bits)
 {
 LBW size= bv_bits_to_size(bits);
-LBW bytes= (size+bv_hiddenwords)*sizeof(Bit_Vector_Word);
+LBW bytes= (size+(LBW)bv_hiddenwords)*(LBW)sizeof(Bit_Vector_Word);
 LBW*addr= (Bit_Vector)my_malloc0((size_t)bytes);
 *addr++= (LBW)bits;
 *addr++= size;
@@ -18124,7 +18124,7 @@ PRIVATE Bit_Vector
 bv_obs_create(struct marpa_obstack*obs,int bits)
 {
 LBW size= bv_bits_to_size(bits);
-LBW bytes= (size+bv_hiddenwords)*sizeof(Bit_Vector_Word);
+LBW bytes= (size+(LBW)bv_hiddenwords)*sizeof(Bit_Vector_Word);
 LBW*addr= (Bit_Vector)marpa__obs_alloc(obs,(size_t)bytes,ALIGNOF(LBW));
 *addr++= (LBW)bits;
 *addr++= size;
@@ -18567,7 +18567,7 @@ PRIVATE size_t matrix_sizeof(int rows,int columns)
 {
 const LBW bv_data_words= bv_bits_to_size(columns);
 const LBW row_bytes= 
-(bv_data_words+bv_hiddenwords)*sizeof(Bit_Vector_Word);
+(LBW)(bv_data_words+bv_hiddenwords)*sizeof(Bit_Vector_Word);
 return offsetof(struct s_bit_matrix,t_row_data)+((size_t)rows)*row_bytes;
 }
 
