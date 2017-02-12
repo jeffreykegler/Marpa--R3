@@ -13255,7 +13255,7 @@ PRIVATE Bit_Vector
 bv_obs_create (struct marpa_obstack *obs, int bits)
 {
   LBW size = bv_bits_to_size (bits);
-  LBW bytes = (size + (LBW)bv_hiddenwords) * sizeof (Bit_Vector_Word);
+  LBW bytes = (size + (LBW)bv_hiddenwords) * (LBW)sizeof (Bit_Vector_Word);
   LBW *addr = (Bit_Vector) marpa__obs_alloc (obs, (size_t) bytes, ALIGNOF(LBW));
   *addr++ = (LBW)bits;
   *addr++ = size;
@@ -13760,8 +13760,9 @@ PRIVATE size_t matrix_sizeof(int rows, int columns)
 {
   const LBW bv_data_words = bv_bits_to_size (columns);
   const LBW row_bytes =
-    (LBW)(bv_data_words + bv_hiddenwords) * sizeof (Bit_Vector_Word);
-  return offsetof (struct s_bit_matrix, t_row_data) +((size_t)rows) * row_bytes;
+    (LBW) (bv_data_words + bv_hiddenwords) * (LBW) sizeof (Bit_Vector_Word);
+  return offsetof (struct s_bit_matrix,
+		   t_row_data) +((size_t) rows) * row_bytes;
 }
 
 @*0 Create a boolean matrix on an obstack.
