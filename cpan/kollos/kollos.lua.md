@@ -137,12 +137,15 @@ for action during or after development.
 Not all of these are included or mentioned
 in these "Development Notes".
 
-### Factoring out Kollos packages
+### Use generations in Libmarpa trees
 
-Current Kollos assumes a dedicated Lua interpreter,
-an interpreter whose namespace it controls completely.
-This must change to allow Kollos to loaded as an ordinary
-Lua package.
+Currently a valuator "pauses" its base tree, so
+that it does not change during the life of the tree.
+This gets tricky for the Lua garbage collection --
+the valuator may not be garbage collected quickly,
+and no new tree can be created meantime.
+Instead, add a generation number to the tree, and
+use that.
 
 ### Kollos assumes core libraries are loaded
 
