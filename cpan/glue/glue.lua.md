@@ -73,6 +73,10 @@ we may want meaningful performance numbers.
     inspect = require "inspect"
     kollos = require "kollos"
 
+    -- so that inlined code can refer to the kollos package
+    -- the same way as package code
+    _M = kollos
+
     -- This is a useful point to check the namespaces
     -- print('_G: ', inspect(_G, { depth = 1 }))
     -- print('kollos: ', inspect(kollos, { depth = 1 }))
