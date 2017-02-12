@@ -20,5 +20,5 @@ libmarpa/dists.time-stamp:
 engine/read_only.time-stamp: libmarpa/dists.time-stamp
 	sh -x etc/libmarpa_from_tar.sh libmarpa/libmarpa-8.4.0.tar.gz
 
-meta: engine/read_only.time-stamp
+meta: engine/read_only.time-stamp libmarpa/dists.time-stamp
 	make

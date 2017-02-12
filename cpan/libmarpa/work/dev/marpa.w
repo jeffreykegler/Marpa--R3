@@ -9771,6 +9771,13 @@ Marpa_Rule_ID marpa_r_progress_item(
     }
 }
 
+@** Earley item inspectors.
+
+These routines allow efficient inspection of the Earley items.
+This mechanism (expanded to look at Leo items as well)
+could and probably should serve as the basis for a
+Lua-based rewrite of the progress mechanism.
+
 @** Some notes on evaluation.
 
 @*0 Sources of Leo path items.
