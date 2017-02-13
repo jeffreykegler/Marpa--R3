@@ -88,7 +88,7 @@ engine/read_only/marpa_obs.h
 engine/read_only/marpa_tavl.c
 engine/read_only/marpa_tavl.h
 engine/read_only/missing
-engine/read_only/stamp-h1
+engine/read_only.time-stamp
 engine/read_only/steps.table
 engine/read_only/win32/do_config_h.pl
 engine/read_only/win32/marpa.def

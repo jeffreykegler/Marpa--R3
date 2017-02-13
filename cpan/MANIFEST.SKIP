@@ -60,7 +60,10 @@
 ^engine/Makefile[.]old$
 ^engine/cf/LIBMARPA_MODE$
 ^engine/gnu_ac_build/
+^engine/gnu_ac_build[.]time-stamp$
 ^engine/perl_ac_build/
+^engine/read_only[.]bak/
+^engine/read_only[.]time-stamp$
 ^errs$
 ^etc/track[.]list
 ^glue/MYMETA.
@@ -110,6 +113,7 @@
 ^lib/Marpa/R3[.]xs
 ^lib/Marpa/pm_to_blib$
 ^lib/pm_to_blib$
+^libmarpa/
 ^libmarpa_build/
 ^lua/MYMETA.
 ^lua/Makefile$
@@ -120,7 +124,6 @@
 ^lua/luac$
 ^nogit
 ^nogit/
-^notes/
 ^notes[.]
 ^nytprof/
 ^nytprof[.]out$
