@@ -523,6 +523,8 @@ sub file_type {
         if $filepart =~ /[.] (c|h) [.] in \z /xms;
     return \&license_problems_in_tex_file
         if $filepart =~ /[.] (w) \z /xms;
+    return \&trivial
+        if $filepart =~ /[.] time [-] stamp \z /xms;
     return gen_license_problems_in_hash_file()
 
 } ## end sub file_type
