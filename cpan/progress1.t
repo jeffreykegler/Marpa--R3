@@ -114,26 +114,52 @@ EARLEY_SET: for my $earley_set (0 .. 7) {
     my ($set_data) =
       $recce->call_by_tag(
     ('@' . __FILE__ . ':' . __LINE__),
-    <<'END_OF_LUA', 'i>2', $earley_set );
-      local recce, earley_set_id = ...
+    <<'END_OF_LUA', 'ii', $earley_set, $S_rule );
+      local recce, earley_set_id, S_rule = ...
+      local cmp = function(a, b)
+          for i = 1, #a do
+             if a[i] < b[i] then return true end
+             if a[i] > b[i] then return false end
+          end
+          return false
+      end
       local g1r = recce.lmw_g1r
       local g1g = recce.slg.lmw_g1g
-      local result = {}
+      local xrl_data = {}
+      local fmt = "jjj"
       g1r:earley_set_data(earley_set_id)
       for item_id = 0, math.maxinteger do
           local item_data = g1r:earley_item_data(item_id)
           if not item_data then break end
           local irl_id = item_data.irl_id
           if g1g:_irl_is_virtual_lhs(irl_id) ~= 0 then 
-              io.stderr:write(string.format("IRL #%d is virtual LHS\n", irl_id))
-          else
-              result[#result+1] = item_data
-              io.stderr:write(string.format("IRL #%d is NOT virtual LHS\n", irl_id))
+              goto NEXT_ITEM
           end
+          local irl_lhs = g1g:_irl_lhs(irl_id)
+          local xrl = g1g:_source_xrl(irl_id)
+          if not xrl then goto NEXT_ITEM end
+          if xrl ~= S_rule then goto NEXT_ITEM end
+          -- print(inspect(item_data))
+          local key = string.pack(fmt,
+              xrl, item_data.dot_position, item_data.origin_set_id)
+          xrl_data[key] = true
+          ::NEXT_ITEM::
       end
+      result = {}
+      for key, value in pairs(xrl_data) do
+           local xrl_datum = { string.unpack(fmt, key) }
+           xrl_datum[#xrl_datum] = nil
+           result[#result+1] = xrl_datum
+      end
+      table.sort(result, cmp)
       return result
 END_OF_LUA
-    say Data::Dumper::Dumper($set_data);
+    # say Data::Dumper::Dumper($set_data);
+    say "===";
+    for my $datum (@{$set_data}) {
+        my ($rule_id, $dot, $origin) = @{$datum};
+        say "S:$dot " . '@' . "$origin-$earley_set " . $grammar->show_dotted_rule($rule_id, $dot);
+    }
 }
 
 # vim: expandtab shiftwidth=4:
