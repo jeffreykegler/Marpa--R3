@@ -916,41 +916,70 @@ inspect package to dump it.
 
 ```
     -- miranda: section+ populate metatables
+
+    -- `inspect` is used in our __tostring methods, but
+    -- it also calls __tostring.  This global is used to
+    -- prevent any recursive calls.
+    _M.recursive_tostring = false
+
     local function X_fallback_tostring(self)
          -- print("in X_fallback_tostring")
-         local object = self.object
-         if not object then
-             return debug.traceback("Kollos internal error: No object in X_fallback_tostring")
-         end
-         local desc = inspect(object, { depth = 3 })
-         local nl = ''
-         local where = self.where
-         if where then
-             if desc:sub(-1) ~= '\n' then nl = '\n' end
+         local desc
+         if _M.recursive_tostring then
+             desc = '[Recursive call of inspect]'
          else
-             where = ''
+             _M.recursive_tostring = 'X_fallback_tostring'
+             desc = inspect(self, { depth = 3 })
+             _M.recursive_tostring = false
          end
-         return desc .. nl .. where
+         local nl = ''
+         local where = ''
+         if type(self) == 'table' then
+             local where = self.where
+             if where and desc:sub(-1) ~= '\n' then
+                 nl = '\n'
+             end
+         end
+         local traceback = debug.traceback("Kollos internal error: bad exception object")
+         return desc .. nl .. where .. '\n' .. traceback
     end
 
     local function X_tostring(self)
          -- print("in X_tostring")
+         if type(self) ~= 'table' then
+              return X_fallback_tostring(self)
+         end
          local desc = self.msg
          local desc_type = type(desc)
-         if desc_type ~= "string" then
-             return debug.traceback(
-                 "Kollos internal error: Wrong type for string in X_tostring: "
-                 .. desc_type
-             )
+         if desc_type == "string" then
+             local nl = ''
+             local where = self.where
+             if where then
+                 if desc:sub(-1) ~= '\n' then nl = '\n' end
+             else
+                 where = ''
+             end
+             return desc .. nl .. where
          end
-         local nl = ''
-         local where = self.where
-         if where then
-             if desc:sub(-1) ~= '\n' then nl = '\n' end
-         else
-             where = ''
+
+         -- no `msg` so look for a code
+         local error_code = self.code
+         if error_code then
+              local description = _M.error_description(error_code)
+              local details = self.details
+              if details then
+                  return debug.traceback(details .. ': ' .. description)
+              end
+              return debug.traceback(description)
          end
-         return desc .. nl .. where
+
+         -- no `msg` or `code` so we fall back
+         return X_fallback_tostring(self)
+    end
+
+    local function error_tostring(self)
+         print("Calling error_tostring")
+         return '[error_tostring]'
     end
 
     _M.mt_X.__tostring = X_tostring
@@ -2089,7 +2118,7 @@ Functions for tracing Earley sets
         return result
     end
 
-    function _M.class_recce.earley_item_data(lmw_r, set_id, item_id)
+    function _M.class_recce.earley_item_data(lmw_r, item_id)
         local item_data = {}
         local lmw_g = lmw_r.lmw_g
 
@@ -2154,7 +2183,7 @@ Functions for tracing Earley sets
 
         local item_id = 0
         while true do
-            local item_data = lmw_r:earley_item_data(set_id, item_id)
+            local item_data = lmw_r:earley_item_data(item_id)
             if not item_data then break end
             data[#data+1] = item_data
             item_id = item_id + 1
@@ -3225,7 +3254,6 @@ Luacheck declarations
 
     -- miranda: insert error object code from okollos.c.lua
     -- miranda: insert base error handlers
-    -- miranda: insert error handlers
 
     -- miranda: insert utilities from okollos.c.lua
     -- miranda: insert utility function definitions
@@ -3286,8 +3314,6 @@ Luacheck declarations
     -- miranda: section private error code declarations
     /* error codes */
 
-    static char kollos_error_mt_key;
-
     struct s_libmarpa_error_code {
        lua_Integer code;
        const char* mnemonic;
@@ -3347,7 +3373,11 @@ Luacheck declarations
     static inline int lca_error_description_by_code(lua_State* L)
     {
        const lua_Integer error_code = marpa_luaL_checkinteger(L, 1);
-       push_error_description_by_code(L, error_code);
+       if (marpa_lua_isinteger(L, 1)) {
+           push_error_description_by_code(L, error_code);
+           return 1;
+       }
+       marpa_luaL_tolstring(L, 1, NULL);
        return 1;
     }
 
@@ -3506,10 +3536,11 @@ tree op.
     static inline void push_error_object(lua_State* L,
         lua_Integer code, const char* details)
     {
+      if (0) printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
        const int error_object_stack_ix = marpa_lua_gettop(L)+1;
        marpa_lua_newtable(L);
        /* [ ..., error_object ] */
-       marpa_lua_rawgetp(L, LUA_REGISTRYINDEX, &kollos_error_mt_key);
+       marpa_lua_rawgetp(L, LUA_REGISTRYINDEX, &kollos_X_mt_key);
        /* [ ..., error_object, error_metatable ] */
        marpa_lua_setmetatable(L, error_object_stack_ix);
        /* [ ..., error_object ] */
@@ -3521,86 +3552,6 @@ tree op.
        marpa_lua_pushstring(L, details);
        marpa_lua_setfield(L, error_object_stack_ix, "details" );
        /* [ ..., error_object ] */
-    }
-
-    -- miranda: section+ error handlers
-
-    /* Return string equivalent of error argument
-     */
-    static inline int lca_error_tostring(lua_State* L)
-    {
-      lua_Integer error_code = -1;
-      const int error_object_ix = 1;
-      const char *temp_string;
-
-      marpa_lua_getfield (L, error_object_ix, "string");
-
-      /* [ ..., error_object, string ] */
-
-      if (0) printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
-      /* If present, a "string" overrides everything else */
-      if (marpa_lua_isstring (L, -1))
-        {
-          marpa_lua_replace (L, error_object_ix);
-          return 1;
-        }
-
-      /* [ ..., error_object, bad-string ] */
-      marpa_lua_pop (L, 1);
-      /* [ ..., error_object ] */
-
-      marpa_lua_getfield (L, error_object_ix, "details");
-      /* [ ..., error_object, details ] */
-      if (marpa_lua_isstring (L, -1))
-        {
-          marpa_lua_pushstring (L, ": ");
-        }
-      else
-        {
-          marpa_lua_pop (L, 1);
-        }
-
-      /* [ ..., error_object ] */
-      marpa_lua_getfield (L, error_object_ix, "code");
-      /* [ ..., error_object, code ] */
-      if (0) printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
-      if (!marpa_lua_isnumber (L, -1))
-        {
-          marpa_lua_pop (L, 1);
-          marpa_lua_pushstring (L, "[No error code]");
-        }
-      else
-        {
-          error_code = marpa_lua_tointeger (L, -1);
-          /* Concatenation will eventually convert a numeric
-           * code on top of the stack to a string, so we do
-           * nothing with it here.
-           */
-        }
-
-      marpa_lua_pushstring (L, " ");        /* Add space separator */
-
-      temp_string = error_name_by_code (error_code);
-      if (temp_string)
-        {
-          marpa_lua_pushstring (L, temp_string);
-        }
-      else
-        {
-          marpa_lua_pushfstring (L, "Unknown error code (%d)", (int) error_code);
-        }
-      marpa_lua_pushstring (L, " ");        /* Add space separator */
-
-      /* Push the error description string */
-      push_error_description_by_code(L, error_code);
-      marpa_lua_pushstring (L, "\n");        /* Add space separator */
-
-      if (0) printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
-      marpa_lua_concat (L, marpa_lua_gettop (L) - error_object_ix);
-      /* stack is [ ..., error_object, concatenated_result ] */
-      marpa_lua_replace (L, error_object_ix);
-      /* [ ..., concatenated_result ] */
-      return 1;
     }
 
     -- miranda: section+ base error handlers
@@ -3692,11 +3643,15 @@ The "throw" flag is ignored.
       if (!throw_flag) {
           marpa_lua_pushnil(L);
       }
+      if (0) fprintf (stderr, "%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
       push_error_object(L, error_code, details);
+      if (0) fprintf (stderr, "%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
       /* [ ..., nil, error_object ] */
       marpa_lua_pushvalue(L, -1);
       marpa_lua_setfield(L, marpa_lua_upvalueindex(1), "error_object");
+      if (0) fprintf (stderr, "%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
       if (throw_flag) return marpa_lua_error(L);
+      if (0) fprintf (stderr, "%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
       return 2;
     }
 
@@ -4632,19 +4587,6 @@ Marpa::R3.
           marpa_lua_setfield(L, kollos_table_stack_ix, "class_slr");
           marpa_lua_pushvalue(L, kollos_table_stack_ix);
           marpa_lua_setfield(L, -2, "kollos");
-
-        /* Set up Kollos error handling metatable.
-           The metatable starts out empty.
-         */
-        marpa_lua_newtable (L);
-        /* [ kollos, error_mt ] */
-        marpa_lua_pushvalue (L, upvalue_stack_ix);
-        marpa_lua_pushcclosure (L, lca_error_tostring, 1);
-        /* [ kollos, error_mt, tostring_fn ] */
-        marpa_lua_setfield (L, -2, "__tostring");
-        /* [ kollos, error_mt ] */
-        marpa_lua_rawsetp (L, LUA_REGISTRYINDEX, &kollos_error_mt_key);
-        /* [ kollos ] */
 
         /* Set up Kollos grammar userdata metatable */
         marpa_lua_newtable (L);

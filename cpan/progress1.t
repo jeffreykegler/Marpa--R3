@@ -71,45 +71,46 @@ EOS
 Marpa::R3::Test::is( $grammar->show_irls,
     <<'EOS', 'Aycock/Horspool IRLs' );
 0: S -> A S[R0:1]
-1: S -> A A[] A[] A[]
+1: S -> A A[] A[] A[] A[] A[] A[]
 2: S -> A[] S[R0:1]
 3: S[R0:1] -> A S[R0:2]
-4: S[R0:1] -> A A[] A[]
+4: S[R0:1] -> A A[] A[] A[] A[] A[]
 5: S[R0:1] -> A[] S[R0:2]
-6: S[R0:2] -> A A
-7: S[R0:2] -> A A[]
-8: S[R0:2] -> A[] A
-9: A -> [Lex-0]
-10: [:start] -> S
-11: [:start]['] -> [:start]
+6: S[R0:2] -> A S[R0:3]
+7: S[R0:2] -> A A[] A[] A[] A[]
+8: S[R0:2] -> A[] S[R0:3]
+9: S[R0:3] -> A S[R0:4]
+10: S[R0:3] -> A A[] A[] A[]
+11: S[R0:3] -> A[] S[R0:4]
+12: S[R0:4] -> A S[R0:5]
+13: S[R0:4] -> A A[] A[]
+14: S[R0:4] -> A[] S[R0:5]
+15: S[R0:5] -> A A
+16: S[R0:5] -> A A[]
+17: S[R0:5] -> A[] A
+18: A -> [Lex-0]
+19: [:start] -> S
+20: [:start]['] -> [:start]
 EOS
 
 }
 
 my ($S_sym) = grep { $grammar->symbol_name($_) eq 'S' } $grammar->symbol_ids();
-say "S sym $S_sym";
 my ($S_rule) = grep { ($grammar->rule_expand($_))[0] eq $S_sym } $grammar->rule_ids();
-say "S rule $S_rule";
 
 my $recce = Marpa::R3::Scanless::R->new( {   grammar => $grammar });
 my $input_length = 7;
 my $input = ('a' x $input_length);
 $recce->read( \$input );
-# for my $earley_set (0 .. 7) {
-EARLEY_SET: for my $earley_set (7) {
+EARLEY_SET: for my $earley_set (0 .. 7) {
     say "=== Earley Set $earley_set->progress() ===";
     my @S_items = grep { $_->[0] eq $S_rule } @{$recce->progress($earley_set)};
-    say Data::Dumper::Dumper($recce->progress($earley_set));
+    # say Data::Dumper::Dumper($recce->progress($earley_set));
     for my $S_item (@S_items) {
         my ($rule_id, $dot, $origin) = @{$S_item};
         say "S:$dot " . '@' . "$origin-$earley_set " . $grammar->show_dotted_rule($rule_id, $dot);
     }
-    next EARLEY_SET;
-    say "=== Earley Set $earley_set->show_progress() ===";
-    say $recce->show_progress($earley_set);
-    say "=== Earley Set $earley_set->show_earley_set() ===";
-    say $recce->show_earley_set($earley_set);
-    say "===";
+
     my ($set_data) =
       $recce->call_by_tag(
     ('@' . __FILE__ . ':' . __LINE__),
@@ -118,7 +119,6 @@ EARLEY_SET: for my $earley_set (7) {
       local g1r = recce.lmw_g1r
       local g1g = recce.slg.lmw_g1g
       local result = {}
-      -- !!! NOT TESTED !!!
       g1r:earley_set_data(earley_set_id)
       for item_id = 0, math.maxinteger do
           local item_data = g1r:earley_item_data(item_id)
@@ -134,41 +134,6 @@ EARLEY_SET: for my $earley_set (7) {
       return result
 END_OF_LUA
     say Data::Dumper::Dumper($set_data);
-}
-
-exit 0;
-
-for my $earley_set_id (0 .. 7) {
-    my ($set_data) =
-      $recce->call_by_tag(
-    ('@' . __FILE__ . ':' . __LINE__),
-    <<'END_OF_LUA', 'i>2', $earley_set_id );
-      local recce, earley_set_id = ...
-      return recce:g1_earley_set_data(earley_set_id)
-END_OF_LUA
-
-    return if not $set_data;
-    my %set_data = @{$set_data};
-    my $current_earleme = $set_data{earleme};
-  EARLEY_ITEM: for ( my $item_id = 0 ; ; $item_id++ ) {
-
-        my $item_data = $set_data{ $item_id + 1 };
-        last EARLEY_ITEM if not defined $item_data;
-
-        my %item_data = @{$item_data};
-
-        my $irl_id       = $item_data{irl_id};
-        my $dot_position = $item_data{dot_position};
-        my $ahm_id_of_yim  = $item_data{ahm_id_of_yim};
-        my $origin_earleme = $item_data{origin_earleme};
-
-        say
-            qq{  }
-          . $irl_id . q{: } . '@' . $origin_earleme
-          . '-' . $earley_set_id . ' '
-          . $grammar->show_dotted_irl( $irl_id, $dot_position );
-
-    }
 }
 
 # vim: expandtab shiftwidth=4:

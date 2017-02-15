@@ -1922,6 +1922,7 @@ sub Marpa::R3::Scanless::G::l0_rule_expand {
 
 sub Marpa::R3::Scanless::G::symbol_name {
     my ( $slg, $symbol_id ) = @_;
+    $symbol_id += 0;
     return $slg->lmg_symbol_name('lmw_g1g', $symbol_id);
 }
 
@@ -2093,7 +2094,7 @@ END_OF_LUA
     if ($has_minimum) {
         @quantifier = ($minimum <= 0 ? q{*} : q{+} );
     }
-    $dot_position = 0 if $dot_position < 0;
+    $dot_position = $rhs_length + $dot_position + 1 if $dot_position < 0;
     if ($dot_position < $rhs_length) {
         splice @rhs, $dot_position, 0, q{.};
         return join q{ }, $lhs, q{->}, @rhs, @quantifier;
