@@ -127,9 +127,8 @@ EARLEY_SET: for my $earley_set (0 .. 7) {
       local g1g = recce.slg.lmw_g1g
       local xrl_data = {}
       local fmt = "jjj"
-      g1r:earley_set_data(earley_set_id)
       for item_id = 0, math.maxinteger do
-          local item_data = g1r:earley_item_data(item_id)
+          local item_data = g1r:earley_item_data(earley_set_id, item_id)
           if not item_data then break end
           local irl_id = item_data.irl_id
           if g1g:_irl_is_virtual_lhs(irl_id) ~= 0 then 
@@ -139,7 +138,7 @@ EARLEY_SET: for my $earley_set (0 .. 7) {
           local xrl = g1g:_source_xrl(irl_id)
           if not xrl then goto NEXT_ITEM end
           if xrl ~= S_rule then goto NEXT_ITEM end
-          -- print(inspect(item_data))
+          print(inspect(item_data))
           local key = string.pack(fmt,
               xrl, item_data.dot_position, item_data.origin_set_id)
           xrl_data[key] = true

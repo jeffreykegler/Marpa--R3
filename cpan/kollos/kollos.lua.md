@@ -967,10 +967,18 @@ inspect package to dump it.
          if error_code then
               local description = _M.error_description(error_code)
               local details = self.details
+              local pieces = {}
               if details then
-                  return debug.traceback(details .. ': ' .. description)
+                  pieces[#pieces+1] = details
+                  pieces[#pieces+1] = ': '
               end
-              return debug.traceback(description)
+              pieces[#pieces+1] = description
+              local where = self.where
+              if where then
+                  pieces[#pieces+1] = '\n'
+                  pieces[#pieces+1] = where
+              end
+              return table.concat(pieces)
          end
 
          -- no `msg` or `code` so we fall back
@@ -2118,9 +2126,12 @@ Functions for tracing Earley sets
         return result
     end
 
-    function _M.class_recce.earley_item_data(lmw_r, item_id)
+    function _M.class_recce.earley_item_data(lmw_r, set_id, item_id)
         local item_data = {}
         local lmw_g = lmw_r.lmw_g
+
+        local result = lmw_r:_earley_set_trace(set_id)
+        if not result then return end
 
         local ahm_id_of_yim = lmw_r:_earley_item_trace(item_id)
         if not ahm_id_of_yim then return end
@@ -2183,7 +2194,7 @@ Functions for tracing Earley sets
 
         local item_id = 0
         while true do
-            local item_data = lmw_r:earley_item_data(item_id)
+            local item_data = lmw_r:earley_item_data(set_id, item_id)
             if not item_data then break end
             data[#data+1] = item_data
             item_id = item_id + 1
@@ -3549,6 +3560,10 @@ tree op.
       if (0) printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
       if (0) printf ("%s code = %ld\n", __PRETTY_FUNCTION__, (long)code);
        /* [ ..., error_object ] */
+
+       marpa_luaL_traceback(L, L, NULL, 1);
+       marpa_lua_setfield(L, error_object_stack_ix, "where");
+
        marpa_lua_pushstring(L, details);
        marpa_lua_setfield(L, error_object_stack_ix, "details" );
        /* [ ..., error_object ] */

@@ -118,10 +118,9 @@ EARLEY_SET: for my $earley_set (7) {
       local g1r = recce.lmw_g1r
       local g1g = recce.slg.lmw_g1g
       local result = {}
-      -- !!! NOT TESTED !!!
-      g1r:earley_set_data(earley_set_id)
       for item_id = 0, math.maxinteger do
-          local item_data = g1r:earley_item_data(item_id)
+          -- !!! NOT TESTED !!!
+          local item_data = g1r:earley_item_data(earley_set_id, item_id)
           if not item_data then break end
           local irl_id = item_data.irl_id
           if g1g:_irl_is_virtual_lhs(irl_id) ~= 0 then 
