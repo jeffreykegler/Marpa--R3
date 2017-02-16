@@ -1954,8 +1954,10 @@ Constructor
 ```
     -- miranda: section+ grammar Libmarpa wrapper Lua functions
 
-    function _M.class_grammar.isy_name(lmw_g, nsy_id)
+    function _M.class_grammar.isy_name(lmw_g, nsy_id_arg)
          -- start symbol
+         local nsy_id = math.tointeger(nsy_id_arg)
+         if not nsy_id then error('Bad isy_name() symbol ID arg: ' .. inspect(nsy_id_arg)) end
          local nsy_is_start = 0 ~= lmw_g:_nsy_is_start(nsy_id)
          if nsy_is_start then
              local xsy_id = lmw_g:_source_xsy(nsy_id)

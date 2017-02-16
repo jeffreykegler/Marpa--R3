@@ -127,10 +127,24 @@ EARLEY_SET: for my $earley_set (0 .. 7) {
       local g1g = recce.slg.lmw_g1g
       local function origin_gen(item_data)
           local irl_id = item_data.irl_id
-          if g1g:_irl_is_virtual_lhs(irl_id) > 0 then 
-              return
+          local this_origin =  item_data.origin_set_id
+          if g1g:_irl_is_virtual_lhs(irl_id) == 0 then 
+              coroutine.yield( this_origin )
           end
-          coroutine.yield( item_data.origin_set_id )
+          g1r:_earley_set_trace(this_origin)
+          local lhs = g1g:_irl_lhs(irl_id)
+          print('irl: ', g1g:brief_irl(irl_id))
+          print('lhs: ', g1g:isy_name(lhs))
+          local pim_symbol = g1r:_postdot_symbol_trace(lhs)
+          if pim_symbol then
+              print('symbol for initial pim: ', g1g:isy_name(pim_symbol))
+          end
+          while pim_symbol do
+              print('pim symbol:', g1g:isy_name(pim_symbol))
+              local this_symbol = g1r:_postdot_item_symbol()
+              print('current symbol:', g1g:isy_name(this_symbol))
+              pim_symbol = g1r:_next_postdot_item_trace()
+          end
       end
       local function  origins(item_data)
           local co = coroutine.create(
@@ -138,6 +152,7 @@ EARLEY_SET: for my $earley_set (0 .. 7) {
           )
           return function ()
               local code, res = coroutine.resume(co)
+              if not code then error(res) end
               return res
           end
       end

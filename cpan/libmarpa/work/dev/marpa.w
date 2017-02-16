@@ -7049,7 +7049,7 @@ union u_postdot_item;
 struct s_earley_ix {
      union u_postdot_item* t_next;
      NSYID t_postdot_nsyid;
-     YIM t_earley_item; // Never NULL if this is an index item
+     YIM t_earley_item; // NULL iff this is a LIM
 };
 typedef struct s_earley_ix YIX_Object;
 
