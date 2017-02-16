@@ -116,7 +116,7 @@ EARLEY_SET: for my $earley_set (0 .. 7) {
     ('@' . __FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', 'ii', $earley_set, $S_rule );
       local recce, earley_set_id, S_rule = ...
-      local cmp = function(a, b)
+      local function cmp(a, b)
           for i = 1, #a do
              if a[i] < b[i] then return true end
              if a[i] > b[i] then return false end
@@ -125,23 +125,39 @@ EARLEY_SET: for my $earley_set (0 .. 7) {
       end
       local g1r = recce.lmw_g1r
       local g1g = recce.slg.lmw_g1g
+      local function origin_gen(item_data)
+          local irl_id = item_data.irl_id
+          if g1g:_irl_is_virtual_lhs(irl_id) > 0 then 
+              return
+          end
+          coroutine.yield( item_data.origin_set_id )
+      end
+      local function  origins(item_data)
+          local co = coroutine.create(
+              function () origin_gen(item_data) end
+          )
+          return function ()
+              local code, res = coroutine.resume(co)
+              return res
+          end
+      end
       local xrl_data = {}
       local fmt = "jjj"
       for item_id = 0, math.maxinteger do
           local item_data = g1r:earley_item_data(earley_set_id, item_id)
           if not item_data then break end
           local irl_id = item_data.irl_id
-          if g1g:_irl_is_virtual_lhs(irl_id) ~= 0 then 
-              goto NEXT_ITEM
-          end
-          local irl_lhs = g1g:_irl_lhs(irl_id)
           local xrl = g1g:_source_xrl(irl_id)
           if not xrl then goto NEXT_ITEM end
           if xrl ~= S_rule then goto NEXT_ITEM end
-          print(inspect(item_data))
-          local key = string.pack(fmt,
-              xrl, item_data.dot_position, item_data.origin_set_id)
-          xrl_data[key] = true
+          -- print(inspect(item_data))
+
+          for origin in origins(item_data) do
+              local key = string.pack(fmt,
+                  xrl, item_data.dot_position, item_data.origin_set_id)
+              xrl_data[key] = true
+          end
+
           ::NEXT_ITEM::
       end
       result = {}

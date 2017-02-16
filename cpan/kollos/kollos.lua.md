@@ -2138,10 +2138,13 @@ Functions for tracing Earley sets
 
         local origin_set_id  = lmw_r:_earley_item_origin()
         local origin_earleme = lmw_r:earleme(origin_set_id)
+        local current_earleme = lmw_r:earleme(set_id)
 
         local irl_id = lmw_g:_ahm_irl(ahm_id_of_yim)
         local dot_position = lmw_g:_ahm_position(ahm_id_of_yim)
 
+        item_data.current_set_id = set_id
+        item_data.current_earleme = current_earleme
         item_data.ahm_id_of_yim = ahm_id_of_yim
         item_data.origin_set_id = origin_set_id
         item_data.origin_earleme = origin_earleme
