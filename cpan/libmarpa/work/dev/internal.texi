@@ -56,23 +56,24 @@ Published @value{UPDATED} by Jeffrey Kegler
 @end ifnottex
 
 @menu
-* About this document::         
-* Internal Interface::          
+* About this document::
+* Internal Interface::
 
 @detailmenu
  --- The Detailed Node Listing ---
 
 Internal Interface
 
-* Symbol internal methods::     
-* Rule internals::              
-* Grammar internals::           
-* Recognizer internals::        
-* Bocage internals::            
-* Ordering internals::          
-* Tree internals::              
-* Valuator internals::          
-* Debugging methods::           
+* Symbol internal methods::
+* Rule internals::
+* Grammar internals::
+* Recognizer internals::
+* Bocage internals::
+* Ordering internals::
+* Tree internals::
+* Valuator internals::
+* Debugging methods::
+* Looker methods::
 
 @end detailmenu
 @end menu
@@ -100,15 +101,16 @@ but all applications
 should treat these methods as ``undocumented''.
 
 @menu
-* Symbol internal methods::     
-* Rule internals::              
-* Grammar internals::           
-* Recognizer internals::        
-* Bocage internals::            
-* Ordering internals::          
-* Tree internals::              
-* Valuator internals::          
-* Debugging methods::           
+* Symbol internal methods::
+* Rule internals::
+* Grammar internals::
+* Recognizer internals::
+* Bocage internals::
+* Ordering internals::
+* Tree internals::
+* Valuator internals::
+* Debugging methods::
+* Looker methods::
 @end menu
 
 @node Symbol internal methods, Rule internals, Internal Interface, Internal Interface
@@ -551,7 +553,7 @@ Return the is-predecessor bit for @var{nook_id}.
     Marpa_Value @var{v})
 @end deftypefun
 
-@node Debugging methods,  , Valuator internals, Internal Interface
+@node Debugging methods, Looker methods, Valuator internals, Internal Interface
 @section Debugging methods
 
 @deftypefun const char* _marpa_tag(void)
@@ -568,6 +570,16 @@ identical libraries is in use.
 @end deftypefun
 
 @deftypefun void marpa_debug_handler_set ( int (*@var{debug_handler})(const char*, ...) )
+@end deftypefun
+
+@node Looker methods,  , Debugging methods, Internal Interface
+@section Looker methods
+
+@deftypefun int _marpa_r_look_yim( @
+    Marpa_Recognizer @var{r}, @
+    Marpa_R_Look* @var{look}, @
+    Marpa_Earley_Set_ID @var{es_id}, @
+    Marpa_Earley_Item_ID @var{eim_id})
 @end deftypefun
 
 @bye

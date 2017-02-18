@@ -1,7 +1,7 @@
 ; DO NOT EDIT DIRECTLY.
 ; This file was automatically generated.
 ; This file is for the Microsoft linker.
-; Sat Feb 11 18:27:25 2017
+; Thu Feb 16 17:08:37 2017
 EXPORTS
    marpa_check_version
    marpa_version
@@ -209,3 +209,4 @@ EXPORTS
    _marpa_tag
    marpa_debug_level_set
    marpa_debug_handler_set
+   _marpa_r_look_yim

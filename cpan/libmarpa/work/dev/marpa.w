@@ -4893,7 +4893,9 @@ Raw position is the same as position except
 for completions, in which case it is the length of the IRL.
 @d Position_of_AHM(ahm) ((ahm)->t_position)
 @d Raw_Position_of_AHM(ahm)
-  (Position_of_AHM(ahm) < 0 ? Length_of_IRL(IRL_of_AHM(ahm)))
+  (Position_of_AHM(ahm) < 0
+    ? ((Length_of_IRL(IRL_of_AHM(ahm))) + Position_of_AHM(ahm) + 1)
+    : Position_of_AHM(ahm))
 @<Int aligned AHM elements@> =
 int t_position;
 
@@ -14801,7 +14803,15 @@ typedef const char* Marpa_Message_ID;
 
 @** Trace functions.
 
-@** Earley set trace functions.
+The ``trace '' functions were designed for just that --
+use in tracing and diagnostics.
+They were not designed for use in production -- they
+lack some of the efficiency and coverage needed.
+For the recognizer's trace functions,
+this intent is, in Kollos,
+to replace them
+with the ``looker'' functions.
+
 Many of the
 trace functions use
 a ``trace Earley set" which is
@@ -15014,7 +15024,7 @@ Marpa_Earley_Set_ID _marpa_r_earley_item_origin(Marpa_Recognizer r)
     return Origin_Ord_of_YIM(item);
 }
 
-@** Leo item (LIM) trace functions.
+@*0 Leo item (LIM) trace functions.
 The functions in this section are all accessors.
 The trace Leo item is selected by setting the trace postdot item
 to a Leo item.
@@ -16046,6 +16056,126 @@ int _marpa_t_nook_is_predecessor(Marpa_Tree t, int nook_id)
   @<Unpack tree objects@>@;
    @<Check |r| and |nook_id|; set |nook|@>@;
     return NOOK_is_Predecessor(nook);
+}
+
+@** Looker functions.
+
+The functions are intended as a run-time and
+production-quality way of examining the Earley tables.
+For the recognizer data, in Kollos,
+they will replace the ``trace'' functions.
+
+From the point of view of Libmarpa's users,
+Lookers must be used carefully.
+All looker function calls are mutators.
+In addition, the lookers have public accessor macros.
+Looker data can be safely accessed only via
+a looker accessor or the return value of a
+looker mutator.
+
+Before any other use of a looker can be made,
+its Earley set and Earley item
+must be initialized with 
+a |_marpa_r_look_yim| call.
+No recognizer mutator can be called between the call
+that initializes a looker, and any other looker
+mutator function or accessor macro.
+If necessary,
+a looker can be
+reinitialized with another |_marpa_r_look_yim| call.
+
+After any call to a looker function,
+only a specified set of accessors are valid.
+This is because the lookers mutators
+reuse data fields.
+
+@ @<Recognizer look common key fields@> =
+    Marpa_Earley_Set_ID t_rlook_ys_id;
+    Marpa_Earley_Item_ID t_rlook_yim_ord;
+    const char* t_rlook_error;
+
+@ @<Public structures@> =
+struct marpa_r_yim_look {
+    @<Recognizer look common key fields@>@;
+    Marpa_Earley_Set_ID t_yim_look_origin_id;
+    Marpa_Rule_ID t_yim_look_rule_id;
+    int t_yim_look_dot;
+};
+union marpa_r_look {
+    struct marpa_r_yim_look t_look_yim;
+};
+typedef union marpa_r_look Marpa_R_Look;
+
+@ The following two accessors are valid for every
+looker mutator.
+(Public defines use ``es'' instead of ``ys'' for Earley set
+and ``eim'' instead of ``yim'' for Earley item.)
+@<Public defines@> =
+#define marpa_look_es(l) ((l)->t_look_yim.t_rlook_ys_id)
+#define marpa_look_eim(l) ((l)->t_look_yim.t_rlook_yim_ord)
+#define marpa_look_error(l) ((l)->t_look_yim.t_rlook_error)
+
+@ These accessors are valid for |marpa_r_look_yim|.
+@<Public defines@> =
+#define marpa_look_rule(l) ((l)->t_look_yim.t_yim_look_rule_id)
+#define marpa_look_dot(l) ((l)->t_look_yim.t_yim_look_dot)
+#define marpa_look_origin(l) ((l)->t_look_yim.t_yim_look_origin_id)
+
+@ The YIM looker returns data specific to a YIM.
+It is also necessary before the use of any
+other looker accessor or mutator,
+to initializes the looker's Earley set
+and Earley item.
+
+@<Function definitions@> =
+int
+_marpa_r_look_yim(Marpa_Recognizer r, Marpa_R_Look* look,
+  Marpa_Earley_Set_ID es_id, Marpa_Earley_Item_ID eim_id)
+{
+  const int invalid = -1;
+  YS earley_set;
+  YIM earley_item;
+  YIM *earley_items;
+  AHM ahm;
+  @<Return |-2| on failure@>@;
+  @<Unpack recognizer objects@>@;
+
+  @t}\comment{@>
+  /* Set up default results */
+  marpa_look_dot(look) = -1;
+  marpa_look_rule(look) = -1;
+  marpa_look_origin(look) = -1;
+  marpa_look_error(look) = NULL;
+
+    if (es_id < 0)
+    {
+        MARPA_ERROR(MARPA_ERR_INVALID_LOCATION);
+        return failure_indicator;
+    }
+  r_update_earley_sets (r);
+    if (es_id >= MARPA_DSTACK_LENGTH (r->t_earley_set_stack))
+      {
+        marpa_look_error(look) = "unacceptable earley set";
+        return invalid;
+      }
+    earley_set = YS_of_R_by_Ord (r, es_id);
+  if (eim_id < 0)
+    {
+      MARPA_ERROR (MARPA_ERR_YIM_ID_INVALID);
+      return failure_indicator;
+    }
+  if (eim_id >= YIM_Count_of_YS (earley_set))
+    {
+      marpa_look_error(look) = "unacceptable earley item";
+      return invalid;
+    }
+  earley_items = YIMs_of_YS (earley_set);
+  earley_item = earley_items[eim_id];
+  ahm = AHM_of_YIM(earley_item);
+  marpa_look_dot(look) = Position_of_AHM(ahm);
+  marpa_look_rule(look) = IRLID_of_AHM(ahm);
+  marpa_look_origin(look) = Origin_Ord_of_YIM(earley_item);
+  return Raw_Position_of_AHM(ahm);
 }
 
 @** Debugging functions.
