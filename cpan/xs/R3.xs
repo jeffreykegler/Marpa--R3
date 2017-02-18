@@ -2552,13 +2552,10 @@ pos( outer_slr )
 PPCODE:
 {
   lua_Integer perl_pos;
-  Scanless_R *slr = slr_inner_get(outer_slr);
-
   call_by_tag (outer_slr->L, MYLUA_TAG,
       "local recce = ...\n"
       "return recce.perl_pos\n",
       "R>i", outer_slr->lua_ref, &perl_pos);
-
   XSRETURN_IV((IV)perl_pos);
 }
 

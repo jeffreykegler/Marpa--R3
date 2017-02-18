@@ -16128,54 +16128,66 @@ to initializes the looker's Earley set
 and Earley item.
 
 @<Function definitions@> =
+PRIVATE int look_yim(Marpa_R_Look* look,
+  YS earley_set, Marpa_Earley_Item_ID eim_id)
+{
+  YIM* earley_items = YIMs_of_YS (earley_set);
+  YIM earley_item = earley_items[eim_id];
+  AHM ahm = AHM_of_YIM(earley_item);
+  marpa_look_dot(look) = Position_of_AHM(ahm);
+  marpa_look_rule(look) = IRLID_of_AHM(ahm);
+  marpa_look_origin(look) = Origin_Ord_of_YIM(earley_item);
+  return Raw_Position_of_AHM(ahm);
+}
+
+@ This is the external wrapper of the YIM looker.
+
+@<Function definitions@> =
 int
 _marpa_r_look_yim(Marpa_Recognizer r, Marpa_R_Look* look,
   Marpa_Earley_Set_ID es_id, Marpa_Earley_Item_ID eim_id)
 {
-  const int invalid = -1;
+  const int soft_fail = -1;
+  int return_code = 0; // default to success
   YS earley_set;
-  YIM earley_item;
-  YIM *earley_items;
-  AHM ahm;
   @<Return |-2| on failure@>@;
   @<Unpack recognizer objects@>@;
-
-  @t}\comment{@>
-  /* Set up default results */
-  marpa_look_dot(look) = -1;
-  marpa_look_rule(look) = -1;
-  marpa_look_origin(look) = -1;
-  marpa_look_error(look) = NULL;
 
     if (es_id < 0)
     {
         MARPA_ERROR(MARPA_ERR_INVALID_LOCATION);
-        return failure_indicator;
+        return_code = failure_indicator;
+        goto FAIL;
     }
   r_update_earley_sets (r);
     if (es_id >= MARPA_DSTACK_LENGTH (r->t_earley_set_stack))
       {
         marpa_look_error(look) = "unacceptable earley set";
-        return invalid;
+        return_code = soft_fail;
+        goto FAIL;
       }
-    earley_set = YS_of_R_by_Ord (r, es_id);
+  earley_set = YS_of_R_by_Ord (r, es_id);
   if (eim_id < 0)
     {
       MARPA_ERROR (MARPA_ERR_YIM_ID_INVALID);
-      return failure_indicator;
+      return_code = failure_indicator;
+      goto FAIL;
     }
   if (eim_id >= YIM_Count_of_YS (earley_set))
     {
       marpa_look_error(look) = "unacceptable earley item";
-      return invalid;
+      return_code = soft_fail;
+      goto FAIL;
     }
-  earley_items = YIMs_of_YS (earley_set);
-  earley_item = earley_items[eim_id];
-  ahm = AHM_of_YIM(earley_item);
-  marpa_look_dot(look) = Position_of_AHM(ahm);
-  marpa_look_rule(look) = IRLID_of_AHM(ahm);
-  marpa_look_origin(look) = Origin_Ord_of_YIM(earley_item);
-  return Raw_Position_of_AHM(ahm);
+  if (!return_code) {
+    return look_yim(look, earley_set, eim_id);
+  }
+  FAIL:
+  marpa_look_dot(look) = -1;
+  marpa_look_rule(look) = -1;
+  marpa_look_origin(look) = -1;
+  marpa_look_error(look) = NULL;
+  return return_code;
 }
 
 @** Debugging functions.
