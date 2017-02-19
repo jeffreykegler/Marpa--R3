@@ -582,6 +582,12 @@ identical libraries is in use.
     Marpa_Earley_Item_ID @var{eim_id})
 @end deftypefun
 
+@deftypefun int _marpa_r_yim_check( @
+    Marpa_Recognizer @var{r}, @
+    Marpa_Earley_Set_ID @var{es_id}, @
+    Marpa_Earley_Item_ID @var{eim_id})
+@end deftypefun
+
 @bye
 
 @c vim: expandtab shiftwidth=4:

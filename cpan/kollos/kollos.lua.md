@@ -4177,11 +4177,21 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
         r = *(Marpa_Recce *) marpa_lua_touserdata (L, -1);
         es_id = (Marpa_Earley_Set_ID)marpa_luaL_checkinteger (L, 2);
         eim_id = (Marpa_Earley_Item_ID)marpa_luaL_checkinteger (L, 3);
-        raw_position = _marpa_r_look_yim(r, &look, es_id, eim_id);
-        if (raw_position == -1) {
+        check_result = marpa_r_yim_check(r, es_id, eim_id);
+        if (check_result <= -2) {
+           return libmarpa_error_handle (L, recce_stack_ix, "recce:progress_item()");
+        }
+        if (check_result == 0)
             marpa_lua_pushnil(L);
             return 1;
         }
+        if (check_result == -1)
+        {
+            return marpa_luaL_error(L, "yim_look(%d, %d): No such earley set",
+                es_id, eim_id);
+                case -2
+        }
+        raw_position = _marpa_r_look_yim(r, &look, es_id, eim_id);
         marpa_lua_pushinteger(L, (lua_Integer)marpa_look_rule(&look));
         marpa_lua_pushinteger(L, (lua_Integer)marpa_look_dot(&look));
         marpa_lua_pushinteger(L, (lua_Integer)marpa_look_origin(&look));

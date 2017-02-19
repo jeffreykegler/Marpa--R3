@@ -16086,37 +16086,28 @@ production-quality way of examining the Earley tables.
 For the recognizer data, in Kollos,
 they will replace the ``trace'' functions.
 
-From the point of view of Libmarpa's users,
-Lookers must be used carefully.
+Lookers are internal.
+Many Libmarpa internal calls currently do
+some checking of arguments.
+Libmarpa methods,
+including at least one of the looker methods,
+will do checking for the user.
+Callers of looker methods
+are required to ensure all necessary
+argument checking is done.
+
 All looker function calls are mutators.
 In addition, the lookers have public accessor macros.
 Looker data can be safely accessed only via
 a looker accessor or the return value of a
 looker mutator.
-
-Before any other use of a looker can be made,
-its Earley set and Earley item
-must be initialized with 
-a |_marpa_r_look_yim| call.
-No recognizer mutator can be called between the call
-that initializes a looker, and any other looker
-mutator function or accessor macro.
-If necessary,
-a looker can be
-reinitialized with another |_marpa_r_look_yim| call.
-
 After any call to a looker function,
 only a specified set of accessors are valid.
 This is because the lookers mutators
 reuse data fields.
 
-@ @<Recognizer look common key fields@> =
-    Marpa_Earley_Set_ID t_rlook_ys_id;
-    Marpa_Earley_Item_ID t_rlook_yim_ord;
-
-@ @<Public structures@> =
+@<Public structures@> =
 struct marpa_r_yim_look {
-    @<Recognizer look common key fields@>@;
     Marpa_Earley_Set_ID t_yim_look_origin_id;
     Marpa_Rule_ID t_yim_look_rule_id;
     int t_yim_look_dot;
@@ -16125,14 +16116,6 @@ union marpa_r_look {
     struct marpa_r_yim_look t_look_yim;
 };
 typedef union marpa_r_look Marpa_R_Look;
-
-@ The following two accessors are valid for every
-looker mutator.
-(Public defines use ``es'' instead of ``ys'' for Earley set
-and ``eim'' instead of ``yim'' for Earley item.)
-@<Public defines@> =
-#define marpa_look_es(l) ((l)->t_look_yim.t_rlook_ys_id)
-#define marpa_look_eim(l) ((l)->t_look_yim.t_rlook_yim_ord)
 
 @ These accessors are valid for |marpa_r_look_yim|.
 @<Public defines@> =
@@ -16160,35 +16143,54 @@ PRIVATE int look_yim(Marpa_R_Look* look,
 }
 
 @ This is the external wrapper of the YIM looker.
-
+Caller must ensure that its arguments are checked.
 @<Function definitions@> =
 int
 _marpa_r_look_yim(Marpa_Recognizer r, Marpa_R_Look* look,
   Marpa_Earley_Set_ID es_id, Marpa_Earley_Item_ID eim_id)
 {
-  const int soft_fail = -1;
-  YS earley_set;
-  @<Return |-2| on failure@>@;
-  @<Unpack recognizer objects@>@;
+  const YS earley_set = YS_of_R_by_Ord (r, es_id);
+  return look_yim(look, earley_set, eim_id);
+}
 
-  r_update_earley_sets (r);
-  if (es_id < 0 ||
-    es_id >= MARPA_DSTACK_LENGTH (r->t_earley_set_stack))
-    {
+@ This function is convenient for checking looker
+arguments.
+Returns 1 if all are OK, 0 if no such Earley item,
+-1 if no such Earley set.
+If Earley item or Earley set are malformed,
+or on other hard failure,
+returns -2.
+@<Function definitions@> =
+int
+_marpa_r_yim_check(Marpa_Recognizer r,
+  Marpa_Earley_Set_ID es_id, Marpa_Earley_Item_ID eim_id)
+{
+  YS earley_set;
+  @<Unpack recognizer objects@>@;
+  @<Return |-2| on failure@>@/
+
+  if (es_id < 0)
+  {
         MARPA_ERROR(MARPA_ERR_INVALID_LOCATION);
         return failure_indicator;
-    }
-  earley_set = YS_of_R_by_Ord (r, es_id);
+  }
   if (eim_id < 0)
     {
       MARPA_ERROR (MARPA_ERR_YIM_ID_INVALID);
       return failure_indicator;
+  }
+  r_update_earley_sets (r);
+  earley_set = YS_of_R_by_Ord (r, es_id);
+  if (es_id >= MARPA_DSTACK_LENGTH (r->t_earley_set_stack))
+    {
+        MARPA_ERROR(MARPA_ERR_INVALID_LOCATION);
+        return -1;
     }
   if (eim_id >= YIM_Count_of_YS (earley_set))
     {
-    return soft_fail;
+    return 0;
     }
-  return look_yim(look, earley_set, eim_id);
+  return 1;
 }
 
 @** Debugging functions.
