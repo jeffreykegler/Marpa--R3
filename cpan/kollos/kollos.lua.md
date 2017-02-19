@@ -4274,7 +4274,7 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
       { "error_code", lca_libmarpa_error_code },
       { "error_description", lca_libmarpa_error_description },
       { "terminals_expected", lca_recce_terminals_expected },
-      { "look_yim", lca_recce_look_yim },
+      { "earley_item_look", lca_recce_look_yim },
       { "progress_item", lca_recce_progress_item },
       { "_source_token", lca_recce_source_token },
       { NULL, NULL },

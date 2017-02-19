@@ -171,7 +171,7 @@
 #define MARPA_STEP_INITIAL 7
 
 /*1350:*/
-#line 16374 "./marpa.w"
+#line 16376 "./marpa.w"
 
 extern const int marpa_major_version;
 extern const int marpa_minor_version;
@@ -212,20 +212,20 @@ extern const int marpa_micro_version;
 #define marpa_v_es_id(v) ((v)->t_ys_id)
 
 /*:1046*//*1323:*/
-#line 16112 "./marpa.w"
+#line 16114 "./marpa.w"
 
 #define marpa_look_es(l) ((l)->t_look_yim.t_rlook_ys_id)
 #define marpa_look_eim(l) ((l)->t_look_yim.t_rlook_yim_ord)
 
 /*:1323*//*1324:*/
-#line 16117 "./marpa.w"
+#line 16119 "./marpa.w"
 
 #define marpa_look_rule(l) ((l)->t_look_yim.t_yim_look_rule_id)
 #define marpa_look_dot(l) ((l)->t_look_yim.t_yim_look_dot)
 #define marpa_look_origin(l) ((l)->t_look_yim.t_yim_look_origin_id)
 
 /*:1324*/
-#line 16379 "./marpa.w"
+#line 16381 "./marpa.w"
 
 /*47:*/
 #line 650 "./marpa.w"
@@ -264,7 +264,7 @@ typedef struct marpa_tree*Marpa_Tree;
 struct marpa_value;
 typedef struct marpa_value*Marpa_Value;
 /*:1041*/
-#line 16380 "./marpa.w"
+#line 16382 "./marpa.w"
 
 /*91:*/
 #line 919 "./marpa.w"
@@ -335,7 +335,7 @@ typedef int Marpa_Step_Type;
 typedef const char*Marpa_Message_ID;
 
 /*:1230*/
-#line 16381 "./marpa.w"
+#line 16383 "./marpa.w"
 
 /*44:*/
 #line 610 "./marpa.w"
@@ -380,17 +380,17 @@ Marpa_Earley_Set_ID t_rule_start_ys_id;
 Marpa_Earley_Set_ID t_ys_id;
 };
 /*:1045*//*1322:*/
-#line 16096 "./marpa.w"
+#line 16098 "./marpa.w"
 
 struct marpa_r_yim_look{
 /*1321:*/
-#line 16092 "./marpa.w"
+#line 16094 "./marpa.w"
 
 Marpa_Earley_Set_ID t_rlook_ys_id;
 Marpa_Earley_Item_ID t_rlook_yim_ord;
 
 /*:1321*/
-#line 16098 "./marpa.w"
+#line 16100 "./marpa.w"
 
 Marpa_Earley_Set_ID t_yim_look_origin_id;
 Marpa_Rule_ID t_yim_look_rule_id;
@@ -402,7 +402,7 @@ struct marpa_r_yim_look t_look_yim;
 typedef union marpa_r_look Marpa_R_Look;
 
 /*:1322*/
-#line 16382 "./marpa.w"
+#line 16384 "./marpa.w"
 
 /*1229:*/
 #line 14798 "./marpa.w"
@@ -410,14 +410,14 @@ typedef union marpa_r_look Marpa_R_Look;
 extern void*(*const marpa__out_of_memory)(void);
 
 /*:1229*//*1327:*/
-#line 16179 "./marpa.w"
+#line 16181 "./marpa.w"
 
 extern int marpa__default_debug_handler(const char*format,...);
 extern int(*marpa__debug_handler)(const char*,...);
 extern int marpa__debug_level;
 
 /*:1327*/
-#line 16383 "./marpa.w"
+#line 16385 "./marpa.w"
 
 
 /*:1350*/

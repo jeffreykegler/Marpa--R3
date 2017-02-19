@@ -15120,6 +15120,7 @@ _marpa_r_postdot_symbol_trace (Marpa_Recognizer r,
   YS current_ys = r->t_trace_earley_set;
   PIM* pim_nsy_p;
   PIM pim;
+  NSYID nsy_id;
   @<Unpack recognizer objects@>@;
   @<Clear trace postdot item data@>@;
   @<Fail if not trace-safe@>@;
@@ -15129,12 +15130,13 @@ _marpa_r_postdot_symbol_trace (Marpa_Recognizer r,
       MARPA_ERROR(MARPA_ERR_NO_TRACE_YS);
       return failure_indicator;
   }
-  pim_nsy_p = PIM_NSY_P_of_YS_by_NSYID(current_ys, NSYID_by_XSYID(xsy_id));
+  nsy_id = NSYID_by_XSYID(xsy_id);
+  pim_nsy_p = PIM_NSY_P_of_YS_by_NSYID(current_ys, nsy_id);
   pim = *pim_nsy_p;
   if (!pim) return -1;
   r->t_trace_pim_nsy_p = pim_nsy_p;
   r->t_trace_postdot_item = pim;
-  return xsy_id;
+  return nsy_id;
 }
 
 @ @<Clear trace postdot item data@> =

@@ -127,7 +127,7 @@ EARLEY_SET: for my $earley_set (0 .. 7) {
       local g1g = recce.slg.lmw_g1g
       local function origin_gen(es_id, eim_id)
           local irl_id, dot, this_origin
-              = g1r:yim_look(earley_set_id, item_id)
+              = g1r:earley_item_look(es_id, eim_id)
           if g1g:_irl_is_virtual_lhs(irl_id) == 0 then 
               coroutine.yield( this_origin )
           end
@@ -142,7 +142,7 @@ EARLEY_SET: for my $earley_set (0 .. 7) {
           while pim_symbol do
               print('pim symbol:', g1g:isy_name(pim_symbol))
               local this_symbol = g1r:_postdot_item_symbol()
-              print('current symbol:', g1g:isy_name(this_symbol))
+              print('current symbol:', this_symbol, g1g:isy_name(this_symbol))
               pim_symbol = g1r:_next_postdot_item_trace()
           end
       end
@@ -159,16 +159,15 @@ EARLEY_SET: for my $earley_set (0 .. 7) {
       local xrl_data = {}
       local fmt = "jjj"
       for item_id = 0, math.maxinteger do
-          local irl_id, dot, origin = g1r:yim_look(earley_set_id, item_id)
+          local irl_id, dot, origin = g1r:earley_item_look(earley_set_id, item_id)
           if not irl_id then break end
           local xrl = g1g:_source_xrl(irl_id)
           if not xrl then goto NEXT_ITEM end
           if xrl ~= S_rule then goto NEXT_ITEM end
           -- print(inspect(item_data))
 
-          for origin in origins(item_data) do
-              local key = string.pack(fmt,
-                  xrl, item_data.dot_position, item_data.origin_set_id)
+          for origin in origins(earley_set_id, item_id) do
+              local key = string.pack(fmt, xrl, dot, origin)
               xrl_data[key] = true
           end
 
