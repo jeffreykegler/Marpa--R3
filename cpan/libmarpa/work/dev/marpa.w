@@ -16162,7 +16162,7 @@ _marpa_r_look_yim(Marpa_Recognizer r, Marpa_R_Look* look,
   r_update_earley_sets (r);
     if (es_id >= MARPA_DSTACK_LENGTH (r->t_earley_set_stack))
       {
-        marpa_look_error(look) = "unacceptable earley set";
+        marpa_look_error(look) = "unknown earley set";
         return_code = soft_fail;
         goto FAIL;
       }
@@ -16175,7 +16175,7 @@ _marpa_r_look_yim(Marpa_Recognizer r, Marpa_R_Look* look,
     }
   if (eim_id >= YIM_Count_of_YS (earley_set))
     {
-      marpa_look_error(look) = "unacceptable earley item";
+      marpa_look_error(look) = "unknown earley item";
       return_code = soft_fail;
       goto FAIL;
     }

@@ -29,15 +29,17 @@ cd kollos && ../lua/lua toc.lua < kollos.lua.md
 * [Development Notes](#development-notes)
   * [To Do](#to-do)
     * [TODO notes](#todo-notes)
-  * [Factoring out Kollos packages](#factoring-out-kollos-packages)
+  * [Use generations in Libmarpa trees](#use-generations-in-libmarpa-trees)
   * [Kollos assumes core libraries are loaded](#kollos-assumes-core-libraries-are-loaded)
   * [Kollos assumes global name "kollos"](#kollos-assumes-global-name-kollos)
   * [New lexer features](#new-lexer-features)
+  * [Discard events](#discard-events)
 * [Kollos object](#kollos-object)
 * [Kollos registry objects](#kollos-registry-objects)
 * [Kollos SLIF grammar object](#kollos-slif-grammar-object)
 * [Kollos SLIF recognizer object](#kollos-slif-recognizer-object)
   * [Constructor](#constructor)
+  * [Reading](#reading)
   * [Locations](#locations)
   * [Events](#events)
   * [Progress reporting](#progress-reporting)
@@ -4163,9 +4165,32 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
         /* [ userdata ] */
     }
 
-    /* recognizer wrappers which need to be hand-written */
+    static int lca_recce_look_yim(lua_State *L)
+    {
+        const int recce_stack_ix = 1;
+        Marpa_Recce r;
+        Marpa_R_Look look;
+        Marpa_Earley_Set_ID es_id;
+        Marpa_Earley_Item_ID eim_id;
+        int raw_position;
 
-    /* The grammar error code */
+        marpa_lua_getfield (L, recce_stack_ix, "_libmarpa");
+        r = *(Marpa_Recce *) marpa_lua_touserdata (L, -1);
+        es_id = (Marpa_Earley_Set_ID)marpa_luaL_checkinteger (L, 2);
+        eim_id = (Marpa_Earley_Item_ID)marpa_luaL_checkinteger (L, 3);
+        raw_position = _marpa_r_look_yim(r, &look, es_id, eim_id);
+        if (raw_position == -1) {
+            const char* msg = marpa_look_error(&look);
+            marpa_lua_pushnil(L);
+            marpa_lua_pushstring(L, msg);
+            return 2;
+        }
+        marpa_lua_pushinteger(L, (lua_Integer)marpa_look_rule(&look));
+        marpa_lua_pushinteger(L, (lua_Integer)marpa_look_dot(&look));
+        marpa_lua_pushinteger(L, (lua_Integer)marpa_look_origin(&look));
+        return 3;
+    }
+
     static int lca_recce_progress_item(lua_State *L)
     {
       /* [ recce_object ] */
@@ -4252,6 +4277,7 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
       { "error_code", lca_libmarpa_error_code },
       { "error_description", lca_libmarpa_error_description },
       { "terminals_expected", lca_recce_terminals_expected },
+      { "look_yim", lca_recce_look_yim },
       { "progress_item", lca_recce_progress_item },
       { "_source_token", lca_recce_source_token },
       { NULL, NULL },
