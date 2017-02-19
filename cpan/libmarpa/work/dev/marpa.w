@@ -16092,7 +16092,6 @@ reuse data fields.
 @ @<Recognizer look common key fields@> =
     Marpa_Earley_Set_ID t_rlook_ys_id;
     Marpa_Earley_Item_ID t_rlook_yim_ord;
-    const char* t_rlook_error;
 
 @ @<Public structures@> =
 struct marpa_r_yim_look {
@@ -16113,7 +16112,6 @@ and ``eim'' instead of ``yim'' for Earley item.)
 @<Public defines@> =
 #define marpa_look_es(l) ((l)->t_look_yim.t_rlook_ys_id)
 #define marpa_look_eim(l) ((l)->t_look_yim.t_rlook_yim_ord)
-#define marpa_look_error(l) ((l)->t_look_yim.t_rlook_error)
 
 @ These accessors are valid for |marpa_r_look_yim|.
 @<Public defines@> =
@@ -16148,46 +16146,28 @@ _marpa_r_look_yim(Marpa_Recognizer r, Marpa_R_Look* look,
   Marpa_Earley_Set_ID es_id, Marpa_Earley_Item_ID eim_id)
 {
   const int soft_fail = -1;
-  int return_code = 0; // default to success
   YS earley_set;
   @<Return |-2| on failure@>@;
   @<Unpack recognizer objects@>@;
 
-    if (es_id < 0)
+  r_update_earley_sets (r);
+  if (es_id < 0 ||
+    es_id >= MARPA_DSTACK_LENGTH (r->t_earley_set_stack))
     {
         MARPA_ERROR(MARPA_ERR_INVALID_LOCATION);
-        return_code = failure_indicator;
-        goto FAIL;
+        return failure_indicator;
     }
-  r_update_earley_sets (r);
-    if (es_id >= MARPA_DSTACK_LENGTH (r->t_earley_set_stack))
-      {
-        marpa_look_error(look) = "unknown earley set";
-        return_code = soft_fail;
-        goto FAIL;
-      }
   earley_set = YS_of_R_by_Ord (r, es_id);
   if (eim_id < 0)
     {
       MARPA_ERROR (MARPA_ERR_YIM_ID_INVALID);
-      return_code = failure_indicator;
-      goto FAIL;
+      return failure_indicator;
     }
   if (eim_id >= YIM_Count_of_YS (earley_set))
     {
-      marpa_look_error(look) = "unknown earley item";
-      return_code = soft_fail;
-      goto FAIL;
+    return soft_fail;
     }
-  if (!return_code) {
-    return look_yim(look, earley_set, eim_id);
-  }
-  FAIL:
-  marpa_look_dot(look) = -1;
-  marpa_look_rule(look) = -1;
-  marpa_look_origin(look) = -1;
-  marpa_look_error(look) = NULL;
-  return return_code;
+  return look_yim(look, earley_set, eim_id);
 }
 
 @** Debugging functions.

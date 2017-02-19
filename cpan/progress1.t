@@ -125,9 +125,9 @@ EARLEY_SET: for my $earley_set (0 .. 7) {
       end
       local g1r = recce.lmw_g1r
       local g1g = recce.slg.lmw_g1g
-      local function origin_gen(item_data)
-          local irl_id = item_data.irl_id
-          local this_origin =  item_data.origin_set_id
+      local function origin_gen(es_id, eim_id)
+          local irl_id, dot, this_origin
+              = g1r:yim_look(earley_set_id, item_id)
           if g1g:_irl_is_virtual_lhs(irl_id) == 0 then 
               coroutine.yield( this_origin )
           end
@@ -146,9 +146,9 @@ EARLEY_SET: for my $earley_set (0 .. 7) {
               pim_symbol = g1r:_next_postdot_item_trace()
           end
       end
-      local function  origins(item_data)
+      local function  origins(es_id, eim_id)
           local co = coroutine.create(
-              function () origin_gen(item_data) end
+              function () origin_gen(es_id, eim_id) end
           )
           return function ()
               local code, res = coroutine.resume(co)
@@ -159,9 +159,8 @@ EARLEY_SET: for my $earley_set (0 .. 7) {
       local xrl_data = {}
       local fmt = "jjj"
       for item_id = 0, math.maxinteger do
-          local item_data = g1r:earley_item_data(earley_set_id, item_id)
-          if not item_data then break end
-          local irl_id = item_data.irl_id
+          local irl_id, dot, origin = g1r:yim_look(earley_set_id, item_id)
+          if not irl_id then break end
           local xrl = g1g:_source_xrl(irl_id)
           if not xrl then goto NEXT_ITEM end
           if xrl ~= S_rule then goto NEXT_ITEM end

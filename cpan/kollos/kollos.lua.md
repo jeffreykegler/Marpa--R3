@@ -3554,7 +3554,6 @@ tree op.
     static inline void push_error_object(lua_State* L,
         lua_Integer code, const char* details)
     {
-      if (0) printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
        const int error_object_stack_ix = marpa_lua_gettop(L)+1;
        marpa_lua_newtable(L);
        /* [ ..., error_object ] */
@@ -4180,10 +4179,8 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
         eim_id = (Marpa_Earley_Item_ID)marpa_luaL_checkinteger (L, 3);
         raw_position = _marpa_r_look_yim(r, &look, es_id, eim_id);
         if (raw_position == -1) {
-            const char* msg = marpa_look_error(&look);
             marpa_lua_pushnil(L);
-            marpa_lua_pushstring(L, msg);
-            return 2;
+            return 1;
         }
         marpa_lua_pushinteger(L, (lua_Integer)marpa_look_rule(&look));
         marpa_lua_pushinteger(L, (lua_Integer)marpa_look_dot(&look));
