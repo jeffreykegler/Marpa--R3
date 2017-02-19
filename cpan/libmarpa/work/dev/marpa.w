@@ -781,6 +781,8 @@ PRIVATE int xsy_id_is_valid(GRAMMAR g, XSYID xsy_id)
 }
 
 @ Check that internal symbol is in valid range.
+@d NSYID_is_Malformed(nsy_id) ((nsy_id) < 0)
+@d NSYID_of_G_Exists(nsy_id) ((nsy_id) < NSY_Count_of_G(g))
 @<Function definitions@> =
 PRIVATE int nsy_is_valid(GRAMMAR g, NSYID nsyid)
 {
@@ -14590,11 +14592,25 @@ if (_MARPA_UNLIKELY(!XSYID_of_G_Exists(xsy_id))) {
     MARPA_ERROR (MARPA_ERR_NO_SUCH_SYMBOL_ID);
     return failure_indicator;
 }
+
 @ @<Fail if |nsy_id| is invalid@> =
 if (_MARPA_UNLIKELY(!nsy_is_valid(g, nsy_id))) {
     MARPA_ERROR(MARPA_ERR_INVALID_NSYID);
     return failure_indicator;
 }
+@ @<Fail if |nsy_id| is malformed@> =
+if (_MARPA_UNLIKELY(NSYID_is_Malformed(nsy_id))) {
+    MARPA_ERROR(MARPA_ERR_INVALID_SYMBOL_ID);
+    return failure_indicator;
+}
+@ Fail with |-1| for well-formed,
+but non-existent symbol ID.
+@<Soft fail if |nsy_id| does not exist@> =
+if (_MARPA_UNLIKELY(!NSYID_of_G_Exists(nsy_id))) {
+    MARPA_ERROR (MARPA_ERR_NO_SUCH_SYMBOL_ID);
+    return -1;
+}
+
 @ @<Fail if |irl_id| is invalid@> =
 if (_MARPA_UNLIKELY(!IRLID_of_G_is_Valid(irl_id))) {
     MARPA_ERROR (MARPA_ERR_INVALID_IRLID);
@@ -15101,9 +15117,14 @@ union u_postdot_item* t_trace_postdot_item;
 r->t_trace_pim_nsy_p = NULL;
 r->t_trace_postdot_item = NULL;
 @ |marpa_r_postdot_symbol_trace|
-takes a recognizer and a symbol ID
+takes a recognizer and an internal symbol ID
 as an argument.
-It sets the trace postdot item to the first
+(Note untested previous versions used an
+external symbol ID, which was inconsistent
+with the rest of the interface.)
+
+|marpa_r_postdot_symbol_trace|
+sets the trace postdot item to the first
 postdot item for the symbol ID.
 If there is no postdot item
 for that symbol ID,
@@ -15114,23 +15135,21 @@ and clears the trace postdot item.
 @<Function definitions@> =
 Marpa_Symbol_ID
 _marpa_r_postdot_symbol_trace (Marpa_Recognizer r,
-    Marpa_Symbol_ID xsy_id)
+    Marpa_Symbol_ID nsy_id)
 {
   @<Return |-2| on failure@>@;
   YS current_ys = r->t_trace_earley_set;
   PIM* pim_nsy_p;
   PIM pim;
-  NSYID nsy_id;
   @<Unpack recognizer objects@>@;
   @<Clear trace postdot item data@>@;
   @<Fail if not trace-safe@>@;
-    @<Fail if |xsy_id| is malformed@>@;
-    @<Soft fail if |xsy_id| does not exist@>@;
+  @<Fail if |nsy_id| is malformed@>@;
+  @<Soft fail if |nsy_id| does not exist@>@;
   if (!current_ys) {
       MARPA_ERROR(MARPA_ERR_NO_TRACE_YS);
       return failure_indicator;
   }
-  nsy_id = NSYID_by_XSYID(xsy_id);
   pim_nsy_p = PIM_NSY_P_of_YS_by_NSYID(current_ys, nsy_id);
   pim = *pim_nsy_p;
   if (!pim) return -1;
