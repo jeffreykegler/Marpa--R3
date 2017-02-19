@@ -577,7 +577,7 @@ identical libraries is in use.
 
 @deftypefun int _marpa_r_look_yim( @
     Marpa_Recognizer @var{r}, @
-    Marpa_R_Look* @var{look}, @
+    Marpa_Earley_Item_Look* @var{look}, @
     Marpa_Earley_Set_ID @var{es_id}, @
     Marpa_Earley_Item_ID @var{eim_id})
 @end deftypefun

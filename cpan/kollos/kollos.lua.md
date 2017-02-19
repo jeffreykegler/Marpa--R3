@@ -4168,33 +4168,31 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
     {
         const int recce_stack_ix = 1;
         Marpa_Recce r;
-        Marpa_R_Look look;
+        Marpa_Earley_Item_Look look;
         Marpa_Earley_Set_ID es_id;
         Marpa_Earley_Item_ID eim_id;
-        int raw_position;
+        int check_result;
 
         marpa_lua_getfield (L, recce_stack_ix, "_libmarpa");
         r = *(Marpa_Recce *) marpa_lua_touserdata (L, -1);
         es_id = (Marpa_Earley_Set_ID)marpa_luaL_checkinteger (L, 2);
         eim_id = (Marpa_Earley_Item_ID)marpa_luaL_checkinteger (L, 3);
-        check_result = marpa_r_yim_check(r, es_id, eim_id);
+        check_result = _marpa_r_yim_check(r, es_id, eim_id);
         if (check_result <= -2) {
            return libmarpa_error_handle (L, recce_stack_ix, "recce:progress_item()");
         }
-        if (check_result == 0)
+        if (check_result == 0) {
             marpa_lua_pushnil(L);
             return 1;
         }
-        if (check_result == -1)
-        {
+        if (check_result == -1) {
             return marpa_luaL_error(L, "yim_look(%d, %d): No such earley set",
                 es_id, eim_id);
-                case -2
         }
-        raw_position = _marpa_r_look_yim(r, &look, es_id, eim_id);
-        marpa_lua_pushinteger(L, (lua_Integer)marpa_look_rule(&look));
-        marpa_lua_pushinteger(L, (lua_Integer)marpa_look_dot(&look));
-        marpa_lua_pushinteger(L, (lua_Integer)marpa_look_origin(&look));
+        (void) _marpa_r_look_yim(r, &look, es_id, eim_id);
+        marpa_lua_pushinteger(L, (lua_Integer)marpa_eim_look_rule(&look));
+        marpa_lua_pushinteger(L, (lua_Integer)marpa_eim_look_dot(&look));
+        marpa_lua_pushinteger(L, (lua_Integer)marpa_eim_look_origin(&look));
         return 3;
     }
 

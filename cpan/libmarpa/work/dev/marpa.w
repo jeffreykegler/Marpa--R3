@@ -6670,7 +6670,7 @@ typedef struct s_earley_set_key YSK_Object;
 @ @<Private structures@> =
 struct s_earley_set {
     YSK_Object t_key;
-    union u_postdot_item** t_postdot_ary;
+    PIM* t_postdot_ary;
     YS t_next_earley_set;
     @<Widely aligned Earley set elements@>@;
     int t_postdot_sym_count;
@@ -7048,10 +7048,9 @@ a postdot symbol.
 @<Private incomplete structures@> =
 struct s_earley_ix;
 typedef struct s_earley_ix* YIX;
-union u_postdot_item;
 @ @<Private structures@> =
 struct s_earley_ix {
-     union u_postdot_item* t_next;
+     PIM t_next;
      NSYID t_postdot_nsyid;
      YIM t_earley_item; // NULL iff this is a LIM
 };
@@ -7119,13 +7118,18 @@ for each Earley set.
 @d PIM_of_LIM(pim) ((PIM)(pim))
 @d PIM_is_LIM(pim) (YIM_of_YIX(YIX_of_PIM(pim)) == NULL)
 @s PIM int
-@<Private structures@> =
-union u_postdot_item {
+@<Public incomplete structures@> =
+union _Marpa_PIM_Object;
+@ @<Public typedefs@> =
+typedef union _Marpa_PIM_Object* _Marpa_PIM;
+@ @<Private unions@> =
+union _Marpa_PIM_Object {
     LIM_Object t_leo;
     YIX_Object t_earley;
 };
-typedef union u_postdot_item PIM_Object;
-typedef union u_postdot_item* PIM;
+@ @<Private typedefs@> =
+typedef union _Marpa_PIM_Object PIM_Object;
+typedef union _Marpa_PIM_Object* PIM;
 
 @ This function searches for the
 first postdot item for an Earley set
@@ -15111,8 +15115,8 @@ a ``trace postdot item".
 This is
 tracked on a per-recognizer basis.
 @<Widely aligned recognizer elements@> =
-union u_postdot_item** t_trace_pim_nsy_p;
-union u_postdot_item* t_trace_postdot_item;
+PIM* t_trace_pim_nsy_p;
+PIM t_trace_postdot_item;
 @ @<Initialize recognizer elements@> =
 r->t_trace_pim_nsy_p = NULL;
 r->t_trace_postdot_item = NULL;
@@ -16107,21 +16111,18 @@ This is because the lookers mutators
 reuse data fields.
 
 @<Public structures@> =
-struct marpa_r_yim_look {
+struct s_marpa_yim_look {
     Marpa_Earley_Set_ID t_yim_look_origin_id;
     Marpa_Rule_ID t_yim_look_rule_id;
     int t_yim_look_dot;
 };
-union marpa_r_look {
-    struct marpa_r_yim_look t_look_yim;
-};
-typedef union marpa_r_look Marpa_R_Look;
+typedef struct s_marpa_yim_look Marpa_Earley_Item_Look;
 
 @ These accessors are valid for |marpa_r_look_yim|.
 @<Public defines@> =
-#define marpa_look_rule(l) ((l)->t_look_yim.t_yim_look_rule_id)
-#define marpa_look_dot(l) ((l)->t_look_yim.t_yim_look_dot)
-#define marpa_look_origin(l) ((l)->t_look_yim.t_yim_look_origin_id)
+#define marpa_eim_look_rule(l) ((l)->t_yim_look_rule_id)
+#define marpa_eim_look_dot(l) ((l)->t_yim_look_dot)
+#define marpa_eim_look_origin(l) ((l)->t_yim_look_origin_id)
 
 @ The YIM looker returns data specific to a YIM.
 It is also necessary before the use of any
@@ -16130,15 +16131,15 @@ to initializes the looker's Earley set
 and Earley item.
 
 @<Function definitions@> =
-PRIVATE int look_yim(Marpa_R_Look* look,
+PRIVATE int look_yim(Marpa_Earley_Item_Look* look,
   YS earley_set, Marpa_Earley_Item_ID eim_id)
 {
   YIM* earley_items = YIMs_of_YS (earley_set);
   YIM earley_item = earley_items[eim_id];
   AHM ahm = AHM_of_YIM(earley_item);
-  marpa_look_dot(look) = Position_of_AHM(ahm);
-  marpa_look_rule(look) = IRLID_of_AHM(ahm);
-  marpa_look_origin(look) = Origin_Ord_of_YIM(earley_item);
+  marpa_eim_look_dot(look) = Position_of_AHM(ahm);
+  marpa_eim_look_rule(look) = IRLID_of_AHM(ahm);
+  marpa_eim_look_origin(look) = Origin_Ord_of_YIM(earley_item);
   return Raw_Position_of_AHM(ahm);
 }
 
@@ -16146,7 +16147,7 @@ PRIVATE int look_yim(Marpa_R_Look* look,
 Caller must ensure that its arguments are checked.
 @<Function definitions@> =
 int
-_marpa_r_look_yim(Marpa_Recognizer r, Marpa_R_Look* look,
+_marpa_r_look_yim(Marpa_Recognizer r, Marpa_Earley_Item_Look* look,
   Marpa_Earley_Set_ID es_id, Marpa_Earley_Item_ID eim_id)
 {
   const YS earley_set = YS_of_R_by_Ord (r, es_id);
@@ -16192,6 +16193,21 @@ _marpa_r_yim_check(Marpa_Recognizer r,
     }
   return 1;
 }
+
+@ The structure for looking at PIM data.
+Eventually there will be a lot of fields for LIM data.
+|t_pim_eim_id| is $-1$ if PIM is a LIM,
+otherwise it is the ordinal of the EIM.
+@<Public structures@> =
+struct s_marpa_pim_look {
+    _Marpa_PIM t_next_pim;
+    Marpa_Earley_Item_ID t_pim_eim_id;
+};
+typedef struct s_marpa_pim_look Marpa_Postdot_Item_Look;
+
+@ These accessors are valid for |marpa_r_look_pim|.
+@<Public defines@> =
+#define marpa_pim_look_eim(l) ((l)->t_pim_look_eim_id)
 
 @** Debugging functions.
 Much of the debugging logic is in other documents.
@@ -16370,6 +16386,7 @@ So I add such a comment.
 @<Private typedefs@>@;
 @<Private utility structures@>@;
 @<Private structures@>@;
+@<Private unions@>@;
 
 @ To preserve thread-safety,
 global variables are either constants,
