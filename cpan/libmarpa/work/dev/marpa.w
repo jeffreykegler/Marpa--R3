@@ -16194,6 +16194,15 @@ _marpa_r_yim_check(Marpa_Recognizer r,
   return 1;
 }
 
+@*0 Basic PIM Looker functions.
+
+@ The only PIM looker functions at the moment
+are ``basic''.
+They return data only for PIMs chains which do
+not contain a LIM.
+For efficiency, they use the fact that the LIMs
+come first in a PIM chain.
+
 @ The structure for looking at PIM data.
 Eventually there will be a lot of fields for LIM data.
 |t_pim_eim_id| is $-1$ if PIM is a LIM,
@@ -16205,12 +16214,21 @@ struct s_marpa_pim_look {
 };
 typedef struct s_marpa_pim_look Marpa_Postdot_Item_Look;
 
-@ These accessors are valid for |marpa_r_look_pim|.
+@ These accessors are valid for |marpa_r_look_pim_eim_first|
+and |marpa_r_look_pim_eim_next|.
 @<Public defines@> =
 #define marpa_pim_look_eim(l) ((l)->t_pim_look_eim_id)
 
 @ Return the first Earley Item ID from a PIM chain.
 Caller must ensure that its arguments are checked.
+
+On success, returns the Earley item index,
+and sets up the field in the |look| structure.
+If there is no PIM chain for |es_id| and |nsy_id|,
+returns -1.
+If this PIM chain contains a LIM,
+returns -1.
+
 @<Private function prototypes@> =
 int
 _marpa_r_look_pim_eim_first(Marpa_Recognizer r, Marpa_Postdot_Item_Look* look,
@@ -16226,17 +16244,47 @@ _marpa_r_look_pim_eim_first(Marpa_Recognizer r, Marpa_Postdot_Item_Look* look,
     const YS earley_set = YS_of_R_by_Ord (r, es_id);
     YIM earley_item = NULL;
     PIM pim = First_PIM_of_YS_by_NSYID (earley_set, nsy_id);
-    while (pim) {
-        earley_item = YIM_of_PIM (pim);
-        if (earley_item)
-            break;
-        pim = Next_PIM_of_PIM (pim);
-    }
-    if (earley_item) {
-        look->t_pim_look_current = pim;
-        earley_item_ix = Ord_of_YIM (earley_item);
-        marpa_pim_look_eim (look) = earley_item_ix;
-    }
+    if (!pim) return -1;
+    earley_item = YIM_of_PIM (pim);
+    if (!earley_item) return -1;
+    look->t_pim_look_current = pim;
+    earley_item_ix = Ord_of_YIM (earley_item);
+    marpa_pim_look_eim (look) = earley_item_ix;
+    return earley_item_ix;
+}
+
+@ Return the data for the next PIM from a PIM chain.
+Caller must ensure that its arguments are checked.
+|look| must have been initialized by a previous call
+to |_marpa_r_look_pim_eim_first|.
+
+On success, returns the Earley item index,
+and sets up the field in the |look| structure.
+If there is no next PIM,
+returns -1.
+|_marpa_r_look_pim_eim_first| should soft fail if there
+is a LIM in this PIM chain but,
+just in case,
+|_marpa_r_look_pim_eim_next| soft fails and returns -1
+if this PIM chain contains a LIM.
+@<Private function prototypes@> =
+int
+_marpa_r_look_pim_eim_next(Marpa_Postdot_Item_Look* look);
+@ This function is prototyped here rather than
+the internal.texi file.
+@<Function definitions@> =
+int
+_marpa_r_look_pim_eim_next(Marpa_Postdot_Item_Look* look)
+{
+    int earley_item_ix = -1;
+    YIM earley_item = NULL;
+    PIM pim = Next_PIM_of_PIM (look->t_pim_look_current);
+    if (!pim) return -1;
+    earley_item = YIM_of_PIM (pim);
+    if (!earley_item) return -1;
+    look->t_pim_look_current = pim;
+    earley_item_ix = Ord_of_YIM (earley_item);
+    marpa_pim_look_eim (look) = earley_item_ix;
     return earley_item_ix;
 }
 

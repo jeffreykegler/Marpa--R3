@@ -170,8 +170,8 @@
 #define MARPA_STEP_INTERNAL2 6
 #define MARPA_STEP_INITIAL 7
 
-/*1357:*/
-#line 16446 "./marpa.w"
+/*1361:*/
+#line 16494 "./marpa.w"
 
 extern const int marpa_major_version;
 extern const int marpa_minor_version;
@@ -218,13 +218,13 @@ extern const int marpa_micro_version;
 #define marpa_eim_look_dot(l) ((l)->t_yim_look_dot)
 #define marpa_eim_look_origin(l) ((l)->t_yim_look_origin_id)
 
-/*:1326*//*1331:*/
-#line 16209 "./marpa.w"
+/*:1326*//*1333:*/
+#line 16219 "./marpa.w"
 
 #define marpa_pim_look_eim(l) ((l)->t_pim_look_eim_id)
 
-/*:1331*/
-#line 16451 "./marpa.w"
+/*:1333*/
+#line 16499 "./marpa.w"
 
 /*47:*/
 #line 650 "./marpa.w"
@@ -267,7 +267,7 @@ typedef struct marpa_tree*Marpa_Tree;
 struct marpa_value;
 typedef struct marpa_value*Marpa_Value;
 /*:1044*/
-#line 16452 "./marpa.w"
+#line 16500 "./marpa.w"
 
 /*91:*/
 #line 921 "./marpa.w"
@@ -342,7 +342,7 @@ typedef int Marpa_Step_Type;
 typedef const char*Marpa_Message_ID;
 
 /*:1235*/
-#line 16453 "./marpa.w"
+#line 16501 "./marpa.w"
 
 /*44:*/
 #line 610 "./marpa.w"
@@ -396,8 +396,8 @@ int t_yim_look_dot;
 };
 typedef struct s_marpa_yim_look Marpa_Earley_Item_Look;
 
-/*:1325*//*1330:*/
-#line 16201 "./marpa.w"
+/*:1325*//*1332:*/
+#line 16210 "./marpa.w"
 
 struct s_marpa_pim_look{
 _Marpa_PIM t_pim_look_current;
@@ -405,26 +405,26 @@ Marpa_Earley_Item_ID t_pim_look_eim_id;
 };
 typedef struct s_marpa_pim_look Marpa_Postdot_Item_Look;
 
-/*:1330*/
-#line 16454 "./marpa.w"
+/*:1332*/
+#line 16502 "./marpa.w"
 
 /*1234:*/
 #line 14818 "./marpa.w"
 
 extern void*(*const marpa__out_of_memory)(void);
 
-/*:1234*//*1334:*/
-#line 16249 "./marpa.w"
+/*:1234*//*1338:*/
+#line 16297 "./marpa.w"
 
 extern int marpa__default_debug_handler(const char*format,...);
 extern int(*marpa__debug_handler)(const char*,...);
 extern int marpa__debug_level;
 
-/*:1334*/
-#line 16455 "./marpa.w"
+/*:1338*/
+#line 16503 "./marpa.w"
 
 
-/*:1357*/
+/*:1361*/
 
 #line 1 "./marpa.h.p80"
 Marpa_Error_Code marpa_check_version (int required_major, int required_minor, int required_micro );
