@@ -171,7 +171,7 @@
 #define MARPA_STEP_INITIAL 7
 
 /*1361:*/
-#line 16494 "./marpa.w"
+#line 16493 "./marpa.w"
 
 extern const int marpa_major_version;
 extern const int marpa_minor_version;
@@ -224,7 +224,7 @@ extern const int marpa_micro_version;
 #define marpa_pim_look_eim(l) ((l)->t_pim_look_eim_id)
 
 /*:1333*/
-#line 16499 "./marpa.w"
+#line 16498 "./marpa.w"
 
 /*47:*/
 #line 650 "./marpa.w"
@@ -267,7 +267,7 @@ typedef struct marpa_tree*Marpa_Tree;
 struct marpa_value;
 typedef struct marpa_value*Marpa_Value;
 /*:1044*/
-#line 16500 "./marpa.w"
+#line 16499 "./marpa.w"
 
 /*91:*/
 #line 921 "./marpa.w"
@@ -342,7 +342,7 @@ typedef int Marpa_Step_Type;
 typedef const char*Marpa_Message_ID;
 
 /*:1235*/
-#line 16501 "./marpa.w"
+#line 16500 "./marpa.w"
 
 /*44:*/
 #line 610 "./marpa.w"
@@ -406,7 +406,7 @@ Marpa_Earley_Item_ID t_pim_look_eim_id;
 typedef struct s_marpa_pim_look Marpa_Postdot_Item_Look;
 
 /*:1332*/
-#line 16502 "./marpa.w"
+#line 16501 "./marpa.w"
 
 /*1234:*/
 #line 14818 "./marpa.w"
@@ -421,6 +421,20 @@ extern int(*marpa__debug_handler)(const char*,...);
 extern int marpa__debug_level;
 
 /*:1338*/
+#line 16502 "./marpa.w"
+
+/*1334:*/
+#line 16232 "./marpa.w"
+
+int
+_marpa_r_look_pim_eim_first(Marpa_Recognizer r,Marpa_Postdot_Item_Look*look,
+Marpa_Earley_Set_ID es_id,Marpa_Symbol_ID nsy_id);
+/*:1334*//*1336:*/
+#line 16270 "./marpa.w"
+
+int
+_marpa_r_look_pim_eim_next(Marpa_Postdot_Item_Look*look);
+/*:1336*/
 #line 16503 "./marpa.w"
 
 

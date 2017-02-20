@@ -16229,7 +16229,7 @@ returns -1.
 If this PIM chain contains a LIM,
 returns -1.
 
-@<Private function prototypes@> =
+@<Public function prototypes@> =
 int
 _marpa_r_look_pim_eim_first(Marpa_Recognizer r, Marpa_Postdot_Item_Look* look,
   Marpa_Earley_Set_ID es_id, Marpa_Symbol_ID nsy_id);
@@ -16267,7 +16267,7 @@ is a LIM in this PIM chain but,
 just in case,
 |_marpa_r_look_pim_eim_next| soft fails and returns -1
 if this PIM chain contains a LIM.
-@<Private function prototypes@> =
+@<Public function prototypes@> =
 int
 _marpa_r_look_pim_eim_next(Marpa_Postdot_Item_Look* look);
 @ This function is prototyped here rather than
@@ -16466,7 +16466,6 @@ So I add such a comment.
 @<Private utility structures@>@;
 @<Private structures@>@;
 @<Private unions@>@;
-@<Private function prototypes@>@;
 
 @ To preserve thread-safety,
 global variables are either constants,
@@ -16501,6 +16500,7 @@ extern const int marpa_micro_version;
 @<Public typedefs@>@;
 @<Public structures@>@;
 @<Debugging variable declarations@>@;
+@<Public function prototypes@>@;
 
 @** Index.
 

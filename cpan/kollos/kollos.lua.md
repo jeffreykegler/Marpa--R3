@@ -4196,6 +4196,64 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
         return 3;
     }
 
+```
+
+For an Earley set, call it `es`,
+and an internal symbol, call it `sym`,
+`lca_recce_postdot_eims` returns
+a sequence containing
+the Earley items in `es` whose
+postdot symbol is `sym`.
+If there are none, an empty table
+is returned.
+
+```
+    -- miranda: section+ non-standard wrappers
+    static int lca_recce_postdot_eims(lua_State *L)
+    {
+        const int recce_stack_ix = 1;
+        Marpa_Recce r;
+        Marpa_Postdot_Item_Look look;
+        Marpa_Earley_Set_ID es_id;
+        Marpa_Symbol_ID isy_id;
+        int check_result;
+        int table_ix;
+        int eim_index;
+
+        marpa_lua_getfield (L, recce_stack_ix, "_libmarpa");
+        r = *(Marpa_Recce *) marpa_lua_touserdata (L, -1);
+        es_id = (Marpa_Earley_Set_ID) marpa_luaL_checkinteger (L, 2);
+        isy_id = (Marpa_Symbol_ID) marpa_luaL_checkinteger (L, 3);
+        /* Every Earley set should contain an EIM #0 */
+        check_result = _marpa_r_yim_check (r, es_id, 0);
+        if (check_result <= -2) {
+            return libmarpa_error_handle (L, recce_stack_ix,
+                "recce:postdot_eims()");
+        }
+        if (check_result == 0) {
+            marpa_lua_pushnil (L);
+            return 1;
+        }
+        if (check_result == -1) {
+            return marpa_luaL_error (L, "yim_look(%d, %d): No such earley set",
+                es_id, 0);
+        }
+        marpa_lua_newtable (L);
+        table_ix = 1;
+        eim_index = _marpa_r_look_pim_eim_first (r, &look, es_id, isy_id);
+        while (eim_index >= 0) {
+            marpa_lua_pushinteger (L, (lua_Integer) eim_index);
+            marpa_lua_rawseti (L, -2, table_ix);
+            table_ix++;
+            eim_index = _marpa_r_look_pim_eim_next (&look);
+        }
+        return 1;
+    }
+
+```
+
+```
+    -- miranda: section+ non-standard wrappers
     static int lca_recce_progress_item(lua_State *L)
     {
       /* [ recce_object ] */
@@ -4283,6 +4341,7 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
       { "error_description", lca_libmarpa_error_description },
       { "terminals_expected", lca_recce_terminals_expected },
       { "earley_item_look", lca_recce_look_yim },
+      { "postdot_eims", lca_recce_postdot_eims },
       { "progress_item", lca_recce_progress_item },
       { "_source_token", lca_recce_source_token },
       { NULL, NULL },
