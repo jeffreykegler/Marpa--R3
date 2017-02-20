@@ -7116,7 +7116,7 @@ for each Earley set.
 @ |PIM_of_LIM| assumes that PIM is in fact a LIM.
 |PIM_is_LIM| is available to check this.
 @d PIM_of_LIM(pim) ((PIM)(pim))
-@d PIM_is_LIM(pim) (YIM_of_YIX(YIX_of_PIM(pim)) == NULL)
+@d PIM_is_LIM(pim) (YIM_of_PIM(pim) == NULL)
 @s PIM int
 @<Public incomplete structures@> =
 union _Marpa_PIM_Object;
@@ -16200,14 +16200,45 @@ Eventually there will be a lot of fields for LIM data.
 otherwise it is the ordinal of the EIM.
 @<Public structures@> =
 struct s_marpa_pim_look {
-    _Marpa_PIM t_next_pim;
-    Marpa_Earley_Item_ID t_pim_eim_id;
+    _Marpa_PIM t_pim_look_current;
+    Marpa_Earley_Item_ID t_pim_look_eim_id;
 };
 typedef struct s_marpa_pim_look Marpa_Postdot_Item_Look;
 
 @ These accessors are valid for |marpa_r_look_pim|.
 @<Public defines@> =
 #define marpa_pim_look_eim(l) ((l)->t_pim_look_eim_id)
+
+@ Return the first Earley Item ID from a PIM chain.
+Caller must ensure that its arguments are checked.
+@<Private function prototypes@> =
+int
+_marpa_r_look_pim_eim_first(Marpa_Recognizer r, Marpa_Postdot_Item_Look* look,
+  Marpa_Earley_Set_ID es_id, Marpa_Symbol_ID nsy_id);
+@ This function is prototyped here rather than
+the internal.texi file.
+@<Function definitions@> =
+int
+_marpa_r_look_pim_eim_first(Marpa_Recognizer r, Marpa_Postdot_Item_Look* look,
+  Marpa_Earley_Set_ID es_id, Marpa_Symbol_ID nsy_id)
+{
+    int earley_item_ix = -1;
+    const YS earley_set = YS_of_R_by_Ord (r, es_id);
+    YIM earley_item = NULL;
+    PIM pim = First_PIM_of_YS_by_NSYID (earley_set, nsy_id);
+    while (pim) {
+        earley_item = YIM_of_PIM (pim);
+        if (earley_item)
+            break;
+        pim = Next_PIM_of_PIM (pim);
+    }
+    if (earley_item) {
+        look->t_pim_look_current = pim;
+        earley_item_ix = Ord_of_YIM (earley_item);
+        marpa_pim_look_eim (look) = earley_item_ix;
+    }
+    return earley_item_ix;
+}
 
 @** Debugging functions.
 Much of the debugging logic is in other documents.
@@ -16387,6 +16418,7 @@ So I add such a comment.
 @<Private utility structures@>@;
 @<Private structures@>@;
 @<Private unions@>@;
+@<Private function prototypes@>@;
 
 @ To preserve thread-safety,
 global variables are either constants,
