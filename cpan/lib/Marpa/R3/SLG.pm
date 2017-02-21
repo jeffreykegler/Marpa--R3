@@ -2494,12 +2494,7 @@ sub Marpa::R3::Scanless::G::show_ahms {
 	<<'END_OF_LUA', '' );
     local grammar = ...
     local g1g = grammar.lmw_g1g
-    local pieces = {}
-    local count = g1g:_ahm_count()
-    for i = 0, count -1 do
-        pieces[#pieces+1] = g1g:show_ahm(i)
-    end
-    return table.concat(pieces)
+    return g1g:show_ahms()
 END_OF_LUA
 
     return $text;

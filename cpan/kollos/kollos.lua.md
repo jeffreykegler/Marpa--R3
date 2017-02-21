@@ -2013,6 +2013,15 @@ Constructor
         return table.concat(pieces)
     end
 
+    function _M.class_grammar.show_ahms(lmw_g)
+        local pieces = {}
+        local count = lmw_g:_ahm_count()
+        for i = 0, count -1 do
+            pieces[#pieces+1] = lmw_g:show_ahm(i)
+        end
+        return table.concat(pieces)
+    end
+
     function _M.class_grammar.show_isy(lmw_g, isy_id)
         local name = lmw_g:isy_name(isy_id)
         local pieces = { string.format("%d: %s", isy_id, name) }
@@ -4243,14 +4252,14 @@ is returned.
         marpa_lua_newtable (L);
         table_ix = 1;
         eim_index = _marpa_r_look_pim_eim_first (r, &look, es_id, isy_id);
-        if (1) fprintf (stderr, "%s %s %d eim_index=%ld\n", __PRETTY_FUNCTION__, __FILE__, __LINE__, (long)eim_index);
+        if (0) fprintf (stderr, "%s %s %d eim_index=%ld\n", __PRETTY_FUNCTION__, __FILE__, __LINE__, (long)eim_index);
         while (eim_index >= 0) {
             marpa_lua_pushinteger (L, (lua_Integer) eim_index);
             marpa_lua_rawseti (L, -2, table_ix);
             table_ix++;
             eim_index = _marpa_r_look_pim_eim_next (&look);
-            if (1) fprintf (stderr, "%s %s %d eim_index=%ld\n", __PRETTY_FUNCTION__, __FILE__, __LINE__, (long)eim_index);
-            if (1) fprintf (stderr, "%s %s %d tos=%ld\n", __PRETTY_FUNCTION__, __FILE__, __LINE__, (long)marpa_lua_gettop(L));
+            if (0) fprintf (stderr, "%s %s %d eim_index=%ld\n", __PRETTY_FUNCTION__, __FILE__, __LINE__, (long)eim_index);
+            if (0) fprintf (stderr, "%s %s %d tos=%ld\n", __PRETTY_FUNCTION__, __FILE__, __LINE__, (long)marpa_lua_gettop(L));
         }
         return 1;
     }

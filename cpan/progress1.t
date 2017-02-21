@@ -132,12 +132,11 @@ EARLEY_SET: for my $earley_set (0 .. 7) {
               = g1r:earley_item_look(es_id, eim_id)
           if rule_id < 0 then return end
           if g1g:_irl_is_virtual_lhs(irl_id) == 0 then 
-              print(string.format("adding origin %d for %s", this_origin, g1g:show_dotted_irl(irl_id, irl_dot)))
               coroutine.yield( this_origin )
           end
           local lhs = g1g:_irl_lhs(irl_id)
           local eims = g1r:postdot_eims(this_origin, lhs)
-          print('eims: ', inspect(eims))
+          -- print('eims: ', inspect(eims))
           for ix = 1, #eims do
               origin_gen(this_origin, eims[ix])
           end
@@ -155,13 +154,16 @@ EARLEY_SET: for my $earley_set (0 .. 7) {
       local xrl_data = {}
       local fmt = "jjj"
       for item_id = 0, math.maxinteger do
-          local rule_id, dot, origin = g1r:earley_item_look(earley_set_id, item_id)
+          -- IRL data for debugging only -- delete
+          local rule_id, dot, origin, irl_id, irl_dot = g1r:earley_item_look(earley_set_id, item_id)
           if rule_id < 0 then break end
           if rule_id ~= S_rule then goto NEXT_ITEM end
           -- print(inspect(item_data))
 
           for origin in origins(earley_set_id, item_id) do
-              print(string.format('origin for %d:%d', earley_set_id, item_id), inspect(origin))
+              print(string.format('origin for %d:%d, dot=%d', earley_set_id, item_id, dot), inspect(origin))
+              print(string.format("   adding origin %d for %s", origin, g1g:show_dotted_irl(irl_id, irl_dot)))
+              print(string.format("   xrl is %d:%d; length=%d", rule_id, dot, g1g:rule_length(rule_id)))
               local key = string.pack(fmt, rule_id, dot, origin)
               xrl_data[key] = true
           end
