@@ -4190,10 +4190,12 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
                 es_id, eim_id);
         }
         (void) _marpa_r_look_yim(r, &look, es_id, eim_id);
-        marpa_lua_pushinteger(L, (lua_Integer)marpa_eim_look_rule(&look));
+        marpa_lua_pushinteger(L, (lua_Integer)marpa_eim_look_rule_id(&look));
         marpa_lua_pushinteger(L, (lua_Integer)marpa_eim_look_dot(&look));
         marpa_lua_pushinteger(L, (lua_Integer)marpa_eim_look_origin(&look));
-        return 3;
+        marpa_lua_pushinteger(L, (lua_Integer)marpa_eim_look_irl_id(&look));
+        marpa_lua_pushinteger(L, (lua_Integer)marpa_eim_look_irl_dot(&look));
+        return 5;
     }
 
 ```

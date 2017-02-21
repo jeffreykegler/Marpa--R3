@@ -5208,6 +5208,7 @@ XRL position is complicated to compute,
 and it depends on XRL -- in particular if
 the XRL is |NULL|, XRL position is not defined.
 @d XRL_of_AHM(ahm) ((ahm)->t_xrl)
+@d XRLID_of_AHM(ahm) (ID_of_XRL(XRL_of_AHM(ahm)))
 @<Widely aligned AHM elements@> =
    XRL t_xrl;
 @ @d XRL_Position_of_AHM(ahm) ((ahm)->t_xrl_position)
@@ -16112,17 +16113,21 @@ reuse data fields.
 
 @<Public structures@> =
 struct s_marpa_yim_look {
-    Marpa_Earley_Set_ID t_yim_look_origin_id;
     Marpa_Rule_ID t_yim_look_rule_id;
     int t_yim_look_dot;
+    Marpa_Earley_Set_ID t_yim_look_origin_id;
+    Marpa_IRL_ID t_yim_look_irl_id;
+    int t_yim_look_irl_dot;
 };
 typedef struct s_marpa_yim_look Marpa_Earley_Item_Look;
 
 @ These accessors are valid for |marpa_r_look_yim|.
 @<Public defines@> =
-#define marpa_eim_look_rule(l) ((l)->t_yim_look_rule_id)
+#define marpa_eim_look_rule_id(l) ((l)->t_yim_look_rule_id)
 #define marpa_eim_look_dot(l) ((l)->t_yim_look_dot)
 #define marpa_eim_look_origin(l) ((l)->t_yim_look_origin_id)
+#define marpa_eim_look_irl_id(l) ((l)->t_yim_look_irl_id)
+#define marpa_eim_look_irl_dot(l) ((l)->t_yim_look_irl_dot)
 
 @ The YIM looker returns data specific to a YIM.
 It is also necessary before the use of any
@@ -16137,10 +16142,12 @@ PRIVATE int look_yim(Marpa_Earley_Item_Look* look,
   YIM* earley_items = YIMs_of_YS (earley_set);
   YIM earley_item = earley_items[eim_id];
   AHM ahm = AHM_of_YIM(earley_item);
-  marpa_eim_look_dot(look) = Position_of_AHM(ahm);
-  marpa_eim_look_rule(look) = IRLID_of_AHM(ahm);
+  marpa_eim_look_rule_id(look) = XRLID_of_AHM(ahm);
+  marpa_eim_look_dot(look) = XRL_Position_of_AHM(ahm);
   marpa_eim_look_origin(look) = Origin_Ord_of_YIM(earley_item);
-  return Raw_Position_of_AHM(ahm);
+  marpa_eim_look_irl_id(look) = IRLID_of_AHM(ahm);
+  marpa_eim_look_irl_dot(look) = Position_of_AHM(ahm);
+  return Raw_XRL_Position_of_AHM(ahm);
 }
 
 @ This is the external wrapper of the YIM looker.

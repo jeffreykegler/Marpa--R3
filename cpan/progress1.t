@@ -126,24 +126,16 @@ EARLEY_SET: for my $earley_set (0 .. 7) {
       local g1r = recce.lmw_g1r
       local g1g = recce.slg.lmw_g1g
       local function origin_gen(es_id, eim_id)
-          local irl_id, dot, this_origin
+          local rule_id, dot, this_origin, irl_id
               = g1r:earley_item_look(es_id, eim_id)
+          if rule_id < 0 then return end
           if g1g:_irl_is_virtual_lhs(irl_id) == 0 then 
               coroutine.yield( this_origin )
           end
-          g1r:_earley_set_trace(this_origin)
           local lhs = g1g:_irl_lhs(irl_id)
-          print('irl: ', g1g:brief_irl(irl_id))
-          print('lhs: ', g1g:isy_name(lhs))
-          local pim_symbol = g1r:_postdot_symbol_trace(lhs)
-          if pim_symbol then
-              print('symbol for initial pim: ', g1g:isy_name(pim_symbol))
-          end
-          while pim_symbol do
-              print('pim symbol:', g1g:isy_name(pim_symbol))
-              local this_symbol = g1r:_postdot_item_symbol()
-              print('current symbol:', this_symbol, g1g:isy_name(this_symbol))
-              pim_symbol = g1r:_next_postdot_item_trace()
+          local eims = g1r:postdot_eims(this_origin, lhs)
+          for ix = 1, #eims do
+              origin_gen(this_origin, eims[ix])
           end
       end
       local function  origins(es_id, eim_id)
@@ -159,15 +151,13 @@ EARLEY_SET: for my $earley_set (0 .. 7) {
       local xrl_data = {}
       local fmt = "jjj"
       for item_id = 0, math.maxinteger do
-          local irl_id, dot, origin = g1r:earley_item_look(earley_set_id, item_id)
-          if not irl_id then break end
-          local xrl = g1g:_source_xrl(irl_id)
-          if not xrl then goto NEXT_ITEM end
-          if xrl ~= S_rule then goto NEXT_ITEM end
+          local rule_id, dot, origin = g1r:earley_item_look(earley_set_id, item_id)
+          if rule_id < 0 then break end
+          if rule_id ~= S_rule then goto NEXT_ITEM end
           -- print(inspect(item_data))
 
           for origin in origins(earley_set_id, item_id) do
-              local key = string.pack(fmt, xrl, dot, origin)
+              local key = string.pack(fmt, rule_id, dot, origin)
               xrl_data[key] = true
           end
 
