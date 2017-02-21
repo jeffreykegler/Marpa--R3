@@ -170,8 +170,8 @@
 #define MARPA_STEP_INTERNAL2 6
 #define MARPA_STEP_INITIAL 7
 
-/*1361:*/
-#line 16493 "./marpa.w"
+/*1363:*/
+#line 16501 "./marpa.w"
 
 extern const int marpa_major_version;
 extern const int marpa_minor_version;
@@ -218,13 +218,13 @@ extern const int marpa_micro_version;
 #define marpa_eim_look_dot(l) ((l)->t_yim_look_dot)
 #define marpa_eim_look_origin(l) ((l)->t_yim_look_origin_id)
 
-/*:1326*//*1333:*/
-#line 16219 "./marpa.w"
+/*:1326*//*1335:*/
+#line 16227 "./marpa.w"
 
 #define marpa_pim_look_eim(l) ((l)->t_pim_look_eim_id)
 
-/*:1333*/
-#line 16498 "./marpa.w"
+/*:1335*/
+#line 16506 "./marpa.w"
 
 /*47:*/
 #line 650 "./marpa.w"
@@ -267,7 +267,7 @@ typedef struct marpa_tree*Marpa_Tree;
 struct marpa_value;
 typedef struct marpa_value*Marpa_Value;
 /*:1044*/
-#line 16499 "./marpa.w"
+#line 16507 "./marpa.w"
 
 /*91:*/
 #line 921 "./marpa.w"
@@ -342,7 +342,7 @@ typedef int Marpa_Step_Type;
 typedef const char*Marpa_Message_ID;
 
 /*:1235*/
-#line 16500 "./marpa.w"
+#line 16508 "./marpa.w"
 
 /*44:*/
 #line 610 "./marpa.w"
@@ -396,8 +396,8 @@ int t_yim_look_dot;
 };
 typedef struct s_marpa_yim_look Marpa_Earley_Item_Look;
 
-/*:1325*//*1332:*/
-#line 16210 "./marpa.w"
+/*:1325*//*1334:*/
+#line 16218 "./marpa.w"
 
 struct s_marpa_pim_look{
 _Marpa_PIM t_pim_look_current;
@@ -405,40 +405,52 @@ Marpa_Earley_Item_ID t_pim_look_eim_id;
 };
 typedef struct s_marpa_pim_look Marpa_Postdot_Item_Look;
 
-/*:1332*/
-#line 16501 "./marpa.w"
+/*:1334*/
+#line 16509 "./marpa.w"
 
 /*1234:*/
 #line 14818 "./marpa.w"
 
 extern void*(*const marpa__out_of_memory)(void);
 
-/*:1234*//*1338:*/
-#line 16297 "./marpa.w"
+/*:1234*//*1340:*/
+#line 16305 "./marpa.w"
 
 extern int marpa__default_debug_handler(const char*format,...);
 extern int(*marpa__debug_handler)(const char*,...);
 extern int marpa__debug_level;
 
-/*:1338*/
-#line 16502 "./marpa.w"
+/*:1340*/
+#line 16510 "./marpa.w"
 
-/*1334:*/
-#line 16232 "./marpa.w"
+/*1328:*/
+#line 16148 "./marpa.w"
+
+int
+_marpa_r_look_yim(Marpa_Recognizer r,Marpa_Earley_Item_Look*look,
+Marpa_Earley_Set_ID es_id,Marpa_Earley_Item_ID eim_id);
+/*:1328*//*1330:*/
+#line 16168 "./marpa.w"
+
+int
+_marpa_r_yim_check(Marpa_Recognizer r,
+Marpa_Earley_Set_ID es_id,Marpa_Earley_Item_ID eim_id);
+/*:1330*//*1336:*/
+#line 16240 "./marpa.w"
 
 int
 _marpa_r_look_pim_eim_first(Marpa_Recognizer r,Marpa_Postdot_Item_Look*look,
 Marpa_Earley_Set_ID es_id,Marpa_Symbol_ID nsy_id);
-/*:1334*//*1336:*/
-#line 16270 "./marpa.w"
+/*:1336*//*1338:*/
+#line 16278 "./marpa.w"
 
 int
 _marpa_r_look_pim_eim_next(Marpa_Postdot_Item_Look*look);
-/*:1336*/
-#line 16503 "./marpa.w"
+/*:1338*/
+#line 16511 "./marpa.w"
 
 
-/*:1361*/
+/*:1363*/
 
 #line 1 "./marpa.h.p80"
 Marpa_Error_Code marpa_check_version (int required_major, int required_minor, int required_micro );

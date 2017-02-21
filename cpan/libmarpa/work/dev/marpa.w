@@ -16145,7 +16145,11 @@ PRIVATE int look_yim(Marpa_Earley_Item_Look* look,
 
 @ This is the external wrapper of the YIM looker.
 Caller must ensure that its arguments are checked.
-@<Function definitions@> =
+@<Public function prototypes@> =
+int
+_marpa_r_look_yim(Marpa_Recognizer r, Marpa_Earley_Item_Look* look,
+  Marpa_Earley_Set_ID es_id, Marpa_Earley_Item_ID eim_id);
+@ @<Function definitions@> =
 int
 _marpa_r_look_yim(Marpa_Recognizer r, Marpa_Earley_Item_Look* look,
   Marpa_Earley_Set_ID es_id, Marpa_Earley_Item_ID eim_id)
@@ -16161,7 +16165,11 @@ Returns 1 if all are OK, 0 if no such Earley item,
 If Earley item or Earley set are malformed,
 or on other hard failure,
 returns -2.
-@<Function definitions@> =
+@<Public function prototypes@> =
+int
+_marpa_r_yim_check(Marpa_Recognizer r,
+  Marpa_Earley_Set_ID es_id, Marpa_Earley_Item_ID eim_id);
+@ @<Function definitions@> =
 int
 _marpa_r_yim_check(Marpa_Recognizer r,
   Marpa_Earley_Set_ID es_id, Marpa_Earley_Item_ID eim_id)

@@ -86,6 +86,19 @@ for is those working on the Libmarpa internals.
 Unless you are thoroughly familiar with Libmarpa already,
 it is not of interest to you.
 
+Previously, this document was used to generate the
+prototypes of all of Libmarpa's internal public
+methods.
+As of this writing (Mon Feb 20 2017),
+we are moving to Kollos, where the nature of the
+Libmarpa interface will change, and
+this document no longer contains the prototypes
+of all internal methods --
+Some prototypes are declared in
+|marpa.w|.
+The fate of this document will be settled once
+the plans for the Kollos interface stabilize.
+
 @node Internal Interface,  , About this document, Top
 @chapter Internal Interface
 
