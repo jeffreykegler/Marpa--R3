@@ -14,7 +14,7 @@ debug:
 license:
 	perl etc/check_license.pl
 
-engine/read_only.time-stamp: libmarpa/dists.time-stamp
+engine/read_only.time-stamp: libmarpa/timestamp/tar.stamp
 	sh -x etc/libmarpa_from_tar.sh libmarpa/libmarpa-8.4.0.tar.gz
 
 libmarpa:

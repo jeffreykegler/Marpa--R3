@@ -4243,11 +4243,14 @@ is returned.
         marpa_lua_newtable (L);
         table_ix = 1;
         eim_index = _marpa_r_look_pim_eim_first (r, &look, es_id, isy_id);
+        if (1) fprintf (stderr, "%s %s %d eim_index=%ld\n", __PRETTY_FUNCTION__, __FILE__, __LINE__, (long)eim_index);
         while (eim_index >= 0) {
             marpa_lua_pushinteger (L, (lua_Integer) eim_index);
             marpa_lua_rawseti (L, -2, table_ix);
             table_ix++;
             eim_index = _marpa_r_look_pim_eim_next (&look);
+            if (1) fprintf (stderr, "%s %s %d eim_index=%ld\n", __PRETTY_FUNCTION__, __FILE__, __LINE__, (long)eim_index);
+            if (1) fprintf (stderr, "%s %s %d tos=%ld\n", __PRETTY_FUNCTION__, __FILE__, __LINE__, (long)marpa_lua_gettop(L));
         }
         return 1;
     }

@@ -24,12 +24,7 @@ version=`cat LIB_VERSION`
 dummy:
 	@echo The target to make the distributions is '"dists"'
 
-dists.time-stamp: work/dev/marpa.w
-
-dists.time-stamp: dist doc_dist doc1_dist cm_dist
-	date > dists.time-stamp
-
-dists: dists.time-stamp
+dists: dist doc_dist doc1_dist cm_dist
 
 work_install:
 	(cd work; make install)

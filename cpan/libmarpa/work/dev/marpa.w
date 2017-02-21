@@ -5208,7 +5208,6 @@ XRL position is complicated to compute,
 and it depends on XRL -- in particular if
 the XRL is |NULL|, XRL position is not defined.
 @d XRL_of_AHM(ahm) ((ahm)->t_xrl)
-@d XRLID_of_AHM(ahm) (ID_of_XRL(XRL_of_AHM(ahm)))
 @<Widely aligned AHM elements@> =
    XRL t_xrl;
 @ @d XRL_Position_of_AHM(ahm) ((ahm)->t_xrl_position)
@@ -16139,15 +16138,25 @@ and Earley item.
 PRIVATE int look_yim(Marpa_Earley_Item_Look* look,
   YS earley_set, Marpa_Earley_Item_ID eim_id)
 {
+  int xrl_position;
+  int raw_xrl_position;
   YIM* earley_items = YIMs_of_YS (earley_set);
   YIM earley_item = earley_items[eim_id];
   AHM ahm = AHM_of_YIM(earley_item);
-  marpa_eim_look_rule_id(look) = XRLID_of_AHM(ahm);
-  marpa_eim_look_dot(look) = XRL_Position_of_AHM(ahm);
+  XRL xrl = XRL_of_AHM(ahm);
+  if (xrl) {
+    marpa_eim_look_rule_id(look) = ID_of_XRL(xrl);
+    xrl_position = XRL_Position_of_AHM(ahm);
+    raw_xrl_position = Raw_XRL_Position_of_AHM(ahm);
+  } else {
+    marpa_eim_look_rule_id(look) = -1;
+    raw_xrl_position = xrl_position = -1;
+  }
+  marpa_eim_look_dot(look) = xrl_position;
   marpa_eim_look_origin(look) = Origin_Ord_of_YIM(earley_item);
   marpa_eim_look_irl_id(look) = IRLID_of_AHM(ahm);
   marpa_eim_look_irl_dot(look) = Position_of_AHM(ahm);
-  return Raw_XRL_Position_of_AHM(ahm);
+  return raw_xrl_position;
 }
 
 @ This is the external wrapper of the YIM looker.

@@ -106,6 +106,8 @@ EARLEY_SET: for my $earley_set (0 .. 7) {
     say "=== Earley Set $earley_set->progress() ===";
     my @S_items = grep { $_->[0] eq $S_rule } @{$recce->progress($earley_set)};
     # say Data::Dumper::Dumper($recce->progress($earley_set));
+    say $recce->show_earley_set($earley_set);
+    say '=';
     for my $S_item (@S_items) {
         my ($rule_id, $dot, $origin) = @{$S_item};
         say "S:$dot " . '@' . "$origin-$earley_set " . $grammar->show_dotted_rule($rule_id, $dot);
@@ -126,14 +128,16 @@ EARLEY_SET: for my $earley_set (0 .. 7) {
       local g1r = recce.lmw_g1r
       local g1g = recce.slg.lmw_g1g
       local function origin_gen(es_id, eim_id)
-          local rule_id, dot, this_origin, irl_id
+          local rule_id, dot, this_origin, irl_id, irl_dot
               = g1r:earley_item_look(es_id, eim_id)
           if rule_id < 0 then return end
           if g1g:_irl_is_virtual_lhs(irl_id) == 0 then 
+              print(string.format("adding origin %d for %s", this_origin, g1g:show_dotted_irl(irl_id, irl_dot)))
               coroutine.yield( this_origin )
           end
           local lhs = g1g:_irl_lhs(irl_id)
           local eims = g1r:postdot_eims(this_origin, lhs)
+          print('eims: ', inspect(eims))
           for ix = 1, #eims do
               origin_gen(this_origin, eims[ix])
           end
@@ -157,6 +161,7 @@ EARLEY_SET: for my $earley_set (0 .. 7) {
           -- print(inspect(item_data))
 
           for origin in origins(earley_set_id, item_id) do
+              print(string.format('origin for %d:%d', earley_set_id, item_id), inspect(origin))
               local key = string.pack(fmt, rule_id, dot, origin)
               xrl_data[key] = true
           end

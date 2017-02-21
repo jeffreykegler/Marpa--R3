@@ -144,11 +144,14 @@ END_OF_POSTAMBLE_PIECE
     return join "\n", @postamble_pieces;
 };
 
+my @files_to_cleanup = ( "gnu_ac_build.time-stamp" );
+
 WriteMakefile(
-    INC => '-I.',
-    NAME      => 'Marpa::R3',
+    clean   => { FILES => ( join q{ }, @files_to_cleanup ) },
+    INC     => '-I.',
+    NAME    => 'Marpa::R3',
     VERSION => $STRING_VERSION,
-    DEFINE    => $define,
-    SKIP      => [qw(test test_dynamic dynamic dynamic_lib dlsyms)],
+    DEFINE  => $define,
+    SKIP => [qw(test test_dynamic dynamic dynamic_lib dlsyms)],
 );
 
