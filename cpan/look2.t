@@ -102,7 +102,7 @@ EOS
 }
 
 my ($SS_sym) = grep { $grammar->symbol_name($_) eq 'SS' } $grammar->symbol_ids();
-my ($SS_rule) = grep { ($grammar->rule_expand($_))[0] eq $SS_sym } $grammar->rule_ids();
+my ($target_rule) = grep { ($grammar->rule_expand($_))[0] eq $SS_sym } $grammar->rule_ids();
 
 my $recce = Marpa::R3::Scanless::R->new( {   grammar => $grammar });
 my $input_length = 11;
@@ -113,8 +113,8 @@ sub earley_set_display {
     my ($earley_set) = @_;
     my $result = "=== Earley Set $earley_set ===\n";
     my ($set_data) = $recce->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 'ii', $earley_set, $SS_rule );
-      local recce, earley_set_id, SS_rule = ...
+        <<'END_OF_LUA', 'ii', $earley_set, $target_rule );
+      local recce, earley_set_id, target_rule = ...
       local function cmp(a, b)
           for i = 1, #a do
              if a[i] < b[i] then return true end
@@ -156,7 +156,7 @@ sub earley_set_display {
           -- IRL data for debugging only -- delete
           local rule_id, dot, origin, irl_id, irl_dot = g1r:earley_item_look(earley_set_id, item_id)
           if rule_id < 0 then break end
-          if rule_id ~= SS_rule then goto NEXT_ITEM end
+          if rule_id ~= target_rule then goto NEXT_ITEM end
 
           for origin in origins(earley_set_id, item_id) do
               local key = string.pack(fmt, rule_id, dot, origin)

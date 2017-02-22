@@ -20,7 +20,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-use Test::More tests => 42;
+use Test::More tests => 11;
 use POSIX qw(setlocale LC_ALL);
 
 POSIX::setlocale(LC_ALL, "C");
@@ -96,19 +96,19 @@ EOS
 }
 
 my ($S_sym) = grep { $grammar->symbol_name($_) eq 'S' } $grammar->symbol_ids();
-my ($S_rule) = grep { ($grammar->rule_expand($_))[0] eq $S_sym } $grammar->rule_ids();
+my ($target_rule) = grep { ($grammar->rule_expand($_))[0] eq $S_sym } $grammar->rule_ids();
 
 my $recce = Marpa::R3::Scanless::R->new( {   grammar => $grammar });
 my $input_length = 7;
 my $input = ('a' x $input_length);
 $recce->read( \$input );
-EARLEY_SET: for my $earley_set (0 .. 7) {
-    say "=== Earley Set $earley_set->progress() ===";
-    my ($set_data) =
-      $recce->call_by_tag(
-    ('@' . __FILE__ . ':' . __LINE__),
-    <<'END_OF_LUA', 'ii', $earley_set, $S_rule );
-      local recce, earley_set_id, S_rule = ...
+
+sub earley_set_display {
+    my ($earley_set) = @_;
+    my $result = "=== Earley Set $earley_set ===\n";
+    my ($set_data) = $recce->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 'ii', $earley_set, $target_rule );
+      local recce, earley_set_id, target_rule = ...
       local function cmp(a, b)
           for i = 1, #a do
              if a[i] < b[i] then return true end
@@ -122,13 +122,14 @@ EARLEY_SET: for my $earley_set (0 .. 7) {
           local rule_id, dot, this_origin, irl_id, irl_dot
               = g1r:earley_item_look(es_id, eim_id)
           if rule_id < 0 then return end
-          if g1g:_irl_is_virtual_lhs(irl_id) == 0 then 
+          if g1g:_irl_is_virtual_lhs(irl_id) == 0 then
               coroutine.yield( this_origin )
               return
           end
           local lhs = g1g:_irl_lhs(irl_id)
           local eims = g1r:postdot_eims(this_origin, lhs)
-          -- print('eims: ', inspect(eims))
+          -- print(string.format('eims for %s@%d: %s',
+              -- g1g:isy_name(lhs), this_origin, inspect(eims)))
           for ix = 1, #eims do
               origin_gen(this_origin, eims[ix])
           end
@@ -149,13 +150,9 @@ EARLEY_SET: for my $earley_set (0 .. 7) {
           -- IRL data for debugging only -- delete
           local rule_id, dot, origin, irl_id, irl_dot = g1r:earley_item_look(earley_set_id, item_id)
           if rule_id < 0 then break end
-          if rule_id ~= S_rule then goto NEXT_ITEM end
-          -- print(inspect(item_data))
+          if rule_id ~= target_rule then goto NEXT_ITEM end
 
           for origin in origins(earley_set_id, item_id) do
-              -- print(string.format('origin for ES %d:%d, xrl dot=%d', earley_set_id, item_id, dot), inspect(origin))
-              -- print(string.format("   adding origin %d for %s", origin, g1g:show_dotted_irl(irl_id, irl_dot)))
-              -- print(string.format("   xrl is %d:%d; length=%d", rule_id, dot, g1g:rule_length(rule_id)))
               local key = string.pack(fmt, rule_id, dot, origin)
               xrl_data[key] = true
           end
@@ -171,11 +168,85 @@ EARLEY_SET: for my $earley_set (0 .. 7) {
       table.sort(result, cmp)
       return result
 END_OF_LUA
-    say "===";
-    for my $datum (@{$set_data}) {
-        my ($rule_id, $dot, $origin) = @{$datum};
-        say "S:$dot " . '@' . "$origin-$earley_set " . $grammar->show_dotted_rule($rule_id, $dot);
+    for my $datum ( @{$set_data} ) {
+        my ( $rule_id, $dot, $origin ) = @{$datum};
+        $result .=
+            "S:$dot " . '@'
+          . "$origin-$earley_set "
+          . $grammar->show_dotted_rule( $rule_id, $dot ) . "\n";
     }
+    return $result;
 }
+
+TODO: {
+    local $TODO = "Problem with Earley Set 0";
+    Marpa::R3::Test::is( earley_set_display(0), <<'EOS', 'Earley Set 0' );
+=== Earley Set 0 ===
+Huh?
+EOS
+}
+
+Marpa::R3::Test::is( earley_set_display(1),
+    <<'EOS', 'Earley Set 1' );
+=== Earley Set 1 ===
+S:-1 @0-1 S -> A A A A A A A .
+S:1 @0-1 S -> A . A A A A A A
+S:2 @0-1 S -> A A . A A A A A
+S:3 @0-1 S -> A A A . A A A A
+S:4 @0-1 S -> A A A A . A A A
+S:5 @0-1 S -> A A A A A . A A
+S:6 @0-1 S -> A A A A A A . A
+EOS
+
+Marpa::R3::Test::is( earley_set_display(2),
+    <<'EOS', 'Earley Set 2' );
+=== Earley Set 2 ===
+S:-1 @0-2 S -> A A A A A A A .
+S:2 @0-2 S -> A A . A A A A A
+S:3 @0-2 S -> A A A . A A A A
+S:4 @0-2 S -> A A A A . A A A
+S:5 @0-2 S -> A A A A A . A A
+S:6 @0-2 S -> A A A A A A . A
+EOS
+
+Marpa::R3::Test::is( earley_set_display(3),
+    <<'EOS', 'Earley Set 3' );
+=== Earley Set 3 ===
+S:-1 @0-3 S -> A A A A A A A .
+S:3 @0-3 S -> A A A . A A A A
+S:4 @0-3 S -> A A A A . A A A
+S:5 @0-3 S -> A A A A A . A A
+S:6 @0-3 S -> A A A A A A . A
+EOS
+
+Marpa::R3::Test::is( earley_set_display(4),
+    <<'EOS', 'Earley Set 4' );
+=== Earley Set 4 ===
+S:-1 @0-4 S -> A A A A A A A .
+S:4 @0-4 S -> A A A A . A A A
+S:5 @0-4 S -> A A A A A . A A
+S:6 @0-4 S -> A A A A A A . A
+EOS
+
+Marpa::R3::Test::is( earley_set_display(5),
+    <<'EOS', 'Earley Set 5' );
+=== Earley Set 5 ===
+S:-1 @0-5 S -> A A A A A A A .
+S:5 @0-5 S -> A A A A A . A A
+S:6 @0-5 S -> A A A A A A . A
+EOS
+
+Marpa::R3::Test::is( earley_set_display(6),
+    <<'EOS', 'Earley Set 6' );
+=== Earley Set 6 ===
+S:-1 @0-6 S -> A A A A A A A .
+S:6 @0-6 S -> A A A A A A . A
+EOS
+
+Marpa::R3::Test::is( earley_set_display(7),
+    <<'EOS', 'Earley Set 7' );
+=== Earley Set 7 ===
+S:-1 @0-7 S -> A A A A A A A .
+EOS
 
 # vim: expandtab shiftwidth=4:
