@@ -4177,6 +4177,7 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
     {
         const int recce_stack_ix = 1;
         Marpa_Recce r;
+        Marpa_Grammar g;
         Marpa_Earley_Item_Look look;
         Marpa_Earley_Set_ID es_id;
         Marpa_Earley_Item_ID eim_id;
@@ -4184,6 +4185,10 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
 
         marpa_lua_getfield (L, recce_stack_ix, "_libmarpa");
         r = *(Marpa_Recce *) marpa_lua_touserdata (L, -1);
+        marpa_lua_getfield (L, recce_stack_ix, "lmw_g");
+        if (0) fprintf (stderr, "%s %s %d tos=%s\n", __PRETTY_FUNCTION__, __FILE__, __LINE__, marpa_luaL_typename(L, -1));
+        marpa_lua_getfield (L, -1, "_libmarpa");
+        g = *(Marpa_Grammar *) marpa_lua_touserdata (L, -1);
         es_id = (Marpa_Earley_Set_ID)marpa_luaL_checkinteger (L, 2);
         eim_id = (Marpa_Earley_Item_ID)marpa_luaL_checkinteger (L, 3);
         check_result = _marpa_r_yim_check(r, es_id, eim_id);
@@ -4199,11 +4204,31 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
                 es_id, eim_id);
         }
         (void) _marpa_r_look_yim(r, &look, es_id, eim_id);
-        marpa_lua_pushinteger(L, (lua_Integer)marpa_eim_look_rule_id(&look));
-        marpa_lua_pushinteger(L, (lua_Integer)marpa_eim_look_dot(&look));
-        marpa_lua_pushinteger(L, (lua_Integer)marpa_eim_look_origin(&look));
-        marpa_lua_pushinteger(L, (lua_Integer)marpa_eim_look_irl_id(&look));
-        marpa_lua_pushinteger(L, (lua_Integer)marpa_eim_look_irl_dot(&look));
+        /* The "raw xrl dot" is a development hack to test a fix
+         * to the xrl dot value.
+         * TODO -- Delete after development.
+         */
+        {
+            const lua_Integer raw_xrl_dot = (lua_Integer)marpa_eim_look_dot(&look);
+            lua_Integer xrl_dot = raw_xrl_dot;
+            const lua_Integer irl_dot = (lua_Integer)marpa_eim_look_irl_dot(&look);
+            const lua_Integer irl_id = marpa_eim_look_irl_id(&look);
+            if (0) fprintf (stderr, "%s %s %d; xrl dot = %ld; irl dot = %ld; irl length = %ld\n", __PRETTY_FUNCTION__, __FILE__, __LINE__,
+                (long)xrl_dot,
+                (long)irl_dot,
+                (long)_marpa_g_irl_length(g, (Marpa_IRL_ID)irl_id));
+            if (irl_dot < 0) {
+                xrl_dot = -1;
+            }
+            if (irl_dot >= (lua_Integer)_marpa_g_irl_length(g, (Marpa_IRL_ID)irl_id)) {
+                xrl_dot = -1;
+            }
+            marpa_lua_pushinteger(L, (lua_Integer)marpa_eim_look_rule_id(&look));
+            marpa_lua_pushinteger(L, xrl_dot);
+            marpa_lua_pushinteger(L, (lua_Integer)marpa_eim_look_origin(&look));
+            marpa_lua_pushinteger(L, irl_id);
+            marpa_lua_pushinteger(L, irl_dot);
+        }
         return 5;
     }
 
@@ -4314,7 +4339,7 @@ is returned.
 
       count = marpa_r_terminals_expected (r, buffer);
       if (count < 0) {
-          return libmarpa_error_handle(L, recce_stack_ix, "grammar:terminals_expected; marpa_g_terminals_expected");
+          return libmarpa_error_handle(L, recce_stack_ix, "grammar:terminals_expected; marpa_r_terminals_expected");
       }
       marpa_lua_newtable(L);
       for (ix = 0; ix < count; ix++) {

@@ -103,11 +103,77 @@ my $input_length = 7;
 my $input = ('a' x $input_length);
 $recce->read( \$input );
 EARLEY_SET: for my $earley_set (0 .. 7) {
-    say "=== Earley Set $earley_set ===";
-    say $recce->show_progress($earley_set);
-    my @S_items = grep { $_->[0] eq $S_rule } @{$recce->progress($earley_set)};
-    for my $S_item (@S_items) {
-        my ($rule_id, $dot, $origin) = @{$S_item};
+    say "=== Earley Set $earley_set->progress() ===";
+    my ($set_data) =
+      $recce->call_by_tag(
+    ('@' . __FILE__ . ':' . __LINE__),
+    <<'END_OF_LUA', 'ii', $earley_set, $S_rule );
+      local recce, earley_set_id, S_rule = ...
+      local function cmp(a, b)
+          for i = 1, #a do
+             if a[i] < b[i] then return true end
+             if a[i] > b[i] then return false end
+          end
+          return false
+      end
+      local g1r = recce.lmw_g1r
+      local g1g = recce.slg.lmw_g1g
+      local function origin_gen(es_id, eim_id)
+          local rule_id, dot, this_origin, irl_id, irl_dot
+              = g1r:earley_item_look(es_id, eim_id)
+          if rule_id < 0 then return end
+          if g1g:_irl_is_virtual_lhs(irl_id) == 0 then 
+              coroutine.yield( this_origin )
+              return
+          end
+          local lhs = g1g:_irl_lhs(irl_id)
+          local eims = g1r:postdot_eims(this_origin, lhs)
+          -- print('eims: ', inspect(eims))
+          for ix = 1, #eims do
+              origin_gen(this_origin, eims[ix])
+          end
+      end
+      local function  origins(es_id, eim_id)
+          local co = coroutine.create(
+              function () origin_gen(es_id, eim_id) end
+          )
+          return function ()
+              local code, res = coroutine.resume(co)
+              if not code then error(res) end
+              return res
+          end
+      end
+      local xrl_data = {}
+      local fmt = "jjj"
+      for item_id = 0, math.maxinteger do
+          -- IRL data for debugging only -- delete
+          local rule_id, dot, origin, irl_id, irl_dot = g1r:earley_item_look(earley_set_id, item_id)
+          if rule_id < 0 then break end
+          if rule_id ~= S_rule then goto NEXT_ITEM end
+          -- print(inspect(item_data))
+
+          for origin in origins(earley_set_id, item_id) do
+              -- print(string.format('origin for ES %d:%d, xrl dot=%d', earley_set_id, item_id, dot), inspect(origin))
+              -- print(string.format("   adding origin %d for %s", origin, g1g:show_dotted_irl(irl_id, irl_dot)))
+              -- print(string.format("   xrl is %d:%d; length=%d", rule_id, dot, g1g:rule_length(rule_id)))
+              local key = string.pack(fmt, rule_id, dot, origin)
+              xrl_data[key] = true
+          end
+
+          ::NEXT_ITEM::
+      end
+      result = {}
+      for key, value in pairs(xrl_data) do
+           local xrl_datum = { string.unpack(fmt, key) }
+           xrl_datum[#xrl_datum] = nil
+           result[#result+1] = xrl_datum
+      end
+      table.sort(result, cmp)
+      return result
+END_OF_LUA
+    say "===";
+    for my $datum (@{$set_data}) {
+        my ($rule_id, $dot, $origin) = @{$datum};
         say "S:$dot " . '@' . "$origin-$earley_set " . $grammar->show_dotted_rule($rule_id, $dot);
     }
 }
