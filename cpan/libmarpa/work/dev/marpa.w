@@ -4050,6 +4050,28 @@ And rule ID's increase by one each time,
 so that all the new
 rules will have ID's equal to or greater than
 the pre-CHAF rule count.
+
+@*0 Is this a CHAF IRL?.
+Is this IRL a product of the CHAF rewrite?
+@d IRL_is_CHAF(irl) ((irl)->t_is_chaf)
+@<Bit aligned IRL elements@> = BITFIELD t_is_chaf:1;
+@ @<Initialize IRL elements@> =
+  IRL_is_CHAF(irl) = 0;
+@ @<Public function prototypes@> =
+int _marpa_g_irl_is_chaf(
+    Marpa_Grammar g,
+    Marpa_IRL_ID irl_id);
+@ @<Function definitions@> =
+int _marpa_g_irl_is_chaf(
+    Marpa_Grammar g,
+    Marpa_IRL_ID irl_id)
+{
+    @<Return |-2| on failure@>@;
+    @<Fail if not precomputed@>@;
+    @<Fail if |irl_id| is invalid@>@;
+    return IRL_is_CHAF(IRL_by_ID(irl_id));
+}
+
 @ @<Rewrite grammar |g| into CHAF form@> =
 {
   @<CHAF rewrite declarations@>@;
@@ -4615,6 +4637,7 @@ rule structure, and performing the call back.
 @<Add CHAF IRL@> =
 {
   const int is_virtual_lhs = (piece_start > 0);
+  IRL_is_CHAF(chaf_irl) = 1;
   Source_XRL_of_IRL(chaf_irl) = rule;
   IRL_has_Virtual_LHS (chaf_irl) = Boolean(is_virtual_lhs);
   IRL_has_Virtual_RHS (chaf_irl) =
