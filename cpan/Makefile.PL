@@ -33,9 +33,6 @@ $STRING_VERSION = $VERSION;
 $VERSION = eval $VERSION;
 ## use critic
 
-my $verbose = 1;
-my $libmarpa_debug = 0;
-
 my %perl_autoconf_os =
     map { $_ => 1 } qw( MSWin32 openbsd solaris sunos midnightbsd );
 my $use_perl_autoconf = $ENV{MARPA_USE_PERL_AUTOCONF}
@@ -304,16 +301,6 @@ my $myextlib = join q{ }, $libmarpa_in_build_dir, 'lua/marpa_lua$(LIB_EXT)',
   'glue/glue$(LIB_EXT)', 'kollos/kollos$(LIB_EXT)';
 
 # my $ccflags = $Config{ccflags} . " -Iengine/read_only -Ixs";
-
-# my @debug_flags            = ();
-# if ($libmarpa_debug) {
-    # if ( defined $ENV{LIBMARPA_CFLAGS} ) {
-        # $ENV{CFLAGS} = $ENV{LIBMARPA_CFLAGS};
-    # }
-    # push @debug_flags, '-DMARPA_DEBUG=1';
-    # push @debug_flags, '-fno-inline', '-Wno-inline'
-        # if ( $Config{'cc'} eq 'gcc' );
-# } ## end if ($libmarpa_debug)
 
 undef &MY::postamble; # suppress warning
 *MY::postamble = sub {

@@ -8,8 +8,8 @@ dummy:
 
 debug:
 	make clean
-	perl Makefile.PL OPTIMIZE=-g
-	make OPTIMIZE=-g
+	MARPA_DEBUG_FLAG="-DMARPA_DEBUG=1" perl Makefile.PL OPTIMIZE=-g
+	make
 
 license:
 	perl etc/check_license.pl

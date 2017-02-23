@@ -32,6 +32,11 @@ my %perl_autoconf_os =
 my $use_perl_autoconf = $ENV{MARPA_USE_PERL_AUTOCONF}
     || ( $perl_autoconf_os{$^O} // 0 );
 
+my $marpa_debug_flags = '';
+if ($ENV{MARPA_DEBUG_FLAG}) {
+  $marpa_debug_flags = 'MARPA_DEBUG_FLAG=' .  $ENV{MARPA_DEBUG_FLAG};
+}
+
 my $define = q{};
 $define .= ' -DWIN32' if ($^O eq 'MSWin32');
 
@@ -106,8 +111,12 @@ END_OF_POSTAMBLE_PIECE
 gnu_ac_build/Makefile: gnu_ac_build.time-stamp
 	%s
 END_OF_POSTAMBLE_PIECE
-        $self->cd( File::Spec->catdir(qw(gnu_ac_build)),
-'$(SHELL) configure --with-pic --disable-shared --disable-maintainer-mode'
+        $self->cd(
+            File::Spec->catdir(qw(gnu_ac_build)),
+            join( q{ },
+                '$(SHELL) configure',
+                $marpa_debug_flags,
+                '--with-pic --disable-shared --disable-maintainer-mode' )
         );
 
 # == Logic to create Makefile for Perl autoconf

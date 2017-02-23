@@ -6904,6 +6904,7 @@ the Earley set.
 @d Postdot_NSYID_of_YIM(yim) Postdot_NSYID_of_AHM(AHM_of_YIM(yim))
 @d IRL_of_YIM(yim) IRL_of_AHM(AHM_of_YIM(yim))
 @d IRLID_of_YIM(yim) ID_of_IRL(IRL_of_YIM(yim))
+@d XRL_of_YIM(yim) XRL_of_AHM(AHM_of_YIM(yim))
 @d Origin_Earleme_of_YIM(yim) (Earleme_of_YS(Origin_of_YIM(yim)))
 @d Origin_Ord_of_YIM(yim) (Ord_of_YS(Origin_of_YIM(yim)))
 @d Origin_of_YIM(yim) ((yim)->t_key.t_origin)
@@ -9739,8 +9740,22 @@ progress_report_items_insert(MARPA_AVL_TREE report_tree,
   AHM report_ahm,
     YIM origin_yim)
 {
+  MARPA_DEBUG5(
+     "%s Calling progress_report_items_insert(%p, %p, %p)",
+     STRLOC, report_tree, report_ahm, origin_yim);
+
   const XRL source_xrl = XRL_of_AHM (report_ahm);
+  const XRL origin_xrl = XRL_of_YIM (origin_yim);
   if (!source_xrl) return;
+
+  MARPA_DEBUG3("%s, report_ahm = %p", STRLOC, report_ahm);
+  MARPA_DEBUG3("%s, origin ahm = %p", STRLOC, AHM_of_YIM(origin_yim));
+  MARPA_DEBUG3("%s, source_xrl = %p", STRLOC, source_xrl);
+  MARPA_DEBUG3("%s, origin_xrl = %p", STRLOC, origin_xrl);
+  MARPA_DEBUG3("%s, source_xrl is sequence = %ld", STRLOC,
+      XRL_is_Sequence(source_xrl));
+  MARPA_DEBUG3("%s, length of xrl sequence = %ld", STRLOC,
+          Length_of_XRL (source_xrl));
 
   @t}\comment{@>
   /* If LHS is a brick symbol, we are done --
@@ -9773,6 +9788,7 @@ progress_report_items_insert(MARPA_AVL_TREE report_tree,
      const NSYID lhs_nsyid = LHS_NSYID_of_YIM(origin_yim);
      const YS origin_ys = YS_of_YIM(origin_yim);
      PIM pim = First_PIM_of_YS_by_NSYID (origin_ys, lhs_nsyid);
+     MARPA_DEBUG4("%s, first pim, ys = %p, id = %d", STRLOC, origin_ys, lhs_nsyid);
      for (; pim; pim = Next_PIM_of_PIM (pim))
      {
          const YIM predecessor = YIM_of_PIM (pim);
