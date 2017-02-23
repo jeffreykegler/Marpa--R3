@@ -124,10 +124,8 @@ TODO: {
 === Earley Set 0 ===
 Huh?
 EOS
-}
 
-Marpa::R3::Test::is( earley_set_display(1),
-    <<'EOS', 'Earley Set 1' );
+    Marpa::R3::Test::is( earley_set_display(1), <<'EOS', 'Earley Set 1' );
 === Earley Set 1 ===
 S:-1 @0-1 S -> A A A A A A A .
 S:1 @0-1 S -> A . A A A A A A
@@ -138,8 +136,7 @@ S:5 @0-1 S -> A A A A A . A A
 S:6 @0-1 S -> A A A A A A . A
 EOS
 
-Marpa::R3::Test::is( earley_set_display(2),
-    <<'EOS', 'Earley Set 2' );
+    Marpa::R3::Test::is( earley_set_display(2), <<'EOS', 'Earley Set 2' );
 === Earley Set 2 ===
 S:-1 @0-2 S -> A A A A A A A .
 S:2 @0-2 S -> A A . A A A A A
@@ -149,8 +146,7 @@ S:5 @0-2 S -> A A A A A . A A
 S:6 @0-2 S -> A A A A A A . A
 EOS
 
-Marpa::R3::Test::is( earley_set_display(3),
-    <<'EOS', 'Earley Set 3' );
+    Marpa::R3::Test::is( earley_set_display(3), <<'EOS', 'Earley Set 3' );
 === Earley Set 3 ===
 S:-1 @0-3 S -> A A A A A A A .
 S:3 @0-3 S -> A A A . A A A A
@@ -159,8 +155,7 @@ S:5 @0-3 S -> A A A A A . A A
 S:6 @0-3 S -> A A A A A A . A
 EOS
 
-Marpa::R3::Test::is( earley_set_display(4),
-    <<'EOS', 'Earley Set 4' );
+    Marpa::R3::Test::is( earley_set_display(4), <<'EOS', 'Earley Set 4' );
 === Earley Set 4 ===
 S:-1 @0-4 S -> A A A A A A A .
 S:4 @0-4 S -> A A A A . A A A
@@ -168,25 +163,24 @@ S:5 @0-4 S -> A A A A A . A A
 S:6 @0-4 S -> A A A A A A . A
 EOS
 
-Marpa::R3::Test::is( earley_set_display(5),
-    <<'EOS', 'Earley Set 5' );
+    Marpa::R3::Test::is( earley_set_display(5), <<'EOS', 'Earley Set 5' );
 === Earley Set 5 ===
 S:-1 @0-5 S -> A A A A A A A .
 S:5 @0-5 S -> A A A A A . A A
 S:6 @0-5 S -> A A A A A A . A
 EOS
 
-Marpa::R3::Test::is( earley_set_display(6),
-    <<'EOS', 'Earley Set 6' );
+    Marpa::R3::Test::is( earley_set_display(6), <<'EOS', 'Earley Set 6' );
 === Earley Set 6 ===
 S:-1 @0-6 S -> A A A A A A A .
 S:6 @0-6 S -> A A A A A A . A
 EOS
 
-Marpa::R3::Test::is( earley_set_display(7),
-    <<'EOS', 'Earley Set 7' );
+    Marpa::R3::Test::is( earley_set_display(7), <<'EOS', 'Earley Set 7' );
 === Earley Set 7 ===
 S:-1 @0-7 S -> A A A A A A A .
 EOS
+
+}
 
 # vim: expandtab shiftwidth=4:
