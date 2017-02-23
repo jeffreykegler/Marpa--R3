@@ -20,7 +20,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-use Test::More tests => 42;
+use Test::More tests => 11;
 use POSIX qw(setlocale LC_ALL);
 
 POSIX::setlocale(LC_ALL, "C");
@@ -96,20 +96,97 @@ EOS
 }
 
 my ($S_sym) = grep { $grammar->symbol_name($_) eq 'S' } $grammar->symbol_ids();
-my ($S_rule) = grep { ($grammar->rule_expand($_))[0] eq $S_sym } $grammar->rule_ids();
+my ($target_rule) = grep { ($grammar->rule_expand($_))[0] eq $S_sym } $grammar->rule_ids();
 
 my $recce = Marpa::R3::Scanless::R->new( {   grammar => $grammar });
 my $input_length = 7;
 my $input = ('a' x $input_length);
 $recce->read( \$input );
-EARLEY_SET: for my $earley_set (0 .. 7) {
-    say "=== Earley Set $earley_set ===";
-    say $recce->show_progress($earley_set);
-    my @S_items = grep { $_->[0] eq $S_rule } @{$recce->progress($earley_set)};
-    for my $S_item (@S_items) {
-        my ($rule_id, $dot, $origin) = @{$S_item};
-        say "S:$dot " . '@' . "$origin-$earley_set " . $grammar->show_dotted_rule($rule_id, $dot);
+
+sub earley_set_display {
+    my ($earley_set) = @_;
+    my $result = "=== Earley Set $earley_set ===\n";
+    my @target_items =
+      grep { $_->[0] eq $target_rule } @{ $recce->progress($earley_set) };
+    for my $target_item (@target_items) {
+        my ( $rule_id, $dot, $origin ) = @{$target_item};
+        $result .=
+            "S:$dot " . '@'
+          . "$origin-$earley_set "
+          . $grammar->show_dotted_rule( $rule_id, $dot ) . "\n";
     }
+    return $result;
 }
+
+TODO: {
+    local $TODO = "Problem with Earley Set 0";
+    Marpa::R3::Test::is( earley_set_display(0), <<'EOS', 'Earley Set 0' );
+=== Earley Set 0 ===
+Huh?
+EOS
+}
+
+Marpa::R3::Test::is( earley_set_display(1),
+    <<'EOS', 'Earley Set 1' );
+=== Earley Set 1 ===
+S:-1 @0-1 S -> A A A A A A A .
+S:1 @0-1 S -> A . A A A A A A
+S:2 @0-1 S -> A A . A A A A A
+S:3 @0-1 S -> A A A . A A A A
+S:4 @0-1 S -> A A A A . A A A
+S:5 @0-1 S -> A A A A A . A A
+S:6 @0-1 S -> A A A A A A . A
+EOS
+
+Marpa::R3::Test::is( earley_set_display(2),
+    <<'EOS', 'Earley Set 2' );
+=== Earley Set 2 ===
+S:-1 @0-2 S -> A A A A A A A .
+S:2 @0-2 S -> A A . A A A A A
+S:3 @0-2 S -> A A A . A A A A
+S:4 @0-2 S -> A A A A . A A A
+S:5 @0-2 S -> A A A A A . A A
+S:6 @0-2 S -> A A A A A A . A
+EOS
+
+Marpa::R3::Test::is( earley_set_display(3),
+    <<'EOS', 'Earley Set 3' );
+=== Earley Set 3 ===
+S:-1 @0-3 S -> A A A A A A A .
+S:3 @0-3 S -> A A A . A A A A
+S:4 @0-3 S -> A A A A . A A A
+S:5 @0-3 S -> A A A A A . A A
+S:6 @0-3 S -> A A A A A A . A
+EOS
+
+Marpa::R3::Test::is( earley_set_display(4),
+    <<'EOS', 'Earley Set 4' );
+=== Earley Set 4 ===
+S:-1 @0-4 S -> A A A A A A A .
+S:4 @0-4 S -> A A A A . A A A
+S:5 @0-4 S -> A A A A A . A A
+S:6 @0-4 S -> A A A A A A . A
+EOS
+
+Marpa::R3::Test::is( earley_set_display(5),
+    <<'EOS', 'Earley Set 5' );
+=== Earley Set 5 ===
+S:-1 @0-5 S -> A A A A A A A .
+S:5 @0-5 S -> A A A A A . A A
+S:6 @0-5 S -> A A A A A A . A
+EOS
+
+Marpa::R3::Test::is( earley_set_display(6),
+    <<'EOS', 'Earley Set 6' );
+=== Earley Set 6 ===
+S:-1 @0-6 S -> A A A A A A A .
+S:6 @0-6 S -> A A A A A A . A
+EOS
+
+Marpa::R3::Test::is( earley_set_display(7),
+    <<'EOS', 'Earley Set 7' );
+=== Earley Set 7 ===
+S:-1 @0-7 S -> A A A A A A A .
+EOS
 
 # vim: expandtab shiftwidth=4:
