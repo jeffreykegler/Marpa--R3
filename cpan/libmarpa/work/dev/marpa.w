@@ -9739,33 +9739,54 @@ progress_report_items_insert(MARPA_AVL_TREE report_tree,
   AHM report_ahm,
     YIM origin_yim)
 {
-  PROGRESS new_report_item;
   const XRL source_xrl = XRL_of_AHM (report_ahm);
-  const int xrl_position = XRL_Position_of_AHM (report_ahm);
-  if (!source_xrl)
-    return;
-
-  MARPA_OFF_DEBUG5(
-    "At %s, report item insert rule=%ld pos=%ld origin=%ld",
-    STRLOC, (long)ID_of_XRL (source_xrl),
-    (long)xrl_position, (long)report_origin);
+  if (!source_xrl) return;
 
   @t}\comment{@>
-  /* As a special case, for the starting rules of a sequence rewrite, we
-  skip all but the top one, which is the one with a semantic LHS */
-  if (XRL_is_Sequence (source_xrl)
-      && Position_of_AHM(report_ahm) <= 0
-      && IRL_has_Virtual_LHS (IRL_of_AHM (report_ahm)))
+  /* If LHS is a brick symbol, we are done --
+   * insert the report item and return
+   */
+  if (!IRL_has_Virtual_LHS (IRL_of_YIM (origin_yim))) {
+    PROGRESS new_report_item =
+      marpa_obs_new (MARPA_AVL_OBSTACK (report_tree),
+                     struct marpa_progress_item, 1);
+    Position_of_PROGRESS (new_report_item) = XRL_Position_of_AHM (report_ahm);
+    Origin_of_PROGRESS (new_report_item) = Origin_Ord_of_YIM(origin_yim);
+    RULEID_of_PROGRESS (new_report_item) = ID_of_XRL (source_xrl);
+    _marpa_avl_insert (report_tree, new_report_item);
     return;
+  }
+  @t}\comment{@>
+  /* LHS is a mortar symbol */
+  @t}\comment{@>
+  /* As a special case, skip all but the top sequence rule.
+   * This is necessary to avoid infinite recursion.
+   */
+  if (XRL_is_Sequence(source_xrl) && Position_of_AHM(report_ahm) <= 0)
+      return;
 
-  new_report_item =
-    marpa_obs_new (MARPA_AVL_OBSTACK (report_tree),
-		   struct marpa_progress_item, 1);
-  Position_of_PROGRESS (new_report_item) = xrl_position;
-  Origin_of_PROGRESS (new_report_item) = Origin_Ord_of_YIM(origin_yim);
-  RULEID_of_PROGRESS (new_report_item) = ID_of_XRL (source_xrl);
-  _marpa_avl_insert (report_tree, new_report_item);
-  return;
+  @t}\comment{@>
+  /* Look at the predecessor items for
+   * the origin of the XRL.
+   */
+  {
+     const NSYID lhs_nsyid = LHS_NSYID_of_YIM(origin_yim);
+     const YS origin_ys = YS_of_YIM(origin_yim);
+     PIM pim = First_PIM_of_YS_by_NSYID (origin_ys, lhs_nsyid);
+     for (; pim; pim = Next_PIM_of_PIM (pim))
+     {
+         const YIM predecessor = YIM_of_PIM (pim);
+         @t}\comment{@>
+         /* Ignore PIM chains with Leo items in them.
+          * (Leo items will always be first.)
+          */
+         if (!predecessor) return;
+         if (YIM_is_Active(predecessor)) {
+           progress_report_items_insert(report_tree,
+             report_ahm, predecessor);
+         }
+     }
+  }
 }
 
 @ @<Function definitions@> =
