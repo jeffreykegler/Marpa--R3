@@ -5115,7 +5115,7 @@ Marpa_Symbol_ID _marpa_g_ahm_postdot(Marpa_Grammar g,
     = AHM_is_Prediction (current_item)
       ? -1
       : SYMI_of_IRL (irl) + Position_of_AHM (current_item - 1);
-  @<Memoize XRL data for AHM@>@;
+  memoize_xrl_data_for_AHM(current_item, irl);
 }
 
 @ @<Create an AHM for a completion@> =
@@ -5124,7 +5124,7 @@ Marpa_Symbol_ID _marpa_g_ahm_postdot(Marpa_Grammar g,
   Postdot_NSYID_of_AHM (current_item) = -1;
   Position_of_AHM (current_item) = -1;
   SYMI_of_AHM(current_item) = SYMI_of_IRL(irl) + Position_of_AHM(current_item-1);
-  @<Memoize XRL data for AHM@>@;
+  memoize_xrl_data_for_AHM(current_item, irl);
 }
 
 @ @<Initializations common to all AHMs@> =
@@ -5148,7 +5148,9 @@ Marpa_Symbol_ID _marpa_g_ahm_postdot(Marpa_Grammar g,
   @<Initialize event data for |current_item|@>@;
 }
 
-@ @<Memoize XRL data for AHM@> =
+@ @<Function definitions@> =
+PRIVATE void
+memoize_xrl_data_for_AHM(AHM current_item, IRL irl)
 {
   XRL source_xrl = Source_XRL_of_IRL(irl);
   XRL_of_AHM(current_item) = source_xrl;
@@ -5156,24 +5158,30 @@ Marpa_Symbol_ID _marpa_g_ahm_postdot(Marpa_Grammar g,
     @t}\comment{@>
     /* |source_xrl = NULL|, which is the case only for the start rule */
     XRL_Position_of_AHM(current_item) = -2;
-  } else {
+    return;
+  }
+  {
     const int virtual_start = Virtual_Start_of_IRL (irl);
     const int irl_position = Position_of_AHM (current_item);
-    int xrl_position = irl_position;
-    if (virtual_start >= 0)
-      {
-        xrl_position += virtual_start;
-      }
     if (XRL_is_Sequence (source_xrl))
       {
         @t}\comment{@>
         /* Note that a sequence XRL,
           because of the way it is rewritten, may have several
          IRL's, and therefore several AHM's at position 0. */
-        xrl_position = irl_position > 0 ? -1 : 0;
+        XRL_Position_of_AHM(current_item) = irl_position > 0 ? -1 : 0;
+        return;
       }
-    XRL_Position_of_AHM(current_item) = xrl_position;
+    @t}\comment{@>
+    /* If here, we are dealing with a normal rule. */
+    if (virtual_start >= 0)
+      {
+        XRL_Position_of_AHM(current_item) = irl_position + virtual_start;
+        return;
+      }
+    XRL_Position_of_AHM(current_item) = irl_position;
   }
+  return;
 }
 
 @ This is done after creating the AHMs, because in
