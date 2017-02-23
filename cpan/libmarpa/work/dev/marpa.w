@@ -5173,7 +5173,13 @@ memoize_xrl_data_for_AHM(AHM current_item, IRL irl)
         return;
       }
     @t}\comment{@>
-    /* If here, we are dealing with a normal rule. */
+    /* Completed CHAF rules are a special case */
+    if (IRL_is_CHAF (irl) &&
+        (irl_position < 0 || irl_position >= Length_of_IRL(irl)))
+    {
+      XRL_Position_of_AHM(current_item) = -1;
+      return;
+    }
     if (virtual_start >= 0)
       {
         XRL_Position_of_AHM(current_item) = irl_position + virtual_start;
@@ -9699,8 +9705,8 @@ int marpa_r_progress_report_reset( Marpa_Recognizer r)
 
    MARPA_OFF_DEBUG2("At %s, Do the progress report", STRLOC);
 
-  progress_report_item_insert (report_tree, AHM_of_YIM (earley_item),
-			       Origin_Ord_of_YIM (earley_item));
+  progress_report_items_insert (report_tree, AHM_of_YIM (earley_item),
+			       earley_item);
   for (leo_source_link = First_Leo_SRCL_of_YIM (earley_item);
        leo_source_link; leo_source_link = Next_SRCL_of_SRCL (leo_source_link))
     {
@@ -9718,10 +9724,9 @@ int marpa_r_progress_report_reset( Marpa_Recognizer r)
 	   leo_item; leo_item = Predecessor_LIM_of_LIM (leo_item))
 	{
           const YIM trailhead_yim = Trailhead_YIM_of_LIM (leo_item);
-	  const YSID trailhead_origin = Ord_of_YS (Origin_of_YIM (trailhead_yim));
 	  const AHM trailhead_ahm = Trailhead_AHM_of_LIM (leo_item);
-	  progress_report_item_insert (report_tree, trailhead_ahm,
-				       trailhead_origin);
+	  progress_report_items_insert (report_tree, trailhead_ahm,
+				       trailhead_yim);
 	}
 
        MARPA_OFF_DEBUG3("At %s, finished Leo source link %p", STRLOC, leo_source_link);
@@ -9730,9 +9735,9 @@ int marpa_r_progress_report_reset( Marpa_Recognizer r)
 
 @ @<Function definitions@> =
 PRIVATE void
-progress_report_item_insert(MARPA_AVL_TREE report_tree,
+progress_report_items_insert(MARPA_AVL_TREE report_tree,
   AHM report_ahm,
-    YSID report_origin)
+    YIM origin_yim)
 {
   PROGRESS new_report_item;
   const XRL source_xrl = XRL_of_AHM (report_ahm);
@@ -9757,7 +9762,7 @@ progress_report_item_insert(MARPA_AVL_TREE report_tree,
     marpa_obs_new (MARPA_AVL_OBSTACK (report_tree),
 		   struct marpa_progress_item, 1);
   Position_of_PROGRESS (new_report_item) = xrl_position;
-  Origin_of_PROGRESS (new_report_item) = report_origin;
+  Origin_of_PROGRESS (new_report_item) = Origin_Ord_of_YIM(origin_yim);
   RULEID_of_PROGRESS (new_report_item) = ID_of_XRL (source_xrl);
   _marpa_avl_insert (report_tree, new_report_item);
   return;
