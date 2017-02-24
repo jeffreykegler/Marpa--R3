@@ -9772,17 +9772,20 @@ progress_report_items_insert(MARPA_AVL_TREE report_tree,
     return;
   }
   @t}\comment{@>
-  /* LHS is a mortar symbol */
+  /* If here, LHS is a mortar symbol */
   @t}\comment{@>
-  /* As a special case, skip all but the top sequence rule.
-   * This is necessary to avoid infinite recursion.
+  /* We don't recurse on sequence rules --
+   * we only need to look at the top rules, which
+   * have brick LHS's
    */
-  if (XRL_is_Sequence(source_xrl) && Position_of_AHM(report_ahm) <= 0)
-      return;
+  if (XRL_is_Sequence(source_xrl)) return;
 
   @t}\comment{@>
   /* Look at the predecessor items for
-   * the origin of the XRL.
+   * the origin of the XRL.  At this point, only
+   * CHAF rules do this.  Source rules and sequence rules
+   * were specifically excluded above.  And BNF rules
+   * will also have a non-virtual LHS.
    */
   {
      const NSYID lhs_nsyid = LHS_NSYID_of_YIM(origin_yim);
