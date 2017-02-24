@@ -9983,7 +9983,7 @@ if(XRL_is_Sequence(source_xrl))
 
 
 
-XRL_Position_of_AHM(current_item)= irl_position> 0?-1:0;
+XRL_Position_of_AHM(current_item)= irl_position?-1:0;
 return;
 }
 

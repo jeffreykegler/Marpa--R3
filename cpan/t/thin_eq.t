@@ -238,18 +238,19 @@ $marpa_lua->exec(<<'END_OF_LUA');
      Test.More.is(#terminals_expected, 1, 'count of terminals expected')
      Test.More.is(terminals_expected[1], sep, 'expected terminal')
 
-     local ordinal = recce:latest_earley_set()
-     recce:progress_report_start(ordinal)
      local report = {}
-     while true do
-         local rule_id, dot_position, origin = recce:progress_item()
-         if not rule_id then break end
-         report[#report+1] = rule_id
-         report[#report+1] = dot_position
-         report[#report+1] = origin
+     local last_ordinal = recce:latest_earley_set()
+     for ordinal = 0, last_ordinal do
+         recce:progress_report_start(ordinal)
+         while true do
+             local rule_id, dot_position, origin = recce:progress_item()
+             if not rule_id then break end
+             report[#report+1] = string.format("%d:%d@%d",
+                 rule_id, dot_position, origin)
+         end
      end
      local report_string = table.concat(report, ' ')
-     Test.More.is(report_string, '0 -1 0 0 0 0', 'progress report' )
+     Test.More.is(report_string, '0:0@0 0:-1@0', 'progress report' )
 
      recce:alternative(sep, 1, 1)
      recce:earleme_complete()

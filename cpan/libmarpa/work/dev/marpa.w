@@ -5169,7 +5169,7 @@ memoize_xrl_data_for_AHM(AHM current_item, IRL irl)
         /* Note that a sequence XRL,
           because of the way it is rewritten, may have several
          IRL's, and therefore several AHM's at position 0. */
-        XRL_Position_of_AHM(current_item) = irl_position > 0 ? -1 : 0;
+        XRL_Position_of_AHM(current_item) = irl_position ? -1 : 0;
         return;
       }
     @t}\comment{@>
