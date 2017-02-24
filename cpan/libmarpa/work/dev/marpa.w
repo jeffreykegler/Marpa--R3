@@ -9752,6 +9752,10 @@ progress_report_items_insert(MARPA_AVL_TREE report_tree,
    insert the report item and return
    */
   if (!IRL_has_Virtual_LHS (IRL_of_YIM (origin_yim))) {
+    int xrl_position = XRL_Position_of_AHM (report_ahm);
+    int origin_of_xrl = Origin_Ord_of_YIM(origin_yim);
+    XRLID xrl_id = ID_of_XRL (source_xrl);
+
     PROGRESS new_report_item =
       marpa_obs_new (MARPA_AVL_OBSTACK (report_tree),
                      struct marpa_progress_item, 1);
@@ -9764,10 +9768,22 @@ progress_report_items_insert(MARPA_AVL_TREE report_tree,
     MARPA_DEBUG3("%s, xrl dot = %d", STRLOC, XRL_Position_of_AHM (report_ahm));
     MARPA_DEBUG3("%s, origin ord = %d", STRLOC, Origin_Ord_of_YIM(origin_yim));
 
-    Position_of_PROGRESS (new_report_item) = XRL_Position_of_AHM (report_ahm);
-    Origin_of_PROGRESS (new_report_item) = Origin_Ord_of_YIM(origin_yim);
-    RULEID_of_PROGRESS (new_report_item) = ID_of_XRL (source_xrl);
+    Position_of_PROGRESS (new_report_item) = xrl_position;
+    Origin_of_PROGRESS (new_report_item) = origin_of_xrl;
+    RULEID_of_PROGRESS (new_report_item) = xrl_id;
     _marpa_avl_insert (report_tree, new_report_item);
+
+    @t}\comment{@>
+    /* If this is the prediction of a nullable, then also
+       add its completion */
+
+    if (XRL_is_Nullable(source_xrl) && xrl_position == 0) {
+        new_report_item = marpa_obs_new (MARPA_AVL_OBSTACK (report_tree),
+                       struct marpa_progress_item, 1);
+        Position_of_PROGRESS (new_report_item) = -1;
+        Origin_of_PROGRESS (new_report_item) = origin_of_xrl;
+        RULEID_of_PROGRESS (new_report_item) = xrl_id;
+    }
     return;
   }
   @t}\comment{@>
