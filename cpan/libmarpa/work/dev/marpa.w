@@ -5230,7 +5230,7 @@ result of a prediction, and does not always
 indicate whether the AHM or YIM contains a
 prediction.
 This is relevant in the case of the the
-initial AHM, which contains a predicted,
+initial AHM, which contains a prediction,
 but for which ``was predicted'' is false.
 @d AHM_was_Predicted(ahm) ((ahm)->t_was_predicted)
 @d YIM_was_Predicted(yim) AHM_was_Predicted(AHM_of_YIM(yim))
