@@ -164,7 +164,6 @@ P8 @2-2 L1c5 expression -> . variable
 P9 @2-2 L1c5 expression -> . string
 P10 @2-2 L1c5 expression -> . 'string' '(' <numeric expression> ')'
 P11 @2-2 L1c5 expression -> . expression '+' expression
-P0 @0-3 L1c1-11 statements -> . statement *
 F0 @0-3 L1c1-11 statements -> statement * .
 P1 @3-3 L1c13 statement -> . assignment
 P2 @3-3 L1c13 statement -> . <numeric assignment>
@@ -183,7 +182,6 @@ P8 @4-4 L1c15 expression -> . variable
 P9 @4-4 L1c15 expression -> . string
 P10 @4-4 L1c15 expression -> . 'string' '(' <numeric expression> ')'
 R11:2 @2-4 L1c5-13 expression -> expression '+' . expression
-P0 @0-5 L1c1-16 statements -> . statement *
 F0 @0-5 L1c1-16 statements -> statement * .
 P1 @5-5 L1c17 statement -> . assignment
 P2 @5-5 L1c17 statement -> . <numeric assignment>
@@ -219,14 +217,14 @@ my $report0 = $recce->progress(0);
 chomp( my $expected_report0 = <<'END_PROGRESS_REPORT');
 [[0,0,0],[1,0,0],[2,0,0],[3,0,0],[4,0,0],[19,0,0]]
 END_PROGRESS_REPORT
-Marpa::R3::Test::is( Data::Dumper::Dumper($report0),
+Test::More::is_deeply( Data::Dumper::Dumper($report0),
     $expected_report0, 'progress report at location 0' );
 
 # Marpa::R3::Display::End
 
 # Try again with negative index
 $report0 = $recce->progress(-6);
-Marpa::R3::Test::is( Data::Dumper::Dumper($report0),
+Test::More::is_deeply( Data::Dumper::Dumper($report0),
     $expected_report0, 'progress report at location -6' );
 
 my $report1 = $recce->progress(1);
@@ -239,14 +237,14 @@ my $report1 = $recce->progress(1);
 chomp( my $expected_report1 = <<'END_PROGRESS_REPORT');
 [[4,1,0]]
 END_PROGRESS_REPORT
-Marpa::R3::Test::is( Data::Dumper::Dumper($report1),
+Test::More::is_deeply( Data::Dumper::Dumper($report1),
     $expected_report1, 'progress report at location 1' );
 
 # Marpa::R3::Display::End
 
 # Try again with negative index
 $report1 = $recce->progress(-5);
-Marpa::R3::Test::is( Data::Dumper::Dumper($report1),
+Test::More::is_deeply( Data::Dumper::Dumper($report1),
     $expected_report1, 'progress report at location -5' );
 
 my $report2 = $recce->progress(2);
@@ -259,14 +257,14 @@ my $report2 = $recce->progress(2);
 chomp( my $expected_report2 = <<'END_PROGRESS_REPORT');
 [[5,0,2],[6,0,2],[7,0,2],[8,0,2],[9,0,2],[10,0,2],[11,0,2],[4,2,0]]
 END_PROGRESS_REPORT
-Marpa::R3::Test::is( Data::Dumper::Dumper($report2),
+Test::More::is_deeply( Data::Dumper::Dumper($report2),
     $expected_report2, 'progress report at location 2' );
 
 # Marpa::R3::Display::End
 
 # Try again with negative index
 $report2 = $recce->progress(-4);
-Marpa::R3::Test::is( Data::Dumper::Dumper($report2),
+Test::More::is_deeply( Data::Dumper::Dumper($report2),
     $expected_report2, 'progress report at location -4' );
 
 # Marpa::R3::Display
@@ -282,25 +280,25 @@ my $latest_report = $recce->progress();
 # end-before-line: '^END_PROGRESS_REPORT$'
 
 chomp( my $expected_default_report = <<'END_PROGRESS_REPORT');
-[[0,-1,0],[2,-1,0],[4,-1,0],[5,-1,2],[7,-1,4],[8,-1,4],[11,-1,2],[19,-1,0],[0,0,0],[1,0,5],[2,0,5],[3,0,5],[4,0,5],[11,1,2]]
+[[0,-1,0],[2,-1,0],[4,-1,0],[5,-1,2],[7,-1,4],[8,-1,4],[11,-1,2],[19,-1,0],[1,0,5],[2,0,5],[3,0,5],[4,0,5],[11,1,2]]
 END_PROGRESS_REPORT
-Marpa::R3::Test::is( Data::Dumper::Dumper($latest_report),
+Test::More::is_deeply( Data::Dumper::Dumper($latest_report),
     $expected_default_report, 'progress report at default location' );
 
 # Marpa::R3::Display::End
 
 chomp( my $expected_report3 = <<'END_PROGRESS_REPORT');
-[[0,-1,0],[2,-1,0],[4,-1,0],[5,-1,2],[6,-1,2],[7,-1,2],[8,-1,2],[19,-1,0],[0,0,0],[1,0,3],[2,0,3],[3,0,3],[4,0,3],[11,1,2]]
+[[0,-1,0],[2,-1,0],[4,-1,0],[5,-1,2],[6,-1,2],[7,-1,2],[8,-1,2],[19,-1,0],[1,0,3],[2,0,3],[3,0,3],[4,0,3],[11,1,2]]
 END_PROGRESS_REPORT
 
 # Try latest report again with explicit index
 my $report3 = $recce->progress(3);
-Marpa::R3::Test::is( Data::Dumper::Dumper($report3),
+Test::More::is_deeply( Data::Dumper::Dumper($report3),
     $expected_report3, 'progress report at location 3' );
 
 # Try latest report again with negative index
 $latest_report = $recce->progress(-3);
-Marpa::R3::Test::is( Data::Dumper::Dumper($latest_report),
+Test::More::is_deeply( Data::Dumper::Dumper($latest_report),
     $expected_report3, 'progress report at location -3' );
 
 # Marpa::R3::Display
