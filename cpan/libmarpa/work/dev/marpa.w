@@ -9745,26 +9745,25 @@ progress_report_items_insert(MARPA_AVL_TREE report_tree,
      STRLOC, report_tree, report_ahm, origin_yim);
 
   const XRL source_xrl = XRL_of_AHM (report_ahm);
-  const XRL origin_xrl = XRL_of_YIM (origin_yim);
   if (!source_xrl) return;
-
-  MARPA_DEBUG3("%s, report_ahm = %p", STRLOC, report_ahm);
-  MARPA_DEBUG3("%s, origin ahm = %p", STRLOC, AHM_of_YIM(origin_yim));
-  MARPA_DEBUG3("%s, source_xrl = %p", STRLOC, source_xrl);
-  MARPA_DEBUG3("%s, origin_xrl = %p", STRLOC, origin_xrl);
-  MARPA_DEBUG3("%s, source_xrl is sequence = %ld", STRLOC,
-      XRL_is_Sequence(source_xrl));
-  MARPA_DEBUG3("%s, length of xrl sequence = %ld", STRLOC,
-          Length_of_XRL (source_xrl));
 
   @t}\comment{@>
   /* If LHS is a brick symbol, we are done --
-   * insert the report item and return
+   insert the report item and return
    */
   if (!IRL_has_Virtual_LHS (IRL_of_YIM (origin_yim))) {
     PROGRESS new_report_item =
       marpa_obs_new (MARPA_AVL_OBSTACK (report_tree),
                      struct marpa_progress_item, 1);
+
+    MARPA_DEBUG2("%s, === Adding report item ===", STRLOC);
+    MARPA_DEBUG3("%s, report irl = %d", STRLOC, IRLID_of_AHM(report_ahm));
+    MARPA_DEBUG3("%s, report irl position = %d", STRLOC, Position_of_AHM(report_ahm));
+
+    MARPA_DEBUG3("%s, xrl = %d", STRLOC, ID_of_XRL (source_xrl));
+    MARPA_DEBUG3("%s, xrl dot = %d", STRLOC, XRL_Position_of_AHM (report_ahm));
+    MARPA_DEBUG3("%s, origin ord = %d", STRLOC, Origin_Ord_of_YIM(origin_yim));
+
     Position_of_PROGRESS (new_report_item) = XRL_Position_of_AHM (report_ahm);
     Origin_of_PROGRESS (new_report_item) = Origin_Ord_of_YIM(origin_yim);
     RULEID_of_PROGRESS (new_report_item) = ID_of_XRL (source_xrl);
@@ -9775,29 +9774,28 @@ progress_report_items_insert(MARPA_AVL_TREE report_tree,
   /* If here, LHS is a mortar symbol */
   @t}\comment{@>
   /* We don't recurse on sequence rules --
-   * we only need to look at the top rules, which
-   * have brick LHS's
+   we only need to look at the top rules, which
+   have brick LHS's
    */
   if (XRL_is_Sequence(source_xrl)) return;
 
   @t}\comment{@>
   /* Look at the predecessor items for
-   * the origin of the XRL.  At this point, only
-   * CHAF rules do this.  Source rules and sequence rules
-   * were specifically excluded above.  And BNF rules
-   * will also have a non-virtual LHS.
+   the origin of the XRL.  At this point, only
+   CHAF rules do this.  Source rules and sequence rules
+   were specifically excluded above.  And BNF rules
+   will also have a non-virtual LHS.
    */
   {
      const NSYID lhs_nsyid = LHS_NSYID_of_YIM(origin_yim);
-     const YS origin_ys = YS_of_YIM(origin_yim);
-     PIM pim = First_PIM_of_YS_by_NSYID (origin_ys, lhs_nsyid);
-     MARPA_DEBUG4("%s, first pim, ys = %p, id = %d", STRLOC, origin_ys, lhs_nsyid);
+     const YS origin_of_origin_ys = Origin_of_YIM(origin_yim);
+     PIM pim = First_PIM_of_YS_by_NSYID (origin_of_origin_ys, lhs_nsyid);
      for (; pim; pim = Next_PIM_of_PIM (pim))
      {
          const YIM predecessor = YIM_of_PIM (pim);
          @t}\comment{@>
          /* Ignore PIM chains with Leo items in them.
-          * (Leo items will always be first.)
+          (Leo items will always be first.)
           */
          if (!predecessor) return;
          if (YIM_is_Active(predecessor)) {
