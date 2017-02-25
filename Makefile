@@ -65,6 +65,7 @@ gnu_ac_disttest:
 
 install:
 	@echo === install target ===
+	date > cpan/engine/read_only.time-stamp
 	(cd cpan/meta && $(MAKE) all)
 	(cd cpan && perl Makefile.PL)
 	(cd cpan && $(MAKE))
