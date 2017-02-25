@@ -27,7 +27,7 @@ my ( $major, $minor, $underscore, $micro, $libmarpa_major, $libmarpa_minor,
     = (
     $latest =~ m/\A
 	  (\d+) [.] (\d\d\d) ([_]?) (\d\d\d)
-	  \s+ [(] libmarpa \s+ (\d+) [.] (\d+) [.] (\d+) [)]
+	  \s+ [(] forked \s+ libmarpa \s+ (\d+) [.] (\d+) [.] (\d+) [)]
 	/xms
     );
 
