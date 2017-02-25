@@ -12,6 +12,8 @@
 
 # Temporary
 ^grep[.]pl$
+^look1[.]t$
+^look2[.]t$
 
 # Permanent
 
