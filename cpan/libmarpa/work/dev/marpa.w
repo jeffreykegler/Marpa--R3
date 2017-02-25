@@ -9740,11 +9740,12 @@ progress_report_items_insert(MARPA_AVL_TREE report_tree,
   AHM report_ahm,
     YIM origin_yim)
 {
-  MARPA_DEBUG5(
+  const XRL source_xrl = XRL_of_AHM (report_ahm);
+
+  MARPA_OFF_DEBUG5(
      "%s Calling progress_report_items_insert(%p, %p, %p)",
      STRLOC, report_tree, report_ahm, origin_yim);
 
-  const XRL source_xrl = XRL_of_AHM (report_ahm);
   if (!source_xrl) return;
 
   @t}\comment{@>
@@ -9760,13 +9761,13 @@ progress_report_items_insert(MARPA_AVL_TREE report_tree,
       marpa_obs_new (MARPA_AVL_OBSTACK (report_tree),
                      struct marpa_progress_item, 1);
 
-    MARPA_DEBUG2("%s, === Adding report item ===", STRLOC);
-    MARPA_DEBUG3("%s, report irl = %d", STRLOC, IRLID_of_AHM(report_ahm));
-    MARPA_DEBUG3("%s, report irl position = %d", STRLOC, Position_of_AHM(report_ahm));
+    MARPA_OFF_DEBUG2("%s, === Adding report item ===", STRLOC);
+    MARPA_OFF_DEBUG3("%s, report irl = %d", STRLOC, IRLID_of_AHM(report_ahm));
+    MARPA_OFF_DEBUG3("%s, report irl position = %d", STRLOC, Position_of_AHM(report_ahm));
 
-    MARPA_DEBUG3("%s, xrl = %d", STRLOC, ID_of_XRL (source_xrl));
-    MARPA_DEBUG3("%s, xrl dot = %d", STRLOC, XRL_Position_of_AHM (report_ahm));
-    MARPA_DEBUG3("%s, origin ord = %d", STRLOC, Origin_Ord_of_YIM(origin_yim));
+    MARPA_OFF_DEBUG3("%s, xrl = %d", STRLOC, ID_of_XRL (source_xrl));
+    MARPA_OFF_DEBUG3("%s, xrl dot = %d", STRLOC, XRL_Position_of_AHM (report_ahm));
+    MARPA_OFF_DEBUG3("%s, origin ord = %d", STRLOC, Origin_Ord_of_YIM(origin_yim));
 
     Position_of_PROGRESS (new_report_item) = xrl_position;
     Origin_of_PROGRESS (new_report_item) = origin_of_xrl;
