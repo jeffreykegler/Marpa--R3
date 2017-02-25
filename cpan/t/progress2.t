@@ -145,107 +145,147 @@ EOS
 
     Marpa::R3::Test::is( earley_set_display(1), <<'EOS', 'Earley Set 1' );
 === Earley Set 1 ===
+S:0 @1-1 SS -> . A A A A A A A
 S:1 @0-1 SS -> A . A A A A A A
+S:1 @1-1 SS -> A . A A A A A A
 S:2 @0-1 SS -> A A . A A A A A
+S:2 @1-1 SS -> A A . A A A A A
 S:3 @0-1 SS -> A A A . A A A A
+S:3 @1-1 SS -> A A A . A A A A
 S:4 @0-1 SS -> A A A A . A A A
+S:4 @1-1 SS -> A A A A . A A A
 S:5 @0-1 SS -> A A A A A . A A
+S:5 @1-1 SS -> A A A A A . A A
 S:6 @0-1 SS -> A A A A A A . A
+S:6 @1-1 SS -> A A A A A A . A
 S:-1 @0-1 SS -> A A A A A A A .
+S:-1 @1-1 SS -> A A A A A A A .
 EOS
 
     Marpa::R3::Test::is( earley_set_display(2), <<'EOS', 'Earley Set 2' );
 === Earley Set 2 ===
+S:0 @2-2 SS -> . A A A A A A A
 S:1 @1-2 SS -> A . A A A A A A
+S:1 @2-2 SS -> A . A A A A A A
 S:2 @0-2 SS -> A A . A A A A A
 S:2 @1-2 SS -> A A . A A A A A
+S:2 @2-2 SS -> A A . A A A A A
 S:3 @0-2 SS -> A A A . A A A A
 S:3 @1-2 SS -> A A A . A A A A
+S:3 @2-2 SS -> A A A . A A A A
 S:4 @0-2 SS -> A A A A . A A A
 S:4 @1-2 SS -> A A A A . A A A
+S:4 @2-2 SS -> A A A A . A A A
 S:5 @0-2 SS -> A A A A A . A A
 S:5 @1-2 SS -> A A A A A . A A
+S:5 @2-2 SS -> A A A A A . A A
 S:6 @0-2 SS -> A A A A A A . A
 S:6 @1-2 SS -> A A A A A A . A
+S:6 @2-2 SS -> A A A A A A . A
 S:-1 @0-2 SS -> A A A A A A A .
 S:-1 @1-2 SS -> A A A A A A A .
+S:-1 @2-2 SS -> A A A A A A A .
 EOS
 
     Marpa::R3::Test::is( earley_set_display(3), <<'EOS', 'Earley Set 3' );
 === Earley Set 3 ===
+S:0 @3-3 SS -> . A A A A A A A
 S:1 @2-3 SS -> A . A A A A A A
+S:1 @3-3 SS -> A . A A A A A A
 S:2 @1-3 SS -> A A . A A A A A
 S:2 @2-3 SS -> A A . A A A A A
+S:2 @3-3 SS -> A A . A A A A A
 S:3 @0-3 SS -> A A A . A A A A
 S:3 @1-3 SS -> A A A . A A A A
 S:3 @2-3 SS -> A A A . A A A A
+S:3 @3-3 SS -> A A A . A A A A
 S:4 @0-3 SS -> A A A A . A A A
 S:4 @1-3 SS -> A A A A . A A A
 S:4 @2-3 SS -> A A A A . A A A
+S:4 @3-3 SS -> A A A A . A A A
 S:5 @0-3 SS -> A A A A A . A A
 S:5 @1-3 SS -> A A A A A . A A
 S:5 @2-3 SS -> A A A A A . A A
+S:5 @3-3 SS -> A A A A A . A A
 S:6 @0-3 SS -> A A A A A A . A
 S:6 @1-3 SS -> A A A A A A . A
 S:6 @2-3 SS -> A A A A A A . A
+S:6 @3-3 SS -> A A A A A A . A
 S:-1 @0-3 SS -> A A A A A A A .
 S:-1 @1-3 SS -> A A A A A A A .
 S:-1 @2-3 SS -> A A A A A A A .
+S:-1 @3-3 SS -> A A A A A A A .
 EOS
 
     Marpa::R3::Test::is( earley_set_display(4), <<'EOS', 'Earley Set 4' );
 === Earley Set 4 ===
+S:0 @4-4 SS -> . A A A A A A A
 S:1 @3-4 SS -> A . A A A A A A
+S:1 @4-4 SS -> A . A A A A A A
 S:2 @2-4 SS -> A A . A A A A A
 S:2 @3-4 SS -> A A . A A A A A
+S:2 @4-4 SS -> A A . A A A A A
 S:3 @1-4 SS -> A A A . A A A A
 S:3 @2-4 SS -> A A A . A A A A
 S:3 @3-4 SS -> A A A . A A A A
+S:3 @4-4 SS -> A A A . A A A A
 S:4 @0-4 SS -> A A A A . A A A
 S:4 @1-4 SS -> A A A A . A A A
 S:4 @2-4 SS -> A A A A . A A A
 S:4 @3-4 SS -> A A A A . A A A
+S:4 @4-4 SS -> A A A A . A A A
 S:5 @0-4 SS -> A A A A A . A A
 S:5 @1-4 SS -> A A A A A . A A
 S:5 @2-4 SS -> A A A A A . A A
 S:5 @3-4 SS -> A A A A A . A A
+S:5 @4-4 SS -> A A A A A . A A
 S:6 @0-4 SS -> A A A A A A . A
 S:6 @1-4 SS -> A A A A A A . A
 S:6 @2-4 SS -> A A A A A A . A
 S:6 @3-4 SS -> A A A A A A . A
+S:6 @4-4 SS -> A A A A A A . A
 S:-1 @0-4 SS -> A A A A A A A .
 S:-1 @1-4 SS -> A A A A A A A .
 S:-1 @2-4 SS -> A A A A A A A .
 S:-1 @3-4 SS -> A A A A A A A .
+S:-1 @4-4 SS -> A A A A A A A .
 EOS
 
     Marpa::R3::Test::is( earley_set_display(5), <<'EOS', 'Earley Set 5' );
 === Earley Set 5 ===
+S:0 @5-5 SS -> . A A A A A A A
 S:1 @4-5 SS -> A . A A A A A A
+S:1 @5-5 SS -> A . A A A A A A
 S:2 @3-5 SS -> A A . A A A A A
 S:2 @4-5 SS -> A A . A A A A A
+S:2 @5-5 SS -> A A . A A A A A
 S:3 @2-5 SS -> A A A . A A A A
 S:3 @3-5 SS -> A A A . A A A A
 S:3 @4-5 SS -> A A A . A A A A
+S:3 @5-5 SS -> A A A . A A A A
 S:4 @1-5 SS -> A A A A . A A A
 S:4 @2-5 SS -> A A A A . A A A
 S:4 @3-5 SS -> A A A A . A A A
 S:4 @4-5 SS -> A A A A . A A A
+S:4 @5-5 SS -> A A A A . A A A
 S:5 @0-5 SS -> A A A A A . A A
 S:5 @1-5 SS -> A A A A A . A A
 S:5 @2-5 SS -> A A A A A . A A
 S:5 @3-5 SS -> A A A A A . A A
 S:5 @4-5 SS -> A A A A A . A A
+S:5 @5-5 SS -> A A A A A . A A
 S:6 @0-5 SS -> A A A A A A . A
 S:6 @1-5 SS -> A A A A A A . A
 S:6 @2-5 SS -> A A A A A A . A
 S:6 @3-5 SS -> A A A A A A . A
 S:6 @4-5 SS -> A A A A A A . A
+S:6 @5-5 SS -> A A A A A A . A
 S:-1 @0-5 SS -> A A A A A A A .
 S:-1 @1-5 SS -> A A A A A A A .
 S:-1 @2-5 SS -> A A A A A A A .
 S:-1 @3-5 SS -> A A A A A A A .
 S:-1 @4-5 SS -> A A A A A A A .
+S:-1 @5-5 SS -> A A A A A A A .
 EOS
 
     Marpa::R3::Test::is( earley_set_display(6), <<'EOS', 'Earley Set 6' );
@@ -326,6 +366,8 @@ S:-1 @5-7 SS -> A A A A A A A .
 S:-1 @6-7 SS -> A A A A A A A .
 S:-1 @7-7 SS -> A A A A A A A .
 EOS
+
+}
 
     Marpa::R3::Test::is( earley_set_display(8), <<'EOS', 'Earley Set 8' );
 === Earley Set 8 ===
@@ -416,7 +458,5 @@ S:-1 @5-11 SS -> A A A A A A A .
 S:-1 @6-11 SS -> A A A A A A A .
 S:-1 @7-11 SS -> A A A A A A A .
 EOS
-
-}
 
 # vim: expandtab shiftwidth=4:
