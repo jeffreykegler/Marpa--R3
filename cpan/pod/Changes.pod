@@ -27,6 +27,30 @@ and tools to Marpa::R3.
 
 =head1 Changes
 
+=head2 Problems with kernel Earley items in progress reports fixed
+
+Progress reports had been misreporting some
+Earley items.  The misreported items
+were certain kernel Earley items
+instances containing one
+or more proper nullables.
+By kernel Earley item, I mean an Earley item
+where the dot is in the middle -- not at the beginning
+and and not at the end.
+In other words, kernel Earley items are items which
+are not predictions, and which are not
+completions.
+
+This bug is actually quite obscure --
+almost all interest in progress reports is in
+completed Earley items, which were not affected.
+So obscure, in fact, was this bug that
+it went unnoticed in use.
+It surfaced only when I reread the
+code and realized that some corner cases were
+not being dealt with correctly.
+This bugs is now fixed.
+
 =head2 Semantics moved from recognizer to grammar
 
 In Marpa::R2, the semantics was not finally settled
