@@ -2278,7 +2278,7 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
 }
 
 #define EXPECTED_LIBMARPA_MAJOR 8
-#define EXPECTED_LIBMARPA_MINOR 4
+#define EXPECTED_LIBMARPA_MINOR 6
 #define EXPECTED_LIBMARPA_MICRO 0
 
 /* get_mortalspace comes from "Extending and Embedding Perl"

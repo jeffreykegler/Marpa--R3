@@ -4983,7 +4983,7 @@ but before it is executed.
     #endif
 
     #define EXPECTED_LIBMARPA_MAJOR 8
-    #define EXPECTED_LIBMARPA_MINOR 4
+    #define EXPECTED_LIBMARPA_MINOR 6
     #define EXPECTED_LIBMARPA_MICRO 0
 
 ```

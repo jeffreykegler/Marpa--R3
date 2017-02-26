@@ -17,7 +17,7 @@
 # ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 
-version=`cat LIB_VERSION`
+version:=$(shell cat LIB_VERSION)
 
 .PHONY: dummy dist doc_dist doc1_dist cm_dist test tar work_install
 
