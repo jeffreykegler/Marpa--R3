@@ -1706,7 +1706,17 @@ sub Marpa::R3::Scanless::R::lexeme_read {
 sub Marpa::R3::Scanless::R::pause_span {
     my ($slr) = @_;
     my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
-    return $thin_slr->pause_span();
+    my ($start, $end) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+            <<'END_OF_LUA', ''  );
+        local recce = ...
+        local lexeme_start = recce.start_of_pause_lexeme
+        local lexeme_end = recce.end_of_pause_lexeme
+        if lexeme_end < 0 then return -1, -1 end
+        local lexeme_length = lexeme_end - lexeme_start
+        return lexeme_start, lexeme_end - lexeme_start
+END_OF_LUA
+    return if $start < 0;
+    return $start, $end;
 }
 
 sub Marpa::R3::Scanless::R::line_column {
