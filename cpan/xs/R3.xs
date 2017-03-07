@@ -1957,7 +1957,7 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
                         "recce, lexeme_start, lexeme_end,\n"
                         "    g1_lexeme, priority, required_priority = ...\n"
                         "local q = recce.lexeme_queue\n"
-                        "q[#q+1] = { '!trace', 'outprioritized lexeme',\n"
+                        "q[#q+1] = { '!trace', 'acceptable lexeme',\n"
                         "   lexeme_start, lexeme_end, g1_lexeme, priority, required_priority}\n"
                         , "Riiiii>", outer_slr->lua_ref,
                         (lua_Integer) slr->start_of_lexeme,
@@ -2009,34 +2009,30 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
             union marpa_slr_event_s *const lexeme_stack_event =
                 slr->t_lexemes + i;
             const int event_type = MARPA_SLREV_TYPE (lexeme_stack_event);
+
+            call_by_tag (outer_slr->L, MYLUA_TAG,
+                "recce, i, high_lexeme_priority = ...\n"
+                "local lexeme_q = recce.lexeme_queue\n"
+                "local this_event = lexeme_q[i]\n"
+                "local event_type = this_event[2]\n"
+                "if event_type == 'acceptable lexeme' then\n"
+                "    local bang_trace, event_type, lexeme_start, lexeme_end,\n"
+                "    g1_lexeme, priority, required_priority =\n"
+                "        table.unpack(this_event)\n"
+                "    if priority < high_lexeme_priority\n"
+                "            and recce.trace_terminals > 0 then\n"
+                "        local q = recce.event_queue\n"
+                "        q[#q+1] = { '!trace', 'outprioritized lexeme',\n"
+                "           lexeme_start, lexeme_end, g1_lexeme,\n"
+                "           priority, high_lexeme_priority}\n"
+                "    end\n"
+                "end\n"
+                ,
+                "Rii>", outer_slr->lua_ref,
+                (lua_Integer)(i+1), high_lexeme_priority
+              );
+
             switch (event_type) {
-            case MARPA_SLRTR_LEXEME_ACCEPTABLE:
-                if (lexeme_stack_event->t_lexeme_acceptable.t_priority <
-                    high_lexeme_priority) {
-                    MARPA_SLREV_TYPE (lexeme_stack_event) =
-                        MARPA_SLRTR_LEXEME_OUTPRIORITIZED;
-                    lexeme_stack_event->t_lexeme_acceptable.
-                        t_required_priority = high_lexeme_priority;
-                    call_by_tag (outer_slr->L, MYLUA_TAG,
-                        "recce, lexeme_start, lexeme_end,\n"
-                        "    g1_lexeme, priority, required_priority = ...\n"
-                        "if recce.trace_terminals > 0 then\n"
-                        "    local q = recce.event_queue\n"
-                        "    q[#q+1] = { '!trace', 'outprioritized lexeme',\n"
-                        "   lexeme_start, lexeme_end, g1_lexeme, priority, required_priority}\n"
-                        "end\n", "Riiiii>", outer_slr->lua_ref,
-                        (lua_Integer) lexeme_stack_event->
-                        t_trace_lexeme_acceptable.t_start_of_lexeme,
-                        (lua_Integer) lexeme_stack_event->
-                        t_trace_lexeme_acceptable.t_end_of_lexeme,
-                        (lua_Integer) lexeme_stack_event->
-                        t_trace_lexeme_acceptable.t_lexeme,
-                        (lua_Integer) lexeme_stack_event->
-                        t_trace_lexeme_acceptable.t_priority,
-                        (lua_Integer) lexeme_stack_event->
-                        t_trace_lexeme_acceptable.t_required_priority);
-                }
-                goto NEXT_LEXEME_EVENT;
             case MARPA_SLRTR_LEXEME_DISCARDED:
                 /* We do not have the lexeme, but we have the
                  * lexer rule.
