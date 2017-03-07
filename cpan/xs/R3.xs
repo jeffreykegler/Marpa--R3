@@ -1893,6 +1893,20 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
                     slr->end_of_lexeme;
                 discarded++;
 
+                call_by_tag (outer_slr->L, MYLUA_TAG,
+                    "recce, rule_id, lexeme_start, lexeme_end = ...\n"
+                    "if recce.trace_terminals > 0 then\n"
+                    "local q = recce.lexeme_queue\n"
+                    "q[#q+1] = { '!trace', 'discarded lexeme',\n"
+                    "    rule_id, lexeme_start, lexeme_end}\n"
+                    "end\n",
+                    "Riii>",
+                    outer_slr->lua_ref,
+                    (lua_Integer) rule_id,
+                    (lua_Integer) slr->start_of_lexeme,
+                    (lua_Integer) slr->end_of_lexeme
+                    );
+
                 goto NEXT_PASS1_REPORT_ITEM;
             }
 
@@ -2485,6 +2499,7 @@ PPCODE:
       "recce.codepoint = nil\n"
       "recce.es_data = {}\n"
       "recce.event_queue = {}\n"
+      "recce.lexeme_queue = {}\n"
       "recce.l0_rules = {}\n"
       "recce.per_codepoint = {}\n"
       "recce.end_pos = 0\n"
@@ -2606,6 +2621,7 @@ PPCODE:
     /* Clear event queue */
     call_by_tag (outer_slr->L, MYLUA_TAG,
         "local recce = ...\n"
+        "recce.lexeme_queue = {}\n"
         "recce.event_queue = {}\n", "R>", outer_slr->lua_ref);
 
     /* Application intervention resets perl_pos */
