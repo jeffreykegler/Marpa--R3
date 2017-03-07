@@ -1807,6 +1807,7 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
     call_by_tag (outer_slr->L,
         MYLUA_TAG,
         "recce=...\n"
+        "recce.lexeme_queue = {}\n"
         "local l0r = recce.lmw_l0r\n"
         "if not l0r then\n"
         "    error('Internal error: No l0r in slr_alternatives(): %s',\n"
@@ -1895,11 +1896,10 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
 
                 call_by_tag (outer_slr->L, MYLUA_TAG,
                     "recce, rule_id, lexeme_start, lexeme_end = ...\n"
-                    "if recce.trace_terminals > 0 then\n"
                     "local q = recce.lexeme_queue\n"
                     "q[#q+1] = { '!trace', 'discarded lexeme',\n"
                     "    rule_id, lexeme_start, lexeme_end}\n"
-                    "end\n",
+                    ,
                     "Riii>",
                     outer_slr->lua_ref,
                     (lua_Integer) rule_id,
@@ -1956,11 +1956,10 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
                     call_by_tag (outer_slr->L, MYLUA_TAG,
                         "recce, lexeme_start, lexeme_end,\n"
                         "    g1_lexeme, priority, required_priority = ...\n"
-                        "if recce.trace_terminals > 0 then\n"
-                        "    local q = recce.lexeme_queue\n"
-                        "    q[#q+1] = { '!trace', 'outprioritized lexeme',\n"
+                        "local q = recce.lexeme_queue\n"
+                        "q[#q+1] = { '!trace', 'outprioritized lexeme',\n"
                         "   lexeme_start, lexeme_end, g1_lexeme, priority, required_priority}\n"
-                        "end\n", "Riiiii>", outer_slr->lua_ref,
+                        , "Riiiii>", outer_slr->lua_ref,
                         (lua_Integer) slr->start_of_lexeme,
                         (lua_Integer) slr->end_of_lexeme,
                         (lua_Integer) g1_lexeme,
@@ -1997,7 +1996,16 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
          * events into real trace events.
          */
         int i;
-        for (i = 0; i < slr->t_lexeme_count; i++) {
+        lua_Integer lexeme_count;
+
+        call_by_tag (outer_slr->L, MYLUA_TAG,
+            "recce = ...\n"
+            "return #recce.lexeme_queue\n"
+            ,
+             "R>i", outer_slr->lua_ref,
+            &lexeme_count);
+
+        for (i = 0; i < lexeme_count; i++) {
             union marpa_slr_event_s *const lexeme_stack_event =
                 slr->t_lexemes + i;
             const int event_type = MARPA_SLREV_TYPE (lexeme_stack_event);
@@ -2549,6 +2557,22 @@ PPCODE:
       ,
       "R>", outer_slr->lua_ref);
 
+      if (0) { lua_Integer lexeme_count;
+        call_by_tag (outer_slr->L, MYLUA_TAG,
+            "recce = ...\n"
+            "return #recce.lexeme_queue\n"
+            ,
+             "R>i", outer_slr->lua_ref,
+            &lexeme_count);
+        if (lexeme_count != slr->t_lexeme_count) {
+          warn("%s %d Lua %ld vs. C %ld\n",
+            __FILE__, __LINE__,
+            (long)lexeme_count,
+            (long)slr->t_lexeme_count
+          );
+        }
+      }
+
   new_sv = sv_newmortal ();
   sv_setref_pv (new_sv, scanless_r_class_name, (void *) outer_slr);
   XPUSHs (new_sv);
@@ -2637,7 +2661,6 @@ PPCODE:
     /* Clear event queue */
     call_by_tag (outer_slr->L, MYLUA_TAG,
         "local recce = ...\n"
-        "recce.lexeme_queue = {}\n"
         "recce.event_queue = {}\n", "R>", outer_slr->lua_ref);
 
     /* Application intervention resets perl_pos */
