@@ -1952,6 +1952,22 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
                    yet know what the required priority will be */
                 lexeme_entry->t_lexeme_acceptable.t_required_priority =
                     this_lexeme_priority;
+
+                    call_by_tag (outer_slr->L, MYLUA_TAG,
+                        "recce, lexeme_start, lexeme_end,\n"
+                        "    g1_lexeme, priority, required_priority = ...\n"
+                        "if recce.trace_terminals > 0 then\n"
+                        "    local q = recce.lexeme_queue\n"
+                        "    q[#q+1] = { '!trace', 'outprioritized lexeme',\n"
+                        "   lexeme_start, lexeme_end, g1_lexeme, priority, required_priority}\n"
+                        "end\n", "Riiiii>", outer_slr->lua_ref,
+                        (lua_Integer) slr->start_of_lexeme,
+                        (lua_Integer) slr->end_of_lexeme,
+                        (lua_Integer) g1_lexeme,
+                        (lua_Integer) this_lexeme_priority,
+                        (lua_Integer) this_lexeme_priority
+                        );
+
             }
 
           NEXT_PASS1_REPORT_ITEM:      /* Clearer, I think, using this label than long distance
