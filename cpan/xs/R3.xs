@@ -1741,6 +1741,7 @@ marpa_inner_slr_new (Outer_G* outer_slg)
         ,
         "G>i", outer_slg->lua_ref, &value_is_literal);
 
+    /* Lua rewrite is in caller */
     slr->start_of_pause_lexeme = -1;
     slr->end_of_pause_lexeme = -1;
 
@@ -2145,6 +2146,8 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
                         "        q[#q+1] = { '!trace', 'g1 before lexeme event', event_lexeme}\n"
                         "    end\n"
                         "    q[#q+1] = { 'before lexeme', event_lexeme}\n"
+                        "    recce.start_of_pause_lexeme = lexeme_start\n"
+                        "    recce.end_of_pause_lexeme = lexeme_end\n"
                         "    return event_lexeme\n"
                         "end\n"
                         "return -1\n"
@@ -2243,6 +2246,8 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
 
                         call_by_tag (outer_slr->L, MYLUA_TAG,
                             "recce, lexeme_start, lexeme_end, lexeme = ...\n"
+                            "recce.start_of_pause_lexeme = lexeme_start\n"
+                            "recce.end_of_pause_lexeme = lexeme_end\n"
                             "local pause_after_active = recce.g1_symbols[g1_lexeme].pause_after_active\n"
                             "if pause_after_active then\n"
                             "    local q = recce.event_queue\n"
@@ -2537,6 +2542,8 @@ PPCODE:
       "recce.perl_pos = 0\n"
       "recce.too_many_earley_items = -1\n"
       "recce.trace_terminals = 0\n"
+      "recce.start_of_pause_lexeme = -1\n"
+      "recce.end_of_pause_lexeme = -1\n"
       "local r_l0_rules = recce.l0_rules\n"
       "local g_l0_rules = grammar.l0_rules\n"
       "-- print('g_l0_rules: ', inspect(g_l0_rules))\n"
@@ -2668,6 +2675,8 @@ PPCODE:
     /* Clear event queue */
     call_by_tag (outer_slr->L, MYLUA_TAG,
         "local recce = ...\n"
+        "recce.start_of_pause_lexeme = -1\n"
+        "recce.end_of_pause_lexeme = -1\n"
         "recce.event_queue = {}\n", "R>", outer_slr->lua_ref);
 
     /* Application intervention resets perl_pos */
