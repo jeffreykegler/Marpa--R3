@@ -1777,31 +1777,27 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
                     "recce, rule_id, lexeme_start, lexeme_end = ...\n"
                     "local q = recce.lexeme_queue\n"
                     "q[#q+1] = { '!trace', 'discarded lexeme',\n"
-                    "    rule_id, lexeme_start, lexeme_end}\n"
+                    "    rule_id, recce.start_of_lexeme, recce.end_of_lexeme}\n"
                     ,
-                    "Riii>",
+                    "Ri>",
                     outer_slr->lua_ref,
-                    (lua_Integer) rule_id,
-                    (lua_Integer) slr->start_of_lexeme,
-                    (lua_Integer) slr->end_of_lexeme
+                    (lua_Integer) rule_id
                     );
 
                 goto NEXT_PASS1_REPORT_ITEM;
             }
 
             call_by_tag (outer_slr->L, MYLUA_TAG,
-                "recce, g1_lexeme, start_of_lexeme, end_of_lexeme = ...\n"
+                "recce, g1_lexeme = ...\n"
                 "local is_expected = recce.lmw_g1r:terminal_is_expected(g1_lexeme)\n"
                 "if not is_expected then\n"
                 "    error(string.format('Internnal error: Marpa recognized unexpected token @%d-%d: lexme=%d',\n"
-                "        start_of_lexeme, end_of_lexeme, g1_lexeme))\n"
+                "        recce.start_of_lexeme, recce.end_of_lexeme, g1_lexeme))\n"
                 "end\n"
                 "return recce.g1_symbols[g1_lexeme].lexeme_priority\n"
                 ,
-                "Riii>i",
+                "Ri>i",
                 outer_slr->lua_ref, (lua_Integer) g1_lexeme,
-                (lua_Integer) slr->start_of_lexeme,
-                (lua_Integer) slr->end_of_lexeme,
                 &this_lexeme_priority
                 );
 
@@ -1817,14 +1813,11 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
 
             {
                     call_by_tag (outer_slr->L, MYLUA_TAG,
-                        "recce, lexeme_start, lexeme_end,\n"
-                        "    g1_lexeme, priority, required_priority = ...\n"
+                        "recce, g1_lexeme, priority, required_priority = ...\n"
                         "local q = recce.lexeme_queue\n"
                         "q[#q+1] = { '!trace', 'acceptable lexeme',\n"
-                        "   lexeme_start, lexeme_end, g1_lexeme, priority, required_priority}\n"
-                        , "Riiiii>", outer_slr->lua_ref,
-                        (lua_Integer) slr->start_of_lexeme,
-                        (lua_Integer) slr->end_of_lexeme,
+                        "   recce.start_of_lexeme, recce.end_of_lexeme, g1_lexeme, priority, required_priority}\n"
+                        , "Riii>", outer_slr->lua_ref,
                         (lua_Integer) g1_lexeme,
                         (lua_Integer) this_lexeme_priority,
                         (lua_Integer) this_lexeme_priority
