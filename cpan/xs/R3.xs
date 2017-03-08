@@ -2144,7 +2144,9 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
             "        recce.end_of_pause_lexeme = lexeme_end\n"
             "        return g1_lexeme\n"
             "    end\n"
-            "end\n" "return -1\n", "R>i", outer_slr->lua_ref, &event_lexeme);
+            "end\n"
+            "return -1\n"
+            , "R>i", outer_slr->lua_ref, &event_lexeme);
 
 
         if (event_lexeme >= 0) {
@@ -2177,6 +2179,9 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
                     "local value_is_literal = kollos.defines.TOKEN_VALUE_IS_LITERAL\n"
                     "local return_value = g1r:alternative(g1_lexeme, value_is_literal, 1)\n"
                     "-- print('return value = ', inspect(return_value))\n"
+                    "if return_value == kollos.err.UNEXPECTED_TOKEN_ID then\n"
+                    "    error('Internal error: Marpa rejected expected token')\n"
+                    "end\n"
                     "return return_value\n",
                     "Riii>i",
                     outer_slr->lua_ref,
@@ -2185,11 +2190,6 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
                     (lua_Integer) g1_lexeme, &return_value);
 
                 switch (return_value) {
-
-                case MARPA_ERR_UNEXPECTED_TOKEN_ID:
-                    croak
-                        ("Internal error: Marpa rejected expected token");
-                    break;
 
                 case MARPA_ERR_DUPLICATE_TOKEN:
                     call_by_tag (outer_slr->L, MYLUA_TAG,
