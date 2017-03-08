@@ -50,11 +50,6 @@ typedef struct
    */
   lua_Integer lexer_start_pos;
 
-  /* A boolean to prevent the inappropriate mixing
-   * of internal and external scanning
-   */
-  int is_external_scanning;
-
   lua_Integer last_perl_pos;
 
 } Scanless_R;
@@ -1631,7 +1626,6 @@ marpa_inner_slr_new (void)
 
     slr->start_of_lexeme = 0;
     slr->end_of_lexeme = 0;
-    slr->is_external_scanning = 0;
 
     /* Lua setting done in caller */
     slr->last_perl_pos = -1;
@@ -2361,10 +2355,6 @@ PPCODE:
     const char *cmd = "";
     Scanless_R *slr = slr_inner_get (outer_slr);
 
-    if (slr->is_external_scanning) {
-        XSRETURN_PV ("unpermitted mix of external and internal scanning");
-    }
-
     /* Clear event queue */
     call_by_tag (outer_slr->L, MYLUA_TAG,
         "local recce = ...\n"
@@ -2615,9 +2605,6 @@ PPCODE:
         &result
     );
 
-  if (result >= MARPA_ERR_NONE) {
-    slr->is_external_scanning = 1;
-  }
   XSRETURN_IV ((IV)result);
 }
 
@@ -2700,7 +2687,6 @@ PPCODE:
         "local result = g1r:earleme_complete()\n"
         "return result\n", "R>i", outer_slr->lua_ref, &result);
 
-    slr->is_external_scanning = 0;
     if (result >= 0) {
         call_by_tag (outer_slr->L, MYLUA_TAG,
             "local recce, start_pos, lexeme_length = ...\n"
