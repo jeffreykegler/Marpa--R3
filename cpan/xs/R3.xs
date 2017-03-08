@@ -2151,7 +2151,6 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
 
     {
         lua_Integer return_value;
-        int i;
         call_by_tag (outer_slr->L, MYLUA_TAG,
           "recce = ...\n"
           "return recce:g1_alternatives()\n"
