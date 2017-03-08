@@ -2160,56 +2160,14 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
                     event->t_lexeme_acceptable.t_lexeme;
                 call_by_tag (outer_slr->L, MYLUA_TAG,
                     "recce, lexeme_start, lexeme_end, g1_lexeme = ...\n"
-                    "if recce.trace_terminals > 2 then\n"
-                    "    local q = recce.event_queue\n"
-                    "    q[#q+1] = { '!trace', 'g1 attempting lexeme', lexeme_start, lexeme_end, g1_lexeme}\n"
-                    "end\n"
-                    "local g1r = recce.lmw_g1r\n"
-                    "local kollos = getmetatable(g1r).kollos\n"
-                    "local value_is_literal = kollos.defines.TOKEN_VALUE_IS_LITERAL\n"
-                    "local return_value = g1r:alternative(g1_lexeme, value_is_literal, 1)\n"
-                    "-- print('return value = ', inspect(return_value))\n"
-                    "if return_value == kollos.err.UNEXPECTED_TOKEN_ID then\n"
-                    "    error('Internal error: Marpa rejected expected token')\n"
-                    "end\n"
-                    "if return_value == kollos.err.DUPLICATE_TOKEN then\n"
-                    "    local q = recce.event_queue\n"
-                    "    q[#q+1] = { '!trace', 'g1 duplicate lexeme', lexeme_start, lexeme_end, g1_lexeme}\n"
-                    "    goto NEXT_EVENT\n"
-                    "end\n"
-                    "if return_value ~= kollos.err.NONE then\n"
-                    "    local l0r = recce.lmw_l0r\n"
-                    "    error(string.format([[\n"
-                    "         'Problem SLR->read() failed on symbol id %d at position %d: %s'\n"
-                    "    ]],\n"
-                    "        g1_lexeme, recce.perl_pos, l0r:error_description()\n"
-                    "    ))\n"
-                    "    goto NEXT_EVENT\n"
-                    "end\n"
-                    "do\n"
-                    "    if recce.trace_terminals > 0 then\n"
-                    "        local q = recce.event_queue\n"
-                    "        q[#q+1] = { '!trace', 'g1 accepted lexeme', lexeme_start, lexeme_end, g1_lexeme}\n"
-                    "    end\n"
-                    "    recce.start_of_pause_lexeme = lexeme_start\n"
-                    "    recce.end_of_pause_lexeme = lexeme_end\n"
-                    "    local pause_after_active = recce.g1_symbols[g1_lexeme].pause_after_active\n"
-                    "    if pause_after_active then\n"
-                    "        local q = recce.event_queue\n"
-                    "        if recce.trace_terminals > 2 then\n"
-                    "            q[#q+1] = { '!trace', 'g1 pausing after lexeme', lexeme_start, lexeme_end, g1_lexeme}\n"
-                    "        end\n"
-                    "        q[#q+1] = { 'after lexeme', g1_lexeme}\n"
-                    "    end\n"
-                    "end\n"
-                    "::NEXT_EVENT::\n"
-                    "return return_value\n",
-                    "Riii>i",
+                    "return recce:g1_alternatives(lexeme_start, lexeme_end, g1_lexeme)\n"
+                    ,
+                    "Riii>",
                     outer_slr->lua_ref,
                     (lua_Integer) event->t_lexeme_acceptable.t_start_of_lexeme,
                     (lua_Integer) event->t_lexeme_acceptable.t_end_of_lexeme,
-                    (lua_Integer) g1_lexeme,
-                    &return_value);
+                    (lua_Integer) g1_lexeme
+                    );
             }
         }
 

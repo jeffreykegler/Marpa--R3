@@ -658,6 +658,60 @@ Returns a status string.
         error('Unexpected fall through in l0_read()')
     end
 
+```
+
+Read alternatives into the G1 grammar.
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slr.g1_alternatives(slr, lexeme_start, lexeme_end, g1_lexeme)
+        if slr.trace_terminals > 2 then
+            local q = slr.event_queue
+            q[#q+1] = { '!trace', 'g1 attempting lexeme', lexeme_start, lexeme_end, g1_lexeme}
+        end
+        local g1r = slr.lmw_g1r
+        local kollos = getmetatable(g1r).kollos
+        local value_is_literal = kollos.defines.TOKEN_VALUE_IS_LITERAL
+        local return_value = g1r:alternative(g1_lexeme, value_is_literal, 1)
+        -- print('return value = ', inspect(return_value))
+        if return_value == kollos.err.UNEXPECTED_TOKEN_ID then
+            error('Internal error: Marpa rejected expected token')
+        end
+        if return_value == kollos.err.DUPLICATE_TOKEN then
+            local q = slr.event_queue
+            q[#q+1] = { '!trace', 'g1 duplicate lexeme', lexeme_start, lexeme_end, g1_lexeme}
+            goto NEXT_EVENT
+        end
+        if return_value ~= kollos.err.NONE then
+            local l0r = slr.lmw_l0r
+            error(string.format([[
+                 'Problem SLR->read() failed on symbol id %d at position %d: %s'
+            ]],
+                g1_lexeme, slr.perl_pos, l0r:error_description()
+            ))
+            goto NEXT_EVENT
+        end
+        do
+            if slr.trace_terminals > 0 then
+                local q = slr.event_queue
+                q[#q+1] = { '!trace', 'g1 accepted lexeme', lexeme_start, lexeme_end, g1_lexeme}
+            end
+            slr.start_of_pause_lexeme = lexeme_start
+            slr.end_of_pause_lexeme = lexeme_end
+            local pause_after_active = slr.g1_symbols[g1_lexeme].pause_after_active
+            if pause_after_active then
+                local q = slr.event_queue
+                if slr.trace_terminals > 2 then
+                    q[#q+1] = { '!trace', 'g1 pausing after lexeme', lexeme_start, lexeme_end, g1_lexeme}
+                end
+                q[#q+1] = { 'after lexeme', g1_lexeme}
+            end
+        end
+        ::NEXT_EVENT::
+        return return_value
+    end
+```
+
 ### Locations
 
 Given a G1 span return an L0 span.
