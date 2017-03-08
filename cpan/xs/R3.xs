@@ -1707,18 +1707,18 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
     for (; earley_set > 0; earley_set--) {
         lua_Integer return_value;
         int end_of_earley_items = 0;
-        working_pos = slr->start_of_lexeme + (int)earley_set;
 
         call_by_tag (outer_slr->L, MYLUA_TAG,
             "recce, earley_set = ...\n"
+            "local working_pos = recce.start_of_lexeme + earley_set\n"
             "local return_value = recce.lmw_l0r:progress_report_start(earley_set)\n"
             "if return_value < 0 then\n"
             "    error(string.format('Problem in recce:progress_report_start(...,%d): %s'),\n"
             "        earley_set, recce.lmw_l0r:error_description())\n"
             "end\n"
-            "return return_value\n",
-            "Ri>i",
-            outer_slr->lua_ref, (lua_Integer) earley_set, &return_value);
+            "return return_value, working_pos\n",
+            "Ri>ii",
+            outer_slr->lua_ref, (lua_Integer) earley_set, &return_value, &working_pos);
 
         while (!end_of_earley_items) {
             lua_Integer g1_lexeme;
