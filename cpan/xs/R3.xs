@@ -42,8 +42,7 @@ typedef struct {
 
 typedef struct
 {
-  lua_Integer start_of_lexeme;
-  lua_Integer end_of_lexeme;
+  lua_Integer dummy;
 
 } Scanless_R;
 
@@ -1610,11 +1609,6 @@ marpa_inner_slr_new (void)
     Scanless_R *slr;
 
     Newx (slr, 1, Scanless_R);
-
-    /* Lua settings done in caller */
-    slr->start_of_lexeme = 0;
-    slr->end_of_lexeme = 0;
-
     return slr;
 }
 
@@ -1667,20 +1661,6 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
 
     /* none, discard, "no lexeme", accept */
     const char* pass1_result = "none";
-
-    {
-      lua_Integer lua_start_of_lexeme;
-      call_by_tag (outer_slr->L, MYLUA_TAG,
-          "recce = ...\n"
-          "return recce.start_of_lexeme\n",
-          "R>i", outer_slr->lua_ref, &lua_start_of_lexeme);
-      if (slr->start_of_lexeme != lua_start_of_lexeme) {
-        warn("%s %d start_of_lexeme, C vs. lua: %ld vs. %ld\n",
-          __FILE__, __LINE__,
-          (long)slr->start_of_lexeme, (long)lua_start_of_lexeme
-          );
-      }
-    }
 
     call_by_tag (outer_slr->L,
         MYLUA_TAG,
@@ -1760,7 +1740,6 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
             if (g1_lexeme == -1)
                 goto NEXT_PASS1_REPORT_ITEM;
 
-            slr->end_of_lexeme = working_pos;
             call_by_tag (outer_slr->L,
                 MYLUA_TAG,
                 "local recce, working_pos = ...\n"
@@ -2405,8 +2384,6 @@ PPCODE:
             if (lexer_start_pos >= end_pos) {
                 XSRETURN_PV ("");
             }
-
-            slr->start_of_lexeme = lexer_start_pos;
 
             call_by_tag (outer_slr->L, MYLUA_TAG,
                 "local recce = ...\n"
