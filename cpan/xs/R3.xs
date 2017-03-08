@@ -1710,11 +1710,10 @@ u_pos_set (Outer_R * outer_slr, const char* name, lua_Integer start_pos_arg, lua
 /* Static SLR methods */
 
 static Scanless_R *
-marpa_inner_slr_new (Outer_G* outer_slg)
+marpa_inner_slr_new (void)
 {
     dTHX;
     Scanless_R *slr;
-    lua_Integer value_is_literal;
 
     Newx (slr, 1, Scanless_R);
 
@@ -1729,15 +1728,6 @@ marpa_inner_slr_new (Outer_G* outer_slg)
     slr->lexer_start_pos = 0;
 
     slr->problem_pos = -1;
-
-    call_by_tag (outer_slg->L, MYLUA_TAG,
-        "grammar = ...\n"
-        "local g1g = grammar.lmw_g1g\n"
-        "local kollos = getmetatable(g1g).kollos\n"
-        "local defines = kollos.defines\n"
-        "return defines.TOKEN_VALUE_IS_LITERAL\n"
-        ,
-        "G>i", outer_slg->lua_ref, &value_is_literal);
 
     slr->t_lexeme_count = 0;
     slr->t_lexeme_capacity =
@@ -2422,7 +2412,7 @@ PPCODE:
   }
   L = outer_slg->L;
 
-  slr = marpa_inner_slr_new(outer_slg);
+  slr = marpa_inner_slr_new();
   /* Copy and take references to the "parent objects",
    * the ones responsible for holding references.
    */
