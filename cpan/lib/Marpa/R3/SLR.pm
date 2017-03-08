@@ -1027,14 +1027,27 @@ sub Marpa::R3::Scanless::R::read_problem {
     my $g1_status = 0;
     CODE_TO_PROBLEM: {
         if ( $problem_code eq 'R1 exhausted before end' ) {
-            my ($lexeme_start) = $thin_slr->lexeme_span();
+
+            my ($lexeme_start) = $slr->call_by_tag(
+            ('@' . __FILE__ . ':' . __LINE__),
+            <<'END_OF_LUA', '>0');
+                recce = ...
+                return recce.start_of_lexeme
+END_OF_LUA
+
             my ( $line, $column ) = $slr->line_column($lexeme_start);
             $problem =
                 "Parse exhausted, but lexemes remain, at line $line, column $column\n";
             last CODE_TO_PROBLEM;
         }
         if ( $problem_code eq 'SLIF loop' ) {
-            my ($lexeme_start) = $thin_slr->lexeme_span();
+            my ($lexeme_start) = $slr->call_by_tag(
+            ('@' . __FILE__ . ':' . __LINE__),
+            <<'END_OF_LUA', '>0');
+                recce = ...
+                return recce.start_of_lexeme
+END_OF_LUA
+
             my ( $line, $column ) = $slr->line_column($lexeme_start);
             $problem = "SLIF loops at line $line, column $column";
             last CODE_TO_PROBLEM;
