@@ -120,8 +120,6 @@ typedef struct
   /* Position of problem -- unspecifed if not returning a problem */
   lua_Integer problem_pos;
   int throw;
-  lua_Integer start_of_pause_lexeme;
-  lua_Integer end_of_pause_lexeme;
 
   union marpa_slr_event_s* t_lexemes;
   int t_lexeme_capacity;
@@ -1741,10 +1739,6 @@ marpa_inner_slr_new (Outer_G* outer_slg)
         ,
         "G>i", outer_slg->lua_ref, &value_is_literal);
 
-    /* Lua rewrite is in caller */
-    slr->start_of_pause_lexeme = -1;
-    slr->end_of_pause_lexeme = -1;
-
     slr->t_lexeme_count = 0;
     slr->t_lexeme_capacity =
         (int) MAX (1024 / sizeof (union marpa_slr_event_s), 16);
@@ -2160,11 +2154,6 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
                         );
                 }
 
-                if (event_lexeme >= 0) {
-                    slr->start_of_pause_lexeme = lexeme_entry->t_lexeme_acceptable.
-                          t_start_of_lexeme;
-                    slr->end_of_pause_lexeme = lexeme_entry->t_lexeme_acceptable.t_end_of_lexeme;
-                }
         }
 
         if (event_lexeme >= 0) {
@@ -2239,11 +2228,6 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
                         (lua_Integer) slr->end_of_lexeme,
                         (lua_Integer) g1_lexeme);
                     {
-                        slr->start_of_pause_lexeme =
-                            event->t_lexeme_acceptable.t_start_of_lexeme;
-                        slr->end_of_pause_lexeme =
-                            event->t_lexeme_acceptable.t_end_of_lexeme;
-
                         call_by_tag (outer_slr->L, MYLUA_TAG,
                             "recce, lexeme_start, lexeme_end, lexeme = ...\n"
                             "recce.start_of_pause_lexeme = lexeme_start\n"
@@ -2668,9 +2652,6 @@ PPCODE:
     if (slr->is_external_scanning) {
         XSRETURN_PV ("unpermitted mix of external and internal scanning");
     }
-
-    slr->start_of_pause_lexeme = -1;
-    slr->end_of_pause_lexeme = -1;
 
     /* Clear event queue */
     call_by_tag (outer_slr->L, MYLUA_TAG,
