@@ -119,7 +119,6 @@ typedef struct
    */
   /* Position of problem -- unspecifed if not returning a problem */
   lua_Integer problem_pos;
-  int throw;
 
   union marpa_slr_event_s* t_lexemes;
   int t_lexeme_capacity;
@@ -1717,8 +1716,6 @@ marpa_inner_slr_new (void)
 
     Newx (slr, 1, Scanless_R);
 
-    slr->throw = 1;
-
     slr->start_of_lexeme = 0;
     slr->end_of_lexeme = 0;
     slr->is_external_scanning = 0;
@@ -2475,15 +2472,6 @@ PPCODE:
   Safefree (outer_slr);
 }
 
-void throw_set(outer_slr, throw_setting)
-    Outer_R *outer_slr;
-    int throw_setting;
-PPCODE:
-{
-  Scanless_R *slr = slr_inner_get(outer_slr);
-  slr->throw = throw_setting;
-}
-
 void
 pos( outer_slr )
     Outer_R *outer_slr;
@@ -2884,10 +2872,14 @@ PPCODE:
 
         XSRETURN_IV (0);
     }
-    if (slr->throw) {
-        croak ("Problem in slr->g1_lexeme_complete(): %s",
-            slr_g1_error (outer_slr));
-    }
+
+    call_by_tag (outer_slr->L, MYLUA_TAG,
+            "recce = ...\n"
+            "error('Problem in slr->g1_lexeme_complete(): '\n"
+            "    ..  recce.slg.lmw_g1g:error_description())\n"
+            ,
+            "R>", outer_slr->lua_ref);
+
     XSRETURN_IV (0);
 }
 
