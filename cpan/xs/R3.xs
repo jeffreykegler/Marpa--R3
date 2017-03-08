@@ -2259,8 +2259,8 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
                             ,
                             "Riii>",
                             outer_slr->lua_ref,
-                            (lua_Integer) slr->start_of_pause_lexeme,
-                            (lua_Integer) slr->end_of_pause_lexeme,
+                            (lua_Integer) event->t_lexeme_acceptable.t_start_of_lexeme,
+                            (lua_Integer) event->t_lexeme_acceptable.t_end_of_lexeme,
                             (lua_Integer) g1_lexeme);
                     }
                     break;
