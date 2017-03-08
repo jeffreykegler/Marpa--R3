@@ -2377,7 +2377,15 @@ PPCODE:
     }
 
     while (1) {
-        if (slr->lexer_start_pos >= 0) {
+        lua_Integer lexer_start_pos;
+
+        call_by_tag (outer_slr->L, MYLUA_TAG,
+            "local recce = ...\n"
+            "return recce.lexer_start_pos\n"
+            ,
+            "R>i", outer_slr->lua_ref, &lexer_start_pos);
+
+        if (lexer_start_pos >= 0) {
              lua_Integer end_pos;
 
     call_by_tag (outer_slr->L, MYLUA_TAG,
@@ -2386,18 +2394,18 @@ PPCODE:
         ,
         "R>i", outer_slr->lua_ref, &end_pos);
 
-            if (slr->lexer_start_pos >= end_pos) {
+            if (lexer_start_pos >= end_pos) {
                 XSRETURN_PV ("");
             }
 
-            slr->start_of_lexeme = slr->lexer_start_pos;
+            slr->start_of_lexeme = lexer_start_pos;
 
             call_by_tag (outer_slr->L, MYLUA_TAG,
-                "local recce, lexer_start_pos = ...\n"
-                "recce.perl_pos = lexer_start_pos\n"
+                "local recce = ...\n"
+                "recce.perl_pos = recce.lexer_start_pos\n"
                 "recce.lexer_start_pos = -1\n"
                 ,
-                "Ri>", outer_slr->lua_ref, (lua_Integer) slr->lexer_start_pos);
+                "R>", outer_slr->lua_ref);
 
             slr->lexer_start_pos = -1;
 
