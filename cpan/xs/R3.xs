@@ -50,8 +50,6 @@ typedef struct
    */
   lua_Integer lexer_start_pos;
 
-  lua_Integer last_perl_pos;
-
 } Scanless_R;
 
 typedef struct
@@ -1605,7 +1603,6 @@ u_pos_set (Outer_R * outer_slr, const char* name, lua_Integer start_pos_arg, lua
   }
 
   /* Application level intervention resets |perl_pos| */
-  slr->last_perl_pos = -1;
     call_by_tag (outer_slr->L, MYLUA_TAG,
         "local recce, new_perl_pos, new_end_pos = ...\n"
         "recce.perl_pos = new_perl_pos\n"
@@ -1628,7 +1625,6 @@ marpa_inner_slr_new (void)
     slr->end_of_lexeme = 0;
 
     /* Lua setting done in caller */
-    slr->last_perl_pos = -1;
     slr->lexer_start_pos = 0;
 
     return slr;
@@ -2373,9 +2369,6 @@ PPCODE:
         XSRETURN_PV (cmd);
     }
 
-    /* Application intervention resets perl_pos */
-    slr->last_perl_pos = -1;
-
     while (1) {
         if (slr->lexer_start_pos >= 0) {
              lua_Integer end_pos;
@@ -2650,9 +2643,6 @@ PPCODE:
         "recce = ...\n"
         "return #recce.codepoints\n",
         "R>i", outer_slr->lua_ref, &input_length);
-
-    /* User intervention resets last |perl_pos| */
-    slr->last_perl_pos = -1;
 
     start_pos = start_pos < 0 ? (int)input_length + start_pos : start_pos;
     if (start_pos < 0 || start_pos > input_length) {
