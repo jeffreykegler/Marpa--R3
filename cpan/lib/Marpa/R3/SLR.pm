@@ -1040,7 +1040,6 @@ sub Marpa::R3::Scanless::R::read_problem {
             last CODE_TO_PROBLEM;
         }
         if ( $problem_code eq 'no lexeme' ) {
-            $problem_pos = $thin_slr->problem_pos();
             my ( $line, $column ) = $slr->line_column($problem_pos);
             my @details    = ();
             my %rejections = ();
