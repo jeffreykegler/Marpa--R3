@@ -2123,50 +2123,36 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
 
     /* If here, a lexeme has been accepted and priority is set
      */
-
-    {                           /* Check for a "pause before" lexeme */
-        /* A legacy implement allowed only one pause-before lexeme, and used elements of
-           the SLR structure to hold the data.  The new mechanism uses events and allows
-           multiple pause-before lexemes, but the legacy mechanism must be supported. */
+    {                               /* Check for a "pause before" lexeme */
         lua_Integer event_lexeme = -1;
-        int i;
-        for (i = 0; i < slr->t_lexeme_count; i++) {
-            union marpa_slr_event_s *const lexeme_entry =
-                slr->t_lexemes + i;
-            const int event_type = MARPA_SLREV_TYPE (lexeme_entry);
-            if (event_type == MARPA_SLRTR_LEXEME_ACCEPTABLE) {
-                    call_by_tag (outer_slr->L, MYLUA_TAG,
-                        "recce, lexeme_start, lexeme_end, event_lexeme = ...\n"
-                        "local pause_before_active = recce.g1_symbols[event_lexeme].pause_before_active\n"
-                        "if pause_before_active then\n"
-                        "    local q = recce.event_queue\n"
-                        "    if recce.trace_terminals > 2 then\n"
-                        "        q[#q+1] = { '!trace', 'g1 before lexeme event', event_lexeme}\n"
-                        "    end\n"
-                        "    q[#q+1] = { 'before lexeme', event_lexeme}\n"
-                        "    recce.start_of_pause_lexeme = lexeme_start\n"
-                        "    recce.end_of_pause_lexeme = lexeme_end\n"
-                        "    return event_lexeme\n"
-                        "end\n"
-                        "return -1\n"
-                        ,
-                        "Riii>i", outer_slr->lua_ref,
-                        (lua_Integer)(lexeme_entry->t_lexeme_acceptable.t_start_of_lexeme),
-                        (lua_Integer)(lexeme_entry->t_lexeme_acceptable.t_end_of_lexeme),
-                        (lua_Integer)(lexeme_entry->t_lexeme_acceptable.t_lexeme),
-                        &event_lexeme
-                        );
-                }
+        call_by_tag (outer_slr->L, MYLUA_TAG,
+            "recce = ...\n"
+            "local accept_q = recce.accept_queue\n"
+            "for ix = 1, #accept_q do\n"
+            "    local this_event = accept_q[ix]\n"
+            "    local bang_trace, event_type, lexeme_start, lexeme_end,\n"
+            "            g1_lexeme, priority, required_priority =\n"
+            "        table.unpack(this_event)\n"
+            "    local pause_before_active = recce.g1_symbols[g1_lexeme].pause_before_active\n"
+            "    if pause_before_active then\n"
+            "        local q = recce.event_queue\n"
+            "        if recce.trace_terminals > 2 then\n"
+            "            q[#q+1] = { '!trace', 'g1 before lexeme event', g1_lexeme}\n"
+            "        end\n"
+            "        q[#q+1] = { 'before lexeme', g1_lexeme}\n"
+            "        recce.start_of_pause_lexeme = lexeme_start\n"
+            "        recce.end_of_pause_lexeme = lexeme_end\n"
+            "        return g1_lexeme\n"
+            "    end\n"
+            "end\n" "return -1\n", "R>i", outer_slr->lua_ref, &event_lexeme);
 
-        }
 
         if (event_lexeme >= 0) {
             slr->lexer_start_pos = slr->start_of_lexeme;
-    call_by_tag (outer_slr->L, MYLUA_TAG,
-        "local recce, perl_pos = ...\n"
-        "recce.perl_pos = perl_pos\n"
-        ,
-        "Ri>", outer_slr->lua_ref, (lua_Integer)slr->start_of_lexeme);
+            call_by_tag (outer_slr->L, MYLUA_TAG,
+                "local recce, perl_pos = ...\n"
+                "recce.perl_pos = perl_pos\n",
+                "Ri>", outer_slr->lua_ref, (lua_Integer) slr->start_of_lexeme);
             return 0;
         }
     }
