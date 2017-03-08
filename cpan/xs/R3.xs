@@ -57,17 +57,6 @@ typedef struct
 
   lua_Integer last_perl_pos;
 
-  /* character position, taking into account Unicode
-     Equivalent to Perl pos()
-     One past last actual position indicates past-end-of-string
-   */
-  /* Position of problem -- unspecifed if not returning a problem */
-  lua_Integer problem_pos;
-
-  /* We need a copy of the outer_slr lua_ref,
-   * but hopefully only while refactoring
-   */
-
 } Scanless_R;
 
 typedef struct
@@ -1648,8 +1637,6 @@ marpa_inner_slr_new (void)
     slr->last_perl_pos = -1;
     slr->lexer_start_pos = 0;
 
-    slr->problem_pos = -1;
-
     return slr;
 }
 
@@ -1948,7 +1935,6 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
     }
 
     if (!strcmp(pass1_result, "discard")) {
-        /* slr->problem_pos? */
         slr->lexer_start_pos = working_pos;
     call_by_tag (outer_slr->L, MYLUA_TAG,
         "local recce, perl_pos = ...\n"
@@ -1964,8 +1950,7 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
 
     /* If NOT accepted */
     if (strcmp(pass1_result, "accept")) {
-        slr->problem_pos = slr->lexer_start_pos =
-            slr->start_of_lexeme;
+        slr->lexer_start_pos = slr->start_of_lexeme;
     call_by_tag (outer_slr->L, MYLUA_TAG,
         "local recce, perl_pos = ...\n"
         "recce.perl_pos = perl_pos\n"
@@ -2278,6 +2263,7 @@ PPCODE:
       "recce.trace_terminals = 0\n"
       "recce.start_of_pause_lexeme = -1\n"
       "recce.end_of_pause_lexeme = -1\n"
+      "recce.is_external_scanning = false\n"
       "local r_l0_rules = recce.l0_rules\n"
       "local g_l0_rules = grammar.l0_rules\n"
       "-- print('g_l0_rules: ', inspect(g_l0_rules))\n"
@@ -2372,6 +2358,7 @@ read(outer_slr)
     Outer_R *outer_slr;
 PPCODE:
 {
+    const char *cmd = "";
     Scanless_R *slr = slr_inner_get (outer_slr);
 
     if (slr->is_external_scanning) {
@@ -2381,9 +2368,20 @@ PPCODE:
     /* Clear event queue */
     call_by_tag (outer_slr->L, MYLUA_TAG,
         "local recce = ...\n"
+        "if recce.is_external_scanning then\n"
+        "   return 'unpermitted mix of external and internal scanning'\n"
+        "end\n"
         "recce.start_of_pause_lexeme = -1\n"
         "recce.end_of_pause_lexeme = -1\n"
-        "recce.event_queue = {}\n", "R>", outer_slr->lua_ref);
+        "recce.event_queue = {}\n"
+        "return ''\n"
+        ,
+        "R>s",
+        outer_slr->lua_ref, &cmd);
+
+    if (*cmd) {
+        XSRETURN_PV (cmd);
+    }
 
     /* Application intervention resets perl_pos */
     slr->last_perl_pos = -1;
@@ -2601,13 +2599,17 @@ PPCODE:
 
 
     call_by_tag (outer_slr->L, MYLUA_TAG,
-        "recce, symbol_id, token_ix = ...\n"
+        "recce, result, symbol_id, token_ix = ...\n"
         "local g1r = recce.lmw_g1r\n"
+        "if result ~= kollos.err.NONE then\n"
+        "    recce.is_external_scanning = true\n"
+        "end\n"
         "local return_value = g1r:alternative(symbol_id, token_ix, 1)\n"
         "return return_value\n"
         ,
-        "Rii>i",
+        "Riii>i",
         outer_slr->lua_ref,
+        (lua_Integer)result,
         (lua_Integer)symbol_id,
         (lua_Integer)token_ix,
         &result
@@ -2694,6 +2696,7 @@ PPCODE:
         "local recce = ...\n"
         "local g1r = recce.lmw_g1r\n"
         "recce.event_queue = {}\n"
+        "recce.is_external_scanning = false\n"
         "local result = g1r:earleme_complete()\n"
         "return result\n", "R>i", outer_slr->lua_ref, &result);
 
@@ -2733,18 +2736,6 @@ PPCODE:
             "R>", outer_slr->lua_ref);
 
     XSRETURN_IV (0);
-}
-
-void
-problem_pos( outer_slr )
-    Outer_R *outer_slr;
-PPCODE:
-{
-  Scanless_R *slr = slr_inner_get(outer_slr);
-  if (slr->problem_pos < 0) {
-     XSRETURN_UNDEF;
-  }
-  XSRETURN_IV((IV)slr->problem_pos);
 }
 
 void
