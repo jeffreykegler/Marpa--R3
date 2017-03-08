@@ -1927,8 +1927,9 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
     if (!strcmp(pass1_result, "discard")) {
         slr->lexer_start_pos = working_pos;
     call_by_tag (outer_slr->L, MYLUA_TAG,
-        "local recce, perl_pos = ...\n"
-        "recce.perl_pos = perl_pos\n"
+        "local recce, working_pos = ...\n"
+        "recce.lexer_start_pos = working_pos\n"
+        "recce.perl_pos = working_pos\n"
         ,
         "Ri>", outer_slr->lua_ref, (lua_Integer)working_pos);
         return 0;
@@ -1942,8 +1943,9 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
     if (strcmp(pass1_result, "accept")) {
         slr->lexer_start_pos = slr->start_of_lexeme;
     call_by_tag (outer_slr->L, MYLUA_TAG,
-        "local recce, perl_pos = ...\n"
-        "recce.perl_pos = perl_pos\n"
+        "local recce, start_of_lexeme = ...\n"
+        "recce.lexer_start_pos = start_of_lexeme\n"
+        "recce.perl_pos = start_of_lexeme\n"
         ,
         "Ri>", outer_slr->lua_ref, (lua_Integer)slr->start_of_lexeme);
         return "no lexeme";
@@ -1981,8 +1983,10 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
         if (event_lexeme >= 0) {
             slr->lexer_start_pos = slr->start_of_lexeme;
             call_by_tag (outer_slr->L, MYLUA_TAG,
-                "local recce, perl_pos = ...\n"
-                "recce.perl_pos = perl_pos\n",
+                "local recce, start_of_lexeme = ...\n"
+                "recce.lexer_start_pos = start_of_lexeme\n"
+                "recce.perl_pos = start_of_lexeme\n"
+                ,
                 "Ri>", outer_slr->lua_ref, (lua_Integer) slr->start_of_lexeme);
             return 0;
         }
@@ -2009,8 +2013,9 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
         }
         slr->lexer_start_pos = slr->end_of_lexeme;
     call_by_tag (outer_slr->L, MYLUA_TAG,
-        "local recce, perl_pos = ...\n"
-        "recce.perl_pos = perl_pos\n"
+        "local recce, end_of_lexeme = ...\n"
+        "recce.lexer_start_pos = end_of_lexeme\n"
+        "recce.perl_pos = end_of_lexeme\n"
         ,
         "Ri>", outer_slr->lua_ref, (lua_Integer)slr->end_of_lexeme);
         if (return_value > 0) {
@@ -2253,6 +2258,7 @@ PPCODE:
       "recce.trace_terminals = 0\n"
       "recce.start_of_pause_lexeme = -1\n"
       "recce.end_of_pause_lexeme = -1\n"
+      "recce.lexer_start_pos = 0\n"
       "recce.is_external_scanning = false\n"
       "local r_l0_rules = recce.l0_rules\n"
       "local g_l0_rules = grammar.l0_rules\n"
@@ -2336,6 +2342,7 @@ PPCODE:
 
   call_by_tag (outer_slr->L, MYLUA_TAG,
       "local recce = ...\n"
+      "recce.lexer_start_pos = recce.perl_pos\n"
       "return recce.perl_pos\n",
       "R>i", outer_slr->lua_ref, &perl_pos);
 
@@ -2388,6 +2395,7 @@ PPCODE:
             call_by_tag (outer_slr->L, MYLUA_TAG,
                 "local recce, lexer_start_pos = ...\n"
                 "recce.perl_pos = lexer_start_pos\n"
+                "recce.lexer_start_pos = -1\n"
                 ,
                 "Ri>", outer_slr->lua_ref, (lua_Integer) slr->lexer_start_pos);
 
