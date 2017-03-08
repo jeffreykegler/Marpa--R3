@@ -120,10 +120,6 @@ typedef struct
   /* Position of problem -- unspecifed if not returning a problem */
   lua_Integer problem_pos;
 
-  union marpa_slr_event_s* t_lexemes;
-  int t_lexeme_capacity;
-  int t_lexeme_count;
-
   /* We need a copy of the outer_slr lua_ref,
    * but hopefully only while refactoring
    */
@@ -206,22 +202,6 @@ static void lua_refdec(lua_State* L)
        free(p_extra);
     }
 }
-
-static void marpa_slr_lexeme_clear( Scanless_R* slr )
-{
-  slr->t_lexeme_count = 0;
-}
-
-static union marpa_slr_event_s * marpa_slr_lexeme_push( Scanless_R* slr )
-{
-  if (slr->t_lexeme_count >= slr->t_lexeme_capacity)
-    {
-      slr->t_lexeme_capacity *= 2;
-      Renew (slr->t_lexemes, (unsigned int)slr->t_lexeme_capacity, union marpa_slr_event_s);
-    }
-  return slr->t_lexemes + (slr->t_lexeme_count++);
-}
-
 
 typedef struct marpa_g Grammar;
 /* The error_code member should usually be ignored in favor of
@@ -1726,12 +1706,6 @@ marpa_inner_slr_new (void)
 
     slr->problem_pos = -1;
 
-    slr->t_lexeme_count = 0;
-    slr->t_lexeme_capacity =
-        (int) MAX (1024 / sizeof (union marpa_slr_event_s), 16);
-    Newx (slr->t_lexemes, (unsigned int) slr->t_lexeme_capacity,
-        union marpa_slr_event_s);
-
     return slr;
 }
 
@@ -1758,7 +1732,6 @@ static void slr_inner_destroy(lua_State* L, Scanless_R* slr)
   dTHX;
     PERL_UNUSED_ARG(L);
 
-   Safefree(slr->t_lexemes);
   Safefree (slr);
 }
 
@@ -1796,9 +1769,6 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
         "    error('Internal error: No l0r in slr_alternatives(): %s',\n"
         "        recce.slg.lmw_l0g:error_description())\n"
         "end\n", "R>", outer_slr->lua_ref);
-
-    marpa_slr_lexeme_clear (slr);
-
 
     call_by_tag (outer_slr->L, MYLUA_TAG,
         "recce = ...\n"
@@ -1965,11 +1935,6 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
             &lexeme_count);
 
         for (i = 0; i < lexeme_count; i++) {
-            union marpa_slr_event_s *const lexeme_stack_event =
-                slr->t_lexemes + i;
-            const int event_type = MARPA_SLREV_TYPE (lexeme_stack_event);
-            lua_Integer outprioritized;
-
             call_by_tag (outer_slr->L, MYLUA_TAG,
                 "recce, i, high_lexeme_priority = ...\n"
                 "local lexeme_q = recce.lexeme_queue\n"
@@ -1986,18 +1951,17 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
                 "               lexeme_start, lexeme_end, g1_lexeme,\n"
                 "               priority, high_lexeme_priority}\n"
                 "        end\n"
-                "        return 1\n"
+                "        return\n"
                 "    else\n"
                 "        local q = recce.accept_queue\n"
                 "        q[#q+1] = this_event\n"
                 "    end\n"
                 "end\n"
-                "return 0\n"
+                "return\n"
                 ,
-                "Rii>i", outer_slr->lua_ref,
+                "Rii>", outer_slr->lua_ref,
                 (lua_Integer)(i+1),
-                high_lexeme_priority,
-                &outprioritized
+                high_lexeme_priority
               );
               
                 /* We do not have the lexeme, but we have the
@@ -2036,7 +2000,6 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
                     (lua_Integer)(i+1),
                     pass1_result
                     );
-
         }
     }
 
@@ -2397,22 +2360,6 @@ PPCODE:
       "end\n"
       ,
       "R>", outer_slr->lua_ref);
-
-      if (0) { lua_Integer lexeme_count;
-        call_by_tag (outer_slr->L, MYLUA_TAG,
-            "recce = ...\n"
-            "return #recce.lexeme_queue\n"
-            ,
-             "R>i", outer_slr->lua_ref,
-            &lexeme_count);
-        if (lexeme_count != slr->t_lexeme_count) {
-          warn("%s %d Lua %ld vs. C %ld\n",
-            __FILE__, __LINE__,
-            (long)lexeme_count,
-            (long)slr->t_lexeme_count
-          );
-        }
-      }
 
   new_sv = sv_newmortal ();
   sv_setref_pv (new_sv, scanless_r_class_name, (void *) outer_slr);
