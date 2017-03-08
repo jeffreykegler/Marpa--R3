@@ -1970,6 +1970,7 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
         pass1_result = "no lexeme";
     }
 
+    /* Pass 2 */
     {
         /* In pass 1, we used a stack of tentative
          * trace events to record which lexemes
@@ -2023,27 +2024,33 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
                 &outprioritized
               );
               
-              if (outprioritized) {
-                  MARPA_SLREV_TYPE (lexeme_stack_event) = MARPA_SLRTR_LEXEME_OUTPRIORITIZED;
-                  lexeme_stack_event->t_lexeme_acceptable.t_required_priority
-                    = high_lexeme_priority;
-              }
-
-            switch (event_type) {
-            case MARPA_SLRTR_LEXEME_DISCARDED:
+            if (event_type == MARPA_SLRTR_LEXEME_DISCARDED) {
                 /* We do not have the lexeme, but we have the
                  * lexer rule.
                  * The upper level will have to figure things out.
                  */
                 call_by_tag (outer_slr->L, MYLUA_TAG,
-                    "recce, rule_id, lexeme_start, lexeme_end = ...\n"
+                    "recce, pass1_result, rule_id, lexeme_start, lexeme_end = ...\n"
                     "if recce.trace_terminals > 0 then\n"
-                    "local q = recce.event_queue\n"
-                    "q[#q+1] = { '!trace', 'discarded lexeme',\n"
-                    "    rule_id, lexeme_start, lexeme_end}\n"
-                    "end\n",
-                    "Riii>",
+                    "    local q = recce.event_queue\n"
+                    "    q[#q+1] = { '!trace', 'discarded lexeme',\n"
+                    "        rule_id, lexeme_start, lexeme_end}\n"
+                    "end\n"
+                    "if pass1_result == 'discard' then\n"
+                    "    local q = recce.event_queue\n"
+                    "    local g1r = recce.lmw_g1r\n"
+                    "    local event_on_discard_active =\n"
+                    "        recce.l0_rules[rule_id].event_on_discard_active\n"
+                    "    if event_on_discard_active then\n"
+                    "        local last_g1_location = g1r:latest_earley_set()\n"
+                    "        q[#q+1] = { 'discarded lexeme',\n"
+                    "            rule_id, lexeme_start, lexeme_end, last_g1_location}\n"
+                    "     end\n"
+                    "end\n"
+                    ,
+                    "Rsiii>",
                     outer_slr->lua_ref,
+                    pass1_result,
                     (lua_Integer) lexeme_stack_event->
                     t_trace_lexeme_discarded.t_rule_id,
                     (lua_Integer) lexeme_stack_event->
@@ -2051,34 +2058,7 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
                     (lua_Integer) lexeme_stack_event->
                     t_trace_lexeme_discarded.t_end_of_lexeme);
 
-                if (!strcmp(pass1_result, "discard")) {
-                    const Marpa_Rule_ID l0_rule_id =
-                        lexeme_stack_event->t_trace_lexeme_discarded.
-                        t_rule_id;
-                    call_by_tag (outer_slr->L, MYLUA_TAG,
-                        "recce, rule_id, lexeme_start, lexeme_end = ...\n"
-                        "local q = recce.event_queue\n"
-                        "local g1r = recce.lmw_g1r\n"
-                        "local event_on_discard_active =\n"
-                        "    recce.l0_rules[rule_id].event_on_discard_active\n"
-                        "if event_on_discard_active then\n"
-                        "   local last_g1_location = g1r:latest_earley_set()\n"
-                        "   q[#q+1] = { 'discarded lexeme',\n"
-                        "      rule_id, lexeme_start, lexeme_end, last_g1_location}\n"
-                        "end\n"
-                        ,
-                        "Riiii>",
-                        outer_slr->lua_ref,
-                        (lua_Integer) l0_rule_id,
-                        (lua_Integer) lexeme_stack_event->
-                        t_trace_lexeme_discarded.t_start_of_lexeme,
-                        (lua_Integer) lexeme_stack_event->
-                        t_trace_lexeme_discarded.t_end_of_lexeme
-                    );
-                }
-                goto NEXT_LEXEME_EVENT;
             }
-          NEXT_LEXEME_EVENT:;
         }
     }
 
@@ -2109,6 +2089,7 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
         return "no lexeme";
     }
 
+    /* Pass 3 */
     /* If here, a lexeme has been accepted and priority is set
      */
     {                               /* Check for a "pause before" lexeme */
@@ -2147,6 +2128,7 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
         }
     }
 
+    /* Pass 4 */
     {
         lua_Integer return_value;
         call_by_tag (outer_slr->L, MYLUA_TAG,
