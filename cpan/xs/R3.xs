@@ -1782,9 +1782,9 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
     int discarded = 0;
     int rejected = 0;
     lua_Integer working_pos = slr->start_of_lexeme;
-    enum pass1_result_type
-    { none, discard, no_lexeme, accept };
-    enum pass1_result_type pass1_result = none;
+
+    /* none, discard, "no lexeme", accept */
+    const char* pass1_result = "none";
 
     call_by_tag (outer_slr->L,
         MYLUA_TAG,
@@ -1963,11 +1963,11 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
 
     /* Figure out what the result of pass 1 was */
     if (is_priority_set) {
-        pass1_result = accept;
+        pass1_result = "accept";
     } else if (discarded) {
-        pass1_result = discard;
+        pass1_result = "discard";
     } else {
-        pass1_result = no_lexeme;
+        pass1_result = "no lexeme";
     }
 
     {
@@ -2051,7 +2051,7 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
                     (lua_Integer) lexeme_stack_event->
                     t_trace_lexeme_discarded.t_end_of_lexeme);
 
-                if (pass1_result == discard) {
+                if (!strcmp(pass1_result, "discard")) {
                     const Marpa_Rule_ID l0_rule_id =
                         lexeme_stack_event->t_trace_lexeme_discarded.
                         t_rule_id;
@@ -2082,7 +2082,7 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
         }
     }
 
-    if (pass1_result == discard) {
+    if (!strcmp(pass1_result, "discard")) {
         /* slr->problem_pos? */
         slr->lexer_start_pos = working_pos;
     call_by_tag (outer_slr->L, MYLUA_TAG,
@@ -2097,7 +2097,8 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
         return "R1 exhausted before end";
     }
 
-    if (pass1_result != accept) {
+    /* If NOT accepted */
+    if (strcmp(pass1_result, "accept")) {
         slr->problem_pos = slr->lexer_start_pos =
             slr->start_of_lexeme;
     call_by_tag (outer_slr->L, MYLUA_TAG,
