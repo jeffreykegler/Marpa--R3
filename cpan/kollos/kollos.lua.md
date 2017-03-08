@@ -664,7 +664,14 @@ Read alternatives into the G1 grammar.
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slr.g1_alternatives(slr, lexeme_start, lexeme_end, g1_lexeme)
+    function _M.class_slr.g1_alternatives(slr)
+        local accept_q = recce.accept_queue
+        for ix = 1, #accept_q do
+            local this_event = accept_q[ix]
+            local bang_trace, event_type, lexeme_start, lexeme_end,
+                    g1_lexeme, priority, required_priority =
+                table.unpack(this_event)
+
         if slr.trace_terminals > 2 then
             local q = slr.event_queue
             q[#q+1] = { '!trace', 'g1 attempting lexeme', lexeme_start, lexeme_end, g1_lexeme}
@@ -708,7 +715,8 @@ Read alternatives into the G1 grammar.
             end
         end
         ::NEXT_EVENT::
-        return return_value
+
+        end
     end
 ```
 

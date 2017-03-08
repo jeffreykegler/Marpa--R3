@@ -2152,24 +2152,11 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
     {
         lua_Integer return_value;
         int i;
-        for (i = 0; i < slr->t_lexeme_count; i++) {
-            union marpa_slr_event_s *const event = slr->t_lexemes + i;
-            const int event_type = MARPA_SLREV_TYPE (event);
-            if (event_type == MARPA_SLRTR_LEXEME_ACCEPTABLE) {
-                const Marpa_Symbol_ID g1_lexeme =
-                    event->t_lexeme_acceptable.t_lexeme;
-                call_by_tag (outer_slr->L, MYLUA_TAG,
-                    "recce, lexeme_start, lexeme_end, g1_lexeme = ...\n"
-                    "return recce:g1_alternatives(lexeme_start, lexeme_end, g1_lexeme)\n"
-                    ,
-                    "Riii>",
-                    outer_slr->lua_ref,
-                    (lua_Integer) event->t_lexeme_acceptable.t_start_of_lexeme,
-                    (lua_Integer) event->t_lexeme_acceptable.t_end_of_lexeme,
-                    (lua_Integer) g1_lexeme
-                    );
-            }
-        }
+        call_by_tag (outer_slr->L, MYLUA_TAG,
+          "recce = ...\n"
+          "return recce:g1_alternatives()\n"
+          ,
+          "R>", outer_slr->lua_ref);
 
         call_by_tag (outer_slr->L, MYLUA_TAG,
             "local recce = ...\n"
