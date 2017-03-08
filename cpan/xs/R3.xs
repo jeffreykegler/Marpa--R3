@@ -35,62 +35,6 @@ extern const struct marpa_event_description_s marpa_event_description[];
 extern const struct marpa_step_type_description_s
   marpa_step_type_description[];
 
-union marpa_slr_event_s;
-
-#define MARPA_SLREV_LEXEME_DISCARDED 3
-#define MARPA_SLRTR_LEXEME_DISCARDED 16
-#define MARPA_SLRTR_LEXEME_ACCEPTABLE 23
-#define MARPA_SLRTR_LEXEME_OUTPRIORITIZED 24
-
-#define MARPA_SLREV_TYPE(event) ((event)->t_header.t_event_type)
-
-union marpa_slr_event_s
-{
-  struct
-  {
-    int t_event_type;
-  } t_header;
-
-  struct
-  {
-    int event_type;
-    int t_rule_id;
-    lua_Integer t_start_of_lexeme;
-    lua_Integer t_end_of_lexeme;
-  } t_trace_lexeme_discarded;
-
-  struct
-  {
-    int event_type;
-    int t_rule_id;
-    lua_Integer t_start_of_lexeme;
-    lua_Integer t_end_of_lexeme;
-    int t_last_g1_location;
-  } t_lexeme_discarded;
-
-  struct
-  {
-    int event_type;
-    lua_Integer t_start_of_lexeme;
-    lua_Integer t_end_of_lexeme;
-    int t_lexeme;
-    lua_Integer t_priority;
-    lua_Integer t_required_priority;
-  } t_trace_lexeme_acceptable;
-
-
-  struct
-  {
-    int event_type;
-    lua_Integer t_start_of_lexeme;
-    lua_Integer t_end_of_lexeme;
-    int t_lexeme;
-    lua_Integer t_priority;
-    lua_Integer t_required_priority;
-  } t_lexeme_acceptable;
-
-};
-
 typedef struct {
   lua_Integer lua_ref;
   lua_State* L;
