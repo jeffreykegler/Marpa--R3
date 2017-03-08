@@ -1866,15 +1866,6 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
             slr->end_of_lexeme = working_pos;
             /* -2 means a discarded item */
             if (g1_lexeme <= -2) {
-                union marpa_slr_event_s *lexeme_entry =
-                    marpa_slr_lexeme_push (slr);
-                MARPA_SLREV_TYPE (lexeme_entry) =
-                    MARPA_SLRTR_LEXEME_DISCARDED;
-                lexeme_entry->t_trace_lexeme_discarded.t_rule_id = (int)rule_id;
-                lexeme_entry->t_trace_lexeme_discarded.t_start_of_lexeme =
-                    slr->start_of_lexeme;
-                lexeme_entry->t_trace_lexeme_discarded.t_end_of_lexeme =
-                    slr->end_of_lexeme;
                 discarded++;
 
                 call_by_tag (outer_slr->L, MYLUA_TAG,
@@ -1920,22 +1911,6 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
             }
 
             {
-                union marpa_slr_event_s *lexeme_entry =
-                    marpa_slr_lexeme_push (slr);
-                MARPA_SLREV_TYPE (lexeme_entry) =
-                    MARPA_SLRTR_LEXEME_ACCEPTABLE;
-                lexeme_entry->t_lexeme_acceptable.t_start_of_lexeme =
-                    slr->start_of_lexeme;
-                lexeme_entry->t_lexeme_acceptable.t_end_of_lexeme =
-                    slr->end_of_lexeme;
-                lexeme_entry->t_lexeme_acceptable.t_lexeme = (int)g1_lexeme;
-                lexeme_entry->t_lexeme_acceptable.t_priority =
-                    this_lexeme_priority;
-                /* Default to this symbol's priority, since we don't
-                   yet know what the required priority will be */
-                lexeme_entry->t_lexeme_acceptable.t_required_priority =
-                    this_lexeme_priority;
-
                     call_by_tag (outer_slr->L, MYLUA_TAG,
                         "recce, lexeme_start, lexeme_end,\n"
                         "    g1_lexeme, priority, required_priority = ...\n"
@@ -2030,10 +2005,11 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
                  * The upper level will have to figure things out.
                  */
                 call_by_tag (outer_slr->L, MYLUA_TAG,
-                    "recce, ix, pass1_result, rule_id, lexeme_start, lexeme_end = ...\n"
+                    "recce, ix, pass1_result = ...\n"
                     "local lexeme_q = recce.lexeme_queue\n"
                     "local this_event = lexeme_q[ix]\n"
-                    "local event_type = this_event[2]\n"
+                    "local bang_trace, event_type, rule_id, lexeme_start, lexeme_end\n"
+                    "    = table.unpack(this_event)\n"
                     "if event_type == 'discarded lexeme' then\n"
                     "    -- we do not have the lexeme, only the lexer rule,\n"
                     "    -- so we will let the upper layer figure things out.\n"
@@ -2055,16 +2031,11 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
                     "    end\n"
                     "end\n"
                     ,
-                    "Risiii>",
+                    "Ris>",
                     outer_slr->lua_ref,
                     (lua_Integer)(i+1),
-                    pass1_result,
-                    (lua_Integer) lexeme_stack_event->
-                    t_trace_lexeme_discarded.t_rule_id,
-                    (lua_Integer) lexeme_stack_event->
-                    t_trace_lexeme_discarded.t_start_of_lexeme,
-                    (lua_Integer) lexeme_stack_event->
-                    t_trace_lexeme_discarded.t_end_of_lexeme);
+                    pass1_result
+                    );
 
         }
     }
