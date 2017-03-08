@@ -42,12 +42,6 @@ typedef struct {
 
 typedef struct
 {
-  lua_Integer dummy;
-
-} Scanless_R;
-
-typedef struct
-{
   /* Lua "reference" to this object */
   lua_Integer lua_ref;
   lua_State* L;
@@ -1045,7 +1039,7 @@ xlua_recce_step_meth (lua_State * L)
     /* Lua stack: [ recce_table, lmw_v ] */
     marpa_luaL_argcheck (L, (LUA_TUSERDATA == marpa_lua_getfield (L,
                 -1, "_libmarpa")), 1,
-        "Internal error: recce.lud userdata not set");
+        "Internal error: recce._libmarpa userdata not set");
     /* Lua stack: [ recce_table, lmw_v, v_ud ] */
     v = *(Marpa_Value *) marpa_lua_touserdata (L, -1);
     /* Lua stack: [ recce_table, lmw_v, v_ud ] */
@@ -1105,30 +1099,10 @@ xlua_recce_step_meth (lua_State * L)
     return 0;
 }
 
-static void slr_inner_destroy(lua_State* L, Scanless_R* slr);
-
-static int
-xlua_recce_gc (lua_State * L)
-{
-    Scanless_R *slr;
-    int lud_type;
-
-    /* marpa_r3_warn("xlua_recce_gc"); */
-    /* Checks needed after development ?? */
-    marpa_luaL_checktype (L, 1, LUA_TTABLE);
-    lud_type = marpa_lua_getfield (L, 1, "lud");
-    marpa_luaL_argcheck (L, (lud_type == LUA_TLIGHTUSERDATA), 1,
-        "recce userdata not set");
-    slr = (Scanless_R *) marpa_lua_touserdata (L, -1);
-    slr_inner_destroy(L, slr);
-    return 0;
-}
-
 static const struct luaL_Reg marpa_slr_meths[] = {
     {"step", xlua_recce_step_meth},
     {"ref", xlua_ref},
     {"unref", xlua_unref},
-    {"__gc", xlua_recce_gc},
     {NULL, NULL},
 };
 
@@ -1602,42 +1576,6 @@ u_pos_set (Outer_R * outer_slr, const char* name, lua_Integer start_pos_arg, lua
 
 /* Static SLR methods */
 
-static Scanless_R *
-marpa_inner_slr_new (void)
-{
-    dTHX;
-    Scanless_R *slr;
-
-    Newx (slr, 1, Scanless_R);
-    return slr;
-}
-
-static Scanless_R* slr_inner_get(Outer_R* outer_slr) {
-    lua_State* const L = outer_slr->L;
-    const lua_Integer lua_ref = outer_slr->lua_ref;
-    const int base_of_stack = marpa_lua_gettop(L);
-    Scanless_R *slr;
-    /* Necessary every time to check stack ?? */
-    if (!marpa_lua_checkstack(L, MYLUA_STACK_INCR)) {
-        croak ("Internal Marpa::R3 error; could not grow stack: " MYLUA_TAG);
-    }
-    marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, lua_ref);
-    /* Lua stack: [ recce_table ] */
-    marpa_lua_getfield(L, -1, "lud");
-    /* Lua stack: [ recce_table, lud ] */
-    slr = marpa_lua_touserdata(L, -1);
-    marpa_lua_settop(L, base_of_stack);
-    return slr;
-}
-
-static void slr_inner_destroy(lua_State* L, Scanless_R* slr)
-{
-  dTHX;
-    PERL_UNUSED_ARG(L);
-
-  Safefree (slr);
-}
-
 /*
  * Return values:
  * NULL OK.
@@ -1648,7 +1586,6 @@ static const char *
 slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
 {
     dTHX;
-    Scanless_R *slr = slr_inner_get (outer_slr);
     lua_Integer earley_set;
 
     /* |high_lexeme_priority| is not valid unless |is_priority_set| is set. */
@@ -2172,7 +2109,6 @@ PPCODE:
   SV *new_sv;
   Outer_G *outer_slg;
   Outer_R *outer_slr;
-  Scanless_R *slr;
   PERL_UNUSED_ARG(class);
 
   if (!sv_isa (slg_sv, "Marpa::R3::Thin::SLG"))
@@ -2188,7 +2124,6 @@ PPCODE:
   }
   L = outer_slg->L;
 
-  slr = marpa_inner_slr_new();
   /* Copy and take references to the "parent objects",
    * the ones responsible for holding references.
    */
@@ -2214,8 +2149,6 @@ PPCODE:
     marpa_lua_getglobal(L, "kollos");
     marpa_lua_getfield(L, -1, "class_slr");
     marpa_lua_setmetatable (L, slr_ix);
-    marpa_lua_pushlightuserdata (L, slr);
-    marpa_lua_setfield (L, slr_ix, "lud");
     marpa_lua_pushinteger(L, 1);
     marpa_lua_setfield (L, slr_ix, "ref_count");
     marpa_lua_pushvalue (L, slr_ix);
@@ -2343,7 +2276,6 @@ read(outer_slr)
 PPCODE:
 {
     const char *cmd = "";
-    Scanless_R *slr = slr_inner_get (outer_slr);
 
     /* Clear event queue */
     call_by_tag (outer_slr->L, MYLUA_TAG,
