@@ -2187,6 +2187,14 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
                     "    q[#q+1] = { '!trace', 'g1 duplicate lexeme', lexeme_start, lexeme_end, g1_lexeme}\n"
                     "    goto NEXT_EVENT\n"
                     "end\n"
+                    "if return_value ~= kollos.err.NONE then\n"
+                    "    local l0r = recce.lmw_l0r\n"
+                    "    error(string.format([[\n"
+                    "         'Problem SLR->read() failed on symbol id %d at position %d: %s'\n"
+                    "    ]],\n"
+                    "        g1_lexeme, recce.perl_pos, l0r:error_description()\n"
+                    "    ))\n"
+                    "end\n"
                     "::NEXT_EVENT::\n"
                     "return return_value\n",
                     "Riii>i",
@@ -2224,29 +2232,9 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
                     }
                     break;
 
-                default:
-
-                        call_by_tag (outer_slr->L, MYLUA_TAG,
-                            "recce, g1_lexeme = ...\n"
-                            "local l0r = recce.lmw_l0r\n"
-                            "error(string.format([[\n"
-                            "     'Problem SLR->read() failed on symbol id %d at position %d: %s'\n"
-                            "]],\n"
-                            "    symbol_id, recce.perl_pos, l0r:error_description()\n"
-                            "))\n"
-                            ,
-                            "Rii>",
-                            outer_slr->lua_ref,
-                            (lua_Integer)g1_lexeme);
-
-                    /* NOTREACHED */
-
                 }
-
             }
         }
-
-
 
         call_by_tag (outer_slr->L, MYLUA_TAG,
             "local recce = ...\n"
