@@ -2182,28 +2182,20 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
                     "if return_value == kollos.err.UNEXPECTED_TOKEN_ID then\n"
                     "    error('Internal error: Marpa rejected expected token')\n"
                     "end\n"
+                    "if return_value == kollos.err.DUPLICATE_TOKEN then\n"
+                    "    local q = recce.event_queue\n"
+                    "    q[#q+1] = { '!trace', 'g1 duplicate lexeme', lexeme_start, lexeme_end, g1_lexeme}\n"
+                    "    goto NEXT_EVENT\n"
+                    "end\n"
+                    "::NEXT_EVENT::\n"
                     "return return_value\n",
                     "Riii>i",
                     outer_slr->lua_ref,
-                    (lua_Integer) slr->start_of_lexeme,
-                    (lua_Integer) slr->end_of_lexeme,
+                    (lua_Integer) event->t_lexeme_acceptable.t_start_of_lexeme,
+                    (lua_Integer) event->t_lexeme_acceptable.t_end_of_lexeme,
                     (lua_Integer) g1_lexeme, &return_value);
 
                 switch (return_value) {
-
-                case MARPA_ERR_DUPLICATE_TOKEN:
-                    call_by_tag (outer_slr->L, MYLUA_TAG,
-                        "recce, lexeme_start, lexeme_end, lexeme = ...\n"
-                        "if recce.trace_terminals > 0 then\n"
-                        "    local q = recce.event_queue\n"
-                        "    q[#q+1] = { '!trace', 'g1 duplicate lexeme', lexeme_start, lexeme_end, lexeme}\n"
-                        "end\n",
-                        "Riii>",
-                        outer_slr->lua_ref,
-                        (lua_Integer) slr->start_of_lexeme,
-                        (lua_Integer) slr->end_of_lexeme,
-                        (lua_Integer) g1_lexeme);
-                    break;
 
                 case MARPA_ERR_NONE:
                     {
