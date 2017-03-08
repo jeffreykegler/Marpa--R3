@@ -1747,7 +1747,16 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
 
             if (g1_lexeme == -1)
                 goto NEXT_PASS1_REPORT_ITEM;
+
             slr->end_of_lexeme = working_pos;
+            call_by_tag (outer_slr->L,
+                MYLUA_TAG,
+                "local recce, working_pos = ...\n"
+                "recce.end_of_lexeme = working_pos\n"
+                ,
+                "Ri>", outer_slr->lua_ref, (lua_Integer) working_pos
+                );
+
             /* -2 means a discarded item */
             if (g1_lexeme <= -2) {
                 discarded++;
@@ -2245,6 +2254,8 @@ PPCODE:
       "recce.perl_pos = 0\n"
       "recce.too_many_earley_items = -1\n"
       "recce.trace_terminals = 0\n"
+      "recce.start_of_lexeme = 0\n"
+      "recce.end_of_lexeme = 0\n"
       "recce.start_of_pause_lexeme = -1\n"
       "recce.end_of_pause_lexeme = -1\n"
       "recce.lexer_start_pos = 0\n"
@@ -2390,7 +2401,9 @@ PPCODE:
 
             call_by_tag (outer_slr->L, MYLUA_TAG,
                 "local recce = ...\n"
-                "recce.perl_pos = recce.lexer_start_pos\n"
+                "local lexer_start_pos= recce.lexer_start_pos\n"
+                "recce.perl_pos = lexer_start_pos\n"
+                "recce.start_of_lexeme = lexer_start_pos\n"
                 "recce.lexer_start_pos = -1\n"
                 ,
                 "R>", outer_slr->lua_ref);
