@@ -1663,10 +1663,24 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
 
     int discarded = 0;
     int rejected = 0;
-    lua_Integer working_pos = slr->start_of_lexeme;
+    lua_Integer working_pos;
 
     /* none, discard, "no lexeme", accept */
     const char* pass1_result = "none";
+
+    {
+      lua_Integer lua_start_of_lexeme;
+      call_by_tag (outer_slr->L, MYLUA_TAG,
+          "recce = ...\n"
+          "return recce.start_of_lexeme\n",
+          "R>i", outer_slr->lua_ref, &lua_start_of_lexeme);
+      if (slr->start_of_lexeme != lua_start_of_lexeme) {
+        warn("%s %d start_of_lexeme, C vs. lua: %ld vs. %ld\n",
+          __FILE__, __LINE__,
+          (long)slr->start_of_lexeme, (long)lua_start_of_lexeme
+          );
+      }
+    }
 
     call_by_tag (outer_slr->L,
         MYLUA_TAG,
@@ -1677,7 +1691,10 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
         "if not l0r then\n"
         "    error('Internal error: No l0r in slr_alternatives(): %s',\n"
         "        recce.slg.lmw_l0g:error_description())\n"
-        "end\n", "R>", outer_slr->lua_ref);
+        "end\n"
+        "return recce.start_of_lexeme\n"
+        ,
+        "R>i", outer_slr->lua_ref, &working_pos);
 
     call_by_tag (outer_slr->L, MYLUA_TAG,
         "recce = ...\n"
