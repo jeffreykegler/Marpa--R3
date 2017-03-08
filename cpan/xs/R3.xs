@@ -45,11 +45,6 @@ typedef struct
   lua_Integer start_of_lexeme;
   lua_Integer end_of_lexeme;
 
-  /* Input position at which to start the lexer.
-     -1 means no restart.
-   */
-  lua_Integer lexer_start_pos;
-
 } Scanless_R;
 
 typedef struct
@@ -1621,11 +1616,9 @@ marpa_inner_slr_new (void)
 
     Newx (slr, 1, Scanless_R);
 
+    /* Lua settings done in caller */
     slr->start_of_lexeme = 0;
     slr->end_of_lexeme = 0;
-
-    /* Lua setting done in caller */
-    slr->lexer_start_pos = 0;
 
     return slr;
 }
@@ -1925,7 +1918,6 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
     }
 
     if (!strcmp(pass1_result, "discard")) {
-        slr->lexer_start_pos = working_pos;
     call_by_tag (outer_slr->L, MYLUA_TAG,
         "local recce, working_pos = ...\n"
         "recce.lexer_start_pos = working_pos\n"
@@ -1941,7 +1933,6 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
 
     /* If NOT accepted */
     if (strcmp(pass1_result, "accept")) {
-        slr->lexer_start_pos = slr->start_of_lexeme;
     call_by_tag (outer_slr->L, MYLUA_TAG,
         "local recce, start_of_lexeme = ...\n"
         "recce.lexer_start_pos = start_of_lexeme\n"
@@ -1981,7 +1972,6 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
 
 
         if (event_lexeme >= 0) {
-            slr->lexer_start_pos = slr->start_of_lexeme;
             call_by_tag (outer_slr->L, MYLUA_TAG,
                 "local recce, start_of_lexeme = ...\n"
                 "recce.lexer_start_pos = start_of_lexeme\n"
@@ -2011,7 +2001,6 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
             croak ("Problem in marpa_r_earleme_complete(): %s",
                 slr_g1_error (outer_slr));
         }
-        slr->lexer_start_pos = slr->end_of_lexeme;
     call_by_tag (outer_slr->L, MYLUA_TAG,
         "local recce, end_of_lexeme = ...\n"
         "recce.lexer_start_pos = end_of_lexeme\n"
@@ -2343,10 +2332,9 @@ PPCODE:
   call_by_tag (outer_slr->L, MYLUA_TAG,
       "local recce = ...\n"
       "recce.lexer_start_pos = recce.perl_pos\n"
-      "return recce.perl_pos\n",
-      "R>i", outer_slr->lua_ref, &perl_pos);
+      ,
+      "R>", outer_slr->lua_ref);
 
-  slr->lexer_start_pos = perl_pos;
   XSRETURN_YES;
 }
 
@@ -2406,8 +2394,6 @@ PPCODE:
                 "recce.lexer_start_pos = -1\n"
                 ,
                 "R>", outer_slr->lua_ref);
-
-            slr->lexer_start_pos = -1;
 
             call_by_tag (outer_slr->L, MYLUA_TAG,
                 "local recce = ...\n"
