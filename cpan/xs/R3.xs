@@ -1536,42 +1536,34 @@ static void
 u_pos_set (Outer_R * outer_slr, const char* name, lua_Integer start_pos_arg, lua_Integer length_arg)
 {
   dTHX;
-  lua_Integer input_length;
-  lua_Integer new_perl_pos;
-  lua_Integer new_end_pos;
 
   call_by_tag (outer_slr->L, MYLUA_TAG,
-      "recce = ...\n"
-      "return #recce.codepoints\n",
-      "R>i", outer_slr->lua_ref, &input_length);
+      "recce, start_pos_arg, length_arg = ...\n"
+      "local input_length = #recce.codepoints\n"
+      "local new_perl_pos = start_pos_arg >=0  and start_pos_arg or input_length + start_pos_arg\n"
+      "if new_perl_pos < 0 then\n"
+      "    error(string.format('Bad start position in pos_set: %d', start_pos_arg))\n"
+      "end\n"
+      "if new_perl_pos > input_length then\n"
+      "    error(string.format('Start position in pos_set (%d) is after input end (%d)',\n"
+      "        start_pos_arg, input_length))\n"
+      "end\n"
+      "local new_end_pos = length_arg >= 0 and new_perl_pos + length_arg\n"
+      "    or input_length + length_arg + 1\n"
+      "if new_end_pos < 0 then\n"
+      "    error(string.format('Bad end position in pos_set: %d', new_end_pos))\n"
+      "end\n"
+      "if new_end_pos > input_length then\n"
+      "    error(string.format('End position in pos_set (%d) is after input end (%d)',\n"
+      "        new_end_pos, input_length))\n"
+      "end\n"
+      "recce.perl_pos = new_perl_pos\n"
+      "recce.end_pos = new_end_pos\n"
+      "return\n"
+      ,
+      "Rii>",
+      outer_slr->lua_ref, start_pos_arg, length_arg);
 
-  if (start_pos_arg < 0) {
-      new_perl_pos = (int)input_length + start_pos_arg;
-  } else {
-      new_perl_pos = start_pos_arg;
-  }
-  if (new_perl_pos < 0 || new_perl_pos > input_length)
-  {
-      croak ("Bad start position in %s(): %ld", name, (long)start_pos_arg);
-  }
-
-  if (length_arg < 0) {
-      new_end_pos = input_length + length_arg + 1;
-  } else {
-    new_end_pos = new_perl_pos + length_arg;
-  }
-  if (new_end_pos < 0 || new_end_pos > input_length)
-  {
-      croak ("Bad length in %s(): %ld", name, (long)length_arg);
-  }
-
-  /* Application level intervention resets |perl_pos| */
-    call_by_tag (outer_slr->L, MYLUA_TAG,
-        "local recce, new_perl_pos, new_end_pos = ...\n"
-        "recce.perl_pos = new_perl_pos\n"
-        "recce.end_pos = new_end_pos\n"
-        ,
-        "Rii>", outer_slr->lua_ref, new_perl_pos, new_end_pos);
 }
 
 /* Static SLR methods */
