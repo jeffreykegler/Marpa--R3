@@ -1538,10 +1538,6 @@ static void recursive_coerce_to_lua(
 
 /* Static recognizer methods */
 
-/* Maybe inline some of these */
-
-static Scanless_R* slr_inner_get(Outer_R* outer_slr);
-
 /* Return values:
  * 1 or greater: reserved for an event count, to deal with multiple events
  *   when and if necessary
@@ -1567,7 +1563,6 @@ static void
 u_pos_set (Outer_R * outer_slr, const char* name, lua_Integer start_pos_arg, lua_Integer length_arg)
 {
   dTHX;
-  Scanless_R *slr = slr_inner_get(outer_slr);
   lua_Integer input_length;
   lua_Integer new_perl_pos;
   lua_Integer new_end_pos;
@@ -2329,7 +2324,6 @@ PPCODE:
   lua_Integer perl_pos;
   lua_Integer start_pos;
   lua_Integer length;
-  Scanless_R *slr = slr_inner_get(outer_slr);
 
   call_by_tag (outer_slr->L, MYLUA_TAG,
       "local recce = ...\n"
@@ -2479,17 +2473,6 @@ PPCODE:
     XSRETURN_PV ("");
 }
 
-void
-lexeme_span (outer_slr)
-    Outer_R *outer_slr;
-PPCODE:
-{
-  Scanless_R *slr = slr_inner_get(outer_slr);
-  lua_Integer length = slr->end_of_lexeme - slr->start_of_lexeme;
-  XPUSHs (sv_2mortal (newSViv ((IV) slr->start_of_lexeme)));
-  XPUSHs (sv_2mortal (newSViv ((IV) length)));
-}
-
  # TODO: Currently end location is not known at this
  # point.  Once it is, add tracing:
  # Don't bother with lexeme events as unnecessary
@@ -2533,7 +2516,6 @@ g1_alternative (outer_slr, symbol_id, ...)
     Marpa_Symbol_ID symbol_id;
 PPCODE:
 {
-  Scanless_R *slr = slr_inner_get(outer_slr);
   lua_Integer result;
   lua_Integer token_ix;
   switch (items)
@@ -2624,7 +2606,6 @@ g1_lexeme_complete (outer_slr, start_pos_sv, length_sv)
      SV* length_sv;
 PPCODE:
 {
-    Scanless_R *slr = slr_inner_get (outer_slr);
     lua_Integer perl_pos;
     lua_Integer result;
     lua_Integer input_length;
