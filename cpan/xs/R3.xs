@@ -2206,20 +2206,13 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
                     break;
 
                 case MARPA_ERR_NONE:
-                    call_by_tag (outer_slr->L, MYLUA_TAG,
-                        "recce, lexeme_start, lexeme_end, lexeme = ...\n"
-                        "if recce.trace_terminals > 0 then\n"
-                        "    local q = recce.event_queue\n"
-                        "    q[#q+1] = { '!trace', 'g1 accepted lexeme', lexeme_start, lexeme_end, lexeme}\n"
-                        "end\n",
-                        "Riii>",
-                        outer_slr->lua_ref,
-                        (lua_Integer) slr->start_of_lexeme,
-                        (lua_Integer) slr->end_of_lexeme,
-                        (lua_Integer) g1_lexeme);
                     {
                         call_by_tag (outer_slr->L, MYLUA_TAG,
                             "recce, lexeme_start, lexeme_end, lexeme = ...\n"
+                            "if recce.trace_terminals > 0 then\n"
+                            "    local q = recce.event_queue\n"
+                            "    q[#q+1] = { '!trace', 'g1 accepted lexeme', lexeme_start, lexeme_end, lexeme}\n"
+                            "end\n"
                             "recce.start_of_pause_lexeme = lexeme_start\n"
                             "recce.end_of_pause_lexeme = lexeme_end\n"
                             "local pause_after_active = recce.g1_symbols[g1_lexeme].pause_after_active\n"
