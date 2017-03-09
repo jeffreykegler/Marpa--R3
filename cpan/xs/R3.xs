@@ -1601,11 +1601,11 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
             const char* cmd;
 
             call_by_tag (outer_slr->L, MYLUA_TAG,
-                "recce, working_pos, discarded, is_priority_set = ...\n"
+                "recce, working_pos, discarded, is_priority_set, high_lexeme_priority = ...\n"
                 "local g1_lexeme = -1\n"
                 "local rule_id, dot_position, origin = recce.lmw_l0r:progress_item()\n"
                 "if not rule_id then\n"
-                "    return 'next_earley_set', -1, discarded, is_priority_set\n"
+                "    return 'next_earley_set', -1, discarded, is_priority_set, high_lexeme_priority\n"
                 "end\n"
                 "if rule_id <= -2 then\n"
                 "    error(string.format('Problem in recce:progress_item(): %s'),\n"
@@ -1615,15 +1615,15 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
                 "   return 'next_earley_set', g1_lexeme, discarded, is_priority_set\n"
                 "end\n"
                 "if origin ~= 0 then\n"
-                "   return 'next_pass1_report_item', g1_lexeme, discarded, is_priority_set\n"
+                "   return 'next_pass1_report_item', g1_lexeme, discarded, is_priority_set, high_lexeme_priority\n"
                 "end\n"
                 "if dot_position ~= -1 then\n"
-                "   return 'next_pass1_report_item', g1_lexeme, discarded, is_priority_set\n"
+                "   return 'next_pass1_report_item', g1_lexeme, discarded, is_priority_set, high_lexeme_priority\n"
                 "end\n"
                 "g1_lexeme = recce.slg.l0_rules[rule_id].g1_lexeme\n"
                 "g1_lexeme = g1_lexeme or -1\n"
                 "if g1_lexeme == -1 then\n"
-                "   return 'next_pass1_report_item', g1_lexeme, discarded, is_priority_set\n"
+                "   return 'next_pass1_report_item', g1_lexeme, discarded, is_priority_set, high_lexeme_priority\n"
                 "end\n"
                 "recce.end_of_lexeme = working_pos\n"
                 "-- -2 means a discarded item\n"
@@ -1632,16 +1632,16 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
                 "   local q = recce.lexeme_queue\n"
                 "   q[#q+1] = { '!trace', 'discarded lexeme',\n"
                 "       rule_id, recce.start_of_lexeme, recce.end_of_lexeme}\n"
-                "   return 'next_pass1_report_item', g1_lexeme, discarded, is_priority_set\n"
+                "   return 'next_pass1_report_item', g1_lexeme, discarded, is_priority_set, high_lexeme_priority\n"
                 "end\n"
-                "return '', g1_lexeme, discarded, is_priority_set\n"
+                "return '', g1_lexeme, discarded, is_priority_set, high_lexeme_priority\n"
                 ,
-                "Riii>siii",
+                "Riiii>siiii",
                 outer_slr->lua_ref,
-                working_pos, discarded, is_priority_set,
+                working_pos, discarded, is_priority_set, high_lexeme_priority,
                 &cmd,
                 &g1_lexeme,
-                &discarded, &is_priority_set
+                &discarded, &is_priority_set, &high_lexeme_priority
                 );
 
             if (!strcmp(cmd, "next_earley_set")) {
