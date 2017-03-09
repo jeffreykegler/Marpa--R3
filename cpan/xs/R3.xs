@@ -1559,19 +1559,20 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
         "recce=...\n"
         "recce.lexeme_queue = {}\n"
         "recce.accept_queue = {}\n"
+        "--\n"
+        "-- TODO remember to localize the following variables\n"
+        "--\n"
         "local l0r = recce.lmw_l0r\n"
         "if not l0r then\n"
         "    error('Internal error: No l0r in slr_alternatives(): %s',\n"
         "        recce.slg.lmw_l0g:error_description())\n"
         "end\n"
-        "return recce.start_of_lexeme\n"
+        "return recce.start_of_lexeme,\n"
+        "    recce.lmw_l0r:latest_earley_set()\n"
         ,
-        "R>i", outer_slr->lua_ref, &working_pos);
-
-    call_by_tag (outer_slr->L, MYLUA_TAG,
-        "recce = ...\n"
-        "return recce.lmw_l0r:latest_earley_set()\n",
-        "R>i", outer_slr->lua_ref, &earley_set);
+        "R>ii", outer_slr->lua_ref, &working_pos,
+         &earley_set
+         );
 
     /* Zero length lexemes are not of interest, so we do NOT
      * search the 0'th Earley set.
@@ -1594,9 +1595,6 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
         while (1) {
             lua_Integer g1_lexeme;
             lua_Integer this_lexeme_priority;
-            lua_Integer dot_position;
-            lua_Integer origin;
-            lua_Integer rule_id;
             const char* cmd;
 
             call_by_tag (outer_slr->L, MYLUA_TAG,
