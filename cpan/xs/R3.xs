@@ -1548,7 +1548,7 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
     lua_Integer is_priority_set = 0;
     lua_Integer high_lexeme_priority = 0;
 
-    lua_Integer found_discarded = 0;
+    lua_Integer discarded = 0;
     lua_Integer working_pos;
 
     /* none, discard, "no lexeme", accept */
@@ -1600,38 +1600,39 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
             const char* cmd;
 
             call_by_tag (outer_slr->L, MYLUA_TAG,
-                "recce, working_pos, is_priority_set = ...\n"
+                "recce, working_pos, discarded, is_priority_set = ...\n"
                 "local g1_lexeme = -1\n"
                 "local rule_id, dot_position, origin = recce.lmw_l0r:progress_item()\n"
                 "if not rule_id then\n"
-                "    return 'next_earley_set', -1, 0, 0, -1\n"
+                "    return 'next_earley_set', -1, 0, 0, -1, discarded, is_priority_set\n"
                 "end\n"
                 "if rule_id <= -2 then\n"
                 "    error(string.format('Problem in recce:progress_item(): %s'),\n"
                 "        recce.lmw_l0r:error_description())\n"
                 "end\n"
                 "if rule_id == -1 then\n"
-                "   return 'next_earley_set', rule_id, dot_position, origin, g1_lexeme\n"
+                "   return 'next_earley_set', rule_id, dot_position, origin, g1_lexeme, discarded, is_priority_set\n"
                 "end\n"
                 "if origin ~= 0 then\n"
-                "   return 'next_pass1_report_item', rule_id, dot_position, origin, g1_lexeme\n"
+                "   return 'next_pass1_report_item', rule_id, dot_position, origin, g1_lexeme, discarded, is_priority_set\n"
                 "end\n"
                 "if dot_position ~= -1 then\n"
-                "   return 'next_pass1_report_item', rule_id, dot_position, origin, g1_lexeme\n"
+                "   return 'next_pass1_report_item', rule_id, dot_position, origin, g1_lexeme, discarded, is_priority_set\n"
                 "end\n"
                 "g1_lexeme = recce.slg.l0_rules[rule_id].g1_lexeme\n"
                 "g1_lexeme = g1_lexeme or -1\n"
                 "if g1_lexeme == -1 then\n"
-                "   return 'next_pass1_report_item', rule_id, dot_position, origin, g1_lexeme\n"
+                "   return 'next_pass1_report_item', rule_id, dot_position, origin, g1_lexeme, discarded, is_priority_set\n"
                 "end\n"
                 "recce.end_of_lexeme = working_pos\n"
-                "return '', rule_id, dot_position, origin, g1_lexeme\n"
+                "return '', rule_id, dot_position, origin, g1_lexeme, discarded, is_priority_set\n"
                 ,
-                "Rii>siiii",
+                "Riii>siiiiii",
                 outer_slr->lua_ref,
-                working_pos, is_priority_set,
+                working_pos, discarded, is_priority_set,
                 &cmd,
-                &rule_id, &dot_position, &origin, &g1_lexeme
+                &rule_id, &dot_position, &origin, &g1_lexeme,
+                &discarded, &is_priority_set
                 );
 
             if (!strcmp(cmd, "next_earley_set")) {
@@ -1643,7 +1644,7 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
 
             /* -2 means a discarded item */
             if (g1_lexeme <= -2) {
-                found_discarded = 1;
+                discarded++;
 
                 call_by_tag (outer_slr->L, MYLUA_TAG,
                     "recce, rule_id, lexeme_start, lexeme_end = ...\n"
@@ -1703,7 +1704,7 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
 
         NEXT_EARLEY_SET:
 
-        if (found_discarded || is_priority_set)
+        if (discarded || is_priority_set)
             break;
 
     }
@@ -1711,7 +1712,7 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
     /* Figure out what the result of pass 1 was */
     if (is_priority_set) {
         pass1_result = "accept";
-    } else if (found_discarded) {
+    } else if (discarded) {
         pass1_result = "discard";
     } else {
         pass1_result = "no lexeme";
