@@ -1549,7 +1549,6 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
     lua_Integer high_lexeme_priority = 0;
 
     int discarded = 0;
-    int rejected = 0;
     lua_Integer working_pos;
 
     /* none, discard, "no lexeme", accept */
@@ -1701,7 +1700,7 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
                                            break and continue */ ;
         }
 
-        if (discarded || rejected || is_priority_set)
+        if (discarded || is_priority_set)
             break;
 
     }
