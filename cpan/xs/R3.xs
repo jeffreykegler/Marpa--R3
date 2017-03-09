@@ -1578,7 +1578,6 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
      */
     for (; earley_set > 0; earley_set--) {
         lua_Integer return_value;
-        int end_of_earley_items = 0;
 
         call_by_tag (outer_slr->L, MYLUA_TAG,
             "recce, earley_set = ...\n"
@@ -1592,7 +1591,7 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
             "Ri>ii",
             outer_slr->lua_ref, (lua_Integer) earley_set, &return_value, &working_pos);
 
-        while (!end_of_earley_items) {
+        while (1) {
             lua_Integer g1_lexeme;
             lua_Integer this_lexeme_priority;
             lua_Integer dot_position;
@@ -1612,8 +1611,7 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
                 outer_slr->lua_ref, &rule_id, &dot_position, &origin);
 
             if (rule_id == -1) {
-                end_of_earley_items = 1;
-                goto NEXT_PASS1_REPORT_ITEM;
+                goto NEXT_EARLEY_ITEM;
             }
             if (origin != 0)
                 goto NEXT_PASS1_REPORT_ITEM;
@@ -1699,6 +1697,8 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
           NEXT_PASS1_REPORT_ITEM:      /* Clearer, I think, using this label than long distance
                                            break and continue */ ;
         }
+
+        NEXT_EARLEY_ITEM:
 
         if (discarded || is_priority_set)
             break;
