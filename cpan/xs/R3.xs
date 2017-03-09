@@ -1582,6 +1582,7 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
      */
     for (; earley_set > 0; earley_set--) {
         lua_Integer return_value;
+        const char* cmd;
 
         call_by_tag (outer_slr->L, MYLUA_TAG,
             "recce, earley_set = ...\n"
@@ -1596,7 +1597,6 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
             outer_slr->lua_ref, (lua_Integer) earley_set, &return_value, &working_pos);
 
         while (1) {
-            const char* cmd;
 
             call_by_tag (outer_slr->L, MYLUA_TAG,
                 "recce, working_pos, discarded, is_priority_set, high_lexeme_priority = ...\n"
@@ -1659,12 +1659,6 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
             if (!strcmp(cmd, "next_earley_set")) {
                 goto NEXT_EARLEY_SET;
             }
-            if (!strcmp(cmd, "next_pass1_report_item")) {
-                goto NEXT_PASS1_REPORT_ITEM;
-            }
-
-          NEXT_PASS1_REPORT_ITEM:      /* Clearer, I think, using this label than long distance
-                                           break and continue */ ;
         }
 
         NEXT_EARLEY_SET:
