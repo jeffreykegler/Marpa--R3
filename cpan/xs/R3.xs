@@ -1530,22 +1530,6 @@ static void recursive_coerce_to_lua(
 #define U_READ_EXHAUSTED_ON_SUCCESS "exhausted on success"
 #define U_READ_INVALID_CHAR "invalid char"
 
-
-/* It is OK to set pos to last codepoint + 1 */
-static void
-u_pos_set (Outer_R * outer_slr, const char* name, lua_Integer start_pos_arg, lua_Integer length_arg)
-{
-  dTHX;
-
-  call_by_tag (outer_slr->L, MYLUA_TAG,
-      "recce, start_pos_arg, length_arg = ...\n"
-      "return recce:pos_set(start_pos_arg, length_arg)\n"
-      ,
-      "Rii>",
-      outer_slr->lua_ref, start_pos_arg, length_arg);
-
-}
-
 /* Static SLR methods */
 
 /*
@@ -2211,35 +2195,6 @@ PPCODE:
       "return recce.perl_pos\n",
       "R>i", outer_slr->lua_ref, &perl_pos);
   XSRETURN_IV((IV)perl_pos);
-}
-
-void
-pos_set( outer_slr, start_pos_sv, length_sv )
-    Outer_R *outer_slr;
-     SV* start_pos_sv;
-     SV* length_sv;
-PPCODE:
-{
-  lua_Integer perl_pos;
-  lua_Integer start_pos;
-  lua_Integer length;
-
-  call_by_tag (outer_slr->L, MYLUA_TAG,
-      "local recce = ...\n"
-      "return recce.perl_pos\n",
-      "R>i", outer_slr->lua_ref, &perl_pos);
-
-  start_pos = SvIOK(start_pos_sv) ? (lua_Integer)SvIV(start_pos_sv) : perl_pos;
-  length = SvIOK(length_sv) ? (lua_Integer)SvIV(length_sv) : -1;
-  u_pos_set(outer_slr, "slr->pos_set", start_pos, length);
-
-  call_by_tag (outer_slr->L, MYLUA_TAG,
-      "local recce = ...\n"
-      "recce.lexer_start_pos = recce.perl_pos\n"
-      ,
-      "R>", outer_slr->lua_ref);
-
-  XSRETURN_YES;
 }
 
 void

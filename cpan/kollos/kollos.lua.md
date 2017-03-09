@@ -744,6 +744,7 @@ Set the position and length of input string.
                 new_end_pos, input_length))
         end
         recce.perl_pos = new_perl_pos
+        recce.lexer_start_pos = new_perl_pos
         recce.end_pos = new_end_pos
         return
     end

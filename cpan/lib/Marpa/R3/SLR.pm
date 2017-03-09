@@ -862,7 +862,6 @@ sub Marpa::R3::Scanless::R::resume {
 
     my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
 
-    $thin_slr->pos_set( $start_pos, $length );
     {
        my $length_arg = $length // -1;
        my $start_pos_arg = $start_pos // 'undef';
