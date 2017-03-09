@@ -1561,6 +1561,9 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
         "recce.accept_queue = {}\n"
         "--\n"
         "-- TODO remember to localize the following variables\n"
+        "recce.discarded = 0\n"
+        "recce.is_priority_set = 0\n"
+        "recce.high_lexeme_priority = 0\n"
         "--\n"
         "local l0r = recce.lmw_l0r\n"
         "if not l0r then\n"
@@ -1649,28 +1652,27 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
             }
 
             call_by_tag (outer_slr->L, MYLUA_TAG,
-                "recce, g1_lexeme = ...\n"
+                "recce, g1_lexeme, is_priority_set = ...\n"
                 "local is_expected = recce.lmw_g1r:terminal_is_expected(g1_lexeme)\n"
                 "if not is_expected then\n"
                 "    error(string.format('Internnal error: Marpa recognized unexpected token @%d-%d: lexme=%d',\n"
                 "        recce.start_of_lexeme, recce.end_of_lexeme, g1_lexeme))\n"
                 "end\n"
-                "return recce.g1_symbols[g1_lexeme].lexeme_priority\n"
+                "local this_lexeme_priority = recce.g1_symbols[g1_lexeme].lexeme_priority\n"
+                "if is_priority_set == 0 or this_lexeme_priority > high_lexeme_priority then\n"
+                "    high_lexeme_priority = this_lexeme_priority\n"
+                "    is_priority_set = 1\n"
+                "end\n"
+                "return this_lexeme_priority, high_lexeme_priority, is_priority_set\n"
                 ,
-                "Ri>i",
-                outer_slr->lua_ref, (lua_Integer) g1_lexeme,
-                &this_lexeme_priority
+                "Rii>iii",
+                outer_slr->lua_ref, (lua_Integer) g1_lexeme, is_priority_set,
+                &this_lexeme_priority, &high_lexeme_priority, &is_priority_set
                 );
 
             /* If we are here, the lexeme will be accepted  by the grammar,
              * but we do not yet know about priority
              */
-
-            if (!is_priority_set
-                || this_lexeme_priority > high_lexeme_priority) {
-                high_lexeme_priority = this_lexeme_priority;
-                is_priority_set = 1;
-            }
 
             {
                     call_by_tag (outer_slr->L, MYLUA_TAG,
