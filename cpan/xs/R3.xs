@@ -1597,7 +1597,6 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
 
         while (1) {
             lua_Integer g1_lexeme;
-            lua_Integer this_lexeme_priority;
             const char* cmd;
 
             call_by_tag (outer_slr->L, MYLUA_TAG,
@@ -1634,6 +1633,21 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
                 "       rule_id, recce.start_of_lexeme, recce.end_of_lexeme}\n"
                 "   return 'next_pass1_report_item', g1_lexeme, discarded, is_priority_set, high_lexeme_priority\n"
                 "end\n"
+                "local is_expected = recce.lmw_g1r:terminal_is_expected(g1_lexeme)\n"
+                "if not is_expected then\n"
+                "    error(string.format('Internnal error: Marpa recognized unexpected token @%d-%d: lexme=%d',\n"
+                "        recce.start_of_lexeme, recce.end_of_lexeme, g1_lexeme))\n"
+                "end\n"
+                "local this_lexeme_priority = recce.g1_symbols[g1_lexeme].lexeme_priority\n"
+                "if is_priority_set == 0 or this_lexeme_priority > high_lexeme_priority then\n"
+                "    high_lexeme_priority = this_lexeme_priority\n"
+                "    is_priority_set = 1\n"
+                "end\n"
+                "local q = recce.lexeme_queue\n"
+                "-- at this point we know the lexeme will be accepted by the grammar\n"
+                "-- but we do not yet know about priority\n"
+                "q[#q+1] = { '!trace', 'acceptable lexeme',\n"
+                "   recce.start_of_lexeme, recce.end_of_lexeme, g1_lexeme, this_lexeme_priority, this_lexeme_priority}\n"
                 "return '', g1_lexeme, discarded, is_priority_set, high_lexeme_priority\n"
                 ,
                 "Riiii>siiii",
@@ -1650,31 +1664,6 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
             if (!strcmp(cmd, "next_pass1_report_item")) {
                 goto NEXT_PASS1_REPORT_ITEM;
             }
-
-            call_by_tag (outer_slr->L, MYLUA_TAG,
-                "recce, g1_lexeme, is_priority_set = ...\n"
-                "local is_expected = recce.lmw_g1r:terminal_is_expected(g1_lexeme)\n"
-                "if not is_expected then\n"
-                "    error(string.format('Internnal error: Marpa recognized unexpected token @%d-%d: lexme=%d',\n"
-                "        recce.start_of_lexeme, recce.end_of_lexeme, g1_lexeme))\n"
-                "end\n"
-                "local this_lexeme_priority = recce.g1_symbols[g1_lexeme].lexeme_priority\n"
-                "if is_priority_set == 0 or this_lexeme_priority > high_lexeme_priority then\n"
-                "    high_lexeme_priority = this_lexeme_priority\n"
-                "    is_priority_set = 1\n"
-                "end\n"
-                "local q = recce.lexeme_queue\n"
-                "-- at this point we know the lexeme will be accepted by the grammar\n"
-                "-- but we do not yet know about priority\n"
-                "q[#q+1] = { '!trace', 'acceptable lexeme',\n"
-                "   recce.start_of_lexeme, recce.end_of_lexeme, g1_lexeme, this_lexeme_priority, this_lexeme_priority}\n"
-                "return high_lexeme_priority, is_priority_set\n"
-                ,
-                "Rii>ii",
-                outer_slr->lua_ref, (lua_Integer) g1_lexeme, is_priority_set,
-                &high_lexeme_priority, &is_priority_set
-                );
-
 
           NEXT_PASS1_REPORT_ITEM:      /* Clearer, I think, using this label than long distance
                                            break and continue */ ;
