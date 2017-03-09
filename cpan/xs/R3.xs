@@ -2250,18 +2250,13 @@ PPCODE:
                 "recce.perl_pos = lexer_start_pos\n"
                 "recce.start_of_lexeme = lexer_start_pos\n"
                 "recce.lexer_start_pos = -1\n"
-                ,
-                "R>", outer_slr->lua_ref);
-
-            call_by_tag (outer_slr->L, MYLUA_TAG,
-                "local recce = ...\n"
                 "recce.lmw_l0r = nil\n"
                 "if recce.trace_terminals >= 1 then\n"
                 "    local q = recce.event_queue\n"
                 "    q[#q+1] = { '!trace', 'lexer restarted recognizer', recce.perl_pos}\n"
                 "end\n"
                 ,
-                "Ri>", outer_slr->lua_ref );
+                "R>", outer_slr->lua_ref);
 
         }
 
