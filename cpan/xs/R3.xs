@@ -1601,27 +1601,35 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
 
             call_by_tag (outer_slr->L, MYLUA_TAG,
                 "recce = ...\n"
+                "local g1_lexeme = -1\n"
                 "local rule_id, dot_position, origin = recce.lmw_l0r:progress_item()\n"
                 "if not rule_id then\n"
-                "    return 'next_earley_set', -1, 0, 0\n"
+                "    return 'next_earley_set', -1, 0, 0, -1\n"
                 "end\n"
                 "if rule_id <= -2 then\n"
                 "    error(string.format('Problem in recce:progress_item(): %s'),\n"
                 "        recce.lmw_l0r:error_description())\n"
                 "end\n"
                 "if rule_id == -1 then\n"
-                "   return 'next_earley_set', rule_id, dot_position, origin\n"
+                "   return 'next_earley_set', rule_id, dot_position, origin, g1_lexeme\n"
                 "end\n"
                 "if origin ~= 0 then\n"
-                "   return 'next_pass1_report_item', rule_id, dot_position, origin\n"
+                "   return 'next_pass1_report_item', rule_id, dot_position, origin, g1_lexeme\n"
                 "end\n"
                 "if dot_position ~= -1 then\n"
-                "   return 'next_pass1_report_item', rule_id, dot_position, origin\n"
+                "   return 'next_pass1_report_item', rule_id, dot_position, origin, g1_lexeme\n"
                 "end\n"
-                "return '', rule_id, dot_position, origin\n"
+                "g1_lexeme = recce.slg.l0_rules[rule_id].g1_lexeme\n"
+                "g1_lexeme = g1_lexeme or -1\n"
+                "if g1_lexeme == -1 then\n"
+                "   return 'next_pass1_report_item', rule_id, dot_position, origin, g1_lexeme\n"
+                "end\n"
+                "return '', rule_id, dot_position, origin, g1_lexeme\n"
                 ,
-                "R>siii",
-                outer_slr->lua_ref, &cmd, &rule_id, &dot_position, &origin);
+                "R>siiii",
+                outer_slr->lua_ref, &cmd, &rule_id, &dot_position, &origin,
+                &g1_lexeme
+                );
 
             if (!strcmp(cmd, "next_earley_set")) {
                 goto NEXT_EARLEY_SET;
@@ -1629,18 +1637,6 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
             if (!strcmp(cmd, "next_pass1_report_item")) {
                 goto NEXT_PASS1_REPORT_ITEM;
             }
-
-            call_by_tag (outer_slr->L,
-                MYLUA_TAG,
-                "local recce, rule_id = ...\n"
-                "local g1_lexeme = recce.slg.l0_rules[rule_id].g1_lexeme\n"
-                "g1_lexeme = g1_lexeme or -1\n"
-                "return g1_lexeme\n",
-                "Ri>i", outer_slr->lua_ref, (lua_Integer) rule_id,
-                &g1_lexeme);
-
-            if (g1_lexeme == -1)
-                goto NEXT_PASS1_REPORT_ITEM;
 
             call_by_tag (outer_slr->L,
                 MYLUA_TAG,
