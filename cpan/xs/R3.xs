@@ -1545,7 +1545,7 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
     lua_Integer earley_set;
 
     /* |high_lexeme_priority| is not valid unless |is_priority_set| is set. */
-    int is_priority_set = 0;
+    lua_Integer is_priority_set = 0;
     lua_Integer high_lexeme_priority = 0;
 
     int discarded = 0;
@@ -1600,7 +1600,7 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
             const char* cmd;
 
             call_by_tag (outer_slr->L, MYLUA_TAG,
-                "recce = ...\n"
+                "recce, working_pos, is_priority_set = ...\n"
                 "local g1_lexeme = -1\n"
                 "local rule_id, dot_position, origin = recce.lmw_l0r:progress_item()\n"
                 "if not rule_id then\n"
@@ -1624,11 +1624,14 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
                 "if g1_lexeme == -1 then\n"
                 "   return 'next_pass1_report_item', rule_id, dot_position, origin, g1_lexeme\n"
                 "end\n"
+                "recce.end_of_lexeme = working_pos\n"
                 "return '', rule_id, dot_position, origin, g1_lexeme\n"
                 ,
-                "R>siiii",
-                outer_slr->lua_ref, &cmd, &rule_id, &dot_position, &origin,
-                &g1_lexeme
+                "Rii>siiii",
+                outer_slr->lua_ref,
+                working_pos, is_priority_set,
+                &cmd,
+                &rule_id, &dot_position, &origin, &g1_lexeme
                 );
 
             if (!strcmp(cmd, "next_earley_set")) {
@@ -1637,14 +1640,6 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
             if (!strcmp(cmd, "next_pass1_report_item")) {
                 goto NEXT_PASS1_REPORT_ITEM;
             }
-
-            call_by_tag (outer_slr->L,
-                MYLUA_TAG,
-                "local recce, working_pos = ...\n"
-                "recce.end_of_lexeme = working_pos\n"
-                ,
-                "Ri>", outer_slr->lua_ref, (lua_Integer) working_pos
-                );
 
             /* -2 means a discarded item */
             if (g1_lexeme <= -2) {
