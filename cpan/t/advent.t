@@ -115,6 +115,13 @@ for my $test_data (@tests) {
     my ( $input, $expected_result, $expected_value ) = @{$test_data};
     my ( $actual_result, $actual_value );
 
+    # There is probably a way to print this without Test::More warning
+    # about "wide characters", and
+    # which works on Perls from 5.10.1 on,
+    # but here I take the easy way out.
+    my $input_desc = $input;
+    $input_desc =~ tr/♥♦♣♠/HDCS/;
+
     for my $suit_line_data (@suit_line) {
         my ( $suit_line, $suit_line_type ) = @{$suit_line_data};
         PROCESSING: {
@@ -173,9 +180,9 @@ for my $test_data (@tests) {
         } ## end PROCESSING:
 
         Marpa::R3::Test::is( $actual_result, $expected_result,
-            "Result of $input using $suit_line_type" );
+            "Result of $input_desc using $suit_line_type" );
         Marpa::R3::Test::is( $actual_value, $expected_value,
-            "Value of $input using $suit_line_type" );
+            "Value of $input_desc using $suit_line_type" );
     } ## end for my $suit_line_data (@suit_line)
 } ## end for my $test_data (@tests)
 

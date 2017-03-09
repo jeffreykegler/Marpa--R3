@@ -443,7 +443,7 @@ recursive_coerce_to_sv (lua_State * L, int visited_ix, int idx, char signature)
  * and none of the values are nil.  If the signature is '0',
  * the sequence will converted to a zero-based Perl array,
  * so that a conventional Lua sequence is converted to a
- * convention-compliant Perl array.  If the signature is '1' 
+ * convention-compliant Perl array.  If the signature is '1'
  * the keys in the Perl array will be exactly those of the
  * Lua sequence.
  */
@@ -1799,7 +1799,7 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
                 (lua_Integer)(i+1),
                 high_lexeme_priority
               );
-              
+
                 /* We do not have the lexeme, but we have the
                  * lexer rule.
                  * The upper level will have to figure things out.

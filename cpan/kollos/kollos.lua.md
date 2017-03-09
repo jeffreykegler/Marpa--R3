@@ -720,6 +720,35 @@ Read alternatives into the G1 grammar.
     end
 ```
 
+Set the position and length of input string.
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slr.pos_set(slr, start_pos_arg, length_arg)
+        local input_length = #recce.codepoints
+        local new_perl_pos = start_pos_arg >=0  and start_pos_arg or input_length + start_pos_arg
+        if new_perl_pos < 0 then
+            error(string.format('Bad start position in pos_set: %d', start_pos_arg))
+        end
+        if new_perl_pos > input_length then
+            error(string.format('Start position in pos_set (%d) is after input end (%d)',
+                start_pos_arg, input_length))
+        end
+        local new_end_pos = length_arg >= 0 and new_perl_pos + length_arg
+            or input_length + length_arg + 1
+        if new_end_pos < 0 then
+            error(string.format('Bad end position in pos_set: %d', new_end_pos))
+        end
+        if new_end_pos > input_length then
+            error(string.format('End position in pos_set (%d) is after input end (%d)',
+                new_end_pos, input_length))
+        end
+        recce.perl_pos = new_perl_pos
+        recce.end_pos = new_end_pos
+        return
+    end
+```
+
 ### Locations
 
 Given a G1 span return an L0 span.
