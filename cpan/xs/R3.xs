@@ -1663,30 +1663,18 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
                 "    high_lexeme_priority = this_lexeme_priority\n"
                 "    is_priority_set = 1\n"
                 "end\n"
-                "return this_lexeme_priority, high_lexeme_priority, is_priority_set\n"
+                "local q = recce.lexeme_queue\n"
+                "-- at this point we know the lexeme will be accepted by the grammar\n"
+                "-- but we do not yet know about priority\n"
+                "q[#q+1] = { '!trace', 'acceptable lexeme',\n"
+                "   recce.start_of_lexeme, recce.end_of_lexeme, g1_lexeme, this_lexeme_priority, this_lexeme_priority}\n"
+                "return high_lexeme_priority, is_priority_set\n"
                 ,
-                "Rii>iii",
+                "Rii>ii",
                 outer_slr->lua_ref, (lua_Integer) g1_lexeme, is_priority_set,
-                &this_lexeme_priority, &high_lexeme_priority, &is_priority_set
+                &high_lexeme_priority, &is_priority_set
                 );
 
-            /* If we are here, the lexeme will be accepted  by the grammar,
-             * but we do not yet know about priority
-             */
-
-            {
-                    call_by_tag (outer_slr->L, MYLUA_TAG,
-                        "recce, g1_lexeme, priority, required_priority = ...\n"
-                        "local q = recce.lexeme_queue\n"
-                        "q[#q+1] = { '!trace', 'acceptable lexeme',\n"
-                        "   recce.start_of_lexeme, recce.end_of_lexeme, g1_lexeme, priority, required_priority}\n"
-                        , "Riii>", outer_slr->lua_ref,
-                        (lua_Integer) g1_lexeme,
-                        (lua_Integer) this_lexeme_priority,
-                        (lua_Integer) this_lexeme_priority
-                        );
-
-            }
 
           NEXT_PASS1_REPORT_ITEM:      /* Clearer, I think, using this label than long distance
                                            break and continue */ ;
