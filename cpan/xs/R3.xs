@@ -1597,26 +1597,38 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
             lua_Integer dot_position;
             lua_Integer origin;
             lua_Integer rule_id;
+            const char* cmd;
 
             call_by_tag (outer_slr->L, MYLUA_TAG,
                 "recce = ...\n"
                 "local rule_id, dot_position, origin = recce.lmw_l0r:progress_item()\n"
-                "if not rule_id then return -1, 0, 0 end\n"
+                "if not rule_id then\n"
+                "    return 'next_earley_set', -1, 0, 0\n"
+                "end\n"
                 "if rule_id <= -2 then\n"
                 "    error(string.format('Problem in recce:progress_item(): %s'),\n"
                 "        recce.lmw_l0r:error_description())\n"
                 "end\n"
-                "return rule_id, dot_position, origin\n",
-                "R>iii",
-                outer_slr->lua_ref, &rule_id, &dot_position, &origin);
+                "if rule_id == -1 then\n"
+                "   return 'next_earley_set', rule_id, dot_position, origin\n"
+                "end\n"
+                "if origin ~= 0 then\n"
+                "   return 'next_pass1_report_item', rule_id, dot_position, origin\n"
+                "end\n"
+                "if dot_position ~= -1 then\n"
+                "   return 'next_pass1_report_item', rule_id, dot_position, origin\n"
+                "end\n"
+                "return '', rule_id, dot_position, origin\n"
+                ,
+                "R>siii",
+                outer_slr->lua_ref, &cmd, &rule_id, &dot_position, &origin);
 
-            if (rule_id == -1) {
-                goto NEXT_EARLEY_ITEM;
+            if (!strcmp(cmd, "next_earley_set")) {
+                goto NEXT_EARLEY_SET;
             }
-            if (origin != 0)
+            if (!strcmp(cmd, "next_pass1_report_item")) {
                 goto NEXT_PASS1_REPORT_ITEM;
-            if (dot_position != -1)
-                goto NEXT_PASS1_REPORT_ITEM;
+            }
 
             call_by_tag (outer_slr->L,
                 MYLUA_TAG,
@@ -1698,7 +1710,7 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
                                            break and continue */ ;
         }
 
-        NEXT_EARLEY_ITEM:
+        NEXT_EARLEY_SET:
 
         if (discarded || is_priority_set)
             break;
