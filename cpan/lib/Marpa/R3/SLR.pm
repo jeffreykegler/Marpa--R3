@@ -863,6 +863,26 @@ sub Marpa::R3::Scanless::R::resume {
     my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
 
     $thin_slr->pos_set( $start_pos, $length );
+    {
+       my $length_arg = $length // -1;
+       my $start_pos_arg = $start_pos // 'undef';
+       $slr->call_by_tag(( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 'si', $start_pos_arg, $length_arg);
+            local recce, start_pos_arg, length_arg = ...
+            local start_pos
+            if start_pos_arg == 'undef' then
+                start_pos = recce.perl_pos
+            else
+                start_pos = math.tointeger(start_pos_arg)
+                if not start_pos then
+                    error(string.format('Bad start arg in resume: %q',
+                        start_pos_arg))
+                end
+            end
+            return recce:pos_set(start_pos, length_arg)
+END_OF_LUA
+    }
+
     $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] = [];
     my $slg      = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $thin_slg = $slg->[Marpa::R3::Internal::Scanless::G::C];
