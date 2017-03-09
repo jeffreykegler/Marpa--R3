@@ -1548,7 +1548,7 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
     lua_Integer is_priority_set = 0;
     lua_Integer high_lexeme_priority = 0;
 
-    int discarded = 0;
+    lua_Integer found_discarded = 0;
     lua_Integer working_pos;
 
     /* none, discard, "no lexeme", accept */
@@ -1643,7 +1643,7 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
 
             /* -2 means a discarded item */
             if (g1_lexeme <= -2) {
-                discarded++;
+                found_discarded = 1;
 
                 call_by_tag (outer_slr->L, MYLUA_TAG,
                     "recce, rule_id, lexeme_start, lexeme_end = ...\n"
@@ -1703,7 +1703,7 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
 
         NEXT_EARLEY_SET:
 
-        if (discarded || is_priority_set)
+        if (found_discarded || is_priority_set)
             break;
 
     }
@@ -1711,7 +1711,7 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
     /* Figure out what the result of pass 1 was */
     if (is_priority_set) {
         pass1_result = "accept";
-    } else if (discarded) {
+    } else if (found_discarded) {
         pass1_result = "discard";
     } else {
         pass1_result = "no lexeme";
