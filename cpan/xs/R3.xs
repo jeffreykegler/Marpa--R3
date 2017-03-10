@@ -1645,9 +1645,9 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
 
         for (i = 0; i < lexeme_count; i++) {
             call_by_tag (outer_slr->L, MYLUA_TAG,
-                "recce, i, high_lexeme_priority = ...\n"
+                "recce, ix, pass1_result, high_lexeme_priority = ...\n"
                 "local lexeme_q = recce.lexeme_queue\n"
-                "local this_event = lexeme_q[i]\n"
+                "local this_event = lexeme_q[ix]\n"
                 "local event_type = this_event[2]\n"
                 "if event_type == 'acceptable lexeme' then\n"
                 "    local bang_trace, event_type, lexeme_start, lexeme_end,\n"
@@ -1665,50 +1665,38 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
                 "        local q = recce.accept_queue\n"
                 "        q[#q+1] = this_event\n"
                 "    end\n"
+                "    return\n"
+                "end\n"
+                "local bang_trace, event_type, rule_id, lexeme_start, lexeme_end\n"
+                "    = table.unpack(this_event)\n"
+                "if event_type == 'discarded lexeme' then\n"
+                "    -- we do not have the lexeme, only the lexer rule,\n"
+                "    -- so we will let the upper layer figure things out.\n"
+                "    if recce.trace_terminals > 0 then\n"
+                "        local q = recce.event_queue\n"
+                "        q[#q+1] = { '!trace', 'discarded lexeme',\n"
+                "            rule_id, lexeme_start, lexeme_end}\n"
+                "    end\n"
+                "    if pass1_result == 'discard' then\n"
+                "        local q = recce.event_queue\n"
+                "        local g1r = recce.lmw_g1r\n"
+                "        local event_on_discard_active =\n"
+                "            recce.l0_rules[rule_id].event_on_discard_active\n"
+                "        if event_on_discard_active then\n"
+                "            local last_g1_location = g1r:latest_earley_set()\n"
+                "            q[#q+1] = { 'discarded lexeme',\n"
+                "                rule_id, lexeme_start, lexeme_end, last_g1_location}\n"
+                "         end\n"
+                "    end\n"
                 "end\n"
                 "return\n"
                 ,
-                "Rii>", outer_slr->lua_ref,
+                "Risi>", outer_slr->lua_ref,
                 (lua_Integer)(i+1),
+                pass1_result,
                 high_lexeme_priority
               );
 
-                /* We do not have the lexeme, but we have the
-                 * lexer rule.
-                 * The upper level will have to figure things out.
-                 */
-                call_by_tag (outer_slr->L, MYLUA_TAG,
-                    "recce, ix, pass1_result = ...\n"
-                    "local lexeme_q = recce.lexeme_queue\n"
-                    "local this_event = lexeme_q[ix]\n"
-                    "local bang_trace, event_type, rule_id, lexeme_start, lexeme_end\n"
-                    "    = table.unpack(this_event)\n"
-                    "if event_type == 'discarded lexeme' then\n"
-                    "    -- we do not have the lexeme, only the lexer rule,\n"
-                    "    -- so we will let the upper layer figure things out.\n"
-                    "    if recce.trace_terminals > 0 then\n"
-                    "        local q = recce.event_queue\n"
-                    "        q[#q+1] = { '!trace', 'discarded lexeme',\n"
-                    "            rule_id, lexeme_start, lexeme_end}\n"
-                    "    end\n"
-                    "    if pass1_result == 'discard' then\n"
-                    "        local q = recce.event_queue\n"
-                    "        local g1r = recce.lmw_g1r\n"
-                    "        local event_on_discard_active =\n"
-                    "            recce.l0_rules[rule_id].event_on_discard_active\n"
-                    "        if event_on_discard_active then\n"
-                    "            local last_g1_location = g1r:latest_earley_set()\n"
-                    "            q[#q+1] = { 'discarded lexeme',\n"
-                    "                rule_id, lexeme_start, lexeme_end, last_g1_location}\n"
-                    "         end\n"
-                    "    end\n"
-                    "end\n"
-                    ,
-                    "Ris>",
-                    outer_slr->lua_ref,
-                    (lua_Integer)(i+1),
-                    pass1_result
-                    );
         }
     }
 
