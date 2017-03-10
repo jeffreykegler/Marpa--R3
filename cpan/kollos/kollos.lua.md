@@ -719,6 +719,63 @@ Determine which lexemes are acceptable or discards.
 
 ```
 
+Process the lexeme queue generated in pass 1.
+In pass 1, we used a stack of tentative
+trace events to record which lexemes
+are acceptable, to be discarded, etc.
+At this point, if we are tracing,
+we convert the tentative trace
+events into real trace events.
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slr.lexeme_queue_examine(recce, high_lexeme_priority)
+        local lexeme_q = recce.lexeme_queue
+        for ix = 1, #recce.lexeme_queue do
+            local this_event = lexeme_q[ix]
+            local event_type = this_event[2]
+            if event_type == 'acceptable lexeme' then
+                local bang_trace, event_type, lexeme_start, lexeme_end,
+                g1_lexeme, priority, required_priority =
+                    table.unpack(this_event)
+                if priority < high_lexeme_priority then
+                    if recce.trace_terminals > 0 then
+                        local q = recce.event_queue
+                        q[#q+1] = { '!trace', 'outprioritized lexeme',
+                           lexeme_start, lexeme_end, g1_lexeme,
+                           priority, high_lexeme_priority}
+                    end
+                    goto NEXT_LEXEME
+                end
+                local q = recce.accept_queue
+                q[#q+1] = this_event
+                goto NEXT_LEXEME
+            end
+            if event_type == 'discarded lexeme' then
+                local bang_trace, event_type, rule_id, lexeme_start, lexeme_end
+                    = table.unpack(this_event)
+                -- we do not have the lexeme, only the lexer rule,
+                -- so we will let the upper layer figure things out.
+                if recce.trace_terminals > 0 then
+                    local q = recce.event_queue
+                    q[#q+1] = { '!trace', 'discarded lexeme',
+                        rule_id, lexeme_start, lexeme_end}
+                end
+                    local q = recce.event_queue
+                    local g1r = recce.lmw_g1r
+                    local event_on_discard_active =
+                        recce.l0_rules[rule_id].event_on_discard_active
+                    if event_on_discard_active then
+                        local last_g1_location = g1r:latest_earley_set()
+                        q[#q+1] = { 'discarded lexeme',
+                            rule_id, lexeme_start, lexeme_end, last_g1_location}
+                     end
+            end
+            ::NEXT_LEXEME::
+        end
+        return
+    end
+```
 Read alternatives into the G1 grammar.
 
 ```
