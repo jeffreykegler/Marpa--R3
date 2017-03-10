@@ -1560,7 +1560,7 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
     {
 
         call_by_tag (outer_slr->L, MYLUA_TAG,
-            "local recce, discarded, is_priority_set, high_lexeme_priority = ...\n"
+            "local recce = ...\n"
         "recce.lexeme_queue = {}\n"
         "recce.accept_queue = {}\n"
         "local l0r = recce.lmw_l0r\n"
@@ -1568,6 +1568,9 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
         "    error('Internal error: No l0r in slr_alternatives(): %s',\n"
         "        recce.slg.lmw_l0g:error_description())\n"
         "end\n"
+        "local discarded = 0\n"
+        "local is_priority_set = 0\n"
+        "local high_lexeme_priority = 0\n"
             "local working_pos = recce.start_of_lexeme\n"
           "for earley_set = recce.lmw_l0r:latest_earley_set(), 1, -1 do\n"
             "working_pos = recce.start_of_lexeme + earley_set\n"
@@ -1584,9 +1587,8 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
             "::LAST_EARLEY_SET::\n"
             "return working_pos, discarded, is_priority_set, high_lexeme_priority\n"
             ,
-            "Riii>iiii",
+            "R>iiii",
             outer_slr->lua_ref,
-            discarded, is_priority_set, high_lexeme_priority,
             &working_pos, &discarded, &is_priority_set, &high_lexeme_priority
             );
 
