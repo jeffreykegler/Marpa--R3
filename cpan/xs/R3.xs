@@ -1543,6 +1543,7 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
 {
     dTHX;
     lua_Integer earley_set;
+    const char* cmd;
 
     /* |high_lexeme_priority| is not valid unless |is_priority_set| is set. */
     lua_Integer is_priority_set = 0;
@@ -1587,14 +1588,17 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
 "::LAST_EARLEY_SET::\n"
 "-- PASS 2 --\n"
 "recce:lexeme_queue_examine(high_lexeme_priority)\n"
-"return working_pos, discarded, is_priority_set\n"
+"return '', working_pos, discarded, is_priority_set\n"
             ,
-            "R>iii",
+            "R>siii",
             outer_slr->lua_ref,
-            &working_pos, &discarded, &is_priority_set
+            &cmd, &working_pos, &discarded, &is_priority_set
             );
 
     }
+
+    if (!strcmp(cmd, "return")) { return 0; }
+    if (*cmd) { return cmd; }
 
     /* Figure out what the result of pass 1 was */
     if (is_priority_set) {
