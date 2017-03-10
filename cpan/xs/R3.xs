@@ -1580,28 +1580,31 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
     /* Zero length lexemes are not of interest, so we do NOT
      * search the 0'th Earley set.
      */
-    for (; earley_set > 0; earley_set--) {
+    {
 
         call_by_tag (outer_slr->L, MYLUA_TAG,
-            "local recce, earley_set, discarded, is_priority_set, high_lexeme_priority = ...\n"
-            "local working_pos = recce.start_of_lexeme + earley_set\n"
+            "local recce, discarded, is_priority_set, high_lexeme_priority = ...\n"
+            "local working_pos = recce.start_of_lexeme\n"
+          "for earley_set = recce.lmw_l0r:latest_earley_set(), 1, -1 do\n"
+            "working_pos = recce.start_of_lexeme + earley_set\n"
             "local return_value = recce.lmw_l0r:progress_report_start(earley_set)\n"
             "if return_value < 0 then\n"
             "    error(string.format('Problem in recce:progress_report_start(...,%d): %s'),\n"
             "        earley_set, recce.lmw_l0r:error_description())\n"
             "end\n"
-            "local discarded, is_priority_set, high_lexeme_priority =\n"
+            "discarded, is_priority_set, high_lexeme_priority =\n"
             "    recce:l0_earley_set_examine(working_pos, discarded, is_priority_set, high_lexeme_priority)\n"
+            "if discarded > 0 then goto LAST_EARLEY_SET end\n"
+            "if is_priority_set ~= 0 then goto LAST_EARLEY_SET end\n"
+          "end\n"
+            "::LAST_EARLEY_SET::\n"
             "return working_pos, discarded, is_priority_set, high_lexeme_priority\n"
             ,
-            "Riiii>iiii",
+            "Riii>iiii",
             outer_slr->lua_ref,
-            (lua_Integer) earley_set, discarded, is_priority_set, high_lexeme_priority,
+            discarded, is_priority_set, high_lexeme_priority,
             &working_pos, &discarded, &is_priority_set, &high_lexeme_priority
             );
-
-        if (discarded || is_priority_set)
-            break;
 
     }
 
