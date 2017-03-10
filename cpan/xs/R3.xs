@@ -1593,23 +1593,23 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
 "    if discarded <= 0 then\n"
 "        -- no accepted or discarded lexemes\n"
 "        if discard_mode ~= 0 then\n"
-"             return 'R1 exhausted before end', -1, -1, -1\n"
+"             return 'R1 exhausted before end', -1\n"
 "        end\n"
 "        local start_of_lexeme = recce.start_of_lexeme\n"
 "        recce.lexer_start_pos = start_of_lexeme\n"
 "        recce.perl_pos = start_of_lexeme\n"
-"        return 'no lexeme', -1, -1, -1\n"
+"        return 'no lexeme', -1\n"
 "    end\n"
 "    -- if here, no accepted lexemes, but discarded ones\n"
 "    recce.lexer_start_pos = working_pos\n"
 "    recce.perl_pos = working_pos\n"
-"    return 'return', -1, -1, -1\n"
+"    return 'return', -1\n"
 "end\n"
-"return '', working_pos, discarded, is_priority_set\n"
+"return '', working_pos \n"
             ,
-            "Ri>siii",
+            "Ri>si",
             outer_slr->lua_ref, discard_mode,
-            &cmd, &working_pos, &discarded, &is_priority_set
+            &cmd, &working_pos
             );
 
     }
