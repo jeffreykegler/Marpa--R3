@@ -776,6 +776,39 @@ events into real trace events.
         return
     end
 ```
+
+Process any "pause before" lexemes.
+Returns `true` is there was one,
+`false` otherwise.
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slr.do_pause_before(recce)
+        local accept_q = recce.accept_queue
+        for ix = 1, #accept_q do
+            local this_event = accept_q[ix]
+            local bang_trace, event_type, lexeme_start, lexeme_end,
+                    g1_lexeme, priority, required_priority =
+                table.unpack(this_event)
+            local pause_before_active = recce.g1_symbols[g1_lexeme].pause_before_active
+            if pause_before_active then
+                local q = recce.event_queue
+                if recce.trace_terminals > 2 then
+                    q[#q+1] = { '!trace', 'g1 before lexeme event', g1_lexeme}
+                end
+                q[#q+1] = { 'before lexeme', g1_lexeme}
+                recce.start_of_pause_lexeme = lexeme_start
+                recce.end_of_pause_lexeme = lexeme_end
+                local start_of_lexeme = recce.start_of_lexeme
+                recce.lexer_start_pos = start_of_lexeme
+                recce.perl_pos = start_of_lexeme
+                return true
+            end
+        end
+        return false
+    end
+```
+
 Read alternatives into the G1 grammar.
 
 ```
