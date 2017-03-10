@@ -1561,7 +1561,7 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
     {
 
         call_by_tag (outer_slr->L, MYLUA_TAG,
-"local recce = ...\n"
+"local recce, discard_mode = ...\n"
 "recce.lexeme_queue = {}\n"
 "recce.accept_queue = {}\n"
 "local l0r = recce.lmw_l0r\n"
@@ -1588,10 +1588,23 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
 "::LAST_EARLEY_SET::\n"
 "-- PASS 2 --\n"
 "recce:lexeme_queue_examine(high_lexeme_priority)\n"
+"local accept_q = recce.accept_queue\n"
+"if #accept_q <= 0 then\n"
+"    if discarded <= 0 then\n"
+"        -- no accepted or discarded lexemes\n"
+"        if discard_mode ~= 0 then\n"
+"             return 'R1 exhausted before end', -1, -1, -1\n"
+"        end\n"
+"        local start_of_lexeme = recce.start_of_lexeme\n"
+"        recce.lexer_start_pos = start_of_lexeme\n"
+"        recce.perl_pos = start_of_lexeme\n"
+"        return 'no lexeme', -1, -1, -1\n"
+"    end\n"
+"end\n"
 "return '', working_pos, discarded, is_priority_set\n"
             ,
-            "R>siii",
-            outer_slr->lua_ref,
+            "Ri>siii",
+            outer_slr->lua_ref, discard_mode,
             &cmd, &working_pos, &discarded, &is_priority_set
             );
 
@@ -1617,22 +1630,6 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
         ,
         "Ri>", outer_slr->lua_ref, (lua_Integer)working_pos);
         return 0;
-    }
-
-    if (discard_mode) {
-        return "R1 exhausted before end";
-    }
-
-    /* If NOT accepted */
-    if (strcmp(pass1_result, "accept")) {
-    call_by_tag (outer_slr->L, MYLUA_TAG,
-        "local recce = ...\n"
-        "local start_of_lexeme = recce.start_of_lexeme\n"
-        "recce.lexer_start_pos = start_of_lexeme\n"
-        "recce.perl_pos = start_of_lexeme\n"
-        ,
-        "R>", outer_slr->lua_ref);
-        return "no lexeme";
     }
 
     /* Pass 3 */
