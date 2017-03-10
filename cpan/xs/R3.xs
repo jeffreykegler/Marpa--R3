@@ -1614,29 +1614,24 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
     /* Pass 4 */
     {
         lua_Integer return_value;
-        call_by_tag (outer_slr->L, MYLUA_TAG,
-          "recce = ...\n"
-          "return recce:g1_alternatives()\n"
-          ,
-          "R>", outer_slr->lua_ref);
 
         call_by_tag (outer_slr->L, MYLUA_TAG,
             "local recce = ...\n"
+            "recce:g1_alternatives()\n"
             "local g1r = recce.lmw_g1r\n"
-            "return g1r:earleme_complete()\n",
+            "local result = g1r:earleme_complete()\n"
+            "if result < 0 then\n"
+            "    error(string.format(\n"
+            "        'Problem in marpa_r_earleme_complete(): %s',\n"
+            "        g1r:error_description()\n"
+            "    ))\n"
+            "end\n"
+            "local end_of_lexeme = recce.end_of_lexeme\n"
+            "recce.lexer_start_pos = end_of_lexeme\n"
+            "recce.perl_pos = end_of_lexeme\n"
+            "return result\n",
             "R>i", outer_slr->lua_ref, &return_value);
 
-        if (return_value < 0) {
-            croak ("Problem in marpa_r_earleme_complete(): %s",
-                slr_g1_error (outer_slr));
-        }
-    call_by_tag (outer_slr->L, MYLUA_TAG,
-        "local recce = ...\n"
-        "local end_of_lexeme = recce.end_of_lexeme\n"
-        "recce.lexer_start_pos = end_of_lexeme\n"
-        "recce.perl_pos = end_of_lexeme\n"
-        ,
-        "R>", outer_slr->lua_ref);
         if (return_value > 0) {
             call_by_tag (outer_slr->L, MYLUA_TAG,
                 "local recce = ...\n"
