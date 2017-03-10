@@ -1600,10 +1600,7 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
 
             call_by_tag (outer_slr->L, MYLUA_TAG,
                 "local recce, working_pos, discarded, is_priority_set, high_lexeme_priority = ...\n"
-                "discarded, is_priority_set, high_lexeme_priority =\n"
-                "    recce:l0_earley_set_examine(working_pos, discarded, is_priority_set, high_lexeme_priority)\n"
-                "recce:lexeme_queue_examine(high_lexeme_priority)\n"
-                "return discarded, is_priority_set, high_lexeme_priority\n"
+                "return recce:l0_earley_set_examine(working_pos, discarded, is_priority_set, high_lexeme_priority)\n"
                 ,
                 "Riiii>iii",
                 outer_slr->lua_ref,
@@ -1617,6 +1614,15 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
             break;
 
     }
+
+    /* Pass 2 */
+            call_by_tag (outer_slr->L, MYLUA_TAG,
+                "local recce, high_lexeme_priority = ...\n"
+                "return recce:lexeme_queue_examine(high_lexeme_priority)\n"
+                ,
+                "Ri>", outer_slr->lua_ref,
+                high_lexeme_priority
+              );
 
     /* Figure out what the result of pass 1 was */
     if (is_priority_set) {
