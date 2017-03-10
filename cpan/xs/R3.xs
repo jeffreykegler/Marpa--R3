@@ -1542,18 +1542,9 @@ static const char *
 slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
 {
     dTHX;
-    lua_Integer earley_set;
     const char* cmd;
 
     /* |high_lexeme_priority| is not valid unless |is_priority_set| is set. */
-    lua_Integer is_priority_set = 0;
-    lua_Integer high_lexeme_priority = 0;
-
-    lua_Integer discarded = 0;
-    lua_Integer working_pos;
-
-    /* none, discard, "no lexeme", accept */
-    const char* pass1_result = "none";
 
     /* Zero length lexemes are not of interest, so we do NOT
      * search the 0'th Earley set.
@@ -1593,23 +1584,23 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
 "    if discarded <= 0 then\n"
 "        -- no accepted or discarded lexemes\n"
 "        if discard_mode ~= 0 then\n"
-"             return 'R1 exhausted before end', -1\n"
+"             return 'R1 exhausted before end'\n"
 "        end\n"
 "        local start_of_lexeme = recce.start_of_lexeme\n"
 "        recce.lexer_start_pos = start_of_lexeme\n"
 "        recce.perl_pos = start_of_lexeme\n"
-"        return 'no lexeme', -1\n"
+"        return 'no lexeme'\n"
 "    end\n"
 "    -- if here, no accepted lexemes, but discarded ones\n"
 "    recce.lexer_start_pos = working_pos\n"
 "    recce.perl_pos = working_pos\n"
-"    return 'return', -1\n"
+"    return 'return'\n"
 "end\n"
-"return '', working_pos \n"
+"return ''\n"
             ,
-            "Ri>si",
+            "Ri>s",
             outer_slr->lua_ref, discard_mode,
-            &cmd, &working_pos
+            &cmd
             );
 
     }
