@@ -1613,7 +1613,6 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
 
     /* Pass 4 */
     {
-        lua_Integer return_value;
 
         call_by_tag (outer_slr->L, MYLUA_TAG,
             "local recce = ...\n"
@@ -1629,26 +1628,18 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
             "local end_of_lexeme = recce.end_of_lexeme\n"
             "recce.lexer_start_pos = end_of_lexeme\n"
             "recce.perl_pos = end_of_lexeme\n"
-            "return result\n",
-            "R>i", outer_slr->lua_ref, &return_value);
-
-        if (return_value > 0) {
-            call_by_tag (outer_slr->L, MYLUA_TAG,
-                "local recce = ...\n"
-                "recce:g1_convert_events(recce.perl_pos)\n",
-                "Ri>", outer_slr->lua_ref);
-        }
-
-        call_by_tag (outer_slr->L, MYLUA_TAG,
-            "local recce = ...\n"
+            "if result > 0 then\n"
+            "    recce:g1_convert_events(recce.perl_pos)\n"
+            "end\n"
             "local start_of_lexeme = recce.start_of_lexeme\n"
             "local end_of_lexeme = recce.end_of_lexeme\n"
             "local lexeme_length = end_of_lexeme - start_of_lexeme\n"
             "local g1r = recce.lmw_g1r\n"
             "local latest_earley_set = g1r:latest_earley_set()\n"
-            "recce.es_data[latest_earley_set] = { start_of_lexeme, lexeme_length }\n",
-            "R>", outer_slr->lua_ref
-            );
+            "recce.es_data[latest_earley_set] = { start_of_lexeme, lexeme_length }\n"
+            "return result\n"
+            ,
+            "R>", outer_slr->lua_ref);
 
     }
 
