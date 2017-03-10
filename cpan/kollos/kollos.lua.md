@@ -809,6 +809,33 @@ Returns `true` is there was one,
     end
 ```
 
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slr.g1_earleme_complete(recce)
+        recce:g1_alternatives()
+        local g1r = recce.lmw_g1r
+        local result = g1r:earleme_complete()
+        if result < 0 then
+            error(string.format(
+                'Problem in marpa_r_earleme_complete(): %s',
+                g1r:error_description()
+            ))
+        end
+        local end_of_lexeme = recce.end_of_lexeme
+        recce.lexer_start_pos = end_of_lexeme
+        recce.perl_pos = end_of_lexeme
+        if result > 0 then
+            recce:g1_convert_events(recce.perl_pos)
+        end
+        local start_of_lexeme = recce.start_of_lexeme
+        local end_of_lexeme = recce.end_of_lexeme
+        local lexeme_length = end_of_lexeme - start_of_lexeme
+        local g1r = recce.lmw_g1r
+        local latest_earley_set = g1r:latest_earley_set()
+        recce.es_data[latest_earley_set] = { start_of_lexeme, lexeme_length }
+    end
+```
+
 Read alternatives into the G1 grammar.
 
 ```

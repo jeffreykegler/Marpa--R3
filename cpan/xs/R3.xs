@@ -1599,6 +1599,7 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
 "-- PASS 3 --\n"
 "local result = recce:do_pause_before()\n"
 "if result then return 'return' end\n"
+"recce:g1_earleme_complete()\n"
 "return ''\n"
             ,
             "Ri>s",
@@ -1610,38 +1611,6 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
 
     if (!strcmp(cmd, "return")) { return 0; }
     if (*cmd) { return cmd; }
-
-    /* Pass 4 */
-    {
-
-        call_by_tag (outer_slr->L, MYLUA_TAG,
-            "local recce = ...\n"
-            "recce:g1_alternatives()\n"
-            "local g1r = recce.lmw_g1r\n"
-            "local result = g1r:earleme_complete()\n"
-            "if result < 0 then\n"
-            "    error(string.format(\n"
-            "        'Problem in marpa_r_earleme_complete(): %s',\n"
-            "        g1r:error_description()\n"
-            "    ))\n"
-            "end\n"
-            "local end_of_lexeme = recce.end_of_lexeme\n"
-            "recce.lexer_start_pos = end_of_lexeme\n"
-            "recce.perl_pos = end_of_lexeme\n"
-            "if result > 0 then\n"
-            "    recce:g1_convert_events(recce.perl_pos)\n"
-            "end\n"
-            "local start_of_lexeme = recce.start_of_lexeme\n"
-            "local end_of_lexeme = recce.end_of_lexeme\n"
-            "local lexeme_length = end_of_lexeme - start_of_lexeme\n"
-            "local g1r = recce.lmw_g1r\n"
-            "local latest_earley_set = g1r:latest_earley_set()\n"
-            "recce.es_data[latest_earley_set] = { start_of_lexeme, lexeme_length }\n"
-            "return result\n"
-            ,
-            "R>", outer_slr->lua_ref);
-
-    }
 
     return 0;
 
