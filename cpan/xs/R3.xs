@@ -1600,6 +1600,10 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
 "        recce.perl_pos = start_of_lexeme\n"
 "        return 'no lexeme', -1, -1, -1\n"
 "    end\n"
+"    -- if here, no accepted lexemes, but discarded ones\n"
+"    recce.lexer_start_pos = working_pos\n"
+"    recce.perl_pos = working_pos\n"
+"    return 'return', -1, -1, -1\n"
 "end\n"
 "return '', working_pos, discarded, is_priority_set\n"
             ,
@@ -1612,25 +1616,6 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
 
     if (!strcmp(cmd, "return")) { return 0; }
     if (*cmd) { return cmd; }
-
-    /* Figure out what the result of pass 1 was */
-    if (is_priority_set) {
-        pass1_result = "accept";
-    } else if (discarded) {
-        pass1_result = "discard";
-    } else {
-        pass1_result = "no lexeme";
-    }
-
-    if (!strcmp(pass1_result, "discard")) {
-    call_by_tag (outer_slr->L, MYLUA_TAG,
-        "local recce, working_pos = ...\n"
-        "recce.lexer_start_pos = working_pos\n"
-        "recce.perl_pos = working_pos\n"
-        ,
-        "Ri>", outer_slr->lua_ref, (lua_Integer)working_pos);
-        return 0;
-    }
 
     /* Pass 3 */
     /* If here, a lexeme has been accepted and priority is set
