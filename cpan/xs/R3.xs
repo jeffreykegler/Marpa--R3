@@ -1621,7 +1621,6 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
     /* If here, a lexeme has been accepted and priority is set
      */
     {                               /* Check for a "pause before" lexeme */
-        lua_Integer event_lexeme = -1;
         call_by_tag (outer_slr->L, MYLUA_TAG,
             "recce = ...\n"
             "local accept_q = recce.accept_queue\n"
@@ -1639,23 +1638,18 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
             "        q[#q+1] = { 'before lexeme', g1_lexeme}\n"
             "        recce.start_of_pause_lexeme = lexeme_start\n"
             "        recce.end_of_pause_lexeme = lexeme_end\n"
-            "        return g1_lexeme\n"
+            "        local start_of_lexeme = recce.start_of_lexeme\n"
+            "        recce.lexer_start_pos = start_of_lexeme\n"
+            "        recce.perl_pos = start_of_lexeme\n"
+            "        return 'return'\n"
             "    end\n"
             "end\n"
-            "return -1\n"
-            , "R>i", outer_slr->lua_ref, &event_lexeme);
+            "return ''\n"
+            , "R>s", outer_slr->lua_ref, &cmd);
 
+    if (!strcmp(cmd, "return")) { return 0; }
+    if (*cmd) { return cmd; }
 
-        if (event_lexeme >= 0) {
-            call_by_tag (outer_slr->L, MYLUA_TAG,
-                "local recce = ...\n"
-                "local start_of_lexeme = recce.start_of_lexeme\n"
-                "recce.lexer_start_pos = start_of_lexeme\n"
-                "recce.perl_pos = start_of_lexeme\n"
-                ,
-                "R>", outer_slr->lua_ref);
-            return 0;
-        }
     }
 
     /* Pass 4 */
