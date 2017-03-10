@@ -1636,62 +1636,55 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
         int i;
         lua_Integer lexeme_count;
 
-        call_by_tag (outer_slr->L, MYLUA_TAG,
-            "recce = ...\n"
-            "return #recce.lexeme_queue\n"
-            ,
-             "R>i", outer_slr->lua_ref,
-            &lexeme_count);
-
-        for (i = 0; i < lexeme_count; i++) {
+        {
             call_by_tag (outer_slr->L, MYLUA_TAG,
-                "recce, ix, pass1_result, high_lexeme_priority = ...\n"
+                "local recce, high_lexeme_priority = ...\n"
                 "local lexeme_q = recce.lexeme_queue\n"
-                "local this_event = lexeme_q[ix]\n"
-                "local event_type = this_event[2]\n"
-                "if event_type == 'acceptable lexeme' then\n"
-                "    local bang_trace, event_type, lexeme_start, lexeme_end,\n"
-                "    g1_lexeme, priority, required_priority =\n"
-                "        table.unpack(this_event)\n"
-                "    if priority < high_lexeme_priority then\n"
-                "        if recce.trace_terminals > 0 then\n"
-                "            local q = recce.event_queue\n"
-                "            q[#q+1] = { '!trace', 'outprioritized lexeme',\n"
-                "               lexeme_start, lexeme_end, g1_lexeme,\n"
-                "               priority, high_lexeme_priority}\n"
+                "for ix = 1, #recce.lexeme_queue do\n"
+                "    local this_event = lexeme_q[ix]\n"
+                "    local event_type = this_event[2]\n"
+                "    if event_type == 'acceptable lexeme' then\n"
+                "        local bang_trace, event_type, lexeme_start, lexeme_end,\n"
+                "        g1_lexeme, priority, required_priority =\n"
+                "            table.unpack(this_event)\n"
+                "        if priority < high_lexeme_priority then\n"
+                "            if recce.trace_terminals > 0 then\n"
+                "                local q = recce.event_queue\n"
+                "                q[#q+1] = { '!trace', 'outprioritized lexeme',\n"
+                "                   lexeme_start, lexeme_end, g1_lexeme,\n"
+                "                   priority, high_lexeme_priority}\n"
+                "            end\n"
+                "            goto NEXT_LEXEME\n"
                 "        end\n"
-                "        return\n"
-                "    else\n"
                 "        local q = recce.accept_queue\n"
                 "        q[#q+1] = this_event\n"
+                "        goto NEXT_LEXEME\n"
                 "    end\n"
-                "    return\n"
-                "end\n"
-                "local bang_trace, event_type, rule_id, lexeme_start, lexeme_end\n"
-                "    = table.unpack(this_event)\n"
-                "if event_type == 'discarded lexeme' then\n"
-                "    -- we do not have the lexeme, only the lexer rule,\n"
-                "    -- so we will let the upper layer figure things out.\n"
-                "    if recce.trace_terminals > 0 then\n"
-                "        local q = recce.event_queue\n"
-                "        q[#q+1] = { '!trace', 'discarded lexeme',\n"
-                "            rule_id, lexeme_start, lexeme_end}\n"
+                "    if event_type == 'discarded lexeme' then\n"
+                "        local bang_trace, event_type, rule_id, lexeme_start, lexeme_end\n"
+                "            = table.unpack(this_event)\n"
+                "        -- we do not have the lexeme, only the lexer rule,\n"
+                "        -- so we will let the upper layer figure things out.\n"
+                "        if recce.trace_terminals > 0 then\n"
+                "            local q = recce.event_queue\n"
+                "            q[#q+1] = { '!trace', 'discarded lexeme',\n"
+                "                rule_id, lexeme_start, lexeme_end}\n"
+                "        end\n"
+                "            local q = recce.event_queue\n"
+                "            local g1r = recce.lmw_g1r\n"
+                "            local event_on_discard_active =\n"
+                "                recce.l0_rules[rule_id].event_on_discard_active\n"
+                "            if event_on_discard_active then\n"
+                "                local last_g1_location = g1r:latest_earley_set()\n"
+                "                q[#q+1] = { 'discarded lexeme',\n"
+                "                    rule_id, lexeme_start, lexeme_end, last_g1_location}\n"
+                "             end\n"
                 "    end\n"
-                "        local q = recce.event_queue\n"
-                "        local g1r = recce.lmw_g1r\n"
-                "        local event_on_discard_active =\n"
-                "            recce.l0_rules[rule_id].event_on_discard_active\n"
-                "        if event_on_discard_active then\n"
-                "            local last_g1_location = g1r:latest_earley_set()\n"
-                "            q[#q+1] = { 'discarded lexeme',\n"
-                "                rule_id, lexeme_start, lexeme_end, last_g1_location}\n"
-                "         end\n"
+                "    ::NEXT_LEXEME::\n"
                 "end\n"
                 "return\n"
                 ,
-                "Risi>", outer_slr->lua_ref,
-                (lua_Integer)(i+1),
-                pass1_result,
+                "Ri>", outer_slr->lua_ref,
                 high_lexeme_priority
               );
 
