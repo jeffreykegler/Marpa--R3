@@ -1677,7 +1677,6 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
                 "        q[#q+1] = { '!trace', 'discarded lexeme',\n"
                 "            rule_id, lexeme_start, lexeme_end}\n"
                 "    end\n"
-                "    if pass1_result == 'discard' then\n"
                 "        local q = recce.event_queue\n"
                 "        local g1r = recce.lmw_g1r\n"
                 "        local event_on_discard_active =\n"
@@ -1687,7 +1686,6 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
                 "            q[#q+1] = { 'discarded lexeme',\n"
                 "                rule_id, lexeme_start, lexeme_end, last_g1_location}\n"
                 "         end\n"
-                "    end\n"
                 "end\n"
                 "return\n"
                 ,
