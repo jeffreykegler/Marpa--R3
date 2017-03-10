@@ -1600,70 +1600,15 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
 
             call_by_tag (outer_slr->L, MYLUA_TAG,
                 "local recce, working_pos, discarded, is_priority_set, high_lexeme_priority = ...\n"
-                "while true do\n"
-                "    local g1_lexeme = -1\n"
-                "    local rule_id, dot_position, origin = recce.lmw_l0r:progress_item()\n"
-                "    if not rule_id then\n"
-                "        return 'next_earley_set', discarded, is_priority_set, high_lexeme_priority\n"
-                "    end\n"
-                "    if rule_id <= -2 then\n"
-                "        error(string.format('Problem in recce:progress_item(): %s'),\n"
-                "            recce.lmw_l0r:error_description())\n"
-                "    end\n"
-                "    if origin ~= 0 then\n"
-                "       goto NEXT_EARLEY_ITEM\n"
-                "    end\n"
-                "    if dot_position ~= -1 then\n"
-                "       goto NEXT_EARLEY_ITEM\n"
-                "    end\n"
-                "    g1_lexeme = recce.slg.l0_rules[rule_id].g1_lexeme\n"
-                "    g1_lexeme = g1_lexeme or -1\n"
-                "    if g1_lexeme == -1 then\n"
-                "       goto NEXT_EARLEY_ITEM\n"
-                "    end\n"
-                "    recce.end_of_lexeme = working_pos\n"
-                "    -- -2 means a discarded item\n"
-                "    if g1_lexeme <= -2 then\n"
-                "       discarded = discarded + 1\n"
-                "       local q = recce.lexeme_queue\n"
-                "       q[#q+1] = { '!trace', 'discarded lexeme',\n"
-                "           rule_id, recce.start_of_lexeme, recce.end_of_lexeme}\n"
-                "       goto NEXT_EARLEY_ITEM\n"
-                "    end\n"
-                "    -- this block hides the local's and allows the goto to work\n"
-                "    do\n"
-                "        local is_expected = recce.lmw_g1r:terminal_is_expected(g1_lexeme)\n"
-                "        if not is_expected then\n"
-                "            error(string.format('Internnal error: Marpa recognized unexpected token @%d-%d: lexme=%d',\n"
-                "                recce.start_of_lexeme, recce.end_of_lexeme, g1_lexeme))\n"
-                "        end\n"
-                "        local this_lexeme_priority = recce.g1_symbols[g1_lexeme].lexeme_priority\n"
-                "        if is_priority_set == 0 or this_lexeme_priority > high_lexeme_priority then\n"
-                "            high_lexeme_priority = this_lexeme_priority\n"
-                "            is_priority_set = 1\n"
-                "        end\n"
-                "        local q = recce.lexeme_queue\n"
-                "        -- at this point we know the lexeme will be accepted by the grammar\n"
-                "        -- but we do not yet know about priority\n"
-                "        q[#q+1] = { '!trace', 'acceptable lexeme',\n"
-                "           recce.start_of_lexeme, recce.end_of_lexeme, g1_lexeme, this_lexeme_priority, this_lexeme_priority}\n"
-                "    end\n"
-                "    ::NEXT_EARLEY_ITEM::\n"
-                "end\n"
+                "return recce:l0_earley_set_examine(working_pos, discarded, is_priority_set, high_lexeme_priority)\n"
                 ,
-                "Riiii>siii",
+                "Riiii>iii",
                 outer_slr->lua_ref,
                 working_pos, discarded, is_priority_set, high_lexeme_priority,
-                &cmd,
                 &discarded, &is_priority_set, &high_lexeme_priority
                 );
 
-            if (!strcmp(cmd, "next_earley_set")) {
-                goto NEXT_EARLEY_SET;
-            }
         }
-
-        NEXT_EARLEY_SET:
 
         if (discarded || is_priority_set)
             break;

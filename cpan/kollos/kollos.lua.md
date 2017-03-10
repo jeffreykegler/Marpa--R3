@@ -660,6 +660,65 @@ Returns a status string.
 
 ```
 
+Determine which lexemes are acceptable or discards.
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slr.l0_earley_set_examine(slr, working_pos, discarded, is_priority_set, high_lexeme_priority)
+        while true do
+            local g1_lexeme = -1
+            local rule_id, dot_position, origin = recce.lmw_l0r:progress_item()
+            if not rule_id then
+                return discarded, is_priority_set, high_lexeme_priority
+            end
+            if rule_id <= -2 then
+                error(string.format('Problem in recce:progress_item(): %s'),
+                    recce.lmw_l0r:error_description())
+            end
+            if origin ~= 0 then
+               goto NEXT_EARLEY_ITEM
+            end
+            if dot_position ~= -1 then
+               goto NEXT_EARLEY_ITEM
+            end
+            g1_lexeme = recce.slg.l0_rules[rule_id].g1_lexeme
+            g1_lexeme = g1_lexeme or -1
+            if g1_lexeme == -1 then
+               goto NEXT_EARLEY_ITEM
+            end
+            recce.end_of_lexeme = working_pos
+            -- -2 means a discarded item
+            if g1_lexeme <= -2 then
+               discarded = discarded + 1
+               local q = recce.lexeme_queue
+               q[#q+1] = { '!trace', 'discarded lexeme',
+                   rule_id, recce.start_of_lexeme, recce.end_of_lexeme}
+               goto NEXT_EARLEY_ITEM
+            end
+            -- this block hides the local's and allows the goto to work
+            do
+                local is_expected = recce.lmw_g1r:terminal_is_expected(g1_lexeme)
+                if not is_expected then
+                    error(string.format('Internnal error: Marpa recognized unexpected token @%d-%d: lexme=%d',
+                        recce.start_of_lexeme, recce.end_of_lexeme, g1_lexeme))
+                end
+                local this_lexeme_priority = recce.g1_symbols[g1_lexeme].lexeme_priority
+                if is_priority_set == 0 or this_lexeme_priority > high_lexeme_priority then
+                    high_lexeme_priority = this_lexeme_priority
+                    is_priority_set = 1
+                end
+                local q = recce.lexeme_queue
+                -- at this point we know the lexeme will be accepted by the grammar
+                -- but we do not yet know about priority
+                q[#q+1] = { '!trace', 'acceptable lexeme',
+                   recce.start_of_lexeme, recce.end_of_lexeme, g1_lexeme, this_lexeme_priority, this_lexeme_priority}
+            end
+            ::NEXT_EARLEY_ITEM::
+        end
+    end
+
+```
+
 Read alternatives into the G1 grammar.
 
 ```
