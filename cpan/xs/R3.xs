@@ -1585,23 +1585,16 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
             "if is_priority_set ~= 0 then goto LAST_EARLEY_SET end\n"
           "end\n"
             "::LAST_EARLEY_SET::\n"
-            "return working_pos, discarded, is_priority_set, high_lexeme_priority\n"
+            "-- PASS 2 --\n"
+            "recce:lexeme_queue_examine(high_lexeme_priority)\n"
+            "return working_pos, discarded, is_priority_set\n"
             ,
-            "R>iiii",
+            "R>iii",
             outer_slr->lua_ref,
-            &working_pos, &discarded, &is_priority_set, &high_lexeme_priority
+            &working_pos, &discarded, &is_priority_set
             );
 
     }
-
-    /* Pass 2 */
-            call_by_tag (outer_slr->L, MYLUA_TAG,
-                "local recce, high_lexeme_priority = ...\n"
-                "return recce:lexeme_queue_examine(high_lexeme_priority)\n"
-                ,
-                "Ri>", outer_slr->lua_ref,
-                high_lexeme_priority
-              );
 
     /* Figure out what the result of pass 1 was */
     if (is_priority_set) {
