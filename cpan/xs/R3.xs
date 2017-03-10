@@ -1581,34 +1581,24 @@ slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
      * search the 0'th Earley set.
      */
     for (; earley_set > 0; earley_set--) {
-        lua_Integer return_value;
-        const char* cmd;
 
         call_by_tag (outer_slr->L, MYLUA_TAG,
-            "recce, earley_set = ...\n"
+            "local recce, earley_set, discarded, is_priority_set, high_lexeme_priority = ...\n"
             "local working_pos = recce.start_of_lexeme + earley_set\n"
             "local return_value = recce.lmw_l0r:progress_report_start(earley_set)\n"
             "if return_value < 0 then\n"
             "    error(string.format('Problem in recce:progress_report_start(...,%d): %s'),\n"
             "        earley_set, recce.lmw_l0r:error_description())\n"
             "end\n"
-            "return return_value, working_pos\n",
-            "Ri>ii",
-            outer_slr->lua_ref, (lua_Integer) earley_set, &return_value, &working_pos);
-
-        {
-
-            call_by_tag (outer_slr->L, MYLUA_TAG,
-                "local recce, working_pos, discarded, is_priority_set, high_lexeme_priority = ...\n"
-                "return recce:l0_earley_set_examine(working_pos, discarded, is_priority_set, high_lexeme_priority)\n"
-                ,
-                "Riiii>iii",
-                outer_slr->lua_ref,
-                working_pos, discarded, is_priority_set, high_lexeme_priority,
-                &discarded, &is_priority_set, &high_lexeme_priority
-                );
-
-        }
+            "local discarded, is_priority_set, high_lexeme_priority =\n"
+            "    recce:l0_earley_set_examine(working_pos, discarded, is_priority_set, high_lexeme_priority)\n"
+            "return working_pos, discarded, is_priority_set, high_lexeme_priority\n"
+            ,
+            "Riiii>iiii",
+            outer_slr->lua_ref,
+            (lua_Integer) earley_set, discarded, is_priority_set, high_lexeme_priority,
+            &working_pos, &discarded, &is_priority_set, &high_lexeme_priority
+            );
 
         if (discarded || is_priority_set)
             break;
