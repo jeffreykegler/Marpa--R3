@@ -1845,24 +1845,17 @@ PPCODE:
                 "if result == 'trace' then return result end\n"
                 "if result == 'unregistered char' then return result end\n"
                 "local discard_mode = g1r:is_exhausted()\n"
-                "return recce:alternatives(discard_mode) or ''\n"
+                "result = recce:alternatives(discard_mode)\n"
+                "if result then return result end\n"
+                "local event_count = #recce.event_queue\n"
+                "if event_count >= 1 then return 'event' end\n"
+                "return ''\n"
                 ,
                 "R>s", outer_slr->lua_ref, &cmd);
 
               if (!strcmp(cmd, "return")) { XSRETURN_PV (""); }
               if (*cmd) { XSRETURN_PV (cmd); }
 
-        }
-
-        {
-            lua_Integer event_count;
-            call_by_tag (outer_slr->L, MYLUA_TAG,
-                "local recce = ...\n"
-                "return #recce.event_queue\n",
-                "R>i", outer_slr->lua_ref, &event_count);
-            if (event_count) {
-                XSRETURN_PV ("event");
-            }
         }
 
         {
