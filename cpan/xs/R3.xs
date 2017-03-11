@@ -1821,13 +1821,6 @@ PPCODE:
     }
 
     while (1) {
-        lua_Integer lexer_start_pos;
-
-        call_by_tag (outer_slr->L, MYLUA_TAG,
-            "local recce = ...\n"
-            "return recce.lexer_start_pos\n"
-            ,
-            "R>i", outer_slr->lua_ref, &lexer_start_pos);
 
         {
 
@@ -1847,19 +1840,6 @@ PPCODE:
                 "        q[#q+1] = { '!trace', 'lexer restarted recognizer', recce.perl_pos}\n"
                 "    end\n"
                 "end\n"
-                "return ''\n"
-                ,
-                "R>s", outer_slr->lua_ref, &cmd);
-
-              if (!strcmp(cmd, "return")) { XSRETURN_PV (""); }
-              if (*cmd) { XSRETURN_PV (cmd); }
-
-        }
-
-        {
-
-            call_by_tag (outer_slr->L, MYLUA_TAG,
-                "local recce = ...\n"
                 "local g1r = recce.lmw_g1r\n"
                 "local result = recce:l0_read_lexeme()\n"
                 "if result == 'trace' then return result end\n"
@@ -1869,7 +1849,9 @@ PPCODE:
                 ,
                 "R>s", outer_slr->lua_ref, &cmd);
 
-            if (*cmd) { XSRETURN_PV (cmd); }
+              if (!strcmp(cmd, "return")) { XSRETURN_PV (""); }
+              if (*cmd) { XSRETURN_PV (cmd); }
+
         }
 
         {
