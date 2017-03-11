@@ -660,6 +660,63 @@ Returns a status string.
 
 ```
 
+Read find and read the alternatives in the SLIF.
+Returns `nil` on success,
+a string indicating the error otherwise.
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slr.alternatives(recce, discard_mode)
+        recce.lexeme_queue = {}
+        recce.accept_queue = {}
+        local l0r = recce.lmw_l0r
+        if not l0r then
+            error('Internal error: No l0r in slr_alternatives(): %s',
+                recce.slg.lmw_l0g:error_description())
+        end
+        local discarded = 0
+        local is_priority_set = 0
+        local high_lexeme_priority = 0
+        local working_pos = recce.start_of_lexeme
+        for earley_set = recce.lmw_l0r:latest_earley_set(), 1, -1 do
+            working_pos = recce.start_of_lexeme + earley_set
+            local return_value = recce.lmw_l0r:progress_report_start(earley_set)
+            if return_value < 0 then
+                error(string.format('Problem in recce:progress_report_start(...,%d): %s'),
+                    earley_set, recce.lmw_l0r:error_description())
+            end
+            discarded, is_priority_set, high_lexeme_priority =
+                recce:l0_earley_set_examine(working_pos, discarded, is_priority_set, high_lexeme_priority)
+            if discarded > 0 then goto LAST_EARLEY_SET end
+            if is_priority_set ~= 0 then goto LAST_EARLEY_SET end
+        end
+        ::LAST_EARLEY_SET::
+        -- PASS 2 --
+        recce:lexeme_queue_examine(high_lexeme_priority)
+        local accept_q = recce.accept_queue
+        if #accept_q <= 0 then
+            if discarded <= 0 then
+                -- no accepted or discarded lexemes
+                if discard_mode ~= 0 then
+                     return 'R1 exhausted before end'
+                end
+                local start_of_lexeme = recce.start_of_lexeme
+                recce.lexer_start_pos = start_of_lexeme
+                recce.perl_pos = start_of_lexeme
+                return 'no lexeme'
+            end
+            -- if here, no accepted lexemes, but discarded ones
+            recce.lexer_start_pos = working_pos
+            recce.perl_pos = working_pos
+            return
+        end
+        -- PASS 3 --
+        local result = recce:do_pause_before()
+        if result then return end
+        recce:g1_earleme_complete()
+    end
+```
+
 Determine which lexemes are acceptable or discards.
 
 ```

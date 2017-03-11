@@ -1972,19 +1972,16 @@ PPCODE:
         }
 
         {
-            lua_Integer discard_mode;
-            const char *result_string;
 
             call_by_tag (outer_slr->L, MYLUA_TAG,
                 "local recce = ...\n"
                 "local g1r = recce.lmw_g1r\n"
-                "return g1r:is_exhausted()\n",
-                "R>i", outer_slr->lua_ref, &discard_mode);
+                "local discard_mode = g1r:is_exhausted()\n"
+                "return recce:alternatives(discard_mode) or ''\n"
+                ,
+                "R>s", outer_slr->lua_ref, &cmd);
 
-            result_string = slr_alternatives (outer_slr, discard_mode);
-            if (result_string) {
-                XSRETURN_PV (result_string);
-            }
+            if (*cmd) { XSRETURN_PV (cmd); }
         }
 
         {
