@@ -1526,113 +1526,15 @@ static void recursive_coerce_to_lua(
 #define U_READ_REJECTED_CHAR "rejected char"
 #define U_READ_UNREGISTERED_CHAR "unregistered char"
 #define U_READ_EXHAUSTED_ON_FAILURE "exhausted on failure"
-#define U_READ_TRACING "tracing"
+#define U_READ_TRACING "trace"
 #define U_READ_EXHAUSTED_ON_SUCCESS "exhausted on success"
 #define U_READ_INVALID_CHAR "invalid char"
 
 /* Static SLR methods */
 
-/*
- * Return values:
- * NULL OK.
- * Otherwise, a string containing the error.
- * The string must be a constant in static space.
- */
-static const char *
-slr_alternatives ( Outer_R *outer_slr, lua_Integer discard_mode)
-{
-    dTHX;
-    const char* cmd;
-
-    /* |high_lexeme_priority| is not valid unless |is_priority_set| is set. */
-
-    /* Zero length lexemes are not of interest, so we do NOT
-     * search the 0'th Earley set.
-     */
-    {
-
-        call_by_tag (outer_slr->L, MYLUA_TAG,
-"local recce, discard_mode = ...\n"
-"recce.lexeme_queue = {}\n"
-"recce.accept_queue = {}\n"
-"local l0r = recce.lmw_l0r\n"
-"if not l0r then\n"
-"    error('Internal error: No l0r in slr_alternatives(): %s',\n"
-"        recce.slg.lmw_l0g:error_description())\n"
-"end\n"
-"local discarded = 0\n"
-"local is_priority_set = 0\n"
-"local high_lexeme_priority = 0\n"
-"local working_pos = recce.start_of_lexeme\n"
-"for earley_set = recce.lmw_l0r:latest_earley_set(), 1, -1 do\n"
-"    working_pos = recce.start_of_lexeme + earley_set\n"
-"    local return_value = recce.lmw_l0r:progress_report_start(earley_set)\n"
-"    if return_value < 0 then\n"
-"        error(string.format('Problem in recce:progress_report_start(...,%d): %s'),\n"
-"            earley_set, recce.lmw_l0r:error_description())\n"
-"    end\n"
-"    discarded, is_priority_set, high_lexeme_priority =\n"
-"        recce:l0_earley_set_examine(working_pos, discarded, is_priority_set, high_lexeme_priority)\n"
-"    if discarded > 0 then goto LAST_EARLEY_SET end\n"
-"    if is_priority_set ~= 0 then goto LAST_EARLEY_SET end\n"
-"end\n"
-"::LAST_EARLEY_SET::\n"
-"-- PASS 2 --\n"
-"recce:lexeme_queue_examine(high_lexeme_priority)\n"
-"local accept_q = recce.accept_queue\n"
-"if #accept_q <= 0 then\n"
-"    if discarded <= 0 then\n"
-"        -- no accepted or discarded lexemes\n"
-"        if discard_mode ~= 0 then\n"
-"             return 'R1 exhausted before end'\n"
-"        end\n"
-"        local start_of_lexeme = recce.start_of_lexeme\n"
-"        recce.lexer_start_pos = start_of_lexeme\n"
-"        recce.perl_pos = start_of_lexeme\n"
-"        return 'no lexeme'\n"
-"    end\n"
-"    -- if here, no accepted lexemes, but discarded ones\n"
-"    recce.lexer_start_pos = working_pos\n"
-"    recce.perl_pos = working_pos\n"
-"    return 'return'\n"
-"end\n"
-"-- PASS 3 --\n"
-"local result = recce:do_pause_before()\n"
-"if result then return 'return' end\n"
-"recce:g1_earleme_complete()\n"
-"return ''\n"
-            ,
-            "Ri>s",
-            outer_slr->lua_ref, discard_mode,
-            &cmd
-            );
-
-    }
-
-    if (!strcmp(cmd, "return")) { return 0; }
-    if (*cmd) { return cmd; }
-
-    return 0;
-
-}
-
 #define EXPECTED_LIBMARPA_MAJOR 8
 #define EXPECTED_LIBMARPA_MINOR 6
 #define EXPECTED_LIBMARPA_MICRO 0
-
-/* get_mortalspace comes from "Extending and Embedding Perl"
-   by Jenness and Cozens, p. 242 */
-static void *
-get_mortalspace (size_t nbytes) PERL_UNUSED_DECL;
-
-static void *
-get_mortalspace (size_t nbytes)
-{
-    dTHX;
-    SV *mortal;
-    mortal = sv_2mortal (NEWSV (0, nbytes));
-    return (void *) SvPVX (mortal);
-}
 
 #include "inspect_inc.c"
 #include "kollos_inc.c"
@@ -1927,48 +1829,31 @@ PPCODE:
             ,
             "R>i", outer_slr->lua_ref, &lexer_start_pos);
 
-        if (lexer_start_pos >= 0) {
-             lua_Integer end_pos;
-
-    call_by_tag (outer_slr->L, MYLUA_TAG,
-        "local recce = ...\n"
-        "return recce.end_pos\n"
-        ,
-        "R>i", outer_slr->lua_ref, &end_pos);
-
-            if (lexer_start_pos >= end_pos) {
-                XSRETURN_PV ("");
-            }
+        {
 
             call_by_tag (outer_slr->L, MYLUA_TAG,
                 "local recce = ...\n"
-                "local lexer_start_pos= recce.lexer_start_pos\n"
-                "recce.perl_pos = lexer_start_pos\n"
-                "recce.start_of_lexeme = lexer_start_pos\n"
-                "recce.lexer_start_pos = -1\n"
-                "recce.lmw_l0r = nil\n"
-                "if recce.trace_terminals >= 1 then\n"
-                "    local q = recce.event_queue\n"
-                "    q[#q+1] = { '!trace', 'lexer restarted recognizer', recce.perl_pos}\n"
+                "local lexer_start_pos = recce.lexer_start_pos\n"
+                "if lexer_start_pos >= recce.end_pos then\n"
+                "    return 'return'\n"
                 "end\n"
+                "if lexer_start_pos >= 0 then\n"
+                "    recce.perl_pos = lexer_start_pos\n"
+                "    recce.start_of_lexeme = lexer_start_pos\n"
+                "    recce.lexer_start_pos = -1\n"
+                "    recce.lmw_l0r = nil\n"
+                "    if recce.trace_terminals >= 1 then\n"
+                "        local q = recce.event_queue\n"
+                "        q[#q+1] = { '!trace', 'lexer restarted recognizer', recce.perl_pos}\n"
+                "    end\n"
+                "end\n"
+                "return ''\n"
                 ,
-                "R>", outer_slr->lua_ref);
+                "R>s", outer_slr->lua_ref, &cmd);
 
-        }
+              if (!strcmp(cmd, "return")) { XSRETURN_PV (""); }
+              if (*cmd) { XSRETURN_PV (cmd); }
 
-        {
-           char *cmd;
-           call_by_tag (outer_slr->L,
-              MYLUA_TAG,
-              "local recce = ...\n"
-              "return recce:l0_read_lexeme()\n"
-              /* end of lua */ ,
-              "R>s", outer_slr->lua_ref, &cmd);
-            if (!strcmp (cmd, U_READ_TRACING)) {
-                XSRETURN_PV ("trace");
-            } else if (!strcmp (cmd, U_READ_UNREGISTERED_CHAR)) {
-                XSRETURN_PV ("unregistered char");
-            }
         }
 
         {
@@ -1976,6 +1861,9 @@ PPCODE:
             call_by_tag (outer_slr->L, MYLUA_TAG,
                 "local recce = ...\n"
                 "local g1r = recce.lmw_g1r\n"
+                "local result = recce:l0_read_lexeme()\n"
+                "if result == 'trace' then return result end\n"
+                "if result == 'unregistered char' then return result end\n"
                 "local discard_mode = g1r:is_exhausted()\n"
                 "return recce:alternatives(discard_mode) or ''\n"
                 ,

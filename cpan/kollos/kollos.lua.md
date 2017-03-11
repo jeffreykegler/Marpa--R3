@@ -652,7 +652,7 @@ Returns a status string.
             if errmsg then return errmsg end
             recce.perl_pos = recce.perl_pos + 1
             if recce.trace_terminals > 0 then
-               return 'tracing'
+               return 'trace'
             end
         end
         error('Unexpected fall through in l0_read()')
