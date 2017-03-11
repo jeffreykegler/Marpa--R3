@@ -524,6 +524,48 @@ This is a registry object.
 
 ### Reading
 
+The top-level read function.
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slr.read(recce)
+        if recce.is_external_scanning then
+           return 'unpermitted mix of external and internal scanning'
+        end
+        recce.start_of_pause_lexeme = -1
+        recce.end_of_pause_lexeme = -1
+        recce.event_queue = {}
+        while true do
+            local lexer_start_pos = recce.lexer_start_pos
+            if lexer_start_pos >= recce.end_pos then
+                -- a 'normal' return
+                return
+            end
+            if lexer_start_pos >= 0 then
+                recce.perl_pos = lexer_start_pos
+                recce.start_of_lexeme = lexer_start_pos
+                recce.lexer_start_pos = -1
+                recce.lmw_l0r = nil
+                if recce.trace_terminals >= 1 then
+                    local q = recce.event_queue
+                    q[#q+1] = { '!trace', 'lexer restarted recognizer', recce.perl_pos}
+                end
+            end
+            local g1r = recce.lmw_g1r
+            local result = recce:l0_read_lexeme()
+            if result == 'trace' then return result end
+            if result == 'unregistered char' then return result end
+            local discard_mode = g1r:is_exhausted()
+            result = recce:alternatives(discard_mode)
+            if result then return result end
+            local event_count = #recce.event_queue
+            if event_count >= 1 then return 'event' end
+            if recce.trace_terminals ~= 0 then return 'trace' end
+        end
+        error('Internal error: unexcepted end of read loop')
+    end
+```
+
 "Complete" an earleme in L0.
 Return nil on success,
 otherwise a failure code.
