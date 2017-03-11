@@ -1821,9 +1821,6 @@ PPCODE:
     }
 
     while (1) {
-
-        {
-
             call_by_tag (outer_slr->L, MYLUA_TAG,
                 "local recce = ...\n"
                 "local lexer_start_pos = recce.lexer_start_pos\n"
@@ -1849,26 +1846,13 @@ PPCODE:
                 "if result then return result end\n"
                 "local event_count = #recce.event_queue\n"
                 "if event_count >= 1 then return 'event' end\n"
+                "if recce.trace_terminals ~= 0 then return 'trace' end\n"
                 "return ''\n"
                 ,
                 "R>s", outer_slr->lua_ref, &cmd);
 
               if (!strcmp(cmd, "return")) { XSRETURN_PV (""); }
               if (*cmd) { XSRETURN_PV (cmd); }
-
-        }
-
-        {
-            lua_Integer trace_terminals;
-            call_by_tag (outer_slr->L, MYLUA_TAG,
-                "recce = ...\n"
-                "return recce.trace_terminals\n",
-                "R>i", outer_slr->lua_ref, &trace_terminals);
-            if (trace_terminals) {
-                XSRETURN_PV ("trace");
-            }
-        }
-
     }
 
     /* Never reached */
