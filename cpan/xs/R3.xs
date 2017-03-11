@@ -1802,64 +1802,51 @@ PPCODE:
 {
     const char *cmd = "";
 
-    /* Clear event queue */
-    call_by_tag (outer_slr->L, MYLUA_TAG,
-        "local recce = ...\n"
-        "if recce.is_external_scanning then\n"
-        "   return 'unpermitted mix of external and internal scanning'\n"
-        "end\n"
-        "recce.start_of_pause_lexeme = -1\n"
-        "recce.end_of_pause_lexeme = -1\n"
-        "recce.event_queue = {}\n"
-        "return ''\n"
-        ,
-        "R>s",
-        outer_slr->lua_ref, &cmd);
+  call_by_tag (outer_slr->L, MYLUA_TAG,
+  "local recce = ...\n"
+  "if recce.is_external_scanning then\n"
+  "   return 'unpermitted mix of external and internal scanning'\n"
+  "end\n"
+  "recce.start_of_pause_lexeme = -1\n"
+  "recce.end_of_pause_lexeme = -1\n"
+  "recce.event_queue = {}\n"
+  "while true do\n"
+  "    local lexer_start_pos = recce.lexer_start_pos\n"
+  "    if lexer_start_pos >= recce.end_pos then\n"
+  "        return 'return'\n"
+  "    end\n"
+  "    if lexer_start_pos >= 0 then\n"
+  "        recce.perl_pos = lexer_start_pos\n"
+  "        recce.start_of_lexeme = lexer_start_pos\n"
+  "        recce.lexer_start_pos = -1\n"
+  "        recce.lmw_l0r = nil\n"
+  "        if recce.trace_terminals >= 1 then\n"
+  "            local q = recce.event_queue\n"
+  "            q[#q+1] = { '!trace', 'lexer restarted recognizer', recce.perl_pos}\n"
+  "        end\n"
+  "    end\n"
+  "    local g1r = recce.lmw_g1r\n"
+  "    local result = recce:l0_read_lexeme()\n"
+  "    if result == 'trace' then return result end\n"
+  "    if result == 'unregistered char' then return result end\n"
+  "    local discard_mode = g1r:is_exhausted()\n"
+  "    result = recce:alternatives(discard_mode)\n"
+  "    if result then return result end\n"
+  "    local event_count = #recce.event_queue\n"
+  "    if event_count >= 1 then return 'event' end\n"
+  "    if recce.trace_terminals ~= 0 then return 'trace' end\n"
+  "end\n"
+  "error('Internal error: unexcepted end of read loop')\n"
+  ,
+                  "R>s", outer_slr->lua_ref, &cmd);
 
-    if (*cmd) {
-        XSRETURN_PV (cmd);
-    }
-
-    while (1) {
-            call_by_tag (outer_slr->L, MYLUA_TAG,
-                "local recce = ...\n"
-                "local lexer_start_pos = recce.lexer_start_pos\n"
-                "if lexer_start_pos >= recce.end_pos then\n"
-                "    return 'return'\n"
-                "end\n"
-                "if lexer_start_pos >= 0 then\n"
-                "    recce.perl_pos = lexer_start_pos\n"
-                "    recce.start_of_lexeme = lexer_start_pos\n"
-                "    recce.lexer_start_pos = -1\n"
-                "    recce.lmw_l0r = nil\n"
-                "    if recce.trace_terminals >= 1 then\n"
-                "        local q = recce.event_queue\n"
-                "        q[#q+1] = { '!trace', 'lexer restarted recognizer', recce.perl_pos}\n"
-                "    end\n"
-                "end\n"
-                "local g1r = recce.lmw_g1r\n"
-                "local result = recce:l0_read_lexeme()\n"
-                "if result == 'trace' then return result end\n"
-                "if result == 'unregistered char' then return result end\n"
-                "local discard_mode = g1r:is_exhausted()\n"
-                "result = recce:alternatives(discard_mode)\n"
-                "if result then return result end\n"
-                "local event_count = #recce.event_queue\n"
-                "if event_count >= 1 then return 'event' end\n"
-                "if recce.trace_terminals ~= 0 then return 'trace' end\n"
-                "return ''\n"
-                ,
-                "R>s", outer_slr->lua_ref, &cmd);
-
-              if (!strcmp(cmd, "return")) { XSRETURN_PV (""); }
-              if (*cmd) { XSRETURN_PV (cmd); }
-    }
-
-    /* Never reached */
-    XSRETURN_PV ("");
+                if (!strcmp(cmd, "return")) { XSRETURN_PV (""); }
+                if (*cmd) { XSRETURN_PV (cmd); }
+      /* Never reached */
+      XSRETURN_PV ("");
 }
 
- # TODO: Currently end location is not known at this
+   # TODO: Currently end location is not known at this
  # point.  Once it is, add tracing:
  # Don't bother with lexeme events as unnecessary
  # and counter-productive for this call, which often
