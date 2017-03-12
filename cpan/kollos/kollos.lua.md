@@ -682,19 +682,18 @@ Returns a status string.
         if not recce.lmw_l0r then
             recce:l0r_new(recce.perl_pos)
         end
+        local trigger_pos
         while true do
-            local codepoint = -1
             if recce.perl_pos >= recce.end_pos then
-                return 'ok'
+                return 'ok', trigger_pos
             end
             -- +1 because codepoints array is 1-based
-            local codepoint = recce.codepoints[recce.perl_pos+1]
-            recce.codepoint = codepoint
+            recce.codepoint = recce.codepoints[recce.perl_pos+1]
             local errmsg = recce:l0_read_codepoint()
-            if errmsg then return errmsg end
+            if errmsg then return errmsg, trigger_pos end
             recce.perl_pos = recce.perl_pos + 1
             if recce.trace_terminals > 0 then
-               return 'trace'
+               return 'trace', trigger_pos
             end
         end
         error('Unexpected fall through in l0_read()')
