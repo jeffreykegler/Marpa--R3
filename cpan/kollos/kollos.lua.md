@@ -682,23 +682,41 @@ Returns a status string.
         if not recce.lmw_l0r then
             recce:l0r_new(recce.perl_pos)
         end
-        local trigger_pos
+        local candidate
         while true do
             if recce.perl_pos >= recce.end_pos then
-                return 'ok', trigger_pos
+                return 'ok', candidate
             end
             -- +1 because codepoints array is 1-based
             recce.codepoint = recce.codepoints[recce.perl_pos+1]
             local errmsg = recce:l0_read_codepoint()
-            if errmsg then return errmsg, trigger_pos end
+            local this_candidate = recce:l0_track_candidates()
+            candidate = this_candidate or candidate
+            if errmsg then return errmsg, candidate end
             recce.perl_pos = recce.perl_pos + 1
             if recce.trace_terminals > 0 then
-               return 'trace', trigger_pos
+               return 'trace', candidate
             end
         end
         error('Unexpected fall through in l0_read()')
     end
 
+```
+
+Determine which paths
+and candidates
+are active.
+Right now this is a prototype:
+A candidate is an earley set ID,
+and candidates are proposed, moved
+and seconded all at once.
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slr.l0_track_candidates(recce)
+        local earley_set = recce.lmw_l0r:latest_earley_set()
+        return
+    end
 ```
 
 Read find and read the alternatives in the SLIF.
