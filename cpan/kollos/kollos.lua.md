@@ -707,15 +707,36 @@ Determine which paths
 and candidates
 are active.
 Right now this is a prototype:
-A candidate is an earley set ID,
-and candidates are proposed, moved
-and seconded all at once.
+Only LATM is implemented;
+a candidate is an earley set ID;
+candidates are moved
+and seconded at once;
+and the candidate chosen is the last one
+moved.
+
+Return earley set ID if we have the completion of a lexeme
+rule, false otherwise.
 
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.l0_track_candidates(recce)
-        local earley_set = recce.lmw_l0r:latest_earley_set()
-        return
+        local l0r = recce.lmw_l0r
+        local l0_rules = recce.slg.l0_rules
+        local es_id = l0r:latest_earley_set()
+        -- Do we have a completion of a lexeme rule?
+        for eim_id = 0, math.maxinteger do
+            local rule_id, dot = l0r:earley_item_look(es_id, eim_id)
+            if not rule_id then return false end
+            -- ignore rules with no XRL
+            if rule_id < 0 then goto NEXT_EIM end
+            -- ignore non-completions
+            if dot >= 0 then goto NEXT_EIM end
+            -- ignore rules which are not lexeme rules
+            local g1_lexeme = l0_rules[rule_id].g1_lexeme
+            if g1_lexeme then return es_id end
+            ::NEXT_EIM::
+        end
+        error('Unexpected fall through in l0_track_candidates()')
     end
 ```
 
@@ -4534,28 +4555,7 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
       { NULL, NULL },
     };
 
-    -- miranda: section+ C function declarations
-
-    /* recce wrappers which need to be hand-written */
-
-    void marpa_gen_recce_ud(lua_State* L, Marpa_Recce recce);
-
     -- miranda: section+ non-standard wrappers
-
-    /* Caller must ensure enough stack space.
-     * Leaves a new userdata on top of the stack.
-     */
-    void marpa_gen_recce_ud(lua_State* L, Marpa_Recce recce)
-    {
-        Marpa_Recce* p_recce;
-        p_recce = (Marpa_Recce *) marpa_lua_newuserdata (L, sizeof (Marpa_Recce));
-        *p_recce = recce;
-        /* [ userdata ] */
-        marpa_lua_rawgetp (L, LUA_REGISTRYINDEX, &kollos_r_ud_mt_key);
-        /* [ userdata, metatable ] */
-        marpa_lua_setmetatable (L, -2);
-        /* [ userdata ] */
-    }
 
     static int lca_recce_look_yim(lua_State *L)
     {
