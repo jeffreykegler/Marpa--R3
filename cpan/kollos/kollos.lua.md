@@ -552,11 +552,11 @@ The top-level read function.
                 end
             end
             local g1r = recce.lmw_g1r
-            local result = recce:l0_read_lexeme()
+            local result, candidate = recce:l0_read_lexeme()
             if result == 'trace' then return result end
             if result == 'unregistered char' then return result end
             local discard_mode = g1r:is_exhausted()
-            result = recce:alternatives(discard_mode)
+            result = recce:alternatives((candidate or 0), discard_mode)
             if result then return result end
             local event_count = #recce.event_queue
             if event_count >= 1 then return 'event' end
@@ -746,7 +746,7 @@ a string indicating the error otherwise.
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slr.alternatives(recce, discard_mode)
+    function _M.class_slr.alternatives(recce, candidate, discard_mode)
         recce.lexeme_queue = {}
         recce.accept_queue = {}
         local l0r = recce.lmw_l0r
@@ -758,19 +758,27 @@ a string indicating the error otherwise.
         local is_priority_set = 0
         local high_lexeme_priority = 0
         local working_pos = recce.start_of_lexeme
-        for earley_set = recce.lmw_l0r:latest_earley_set(), 1, -1 do
-            working_pos = recce.start_of_lexeme + earley_set
-            local return_value = recce.lmw_l0r:progress_report_start(earley_set)
+        local elect_earley_set = recce.lmw_l0r:latest_earley_set()
+        -- no zero-length lexemes, so Earley set 0 is ignored
+        while elect_earley_set >= 1 do
+            working_pos = recce.start_of_lexeme + elect_earley_set
+            local return_value = recce.lmw_l0r:progress_report_start(elect_earley_set)
             if return_value < 0 then
                 error(string.format('Problem in recce:progress_report_start(...,%d): %s'),
-                    earley_set, recce.lmw_l0r:error_description())
+                    elect_earley_set, recce.lmw_l0r:error_description())
             end
             discarded, is_priority_set, high_lexeme_priority =
                 recce:l0_earley_set_examine(working_pos, discarded, is_priority_set, high_lexeme_priority)
             if discarded > 0 then goto LAST_EARLEY_SET end
             if is_priority_set ~= 0 then goto LAST_EARLEY_SET end
+            elect_earley_set = elect_earley_set - 1
         end
         ::LAST_EARLEY_SET::
+        if (elect_earley_set ~= candidate) then
+            io.stderr:write(string.format("Candidate vs. elect: %s vs. %s\n",
+                inspect(candidate), inspect(elect_earley_set)
+            ))
+        end
         -- PASS 2 --
         recce:lexeme_queue_examine(high_lexeme_priority)
         local accept_q = recce.accept_queue
