@@ -557,7 +557,7 @@ The top-level read function.
             local result = recce:l0_read_lexeme()
             if result == 'trace' then return result end
             if result == 'unregistered char' then return result end
-            local discard_mode = g1r:is_exhausted()
+            local discard_mode = (g1r:is_exhausted() ~= 0)
             result = recce:alternatives(discard_mode)
             if result then return result end
             local event_count = #recce.event_queue
@@ -749,7 +749,7 @@ a string indicating the error otherwise.
     -- miranda: section+ most Lua function definitions
     local function exhausted(recce, discard_mode)
         -- no accepted or discarded lexemes
-        if discard_mode ~= 0 then
+        if discard_mode then
              return 'R1 exhausted before end'
         end
         local start_of_lexeme = recce.start_of_lexeme
@@ -766,22 +766,18 @@ a string indicating the error otherwise.
             error('Internal error: No l0r in slr_alternatives(): %s',
                 recce.slg.lmw_l0g:error_description())
         end
-        local discarded = 0
-        local high_lexeme_priority = nil
-        local working_pos = recce.start_of_lexeme
         local elect_earley_set = recce.l0_candidate
         -- no zero-length lexemes, so Earley set 0 is ignored
         if not elect_earley_set then return exhausted(recce, discard_mode) end
-        working_pos = recce.start_of_lexeme + elect_earley_set
+        local working_pos = recce.start_of_lexeme + elect_earley_set
         local return_value = recce.lmw_l0r:progress_report_start(elect_earley_set)
         if return_value < 0 then
             error(string.format('Problem in recce:progress_report_start(...,%d): %s'),
                 elect_earley_set, recce.lmw_l0r:error_description())
         end
-        local discarded, high_lexeme_priority =
-            recce:l0_earley_set_examine(working_pos, discarded, high_lexeme_priority)
+        local discarded, high_lexeme_priority = recce:l0_earley_set_examine(working_pos)
         -- PASS 2 --
-        recce:lexeme_queue_examine(high_lexeme_priority or 0)
+        recce:lexeme_queue_examine(high_lexeme_priority)
         local accept_q = recce.accept_queue
         if #accept_q <= 0 then
             if discarded <= 0 then return exhausted(recce, discard_mode) end
@@ -801,7 +797,9 @@ Determine which lexemes are acceptable or discards.
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slr.l0_earley_set_examine(slr, working_pos, discarded, high_lexeme_priority)
+    function _M.class_slr.l0_earley_set_examine(slr, working_pos)
+        local discarded = 0
+        local high_lexeme_priority = math.mininteger
         while true do
             local g1_lexeme = -1
             local rule_id, dot_position, origin = recce.lmw_l0r:progress_item()
@@ -840,7 +838,7 @@ Determine which lexemes are acceptable or discards.
                         recce.start_of_lexeme, recce.end_of_lexeme, g1_lexeme))
                 end
                 local this_lexeme_priority = recce.g1_symbols[g1_lexeme].lexeme_priority
-                if not high_lexeme_priority or this_lexeme_priority > high_lexeme_priority then
+                if this_lexeme_priority > high_lexeme_priority then
                     high_lexeme_priority = this_lexeme_priority
                 end
                 local q = recce.lexeme_queue
