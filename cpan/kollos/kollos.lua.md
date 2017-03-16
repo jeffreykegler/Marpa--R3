@@ -756,8 +756,7 @@ a string indicating the error otherwise.
                 recce.slg.lmw_l0g:error_description())
         end
         local discarded = 0
-        local is_priority_set = 0
-        local high_lexeme_priority = 0
+        local high_lexeme_priority = nil
         local working_pos = recce.start_of_lexeme
         local elect_earley_set = recce.l0_candidate
         -- no zero-length lexemes, so Earley set 0 is ignored
@@ -768,11 +767,11 @@ a string indicating the error otherwise.
                 error(string.format('Problem in recce:progress_report_start(...,%d): %s'),
                     elect_earley_set, recce.lmw_l0r:error_description())
             end
-            discarded, is_priority_set, high_lexeme_priority =
-                recce:l0_earley_set_examine(working_pos, discarded, is_priority_set, high_lexeme_priority)
+            discarded, high_lexeme_priority =
+                recce:l0_earley_set_examine(working_pos, discarded, high_lexeme_priority)
         end
         -- PASS 2 --
-        recce:lexeme_queue_examine(high_lexeme_priority)
+        recce:lexeme_queue_examine(high_lexeme_priority or 0)
         local accept_q = recce.accept_queue
         if #accept_q <= 0 then
             if discarded <= 0 then
@@ -801,12 +800,12 @@ Determine which lexemes are acceptable or discards.
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slr.l0_earley_set_examine(slr, working_pos, discarded, is_priority_set, high_lexeme_priority)
+    function _M.class_slr.l0_earley_set_examine(slr, working_pos, discarded, high_lexeme_priority)
         while true do
             local g1_lexeme = -1
             local rule_id, dot_position, origin = recce.lmw_l0r:progress_item()
             if not rule_id then
-                return discarded, is_priority_set, high_lexeme_priority
+                return discarded, high_lexeme_priority
             end
             if rule_id <= -2 then
                 error(string.format('Problem in recce:progress_item(): %s'),
@@ -840,9 +839,8 @@ Determine which lexemes are acceptable or discards.
                         recce.start_of_lexeme, recce.end_of_lexeme, g1_lexeme))
                 end
                 local this_lexeme_priority = recce.g1_symbols[g1_lexeme].lexeme_priority
-                if is_priority_set == 0 or this_lexeme_priority > high_lexeme_priority then
+                if not high_lexeme_priority or this_lexeme_priority > high_lexeme_priority then
                     high_lexeme_priority = this_lexeme_priority
-                    is_priority_set = 1
                 end
                 local q = recce.lexeme_queue
                 -- at this point we know the lexeme will be accepted by the grammar
