@@ -480,6 +480,8 @@ This is a registry object.
                 recce.slg.lmw_l0g:error_description())
         end
         recce.lmw_l0r = l0r
+        -- reset the candidate in the lexer
+        recce.l0_candidate = nil
         local too_many_earley_items = recce.too_many_earley_items
         if too_many_earley_items >= 0 then
             recce.lmw_l0r:earley_item_warning_threshold_set(too_many_earley_items)
@@ -552,11 +554,11 @@ The top-level read function.
                 end
             end
             local g1r = recce.lmw_g1r
-            local result, candidate = recce:l0_read_lexeme()
+            local result = recce:l0_read_lexeme()
             if result == 'trace' then return result end
             if result == 'unregistered char' then return result end
             local discard_mode = g1r:is_exhausted()
-            result = recce:alternatives((candidate or 0), discard_mode)
+            result = recce:alternatives(discard_mode)
             if result then return result end
             local event_count = #recce.event_queue
             if event_count >= 1 then return 'event' end
@@ -682,20 +684,19 @@ Returns a status string.
         if not recce.lmw_l0r then
             recce:l0r_new(recce.perl_pos)
         end
-        local candidate
         while true do
             if recce.perl_pos >= recce.end_pos then
-                return 'ok', candidate
+                return 'ok'
             end
             -- +1 because codepoints array is 1-based
             recce.codepoint = recce.codepoints[recce.perl_pos+1]
             local errmsg = recce:l0_read_codepoint()
             local this_candidate = recce:l0_track_candidates()
-            candidate = this_candidate or candidate
-            if errmsg then return errmsg, candidate end
+            if this_candidate then recce.candidate = this_candidate end
+            if errmsg then return errmsg end
             recce.perl_pos = recce.perl_pos + 1
             if recce.trace_terminals > 0 then
-               return 'trace', candidate
+               return 'trace'
             end
         end
         error('Unexpected fall through in l0_read()')
@@ -746,7 +747,7 @@ a string indicating the error otherwise.
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slr.alternatives(recce, candidate, discard_mode)
+    function _M.class_slr.alternatives(recce, discard_mode)
         recce.lexeme_queue = {}
         recce.accept_queue = {}
         local l0r = recce.lmw_l0r
@@ -774,9 +775,12 @@ a string indicating the error otherwise.
             elect_earley_set = elect_earley_set - 1
         end
         ::LAST_EARLEY_SET::
-        if (elect_earley_set ~= candidate) then
-            io.stderr:write(string.format("Candidate vs. elect: %s vs. %s\n",
-                inspect(candidate), inspect(elect_earley_set)
+        if (elect_earley_set ~= recce.candidate) then
+            io.stderr:write(string.format("===== Candidate vs. elect: %s vs. %s\n",
+                inspect(recce.candidate), inspect(elect_earley_set)
+            ))
+            io.stderr:write(string.format("discarded = %s, is_priority_set = %s, accept_q = %s\n",
+                inspect(discarded), inspect(is_priority_set), inspect(recce.accept_queue)
             ))
         end
         -- PASS 2 --
