@@ -692,7 +692,7 @@ Returns a status string.
             recce.codepoint = recce.codepoints[recce.perl_pos+1]
             local errmsg = recce:l0_read_codepoint()
             local this_candidate = recce:l0_track_candidates()
-            if this_candidate then recce.candidate = this_candidate end
+            if this_candidate then recce.l0_candidate = this_candidate end
             if errmsg then return errmsg end
             recce.perl_pos = recce.perl_pos + 1
             if recce.trace_terminals > 0 then
@@ -759,9 +759,9 @@ a string indicating the error otherwise.
         local is_priority_set = 0
         local high_lexeme_priority = 0
         local working_pos = recce.start_of_lexeme
-        local elect_earley_set = recce.lmw_l0r:latest_earley_set()
+        local elect_earley_set = recce.l0_candidate
         -- no zero-length lexemes, so Earley set 0 is ignored
-        while elect_earley_set >= 1 do
+        if elect_earley_set then
             working_pos = recce.start_of_lexeme + elect_earley_set
             local return_value = recce.lmw_l0r:progress_report_start(elect_earley_set)
             if return_value < 0 then
@@ -772,17 +772,8 @@ a string indicating the error otherwise.
                 recce:l0_earley_set_examine(working_pos, discarded, is_priority_set, high_lexeme_priority)
             if discarded > 0 then goto LAST_EARLEY_SET end
             if is_priority_set ~= 0 then goto LAST_EARLEY_SET end
-            elect_earley_set = elect_earley_set - 1
         end
         ::LAST_EARLEY_SET::
-        if (elect_earley_set ~= recce.candidate) then
-            io.stderr:write(string.format("===== Candidate vs. elect: %s vs. %s\n",
-                inspect(recce.candidate), inspect(elect_earley_set)
-            ))
-            io.stderr:write(string.format("discarded = %s, is_priority_set = %s, accept_q = %s\n",
-                inspect(discarded), inspect(is_priority_set), inspect(recce.accept_queue)
-            ))
-        end
         -- PASS 2 --
         recce:lexeme_queue_examine(high_lexeme_priority)
         local accept_q = recce.accept_queue
