@@ -746,8 +746,8 @@ Returns `nil` on success,
 a string indicating the error otherwise.
 
 ```
-    -- miranda: section+ most Lua function definitions
-    local function exhausted(recce, discard_mode)
+    -- miranda: section exhausted(), nested function of recce:alternatives()
+    local function exhausted()
         -- no accepted or discarded lexemes
         if discard_mode then
              return 'R1 exhausted before end'
@@ -758,7 +758,11 @@ a string indicating the error otherwise.
         return 'no lexeme'
     end
 
+    -- miranda: section+ most Lua function definitions
     function _M.class_slr.alternatives(recce, discard_mode)
+
+        -- miranda: insert exhausted(), nested function of recce:alternatives()
+
         recce.lexeme_queue = {}
         recce.accept_queue = {}
         local l0r = recce.lmw_l0r
@@ -768,7 +772,7 @@ a string indicating the error otherwise.
         end
         local elect_earley_set = recce.l0_candidate
         -- no zero-length lexemes, so Earley set 0 is ignored
-        if not elect_earley_set then return exhausted(recce, discard_mode) end
+        if not elect_earley_set then return exhausted() end
         local working_pos = recce.start_of_lexeme + elect_earley_set
         local return_value = recce.lmw_l0r:progress_report_start(elect_earley_set)
         if return_value < 0 then
@@ -780,7 +784,7 @@ a string indicating the error otherwise.
         recce:lexeme_queue_examine(high_lexeme_priority)
         local accept_q = recce.accept_queue
         if #accept_q <= 0 then
-            if discarded <= 0 then return exhausted(recce, discard_mode) end
+            if discarded <= 0 then return exhausted() end
             -- if here, no accepted lexemes, but discarded ones
             recce.lexer_start_pos = working_pos
             recce.perl_pos = working_pos
