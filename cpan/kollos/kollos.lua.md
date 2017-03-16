@@ -770,10 +770,7 @@ a string indicating the error otherwise.
             end
             discarded, is_priority_set, high_lexeme_priority =
                 recce:l0_earley_set_examine(working_pos, discarded, is_priority_set, high_lexeme_priority)
-            if discarded > 0 then goto LAST_EARLEY_SET end
-            if is_priority_set ~= 0 then goto LAST_EARLEY_SET end
         end
-        ::LAST_EARLEY_SET::
         -- PASS 2 --
         recce:lexeme_queue_examine(high_lexeme_priority)
         local accept_q = recce.accept_queue
