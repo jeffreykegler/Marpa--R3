@@ -531,6 +531,7 @@ The top-level read function.
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.read(recce)
+        print('l0_rules: ', inspect(recce.slg.l0_rules))
         if recce.is_external_scanning then
            return 'unpermitted mix of external and internal scanning'
         end
@@ -736,7 +737,11 @@ rule, false otherwise.
             -- ignore rules which are not lexeme rules
             local g1_lexeme = l0_rules[rule_id].g1_lexeme
             if g1_lexeme then
+                io.stderr:write(string.format("%s\n",
+                    inspect(l0_rules[rule_id])))
                 local eager = l0_rules[rule_id].eager
+                io.stderr:write(string.format('in track_candidates(): es_id=%s, eager=%s\n',
+                    inspect(es_id), inspect(eager)))
                 return es_id, eager
             end
             ::NEXT_EIM::
@@ -824,7 +829,7 @@ Determine which lexemes are acceptable or discards.
             if dot_position ~= -1 then
                goto NEXT_EARLEY_ITEM
             end
-            g1_lexeme = recce.slg.l0_rules[rule_id].g1_lexeme
+            g1_lexeme = recce.l0_rules[rule_id].g1_lexeme
             g1_lexeme = g1_lexeme or -1
             if g1_lexeme == -1 then
                goto NEXT_EARLEY_ITEM

@@ -494,6 +494,90 @@ END_OF_SOURCE
 if (1) {
     my $source = <<'END_OF_SOURCE';
 
+    start ::= literals action => ::first
+    literals ::= literal+ action => [values]
+    :lexeme ~ literal
+
+    <literal> ~ '[[' <stuff> ']]'
+    <stuff> ~ <any char>*
+    <any char> ~ [\d\D]
+
+    :discard ~ whitespace
+    whitespace ~ [\s]+
+
+END_OF_SOURCE
+
+    my $input           = "[[X]] [[Y]]";
+    my $expected_output = [ $input ];
+
+    my $grammar = Marpa::R3::Scanless::G->new( { source => \$source } );
+    push @tests_data,
+        [
+        $grammar, $input, $expected_output,
+        'Parse OK', qq{Test 1 of lazy long brackets}
+        ];
+
+}
+
+if (1) {
+    my $source = <<'END_OF_SOURCE';
+
+    start ::= literals action => ::first
+    literals ::= literal+ action => [values]
+    :lexeme ~ literal eager => 0
+
+    <literal> ~ '[[' <stuff> ']]'
+    <stuff> ~ <any char>*
+    <any char> ~ [\d\D]
+
+    :discard ~ whitespace
+    whitespace ~ [\s]+
+
+END_OF_SOURCE
+
+    my $input           = "[[X]] [[Y]]";
+    my $expected_output = [ $input ];
+
+    my $grammar = Marpa::R3::Scanless::G->new( { source => \$source } );
+    push @tests_data,
+        [
+        $grammar, $input, $expected_output,
+        'Parse OK', qq{Test 2 of lazy long brackets}
+        ];
+
+}
+
+if (1) {
+    my $source = <<'END_OF_SOURCE';
+
+    start ::= literals action => ::first
+    literals ::= literal+ action => [values]
+    :lexeme ~ literal eager => 1
+
+    <literal> ~ '[[' <stuff> ']]'
+    <stuff> ~ <any char>*
+    <any char> ~ [\d\D]
+
+    :discard ~ whitespace
+    whitespace ~ [\s]+
+
+END_OF_SOURCE
+
+    my $input           = "[[X]] [[Y]]";
+    my $expected_output = [ '[[X]]', '[[Y]]' ];
+
+    my $grammar = Marpa::R3::Scanless::G->new( { source => \$source } );
+    push @tests_data,
+        [
+        $grammar, $input, $expected_output,
+        'Parse OK', qq{Test of eager long brackets}
+        ];
+
+}
+
+if (1) {
+    my $source = <<'END_OF_SOURCE';
+
     :default ::= action => ::first
 
     dual_start ::= start1 name => 'first start rule'
