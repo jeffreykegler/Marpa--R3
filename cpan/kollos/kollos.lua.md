@@ -691,8 +691,9 @@ Returns a status string.
             -- +1 because codepoints array is 1-based
             recce.codepoint = recce.codepoints[recce.perl_pos+1]
             local errmsg = recce:l0_read_codepoint()
-            local this_candidate = recce:l0_track_candidates()
+            local this_candidate, eager = recce:l0_track_candidates()
             if this_candidate then recce.l0_candidate = this_candidate end
+            if eager then return 'ok' end
             if errmsg then return errmsg end
             recce.perl_pos = recce.perl_pos + 1
             if recce.trace_terminals > 0 then
@@ -727,14 +728,17 @@ rule, false otherwise.
         -- Do we have a completion of a lexeme rule?
         for eim_id = 0, math.maxinteger do
             local rule_id, dot = l0r:earley_item_look(es_id, eim_id)
-            if not rule_id then return false end
+            if not rule_id then return end
             -- ignore rules with no XRL
             if rule_id < 0 then goto NEXT_EIM end
             -- ignore non-completions
             if dot >= 0 then goto NEXT_EIM end
             -- ignore rules which are not lexeme rules
             local g1_lexeme = l0_rules[rule_id].g1_lexeme
-            if g1_lexeme then return es_id end
+            if g1_lexeme then
+                local eager = l0_rules[rule_id].eager
+                return es_id, eager
+            end
             ::NEXT_EIM::
         end
         error('Unexpected fall through in l0_track_candidates()')
