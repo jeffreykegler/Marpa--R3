@@ -987,13 +987,15 @@ END_OF_LUA
         my $g1_lexeme_id = $g1_id_by_lexeme_name{$lexeme_name};
         my $declarations = $lexeme_declarations->{$lexeme_name};
         my $priority     = $declarations->{priority} // 0;
+        my $eager     = $declarations->{eager} // 0;
 
         $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-            <<'END_OF_LUA', 'ii', $g1_lexeme_id, $priority );
-    local slg, g1_lexeme_id, priority = ...
+            <<'END_OF_LUA', 'iii', $g1_lexeme_id, $priority, $eager );
+    local slg, g1_lexeme_id, priority, eager = ...
     local lexeme_data = slg.g1_symbols[g1_lexeme_id]
     lexeme_data.is_lexeme = true
     lexeme_data.priority = priority
+    if eager then lexeme_data.eager = true end
 END_OF_LUA
 
         my $pause_value = $declarations->{pause};
