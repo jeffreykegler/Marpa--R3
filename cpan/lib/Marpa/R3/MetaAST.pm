@@ -380,6 +380,12 @@ sub Marpa::R3::Internal::MetaAST_Nodes::group_association::evaluate {
     return bless { assoc => 'G' }, $PROTO_ALTERNATIVE;
 }
 
+sub Marpa::R3::Internal::MetaAST_Nodes::eager_specification::evaluate {
+    my ($values) = @_;
+    my $child = $values->[2];
+    return bless { eager => $child->value() }, $PROTO_ALTERNATIVE;
+}
+
 sub Marpa::R3::Internal::MetaAST_Nodes::event_specification::evaluate {
     my ($values) = @_;
     return bless { event => ( $values->[2]->event() ) }, $PROTO_ALTERNATIVE;
@@ -1055,8 +1061,20 @@ sub Marpa::R3::Internal::MetaAST_Nodes::lexeme_rule::evaluate {
     my %declarations;
     ADVERB: for my $key ( keys %{$adverb_list} ) {
         my $raw_value = $adverb_list->{$key};
-        if ( $key eq 'priority' ) {
-            $declarations{$key} = $raw_value + 0;
+        if ( $key eq 'action' ) {
+            $declarations{$key} = $raw_value;
+            next ADVERB;
+        }
+        if ( $key eq 'blessing' ) {
+            $declarations{$key} = $raw_value;
+            next ADVERB;
+        }
+        if ( $key eq 'eager' ) {
+            $declarations{$key} = 1 if $raw_value;
+            next ADVERB;
+        }
+        if ( $key eq 'event' ) {
+            $declarations{$key} = $raw_value;
             next ADVERB;
         }
         if ( $key eq 'pause' ) {
@@ -1073,16 +1091,8 @@ sub Marpa::R3::Internal::MetaAST_Nodes::lexeme_rule::evaluate {
                 "  Location was line $line, column $column\n",
                 '  Rule was ', $parse->substring( $start, $length ), "\n";
         } ## end if ( $key eq 'pause' )
-        if ( $key eq 'event' ) {
-            $declarations{$key} = $raw_value;
-            next ADVERB;
-        }
-        if ( $key eq 'action' ) {
-            $declarations{$key} = $raw_value;
-            next ADVERB;
-        }
-        if ( $key eq 'blessing' ) {
-            $declarations{$key} = $raw_value;
+        if ( $key eq 'priority' ) {
+            $declarations{$key} = $raw_value + 0;
             next ADVERB;
         }
         my ( $line, $column ) = $parse->{meta_recce}->line_column($start);
