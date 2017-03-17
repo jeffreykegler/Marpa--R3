@@ -62,7 +62,10 @@ alternative ::= rhs <adverb list>
     | <left association> | <right association> | <group association>
     | <separator specification> | <proper specification>
     | <rank specification> | <null ranking specification>
-    | <priority specification> | <pause specification> | <event specification>
+    | <eager specification>
+    | <event specification>
+    | <priority specification>
+    | <pause specification>
     | blessing | naming | <null adverb>
 
 <null adverb> ::= ','
@@ -72,6 +75,7 @@ action ::= ('action' '=>') <action name>
 <group association> ::= ('assoc' '=>' 'group')
 <separator specification> ::= ('separator' '=>') <single symbol>
 <proper specification> ::= ('proper' '=>') boolean
+<eager specification> ::= ('eager' '=>') boolean
 <rank specification> ::= ('rank' '=>') <signed integer>
 <null ranking specification> ::= ('null-ranking' '=>') <null ranking constant>
 <null ranking specification> ::= ('null' 'rank' '=>') <null ranking constant>
