@@ -983,14 +983,11 @@ END_OF_LUA
 
     # Mark the lexemes, and set their data
     # already determined above.
-        say STDERR join " ", __FILE__, __LINE__;
   LEXEME: for my $lexeme_name ( keys %g1_id_by_lexeme_name ) {
         my $g1_lexeme_id = $g1_id_by_lexeme_name{$lexeme_name};
         my $declarations = $lexeme_declarations->{$lexeme_name};
         my $priority     = $declarations->{priority} // 0;
         my $eager     = $declarations->{eager} ? 1 : 0;
-        say STDERR join " ", __FILE__, __LINE__;
-        say STDERR "Perl eager=$eager g1_lexeme=$g1_lexeme_id";
 
         $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
             <<'END_OF_LUA', 'iii', $g1_lexeme_id, $priority, $eager );
@@ -1053,7 +1050,6 @@ END_OF_LUA
         my $g1_lexeme_id = $lex_rule_to_g1_lexeme[$lexer_rule_id];
         my $lexeme_name  = $slg->symbol_name($g1_lexeme_id);
         my $assertion_id = $lexeme_data{$lexeme_name}{lexer}{'assertion'} // -1;
-        say STDERR join " ", __FILE__, __LINE__, "lexer_rule=$lexer_rule_id g1_lexeme=$g1_lexeme_id";
 
       $thin_slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'iii', $lexer_rule_id, $g1_lexeme_id, $assertion_id );
@@ -1062,8 +1058,6 @@ END_OF_LUA
         g.l0_rules[lexer_rule_id].g1_lexeme = g1_lexeme_id
         if g1_lexeme_id >= 0 then
             local eager = g.g1_symbols[g1_lexeme_id].eager
-            io.stderr:write(string.format(
-                'rule %d, eager=%s\n', lexer_rule_id, inspect(eager)))
             if eager then g.l0_rules[lexer_rule_id].eager = true end
         end
     end

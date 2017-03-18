@@ -17,7 +17,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-use Test::More tests => 34;
+use Test::More tests => 40;
 use Data::Dumper;
 use English qw( -no_match_vars );
 use POSIX qw(setlocale LC_ALL);

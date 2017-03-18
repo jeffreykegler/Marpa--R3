@@ -531,7 +531,6 @@ The top-level read function.
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.read(recce)
-        print('l0_rules: ', inspect(recce.slg.l0_rules))
         if recce.is_external_scanning then
            return 'unpermitted mix of external and internal scanning'
         end
@@ -724,29 +723,29 @@ rule, false otherwise.
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.l0_track_candidates(recce)
         local l0r = recce.lmw_l0r
-        local l0_rules = recce.slg.l0_rules
+        local l0g = recce.slg.lmw_l0g
+        local l0_rules = recce.l0_rules
+        local eager
         local es_id = l0r:latest_earley_set()
         -- Do we have a completion of a lexeme rule?
         for eim_id = 0, math.maxinteger do
             local rule_id, dot = l0r:earley_item_look(es_id, eim_id)
-            if not rule_id then return end
+            if not rule_id then goto LAST_EIM end
             -- ignore rules with no XRL
             if rule_id < 0 then goto NEXT_EIM end
             -- ignore non-completions
             if dot >= 0 then goto NEXT_EIM end
             -- ignore rules which are not lexeme rules
+            -- io.stderr:write(string.format("%s\n", inspect(l0_rules[rule_id])))
             local g1_lexeme = l0_rules[rule_id].g1_lexeme
-            if g1_lexeme then
-                io.stderr:write(string.format("%s\n",
-                    inspect(l0_rules[rule_id])))
-                local eager = l0_rules[rule_id].eager
-                io.stderr:write(string.format('in track_candidates(): es_id=%s, eager=%s\n',
-                    inspect(es_id), inspect(eager)))
-                return es_id, eager
-            end
+            -- io.stderr:write(string.format("%s\n", l0g:brief_irl(rule_id)))
+            eager = eager or l0_rules[rule_id].eager
+            -- io.stderr:write(string.format('in track_candidates(): rule_id=%s, eager=%s\n',
+                -- inspect(rule_id), inspect(eager)))
             ::NEXT_EIM::
         end
-        error('Unexpected fall through in l0_track_candidates()')
+        ::LAST_EIM::
+        return es_id, eager
     end
 ```
 
