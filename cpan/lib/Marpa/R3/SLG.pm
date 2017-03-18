@@ -1838,6 +1838,7 @@ END_OF_LUA
         <<'END_OF_LUA', 'i', $arg_hash);
     local g, arg_hash = ...
     -- print('arg_hash: ', inspect(arg_hash))
+    arg_hash.eager = (arg_hash.eager and arg_hash.eager ~= 0)
     arg_hash.proper = (arg_hash.proper ~= 0)
     kollos.throw = false
     base_rule_id = g.lmw_l0g:sequence_new(arg_hash)
@@ -1845,7 +1846,10 @@ END_OF_LUA
     -- remove the test for nil or less than zero
     -- once refactoring is complete?
     if not base_rule_id or base_rule_id < 0 then return end
-    g.l0_rules[base_rule_id] = { id = base_rule_id }
+    local eager = arg_hash.eager
+    local l0_rule = { id = base_rule_id }
+    if eager then l0_rule.eager = eager end
+    g.l0_rules[base_rule_id] = l0_rule
     return base_rule_id
 END_OF_LUA
 

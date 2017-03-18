@@ -4407,6 +4407,9 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
                     }
                     goto NEXT_ELEMENT;
                 }
+                if (!strcmp (string_key, "eager")) {
+                    goto NEXT_ELEMENT;
+                }
                 if (!strcmp (string_key, "proper")) {
                     proper = marpa_lua_toboolean (L, value_stack_ix);
                     goto NEXT_ELEMENT;
