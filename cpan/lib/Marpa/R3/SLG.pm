@@ -992,9 +992,6 @@ END_OF_LUA
         $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
             <<'END_OF_LUA', 'iii', $g1_lexeme_id, $priority, $eager );
     local slg, g1_lexeme_id, priority, eager = ...
-    -- if eager ~= 0 then
-        print('eager: ', inspect(eager))
-    -- end
     local lexeme_data = slg.g1_symbols[g1_lexeme_id]
     lexeme_data.is_lexeme = true
     lexeme_data.priority = priority

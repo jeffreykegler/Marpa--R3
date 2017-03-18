@@ -726,6 +726,7 @@ rule, false otherwise.
         local l0g = recce.slg.lmw_l0g
         local l0_rules = recce.l0_rules
         local eager
+        local complete_lexemes = false
         local es_id = l0r:latest_earley_set()
         -- Do we have a completion of a lexeme rule?
         for eim_id = 0, math.maxinteger do
@@ -735,6 +736,7 @@ rule, false otherwise.
             if rule_id < 0 then goto NEXT_EIM end
             -- ignore non-completions
             if dot >= 0 then goto NEXT_EIM end
+            complete_lexemes = true
             -- ignore rules which are not lexeme rules
             -- io.stderr:write(string.format("%s\n", inspect(l0_rules[rule_id])))
             local g1_lexeme = l0_rules[rule_id].g1_lexeme
@@ -745,7 +747,8 @@ rule, false otherwise.
             ::NEXT_EIM::
         end
         ::LAST_EIM::
-        return es_id, eager
+        if complete_lexemes then return es_id, eager end
+        return
     end
 ```
 
