@@ -1182,14 +1182,19 @@ sub Marpa::R3::Internal::MetaAST_Nodes::discard_rule::evaluate {
     my $rhs_as_event         = $symbol->event_name($parse);
     my $adverb_list = $raw_adverb_list->evaluate($parse);
     my $event;
+    my $eager;
     ADVERB: for my $key ( keys %{$adverb_list} ) {
         my $value = $adverb_list->{$key};
+        if ( $key eq 'eager' ) {
+            $eager = 1 if $value;
+            next ADVERB;
+        }
         if ( $key eq 'event' ) {
             $event = $value;
             next ADVERB;
         }
         Marpa::R3::exception(
-            qq{"$key" adverb not allowed as discard default"});
+            qq{"$key" adverb not allowed with discard rule"});
     } ## end ADVERB: for my $key ( keys %{$adverb_list} )
 
     # Discard rule
@@ -1200,6 +1205,7 @@ sub Marpa::R3::Internal::MetaAST_Nodes::discard_rule::evaluate {
         length => $length,
         symbol_as_event => $rhs_as_event
     );
+    $rule_hash{eager} = $eager if $eager;
     $rule_hash{event} = $event if defined $event;
     my $wrl = $parse->xbnf_create( \%rule_hash, 'L0' );
     push @{ $parse->{rules}->{L0} }, $wrl;

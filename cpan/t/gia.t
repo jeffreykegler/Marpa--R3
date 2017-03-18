@@ -17,7 +17,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-use Test::More tests => 40;
+use Test::More tests => 42;
 use Data::Dumper;
 use English qw( -no_match_vars );
 use POSIX qw(setlocale LC_ALL);
@@ -578,6 +578,38 @@ END_OF_SOURCE
 if (1) {
     my $source = <<'END_OF_SOURCE';
 
+    start ::= text action => ::first
+    text ::= piece+ action => [values]
+    piece ::= '/' | <slashfree text>
+
+    <slashfree text> ~ <nonslash char>+
+    <nonslash char> ~ [^/]
+
+    :discard ~ whitespace
+    whitespace ~ [\s]+
+    :discard ~ comment eager => 1
+    comment ~ '//' <stuff> <newline>
+    <stuff> ~ <any char>*
+    <any char> ~ [\d\D]
+    <newline> ~ [\n]
+
+END_OF_SOURCE
+
+    my $input           = "abc//xyz\ndef";
+    my $expected_output = [ 'abc', 'def' ];
+
+    my $grammar = Marpa::R3::Scanless::G->new( { source => \$source } );
+    push @tests_data,
+        [
+        $grammar, $input, $expected_output,
+        'Parse OK', qq{Test of eager discard}
+        ];
+
+}
+
+if (1) {
+    my $source = <<'END_OF_SOURCE';
+
     :default ::= action => ::first
 
     dual_start ::= start1 name => 'first start rule'
@@ -626,7 +658,7 @@ END_OF_SOURCE
         'Parse OK', qq{Test of alternative as start rule}
         ];
 
-} ## end if (0)
+}
 
 TEST:
 for my $test_data (@tests_data) {

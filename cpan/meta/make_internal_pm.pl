@@ -132,6 +132,7 @@ __DATA__
     MIN
     SEPARATOR
     PROPER
+    EAGER
     DISCARD_SEPARATION
     MASK { Semantic mask of RHS symbols }
     ACTION_NAME
