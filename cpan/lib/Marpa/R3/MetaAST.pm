@@ -1198,7 +1198,10 @@ sub Marpa::R3::Internal::MetaAST_Nodes::discard_rule::evaluate {
             qq{"$key" adverb not allowed with discard rule"});
     } ## end ADVERB: for my $key ( keys %{$adverb_list} )
 
-    $parse->discard_symbol_assign($discard_symbol);
+    my $discard_symbol_data = $parse->discard_symbol_assign($discard_symbol);
+    if ($eager) {
+        $discard_symbol_data->{eager} = $eager;
+    }
 
     # Discard rule
     my %rule_hash = (
