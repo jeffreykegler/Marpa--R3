@@ -1171,14 +1171,15 @@ sub Marpa::R3::Internal::MetaAST_Nodes::discard_rule::evaluate {
     my ( $start, $length, $symbol, $raw_adverb_list ) = @{$values};
 
     local $Marpa::R3::Internal::SUBGRAMMAR = 'L0';
-    my $discard_lhs = '[:discard]';
+    my $pseudo_lhs = '[:discard]';
     $parse->symbol_names_set(
-        $discard_lhs,
+        $pseudo_lhs,
         'L0',
         {   # description  => qq{Internal LHS for lexer discard}
         }
     );
     my $rhs         = $symbol->names($parse);
+    my $discard_symbol = $rhs->[0];
     my $rhs_as_event         = $symbol->event_name($parse);
     my $adverb_list = $raw_adverb_list->evaluate($parse);
     my $event;
@@ -1197,15 +1198,16 @@ sub Marpa::R3::Internal::MetaAST_Nodes::discard_rule::evaluate {
             qq{"$key" adverb not allowed with discard rule"});
     } ## end ADVERB: for my $key ( keys %{$adverb_list} )
 
+    $parse->discard_symbol_assign($discard_symbol);
+
     # Discard rule
     my %rule_hash = (
-        lhs => $discard_lhs,
-        rhs => $rhs,
+        lhs => $pseudo_lhs,
+        rhs => [$discard_symbol],
         start => $start,
         length => $length,
         symbol_as_event => $rhs_as_event
     );
-    $rule_hash{eager} = $eager if $eager;
     $rule_hash{event} = $event if defined $event;
     my $wrl = $parse->xbnf_create( \%rule_hash, 'L0' );
     push @{ $parse->{rules}->{L0} }, $wrl;
@@ -1705,6 +1707,7 @@ sub Marpa::R3::Internal::MetaAST::Parse::symbol_names_set {
         my $value = $args->{$arg_type};
         $parse->{symbols}->{$symbol_type}->{$symbol}->{$arg_type} = $value;
     }
+    return $parse->{symbols}->{$symbol_type}->{$symbol};
 }
 
 # Return the priotized symbol name,
@@ -1730,6 +1733,22 @@ sub Marpa::R3::Internal::MetaAST::Parse::prioritized_symbol {
     $parse->symbol_names_set( $symbol_name, $Marpa::R3::Internal::SUBGRAMMAR,
         $symbol_data );
     return $symbol_name;
+} ## end sub Marpa::R3::Internal::MetaAST::Parse::prioritized_symbol
+
+sub Marpa::R3::Internal::MetaAST::Parse::discard_symbol_assign {
+    my ( $parse, $symbol_name ) = @_;
+
+    my $current_symbol_data =
+        $parse->{symbols}->{'L0'}->{$symbol_name};
+    return $symbol_name if defined $current_symbol_data;
+
+    my $symbol_data = {
+        dsl_form    => $symbol_name,
+        name_source => 'lexical',
+    };
+    $parse->xsy_assign( $symbol_name, $symbol_data );
+    $symbol_data = { xsy => $symbol_name };
+    return $parse->symbol_names_set( $symbol_name, 'L0', $symbol_data );
 } ## end sub Marpa::R3::Internal::MetaAST::Parse::prioritized_symbol
 
 sub Marpa::R3::Internal::MetaAST::Parse::xsy_create {
