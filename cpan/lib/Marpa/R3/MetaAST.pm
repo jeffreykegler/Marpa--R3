@@ -120,15 +120,14 @@ sub ast_to_hash {
       SYM: for my $symbol_name (@symbols) {
             next SYM if defined $wsyms->{$symbol_name};
 
-            $hashed_ast->xsy_assign(
-                $symbol_name,
-                {
-                    dsl_form    => $symbol_name,
-                    name_source => 'lexical'
-                }
-            );
-            $hashed_ast->symbol_data_set( $symbol_name, $grammar,
-                $symbol_name );
+            my $symbol_data = {
+                dsl_form    => $symbol_name,
+                name_source => 'lexical'
+            };
+            $hashed_ast->xsy_assign( $symbol_name, $symbol_data );
+            $symbol_data = { xsy => $symbol_name };
+            $hashed_ast->symbol_names_set( $symbol_name, $grammar,
+                $symbol_data );
         }
     }
 
@@ -1173,7 +1172,12 @@ sub Marpa::R3::Internal::MetaAST_Nodes::discard_rule::evaluate {
 
     local $Marpa::R3::Internal::SUBGRAMMAR = 'L0';
     my $discard_lhs = '[:discard]';
-    $parse->symbol_data_set( $discard_lhs, 'L0');
+    $parse->symbol_names_set(
+        $discard_lhs,
+        'L0',
+        {   # description  => qq{Internal LHS for lexer discard}
+        }
+    );
     my $rhs         = $symbol->names($parse);
     my $rhs_as_event         = $symbol->event_name($parse);
     my $adverb_list = $raw_adverb_list->evaluate($parse);
@@ -1193,9 +1197,6 @@ sub Marpa::R3::Internal::MetaAST_Nodes::discard_rule::evaluate {
             qq{"$key" adverb not allowed with discard rule"});
     } ## end ADVERB: for my $key ( keys %{$adverb_list} )
 
-    my $l0_symbol_data = $parse->discard_symbol_assign( $symbol->name() );
-    if ($eager) { $l0_symbol_data->{eager} = 1; }
-
     # Discard rule
     my %rule_hash = (
         lhs => $discard_lhs,
@@ -1204,14 +1205,9 @@ sub Marpa::R3::Internal::MetaAST_Nodes::discard_rule::evaluate {
         length => $length,
         symbol_as_event => $rhs_as_event
     );
+    $rule_hash{eager} = $eager if $eager;
     $rule_hash{event} = $event if defined $event;
-
-    say 'rule_hash: ', Data::Dumper::Dumper(\%rule_hash);
-
     my $wrl = $parse->xbnf_create( \%rule_hash, 'L0' );
-
-    say 'wrl: ', Data::Dumper::Dumper($wrl);
-
     push @{ $parse->{rules}->{L0} }, $wrl;
     ## no critic(Subroutines::ProhibitExplicitReturnUndef)
     return undef;
@@ -1694,21 +1690,21 @@ sub char_class_to_symbol {
 
         # description  => "Character class: $char_class"
         $parse->xsy_create( $symbol_name, $symbol_data );
-        $parse->symbol_data_set( $symbol_name, $subgrammar, $symbol_name );
+        $symbol_data = { xsy => $symbol_name };
+        $parse->symbol_names_set( $symbol_name, $subgrammar, $symbol_data );
     } ## end if ( not defined $symbol )
     return $symbol;
 } ## end sub char_class_to_symbol
 
-sub Marpa::R3::Internal::MetaAST::Parse::symbol_data_set {
-    my ( $parse, $symbol, $subgrammar, $xsy_name ) = @_;
+sub Marpa::R3::Internal::MetaAST::Parse::symbol_names_set {
+    my ( $parse, $symbol, $subgrammar, $args ) = @_;
     my $symbol_type = $subgrammar eq 'G1' ? 'G1' : 'L0';
     my $wsyid = $parse->{next_wsyid}++;
     $parse->{symbols}->{$symbol_type}->{$symbol}->{wsyid} = $wsyid;
-    my $symbol_data = $parse->{symbols}->{$symbol_type}->{$symbol};
-    if ($xsy_name) {
-        $symbol_data->{xsy} = $xsy_name;
+    for my $arg_type (keys %{$args}) {
+        my $value = $args->{$arg_type};
+        $parse->{symbols}->{$symbol_type}->{$symbol}->{$arg_type} = $value;
     }
-    return $symbol_data;
 }
 
 # Return the priotized symbol name,
@@ -1725,41 +1721,15 @@ sub Marpa::R3::Internal::MetaAST::Parse::prioritized_symbol {
     return $symbol_name if defined $current_symbol_data;
 
     # description  => "<$base_symbol> at priority $priority"
-    $parse->xsy_assign(
-        $base_symbol,
-        {
-            dsl_form    => $base_symbol,
-            name_source => 'lexical',
-        }
-    );
-    $parse->symbol_data_set( $symbol_name, $Marpa::R3::Internal::SUBGRAMMAR,
-        $base_symbol );
+    my $symbol_data = {
+        dsl_form    => $base_symbol,
+        name_source => 'lexical',
+    };
+    $parse->xsy_assign( $base_symbol, $symbol_data );
+    $symbol_data = { xsy => $base_symbol };
+    $parse->symbol_names_set( $symbol_name, $Marpa::R3::Internal::SUBGRAMMAR,
+        $symbol_data );
     return $symbol_name;
-} ## end sub Marpa::R3::Internal::MetaAST::Parse::prioritized_symbol
-
-# Return the L0 data for a discard symbol, creating the symbol
-# if necessary.
-sub Marpa::R3::Internal::MetaAST::Parse::discard_symbol_assign {
-    my ( $parse, $symbol_name ) = @_;
-
-    say STDERR "Assigning discard symbol $symbol_name";
-
-    my $current_symbol_data =
-      $parse->{symbols}->{'L0'}->{$symbol_name};
-    return $current_symbol_data if defined $current_symbol_data;
-
-    say STDERR "Creating discard symbol $symbol_name";
-
-    $parse->xsy_assign(
-        $symbol_name,
-        {
-            dsl_form    => $symbol_name,
-            name_source => 'lexical',
-        }
-    );
-    my $symbol_data = $parse->symbol_data_set( $symbol_name, 'L0', $symbol_name );
-    say Data::Dumper::Dumper( $symbol_data );
-    return $symbol_data;
 } ## end sub Marpa::R3::Internal::MetaAST::Parse::prioritized_symbol
 
 sub Marpa::R3::Internal::MetaAST::Parse::xsy_create {
@@ -1928,14 +1898,13 @@ sub Marpa::R3::Internal::MetaAST::Parse::internal_lexeme {
     my $lexical_symbol    = "[Lex-$lexical_lhs_index]";
 
     # description  => qq{Internal lexical symbol for "$dsl_form"}
-    $parse->xsy_assign(
-        $lexical_symbol,
-        {
-            dsl_form    => $dsl_form,
-            name_source => 'internal'
-        }
-    );
-    $parse->symbol_data_set( $lexical_symbol, $_, $lexical_symbol ) for qw(G1 L);
+    my $symbol_data = {
+        dsl_form => $dsl_form,
+        name_source => 'internal'
+    };
+    $parse->xsy_assign( $lexical_symbol, $symbol_data );
+    $symbol_data = { xsy => $lexical_symbol };
+    $parse->symbol_names_set( $lexical_symbol, $_, $symbol_data ) for qw(G1 L);
     return $lexical_symbol;
 } ## end sub Marpa::R3::Internal::MetaAST::Parse::internal_lexeme
 

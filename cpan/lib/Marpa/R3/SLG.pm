@@ -1498,6 +1498,19 @@ END_OF_LUA
                 $xsy;
             next PROPERTY;
         }
+        if ( $property eq 'eager' ) {
+            my $value = $options->{$property};
+
+      $thin_slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 'ii', $symbol_id, ($value ? 1 : 0));
+    local g, symbol_id, eager = ...
+    if eager > 0 then
+        g.l0_symbols[symbol_id].eager = true
+    end
+END_OF_LUA
+
+            next PROPERTY;
+        }
         if ( $property eq 'terminal' ) {
             my $value = $options->{$property};
 
