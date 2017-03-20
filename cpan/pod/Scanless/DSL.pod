@@ -1132,8 +1132,8 @@ A value of C<1> specifies "eager" matching.
 
 In these Marpa documents,
 it is assumed
-that "greedy" matching
-or LATM (Longest Acceptable Token Matching).
+that "greedy" matching,
+or LATM (Longest Acceptable Token Matching),
 is in effect.
 This means that a Marpa token or lexeme will match
 the longest token or lexeme that is acceptable to
@@ -1161,7 +1161,7 @@ the longest acceptable token of their kind
 If this behavior is considered undesirable,
 it can be changed
 using the
-L<priority/"priority"> adverb.
+L<priority|/"priority"> adverb.
 
 Note that it is possible that
 an "eager" token
