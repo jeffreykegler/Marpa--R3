@@ -27,6 +27,10 @@ and tools to Marpa::R3.
 
 =head1 Changes
 
+=head2 "Eager" lexemes added
+
+See L<Marpa::R3::Scanless::DSL/"eager">.
+
 =head2 Problems with kernel Earley items in progress reports fixed
 
 Progress reports had been misreporting some

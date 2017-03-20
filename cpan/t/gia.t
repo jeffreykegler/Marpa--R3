@@ -540,7 +540,13 @@ if (1) {
 
     start ::= literals action => ::first
     literals ::= literal+ action => [values]
+
+# Marpa::R3::Display
+# name: eager lexeme example
+
     :lexeme ~ literal eager => 1
+
+# Marpa::R3::Display::End
 
     <literal> ~ '[[' <stuff> ']]'
     <stuff> ~ <any char>*
@@ -575,7 +581,14 @@ if (1) {
 
     :discard ~ whitespace
     whitespace ~ [\s]+
+
+# Marpa::R3::Display
+# name: eager discard example
+
     :discard ~ comment eager => 1
+
+# Marpa::R3::Display::End
+
     comment ~ '//' <stuff> <newline>
     <stuff> ~ <any char>*
     <any char> ~ [\d\D]

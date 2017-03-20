@@ -1097,6 +1097,21 @@ document|Marpa::R3::Semantics/"Blessings">.
 
 =head2 eager
 
+=for Marpa::R3::Display
+name: eager lexeme example
+
+    :lexeme ~ literal eager => 1
+
+=for Marpa::R3::Display::End
+
+=for Marpa::R3::Display
+name: eager discard example
+normalize-whitespace: 1
+
+    :discard ~ comment eager => 1
+
+=for Marpa::R3::Display::End
+
 The C<eager> adverb applies only to lexemes and
 is only allowed in
 L<C<:lexeme> pseudo-rules|/"Lexeme pseudo-rule">
