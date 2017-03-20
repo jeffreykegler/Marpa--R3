@@ -416,12 +416,6 @@ END_OF_LUA
                       $source_xbnf_data->{$datum_key};
                     next KEY;
                 }
-                if ( $datum_key eq 'eager' ) {
-                    # TODO -- DELETE XBNF::EAGER
-                    $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::EAGER] =
-                      $source_xbnf_data->{$datum_key};
-                    next KEY;
-                }
                 if ( $datum_key eq 'event' ) {
                     $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::EVENT] =
                       $source_xbnf_data->{$datum_key};
