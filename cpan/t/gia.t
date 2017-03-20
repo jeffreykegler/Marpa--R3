@@ -17,7 +17,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-use Test::More tests => 42;
+use Test::More tests => 74;
 use Data::Dumper;
 use English qw( -no_match_vars );
 use POSIX qw(setlocale LC_ALL);
@@ -591,6 +591,40 @@ END_OF_SOURCE
         $grammar, $input, $expected_output,
         'Parse OK', qq{Test of eager discard}
         );
+
+}
+
+if (1) {
+    my $source = <<'END_OF_SOURCE';
+
+    start ::= text action => ::first
+    text ::= piece+ action => [values]
+
+    :lexeme ~ piece eager => 1
+    piece ~ '[' balanced_eq ']'
+    balanced_eq ~ '=' balanced_eq '='
+    balanced_eq ~ '[' anything ']'
+
+    <anything> ~ <anychar>+
+    <anychar> ~ [\d\D]
+
+    :discard ~ whitespace
+    whitespace ~ [\s]+
+
+END_OF_SOURCE
+
+    my @left_pieces  = qw([[X]] [=[X]=] [==[X]==] [===[X]===]);
+    my @right_pieces = qw([[Y]] [=[Y]=] [==[Y]==] [===[Y]===]);
+
+    for my $left_piece (@left_pieces) {
+        for my $right_piece (@right_pieces) {
+            my $input = join " ", $left_piece, $right_piece;
+            my $expected_output = [ $left_piece, $right_piece ];
+            my $grammar = Marpa::R3::Scanless::G->new( { source => \$source } );
+            do_test( $grammar, $input, $expected_output, 'Parse OK',
+                qq{Test of eager discard for "$input"} );
+        }
+    }
 
 }
 
