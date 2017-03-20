@@ -562,13 +562,13 @@ END_OF_SOURCE
 
 }
 
-TODO: {
-    local $TODO = "Not yet implemented";
+if (1) {
     my $source = <<'END_OF_SOURCE';
 
     start ::= text action => ::first
     text ::= piece+ action => [values]
-    piece ::= '/' | <slashfree text>
+    piece ::= '/' action => ::first
+        | <slashfree text> action => ::first
 
     <slashfree text> ~ <nonslash char>+
     <nonslash char> ~ [^/]

@@ -417,6 +417,7 @@ END_OF_LUA
                     next KEY;
                 }
                 if ( $datum_key eq 'eager' ) {
+                    # TODO -- DELETE XBNF::EAGER
                     $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::EAGER] =
                       $source_xbnf_data->{$datum_key};
                     next KEY;
@@ -1052,21 +1053,30 @@ END_OF_LUA
         my $g1_lexeme_id = $lex_rule_to_g1_lexeme[$lexer_rule_id];
         my $lexeme_name  = $slg->symbol_name($g1_lexeme_id);
         my $assertion_id = $lexeme_data{$lexeme_name}{lexer}{'assertion'} // -1;
+        my $discard_symbol_id = -1;
+        if ($lexer_rule_id >= 0) {
+            ( $discard_symbol_id ) = $slg->l0_rule_expand($lexer_rule_id);
+        }
 
       $thin_slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 'iii', $lexer_rule_id, $g1_lexeme_id, $assertion_id );
-    local g, lexer_rule_id, g1_lexeme_id, assertion_id = ...
+        <<'END_OF_LUA',
+    local g, lexer_rule_id, g1_lexeme_id, assertion_id, discard_symbol_id = ...
     if lexer_rule_id >= 0 then
         g.l0_rules[lexer_rule_id].g1_lexeme = g1_lexeme_id
         if g1_lexeme_id >= 0 then
             local eager = g.g1_symbols[g1_lexeme_id].eager
             if eager then g.l0_rules[lexer_rule_id].eager = true end
         end
+        local eager = g.l0_symbols[discard_symbol_id].eager
+        if eager then
+            g.l0_rules[lexer_rule_id].eager = true
+        end
     end
     if g1_lexeme_id >= 0 then
         g.g1_symbols[g1_lexeme_id].assertion = assertion_id
     end
 END_OF_LUA
+        'iiii', $lexer_rule_id, $g1_lexeme_id, $assertion_id, $discard_symbol_id );
 
         my $discard_event = $discard_event_by_lexer_rule_id[$lexer_rule_id];
         if ( defined $discard_event ) {
@@ -1851,7 +1861,6 @@ END_OF_LUA
         <<'END_OF_LUA', 'i', $arg_hash);
     local g, arg_hash = ...
     -- print('arg_hash: ', inspect(arg_hash))
-    arg_hash.eager = (arg_hash.eager and arg_hash.eager ~= 0)
     arg_hash.proper = (arg_hash.proper ~= 0)
     kollos.throw = false
     base_rule_id = g.lmw_l0g:sequence_new(arg_hash)
@@ -1859,9 +1868,7 @@ END_OF_LUA
     -- remove the test for nil or less than zero
     -- once refactoring is complete?
     if not base_rule_id or base_rule_id < 0 then return end
-    local eager = arg_hash.eager
     local l0_rule = { id = base_rule_id }
-    if eager then l0_rule.eager = eager end
     g.l0_rules[base_rule_id] = l0_rule
     return base_rule_id
 END_OF_LUA
