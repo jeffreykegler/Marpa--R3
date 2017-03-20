@@ -1164,8 +1164,9 @@ using the
 L<priority|/"priority"> adverb.
 
 Note that it is possible that
-an "eager" token
-may be longer than any of the "greedy"
+a matching "eager" token
+may be longer than any of
+the acceptable "greedy"
 tokens.
 In this case, the "eager" token will match
 and the "greedy" tokens will be ignored.
