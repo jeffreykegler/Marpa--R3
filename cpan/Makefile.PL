@@ -428,7 +428,7 @@ WriteMakefile(
     META_ADD => {
         no_index => {
             directory => [
-                qw( tool engine author.t )
+                qw( engine author.t )
             ],
             namespace => [
                 @no_index_namespace_inclusive

@@ -55,7 +55,6 @@ meta-spec:
 name: Marpa-R3
 no_index:
   directory:
-    - tool
     - engine
     - author.t
   namespace:
@@ -76,7 +75,6 @@ no_index:
     - Marpa::R3::Internal
     - Marpa::R3::MetaAST
     - Marpa::R3::MetaG
-    - Marpa::R3::Trace::G
 requires:
   CPAN::Meta::Converter: '2.120921'
   Carp: '1.11'
@@ -102,4 +100,4 @@ requires:
   perl: '5.010001'
 resources:
   repository: git://github.com/jeffreykegler/Marpa--R3.git
-version: 4.001_022
+version: 4.001_042

@@ -15,7 +15,6 @@
    "name" : "Marpa-R3",
    "no_index" : {
       "directory" : [
-         "tool",
          "engine",
          "author.t"
       ],
@@ -37,8 +36,7 @@
          "Marpa::R3::Inner",
          "Marpa::R3::Internal",
          "Marpa::R3::MetaAST",
-         "Marpa::R3::MetaG",
-         "Marpa::R3::Trace::G"
+         "Marpa::R3::MetaG"
       ]
    },
    "prereqs" : {
@@ -126,5 +124,5 @@
          "url" : "git://github.com/jeffreykegler/Marpa--R3.git"
       }
    },
-   "version" : "4.001_022"
+   "version" : "4.001_042"
 }
