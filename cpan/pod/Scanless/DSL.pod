@@ -689,8 +689,13 @@ it is not passed as a lexeme to the G1 parser, but is
 (as the name suggests) discarded.
 Discard pseudo-rules must be L0 rules.
 
-Only the C<event> adverb is allowed.
-Its value must be an event initializer.
+Only the
+L<C<eager>|/"eager">
+and the
+L<C<event>|/"event">
+adverbs are allowed.
+The value of the C<event> adverb
+must be an event initializer.
 The format of an event initializer is
 described
 L<above|/"Event initializer">.
@@ -756,6 +761,7 @@ and that RHS alternative must contain exactly one symbol.
 This RHS symbol identifies the lexeme which the adverbs will affect.
 The only adverbs allowed in a C<:lexeme> rule
 are
+L<C<eager>|/"eager">,
 L<C<event>|/"event">,
 L<C<pause>|/"pause">,
 and
@@ -1088,6 +1094,64 @@ blessed into the class indicated by the value of the adverb.
 Details of its use may be found in
 L<the semantics
 document|Marpa::R3::Semantics/"Blessings">.
+
+=head2 eager
+
+The C<eager> adverb applies only to lexemes and
+is only allowed in
+L<C<:lexeme> pseudo-rules|/"Lexeme pseudo-rule">
+and
+L<discard pseudo-rules|/"Discard pseudo-rule">.
+The C<eager> adverb may be specified
+as a default.
+
+The value of the C<eager> adverb is a boolean,
+in the form of a binary digit (C<0> or C<1>).
+The default is C<0>, which means "greedy"
+matching for the lexeme or token.
+A value of C<1> specifies "eager" matching.
+
+In most of this documentation set, it is assumed
+that "greedy" matching is in effect
+or LATM (Longest Acceptable Token Matching).
+This means that a Marpa token or lexeme will match
+the longest token or lexeme that is acceptable to
+the grammar.
+
+If "eager" matching is in effect,
+and any "eager" match is available,
+then Marpa
+will match the B<shortest> eager token or lexeme that is
+acceptable to the grammar.
+Intuitively, "eagerness" may be thought of as
+overriding "greediness", even for greedy tokens.
+
+Several tokens may match, and they may be all greedy,
+all eager, or any combination of both.
+Whatever the settings, all tokens matched by Marpa
+will always be of the same length.
+
+If an "eager" token matches, all "greedy" tokens
+of the same length will also match.
+In this case, these "greedy" token matches may not be
+the longest acceptable token of their kind
+-- intuitively, "eagerness" overrides "greediness".
+If this behavior is considered undesirable,
+it can be changed
+using the
+C<priority/"priority"> adverb.
+
+Note that it is possible that,
+at a given position,
+an "eager" token
+may be longer than any of the "greedy"
+tokens.
+In this case, the "eager" token will match
+and the "greedy" tokens will be ignored,
+unless they are of the same length as
+the "eager" token.
+Again, intuitively,
+"eagerness" overrides "greediness".
 
 =head2 event
 
