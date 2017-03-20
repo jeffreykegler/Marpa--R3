@@ -2576,7 +2576,7 @@ $hashed_metag = {
                   'symbols' => {
                                  'G1' => {
                                            'Perl name' => {
-                                                            'wsyid' => 660,
+                                                            'wsyid' => 662,
                                                             'xsy' => 'Perl name'
                                                           },
                                            '[:start]' => {},
@@ -2865,11 +2865,11 @@ $hashed_metag = {
                                                            'xsy' => '[Lex-73]'
                                                          },
                                            '[Lex-74]' => {
-                                                           'wsyid' => 472,
+                                                           'wsyid' => 474,
                                                            'xsy' => '[Lex-74]'
                                                          },
                                            '[Lex-75]' => {
-                                                           'wsyid' => 475,
+                                                           'wsyid' => 477,
                                                            'xsy' => '[Lex-75]'
                                                          },
                                            '[Lex-7]' => {
@@ -2885,291 +2885,291 @@ $hashed_metag = {
                                                           'xsy' => '[Lex-9]'
                                                         },
                                            'action' => {
-                                                         'wsyid' => 616,
+                                                         'wsyid' => 618,
                                                          'xsy' => 'action'
                                                        },
                                            'action name' => {
-                                                              'wsyid' => 645,
+                                                              'wsyid' => 647,
                                                               'xsy' => 'action name'
                                                             },
                                            'adverb item' => {
-                                                              'wsyid' => 614,
+                                                              'wsyid' => 616,
                                                               'xsy' => 'adverb item'
                                                             },
                                            'adverb list' => {
-                                                              'wsyid' => 612,
+                                                              'wsyid' => 614,
                                                               'xsy' => 'adverb list'
                                                             },
                                            'adverb list items' => {
-                                                                    'wsyid' => 613,
+                                                                    'wsyid' => 615,
                                                                     'xsy' => 'adverb list items'
                                                                   },
                                            'alternative' => {
-                                                              'wsyid' => 611,
+                                                              'wsyid' => 613,
                                                               'xsy' => 'alternative'
                                                             },
                                            'alternative name' => {
-                                                                   'wsyid' => 634,
+                                                                   'wsyid' => 636,
                                                                    'xsy' => 'alternative name'
                                                                  },
                                            'alternatives' => {
-                                                               'wsyid' => 610,
+                                                               'wsyid' => 612,
                                                                'xsy' => 'alternatives'
                                                              },
                                            'array descriptor' => {
-                                                                   'wsyid' => 662,
+                                                                   'wsyid' => 664,
                                                                    'xsy' => 'array descriptor'
                                                                  },
                                            'bare name' => {
-                                                            'wsyid' => 658,
+                                                            'wsyid' => 660,
                                                             'xsy' => 'bare name'
                                                           },
                                            'before or after' => {
-                                                                  'wsyid' => 651,
+                                                                  'wsyid' => 653,
                                                                   'xsy' => 'before or after'
                                                                 },
                                            'blessing' => {
-                                                           'wsyid' => 632,
+                                                           'wsyid' => 634,
                                                            'xsy' => 'blessing'
                                                          },
                                            'blessing name' => {
-                                                                'wsyid' => 636,
+                                                                'wsyid' => 638,
                                                                 'xsy' => 'blessing name'
                                                               },
                                            'boolean' => {
-                                                          'wsyid' => 649,
+                                                          'wsyid' => 651,
                                                           'xsy' => 'boolean'
                                                         },
                                            'bracketed name' => {
-                                                                 'wsyid' => 659,
+                                                                 'wsyid' => 661,
                                                                  'xsy' => 'bracketed name'
                                                                },
                                            'character class' => {
-                                                                  'wsyid' => 657,
+                                                                  'wsyid' => 659,
                                                                   'xsy' => 'character class'
                                                                 },
                                            'completion event declaration' => {
-                                                                               'wsyid' => 603,
+                                                                               'wsyid' => 605,
                                                                                'xsy' => 'completion event declaration'
                                                                              },
                                            'default rule' => {
-                                                               'wsyid' => 595,
+                                                               'wsyid' => 597,
                                                                'xsy' => 'default rule'
                                                              },
                                            'discard default statement' => {
-                                                                            'wsyid' => 597,
+                                                                            'wsyid' => 599,
                                                                             'xsy' => 'discard default statement'
                                                                           },
                                            'discard rule' => {
-                                                               'wsyid' => 601,
+                                                               'wsyid' => 603,
                                                                'xsy' => 'discard rule'
                                                              },
                                            'eager specification' => {
-                                                                      'wsyid' => 622,
+                                                                      'wsyid' => 624,
                                                                       'xsy' => 'eager specification'
                                                                     },
                                            'empty rule' => {
-                                                             'wsyid' => 599,
+                                                             'wsyid' => 601,
                                                              'xsy' => 'empty rule'
                                                            },
                                            'event initialization' => {
-                                                                       'wsyid' => 629,
+                                                                       'wsyid' => 631,
                                                                        'xsy' => 'event initialization'
                                                                      },
                                            'event initializer' => {
-                                                                    'wsyid' => 630,
+                                                                    'wsyid' => 632,
                                                                     'xsy' => 'event initializer'
                                                                   },
                                            'event name' => {
-                                                             'wsyid' => 635,
+                                                             'wsyid' => 637,
                                                              'xsy' => 'event name'
                                                            },
                                            'event specification' => {
-                                                                      'wsyid' => 628,
+                                                                      'wsyid' => 630,
                                                                       'xsy' => 'event specification'
                                                                     },
                                            'group association' => {
-                                                                    'wsyid' => 619,
+                                                                    'wsyid' => 621,
                                                                     'xsy' => 'group association'
                                                                   },
                                            'inaccessible statement' => {
-                                                                         'wsyid' => 606,
+                                                                         'wsyid' => 608,
                                                                          'xsy' => 'inaccessible statement'
                                                                        },
                                            'inaccessible treatment' => {
-                                                                         'wsyid' => 607,
+                                                                         'wsyid' => 609,
                                                                          'xsy' => 'inaccessible treatment'
                                                                        },
                                            'left association' => {
-                                                                   'wsyid' => 617,
+                                                                   'wsyid' => 619,
                                                                    'xsy' => 'left association'
                                                                  },
                                            'lexeme default statement' => {
-                                                                           'wsyid' => 596,
+                                                                           'wsyid' => 598,
                                                                            'xsy' => 'lexeme default statement'
                                                                          },
                                            'lexeme rule' => {
-                                                              'wsyid' => 602,
+                                                              'wsyid' => 604,
                                                               'xsy' => 'lexeme rule'
                                                             },
                                            'lhs' => {
-                                                      'wsyid' => 637,
+                                                      'wsyid' => 639,
                                                       'xsy' => 'lhs'
                                                     },
                                            'naming' => {
-                                                         'wsyid' => 633,
+                                                         'wsyid' => 635,
                                                          'xsy' => 'naming'
                                                        },
                                            'null adverb' => {
-                                                              'wsyid' => 615,
+                                                              'wsyid' => 617,
                                                               'xsy' => 'null adverb'
                                                             },
                                            'null ranking constant' => {
-                                                                        'wsyid' => 625,
+                                                                        'wsyid' => 627,
                                                                         'xsy' => 'null ranking constant'
                                                                       },
                                            'null ranking specification' => {
-                                                                             'wsyid' => 624,
+                                                                             'wsyid' => 626,
                                                                              'xsy' => 'null ranking specification'
                                                                            },
                                            'null statement' => {
-                                                                 'wsyid' => 592,
+                                                                 'wsyid' => 594,
                                                                  'xsy' => 'null statement'
                                                                },
                                            'nulled event declaration' => {
-                                                                           'wsyid' => 604,
+                                                                           'wsyid' => 606,
                                                                            'xsy' => 'nulled event declaration'
                                                                          },
                                            'on or off' => {
-                                                            'wsyid' => 631,
+                                                            'wsyid' => 633,
                                                             'xsy' => 'on or off'
                                                           },
                                            'op declare' => {
-                                                             'wsyid' => 608,
+                                                             'wsyid' => 610,
                                                              'xsy' => 'op declare'
                                                            },
                                            'op declare bnf' => {
-                                                                 'wsyid' => 647,
+                                                                 'wsyid' => 649,
                                                                  'xsy' => 'op declare bnf'
                                                                },
                                            'op declare match' => {
-                                                                   'wsyid' => 648,
+                                                                   'wsyid' => 650,
                                                                    'xsy' => 'op declare match'
                                                                  },
                                            'parenthesized rhs primary list' => {
-                                                                                 'wsyid' => 640,
+                                                                                 'wsyid' => 642,
                                                                                  'xsy' => 'parenthesized rhs primary list'
                                                                                },
                                            'pause specification' => {
-                                                                      'wsyid' => 627,
+                                                                      'wsyid' => 629,
                                                                       'xsy' => 'pause specification'
                                                                     },
                                            'prediction event declaration' => {
-                                                                               'wsyid' => 605,
+                                                                               'wsyid' => 607,
                                                                                'xsy' => 'prediction event declaration'
                                                                              },
                                            'priorities' => {
-                                                             'wsyid' => 609,
+                                                             'wsyid' => 611,
                                                              'xsy' => 'priorities'
                                                            },
                                            'priority rule' => {
-                                                                'wsyid' => 598,
+                                                                'wsyid' => 600,
                                                                 'xsy' => 'priority rule'
                                                               },
                                            'priority specification' => {
-                                                                         'wsyid' => 626,
+                                                                         'wsyid' => 628,
                                                                          'xsy' => 'priority specification'
                                                                        },
                                            'proper specification' => {
-                                                                       'wsyid' => 621,
+                                                                       'wsyid' => 623,
                                                                        'xsy' => 'proper specification'
                                                                      },
                                            'quantified rule' => {
-                                                                  'wsyid' => 600,
+                                                                  'wsyid' => 602,
                                                                   'xsy' => 'quantified rule'
                                                                 },
                                            'quantifier' => {
-                                                             'wsyid' => 646,
+                                                             'wsyid' => 648,
                                                              'xsy' => 'quantifier'
                                                            },
                                            'rank specification' => {
-                                                                     'wsyid' => 623,
+                                                                     'wsyid' => 625,
                                                                      'xsy' => 'rank specification'
                                                                    },
                                            'reserved action name' => {
-                                                                       'wsyid' => 661,
+                                                                       'wsyid' => 663,
                                                                        'xsy' => 'reserved action name'
                                                                      },
                                            'reserved blessing name' => {
-                                                                         'wsyid' => 655,
+                                                                         'wsyid' => 657,
                                                                          'xsy' => 'reserved blessing name'
                                                                        },
                                            'reserved event name' => {
-                                                                      'wsyid' => 654,
+                                                                      'wsyid' => 656,
                                                                       'xsy' => 'reserved event name'
                                                                     },
                                            'rhs' => {
-                                                      'wsyid' => 638,
+                                                      'wsyid' => 640,
                                                       'xsy' => 'rhs'
                                                     },
                                            'rhs primary' => {
-                                                              'wsyid' => 639,
+                                                              'wsyid' => 641,
                                                               'xsy' => 'rhs primary'
                                                             },
                                            'rhs primary list' => {
-                                                                   'wsyid' => 641,
+                                                                   'wsyid' => 643,
                                                                    'xsy' => 'rhs primary list'
                                                                  },
                                            'right association' => {
-                                                                    'wsyid' => 618,
+                                                                    'wsyid' => 620,
                                                                     'xsy' => 'right association'
                                                                   },
                                            'separator specification' => {
-                                                                          'wsyid' => 620,
+                                                                          'wsyid' => 622,
                                                                           'xsy' => 'separator specification'
                                                                         },
                                            'signed integer' => {
-                                                                 'wsyid' => 650,
+                                                                 'wsyid' => 652,
                                                                  'xsy' => 'signed integer'
                                                                },
                                            'single quoted name' => {
-                                                                     'wsyid' => 653,
+                                                                     'wsyid' => 655,
                                                                      'xsy' => 'single quoted name'
                                                                    },
                                            'single quoted string' => {
-                                                                       'wsyid' => 656,
+                                                                       'wsyid' => 658,
                                                                        'xsy' => 'single quoted string'
                                                                      },
                                            'single symbol' => {
-                                                                'wsyid' => 642,
+                                                                'wsyid' => 644,
                                                                 'xsy' => 'single symbol'
                                                               },
                                            'standard name' => {
-                                                                'wsyid' => 652,
+                                                                'wsyid' => 654,
                                                                 'xsy' => 'standard name'
                                                               },
                                            'start rule' => {
-                                                             'wsyid' => 594,
+                                                             'wsyid' => 596,
                                                              'xsy' => 'start rule'
                                                            },
                                            'statement' => {
-                                                            'wsyid' => 591,
+                                                            'wsyid' => 593,
                                                             'xsy' => 'statement'
                                                           },
                                            'statement group' => {
-                                                                  'wsyid' => 593,
+                                                                  'wsyid' => 595,
                                                                   'xsy' => 'statement group'
                                                                 },
                                            'statements' => {
-                                                             'wsyid' => 590,
+                                                             'wsyid' => 592,
                                                              'xsy' => 'statements'
                                                            },
                                            'symbol' => {
-                                                         'wsyid' => 643,
+                                                         'wsyid' => 645,
                                                          'xsy' => 'symbol'
                                                        },
                                            'symbol name' => {
-                                                              'wsyid' => 644,
+                                                              'wsyid' => 646,
                                                               'xsy' => 'symbol name'
                                                             }
                                          },
@@ -3183,7 +3183,7 @@ $hashed_metag = {
                                                             'xsy' => 'Perl name'
                                                           },
                                            '[:discard]' => {
-                                                             'wsyid' => 459
+                                                             'wsyid' => 460
                                                            },
                                            '[Lex-0]' => {
                                                           'wsyid' => 2,
@@ -3470,11 +3470,11 @@ $hashed_metag = {
                                                            'xsy' => '[Lex-73]'
                                                          },
                                            '[Lex-74]' => {
-                                                           'wsyid' => 473,
+                                                           'wsyid' => 475,
                                                            'xsy' => '[Lex-74]'
                                                          },
                                            '[Lex-75]' => {
-                                                           'wsyid' => 476,
+                                                           'wsyid' => 478,
                                                            'xsy' => '[Lex-75]'
                                                          },
                                            '[Lex-7]' => {
@@ -3490,31 +3490,31 @@ $hashed_metag = {
                                                           'xsy' => '[Lex-9]'
                                                         },
                                            '[[\']]' => {
-                                                         'wsyid' => 568,
+                                                         'wsyid' => 570,
                                                          'xsy' => '[[\']]'
                                                        },
                                            '[[+-]]' => {
-                                                         'wsyid' => 488,
+                                                         'wsyid' => 490,
                                                          'xsy' => '[[+-]]'
                                                        },
                                            '[[,]]' => {
-                                                        'wsyid' => 510,
+                                                        'wsyid' => 512,
                                                         'xsy' => '[[,]]'
                                                       },
                                            '[[01]]' => {
-                                                         'wsyid' => 490,
+                                                         'wsyid' => 492,
                                                          'xsy' => '[[01]]'
                                                        },
                                            '[[1]]' => {
-                                                        'wsyid' => 530,
+                                                        'wsyid' => 532,
                                                         'xsy' => '[[1]]'
                                                       },
                                            '[[[:alnum:]]]' => {
-                                                                'wsyid' => 588,
+                                                                'wsyid' => 590,
                                                                 'xsy' => '[[[:alnum:]]]'
                                                               },
                                            '[[\\#]]' => {
-                                                          'wsyid' => 461,
+                                                          'wsyid' => 463,
                                                           'xsy' => '[[\\#]]'
                                                         },
                                            '[[\\(]]' => {
@@ -3526,11 +3526,11 @@ $hashed_metag = {
                                                           'xsy' => '[[\\)]]'
                                                         },
                                            '[[\\*]]' => {
-                                                          'wsyid' => 471,
+                                                          'wsyid' => 473,
                                                           'xsy' => '[[\\*]]'
                                                         },
                                            '[[\\+]]' => {
-                                                          'wsyid' => 474,
+                                                          'wsyid' => 476,
                                                           'xsy' => '[[\\+]]'
                                                         },
                                            '[[\\,]]' => {
@@ -3542,7 +3542,7 @@ $hashed_metag = {
                                                           'xsy' => '[[\\-]]'
                                                         },
                                            '[[\\:]]' => {
-                                                          'wsyid' => 586,
+                                                          'wsyid' => 588,
                                                           'xsy' => '[[\\:]]'
                                                         },
                                            '[[\\;]]' => {
@@ -3550,51 +3550,51 @@ $hashed_metag = {
                                                           'xsy' => '[[\\;]]'
                                                         },
                                            '[[\\<]]' => {
-                                                          'wsyid' => 502,
+                                                          'wsyid' => 504,
                                                           'xsy' => '[[\\<]]'
                                                         },
                                            '[[\\=]]' => {
-                                                          'wsyid' => 466,
+                                                          'wsyid' => 468,
                                                           'xsy' => '[[\\=]]'
                                                         },
                                            '[[\\>]]' => {
-                                                          'wsyid' => 503,
+                                                          'wsyid' => 505,
                                                           'xsy' => '[[\\>]]'
                                                         },
                                            '[[\\[]]' => {
-                                                          'wsyid' => 583,
+                                                          'wsyid' => 585,
                                                           'xsy' => '[[\\[]]'
                                                         },
                                            '[[\\\\]]' => {
-                                                           'wsyid' => 573,
+                                                           'wsyid' => 575,
                                                            'xsy' => '[[\\\\]]'
                                                          },
                                            '[[\\]]]' => {
-                                                          'wsyid' => 587,
+                                                          'wsyid' => 589,
                                                           'xsy' => '[[\\]]]'
                                                         },
                                            '[[\\^]]' => {
-                                                          'wsyid' => 585,
+                                                          'wsyid' => 587,
                                                           'xsy' => '[[\\^]]'
                                                         },
                                            '[[\\d]]' => {
-                                                          'wsyid' => 489,
+                                                          'wsyid' => 491,
                                                           'xsy' => '[[\\d]]'
                                                         },
                                            '[[\\s\\w]]' => {
-                                                             'wsyid' => 504,
+                                                             'wsyid' => 506,
                                                              'xsy' => '[[\\s\\w]]'
                                                            },
                                            '[[\\s]]' => {
-                                                          'wsyid' => 458,
+                                                          'wsyid' => 459,
                                                           'xsy' => '[[\\s]]'
                                                         },
                                            '[[\\w]]' => {
-                                                          'wsyid' => 500,
+                                                          'wsyid' => 502,
                                                           'xsy' => '[[\\w]]'
                                                         },
                                            '[[\\x{A}\\x{B}\\x{C}\\x{D}\\x{2028}\\x{2029}]]' => {
-                                                                                                 'wsyid' => 462,
+                                                                                                 'wsyid' => 464,
                                                                                                  'xsy' => '[[\\x{A}\\x{B}\\x{C}\\x{D}\\x{2028}\\x{2029}]]'
                                                                                                },
                                            '[[\\{]]' => {
@@ -3602,7 +3602,7 @@ $hashed_metag = {
                                                           'xsy' => '[[\\{]]'
                                                         },
                                            '[[\\|]]' => {
-                                                          'wsyid' => 470,
+                                                          'wsyid' => 472,
                                                           'xsy' => '[[\\|]]'
                                                         },
                                            '[[\\}]]' => {
@@ -3610,35 +3610,35 @@ $hashed_metag = {
                                                           'xsy' => '[[\\}]]'
                                                         },
                                            '[[\\~]]' => {
-                                                          'wsyid' => 467,
+                                                          'wsyid' => 469,
                                                           'xsy' => '[[\\~]]'
                                                         },
                                            '[[^\'\\x{0A}\\x{0B}\\x{0C}\\x{0D}\\x{0085}\\x{2028}\\x{2029}]]' => {
-                                                                                                                 'wsyid' => 569,
+                                                                                                                 'wsyid' => 571,
                                                                                                                  'xsy' => '[[^\'\\x{0A}\\x{0B}\\x{0C}\\x{0D}\\x{0085}\\x{2028}\\x{2029}]]'
                                                                                                                },
                                            '[[^\\x{5d}\\x{0A}\\x{0B}\\x{0C}\\x{0D}\\x{0085}\\x{2028}\\x{2029}]]' => {
-                                                                                                                      'wsyid' => 572,
+                                                                                                                      'wsyid' => 574,
                                                                                                                       'xsy' => '[[^\\x{5d}\\x{0A}\\x{0B}\\x{0C}\\x{0D}\\x{0085}\\x{2028}\\x{2029}]]'
                                                                                                                     },
                                            '[[^\\x{A}\\x{B}\\x{C}\\x{D}\\x{2028}\\x{2029}]]' => {
-                                                                                                  'wsyid' => 589,
+                                                                                                  'wsyid' => 591,
                                                                                                   'xsy' => '[[^\\x{A}\\x{B}\\x{C}\\x{D}\\x{2028}\\x{2029}]]'
                                                                                                 },
                                            '[[a-zA-Z]]' => {
-                                                             'wsyid' => 501,
+                                                             'wsyid' => 503,
                                                              'xsy' => '[[a-zA-Z]]'
                                                            },
                                            '[[a]]' => {
-                                                        'wsyid' => 560,
+                                                        'wsyid' => 562,
                                                         'xsy' => '[[a]]'
                                                       },
                                            '[[b]]' => {
-                                                        'wsyid' => 547,
+                                                        'wsyid' => 549,
                                                         'xsy' => '[[b]]'
                                                       },
                                            '[[c]]' => {
-                                                        'wsyid' => 576,
+                                                        'wsyid' => 578,
                                                         'xsy' => '[[c]]'
                                                       },
                                            '[[d]]' => {
@@ -3646,23 +3646,23 @@ $hashed_metag = {
                                                         'xsy' => '[[d]]'
                                                       },
                                            '[[e]]' => {
-                                                        'wsyid' => 563,
+                                                        'wsyid' => 565,
                                                         'xsy' => '[[e]]'
                                                       },
                                            '[[f]]' => {
-                                                        'wsyid' => 484,
+                                                        'wsyid' => 486,
                                                         'xsy' => '[[f]]'
                                                       },
                                            '[[g]]' => {
-                                                        'wsyid' => 534,
+                                                        'wsyid' => 536,
                                                         'xsy' => '[[g]]'
                                                       },
                                            '[[h]]' => {
-                                                        'wsyid' => 542,
+                                                        'wsyid' => 544,
                                                         'xsy' => '[[h]]'
                                                       },
                                            '[[i]]' => {
-                                                        'wsyid' => 578,
+                                                        'wsyid' => 580,
                                                         'xsy' => '[[i]]'
                                                       },
                                            '[[k]]' => {
@@ -3670,19 +3670,19 @@ $hashed_metag = {
                                                         'xsy' => '[[k]]'
                                                       },
                                            '[[l]]' => {
-                                                        'wsyid' => 561,
+                                                        'wsyid' => 563,
                                                         'xsy' => '[[l]]'
                                                       },
                                            '[[m]]' => {
-                                                        'wsyid' => 546,
+                                                        'wsyid' => 548,
                                                         'xsy' => '[[m]]'
                                                       },
                                            '[[n]]' => {
-                                                        'wsyid' => 537,
+                                                        'wsyid' => 539,
                                                         'xsy' => '[[n]]'
                                                       },
                                            '[[o]]' => {
-                                                        'wsyid' => 548,
+                                                        'wsyid' => 550,
                                                         'xsy' => '[[o]]'
                                                       },
                                            '[[p]]' => {
@@ -3690,23 +3690,23 @@ $hashed_metag = {
                                                         'xsy' => '[[p]]'
                                                       },
                                            '[[r]]' => {
-                                                        'wsyid' => 550,
+                                                        'wsyid' => 552,
                                                         'xsy' => '[[r]]'
                                                       },
                                            '[[s]]' => {
-                                                        'wsyid' => 564,
+                                                        'wsyid' => 566,
                                                         'xsy' => '[[s]]'
                                                       },
                                            '[[t]]' => {
-                                                        'wsyid' => 535,
+                                                        'wsyid' => 537,
                                                         'xsy' => '[[t]]'
                                                       },
                                            '[[u]]' => {
-                                                        'wsyid' => 562,
+                                                        'wsyid' => 564,
                                                         'xsy' => '[[u]]'
                                                       },
                                            '[[v]]' => {
-                                                        'wsyid' => 559,
+                                                        'wsyid' => 561,
                                                         'xsy' => '[[v]]'
                                                       },
                                            '[[w]]' => {
@@ -3718,7 +3718,7 @@ $hashed_metag = {
                                                         'xsy' => '[[x]]'
                                                       },
                                            '[[y]]' => {
-                                                        'wsyid' => 545,
+                                                        'wsyid' => 547,
                                                         'xsy' => '[[y]]'
                                                       },
                                            'array descriptor' => {
@@ -3782,7 +3782,7 @@ $hashed_metag = {
                                                                        'xsy' => 'escaped cc character'
                                                                      },
                                            'hash comment' => {
-                                                               'wsyid' => 665,
+                                                               'wsyid' => 461,
                                                                'xsy' => 'hash comment'
                                                              },
                                            'hash comment body' => {
@@ -3842,7 +3842,7 @@ $hashed_metag = {
                                                                          'xsy' => 'reserved blessing name'
                                                                        },
                                            'reserved event name' => {
-                                                                      'wsyid' => 663,
+                                                                      'wsyid' => 665,
                                                                       'xsy' => 'reserved event name'
                                                                     },
                                            'result item descriptor' => {
@@ -3898,7 +3898,7 @@ $hashed_metag = {
                                                                       'xsy' => 'vertical space char'
                                                                     },
                                            'whitespace' => {
-                                                             'wsyid' => 664,
+                                                             'wsyid' => 458,
                                                              'xsy' => 'whitespace'
                                                            },
                                            'zero or more word characters' => {

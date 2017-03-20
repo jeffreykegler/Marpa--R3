@@ -53,14 +53,13 @@ END_OF_SOURCE
 
     my $input = 'child::book';
 
-    push @tests_data,
-        [
+    do_test(
         $glenn_grammar,
         'child::book',
         [ 'child', q{::}, 'book' ],
         'Parse OK',
         'Nate Glenn bug regression'
-        ];
+        );
 } ## end if (0)
 
 # Marpa::R3::Display
@@ -88,14 +87,13 @@ END_OF_SOURCE
 
 # Marpa::R3::Display::End
 
-    push @tests_data,
-        [
+    do_test(
         $ic_grammar,
         'ChilD::BooK',
         [ 'ChilD', q{::}, 'BooK' ],
         'Parse OK',
         'Case insensitivity test'
-        ];
+        );
 } ## end if (0)
 
 if (1) {
@@ -120,7 +118,7 @@ END_OF_SOURCE
         }
     );
 
-    push @tests_data, [
+    do_test(
         $durand_grammar1, <<INPUT,
 ## Allowed in the input
 
@@ -129,7 +127,7 @@ INPUT
         ["## Allowed in the input\n"],
         'Parse OK',
         'JDD test of discard versus accepted'
-    ];
+    );
 } ## end if (0)
 
 # ===============
@@ -153,7 +151,7 @@ END_OF_SOURCE
         }
     );
 
-    push @tests_data, [
+    do_test(
         $durand_grammar2, <<INPUT,
 # Comment followed by a newline
 
@@ -163,7 +161,7 @@ INPUT
         [ 'test input', "\n" ],
         'Parse OK',
         'Regression test of bug found by JDD'
-    ];
+    );
 } ## end if (1)
 
 # ===============
@@ -195,14 +193,14 @@ END_OF_SOURCE
         }
     );
 
-    push @tests_data, [
+    do_test(
         $durand_grammar3, <<INPUT,
  = / dumb
 INPUT
         [qw(= / dumb)],
         'Parse OK',
         'Regression test of perl_pos bug found by JDD'
-    ];
+    );
 } ## end if (1)
 
 
@@ -220,12 +218,12 @@ END_OF_SOURCE
         }
     );
 
-    push @tests_data, [
+    do_test(
         $grammar, q{},
         undef,
         'Parse OK',
         'Regression test of lexerless grammar, bug found by JDD'
-    ];
+    );
 
 } ## end if (1)
 
@@ -258,12 +256,11 @@ Descriptive line
 INPUT
 
     my $grammar = Marpa::R3::Scanless::G->new( { source => \$source } );
-    push @tests_data,
-        [
+    do_test(
         $grammar, $input,
         [ '130.12312', 'Descriptive line', '1,10', '1,10', '1,30' ],
         'Parse OK', 'Test of forgiving token from Peter Stuifzand'
-        ];
+        );
 }
 
 # Test of LATM token from Ruslan Zakirov
@@ -283,11 +280,10 @@ END_OF_SOURCE
         [ 'UID', ':', 'urn:uuid:4fbe8971-0bc3-424c-9c26-36c3e1eff6b1' ];
 
     my $grammar = Marpa::R3::Scanless::G->new( { source => \$source } );
-    push @tests_data,
-        [
+    do_test(
         $grammar, $input, $expected_output,
         'Parse OK', 'Test of LATM token from Ruslan Zakirov'
-        ];
+        );
 }
 
 # Test of LATM token from Ruslan Zakirov
@@ -307,11 +303,10 @@ END_OF_SOURCE
         [ 'UID', ':', 'urn:uuid:4fbe8971-0bc3-424c-9c26-36c3e1eff6b1' ];
 
     my $grammar = Marpa::R3::Scanless::G->new( { source => \$source } );
-    push @tests_data,
-        [
+    do_test(
         $grammar, $input, $expected_output,
         'Parse OK', 'Test of LATM token using lexeme default statement'
-        ];
+        );
 }
 
 # Test of rank adverb
@@ -351,11 +346,10 @@ END_OF_INPUT
     ];
 
     my $grammar = Marpa::R3::Scanless::G->new( { source => \$source } );
-    push @tests_data,
-        [
+    do_test(
         $grammar, $input, $expected_output,
         'Parse OK', 'Test of rank adverb for display'
-        ];
+        );
 }
 
 # Test of rule array item descriptor for action adverb
@@ -378,11 +372,10 @@ END_OF_SOURCE
         [ 5, 0, [ 3, 1, [ 2, undef, '42' ] ], [ 4, 2, [ 1, undef, '43' ] ] ];
 
     my $grammar = Marpa::R3::Scanless::G->new( { source => \$source } );
-    push @tests_data,
-        [
+    do_test(
         $grammar, $input, $expected_output,
         'Parse OK', 'Test of rule array item descriptor for action adverb'
-        ];
+        );
 }
 
 # Test of 'symbol', 'name' array item descriptors
@@ -415,11 +408,10 @@ END_OF_SOURCE
     ];
 
     my $grammar = Marpa::R3::Scanless::G->new( { source => \$source } );
-    push @tests_data,
-        [
+    do_test(
         $grammar, $input, $expected_output,
         'Parse OK', 'Test of rule array item descriptor for action adverb'
-        ];
+        );
 }
 
 ### Test of 'inaccessible is ok'
@@ -452,11 +444,10 @@ END_OF_SOURCE
     ];
 
     my $grammar = Marpa::R3::Scanless::G->new( { source => \$source } );
-    push @tests_data,
-        [
+    do_test(
         $grammar, $input, $expected_output,
         'Parse OK', qq{Test of "Inaccessible is ok"}
-        ];
+        );
 }
 
 if (1) {
@@ -482,11 +473,10 @@ END_OF_SOURCE
         my $this_source = $source;
         $this_source =~ s/!START!/$this_start/;
         my $grammar = Marpa::R3::Scanless::G->new( { source => \$this_source } );
-        push @tests_data,
-            [
+        do_test(
             $grammar, $input, $expected_output,
             'Parse OK', qq{Test of changing start symbols: <$this_start>}
-            ];
+            );
 
     } ## end for my $this_start (qw/start1 start2/)
 }
@@ -511,11 +501,10 @@ END_OF_SOURCE
     my $expected_output = [ $input ];
 
     my $grammar = Marpa::R3::Scanless::G->new( { source => \$source } );
-    push @tests_data,
-        [
+    do_test(
         $grammar, $input, $expected_output,
         'Parse OK', qq{Test 1 of lazy long brackets}
-        ];
+        );
 
 }
 
@@ -539,11 +528,10 @@ END_OF_SOURCE
     my $expected_output = [ $input ];
 
     my $grammar = Marpa::R3::Scanless::G->new( { source => \$source } );
-    push @tests_data,
-        [
+    do_test(
         $grammar, $input, $expected_output,
         'Parse OK', qq{Test 2 of lazy long brackets}
-        ];
+        );
 
 }
 
@@ -567,15 +555,15 @@ END_OF_SOURCE
     my $expected_output = [ '[[X]]', '[[Y]]' ];
 
     my $grammar = Marpa::R3::Scanless::G->new( { source => \$source } );
-    push @tests_data,
-        [
+    do_test(
         $grammar, $input, $expected_output,
         'Parse OK', qq{Test of eager long brackets}
-        ];
+        );
 
 }
 
-if (1) {
+TODO: {
+    local $TODO = "Not yet implemented";
     my $source = <<'END_OF_SOURCE';
 
     start ::= text action => ::first
@@ -599,11 +587,10 @@ END_OF_SOURCE
     my $expected_output = [ 'abc', 'def' ];
 
     my $grammar = Marpa::R3::Scanless::G->new( { source => \$source } );
-    push @tests_data,
-        [
+    do_test(
         $grammar, $input, $expected_output,
         'Parse OK', qq{Test of eager discard}
-        ];
+        );
 
 }
 
@@ -652,19 +639,16 @@ END_OF_SOURCE
         q{Test of $grammar->rule_name()}
     );
 
-    push @tests_data,
-        [
+    do_test(
         $grammar, $input, $expected_output,
         'Parse OK', qq{Test of alternative as start rule}
-        ];
+        );
 
 }
 
-TEST:
-for my $test_data (@tests_data) {
+sub do_test {
     my ( $grammar, $test_string, $expected_value, $expected_result,
-        $test_name )
-        = @{$test_data};
+        $test_name ) = @_;
     my ( $actual_value, $actual_result ) =
         my_parser( $grammar, $test_string );
     Test::More::is(
@@ -674,7 +658,7 @@ for my $test_data (@tests_data) {
     );
     Test::More::is( $actual_result, $expected_result,
         qq{Result of $test_name} );
-} ## end TEST: for my $test_data (@tests_data)
+}
 
 sub my_parser {
     my ( $grammar, $string ) = @_;
