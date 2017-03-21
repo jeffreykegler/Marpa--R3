@@ -2061,11 +2061,6 @@ PPCODE:
         "local recce = ...; return recce:find_and_do_ops()\n",
         "R>iC", outer_slr->lua_ref, &result, &new_values);
 
-    switch (result) {
-    case 3:
-    default:
-    case -1:
-    case 1:
         {
             const char* step_type;
             lua_Integer parm2;
@@ -2074,6 +2069,9 @@ PPCODE:
               "if result == -1 then return 'trace', -1, {} end\n"
               "local this = recce.this_step\n"
               "local step_type = this.type\n"
+              "if step_type == 'MARPA_STEP_INACTIVE' then\n"
+              "   return step_type, -1, {}\n"
+              "end\n"
               "local parm2 = -1\n"
               "if step_type == 'MARPA_STEP_RULE' then parm2 = this.rule end\n"
               "if step_type == 'MARPA_STEP_TOKEN' then parm2 = this.symbol end\n"
@@ -2085,9 +2083,6 @@ PPCODE:
             XPUSHs (new_values);      /* already mortal */
             XSRETURN (3);
         }
-    case 0:
-        XSRETURN_EMPTY;
-    }
 }
 
 void
