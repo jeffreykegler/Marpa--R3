@@ -1940,8 +1940,6 @@ PPCODE:
     lua_Integer input_length;
     lua_Integer lexeme_length;
 
-    if (!length_defined) length = -1;
-
   call_by_tag (outer_slr->L, MYLUA_TAG,
       "local recce, length_is_defined, length_arg = ...\n"
       "local perl_pos = recce.perl_pos\n"
