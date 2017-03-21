@@ -1940,8 +1940,8 @@ PPCODE:
     lua_Integer input_length;
     lua_Integer lexeme_length;
 
-  call_by_tag (outer_slr->L, MYLUA_TAG,
-      "local recce, length_is_defined, length_arg = ...\n"
+        call_by_tag (outer_slr->L, MYLUA_TAG,
+            "recce, start_pos_defined, start_pos, length_is_defined, length_arg = ...\n"
       "local perl_pos = recce.perl_pos\n"
       "local lexeme_length = -1\n"
       "if length_is_defined ~= 0 then\n"
@@ -1949,12 +1949,6 @@ PPCODE:
       "elseif perl_pos == recce.start_of_pause_lexeme then\n"
       "     lexeme_length = recce.end_of_pause_lexeme - recce.start_of_pause_lexeme\n"
       "end\n"
-      "return lexeme_length, perl_pos\n"
-      ,
-      "Rii>ii", outer_slr->lua_ref, (lua_Integer)length_defined, (lua_Integer)length, &lexeme_length, &perl_pos);
-
-        call_by_tag (outer_slr->L, MYLUA_TAG,
-            "recce, start_pos_defined, start_pos, lexeme_length, length_arg = ...\n"
             "if start_pos_defined == 0 then start_pos = recce.perl_pos end\n"
             "local input_length = #recce.codepoints\n"
             "if start_pos < 0 then\n"
@@ -2005,7 +1999,7 @@ PPCODE:
             , "Riiii>i", outer_slr->lua_ref,
                (lua_Integer) start_pos_defined,
                (lua_Integer) start_pos,
-               (lua_Integer) lexeme_length,
+               (lua_Integer) length_defined,
                (lua_Integer) length,
                &return_value);
 
