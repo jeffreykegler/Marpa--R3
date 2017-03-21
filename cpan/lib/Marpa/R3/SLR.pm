@@ -1724,7 +1724,18 @@ sub Marpa::R3::Scanless::R::lexeme_complete {
     my $slg  = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
 
     $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] = [];
-    my $return_value = $thin_slr->g1_lexeme_complete( $start, $length );
+
+    my $start_defined = 1;
+    if (defined $start) {
+        Marpa::R3::exception( 'Start value is not a number: ', $start)
+            if not Scalar::Util::looks_like_number($start);
+    } else { 
+        $start = 0;
+        $start_defined = 0;
+    }
+    my $return_value = $thin_slr->g1_lexeme_complete(
+        $start_defined, $start,
+        $length );
 
     if ($return_value == 0) {
         $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),

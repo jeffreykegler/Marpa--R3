@@ -1927,16 +1927,16 @@ PPCODE:
 
  # Returns current position on success, 0 on unthrown failure
 void
-g1_lexeme_complete (outer_slr, start_pos_sv, length_sv)
+g1_lexeme_complete (outer_slr, start_pos_defined, start_pos, length_sv)
      Outer_R *outer_slr;
-     SV* start_pos_sv;
+     int start_pos_defined;
+     int start_pos;
      SV* length_sv;
 PPCODE:
 {
     lua_Integer perl_pos;
     lua_Integer result;
     lua_Integer input_length;
-    lua_Integer start_pos;
     lua_Integer lexeme_length;
     lua_Integer length_defined = 0;
     lua_Integer length_arg = -1;
@@ -1959,8 +1959,7 @@ PPCODE:
       ,
       "Rii>ii", outer_slr->lua_ref, length_defined, length_arg, &lexeme_length, &perl_pos);
 
-    start_pos =
-        SvIOK (start_pos_sv) ? (lua_Integer)SvIV (start_pos_sv) : perl_pos;
+    if (!start_pos_defined) start_pos = perl_pos;
 
     call_by_tag (outer_slr->L, MYLUA_TAG,
         "recce = ...\n"
@@ -1971,7 +1970,7 @@ PPCODE:
     if (start_pos < 0 || start_pos > input_length) {
         /* Undef start_pos_sv should not cause error */
         croak ("Bad start position in slr->g1_lexeme_complete(): %ld",
-            (long) (SvIOK (start_pos_sv) ? SvIV (start_pos_sv) : -1));
+            (long) start_pos);
     }
     call_by_tag (outer_slr->L, MYLUA_TAG,
         "local recce, perl_pos = ...\n"
