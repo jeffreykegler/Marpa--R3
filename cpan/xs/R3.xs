@@ -2057,15 +2057,12 @@ PPCODE:
     lua_Integer result;
     SV *new_values;
 
-    call_by_tag (outer_slr->L, MYLUA_TAG,
-        "local recce = ...; return recce:find_and_do_ops()\n",
-        "R>iC", outer_slr->lua_ref, &result, &new_values);
-
         {
             const char* step_type;
             lua_Integer parm2;
             call_by_tag (outer_slr->L, MYLUA_TAG,
-              "local recce, result = ...\n"
+              "local recce = ...\n"
+              "local result, new_values = recce:find_and_do_ops()\n"
               "if result == -1 then return 'trace', -1, {} end\n"
               "local this = recce.this_step\n"
               "local step_type = this.type\n"
@@ -2076,8 +2073,8 @@ PPCODE:
               "if step_type == 'MARPA_STEP_RULE' then parm2 = this.rule end\n"
               "if step_type == 'MARPA_STEP_TOKEN' then parm2 = this.symbol end\n"
               "if step_type == 'MARPA_STEP_NULLING_SYMBOL' then parm2 = this.symbol end\n"
-              "return step_type, parm2\n",
-              "Ri>si", outer_slr->lua_ref, result, &step_type, &parm2);
+              "return step_type, parm2, new_values\n",
+              "R>siC", outer_slr->lua_ref, &step_type, &parm2, &new_values);
             XPUSHs (sv_2mortal(newSVpv(step_type, 0)));
             XPUSHs (sv_2mortal(newSViv((IV)parm2)));
             XPUSHs (new_values);      /* already mortal */
