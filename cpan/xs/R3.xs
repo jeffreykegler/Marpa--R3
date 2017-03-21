@@ -2050,39 +2050,6 @@ PPCODE:
 }
 
 void
-stack_step( outer_slr )
-    Outer_R *outer_slr;
-PPCODE:
-{
-    lua_Integer result;
-    SV *new_values;
-
-        {
-            const char* step_type;
-            lua_Integer parm2;
-            call_by_tag (outer_slr->L, MYLUA_TAG,
-              "local recce = ...\n"
-              "local result, new_values = recce:find_and_do_ops()\n"
-              "if result == -1 then return 'trace', -1, {} end\n"
-              "local this = recce.this_step\n"
-              "local step_type = this.type\n"
-              "if step_type == 'MARPA_STEP_INACTIVE' then\n"
-              "   return step_type, -1, {}\n"
-              "end\n"
-              "local parm2 = -1\n"
-              "if step_type == 'MARPA_STEP_RULE' then parm2 = this.rule end\n"
-              "if step_type == 'MARPA_STEP_TOKEN' then parm2 = this.symbol end\n"
-              "if step_type == 'MARPA_STEP_NULLING_SYMBOL' then parm2 = this.symbol end\n"
-              "return step_type, parm2, new_values\n",
-              "R>siC", outer_slr->lua_ref, &step_type, &parm2, &new_values);
-            XPUSHs (sv_2mortal(newSVpv(step_type, 0)));
-            XPUSHs (sv_2mortal(newSViv((IV)parm2)));
-            XPUSHs (new_values);      /* already mortal */
-            XSRETURN (3);
-        }
-}
-
-void
 start_input( outer_slr )
     Outer_R *outer_slr;
 PPCODE:
