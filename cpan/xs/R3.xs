@@ -2063,6 +2063,8 @@ PPCODE:
 
     switch (result) {
     case 3:
+    default:
+    case 1:
         {
             const char* step_type;
             lua_Integer parm2;
@@ -2070,24 +2072,16 @@ PPCODE:
               "local recce = ...\n"
               "local this = recce.this_step\n"
               "local step_type = this.type\n"
-              "local parm2 = step_type == 'MARPA_STEP_RULE' and this.rule or this.symbol\n"
+              "local parm2 = -1\n"
+              "if step_type == 'MARPA_STEP_RULE' then parm2 = this.rule end\n"
+              "if step_type == 'MARPA_STEP_TOKEN' then parm2 = this.symbol end\n"
+              "if step_type == 'MARPA_STEP_NULLING_SYMBOL' then parm2 = this.symbol end\n"
               "return step_type, parm2\n",
               "R>si", outer_slr->lua_ref, &step_type, &parm2);
             XPUSHs (sv_2mortal(newSVpv(step_type, 0)));
             XPUSHs (sv_2mortal(newSViv((IV)parm2)));
             XPUSHs (new_values);      /* already mortal */
             XSRETURN (3);
-        }
-    default:
-    case 1:
-        {
-            const char* step_type;
-            call_by_tag (outer_slr->L, MYLUA_TAG,
-              "local recce = ...\n"
-              "return recce.this_step.type\n",
-              "R>s", outer_slr->lua_ref, &step_type);
-            XPUSHs (sv_2mortal(newSVpv(step_type, 0)));
-            XSRETURN (1);
         }
     case 0:
         XSRETURN_EMPTY;
