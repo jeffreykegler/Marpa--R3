@@ -1733,9 +1733,17 @@ sub Marpa::R3::Scanless::R::lexeme_complete {
         $start = 0;
         $start_defined = 0;
     }
+    my $length_defined = 1;
+    if (defined $length) {
+        Marpa::R3::exception( 'Start value is not a number: ', $length)
+            if not Scalar::Util::looks_like_number($length);
+    } else { 
+        $length = 0;
+        $length_defined = 0;
+    }
     my $return_value = $thin_slr->g1_lexeme_complete(
         $start_defined, $start,
-        $length );
+        $length_defined, $length );
 
     if ($return_value == 0) {
         $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),

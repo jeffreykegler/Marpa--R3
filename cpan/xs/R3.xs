@@ -1927,24 +1927,20 @@ PPCODE:
 
  # Returns current position on success, 0 on unthrown failure
 void
-g1_lexeme_complete (outer_slr, start_pos_defined, start_pos, length_sv)
+g1_lexeme_complete (outer_slr, start_pos_defined, start_pos, length_defined, length)
      Outer_R *outer_slr;
      int start_pos_defined;
      int start_pos;
-     SV* length_sv;
+     int length_defined;
+     int length;
 PPCODE:
 {
     lua_Integer perl_pos;
     lua_Integer result;
     lua_Integer input_length;
     lua_Integer lexeme_length;
-    lua_Integer length_defined = 0;
-    lua_Integer length_arg = -1;
 
-    if (SvIOK (length_sv)) {
-        length_defined = 1;
-        length_arg = (lua_Integer)SvIV (length_sv);
-    }
+    if (!length_defined) length = -1;
 
   call_by_tag (outer_slr->L, MYLUA_TAG,
       "local recce, length_is_defined, length_arg = ...\n"
@@ -1957,7 +1953,7 @@ PPCODE:
       "end\n"
       "return lexeme_length, perl_pos\n"
       ,
-      "Rii>ii", outer_slr->lua_ref, length_defined, length_arg, &lexeme_length, &perl_pos);
+      "Rii>ii", outer_slr->lua_ref, (lua_Integer)length_defined, (lua_Integer)length, &lexeme_length, &perl_pos);
 
     if (!start_pos_defined) start_pos = perl_pos;
 
@@ -1986,7 +1982,7 @@ PPCODE:
         if (end_pos < 0 || end_pos > input_length) {
             /* Undef length_sv should not cause error */
             croak ("Bad length in slr->g1_lexeme_complete(): %ld",
-                (long) (SvIOK (length_sv) ? SvIV (length_sv) : -1));
+                (long) length);
         }
         lexeme_length = end_pos - start_pos;
     }
