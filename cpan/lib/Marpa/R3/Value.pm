@@ -1550,7 +1550,23 @@ END_OF_LUA
 
   STEP: while (1) {
         my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
-        my ( $value_type, @value_data ) = $thin_slr->stack_step();
+        my ( $value_type, @value_data ) = $slr->call_by_tag(
+            ( '@' . __FILE__ . ':' . __LINE__ ),
+            << 'END_OF_LUA', '');
+          local recce = ...
+          local result, new_values = recce:find_and_do_ops()
+          if result == -1 then return 'trace', -1, {} end
+          local this = recce.this_step
+          local step_type = this.type
+          if step_type == 'MARPA_STEP_INACTIVE' then
+             return step_type, -1, {}
+          end
+          local parm2 = -1
+          if step_type == 'MARPA_STEP_RULE' then parm2 = this.rule end
+          if step_type == 'MARPA_STEP_TOKEN' then parm2 = this.symbol end
+          if step_type == 'MARPA_STEP_NULLING_SYMBOL' then parm2 = this.symbol end
+          return step_type, parm2, new_values
+END_OF_LUA
 
         if ($trace_values) {
           EVENT: for ( my $event_ix = 0 ; ; $event_ix++ ) {
