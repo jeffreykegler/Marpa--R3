@@ -1957,13 +1957,9 @@ PPCODE:
 
     if (!start_pos_defined) start_pos = perl_pos;
 
-    call_by_tag (outer_slr->L, MYLUA_TAG,
-        "recce = ...\n"
-        "return #recce.codepoints\n",
-        "R>i", outer_slr->lua_ref, &input_length);
-
         call_by_tag (outer_slr->L, MYLUA_TAG,
-            "recce, start_pos, lexeme_length, input_length, length = ...\n"
+            "recce, start_pos, lexeme_length, length = ...\n"
+            "local input_length = #recce.codepoints\n"
             "if start_pos < 0 then\n"
             "    start_pos = input_length + start_pos\n"
             "end\n"
@@ -2009,11 +2005,10 @@ PPCODE:
             "end\n"
             "error('Problem in slr->g1_lexeme_complete(): '\n"
             "    ..  recce.slg.lmw_g1g:error_description())\n"
-            , "Riiii>i", outer_slr->lua_ref,
+            , "Riii>i", outer_slr->lua_ref,
                (lua_Integer) start_pos, (lua_Integer) lexeme_length,
-               (lua_Integer) input_length, (lua_Integer) length,
+               (lua_Integer) length,
                &return_value);
-
 
     XSRETURN_IV ((IV)return_value);
 }
