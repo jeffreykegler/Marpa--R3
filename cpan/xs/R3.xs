@@ -1995,37 +1995,32 @@ PPCODE:
         "local result = g1r:earleme_complete()\n"
         "return result\n", "R>i", outer_slr->lua_ref, &result);
 
-    if (result >= 0) {
         call_by_tag (outer_slr->L, MYLUA_TAG,
-            "local recce, start_pos, lexeme_length = ...\n"
-            "recce:g1_convert_events(recce.perl_pos)\n"
-            "local g1r = recce.lmw_g1r\n"
-            "local latest_earley_set = g1r:latest_earley_set()\n"
-            "recce.es_data[latest_earley_set] = { start_pos, lexeme_length }\n"
-            "recce.perl_pos = start_pos + lexeme_length\n"
-            "return recce.perl_pos\n"
-            ,
-            "Rii>i", outer_slr->lua_ref, (lua_Integer) start_pos,
-            (lua_Integer) lexeme_length, &perl_pos);
-
-        XSRETURN_IV ((IV)perl_pos);
-    }
-        call_by_tag (outer_slr->L, MYLUA_TAG,
-            "recce, result = ...\n"
+            "recce, result, start_pos, lexeme_length = ...\n"
+            "if result >= 0 then\n"
+            "    recce:g1_convert_events(recce.perl_pos)\n"
+            "    local g1r = recce.lmw_g1r\n"
+            "    local latest_earley_set = g1r:latest_earley_set()\n"
+            "    recce.es_data[latest_earley_set] = { start_pos, lexeme_length }\n"
+            "    recce.perl_pos = start_pos + lexeme_length\n"
+            "    return recce.perl_pos\n"
+            "end\n"
             "if result == -2 then\n"
             "    local error_code = recce.slg.lmw_g1g:error_code()\n"
             "    if error_code == kollos.err.PARSE_EXHAUSTED then\n"
             "        local q = recce.event_queue\n"
             "        q[#q+1] = { 'no acceptable input' }\n"
             "    end\n"
-            "    return\n"
+            "    return 0\n"
             "end\n"
             "error('Problem in slr->g1_lexeme_complete(): '\n"
             "    ..  recce.slg.lmw_g1g:error_description())\n"
-            , "Ri>", outer_slr->lua_ref, result);
+            , "Riii>i", outer_slr->lua_ref, result,
+               (lua_Integer) start_pos, (lua_Integer) lexeme_length,
+               &perl_pos);
 
 
-    XSRETURN_IV (0);
+    XSRETURN_IV ((IV)perl_pos);
 }
 
 void
