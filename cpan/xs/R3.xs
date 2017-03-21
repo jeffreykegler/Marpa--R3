@@ -2010,24 +2010,20 @@ PPCODE:
 
         XSRETURN_IV ((IV)perl_pos);
     }
-    if (result == -2) {
         call_by_tag (outer_slr->L, MYLUA_TAG,
-            "recce = ...\n"
-            "local error_code = recce.slg.lmw_g1g:error_code()\n"
-            "if error_code == kollos.err.PARSE_EXHAUSTED then\n"
-            "    local q = recce.event_queue\n"
-            "    q[#q+1] = { 'no acceptable input' }\n"
-            "end\n", "R>", outer_slr->lua_ref);
-
-        XSRETURN_IV (0);
-    }
-
-    call_by_tag (outer_slr->L, MYLUA_TAG,
-            "recce = ...\n"
+            "recce, result = ...\n"
+            "if result == -2 then\n"
+            "    local error_code = recce.slg.lmw_g1g:error_code()\n"
+            "    if error_code == kollos.err.PARSE_EXHAUSTED then\n"
+            "        local q = recce.event_queue\n"
+            "        q[#q+1] = { 'no acceptable input' }\n"
+            "    end\n"
+            "    return\n"
+            "end\n"
             "error('Problem in slr->g1_lexeme_complete(): '\n"
             "    ..  recce.slg.lmw_g1g:error_description())\n"
-            ,
-            "R>", outer_slr->lua_ref);
+            , "Ri>", outer_slr->lua_ref, result);
+
 
     XSRETURN_IV (0);
 }
