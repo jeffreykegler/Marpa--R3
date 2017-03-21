@@ -1987,16 +1987,12 @@ PPCODE:
         lexeme_length = end_pos - start_pos;
     }
 
-    call_by_tag (outer_slr->L, MYLUA_TAG,
-        "local recce = ...\n"
-        "local g1r = recce.lmw_g1r\n"
-        "recce.event_queue = {}\n"
-        "recce.is_external_scanning = false\n"
-        "local result = g1r:earleme_complete()\n"
-        "return result\n", "R>i", outer_slr->lua_ref, &result);
-
         call_by_tag (outer_slr->L, MYLUA_TAG,
-            "recce, result, start_pos, lexeme_length = ...\n"
+            "recce, start_pos, lexeme_length = ...\n"
+            "local g1r = recce.lmw_g1r\n"
+            "recce.event_queue = {}\n"
+            "recce.is_external_scanning = false\n"
+            "local result = g1r:earleme_complete()\n"
             "if result >= 0 then\n"
             "    recce:g1_convert_events(recce.perl_pos)\n"
             "    local g1r = recce.lmw_g1r\n"
@@ -2015,7 +2011,7 @@ PPCODE:
             "end\n"
             "error('Problem in slr->g1_lexeme_complete(): '\n"
             "    ..  recce.slg.lmw_g1g:error_description())\n"
-            , "Riii>i", outer_slr->lua_ref, result,
+            , "Rii>i", outer_slr->lua_ref,
                (lua_Integer) start_pos, (lua_Integer) lexeme_length,
                &perl_pos);
 
