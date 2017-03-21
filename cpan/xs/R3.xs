@@ -1956,7 +1956,7 @@ PPCODE:
       "Rii>ii", outer_slr->lua_ref, (lua_Integer)length_defined, (lua_Integer)length, &lexeme_length, &perl_pos);
 
         call_by_tag (outer_slr->L, MYLUA_TAG,
-            "recce, start_pos_defined, start_pos, lexeme_length, length = ...\n"
+            "recce, start_pos_defined, start_pos, lexeme_length, length_arg = ...\n"
             "if start_pos_defined == 0 then start_pos = recce.perl_pos end\n"
             "local input_length = #recce.codepoints\n"
             "if start_pos < 0 then\n"
@@ -1979,7 +1979,7 @@ PPCODE:
             "   -- undefined length should not cause this error\n"
             "   error(string.format(\n"
             "       'Bad length in lexeme_complete(): %d',\n"
-            "          length\n"
+            "          (length_arg or math.mininteger)\n"
             "   ))\n"
             "end\n"
             "local g1r = recce.lmw_g1r\n"
