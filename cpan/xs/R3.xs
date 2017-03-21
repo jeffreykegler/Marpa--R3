@@ -1936,7 +1936,7 @@ g1_lexeme_complete (outer_slr, start_pos_defined, start_pos, length_defined, len
 PPCODE:
 {
     lua_Integer perl_pos;
-    lua_Integer result;
+    lua_Integer return_value;
     lua_Integer input_length;
     lua_Integer lexeme_length;
 
@@ -1962,33 +1962,31 @@ PPCODE:
         "return #recce.codepoints\n",
         "R>i", outer_slr->lua_ref, &input_length);
 
-    start_pos = start_pos < 0 ? (int)input_length + start_pos : start_pos;
-    if (start_pos < 0 || start_pos > input_length) {
-        /* Undef start_pos_sv should not cause error */
-        croak ("Bad start position in slr->g1_lexeme_complete(): %ld",
-            (long) start_pos);
-    }
-    call_by_tag (outer_slr->L, MYLUA_TAG,
-        "local recce, perl_pos = ...\n"
-        "recce.perl_pos = perl_pos\n"
-        ,
-        "Ri>", outer_slr->lua_ref, (lua_Integer)start_pos);
-
-    {
-        const lua_Integer end_pos =
-            lexeme_length <
-            0 ? input_length + lexeme_length + 1 : start_pos +
-            lexeme_length;
-        if (end_pos < 0 || end_pos > input_length) {
-            /* Undef length_sv should not cause error */
-            croak ("Bad length in slr->g1_lexeme_complete(): %ld",
-                (long) length);
-        }
-        lexeme_length = end_pos - start_pos;
-    }
-
         call_by_tag (outer_slr->L, MYLUA_TAG,
-            "recce, start_pos, lexeme_length = ...\n"
+            "recce, start_pos, lexeme_length, input_length, length = ...\n"
+            "if start_pos < 0 then\n"
+            "    start_pos = input_length + start_pos\n"
+            "end\n"
+            "if start_pos < 0 or start_pos > input_length then\n"
+            "   error(string.format(\n"
+            "       'Bad start position in lexeme_complete(): %d',\n"
+            "          start_pos\n"
+            "   ))\n"
+            "end\n"
+            "recce.perl_pos = start_pos\n"
+            "local end_pos\n"
+            "if lexeme_length < 0 then\n"
+            "   end_pos = input_length + lexeme_length + 1\n"
+            "else\n"
+            "   end_pos = start_pos + lexeme_length\n"
+            "end\n"
+            "if end_pos < 0 or end_pos > input_length then\n"
+            "   -- undefined length should not cause this error\n"
+            "   error(string.format(\n"
+            "       'Bad length in lexeme_complete(): %d',\n"
+            "          length\n"
+            "   ))\n"
+            "end\n"
             "local g1r = recce.lmw_g1r\n"
             "recce.event_queue = {}\n"
             "recce.is_external_scanning = false\n"
@@ -2011,12 +2009,13 @@ PPCODE:
             "end\n"
             "error('Problem in slr->g1_lexeme_complete(): '\n"
             "    ..  recce.slg.lmw_g1g:error_description())\n"
-            , "Rii>i", outer_slr->lua_ref,
+            , "Riiii>i", outer_slr->lua_ref,
                (lua_Integer) start_pos, (lua_Integer) lexeme_length,
-               &perl_pos);
+               (lua_Integer) input_length, (lua_Integer) length,
+               &return_value);
 
 
-    XSRETURN_IV ((IV)perl_pos);
+    XSRETURN_IV ((IV)return_value);
 }
 
 void
