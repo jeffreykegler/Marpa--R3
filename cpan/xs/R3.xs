@@ -2069,7 +2069,7 @@ PPCODE:
             const char* step_type;
             lua_Integer parm2;
             call_by_tag (outer_slr->L, MYLUA_TAG,
-              "local recce = ...\n"
+              "local recce, result = ...\n"
               "local this = recce.this_step\n"
               "local step_type = this.type\n"
               "local parm2 = -1\n"
@@ -2077,7 +2077,7 @@ PPCODE:
               "if step_type == 'MARPA_STEP_TOKEN' then parm2 = this.symbol end\n"
               "if step_type == 'MARPA_STEP_NULLING_SYMBOL' then parm2 = this.symbol end\n"
               "return step_type, parm2\n",
-              "R>si", outer_slr->lua_ref, &step_type, &parm2);
+              "Ri>si", outer_slr->lua_ref, result, &step_type, &parm2);
             XPUSHs (sv_2mortal(newSVpv(step_type, 0)));
             XPUSHs (sv_2mortal(newSViv((IV)parm2)));
             XPUSHs (new_values);      /* already mortal */

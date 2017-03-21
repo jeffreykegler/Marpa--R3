@@ -1608,6 +1608,7 @@ END_OF_LUA
         } ## end if ($trace_values)
 
         last STEP if not defined $value_type;
+        last STEP if $value_type eq 'MARPA_STEP_INACTIVE';
         next STEP if $value_type eq 'trace';
 
         my $semantics_arg0 = $per_parse_arg // {};
