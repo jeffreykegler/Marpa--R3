@@ -2064,12 +2064,14 @@ PPCODE:
     switch (result) {
     case 3:
     default:
+    case -1:
     case 1:
         {
             const char* step_type;
             lua_Integer parm2;
             call_by_tag (outer_slr->L, MYLUA_TAG,
               "local recce, result = ...\n"
+              "if result == -1 then return 'trace', -1, {} end\n"
               "local this = recce.this_step\n"
               "local step_type = this.type\n"
               "local parm2 = -1\n"
@@ -2085,8 +2087,6 @@ PPCODE:
         }
     case 0:
         XSRETURN_EMPTY;
-    case -1:
-        XSRETURN_PV ("trace");
     }
 }
 
