@@ -1884,12 +1884,6 @@ PPCODE:
             break;
           }
 
-        /* Fail fast with a tainted input token value */
-        if (SvTAINTED(token_value)) {
-            croak
-              ("Problem in Marpa::R3: Attempt to use a tainted token value\n"
-              "Marpa::R3 is insecure for use with tainted data\n");
-        }
         call_by_tag (outer_slr->L, MYLUA_TAG,
             "local recce, token_sv = ...;\n"
             "local new_token_ix = #recce.token_values + 1\n"

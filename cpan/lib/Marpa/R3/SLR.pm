@@ -1700,6 +1700,11 @@ sub Marpa::R3::Scanless::R::lexeme_alternative {
             qq{slr->alternative(): symbol "$symbol_name" does not exist});
     }
 
+    if (Scalar::Util::tainted($value[1])) {
+        Marpa::R3::exception(
+              "Problem in Marpa::R3: Attempt to use a tainted token value\n",
+              "Marpa::R3 is insecure for use with tainted data\n");
+    }
     my $result = $thin_slr->g1_alternative( $symbol_id, @value );
     return 1 if $result == $Marpa::R3::Error::NONE;
 
