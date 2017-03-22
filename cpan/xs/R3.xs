@@ -1925,31 +1925,6 @@ PPCODE:
   XSRETURN_IV ((IV)result);
 }
 
- # Returns current position on success, 0 on unthrown failure
-void
-g1_lexeme_complete (outer_slr, start_pos_defined, start_pos, length_defined, length)
-     Outer_R *outer_slr;
-     int start_pos_defined;
-     int start_pos;
-     int length_defined;
-     int length;
-PPCODE:
-{
-    lua_Integer return_value;
-
-        call_by_tag (outer_slr->L, MYLUA_TAG,
-            "recce, start_pos_defined, start_pos, length_is_defined, length_arg = ...\n"
-      "return recce:ext_lexeme_complete(start_pos_defined, start_pos, length_is_defined, length_arg)\n"
-            , "Riiii>i", outer_slr->lua_ref,
-               (lua_Integer) start_pos_defined,
-               (lua_Integer) start_pos,
-               (lua_Integer) length_defined,
-               (lua_Integer) length,
-               &return_value);
-
-    XSRETURN_IV ((IV)return_value);
-}
-
 void
 codepoint( outer_slr )
     Outer_R *outer_slr;

@@ -1741,9 +1741,11 @@ sub Marpa::R3::Scanless::R::lexeme_complete {
         $length = 0;
         $length_defined = 0;
     }
-    my $return_value = $thin_slr->g1_lexeme_complete(
-        $start_defined, $start,
-        $length_defined, $length );
+    my ($return_value) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 'iiii', $start_defined, $start, $length_defined, $length );
+      recce, start_pos_defined, start_pos, length_is_defined, length_arg = ...
+      return recce:ext_lexeme_complete(start_pos_defined, start_pos, length_is_defined, length_arg)
+END_OF_LUA
 
     if ($return_value == 0) {
         $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
