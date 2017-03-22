@@ -1787,19 +1787,6 @@ PPCODE:
   Safefree (outer_slr);
 }
 
-void
-pos( outer_slr )
-    Outer_R *outer_slr;
-PPCODE:
-{
-  lua_Integer perl_pos;
-  call_by_tag (outer_slr->L, MYLUA_TAG,
-      "local recce = ...\n"
-      "return recce.perl_pos\n",
-      "R>i", outer_slr->lua_ref, &perl_pos);
-  XSRETURN_IV((IV)perl_pos);
-}
-
 MODULE = Marpa::R3            PACKAGE = Marpa::R3::Lua
 
 void
