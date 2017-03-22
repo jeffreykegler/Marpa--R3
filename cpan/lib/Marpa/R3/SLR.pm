@@ -959,13 +959,13 @@ END_OF_LUA
         if ( $problem_code eq 'unregistered char' ) {
 
             # Recover by registering character, if we can
-            my ($codepoint) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-                'recce = ...; return recce.codepoint', '');
+            my ($codepoint, $perl_pos) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+                'recce = ...; return recce.codepoint, recce.perl_pos', '');
 
             my $character =
               substr
               ${ $slr->[Marpa::R3::Internal::Scanless::R::P_INPUT_STRING] },
-              $thin_slr->pos(), 1;
+              $perl_pos, 1;
 
             my $character_class_table =
               $slg->[Marpa::R3::Internal::Scanless::G::CHARACTER_CLASS_TABLE];
@@ -1012,7 +1012,7 @@ END_OF_LUA
 
     } ## end OUTER_READ: while (1)
 
-    return $thin_slr->pos();
+    return $slr->pos();
 } ## end sub Marpa::R3::Scanless::R::resume
 
 sub Marpa::R3::Scanless::R::events {
@@ -1050,7 +1050,7 @@ sub Marpa::R3::Scanless::R::read_problem {
     my $trace_file_handle =
         $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
 
-    my $pos      = $thin_slr->pos();
+    my $pos      = $slr->pos();
     my $problem_pos = $pos;
     my $p_string = $slr->[Marpa::R3::Internal::Scanless::R::P_INPUT_STRING];
     my $length_of_string = length ${$p_string};
@@ -1831,14 +1831,15 @@ END_OF_LUA
 sub Marpa::R3::Scanless::R::line_column {
     my ( $slr, $pos ) = @_;
     my $p_input = $slr->[Marpa::R3::Internal::Scanless::R::P_INPUT_STRING];
-    $pos //= $slr->[Marpa::R3::Internal::Scanless::R::SLR_C]->pos();
+    $pos //= $slr->pos();
     return @{Marpa::R3::Internal::line_column($p_input, $pos)};
 } ## end sub Marpa::R3::Scanless::R::line_column
 
 sub Marpa::R3::Scanless::R::pos {
-    my ( $slr ) = @_;
-    my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
-    return $thin_slr->pos();
+    my ($slr) = @_;
+    my ($perl_pos) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        'recce = ...; return recce.perl_pos', '' );
+    return $perl_pos;
 }
 
 sub Marpa::R3::Scanless::R::input_length {
