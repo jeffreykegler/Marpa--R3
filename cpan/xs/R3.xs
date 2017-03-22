@@ -1900,17 +1900,14 @@ PPCODE:
 
 
     call_by_tag (outer_slr->L, MYLUA_TAG,
-        "recce, result, symbol_id, token_ix = ...\n"
+        "recce, symbol_id, token_ix = ...\n"
         "local g1r = recce.lmw_g1r\n"
-        "if result ~= kollos.err.NONE then\n"
-        "    recce.is_external_scanning = true\n"
-        "end\n"
+        "recce.is_external_scanning = true\n"
         "local return_value = g1r:alternative(symbol_id, token_ix, 1)\n"
         "return return_value\n"
         ,
-        "Riii>i",
+        "Rii>i",
         outer_slr->lua_ref,
-        (lua_Integer)result,
         (lua_Integer)symbol_id,
         (lua_Integer)token_ix,
         &result
