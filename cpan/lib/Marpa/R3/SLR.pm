@@ -1910,14 +1910,6 @@ END_OF_LUA
 # Internal methods, not to be documented
 
 # not to be documented
-sub Marpa::R3::Scanless::R::call_by_name {
-    my ( $slr, $name, $signature, @args ) = @_;
-    my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
-    my @results = $thin_slr->call_by_name($name, $signature, @args);
-    return @results;
-}
-
-# not to be documented
 sub Marpa::R3::Scanless::R::call_by_tag {
     my ( $slr, $tag, $codestr, $signature, @args ) = @_;
     my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];

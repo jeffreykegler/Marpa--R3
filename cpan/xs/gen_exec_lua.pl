@@ -199,38 +199,6 @@ my $code = <<'END_OF_MAIN_CODE';
 MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::SLG
 
 void
-call_by_name( outer_slg, name, signature, ... )
-   Outer_G *outer_slg;
-   char* name;
-   char *signature;
-PPCODE:
-{
-    int object_stack_ix;
-    const int first_optional_arg = 3;
-    const int is_method = 1;
-    lua_State *const L = outer_slg->L;
-    const int base_of_stack = marpa_lua_gettop (L);
-    int msghandler_ix;
-    int type;
-
-    marpa_lua_pushcfunction(L, glue_msghandler);
-    msghandler_ix = marpa_lua_gettop(L);
-
-    marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, outer_slg->lua_ref);
-    /* Lua stack: [ grammar_table ] */
-    object_stack_ix = marpa_lua_gettop (L);
-
-    type = marpa_lua_getglobal (L, name);
-    if (type != LUA_TFUNCTION)
-    {
-      croak ("call_by_name(): global %s name is not a function", name);
-    }
-    /* [ grammar_table, function ] */
-
-    === LUA_EXEC_SIG_BODY ===
-}
-
-void
 call_by_tag( outer_slg, tag, codestr, signature, ... )
    Outer_G *outer_slg;
    const char* tag;
@@ -279,41 +247,6 @@ PPCODE:
 }
 
 MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::SLR
-
-void
-call_by_name( outer_slr, name, signature, ... )
-   Outer_R *outer_slr;
-   char* name;
-   char *signature;
-PPCODE:
-{
-    const char * const error_tag = name;
-    int object_stack_ix;
-    const int first_optional_arg = 3;
-    const int is_method = 1;
-    lua_State *const L = outer_slr->L;
-    const int base_of_stack = marpa_lua_gettop (L);
-    int msghandler_ix;
-    int type;
-
-    PERL_UNUSED_VAR(error_tag); /* Silence warning */
-
-    marpa_lua_pushcfunction(L, glue_msghandler);
-    msghandler_ix = marpa_lua_gettop(L);
-
-    marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, outer_slr->lua_ref);
-    /* Lua stack: [ recce_table ] */
-    object_stack_ix = marpa_lua_gettop (L);
-
-    type = marpa_lua_getglobal (L, name);
-    if (type != LUA_TFUNCTION)
-    {
-      croak ("call_by_name(): global %s name is not a function", name);
-    }
-    /* [ recce_table, function ] */
-
-    === LUA_EXEC_SIG_BODY ===
-}
 
 void
 call_by_tag( outer_slr, tag, codestr, signature, ... )
