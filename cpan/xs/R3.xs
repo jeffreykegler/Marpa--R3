@@ -1935,67 +1935,11 @@ g1_lexeme_complete (outer_slr, start_pos_defined, start_pos, length_defined, len
      int length;
 PPCODE:
 {
-    lua_Integer perl_pos;
     lua_Integer return_value;
-    lua_Integer input_length;
-    lua_Integer lexeme_length;
 
         call_by_tag (outer_slr->L, MYLUA_TAG,
             "recce, start_pos_defined, start_pos, length_is_defined, length_arg = ...\n"
-      "local perl_pos = recce.perl_pos\n"
-      "local lexeme_length = -1\n"
-      "if length_is_defined ~= 0 then\n"
-      "     lexeme_length = length_arg\n"
-      "elseif perl_pos == recce.start_of_pause_lexeme then\n"
-      "     lexeme_length = recce.end_of_pause_lexeme - recce.start_of_pause_lexeme\n"
-      "end\n"
-            "if start_pos_defined == 0 then start_pos = recce.perl_pos end\n"
-            "local input_length = #recce.codepoints\n"
-            "if start_pos < 0 then\n"
-            "    start_pos = input_length + start_pos\n"
-            "end\n"
-            "if start_pos < 0 or start_pos > input_length then\n"
-            "   error(string.format(\n"
-            "       'Bad start position in lexeme_complete(): %d',\n"
-            "          start_pos\n"
-            "   ))\n"
-            "end\n"
-            "recce.perl_pos = start_pos\n"
-            "local end_pos\n"
-            "if lexeme_length < 0 then\n"
-            "   end_pos = input_length + lexeme_length + 1\n"
-            "else\n"
-            "   end_pos = start_pos + lexeme_length\n"
-            "end\n"
-            "if end_pos < 0 or end_pos > input_length then\n"
-            "   -- undefined length should not cause this error\n"
-            "   error(string.format(\n"
-            "       'Bad length in lexeme_complete(): %d',\n"
-            "          (length_arg or math.mininteger)\n"
-            "   ))\n"
-            "end\n"
-            "local g1r = recce.lmw_g1r\n"
-            "recce.event_queue = {}\n"
-            "recce.is_external_scanning = false\n"
-            "local result = g1r:earleme_complete()\n"
-            "if result >= 0 then\n"
-            "    recce:g1_convert_events(recce.perl_pos)\n"
-            "    local g1r = recce.lmw_g1r\n"
-            "    local latest_earley_set = g1r:latest_earley_set()\n"
-            "    recce.es_data[latest_earley_set] = { start_pos, lexeme_length }\n"
-            "    recce.perl_pos = start_pos + lexeme_length\n"
-            "    return recce.perl_pos\n"
-            "end\n"
-            "if result == -2 then\n"
-            "    local error_code = recce.slg.lmw_g1g:error_code()\n"
-            "    if error_code == kollos.err.PARSE_EXHAUSTED then\n"
-            "        local q = recce.event_queue\n"
-            "        q[#q+1] = { 'no acceptable input' }\n"
-            "    end\n"
-            "    return 0\n"
-            "end\n"
-            "error('Problem in slr->g1_lexeme_complete(): '\n"
-            "    ..  recce.slg.lmw_g1g:error_description())\n"
+      "return recce:ext_lexeme_complete(start_pos_defined, start_pos, length_is_defined, length_arg)\n"
             , "Riiii>i", outer_slr->lua_ref,
                (lua_Integer) start_pos_defined,
                (lua_Integer) start_pos,
