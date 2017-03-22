@@ -1733,7 +1733,16 @@ END_OF_LUA
 END_OF_LUA
             last DO_ALTERNATIVE;
         }
-        $result = $thin_slr->g1_alternative( $symbol_id, @value );
+            ($result) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+                <<'END_OF_LUA', 'iS', $symbol_id, $value );
+        recce, symbol_id, token_sv = ...
+        local token_ix = #recce.token_values + 1
+        recce.token_values[token_ix] = token_sv
+        local g1r = recce.lmw_g1r
+        recce.is_external_scanning = true
+        local return_value = g1r:alternative(symbol_id, token_ix, 1)
+        return return_value
+END_OF_LUA
     }
     return 1 if $result == $Marpa::R3::Error::NONE;
 

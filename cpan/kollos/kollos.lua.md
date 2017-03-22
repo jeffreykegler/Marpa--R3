@@ -1081,6 +1081,47 @@ These functions are for "external" reading of tokens --
 that is reading tokens by a means other than Marpa's own
 lexer.
 
+##### Notes on tracing
+
+The following is
+from my notes on the XS code, about adding tracing to
+the external reading methods:
+
+TODO: Currently end location is not known at this
+point.  Once it is, add tracing:
+Don't bother with lexeme events as unnecessary
+and counter-productive for this call, which often
+is used to override them
+
+```
+  { '!trace', 'g1 pausing after lexeme', lexeme_start, lexeme_end, lexeme}
+  { '!trace', 'g1 before lexeme event', g1_lexeme}
+
+Yes, at trace level > 0
+ { "!trace", "g1 duplicate lexeme" ...
+ { '!trace', 'g1 accepted lexeme', lexeme_start, lexeme_end, lexeme}
+
+Yes, at trace level > 0
+ { '!trace', 'g1 attempting lexeme', lexeme_start, lexeme_end, lexeme}
+
+Irrelevant, cannot happen
+  { "!trace", "discarded lexeme" }
+
+Irrelevant?  Need to investigate.
+  { '!trace', 'ignored lexeme', g1_lexeme, lexeme_start, lexeme_end}
+
+  Irrelevant, because this call overrides priorities
+  { "!trace", "outprioritized lexeme" }
+
+These are about lexeme expectations, which are
+regarded as known before this call (or alternatively non-
+acceptance is caught here via rejection).  Ignore
+  { '!trace', 'expected lexeme', perl_pos, lexeme, assertion }
+
+```
+
+##### Methods
+
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.ext_lexeme_complete(recce,
