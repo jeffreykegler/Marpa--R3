@@ -272,15 +272,21 @@ END_OF_LUA
 
     } ## end EVENT: for my $event_name ( keys %{$event_is_active_arg} )
 
-    $thin_slr->start_input();
-    if (0) {
-        $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', '' );
-        local grammar = ...
-        error( string.format('Recognizer start of input failed: %s',
-            grammar.lmw_g1g.error_description()))
+        local recce = ...
+        local g1r = recce.lmw_g1r
+        local return_value = g1r:start_input()
+        if return_value == -1 then
+            error( string.format('Recognizer start of input failed: %s',
+                recce.slg.lmw_g1g.error_description()))
+        end
+        if return_value < 0 then
+            error( string.format('Problem in start_input(): %s',
+                recce.slg.lmw_g1g.error_description()))
+        end
+        recce:g1_convert_events(recce.perl_pos)
 END_OF_LUA
-    }
 
     {
         my ($trace_terminals) = $slr->call_by_tag(

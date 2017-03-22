@@ -1812,31 +1812,6 @@ PPCODE:
     XSRETURN_UV ((UV) codepoint);
 }
 
-void
-start_input( outer_slr )
-    Outer_R *outer_slr;
-PPCODE:
-{
-
-    call_by_tag (outer_slr->L, MYLUA_TAG,
-        "recce = ...\n"
-        "local g1r = recce.lmw_g1r\n"
-        "local return_value = g1r:start_input()\n"
-        "if return_value == -1 then\n"
-        "    error( string.format('Recognizer start of input failed: %s',\n"
-        "        recce.slg.lmw_g1g.error_description()))\n"
-        "end\n"
-        "if return_value < 0 then\n"
-        "    error( string.format('Problem in start_input(): %s',\n"
-        "        recce.slg.lmw_g1g.error_description()))\n"
-        "end\n"
-        "recce:g1_convert_events(recce.perl_pos)\n"
-        ,
-        "R>",
-        outer_slr->lua_ref
-    );
-}
-
 MODULE = Marpa::R3            PACKAGE = Marpa::R3::Lua
 
 void
