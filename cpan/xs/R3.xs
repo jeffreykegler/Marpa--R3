@@ -1850,24 +1850,6 @@ PPCODE:
     case 3:
       {
         SV *token_value = ST (2);
-        if (IS_PERL_UNDEF (token_value))
-          { lua_Integer value_is_undef;
-            call_by_tag (outer_slr->L, MYLUA_TAG,
-                "recce = ...\n"
-                "local g1r = recce.lmw_g1r\n"
-                "local kollos = getmetatable(g1r).kollos\n"
-                "local defines = kollos.defines\n"
-                "return defines.TOKEN_VALUE_IS_UNDEF\n",
-                "R>i",
-                outer_slr->lua_ref,
-                &value_is_undef
-            );
-
-
-            token_ix = value_is_undef;    /* default */
-            break;
-          }
-
         call_by_tag (outer_slr->L, MYLUA_TAG,
             "local recce, token_sv = ...;\n"
             "local new_token_ix = #recce.token_values + 1\n"

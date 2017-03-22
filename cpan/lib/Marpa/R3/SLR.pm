@@ -1720,6 +1720,19 @@ sub Marpa::R3::Scanless::R::lexeme_alternative {
 END_OF_LUA
             last DO_ALTERNATIVE;
         }
+        my $value = $value[0];
+        if ( not defined $value ) {
+            ($result) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+                <<'END_OF_LUA', 'i', $symbol_id );
+        recce, symbol_id = ...
+        local token_ix = _M.defines.TOKEN_VALUE_IS_UNDEF
+        local g1r = recce.lmw_g1r
+        recce.is_external_scanning = true
+        local return_value = g1r:alternative(symbol_id, token_ix, 1)
+        return return_value
+END_OF_LUA
+            last DO_ALTERNATIVE;
+        }
         $result = $thin_slr->g1_alternative( $symbol_id, @value );
     }
     return 1 if $result == $Marpa::R3::Error::NONE;
