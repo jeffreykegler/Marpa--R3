@@ -272,7 +272,8 @@ END_OF_LUA
 
     } ## end EVENT: for my $event_name ( keys %{$event_is_active_arg} )
 
-    if ( not $thin_slr->start_input() ) {
+    $thin_slr->start_input();
+    if (0) {
         $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', '' );
         local grammar = ...

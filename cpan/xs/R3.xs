@@ -1817,34 +1817,24 @@ start_input( outer_slr )
     Outer_R *outer_slr;
 PPCODE:
 {
-  lua_Integer gp_result;
 
     call_by_tag (outer_slr->L, MYLUA_TAG,
         "recce = ...\n"
         "local g1r = recce.lmw_g1r\n"
         "local return_value = g1r:start_input()\n"
-        "return return_value\n"
-        ,
-        "R>i",
-        outer_slr->lua_ref,
-        &gp_result
-    );
-
-  if ( gp_result == -1 ) { XSRETURN_UNDEF; }
-  if ( gp_result < 0 ) {
-    croak( "Problem in r->start_input(): %s",
-      slr_g1_error (outer_slr));
-  }
-
-    call_by_tag (outer_slr->L, MYLUA_TAG,
-        "recce = ...\n"
+        "if return_value == -1 then\n"
+        "    error( string.format('Recognizer start of input failed: %s',\n"
+        "        recce.slg.lmw_g1g.error_description()))\n"
+        "end\n"
+        "if return_value < 0 then\n"
+        "    error( string.format('Problem in start_input(): %s',\n"
+        "        recce.slg.lmw_g1g.error_description()))\n"
+        "end\n"
         "recce:g1_convert_events(recce.perl_pos)\n"
         ,
         "R>",
         outer_slr->lua_ref
     );
-
-  XPUSHs (sv_2mortal (newSViv ((IV)gp_result)));
 }
 
 MODULE = Marpa::R3            PACKAGE = Marpa::R3::Lua
