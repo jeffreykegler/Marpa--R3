@@ -157,76 +157,6 @@ static void
 call_by_tag (lua_State * L, const char* tag, const char *codestr,
   const char *sig, ...);
 
-/* Note: returned string is in a mortal SV --
- * copy it if you want want to save it.
- */
-static const char *
-slg_l0_error (Outer_G * outer_slg) PERL_UNUSED_DECL;
-static const char *
-slg_l0_error (Outer_G * outer_slg)
-{
-    dTHX;
-    SV *error_description;
-    call_by_tag (outer_slg->L, MYLUA_TAG,
-        "slg = ...\n"
-        "local l0g = slg.lmw_l0g\n"
-        "return l0g:error_description()\n", "G>C",
-        outer_slg->lua_ref, &error_description);
-    return SvPV_nolen (error_description);
-}
-
-/* Note: returned string is in a mortal SV --
- * copy it if you want want to save it.
- */
-static const char *
-slr_l0_error (Outer_R * outer_slr) PERL_UNUSED_DECL;
-static const char *
-slr_l0_error (Outer_R * outer_slr)
-{
-    dTHX;
-    SV *error_description;
-    call_by_tag (outer_slr->L, MYLUA_TAG,
-        "recce = ...\n"
-        "local l0g = recce.slg.lmw_l0g\n"
-        "return l0g:error_description()\n", "R>C",
-        outer_slr->lua_ref, &error_description);
-    return SvPV_nolen (error_description);
-}
-
-/* Note: returned string is in a mortal SV --
- * copy it if you want want to save it.
- */
-static const char *
-slg_g1_error (Outer_G * outer_slg) PERL_UNUSED_DECL;
-static const char *
-slg_g1_error (Outer_G * outer_slg)
-{
-    dTHX;
-    SV *error_description;
-    call_by_tag (outer_slg->L, MYLUA_TAG,
-        "slg = ...\n"
-        "local g1g = slg.lmw_g1g\n"
-        "return g1g:error_description()\n", "G>C",
-        outer_slg->lua_ref, &error_description);
-    return SvPV_nolen (error_description);
-}
-
-/* Note: returned string is in a mortal SV --
- * copy it if you want want to save it.
- */
-static const char *
-slr_g1_error (Outer_R * outer_slr)
-{
-    dTHX;
-    SV *error_description;
-    call_by_tag (outer_slr->L, MYLUA_TAG,
-        "recce = ...\n"
-        "local g1g = recce.slg.lmw_g1g\n"
-        "return g1g:error_description()\n", "R>C",
-        outer_slr->lua_ref, &error_description);
-    return SvPV_nolen (error_description);
-}
-
 /* Wrapper to use vwarn with libmarpa */
 static int marpa_r3_warn(const char* format, ...)
 {
@@ -1510,25 +1440,6 @@ static void recursive_coerce_to_lua(
 }
 
 /* Static recognizer methods */
-
-/* Return values:
- * 1 or greater: reserved for an event count, to deal with multiple events
- *   when and if necessary
- * 0: success: a full reading of the input, with nothing to report.
- * -1: a character was rejected
- * -2: an unregistered character was found
- * -3: earleme_complete() reported an exhausted parse on failure
- * -4: we are tracing, character by character
- * -5: earleme_complete() reported an exhausted parse on success
- */
-
-#define U_READ_OK "ok"
-#define U_READ_REJECTED_CHAR "rejected char"
-#define U_READ_UNREGISTERED_CHAR "unregistered char"
-#define U_READ_EXHAUSTED_ON_FAILURE "exhausted on failure"
-#define U_READ_TRACING "trace"
-#define U_READ_EXHAUSTED_ON_SUCCESS "exhausted on success"
-#define U_READ_INVALID_CHAR "invalid char"
 
 /* Static SLR methods */
 
