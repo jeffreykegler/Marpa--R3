@@ -1707,9 +1707,10 @@ sub Marpa::R3::Scanless::R::lexeme_alternative {
               "Marpa::R3 is insecure for use with tainted data\n");
     }
     my $result;
-    if (scalar @value == 0) {
-        ($result) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 'i', $symbol_id);
+  DO_ALTERNATIVE: {
+        if ( scalar @value == 0 ) {
+            ($result) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+                <<'END_OF_LUA', 'i', $symbol_id );
         recce, symbol_id = ...
         local token_ix = _M.defines.TOKEN_VALUE_IS_LITERAL
         local g1r = recce.lmw_g1r
@@ -1717,7 +1718,8 @@ sub Marpa::R3::Scanless::R::lexeme_alternative {
         local return_value = g1r:alternative(symbol_id, token_ix, 1)
         return return_value
 END_OF_LUA
-    } else {
+            last DO_ALTERNATIVE;
+        }
         $result = $thin_slr->g1_alternative( $symbol_id, @value );
     }
     return 1 if $result == $Marpa::R3::Error::NONE;
