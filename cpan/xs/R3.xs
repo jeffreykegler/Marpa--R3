@@ -1847,22 +1847,6 @@ PPCODE:
   lua_Integer token_ix;
   switch (items)
     {
-    case 2:
-    { lua_Integer value_is_literal;
-            call_by_tag (outer_slr->L, MYLUA_TAG,
-                "recce = ...\n"
-                "local g1r = recce.lmw_g1r\n"
-                "local kollos = getmetatable(g1r).kollos\n"
-                "local defines = kollos.defines\n"
-                "return defines.TOKEN_VALUE_IS_LITERAL\n",
-                "R>i",
-                outer_slr->lua_ref,
-                &value_is_literal
-            );
-
-      token_ix = value_is_literal;        /* default */
-      }
-      break;
     case 3:
       {
         SV *token_value = ST (2);
