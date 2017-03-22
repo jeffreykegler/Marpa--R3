@@ -1800,18 +1800,6 @@ PPCODE:
   XSRETURN_IV((IV)perl_pos);
 }
 
-void
-codepoint( outer_slr )
-    Outer_R *outer_slr;
-PPCODE:
-{
-    lua_Integer codepoint;
-    call_by_tag (outer_slr->L, MYLUA_TAG,
-        "recce = ...\n"
-        "return recce.codepoint\n", "R>i", outer_slr->lua_ref, &codepoint);
-    XSRETURN_UV ((UV) codepoint);
-}
-
 MODULE = Marpa::R3            PACKAGE = Marpa::R3::Lua
 
 void
