@@ -1052,7 +1052,7 @@ END_OF_LUA
             ( $discard_symbol_id ) = $slg->l0_rule_expand($lexer_rule_id);
         }
 
-      $thin_slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA',
     local g, lexer_rule_id, g1_lexeme_id, assertion_id, discard_symbol_id = ...
     if lexer_rule_id >= 0 then
@@ -1322,7 +1322,7 @@ END_OF_LUA
     # Here I go through the events for situations where there was no
     # hard error returned from libmarpa
       my ($loop_rule_count) = 
-      $thin_slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 's', $lmw_name );
         local grammar, lmw_name = ...
         local loop_rule_count = 0
@@ -1414,7 +1414,7 @@ sub assign_G1_symbol {
     }
 
     ($symbol_id) =
-      $thin_slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 's', $name );
     local g, symbol_name = ...
     local lmw_g = g.lmw_g1g
@@ -1439,7 +1439,7 @@ END_OF_LUA
         if ( $property eq 'terminal' ) {
             my $value = $options->{$property};
 
-      $thin_slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 's', $symbol_id, ($value ? 1 : 0));
     local g, symbol_id, value = ...
     local g1g = g.lmw_g1g
@@ -1454,7 +1454,7 @@ END_OF_LUA
                 if not Scalar::Util::looks_like_number($value)
                     or int($value) != $value;
 
-      $thin_slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 's', $symbol_id, $value);
     local g, symbol_id, value = ...
     local g1g = g.lmw_g1g
@@ -1482,7 +1482,7 @@ sub assign_L0_symbol {
     }
 
     ($symbol_id) =
-      $thin_slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 's', $name );
     local g, symbol_name = ...
     local lmw_g = g.lmw_l0g
@@ -1505,7 +1505,7 @@ END_OF_LUA
         if ( $property eq 'eager' ) {
             my $value = $options->{$property};
 
-      $thin_slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'ii', $symbol_id, ($value ? 1 : 0));
     local g, symbol_id, eager = ...
     if eager > 0 then
@@ -1518,7 +1518,7 @@ END_OF_LUA
         if ( $property eq 'terminal' ) {
             my $value = $options->{$property};
 
-      $thin_slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 's', $symbol_id, ($value ? 1 : 0));
     local g, symbol_id, value = ...
     local l0g = g.lmw_l0g
@@ -1533,7 +1533,7 @@ END_OF_LUA
                 if not Scalar::Util::looks_like_number($value)
                     or int($value) != $value;
 
-      $thin_slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 's', $symbol_id, $value);
     local g, symbol_id, value = ...
     local l0g = g.lmw_l0g
@@ -1617,7 +1617,7 @@ sub add_G1_user_rule {
     $rhs_names //= [];
 
     my ($default_rank) =
-          $thin_slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ), <<'END_OF_LUA', '');
+          $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ), <<'END_OF_LUA', '');
     local grammar = ...
     return grammar.lmw_g1g:default_rank()
 END_OF_LUA
@@ -1645,7 +1645,7 @@ END_OF_LUA
     if ($is_ordinary_rule) {
 
         ($base_rule_id) =
-          $thin_slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+          $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
             <<'END_OF_LUA', 'i', [ $lhs_id, @rhs_ids ] );
     local g, rule  = ...
     -- remove the test for nil or less than zero
@@ -1683,7 +1683,7 @@ END_OF_LUA
         };
 
       ($base_rule_id) = 
-      $thin_slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'i', $arg_hash);
     local g, arg_hash = ...
     -- print('arg_hash: ', inspect(arg_hash))
@@ -1703,7 +1703,7 @@ END_OF_LUA
     if ( not defined $base_rule_id or $base_rule_id < 0 ) {
         my $rule_description = rule_describe( $lhs_name, $rhs_names );
         my ($ok, $problem) =
-        $thin_slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
             <<'END_OF_LUA', 's', $rule_description );
             local grammar, rule_description = ...
             local g1g = grammar.lmw_g1g
@@ -1727,7 +1727,7 @@ END_OF_LUA
     $tracer->[Marpa::R3::Internal::Trace::G::MASK_BY_IRLID]->[$base_rule_id] =
         $xbnf->[Marpa::R3::Internal::XBNF::MASK];
 
-      $thin_slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'iii',
         local grammar, rule_id, ranking_is_high, rank = ...
         local g1g = grammar.lmw_g1g
@@ -1785,7 +1785,7 @@ sub add_L0_user_rule {
     $rhs_names //= [];
 
     my ($default_rank) =
-          $thin_slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ), <<'END_OF_LUA', '');
+          $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ), <<'END_OF_LUA', '');
     local grammar = ...
     return grammar.lmw_l0g:default_rank()
 END_OF_LUA
@@ -1812,7 +1812,7 @@ END_OF_LUA
     if ($is_ordinary_rule) {
 
         ($base_rule_id) =
-          $thin_slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+          $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
             <<'END_OF_LUA', 'i', [ $lhs_id, @rhs_ids ] );
     local g, rule  = ...
     -- remove the test for nil or less than zero
@@ -1851,7 +1851,7 @@ END_OF_LUA
         };
 
       ($base_rule_id) = 
-      $thin_slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'i', $arg_hash);
     local g, arg_hash = ...
     -- print('arg_hash: ', inspect(arg_hash))
@@ -1872,7 +1872,7 @@ END_OF_LUA
     if ( not defined $base_rule_id or $base_rule_id < 0 ) {
         my $rule_description = rule_describe( $lhs_name, $rhs_names );
         my ($ok, $problem) =
-        $thin_slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
             <<'END_OF_LUA', 's', $rule_description );
             local grammar, rule_description = ...
             local l0g = grammar.lmw_l0g
@@ -1896,7 +1896,7 @@ END_OF_LUA
     $tracer->[Marpa::R3::Internal::Trace::G::MASK_BY_IRLID]->[$base_rule_id] =
         $xbnf->[Marpa::R3::Internal::XBNF::MASK];
 
-      $thin_slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'iii',
         local grammar, rule_id, ranking_is_high, rank = ...
         local l0g = grammar.lmw_l0g
