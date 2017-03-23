@@ -361,6 +361,45 @@ Lua code
 should simply copy the table object -- in Lua this
 is a reference and Lua's GC will do the right thing.
 
+```
+    -- miranda: section+ kollos table methods
+    static int lca_registry_get(lua_State* L)
+    {
+      /* Lua stack [ recce_ref ] */
+      lua_Integer recce_ref = marpa_luaL_checkinteger(L, 1);
+      marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, recce_ref);
+      /* Lua stack [ recce_ref, recce_table ] */
+      return 1;
+    }
+
+    static int
+    lca_register(lua_State* L)
+    {
+        marpa_luaL_checktype(L, 1, LUA_TTABLE);
+        marpa_luaL_checkany(L, 2);
+        marpa_lua_pushinteger(L, marpa_luaL_ref(L, 1));
+        return 1;
+    }
+
+    static int
+    lca_unregister(lua_State* L)
+    {
+        marpa_luaL_checktype(L, 1, LUA_TTABLE);
+        marpa_luaL_checkinteger(L, 2);
+        marpa_luaL_unref(L, 1, (int)marpa_lua_tointeger(L, 2));
+        return 0;
+    }
+
+    -- miranda: section+ luaL_Reg definitions
+    static const struct luaL_Reg kollos_funcs[] = {
+      { "registry_get", lca_registry_get },
+      { "register", lca_register },
+      { "unregister", lca_unregister },
+      { NULL, NULL },
+    };
+
+```
+
 `kollos_robrefinc()`
 creates a new reference
 to a Kollos registry object,
@@ -3815,6 +3854,7 @@ Luacheck declarations
     -- miranda: insert metatable keys
     -- miranda: insert non-standard wrappers
     -- miranda: insert object userdata gc methods
+    -- miranda: insert kollos table methods
     -- miranda: insert luaL_reg definitions
     -- miranda: insert object constructors
 
@@ -5221,6 +5261,10 @@ Marpa::R3.
         marpa_lua_setfield (L, kollos_table_stack_ix, "upvalues");
 
         --miranda: insert create kollos libmarpa wrapper class tables
+
+          marpa_lua_pushvalue(L, kollos_table_stack_ix);
+          marpa_lua_pushvalue(L, upvalue_stack_ix);
+          marpa_luaL_setfuncs(L, kollos_funcs, 1);
 
           /* Create the SLIF grammar metatable */
           marpa_luaL_newlibtable(L, slg_methods);

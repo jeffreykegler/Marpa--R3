@@ -176,27 +176,6 @@ static int marpa_r3_warn(const char* format, ...)
 #define MT_NAME_AV "Marpa_av"
 #define MT_NAME_ARRAY "Marpa_array"
 
-/* Make the Lua reference facility available from
- * Lua itself
- */
-static int
-xlua_ref(lua_State* L)
-{
-    marpa_luaL_checktype(L, 1, LUA_TTABLE);
-    marpa_luaL_checkany(L, 2);
-    marpa_lua_pushinteger(L, marpa_luaL_ref(L, 1));
-    return 1;
-}
-
-static int
-xlua_unref(lua_State* L)
-{
-    marpa_luaL_checktype(L, 1, LUA_TTABLE);
-    marpa_luaL_checkinteger(L, 2);
-    marpa_luaL_unref(L, 1, (int)marpa_lua_tointeger(L, 2));
-    return 0;
-}
-
 /* Returns 0 if visitee_ix "thing" is already "seen",
  * otherwise, sets it "seen" and returns 1.
  * A small fixed number of stack entries are used
@@ -1031,8 +1010,6 @@ xlua_recce_step_meth (lua_State * L)
 
 static const struct luaL_Reg marpa_slr_meths[] = {
     {"step", xlua_recce_step_meth},
-    {"ref", xlua_ref},
-    {"unref", xlua_unref},
     {NULL, NULL},
 };
 
@@ -1040,17 +1017,7 @@ static const struct luaL_Reg marpa_slg_meths[] = {
     {NULL, NULL},
 };
 
-static int xlua_recce_func(lua_State* L)
-{
-  /* Lua stack [ recce_ref ] */
-  lua_Integer recce_ref = marpa_luaL_checkinteger(L, 1);
-  marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, recce_ref);
-  /* Lua stack [ recce_ref, recce_table ] */
-  return 1;
-}
-
 static const struct luaL_Reg marpa_funcs[] = {
-    {"recce", xlua_recce_func},
     {NULL, NULL},
 };
 
