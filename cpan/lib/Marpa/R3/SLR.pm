@@ -157,10 +157,11 @@ sub Marpa::R3::Scanless::R::new {
     $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE] =
          $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE];
 
-    my $thin_slr = Marpa::R3::Thin::SLR->new(
+    my ($thin_slr, $regix) = Marpa::R3::Thin::SLR->new(
         $slg->[Marpa::R3::Internal::Scanless::G::C]
     );
     $slr->[Marpa::R3::Internal::Scanless::R::SLR_C]      = $thin_slr;
+    $slr->[Marpa::R3::Internal::Scanless::R::REGIX]      = $regix;
 
     $slr->reset_evaluation();
 

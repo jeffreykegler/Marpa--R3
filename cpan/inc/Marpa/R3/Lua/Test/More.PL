@@ -69,7 +69,9 @@ sub load_me
     Test.More = load_fn()
     package.loaded['Test.More'] = Test.More
 END_OF_LUA
-    $lua_interp->raw_exec($script,
+    $lua_interp->call_by_tag(-1,
+         ( '@' . __FILE__ . ':' . __LINE__ ),
+    $script, 'SS',
     $Marpa::R3::Lua::Test::Builder::loader,
     $Marpa::R3::Lua::Test::More::loader)
 }

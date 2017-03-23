@@ -16,7 +16,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-use Test::More tests => 45;
+use Test::More tests => 54;
 use English qw( -no_match_vars );
 use POSIX qw(setlocale LC_ALL);
 
@@ -200,6 +200,24 @@ sub do_lua_g_test {
 
 for my $test_data (@tests) {
     do_lua_g_test(@{$test_data});
+}
+
+my $r_regix = $recce->regix();
+
+sub do_lua_r_test {
+    my ($tag, $code, $signature, $args_fn, $expected, $test_name) = @_;
+    my $args = &{$args_fn}();
+    $code =~ s/%OBJECT%,\s*/recce, /;
+    # We modified $code, so we must modify $tag!!
+    $tag = "Lua R:$tag";
+    $test_name //= qq{"$code"};
+    $test_name = "Lua G: $test_name";
+    my @actual = $marpa_lua->call_by_tag($r_regix, $tag, $code, $signature, @{$args});
+    Test::More::is_deeply( \@actual, $expected, $test_name);
+}
+
+for my $test_data (@tests) {
+    do_lua_r_test(@{$test_data});
 }
 
 # Marpa::R3::Lua::raw_exec("collectgarbage()");
