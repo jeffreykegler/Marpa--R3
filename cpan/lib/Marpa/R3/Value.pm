@@ -1026,7 +1026,7 @@ END_OF_LUA
     }
 
     # state $op_lua = Marpa::R3::Thin::op('lua');
-    my ($op_lua) = $thin_slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+    my ($op_lua) = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', '' );
         return kollos.defines.MARPA_OP_LUA
 END_OF_LUA

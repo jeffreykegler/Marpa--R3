@@ -239,6 +239,10 @@ __DATA__
 
     :package=Marpa::R3::Internal::Scanless::G
 
+    L { Lua Interpreter }
+    REGIX { Registry index in Lua interpreter --
+        a valid Lua index but not a pseudo-index. }
+
     C { The thin version of this object }
 
     { The "per libmarpa grammar objects", aka "tracers", are objects
@@ -293,6 +297,9 @@ __DATA__
 
     SLG
 
+    L { Lua Interpreter }
+    REGIX { Registry index in Lua interpreter --
+        a valid Lua index but not a pseudo-index. }
     PHASE {
         "initial", "read", "value"
     }

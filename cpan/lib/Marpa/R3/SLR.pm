@@ -1956,7 +1956,7 @@ END_OF_LUA
 sub Marpa::R3::Scanless::R::call_by_tag {
     my ( $slr, $tag, $codestr, $signature, @args ) = @_;
     my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
-    $DB::single = 1 if grep { not defined $_ } @args;
+    # $DB::single = 1 if grep { not defined $_ } @args;
     my @results = $thin_slr->call_by_tag($tag, $codestr, $signature, @args);
     return @results;
 }
