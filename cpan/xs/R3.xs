@@ -1513,6 +1513,7 @@ PPCODE:
     new_sv = sv_newmortal ();
     sv_setref_pv (new_sv, scanless_g_class_name, (void *) outer_slg);
     XPUSHs (new_sv);
+    XPUSHs (sv_2mortal(newSViv((IV)outer_slg->lua_ref)));
 }
 
 void

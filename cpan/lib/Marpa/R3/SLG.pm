@@ -228,8 +228,8 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     # Pre-lexer G1 processing
 
     my $kollos = Marpa::R3::Lua->new();
-    my $thin_slg = $slg->[Marpa::R3::Internal::Scanless::G::C] =
-      Marpa::R3::Thin::SLG->new($kollos);
+    my ($thin_slg, $lua_ref)  = Marpa::R3::Thin::SLG->new($kollos);
+    $slg->[Marpa::R3::Internal::Scanless::G::C] = $thin_slg;
 
     $slg->call_by_tag(
         ('@' .__FILE__ . ':' .  __LINE__),
