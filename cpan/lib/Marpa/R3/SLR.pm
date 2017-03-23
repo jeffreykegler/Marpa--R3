@@ -162,6 +162,8 @@ sub Marpa::R3::Scanless::R::new {
     );
     $slr->[Marpa::R3::Internal::Scanless::R::SLR_C]      = $thin_slr;
     $slr->[Marpa::R3::Internal::Scanless::R::REGIX]      = $regix;
+    $slr->[Marpa::R3::Internal::Scanless::R::L]      =
+        $slg->[Marpa::R3::Internal::Scanless::G::L];
 
     $slr->reset_evaluation();
 
@@ -1956,9 +1958,10 @@ END_OF_LUA
 # not to be documented
 sub Marpa::R3::Scanless::R::call_by_tag {
     my ( $slr, $tag, $codestr, $signature, @args ) = @_;
-    my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
+    my $lua = $slr->[Marpa::R3::Internal::Scanless::R::L];
+    my $regix = $slr->[Marpa::R3::Internal::Scanless::R::REGIX];
     # $DB::single = 1 if grep { not defined $_ } @args;
-    my @results = $thin_slr->call_by_tag($tag, $codestr, $signature, @args);
+    my @results = $lua->call_by_tag($regix, $tag, $codestr, $signature, @args);
     return @results;
 }
 

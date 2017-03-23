@@ -1998,7 +1998,6 @@ sub Marpa::R3::Scanless::G::l0_rule_show
 
 sub Marpa::R3::Scanless::G::call_by_tag {
     my ( $slg, $tag, $codestr, $sig, @args ) = @_;
-    my $thin_slg = $slg->[Marpa::R3::Internal::Scanless::G::C];
     my $lua = $slg->[Marpa::R3::Internal::Scanless::G::L];
     my $regix = $slg->[Marpa::R3::Internal::Scanless::G::REGIX];
     $DB::single = 1 if not defined $tag;
