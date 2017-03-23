@@ -1999,11 +1999,13 @@ sub Marpa::R3::Scanless::G::l0_rule_show
 sub Marpa::R3::Scanless::G::call_by_tag {
     my ( $slg, $tag, $codestr, $sig, @args ) = @_;
     my $thin_slg = $slg->[Marpa::R3::Internal::Scanless::G::C];
+    my $lua = $slg->[Marpa::R3::Internal::Scanless::G::L];
+    my $regix = $slg->[Marpa::R3::Internal::Scanless::G::REGIX];
     $DB::single = 1 if not defined $tag;
     $DB::single = 1 if not defined $codestr;
     $DB::single = 1 if not defined $sig;
     $DB::single = 1 if grep { not defined $_ } @args;
-    my @results = $thin_slg->call_by_tag($tag, $codestr, $sig, @args);
+    my @results = $lua->call_by_tag($regix, $tag, $codestr, $sig, @args);
     return @results;
 }
 
