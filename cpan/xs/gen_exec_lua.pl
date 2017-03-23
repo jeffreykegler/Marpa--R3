@@ -358,65 +358,6 @@ PPCODE:
     === LUA_EXEC_BODY ===
 }
 
-void
-call_by_tag( lua_wrapper, lua_ref, tag, codestr, signature, ... )
-   Marpa_Lua* lua_wrapper;
-   int lua_ref;
-   const char* tag;
-   const char* codestr;
-   const char *signature;
-PPCODE:
-{
-    const char * const error_tag = tag;
-
-    /* 0 is never an acceptable index,
-     * but this suppresses the GCC warning
-     */
-    int object_stack_ix = 0;
-
-    const int first_optional_arg = 5;
-    const int is_method = (lua_ref > 0);
-    lua_State *const L = lua_wrapper->L;
-    const int base_of_stack = marpa_lua_gettop (L);
-    int msghandler_ix;
-    int cache_ix;
-    int type;
-
-    PERL_UNUSED_VAR(error_tag); /* Silence warning */
-
-    marpa_lua_pushcfunction(L, glue_msghandler);
-    msghandler_ix = marpa_lua_gettop(L);
-
-    if (lua_ref > 0) {
-        marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, lua_ref);
-        /* Lua stack: [ recce_table ] */
-        object_stack_ix = marpa_lua_gettop (L);
-    }
-
-    marpa_lua_getglobal (L, "glue");
-    marpa_lua_getfield (L, -1, "code_by_tag");
-    cache_ix = marpa_lua_gettop(L);
-    type = marpa_lua_getfield (L, cache_ix, tag);
-
-    /*    warn("%s %d", __FILE__, __LINE__); */
-    if (type != LUA_TFUNCTION) {
-
-        const int status =
-            marpa_luaL_loadbuffer (L, codestr, strlen (codestr), tag);
-        if (status != 0) {
-            const char *error_string = marpa_lua_tostring (L, -1);
-            marpa_lua_pop (L, 1);
-            croak ("Marpa::R3 error in call_by_tag(): %s", error_string);
-        }
-        marpa_lua_pushvalue (L, -1);
-        marpa_lua_setfield (L, cache_ix, tag);
-    }
-
-    /* [ recce_table, function ] */
-
-    === LUA_EXEC_SIG_BODY ===
-}
-
 END_OF_MAIN_CODE
 
 $code =~ s/=== \s* LUA_EXEC_BODY \s* === \s /$lua_exec_body/xsmg;

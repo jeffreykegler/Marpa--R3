@@ -16,7 +16,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-use Test::More tests => 36;
+use Test::More tests => 45;
 use English qw( -no_match_vars );
 use POSIX qw(setlocale LC_ALL);
 
@@ -82,23 +82,35 @@ END_OF_SOURCE
 
 my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
 
+# A function is used to generate the args, because some tests modify them
+# in-place.  The function ensures that each test has a fresh copy.
+
 my @tests = ();
 push @tests, [ ( __FILE__ . ':' . __LINE__ ), 'return 42', '',
-    [], ['42'] ];
+    sub { return [] },
+    ['42'] ];
 push @tests, [
     ( __FILE__ . ':' . __LINE__ ),
     'function taxicurry(fact2) return 9^3 + fact2 end',
-    '', [], []
+    '',
+    sub { return [] },
+    []
 ];
 push @tests, [
     ( __FILE__ . ':' . __LINE__ ),
     'return taxicurry(10^3)',
-    '', [], [1729]
+    '',
+    sub { return [] },
+    [1729]
 ];
 push @tests, [
     ( __FILE__ . ':' . __LINE__ ),
-    "local %OBJECT%, x = ...; x[0] = 42; return x",
-    'S', [ [] ], [ [42] ]
+    "local %OBJECT%, x = ...;
+    print('x: ', inspect(x))
+    x[0] = 42; return x",
+    'S',
+    sub { return [ [] ] },
+    [ [42] ]
 ];
 push @tests, [
     ( __FILE__ . ':' . __LINE__ ),
@@ -122,7 +134,7 @@ push @tests, [
     ( __FILE__ . ':' . __LINE__ ),
     "local %OBJECT%, x = ...; marpa.sv.fill(x, 1); return x",
     'S',
-    [ [ 1, 2, 3, 4 ] ],
+    sub { return [ [ 1, 2, 3, 4 ] ] },
     [ [ 1, 2 ] ],
     "Fill method #1"
 ];
@@ -130,23 +142,24 @@ push @tests, [
     ( __FILE__ . ':' . __LINE__ ),
     "local %OBJECT%, x = ...; marpa.sv.fill(x, 4); return x",
     'S',
-    [ [ 1, 2, 3, 4 ] ],
+    sub { return [ [ 1, 2, 3, 4 ] ] },
     [ [ 1, 2, 3, 4, undef ] ],
     "Fill method #2"
 ];
 push @tests, [
     ( __FILE__ . ':' . __LINE__ ),
     "local %OBJECT%, x = ...; marpa.sv.fill(x, -1); return x",
-    'S', [ [ 1, 2, 3, 4 ] ],
+    'S',
+    sub { return [ [ 1, 2, 3, 4 ] ] },
     [ [] ], "Fill method #2"
 ];
 
 sub do_recce_test {
-    my ($tag, $code, $signature, $args, $expected, $test_name) = @_;
-    if (ref $args eq 'CODE') { $args = &{$args}() };
+    my ($tag, $code, $signature, $args_fn, $expected, $test_name) = @_;
+    my $args = &{$args_fn}();
+    $code =~ s/%OBJECT%,\s*/recce, /;
     $test_name //= qq{"$code"};
     $test_name = "Recce: $test_name";
-    $code =~ s/%OBJECT%,/recce,/;
     my @actual = $recce->call_by_tag($tag, $code, $signature, @{$args});
     Test::More::is_deeply( \@actual, $expected, $test_name);
 }
@@ -156,11 +169,13 @@ for my $test_data (@tests) {
 }
 
 sub do_lua_test {
-    my ($tag, $code, $signature, $args, $expected, $test_name) = @_;
-    if (ref $args eq 'CODE') { $args = &{$args}() };
+    my ($tag, $code, $signature, $args_fn, $expected, $test_name) = @_;
+    my $args = &{$args_fn}();
+    $code =~ s/%OBJECT%,\s*//;
+    # We modified $code, so we must modify $tag!!
+    $tag = "Lua:$tag";
     $test_name //= qq{"$code"};
     $test_name = "Lua static: $test_name";
-    $code =~ s/%OBJECT%,//;
     my @actual = $marpa_lua->call_by_tag(-1, $tag, $code, $signature, @{$args});
     Test::More::is_deeply( \@actual, $expected, $test_name);
 }
@@ -169,6 +184,23 @@ for my $test_data (@tests) {
     do_lua_test(@{$test_data});
 }
 
+my $g_regix = $grammar->regix();
+
+sub do_lua_g_test {
+    my ($tag, $code, $signature, $args_fn, $expected, $test_name) = @_;
+    my $args = &{$args_fn}();
+    $code =~ s/%OBJECT%,\s*/grammar, /;
+    # We modified $code, so we must modify $tag!!
+    $tag = "Lua G:$tag";
+    $test_name //= qq{"$code"};
+    $test_name = "Lua G: $test_name";
+    my @actual = $marpa_lua->call_by_tag($g_regix, $tag, $code, $signature, @{$args});
+    Test::More::is_deeply( \@actual, $expected, $test_name);
+}
+
+for my $test_data (@tests) {
+    do_lua_g_test(@{$test_data});
+}
 
 # Marpa::R3::Lua::raw_exec("collectgarbage()");
 

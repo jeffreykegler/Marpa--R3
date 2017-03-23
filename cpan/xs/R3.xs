@@ -1814,6 +1814,164 @@ PPCODE:
 
 INCLUDE: exec_lua.xs
 
+void
+call_by_tag( lua_wrapper, lua_ref, tag, codestr, signature, ... )
+   Marpa_Lua* lua_wrapper;
+   int lua_ref;
+   const char* tag;
+   const char* codestr;
+   const char *signature;
+PPCODE:
+{
+    const char * const error_tag = tag;
+
+    /* 0 is never an acceptable index,
+     * but this suppresses the GCC warning
+     */
+    int object_stack_ix = 0;
+
+    const int first_optional_arg = 5;
+    const int is_method = (lua_ref > 0);
+    lua_State *const L = lua_wrapper->L;
+    const int base_of_stack = marpa_lua_gettop (L);
+    int msghandler_ix;
+    int cache_ix;
+    int type;
+
+    /* warn("%s %d is_method=%ld lua_ref=%ld", __FILE__, __LINE__,
+     *  (long)is_method, (long)lua_ref);
+     */
+
+    PERL_UNUSED_VAR(error_tag); /* Silence warning */
+
+    marpa_lua_pushcfunction(L, glue_msghandler);
+    msghandler_ix = marpa_lua_gettop(L);
+
+    if (lua_ref > 0) {
+        marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, lua_ref);
+        /* Lua stack: [ recce_table ] */
+        object_stack_ix = marpa_lua_gettop (L);
+    }
+
+    marpa_lua_getglobal (L, "glue");
+    marpa_lua_getfield (L, -1, "code_by_tag");
+    cache_ix = marpa_lua_gettop(L);
+    type = marpa_lua_getfield (L, cache_ix, tag);
+
+    /*    warn("%s %d", __FILE__, __LINE__); */
+    if (type != LUA_TFUNCTION) {
+
+        const int status =
+            marpa_luaL_loadbuffer (L, codestr, strlen (codestr), tag);
+        if (status != 0) {
+            const char *error_string = marpa_lua_tostring (L, -1);
+            marpa_lua_pop (L, 1);
+            croak ("Marpa::R3 error in call_by_tag(): %s", error_string);
+        }
+        marpa_lua_pushvalue (L, -1);
+        marpa_lua_setfield (L, cache_ix, tag);
+    }
+
+    /* [ recce_table, function ] */
+
+    {
+        const int function_stack_ix = marpa_lua_gettop (L);
+        int i, status;
+        int arg_count;
+        const int args_supplied = items - first_optional_arg;
+        char default_return_sig[] = "*";
+        const char* return_signature = default_return_sig;
+
+        marpa_luaL_checkstack(L, items+20, "xlua EXEC_SIG_BODY");
+
+        if (is_method) {
+            /* first argument is table for object */
+            marpa_lua_pushvalue (L, object_stack_ix);
+            /* [ object_table, function, object_table ] */
+        }
+
+        /* the remaining arguments are those passed to the Perl call */
+        for (i = 0; ; i++) {
+            const char this_sig = signature[i];
+            const int arg_ix = first_optional_arg + i;
+            SV *arg_sv;
+
+            switch (this_sig) {
+            case '>':              /* end of arguments */
+                return_signature = signature+i+1;
+                goto endargs;
+            case 0:              /* end of arguments */
+                goto endargs;
+            }
+
+            if ((size_t)arg_ix >= (size_t)items) {
+                croak
+                    ("Internal error: signature ('%s') wants %ld items, but only %ld arguments in call_by_tag()",
+                        signature, (long)(i + 1), (long)(items - first_optional_arg));
+            }
+
+            arg_sv = ST (arg_ix);
+            coerce_to_lua(L, arg_sv, this_sig);
+        }
+      endargs:;
+
+       arg_count = marpa_lua_gettop(L) - function_stack_ix;
+
+       if (arg_count - is_method != args_supplied) {
+                croak
+                    ("Internal error: signature ('%s') wants %ld items, but %ld arguments in call_by_tag()",
+                        signature, (long)(arg_count - is_method), (long)(args_supplied));
+       }
+
+        status = marpa_lua_pcall (L, arg_count, LUA_MULTRET, msghandler_ix);
+        if (status != 0) {
+            const char *exception_string = handle_pcall_error(L, status);
+            marpa_lua_settop (L, base_of_stack);
+            croak(exception_string);
+        }
+
+        marpa_luaL_checkstack(L, 20, "xlua EXEC_SIG_BODY");
+
+        /* return args to caller */
+        {
+            const int top_after = marpa_lua_gettop (L);
+            SV *sv_result;
+            int stack_ix;
+            int signature_ix = 0;
+            for (stack_ix = function_stack_ix;
+                    stack_ix <= top_after;
+                    stack_ix++) {
+                const char this_sig = return_signature[signature_ix];
+                switch (this_sig) {
+                    case '*':
+                        sv_result = coerce_to_sv (L, stack_ix, '-');
+                        /* Took ownership of sv_result, we now need to mortalize it */
+                        XPUSHs (sv_2mortal (sv_result));
+                        break;
+                    case '-':
+                    case '0':
+                    case '2':
+                        sv_result = coerce_to_sv (L, stack_ix, this_sig);
+                        /* Took ownership of sv_result, we now need to mortalize it */
+                        XPUSHs (sv_2mortal (sv_result));
+                        signature_ix++;
+                        break;
+                    default:
+                        croak
+                            ("Internal error: invalid return sig option %c in xlua EXEC_SIG_BODY",
+                            this_sig);
+                    case 0:
+                        croak
+                            ("Internal error: return sig too short ('%s') in xlua EXEC_SIG_BODY",
+                            signature);
+                }
+            }
+        }
+
+        marpa_lua_settop (L, base_of_stack);
+    }
+}
+
 BOOT:
 
     marpa_debug_handler_set(marpa_r3_warn);

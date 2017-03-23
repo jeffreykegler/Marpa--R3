@@ -2409,6 +2409,13 @@ END_OF_LUA
     return $text;
 }
 
+# not to be documented
+sub Marpa::R3::Scanless::R::regix {
+    my ( $slr ) = @_;
+    my $regix = $slr->[Marpa::R3::Internal::Scanless::R::REGIX];
+    return $regix;
+}
+
 1;
 
 # vim: expandtab shiftwidth=4:
