@@ -403,7 +403,6 @@ sub Marpa::R3::ASF::new {
     $asf->[Marpa::R3::Internal::ASF::FACTORING_MAX] //= 42;
 
     my $slg       = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $thin_slr  = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
 
     if ( defined $slr->[Marpa::R3::Internal::Scanless::R::TREE_MODE] ) {
 

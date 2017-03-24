@@ -732,7 +732,6 @@ END_OF_LUA
 
 sub registrations_find {
     my ($slg) = @_;
-    my $thin_slg = $slg->[Marpa::R3::Internal::Scanless::G::C];
     my $trace_file_handle =
       $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE];
     my $tracer        = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
@@ -1549,7 +1548,6 @@ END_OF_LUA
 END_OF_LUA
 
   STEP: while (1) {
-        my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
         my ( $value_type, @value_data ) = $slr->call_by_tag(
             ( '@' . __FILE__ . ':' . __LINE__ ),
             << 'END_OF_LUA', '');

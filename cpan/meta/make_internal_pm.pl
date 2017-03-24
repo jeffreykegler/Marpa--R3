@@ -243,11 +243,8 @@ __DATA__
     REGIX { Registry index in Lua interpreter --
         a valid Lua index but not a pseudo-index. }
 
-    C { The thin version of this object }
-
     { The "per libmarpa grammar objects", aka "tracers", are objects
-       which currently wrap the "thin" C structure,
-       and which will hold the data specific to each Libmarpa
+       which hold the data specific to each Libmarpa
        grammar object.  }
     PER_LMG
     L0_TRACER
@@ -303,12 +300,6 @@ __DATA__
     PHASE {
         "initial", "read", "value"
     }
-
-    { "Thin" interfaces,
-      that is, objects for the C language Perl/XS
-      interfaces
-    }
-    SLR_C { The thin version of this object }
 
     P_INPUT_STRING
 

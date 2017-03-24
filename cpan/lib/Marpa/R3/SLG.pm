@@ -1240,7 +1240,6 @@ qq{Symbol "$lexeme_name" needs a blessing package, but grammar has none\n},
 sub Marpa::R3::Internal::Scanless::G::precompute {
     my ($slg, $per_lmg) = @_;
 
-    my $thin_slg = $slg->[Marpa::R3::Internal::Scanless::G::C];
     my $xsy_by_isyid     = $per_lmg->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID];
     my $lmw_name     = $per_lmg->[Marpa::R3::Internal::Trace::G::LMW_NAME];
 
@@ -1443,7 +1442,6 @@ END_OF_LUA
 sub assign_G1_symbol {
     # $slg will be needed for the XSY's
     my ( $slg, $name, $options ) = @_;
-    my $thin_slg = $slg->[Marpa::R3::Internal::Scanless::G::C];
     my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
 
     my $symbol_id = $slg->symbol_by_name($name);
@@ -1511,7 +1509,6 @@ END_OF_LUA
 sub assign_L0_symbol {
     # $slg will be needed for the XSY's
     my ( $slg, $name, $options ) = @_;
-    my $thin_slg = $slg->[Marpa::R3::Internal::Scanless::G::C];
     my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER];
 
     my $symbol_id = $slg->l0_symbol_by_name($name);
@@ -1611,7 +1608,6 @@ sub add_L0_user_rules {
 
 sub add_G1_user_rule {
     my ( $slg, $options ) = @_;
-    my $thin_slg = $slg->[Marpa::R3::Internal::Scanless::G::C];
 
     my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     my $subgrammar = $tracer->[Marpa::R3::Internal::Trace::G::NAME];
@@ -1780,7 +1776,6 @@ END_OF_LUA
 
 sub add_L0_user_rule {
     my ( $slg, $options ) = @_;
-    my $thin_slg = $slg->[Marpa::R3::Internal::Scanless::G::C];
 
     my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER];
 

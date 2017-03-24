@@ -97,7 +97,6 @@ sub Marpa::R3::Scanless::R::g1_literal {
 
 sub Marpa::R3::Scanless::R::g1_location_to_span {
     my ( $slr, $g1_location ) = @_;
-    my $thin_self = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
     return $slr->g1_input_span( $g1_location, 1 );
 }
 
@@ -442,7 +441,6 @@ sub Marpa::R3::Scanless::R::set {
 sub common_set {
 
     my ( $slr, $method, $flat_args ) = @_;
-    my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
 
     # These recce args are allowed in all contexts
     state $common_recce_args = {
@@ -535,17 +533,6 @@ END_OF_LUA
     } ## end if ( defined( my $value = $arg_hash->{'end'} ) )
 
 }
-
-sub Marpa::R3::Scanless::R::thin {
-    return $_[0]->[Marpa::R3::Internal::Scanless::R::SLR_C];
-}
-
-sub Marpa::R3::Scanless::R::trace {
-    my ( $self, $level ) = @_;
-    my $thin_slr = $self->[Marpa::R3::Internal::Scanless::R::SLR_C];
-    $level //= 1;
-    return $thin_slr->trace($level);
-} ## end sub Marpa::R3::Scanless::R::trace
 
 sub Marpa::R3::Scanless::R::error {
     my ($self) = @_;
@@ -959,8 +946,6 @@ sub Marpa::R3::Scanless::R::resume {
         );
     }
 
-    my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
-
     {
        my $length_arg = $length // -1;
        my $start_pos_arg = $start_pos // 'undef';
@@ -983,7 +968,6 @@ END_OF_LUA
 
     $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] = [];
     my $slg      = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $thin_slg = $slg->[Marpa::R3::Internal::Scanless::G::C];
 
     my ($trace_terminals) = $slr->call_by_tag(
         ( '@' . __FILE__ . ':' . __LINE__ ),
@@ -1114,7 +1098,6 @@ sub Marpa::R3::Scanless::R::events {
 
 sub Marpa::R3::Scanless::R::xs_events {
     my ($slr) = @_;
-    my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
     my ($event_queue) = $slr->call_by_tag(
     ('@' . __FILE__ . ':' . __LINE__),
     <<'END_OF_LUA',
@@ -1133,7 +1116,6 @@ sub Marpa::R3::Scanless::R::read_problem {
 
     die 'No problem_code in slr->read_problem()' if not $problem_code;
 
-    my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
     my $slg  = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
 
     my $lex_tracer =
@@ -1783,7 +1765,6 @@ END_OF_LUA
 
 sub Marpa::R3::Scanless::R::lexeme_alternative {
     my ( $slr, $symbol_name, @value ) = @_;
-    my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
 
     Marpa::R3::exception(
         "slr->alternative(): symbol name is undefined\n",
@@ -1860,7 +1841,6 @@ END_OF_LUA
 # Returns 0 on unthrown failure, current location on success
 sub Marpa::R3::Scanless::R::lexeme_complete {
     my ( $slr, $start, $length ) = @_;
-    my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
     my $slg  = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
 
     $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] = [];
@@ -1906,7 +1886,6 @@ sub Marpa::R3::Scanless::R::lexeme_read {
 
 sub Marpa::R3::Scanless::R::pause_span {
     my ($slr) = @_;
-    my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
     my ($start, $end) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
             <<'END_OF_LUA', ''  );
         local recce = ...
@@ -1972,8 +1951,6 @@ END_OF_LUA
         recce.lmw_g1r:prediction_symbol_activate(event, activate)
 END_OF_LUA
     }
-
-    my $thin_slr = $slr->[Marpa::R3::Internal::Scanless::R::SLR_C];
 
     {
         my $symbol_ids = $event_symbol_ids_by_type->{lexeme} // [];
