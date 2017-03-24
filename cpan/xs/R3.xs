@@ -1978,11 +1978,9 @@ exec( lua_wrapper, codestr, ... )
 PPCODE:
 {
     const char * const error_tag = "Marpa::R3::Lua exec()";
-    /* object_stack_ix is actually never used */
-    const int object_stack_ix = -1;
-    const int is_method = 0;
     lua_State *const L = lua_wrapper->L;
     const int base_of_stack = marpa_lua_gettop (L);
+    int arg_count;
     int msghandler_ix;
     int kollos_ix;
 
@@ -2025,12 +2023,6 @@ PPCODE:
 
         marpa_luaL_checkstack(L, items+20, "xlua EXEC_BODY");
 
-        if (is_method) {
-            /* first argument is object table */
-            marpa_lua_pushvalue (L, object_stack_ix);
-            /* [ object_table, function, object_table ] */
-        }
-
         /* the remaining arguments are those passed to the Perl call */
         for (i = 2; i < items; i++) {
             SV *arg_sv = ST (i);
@@ -2040,7 +2032,9 @@ PPCODE:
             MARPA_SV_SV (L, arg_sv);
         }
 
-        status = marpa_lua_pcall (L, (items - 2) + is_method, LUA_MULTRET, msghandler_ix);
+       arg_count = marpa_lua_gettop(L) - function_stack_ix;
+
+        status = marpa_lua_pcall (L, arg_count, LUA_MULTRET, msghandler_ix);
         if (status != 0) {
             const char *exception_string = handle_pcall_error(L, status);
             marpa_lua_settop (L, base_of_stack);
