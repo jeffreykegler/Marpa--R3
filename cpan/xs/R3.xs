@@ -1542,6 +1542,8 @@ PPCODE:
   lua_Integer lua_ref;
   Outer_G *outer_slg;
   Outer_R *outer_slr;
+    int base_of_stack;
+
   PERL_UNUSED_ARG(class);
 
   if (!sv_isa (slg_sv, "Marpa::R3::Thin::SLG"))
@@ -1557,14 +1559,6 @@ PPCODE:
   }
   L = outer_slg->L;
 
-  /* Copy and take references to the "parent objects",
-   * the ones responsible for holding references.
-   */
-
-  {
-    const int base_of_stack = marpa_lua_gettop(L);
-    int slr_ix;
-
     if (!marpa_lua_checkstack(L, MYLUA_STACK_INCR))
     {
         croak ("Internal Marpa::R3 error; could not grow stack: " MYLUA_TAG);
@@ -1572,6 +1566,11 @@ PPCODE:
     outer_slr->L = L;
     /* Take ownership of a new reference to the Lua state */
     lua_refinc(L);
+
+    base_of_stack = marpa_lua_gettop(L);
+
+  if (0) {
+    int slr_ix;
 
     marpa_lua_newtable (L);
     slr_ix = marpa_lua_gettop(L);
@@ -1588,12 +1587,17 @@ PPCODE:
     marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, outer_slg->lua_ref);
     marpa_lua_setfield(L, slr_ix, "slg");
     lua_ref = marpa_luaL_ref (L, LUA_REGISTRYINDEX);
-    marpa_lua_settop(L, base_of_stack);
   }
 
   call_by_tag (outer_slr->L, MYLUA_TAG,
-      "local recce = ...\n"
-      "local grammar = recce.slg\n"
+      "local slg_lua_ref = ...\n"
+      "local recce = {}\n"
+      "local registry = debug.getregistry()\n"
+      "setmetatable(recce, _M.class_slr)\n"
+      "local grammar = registry[slg_lua_ref]\n"
+      "recce.slg = grammar\n"
+      "local lua_ref = _M.register(registry, recce)\n"
+      "recce.ref_count = 1\n"
       "local l0g = grammar.lmw_l0g\n"
       "local g1g = grammar.lmw_g1g\n"
       "recce.lmw_g1r = kollos.recce_new(g1g)\n"
@@ -1644,8 +1648,13 @@ PPCODE:
       "            g_g1_symbols[symbol_id].pause_after_active\n"
       "    }\n"
       "end\n"
+      "return lua_ref\n"
       ,
-      "R>", lua_ref);
+      "i>i",
+      outer_slg->lua_ref,
+      &lua_ref);
+
+    marpa_lua_settop(L, base_of_stack);
 
   new_sv = sv_newmortal ();
   sv_setref_pv (new_sv, scanless_r_class_name, (void *) outer_slr);
