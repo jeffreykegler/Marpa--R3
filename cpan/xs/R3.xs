@@ -35,15 +35,10 @@ extern const struct marpa_event_description_s marpa_event_description[];
 extern const struct marpa_step_type_description_s
   marpa_step_type_description[];
 
-typedef struct {
-  lua_State* L;
-} Outer_G;
-
 typedef struct
 {
   lua_State* L;
 } Marpa_Lua;
-
 
 #undef IS_PERL_UNDEF
 #define IS_PERL_UNDEF(x) (SvTYPE(x) == SVt_NULL)
@@ -109,27 +104,10 @@ static void lua_refdec(lua_State* L)
     }
 }
 
-typedef struct marpa_g Grammar;
-/* The error_code member should usually be ignored in favor of
- * getting a fresh error code from Libmarpa.  Essentially it
- * acts as an optional return value for marpa_g_error()
- */
-
-typedef struct marpa_r Recce;
-
-typedef struct marpa_b Bocage;
-
-typedef struct marpa_o Order;
-
-typedef struct marpa_t Tree;
-
-typedef struct marpa_v Value;
-
 #define MARPA_XS_V_MODE_IS_INITIAL 0
 #define MARPA_XS_V_MODE_IS_RAW 1
 #define MARPA_XS_V_MODE_IS_STACK 2
 
-static const char scanless_g_class_name[] = "Marpa::R3::Thin::SLG";
 static const char marpa_lua_class_name[] = "Marpa::R3::Lua";
 
 static const char *
@@ -1449,58 +1427,6 @@ PPCODE:
 {
    const char* tag = _marpa_tag();
    XSRETURN_PV(tag);
-}
-
-MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::SLG
-
-void
-new( class, lua_wrapper )
-    char * class;
-    Marpa_Lua* lua_wrapper;
-PPCODE:
-{
-    SV *new_sv;
-    Outer_G *outer_slg;
-    lua_State *L = lua_wrapper->L;
-    lua_Integer lua_ref = 0;
-    int base_of_stack;
-    int grammar_ix;
-    PERL_UNUSED_ARG (class);
-
-    Newx (outer_slg, 1, Outer_G);
-    outer_slg->L = L;
-    base_of_stack = marpa_lua_gettop(L);
-    lua_refinc (L);
-
-    call_by_tag (outer_slg->L, MYLUA_TAG,
-        "local grammar = {}\n"
-        "local registry = debug.getregistry()\n"
-        "setmetatable(grammar, _M.class_slg)\n"
-        "local lua_ref = _M.register(registry, grammar)\n"
-        "grammar.ref_count = 1\n"
-        "grammar:post_new()\n"
-        "return lua_ref\n"
-        ,
-        ">i", &lua_ref);
-
-    new_sv = sv_newmortal ();
-    sv_setref_pv (new_sv, scanless_g_class_name, (void *) outer_slg);
-    XPUSHs (new_sv);
-    XPUSHs (sv_2mortal(newSViv((IV)lua_ref)));
-}
-
-void
-DESTROY( outer_slg )
-    Outer_G *outer_slg;
-PPCODE:
-{
-
-  /* This is unnecessary at the moment, since the next statement
-   * will destroy the Lua state.  But someday grammars may share
-   * Lua states, and then this will be necessary.
-   */
-  lua_refdec(outer_slg->L);
-  Safefree (outer_slg);
 }
 
 MODULE = Marpa::R3            PACKAGE = Marpa::R3::Lua
