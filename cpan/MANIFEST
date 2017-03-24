@@ -309,6 +309,5 @@ t/wall.t
 t/zorro.t
 xs/Makefile.PL
 xs/R3.xs
-xs/gen_exec_lua.pl
 xs/ppport.h
 xs/typemap
