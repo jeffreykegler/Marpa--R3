@@ -109,9 +109,14 @@ die qq{"perl Makefile.PL" failed: $!}
     command => [ $EXECUTABLE_NAME, 'Makefile.PL' ],
     verbose => 1
     );
-die qq{"./make distmeta" failed: $!}
-    if
-    not IPC::Cmd::run( command => [ 'make', 'distmeta' ], verbose => 1 );
 chdir 'meta';
 die qq{"make all" in cpan/meta/ directory failed: $!}
     if not IPC::Cmd::run( command => [ 'make', 'all' ], verbose => 1 );
+chdir '..';
+die qq{"./make distmeta" failed: $!}
+    if
+    not IPC::Cmd::run( command => [ 'make', 'distmeta' ], verbose => 1 );
+my $distdir = "Marpa-R3-$perlish_version";
+die qq{cp of META files failed: $!}
+    if
+    not IPC::Cmd::run( command => [ 'cp', "$distdir/META.yml", "$distdir/META.json", '.' ], verbose => 1 );
