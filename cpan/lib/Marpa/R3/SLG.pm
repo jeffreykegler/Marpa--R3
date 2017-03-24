@@ -79,6 +79,31 @@ sub Marpa::R3::Scanless::G::new {
     return $slg;
 }
 
+sub Marpa::R3::Scanless::G::DESTROY {
+    # say STDERR "In Marpa::R3::Scanless::G::DESTROY before test";
+    my $slg = shift;
+    my $lua = $slg->[Marpa::R3::Internal::Scanless::G::L];
+
+    # If we are destroying the Perl interpreter, then all the Marpa
+    # objects will be destroyed, including Marpa's Lua interpreter.
+    # We do not need to worry about cleaning up the
+    # grammar is an orderly manner, because the Lua interpreter
+    # containing the grammar will be destroyed.
+    # In fact, the Lua interpreter may already have been destroyed,
+    # so this test is necessary to avoid a warning message.
+    return if not $lua;
+    # say STDERR "In Marpa::R3::Scanless::G::DESTROY after test";
+
+    my $regix = $slg->[Marpa::R3::Internal::Scanless::G::REGIX];
+    $lua->call_by_tag($regix,
+        ('@' . __FILE__ . ':' . __LINE__),
+        <<'END_OF_LUA', 'i', $regix);
+    local grammar, regix = ...
+    local registry = debug.getregistry()
+    _M.unregister(registry, regix)
+END_OF_LUA
+}
+
 sub Marpa::R3::Scanless::G::set {
     my ( $slg, @hash_ref_args ) = @_;
     my ( $flat_args, $error_message ) =

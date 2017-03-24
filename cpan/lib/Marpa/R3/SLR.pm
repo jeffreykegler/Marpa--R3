@@ -399,6 +399,8 @@ END_OF_LUA
 
 sub Marpa::R3::Scanless::R::DESTROY {
     # say STDERR "In Marpa::R3::Scanless::R::DESTROY before test";
+    my $slr = shift;
+    my $lua = $slr->[Marpa::R3::Internal::Scanless::R::L];
 
     # If we are destroying the Perl interpreter, then all the Marpa
     # objects will be destroyed, including Marpa's Lua interpreter.
@@ -407,12 +409,10 @@ sub Marpa::R3::Scanless::R::DESTROY {
     # containing the recognizer will be destroyed.
     # In fact, the Lua interpreter may already have been destroyed,
     # so this test is necessary to avoid a warning message.
-    return if $Marpa::R3::Internal::IN_DESTRUCTION;
-
+    return if not $lua;
     # say STDERR "In Marpa::R3::Scanless::R::DESTROY after test";
-    my $slr = shift;
+
     my $regix = $slr->[Marpa::R3::Internal::Scanless::R::REGIX];
-    my $lua = $slr->[Marpa::R3::Internal::Scanless::R::L];
     $lua->call_by_tag($regix,
         ('@' . __FILE__ . ':' . __LINE__),
         <<'END_OF_LUA', 'i', $regix);

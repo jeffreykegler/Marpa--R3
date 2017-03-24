@@ -42,12 +42,6 @@ typedef struct {
 
 typedef struct
 {
-  /* Lua "reference" to this object */
-  lua_State* L;
-} Outer_R;
-
-typedef struct
-{
   lua_State* L;
 } Marpa_Lua;
 
@@ -1513,11 +1507,12 @@ DESTROY( outer_slg )
     Outer_G *outer_slg;
 PPCODE:
 {
+  /* kollos_robrefdec(outer_slg->L, outer_slg->lua_ref); */
+
   /* This is unnecessary at the moment, since the next statement
    * will destroy the Lua state.  But someday grammars may share
    * Lua states, and then this will be necessary.
    */
-  kollos_robrefdec(outer_slg->L, outer_slg->lua_ref);
   lua_refdec(outer_slg->L);
   Safefree (outer_slg);
 }

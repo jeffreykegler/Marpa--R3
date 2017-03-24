@@ -96,16 +96,6 @@ require Marpa::R3::X;
 ( $version_result = version_ok($Marpa::R3::X::VERSION) )
     and die 'Marpa::R3::X::VERSION ', $version_result;
 
-BEGIN {
-    # say STDERR "In BEGIN block";
-    $Marpa::R3::Internal::IN_DESTRUCTION = 0;
-}
-
-END {
-    # say STDERR "In END block";
-    $Marpa::R3::Internal::IN_DESTRUCTION = 1;
-}
-
 1;
 
 # vim: set expandtab shiftwidth=4:
