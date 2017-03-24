@@ -36,7 +36,6 @@ extern const struct marpa_step_type_description_s
   marpa_step_type_description[];
 
 typedef struct {
-  lua_Integer lua_ref;
   lua_State* L;
 } Outer_G;
 
@@ -1463,6 +1462,7 @@ PPCODE:
     SV *new_sv;
     Outer_G *outer_slg;
     lua_State *L = lua_wrapper->L;
+    lua_Integer lua_ref = 0;
     int base_of_stack;
     int grammar_ix;
     PERL_UNUSED_ARG (class);
@@ -1486,7 +1486,7 @@ PPCODE:
     marpa_lua_pushinteger(L, 1);
     marpa_lua_setfield (L, grammar_ix, "ref_count");
     marpa_lua_pushvalue (L, grammar_ix);
-    outer_slg->lua_ref = marpa_luaL_ref (L, LUA_REGISTRYINDEX);
+    lua_ref = marpa_luaL_ref (L, LUA_REGISTRYINDEX);
     marpa_lua_settop(L, base_of_stack);
 
 
@@ -1494,12 +1494,12 @@ PPCODE:
         "slg = ...\n"
         "slg:post_new()\n"
         ,
-        "G>", outer_slg->lua_ref);
+        "G>", lua_ref);
 
     new_sv = sv_newmortal ();
     sv_setref_pv (new_sv, scanless_g_class_name, (void *) outer_slg);
     XPUSHs (new_sv);
-    XPUSHs (sv_2mortal(newSViv((IV)outer_slg->lua_ref)));
+    XPUSHs (sv_2mortal(newSViv((IV)lua_ref)));
 }
 
 void
