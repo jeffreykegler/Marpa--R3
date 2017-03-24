@@ -312,7 +312,7 @@ sub Marpa::R3::Internal::ASF::blessings_set {
     <<'END_OF_LUA', '>*' ) ;
     local recce = ...
     local grammar = recce.slg
-    local g1g = slg.lmw_g1g
+    local g1g = grammar.lmw_g1g
     return g1g:highest_rule_id()
 END_OF_LUA
 
@@ -331,7 +331,7 @@ END_OF_LUA
     <<'END_OF_LUA', 'i>*', $irlid ) ;
     local recce, irlid = ...
     local grammar = recce.slg
-    local g1g = slg.lmw_g1g
+    local g1g = grammar.lmw_g1g
     local lhs_id = g1g:rule_lhs(irlid)
     return g1g:symbol_name(lhs_id)
 END_OF_LUA
@@ -347,7 +347,7 @@ END_OF_LUA
     <<'END_OF_LUA', '>*' ) ;
     local recce = ...
     local grammar = recce.slg
-    local g1g = slg.lmw_g1g
+    local g1g = grammar.lmw_g1g
     return g1g:highest_symbol_id()
 END_OF_LUA
 

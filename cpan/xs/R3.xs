@@ -1472,29 +1472,16 @@ PPCODE:
     base_of_stack = marpa_lua_gettop(L);
     lua_refinc (L);
 
-    /* No lock held -- SLG must delete grammar table in its */
-    /*   destructor. */
-    marpa_lua_newtable (L);
-    grammar_ix = marpa_lua_gettop(L);
-
-    /* When this moves into the kollos library, we
-     * *CANNOT* use the "kollos" global.
-     */
-    marpa_lua_getglobal(L, "kollos");
-    marpa_lua_getfield(L, -1, "class_slg");
-    marpa_lua_setmetatable (L, grammar_ix);
-    marpa_lua_pushinteger(L, 1);
-    marpa_lua_setfield (L, grammar_ix, "ref_count");
-    marpa_lua_pushvalue (L, grammar_ix);
-    lua_ref = marpa_luaL_ref (L, LUA_REGISTRYINDEX);
-    marpa_lua_settop(L, base_of_stack);
-
-
     call_by_tag (outer_slg->L, MYLUA_TAG,
-        "slg = ...\n"
-        "slg:post_new()\n"
+        "local grammar = {}\n"
+        "local registry = debug.getregistry()\n"
+        "setmetatable(grammar, _M.class_slg)\n"
+        "local lua_ref = _M.register(registry, grammar)\n"
+        "grammar.ref_count = 1\n"
+        "grammar:post_new()\n"
+        "return lua_ref\n"
         ,
-        "G>", lua_ref);
+        ">i", &lua_ref);
 
     new_sv = sv_newmortal ();
     sv_setref_pv (new_sv, scanless_g_class_name, (void *) outer_slg);
@@ -1507,7 +1494,6 @@ DESTROY( outer_slg )
     Outer_G *outer_slg;
 PPCODE:
 {
-  /* kollos_robrefdec(outer_slg->L, outer_slg->lua_ref); */
 
   /* This is unnecessary at the moment, since the next statement
    * will destroy the Lua state.  But someday grammars may share
