@@ -10,53 +10,9 @@
 # or implied warranties. For details, see the full text of
 # of the licenses in the directory LICENSES.
 
-G_Wrapper * T_MARPA_G_W
-Outer_G * T_OUTER_G
-Outer_R * T_OUTER_R
 Marpa_Lua * T_MARPA_LUA
 
-Marpa_AHM_ID T_IV
-Marpa_And_Node_ID T_IV
-Marpa_Assertion_ID T_IV
-Marpa_Earleme T_IV
-Marpa_Earley_Item_ID T_IV
-Marpa_Earley_Set_ID T_IV
-Marpa_IRL_ID T_IV
-Marpa_Nook_ID T_IV
-Marpa_NSY_ID T_IV
-Marpa_Or_Node_ID T_IV
-Marpa_Rank T_IV
-Marpa_Rule_ID T_IV
-Marpa_Symbol_ID T_IV
-
 INPUT
-
-T_MARPA_G_W
-        if (sv_isa($arg, \"Marpa::R3::Thin::G\")) {
-            IV tmp = SvIV((SV*)SvRV($arg));
-            $var = INT2PTR(G_Wrapper *, tmp);
-        } else
-            Perl_croak(aTHX_ \"%s: %s is not of type Marpa::R3::Thin::G\",
-                        ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-                        \"$var\")
-
-T_OUTER_G
-        if (sv_isa($arg, \"Marpa::R3::Thin::SLG\")) {
-            IV tmp = SvIV((SV*)SvRV($arg));
-            $var = INT2PTR(Outer_G *, tmp);
-        } else
-            Perl_croak(aTHX_ \"%s: %s is not of type Marpa::R3::Thin::SLG\",
-                        ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-                        \"$var\")
-
-T_OUTER_R
-        if (sv_isa($arg, \"Marpa::R3::Thin::SLR\")) {
-            IV tmp = SvIV((SV*)SvRV($arg));
-            $var = INT2PTR(Outer_R *, tmp);
-        } else
-            Perl_croak(aTHX_ \"%s: %s is not of type Marpa::R3::Thin::SLR\",
-                        ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-                        \"$var\")
 
 T_MARPA_LUA
         if (sv_isa($arg, \"Marpa::R3::Lua\")) {

@@ -88,6 +88,7 @@ static struct lua_extraspace *extraspace_get(lua_State* L)
     return *(struct lua_extraspace **)marpa_lua_getextraspace(L);
 }
 
+static void lua_refinc(lua_State* L) PERL_UNUSED_DECL;
 static void lua_refinc(lua_State* L)
 {
     struct lua_extraspace *p_extra = extraspace_get(L);
@@ -103,10 +104,6 @@ static void lua_refdec(lua_State* L)
        free(p_extra);
     }
 }
-
-#define MARPA_XS_V_MODE_IS_INITIAL 0
-#define MARPA_XS_V_MODE_IS_RAW 1
-#define MARPA_XS_V_MODE_IS_STACK 2
 
 static const char marpa_lua_class_name[] = "Marpa::R3::Lua";
 
@@ -580,8 +577,6 @@ static const char* handle_pcall_error (lua_State* L, int status) {
 }
 
 /* Push a Perl value onto the Lua stack. */
-static void
-push_val (lua_State * L, SV * val) PERL_UNUSED_DECL;
 static void
 push_val (lua_State * L, SV * val)
 {
