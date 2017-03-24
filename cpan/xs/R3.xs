@@ -1539,7 +1539,7 @@ PPCODE:
 {
   lua_State* L;
   SV *new_sv;
-  lua_Integer lua_ref;
+  lua_Integer lua_ref = 0;
   Outer_G *outer_slg;
   Outer_R *outer_slr;
     int base_of_stack;
@@ -1568,91 +1568,6 @@ PPCODE:
     lua_refinc(L);
 
     base_of_stack = marpa_lua_gettop(L);
-
-  if (0) {
-    int slr_ix;
-
-    marpa_lua_newtable (L);
-    slr_ix = marpa_lua_gettop(L);
-
-    /* When this moves into the kollos library, we
-     * *CANNOT* use the "kollos" global.
-     */
-    marpa_lua_getglobal(L, "kollos");
-    marpa_lua_getfield(L, -1, "class_slr");
-    marpa_lua_setmetatable (L, slr_ix);
-    marpa_lua_pushinteger(L, 1);
-    marpa_lua_setfield (L, slr_ix, "ref_count");
-    marpa_lua_pushvalue (L, slr_ix);
-    marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, outer_slg->lua_ref);
-    marpa_lua_setfield(L, slr_ix, "slg");
-    lua_ref = marpa_luaL_ref (L, LUA_REGISTRYINDEX);
-  }
-
-  call_by_tag (outer_slr->L, MYLUA_TAG,
-      "local slg_lua_ref = ...\n"
-      "local recce = {}\n"
-      "local registry = debug.getregistry()\n"
-      "setmetatable(recce, _M.class_slr)\n"
-      "local grammar = registry[slg_lua_ref]\n"
-      "recce.slg = grammar\n"
-      "local lua_ref = _M.register(registry, recce)\n"
-      "recce.ref_count = 1\n"
-      "local l0g = grammar.lmw_l0g\n"
-      "local g1g = grammar.lmw_g1g\n"
-      "recce.lmw_g1r = kollos.recce_new(g1g)\n"
-      "recce.lmw_g1r.lmw_g = g1g\n"
-      "recce.codepoint = nil\n"
-      "recce.es_data = {}\n"
-      "recce.event_queue = {}\n"
-      "recce.lexeme_queue = {}\n"
-      "recce.accept_queue = {}\n"
-      "recce.l0_rules = {}\n"
-      "recce.per_codepoint = {}\n"
-      "recce.end_pos = 0\n"
-      "recce.perl_pos = 0\n"
-      "recce.too_many_earley_items = -1\n"
-      "recce.trace_terminals = 0\n"
-      "recce.start_of_lexeme = 0\n"
-      "recce.end_of_lexeme = 0\n"
-      "recce.start_of_pause_lexeme = -1\n"
-      "recce.end_of_pause_lexeme = -1\n"
-      "recce.lexer_start_pos = 0\n"
-      "recce.is_external_scanning = false\n"
-      "local r_l0_rules = recce.l0_rules\n"
-      "local g_l0_rules = grammar.l0_rules\n"
-      "-- print('g_l0_rules: ', inspect(g_l0_rules))\n"
-      "local max_l0_rule_id = l0g:highest_rule_id()\n"
-      "for rule_id = 0, max_l0_rule_id do\n"
-      "    local r_l0_rule = {}\n"
-      "    local g_l0_rule = g_l0_rules[rule_id]\n"
-      "    if g_l0_rule then\n"
-      "        for field, value in pairs(g_l0_rule) do\n"
-      "            r_l0_rule[field] = value\n"
-      "        end\n"
-      "    end\n"
-      "    r_l0_rules[rule_id] = r_l0_rule\n"
-      "end\n"
-      "-- print('r_l0_rules: ', inspect(r_l0_rules))\n"
-      "recce.g1_symbols = {}\n"
-      "local g_g1_symbols = grammar.g1_symbols\n"
-      "local r_g1_symbols = recce.g1_symbols\n"
-      "local max_g1_symbol_id = g1g:highest_symbol_id()\n"
-      "for symbol_id = 0, max_g1_symbol_id do\n"
-      "    r_g1_symbols[symbol_id] = {\n"
-      "        lexeme_priority =\n"
-      "            g_g1_symbols[symbol_id].priority,\n"
-      "        pause_before_active =\n"
-      "            g_g1_symbols[symbol_id].pause_before_active,\n"
-      "        pause_after_active =\n"
-      "            g_g1_symbols[symbol_id].pause_after_active\n"
-      "    }\n"
-      "end\n"
-      "return lua_ref\n"
-      ,
-      "i>i",
-      outer_slg->lua_ref,
-      &lua_ref);
 
     marpa_lua_settop(L, base_of_stack);
 

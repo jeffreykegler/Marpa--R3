@@ -157,13 +157,76 @@ sub Marpa::R3::Scanless::R::new {
     $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE] =
          $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE];
 
-    my ($thin_slr, $regix) = Marpa::R3::Thin::SLR->new(
-        $slg->[Marpa::R3::Internal::Scanless::G::C]
-    );
-    $slr->[Marpa::R3::Internal::Scanless::R::SLR_C]      = $thin_slr;
+    my $lua = $slg->[Marpa::R3::Internal::Scanless::G::L];
+    $slr->[Marpa::R3::Internal::Scanless::R::L] = $lua;
+
+  my $slg_regix = $slg->[Marpa::R3::Internal::Scanless::G::REGIX];
+
+  my ($regix) = $lua->call_by_tag (-1, 
+    ('@' . __FILE__ . ':' . __LINE__),
+    <<'END_OF_LUA', 'i', $slg_regix);
+    local slg_lua_ref = ...
+    local recce = {}
+    local registry = debug.getregistry()
+    setmetatable(recce, _M.class_slr)
+    local grammar = registry[slg_lua_ref]
+    recce.slg = grammar
+    local lua_ref = _M.register(registry, recce)
+    recce.ref_count = 1
+    local l0g = grammar.lmw_l0g
+    local g1g = grammar.lmw_g1g
+    recce.lmw_g1r = _M.recce_new(g1g)
+    recce.lmw_g1r.lmw_g = g1g
+    recce.codepoint = nil
+    recce.es_data = {}
+    recce.event_queue = {}
+    recce.lexeme_queue = {}
+    recce.accept_queue = {}
+    recce.l0_rules = {}
+    recce.per_codepoint = {}
+    recce.end_pos = 0
+    recce.perl_pos = 0
+    recce.too_many_earley_items = -1
+    recce.trace_terminals = 0
+    recce.start_of_lexeme = 0
+    recce.end_of_lexeme = 0
+    recce.start_of_pause_lexeme = -1
+    recce.end_of_pause_lexeme = -1
+    recce.lexer_start_pos = 0
+    recce.is_external_scanning = false
+    local r_l0_rules = recce.l0_rules
+    local g_l0_rules = grammar.l0_rules
+    -- print('g_l0_rules: ', inspect(g_l0_rules))
+    local max_l0_rule_id = l0g:highest_rule_id()
+    for rule_id = 0, max_l0_rule_id do
+        local r_l0_rule = {}
+        local g_l0_rule = g_l0_rules[rule_id]
+        if g_l0_rule then
+            for field, value in pairs(g_l0_rule) do
+                r_l0_rule[field] = value
+            end
+        end
+        r_l0_rules[rule_id] = r_l0_rule
+    end
+    -- print('r_l0_rules: ', inspect(r_l0_rules))
+    recce.g1_symbols = {}
+    local g_g1_symbols = grammar.g1_symbols
+    local r_g1_symbols = recce.g1_symbols
+    local max_g1_symbol_id = g1g:highest_symbol_id()
+    for symbol_id = 0, max_g1_symbol_id do
+        r_g1_symbols[symbol_id] = {
+            lexeme_priority =
+                g_g1_symbols[symbol_id].priority,
+            pause_before_active =
+                g_g1_symbols[symbol_id].pause_before_active,
+            pause_after_active =
+                g_g1_symbols[symbol_id].pause_after_active
+        }
+    end
+    return lua_ref
+END_OF_LUA
+
     $slr->[Marpa::R3::Internal::Scanless::R::REGIX]      = $regix;
-    $slr->[Marpa::R3::Internal::Scanless::R::L]      =
-        $slg->[Marpa::R3::Internal::Scanless::G::L];
 
     $slr->reset_evaluation();
 
