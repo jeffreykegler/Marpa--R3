@@ -43,7 +43,6 @@ typedef struct {
 typedef struct
 {
   /* Lua "reference" to this object */
-  lua_Integer lua_ref;
   lua_State* L;
 } Outer_R;
 
@@ -1540,6 +1539,7 @@ PPCODE:
 {
   lua_State* L;
   SV *new_sv;
+  lua_Integer lua_ref;
   Outer_G *outer_slg;
   Outer_R *outer_slr;
   PERL_UNUSED_ARG(class);
@@ -1587,7 +1587,7 @@ PPCODE:
     marpa_lua_pushvalue (L, slr_ix);
     marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, outer_slg->lua_ref);
     marpa_lua_setfield(L, slr_ix, "slg");
-    outer_slr->lua_ref = marpa_luaL_ref (L, LUA_REGISTRYINDEX);
+    lua_ref = marpa_luaL_ref (L, LUA_REGISTRYINDEX);
     marpa_lua_settop(L, base_of_stack);
   }
 
@@ -1645,12 +1645,12 @@ PPCODE:
       "    }\n"
       "end\n"
       ,
-      "R>", outer_slr->lua_ref);
+      "R>", lua_ref);
 
   new_sv = sv_newmortal ();
   sv_setref_pv (new_sv, scanless_r_class_name, (void *) outer_slr);
   XPUSHs (new_sv);
-  XPUSHs (sv_2mortal(newSViv((IV)outer_slr->lua_ref)));
+  XPUSHs (sv_2mortal(newSViv((IV)lua_ref)));
 }
 
 void
@@ -1658,11 +1658,6 @@ DESTROY( outer_slr )
     Outer_R *outer_slr;
 PPCODE:
 {
-  call_by_tag (outer_slr->L, MYLUA_TAG,
-      "local recce = ...\n"
-      "valuation_reset(recce)\n"
-      "return 0\n",
-      "R>", outer_slr->lua_ref);
   lua_refdec(outer_slr->L);
   Safefree (outer_slr);
 }
