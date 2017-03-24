@@ -1813,8 +1813,6 @@ PPCODE:
   Safefree (lua_wrapper);
 }
 
-INCLUDE: exec_lua.xs
-
 void
 call_by_tag( lua_wrapper, lua_ref, tag, codestr, signature, ... )
    Marpa_Lua* lua_wrapper;
@@ -1967,6 +1965,96 @@ PPCODE:
                             signature);
                 }
             }
+        }
+
+        marpa_lua_settop (L, base_of_stack);
+    }
+}
+
+void
+exec( lua_wrapper, codestr, ... )
+   Marpa_Lua* lua_wrapper;
+   char* codestr;
+PPCODE:
+{
+    const char * const error_tag = "Marpa::R3::Lua exec()";
+    /* object_stack_ix is actually never used */
+    const int object_stack_ix = -1;
+    const int is_method = 0;
+    lua_State *const L = lua_wrapper->L;
+    const int base_of_stack = marpa_lua_gettop (L);
+    int msghandler_ix;
+    int kollos_ix;
+
+    marpa_lua_pushcfunction(L, glue_msghandler);
+    msghandler_ix = marpa_lua_gettop(L);
+    marpa_lua_getglobal (L, "kollos");
+    kollos_ix = marpa_lua_gettop(L);
+
+    {
+        const int load_status = marpa_luaL_loadstring (L, codestr);
+        if (load_status != 0) {
+            /* The following is complex, because the error string
+             * must be copied before it is removed from the Lua stack.
+             * This is done with a Perl mortal SV.
+             */
+            const char *error_string = marpa_lua_tostring (L, -1);
+            SV *temp_sv = sv_newmortal ();
+            sv_setpvf (temp_sv, "Marpa::R3::Lua error in luaL_loadstring for %s: %s",
+                error_tag, error_string);
+            marpa_lua_settop (L, base_of_stack);
+            croak ("%s", SvPV_nolen (temp_sv));
+        }
+    }
+
+    /* At this point, the Lua function is on the top of the stack:
+     * [func]
+     * Set its first up value to the sandbox table.
+     */
+    marpa_lua_getfield (L, kollos_ix, "sandbox");
+    if (!marpa_lua_setupvalue (L, -2, 1)) {
+        marpa_lua_settop (L, base_of_stack);
+        croak ("Marpa::R3::Lua error -- lua_setupvalue() failed");
+    }
+    /* [func] */
+
+    {
+        const int function_stack_ix = marpa_lua_gettop (L);
+        int i, status;
+        int top_after;
+
+        marpa_luaL_checkstack(L, items+20, "xlua EXEC_BODY");
+
+        if (is_method) {
+            /* first argument is object table */
+            marpa_lua_pushvalue (L, object_stack_ix);
+            /* [ object_table, function, object_table ] */
+        }
+
+        /* the remaining arguments are those passed to the Perl call */
+        for (i = 2; i < items; i++) {
+            SV *arg_sv = ST (i);
+            if (!SvOK (arg_sv)) {
+                croak ("Marpa::R3::Lua::exec arg %d is not an SV", i);
+            }
+            MARPA_SV_SV (L, arg_sv);
+        }
+
+        status = marpa_lua_pcall (L, (items - 2) + is_method, LUA_MULTRET, msghandler_ix);
+        if (status != 0) {
+            const char *exception_string = handle_pcall_error(L, status);
+            marpa_lua_settop (L, base_of_stack);
+            croak(exception_string);
+        }
+
+        marpa_luaL_checkstack(L, 20, "xlua EXEC_BODY");
+
+        /* return args to caller */
+        top_after = marpa_lua_gettop (L);
+        for (i = function_stack_ix; i <= top_after; i++) {
+            SV *sv_result = coerce_to_sv (L, i, '-');
+            /* Took ownership of sv_result, we now need to mortalize it */
+            XPUSHs (sv_2mortal (sv_result));
         }
 
         marpa_lua_settop (L, base_of_stack);

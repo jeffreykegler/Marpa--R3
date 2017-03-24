@@ -166,11 +166,8 @@ sub postamble {
     my @postamble_pieces = (".NOTPARALLEL:\n");
 
     push @postamble_pieces, <<'END_OF_POSTAMBLE_PIECE';
-R3.c: exec_lua.xs ../kollos/kollos.h \
+R3.c: ../kollos/kollos.h \
       inspect_inc.c glue_inc.c kollos_inc.c
-
-exec_lua.xs: gen_exec_lua.pl
-	$(PERLRUN) gen_exec_lua.pl $@
 
 inspect.out: $(INSPECT_LUA)
 	LUA_PATH=$(LUA_PATH) $(LUAC) -o inspect.out $(INSPECT_LUA)
