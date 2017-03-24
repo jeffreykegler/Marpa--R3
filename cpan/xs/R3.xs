@@ -136,10 +136,7 @@ typedef struct marpa_v Value;
 #define MARPA_XS_V_MODE_IS_RAW 1
 #define MARPA_XS_V_MODE_IS_STACK 2
 
-static const char grammar_c_class_name[] = "Marpa::R3::Thin::G";
-static const char recce_c_class_name[] = "Marpa::R3::Thin::R";
 static const char scanless_g_class_name[] = "Marpa::R3::Thin::SLG";
-static const char scanless_r_class_name[] = "Marpa::R3::Thin::SLR";
 static const char marpa_lua_class_name[] = "Marpa::R3::Lua";
 
 static const char *
@@ -1405,10 +1402,6 @@ static void recursive_coerce_to_lua(
     return;
 }
 
-/* Static recognizer methods */
-
-/* Static SLR methods */
-
 #define EXPECTED_LIBMARPA_MAJOR 8
 #define EXPECTED_LIBMARPA_MINOR 6
 #define EXPECTED_LIBMARPA_MICRO 0
@@ -1527,63 +1520,6 @@ PPCODE:
   kollos_robrefdec(outer_slg->L, outer_slg->lua_ref);
   lua_refdec(outer_slg->L);
   Safefree (outer_slg);
-}
-
-MODULE = Marpa::R3        PACKAGE = Marpa::R3::Thin::SLR
-
-void
-new( class, slg_sv )
-    char * class;
-    SV *slg_sv;
-PPCODE:
-{
-  lua_State* L;
-  SV *new_sv;
-  lua_Integer lua_ref = 0;
-  Outer_G *outer_slg;
-  Outer_R *outer_slr;
-    int base_of_stack;
-
-  PERL_UNUSED_ARG(class);
-
-  if (!sv_isa (slg_sv, "Marpa::R3::Thin::SLG"))
-    {
-      croak
-        ("Problem in u->new(): slg arg is not of type Marpa::R3::Thin::SLG");
-    }
-  Newx (outer_slr, 1, Outer_R);
-  /* Set slg and outer_slg from the SLG SV */
-  {
-    IV tmp = SvIV ((SV *) SvRV (slg_sv));
-    outer_slg = INT2PTR (Outer_G *, tmp);
-  }
-  L = outer_slg->L;
-
-    if (!marpa_lua_checkstack(L, MYLUA_STACK_INCR))
-    {
-        croak ("Internal Marpa::R3 error; could not grow stack: " MYLUA_TAG);
-    }
-    outer_slr->L = L;
-    /* Take ownership of a new reference to the Lua state */
-    lua_refinc(L);
-
-    base_of_stack = marpa_lua_gettop(L);
-
-    marpa_lua_settop(L, base_of_stack);
-
-  new_sv = sv_newmortal ();
-  sv_setref_pv (new_sv, scanless_r_class_name, (void *) outer_slr);
-  XPUSHs (new_sv);
-  XPUSHs (sv_2mortal(newSViv((IV)lua_ref)));
-}
-
-void
-DESTROY( outer_slr )
-    Outer_R *outer_slr;
-PPCODE:
-{
-  lua_refdec(outer_slr->L);
-  Safefree (outer_slr);
 }
 
 MODULE = Marpa::R3            PACKAGE = Marpa::R3::Lua
