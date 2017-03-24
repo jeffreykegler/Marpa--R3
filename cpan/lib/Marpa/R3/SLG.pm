@@ -252,11 +252,22 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     my $trace_fh = $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE];
     # Pre-lexer G1 processing
 
-    my $kollos = Marpa::R3::Lua->new();
-    $slg->[Marpa::R3::Internal::Scanless::G::L] = $kollos;
-    my ($thin_slg, $lua_ref)  = Marpa::R3::Thin::SLG->new($kollos);
-    $slg->[Marpa::R3::Internal::Scanless::G::C] = $thin_slg;
-    $slg->[Marpa::R3::Internal::Scanless::G::REGIX] = $lua_ref;
+    my $lua = Marpa::R3::Lua->new();
+    $slg->[Marpa::R3::Internal::Scanless::G::L] = $lua;
+
+    my ($regix) = $lua->call_by_tag (-1,
+        ('@' .__FILE__ . ':' .  __LINE__),
+       <<'END_OF_LUA', '');
+        local grammar = {}
+        local registry = debug.getregistry()
+        setmetatable(grammar, _M.class_slg)
+        local regix = _M.register(registry, grammar)
+        grammar.ref_count = 1
+        grammar:post_new()
+        return regix
+END_OF_LUA
+
+    $slg->[Marpa::R3::Internal::Scanless::G::REGIX] = $regix;
 
     $slg->call_by_tag(
         ('@' .__FILE__ . ':' .  __LINE__),
