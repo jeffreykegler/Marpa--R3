@@ -177,11 +177,10 @@ use constant PHASE => 3;
 use constant P_INPUT_STRING => 4;
 use constant TRACE_FILE_HANDLE => 5;
 use constant TRACE_VALUES => 6;
-use constant READ_STRING_ERROR => 7;
-use constant EVENTS => 8;
-use constant MAX_PARSES => 9;
-use constant NO_PARSE => 10;
-use constant TREE_MODE => 11;
-use constant END_OF_PARSE => 12;
+use constant EVENTS => 7;
+use constant MAX_PARSES => 8;
+use constant NO_PARSE => 9;
+use constant TREE_MODE => 10;
+use constant END_OF_PARSE => 11;
 
 1;

@@ -688,6 +688,8 @@ END_OF_LUA
             $precompute_error );
     } ## end if ( defined( my $precompute_error = ...))
 
+    # G1 is now precomputed
+
     # Find out the list of lexemes according to G1
     my %g1_id_by_lexeme_name = ();
   SYMBOL: for my $symbol_id ( $slg->symbol_ids() ) {
@@ -921,6 +923,8 @@ END_OF_LUA
             $precompute_error
         );
     }
+
+    # L0 is now precomputed
 
     my @class_table = ();
 

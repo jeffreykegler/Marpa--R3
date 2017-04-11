@@ -534,11 +534,6 @@ END_OF_LUA
 
 }
 
-sub Marpa::R3::Scanless::R::error {
-    my ($self) = @_;
-    return $self->[Marpa::R3::Internal::Scanless::R::READ_STRING_ERROR];
-}
-
 sub Marpa::R3::Scanless::R::read {
     my ( $slr, $p_string, $start_pos, $length ) = @_;
 
@@ -1324,8 +1319,6 @@ END_OF_LUA
             . Marpa::R3::escape_string( ${$p_string}, -50 ) . "\n";
     } ## end else [ if ($g1_status) ]
 
-    $slr->[Marpa::R3::Internal::Scanless::R::READ_STRING_ERROR] =
-        $read_string_error;
     Marpa::R3::exception($read_string_error);
 
     # Never reached
