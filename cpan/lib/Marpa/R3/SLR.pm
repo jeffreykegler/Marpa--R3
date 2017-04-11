@@ -130,7 +130,6 @@ sub Marpa::R3::Scanless::R::new {
     bless $slr, $class;
 
     # Set recognizer args to default
-    $slr->[Marpa::R3::Internal::Scanless::R::MAX_PARSES]     = 0;
     $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] = [];
     $slr->[Marpa::R3::Internal::Scanless::R::PHASE] = "initial";
 
@@ -177,6 +176,7 @@ sub Marpa::R3::Scanless::R::new {
     recce.lmw_g1r = _M.recce_new(g1g)
     recce.lmw_g1r.lmw_g = g1g
     recce.codepoint = nil
+    recce.max_parses = nil
     recce.es_data = {}
     recce.event_queue = {}
     recce.lexeme_queue = {}
@@ -494,9 +494,14 @@ END_OF_LUA
             'i', $normalized_value);
     }
 
-    if ( defined $flat_args->{'max_parses'} ) {
-        my $value = $flat_args->{'max_parses'};
-        $slr->[Marpa::R3::Internal::Scanless::R::MAX_PARSES] = $value;
+    if ( defined( my $value = $flat_args->{'max_parses'}) ) {
+        $slr->call_by_tag(
+            ( __FILE__ . ':' . __LINE__ ),
+            <<'END_OF_LUA', 'i', $value
+    local recce, value = ...
+    recce.max_parses = value
+END_OF_LUA
+        );
     }
 
     if ( defined( my $value = $flat_args->{'trace_values'} ) ) {

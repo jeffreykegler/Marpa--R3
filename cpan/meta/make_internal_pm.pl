@@ -307,8 +307,6 @@ __DATA__
     TRACE_VALUES
     EVENTS
 
-    MAX_PARSES
-
     { The following fields must be reinitialized when
     evaluation is reset }
 

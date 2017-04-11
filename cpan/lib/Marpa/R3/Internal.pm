@@ -178,9 +178,8 @@ use constant P_INPUT_STRING => 4;
 use constant TRACE_FILE_HANDLE => 5;
 use constant TRACE_VALUES => 6;
 use constant EVENTS => 7;
-use constant MAX_PARSES => 8;
-use constant NO_PARSE => 9;
-use constant TREE_MODE => 10;
-use constant END_OF_PARSE => 11;
+use constant NO_PARSE => 8;
+use constant TREE_MODE => 9;
+use constant END_OF_PARSE => 10;
 
 1;

@@ -1513,13 +1513,12 @@ END_OF_LUA
 
     }
 
-    my $max_parses = $slr->[Marpa::R3::Internal::Scanless::R::MAX_PARSES];
     my ($result) = $slr->call_by_tag( ( __FILE__ . ':' . __LINE__ ),
-        << 'END_OF_LUA', 'i>*', ( $max_parses // 0 ) );
-        recce, raw_max_parses = ...
-        local max_parses = math.tointeger(raw_max_parses + 0)
+        << 'END_OF_LUA', '>*'  );
+        recce = ...
+        local max_parses = recce.max_parses
         local parse_count = recce.lmw_t:parse_count()
-        if max_parses > 0 and parse_count > max_parses then
+        if max_parses and parse_count > max_parses then
             error(string.format("Maximum parse count (%d) exceeded", max_parses));
         end
         -- io.stderr:write('tree:', inspect(recce.lmw_t))
