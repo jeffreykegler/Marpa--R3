@@ -332,7 +332,6 @@ END_OF_LUA
 # true otherwise
 sub Marpa::R3::Scanless::R::ordering_get {
     my ($slr) = @_;
-    return if $slr->[Marpa::R3::Internal::Scanless::R::NO_PARSE];
     my $parse_set_arg = $slr->[Marpa::R3::Internal::Scanless::R::END_OF_PARSE];
     my $slg           = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $ranking_method =
@@ -342,12 +341,19 @@ sub Marpa::R3::Scanless::R::ordering_get {
         ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA',
     local recce, end_of_parse, ranking_method = ...
-    if recce.lmw_o then return true end
+    if recce.has_parse == false then return recce.has_parse end
+    if recce.lmw_o then
+        recce.has_parse = true
+        return recce.has_parse
+    end
     kollos.throw = false
     local bocage = kollos.bocage_new(recce.lmw_g1r, end_of_parse)
     kollos.throw = true
     recce.lmw_b = bocage
-    if not bocage then return false end
+    if not bocage then
+        recce.has_parse = false
+        return recce.has_parse
+    end
     recce.lmw_o = kollos.order_new(bocage)
 
     if ranking_method == 'high_rule_only' then
@@ -358,14 +364,14 @@ sub Marpa::R3::Scanless::R::ordering_get {
         recce.lmw_o:high_rank_only_set(0)
         recce.lmw_o:rank()
     end
-    return true
+    recce.has_parse = true
+    return recce.has_parse
 END_OF_LUA
         'is',
         ( $parse_set_arg // -1 ),
         $ranking_method
     );
 
-    $slr->[Marpa::R3::Internal::Scanless::R::NO_PARSE] = not $has_parse;
     return $has_parse;
 }
 
