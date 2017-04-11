@@ -310,7 +310,6 @@ __DATA__
     { The following fields must be reinitialized when
     evaluation is reset }
 
-    NO_PARSE { no parse found in parse series -- memoized }
     TREE_MODE { 'tree' or 'forest' or undef }
     END_OF_PARSE
 
