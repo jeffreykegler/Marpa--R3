@@ -1441,8 +1441,9 @@ sub Marpa::R3::Scanless::R::value {
 
     $slr->[Marpa::R3::Internal::Scanless::R::PHASE] = "value";
 
-    $slr->call_by_tag( ( __FILE__ . ':' . __LINE__ ), <<'END_OF_LUA', '' );
-    recce = ...
+    my ($have_tree) = $slr->call_by_tag( ( __FILE__ . ':' . __LINE__ ),
+        << 'END_OF_LUA', '>*' );
+            recce=...
     local g1r = recce.lmw_g1r
     local furthest_earleme = g1r:furthest_earleme()
     local last_completed_earleme = g1r:current_earleme()
@@ -1455,26 +1456,17 @@ sub Marpa::R3::Scanless::R::value {
             last_completed_earleme
         ))
     end
+    local lmw_t = recce.lmw_t
+    if lmw_t then return true end
+    -- No tree, therefore ordering is not initialized
+    local lmw_o = recce:ordering_get()
+    if not lmw_o then return false end
+    recce.lmw_t = kollos.tree_new(lmw_o)
+    return true
 END_OF_LUA
 
-  ENSURE_TREE: {
+    return if not $have_tree;
 
-
-        my ($have_tree) = $slr->call_by_tag( ( __FILE__ . ':' . __LINE__ ),
-        << 'END_OF_LUA', '>*' );
-            recce=...
-            local lmw_t = recce.lmw_t
-            if lmw_t then return true end
-            -- No tree, therefore ordering is not initialized
-            local lmw_o = recce:ordering_get()
-            if not lmw_o then return false end
-            recce.lmw_t = kollos.tree_new(lmw_o)
-            return true
-END_OF_LUA
-
-        return if not $have_tree;
-
-    }
 
     my ($result) = $slr->call_by_tag( ( __FILE__ . ':' . __LINE__ ),
         << 'END_OF_LUA', '>*'  );
