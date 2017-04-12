@@ -328,25 +328,6 @@ END_OF_LUA
     return join q{ }, @op_descs;
 } ## end sub show_semantics
 
-# Return false if no ordering was created,
-# true otherwise
-sub Marpa::R3::Scanless::R::ordering_get {
-    my ($slr) = @_;
-    my $slg           = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-
-    my ($has_parse) = $slr->call_by_tag(
-        ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA',
-    local recce = ...
-    local lmw_o = recce:ordering_get()
-    return recce.has_parse
-END_OF_LUA
-        '',
-    );
-
-    return $has_parse;
-}
-
 sub resolve_rule_by_id {
     my ( $slg, $irlid ) = @_;
     my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
@@ -1484,10 +1465,16 @@ END_OF_LUA
             'recce=...; return recce.lmw_t', '>*' );
         last ENSURE_TREE if $lua_tree;
 
-        my $have_order = $slr->ordering_get();
+        my ($have_order) = $slr->call_by_tag( ( __FILE__ . ':' . __LINE__ ),
+        << 'END_OF_LUA', '>*' );
+            recce=...
+            local lmw_o = recce:ordering_get()
+            if not lmw_o then return false end
+            recce.lmw_t = kollos.tree_new(lmw_o)
+            return true
+END_OF_LUA
+
         return if not $have_order;
-        $slr->call_by_tag( ( __FILE__ . ':' . __LINE__ ),
-            'recce=...; recce.lmw_t = kollos.tree_new(recce.lmw_o)', '' );
 
     }
 
