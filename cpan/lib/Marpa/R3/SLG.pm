@@ -256,21 +256,24 @@ END_OF_LUA
 # not to be documented
 sub per_lmg_init {
     my ( $slg, $name ) = @_;
+    my $field_name_form = lc $name;
     my $per_lmg = [];
     $per_lmg->[Marpa::R3::Internal::Trace::G::NAME] = $name;
-    my $lmw_name = 'lmw_' . ( lc $name ) . 'g';
+    my $lmw_name = 'lmw_' . $field_name_form . 'g';
     $per_lmg->[Marpa::R3::Internal::Trace::G::LMW_NAME]            = $lmw_name;
     $per_lmg->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID]        = [];
     $slg->[Marpa::R3::Internal::Scanless::G::PER_LMG]->{$lmw_name} = $per_lmg;
 
     $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 's', ( lc $name ) );
-    local g, short_name = ...
-    lmw_g_name = 'lmw_' .. short_name .. 'g'
+        <<'END_OF_LUA', 's', $field_name_form );
+    local g, field_name_form = ...
+    lmw_g_name = 'lmw_' .. field_name_form .. 'g'
     g[lmw_g_name] = kollos.grammar_new()
+    g[field_name_form] = {}
+    g[field_name_form].xsy_by_isyid = {}
     local lmw_g = g[lmw_g_name]
     lmw_g:force_valued()
-    lmw_g.short_name = short_name
+    lmw_g.short_name = field_name_form
 END_OF_LUA
 
     return $per_lmg;
