@@ -496,6 +496,13 @@ This "post-new" method will become the latter part of the
 
 ```
 
+### Ranking methods
+
+```
+    -- miranda: section+ constant Lua tables
+    _M.ranking_methods = { none = true, high_rule_only = true, rule = true }
+```
+
 ## Kollos SLIF recognizer object
 
 This is a registry object.
@@ -3761,6 +3768,8 @@ a special "configuration" argument.
     -- miranda: insert populate metatables
 
     -- set up various tables
+
+    -- miranda: insert constant Lua tables
     _M.upvalues.kollos = _M
     _M.defines = {}
 

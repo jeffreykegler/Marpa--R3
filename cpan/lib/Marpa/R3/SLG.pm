@@ -228,17 +228,21 @@ qq{'source' name argument to Marpa::R3::Scanless::G->new() is a ref to a an unde
     if ( exists $flat_args->{'ranking_method'} ) {
 
         # Only allowed in new method
-        state $ranking_methods =
-          { map { ( $_, 0 ) } qw(high_rule_only rule none) };
         my $value = $flat_args->{'ranking_method'} // 'undefined';
-        Marpa::R3::exception(
-            qq{ranking_method value is $value (should be one of },
-            ( join q{, }, map { q{'} . $_ . q{'} } keys %{$ranking_methods} ),
-            ')' )
-          if not exists $ranking_methods->{$value};
+
     $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 's', $value);
     local slg, value = ...
+    if not _M.ranking_methods[value] then
+        local list = {}
+        for method,_ in pairs(_M.ranking_methods) do
+            list[#list+1] = string.format('%q', key)
+        end
+        error(string.format(
+            'ranking_method value is %q (should be one of %s)',
+            value, table.concat(list, ', ')
+        ))
+    end
     slg.ranking_method = value
 END_OF_LUA
 
