@@ -338,32 +338,7 @@ sub Marpa::R3::Scanless::R::ordering_get {
         ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA',
     local recce = ...
-    local slg = recce.slg
-    local ranking_method = slg.ranking_method
-    if recce.has_parse == false then return recce.has_parse end
-    if recce.lmw_o then
-        recce.has_parse = true
-        return recce.has_parse
-    end
-    kollos.throw = false
-    local bocage = kollos.bocage_new(recce.lmw_g1r, recce.end_of_parse)
-    kollos.throw = true
-    recce.lmw_b = bocage
-    if not bocage then
-        recce.has_parse = false
-        return recce.has_parse
-    end
-    recce.lmw_o = kollos.order_new(bocage)
-
-    if ranking_method == 'high_rule_only' then
-        recce.lmw_o:high_rank_only_set(1)
-        recce.lmw_o:rank()
-    end
-    if ranking_method == 'rule' then
-        recce.lmw_o:high_rank_only_set(0)
-        recce.lmw_o:rank()
-    end
-    recce.has_parse = true
+    local lmw_o = recce:ordering_get()
     return recce.has_parse
 END_OF_LUA
         '',

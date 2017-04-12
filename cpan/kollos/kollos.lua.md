@@ -1229,6 +1229,47 @@ acceptance is caught here via rejection).  Ignore
     end
 ```
 
+Get the Libmarpa ordering object of `slr`,
+creating it if necessary.
+Returns the Libmarpa object if it could "get" one,
+`nil` otherwise
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slr.ordering_get(recce)
+        local slg = recce.slg
+        local ranking_method = slg.ranking_method
+        if recce.has_parse == false then return recce.has_parse end
+        local lmw_o = recce.lmw_0
+        if lmw_o then
+            recce.has_parse = true
+            return lmw_o
+        end
+        kollos.throw = false
+        local bocage = kollos.bocage_new(recce.lmw_g1r, recce.end_of_parse)
+        kollos.throw = true
+        recce.lmw_b = bocage
+        if not bocage then
+            recce.has_parse = false
+            return
+        end
+
+        lmw_o = kollos.order_new(bocage)
+        recce.lmw_o = lmw_o
+
+        if ranking_method == 'high_rule_only' then
+            recce.lmw_o:high_rank_only_set(1)
+            recce.lmw_o:rank()
+        end
+        if ranking_method == 'rule' then
+            recce.lmw_o:high_rank_only_set(0)
+            recce.lmw_o:rank()
+        end
+        recce.has_parse = true
+        return lmw_o
+    end
+```
+
 ### Locations
 
 Given a G1 span return an L0 span.
