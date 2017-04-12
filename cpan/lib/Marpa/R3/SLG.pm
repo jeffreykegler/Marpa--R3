@@ -334,6 +334,18 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
         $xsy_by_name->{$xsy_name} = $runtime_xsy_data;
     }
 
+    $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 's', $hashed_source );
+        local slg, source_hash = ...
+        -- io.stderr:write(inspect(source_hash))
+        local xsy_names = {}
+        local hash_xsy_data = source_hash.xsy
+        for xsy_name, _ in pairs(hash_xsy_data) do
+             xsy_names[#xsy_names+1] = xsy_name
+        end
+        table.sort(xsy_names)
+END_OF_LUA
+
     $slg->[Marpa::R3::Internal::Scanless::G::XRL_BY_ID]   = [];
     $slg->[Marpa::R3::Internal::Scanless::G::XRL_BY_NAME] = {};
     my $xrls        = $hashed_source->{xrl};
@@ -2041,6 +2053,8 @@ sub Marpa::R3::Scanless::G::call_by_tag {
     my ( $slg, $tag, $codestr, $sig, @args ) = @_;
     my $lua = $slg->[Marpa::R3::Internal::Scanless::G::L];
     my $regix = $slg->[Marpa::R3::Internal::Scanless::G::REGIX];
+    $DB::single = 1 if not defined $lua;
+    $DB::single = 1 if not defined $regix;
     $DB::single = 1 if not defined $tag;
     $DB::single = 1 if not defined $codestr;
     $DB::single = 1 if not defined $sig;

@@ -1161,6 +1161,11 @@ static void recursive_coerce_to_lua(
         return;
     }
 
+    if (!SvOK(sv)) {
+        marpa_lua_pushnil (L);
+        return;
+    }
+
     if (SvROK(sv)) {
         SV* referent = SvRV(sv);
         if (SvTYPE(referent) == SVt_PVAV) {
