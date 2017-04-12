@@ -333,13 +333,13 @@ END_OF_LUA
 sub Marpa::R3::Scanless::R::ordering_get {
     my ($slr) = @_;
     my $slg           = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $ranking_method =
-      $slg->[Marpa::R3::Internal::Scanless::G::RANKING_METHOD];
 
     my ($has_parse) = $slr->call_by_tag(
         ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA',
-    local recce, ranking_method = ...
+    local recce = ...
+    local slg = recce.slg
+    local ranking_method = slg.ranking_method
     if recce.has_parse == false then return recce.has_parse end
     if recce.lmw_o then
         recce.has_parse = true
@@ -366,8 +366,7 @@ sub Marpa::R3::Scanless::R::ordering_get {
     recce.has_parse = true
     return recce.has_parse
 END_OF_LUA
-        's',
-        $ranking_method
+        '',
     );
 
     return $has_parse;

@@ -38,7 +38,6 @@ sub pre_construct {
     $pre_slg->[Marpa::R3::Internal::Scanless::G::EXHAUSTION_ACTION] = 'fatal';
     $pre_slg->[Marpa::R3::Internal::Scanless::G::REJECTION_ACTION] = 'fatal';
     $pre_slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE] = \*STDERR;
-    $pre_slg->[Marpa::R3::Internal::Scanless::G::RANKING_METHOD] = 'none';
     $pre_slg->[Marpa::R3::Internal::Scanless::G::CONSTANTS] = [];
 
     my $lua = Marpa::R3::Lua->new();
@@ -237,7 +236,6 @@ qq{'source' name argument to Marpa::R3::Scanless::G->new() is a ref to a an unde
             ( join q{, }, map { q{'} . $_ . q{'} } keys %{$ranking_methods} ),
             ')' )
           if not exists $ranking_methods->{$value};
-        $slg->[Marpa::R3::Internal::Scanless::G::RANKING_METHOD] = $value;
     $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 's', $value);
     local slg, value = ...

@@ -162,12 +162,11 @@ use constant CHARACTER_CLASSES => 24;
 use constant EXHAUSTION_ACTION => 25;
 use constant REJECTION_ACTION => 26;
 use constant SEMANTICS_PACKAGE => 27;
-use constant RANKING_METHOD => 28;
-use constant TRACE_ACTIONS => 29;
-use constant NULL_VALUES => 30;
-use constant CLOSURE_BY_SYMBOL_ID => 31;
-use constant CLOSURE_BY_RULE_ID => 32;
-use constant CONSTANTS => 33;
+use constant TRACE_ACTIONS => 28;
+use constant NULL_VALUES => 29;
+use constant CLOSURE_BY_SYMBOL_ID => 30;
+use constant CLOSURE_BY_RULE_ID => 31;
+use constant CONSTANTS => 32;
 
 package Marpa::R3::Internal::Scanless::R;
 use constant SLG => 0;
