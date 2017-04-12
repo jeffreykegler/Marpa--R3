@@ -438,17 +438,15 @@ sub Marpa::R3::ASF::new {
 
     $asf->[Marpa::R3::Internal::ASF::GLADES] = [];
 
-    $slr->ordering_get();
-
     my ($is_null) = $slr->call_by_tag(
     ('@' . __FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', '>*' ) ;
     recce = ...
-    local order = recce.lmw_o;
+    local order = recce:ordering_get()
     if not order then
         error( 'Parse failed' )
     end
-    if recce.lmw_o:is_null() == 1 then
+    if order:is_null() == 1 then
         error([[
 An attempt was make to create an ASF for a null parse
   A null parse is a successful parse of a zero-length string

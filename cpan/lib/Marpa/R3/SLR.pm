@@ -1428,13 +1428,12 @@ sub Marpa::R3::Internal::Scanless::input_escape {
 
 sub Marpa::R3::Scanless::R::ambiguity_metric {
     my ($slr) = @_;
-    $slr->ordering_get();
 
     my ($metric) = $slr->call_by_tag(
     ('@' . __FILE__ . ':' . __LINE__),
     <<'END__OF_LUA', '>*' );
     local recce = ...
-    local order = recce.lmw_o
+    local order = recce:ordering_get()
     if not order then return 0 end
     return order:ambiguity_metric()
 END__OF_LUA
