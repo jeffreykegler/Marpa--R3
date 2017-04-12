@@ -40,6 +40,34 @@ sub pre_construct {
     $pre_slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE] = \*STDERR;
     $pre_slg->[Marpa::R3::Internal::Scanless::G::RANKING_METHOD] = 'none';
     $pre_slg->[Marpa::R3::Internal::Scanless::G::CONSTANTS] = [];
+
+    my $lua = Marpa::R3::Lua->new();
+    $pre_slg->[Marpa::R3::Internal::Scanless::G::L] = $lua;
+
+    my ($regix) = $lua->call_by_tag (-1,
+        ('@' .__FILE__ . ':' .  __LINE__),
+       <<'END_OF_LUA', '');
+        local grammar = {}
+        local registry = debug.getregistry()
+        setmetatable(grammar, _M.class_slg)
+        local regix = _M.register(registry, grammar)
+        grammar.ref_count = 1
+        grammar:post_new()
+        return regix
+END_OF_LUA
+
+    $pre_slg->[Marpa::R3::Internal::Scanless::G::REGIX] = $regix;
+
+    $pre_slg->call_by_tag(
+        ('@' .__FILE__ . ':' .  __LINE__),
+        <<'END_OF_LUA', '');
+        local grammar = ...
+        grammar.l0_rules = {}
+        grammar.l0_symbols = {}
+        grammar.g1_rules = {}
+        grammar.g1_symbols = {}
+END_OF_LUA
+
     return $pre_slg;
 }
 
@@ -251,33 +279,6 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
 
     my $trace_fh = $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE];
     # Pre-lexer G1 processing
-
-    my $lua = Marpa::R3::Lua->new();
-    $slg->[Marpa::R3::Internal::Scanless::G::L] = $lua;
-
-    my ($regix) = $lua->call_by_tag (-1,
-        ('@' .__FILE__ . ':' .  __LINE__),
-       <<'END_OF_LUA', '');
-        local grammar = {}
-        local registry = debug.getregistry()
-        setmetatable(grammar, _M.class_slg)
-        local regix = _M.register(registry, grammar)
-        grammar.ref_count = 1
-        grammar:post_new()
-        return regix
-END_OF_LUA
-
-    $slg->[Marpa::R3::Internal::Scanless::G::REGIX] = $regix;
-
-    $slg->call_by_tag(
-        ('@' .__FILE__ . ':' .  __LINE__),
-        <<'END_OF_LUA', '');
-        local grammar = ...
-        grammar.l0_rules = {}
-        grammar.l0_symbols = {}
-        grammar.g1_rules = {}
-        grammar.g1_symbols = {}
-END_OF_LUA
 
     my $g1_tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER] =
       per_lmg_init($slg, "G1");
