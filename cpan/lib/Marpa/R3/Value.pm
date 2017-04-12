@@ -1457,11 +1457,13 @@ sub Marpa::R3::Scanless::R::value {
         ))
     end
     local lmw_t = recce.lmw_t
-    if lmw_t then return true end
-    -- No tree, therefore ordering is not initialized
-    local lmw_o = recce:ordering_get()
-    if not lmw_o then return false end
-    recce.lmw_t = kollos.tree_new(lmw_o)
+    if not lmw_t then
+        -- No tree, therefore ordering is not initialized
+        local lmw_o = recce:ordering_get()
+        if not lmw_o then return false end
+        lmw_t = kollos.tree_new(lmw_o)
+        recce.lmw_t = lmw_t
+    end
     return true
 END_OF_LUA
 
