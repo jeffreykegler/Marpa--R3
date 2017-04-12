@@ -53,21 +53,15 @@ sub pre_construct {
         local regix = _M.register(registry, grammar)
         grammar.ref_count = 1
         grammar:post_new()
-        return regix
-END_OF_LUA
-
-    $pre_slg->[Marpa::R3::Internal::Scanless::G::REGIX] = $regix;
-
-    $pre_slg->call_by_tag(
-        ('@' .__FILE__ . ':' .  __LINE__),
-        <<'END_OF_LUA', '');
-        local grammar = ...
+        grammar.ranking_method = 'none'
         grammar.l0_rules = {}
         grammar.l0_symbols = {}
         grammar.g1_rules = {}
         grammar.g1_symbols = {}
+        return regix
 END_OF_LUA
 
+    $pre_slg->[Marpa::R3::Internal::Scanless::G::REGIX] = $regix;
     return $pre_slg;
 }
 
@@ -244,6 +238,12 @@ qq{'source' name argument to Marpa::R3::Scanless::G->new() is a ref to a an unde
             ')' )
           if not exists $ranking_methods->{$value};
         $slg->[Marpa::R3::Internal::Scanless::G::RANKING_METHOD] = $value;
+    $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 's', $value);
+    local slg, value = ...
+    slg.ranking_method = value
+END_OF_LUA
+
         delete $flat_args->{'ranking_method'};
     }
 
