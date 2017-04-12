@@ -514,7 +514,7 @@ END_OF_LUA
 
     if ( defined( my $value = $flat_args->{'too_many_earley_items'} ) ) {
         $slr->call_by_tag(
-            ( __FILE__ . ':' . __LINE__ ),
+            ('@' . __FILE__ . ':' . __LINE__ ),
             <<'END_OF_LUA', 'i', $value
     local recce, value = ...
     recce.too_many_earley_items = value
@@ -525,16 +525,16 @@ END_OF_LUA
 
     if ( defined( my $value = $flat_args->{'end'} ) ) {
 
-        # Not allowed once evaluation is started
-        my ($has_bocage) = $slr->call_by_tag(
+        $slr->call_by_tag(
     ('@' . __FILE__ . ':' . __LINE__),
-            'local recce = ...; return recce.lmw_b', ''
-        );
-        if ( $has_bocage ) {
-            Marpa::R3::exception(
-                q{Cannot reset end once evaluation has started});
-        }
-        $slr->[Marpa::R3::Internal::Scanless::R::END_OF_PARSE] = $value;
+            <<'END_OF_LUA', 'i', $value);
+            local recce, value = ...
+            -- Not allowed once evaluation is started
+            if recce.lmw_b then
+                error'Cannot reset end once evaluation has started'
+            end
+            recce.end_of_parse = value
+END_OF_LUA
     } ## end if ( defined( my $value = $arg_hash->{'end'} ) )
 
 }

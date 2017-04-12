@@ -179,6 +179,5 @@ use constant TRACE_FILE_HANDLE => 5;
 use constant TRACE_VALUES => 6;
 use constant EVENTS => 7;
 use constant TREE_MODE => 8;
-use constant END_OF_PARSE => 9;
 
 1;

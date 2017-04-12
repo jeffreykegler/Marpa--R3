@@ -311,7 +311,6 @@ __DATA__
     evaluation is reset }
 
     TREE_MODE { 'tree' or 'forest' or undef }
-    END_OF_PARSE
 
     { This is the end of the list of fields which
     must be reinitialized when evaluation is reset }

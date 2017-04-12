@@ -332,7 +332,6 @@ END_OF_LUA
 # true otherwise
 sub Marpa::R3::Scanless::R::ordering_get {
     my ($slr) = @_;
-    my $parse_set_arg = $slr->[Marpa::R3::Internal::Scanless::R::END_OF_PARSE];
     my $slg           = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $ranking_method =
       $slg->[Marpa::R3::Internal::Scanless::G::RANKING_METHOD];
@@ -340,14 +339,14 @@ sub Marpa::R3::Scanless::R::ordering_get {
     my ($has_parse) = $slr->call_by_tag(
         ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA',
-    local recce, end_of_parse, ranking_method = ...
+    local recce, ranking_method = ...
     if recce.has_parse == false then return recce.has_parse end
     if recce.lmw_o then
         recce.has_parse = true
         return recce.has_parse
     end
     kollos.throw = false
-    local bocage = kollos.bocage_new(recce.lmw_g1r, end_of_parse)
+    local bocage = kollos.bocage_new(recce.lmw_g1r, recce.end_of_parse)
     kollos.throw = true
     recce.lmw_b = bocage
     if not bocage then
@@ -367,8 +366,7 @@ sub Marpa::R3::Scanless::R::ordering_get {
     recce.has_parse = true
     return recce.has_parse
 END_OF_LUA
-        'is',
-        ( $parse_set_arg // -1 ),
+        's',
         $ranking_method
     );
 
