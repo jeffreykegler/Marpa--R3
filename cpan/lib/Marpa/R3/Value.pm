@@ -1459,22 +1459,20 @@ END_OF_LUA
 
   ENSURE_TREE: {
 
-        # No tree, therefore not initialized
 
-        my ($lua_tree) = $slr->call_by_tag( ( __FILE__ . ':' . __LINE__ ),
-            'recce=...; return recce.lmw_t', '>*' );
-        last ENSURE_TREE if $lua_tree;
-
-        my ($have_order) = $slr->call_by_tag( ( __FILE__ . ':' . __LINE__ ),
+        my ($have_tree) = $slr->call_by_tag( ( __FILE__ . ':' . __LINE__ ),
         << 'END_OF_LUA', '>*' );
             recce=...
+            local lmw_t = recce.lmw_t
+            if lmw_t then return true end
+            -- No tree, therefore ordering is not initialized
             local lmw_o = recce:ordering_get()
             if not lmw_o then return false end
             recce.lmw_t = kollos.tree_new(lmw_o)
             return true
 END_OF_LUA
 
-        return if not $have_order;
+        return if not $have_tree;
 
     }
 
