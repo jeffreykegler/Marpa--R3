@@ -1441,7 +1441,7 @@ sub Marpa::R3::Scanless::R::value {
 
     $slr->[Marpa::R3::Internal::Scanless::R::PHASE] = "value";
 
-    my ($have_tree) = $slr->call_by_tag( ( __FILE__ . ':' . __LINE__ ),
+    my ($result) = $slr->call_by_tag( ( __FILE__ . ':' . __LINE__ ),
         << 'END_OF_LUA', '>*' );
             recce=...
     local g1r = recce.lmw_g1r
@@ -1464,29 +1464,21 @@ sub Marpa::R3::Scanless::R::value {
         lmw_t = kollos.tree_new(lmw_o)
         recce.lmw_t = lmw_t
     end
-    return true
-END_OF_LUA
 
-    return if not $have_tree;
-
-
-    my ($result) = $slr->call_by_tag( ( __FILE__ . ':' . __LINE__ ),
-        << 'END_OF_LUA', '>*'  );
-        recce = ...
-        local max_parses = recce.max_parses
-        local parse_count = recce.lmw_t:parse_count()
-        if max_parses and parse_count > max_parses then
-            error(string.format("Maximum parse count (%d) exceeded", max_parses));
-        end
-        -- io.stderr:write('tree:', inspect(recce.lmw_t))
-        recce.lmw_v = nil
-        -- print(inspect(_G))
-        collectgarbage()
-        local result = recce.lmw_t:next()
-        if not result then return result end
-        -- print('result:', result)
-        recce.lmw_v = kollos.value_new(recce.lmw_t)
-        return result
+    local max_parses = recce.max_parses
+    local parse_count = recce.lmw_t:parse_count()
+    if max_parses and parse_count > max_parses then
+        error(string.format("Maximum parse count (%d) exceeded", max_parses));
+    end
+    -- io.stderr:write('tree:', inspect(recce.lmw_t))
+    recce.lmw_v = nil
+    -- print(inspect(_G))
+    collectgarbage()
+    local result = recce.lmw_t:next()
+    if not result then return result end
+    -- print('result:', result)
+    recce.lmw_v = kollos.value_new(recce.lmw_t)
+    return result
 END_OF_LUA
 
     return if not defined $result;
