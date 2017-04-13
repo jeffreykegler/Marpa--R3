@@ -29,7 +29,6 @@ package Marpa::R3::Internal::XSY;
 use constant NAME => 0;
 use constant BLESSING => 1;
 use constant LEXEME_SEMANTICS => 2;
-use constant DSL_FORM => 3;
 
 package Marpa::R3::Internal::XRL;
 use constant ID => 0;

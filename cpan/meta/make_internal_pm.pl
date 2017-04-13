@@ -103,7 +103,6 @@ __DATA__
     NAME
     BLESSING
     LEXEME_SEMANTICS
-    DSL_FORM
 
     :package=Marpa::R3::Internal::XRL
 

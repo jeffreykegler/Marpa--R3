@@ -310,11 +310,6 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
                   $source_xsy_data->{$datum_key};
                 next KEY;
             }
-            if ( $datum_key eq 'dsl_form' ) {
-                $runtime_xsy_data->[Marpa::R3::Internal::XSY::DSL_FORM] =
-                  $source_xsy_data->{$datum_key};
-                next KEY;
-            }
         }
         push @{$xsy_by_id}, $runtime_xsy_data;
         $xsy_by_name->{$xsy_name} = $runtime_xsy_data;
@@ -2353,11 +2348,21 @@ END_OF_LUA
 # Does no checking
 sub Marpa::R3::Scanless::G::lmg_symbol_dsl_form {
     my ( $slg, $lmw_name, $isyid ) = @_;
-    my $per_lmg = $slg->[Marpa::R3::Internal::Scanless::G::PER_LMG]->{$lmw_name};
-    my $xsy_by_isyid   = $per_lmg->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID];
-    my $xsy = $xsy_by_isyid->[$isyid];
+    my $per_lmg =
+      $slg->[Marpa::R3::Internal::Scanless::G::PER_LMG]->{$lmw_name};
+    my $xsy_by_isyid = $per_lmg->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID];
+    my $xsy          = $xsy_by_isyid->[$isyid];
     return if not defined $xsy;
-    return $xsy->[Marpa::R3::Internal::XSY::DSL_FORM];
+
+    # switch to ID after developement
+    my $xsy_name = $xsy->[Marpa::R3::Internal::XSY::NAME];
+
+    my ($dsl_form) = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 's', $xsy_name );
+        local slg, xsy_name = ...
+        return slg.xsys[xsy_name].dsl_form
+END_OF_LUA
+    return $dsl_form;
 }
 
 # Return display form of symbol
