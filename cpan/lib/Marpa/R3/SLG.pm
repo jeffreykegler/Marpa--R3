@@ -315,11 +315,6 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
                   $source_xsy_data->{$datum_key};
                 next KEY;
             }
-            if ( $datum_key eq 'name_source' ) {
-                $runtime_xsy_data->[Marpa::R3::Internal::XSY::NAME_SOURCE] =
-                  $source_xsy_data->{$datum_key};
-                next KEY;
-            }
         }
         push @{$xsy_by_id}, $runtime_xsy_data;
         $xsy_by_name->{$xsy_name} = $runtime_xsy_data;
