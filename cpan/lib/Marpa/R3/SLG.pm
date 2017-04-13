@@ -345,16 +345,22 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
              xsy_names[#xsy_names+1] = xsy_name
         end
         table.sort(xsy_names)
-        for xsy_id = 1, #xsy_names do
+        for ix = 1, #xsy_names do
+            -- during development, zero-based so that it duplicates original
+            -- Perl implementation
+            local xsy_name = xsy_names[ix]
+            local xsy_id = ix - 1
             local runtime_xsy = { id = xsy_id }
-            xsy_name = xsy_names[xsy_id]
             runtime_xsy.name = xsy_name
-            xsy_source = hash_xsy_data[xsy_name]
+            local xsy_source = hash_xsy_data[xsy_name]
+
             -- copy, so that we can destroy `source_hash`
-            for _, key in pairs({'action', 'blessing', 'dsl_form',
-                'if_inaccessible', 'name_source'}) do
-                runtime_xsy[key] = xsy_source[key]
-            end
+            runtime_xsy.lexeme_semantics = xsy_source.action
+            runtime_xsy.blessing = xsy_source.blessing
+            runtime_xsy.dsl_form = xsy_source.dsl_form
+            runtime_xsy.if_inaccessible = xsy_source.if_inaccessible
+            runtime_xsy.name_source = xsy_source.name_source
+
             slg.xsys[xsy_name] = runtime_xsy
             slg.xsys[xsy_id] = runtime_xsy
         end
@@ -1448,6 +1454,7 @@ END_OF_LUA
         next SYMBOL if $is_accessible;
 
         my $xsy      = $xsy_by_isyid->[$symbol_id];
+        my $xsy_name = $xsy->[Marpa::R3::Internal::XSY::NAME];
 
         # Inaccessible internal symbols may be created
         # from inaccessible use symbols -- ignore these.
@@ -1457,9 +1464,13 @@ END_OF_LUA
         # accessible ones.
         next SYMBOL if not defined $xsy;
 
-        my $treatment =
-            $xsy->[Marpa::R3::Internal::XSY::IF_INACCESSIBLE] //
-            $default_if_inaccessible;
+        my ($treatment) = $slg->call_by_tag(
+        ('@' .__FILE__ . ':' .  __LINE__),
+        <<'END_OF_LUA', 'ss', $xsy_name, $default_if_inaccessible);
+        local slg, xsy_name, default_treatment = ...
+        return slg.xsys[xsy_name].if_inaccessible or default_treatment
+END_OF_LUA
+
         next SYMBOL if $treatment eq 'ok';
         my $symbol_name = $slg->lmg_symbol_name($lmw_name, $symbol_id);
         my $message = "Inaccessible symbol: $symbol_name";
