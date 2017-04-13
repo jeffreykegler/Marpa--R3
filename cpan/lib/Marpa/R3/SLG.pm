@@ -337,6 +337,7 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 's', $hashed_source );
         local slg, source_hash = ...
+        slg.xsys = {}
         -- io.stderr:write(inspect(source_hash))
         local xsy_names = {}
         local hash_xsy_data = source_hash.xsy
@@ -344,6 +345,20 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
              xsy_names[#xsy_names+1] = xsy_name
         end
         table.sort(xsy_names)
+        for xsy_id = 1, #xsy_names do
+            local runtime_xsy = { id = xsy_id }
+            xsy_name = xsy_names[xsy_id]
+            runtime_xsy.name = xsy_name
+            xsy_source = hash_xsy_data[xsy_name]
+            -- copy, so that we can destroy `source_hash`
+            for _, key in pairs({'action', 'blessing', 'dsl_form',
+                'if_inaccessible', 'name_source'}) do
+                runtime_xsy[key] = xsy_source[key]
+            end
+            slg.xsys[xsy_name] = runtime_xsy
+            slg.xsys[xsy_id] = runtime_xsy
+        end
+        -- io.stderr:write(inspect(slg.xsys))
 END_OF_LUA
 
     $slg->[Marpa::R3::Internal::Scanless::G::XRL_BY_ID]   = [];
