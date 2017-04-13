@@ -100,7 +100,6 @@ END_OF_HEADER
 __DATA__
 
     :package=Marpa::R3::Internal::XSY
-    ID
     NAME
     NAME_SOURCE { Where is the symbol name from?
        lexical?  internal?
@@ -108,7 +107,6 @@ __DATA__
     BLESSING
     LEXEME_SEMANTICS
     DSL_FORM
-    IF_INACCESSIBLE
 
     :package=Marpa::R3::Internal::XRL
 

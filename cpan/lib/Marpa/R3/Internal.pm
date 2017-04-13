@@ -26,13 +26,11 @@ $VERSION = eval $VERSION;
 
 
 package Marpa::R3::Internal::XSY;
-use constant ID => 0;
-use constant NAME => 1;
-use constant NAME_SOURCE => 2;
-use constant BLESSING => 3;
-use constant LEXEME_SEMANTICS => 4;
-use constant DSL_FORM => 5;
-use constant IF_INACCESSIBLE => 6;
+use constant NAME => 0;
+use constant NAME_SOURCE => 1;
+use constant BLESSING => 2;
+use constant LEXEME_SEMANTICS => 3;
+use constant DSL_FORM => 4;
 
 package Marpa::R3::Internal::XRL;
 use constant ID => 0;

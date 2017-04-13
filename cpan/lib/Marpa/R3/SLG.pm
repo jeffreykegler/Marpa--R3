@@ -297,8 +297,6 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
       {};
     for my $xsy_name ( sort @xsy_names ) {
         my $runtime_xsy_data = [];
-        $runtime_xsy_data->[Marpa::R3::Internal::XSY::ID] =
-          scalar @{$xsy_by_id};
         $runtime_xsy_data->[Marpa::R3::Internal::XSY::NAME] = $xsy_name;
         my $source_xsy_data = $hashed_source->{xsy}->{$xsy_name};
       KEY: for my $datum_key ( keys %{$source_xsy_data} ) {
@@ -317,18 +315,11 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
                   $source_xsy_data->{$datum_key};
                 next KEY;
             }
-            if ( $datum_key eq 'if_inaccessible' ) {
-                $runtime_xsy_data->[Marpa::R3::Internal::XSY::IF_INACCESSIBLE]
-                  = $source_xsy_data->{$datum_key};
-                next KEY;
-            }
             if ( $datum_key eq 'name_source' ) {
                 $runtime_xsy_data->[Marpa::R3::Internal::XSY::NAME_SOURCE] =
                   $source_xsy_data->{$datum_key};
                 next KEY;
             }
-            Marpa::R3::exception(
-                "Internal error: Unknown hashed source xsy field: $datum_key");
         }
         push @{$xsy_by_id}, $runtime_xsy_data;
         $xsy_by_name->{$xsy_name} = $runtime_xsy_data;
