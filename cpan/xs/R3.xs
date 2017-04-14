@@ -219,6 +219,57 @@ do_lua_tree_op (lua_State * L, int visited_ix, int idx, char signature)
     return 0;
 }
 
+/* Reworked from Lua's utf8_decode.
+ * We cannot use the XS Unicode routines, because
+ * we are checking for standard Unicode, which Lua
+ * uses, and Perl extends UTF-8.
+ */
+static const char *utf8_validate (const char *o, int max_size) {
+  const lua_Integer maxunicode= 0x10FFFF;
+  static const unsigned int limits[] = {0xFF, 0x7F, 0x7FF, 0xFFFF};
+  const unsigned char *s = (const unsigned char *)o;
+  unsigned int c = s[0];
+  unsigned int res = 0;  /* final result */
+  if (max_size <= 0) return NULL;
+  if (c < 0x80)  /* ascii? */
+    res = c;
+  else {
+    int count = 0;  /* to count number of continuation bytes */
+    while (c & 0x40) {  /* still have continuation bytes? */
+      int cc;
+      ++count;
+      if (count + 1 > max_size) return NULL;
+      cc = s[count];  /* read next byte */
+      if ((cc & 0xC0) != 0x80)  /* not a continuation byte? */
+        return NULL;  /* invalid byte sequence */
+      res = (res << 6) | (cc & 0x3F);  /* add lower 6 bits from cont. byte */
+      c <<= 1;  /* to test next bit */
+    }
+    res |= ((c & 0x7F) << (count * 5));  /* add first byte */
+    if (count > 3 || res > maxunicode || res <= limits[count])
+      return NULL;  /* invalid byte sequence */
+    s += count;  /* skip continuation bytes read */
+  }
+  return (const char *)s + 1;  /* +1 to include first byte */
+}
+
+static int find_utf8_error (const char *s, const char *end) {
+  const char *s1 = s;
+  while (s1 < end) {
+    const char *s1 = utf8_validate(s1, end - s1);
+    if (s1 == NULL) return s1 - s;
+  }
+  return -1;
+}
+
+static int is_ascii7 (const char *s, size_t length) {
+    size_t i;
+    for (i = 0; i < length; i++) {
+        if (s[i] & 0x80) return 0;
+    }
+    return 1;
+}
+
 static SV*
 recursive_coerce_to_sv (lua_State * L, int visited_ix, int idx, char signature)
 {
@@ -248,9 +299,12 @@ recursive_coerce_to_sv (lua_State * L, int visited_ix, int idx, char signature)
         break;
     case LUA_TSTRING:
         /* warn("%s %d: %s len=%d\n", __FILE__, __LINE__, marpa_lua_tostring (L, idx), marpa_lua_rawlen (L, idx)); */
-        result =
-            newSVpvn (marpa_lua_tostring (L, idx), marpa_lua_rawlen (L,
-                idx));
+        {
+            size_t str_length;
+            const char *str = marpa_lua_tolstring (L, idx, &str_length);
+            result = newSVpvn (str, (STRLEN)str_length);
+            if (!is_ascii7(str, str_length)) SvUTF8_on(result);
+        }
         break;
     case LUA_TTABLE:
         {
@@ -1200,7 +1254,16 @@ static void recursive_coerce_to_lua(
 
     DEFAULT_TO_STRING:
     /* If here, we are coercing to a string */
-    marpa_lua_pushstring (L, SvPV_nolen (sv));
+    {
+      STRLEN len;
+      const char *s = SvPV (sv, len);
+      int error_pos = find_utf8_error(s, s+len);
+      if (error_pos >= 0) {
+         croak("Non-UTF-8 string ('%.10s') passed to Marpa, problem at pos=%ld, '%.10s'",
+              s, (long)error_pos, s+error_pos);
+      }
+      marpa_lua_pushstring (L, s);
+    }
     return;
 }
 
