@@ -295,7 +295,8 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     my $xsy_by_id = $slg->[Marpa::R3::Internal::Scanless::G::XSY_BY_ID] = [];
     my $xsy_by_name = $slg->[Marpa::R3::Internal::Scanless::G::XSY_BY_NAME] =
       {};
-    for my $xsy_name ( sort @{$xsy_names} ) {
+    $xsy_names = [ sort @{$xsy_names} ];
+    for my $xsy_name ( @{$xsy_names} ) {
         my $runtime_xsy_data = [];
         $runtime_xsy_data->[Marpa::R3::Internal::XSY::NAME] = $xsy_name;
         my $source_xsy_data = $hashed_source->{xsy}->{$xsy_name};
@@ -311,11 +312,13 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
                 next KEY;
             }
         }
+        $runtime_xsy_data->[Marpa::R3::Internal::XSY::ID] = scalar @{$xsy_by_id};
         push @{$xsy_by_id}, $runtime_xsy_data;
         $xsy_by_name->{$xsy_name} = $runtime_xsy_data;
     }
 
-    ($xsy_names) = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+    # ($xsy_names) =
+    $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 's', $hashed_source );
         local slg, source_hash = ...
         slg.xsys = {}
@@ -330,9 +333,8 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
             -- during development, zero-based so that it duplicates original
             -- Perl implementation
             local xsy_name = xsy_names[ix]
-            local xsy_id = ix - 1
-            local runtime_xsy = { id = xsy_id }
-            runtime_xsy.name = xsy_name
+            local runtime_xsy = { name = xsy_name }
+
             local xsy_source = hash_xsy_data[xsy_name]
 
             -- copy, so that we can destroy `source_hash`
@@ -343,11 +345,10 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
             runtime_xsy.name_source = xsy_source.name_source
 
             slg.xsys[xsy_name] = runtime_xsy
-            slg.xsys[xsy_id] = runtime_xsy
         end
         -- io.stderr:write(inspect(xsy_names), "\n")
         -- io.stderr:write("Before returning xsy_names\n")
-        return xsy_names
+        -- return xsy_names
 END_OF_LUA
 
     # say STDERR Data::Dumper::Dumper($xsy_names);
@@ -1201,14 +1202,31 @@ END_OF_LUA
             my $g1_lexeme_id = $g1_id_by_lexeme_name{$lexeme_name};
             my $xsy          = $xsy_by_isyid->[$g1_lexeme_id];
             next LEXEME if not defined $xsy;
+            my $xsy_id = $xsy->[Marpa::R3::Internal::XSY::ID];
             my $xsy_name = $xsy->[Marpa::R3::Internal::XSY::NAME];
 
         my ($name_source) = $slg->call_by_tag(
         ('@' .__FILE__ . ':' .  __LINE__),
-        <<'END_OF_LUA', 's', $xsy_name);
-        local slg, xsy_name = ...
-        -- print(inspect( slg.xsys[xsy_name]))
-        return slg.xsys[xsy_name].name_source
+        <<'END_OF_LUA', 'is', $xsy_id, $xsy_name);
+        local slg, xsy_id, xsy_name = ...
+        -- print(inspect( xsy_id ) )
+        -- print(inspect( slg.xsys[xsy_id]))
+        local name_source_by_id = slg.xsys[xsy_id].name_source
+        local name_source_by_name = slg.xsys[xsy_name].name_source
+        if (name_source_by_id ~= name_source_by_name) then
+            io.stderr:write(string.format(
+                "id=%s; name=%s; id by name = %s; name by id = %s\n",
+                inspect(xsy_id), inspect(xsy_name),
+                inspect(slg.xsys[xsy_name].id),
+                inspect(slg.xsys[xsy_id].name)
+            ))
+            error(string.format(
+                "name_source mismatch, by id = %s; by name = %s\n",
+                inspect(name_source_by_id),
+                inspect(name_source_by_name)
+            ))
+        end
+        return slg.xsys[xsy_id].name_source
 END_OF_LUA
             next LEXEME if $name_source ne 'lexical';
 
