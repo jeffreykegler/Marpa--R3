@@ -352,11 +352,10 @@ END_OF_LUA
 
     # say STDERR Data::Dumper::Dumper($xsy_names);
 
-    if (0) {
     $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 's', $xsy_names );
         local slg, xsy_names = ...
-        io.stderr:write(inspect(xsy_names), "\n")
+        -- io.stderr:write(inspect(xsy_names), "\n")
         xsys = slg.xsys
         for ix = 1, #xsy_names do
             local xsy_name = xsy_names[ix]
@@ -370,7 +369,6 @@ END_OF_LUA
             xsys[xsy_id] = xsy_source
         end
 END_OF_LUA
-    }
 
     $slg->[Marpa::R3::Internal::Scanless::G::XRL_BY_ID]   = [];
     $slg->[Marpa::R3::Internal::Scanless::G::XRL_BY_NAME] = {};
