@@ -228,10 +228,10 @@ static const char *utf8_validate (const char *o, int max_size) {
   const lua_Integer maxunicode= 0x10FFFF;
   static const unsigned int limits[] = {0xFF, 0x7F, 0x7FF, 0xFFFF};
   const unsigned char *s = (const unsigned char *)o;
-  unsigned int c = s[0];
+  unsigned int c = (unsigned int)s[0];
   unsigned int res = 0;  /* final result */
   if (max_size <= 0) return NULL;
-  if (c < 0x80)  /* ascii? */
+  if (c <= 0x7F)  /* ascii? */
     res = c;
   else {
     int count = 0;  /* to count number of continuation bytes */
@@ -256,7 +256,9 @@ static const char *utf8_validate (const char *o, int max_size) {
 static int find_utf8_error (const char *s, const char *end) {
   const char *s1 = s;
   while (s1 < end) {
-    const char *s1 = utf8_validate(s1, end - s1);
+    /* warn("%s %d before s1=%p\n", __FILE__, __LINE__, s1); */
+    s1 = utf8_validate(s1, end - s1);
+    /* warn("%s %d after s1=%p\n", __FILE__, __LINE__, s1); */
     if (s1 == NULL) return s1 - s;
   }
   return -1;
@@ -1129,12 +1131,14 @@ static void coerce_to_lua_sequence(
     result_ix = marpa_lua_gettop(L);
     last_perl_ix = av_len(av);
     for (perl_ix = 0; perl_ix <= last_perl_ix; perl_ix++) {
+       /* warn("%s %d fetching perl array index %ld\n", __FILE__, __LINE__, (long)(perl_ix)); */
        SV** p_sv = av_fetch(av, perl_ix, 0);
        if (p_sv) {
            recursive_coerce_to_lua(L, visited_ix, *p_sv, sig);
        } else {
            marpa_lua_pushboolean(L, 0);
        }
+       /* warn("%s %d setting lua array index %ld\n", __FILE__, __LINE__, (long)(perl_ix+1)); */
        marpa_lua_seti(L, result_ix, perl_ix+1);
     }
 
@@ -1262,7 +1266,8 @@ static void recursive_coerce_to_lua(
          croak("Non-UTF-8 string ('%.10s') passed to Marpa, problem at pos=%ld, '%.10s'",
               s, (long)error_pos, s+error_pos);
       }
-      marpa_lua_pushstring (L, s);
+      /* warn("%s %d pushing lua string %s tos=%ld", __FILE__, __LINE__, s, (long)marpa_lua_gettop(L)); */
+      marpa_lua_pushlstring (L, s, (size_t)len);
     }
     return;
 }
@@ -1491,13 +1496,12 @@ PPCODE:
     const int base_of_stack = marpa_lua_gettop (L);
     int msghandler_ix;
     int cache_ix;
+    int top_after;
     int type;
 
     /* warn("%s %d is_method=%ld lua_ref=%ld", __FILE__, __LINE__,
      *  (long)is_method, (long)lua_ref);
      */
-
-    PERL_UNUSED_VAR(error_tag); /* Silence warning */
 
     marpa_lua_pushcfunction(L, glue_msghandler);
     msghandler_ix = marpa_lua_gettop(L);
@@ -1574,8 +1578,10 @@ PPCODE:
 
        if (arg_count - is_method != args_supplied) {
                 croak
-                    ("Internal error: signature ('%s') wants %ld items, but %ld arguments in call_by_tag()",
-                        signature, (long)(arg_count - is_method), (long)(args_supplied));
+                    ("Internal error: signature ('%s') wants %ld items, but %ld arguments in call_by_tag()\n"
+                        "    Problem was at %s\n",
+                        signature, (long)(arg_count - is_method), (long)(args_supplied),
+                        error_tag);
        }
 
         status = marpa_lua_pcall (L, arg_count, LUA_MULTRET, msghandler_ix);
@@ -1586,10 +1592,62 @@ PPCODE:
         }
 
         marpa_luaL_checkstack(L, 20, "xlua EXEC_SIG_BODY");
+        
+        top_after = marpa_lua_gettop (L);
+
+        {
+            /* check count of return values */
+            int i;
+            const int actual_return_count
+              = top_after - function_stack_ix + 1;
+            int desired_return_count = 0;
+            int wanted_is_exact = 1;
+            for (i = 0; ; i++) {
+                const char this_sig = return_signature[i];
+                if (!this_sig) break;
+                if (!wanted_is_exact) {
+                  /* If here, we've seen a '*', which has trailing
+                   * signature items.
+                   */
+                  croak
+                      ("Internal error: poorly formed return signature ('%s')", signature);
+                }
+                switch(this_sig) {
+                case '*':
+                     wanted_is_exact = 0;
+                     break;
+                case '-':
+                case '0':
+                case '1':
+                case '2':
+                     desired_return_count++;
+                     break;
+                default:
+                    croak
+                        ("Internal error: invalid return sig option '%c', signature=%s",
+                        this_sig, signature);
+                }
+            }
+            if (wanted_is_exact && actual_return_count > desired_return_count) {
+                croak
+                    ("Internal error; too many return items for signature ('%s'); actual=%ld; desired=%ld\n"
+                        "    Problem was at %s\n",
+                        signature, (long)actual_return_count, (long)desired_return_count,
+                        error_tag
+                        );
+            }
+            if (actual_return_count < desired_return_count) {
+                croak
+                    ("Internal error; too few return items for signature ('%s'); actual=%ld; desired=%ld\n"
+                        "    Problem was at %s\n",
+                        signature, (long)actual_return_count, (long)desired_return_count,
+                        error_tag
+                        );
+            }
+        }
 
         /* return args to caller */
         {
-            const int top_after = marpa_lua_gettop (L);
             SV *sv_result;
             int stack_ix;
             int signature_ix = 0;

@@ -290,12 +290,12 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     my $lex_tracer = $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER] =
       per_lmg_init($slg, "L0");
 
-    my @xsy_names = keys %{ $hashed_source->{xsy} };
+    my $xsy_names = [ keys %{ $hashed_source->{xsy} } ];
 
     my $xsy_by_id = $slg->[Marpa::R3::Internal::Scanless::G::XSY_BY_ID] = [];
     my $xsy_by_name = $slg->[Marpa::R3::Internal::Scanless::G::XSY_BY_NAME] =
       {};
-    for my $xsy_name ( sort @xsy_names ) {
+    for my $xsy_name ( sort @{$xsy_names} ) {
         my $runtime_xsy_data = [];
         $runtime_xsy_data->[Marpa::R3::Internal::XSY::NAME] = $xsy_name;
         my $source_xsy_data = $hashed_source->{xsy}->{$xsy_name};
@@ -315,6 +315,7 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
         $xsy_by_name->{$xsy_name} = $runtime_xsy_data;
     }
 
+    # ($xsy_names) =
     $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 's', $hashed_source );
         local slg, source_hash = ...
@@ -345,8 +346,31 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
             slg.xsys[xsy_name] = runtime_xsy
             slg.xsys[xsy_id] = runtime_xsy
         end
-        -- io.stderr:write(inspect(slg.xsys))
+        -- io.stderr:write(inspect(xsy_names), "\n")
+        -- return xsy_names
 END_OF_LUA
+
+    # say STDERR Data::Dumper::Dumper($xsy_names);
+
+    if (0) {
+    $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 's', $xsy_names );
+        local slg, xsy_names = ...
+        io.stderr:write(inspect(xsy_names), "\n")
+        xsys = slg.xsys
+        for ix = 1, #xsy_names do
+            local xsy_name = xsy_names[ix]
+            local xsy_source = xsys[xsy_name]
+            -- TODO delete next test after development
+            if not xsy_source then
+                 error("No xsy for " .. inspect(xsy_name))
+            end
+            local xsy_id = ix - 1
+            xsy_source.id = xsy_id
+            xsys[xsy_id] = xsy_source
+        end
+END_OF_LUA
+    }
 
     $slg->[Marpa::R3::Internal::Scanless::G::XRL_BY_ID]   = [];
     $slg->[Marpa::R3::Internal::Scanless::G::XRL_BY_NAME] = {};
