@@ -1211,21 +1211,21 @@ END_OF_LUA
         local slg, xsy_id, xsy_name = ...
         -- print(inspect( xsy_id ) )
         -- print(inspect( slg.xsys[xsy_id]))
-        local name_source_by_id = slg.xsys[xsy_id].name_source
-        local name_source_by_name = slg.xsys[xsy_name].name_source
-        if (name_source_by_id ~= name_source_by_name) then
-            io.stderr:write(string.format(
-                "id=%s; name=%s; id by name = %s; name by id = %s\n",
-                inspect(xsy_id), inspect(xsy_name),
-                inspect(slg.xsys[xsy_name].id),
-                inspect(slg.xsys[xsy_id].name)
-            ))
-            error(string.format(
-                "name_source mismatch, by id = %s; by name = %s\n",
-                inspect(name_source_by_id),
-                inspect(name_source_by_name)
-            ))
-        end
+        -- local name_source_by_id = slg.xsys[xsy_id].name_source
+        -- local name_source_by_name = slg.xsys[xsy_name].name_source
+        -- if (name_source_by_id ~= name_source_by_name) then
+            -- io.stderr:write(string.format(
+                -- "id=%s; name=%s; id by name = %s; name by id = %s\n",
+                -- inspect(xsy_id), inspect(xsy_name),
+                -- inspect(slg.xsys[xsy_name].id),
+                -- inspect(slg.xsys[xsy_id].name)
+            -- ))
+            -- error(string.format(
+                -- "name_source mismatch, by id = %s; by name = %s\n",
+                -- inspect(name_source_by_id),
+                -- inspect(name_source_by_name)
+            -- ))
+        -- end
         return slg.xsys[xsy_id].name_source
 END_OF_LUA
             next LEXEME if $name_source ne 'lexical';
