@@ -382,6 +382,8 @@ coerce_to_av (lua_State * L, int visited_ix, int table_ix, char signature)
     const int base_of_stack = marpa_lua_gettop(L);
     const int ix_offset = signature == '1' ? 0 : -1;
 
+    /* warn("%s %d table_ix=%ld signature=%c\n", __FILE__, __LINE__, table_ix, signature); */
+
     marpa_lua_pushvalue(L, table_ix);
     if (!visitee_on(L, visited_ix, table_ix)) {
         result = newSVpvs ("[cycle in lua table]");
@@ -403,11 +405,14 @@ coerce_to_av (lua_State * L, int visited_ix, int table_ix, char signature)
 	SV *entry_value;
 	SV** ownership_taken;
         const int type_pushed = marpa_lua_geti(L, table_ix, seq_ix);
+        /* warn("%s %d seq_ix=%ld\n", __FILE__, __LINE__, seq_ix); */
 
         if (type_pushed == LUA_TNIL) { break; }
         value_ix = marpa_lua_gettop(L); /* We need an absolute index, not -1 */
+        /* warn("%s %d value_ix=%ld\n", __FILE__, __LINE__, value_ix); */
 	entry_value = recursive_coerce_to_sv(L, visited_ix, value_ix, signature);
 	ownership_taken = av_store(av, (int)seq_ix + ix_offset, entry_value);
+        marpa_lua_settop(L, value_ix - 1);
 	if (!ownership_taken) {
 	  SvREFCNT_dec (entry_value);
           croak (R3ERR "av_store failed; " MYLUA_TAG);

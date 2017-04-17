@@ -315,8 +315,7 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
         $xsy_by_name->{$xsy_name} = $runtime_xsy_data;
     }
 
-    # ($xsy_names) =
-    $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+    ($xsy_names) = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 's', $hashed_source );
         local slg, source_hash = ...
         slg.xsys = {}
@@ -347,7 +346,8 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
             slg.xsys[xsy_id] = runtime_xsy
         end
         -- io.stderr:write(inspect(xsy_names), "\n")
-        -- return xsy_names
+        -- io.stderr:write("Before returning xsy_names\n")
+        return xsy_names
 END_OF_LUA
 
     # say STDERR Data::Dumper::Dumper($xsy_names);
