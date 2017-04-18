@@ -1194,10 +1194,26 @@ static void coerce_to_lua_table(
     hv_iterinit (hv);
     {
         char *key;
-        I32 klen;
-        SV *val;
-        while ((val = hv_iternextsv (hv, (char **) &key, &klen))) {
-            marpa_lua_pushlstring (L, key, (size_t)klen);
+        HE *entry;
+        while ((entry = hv_iternext (hv))) {
+
+            SV *val = hv_iterval(hv, entry);
+            SV* keysv = hv_iterkeysv(entry);
+            STRLEN keylen;
+            const char *key = SvPV (keysv, keylen);
+
+            int error_pos = find_utf8_error(key, key+keylen);
+            if (error_pos >= 0) {
+               croak("Non-UTF-8 string ('%.10s') passed to Marpa, problem at pos=%ld, '%.10s'",
+                    key, (long)error_pos, key+error_pos);
+            }
+
+            /* warn("%s %d pushing Perl hash key as lua string %.10s klen=%ld", __FILE__, __LINE__, key, (long)klen); */
+            /* warn("%s %d 1-length Perl hash key %lx", __FILE__, __LINE__, (long)*key); */
+            /* warn("from hv_iterkeysv(): length=%ld, key[0]=%lx key[1]=%lx", (long)len, (long)s[0], (long)s[1]); */
+
+            marpa_lua_pushlstring (L, key, (size_t)keylen);
+
             recursive_coerce_to_lua (L, visited_ix, val, sig);
             marpa_lua_settable (L, result_ix);
         }
@@ -1271,7 +1287,7 @@ static void recursive_coerce_to_lua(
          croak("Non-UTF-8 string ('%.10s') passed to Marpa, problem at pos=%ld, '%.10s'",
               s, (long)error_pos, s+error_pos);
       }
-      /* warn("%s %d pushing lua string %s tos=%ld", __FILE__, __LINE__, s, (long)marpa_lua_gettop(L)); */
+      /* warn("%s %d pushing 2-length lua string %lx %lx", __FILE__, __LINE__, (long)s[0], (long)s[1]); */
       marpa_lua_pushlstring (L, s, (size_t)len);
     }
     return;
