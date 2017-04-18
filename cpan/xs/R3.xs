@@ -1193,11 +1193,14 @@ static void coerce_to_lua_table(
     result_ix = marpa_lua_gettop (L);
     hv_iterinit (hv);
     {
-        char *key;
         HE *entry;
         while ((entry = hv_iternext (hv))) {
 
             SV *val = hv_iterval(hv, entry);
+
+            /* We must use hv_iterkeysv() because hv_iterkey() fails
+             * for certain Unicode keys -- U+00C1 being one.
+             */
             SV* keysv = hv_iterkeysv(entry);
             STRLEN keylen;
             const char *key = SvPV (keysv, keylen);
