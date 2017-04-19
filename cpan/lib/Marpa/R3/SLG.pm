@@ -1203,12 +1203,11 @@ END_OF_LUA
             my $xsy          = $xsy_by_isyid->[$g1_lexeme_id];
             next LEXEME if not defined $xsy;
             my $xsy_id = $xsy->[Marpa::R3::Internal::XSY::ID];
-            my $xsy_name = $xsy->[Marpa::R3::Internal::XSY::NAME];
 
         my ($name_source) = $slg->call_by_tag(
         ('@' .__FILE__ . ':' .  __LINE__),
-        <<'END_OF_LUA', 'is', $xsy_id, $xsy_name);
-        local slg, xsy_id, xsy_name = ...
+        <<'END_OF_LUA', 'i', $xsy_id);
+        local slg, xsy_id = ...
         -- print(inspect( xsy_id ) )
         -- print(inspect( slg.xsys[xsy_id]))
         -- local name_source_by_id = slg.xsys[xsy_id].name_source
@@ -1246,14 +1245,14 @@ END_OF_LUA
             my $g1_lexeme_id = $g1_id_by_lexeme_name{$lexeme_name};
             my $xsy          = $xsy_by_isyid->[$g1_lexeme_id];
             next LEXEME if not defined $xsy;
-            my $xsy_name = $xsy->[Marpa::R3::Internal::XSY::NAME];
+            my $xsy_id = $xsy->[Marpa::R3::Internal::XSY::ID];
 
         my ($name_source) = $slg->call_by_tag(
         ('@' .__FILE__ . ':' .  __LINE__),
-        <<'END_OF_LUA', 's', $xsy_name);
-        local slg, xsy_name = ...
+        <<'END_OF_LUA', 'i', $xsy_id);
+        local slg, xsy_id = ...
         -- print(inspect( slg.xsys[xsy_name]))
-        return slg.xsys[xsy_name].name_source
+        return slg.xsys[xsy_id].name_source
 END_OF_LUA
             next LEXEME if $name_source ne 'lexical';
 
