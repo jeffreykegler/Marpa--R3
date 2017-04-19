@@ -898,7 +898,7 @@ Determine which lexemes are acceptable or discards.
                     error(string.format('Internnal error: Marpa recognized unexpected token @%d-%d: lexme=%d',
                         recce.start_of_lexeme, recce.end_of_lexeme, g1_lexeme))
                 end
-                local this_lexeme_priority = recce.g1_symbols[g1_lexeme].lexeme_priority
+                local this_lexeme_priority = recce.g1.isys[g1_lexeme].lexeme_priority
                 if this_lexeme_priority > high_lexeme_priority then
                     high_lexeme_priority = this_lexeme_priority
                 end
@@ -985,7 +985,7 @@ Returns `true` is there was one,
             local bang_trace, event_type, lexeme_start, lexeme_end,
                     g1_lexeme, priority, required_priority =
                 table.unpack(this_event)
-            local pause_before_active = recce.g1_symbols[g1_lexeme].pause_before_active
+            local pause_before_active = recce.g1.isys[g1_lexeme].pause_before_active
             if pause_before_active then
                 local q = recce.event_queue
                 if recce.trace_terminals > 2 then
@@ -1076,7 +1076,7 @@ Read alternatives into the G1 grammar.
             end
             slr.start_of_pause_lexeme = lexeme_start
             slr.end_of_pause_lexeme = lexeme_end
-            local pause_after_active = slr.g1_symbols[g1_lexeme].pause_after_active
+            local pause_after_active = slr.g1.isys[g1_lexeme].pause_after_active
             if pause_after_active then
                 local q = slr.event_queue
                 if slr.trace_terminals > 2 then
