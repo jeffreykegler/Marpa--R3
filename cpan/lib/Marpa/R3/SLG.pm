@@ -1491,7 +1491,7 @@ END_OF_LUA
         next SYMBOL if $is_accessible;
 
         my $xsy      = $xsy_by_isyid->[$symbol_id];
-        my $xsy_name = $xsy->[Marpa::R3::Internal::XSY::NAME];
+        my $xsy_id = $xsy->[Marpa::R3::Internal::XSY::ID];
 
         # Inaccessible internal symbols may be created
         # from inaccessible use symbols -- ignore these.
@@ -1503,9 +1503,9 @@ END_OF_LUA
 
         my ($treatment) = $slg->call_by_tag(
         ('@' .__FILE__ . ':' .  __LINE__),
-        <<'END_OF_LUA', 'ss', $xsy_name, $default_if_inaccessible);
-        local slg, xsy_name, default_treatment = ...
-        return slg.xsys[xsy_name].if_inaccessible or default_treatment
+        <<'END_OF_LUA', 'is', $xsy_id, $default_if_inaccessible);
+        local slg, xsy_id, default_treatment = ...
+        return slg.xsys[xsy_id].if_inaccessible or default_treatment
 END_OF_LUA
 
         next SYMBOL if $treatment eq 'ok';
@@ -2394,12 +2394,12 @@ sub Marpa::R3::Scanless::G::lmg_symbol_dsl_form {
     return if not defined $xsy;
 
     # switch to ID after developement
-    my $xsy_name = $xsy->[Marpa::R3::Internal::XSY::NAME];
+    my $xsy_id = $xsy->[Marpa::R3::Internal::XSY::ID];
 
     my ($dsl_form) = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 's', $xsy_name );
-        local slg, xsy_name = ...
-        return slg.xsys[xsy_name].dsl_form
+        <<'END_OF_LUA', 'i', $xsy_id );
+        local slg, xsy_id = ...
+        return slg.xsys[xsy_id].dsl_form
 END_OF_LUA
     return $dsl_form;
 }
