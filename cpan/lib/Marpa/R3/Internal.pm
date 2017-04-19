@@ -27,7 +27,6 @@ $VERSION = eval $VERSION;
 
 package Marpa::R3::Internal::XSY;
 use constant ID => 0;
-use constant BLESSING => 1;
 
 package Marpa::R3::Internal::XRL;
 use constant ID => 0;

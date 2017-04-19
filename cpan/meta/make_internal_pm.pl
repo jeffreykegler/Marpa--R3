@@ -101,7 +101,6 @@ __DATA__
 
     :package=Marpa::R3::Internal::XSY
     ID
-    BLESSING
 
     :package=Marpa::R3::Internal::XRL
 

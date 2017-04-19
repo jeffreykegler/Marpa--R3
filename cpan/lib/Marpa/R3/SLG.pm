@@ -299,13 +299,6 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     for my $xsy_name ( @{$xsy_names} ) {
         my $runtime_xsy_data = [];
         my $source_xsy_data = $hashed_source->{xsy}->{$xsy_name};
-      KEY: for my $datum_key ( keys %{$source_xsy_data} ) {
-            if ( $datum_key eq 'blessing' ) {
-                $runtime_xsy_data->[Marpa::R3::Internal::XSY::BLESSING] =
-                  $source_xsy_data->{$datum_key};
-                next KEY;
-            }
-        }
         $runtime_xsy_data->[Marpa::R3::Internal::XSY::ID] = scalar @{$xsy_by_id};
         push @{$xsy_by_id}, $runtime_xsy_data;
         $xsy_by_name->{$xsy_name} = $runtime_xsy_data;
@@ -1243,7 +1236,7 @@ END_OF_LUA
             next LEXEME if not defined $xsy;
             my $xsy_id = $xsy->[Marpa::R3::Internal::XSY::ID];
 
-        my ($name_source) = $slg->call_by_tag(
+        my ($blessing, $name_source) = $slg->call_by_tag(
         ('@' .__FILE__ . ':' .  __LINE__),
         <<'END_OF_LUA', 'is', $xsy_id, ($default_blessing // '::undef'));
         local slg, xsy_id, default_blessing = ...
@@ -1253,14 +1246,10 @@ END_OF_LUA
         if name_source == 'lexical' and not xsy.blessing then
             xsy.blessing = default_blessing
         end
-        return name_source
+        return xsy.blessing, name_source
 END_OF_LUA
 
             next LEXEME if $name_source ne 'lexical';
-
-            my $blessing = $xsy->[Marpa::R3::Internal::XSY::BLESSING]
-              // $default_blessing;
-            $blessing //= '::undef';
 
           FIND_BASE_BLESSING: {
                 if ( $blessing eq '::undef' ) {
@@ -1305,8 +1294,6 @@ qq{Symbol "$lexeme_name" needs a blessing package, but grammar has none\n},
                 } ## end if ( not defined $bless_package )
                 $blessing = $bless_package . q{::} . $blessing;
             }
-
-            $xsy->[Marpa::R3::Internal::XSY::BLESSING] = $blessing;
 
             $slg->call_by_tag(
                 ('@' .__FILE__ . ':' .  __LINE__),
