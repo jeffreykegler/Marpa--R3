@@ -300,11 +300,6 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
         my $runtime_xsy_data = [];
         my $source_xsy_data = $hashed_source->{xsy}->{$xsy_name};
       KEY: for my $datum_key ( keys %{$source_xsy_data} ) {
-            if ( $datum_key eq 'action' ) {
-                $runtime_xsy_data->[Marpa::R3::Internal::XSY::LEXEME_SEMANTICS]
-                  = $source_xsy_data->{$datum_key};
-                next KEY;
-            }
             if ( $datum_key eq 'blessing' ) {
                 $runtime_xsy_data->[Marpa::R3::Internal::XSY::BLESSING] =
                   $source_xsy_data->{$datum_key};
