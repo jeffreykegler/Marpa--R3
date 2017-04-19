@@ -268,10 +268,14 @@ sub per_lmg_init {
         <<'END_OF_LUA', 's', $field_name_form );
     local g, field_name_form = ...
     lmw_g_name = 'lmw_' .. field_name_form .. 'g'
-    g[lmw_g_name] = kollos.grammar_new()
-    g[field_name_form] = {}
-    g[field_name_form].xsy_by_isyid = {}
-    local lmw_g = g[lmw_g_name]
+    local lmw_g = kollos.grammar_new()
+    -- TODO Replace g.lmw_g1g with g.g1.lmw_g everywhere
+    g[lmw_g_name] = lmw_g
+    g[field_name_form] = {
+        lmw_g = lmw_g,
+        name = field_name_form,
+        xsy_by_isyid = {}
+    }
     lmw_g:force_valued()
     lmw_g.short_name = field_name_form
 END_OF_LUA
