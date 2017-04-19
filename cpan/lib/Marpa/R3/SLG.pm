@@ -1383,9 +1383,9 @@ END_OF_LUA
 
       my ($ok, $result) =
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 'si', $lmw_name, $precompute_error_code );
-    local grammar, lmw_name, error_code = ...
-    local lmw_g = grammar[lmw_name]
+        <<'END_OF_LUA', 'si', $subg_name, $precompute_error_code );
+    local grammar, subg_name, error_code = ...
+    local lmw_g = grammar[subg_name].lmw_g
     if error_code == kollos.err["NO_RULES"] then
         kollos.userX('Attempted to precompute grammar with no rules')
     end
@@ -1442,10 +1442,10 @@ END_OF_LUA
     # hard error returned from libmarpa
       my ($loop_rule_count) = 
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 's', $lmw_name );
-        local grammar, lmw_name = ...
+        <<'END_OF_LUA', 's', $subg_name );
+        local grammar, subg_name = ...
         local loop_rule_count = 0
-        local lmw_g = grammar[lmw_name]
+        local lmw_g = grammar[subg_name].lmw_g
         local events = lmw_g:events()
         for i = 1, #events, 2 do
             local event_type = events[i]
@@ -1463,9 +1463,9 @@ END_OF_LUA
         for my $rule_id ( $slg->lmg_rule_ids($lmw_name) ) {
             my ($rule_is_loop) =
               $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-                <<'END_OF_LUA', 'si', $lmw_name, $rule_id );
-        local grammar, lmw_name, rule_id = ...
-        local lmw_g = grammar[lmw_name]
+                <<'END_OF_LUA', 'si', $subg_name, $rule_id );
+        local grammar, subg_name, rule_id = ...
+        local lmw_g = grammar[subg_name].lmw_g
         return lmw_g:rule_is_loop(rule_id)
 END_OF_LUA
 
@@ -1485,9 +1485,9 @@ END_OF_LUA
     {
         my ($is_accessible) = $slg->call_by_tag(
         ('@' .__FILE__ . ':' .  __LINE__),
-        <<'END_OF_LUA', 'si', $lmw_name, $symbol_id);
-        local grammar, lmw_name, symbol_id = ...
-        local lmw_g = grammar[lmw_name]
+        <<'END_OF_LUA', 'si', $subg_name, $symbol_id);
+        local grammar, subg_name, symbol_id = ...
+        local lmw_g = grammar[subg_name].lmw_g
         return lmw_g:symbol_is_accessible(symbol_id)
 END_OF_LUA
         next SYMBOL if $is_accessible;
