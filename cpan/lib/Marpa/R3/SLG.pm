@@ -56,7 +56,6 @@ sub pre_construct {
         grammar.l0_rules = {}
         grammar.l0_symbols = {}
         grammar.g1_rules = {}
-        grammar.g1_symbols = {}
         return regix
 END_OF_LUA
 
@@ -275,7 +274,8 @@ sub per_lmg_init {
         lmw_g = lmw_g,
         name = field_name_form,
         xsy_by_isyid = {},
-        isys = {}
+        isys = {},
+        irls = {}
     }
     lmw_g:force_valued()
     lmw_g.short_name = field_name_form
@@ -1069,7 +1069,7 @@ END_OF_LUA
         $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
             <<'END_OF_LUA', 'iii', $g1_lexeme_id, $priority, $eager );
     local slg, g1_lexeme_id, priority, eager = ...
-    local lexeme_data = slg.g1_symbols[g1_lexeme_id]
+    local lexeme_data = slg.g1.isys[g1_lexeme_id]
     lexeme_data.is_lexeme = true
     lexeme_data.priority = priority
     if eager ~= 0 then lexeme_data.eager = true end
@@ -1081,7 +1081,7 @@ END_OF_LUA
             $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
                 <<'END_OF_LUA', 'ii', $g1_lexeme_id, $pause_value );
     local slg, g1_lexeme_id, pause_value = ...
-    local lexeme_data = slg.g1_symbols[g1_lexeme_id]
+    local lexeme_data = slg.g1.isys[g1_lexeme_id]
     if pause_value == 1 then
          lexeme_data.pause_after = true
     elseif pause_value == -1 then
@@ -1104,7 +1104,7 @@ END_OF_LUA
                 <<'END_OF_LUA', 'ii', $g1_lexeme_id, $is_active );
     local slg, g1_lexeme_id, is_active_arg = ...
     local is_active = (is_active_arg ~= 0 and true or nil)
-    local lexeme_data = slg.g1_symbols[g1_lexeme_id]
+    local lexeme_data = slg.g1.isys[g1_lexeme_id]
     if is_active then
         -- activate only if event is enabled
         lexeme_data.pause_after_active = lexeme_data.pause_after
@@ -1135,7 +1135,7 @@ END_OF_LUA
     if lexer_rule_id >= 0 then
         g.l0_rules[lexer_rule_id].g1_lexeme = g1_lexeme_id
         if g1_lexeme_id >= 0 then
-            local eager = g.g1_symbols[g1_lexeme_id].eager
+            local eager = g.g1.isys[g1_lexeme_id].eager
             if eager then g.l0_rules[lexer_rule_id].eager = true end
         end
         local eager = g.l0_symbols[discard_symbol_id].eager
@@ -1144,7 +1144,7 @@ END_OF_LUA
         end
     end
     if g1_lexeme_id >= 0 then
-        g.g1_symbols[g1_lexeme_id].assertion = assertion_id
+        g.g1.isys[g1_lexeme_id].assertion = assertion_id
     end
 END_OF_LUA
         'iiii', $lexer_rule_id, $g1_lexeme_id, $assertion_id, $discard_symbol_id );
@@ -1543,7 +1543,7 @@ sub assign_G1_symbol {
     local g, symbol_name = ...
     local lmw_g = g.lmw_g1g
     local symbol_id = lmw_g:symbol_new(symbol_name)
-    g.g1_symbols[symbol_id] = { id = symbol_id }
+    g.g1.isys[symbol_id] = { id = symbol_id }
     return symbol_id
 END_OF_LUA
 

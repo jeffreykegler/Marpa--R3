@@ -544,7 +544,7 @@ This is a registry object.
         for i = 0, count -1 do
             local ix = i + 1
             local terminal = recce.terminals_expected[ix]
-            local assertion = recce.slg.g1_symbols[terminal].assertion
+            local assertion = recce.slg.g1.isys[terminal].assertion
             assertion = assertion or -1
             if assertion >= 0 then
                 local result = recce.lmw_l0r:zwa_default_set(assertion, 1)

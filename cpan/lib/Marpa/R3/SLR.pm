@@ -209,7 +209,7 @@ sub Marpa::R3::Scanless::R::new {
     end
     -- print('r_l0_rules: ', inspect(r_l0_rules))
     recce.g1_symbols = {}
-    local g_g1_symbols = grammar.g1_symbols
+    local g_g1_symbols = grammar.g1.isys
     local r_g1_symbols = recce.g1_symbols
     local max_g1_symbol_id = g1g:highest_symbol_id()
     for symbol_id = 0, max_g1_symbol_id do
@@ -260,7 +260,7 @@ END_OF_LUA
         local slr, symbol_ids, is_active_arg = ...
         local slg = slr.slg
         local is_active = (is_active_arg ~= 0 and true or nil)
-        local g_g1_symbols = slg.g1_symbols
+        local g_g1_symbols = slg.g1.isys
         local r_g1_symbols = slr.g1_symbols
         for ix = 1, #symbol_ids do
             local symbol_id = symbol_ids[ix]
@@ -1955,7 +1955,7 @@ END_OF_LUA
         local slr, symbol_ids, is_active_arg = ...
         local slg = slr.slg
         local is_active = (is_active_arg ~= 0 and true or nil)
-        local g_g1_symbols = slg.g1_symbols
+        local g_g1_symbols = slg.g1.isys
         local r_g1_symbols = slr.g1_symbols
         for ix = 1, #symbol_ids do
             local symbol_id = symbol_ids[ix]
@@ -1998,7 +1998,7 @@ sub Marpa::R3::Scanless::R::lexeme_priority_set {
                 new_priority
             ))
         end
-        local g_lexeme_data = slg.g1_symbols[lexeme_id]
+        local g_lexeme_data = slg.g1.isys[lexeme_id]
         local r_lexeme_data = recce.g1_symbols[lexeme_id]
         if not g_lexeme_data.is_lexeme then
             print(inspect(lexeme_data))
