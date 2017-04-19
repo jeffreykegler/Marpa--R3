@@ -2286,13 +2286,13 @@ sub Marpa::R3::Scanless::G::l0_symbol_by_name {
 # Internal methods, not to be documented
 
 sub Marpa::R3::Scanless::G::lmg_symbol_by_name {
-    my ( $slg, $lmw_name, $symbol_name ) = @_;
+    my ( $slg, $subg_name, $symbol_name ) = @_;
 
     my ($symbol_id) = $slg->call_by_tag(
         ('@' . __FILE__ . ':' .  __LINE__),
-      <<'END_OF_LUA', 'ss', $lmw_name, $symbol_name);
-    local g, lmw_name, symbol_name = ...
-    local lmw_g = g[lmw_name]
+      <<'END_OF_LUA', 'ss', $subg_name, $symbol_name);
+    local g, subg_name, symbol_name = ...
+    local lmw_g = g[subg_name]
     return lmw_g.isyid_by_name[symbol_name]
 END_OF_LUA
 
@@ -2300,13 +2300,13 @@ END_OF_LUA
 }
 
 sub Marpa::R3::Scanless::G::lmg_symbol_name {
-    my ( $slg, $lmw_name, $symbol_id ) = @_;
+    my ( $slg, $subg_name, $symbol_id ) = @_;
 
     my ($name) = $slg->call_by_tag(
         ('@' . __FILE__ . ':' .  __LINE__),
-      <<'END_OF_LUA', 'si', $lmw_name, $symbol_id);
-    local g, lmw_name, symbol_id = ...
-    local lmw_g = g[lmw_name]
+      <<'END_OF_LUA', 'si', $subg_name, $symbol_id);
+    local g, subg_name, symbol_id = ...
+    local lmw_g = g[subg_name]
     return lmw_g:symbol_name(symbol_id)
 END_OF_LUA
 
@@ -2330,15 +2330,15 @@ sub Marpa::R3::Scanless::G::brief_rule {
 }
 
 sub Marpa::R3::Scanless::G::lmg_brief_rule {
-    my ( $slg, $lmw_name, $irlid ) = @_;
+    my ( $slg, $subg_name, $irlid ) = @_;
     my ($lhs_id, @rhs_ids) = $slg->irl_isyids($irlid);
     my $lhs = $slg->formatted_symbol_name( $lhs_id );
     my @rhs = map { $slg->formatted_symbol_name( $_ ) } @rhs_ids;
     my ($has_minimum, $minimum) = $slg->call_by_tag(
     ('@' .__FILE__ . ':' . __LINE__),
-    <<'END_OF_LUA', 'si>*', $lmw_name, $irlid ) ;
-    local grammar, lmw_name, irlid = ...
-    local lmw_g = grammar[lmw_name]
+    <<'END_OF_LUA', 'si>*', $subg_name, $irlid ) ;
+    local grammar, subg_name, irlid = ...
+    local lmw_g = grammar[subg_name]
     local minimum = lmw_g:sequence_min(irlid)
     if not minimum then return 0, -1 end
     return 1, minimum
@@ -2355,12 +2355,12 @@ END_OF_LUA
 # Currently there are none, but Libmarpa does not
 # guarantee this.
 sub Marpa::R3::Scanless::G::lmg_rule_ids {
-    my ($slg, $lmw_name) = @_;
+    my ($slg, $subg_name) = @_;
     my ($highest_rule_id) = $slg->call_by_tag(
     ('@' .__FILE__ . ':' . __LINE__),
-    <<'END_OF_LUA', 's>*', $lmw_name ) ;
-    local grammar, lmw_name = ...
-    local lmw_g = grammar[lmw_name]
+    <<'END_OF_LUA', 's>*', $subg_name ) ;
+    local grammar, subg_name = ...
+    local lmw_g = grammar[subg_name]
     return lmw_g:highest_rule_id()
 END_OF_LUA
 
@@ -2371,12 +2371,12 @@ END_OF_LUA
 # Currently there are none, but Libmarpa does not
 # guarantee this.
 sub Marpa::R3::Scanless::G::lmg_symbol_ids {
-    my ($slg, $lmw_name) = @_;
+    my ($slg, $subg_name) = @_;
     my ($highest_symbol_id) = $slg->call_by_tag(
     ('@' .__FILE__ . ':' . __LINE__),
-    <<'END_OF_LUA', 's>*', $lmw_name ) ;
-    local grammar, lmw_name = ...
-    local lmw_g = grammar[lmw_name]
+    <<'END_OF_LUA', 's>*', $subg_name ) ;
+    local grammar, subg_name = ...
+    local lmw_g = grammar[subg_name]
     return lmw_g:highest_symbol_id()
 END_OF_LUA
 
@@ -2386,9 +2386,9 @@ END_OF_LUA
 # Return DSL form of symbol
 # Does no checking
 sub Marpa::R3::Scanless::G::lmg_symbol_dsl_form {
-    my ( $slg, $lmw_name, $isyid ) = @_;
+    my ( $slg, $subg_name, $isyid ) = @_;
     my $per_lmg =
-      $slg->[Marpa::R3::Internal::Scanless::G::PER_LMG]->{$lmw_name};
+      $slg->[Marpa::R3::Internal::Scanless::G::PER_LMG]->{$subg_name};
     my $xsy_by_isyid = $per_lmg->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID];
     my $xsy          = $xsy_by_isyid->[$isyid];
     return if not defined $xsy;
@@ -2407,17 +2407,17 @@ END_OF_LUA
 # Return display form of symbol
 # Does lots of checking and makes use of alternatives.
 sub Marpa::R3::Scanless::G::lmg_symbol_display_form {
-    my ( $slg, $lmw_name, $isyid ) = @_;
-    my $text = $slg->lmg_symbol_dsl_form( $lmw_name, $isyid )
-      // $slg->lmg_symbol_name($lmw_name, $isyid);
+    my ( $slg, $subg_name, $isyid ) = @_;
+    my $text = $slg->lmg_symbol_dsl_form( $subg_name, $isyid )
+      // $slg->lmg_symbol_name($subg_name, $isyid);
     return "<!No symbol with ID $isyid!>" if not defined $text;
     return ( $text =~ m/\s/xms ) ? "<$text>" : $text;
 }
 
 sub Marpa::R3::Scanless::G::lmg_show_symbols {
-    my ( $slg, $lmw_name, $verbose ) = @_;
+    my ( $slg, $subg_name, $verbose ) = @_;
     my $per_lmg =
-      $slg->[Marpa::R3::Internal::Scanless::G::PER_LMG]->{$lmw_name};
+      $slg->[Marpa::R3::Internal::Scanless::G::PER_LMG]->{$subg_name};
     my $text = q{};
     $verbose //= 0;
 
@@ -2425,26 +2425,26 @@ sub Marpa::R3::Scanless::G::lmg_show_symbols {
 
     my ($highest_symbol_id) =
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 's>*', $lmw_name );
-    local grammar, lmw_name = ...
-    local lmw_g = grammar[lmw_name]
+        <<'END_OF_LUA', 's>*', $subg_name );
+    local grammar, subg_name = ...
+    local lmw_g = grammar[subg_name]
     return lmw_g:highest_symbol_id()
 END_OF_LUA
 
     for my $symbol_id ( 0 .. $highest_symbol_id ) {
 
         $text .= join q{ }, $grammar_name, "S$symbol_id",
-          $slg->lmg_symbol_display_form( $lmw_name, $symbol_id );
+          $slg->lmg_symbol_display_form( $subg_name, $symbol_id );
         $text .= "\n";
 
         if ( $verbose >= 2 ) {
 
             ($text) = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-                <<'END_OF_LUA', 'sis', $lmw_name, $symbol_id, $text );
-    local g, lmw_name, symbol_id, text = ...
+                <<'END_OF_LUA', 'sis', $subg_name, $symbol_id, $text );
+    local g, subg_name, symbol_id, text = ...
     local pieces = { text }
     local tags = { ' /*' }
-    local lmw_g = g[lmw_name]
+    local lmw_g = g[subg_name]
     if lmw_g:symbol_is_productive(symbol_id) == 0 then
         tags[#tags+1] = 'unproductive'
     end
@@ -2473,7 +2473,7 @@ END_OF_LUA
 
         if ( $verbose >= 3 ) {
 
-            my $dsl_form = $slg->lmg_symbol_dsl_form( $lmw_name, $symbol_id );
+            my $dsl_form = $slg->lmg_symbol_dsl_form( $subg_name, $symbol_id );
             if ($dsl_form) { $text .= qq{  SLIF name: $dsl_form\n}; }
 
         } ## end if ( $verbose >= 3 )
@@ -2484,20 +2484,20 @@ END_OF_LUA
 }
 
 sub Marpa::R3::Scanless::G::lmg_show_rules {
-    my ( $slg, $lmw_name, $verbose ) = @_;
+    my ( $slg, $subg_name, $verbose ) = @_;
     my $text = q{};
     $verbose //= 0;
 
     my $per_lmg =
-      $slg->[Marpa::R3::Internal::Scanless::G::PER_LMG]->{$lmw_name};
+      $slg->[Marpa::R3::Internal::Scanless::G::PER_LMG]->{$subg_name};
     my $grammar_name = $per_lmg->[Marpa::R3::Internal::Trace::G::NAME];
     my $xbnf_by_irlid = $per_lmg->[Marpa::R3::Internal::Trace::G::XBNF_BY_IRLID];
 
     my ($highest_rule_id) = $slg->call_by_tag(
     ('@' .__FILE__ . ':' . __LINE__),
-    <<'END_OF_LUA', 's>*', $lmw_name ) ;
-    local grammar, lmw_name = ...
-    local lmw_g = grammar[lmw_name]
+    <<'END_OF_LUA', 's>*', $subg_name ) ;
+    local grammar, subg_name = ...
+    local lmw_g = grammar[subg_name]
     return lmw_g:highest_rule_id()
 END_OF_LUA
 
@@ -2507,9 +2507,9 @@ END_OF_LUA
 
         my ( $has_minimum, $minimum ) =
           $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-            <<'END_OF_LUA', 'si>*', $lmw_name, $irlid );
-    local grammar, lmw_name, irlid = ...
-    local lmw_g = grammar[lmw_name]
+            <<'END_OF_LUA', 'si>*', $subg_name, $irlid );
+    local grammar, subg_name, irlid = ...
+    local lmw_g = grammar[subg_name]
     local minimum = lmw_g:sequence_min(irlid)
     if not minimum then return 0, -1 end
     return 1, minimum
@@ -2521,11 +2521,11 @@ END_OF_LUA
             @quantifier = ( $minimum <= 0 ? q{*} : q{+} );
         }
 
-        my ( $lhs_id, @rhs_ids ) = $slg->lmg_irl_isyids( $lmw_name, $irlid );
+        my ( $lhs_id, @rhs_ids ) = $slg->lmg_irl_isyids( $subg_name, $irlid );
         $text .= join q{ }, $grammar_name, "R$irlid",
-          $slg->lmg_symbol_display_form( $lmw_name, $lhs_id ),
+          $slg->lmg_symbol_display_form( $subg_name, $lhs_id ),
           '::=',
-          ( map { $slg->lmg_symbol_display_form( $lmw_name, $_ ) } @rhs_ids ),
+          ( map { $slg->lmg_symbol_display_form( $subg_name, $_ ) } @rhs_ids ),
           @quantifier;
         $text .= "\n";
 
@@ -2537,9 +2537,9 @@ END_OF_LUA
 
             ($comments) =
               $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-                <<'END_OF_LUA', 'sis', $lmw_name, $irlid, $comments );
-    local g, lmw_name, irl_id, comments = ...
-    local lmw_g = g[lmw_name]
+                <<'END_OF_LUA', 'sis', $subg_name, $irlid, $comments );
+    local g, subg_name, irl_id, comments = ...
+    local lmw_g = g[subg_name]
     if lmw_g:_rule_is_used(irl_id) == 0 then
         comments[#comments+1] = '!used'
     end
@@ -2569,11 +2569,11 @@ END_OF_LUA
 
             $text .=
                 "  Internal symbols: <"
-              . $slg->lmg_symbol_name( $lmw_name, $lhs_id )
+              . $slg->lmg_symbol_name( $subg_name, $lhs_id )
               . q{> ::= }
               . (
                 join q{ },
-                map { '<' . $slg->lmg_symbol_name( $lmw_name, $_ ) . '>' }
+                map { '<' . $slg->lmg_symbol_name( $subg_name, $_ ) . '>' }
                   @rhs_ids
               ) . "\n";
 
@@ -2595,12 +2595,12 @@ sub Marpa::R3::Scanless::G::l0_irl_isyids {
 }
 
 sub Marpa::R3::Scanless::G::lmg_irl_isyids {
-    my ($slg, $lmw_name, $irlid) = @_;
+    my ($slg, $subg_name, $irlid) = @_;
     my ($symbols) = $slg->call_by_tag(
     ('@' .__FILE__ . ':' . __LINE__),
-    <<'END_OF_LUA', 'si>*', $lmw_name, $irlid ) ;
-    local grammar, lmw_name, irlid = ...
-    local lmw_g = grammar[lmw_name]
+    <<'END_OF_LUA', 'si>*', $subg_name, $irlid ) ;
+    local grammar, subg_name, irlid = ...
+    local lmw_g = grammar[subg_name]
     return lmw_g:irl_isyids(irlid)
 END_OF_LUA
     return @{$symbols};
