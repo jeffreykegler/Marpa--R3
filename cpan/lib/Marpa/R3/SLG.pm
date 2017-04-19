@@ -54,8 +54,6 @@ sub pre_construct {
         grammar:post_new()
         grammar.ranking_method = 'none'
         grammar.l0_rules = {}
-        grammar.l0_symbols = {}
-        grammar.g1_rules = {}
         return regix
 END_OF_LUA
 
@@ -1138,7 +1136,7 @@ END_OF_LUA
             local eager = g.g1.isys[g1_lexeme_id].eager
             if eager then g.l0_rules[lexer_rule_id].eager = true end
         end
-        local eager = g.l0_symbols[discard_symbol_id].eager
+        local eager = g.l0.isys[discard_symbol_id].eager
         if eager then
             g.l0_rules[lexer_rule_id].eager = true
         end
@@ -1610,7 +1608,7 @@ sub assign_L0_symbol {
     local g, symbol_name = ...
     local lmw_g = g.lmw_l0g
     local symbol_id = lmw_g:symbol_new(symbol_name)
-    g.l0_symbols[symbol_id] = { id = symbol_id }
+    g.l0.isys[symbol_id] = { id = symbol_id }
     return symbol_id
 END_OF_LUA
 
@@ -1632,7 +1630,7 @@ END_OF_LUA
         <<'END_OF_LUA', 'ii', $symbol_id, ($value ? 1 : 0));
     local g, symbol_id, eager = ...
     if eager > 0 then
-        g.l0_symbols[symbol_id].eager = true
+        g.l0.isys[symbol_id].eager = true
     end
 END_OF_LUA
 
@@ -1777,7 +1775,7 @@ END_OF_LUA
     -- print('base_rule_id: ', inspect(base_rule_id))
     kollos.throw = true
     if not base_rule_id or base_rule_id < 0 then return -1 end
-    g.g1_rules[base_rule_id] = { id = base_rule_id }
+    g.g1.irls[base_rule_id] = { id = base_rule_id }
     return base_rule_id
 END_OF_LUA
 
@@ -1816,7 +1814,7 @@ END_OF_LUA
     -- remove the test for nil or less than zero
     -- once refactoring is complete?
     if not base_rule_id or base_rule_id < 0 then return end
-    g.g1_rules[base_rule_id] = { id = base_rule_id }
+    g.g1.irls[base_rule_id] = { id = base_rule_id }
     return base_rule_id
 END_OF_LUA
 
