@@ -2130,12 +2130,13 @@ sub Marpa::R3::Scanless::G::call_by_tag {
 
 sub slg_rule_show {
     my ( $slg, $tracer, $irlid ) = @_;
+    my $subg_name     = $tracer->[Marpa::R3::Internal::Trace::G::SUBG_NAME];
     my $lmw_name     = $tracer->[Marpa::R3::Internal::Trace::G::LMW_NAME];
     my ($symbol_ids) = $slg->call_by_tag(
     ('@' .__FILE__ . ':' . __LINE__),
-    <<'END_OF_LUA', 'si>*', $lmw_name, $irlid ) ;
-    local grammar, lmw_name, irlid = ...
-    local lmw_g = grammar[lmw_name]
+    <<'END_OF_LUA', 'si>*', $subg_name, $irlid ) ;
+    local grammar, subg_name, irlid = ...
+    local lmw_g = grammar[subg_name].lmw_g
     return lmw_g:irl_isyids(irlid)
 END_OF_LUA
 
@@ -2145,9 +2146,9 @@ END_OF_LUA
 
     my ($has_minimum, $minimum) = $slg->call_by_tag(
     ('@' .__FILE__ . ':' . __LINE__),
-    <<'END_OF_LUA', 'si>*', $lmw_name, $irlid ) ;
-    local grammar, lmw_name, irlid = ...
-    local lmw_g = grammar[lmw_name]
+    <<'END_OF_LUA', 'si>*', $subg_name, $irlid ) ;
+    local grammar, subg_name, irlid = ...
+    local lmw_g = grammar[subg_name].lmw_g
     local minimum = lmw_g:sequence_min(irlid)
     if not minimum then return 0, -1 end
     return 1, minimum
