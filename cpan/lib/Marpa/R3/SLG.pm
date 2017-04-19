@@ -298,7 +298,6 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     $xsy_names = [ sort @{$xsy_names} ];
     for my $xsy_name ( @{$xsy_names} ) {
         my $runtime_xsy_data = [];
-        $runtime_xsy_data->[Marpa::R3::Internal::XSY::NAME] = $xsy_name;
         my $source_xsy_data = $hashed_source->{xsy}->{$xsy_name};
       KEY: for my $datum_key ( keys %{$source_xsy_data} ) {
             if ( $datum_key eq 'action' ) {

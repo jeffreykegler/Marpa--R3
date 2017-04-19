@@ -27,9 +27,8 @@ $VERSION = eval $VERSION;
 
 package Marpa::R3::Internal::XSY;
 use constant ID => 0;
-use constant NAME => 1;
-use constant BLESSING => 2;
-use constant LEXEME_SEMANTICS => 3;
+use constant BLESSING => 1;
+use constant LEXEME_SEMANTICS => 2;
 
 package Marpa::R3::Internal::XRL;
 use constant ID => 0;

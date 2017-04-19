@@ -101,7 +101,6 @@ __DATA__
 
     :package=Marpa::R3::Internal::XSY
     ID
-    NAME
     BLESSING
     LEXEME_SEMANTICS
 
