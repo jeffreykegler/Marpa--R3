@@ -520,10 +520,10 @@ This is a registry object.
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.l0r_new(recce, perl_pos)
-        local l0r = _M.recce_new(recce.slg.lmw_l0g)
+        local l0r = _M.recce_new(recce.slg.l0.lmw_g)
         if not l0r then
             error('Internal error: l0r_new() failed %s',
-                recce.slg.lmw_l0g:error_description())
+                recce.slg.l0.lmw_g:error_description())
         end
         recce.lmw_l0r = l0r
         -- reset the candidate in the lexer
@@ -769,7 +769,7 @@ rule, false otherwise.
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.l0_track_candidates(recce)
         local l0r = recce.lmw_l0r
-        local l0g = recce.slg.lmw_l0g
+        local l0g = recce.slg.l0.lmw_g
         local l0_rules = recce.l0.irls
         local eager
         local complete_lexemes = false
@@ -825,7 +825,7 @@ a string indicating the error otherwise.
         local l0r = recce.lmw_l0r
         if not l0r then
             error('Internal error: No l0r in slr_alternatives(): %s',
-                recce.slg.lmw_l0g:error_description())
+                recce.slg.l0.lmw_g:error_description())
         end
         local elect_earley_set = recce.l0_candidate
         -- no zero-length lexemes, so Earley set 0 is ignored
@@ -1367,7 +1367,7 @@ span is zero or less.
     -- TODO: perl_pos arg is development hack --
     -- eventually use recce.perl_pos
     function _M.class_slr.l0_convert_events(recce, perl_pos)
-        local l0g = recce.slg.lmw_l0g
+        local l0g = recce.slg.l0.lmw_g
         local q = recce.event_queue
         local events = l0g:events()
         for i = 1, #events, 2 do

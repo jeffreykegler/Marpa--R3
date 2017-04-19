@@ -171,7 +171,7 @@ sub Marpa::R3::Scanless::R::new {
     recce.slg = grammar
     local lua_ref = _M.register(registry, recce)
     recce.ref_count = 1
-    local l0g = grammar.lmw_l0g
+    local l0g = grammar.l0.lmw_g
     local g1g = grammar.g1.lmw_g
     recce.lmw_g1r = _M.recce_new(g1g)
     recce.lmw_g1r.lmw_g = g1g

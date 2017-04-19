@@ -847,7 +847,7 @@ END_OF_LUA
         ('@' .__FILE__ . ':' .  __LINE__),
         <<'END_OF_LUA', 's', $lex_start_symbol_name);
         local grammar, start_name = ...
-        local l0g = grammar.lmw_l0g
+        local l0g = grammar.l0.lmw_g
         l0g.start_name = start_name
 END_OF_LUA
 
@@ -893,7 +893,7 @@ END_OF_LUA
         my ($lhs_id) = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
             <<'END_OF_LUA', 'i>*', $rule_id );
     local grammar, rule_id = ...
-    local l0g = grammar.lmw_l0g
+    local l0g = grammar.l0.lmw_g
     return l0g:rule_lhs(rule_id)
 END_OF_LUA
 
@@ -909,7 +909,7 @@ END_OF_LUA
           $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
             <<'END_OF_LUA', 'i>*', $rule_id );
     local grammar, rule_id = ...
-    local l0g = grammar.lmw_l0g
+    local l0g = grammar.l0.lmw_g
     return l0g:rule_rhs(rule_id, 0)
 END_OF_LUA
 
@@ -930,7 +930,7 @@ END_OF_LUA
               $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
                 <<'END_OF_LUA', '>*' );
     local grammar = ...
-    local l0g = grammar.lmw_l0g
+    local l0g = grammar.l0.lmw_g
     return l0g:zwa_new(0)
 END_OF_LUA
 
@@ -941,7 +941,7 @@ END_OF_LUA
         $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
             <<'END_OF_LUA', 'ii>*', $assertion_id, $rule_id );
     local grammar, assertion_id, rule_id = ...
-    local l0g = grammar.lmw_l0g
+    local l0g = grammar.l0.lmw_g
     l0g:zwa_place(assertion_id, rule_id, 0)
 END_OF_LUA
 
@@ -996,7 +996,7 @@ END_OF_LUA
     ('@' .__FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', 'i>*', $irlid ) ;
     local grammar, irlid = ...
-    local l0g = grammar.lmw_l0g
+    local l0g = grammar.l0.lmw_g
     return l0g:rule_lhs(irlid)
 END_OF_LUA
             last FIND_EVENT if $lhs_id != $lex_discard_symbol_id;
@@ -1605,7 +1605,7 @@ sub assign_L0_symbol {
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 's', $name );
     local g, symbol_name = ...
-    local lmw_g = g.lmw_l0g
+    local lmw_g = g.l0.lmw_g
     local symbol_id = lmw_g:symbol_new(symbol_name)
     g.l0.isys[symbol_id] = { id = symbol_id }
     return symbol_id
@@ -1641,7 +1641,7 @@ END_OF_LUA
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 's', $symbol_id, ($value ? 1 : 0));
     local g, symbol_id, value = ...
-    local l0g = g.lmw_l0g
+    local l0g = g.l0.lmw_g
     l0g:symbol_is_terminal_set(symbol_id, value)
 END_OF_LUA
 
@@ -1656,7 +1656,7 @@ END_OF_LUA
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 's', $symbol_id, $value);
     local g, symbol_id, value = ...
-    local l0g = g.lmw_l0g
+    local l0g = g.l0.lmw_g
     l0g:symbol_rank_set(symbol_id, value)
 END_OF_LUA
 
@@ -1905,7 +1905,7 @@ sub add_L0_user_rule {
     my ($default_rank) =
           $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ), <<'END_OF_LUA', '');
     local grammar = ...
-    return grammar.lmw_l0g:default_rank()
+    return grammar.l0.lmw_g:default_rank()
 END_OF_LUA
     $rank //= $default_rank;
     $null_ranking //= 'low';
@@ -1936,7 +1936,7 @@ END_OF_LUA
     -- remove the test for nil or less than zero
     -- once refactoring is complete?
     kollos.throw = false
-    local base_rule_id = g.lmw_l0g:rule_new(rule)
+    local base_rule_id = g.l0.lmw_g:rule_new(rule)
     -- print('base_rule_id: ', inspect(base_rule_id))
     kollos.throw = true
     if not base_rule_id or base_rule_id < 0 then return -1 end
@@ -1975,7 +1975,7 @@ END_OF_LUA
     -- print('arg_hash: ', inspect(arg_hash))
     arg_hash.proper = (arg_hash.proper ~= 0)
     kollos.throw = false
-    base_rule_id = g.lmw_l0g:sequence_new(arg_hash)
+    base_rule_id = g.l0.lmw_g:sequence_new(arg_hash)
     kollos.throw = true
     -- remove the test for nil or less than zero
     -- once refactoring is complete?
@@ -1993,7 +1993,7 @@ END_OF_LUA
         $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
             <<'END_OF_LUA', 's', $rule_description );
             local grammar, rule_description = ...
-            local l0g = grammar.lmw_l0g
+            local l0g = grammar.l0.lmw_g
             local error_code = l0g:error_code()
             if error_code == kollos.err.DUPLICATE_RULE then
                 problem_description = "Duplicate rule"
@@ -2017,7 +2017,7 @@ END_OF_LUA
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'iii',
         local grammar, rule_id, ranking_is_high, rank = ...
-        local l0g = grammar.lmw_l0g
+        local l0g = grammar.l0.lmw_g
         l0g:rule_null_high_set(rule_id, ranking_is_high)
         l0g:rule_rank_set(rule_id, rank)
 END_OF_LUA
