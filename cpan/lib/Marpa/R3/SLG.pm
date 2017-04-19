@@ -1460,7 +1460,7 @@ END_OF_LUA
 
     if ($loop_rule_count) {
       RULE:
-        for my $rule_id ( $slg->lmg_rule_ids($lmw_name) ) {
+        for my $rule_id ( $slg->lmg_rule_ids($subg_name) ) {
             my ($rule_is_loop) =
               $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
                 <<'END_OF_LUA', 'si', $subg_name, $rule_id );
@@ -2258,12 +2258,12 @@ END_OF_LUA
 
 sub Marpa::R3::Scanless::G::rule_ids {
     my ($slg) = @_;
-    return $slg->lmg_rule_ids('lmw_g1g');
+    return $slg->lmg_rule_ids('g1');
 }
 
 sub Marpa::R3::Scanless::G::l0_rule_ids {
     my ($slg) = @_;
-    return $slg->lmg_rule_ids('lmw_l0g');
+    return $slg->lmg_rule_ids('l0');
 }
 
 sub Marpa::R3::Scanless::G::symbol_ids {
@@ -2363,7 +2363,7 @@ sub Marpa::R3::Scanless::G::lmg_rule_ids {
     ('@' .__FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', 's>*', $subg_name ) ;
     local grammar, subg_name = ...
-    local lmw_g = grammar[subg_name]
+    local lmw_g = grammar[subg_name].lmw_g
     return lmw_g:highest_rule_id()
 END_OF_LUA
 
