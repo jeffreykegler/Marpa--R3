@@ -355,8 +355,17 @@ sub lexeme_semantics_find {
     my $tracer       = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     my $xsy_by_isyid = $tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID];
     my $xsy          = $xsy_by_isyid->[$lexeme_id];
-    my $semantics    = $xsy->[Marpa::R3::Internal::XSY::LEXEME_SEMANTICS];
-    return '::!default' if not defined $semantics;
+    my $xsy_id    = $xsy->[Marpa::R3::Internal::XSY::ID];
+
+        my ($semantics) =
+          $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+            <<'END_OF_LUA', 'i>*', ($xsy_id // -1));
+    local slg, xsy_id = ...
+    if xsy_id < 0 then return '::!default' end
+    local semantics = slg.xsys[xsy_id].lexeme_semantics
+    return semantics or '::!default'
+END_OF_LUA
+
     return $semantics;
 }
 

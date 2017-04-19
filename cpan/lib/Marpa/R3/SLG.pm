@@ -1205,8 +1205,8 @@ END_OF_LUA
 
         my ($name_source) = $slg->call_by_tag(
         ('@' .__FILE__ . ':' .  __LINE__),
-        <<'END_OF_LUA', 'i', $xsy_id);
-        local slg, xsy_id = ...
+        <<'END_OF_LUA', 'is', $xsy_id, $default_lexeme_action);
+        local slg, xsy_id, default_lexeme_action = ...
         -- print(inspect( xsy_id ) )
         -- print(inspect( slg.xsys[xsy_id]))
         -- local name_source_by_id = slg.xsys[xsy_id].name_source
@@ -1224,12 +1224,14 @@ END_OF_LUA
                 -- inspect(name_source_by_name)
             -- ))
         -- end
-        return slg.xsys[xsy_id].name_source
+        local xsy = slg.xsys[xsy_id]
+        local name_source = xsy.name_source
+        if name_source == 'lexical' and not xsy.lexeme_semantics then
+            xsy.lexeme_semantics = default_lexeme_action
+        end
+        return name_source
 END_OF_LUA
-            next LEXEME if $name_source ne 'lexical';
 
-            $xsy->[Marpa::R3::Internal::XSY::LEXEME_SEMANTICS] //=
-              $default_lexeme_action;
         } ## end LEXEME: for my $lexeme_name ( keys %g1_id_by_lexeme_name )
     }
 
