@@ -53,7 +53,6 @@ sub pre_construct {
         grammar.ref_count = 1
         grammar:post_new()
         grammar.ranking_method = 'none'
-        grammar.l0_rules = {}
         return regix
 END_OF_LUA
 
@@ -1131,14 +1130,14 @@ END_OF_LUA
         <<'END_OF_LUA',
     local g, lexer_rule_id, g1_lexeme_id, assertion_id, discard_symbol_id = ...
     if lexer_rule_id >= 0 then
-        g.l0_rules[lexer_rule_id].g1_lexeme = g1_lexeme_id
+        g.l0.irls[lexer_rule_id].g1_lexeme = g1_lexeme_id
         if g1_lexeme_id >= 0 then
             local eager = g.g1.isys[g1_lexeme_id].eager
-            if eager then g.l0_rules[lexer_rule_id].eager = true end
+            if eager then g.l0.irls[lexer_rule_id].eager = true end
         end
         local eager = g.l0.isys[discard_symbol_id].eager
         if eager then
-            g.l0_rules[lexer_rule_id].eager = true
+            g.l0.irls[lexer_rule_id].eager = true
         end
     end
     if g1_lexeme_id >= 0 then
@@ -1161,7 +1160,7 @@ END_OF_LUA
         <<'END_OF_LUA', 'ii', $lexer_rule_id, ($is_active ? 1 : 0) );
         local slg, lexer_rule_id, is_active_arg = ...
         local is_active = (is_active_arg ~= 0 and true or nil)
-        local l0_rules = slg.l0_rules
+        local l0_rules = slg.l0.irls
         l0_rules[lexer_rule_id].event_on_discard = true
         l0_rules[lexer_rule_id].event_on_discard_active = is_active
 END_OF_LUA
@@ -1941,7 +1940,7 @@ END_OF_LUA
     -- print('base_rule_id: ', inspect(base_rule_id))
     kollos.throw = true
     if not base_rule_id or base_rule_id < 0 then return -1 end
-    g.l0_rules[base_rule_id] = { id = base_rule_id }
+    g.l0.irls[base_rule_id] = { id = base_rule_id }
     return base_rule_id
 END_OF_LUA
 
@@ -1982,7 +1981,7 @@ END_OF_LUA
     -- once refactoring is complete?
     if not base_rule_id or base_rule_id < 0 then return end
     local l0_rule = { id = base_rule_id }
-    g.l0_rules[base_rule_id] = l0_rule
+    g.l0.irls[base_rule_id] = l0_rule
     return base_rule_id
 END_OF_LUA
 

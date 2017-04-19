@@ -770,7 +770,7 @@ rule, false otherwise.
     function _M.class_slr.l0_track_candidates(recce)
         local l0r = recce.lmw_l0r
         local l0g = recce.slg.lmw_l0g
-        local l0_rules = recce.l0_rules
+        local l0_rules = recce.l0.irls
         local eager
         local complete_lexemes = false
         local es_id = l0r:latest_earley_set()
@@ -877,7 +877,7 @@ Determine which lexemes are acceptable or discards.
             if dot_position ~= -1 then
                goto NEXT_EARLEY_ITEM
             end
-            g1_lexeme = recce.l0_rules[rule_id].g1_lexeme
+            g1_lexeme = recce.l0.irls[rule_id].g1_lexeme
             g1_lexeme = g1_lexeme or -1
             if g1_lexeme == -1 then
                goto NEXT_EARLEY_ITEM
@@ -959,7 +959,7 @@ events into real trace events.
                     local q = recce.event_queue
                     local g1r = recce.lmw_g1r
                     local event_on_discard_active =
-                        recce.l0_rules[rule_id].event_on_discard_active
+                        recce.l0.irls[rule_id].event_on_discard_active
                     if event_on_discard_active then
                         local last_g1_location = g1r:latest_earley_set()
                         q[#q+1] = { 'discarded lexeme',

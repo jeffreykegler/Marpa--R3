@@ -181,7 +181,12 @@ sub Marpa::R3::Scanless::R::new {
     recce.event_queue = {}
     recce.lexeme_queue = {}
     recce.accept_queue = {}
-    recce.l0_rules = {}
+
+    recce.l0 = {}
+    recce.l0.irls = {}
+    recce.g1 = {}
+    recce.g1.isys = {}
+
     recce.per_codepoint = {}
     recce.end_pos = 0
     recce.perl_pos = 0
@@ -193,8 +198,8 @@ sub Marpa::R3::Scanless::R::new {
     recce.end_of_pause_lexeme = -1
     recce.lexer_start_pos = 0
     recce.is_external_scanning = false
-    local r_l0_rules = recce.l0_rules
-    local g_l0_rules = grammar.l0_rules
+    local r_l0_rules = recce.l0.irls
+    local g_l0_rules = grammar.l0.irls
     -- print('g_l0_rules: ', inspect(g_l0_rules))
     local max_l0_rule_id = l0g:highest_rule_id()
     for rule_id = 0, max_l0_rule_id do
@@ -208,8 +213,6 @@ sub Marpa::R3::Scanless::R::new {
         r_l0_rules[rule_id] = r_l0_rule
     end
     -- print('r_l0_rules: ', inspect(r_l0_rules))
-    recce.g1 = {}
-    recce.g1.isys = {}
     local g_g1_symbols = grammar.g1.isys
     local r_g1_symbols = recce.g1.isys
     local max_g1_symbol_id = g1g:highest_symbol_id()
@@ -286,8 +289,8 @@ END_OF_LUA
         local slr, lexer_rule_ids, is_active_arg = ...
         local slg = slr.slg
         local is_active = (is_active_arg ~= 0 and true or nil)
-        local g_l0_rules = slg.l0_rules
-        local r_l0_rules = slr.l0_rules
+        local g_l0_rules = slg.l0.irls
+        local r_l0_rules = slr.l0.irls
         for ix = 1, #lexer_rule_ids do
             local lexer_rule_id = lexer_rule_ids[ix]
             if is_active then
