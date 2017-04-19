@@ -354,11 +354,21 @@ END_OF_LUA
     SYMBOL:
     for ( my $symbol_id = 0; $symbol_id <= $highest_symbol_id; $symbol_id++ )
     {
-        my $blessing;
+        my $blessing = '';
         my $xsy = $xsy_by_isyid->[$symbol_id];
-        $blessing = $xsy->[Marpa::R3::Internal::XSY::BLESSING]
-            if defined $xsy;
-        if ( defined $blessing and q{::} ne substr $blessing, 0, 2 ) {
+        if (defined $xsy) {
+            my $xsy_id = $xsy->[Marpa::R3::Internal::XSY::ID];
+            ($blessing) = $slr->call_by_tag(
+                ('@' .__FILE__ . ':' . __LINE__),
+                <<'END_OF_LUA', 'i>*', $xsy_id ) ;
+                local recce, xsy_id = ...
+                local slg = recce.slg
+                local xsy = slg.xsys[xsy_id]
+                return xsy.blessing or ''
+END_OF_LUA
+        }
+
+        if ( $blessing ne '' and q{::} ne substr $blessing, 0, 2 ) {
             $symbol_blessing[$symbol_id] = $blessing;
             next SYMBOL;
         }
