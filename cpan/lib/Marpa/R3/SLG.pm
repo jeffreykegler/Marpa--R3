@@ -1245,11 +1245,17 @@ END_OF_LUA
 
         my ($name_source) = $slg->call_by_tag(
         ('@' .__FILE__ . ':' .  __LINE__),
-        <<'END_OF_LUA', 'i', $xsy_id);
-        local slg, xsy_id = ...
+        <<'END_OF_LUA', 'is', $xsy_id, ($default_blessing // '::undef'));
+        local slg, xsy_id, default_blessing = ...
         -- print(inspect( slg.xsys[xsy_name]))
-        return slg.xsys[xsy_id].name_source
+        local xsy = slg.xsys[xsy_id]
+        local name_source = xsy.name_source
+        if name_source == 'lexical' and not xsy.blessing then
+            xsy.blessing = default_blessing
+        end
+        return name_source
 END_OF_LUA
+
             next LEXEME if $name_source ne 'lexical';
 
             my $blessing = $xsy->[Marpa::R3::Internal::XSY::BLESSING]
@@ -1301,6 +1307,15 @@ qq{Symbol "$lexeme_name" needs a blessing package, but grammar has none\n},
             }
 
             $xsy->[Marpa::R3::Internal::XSY::BLESSING] = $blessing;
+
+            $slg->call_by_tag(
+                ('@' .__FILE__ . ':' .  __LINE__),
+                <<'END_OF_LUA', 'is', $xsy_id, $blessing);
+            local slg, xsy_id, blessing = ...
+            -- print(inspect( slg.xsys[xsy_name]))
+            local xsy = slg.xsys[xsy_id]
+            xsy.blessing = blessing
+END_OF_LUA
 
         } ## end LEXEME: for my $lexeme_name ( keys %g1_id_by_lexeme_name )
 

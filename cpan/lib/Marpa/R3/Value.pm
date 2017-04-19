@@ -610,7 +610,18 @@ sub lexeme_blessing_find {
     my $tracer       = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     my $xsy_by_isyid = $tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID];
     my $xsy          = $xsy_by_isyid->[$lexeme_id];
-    return $xsy->[Marpa::R3::Internal::XSY::BLESSING] // '::undef';
+    my $xsy_id = $xsy->[Marpa::R3::Internal::XSY::ID];
+
+    my ($result) = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 'i', ($xsy_id // -1) );
+      local slg, xsy_id = ...
+      if xsy_id < 0 then return '::undef' end
+      local xsy = slg.xsys[xsy_id]
+      local blessing = xsy.blessing
+      return blessing or '::undef'
+END_OF_LUA
+
+    return $result;
 }
 
 # For diagnostics
