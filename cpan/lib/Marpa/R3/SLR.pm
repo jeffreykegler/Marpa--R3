@@ -172,7 +172,7 @@ sub Marpa::R3::Scanless::R::new {
     local lua_ref = _M.register(registry, recce)
     recce.ref_count = 1
     local l0g = grammar.lmw_l0g
-    local g1g = grammar.lmw_g1g
+    local g1g = grammar.g1.lmw_g
     recce.lmw_g1r = _M.recce_new(g1g)
     recce.lmw_g1r.lmw_g = g1g
     recce.codepoint = nil
@@ -348,11 +348,11 @@ END_OF_LUA
         local return_value = g1r:start_input()
         if return_value == -1 then
             error( string.format('Recognizer start of input failed: %s',
-                recce.slg.lmw_g1g.error_description()))
+                recce.slg.g1.lmw_g.error_description()))
         end
         if return_value < 0 then
             error( string.format('Problem in start_input(): %s',
-                recce.slg.lmw_g1g.error_description()))
+                recce.slg.g1.lmw_g.error_description()))
         end
         recce:g1_convert_events(recce.perl_pos)
 END_OF_LUA
@@ -1254,7 +1254,7 @@ END_OF_LUA
 
       my ($desc) = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ), <<'END_OF_LUA', '');
     local grammar = ...
-    local g1g = grammar.lmw_g1g
+    local g1g = grammar.g1.lmw_g
         local msgs = {}
         local events = lmw_g:events()
         for i = 1, #events, 2 do
@@ -1291,7 +1291,7 @@ END_OF_LUA
                   $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
                     <<'END_OF_LUA', '' );
         local grammar = ...
-        return grammar.lmw_g1g.error_description()
+        return grammar.g1.lmw_g.error_description()
 END_OF_LUA
                 $desc = 'G1 error: ' . $error_description;
                 chomp $desc;
@@ -1599,7 +1599,7 @@ sub Marpa::R3::Scanless::R::show_progress {
             if ( $position < 0 ) {
                 ($position) = $slg->call_by_tag(
                     ( __FILE__ . ':' . __LINE__ ),
-                    'local grammar, rule_id = ...; return grammar.lmw_g1g:rule_length(rule_id)',
+                    'local grammar, rule_id = ...; return grammar.g1.lmw_g:rule_length(rule_id)',
                     'i', $rule_id
                 );
             }
@@ -1622,7 +1622,7 @@ sub Marpa::R3::Scanless::R::show_progress {
 
                 my ($rhs_length) = $slg->call_by_tag(
                 ('@' . __FILE__ . ':' . __LINE__),
-                        'local grammar, rule_id = ...; return grammar.lmw_g1g:rule_length(rule_id)',
+                        'local grammar, rule_id = ...; return grammar.g1.lmw_g:rule_length(rule_id)',
                         'i', $rule_id);
                 my @item_text;
 
@@ -1833,7 +1833,7 @@ END_OF_LUA
 
     my ($error_description)
     = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        'local grammar = ...; return grammar.lmw_g1g:error_description()', '');
+        'local grammar = ...; return grammar.g1.lmw_g:error_description()', '');
     Marpa::R3::exception( qq{Problem reading symbol "$symbol_name": },
         $error_description );
 } ## end sub Marpa::R3::Scanless::R::lexeme_alternative
@@ -1869,7 +1869,7 @@ END_OF_LUA
 
     if ($return_value == 0) {
         $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-            'local grammar = ...; grammar.lmw_g1g.error()', '' );
+            'local grammar = ...; grammar.g1.lmw_g.error()', '' );
     }
     Marpa::R3::Internal::Scanless::convert_libmarpa_events($slr);
 
@@ -1988,7 +1988,7 @@ sub Marpa::R3::Scanless::R::lexeme_priority_set {
         <<'END_OF_LUA', 'si>*', $lexeme_name, $new_priority );
         local recce, lexeme_name, new_priority = ...
         local slg = recce.slg
-        local g1g = slg.lmw_g1g
+        local g1g = slg.g1.lmw_g
         local lexeme_id = g1g.isyid_by_name[lexeme_name]
         if not lexeme_id then
             kollos.userX(string.format(

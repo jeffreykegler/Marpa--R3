@@ -586,7 +586,7 @@ END_OF_LUA
         ('@' .__FILE__ . ':' .  __LINE__),
         <<'END_OF_LUA', '');
         local grammar = ...
-        local g1g = grammar.lmw_g1g
+        local g1g = grammar.g1.lmw_g
         g1g.start_name = '[:start]'
 END_OF_LUA
 
@@ -629,7 +629,7 @@ END_OF_LUA
         ('@' .__FILE__ . ':' .  __LINE__),
         <<'END_OF_LUA', 'ii', $symbol_id, ($is_active ? 1 : 0));
         local grammar, symbol_id, is_active = ...
-        local g1g = grammar.lmw_g1g
+        local g1g = grammar.g1.lmw_g
         g1g:symbol_is_completion_event_set(symbol_id, 1)
         if is_active == 0 then
             g1g:completion_symbol_activate(symbol_id, 0)
@@ -660,7 +660,7 @@ END_OF_LUA
         ('@' .__FILE__ . ':' .  __LINE__),
         <<'END_OF_LUA', 'ii', $symbol_id, ($is_active ? 1 : 0));
         local grammar, symbol_id, is_active = ...
-        local g1g = grammar.lmw_g1g
+        local g1g = grammar.g1.lmw_g
         g1g:symbol_is_nulled_event_set(symbol_id, 1)
         if is_active == 0 then
             g1g:nulled_symbol_activate(symbol_id, 0)
@@ -691,7 +691,7 @@ END_OF_LUA
         ('@' .__FILE__ . ':' .  __LINE__),
         <<'END_OF_LUA', 'ii', $symbol_id, ($is_active ? 1 : 0));
         local grammar, symbol_id, is_active = ...
-        local g1g = grammar.lmw_g1g
+        local g1g = grammar.g1.lmw_g
         g1g:symbol_is_prediction_event_set(symbol_id, 1)
         if is_active == 0 then
             g1g:prediction_symbol_activate(symbol_id, 0)
@@ -730,7 +730,7 @@ END_OF_LUA
         ('@' .__FILE__ . ':' .  __LINE__),
         <<'END_OF_LUA', 'i', $symbol_id);
         local grammar, symbol_id = ...
-        local g1g = grammar.lmw_g1g
+        local g1g = grammar.g1.lmw_g
         return g1g:symbol_is_terminal(symbol_id)
 END_OF_LUA
 
@@ -1538,7 +1538,7 @@ sub assign_G1_symbol {
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 's', $name );
     local g, symbol_name = ...
-    local lmw_g = g.lmw_g1g
+    local lmw_g = g.g1.lmw_g
     local symbol_id = lmw_g:symbol_new(symbol_name)
     g.g1.isys[symbol_id] = { id = symbol_id }
     return symbol_id
@@ -1563,7 +1563,7 @@ END_OF_LUA
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 's', $symbol_id, ($value ? 1 : 0));
     local g, symbol_id, value = ...
-    local g1g = g.lmw_g1g
+    local g1g = g.g1.lmw_g
     gig:symbol_is_terminal_set(symbol_id, value)
 END_OF_LUA
 
@@ -1578,7 +1578,7 @@ END_OF_LUA
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 's', $symbol_id, $value);
     local g, symbol_id, value = ...
-    local g1g = g.lmw_g1g
+    local g1g = g.g1.lmw_g
     g1g:symbol_rank_set(symbol_id, value)
 END_OF_LUA
             next PROPERTY;
@@ -1738,7 +1738,7 @@ sub add_G1_user_rule {
     my ($default_rank) =
           $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ), <<'END_OF_LUA', '');
     local grammar = ...
-    return grammar.lmw_g1g:default_rank()
+    return grammar.g1.lmw_g:default_rank()
 END_OF_LUA
 
     $rank //= $default_rank;
@@ -1770,7 +1770,7 @@ END_OF_LUA
     -- remove the test for nil or less than zero
     -- once refactoring is complete?
     kollos.throw = false
-    local base_rule_id = g.lmw_g1g:rule_new(rule)
+    local base_rule_id = g.g1.lmw_g:rule_new(rule)
     -- print('base_rule_id: ', inspect(base_rule_id))
     kollos.throw = true
     if not base_rule_id or base_rule_id < 0 then return -1 end
@@ -1808,7 +1808,7 @@ END_OF_LUA
     -- print('arg_hash: ', inspect(arg_hash))
     arg_hash.proper = (arg_hash.proper ~= 0)
     kollos.throw = false
-    base_rule_id = g.lmw_g1g:sequence_new(arg_hash)
+    base_rule_id = g.g1.lmw_g:sequence_new(arg_hash)
     kollos.throw = true
     -- remove the test for nil or less than zero
     -- once refactoring is complete?
@@ -1825,7 +1825,7 @@ END_OF_LUA
         $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
             <<'END_OF_LUA', 's', $rule_description );
             local grammar, rule_description = ...
-            local g1g = grammar.lmw_g1g
+            local g1g = grammar.g1.lmw_g
             local error_code = g1g:error_code()
             if error_code == kollos.err.DUPLICATE_RULE then
                 problem_description = "Duplicate rule"
@@ -1849,7 +1849,7 @@ END_OF_LUA
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'iii',
         local grammar, rule_id, ranking_is_high, rank = ...
-        local g1g = grammar.lmw_g1g
+        local g1g = grammar.g1.lmw_g
         g1g:rule_null_high_set(rule_id, ranking_is_high)
         g1g:rule_rank_set(rule_id, rank)
 END_OF_LUA
@@ -2040,7 +2040,7 @@ sub Marpa::R3::Scanless::G::start_symbol_id {
     ('@' .__FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', '>*' ) ;
     local grammar = ...
-    return grammar.lmw_g1g:start_symbol()
+    return grammar.g1.lmw_g:start_symbol()
 END_OF_LUA
     return $start_symbol;
 }
@@ -2189,7 +2189,7 @@ sub Marpa::R3::Scanless::G::symbol_is_accessible {
     ('@' .__FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', 'i>*', $symid ) ;
     local grammar, symid = ...
-    local g1g = grammar.lmw_g1g
+    local g1g = grammar.g1.lmw_g
     return g1g:symbol_is_accessible(symid)
 END_OF_LUA
 
@@ -2202,7 +2202,7 @@ sub Marpa::R3::Scanless::G::symbol_is_productive {
     ('@' .__FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', 'i>*', $symid ) ;
     local grammar, symid = ...
-    local g1g = grammar.lmw_g1g
+    local g1g = grammar.g1.lmw_g
     return g1g:symbol_is_productive(symid)
 END_OF_LUA
 
@@ -2215,7 +2215,7 @@ sub Marpa::R3::Scanless::G::symbol_is_nulling {
     ('@' .__FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', 'i>*', $symid ) ;
     local grammar, symid = ...
-    local g1g = grammar.lmw_g1g
+    local g1g = grammar.g1.lmw_g
     return g1g:symbol_is_nulling(symid)
 END_OF_LUA
 
@@ -2234,7 +2234,7 @@ sub Marpa::R3::Scanless::G::show_dotted_rule {
     ('@' .__FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', 'i>*', $irlid ) ;
     local grammar, irlid = ...
-    local g1g = grammar.lmw_g1g
+    local g1g = grammar.g1.lmw_g
     local minimum = g1g:sequence_min(irlid)
     if not minimum then return 0, -1 end
     return 1, minimum
@@ -2614,7 +2614,7 @@ sub Marpa::R3::Scanless::G::show_irls {
         ('@' . __FILE__ . ':' .  __LINE__),
 	<<'END_OF_LUA', '' );
     local grammar = ...
-    local g1g = grammar.lmw_g1g
+    local g1g = grammar.g1.lmw_g
     local irl_count = g1g:_irl_count()
     local pieces = {}
     for irl_id = 0, irl_count - 1 do
@@ -2634,7 +2634,7 @@ sub Marpa::R3::Scanless::G::show_isys {
         ('@' . __FILE__ . ':' .  __LINE__),
 	<<'END_OF_LUA', '' );
     local grammar = ...
-    local g1g = grammar.lmw_g1g
+    local g1g = grammar.g1.lmw_g
     local nsy_count = g1g:_nsy_count()
     local pieces = {}
     for isy_id = 0, nsy_count - 1 do
@@ -2653,7 +2653,7 @@ sub Marpa::R3::Scanless::G::show_ahms {
         ('@' . __FILE__ . ':' .  __LINE__),
 	<<'END_OF_LUA', '' );
     local grammar = ...
-    local g1g = grammar.lmw_g1g
+    local g1g = grammar.g1.lmw_g
     return g1g:show_ahms()
 END_OF_LUA
 
@@ -2669,7 +2669,7 @@ sub Marpa::R3::Scanless::G::show_dotted_irl {
         ('@' . __FILE__ . ':' .  __LINE__),
 	<<'END_OF_LUA', 'ii', $irl_id, $dot_position );
     local grammar, irl_id, dot_position = ...
-    local g1g = grammar.lmw_g1g
+    local g1g = grammar.g1.lmw_g
     return g1g:show_dotted_irl(irl_id, dot_position)
 END_OF_LUA
     return $result;
@@ -2683,7 +2683,7 @@ sub Marpa::R3::Scanless::G::show_briefer_ahm {
         ('@' . __FILE__ . ':' .  __LINE__),
 	<<'END_OF_LUA', 'i', $item_id );
     local grammar, item_id = ...
-    local g1g = grammar.lmw_g1g
+    local g1g = grammar.g1.lmw_g
     local irl_id = g1g:_ahm_irl(item_id)
     local dot_position = g1g:_ahm_position(item_id)
     if (dot_position < 0 ) then
@@ -2702,7 +2702,7 @@ sub Marpa::R3::Scanless::G::brief_irl {
     my ($text) = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'i', $irl_id );
     local grammar, irl_id = ...
-    local g1g = grammar.lmw_g1g
+    local g1g = grammar.g1.lmw_g
     return g1g:brief_irl(irl_id)
 END_OF_LUA
 

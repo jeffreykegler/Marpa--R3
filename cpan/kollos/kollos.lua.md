@@ -1217,7 +1217,7 @@ acceptance is caught here via rejection).  Ignore
             return recce.perl_pos
         end
         if result == -2 then
-            local error_code = recce.slg.lmw_g1g:error_code()
+            local error_code = recce.slg.g1.lmw_g:error_code()
             if error_code == kollos.err.PARSE_EXHAUSTED then
                 local q = recce.event_queue
                 q[#q+1] = { 'no acceptable input' }
@@ -1225,7 +1225,7 @@ acceptance is caught here via rejection).  Ignore
             return 0
         end
         error('Problem in slr->g1_lexeme_complete(): '
-            ..  recce.slg.lmw_g1g:error_description())
+            ..  recce.slg.g1.lmw_g:error_description())
     end
 ```
 
@@ -1325,7 +1325,7 @@ span is zero or less.
     -- TODO: perl_pos arg is development hack --
     -- eventually use recce.perl_pos
     function _M.class_slr.g1_convert_events(recce, perl_pos)
-        local g1g = recce.slg.lmw_g1g
+        local g1g = recce.slg.g1.lmw_g
         local q = recce.event_queue
         local events = g1g:events()
         for i = 1, #events, 2 do
@@ -1410,7 +1410,7 @@ or nil if there was none.
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.last_completed(recce, symbol_id)
          local g1r = recce.lmw_g1r
-         local g1g = recce.slg.lmw_g1g
+         local g1g = recce.slg.g1.lmw_g
          local latest_earley_set = g1r:latest_earley_set()
          local first_origin = latest_earley_set + 1
          local earley_set = latest_earley_set
@@ -1639,7 +1639,7 @@ part of a "Pure Lua" implementation.
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.show_leo_item(recce)
         local g1r = recce.lmw_g1r
-        local g1g = recce.slg.lmw_g1g
+        local g1g = recce.slg.g1.lmw_g
         local leo_base_state = g1r:_leo_base_state()
         if not leo_base_state then return '' end
         local trace_earley_set = g1r:_trace_earley_set()
