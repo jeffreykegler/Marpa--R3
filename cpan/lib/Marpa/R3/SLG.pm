@@ -274,7 +274,8 @@ sub per_lmg_init {
     g[field_name_form] = {
         lmw_g = lmw_g,
         name = field_name_form,
-        xsy_by_isyid = {}
+        xsy_by_isyid = {},
+        isys = {}
     }
     lmw_g:force_valued()
     lmw_g.short_name = field_name_form
