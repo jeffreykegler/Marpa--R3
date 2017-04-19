@@ -58,11 +58,12 @@ use constant XRL => 17;
 
 package Marpa::R3::Internal::Trace::G;
 use constant NAME => 0;
-use constant LMW_NAME => 1;
-use constant XSY_BY_ISYID => 2;
-use constant XBNF_BY_IRLID => 3;
-use constant ACTION_BY_IRLID => 4;
-use constant MASK_BY_IRLID => 5;
+use constant SUBG_NAME => 1;
+use constant LMW_NAME => 2;
+use constant XSY_BY_ISYID => 3;
+use constant XBNF_BY_IRLID => 4;
+use constant ACTION_BY_IRLID => 5;
+use constant MASK_BY_IRLID => 6;
 
 package Marpa::R3::Internal::Progress_Report;
 use constant RULE_ID => 0;

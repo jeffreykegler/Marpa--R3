@@ -257,6 +257,7 @@ sub per_lmg_init {
     $per_lmg->[Marpa::R3::Internal::Trace::G::NAME] = $name;
     my $lmw_name = 'lmw_' . $field_name_form . 'g';
     $per_lmg->[Marpa::R3::Internal::Trace::G::LMW_NAME]            = $lmw_name;
+    $per_lmg->[Marpa::R3::Internal::Trace::G::SUBG_NAME]            = $field_name_form;
     $per_lmg->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID]        = [];
     $slg->[Marpa::R3::Internal::Scanless::G::PER_LMG]->{$lmw_name} = $per_lmg;
 
@@ -1322,15 +1323,16 @@ sub Marpa::R3::Internal::Scanless::G::precompute {
 
     my $xsy_by_isyid     = $per_lmg->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID];
     my $lmw_name     = $per_lmg->[Marpa::R3::Internal::Trace::G::LMW_NAME];
+    my $subg_name = $per_lmg->[Marpa::R3::Internal::Trace::G::SUBG_NAME];
 
     my $trace_fh =
         $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE];
 
     my ($do_return, $precompute_result, $precompute_error_code)
       = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 's', $lmw_name );
-    local grammar, lmw_name = ...
-    local lmw_g = grammar[lmw_name]
+        <<'END_OF_LUA', 's', $subg_name );
+    local grammar, subg_name = ...
+    local lmw_g = grammar[subg_name].lmw_g
     if lmw_g:is_precomputed() ~= 0 then
         return "false"
     end

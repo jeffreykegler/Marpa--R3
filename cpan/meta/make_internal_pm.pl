@@ -134,7 +134,8 @@ __DATA__
 
     :package=Marpa::R3::Internal::Trace::G
 
-    NAME { Name of the grammar -- 'l0' or 'g1' }
+    NAME
+    SUBG_NAME { Name of the grammar -- 'l0' or 'g1' }
     LMW_NAME
 
     XSY_BY_ISYID { Array mapping ISYID to XSY }
