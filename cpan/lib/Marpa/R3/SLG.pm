@@ -299,7 +299,9 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 's', $hashed_source );
         local slg, source_hash = ...
-        slg.xsys = {}
+        local xsys = {}
+        slg.xsys = xsys
+
         -- io.stderr:write(inspect(source_hash))
         local xsy_names = {}
         local hash_xsy_data = source_hash.xsy
@@ -307,11 +309,14 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
              xsy_names[#xsy_names+1] = xsy_name
         end
         table.sort(xsy_names)
-        for ix = 1, #xsy_names do
+        for xsy_id = 1, #xsy_names do
             -- during development, zero-based so that it duplicates original
             -- Perl implementation
-            local xsy_name = xsy_names[ix]
-            local runtime_xsy = { name = xsy_name }
+            local xsy_name = xsy_names[xsy_id]
+            local runtime_xsy = {
+                id = xsy_id,
+                name = xsy_name
+            }
 
             local xsy_source = hash_xsy_data[xsy_name]
 
@@ -323,28 +328,6 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
             runtime_xsy.name_source = xsy_source.name_source
 
             slg.xsys[xsy_name] = runtime_xsy
-        end
-        -- io.stderr:write(inspect(xsy_names), "\n")
-        -- io.stderr:write("Before returning xsy_names\n")
-        -- return xsy_names
-END_OF_LUA
-
-    # say STDERR Data::Dumper::Dumper($xsy_names);
-
-    $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 's', $xsy_names );
-        local slg, xsy_names = ...
-        -- io.stderr:write(inspect(xsy_names), "\n")
-        xsys = slg.xsys
-        for ix = 1, #xsy_names do
-            local xsy_name = xsy_names[ix]
-            local xsy_source = xsys[xsy_name]
-            -- TODO delete next test after development
-            if not xsy_source then
-                 error("No xsy for " .. inspect(xsy_name))
-            end
-            local xsy_id = ix - 1
-            xsy_source.id = xsy_id
             xsys[xsy_id] = xsy_source
         end
 END_OF_LUA
