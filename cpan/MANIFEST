@@ -206,6 +206,7 @@ meta/make_internal_pm.pl
 pod/ASF.pod
 pod/Acknowledgements.pod
 pod/Changes.pod
+pod/Details.pod
 pod/Event.pod
 pod/Exhaustion.pod
 pod/Glade.pod

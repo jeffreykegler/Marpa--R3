@@ -1,0 +1,121 @@
+# Marpa::R3 is Copyright (C) 2017, Jeffrey Kegler.
+#
+# This module is free software; you can redistribute it and/or modify it
+# under the same terms as Perl 5.10.1. For more details, see the full text
+# of the licenses in the directory LICENSES.
+#
+# This program is distributed in the hope that it will be
+# useful, but it is provided “as is” and without any express
+# or implied warranties. For details, see the full text of
+# of the licenses in the directory LICENSES.
+
+=head1 NAME
+
+Details - The "fine print" for Marpa::R3
+
+=head1 Description
+
+This section contains the "fine print".
+It describes various details,
+and issues some
+caveats that apply to
+Marpa::R3 in a general way.
+Everyone writing an Marpa::R3 app should
+skim this document.
+
+=head1 Character set
+
+Marpa::R3 expects all strings passed to it to be
+valid UTF-8.
+If a string is passed to Marpa::R3 which does
+not look like valid UTF-8, a fatal error results.
+
+All ASCII-7 strings are valid UTF-8 strings,
+so apps which restrict themselves to the ASCII
+7 characters will have no problem.
+
+Pedantically, Marpa::R3 is "outside" of Perl,
+so that strings must be encoded when passed to
+Marpa::R3,
+and decoded when returned from Marpa::R3.
+By default and in practice,
+Perl uses only valid UTF-8 characters so that
+it will usually not be necessary to encode/decode.
+
+Unfortunately, Perl's default is "utf8", which
+is different from the official Unicode UTF-8.
+Perl's "utf8" is a superset of "UTF-8"
+-- it allows additional
+characters not valid according to the Unicode standard.
+Most Perl applications do not use UTF-8-invalid characters.
+
+Perl applications that do not use UTF-8-invalid characters
+do not need to decode/encode
+When communicating with Marpa::R3.
+However, if one of the Perl "utf8" characters
+that is not a valid UTF-8 character
+is passed to Marpa::R3,
+a fatal error will result.
+To fix the problem, an application will have
+to encode the Perl "utf8" string into "UTF-8".
+
+=head1 Tainted data
+
+Marpa::R3 exists to allow its input to alter execution in
+flexible and powerful ways.
+Marpa should not be used with untrusted input.
+In Perl' s taint mode, it is a fatal error to use Marpa's SLIF
+interface
+with a tainted grammar, a tainted input string,
+or tainted token values.
+
+=head1 Threads
+
+Perl interpreter-based threads are now
+L<officially "discouraged"|perlthread/"WARNNG">.
+Nonetheless, Marpa::R3 supports them,
+with one restriction:
+A Marpa grammar object, and any recognizer or
+other object created from that grammar,
+must be used within a single thread.
+
+This restriction is less severe than it may sound:
+Marpa grammars are relatively inexpensive to create,
+and several Marpa grammar objects can be created from
+the same SLIF source.
+
+=head1 The Marpa:: namespace
+
+The C<Marpa::> top-level namespace is reserved.
+For extensions to Marpa,
+one appropriate place is the C<MarpaX::> namespace.
+This practice helps avoid namespace collisions,
+and follows a CPAN standard, as exemplified by
+the
+C<DBIx::>
+C<LWPx::>
+and
+C<MooseX::>
+which are for extensions of, respectively,
+DBI, LWP and Moose.
+
+=head1 COPYRIGHT AND LICENSE
+
+=for Marpa::R3::Display
+ignore: 1
+
+  Marpa::R3 is Copyright (C) 2017, Jeffrey Kegler.
+
+  This module is free software; you can redistribute it and/or modify it
+  under the same terms as Perl 5.10.1. For more details, see the full text
+  of the licenses in the directory LICENSES.
+
+  This program is distributed in the hope that it will be
+  useful, but without any warranty; without even the implied
+  warranty of merchantability or fitness for a particular purpose.
+
+=for Marpa::R3::Display::End
+
+=cut
+
+# vim: expandtab shiftwidth=4:

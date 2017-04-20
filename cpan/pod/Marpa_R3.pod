@@ -577,46 +577,6 @@ The exception is the value for the start rule.
 The return value for the start rule becomes
 the parse result.
 
-=head1 Tainted data
-
-Marpa::R3 exists to allow its input to alter execution in
-flexible and powerful ways.
-Marpa should not be used with untrusted input.
-In Perl' s taint mode, it is a fatal error to use Marpa's SLIF
-interface
-with a tainted grammar, a tainted input string,
-or tainted token values.
-
-=head1 Threads
-
-Perl interpreter-based threads are now
-L<officially "discouraged"|perlthread/"WARNNG">.
-Nonetheless, Marpa::R3 supports them,
-with one restriction:
-A Marpa grammar object, and any recognizer or
-other object created from that grammar,
-must be used within a single thread.
-
-This restriction is less severe than it may sound:
-Marpa grammars are relatively inexpensive to create,
-and several Marpa grammar objects can be created from
-the same SLIF source.
-
-=head1 The Marpa:: namespace
-
-The C<Marpa::> top-level namespace is reserved.
-For extensions to Marpa,
-one appropriate place is the C<MarpaX::> namespace.
-This practice helps avoid namespace collisions,
-and follows a CPAN standard, as exemplified by
-the
-C<DBIx::>
-C<LWPx::>
-and
-C<MooseX::>
-which are for extensions of, respectively,
-DBI, LWP and Moose.
-
 =head1 Other documents
 
 This document gives a semi-tutorial overview of Marpa's Scanless interface (SLIF).
@@ -632,9 +592,12 @@ L<its DSL|Marpa::R3::Scanless::DSL>,
 L<its grammar methods|Marpa::R3::Scanless::G>,
 and
 L<its recognizer methods|Marpa::R3::Scanless::R>.
-
 Marpa's standard semantics are fully described in the
 L<Marpa::R3::Semantics> document.
+
+If you are going to write or maintain a Marpa::R3 application,
+you should skim the
+L<Marpa::R3::Details> document.
 Techniques for tracing and for debugging your Marpa grammars
 are described in the
 L<Marpa::R3::Tracing> document and the
