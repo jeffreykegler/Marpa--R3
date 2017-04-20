@@ -138,7 +138,6 @@ __DATA__
     SUBG_NAME { Name of the grammar -- 'l0' or 'g1' }
     LMW_NAME
 
-    XSY_BY_ISYID { Array mapping ISYID to XSY }
     XBNF_BY_IRLID { Array mapping IRLID to XBNF }
     ACTION_BY_IRLID
     MASK_BY_IRLID

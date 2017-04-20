@@ -258,7 +258,6 @@ sub per_lmg_init {
     my $lmw_name = 'lmw_' . $field_name_form . 'g';
     $per_lmg->[Marpa::R3::Internal::Trace::G::LMW_NAME]            = $lmw_name;
     $per_lmg->[Marpa::R3::Internal::Trace::G::SUBG_NAME]            = $field_name_form;
-    $per_lmg->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID]        = [];
     $slg->[Marpa::R3::Internal::Scanless::G::PER_LMG]->{$lmw_name} = $per_lmg;
     $slg->[Marpa::R3::Internal::Scanless::G::PER_LMG]->{$field_name_form} = $per_lmg;
 
@@ -1295,7 +1294,6 @@ END_OF_LUA
 sub Marpa::R3::Internal::Scanless::G::precompute {
     my ($slg, $per_lmg) = @_;
 
-    my $xsy_by_isyid     = $per_lmg->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID];
     my $lmw_name     = $per_lmg->[Marpa::R3::Internal::Trace::G::LMW_NAME];
     my $subg_name = $per_lmg->[Marpa::R3::Internal::Trace::G::SUBG_NAME];
 
@@ -1527,9 +1525,6 @@ END_OF_LUA
         }
         if ( $property eq 'xsy' ) {
             my $xsy_name = $options->{$property};
-            my $xsy = $slg->[Marpa::R3::Internal::Scanless::G::XSY_BY_NAME]->{$xsy_name};
-            $tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID]->[$symbol_id] =
-                $xsy;
 
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'is', $symbol_id, $xsy_name);
@@ -1602,9 +1597,6 @@ END_OF_LUA
         }
         if ( $property eq 'xsy' ) {
             my $xsy_name = $options->{$property};
-            my $xsy = $slg->[Marpa::R3::Internal::Scanless::G::XSY_BY_NAME]->{$xsy_name};
-            $tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID]->[$symbol_id] =
-                $xsy;
 
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'is', $symbol_id, $xsy_name);
