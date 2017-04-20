@@ -604,16 +604,12 @@ END_OF_LUA
 # Find the blessing for a lexeme.
 sub lexeme_blessing_find {
     my ( $slg, $lexeme_id ) = @_;
-    my $tracer       = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
-    my $xsy_by_isyid = $tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID];
-    my $xsy          = $xsy_by_isyid->[$lexeme_id];
-    my $xsy_id = $xsy->[Marpa::R3::Internal::XSY::ID];
 
     my ($result) = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 'i', ($xsy_id // -1) );
-      local slg, xsy_id = ...
-      if xsy_id < 0 then return '::undef' end
-      local xsy = slg.xsys[xsy_id]
+        <<'END_OF_LUA', 'i', $lexeme_id );
+      local slg, isyid = ...
+      local xsy = slg.g1.xsy_by_isyid[isyid]
+      if not xsy then return '::undef' end
       local blessing = xsy.blessing
       return blessing or '::undef'
 END_OF_LUA
