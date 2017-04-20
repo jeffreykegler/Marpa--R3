@@ -1219,20 +1219,21 @@ END_OF_LUA
             next LEXEME if not defined $xsy;
             my $xsy_id = $xsy->[Marpa::R3::Internal::XSY::ID];
 
-        my ($blessing, $name_source) = $slg->call_by_tag(
+        my ($cmd, $blessing) = $slg->call_by_tag(
         ('@' .__FILE__ . ':' .  __LINE__),
         <<'END_OF_LUA', 'is', $xsy_id, ($default_blessing // '::undef'));
         local slg, xsy_id, default_blessing = ...
         -- print(inspect( slg.xsys[xsy_name]))
         local xsy = slg.xsys[xsy_id]
         local name_source = xsy.name_source
-        if name_source == 'lexical' and not xsy.blessing then
+        if name_source ~= 'lexical' then return 'next lexeme', default_blessing end
+        if not xsy.blessing then
             xsy.blessing = default_blessing
         end
-        return xsy.blessing, name_source
+        return 'ok', xsy.blessing
 END_OF_LUA
 
-            next LEXEME if $name_source ne 'lexical';
+            next LEXEME if $cmd eq 'next lexeme';
 
           FIND_BASE_BLESSING: {
                 if ( $blessing eq '::undef' ) {
