@@ -299,13 +299,6 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     my $xsy_by_name = $slg->[Marpa::R3::Internal::Scanless::G::XSY_BY_NAME] =
       {};
     $xsy_names = [ sort @{$xsy_names} ];
-    for my $xsy_name ( @{$xsy_names} ) {
-        my $runtime_xsy_data = [];
-        my $source_xsy_data = $hashed_source->{xsy}->{$xsy_name};
-        $runtime_xsy_data->[Marpa::R3::Internal::XSY::ID] = scalar @{$xsy_by_id};
-        push @{$xsy_by_id}, $runtime_xsy_data;
-        $xsy_by_name->{$xsy_name} = $runtime_xsy_data;
-    }
 
     # ($xsy_names) =
     $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),

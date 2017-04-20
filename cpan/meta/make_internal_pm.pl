@@ -99,9 +99,6 @@ END_OF_HEADER
 
 __DATA__
 
-    :package=Marpa::R3::Internal::XSY
-    ID
-
     :package=Marpa::R3::Internal::XRL
 
     ID
