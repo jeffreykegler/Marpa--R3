@@ -1280,10 +1280,9 @@ qq{Symbol "$lexeme_name" needs a blessing package, but grammar has none\n},
 
             $slg->call_by_tag(
                 ('@' .__FILE__ . ':' .  __LINE__),
-                <<'END_OF_LUA', 'is', $xsy_id, $blessing);
-            local slg, xsy_id, blessing = ...
-            -- print(inspect( slg.xsys[xsy_name]))
-            local xsy = slg.xsys[xsy_id]
+                <<'END_OF_LUA', 'is', $g1_lexeme_id, $blessing);
+            local slg, isyid, blessing = ...
+            local xsy = slg.g1.xsy_by_isyid[isyid]
             xsy.blessing = blessing
 END_OF_LUA
 
