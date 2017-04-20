@@ -1221,10 +1221,10 @@ END_OF_LUA
 
         my ($cmd, $blessing) = $slg->call_by_tag(
         ('@' .__FILE__ . ':' .  __LINE__),
-        <<'END_OF_LUA', 'is', $xsy_id, ($default_blessing // '::undef'));
-        local slg, xsy_id, default_blessing = ...
-        -- print(inspect( slg.xsys[xsy_name]))
-        local xsy = slg.xsys[xsy_id]
+        <<'END_OF_LUA', 'is', $g1_lexeme_id, ($default_blessing // '::undef'));
+        local slg, isyid, default_blessing = ...
+        local xsy = slg.g1.xsy_by_isyid[isyid]
+        if not xsy then return 'next lexeme', default_blessing end
         local name_source = xsy.name_source
         if name_source ~= 'lexical' then return 'next lexeme', default_blessing end
         if not xsy.blessing then
