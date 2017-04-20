@@ -27,7 +27,7 @@ and tools to Marpa::R3.
 
 =head1 Changes
 
-=head2 Marpa string must be UTF-8
+=head2 Marpa strings must be UTF-8
 
 Marpa expects all strings passed to it to be valid UTF-8.
 (Note that all ASCII-7 string are valid UTF-8).
