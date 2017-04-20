@@ -1185,43 +1185,22 @@ END_OF_LUA
   {
 
         my $default_lexeme_action = $lexeme_default_adverbs->{action};
-        my $xsy_by_isyid =
-          $g1_tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID];
 
       LEXEME:
         for my $lexeme_name ( keys %g1_id_by_lexeme_name ) {
             my $g1_lexeme_id = $g1_id_by_lexeme_name{$lexeme_name};
-            my $xsy          = $xsy_by_isyid->[$g1_lexeme_id];
-            next LEXEME if not defined $xsy;
-            my $xsy_id = $xsy->[Marpa::R3::Internal::XSY::ID];
 
-        my ($name_source) = $slg->call_by_tag(
+        $slg->call_by_tag(
         ('@' .__FILE__ . ':' .  __LINE__),
-        <<'END_OF_LUA', 'is', $xsy_id, $default_lexeme_action);
-        local slg, xsy_id, default_lexeme_action = ...
-        -- print(inspect( xsy_id ) )
-        -- print(inspect( slg.xsys[xsy_id]))
-        -- local name_source_by_id = slg.xsys[xsy_id].name_source
-        -- local name_source_by_name = slg.xsys[xsy_name].name_source
-        -- if (name_source_by_id ~= name_source_by_name) then
-            -- io.stderr:write(string.format(
-                -- "id=%s; name=%s; id by name = %s; name by id = %s\n",
-                -- inspect(xsy_id), inspect(xsy_name),
-                -- inspect(slg.xsys[xsy_name].id),
-                -- inspect(slg.xsys[xsy_id].name)
-            -- ))
-            -- error(string.format(
-                -- "name_source mismatch, by id = %s; by name = %s\n",
-                -- inspect(name_source_by_id),
-                -- inspect(name_source_by_name)
-            -- ))
-        -- end
-        local xsy = slg.xsys[xsy_id]
-        local name_source = xsy.name_source
-        if name_source == 'lexical' and not xsy.lexeme_semantics then
-            xsy.lexeme_semantics = default_lexeme_action
+        <<'END_OF_LUA', 'is', $g1_lexeme_id, $default_lexeme_action);
+        local slg, isyid, default_lexeme_action = ...
+        local xsy = slg.g1.xsy_by_isyid[isyid]
+        if xsy then
+            local name_source = xsy.name_source
+            if name_source == 'lexical' and not xsy.lexeme_semantics then
+                xsy.lexeme_semantics = default_lexeme_action
+            end
         end
-        return name_source
 END_OF_LUA
 
         } ## end LEXEME: for my $lexeme_name ( keys %g1_id_by_lexeme_name )
