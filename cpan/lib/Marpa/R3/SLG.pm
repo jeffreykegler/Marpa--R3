@@ -1556,6 +1556,14 @@ END_OF_LUA
             my $xsy = $slg->[Marpa::R3::Internal::Scanless::G::XSY_BY_NAME]->{$xsy_name};
             $tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID]->[$symbol_id] =
                 $xsy;
+
+      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 'is', $symbol_id, $xsy_name);
+    local slg, isyid, xsy_name = ...
+    local xsy = slg.xsys[xsy_name]
+    slg.g1.xsy_by_isyid[isyid] = xsy
+END_OF_LUA
+
             next PROPERTY;
         }
 
@@ -1623,6 +1631,14 @@ END_OF_LUA
             my $xsy = $slg->[Marpa::R3::Internal::Scanless::G::XSY_BY_NAME]->{$xsy_name};
             $tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID]->[$symbol_id] =
                 $xsy;
+
+      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 'is', $symbol_id, $xsy_name);
+    local slg, isyid, xsy_name = ...
+    local xsy = slg.xsys[xsy_name]
+    slg.l0.xsy_by_isyid[isyid] = xsy
+END_OF_LUA
+
             next PROPERTY;
         }
         if ( $property eq 'eager' ) {
