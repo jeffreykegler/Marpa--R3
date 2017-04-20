@@ -1457,37 +1457,35 @@ END_OF_LUA
     SYMBOL:
     for my $isyid ( $slg->lmg_symbol_ids($lmw_name))
     {
-        my ($cmd) = $slg->call_by_tag(
-        ('@' .__FILE__ . ':' .  __LINE__),
-        <<'END_OF_LUA', 'si', $subg_name, $isyid);
-        local grammar, subg_name, isyid = ...
-        local lmw_g = grammar[subg_name].lmw_g
-        local is_accessible = lmw_g:symbol_is_accessible(isyid) ~= 0
-        local cmd = is_accessible and 'next symbol' or 'ok'
-        return cmd
-END_OF_LUA
-
-        next SYMBOL if $cmd ne 'ok';
-
-        my $xsy      = $xsy_by_isyid->[$isyid];
-        my $xsy_id = $xsy->[Marpa::R3::Internal::XSY::ID];
-
         # Inaccessible internal symbols may be created
         # from inaccessible use symbols -- ignore these.
         # This assumes that Marpa's logic
         # is correct and that
         # it is not creating inaccessible symbols from
         # accessible ones.
-        next SYMBOL if not defined $xsy;
 
-        my ($treatment) = $slg->call_by_tag(
+        my ($cmd, $treatment) = $slg->call_by_tag(
         ('@' .__FILE__ . ':' .  __LINE__),
-        <<'END_OF_LUA', 'is', $xsy_id, $default_if_inaccessible);
-        local slg, xsy_id, default_treatment = ...
-        return slg.xsys[xsy_id].if_inaccessible or default_treatment
+        <<'END_OF_LUA', 'sis', $subg_name, $isyid, $default_if_inaccessible);
+        local slg, subg_name, isyid, default_treatment = ...
+        local lmw_g = slg[subg_name].lmw_g
+        local is_accessible = lmw_g:symbol_is_accessible(isyid) ~= 0
+        if is_accessible then
+            return 'next symbol', default_treatment
+        end
+        local xsy = slg[subg_name].xsy_by_isyid[isyid]
+        if not xsy then
+            return 'next symbol', default_treatment
+        end
+        local treatment = xsy.if_inaccessible or default_treatment
+        if treatment == 'ok' then
+            return 'next symbol', treatment
+        end
+        return 'ok', treatment
 END_OF_LUA
 
-        next SYMBOL if $treatment eq 'ok';
+        next SYMBOL if $cmd ne 'ok';
+
         my $symbol_name = $slg->lmg_symbol_name($subg_name, $isyid);
         my $message = "Inaccessible symbol: $symbol_name";
         Marpa::R3::exception($message) if $treatment eq 'fatal';
