@@ -1207,17 +1207,11 @@ END_OF_LUA
     }
 
   APPLY_DEFAULT_LEXEME_BLESSING: {
-        my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
         my $default_blessing = $lexeme_default_adverbs->{bless};
-        my $xsy_by_isyid =
-          $g1_tracer->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID];
 
       LEXEME:
         for my $lexeme_name ( keys %g1_id_by_lexeme_name ) {
             my $g1_lexeme_id = $g1_id_by_lexeme_name{$lexeme_name};
-            my $xsy          = $xsy_by_isyid->[$g1_lexeme_id];
-            next LEXEME if not defined $xsy;
-            my $xsy_id = $xsy->[Marpa::R3::Internal::XSY::ID];
 
         my ($cmd, $blessing) = $slg->call_by_tag(
         ('@' .__FILE__ . ':' .  __LINE__),
