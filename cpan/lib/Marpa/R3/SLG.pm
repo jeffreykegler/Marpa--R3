@@ -2378,20 +2378,16 @@ END_OF_LUA
 # Does no checking
 sub Marpa::R3::Scanless::G::lmg_symbol_dsl_form {
     my ( $slg, $subg_name, $isyid ) = @_;
-    my $per_lmg =
-      $slg->[Marpa::R3::Internal::Scanless::G::PER_LMG]->{$subg_name};
-    my $xsy_by_isyid = $per_lmg->[Marpa::R3::Internal::Trace::G::XSY_BY_ISYID];
-    my $xsy          = $xsy_by_isyid->[$isyid];
-    return if not defined $xsy;
 
-    # switch to ID after developement
-    my $xsy_id = $xsy->[Marpa::R3::Internal::XSY::ID];
-
-    my ($dsl_form) = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 'i', $xsy_id );
-        local slg, xsy_id = ...
-        return slg.xsys[xsy_id].dsl_form
+    my ($ok, $dsl_form) = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 'is', $isyid, $subg_name );
+        local slg, isyid, subg_name = ...
+        local xsy = slg[subg_name].xsy_by_isyid[isyid]
+        if not xsy then return '' end
+        return 'ok', xsy.dsl_form
 END_OF_LUA
+
+    return if $ok ne 'ok';
     return $dsl_form;
 }
 
