@@ -25,9 +25,6 @@ $STRING_VERSION = $VERSION;
 $VERSION = eval $VERSION;
 
 
-package Marpa::R3::Internal::XSY;
-use constant ID => 0;
-
 package Marpa::R3::Internal::XRL;
 use constant ID => 0;
 use constant NAME => 1;
@@ -59,10 +56,9 @@ use constant XRL => 17;
 package Marpa::R3::Internal::Trace::G;
 use constant NAME => 0;
 use constant SUBG_NAME => 1;
-use constant LMW_NAME => 2;
-use constant XBNF_BY_IRLID => 3;
-use constant ACTION_BY_IRLID => 4;
-use constant MASK_BY_IRLID => 5;
+use constant XBNF_BY_IRLID => 2;
+use constant ACTION_BY_IRLID => 3;
+use constant MASK_BY_IRLID => 4;
 
 package Marpa::R3::Internal::Progress_Report;
 use constant RULE_ID => 0;

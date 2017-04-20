@@ -255,19 +255,14 @@ sub per_lmg_init {
     my $field_name_form = lc $name;
     my $per_lmg = [];
     $per_lmg->[Marpa::R3::Internal::Trace::G::NAME] = $name;
-    my $lmw_name = 'lmw_' . $field_name_form . 'g';
-    $per_lmg->[Marpa::R3::Internal::Trace::G::LMW_NAME]            = $lmw_name;
     $per_lmg->[Marpa::R3::Internal::Trace::G::SUBG_NAME]            = $field_name_form;
-    $slg->[Marpa::R3::Internal::Scanless::G::PER_LMG]->{$lmw_name} = $per_lmg;
     $slg->[Marpa::R3::Internal::Scanless::G::PER_LMG]->{$field_name_form} = $per_lmg;
 
     $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 's', $field_name_form );
     local g, field_name_form = ...
-    lmw_g_name = 'lmw_' .. field_name_form .. 'g'
     local lmw_g = kollos.grammar_new()
     -- TODO Replace g.lmw_g1g with g.g1.lmw_g everywhere
-    g[lmw_g_name] = lmw_g
     g[field_name_form] = {
         lmw_g = lmw_g,
         name = field_name_form,
@@ -1287,7 +1282,6 @@ END_OF_LUA
 sub Marpa::R3::Internal::Scanless::G::precompute {
     my ($slg, $per_lmg) = @_;
 
-    my $lmw_name     = $per_lmg->[Marpa::R3::Internal::Trace::G::LMW_NAME];
     my $subg_name = $per_lmg->[Marpa::R3::Internal::Trace::G::SUBG_NAME];
 
     my $trace_fh =
@@ -1446,7 +1440,7 @@ END_OF_LUA
         $slg->[Marpa::R3::Internal::Scanless::G::IF_INACCESSIBLE]
         // 'warn';
     SYMBOL:
-    for my $isyid ( $slg->lmg_symbol_ids($lmw_name))
+    for my $isyid ( $slg->lmg_symbol_ids($subg_name))
     {
         # Inaccessible internal symbols may be created
         # from inaccessible use symbols -- ignore these.

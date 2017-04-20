@@ -133,7 +133,6 @@ __DATA__
 
     NAME
     SUBG_NAME { Name of the grammar -- 'l0' or 'g1' }
-    LMW_NAME
 
     XBNF_BY_IRLID { Array mapping IRLID to XBNF }
     ACTION_BY_IRLID
