@@ -51,7 +51,10 @@ sub pre_construct {
         setmetatable(grammar, _M.class_slg)
         local regix = _M.register(registry, grammar)
         grammar.ref_count = 1
-        grammar:post_new()
+        grammar.nulling_semantics = {}
+        grammar.rule_semantics = {}
+        grammar.token_semantics = {}
+        grammar.per_codepoint = {}
         grammar.ranking_method = 'none'
         return regix
 END_OF_LUA

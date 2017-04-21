@@ -481,21 +481,6 @@ This is a registry object.
 
 ```
 
-This "post-new" method will become the latter part of the
-`slg_new()` method.
-
-```
-    -- miranda: section+ most Lua function definitions
-    function _M.class_slg.post_new(grammar)
-        grammar.nulling_semantics = {}
-        grammar.rule_semantics = {}
-        grammar.token_semantics = {}
-        grammar.per_codepoint = {}
-        return
-    end
-
-```
-
 ### Ranking methods
 
 ```
