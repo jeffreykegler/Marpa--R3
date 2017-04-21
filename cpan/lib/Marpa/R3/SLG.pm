@@ -280,6 +280,12 @@ END_OF_LUA
     return $per_lmg;
 }
 
+# The object, in computing the hash, is to get as much
+# precomputation in as possible, without using undue space.
+# That means CPU-intensive processing should tend to be done
+# before or during hash creation, and space-intensive processing
+# should tend to be done here, in the code that converts the
+# hash to its runtime equivalent.
 sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     my ( $slg, $hashed_source, $g1_args ) = @_;
 
@@ -291,48 +297,10 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     my $lex_tracer = $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER] =
       per_lmg_init($slg, "L0");
 
-    my $xsy_names = [ keys %{ $hashed_source->{xsy} } ];
-
-    my $xsy_by_id = $slg->[Marpa::R3::Internal::Scanless::G::XSY_BY_ID] = [];
-    my $xsy_by_name = $slg->[Marpa::R3::Internal::Scanless::G::XSY_BY_NAME] =
-      {};
-    $xsy_names = [ sort @{$xsy_names} ];
-
-    # ($xsy_names) =
     $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 's', $hashed_source );
         local slg, source_hash = ...
-        local xsys = {}
-        slg.xsys = xsys
-
-        -- io.stderr:write(inspect(source_hash))
-        local xsy_names = {}
-        local hash_xsy_data = source_hash.xsy
-        for xsy_name, _ in pairs(hash_xsy_data) do
-             xsy_names[#xsy_names+1] = xsy_name
-        end
-        table.sort(xsy_names)
-        for xsy_id = 1, #xsy_names do
-            -- during development, zero-based so that it duplicates original
-            -- Perl implementation
-            local xsy_name = xsy_names[xsy_id]
-            local runtime_xsy = {
-                id = xsy_id,
-                name = xsy_name
-            }
-
-            local xsy_source = hash_xsy_data[xsy_name]
-
-            -- copy, so that we can destroy `source_hash`
-            runtime_xsy.lexeme_semantics = xsy_source.action
-            runtime_xsy.blessing = xsy_source.blessing
-            runtime_xsy.dsl_form = xsy_source.dsl_form
-            runtime_xsy.if_inaccessible = xsy_source.if_inaccessible
-            runtime_xsy.name_source = xsy_source.name_source
-
-            slg.xsys[xsy_name] = runtime_xsy
-            xsys[xsy_id] = xsy_source
-        end
+        return xsys_populate(slg, source_hash)
 END_OF_LUA
 
     $slg->[Marpa::R3::Internal::Scanless::G::XRL_BY_ID]   = [];
