@@ -530,8 +530,47 @@ Populate the `xsys` table.
             runtime_xsy.if_inaccessible = xsy_source.if_inaccessible
             runtime_xsy.name_source = xsy_source.name_source
 
-            slg.xsys[xsy_name] = runtime_xsy
-            xsys[xsy_id] = xsy_source
+            xsys[xsy_name] = runtime_xsy
+            xsys[xsy_id] = runtime_xsy
+        end
+    end
+```
+
+Populate the `xrls` table.
+
+```
+    -- miranda: section+ most Lua function definitions
+    function xrls_populate(slg, source_hash)
+        local xrls = {}
+        slg.xrls = xrls
+
+        -- io.stderr:write(inspect(source_hash))
+        local xsy_names = {}
+        local hash_xrl_data = source_hash.xrl
+        for xrl_name, _ in pairs(hash_xrl_data) do
+             xrl_names[#xrl_names+1] = xrl_name
+        end
+        table.sort(xrl_names)
+        for xsy_id = 1, #xrl_names do
+            -- during development, zero-based so that it duplicates original
+            -- Perl implementation
+            local xrl_name = xrl_names[xsy_id]
+            local runtime_xrl = {
+                id = xsy_id,
+                name = xrl_name
+            }
+
+            local xrl_source = hash_xrl_data[xrl_name]
+
+            -- copy, so that we can destroy `source_hash`
+            runtime_xrl.lexeme_semantics = xrl_source.action
+            runtime_xrl.blessing = xrl_source.blessing
+            runtime_xrl.dsl_form = xrl_source.dsl_form
+            runtime_xrl.if_inaccessible = xrl_source.if_inaccessible
+            runtime_xrl.name_source = xrl_source.name_source
+
+            xrls[xrl_name] = runtime_xrl
+            xrls[xsy_id] = runtime_xrl
         end
     end
 ```
