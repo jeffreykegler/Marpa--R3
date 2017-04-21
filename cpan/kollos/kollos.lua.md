@@ -513,8 +513,6 @@ Populate the `xsys` table.
         end
         table.sort(xsy_names)
         for xsy_id = 1, #xsy_names do
-            -- during development, zero-based so that it duplicates original
-            -- Perl implementation
             local xsy_name = xsy_names[xsy_id]
             local runtime_xsy = {
                 id = xsy_id,
@@ -545,32 +543,38 @@ Populate the `xrls` table.
         slg.xrls = xrls
 
         -- io.stderr:write(inspect(source_hash))
-        local xsy_names = {}
+        local xrl_names = {}
         local hash_xrl_data = source_hash.xrl
         for xrl_name, _ in pairs(hash_xrl_data) do
              xrl_names[#xrl_names+1] = xrl_name
         end
-        table.sort(xrl_names)
-        for xsy_id = 1, #xrl_names do
+        table.sort(xrl_names,
+           function(a, b)
+                if a ~= b then return a >= b end
+                local start_a = xrls[a].start
+                local start_b = xrls[b].start
+                return start_a >= start_b
+           end
+        )
+        for xrl_id = 1, #xrl_names do
             -- during development, zero-based so that it duplicates original
             -- Perl implementation
-            local xrl_name = xrl_names[xsy_id]
+            local xrl_name = xrl_names[xrl_id]
             local runtime_xrl = {
-                id = xsy_id,
+                id = xrl_id,
                 name = xrl_name
             }
 
             local xrl_source = hash_xrl_data[xrl_name]
 
             -- copy, so that we can destroy `source_hash`
-            runtime_xrl.lexeme_semantics = xrl_source.action
-            runtime_xrl.blessing = xrl_source.blessing
-            runtime_xrl.dsl_form = xrl_source.dsl_form
-            runtime_xrl.if_inaccessible = xrl_source.if_inaccessible
-            runtime_xrl.name_source = xrl_source.name_source
+            runtime_xrl.precedence_count = xrl_source.precedence_count
+            runtime_xrl.lhs = xrl_source.lhs
+            runtime_xrl.start = xrl_source.start
+            runtime_xrl.length = xrl_source.length
 
             xrls[xrl_name] = runtime_xrl
-            xrls[xsy_id] = runtime_xrl
+            xrls[xrl_id] = runtime_xrl
         end
     end
 ```

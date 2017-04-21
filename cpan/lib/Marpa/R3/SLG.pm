@@ -323,11 +323,6 @@ END_OF_LUA
           scalar @{$xrl_by_id};
         $runtime_xrl_data->[Marpa::R3::Internal::XRL::NAME] = $xrl_name;
       KEY: for my $datum_key ( keys %{$source_xrl_data} ) {
-            if ( $datum_key eq 'id' ) {
-                $runtime_xrl_data->[Marpa::R3::Internal::XRL::NAME] =
-                  $source_xrl_data->{$datum_key};
-                next KEY;
-            }
             if ( $datum_key eq 'precedence_count' ) {
                 $runtime_xrl_data->[Marpa::R3::Internal::XRL::PRECEDENCE_COUNT]
                   = $source_xrl_data->{$datum_key};
