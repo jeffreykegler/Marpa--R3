@@ -350,6 +350,12 @@ END_OF_LUA
         $xrl_by_name->{$xrl_name} = $runtime_xrl_data;
     }
 
+    $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 's', $hashed_source );
+        local slg, source_hash = ...
+        return xrls_populate(slg, source_hash)
+END_OF_LUA
+
     $slg->[Marpa::R3::Internal::Scanless::G::L0_XBNF_BY_ID]   = [];
     $slg->[Marpa::R3::Internal::Scanless::G::G1_XBNF_BY_ID]   = [];
     $slg->[Marpa::R3::Internal::Scanless::G::L0_XBNF_BY_NAME] = {};

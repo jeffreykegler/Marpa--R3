@@ -550,15 +550,13 @@ Populate the `xrls` table.
         end
         table.sort(xrl_names,
            function(a, b)
-                if a ~= b then return a >= b end
-                local start_a = xrls[a].start
-                local start_b = xrls[b].start
-                return start_a >= start_b
+                if a ~= b then return a < b end
+                local start_a = hash_xrl_data[a].start
+                local start_b = hash_xrl_data[b].start
+                return start_a < start_b
            end
         )
         for xrl_id = 1, #xrl_names do
-            -- during development, zero-based so that it duplicates original
-            -- Perl implementation
             local xrl_name = xrl_names[xrl_id]
             local runtime_xrl = {
                 id = xrl_id,
