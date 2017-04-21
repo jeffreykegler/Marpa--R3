@@ -35,9 +35,9 @@ so apps which restrict themselves to the ASCII
 7 characters will have no problem.
 
 Pedantically, Marpa::R3 is "outside" of Perl,
-so that strings must be encoded when passed to
+so that strings must be encoded before being passed to
 Marpa::R3,
-and decoded when returned from Marpa::R3.
+and decoded after being returned from Marpa::R3.
 By default and in practice,
 Perl uses only valid UTF-8 characters so that
 it will usually not be necessary to encode/decode.
