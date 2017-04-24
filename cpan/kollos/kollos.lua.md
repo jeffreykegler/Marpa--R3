@@ -535,6 +535,10 @@ Populate the `xsys` table.
 ```
 
 Populate the `xrls` table.
+The contents of this table are not used,
+currently,
+but Jeffrey thinks they might be used someday,
+for example in error message.
 
 ```
     -- miranda: section+ most Lua function definitions
@@ -573,6 +577,79 @@ Populate the `xrls` table.
 
             xrls[xrl_name] = runtime_xrl
             xrls[xrl_id] = runtime_xrl
+        end
+    end
+```
+
+Populate xbnfs.
+"xbnfs" are eXternal BNF rules.
+They are actually not fully external,
+but are first translation of the XRLs into
+BNF form.
+One symptom of their less-than-fully external
+nature is that they are two `xbnfs` tables,
+one for each subgrammar.
+(The subgrammars are only visible internally.)
+
+```
+    -- miranda: section+ most Lua function definitions
+    function xbnfs_populate(slg, source_hash, subgrammar)
+        local xbnfs = {}
+        slg.xbnfs = xbnfs
+        local hash_subg = string.lower(subgrammar)
+
+        -- io.stderr:write(inspect(source_hash))
+        local xbnf_names = {}
+        local hash_xbnf_data = source_hash.xbnf[hash_subg]
+        for xbnf_name, _ in pairs(hash_xbnf_data) do
+             xbnf_names[#xbnf_names+1] = xbnf_name
+        end
+        table.sort(xbnf_names,
+           function(a, b)
+                local start_a = hash_xbnf_data[a].start
+                local start_b = hash_xbnf_data[b].start
+                if start_a ~= start_b then return start_a < start_b end
+                local subkey_a = hash_xbnf_data[a].subkey
+                local subkey_b = hash_xbnf_data[b].subkey
+                return subkey_a < subkey_b
+           end
+        )
+        for xbnf_id = 1, #xbnf_names do
+            local xbnf_name = xbnf_names[xbnf_id]
+            local runtime_xbnf = {
+                id = xbnf_id,
+                name = xbnf_name
+            }
+
+            local xbnf_source = hash_xbnf_data[xbnf_name]
+
+            -- copy, so that we can destroy `source_hash`
+
+
+            runtime_xbnf.xrl_name = xbnf_source.xrlid
+            runtime_xbnf.name = xbnf_source.name
+            runtime_xbnf.lhs = xbnf_source.lhs
+            runtime_xbnf.rhs = xbnf_source.rhs
+            runtime_xbnf.rank = xbnf_source.rank
+            runtime_xbnf.null_ranking = xbnf_source.null_ranking
+            runtime_xbnf.symbol_as_event = xbnf_source.symbol_as_event
+            runtime_xbnf.event = xbnf_source.event
+            runtime_xbnf.min = xbnf_source.min
+            runtime_xbnf.separator = xbnf_source.separator
+            runtime_xbnf.proper = xbnf_source.proper
+            -- Marpa::R3::Internal::XBNF::BLESSING -- note name change
+            runtime_xbnf.bless = xbnf_source.bless
+            -- Marpa::R3::Internal::XBNF::ACTION_NAME --note name change
+            runtime_xbnf.action = xbnf_source.action
+            runtime_xbnf.start = xbnf_source.start
+            runtime_xbnf.length = xbnf_source.length
+
+          -- TODO mask
+          -- TODO keep ? I think I can ignore this
+          -- TODO discard_separation
+
+            xbnfs[xbnf_name] = runtime_xbnf
+            xbnfs[xbnf_id] = runtime_xbnf
         end
     end
 ```
