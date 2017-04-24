@@ -648,11 +648,10 @@ one for each subgrammar.
                 xbnf_source.separator and
                     not xbnf_source.keep
 
-            -- TODO This is probably wrong -- fix it
             local rhs_length = #xbnf_source.rhs
 
-            if xbnf_source.min -- min defined if sequence rule
-                or #xbnf_source.rhs == 0 then -- TODO probably wrong
+            -- min defined if sequence rule
+            if xbnf_source.min or rhs_length == 0 then
                 if xbnf_source.mask then
                     runtime_xbnf.mask = xbnf_source.mask
                 else
