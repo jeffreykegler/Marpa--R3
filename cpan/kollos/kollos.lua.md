@@ -596,7 +596,7 @@ one for each subgrammar.
     function xbnfs_populate(slg, source_hash, subgrammar)
         local xbnfs = {}
         slg.xbnfs = xbnfs
-        local hash_subg = string.lower(subgrammar)
+        local hash_subg = string.upper(subgrammar)
 
         -- io.stderr:write(inspect(source_hash))
         local xbnf_names = {}
@@ -644,13 +644,30 @@ one for each subgrammar.
             runtime_xbnf.start = xbnf_source.start
             runtime_xbnf.length = xbnf_source.length
 
-          -- TODO mask
-          -- TODO keep ? I think I can ignore this
-          -- TODO discard_separation
+            runtime_xbnf.discard_separation =
+                xbnf_source.separator and
+                    not xbnf_source.keep
+
+            -- TODO This is probably wrong -- fix it
+            local rhs_length = #xbnf_source.rhs
+
+            if xbnf_source.min -- min defined if sequence rule
+                or #xbnf_source.rhs == 0 then -- TODO probably wrong
+                if xbnf_source.mask then
+                    runtime_xbnf.mask = xbnf_source.mask
+                else
+                    local mask = {}
+                    for i = 1, rhs_length do
+                        mask[i] = 1
+                    end
+                    runtime_xbnf.mask = mask
+                end
+            end
 
             xbnfs[xbnf_name] = runtime_xbnf
             xbnfs[xbnf_id] = runtime_xbnf
         end
+        slg[subgrammar].xbnfs = xbnfs
     end
 ```
 

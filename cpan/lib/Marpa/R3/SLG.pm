@@ -454,6 +454,14 @@ END_OF_LUA
         }
     }
 
+    $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 's', $hashed_source );
+        local slg, source_hash = ...
+        xbnfs_populate(slg, source_hash, 'l0')
+        xbnfs_populate(slg, source_hash, 'g1')
+END_OF_LUA
+
+
     my $if_inaccessible_default_arg =
       $hashed_source->{defaults}->{if_inaccessible};
     if ( defined $if_inaccessible_default_arg ) {
