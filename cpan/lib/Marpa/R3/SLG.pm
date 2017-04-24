@@ -303,53 +303,6 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
         return xsys_populate(slg, source_hash)
 END_OF_LUA
 
-    $slg->[Marpa::R3::Internal::Scanless::G::XRL_BY_ID]   = [];
-    $slg->[Marpa::R3::Internal::Scanless::G::XRL_BY_NAME] = {};
-    my $xrls        = $hashed_source->{xrl};
-    my $xrl_by_id   = $slg->[Marpa::R3::Internal::Scanless::G::XRL_BY_ID];
-    my $xrl_by_name = $slg->[Marpa::R3::Internal::Scanless::G::XRL_BY_NAME];
-
-    # Sort (from major to minor) by start position,
-    # and subkey.
-    for my $xrl_name (
-        map  { $_->[0] }
-        sort { $a->[1] <=> $b->[1] }
-        map  { [ $_, $xrls->{$_}->{start} ] } keys %{$xrls}
-      )
-    {
-        my $source_xrl_data  = $xrls->{$xrl_name};
-        my $runtime_xrl_data = [];
-        $runtime_xrl_data->[Marpa::R3::Internal::XRL::ID] =
-          scalar @{$xrl_by_id};
-        $runtime_xrl_data->[Marpa::R3::Internal::XRL::NAME] = $xrl_name;
-      KEY: for my $datum_key ( keys %{$source_xrl_data} ) {
-            if ( $datum_key eq 'precedence_count' ) {
-                $runtime_xrl_data->[Marpa::R3::Internal::XRL::PRECEDENCE_COUNT]
-                  = $source_xrl_data->{$datum_key};
-                next KEY;
-            }
-            if ( $datum_key eq 'lhs' ) {
-                $runtime_xrl_data->[Marpa::R3::Internal::XRL::LHS] =
-                  $source_xrl_data->{$datum_key};
-                next KEY;
-            }
-            if ( $datum_key eq 'start' ) {
-                $runtime_xrl_data->[Marpa::R3::Internal::XRL::START] =
-                  $source_xrl_data->{$datum_key};
-                next KEY;
-            }
-            if ( $datum_key eq 'length' ) {
-                $runtime_xrl_data->[Marpa::R3::Internal::XRL::LENGTH] =
-                  $source_xrl_data->{$datum_key};
-                next KEY;
-            }
-            Marpa::R3::exception(
-                "Internal error: Unknown hashed source xrl field: $datum_key");
-        }
-        push @{$xrl_by_id}, $runtime_xrl_data;
-        $xrl_by_name->{$xrl_name} = $runtime_xrl_data;
-    }
-
     $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 's', $hashed_source );
         local slg, source_hash = ...
@@ -394,8 +347,9 @@ END_OF_LUA
               scalar @{$xbnf_by_id};
           KEY: for my $datum_key ( keys %{$source_xbnf_data} ) {
                 if ( $datum_key eq 'xrlid' ) {
-                    $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::XRL] =
-                      $xrl_by_name->{$datum_key};
+                    # TODO -- on conversion to Lua, have some link to XRL
+                    # $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::XRL] =
+                      # $xrl_by_name->{$datum_key};
                     next KEY;
                 }
                 if ( $datum_key eq 'name' ) {

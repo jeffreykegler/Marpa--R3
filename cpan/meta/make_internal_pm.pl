@@ -99,15 +99,6 @@ END_OF_HEADER
 
 __DATA__
 
-    :package=Marpa::R3::Internal::XRL
-
-    ID
-    NAME
-    LHS
-    START
-    LENGTH
-    PRECEDENCE_COUNT
-
     :package=Marpa::R3::Internal::XBNF
 
     ID
@@ -247,8 +238,6 @@ __DATA__
     G1_XBNF_BY_ID { G1 eXternal SEQuence, by XBNFID }
     L0_XBNF_BY_NAME { L0 eXternal SEQuence, by XBNF name }
     G1_XBNF_BY_NAME { G1 eXternal SEQuence, by XBNF name }
-    XRL_BY_ID { G1 eXternal RuLe, by XRLID }
-    XRL_BY_NAME { L0 eXternal RuLe, by XRL name }
     COMPLETION_EVENT_BY_ID
     NULLED_EVENT_BY_ID
     PREDICTION_EVENT_BY_ID
