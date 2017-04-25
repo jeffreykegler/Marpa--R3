@@ -2426,22 +2426,26 @@ END_OF_LUA
             ($comments) =
               $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
                 <<'END_OF_LUA', 'sis', $subg_name, $irlid, $comments );
-    local g, subg_name, irl_id, comments = ...
-    local lmw_g = g[subg_name].lmw_g
-    if lmw_g:_rule_is_used(irl_id) == 0 then
+    local slg, subg_name, irlid, comments = ...
+    local lmw_g = slg[subg_name].lmw_g
+    if lmw_g:_rule_is_used(irlid) == 0 then
         comments[#comments+1] = '!used'
     end
-    if lmw_g:rule_is_productive(irl_id) == 0 then
+    if lmw_g:rule_is_productive(irlid) == 0 then
         comments[#comments+1] = 'unproductive'
     end
-    if lmw_g:rule_is_accessible(irl_id) == 0 then
+    if lmw_g:rule_is_accessible(irlid) == 0 then
         comments[#comments+1] = 'inaccessible'
+    end
+    local irl = slg[subg_name].irls[irlid]
+    local xbnf = irl.xbnf
+    if xbnf then
+        if xbnf.discard_separation then
+            comments[#comments+1] = 'discard_sep'
+        end
     end
     return comments
 END_OF_LUA
-
-            $xbnf->[Marpa::R3::Internal::XBNF::DISCARD_SEPARATION]
-              and push @{$comments}, 'discard_sep';
 
             if ( @{$comments} ) {
                 $text .=

@@ -1088,24 +1088,31 @@ END_OF_LUA
   WORK_ITEM: for my $work_item (@work_list) {
         my ( $irlid, $lexeme_id, $semantics, $blessing ) = @{$work_item};
 
-        my ( $closure, $xbnf, $rule_length, $is_sequence_rule,
-            $is_discard_sequence_rule, $nulling_symbol_id );
+        my ( $closure, $xbnf, $rule_length,
+            $is_sequence_rule,
+            $is_discard_sequence_rule,
+            $nulling_symbol_id );
         if ( defined $irlid ) {
             $nulling_symbol_id = $nulling_symbol_by_semantic_rule[$irlid];
             $closure           = $closure_by_irlid[$irlid];
             $xbnf              = $xbnf_by_irlid->[$irlid];
 
-            ( $rule_length, $is_sequence_rule ) =
+            ( $rule_length, $is_sequence_rule,
+                $is_discard_sequence_rule ) =
               $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
                 <<'END_OF_LUA', 'i', $irlid );
-        local grammar, irlid = ...
-        local g1g = grammar.g1.lmw_g
-        return g1g:rule_length(irlid), (g1g:sequence_min(irlid) and 1 or 0)
-           
+        local slg, irlid = ...
+        local g1g = slg.g1.lmw_g
+        local is_sequence_rule = g1g:sequence_min(irlid) and 1 or 0
+        local irl = slg.g1.irls[irlid]
+        local xbnf = irl.xbnf
+        local is_discard_sequence = false
+        if xbnf and xbnf.discard_separation and is_sequence_rule then
+            is_discard_sequence = true
+        end
+        return g1g:rule_length(irlid), is_sequence_rule, is_discard_sequence
 END_OF_LUA
 
-            $is_discard_sequence_rule = $is_sequence_rule
-              && $xbnf->[Marpa::R3::Internal::XBNF::DISCARD_SEPARATION];
         } ## end if ( defined $irlid )
 
         # Determine the "fate" of the array of child values
