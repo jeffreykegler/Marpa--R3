@@ -126,7 +126,6 @@ __DATA__
     SUBG_NAME { Name of the grammar -- 'l0' or 'g1' }
 
     XBNF_BY_IRLID { Array mapping IRLID to XBNF }
-    ACTION_BY_IRLID
     MASK_BY_IRLID
 
     :package=Marpa::R3::Internal::Progress_Report
