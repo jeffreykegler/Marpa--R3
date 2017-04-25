@@ -1626,7 +1626,7 @@ sub add_G1_user_rule {
     my $default_rank;
     ($default_rank, $xbnf_id) =
           $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-          <<'END_OF_LUA', 'i', $xbnf_name);
+          <<'END_OF_LUA', 's', $xbnf_name);
     local grammar, xbnf_name = ...
     local default_rank = grammar.g1.lmw_g:default_rank()
     local xbnf_id = grammar.g1.xbnfs[xbnf_name].id
@@ -1733,8 +1733,6 @@ END_OF_LUA
     $tracer->[Marpa::R3::Internal::Trace::G::XBNF_BY_IRLID]->[$base_irl_id] = $xbnf;
 
     # Later on we will need per-IRL actions and masks
-    $tracer->[Marpa::R3::Internal::Trace::G::ACTION_BY_IRLID]->[$base_irl_id] =
-        $xbnf->[Marpa::R3::Internal::XBNF::ACTION_NAME];
     $tracer->[Marpa::R3::Internal::Trace::G::MASK_BY_IRLID]->[$base_irl_id] =
         $xbnf->[Marpa::R3::Internal::XBNF::MASK];
 
@@ -1772,10 +1770,13 @@ sub add_L0_user_rule {
     my $null_ranking;
     my $xbnf;
     my $proper_separation = 0;
+    my $xbnf_name;
+    my $xbnf_id;
 
   OPTION: for my $option ( keys %{$options} ) {
         my $value = $options->{$option};
         if ( $option eq 'xbnfid' ) {
+            $xbnf_name = $value;
             $xbnf = $slg->[
               Marpa::R3::Internal::Scanless::G::L0_XBNF_BY_NAME
             ]->{$value};
@@ -1801,14 +1802,22 @@ sub add_L0_user_rule {
         Marpa::R3::exception("Unknown user rule option: $option");
     } ## end OPTION: for my $option ( keys %{$options} )
 
-
     $rhs_names //= [];
 
-    my ($default_rank) =
-          $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ), <<'END_OF_LUA', '');
-    local grammar = ...
-    return grammar.l0.lmw_g:default_rank()
+    my $default_rank;
+    ($default_rank, $xbnf_id) =
+          $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+          <<'END_OF_LUA', 's', ($xbnf_name // ''));
+    local slg, xbnf_name = ...
+    local default_rank = slg.l0.lmw_g:default_rank()
+    -- io.stderr:write('xbnf_name: ', inspect(xbnf_name), '\n')
+    local xbnf_id = -1
+    if #xbnf_name > 0 then
+        xbnf_id = slg.l0.xbnfs[xbnf_name].id
+    end
+    return default_rank, xbnf_id
 END_OF_LUA
+
     $rank //= $default_rank;
     $null_ranking //= 'low';
 
@@ -1826,24 +1835,24 @@ END_OF_LUA
         } @{$rhs_names};
     my $lhs_id = assign_L0_symbol( $slg, $lhs_name );
 
-    my $base_rule_id;
+    my $base_irl_id;
     my $separator_id = -1;
 
     if ($is_ordinary_rule) {
 
-        ($base_rule_id) =
+        ($base_irl_id) =
           $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
             <<'END_OF_LUA', 'i', [ $lhs_id, @rhs_ids ] );
     local g, rule  = ...
     -- remove the test for nil or less than zero
     -- once refactoring is complete?
     kollos.throw = false
-    local base_rule_id = g.l0.lmw_g:rule_new(rule)
-    -- print('base_rule_id: ', inspect(base_rule_id))
+    local base_irl_id = g.l0.lmw_g:rule_new(rule)
+    -- print('base_irl_id: ', inspect(base_irl_id))
     kollos.throw = true
-    if not base_rule_id or base_rule_id < 0 then return -1 end
-    g.l0.irls[base_rule_id] = { id = base_rule_id }
-    return base_rule_id
+    if not base_irl_id or base_irl_id < 0 then return -1 end
+    g.l0.irls[base_irl_id] = { id = base_irl_id }
+    return base_irl_id
 END_OF_LUA
 
     } ## end if ($is_ordinary_rule)
@@ -1870,26 +1879,26 @@ END_OF_LUA
             min       => $min,
         };
 
-      ($base_rule_id) = 
+      ($base_irl_id) = 
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'i', $arg_hash);
     local g, arg_hash = ...
     -- print('arg_hash: ', inspect(arg_hash))
     arg_hash.proper = (arg_hash.proper ~= 0)
     kollos.throw = false
-    base_rule_id = g.l0.lmw_g:sequence_new(arg_hash)
+    base_irl_id = g.l0.lmw_g:sequence_new(arg_hash)
     kollos.throw = true
     -- remove the test for nil or less than zero
     -- once refactoring is complete?
-    if not base_rule_id or base_rule_id < 0 then return end
-    local l0_rule = { id = base_rule_id }
-    g.l0.irls[base_rule_id] = l0_rule
-    return base_rule_id
+    if not base_irl_id or base_irl_id < 0 then return end
+    local l0_rule = { id = base_irl_id }
+    g.l0.irls[base_irl_id] = l0_rule
+    return base_irl_id
 END_OF_LUA
 
     }
 
-    if ( not defined $base_rule_id or $base_rule_id < 0 ) {
+    if ( not defined $base_irl_id or $base_irl_id < 0 ) {
         my $rule_description = rule_describe( $lhs_name, $rhs_names );
         my ($ok, $problem) =
         $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
@@ -1908,22 +1917,31 @@ END_OF_LUA
         Marpa::R3::exception($problem) if $ok ne 'fail';
     }
 
-    $tracer->[Marpa::R3::Internal::Trace::G::XBNF_BY_IRLID]->[$base_rule_id] = $xbnf;
+    $tracer->[Marpa::R3::Internal::Trace::G::XBNF_BY_IRLID]->[$base_irl_id] = $xbnf;
 
     # Later on we will need per-IRL actions and masks
-    $tracer->[Marpa::R3::Internal::Trace::G::ACTION_BY_IRLID]->[$base_rule_id] =
-        $xbnf->[Marpa::R3::Internal::XBNF::ACTION_NAME];
-    $tracer->[Marpa::R3::Internal::Trace::G::MASK_BY_IRLID]->[$base_rule_id] =
+    $tracer->[Marpa::R3::Internal::Trace::G::MASK_BY_IRLID]->[$base_irl_id] =
         $xbnf->[Marpa::R3::Internal::XBNF::MASK];
 
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 'iii',
-        local grammar, rule_id, ranking_is_high, rank = ...
-        local l0g = grammar.l0.lmw_g
-        l0g:rule_null_high_set(rule_id, ranking_is_high)
-        l0g:rule_rank_set(rule_id, rank)
+        <<'END_OF_LUA', 'iiii',
+        local slg, irl_id, ranking_is_high, rank, xbnf_id = ...
+        local l0g = slg.l0.lmw_g
+        l0g:rule_null_high_set(irl_id, ranking_is_high)
+        l0g:rule_rank_set(irl_id, rank)
+        if xbnf_id >= 0 then
+            local xbnf = slg.l0.xbnfs[xbnf_id]
+            local irl = slg.l0.irls[irl_id]
+            irl.xbnf = xbnf
+            -- right now, the action & mask of an irl
+            -- is always the action/mask of its xbnf.
+            -- But some day each irl may need its own.
+            irl.action = xbnf.action
+            irl.mask = xbnf.mask
+        end
 END_OF_LUA
-            $base_rule_id, ( $null_ranking eq 'high' ? 1 : 0 ), $rank);
+            $base_irl_id, ( $null_ranking eq 'high' ? 1 : 0 ),
+            $rank, $xbnf_id);
 
     return;
 
