@@ -395,11 +395,6 @@ END_OF_LUA
                       = $source_xbnf_data->{$datum_key};
                     next KEY;
                 }
-                if ( $datum_key eq 'proper' ) {
-                    $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::PROPER] =
-                      $source_xbnf_data->{$datum_key};
-                    next KEY;
-                }
                 if ( $datum_key eq 'bless' ) {
                     $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::BLESSING] =
                       $source_xbnf_data->{$datum_key};
@@ -420,7 +415,7 @@ END_OF_LUA
                       $source_xbnf_data->{$datum_key};
                     next KEY;
                 }
-                if ( $datum_key =~ /\A (mask|keep|subkey|id) \z/xms ) {
+                if ( $datum_key =~ /\A (mask|keep|subkey|id|proper) \z/xms ) {
                     next KEY;
                 }
                 Marpa::R3::exception(
