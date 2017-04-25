@@ -38,18 +38,16 @@ use constant MIN => 8;
 use constant SEPARATOR => 9;
 use constant PROPER => 10;
 use constant DISCARD_SEPARATION => 11;
-use constant MASK => 12;
-use constant ACTION_NAME => 13;
-use constant BLESSING => 14;
-use constant SYMBOL_AS_EVENT => 15;
-use constant EVENT => 16;
-use constant XRL => 17;
+use constant ACTION_NAME => 12;
+use constant BLESSING => 13;
+use constant SYMBOL_AS_EVENT => 14;
+use constant EVENT => 15;
+use constant XRL => 16;
 
 package Marpa::R3::Internal::Trace::G;
 use constant NAME => 0;
 use constant SUBG_NAME => 1;
 use constant XBNF_BY_IRLID => 2;
-use constant MASK_BY_IRLID => 3;
 
 package Marpa::R3::Internal::Progress_Report;
 use constant RULE_ID => 0;

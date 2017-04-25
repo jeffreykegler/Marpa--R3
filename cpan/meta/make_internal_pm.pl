@@ -113,7 +113,6 @@ __DATA__
     SEPARATOR
     PROPER
     DISCARD_SEPARATION
-    MASK { Semantic mask of RHS symbols }
     ACTION_NAME
     BLESSING
     SYMBOL_AS_EVENT
@@ -126,7 +125,6 @@ __DATA__
     SUBG_NAME { Name of the grammar -- 'l0' or 'g1' }
 
     XBNF_BY_IRLID { Array mapping IRLID to XBNF }
-    MASK_BY_IRLID
 
     :package=Marpa::R3::Internal::Progress_Report
 

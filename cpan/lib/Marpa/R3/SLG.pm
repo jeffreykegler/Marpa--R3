@@ -432,24 +432,6 @@ END_OF_LUA
               = $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::SEPARATOR]
               && !$source_xbnf_data->{keep};
 
-            my $rhs_length =
-              scalar @{ $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::RHS] };
-
-            if ( $rhs_length == 0
-                || !
-                defined $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::MIN] )
-            {
-                my $explicit_mask = $source_xbnf_data->{mask};
-                if ($explicit_mask) {
-                    $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::MASK] =
-                      $explicit_mask;
-                }
-                else {
-                    $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::MASK] =
-                      [ (1) x $rhs_length ];
-                }
-            }
-
             push @{$xbnf_by_id}, $runtime_xbnf_data;
             $xbnf_by_name->{$xbnf_name} = $runtime_xbnf_data;
         }
@@ -1732,10 +1714,6 @@ END_OF_LUA
 
     $tracer->[Marpa::R3::Internal::Trace::G::XBNF_BY_IRLID]->[$base_irl_id] = $xbnf;
 
-    # Later on we will need per-IRL actions and masks
-    $tracer->[Marpa::R3::Internal::Trace::G::MASK_BY_IRLID]->[$base_irl_id] =
-        $xbnf->[Marpa::R3::Internal::XBNF::MASK];
-
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'iiii',
         local slg, irl_id, ranking_is_high, rank, xbnf_id = ...
@@ -1918,10 +1896,6 @@ END_OF_LUA
     }
 
     $tracer->[Marpa::R3::Internal::Trace::G::XBNF_BY_IRLID]->[$base_irl_id] = $xbnf;
-
-    # Later on we will need per-IRL actions and masks
-    $tracer->[Marpa::R3::Internal::Trace::G::MASK_BY_IRLID]->[$base_irl_id] =
-        $xbnf->[Marpa::R3::Internal::XBNF::MASK];
 
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'iiii',

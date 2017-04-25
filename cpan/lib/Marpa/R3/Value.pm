@@ -1358,7 +1358,6 @@ END_OF_LUA
                           ( $is_discard_sequence_rule ? 2 : 1 );
                         next RESULT_DESCRIPTOR;
                     } ## end if ($is_sequence_rule)
-                    # my $mask = $xbnf->[Marpa::R3::Internal::XBNF::MASK];
 
                     my ($mask) = $slg->call_by_tag(
                     ( '@' . __FILE__ . ':' . __LINE__ ),
