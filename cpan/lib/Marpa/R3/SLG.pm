@@ -1749,7 +1749,7 @@ END_OF_LUA
         irl.xbnf = xbnf
         -- right now, the action & mask of an irl
         -- is always the action/mask of its xbnf.
-        -- But some day each irl may need its own
+        -- But some day each irl may need its own.
         irl.action = xbnf.action
         irl.mask = xbnf.mask
 END_OF_LUA
