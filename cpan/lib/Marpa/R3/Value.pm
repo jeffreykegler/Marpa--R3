@@ -330,9 +330,6 @@ END_OF_LUA
 
 sub resolve_rule_by_id {
     my ( $slg, $irlid ) = @_;
-    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
-    # my $action_name =
-      # $tracer->[Marpa::R3::Internal::Trace::G::ACTION_BY_IRLID]->[$irlid];
 
         my ($action_name) =
           $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
@@ -420,21 +417,22 @@ sub resolve_grammar {
 
         if ( not $rule_resolution ) {
             my $rule_desc = $slg->rule_show($irlid);
-            my $message   = "Could not resolve action\n  Rule was $rule_desc\n";
 
-        my ($action) =
-          $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-            <<'END_OF_LUA', 'i>*', $irlid );
-    local slg, irl_id = ...
-    return slg.g1.irls[irl_id].action
+            my ($action) =
+              $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+                <<'END_OF_LUA', 'is>*', $irlid );
+    local slg, irl_id, rule_desc = ...
+    local action = slg.g1.irls[irl_id].action
+    local message = string.format(
+        "Could not resolve action\n  Rule was %s\n",
+        rule_desc)
+    if action then
+        message = message ..
+           string.format("  Action was specified as %q\n", action)
+    end
+    error(message)
 END_OF_LUA
 
-            # my $action =
-              # $tracer->[Marpa::R3::Internal::Trace::G::ACTION_BY_IRLID]
-              # ->[$irlid];
-            $message .= qq{  Action was specified as "$action"\n}
-              if defined $action;
-            Marpa::R3::exception($message);
         } ## end if ( not $rule_resolution )
 
       DETERMINE_BLESSING: {
