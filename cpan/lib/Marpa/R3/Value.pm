@@ -1195,20 +1195,12 @@ END_OF_LUA
                     last SET_OPS;
                 }
 
-                my $old_mask =
-                  $tracer->[Marpa::R3::Internal::Trace::G::MASK_BY_IRLID]
-                  ->[$irlid];
-
-                        my ($mask) = $slg->call_by_tag(
-                            ( '@' . __FILE__ . ':' . __LINE__ ),
-                            <<'END_OF_LUA', 'i>0', $irlid );
-    local slg, irlid = ...
-    -- io.stderr:write('irl: ', inspect(slg.g1.irls[irlid]), '\n')
-    return slg.g1.irls[irlid].mask
+                my ($mask) = $slg->call_by_tag(
+                    ( '@' . __FILE__ . ':' . __LINE__ ),
+                    <<'END_OF_LUA', 'i>0', $irlid );
+                        local slg, irlid = ...
+                        return slg.g1.irls[irlid].mask
 END_OF_LUA
-
-# say STDERR 'old_mask: ', Data::Dumper::Dumper($old_mask);
-# say STDERR 'mask', Data::Dumper::Dumper($mask);
 
                 my @elements =
                   grep { $mask->[$_] } 0 .. ( $rule_length - 1 );
@@ -1366,7 +1358,15 @@ END_OF_LUA
                           ( $is_discard_sequence_rule ? 2 : 1 );
                         next RESULT_DESCRIPTOR;
                     } ## end if ($is_sequence_rule)
-                    my $mask = $xbnf->[Marpa::R3::Internal::XBNF::MASK];
+                    # my $mask = $xbnf->[Marpa::R3::Internal::XBNF::MASK];
+
+                    my ($mask) = $slg->call_by_tag(
+                    ( '@' . __FILE__ . ':' . __LINE__ ),
+                    <<'END_OF_LUA', 'i>0', $irlid );
+                        local slg, irlid = ...
+                        return slg.g1.irls[irlid].mask
+END_OF_LUA
+
                     if ( $rule_length > 0 ) {
                         push @push_ops, map {
                             $mask->[$_]
