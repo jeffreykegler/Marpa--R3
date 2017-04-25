@@ -428,10 +428,6 @@ END_OF_LUA
                 );
             }
 
-            $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::DISCARD_SEPARATION]
-              = $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::SEPARATOR]
-              && !$source_xbnf_data->{keep};
-
             push @{$xbnf_by_id}, $runtime_xbnf_data;
             $xbnf_by_name->{$xbnf_name} = $runtime_xbnf_data;
         }

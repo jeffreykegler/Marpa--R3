@@ -37,12 +37,11 @@ use constant NULL_RANKING => 7;
 use constant MIN => 8;
 use constant SEPARATOR => 9;
 use constant PROPER => 10;
-use constant DISCARD_SEPARATION => 11;
-use constant ACTION_NAME => 12;
-use constant BLESSING => 13;
-use constant SYMBOL_AS_EVENT => 14;
-use constant EVENT => 15;
-use constant XRL => 16;
+use constant ACTION_NAME => 11;
+use constant BLESSING => 12;
+use constant SYMBOL_AS_EVENT => 13;
+use constant EVENT => 14;
+use constant XRL => 15;
 
 package Marpa::R3::Internal::Trace::G;
 use constant NAME => 0;
