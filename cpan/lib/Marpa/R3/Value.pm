@@ -1194,9 +1194,22 @@ END_OF_LUA
                       ( $op_lua, $result_is_n_of_rhs_key, $singleton_element );
                     last SET_OPS;
                 }
-                my $mask =
+
+                my $old_mask =
                   $tracer->[Marpa::R3::Internal::Trace::G::MASK_BY_IRLID]
                   ->[$irlid];
+
+                        my ($mask) = $slg->call_by_tag(
+                            ( '@' . __FILE__ . ':' . __LINE__ ),
+                            <<'END_OF_LUA', 'i>0', $irlid );
+    local slg, irlid = ...
+    -- io.stderr:write('irl: ', inspect(slg.g1.irls[irlid]), '\n')
+    return slg.g1.irls[irlid].mask
+END_OF_LUA
+
+# say STDERR 'old_mask: ', Data::Dumper::Dumper($old_mask);
+# say STDERR 'mask', Data::Dumper::Dumper($mask);
+
                 my @elements =
                   grep { $mask->[$_] } 0 .. ( $rule_length - 1 );
                 if ( not scalar @elements ) {

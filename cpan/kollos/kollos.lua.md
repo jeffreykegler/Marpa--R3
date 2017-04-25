@@ -651,7 +651,7 @@ one for each subgrammar.
             local rhs_length = #xbnf_source.rhs
 
             -- min defined if sequence rule
-            if xbnf_source.min or rhs_length == 0 then
+            if not xbnf_source.min or rhs_length == 0 then
                 if xbnf_source.mask then
                     runtime_xbnf.mask = xbnf_source.mask
                 else
