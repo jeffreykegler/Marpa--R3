@@ -1908,7 +1908,7 @@ END_OF_LUA
         $trace_output .= join q{},
           'Head of Virtual Rule: ',
           $slr->and_node_tag($and_node_id),
-          ', rule: ', $slg->brief_irl($trace_irl_id),
+          ', rule: ', $slg->brief_nrl($trace_irl_id),
           "\n",
           'Incrementing virtual rule by ', $real_symbol_count, ' symbols', "\n"
           or Marpa::R3::exception('Could not print to trace file');
@@ -1922,7 +1922,7 @@ END_OF_LUA
         $trace_output .= join q{},
           'Virtual Rule: ',
           $slr->and_node_tag($and_node_id),
-          ', rule: ', $slg->brief_irl($trace_irl_id),
+          ', rule: ', $slg->brief_nrl($trace_irl_id),
           "\nAdding ",
           $real_symbol_count,
           "\n";
@@ -1936,7 +1936,7 @@ END_OF_LUA
         $trace_output .= join q{},
           'New Virtual Rule: ',
           $slr->and_node_tag($and_node_id),
-          ', rule: ', $slg->brief_irl($trace_irl_id),
+          ', rule: ', $slg->brief_nrl($trace_irl_id),
           "\nReal symbol count is ",
           $real_symbol_count,
           "\n";

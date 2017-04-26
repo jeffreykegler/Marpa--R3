@@ -2426,7 +2426,7 @@ END_OF_LUA
 }
 
 # not to be documented
-sub Marpa::R3::Scanless::G::show_irls {
+sub Marpa::R3::Scanless::G::show_nrls {
     my ($slg) = @_;
     my ($result) =
       $slg->call_by_tag(
@@ -2434,10 +2434,10 @@ sub Marpa::R3::Scanless::G::show_irls {
 	<<'END_OF_LUA', '' );
     local grammar = ...
     local g1g = grammar.g1.lmw_g
-    local irl_count = g1g:_irl_count()
+    local nrl_count = g1g:_irl_count()
     local pieces = {}
-    for irl_id = 0, irl_count - 1 do
-        pieces[#pieces+1] = g1g:brief_irl(irl_id)
+    for nrl_id = 0, nrl_count - 1 do
+        pieces[#pieces+1] = g1g:brief_nrl(nrl_id)
     end
     pieces[#pieces+1] = ''
     return table.concat(pieces, '\n')
@@ -2446,7 +2446,7 @@ END_OF_LUA
 }
 
 # not to be documented
-sub Marpa::R3::Scanless::G::show_isys {
+sub Marpa::R3::Scanless::G::show_nsys {
     my ($slg) = @_;
     my ($result) =
       $slg->call_by_tag(
@@ -2456,8 +2456,8 @@ sub Marpa::R3::Scanless::G::show_isys {
     local g1g = grammar.g1.lmw_g
     local nsy_count = g1g:_nsy_count()
     local pieces = {}
-    for isy_id = 0, nsy_count - 1 do
-        pieces[#pieces+1] = g1g:show_isy(isy_id)
+    for nsy_id = 0, nsy_count - 1 do
+        pieces[#pieces+1] = g1g:show_nsy(nsy_id)
     end
     return table.concat(pieces)
 END_OF_LUA
@@ -2516,13 +2516,13 @@ END_OF_LUA
 }
 
 # not to be documented
-sub Marpa::R3::Scanless::G::brief_irl {
-    my ( $slg, $irl_id ) = @_;
+sub Marpa::R3::Scanless::G::brief_nrl {
+    my ( $slg, $nrl_id ) = @_;
     my ($text) = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 'i', $irl_id );
-    local grammar, irl_id = ...
+        <<'END_OF_LUA', 'i', $nrl_id );
+    local grammar, nrl_id = ...
     local g1g = grammar.g1.lmw_g
-    return g1g:brief_irl(irl_id)
+    return g1g:brief_nrl(nrl_id)
 END_OF_LUA
 
     return $text;

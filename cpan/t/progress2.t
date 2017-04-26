@@ -71,7 +71,7 @@ G1 S3 [:start]
 G1 S4 'a'
 EOS
 
-Marpa::R3::Test::is( $grammar->show_irls,
+Marpa::R3::Test::is( $grammar->show_nrls,
     <<'EOS', 'Aycock/Horspool IRLs' );
 0: S -> SS SS
 1: S -> SS SS[]

@@ -37,9 +37,14 @@ cd kollos && ../lua/lua toc.lua < kollos.lua.md
 * [Kollos object](#kollos-object)
 * [Kollos registry objects](#kollos-registry-objects)
 * [Kollos SLIF grammar object](#kollos-slif-grammar-object)
+  * [Ranking methods](#ranking-methods)
+  * [Hash to runtime processing](#hash-to-runtime-processing)
 * [Kollos SLIF recognizer object](#kollos-slif-recognizer-object)
   * [Constructor](#constructor)
   * [Reading](#reading)
+    * [External reading](#external-reading)
+      * [Notes on tracing](#notes-on-tracing)
+      * [Methods](#methods)
   * [Locations](#locations)
   * [Events](#events)
   * [Progress reporting](#progress-reporting)
@@ -952,7 +957,7 @@ rule, false otherwise.
             -- ignore rules which are not lexeme rules
             -- io.stderr:write(string.format("%s\n", inspect(l0_rules[rule_id])))
             local g1_lexeme = l0_rules[rule_id].g1_lexeme
-            -- io.stderr:write(string.format("%s\n", l0g:brief_irl(rule_id)))
+            -- io.stderr:write(string.format("%s\n", l0g:brief_nrl(rule_id)))
             eager = eager or l0_rules[rule_id].eager
             -- io.stderr:write(string.format('in track_candidates(): rule_id=%s, eager=%s\n',
                 -- inspect(rule_id), inspect(eager)))
@@ -1811,7 +1816,7 @@ part of a "Pure Lua" implementation.
         local trace_earley_set = g1r:_trace_earley_set()
         local trace_earleme = g1r:earleme(trace_earley_set)
         local postdot_symbol_id = g1r:_postdot_item_symbol()
-        local postdot_symbol_name = g1g:isy_name(postdot_symbol_id)
+        local postdot_symbol_name = g1g:nsy_name(postdot_symbol_id)
         local predecessor_symbol_id = g1r:_leo_predecessor_symbol()
         local base_origin_set_id = g1r:_leo_base_origin()
         local base_origin_earleme = g1r:earleme(base_origin_set_id)
@@ -2649,6 +2654,29 @@ is zero.
 
 ```
 
+## Layers and wrappers
+
+There is a SLIF grammar object and
+a SLIF recce object.
+The SLIF has two *layers*, G1 and L0.
+
+Each SLIF object contains two layer objects.
+SLIF grammars contain
+a G1 layer grammar object
+and an L0 layer grammar object.
+Each layer grammar object, in turn,
+contains a Libmarpa grammar wrapper object.
+
+SLIF recognizers contain
+a G1 layer recognizer object
+and an L0 layer recognizer object.
+Each layer recognizer object, in turn,
+contains a Libmarpa recognizer wrapper object.
+
+## The layer grammar
+
+### Layer grammar accessors
+
 ## The grammar Libmarpa wrapper
 
 Constructor
@@ -2710,14 +2738,14 @@ Constructor
     function _M.class_grammar.show_dotted_irl(lmw_g, irl_id, dot_position)
         local lhs_id = lmw_g:_irl_lhs(irl_id)
         local irl_length = lmw_g:_irl_length(irl_id)
-        local lhs_name = lmw_g:isy_name(lhs_id)
+        local lhs_name = lmw_g:nsy_name(lhs_id)
         local pieces = { lhs_name, '::=' }
         if dot_position < 0 then
             dot_position = irl_length
         end
         for ix = 0, irl_length - 1 do
             local rhs_nsy_id = lmw_g:_irl_rhs(irl_id, ix)
-            local rhs_nsy_name = lmw_g:isy_name(rhs_nsy_id)
+            local rhs_nsy_name = lmw_g:nsy_name(rhs_nsy_id)
             if ix == dot_position then
                 pieces[#pieces+1] = '.'
             end
@@ -2734,10 +2762,10 @@ Constructor
 ```
     -- miranda: section+ grammar Libmarpa wrapper Lua functions
 
-    function _M.class_grammar.isy_name(lmw_g, nsy_id_arg)
+    function _M.class_grammar.nsy_name(lmw_g, nsy_id_arg)
          -- start symbol
          local nsy_id = math.tointeger(nsy_id_arg)
-         if not nsy_id then error('Bad isy_name() symbol ID arg: ' .. inspect(nsy_id_arg)) end
+         if not nsy_id then error('Bad nsy_name() symbol ID arg: ' .. inspect(nsy_id_arg)) end
          local nsy_is_start = 0 ~= lmw_g:_nsy_is_start(nsy_id)
          if nsy_is_start then
              local xsy_id = lmw_g:_source_xsy(nsy_id)
@@ -2780,7 +2808,7 @@ Constructor
             properties[#properties+1] = 'completion'
         else
             properties[#properties+1] =
-               'postdot = "' ..  lmw_g:isy_name(postdot_id) .. '"'
+               'postdot = "' ..  lmw_g:nsy_name(postdot_id) .. '"'
         end
         pieces[#pieces+1] = table.concat(properties, '; ')
         pieces[#pieces+1] = "\n    "
@@ -2800,11 +2828,11 @@ Constructor
         return table.concat(pieces)
     end
 
-    function _M.class_grammar.show_isy(lmw_g, isy_id)
-        local name = lmw_g:isy_name(isy_id)
-        local pieces = { string.format("%d: %s", isy_id, name) }
+    function _M.class_grammar.show_nsy(lmw_g, nsy_id)
+        local name = lmw_g:nsy_name(nsy_id)
+        local pieces = { string.format("%d: %s", nsy_id, name) }
         local tags = {}
-        local is_nulling = 0 ~= lmw_g:_nsy_is_nulling(isy_id)
+        local is_nulling = 0 ~= lmw_g:_nsy_is_nulling(nsy_id)
         if is_nulling then
         tags[#tags+1] = 'nulling'
         end
@@ -2815,17 +2843,17 @@ Constructor
         return table.concat(pieces)
     end
 
-    function _M.class_grammar.brief_irl(lmw_g, irl_id)
-        local pieces = { string.format("%d: ", irl_id) }
-        local lhs_id = lmw_g:_irl_lhs(irl_id)
-        pieces[#pieces+1] = lmw_g:isy_name(lhs_id)
+    function _M.class_grammar.brief_nrl(lmw_g, nrl_id)
+        local pieces = { string.format("%d: ", nrl_id) }
+        local lhs_id = lmw_g:_irl_lhs(nrl_id)
+        pieces[#pieces+1] = lmw_g:nsy_name(lhs_id)
         pieces[#pieces+1] = " ->"
-        local rh_length = lmw_g:_irl_length(irl_id)
+        local rh_length = lmw_g:_irl_length(nrl_id)
         if rh_length > 0 then
            local rhs_names = {}
            for rhs_ix = 0, rh_length - 1 do
-              local this_rhs_id = lmw_g:_irl_rhs(irl_id, rhs_ix)
-              rhs_names[#rhs_names+1] = lmw_g:isy_name(this_rhs_id)
+              local this_rhs_id = lmw_g:_irl_rhs(nrl_id, rhs_ix)
+              rhs_names[#rhs_names+1] = lmw_g:nsy_name(this_rhs_id)
            end
            pieces[#pieces+1] = " " .. table.concat(rhs_names, " ")
         end
@@ -2847,7 +2875,7 @@ Functions for tracing Earley sets
         local trace_earley_set = lmw_r:_trace_earley_set()
         local trace_earleme = lmw_r:earleme(trace_earley_set)
         local postdot_symbol_id = lmw_r:_postdot_item_symbol()
-        local postdot_symbol_name = lmw_g:isy_name(postdot_symbol_id)
+        local postdot_symbol_name = lmw_g:nsy_name(postdot_symbol_id)
         local predecessor_symbol_id = lmw_r:_leo_predecessor_symbol()
         local base_origin_set_id = lmw_r:_leo_base_origin()
         local base_origin_earleme = lmw_r:earleme(base_origin_set_id)
@@ -2873,7 +2901,7 @@ Functions for tracing Earley sets
         if predecessor_ahm then
             middle_earleme = lmw_r:earleme(middle_set_id)
         end
-        local token_name = lmw_g:isy_name(token_id)
+        local token_name = lmw_g:nsy_name(token_id)
         result.predecessor_ahm = predecessor_ahm
         result.origin_earleme = origin_earleme
         result.middle_set_id = middle_set_id

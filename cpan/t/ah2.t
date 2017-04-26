@@ -68,7 +68,7 @@ G1 S2 [:start]
 G1 S3 'a'
 EOS
 
-Marpa::R3::Test::is( $grammar->show_isys,
+Marpa::R3::Test::is( $grammar->show_nsys,
         <<'EOS', 'Aycock/Horspool ISYs' );
 0: A
 1: A[], nulling
@@ -82,7 +82,7 @@ Marpa::R3::Test::is( $grammar->show_isys,
 9: [:start][']
 EOS
 
-Marpa::R3::Test::is( $grammar->show_irls,
+Marpa::R3::Test::is( $grammar->show_nrls,
     <<'EOS', 'Aycock/Horspool IRLs' );
 0: S -> A S[R0:1]
 1: S -> A A[] A[] A[]
