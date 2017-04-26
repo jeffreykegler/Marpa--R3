@@ -1503,7 +1503,6 @@ sub add_G1_user_rule {
     my ( $min, $separator_name );
     my $rank;
     my $null_ranking;
-    my $xbnf;
     my $proper_separation = 0;
     my $xbnf_name;
     my $xbnf_id;
@@ -1512,9 +1511,6 @@ sub add_G1_user_rule {
         my $value = $options->{$option};
         if ( $option eq 'xbnfid' ) {
             $xbnf_name = $value;
-            $xbnf = $slg->[
-              Marpa::R3::Internal::Scanless::G::G1_XBNF_BY_NAME
-            ]->{$xbnf_name};
             next OPTION;
         }
         if ( $option eq 'rhs' )    { $rhs_names = $value; next OPTION }
@@ -1679,7 +1675,6 @@ sub add_L0_user_rule {
     my ( $min, $separator_name );
     my $rank;
     my $null_ranking;
-    my $xbnf;
     my $proper_separation = 0;
     my $xbnf_name;
     my $xbnf_id;
@@ -1688,9 +1683,6 @@ sub add_L0_user_rule {
         my $value = $options->{$option};
         if ( $option eq 'xbnfid' ) {
             $xbnf_name = $value;
-            $xbnf = $slg->[
-              Marpa::R3::Internal::Scanless::G::L0_XBNF_BY_NAME
-            ]->{$value};
             next OPTION;
         }
         if ( $option eq 'rhs' )    { $rhs_names = $value; next OPTION }
