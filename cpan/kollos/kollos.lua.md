@@ -629,21 +629,25 @@ one for each subgrammar.
 
             -- copy, so that we can destroy `source_hash`
 
-
             runtime_xbnf.xrl_name = xbnf_source.xrlid
             runtime_xbnf.name = xbnf_source.name
             runtime_xbnf.lhs = xbnf_source.lhs
             runtime_xbnf.rhs = xbnf_source.rhs
             runtime_xbnf.rank = xbnf_source.rank
             runtime_xbnf.null_ranking = xbnf_source.null_ranking
+
             runtime_xbnf.symbol_as_event = xbnf_source.symbol_as_event
-            runtime_xbnf.event = xbnf_source.event
+            local source_event = xbnf_source.event
+            if source_event then
+                runtime_xbnf.event_name = source_event[1]
+                runtime_xbnf.event_starts_active
+                    = (source_event[2] ~= 0)
+            end
+
             runtime_xbnf.min = xbnf_source.min
             runtime_xbnf.separator = xbnf_source.separator
             runtime_xbnf.proper = xbnf_source.proper
-            -- Marpa::R3::Internal::XBNF::BLESSING -- note name change
             runtime_xbnf.bless = xbnf_source.bless
-            -- Marpa::R3::Internal::XBNF::ACTION_NAME --note name change
             runtime_xbnf.action = xbnf_source.action
             runtime_xbnf.start = xbnf_source.start
             runtime_xbnf.length = xbnf_source.length

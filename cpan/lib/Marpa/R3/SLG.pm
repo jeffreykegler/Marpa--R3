@@ -340,23 +340,11 @@ END_OF_LUA
             my $source_xbnf_data  = $xbnfs->{$xbnf_name};
             my $runtime_xbnf_data = [];
           KEY: for my $datum_key ( keys %{$source_xbnf_data} ) {
-                if ( $datum_key eq 'name' ) {
-                    $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::NAME] =
-                      $source_xbnf_data->{$datum_key};
-                    next KEY;
-                }
-                if ( $datum_key eq 'symbol_as_event' ) {
-                    $runtime_xbnf_data
-                      ->[Marpa::R3::Internal::XBNF::SYMBOL_AS_EVENT] =
-                      $source_xbnf_data->{$datum_key};
-                    next KEY;
-                }
                 if ( $datum_key eq 'event' ) {
                     $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::EVENT] =
                       $source_xbnf_data->{$datum_key};
-                    next KEY;
+                    say STDERR Data::Dumper::Dumper( $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::EVENT] );
                 }
-                next KEY;
             }
 
             push @{$xbnf_by_id}, $runtime_xbnf_data;
@@ -803,24 +791,31 @@ END_OF_LUA
             $event = $xbnf->[Marpa::R3::Internal::XBNF::EVENT];
             last FIND_EVENT if defined $event;
 
-    my ($lhs_id) = $slg->call_by_tag(
-    ('@' .__FILE__ . ':' . __LINE__),
-    <<'END_OF_LUA', 'i>*', $irlid ) ;
-    local grammar, irlid = ...
+            my ( $cmd, $lhs_id ) =
+              $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+                <<'END_OF_LUA', 'ii>*', $irlid, $lex_discard_symbol_id );
+    local grammar, irlid, lex_discard_symbol_id = ...
     local l0g = grammar.l0.lmw_g
-    return l0g:rule_lhs(irlid)
+    local lhs_id = l0g:rule_lhs(irlid)
+    if lhs_id ~= lex_discard_symbol_id then
+        return 'next RULE_ID'
+    end
+    return 'ok'
 END_OF_LUA
-            last FIND_EVENT if $lhs_id != $lex_discard_symbol_id;
+
+            next RULE_ID if $cmd eq 'next RULE_ID';
+
             $event = $default_discard_event;
         } ## end FIND_EVENT:
+
         next RULE_ID if not defined $event;
 
         my ( $event_name, $event_starts_active ) = @{$event};
         if ( $event_name eq q{'symbol} ) {
 
-    my ($symbol_as_event) = $slg->call_by_tag(
-    ('@' .__FILE__ . ':' . __LINE__),
-    <<'END_OF_LUA', 'i>*', $irlid ) ;
+            my ($symbol_as_event) =
+              $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+                <<'END_OF_LUA', 'i>*', $irlid );
     local slg, irlid = ...
     local irl = slg.l0.irls[irlid]
     -- at this point, xbnf must be defined
