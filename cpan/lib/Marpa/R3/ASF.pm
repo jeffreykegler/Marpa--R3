@@ -315,27 +315,32 @@ sub Marpa::R3::Internal::ASF::blessings_set {
 END_OF_LUA
 
   RULE: for ( my $irlid = 0 ; $irlid <= $highest_irlid ; $irlid++ ) {
-        my $xbnf = $xbnf_by_irlid->[$irlid];
 
-        # In theory, there could be gaps in the IRL ids
-        next RULE if not $xbnf;
-        my $blessing = $xbnf->[Marpa::R3::Internal::XBNF::BLESSING];
-        if ( defined $blessing and q{::} ne substr $blessing, 0, 2 ) {
+        my ($cmd, $blessing) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+            <<'END_OF_LUA', 'i>*', $irlid );
+    local recce, irlid = ...
+    local slg = recce.slg
+    local irl = slg.g1.irls[irlid]
+    local xbnf = irl.xbnf
+    if xbnf then
+        local blessing = xbnf.bless
+        if blessing and string.sub(blessing, 1, 2) ~= '::' then
+            return 'ok', blessing
+        end
+    end
+
+    local g1g = slg.g1.lmw_g
+    local lhs_id = g1g:rule_lhs(irlid)
+    return 'continue', g1g:symbol_name(lhs_id)
+END_OF_LUA
+
+        if ($cmd eq 'ok') {
             $rule_blessing[$irlid] = $blessing;
             next RULE;
         }
 
-        my ($name) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-            <<'END_OF_LUA', 'i>*', $irlid );
-    local recce, irlid = ...
-    local grammar = recce.slg
-    local g1g = grammar.g1.lmw_g
-    local lhs_id = g1g:rule_lhs(irlid)
-    return g1g:symbol_name(lhs_id)
-END_OF_LUA
-
         $rule_blessing[$irlid] = join q{::}, $default_rule_blessing_package,
-          normalize_asf_blessing($name);
+          normalize_asf_blessing($blessing);
     }
 
     my @symbol_blessing = ();
