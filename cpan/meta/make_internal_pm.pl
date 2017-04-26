@@ -99,17 +99,6 @@ END_OF_HEADER
 
 __DATA__
 
-    :package=Marpa::R3::Internal::XBNF
-
-    NAME
-    SYMBOL_AS_EVENT
-    EVENT
-
-    :package=Marpa::R3::Internal::Trace::G
-
-    NAME
-    SUBG_NAME { Name of the grammar -- 'l0' or 'g1' }
-
     :package=Marpa::R3::Internal::Progress_Report
 
     RULE_ID
@@ -206,8 +195,6 @@ __DATA__
     CHARACTER_CLASS_TABLE
     DISCARD_EVENT_BY_LEXER_RULE
 
-    XSY_BY_ID { eXternal symbols, by XSYID }
-    XSY_BY_NAME { eXternal symbols, by XSY name }
     COMPLETION_EVENT_BY_ID
     NULLED_EVENT_BY_ID
     PREDICTION_EVENT_BY_ID
