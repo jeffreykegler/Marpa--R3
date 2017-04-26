@@ -374,20 +374,31 @@ END_OF_LUA
 # Find the blessing for a rule.
 sub rule_blessing_find {
     my ( $slg, $irlid ) = @_;
-    my $tracer        = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
-    my $xbnf_by_irlid = $tracer->[Marpa::R3::Internal::Trace::G::XBNF_BY_IRLID];
-    my $xbnf          = $xbnf_by_irlid->[$irlid];
-    my $blessing      = $xbnf->[Marpa::R3::Internal::XBNF::BLESSING];
-    $blessing = '::undef' if not defined $blessing;
-    return $blessing if $blessing eq '::undef';
     my $bless_package = $slg->[Marpa::R3::Internal::Scanless::G::BLESS_PACKAGE];
 
-    if ( not defined $bless_package ) {
-        Marpa::R3::exception(
-                qq{A blessed rule is in a grammar with no bless_package\n}
-              . qq{  The rule was blessed as "$blessing"\n} );
-    }
-    return join q{}, $bless_package, q{::}, $blessing;
+    my ($blessing) =
+      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 'is>*', $irlid, ($bless_package // ''));
+        local slg, irlid, bless_package = ...
+        local irl = slg.g1.irls[irlid]
+        local blessing = '::undef'
+        local xbnf = irl.xbnf
+        if xbnf then
+            blessing = xbnf.bless or '::undef'
+        end
+        if blessing == '::undef' then return blessing end
+        if #bless_package == 0 then
+            error(string.format(
+                'A blessed rule is in a grammar with no bless_package\n'
+                .. '  The rule was blessed as %q\n',
+                blessing
+            ))
+        end
+        return bless_package .. '::' .. blessing
+END_OF_LUA
+
+    return $blessing;
+
 }
 
 sub resolve_grammar {
