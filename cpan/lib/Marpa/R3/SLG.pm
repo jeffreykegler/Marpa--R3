@@ -339,38 +339,9 @@ END_OF_LUA
             $DB::single = 1 if not defined $xbnf_name;
             my $source_xbnf_data  = $xbnfs->{$xbnf_name};
             my $runtime_xbnf_data = [];
-            $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::ID] =
-              scalar @{$xbnf_by_id};
           KEY: for my $datum_key ( keys %{$source_xbnf_data} ) {
-                if ( $datum_key eq 'xrlid' ) {
-                    # TODO -- on conversion to Lua, have some link to XRL
-                    # $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::XRL] =
-                      # $xrl_by_name->{$datum_key};
-                    next KEY;
-                }
                 if ( $datum_key eq 'name' ) {
                     $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::NAME] =
-                      $source_xbnf_data->{$datum_key};
-                    next KEY;
-                }
-                if ( $datum_key eq 'lhs' ) {
-                    $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::LHS] =
-                      $source_xbnf_data->{$datum_key};
-                    next KEY;
-                }
-                if ( $datum_key eq 'rhs' ) {
-                    $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::RHS] =
-                      $source_xbnf_data->{$datum_key};
-                    next KEY;
-                }
-                if ( $datum_key eq 'rank' ) {
-                    $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::RANK] =
-                      $source_xbnf_data->{$datum_key};
-                    next KEY;
-                }
-                if ( $datum_key eq 'null_ranking' ) {
-                    $runtime_xbnf_data
-                      ->[Marpa::R3::Internal::XBNF::NULL_RANKING] =
                       $source_xbnf_data->{$datum_key};
                     next KEY;
                 }
@@ -385,42 +356,12 @@ END_OF_LUA
                       $source_xbnf_data->{$datum_key};
                     next KEY;
                 }
-                if ( $datum_key eq 'min' ) {
-                    $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::MIN] =
-                      $source_xbnf_data->{$datum_key};
-                    next KEY;
-                }
-                if ( $datum_key eq 'separator' ) {
-                    $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::SEPARATOR]
-                      = $source_xbnf_data->{$datum_key};
-                    next KEY;
-                }
                 if ( $datum_key eq 'bless' ) {
                     $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::BLESSING] =
                       $source_xbnf_data->{$datum_key};
                     next KEY;
                 }
-                if ( $datum_key eq 'action' ) {
-                    $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::ACTION_NAME]
-                      = $source_xbnf_data->{$datum_key};
-                    next KEY;
-                }
-                if ( $datum_key eq 'start' ) {
-                    $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::START] =
-                      $source_xbnf_data->{$datum_key};
-                    next KEY;
-                }
-                if ( $datum_key eq 'length' ) {
-                    $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::LENGTH] =
-                      $source_xbnf_data->{$datum_key};
-                    next KEY;
-                }
-                if ( $datum_key =~ /\A (mask|keep|subkey|id|proper) \z/xms ) {
-                    next KEY;
-                }
-                Marpa::R3::exception(
-"Internal error: Unknown hashed source xbnf field: $datum_key"
-                );
+                next KEY;
             }
 
             push @{$xbnf_by_id}, $runtime_xbnf_data;

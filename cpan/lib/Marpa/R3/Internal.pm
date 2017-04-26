@@ -26,21 +26,10 @@ $VERSION = eval $VERSION;
 
 
 package Marpa::R3::Internal::XBNF;
-use constant ID => 0;
-use constant NAME => 1;
-use constant START => 2;
-use constant LENGTH => 3;
-use constant LHS => 4;
-use constant RHS => 5;
-use constant RANK => 6;
-use constant NULL_RANKING => 7;
-use constant MIN => 8;
-use constant SEPARATOR => 9;
-use constant ACTION_NAME => 10;
-use constant BLESSING => 11;
-use constant SYMBOL_AS_EVENT => 12;
-use constant EVENT => 13;
-use constant XRL => 14;
+use constant NAME => 0;
+use constant BLESSING => 1;
+use constant SYMBOL_AS_EVENT => 2;
+use constant EVENT => 3;
 
 package Marpa::R3::Internal::Trace::G;
 use constant NAME => 0;

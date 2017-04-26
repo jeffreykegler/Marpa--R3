@@ -101,21 +101,10 @@ __DATA__
 
     :package=Marpa::R3::Internal::XBNF
 
-    ID
     NAME
-    START
-    LENGTH
-    LHS
-    RHS
-    RANK
-    NULL_RANKING
-    MIN
-    SEPARATOR
-    ACTION_NAME
     BLESSING
     SYMBOL_AS_EVENT
     EVENT
-    XRL
 
     :package=Marpa::R3::Internal::Trace::G
 
