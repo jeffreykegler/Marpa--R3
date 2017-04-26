@@ -85,6 +85,10 @@ cd kollos && ../lua/lua toc.lua < kollos.lua.md
     * [Return the value of a stack entry](#return-the-value-of-a-stack-entry)
     * [Set the value of a stack entry](#set-the-value-of-a-stack-entry)
     * [Convert current, origin Earley set to L0 span](#convert-current-origin-earley-set-to-l0-span)
+* [External, inner and internal](#external-inner-and-internal)
+* [Layers and wrappers](#layers-and-wrappers)
+* [The layer grammar](#the-layer-grammar)
+  * [Layer grammar accessors](#layer-grammar-accessors)
 * [The grammar Libmarpa wrapper](#the-grammar-libmarpa-wrapper)
 * [The recognizer Libmarpa wrapper](#the-recognizer-libmarpa-wrapper)
 * [The valuator Libmarpa wrapper](#the-valuator-libmarpa-wrapper)
@@ -2730,6 +2734,28 @@ contains a Libmarpa recognizer wrapper object.
 
 ## The layer grammar
 
+### Constructor
+
+```
+    -- miranda: section+ create nonmetallic metatables
+    _M.class_lyg = {}
+
+    -- miranda: section+ most Lua function definitions
+    function _M.class_lyg.new(slg, lyr_name)
+        local lmw_g = kollos.grammar_new()
+        slg[lyr_name] = {
+            lmw_g = lmw_g,
+            name = lyr_name,
+            xsy_by_isyid = {},
+            xbnf_by_irlid = {},
+            isys = {},
+            irls = {}
+        }
+        lmw_g:force_valued()
+        lmw_g.short_name = lyr_name
+    end
+```
+
 ### Layer grammar accessors
 
 ## The grammar Libmarpa wrapper
@@ -4055,6 +4081,7 @@ a special "configuration" argument.
 
     -- miranda: insert create metal tables
     -- miranda: insert copy metal tables
+    -- miranda: insert create nonmetallic metatables
     -- miranda: insert populate metatables
 
     -- set up various tables

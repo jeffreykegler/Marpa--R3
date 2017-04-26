@@ -285,12 +285,11 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     my $trace_fh = $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE];
     # Pre-lexer G1 processing
 
-      per_lmg_init($slg, "g1");
-      per_lmg_init($slg, "l0");
-
     $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 's', $hashed_source );
         local slg, source_hash = ...
+        _M.class_lyg.new(slg, 'g1')
+        _M.class_lyg.new(slg, 'l0')
         slg:xsys_populate( source_hash)
         return slg:xrls_populate(source_hash)
 END_OF_LUA
