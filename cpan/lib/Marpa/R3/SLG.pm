@@ -1647,8 +1647,6 @@ END_OF_LUA
         Marpa::R3::exception($problem) if $ok ne 'fail'
     }
 
-    $tracer->[Marpa::R3::Internal::Trace::G::XBNF_BY_IRLID]->[$base_irl_id] = $xbnf;
-
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'iiii',
         local slg, irl_id, ranking_is_high, rank, xbnf_id = ...
@@ -1829,8 +1827,6 @@ END_OF_LUA
 
         Marpa::R3::exception($problem) if $ok ne 'fail';
     }
-
-    $tracer->[Marpa::R3::Internal::Trace::G::XBNF_BY_IRLID]->[$base_irl_id] = $xbnf;
 
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'iiii',

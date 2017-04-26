@@ -731,7 +731,6 @@ sub registrations_find {
     my $trace_file_handle =
       $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE];
     my $tracer        = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
-    my $xbnf_by_irlid = $tracer->[Marpa::R3::Internal::Trace::G::XBNF_BY_IRLID];
     my $trace_actions =
       $slg->[Marpa::R3::Internal::Scanless::G::TRACE_ACTIONS] // 0;
 
@@ -1099,14 +1098,13 @@ END_OF_LUA
   WORK_ITEM: for my $work_item (@work_list) {
         my ( $irlid, $lexeme_id, $semantics, $blessing ) = @{$work_item};
 
-        my ( $closure, $xbnf, $rule_length,
+        my ( $closure, $rule_length,
             $is_sequence_rule,
             $is_discard_sequence_rule,
             $nulling_symbol_id );
         if ( defined $irlid ) {
             $nulling_symbol_id = $nulling_symbol_by_semantic_rule[$irlid];
             $closure           = $closure_by_irlid[$irlid];
-            $xbnf              = $xbnf_by_irlid->[$irlid];
 
             ( $rule_length, $is_sequence_rule,
                 $is_discard_sequence_rule ) =
