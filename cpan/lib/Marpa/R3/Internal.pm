@@ -27,9 +27,8 @@ $VERSION = eval $VERSION;
 
 package Marpa::R3::Internal::XBNF;
 use constant NAME => 0;
-use constant BLESSING => 1;
-use constant SYMBOL_AS_EVENT => 2;
-use constant EVENT => 3;
+use constant SYMBOL_AS_EVENT => 1;
+use constant EVENT => 2;
 
 package Marpa::R3::Internal::Trace::G;
 use constant NAME => 0;

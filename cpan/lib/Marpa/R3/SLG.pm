@@ -356,11 +356,6 @@ END_OF_LUA
                       $source_xbnf_data->{$datum_key};
                     next KEY;
                 }
-                if ( $datum_key eq 'bless' ) {
-                    $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::BLESSING] =
-                      $source_xbnf_data->{$datum_key};
-                    next KEY;
-                }
                 next KEY;
             }
 

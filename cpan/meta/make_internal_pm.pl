@@ -102,7 +102,6 @@ __DATA__
     :package=Marpa::R3::Internal::XBNF
 
     NAME
-    BLESSING
     SYMBOL_AS_EVENT
     EVENT
 
