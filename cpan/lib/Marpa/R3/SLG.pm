@@ -325,10 +325,6 @@ END_OF_LUA
         for my $xbnf_name (
             map { $_->[0] }
             sort {
-                # die  "a=", Data::Dumper::Dumper($a) if not defined $a->[1];
-                # die  "a=", Data::Dumper::Dumper($a) if not defined $a->[2];
-                # die  "b=", Data::Dumper::Dumper($b) if not defined $a->[1];
-                # die  "b=", Data::Dumper::Dumper($b) if not defined $b->[2];
                 $a->[1] <=> $b->[1]
                   || $a->[2] <=> $b->[2]
             }
@@ -343,7 +339,6 @@ END_OF_LUA
                 if ( $datum_key eq 'event' ) {
                     $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::EVENT] =
                       $source_xbnf_data->{$datum_key};
-                    say STDERR Data::Dumper::Dumper( $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::EVENT] );
                 }
             }
 
@@ -778,30 +773,39 @@ END_OF_LUA
     # Apply defaults to determine the discard event for every
     # rule id of the lexer.
 
-    my $l0_xbnfs_by_irlid =
-      $lex_tracer->[Marpa::R3::Internal::Trace::G::XBNF_BY_IRLID];
     my $default_discard_event = $discard_default_adverbs->{event};
   RULE_ID: for my $irlid ( $slg->l0_rule_ids() ) {
-        my $xbnf = $l0_xbnfs_by_irlid->[$irlid];
 
         # There may be gaps in the IRLIDs
-        next RULE_ID if not defined $xbnf;
         my $event;
       FIND_EVENT: {
-            $event = $xbnf->[Marpa::R3::Internal::XBNF::EVENT];
-            last FIND_EVENT if defined $event;
 
-            my ( $cmd, $lhs_id ) =
+            my ( $cmd, $event_name, $event_starts_active ) =
               $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
                 <<'END_OF_LUA', 'ii>*', $irlid, $lex_discard_symbol_id );
-    local grammar, irlid, lex_discard_symbol_id = ...
-    local l0g = grammar.l0.lmw_g
+    local slg, irlid, lex_discard_symbol_id = ...
+    local lyr_l0 = slg.l0
+    local irl = lyr_l0.irls[irlid]
+    local xbnf = irl.xbnf
+    if not xbnf then
+        return 'next RULE_ID'
+    end
+    local event_name = xbnf.event_name
+    if event_name then
+         return 'ok', event_name, xbnf.event_starts_active
+    end
+    local l0g = lyr_l0.lmw_g
     local lhs_id = l0g:rule_lhs(irlid)
     if lhs_id ~= lex_discard_symbol_id then
         return 'next RULE_ID'
     end
-    return 'ok'
+    return ''
 END_OF_LUA
+
+            if ($cmd eq 'ok') {
+                $event = [ $event_name, $event_starts_active ];
+                last FIND_EVENT;
+            }
 
             next RULE_ID if $cmd eq 'next RULE_ID';
 
@@ -2322,7 +2326,6 @@ sub Marpa::R3::Scanless::G::lmg_show_rules {
     my $per_lmg =
       $slg->[Marpa::R3::Internal::Scanless::G::PER_LMG]->{$subg_name};
     my $grammar_name = $per_lmg->[Marpa::R3::Internal::Trace::G::NAME];
-    my $xbnf_by_irlid = $per_lmg->[Marpa::R3::Internal::Trace::G::XBNF_BY_IRLID];
 
     my ($highest_rule_id) = $slg->call_by_tag(
     ('@' .__FILE__ . ':' . __LINE__),
@@ -2333,8 +2336,6 @@ sub Marpa::R3::Scanless::G::lmg_show_rules {
 END_OF_LUA
 
     for my $irlid ( 0 .. $highest_rule_id ) {
-
-        my $xbnf = $xbnf_by_irlid->[$irlid];
 
         my ( $has_minimum, $minimum ) =
           $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),

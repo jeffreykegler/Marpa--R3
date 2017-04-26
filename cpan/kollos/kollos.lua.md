@@ -641,7 +641,7 @@ one for each subgrammar.
             if source_event then
                 runtime_xbnf.event_name = source_event[1]
                 runtime_xbnf.event_starts_active
-                    = (source_event[2] ~= 0)
+                    = (math.tointeger(source_event[2]) ~= 0)
             end
 
             runtime_xbnf.min = xbnf_source.min
