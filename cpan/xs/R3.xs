@@ -257,9 +257,9 @@ static int find_utf8_error (const char *s, const char *end) {
   const char *s1 = s;
   while (s1 < end) {
     /* warn("%s %d before s1=%p\n", __FILE__, __LINE__, s1); */
-    s1 = utf8_validate(s1, end - s1);
+    s1 = utf8_validate(s1, (int)(end - s1));
     /* warn("%s %d after s1=%p\n", __FILE__, __LINE__, s1); */
-    if (s1 == NULL) return s1 - s;
+    if (s1 == NULL) return (int)(s1 - s);
   }
   return -1;
 }
