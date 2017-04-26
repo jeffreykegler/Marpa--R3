@@ -1056,8 +1056,6 @@ END_OF_LUA
                 if ( $character =~ $re ) {
 
                     if ( $trace_terminals >= 2 ) {
-                        my $lex_tracer =
-                          $slg->[ Marpa::R3::Internal::Scanless::G::L0_TRACER ];
                         my $trace_file_handle = $slr->[
                           Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
                         my $char_desc = sprintf 'U+%04x', $codepoint;
@@ -1121,9 +1119,6 @@ sub Marpa::R3::Scanless::R::read_problem {
     die 'No problem_code in slr->read_problem()' if not $problem_code;
 
     my $slg  = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-
-    my $lex_tracer =
-        $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER];
 
     my $trace_file_handle =
         $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];

@@ -295,7 +295,6 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
 
     my $g1_tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER] =
       per_lmg_init($slg, "G1");
-    my $lex_tracer = $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER] =
       per_lmg_init($slg, "L0");
 
     $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
@@ -460,7 +459,7 @@ END_OF_LUA
       $slg->[Marpa::R3::Internal::Scanless::G::LEXEME_EVENT_BY_ID] = [];
 
     my $precompute_error =
-      Marpa::R3::Internal::Scanless::G::precompute( $slg, $g1_tracer );
+      Marpa::R3::Internal::Scanless::G::precompute( $slg, 'g1' );
     if ( defined $precompute_error ) {
         if ( $precompute_error == $Marpa::R3::Error::UNPRODUCTIVE_START ) {
 
@@ -700,7 +699,7 @@ END_OF_LUA
     }
 
     my $lex_precompute_error =
-      Marpa::R3::Internal::Scanless::G::precompute( $slg, $lex_tracer );
+      Marpa::R3::Internal::Scanless::G::precompute( $slg, 'l0' );
     if ( defined $lex_precompute_error ) {
         Marpa::R3::exception(
 'Internal errror: expected error code from precompute of lexer grammar ',
@@ -1068,9 +1067,7 @@ END_OF_LUA
 } ## end sub Marpa::R3::Internal::Scanless::G::hash_to_runtime
 
 sub Marpa::R3::Internal::Scanless::G::precompute {
-    my ($slg, $per_lmg) = @_;
-
-    my $subg_name = $per_lmg->[Marpa::R3::Internal::Trace::G::SUBG_NAME];
+    my ($slg, $subg_name ) = @_;
 
     my $trace_fh =
         $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE];
@@ -1349,7 +1346,6 @@ END_OF_LUA
 sub assign_L0_symbol {
     # $slg will be needed for the XSY's
     my ( $slg, $name, $options ) = @_;
-    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER];
 
     my $symbol_id = $slg->l0_symbol_by_name($name);
     if ( defined $symbol_id ) {
