@@ -38,8 +38,6 @@ our $PACKAGE = 'Marpa::R3::Scanless::R';
 sub Marpa::R3::Scanless::R::last_completed {
     my ( $slr, $symbol_name ) = @_;
     my $slg  = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $g1_tracer =
-        $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     my $symbol_id       = $slg->symbol_by_name($symbol_name);
 
     my ($start, $length) = $slr->call_by_tag(
@@ -1183,8 +1181,6 @@ END_OF_LUA
                 my $trace_file_handle =
                   $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
                 my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-                my $tracer =
-                  $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
 
        # Different internal symbols may have the same external "display form",
        # which in naive reporting logic would result in many identical messages,
@@ -1548,7 +1544,6 @@ sub input_range_describe {
 sub Marpa::R3::Scanless::R::show_progress {
     my ( $slr, $start_ordinal, $end_ordinal ) = @_;
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $tracer  = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
 
     my ($last_ordinal) = $slr->call_by_tag(
     ('@' . __FILE__ . ':' . __LINE__),
@@ -1767,7 +1762,6 @@ sub Marpa::R3::Scanless::R::lexeme_alternative {
     ) if not defined $symbol_name;
 
     my $slg        = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $g1_tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     my $symbol_id  = $slg->symbol_by_name($symbol_name);
     if ( not defined $symbol_id ) {
         Marpa::R3::exception(
@@ -2067,7 +2061,6 @@ END_OF_LUA
 sub Marpa::R3::Scanless::R::show_earley_set {
     my ( $slr, $traced_set_id ) = @_;
     my $slg     = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $tracer  = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
 
     my ($set_data) =
       $slr->call_by_tag(

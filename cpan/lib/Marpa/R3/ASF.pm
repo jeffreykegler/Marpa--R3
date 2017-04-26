@@ -296,7 +296,6 @@ sub Marpa::R3::Internal::ASF::blessings_set {
     my ( $asf, $default_blessing ) = @_;
     my $slr           = $asf->[Marpa::R3::Internal::ASF::SLR];
     my $slg           = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $tracer        = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
 
     my $default_token_blessing_package =
       $asf->[Marpa::R3::Internal::ASF::DEFAULT_TOKEN_BLESSING_PACKAGE];

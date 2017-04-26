@@ -203,12 +203,6 @@ __DATA__
     REGIX { Registry index in Lua interpreter --
         a valid Lua index but not a pseudo-index. }
 
-    { The "per libmarpa grammar objects", aka "tracers", are objects
-       which hold the data specific to each Libmarpa
-       grammar object.  }
-    L0_TRACER
-    G1_TRACER
-
     CHARACTER_CLASS_TABLE
     DISCARD_EVENT_BY_LEXER_RULE
 

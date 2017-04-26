@@ -71,8 +71,6 @@ sub Marpa::R3::Internal::Scanless::meta_grammar {
     Marpa::R3::Internal::Scanless::G::hash_to_runtime( $meta_slg, $hashed_metag,
         { bless_package => 'Marpa::R3::Internal::MetaAST_Nodes' } );
 
-    my $tracer = $meta_slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
-
     return $meta_slg;
 
 } ## end sub Marpa::R3::Internal::Scanless::meta_grammar
@@ -287,7 +285,6 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     my $trace_fh = $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE];
     # Pre-lexer G1 processing
 
-    my $g1_tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER] =
       per_lmg_init($slg, "g1");
       per_lmg_init($slg, "l0");
 
@@ -1268,7 +1265,6 @@ END_OF_LUA
 sub assign_G1_symbol {
     # $slg will be needed for the XSY's
     my ( $slg, $name, $options ) = @_;
-    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
 
     my $symbol_id = $slg->symbol_by_name($name);
     if ( defined $symbol_id ) {

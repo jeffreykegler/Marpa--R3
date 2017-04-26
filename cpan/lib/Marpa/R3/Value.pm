@@ -404,7 +404,6 @@ END_OF_LUA
 sub resolve_grammar {
 
     my ($slg) = @_;
-    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
 
     my $trace_actions =
       $slg->[Marpa::R3::Internal::Scanless::G::TRACE_ACTIONS] // 0;
@@ -730,7 +729,6 @@ sub registrations_find {
     my ($slg) = @_;
     my $trace_file_handle =
       $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE];
-    my $tracer        = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
     my $trace_actions =
       $slg->[Marpa::R3::Internal::Scanless::G::TRACE_ACTIONS] // 0;
 
