@@ -1867,20 +1867,23 @@ END_OF_LUA
 }
 
 sub Marpa::R3::Scanless::G::rule_name {
-    my ( $slg, $rule_id ) = @_;
-    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
-    my $xbnf_by_irlid = $tracer->[Marpa::R3::Internal::Trace::G::XBNF_BY_IRLID];
-    my $xbnf  = $xbnf_by_irlid->[$rule_id];
-    return "Non-existent rule $rule_id" if not defined $xbnf;
-    my $name = $xbnf->[Marpa::R3::Internal::XBNF::NAME];
-    return $name if defined $name;
-    my ( $lhs_id ) = $slg->rule_expand($rule_id);
+    my ( $slg, $irlid ) = @_;
 
     my ($rule_name) = $slg->call_by_tag(
         ('@' . __FILE__ . ':' .  __LINE__),
-      <<'END_OF_LUA', 'i', $lhs_id);
-    local slg, xrlid = ...
-    return slg.g1.lmw_g:symbol_name(xrlid)
+      <<'END_OF_LUA', 'i', $irlid);
+    local slg, irlid = ...
+    local g1 = slg.g1
+    local irl = g1.irls[irlid]
+    local xbnf = irl.xbnf
+    if not xbnf then
+        return string.format('Non-existent rule %d', irlid)
+    end
+    local name = xbnf.name
+    if name then return name end
+    local lmw_g = g1.lmw_g
+    local lhs_isyid = lmw_g:rule_lhs(irlid)
+    return slg.g1.lmw_g:symbol_name(lhs_isyid)
 END_OF_LUA
 
     return $rule_name;
