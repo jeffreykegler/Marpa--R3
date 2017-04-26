@@ -501,7 +501,7 @@ Populate the `xsys` table.
 
 ```
     -- miranda: section+ most Lua function definitions
-    function xsys_populate(slg, source_hash)
+    function _M.class_slg.xsys_populate(slg, source_hash)
         local xsys = {}
         slg.xsys = xsys
 
@@ -542,7 +542,7 @@ for example in error message.
 
 ```
     -- miranda: section+ most Lua function definitions
-    function xrls_populate(slg, source_hash)
+    function _M.class_slg.xrls_populate(slg, source_hash)
         local xrls = {}
         slg.xrls = xrls
 
@@ -593,9 +593,8 @@ one for each subgrammar.
 
 ```
     -- miranda: section+ most Lua function definitions
-    function xbnfs_populate(slg, source_hash, subgrammar)
+    function _M.class_slg.xbnfs_populate(slg, source_hash, subgrammar)
         local xbnfs = {}
-        slg.xbnfs = xbnfs
         local hash_subg = string.upper(subgrammar)
 
         -- io.stderr:write(inspect(source_hash))

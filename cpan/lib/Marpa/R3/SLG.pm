@@ -301,8 +301,8 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 's', $hashed_source );
         local slg, source_hash = ...
-        xsys_populate(slg, source_hash)
-        return xrls_populate(slg, source_hash)
+        slg:xsys_populate( source_hash)
+        return slg:xrls_populate(source_hash)
 END_OF_LUA
 
     $slg->[Marpa::R3::Internal::Scanless::G::L0_XBNF_BY_ID]   = [];
@@ -367,8 +367,8 @@ END_OF_LUA
     $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 's', $hashed_source );
         local slg, source_hash = ...
-        xbnfs_populate(slg, source_hash, 'l0')
-        xbnfs_populate(slg, source_hash, 'g1')
+        slg:xbnfs_populate(source_hash, 'l0')
+        slg:xbnfs_populate(source_hash, 'g1')
 END_OF_LUA
 
 
