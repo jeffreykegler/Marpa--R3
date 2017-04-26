@@ -305,48 +305,6 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
         return slg:xrls_populate(source_hash)
 END_OF_LUA
 
-    $slg->[Marpa::R3::Internal::Scanless::G::L0_XBNF_BY_ID]   = [];
-    $slg->[Marpa::R3::Internal::Scanless::G::G1_XBNF_BY_ID]   = [];
-    $slg->[Marpa::R3::Internal::Scanless::G::L0_XBNF_BY_NAME] = {};
-    $slg->[Marpa::R3::Internal::Scanless::G::G1_XBNF_BY_NAME] = {};
-    for my $subgrammar (qw(G1 L0)) {
-        my $xbnfs = $hashed_source->{xbnf}->{$subgrammar};
-        my $xbnf_by_id =
-            $subgrammar eq 'L0'
-          ? $slg->[Marpa::R3::Internal::Scanless::G::L0_XBNF_BY_ID]
-          : $slg->[Marpa::R3::Internal::Scanless::G::G1_XBNF_BY_ID];
-        my $xbnf_by_name =
-            $subgrammar eq 'L0'
-          ? $slg->[Marpa::R3::Internal::Scanless::G::L0_XBNF_BY_NAME]
-          : $slg->[Marpa::R3::Internal::Scanless::G::G1_XBNF_BY_NAME];
-
-        # Sort (from major to minor) by start position,
-        # and subkey.
-        for my $xbnf_name (
-            map { $_->[0] }
-            sort {
-                $a->[1] <=> $b->[1]
-                  || $a->[2] <=> $b->[2]
-            }
-            map { [ $_, $xbnfs->{$_}->{start}, $xbnfs->{$_}->{subkey} ] }
-            keys %{$xbnfs}
-          )
-        {
-            $DB::single = 1 if not defined $xbnf_name;
-            my $source_xbnf_data  = $xbnfs->{$xbnf_name};
-            my $runtime_xbnf_data = [];
-          KEY: for my $datum_key ( keys %{$source_xbnf_data} ) {
-                if ( $datum_key eq 'event' ) {
-                    $runtime_xbnf_data->[Marpa::R3::Internal::XBNF::EVENT] =
-                      $source_xbnf_data->{$datum_key};
-                }
-            }
-
-            push @{$xbnf_by_id}, $runtime_xbnf_data;
-            $xbnf_by_name->{$xbnf_name} = $runtime_xbnf_data;
-        }
-    }
-
     $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 's', $hashed_source );
         local slg, source_hash = ...
@@ -1496,9 +1454,6 @@ sub add_L0_user_rules {
 sub add_G1_user_rule {
     my ( $slg, $options ) = @_;
 
-    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
-    my $subgrammar = $tracer->[Marpa::R3::Internal::Trace::G::NAME];
-
     my ( $lhs_name, $rhs_names, $action, $blessing );
     my ( $min, $separator_name );
     my $rank;
@@ -1668,8 +1623,6 @@ END_OF_LUA
 
 sub add_L0_user_rule {
     my ( $slg, $options ) = @_;
-
-    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER];
 
     my ( $lhs_name, $rhs_names, $action, $blessing );
     my ( $min, $separator_name );
@@ -1930,34 +1883,32 @@ sub Marpa::R3::Scanless::G::l0_symbol_dsl_form {
 sub Marpa::R3::Scanless::G::rule_show
 {
     my ( $slg, $rule_id ) = @_;
-    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER];
-    return slg_rule_show($slg, $tracer, $rule_id);
+    return slg_rule_show($slg, 'g1', $rule_id);
 }
 
 sub Marpa::R3::Scanless::G::l0_rule_show
 {
     my ( $slg, $rule_id ) = @_;
-    my $tracer = $slg->[Marpa::R3::Internal::Scanless::G::L0_TRACER];
-    return slg_rule_show($slg, $tracer, $rule_id);
+    return slg_rule_show($slg, 'l0', $rule_id);
 }
 
 sub Marpa::R3::Scanless::G::call_by_tag {
     my ( $slg, $tag, $codestr, $sig, @args ) = @_;
     my $lua = $slg->[Marpa::R3::Internal::Scanless::G::L];
     my $regix = $slg->[Marpa::R3::Internal::Scanless::G::REGIX];
-    $DB::single = 1 if not defined $lua;
-    $DB::single = 1 if not defined $regix;
-    $DB::single = 1 if not defined $tag;
-    $DB::single = 1 if not defined $codestr;
-    $DB::single = 1 if not defined $sig;
-    $DB::single = 1 if grep { not defined $_ } @args;
+    # $DB::single = 1 if not defined $lua;
+    # $DB::single = 1 if not defined $regix;
+    # $DB::single = 1 if not defined $tag;
+    # $DB::single = 1 if not defined $codestr;
+    # $DB::single = 1 if not defined $sig;
+    # $DB::single = 1 if grep { not defined $_ } @args;
     my @results = $lua->call_by_tag($regix, $tag, $codestr, $sig, @args);
     return @results;
 }
 
 sub slg_rule_show {
-    my ( $slg, $tracer, $irlid ) = @_;
-    my $subg_name     = $tracer->[Marpa::R3::Internal::Trace::G::SUBG_NAME];
+    my ( $slg, $subg_name, $irlid ) = @_;
+
     my ($symbol_ids) = $slg->call_by_tag(
     ('@' .__FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', 'si>*', $subg_name, $irlid ) ;
