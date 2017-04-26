@@ -1875,7 +1875,16 @@ sub Marpa::R3::Scanless::G::rule_name {
     my $name = $xbnf->[Marpa::R3::Internal::XBNF::NAME];
     return $name if defined $name;
     my ( $lhs_id ) = $slg->rule_expand($rule_id);
-    return $slg->symbol_name($lhs_id);
+
+    my ($rule_name) = $slg->call_by_tag(
+        ('@' . __FILE__ . ':' .  __LINE__),
+      <<'END_OF_LUA', 'i', $lhs_id);
+    local slg, xrlid = ...
+    return slg.g1.lmw_g:symbol_name(xrlid)
+END_OF_LUA
+
+    return $rule_name;
+
 }
 
 sub Marpa::R3::Scanless::G::rule_expand {
