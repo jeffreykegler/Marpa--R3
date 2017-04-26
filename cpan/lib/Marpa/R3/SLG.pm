@@ -817,10 +817,19 @@ END_OF_LUA
 
         my ( $event_name, $event_starts_active ) = @{$event};
         if ( $event_name eq q{'symbol} ) {
-            my @event = (
-                $event = $xbnf->[Marpa::R3::Internal::XBNF::SYMBOL_AS_EVENT],
-                $event_starts_active
-            );
+
+    my ($symbol_as_event) = $slg->call_by_tag(
+    ('@' .__FILE__ . ':' . __LINE__),
+    <<'END_OF_LUA', 'i>*', $irlid ) ;
+    local slg, irlid = ...
+    local irl = slg.l0.irls[irlid]
+    -- at this point, xbnf must be defined
+    local xbnf = irl.xbnf
+    return xbnf.symbol_as_event
+END_OF_LUA
+
+            $event = $symbol_as_event;
+            my @event = ( $event, $event_starts_active );
             $discard_event_by_lexer_rule_id[$irlid] = \@event;
             next RULE_ID;
         } ## end if ( $event_name eq q{'symbol} )
