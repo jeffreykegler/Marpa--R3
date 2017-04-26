@@ -255,14 +255,9 @@ END_OF_LUA
 # not to be documented
 sub per_lmg_init {
     my ( $slg, $name ) = @_;
-    my $field_name_form = lc $name;
-    my $per_lmg = [];
-    $per_lmg->[Marpa::R3::Internal::Trace::G::NAME] = $name;
-    $per_lmg->[Marpa::R3::Internal::Trace::G::SUBG_NAME]            = $field_name_form;
-    $slg->[Marpa::R3::Internal::Scanless::G::PER_LMG]->{$field_name_form} = $per_lmg;
 
     $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 's', $field_name_form );
+        <<'END_OF_LUA', 's', $name );
     local g, field_name_form = ...
     local lmw_g = kollos.grammar_new()
     -- TODO Replace g.lmw_g1g with g.g1.lmw_g everywhere
@@ -278,7 +273,6 @@ sub per_lmg_init {
     lmw_g.short_name = field_name_form
 END_OF_LUA
 
-    return $per_lmg;
 }
 
 # The object, in computing the hash, is to get as much
@@ -294,8 +288,8 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     # Pre-lexer G1 processing
 
     my $g1_tracer = $slg->[Marpa::R3::Internal::Scanless::G::G1_TRACER] =
-      per_lmg_init($slg, "G1");
-      per_lmg_init($slg, "L0");
+      per_lmg_init($slg, "g1");
+      per_lmg_init($slg, "l0");
 
     $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 's', $hashed_source );
@@ -2186,12 +2180,10 @@ sub Marpa::R3::Scanless::G::lmg_symbol_display_form {
 
 sub Marpa::R3::Scanless::G::lmg_show_symbols {
     my ( $slg, $subg_name, $verbose ) = @_;
-    my $per_lmg =
-      $slg->[Marpa::R3::Internal::Scanless::G::PER_LMG]->{$subg_name};
     my $text = q{};
     $verbose //= 0;
 
-    my $grammar_name = $per_lmg->[Marpa::R3::Internal::Trace::G::NAME];
+    my $grammar_name = uc $subg_name;
 
     my ($highest_symbol_id) =
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
@@ -2258,9 +2250,7 @@ sub Marpa::R3::Scanless::G::lmg_show_rules {
     my $text = q{};
     $verbose //= 0;
 
-    my $per_lmg =
-      $slg->[Marpa::R3::Internal::Scanless::G::PER_LMG]->{$subg_name};
-    my $grammar_name = $per_lmg->[Marpa::R3::Internal::Trace::G::NAME];
+    my $grammar_name = uc $subg_name;
 
     my ($highest_rule_id) = $slg->call_by_tag(
     ('@' .__FILE__ . ':' . __LINE__),

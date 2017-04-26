@@ -206,7 +206,6 @@ __DATA__
     { The "per libmarpa grammar objects", aka "tracers", are objects
        which hold the data specific to each Libmarpa
        grammar object.  }
-    PER_LMG
     L0_TRACER
     G1_TRACER
 
