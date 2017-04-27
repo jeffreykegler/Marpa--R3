@@ -250,29 +250,6 @@ END_OF_LUA
 
 } ## end sub Marpa::R3::Internal::Scanless::G::set
 
-# not to be documented
-sub per_lmg_init {
-    my ( $slg, $name ) = @_;
-
-    $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 's', $name );
-    local g, field_name_form = ...
-    local lmw_g = kollos.grammar_new()
-    -- TODO Replace g.lmw_g1g with g.g1.lmw_g everywhere
-    g[field_name_form] = {
-        lmw_g = lmw_g,
-        name = field_name_form,
-        xsy_by_isyid = {},
-        xbnf_by_irlid = {},
-        isys = {},
-        irls = {}
-    }
-    lmw_g:force_valued()
-    lmw_g.short_name = field_name_form
-END_OF_LUA
-
-}
-
 # The object, in computing the hash, is to get as much
 # precomputation in as possible, without using undue space.
 # That means CPU-intensive processing should tend to be done
@@ -291,16 +268,10 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
         _M.class_lyg.new(slg, 'g1')
         _M.class_lyg.new(slg, 'l0')
         slg:xsys_populate( source_hash)
-        return slg:xrls_populate(source_hash)
-END_OF_LUA
-
-    $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 's', $hashed_source );
-        local slg, source_hash = ...
+        slg:xrls_populate(source_hash)
         slg:xbnfs_populate(source_hash, 'l0')
         slg:xbnfs_populate(source_hash, 'g1')
 END_OF_LUA
-
 
     my $if_inaccessible_default_arg =
       $hashed_source->{defaults}->{if_inaccessible};
