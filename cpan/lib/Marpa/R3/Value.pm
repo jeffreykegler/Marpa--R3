@@ -1481,21 +1481,19 @@ sub Marpa::R3::Scanless::R::value {
           if ref $slr ne 'Marpa::R3::Scanless::R';
     }
 
-    $slr->[Marpa::R3::Internal::Scanless::R::TREE_MODE] //= 'tree';
-    if ( $slr->[Marpa::R3::Internal::Scanless::R::TREE_MODE] ne 'tree' ) {
-        Marpa::R3::exception(
-            "value() called when recognizer is not in tree mode\n",
-            '  The current mode is "',
-            $slr->[Marpa::R3::Internal::Scanless::R::TREE_MODE],
-            qq{"\n}
-        );
-    }
-
     my ($result) = $slr->call_by_tag( ( __FILE__ . ':' . __LINE__ ),
         << 'END_OF_LUA', '>*' );
             recce=...
     local g1r = recce.lmw_g1r
+
     recce.tree_mode = recce.tree_mode or 'tree'
+    if recce.tree_mode ~= 'tree' then
+        error(
+            "value() called when recognizer is not in tree mode\n"
+            .. string.format('  The current mode is %q\n', recce.tree_mode)
+        )
+    end
+
     recce.phase = 'value'
     local furthest_earleme = g1r:furthest_earleme()
     local last_completed_earleme = g1r:current_earleme()

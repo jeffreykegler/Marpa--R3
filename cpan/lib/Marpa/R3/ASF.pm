@@ -409,21 +409,17 @@ sub Marpa::R3::ASF::new {
 
     my $slg       = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
 
-    if ( defined $slr->[Marpa::R3::Internal::Scanless::R::TREE_MODE] ) {
-
-        # If we already in ASF mode, or are in valuation mode, we cannot create an ASF
-        Marpa::R3::exception(
-            "An attempt was made to create an ASF for a SLIF recognizer already in use\n",
-            "   The recognizer must be reset first\n",
-            '  The current SLIF recognizer mode is "',
-            $slr->[Marpa::R3::Internal::Scanless::R::TREE_MODE],
-            qq{"\n}
-        );
-    }
-
      $slr->call_by_tag( ('@' . __FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', '');
     local recce = ...
+    if recce.tree_mode then
+        error(
+            "An attempt was made to create an ASF for a SLIF recognizer already in use\n"
+            .. "   The recognizer must be reset first\n"
+            .. string.format('  The current SLIF recognizer mode is $q\n', 
+                recce.tree_mode)
+        )
+    end
     recce.tree_mode = 'forest'
 END_OF_LUA
 
