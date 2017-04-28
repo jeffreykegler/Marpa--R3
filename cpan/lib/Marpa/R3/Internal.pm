@@ -116,11 +116,9 @@ package Marpa::R3::Internal::Scanless::R;
 use constant SLG => 0;
 use constant L => 1;
 use constant REGIX => 2;
-use constant PHASE => 3;
-use constant P_INPUT_STRING => 4;
-use constant TRACE_FILE_HANDLE => 5;
-use constant TRACE_VALUES => 6;
-use constant EVENTS => 7;
-use constant TREE_MODE => 8;
+use constant P_INPUT_STRING => 3;
+use constant TRACE_FILE_HANDLE => 4;
+use constant TRACE_VALUES => 5;
+use constant EVENTS => 6;
 
 1;

@@ -423,8 +423,6 @@ sub Marpa::R3::ASF::new {
     recce.tree_mode = 'forest'
 END_OF_LUA
 
-    $slr->[Marpa::R3::Internal::Scanless::R::TREE_MODE] = 'forest';
-
     (   $asf->[Marpa::R3::Internal::ASF::RULE_RESOLUTIONS],
         $asf->[Marpa::R3::Internal::ASF::LEXEME_RESOLUTIONS]
     ) = Marpa::R3::Internal::Value::resolve_grammar( $slg );

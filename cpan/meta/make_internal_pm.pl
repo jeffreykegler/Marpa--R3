@@ -230,23 +230,12 @@ __DATA__
     L { Lua Interpreter }
     REGIX { Registry index in Lua interpreter --
         a valid Lua index but not a pseudo-index. }
-    PHASE {
-        "initial", "read", "value"
-    }
 
     P_INPUT_STRING
 
     TRACE_FILE_HANDLE
     TRACE_VALUES
     EVENTS
-
-    { The following fields must be reinitialized when
-    evaluation is reset }
-
-    TREE_MODE { 'tree' or 'forest' or undef }
-
-    { This is the end of the list of fields which
-    must be reinitialized when evaluation is reset }
 
     { vim: set expandtab shiftwidth=4:
     }
