@@ -129,7 +129,6 @@ sub Marpa::R3::Scanless::R::new {
 
     # Set recognizer args to default
     $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] = [];
-    $slr->[Marpa::R3::Internal::Scanless::R::PHASE] = "initial";
 
     my ($flat_args, $error_message) = Marpa::R3::flatten_hash_args(\@args);
     Marpa::R3::exception( sprintf $error_message, '$slr->new' ) if not $flat_args;
@@ -578,8 +577,6 @@ sub Marpa::R3::Scanless::R::read {
             qq{Arg to Marpa::R3::Scanless::R::read() is a ref to an undef\n},
             '  It should be a ref to a defined scalar' );
     } ## end if ( ( my $ref_type = ref $p_string ) ne 'SCALAR' )
-
-    $slr->[Marpa::R3::Internal::Scanless::R::PHASE] = "read";
 
     $slr->[Marpa::R3::Internal::Scanless::R::P_INPUT_STRING] = $p_string;
 
@@ -1501,8 +1498,6 @@ sub Marpa::R3::Scanless::G::parse {
 sub Marpa::R3::Scanless::R::series_restart {
     my ( $slr , @args ) = @_;
 
-    $slr->[Marpa::R3::Internal::Scanless::R::PHASE] = "read";
-
     $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         'local recce = ...; recce.phase = "read"', '' );
     $slr->reset_evaluation();
@@ -1535,7 +1530,12 @@ sub Marpa::R3::Scanless::R::reset_evaluation {
     $slr->[Marpa::R3::Internal::Scanless::R::TREE_MODE] = undef;
 
     $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        'local recce = ...; recce:valuation_reset()', '' );
+    <<'END_OF_LUA', '' );
+        local recce = ...
+        recce.tree_mode = nil
+        recce:valuation_reset()
+END_OF_LUA
+
     return;
 }
 

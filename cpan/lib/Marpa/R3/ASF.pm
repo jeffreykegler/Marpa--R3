@@ -420,6 +420,13 @@ sub Marpa::R3::ASF::new {
             qq{"\n}
         );
     }
+
+     $slr->call_by_tag( ('@' . __FILE__ . ':' . __LINE__),
+    <<'END_OF_LUA', '');
+    local recce = ...
+    recce.tree_mode = 'forest'
+END_OF_LUA
+
     $slr->[Marpa::R3::Internal::Scanless::R::TREE_MODE] = 'forest';
 
     (   $asf->[Marpa::R3::Internal::ASF::RULE_RESOLUTIONS],
@@ -446,7 +453,7 @@ sub Marpa::R3::ASF::new {
     my ($is_null) = $slr->call_by_tag(
     ('@' . __FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', '>*' ) ;
-    recce = ...
+    local recce = ...
     local order = recce:ordering_get()
     if not order then
         error( 'Parse failed' )

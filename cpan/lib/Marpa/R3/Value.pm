@@ -1491,12 +1491,11 @@ sub Marpa::R3::Scanless::R::value {
         );
     }
 
-    $slr->[Marpa::R3::Internal::Scanless::R::PHASE] = "value";
-
     my ($result) = $slr->call_by_tag( ( __FILE__ . ':' . __LINE__ ),
         << 'END_OF_LUA', '>*' );
             recce=...
     local g1r = recce.lmw_g1r
+    recce.tree_mode = recce.tree_mode or 'tree'
     recce.phase = 'value'
     local furthest_earleme = g1r:furthest_earleme()
     local last_completed_earleme = g1r:current_earleme()
