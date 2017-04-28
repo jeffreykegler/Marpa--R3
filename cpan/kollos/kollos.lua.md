@@ -5261,10 +5261,6 @@ is returned.
       { NULL, NULL },
     };
 
-    -- miranda: section+ C function declarations
-
-    /* bocage wrappers which need to be hand-written */
-
     -- miranda: section+ luaL_Reg definitions
 
     static const struct luaL_Reg bocage_methods[] = {
@@ -5284,10 +5280,6 @@ is returned.
       { "error_description", lca_libmarpa_error_description },
       { NULL, NULL },
     };
-
-    -- miranda: section+ C function declarations
-
-    /* tree wrappers which need to be hand-written */
 
     -- miranda: section+ luaL_Reg definitions
 
@@ -5994,6 +5986,53 @@ and error codes.
     function _M.posix_lc(str)
        return str:gsub('[A-Z]', function(str) return string.char(string.byte(str)) end)
     end
+
+```
+
+### VLQ (Variable-Length Quantity)
+
+This is an implementation of
+[VLQ (Variable-Length Quantity)|https://en.wikipedia.org/wiki/Variable-length_quantity].
+
+```
+    -- miranda: section+ C function declarations
+    unsigned char* to_vlq(lua_Unsigned x, unsigned char *out);
+    -- miranda: section+ external C function definitions
+    unsigned char* to_vlq(lua_Unsigned x, unsigned char *out)
+    {
+            unsigned char buf[(8*sizeof(lua_Unsigned))/7 + 1];
+            unsigned char *p_buf = buf;
+            unsigned char *p_out = out;
+            int byte_count;
+            for (;;) {
+                *p_buf = x & 0x7F;
+                x >>= 7;
+                if (x == 0) break;
+                *p_buf |= 0x80;
+                p_buf++;
+            }
+            byte_count = (p_buf - buf) + 1;
+            while (byte_count--) {
+               *p_out++ = *p_buf--;
+            }
+            return p_out;
+    }
+
+    -- miranda: section+ C function declarations
+    unsigned char* from_vlq(unsigned char *in, lua_Unsigned* p_x);
+    -- miranda: section+ external C function definitions
+    unsigned char* from_vlq(unsigned char *in, lua_Unsigned* p_x)
+    {
+            lua_Unsigned r = 0;
+            unsigned char this_byte;
+
+            do {
+                this_byte = *in++;
+                r = (r << 7) | (this_byte & 0x7F);
+            } while (this_byte & 0x80);
+            *p_x = r;
+            return in;
+    }
 
 ```
 
