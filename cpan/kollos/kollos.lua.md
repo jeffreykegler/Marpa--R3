@@ -644,6 +644,8 @@ one for each subgrammar.
             local source_event = xbnf_source.event
             if source_event then
                 runtime_xbnf.event_name = source_event[1]
+                -- TODO revisit type (boolean? string? integer?)
+                --   once conversion to Lua is complete
                 runtime_xbnf.event_starts_active
                     = (math.tointeger(source_event[2]) ~= 0)
             end

@@ -1497,6 +1497,7 @@ sub Marpa::R3::Scanless::R::value {
         << 'END_OF_LUA', '>*' );
             recce=...
     local g1r = recce.lmw_g1r
+    recce.phase = 'value'
     local furthest_earleme = g1r:furthest_earleme()
     local last_completed_earleme = g1r:current_earleme()
     if furthest_earleme ~= last_completed_earleme then

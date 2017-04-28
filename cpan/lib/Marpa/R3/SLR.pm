@@ -163,6 +163,7 @@ sub Marpa::R3::Scanless::R::new {
     <<'END_OF_LUA', 'i', $slg_regix);
     local slg_lua_ref = ...
     local recce = {}
+    recce.phase = 'initial'
     local registry = debug.getregistry()
     setmetatable(recce, _M.class_slr)
     local grammar = registry[slg_lua_ref]
@@ -176,7 +177,16 @@ sub Marpa::R3::Scanless::R::new {
     recce.codepoint = nil
     recce.max_parses = nil
     recce.es_data = {}
+
+    -- Events are higher priority, and are cleared
+    --   at the beginning of many methods.
+    --   Traces are lower priority, and are cleared
+    --   only when returned to Perl.
+    -- TODO but there are also traces in event queue
+    --   What to do?
     recce.event_queue = {}
+    recce.trace_queue = {}
+
     recce.lexeme_queue = {}
     recce.accept_queue = {}
 
@@ -577,6 +587,7 @@ sub Marpa::R3::Scanless::R::read {
     ('@' . __FILE__ . ':' . __LINE__),
         <<'END_OF_LUA', 'i', [unpack('C*', ${$p_string})],
             local recce, codepoints = ...
+            recce.phase = 'read'
             -- print("codepoints:", inspect(codepoints))
             recce.codepoints = codepoints
 END_OF_LUA
@@ -935,25 +946,26 @@ sub Marpa::R3::Scanless::R::resume {
         '  The string should be set first using read()'
     ) if not defined $slr->[Marpa::R3::Internal::Scanless::R::P_INPUT_STRING];
 
-    if ( $slr->[Marpa::R3::Internal::Scanless::R::PHASE] ne "read" ) {
-        if ( $slr->[Marpa::R3::Internal::Scanless::R::PHASE] eq "value" ) {
-            Marpa::R3::exception(
-"Attempt to resume an SLIF recce while the parse is being evaluated\n",
-                '   The resume() method is not allowed once value() is called'
-            );
-        }
-        Marpa::R3::exception(
-            "Attempt to resume an SLIF recce which is not in the Read Phase\n",
-            '   The resume() method is only allowed in the Read Phase'
-        );
-    }
-
     {
        my $length_arg = $length // -1;
        my $start_pos_arg = $start_pos // 'undef';
        $slr->call_by_tag(( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'si', $start_pos_arg, $length_arg);
             local recce, start_pos_arg, length_arg = ...
+
+            if recce.phase ~= 'read' then
+                if recce.phase == 'value' then
+                    error(
+                        "Attempt to resume an SLIF recce while the parse is being evaluated\n"
+                        .. '   The resume() method is not allowed once value() is called'
+                    )
+                end
+                error(
+                    "Attempt to resume an SLIF recce which is not in the Read Phase\n"
+                    .. '   The resume() method is only allowed in the Read Phase'
+                )
+            end
+
             local start_pos
             if start_pos_arg == 'undef' then
                 start_pos = recce.perl_pos
@@ -1490,6 +1502,9 @@ sub Marpa::R3::Scanless::R::series_restart {
     my ( $slr , @args ) = @_;
 
     $slr->[Marpa::R3::Internal::Scanless::R::PHASE] = "read";
+
+    $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        'local recce = ...; recce.phase = "read"', '' );
     $slr->reset_evaluation();
 
     my ($flat_args, $error_message) = Marpa::R3::flatten_hash_args(\@args);
