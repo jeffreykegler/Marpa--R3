@@ -401,6 +401,8 @@ is a reference and Lua's GC will do the right thing.
 
     -- miranda: section+ luaL_Reg definitions
     static const struct luaL_Reg kollos_funcs[] = {
+      { "from_vlq", lca_from_vlq },
+      { "to_vlq", lca_to_vlq },
       { "registry_get", lca_registry_get },
       { "register", lca_register },
       { "unregister", lca_unregister },
@@ -5995,12 +5997,47 @@ This is an implementation of
 [VLQ (Variable-Length Quantity)|https://en.wikipedia.org/wiki/Variable-length_quantity].
 
 ```
-    -- miranda: section+ C function declarations
-    unsigned char* to_vlq(lua_Unsigned x, unsigned char *out);
-    -- miranda: section+ external C function definitions
-    unsigned char* to_vlq(lua_Unsigned x, unsigned char *out)
+    -- miranda: section+ kollos table methods
+    /*
+    ** From the Lua code
+    ** Check that 'arg' either is a table or can behave like one (that is,
+    ** has a metatable with the required metamethods)
+    */
+
+    /*
+    ** Operations that an object must define to mimic a table
+    ** (some functions only need some of them)
+    */
+    #define TAB_R 1   /* read */
+    #define TAB_W 2   /* write */
+    #define TAB_L 4   /* length */
+    #define TAB_RW (TAB_R | TAB_W)  /* read/write */
+    #define UNSIGNED_VLQ_SIZE ((8*sizeof(lua_Unsigned))/7 + 1)
+
+    #define aux_getn(L,n,w) (checktab(L, n, (w) | TAB_L), marpa_luaL_len(L, n))
+
+    static int checkfield (lua_State *L, const char *key, int n) {
+      marpa_lua_pushstring(L, key);
+      return (marpa_lua_rawget(L, -n) != LUA_TNIL);
+    }
+
+    static void checktab (lua_State *L, int arg, int what) {
+      if (marpa_lua_type(L, arg) != LUA_TTABLE) {  /* is it not a table? */
+        int n = 1;  /* number of elements to pop */
+        if (marpa_lua_getmetatable(L, arg) &&  /* must have metatable */
+            (!(what & TAB_R) || checkfield(L, "__index", ++n)) &&
+            (!(what & TAB_W) || checkfield(L, "__newindex", ++n)) &&
+            (!(what & TAB_L) || checkfield(L, "__len", ++n))) {
+          marpa_lua_pop(L, n);  /* pop metatable and tested metamethods */
+        }
+        else
+          marpa_luaL_argerror(L, arg, "table expected");  /* force an error */
+      }
+    }
+
+    static const unsigned char* uint_to_vlq(lua_Unsigned x, unsigned char *out)
     {
-            unsigned char buf[(8*sizeof(lua_Unsigned))/7 + 1];
+            unsigned char buf[UNSIGNED_VLQ_SIZE];
             unsigned char *p_buf = buf;
             unsigned char *p_out = out;
             int byte_count;
@@ -6018,10 +6055,8 @@ This is an implementation of
             return p_out;
     }
 
-    -- miranda: section+ C function declarations
-    unsigned char* from_vlq(unsigned char *in, lua_Unsigned* p_x);
-    -- miranda: section+ external C function definitions
-    unsigned char* from_vlq(unsigned char *in, lua_Unsigned* p_x)
+    static const unsigned char* uint_from_vlq(
+        const unsigned char *in, lua_Unsigned* p_x)
     {
             lua_Unsigned r = 0;
             unsigned char this_byte;
@@ -6032,6 +6067,56 @@ This is an implementation of
             } while (this_byte & 0x80);
             *p_x = r;
             return in;
+    }
+
+```
+
+Kollos static function for creating VLQ strings.
+
+```
+    -- miranda: section+ kollos table methods
+    static int lca_to_vlq (lua_State *L) {
+      int i;
+      unsigned char vlq_buf[UNSIGNED_VLQ_SIZE];
+      luaL_Buffer b;
+      lua_Integer last = aux_getn(L, 1, TAB_R);
+      marpa_luaL_buffinit(L, &b);
+      for (i = 1; i <= last; i++) {
+        lua_Unsigned x;
+        const unsigned char *eobuf;
+        marpa_lua_geti(L, 1, i);
+        x = (lua_Unsigned)marpa_lua_tointeger(L, -1);
+        /* Stack must be restored before luaL_addlstring() */
+        marpa_lua_pop(L, 1);
+        eobuf = uint_to_vlq(x, vlq_buf);
+        marpa_luaL_addlstring(&b, (char *)vlq_buf,
+            (size_t)(eobuf - vlq_buf));
+      }
+      marpa_luaL_pushresult(&b);
+      return 1;
+    }
+
+```
+
+Kollos static function for unpacking VLQ strings
+into integer sequences.
+
+```
+    -- miranda: section+ kollos table methods
+    static int lca_from_vlq (lua_State *L) {
+      int i;
+      size_t vlq_len;
+      const unsigned char *vlq
+          = (unsigned char *)marpa_luaL_checklstring(L, 1, &vlq_len);
+      const unsigned char *p = vlq;
+      marpa_lua_newtable(L);
+      for (i = 1; (size_t)(p - vlq) < vlq_len; i++) {
+        lua_Unsigned x;
+        p = uint_from_vlq(vlq, &x);
+        marpa_lua_pushinteger(L, (lua_Integer)x);
+        marpa_lua_rawseti(L, 2, i);
+      }
+      return 1;
     }
 
 ```

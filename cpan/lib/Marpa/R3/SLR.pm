@@ -173,7 +173,10 @@ sub Marpa::R3::Scanless::R::new {
     local g1g = grammar.g1.lmw_g
     recce.lmw_g1r = _M.recce_new(g1g)
     recce.lmw_g1r.lmw_g = g1g
+
     recce.codepoint = nil
+    recce.input = {}
+
     recce.max_parses = nil
     recce.es_data = {}
 
@@ -560,10 +563,6 @@ sub Marpa::R3::Scanless::R::read {
 
     $start_pos //= 0;
     $length    //= -1;
-    Marpa::R3::exception(
-        "Multiple read()'s tried on a scannerless recognizer\n",
-        '  Currently the string cannot be changed once set'
-    ) if defined $slr->[Marpa::R3::Internal::Scanless::R::P_INPUT_STRING];
 
     if ( ( my $ref_type = ref $p_string ) ne 'SCALAR' ) {
         my $desc = $ref_type ? "a ref to $ref_type" : 'not a ref';
@@ -582,13 +581,23 @@ sub Marpa::R3::Scanless::R::read {
 
     $slr->call_by_tag(
     ('@' . __FILE__ . ':' . __LINE__),
-        <<'END_OF_LUA', 'i', [unpack('C*', ${$p_string})],
-            local recce, codepoints = ...
+        <<'END_OF_LUA', 'is', [unpack('C*', ${$p_string})], ${$p_string});
+            local recce, codepoints, input_string = ...
+            local inputs = recce.input
+            -- Currently only one physical input string is allowed
+            if #inputs > 0 then
+                error(
+                "Multiple read()'s tried on a scannerless recognizer\n"
+                .. '  Currently the string cannot be changed once set'
+                )
+            end
+            this_input = {}
+            inputs[#inputs + 1] = this_input
+            this_input.text = input_string
             recce.phase = 'read'
             -- print("codepoints:", inspect(codepoints))
             recce.codepoints = codepoints
 END_OF_LUA
-            );
 
     return 0 if @{ $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] };
 
