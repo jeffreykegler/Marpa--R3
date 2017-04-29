@@ -581,8 +581,8 @@ sub Marpa::R3::Scanless::R::read {
 
     $slr->call_by_tag(
     ('@' . __FILE__ . ':' . __LINE__),
-        <<'END_OF_LUA', 'is', [unpack('C*', ${$p_string})], ${$p_string});
-            local recce, codepoints, input_string = ...
+        <<'END_OF_LUA', 's', ${$p_string});
+            local recce, input_string = ...
             local inputs = recce.input
             -- Currently only one physical input string is allowed
             if #inputs > 0 then
@@ -596,18 +596,10 @@ sub Marpa::R3::Scanless::R::read {
             this_input.text = input_string
             local ix = 1
 
-            --[=[
+            local codepoints = {}
             for byte_p, codepoint in utf8.codes(input_string) do
-                if codepoint ~= codepoints[ix] then
-                    io.stderr:write(input_string, "\n")
-                    error(string.format("Codepoint mismatch at %d: %c vs. %c",
-                        ix,
-                        codepoint,
-                        codepoints[ix]))
-                end
-                ix = ix + 1
+                codepoints[#codepoints+1] = codepoint
             end
-            --]=]
 
             recce.phase = 'read'
             -- print("codepoints:", inspect(codepoints))
