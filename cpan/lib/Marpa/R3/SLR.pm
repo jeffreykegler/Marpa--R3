@@ -5,7 +5,7 @@
 # of the licenses in the directory LICENSES.
 #
 # This program is distributed in the hope that it will be
-# useful, but it is provided “as is” and without any express
+# useful, but it is provided "as is" and without any express
 # or implied warranties. For details, see the full text of
 # of the licenses in the directory LICENSES.
 
@@ -591,9 +591,24 @@ sub Marpa::R3::Scanless::R::read {
                 .. '  Currently the string cannot be changed once set'
                 )
             end
-            this_input = {}
+            local this_input = {}
             inputs[#inputs + 1] = this_input
             this_input.text = input_string
+            local ix = 1
+
+            --[=[
+            for byte_p, codepoint in utf8.codes(input_string) do
+                if codepoint ~= codepoints[ix] then
+                    io.stderr:write(input_string, "\n")
+                    error(string.format("Codepoint mismatch at %d: %c vs. %c",
+                        ix,
+                        codepoint,
+                        codepoints[ix]))
+                end
+                ix = ix + 1
+            end
+            --]=]
+
             recce.phase = 'read'
             -- print("codepoints:", inspect(codepoints))
             recce.codepoints = codepoints

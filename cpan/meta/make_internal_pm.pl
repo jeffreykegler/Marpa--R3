@@ -6,7 +6,7 @@
 # of the licenses in the directory LICENSES.
 #
 # This program is distributed in the hope that it will be
-# useful, but it is provided “as is” and without any express
+# useful, but it is provided "as is" and without any express
 # or implied warranties. For details, see the full text of
 # of the licenses in the directory LICENSES.
 
@@ -75,7 +75,7 @@ $HEADER = <<'END_OF_HEADER';
 # of the licenses in the directory LICENSES.
 #
 # This program is distributed in the hope that it will be
-# useful, but it is provided “as is” and without any express
+# useful, but it is provided "as is" and without any express
 # or implied warranties. For details, see the full text of
 # of the licenses in the directory LICENSES.
 
