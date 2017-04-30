@@ -597,8 +597,48 @@ sub Marpa::R3::Scanless::R::read {
             local ix = 1
 
             local codepoints = {}
+            local eols = {
+                [0x0A] = 0x0A,
+                [0x0D] = 0x0D,
+                [0x0085] = 0x0085,
+                [0x000B] = 0x000B,
+                [0x000C] = 0x000C,
+                [0x2028] = 0x2028,
+                [0x2029] = 0x2029
+            }
+            local eol_seen = false
+            local line_no = 1
+            local column_no = 0
             for byte_p, codepoint in utf8.codes(input_string) do
                 codepoints[#codepoints+1] = codepoint
+                -- TODO: add line numbering logic
+                if eol_seen
+                   and (eol_seen ~= 0x0D or codepoint ~= 0X0A)
+                then
+                   eol_seen = false
+                   line_no = line_no + 1
+                   column_no = 0
+                end
+                column_no = column_no + 1
+                eol_seen = eols[codepoint]
+
+                -- print('lc:', line_no, column_no)
+                local vlq = _M.to_vlq({ byte_p, line_no, column_no })
+                -- TODO: eliminate this check after development
+                local codepoint_data = _M.from_vlq(vlq)
+                if
+                    #codepoint_data ~= 3
+                    or codepoint_data[1] ~= byte_p
+                    or codepoint_data[2] ~= line_no
+                    or codepoint_data[3] ~= column_no
+                then
+                    error(string.format("VLQ issue: %d, %d, %d vs. %s",
+                        byte_p,
+                        line_no,
+                        column_no,
+                        inspect(codepoint_data)
+                    ))
+                end
             end
 
             recce.phase = 'read'

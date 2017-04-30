@@ -6040,18 +6040,23 @@ This is an implementation of
             unsigned char buf[UNSIGNED_VLQ_SIZE];
             unsigned char *p_buf = buf;
             unsigned char *p_out = out;
-            int byte_count;
+      if (0) printf("%s %s %d %lu\n", __PRETTY_FUNCTION__, __FILE__, __LINE__, (unsigned long)x);
             for (;;) {
                 *p_buf = x & 0x7F;
+      if (0) printf("%s %s %d byte = %lu\n", __PRETTY_FUNCTION__, __FILE__, __LINE__, (unsigned long)(*p_buf));
+      if (0) printf("%s %s %d %lu\n", __PRETTY_FUNCTION__, __FILE__, __LINE__, (unsigned long)x);
                 x >>= 7;
+      if (0) printf("%s %s %d %lu\n", __PRETTY_FUNCTION__, __FILE__, __LINE__, (unsigned long)x);
                 if (x == 0) break;
-                *p_buf |= 0x80;
                 p_buf++;
             }
-            byte_count = (p_buf - buf) + 1;
-            while (byte_count--) {
-               *p_out++ = *p_buf--;
+            while (p_buf > buf) {
+      if (0) printf("%s %s %d p_buf byte = %lu\n", __PRETTY_FUNCTION__, __FILE__, __LINE__, (unsigned long)(*p_buf));
+               unsigned char this_byte = *p_buf;
+               p_buf--;
+               *p_out++ = this_byte | 0x80;
             }
+            *p_out++ = *p_buf;
             return p_out;
     }
 
@@ -6062,7 +6067,9 @@ This is an implementation of
             unsigned char this_byte;
 
             do {
+      if (0) printf("%s %s %d in byte = %lu\n", __PRETTY_FUNCTION__, __FILE__, __LINE__, (unsigned long)(*in));
                 this_byte = *in++;
+      if (0) printf("%s %s %d %lu\n", __PRETTY_FUNCTION__, __FILE__, __LINE__, (unsigned long)r);
                 r = (r << 7) | (this_byte & 0x7F);
             } while (this_byte & 0x80);
             *p_x = r;
@@ -6110,12 +6117,15 @@ into integer sequences.
           = (unsigned char *)marpa_luaL_checklstring(L, 1, &vlq_len);
       const unsigned char *p = vlq;
       marpa_lua_newtable(L);
+      if (0) printf("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
       for (i = 1; (size_t)(p - vlq) < vlq_len; i++) {
+        if (0) printf("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
         lua_Unsigned x;
-        p = uint_from_vlq(vlq, &x);
+        p = uint_from_vlq(p, &x);
         marpa_lua_pushinteger(L, (lua_Integer)x);
         marpa_lua_rawseti(L, 2, i);
       }
+      if (0) printf("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
       return 1;
     }
 
