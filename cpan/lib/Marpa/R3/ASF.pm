@@ -1317,7 +1317,6 @@ sub Marpa::R3::Internal::ASF::ambiguities_show {
     my ( $asf, $ambiguities ) = @_;
     my $grammar = $asf->grammar();
     my $slr     = $asf->[Marpa::R3::Internal::ASF::SLR];
-    my $p_input = $slr->[Marpa::R3::Internal::Scanless::R::P_INPUT_STRING];
     my $result  = q{};
     AMBIGUITY: for my $ambiguity ( @{$ambiguities} ) {
         my $type = $ambiguity->[0];
