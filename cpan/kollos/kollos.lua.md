@@ -3469,7 +3469,7 @@ It should free all memory associated with the valuation.
                     ))
                 end
              local byte_p = table.unpack(_M.from_vlq(vlq))
-             print(inspect(_M.from_vlq(vlq)))
+             -- print(inspect(_M.from_vlq(vlq)))
              local codepoint = utf8.codepoint(text, byte_p)
              local escape = _M.escape_codepoint(codepoint)
              length_so_far = length_so_far + #escape
@@ -3499,6 +3499,65 @@ It should free all memory associated with the valuation.
             if length_so_far <= max_length then break end
             escapes[i] = ''
             length_so_far = length_so_far - 2
+        end
+
+             -- print(inspect(escapes))
+
+        return table.concat(escapes)
+    end
+
+    function _M.class_slr.reversed_input_escape(slr, block, base_pos, max_length)
+        local input = slr.inputs[block]
+        if not input then
+            error(string.format(
+                "slr:input_escape() -- %d is not a valid block\n",
+                block
+            ))
+        end
+        local text = input.text
+        local pos = start
+        local length_so_far = 0
+        local escapes = {}
+        while pos >= 1 do
+             local vlq = input[pos]
+                if not vlq then
+                    error(string.format(
+                        "slr:input_escape() -- %d is not a valid position in block %d\n",
+                        pos, block
+                    ))
+                end
+             local byte_p = table.unpack(_M.from_vlq(vlq))
+             -- print(inspect(_M.from_vlq(vlq)))
+             local codepoint = utf8.codepoint(text, byte_p)
+             local escape = _M.escape_codepoint(codepoint)
+             length_so_far = length_so_far + #escape
+             if length_so_far > max_length then
+                 length_so_far = length_so_far - #escape
+                 break
+             end
+             escapes[#escapes+1] = escape
+             pos = pos - 1
+        end
+
+             -- print(inspect(escapes))
+
+        -- trailing spaces get special treatment
+        for i = #escapes, 1, -1 do
+            if escapes[i] ~= ' ' then break end
+            escapes[i] = '\\s'
+            -- the escaped version is one character longer
+            length_so_far = length_so_far + 1
+        end
+
+             -- print(inspect(escapes))
+
+        -- trim back to adjust for escaped trailing spaces
+        for i = 1, #escapes do
+             -- print(length_so_far, max_length)
+            if length_so_far <= max_length then break end
+            local this_escape = escapes[i]
+            escapes[i] = ''
+            length_so_far = length_so_far - #this_escape
         end
 
              -- print(inspect(escapes))

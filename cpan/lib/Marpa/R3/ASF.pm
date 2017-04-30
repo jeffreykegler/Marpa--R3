@@ -1392,6 +1392,7 @@ END_OF_LUA
                 my $symbol_display_form =
                     $grammar->symbol_display_form(
                     $asf->glade_symbol_id($first_downglade) );
+                my $block = 1; # TODO -- glade_span() should return block
                 my ( $start, $first_length ) =
                     $asf->glade_span($first_downglade);
                 my ( undef, $this_length ) =
@@ -1403,10 +1404,17 @@ END_OF_LUA
                     .= qq{Length of symbol "$symbol_display_form" at line $start_line, column $start_column is ambiguous\n};
 
                 if ( $display_length > 0 ) {
-                    $result .= qq{  Choices start with: }
-                        . Marpa::R3::Internal::Scanless::input_escape(
-                        $p_input, $start, $display_length )
-                        . qq{\n};
+
+                    my ($piece) = $slr->call_by_tag(
+                    ('@' . __FILE__ . ':' . __LINE__), 
+                    <<'END_OF_LUA', 'iii', $block, $start + 1, $display_length);
+                    local slr, block, start, input_length = ...
+                    local escaped_input = slr:input_escape(block, start, input_length)
+                    return "  Choices start with: " .. escaped_input .. "\n"
+END_OF_LUA
+
+                    $result .= $piece;
+
                 } ## end if ( $display_length > 0 )
 
                 my @display_downglade = ( $first_downglade, $this_downglade );
@@ -1420,6 +1428,7 @@ END_OF_LUA
                     # Choices may be zero length
                     my $choice_number = $glade_ix + 1;
                     my $glade_id      = $display_downglade[$glade_ix];
+                    my $block = 1; # TODO: Add block to glade_span()
                     my ( undef, $length ) = $asf->glade_span($glade_id);
                     if ( $length <= 0 ) {
                         $result
@@ -1430,17 +1439,28 @@ END_OF_LUA
                         $slr->line_column( $start + $length - 1 );
                     $result
                         .= qq{  Choice $choice_number, length=$length, ends at line $end_line, column $end_column\n};
-                    if ( $length > 60 ) {
-                        $result .= qq{  Choice $choice_number ending: }
-                            . Marpa::R3::Internal::Scanless::reversed_input_escape(
-                            $p_input, $start + $length, 60 )
-                            . qq{\n};
-                        next DISPLAY_GLADE;
-                    } ## end if ( $length > 60 )
-                    $result .= qq{  Choice $choice_number: }
-                        . Marpa::R3::Internal::Scanless::input_escape(
-                        $p_input, $start, $length )
-                        . qq{\n};
+
+                    my ($piece) = $slr->call_by_tag(
+                    ('@' . __FILE__ . ':' . __LINE__), 
+                    <<'END_OF_LUA', 'iiii', $choice_number, $block, $start + 1, $length);
+                    local slr, choice_number, block, start, input_length = ...
+                    local subpieces = {}
+                    local escaped_input
+                    if input_length > 60 then
+                        escaped_input =
+                            slr:reversed_input_escape(block, start + input_length, 60)
+                        subpieces[#subpieces+1] = string.format("  Choice %d ending: %s\n",
+                            choice_number,
+                            escaped_input)
+                    end
+                    escaped_input = slr:input_escape(block, start, input_length)
+                    subpieces[#subpieces+1] = string.format("  Choice %d: %s\n",
+                            choice_number,
+                            escaped_input)
+                    return table.concat(subpieces)
+END_OF_LUA
+
+                    $result .= $piece;
 
                 } ## end DISPLAY_GLADE: for ( my $glade_ix = 0; $glade_ix <= ...)
                 next AMBIGUITY;
