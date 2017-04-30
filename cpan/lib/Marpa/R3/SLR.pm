@@ -175,7 +175,7 @@ sub Marpa::R3::Scanless::R::new {
     recce.lmw_g1r.lmw_g = g1g
 
     recce.codepoint = nil
-    recce.input = {}
+    recce.inputs = {}
 
     recce.max_parses = nil
     recce.es_data = {}
@@ -582,8 +582,8 @@ sub Marpa::R3::Scanless::R::read {
     $slr->call_by_tag(
     ('@' . __FILE__ . ':' . __LINE__),
         <<'END_OF_LUA', 's', ${$p_string});
-            local recce, input_string = ...
-            local inputs = recce.input
+            local slr, input_string = ...
+            local inputs = slr.inputs
             -- Currently only one physical input string is allowed
             if #inputs > 0 then
                 error(
@@ -611,7 +611,8 @@ sub Marpa::R3::Scanless::R::read {
             local column_no = 0
             for byte_p, codepoint in utf8.codes(input_string) do
                 codepoints[#codepoints+1] = codepoint
-                -- TODO: add line numbering logic
+
+                -- line numbering logic
                 if eol_seen
                    and (eol_seen ~= 0x0D or codepoint ~= 0X0A)
                 then
@@ -621,9 +622,10 @@ sub Marpa::R3::Scanless::R::read {
                 end
                 column_no = column_no + 1
                 eol_seen = eols[codepoint]
-
                 -- print('lc:', line_no, column_no)
+
                 local vlq = _M.to_vlq({ byte_p, line_no, column_no })
+                --[=[
                 -- TODO: eliminate this check after development
                 local codepoint_data = _M.from_vlq(vlq)
                 if
@@ -639,11 +641,14 @@ sub Marpa::R3::Scanless::R::read {
                         inspect(codepoint_data)
                     ))
                 end
+                --]=]
+
+                this_input[#this_input+1] = vlq
             end
 
-            recce.phase = 'read'
+            slr.phase = 'read'
             -- print("codepoints:", inspect(codepoints))
-            recce.codepoints = codepoints
+            slr.codepoints = codepoints
 END_OF_LUA
 
     return 0 if @{ $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] };

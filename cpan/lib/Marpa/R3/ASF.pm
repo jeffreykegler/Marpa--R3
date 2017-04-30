@@ -1328,6 +1328,10 @@ sub Marpa::R3::Internal::ASF::ambiguities_show {
             my $symbol_display_form =
                 $grammar->symbol_display_form(
                 $asf->glade_symbol_id($glade) );
+
+            # TODO -- glade span must return block
+            #         for now it is always 1
+            my $block = 1;
             my ( $start,      $length )       = $asf->glade_span($glade);
             my ( $start_line, $start_column ) = $slr->line_column($start);
             my ( $end_line,   $end_column ) =
@@ -1340,11 +1344,18 @@ sub Marpa::R3::Internal::ASF::ambiguities_show {
                 . qq{to line $end_line, column $end_column\n};
             my $literal_label =
                 $display_length == $length ? 'Text is: ' : 'Text begins: ';
+
+        my ($escaped_input) = $slr->call_by_tag(
+        ('@' . __FILE__ . ':' . __LINE__), 
+        <<'END_OF_LUA', 'iii', $block, $start + 1, $display_length);
+        local slr, block, start, input_length = ...
+        return slr:input_escape(block, start, input_length)
+END_OF_LUA
+
             $result
                 .= q{  }
                 . $literal_label
-                . Marpa::R3::Internal::Scanless::input_escape( $p_input,
-                $start, $display_length )
+                . $escaped_input
                 . qq{\n};
 
             my $symch_count = $asf->glade_symch_count($glade);

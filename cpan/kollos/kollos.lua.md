@@ -3443,6 +3443,71 @@ It should free all memory associated with the valuation.
 
 ```
 
+### Input
+
+```
+    -- miranda: section+ diagnostics
+    function _M.class_slr.input_escape(slr, block, start, max_length)
+        local input = slr.inputs[block]
+        if not input then
+            error(string.format(
+                "slr:input_escape() -- %d is not a valid block\n",
+                block
+            ))
+        end
+        local text = input.text
+        local end_of_input = #input
+        local pos = start
+        local length_so_far = 0
+        local escapes = {}
+        while pos <= end_of_input do
+             local vlq = input[pos]
+                if not vlq then
+                    error(string.format(
+                        "slr:input_escape() -- %d is not a valid position in block %d\n",
+                        pos, block
+                    ))
+                end
+             local byte_p = table.unpack(_M.from_vlq(vlq))
+             print(inspect(_M.from_vlq(vlq)))
+             local codepoint = utf8.codepoint(text, byte_p)
+             local escape = _M.escape_codepoint(codepoint)
+             length_so_far = length_so_far + #escape
+             if length_so_far > max_length then
+                 length_so_far = length_so_far - #escape
+                 break
+             end
+             escapes[#escapes+1] = escape
+             pos = pos + 1
+        end
+
+             -- print(inspect(escapes))
+
+        -- trailing spaces get special treatment
+        for i = #escapes, 1, -1 do
+            if escapes[i] ~= ' ' then break end
+            escapes[i] = '\\s'
+            -- the escaped version is one character longer
+            length_so_far = length_so_far + 1
+        end
+
+             -- print(inspect(escapes))
+
+        -- trim back to adjust for escaped trailing spaces
+        for i = #escapes, 1, -1 do
+             -- print(length_so_far, max_length)
+            if length_so_far <= max_length then break end
+            escapes[i] = ''
+            length_so_far = length_so_far - 2
+        end
+
+             -- print(inspect(escapes))
+
+        return table.concat(escapes)
+    end
+
+```
+
 ## Libmarpa interface
 
 ```
@@ -5987,6 +6052,29 @@ and error codes.
     -- miranda: section+ most Lua function definitions
     function _M.posix_lc(str)
        return str:gsub('[A-Z]', function(str) return string.char(string.byte(str)) end)
+    end
+
+    local escape_by_codepoint = {
+       [string.byte("\a")] = "\\a",
+       [string.byte("\b")] = "\\b",
+       [string.byte("\f")] = "\\f",
+       [string.byte("\n")] = "\\n",
+       [string.byte("\r")] = "\\r",
+       [string.byte("\t")] = "\\t",
+       [string.byte("\v")] = "\\v",
+       [string.byte("\\")] = "\\\\"
+    }
+
+    function _M.escape_codepoint(codepoint)
+        local escape = escape_by_codepoint[codepoint]
+        if escape then return escape end
+        if 32 <= codepoint and codepoint <= 126 then
+            return string.char(codepoint)
+        end
+        if codepoint < 255 then
+            return string.format("%02x", codepoint)
+        end
+        return string.format("%04x", codepoint)
     end
 
 ```
