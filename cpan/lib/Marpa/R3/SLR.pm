@@ -179,6 +179,7 @@ sub Marpa::R3::Scanless::R::new {
 
     recce.max_parses = nil
     recce.es_data = {}
+    recce.current_block = nil
 
     -- Events are higher priority, and are cleared
     --   at the beginning of many methods.
@@ -593,7 +594,9 @@ sub Marpa::R3::Scanless::R::read {
             end
             local this_input = {}
             inputs[#inputs + 1] = this_input
+            slr.current_block = this_input
             this_input.text = input_string
+            this_input.index = #inputs
             local ix = 1
 
             local codepoints = {}
