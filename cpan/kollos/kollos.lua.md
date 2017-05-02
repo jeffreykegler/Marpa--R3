@@ -1353,17 +1353,17 @@ acceptance is caught here via rejection).  Ignore
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slr.ext_lexeme_complete(recce,
+    function _M.class_slr.ext_lexeme_complete(slr,
             start_pos_defined, start_pos, length_is_defined, length_arg)
-        local perl_pos = recce.perl_pos
+        local perl_pos = slr.perl_pos
         local lexeme_length = -1
         if length_is_defined ~= 0 then
              lexeme_length = length_arg
-        elseif perl_pos == recce.start_of_pause_lexeme then
-             lexeme_length = recce.end_of_pause_lexeme - recce.start_of_pause_lexeme
+        elseif perl_pos == slr.start_of_pause_lexeme then
+             lexeme_length = slr.end_of_pause_lexeme - slr.start_of_pause_lexeme
         end
-        if start_pos_defined == 0 then start_pos = recce.perl_pos end
-        local input_length = #recce.codepoints
+        if start_pos_defined == 0 then start_pos = slr.perl_pos end
+        local input_length = #slr.current_block
         if start_pos < 0 then
             start_pos = input_length + start_pos
         end
@@ -1373,7 +1373,7 @@ acceptance is caught here via rejection).  Ignore
                   start_pos
            ))
         end
-        recce.perl_pos = start_pos
+        slr.perl_pos = start_pos
         local end_pos
         if lexeme_length < 0 then
            end_pos = input_length + lexeme_length + 1
@@ -1387,28 +1387,28 @@ acceptance is caught here via rejection).  Ignore
                   (length_arg or math.mininteger)
            ))
         end
-        local g1r = recce.lmw_g1r
-        recce.event_queue = {}
-        recce.is_external_scanning = false
+        local g1r = slr.lmw_g1r
+        slr.event_queue = {}
+        slr.is_external_scanning = false
         local result = g1r:earleme_complete()
         if result >= 0 then
-            recce:g1_convert_events(recce.perl_pos)
-            local g1r = recce.lmw_g1r
+            slr:g1_convert_events(slr.perl_pos)
+            local g1r = slr.lmw_g1r
             local latest_earley_set = g1r:latest_earley_set()
-            recce.es_data[latest_earley_set] = { start_pos, lexeme_length }
-            recce.perl_pos = start_pos + lexeme_length
-            return recce.perl_pos
+            slr.es_data[latest_earley_set] = { start_pos, lexeme_length }
+            slr.perl_pos = start_pos + lexeme_length
+            return slr.perl_pos
         end
         if result == -2 then
-            local error_code = recce.slg.g1.lmw_g:error_code()
+            local error_code = slr.slg.g1.lmw_g:error_code()
             if error_code == kollos.err.PARSE_EXHAUSTED then
-                local q = recce.event_queue
+                local q = slr.event_queue
                 q[#q+1] = { 'no acceptable input' }
             end
             return 0
         end
         error('Problem in slr->g1_lexeme_complete(): '
-            ..  recce.slg.g1.lmw_g:error_description())
+            ..  slr.slg.g1.lmw_g:error_description())
     end
 ```
 
