@@ -1279,7 +1279,7 @@ Set the position and length of input string.
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.pos_set(slr, start_pos_arg, length_arg)
-        local input_length = #recce.codepoints
+        local input_length = #slr.current_block
         local new_perl_pos = start_pos_arg >=0  and start_pos_arg or input_length + start_pos_arg
         if new_perl_pos < 0 then
             error(string.format('Bad start position in pos_set: %d', start_pos_arg))
@@ -1297,9 +1297,9 @@ Set the position and length of input string.
             error(string.format('End position in pos_set (%d) is after input end (%d)',
                 new_end_pos, input_length))
         end
-        recce.perl_pos = new_perl_pos
-        recce.lexer_start_pos = new_perl_pos
-        recce.end_pos = new_end_pos
+        slr.perl_pos = new_perl_pos
+        slr.lexer_start_pos = new_perl_pos
+        slr.end_pos = new_end_pos
         return
     end
 ```
