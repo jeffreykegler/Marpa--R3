@@ -993,9 +993,9 @@ a string indicating the error otherwise.
         if discard_mode then
              return 'R1 exhausted before end'
         end
-        local start_of_lexeme = recce.start_of_lexeme
-        recce.lexer_start_pos = start_of_lexeme
-        recce.perl_pos = start_of_lexeme
+        local start_of_lexeme = slr.start_of_lexeme
+        slr.lexer_start_pos = start_of_lexeme
+        slr.perl_pos = start_of_lexeme
         return 'no lexeme'
     end
 
@@ -1047,13 +1047,13 @@ Determine which lexemes are acceptable or discards.
         local high_lexeme_priority = math.mininteger
         while true do
             local g1_lexeme = -1
-            local rule_id, dot_position, origin = recce.l0.lmw_r:progress_item()
+            local rule_id, dot_position, origin = slr.l0.lmw_r:progress_item()
             if not rule_id then
                 return discarded, high_lexeme_priority
             end
             if rule_id <= -2 then
-                error(string.format('Problem in recce:progress_item(): %s'),
-                    recce.l0.lmw_r:error_description())
+                error(string.format('Problem in slr:progress_item(): %s'),
+                    slr.l0.lmw_r:error_description())
             end
             if origin ~= 0 then
                goto NEXT_EARLEY_ITEM
@@ -1061,36 +1061,36 @@ Determine which lexemes are acceptable or discards.
             if dot_position ~= -1 then
                goto NEXT_EARLEY_ITEM
             end
-            g1_lexeme = recce.l0.irls[rule_id].g1_lexeme
+            g1_lexeme = slr.l0.irls[rule_id].g1_lexeme
             g1_lexeme = g1_lexeme or -1
             if g1_lexeme == -1 then
                goto NEXT_EARLEY_ITEM
             end
-            recce.end_of_lexeme = working_pos
+            slr.end_of_lexeme = working_pos
             -- -2 means a discarded item
             if g1_lexeme <= -2 then
                discarded = discarded + 1
-               local q = recce.lexeme_queue
+               local q = slr.lexeme_queue
                q[#q+1] = { '!trace', 'discarded lexeme',
-                   rule_id, recce.start_of_lexeme, recce.end_of_lexeme}
+                   rule_id, slr.start_of_lexeme, slr.end_of_lexeme}
                goto NEXT_EARLEY_ITEM
             end
             -- this block hides the local's and allows the goto to work
             do
-                local is_expected = recce.g1.lmw_r:terminal_is_expected(g1_lexeme)
+                local is_expected = slr.g1.lmw_r:terminal_is_expected(g1_lexeme)
                 if not is_expected then
                     error(string.format('Internnal error: Marpa recognized unexpected token @%d-%d: lexme=%d',
-                        recce.start_of_lexeme, recce.end_of_lexeme, g1_lexeme))
+                        slr.start_of_lexeme, slr.end_of_lexeme, g1_lexeme))
                 end
-                local this_lexeme_priority = recce.g1.isys[g1_lexeme].lexeme_priority
+                local this_lexeme_priority = slr.g1.isys[g1_lexeme].lexeme_priority
                 if this_lexeme_priority > high_lexeme_priority then
                     high_lexeme_priority = this_lexeme_priority
                 end
-                local q = recce.lexeme_queue
+                local q = slr.lexeme_queue
                 -- at this point we know the lexeme will be accepted by the grammar
                 -- but we do not yet know about priority
                 q[#q+1] = { '!trace', 'acceptable lexeme',
-                   recce.start_of_lexeme, recce.end_of_lexeme, g1_lexeme, this_lexeme_priority, this_lexeme_priority}
+                   slr.start_of_lexeme, slr.end_of_lexeme, g1_lexeme, this_lexeme_priority, this_lexeme_priority}
             end
             ::NEXT_EARLEY_ITEM::
         end
