@@ -84,13 +84,6 @@ It was a little noticed feature of Marpa::R2, that actions specified
 as Perl names (like "My_Action::doit") could resolve to scalars.
 In Marpa::R3 they must resolve to Perl subroutines.
 
-=head2 Newlines now obey Perl standards
-
-In Marpa::R3 newlines are defined as in Perl.
-In Marpa::R2 newlines were recognized according to the Unicode
-standard, which was a superset including
-UNIX and Windows newlines.
-
 =head2 The Stuifzand interface (PSIF) has been removed
 
 The Stuifzand interface (PSIF), and its documentation,

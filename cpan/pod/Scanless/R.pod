@@ -1568,21 +1568,60 @@ and the second element is the column position.
 
 Numbering of lines and columns is 1-based,
 following UNIX editor tradition.
-Except at B<EOVS>
-(the B<end of the virtual input stream>),
+Except at the end of an input block
+(B<EOB>)
 the line and column will be that of an
 actual character.
-At EOVS the line number
+At EOB the line number
 will be that of the last line,
 and the column number will be that of the last column
 plus one.
-Applications which want to treat EOVS as a special case
+Applications which want to treat EOB as a special case
 can test for it using the L<C<pos()> method|/"pos()">
 and the L<C<input_length()> method|/"input_length()">.
 
 For line numbering purposes,
-a line is considered to end with the newline
-as defined by Perl.
+a line is considered to end with any newline sequence
+as defined in the
+Unicode Specification 4.0.0, Section 5.8.
+Specifically, a line ends with one of the following:
+
+=over 4
+
+=item *
+
+a LF (line feed U+000A);
+
+=item *
+
+a CR (carriage return, U+000D), when it is not followed by a LF;
+
+=item *
+
+a CRLF sequence (U+000D,U+000A);
+
+=item *
+
+a NEL (next line, U+0085);
+
+=item *
+
+a VT (vertical tab, U+000B);
+
+=item *
+
+a FF (form feed, U+000C);
+
+=item *
+
+a LS (line separator, U+2028) or
+
+=item *
+
+a PS (paragraph separator, U+2029).
+
+=back
+
 
 =head2 literal()
 

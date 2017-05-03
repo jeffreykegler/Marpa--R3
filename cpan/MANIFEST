@@ -275,6 +275,7 @@ t/jirotka.t
 t/json.t
 t/json_ast.t
 t/latk.t
+t/lc.t
 t/leo.t
 t/leo166.t
 t/leo168.t
