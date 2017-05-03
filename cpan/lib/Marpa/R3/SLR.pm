@@ -172,7 +172,6 @@ sub Marpa::R3::Scanless::R::new {
     local l0g = grammar.l0.lmw_g
     local g1g = grammar.g1.lmw_g
     recce.lmw_g1r = _M.recce_new(g1g)
-    recce.lmw_g1r.lmw_g = g1g
 
     recce.codepoint = nil
     recce.inputs = {}
