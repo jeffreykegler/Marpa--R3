@@ -919,7 +919,7 @@ Returns a status string.
                 return 'ok'
             end
             -- +1 because codepoints array is 1-based
-            slr.codepoint = slr:pos_data(block_ix, slr.perl_pos+1)
+            slr.codepoint = slr:per_pos(block_ix, slr.perl_pos+1)
             local errmsg = slr:l0_read_codepoint()
             local this_candidate, eager = slr:l0_track_candidates()
             if this_candidate then slr.l0_candidate = this_candidate end
@@ -1211,7 +1211,7 @@ Returns `true` is there was one,
         local lexeme_length = end_of_lexeme - start_of_lexeme
         local g1r = recce.lmw_g1r
         local latest_earley_set = g1r:latest_earley_set()
-        recce.es_data[latest_earley_set] = { start_of_lexeme, lexeme_length }
+        recce.per_es[latest_earley_set] = { start_of_lexeme, lexeme_length }
     end
 ```
 
@@ -1396,7 +1396,7 @@ acceptance is caught here via rejection).  Ignore
             slr:g1_convert_events(slr.perl_pos)
             local g1r = slr.lmw_g1r
             local latest_earley_set = g1r:latest_earley_set()
-            slr.es_data[latest_earley_set] = { start_pos, lexeme_length }
+            slr.per_es[latest_earley_set] = { start_pos, lexeme_length }
             slr.perl_pos = start_pos + lexeme_length
             return slr.perl_pos
         end
@@ -1458,7 +1458,7 @@ Returns the Libmarpa object if it could "get" one,
 
 Given a G1 span return an L0 span.
 Note that the data for G1 location `n` is kept in
-`es_data[n+1]`, the data for Earley set `n+1`.
+`per_es[n+1]`, the data for Earley set `n+1`.
 Never fails -- any G1 span is converted into some
 kind of L0 span.  Further,
 the L0 span is zero-count iff the count of the G1
@@ -1467,30 +1467,30 @@ span is zero or less.
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.g1_to_l0_span(slr, g1_start, g1_count)
-         local es_data = slr.es_data
+         local per_es = slr.per_es
          if g1_count <= 0 then
              if g1_start < 0 then
                  return 0, 0
              end
-             if g1_start >= #es_data then
-                 local last_data = es_data[#es_data]
+             if g1_start >= #per_es then
+                 local last_data = per_es[#per_es]
                  return last_data[1] + last_data[2], 0
              end
-             local first_es_data = es_data[g1_start+1]
-             return first_es_data[1], 0
+             local first_per_es = per_es[g1_start+1]
+             return first_per_es[1], 0
          end
          -- count cannot be less than 1,
          -- g1_end >= g1_start, always
          local g1_end = g1_start + g1_count - 1
          if g1_start < 0 then g1_start = 0 end
          if g1_end < 0 then g1_end = 0 end
-         if g1_start >= #es_data then g1_start = #es_data - 1 end
-         if g1_end >= #es_data then g1_end = #es_data - 1 end
-         local start_es_data = es_data[g1_start+1]
-         local end_es_data = es_data[g1_end+1]
-         local l0_start = start_es_data[1]
-         local end_es_start = end_es_data[1]
-         local end_es_length = end_es_data[2]
+         if g1_start >= #per_es then g1_start = #per_es - 1 end
+         if g1_end >= #per_es then g1_end = #per_es - 1 end
+         local start_per_es = per_es[g1_start+1]
+         local end_per_es = per_es[g1_end+1]
+         local l0_start = start_per_es[1]
+         local end_es_start = end_per_es[1]
+         local end_es_length = end_per_es[2]
          local l0_length = end_es_start + end_es_length - l0_start
          -- Because Marpa allowed backward jumps in the input, negative
          -- lengths were possible.  Change these to point to a single
@@ -2241,16 +2241,16 @@ in terms of the input string.
     -- miranda: section+ VM operations
     local function op_fn_push_start(recce, dummy, new_values)
         local start_es = recce.this_step.start_es_id
-        local es_data = recce.es_data
+        local per_es = recce.per_es
         local l0_start
         start_es = start_es + 1
-        if start_es > #es_data then
-             local es_entry = es_data[#es_data]
+        if start_es > #per_es then
+             local es_entry = per_es[#per_es]
              l0_start = es_entry[1] + es_entry[2]
         elseif start_es < 1 then
              l0_start = 0
         else
-             local es_entry = es_data[start_es]
+             local es_entry = per_es[start_es]
              l0_start = es_entry[1]
         end
         local next_ix = #new_values + 1;
@@ -2272,13 +2272,13 @@ that is, in terms of the input string
     local function op_fn_push_length(recce, dummy, new_values)
         local start_es = recce.this_step.start_es_id
         local end_es = recce.this_step.es_id
-        local es_data = recce.es_data
+        local per_es = recce.per_es
         local l0_length = 0
         start_es = start_es + 1
-        local start_es_entry = es_data[start_es]
+        local start_es_entry = per_es[start_es]
         if start_es_entry then
             local l0_start = start_es_entry[1]
-            local end_es_entry = es_data[end_es]
+            local end_es_entry = per_es[end_es]
             l0_length =
                 end_es_entry[1] + end_es_entry[2] - l0_start
         end
@@ -2651,14 +2651,14 @@ is zero.
       if end_earley_set < start_earley_set then
           return 0, 0
       end
-      local es_data = recce.es_data
-      local start_entry = es_data[start_earley_set]
+      local per_es = recce.per_es
+      local start_entry = per_es[start_earley_set]
       if not start_entry then
           return 0, 0
       end
-      local end_entry = es_data[end_earley_set]
+      local end_entry = per_es[end_earley_set]
       if not end_entry then
-          end_entry = es_data[#es_data]
+          end_entry = per_es[#per_es]
       end
       local l0_start = start_entry[1]
       local l0_length = end_entry[1] + end_entry[2] - l0_start
@@ -3450,7 +3450,7 @@ Caller must ensure `block` and `pos` are valid.
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slr.pos_data(slr, block, pos)
+    function _M.class_slr.per_pos(slr, block, pos)
         local input = slr.inputs[block]
         local text = input.text
         -- It is useful to have an "end of block"
@@ -3484,7 +3484,7 @@ Caller must ensure `block` and `pos` are valid.
         local length_so_far = 0
         local escapes = {}
         while true do
-             local codepoint = slr:pos_data(block, pos)
+             local codepoint = slr:per_pos(block, pos)
              if not codepoint then break end
              local escape = _M.escape_codepoint(codepoint)
              length_so_far = length_so_far + #escape
@@ -3527,7 +3527,7 @@ Caller must ensure `block` and `pos` are valid.
         local escapes = {}
         while pos >= 1 do
 
-             local codepoint = slr:pos_data(block, pos)
+             local codepoint = slr:per_pos(block, pos)
              local escape = _M.escape_codepoint(codepoint)
              length_so_far = length_so_far + #escape
              if length_so_far > max_length then
