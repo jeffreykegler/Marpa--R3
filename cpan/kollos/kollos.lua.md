@@ -1029,6 +1029,14 @@ a string indicating the error otherwise.
             -- if here, no accepted lexemes, but discarded ones
             slr.lexer_start_pos = working_pos
             slr.perl_pos = working_pos
+            local latest_es = slr.g1.lmw_r:latest_earley_set()
+            local trailers = slr.trailers
+            trailers[latest_es] =
+                _M.sweep_add(trailers[latest_es],
+                    slr.current_block.index,
+                    slr.start_of_lexeme,
+                    working_pos - slr.start_of_lexeme
+                )
             return
         end
         -- PASS 3 --
@@ -6130,23 +6138,32 @@ and error codes.
     end
 
     function _M.sweep_add(sweep, block, start, len)
+        -- io.stderr:write(string.format("Call: sweep, block,start,len = %s,%s,%s,%s\n",
+            -- inspect(sweep), inspect(block), inspect(start), inspect(len)))
+
         if not sweep then
             return { block, start, len }
         end
         local last_block, last_start, last_len =
-            table.unpack(sweep, -3)
+            table.unpack(sweep, (#sweep-2))
+
+        -- io.stderr:write(string.format("sweep, last block,start,len = %s,%s,%s,%s\n",
+            -- inspect(sweep), inspect(last_block), inspect(last_start), inspect(last_len)))
+
         -- As a special case, if the new sweep
         -- abuts the last one, we simply extend
         -- the last one
-        if block == last_block
-            and last_start + last_len ==  start
+        if (block == last_block)
+            and (last_start + last_len ==  start)
         then
-            sweep[-1] = last_len + len
+            sweep[#sweep] = last_len + len
+            -- io.stderr:write('Special case: ', inspect(sweep), "\n")
             return sweep
         end
         sweep[#sweep+1] = block
         sweep[#sweep+1] = start
         sweep[#sweep+1] = len
+        -- io.stderr:write('Main case: ', inspect(sweep), "\n")
         return sweep
     end
 

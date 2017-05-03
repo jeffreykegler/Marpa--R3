@@ -187,7 +187,8 @@ sub Marpa::R3::Scanless::R::new {
     recce.current_block = nil
 
     -- Trailing (that is, discarded) sweeps by
-    -- Earley set index
+    -- G0 Earley set index.  Integer indices, but not
+    -- necessarily a sequence.
     recce.trailers = {}
 
     -- Events are higher priority, and are cleared
