@@ -708,12 +708,12 @@ This is a registry object.
             error('Internal error: l0r_new() failed %s',
                 recce.slg.l0.lmw_g:error_description())
         end
-        recce.lmw_l0r = l0r
+        recce.l0.lmw_r = l0r
         -- reset the candidate in the lexer
         recce.l0_candidate = nil
         local too_many_earley_items = recce.too_many_earley_items
         if too_many_earley_items >= 0 then
-            recce.lmw_l0r:earley_item_warning_threshold_set(too_many_earley_items)
+            recce.l0.lmw_r:earley_item_warning_threshold_set(too_many_earley_items)
         end
          -- for now use a per-recce field
          -- later replace with a local
@@ -730,9 +730,9 @@ This is a registry object.
             local assertion = recce.slg.g1.isys[terminal].assertion
             assertion = assertion or -1
             if assertion >= 0 then
-                local result = recce.lmw_l0r:zwa_default_set(assertion, 1)
+                local result = recce.l0.lmw_r:zwa_default_set(assertion, 1)
                 if result < 0 then
-                    local error_description = recce.lmw_l0r:error_description()
+                    local error_description = recce.l0.lmw_r:error_description()
                     error('Problem in u_l0r_new() with assertion ID %ld and lexeme ID %ld: %s',
                         assertion, terminal, error_description
                     )
@@ -743,9 +743,9 @@ This is a registry object.
                 q[#q+1] = { '!trace', 'expected lexeme', perl_pos, terminal, assertion }
             end
         end
-        local result = recce.lmw_l0r:start_input()
+        local result = recce.l0.lmw_r:start_input()
         if result and result <= -2 then
-            local error_description = recce.lmw_l0r:error_description()
+            local error_description = recce.l0.lmw_r:error_description()
             error('Internal error: problem with recce:start_input(l0r): %s',
                 error_description)
         end
@@ -776,7 +776,7 @@ The top-level read function.
                 recce.perl_pos = lexer_start_pos
                 recce.start_of_lexeme = lexer_start_pos
                 recce.lexer_start_pos = -1
-                recce.lmw_l0r = nil
+                recce.l0.lmw_r = nil
                 if recce.trace_terminals >= 1 then
                     local q = recce.event_queue
                     q[#q+1] = { '!trace', 'lexer restarted recognizer', recce.perl_pos}
@@ -804,8 +804,8 @@ otherwise a failure code.
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.l0_earleme_complete(recce)
-        local l0r = recce.lmw_l0r
-        local complete_result = recce.lmw_l0r:earleme_complete()
+        local l0r = recce.l0.lmw_r
+        local complete_result = recce.l0.lmw_r:earleme_complete()
         if complete_result == -2 then
             if l0r:error_code() == _M.err.PARSE_EXHAUSTED then
                 return 'exhausted on failure'
@@ -817,7 +817,7 @@ otherwise a failure code.
         end
         if complete_result > 0 then
             recce:l0_convert_events(recce.perl_pos)
-            local is_exhausted = recce.lmw_l0r:is_exhausted()
+            local is_exhausted = recce.l0.lmw_r:is_exhausted()
             if is_exhausted ~= 0 then
                 return 'exhausted on success'
             end
@@ -834,7 +834,7 @@ which will be 1 or 0.
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.l0_alternative(recce, symbol_id)
-        local l0r = recce.lmw_l0r
+        local l0r = recce.l0.lmw_r
         local codepoint = recce.codepoint
         local result = l0r:alternative(symbol_id, 1, 1)
         if result == _M.err.UNEXPECTED_TOKEN_ID then
@@ -911,7 +911,7 @@ Returns a status string.
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.l0_read_lexeme(slr)
         local block_ix = slr.current_block.index
-        if not slr.lmw_l0r then
+        if not slr.l0.lmw_r then
             slr:l0r_new(slr.perl_pos)
         end
         while true do
@@ -952,7 +952,7 @@ rule, false otherwise.
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.l0_track_candidates(recce)
-        local l0r = recce.lmw_l0r
+        local l0r = recce.l0.lmw_r
         local l0g = recce.slg.l0.lmw_g
         local l0_rules = recce.l0.irls
         local eager
@@ -1006,7 +1006,7 @@ a string indicating the error otherwise.
 
         recce.lexeme_queue = {}
         recce.accept_queue = {}
-        local l0r = recce.lmw_l0r
+        local l0r = recce.l0.lmw_r
         if not l0r then
             error('Internal error: No l0r in slr_alternatives(): %s',
                 recce.slg.l0.lmw_g:error_description())
@@ -1015,10 +1015,10 @@ a string indicating the error otherwise.
         -- no zero-length lexemes, so Earley set 0 is ignored
         if not elect_earley_set then return exhausted() end
         local working_pos = recce.start_of_lexeme + elect_earley_set
-        local return_value = recce.lmw_l0r:progress_report_start(elect_earley_set)
+        local return_value = recce.l0.lmw_r:progress_report_start(elect_earley_set)
         if return_value < 0 then
             error(string.format('Problem in recce:progress_report_start(...,%d): %s'),
-                elect_earley_set, recce.lmw_l0r:error_description())
+                elect_earley_set, recce.l0.lmw_r:error_description())
         end
         local discarded, high_lexeme_priority = recce:l0_earley_set_examine(working_pos)
         -- PASS 2 --
@@ -1047,13 +1047,13 @@ Determine which lexemes are acceptable or discards.
         local high_lexeme_priority = math.mininteger
         while true do
             local g1_lexeme = -1
-            local rule_id, dot_position, origin = recce.lmw_l0r:progress_item()
+            local rule_id, dot_position, origin = recce.l0.lmw_r:progress_item()
             if not rule_id then
                 return discarded, high_lexeme_priority
             end
             if rule_id <= -2 then
                 error(string.format('Problem in recce:progress_item(): %s'),
-                    recce.lmw_l0r:error_description())
+                    recce.l0.lmw_r:error_description())
             end
             if origin ~= 0 then
                goto NEXT_EARLEY_ITEM
@@ -1245,7 +1245,7 @@ Read alternatives into the G1 grammar.
             goto NEXT_EVENT
         end
         if return_value ~= kollos.err.NONE then
-            local l0r = slr.lmw_l0r
+            local l0r = slr.l0.lmw_r
             error(string.format([[
                  'Problem SLR->read() failed on symbol id %d at position %d: %s'
             ]],
