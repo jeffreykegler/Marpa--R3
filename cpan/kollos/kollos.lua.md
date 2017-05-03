@@ -702,51 +702,51 @@ This is a registry object.
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slr.l0r_new(recce, perl_pos)
-        local l0r = _M.recce_new(recce.slg.l0.lmw_g)
+    function _M.class_slr.l0r_new(slr, perl_pos)
+        local l0r = _M.recce_new(slr.slg.l0.lmw_g)
         if not l0r then
             error('Internal error: l0r_new() failed %s',
-                recce.slg.l0.lmw_g:error_description())
+                slr.slg.l0.lmw_g:error_description())
         end
-        recce.l0.lmw_r = l0r
+        slr.l0.lmw_r = l0r
         -- reset the candidate in the lexer
-        recce.l0_candidate = nil
-        local too_many_earley_items = recce.too_many_earley_items
+        slr.l0_candidate = nil
+        local too_many_earley_items = slr.too_many_earley_items
         if too_many_earley_items >= 0 then
-            recce.l0.lmw_r:earley_item_warning_threshold_set(too_many_earley_items)
+            l0r:earley_item_warning_threshold_set(too_many_earley_items)
         end
-         -- for now use a per-recce field
+         -- for now use a per-slr field
          -- later replace with a local
-        recce.terminals_expected = recce.g1.lmw_r:terminals_expected()
-        local count = #recce.terminals_expected
+        slr.terminals_expected = slr.g1.lmw_r:terminals_expected()
+        local count = #slr.terminals_expected
         if not count or count < 0 then
-            local error_description = recce.g1.lmw_r:error_description()
+            local error_description = slr.g1.lmw_r:error_description()
             error('Internal error: terminals_expected() failed in u_l0r_new(); %s',
                     error_description)
         end
         for i = 0, count -1 do
             local ix = i + 1
-            local terminal = recce.terminals_expected[ix]
-            local assertion = recce.slg.g1.isys[terminal].assertion
+            local terminal = slr.terminals_expected[ix]
+            local assertion = slr.slg.g1.isys[terminal].assertion
             assertion = assertion or -1
             if assertion >= 0 then
-                local result = recce.l0.lmw_r:zwa_default_set(assertion, 1)
+                local result = l0r:zwa_default_set(assertion, 1)
                 if result < 0 then
-                    local error_description = recce.l0.lmw_r:error_description()
+                    local error_description = l0r:error_description()
                     error('Problem in u_l0r_new() with assertion ID %ld and lexeme ID %ld: %s',
                         assertion, terminal, error_description
                     )
                 end
             end
-            if recce.trace_terminals >= 3 then
-                local q = recce.event_queue
+            if slr.trace_terminals >= 3 then
+                local q = slr.event_queue
                 q[#q+1] = { '!trace', 'expected lexeme', perl_pos, terminal, assertion }
             end
         end
-        local result = recce.l0.lmw_r:start_input()
+        local result = l0r:start_input()
         if result and result <= -2 then
-            local error_description = recce.l0.lmw_r:error_description()
-            error('Internal error: problem with recce:start_input(l0r): %s',
+            local error_description = l0r:error_description()
+            error('Internal error: problem with slr:start_input(l0r): %s',
                 error_description)
         end
     end
