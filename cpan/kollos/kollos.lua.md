@@ -987,7 +987,7 @@ Returns `nil` on success,
 a string indicating the error otherwise.
 
 ```
-    -- miranda: section exhausted(), nested function of recce:alternatives()
+    -- miranda: section exhausted(), nested function of slr:alternatives()
     local function exhausted()
         -- no accepted or discarded lexemes
         if discard_mode then
@@ -1000,41 +1000,41 @@ a string indicating the error otherwise.
     end
 
     -- miranda: section+ most Lua function definitions
-    function _M.class_slr.alternatives(recce, discard_mode)
+    function _M.class_slr.alternatives(slr, discard_mode)
 
-        -- miranda: insert exhausted(), nested function of recce:alternatives()
+        -- miranda: insert exhausted(), nested function of slr:alternatives()
 
-        recce.lexeme_queue = {}
-        recce.accept_queue = {}
-        local l0r = recce.l0.lmw_r
+        slr.lexeme_queue = {}
+        slr.accept_queue = {}
+        local l0r = slr.l0.lmw_r
         if not l0r then
             error('Internal error: No l0r in slr_alternatives(): %s',
-                recce.slg.l0.lmw_g:error_description())
+                slr.slg.l0.lmw_g:error_description())
         end
-        local elect_earley_set = recce.l0_candidate
+        local elect_earley_set = slr.l0_candidate
         -- no zero-length lexemes, so Earley set 0 is ignored
         if not elect_earley_set then return exhausted() end
-        local working_pos = recce.start_of_lexeme + elect_earley_set
-        local return_value = recce.l0.lmw_r:progress_report_start(elect_earley_set)
+        local working_pos = slr.start_of_lexeme + elect_earley_set
+        local return_value = l0r:progress_report_start(elect_earley_set)
         if return_value < 0 then
-            error(string.format('Problem in recce:progress_report_start(...,%d): %s'),
-                elect_earley_set, recce.l0.lmw_r:error_description())
+            error(string.format('Problem in slr:progress_report_start(...,%d): %s'),
+                elect_earley_set, l0r:error_description())
         end
-        local discarded, high_lexeme_priority = recce:l0_earley_set_examine(working_pos)
+        local discarded, high_lexeme_priority = slr:l0_earley_set_examine(working_pos)
         -- PASS 2 --
-        recce:lexeme_queue_examine(high_lexeme_priority)
-        local accept_q = recce.accept_queue
+        slr:lexeme_queue_examine(high_lexeme_priority)
+        local accept_q = slr.accept_queue
         if #accept_q <= 0 then
             if discarded <= 0 then return exhausted() end
             -- if here, no accepted lexemes, but discarded ones
-            recce.lexer_start_pos = working_pos
-            recce.perl_pos = working_pos
+            slr.lexer_start_pos = working_pos
+            slr.perl_pos = working_pos
             return
         end
         -- PASS 3 --
-        local result = recce:do_pause_before()
+        local result = slr:do_pause_before()
         if result then return end
-        recce:g1_earleme_complete()
+        slr:g1_earleme_complete()
     end
 ```
 
