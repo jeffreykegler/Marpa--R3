@@ -909,23 +909,24 @@ Returns a status string.
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slr.l0_read_lexeme(recce)
-        if not recce.lmw_l0r then
-            recce:l0r_new(recce.perl_pos)
+    function _M.class_slr.l0_read_lexeme(slr)
+        local block_ix = slr.current_block.index
+        if not slr.lmw_l0r then
+            slr:l0r_new(slr.perl_pos)
         end
         while true do
-            if recce.perl_pos >= recce.end_pos then
+            if slr.perl_pos >= slr.end_pos then
                 return 'ok'
             end
             -- +1 because codepoints array is 1-based
-            recce.codepoint = recce.codepoints[recce.perl_pos+1]
-            local errmsg = recce:l0_read_codepoint()
-            local this_candidate, eager = recce:l0_track_candidates()
-            if this_candidate then recce.l0_candidate = this_candidate end
+            slr.codepoint = slr:pos_data(block_ix, slr.perl_pos+1)
+            local errmsg = slr:l0_read_codepoint()
+            local this_candidate, eager = slr:l0_track_candidates()
+            if this_candidate then slr.l0_candidate = this_candidate end
             if eager then return 'ok' end
             if errmsg then return errmsg end
-            recce.perl_pos = recce.perl_pos + 1
-            if recce.trace_terminals > 0 then
+            slr.perl_pos = slr.perl_pos + 1
+            if slr.trace_terminals > 0 then
                return 'trace'
             end
         end
