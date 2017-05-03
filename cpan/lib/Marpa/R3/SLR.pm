@@ -181,6 +181,10 @@ sub Marpa::R3::Scanless::R::new {
     recce.per_es = {}
     recce.current_block = nil
 
+    -- Trailing (that is, discarded) sweeps by
+    -- Earley set index
+    recce.trailers = {}
+
     -- Events are higher priority, and are cleared
     --   at the beginning of many methods.
     --   Traces are lower priority, and are cleared

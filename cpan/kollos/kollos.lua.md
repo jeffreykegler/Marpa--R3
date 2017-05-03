@@ -6129,6 +6129,27 @@ and error codes.
         return string.format("%04x", codepoint)
     end
 
+    function _M.sweep_add(sweep, block, start, len)
+        if not sweep then
+            return { block, start, len }
+        end
+        local last_block, last_start, last_len =
+            table.unpack(sweep, -3)
+        -- As a special case, if the new sweep
+        -- abuts the last one, we simply extend
+        -- the last one
+        if block == last_block
+            and last_start + last_len ==  start
+        then
+            sweep[-1] = last_len + len
+            return sweep
+        end
+        sweep[#sweep+1] = block
+        sweep[#sweep+1] = start
+        sweep[#sweep+1] = len
+        return sweep
+    end
+
 ```
 
 ### VLQ (Variable-Length Quantity)
