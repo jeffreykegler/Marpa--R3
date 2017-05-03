@@ -599,7 +599,6 @@ sub Marpa::R3::Scanless::R::read {
             this_input.index = #inputs
             local ix = 1
 
-            local codepoints = {}
             local eols = {
                 [0x0A] = 0x0A,
                 [0x0D] = 0x0D,
@@ -613,7 +612,6 @@ sub Marpa::R3::Scanless::R::read {
             local line_no = 1
             local column_no = 0
             for byte_p, codepoint in utf8.codes(input_string) do
-                codepoints[#codepoints+1] = codepoint
 
                 -- line numbering logic
                 if eol_seen and
@@ -624,33 +622,12 @@ sub Marpa::R3::Scanless::R::read {
                 end
                 column_no = column_no + 1
                 eol_seen = eols[codepoint]
-                -- print('lc:', line_no, column_no)
 
                 local vlq = _M.to_vlq({ byte_p, line_no, column_no })
-                --[=[
-                -- TODO: eliminate this check after development
-                local codepoint_data = _M.from_vlq(vlq)
-                if
-                    #codepoint_data ~= 3
-                    or codepoint_data[1] ~= byte_p
-                    or codepoint_data[2] ~= line_no
-                    or codepoint_data[3] ~= column_no
-                then
-                    error(string.format("VLQ issue: %d, %d, %d vs. %s",
-                        byte_p,
-                        line_no,
-                        column_no,
-                        inspect(codepoint_data)
-                    ))
-                end
-                --]=]
-
                 this_input[#this_input+1] = vlq
             end
 
             slr.phase = 'read'
-            -- print("codepoints:", inspect(codepoints))
-            slr.codepoints = codepoints
 END_OF_LUA
 
     return 0 if @{ $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] };
