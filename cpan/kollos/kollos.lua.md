@@ -3445,32 +3445,46 @@ It should free all memory associated with the valuation.
 
 ### Input
 
+Caller must ensure `block` and `pos` are valid.
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slr.pos_data(slr, block, pos)
+        local input = slr.inputs[block]
+        local text = input.text
+        -- It is useful to have an "end of block"
+        -- position.  No codepoint, but line is
+        -- last line and byte_p and column are one
+        -- after the end
+        if pos == #input + 1 then
+            local vlq = input[#input]
+            local last_byte_p, last_line_no, last_column_no
+                = table.unpack(_M.from_vlq(vlq))
+            return nil,
+                last_byte_p+1, last_line_no, last_column_no+1
+        end
+        local vlq = input[pos]
+        if not vlq then
+            error(string.format(
+                "Internal error: invalid input block,pos: %d, %d\n",
+                block, pos))
+        end
+             -- print(inspect(_M.from_vlq(vlq)))
+        local byte_p, line_no, column_no = table.unpack(_M.from_vlq(vlq))
+        local codepoint = utf8.codepoint(text, byte_p)
+        return codepoint, byte_p, line_no, column_no
+    end
+```
+
 ```
     -- miranda: section+ diagnostics
     function _M.class_slr.input_escape(slr, block, start, max_length)
-        local input = slr.inputs[block]
-        if not input then
-            error(string.format(
-                "slr:input_escape() -- %d is not a valid block\n",
-                block
-            ))
-        end
-        local text = input.text
-        local end_of_input = #input
         local pos = start
         local length_so_far = 0
         local escapes = {}
-        while pos <= end_of_input do
-             local vlq = input[pos]
-                if not vlq then
-                    error(string.format(
-                        "slr:input_escape() -- %d is not a valid position in block %d\n",
-                        pos, block
-                    ))
-                end
-             local byte_p = table.unpack(_M.from_vlq(vlq))
-             -- print(inspect(_M.from_vlq(vlq)))
-             local codepoint = utf8.codepoint(text, byte_p)
+        while true do
+             local codepoint = slr:pos_data(block, pos)
+             if not codepoint then break end
              local escape = _M.escape_codepoint(codepoint)
              length_so_far = length_so_far + #escape
              if length_so_far > max_length then

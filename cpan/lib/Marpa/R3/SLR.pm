@@ -616,9 +616,8 @@ sub Marpa::R3::Scanless::R::read {
                 codepoints[#codepoints+1] = codepoint
 
                 -- line numbering logic
-                if eol_seen
-                   and (eol_seen ~= 0x0D or codepoint ~= 0X0A)
-                then
+                if eol_seen and
+                   (eol_seen ~= 0x0D or codepoint ~= 0x0A) then
                    eol_seen = false
                    line_no = line_no + 1
                    column_no = 0
@@ -1884,11 +1883,22 @@ END_OF_LUA
     return $start, $end;
 }
 
+# TODO -- Either document $block parameter or delete it
 sub Marpa::R3::Scanless::R::line_column {
-    my ( $slr, $pos ) = @_;
-    my $p_input = $slr->[Marpa::R3::Internal::Scanless::R::P_INPUT_STRING];
+    my ( $slr, $pos, $block ) = @_;
     $pos //= $slr->pos();
-    return @{Marpa::R3::Internal::line_column($p_input, $pos)};
+    $pos += 1;
+    $block //= -1;
+
+    my ($line_no, $column_no) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+            <<'END_OF_LUA', 'ii', $block, $pos  );
+        local slr, block, pos = ...
+        if block <= 0 then block = slr.current_block.index end
+        local _, _, line_no, column_no = slr:pos_data(block, pos)
+        return line_no, column_no
+END_OF_LUA
+
+    return $line_no, $column_no;
 } ## end sub Marpa::R3::Scanless::R::line_column
 
 sub Marpa::R3::Scanless::R::pos {

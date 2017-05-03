@@ -14,14 +14,15 @@ use 5.010001;
 use strict;
 use warnings;
 
-# use Test::More tests => 1;
-use Test::More skip_all => 'Switch to using Perl, instead of Unicode newlines';
+use utf8;
+use Test::More tests => 1;
 use English qw( -no_match_vars );
 use lib 'inc';
 use Marpa::R3::Test;
 use Marpa::R3;
 use Data::Dumper;
 use Getopt::Long ();
+use charnames ':full';
 
 our $VERBOSE = 0;
 die if not Getopt::Long::GetOptions( verbose => \$VERBOSE );
@@ -31,7 +32,7 @@ my $dsl = <<'=== END OF DSL ===';
 test ::= [\w] | [\W]
 === END OF DSL ===
 
-my $input = "1\x{0A}2\x{0D}3\x{0D}\x{0A}4\x{85}5\x{0A}\x{0D}\x{0A}7"
+my $input = "1\x{0A}2\x{0D}3\x{0D}\x{0A}4\N{NEXT LINE}5\x{0A}\x{0D}\x{0A}7"
   . ( "\x{0A}\x{0D}" x 4 ) #  5 lines -- 3 medial CRLF, plus 2 at ends
   . ( "\x{0D}" x 3 )  # 3 lines
   . "\x{85}" # 1 line
