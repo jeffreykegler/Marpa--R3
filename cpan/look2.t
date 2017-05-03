@@ -122,7 +122,7 @@ sub earley_set_display {
           end
           return false
       end
-      local g1r = recce.lmw_g1r
+      local g1r = recce.g1.lmw_r -- fixed, but not tested
       local g1g = recce.slg.g1.lmw_g -- fixed, but not tested
       local function origin_gen(es_id, eim_id)
           local rule_id, dot, this_origin, irl_id, irl_dot

@@ -169,9 +169,16 @@ sub Marpa::R3::Scanless::R::new {
     recce.slg = grammar
     local lua_ref = _M.register(registry, recce)
     recce.ref_count = 1
+
     local l0g = grammar.l0.lmw_g
+    recce.l0 = {}
+    recce.l0.irls = {}
+
+    recce.g1 = {}
+    recce.g1.isys = {}
     local g1g = grammar.g1.lmw_g
-    recce.lmw_g1r = _M.recce_new(g1g)
+    recce.g1.lmw_r = _M.recce_new(g1g)
+    recce.lmw_g1r = recce.g1.lmw_r
 
     recce.codepoint = nil
     recce.inputs = {}
@@ -195,11 +202,6 @@ sub Marpa::R3::Scanless::R::new {
 
     recce.lexeme_queue = {}
     recce.accept_queue = {}
-
-    recce.l0 = {}
-    recce.l0.irls = {}
-    recce.g1 = {}
-    recce.g1.isys = {}
 
     recce.per_codepoint = {}
     recce.end_pos = 0
