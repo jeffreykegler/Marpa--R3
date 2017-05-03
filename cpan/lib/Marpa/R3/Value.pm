@@ -1484,7 +1484,7 @@ sub Marpa::R3::Scanless::R::value {
     my ($result) = $slr->call_by_tag( ( __FILE__ . ':' . __LINE__ ),
         << 'END_OF_LUA', '>*' );
             recce=...
-    local g1r = recce.lmw_g1r
+    local g1r = recce.g1.lmw_r
 
     recce.tree_mode = recce.tree_mode or 'tree'
     if recce.tree_mode ~= 'tree' then
