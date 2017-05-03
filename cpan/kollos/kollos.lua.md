@@ -717,10 +717,10 @@ This is a registry object.
         end
          -- for now use a per-recce field
          -- later replace with a local
-        recce.terminals_expected = recce.lmw_g1r:terminals_expected()
+        recce.terminals_expected = recce.g1.lmw_r:terminals_expected()
         local count = #recce.terminals_expected
         if not count or count < 0 then
-            local error_description = recce.lmw_g1r:error_description()
+            local error_description = recce.g1.lmw_r:error_description()
             error('Internal error: terminals_expected() failed in u_l0r_new(); %s',
                     error_description)
         end
@@ -782,7 +782,7 @@ The top-level read function.
                     q[#q+1] = { '!trace', 'lexer restarted recognizer', recce.perl_pos}
                 end
             end
-            local g1r = recce.lmw_g1r
+            local g1r = recce.g1.lmw_r
             local result = recce:l0_read_lexeme()
             if result == 'trace' then return result end
             if result == 'unregistered char' then return result end
@@ -1077,7 +1077,7 @@ Determine which lexemes are acceptable or discards.
             end
             -- this block hides the local's and allows the goto to work
             do
-                local is_expected = recce.lmw_g1r:terminal_is_expected(g1_lexeme)
+                local is_expected = recce.g1.lmw_r:terminal_is_expected(g1_lexeme)
                 if not is_expected then
                     error(string.format('Internnal error: Marpa recognized unexpected token @%d-%d: lexme=%d',
                         recce.start_of_lexeme, recce.end_of_lexeme, g1_lexeme))
@@ -1141,7 +1141,7 @@ events into real trace events.
                         rule_id, lexeme_start, lexeme_end}
                 end
                     local q = recce.event_queue
-                    local g1r = recce.lmw_g1r
+                    local g1r = recce.g1.lmw_r
                     local event_on_discard_active =
                         recce.l0.irls[rule_id].event_on_discard_active
                     if event_on_discard_active then
@@ -1192,7 +1192,7 @@ Returns `true` is there was one,
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.g1_earleme_complete(recce)
         recce:g1_alternatives()
-        local g1r = recce.lmw_g1r
+        local g1r = recce.g1.lmw_r
         local result = g1r:earleme_complete()
         if result < 0 then
             error(string.format(
@@ -1209,7 +1209,7 @@ Returns `true` is there was one,
         local start_of_lexeme = recce.start_of_lexeme
         local end_of_lexeme = recce.end_of_lexeme
         local lexeme_length = end_of_lexeme - start_of_lexeme
-        local g1r = recce.lmw_g1r
+        local g1r = recce.g1.lmw_r
         local latest_earley_set = g1r:latest_earley_set()
         recce.per_es[latest_earley_set] = { start_of_lexeme, lexeme_length }
     end
@@ -1231,7 +1231,7 @@ Read alternatives into the G1 grammar.
             local q = slr.event_queue
             q[#q+1] = { '!trace', 'g1 attempting lexeme', lexeme_start, lexeme_end, g1_lexeme}
         end
-        local g1r = slr.lmw_g1r
+        local g1r = slr.g1.lmw_r
         local kollos = getmetatable(g1r).kollos
         local value_is_literal = kollos.defines.TOKEN_VALUE_IS_LITERAL
         local return_value = g1r:alternative(g1_lexeme, value_is_literal, 1)
@@ -1388,13 +1388,13 @@ acceptance is caught here via rejection).  Ignore
                   (length_arg or math.mininteger)
            ))
         end
-        local g1r = slr.lmw_g1r
+        local g1r = slr.g1.lmw_r
         slr.event_queue = {}
         slr.is_external_scanning = false
         local result = g1r:earleme_complete()
         if result >= 0 then
             slr:g1_convert_events(slr.perl_pos)
-            local g1r = slr.lmw_g1r
+            local g1r = slr.g1.lmw_r
             local latest_earley_set = g1r:latest_earley_set()
             slr.per_es[latest_earley_set] = { start_pos, lexeme_length }
             slr.perl_pos = start_pos + lexeme_length
@@ -1430,7 +1430,7 @@ Returns the Libmarpa object if it could "get" one,
             return lmw_o
         end
         kollos.throw = false
-        local bocage = kollos.bocage_new(recce.lmw_g1r, recce.end_of_parse)
+        local bocage = kollos.bocage_new(recce.g1.lmw_r, recce.end_of_parse)
         kollos.throw = true
         recce.lmw_b = bocage
         if not bocage then
@@ -1593,7 +1593,7 @@ or nil if there was none.
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.last_completed(recce, symbol_id)
-         local g1r = recce.lmw_g1r
+         local g1r = recce.g1.lmw_r
          local g1g = recce.slg.g1.lmw_g
          local latest_earley_set = g1r:latest_earley_set()
          local first_origin = latest_earley_set + 1
@@ -1628,7 +1628,7 @@ or nil if there was none.
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.progress(recce, ordinal_arg)
-        local g1r = recce.lmw_g1r
+        local g1r = recce.g1.lmw_r
         local ordinal = ordinal_arg
         local latest_earley_set = g1r:latest_earley_set()
         if ordinal > latest_earley_set then
@@ -1822,7 +1822,7 @@ part of a "Pure Lua" implementation.
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.show_leo_item(recce)
-        local g1r = recce.lmw_g1r
+        local g1r = recce.g1.lmw_r
         local g1g = recce.slg.g1.lmw_g
         local leo_base_state = g1r:_leo_base_state()
         if not leo_base_state then return '' end
@@ -3003,7 +3003,7 @@ Functions for tracing Earley sets
 
     function _M.class_recce.completion_link_data(lmw_r, ahm_id)
         local lmw_g = lmw_r.lmw_g
-        local g1r = recce.lmw_g1r
+        local g1r = recce.g1.lmw_r
         local result = {}
         local predecessor_state = g1r:_source_predecessor_state()
         local origin_set_id = g1r:_earley_item_origin()
@@ -3020,7 +3020,7 @@ Functions for tracing Earley sets
 
     function _M.class_recce.leo_link_data(lmw_r, ahm_id)
         local lmw_g = lmw_r.lmw_g
-        local g1r = recce.lmw_g1r
+        local g1r = recce.g1.lmw_r
         local result = {}
         local middle_set_id = g1r:_source_middle()
         local middle_earleme = g1r:earleme(middle_set_id)
@@ -3123,7 +3123,7 @@ Functions for tracing Earley sets
     end
 
     function _M.class_slr.g1_earley_set_data(recce, set_id)
-        local lmw_r = recce.lmw_g1r
+        local lmw_r = recce.g1.lmw_r
         local result = lmw_r:earley_set_data(set_id)
         return result
     end
@@ -3218,16 +3218,16 @@ It should free all memory associated with the valuation.
         local bocage = recce.lmw_b
         local parent_or_node_id = bocage:_and_node_parent(and_node_id)
         local origin = bocage:_or_node_origin(parent_or_node_id)
-        local origin_earleme = recce.lmw_g1r:earleme(origin)
+        local origin_earleme = recce.g1.lmw_r:earleme(origin)
 
         local current_earley_set = bocage:_or_node_set(parent_or_node_id)
-        local current_earleme = recce.lmw_g1r:earleme(current_earley_set)
+        local current_earleme = recce.g1.lmw_r:earleme(current_earley_set)
 
         local cause_id = bocage:_and_node_cause(and_node_id)
         local predecessor_id = bocage:_and_node_predecessor(and_node_id)
 
         local middle_earley_set = bocage:_and_node_middle(and_node_id)
-        local middle_earleme = recce.lmw_g1r:earleme(middle_earley_set)
+        local middle_earleme = recce.g1.lmw_r:earleme(middle_earley_set)
 
         local position = bocage:_or_node_position(parent_or_node_id)
         local irl_id = bocage:_or_node_irl(parent_or_node_id)
@@ -3250,7 +3250,7 @@ It should free all memory associated with the valuation.
 
     function _M.class_slr.show_and_nodes(recce)
         local bocage = recce.lmw_b
-        local g1r = recce.lmw_g1r
+        local g1r = recce.g1.lmw_r
         local data = {}
         local id = -1
         while true do
@@ -3334,7 +3334,7 @@ It should free all memory associated with the valuation.
 
     function _M.class_slr.show_or_nodes(recce)
         local bocage = recce.lmw_b
-        local g1r = recce.lmw_g1r
+        local g1r = recce.g1.lmw_r
         local data = {}
         local id = -1
         while true do
@@ -3391,9 +3391,9 @@ It should free all memory associated with the valuation.
             if not irl_id then goto LAST_OR_NODE end
             local position = bocage:_or_node_position(or_node_id)
             local or_origin = bocage:_or_node_origin(or_node_id)
-            local origin_earleme = recce.lmw_g1r:earleme(or_origin)
+            local origin_earleme = recce.g1.lmw_r:earleme(or_origin)
             local or_set = bocage:_or_node_set(or_node_id)
-            local current_earleme = recce.lmw_g1r:earleme(or_set)
+            local current_earleme = recce.g1.lmw_r:earleme(or_set)
             local and_node_ids = {}
             local first_and_id = bocage:_or_node_first_and(or_node_id)
             local last_and_id = bocage:_or_node_last_and(or_node_id)
