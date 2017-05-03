@@ -803,9 +803,9 @@ otherwise a failure code.
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slr.l0_earleme_complete(recce)
-        local l0r = recce.l0.lmw_r
-        local complete_result = recce.l0.lmw_r:earleme_complete()
+    function _M.class_slr.l0_earleme_complete(slr)
+        local l0r = slr.l0.lmw_r
+        local complete_result = l0r:earleme_complete()
         if complete_result == -2 then
             if l0r:error_code() == _M.err.PARSE_EXHAUSTED then
                 return 'exhausted on failure'
@@ -816,8 +816,8 @@ otherwise a failure code.
             l0r:error_description())
         end
         if complete_result > 0 then
-            recce:l0_convert_events(recce.perl_pos)
-            local is_exhausted = recce.l0.lmw_r:is_exhausted()
+            slr:l0_convert_events(slr.perl_pos)
+            local is_exhausted = l0r:is_exhausted()
             if is_exhausted ~= 0 then
                 return 'exhausted on success'
             end
