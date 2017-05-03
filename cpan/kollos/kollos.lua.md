@@ -1198,9 +1198,9 @@ Returns `true` is there was one,
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slr.g1_earleme_complete(recce)
-        recce:g1_alternatives()
-        local g1r = recce.g1.lmw_r
+    function _M.class_slr.g1_earleme_complete(slr)
+        slr:g1_alternatives()
+        local g1r = slr.g1.lmw_r
         local result = g1r:earleme_complete()
         if result < 0 then
             error(string.format(
@@ -1208,18 +1208,19 @@ Returns `true` is there was one,
                 g1r:error_description()
             ))
         end
-        local end_of_lexeme = recce.end_of_lexeme
-        recce.lexer_start_pos = end_of_lexeme
-        recce.perl_pos = end_of_lexeme
+        local end_of_lexeme = slr.end_of_lexeme
+        slr.lexer_start_pos = end_of_lexeme
+        slr.perl_pos = end_of_lexeme
         if result > 0 then
-            recce:g1_convert_events(recce.perl_pos)
+            slr:g1_convert_events(slr.perl_pos)
         end
-        local start_of_lexeme = recce.start_of_lexeme
-        local end_of_lexeme = recce.end_of_lexeme
+        local start_of_lexeme = slr.start_of_lexeme
+        local end_of_lexeme = slr.end_of_lexeme
         local lexeme_length = end_of_lexeme - start_of_lexeme
-        local g1r = recce.g1.lmw_r
+        local g1r = slr.g1.lmw_r
         local latest_earley_set = g1r:latest_earley_set()
-        recce.per_es[latest_earley_set] = { start_of_lexeme, lexeme_length }
+        slr.per_es[latest_earley_set] =
+            { slr.current_block.index, start_of_lexeme, lexeme_length }
     end
 ```
 
@@ -1404,7 +1405,8 @@ acceptance is caught here via rejection).  Ignore
             slr:g1_convert_events(slr.perl_pos)
             local g1r = slr.g1.lmw_r
             local latest_earley_set = g1r:latest_earley_set()
-            slr.per_es[latest_earley_set] = { start_pos, lexeme_length }
+            slr.per_es[latest_earley_set] =
+                { slr.current_block.index, start_pos, lexeme_length }
             slr.perl_pos = start_pos + lexeme_length
             return slr.perl_pos
         end
@@ -1482,10 +1484,10 @@ span is zero or less.
              end
              if g1_start >= #per_es then
                  local last_data = per_es[#per_es]
-                 return last_data[1] + last_data[2], 0
+                 return last_data[2] + last_data[3], 0
              end
              local first_per_es = per_es[g1_start+1]
-             return first_per_es[1], 0
+             return first_per_es[2], 0
          end
          -- count cannot be less than 1,
          -- g1_end >= g1_start, always
@@ -1496,9 +1498,9 @@ span is zero or less.
          if g1_end >= #per_es then g1_end = #per_es - 1 end
          local start_per_es = per_es[g1_start+1]
          local end_per_es = per_es[g1_end+1]
-         local l0_start = start_per_es[1]
-         local end_es_start = end_per_es[1]
-         local end_es_length = end_per_es[2]
+         local l0_start = start_per_es[2]
+         local end_es_start = end_per_es[2]
+         local end_es_length = end_per_es[3]
          local l0_length = end_es_start + end_es_length - l0_start
          -- Because Marpa allowed backward jumps in the input, negative
          -- lengths were possible.  Change these to point to a single
@@ -2254,12 +2256,12 @@ in terms of the input string.
         start_es = start_es + 1
         if start_es > #per_es then
              local es_entry = per_es[#per_es]
-             l0_start = es_entry[1] + es_entry[2]
+             l0_start = es_entry[2] + es_entry[3]
         elseif start_es < 1 then
              l0_start = 0
         else
              local es_entry = per_es[start_es]
-             l0_start = es_entry[1]
+             l0_start = es_entry[2]
         end
         local next_ix = #new_values + 1;
         new_values[next_ix] = l0_start
@@ -2285,10 +2287,10 @@ that is, in terms of the input string
         start_es = start_es + 1
         local start_es_entry = per_es[start_es]
         if start_es_entry then
-            local l0_start = start_es_entry[1]
+            local l0_start = start_es_entry[2]
             local end_es_entry = per_es[end_es]
             l0_length =
-                end_es_entry[1] + end_es_entry[2] - l0_start
+                end_es_entry[2] + end_es_entry[3] - l0_start
         end
         local next_ix = #new_values + 1;
         new_values[next_ix] = l0_length
@@ -2668,8 +2670,8 @@ is zero.
       if not end_entry then
           end_entry = per_es[#per_es]
       end
-      local l0_start = start_entry[1]
-      local l0_length = end_entry[1] + end_entry[2] - l0_start
+      local l0_start = start_entry[2]
+      local l0_length = end_entry[2] + end_entry[3] - l0_start
       return l0_start, l0_length
     end
 
