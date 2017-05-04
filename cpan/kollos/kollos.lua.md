@@ -1491,7 +1491,9 @@ for each trio to the end of `table`, which must be a
             local start_byte_p = slr:per_pos(block_ix, start + 1)
             local end_byte_p = slr:per_pos(block_ix, start + len + 1)
             local text = block.text
-            pieces[#pieces+1] = text:sub(start_byte_p, end_byte_p - 1)
+            local piece = text:sub(start_byte_p, end_byte_p - 1)
+            -- io.stderr:write("Piece: ", piece, "\n")
+            pieces[#pieces+1] = piece
             ix = ix + 3
         end
         return
@@ -1501,17 +1503,21 @@ for each trio to the end of `table`, which must be a
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.g1_span_to_literal(slr, g1_start, g1_count)
-        local g1_end = g1_start + g1_count - 1
-        local g1_ix = g1_start
+        -- io.stderr:write(string.format("g1_span_to_literal(%d, %d)\n",
+            -- g1_start, g1_count
+        -- ))
+        local g1_ix = g1_start + 1
+        local g1_end = g1_ix + g1_count - 1
         local pieces = {}
         local per_es = slr.per_es
         local trailers = slr.trailers
-        for g1_ix = 1, g1_end - 1 do
+        while g1_ix < g1_end do
              slr:add_sweep_to_table(per_es[g1_ix], pieces)
              local trailer = trailers[g1_ix]
              if trailer then
                  slr:add_sweep_to_table(trailer, pieces)
              end
+             g1_ix = g1_ix + 1
         end
         slr:add_sweep_to_table(per_es[g1_end], pieces)
         return table.concat(pieces)
@@ -2242,19 +2248,20 @@ it assumes that the caller has ensured that
 
 ```
     -- miranda: section+ VM operations
-    function _M.class_slr.current_token_literal(recce)
-      if recce.token_is_literal == recce.this_step.value then
-          local start_es = recce.this_step.start_es_id
-          local end_es = recce.this_step.es_id
-          local g1_count = end_es - start_es + 1
+    function _M.class_slr.current_token_literal(slr)
+      if slr.token_is_literal == slr.this_step.value then
+          local start_es = slr.this_step.start_es_id
+          local end_es = slr.this_step.es_id
+          local g1_count = end_es - start_es
+          local literal = slr:g1_span_to_literal(start_es, g1_count)
           local l0_start, l0_length =
-              recce:earley_sets_to_L0_span(start_es, end_es)
+              slr:earley_sets_to_L0_span(start_es, end_es)
           if l0_length <= 0 then return '' end
-          local tree_op = { 'perl', 'literal', l0_start, l0_length }
+          local tree_op = { 'perl', 'literal', l0_start, l0_length, literal }
           setmetatable(tree_op, _M.mt_tree_op)
           return tree_op
       end
-      return recce.token_values[recce.this_step.value]
+      return slr.token_values[slr.this_step.value]
     end
 
 ```
