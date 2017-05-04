@@ -1892,9 +1892,9 @@ part of a "Pure Lua" implementation.
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slr.show_leo_item(recce)
-        local g1r = recce.g1.lmw_r
-        local g1g = recce.slg.g1.lmw_g
+    function _M.class_slr.show_leo_item(slr)
+        local g1r = slr.g1.lmw_r
+        local g1g = slr.slg.g1.lmw_g
         local leo_base_state = g1r:_leo_base_state()
         if not leo_base_state then return '' end
         local trace_earley_set = g1r:_trace_earley_set()
@@ -1991,11 +1991,11 @@ Perhaps I should delete this.
 ```
     -- miranda: section VM operations
 
-    local function op_fn_debug (recce)
-        for k,v in pairs(recce) do
+    local function op_fn_debug (slr)
+        for k,v in pairs(slr) do
             print(k, v)
         end
-        mt = debug.getmetatable(recce)
+        mt = debug.getmetatable(slr)
         print([[=== metatable ===]])
         for k,v in pairs(mt) do
             print(k, v)
@@ -2015,7 +2015,7 @@ It may be useful in debugging.
 ```
     -- miranda: section+ VM operations
 
-    local function op_fn_noop (recce)
+    local function op_fn_noop (slr)
         return -2
     end
     op_fn_add("noop", op_fn_noop)
@@ -2033,7 +2033,7 @@ fast fails with a clear message.
 ```
     -- miranda: section+ VM operations
 
-    local function op_fn_bail (recce)
+    local function op_fn_bail (slr)
         error('executing VM op "bail"')
     end
     op_fn_add("bail", op_fn_bail)
@@ -2045,7 +2045,7 @@ fast fails with a clear message.
 If an operation in the VM returns -1, it is a
 "result operation".
 The actual result is expected to be in the stack
-at index `recce.this_step.result`.
+at index `slr.this_step.result`.
 
 The result operation is not required to be the
 last operation in a sequence,
@@ -2059,7 +2059,7 @@ If a sequence ends without encountering a result
 operation, an implicit "no-op" result operation
 is assumed and, as usual,
 the result is the value in the stack
-at index `recce.this_step.result`.
+at index `slr.this_step.result`.
 
 #### VM "result is undef" operation
 
@@ -2069,11 +2069,11 @@ The result of the semantics is a Perl undef.
 ```
     -- miranda: section+ VM operations
 
-    local function op_fn_result_is_undef(recce)
-        local stack = recce.lmw_v.stack
+    local function op_fn_result_is_undef(slr)
+        local stack = slr.lmw_v.stack
         local undef_tree_op = { 'perl', 'undef' }
         setmetatable(undef_tree_op, _M.mt_tree_op)
-        stack[recce.this_step.result] = undef_tree_op
+        stack[slr.this_step.result] = undef_tree_op
         return -1
     end
     op_fn_add("result_is_undef", op_fn_result_is_undef)
@@ -2090,19 +2090,19 @@ if not the value is an undef.
 ```
     -- miranda: section+ VM operations
 
-    local function op_fn_result_is_token_value(recce)
-        if recce.this_step.type ~= 'MARPA_STEP_TOKEN' then
-          return op_fn_result_is_undef(recce)
+    local function op_fn_result_is_token_value(slr)
+        if slr.this_step.type ~= 'MARPA_STEP_TOKEN' then
+          return op_fn_result_is_undef(slr)
         end
-        local stack = recce.lmw_v.stack
-        local result_ix = recce.this_step.result
-        stack[result_ix] = recce:current_token_literal()
-        if recce.trace_values > 0 then
-          local top_of_queue = #recce.trace_values_queue;
+        local stack = slr.lmw_v.stack
+        local result_ix = slr.this_step.result
+        stack[result_ix] = slr:current_token_literal()
+        if slr.trace_values > 0 then
+          local top_of_queue = #slr.trace_values_queue;
           local tag, token_sv
-          recce.trace_values_queue[top_of_queue+1] =
-             {tag, recce.this_step.type, recce.this_step.symbol, recce.this_step.value, token_sv};
-             -- io.stderr:write('[step_type]: ', inspect(recce))
+          slr.trace_values_queue[top_of_queue+1] =
+             {tag, slr.this_step.type, slr.this_step.symbol, slr.this_step.value, token_sv};
+             -- io.stderr:write('[step_type]: ', inspect(slr))
         end
         return -1
     end
@@ -2114,16 +2114,16 @@ if not the value is an undef.
 
 ```
     -- miranda: section+ VM operations
-    local function op_fn_result_is_n_of_rhs(recce, rhs_ix)
-        if recce.this_step.type ~= 'MARPA_STEP_RULE' then
-          return op_fn_result_is_undef(recce)
+    local function op_fn_result_is_n_of_rhs(slr, rhs_ix)
+        if slr.this_step.type ~= 'MARPA_STEP_RULE' then
+          return op_fn_result_is_undef(slr)
         end
-        local stack = recce.lmw_v.stack
-        local result_ix = recce.this_step.result
+        local stack = slr.lmw_v.stack
+        local result_ix = slr.this_step.result
         repeat
             if rhs_ix == 0 then break end
             local fetch_ix = result_ix + rhs_ix
-            if fetch_ix > recce.this_step.arg_n then
+            if fetch_ix > slr.this_step.arg_n then
                 local undef_tree_op = { 'perl', 'undef' }
                 setmetatable(undef_tree_op, _M.mt_tree_op)
                 stack[result_ix] = undef_tree_op
@@ -2149,16 +2149,16 @@ the "N of RHS" operation should be used.
 
 ```
     -- miranda: section+ VM operations
-    local function op_fn_result_is_n_of_sequence(recce, item_ix)
-        if recce.this_step.type ~= 'MARPA_STEP_RULE' then
-          return op_fn_result_is_undef(recce)
+    local function op_fn_result_is_n_of_sequence(slr, item_ix)
+        if slr.this_step.type ~= 'MARPA_STEP_RULE' then
+          return op_fn_result_is_undef(slr)
         end
-        local result_ix = recce.this_step.result
+        local result_ix = slr.this_step.result
         local fetch_ix = result_ix + item_ix * 2
-        if fetch_ix > recce.this_step.arg_n then
-          return op_fn_result_is_undef(recce)
+        if fetch_ix > slr.this_step.arg_n then
+          return op_fn_result_is_undef(slr)
         end
-        local stack = recce.lmw_v.stack
+        local stack = slr.lmw_v.stack
         if item_ix > 0 then
             stack[result_ix] = stack[fetch_ix]
         end
@@ -2174,17 +2174,17 @@ Returns a constant result.
 
 ```
     -- miranda: section+ VM operations
-    local function op_fn_result_is_constant(recce, constant_ix)
+    local function op_fn_result_is_constant(slr, constant_ix)
         local constant_tree_op = { 'perl', 'constant', constant_ix }
         setmetatable(constant_tree_op, _M.mt_tree_op)
-        local stack = recce.lmw_v.stack
-        local result_ix = recce.this_step.result
+        local stack = slr.lmw_v.stack
+        local result_ix = slr.this_step.result
         stack[result_ix] = constant_tree_op
-        if recce.trace_values > 0 and recce.this_step.type == 'MARPA_STEP_TOKEN' then
-            local top_of_queue = #recce.trace_values_queue
-            recce.trace_values_queue[top_of_queue+1] =
-                { "valuator unknown step", recce.this_step.type, recce.token, constant}
-                      -- io.stderr:write('valuator unknown step: ', inspect(recce))
+        if slr.trace_values > 0 and slr.this_step.type == 'MARPA_STEP_TOKEN' then
+            local top_of_queue = #slr.trace_values_queue
+            slr.trace_values_queue[top_of_queue+1] =
+                { "valuator unknown step", slr.this_step.type, slr.token, constant}
+                      -- io.stderr:write('valuator unknown step: ', inspect(slr))
         end
         return -1
     end
@@ -2205,7 +2205,7 @@ Push an undef on the values array.
 ```
     -- miranda: section+ VM operations
 
-    local function op_fn_push_undef(recce, dummy, new_values)
+    local function op_fn_push_undef(slr, dummy, new_values)
         local next_ix = #new_values + 1;
         local undef_tree_op = { 'perl', 'undef' }
         setmetatable(undef_tree_op, _M.mt_tree_op)
@@ -2223,12 +2223,12 @@ Push one of the RHS child values onto the values array.
 ```
     -- miranda: section+ VM operations
 
-    local function op_fn_push_one(recce, rhs_ix, new_values)
-        if recce.this_step.type ~= 'MARPA_STEP_RULE' then
-          return op_fn_push_undef(recce, nil, new_values)
+    local function op_fn_push_one(slr, rhs_ix, new_values)
+        if slr.this_step.type ~= 'MARPA_STEP_RULE' then
+          return op_fn_push_undef(slr, nil, new_values)
         end
-        local stack = recce.lmw_v.stack
-        local result_ix = recce.this_step.result
+        local stack = slr.lmw_v.stack
+        local result_ix = slr.this_step.result
         local next_ix = #new_values + 1;
         new_values[next_ix] = stack[result_ix + rhs_ix]
         return -2
@@ -2275,16 +2275,16 @@ Otherwise the values of the RHS children are pushed.
 ```
     -- miranda: section+ VM operations
 
-    local function op_fn_push_values(recce, increment, new_values)
-        if recce.this_step.type == 'MARPA_STEP_TOKEN' then
+    local function op_fn_push_values(slr, increment, new_values)
+        if slr.this_step.type == 'MARPA_STEP_TOKEN' then
             local next_ix = #new_values + 1;
-            new_values[next_ix] = recce:current_token_literal()
+            new_values[next_ix] = slr:current_token_literal()
             return -2
         end
-        if recce.this_step.type == 'MARPA_STEP_RULE' then
-            local stack = recce.lmw_v.stack
-            local arg_n = recce.this_step.arg_n
-            local result_ix = recce.this_step.result
+        if slr.this_step.type == 'MARPA_STEP_RULE' then
+            local stack = slr.lmw_v.stack
+            local arg_n = slr.this_step.arg_n
+            local result_ix = slr.this_step.result
             local to_ix = #new_values + 1;
             for from_ix = result_ix,arg_n,increment do
                 new_values[to_ix] = stack[from_ix]
@@ -2306,9 +2306,9 @@ in terms of the input string.
 
 ```
     -- miranda: section+ VM operations
-    local function op_fn_push_start(recce, dummy, new_values)
-        local start_es = recce.this_step.start_es_id
-        local per_es = recce.per_es
+    local function op_fn_push_start(slr, dummy, new_values)
+        local start_es = slr.this_step.start_es_id
+        local per_es = slr.per_es
         local l0_start
         start_es = start_es + 1
         if start_es > #per_es then
@@ -2336,10 +2336,10 @@ that is, in terms of the input string
 
 ```
     -- miranda: section+ VM operations
-    local function op_fn_push_length(recce, dummy, new_values)
-        local start_es = recce.this_step.start_es_id
-        local end_es = recce.this_step.es_id
-        local per_es = recce.per_es
+    local function op_fn_push_length(slr, dummy, new_values)
+        local start_es = slr.this_step.start_es_id
+        local end_es = slr.this_step.es_id
+        local per_es = slr.per_es
         local l0_length = 0
         start_es = start_es + 1
         local start_es_entry = per_es[start_es]
@@ -2364,9 +2364,9 @@ in terms of G1 Earley sets.
 
 ```
     -- miranda: section+ VM operations
-    local function op_fn_push_g1_start(recce, dummy, new_values)
+    local function op_fn_push_g1_start(slr, dummy, new_values)
         local next_ix = #new_values + 1;
-        new_values[next_ix] = recce.this_step.start_es_id
+        new_values[next_ix] = slr.this_step.start_es_id
         return -2
     end
     op_fn_add("push_g1_start", op_fn_push_g1_start)
@@ -2380,10 +2380,10 @@ that is, in terms of G1 Earley sets.
 
 ```
     -- miranda: section+ VM operations
-    local function op_fn_push_g1_length(recce, dummy, new_values)
+    local function op_fn_push_g1_length(slr, dummy, new_values)
         local next_ix = #new_values + 1;
-        new_values[next_ix] = (recce.this_step.es_id
-            - recce.this_step.start_es_id) + 1
+        new_values[next_ix] = (slr.this_step.es_id
+            - slr.this_step.start_es_id) + 1
         return -2
     end
     op_fn_add("push_g1_length", op_fn_push_g1_length)
@@ -2394,7 +2394,7 @@ that is, in terms of G1 Earley sets.
 
 ```
     -- miranda: section+ VM operations
-    local function op_fn_push_constant(recce, constant_ix, new_values)
+    local function op_fn_push_constant(slr, constant_ix, new_values)
         local constant_tree_op = { 'perl', 'constant', constant_ix }
         setmetatable(constant_tree_op, _M.mt_tree_op)
         -- io.stderr:write('constant_ix: ', constant_ix, "\n")
@@ -2414,8 +2414,8 @@ of every sequence of operations
 
 ```
     -- miranda: section+ VM operations
-    local function op_fn_bless(recce, blessing_ix)
-        recce.this_step.blessing_ix = blessing_ix
+    local function op_fn_bless(slr, blessing_ix)
+        slr.this_step.blessing_ix = blessing_ix
         return -2
     end
     op_fn_add("bless", op_fn_bless)
@@ -2429,14 +2429,14 @@ is the result of this sequence of operations.
 
 ```
     -- miranda: section+ VM operations
-    local function op_fn_result_is_array(recce, dummy, new_values)
-        local blessing_ix = recce.this_step.blessing_ix
+    local function op_fn_result_is_array(slr, dummy, new_values)
+        local blessing_ix = slr.this_step.blessing_ix
         if blessing_ix then
           new_values = { 'perl', 'bless', new_values, blessing_ix }
           setmetatable(new_values, _M.mt_tree_op)
         end
-        local stack = recce.lmw_v.stack
-        local result_ix = recce.this_step.result
+        local stack = slr.lmw_v.stack
+        local result_ix = slr.this_step.result
         stack[result_ix] = new_values
         return -1
     end
@@ -2454,9 +2454,9 @@ implementation, which returned the size of the
 
 ```
     -- miranda: section+ VM operations
-    local function op_fn_callback(recce, dummy, new_values)
-        local blessing_ix = recce.this_step.blessing_ix
-        local step_type = recce.this_step.type
+    local function op_fn_callback(slr, dummy, new_values)
+        local blessing_ix = slr.this_step.blessing_ix
+        local step_type = slr.this_step.type
         if step_type ~= 'MARPA_STEP_RULE'
             and step_type ~= 'MARPA_STEP_NULLING_SYMBOL'
         then
@@ -2466,7 +2466,7 @@ implementation, which returned the size of the
             )
             os.exit(false)
         end
-        local blessing_ix = recce.this_step.blessing_ix
+        local blessing_ix = slr.this_step.blessing_ix
         if blessing_ix then
           new_values = { 'perl', 'bless', new_values, blessing_ix }
           setmetatable(new_values, _M.mt_tree_op)
@@ -2481,7 +2481,7 @@ implementation, which returned the size of the
 
 ```
     -- miranda: section+ VM operations
-    function _M.class_slr.do_ops(recce, ops, new_values)
+    function _M.class_slr.do_ops(slr, ops, new_values)
         local op_ix = 1
         while op_ix <= #ops do
             local op_code = ops[op_ix]
@@ -2490,17 +2490,17 @@ implementation, which returned the size of the
             end
             local fn_key = ops[op_ix+1]
             local arg = ops[op_ix+2]
-            if recce.trace_values >= 3 then
-              local queue = recce.trace_values_queue
+            if slr.trace_values >= 3 then
+              local queue = slr.trace_values_queue
               local tag = 'starting lua op'
-              queue[#queue+1] = {'starting op', recce.this_step.type, 'lua'}
-              queue[#queue+1] = {tag, recce.this_step.type, _M.vm_op_names[fn_key]}
-              -- io.stderr:write('starting op: ', inspect(recce))
+              queue[#queue+1] = {'starting op', slr.this_step.type, 'lua'}
+              queue[#queue+1] = {tag, slr.this_step.type, _M.vm_op_names[fn_key]}
+              -- io.stderr:write('starting op: ', inspect(slr))
             end
             -- io.stderr:write('ops: ', inspect(_M.vm_ops), '\n')
             -- io.stderr:write('fn_key: ', inspect(fn_key), '\n')
             local op_fn = _M.vm_ops[fn_key]
-            local result = op_fn(recce, arg, new_values)
+            local result = op_fn(slr, arg, new_values)
             if result >= -1 then return result end
             op_ix = op_ix + 3
             end
@@ -2527,32 +2527,32 @@ with "trace" and "do not return" being special cases.
 
 ```
     -- miranda: section+ VM operations
-    function _M.class_slr.find_and_do_ops(recce)
-        recce.trace_values_queue = {}
-        local grammar = recce.slg
+    function _M.class_slr.find_and_do_ops(slr)
+        slr.trace_values_queue = {}
+        local grammar = slr.slg
         while true do
             local new_values = {}
             local ops = {}
-            recce:step()
-            if recce.this_step.type == 'MARPA_STEP_INACTIVE' then
+            slr:step()
+            if slr.this_step.type == 'MARPA_STEP_INACTIVE' then
                 return 0, new_values
             end
-            if recce.this_step.type == 'MARPA_STEP_RULE' then
-                ops = grammar.rule_semantics[recce.this_step.rule]
+            if slr.this_step.type == 'MARPA_STEP_RULE' then
+                ops = grammar.rule_semantics[slr.this_step.rule]
                 if not ops then
                     ops = _M.rule_semantics_default
                 end
                 goto DO_OPS
             end
-            if recce.this_step.type == 'MARPA_STEP_TOKEN' then
-                ops = grammar.token_semantics[recce.this_step.symbol]
+            if slr.this_step.type == 'MARPA_STEP_TOKEN' then
+                ops = grammar.token_semantics[slr.this_step.symbol]
                 if not ops then
                     ops = _M.token_semantics_default
                 end
                 goto DO_OPS
             end
-            if recce.this_step.type == 'MARPA_STEP_NULLING_SYMBOL' then
-                ops = grammar.nulling_semantics[recce.this_step.symbol]
+            if slr.this_step.type == 'MARPA_STEP_NULLING_SYMBOL' then
+                ops = grammar.nulling_semantics[slr.this_step.symbol]
                 if not ops then
                     ops = _M.nulling_semantics_default
                 end
@@ -2561,17 +2561,17 @@ with "trace" and "do not return" being special cases.
             if true then return 1, new_values end
             ::DO_OPS::
             if not ops then
-                error(string.format('No semantics defined for %s', recce.this_step.type))
+                error(string.format('No semantics defined for %s', slr.this_step.type))
             end
-            local do_ops_result = recce:do_ops(ops, new_values)
-            local stack = recce.lmw_v.stack
+            local do_ops_result = slr:do_ops(ops, new_values)
+            local stack = slr.lmw_v.stack
             -- truncate stack
-            local above_top = recce.this_step.result + 1
+            local above_top = slr.this_step.result + 1
             for i = above_top,#stack do stack[i] = nil end
             if do_ops_result > 0 then
                 return 3, new_values
             end
-            if #recce.trace_values_queue > 0 then return -1, new_values end
+            if #slr.trace_values_queue > 0 then return -1, new_values end
         end
     end
 
@@ -2671,8 +2671,8 @@ to set and discover various Lua values.
 
 ```
     -- miranda: section+ Utilities for semantics
-    function _M.class_slr.stack_top_index(recce)
-        return recce.this_step.result
+    function _M.class_slr.stack_top_index(slr)
+        return slr.this_step.result
     end
 
 ```
@@ -2681,8 +2681,8 @@ to set and discover various Lua values.
 
 ```
     -- miranda: section+ Utilities for semantics
-    function _M.class_slr.stack_get(recce, ix)
-        local stack = recce.lmw_v.stack
+    function _M.class_slr.stack_get(slr, ix)
+        local stack = slr.lmw_v.stack
         return stack[ix+0]
     end
 
@@ -2692,8 +2692,8 @@ to set and discover various Lua values.
 
 ```
     -- miranda: section+ Utilities for semantics
-    function _M.class_slr.stack_set(recce, ix, v)
-        local stack = recce.lmw_v.stack
+    function _M.class_slr.stack_set(slr, ix, v)
+        local stack = slr.lmw_v.stack
         stack[ix+0] = v
     end
 
