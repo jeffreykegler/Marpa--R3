@@ -1481,17 +1481,40 @@ for each trio to the end of `table`, which must be a
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slr.add_sweep_to_table(slr, sweep, table)
-        -- TODO
+    function _M.class_slr.add_sweep_to_table(slr, sweep, pieces)
         local inputs = slr.inputs
-        local ix = 1
-        while true do
+        for ix = 1, #sweep, 3 do
             local block_ix = sweep[ix]
-            if not block_ix then return end
             local block = inputs[block_ix]
             local start = sweep[ix+1]
             local len = sweep[ix+2]
+            local start_byte_p = slr:per_pos(block_ix, start + 1)
+            local end_byte_p = slr:per_pos(block_ix, start + len + 1)
+            local text = block.text
+            pieces[#pieces+1] = text:sub(start_byte_p, end_byte_p - 1)
+            ix = ix + 3
         end
+        return
+    end
+```
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slr.g1_span_to_literal(slr, g1_start, g1_count)
+        local g1_end = g1_start + g1_count - 1
+        local g1_ix = g1_start
+        local pieces = {}
+        local per_es = slr.per_es
+        local trailers = slr.trailers
+        for g1_ix = 1, g1_end - 1 do
+             slr:add_sweep_to_table(per_es[g1_ix], pieces)
+             local trailer = trailers[g1_ix]
+             if trailer then
+                 slr:add_sweep_to_table(trailer, pieces)
+             end
+        end
+        slr:add_sweep_to_table(per_es[g1_end], pieces)
+        return table.concat(pieces)
     end
 ```
 
@@ -1502,6 +1525,9 @@ Never fails -- any G1 span is converted into some
 kind of L0 span.  Further,
 the L0 span is zero-count iff the count of the G1
 span is zero or less.
+
+TODO -- Do I need to keep this?  If so, I must add
+logic for blocks.
 
 ```
     -- miranda: section+ most Lua function definitions
@@ -2212,7 +2238,7 @@ equivalent of the current token.
 It assumes that there *is* a current token,
 that is,
 it assumes that the caller has ensured that
-`recce.this_step.type ~= 'MARPA_STEP_TOKEN'`.
+`slr.this_step.type ~= 'MARPA_STEP_TOKEN'`.
 
 ```
     -- miranda: section+ VM operations
