@@ -1094,10 +1094,7 @@ END_OF_LUA
             my ($codepoint, $perl_pos) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
                 'recce = ...; return recce.codepoint, recce.perl_pos', '');
 
-            my $character =
-              substr
-              ${ $slr->[Marpa::R3::Internal::Scanless::R::P_INPUT_STRING] },
-              $perl_pos, 1;
+            my $character = pack('U', $codepoint);
 
             my $character_class_table =
               $slg->[Marpa::R3::Internal::Scanless::G::CHARACTER_CLASS_TABLE];
