@@ -582,23 +582,6 @@ sub do_tree_ops {
           ->[$constant_ix];
         return bless do_tree_ops( $slr, $tree->[2] ), $blessing;
     }
-    if ( $lua_to_perl_tree_op eq 'literal' ) {
-        # my $perl_literal =
-          # substr ${ $slr->[Marpa::R3::Internal::Scanless::R::P_INPUT_STRING] },
-          # $tree->[2], $tree->[3];
-
-        my $new_literal = $tree->[4];
-
-            # say STDERR ("Testing!:\n",
-            # $perl_literal, "\nVS.\n",
-            # $new_literal, "\n") if $new_literal ne $perl_literal;
-
-            # die("MISMATCH!:\n",
-            # $perl_literal, "\nVS.\n",
-            # $new_literal, "\n") if $new_literal ne $perl_literal;
-
-        return $new_literal;
-    }
     if ( $lua_to_perl_tree_op eq 'constant' ) {
         my $constant_ix = $tree->[2];
         my $slg         = $slr->[Marpa::R3::Internal::Scanless::R::SLG];

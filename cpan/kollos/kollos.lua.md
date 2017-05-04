@@ -2254,12 +2254,7 @@ it assumes that the caller has ensured that
           local end_es = slr.this_step.es_id
           local g1_count = end_es - start_es
           local literal = slr:g1_span_to_literal(start_es, g1_count)
-          local l0_start, l0_length =
-              slr:earley_sets_to_L0_span(start_es, end_es)
-          if l0_length <= 0 then return '' end
-          local tree_op = { 'perl', 'literal', l0_start, l0_length, literal }
-          setmetatable(tree_op, _M.mt_tree_op)
-          return tree_op
+          return literal
       end
       return slr.token_values[slr.this_step.value]
     end
