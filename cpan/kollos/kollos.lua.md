@@ -3042,7 +3042,7 @@ Functions for tracing Earley sets
         }
     end
 
-    function _M.class_recce.token_link_data(lmw_r)
+    function _M.class_slr.token_link_data(slr, lmw_r)
         local lmw_g = lmw_r.lmw_g
         local result = {}
         local token_id, value_ix = lmw_r:_source_token()
@@ -3063,7 +3063,7 @@ Functions for tracing Earley sets
         result.token_id = token_id
         result.value_ix = value_ix
         if value_ix ~= 2 then
-            result.value = recce.token_values[value_ix]
+            result.value = slr.token_values[value_ix]
         end
         return result
     end
@@ -3094,7 +3094,7 @@ Functions for tracing Earley sets
         return result
     end
 
-    function _M.class_recce.earley_item_data(lmw_r, set_id, item_id)
+    function _M.class_slr.earley_item_data(slr, lmw_r, set_id, item_id)
         local item_data = {}
         local lmw_g = lmw_r.lmw_g
 
@@ -3123,7 +3123,7 @@ Functions for tracing Earley sets
             local symbol_id = lmw_r:_first_token_link_trace()
             local links = {}
             while symbol_id do
-                links[#links+1] = lmw_r:token_link_data()
+                links[#links+1] = slr:token_link_data(lmw_r)
                 symbol_id = lmw_r:_next_token_link_trace()
             end
             item_data.token_links = links
@@ -3165,7 +3165,7 @@ Functions for tracing Earley sets
 
         local item_id = 0
         while true do
-            local item_data = lmw_r:earley_item_data(set_id, item_id)
+            local item_data = slr:earley_item_data(lmw_r, set_id, item_id)
             if not item_data then break end
             data[#data+1] = item_data
             item_id = item_id + 1
