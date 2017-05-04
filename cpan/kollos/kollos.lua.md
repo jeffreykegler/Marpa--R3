@@ -3069,14 +3069,12 @@ Functions for tracing Earley sets
     end
 
     function _M.class_recce.completion_link_data(lmw_r, ahm_id)
-        local lmw_g = lmw_r.lmw_g
-        local g1r = recce.g1.lmw_r
         local result = {}
-        local predecessor_state = g1r:_source_predecessor_state()
-        local origin_set_id = g1r:_earley_item_origin()
-        local origin_earleme = g1r:earleme(origin_set_id)
-        local middle_set_id = g1r:_source_middle()
-        local middle_earleme = g1r:earleme(middle_set_id)
+        local predecessor_state = lmw_r:_source_predecessor_state()
+        local origin_set_id = lmw_r:_earley_item_origin()
+        local origin_earleme = lmw_r:earleme(origin_set_id)
+        local middle_set_id = lmw_r:_source_middle()
+        local middle_earleme = lmw_r:earleme(middle_set_id)
         result.predecessor_state = predecessor_state
         result.origin_earleme = origin_earleme
         result.middle_earleme = middle_earleme
