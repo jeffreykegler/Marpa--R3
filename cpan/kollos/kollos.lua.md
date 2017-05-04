@@ -1466,6 +1466,26 @@ Returns the Libmarpa object if it could "get" one,
 
 ### Locations
 
+A "sweep" is a set of trios represeenting spans in the input.
+Each trio is `[block, start, length]`.
+The trios are stored as a sequence in a table, so that,
+if `n` is the number of trios,
+the table's length is `3*n`.
+Each trio represents a consecutive sequence of characters
+in `block`.
+A sweep can store other data in its non-numeric keys.
+
+`slr:add_sweep_to_table(sweep, table)` adds the literals
+for each trio to the end of `table`, which must be a
+(possibly zero-length) sequence of strings.
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slr.add_sweep_to_table(slr, sweep, table)
+        -- TODO
+    end
+```
+
 Given a G1 span return an L0 span.
 Note that the data for G1 location `n` is kept in
 `per_es[n+1]`, the data for Earley set `n+1`.
@@ -2654,14 +2674,14 @@ is zero.
 
 ```
     -- miranda: section+ Utilities for semantics
-    function _M.class_slr.earley_sets_to_L0_span(recce, start_earley_set, end_earley_set)
+    function _M.class_slr.earley_sets_to_L0_span(slr, start_earley_set, end_earley_set)
       start_earley_set = start_earley_set + 1
       -- normalize start_earley_set
       if start_earley_set < 1 then start_earley_set = 1 end
       if end_earley_set < start_earley_set then
           return 0, 0
       end
-      local per_es = recce.per_es
+      local per_es = slr.per_es
       local start_entry = per_es[start_earley_set]
       if not start_entry then
           return 0, 0
