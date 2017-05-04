@@ -1663,9 +1663,9 @@ or nil if there was none.
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slr.last_completed(recce, symbol_id)
-         local g1r = recce.g1.lmw_r
-         local g1g = recce.slg.g1.lmw_g
+    function _M.class_slr.last_completed(slr, symbol_id)
+         local g1r = slr.g1.lmw_r
+         local g1g = slr.slg.g1.lmw_g
          local latest_earley_set = g1r:latest_earley_set()
          local first_origin = latest_earley_set + 1
          local earley_set = latest_earley_set
@@ -1698,13 +1698,13 @@ or nil if there was none.
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slr.progress(recce, ordinal_arg)
-        local g1r = recce.g1.lmw_r
+    function _M.class_slr.progress(slr, ordinal_arg)
+        local g1r = slr.g1.lmw_r
         local ordinal = ordinal_arg
         local latest_earley_set = g1r:latest_earley_set()
         if ordinal > latest_earley_set then
             error(string.format(
-                "Argument out of bounds in recce->progress(%d)\n"
+                "Argument out of bounds in slr->progress(%d)\n"
                 .. "   Argument specifies Earley set after the latest Earley set 0\n"
                 .. "   The latest Earley set is Earley set $latest_earley_set\n",
                 ordinal_arg
@@ -1713,7 +1713,7 @@ or nil if there was none.
             ordinal = latest_earley_set + 1 + ordinal
             if ordinal < 0 then
                 error(string.format(
-                    "Argument out of bounds in recce->progress(%d)\n"
+                    "Argument out of bounds in slr->progress(%d)\n"
                     .. "   Argument specifies Earley set before Earley set 0\n",
                     ordinal_arg
                 ))
