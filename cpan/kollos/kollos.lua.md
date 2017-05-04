@@ -759,39 +759,39 @@ The top-level read function.
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slr.read(recce)
-        if recce.is_external_scanning then
+    function _M.class_slr.read(slr)
+        if slr.is_external_scanning then
            return 'unpermitted mix of external and internal scanning'
         end
-        recce.start_of_pause_lexeme = -1
-        recce.end_of_pause_lexeme = -1
-        recce.event_queue = {}
+        slr.start_of_pause_lexeme = -1
+        slr.end_of_pause_lexeme = -1
+        slr.event_queue = {}
         while true do
-            local lexer_start_pos = recce.lexer_start_pos
-            if lexer_start_pos >= recce.end_pos then
+            local lexer_start_pos = slr.lexer_start_pos
+            if lexer_start_pos >= slr.end_pos then
                 -- a 'normal' return
                 return
             end
             if lexer_start_pos >= 0 then
-                recce.perl_pos = lexer_start_pos
-                recce.start_of_lexeme = lexer_start_pos
-                recce.lexer_start_pos = -1
-                recce.l0.lmw_r = nil
-                if recce.trace_terminals >= 1 then
-                    local q = recce.event_queue
-                    q[#q+1] = { '!trace', 'lexer restarted recognizer', recce.perl_pos}
+                slr.perl_pos = lexer_start_pos
+                slr.start_of_lexeme = lexer_start_pos
+                slr.lexer_start_pos = -1
+                slr.l0.lmw_r = nil
+                if slr.trace_terminals >= 1 then
+                    local q = slr.event_queue
+                    q[#q+1] = { '!trace', 'lexer restarted recognizer', slr.perl_pos}
                 end
             end
-            local g1r = recce.g1.lmw_r
-            local result = recce:l0_read_lexeme()
+            local g1r = slr.g1.lmw_r
+            local result = slr:l0_read_lexeme()
             if result == 'trace' then return result end
             if result == 'unregistered char' then return result end
             local discard_mode = (g1r:is_exhausted() ~= 0)
-            result = recce:alternatives(discard_mode)
+            result = slr:alternatives(discard_mode)
             if result then return result end
-            local event_count = #recce.event_queue
+            local event_count = #slr.event_queue
             if event_count >= 1 then return 'event' end
-            if recce.trace_terminals ~= 0 then return 'trace' end
+            if slr.trace_terminals ~= 0 then return 'trace' end
         end
         error('Internal error: unexcepted end of read loop')
     end
@@ -833,23 +833,23 @@ which will be 1 or 0.
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slr.l0_alternative(recce, symbol_id)
-        local l0r = recce.l0.lmw_r
-        local codepoint = recce.codepoint
+    function _M.class_slr.l0_alternative(slr, symbol_id)
+        local l0r = slr.l0.lmw_r
+        local codepoint = slr.codepoint
         local result = l0r:alternative(symbol_id, 1, 1)
         if result == _M.err.UNEXPECTED_TOKEN_ID then
-            if recce.trace_terminals >= 1 then
-                local q = recce.event_queue
+            if slr.trace_terminals >= 1 then
+                local q = slr.event_queue
                 q[#q+1] = { '!trace', 'lexer rejected codepoint', codepoint,
-                     recce.perl_pos, symbol_id}
+                     slr.perl_pos, symbol_id}
             end
             return 0
         end
         if result == _M.err.NONE then
-            if recce.trace_terminals >= 1 then
-            local q = recce.event_queue
+            if slr.trace_terminals >= 1 then
+            local q = slr.event_queue
             q[#q+1] = { '!trace', 'lexer accepted codepoint', codepoint,
-                recce.perl_pos, symbol_id}
+                slr.perl_pos, symbol_id}
             end
             return 1
         end
@@ -857,7 +857,7 @@ which will be 1 or 0.
              Problem alternative() failed at char ix %d; symbol id %d; codepoint 0x%x
              Problem in l0_read(), alternative() failed: %s
         ]],
-            recce.perl_pos, symbol_id, codepoint, l0r:error_description()
+            slr.perl_pos, symbol_id, codepoint, l0r:error_description()
         ))
     end
 
@@ -870,9 +870,9 @@ otherwise an error code string.
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slr.l0_read_codepoint(recce)
-        local codepoint = recce.codepoint
-        local ops = recce.per_codepoint[codepoint]
+    function _M.class_slr.l0_read_codepoint(slr)
+        local codepoint = slr.codepoint
+        local ops = slr.per_codepoint[codepoint]
         if ops == nil then
             -- print( '1 unregistered char', codepoint, -1)
             return 'unregistered char'
@@ -886,18 +886,18 @@ otherwise an error code string.
             -- print( '2 unregistered char', codepoint, op_count)
             return 'unregistered char'
         end
-        if recce.trace_terminals >= 1 then
-           local q = recce.event_queue
-           q[#q+1] = { '!trace', 'lexer reading codepoint', codepoint, recce.perl_pos}
+        if slr.trace_terminals >= 1 then
+           local q = slr.event_queue
+           q[#q+1] = { '!trace', 'lexer reading codepoint', codepoint, slr.perl_pos}
         end
         local tokens_accepted = 0
         for ix = 1, op_count do
-            local symbol_id = recce.per_codepoint[codepoint][ix]
+            local symbol_id = slr.per_codepoint[codepoint][ix]
             tokens_accepted = tokens_accepted +
-                 recce:l0_alternative(symbol_id)
+                 slr:l0_alternative(symbol_id)
         end
         if tokens_accepted < 1 then return 'rejected char' end
-        local complete_result = recce:l0_earleme_complete()
+        local complete_result = slr:l0_earleme_complete()
         if complete_result then return complete_result end
         return
     end
@@ -951,10 +951,10 @@ rule, false otherwise.
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slr.l0_track_candidates(recce)
-        local l0r = recce.l0.lmw_r
-        local l0g = recce.slg.l0.lmw_g
-        local l0_rules = recce.l0.irls
+    function _M.class_slr.l0_track_candidates(slr)
+        local l0r = slr.l0.lmw_r
+        local l0g = slr.slg.l0.lmw_g
+        local l0_rules = slr.l0.irls
         local eager
         local complete_lexemes = false
         local es_id = l0r:latest_earley_set()
@@ -1116,9 +1116,9 @@ events into real trace events.
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slr.lexeme_queue_examine(recce, high_lexeme_priority)
-        local lexeme_q = recce.lexeme_queue
-        for ix = 1, #recce.lexeme_queue do
+    function _M.class_slr.lexeme_queue_examine(slr, high_lexeme_priority)
+        local lexeme_q = slr.lexeme_queue
+        for ix = 1, #slr.lexeme_queue do
             local this_event = lexeme_q[ix]
             local event_type = this_event[2]
             if event_type == 'acceptable lexeme' then
@@ -1126,15 +1126,15 @@ events into real trace events.
                 g1_lexeme, priority, required_priority =
                     table.unpack(this_event)
                 if priority < high_lexeme_priority then
-                    if recce.trace_terminals > 0 then
-                        local q = recce.event_queue
+                    if slr.trace_terminals > 0 then
+                        local q = slr.event_queue
                         q[#q+1] = { '!trace', 'outprioritized lexeme',
                            lexeme_start, lexeme_end, g1_lexeme,
                            priority, high_lexeme_priority}
                     end
                     goto NEXT_LEXEME
                 end
-                local q = recce.accept_queue
+                local q = slr.accept_queue
                 q[#q+1] = this_event
                 goto NEXT_LEXEME
             end
@@ -1143,15 +1143,15 @@ events into real trace events.
                     = table.unpack(this_event)
                 -- we do not have the lexeme, only the lexer rule,
                 -- so we will let the upper layer figure things out.
-                if recce.trace_terminals > 0 then
-                    local q = recce.event_queue
+                if slr.trace_terminals > 0 then
+                    local q = slr.event_queue
                     q[#q+1] = { '!trace', 'discarded lexeme',
                         rule_id, lexeme_start, lexeme_end}
                 end
-                    local q = recce.event_queue
-                    local g1r = recce.g1.lmw_r
+                    local q = slr.event_queue
+                    local g1r = slr.g1.lmw_r
                     local event_on_discard_active =
-                        recce.l0.irls[rule_id].event_on_discard_active
+                        slr.l0.irls[rule_id].event_on_discard_active
                     if event_on_discard_active then
                         local last_g1_location = g1r:latest_earley_set()
                         q[#q+1] = { 'discarded lexeme',
@@ -1170,25 +1170,25 @@ Returns `true` is there was one,
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slr.do_pause_before(recce)
-        local accept_q = recce.accept_queue
+    function _M.class_slr.do_pause_before(slr)
+        local accept_q = slr.accept_queue
         for ix = 1, #accept_q do
             local this_event = accept_q[ix]
             local bang_trace, event_type, lexeme_start, lexeme_end,
                     g1_lexeme, priority, required_priority =
                 table.unpack(this_event)
-            local pause_before_active = recce.g1.isys[g1_lexeme].pause_before_active
+            local pause_before_active = slr.g1.isys[g1_lexeme].pause_before_active
             if pause_before_active then
-                local q = recce.event_queue
-                if recce.trace_terminals > 2 then
+                local q = slr.event_queue
+                if slr.trace_terminals > 2 then
                     q[#q+1] = { '!trace', 'g1 before lexeme event', g1_lexeme}
                 end
                 q[#q+1] = { 'before lexeme', g1_lexeme}
-                recce.start_of_pause_lexeme = lexeme_start
-                recce.end_of_pause_lexeme = lexeme_end
-                local start_of_lexeme = recce.start_of_lexeme
-                recce.lexer_start_pos = start_of_lexeme
-                recce.perl_pos = start_of_lexeme
+                slr.start_of_pause_lexeme = lexeme_start
+                slr.end_of_pause_lexeme = lexeme_end
+                local start_of_lexeme = slr.start_of_lexeme
+                slr.lexer_start_pos = start_of_lexeme
+                slr.perl_pos = start_of_lexeme
                 return true
             end
         end
@@ -1229,7 +1229,7 @@ Read alternatives into the G1 grammar.
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.g1_alternatives(slr)
-        local accept_q = recce.accept_queue
+        local accept_q = slr.accept_queue
         for ix = 1, #accept_q do
             local this_event = accept_q[ix]
             local bang_trace, event_type, lexeme_start, lexeme_end,
@@ -1430,36 +1430,36 @@ Returns the Libmarpa object if it could "get" one,
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slr.ordering_get(recce)
-        local slg = recce.slg
+    function _M.class_slr.ordering_get(slr)
+        local slg = slr.slg
         local ranking_method = slg.ranking_method
-        if recce.has_parse == false then return recce.has_parse end
-        local lmw_o = recce.lmw_0
+        if slr.has_parse == false then return slr.has_parse end
+        local lmw_o = slr.lmw_0
         if lmw_o then
-            recce.has_parse = true
+            slr.has_parse = true
             return lmw_o
         end
         kollos.throw = false
-        local bocage = kollos.bocage_new(recce.g1.lmw_r, recce.end_of_parse)
+        local bocage = kollos.bocage_new(slr.g1.lmw_r, slr.end_of_parse)
         kollos.throw = true
-        recce.lmw_b = bocage
+        slr.lmw_b = bocage
         if not bocage then
-            recce.has_parse = false
+            slr.has_parse = false
             return
         end
 
         lmw_o = kollos.order_new(bocage)
-        recce.lmw_o = lmw_o
+        slr.lmw_o = lmw_o
 
         if ranking_method == 'high_rule_only' then
-            recce.lmw_o:high_rank_only_set(1)
-            recce.lmw_o:rank()
+            slr.lmw_o:high_rank_only_set(1)
+            slr.lmw_o:rank()
         end
         if ranking_method == 'rule' then
-            recce.lmw_o:high_rank_only_set(0)
-            recce.lmw_o:rank()
+            slr.lmw_o:high_rank_only_set(0)
+            slr.lmw_o:rank()
         end
-        recce.has_parse = true
+        slr.has_parse = true
         return lmw_o
     end
 ```
@@ -1578,10 +1578,10 @@ logic for blocks.
     -- miranda: section+ most Lua function definitions
 
     -- TODO: perl_pos arg is development hack --
-    -- eventually use recce.perl_pos
-    function _M.class_slr.g1_convert_events(recce, perl_pos)
-        local g1g = recce.slg.g1.lmw_g
-        local q = recce.event_queue
+    -- eventually use slr.perl_pos
+    function _M.class_slr.g1_convert_events(slr, perl_pos)
+        local g1g = slr.slg.g1.lmw_g
+        local q = slr.event_queue
         local events = g1g:events()
         for i = 1, #events, 2 do
             local event_type = events[i]
@@ -1620,10 +1620,10 @@ logic for blocks.
     end
 
     -- TODO: perl_pos arg is development hack --
-    -- eventually use recce.perl_pos
-    function _M.class_slr.l0_convert_events(recce, perl_pos)
-        local l0g = recce.slg.l0.lmw_g
-        local q = recce.event_queue
+    -- eventually use slr.perl_pos
+    function _M.class_slr.l0_convert_events(slr, perl_pos)
+        local l0g = slr.slg.l0.lmw_g
+        local q = slr.event_queue
         local events = l0g:events()
         for i = 1, #events, 2 do
             local event_type = events[i]
@@ -3189,8 +3189,8 @@ Functions for tracing Earley sets
         return data
     end
 
-    function _M.class_slr.g1_earley_set_data(recce, set_id)
-        local lmw_r = recce.g1.lmw_r
+    function _M.class_slr.g1_earley_set_data(slr, set_id)
+        local lmw_r = slr.g1.lmw_r
         local result = lmw_r:earley_set_data(set_id)
         return result
     end
@@ -3229,23 +3229,23 @@ Called when a valuator is set up.
 ```
     -- miranda: section+ valuator Libmarpa wrapper Lua functions
 
-    function _M.class_slr.value_init(recce, trace_values)
+    function _M.class_slr.value_init(slr, trace_values)
 
-        if not recce.lmw_v then
-            error('no recce.lmw_v in value_init()')
+        if not slr.lmw_v then
+            error('no slr.lmw_v in value_init()')
         end
 
-        recce.trace_values = trace_values;
-        recce.trace_values_queue = {};
-        if recce.trace_values > 0 then
-          local top_of_queue = #recce.trace_values_queue;
-          recce.trace_values_queue[top_of_queue+1] = {
+        slr.trace_values = trace_values;
+        slr.trace_values_queue = {};
+        if slr.trace_values > 0 then
+          local top_of_queue = #slr.trace_values_queue;
+          slr.trace_values_queue[top_of_queue+1] = {
             "valuator trace level", 0,
-            recce.trace_values,
+            slr.trace_values,
           }
         end
 
-        recce.lmw_v.stack = {}
+        slr.lmw_v.stack = {}
     end
 
 ```
@@ -3259,16 +3259,16 @@ It should free all memory associated with the valuation.
 
     -- miranda: section+ valuator Libmarpa wrapper Lua functions
 
-    function _M.class_slr.valuation_reset(recce)
+    function _M.class_slr.valuation_reset(slr)
         -- io.stderr:write('Initializing rule semantics to nil\n')
 
-        recce.trace_values = 0;
-        recce.trace_values_queue = {};
+        slr.trace_values = 0;
+        slr.trace_values_queue = {};
 
-        recce.lmw_b = nil
-        recce.lmw_o = nil
-        recce.lmw_t = nil
-        recce.lmw_v = nil
+        slr.lmw_b = nil
+        slr.lmw_o = nil
+        slr.lmw_t = nil
+        slr.lmw_v = nil
         -- Libmarpa's tree pausing requires value objects to
         -- be destroyed quickly
         -- print("About to collect garbage")
@@ -3281,20 +3281,20 @@ It should free all memory associated with the valuation.
 
 ```
     -- miranda: section+ diagnostics
-    function _M.class_slr.and_node_tag(recce, and_node_id)
-        local bocage = recce.lmw_b
+    function _M.class_slr.and_node_tag(slr, and_node_id)
+        local bocage = slr.lmw_b
         local parent_or_node_id = bocage:_and_node_parent(and_node_id)
         local origin = bocage:_or_node_origin(parent_or_node_id)
-        local origin_earleme = recce.g1.lmw_r:earleme(origin)
+        local origin_earleme = slr.g1.lmw_r:earleme(origin)
 
         local current_earley_set = bocage:_or_node_set(parent_or_node_id)
-        local current_earleme = recce.g1.lmw_r:earleme(current_earley_set)
+        local current_earleme = slr.g1.lmw_r:earleme(current_earley_set)
 
         local cause_id = bocage:_and_node_cause(and_node_id)
         local predecessor_id = bocage:_and_node_predecessor(and_node_id)
 
         local middle_earley_set = bocage:_and_node_middle(and_node_id)
-        local middle_earleme = recce.g1.lmw_r:earleme(middle_earley_set)
+        local middle_earleme = slr.g1.lmw_r:earleme(middle_earley_set)
 
         local position = bocage:_or_node_position(parent_or_node_id)
         local irl_id = bocage:_or_node_irl(parent_or_node_id)
@@ -3315,9 +3315,9 @@ It should free all memory associated with the valuation.
         return table.concat(tag)
     end
 
-    function _M.class_slr.show_and_nodes(recce)
-        local bocage = recce.lmw_b
-        local g1r = recce.g1.lmw_r
+    function _M.class_slr.show_and_nodes(slr)
+        local bocage = slr.lmw_b
+        local g1r = slr.g1.lmw_r
         local data = {}
         local id = -1
         while true do
@@ -3386,8 +3386,8 @@ It should free all memory associated with the valuation.
         return table.concat(result, '\n')
     end
 
-    function _M.class_slr.or_node_tag(recce, or_node_id)
-        local bocage = recce.lmw_b
+    function _M.class_slr.or_node_tag(slr, or_node_id)
+        local bocage = slr.lmw_b
         local set = bocage:_or_node_set(or_node_id)
         local irl_id = bocage:_or_node_irl(or_node_id)
         local origin = bocage:_or_node_origin(or_node_id)
@@ -3399,9 +3399,9 @@ It should free all memory associated with the valuation.
             set)
     end
 
-    function _M.class_slr.show_or_nodes(recce)
-        local bocage = recce.lmw_b
-        local g1r = recce.g1.lmw_r
+    function _M.class_slr.show_or_nodes(slr)
+        local bocage = slr.lmw_b
+        local g1r = slr.g1.lmw_r
         local data = {}
         local id = -1
         while true do
@@ -3448,8 +3448,8 @@ It should free all memory associated with the valuation.
 `show_bocage` returns a string which describes the bocage.
 
     -- miranda: section+ diagnostics
-    function _M.class_slr.show_bocage(recce)
-        local bocage = recce.lmw_b
+    function _M.class_slr.show_bocage(slr)
+        local bocage = slr.lmw_b
         local data = {}
         local or_node_id = -1
         while true do
@@ -3458,9 +3458,9 @@ It should free all memory associated with the valuation.
             if not irl_id then goto LAST_OR_NODE end
             local position = bocage:_or_node_position(or_node_id)
             local or_origin = bocage:_or_node_origin(or_node_id)
-            local origin_earleme = recce.g1.lmw_r:earleme(or_origin)
+            local origin_earleme = slr.g1.lmw_r:earleme(or_origin)
             local or_set = bocage:_or_node_set(or_node_id)
-            local current_earleme = recce.g1.lmw_r:earleme(or_set)
+            local current_earleme = slr.g1.lmw_r:earleme(or_set)
             local and_node_ids = {}
             local first_and_id = bocage:_or_node_first_and(or_node_id)
             local last_and_id = bocage:_or_node_last_and(or_node_id)
@@ -3472,13 +3472,13 @@ It should free all memory associated with the valuation.
                 local cause_irl_id
                 if cause_id then
                     cause_irl_id = bocage:_or_node_irl(cause_id)
-                    cause_tag = recce:or_node_tag(cause_id)
+                    cause_tag = slr:or_node_tag(cause_id)
                 end
-                local parent_tag = recce:or_node_tag(or_node_id)
+                local parent_tag = slr:or_node_tag(or_node_id)
                 local predecessor_id = bocage:_and_node_predecessor(and_node_id)
                 local predecessor_tag = "-"
                 if predecessor_id then
-                    predecessor_tag = recce:or_node_tag(predecessor_id)
+                    predecessor_tag = slr:or_node_tag(predecessor_id)
                 end
                 local tag = string.format(
                     "%d: %d=%s %s %s",
