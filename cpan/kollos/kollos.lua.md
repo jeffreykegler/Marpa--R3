@@ -1082,7 +1082,7 @@ Determine which lexemes are acceptable or discards.
                discarded = discarded + 1
                local q = slr.lexeme_queue
                q[#q+1] = { '!trace', 'discarded lexeme',
-                   rule_id, slr.start_of_lexeme, slr.end_of_lexeme}
+                   rule_id, block_ix, slr.start_of_lexeme, slr.end_of_lexeme}
                goto NEXT_EARLEY_ITEM
             end
             -- this block hides the local's and allows the goto to work
@@ -1143,7 +1143,8 @@ events into real trace events.
                 goto NEXT_LEXEME
             end
             if event_type == 'discarded lexeme' then
-                local bang_trace, event_type, rule_id, lexeme_start, lexeme_end
+                local bang_trace, event_type, rule_id,
+                        lexeme_block, lexeme_start, lexeme_end
                     = table.unpack(this_event)
                 -- we do not have the lexeme, only the lexer rule,
                 -- so we will let the upper layer figure things out.
@@ -1152,12 +1153,12 @@ events into real trace events.
                     q[#q+1] = { '!trace', 'discarded lexeme',
                         rule_id, lexeme_start, lexeme_end}
                 end
-                    local q = slr.event_queue
                     local g1r = slr.g1.lmw_r
                     local event_on_discard_active =
                         slr.l0.irls[rule_id].event_on_discard_active
                     if event_on_discard_active then
                         local last_g1_location = g1r:latest_earley_set()
+                        local q = slr.event_queue
                         q[#q+1] = { 'discarded lexeme',
                             rule_id, lexeme_start, lexeme_end, last_g1_location}
                      end
