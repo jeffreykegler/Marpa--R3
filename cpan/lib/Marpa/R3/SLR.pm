@@ -1876,7 +1876,7 @@ sub Marpa::R3::Scanless::R::line_column {
             <<'END_OF_LUA', 'ii', $block, $pos  );
         local slr, block, pos = ...
         if block <= 0 then block = slr.current_block.index end
-        local _, _, line_no, column_no = slr:per_pos(block, pos)
+        local _, line_no, column_no = slr:per_pos(block, pos)
         return line_no, column_no
 END_OF_LUA
 

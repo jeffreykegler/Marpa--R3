@@ -919,7 +919,7 @@ Returns a status string.
                 return 'ok'
             end
             -- +1 because codepoints array is 1-based
-            slr.codepoint = slr:per_pos(block_ix, slr.perl_pos+1)
+            slr.codepoint = slr:codepoint_from_pos(block_ix, slr.perl_pos+1)
             local errmsg = slr:l0_read_codepoint()
             local this_candidate, eager = slr:l0_track_candidates()
             if this_candidate then slr.l0_candidate = this_candidate end
@@ -1483,6 +1483,15 @@ for each trio to the end of `table`, which must be a
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.add_sweep_to_table(slr, sweep, table)
         -- TODO
+        local inputs = slr.inputs
+        local ix = 1
+        while true do
+            local block_ix = sweep[ix]
+            if not block_ix then return end
+            local block = inputs[block_ix]
+            local start = sweep[ix+1]
+            local len = sweep[ix+2]
+        end
     end
 ```
 
@@ -3491,8 +3500,7 @@ Caller must ensure `block` and `pos` are valid.
             local vlq = input[#input]
             local last_byte_p, last_line_no, last_column_no
                 = table.unpack(_M.from_vlq(vlq))
-            return nil,
-                last_byte_p+1, last_line_no, last_column_no+1
+            return last_byte_p+1, last_line_no, last_column_no+1
         end
         local vlq = input[pos]
         if not vlq then
@@ -3501,10 +3509,18 @@ Caller must ensure `block` and `pos` are valid.
                 block, pos))
         end
              -- print(inspect(_M.from_vlq(vlq)))
-        local byte_p, line_no, column_no = table.unpack(_M.from_vlq(vlq))
-        local codepoint = utf8.codepoint(text, byte_p)
-        return codepoint, byte_p, line_no, column_no
+        return table.unpack(_M.from_vlq(vlq))
     end
+
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slr.codepoint_from_pos(slr, block, pos)
+        local byte_p = slr:per_pos(block, pos)
+        local input = slr.inputs[block]
+        local text = input.text
+        if byte_p > #text then return end
+        return utf8.codepoint(text, byte_p)
+    end
+
 ```
 
 ```
@@ -3514,7 +3530,7 @@ Caller must ensure `block` and `pos` are valid.
         local length_so_far = 0
         local escapes = {}
         while true do
-             local codepoint = slr:per_pos(block, pos)
+             local codepoint = slr:codepoint_from_pos(block, pos)
              if not codepoint then break end
              local escape = _M.escape_codepoint(codepoint)
              length_so_far = length_so_far + #escape
@@ -3557,7 +3573,7 @@ Caller must ensure `block` and `pos` are valid.
         local escapes = {}
         while pos >= 1 do
 
-             local codepoint = slr:per_pos(block, pos)
+             local codepoint = slr:codepoint_from_pos(block, pos)
              local escape = _M.escape_codepoint(codepoint)
              length_so_far = length_so_far + #escape
              if length_so_far > max_length then
