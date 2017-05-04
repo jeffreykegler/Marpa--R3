@@ -3084,12 +3084,10 @@ Functions for tracing Earley sets
     end
 
     function _M.class_recce.leo_link_data(lmw_r, ahm_id)
-        local lmw_g = lmw_r.lmw_g
-        local g1r = recce.g1.lmw_r
         local result = {}
-        local middle_set_id = g1r:_source_middle()
-        local middle_earleme = g1r:earleme(middle_set_id)
-        local leo_transition_symbol = g1r:_source_leo_transition_symbol()
+        local middle_set_id = lmw_r:_source_middle()
+        local middle_earleme = lmw_r:earleme(middle_set_id)
+        local leo_transition_symbol = lmw_r:_source_leo_transition_symbol()
         result.middle_earleme = middle_earleme
         result.leo_transition_symbol = leo_transition_symbol
         result.ahm_id = ahm_id
@@ -3154,7 +3152,7 @@ Functions for tracing Earley sets
         return item_data
     end
 
-    function _M.class_recce.earley_set_data(lmw_r, set_id)
+    function _M.class_slr.earley_set_data(slr, lmw_r, set_id)
         -- print('earley_set_data(', set_id, ')')
         local lmw_g = lmw_r.lmw_g
         local data = {}
@@ -3189,7 +3187,7 @@ Functions for tracing Earley sets
 
     function _M.class_slr.g1_earley_set_data(slr, set_id)
         local lmw_r = slr.g1.lmw_r
-        local result = lmw_r:earley_set_data(set_id)
+        local result = slr:earley_set_data(lmw_r, set_id)
         return result
     end
 
