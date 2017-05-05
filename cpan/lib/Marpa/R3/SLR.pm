@@ -1646,7 +1646,7 @@ sub Marpa::R3::Scanless::R::show_progress {
     io.stderr:write(string.format("g1_first=%s; current_ordinal=%s\n",
          inspect(g1_first), inspect(current_ordinal )))
 
-    if current_ordinal <= 0 then return 'L0c0' end
+    if current_ordinal <= 0 then return 'B0L0c0' end
     if dotted_type == 'P' then
         -- this is a prediction
         local block, pos = slr:g1_pos_to_l0_first(current_ordinal)
