@@ -654,7 +654,7 @@ my $libmarpa_trace_event_handlers = {
             $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
         my $slg              = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
         say {$trace_file_handle} qq{Accepted lexeme },
-            lc_brief( $slr, $block, $lexeme_start_pos,
+            lc_range_brief( $slr, $block, $lexeme_start_pos,
                 $block, $lexeme_end_pos - 1 ),
             q{ e}, $slr->g1_pos(),
             q{: },
@@ -689,7 +689,7 @@ my $libmarpa_trace_event_handlers = {
         my $slg              = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
         say {$trace_file_handle}
             qq{Outprioritized lexeme },
-            lc_brief( $slr, $block, $lexeme_start_pos,
+            lc_range_brief( $slr, $block, $lexeme_start_pos,
                 $block, $lexeme_end_pos - 1 ),
             q{: },
             $slg->symbol_display_form($g1_lexeme),
@@ -709,7 +709,7 @@ my $libmarpa_trace_event_handlers = {
         my $slg              = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
         say {$trace_file_handle}
             'Rejected as duplicate lexeme ',
-            lc_brief( $slr, $block, $lexeme_start_pos,
+            lc_range_brief( $slr, $block, $lexeme_start_pos,
                 $block, $lexeme_end_pos - 1 ),
             q{: },
             $slg->symbol_display_form($g1_lexeme),
@@ -728,7 +728,7 @@ my $libmarpa_trace_event_handlers = {
         my $slg              = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
         say {$trace_file_handle}
             'Attempting to read lexeme ',
-            lc_brief( $slr, $block, $lexeme_start_pos,
+            lc_range_brief( $slr, $block, $lexeme_start_pos,
                 $block, $lexeme_end_pos - 1 ),
             q{ e}, $slr->g1_pos(),
             q{: },
@@ -815,7 +815,7 @@ my $libmarpa_trace_event_handlers = {
         my $trace_file_handle =
             $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
         say {$trace_file_handle} qq{Discarded lexeme },
-            lc_brief( $slr, $block, $start, $block, $end - 1 ), q{: }, join q{ },
+            lc_range_brief( $slr, $block, $start, $block, $end - 1 ), q{: }, join q{ },
             @rhs
             or Marpa::R3::exception("Could not say(): $ERRNO");
     },
@@ -1501,24 +1501,27 @@ END_OF_LUA
 # Brief description of block/line/column for
 # an L0 range
 sub lc_brief {
-    my ( $slr, $start_block,  $start_pos, $end_block, $end_pos )     = @_;
-    my ( $start_line, $start_column ) = $slr->line_column($start_pos, $start_block);
-    my ( $end_line,  $end_column )  = $slr->line_column($end_pos, $end_block);
-    if ( $start_block != $end_block ) {
-        return join q{},
-            'B', $start_block, 'L', $start_line, 'c', $start_column,
-            '-B', $end_block, 'L', $end_line, 'c', $end_column;
-    }
-    if ( $start_line != $end_line ) {
-        return join q{},
-            'B', $start_block, 'L', $start_line, 'c', $start_column,
-            '-L', $end_line, 'c', $end_column;
-    }
-    if ( $start_column != $end_column ) {
-        return join q{}, 'B', $start_block, 'L', $start_line, 'c', $start_column,
-            '-', $end_column;
-    }
-    return join q{}, 'B', $start_block, 'L', $start_line, 'c', $start_column;
+    my ( $slr, $pos, $block )     = @_;
+    my ($result) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+    <<'END_OF_LUA', 'ii', $pos, ($block // -1));
+        local slr, pos, block = ...
+        if block < 0 then block = nil end
+        return slr:lc_brief(pos, block)
+END_OF_LUA
+     return $result;
+}
+
+# Brief description of block/line/column for
+# an L0 range
+sub lc_range_brief {
+    my ( $slr, $first_block, $first_pos, $last_block, $last_pos ) = @_;
+    my ($result) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 'iiii', $first_block, $first_pos, $last_block, $last_pos );
+        local slr, block1, pos1, block2, pos2 = ...
+        return slr:lc_range_brief(block1, pos1, block2, pos2)
+END_OF_LUA
+     return $result;
+
 } ## end sub input_range_describe
 
 sub input_range_describe {
@@ -1542,10 +1545,8 @@ sub Marpa::R3::Scanless::R::show_progress {
     my ( $slr, $start_ordinal, $end_ordinal ) = @_;
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
 
-    my ($last_ordinal) = $slr->call_by_tag(
-    ('@' . __FILE__ . ':' . __LINE__),
-            'local recce = ...; return recce.g1.lmw_r:latest_earley_set()',
-            '');
+    my ($last_ordinal) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        'local recce = ...; return recce.g1.lmw_r:latest_earley_set()', '' );
 
     if ( not defined $start_ordinal ) {
         $start_ordinal = $last_ordinal;
@@ -1556,8 +1557,8 @@ sub Marpa::R3::Scanless::R::show_progress {
     else {
         if ( $start_ordinal < 0 or $start_ordinal > $last_ordinal ) {
             return
-                "Marpa::R3::Scanless::R::show_progress start index is $start_ordinal, "
-                . "must be in range 0-$last_ordinal";
+"Marpa::R3::Scanless::R::show_progress start index is $start_ordinal, "
+              . "must be in range 0-$last_ordinal";
         }
     } ## end else [ if ( $start_ordinal < 0 ) ]
 
@@ -1571,9 +1572,9 @@ sub Marpa::R3::Scanless::R::show_progress {
         }
         if ( $end_ordinal < 0 ) {
             return
-                "Marpa::R3::Scanless::R::show_progress end index is $end_ordinal_argument, "
-                . sprintf ' must be in range %d-%d', -( $last_ordinal + 1 ),
-                $last_ordinal;
+"Marpa::R3::Scanless::R::show_progress end index is $end_ordinal_argument, "
+              . sprintf ' must be in range %d-%d', -( $last_ordinal + 1 ),
+              $last_ordinal;
         } ## end if ( $end_ordinal < 0 )
     } ## end else [ if ( not defined $end_ordinal ) ]
 
@@ -1586,8 +1587,9 @@ sub Marpa::R3::Scanless::R::show_progress {
             if ( $position < 0 ) {
                 ($position) = $slg->call_by_tag(
                     ( __FILE__ . ':' . __LINE__ ),
-                    'local grammar, rule_id = ...; return grammar.g1.lmw_g:rule_length(rule_id)',
-                    'i', $rule_id
+'local grammar, rule_id = ...; return grammar.g1.lmw_g:rule_length(rule_id)',
+                    'i',
+                    $rule_id
                 );
             }
             $by_rule_by_position{$rule_id}->{$position}->{$origin}++;
@@ -1608,9 +1610,11 @@ sub Marpa::R3::Scanless::R::show_progress {
                 }
 
                 my ($rhs_length) = $slg->call_by_tag(
-                ('@' . __FILE__ . ':' . __LINE__),
-                        'local grammar, rule_id = ...; return grammar.g1.lmw_g:rule_length(rule_id)',
-                        'i', $rule_id);
+                    ( '@' . __FILE__ . ':' . __LINE__ ),
+'local grammar, rule_id = ...; return grammar.g1.lmw_g:rule_length(rule_id)',
+                    'i',
+                    $rule_id
+                );
                 my @item_text;
 
                 if ( $position >= $rhs_length ) {
@@ -1625,34 +1629,38 @@ sub Marpa::R3::Scanless::R::show_progress {
                 push @item_text, "x$origins_count" if $origins_count > 1;
                 push @item_text, q{@} . $origin_desc . q{-} . $current_earleme;
 
-                if ( $current_earleme > 0 ) {
-                    # -1 to convert earley set to G1, then
-                    # +1 one because it is an origin and the character
-                    # don't begin until the next Earley set
-                    my $g1_start = $origins[0];
-                    # Special case: Earley set 0 == G1 location 0
-                    # $g1_start = 0 if $g1_start < 0;
+                # For origins[0], we apply
+                # -1 to convert earley set to G1, then
+                # +1 one because it is an origin and the character
+                # don't begin until the next Earley set
+                # -- in other words, they balance and we do nothing
 
-                    # -1 to convert earley set to G1, then
-                    # +1 to convert from last element range to count
-                    my $g1_count = $current_earleme - $g1_start;
-                    my ($l0_start, $l0_count) = $slr->g1_input_span( $g1_start, $g1_count );
+                my ($input_range) =
+                  $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+                    <<'END_OF_LUA', 'ii', ($origins[0]+0), $current_earleme );
+    local slr, g1_first, current_earleme = ...
 
-                    # say STDERR sprintf "es=%d,%d g1=%d,%d l0=%d,%d",
-                        # $origins[0], $current_earleme,
-                        # $g1_start, $g1_count,
-                        # $l0_start, $l0_count;
+    io.stderr:write(string.format("g1_first=%s; current_earleme=%s\n",
+         inspect(g1_first), inspect(current_earleme )))
 
-                    my $input_range = input_range_describe( $slr,
-                        $l0_start, ($l0_start + $l0_count - 1));
-                    push @item_text, $input_range;
-                }
-                else {
-                    push @item_text, 'L0c0';
-                }
+    if current_earleme <= 0 then return 'L0c0' end
+    if g1_first == current_earleme then
+        -- this is a prediction
+        local block, pos = slr:l0_current_pos()
+        io.stderr:write(string.format("prediction block=%d; pos=%d\n",
+           block, pos))
+        return slr:lc_brief(pos, block)
+    end
+    if g1_first < 0 then g1_first = 0 end
+    local g1_last = current_earleme - 1
+    local l0_first_b, l0_first_p = slr:g1_pos_to_l0_first(g1_first)
+    local l0_last_b, l0_last_p = slr:g1_pos_to_l0_last(g1_last)
+    return slr:lc_range_brief(l0_first_b, l0_first_p, l0_last_b, l0_last_p)
+END_OF_LUA
 
-                push @item_text,
-                    $slg->show_dotted_rule( $rule_id, $position );
+                push @item_text, $input_range;
+
+                push @item_text, $slg->show_dotted_rule( $rule_id, $position );
                 $text .= ( join q{ }, @item_text ) . "\n";
             } ## end for my $position ( sort { $a <=> $b } keys %{...})
         } ## end for my $rule_id ( sort { $a <=> $b } keys ...)
@@ -1889,7 +1897,6 @@ END_OF_LUA
 sub Marpa::R3::Scanless::R::line_column {
     my ( $slr, $pos, $block ) = @_;
     $pos //= $slr->pos();
-    $pos += 1;
     $block //= -1;
 
     my ($line_no, $column_no) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),

@@ -919,7 +919,7 @@ Returns a status string.
                 return 'ok'
             end
             -- +1 because codepoints array is 1-based
-            slr.codepoint = slr:codepoint_from_pos(block_ix, slr.perl_pos+1)
+            slr.codepoint = slr:codepoint_from_pos(block_ix, slr.perl_pos)
             local errmsg = slr:l0_read_codepoint()
             local this_candidate, eager = slr:l0_track_candidates()
             if this_candidate then slr.l0_candidate = this_candidate end
@@ -1500,8 +1500,8 @@ for each trio to the end of `table`, which must be a
             local block = inputs[block_ix]
             local start = sweep[ix+1]
             local len = sweep[ix+2]
-            local start_byte_p = slr:per_pos(block_ix, start + 1)
-            local end_byte_p = slr:per_pos(block_ix, start + len + 1)
+            local start_byte_p = slr:per_pos(block_ix, start)
+            local end_byte_p = slr:per_pos(block_ix, start + len)
             local text = block.text
             local piece = text:sub(start_byte_p, end_byte_p - 1)
             -- io.stderr:write("Piece: ", piece, "\n")
@@ -1533,6 +1533,120 @@ for each trio to the end of `table`, which must be a
         end
         slr:add_sweep_to_table(per_es[g1_end], pieces)
         return table.concat(pieces)
+    end
+```
+
+The current position in L0 terms -- a kind of "end of parse" location.
+Note that, until the parse is not at EOF, this location will change.
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slr.l0_current_pos(slr)
+        local per_es = slr.per_es
+        local this_sweep = per_es[#per_es]
+        local end_block = this_sweep[#this_sweep-2]
+        local end_pos = this_sweep[#this_sweep-1]
+        local end_len = this_sweep[#this_sweep]
+        return end_block, end_pos + end_len
+    end
+```
+
+Takes a g1 position,
+call it `g1_pos`,
+and returns
+L0 position where the g1 position starts
+as a `block, pos` duple.
+As a special case,
+when `g1_pos` is one after the last actual
+g1 position,
+treats it as
+an "end of parse" location,
+and returns the current L0 position.
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slr.g1_pos_to_l0_first(slr, g1_pos)
+        local per_es = slr.per_es
+        if g1_pos == #per_es then
+            return slr:l0_current_pos()
+        end
+        local this_sweep = per_es[g1_pos+1]
+        if not this_sweep then
+            error(string.format(
+                "slr:g1_pos_to_l0_range(%d): bad argument\n\z
+                \u{20}   Allowed values are %d-%d\n",
+                g1_pos, 0, #per_es-1
+            ))
+        end
+        local start_block = this_sweep[1]
+        local start_pos = this_sweep[2]
+        return start_block, start_pos
+    end
+```
+
+Takes a g1 position and returns
+the last actual L0 position of the g1 position
+as a `block, pos` duple.
+The position is "actual" in the sense that
+there is actually a codepoint at that position.
+Allows for the possible future, where the per-es sweep
+contains more than one L0 span.
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slr.g1_pos_to_l0_last(slr, g1_pos)
+        local per_es = slr.per_es
+        local this_sweep = per_es[g1_pos+1]
+        if not this_sweep then
+            error(string.format(
+                "slr:g1_pos_to_l0_range(%d): bad argument\n\z
+                \u{20}   Allowed values are %d-%d\n",
+                g1_pos, 0, #per_es-1
+            ))
+        end
+        local end_block = this_sweep[#this_sweep-2]
+        local end_pos = this_sweep[#this_sweep-1]
+        local end_len = this_sweep[#this_sweep]
+        return end_block, end_pos + end_len - 1
+    end
+```
+
+# Brief description of block/line/column for
+# an L0 range
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slr.lc_brief(slr, l0_pos, block)
+        if not block then block = slr.current_block.index end
+        local _, line_no, column_no = slr:per_pos(block, l0_pos)
+        return string.format("B%dL%dc%d",
+            block, line_no, column_no)
+    end
+}
+```
+
+Brief description of block/line/column for
+an L0 range
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slr.lc_range_brief(slr, block1, l0_pos1, block2, l0_pos2)
+        local _, line1, column1 = slr:per_pos(block1, l0_pos1)
+        local _, line2, column2 = slr:per_pos(block2, l0_pos2)
+        if block1 ~= block2 then
+           return string.format("B%dL%dc%d-B%dL%dc%d",
+             block1, line1, column1, block2, line2, column2)
+        end
+        if line1 ~= line2 then
+           return string.format("B%dL%dc%d-L%dc%d",
+             block1, line1, column1, line2, column2)
+        end
+        if column1 ~= column2 then
+           return string.format("B%dL%dc%d-%d",
+             block1, line1, column1, column2)
+        end
+       return string.format("B%dL%dc%d",
+             block1, line1, column1)
     end
 ```
 
@@ -3525,26 +3639,29 @@ Caller must ensure `block` and `pos` are valid.
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slr.per_pos(slr, block, pos)
-        local input = slr.inputs[block]
-        local text = input.text
-        -- It is useful to have an "end of block"
-        -- position.  No codepoint, but line is
-        -- last line and byte_p and column are one
-        -- after the end
-        if pos == #input + 1 then
-            local vlq = input[#input]
-            local last_byte_p, last_line_no, last_column_no
-                = table.unpack(_M.from_vlq(vlq))
-            return last_byte_p+1, last_line_no, last_column_no+1
-        end
-        local vlq = input[pos]
-        if not vlq then
+    function _M.class_slr.per_pos(slr, block_ix, pos)
+        local block = slr.inputs[block_ix]
+        -- codepoints array is 1-based
+        local codepoint_ix = pos+1
+        local text = block.text
+        if codepoint_ix > #block then
+            -- It is useful to have an "end of block"
+            -- position.  No codepoint, but line is
+            -- last line and byte_p and column are one
+            -- after the end
+            if codepoint_ix == #block + 1 then
+                local vlq = block[#block]
+                local last_byte_p, last_line_no, last_column_no
+                    = table.unpack(_M.from_vlq(vlq))
+                return last_byte_p+1, last_line_no, last_column_no+1
+            end
             error(string.format(
-                "Internal error: invalid input block,pos: %d, %d\n",
-                block, pos))
+                "Internal error: invalid block,pos: %d, %d\n\z
+                \u{20}   pos must be from 0-%d\n",
+                block_ix, pos, #block))
         end
-             -- print(inspect(_M.from_vlq(vlq)))
+        local vlq = block[codepoint_ix]
+        -- print(inspect(_M.from_vlq(vlq)))
         return table.unpack(_M.from_vlq(vlq))
     end
 
