@@ -1642,10 +1642,6 @@ sub Marpa::R3::Scanless::R::show_progress {
                   $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
                     <<'END_OF_LUA', 'sii', $dotted_type, ($origins[0]+0), $current_ordinal );
     local slr, dotted_type, g1_first, current_ordinal = ...
-
-    io.stderr:write(string.format("g1_first=%s; current_ordinal=%s\n",
-         inspect(g1_first), inspect(current_ordinal )))
-
     if current_ordinal <= 0 then return 'B0L0c0' end
     if dotted_type == 'P' then
         -- this is a prediction

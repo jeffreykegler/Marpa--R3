@@ -48,21 +48,21 @@ Test::More::ok( $value_ref, 'Parse ok?' );
 
 Marpa::R3::Test::is( $progress_report,
     <<'END_PROGRESS_REPORT', 'sorted progress report' );
-F0 @0-20 L1c1-20 S -> Top_sequence .
-P1 @20-20 L1c21 Top_sequence -> . Top Top_sequence
-R1:1 @19-20 L1c20 Top_sequence -> Top . Top_sequence
-F1 x19 @0...18-20 L1c1-20 Top_sequence -> Top Top_sequence .
-P2 @20-20 L1c21 Top_sequence -> . Top
-F2 @19-20 L1c20 Top_sequence -> Top .
-P3 @20-20 L1c21 Top -> . Upper_Middle
-F3 @19-20 L1c20 Top -> Upper_Middle .
-P4 @20-20 L1c21 Upper_Middle -> . Lower_Middle
-F4 @19-20 L1c20 Upper_Middle -> Lower_Middle .
-P5 @20-20 L1c21 Lower_Middle -> . Bottom
-F5 @19-20 L1c20 Lower_Middle -> Bottom .
-P6 @20-20 L1c21 Bottom -> . T
-F6 @19-20 L1c20 Bottom -> T .
-F7 @0-20 L1c1-20 [:start] -> S .
+F0 @0-20 B1L1c1-20 S -> Top_sequence .
+P1 @20-20 B1L1c21 Top_sequence -> . Top Top_sequence
+R1:1 @19-20 B1L1c20 Top_sequence -> Top . Top_sequence
+F1 x19 @0...18-20 B1L1c1-20 Top_sequence -> Top Top_sequence .
+P2 @20-20 B1L1c21 Top_sequence -> . Top
+F2 @19-20 B1L1c20 Top_sequence -> Top .
+P3 @20-20 B1L1c21 Top -> . Upper_Middle
+F3 @19-20 B1L1c20 Top -> Upper_Middle .
+P4 @20-20 B1L1c21 Upper_Middle -> . Lower_Middle
+F4 @19-20 B1L1c20 Upper_Middle -> Lower_Middle .
+P5 @20-20 B1L1c21 Lower_Middle -> . Bottom
+F5 @19-20 B1L1c20 Lower_Middle -> Bottom .
+P6 @20-20 B1L1c21 Bottom -> . T
+F6 @19-20 B1L1c20 Bottom -> T .
+F7 @0-20 B1L1c1-20 [:start] -> S .
 END_PROGRESS_REPORT
 
 # vim: expandtab shiftwidth=4:
