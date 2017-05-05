@@ -1346,7 +1346,7 @@ sub Marpa::R3::Internal::ASF::ambiguities_show {
 
         my ($escaped_input) = $slr->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__), 
-        <<'END_OF_LUA', 'iii', $block, $start + 1, $display_length);
+        <<'END_OF_LUA', 'iii', $block, $start, $display_length);
         local slr, block, start, input_length = ...
         return slr:input_escape(block, start, input_length)
 END_OF_LUA
@@ -1406,7 +1406,7 @@ END_OF_LUA
 
                     my ($piece) = $slr->call_by_tag(
                     ('@' . __FILE__ . ':' . __LINE__), 
-                    <<'END_OF_LUA', 'iii', $block, $start + 1, $display_length);
+                    <<'END_OF_LUA', 'iii', $block, $start, $display_length);
                     local slr, block, start, input_length = ...
                     local escaped_input = slr:input_escape(block, start, input_length)
                     return "  Choices start with: " .. escaped_input .. "\n"
@@ -1441,7 +1441,7 @@ END_OF_LUA
 
                     my ($piece) = $slr->call_by_tag(
                     ('@' . __FILE__ . ':' . __LINE__), 
-                    <<'END_OF_LUA', 'iiii', $choice_number, $block, $start + 1, $length);
+                    <<'END_OF_LUA', 'iiii', $choice_number, $block, $start, $length);
                     local slr, choice_number, block, start, input_length = ...
                     local subpieces = {}
                     local escaped_input
