@@ -1121,6 +1121,8 @@ events into real trace events.
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.lexeme_queue_examine(slr, high_lexeme_priority)
         local lexeme_q = slr.lexeme_queue
+        local block = slr.current_block
+        local block_ix = block.index
         for ix = 1, #slr.lexeme_queue do
             local this_event = lexeme_q[ix]
             local event_type = this_event[2]
@@ -1132,7 +1134,7 @@ events into real trace events.
                     if slr.trace_terminals > 0 then
                         local q = slr.event_queue
                         q[#q+1] = { '!trace', 'outprioritized lexeme',
-                           lexeme_start, lexeme_end, g1_lexeme,
+                           block_ix, lexeme_start, lexeme_end, g1_lexeme,
                            priority, high_lexeme_priority}
                     end
                     goto NEXT_LEXEME
@@ -1236,6 +1238,8 @@ Read alternatives into the G1 grammar.
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.g1_alternatives(slr)
         local accept_q = slr.accept_queue
+        local block = slr.current_block
+        local block_ix = block.index
         for ix = 1, #accept_q do
             local this_event = accept_q[ix]
                 -- TODO accept_queue
@@ -1257,7 +1261,7 @@ Read alternatives into the G1 grammar.
             end
             if return_value == kollos.err.DUPLICATE_TOKEN then
                 local q = slr.event_queue
-                q[#q+1] = { '!trace', 'g1 duplicate lexeme', lexeme_start, lexeme_end, g1_lexeme}
+                q[#q+1] = { '!trace', 'g1 duplicate lexeme', block_ix, lexeme_start, lexeme_end, g1_lexeme}
                 goto NEXT_EVENT
             end
             if return_value ~= kollos.err.NONE then
@@ -1272,7 +1276,7 @@ Read alternatives into the G1 grammar.
             do
                 if slr.trace_terminals > 0 then
                     local q = slr.event_queue
-                    q[#q+1] = { '!trace', 'g1 accepted lexeme', lexeme_start, lexeme_end, g1_lexeme}
+                    q[#q+1] = { '!trace', 'g1 accepted lexeme', block_ix, lexeme_start, lexeme_end, g1_lexeme}
                 end
                 slr.start_of_pause_lexeme = lexeme_start
                 slr.end_of_pause_lexeme = lexeme_end

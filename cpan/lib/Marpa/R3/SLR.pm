@@ -645,7 +645,7 @@ my $libmarpa_trace_event_handlers = {
 
     'g1 accepted lexeme' => sub {
         my ( $slr, $event ) = @_;
-        my ( undef, undef, $lexeme_start_pos, $lexeme_end_pos, $g1_lexeme)
+        my ( undef, undef, $block, $lexeme_start_pos, $lexeme_end_pos, $g1_lexeme)
             = @{$event};
         my $raw_token_value =
             $slr->literal( $lexeme_start_pos,
@@ -678,7 +678,7 @@ my $libmarpa_trace_event_handlers = {
     },
     'outprioritized lexeme' => sub {
         my ( $slr, $event ) = @_;
-        my ( undef, undef, $lexeme_start_pos, $lexeme_end_pos, $g1_lexeme,
+        my ( undef, undef, $block, $lexeme_start_pos, $lexeme_end_pos, $g1_lexeme,
             $lexeme_priority, $required_priority )
             = @{$event};
         my $raw_token_value =
@@ -699,7 +699,7 @@ my $libmarpa_trace_event_handlers = {
     },
     'g1 duplicate lexeme' => sub {
         my ( $slr, $event ) = @_;
-        my ( undef, undef, $lexeme_start_pos, $lexeme_end_pos, $g1_lexeme ) =
+        my ( undef, undef, $block, $lexeme_start_pos, $lexeme_end_pos, $g1_lexeme ) =
             @{$event};
         my $raw_token_value =
             $slr->literal( $lexeme_start_pos,
