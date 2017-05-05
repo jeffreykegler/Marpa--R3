@@ -819,38 +819,16 @@ my $libmarpa_trace_event_handlers = {
             @rhs
             or Marpa::R3::exception("Could not say(): $ERRNO");
     },
-    'g1 pausing before lexeme' => sub {
-        my ( $slr, $event ) = @_;
-        my ( undef, undef, $start, $end, $lexeme_id ) = @{$event};
-        my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-        my $lexeme_name =
-            $slg->symbol_display_form($lexeme_id);
-        my $trace_file_handle =
-            $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
-        say {$trace_file_handle} 'Paused before lexeme ',
-            input_range_describe( $slr, $start, $end - 1 ), ": $lexeme_name"
-            or Marpa::R3::exception("Could not say(): $ERRNO");
-    },
     'g1 pausing after lexeme' => sub {
         my ( $slr, $event ) = @_;
-        my ( undef, undef, $start, $end, $lexeme_id ) = @{$event};
+        my ( undef, undef, $block_ix, $start, $end, $lexeme_id ) = @{$event};
         my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
         my $lexeme_name = $slg->symbol_display_form($lexeme_id);
         my $trace_file_handle =
             $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
         say {$trace_file_handle} 'Paused after lexeme ',
-            input_range_describe( $slr, $start, $end - 1 ), ": $lexeme_name"
-            or Marpa::R3::exception("Could not say(): $ERRNO");
-    },
-    'ignored lexeme' => sub {
-        my ( $slr, $event ) = @_;
-        my ( undef, undef, $g1_symbol_id, $start, $end ) = @{$event};
-        my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-        my $lexeme_name = $slg->symbol_display_form($g1_symbol_id);
-        my $trace_file_handle =
-            $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
-        say {$trace_file_handle} 'Ignored lexeme ',
-            input_range_describe( $slr, $start, $end - 1 ), ": $lexeme_name"
+            lc_range_brief( $slr, $block_ix, $start, $block_ix, $end - 1 ),
+                ": $lexeme_name"
             or Marpa::R3::exception("Could not say(): $ERRNO");
     },
 };
@@ -1644,10 +1622,7 @@ sub Marpa::R3::Scanless::R::show_progress {
     local slr, dotted_type, g1_first, current_ordinal = ...
     if current_ordinal <= 0 then return 'B0L0c0' end
     if dotted_type == 'P' then
-        -- this is a prediction
         local block, pos = slr:g1_pos_to_l0_first(current_ordinal)
-        io.stderr:write(string.format("prediction block=%d; pos=%d\n",
-           block, pos))
         return slr:lc_brief(pos, block)
     end
     if g1_first < 0 then g1_first = 0 end

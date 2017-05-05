@@ -1285,7 +1285,8 @@ Read alternatives into the G1 grammar.
                 if pause_after_active then
                     local q = slr.event_queue
                     if slr.trace_terminals > 2 then
-                        q[#q+1] = { '!trace', 'g1 pausing after lexeme', lexeme_start, lexeme_end, g1_lexeme}
+                        q[#q+1] = { '!trace', 'g1 pausing after lexeme',
+                            block_ix, lexeme_start, lexeme_end, g1_lexeme}
                     end
                     q[#q+1] = { 'after lexeme', g1_lexeme}
                 end
@@ -1358,10 +1359,7 @@ Yes, at trace level > 0
 Irrelevant, cannot happen
   { "!trace", "discarded lexeme" }
 
-Irrelevant?  Need to investigate.
-  { '!trace', 'ignored lexeme', g1_lexeme, lexeme_start, lexeme_end}
-
-  Irrelevant, because this call overrides priorities
+Irrelevant, because this call overrides priorities
   { "!trace", "outprioritized lexeme" }
 
 These are about lexeme expectations, which are
