@@ -585,7 +585,7 @@ sub Marpa::R3::Scanless::R::read {
 
     $slr->[Marpa::R3::Internal::Scanless::R::P_INPUT_STRING] = $p_string;
 
-    $slr->call_by_tag(
+    my ($new_codepoints) = $slr->call_by_tag(
     ('@' . __FILE__ . ':' . __LINE__),
         <<'END_OF_LUA', 's', ${$p_string});
             local slr, input_string = ...
@@ -616,7 +616,13 @@ sub Marpa::R3::Scanless::R::read {
             local eol_seen = false
             local line_no = 1
             local column_no = 0
+            local codepoint_seen = {}
+            local per_codepoint = slr.per_codepoint
             for byte_p, codepoint in utf8.codes(input_string) do
+
+                if not per_codepoint[codepoint] then
+                   codepoint_seen[codepoint] = true
+                end
 
                 -- line numbering logic
                 if eol_seen and
@@ -633,7 +639,15 @@ sub Marpa::R3::Scanless::R::read {
             end
 
             slr.phase = 'read'
+
+            local new_codepoints = {}
+            for codepoint, _ in pairs(codepoint_seen) do
+                new_codepoints[#new_codepoints+1] = codepoint
+            end
+            return new_codepoints
 END_OF_LUA
+
+    say STDERR "new_codepoints: ", Data::Dumper::Dumper($new_codepoints);
 
     return 0 if @{ $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] };
 
