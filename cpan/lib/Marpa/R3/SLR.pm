@@ -1500,24 +1500,7 @@ sub lc_range_brief {
 END_OF_LUA
      return $result;
 
-} ## end sub input_range_describe
-
-sub input_range_describe {
-    my ( $slr, $first_pos,  $last_pos )     = @_;
-    my ( $first_line, $first_column ) = $slr->line_column($first_pos);
-    my ( $last_line,  $last_column )  = $slr->line_column($last_pos);
-    if ( $first_line == $last_line ) {
-        # zero length spans sometimes produce range with last
-        # column before 1st column -- print these same as
-        # ranges of length 1.  E.g., L2c3
-        return join q{}, 'L', $first_line, 'c', $first_column
-            if $last_column <= $first_column;
-        return join q{}, 'L', $first_line, 'c', $first_column, '-',
-            $last_column;
-    } ## end if ( $first_line == $last_line )
-    return join q{}, 'L', $first_line, 'c', $first_column, '-L', $last_line,
-        'c', $last_column;
-} ## end sub input_range_describe
+}
 
 sub Marpa::R3::Scanless::R::show_progress {
     my ( $slr, $start_ordinal, $end_ordinal ) = @_;
