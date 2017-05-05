@@ -1153,7 +1153,7 @@ events into real trace events.
                 if slr.trace_terminals > 0 then
                     local q = slr.event_queue
                     q[#q+1] = { '!trace', 'discarded lexeme',
-                        rule_id, lexeme_start, lexeme_end}
+                        rule_id, lexeme_block, lexeme_start, lexeme_end}
                 end
                     local g1r = slr.g1.lmw_r
                     local event_on_discard_active =
@@ -1249,7 +1249,8 @@ Read alternatives into the G1 grammar.
 
             if slr.trace_terminals > 2 then
                 local q = slr.event_queue
-                q[#q+1] = { '!trace', 'g1 attempting lexeme', lexeme_start, lexeme_end, g1_lexeme}
+                q[#q+1] = { '!trace', 'g1 attempting lexeme',
+                    block_ix, lexeme_start, lexeme_end, g1_lexeme}
             end
             local g1r = slr.g1.lmw_r
             local kollos = getmetatable(g1r).kollos

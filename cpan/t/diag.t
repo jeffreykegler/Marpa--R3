@@ -149,15 +149,15 @@ for my $test_data (@tests_data) {
 
     Marpa::R3::Test::is( $show_progress_output,
         <<'END_OF_EXPECTED_OUTPUT', qq{Scanless show_progess()} );
-F0 @0-11 L1c1-19 Script -> Calculation * .
-P1 @11-11 L1c20 Calculation -> . Expression
-F1 @0-11 L1c1-19 Calculation -> Expression .
-P2 @11-11 L1c20 Calculation -> . 'say' Expression
-P3 @11-11 L1c20 Expression -> . Number
-F3 @10-11 L1c19 Expression -> Number .
-P4 @11-11 L1c20 Expression -> . '+' Expression Expression
-F4 x2 @0,6-11 L1c1-19 Expression -> '+' Expression Expression .
-F5 @0-11 L1c1-19 [:start] -> Script .
+F0 @0-11 B1L1c1-19 Script -> Calculation * .
+P1 @11-11 B1L1c20 Calculation -> . Expression
+F1 @0-11 B1L1c1-19 Calculation -> Expression .
+P2 @11-11 B1L1c20 Calculation -> . 'say' Expression
+P3 @11-11 B1L1c20 Expression -> . Number
+F3 @10-11 B1L1c19 Expression -> Number .
+P4 @11-11 B1L1c20 Expression -> . '+' Expression Expression
+F4 x2 @0,6-11 B1L1c1-19 Expression -> '+' Expression Expression .
+F5 @0-11 B1L1c1-19 [:start] -> Script .
 END_OF_EXPECTED_OUTPUT
 
     Marpa::R3::Test::is( $actual_value, $expected_value,
@@ -177,24 +177,24 @@ Registering character U+002b '+' as symbol 9: [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2
 Reading codepoint "+" 0x002b at line 1, column 1
 Codepoint "+" 0x002b accepted as [\+] at line 1, column 1
 Codepoint "+" 0x002b rejected as [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}] at line 1, column 1
-Attempting to read lexeme L1c1 e1: '+'; value="+"
-Accepted lexeme L1c1 e1: '+'; value="+"
+Attempting to read lexeme B1L1c1 e1: '+'; value="+"
+Accepted lexeme B1L1c1 e1: '+'; value="+"
 Restarted recognizer at line 1, column 2
 Expected lexeme Number at line 1, column 2; assertion ID = 0
 Expected lexeme '+' at line 1, column 2; assertion ID = 2
 Reading codepoint "+" 0x002b at line 1, column 2
 Codepoint "+" 0x002b accepted as [\+] at line 1, column 2
 Codepoint "+" 0x002b rejected as [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}] at line 1, column 2
-Attempting to read lexeme L1c2 e2: '+'; value="+"
-Accepted lexeme L1c2 e2: '+'; value="+"
+Attempting to read lexeme B1L1c2 e2: '+'; value="+"
+Accepted lexeme B1L1c2 e2: '+'; value="+"
 Restarted recognizer at line 1, column 3
 Expected lexeme Number at line 1, column 3; assertion ID = 0
 Expected lexeme '+' at line 1, column 3; assertion ID = 2
 Reading codepoint "+" 0x002b at line 1, column 3
 Codepoint "+" 0x002b accepted as [\+] at line 1, column 3
 Codepoint "+" 0x002b rejected as [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}] at line 1, column 3
-Attempting to read lexeme L1c3 e3: '+'; value="+"
-Accepted lexeme L1c3 e3: '+'; value="+"
+Attempting to read lexeme B1L1c3 e3: '+'; value="+"
+Accepted lexeme B1L1c3 e3: '+'; value="+"
 Restarted recognizer at line 1, column 4
 Expected lexeme Number at line 1, column 4; assertion ID = 0
 Expected lexeme '+' at line 1, column 4; assertion ID = 2
@@ -208,7 +208,7 @@ Registering character U+0031 '1' as symbol 9: [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2
 Reading codepoint "1" 0x0031 at line 1, column 5
 Codepoint "1" 0x0031 rejected as [\d] at line 1, column 5
 Codepoint "1" 0x0031 rejected as [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}] at line 1, column 5
-Discarded lexeme L1c4: whitespace
+Discarded lexeme B1L1c4: whitespace
 Restarted recognizer at line 1, column 5
 Expected lexeme Number at line 1, column 5; assertion ID = 0
 Expected lexeme '+' at line 1, column 5; assertion ID = 2
@@ -218,8 +218,8 @@ Codepoint "1" 0x0031 rejected as [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}] at line
 Reading codepoint 0x0020 at line 1, column 6
 Codepoint 0x0020 rejected as [\s] at line 1, column 6
 Codepoint 0x0020 rejected as [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}] at line 1, column 6
-Attempting to read lexeme L1c5 e4: Number; value="1"
-Accepted lexeme L1c5 e4: Number; value="1"
+Attempting to read lexeme B1L1c5 e4: Number; value="1"
+Accepted lexeme B1L1c5 e4: Number; value="1"
 Restarted recognizer at line 1, column 6
 Expected lexeme Number at line 1, column 6; assertion ID = 0
 Expected lexeme '+' at line 1, column 6; assertion ID = 2
@@ -231,7 +231,7 @@ Registering character U+0032 '2' as symbol 9: [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2
 Reading codepoint "2" 0x0032 at line 1, column 7
 Codepoint "2" 0x0032 rejected as [\d] at line 1, column 7
 Codepoint "2" 0x0032 rejected as [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}] at line 1, column 7
-Discarded lexeme L1c6: whitespace
+Discarded lexeme B1L1c6: whitespace
 Restarted recognizer at line 1, column 7
 Expected lexeme Number at line 1, column 7; assertion ID = 0
 Expected lexeme '+' at line 1, column 7; assertion ID = 2
@@ -241,8 +241,8 @@ Codepoint "2" 0x0032 rejected as [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}] at line
 Reading codepoint 0x0020 at line 1, column 8
 Codepoint 0x0020 rejected as [\s] at line 1, column 8
 Codepoint 0x0020 rejected as [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}] at line 1, column 8
-Attempting to read lexeme L1c7 e5: Number; value="2"
-Accepted lexeme L1c7 e5: Number; value="2"
+Attempting to read lexeme B1L1c7 e5: Number; value="2"
+Accepted lexeme B1L1c7 e5: Number; value="2"
 Restarted recognizer at line 1, column 8
 Expected lexeme Number at line 1, column 8; assertion ID = 0
 Expected lexeme '+' at line 1, column 8; assertion ID = 2
@@ -254,7 +254,7 @@ Registering character U+0033 '3' as symbol 9: [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2
 Reading codepoint "3" 0x0033 at line 1, column 9
 Codepoint "3" 0x0033 rejected as [\d] at line 1, column 9
 Codepoint "3" 0x0033 rejected as [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}] at line 1, column 9
-Discarded lexeme L1c8: whitespace
+Discarded lexeme B1L1c8: whitespace
 Restarted recognizer at line 1, column 9
 Expected lexeme Number at line 1, column 9; assertion ID = 0
 Expected lexeme '+' at line 1, column 9; assertion ID = 2
@@ -264,8 +264,8 @@ Codepoint "3" 0x0033 rejected as [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}] at line
 Reading codepoint 0x0020 at line 1, column 10
 Codepoint 0x0020 rejected as [\s] at line 1, column 10
 Codepoint 0x0020 rejected as [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}] at line 1, column 10
-Attempting to read lexeme L1c9 e6: Number; value="3"
-Accepted lexeme L1c9 e6: Number; value="3"
+Attempting to read lexeme B1L1c9 e6: Number; value="3"
+Accepted lexeme B1L1c9 e6: Number; value="3"
 Restarted recognizer at line 1, column 10
 Expected lexeme Number at line 1, column 10; assertion ID = 0
 Expected lexeme '+' at line 1, column 10; assertion ID = 2
@@ -275,15 +275,15 @@ Codepoint 0x0020 rejected as [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}] at line 1, 
 Reading codepoint "+" 0x002b at line 1, column 11
 Codepoint "+" 0x002b rejected as [\+] at line 1, column 11
 Codepoint "+" 0x002b rejected as [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}] at line 1, column 11
-Discarded lexeme L1c10: whitespace
+Discarded lexeme B1L1c10: whitespace
 Restarted recognizer at line 1, column 11
 Expected lexeme Number at line 1, column 11; assertion ID = 0
 Expected lexeme '+' at line 1, column 11; assertion ID = 2
 Reading codepoint "+" 0x002b at line 1, column 11
 Codepoint "+" 0x002b accepted as [\+] at line 1, column 11
 Codepoint "+" 0x002b rejected as [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}] at line 1, column 11
-Attempting to read lexeme L1c11 e7: '+'; value="+"
-Accepted lexeme L1c11 e7: '+'; value="+"
+Attempting to read lexeme B1L1c11 e7: '+'; value="+"
+Accepted lexeme B1L1c11 e7: '+'; value="+"
 Restarted recognizer at line 1, column 12
 Expected lexeme Number at line 1, column 12; assertion ID = 0
 Expected lexeme '+' at line 1, column 12; assertion ID = 2
@@ -293,15 +293,15 @@ Codepoint 0x0020 rejected as [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}] at line 1, 
 Reading codepoint "+" 0x002b at line 1, column 13
 Codepoint "+" 0x002b rejected as [\+] at line 1, column 13
 Codepoint "+" 0x002b rejected as [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}] at line 1, column 13
-Discarded lexeme L1c12: whitespace
+Discarded lexeme B1L1c12: whitespace
 Restarted recognizer at line 1, column 13
 Expected lexeme Number at line 1, column 13; assertion ID = 0
 Expected lexeme '+' at line 1, column 13; assertion ID = 2
 Reading codepoint "+" 0x002b at line 1, column 13
 Codepoint "+" 0x002b accepted as [\+] at line 1, column 13
 Codepoint "+" 0x002b rejected as [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}] at line 1, column 13
-Attempting to read lexeme L1c13 e8: '+'; value="+"
-Accepted lexeme L1c13 e8: '+'; value="+"
+Attempting to read lexeme B1L1c13 e8: '+'; value="+"
+Accepted lexeme B1L1c13 e8: '+'; value="+"
 Restarted recognizer at line 1, column 14
 Expected lexeme Number at line 1, column 14; assertion ID = 0
 Expected lexeme '+' at line 1, column 14; assertion ID = 2
@@ -311,7 +311,7 @@ Codepoint 0x0020 rejected as [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}] at line 1, 
 Reading codepoint "1" 0x0031 at line 1, column 15
 Codepoint "1" 0x0031 rejected as [\d] at line 1, column 15
 Codepoint "1" 0x0031 rejected as [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}] at line 1, column 15
-Discarded lexeme L1c14: whitespace
+Discarded lexeme B1L1c14: whitespace
 Restarted recognizer at line 1, column 15
 Expected lexeme Number at line 1, column 15; assertion ID = 0
 Expected lexeme '+' at line 1, column 15; assertion ID = 2
@@ -321,8 +321,8 @@ Codepoint "1" 0x0031 rejected as [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}] at line
 Reading codepoint 0x0020 at line 1, column 16
 Codepoint 0x0020 rejected as [\s] at line 1, column 16
 Codepoint 0x0020 rejected as [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}] at line 1, column 16
-Attempting to read lexeme L1c15 e9: Number; value="1"
-Accepted lexeme L1c15 e9: Number; value="1"
+Attempting to read lexeme B1L1c15 e9: Number; value="1"
+Accepted lexeme B1L1c15 e9: Number; value="1"
 Restarted recognizer at line 1, column 16
 Expected lexeme Number at line 1, column 16; assertion ID = 0
 Expected lexeme '+' at line 1, column 16; assertion ID = 2
@@ -332,7 +332,7 @@ Codepoint 0x0020 rejected as [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}] at line 1, 
 Reading codepoint "2" 0x0032 at line 1, column 17
 Codepoint "2" 0x0032 rejected as [\d] at line 1, column 17
 Codepoint "2" 0x0032 rejected as [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}] at line 1, column 17
-Discarded lexeme L1c16: whitespace
+Discarded lexeme B1L1c16: whitespace
 Restarted recognizer at line 1, column 17
 Expected lexeme Number at line 1, column 17; assertion ID = 0
 Expected lexeme '+' at line 1, column 17; assertion ID = 2
@@ -342,8 +342,8 @@ Codepoint "2" 0x0032 rejected as [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}] at line
 Reading codepoint 0x0020 at line 1, column 18
 Codepoint 0x0020 rejected as [\s] at line 1, column 18
 Codepoint 0x0020 rejected as [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}] at line 1, column 18
-Attempting to read lexeme L1c17 e10: Number; value="2"
-Accepted lexeme L1c17 e10: Number; value="2"
+Attempting to read lexeme B1L1c17 e10: Number; value="2"
+Accepted lexeme B1L1c17 e10: Number; value="2"
 Restarted recognizer at line 1, column 18
 Expected lexeme Number at line 1, column 18; assertion ID = 0
 Expected lexeme '+' at line 1, column 18; assertion ID = 2
@@ -355,15 +355,15 @@ Registering character U+0034 '4' as symbol 9: [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2
 Reading codepoint "4" 0x0034 at line 1, column 19
 Codepoint "4" 0x0034 rejected as [\d] at line 1, column 19
 Codepoint "4" 0x0034 rejected as [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}] at line 1, column 19
-Discarded lexeme L1c18: whitespace
+Discarded lexeme B1L1c18: whitespace
 Restarted recognizer at line 1, column 19
 Expected lexeme Number at line 1, column 19; assertion ID = 0
 Expected lexeme '+' at line 1, column 19; assertion ID = 2
 Reading codepoint "4" 0x0034 at line 1, column 19
 Codepoint "4" 0x0034 accepted as [\d] at line 1, column 19
 Codepoint "4" 0x0034 rejected as [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}] at line 1, column 19
-Attempting to read lexeme L1c19 e11: Number; value="4"
-Accepted lexeme L1c19 e11: Number; value="4"
+Attempting to read lexeme B1L1c19 e11: Number; value="4"
+Accepted lexeme B1L1c19 e11: Number; value="4"
 END_OF_OUTPUT
 
     my $expected_progress_output = [

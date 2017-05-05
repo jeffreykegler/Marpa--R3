@@ -654,8 +654,8 @@ my $libmarpa_trace_event_handlers = {
             $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
         my $slg              = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
         say {$trace_file_handle} qq{Accepted lexeme },
-            input_range_describe( $slr, $lexeme_start_pos,
-            $lexeme_end_pos - 1 ),
+            lc_brief( $slr, $block, $lexeme_start_pos,
+                $block, $lexeme_end_pos - 1 ),
             q{ e}, $slr->g1_pos(),
             q{: },
             $slg->symbol_display_form($g1_lexeme),
@@ -689,8 +689,8 @@ my $libmarpa_trace_event_handlers = {
         my $slg              = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
         say {$trace_file_handle}
             qq{Outprioritized lexeme },
-            input_range_describe( $slr, $lexeme_start_pos,
-            $lexeme_end_pos - 1 ),
+            lc_brief( $slr, $block, $lexeme_start_pos,
+                $block, $lexeme_end_pos - 1 ),
             q{: },
             $slg->symbol_display_form($g1_lexeme),
             qq{; value="$raw_token_value"; },
@@ -709,8 +709,8 @@ my $libmarpa_trace_event_handlers = {
         my $slg              = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
         say {$trace_file_handle}
             'Rejected as duplicate lexeme ',
-            input_range_describe( $slr, $lexeme_start_pos,
-            $lexeme_end_pos - 1 ),
+            lc_brief( $slr, $block, $lexeme_start_pos,
+                $block, $lexeme_end_pos - 1 ),
             q{: },
             $slg->symbol_display_form($g1_lexeme),
             qq{; value="$raw_token_value"}
@@ -718,7 +718,7 @@ my $libmarpa_trace_event_handlers = {
     },
     'g1 attempting lexeme' => sub {
         my ( $slr, $event ) = @_;
-        my ( undef, undef, $lexeme_start_pos, $lexeme_end_pos, $g1_lexeme ) =
+        my ( undef, undef, $block, $lexeme_start_pos, $lexeme_end_pos, $g1_lexeme ) =
             @{$event};
         my $raw_token_value =
             $slr->literal( $lexeme_start_pos,
@@ -728,8 +728,8 @@ my $libmarpa_trace_event_handlers = {
         my $slg              = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
         say {$trace_file_handle}
             'Attempting to read lexeme ',
-            input_range_describe( $slr, $lexeme_start_pos,
-            $lexeme_end_pos - 1 ),
+            lc_brief( $slr, $block, $lexeme_start_pos,
+                $block, $lexeme_end_pos - 1 ),
             q{ e}, $slr->g1_pos(),
             q{: },
             $slg->symbol_display_form($g1_lexeme),
@@ -805,7 +805,7 @@ my $libmarpa_trace_event_handlers = {
     },
     'discarded lexeme' => sub {
         my ( $slr, $event ) = @_;
-        my ( undef, undef, $lex_rule_id, $start, $end ) =
+        my ( undef, undef, $lex_rule_id, $block, $start, $end ) =
             @{$event};
         my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
         my @rhs_ids = $slg->l0_irl_isyids($lex_rule_id);
@@ -815,7 +815,7 @@ my $libmarpa_trace_event_handlers = {
         my $trace_file_handle =
             $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
         say {$trace_file_handle} qq{Discarded lexeme },
-            input_range_describe( $slr, $start, $end - 1 ), q{: }, join q{ },
+            lc_brief( $slr, $block, $start, $block, $end - 1 ), q{: }, join q{ },
             @rhs
             or Marpa::R3::exception("Could not say(): $ERRNO");
     },
@@ -1498,6 +1498,29 @@ END_OF_LUA
     return;
 }
 
+# Brief description of block/line/column for
+# an L0 range
+sub lc_brief {
+    my ( $slr, $start_block,  $start_pos, $end_block, $end_pos )     = @_;
+    my ( $start_line, $start_column ) = $slr->line_column($start_pos, $start_block);
+    my ( $end_line,  $end_column )  = $slr->line_column($end_pos, $end_block);
+    if ( $start_block != $end_block ) {
+        return join q{},
+            'B', $start_block, 'L', $start_line, 'c', $start_column,
+            '-B', $end_block, 'L', $end_line, 'c', $end_column;
+    }
+    if ( $start_line != $end_line ) {
+        return join q{},
+            'B', $start_block, 'L', $start_line, 'c', $start_column,
+            '-L', $end_line, 'c', $end_column;
+    }
+    if ( $start_column != $end_column ) {
+        return join q{}, 'B', $start_block, 'L', $start_line, 'c', $start_column,
+            '-', $end_column;
+    }
+    return join q{}, 'B', $start_block, 'L', $start_line, 'c', $start_column;
+} ## end sub input_range_describe
+
 sub input_range_describe {
     my ( $slr, $first_pos,  $last_pos )     = @_;
     my ( $first_line, $first_column ) = $slr->line_column($first_pos);
@@ -1862,7 +1885,7 @@ END_OF_LUA
     return $start, $end;
 }
 
-# TODO -- Either document $block parameter or delete it
+# TODO -- Document $block parameter
 sub Marpa::R3::Scanless::R::line_column {
     my ( $slr, $pos, $block ) = @_;
     $pos //= $slr->pos();
