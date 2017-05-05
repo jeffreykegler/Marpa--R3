@@ -1617,13 +1617,16 @@ sub Marpa::R3::Scanless::R::show_progress {
                 );
                 my @item_text;
 
+                my $dotted_type = "R";
                 if ( $position >= $rhs_length ) {
+                    $dotted_type = "F";
                     push @item_text, "F$rule_id";
                 }
                 elsif ($position) {
                     push @item_text, "R$rule_id:$position";
                 }
                 else {
+                    $dotted_type = "P";
                     push @item_text, "P$rule_id";
                 }
                 push @item_text, "x$origins_count" if $origins_count > 1;
@@ -1637,22 +1640,22 @@ sub Marpa::R3::Scanless::R::show_progress {
 
                 my ($input_range) =
                   $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-                    <<'END_OF_LUA', 'ii', ($origins[0]+0), $current_earleme );
-    local slr, g1_first, current_earleme = ...
+                    <<'END_OF_LUA', 'sii', $dotted_type, ($origins[0]+0), $current_ordinal );
+    local slr, dotted_type, g1_first, current_ordinal = ...
 
-    io.stderr:write(string.format("g1_first=%s; current_earleme=%s\n",
-         inspect(g1_first), inspect(current_earleme )))
+    io.stderr:write(string.format("g1_first=%s; current_ordinal=%s\n",
+         inspect(g1_first), inspect(current_ordinal )))
 
-    if current_earleme <= 0 then return 'L0c0' end
-    if g1_first == current_earleme then
+    if current_ordinal <= 0 then return 'L0c0' end
+    if dotted_type == 'P' then
         -- this is a prediction
-        local block, pos = slr:l0_current_pos()
+        local block, pos = slr:g1_pos_to_l0_first(current_ordinal)
         io.stderr:write(string.format("prediction block=%d; pos=%d\n",
            block, pos))
         return slr:lc_brief(pos, block)
     end
     if g1_first < 0 then g1_first = 0 end
-    local g1_last = current_earleme - 1
+    local g1_last = current_ordinal - 1
     local l0_first_b, l0_first_p = slr:g1_pos_to_l0_first(g1_first)
     local l0_last_b, l0_last_p = slr:g1_pos_to_l0_last(g1_last)
     return slr:lc_range_brief(l0_first_b, l0_first_p, l0_last_b, l0_last_p)
