@@ -46,16 +46,21 @@ sub pre_construct {
     my ($regix) = $lua->call_by_tag (-1,
         ('@' .__FILE__ . ':' .  __LINE__),
        <<'END_OF_LUA', '');
-        local grammar = {}
+        local slg = {}
         local registry = debug.getregistry()
-        setmetatable(grammar, _M.class_slg)
-        local regix = _M.register(registry, grammar)
-        grammar.ref_count = 1
-        grammar.nulling_semantics = {}
-        grammar.rule_semantics = {}
-        grammar.token_semantics = {}
-        grammar.per_codepoint = {}
-        grammar.ranking_method = 'none'
+        setmetatable(slg, _M.class_slg)
+        local regix = _M.register(registry, slg)
+        slg.ref_count = 1
+        slg.nulling_semantics = {}
+        slg.rule_semantics = {}
+        slg.token_semantics = {}
+
+        -- The codepoint data is populated, as needed, by the recognizers but,
+        -- once populated, depends only on the codepoint and the
+        -- grammar.
+        slg.per_codepoint = {}
+
+        slg.ranking_method = 'none'
         return regix
 END_OF_LUA
 

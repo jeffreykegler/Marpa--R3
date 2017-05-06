@@ -561,6 +561,7 @@ END_OF_LUA
 
 sub Marpa::R3::Scanless::R::read {
     my ( $slr, $p_string, $start_pos, $length ) = @_;
+    my $slg              = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
 
     Marpa::R3::exception(
     q{Attempt to use a tainted input string in $slr->read()},
@@ -585,7 +586,7 @@ sub Marpa::R3::Scanless::R::read {
 
     $slr->[Marpa::R3::Internal::Scanless::R::P_INPUT_STRING] = $p_string;
 
-    my ($new_codepoints) = $slr->call_by_tag(
+    my ($new_codepoints, $trace_terminals) = $slr->call_by_tag(
     ('@' . __FILE__ . ':' . __LINE__),
         <<'END_OF_LUA', 's', ${$p_string});
             local slr, input_string = ...
@@ -617,7 +618,7 @@ sub Marpa::R3::Scanless::R::read {
             local line_no = 1
             local column_no = 0
             local codepoint_seen = {}
-            local per_codepoint = slr.per_codepoint
+            local per_codepoint = slr.slg.per_codepoint
             for byte_p, codepoint in utf8.codes(input_string) do
 
                 if not per_codepoint[codepoint] then
@@ -644,10 +645,45 @@ sub Marpa::R3::Scanless::R::read {
             for codepoint, _ in pairs(codepoint_seen) do
                 new_codepoints[#new_codepoints+1] = codepoint
             end
-            return new_codepoints
+            return new_codepoints, slr.trace_terminals
 END_OF_LUA
 
-    say STDERR "new_codepoints: ", Data::Dumper::Dumper($new_codepoints);
+    my $character_class_table =
+      $slg->[Marpa::R3::Internal::Scanless::G::CHARACTER_CLASS_TABLE];
+
+    my @ops = ();
+    # say STDERR "new_codepoints: ", Data::Dumper::Dumper($new_codepoints);
+        for my $codepoint (@{$new_codepoints})
+        {
+            my $character = pack('U', $codepoint);
+            my $is_graphic = ( $character =~ m/[[:graph:]]+/ ) ? 1 : 0;
+
+            my @symbols;
+            for my $entry ( @{$character_class_table} ) {
+
+                my ( $symbol_id, $re ) = @{$entry};
+                if ( $character =~ $re ) {
+
+                    if ( $trace_terminals >= 2 ) {
+                        my $trace_file_handle = $slr->[
+                          Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
+                        my $char_desc = sprintf 'U+%04x', $codepoint;
+                        $char_desc .= qq{ '$character'} if $is_graphic;
+                        say {$trace_file_handle}
+qq{Registering character $char_desc as symbol $symbol_id: },
+                          $slg->l0_symbol_display_form($symbol_id)
+                          or Marpa::R3::exception("Could not say(): $ERRNO");
+                    } ## end if ( $trace_terminals >= 2 )
+
+                    push @symbols, $symbol_id;
+
+                } ## end if ( $character =~ $re )
+            } ## end for my $entry ( @{$character_class_table} )
+
+            push @ops, [ 'symbols', $codepoint, @symbols ];
+            push @ops, [ 'is_graphic', $codepoint, $is_graphic ];
+
+        }
 
     return 0 if @{ $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] };
 
