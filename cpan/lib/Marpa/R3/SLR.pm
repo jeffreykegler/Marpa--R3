@@ -1364,7 +1364,7 @@ END_OF_LUA
     my $read_string_error;
     if ( $problem_pos < $length_of_string) {
 
-        my ($read_string_error) =
+        ($read_string_error) =
           $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
             <<'END_OF_LUA', 's', $desc );
           local slr, error_desc = ...
@@ -1372,21 +1372,30 @@ END_OF_LUA
           local block_ix = block.index
           local pos = slr.perl_pos
           local codepoint = slr:codepoint_from_pos(block_ix, pos)
-          local _, line, column = slr:codepoint_from_pos(block_ix, pos)
-          if pos >= 50 then
-              display_start = pos - 50
-              display_length = 50
-          else 
-              display_start = 0
-              display_length = pos
-          end
+          local _, line, column = slr:per_pos(block_ix, pos)
+          -- io.stderr:write(string.format("per_codepoint=%s\n",
+             -- inspect(slr.slg.per_codepoint)
+          -- ))
+          -- io.stderr:write(string.format("pos,codepoint,line,column=%s,%s,%s,%s\n",
+              -- inspect(pos),
+              -- inspect(codepoint),
+              -- inspect(line),
+              -- inspect(column)
+          -- ))
+          -- if pos >= 50 then
+              -- display_start = pos
+              -- display_length = 50
+          -- else 
+              -- display_start = 0
+              -- display_length = pos
+          -- end
           return string.format(
               "Error in SLIF parse: %s\n\z
                * String before error: %s\n\z
                * The error was at line %d, column %d, and at character %s, ...\n\z
                * here: %s\n",
                error_desc,
-               slr:reversed_input_escape(block_ix, display_start, display_length),
+               slr:reversed_input_escape(block_ix, pos, 50),
                line, column,
                slr:character_describe(codepoint),
                slr:input_escape(block_ix, pos, 50)
@@ -1395,7 +1404,7 @@ END_OF_LUA
 
     } ## end elsif ( $problem_pos < $length_of_string )
     else {
-        my ($read_string_error) =
+        ($read_string_error) =
           $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
             <<'END_OF_LUA', '' );
           local slr = ...

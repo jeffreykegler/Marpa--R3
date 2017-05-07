@@ -3725,10 +3725,10 @@ Caller must ensure `block` and `pos` are valid.
     end
 
     function _M.class_slr.reversed_input_escape(slr, block, base_pos, max_length)
-        local pos = start
+        local pos = base_pos - 1
         local length_so_far = 0
-        local escapes = {}
-        while pos >= 1 do
+        local reversed = {}
+        while pos >= 0 do
 
              local codepoint = slr:codepoint_from_pos(block, pos)
              local escape = _M.escape_codepoint(codepoint)
@@ -3737,25 +3737,30 @@ Caller must ensure `block` and `pos` are valid.
                  length_so_far = length_so_far - #escape
                  break
              end
-             escapes[#escapes+1] = escape
+             reversed[#reversed+1] = escape
              pos = pos - 1
         end
 
         -- trailing spaces get special treatment
-        for i = #escapes, 1, -1 do
-            if escapes[i] ~= ' ' then break end
-            escapes[i] = '\\s'
+        for i = 1, #reversed  do
+            if reversed[i] ~= ' ' then break end
+            reversed[i] = '\\s'
             -- the escaped version is one character longer
             length_so_far = length_so_far + 1
         end
 
         -- trim back to adjust for escaped trailing spaces
-        for i = 1, #escapes do
-             -- print(length_so_far, max_length)
-            if length_so_far <= max_length then break end
-            local this_escape = escapes[i]
-            escapes[i] = ''
+        local ix = #reversed
+        while length_so_far > max_length do
+            local this_escape = reversed[ix]
+            reversed[ix] = ''
             length_so_far = length_so_far - #this_escape
+            ix = ix - 1
+        end
+
+        local escapes = {}
+        for i = #reversed, 1, -1 do
+            escapes[#escapes+1] = reversed[i]
         end
 
         return table.concat(escapes)
