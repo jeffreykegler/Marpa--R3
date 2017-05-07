@@ -1193,8 +1193,6 @@ sub Marpa::R3::Scanless::R::read_problem {
 
     my $pos      = $slr->pos();
     my $problem_pos = $pos;
-    my $p_string = $slr->[Marpa::R3::Internal::Scanless::R::P_INPUT_STRING];
-    my $length_of_string = length ${$p_string};
 
     my $problem;
     my $stream_status = 0;
