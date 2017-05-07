@@ -892,7 +892,7 @@ otherwise an error code string.
         end
         local tokens_accepted = 0
         for ix = 1, op_count do
-            local symbol_id = slr.per_codepoint[codepoint][ix]
+            local symbol_id = ops[ix]
             tokens_accepted = tokens_accepted +
                  slr:l0_alternative(symbol_id)
         end

@@ -651,7 +651,7 @@ END_OF_LUA
     my $character_class_table =
       $slg->[Marpa::R3::Internal::Scanless::G::CHARACTER_CLASS_TABLE];
 
-    my @ops = ();
+    my @codepoint_cmds = ();
     # say STDERR "new_codepoints: ", Data::Dumper::Dumper($new_codepoints);
         for my $codepoint (@{$new_codepoints})
         {
@@ -680,10 +680,42 @@ qq{Registering character $char_desc as symbol $symbol_id: },
                 } ## end if ( $character =~ $re )
             } ## end for my $entry ( @{$character_class_table} )
 
-            push @ops, [ 'symbols', $codepoint, @symbols ];
-            push @ops, [ 'is_graphic', $codepoint, $is_graphic ];
+            push @codepoint_cmds, [ 'symbols', $codepoint, \@symbols ];
+            push @codepoint_cmds, [ 'is_graphic', $codepoint, $is_graphic ];
 
         }
+
+    # The argument is a sequence of "codepoint commands", each
+    # of which is a sequence: `[command, codepoint, value ]`
+    #
+    # There are two commands.  The "symbols" command tells Kollos
+    # to create a per-codepoint structure.  The `value` is a sequence
+    # of symbols, used to populate the codepoint.  Kollos will recognize
+    # that codepoint as each of that set of symbols.  (Codepoints can
+    # be, and often are, ambiguous.)
+    #
+    # The other command is "is_graphic".  It set or unsets the
+    # `is_graphic` boolean for the codepoint.  The per-codepoint
+    # structure must already exist.
+    $slr->call_by_tag(
+    ('@' . __FILE__ . ':' . __LINE__),
+        <<'END_OF_LUA', 'i', \@codepoint_cmds);
+        local slr, codepoint_cmds = ...
+        local per_codepoint = slr.slg.per_codepoint
+        for cmd_ix = 1, #codepoint_cmds do
+             local cmd, codepoint, value = table.unpack(codepoint_cmds[cmd_ix])
+             if cmd == 'symbols' then
+                  per_codepoint[codepoint] = value
+                  goto NEXT_COMMAND
+             end
+             if cmd == 'is_graphic' then
+                  per_codepoint[codepoint].is_graphic
+                      = value ~= 0 and true or nil
+                  goto NEXT_COMMAND
+             end
+             ::NEXT_COMMAND::
+        end
+END_OF_LUA
 
     return 0 if @{ $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] };
 
