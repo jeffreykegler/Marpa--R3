@@ -1361,61 +1361,33 @@ END_OF_LUA
         } ## end DESC:
 
 
-    my $read_string_error;
-    if ( $problem_pos < $length_of_string) {
-
-        ($read_string_error) =
-          $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-            <<'END_OF_LUA', 's', $desc );
-          local slr, error_desc = ...
-          local block = slr.current_block
-          local block_ix = block.index
-          local pos = slr.perl_pos
-          local codepoint = slr:codepoint_from_pos(block_ix, pos)
-          local _, line, column = slr:per_pos(block_ix, pos)
-          -- io.stderr:write(string.format("per_codepoint=%s\n",
-             -- inspect(slr.slg.per_codepoint)
-          -- ))
-          -- io.stderr:write(string.format("pos,codepoint,line,column=%s,%s,%s,%s\n",
-              -- inspect(pos),
-              -- inspect(codepoint),
-              -- inspect(line),
-              -- inspect(column)
-          -- ))
-          -- if pos >= 50 then
-              -- display_start = pos
-              -- display_length = 50
-          -- else 
-              -- display_start = 0
-              -- display_length = pos
-          -- end
-          return string.format(
-              "Error in SLIF parse: %s\n\z
-               * String before error: %s\n\z
-               * The error was at line %d, column %d, and at character %s, ...\n\z
-               * here: %s\n",
-               error_desc,
-               slr:reversed_input_escape(block_ix, pos, 50),
-               line, column,
-               slr:character_describe(codepoint),
-               slr:input_escape(block_ix, pos, 50)
-          )
-END_OF_LUA
-
-    } ## end elsif ( $problem_pos < $length_of_string )
-    else {
-        ($read_string_error) =
-          $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-            <<'END_OF_LUA', '' );
-          local slr = ...
-          local block_ix = slr.current_block.index
+    my ($read_string_error) =
+      $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 's', $desc );
+      local slr, error_desc = ...
+      local block = slr.current_block
+      local block_ix = block.index
+      local pos = slr.perl_pos
+      if pos >= #block then
           return "Error in SLIF parse: $desc\n\z
               * Error was at end of input\n\z
               * String before error: "
               ..  slr:input_escape(block_ix, 0, 50) .. "\n"
+      end
+      local codepoint = slr:codepoint_from_pos(block_ix, pos)
+      local _, line, column = slr:per_pos(block_ix, pos)
+      return string.format(
+          "Error in SLIF parse: %s\n\z
+           * String before error: %s\n\z
+           * The error was at line %d, column %d, and at character %s, ...\n\z
+           * here: %s\n",
+           error_desc,
+           slr:reversed_input_escape(block_ix, pos, 50),
+           line, column,
+           slr:character_describe(codepoint),
+           slr:input_escape(block_ix, pos, 50)
+          )
 END_OF_LUA
-
-    } ## end else [ if ($g1_status) ]
 
     Marpa::R3::exception($read_string_error);
 
