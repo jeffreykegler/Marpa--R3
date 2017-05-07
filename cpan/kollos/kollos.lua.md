@@ -785,7 +785,6 @@ The top-level read function.
             local g1r = slr.g1.lmw_r
             local result = slr:l0_read_lexeme()
             if result == 'trace' then return result end
-            if result == 'unregistered char' then return result end
             local discard_mode = (g1r:is_exhausted() ~= 0)
             result = slr:alternatives(discard_mode)
             if result then return result end
@@ -873,33 +872,14 @@ otherwise an error code string.
     function _M.class_slr.l0_read_codepoint(slr)
         local codepoint = slr.codepoint
 
-        -- io.stderr:write(inspect(slr.slg.per_codepoint))
-
         local ops = slr.slg.per_codepoint[codepoint]
+        local op_count = ops and #ops or -1
 
-        -- io.stderr:write('slg per_codepoint: ', inspect(slr.slg.per_codepoint), '\n')
-        -- io.stderr:write('slr per_codepoint: ', inspect(slr.per_codepoint), '\n')
-
-        -- io.stderr:write('hi 2\n')
-        if ops == nil then
-            print( '1 unregistered char', codepoint, -1)
-            return 'unregistered char'
-        end
-        -- io.stderr:write('hi 3\n')
-        if ops == false then
-            -- print( 'invalid char', codepoint, -1)
-            return 'invalid char'
-        end
-        -- io.stderr:write('hi 4\n')
-        local op_count = #ops
         if op_count <= 0 then
-            error( string.format("Registered dodepoint %d, but no no ops\n", codepoint))
+            error( string.format(
+                "Internal error: registered codepoint %d, but no ops\n", codepoint
+            ))
         end
-
-        -- print( 'SLG registered char', codepoint, inspect(slr.slg.per_codepoint[codepoint]))
-        -- print( 'SLR registered char', codepoint, inspect(slr.per_codepoint[codepoint]))
-
-        -- io.stderr:write('hi 6')
 
         if slr.trace_terminals >= 1 then
            local q = slr.event_queue
@@ -911,8 +891,6 @@ otherwise an error code string.
             tokens_accepted = tokens_accepted +
                  slr:l0_alternative(symbol_id)
         end
-
-        -- io.stderr:write('hi 10')
 
         if tokens_accepted < 1 then return 'rejected char' end
         local complete_result = slr:l0_earleme_complete()

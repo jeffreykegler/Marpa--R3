@@ -203,7 +203,6 @@ sub Marpa::R3::Scanless::R::new {
     recce.lexeme_queue = {}
     recce.accept_queue = {}
 
-    recce.per_codepoint = {}
     recce.end_pos = 0
     recce.perl_pos = 0
     recce.too_many_earley_items = -1
@@ -1156,53 +1155,6 @@ END_OF_LUA
                 character_describe( chr $codepoint )
             );
         } ## end if ( $problem_code eq 'invalid char' )
-
-        if ( $problem_code eq 'unregistered char' ) {
-
-            # Recover by registering character, if we can
-            my ($codepoint, $perl_pos) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-                'recce = ...; return recce.codepoint, recce.perl_pos', '');
-
-            my $character = pack('U', $codepoint);
-
-            my $character_class_table =
-              $slg->[Marpa::R3::Internal::Scanless::G::CHARACTER_CLASS_TABLE];
-            my @ops;
-            for my $entry ( @{$character_class_table} ) {
-
-                my ( $symbol_id, $re ) = @{$entry};
-                if ( $character =~ $re ) {
-
-                    if ( $trace_terminals >= 2 ) {
-                        my $trace_file_handle = $slr->[
-                          Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
-                        my $char_desc = sprintf 'U+%04x', $codepoint;
-                        if ( $character =~ m/[[:graph:]]+/ ) {
-                            $char_desc .= qq{ '$character'};
-                        }
-                        say {$trace_file_handle}
-qq{Registering character $char_desc as symbol $symbol_id: },
-                          $slg->l0_symbol_display_form($symbol_id)
-                          or Marpa::R3::exception("Could not say(): $ERRNO");
-                    } ## end if ( $trace_terminals >= 2 )
-
-                    push @ops, $symbol_id;
-
-                } ## end if ( $character =~ $re )
-            } ## end for my $entry ( @{$character_class_table} )
-
-            $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-                <<'END_OF_LUA', 'ii', $codepoint, \@ops );
-        local recce, codepoint, ops = ...
-        if #ops <= 0 then
-             recce.per_codepoint[codepoint] = false
-        else
-             recce.per_codepoint[codepoint] = ops
-        end
-END_OF_LUA
-
-            next OUTER_READ;
-        } ## end if ( $problem_code eq 'unregistered char' )
 
         return $slr->read_problem($problem_code);
 
