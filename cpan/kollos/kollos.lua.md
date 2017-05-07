@@ -3682,13 +3682,14 @@ Caller must ensure `block` and `pos` are valid.
 
 ```
     -- miranda: section+ diagnostics
-    function _M.class_slr.input_escape(slr, block, start, max_length)
+    function _M.class_slr.input_escape(slr, block_ix, start, max_length)
         local pos = start
         local length_so_far = 0
         local escapes = {}
-        while true do
-             local codepoint = slr:codepoint_from_pos(block, pos)
-             if not codepoint then break end
+        local block = slr.inputs[block_ix]
+        local start_byte_p = slr:per_pos(block_ix, pos)
+        local subtext = block.text:sub(start_byte_p)
+        for byte_p, codepoint in utf8.codes(subtext) do
              local escape = _M.escape_codepoint(codepoint)
              length_so_far = length_so_far + #escape
              if length_so_far > max_length then
@@ -3696,7 +3697,6 @@ Caller must ensure `block` and `pos` are valid.
                  break
              end
              escapes[#escapes+1] = escape
-             pos = pos + 1
         end
 
              -- print(inspect(escapes))
@@ -6332,9 +6332,9 @@ and error codes.
             return string.char(codepoint)
         end
         if codepoint < 255 then
-            return string.format("%02x", codepoint)
+            return string.format("\\x{%02x}", codepoint)
         end
-        return string.format("%04x", codepoint)
+        return string.format("\\x{%04x}", codepoint)
     end
 
     function _M.sweep_add(sweep, block, start, len)
