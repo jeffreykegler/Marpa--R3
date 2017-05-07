@@ -1382,11 +1382,17 @@ END_OF_LUA
             . "\n";
     } ## end elsif ( $problem_pos < $length_of_string )
     else {
-        $read_string_error =
-              "Error in SLIF parse: $desc\n"
-            . "* Error was at end of input\n"
-            . '* String before error: '
-            . Marpa::R3::escape_string( ${$p_string}, -50 ) . "\n";
+        my ($read_string_error) =
+          $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+            <<'END_OF_LUA', '' );
+          local slr = ...
+          local block_ix = slr.current_block.index
+          return "Error in SLIF parse: $desc\n\z
+              * Error was at end of input\n\z
+              * String before error: "
+              ..  slr:input_escape(block_x, 0, 50) .. "\n"
+END_OF_LUA
+
     } ## end else [ if ($g1_status) ]
 
     Marpa::R3::exception($read_string_error);
