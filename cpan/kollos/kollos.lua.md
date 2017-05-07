@@ -3672,6 +3672,14 @@ Caller must ensure `block` and `pos` are valid.
 
 ```
     -- miranda: section+ diagnostics
+    function _M.class_slr.character_describe(slr, codepoint)
+        return string.format('U+%04x %q',
+           codepoint, utf8.char(codepoint))
+    end
+```
+
+```
+    -- miranda: section+ diagnostics
     function _M.class_slr.input_escape(slr, block, start, max_length)
         local pos = start
         local length_so_far = 0

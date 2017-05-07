@@ -1380,6 +1380,14 @@ END_OF_LUA
             . Marpa::R3::escape_string( ( substr ${$p_string}, $problem_pos, 50 ),
             50 )
             . "\n";
+
+          $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+            <<'END_OF_LUA', 's', $desc );
+          local slr, desc = ...
+          local block = slr.current_block
+          local block_ix = block.index
+END_OF_LUA
+
     } ## end elsif ( $problem_pos < $length_of_string )
     else {
         my ($read_string_error) =
@@ -1410,8 +1418,7 @@ sub Marpa::R3::Scanless::R::character_describe {
     ('@' . __FILE__ . ':' . __LINE__),
     <<'END__OF_LUA', 'i', $codepoint );
     local slr, codepoint = ...
-    return string.format('U+%04x %q',
-           codepoint, utf8.char(codepoint))
+    return slr:character_describe(codepoint)
 END__OF_LUA
 
     return $desc;
