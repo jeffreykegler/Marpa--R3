@@ -41,6 +41,11 @@ Expression ::=
     | Expression (<op divide>) Expression bless => divide
    || Expression (<op add>) Expression bless => add
     | Expression (<op subtract>) Expression bless => subtract
+
+# we don't actually use the SLIF lexer
+# This is a placebo lexer that recognizes nothing,
+# and discards everything
+:discard ~ [\s\S]
 Number ~ unicorn
 <op comma> ~ unicorn
 <op lparen> ~ unicorn

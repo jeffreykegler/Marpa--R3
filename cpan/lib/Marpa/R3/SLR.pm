@@ -662,6 +662,9 @@ END_OF_LUA
             for my $entry ( @{$character_class_table} ) {
 
                 my ( $symbol_id, $re ) = @{$entry};
+
+                # say STDERR "Codepoint %x vs $re\n";
+
                 if ( $character =~ $re ) {
 
                     if ( $trace_terminals >= 2 ) {
@@ -680,8 +683,14 @@ qq{Registering character $char_desc as symbol $symbol_id: },
                 } ## end if ( $character =~ $re )
             } ## end for my $entry ( @{$character_class_table} )
 
+            if (not scalar @symbols) {
+                my $char_desc = sprintf 'U+%04x', $codepoint;
+                $char_desc .= qq{ '$character'} if $is_graphic;
+                Marpa::R3::exception("Character in input is not in alphabet of grammar: $char_desc\n");
+            }
             push @codepoint_cmds, [ 'symbols', $codepoint, \@symbols ];
-            push @codepoint_cmds, [ 'is_graphic', $codepoint, $is_graphic ];
+            push @codepoint_cmds, [ 'is_graphic', $codepoint, $is_graphic ]
+               if $is_graphic;
 
         }
 

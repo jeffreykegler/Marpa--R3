@@ -168,12 +168,22 @@ Setting trace_terminals option
 Expecting "Number" at earleme 0
 Expecting "[Lex-0]" at earleme 0
 Expecting "[Lex-1]" at earleme 0
+Registering character U+0020 as symbol 7: [\s]
+Registering character U+0020 as symbol 9: [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
+Registering character U+0031 '1' as symbol 6: [\d]
+Registering character U+0031 '1' as symbol 9: [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
+Registering character U+0032 '2' as symbol 6: [\d]
+Registering character U+0032 '2' as symbol 9: [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
+Registering character U+002b '+' as symbol 5: [\+]
+Registering character U+002b '+' as symbol 9: [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
+Registering character U+0034 '4' as symbol 6: [\d]
+Registering character U+0034 '4' as symbol 9: [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
+Registering character U+0033 '3' as symbol 6: [\d]
+Registering character U+0033 '3' as symbol 9: [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
 Restarted recognizer at line 1, column 1
 Expected lexeme Number at line 1, column 1; assertion ID = 0
 Expected lexeme 'say' at line 1, column 1; assertion ID = 1
 Expected lexeme '+' at line 1, column 1; assertion ID = 2
-Registering character U+002b '+' as symbol 5: [\+]
-Registering character U+002b '+' as symbol 9: [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
 Reading codepoint "+" 0x002b at line 1, column 1
 Codepoint "+" 0x002b accepted as [\+] at line 1, column 1
 Codepoint "+" 0x002b rejected as [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}] at line 1, column 1
@@ -198,13 +208,9 @@ Accepted lexeme B1L1c3 e3: '+'; value="+"
 Restarted recognizer at line 1, column 4
 Expected lexeme Number at line 1, column 4; assertion ID = 0
 Expected lexeme '+' at line 1, column 4; assertion ID = 2
-Registering character U+0020 as symbol 7: [\s]
-Registering character U+0020 as symbol 9: [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
 Reading codepoint 0x0020 at line 1, column 4
 Codepoint 0x0020 accepted as [\s] at line 1, column 4
 Codepoint 0x0020 rejected as [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}] at line 1, column 4
-Registering character U+0031 '1' as symbol 6: [\d]
-Registering character U+0031 '1' as symbol 9: [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
 Reading codepoint "1" 0x0031 at line 1, column 5
 Codepoint "1" 0x0031 rejected as [\d] at line 1, column 5
 Codepoint "1" 0x0031 rejected as [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}] at line 1, column 5
@@ -226,8 +232,6 @@ Expected lexeme '+' at line 1, column 6; assertion ID = 2
 Reading codepoint 0x0020 at line 1, column 6
 Codepoint 0x0020 accepted as [\s] at line 1, column 6
 Codepoint 0x0020 rejected as [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}] at line 1, column 6
-Registering character U+0032 '2' as symbol 6: [\d]
-Registering character U+0032 '2' as symbol 9: [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
 Reading codepoint "2" 0x0032 at line 1, column 7
 Codepoint "2" 0x0032 rejected as [\d] at line 1, column 7
 Codepoint "2" 0x0032 rejected as [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}] at line 1, column 7
@@ -249,8 +253,6 @@ Expected lexeme '+' at line 1, column 8; assertion ID = 2
 Reading codepoint 0x0020 at line 1, column 8
 Codepoint 0x0020 accepted as [\s] at line 1, column 8
 Codepoint 0x0020 rejected as [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}] at line 1, column 8
-Registering character U+0033 '3' as symbol 6: [\d]
-Registering character U+0033 '3' as symbol 9: [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
 Reading codepoint "3" 0x0033 at line 1, column 9
 Codepoint "3" 0x0033 rejected as [\d] at line 1, column 9
 Codepoint "3" 0x0033 rejected as [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}] at line 1, column 9
@@ -350,8 +352,6 @@ Expected lexeme '+' at line 1, column 18; assertion ID = 2
 Reading codepoint 0x0020 at line 1, column 18
 Codepoint 0x0020 accepted as [\s] at line 1, column 18
 Codepoint 0x0020 rejected as [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}] at line 1, column 18
-Registering character U+0034 '4' as symbol 6: [\d]
-Registering character U+0034 '4' as symbol 9: [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
 Reading codepoint "4" 0x0034 at line 1, column 19
 Codepoint "4" 0x0034 rejected as [\d] at line 1, column 19
 Codepoint "4" 0x0034 rejected as [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}] at line 1, column 19

@@ -37,6 +37,7 @@ my $g = Marpa::R3::Scanless::G->new({
         OTHER_TOKEN ~ [^\s\S]
         event ev_token          = predicted TOKEN
         event ev_other_token    = predicted OTHER_TOKEN
+        :discard ~ [_]
     },
 });
 my $r = Marpa::R3::Scanless::R->new({ grammar => $g });

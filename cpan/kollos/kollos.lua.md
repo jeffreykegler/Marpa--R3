@@ -872,20 +872,35 @@ otherwise an error code string.
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.l0_read_codepoint(slr)
         local codepoint = slr.codepoint
-        local ops = slr.per_codepoint[codepoint]
+
+        -- io.stderr:write(inspect(slr.slg.per_codepoint))
+
+        local ops = slr.slg.per_codepoint[codepoint]
+
+        -- io.stderr:write('slg per_codepoint: ', inspect(slr.slg.per_codepoint), '\n')
+        -- io.stderr:write('slr per_codepoint: ', inspect(slr.per_codepoint), '\n')
+
+        -- io.stderr:write('hi 2\n')
         if ops == nil then
-            -- print( '1 unregistered char', codepoint, -1)
+            print( '1 unregistered char', codepoint, -1)
             return 'unregistered char'
         end
+        -- io.stderr:write('hi 3\n')
         if ops == false then
             -- print( 'invalid char', codepoint, -1)
             return 'invalid char'
         end
+        -- io.stderr:write('hi 4\n')
         local op_count = #ops
         if op_count <= 0 then
-            -- print( '2 unregistered char', codepoint, op_count)
-            return 'unregistered char'
+            error( string.format("Registered dodepoint %d, but no no ops\n", codepoint))
         end
+
+        -- print( 'SLG registered char', codepoint, inspect(slr.slg.per_codepoint[codepoint]))
+        -- print( 'SLR registered char', codepoint, inspect(slr.per_codepoint[codepoint]))
+
+        -- io.stderr:write('hi 6')
+
         if slr.trace_terminals >= 1 then
            local q = slr.event_queue
            q[#q+1] = { '!trace', 'lexer reading codepoint', codepoint, slr.perl_pos}
@@ -896,6 +911,9 @@ otherwise an error code string.
             tokens_accepted = tokens_accepted +
                  slr:l0_alternative(symbol_id)
         end
+
+        -- io.stderr:write('hi 10')
+
         if tokens_accepted < 1 then return 'rejected char' end
         local complete_result = slr:l0_earleme_complete()
         if complete_result then return complete_result end

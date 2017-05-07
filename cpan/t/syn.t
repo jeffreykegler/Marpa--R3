@@ -91,8 +91,7 @@ my @tests_data = (
     [ ' 8 6 7 5 3 1 1', 31,      qr/\AParse \s+ OK\z/xms ],
     [ '1234',           1234,    qr/\AParse \s+ OK\z/xms ],
     [   '2 x 1234', 'No parse',
-        qr/ No \s+ lexeme \s+ found \s+ at \s /xms,
-        2
+        qr/ Character \s+ in \s+ input \s+ is \s+ not \s+ in \s+ alphabet \s+ of \s+ grammar: \s+ U [+] 0078 \s* 'x' /xms
     ],
     [   '', 'No parse',
         qr/\A Input \s+ read \s+ to \s+ end \s+ but \s+ no \s+ parse \z/xms,
