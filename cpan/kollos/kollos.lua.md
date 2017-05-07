@@ -3629,6 +3629,8 @@ It should free all memory associated with the valuation.
 
 ### Input
 
+Returns byte position, line and column of `pos`
+in block with index `block_ix`.
 Caller must ensure `block` and `pos` are valid.
 
 ```

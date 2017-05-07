@@ -669,7 +669,7 @@ END_OF_LUA
                     if ( $trace_terminals >= 2 ) {
                         my $trace_file_handle = $slr->[
                           Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
-                        my $char_desc = $slr->character_describe($codepoint);
+                        my $char_desc = character_describe($slr, $codepoint);
                         say {$trace_file_handle}
 qq{Registering character $char_desc as symbol $symbol_id: },
                           $slg->l0_symbol_display_form($symbol_id)
@@ -682,7 +682,7 @@ qq{Registering character $char_desc as symbol $symbol_id: },
             } ## end for my $entry ( @{$character_class_table} )
 
             if (not scalar @symbols) {
-                my $char_desc = $slr->character_describe($codepoint);
+                my $char_desc = character_describe($slr, $codepoint);
                 Marpa::R3::exception("Character in input is not in alphabet of grammar: $char_desc\n");
             }
             push @codepoint_cmds, [ 'symbols', $codepoint, \@symbols ];
@@ -1150,7 +1150,7 @@ END_OF_LUA
                 'recce = ...; return recce.codepoint', '');
             Marpa::R3::exception(
                 qq{Failed at unacceptable character },
-                $slr->character_describe( $codepoint )
+                character_describe( $slr, $codepoint )
             );
         } ## end if ( $problem_code eq 'invalid char' )
 
@@ -1363,29 +1363,34 @@ END_OF_LUA
 
     my $read_string_error;
     if ( $problem_pos < $length_of_string) {
-        my $char = substr ${$p_string}, $problem_pos, 1;
-        my $char_desc = $slr->character_describe(ord($char));
-        my ( $line, $column ) = $slr->line_column($problem_pos);
-        my $prefix =
-            $problem_pos >= 50
-            ? ( substr ${$p_string}, $problem_pos - 50, 50 )
-            : ( substr ${$p_string}, 0, $problem_pos );
 
-        $read_string_error =
-              "Error in SLIF parse: $desc\n"
-            . '* String before error: '
-            . Marpa::R3::escape_string( $prefix, -50 ) . "\n"
-            . "* The error was at line $line, column $column, and at character $char_desc, ...\n"
-            . '* here: '
-            . Marpa::R3::escape_string( ( substr ${$p_string}, $problem_pos, 50 ),
-            50 )
-            . "\n";
-
+        my ($read_string_error) =
           $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
             <<'END_OF_LUA', 's', $desc );
-          local slr, desc = ...
+          local slr, error_desc = ...
           local block = slr.current_block
           local block_ix = block.index
+          local pos = slr.perl_pos
+          local codepoint = slr:codepoint_from_pos(block_ix, pos)
+          local _, line, column = slr:codepoint_from_pos(block_ix, pos)
+          if pos >= 50 then
+              display_start = pos - 50
+              display_length = 50
+          else 
+              display_start = 0
+              display_length = pos
+          end
+          return string.format(
+              "Error in SLIF parse: %s\n\z
+               * String before error: %s\n\z
+               * The error was at line %d, column %d, and at character %s, ...\n\z
+               * here: %s\n",
+               error_desc,
+               slr:reversed_input_escape(block_ix, display_start, display_length),
+               line, column,
+               slr:character_describe(codepoint),
+               slr:input_escape(block_ix, pos, 50)
+          )
 END_OF_LUA
 
     } ## end elsif ( $problem_pos < $length_of_string )
@@ -1398,7 +1403,7 @@ END_OF_LUA
           return "Error in SLIF parse: $desc\n\z
               * Error was at end of input\n\z
               * String before error: "
-              ..  slr:input_escape(block_x, 0, 50) .. "\n"
+              ..  slr:input_escape(block_ix, 0, 50) .. "\n"
 END_OF_LUA
 
     } ## end else [ if ($g1_status) ]
@@ -1411,7 +1416,7 @@ END_OF_LUA
 
 } ## end sub Marpa::R3::Scanless::R::read_problem
 
-sub Marpa::R3::Scanless::R::character_describe {
+sub character_describe {
     my ($slr, $codepoint) = @_;
 
     my ($desc) = $slr->call_by_tag(
