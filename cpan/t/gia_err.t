@@ -129,7 +129,7 @@ END_OF_SOURCE
 Parse of BNF/Scanless source failed
 Error in SLIF parse: No lexeme found at line 1, column 12
 * String before error:     quartet
-* The error was at line 1, column 12, and at character 0x0024 '$', ...
+* The error was at line 1, column 12, and at character U+0024 "$", ...
 * here: $ ::= a b c d e f\n
 END_OF_MESSAGE
         'Grammar with syntax error'

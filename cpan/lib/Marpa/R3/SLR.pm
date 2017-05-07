@@ -669,8 +669,7 @@ END_OF_LUA
                     if ( $trace_terminals >= 2 ) {
                         my $trace_file_handle = $slr->[
                           Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
-                        my $char_desc = sprintf 'U+%04x', $codepoint;
-                        $char_desc .= qq{ '$character'} if $is_graphic;
+                        my $char_desc = $slr->character_describe($codepoint);
                         say {$trace_file_handle}
 qq{Registering character $char_desc as symbol $symbol_id: },
                           $slg->l0_symbol_display_form($symbol_id)
@@ -683,8 +682,7 @@ qq{Registering character $char_desc as symbol $symbol_id: },
             } ## end for my $entry ( @{$character_class_table} )
 
             if (not scalar @symbols) {
-                my $char_desc = sprintf 'U+%04x', $codepoint;
-                $char_desc .= qq{ '$character'} if $is_graphic;
+                my $char_desc = $slr->character_describe($codepoint);
                 Marpa::R3::exception("Character in input is not in alphabet of grammar: $char_desc\n");
             }
             push @codepoint_cmds, [ 'symbols', $codepoint, \@symbols ];
@@ -1152,7 +1150,7 @@ END_OF_LUA
                 'recce = ...; return recce.codepoint', '');
             Marpa::R3::exception(
                 qq{Failed at unacceptable character },
-                character_describe( chr $codepoint )
+                $slr->character_describe( $codepoint )
             );
         } ## end if ( $problem_code eq 'invalid char' )
 
@@ -1366,7 +1364,7 @@ END_OF_LUA
     my $read_string_error;
     if ( $problem_pos < $length_of_string) {
         my $char = substr ${$p_string}, $problem_pos, 1;
-        my $char_desc = character_describe($char);
+        my $char_desc = $slr->character_describe(ord($char));
         my ( $line, $column ) = $slr->line_column($problem_pos);
         my $prefix =
             $problem_pos >= 50
@@ -1399,16 +1397,18 @@ END_OF_LUA
 
 } ## end sub Marpa::R3::Scanless::R::read_problem
 
-sub character_describe {
-    my ($char) = @_;
-    my $text = sprintf '0x%04x', ord $char;
-    $text .= q{ }
-        . (
-        $char =~ m/[[:graph:]]/xms
-        ? qq{'$char'}
-        : '(non-graphic character)'
-        );
-    return $text;
+sub Marpa::R3::Scanless::R::character_describe {
+    my ($slr, $codepoint) = @_;
+
+    my ($desc) = $slr->call_by_tag(
+    ('@' . __FILE__ . ':' . __LINE__),
+    <<'END__OF_LUA', 'i', $codepoint );
+    local slr, codepoint = ...
+    return string.format('U+%04x %q',
+           codepoint, utf8.char(codepoint))
+END__OF_LUA
+
+    return $desc;
 } ## end sub character_describe
 
 sub Marpa::R3::Scanless::R::ambiguity_metric {
@@ -1913,7 +1913,7 @@ END_OF_LUA
 sub Marpa::R3::Scanless::R::pos {
     my ($slr) = @_;
     my ($perl_pos) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        'recce = ...; return recce.perl_pos', '' );
+        'slr = ...; return slr.perl_pos', '' );
     return $perl_pos;
 }
 
