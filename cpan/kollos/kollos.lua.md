@@ -1497,8 +1497,20 @@ for each trio to the end of `table`, which must be a
             local start_byte_p = slr:per_pos(block_ix, start)
             local end_byte_p = slr:per_pos(block_ix, start + len)
             local text = block.text
+
+            -- TODO Delete after development
+            -- io.stderr:write(string.format("#block.text,start_p,end_p = %d,%d,%d\n",
+                -- #block.text,
+                -- start_byte_p,
+                -- end_byte_p
+            -- ))
+
             local piece = text:sub(start_byte_p, end_byte_p - 1)
-            -- io.stderr:write("Piece: ", piece, "\n")
+            -- local ok, fail_byte = utf8.len(piece)
+            -- if not ok then
+                -- error(string.format("Piece %s\nFailed at byte %d",
+                    -- piece, fail_byte))
+            -- end
             pieces[#pieces+1] = piece
             ix = ix + 3
         end
@@ -3649,7 +3661,7 @@ Caller must ensure `block` and `pos` are valid.
                 local vlq = block[#block]
                 local last_byte_p, last_line_no, last_column_no
                     = table.unpack(_M.from_vlq(vlq))
-                return last_byte_p+1, last_line_no, last_column_no+1
+                return #text+1, last_line_no, last_column_no+1
             end
             error(string.format(
                 "Internal error: invalid block,pos: %d, %d\n\z
