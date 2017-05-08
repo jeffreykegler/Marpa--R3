@@ -85,12 +85,17 @@ END_OF_LUA
 # Given a scanless recognizer and
 # and two earley sets, return the input string
 sub Marpa::R3::Scanless::R::g1_literal {
-    my ( $slr, $start_earley_set, $length_in_parse_locations ) = @_;
-    my $p_input = $slr->[Marpa::R3::Internal::Scanless::R::P_INPUT_STRING];
-    my ($l0_start, $l0_length) = $slr->g1_input_span($start_earley_set, $length_in_parse_locations);
-    die "Error in $slr->g1_literal($start_earley_set, $length_in_parse_locations)\n"
-       if not defined $l0_start;
-    return substr ${$p_input}, $l0_start, $l0_length;
+    my ( $slr, $g1_start, $g1_count ) = @_;
+
+    my ($literal) = $slr->call_by_tag(
+    ('@' . __FILE__ . ':' . __LINE__),
+    <<'END_OF_LUA', 'ii', $g1_start, $g1_count);
+    local slr, g1_start, g1_count = ...
+    return slr:g1_span_to_literal(g1_start, g1_count)
+END_OF_LUA
+
+   return $literal;
+
 } ## end sub Marpa::R3::Scanless::R::g1_literal
 
 sub Marpa::R3::Scanless::R::g1_location_to_span {
