@@ -27,6 +27,17 @@ and tools to Marpa::R3.
 
 =head1 Changes
 
+=head2 Multiple C<< slr->read() >> calls allowed
+
+Marpa::R3, in the future, will allow the 
+C<< slr->read() >> method to be called multiple
+times, each time with a new string.
+These strings will be called "blocks".
+
+In preparation for this, the
+C< $slr->input_length() >> call allows a new,
+optional parameter: the block index.
+
 =head2 Marpa strings must be UTF-8
 
 Marpa expects all strings passed to it to be valid UTF-8.

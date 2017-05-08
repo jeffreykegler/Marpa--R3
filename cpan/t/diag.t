@@ -16,7 +16,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-use Test::More tests => 9;
+use Test::More tests => 10;
 use English qw( -no_match_vars );
 use POSIX qw(setlocale LC_ALL);
 
@@ -418,6 +418,15 @@ END_OF_OUTPUT
 # Marpa::R3::Display::End
 
     Test::More::is( $input_length, 19, qq{Scanless input_length()} );
+
+# Marpa::R3::Display
+# name: SLIF input_length() 1-arg example
+
+    $input_length = $recce->input_length(1);
+
+# Marpa::R3::Display::End
+
+    Test::More::is( $input_length, 19, qq{Scanless 1-arg input_length()} );
 
     # Test translation from G1 location to input stream spans
     my %location_seen = ();

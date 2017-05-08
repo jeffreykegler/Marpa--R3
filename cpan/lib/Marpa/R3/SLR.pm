@@ -1915,8 +1915,16 @@ sub Marpa::R3::Scanless::R::pos {
 }
 
 sub Marpa::R3::Scanless::R::input_length {
-    my ( $slr ) = @_;
-    return length ${$slr->[Marpa::R3::Internal::Scanless::R::P_INPUT_STRING]};
+    my ( $slr, $block_ix ) = @_;
+    my ($length) = $slr->call_by_tag(
+        ('@' . __FILE__ . ':' . __LINE__),
+    <<'END_OF_LUA', 'i', ($block_ix // -1));
+        local slr, block_ix  = ...
+        local block = block_ix > 0 and slr.inputs[block_ix] or slr.current_block
+        return #block
+END_OF_LUA
+
+    return $length;
 }
 
 # no return value documented

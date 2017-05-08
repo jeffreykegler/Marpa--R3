@@ -1470,15 +1470,25 @@ the input stream span for G1 location 0 is returned as (0,0).
 
 =for Marpa::R3::Display
 name: SLIF input_length() example
-partial: 1
 normalize-whitespace: 1
 
     my $input_length = $recce->input_length();
 
 =for Marpa::R3::Display::End
 
-The C<input_length()> method accepts no arguments,
-and returns the length of the physical input stream.
+=for Marpa::R3::Display
+name: SLIF input_length() 1-arg example
+normalize-whitespace: 1
+
+    $input_length = $recce->input_length(1);
+
+=for Marpa::R3::Display::End
+
+The C<input_length()> method accepts one, optional argument.
+Its argument is the index of an input block, call it C<block_ix>.
+C<input_length()> returns the length of that input block.
+If C<block_ix> is omitted, the input block defaults to the
+current input block.
 
 =head2 last_completed()
 
