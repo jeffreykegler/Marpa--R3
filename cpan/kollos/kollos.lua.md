@@ -3700,8 +3700,11 @@ Caller must ensure `block` and `pos` are valid.
         local escapes = {}
         local block = slr.inputs[block_ix]
         local start_byte_p = slr:per_pos(block_ix, pos)
-        local subtext = block.text:sub(start_byte_p)
-        for byte_p, codepoint in utf8.codes(subtext) do
+        -- local subtext = block.text:sub(start_byte_p)
+        local text = block.text
+        local byte_p = start_byte_p
+        while byte_p <= #text do
+             local codepoint = utf8.codepoint(text, byte_p)
              local escape = _M.escape_codepoint(codepoint)
              length_so_far = length_so_far + #escape
              if length_so_far > max_length then
@@ -3709,6 +3712,7 @@ Caller must ensure `block` and `pos` are valid.
                  break
              end
              escapes[#escapes+1] = escape
+             byte_p = utf8.offset(text, 2, byte_p)
         end
 
              -- print(inspect(escapes))
