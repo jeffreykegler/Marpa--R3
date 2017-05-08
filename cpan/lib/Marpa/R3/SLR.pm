@@ -1054,34 +1054,36 @@ sub Marpa::R3::Internal::Scanless::convert_libmarpa_events {
 sub Marpa::R3::Scanless::R::resume {
     my ( $slr, $start_pos, $length ) = @_;
 
-    Marpa::R3::exception(
-        "Attempt to resume an SLIF recce which has no string set\n",
-        '  The string should be set first using read()'
-    ) if not defined $slr->[Marpa::R3::Internal::Scanless::R::P_INPUT_STRING];
-
     {
        my $length_arg = $length // -1;
        my $start_pos_arg = $start_pos // 'undef';
        $slr->call_by_tag(( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'si', $start_pos_arg, $length_arg);
-            local recce, start_pos_arg, length_arg = ...
+            local slr, start_pos_arg, length_arg = ...
 
-            if recce.phase ~= 'read' then
-                if recce.phase == 'value' then
+            if #slr.inputs <= 0 then
+                error(
+                    "Attempt to resume an SLIF recce which has no string set\n"
+                    .. '  The string should be set first using read()'
+                )
+            end
+
+            if slr.phase ~= 'read' then
+                if slr.phase == 'value' then
                     error(
-                        "Attempt to resume an SLIF recce while the parse is being evaluated\n"
+                        "Attempt to resume an SLIF slr while the parse is being evaluated\n"
                         .. '   The resume() method is not allowed once value() is called'
                     )
                 end
                 error(
-                    "Attempt to resume an SLIF recce which is not in the Read Phase\n"
+                    "Attempt to resume an SLIF slr which is not in the Read Phase\n"
                     .. '   The resume() method is only allowed in the Read Phase'
                 )
             end
 
             local start_pos
             if start_pos_arg == 'undef' then
-                start_pos = recce.perl_pos
+                start_pos = slr.perl_pos
             else
                 start_pos = math.tointeger(start_pos_arg)
                 if not start_pos then
@@ -1089,7 +1091,7 @@ sub Marpa::R3::Scanless::R::resume {
                         start_pos_arg))
                 end
             end
-            return recce:pos_set(start_pos, length_arg)
+            return slr:pos_set(start_pos, length_arg)
 END_OF_LUA
     }
 
