@@ -106,9 +106,17 @@ sub Marpa::R3::Scanless::R::g1_location_to_span {
 # Substring in terms of locations in the input stream
 # This is the one users will be most interested in.
 sub Marpa::R3::Scanless::R::literal {
-    my ( $slr, $start_pos, $length ) = @_;
-    my $p_input = $slr->[Marpa::R3::Internal::Scanless::R::P_INPUT_STRING];
-    return substr ${$p_input}, $start_pos, $length;
+    my ( $slr, $l0_start, $l0_count, $block_ix ) = @_;
+
+    my ($literal) = $slr->call_by_tag(
+    ('@' . __FILE__ . ':' . __LINE__),
+    <<'END_OF_LUA', 'iii', $l0_start, $l0_count, ($block_ix // -1));
+    local slr, l0_start, l0_count, block_ix = ...
+    if block_ix <= 0 then block_ix = nil end
+    return slr:l0_span_to_literal(l0_start, l0_count, block_ix)
+END_OF_LUA
+
+    return $literal;
 } ## end sub Marpa::R3::Scanless::R::literal
 
 sub Marpa::R3::Internal::Scanless::meta_recce {

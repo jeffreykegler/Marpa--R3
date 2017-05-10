@@ -88,6 +88,7 @@ cd kollos && ../lua/lua toc.lua < kollos.lua.md
 * [External, inner and internal](#external-inner-and-internal)
 * [Layers and wrappers](#layers-and-wrappers)
 * [The layer grammar](#the-layer-grammar)
+  * [Constructor](#constructor)
   * [Layer grammar accessors](#layer-grammar-accessors)
 * [The grammar Libmarpa wrapper](#the-grammar-libmarpa-wrapper)
 * [The recognizer Libmarpa wrapper](#the-recognizer-libmarpa-wrapper)
@@ -95,6 +96,7 @@ cd kollos && ../lua/lua toc.lua < kollos.lua.md
   * [Initialize a valuator](#initialize-a-valuator)
   * [Reset a valuator](#reset-a-valuator)
 * [Diagnostics](#diagnostics)
+  * [Input](#input)
 * [Libmarpa interface](#libmarpa-interface)
   * [Standard template methods](#standard-template-methods)
   * [Constructors](#constructors)
@@ -113,6 +115,7 @@ cd kollos && ../lua/lua toc.lua < kollos.lua.md
   * [`c_safe_string` method](#c-safe-string-method)
   * [Meta code argument processing](#meta-code-argument-processing)
 * [Kollos utilities](#kollos-utilities)
+  * [VLQ (Variable-Length Quantity)](#vlq-variable-length-quantity)
 
 ## About Kollos
 
@@ -1515,6 +1518,18 @@ for each trio to the end of `table`, which must be a
             ix = ix + 3
         end
         return
+    end
+```
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slr.l0_span_to_literal(slr, l0_start, l0_length, block_ix)
+        if not block_ix then block_ix = slr.current_block.index end
+        local block = slr.inputs[block_ix]
+        local start_byte_p = slr:per_pos(block_ix, l0_start)
+        local end_byte_p = slr:per_pos(block_ix, l0_start + l0_length)
+        local text = block.text
+        return text:sub(start_byte_p, end_byte_p - 1)
     end
 ```
 
