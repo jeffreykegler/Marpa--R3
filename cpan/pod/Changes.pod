@@ -29,12 +29,13 @@ and tools to Marpa::R3.
 
 =head2 Multiple C<< slr->read() >> calls allowed
 
-Marpa::R3, in the future, will allow the 
-C<< slr->read() >> method to be called multiple
-times, each time with a new string.
-These strings will be called "blocks".
-
-In preparation for this, the
+The C<< slr->read() >> method may now called multiple
+times during a parse. each time with a new string.
+These strings will be called B<input blocks>.
+The <input block> read by the I<n>'th 
+call of the C<< slr->read() >> method during a parse
+has block index I<n>.
+The
 C< $slr->input_length() >> and
 C< $slr->literal() >>
 calls allow a new,
