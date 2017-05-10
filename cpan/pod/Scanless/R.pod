@@ -889,9 +889,8 @@ optionally,
 a L<span|/"Spans">
 within it,
 C<read()> parses the input string according to the grammar.
-
 More formally,
-The C<read()> takes three arguments, the last
+the C<read()> takes three arguments, the last
 two of which are optional.
 The first, required, argument must be a pointer
 to a string.
@@ -901,21 +900,22 @@ the B<reading span> -- the span
 within the input text block that will be read.
 
 By default, the reading span is the input text block.
-Negative locations and lengths are
-interpreted as L<described above|/"Spans">.
 More formally,
 the default start location is zero and
 the default length is -1.
+Negative locations and lengths are
+interpreted as L<described above|/"Spans">.
 
 C<read()> may be called multiple times during a parse.
 Each C<read()> creates a new
 B<input text block>,
 and that new input text block
 becomes the current text block.
-Every input text blocks has a B<block index>.
+Every input text block has a B<block index>.
 The input text block read by the first
 C<read()> call is block 1.
-The input block read by the I<n>, C<read()> call
+The input block read
+by the I<n>'th C<read()> call
 of a parse is block I<n>.
 
 C<read()> returns success if it parses to the end
@@ -926,9 +926,9 @@ the current location is set to the trigger location.
 SLIF parse events are described in detail in
 L<a separate document|Marpa::R3::Event>.
 If no SLIF parse event triggers,
-and the parse reaches the end of the input string without a
+and the parse reaches the end of the reading span without a
 failure,
-the current location is set to the end of the input string.
+the current location is set to the end of the reading span.
 
 On success, C<read()> returns the current
 physical input stream location.

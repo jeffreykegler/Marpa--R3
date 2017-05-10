@@ -68,7 +68,7 @@ do_test(
 );
 
 do_test(
-    'Calculator 1', $calculator_grammar,
+    'Calculator 2', $calculator_grammar,
     [' ', '42', '*(2', ' ', '+', '7)/3', ' '],
     qr/\A 126 \z/xms
 );
