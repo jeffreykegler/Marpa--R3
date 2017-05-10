@@ -236,6 +236,7 @@ t/asf.t
 t/asf_syn.t
 t/ast.t
 t/astsyn.t
+t/block.t
 t/bracket.t
 t/calc.t
 t/catalan.t

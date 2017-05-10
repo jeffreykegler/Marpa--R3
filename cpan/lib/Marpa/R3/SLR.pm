@@ -601,13 +601,6 @@ sub Marpa::R3::Scanless::R::read {
         <<'END_OF_LUA', 's', ${$p_string});
             local slr, input_string = ...
             local inputs = slr.inputs
-            -- Currently only one physical input string is allowed
-            if #inputs > 0 then
-                error(
-                "Multiple read()'s tried on a scannerless recognizer\n"
-                .. '  Currently the string cannot be changed once set'
-                )
-            end
             local this_input = {}
             inputs[#inputs + 1] = this_input
             slr.current_block = this_input
