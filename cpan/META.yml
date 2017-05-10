@@ -47,7 +47,7 @@ configure_requires:
   Time::Piece: '1.12'
   XSLoader: '0.08'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -100,5 +100,5 @@ requires:
   perl: '5.010001'
 resources:
   repository: git://github.com/jeffreykegler/Marpa--R3.git
-version: 4.001_044
+version: 4.001_045
 x_serialization_backend: 'CPAN::Meta::YAML version 0.011'

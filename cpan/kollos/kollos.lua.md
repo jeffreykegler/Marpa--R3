@@ -6460,7 +6460,6 @@ This is an implementation of
                 p_buf++;
             }
             while (p_buf > buf) {
-      if (0) printf("%s %s %d p_buf byte = %lu\n", __PRETTY_FUNCTION__, __FILE__, __LINE__, (unsigned long)(*p_buf));
                unsigned char this_byte = *p_buf;
                p_buf--;
                *p_out++ = this_byte | 0x80;
@@ -6528,7 +6527,6 @@ into integer sequences.
       marpa_lua_newtable(L);
       if (0) printf("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
       for (i = 1; (size_t)(p - vlq) < vlq_len; i++) {
-        if (0) printf("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
         lua_Unsigned x;
         p = uint_from_vlq(p, &x);
         marpa_lua_pushinteger(L, (lua_Integer)x);
