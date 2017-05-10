@@ -1644,10 +1644,15 @@ normalize-whitespace: 1
 
 =for Marpa::R3::Display::End
 
-The C<literal()> method accepts two arguments,
-the start location and length of a span in the
+The C<literal()> method accepts three arguments,
+the last of them optional.
+The first two arguments are the start location and length of a span in the
 physical input stream.
-It returns the substring of the input stream
+The last, optional, argument is the index of an input block.
+If omitted, the current input block is used.
+
+The C<literal()> method
+returns the substring of the input stream
 corresponding to that span.
 
 =head2 pause_span()

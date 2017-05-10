@@ -192,6 +192,11 @@ __DATA__
     REGIX { Registry index in Lua interpreter --
         a valid Lua index but not a pseudo-index. }
 
+    TRACE_FILE_HANDLE
+    CONSTANTS
+
+    { Convert fields after here to Lua? }
+
     CHARACTER_CLASS_TABLE
     DISCARD_EVENT_BY_LEXER_RULE
 
@@ -205,7 +210,6 @@ __DATA__
     IF_INACCESSIBLE { default for symbols }
 
     WARNINGS { print warnings about grammar? }
-    TRACE_FILE_HANDLE
 
     CHARACTER_CLASSES { an hash of
     character class regex by symbol name.
@@ -221,8 +225,6 @@ __DATA__
     CLOSURE_BY_SYMBOL_ID
     CLOSURE_BY_RULE_ID
 
-    CONSTANTS
-
     :package=Marpa::R3::Internal::Scanless::R
 
     SLG
@@ -231,9 +233,10 @@ __DATA__
     REGIX { Registry index in Lua interpreter --
         a valid Lua index but not a pseudo-index. }
 
-    P_INPUT_STRING
-
     TRACE_FILE_HANDLE
+
+    { Convert fields after here to Lua? }
+
     TRACE_VALUES
     EVENTS
 

@@ -596,8 +596,6 @@ sub Marpa::R3::Scanless::R::read {
             '  It should be a ref to a defined scalar' );
     } ## end if ( ( my $ref_type = ref $p_string ) ne 'SCALAR' )
 
-    $slr->[Marpa::R3::Internal::Scanless::R::P_INPUT_STRING] = $p_string;
-
     my ($new_codepoints, $trace_terminals) = $slr->call_by_tag(
     ('@' . __FILE__ . ':' . __LINE__),
         <<'END_OF_LUA', 's', ${$p_string});

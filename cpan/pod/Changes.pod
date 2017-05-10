@@ -35,7 +35,9 @@ times, each time with a new string.
 These strings will be called "blocks".
 
 In preparation for this, the
-C< $slr->input_length() >> call allows a new,
+C< $slr->input_length() >> and
+C< $slr->literal() >>
+calls allow a new,
 optional parameter: the block index.
 
 =head2 Marpa strings must be UTF-8
