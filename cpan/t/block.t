@@ -15,7 +15,7 @@
 use 5.010001;
 use strict;
 use warnings;
-use Test::More tests => 1;
+use Test::More tests => 2;
 use English qw( -no_match_vars );
 use Scalar::Util qw(blessed);
 use POSIX qw(setlocale LC_ALL);
@@ -65,6 +65,12 @@ do_test(
     'Calculator 1', $calculator_grammar,
     [split ' ', q<42*2+7/3 , 42*(2+7)/3, 2 ** 7 - 3, 2**(7-3)>],
     qr/\A 86[.]3\d+ \s+ 126 \s+ 125 \s+ 16\z/xms
+);
+
+do_test(
+    'Calculator 1', $calculator_grammar,
+    [' ', '42', '*(2', ' ', '+', '7)/3', ' '],
+    qr/\A 126 \z/xms
 );
 
 sub do_test {
