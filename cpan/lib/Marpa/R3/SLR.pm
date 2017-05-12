@@ -141,6 +141,7 @@ sub Marpa::R3::Scanless::R::new {
     bless $slr, $class;
 
     # Set recognizer args to default
+    # Lua equivalent is set below
     $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] = [];
 
     my ($flat_args, $error_message) = Marpa::R3::flatten_hash_args(\@args);
@@ -174,35 +175,35 @@ sub Marpa::R3::Scanless::R::new {
     ('@' . __FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', 'i', $slg_regix);
     local slg_lua_ref = ...
-    local recce = {}
-    recce.phase = 'initial'
+    local slr = {}
+    slr.phase = 'initial'
     local registry = debug.getregistry()
-    setmetatable(recce, _M.class_slr)
+    setmetatable(slr, _M.class_slr)
     local grammar = registry[slg_lua_ref]
-    recce.slg = grammar
-    local lua_ref = _M.register(registry, recce)
-    recce.ref_count = 1
+    slr.slg = grammar
+    local lua_ref = _M.register(registry, slr)
+    slr.ref_count = 1
 
     local l0g = grammar.l0.lmw_g
-    recce.l0 = {}
-    recce.l0.irls = {}
+    slr.l0 = {}
+    slr.l0.irls = {}
 
-    recce.g1 = {}
-    recce.g1.isys = {}
+    slr.g1 = {}
+    slr.g1.isys = {}
     local g1g = grammar.g1.lmw_g
-    recce.g1.lmw_r = _M.recce_new(g1g)
+    slr.g1.lmw_r = _M.recce_new(g1g)
 
-    recce.codepoint = nil
-    recce.inputs = {}
+    slr.codepoint = nil
+    slr.inputs = {}
 
-    recce.max_parses = nil
-    recce.per_es = {}
-    recce.current_block = nil
+    slr.max_parses = nil
+    slr.per_es = {}
+    slr.current_block = nil
 
     -- Trailing (that is, discarded) sweeps by
     -- G0 Earley set index.  Integer indices, but not
     -- necessarily a sequence.
-    recce.trailers = {}
+    slr.trailers = {}
 
     -- Events are higher priority, and are cleared
     --   at the beginning of many methods.
@@ -210,23 +211,27 @@ sub Marpa::R3::Scanless::R::new {
     --   only when returned to Perl.
     -- TODO but there are also traces in event queue
     --   What to do?
-    recce.event_queue = {}
-    recce.trace_queue = {}
+    -- TODO Do I need trace_queue
+    slr.event_queue = {}
+    slr.trace_queue = {}
 
-    recce.lexeme_queue = {}
-    recce.accept_queue = {}
+    slr.lexeme_queue = {}
+    slr.accept_queue = {}
 
-    recce.end_pos = 0
-    recce.perl_pos = 0
-    recce.too_many_earley_items = -1
-    recce.trace_terminals = 0
-    recce.start_of_lexeme = 0
-    recce.end_of_lexeme = 0
-    recce.start_of_pause_lexeme = -1
-    recce.end_of_pause_lexeme = -1
-    recce.lexer_start_pos = 0
-    recce.is_external_scanning = false
-    local r_l0_rules = recce.l0.irls
+    -- The external event queue
+    slr.events = {}
+
+    slr.end_pos = 0
+    slr.perl_pos = 0
+    slr.too_many_earley_items = -1
+    slr.trace_terminals = 0
+    slr.start_of_lexeme = 0
+    slr.end_of_lexeme = 0
+    slr.start_of_pause_lexeme = -1
+    slr.end_of_pause_lexeme = -1
+    slr.lexer_start_pos = 0
+    slr.is_external_scanning = false
+    local r_l0_rules = slr.l0.irls
     local g_l0_rules = grammar.l0.irls
     -- print('g_l0_rules: ', inspect(g_l0_rules))
     local max_l0_rule_id = l0g:highest_rule_id()
@@ -242,7 +247,7 @@ sub Marpa::R3::Scanless::R::new {
     end
     -- print('r_l0_rules: ', inspect(r_l0_rules))
     local g_g1_symbols = grammar.g1.isys
-    local r_g1_symbols = recce.g1.isys
+    local r_g1_symbols = slr.g1.isys
     local max_g1_symbol_id = g1g:highest_symbol_id()
     for symbol_id = 0, max_g1_symbol_id do
         r_g1_symbols[symbol_id] = {
@@ -716,7 +721,7 @@ qq{Registering character $char_desc as symbol $symbol_id: },
     # The other command is "is_graphic".  It set or unsets the
     # `is_graphic` boolean for the codepoint.  The per-codepoint
     # structure must already exist.
-    $slr->call_by_tag(
+    my ($event_count) = $slr->call_by_tag(
     ('@' . __FILE__ . ':' . __LINE__),
         <<'END_OF_LUA', 'i', \@codepoint_cmds);
         local slr, codepoint_cmds = ...
@@ -734,9 +739,13 @@ qq{Registering character $char_desc as symbol $symbol_id: },
              end
              ::NEXT_COMMAND::
         end
+        return #slr.events
 END_OF_LUA
 
-    return 0 if @{ $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] };
+    return 0 if
+        ($event_count +
+        @{ $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] })
+        > 0;
 
     return $slr->resume( $start_pos, $length );
 
@@ -1104,16 +1113,18 @@ END_OF_LUA
     }
 
     $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] = [];
-    my $slg      = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
 
     my ($trace_terminals) = $slr->call_by_tag(
         ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA',
-            local recce = ...
-            return recce.trace_terminals
+            local slr = ...
+            slr.events = {}
+            return slr.trace_terminals
 END_OF_LUA
         ''
     );
+
+    my $slg      = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
 
   OUTER_READ: while (1) {
 
@@ -1850,6 +1861,11 @@ sub Marpa::R3::Scanless::R::lexeme_complete {
     my $slg  = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
 
     $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] = [];
+    $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', '' );
+      local slr = ...
+      slr.events = {}
+END_OF_LUA
 
     my $start_defined = 1;
     if (defined $start) {
@@ -1867,6 +1883,7 @@ sub Marpa::R3::Scanless::R::lexeme_complete {
         $length = 0;
         $length_defined = 0;
     }
+
     my ($return_value) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'iiii', $start_defined, $start, $length_defined, $length );
       recce, start_pos_defined, start_pos, length_is_defined, length_arg = ...
