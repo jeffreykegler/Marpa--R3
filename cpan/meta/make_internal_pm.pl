@@ -237,7 +237,6 @@ __DATA__
 
     { Convert fields after here to Lua? }
 
-    TRACE_VALUES
     EVENTS
 
     { vim: set expandtab shiftwidth=4:

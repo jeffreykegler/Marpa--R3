@@ -520,8 +520,8 @@ sub common_set {
         $slr->call_by_tag(
     ('@' . __FILE__ . ':' . __LINE__),
         <<'END_OF_LUA',
-            local recce, trace_terminals = ...
-            recce.trace_terminals = trace_terminals
+            local slr, trace_terminals = ...
+            slr.trace_terminals = trace_terminals
 END_OF_LUA
             'i', $normalized_value);
     }
@@ -530,15 +530,13 @@ END_OF_LUA
         $slr->call_by_tag(
             ( __FILE__ . ':' . __LINE__ ),
             <<'END_OF_LUA', 'i', $value
-    local recce, value = ...
-    recce.max_parses = value
+    local slr, value = ...
+    slr.max_parses = value
 END_OF_LUA
         );
     }
 
     if ( defined( my $value = $flat_args->{'trace_values'} ) ) {
-        $slr->[Marpa::R3::Internal::Scanless::R::TRACE_VALUES] = $value;
-
         my $value = $flat_args->{'trace_values'};
         my $normalized_value =
           Scalar::Util::looks_like_number($value) ? $value : 0;
@@ -548,8 +546,8 @@ END_OF_LUA
         $slr->call_by_tag(
     ('@' . __FILE__ . ':' . __LINE__),
         <<'END_OF_LUA',
-            local recce, trace_values = ...
-            recce.trace_values = trace_values
+            local slr, trace_values = ...
+            slr.trace_values = trace_values
 END_OF_LUA
             'i', $normalized_value);
 
@@ -559,9 +557,9 @@ END_OF_LUA
         $slr->call_by_tag(
             ('@' . __FILE__ . ':' . __LINE__ ),
             <<'END_OF_LUA', 'i', $value
-    local recce, value = ...
-    recce.too_many_earley_items = value
-    recce.g1.lmw_r:earley_item_warning_threshold_set(value)
+    local slr, value = ...
+    slr.too_many_earley_items = value
+    slr.g1.lmw_r:earley_item_warning_threshold_set(value)
 END_OF_LUA
         );
     }
