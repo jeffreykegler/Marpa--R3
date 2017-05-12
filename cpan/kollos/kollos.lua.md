@@ -693,6 +693,61 @@ one for each subgrammar.
 
 This is a registry object.
 
+### Fields
+
+```
+    -- miranda: section+ class_slr field declarations
+    class_slr_fields['accept_queue'] = true
+    class_slr_fields['codepoint'] = true
+    class_slr_fields['current_block'] = true
+    class_slr_fields['end_of_lexeme'] = true
+    class_slr_fields['end_of_parse'] = true
+    class_slr_fields['end_of_pause_lexeme'] = true
+    class_slr_fields['end_pos'] = true
+    class_slr_fields['event_queue'] = true
+    class_slr_fields['events'] = true
+    class_slr_fields['g1'] = true
+    class_slr_fields['has_parse'] = true
+    class_slr_fields['inputs'] = true
+    class_slr_fields['is_external_scanning'] = true
+    class_slr_fields['l0'] = true
+    class_slr_fields['l0_candidate'] = true
+    class_slr_fields['irls'] = true
+    class_slr_fields['lexeme_queue'] = true
+    class_slr_fields['lexer_start_pos'] = true
+    class_slr_fields['lmw_b'] = true
+    class_slr_fields['lmw_o'] = true
+    class_slr_fields['lmw_t'] = true
+    class_slr_fields['lmw_v'] = true
+    class_slr_fields['max_parses'] = true
+    class_slr_fields['per_es'] = true
+    class_slr_fields['perl_pos'] = true
+    class_slr_fields['phase'] = true
+    class_slr_fields['ref_count'] = true
+    class_slr_fields['slg'] = true
+    class_slr_fields['start_of_lexeme'] = true
+    class_slr_fields['start_of_pause_lexeme'] = true
+    class_slr_fields['terminals_expected'] = true
+    class_slr_fields['this_step'] = true
+    class_slr_fields['too_many_earley_items'] = true
+    class_slr_fields['token_is_literal'] = true
+    class_slr_fields['token_is_undef'] = true
+    class_slr_fields['token_values'] = true
+    class_slr_fields['trace_queue'] = true
+    class_slr_fields['trace_terminals'] = true
+    class_slr_fields['trace_values'] = true
+    class_slr_fields['trace_values_queue'] = true
+    class_slr_fields['tree_mode'] = true
+    class_slr_fields['trailers'] = true
+```
+
+```
+    -- miranda: section+ populate metatables
+    local class_slr_fields = {}
+    -- miranda: insert class_slr field declarations
+    declarations(_M.class_slr, class_slr_fields)
+```
+
 ```
     -- miranda: section+ luaL_Reg definitions
     static const struct luaL_Reg slr_methods[] = {
@@ -4439,6 +4494,8 @@ a special "configuration" argument.
 
     local _M = require "kollos.metal"
 
+    -- miranda: insert internal utilities
+
     -- miranda: insert create metal tables
     -- miranda: insert copy metal tables
     -- miranda: insert create nonmetallic metatables
@@ -6269,6 +6326,39 @@ but before it is executed.
      * This file is auto-generated.
      */
 
+```
+
+## Internal utilities
+
+Utilities used internally by Kollos and not visible to
+Kollos users.
+
+"Declare" the fields allowed in a table.
+A variation on the `strict.lua` module, which
+requires the fields to be declared in advance.
+This is very helpful in development.
+
+TODO -- Do I want to turn this off after developement?
+
+```
+    -- miranda: section+ internal utilities
+    local function declarations(table, fields)
+        table.__declared = fields
+
+        table.__newindex = function (t, n, v)
+          if not table.__declared[n] then
+            error("assign to undeclared variable '"..n.."'", 2)
+          end
+          rawset(t, n, v)
+        end
+
+        -- table.__index = function (t, n)
+          -- if not table.__declared[n] then
+            -- error("variable '"..n.."' is not declared", 2)
+          -- end
+          -- return rawget(t, n)
+        -- end
+    end
 ```
 
 ## Meta-coding utilities
