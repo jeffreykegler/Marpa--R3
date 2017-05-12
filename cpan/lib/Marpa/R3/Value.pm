@@ -1465,8 +1465,6 @@ sub Marpa::R3::Scanless::R::value {
 
     my $trace_actions =
       $slg->[Marpa::R3::Internal::Scanless::G::TRACE_ACTIONS] // 0;
-    my $trace_values =
-      $slr->[Marpa::R3::Internal::Scanless::R::TRACE_VALUES] // 0;
     my $trace_file_handle =
       $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
 
@@ -1533,11 +1531,13 @@ END_OF_LUA
     local $Marpa::R3::Context::slg =
       $slr->[Marpa::R3::Internal::Scanless::R::SLG];
 
-    $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        << 'END_OF_LUA', 'i', ( $trace_values ? $trace_values : 0 ) );
-    recce, flag = ...
-    recce.lmw_v:_trace(flag)
-    recce:value_init(flag)
+    my ($trace_values) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        << 'END_OF_LUA', '' );
+    slr = ...
+    local trace_values = slr.trace_values or 0
+    slr.lmw_v:_trace(trace_values)
+    slr:value_init(trace_values)
+    return trace_values
 END_OF_LUA
 
   STEP: while (1) {
