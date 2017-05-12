@@ -538,10 +538,21 @@ END_OF_LUA
 
     if ( defined( my $value = $flat_args->{'trace_values'} ) ) {
         $slr->[Marpa::R3::Internal::Scanless::R::TRACE_VALUES] = $value;
-        if ($value) {
-            say {$trace_file_handle} "Setting trace_values option to $value"
-              or Marpa::R3::exception("Cannot print: $ERRNO");
+
+        my $value = $flat_args->{'trace_values'};
+        my $normalized_value =
+          Scalar::Util::looks_like_number($value) ? $value : 0;
+        if ($normalized_value) {
+            say {$trace_file_handle} qq{Setting trace_values option to $value};
         }
+        $slr->call_by_tag(
+    ('@' . __FILE__ . ':' . __LINE__),
+        <<'END_OF_LUA',
+            local recce, trace_values = ...
+            recce.trace_values = trace_values
+END_OF_LUA
+            'i', $normalized_value);
+
     } ## end if ( defined( my $value = $flat_args->{'trace_values'} ) )
 
     if ( defined( my $value = $flat_args->{'too_many_earley_items'} ) ) {
