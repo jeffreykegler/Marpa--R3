@@ -1854,42 +1854,44 @@ sub trace_op {
 
     my ($slr)  = @_;
     my $slg    = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-
     my $trace_output = q{};
-    my $trace_values =
-      $slr->[Marpa::R3::Internal::Scanless::R::TRACE_VALUES] // 0;
-
-    return $trace_output if not $trace_values >= 2;
 
     my (
+        $cmd,
         $nook_ix,      $or_node_id,       $choice,      $and_node_id,
-        $trace_irl_id, $or_node_position, $virtual_rhs, $virtual_lhs,
-        $irl_length,   $real_symbol_count
+        $trace_irl_id, $virtual_rhs, $virtual_lhs,
+        $real_symbol_count
       )
       = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA' , '' );
     -- in trace_op()
-    recce = ...
-    local nook_ix = recce.lmw_v:_nook()
-    local b = recce.lmw_b
-    local o = recce.lmw_o
-    local t = recce.lmw_t
-    local g1g = recce.slg.g1.lmw_g
+    slr = ...
+    if not slr.trace_values or slr.trace_values < 2 then
+        return 'return'
+    end
+    local nook_ix = slr.lmw_v:_nook()
+    local b = slr.lmw_b
+    local o = slr.lmw_o
+    local t = slr.lmw_t
+    local g1g = slr.slg.g1.lmw_g
     local or_node_id = t:_nook_or_node(nook_ix)
     local choice = t:_nook_choice(nook_ix)
     local trace_irl_id = b:_or_node_irl(or_node_id)
+    local or_node_position = b:_or_node_position(or_node_id)
+    local irl_length = g1g:_irl_length(trace_irl_id)
+    if irl_length ~= or_node_position then
+        return 'return'
+    end
     return
-        nook_ix, or_node_id, choice,
+        '', nook_ix, or_node_id, choice,
             o:_and_order_get(or_node_id, choice), 
             trace_irl_id,
-            b:_or_node_position(or_node_id),
             g1g:_irl_is_virtual_rhs(trace_irl_id),
             g1g:_irl_is_virtual_lhs(trace_irl_id),
-            g1g:_irl_length(trace_irl_id),
             g1g:_real_symbol_count(trace_irl_id)
 END_OF_LUA
 
-    return $trace_output if $or_node_position != $irl_length;
+    if ($cmd eq 'return') { return $trace_output; }
     return $trace_output if not $virtual_rhs and not $virtual_lhs;
 
     if ( $virtual_rhs and not $virtual_lhs ) {
