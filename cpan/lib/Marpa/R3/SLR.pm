@@ -1188,8 +1188,15 @@ END_OF_LUA
 } ## end sub Marpa::R3::Scanless::R::resume
 
 sub Marpa::R3::Scanless::R::events {
-    my ($self) = @_;
-    return $self->[Marpa::R3::Internal::Scanless::R::EVENTS];
+    my ($slr) = @_;
+    my ($events) = $slr->call_by_tag(
+    ('@' . __FILE__ . ':' . __LINE__),
+    <<'END_OF_LUA', '>0');
+        slr = ...
+        return slr.events
+END_OF_LUA
+    push @{$events}, @{$slr->[Marpa::R3::Internal::Scanless::R::EVENTS]};
+    return $events;
 }
 
 sub Marpa::R3::Scanless::R::xs_events {
