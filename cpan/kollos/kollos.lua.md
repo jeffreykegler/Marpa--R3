@@ -3031,6 +3031,25 @@ contains a Libmarpa recognizer wrapper object.
 
 ## The layer grammar
 
+### Fields
+
+
+```
+    -- miranda: section+ class_lyg field declarations
+    class_lyg_fields['irls'] = true
+    class_lyg_fields['isys'] = true
+    class_lyg_fields['lmw_g'] = true
+    class_lyg_fields['xbnfs'] = true
+    class_lyg_fields['xsy_by_isyid'] = true
+```
+
+```
+    -- miranda: section+ populate metatables
+    local class_lyg_fields = {}
+    -- miranda: insert class_lyg field declarations
+    declarations(_M.class_lyg, class_lyg_fields)
+```
+
 ### Constructor
 
 ```
@@ -3040,7 +3059,7 @@ contains a Libmarpa recognizer wrapper object.
     -- miranda: section+ most Lua function definitions
     function _M.class_lyg.new(slg, lyr_name)
         local lmw_g = kollos.grammar_new()
-        slg[lyr_name] = {
+        local layer = {
             lmw_g = lmw_g,
             name = lyr_name,
             xsy_by_isyid = {},
@@ -3048,6 +3067,8 @@ contains a Libmarpa recognizer wrapper object.
             isys = {},
             irls = {}
         }
+        slg[lyr_name] = layer
+        setmetatable(layer, _M.class_lyg)
         lmw_g:force_valued()
         lmw_g.short_name = lyr_name
     end
