@@ -485,6 +485,29 @@ Deletes the interpreter if the reference count drops to zero.
 
 ## Kollos SLIF grammar object
 
+### Fields
+
+```
+    -- miranda: section+ class_slg field declarations
+    class_slg_fields['g1'] = true
+    class_slg_fields['l0'] = true
+    class_slg_fields['nulling_semantics'] = true
+    class_slg_fields['per_codepoint'] = true
+    class_slg_fields['ranking_method'] = true
+    class_slg_fields['ref_count'] = true
+    class_slg_fields['rule_semantics'] = true
+    class_slg_fields['token_semantics'] = true
+    class_slg_fields['xrls'] = true
+    class_slg_fields['xsys'] = true
+```
+
+```
+    -- miranda: section+ populate metatables
+    local class_slg_fields = {}
+    -- miranda: insert class_slg field declarations
+    declarations(_M.class_slg, class_slg_fields)
+```
+
 This is a registry object.
 
 ```

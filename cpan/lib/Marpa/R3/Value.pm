@@ -649,11 +649,6 @@ sub registrations_set {
     my $trace_actions =
       $slg->[Marpa::R3::Internal::Scanless::G::TRACE_ACTIONS] // 0;
 
-    $slg->call_by_tag( ( __FILE__ . ':' . __LINE__ ), << 'END_OF_LUA', '' );
-                local grammar = ...
-                grammar.constants = {}
-END_OF_LUA
-
   REGISTRATION: for my $registration ( @{$registrations} ) {
         my ( $type, $id, @raw_ops ) = @{$registration};
         my @ops = ();
