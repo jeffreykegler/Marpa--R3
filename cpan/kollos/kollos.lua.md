@@ -728,7 +728,7 @@ This is a registry object.
     class_slr_fields['end_of_pause_lexeme'] = true
     class_slr_fields['end_pos'] = true
     class_slr_fields['event_queue'] = true
-    class_slr_fields['events'] = true
+    class_slr_fields['external_events'] = true
     class_slr_fields['g1'] = true
     class_slr_fields['has_parse'] = true
     class_slr_fields['inputs'] = true

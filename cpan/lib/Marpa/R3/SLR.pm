@@ -219,7 +219,7 @@ sub Marpa::R3::Scanless::R::new {
     slr.accept_queue = {}
 
     -- The external event queue
-    slr.events = {}
+    slr.external_events = {}
 
     slr.end_pos = 0
     slr.perl_pos = 0
@@ -739,7 +739,7 @@ qq{Registering character $char_desc as symbol $symbol_id: },
              end
              ::NEXT_COMMAND::
         end
-        return #slr.events
+        return #slr.external_events
 END_OF_LUA
 
     return 0 if
@@ -1118,7 +1118,7 @@ END_OF_LUA
         ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA',
             local slr = ...
-            slr.events = {}
+            slr.external_events = {}
             return slr.trace_terminals
 END_OF_LUA
         ''
@@ -1193,7 +1193,7 @@ sub Marpa::R3::Scanless::R::events {
     ('@' . __FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', '>0');
         slr = ...
-        return slr.events
+        return slr.external_events
 END_OF_LUA
     push @{$events}, @{$slr->[Marpa::R3::Internal::Scanless::R::EVENTS]};
     return $events;
@@ -1871,7 +1871,7 @@ sub Marpa::R3::Scanless::R::lexeme_complete {
     $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', '' );
       local slr = ...
-      slr.events = {}
+      slr.external_events = {}
 END_OF_LUA
 
     my $start_defined = 1;
