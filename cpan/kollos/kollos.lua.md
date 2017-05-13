@@ -1498,7 +1498,7 @@ Returns the Libmarpa object if it could "get" one,
         local slg = slr.slg
         local ranking_method = slg.ranking_method
         if slr.has_parse == false then return slr.has_parse end
-        local lmw_o = slr.lmw_0
+        local lmw_o = slr.lmw_o
         if lmw_o then
             slr.has_parse = true
             return lmw_o
@@ -6352,12 +6352,13 @@ TODO -- Do I want to turn this off after developement?
           rawset(t, n, v)
         end
 
-        -- table.__index = function (t, n)
-          -- if not table.__declared[n] then
-            -- error("variable '"..n.."' is not declared", 2)
-          -- end
-          -- return rawget(t, n)
-        -- end
+        table.__index = function (t, n)
+          local v = rawget(t, n) or table[n]
+          if v == nil and not table.__declared[n] then
+            error("variable '"..n.."' is not declared", 2)
+          end
+          return v
+        end
     end
 ```
 
