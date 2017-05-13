@@ -1165,19 +1165,17 @@ END_OF_LUA
                 events[#events+1] = { "'exhausted" }
                 return 'last OUTER_READ'
             end
+            if problem_code == 'no lexeme'
+               and slg.rejection_action == 'event'
+            then
+                local events = slr.external_events
+                events[#events+1] = { "'rejected" }
+                return 'last OUTER_READ'
+            end
             return ''
 END_OF_LUA
 
         last OUTER_READ if $cmd eq 'last OUTER_READ';
-
-        if (    $problem_code eq 'no lexeme'
-            and $slg->[Marpa::R3::Internal::Scanless::G::REJECTION_ACTION] eq
-            'event' )
-        {
-            push @{ $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] },
-              [q{'rejected}];
-            last OUTER_READ;
-        }
 
         if ( $problem_code eq 'invalid char' ) {
             my ($codepoint) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),

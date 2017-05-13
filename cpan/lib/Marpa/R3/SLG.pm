@@ -35,7 +35,6 @@ our $PACKAGE = 'Marpa::R3::Scanless::G';
 sub pre_construct {
     my ($class) = @_;
     my $pre_slg = bless [], $class;
-    $pre_slg->[Marpa::R3::Internal::Scanless::G::REJECTION_ACTION] = 'fatal';
     $pre_slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE] = \*STDERR;
     $pre_slg->[Marpa::R3::Internal::Scanless::G::CONSTANTS] = [];
 
@@ -222,14 +221,26 @@ END_OF_LUA
 
     if ( exists $flat_args->{'rejection'} ) {
 
-        state $rejection_actions = { map { ( $_, 0 ) } qw(fatal event) };
-        my $value = $flat_args->{'rejection'} // 'undefined';
-        Marpa::R3::exception(
-            qq{'rejection' named arg value is $value (should be one of },
-            ( join q{, }, map { q{'} . $_ . q{'} } keys %{$rejection_actions} ),
-            ')'
-        ) if not exists $rejection_actions->{$value};
-        $slg->[Marpa::R3::Internal::Scanless::G::REJECTION_ACTION] = $value;
+        my $value = $flat_args->{'rejection'} // '';
+
+    $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 's', $value);
+    local slg, value = ...
+    local rejection_actions = {
+        fatal = true,
+        event = true
+    }
+    if not rejection_actions[value] then
+        if #value == 0 then value = 'undefined' end
+        error(string.format(
+            "'rejection' named arg value is %s \z
+            'event' or 'fatal'",
+            value
+        ))
+    end
+    slg.rejection_action = value
+END_OF_LUA
+
         delete $flat_args->{'rejection'};
 
     }
