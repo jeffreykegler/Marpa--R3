@@ -104,13 +104,11 @@ use constant BLESS_PACKAGE => 11;
 use constant IF_INACCESSIBLE => 12;
 use constant WARNINGS => 13;
 use constant CHARACTER_CLASSES => 14;
-use constant EXHAUSTION_ACTION => 15;
-use constant REJECTION_ACTION => 16;
-use constant SEMANTICS_PACKAGE => 17;
-use constant TRACE_ACTIONS => 18;
-use constant NULL_VALUES => 19;
-use constant CLOSURE_BY_SYMBOL_ID => 20;
-use constant CLOSURE_BY_RULE_ID => 21;
+use constant SEMANTICS_PACKAGE => 15;
+use constant TRACE_ACTIONS => 16;
+use constant NULL_VALUES => 17;
+use constant CLOSURE_BY_SYMBOL_ID => 18;
+use constant CLOSURE_BY_RULE_ID => 19;
 
 package Marpa::R3::Internal::Scanless::R;
 use constant SLG => 0;

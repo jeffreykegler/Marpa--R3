@@ -195,7 +195,7 @@ __DATA__
     TRACE_FILE_HANDLE
     CONSTANTS
 
-    { Convert fields after here to Lua? }
+    { TODO -- Convert fields after here to Lua? }
 
     CHARACTER_CLASS_TABLE
     DISCARD_EVENT_BY_LEXER_RULE
@@ -216,8 +216,6 @@ __DATA__
     Used before precomputation. }
 
     { Semantics }
-    EXHAUSTION_ACTION
-    REJECTION_ACTION
     SEMANTICS_PACKAGE
     TRACE_ACTIONS
 
@@ -235,7 +233,7 @@ __DATA__
 
     TRACE_FILE_HANDLE
 
-    { Convert fields after here to Lua? }
+    { TODO -- Convert fields after here to Lua }
 
     EVENTS
 
