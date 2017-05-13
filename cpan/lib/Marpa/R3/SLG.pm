@@ -352,6 +352,39 @@ END_OF_LUA
       = $symbol_ids_by_event_name_and_type;
 
     my $completion_events_by_name = $hashed_source->{completion_events};
+
+    $slg->call_by_tag(
+        ('@' .__FILE__ . ':' .  __LINE__),
+        <<'END_OF_LUA', 'i', $completion_events_by_name // {});
+        local slg, completion_events = ...
+        -- print(inspect(completion_events))
+        local g1g = slg.g1.lmw_g
+        local isy_names = {}
+        for isy_name, _ in pairs(completion_events) do
+            isy_names[#isy_names+1] = isy_name
+        end
+        for ix = 1, #isy_names do
+            local isy_name = isy_names[ix]
+            local isyid = g1g.isyid_by_name[isy_name]
+            if not isyid then
+                -- print(inspect(g1g.isyid_by_name))
+                error(string.format(
+                    "Completion event defined for non-existent symbol: %s\n",
+                    isy_name
+                ))
+            end
+            local event = completion_events[isy_name]
+            completion_events[isyid] = event
+            local is_active = event[1]
+            --  Must be done before precomputation
+            g1g:symbol_is_completion_event_set(isyid, 1)
+            if is_active == 0 then
+                g1g:completion_symbol_activate(isyid, 0)
+            end
+        end
+        -- print(inspect(completion_events))
+END_OF_LUA
+
     my $completion_events_by_id =
       $slg->[Marpa::R3::Internal::Scanless::G::COMPLETION_EVENT_BY_ID] = [];
     for my $symbol_name ( keys %{$completion_events_by_name} ) {
@@ -363,20 +396,6 @@ END_OF_LUA
 "Completion event defined for non-existent symbol: $symbol_name\n"
             );
         }
-
-        # Must be done before precomputation
-
-    $slg->call_by_tag(
-        ('@' .__FILE__ . ':' .  __LINE__),
-        <<'END_OF_LUA', 'ii', $symbol_id, ($is_active ? 1 : 0));
-        local grammar, symbol_id, is_active = ...
-        local g1g = grammar.g1.lmw_g
-        g1g:symbol_is_completion_event_set(symbol_id, 1)
-        if is_active == 0 then
-            g1g:completion_symbol_activate(symbol_id, 0)
-        end
-END_OF_LUA
-
         $slg->[Marpa::R3::Internal::Scanless::G::COMPLETION_EVENT_BY_ID]
           ->[$symbol_id] = $event_name;
         push @{ $symbol_ids_by_event_name_and_type->{$event_name}->{completion}
