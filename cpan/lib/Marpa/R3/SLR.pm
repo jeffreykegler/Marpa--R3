@@ -1157,8 +1157,19 @@ END_OF_LUA
             and $slg->[Marpa::R3::Internal::Scanless::G::EXHAUSTION_ACTION] eq
             'event' )
         {
-            push @{ $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] },
-              [q{'exhausted}];
+
+     $slr->call_by_tag(
+        ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA',
+            local slr = ...
+            local events = slr.external_events
+            events[#events+1] = { 'exhausted' }
+END_OF_LUA
+        ''
+    );
+
+            # push @{ $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] },
+              # [q{'exhausted}];
             last OUTER_READ;
         } ## end if ( $problem_code eq 'R1 exhausted before end' and ...)
 
