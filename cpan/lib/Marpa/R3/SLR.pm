@@ -1153,25 +1153,22 @@ END_OF_LUA
         # The name of the exhausted event begins with a single quote, so
         # that it will not conflict with any user-defined event name.
 
-        if (    $problem_code eq 'R1 exhausted before end'
-            and $slg->[Marpa::R3::Internal::Scanless::G::EXHAUSTION_ACTION] eq
-            'event' )
-        {
-
-     $slr->call_by_tag(
+     my ($cmd) = $slr->call_by_tag(
         ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA',
-            local slr = ...
-            local events = slr.external_events
-            events[#events+1] = { 'exhausted' }
+        <<'END_OF_LUA', 's', $problem_code);
+            local slr, problem_code = ...
+            local slg = slr.slg
+            if problem_code == 'R1 exhausted before end'
+               and slg.exhaustion_action == 'event'
+            then
+                local events = slr.external_events
+                events[#events+1] = { "'exhausted" }
+                return 'last OUTER_READ'
+            end
+            return ''
 END_OF_LUA
-        ''
-    );
 
-            # push @{ $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] },
-              # [q{'exhausted}];
-            last OUTER_READ;
-        } ## end if ( $problem_code eq 'R1 exhausted before end' and ...)
+        last OUTER_READ if $cmd eq 'last OUTER_READ';
 
         if (    $problem_code eq 'no lexeme'
             and $slg->[Marpa::R3::Internal::Scanless::G::REJECTION_ACTION] eq

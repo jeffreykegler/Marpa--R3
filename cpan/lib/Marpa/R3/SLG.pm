@@ -35,7 +35,6 @@ our $PACKAGE = 'Marpa::R3::Scanless::G';
 sub pre_construct {
     my ($class) = @_;
     my $pre_slg = bless [], $class;
-    $pre_slg->[Marpa::R3::Internal::Scanless::G::EXHAUSTION_ACTION] = 'fatal';
     $pre_slg->[Marpa::R3::Internal::Scanless::G::REJECTION_ACTION] = 'fatal';
     $pre_slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE] = \*STDERR;
     $pre_slg->[Marpa::R3::Internal::Scanless::G::CONSTANTS] = [];
@@ -51,6 +50,10 @@ sub pre_construct {
         setmetatable(slg, _M.class_slg)
         local regix = _M.register(registry, slg)
         slg.ref_count = 1
+
+        slg.exhaustion_action = 'fatal'
+        slg.rejection_action = 'fatal'
+
         slg.nulling_semantics = {}
         slg.rule_semantics = {}
         slg.token_semantics = {}
@@ -193,16 +196,26 @@ qq{'source' name argument to Marpa::R3::Scanless::G->new() is a ref to a an unde
 
     if ( exists $flat_args->{'exhaustion'} ) {
 
-        state $exhaustion_actions = { map { ( $_, 0 ) } qw(fatal event) };
-        my $value = $flat_args->{'exhaustion'} // 'undefined';
-        Marpa::R3::exception(
-            qq{'exhaustion' named arg value is $value (should be one of },
-            (
-                join q{, }, map { q{'} . $_ . q{'} } keys %{$exhaustion_actions}
-            ),
-            ')'
-        ) if not exists $exhaustion_actions->{$value};
-        $slg->[Marpa::R3::Internal::Scanless::G::EXHAUSTION_ACTION] = $value;
+        my $value = $flat_args->{'exhaustion'} // '';
+
+    $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 's', $value);
+    local slg, value = ...
+    local exhaustion_actions = {
+        fatal = true,
+        event = true
+    }
+    if not exhaustion_actions[value] then
+        if #value == 0 then value = 'undefined' end
+        error(string.format(
+            "'exhaustion' named arg value is %s \z
+            'event' or 'fatal'",
+            value
+        ))
+    end
+    slg.exhaustion_action = value
+END_OF_LUA
+
         delete $flat_args->{'exhaustion'};
 
     }
