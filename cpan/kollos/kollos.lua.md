@@ -491,7 +491,7 @@ Deletes the interpreter if the reference count drops to zero.
     -- miranda: section+ class_slg field declarations
     class_slg_fields['g1'] = true
     class_slg_fields['l0'] = true
-    class_slg_fields['completion_events_by_isy'] = true
+    class_slg_fields['completion_event_by_isy'] = true
     class_slg_fields['exhaustion_action'] = true
     class_slg_fields['rejection_action'] = true
     class_slg_fields['nulling_semantics'] = true

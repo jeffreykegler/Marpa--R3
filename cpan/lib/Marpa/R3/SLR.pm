@@ -1060,6 +1060,27 @@ sub Marpa::R3::Internal::Scanless::convert_libmarpa_events {
     my @events = $slr->xs_events();
     EVENT: for my $event ( @events ) {
         my ($event_type) = @{$event};
+
+       my $cmd;
+       ($cmd, $pause) = $slr->call_by_tag(( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 'i', $event);
+        local slr, event = ...
+        -- print(inspect(event))
+        local event_type = event[1]
+        if event_type == 'symbol completed' then
+            local completed_isyid = event[2]
+            local slg = slr.slg
+            local event_name = slg.completion_event_by_isy[completed_isyid][1]
+            local events = slr.external_events
+            events[#events+1] = { event_name }
+            return '', 1
+        end
+
+        return 'nyi'
+END_OF_LUA
+
+        next EVENT if $cmd ne 'nyi';
+
         my $handler = $libmarpa_event_handlers->{$event_type};
         Marpa::R3::exception( ( join q{ }, 'Unknown event:', @{$event} ) )
             if not defined $handler;

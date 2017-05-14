@@ -381,6 +381,7 @@ END_OF_LUA
                 g1g:completion_symbol_activate(isyid, 0)
             end
         end
+        slg.completion_event_by_isy = completion_events
         -- print(inspect(completion_events))
 END_OF_LUA
 
