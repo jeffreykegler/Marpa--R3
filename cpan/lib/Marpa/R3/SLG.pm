@@ -357,7 +357,6 @@ END_OF_LUA
         ('@' .__FILE__ . ':' .  __LINE__),
         <<'END_OF_LUA', 'i', $completion_events_by_name // {});
         local slg, completion_events = ...
-        -- print(inspect(completion_events))
         local g1g = slg.g1.lmw_g
         local isy_names = {}
         for isy_name, _ in pairs(completion_events) do
@@ -375,7 +374,7 @@ END_OF_LUA
             end
             local event = completion_events[isy_name]
             completion_events[isyid] = event
-            local is_active = event[1]
+            local is_active = event[2]
             --  Must be done before precomputation
             g1g:symbol_is_completion_event_set(isyid, 1)
             if is_active == 0 then
