@@ -959,17 +959,6 @@ my $libmarpa_event_handlers = {
         return 0;
     },
 
-    'symbol completed' => sub {
-        my ( $slr, $event ) = @_;
-        my ( undef, $completed_symbol_id ) = @{$event};
-        my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-        my $completion_event_by_id =
-            $slg->[Marpa::R3::Internal::Scanless::G::COMPLETION_EVENT_BY_ID];
-        push @{ $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] },
-            [ $completion_event_by_id->[$completed_symbol_id] ];
-        return 1;
-    },
-
     'symbol nulled' => sub {
         my ( $slr,  $event )            = @_;
         my ( undef, $nulled_symbol_id ) = @{$event};
@@ -1070,7 +1059,7 @@ sub Marpa::R3::Internal::Scanless::convert_libmarpa_events {
         if event_type == 'symbol completed' then
             local completed_isyid = event[2]
             local slg = slr.slg
-            local event_name = slg.completion_event_by_isy[completed_isyid][1]
+            local event_name = slg.completion_event_by_isy[completed_isyid].name
             local events = slr.external_events
             events[#events+1] = { event_name }
             return '', 1

@@ -374,6 +374,8 @@ END_OF_LUA
             end
             local event = completion_events[isy_name]
             completion_events[isyid] = event
+            event.name = event[1]
+            event.isyid = isyid
             local is_active = event[2]
             --  Must be done before precomputation
             g1g:symbol_is_completion_event_set(isyid, 1)
