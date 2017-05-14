@@ -1300,9 +1300,7 @@ Returns `true` is there was one,
         local end_of_lexeme = slr.end_of_lexeme
         slr.lexer_start_pos = end_of_lexeme
         slr.perl_pos = end_of_lexeme
-        if result > 0 then
-            slr:g1_convert_events(slr.perl_pos)
-        end
+        if result > 0 then slr:g1_convert_events() end
         local start_of_lexeme = slr.start_of_lexeme
         local end_of_lexeme = slr.end_of_lexeme
         local lexeme_length = end_of_lexeme - start_of_lexeme
@@ -1493,7 +1491,7 @@ acceptance is caught here via rejection).  Ignore
         slr.is_external_scanning = false
         local result = g1r:earleme_complete()
         if result >= 0 then
-            slr:g1_convert_events(slr.perl_pos)
+            slr:g1_convert_events()
             local g1r = slr.g1.lmw_r
             local latest_earley_set = g1r:latest_earley_set()
             slr.per_es[latest_earley_set] =
@@ -1808,7 +1806,8 @@ logic for blocks.
 
     -- TODO: perl_pos arg is development hack --
     -- eventually use slr.perl_pos
-    function _M.class_slr.g1_convert_events(slr, perl_pos)
+    function _M.class_slr.g1_convert_events(slr)
+        local perl_pos = slr.perl_pos
         local g1g = slr.slg.g1.lmw_g
         local q = slr.event_queue
         local events = g1g:events()
