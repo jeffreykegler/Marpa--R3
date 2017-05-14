@@ -359,11 +359,11 @@ END_OF_LUA
         local slg, completion_events = ...
         local g1g = slg.g1.lmw_g
         local isy_names = {}
-        for isy_name, _ in pairs(completion_events) do
-            isy_names[#isy_names+1] = isy_name
-        end
-        for ix = 1, #isy_names do
-            local isy_name = isy_names[ix]
+        local completion_event_by_isy = {}
+        local completion_event_by_name = {}
+        for isy_name, event in pairs(completion_events) do
+            local event_name = event[1]
+            local is_active = event[2]
             local isyid = g1g.isyid_by_name[isy_name]
             if not isyid then
                 -- print(inspect(g1g.isyid_by_name))
@@ -372,18 +372,22 @@ END_OF_LUA
                     isy_name
                 ))
             end
-            local event = completion_events[isy_name]
-            completion_events[isyid] = event
-            event.name = event[1]
-            event.isyid = isyid
-            local is_active = event[2]
+            local event_desc = {
+               name = event_name,
+               isyid = isyid
+            }
+            completion_event_by_isy[isyid] = event_desc
+            completion_event_by_isy[isy_name] = event_desc
+            completion_event_by_name[event_name] = event_desc
+
             --  Must be done before precomputation
             g1g:symbol_is_completion_event_set(isyid, 1)
             if is_active == 0 then
                 g1g:completion_symbol_activate(isyid, 0)
             end
         end
-        slg.completion_event_by_isy = completion_events
+        slg.completion_event_by_isy = completion_event_by_isy
+        slg.completion_event_by_name = completion_event_by_name
         -- print(inspect(completion_events))
 END_OF_LUA
 
