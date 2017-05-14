@@ -289,8 +289,21 @@ END_OF_LUA
 
         my $is_active = $event_is_active_arg->{$event_name};
 
+    $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 'si', $event_name, $is_active );
+        local slr, event_name, activate = ...
+        local slg = slr.slg
+        local event_data = slg.completion_event_by_name[event_name]
+        if event_data then
+            local isyid = event_data.isyid
+            slr.g1.lmw_r:completion_symbol_activate(isyid, activate)
+        end
+END_OF_LUA
+
         my $symbol_ids =
             $symbol_ids_by_event_name_and_type->{$event_name}->{lexeme} // [];
+
+      # There is a lot of overlap of the code here with Marpa::R3::Scanless::R::activate()
 
       $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'ii', $symbol_ids, ($is_active ? 1 : 0) );
@@ -335,18 +348,6 @@ END_OF_LUA
             r_l0_rules[lexer_rule_id].event_on_discard_active = is_active
         end
 END_OF_LUA
-
-        $symbol_ids =
-            $symbol_ids_by_event_name_and_type->{$event_name}->{completion}
-            // [];
-        for my $symbol_id ( @{ $symbol_ids } ) {
-            $slr->call_by_tag(
-    ('@' . __FILE__ . ':' . __LINE__),
-            <<'END_OF_LUA', 'ii', $symbol_id, $is_active );
-            local recce, symbol_id, activate = ...
-            recce.g1.lmw_r:completion_symbol_activate(symbol_id, activate)
-END_OF_LUA
-        }
 
         $symbol_ids =
             $symbol_ids_by_event_name_and_type->{$event_name}->{nulled} // [];
@@ -1987,18 +1988,21 @@ sub Marpa::R3::Scanless::R::activate {
     my ( $slr, $event_name, $activate ) = @_;
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     $activate //= 1;
+    $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 'si', $event_name, $activate );
+        local slr, event_name, activate = ...
+        local slg = slr.slg
+        local event_data = slg.completion_event_by_name[event_name]
+        if event_data then
+            local isyid = event_data.isyid
+            slr.g1.lmw_r:completion_symbol_activate(isyid, activate)
+        end
+END_OF_LUA
+
     my $event_symbol_ids_by_type =
       $slg
       ->[Marpa::R3::Internal::Scanless::G::SYMBOL_IDS_BY_EVENT_NAME_AND_TYPE]
       ->{$event_name};
-
-    for my $event ( @{ $event_symbol_ids_by_type->{completion} } ) {
-        $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-            <<'END_OF_LUA', 'ii', $event, $activate );
-        local recce, event, activate = ...
-        recce.g1.lmw_r:completion_symbol_activate(event, activate)
-END_OF_LUA
-    }
 
     for my $event ( @{ $event_symbol_ids_by_type->{nulled} } ) {
         $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
