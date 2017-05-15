@@ -552,6 +552,13 @@ sub Marpa::R3::ASF::grammar {
     return $slg;
 } ## end sub Marpa::R3::ASF::grammar
 
+# TODO -- Document this method
+sub Marpa::R3::ASF::recce {
+    my ($asf)   = @_;
+    my $slr     = $asf->[Marpa::R3::Internal::ASF::SLR];
+    return $slr;
+} ## end sub Marpa::R3::ASF::recce
+
 sub nid_rule_id {
     my ( $asf, $nid ) = @_;
     return if $nid < 0;
@@ -1530,6 +1537,11 @@ sub Marpa::R3::Internal::ASF::Traverse::all_choices {
     return @results;
 }
 
+# TODO -- Document this method
+sub Marpa::R3::Internal::ASF::Traverse::asf {
+    my ( $traverser ) = @_;
+    return $traverser->[Marpa::R3::Internal::ASF::Traverse::ASF];
+}
 
 sub Marpa::R3::Internal::ASF::Traverse::literal {
     my ( $traverser ) = @_;
@@ -1539,12 +1551,13 @@ sub Marpa::R3::Internal::ASF::Traverse::literal {
     return $asf->glade_literal($glade_id);
 }
 
-sub Marpa::R3::Internal::ASF::Traverse::span {
+# TODO document span() -> g1_span()
+sub Marpa::R3::Internal::ASF::Traverse::g1_span {
     my ( $traverser ) = @_;
     my $asf = $traverser->[Marpa::R3::Internal::ASF::Traverse::ASF];
     my $glade = $traverser->[Marpa::R3::Internal::ASF::Traverse::GLADE];
     my $glade_id = $glade->[Marpa::R3::Internal::Glade::ID];
-    return $asf->glade_span($glade_id);
+    return $asf->glade_g1_span($glade_id);
 }
 
 sub Marpa::R3::Internal::ASF::Traverse::symbol_id {

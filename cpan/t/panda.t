@@ -277,18 +277,25 @@ sub located_traverser {
 # Marpa::R3::Display::Start
 # name: ASF span() traverser method example
 
-    my ( $start, $length ) = $glade->span();
-    my $end = $start + $length - 1;
+    my ( $g1_start, $g1_length ) = $glade->g1_span();
+    my $asf = $glade->asf();
+    my $recce = $asf->recce();
+    my ( $block1, $pos1 ) = $recce->g1_to_l0_first( $g1_start );
+    my ( $block2, $pos2 ) = $recce->g1_to_l0_last( $g1_start + $g1_length - 1 );
+    my $location = $recce->lc_brief($block1, $pos1, $block2, $pos2);
 
 # Marpa::R3::Display::End
 
-    my $location = q{@};
-    $location .= $start >= $end ? $start : "$start-$end";
+    # Remove clutter in the display:
+    #   Everything is expected to be in block 1, line 1
+    $location =~ s/ ^ B1L1c //xms;
+
+    my $atsign = q{@};
     my $join_ws = q{ };
     $join_ws = qq{\n   } if $symbol_name eq 'S';
-    return "($symbol_name$location " . ( join $join_ws, @return_value ) . ')';
+    return "($symbol_name$atsign$location " . ( join $join_ws, @return_value ) . ')';
     my $penn_tag = penn_tag($symbol_name);
-    return "($penn_tag$location " . ( join $join_ws, @return_value ) . ')';
+    return "($penn_tag$atsign$location " . ( join $join_ws, @return_value ) . ')';
 
 }
 
@@ -297,8 +304,8 @@ sub located_traverser {
 # end-before-line: '^END_OF_OUTPUT$'
 
 my $located_expected = <<'END_OF_OUTPUT';
-(S@0-30 (NP@0-6 (DT a) (NN panda))
-   (VP@8-29 (VBZ eats) (NP@13-29 (NNS shoots) (CC and) (NNS leaves)))
+(S@1-31 (NP@1-7 (DT a) (NN panda))
+   (VP@9-30 (VBZ eats) (NP@14-30 (NNS shoots) (CC and) (NNS leaves)))
    (. .))
 END_OF_OUTPUT
 

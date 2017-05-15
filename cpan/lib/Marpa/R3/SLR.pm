@@ -1946,6 +1946,53 @@ END_OF_LUA
     return $start, $end;
 }
 
+# TODO -- Document this method
+sub Marpa::R3::Scanless::R::g1_to_l0_first {
+    my ( $slr, $g1_pos ) = @_;
+    return $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 'i', $g1_pos  );
+        local slr, g1_pos = ...
+        return slr:g1_pos_to_l0_first(g1_pos)
+END_OF_LUA
+}
+
+# TODO -- Document this method
+sub Marpa::R3::Scanless::R::g1_to_l0_last {
+    my ( $slr, $g1_pos ) = @_;
+    return $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 'i', $g1_pos  );
+        local slr, g1_pos = ...
+        return slr:g1_pos_to_l0_last(g1_pos)
+END_OF_LUA
+}
+
+# TODO -- Document this method
+sub Marpa::R3::Scanless::R::lc_brief {
+    my ( $slr, $first_block, $first_pos, $last_block, $last_pos ) = @_;
+    my ($desc) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 'iiii', $first_block, $first_pos, $last_block, $last_pos );
+        local slr, first_block, first_pos, last_block, last_pos = ...
+        local function usage()
+            error(
+            "usage: $recce->lc_brief(first_block, first_pos, [last_block, last_pos])"
+            )
+        end
+        if not first_block or not first_pos then
+            return usage()
+        end
+        if last_block == nil or last_pos == nil then
+            if last_block ~= nil or last_pos ~= nil then
+                return usage()
+            end
+            last_block = first_block
+            last_pos = first_pos
+        end
+        return slr:lc_range_brief(
+            first_block, first_pos, last_block, last_pos)
+END_OF_LUA
+    return $desc;
+}
+
 # TODO -- Document $block parameter
 sub Marpa::R3::Scanless::R::line_column {
     my ( $slr, $pos, $block ) = @_;
