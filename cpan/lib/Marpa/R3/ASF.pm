@@ -1204,7 +1204,7 @@ sub Marpa::R3::Internal::ASF::glade_ambiguities {
 
     my $downglades = $asf->factoring_downglades( $glade, 0, 0 );
     my $min_factors = $#{$downglades} + 1;
-    my ( $upglade_start, $upglade_length ) = $asf->glade_span($glade);
+    my ( $upglade_start, $upglade_length ) = $asf->glade_g1_span($glade);
     my $sync_location = $upglade_start + $upglade_length;
 
     my @factors_by_factoring = ($downglades);
@@ -1225,7 +1225,7 @@ sub Marpa::R3::Internal::ASF::glade_ambiguities {
         # the earliest start of the first downglade of any factoring.
         # Currently this will be the start of the parent glade, but this
         # method will be safe against any future hacks.
-        my ($this_sync_location) = $asf->glade_span( $downglades->[0] );
+        my ($this_sync_location) = $asf->glade_g1_span( $downglades->[0] );
         $sync_location =
             List::Util::min( $this_sync_location, $sync_location );
 
@@ -1249,7 +1249,7 @@ sub Marpa::R3::Internal::ASF::glade_ambiguities {
             my $this_factor_ix = $factor_ix[$factoring_ix];
             my $this_downglade =
                 $factors_by_factoring[$factoring_ix][$this_factor_ix];
-            my ($this_start) = $asf->glade_span($this_downglade);
+            my ($this_start) = $asf->glade_g1_span($this_downglade);
 
             # To keep time complexity down we limit the number of times we deal
             # with a factoring at a sync location to 3, worst case -- a pass which
@@ -1262,7 +1262,7 @@ sub Marpa::R3::Internal::ASF::glade_ambiguities {
             while ( $this_start < $sync_location ) {
                 $factor_ix[$factoring_ix]++;
                 last SYNC_PASS if $factor_ix[$factoring_ix] >= $min_factors;
-                $this_start = $asf->glade_span($this_downglade);
+                $this_start = $asf->glade_g1_span($this_downglade);
             } ## end if ( $this_start < $sync_location )
             if ( $this_start > $sync_location ) {
                 $is_synced     = 0;
