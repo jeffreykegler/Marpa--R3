@@ -640,10 +640,10 @@ sub nid_span {
         my $and_node_id = nid_to_and_node($nid);
         my ( $start, $length ) = token_es_span( $asf, $and_node_id );
         return ($start, 0) if $length == 0;
-        return $slr->g1_input_span( $start, $length );
+        return $start, $length;
     } ## end if ( $nid <= $NID_LEAF_BASE )
     if ( $nid >= 0 ) {
-        return $slr->g1_input_span( or_node_es_span( $asf, $nid ) );
+        return or_node_es_span( $asf, $nid );
     }
     Marpa::R3::exception("No literal for node ID: $nid");
 }
@@ -1094,13 +1094,23 @@ sub Marpa::R3::ASF::glade_literal {
     return nid_literal($asf, $nid0);
 } ## end sub Marpa::R3::ASF::glade_literal
 
-sub Marpa::R3::ASF::glade_span {
+sub Marpa::R3::ASF::glade_g1_span {
     my ( $asf, $glade_id ) = @_;
     my $nidset_by_id = $asf->[Marpa::R3::Internal::ASF::NIDSET_BY_ID];
     my $nidset       = $nidset_by_id->[$glade_id];
     Marpa::R3::exception("No glade found for glade ID $glade_id)") if not defined $nidset;
     my $nid0         = $nidset->nid(0);
-    return nid_span($asf, $nid0);
+    my ($g1_start, $g1_length) = nid_span($asf, $nid0);
+    return $g1_start, $g1_length;
+}
+
+# TODO Eliminate this method?
+#    L0 spans are no longer well-defined for glades
+sub Marpa::R3::ASF::glade_span {
+    my ( $asf, $glade_id ) = @_;
+    my ($g1_start, $g1_length) = $asf->glade_g1_span( $glade_id );
+    my $slr           = $asf->[Marpa::R3::Internal::ASF::SLR];
+    return $slr->g1_input_span( $g1_start, $g1_length );
 }
 
 sub Marpa::R3::ASF::glade_symbol_id {

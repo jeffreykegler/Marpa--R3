@@ -1804,8 +1804,6 @@ logic for blocks.
 ```
     -- miranda: section+ most Lua function definitions
 
-    -- TODO: perl_pos arg is development hack --
-    -- eventually use slr.perl_pos
     function _M.class_slr.g1_convert_events(slr)
         local perl_pos = slr.perl_pos
         local g1g = slr.slg.g1.lmw_g
