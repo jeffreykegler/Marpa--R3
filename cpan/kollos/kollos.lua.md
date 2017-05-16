@@ -3824,7 +3824,8 @@ Caller must ensure `block` and `pos` are valid.
     end
 
     function _M.class_slr.g1_escape(slr, g1_pos, max_length)
-        local this_sweep = per_es[g1_pos+1]
+        local g1_ix = g1_pos + 1
+        local this_es = per_es[g1_ix]
         if not this_sweep then
             error(string.format(
                 "slr:g1_escape(%d): bad g1_pos argument\n\z
@@ -3832,9 +3833,32 @@ Caller must ensure `block` and `pos` are valid.
                 g1_pos, 0, #per_es-1
             ))
         end
-        local this_block = this_sweep[1]
-        local this_pos = this_sweep[2]
-        local this_block_length = this_sweep[2]
+        local sweep_ix = 1
+        local this_block = this_es[1]
+        local this_pos = this_es[2]
+        local this_block_last = this_pos + this_es[3] - 1
+        local function codes()
+            return function()
+                -- this incrementation logic is untested
+                if this_pos >= this_block_last then
+                    -- next sweep, if there is one
+                    sweep_ix = sweep_ix + 3
+                    if sweep_ix > #this_es then
+                       g1_ix = g1_ix + 1
+                       -- After the end of parse, so return nil
+                       if g1_ix > #per_es then return end
+                       this_es = per_es[g1_ix]
+                       sweep_ix = 1
+                   end
+                   this_block = this_es[sweep_ix+1]
+                   this_pos = this_es[sweep_ix+2]
+                   this_block_last = this_pos + this_es[sweep_ix+3] - 1
+                end
+                local codepoint = slr:codepoint_from_pos(this_block, this_pos)
+                this_pos = this_pos + 1
+                return codepoint
+            end
+        end
         return _M.iter_escape(codes, max_length)
     end
 
