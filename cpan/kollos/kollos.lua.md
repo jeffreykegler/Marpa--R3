@@ -1564,6 +1564,38 @@ Each trio represents a consecutive sequence of characters
 in `block`.
 A sweep can store other data in its non-numeric keys.
 
+TODO: Allow for leading trailer, final trailer;
+and nil g1_last (== g1_first)
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slr.sweep_range(slr, g1_first, g1_last)
+         local function iter()
+             local g1_ix = g1_first+1
+             while true do
+                 local this_per_es = slr.per_es[g1_ix]
+                 for sweep_ix = 1, #this_per_es, 3 do
+                      coroutine.yield(this_per_es[sweep_ix],
+                          this_per_es[sweep_ix+1],
+                          this_per_es[sweep_ix+2])
+                 end
+                 if g1_ix > g1_last then return end
+                 local this_trailer = slr.trailers[g1_ix]
+                 if this_trailer then
+                     for sweep_ix = 1, #this_trailer, 3 do
+                          coroutine.yield(this_trailer[sweep_ix],
+                              this_trailer[sweep_ix+1],
+                              this_trailer[sweep_ix+2])
+                     end
+                 end
+                 g1_ix = g1_ix + 1
+             end
+         end
+         return coroutine.wrap(iter)
+    end
+
+```
+
 `slr:add_sweep_to_table(sweep, table)` adds the literals
 for each trio to the end of `table`, which must be a
 (possibly zero-length) sequence of strings.
@@ -1633,6 +1665,28 @@ for each trio to the end of `table`, which must be a
              g1_ix = g1_ix + 1
         end
         slr:add_sweep_to_table(per_es[g1_end], pieces)
+
+        local pieces2 = {}
+        local inputs = slr.inputs
+        for block_ix, start, len in
+            slr:sweep_range(g1_start, g1_start+g1_count-1)
+        do
+            local start_byte_p = slr:per_pos(block_ix, start)
+            local end_byte_p = slr:per_pos(block_ix, start + len)
+            local block = inputs[block_ix]
+            local text = block.text
+            local piece = text:sub(start_byte_p, end_byte_p - 1)
+            pieces2[#pieces2+1] = piece
+        end
+
+        local whole = table.concat(pieces)
+        local whole2 = table.concat(pieces2)
+
+        if whole ~= whole2 then
+           io.stderr:write(string.format("Wholes differ:\n    old: %q\n    .vs new %q\n",
+                whole, whole2))
+        end
+
         return table.concat(pieces)
     end
 ```
