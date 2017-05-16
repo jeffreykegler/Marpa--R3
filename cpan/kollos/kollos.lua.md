@@ -3811,16 +3811,30 @@ Caller must ensure `block` and `pos` are valid.
     -- miranda: section+ diagnostics
     function _M.class_slr.input_escape(slr, block_ix, start, max_length)
         local block = slr.inputs[block_ix]
-        local byte_p = slr:per_pos(block_ix, start)
-        local text = block.text
+        local pos = start
         local function codes()
             return function()
-                if byte_p > #text then return end
-                local codepoint = utf8.codepoint(text, byte_p)
-                byte_p = utf8.offset(text, 2, byte_p)
+                if pos > #block then return end
+                local codepoint = slr:codepoint_from_pos(block_ix, pos)
+                pos = pos + 1
                 return codepoint
             end
         end
+        return _M.iter_escape(codes, max_length)
+    end
+
+    function _M.class_slr.g1_escape(slr, g1_pos, max_length)
+        local this_sweep = per_es[g1_pos+1]
+        if not this_sweep then
+            error(string.format(
+                "slr:g1_escape(%d): bad g1_pos argument\n\z
+                \u{20}   Allowed values are %d-%d\n",
+                g1_pos, 0, #per_es-1
+            ))
+        end
+        local this_block = this_sweep[1]
+        local this_pos = this_sweep[2]
+        local this_block_length = this_sweep[2]
         return _M.iter_escape(codes, max_length)
     end
 
