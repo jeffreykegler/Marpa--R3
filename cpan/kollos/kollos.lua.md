@@ -3810,16 +3810,25 @@ Caller must ensure `block` and `pos` are valid.
 ```
     -- miranda: section+ diagnostics
     function _M.class_slr.input_escape(slr, block_ix, start, max_length)
-        local pos = start
+        local block = slr.inputs[block_ix]
+        local byte_p = slr:per_pos(block_ix, start)
+        local text = block.text
+        local function codes()
+            return function()
+                if byte_p > #text then return end
+                local codepoint = utf8.codepoint(text, byte_p)
+                byte_p = utf8.offset(text, 2, byte_p)
+                return codepoint
+            end
+        end
+        return _M.iter_escape(codes, max_length)
+    end
+
+    function _M.iter_escape(iter, max_length)
         local length_so_far = 0
         local escapes = {}
-        local block = slr.inputs[block_ix]
-        local start_byte_p = slr:per_pos(block_ix, pos)
-        -- local subtext = block.text:sub(start_byte_p)
-        local text = block.text
-        local byte_p = start_byte_p
-        while byte_p <= #text do
-             local codepoint = utf8.codepoint(text, byte_p)
+
+        for codepoint in iter() do
              local escape = _M.escape_codepoint(codepoint)
              length_so_far = length_so_far + #escape
              if length_so_far > max_length then
@@ -3827,7 +3836,6 @@ Caller must ensure `block` and `pos` are valid.
                  break
              end
              escapes[#escapes+1] = escape
-             byte_p = utf8.offset(text, 2, byte_p)
         end
 
              -- print(inspect(escapes))
