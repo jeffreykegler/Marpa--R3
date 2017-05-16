@@ -3863,13 +3863,23 @@ Caller must ensure `block` and `pos` are valid.
         return table.concat(escapes)
     end
 
-    function _M.class_slr.reversed_input_escape(slr, block, base_pos, max_length)
+    function _M.class_slr.reversed_input_escape(slr, block_ix, base_pos, max_length)
         local pos = base_pos - 1
+        local function codes()
+            return function()
+                if pos < 0 then return end
+                local codepoint = slr:codepoint_from_pos(block_ix, pos)
+                pos = pos - 1
+                return codepoint
+            end
+        end
+        return _M.reversed_iter_escape(codes, max_length)
+    end
+
+    function _M.reversed_iter_escape(iter, max_length)
         local length_so_far = 0
         local reversed = {}
-        while pos >= 0 do
-
-             local codepoint = slr:codepoint_from_pos(block, pos)
+        for codepoint in iter() do
              local escape = _M.escape_codepoint(codepoint)
              length_so_far = length_so_far + #escape
              if length_so_far > max_length then
@@ -3877,7 +3887,6 @@ Caller must ensure `block` and `pos` are valid.
                  break
              end
              reversed[#reversed+1] = escape
-             pos = pos - 1
         end
 
         -- trailing spaces get special treatment
