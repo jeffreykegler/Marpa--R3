@@ -1564,13 +1564,16 @@ Each trio represents a consecutive sequence of characters
 in `block`.
 A sweep can store other data in its non-numeric keys.
 
-TODO: Allow for leading trailer, final trailer;
-and nil g1_last (== g1_first)
+Factory to create iterator over the sweeps in a G1 range.
+`g1_last` defaults to `g1_first`.
+
+TODO: Allow for leading trailer, final trailer.
 
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.sweep_range(slr, g1_first, g1_last)
          local function iter()
+             if not g1_last then g1_last = g1_first end
              local g1_ix = g1_first+1
              while true do
                  local this_per_es = slr.per_es[g1_ix]
@@ -1596,43 +1599,6 @@ and nil g1_last (== g1_first)
 
 ```
 
-`slr:add_sweep_to_table(sweep, table)` adds the literals
-for each trio to the end of `table`, which must be a
-(possibly zero-length) sequence of strings.
-
-```
-    -- miranda: section+ most Lua function definitions
-    function _M.class_slr.add_sweep_to_table(slr, sweep, pieces)
-        local inputs = slr.inputs
-        for ix = 1, #sweep, 3 do
-            local block_ix = sweep[ix]
-            local block = inputs[block_ix]
-            local start = sweep[ix+1]
-            local len = sweep[ix+2]
-            local start_byte_p = slr:per_pos(block_ix, start)
-            local end_byte_p = slr:per_pos(block_ix, start + len)
-            local text = block.text
-
-            -- TODO Delete after development
-            -- io.stderr:write(string.format("#block.text,start_p,end_p = %d,%d,%d\n",
-                -- #block.text,
-                -- start_byte_p,
-                -- end_byte_p
-            -- ))
-
-            local piece = text:sub(start_byte_p, end_byte_p - 1)
-            -- local ok, fail_byte = utf8.len(piece)
-            -- if not ok then
-                -- error(string.format("Piece %s\nFailed at byte %d",
-                    -- piece, fail_byte))
-            -- end
-            pieces[#pieces+1] = piece
-            ix = ix + 3
-        end
-        return
-    end
-```
-
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.l0_span_to_literal(slr, l0_start, l0_length, block_ix)
@@ -1651,22 +1617,8 @@ for each trio to the end of `table`, which must be a
         -- io.stderr:write(string.format("g1_span_to_literal(%d, %d)\n",
             -- g1_start, g1_count
         -- ))
-        local g1_ix = g1_start + 1
-        local g1_end = g1_ix + g1_count - 1
-        local pieces = {}
-        local per_es = slr.per_es
-        local trailers = slr.trailers
-        while g1_ix < g1_end do
-             slr:add_sweep_to_table(per_es[g1_ix], pieces)
-             local trailer = trailers[g1_ix]
-             if trailer then
-                 slr:add_sweep_to_table(trailer, pieces)
-             end
-             g1_ix = g1_ix + 1
-        end
-        slr:add_sweep_to_table(per_es[g1_end], pieces)
 
-        local pieces2 = {}
+        local pieces = {}
         local inputs = slr.inputs
         for block_ix, start, len in
             slr:sweep_range(g1_start, g1_start+g1_count-1)
@@ -1676,23 +1628,13 @@ for each trio to the end of `table`, which must be a
             local block = inputs[block_ix]
             local text = block.text
             local piece = text:sub(start_byte_p, end_byte_p - 1)
-            pieces2[#pieces2+1] = piece
+            pieces[#pieces+1] = piece
         end
-
-        local whole = table.concat(pieces)
-        local whole2 = table.concat(pieces2)
-
-        if whole ~= whole2 then
-           io.stderr:write(string.format("Wholes differ:\n    old: %q\n    .vs new %q\n",
-                whole, whole2))
-        end
-
         return table.concat(pieces)
     end
 ```
 
 The current position in L0 terms -- a kind of "end of parse" location.
-Note that, until the parse is not at EOF, this location will change.
 
 ```
     -- miranda: section+ most Lua function definitions
