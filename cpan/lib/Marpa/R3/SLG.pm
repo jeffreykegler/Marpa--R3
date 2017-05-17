@@ -391,23 +391,6 @@ END_OF_LUA
         -- print(inspect(completion_events))
 END_OF_LUA
 
-    my $completion_events_by_id =
-      $slg->[Marpa::R3::Internal::Scanless::G::COMPLETION_EVENT_BY_ID] = [];
-    for my $symbol_name ( keys %{$completion_events_by_name} ) {
-        my ( $event_name, $is_active ) =
-          @{ $completion_events_by_name->{$symbol_name} };
-        my $symbol_id = $slg->symbol_by_name($symbol_name);
-        if ( not defined $symbol_id ) {
-            Marpa::R3::exception(
-"Completion event defined for non-existent symbol: $symbol_name\n"
-            );
-        }
-        $slg->[Marpa::R3::Internal::Scanless::G::COMPLETION_EVENT_BY_ID]
-          ->[$symbol_id] = $event_name;
-        push @{ $symbol_ids_by_event_name_and_type->{$event_name}->{completion}
-        }, $symbol_id;
-    } ## end for my $symbol_name ( keys %{$completion_events_by_name...})
-
     my $nulled_events_by_name = $hashed_source->{nulled_events};
     my $nulled_events_by_id =
       $slg->[Marpa::R3::Internal::Scanless::G::NULLED_EVENT_BY_ID] = [];
