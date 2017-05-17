@@ -3827,7 +3827,7 @@ Caller must ensure `block` and `pos` are valid.
                 return codepoint
             end
         end
-        return _M.iter_escape(codes, max_length)
+        return _M.factory_escape(codes, max_length)
     end
 
     function _M.class_slr.g1_escape(slr, g1_pos, max_length)
@@ -3844,36 +3844,30 @@ Caller must ensure `block` and `pos` are valid.
         local this_block = this_es[1]
         local this_pos = this_es[2]
         local this_block_last = this_pos + this_es[3] - 1
-        local function codes()
-            return function()
-                -- this incrementation logic is untested
-                if this_pos >= this_block_last then
-                    -- next sweep, if there is one
-                    sweep_ix = sweep_ix + 3
-                    if sweep_ix > #this_es then
-                       g1_ix = g1_ix + 1
-                       -- After the end of parse, so return nil
-                       if g1_ix > #per_es then return end
-                       this_es = per_es[g1_ix]
-                       sweep_ix = 1
+        -- a worst case maximum, since each g1 location will have
+        --   an L0 length of at least 1
+        local g1_last = g1_pos + max_length
+        local function factory()
+            local function iter()
+                for this_block, this_start, this_len in
+                    slr:sweep_range(g1_pos, g1_last)
+                do
+                   for this_pos = this_start, this_start + this_len - 1 do
+                       local codepoint = slr:codepoint_from_pos(this_block, this_pos)
+                       coroutine.yield(codepoint)
                    end
-                   this_block = this_es[sweep_ix+1]
-                   this_pos = this_es[sweep_ix+2]
-                   this_block_last = this_pos + this_es[sweep_ix+3] - 1
                 end
-                local codepoint = slr:codepoint_from_pos(this_block, this_pos)
-                this_pos = this_pos + 1
-                return codepoint
             end
+            return coroutine.wrap(iter)
         end
-        return _M.iter_escape(codes, max_length)
+        return _M.factory_escape(factory, max_length)
     end
 
-    function _M.iter_escape(iter, max_length)
+    function _M.factory_escape(factory, max_length)
         local length_so_far = 0
         local escapes = {}
 
-        for codepoint in iter() do
+        for codepoint in factory() do
              local escape = _M.escape_codepoint(codepoint)
              length_so_far = length_so_far + #escape
              if length_so_far > max_length then
@@ -3918,13 +3912,13 @@ Caller must ensure `block` and `pos` are valid.
                 return codepoint
             end
         end
-        return _M.reversed_iter_escape(codes, max_length)
+        return _M.reversed_factory_escape(codes, max_length)
     end
 
-    function _M.reversed_iter_escape(iter, max_length)
+    function _M.reversed_factory_escape(factory, max_length)
         local length_so_far = 0
         local reversed = {}
-        for codepoint in iter() do
+        for codepoint in factory() do
              local escape = _M.escape_codepoint(codepoint)
              length_so_far = length_so_far + #escape
              if length_so_far > max_length then
