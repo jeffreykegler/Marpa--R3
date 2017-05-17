@@ -106,11 +106,11 @@ END_OF_SOURCE
         'SLIF grammar failed',
         <<'END_OF_MESSAGE',
 Parse of BNF/Scanless source failed:
-Length of symbol "statement" at line 2, column 13 is ambiguous
+Length of symbol "statement" at B1L2c13-32 is ambiguous
   Choices start with: quartet  ::= a a a a
-  Choice 1, length=20, ends at line 2, column 32
+  Choice 1, length=20, ends at B1L2c32
   Choice 1: quartet  ::= a a a a
-  Choice 2, length=52, ends at line 3, column 31
+  Choice 2, length=52, ends at B1L3c31
   Choice 2: quartet  ::= a a a a\n        start symbol is quarte
 END_OF_MESSAGE
         'English start statement second'

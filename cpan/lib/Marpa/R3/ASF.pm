@@ -1418,17 +1418,21 @@ END_OF_LUA
                 my $symbol_display_form =
                     $grammar->symbol_display_form(
                     $asf->glade_symbol_id($first_downglade) );
-                my $block = 1; # TODO -- Delete after development
-                my ( $start, $first_length ) =
-                    $asf->glade_span($first_downglade);
+
                 my ( $g1_start, $g1_length ) =
                     $asf->glade_g1_span($first_downglade);
+                my $g1_last = $g1_length > 0 ? ($g1_start + $g1_length - 1) : $g1_start;
+
+                my ( $l0_block1,      $l0_pos1 )       = $slr->g1_to_l0_first($g1_start);
+                my ( $l0_block2,      $l0_pos2 )       = $slr->g1_to_l0_last($g1_last);
+                my $l0_range = $slr->lc_brief($l0_block1, $l0_pos1, $l0_block2, $l0_pos2);
+
+                my $first_length = $asf->glade_L0_length($first_downglade);
                 my $this_length = $asf->glade_L0_length($this_downglade);
-                my ( $start_line, $start_column ) = $slr->line_column($start);
                 my $display_length =
                     List::Util::min( $first_length, $this_length, 60 );
                 $result
-                    .= qq{Length of symbol "$symbol_display_form" at line $start_line, column $start_column is ambiguous\n};
+                    .= qq{Length of symbol "$symbol_display_form" at $l0_range is ambiguous\n};
 
                 if ( $display_length > 0 ) {
 
@@ -1461,10 +1465,13 @@ END_OF_LUA
                             .= qq{  Choice $choice_number is zero length\n};
                         next DISPLAY_GLADE;
                     }
-                    my ( $end_line, $end_column ) =
-                        $slr->line_column( $start + $l0_length - 1 );
+
+                    my ( $g1_start, $g1_length ) = $asf->glade_g1_span($glade_id);
+                    my ( $l0_block,      $l0_pos )       = $slr->g1_to_l0_last($g1_start + $g1_length -1);
+                    my $l0_location = $slr->lc_brief($l0_block, $l0_pos);
+
                     $result
-                        .= qq{  Choice $choice_number, length=$l0_length, ends at line $end_line, column $end_column\n};
+                        .= qq{  Choice $choice_number, length=$l0_length, ends at $l0_location\n};
 
                     my ($piece) = $slr->call_by_tag(
                     ('@' . __FILE__ . ':' . __LINE__),

@@ -110,8 +110,8 @@ Test::More::is(
 Test::More::is( $actual_result, $expected_result, qq{Result of $test_name} );
 
 if ( !$is_ambiguous_parse ) {
-    Test::More::fail(qq{glade_span() start});
-    Test::More::fail(qq{glade_span() length});
+    Test::More::fail(qq{glade_g1_span() start});
+    Test::More::fail(qq{glade_g1_span() length});
 }
 else {
     $recce->series_restart();
@@ -119,14 +119,14 @@ else {
     my $glade_id = $asf->peak;
 
 # Marpa::R3::Display
-# name: glade_span() example
+# name: glade_g1_span() example
 
-    my ( $glade_start, $glade_length ) = $asf->glade_span($glade_id);
+    my ( $glade_start, $glade_length ) = $asf->glade_g1_span($glade_id);
 
 # Marpa::R3::Display::End
 
-    Test::More::is( $glade_start,  0, qq{glade_span() start} );
-    Test::More::is( $glade_length, 2, qq{glade_span() length} );
+    Test::More::is( $glade_start,  0, qq{glade_g1_span() start} );
+    Test::More::is( $glade_length, 2, qq{glade_g1_span() length} );
 
 } ## end else [ if ( !$is_ambiguous_parse ) ]
 
