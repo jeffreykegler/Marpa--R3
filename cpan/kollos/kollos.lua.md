@@ -1632,6 +1632,17 @@ TODO: Allow for leading trailer, final trailer.
         end
         return table.concat(pieces)
     end
+
+    function _M.class_slr.g1_span_l0_length(slr, g1_start, g1_count)
+        local inputs = slr.inputs
+        local length = 0;
+        for _, _, sweep_length in
+            slr:sweep_range(g1_start, g1_start+g1_count-1)
+        do
+            length = length + sweep_length
+        end
+        return length
+    end
 ```
 
 The current position in L0 terms -- a kind of "end of parse" location.

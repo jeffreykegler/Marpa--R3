@@ -416,7 +416,7 @@ sub Marpa::R3::ASF::new {
         error(
             "An attempt was made to create an ASF for a SLIF recognizer already in use\n"
             .. "   The recognizer must be reset first\n"
-            .. string.format('  The current SLIF recognizer mode is $q\n', 
+            .. string.format('  The current SLIF recognizer mode is $q\n',
                 recce.tree_mode)
         )
     end
@@ -482,7 +482,7 @@ END_OF_LUA
 
         last OR_NODE if not scalar @{$and_node_ids};
 
-        # Originally I had intended to sort the and node IDs by 
+        # Originally I had intended to sort the and node IDs by
         # MAJOR: and-node predecessor (or -1 if no predecessor) and
         # MINOR: and_node ID
         # Don't know why, and in fact I screwed up the implementation
@@ -1120,6 +1120,21 @@ sub Marpa::R3::ASF::glade_span {
     return $slr->g1_input_span( $g1_start, $g1_length );
 }
 
+sub Marpa::R3::ASF::glade_L0_length {
+    my ( $asf, $glade_id ) = @_;
+    my ($g1_start, $g1_length) = $asf->glade_g1_span( $glade_id );
+    my $slr           = $asf->[Marpa::R3::Internal::ASF::SLR];
+    return $slr->g1_input_span( $g1_start, $g1_length );
+
+    my ($l0_length) = $slr->call_by_tag(
+    ('@' . __FILE__ . ':' . __LINE__),
+    <<'END_OF_LUA', 'ii', $g1_start, $g1_length);
+    local slr, g1_start, g1_length = ...
+    return slr:g1_span_l0_length(g1_start, g1_length)
+END_OF_LUA
+    return $l0_length;
+}
+
 sub Marpa::R3::ASF::glade_symbol_id {
     my ( $asf, $glade_id ) = @_;
     my $nidset_by_id = $asf->[Marpa::R3::Internal::ASF::NIDSET_BY_ID];
@@ -1260,7 +1275,7 @@ sub Marpa::R3::Internal::ASF::glade_ambiguities {
 
             # To keep time complexity down we limit the number of times we deal
             # with a factoring at a sync location to 3, worst case -- a pass which
-            # identifies it as a potential sync location, a pass which 
+            # identifies it as a potential sync location, a pass which
             # (if possible) brings all the factors to that location, and a
             # pass which leaves all factor IX's where they are, and determines
             # we have found a sync location.  This makes out time O(f*n), where
@@ -1362,7 +1377,7 @@ sub Marpa::R3::Internal::ASF::ambiguities_show {
                 $display_length == $length ? 'Text is: ' : 'Text begins: ';
 
         my ($escaped_input) = $slr->call_by_tag(
-        ('@' . __FILE__ . ':' . __LINE__), 
+        ('@' . __FILE__ . ':' . __LINE__),
         <<'END_OF_LUA', 'iii', $block, $start, $display_length);
         local slr, block, start, input_length = ...
         return slr:input_escape(block, start, input_length)
@@ -1408,11 +1423,10 @@ END_OF_LUA
                 my $symbol_display_form =
                     $grammar->symbol_display_form(
                     $asf->glade_symbol_id($first_downglade) );
-                my $block = 1; # TODO -- glade_span() should return block
+                my $block = 1; # TODO -- Delete after development
                 my ( $start, $first_length ) =
                     $asf->glade_span($first_downglade);
-                my ( undef, $this_length ) =
-                    $asf->glade_span($this_downglade);
+                my $this_length = $asf->glade_L0_length($this_downglade);
                 my ( $start_line, $start_column ) = $slr->line_column($start);
                 my $display_length =
                     List::Util::min( $first_length, $this_length, 60 );
@@ -1422,7 +1436,7 @@ END_OF_LUA
                 if ( $display_length > 0 ) {
 
                     my ($piece) = $slr->call_by_tag(
-                    ('@' . __FILE__ . ':' . __LINE__), 
+                    ('@' . __FILE__ . ':' . __LINE__),
                     <<'END_OF_LUA', 'iii', $block, $start, $display_length);
                     local slr, block, start, input_length = ...
                     local escaped_input = slr:input_escape(block, start, input_length)
@@ -1444,8 +1458,7 @@ END_OF_LUA
                     # Choices may be zero length
                     my $choice_number = $glade_ix + 1;
                     my $glade_id      = $display_downglade[$glade_ix];
-                    my $block = 1; # TODO: Add block to glade_span()
-                    my ( undef, $length ) = $asf->glade_span($glade_id);
+                    my $length = $asf->glade_L0_length($glade_id);
                     if ( $length <= 0 ) {
                         $result
                             .= qq{  Choice $choice_number is zero length\n};
@@ -1457,7 +1470,7 @@ END_OF_LUA
                         .= qq{  Choice $choice_number, length=$length, ends at line $end_line, column $end_column\n};
 
                     my ($piece) = $slr->call_by_tag(
-                    ('@' . __FILE__ . ':' . __LINE__), 
+                    ('@' . __FILE__ . ':' . __LINE__),
                     <<'END_OF_LUA', 'iiii', $choice_number, $block, $start, $length);
                     local slr, choice_number, block, start, input_length = ...
                     local subpieces = {}
@@ -1637,7 +1650,7 @@ sub Marpa::R3::Internal::ASF::Traverse::rh_value {
 
 sub Marpa::R3::Internal::ASF::Traverse::rh_values {
     my ( $traverser ) = @_;
-    return map { Marpa::R3::Internal::ASF::Traverse::rh_value( $traverser, $_ ) } 
+    return map { Marpa::R3::Internal::ASF::Traverse::rh_value( $traverser, $_ ) }
         0 .. Marpa::R3::Internal::ASF::Traverse::rh_length( $traverser ) - 1;
 }
 
