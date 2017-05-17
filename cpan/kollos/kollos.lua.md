@@ -1570,13 +1570,16 @@ Factory to create iterator over the sweeps in a G1 range.
 TODO: Allow for leading trailer, final trailer.
 
 ```
+    -- miranda: section+ forward declarations
+    local sweep_range
     -- miranda: section+ most Lua function definitions
-    function _M.class_slr.sweep_range(slr, g1_first, g1_last)
+    function sweep_range(slr, g1_first, g1_last)
          local function iter()
              if not g1_last then g1_last = g1_first end
              local g1_ix = g1_first+1
              while true do
                  local this_per_es = slr.per_es[g1_ix]
+                 if not this_per_es then return end
                  for sweep_ix = 1, #this_per_es, 3 do
                       coroutine.yield(this_per_es[sweep_ix],
                           this_per_es[sweep_ix+1],
@@ -1592,6 +1595,37 @@ TODO: Allow for leading trailer, final trailer.
                      end
                  end
                  g1_ix = g1_ix + 1
+             end
+         end
+         return coroutine.wrap(iter)
+    end
+
+    -- miranda: section+ forward declarations
+    local reverse_sweep_range
+    -- miranda: section+ most Lua function definitions
+    local function reverse_sweep_range(slr, g1_last, g1_first)
+         local function iter()
+             if not g1_first then g1_first = g1_last end
+             local g1_ix = g1_last+1
+             while true do
+                 local this_per_es = slr.per_es[g1_ix]
+                 if not this_per_es then return end
+                 local last_sweep_ix = 3*math.tointeger((#this_per_es-1)/3)+1
+                 for sweep_ix = last_sweep_ix, 1, -3 do
+                      coroutine.yield(this_per_es[sweep_ix],
+                          this_per_es[sweep_ix+1],
+                          this_per_es[sweep_ix+2])
+                 end
+                 if g1_ix <= g1_first then return end
+                 local this_trailer = slr.trailers[g1_ix]
+                 if this_trailer then
+                     for sweep_ix = 1, #this_trailer, 3 do
+                          coroutine.yield(this_trailer[sweep_ix],
+                              this_trailer[sweep_ix+1],
+                              this_trailer[sweep_ix+2])
+                     end
+                 end
+                 g1_ix = g1_ix - 1
              end
          end
          return coroutine.wrap(iter)
@@ -1621,7 +1655,7 @@ TODO: Allow for leading trailer, final trailer.
         local pieces = {}
         local inputs = slr.inputs
         for block_ix, start, len in
-            slr:sweep_range(g1_start, g1_start+g1_count-1)
+            sweep_range(slr, g1_start, g1_start+g1_count-1)
         do
             local start_byte_p = slr:per_pos(block_ix, start)
             local end_byte_p = slr:per_pos(block_ix, start + len)
@@ -1637,7 +1671,7 @@ TODO: Allow for leading trailer, final trailer.
         local inputs = slr.inputs
         local length = 0;
         for _, _, sweep_length in
-            slr:sweep_range(g1_start, g1_start+g1_count-1)
+            sweep_range(slr, g1_start, g1_start+g1_count-1)
         do
             length = length + sweep_length
         end
@@ -3831,14 +3865,13 @@ Caller must ensure `block` and `pos` are valid.
     end
 
     function _M.class_slr.g1_escape(slr, g1_pos, max_length)
-        local g1_ix = g1_pos + 1
         -- a worst case maximum, since each g1 location will have
         --   an L0 length of at least 1
         local g1_last = g1_pos + max_length
         local function factory()
             local function iter()
                 for this_block, this_start, this_len in
-                    slr:sweep_range(g1_pos, g1_last)
+                    sweep_range(slr, g1_pos, g1_last)
                 do
                    for this_pos = this_start, this_start + this_len - 1 do
                        local codepoint = slr:codepoint_from_pos(this_block, this_pos)
@@ -3900,10 +3933,36 @@ Caller must ensure `block` and `pos` are valid.
                 return codepoint
             end
         end
-        return _M.reversed_factory_escape(codes, max_length)
+        return reverse_factory_escape(codes, max_length)
     end
 
-    function _M.reversed_factory_escape(factory, max_length)
+    function _M.class_slr.reverse_g1_escape(slr, g1_base, max_length)
+
+        -- a worst case maximum, since each g1 location will have
+        --   an L0 length of at least 1
+        local g1_last = g1_base - (max_length + 1)
+        if g1_last < 0 then g1_last = 0 end
+
+        local function factory()
+            local function iter()
+                for this_block, this_start, this_len in
+                    reverse_sweep_range(slr, g1_base - 1, g1_last)
+                do
+                   for this_pos = this_start + this_len - 1, this_start, -1 do
+                       local codepoint = slr:codepoint_from_pos(this_block, this_pos)
+                       coroutine.yield(codepoint)
+                   end
+                end
+            end
+            return coroutine.wrap(iter)
+        end
+        return reverse_factory_escape(factory, max_length)
+    end
+
+    -- miranda: section+ forward declarations
+    local reverse_factory_escape
+    -- miranda: section+ diagnostics
+    function reverse_factory_escape(factory, max_length)
         local length_so_far = 0
         local reversed = {}
         for codepoint in factory() do
@@ -4583,6 +4642,7 @@ a special "configuration" argument.
 
     local _M = require "kollos.metal"
 
+    -- miranda: insert forward declarations
     -- miranda: insert internal utilities
 
     -- miranda: insert create metal tables

@@ -1047,7 +1047,6 @@ sub glade_obtain {
 
         my $symch = $choicepoint_powerset->nidset($asf, $symch_ix);
         my $nid_count = $symch->count();
-        my $factorings_omitted;
         FACTORINGS_LOOP:
         for ( my $nid_ix = 0; $nid_ix < $nid_count; $nid_ix++ ) {
             $choicepoint_nid = $symch_nidset->nid($nid_ix);
@@ -1363,6 +1362,7 @@ sub Marpa::R3::Internal::ASF::ambiguities_show {
             # TODO -- glade span must return block
             #         for now it is always 1
             my $block = 1;
+            my ( $g1_start )       = $asf->glade_g1_span($glade);
             my ( $start,      $length )       = $asf->glade_span($glade);
             my ( $start_line, $start_column ) = $slr->line_column($start);
             my ( $end_line,   $end_column ) =
@@ -1378,9 +1378,9 @@ sub Marpa::R3::Internal::ASF::ambiguities_show {
 
         my ($escaped_input) = $slr->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__),
-        <<'END_OF_LUA', 'iii', $block, $start, $display_length);
-        local slr, block, start, input_length = ...
-        return slr:input_escape(block, start, input_length)
+        <<'END_OF_LUA', 'ii', $g1_start, $display_length);
+        local slr, g1_start, input_length = ...
+        return slr:g1_escape(g1_start, input_length)
 END_OF_LUA
 
             $result
@@ -1426,6 +1426,8 @@ END_OF_LUA
                 my $block = 1; # TODO -- Delete after development
                 my ( $start, $first_length ) =
                     $asf->glade_span($first_downglade);
+                my ( $g1_start ) =
+                    $asf->glade_g1_span($first_downglade);
                 my $this_length = $asf->glade_L0_length($this_downglade);
                 my ( $start_line, $start_column ) = $slr->line_column($start);
                 my $display_length =
@@ -1437,9 +1439,9 @@ END_OF_LUA
 
                     my ($piece) = $slr->call_by_tag(
                     ('@' . __FILE__ . ':' . __LINE__),
-                    <<'END_OF_LUA', 'iii', $block, $start, $display_length);
-                    local slr, block, start, input_length = ...
-                    local escaped_input = slr:input_escape(block, start, input_length)
+                    <<'END_OF_LUA', 'ii', $g1_start, $display_length);
+                    local slr, g1_start, input_length = ...
+                    local escaped_input = slr:g1_escape(g1_start, input_length)
                     return "  Choices start with: " .. escaped_input .. "\n"
 END_OF_LUA
 
