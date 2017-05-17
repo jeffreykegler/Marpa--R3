@@ -3832,18 +3832,6 @@ Caller must ensure `block` and `pos` are valid.
 
     function _M.class_slr.g1_escape(slr, g1_pos, max_length)
         local g1_ix = g1_pos + 1
-        local this_es = per_es[g1_ix]
-        if not this_sweep then
-            error(string.format(
-                "slr:g1_escape(%d): bad g1_pos argument\n\z
-                \u{20}   Allowed values are %d-%d\n",
-                g1_pos, 0, #per_es-1
-            ))
-        end
-        local sweep_ix = 1
-        local this_block = this_es[1]
-        local this_pos = this_es[2]
-        local this_block_last = this_pos + this_es[3] - 1
         -- a worst case maximum, since each g1 location will have
         --   an L0 length of at least 1
         local g1_last = g1_pos + max_length
