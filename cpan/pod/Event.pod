@@ -606,10 +606,10 @@ normalize-whitespace: 1
         for my $event ( @{ $recce->events() } ) {
             my ($name) = @{$event};
             if ( $name eq 'target' ) {
-                @shortest_span = $recce->last_completed_span('target');
+                @shortest_span = $recce->last_completed('target');
                 diag(
                     "Preliminary target at $pos: ",
-                    $recce->literal(@shortest_span)
+                    $recce->g1_literal(@shortest_span)
                 ) if $verbose;
                 next EVENT;
             } ## end if ( $name eq 'target' )

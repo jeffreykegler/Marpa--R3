@@ -1457,25 +1457,6 @@ allows the recognizer's exhaustion status to be discovered directly.
 Parse exhaustion is discussed in detail in
 L<a separate document|Marpa::R3::Exhaustion>.
 
-=head2 g1_location_to_span()
-
-=for Marpa::R3::Display
-name: Scanless g1_location_to_span() synopsis
-
-        my ( $span_start, $span_length ) =
-            $recce->g1_location_to_span($g1_location);
-
-=for Marpa::R3::Display::End
-
-G1 locations do not correspond to a single input stream
-location, but to a span of them.
-The C<g1_location_to_span()> method
-returns an B<array> of two elements, representing a
-L<span|/"Spans"> in the physical input stream.
-G1 location 0 does not correspond to a input stream span so,
-as a special case,
-the input stream span for G1 location 0 is returned as (0,0).
-
 =head2 input_length()
 
 =for Marpa::R3::Display
@@ -1536,35 +1517,6 @@ the longest.
 If there was no match,
 C<last_completed()> returns the empty array in array context
 and a Perl false in scalar context.
-
-=head2 last_completed_span()
-
-=for Marpa::R3::Display
-name: SLIF recognizer last_completed_span() synopsis
-normalize-whitespace: 1
-
-        my @longest_span = $recce->last_completed_span('target');
-        diag( "Actual target at $pos: ", $recce->literal(@longest_span) ) if $verbose;
-
-=for Marpa::R3::Display::End
-
-Returns the most recent input stream span for a completed
-instance of the symbol name
-that is its first and only argument.
-That argument is required.
-The search for a completed instance of a symbol
-can only succeed if the first argument
-is the name
-of the LHS symbol of some rule in the grammar.
-For details on how the input stream span is determined,
-see L<"Literals and G1 spans">.
-
-If more than one instance of the symbol
-ends at the same location,
-C<last_completed_span()> returns the longest span.
-If there is no symbol instance for the argument symbol,
-C<last_completed_span()> returns the empty array.
-Other failures are thrown.
 
 =head2 line_column()
 

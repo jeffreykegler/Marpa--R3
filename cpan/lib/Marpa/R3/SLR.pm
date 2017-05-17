@@ -51,37 +51,6 @@ END_OF_LUA
     return $start, $length;
 } ## end sub Marpa::R3::Scanless::R::last_completed
 
-# Returns most input stream span for symbol.
-# If more than one ends at the same location,
-# returns the longest.
-# Returns under if there is no such span.
-# Other failure is thrown.
-sub Marpa::R3::Scanless::R::last_completed_span {
-    my ( $slr, $symbol_name ) = @_;
-    my ($g1_origin, $g1_span) = $slr->last_completed( $symbol_name );
-    return if not defined $g1_origin;
-    my ($start_input_location) = $slr->g1_location_to_span($g1_origin);
-    my @end_span = $slr->g1_location_to_span($g1_origin + $g1_span - 1);
-    return ($start_input_location, ($end_span[0]+$end_span[1])-$start_input_location);
-}
-
-sub Marpa::R3::Scanless::R::g1_input_span {
-    my ( $slr, $g1_start, $g1_count ) = @_;
-    my ($l0_start, $l0_count) = $slr->call_by_tag(
-    ('@' . __FILE__ . ':' . __LINE__),
-    <<'END_OF_LUA', 'ii', $g1_start, $g1_count);
-    local recce, g1_start, g1_count = ...
-    if g1_count < 0 then
-        error(string.format(
-            "Error in $slr->g1_input_span(%d, %d): count < 0\n",
-            g1_start, g1_count))
-    end
-    return recce:g1_to_l0_span(g1_start, g1_count)
-END_OF_LUA
-
-    return ($l0_start, $l0_count);
-}
-
 # Given a scanless recognizer and
 # and two earley sets, return the input string
 sub Marpa::R3::Scanless::R::g1_literal {
@@ -98,13 +67,9 @@ END_OF_LUA
 
 } ## end sub Marpa::R3::Scanless::R::g1_literal
 
-sub Marpa::R3::Scanless::R::g1_location_to_span {
-    my ( $slr, $g1_location ) = @_;
-    return $slr->g1_input_span( $g1_location, 1 );
-}
-
 # Substring in terms of locations in the input stream
 # This is the one users will be most interested in.
+# TODO - Document block_ix parameter
 sub Marpa::R3::Scanless::R::literal {
     my ( $slr, $l0_start, $l0_count, $block_ix ) = @_;
 

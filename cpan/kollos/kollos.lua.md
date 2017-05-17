@@ -1794,54 +1794,6 @@ an L0 range
     end
 ```
 
-Given a G1 span return an L0 span.
-Note that the data for G1 location `n` is kept in
-`per_es[n+1]`, the data for Earley set `n+1`.
-Never fails -- any G1 span is converted into some
-kind of L0 span.  Further,
-the L0 span is zero-count iff the count of the G1
-span is zero or less.
-
-TODO -- Do I need to keep this?  If so, I must add
-logic for blocks.
-
-```
-    -- miranda: section+ most Lua function definitions
-    function _M.class_slr.g1_to_l0_span(slr, g1_start, g1_count)
-         local per_es = slr.per_es
-         if g1_count <= 0 then
-             if g1_start < 0 then
-                 return 0, 0
-             end
-             if g1_start >= #per_es then
-                 local last_data = per_es[#per_es]
-                 return last_data[2] + last_data[3], 0
-             end
-             local first_per_es = per_es[g1_start+1]
-             return first_per_es[2], 0
-         end
-         -- count cannot be less than 1,
-         -- g1_end >= g1_start, always
-         local g1_end = g1_start + g1_count - 1
-         if g1_start < 0 then g1_start = 0 end
-         if g1_end < 0 then g1_end = 0 end
-         if g1_start >= #per_es then g1_start = #per_es - 1 end
-         if g1_end >= #per_es then g1_end = #per_es - 1 end
-         local start_per_es = per_es[g1_start+1]
-         local end_per_es = per_es[g1_end+1]
-         local l0_start = start_per_es[2]
-         local end_es_start = end_per_es[2]
-         local end_es_length = end_per_es[3]
-         local l0_length = end_es_start + end_es_length - l0_start
-         -- Because Marpa allowed backward jumps in the input, negative
-         -- lengths were possible.  Change these to point to a single
-         -- character.
-         if l0_length < 1 then l0_length = 1 end
-         return l0_start, l0_length
-    end
-
-```
-
 ### Events
 
 ```

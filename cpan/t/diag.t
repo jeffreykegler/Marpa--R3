@@ -433,27 +433,37 @@ END_OF_OUTPUT
     my @spans         = ();
     for my $g1_location (
         sort { $a <=> $b }
-        grep { !$location_seen{$_}++; } map { $_->[-1] } @{$progress_output}
+        grep { !$location_seen{$_}++ and $_ != $g1_pos ; } map { $_->[-1] } @{$progress_output}
         )
     {
 
 # Marpa::R3::Display
-# name: Scanless g1_location_to_span() synopsis
+# name: Scanless g1_to_l0_first() synopsis
 
-        my ( $span_start, $span_length ) =
-            $recce->g1_location_to_span($g1_location);
+        my ( $first_block, $first_l0_pos ) =
+            $recce->g1_to_l0_first($g1_location);
 
 # Marpa::R3::Display::End
 
-        push @spans, [ $g1_location, $span_start, $span_length ];
-    } ## end for my $g1_location ( sort { $a <=> $b } grep { !$location_seen...})
+# Marpa::R3::Display
+# name: Scanless g1_to_l0_last() synopsis
+
+        my ( $last_block, $last_l0_pos ) =
+            $recce->g1_to_l0_last($g1_location);
+
+# Marpa::R3::Display::End
+
+        push @spans, [ $g1_location, $first_block, $first_l0_pos, $last_block, $last_l0_pos];
+    }
 
     # One result for each unique G1 location in progress report
-    # Format of each result is [g1_location, span_start, span_length]
+    # Format of each result is
+    #    [g1_location, first_block, first_l0_pos, last_block, last_l0_pos]
+
     my $expected_spans =
-        [ [ 0, 0, 1 ], [ 6, 10, 1 ], [ 10, 18, 1 ], [ 11, 18, 1 ] ];
+          [ [ 0, 1, 0, 1, 0 ], [ 6, 1, 10, 1, 10 ], [ 10, 1, 18, 1, 18 ] ];
     Test::More::is_deeply( \@spans, $expected_spans,
-        qq{Scanless g1_location_to_span()} );
+        qq{Scanless g1_to_l0_first() & g1_to_l0_last() } );
 
 } ## end TEST: for my $test_data (@tests_data)
 

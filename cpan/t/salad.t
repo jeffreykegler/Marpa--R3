@@ -187,13 +187,8 @@ sub test {
 
         $pos = $recce->resume($prefix_end);
 
-# Marpa::R3::Display
-# name: SLIF recognizer last_completed_span() synopsis
-
         my @longest_span = $recce->last_completed('target');
         diag( "Actual target at $pos: ", $recce->g1_literal(@longest_span) ) if $verbose;
-
-# Marpa::R3::Display::End
 
         last TARGET if not scalar @longest_span;
         push @found, $recce->g1_literal(@longest_span);
