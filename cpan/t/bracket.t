@@ -13,16 +13,11 @@
 # This utility searches for mismatched braces --
 # curly, square and round.
 
-# Two not yet documented (but supported) features of Marpa::R3 are used.
+# TODO: Two not yet documented (but supported) features of Marpa::R3 are used.
 #
 # The 'rejection' recognizer setting causes an event to occur when all
 # alternatives are rejected at a location.  (The default is for this to
 # be a fatal error.)
-#
-# The $recce->last_completed_span($symbol) method takes one argument:
-# the name of a symbol.  It returns the input stream span of the most
-# recent instance of that symbol.  If more than one begins at the most
-# recent location, it returns the longest.
 
 use 5.010001;
 use strict;
@@ -289,9 +284,10 @@ sub test {
         # We've created a properly bracketed span of the input, using
         # the Ruby Slippers token.  Use Marpa's tables to find its
         # beginning.
-        my ($opening_bracket) = $recce->last_completed_span('balanced');
-        my ( $line, $column ) = $recce->line_column($opening_bracket);
-        my $opening_column0 = $opening_bracket - ( $column - 1 );
+        my ($opening_bracket) = $recce->last_completed('balanced');
+        my ( $bracket_block, $bracket_l0_pos ) = $recce->g1_to_l0_first( $opening_bracket );
+        my ( $line, $column ) = $recce->line_column($opening_bracket, $bracket_block );
+        my $opening_column0 = $bracket_l0_pos - ( $column - 1 );
 
         if ( $line == $pos_line ) {
 
@@ -390,9 +386,11 @@ sub test {
         # Used for testing
         push @fixes, "$pos$token_literal" if $fixes;
 
-        my ($opening_bracket) = $recce->last_completed_span('balanced');
-        my ( $line, $column ) = $recce->line_column($opening_bracket);
-        my $opening_column0 = $opening_bracket - ( $column - 1 );
+        my ($opening_bracket) = $recce->last_completed('balanced');
+        my ( $bracket_block, $bracket_l0_pos ) = $recce->g1_to_l0_first( $opening_bracket );
+        my ( $line, $column ) = $recce->line_column($opening_bracket, $bracket_block );
+        my $opening_column0 = $bracket_l0_pos - ( $column - 1 );
+
         my $problem = join "\n",
               "* Line $line, column $column: Opening " . q{'}
             . $literal_match{$token_literal}

@@ -1652,6 +1652,7 @@ TODO: Allow for leading trailer, final trailer.
             -- g1_start, g1_count
         -- ))
 
+        if g1_count <= 0 then return '' end
         local pieces = {}
         local inputs = slr.inputs
         for block_ix, start, len in

@@ -143,10 +143,10 @@ sub test {
         for my $event ( @{ $recce->events() } ) {
             my ($name) = @{$event};
             if ( $name eq 'target' ) {
-                @shortest_span = $recce->last_completed_span('target');
+                @shortest_span = $recce->last_completed('target');
                 diag(
                     "Preliminary target at $pos: ",
-                    $recce->literal(@shortest_span)
+                    $recce->g1_literal(@shortest_span)
                 ) if $verbose;
                 next EVENT;
             } ## end if ( $name eq 'target' )
@@ -168,7 +168,8 @@ sub test {
         # completed <target>.  This will be our longest match.
 
         diag( join q{ }, @shortest_span ) if $verbose;
-        my $prefix_end = $shortest_span[0];
+        my (undef, $prefix_end) = $recce->g1_to_l0_first($shortest_span[0]);
+
         $recce = Marpa::R3::Scanless::R->new(
             {   grammar    => $g,
             },
@@ -189,19 +190,21 @@ sub test {
 # Marpa::R3::Display
 # name: SLIF recognizer last_completed_span() synopsis
 
-        my @longest_span = $recce->last_completed_span('target');
-        diag( "Actual target at $pos: ", $recce->literal(@longest_span) ) if $verbose;
+        my @longest_span = $recce->last_completed('target');
+        diag( "Actual target at $pos: ", $recce->g1_literal(@longest_span) ) if $verbose;
 
 # Marpa::R3::Display::End
 
         last TARGET if not scalar @longest_span;
-        push @found, $recce->literal(@longest_span);
-        diag( "Found target at $pos: ", $recce->literal(@longest_span) ) if $verbose;
+        push @found, $recce->g1_literal(@longest_span);
+        diag( "Found target at $pos: ", $recce->g1_literal(@longest_span) ) if $verbose;
 
         # Move the search location forward,
         # in preparation for looking for the next target
 
-        $target_start = $longest_span[0] + $longest_span[1];
+        ( undef, $target_start ) = $recce->g1_to_l0_last(
+             $longest_span[0] + $longest_span[1] - 1);
+         $target_start += 1;
 
     } ## end TARGET: while ( $target_start < $input_length )
     return join "\n", @found, q{};
