@@ -275,16 +275,17 @@ sub located_traverser {
     return ( join q{ }, @return_value) . "\n" if  $symbol_name eq '[:start]' ;
 
 # Marpa::R3::Display::Start
-# name: ASF span() traverser method example
+# name: ASF g1_span() traverser method example
 
     my ( $g1_start, $g1_length ) = $glade->g1_span();
+
+# Marpa::R3::Display::End
+
     my $asf = $glade->asf();
     my $recce = $asf->recce();
     my ( $block1, $pos1 ) = $recce->g1_to_l0_first( $g1_start );
     my ( $block2, $pos2 ) = $recce->g1_to_l0_last( $g1_start + $g1_length - 1 );
     my $location = $recce->lc_brief($block1, $pos1, $block2, $pos2);
-
-# Marpa::R3::Display::End
 
     # Remove clutter in the display:
     #   Everything is expected to be in block 1, line 1

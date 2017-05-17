@@ -330,27 +330,26 @@ Returns the B<glade literal>, a string in the input which corresponds to this gl
 The glade literal remains constant inside a glade.
 The C<literal()> method accepts no arguments.
 
-=head2 span()
+=head2 g1_span()
 
 =for Marpa::R3::Display::Start
-name: ASF span() traverser method example
+name: ASF g1_span() traverser method example
 normalize-whitespace: 1
 partial: 1
 
-    my ( $start, $length ) = $glade->span();
-    my $end = $start + $length - 1;
+    my ( $g1_start, $g1_length ) = $glade->g1_span();
 
 =for Marpa::R3::Display::End
 
-Returns the B<glade span>, two numbers which describe
-the location which corresponds to this glade.
+Returns the B<G1 glade span>.
 The first number will be the start of the span, as
 an offset in the input stream.
 The second number will be its length.
+Both will be in G1 location terms.
 The glade span remains constant within a glade.
-The C<span()> method accepts no arguments.
+The C<g1_span()> method accepts no arguments.
 
-The "end" character of the span, when defined, may be calculated as
+The "end" G1 location of the span, when defined, may be calculated as
 its start plus its length, minus one.
 Applications should note that glades representing nulled symbols
 are special cases.

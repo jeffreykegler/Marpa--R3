@@ -1668,6 +1668,7 @@ TODO: Allow for leading trailer, final trailer.
     end
 
     function _M.class_slr.g1_span_l0_length(slr, g1_start, g1_count)
+        if g1_count == 0 then return 0 end
         local inputs = slr.inputs
         local length = 0;
         for _, _, sweep_length in

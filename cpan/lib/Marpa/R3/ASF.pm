@@ -1110,20 +1110,10 @@ sub Marpa::R3::ASF::glade_g1_span {
     return $g1_start, $g1_length;
 }
 
-# TODO Eliminate this method?
-#    L0 spans are no longer well-defined for glades
-sub Marpa::R3::ASF::glade_span {
-    my ( $asf, $glade_id ) = @_;
-    my ($g1_start, $g1_length) = $asf->glade_g1_span( $glade_id );
-    my $slr           = $asf->[Marpa::R3::Internal::ASF::SLR];
-    return $slr->g1_input_span( $g1_start, $g1_length );
-}
-
 sub Marpa::R3::ASF::glade_L0_length {
     my ( $asf, $glade_id ) = @_;
     my ($g1_start, $g1_length) = $asf->glade_g1_span( $glade_id );
     my $slr           = $asf->[Marpa::R3::Internal::ASF::SLR];
-    return $slr->g1_input_span( $g1_start, $g1_length );
 
     my ($l0_length) = $slr->call_by_tag(
     ('@' . __FILE__ . ':' . __LINE__),
