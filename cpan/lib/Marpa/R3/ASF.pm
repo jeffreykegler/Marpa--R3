@@ -1426,7 +1426,7 @@ END_OF_LUA
                 my $block = 1; # TODO -- Delete after development
                 my ( $start, $first_length ) =
                     $asf->glade_span($first_downglade);
-                my ( $g1_start ) =
+                my ( $g1_start, $g1_length ) =
                     $asf->glade_g1_span($first_downglade);
                 my $this_length = $asf->glade_L0_length($this_downglade);
                 my ( $start_line, $start_column ) = $slr->line_column($start);
@@ -1460,31 +1460,32 @@ END_OF_LUA
                     # Choices may be zero length
                     my $choice_number = $glade_ix + 1;
                     my $glade_id      = $display_downglade[$glade_ix];
-                    my $length = $asf->glade_L0_length($glade_id);
-                    if ( $length <= 0 ) {
+                    my $l0_length = $asf->glade_L0_length($glade_id);
+                    if ( $l0_length <= 0 ) {
                         $result
                             .= qq{  Choice $choice_number is zero length\n};
                         next DISPLAY_GLADE;
                     }
                     my ( $end_line, $end_column ) =
-                        $slr->line_column( $start + $length - 1 );
+                        $slr->line_column( $start + $l0_length - 1 );
                     $result
-                        .= qq{  Choice $choice_number, length=$length, ends at line $end_line, column $end_column\n};
+                        .= qq{  Choice $choice_number, length=$l0_length, ends at line $end_line, column $end_column\n};
 
                     my ($piece) = $slr->call_by_tag(
                     ('@' . __FILE__ . ':' . __LINE__),
-                    <<'END_OF_LUA', 'iiii', $choice_number, $block, $start, $length);
-                    local slr, choice_number, block, start, input_length = ...
+                    <<'END_OF_LUA', 'iiii', $choice_number, $g1_start, $g1_length, $l0_length);
+                    local slr, choice_number, g1_start, g1_length, l0_length = ...
                     local subpieces = {}
                     local escaped_input
-                    if input_length > 60 then
+                    if l0_length > 60 then
                         escaped_input =
-                            slr:reversed_input_escape(block, start + input_length, 60)
+                            slr:reversed_g1_escape(g1_start + g1_length, 60)
                         subpieces[#subpieces+1] = string.format("  Choice %d ending: %s\n",
                             choice_number,
                             escaped_input)
                     end
-                    escaped_input = slr:input_escape(block, start, input_length)
+                    local display_length = math.min(l0_length, 60)
+                    escaped_input = slr:g1_escape(g1_start, display_length)
                     subpieces[#subpieces+1] = string.format("  Choice %d: %s\n",
                             choice_number,
                             escaped_input)
