@@ -1353,28 +1353,23 @@ sub Marpa::R3::Internal::ASF::ambiguities_show {
         my $type = $ambiguity->[0];
         if ( $type eq 'symch' ) {
 
-            # Not tested !!!!
             my ( undef, $glade ) = @{$ambiguity};
             my $symbol_display_form =
                 $grammar->symbol_display_form(
                 $asf->glade_symbol_id($glade) );
 
-            # TODO -- glade span must return block
-            #         for now it is always 1
-            my $block = 1;
-            my ( $g1_start )       = $asf->glade_g1_span($glade);
-            my ( $start,      $length )       = $asf->glade_span($glade);
-            my ( $start_line, $start_column ) = $slr->line_column($start);
-            my ( $end_line,   $end_column ) =
-                $slr->line_column( $start + $length - 1 );
-            my $display_length = List::Util::min( $length, 60 );
+            my $l0_length = $asf->glade_L0_length($glade);
+            my ( $g1_start, $g1_length )       = $asf->glade_g1_span($glade);
+            my ( $l0_block1,      $l0_pos1 )       = $slr->g1_to_l0_first($g1_start);
+            my ( $l0_block2,      $l0_pos2 )       = $slr->g1_to_l0_last($g1_start + $g1_length -1);
+            my $l0_range = $slr->lc_brief($l0_block1, $l0_pos1, $l0_block2, $l0_pos2);
+            my $display_length = List::Util::min( $l0_length, 60 );
             $result
                 .= qq{Ambiguous symch at Glade=$glade, Symbol=<$symbol_display_form>:\n};
             $result
-                .= qq{  The ambiguity is from line $start_line, column $start_column }
-                . qq{to line $end_line, column $end_column\n};
+                .= qq{  The ambiguity is at $l0_range\n};
             my $literal_label =
-                $display_length == $length ? 'Text is: ' : 'Text begins: ';
+                $display_length == $l0_length ? 'Text is: ' : 'Text begins: ';
 
         my ($escaped_input) = $slr->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__),

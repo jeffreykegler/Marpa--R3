@@ -58,7 +58,7 @@ $r->read( \$input );
  my $ambiguous_status = $r->ambiguous();
 my $expected = <<'EOS';
 Ambiguous symch at Glade=2, Symbol=<Expr>:
-  The ambiguity is from line 1, column 1 to line 1, column 10
+  The ambiguity is at B1L1c1-10
   Text is: 2**7-3**10
   There are 2 symches
   Symch 0 is a rule: Expr ::= Expr '**' Expr

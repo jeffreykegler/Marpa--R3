@@ -43,7 +43,7 @@ my $input           = 'aa';
 my $expected_value   = 'Application grammar is ambiguous';
 my $expected_result = <<'END_OF_MESSAGE';
 Ambiguous symch at Glade=2, Symbol=<pair>:
-  The ambiguity is from line 1, column 1 to line 1, column 2
+  The ambiguity is at B1L1c1-2
   Text is: aa
   There are 2 symches
   Symch 0 is a rule: pair ::= duple
