@@ -257,12 +257,7 @@ END_OF_LUA
     $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'si', $event_name, $is_active );
         local slr, event_name, activate = ...
-        local slg = slr.slg
-        local event_data = slg.completion_event_by_name[event_name]
-        if event_data then
-            local isyid = event_data.isyid
-            slr.g1.lmw_r:completion_symbol_activate(isyid, activate)
-        end
+        return slr:activate_by_event_name(event_name, activate)
 END_OF_LUA
 
         my $symbol_ids =
@@ -2000,15 +1995,11 @@ sub Marpa::R3::Scanless::R::activate {
     my ( $slr, $event_name, $activate ) = @_;
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     $activate //= 1;
+
     $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'si', $event_name, $activate );
         local slr, event_name, activate = ...
-        local slg = slr.slg
-        local event_data = slg.completion_event_by_name[event_name]
-        if event_data then
-            local isyid = event_data.isyid
-            slr.g1.lmw_r:completion_symbol_activate(isyid, activate)
-        end
+        return slr:activate_by_event_name(event_name, activate)
 END_OF_LUA
 
     my $event_symbol_ids_by_type =
