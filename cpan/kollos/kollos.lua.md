@@ -1893,6 +1893,12 @@ an L0 range
             local isyid = event_data.isyid
             slr.g1.lmw_r:nulled_symbol_activate(isyid, activate)
         end
+
+        event_data = slg.prediction_event_by_name[event_name]
+        if event_data then
+            local isyid = event_data.isyid
+            slr.g1.lmw_r:prediction_symbol_activate(isyid, activate)
+        end
     end
 ```
 

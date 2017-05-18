@@ -309,18 +309,6 @@ END_OF_LUA
         end
 END_OF_LUA
 
-        $symbol_ids =
-            $symbol_ids_by_event_name_and_type->{$event_name}->{prediction}
-            // [];
-        for my $symbol_id ( @{ $symbol_ids } ) {
-            $slr->call_by_tag(
-    ('@' . __FILE__ . ':' . __LINE__),
-            <<'END_OF_LUA', 'ii', $symbol_id, $is_active );
-            local recce, symbol_id, activate = ...
-            recce.g1.lmw_r:prediction_symbol_activate(symbol_id, activate)
-END_OF_LUA
-        }
-
     } ## end EVENT: for my $event_name ( keys %{$event_is_active_arg} )
 
         $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
@@ -1993,14 +1981,6 @@ END_OF_LUA
       $slg
       ->[Marpa::R3::Internal::Scanless::G::SYMBOL_IDS_BY_EVENT_NAME_AND_TYPE]
       ->{$event_name};
-
-    for my $event ( @{ $event_symbol_ids_by_type->{prediction} } ) {
-        $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-            <<'END_OF_LUA', 'ii', $event, $activate );
-        local recce, event, activate = ...
-        recce.g1.lmw_r:prediction_symbol_activate(event, activate)
-END_OF_LUA
-    }
 
     {
         my $symbol_ids = $event_symbol_ids_by_type->{lexeme} // [];
