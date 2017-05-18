@@ -355,15 +355,18 @@ END_OF_LUA
 
     $slg->call_by_tag(
         ('@' .__FILE__ . ':' .  __LINE__),
-        <<'END_OF_LUA', 'i', $completion_events_by_name // {});
-        local slg, completion_events = ...
+        <<'END_OF_LUA', 's', $hashed_source );
+        local slg, hashed_source = ...
+        local completion_events = hashed_source.completion_events or {}
+
         local g1g = slg.g1.lmw_g
         local isy_names = {}
         local completion_event_by_isy = {}
         local completion_event_by_name = {}
         for isy_name, event in pairs(completion_events) do
+            -- print(inspect(event))
             local event_name = event[1]
-            local is_active = event[2]
+            local is_active = (event[2] ~= "0")
             local isyid = g1g.isyid_by_name[isy_name]
             if not isyid then
                 -- print(inspect(g1g.isyid_by_name))
@@ -382,13 +385,12 @@ END_OF_LUA
 
             --  Must be done before precomputation
             g1g:symbol_is_completion_event_set(isyid, 1)
-            if is_active == 0 then
+            if not is_active then
                 g1g:completion_symbol_activate(isyid, 0)
             end
         end
         slg.completion_event_by_isy = completion_event_by_isy
         slg.completion_event_by_name = completion_event_by_name
-        -- print(inspect(completion_events))
 END_OF_LUA
 
     my $nulled_events_by_name = $hashed_source->{nulled_events};
