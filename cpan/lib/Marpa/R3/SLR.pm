@@ -310,18 +310,6 @@ END_OF_LUA
 END_OF_LUA
 
         $symbol_ids =
-            $symbol_ids_by_event_name_and_type->{$event_name}->{nulled} // [];
-        # $recce_c->nulled_symbol_activate( $_, $is_active ) for @{$symbol_ids};
-        for my $symbol_id ( @{ $symbol_ids } ) {
-            $slr->call_by_tag(
-    ('@' . __FILE__ . ':' . __LINE__),
-            <<'END_OF_LUA', 'ii', $symbol_id, $is_active );
-            local recce, symbol_id, activate = ...
-            recce.g1.lmw_r:nulled_symbol_activate(symbol_id, activate)
-END_OF_LUA
-        }
-
-        $symbol_ids =
             $symbol_ids_by_event_name_and_type->{$event_name}->{prediction}
             // [];
         for my $symbol_id ( @{ $symbol_ids } ) {
@@ -920,17 +908,6 @@ my $libmarpa_event_handlers = {
         return 0;
     },
 
-    'symbol nulled' => sub {
-        my ( $slr,  $event )            = @_;
-        my ( undef, $nulled_symbol_id ) = @{$event};
-        my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-        my $nulled_event_by_id =
-            $slg->[Marpa::R3::Internal::Scanless::G::NULLED_EVENT_BY_ID];
-        push @{ $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] },
-            [ $nulled_event_by_id->[$nulled_symbol_id] ];
-        return 1;
-    },
-
     'symbol predicted' => sub {
         my ( $slr, $event ) = @_;
         my ( undef, $predicted_symbol_id ) = @{$event};
@@ -1017,10 +994,20 @@ sub Marpa::R3::Internal::Scanless::convert_libmarpa_events {
         local slr, event = ...
         -- print(inspect(event))
         local event_type = event[1]
+
         if event_type == 'symbol completed' then
             local completed_isyid = event[2]
             local slg = slr.slg
             local event_name = slg.completion_event_by_isy[completed_isyid].name
+            local events = slr.external_events
+            events[#events+1] = { event_name }
+            return '', 1
+        end
+
+        if event_type == 'symbol nulled' then
+            local nulled_isyid = event[2]
+            local slg = slr.slg
+            local event_name = slg.nulled_event_by_isy[nulled_isyid].name
             local events = slr.external_events
             events[#events+1] = { event_name }
             return '', 1
@@ -2006,14 +1993,6 @@ END_OF_LUA
       $slg
       ->[Marpa::R3::Internal::Scanless::G::SYMBOL_IDS_BY_EVENT_NAME_AND_TYPE]
       ->{$event_name};
-
-    for my $event ( @{ $event_symbol_ids_by_type->{nulled} } ) {
-        $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-            <<'END_OF_LUA', 'ii', $event, $activate );
-        local recce, event, activate = ...
-        recce.g1.lmw_r:nulled_symbol_activate(event, activate)
-END_OF_LUA
-    }
 
     for my $event ( @{ $event_symbol_ids_by_type->{prediction} } ) {
         $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
