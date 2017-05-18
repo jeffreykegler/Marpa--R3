@@ -896,17 +896,6 @@ my $libmarpa_event_handlers = {
         return 0;
     },
 
-    'symbol predicted' => sub {
-        my ( $slr, $event ) = @_;
-        my ( undef, $predicted_symbol_id ) = @{$event};
-        my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-        my $prediction_event_by_id =
-            $slg->[Marpa::R3::Internal::Scanless::G::PREDICTION_EVENT_BY_ID];
-        push @{ $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] },
-            [ $prediction_event_by_id->[$predicted_symbol_id] ];
-        return 1;
-    },
-
     # 'after lexeme' is same -- copied over below
     'before lexeme' => sub {
         my ( $slr,  $event )     = @_;
@@ -996,6 +985,15 @@ sub Marpa::R3::Internal::Scanless::convert_libmarpa_events {
             local nulled_isyid = event[2]
             local slg = slr.slg
             local event_name = slg.nulled_event_by_isy[nulled_isyid].name
+            local events = slr.external_events
+            events[#events+1] = { event_name }
+            return '', 1
+        end
+
+        if event_type == 'symbol predicted' then
+            local predicted_isyid = event[2]
+            local slg = slr.slg
+            local event_name = slg.prediction_event_by_isy[predicted_isyid].name
             local events = slr.external_events
             events[#events+1] = { event_name }
             return '', 1
