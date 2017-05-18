@@ -812,13 +812,17 @@ END_OF_LUA
         if ( defined $pause_value ) {
 
             $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-                <<'END_OF_LUA', 'ii', $g1_lexeme_id, $pause_value );
-    local slg, g1_lexeme_id, pause_value = ...
-    local lexeme_data = slg.g1.isys[g1_lexeme_id]
-    if pause_value == 1 then
-         lexeme_data.pause_after = true
-    elseif pause_value == -1 then
-         lexeme_data.pause_before = true
+                <<'END_OF_LUA', 'is', $g1_lexeme_id, $declarations );
+    local slg, g1_lexeme_id, declarations = ...
+    local pause_value = declarations.pause
+    if pause_value then
+        pause_value = math.tointeger(pause_value)
+        local lexeme_data = slg.g1.isys[g1_lexeme_id]
+        if pause_value == 1 then
+             lexeme_data.pause_after = true
+        elseif pause_value == -1 then
+             lexeme_data.pause_before = true
+        end
     end
 END_OF_LUA
 
