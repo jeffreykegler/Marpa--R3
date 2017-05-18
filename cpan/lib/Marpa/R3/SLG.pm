@@ -779,12 +779,18 @@ END_OF_LUA
   LEXEME: for my $lexeme_name ( keys %g1_id_by_lexeme_name ) {
         my $g1_lexeme_id = $g1_id_by_lexeme_name{$lexeme_name};
         my $declarations = $lexeme_declarations->{$lexeme_name};
-        my $priority     = $declarations->{priority} // 0;
-        my $eager     = $declarations->{eager} ? 1 : 0;
 
         $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-            <<'END_OF_LUA', 'siii', $lexeme_name, $g1_lexeme_id, $priority, $eager );
-    local slg, lexeme_name, g1_lexeme_id, priority, eager = ...
+            <<'END_OF_LUA', 'sis', $lexeme_name, $g1_lexeme_id, ($declarations // {}));
+    local slg, lexeme_name, g1_lexeme_id, declarations = ...
+    -- local slg, lexeme_name, g1_lexeme_id, priority, eager = ...
+    local lexeme_data = slg.g1.isys[g1_lexeme_id]
+    local priority = 0
+    if declarations.priority then
+        priority = declarations.priority + 0
+    end
+    lexeme_data.priority = priority
+    if declarations.eager then lexeme_data.eager = true end
     if slg.completion_event_by_isy[lexeme_name] then
         error(string.format(
             "A completion event is declared for <%s>, but it is a lexeme.\n\z
@@ -799,10 +805,7 @@ END_OF_LUA
             lexeme_name
         ))
     end
-    local lexeme_data = slg.g1.isys[g1_lexeme_id]
     lexeme_data.is_lexeme = true
-    lexeme_data.priority = priority
-    if eager ~= 0 then lexeme_data.eager = true end
 END_OF_LUA
 
         my $pause_value = $declarations->{pause};
