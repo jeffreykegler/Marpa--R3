@@ -352,6 +352,7 @@ END_OF_LUA
       = $symbol_ids_by_event_name_and_type;
 
     my $completion_events_by_name = $hashed_source->{completion_events};
+    my $nulled_events_by_name = $hashed_source->{nulled_events};
 
     $slg->call_by_tag(
         ('@' .__FILE__ . ':' .  __LINE__),
@@ -383,6 +384,7 @@ END_OF_LUA
             completion_event_by_isy[isy_name] = event_desc
             completion_event_by_name[event_name] = event_desc
 
+            --  NOT serializable
             --  Must be done before precomputation
             g1g:symbol_is_completion_event_set(isyid, 1)
             if not is_active then
@@ -417,6 +419,7 @@ END_OF_LUA
             nulled_event_by_isy[isy_name] = event_desc
             nulled_event_by_name[event_name] = event_desc
 
+            --  NOT serializable
             --  Must be done before precomputation
             g1g:symbol_is_nulled_event_set(isyid, 1)
             if not is_active then
@@ -427,25 +430,6 @@ END_OF_LUA
         slg.nulled_event_by_name = nulled_event_by_name
 
 END_OF_LUA
-
-    my $nulled_events_by_name = $hashed_source->{nulled_events};
-    my $nulled_events_by_id =
-      $slg->[Marpa::R3::Internal::Scanless::G::NULLED_EVENT_BY_ID] = [];
-    for my $symbol_name ( keys %{$nulled_events_by_name} ) {
-        my ( $event_name, $is_active ) =
-          @{ $nulled_events_by_name->{$symbol_name} };
-        my $symbol_id = $slg->symbol_by_name($symbol_name);
-        if ( not defined $symbol_id ) {
-            Marpa::R3::exception(
-                "nulled event defined for non-existent symbol: $symbol_name\n"
-            );
-        }
-
-        $slg->[Marpa::R3::Internal::Scanless::G::NULLED_EVENT_BY_ID]
-          ->[$symbol_id] = $event_name;
-        push @{ $symbol_ids_by_event_name_and_type->{$event_name}->{nulled} },
-          $symbol_id;
-    } ## end for my $symbol_name ( keys %{$nulled_events_by_name} )
 
     my $prediction_events_by_name = $hashed_source->{prediction_events};
     my $prediction_events_by_id =
@@ -838,22 +822,6 @@ END_OF_LUA
         ) if not defined $g1_id_by_lexeme_name{$lexeme_name};
     }
 
-    # Now that we know the lexemes, check attempts to defined a
-    # completion or a nulled event for one
-    for my $symbol_name ( keys %{$completion_events_by_name} ) {
-        Marpa::R3::exception(
-"A completion event is declared for <$symbol_name>, but it is a lexeme.\n",
-"  Completion events are only valid for symbols on the LHS of G1 rules.\n"
-        ) if defined $g1_id_by_lexeme_name{$symbol_name};
-    } ## end for my $symbol_name ( keys %{$completion_events_by_name...})
-
-    for my $symbol_name ( keys %{$nulled_events_by_name} ) {
-        Marpa::R3::exception(
-"A nulled event is declared for <$symbol_name>, but it is a G1 lexeme.\n",
-"  nulled events are only valid for symbols on the LHS of G1 rules.\n"
-        ) if defined $g1_id_by_lexeme_name{$symbol_name};
-    } ## end for my $symbol_name ( keys %{$nulled_events_by_name} )
-
     # Mark the lexemes, and set their data
     # already determined above.
   LEXEME: for my $lexeme_name ( keys %g1_id_by_lexeme_name ) {
@@ -863,8 +831,22 @@ END_OF_LUA
         my $eager     = $declarations->{eager} ? 1 : 0;
 
         $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-            <<'END_OF_LUA', 'iii', $g1_lexeme_id, $priority, $eager );
-    local slg, g1_lexeme_id, priority, eager = ...
+            <<'END_OF_LUA', 'siii', $lexeme_name, $g1_lexeme_id, $priority, $eager );
+    local slg, lexeme_name, g1_lexeme_id, priority, eager = ...
+    if slg.completion_event_by_isy[lexeme_name] then
+        error(string.format(
+            "A completion event is declared for <%s>, but it is a lexeme.\n\z
+            \u{20}    Completion events are only valid for symbols on the LHS of G1 rules.\n",
+            lexeme_name
+        ))
+    end
+    if slg.nulled_event_by_isy[lexeme_name] then
+        error(string.format(
+            "A nulled event is declared for <%s>, but it is a lexeme.\n\z
+            \u{20}    Nulled events are only valid for symbols on the LHS of G1 rules.\n",
+            lexeme_name
+        ))
+    end
     local lexeme_data = slg.g1.isys[g1_lexeme_id]
     lexeme_data.is_lexeme = true
     lexeme_data.priority = priority
