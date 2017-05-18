@@ -358,41 +358,45 @@ END_OF_LUA
         ('@' .__FILE__ . ':' .  __LINE__),
         <<'END_OF_LUA', 's', $hashed_source );
         local slg, hashed_source = ...
-
-        local completion_events = hashed_source.completion_events or {}
         local g1g = slg.g1.lmw_g
-        local isy_names = {}
-        local completion_event_by_isy = {}
-        local completion_event_by_name = {}
-        for isy_name, event in pairs(completion_events) do
-            -- print(inspect(event))
-            local event_name = event[1]
-            local is_active = (event[2] ~= "0")
-            local isyid = g1g.isyid_by_name[isy_name]
-            if not isyid then
-                -- print(inspect(g1g.isyid_by_name))
-                error(string.format(
-                    "Completion event defined for non-existent symbol: %s\n",
-                    isy_name
-                ))
-            end
-            local event_desc = {
-               name = event_name,
-               isyid = isyid
-            }
-            completion_event_by_isy[isyid] = event_desc
-            completion_event_by_isy[isy_name] = event_desc
-            completion_event_by_name[event_name] = event_desc
 
-            --  NOT serializable
-            --  Must be done before precomputation
-            g1g:symbol_is_completion_event_set(isyid, 1)
-            if not is_active then
-                g1g:completion_symbol_activate(isyid, 0)
+        local function event_setup(g1g, events, set_fn, activate_fn)
+            local event_by_isy = {}
+            local event_by_name = {}
+            for isy_name, event in pairs(events) do
+                -- print(inspect(event))
+                local event_name = event[1]
+                local is_active = (event[2] ~= "0")
+                local isyid = g1g.isyid_by_name[isy_name]
+                if not isyid then
+                    -- print(inspect(g1g.isyid_by_name))
+                    error(string.format(
+                        "Completion event defined for non-existent symbol: %s\n",
+                        isy_name
+                    ))
+                end
+                local event_desc = {
+                   name = event_name,
+                   isyid = isyid
+                }
+                event_by_isy[isyid] = event_desc
+                event_by_isy[isy_name] = event_desc
+                event_by_name[event_name] = event_desc
+
+                --  NOT serializable
+                --  Must be done before precomputation
+                set_fn(g1g, isyid, 1)
+                if not is_active then activate_fn(g1g, isyid, 0) end
             end
+        return event_by_isy, event_by_name
         end
-        slg.completion_event_by_isy = completion_event_by_isy
-        slg.completion_event_by_name = completion_event_by_name
+
+        slg.completion_event_by_isy, slg.completion_event_by_name
+            = event_setup(g1g,
+                (hashed_source.completion_events or {}),
+                g1g.symbol_is_completion_event_set,
+                g1g.completion_symbol_activate
+            )
 
         local nulled_events = hashed_source.nulled_events or {}
         local g1g = slg.g1.lmw_g
