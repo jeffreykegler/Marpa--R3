@@ -808,11 +808,8 @@ END_OF_LUA
     lexeme_data.is_lexeme = true
 END_OF_LUA
 
-        my $pause_value = $declarations->{pause};
-        if ( defined $pause_value ) {
-
             $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-                <<'END_OF_LUA', 'is', $g1_lexeme_id, $declarations );
+                <<'END_OF_LUA', 'is', $g1_lexeme_id, ($declarations // {}));
     local slg, g1_lexeme_id, declarations = ...
     local pause_value = declarations.pause
     if pause_value then
@@ -823,30 +820,24 @@ END_OF_LUA
         elseif pause_value == -1 then
              lexeme_data.pause_before = true
         end
+        local event = declarations.event
+        local is_active = 1
+        if event then
+            is_active = event[2] ~= '0'
+        end
+        local lexeme_data = slg.g1.isys[g1_lexeme_id]
+        if is_active then
+            -- activate only if event is enabled
+            lexeme_data.pause_after_active = lexeme_data.pause_after
+            lexeme_data.pause_before_active = lexeme_data.pause_before
+        else
+            lexeme_data.pause_after_active = nil
+            lexeme_data.pause_before_active = nil
+        end
     end
 END_OF_LUA
 
-            $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-                <<'END_OF_LUA', 'is', $g1_lexeme_id, $declarations );
-    local slg, g1_lexeme_id, declarations = ...
-    local event = declarations.event
-    local is_active = 1
-    if event then
-        is_active = event[2] ~= '0'
-    end
-    local lexeme_data = slg.g1.isys[g1_lexeme_id]
-    if is_active then
-        -- activate only if event is enabled
-        lexeme_data.pause_after_active = lexeme_data.pause_after
-        lexeme_data.pause_before_active = lexeme_data.pause_before
-    else
-        lexeme_data.pause_after_active = nil
-        lexeme_data.pause_before_active = nil
-    end
-END_OF_LUA
-
-        } ## end if ( defined $pause_value )
-
+        my $pause_value = $declarations->{pause};
         if ( defined $pause_value ) {
             my $is_active = 1;
 
