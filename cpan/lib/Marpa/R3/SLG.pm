@@ -398,40 +398,19 @@ END_OF_LUA
                 g1g.completion_symbol_activate
             )
 
-        local nulled_events = hashed_source.nulled_events or {}
-        local g1g = slg.g1.lmw_g
-        local isy_names = {}
-        local nulled_event_by_isy = {}
-        local nulled_event_by_name = {}
-        for isy_name, event in pairs(nulled_events) do
-            -- print(inspect(event))
-            local event_name = event[1]
-            local is_active = (event[2] ~= "0")
-            local isyid = g1g.isyid_by_name[isy_name]
-            if not isyid then
-                -- print(inspect(g1g.isyid_by_name))
-                error(string.format(
-                    "Completion event defined for non-existent symbol: %s\n",
-                    isy_name
-                ))
-            end
-            local event_desc = {
-               name = event_name,
-               isyid = isyid
-            }
-            nulled_event_by_isy[isyid] = event_desc
-            nulled_event_by_isy[isy_name] = event_desc
-            nulled_event_by_name[event_name] = event_desc
+        slg.nulled_event_by_isy, slg.nulled_event_by_name
+            = event_setup(g1g,
+                (hashed_source.nulled_events or {}),
+                g1g.symbol_is_nulled_event_set,
+                g1g.nulled_symbol_activate
+            )
 
-            --  NOT serializable
-            --  Must be done before precomputation
-            g1g:symbol_is_nulled_event_set(isyid, 1)
-            if not is_active then
-                g1g:nulled_symbol_activate(isyid, 0)
-            end
-        end
-        slg.nulled_event_by_isy = nulled_event_by_isy
-        slg.nulled_event_by_name = nulled_event_by_name
+        slg.prediction_event_by_isy, slg.prediction_event_by_name
+            = event_setup(g1g,
+                (hashed_source.prediction_events or {}),
+                g1g.symbol_is_prediction_event_set,
+                g1g.prediction_symbol_activate
+            )
 
 END_OF_LUA
 
@@ -447,18 +426,6 @@ END_OF_LUA
 "prediction event defined for non-existent symbol: $symbol_name\n"
             );
         }
-
-        # Must be done before precomputation
-    $slg->call_by_tag(
-        ('@' .__FILE__ . ':' .  __LINE__),
-        <<'END_OF_LUA', 'ii', $symbol_id, ($is_active ? 1 : 0));
-        local grammar, symbol_id, is_active = ...
-        local g1g = grammar.g1.lmw_g
-        g1g:symbol_is_prediction_event_set(symbol_id, 1)
-        if is_active == 0 then
-            g1g:prediction_symbol_activate(symbol_id, 0)
-        end
-END_OF_LUA
 
         $slg->[Marpa::R3::Internal::Scanless::G::PREDICTION_EVENT_BY_ID]
           ->[$symbol_id] = $event_name;
