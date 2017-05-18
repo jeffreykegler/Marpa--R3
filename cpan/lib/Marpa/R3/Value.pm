@@ -26,12 +26,10 @@ package Marpa::R3::Internal::Value;
 
 use English qw( -no_match_vars );
 
-use constant SKIP => -1;
-
 sub Marpa::R3::show_rank_ref {
     my ($rank_ref) = @_;
     return 'undef' if not defined $rank_ref;
-    return 'SKIP'  if $rank_ref == Marpa::R3::Internal::Value::SKIP;
+    return 'SKIP'  if $rank_ref == -1;
     return ${$rank_ref};
 } ## end sub Marpa::R3::show_rank_ref
 
@@ -708,10 +706,12 @@ sub registrations_set {
 END_OF_LUA
 
         next REGISTRATION;
-        Marpa::R3::exception(
-            'Registration: with unknown type: ',
-            Data::Dumper::Dumper($registration)
-        );
+
+        # Marpa::R3::exception(
+            # 'Registration: with unknown type: ',
+            # Data::Dumper::Dumper($registration)
+        # );
+
     } ## end REGISTRATION: for my $registration ( @{ $recce->[...]})
 }
 
