@@ -806,11 +806,7 @@ END_OF_LUA
         ))
     end
     lexeme_data.is_lexeme = true
-END_OF_LUA
 
-            $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-                <<'END_OF_LUA', 'is', $g1_lexeme_id, ($declarations // {}));
-    local slg, g1_lexeme_id, declarations = ...
     local pause_value = declarations.pause
     if pause_value then
         pause_value = math.tointeger(pause_value)
