@@ -414,25 +414,6 @@ END_OF_LUA
 
 END_OF_LUA
 
-    my $prediction_events_by_name = $hashed_source->{prediction_events};
-    my $prediction_events_by_id =
-      $slg->[Marpa::R3::Internal::Scanless::G::PREDICTION_EVENT_BY_ID] = [];
-    for my $symbol_name ( keys %{$prediction_events_by_name} ) {
-        my ( $event_name, $is_active ) =
-          @{ $prediction_events_by_name->{$symbol_name} };
-        my $symbol_id = $slg->symbol_by_name($symbol_name);
-        if ( not defined $symbol_id ) {
-            Marpa::R3::exception(
-"prediction event defined for non-existent symbol: $symbol_name\n"
-            );
-        }
-
-        $slg->[Marpa::R3::Internal::Scanless::G::PREDICTION_EVENT_BY_ID]
-          ->[$symbol_id] = $event_name;
-        push @{ $symbol_ids_by_event_name_and_type->{$event_name}->{prediction}
-        }, $symbol_id;
-    } ## end for my $symbol_name ( keys %{$prediction_events_by_name...})
-
     my $lexeme_events_by_id =
       $slg->[Marpa::R3::Internal::Scanless::G::LEXEME_EVENT_BY_ID] = [];
 
