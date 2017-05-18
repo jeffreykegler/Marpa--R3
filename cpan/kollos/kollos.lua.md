@@ -1878,10 +1878,18 @@ an L0 range
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.activate_by_event_name(slr, event_name, activate)
         local slg = slr.slg
-        local event_data = slg.completion_event_by_name[event_name]
+        local event_data
+
+        event_data = slg.completion_event_by_name[event_name]
         if event_data then
             local isyid = event_data.isyid
             slr.g1.lmw_r:completion_symbol_activate(isyid, activate)
+        end
+
+        event_data = slg.nulled_event_by_name[event_name]
+        if event_data then
+            local isyid = event_data.isyid
+            slr.g1.lmw_r:nulled_symbol_activate(isyid, activate)
         end
     end
 ```
