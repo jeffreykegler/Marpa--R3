@@ -822,17 +822,6 @@ END_OF_LUA
     end
 END_OF_LUA
 
-            my $is_active = 1;
-
-            if ( defined( my $event_data = $declarations->{'event'} ) ) {
-                my $event_name;
-                ( $event_name, $is_active ) = @{$event_data};
-                $lexeme_events_by_id->[$g1_lexeme_id] = $event_name;
-                push
-                  @{ $symbol_ids_by_event_name_and_type->{$event_name}->{lexeme}
-                  }, $g1_lexeme_id;
-            } ## end if ( defined( my $event_data = $declarations->{'event'...}))
-
             $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
                 <<'END_OF_LUA', 'is', $g1_lexeme_id, $declarations );
     local slg, g1_lexeme_id, declarations = ...
@@ -853,6 +842,20 @@ END_OF_LUA
 END_OF_LUA
 
         } ## end if ( defined $pause_value )
+
+        if ( defined $pause_value ) {
+            my $is_active = 1;
+
+            if ( defined( my $event_data = $declarations->{'event'} ) ) {
+                my $event_name;
+                ( $event_name, $is_active ) = @{$event_data};
+                $lexeme_events_by_id->[$g1_lexeme_id] = $event_name;
+                push
+                  @{ $symbol_ids_by_event_name_and_type->{$event_name}->{lexeme}
+                  }, $g1_lexeme_id;
+            } ## end if ( defined( my $event_data = $declarations->{'event'...}))
+        } ## end if ( defined $pause_value )
+
 
     } ## end LEXEME: for my $lexeme_name ( keys %g1_id_by_lexeme_name )
 
