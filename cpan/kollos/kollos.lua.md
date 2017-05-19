@@ -4617,6 +4617,8 @@ a special "configuration" argument.
 
 ```
 
+TODO -- Used?  Delete this?
+
 ```
     -- miranda: section+ set up strict declarations
     do
@@ -4658,8 +4660,6 @@ a special "configuration" argument.
     -- miranda: section main
     -- miranda: insert legal preliminaries
     -- miranda: insert luacheck declarations
-
-    -- miranda: insert set up strict declarations
 
     local _M = require "kollos.metal"
 

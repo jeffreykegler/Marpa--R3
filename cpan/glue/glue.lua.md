@@ -140,34 +140,34 @@ Set "strict" globals, using code taken from strict.lua.
 ```
 
     -- miranda: section enforce strict globals
-    local strict_mt = {}
     do
+        local error, rawset, rawget = error, rawset, rawget
+
         local mt = getmetatable(_G)
         if mt == nil then
-          mt = strict_mt
+          mt = {}
           setmetatable(_G, mt)
         end
+        local strict_mt = mt
 
-        mt.__declared = {}
-
-        local function what ()
-          local d = debug.getinfo(3, "S")
-          return d and d.what or "C"
-        end
+        mt.__declared = {
+           _G = true,
+           _M = true,
+           last_exception = true, -- should this be here?
+           glue = true,
+           kollos = true,
+           marpa = true, -- TODO -- do I need this?  why?
+        }
 
         mt.__newindex = function (t, n, v)
           if not mt.__declared[n] then
-            local w = what()
-            if w ~= "main" and w ~= "C" then
-              error("assign to undeclared variable '"..n.."'", 2)
-            end
-            mt.__declared[n] = true
+            error("assign to undeclared variable '"..n.."'", 2)
           end
           rawset(t, n, v)
         end
 
         mt.__index = function (t, n)
-          if not mt.__declared[n] and what() ~= "C" then
+          if not mt.__declared[n] then
             error("variable '"..n.."' is not declared", 2)
           end
           return rawget(t, n)
