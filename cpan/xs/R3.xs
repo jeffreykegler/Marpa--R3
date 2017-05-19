@@ -1250,7 +1250,6 @@ PPCODE:
 {
     SV *new_sv;
     Marpa_Lua *lua_wrapper;
-    int marpa_table;
     int base_of_stack;
     lua_State *L;
     struct lua_extraspace *p_extra;
@@ -1347,18 +1346,12 @@ PPCODE:
     /* register methods */
     marpa_luaL_setfuncs(L, glue_sv_meths, 0);
 
-    marpa_luaL_newlib(L, glue_funcs);
-    /* Lua stack: [ marpa_table ] */
-    marpa_table = marpa_lua_gettop (L);
-    /* Lua stack: [ marpa_table ] */
-    marpa_lua_pushvalue (L, -1);
-    /* Lua stack: [ marpa_table, marpa_table ] */
-    marpa_lua_setglobal (L, "marpa");
-    /* Lua stack: [ marpa_table ] */
+    marpa_lua_pushvalue(L, glue_ix);
+    marpa_luaL_setfuncs(L, glue_funcs, 0);
 
     marpa_luaL_newlib(L, glue_sv_funcs);
     /* Lua stack: [ marpa_table, sv_table ] */
-    marpa_lua_setfield (L, marpa_table, "sv");
+    marpa_lua_setfield (L, glue_ix, "sv");
     /* Lua stack: [ marpa_table ] */
 
     marpa_lua_settop (L, base_of_stack);

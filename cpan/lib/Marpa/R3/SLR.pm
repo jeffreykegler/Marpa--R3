@@ -358,12 +358,12 @@ END_OF_LUA
 
     recce.token_values = {}
     recce.token_is_undef = 1
-    recce.token_values[recce.token_is_undef] = marpa.sv.undef()
+    recce.token_values[recce.token_is_undef] = glue.sv.undef()
 
     -- token is literal is a pseudo-index, and the SV undef
     -- is just a place holder
     recce.token_is_literal = 2
-    recce.token_values[recce.token_is_literal] = marpa.sv.undef()
+    recce.token_values[recce.token_is_literal] = glue.sv.undef()
 
 END_OF_LUA
 
