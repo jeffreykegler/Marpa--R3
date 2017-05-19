@@ -16,7 +16,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-use Test::More tests => 48;
+use Test::More tests => 53;
 use English qw( -no_match_vars );
 use POSIX qw(setlocale LC_ALL);
 
@@ -33,6 +33,7 @@ do_global_test($raw_salve, [], ['salve, munde!'], 'Salve, 0 args');
 do_global_test($raw_salve, [qw{hi}], ['salve, munde!', 'hi'], 'Salve, 1 arg');
 do_global_test($raw_salve, [qw{hi hi2}], ['salve, munde!', qw(hi hi2)], 'Salve, 2 args');
 do_global_test('return 42', [], ['42'], 'The answer is 42: 1');
+do_global_test('strict.declare("taxicurry", true)', [], [], 'Taxi curry: declare');
 do_global_test('function taxicurry(fact2) return 9^3 + fact2 end', [], [], 'Taxi curry: 1');
 do_global_test('return taxicurry(10^3)', [], [1729], 'Taxi curry: 2');
 do_global_test("local x = ...; x[0] = 42; return x", [[]], [[42]], 'The answer is 42: 2');
@@ -69,14 +70,21 @@ my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
 # in-place.  The function ensures that each test has a fresh copy.
 
 my @tests = ();
-push @tests, [ ( __FILE__ . ':' . __LINE__ ), 'return 42', '',
+push @tests, [ ( '@' . __FILE__ . ':' . __LINE__ ), 'return 42', '',
     sub { return [] },
     ['42'],
     'The answer is 42: 1'
     ]
     ;
+push @tests,
+  [
+    ( '@' . __FILE__ . ':' . __LINE__ ),
+    'strict.declare("taxicurry", true)',
+    '', sub { return [] },
+    [], 'Taxi curry: declare'
+  ];
 push @tests, [
-    ( __FILE__ . ':' . __LINE__ ),
+    ( '@' . __FILE__ . ':' . __LINE__ ),
     'function taxicurry(fact2) return 9^3 + fact2 end',
     '',
     sub { return [] },
@@ -84,7 +92,7 @@ push @tests, [
     'Taxicurry: 1'
 ];
 push @tests, [
-    ( __FILE__ . ':' . __LINE__ ),
+    ( '@' . __FILE__ . ':' . __LINE__ ),
     'return taxicurry(10^3)',
     '',
     sub { return [] },
@@ -92,7 +100,7 @@ push @tests, [
     'Taxicurry: 2'
 ];
 push @tests, [
-    ( __FILE__ . ':' . __LINE__ ),
+    ( '@' . __FILE__ . ':' . __LINE__ ),
     "local %OBJECT%, x = ...;
     x[0] = 42; return x",
     'S',
@@ -101,7 +109,7 @@ push @tests, [
     'The answer is 42: 2'
 ];
 push @tests, [
-    ( __FILE__ . ':' . __LINE__ ),
+    ( '@' . __FILE__ . ':' . __LINE__ ),
     "local %OBJECT%, x = ...;
     local tmp = x[1]; x[1] = x[0]; x[0] = tmp;
     return x",
@@ -111,7 +119,7 @@ push @tests, [
     "Swap array elements: 1"
 ];
 push @tests, [
-    ( __FILE__ . ':' . __LINE__ ),
+    ( '@' . __FILE__ . ':' . __LINE__ ),
     "local %OBJECT%, x = ...; x[1], x[0] = x[0], x[1]; return x",
     'S',
     sub { return [ [ 42, 7 ] ] },
@@ -119,7 +127,7 @@ push @tests, [
     "Swap array elements: 2"
 ];
 push @tests, [
-    ( __FILE__ . ':' . __LINE__ ),
+    ( '@' . __FILE__ . ':' . __LINE__ ),
     "local %OBJECT%, x = ...; marpa.sv.fill(x, 1); return x",
     'S',
     sub { return [ [ 1, 2, 3, 4 ] ] },
@@ -127,7 +135,7 @@ push @tests, [
     "Fill method: 1"
 ];
 push @tests, [
-    ( __FILE__ . ':' . __LINE__ ),
+    ( '@' . __FILE__ . ':' . __LINE__ ),
     "local %OBJECT%, x = ...; marpa.sv.fill(x, 4); return x",
     'S',
     sub { return [ [ 1, 2, 3, 4 ] ] },
@@ -135,7 +143,7 @@ push @tests, [
     "Fill method: 2"
 ];
 push @tests, [
-    ( __FILE__ . ':' . __LINE__ ),
+    ( '@' . __FILE__ . ':' . __LINE__ ),
     "local %OBJECT%, x = ...; marpa.sv.fill(x, -1); return x",
     'S',
     sub { return [ [ 1, 2, 3, 4 ] ] },

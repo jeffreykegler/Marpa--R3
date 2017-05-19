@@ -155,8 +155,10 @@ Set "strict" globals, using code taken from strict.lua.
            _M = true,
            last_exception = true, -- should this be here?
            glue = true,
+           inspect = true,
            kollos = true,
            marpa = true, -- TODO -- do I need this?  why?
+           strict = true,
         }
 
         mt.__newindex = function (t, n, v)
@@ -187,9 +189,14 @@ Set "strict" globals, using code taken from strict.lua.
             end
         end
 
+        local function strict_declare(name, boolean)
+            strict_mt.__declared[name] = boolean
+        end
+
         strict = {
             on = strict_on,
-            off = strict_off
+            off = strict_off,
+            declare = strict_declare,
         }
 
         package.loaded["strict"] = strict

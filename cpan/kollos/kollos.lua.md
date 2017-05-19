@@ -4729,7 +4729,7 @@ Luacheck declarations
     -- miranda: insert non-standard wrappers
     -- miranda: insert object userdata gc methods
     -- miranda: insert kollos table methods
-    -- miranda: insert luaL_reg definitions
+    -- miranda: insert luaL_Reg definitions
     -- miranda: insert object constructors
 
     -- miranda: insert standard libmarpa wrappers
