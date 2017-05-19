@@ -931,12 +931,6 @@ static void create_sv_mt (lua_State* L) {
     int base_of_stack = marpa_lua_gettop(L);
     marpa_luaL_newmetatable(L, MT_NAME_SV);
     /* Lua stack: [mt] */
-
-    /* metatable.__index = metatable */
-    marpa_lua_pushvalue(L, -1);
-    marpa_lua_setfield(L, -2, "__index");
-    /* Lua stack: [mt] */
-
     /* register methods */
     marpa_luaL_setfuncs(L, glue_sv_meths, 0);
     /* Lua stack: [mt] */
