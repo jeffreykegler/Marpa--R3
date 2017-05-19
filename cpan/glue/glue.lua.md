@@ -83,9 +83,6 @@ we may want meaningful performance numbers.
     -- print('kollos.event: ', inspect(kollos.event ))
     -- print('kollos.step: ', inspect(kollos.step ))
 
-    -- create globals from selection Kollos variables
-    valuation_reset = kollos.class_slr.valuation_reset
-
     local _M = {}
 
     -- miranda: insert Lua declarations

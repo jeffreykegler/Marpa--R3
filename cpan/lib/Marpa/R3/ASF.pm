@@ -180,8 +180,8 @@ sub set_last_choice {
         my ($current_predecessor) = $slr->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__),
         <<'END_OF_LUA',
-            recce, id = ...
-            local current = recce.lmw_b:_and_node_predecessor(id)
+            local slr, id = ...
+            local current = slr.lmw_b:_and_node_predecessor(id)
             return current and current or -1
 END_OF_LUA
             'i', $and_node_id);
@@ -192,8 +192,8 @@ END_OF_LUA
             my ($next_predecessor) = $slr->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__),
             <<'END_OF_LUA',
-                recce, id = ...
-                local next = recce.lmw_b:_and_node_predecessor(id)
+                local slr, id = ...
+                local next = slr.lmw_b:_and_node_predecessor(id)
                 return next and next or -1
 END_OF_LUA
                 'i', ($and_node_id // -1));
@@ -524,9 +524,9 @@ sub nid_sort_ix {
         my ($result) = $slr->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__),
         <<'END_OF_LUA', 'i', $nid);
-        recce, nid = ...
-        local irl_id = recce.lmw_b:_or_node_irl(nid)
-        return recce.slg.g1.lmw_g:_source_xrl(irl_id)
+        local slr, nid = ...
+        local irl_id = slr.lmw_b:_or_node_irl(nid)
+        return slr.slg.g1.lmw_g:_source_xrl(irl_id)
 END_OF_LUA
         return $result;
     }
@@ -536,9 +536,9 @@ END_OF_LUA
     my ($result) = $slr->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', 'i', $and_node_id);
-    recce, and_node_id = ...
-    local token_nsy_id = recce.lmw_b:_and_node_symbol(and_node_id)
-    local token_id = recce.slg.g1.lmw_g:_source_xsy(token_nsy_id)
+    local slr, and_node_id = ...
+    local token_nsy_id = slr.lmw_b:_and_node_symbol(and_node_id)
+    local token_id = slr.slg.g1.lmw_g:_source_xsy(token_nsy_id)
     -- -2 is reserved for 'end of data'
     return -token_id - 3
 END_OF_LUA
@@ -598,8 +598,8 @@ sub token_es_span {
     my ($predecessor_id, $parent_or_node_id) = $slr->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__),
     <<'END_OF_LUA',
-        recce, and_node_id = ...
-        local b = recce.lmw_b
+        local slr, and_node_id = ...
+        local b = slr.lmw_b
         return
             b:_and_node_predecessor(and_node_id),
             b:_and_node_parent(and_node_id)
@@ -611,8 +611,8 @@ END_OF_LUA
         my ($origin_es, $current_es) = $slr->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__),
         <<'END_OF_LUA',
-            recce, predecessor_id, parent_or_node_id = ...
-            local b = recce.lmw_b
+            local slr, predecessor_id, parent_or_node_id = ...
+            local b = slr.lmw_b
             return
                 b:_or_node_set(predecessor_id),
                 b:_or_node_set(parent_or_node_id)
@@ -664,9 +664,9 @@ sub nid_token_id {
     my ($token_id) = $slr->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__),
     <<'END_OF_LUA',
-        recce, and_node_id = ...
-        local token_nsy_id = recce.lmw_b:_and_node_symbol(and_node_id)
-        local token_id = recce.slg.g1.lmw_g:_source_xsy(token_nsy_id)
+        local slr, and_node_id = ...
+        local token_nsy_id = slr.lmw_b:_and_node_symbol(and_node_id)
+        local token_id = slr.slg.g1.lmw_g:_source_xsy(token_nsy_id)
         return token_id
 END_OF_LUA
         'i', $and_node_id);
@@ -685,9 +685,9 @@ sub nid_symbol_id {
     my ($lhs_id) = $slr->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__),
     <<'END_OF_LUA',
-        recce, nid = ...
-        local irl_id = recce.lmw_b:_or_node_irl(nid)
-        local g1g = recce.slg.g1.lmw_g
+        local slr, nid = ...
+        local irl_id = slr.lmw_b:_or_node_irl(nid)
+        local g1g = slr.slg.g1.lmw_g
         local xrl_id = g1g:_source_xrl(irl_id)
         local lhs_id = g1g:rule_lhs(xrl_id)
         return lhs_id
@@ -846,7 +846,7 @@ sub factoring_finish {
                 if ( not nook_has_semantic_cause( $asf, $work_nook ) ) {
                     ($child_or_node) = $slr->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__),
-                        'recce, work_and_node_id = ...; return recce.lmw_b:_and_node_cause(work_and_node_id)',
+                        'local slr, work_and_node_id = ...; return slr.lmw_b:_and_node_cause(work_and_node_id)',
                         'i',
                         $work_and_node_id);
                     $child_is_cause = 1;
@@ -859,7 +859,7 @@ sub factoring_finish {
             {
                 ($child_or_node) = $slr->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__),
-                    'recce, work_and_node_id = ...; return recce.lmw_b:_and_node_predecessor(work_and_node_id)',
+                    'local slr, work_and_node_id = ...; return slr.lmw_b:_and_node_predecessor(work_and_node_id)',
                     'i',
                     $work_and_node_id);
                 if ( defined $child_or_node ) {

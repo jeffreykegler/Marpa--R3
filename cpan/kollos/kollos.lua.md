@@ -4618,11 +4618,48 @@ a special "configuration" argument.
 ```
 
 ```
+    -- miranda: section+ set up strict declarations
+    do
+        local error, rawset, rawget = error, rawset, rawget
+
+        local mt = getmetatable(_G)
+        if mt == nil then
+          mt = {}
+          setmetatable(_G, mt)
+        end
+
+        mt.__declared = {
+           _G = true,
+           _M = true,
+           last_exception = true, -- should this be here?
+           glue = true,
+           kollos = true,
+           marpa = true, -- TODO -- do I need this?  why?
+        }
+
+        mt.__newindex = function (t, n, v)
+          if not mt.__declared[n] then
+            error("assign to undeclared variable '"..n.."'", 2)
+          end
+          rawset(t, n, v)
+        end
+
+        mt.__index = function (t, n)
+          if not mt.__declared[n] then
+            error("variable '"..n.."' is not declared", 2)
+          end
+          return rawget(t, n)
+        end
+    end
+
+```
+
+```
     -- miranda: section main
     -- miranda: insert legal preliminaries
     -- miranda: insert luacheck declarations
 
-    require "strict"
+    -- miranda: insert set up strict declarations
 
     local _M = require "kollos.metal"
 

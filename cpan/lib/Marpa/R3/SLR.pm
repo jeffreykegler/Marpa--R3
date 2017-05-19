@@ -389,8 +389,8 @@ sub Marpa::R3::Scanless::R::DESTROY {
     $lua->call_by_tag($regix,
         ('@' . __FILE__ . ':' . __LINE__),
         <<'END_OF_LUA', 'i', $regix);
-    local recce, regix = ...
-    valuation_reset(recce)
+    local slr, regix = ...
+    slr:valuation_reset()
     local registry = debug.getregistry()
     _M.unregister(registry, regix)
 END_OF_LUA
@@ -470,7 +470,7 @@ END_OF_LUA
 
     if ( defined( my $value = $flat_args->{'max_parses'}) ) {
         $slr->call_by_tag(
-            ( __FILE__ . ':' . __LINE__ ),
+            ( '@' . __FILE__ . ':' . __LINE__ ),
             <<'END_OF_LUA', 'i', $value
     local slr, value = ...
     slr.max_parses = value
@@ -1142,7 +1142,7 @@ sub Marpa::R3::Scanless::R::events {
     my ($events) = $slr->call_by_tag(
     ('@' . __FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', '>0');
-        slr = ...
+        local slr = ...
         return slr.external_events
 END_OF_LUA
     push @{$events}, @{$slr->[Marpa::R3::Internal::Scanless::R::EVENTS]};
@@ -1154,9 +1154,8 @@ sub Marpa::R3::Scanless::R::xs_events {
     my ($event_queue) = $slr->call_by_tag(
     ('@' . __FILE__ . ':' . __LINE__),
     <<'END_OF_LUA',
-        recce = ...
-        -- print(inspect(recce.event_queue))
-        return recce.event_queue
+        local slr = ...
+        return slr.event_queue
 END_OF_LUA
         '>0');
     return @{$event_queue};
@@ -1186,8 +1185,8 @@ sub Marpa::R3::Scanless::R::read_problem {
             my ($lexeme_start) = $slr->call_by_tag(
             ('@' . __FILE__ . ':' . __LINE__),
             <<'END_OF_LUA', '>0');
-                recce = ...
-                return recce.start_of_lexeme
+                local slr = ...
+                return slr.start_of_lexeme
 END_OF_LUA
 
             my ( $line, $column ) = $slr->line_column($lexeme_start);
@@ -1199,8 +1198,8 @@ END_OF_LUA
             my ($lexeme_start) = $slr->call_by_tag(
             ('@' . __FILE__ . ':' . __LINE__),
             <<'END_OF_LUA', '>0');
-                recce = ...
-                return recce.start_of_lexeme
+                local slr = ...
+                return slr.start_of_lexeme
 END_OF_LUA
 
             my ( $line, $column ) = $slr->line_column($lexeme_start);
@@ -1570,7 +1569,7 @@ sub Marpa::R3::Scanless::R::show_progress {
             my ( $rule_id, $position, $origin ) = @{$progress_item};
             if ( $position < 0 ) {
                 ($position) = $slg->call_by_tag(
-                    ( __FILE__ . ':' . __LINE__ ),
+                    ( '@' . __FILE__ . ':' . __LINE__ ),
 'local grammar, rule_id = ...; return grammar.g1.lmw_g:rule_length(rule_id)',
                     'i',
                     $rule_id
@@ -1763,10 +1762,10 @@ sub Marpa::R3::Scanless::R::lexeme_alternative {
         if ( scalar @value == 0 ) {
             ($result) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
                 <<'END_OF_LUA', 'i', $symbol_id );
-        recce, symbol_id = ...
+        local slr, symbol_id = ...
         local token_ix = _M.defines.TOKEN_VALUE_IS_LITERAL
-        local g1r = recce.g1.lmw_r
-        recce.is_external_scanning = true
+        local g1r = slr.g1.lmw_r
+        slr.is_external_scanning = true
         local return_value = g1r:alternative(symbol_id, token_ix, 1)
         return return_value
 END_OF_LUA
@@ -1776,10 +1775,10 @@ END_OF_LUA
         if ( not defined $value ) {
             ($result) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
                 <<'END_OF_LUA', 'i', $symbol_id );
-        recce, symbol_id = ...
+        local slr, symbol_id = ...
         local token_ix = _M.defines.TOKEN_VALUE_IS_UNDEF
-        local g1r = recce.g1.lmw_r
-        recce.is_external_scanning = true
+        local g1r = slr.g1.lmw_r
+        slr.is_external_scanning = true
         local return_value = g1r:alternative(symbol_id, token_ix, 1)
         return return_value
 END_OF_LUA
@@ -1787,11 +1786,11 @@ END_OF_LUA
         }
             ($result) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
                 <<'END_OF_LUA', 'iS', $symbol_id, $value );
-        recce, symbol_id, token_sv = ...
-        local token_ix = #recce.token_values + 1
-        recce.token_values[token_ix] = token_sv
-        local g1r = recce.g1.lmw_r
-        recce.is_external_scanning = true
+        local slr, symbol_id, token_sv = ...
+        local token_ix = #slr.token_values + 1
+        slr.token_values[token_ix] = token_sv
+        local g1r = slr.g1.lmw_r
+        slr.is_external_scanning = true
         local return_value = g1r:alternative(symbol_id, token_ix, 1)
         return return_value
 END_OF_LUA
@@ -1843,8 +1842,8 @@ END_OF_LUA
 
     my ($return_value) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'iiii', $start_defined, $start, $length_defined, $length );
-      recce, start_pos_defined, start_pos, length_is_defined, length_arg = ...
-      return recce:ext_lexeme_complete(start_pos_defined, start_pos, length_is_defined, length_arg)
+      local slr, start_pos_defined, start_pos, length_is_defined, length_arg = ...
+      return slr:ext_lexeme_complete(start_pos_defined, start_pos, length_is_defined, length_arg)
 END_OF_LUA
 
     if ($return_value == 0) {
@@ -1946,7 +1945,7 @@ END_OF_LUA
 sub Marpa::R3::Scanless::R::pos {
     my ($slr) = @_;
     my ($perl_pos) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        'slr = ...; return slr.perl_pos', '' );
+        'local slr = ...; return slr.perl_pos', '' );
     return $perl_pos;
 }
 
@@ -2432,7 +2431,7 @@ END_OF_LUA
         my $this_choice;
         ($this_choice) = $slr->call_by_tag(
     ('@' . __FILE__ . ':' . __LINE__),
-            ' recce, nook_id = ...; return recce.lmw_t:_nook_choice(nook_id)',
+            'local slr, nook_id = ...; return slr.lmw_t:_nook_choice(nook_id)',
             'i', $nook_id
         );
         CHOICE: for ( my $choice_ix = 0;; $choice_ix++ ) {
@@ -2440,8 +2439,8 @@ END_OF_LUA
                 my ($and_node_id) = $slr->call_by_tag(
     ('@' . __FILE__ . ':' . __LINE__),
                 <<'END_OF_LUA', 'ii>*', $or_node_id, $choice_ix );
-                recce, or_node_id, choice_ix = ...
-                return recce.lmw_o:_and_order_get(or_node_id+0, choice_ix+0)
+                local slr, or_node_id, choice_ix = ...
+                return slr.lmw_o:_and_order_get(or_node_id+0, choice_ix+0)
 END_OF_LUA
 
             last CHOICE if not defined $and_node_id;

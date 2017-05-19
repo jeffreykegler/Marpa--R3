@@ -371,7 +371,7 @@ END_OF_LUA
                 if not isyid then
                     -- print(inspect(g1g.isyid_by_name))
                     error(string.format(
-                        "Completion event defined for non-existent symbol: %s\n",
+                        "Event defined for non-existent symbol: %s\n",
                         isy_name
                     ))
                 end
@@ -1521,7 +1521,7 @@ END_OF_LUA
     -- print('arg_hash: ', inspect(arg_hash))
     arg_hash.proper = (arg_hash.proper ~= 0)
     kollos.throw = false
-    base_irl_id = g.g1.lmw_g:sequence_new(arg_hash)
+    local base_irl_id = g.g1.lmw_g:sequence_new(arg_hash)
     kollos.throw = true
     -- remove the test for nil or less than zero
     -- once refactoring is complete?
@@ -1540,6 +1540,7 @@ END_OF_LUA
             local grammar, rule_description = ...
             local g1g = grammar.g1.lmw_g
             local error_code = g1g:error_code()
+            local problem_description
             if error_code == kollos.err.DUPLICATE_RULE then
                 problem_description = "Duplicate rule"
             else
@@ -1695,7 +1696,7 @@ END_OF_LUA
     -- print('arg_hash: ', inspect(arg_hash))
     arg_hash.proper = (arg_hash.proper ~= 0)
     kollos.throw = false
-    base_irl_id = g.l0.lmw_g:sequence_new(arg_hash)
+    local base_irl_id = g.l0.lmw_g:sequence_new(arg_hash)
     kollos.throw = true
     -- remove the test for nil or less than zero
     -- once refactoring is complete?
@@ -1715,6 +1716,7 @@ END_OF_LUA
             local grammar, rule_description = ...
             local l0g = grammar.l0.lmw_g
             local error_code = l0g:error_code()
+            local problem_description
             if error_code == kollos.err.DUPLICATE_RULE then
                 problem_description = "Duplicate rule"
             else

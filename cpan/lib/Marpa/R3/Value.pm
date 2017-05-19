@@ -165,9 +165,9 @@ sub Marpa::R3::Context::bail {   ## no critic (Subroutines::RequireArgUnpacking)
 sub Marpa::R3::Context::g1_range {
     my $slr = $Marpa::R3::Context::slr;
     my ( $start, $end ) =
-      $slr->call_by_tag( ( __FILE__ . ':' . __LINE__ ), <<'END_OF_LUA', '>*' );
-recce = ...
-return recce.this_step.start_es_id, recce.this_step.es_id
+      $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ), <<'END_OF_LUA', '>*' );
+local slr = ...
+return slr.this_step.start_es_id, slr.this_step.es_id
 END_OF_LUA
     return $start, $end;
 } ## end sub Marpa::R3::Context::g1_range
@@ -175,10 +175,10 @@ END_OF_LUA
 sub Marpa::R3::Context::g1_span {
     my $slr = $Marpa::R3::Context::slr;
     my ( $start, $length ) =
-      $slr->call_by_tag( ( __FILE__ . ':' . __LINE__ ), <<'END_OF_LUA', '>*' );
-recce = ...
-local start = recce.this_step.start_es_id + 0
-local length = (start - recce.this_step.es_id) + 1
+      $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ), <<'END_OF_LUA', '>*' );
+local slr = ...
+local start = slr.this_step.start_es_id + 0
+local length = (start - slr.this_step.es_id) + 1
 return start, length
 END_OF_LUA
     return $start, $length;
@@ -693,7 +693,7 @@ sub registrations_set {
             push @ops, $raw_op;
         } ## end OP: for my $raw_op (@raw_ops)
 
-        my ($constant_ix) = $slg->call_by_tag( ( __FILE__ . ':' . __LINE__ ),
+        my ($constant_ix) = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
             << 'END_OF_LUA', 'sii', $type, $id, \@ops );
                 local grammar, type, id, ops = ...
                 if type == 'token' then
@@ -1469,53 +1469,53 @@ sub Marpa::R3::Scanless::R::value {
           if ref $slr ne 'Marpa::R3::Scanless::R';
     }
 
-    my ($result) = $slr->call_by_tag( ( __FILE__ . ':' . __LINE__ ),
+    my ($result) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         << 'END_OF_LUA', '>*' );
-            recce=...
-    local g1r = recce.g1.lmw_r
+        local slr=...
+        local g1r = slr.g1.lmw_r
 
-    recce.tree_mode = recce.tree_mode or 'tree'
-    if recce.tree_mode ~= 'tree' then
-        error(
-            "value() called when recognizer is not in tree mode\n"
-            .. string.format('  The current mode is %q\n', recce.tree_mode)
-        )
-    end
+        slr.tree_mode = slr.tree_mode or 'tree'
+        if slr.tree_mode ~= 'tree' then
+            error(
+                "value() called when recognizer is not in tree mode\n"
+                .. string.format('  The current mode is %q\n', slr.tree_mode)
+            )
+        end
 
-    recce.phase = 'value'
-    local furthest_earleme = g1r:furthest_earleme()
-    local last_completed_earleme = g1r:current_earleme()
-    if furthest_earleme ~= last_completed_earleme then
-        error(string.format(
-            "Attempt to evaluate incompletely recognized parse:\n"
-            .. "  Last token ends at location %d\n"
-            .. "  Recognition done only as far as location %d\n",
-            furthest_earleme,
-            last_completed_earleme
-        ))
-    end
-    local lmw_t = recce.lmw_t
-    if not lmw_t then
-        -- No tree, therefore ordering is not initialized
-        local lmw_o = recce:ordering_get()
-        if not lmw_o then return false end
-        lmw_t = kollos.tree_new(lmw_o)
-        recce.lmw_t = lmw_t
-    end
+        slr.phase = 'value'
+        local furthest_earleme = g1r:furthest_earleme()
+        local last_completed_earleme = g1r:current_earleme()
+        if furthest_earleme ~= last_completed_earleme then
+            error(string.format(
+                "Attempt to evaluate incompletely recognized parse:\n"
+                .. "  Last token ends at location %d\n"
+                .. "  Recognition done only as far as location %d\n",
+                furthest_earleme,
+                last_completed_earleme
+            ))
+        end
+        local lmw_t = slr.lmw_t
+        if not lmw_t then
+            -- No tree, therefore ordering is not initialized
+            local lmw_o = slr:ordering_get()
+            if not lmw_o then return false end
+            lmw_t = kollos.tree_new(lmw_o)
+            slr.lmw_t = lmw_t
+        end
 
-    local max_parses = recce.max_parses
-    local parse_count = recce.lmw_t:parse_count()
-    if max_parses and parse_count > max_parses then
-        error(string.format("Maximum parse count (%d) exceeded", max_parses));
-    end
-    -- io.stderr:write('tree:', inspect(recce.lmw_t))
-    recce.lmw_v = nil
-    -- print(inspect(_G))
-    collectgarbage()
-    local result = recce.lmw_t:next()
-    if not result then return result end
-    -- print('result:', result)
-    recce.lmw_v = kollos.value_new(recce.lmw_t)
+        local max_parses = slr.max_parses
+        local parse_count = slr.lmw_t:parse_count()
+        if max_parses and parse_count > max_parses then
+            error(string.format("Maximum parse count (%d) exceeded", max_parses));
+        end
+        -- io.stderr:write('tree:', inspect(slr.lmw_t))
+        slr.lmw_v = nil
+        -- print(inspect(_G))
+        collectgarbage()
+        local result = slr.lmw_t:next()
+        if not result then return result end
+        -- print('result:', result)
+        slr.lmw_v = kollos.value_new(slr.lmw_t)
     return result
 END_OF_LUA
 
@@ -1528,7 +1528,7 @@ END_OF_LUA
 
     my ($trace_values) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         << 'END_OF_LUA', '' );
-    slr = ...
+    local slr = ...
     local trace_values = slr.trace_values or 0
     slr.lmw_v:_trace(trace_values)
     slr:value_init(trace_values)
@@ -1556,7 +1556,7 @@ END_OF_LUA
 
         if ($trace_values) {
           EVENT: for ( my $event_ix = 0 ; ; $event_ix++ ) {
-                my @event = $slr->call_by_tag( ( __FILE__ . ':' . __LINE__ ),
+                my @event = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
                     <<'END_OF_LUA', 'i>*', $event_ix );
 local recce, event_ix = ...;
 local entry = recce.trace_values_queue[event_ix+1]
@@ -1826,12 +1826,11 @@ sub trace_stack_1 {
 
     my $argc = scalar @{$args};
     my ( $nook_ix, $and_node_id ) =
-      $slr->call_by_tag( ( __FILE__ . ':' . __LINE__ ), <<'END_OF_LUA', '>*' );
-    -- in trace_stack_1
-    recce = ...
-    local nook_ix = recce.lmw_v:_nook()
-    local o = recce.lmw_o
-    local t = recce.lmw_t
+      $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ), <<'END_OF_LUA', '>*' );
+    local slr = ...
+    local nook_ix = slr.lmw_v:_nook()
+    local o = slr.lmw_o
+    local t = slr.lmw_t
     local or_node_id = t:_nook_or_node(nook_ix)
     local choice = t:_nook_choice(nook_ix)
     local and_node_id = o:_and_order_get(or_node_id, choice)
@@ -1859,8 +1858,7 @@ sub trace_op {
       )
       = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA' , '' );
-    -- in trace_op()
-    slr = ...
+    local slr = ...
     if not slr.trace_values or slr.trace_values < 2 then
         return 'return'
     end
