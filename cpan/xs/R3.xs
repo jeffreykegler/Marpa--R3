@@ -122,9 +122,9 @@ static int marpa_r3_warn(const char* format, ...)
  * Portions of this code adopted from Inline::Lua
  */
 
-#define MT_NAME_SV "Marpa_sv"
-#define MT_NAME_AV "Marpa_av"
-#define MT_NAME_ARRAY "Marpa_array"
+#define MT_NAME_SV "Glue_sv"
+#define MT_NAME_AV "Glue_av"
+#define MT_NAME_ARRAY "Glue_array"
 
 /* Returns 0 if visitee_ix "thing" is already "seen",
  * otherwise, sets it "seen" and returns 1.
@@ -926,18 +926,7 @@ static const struct luaL_Reg glue_sv_funcs[] = {
     {NULL, NULL},
 };
 
-/* create SV metatable */
-static void create_sv_mt (lua_State* L) {
-    int base_of_stack = marpa_lua_gettop(L);
-    marpa_luaL_newmetatable(L, MT_NAME_SV);
-    /* Lua stack: [mt] */
-    /* register methods */
-    marpa_luaL_setfuncs(L, glue_sv_meths, 0);
-    /* Lua stack: [mt] */
-    marpa_lua_settop(L, base_of_stack);
-}
-
-static const struct luaL_Reg marpa_funcs[] = {
+static const struct luaL_Reg glue_funcs[] = {
     {NULL, NULL},
 };
 
@@ -1268,6 +1257,7 @@ PPCODE:
     int preload_ix;
     int package_ix;
     int loaded_ix;
+    int glue_ix;
     int msghandler_ix;
     int status;
 
@@ -1345,14 +1335,19 @@ PPCODE:
         croak (exception_string);
     }
     /* Dup the module on top of the stack */
-    marpa_lua_pushvalue(L, -1);
+    glue_ix = marpa_lua_gettop(L);
+    marpa_lua_pushvalue(L, glue_ix);
     marpa_lua_setfield(L, loaded_ix, "glue");
+    marpa_lua_pushvalue(L, glue_ix);
     marpa_lua_setglobal(L, "glue");
 
     /* create metatables */
-    create_sv_mt(L);
+    marpa_luaL_newmetatable(L, MT_NAME_SV);
+    /* Lua stack: [mt] */
+    /* register methods */
+    marpa_luaL_setfuncs(L, glue_sv_meths, 0);
 
-    marpa_luaL_newlib(L, marpa_funcs);
+    marpa_luaL_newlib(L, glue_funcs);
     /* Lua stack: [ marpa_table ] */
     marpa_table = marpa_lua_gettop (L);
     /* Lua stack: [ marpa_table ] */
