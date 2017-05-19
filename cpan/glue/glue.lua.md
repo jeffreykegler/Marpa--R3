@@ -153,11 +153,10 @@ Set "strict" globals, using code taken from strict.lua.
         mt.__declared = {
            _G = true,
            _M = true,
-           last_exception = true, -- should this be here?
+           last_exception = true, -- TODO -- should this be here?
            glue = true,
            inspect = true,
            kollos = true,
-           marpa = true, -- TODO -- do I need this?  why?
            strict = true,
         }
 

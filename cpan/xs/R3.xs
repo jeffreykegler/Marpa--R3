@@ -11,7 +11,10 @@
  * of the licenses in the directory LICENSES.
  */
 
+/* TODO: Eliminate this? */
 #include "marpa.h"
+
+/* TODO: Replace error codes with Lua equivalent? */
 #include "marpa_codes.h"
 
 #define PERL_NO_GET_CONTEXT
@@ -28,12 +31,8 @@
 #define LUAOPEN_KOLLOS_METAL kollos_metal_loader
 #include <kollos.h>
 
-typedef unsigned int Marpa_Codepoint;
-
+/* TODO: Replace this with Lua equivalent? */
 extern const struct marpa_error_description_s marpa_error_description[];
-extern const struct marpa_event_description_s marpa_event_description[];
-extern const struct marpa_step_type_description_s
-  marpa_step_type_description[];
 
 typedef struct
 {
@@ -1214,6 +1213,7 @@ void
 error_names()
 PPCODE:
 {
+  /* TODO: Replace this function with Lua equivalent? */
   int error_code;
   for (error_code = 0; error_code < MARPA_ERROR_COUNT; error_code++)
     {
@@ -1333,7 +1333,7 @@ PPCODE:
         marpa_lua_settop (L, base_of_stack);
         croak (exception_string);
     }
-    /* Dup the module on top of the stack */
+
     glue_ix = marpa_lua_gettop(L);
     marpa_lua_pushvalue(L, glue_ix);
     marpa_lua_setfield(L, loaded_ix, "glue");
