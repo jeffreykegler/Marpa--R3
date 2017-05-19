@@ -1202,6 +1202,7 @@ debug_level_set(new_level)
     int new_level;
 PPCODE:
 {
+  /* TODO: Replace this function with Lua equivalent? */
   const int old_level = marpa_debug_level_set (new_level);
   if (old_level || new_level)
     marpa_r3_warn ("libmarpa debug level set to %d, was %d", new_level,
@@ -1226,6 +1227,7 @@ void
 version()
 PPCODE:
 {
+  /* TODO: Replace this function with Lua equivalent? */
     int version[3];
     int result = marpa_version(version);
     if (result < 0) { XSRETURN_UNDEF; }
@@ -1238,6 +1240,7 @@ void
 tag()
 PPCODE:
 {
+  /* TODO: Replace this function with Lua equivalent? */
    const char* tag = _marpa_tag();
    XSRETURN_PV(tag);
 }
