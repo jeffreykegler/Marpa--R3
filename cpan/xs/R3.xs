@@ -943,14 +943,6 @@ static void create_sv_mt (lua_State* L) {
     marpa_lua_settop(L, base_of_stack);
 }
 
-static const struct luaL_Reg marpa_slr_meths[] = {
-    {NULL, NULL},
-};
-
-static const struct luaL_Reg marpa_slg_meths[] = {
-    {NULL, NULL},
-};
-
 static const struct luaL_Reg marpa_funcs[] = {
     {NULL, NULL},
 };
@@ -1279,7 +1271,6 @@ PPCODE:
     int base_of_stack;
     lua_State *L;
     struct lua_extraspace *p_extra;
-    int kollos_ix;
     int preload_ix;
     int package_ix;
     int loaded_ix;
@@ -1363,20 +1354,6 @@ PPCODE:
     marpa_lua_pushvalue(L, -1);
     marpa_lua_setfield(L, loaded_ix, "glue");
     marpa_lua_setglobal(L, "glue");
-
-    /* We will need the kollos table in what follows,
-     * so get it from the global.
-     */
-    marpa_lua_getglobal(L, "kollos");
-    kollos_ix = marpa_lua_gettop(L);
-
-    marpa_lua_getfield(L, kollos_ix, "class_slg");
-    marpa_lua_getfield(L, kollos_ix, "upvalues");
-    marpa_luaL_setfuncs(L, marpa_slg_meths, 1);
-
-    marpa_lua_getfield(L, kollos_ix, "class_slr");
-    marpa_lua_getfield(L, kollos_ix, "upvalues");
-    marpa_luaL_setfuncs(L, marpa_slr_meths, 1);
 
     /* create metatables */
     create_sv_mt(L);
