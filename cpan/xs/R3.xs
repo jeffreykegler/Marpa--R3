@@ -679,7 +679,7 @@ push_val (lua_State * L, SV * val)
  * The caller must have a reference count whose ownership
  * the caller is prepared to transfer to the Lua userdata.
  */
-static void marpa_sv_sv_noinc (lua_State* L, SV* sv) {
+static void glue_sv_sv_noinc (lua_State* L, SV* sv) {
     SV** p_sv = (SV**)marpa_lua_newuserdata(L, sizeof(SV*));
     *p_sv = sv;
     /* warn("new ud %p, SV %p %s %d\n", p_sv, sv, __FILE__, __LINE__); */
@@ -689,7 +689,7 @@ static void marpa_sv_sv_noinc (lua_State* L, SV* sv) {
 }
 
 #define MARPA_SV_SV(L, sv) \
-    (marpa_sv_sv_noinc((L), (sv)), SvREFCNT_inc_simple_void_NN (sv))
+    (glue_sv_sv_noinc((L), (sv)), SvREFCNT_inc_simple_void_NN (sv))
 
 /* Creates a userdata containing a reference to a Perl AV, and
  * leaves the new userdata on top of the stack.
@@ -698,8 +698,8 @@ static void marpa_sv_sv_noinc (lua_State* L, SV* sv) {
  * the caller is prepared to transfer to the Lua userdata.
  */
 /* TODO: Will I need this? */
-static void marpa_sv_av_noinc (lua_State* L, AV* av) PERL_UNUSED_DECL;
-static void marpa_sv_av_noinc (lua_State* L, AV* av) {
+static void glue_sv_av_noinc (lua_State* L, AV* av) PERL_UNUSED_DECL;
+static void glue_sv_av_noinc (lua_State* L, AV* av) {
     dTHX;
     SV* av_ref = newRV_noinc((SV*)av);
     SV** p_sv = (SV**)marpa_lua_newuserdata(L, sizeof(SV*));
@@ -711,17 +711,17 @@ static void marpa_sv_av_noinc (lua_State* L, AV* av) {
 }
 
 #define MARPA_SV_AV(L, av) \
-    (SvREFCNT_inc_simple_void_NN (av), marpa_sv_av_noinc((L), (av)))
+    (SvREFCNT_inc_simple_void_NN (av), glue_sv_av_noinc((L), (av)))
 
-static int marpa_sv_undef (lua_State* L) {
+static int glue_sv_undef (lua_State* L) {
     dTHX;
     /* [] */
-    marpa_sv_sv_noinc( L, newSV(0) );
+    glue_sv_sv_noinc( L, newSV(0) );
     /* [sv_userdata] */
     return 1;
 }
 
-static int marpa_sv_finalize_meth (lua_State* L) {
+static int glue_sv_finalize_meth (lua_State* L) {
     dTHX;
     /* Is this check necessary after development? */
     SV** p_sv = (SV**)marpa_luaL_checkudata(L, 1, MT_NAME_SV);
@@ -749,7 +749,7 @@ static lua_Number marpa_xlua_tonumber (lua_State* L, int idx, int* pisnum) {
     return (lua_Number) SvNV (*(SV**)ud);
 }
 
-static int marpa_sv_add_meth (lua_State* L) {
+static int glue_sv_add_meth (lua_State* L) {
     lua_Number num1 = marpa_xlua_tonumber(L, 1, NULL);
     lua_Number num2 = marpa_xlua_tonumber(L, 2, NULL);
     marpa_lua_pushnumber(L, num1+num2);
@@ -761,7 +761,7 @@ static int marpa_sv_add_meth (lua_State* L) {
  * SV immediately, or increment the reference count.
  * Will return 0, if there is no SV at that index.
  */
-static SV** marpa_av_fetch(SV* table, lua_Integer key) {
+static SV** glue_av_fetch(SV* table, lua_Integer key) {
      dTHX;
      AV* av;
      if ( !SvROK(table) ) {
@@ -774,19 +774,19 @@ static SV** marpa_av_fetch(SV* table, lua_Integer key) {
      return av_fetch(av, (int)key, 0);
 }
 
-static int marpa_av_fetch_meth(lua_State* L) {
+static int glue_av_fetch_meth(lua_State* L) {
     SV** p_result_sv;
     SV** p_table_sv = (SV**)marpa_luaL_checkudata(L, 1, MT_NAME_SV);
     lua_Integer key = marpa_luaL_checkinteger(L, 2);
 
-    p_result_sv = marpa_av_fetch(*p_table_sv, key);
+    p_result_sv = glue_av_fetch(*p_table_sv, key);
     if (p_result_sv) {
         SV* const sv = *p_result_sv;
         /* Increment the reference count and put this SV on top of the stack */
         MARPA_SV_SV(L, sv);
     } else {
         /* Put a new nil SV on top of the stack */
-        marpa_sv_undef(L);
+        glue_sv_undef(L);
     }
     return 1;
 }
@@ -794,7 +794,7 @@ static int marpa_av_fetch_meth(lua_State* L) {
 /* Basically a Lua wrapper for Perl's av_len()
  */
 static int
-marpa_av_len_meth (lua_State * L)
+glue_av_len_meth (lua_State * L)
 {
     dTHX;
     AV *av;
@@ -814,7 +814,7 @@ marpa_av_len_meth (lua_State * L)
     return 1;
 }
 
-static void marpa_av_store(SV* table, lua_Integer key, SV*value) {
+static void glue_av_store(SV* table, lua_Integer key, SV*value) {
      dTHX;
      AV* av;
      if ( !SvROK(table) ) {
@@ -827,7 +827,7 @@ static void marpa_av_store(SV* table, lua_Integer key, SV*value) {
      av_store(av, (int)key, value);
 }
 
-static int marpa_av_store_meth(lua_State* L) {
+static int glue_av_store_meth(lua_State* L) {
     SV** p_table_sv = (SV**)marpa_luaL_checkudata(L, 1, MT_NAME_SV);
     lua_Integer key = marpa_luaL_checkinteger(L, 2);
     SV* value_sv = coerce_to_sv(L, 3, '-');
@@ -835,12 +835,12 @@ static int marpa_av_store_meth(lua_State* L) {
     /* coerce_to_sv transfered a reference count to us, which we
      * pass on to the AV.
      */
-    marpa_av_store(*p_table_sv, key, value_sv);
+    glue_av_store(*p_table_sv, key, value_sv);
     return 0;
 }
 
 static void
-marpa_av_fill (lua_State * L, SV * sv, int x)
+glue_av_fill (lua_State * L, SV * sv, int x)
 {
   dTHX;
   AV *av;
@@ -864,19 +864,19 @@ marpa_av_fill (lua_State * L, SV * sv, int x)
      /* warn("%s %d\n", __FILE__, __LINE__); */
 }
 
-static int marpa_av_fill_meth (lua_State* L) {
+static int glue_av_fill_meth (lua_State* L) {
     /* After development, check not needed */
     /* I think this call is not used anywhere in the test suite */
     SV** p_table_sv = (SV**)marpa_luaL_checkudata(L, 1, MT_NAME_SV);
     /* warn("%s %d\n", __FILE__, __LINE__); */
     lua_Integer index = marpa_luaL_checkinteger(L, 2);
     /* warn("%s %d\n", __FILE__, __LINE__); */
-    marpa_av_fill(L, *p_table_sv, (int)index);
+    glue_av_fill(L, *p_table_sv, (int)index);
     /* warn("%s %d\n", __FILE__, __LINE__); */
     return 0;
 }
 
-static int marpa_sv_tostring_meth(lua_State* L) {
+static int glue_sv_tostring_meth(lua_State* L) {
     /* Lua stack: [ sv_userdata ] */
     /* After development, check not needed */
     SV** p_table_sv = (SV**)marpa_luaL_checkudata(L, 1, MT_NAME_SV);
@@ -892,7 +892,7 @@ static int marpa_sv_tostring_meth(lua_State* L) {
     return 1;
 }
 
-static int marpa_sv_svaddr_meth(lua_State* L) {
+static int glue_sv_svaddr_meth(lua_State* L) {
     /* Lua stack: [ sv_userdata ] */
     /* For debugging, so keep the check even after development */
     SV** p_table_sv = (SV**)marpa_luaL_checkudata(L, 1, MT_NAME_SV);
@@ -900,7 +900,7 @@ static int marpa_sv_svaddr_meth(lua_State* L) {
     return 1;
 }
 
-static int marpa_sv_addr_meth(lua_State* L) {
+static int glue_sv_addr_meth(lua_State* L) {
     /* Lua stack: [ sv_userdata ] */
     /* For debugging, so keep the check even after development */
     SV** p_table_sv = (SV**)marpa_luaL_checkudata(L, 1, MT_NAME_SV);
@@ -908,21 +908,21 @@ static int marpa_sv_addr_meth(lua_State* L) {
     return 1;
 }
 
-static const struct luaL_Reg marpa_sv_meths[] = {
-    {"__add", marpa_sv_add_meth},
-    {"__gc", marpa_sv_finalize_meth},
-    {"__index", marpa_av_fetch_meth},
-    {"__newindex", marpa_av_store_meth},
-    {"__tostring", marpa_sv_tostring_meth},
+static const struct luaL_Reg glue_sv_meths[] = {
+    {"__add", glue_sv_add_meth},
+    {"__gc", glue_sv_finalize_meth},
+    {"__index", glue_av_fetch_meth},
+    {"__newindex", glue_av_store_meth},
+    {"__tostring", glue_sv_tostring_meth},
     {NULL, NULL},
 };
 
-static const struct luaL_Reg marpa_sv_funcs[] = {
-    {"fill", marpa_av_fill_meth},
-    {"top_index", marpa_av_len_meth},
-    {"undef", marpa_sv_undef},
-    {"svaddr", marpa_sv_svaddr_meth},
-    {"addr", marpa_sv_addr_meth},
+static const struct luaL_Reg glue_sv_funcs[] = {
+    {"fill", glue_av_fill_meth},
+    {"top_index", glue_av_len_meth},
+    {"undef", glue_sv_undef},
+    {"svaddr", glue_sv_svaddr_meth},
+    {"addr", glue_sv_addr_meth},
     {NULL, NULL},
 };
 
@@ -938,7 +938,7 @@ static void create_sv_mt (lua_State* L) {
     /* Lua stack: [mt] */
 
     /* register methods */
-    marpa_luaL_setfuncs(L, marpa_sv_meths, 0);
+    marpa_luaL_setfuncs(L, glue_sv_meths, 0);
     /* Lua stack: [mt] */
     marpa_lua_settop(L, base_of_stack);
 }
@@ -1146,7 +1146,7 @@ static void recursive_coerce_to_lua(
 
     if (sig == 'S') {
         SvREFCNT_inc_simple_void_NN (sv);
-        marpa_sv_sv_noinc (L, sv);
+        glue_sv_sv_noinc (L, sv);
         return;
     }
 
@@ -1367,7 +1367,7 @@ PPCODE:
     marpa_lua_setglobal (L, "marpa");
     /* Lua stack: [ marpa_table ] */
 
-    marpa_luaL_newlib(L, marpa_sv_funcs);
+    marpa_luaL_newlib(L, glue_sv_funcs);
     /* Lua stack: [ marpa_table, sv_table ] */
     marpa_lua_setfield (L, marpa_table, "sv");
     /* Lua stack: [ marpa_table ] */
