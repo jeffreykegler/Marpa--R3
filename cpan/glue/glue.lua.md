@@ -173,14 +173,14 @@ Set "strict" globals, using code taken from strict.lua.
           return rawget(t, n)
         end
 
-        function strict_on()
+        local function strict_on()
             local G_mt = getmetatable(_G)
             if G_mt == nil then
               setmetatable(_G, strict_mt)
             end
         end
 
-        function strict_off()
+        local function strict_off()
             local G_mt = getmetatable(_G)
             if G_mt == strict_mt then
               setmetatable(_G, nil)
