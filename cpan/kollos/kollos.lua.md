@@ -782,6 +782,7 @@ This is a registry object.
 ```
     -- miranda: section+ luaL_Reg definitions
     static const struct luaL_Reg slr_methods[] = {
+      {"step", lca_slr_step_meth},
       { NULL, NULL },
     };
 
@@ -1555,6 +1556,85 @@ Returns the Libmarpa object if it could "get" one,
         slr.has_parse = true
         return lmw_o
     end
+```
+
+### Evaluation
+
+```
+    -- miranda: section+ class_slr C methods
+    static int lca_slr_step_meth (lua_State * L)
+    {
+        Marpa_Value v;
+        lua_Integer step_type;
+        const int recce_table = marpa_lua_gettop (L);
+        int step_table;
+
+        marpa_luaL_checktype (L, 1, LUA_TTABLE);
+        /* Lua stack: [ recce_table ] */
+        marpa_lua_getfield(L, recce_table, "lmw_v");
+        /* Lua stack: [ recce_table, lmw_v ] */
+        marpa_luaL_argcheck (L, (LUA_TUSERDATA == marpa_lua_getfield (L,
+                    -1, "_libmarpa")), 1,
+            "Internal error: recce._libmarpa userdata not set");
+        /* Lua stack: [ recce_table, lmw_v, v_ud ] */
+        v = *(Marpa_Value *) marpa_lua_touserdata (L, -1);
+        /* Lua stack: [ recce_table, lmw_v, v_ud ] */
+        marpa_lua_settop (L, recce_table);
+        /* Lua stack: [ recce_table ] */
+        marpa_lua_newtable (L);
+        /* Lua stack: [ recce_table, step_table ] */
+        step_table = marpa_lua_gettop (L);
+        marpa_lua_pushvalue (L, -1);
+        marpa_lua_setfield (L, recce_table, "this_step");
+        /* Lua stack: [ recce_table, step_table ] */
+
+        step_type = (lua_Integer) marpa_v_step (v);
+        marpa_lua_pushstring (L, step_name_by_code (step_type));
+        marpa_lua_setfield (L, step_table, "type");
+
+        /* Stack indexes adjusted up by 1, because Lua arrays
+         * are 1-based.
+         */
+        switch (step_type) {
+        case MARPA_STEP_RULE:
+            marpa_lua_pushinteger (L, marpa_v_result (v)+1);
+            marpa_lua_setfield (L, step_table, "result");
+            marpa_lua_pushinteger (L, marpa_v_arg_n (v)+1);
+            marpa_lua_setfield (L, step_table, "arg_n");
+            marpa_lua_pushinteger (L, marpa_v_rule (v));
+            marpa_lua_setfield (L, step_table, "rule");
+            marpa_lua_pushinteger (L, marpa_v_rule_start_es_id (v));
+            marpa_lua_setfield (L, step_table, "start_es_id");
+            marpa_lua_pushinteger (L, marpa_v_es_id (v));
+            marpa_lua_setfield (L, step_table, "es_id");
+            break;
+        case MARPA_STEP_TOKEN:
+            marpa_lua_pushinteger (L, marpa_v_result (v)+1);
+            marpa_lua_setfield (L, step_table, "result");
+            marpa_lua_pushinteger (L, marpa_v_token (v));
+            marpa_lua_setfield (L, step_table, "symbol");
+            marpa_lua_pushinteger (L, marpa_v_token_value (v));
+            marpa_lua_setfield (L, step_table, "value");
+            marpa_lua_pushinteger (L, marpa_v_token_start_es_id (v));
+            marpa_lua_setfield (L, step_table, "start_es_id");
+            marpa_lua_pushinteger (L, marpa_v_es_id (v));
+            marpa_lua_setfield (L, step_table, "es_id");
+            break;
+        case MARPA_STEP_NULLING_SYMBOL:
+            marpa_lua_pushinteger (L, marpa_v_result (v)+1);
+            marpa_lua_setfield (L, step_table, "result");
+            marpa_lua_pushinteger (L, marpa_v_token (v));
+            marpa_lua_setfield (L, step_table, "symbol");
+            marpa_lua_pushinteger (L, marpa_v_token_start_es_id (v));
+            marpa_lua_setfield (L, step_table, "start_es_id");
+            marpa_lua_pushinteger (L, marpa_v_es_id (v));
+            marpa_lua_setfield (L, step_table, "es_id");
+            break;
+        }
+
+        return 0;
+    }
+
 ```
 
 ### Locations
@@ -4729,6 +4809,7 @@ Luacheck declarations
     -- miranda: insert non-standard wrappers
     -- miranda: insert object userdata gc methods
     -- miranda: insert kollos table methods
+    -- miranda: insert class_slr C methods
     -- miranda: insert luaL_Reg definitions
     -- miranda: insert object constructors
 

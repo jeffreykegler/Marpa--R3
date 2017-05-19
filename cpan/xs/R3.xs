@@ -107,16 +107,6 @@ static void lua_refdec(lua_State* L)
 
 static const char marpa_lua_class_name[] = "Marpa::R3::Lua";
 
-static const char *
-step_type_to_string (const lua_Integer step_type)
-{
-  const char *step_type_name = NULL;
-  if (step_type >= 0 && step_type < MARPA_STEP_COUNT) {
-      step_type_name = marpa_step_type_description[step_type].name;
-  }
-  return step_type_name;
-}
-
 /* Wrapper to use vwarn with libmarpa */
 static int marpa_r3_warn(const char* format, ...)
 {
@@ -953,82 +943,7 @@ static void create_sv_mt (lua_State* L) {
     marpa_lua_settop(L, base_of_stack);
 }
 
-static int
-xlua_recce_step_meth (lua_State * L)
-{
-    Marpa_Value v;
-    lua_Integer step_type;
-    const int recce_table = marpa_lua_gettop (L);
-    int step_table;
-
-    marpa_luaL_checktype (L, 1, LUA_TTABLE);
-    /* Lua stack: [ recce_table ] */
-    marpa_lua_getfield(L, recce_table, "lmw_v");
-    /* Lua stack: [ recce_table, lmw_v ] */
-    marpa_luaL_argcheck (L, (LUA_TUSERDATA == marpa_lua_getfield (L,
-                -1, "_libmarpa")), 1,
-        "Internal error: recce._libmarpa userdata not set");
-    /* Lua stack: [ recce_table, lmw_v, v_ud ] */
-    v = *(Marpa_Value *) marpa_lua_touserdata (L, -1);
-    /* Lua stack: [ recce_table, lmw_v, v_ud ] */
-    marpa_lua_settop (L, recce_table);
-    /* Lua stack: [ recce_table ] */
-    marpa_lua_newtable (L);
-    /* Lua stack: [ recce_table, step_table ] */
-    step_table = marpa_lua_gettop (L);
-    marpa_lua_pushvalue (L, -1);
-    marpa_lua_setfield (L, recce_table, "this_step");
-    /* Lua stack: [ recce_table, step_table ] */
-
-    step_type = (lua_Integer) marpa_v_step (v);
-    marpa_lua_pushstring (L, step_type_to_string (step_type));
-    marpa_lua_setfield (L, step_table, "type");
-
-    /* Stack indexes adjusted up by 1, because Lua arrays
-     * are 1-based.
-     */
-    switch (step_type) {
-    case MARPA_STEP_RULE:
-        marpa_lua_pushinteger (L, marpa_v_result (v)+1);
-        marpa_lua_setfield (L, step_table, "result");
-        marpa_lua_pushinteger (L, marpa_v_arg_n (v)+1);
-        marpa_lua_setfield (L, step_table, "arg_n");
-        marpa_lua_pushinteger (L, marpa_v_rule (v));
-        marpa_lua_setfield (L, step_table, "rule");
-        marpa_lua_pushinteger (L, marpa_v_rule_start_es_id (v));
-        marpa_lua_setfield (L, step_table, "start_es_id");
-        marpa_lua_pushinteger (L, marpa_v_es_id (v));
-        marpa_lua_setfield (L, step_table, "es_id");
-        break;
-    case MARPA_STEP_TOKEN:
-        marpa_lua_pushinteger (L, marpa_v_result (v)+1);
-        marpa_lua_setfield (L, step_table, "result");
-        marpa_lua_pushinteger (L, marpa_v_token (v));
-        marpa_lua_setfield (L, step_table, "symbol");
-        marpa_lua_pushinteger (L, marpa_v_token_value (v));
-        marpa_lua_setfield (L, step_table, "value");
-        marpa_lua_pushinteger (L, marpa_v_token_start_es_id (v));
-        marpa_lua_setfield (L, step_table, "start_es_id");
-        marpa_lua_pushinteger (L, marpa_v_es_id (v));
-        marpa_lua_setfield (L, step_table, "es_id");
-        break;
-    case MARPA_STEP_NULLING_SYMBOL:
-        marpa_lua_pushinteger (L, marpa_v_result (v)+1);
-        marpa_lua_setfield (L, step_table, "result");
-        marpa_lua_pushinteger (L, marpa_v_token (v));
-        marpa_lua_setfield (L, step_table, "symbol");
-        marpa_lua_pushinteger (L, marpa_v_token_start_es_id (v));
-        marpa_lua_setfield (L, step_table, "start_es_id");
-        marpa_lua_pushinteger (L, marpa_v_es_id (v));
-        marpa_lua_setfield (L, step_table, "es_id");
-        break;
-    }
-
-    return 0;
-}
-
 static const struct luaL_Reg marpa_slr_meths[] = {
-    {"step", xlua_recce_step_meth},
     {NULL, NULL},
 };
 

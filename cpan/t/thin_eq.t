@@ -138,7 +138,7 @@ $marpa_lua->exec(<<'END_OF_LUA');
            if not ok then error_throw(step) end
            if not step then break end
            local type = step[1]
-           if type == 'RULE' then
+           if type == 'MARPA_STEP_RULE' then
                local _, rule_id, start_loc, end_loc, result, arg_0, arg_n = table.unpack(step)
                rule_id = rule_id+0
                if rule_id == start_rule_id then
@@ -176,11 +176,11 @@ $marpa_lua->exec(<<'END_OF_LUA');
                    goto NEXT_STEP
                end
                stack[result] = { string.format("Unknown rule ID: %d", rule_id), 0 }
-           elseif type == 'TOKEN' then
+           elseif type == 'MARPA_STEP_TOKEN' then
                local _, symbol, start_loc, end_loc, result, token_value_ix = table.unpack(step)
                stack[result] = token_strings[token_value_ix]
            else
-               stack[result] = { string.format("Unexpected step type: %q\n", type), 0 }
+               error( string.format("Unexpected step type: %q\n", type) )
            end
            ::NEXT_STEP::
         end
@@ -275,11 +275,11 @@ $marpa_lua->exec(<<'END_OF_LUA');
        if not ok then error_throw(step) end
        if not step then break end
        local type, symbol, start_loc, end_loc = table.unpack(step)
-       if type == 'RULE' then
+       if type == 'MARPA_STEP_RULE' then
            result[#result+1] = string.format("Rule %s is from %d to %d\n", symbol, start_loc, end_loc)
-       elseif type == 'TOKEN' then
+       elseif type == 'MARPA_STEP_TOKEN' then
            result[#result+1] = string.format("Token %s is from %d to %d\n", symbol, start_loc, end_loc)
-       elseif type == 'NULLING_SYMBOL' then
+       elseif type == 'MARPA_STEP_NULLING_SYMBOL' then
            result[#result+1] = string.format("Nulling symbol %s is from %d to %d\n", symbol, start_loc, end_loc)
        else
            result[#result+1] = string.format("Unknown step type: %q\n", type)
