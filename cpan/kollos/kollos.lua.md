@@ -1999,6 +1999,23 @@ an L0 range
             end
         end
 
+        events = slg.discard_event_by_name[event_name]
+        if events then
+            local g_l0_rules = slg.l0.irls
+            local r_l0_rules = slr.l0.irls
+            for ix = 1, #events do
+                local event_data = events[ix]
+                local irlid = event_data.irlid
+                if activate
+                    and not g_l0_rules[irlid].event_on_discard
+                then
+                    -- TODO: Can this be a user error?
+                    error("Attempt to activate non-existent discard event")
+                end
+                r_l0_rules[irlid].event_on_discard_active = activate
+            end
+        end
+
         events = slg.lexeme_event_by_name[event_name]
         if events then
             local g_g1_symbols = slg.g1.isys

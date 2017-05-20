@@ -260,34 +260,6 @@ END_OF_LUA
         return slr:activate_by_event_name(event_name, activate)
 END_OF_LUA
 
-        my $symbol_ids =
-            $symbol_ids_by_event_name_and_type->{$event_name}->{lexeme} // [];
-
-      # There is a lot of overlap of the code here with Marpa::R3::Scanless::R::activate()
-
-        my $lexer_rule_ids =
-            $symbol_ids_by_event_name_and_type->{$event_name}->{discard}
-            // [];
-
-      $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 'ii', $lexer_rule_ids, ($is_active ? 1 : 0) );
-        local slr, lexer_rule_ids, is_active_arg = ...
-        local slg = slr.slg
-        local is_active = (is_active_arg ~= 0 and true or nil)
-        local g_l0_rules = slg.l0.irls
-        local r_l0_rules = slr.l0.irls
-        for ix = 1, #lexer_rule_ids do
-            local lexer_rule_id = lexer_rule_ids[ix]
-            if is_active then
-                if not g_l0_rules[lexer_rule_id].event_on_discard then
-                    -- TODO: Can this be a user error?
-                    error("Attempt to activate non-existent discard event")
-                end
-            end
-            r_l0_rules[lexer_rule_id].event_on_discard_active = is_active
-        end
-END_OF_LUA
-
     } ## end EVENT: for my $event_name ( keys %{$event_is_active_arg} )
 
         $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
