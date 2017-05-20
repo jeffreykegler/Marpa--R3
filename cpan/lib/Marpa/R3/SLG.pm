@@ -381,7 +381,13 @@ END_OF_LUA
                 }
                 event_by_isy[isyid] = event_desc
                 event_by_isy[isy_name] = event_desc
-                event_by_name[event_name] = event_desc
+                local name_entry = event_by_name[event_name]
+                if not name_entry then
+                    event_by_name[event_name] = { event_desc }
+                else
+                    name_entry[#name_entry+1] = event_desc
+                end
+
 
                 --  NOT serializable
                 --  Must be done before precomputation
@@ -832,7 +838,12 @@ END_OF_LUA
                 }
                 lexeme_event_by_isy[g1_lexeme_id] = event_desc
                 lexeme_event_by_isy[lexeme_name] = event_desc
-                lexeme_event_by_name[event_name] = event_desc
+                local name_entry = lexeme_event_by_name[event_name]
+                if not name_entry then
+                    lexeme_event_by_name[event_name] = { event_desc }
+                else
+                    name_entry[#name_entry+1] = event_desc
+                end
 
                 local lexeme_data = slg.g1.isys[g1_lexeme_id]
                 if is_active then

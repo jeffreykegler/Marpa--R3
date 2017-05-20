@@ -1967,24 +1967,33 @@ an L0 range
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.activate_by_event_name(slr, event_name, activate)
         local slg = slr.slg
-        local event_data
+        local events
 
-        event_data = slg.completion_event_by_name[event_name]
-        if event_data then
-            local isyid = event_data.isyid
-            slr.g1.lmw_r:completion_symbol_activate(isyid, activate)
+        events = slg.completion_event_by_name[event_name]
+        if events then
+            for ix = 1, #events do
+                local event_data = events[ix]
+                local isyid = event_data.isyid
+                slr.g1.lmw_r:completion_symbol_activate(isyid, activate)
+            end
         end
 
-        event_data = slg.nulled_event_by_name[event_name]
-        if event_data then
-            local isyid = event_data.isyid
-            slr.g1.lmw_r:nulled_symbol_activate(isyid, activate)
+        events = slg.nulled_event_by_name[event_name]
+        if events then
+            for ix = 1, #events do
+                local event_data = events[ix]
+                local isyid = event_data.isyid
+                slr.g1.lmw_r:nulled_symbol_activate(isyid, activate)
+            end
         end
 
-        event_data = slg.prediction_event_by_name[event_name]
-        if event_data then
-            local isyid = event_data.isyid
-            slr.g1.lmw_r:prediction_symbol_activate(isyid, activate)
+        events = slg.prediction_event_by_name[event_name]
+        if events then
+            for ix = 1, #events do
+                local event_data = events[ix]
+                local isyid = event_data.isyid
+                slr.g1.lmw_r:prediction_symbol_activate(isyid, activate)
+            end
         end
     end
 ```

@@ -896,20 +896,6 @@ my $libmarpa_event_handlers = {
         return 0;
     },
 
-    # 'after lexeme' is same -- copied over below
-    'before lexeme' => sub {
-        my ( $slr,  $event )     = @_;
-        my ( undef, $lexeme_id ) = @{$event};
-        my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-        my $lexeme_event =
-            $slg->[Marpa::R3::Internal::Scanless::G::LEXEME_EVENT_BY_ID]
-            ->[$lexeme_id];
-        push @{ $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] },
-            [$lexeme_event]
-            if defined $lexeme_event;
-        return 1;
-    },
-
     'discarded lexeme' => sub {
         my ( $slr,  $event )     = @_;
         my ( undef, $rule_id, @other_data) = @{$event};
@@ -955,8 +941,6 @@ my $libmarpa_event_handlers = {
     },
 };
 
-$libmarpa_event_handlers->{'after lexeme'} = $libmarpa_event_handlers->{'before lexeme'};
-
 # Return 1 if internal scanning should pause
 sub Marpa::R3::Internal::Scanless::convert_libmarpa_events {
     my ($slr)    = @_;
@@ -972,6 +956,9 @@ sub Marpa::R3::Internal::Scanless::convert_libmarpa_events {
         -- print(inspect(event))
         local event_type = event[1]
 
+        -- The code next set of events is highly similar -- an isyid at
+        -- event[2] is looked up in a table of event names.  Does it
+        -- make sense to share code, perhaps using closures?
         if event_type == 'symbol completed' then
             local completed_isyid = event[2]
             local slg = slr.slg
