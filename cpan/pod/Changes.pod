@@ -115,7 +115,7 @@ In Marpa::R3 they must resolve to Perl subroutines.
 The Stuifzand interface (PSIF), and its documentation,
 have been removed.
 Important in the development of Marpa,
-it now has little or now usage.
+it now has little or no usage.
 
 =head2 The Thin interface (THIF) has been removed.
 
@@ -216,8 +216,8 @@ The following methods have been changed:
 =back
 
 They no longer take an argument indicating the subgrammar --
-instead they always return result for the G1 grammar.
-New methods have been added to return results for the L0
+instead they always return the results for the G1 grammar.
+New methods have been added to return the results for the L0
 grammar.
 For these, see
 L</"New Marpa::R3::Scanless::G methods">.
