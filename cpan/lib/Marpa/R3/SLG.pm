@@ -774,64 +774,82 @@ END_OF_LUA
         ) if not defined $g1_id_by_lexeme_name{$lexeme_name};
     }
 
-    # Mark the lexemes, and set their data
-    # already determined above.
-  LEXEME: for my $lexeme_name ( keys %g1_id_by_lexeme_name ) {
-        my $g1_lexeme_id = $g1_id_by_lexeme_name{$lexeme_name};
-        my $declarations = $lexeme_declarations->{$lexeme_name};
+    $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 'ss', \%g1_id_by_lexeme_name, ($lexeme_declarations // {}));
+    local slg, g1_id_by_lexeme_name, lexeme_declarations = ...
+    -- local slg, lexeme_name, g1_lexeme_id, declarations = ...
 
-        $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-            <<'END_OF_LUA', 'sis', $lexeme_name, $g1_lexeme_id, ($declarations // {}));
-    local slg, lexeme_name, g1_lexeme_id, declarations = ...
-    -- local slg, lexeme_name, g1_lexeme_id, priority, eager = ...
-    local lexeme_data = slg.g1.isys[g1_lexeme_id]
-    local priority = 0
-    if declarations.priority then
-        priority = declarations.priority + 0
-    end
-    lexeme_data.priority = priority
-    if declarations.eager then lexeme_data.eager = true end
-    if slg.completion_event_by_isy[lexeme_name] then
-        error(string.format(
-            "A completion event is declared for <%s>, but it is a lexeme.\n\z
-            \u{20}    Completion events are only valid for symbols on the LHS of G1 rules.\n",
-            lexeme_name
-        ))
-    end
-    if slg.nulled_event_by_isy[lexeme_name] then
-        error(string.format(
-            "A nulled event is declared for <%s>, but it is a lexeme.\n\z
-            \u{20}    Nulled events are only valid for symbols on the LHS of G1 rules.\n",
-            lexeme_name
-        ))
-    end
-    lexeme_data.is_lexeme = true
+    local lexeme_event_by_isy = {}
+    local lexeme_event_by_name = {}
 
-    local pause_value = declarations.pause
-    if pause_value then
-        pause_value = math.tointeger(pause_value)
+    for lexeme_name, g1_lexeme_id in pairs(g1_id_by_lexeme_name) do
+        g1_lexeme_id = math.tointeger(g1_lexeme_id)
+        local declarations = lexeme_declarations[lexeme_name] or {}
+
         local lexeme_data = slg.g1.isys[g1_lexeme_id]
-        if pause_value == 1 then
-             lexeme_data.pause_after = true
-        elseif pause_value == -1 then
-             lexeme_data.pause_before = true
+        local priority = 0
+        if declarations.priority then
+            priority = declarations.priority + 0
         end
-        local event = declarations.event
-        local is_active = 1
-        if event then
-            is_active = event[2] ~= '0'
+        lexeme_data.priority = priority
+        if declarations.eager then lexeme_data.eager = true end
+        if slg.completion_event_by_isy[lexeme_name] then
+            error(string.format(
+                "A completion event is declared for <%s>, but it is a lexeme.\n\z
+                \u{20}    Completion events are only valid for symbols on the LHS of G1 rules.\n",
+                lexeme_name
+            ))
+        end
+        if slg.nulled_event_by_isy[lexeme_name] then
+            error(string.format(
+                "A nulled event is declared for <%s>, but it is a lexeme.\n\z
+                \u{20}    Nulled events are only valid for symbols on the LHS of G1 rules.\n",
+                lexeme_name
+            ))
+        end
+        lexeme_data.is_lexeme = true
+
+        local pause_value = declarations.pause
+        if pause_value then
+            pause_value = math.tointeger(pause_value)
             local lexeme_data = slg.g1.isys[g1_lexeme_id]
-            if is_active then
-                -- activate only if event is enabled
-                lexeme_data.pause_after_active = lexeme_data.pause_after
-                lexeme_data.pause_before_active = lexeme_data.pause_before
-            else
-                lexeme_data.pause_after_active = nil
-                lexeme_data.pause_before_active = nil
+            if pause_value == 1 then
+                 lexeme_data.pause_after = true
+            elseif pause_value == -1 then
+                 lexeme_data.pause_before = true
+            end
+            local event = declarations.event
+            local is_active = 1
+            if event then
+                local event_name = event[1]
+                local is_active = event[2] ~= '0'
+
+                local event_desc = {
+                   name = event_name,
+                   isyid = g1_lexeme_id,
+                }
+                lexeme_event_by_isy[g1_lexeme_id] = event_desc
+                lexeme_event_by_isy[lexeme_name] = event_desc
+                lexeme_event_by_name[event_name] = event_desc
+
+                local lexeme_data = slg.g1.isys[g1_lexeme_id]
+                if is_active then
+                    -- activate only if event is enabled
+                    lexeme_data.pause_after_active = lexeme_data.pause_after
+                    lexeme_data.pause_before_active = lexeme_data.pause_before
+                else
+                    lexeme_data.pause_after_active = nil
+                    lexeme_data.pause_before_active = nil
+                end
+
             end
         end
     end
 END_OF_LUA
+
+  LEXEME: for my $lexeme_name ( keys %g1_id_by_lexeme_name ) {
+        my $g1_lexeme_id = $g1_id_by_lexeme_name{$lexeme_name};
+        my $declarations = $lexeme_declarations->{$lexeme_name};
 
         my $pause_value = $declarations->{pause};
         if ( defined $pause_value ) {
