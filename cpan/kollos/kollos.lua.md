@@ -1968,13 +1968,14 @@ an L0 range
     function _M.class_slr.activate_by_event_name(slr, event_name, activate)
         local slg = slr.slg
         local events
+        local active_flag = activate and 1 or 0
 
         events = slg.completion_event_by_name[event_name]
         if events then
             for ix = 1, #events do
                 local event_data = events[ix]
                 local isyid = event_data.isyid
-                slr.g1.lmw_r:completion_symbol_activate(isyid, activate)
+                slr.g1.lmw_r:completion_symbol_activate(isyid, active_flag)
             end
         end
 
@@ -1983,7 +1984,7 @@ an L0 range
             for ix = 1, #events do
                 local event_data = events[ix]
                 local isyid = event_data.isyid
-                slr.g1.lmw_r:nulled_symbol_activate(isyid, activate)
+                slr.g1.lmw_r:nulled_symbol_activate(isyid, active_flag)
             end
         end
 
@@ -1992,7 +1993,27 @@ an L0 range
             for ix = 1, #events do
                 local event_data = events[ix]
                 local isyid = event_data.isyid
-                slr.g1.lmw_r:prediction_symbol_activate(isyid, activate)
+                slr.g1.lmw_r:prediction_symbol_activate(isyid, active_flag)
+            end
+        end
+
+        events = slg.lexeme_event_by_name[event_name]
+        if events then
+            local g_g1_symbols = slg.g1.isys
+            local r_g1_symbols = slr.g1.isys
+            for ix = 1, #events do
+                    local event_data = events[ix]
+                    local isyid = event_data.isyid
+                    -- print(event_name, activate)
+                    if activate then
+                        r_g1_symbols[isyid].pause_after_active
+                            = g_g1_symbols[isyid].pause_after
+                        r_g1_symbols[isyid].pause_before_active
+                            = g_g1_symbols[isyid].pause_before
+                    else
+                        r_g1_symbols[isyid].pause_after_active = nil
+                        r_g1_symbols[isyid].pause_before_active = nil
+                    end
             end
         end
     end

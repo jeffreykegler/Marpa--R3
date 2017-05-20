@@ -255,7 +255,7 @@ END_OF_LUA
         my $is_active = $event_is_active_arg->{$event_name};
 
     $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 'si', $event_name, $is_active );
+        <<'END_OF_LUA', 'si', $event_name, ($is_active ? 1 : undef));
         local slr, event_name, activate = ...
         return slr:activate_by_event_name(event_name, activate)
 END_OF_LUA
@@ -264,27 +264,6 @@ END_OF_LUA
             $symbol_ids_by_event_name_and_type->{$event_name}->{lexeme} // [];
 
       # There is a lot of overlap of the code here with Marpa::R3::Scanless::R::activate()
-
-      $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 'ii', $symbol_ids, ($is_active ? 1 : 0) );
-        local slr, symbol_ids, is_active_arg = ...
-        local slg = slr.slg
-        local is_active = (is_active_arg ~= 0 and true or nil)
-        local g_g1_symbols = slg.g1.isys
-        local r_g1_symbols = slr.g1.isys
-        for ix = 1, #symbol_ids do
-            local symbol_id = symbol_ids[ix]
-            if is_active then
-                r_g1_symbols[symbol_id].pause_after_active
-                    = g_g1_symbols[symbol_id].pause_after
-                r_g1_symbols[symbol_id].pause_before_active
-                    = g_g1_symbols[symbol_id].pause_before
-            else
-                r_g1_symbols[symbol_id].pause_after_active = nil
-                r_g1_symbols[symbol_id].pause_before_active = nil
-            end
-        end
-END_OF_LUA
 
         my $lexer_rule_ids =
             $symbol_ids_by_event_name_and_type->{$event_name}->{discard}
@@ -1964,42 +1943,18 @@ END_OF_LUA
 sub Marpa::R3::Scanless::R::activate {
     my ( $slr, $event_name, $activate ) = @_;
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    $activate //= 1;
 
     $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 'si', $event_name, $activate );
+        <<'END_OF_LUA', 'si', $event_name, $activate);
         local slr, event_name, activate = ...
+        if not activate then
+           activate = 1
+        else
+           activate = activate ~= 0
+        end
+        -- print('$slr->activate():', event_name, activate)
         return slr:activate_by_event_name(event_name, activate)
 END_OF_LUA
-
-    my $event_symbol_ids_by_type =
-      $slg
-      ->[Marpa::R3::Internal::Scanless::G::SYMBOL_IDS_BY_EVENT_NAME_AND_TYPE]
-      ->{$event_name};
-
-    {
-        my $symbol_ids = $event_symbol_ids_by_type->{lexeme} // [];
-        $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-            <<'END_OF_LUA', 'ii', $symbol_ids, ( $activate ? 1 : 0 ) );
-        local slr, symbol_ids, is_active_arg = ...
-        local slg = slr.slg
-        local is_active = (is_active_arg ~= 0 and true or nil)
-        local g_g1_symbols = slg.g1.isys
-        local r_g1_symbols = slr.g1.isys
-        for ix = 1, #symbol_ids do
-            local symbol_id = symbol_ids[ix]
-            if is_active then
-                r_g1_symbols[symbol_id].pause_after_active
-                    = g_g1_symbols[symbol_id].pause_after
-                r_g1_symbols[symbol_id].pause_before_active
-                    = g_g1_symbols[symbol_id].pause_before
-            else
-                r_g1_symbols[symbol_id].pause_after_active = nil
-                r_g1_symbols[symbol_id].pause_before_active = nil
-            end
-        end
-END_OF_LUA
-    }
 
     return 1;
 }
