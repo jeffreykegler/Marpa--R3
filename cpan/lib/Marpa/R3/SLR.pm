@@ -958,6 +958,8 @@ END_OF_LUA
 sub Marpa::R3::Scanless::R::resume {
     my ( $slr, $start_pos, $length ) = @_;
 
+    my $result;
+    $result = do {
     {
        my $length_arg = $length // -1;
        my $start_pos_arg = $start_pos // 'undef';
@@ -1075,6 +1077,9 @@ END_OF_LUA
     } ## end OUTER_READ: while (1)
 
     return $slr->pos();
+    };
+
+    return $result;
 } ## end sub Marpa::R3::Scanless::R::resume
 
 sub Marpa::R3::Scanless::R::events {
