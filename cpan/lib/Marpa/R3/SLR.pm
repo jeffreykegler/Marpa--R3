@@ -1113,22 +1113,24 @@ sub Marpa::R3::Scanless::R::read_problem {
     my $problem_pos = $pos;
 
     my $problem;
-    my $g1_status = 0;
     CODE_TO_PROBLEM: {
-        if ( $problem_code eq 'R1 exhausted before end' ) {
 
-            my ($lexeme_start) = $slr->call_by_tag(
-            ('@' . __FILE__ . ':' . __LINE__),
-            <<'END_OF_LUA', '>0');
-                local slr = ...
-                return slr.start_of_lexeme
+        my $cmd;
+        ($cmd, $problem) = $slr->call_by_tag(
+        ('@' . __FILE__ . ':' . __LINE__),
+        <<'END_OF_LUA', 's', $problem_code);
+            local slr, problem_code = ...
+            if problem_code == 'R1 exhausted before end' then
+                return 'last CODE_TO_PROBLEM',
+                    string.format(
+                        "Parse exhausted, but lexemes remain, at %s\n",
+                        slr:lc_brief(slr.start_of_lexeme))
+            end
+            return ''
 END_OF_LUA
 
-            my ( $line, $column ) = $slr->line_column($lexeme_start);
-            $problem =
-                "Parse exhausted, but lexemes remain, at line $line, column $column\n";
-            last CODE_TO_PROBLEM;
-        }
+        last CODE_TO_PROBLEM if $cmd eq 'last CODE_TO_PROBLEM';
+
         if ( $problem_code eq 'SLIF loop' ) {
             my ($lexeme_start) = $slr->call_by_tag(
             ('@' . __FILE__ . ':' . __LINE__),
@@ -1205,47 +1207,11 @@ END_OF_LUA
     } ## end CODE_TO_PROBLEM:
 
       my ($desc) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-          <<'END_OF_LUA', 'si', $problem, $g1_status);
-        local slr, problem, g1_status = ...
+          <<'END_OF_LUA', 's', $problem);
+        local slr, problem = ...
         local slg = slr.slg
         local desc = problem or ''
         local g1g = slg.g1.lmw_g
-        if g1_status ~= 0 then
-            local msgs = {}
-            local events = lmw_g:events()
-            for i = 1, #events, 2 do
-                local event_type = events[i]
-                local event_value = events[i+1]
-                if event_type == kollos.event["EARLEY_ITEM_THRESHOLD"] then
-                    msgs[#msgs+1] =
-                       string.format(
-                            "G1 grammar: Earley item count (%d) exceeds warning threshold\n",
-                           event_value
-                       )
-                   goto NEXT_EVENT
-                end
-                if event_type == kollos.event["EXHAUSTED"] then
-                   msgs[#msgs+1] = 'Parse exhausted'
-                   goto NEXT_EVENT
-                end
-                local event_mnemonic = kollos.event[event_type]
-                if mnemonic then
-                   msgs[#msgs+1] =
-                       string.format( "Unexpected G1 grammar event: %q", mnemonic)
-                   goto NEXT_EVENT
-                end
-                msgs[#msgs+1] = string.format("Unknown G1 grammar event: %s\n",
-                   inspect(event_type))
-                ::NEXT_EVENT::
-            end
-            msgs[#msgs+1] = 'A terminal symbol cannot also be a nulling symbol'
-            desc = table.concat(msgs)
-        end
-        if g1_status < 0 then
-            desc = string.format('G1 error: %s',
-                slr.g1.lmw_g.error_description()
-                ):gsub('\n$', '')
-        end
 
       local block = slr.current_block
       local block_ix = block.index
