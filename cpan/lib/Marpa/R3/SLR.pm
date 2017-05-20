@@ -1057,19 +1057,18 @@ END_OF_LUA
                 events[#events+1] = { "'rejected" }
                 return 'last OUTER_READ'
             end
+            if problem_code == 'invalid char' then
+                local codepoint = slr.codepoint
+                error(string.format(
+                   'Failed at unacceptable character %s',
+                   slr:character_describe(codepoint)
+               ))
+               return 'last OUTER_READ'
+            end
             return ''
 END_OF_LUA
 
         last OUTER_READ if $cmd eq 'last OUTER_READ';
-
-        if ( $problem_code eq 'invalid char' ) {
-            my ($codepoint) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-                'recce = ...; return recce.codepoint', '');
-            Marpa::R3::exception(
-                qq{Failed at unacceptable character },
-                character_describe( $slr, $codepoint )
-            );
-        } ## end if ( $problem_code eq 'invalid char' )
 
         return $slr->read_problem($problem_code);
 
@@ -1205,61 +1204,49 @@ END_OF_LUA
         $problem = 'Unrecognized problem code: ' . $problem_code;
     } ## end CODE_TO_PROBLEM:
 
-    my $desc;
-    DESC: {
-        if ( defined $problem ) {
-            $desc .= "$problem";
-        }
-
-        if ($g1_status) {
-
-      my ($desc) = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ), <<'END_OF_LUA', '');
-    local grammar = ...
-    local g1g = grammar.g1.lmw_g
-        local msgs = {}
-        local events = lmw_g:events()
-        for i = 1, #events, 2 do
-            local event_type = events[i]
-            local event_value = events[i+1]
-            if event_type == kollos.event["EARLEY_ITEM_THRESHOLD"] then
-                msgs[#msgs+1] =
-                   string.format(
-                        "G1 grammar: Earley item count (%d) exceeds warning threshold\n",
-                       event_value
-                   )
-               goto NEXT_EVENT
+      my ($desc) = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+          <<'END_OF_LUA', 'si', $problem, $g1_status);
+        local slg, problem, g1_status = ...
+        local desc = problem or ''
+        local g1g = slg.g1.lmw_g
+        if g1_status ~= 0 then
+            local msgs = {}
+            local events = lmw_g:events()
+            for i = 1, #events, 2 do
+                local event_type = events[i]
+                local event_value = events[i+1]
+                if event_type == kollos.event["EARLEY_ITEM_THRESHOLD"] then
+                    msgs[#msgs+1] =
+                       string.format(
+                            "G1 grammar: Earley item count (%d) exceeds warning threshold\n",
+                           event_value
+                       )
+                   goto NEXT_EVENT
+                end
+                if event_type == kollos.event["EXHAUSTED"] then
+                   msgs[#msgs+1] = 'Parse exhausted'
+                   goto NEXT_EVENT
+                end
+                local event_mnemonic = kollos.event[event_type]
+                if mnemonic then
+                   msgs[#msgs+1] =
+                       string.format( "Unexpected G1 grammar event: %q", mnemonic)
+                   goto NEXT_EVENT
+                end
+                msgs[#msgs+1] = string.format("Unknown G1 grammar event: %s\n",
+                   inspect(event_type))
+                ::NEXT_EVENT::
             end
-            if event_type == kollos.event["EXHAUSTED"] then
-               msgs[#msgs+1] = 'Parse exhausted'
-               goto NEXT_EVENT
-            end
-            local event_mnemonic = kollos.event[event_type]
-            if mnemonic then
-               msgs[#msgs+1] =
-                   string.format( "Unexpected G1 grammar event: %q", mnemonic)
-               goto NEXT_EVENT
-            end
-            msgs[#msgs+1] = string.format("Unknown G1 grammar event: code = %d\n"
-            ::NEXT_EVENT::
+            msgs[#msgs+1] = 'A terminal symbol cannot also be a nulling symbol'
+            desc = table.concat(msgs)
         end
-        msgs[#msgs+1] = 'A terminal symbol cannot also be a nulling symbol'
-        return table.concat(msgs)
+        if g1_status < 0 then
+            desc = string.format('G1 error: %s',
+                slr.g1.lmw_g.error_description()
+                ):gsub('\n$', '')
+        end
+        return desc
 END_OF_LUA
-
-            } ## end if ($g1_status)
-            if ( $g1_status < 0 ) {
-                my ($error_description) =
-                  $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-                    <<'END_OF_LUA', '' );
-        local grammar = ...
-        return grammar.g1.lmw_g.error_description()
-END_OF_LUA
-                $desc = 'G1 error: ' . $error_description;
-                chomp $desc;
-                last DESC;
-            }
-        } ## end DESC:
-
 
     my ($read_string_error) =
       $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
