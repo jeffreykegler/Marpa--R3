@@ -875,19 +875,6 @@ my $libmarpa_event_handlers = {
         return 0;
     },
 
-    'discarded lexeme' => sub {
-        my ( $slr,  $event )     = @_;
-        my ( undef, $rule_id, @other_data) = @{$event};
-        my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-        my $lexeme_event =
-            $slg->[Marpa::R3::Internal::Scanless::G::DISCARD_EVENT_BY_LEXER_RULE]
-            ->[$rule_id];
-        push @{ $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] },
-            [$lexeme_event, @other_data]
-            if defined $lexeme_event;
-        return 1;
-    },
-
     'l0 earley item threshold exceeded' => sub {
         my ( $slr, $event ) = @_;
         my ( undef, $position, $yim_count) = @{$event};
@@ -973,6 +960,21 @@ sub Marpa::R3::Internal::Scanless::convert_libmarpa_events {
             local event_name = slg.lexeme_event_by_isy[lexeme_isyid].name
             local events = slr.external_events
             events[#events+1] = { event_name }
+            return '', 1
+        end
+
+        -- end of run of highly similar events
+
+        if event_type == 'discarded lexeme' then
+            local lexeme_irlid = event[2]
+            local slg = slr.slg
+            local event_name = slg.discard_event_by_irl[lexeme_irlid].name
+            local new_event = { event_name }
+            for ix = 3, #event do
+                new_event[#new_event+1] = event[ix]
+            end
+            local events = slr.external_events
+            events[#events+1] = new_event
             return '', 1
         end
 
