@@ -420,9 +420,6 @@ END_OF_LUA
 
 END_OF_LUA
 
-    my $lexeme_events_by_id =
-      $slg->[Marpa::R3::Internal::Scanless::G::LEXEME_EVENT_BY_ID] = [];
-
     my $precompute_error =
       Marpa::R3::Internal::Scanless::G::precompute( $slg, 'g1' );
     if ( defined $precompute_error ) {
@@ -859,27 +856,6 @@ END_OF_LUA
         end
     end
 END_OF_LUA
-
-  LEXEME: for my $lexeme_name ( keys %g1_id_by_lexeme_name ) {
-        my $g1_lexeme_id = $g1_id_by_lexeme_name{$lexeme_name};
-        my $declarations = $lexeme_declarations->{$lexeme_name};
-
-        my $pause_value = $declarations->{pause};
-        if ( defined $pause_value ) {
-            my $is_active = 1;
-
-            if ( defined( my $event_data = $declarations->{'event'} ) ) {
-                my $event_name;
-                ( $event_name, $is_active ) = @{$event_data};
-                $lexeme_events_by_id->[$g1_lexeme_id] = $event_name;
-                push
-                  @{ $symbol_ids_by_event_name_and_type->{$event_name}->{lexeme}
-                  }, $g1_lexeme_id;
-            } ## end if ( defined( my $event_data = $declarations->{'event'...}))
-        } ## end if ( defined $pause_value )
-
-
-    } ## end LEXEME: for my $lexeme_name ( keys %g1_id_by_lexeme_name )
 
     # Second phase of lexer processing
   RULE_ID: for my $lexer_rule_id ( 0 .. $#lex_rule_to_g1_lexeme ) {

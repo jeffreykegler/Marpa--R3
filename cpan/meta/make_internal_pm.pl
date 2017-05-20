@@ -198,9 +198,8 @@ __DATA__
     { TODO -- Convert fields after here to Lua? }
 
     CHARACTER_CLASS_TABLE
-    DISCARD_EVENT_BY_LEXER_RULE
 
-    LEXEME_EVENT_BY_ID
+    DISCARD_EVENT_BY_LEXER_RULE
     SYMBOL_IDS_BY_EVENT_NAME_AND_TYPE
 
     BLESS_PACKAGE { Default package into which nodes are blessed }
