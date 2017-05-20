@@ -491,20 +491,27 @@ Deletes the interpreter if the reference count drops to zero.
     -- miranda: section+ class_slg field declarations
     class_slg_fields['g1'] = true
     class_slg_fields['l0'] = true
+
     class_slg_fields['completion_event_by_isy'] = true
     class_slg_fields['completion_event_by_name'] = true
-    class_slg_fields['exhaustion_action'] = true
-    class_slg_fields['rejection_action'] = true
+    class_slg_fields['lexeme_event_by_isy'] = true
+    class_slg_fields['lexeme_event_by_name'] = true
     class_slg_fields['nulled_event_by_isy'] = true
     class_slg_fields['nulled_event_by_name'] = true
-    class_slg_fields['nulling_semantics'] = true
-    class_slg_fields['per_codepoint'] = true
     class_slg_fields['prediction_event_by_isy'] = true
     class_slg_fields['prediction_event_by_name'] = true
+
+    class_slg_fields['exhaustion_action'] = true
+    class_slg_fields['rejection_action'] = true
+
+    class_slg_fields['nulling_semantics'] = true
+    class_slg_fields['per_codepoint'] = true
     class_slg_fields['ranking_method'] = true
     class_slg_fields['ref_count'] = true
+
     class_slg_fields['rule_semantics'] = true
     class_slg_fields['token_semantics'] = true
+
     class_slg_fields['xrls'] = true
     class_slg_fields['xsys'] = true
 ```

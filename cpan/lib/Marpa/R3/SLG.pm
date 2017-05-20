@@ -780,7 +780,9 @@ END_OF_LUA
     -- local slg, lexeme_name, g1_lexeme_id, declarations = ...
 
     local lexeme_event_by_isy = {}
+    slg.lexeme_event_by_isy = lexeme_event_by_isy
     local lexeme_event_by_name = {}
+    slg.lexeme_event_by_name = lexeme_event_by_name
 
     for lexeme_name, g1_lexeme_id in pairs(g1_id_by_lexeme_name) do
         g1_lexeme_id = math.tointeger(g1_lexeme_id)
