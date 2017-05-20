@@ -959,12 +959,19 @@ sub Marpa::R3::Scanless::R::resume {
     my ( $slr, $start_pos, $length ) = @_;
 
     my $result;
-    $result = do {
+    my $eval_error;
+    my $eval_ok;
     {
-       my $length_arg = $length // -1;
-       my $start_pos_arg = $start_pos // 'undef';
-       $slr->call_by_tag(( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 'si', $start_pos_arg, $length_arg);
+        local $@;
+        $eval_ok = eval {
+
+       # say STDERR join " ", __FILE__, __LINE__, Data::Dumper::Dumper($result);
+          FOR_LUA: {
+                {
+                    my $length_arg    = $length    // -1;
+                    my $start_pos_arg = $start_pos // 'undef';
+                    $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+                        <<'END_OF_LUA', 'si', $start_pos_arg, $length_arg );
             local slr, start_pos_arg, length_arg = ...
 
             if #slr.inputs <= 0 then
@@ -999,50 +1006,50 @@ sub Marpa::R3::Scanless::R::resume {
             end
             return slr:pos_set(start_pos, length_arg)
 END_OF_LUA
-    }
+                }
 
-    my ($trace_terminals) = $slr->call_by_tag(
-        ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA',
+                my ($trace_terminals) = $slr->call_by_tag(
+                    ( '@' . __FILE__ . ':' . __LINE__ ),
+                    <<'END_OF_LUA',
             local slr = ...
             slr.external_events = {}
             return slr.trace_terminals
 END_OF_LUA
-        ''
-    );
+                    ''
+                );
 
-    my $slg      = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+                my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
 
-  OUTER_READ: while (1) {
+              OUTER_READ: while (1) {
 
-    my ($problem_code) = $slr->call_by_tag(
-        ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA',
+                    my ($problem_code) = $slr->call_by_tag(
+                        ( '@' . __FILE__ . ':' . __LINE__ ),
+                        <<'END_OF_LUA',
             local recce = ...
             return recce:read() or ''
 END_OF_LUA
-        ''
-    );
+                        ''
+                    );
 
+                    last OUTER_READ if $problem_code eq q{};
+                    my $pause =
+                      Marpa::R3::Internal::Scanless::convert_libmarpa_events(
+                        $slr);
 
-        last OUTER_READ if $problem_code eq q{};
-        my $pause =
-          Marpa::R3::Internal::Scanless::convert_libmarpa_events($slr);
+                    last OUTER_READ if $pause;
+                    next OUTER_READ if $problem_code eq 'event';
+                    next OUTER_READ if $problem_code eq 'trace';
 
-        last OUTER_READ if $pause;
-        next OUTER_READ if $problem_code eq 'event';
-        next OUTER_READ if $problem_code eq 'trace';
+             # The event on exhaustion only occurs if needed to provide a reason
+             # to return -- if an exhausted reader would return anyway, there is
+             # no exhaustion event.  For a reliable way to detect exhaustion,
+             # use the $slr->exhausted() method.
+             # The name of the exhausted event begins with a single quote, so
+             # that it will not conflict with any user-defined event name.
 
-        # The event on exhaustion only occurs if needed to provide a reason
-        # to return -- if an exhausted reader would return anyway, there is
-        # no exhaustion event.  For a reliable way to detect exhaustion,
-        # use the $slr->exhausted() method.
-        # The name of the exhausted event begins with a single quote, so
-        # that it will not conflict with any user-defined event name.
-
-     my ($cmd) = $slr->call_by_tag(
-        ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 's', $problem_code);
+                    my ($cmd) =
+                      $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+                        <<'END_OF_LUA', 's', $problem_code );
             local slr, problem_code = ...
             local slg = slr.slg
             if problem_code == 'R1 exhausted before end'
@@ -1070,14 +1077,31 @@ END_OF_LUA
             return ''
 END_OF_LUA
 
-        last OUTER_READ if $cmd eq 'last OUTER_READ';
+                    last OUTER_READ if $cmd eq 'last OUTER_READ';
 
-        return $slr->read_problem($problem_code);
+                    $result = $slr->read_problem($problem_code);
+                    last FOR_LUA;
 
-    } ## end OUTER_READ: while (1)
+                } ## end OUTER_READ: while (1)
 
-    return $slr->pos();
-    };
+                # say STDERR join " ", __FILE__, __LINE__, $slr->pos();
+                $result = $slr->pos();
+            }
+
+            # say STDERR join " ", __FILE__, __LINE__, $result;
+            return 1;
+        };
+        $eval_error = $@;
+    }
+
+    # say STDERR join " ", __FILE__, __LINE__, Data::Dumper::Dumper($eval_ok);
+    if ( not $eval_ok ) {
+
+        # say STDERR join " ", __FILE__, __LINE__;
+        Marpa::R3::exception($eval_error);
+    }
+
+    # say STDERR join " ", __FILE__, __LINE__, $result;
 
     return $result;
 } ## end sub Marpa::R3::Scanless::R::resume
