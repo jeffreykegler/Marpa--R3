@@ -1204,9 +1204,10 @@ END_OF_LUA
         $problem = 'Unrecognized problem code: ' . $problem_code;
     } ## end CODE_TO_PROBLEM:
 
-      my ($desc) = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+      my ($desc) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
           <<'END_OF_LUA', 'si', $problem, $g1_status);
-        local slg, problem, g1_status = ...
+        local slr, problem, g1_status = ...
+        local slg = slr.slg
         local desc = problem or ''
         local g1g = slg.g1.lmw_g
         if g1_status ~= 0 then
@@ -1245,13 +1246,7 @@ END_OF_LUA
                 slr.g1.lmw_g.error_description()
                 ):gsub('\n$', '')
         end
-        return desc
-END_OF_LUA
 
-    my ($read_string_error) =
-      $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 's', $desc );
-      local slr, error_desc = ...
       local block = slr.current_block
       local block_ix = block.index
       local pos = slr.perl_pos
@@ -1268,7 +1263,7 @@ END_OF_LUA
            * String before error: %s\n\z
            * The error was at line %d, column %d, and at character %s, ...\n\z
            * here: %s\n",
-           error_desc,
+           desc,
            slr:reversed_input_escape(block_ix, pos, 50),
            line, column,
            slr:character_describe(codepoint),
@@ -1276,10 +1271,9 @@ END_OF_LUA
           )
 END_OF_LUA
 
-    Marpa::R3::exception($read_string_error);
+    Marpa::R3::exception($desc);
 
     # Never reached
-    # Fall through to return undef
     return;
 
 } ## end sub Marpa::R3::Scanless::R::read_problem
