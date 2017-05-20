@@ -347,10 +347,6 @@ END_OF_LUA
         );
     }
 
-    my $symbol_ids_by_event_name_and_type = {};
-    $slg->[Marpa::R3::Internal::Scanless::G::SYMBOL_IDS_BY_EVENT_NAME_AND_TYPE]
-      = $symbol_ids_by_event_name_and_type;
-
     my $completion_events_by_name = $hashed_source->{completion_events};
     my $nulled_events_by_name = $hashed_source->{nulled_events};
 
@@ -895,17 +891,9 @@ END_OF_LUA
         'iiii', $lexer_rule_id, $g1_lexeme_id, $assertion_id, $discard_symbol_id );
 
         my $discard_event = $discard_event_by_lexer_rule_id[$lexer_rule_id];
-        if ( defined $discard_event ) {
-            my ( $event_name, $is_active ) = @{$discard_event};
-            $slg
-              ->[ Marpa::R3::Internal::Scanless::G::DISCARD_EVENT_BY_LEXER_RULE
-              ]->[$lexer_rule_id] = $event_name;
-            push
-              @{ $symbol_ids_by_event_name_and_type->{$event_name}->{discard} },
-              $lexer_rule_id;
 
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 'is', $lexer_rule_id, $discard_event_by_lexer_rule_id[$lexer_rule_id] );
+        <<'END_OF_LUA', 'is', $lexer_rule_id, $discard_event );
         local slg, lexer_rule_id, discard_event = ...
         if discard_event then
             -- print(inspect(discard_event))
@@ -930,7 +918,6 @@ END_OF_LUA
         end
 END_OF_LUA
 
-        } ## end if ( defined $discard_event )
     }
 
     # Second phase of G1 processing

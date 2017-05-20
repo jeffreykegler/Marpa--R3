@@ -199,9 +199,6 @@ __DATA__
 
     CHARACTER_CLASS_TABLE
 
-    DISCARD_EVENT_BY_LEXER_RULE
-    SYMBOL_IDS_BY_EVENT_NAME_AND_TYPE
-
     BLESS_PACKAGE { Default package into which nodes are blessed }
     IF_INACCESSIBLE { default for symbols }
 
@@ -228,10 +225,6 @@ __DATA__
         a valid Lua index but not a pseudo-index. }
 
     TRACE_FILE_HANDLE
-
-    { TODO -- Convert fields after here to Lua }
-
-    EVENTS
 
     { vim: set expandtab shiftwidth=4:
     }

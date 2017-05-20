@@ -107,7 +107,6 @@ sub Marpa::R3::Scanless::R::new {
 
     # Set recognizer args to default
     # Lua equivalent is set below
-    $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] = [];
 
     my ($flat_args, $error_message) = Marpa::R3::flatten_hash_args(\@args);
     Marpa::R3::exception( sprintf $error_message, '$slr->new' ) if not $flat_args;
@@ -232,10 +231,6 @@ END_OF_LUA
     $slr->reset_evaluation();
 
     common_set( $slr, "new",  $flat_args );
-
-    my $symbol_ids_by_event_name_and_type =
-        $slg->[
-        Marpa::R3::Internal::Scanless::G::SYMBOL_IDS_BY_EVENT_NAME_AND_TYPE];
 
     my $event_is_active_arg = $flat_args->{event_is_active} // {};
     if (ref $event_is_active_arg ne 'HASH') {
@@ -630,10 +625,7 @@ qq{Registering character $char_desc as symbol $symbol_id: },
         return #slr.external_events
 END_OF_LUA
 
-    return 0 if
-        ($event_count +
-        @{ $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] })
-        > 0;
+    return 0 if $event_count > 0;
 
     return $slr->resume( $start_pos, $length );
 
@@ -1007,8 +999,6 @@ sub Marpa::R3::Scanless::R::resume {
 END_OF_LUA
     }
 
-    $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] = [];
-
     my ($trace_terminals) = $slr->call_by_tag(
         ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA',
@@ -1096,7 +1086,6 @@ sub Marpa::R3::Scanless::R::events {
         local slr = ...
         return slr.external_events
 END_OF_LUA
-    push @{$events}, @{$slr->[Marpa::R3::Internal::Scanless::R::EVENTS]};
     return $events;
 }
 
@@ -1767,7 +1756,6 @@ sub Marpa::R3::Scanless::R::lexeme_complete {
     my ( $slr, $start, $length ) = @_;
     my $slg  = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
 
-    $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] = [];
     $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', '' );
       local slr = ...
