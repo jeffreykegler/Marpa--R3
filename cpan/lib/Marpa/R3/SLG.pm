@@ -820,15 +820,15 @@ END_OF_LUA
         local is_active = 1
         if event then
             is_active = event[2] ~= '0'
-        end
-        local lexeme_data = slg.g1.isys[g1_lexeme_id]
-        if is_active then
-            -- activate only if event is enabled
-            lexeme_data.pause_after_active = lexeme_data.pause_after
-            lexeme_data.pause_before_active = lexeme_data.pause_before
-        else
-            lexeme_data.pause_after_active = nil
-            lexeme_data.pause_before_active = nil
+            local lexeme_data = slg.g1.isys[g1_lexeme_id]
+            if is_active then
+                -- activate only if event is enabled
+                lexeme_data.pause_after_active = lexeme_data.pause_after
+                lexeme_data.pause_before_active = lexeme_data.pause_before
+            else
+                lexeme_data.pause_after_active = nil
+                lexeme_data.pause_before_active = nil
+            end
         end
     end
 END_OF_LUA
