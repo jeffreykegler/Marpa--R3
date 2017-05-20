@@ -858,6 +858,13 @@ END_OF_LUA
 END_OF_LUA
 
     # Second phase of lexer processing
+      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', '');
+        local slg = ...
+        slg.discard_event_by_irl = {}
+        slg.discard_event_by_name = {}
+END_OF_LUA
+
   RULE_ID: for my $lexer_rule_id ( 0 .. $#lex_rule_to_g1_lexeme ) {
         my $g1_lexeme_id = $lex_rule_to_g1_lexeme[$lexer_rule_id];
         my $lexeme_name  = $slg->symbol_name($g1_lexeme_id);
@@ -898,12 +905,29 @@ END_OF_LUA
               $lexer_rule_id;
 
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 'ii', $lexer_rule_id, ($is_active ? 1 : 0) );
-        local slg, lexer_rule_id, is_active_arg = ...
-        local is_active = (is_active_arg ~= 0 and true or nil)
-        local l0_rules = slg.l0.irls
-        l0_rules[lexer_rule_id].event_on_discard = true
-        l0_rules[lexer_rule_id].event_on_discard_active = is_active
+        <<'END_OF_LUA', 'is', $lexer_rule_id, $discard_event_by_lexer_rule_id[$lexer_rule_id] );
+        local slg, lexer_rule_id, discard_event = ...
+        if discard_event then
+            -- print(inspect(discard_event))
+            local event_name = discard_event[1]
+            local is_active = discard_event[2] == "1"
+            local l0_rules = slg.l0.irls
+
+            local event_desc = {
+               name = event_name,
+               irlid = lexer_rule_id
+            }
+            slg.discard_event_by_irl[lexer_rule_id] = event_desc
+            local name_entry = slg.discard_event_by_name[event_name]
+            if not name_entry then
+                slg.discard_event_by_name[event_name] = { event_desc }
+            else
+                name_entry[#name_entry+1] = event_desc
+            end
+
+            l0_rules[lexer_rule_id].event_on_discard = true
+            l0_rules[lexer_rule_id].event_on_discard_active = is_active
+        end
 END_OF_LUA
 
         } ## end if ( defined $discard_event )

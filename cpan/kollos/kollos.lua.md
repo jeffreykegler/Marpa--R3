@@ -494,6 +494,8 @@ Deletes the interpreter if the reference count drops to zero.
 
     class_slg_fields['completion_event_by_isy'] = true
     class_slg_fields['completion_event_by_name'] = true
+    class_slg_fields['discard_event_by_irl'] = true
+    class_slg_fields['discard_event_by_name'] = true
     class_slg_fields['lexeme_event_by_isy'] = true
     class_slg_fields['lexeme_event_by_name'] = true
     class_slg_fields['nulled_event_by_isy'] = true
