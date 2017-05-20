@@ -106,9 +106,9 @@ $progress_report = $recce->show_progress( 0, -1 );
 
 $eval_error =~ s/^(Marpa::R3 \s+ exception \s+ at) .*/$1\n/xms;
 Marpa::R3::Test::is($eval_error, <<'END_OF_TEXT', 'Error message before fix');
-Error in SLIF parse: No lexeme found at line 1, column 18
+Error in SLIF parse: No lexeme found at B1L1c18
 * String before error: a = 8675309 + 42\s
-* The error was at line 1, column 18, and at character U+002a "*", ...
+* The error was at B1L1c18 and at character U+002a "*", ...
 * here: * 711
 Marpa::R3 exception at
 END_OF_TEXT

@@ -1126,23 +1126,17 @@ sub Marpa::R3::Scanless::R::read_problem {
                         "Parse exhausted, but lexemes remain, at %s\n",
                         slr:lc_brief(slr.start_of_lexeme))
             end
+            if problem_code == 'SLIF loop' then
+                return 'last CODE_TO_PROBLEM',
+                    string.format(
+                        "SLIF loops at %s\n",
+                        slr:lc_brief(slr.start_of_lexeme))
+            end
             return ''
 END_OF_LUA
 
         last CODE_TO_PROBLEM if $cmd eq 'last CODE_TO_PROBLEM';
 
-        if ( $problem_code eq 'SLIF loop' ) {
-            my ($lexeme_start) = $slr->call_by_tag(
-            ('@' . __FILE__ . ':' . __LINE__),
-            <<'END_OF_LUA', '>0');
-                local slr = ...
-                return slr.start_of_lexeme
-END_OF_LUA
-
-            my ( $line, $column ) = $slr->line_column($lexeme_start);
-            $problem = "SLIF loops at line $line, column $column";
-            last CODE_TO_PROBLEM;
-        }
         if ( $problem_code eq 'no lexeme' ) {
             my ( $line, $column ) = $slr->line_column($problem_pos);
             my @details    = ();
@@ -1184,7 +1178,7 @@ END_OF_LUA
             if ( scalar @rejections ) {
                 my $rejection_count = scalar @rejections;
                 push @problem,
-                    "No lexemes accepted at line $line, column $column";
+                    "No lexeme accepted at " . lc_brief($slr, $problem_pos);
                 REJECTION: for my $i ( 0 .. 5 ) {
                     my $rejection = $rejections[$i];
                     last REJECTION if not defined $rejection;
@@ -1198,7 +1192,7 @@ END_OF_LUA
             } ## end if ( scalar @rejections )
             else {
                 push @problem,
-                    "No lexeme found at line $line, column $column";
+                    "No lexeme found at " . lc_brief($slr, $problem_pos);
             }
             $problem = join "\n", @problem;
             last CODE_TO_PROBLEM;
@@ -1213,25 +1207,24 @@ END_OF_LUA
         local desc = problem or ''
         local g1g = slg.g1.lmw_g
 
+      local pos = slr.perl_pos
       local block = slr.current_block
       local block_ix = block.index
-      local pos = slr.perl_pos
-      if pos >= #block then
+      if pos >= #slr.current_block then
           return "Error in SLIF parse: $desc\n\z
               * Error was at end of input\n\z
               * String before error: "
               ..  slr:input_escape(block_ix, 0, 50) .. "\n"
       end
       local codepoint = slr:codepoint_from_pos(block_ix, pos)
-      local _, line, column = slr:per_pos(block_ix, pos)
       return string.format(
           "Error in SLIF parse: %s\n\z
            * String before error: %s\n\z
-           * The error was at line %d, column %d, and at character %s, ...\n\z
+           * The error was at %s and at character %s, ...\n\z
            * here: %s\n",
            desc,
            slr:reversed_input_escape(block_ix, pos, 50),
-           line, column,
+           slr:lc_brief(pos, block_ix),
            slr:character_describe(codepoint),
            slr:input_escape(block_ix, pos, 50)
           )
