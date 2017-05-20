@@ -1110,14 +1110,10 @@ sub Marpa::R3::Scanless::R::read_problem {
 
     my $slg  = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
 
-    my $trace_file_handle =
-        $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
-
     my $pos      = $slr->pos();
     my $problem_pos = $pos;
 
     my $problem;
-    my $stream_status = 0;
     my $g1_status = 0;
     CODE_TO_PROBLEM: {
         if ( $problem_code eq 'R1 exhausted before end' ) {
@@ -1168,8 +1164,6 @@ END_OF_LUA
                 my $raw_token_value =
                   $slr->literal( $lexeme_start_pos,
                     $lexeme_end_pos - $lexeme_start_pos );
-                my $trace_file_handle =
-                  $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
                 my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
 
        # Different internal symbols may have the same external "display form",
@@ -1215,20 +1209,6 @@ END_OF_LUA
     DESC: {
         if ( defined $problem ) {
             $desc .= "$problem";
-        }
-        if ( $stream_status == -1 ) {
-            $desc = 'Lexer: Character rejected';
-            last DESC;
-        }
-        if ( $stream_status == -2 ) {
-            $desc = 'Lexer: Unregistered character';
-            last DESC;
-        }
-
-        # -5 indicates success, in which case we should never have called this subroutine.
-        if ( $stream_status == -3 || $stream_status == -5 ) {
-            $desc = 'Unexpected return value from lexer: Parse exhausted';
-            last DESC;
         }
 
         if ($g1_status) {
