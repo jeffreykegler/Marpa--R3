@@ -999,6 +999,17 @@ sub Marpa::R3::Internal::Scanless::convert_libmarpa_events {
             return '', 1
         end
 
+        if event_type == 'after lexeme'
+            or event_type == 'before lexeme'
+        then
+            local lexeme_isyid = event[2]
+            local slg = slr.slg
+            local event_name = slg.lexeme_event_by_isy[lexeme_isyid].name
+            local events = slr.external_events
+            events[#events+1] = { event_name }
+            return '', 1
+        end
+
         return 'nyi'
 END_OF_LUA
 
