@@ -2272,6 +2272,36 @@ but that is not necessarily the case.)
 
 ### Diagnostics
 
+TODO -- after development, this should be a local function.
+
+`throw_at_pos` appends a location description to `desc`
+and throws the error.
+It is designed to be convenient for use as a tail call.
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slr.throw_at_pos(slr, desc, block_ix, pos)
+      desc = desc or ''
+      if not block_ix then
+          local block = slr.current_block
+          block_ix = block.index
+      end
+      pos = pos or slr.perl_pos
+      local codepoint = slr:codepoint_from_pos(block_ix, pos)
+      return _M.userX(string.format(
+             "Error in SLIF parse: %s\n\z
+              * String before error: %s\n\z
+              * The error was at %s and at character %s, ...\n\z
+              * here: %s\n",
+              desc,
+              slr:reversed_input_escape(block_ix, pos, 50),
+              slr:lc_brief(pos, block_ix),
+              slr:character_describe(codepoint),
+              slr:input_escape(block_ix, pos, 50)
+          ))
+    end
+```
+
 This is not currently used.
 It was created for development,
 and is being kept for use as

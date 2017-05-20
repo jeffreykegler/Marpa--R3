@@ -1232,34 +1232,10 @@ END_OF_LUA
       my ($desc) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
           <<'END_OF_LUA', 's', $problem);
         local slr, problem = ...
-        local slg = slr.slg
-        local desc = problem or ''
-        local g1g = slg.g1.lmw_g
-
-      local pos = slr.perl_pos
-      local block = slr.current_block
-      local block_ix = block.index
-      if pos >= #slr.current_block then
-          return "Error in SLIF parse: $desc\n\z
-              * Error was at end of input\n\z
-              * String before error: "
-              ..  slr:input_escape(block_ix, 0, 50) .. "\n"
-      end
-      local codepoint = slr:codepoint_from_pos(block_ix, pos)
-      return string.format(
-          "Error in SLIF parse: %s\n\z
-           * String before error: %s\n\z
-           * The error was at %s and at character %s, ...\n\z
-           * here: %s\n",
-           desc,
-           slr:reversed_input_escape(block_ix, pos, 50),
-           slr:lc_brief(pos, block_ix),
-           slr:character_describe(codepoint),
-           slr:input_escape(block_ix, pos, 50)
-          )
+        return slr:throw_at_pos(problem)
 END_OF_LUA
 
-    Marpa::R3::exception($desc);
+    # Marpa::R3::exception($desc);
 
     # Never reached
     return;
