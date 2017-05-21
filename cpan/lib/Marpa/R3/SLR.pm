@@ -1067,7 +1067,6 @@ END_OF_LUA
 
                     last OUTER_READ if $cmd eq 'last OUTER_READ';
 
-                    $result = $slr->read_problem($problem_code);
                     last FOR_LUA;
 
                 } ## end OUTER_READ: while (1)
@@ -1118,43 +1117,6 @@ END_OF_LUA
         '>0');
     return @{$event_queue};
 }
-
-## From here, recovery is a matter for the caller,
-## if it is possible at all
-sub Marpa::R3::Scanless::R::read_problem {
-    my ( $slr, $problem_code ) = @_;
-
-    die 'No problem_code in slr->read_problem()' if not $problem_code;
-
-    my $slg  = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-
-    my $pos      = $slr->pos();
-    my $problem_pos = $pos;
-
-    my $problem;
-    CODE_TO_PROBLEM: {
-
-        if ( $problem_code eq 'no lexeme' ) {
-            $problem = 
-                    "No lexeme found at " . lc_brief($slr, $problem_pos);
-            last CODE_TO_PROBLEM;
-        } ## end if ( $problem_code eq 'no lexeme' )
-
-        $problem = 'Unrecognized problem code: ' . $problem_code;
-    } ## end CODE_TO_PROBLEM:
-
-      my ($desc) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-          <<'END_OF_LUA', 's', $problem);
-        local slr, problem = ...
-        return slr:throw_at_pos(problem)
-END_OF_LUA
-
-    # Marpa::R3::exception($desc);
-
-    # Never reached
-    return;
-
-} ## end sub Marpa::R3::Scanless::R::read_problem
 
 sub character_describe {
     my ($slr, $codepoint) = @_;
