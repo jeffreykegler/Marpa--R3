@@ -592,7 +592,7 @@ Populate the `xrls` table.
 The contents of this table are not used,
 currently,
 but Jeffrey thinks they might be used someday,
-for example in error message.
+for example in error messages.
 
 ```
     -- miranda: section+ most Lua function definitions
