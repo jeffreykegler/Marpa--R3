@@ -1004,19 +1004,10 @@ sub Marpa::R3::Scanless::R::resume {
                         start_pos_arg))
                 end
             end
-            return slr:pos_set(start_pos, length_arg)
+            slr:pos_set(start_pos, length_arg)
+            slr.external_events = {}
 END_OF_LUA
                 }
-
-                my ($trace_terminals) = $slr->call_by_tag(
-                    ( '@' . __FILE__ . ':' . __LINE__ ),
-                    <<'END_OF_LUA',
-            local slr = ...
-            slr.external_events = {}
-            return slr.trace_terminals
-END_OF_LUA
-                    ''
-                );
 
                 my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
 
@@ -1065,14 +1056,6 @@ END_OF_LUA
                 local events = slr.external_events
                 events[#events+1] = { "'rejected" }
                 return 'last OUTER_READ'
-            end
-            if problem_code == 'invalid char' then
-                local codepoint = slr.codepoint
-                error(string.format(
-                   'Failed at unacceptable character %s',
-                   slr:character_describe(codepoint)
-               ))
-               return 'last OUTER_READ'
             end
             return ''
 END_OF_LUA
