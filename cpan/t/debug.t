@@ -415,10 +415,6 @@ Reading codepoint "*" 0x002a at line 1, column 18
 Codepoint "*" 0x002a rejected as [\*] at line 1, column 18
 Codepoint "*" 0x002a rejected as [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] at line 1, column 18
 Discarded lexeme B1L1c17: whitespace
-Restarted recognizer at line 1, column 18
-Reading codepoint "*" 0x002a at line 1, column 18
-Codepoint "*" 0x002a rejected as [\*] at line 1, column 18
-Codepoint "*" 0x002a rejected as [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] at line 1, column 18
 END_TRACE_OUTPUT
 
 # Marpa::R3::Display::End

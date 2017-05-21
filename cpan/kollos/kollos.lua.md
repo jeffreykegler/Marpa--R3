@@ -1083,9 +1083,15 @@ not find an acceptable lexeme.
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.no_lexeme_handle(slr)
-        local events = slr.event_queue
-        for ix = 1, #events do
-        end
+       if slr.slg.rejection_action == 'event' then
+           local q = slr.event_queue
+           q[#q+1] = { "'rejected" }
+           return 'event'
+       end
+       return slr:throw_at_pos(string.format(
+            "No lexeme found at %s",
+            slr:lc_brief(slr.start_of_lexeme))
+            )
     end
 ```
 
@@ -1100,14 +1106,14 @@ not find an acceptable lexeme.
                return 'event'
            end
            return slr:throw_at_pos(string.format(
-                "Parse exhausted, but lexemes remain, at %s\n",
+                "Parse exhausted, but lexemes remain, at %s",
                 slr:lc_brief(slr.start_of_lexeme))
                 )
         end
         local start_of_lexeme = slr.start_of_lexeme
         slr.lexer_start_pos = start_of_lexeme
         slr.perl_pos = start_of_lexeme
-        return 'no lexeme'
+        return slr:no_lexeme_handle()
     end
 ```
 

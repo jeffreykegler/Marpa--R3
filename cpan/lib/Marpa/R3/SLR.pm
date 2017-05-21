@@ -1135,65 +1135,11 @@ sub Marpa::R3::Scanless::R::read_problem {
     CODE_TO_PROBLEM: {
 
         if ( $problem_code eq 'no lexeme' ) {
-            my ( $line, $column ) = $slr->line_column($problem_pos);
-            my @details    = ();
-            my %rejections = ();
-            my @events     = $slr->xs_events();
-            if ( scalar @events > 100 ) {
-                my $omitted = scalar @events - 100;
-                push @details,
-                    "  [there were $omitted events -- only the first 100 were examined]";
-                $#events = 99;
-            } ## end if ( scalar @events > 100 )
-          EVENT: for my $event (@events) {
-                my (
-                    $event_type,     $trace_event_type, $lexeme_start_pos,
-                    $lexeme_end_pos, $g1_lexeme
-                ) = @{$event};
-                next EVENT
-                  if $event_type ne q{'trace}
-                  or $trace_event_type ne 'rejected lexeme';
-                my $raw_token_value =
-                  $slr->literal( $lexeme_start_pos,
-                    $lexeme_end_pos - $lexeme_start_pos );
-                my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-
-       # Different internal symbols may have the same external "display form",
-       # which in naive reporting logic would result in many identical messages,
-       # confusing the user.  This logic makes sure that identical rejection
-       # reports are not repeated, even when they have different causes
-       # internally.
-
-                $rejections{
-                    $slg->symbol_display_form( $g1_lexeme )
-                      . qq{; value="$raw_token_value"; length = }
-                      . ( $lexeme_end_pos - $lexeme_start_pos )
-                } = 1;
-            } ## end EVENT: for my $event (@events)
-            my @problem    = ();
-            my @rejections = keys %rejections;
-            if ( scalar @rejections ) {
-                my $rejection_count = scalar @rejections;
-                push @problem,
-                    "No lexeme accepted at " . lc_brief($slr, $problem_pos);
-                REJECTION: for my $i ( 0 .. 5 ) {
-                    my $rejection = $rejections[$i];
-                    last REJECTION if not defined $rejection;
-                    push @problem, qq{  Rejected lexeme #$i: $rejection};
-                }
-                if ( $rejection_count > 5 ) {
-                    push @problem,
-                        "  [there were $rejection_count rejection messages -- only the first 5 are shown]";
-                }
-                push @problem, @details;
-            } ## end if ( scalar @rejections )
-            else {
-                push @problem,
+            $problem = 
                     "No lexeme found at " . lc_brief($slr, $problem_pos);
-            }
-            $problem = join "\n", @problem;
             last CODE_TO_PROBLEM;
         } ## end if ( $problem_code eq 'no lexeme' )
+
         $problem = 'Unrecognized problem code: ' . $problem_code;
     } ## end CODE_TO_PROBLEM:
 
