@@ -863,8 +863,11 @@ END_OF_LUA
 
   RULE_ID: for my $lexer_rule_id ( 0 .. $#lex_rule_to_g1_lexeme ) {
         my $g1_lexeme_id = $lex_rule_to_g1_lexeme[$lexer_rule_id];
+        my $assertion_id = -1;
         my $lexeme_name  = $slg->symbol_name($g1_lexeme_id);
-        my $assertion_id = $lexeme_data{$lexeme_name}{lexer}{'assertion'} // -1;
+        if (defined $lexeme_name) {
+            $assertion_id = $lexeme_data{$lexeme_name}{lexer}{'assertion'};
+        }
         my $discard_symbol_id = -1;
         if ($lexer_rule_id >= 0) {
             ( $discard_symbol_id ) = $slg->l0_rule_expand($lexer_rule_id);
@@ -2026,38 +2029,39 @@ sub Marpa::R3::Scanless::G::l0_symbol_ids {
 
 sub Marpa::R3::Scanless::G::symbol_by_name {
     my ($slg, $name) = @_;
-
-    my ($symbol_id) = $slg->call_by_tag(
-        ('@' . __FILE__ . ':' .  __LINE__),
-      <<'END_OF_LUA', 's', $name);
-    local slg, symbol_name = ...
-    return slg:symbol_by_name(symbol_name)
-END_OF_LUA
-
-    return $symbol_id;
+    return $slg->lmg_symbol_by_name('g1', $name);
 }
 
 sub Marpa::R3::Scanless::G::l0_symbol_by_name {
     my ($slg, $name) = @_;
+    return $slg->lmg_symbol_by_name('l0', $name);
+}
+
+# Internal methods, not to be documented
+
+sub Marpa::R3::Scanless::G::lmg_symbol_by_name {
+    my ( $slg, $subg_name, $symbol_name ) = @_;
+
     my ($symbol_id) = $slg->call_by_tag(
         ('@' . __FILE__ . ':' .  __LINE__),
-      <<'END_OF_LUA', 's', $name);
-    local slg, symbol_name = ...
-    return slg:l0_symbol_by_name(symbol_name)
+      <<'END_OF_LUA', 'ss', $subg_name, $symbol_name);
+    local g, subg_name, symbol_name = ...
+    local lmw_g = g[subg_name].lmw_g
+    return lmw_g.isyid_by_name[symbol_name]
 END_OF_LUA
 
     return $symbol_id;
 }
 
-# TODO -- delete lmg_*() forms after development?
 sub Marpa::R3::Scanless::G::lmg_symbol_name {
     my ( $slg, $subg_name, $symbol_id ) = @_;
 
     my ($name) = $slg->call_by_tag(
         ('@' . __FILE__ . ':' .  __LINE__),
       <<'END_OF_LUA', 'si', $subg_name, $symbol_id);
-    local slg, subg_name, symbol_id = ...
-    return slg:lmg_symbol_name(symbol_id, subg_name)
+    local g, subg_name, symbol_id = ...
+    local lmw_g = g[subg_name].lmw_g
+    return lmw_g:symbol_name(symbol_id)
 END_OF_LUA
 
     return $name;

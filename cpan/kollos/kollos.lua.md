@@ -37,14 +37,18 @@ cd kollos && ../lua/lua toc.lua < kollos.lua.md
 * [Kollos object](#kollos-object)
 * [Kollos registry objects](#kollos-registry-objects)
 * [Kollos SLIF grammar object](#kollos-slif-grammar-object)
+  * [Fields](#fields)
   * [Ranking methods](#ranking-methods)
   * [Hash to runtime processing](#hash-to-runtime-processing)
+  * [Diagnostics](#diagnostics)
 * [Kollos SLIF recognizer object](#kollos-slif-recognizer-object)
+  * [Fields](#fields)
   * [Constructor](#constructor)
   * [Reading](#reading)
     * [External reading](#external-reading)
       * [Notes on tracing](#notes-on-tracing)
       * [Methods](#methods)
+  * [Evaluation](#evaluation)
   * [Locations](#locations)
   * [Events](#events)
   * [Progress reporting](#progress-reporting)
@@ -88,6 +92,7 @@ cd kollos && ../lua/lua toc.lua < kollos.lua.md
 * [External, inner and internal](#external-inner-and-internal)
 * [Layers and wrappers](#layers-and-wrappers)
 * [The layer grammar](#the-layer-grammar)
+  * [Fields](#fields)
   * [Constructor](#constructor)
   * [Layer grammar accessors](#layer-grammar-accessors)
 * [The grammar Libmarpa wrapper](#the-grammar-libmarpa-wrapper)
@@ -109,6 +114,7 @@ cd kollos && ../lua/lua toc.lua < kollos.lua.md
   * [Preliminaries to the C library code](#preliminaries-to-the-c-library-code)
 * [The Kollos C header file](#the-kollos-c-header-file)
   * [Preliminaries to the C header file](#preliminaries-to-the-c-header-file)
+* [Internal utilities](#internal-utilities)
 * [Meta-coding utilities](#meta-coding-utilities)
   * [Metacode execution sequence](#metacode-execution-sequence)
   * [Dedent method](#dedent-method)
@@ -739,7 +745,7 @@ TODO -- Turn lmg_*() forms into local functions?
         local lmw_g = slg[subg_name].lmw_g
         return lmw_g:symbol_name(symbol_id)
     end
-    function _M.class_slg.symbol_name(slg, symbol_id)
+    function _M.class_slg.g1_symbol_name(slg, symbol_id)
         return slg:lmg_symbol_name(symbol_id, 'g1')
     end
     function _M.class_slg.l0_symbol_name(slg, symbol_id)
@@ -750,7 +756,7 @@ TODO -- Turn lmg_*() forms into local functions?
         local lmw_g = slg[subg_name].lmw_g
         return lmw_g.isyid_by_name[symbol_name]
     end
-    function _M.class_slg.symbol_by_name(slg, symbol_name)
+    function _M.class_slg.g1_symbol_by_name(slg, symbol_name)
         return slg:lmg_symbol_by_name(symbol_name, 'g1')
     end
     function _M.class_slg.l0_symbol_by_name(slg, symbol_name)
@@ -762,7 +768,7 @@ TODO -- Turn lmg_*() forms into local functions?
         if not xsy then return end
         return xsy.dsl_form
     end
-    function _M.class_slg.symbol_dsl_form(slg, symbol_id)
+    function _M.class_slg.g1_symbol_dsl_form(slg, symbol_id)
         return slg:lmg_symbol_dsl_form(symbol_id, 'g1')
     end
     function _M.class_slg.l0_symbol_dsl_form(slg, symbol_id)
@@ -3376,8 +3382,7 @@ Constructor
 
     function _M.class_grammar.symbol_name(lmw_g, symbol_id)
         local symbol_name = lmw_g.name_by_isyid[symbol_id]
-        if symbol_name then return symbol_name end
-        return string.format('R%d', symbol_id)
+        return symbol_name
     end
 
     function _M.class_grammar.irl_isyids(lmw_g, rule_id)
