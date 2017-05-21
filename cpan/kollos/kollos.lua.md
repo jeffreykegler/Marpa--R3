@@ -1542,11 +1542,14 @@ acceptance is caught here via rejection).  Ignore
             return slr.perl_pos
         end
         if result == -2 then
-            local error_code = slr.slg.g1.lmw_g:error_code()
-            if error_code == kollos.err.PARSE_EXHAUSTED then
-                local q = slr.event_queue
-                q[#q+1] = { 'no acceptable input' }
-            end
+            -- Current, we do nothing with an exhausted error code
+            -- here
+
+            -- local error_code = slr.slg.g1.lmw_g:error_code()
+            -- if error_code == kollos.err.PARSE_EXHAUSTED then
+                -- local q = slr.event_queue
+                -- q[#q+1] = { 'no acceptable input' }
+            -- end
             return 0
         end
         error('Problem in slr->g1_lexeme_complete(): '
