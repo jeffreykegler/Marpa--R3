@@ -969,6 +969,8 @@ END_OF_LUA
 
 sub Marpa::R3::Scanless::R::resume {
     my ( $slr, $start_pos, $length ) = @_;
+    my $length_arg    = $length    // -1;
+    my $start_pos_arg = $start_pos // 'undef';
 
     my $result;
     my $eval_error;
@@ -979,9 +981,6 @@ sub Marpa::R3::Scanless::R::resume {
 
        # say STDERR join " ", __FILE__, __LINE__, Data::Dumper::Dumper($result);
           FOR_LUA: {
-                {
-                    my $length_arg    = $length    // -1;
-                    my $start_pos_arg = $start_pos // 'undef';
                     $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
                         <<'END_OF_LUA', 'si', $start_pos_arg, $length_arg );
             local slr, start_pos_arg, length_arg = ...
@@ -1019,9 +1018,6 @@ sub Marpa::R3::Scanless::R::resume {
             slr:pos_set(start_pos, length_arg)
             slr.external_events = {}
 END_OF_LUA
-                }
-
-                my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
 
               OUTER_READ: while (1) {
 
@@ -1042,30 +1038,6 @@ END_OF_LUA
                     last OUTER_READ if $pause;
                     next OUTER_READ if $problem_code eq 'event';
                     next OUTER_READ if $problem_code eq 'trace';
-
-             # The event on exhaustion only occurs if needed to provide a reason
-             # to return -- if an exhausted reader would return anyway, there is
-             # no exhaustion event.  For a reliable way to detect exhaustion,
-             # use the $slr->exhausted() method.
-             # The name of the exhausted event begins with a single quote, so
-             # that it will not conflict with any user-defined event name.
-
-                    my ($cmd) =
-                      $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-                        <<'END_OF_LUA', 's', $problem_code );
-            local slr, problem_code = ...
-            local slg = slr.slg
-            if problem_code == 'no lexeme'
-               and slg.rejection_action == 'event'
-            then
-                local events = slr.external_events
-                events[#events+1] = { "'rejected" }
-                return 'last OUTER_READ'
-            end
-            return ''
-END_OF_LUA
-
-                    last OUTER_READ if $cmd eq 'last OUTER_READ';
 
                     last FOR_LUA;
 
