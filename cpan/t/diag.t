@@ -73,7 +73,7 @@ sub show_last_expression {
     my $recce = $self->{recce};
     my ( $start, $length ) = $recce->last_completed('Expression');
     return if not defined $start;
-    my $last_expression = $recce->length( $start, $length );
+    my $last_expression = $recce->g1_literal( $start, $length );
     return $last_expression;
 } ## end sub show_last_expression
 

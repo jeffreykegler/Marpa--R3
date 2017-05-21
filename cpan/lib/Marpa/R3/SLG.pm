@@ -2050,15 +2050,15 @@ END_OF_LUA
     return $symbol_id;
 }
 
+# TODO -- delete lmg_*() forms after development?
 sub Marpa::R3::Scanless::G::lmg_symbol_name {
     my ( $slg, $subg_name, $symbol_id ) = @_;
 
     my ($name) = $slg->call_by_tag(
         ('@' . __FILE__ . ':' .  __LINE__),
       <<'END_OF_LUA', 'si', $subg_name, $symbol_id);
-    local g, subg_name, symbol_id = ...
-    local lmw_g = g[subg_name].lmw_g
-    return lmw_g:symbol_name(symbol_id)
+    local slg, subg_name, symbol_id = ...
+    return slg:lmg_symbol_name(subg_name, symbol_id)
 END_OF_LUA
 
     return $name;
