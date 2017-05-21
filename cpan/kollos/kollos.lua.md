@@ -1077,23 +1077,45 @@ rule, false otherwise.
     end
 ```
 
-Read find and read the alternatives in the SLIF.
-Returns `nil` on success,
-a string indicating the error otherwise.
+`no_lexeme_handle()` handles the situation where the recognizer does
+not find an acceptable lexeme.
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slr.no_lexeme_handle(slr)
+        local events = slr.event_queue
+        for ix = 1, #events do
+        end
+    end
+```
 
 ```
     -- miranda: section exhausted(), nested function of slr:alternatives()
     local function exhausted()
         -- no accepted or discarded lexemes
         if discard_mode then
-             return 'R1 exhausted before end'
+           if slr.slg.exhaustion_action == 'event' then
+               local q = slr.event_queue
+               q[#q+1] = { "'exhausted" }
+               return 'event'
+           end
+           return slr:throw_at_pos(string.format(
+                "Parse exhausted, but lexemes remain, at %s\n",
+                slr:lc_brief(slr.start_of_lexeme))
+                )
         end
         local start_of_lexeme = slr.start_of_lexeme
         slr.lexer_start_pos = start_of_lexeme
         slr.perl_pos = start_of_lexeme
         return 'no lexeme'
     end
+```
 
+Read find and read the alternatives in the SLIF.
+Returns `nil` on success,
+a string indicating the error otherwise.
+
+```
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.alternatives(slr, discard_mode)
 

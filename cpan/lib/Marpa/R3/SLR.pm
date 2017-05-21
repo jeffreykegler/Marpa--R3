@@ -886,6 +886,18 @@ sub Marpa::R3::Internal::Scanless::convert_libmarpa_events {
         -- print(inspect(event))
         local event_type = event[1]
 
+        if event_type == "'exhausted" then
+            local events = slr.external_events
+            events[#events+1] = { event_type }
+            return '', 1
+        end
+
+        if event_type == "'rejected" then
+            local events = slr.external_events
+            events[#events+1] = { event_type }
+            return '', 1
+        end
+
         -- The code next set of events is highly similar -- an isyid at
         -- event[2] is looked up in a table of event names.  Does it
         -- make sense to share code, perhaps using closures?
@@ -1043,13 +1055,6 @@ END_OF_LUA
                         <<'END_OF_LUA', 's', $problem_code );
             local slr, problem_code = ...
             local slg = slr.slg
-            if problem_code == 'R1 exhausted before end'
-               and slg.exhaustion_action == 'event'
-            then
-                local events = slr.external_events
-                events[#events+1] = { "'exhausted" }
-                return 'last OUTER_READ'
-            end
             if problem_code == 'no lexeme'
                and slg.rejection_action == 'event'
             then
@@ -1100,6 +1105,8 @@ END_OF_LUA
     return $events;
 }
 
+# Delete this after development?
+# Otherwise, convert it to internal
 sub Marpa::R3::Scanless::R::xs_events {
     my ($slr) = @_;
     my ($event_queue) = $slr->call_by_tag(
@@ -1126,28 +1133,6 @@ sub Marpa::R3::Scanless::R::read_problem {
 
     my $problem;
     CODE_TO_PROBLEM: {
-
-        my $cmd;
-        ($cmd, $problem) = $slr->call_by_tag(
-        ('@' . __FILE__ . ':' . __LINE__),
-        <<'END_OF_LUA', 's', $problem_code);
-            local slr, problem_code = ...
-            if problem_code == 'R1 exhausted before end' then
-                return 'last CODE_TO_PROBLEM',
-                    string.format(
-                        "Parse exhausted, but lexemes remain, at %s\n",
-                        slr:lc_brief(slr.start_of_lexeme))
-            end
-            if problem_code == 'SLIF loop' then
-                return 'last CODE_TO_PROBLEM',
-                    string.format(
-                        "SLIF loops at %s\n",
-                        slr:lc_brief(slr.start_of_lexeme))
-            end
-            return ''
-END_OF_LUA
-
-        last CODE_TO_PROBLEM if $cmd eq 'last CODE_TO_PROBLEM';
 
         if ( $problem_code eq 'no lexeme' ) {
             my ( $line, $column ) = $slr->line_column($problem_pos);
