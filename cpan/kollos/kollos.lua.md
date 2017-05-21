@@ -735,7 +735,7 @@ TODO -- Turn lmg_*() forms into local functions?
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slg.lmg_symbol_name(slg, subg_name, symbol_id)
+    function _M.class_slg.lmg_symbol_name(slg, symbol_id, subg_name)
         local lmw_g = slg[subg_name].lmw_g
         return lmw_g:symbol_name(symbol_id)
     end
@@ -745,6 +745,18 @@ TODO -- Turn lmg_*() forms into local functions?
     function _M.class_slg.l0_symbol_name(slg, symbol_id)
         return slg:lmg_symbol_name(symbol_id, 'l0')
     end
+
+    function _M.class_slg.lmg_symbol_by_name(slg, symbol_name, subg_name)
+        local lmw_g = slg[subg_name].lmw_g
+        return lmw_g.isyid_by_name[symbol_name]
+    end
+    function _M.class_slg.symbol_by_name(slg, symbol_name)
+        return slg:lmg_symbol_by_name(symbol_name, 'g1')
+    end
+    function _M.class_slg.l0_symbol_by_name(slg, symbol_name)
+        return slg:lmg_symbol_by_name(symbol_name, 'l0')
+    end
+
 ```
 
 ## Kollos SLIF recognizer object

@@ -2026,25 +2026,24 @@ sub Marpa::R3::Scanless::G::l0_symbol_ids {
 
 sub Marpa::R3::Scanless::G::symbol_by_name {
     my ($slg, $name) = @_;
-    return $slg->lmg_symbol_by_name('g1', $name);
+
+    my ($symbol_id) = $slg->call_by_tag(
+        ('@' . __FILE__ . ':' .  __LINE__),
+      <<'END_OF_LUA', 's', $name);
+    local slg, symbol_name = ...
+    return slg:symbol_by_name(symbol_name)
+END_OF_LUA
+
+    return $symbol_id;
 }
 
 sub Marpa::R3::Scanless::G::l0_symbol_by_name {
     my ($slg, $name) = @_;
-    return $slg->lmg_symbol_by_name('l0', $name);
-}
-
-# Internal methods, not to be documented
-
-sub Marpa::R3::Scanless::G::lmg_symbol_by_name {
-    my ( $slg, $subg_name, $symbol_name ) = @_;
-
     my ($symbol_id) = $slg->call_by_tag(
         ('@' . __FILE__ . ':' .  __LINE__),
-      <<'END_OF_LUA', 'ss', $subg_name, $symbol_name);
-    local g, subg_name, symbol_name = ...
-    local lmw_g = g[subg_name].lmw_g
-    return lmw_g.isyid_by_name[symbol_name]
+      <<'END_OF_LUA', 's', $name);
+    local slg, symbol_name = ...
+    return slg:l0_symbol_by_name(symbol_name)
 END_OF_LUA
 
     return $symbol_id;
@@ -2058,7 +2057,7 @@ sub Marpa::R3::Scanless::G::lmg_symbol_name {
         ('@' . __FILE__ . ':' .  __LINE__),
       <<'END_OF_LUA', 'si', $subg_name, $symbol_id);
     local slg, subg_name, symbol_id = ...
-    return slg:lmg_symbol_name(subg_name, symbol_id)
+    return slg:lmg_symbol_name(symbol_id, subg_name)
 END_OF_LUA
 
     return $name;
