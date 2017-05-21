@@ -757,6 +757,18 @@ TODO -- Turn lmg_*() forms into local functions?
         return slg:lmg_symbol_by_name(symbol_name, 'l0')
     end
 
+    function _M.class_slg.lmg_symbol_dsl_form(slg, isyid, subg_name)
+        local xsy = slg[subg_name].xsy_by_isyid[isyid]
+        if not xsy then return end
+        return xsy.dsl_form
+    end
+    function _M.class_slg.symbol_dsl_form(slg, symbol_id)
+        return slg:lmg_symbol_dsl_form(symbol_id, 'g1')
+    end
+    function _M.class_slg.l0_symbol_dsl_form(slg, symbol_id)
+        return slg:lmg_symbol_dsl_form(symbol_id, 'l0')
+    end
+
 ```
 
 ## Kollos SLIF recognizer object
