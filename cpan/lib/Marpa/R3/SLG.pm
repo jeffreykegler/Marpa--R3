@@ -868,10 +868,7 @@ END_OF_LUA
         if (defined $lexeme_name) {
             $assertion_id = $lexeme_data{$lexeme_name}{lexer}{'assertion'};
         }
-        my $discard_symbol_id = -1;
-        if ($lexer_rule_id >= 0) {
-            ( $discard_symbol_id ) = $slg->l0_rule_expand($lexer_rule_id);
-        }
+        my ( $discard_symbol_id ) = $slg->l0_rule_expand($lexer_rule_id);
 
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA',
