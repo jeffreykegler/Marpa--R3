@@ -3307,11 +3307,13 @@ contains a Libmarpa recognizer wrapper object.
 
 ```
     -- miranda: section+ class_lyg field declarations
-    class_lyg_fields['irls'] = true
-    class_lyg_fields['isys'] = true
-    class_lyg_fields['lmw_g'] = true
-    class_lyg_fields['xbnfs'] = true
-    class_lyg_fields['xsy_by_isyid'] = true
+    class_lyg_fields.slg = true
+    class_lyg_fields.irls = true
+    class_lyg_fields.isys = true
+    class_lyg_fields.lmw_g = true
+    class_lyg_fields.xbnfs = true
+    class_lyg_fields.xbnf_by_irlid = true
+    class_lyg_fields.xsy_by_isyid = true
 ```
 
 ```
@@ -3330,18 +3332,20 @@ contains a Libmarpa recognizer wrapper object.
     -- miranda: section+ most Lua function definitions
     function _M.class_lyg.new(slg, lyr_name)
         local lmw_g = _M.grammar_new()
-        local layer = {
-            slg = slg,
-            lmw_g = lmw_g,
-            -- name = lyr_name,
-            xsy_by_isyid = {},
-            xbnf_by_irlid = {},
-            isys = {},
-            irls = {}
-        }
-        slg[lyr_name] = layer
-        setmetatable(layer, _M.class_lyg)
         lmw_g:force_valued()
+
+        local layer = {}
+        setmetatable(layer, _M.class_lyg)
+
+        layer.slg = slg
+        layer.lmw_g = lmw_g
+        layer.xbnfs = {}
+        layer.xsy_by_isyid = {}
+        layer.xbnf_by_irlid = {}
+        layer.isys = {}
+        layer.irls = {}
+
+        return layer
     end
 ```
 

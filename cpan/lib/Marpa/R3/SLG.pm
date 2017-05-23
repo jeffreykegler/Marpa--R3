@@ -294,8 +294,8 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 's', $hashed_source );
         local slg, source_hash = ...
-        _M.class_lyg.new(slg, 'g1')
-        _M.class_lyg.new(slg, 'l0')
+        slg.g1 = _M.class_lyg.new(slg)
+        slg.l0 = _M.class_lyg.new(slg)
         slg:xsys_populate( source_hash)
         slg:xrls_populate(source_hash)
         slg:xbnfs_populate(source_hash, 'l0')
