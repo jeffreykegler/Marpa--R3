@@ -3331,8 +3331,9 @@ contains a Libmarpa recognizer wrapper object.
     function _M.class_lyg.new(slg, lyr_name)
         local lmw_g = _M.grammar_new()
         local layer = {
+            slg = slg,
             lmw_g = lmw_g,
-            name = lyr_name,
+            -- name = lyr_name,
             xsy_by_isyid = {},
             xbnf_by_irlid = {},
             isys = {},
@@ -3341,7 +3342,6 @@ contains a Libmarpa recognizer wrapper object.
         slg[lyr_name] = layer
         setmetatable(layer, _M.class_lyg)
         lmw_g:force_valued()
-        lmw_g.short_name = lyr_name
     end
 ```
 
