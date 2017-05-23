@@ -521,7 +521,7 @@ Deletes the interpreter if the reference count drops to zero.
     class_slg_fields['token_semantics'] = true
 
     class_slg_fields['xrls'] = true
-    class_slg_fields['xsys'] = true
+    class_slg_fields.xsys = true
 ```
 
 ```
@@ -741,6 +741,9 @@ TODO -- Turn lmg_*() forms into local functions?
 
 ```
     -- miranda: section+ most Lua function definitions
+    function _M.class_slg.symbol_name(slg, xsyid)
+        return slg.xsys[xsyid]
+    end
     function _M.class_slg.lmg_symbol_name(slg, symbol_id, subg_name)
         local lmw_g = slg[subg_name].lmw_g
         return lmw_g:symbol_name(symbol_id)
@@ -763,11 +766,6 @@ TODO -- Turn lmg_*() forms into local functions?
         return slg:lmg_symbol_by_name(symbol_name, 'l0')
     end
 
-    function _M.class_slg.lmg_symbol_dsl_form(slg, isyid, subg_name)
-        local xsy = slg[subg_name].xsy_by_isyid[isyid]
-        if not xsy then return end
-        return xsy.dsl_form
-    end
     function _M.class_slg.g1_symbol_dsl_form(slg, symbol_id)
         return slg:lmg_symbol_dsl_form(symbol_id, 'g1')
     end
@@ -3350,6 +3348,50 @@ contains a Libmarpa recognizer wrapper object.
 ```
 
 ### Layer grammar accessors
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_lyg.xsy_name(lyg, isyid)
+        local xsy = lyg.xsy_by_isyid[isyid]
+        return xsy and xsy.name
+    end
+```
+
+"Force" there to be an XSY name for an ISYID,
+pulling one out of thin air if need be.
+Unlike real XSY names, the "forced" one is not
+necessarily unique.
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_lyg.force_xsy_name(lyg, isyid)
+         return lyg:xsy_name(isyid) or
+             string.format("ISYID%d", isyid)
+    end
+```
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_lyg.symbol_dsl_form(lyg, isyid)
+        local xsy = lyg.xsy_by_isyid[isyid]
+        if not xsy then return end
+        return xsy.dsl_form
+    end
+    function _M.class_lyg.symbol_display_form(lyg, isyid)
+        local xsy = lyg.xsy_by_isyid[isyid]
+        if not xsy then
+            return string.format('<ISYID %d>', isyid)
+        end
+        local dsl_form = xsy.dsl_form
+        if not dsl_form then
+            return string.format('<XSYID %d>', xsy.id)
+        end
+        if dsl_form:match('[ ]') then
+            return string.format('<%s>', dsl_form)
+        end
+        return dsl_form
+    end
+```
 
 ## The grammar Libmarpa wrapper
 
