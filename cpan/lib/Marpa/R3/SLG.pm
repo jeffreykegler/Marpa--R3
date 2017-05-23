@@ -1073,9 +1073,9 @@ sub Marpa::R3::Internal::Scanless::G::precompute {
                 lmw_g:error_description()
         ))
     end
-    kollos.throw = false
+    _M.throw = false
     local result, error = lmw_g:precompute()
-    kollos.throw = true
+    _M.throw = true
     if result then return "no", result, 0 end
     return "no", -1, error.code
 END_OF_LUA
@@ -1106,15 +1106,15 @@ END_OF_LUA
         <<'END_OF_LUA', 'si', $subg_name, $precompute_error_code );
     local grammar, subg_name, error_code = ...
     local lmw_g = grammar[subg_name].lmw_g
-    if error_code == kollos.err["NO_RULES"] then
-        kollos.userX('Attempted to precompute grammar with no rules')
+    if error_code == _M.err["NO_RULES"] then
+        _M.userX('Attempted to precompute grammar with no rules')
     end
-    if error_code == kollos.err["NULLING_TERMINAL"] then
+    if error_code == _M.err["NULLING_TERMINAL"] then
         local msgs = {}
         local events = lmw_g:events()
         for i = 1, #events, 2 do
             local event_type = events[i]
-            if event_type == kollos.event["NULLING_TERMINAL"] then
+            if event_type == _M.event["NULLING_TERMINAL"] then
                 msgs[#msgs+1] =
                    string.format("Nullable symbol %q is also a terminal\n",
                        lmw_g:symbol_name(events[i+1])
@@ -1122,14 +1122,14 @@ END_OF_LUA
             end
         end
         msgs[#msgs+1] = 'A terminal symbol cannot also be a nulling symbol'
-        kollos.userX( table.concat(msgs) )
+        _M.userX( table.concat(msgs) )
     end
-    if error_code == kollos.err["COUNTED_NULLABLE"] then
+    if error_code == _M.err["COUNTED_NULLABLE"] then
         local msgs = {}
         local events = lmw_g:events()
         for i = 1, #events, 2 do
             local event_type = events[i]
-            if event_type == kollos.event["COUNTED_NULLABLE"] then
+            if event_type == _M.event["COUNTED_NULLABLE"] then
                 msgs[#msgs+1] =
                    string.format("Nullable symbol %q is on RHS of counted rule\n",
                        lmw_g:symbol_name(events[i+1])
@@ -1137,16 +1137,16 @@ END_OF_LUA
             end
         end
         msgs[#msgs+1] = 'Counted nullables confuse Marpa -- please rewrite the grammar\n'
-        kollos.userX( table.concat(msgs) )
+        _M.userX( table.concat(msgs) )
     end
-    if error_code == kollos.err["START_NOT_LHS"] then
-        kollos.userX( "Start symbol " .. lmw_g.start_name .. " not on LHS of any rule");
+    if error_code == _M.err["START_NOT_LHS"] then
+        _M.userX( "Start symbol " .. lmw_g.start_name .. " not on LHS of any rule");
     end
-    if error_code == kollos.err["NO_START_SYMBOL"] then
-            kollos.userX('No start symbol')
+    if error_code == _M.err["NO_START_SYMBOL"] then
+            _M.userX('No start symbol')
     end
-    if error_code ~= kollos.err["UNPRODUCTIVE_START"] then
-            kollos.userX( lmw_g:error_description() )
+    if error_code ~= _M.err["UNPRODUCTIVE_START"] then
+            _M.userX( lmw_g:error_description() )
     end
     return "ok"
 END_OF_LUA
@@ -1169,7 +1169,7 @@ END_OF_LUA
         local events = lmw_g:events()
         for i = 1, #events, 2 do
             local event_type = events[i]
-            if event_type == kollos.event["LOOP_RULES"] then
+            if event_type == _M.event["LOOP_RULES"] then
                 error(string.format(
                    "Unknown grammar precomputation event; type=%q"))
             end
@@ -1500,10 +1500,10 @@ END_OF_LUA
     local g, rule  = ...
     -- remove the test for nil or less than zero
     -- once refactoring is complete?
-    kollos.throw = false
+    _M.throw = false
     local base_irl_id = g.g1.lmw_g:rule_new(rule)
     -- print('base_irl_id: ', inspect(base_irl_id))
-    kollos.throw = true
+    _M.throw = true
     if not base_irl_id or base_irl_id < 0 then return -1 end
     g.g1.irls[base_irl_id] = { id = base_irl_id }
     return base_irl_id
@@ -1538,9 +1538,9 @@ END_OF_LUA
     local g, arg_hash = ...
     -- print('arg_hash: ', inspect(arg_hash))
     arg_hash.proper = (arg_hash.proper ~= 0)
-    kollos.throw = false
+    _M.throw = false
     local base_irl_id = g.g1.lmw_g:sequence_new(arg_hash)
-    kollos.throw = true
+    _M.throw = true
     -- remove the test for nil or less than zero
     -- once refactoring is complete?
     if not base_irl_id or base_irl_id < 0 then return end
@@ -1559,10 +1559,10 @@ END_OF_LUA
             local g1g = grammar.g1.lmw_g
             local error_code = g1g:error_code()
             local problem_description
-            if error_code == kollos.err.DUPLICATE_RULE then
+            if error_code == _M.err.DUPLICATE_RULE then
                 problem_description = "Duplicate rule"
             else
-                problem_description = kollos.err[error_code].description
+                problem_description = _M.err[error_code].description
             end
             return "abend", (problem_description .. ': ' .. rule_description)
 END_OF_LUA
@@ -1674,10 +1674,10 @@ END_OF_LUA
     local g, rule  = ...
     -- remove the test for nil or less than zero
     -- once refactoring is complete?
-    kollos.throw = false
+    _M.throw = false
     local base_irl_id = g.l0.lmw_g:rule_new(rule)
     -- print('base_irl_id: ', inspect(base_irl_id))
-    kollos.throw = true
+    _M.throw = true
     if not base_irl_id or base_irl_id < 0 then return -1 end
     g.l0.irls[base_irl_id] = { id = base_irl_id }
     return base_irl_id
@@ -1713,9 +1713,9 @@ END_OF_LUA
     local g, arg_hash = ...
     -- print('arg_hash: ', inspect(arg_hash))
     arg_hash.proper = (arg_hash.proper ~= 0)
-    kollos.throw = false
+    _M.throw = false
     local base_irl_id = g.l0.lmw_g:sequence_new(arg_hash)
-    kollos.throw = true
+    _M.throw = true
     -- remove the test for nil or less than zero
     -- once refactoring is complete?
     if not base_irl_id or base_irl_id < 0 then return end
@@ -1735,10 +1735,10 @@ END_OF_LUA
             local l0g = grammar.l0.lmw_g
             local error_code = l0g:error_code()
             local problem_description
-            if error_code == kollos.err.DUPLICATE_RULE then
+            if error_code == _M.err.DUPLICATE_RULE then
                 problem_description = "Duplicate rule"
             else
-                problem_description = kollos.err[error_code].description
+                problem_description = _M.err[error_code].description
             end
             return "abend", (problem_description .. ': ' .. rule_description)
 END_OF_LUA

@@ -1697,13 +1697,13 @@ sub Marpa::R3::Scanless::R::lexeme_priority_set {
         local g1g = slg.g1.lmw_g
         local lexeme_id = g1g.isyid_by_name[lexeme_name]
         if not lexeme_id then
-            kollos.userX(string.format(
+            _M.userX(string.format(
                 "lexeme_priority_set(): no such symbol as %q",
                 lexeme_name
             ))
         end
         if type(new_priority) ~= 'number' then
-            kollos.userX(string.format(
+            _M.userX(string.format(
                 "lexeme_priority_set(): priority is not a number, it is %s",
                 new_priority
             ))
@@ -1712,7 +1712,7 @@ sub Marpa::R3::Scanless::R::lexeme_priority_set {
         local r_lexeme_data = recce.g1.isys[lexeme_id]
         if not g_lexeme_data.is_lexeme then
             print(inspect(lexeme_data))
-            kollos.userX(string.format(
+            _M.userX(string.format(
                 "lexeme_priority_set(): %q is not a lexeme",
                 lexeme_name
             ))

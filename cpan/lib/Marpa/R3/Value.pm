@@ -600,7 +600,7 @@ sub op_fn_key_by_name {
     my ($key) = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 's', $name );
       local recce, name = ...
-      return kollos.get_op_fn_key_by_name(name)
+      return _M.get_op_fn_key_by_name(name)
 END_OF_LUA
 
     return $key;
@@ -611,7 +611,7 @@ sub op_fn_name_by_key {
     my ($name) = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'i', $key );
       local recce, key = ...
-      return kollos.get_op_fn_name_by_key(key)
+      return _M.get_op_fn_name_by_key(key)
 END_OF_LUA
 
     return $name;
@@ -1010,7 +1010,7 @@ END_OF_LUA
     # state $op_lua = Marpa::R3::Thin::op('lua');
     my ($op_lua) = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', '' );
-        return kollos.defines.MARPA_OP_LUA
+        return _M.defines.MARPA_OP_LUA
 END_OF_LUA
 
     my ($op_debug_key)        = op_fn_key_by_name( $slg, "debug" );
@@ -1499,7 +1499,7 @@ sub Marpa::R3::Scanless::R::value {
             -- No tree, therefore ordering is not initialized
             local lmw_o = slr:ordering_get()
             if not lmw_o then return false end
-            lmw_t = kollos.tree_new(lmw_o)
+            lmw_t = _M.tree_new(lmw_o)
             slr.lmw_t = lmw_t
         end
 
@@ -1515,7 +1515,7 @@ sub Marpa::R3::Scanless::R::value {
         local result = slr.lmw_t:next()
         if not result then return result end
         -- print('result:', result)
-        slr.lmw_v = kollos.value_new(slr.lmw_t)
+        slr.lmw_v = _M.value_new(slr.lmw_t)
     return result
 END_OF_LUA
 
