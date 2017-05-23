@@ -1423,18 +1423,18 @@ Read alternatives into the G1 grammar.
             end
             local g1r = slr.g1.lmw_r
             local kollos = getmetatable(g1r).kollos
-            local value_is_literal = kollos.defines.TOKEN_VALUE_IS_LITERAL
+            local value_is_literal = _M.defines.TOKEN_VALUE_IS_LITERAL
             local return_value = g1r:alternative(g1_lexeme, value_is_literal, 1)
             -- print('return value = ', inspect(return_value))
-            if return_value == kollos.err.UNEXPECTED_TOKEN_ID then
+            if return_value == _M.err.UNEXPECTED_TOKEN_ID then
                 error('Internal error: Marpa rejected expected token')
             end
-            if return_value == kollos.err.DUPLICATE_TOKEN then
+            if return_value == _M.err.DUPLICATE_TOKEN then
                 local q = slr.event_queue
                 q[#q+1] = { '!trace', 'g1 duplicate lexeme', block_ix, lexeme_start, lexeme_end, g1_lexeme}
                 goto NEXT_EVENT
             end
-            if return_value ~= kollos.err.NONE then
+            if return_value ~= _M.err.NONE then
                 local l0r = slr.l0.lmw_r
                 error(string.format([[
                      'Problem SLR->read() failed on symbol id %d at position %d: %s'
@@ -1594,7 +1594,7 @@ acceptance is caught here via rejection).  Ignore
             -- here
 
             -- local error_code = slr.slg.g1.lmw_g:error_code()
-            -- if error_code == kollos.err.PARSE_EXHAUSTED then
+            -- if error_code == _M.err.PARSE_EXHAUSTED then
                 -- local q = slr.event_queue
                 -- q[#q+1] = { 'no acceptable input' }
             -- end
@@ -1621,16 +1621,16 @@ Returns the Libmarpa object if it could "get" one,
             slr.has_parse = true
             return lmw_o
         end
-        kollos.throw = false
-        local bocage = kollos.bocage_new(slr.g1.lmw_r, slr.end_of_parse)
-        kollos.throw = true
+        _M.throw = false
+        local bocage = _M.bocage_new(slr.g1.lmw_r, slr.end_of_parse)
+        _M.throw = true
         slr.lmw_b = bocage
         if not bocage then
             slr.has_parse = false
             return
         end
 
-        lmw_o = kollos.order_new(bocage)
+        lmw_o = _M.order_new(bocage)
         slr.lmw_o = lmw_o
 
         if ranking_method == 'high_rule_only' then
@@ -3329,7 +3329,7 @@ contains a Libmarpa recognizer wrapper object.
 
     -- miranda: section+ most Lua function definitions
     function _M.class_lyg.new(slg, lyr_name)
-        local lmw_g = kollos.grammar_new()
+        local lmw_g = _M.grammar_new()
         local layer = {
             lmw_g = lmw_g,
             name = lyr_name,
@@ -6348,7 +6348,7 @@ Marpa::R3.
          */
         /* [ kollos ] */
 
-        /* kollos.throw = true */
+        /* _M.throw = true */
         marpa_lua_pushboolean (L, 1);
         marpa_lua_setfield (L, kollos_table_stack_ix, "throw");
 
