@@ -36,6 +36,8 @@ cd kollos && ../lua/lua toc.lua < kollos.lua.md
   * [Discard events](#discard-events)
 * [Kollos object](#kollos-object)
 * [Kollos registry objects](#kollos-registry-objects)
+* [External, inner and internal](#external-inner-and-internal)
+* [Layers and wrappers](#layers-and-wrappers)
 * [Kollos SLIF grammar object](#kollos-slif-grammar-object)
   * [Fields](#fields)
   * [Ranking methods](#ranking-methods)
@@ -89,8 +91,6 @@ cd kollos && ../lua/lua toc.lua < kollos.lua.md
     * [Return the value of a stack entry](#return-the-value-of-a-stack-entry)
     * [Set the value of a stack entry](#set-the-value-of-a-stack-entry)
     * [Convert current, origin Earley set to L0 span](#convert-current-origin-earley-set-to-l0-span)
-* [External, inner and internal](#external-inner-and-internal)
-* [Layers and wrappers](#layers-and-wrappers)
 * [The layer grammar](#the-layer-grammar)
   * [Fields](#fields)
   * [Constructor](#constructor)
@@ -488,6 +488,94 @@ Deletes the interpreter if the reference count drops to zero.
     }
 
 ```
+
+## Symbols
+
+### External, inner and internal
+
+The Kollos upper layers and Libmarpa both
+makes substantial use of rule rewriting.
+As a result,
+Kollos has external rules (xrl's),
+inner rules (irl's)
+and internal rules (nrl's).
+External rules contain external symbols (xsy's).
+Inner rules contain inner symbols (isy's).
+Internal rules contain internal symbols (nsy's).
+
+Xrl's and xsy's are the
+only rules and symbols
+intended to be visible to the SLIF user.
+Irl's, isy's, nrl's and nsy's are
+intended to be seen by Kollos
+developers and maintainers only.
+
+Libmarpa and the
+Kollos upper layers
+each have
+two sets of rules and symbols,
+one pre-rewrite and one post-rewrite.
+The xrl's and xsy's are the Kollos upper
+layer's pre-rewrite rules and symbols.
+
+The irl's and isy's are the Kollos upper
+layer's post-rewrite rules and symbols.
+The irl's and isy's are also Libmarpa's
+pre-rewrite rules and symbols.
+Irl's and isy's
+are, therefore, a "common language"
+that Libmarpa and the Kollos upper layers share.
+
+Libmarpa's post-rewrite symbols are
+the nrl's and nsy's.
+Nrl's and nsy's are
+intended to be known only to Libmarpa,
+and to Libmarpa's developers and maintainers.
+
+For historical reasons,
+and confusingly,
+some of Libmarpa's
+internal methods refer to nrl's as irl's.
+The names of these methods will eventually be
+changed.
+They are being kept for now so that
+Kollos's Libmarpa does not diverge
+too far from
+Marpa::R2's Libmarpa.
+
+## ISY Fields
+
+```
+    -- miranda: section+ class_isy field declarations
+    class_isy_fields.assertion = true
+```
+
+```
+    -- miranda: section+ create nonmetallic metatables
+    _M.class_isy = {}
+    -- miranda: section+ populate metatables
+    local class_isy_fields = {}
+    -- miranda: insert class_isy field declarations
+    declarations(_M.class_isy, class_isy_fields)
+```
+
+## Layers and wrappers
+
+There is a SLIF grammar object and
+a SLIF recce object.
+The SLIF has two *layers*, G1 and L0.
+
+Each SLIF object contains two layer objects.
+SLIF grammars contain
+a G1 layer grammar object
+and an L0 layer grammar object.
+Each layer grammar object, in turn,
+contains a Libmarpa grammar wrapper object.
+
+SLIF recognizers contain
+a G1 layer recognizer object
+Each layer recognizer object, in turn,
+contains a Libmarpa recognizer wrapper object.
 
 ## Kollos SLIF grammar object
 
@@ -3227,76 +3315,6 @@ is zero.
     end
 
 ```
-
-## External, inner and internal
-
-The Kollos upper layers and Libmarpa both
-makes substantial use of rule rewriting.
-As a result,
-Kollos has external rules (xrl's),
-inner rules (irl's)
-and internal rules (nrl's).
-External rules contain external symbols (xsy's).
-Inner rules contain inner symbols (isy's).
-Internal rules contain internal symbols (nsy's).
-
-Xrl's and xsy's are the
-only rules and symbols
-intended to be visible to the SLIF user.
-Irl's, isy's, nrl's and nsy's are
-intended to be seen by Kollos
-developers and maintainers only.
-
-Libmarpa and the
-Kollos upper layers
-each have
-two sets of rules and symbols,
-one pre-rewrite and one post-rewrite.
-The xrl's and xsy's are the Kollos upper
-layer's pre-rewrite rules and symbols.
-
-The irl's and isy's are the Kollos upper
-layer's post-rewrite rules and symbols.
-The irl's and isy's are also Libmarpa's
-pre-rewrite rules and symbols.
-Irl's and isy's
-are, therefore, a "common language"
-that Libmarpa and the Kollos upper layers share.
-
-Libmarpa's post-rewrite symbols are
-the nrl's and nsy's.
-Nrl's and nsy's are
-intended to be known only to Libmarpa,
-and to Libmarpa's developers and maintainers.
-
-For historical reasons,
-and confusingly,
-some of Libmarpa's
-internal methods refer to nrl's as irl's.
-The names of these methods will eventually be
-changed.
-They are being kept for now so that
-Kollos's Libmarpa does not diverge
-too far from
-Marpa::R2's Libmarpa.
-
-## Layers and wrappers
-
-There is a SLIF grammar object and
-a SLIF recce object.
-The SLIF has two *layers*, G1 and L0.
-
-Each SLIF object contains two layer objects.
-SLIF grammars contain
-a G1 layer grammar object
-and an L0 layer grammar object.
-Each layer grammar object, in turn,
-contains a Libmarpa grammar wrapper object.
-
-SLIF recognizers contain
-a G1 layer recognizer object
-Each layer recognizer object, in turn,
-contains a Libmarpa recognizer wrapper object.
 
 ## The layer grammar
 
