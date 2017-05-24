@@ -3325,8 +3325,8 @@ is zero.
     _M.class_lyg = {}
 
     -- miranda: section+ most Lua function definitions
-    function _M.class_lyg.new(slg, lyr_name)
-        local lmw_g = _M.grammar_new()
+    function _M.class_lyg.new(slg)
+        local lmw_g = slg:grammar_new()
         lmw_g:force_valued()
 
         lmw_g.slg = slg
@@ -3418,9 +3418,10 @@ necessarily unique.
     -- miranda: section+ copy metal tables
     _M.metal.grammar_new = _M.grammar_new
     -- miranda: section+ most Lua function definitions
-    function _M.grammar_new()
+    function _M.class_slg.grammar_new(slg)
         local lmw_g = _M.metal.grammar_new()
         setmetatable(lmw_g, _M.class_grammar)
+        lmw_g.slg = slg
         lmw_g.isyid_by_name = {}
         lmw_g.name_by_isyid = {}
         return lmw_g
