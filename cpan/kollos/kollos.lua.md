@@ -3318,6 +3318,27 @@ is zero.
 
 ## The layer grammar
 
+### Fields
+
+
+```
+    -- miranda: section+ class_lyg field declarations
+    class_lyg_fields.slg = true
+    class_lyg_fields.irls = true
+    class_lyg_fields.isys = true
+    class_lyg_fields.lmw_g = true
+    class_lyg_fields.xbnfs = true
+    class_lyg_fields.xbnf_by_irlid = true
+    class_lyg_fields.xsy_by_isyid = true
+```
+
+```
+    -- miranda: section+ populate metatables
+    local class_lyg_fields = {}
+    -- miranda: insert class_lyg field declarations
+    declarations(_M.class_lyg, class_lyg_fields)
+```
+
 ### Constructor
 
 ```
@@ -3325,18 +3346,22 @@ is zero.
     _M.class_lyg = {}
 
     -- miranda: section+ most Lua function definitions
-    function _M.class_lyg.new(slg)
-        local lmw_g = slg:grammar_new()
+    function _M.class_lyg.new(slg, lyr_name)
+        local lmw_g = _M.grammar_new()
         lmw_g:force_valued()
 
-        lmw_g.slg = slg
-        lmw_g.xbnfs = {}
-        lmw_g.xsy_by_isyid = {}
-        lmw_g.xbnf_by_irlid = {}
-        lmw_g.isys = {}
-        lmw_g.irls = {}
+        local layer = {}
+        setmetatable(layer, _M.class_lyg)
 
-        return lmw_g
+        layer.slg = slg
+        layer.lmw_g = lmw_g
+        layer.xbnfs = {}
+        layer.xsy_by_isyid = {}
+        layer.xbnf_by_irlid = {}
+        layer.isys = {}
+        layer.irls = {}
+
+        return layer
     end
 ```
 
@@ -3397,12 +3422,6 @@ necessarily unique.
     class_grammar_fields.lmw_g = true
     class_grammar_fields.name_by_isyid = true
     class_grammar_fields.start_name = true
-    class_grammar_fields.slg = true
-    class_grammar_fields.irls = true
-    class_grammar_fields.isys = true
-    class_grammar_fields.xbnfs = true
-    class_grammar_fields.xbnf_by_irlid = true
-    class_grammar_fields.xsy_by_isyid = true
 ```
 
 ```
@@ -3418,10 +3437,9 @@ necessarily unique.
     -- miranda: section+ copy metal tables
     _M.metal.grammar_new = _M.grammar_new
     -- miranda: section+ most Lua function definitions
-    function _M.class_slg.grammar_new(slg)
+    function _M.grammar_new()
         local lmw_g = _M.metal.grammar_new()
         setmetatable(lmw_g, _M.class_grammar)
-        lmw_g.slg = slg
         lmw_g.isyid_by_name = {}
         lmw_g.name_by_isyid = {}
         return lmw_g
