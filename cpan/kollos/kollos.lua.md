@@ -615,7 +615,13 @@ Marpa::R2's Libmarpa.
 
 ```
     -- miranda: section+ class_xrl field declarations
+    class_xrl_fields.id = true
+    class_xrl_fields.name = true
     class_xrl_fields.assertion = true
+    class_xrl_fields.precedence_count = true
+    class_xrl_fields.lhs = true
+    class_xrl_fields.start = true
+    class_xrl_fields.length = true
 ```
 
 ```
@@ -780,13 +786,11 @@ for example in error messages.
         )
         for xrl_id = 1, #xrl_names do
             local xrl_name = xrl_names[xrl_id]
-            local runtime_xrl = {
-                id = xrl_id,
-                name = xrl_name
-            }
-
+            local runtime_xrl = setmetatable({}, _M.class_xrl)
             local xrl_source = hash_xrl_data[xrl_name]
 
+            runtime_xrl.id = xrl_id
+            runtime_xrl.name = xrl_name
             -- copy, so that we can destroy `source_hash`
             runtime_xrl.precedence_count = xrl_source.precedence_count
             runtime_xrl.lhs = xrl_source.lhs
