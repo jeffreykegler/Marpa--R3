@@ -1546,7 +1546,10 @@ END_OF_LUA
     -- remove the test for nil or less than zero
     -- once refactoring is complete?
     if not base_irl_id or base_irl_id < 0 then return end
-    g.g1.lmw_g.irls[base_irl_id] = { id = base_irl_id }
+
+    local g1_rule = setmetatable({}, _M.class_irl)
+    g1_rule.id = base_irl_id
+    g.g1.lmw_g.irls[base_irl_id] = g1_rule
     return base_irl_id
 END_OF_LUA
 
@@ -1721,7 +1724,8 @@ END_OF_LUA
     -- remove the test for nil or less than zero
     -- once refactoring is complete?
     if not base_irl_id or base_irl_id < 0 then return end
-    local l0_rule = { id = base_irl_id }
+    local l0_rule = setmetatable({}, _M.class_irl)
+    l0_rule.id = base_irl_id
     g.l0.lmw_g.irls[base_irl_id] = l0_rule
     return base_irl_id
 END_OF_LUA

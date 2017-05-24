@@ -183,28 +183,14 @@ core libraries are loaded.
 Going forward, it needs to "require" then,
 like an ordinary Lua library.
 
-### Kollos assumes global name "kollos"
-
-The Kollos methods now often assume that the kollos
-class can be found as a global named "kollos".
-Namespace hygiene and preserving the ability to
-load multiple kollos packages (for debugging, say),
-requires that this be changed.
-Going forward, we will store kollos as a field
-in all libmarpa wrapper and Kollos registry object metatables,
-and use that in all methods.
-like an ordinary Lua library.
-
 ### New lexer features
-
-* "Eager" tokens (currently all tokens are "greedy")
 
 *  Changing priorities to be "non-local".  Current priorities only break
 ties for tokens at the same location.  "Non-local" means if there is a
 priority 2 lexeme of any length and/or eagerness, you will get that
 lexeme, and not any lexeme of priority 1 or lower.
 
-* Lookahead.
+* Lookahead?
 
 ### Discard events
 
@@ -575,7 +561,7 @@ Marpa::R2's Libmarpa.
     -- miranda: section+ populate metatables
     local class_isy_fields = {}
     -- miranda: insert class_isy field declarations
-    declarations(_M.class_isy, class_isy_fields)
+    declarations(_M.class_isy, class_isy_fields, 'isy')
 ```
 
 ## XSY Fields
@@ -600,7 +586,7 @@ Marpa::R2's Libmarpa.
     class_xsy_fields.name_source = true
 
     -- miranda: insert class_xsy field declarations
-    declarations(_M.class_xsy, class_xsy_fields)
+    declarations(_M.class_xsy, class_xsy_fields, 'xsy')
 ```
 
 ## Rules
@@ -610,6 +596,10 @@ Marpa::R2's Libmarpa.
 ```
     -- miranda: section+ class_irl field declarations
     class_irl_fields.id = true
+    class_irl_fields.xbnf = true
+    class_irl_fields.action = true
+    class_irl_fields.mask = true
+    class_irl_fields.g1_lexeme = true
 ```
 
 ```
@@ -618,7 +608,7 @@ Marpa::R2's Libmarpa.
     -- miranda: section+ populate metatables
     local class_irl_fields = {}
     -- miranda: insert class_irl field declarations
-    declarations(_M.class_irl, class_irl_fields)
+    declarations(_M.class_irl, class_irl_fields, 'irl')
 ```
 
 ## XRL Fields
@@ -637,7 +627,7 @@ Marpa::R2's Libmarpa.
     class_xrl_fields.id = true
 
     -- miranda: insert class_xrl field declarations
-    declarations(_M.class_xrl, class_xrl_fields)
+    declarations(_M.class_xrl, class_xrl_fields, 'xrl')
 ```
 
 ## Layers and wrappers
@@ -697,7 +687,7 @@ contains a Libmarpa recognizer wrapper object.
     -- miranda: section+ populate metatables
     local class_slg_fields = {}
     -- miranda: insert class_slg field declarations
-    declarations(_M.class_slg, class_slg_fields)
+    declarations(_M.class_slg, class_slg_fields, 'slg')
 ```
 
 This is a registry object.
@@ -999,7 +989,7 @@ This is a registry object.
     -- miranda: section+ populate metatables
     local class_slr_fields = {}
     -- miranda: insert class_slr field declarations
-    declarations(_M.class_slr, class_slr_fields)
+    declarations(_M.class_slr, class_slr_fields, 'slr')
 ```
 
 ```
@@ -3432,7 +3422,7 @@ grammar wrapper.
     -- miranda: section+ populate metatables
     local class_subg_fields = {}
     -- miranda: insert class_subg field declarations
-    declarations(_M.class_subg, class_subg_fields)
+    declarations(_M.class_subg, class_subg_fields, 'subg')
 ```
 
 ### Constructor
@@ -3524,7 +3514,7 @@ necessarily unique.
     -- miranda: section+ populate metatables
     local class_grammar_fields = {}
     -- miranda: insert class_grammar field declarations
-    declarations(_M.class_grammar, class_grammar_fields)
+    declarations(_M.class_grammar, class_grammar_fields, 'grammar')
 ```
 
 ### Constructor
@@ -3735,7 +3725,7 @@ that is, it does not assume the SLIF.
     -- miranda: section+ populate metatables
     local class_recce_fields = {}
     -- miranda: insert class_recce field declarations
-    declarations(_M.class_recce, class_recce_fields)
+    declarations(_M.class_recce, class_recce_fields, 'recce')
 ```
 
 Functions for tracing Earley sets
@@ -6923,12 +6913,18 @@ TODO -- Do I want to turn this off after developement?
 
 ```
     -- miranda: section+ internal utilities
-    local function declarations(table, fields)
+    local function declarations(table, fields, name)
         table.__declared = fields
 
         table.__newindex = function (t, n, v)
           if not table.__declared[n] then
-            error("assign to undeclared variable '"..n.."'", 2)
+            error(
+                "assign to undeclared member '"
+                ..name
+                .."."
+                ..n
+                .."'",
+                2)
           end
           rawset(t, n, v)
         end
