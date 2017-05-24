@@ -1261,8 +1261,9 @@ sub assign_G1_symbol {
         <<'END_OF_LUA', 's', $name );
     local g, symbol_name = ...
     local lmw_g = g.g1.lmw_g
-    local symbol_id = lmw_g:symbol_new(symbol_name)
-    g.g1.lmw_g.isys[symbol_id] = { id = symbol_id }
+    local isy = lmw_g:symbol_new(symbol_name)
+    local symbol_id = isy.id
+    g.g1.lmw_g.isys[symbol_id] = isy
     return symbol_id
 END_OF_LUA
 
@@ -1332,8 +1333,9 @@ sub assign_L0_symbol {
         <<'END_OF_LUA', 's', $name );
     local g, symbol_name = ...
     local lmw_g = g.l0.lmw_g
-    local symbol_id = lmw_g:symbol_new(symbol_name)
-    g.l0.lmw_g.isys[symbol_id] = { id = symbol_id }
+    local isy = lmw_g:symbol_new(symbol_name)
+    local symbol_id = isy.id
+    g.l0.lmw_g.isys[symbol_id] = isy
     return symbol_id
 END_OF_LUA
 

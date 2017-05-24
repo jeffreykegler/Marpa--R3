@@ -547,7 +547,17 @@ Marpa::R2's Libmarpa.
 
 ```
     -- miranda: section+ class_isy field declarations
+    class_isy_fields.id = true
+    class_isy_fields.name = true
+    -- fields for use by upper layers?
     class_isy_fields.assertion = true
+    class_isy_fields.pause_after = true
+    class_isy_fields.pause_after_active = true
+    class_isy_fields.pause_before = true
+    class_isy_fields.pause_before_active = true
+    class_isy_fields.priority = true
+    class_isy_fields.is_lexeme = true
+    class_isy_fields.eager = true
 ```
 
 ```
@@ -557,6 +567,22 @@ Marpa::R2's Libmarpa.
     local class_isy_fields = {}
     -- miranda: insert class_isy field declarations
     declarations(_M.class_isy, class_isy_fields)
+```
+
+## XSY Fields
+
+```
+    -- miranda: section+ class_xsy field declarations
+    class_xsy_fields.assertion = true
+```
+
+```
+    -- miranda: section+ create nonmetallic metatables
+    _M.class_xsy = {}
+    -- miranda: section+ populate metatables
+    local class_xsy_fields = {}
+    -- miranda: insert class_xsy field declarations
+    declarations(_M.class_xsy, class_xsy_fields)
 ```
 
 ## Layers and wrappers
@@ -3471,9 +3497,12 @@ necessarily unique.
     -- miranda: section+ most Lua function definitions
     function _M.class_grammar.symbol_new(lmw_g, symbol_name)
         local symbol_id = _M.metal_grammar.symbol_new(lmw_g)
+        local symbol = setmetatable({}, _M.class_isy)
+        symbol.id = symbol_id
+        symbol.name = symbol_name
         lmw_g.isyid_by_name[symbol_name] = symbol_id
         lmw_g.name_by_isyid[symbol_id] = symbol_name
-        return symbol_id
+        return symbol
     end
 
 ```
