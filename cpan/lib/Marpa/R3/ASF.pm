@@ -318,7 +318,7 @@ END_OF_LUA
             <<'END_OF_LUA', 'i>*', $irlid );
     local recce, irlid = ...
     local slg = recce.slg
-    local irl = slg.g1.irls[irlid]
+    local irl = slg.g1.lmw_g.irls[irlid]
     local xbnf = irl.xbnf
     if xbnf then
         local blessing = xbnf.bless

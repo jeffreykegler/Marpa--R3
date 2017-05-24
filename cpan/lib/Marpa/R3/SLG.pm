@@ -700,7 +700,7 @@ END_OF_LUA
                 <<'END_OF_LUA', 'ii>*', $irlid, $lex_discard_symbol_id );
     local slg, irlid, lex_discard_symbol_id = ...
     local lyr_l0 = slg.l0
-    local irl = lyr_l0.irls[irlid]
+    local irl = lyr_l0.lmw_g.irls[irlid]
     local xbnf = irl.xbnf
     if not xbnf then
         return 'next RULE_ID'
@@ -736,7 +736,7 @@ END_OF_LUA
               $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
                 <<'END_OF_LUA', 'i>*', $irlid );
     local slg, irlid = ...
-    local irl = slg.l0.irls[irlid]
+    local irl = slg.l0.lmw_g.irls[irlid]
     -- at this point, xbnf must be defined
     local xbnf = irl.xbnf
     return xbnf.symbol_as_event
@@ -787,7 +787,7 @@ END_OF_LUA
         g1_lexeme_id = math.tointeger(g1_lexeme_id)
         local declarations = lexeme_declarations[lexeme_name] or {}
 
-        local lexeme_data = slg.g1.isys[g1_lexeme_id]
+        local lexeme_data = slg.g1.lmw_g.isys[g1_lexeme_id]
         local priority = 0
         if declarations.priority then
             priority = declarations.priority + 0
@@ -813,7 +813,7 @@ END_OF_LUA
         local pause_value = declarations.pause
         if pause_value then
             pause_value = math.tointeger(pause_value)
-            local lexeme_data = slg.g1.isys[g1_lexeme_id]
+            local lexeme_data = slg.g1.lmw_g.isys[g1_lexeme_id]
             if pause_value == 1 then
                  lexeme_data.pause_after = true
             elseif pause_value == -1 then
@@ -838,7 +838,7 @@ END_OF_LUA
                     name_entry[#name_entry+1] = event_desc
                 end
 
-                local lexeme_data = slg.g1.isys[g1_lexeme_id]
+                local lexeme_data = slg.g1.lmw_g.isys[g1_lexeme_id]
                 if is_active then
                     -- activate only if event is enabled
                     lexeme_data.pause_after_active = lexeme_data.pause_after
@@ -874,18 +874,18 @@ END_OF_LUA
         <<'END_OF_LUA',
     local g, lexer_rule_id, g1_lexeme_id, assertion_id, discard_symbol_id = ...
     if lexer_rule_id >= 0 then
-        g.l0.irls[lexer_rule_id].g1_lexeme = g1_lexeme_id
+        g.l0.lmw_g.irls[lexer_rule_id].g1_lexeme = g1_lexeme_id
         if g1_lexeme_id >= 0 then
-            local eager = g.g1.isys[g1_lexeme_id].eager
-            if eager then g.l0.irls[lexer_rule_id].eager = true end
+            local eager = g.g1.lmw_g.isys[g1_lexeme_id].eager
+            if eager then g.l0.lmw_g.irls[lexer_rule_id].eager = true end
         end
-        local eager = g.l0.isys[discard_symbol_id].eager
+        local eager = g.l0.lmw_g.isys[discard_symbol_id].eager
         if eager then
-            g.l0.irls[lexer_rule_id].eager = true
+            g.l0.lmw_g.irls[lexer_rule_id].eager = true
         end
     end
     if g1_lexeme_id >= 0 then
-        g.g1.isys[g1_lexeme_id].assertion = assertion_id
+        g.g1.lmw_g.isys[g1_lexeme_id].assertion = assertion_id
     end
 END_OF_LUA
         'iiii', $lexer_rule_id, $g1_lexeme_id, $assertion_id, $discard_symbol_id );
@@ -899,7 +899,7 @@ END_OF_LUA
             -- print(inspect(discard_event))
             local event_name = discard_event[1]
             local is_active = discard_event[2] == "1"
-            local l0_rules = slg.l0.irls
+            local l0_rules = slg.l0.lmw_g.irls
 
             local event_desc = {
                name = event_name,
@@ -1262,7 +1262,7 @@ sub assign_G1_symbol {
     local g, symbol_name = ...
     local lmw_g = g.g1.lmw_g
     local symbol_id = lmw_g:symbol_new(symbol_name)
-    g.g1.isys[symbol_id] = { id = symbol_id }
+    g.g1.lmw_g.isys[symbol_id] = { id = symbol_id }
     return symbol_id
 END_OF_LUA
 
@@ -1333,7 +1333,7 @@ sub assign_L0_symbol {
     local g, symbol_name = ...
     local lmw_g = g.l0.lmw_g
     local symbol_id = lmw_g:symbol_new(symbol_name)
-    g.l0.isys[symbol_id] = { id = symbol_id }
+    g.l0.lmw_g.isys[symbol_id] = { id = symbol_id }
     return symbol_id
 END_OF_LUA
 
@@ -1360,7 +1360,7 @@ END_OF_LUA
         <<'END_OF_LUA', 'ii', $symbol_id, ($value ? 1 : 0));
     local g, symbol_id, eager = ...
     if eager > 0 then
-        g.l0.isys[symbol_id].eager = true
+        g.l0.lmw_g.isys[symbol_id].eager = true
     end
 END_OF_LUA
 
@@ -1505,7 +1505,7 @@ END_OF_LUA
     -- print('base_irl_id: ', inspect(base_irl_id))
     _M.throw = true
     if not base_irl_id or base_irl_id < 0 then return -1 end
-    g.g1.irls[base_irl_id] = { id = base_irl_id }
+    g.g1.lmw_g.irls[base_irl_id] = { id = base_irl_id }
     return base_irl_id
 END_OF_LUA
 
@@ -1544,7 +1544,7 @@ END_OF_LUA
     -- remove the test for nil or less than zero
     -- once refactoring is complete?
     if not base_irl_id or base_irl_id < 0 then return end
-    g.g1.irls[base_irl_id] = { id = base_irl_id }
+    g.g1.lmw_g.irls[base_irl_id] = { id = base_irl_id }
     return base_irl_id
 END_OF_LUA
 
@@ -1577,7 +1577,7 @@ END_OF_LUA
         g1g:rule_null_high_set(irl_id, ranking_is_high)
         g1g:rule_rank_set(irl_id, rank)
         local xbnf = slg.g1.xbnfs[xbnf_id]
-        local irl = slg.g1.irls[irl_id]
+        local irl = slg.g1.lmw_g.irls[irl_id]
         irl.xbnf = xbnf
         -- right now, the action & mask of an irl
         -- is always the action/mask of its xbnf.
@@ -1679,7 +1679,7 @@ END_OF_LUA
     -- print('base_irl_id: ', inspect(base_irl_id))
     _M.throw = true
     if not base_irl_id or base_irl_id < 0 then return -1 end
-    g.l0.irls[base_irl_id] = { id = base_irl_id }
+    g.l0.lmw_g.irls[base_irl_id] = { id = base_irl_id }
     return base_irl_id
 END_OF_LUA
 
@@ -1720,7 +1720,7 @@ END_OF_LUA
     -- once refactoring is complete?
     if not base_irl_id or base_irl_id < 0 then return end
     local l0_rule = { id = base_irl_id }
-    g.l0.irls[base_irl_id] = l0_rule
+    g.l0.lmw_g.irls[base_irl_id] = l0_rule
     return base_irl_id
 END_OF_LUA
 
@@ -1754,7 +1754,7 @@ END_OF_LUA
         l0g:rule_rank_set(irl_id, rank)
         if xbnf_id >= 0 then
             local xbnf = slg.l0.xbnfs[xbnf_id]
-            local irl = slg.l0.irls[irl_id]
+            local irl = slg.l0.lmw_g.irls[irl_id]
             irl.xbnf = xbnf
             -- right now, the action & mask of an irl
             -- is always the action/mask of its xbnf.
@@ -1796,7 +1796,7 @@ sub Marpa::R3::Scanless::G::rule_name {
       <<'END_OF_LUA', 'i', $irlid);
     local slg, irlid = ...
     local g1 = slg.g1
-    local irl = g1.irls[irlid]
+    local irl = g1.lmw_g.irls[irlid]
     local xbnf = irl.xbnf
     if not xbnf then
         return string.format('Non-existent rule %d', irlid)
@@ -2289,7 +2289,7 @@ END_OF_LUA
     if lmw_g:rule_is_accessible(irlid) == 0 then
         comments[#comments+1] = 'inaccessible'
     end
-    local irl = slg[subg_name].irls[irlid]
+    local irl = slg[subg_name].lmw_g.irls[irlid]
     local xbnf = irl.xbnf
     if xbnf then
         if xbnf.discard_separation then

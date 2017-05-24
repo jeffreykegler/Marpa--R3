@@ -960,7 +960,7 @@ This is a registry object.
         for i = 0, count -1 do
             local ix = i + 1
             local terminal = slr.terminals_expected[ix]
-            local assertion = slr.slg.g1.isys[terminal].assertion
+            local assertion = slr.slg.g1.lmw_g.isys[terminal].assertion
             assertion = assertion or -1
             if assertion >= 0 then
                 local result = l0r:zwa_default_set(assertion, 1)
@@ -2166,7 +2166,7 @@ an L0 range
 
         events = slg.discard_event_by_name[event_name]
         if events then
-            local g_l0_rules = slg.l0.irls
+            local g_l0_rules = slg.l0.lmw_g.irls
             local r_l0_rules = slr.l0.irls
             for ix = 1, #events do
                 local event_data = events[ix]
@@ -2183,7 +2183,7 @@ an L0 range
 
         events = slg.lexeme_event_by_name[event_name]
         if events then
-            local g_g1_symbols = slg.g1.isys
+            local g_g1_symbols = slg.g1.lmw_g.isys
             local r_g1_symbols = slr.g1.isys
             for ix = 1, #events do
                     local event_data = events[ix]
@@ -3324,8 +3324,6 @@ is zero.
 ```
     -- miranda: section+ class_lyg field declarations
     class_lyg_fields.slg = true
-    class_lyg_fields.irls = true
-    class_lyg_fields.isys = true
     class_lyg_fields.lmw_g = true
     class_lyg_fields.xbnfs = true
     class_lyg_fields.xbnf_by_irlid = true
@@ -3358,8 +3356,6 @@ is zero.
         layer.xbnfs = {}
         layer.xsy_by_isyid = {}
         layer.xbnf_by_irlid = {}
-        layer.isys = {}
-        layer.irls = {}
 
         return layer
     end
@@ -3422,6 +3418,8 @@ necessarily unique.
     class_grammar_fields.lmw_g = true
     class_grammar_fields.name_by_isyid = true
     class_grammar_fields.start_name = true
+    class_grammar_fields.isys = true
+    class_grammar_fields.irls = true
 ```
 
 ```
@@ -3442,6 +3440,8 @@ necessarily unique.
         setmetatable(lmw_g, _M.class_grammar)
         lmw_g.isyid_by_name = {}
         lmw_g.name_by_isyid = {}
+        lmw_g.irls = {}
+        lmw_g.isys = {}
         return lmw_g
     end
 

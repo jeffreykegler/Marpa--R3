@@ -195,8 +195,9 @@ sub Marpa::R3::Scanless::R::new {
     slr.end_of_pause_lexeme = -1
     slr.lexer_start_pos = 0
     slr.is_external_scanning = false
+
+    local g_l0_rules = grammar.l0.lmw_g.irls
     local r_l0_rules = slr.l0.irls
-    local g_l0_rules = grammar.l0.irls
     -- print('g_l0_rules: ', inspect(g_l0_rules))
     local max_l0_rule_id = l0g:highest_rule_id()
     for rule_id = 0, max_l0_rule_id do
@@ -210,7 +211,7 @@ sub Marpa::R3::Scanless::R::new {
         r_l0_rules[rule_id] = r_l0_rule
     end
     -- print('r_l0_rules: ', inspect(r_l0_rules))
-    local g_g1_symbols = grammar.g1.isys
+    local g_g1_symbols = grammar.g1.lmw_g.isys
     local r_g1_symbols = slr.g1.isys
     local max_g1_symbol_id = g1g:highest_symbol_id()
     for symbol_id = 0, max_g1_symbol_id do
@@ -1708,7 +1709,7 @@ sub Marpa::R3::Scanless::R::lexeme_priority_set {
                 new_priority
             ))
         end
-        local g_lexeme_data = slg.g1.isys[lexeme_id]
+        local g_lexeme_data = slg.g1.lmw_g.isys[lexeme_id]
         local r_lexeme_data = recce.g1.isys[lexeme_id]
         if not g_lexeme_data.is_lexeme then
             print(inspect(lexeme_data))

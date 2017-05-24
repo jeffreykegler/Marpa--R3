@@ -333,7 +333,7 @@ sub resolve_rule_by_id {
           $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
             <<'END_OF_LUA', 'i>*', $irlid );
     local slg, irl_id = ...
-    return slg.g1.irls[irl_id].action
+    return slg.g1.lmw_g.irls[irl_id].action
 END_OF_LUA
 
     my $resolve_error;
@@ -378,7 +378,7 @@ sub rule_blessing_find {
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'is>*', $irlid, ($bless_package // ''));
         local slg, irlid, bless_package = ...
-        local irl = slg.g1.irls[irlid]
+        local irl = slg.g1.lmw_g.irls[irlid]
         local blessing = '::undef'
         local xbnf = irl.xbnf
         if xbnf then
@@ -430,7 +430,7 @@ sub resolve_grammar {
               $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
                 <<'END_OF_LUA', 'is>*', $irlid );
     local slg, irl_id, rule_desc = ...
-    local action = slg.g1.irls[irl_id].action
+    local action = slg.g1.lmw_g.irls[irl_id].action
     local message = string.format(
         "Could not resolve action\n  Rule was %s\n",
         rule_desc)
@@ -1101,7 +1101,7 @@ END_OF_LUA
         local slg, irlid = ...
         local g1g = slg.g1.lmw_g
         local is_sequence_rule = g1g:sequence_min(irlid) and 1 or 0
-        local irl = slg.g1.irls[irlid]
+        local irl = slg.g1.lmw_g.irls[irlid]
         local xbnf = irl.xbnf
         local is_discard_sequence = false
         if xbnf and xbnf.discard_separation and is_sequence_rule then
@@ -1203,7 +1203,7 @@ END_OF_LUA
                     ( '@' . __FILE__ . ':' . __LINE__ ),
                     <<'END_OF_LUA', 'i>0', $irlid );
                         local slg, irlid = ...
-                        return slg.g1.irls[irlid].mask
+                        return slg.g1.lmw_g.irls[irlid].mask
 END_OF_LUA
 
                 my @elements =
@@ -1367,7 +1367,7 @@ END_OF_LUA
                     ( '@' . __FILE__ . ':' . __LINE__ ),
                     <<'END_OF_LUA', 'i>0', $irlid );
                         local slg, irlid = ...
-                        return slg.g1.irls[irlid].mask
+                        return slg.g1.lmw_g.irls[irlid].mask
 END_OF_LUA
 
                     if ( $rule_length > 0 ) {
