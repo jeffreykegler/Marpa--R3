@@ -36,7 +36,13 @@ cd kollos && ../lua/lua toc.lua < kollos.lua.md
   * [Discard events](#discard-events)
 * [Kollos object](#kollos-object)
 * [Kollos registry objects](#kollos-registry-objects)
-* [External, inner and internal](#external-inner-and-internal)
+  * [External, inner and internal](#external-inner-and-internal)
+* [Symbols](#symbols)
+* [ISY Fields](#isy-fields)
+* [XSY Fields](#xsy-fields)
+* [Rules](#rules)
+* [IRL Fields](#irl-fields)
+* [XRL Fields](#xrl-fields)
 * [Layers and wrappers](#layers-and-wrappers)
 * [Kollos SLIF grammar object](#kollos-slif-grammar-object)
   * [Fields](#fields)
@@ -91,12 +97,15 @@ cd kollos && ../lua/lua toc.lua < kollos.lua.md
     * [Return the value of a stack entry](#return-the-value-of-a-stack-entry)
     * [Set the value of a stack entry](#set-the-value-of-a-stack-entry)
     * [Convert current, origin Earley set to L0 span](#convert-current-origin-earley-set-to-l0-span)
-* [The layer grammar](#the-layer-grammar)
+* [The subgrammar](#the-subgrammar)
   * [Fields](#fields)
   * [Constructor](#constructor)
   * [Layer grammar accessors](#layer-grammar-accessors)
 * [The grammar Libmarpa wrapper](#the-grammar-libmarpa-wrapper)
+  * [Fields](#fields)
+  * [Constructor](#constructor)
 * [The recognizer Libmarpa wrapper](#the-recognizer-libmarpa-wrapper)
+  * [Fields](#fields)
 * [The valuator Libmarpa wrapper](#the-valuator-libmarpa-wrapper)
   * [Initialize a valuator](#initialize-a-valuator)
   * [Reset a valuator](#reset-a-valuator)
@@ -489,8 +498,6 @@ Deletes the interpreter if the reference count drops to zero.
 
 ```
 
-## Symbols
-
 ### External, inner and internal
 
 The Kollos upper layers and Libmarpa both
@@ -543,6 +550,8 @@ Kollos's Libmarpa does not diverge
 too far from
 Marpa::R2's Libmarpa.
 
+## Symbols
+
 ## ISY Fields
 
 ```
@@ -592,6 +601,43 @@ Marpa::R2's Libmarpa.
 
     -- miranda: insert class_xsy field declarations
     declarations(_M.class_xsy, class_xsy_fields)
+```
+
+## Rules
+
+## IRL Fields
+
+```
+    -- miranda: section+ class_irl field declarations
+    class_irl_fields.id = true
+```
+
+```
+    -- miranda: section+ create nonmetallic metatables
+    _M.class_irl = {}
+    -- miranda: section+ populate metatables
+    local class_irl_fields = {}
+    -- miranda: insert class_irl field declarations
+    declarations(_M.class_irl, class_irl_fields)
+```
+
+## XRL Fields
+
+```
+    -- miranda: section+ class_xrl field declarations
+    class_xrl_fields.assertion = true
+```
+
+```
+    -- miranda: section+ create nonmetallic metatables
+    _M.class_xrl = {}
+    -- miranda: section+ populate metatables
+    local class_xrl_fields = {}
+
+    class_xrl_fields.id = true
+
+    -- miranda: insert class_xrl field declarations
+    declarations(_M.class_xrl, class_xrl_fields)
 ```
 
 ## Layers and wrappers
