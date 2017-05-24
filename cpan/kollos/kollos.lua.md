@@ -3318,27 +3318,6 @@ is zero.
 
 ## The layer grammar
 
-### Fields
-
-
-```
-    -- miranda: section+ class_lyg field declarations
-    class_lyg_fields.slg = true
-    class_lyg_fields.irls = true
-    class_lyg_fields.isys = true
-    class_lyg_fields.lmw_g = true
-    class_lyg_fields.xbnfs = true
-    class_lyg_fields.xbnf_by_irlid = true
-    class_lyg_fields.xsy_by_isyid = true
-```
-
-```
-    -- miranda: section+ populate metatables
-    local class_lyg_fields = {}
-    -- miranda: insert class_lyg field declarations
-    declarations(_M.class_lyg, class_lyg_fields)
-```
-
 ### Constructor
 
 ```
@@ -3350,23 +3329,12 @@ is zero.
         local lmw_g = _M.grammar_new()
         lmw_g:force_valued()
 
-        local layer = {}
-        setmetatable(layer, _M.class_lyg)
-
-        layer.slg = slg
-        layer.lmw_g = lmw_g
-        layer.xbnfs = {}
-        layer.xsy_by_isyid = {}
-        layer.xbnf_by_irlid = {}
-        layer.isys = {}
-        layer.irls = {}
-
         lmw_g.slg = slg
-        lmw_g.xbnfs = layer.xbnfs
-        lmw_g.xsy_by_isyid = layer.xsy_by_isyid
-        lmw_g.xbnf_by_irlid = layer.xbnf_by_irlid
-        lmw_g.isys = layer.isys
-        lmw_g.irls = layer.irls
+        lmw_g.xbnfs = {}
+        lmw_g.xsy_by_isyid = {}
+        lmw_g.xbnf_by_irlid = {}
+        lmw_g.isys = {}
+        lmw_g.irls = {}
 
         return lmw_g
     end
