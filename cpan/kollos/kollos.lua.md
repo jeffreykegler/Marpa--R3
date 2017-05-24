@@ -3361,13 +3361,14 @@ is zero.
         layer.isys = {}
         layer.irls = {}
 
+        lmw_g.slg = slg
         lmw_g.xbnfs = layer.xbnfs
         lmw_g.xsy_by_isyid = layer.xsy_by_isyid
         lmw_g.xbnf_by_irlid = layer.xbnf_by_irlid
         lmw_g.isys = layer.isys
         lmw_g.irls = layer.irls
 
-        return layer
+        return lmw_g
     end
 ```
 
