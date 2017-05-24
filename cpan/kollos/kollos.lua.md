@@ -3616,6 +3616,21 @@ necessarily unique.
 
 ## The recognizer Libmarpa wrapper
 
+### Fields
+
+```
+    -- miranda: section+ class_recce field declarations
+    class_recce_fields._libmarpa = true
+    class_recce_fields.lmw_g = true
+```
+
+```
+    -- miranda: section+ populate metatables
+    local class_recce_fields = {}
+    -- miranda: insert class_recce field declarations
+    declarations(_M.class_recce, class_recce_fields)
+```
+
 Functions for tracing Earley sets
 
 ```
