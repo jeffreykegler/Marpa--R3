@@ -3316,40 +3316,58 @@ is zero.
 
 ```
 
-## The layer grammar
+## The subgrammar
+
+There is an L0 and G1 subgrammar, and an L0
+and G1 grammar wrapper.
+The difference is that the wrapper is a self-contained
+wrapper for the Libmarpa layer,
+while the subgrammar assumes that it is in a
+SLIF environment.
+
+The intent is to make it possible to separate out
+the grammar wrapper and use it for testing,
+as basis for other systems, etc.., etc.
+For this purpose it cannot rely on any
+assumption that it has a SLIF above it.
+
+The subgrammar contains only fields and methods
+which rely on the SLIF.
+All other fields and methods should go into the
+grammar wrapper.
 
 ### Fields
 
 
 ```
-    -- miranda: section+ class_lyg field declarations
-    class_lyg_fields.slg = true
-    class_lyg_fields.lmw_g = true
-    class_lyg_fields.xbnfs = true
-    class_lyg_fields.xbnf_by_irlid = true
-    class_lyg_fields.xsy_by_isyid = true
+    -- miranda: section+ class_subg field declarations
+    class_subg_fields.slg = true
+    class_subg_fields.lmw_g = true
+    class_subg_fields.xbnfs = true
+    class_subg_fields.xbnf_by_irlid = true
+    class_subg_fields.xsy_by_isyid = true
 ```
 
 ```
     -- miranda: section+ populate metatables
-    local class_lyg_fields = {}
-    -- miranda: insert class_lyg field declarations
-    declarations(_M.class_lyg, class_lyg_fields)
+    local class_subg_fields = {}
+    -- miranda: insert class_subg field declarations
+    declarations(_M.class_subg, class_subg_fields)
 ```
 
 ### Constructor
 
 ```
     -- miranda: section+ create nonmetallic metatables
-    _M.class_lyg = {}
+    _M.class_subg = {}
 
     -- miranda: section+ most Lua function definitions
-    function _M.class_lyg.new(slg, lyr_name)
+    function _M.class_subg.new(slg, lyr_name)
         local lmw_g = _M.grammar_new()
         lmw_g:force_valued()
 
         local layer = {}
-        setmetatable(layer, _M.class_lyg)
+        setmetatable(layer, _M.class_subg)
 
         layer.slg = slg
         layer.lmw_g = lmw_g
@@ -3365,8 +3383,8 @@ is zero.
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_lyg.xsy_name(lyg, isyid)
-        local xsy = lyg.xsy_by_isyid[isyid]
+    function _M.class_subg.xsy_name(subg, isyid)
+        local xsy = subg.xsy_by_isyid[isyid]
         return xsy and xsy.name
     end
 ```
@@ -3378,21 +3396,21 @@ necessarily unique.
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_lyg.force_xsy_name(lyg, isyid)
-         return lyg:xsy_name(isyid) or
+    function _M.class_subg.force_xsy_name(subg, isyid)
+         return subg:xsy_name(isyid) or
              string.format("ISYID%d", isyid)
     end
 ```
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_lyg.symbol_dsl_form(lyg, isyid)
-        local xsy = lyg.xsy_by_isyid[isyid]
+    function _M.class_subg.symbol_dsl_form(subg, isyid)
+        local xsy = subg.xsy_by_isyid[isyid]
         if not xsy then return end
         return xsy.dsl_form
     end
-    function _M.class_lyg.symbol_display_form(lyg, isyid)
-        local xsy = lyg.xsy_by_isyid[isyid]
+    function _M.class_subg.symbol_display_form(subg, isyid)
+        local xsy = subg.xsy_by_isyid[isyid]
         if not xsy then
             return string.format('<ISYID %d>', isyid)
         end
@@ -3615,6 +3633,12 @@ necessarily unique.
 ```
 
 ## The recognizer Libmarpa wrapper
+
+Currently there is no "subrecce" layer analogous
+to the "subgrammar" layer.
+This is because all data kept on a per-Libmarpa-recce
+basis is self-contained --
+that is, it does not assume the SLIF.
 
 ### Fields
 
