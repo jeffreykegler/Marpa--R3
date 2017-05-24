@@ -697,12 +697,12 @@ Populate the `xsys` table.
         table.sort(xsy_names)
         for xsy_id = 1, #xsy_names do
             local xsy_name = xsy_names[xsy_id]
-            local runtime_xsy = setmetatable({}, _M.class_xsy)
-            runtime.xsy.id = xsy_id,
-            runtime.xsy.name = xsy_name
 
+            local runtime_xsy = setmetatable({}, _M.class_xsy)
             local xsy_source = hash_xsy_data[xsy_name]
 
+            runtime_xsy.id = xsy_id
+            runtime_xsy.name = xsy_name
             -- copy, so that we can destroy `source_hash`
             runtime_xsy.lexeme_semantics = xsy_source.action
             runtime_xsy.blessing = xsy_source.blessing
