@@ -3413,7 +3413,25 @@ necessarily unique.
 
 ## The grammar Libmarpa wrapper
 
-Constructor
+### Fields
+
+```
+    -- miranda: section+ class_grammar field declarations
+    class_grammar_fields.isyid_by_name = true
+    class_grammar_fields._libmarpa = true
+    class_grammar_fields.lmw_g = true
+    class_grammar_fields.name_by_isyid = true
+    class_grammar_fields.start_name = true
+```
+
+```
+    -- miranda: section+ populate metatables
+    local class_grammar_fields = {}
+    -- miranda: insert class_grammar field declarations
+    declarations(_M.class_grammar, class_grammar_fields)
+```
+
+### Constructor
 
 ```
     -- miranda: section+ copy metal tables
@@ -3421,6 +3439,7 @@ Constructor
     -- miranda: section+ most Lua function definitions
     function _M.grammar_new()
         local lmw_g = _M.metal.grammar_new()
+        setmetatable(lmw_g, _M.class_grammar)
         lmw_g.isyid_by_name = {}
         lmw_g.name_by_isyid = {}
         return lmw_g
