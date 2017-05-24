@@ -581,6 +581,15 @@ Marpa::R2's Libmarpa.
     _M.class_xsy = {}
     -- miranda: section+ populate metatables
     local class_xsy_fields = {}
+
+    class_xsy_fields.id = true
+    class_xsy_fields.name = true
+    class_xsy_fields.lexeme_semantics = true
+    class_xsy_fields.blessing = true
+    class_xsy_fields.dsl_form = true
+    class_xsy_fields.if_inaccessible = true
+    class_xsy_fields.name_source = true
+
     -- miranda: insert class_xsy field declarations
     declarations(_M.class_xsy, class_xsy_fields)
 ```
@@ -688,10 +697,9 @@ Populate the `xsys` table.
         table.sort(xsy_names)
         for xsy_id = 1, #xsy_names do
             local xsy_name = xsy_names[xsy_id]
-            local runtime_xsy = {
-                id = xsy_id,
-                name = xsy_name
-            }
+            local runtime_xsy = setmetatable({}, _M.class_xsy)
+            runtime.xsy.id = xsy_id,
+            runtime.xsy.name = xsy_name
 
             local xsy_source = hash_xsy_data[xsy_name]
 
