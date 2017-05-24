@@ -3361,6 +3361,12 @@ is zero.
         layer.isys = {}
         layer.irls = {}
 
+        lmw_g.xbnfs = layer.xbnfs
+        lmw_g.xsy_by_isyid = layer.xsy_by_isyid
+        lmw_g.xbnf_by_irlid = layer.xbnf_by_irlid
+        lmw_g.isys = layer.isys
+        lmw_g.irls = layer.irls
+
         return layer
     end
 ```
@@ -3422,6 +3428,12 @@ necessarily unique.
     class_grammar_fields.lmw_g = true
     class_grammar_fields.name_by_isyid = true
     class_grammar_fields.start_name = true
+    class_grammar_fields.slg = true
+    class_grammar_fields.irls = true
+    class_grammar_fields.isys = true
+    class_grammar_fields.xbnfs = true
+    class_grammar_fields.xbnf_by_irlid = true
+    class_grammar_fields.xsy_by_isyid = true
 ```
 
 ```
