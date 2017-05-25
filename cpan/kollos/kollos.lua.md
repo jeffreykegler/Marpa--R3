@@ -907,8 +907,8 @@ TODO -- Turn lmg_*() forms into local functions?
         return slg.xsys[xsyid]
     end
     function _M.class_slg.lmg_symbol_name(slg, symbol_id, subg_name)
-        local lmw_g = slg[subg_name].lmw_g
-        return lmw_g:symbol_name(symbol_id)
+        local subg = slg[subg_name]
+        return subg:symbol_name(symbol_id)
     end
     function _M.class_slg.g1_symbol_name(slg, symbol_id)
         return slg:lmg_symbol_name(symbol_id, 'g1')
@@ -918,8 +918,8 @@ TODO -- Turn lmg_*() forms into local functions?
     end
 
     function _M.class_slg.lmg_symbol_by_name(slg, symbol_name, subg_name)
-        local lmw_g = slg[subg_name].lmw_g
-        return lmw_g.isyid_by_name[symbol_name]
+        local subg = slg[subg_name]
+        return subg.isyid_by_name[symbol_name]
     end
     function _M.class_slg.g1_symbol_by_name(slg, symbol_name)
         return slg:lmg_symbol_by_name(symbol_name, 'g1')
@@ -3390,82 +3390,23 @@ is zero.
 
 ```
 
-## The subgrammar
-
-There is an L0 and G1 subgrammar, and an L0
-and G1 grammar wrapper.
-The difference is that the wrapper is a self-contained
-wrapper for the Libmarpa layer,
-while the subgrammar assumes that it is in a
-SLIF environment.
-
-The intent is to make it possible to separate out
-the grammar wrapper and use it for testing,
-as basis for other systems, etc.., etc.
-For this purpose it cannot rely on any
-assumption that it has a SLIF above it.
-
-The subgrammar contains only fields and methods
-which rely on the SLIF.
-All other fields and methods should go into the
-grammar wrapper.
-
-### Fields
-
-
-```
-    -- miranda: section+ class_subg field declarations
-    class_subg_fields.slg = true
-    class_subg_fields.lmw_g = true
-    class_subg_fields.xbnfs = true
-    class_subg_fields.xbnf_by_irlid = true
-    class_subg_fields.xsy_by_isyid = true
-```
-
-```
-    -- miranda: section+ populate metatables
-    local class_subg_fields = {}
-    -- miranda: insert class_subg field declarations
-    declarations(_M.class_subg, class_subg_fields, 'subg')
-```
-
-### Constructor
-
-```
-    -- miranda: section+ create nonmetallic metatables
-    _M.class_subg = {}
-
-    -- miranda: section+ most Lua function definitions
-    function _M.class_subg.new(slg)
-        local lmw_g = _M.grammar_new()
-        lmw_g:force_valued()
-
-        local layer = {}
-        setmetatable(layer, _M.class_subg)
-
-        layer.slg = slg
-        layer.lmw_g = lmw_g
-        layer.xbnfs = {}
-        layer.xsy_by_isyid = {}
-        layer.xbnf_by_irlid = {}
-
-        return layer
-    end
-```
-
 ## The grammar Libmarpa wrapper
 
 ### Fields
 
 ```
     -- miranda: section+ class_grammar field declarations
-    class_grammar_fields.isyid_by_name = true
     class_grammar_fields._libmarpa = true
+    class_grammar_fields.irls = true
+    class_grammar_fields.isyid_by_name = true
+    class_grammar_fields.isys = true
     class_grammar_fields.lmw_g = true
     class_grammar_fields.name_by_isyid = true
+    class_grammar_fields.slg = true
     class_grammar_fields.start_name = true
-    class_grammar_fields.isys = true
-    class_grammar_fields.irls = true
+    class_grammar_fields.xbnf_by_irlid = true
+    class_grammar_fields.xbnfs = true
+    class_grammar_fields.xsy_by_isyid = true
 ```
 
 ```
@@ -3481,14 +3422,21 @@ grammar wrapper.
     -- miranda: section+ copy metal tables
     _M.metal.grammar_new = _M.grammar_new
     -- miranda: section+ most Lua function definitions
-    function _M.grammar_new()
-        local lmw_g = _M.metal.grammar_new()
-        setmetatable(lmw_g, _M.class_grammar)
-        lmw_g.isyid_by_name = {}
-        lmw_g.name_by_isyid = {}
-        lmw_g.irls = {}
-        lmw_g.isys = {}
-        return lmw_g
+    function _M.grammar_new(slg)
+        local grammar = _M.metal.grammar_new()
+        setmetatable(grammar, _M.class_grammar)
+        grammar:force_valued()
+        grammar.isyid_by_name = {}
+        grammar.name_by_isyid = {}
+        grammar.irls = {}
+        grammar.isys = {}
+        grammar.slg = slg
+        grammar.xbnfs = {}
+        grammar.xsy_by_isyid = {}
+        grammar.xbnf_by_irlid = {}
+        grammar.lmw_g = grammar
+
+        return grammar
     end
 
 ```
@@ -3710,12 +3658,6 @@ necessarily unique.
 ```
 
 ## The recognizer Libmarpa wrapper
-
-Currently there is no "subrecce" layer analogous
-to the "subgrammar" layer.
-This is because all data kept on a per-Libmarpa-recce
-basis is self-contained --
-that is, it does not assume the SLIF.
 
 ### Fields
 
