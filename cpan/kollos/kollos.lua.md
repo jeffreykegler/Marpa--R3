@@ -3436,7 +3436,7 @@ grammar wrapper.
     _M.class_subg = {}
 
     -- miranda: section+ most Lua function definitions
-    function _M.class_subg.new(slg, lyr_name)
+    function _M.class_subg.new(slg)
         local lmw_g = _M.grammar_new()
         lmw_g:force_valued()
 
@@ -3450,52 +3450,6 @@ grammar wrapper.
         layer.xbnf_by_irlid = {}
 
         return layer
-    end
-```
-
-### Layer grammar accessors
-
-```
-    -- miranda: section+ most Lua function definitions
-    function _M.class_subg.xsy_name(subg, isyid)
-        local xsy = subg.xsy_by_isyid[isyid]
-        return xsy and xsy.name
-    end
-```
-
-"Force" there to be an XSY name for an ISYID,
-pulling one out of thin air if need be.
-Unlike real XSY names, the "forced" one is not
-necessarily unique.
-
-```
-    -- miranda: section+ most Lua function definitions
-    function _M.class_subg.force_xsy_name(subg, isyid)
-         return subg:xsy_name(isyid) or
-             string.format("ISYID%d", isyid)
-    end
-```
-
-```
-    -- miranda: section+ most Lua function definitions
-    function _M.class_subg.symbol_dsl_form(subg, isyid)
-        local xsy = subg.xsy_by_isyid[isyid]
-        if not xsy then return end
-        return xsy.dsl_form
-    end
-    function _M.class_subg.symbol_display_form(subg, isyid)
-        local xsy = subg.xsy_by_isyid[isyid]
-        if not xsy then
-            return string.format('<ISYID %d>', isyid)
-        end
-        local dsl_form = xsy.dsl_form
-        if not dsl_form then
-            return string.format('<XSYID %d>', xsy.id)
-        end
-        if dsl_form:match('[ ]') then
-            return string.format('<%s>', dsl_form)
-        end
-        return dsl_form
     end
 ```
 
@@ -3707,6 +3661,52 @@ necessarily unique.
         return table.concat(pieces)
     end
 
+```
+
+### Layer grammar accessors
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_grammar.xsy_name(grammar, isyid)
+        local xsy = grammar.xsy_by_isyid[isyid]
+        return xsy and xsy.name
+    end
+```
+
+"Force" there to be an XSY name for an ISYID,
+pulling one out of thin air if need be.
+Unlike real XSY names, the "forced" one is not
+necessarily unique.
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_grammar.force_xsy_name(grammar, isyid)
+         return grammar:xsy_name(isyid) or
+             string.format("ISYID%d", isyid)
+    end
+```
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_grammar.symbol_dsl_form(grammar, isyid)
+        local xsy = grammar.xsy_by_isyid[isyid]
+        if not xsy then return end
+        return xsy.dsl_form
+    end
+    function _M.class_grammar.symbol_display_form(grammar, isyid)
+        local xsy = grammar.xsy_by_isyid[isyid]
+        if not xsy then
+            return string.format('<ISYID %d>', isyid)
+        end
+        local dsl_form = xsy.dsl_form
+        if not dsl_form then
+            return string.format('<XSYID %d>', xsy.id)
+        end
+        if dsl_form:match('[ ]') then
+            return string.format('<%s>', dsl_form)
+        end
+        return dsl_form
+    end
 ```
 
 ## The recognizer Libmarpa wrapper
