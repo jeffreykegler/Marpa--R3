@@ -3434,7 +3434,6 @@ is zero.
         grammar.xbnfs = {}
         grammar.xsy_by_isyid = {}
         grammar.xbnf_by_irlid = {}
-        grammar.lmw_g = grammar
 
         return grammar
     end
