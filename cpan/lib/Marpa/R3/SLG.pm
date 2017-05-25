@@ -1260,9 +1260,15 @@ sub assign_G1_symbol {
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'ss', $name, $options );
     local slg, symbol_name, options = ...
+    local isyid = slg:g1_symbol_by_name(symbol_name)
+    if isyid then
+        -- symbol already exists
+        return isyid
+    end
+
     local g1g = slg.g1
     local isy = g1g:symbol_new(symbol_name)
-    local isyid = isy.id
+    isyid = isy.id
     g1g.isys[isyid] = isy
     local properties = {}
     -- Assuming order does not matter
