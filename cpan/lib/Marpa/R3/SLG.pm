@@ -1258,62 +1258,47 @@ sub assign_G1_symbol {
 
     ($symbol_id) =
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 's', $name );
-    local g, symbol_name = ...
-    local lmw_g = g.g1.lmw_g
-    local isy = lmw_g:symbol_new(symbol_name)
-    local symbol_id = isy.id
-    g.g1.lmw_g.isys[symbol_id] = isy
-    return symbol_id
+        <<'END_OF_LUA', 'ss', $name, $options );
+    local slg, symbol_name, options = ...
+    local g1g = slg.g1
+    local isy = g1g:symbol_new(symbol_name)
+    local isyid = isy.id
+    g1g.isys[isyid] = isy
+    local properties = {}
+    -- Assuming order does not matter
+    for property, value in pairs(options or {}) do
+        if property == 'wsyid' then
+            goto NEXT_PROPERTY
+        end
+        if property == 'xsy' then
+            local xsy = slg.xsys[value]
+            g1g.xsy_by_isyid[isyid] = xsy
+            goto NEXT_PROPERTY
+        end
+        if property == 'terminal' then
+            gig:symbol_is_terminal_set(isyid, value)
+            goto NEXT_PROPERTY
+        end
+        if property == 'rank' then
+            int_value = math.tointeger(value)
+            if not int_value then
+                error(string.format('Symbol %q": rank is %s; must be an integer',
+                    symbol_name,
+                    inspect(value, {depth = 1})
+                ))
+            end
+            g1g:symbol_rank_set(isyid, value)
+            goto NEXT_PROPERTY
+        end
+        error(string.format('Internal error: Symbol %q has unknown property %q',
+            symbol_name,
+            property
+        ))
+        ::NEXT_PROPERTY::
+    end
+
+    return isyid
 END_OF_LUA
-
-    PROPERTY: for my $property ( sort keys %{$options} ) {
-        if ( $property eq 'wsyid' ) {
-            next PROPERTY;
-        }
-        if ( $property eq 'xsy' ) {
-            my $xsy_name = $options->{$property};
-
-      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 'is', $symbol_id, $xsy_name);
-    local slg, isyid, xsy_name = ...
-    local xsy = slg.xsys[xsy_name]
-    slg.g1.xsy_by_isyid[isyid] = xsy
-END_OF_LUA
-
-            next PROPERTY;
-        }
-
-
-        if ( $property eq 'terminal' ) {
-            my $value = $options->{$property};
-
-      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 's', $symbol_id, ($value ? 1 : 0));
-    local g, symbol_id, value = ...
-    local g1g = g.g1.lmw_g
-    gig:symbol_is_terminal_set(symbol_id, value)
-END_OF_LUA
-
-            next PROPERTY;
-        }
-        if ( $property eq 'rank' ) {
-            my $value = $options->{$property};
-            Marpa::R3::exception(qq{Symbol "$name": rank must be an integer})
-                if not Scalar::Util::looks_like_number($value)
-                    or int($value) != $value;
-
-      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 's', $symbol_id, $value);
-    local g, symbol_id, value = ...
-    local g1g = g.g1.lmw_g
-    g1g:symbol_rank_set(symbol_id, value)
-END_OF_LUA
-            next PROPERTY;
-        }
-
-        Marpa::R3::exception(qq{Unknown symbol property "$property"});
-    } ## end PROPERTY: for my $property ( keys %{$options} )
 
     return $symbol_id;
 
