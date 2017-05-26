@@ -1311,7 +1311,7 @@ sub assign_L0_symbol {
     my ($symbol_id) =
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'ss', $name, $options );
-    local slg, symbol_name = ...
+    local slg, symbol_name, options = ...
     local isyid = slg:l0_symbol_by_name(symbol_name)
     if isyid then
         -- symbol already exists
@@ -1322,67 +1322,54 @@ sub assign_L0_symbol {
     local isy = l0g:symbol_new(symbol_name)
     local isyid = isy.id
     l0g.isys[isyid] = isy
+
+    local properties = {}
+    -- Assuming order does not matter
+    for property, value in pairs(options or {}) do
+        if property == 'wsyid' then
+            goto NEXT_PROPERTY
+        end
+        if property == 'xsy' then
+            local xsy = slg.xsys[value]
+            l0g.xsy_by_isyid[isyid] = xsy
+            goto NEXT_PROPERTY
+        end
+        if property == 'terminal' then
+            gig:symbol_is_terminal_set(isyid, value)
+            goto NEXT_PROPERTY
+        end
+        if property == 'rank' then
+            local int_value = math.tointeger(value)
+            if not int_value then
+                error(string.format('Symbol %q": rank is %s; must be an integer',
+                    symbol_name,
+                    inspect(value, {depth = 1})
+                ))
+            end
+            l0g:symbol_rank_set(isyid, value)
+            goto NEXT_PROPERTY
+        end
+        if property == 'eager' then
+            local int_value = math.tointeger(value)
+            if not int_value or (int_value > 1 and int_value < 0) then
+                error(string.format('Symbol %q": eager is %s; must be a boolean',
+                    symbol_name,
+                    inspect(value, {depth = 1})
+                ))
+            end
+            if int_value == 1 then
+                l0g.isys[isyid].eager = true
+            end
+            goto NEXT_PROPERTY
+        end
+        error(string.format('Internal error: Symbol %q has unknown property %q',
+            symbol_name,
+            property
+        ))
+        ::NEXT_PROPERTY::
+    end
     return isyid
 END_OF_LUA
-
-    PROPERTY: for my $property ( sort keys %{$options} ) {
-        if ( $property eq 'wsyid' ) {
-            next PROPERTY;
-        }
-        if ( $property eq 'xsy' ) {
-            my $xsy_name = $options->{$property};
-
-      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 'is', $symbol_id, $xsy_name);
-    local slg, isyid, xsy_name = ...
-    local xsy = slg.xsys[xsy_name]
-    slg.l0.xsy_by_isyid[isyid] = xsy
-END_OF_LUA
-
-            next PROPERTY;
-        }
-        if ( $property eq 'eager' ) {
-            my $value = $options->{$property};
-
-      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 'ii', $symbol_id, ($value ? 1 : 0));
-    local g, symbol_id, eager = ...
-    if eager > 0 then
-        g.l0.lmw_g.isys[symbol_id].eager = true
-    end
-END_OF_LUA
-
-            next PROPERTY;
-        }
-        if ( $property eq 'terminal' ) {
-            my $value = $options->{$property};
-
-      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 's', $symbol_id, ($value ? 1 : 0));
-    local g, symbol_id, value = ...
-    local l0g = g.l0.lmw_g
-    l0g:symbol_is_terminal_set(symbol_id, value)
-END_OF_LUA
-
-            next PROPERTY;
-        }
-        if ( $property eq 'rank' ) {
-            my $value = $options->{$property};
-            Marpa::R3::exception(qq{Symbol "$name": rank must be an integer})
-                if not Scalar::Util::looks_like_number($value)
-                    or int($value) != $value;
-
-      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 's', $symbol_id, $value);
-    local g, symbol_id, value = ...
-    local l0g = g.l0.lmw_g
-    l0g:symbol_rank_set(symbol_id, value)
-END_OF_LUA
-
-            next PROPERTY;
-        } ## end if ( $property eq 'rank' )
-        Marpa::R3::exception(qq{Unknown symbol property "$property"});
-    } ## end PROPERTY: for my $property ( keys %{$options} )
 
     return $symbol_id;
 
