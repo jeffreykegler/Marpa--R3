@@ -1747,10 +1747,11 @@ Read alternatives into the G1 grammar.
                         local q = slr.event_queue
                         local event = { '!trace', 'g1 accepted lexeme', block_ix, lexeme_start, lexeme_end, g1_lexeme}
                         local display_form = xsy:display_form()
+                        local working_earley_set = slr.g1.lmw_r:latest_earley_set() + 1
                         event.msg = string.format(
-                            "Accepted lexeme %s e%d: %s; value=%s",
+                            "Accepted lexeme %s e%d: %s; value=%q",
                             slr:lc_range_brief(block_ix, lexeme_start, block_ix, lexeme_end - 1),
-                            slr.perl_pos,
+                            working_earley_set,
                             display_form,
                             slr:l0_literal( lexeme_start,  lexeme_end - lexeme_start, block_ix )
                         )

@@ -634,25 +634,6 @@ END_OF_LUA
 
 my $libmarpa_trace_event_handlers = {
 
-    'g1 accepted lexeme' => sub {
-        my ( $slr, $event ) = @_;
-        my ( undef, undef, $block, $lexeme_start_pos, $lexeme_end_pos, $g1_lexeme)
-            = @{$event};
-        my $raw_token_value =
-            $slr->literal( $lexeme_start_pos,
-            $lexeme_end_pos - $lexeme_start_pos );
-        my $trace_file_handle =
-            $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
-        my $slg              = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-        say {$trace_file_handle} qq{Accepted lexeme },
-            lc_range_brief( $slr, $block, $lexeme_start_pos,
-                $block, $lexeme_end_pos - 1 ),
-            q{ e}, $slr->g1_pos(),
-            q{: },
-            $slg->symbol_display_form($g1_lexeme),
-            qq{; value="$raw_token_value"}
-            or Marpa::R3::exception("Could not say(): $ERRNO");
-    },
     'expected lexeme' => sub {
         my ( $slr, $event ) = @_;
         # Necessary to check, because this one can be returned when not tracing
@@ -870,12 +851,13 @@ sub Marpa::R3::Internal::Scanless::convert_libmarpa_events {
 
     my $pause    = 0;
     my @events = $slr->xs_events();
-    EVENT: for my $event ( @events ) {
-        my ($event_type) = @{$event};
+
+    EVENT: for (my $event_ix = 1; $event_ix <= scalar @events; $event_ix++) {
 
        my ($cmd, $value) = $slr->call_by_tag(( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 'i', $event);
-        local slr, event = ...
+        <<'END_OF_LUA', 'i', $event_ix);
+        local slr, event_ix = ...
+        local event = slr.event_queue[event_ix]
         -- print(inspect(event))
         local event_type = event[1]
 
@@ -963,12 +945,15 @@ END_OF_LUA
         $pause = ($pause or $this_pause);
         next EVENT if $cmd ne 'nyi';
 
+        my $event = $events[$event_ix-1];
+        my $event_type = $event->[0];
         my $handler = $libmarpa_event_handlers->{$event_type};
-        Marpa::R3::exception( ( join q{ }, 'Unknown event:', @{$event} ) )
+        Marpa::R3::exception( ( join q{ }, 'Unknown event:', $event ) )
             if not defined $handler;
         $this_pause = 1 if $handler->( $slr, $event );
         $pause = ($pause or $this_pause);
     }
+
     return $pause;
 } ## end sub Marpa::R3::Internal::Scanless::convert_libmarpa_events
 
