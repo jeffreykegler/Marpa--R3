@@ -60,7 +60,7 @@ sub Marpa::R3::Scanless::R::g1_literal {
     ('@' . __FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', 'ii', $g1_start, $g1_count);
     local slr, g1_start, g1_count = ...
-    return slr:g1_span_to_literal(g1_start, g1_count)
+    return slr:g1_literal(g1_start, g1_count)
 END_OF_LUA
 
    return $literal;
@@ -78,7 +78,7 @@ sub Marpa::R3::Scanless::R::literal {
     <<'END_OF_LUA', 'iii', $l0_start, $l0_count, ($block_ix // -1));
     local slr, l0_start, l0_count, block_ix = ...
     if block_ix <= 0 then block_ix = nil end
-    return slr:l0_span_to_literal(l0_start, l0_count, block_ix)
+    return slr:l0_literal(l0_start, l0_count, block_ix)
 END_OF_LUA
 
     return $literal;

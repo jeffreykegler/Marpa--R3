@@ -589,6 +589,22 @@ Marpa::R2's Libmarpa.
     declarations(_M.class_xsy, class_xsy_fields, 'xsy')
 ```
 
+## XSY Accessors
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_xsy.dsl_form(xsy)
+        return xsy.dsl_form
+    end
+    function _M.class_xsy.display_form(xsy)
+        local form1 = xsy.dsl_form or xsy.name
+        if form1:find(' ', 1, true) then
+            return '<' .. form1 .. '>'
+        end
+        return form1
+    end
+```
+
 ## Rules
 
 ## IRL Fields
@@ -1684,6 +1700,8 @@ Read alternatives into the G1 grammar.
         local accept_q = slr.accept_queue
         local block = slr.current_block
         local block_ix = block.index
+        local slg = slr.slg
+        local g1g = slg.g1
         for ix = 1, #accept_q do
             local this_event = accept_q[ix]
                 -- TODO accept_queue
@@ -1720,9 +1738,42 @@ Read alternatives into the G1 grammar.
             end
             do
                 if slr.trace_terminals > 0 then
-                    local q = slr.event_queue
-                    q[#q+1] = { '!trace', 'g1 accepted lexeme', block_ix, lexeme_start, lexeme_end, g1_lexeme}
+                    local xsy = g1g:xsy(g1_lexeme)
+                    if xsy then
+                        local q = slr.event_queue
+                        local event = { '!trace', 'g1 accepted lexeme', block_ix, lexeme_start, lexeme_end, g1_lexeme}
+                        local display_form = xsy:display_form()
+                        event.msg = string.format(
+                            "Accepted lexeme %s e%d: %s; value=%s",
+                            slr:lc_range_brief(block_ix, lexeme_start, block_ix, lexeme_end - 1),
+                            slr.perl_pos,
+                            display_form,
+                            slr:l0_literal( lexeme_start,  lexeme_end - lexeme_start, block_ix )
+                        )
+                        q[#q+1] = event
+                    end
                 end
+
+                    --[[ TODO: DELETE AFTER DEVELOPEMENT
+                    my ( $slr, $event ) = @_;
+                    my ( undef, undef, $block, $lexeme_start_pos, $lexeme_end_pos, $g1_lexeme)
+                        = @{$event};
+                    my $raw_token_value =
+                        $slr->literal( $lexeme_start_pos,
+                        $lexeme_end_pos - $lexeme_start_pos );
+                    my $trace_file_handle =
+                        $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
+                    my $slg              = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+                    say {$trace_file_handle} qq{Accepted lexeme },
+                        lc_range_brief( $slr, $block, $lexeme_start_pos,
+                            $block, $lexeme_end_pos - 1 ),
+                        q{ e}, $slr->g1_pos(),
+                        q{: },
+                        $slg->symbol_display_form($g1_lexeme),
+                        qq{; value="$raw_token_value"}
+                        or Marpa::R3::exception("Could not say(): $ERRNO");
+                    --]]
+
                 slr.start_of_pause_lexeme = lexeme_start
                 slr.end_of_pause_lexeme = lexeme_end
                 local pause_after_active = slr.g1.isys[g1_lexeme].pause_after_active
@@ -2082,7 +2133,7 @@ TODO: Allow for leading trailer, final trailer.
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slr.l0_span_to_literal(slr, l0_start, l0_length, block_ix)
+    function _M.class_slr.l0_literal(slr, l0_start, l0_length, block_ix)
         if not block_ix then block_ix = slr.current_block.index end
         local block = slr.inputs[block_ix]
         local start_byte_p = slr:per_pos(block_ix, l0_start)
@@ -2094,8 +2145,8 @@ TODO: Allow for leading trailer, final trailer.
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slr.g1_span_to_literal(slr, g1_start, g1_count)
-        -- io.stderr:write(string.format("g1_span_to_literal(%d, %d)\n",
+    function _M.class_slr.g1_literal(slr, g1_start, g1_count)
+        -- io.stderr:write(string.format("g1_literal(%d, %d)\n",
             -- g1_start, g1_count
         -- ))
 
@@ -3024,7 +3075,7 @@ it assumes that the caller has ensured that
           local start_es = slr.this_step.start_es_id
           local end_es = slr.this_step.es_id
           local g1_count = end_es - start_es
-          local literal = slr:g1_span_to_literal(start_es, g1_count)
+          local literal = slr:g1_literal(start_es, g1_count)
           return literal
       end
       return slr.token_values[slr.this_step.value]
