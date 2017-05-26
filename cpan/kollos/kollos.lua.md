@@ -3853,6 +3853,9 @@ necessarily unique.
     -- miranda: section+ class_recce field declarations
     class_recce_fields._libmarpa = true
     class_recce_fields.lmw_g = true
+    class_recce_fields.lmw_r = true
+    class_recce_fields.g1 = true
+    class_recce_fields.isys = true
 ```
 
 ```

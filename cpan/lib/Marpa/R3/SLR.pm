@@ -152,10 +152,10 @@ sub Marpa::R3::Scanless::R::new {
     slr.l0 = {}
     slr.l0.irls = {}
 
-    slr.g1 = {}
-    slr.g1.isys = {}
     local g1g = grammar.g1.lmw_g
-    slr.g1.lmw_r = _M.recce_new(g1g)
+    slr.g1 = _M.recce_new(g1g)
+    slr.g1.lmw_r = slr.g1
+    slr.g1.isys = {}
 
     slr.codepoint = nil
     slr.inputs = {}
