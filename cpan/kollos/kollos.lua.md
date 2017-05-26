@@ -3734,10 +3734,21 @@ indexed by isyid.
 
 ### Layer grammar accessors
 
+`isy_key` is an ISY id.
+
+TODO: Perhaps `isy_key` should also allow isy tables.
+
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_grammar.xsy_name(grammar, isyid)
-        local xsy = grammar.xsys[isyid]
+    function _M.class_grammar.xsy(grammar, isy_key)
+        return grammar.xsys[isy_key]
+    end
+```
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_grammar.xsy_name(grammar, isy_key)
+        local xsy = grammar:xsy(isy_key)
         return xsy and xsy.name
     end
 ```
