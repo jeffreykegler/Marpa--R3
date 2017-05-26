@@ -1066,8 +1066,7 @@ END_OF_LUA
     return $events;
 }
 
-# Delete this after development?
-# Otherwise, convert it to internal
+# TODO -- Delete this after development
 sub Marpa::R3::Scanless::R::xs_events {
     my ($slr) = @_;
     my ($event_queue) = $slr->call_by_tag(

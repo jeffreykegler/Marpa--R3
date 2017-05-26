@@ -1146,6 +1146,11 @@ This is a registry object.
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.l0r_new(slr, perl_pos)
         local l0r = _M.recce_new(slr.slg.l0.lmw_g)
+
+        local block_ix = slr.current_block.index
+        local perl_pos = slr.perl_pos
+        local g1g = slr.slg.g1
+
         if not l0r then
             error('Internal error: l0r_new() failed %s',
                 slr.slg.l0.lmw_g:error_description())
@@ -1181,9 +1186,39 @@ This is a registry object.
                 end
             end
             if slr.trace_terminals >= 3 then
-                local q = slr.event_queue
-                q[#q+1] = { '!trace', 'expected lexeme', perl_pos, terminal, assertion }
+                local xsy = g1g:xsy(terminal)
+                if xsy then
+                    local q = slr.event_queue
+                    -- TODO -- needs block_ix
+                    local event = { '!trace', 'expected lexeme', perl_pos, terminal, assertion }
+                    local display_form = xsy:display_form()
+                    event.msg = string.format(
+                        "Expected lexeme %s at %s; assertion ID = %d",
+                        display_form,
+                        slr:lc_brief(perl_pos),
+                        assertion
+                    )
+                    q[#q+1] = event
+                end
             end
+
+                --[[
+                    'expected lexeme' => sub {
+                        my ( $slr, $event ) = @_;
+                        # Necessary to check, because this one can be returned when not tracing
+                        my ( undef, undef, $position, $g1_lexeme, $assertion_id)
+                            = @{$event};
+                        my ( $line, $column ) = $slr->line_column($position);
+                        my $trace_file_handle =
+                            $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
+                        my $slg              = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+                        say {$trace_file_handle} qq{Expected lexeme },
+                            $slg->symbol_display_form($g1_lexeme),
+                            " at line $line, column $column; assertion ID = $assertion_id"
+                            or Marpa::R3::exception("Could not say(): $ERRNO");
+                    },
+                --]]
+
         end
         local result = l0r:start_input()
         if result and result <= -2 then
@@ -1350,7 +1385,7 @@ Returns a status string.
     function _M.class_slr.l0_read_lexeme(slr)
         local block_ix = slr.current_block.index
         if not slr.l0.lmw_r then
-            slr:l0r_new(slr.perl_pos)
+            slr:l0r_new()
         end
         while true do
             if slr.perl_pos >= slr.end_pos then
@@ -1741,6 +1776,7 @@ Read alternatives into the G1 grammar.
                 goto NEXT_EVENT
             end
             do
+
                 if slr.trace_terminals > 0 then
                     local xsy = g1g:xsy(g1_lexeme)
                     if xsy then
@@ -1758,26 +1794,6 @@ Read alternatives into the G1 grammar.
                         q[#q+1] = event
                     end
                 end
-
-                    --[[ TODO: DELETE AFTER DEVELOPEMENT
-                    my ( $slr, $event ) = @_;
-                    my ( undef, undef, $block, $lexeme_start_pos, $lexeme_end_pos, $g1_lexeme)
-                        = @{$event};
-                    my $raw_token_value =
-                        $slr->literal( $lexeme_start_pos,
-                        $lexeme_end_pos - $lexeme_start_pos );
-                    my $trace_file_handle =
-                        $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
-                    my $slg              = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-                    say {$trace_file_handle} qq{Accepted lexeme },
-                        lc_range_brief( $slr, $block, $lexeme_start_pos,
-                            $block, $lexeme_end_pos - 1 ),
-                        q{ e}, $slr->g1_pos(),
-                        q{: },
-                        $slg->symbol_display_form($g1_lexeme),
-                        qq{; value="$raw_token_value"}
-                        or Marpa::R3::exception("Could not say(): $ERRNO");
-                    --]]
 
                 slr.start_of_pause_lexeme = lexeme_start
                 slr.end_of_pause_lexeme = lexeme_end
