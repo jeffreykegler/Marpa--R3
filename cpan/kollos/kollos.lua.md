@@ -758,6 +758,69 @@ This is a registry object.
 
 ```
 
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slg.l0_symbol_assign(slg, symbol_name, options)
+        local isyid = slg:l0_symbol_by_name(symbol_name)
+        if isyid then
+            -- symbol already exists
+            return isyid
+        end
+
+        local l0g = slg.l0
+        local isy = l0g:symbol_new(symbol_name)
+        local isyid = isy.id
+        l0g.isys[isyid] = isy
+
+        local properties = {}
+        -- Assuming order does not matter
+        for property, value in pairs(options or {}) do
+            if property == 'wsyid' then
+                goto NEXT_PROPERTY
+            end
+            if property == 'xsy' then
+                local xsy = slg.xsys[value]
+                l0g.xsy_by_isyid[isyid] = xsy
+                goto NEXT_PROPERTY
+            end
+            if property == 'terminal' then
+                gig:symbol_is_terminal_set(isyid, value)
+                goto NEXT_PROPERTY
+            end
+            if property == 'rank' then
+                local int_value = math.tointeger(value)
+                if not int_value then
+                    error(string.format('Symbol %q": rank is %s; must be an integer',
+                        symbol_name,
+                        inspect(value, {depth = 1})
+                    ))
+                end
+                l0g:symbol_rank_set(isyid, value)
+                goto NEXT_PROPERTY
+            end
+            if property == 'eager' then
+                local int_value = math.tointeger(value)
+                if not int_value or (int_value > 1 and int_value < 0) then
+                    error(string.format('Symbol %q": eager is %s; must be a boolean',
+                        symbol_name,
+                        inspect(value, {depth = 1})
+                    ))
+                end
+                if int_value == 1 then
+                    l0g.isys[isyid].eager = true
+                end
+                goto NEXT_PROPERTY
+            end
+            error(string.format('Internal error: Symbol %q has unknown property %q',
+                symbol_name,
+                property
+            ))
+            ::NEXT_PROPERTY::
+        end
+        return isyid
+    end
+```
+
 ### Constanst: Ranking methods
 
 ```
