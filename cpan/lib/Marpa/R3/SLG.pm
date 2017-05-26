@@ -1251,12 +1251,7 @@ sub assign_G1_symbol {
     # $slg will be needed for the XSY's
     my ( $slg, $name, $options ) = @_;
 
-    my $symbol_id = $slg->symbol_by_name($name);
-    if ( defined $symbol_id ) {
-        return $symbol_id;
-    }
-
-    ($symbol_id) =
+    my ($symbol_id) =
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'ss', $name, $options );
     local slg, symbol_name, options = ...
@@ -1311,23 +1306,23 @@ END_OF_LUA
 }
 
 sub assign_L0_symbol {
-    # $slg will be needed for the XSY's
     my ( $slg, $name, $options ) = @_;
 
-    my $symbol_id = $slg->l0_symbol_by_name($name);
-    if ( defined $symbol_id ) {
-        return $symbol_id;
-    }
-
-    ($symbol_id) =
+    my ($symbol_id) =
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 's', $name );
-    local g, symbol_name = ...
-    local lmw_g = g.l0.lmw_g
-    local isy = lmw_g:symbol_new(symbol_name)
-    local symbol_id = isy.id
-    g.l0.lmw_g.isys[symbol_id] = isy
-    return symbol_id
+        <<'END_OF_LUA', 'ss', $name, $options );
+    local slg, symbol_name = ...
+    local isyid = slg:l0_symbol_by_name(symbol_name)
+    if isyid then
+        -- symbol already exists
+        return isyid
+    end
+
+    local l0g = slg.l0
+    local isy = l0g:symbol_new(symbol_name)
+    local isyid = isy.id
+    l0g.isys[isyid] = isy
+    return isyid
 END_OF_LUA
 
     PROPERTY: for my $property ( sort keys %{$options} ) {
