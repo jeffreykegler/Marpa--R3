@@ -1032,6 +1032,10 @@ one for each subgrammar.
 
 TODO -- Turn lmg_*() forms into local functions?
 
+TODO -- Census all Lua and perl symbol name functions, including
+but not limited to lmg_*(), *_name(), *_{dsl,display}_form()
+and eliminate the redundant ones.
+
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_slg.symbol_name(slg, xsyid)

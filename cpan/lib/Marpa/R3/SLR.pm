@@ -865,16 +865,24 @@ my $libmarpa_event_handlers = {
 # Return 1 if internal scanning should pause
 sub Marpa::R3::Internal::Scanless::convert_libmarpa_events {
     my ($slr)    = @_;
+    my $trace_file_handle =
+        $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
+
     my $pause    = 0;
     my @events = $slr->xs_events();
     EVENT: for my $event ( @events ) {
         my ($event_type) = @{$event};
 
-       my ($cmd, $this_pause) = $slr->call_by_tag(( '@' . __FILE__ . ':' . __LINE__ ),
+       my ($cmd, $value) = $slr->call_by_tag(( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'i', $event);
         local slr, event = ...
         -- print(inspect(event))
         local event_type = event[1]
+
+        if event_type == "!trace" then
+            local msg = event.msg
+            if msg then return 'trace', msg end
+        end
 
         if event_type == "'exhausted" then
             local events = slr.external_events
@@ -947,6 +955,11 @@ sub Marpa::R3::Internal::Scanless::convert_libmarpa_events {
         return 'nyi', 0
 END_OF_LUA
 
+        if ($cmd eq 'trace') {
+            say {$trace_file_handle} $value;
+            next EVENT;
+        }
+        my $this_pause = $value;
         $pause = ($pause or $this_pause);
         next EVENT if $cmd ne 'nyi';
 
