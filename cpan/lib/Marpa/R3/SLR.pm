@@ -634,20 +634,6 @@ END_OF_LUA
 
 my $libmarpa_trace_event_handlers = {
 
-    'expected lexeme' => sub {
-        my ( $slr, $event ) = @_;
-        # Necessary to check, because this one can be returned when not tracing
-        my ( undef, undef, $position, $g1_lexeme, $assertion_id)
-            = @{$event};
-        my ( $line, $column ) = $slr->line_column($position);
-        my $trace_file_handle =
-            $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
-        my $slg              = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-        say {$trace_file_handle} qq{Expected lexeme },
-            $slg->symbol_display_form($g1_lexeme),
-            " at line $line, column $column; assertion ID = $assertion_id"
-            or Marpa::R3::exception("Could not say(): $ERRNO");
-    },
     'outprioritized lexeme' => sub {
         my ( $slr, $event ) = @_;
         my ( undef, undef, $block, $lexeme_start_pos, $lexeme_end_pos, $g1_lexeme,

@@ -1185,6 +1185,7 @@ This is a registry object.
                     )
                 end
             end
+
             if slr.trace_terminals >= 3 then
                 local xsy = g1g:xsy(terminal)
                 if xsy then
@@ -1201,23 +1202,6 @@ This is a registry object.
                     q[#q+1] = event
                 end
             end
-
-                --[[
-                    'expected lexeme' => sub {
-                        my ( $slr, $event ) = @_;
-                        # Necessary to check, because this one can be returned when not tracing
-                        my ( undef, undef, $position, $g1_lexeme, $assertion_id)
-                            = @{$event};
-                        my ( $line, $column ) = $slr->line_column($position);
-                        my $trace_file_handle =
-                            $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
-                        my $slg              = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-                        say {$trace_file_handle} qq{Expected lexeme },
-                            $slg->symbol_display_form($g1_lexeme),
-                            " at line $line, column $column; assertion ID = $assertion_id"
-                            or Marpa::R3::exception("Could not say(): $ERRNO");
-                    },
-                --]]
 
         end
         local result = l0r:start_input()
