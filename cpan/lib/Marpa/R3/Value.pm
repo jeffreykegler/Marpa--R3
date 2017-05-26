@@ -360,7 +360,7 @@ sub lexeme_semantics_find {
           $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
             <<'END_OF_LUA', 'i>*', $lexeme_id);
     local slg, isyid = ...
-    local xsy = slg.g1.xsy_by_isyid[isyid]
+    local xsy = slg.g1.xsys[isyid]
     if not xsy then return '::!default' end
     local semantics = xsy.lexeme_semantics
     return semantics or '::!default'
@@ -624,7 +624,7 @@ sub lexeme_blessing_find {
     my ($result) = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'i', $lexeme_id );
       local slg, isyid = ...
-      local xsy = slg.g1.xsy_by_isyid[isyid]
+      local xsy = slg.g1.xsys[isyid]
       if not xsy then return '::undef' end
       local blessing = xsy.blessing
       return blessing or '::undef'

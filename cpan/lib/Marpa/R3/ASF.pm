@@ -358,7 +358,7 @@ END_OF_LUA
             <<'END_OF_LUA', 'i>*', $isyid );
                 local recce, isyid = ...
                 local slg = recce.slg
-                local xsy = slg.g1.xsy_by_isyid[isyid]
+                local xsy = slg.g1.xsys[isyid]
                 if not xsy then return '' end
                 return xsy.blessing or ''
 END_OF_LUA

@@ -729,7 +729,7 @@ This is a registry object.
             end
             if property == 'xsy' then
                 local xsy = slg.xsys[value]
-                g1g.xsy_by_isyid[isyid] = xsy
+                g1g.xsys[isyid] = xsy
                 goto NEXT_PROPERTY
             end
             if property == 'terminal' then
@@ -780,7 +780,7 @@ This is a registry object.
             end
             if property == 'xsy' then
                 local xsy = slg.xsys[value]
-                l0g.xsy_by_isyid[isyid] = xsy
+                l0g.xsys[isyid] = xsy
                 goto NEXT_PROPERTY
             end
             if property == 'terminal' then
@@ -3521,7 +3521,14 @@ is zero.
     class_grammar_fields.start_name = true
     class_grammar_fields.xbnf_by_irlid = true
     class_grammar_fields.xbnfs = true
-    class_grammar_fields.xsy_by_isyid = true
+```
+
+A per-grammar table of the XSY's,
+indexed by isyid.
+
+```
+    -- miranda: section+ class_grammar field declarations
+    class_grammar_fields.xsys = true
 ```
 
 ```
@@ -3547,8 +3554,8 @@ is zero.
         grammar.isys = {}
         grammar.slg = slg
         grammar.xbnfs = {}
-        grammar.xsy_by_isyid = {}
         grammar.xbnf_by_irlid = {}
+        grammar.xsys = {}
 
         return grammar
     end
@@ -3730,7 +3737,7 @@ is zero.
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_grammar.xsy_name(grammar, isyid)
-        local xsy = grammar.xsy_by_isyid[isyid]
+        local xsy = grammar.xsys[isyid]
         return xsy and xsy.name
     end
 ```
@@ -3751,12 +3758,12 @@ necessarily unique.
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_grammar.symbol_dsl_form(grammar, isyid)
-        local xsy = grammar.xsy_by_isyid[isyid]
+        local xsy = grammar.xsys[isyid]
         if not xsy then return end
         return xsy.dsl_form
     end
     function _M.class_grammar.symbol_display_form(grammar, isyid)
-        local xsy = grammar.xsy_by_isyid[isyid]
+        local xsy = grammar.xsys[isyid]
         if not xsy then
             return string.format('<ISYID %d>', isyid)
         end

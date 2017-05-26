@@ -944,7 +944,7 @@ END_OF_LUA
         ('@' .__FILE__ . ':' .  __LINE__),
         <<'END_OF_LUA', 'is', $g1_lexeme_id, $default_lexeme_action);
         local slg, isyid, default_lexeme_action = ...
-        local xsy = slg.g1.xsy_by_isyid[isyid]
+        local xsy = slg.g1.xsys[isyid]
         if xsy then
             local name_source = xsy.name_source
             if name_source == 'lexical' and not xsy.lexeme_semantics then
@@ -967,7 +967,7 @@ END_OF_LUA
         ('@' .__FILE__ . ':' .  __LINE__),
         <<'END_OF_LUA', 'is', $g1_lexeme_id, ($default_blessing // '::undef'));
         local slg, isyid, default_blessing = ...
-        local xsy = slg.g1.xsy_by_isyid[isyid]
+        local xsy = slg.g1.xsys[isyid]
         if not xsy then return 'next lexeme', default_blessing end
         local name_source = xsy.name_source
         if name_source ~= 'lexical' then return 'next lexeme', default_blessing end
@@ -1027,7 +1027,7 @@ qq{Symbol "$lexeme_name" needs a blessing package, but grammar has none\n},
                 ('@' .__FILE__ . ':' .  __LINE__),
                 <<'END_OF_LUA', 'is', $g1_lexeme_id, $blessing);
             local slg, isyid, blessing = ...
-            local xsy = slg.g1.xsy_by_isyid[isyid]
+            local xsy = slg.g1.xsys[isyid]
             xsy.blessing = blessing
 END_OF_LUA
 
@@ -1219,7 +1219,7 @@ END_OF_LUA
         if is_accessible then
             return 'next symbol', default_treatment
         end
-        local xsy = slg[subg_name].xsy_by_isyid[isyid]
+        local xsy = slg[subg_name].xsys[isyid]
         if not xsy then
             return 'next symbol', default_treatment
         end
@@ -2010,7 +2010,7 @@ sub Marpa::R3::Scanless::G::lmg_symbol_dsl_form {
     my ($ok, $dsl_form) = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'is', $isyid, $subg_name );
         local slg, isyid, subg_name = ...
-        local xsy = slg[subg_name].xsy_by_isyid[isyid]
+        local xsy = slg[subg_name].xsys[isyid]
         if not xsy then return '' end
         return 'ok', xsy.dsl_form
 END_OF_LUA
