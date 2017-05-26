@@ -1255,50 +1255,7 @@ sub assign_G1_symbol {
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'ss', $name, $options );
     local slg, symbol_name, options = ...
-    local isyid = slg:g1_symbol_by_name(symbol_name)
-    if isyid then
-        -- symbol already exists
-        return isyid
-    end
-
-    local g1g = slg.g1
-    local isy = g1g:symbol_new(symbol_name)
-    isyid = isy.id
-    g1g.isys[isyid] = isy
-    local properties = {}
-    -- Assuming order does not matter
-    for property, value in pairs(options or {}) do
-        if property == 'wsyid' then
-            goto NEXT_PROPERTY
-        end
-        if property == 'xsy' then
-            local xsy = slg.xsys[value]
-            g1g.xsy_by_isyid[isyid] = xsy
-            goto NEXT_PROPERTY
-        end
-        if property == 'terminal' then
-            gig:symbol_is_terminal_set(isyid, value)
-            goto NEXT_PROPERTY
-        end
-        if property == 'rank' then
-            int_value = math.tointeger(value)
-            if not int_value then
-                error(string.format('Symbol %q": rank is %s; must be an integer',
-                    symbol_name,
-                    inspect(value, {depth = 1})
-                ))
-            end
-            g1g:symbol_rank_set(isyid, value)
-            goto NEXT_PROPERTY
-        end
-        error(string.format('Internal error: Symbol %q has unknown property %q',
-            symbol_name,
-            property
-        ))
-        ::NEXT_PROPERTY::
-    end
-
-    return isyid
+    return slg:g1_symbol_assign(symbol_name, options)
 END_OF_LUA
 
     return $symbol_id;
