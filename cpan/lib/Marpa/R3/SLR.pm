@@ -152,7 +152,7 @@ sub Marpa::R3::Scanless::R::new {
     slr.l0 = {}
     slr.l0_irls = {}
 
-    local g1g = grammar.g1.lmw_g
+    local g1g = grammar.g1
     slr.g1 = _M.recce_new(g1g)
     -- TODO Census, eliminate most (all?) references via lmw_g
     slr.g1_isys = {}
@@ -211,7 +211,7 @@ sub Marpa::R3::Scanless::R::new {
         r_l0_rules[rule_id] = r_l0_rule
     end
     -- print('r_l0_rules: ', inspect(r_l0_rules))
-    local g_g1_symbols = grammar.g1.lmw_g.isys
+    local g_g1_symbols = grammar.g1.isys
     local r_g1_symbols = slr.g1_isys
     local max_g1_symbol_id = g1g:highest_symbol_id()
     for symbol_id = 0, max_g1_symbol_id do
@@ -265,11 +265,11 @@ END_OF_LUA
         local return_value = g1r:start_input()
         if return_value == -1 then
             error( string.format('Recognizer start of input failed: %s',
-                recce.slg.g1.lmw_g.error_description()))
+                recce.slg.g1.error_description()))
         end
         if return_value < 0 then
             error( string.format('Problem in start_input(): %s',
-                recce.slg.g1.lmw_g.error_description()))
+                recce.slg.g1.error_description()))
         end
         recce:g1_convert_events(recce.perl_pos)
 END_OF_LUA
@@ -1258,7 +1258,7 @@ sub Marpa::R3::Scanless::R::show_progress {
             if ( $position < 0 ) {
                 ($position) = $slg->call_by_tag(
                     ( '@' . __FILE__ . ':' . __LINE__ ),
-'local grammar, rule_id = ...; return grammar.g1.lmw_g:rule_length(rule_id)',
+'local grammar, rule_id = ...; return grammar.g1:rule_length(rule_id)',
                     'i',
                     $rule_id
                 );
@@ -1282,7 +1282,7 @@ sub Marpa::R3::Scanless::R::show_progress {
 
                 my ($rhs_length) = $slg->call_by_tag(
                     ( '@' . __FILE__ . ':' . __LINE__ ),
-'local grammar, rule_id = ...; return grammar.g1.lmw_g:rule_length(rule_id)',
+'local grammar, rule_id = ...; return grammar.g1:rule_length(rule_id)',
                     'i',
                     $rule_id
                 );
@@ -1494,7 +1494,7 @@ END_OF_LUA
 
     my ($error_description)
     = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        'local grammar = ...; return grammar.g1.lmw_g:error_description()', '');
+        'local grammar = ...; return grammar.g1:error_description()', '');
     Marpa::R3::exception( qq{Problem reading symbol "$symbol_name": },
         $error_description );
 } ## end sub Marpa::R3::Scanless::R::lexeme_alternative
@@ -1535,7 +1535,7 @@ END_OF_LUA
 
     if ($return_value == 0) {
         $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-            'local grammar = ...; grammar.g1.lmw_g.error()', '' );
+            'local grammar = ...; grammar.g1.error()', '' );
     }
     Marpa::R3::Internal::Scanless::convert_libmarpa_events($slr);
 
@@ -1678,7 +1678,7 @@ sub Marpa::R3::Scanless::R::lexeme_priority_set {
         <<'END_OF_LUA', 'si>*', $lexeme_name, $new_priority );
         local recce, lexeme_name, new_priority = ...
         local slg = recce.slg
-        local g1g = slg.g1.lmw_g
+        local g1g = slg.g1
         local lexeme_id = g1g.isyid_by_name[lexeme_name]
         if not lexeme_id then
             _M.userX(string.format(
@@ -1692,7 +1692,7 @@ sub Marpa::R3::Scanless::R::lexeme_priority_set {
                 new_priority
             ))
         end
-        local g_lexeme_data = slg.g1.lmw_g.isys[lexeme_id]
+        local g_lexeme_data = slg.g1.isys[lexeme_id]
         local r_lexeme_data = recce.g1_isys[lexeme_id]
         if not g_lexeme_data.is_lexeme then
             print(inspect(lexeme_data))
