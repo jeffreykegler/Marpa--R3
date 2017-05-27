@@ -1267,7 +1267,7 @@ otherwise a failure code.
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.l0_earleme_complete(slr)
-        local l0r = slr.l0.lmw_r
+        local l0r = slr.l0
         local complete_result = l0r:earleme_complete()
         if complete_result == -2 then
             if l0r:error_code() == _M.err.PARSE_EXHAUSTED then
@@ -1297,7 +1297,7 @@ which will be 1 or 0.
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.l0_alternative(slr, symbol_id)
-        local l0r = slr.l0.lmw_r
+        local l0r = slr.l0
         local codepoint = slr.codepoint
         local result = l0r:alternative(symbol_id, 1, 1)
         if result == _M.err.UNEXPECTED_TOKEN_ID then
@@ -1371,7 +1371,7 @@ Returns a status string.
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.l0_read_lexeme(slr)
         local block_ix = slr.current_block.index
-        if not slr.l0.lmw_r then
+        if not slr.l0 then
             slr:l0r_new()
         end
         while true do
@@ -1412,7 +1412,7 @@ rule, false otherwise.
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.l0_track_candidates(slr)
-        local l0r = slr.l0.lmw_r
+        local l0r = slr.l0
         local l0g = slr.slg.l0.lmw_g
         local l0_rules = slr.l0_irls
         local eager
@@ -1494,7 +1494,7 @@ a string indicating the error otherwise.
 
         slr.lexeme_queue = {}
         slr.accept_queue = {}
-        local l0r = slr.l0.lmw_r
+        local l0r = slr.l0
         if not l0r then
             error('Internal error: No l0r in slr_alternatives(): %s',
                 slr.slg.l0.lmw_g:error_description())
@@ -1545,13 +1545,13 @@ Determine which lexemes are acceptable or discards.
         local block_ix = block.index
         while true do
             local g1_lexeme = -1
-            local rule_id, dot_position, origin = slr.l0.lmw_r:progress_item()
+            local rule_id, dot_position, origin = slr.l0:progress_item()
             if not rule_id then
                 return discarded, high_lexeme_priority
             end
             if rule_id <= -2 then
                 error(string.format('Problem in slr:progress_item(): %s'),
-                    slr.l0.lmw_r:error_description())
+                    slr.l0:error_description())
             end
             if origin ~= 0 then
                goto NEXT_EARLEY_ITEM
@@ -1754,7 +1754,7 @@ Read alternatives into the G1 grammar.
                 goto NEXT_EVENT
             end
             if return_value ~= _M.err.NONE then
-                local l0r = slr.l0.lmw_r
+                local l0r = slr.l0
                 error(string.format([[
                      'Problem SLR->read() failed on symbol id %d at position %d: %s'
                 ]],
