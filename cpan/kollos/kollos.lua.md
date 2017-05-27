@@ -1764,26 +1764,6 @@ Read alternatives into the G1 grammar.
                 local xsy = g1g:xsy(g1_lexeme)
                 if xsy then
                     local event = { '!trace', 'g1 duplicate lexeme', block_ix, lexeme_start, lexeme_end, g1_lexeme}
-
-    --[[ 'g1 duplicate lexeme' => sub {
-        my ( $slr, $event ) = @_;
-        my ( undef, undef, $block, $lexeme_start_pos, $lexeme_end_pos, $g1_lexeme ) =
-            @{$event};
-        my $raw_token_value =
-            $slr->literal( $lexeme_start_pos,
-            $lexeme_end_pos - $lexeme_start_pos );
-        my $trace_file_handle =
-            $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
-        my $slg              = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-        say {$trace_file_handle}
-            'Rejected as duplicate lexeme ',
-            lc_range_brief( $slr, $block, $lexeme_start_pos,
-                $block, $lexeme_end_pos - 1 ),
-            q{: },
-            $slg->symbol_display_form($g1_lexeme),
-            qq{; value="$raw_token_value"}
-            or Marpa::R3::exception("Could not say(): $ERRNO");
-    }, --]]
                     event.msg = string.format(
                         'Rejected as duplicate lexeme %s: %s; value=%q',
                         slr:lc_range_brief(block_ix, lexeme_start, block_ix, lexeme_end - 1),
