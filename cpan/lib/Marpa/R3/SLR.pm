@@ -148,7 +148,7 @@ sub Marpa::R3::Scanless::R::new {
     local lua_ref = _M.register(registry, slr)
     slr.ref_count = 1
 
-    local l0g = grammar.l0.lmw_g
+    local l0g = grammar.l0
     slr.l0 = {}
     slr.l0_irls = {}
 
@@ -196,7 +196,7 @@ sub Marpa::R3::Scanless::R::new {
     slr.lexer_start_pos = 0
     slr.is_external_scanning = false
 
-    local g_l0_rules = grammar.l0.lmw_g.irls
+    local g_l0_rules = grammar.l0.irls
     local r_l0_rules = slr.l0_irls
     -- print('g_l0_rules: ', inspect(g_l0_rules))
     local max_l0_rule_id = l0g:highest_rule_id()

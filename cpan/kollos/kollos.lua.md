@@ -1147,7 +1147,7 @@ This is a registry object.
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.l0r_new(slr, perl_pos)
-        local l0r = _M.recce_new(slr.slg.l0.lmw_g)
+        local l0r = _M.recce_new(slr.slg.l0)
 
         local block_ix = slr.current_block.index
         local perl_pos = slr.perl_pos
@@ -1155,7 +1155,7 @@ This is a registry object.
 
         if not l0r then
             error('Internal error: l0r_new() failed %s',
-                slr.slg.l0.lmw_g:error_description())
+                slr.slg.l0:error_description())
         end
         slr.l0 = l0r
         -- reset the candidate in the lexer
@@ -1412,7 +1412,7 @@ rule, false otherwise.
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.l0_track_candidates(slr)
         local l0r = slr.l0
-        local l0g = slr.slg.l0.lmw_g
+        local l0g = slr.slg.l0
         local l0_rules = slr.l0_irls
         local eager
         local complete_lexemes = false
@@ -1496,7 +1496,7 @@ a string indicating the error otherwise.
         local l0r = slr.l0
         if not l0r then
             error('Internal error: No l0r in slr_alternatives(): %s',
-                slr.slg.l0.lmw_g:error_description())
+                slr.slg.l0:error_description())
         end
         local elect_earley_set = slr.l0_candidate
         -- no zero-length lexemes, so Earley set 0 is ignored
@@ -2348,7 +2348,7 @@ an L0 range
     -- TODO: perl_pos arg is development hack --
     -- eventually use slr.perl_pos
     function _M.class_slr.l0_convert_events(slr, perl_pos)
-        local l0g = slr.slg.l0.lmw_g
+        local l0g = slr.slg.l0
         local q = slr.event_queue
         local events = l0g:events()
         for i = 1, #events, 2 do
@@ -2413,7 +2413,7 @@ an L0 range
 
         events = slg.discard_event_by_name[event_name]
         if events then
-            local g_l0_rules = slg.l0.lmw_g.irls
+            local g_l0_rules = slg.l0.irls
             local r_l0_rules = slr.l0_irls
             for ix = 1, #events do
                 local event_data = events[ix]

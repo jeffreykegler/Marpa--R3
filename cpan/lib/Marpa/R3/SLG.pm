@@ -556,7 +556,7 @@ END_OF_LUA
         ('@' .__FILE__ . ':' .  __LINE__),
         <<'END_OF_LUA', 's', $lex_start_symbol_name);
         local grammar, start_name = ...
-        local l0g = grammar.l0.lmw_g
+        local l0g = grammar.l0
         l0g.start_name = start_name
 END_OF_LUA
 
@@ -602,7 +602,7 @@ END_OF_LUA
         my ($lhs_id) = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
             <<'END_OF_LUA', 'i>*', $rule_id );
     local grammar, rule_id = ...
-    local l0g = grammar.l0.lmw_g
+    local l0g = grammar.l0
     return l0g:rule_lhs(rule_id)
 END_OF_LUA
 
@@ -618,7 +618,7 @@ END_OF_LUA
           $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
             <<'END_OF_LUA', 'i>*', $rule_id );
     local grammar, rule_id = ...
-    local l0g = grammar.l0.lmw_g
+    local l0g = grammar.l0
     return l0g:rule_rhs(rule_id, 0)
 END_OF_LUA
 
@@ -639,7 +639,7 @@ END_OF_LUA
               $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
                 <<'END_OF_LUA', '>*' );
     local grammar = ...
-    local l0g = grammar.l0.lmw_g
+    local l0g = grammar.l0
     return l0g:zwa_new(0)
 END_OF_LUA
 
@@ -650,7 +650,7 @@ END_OF_LUA
         $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
             <<'END_OF_LUA', 'ii>*', $assertion_id, $rule_id );
     local grammar, assertion_id, rule_id = ...
-    local l0g = grammar.l0.lmw_g
+    local l0g = grammar.l0
     l0g:zwa_place(assertion_id, rule_id, 0)
 END_OF_LUA
 
@@ -700,7 +700,7 @@ END_OF_LUA
                 <<'END_OF_LUA', 'ii>*', $irlid, $lex_discard_symbol_id );
     local slg, irlid, lex_discard_symbol_id = ...
     local lyr_l0 = slg.l0
-    local irl = lyr_l0.lmw_g.irls[irlid]
+    local irl = lyr_l0.irls[irlid]
     local xbnf = irl.xbnf
     if not xbnf then
         return 'next RULE_ID'
@@ -709,7 +709,7 @@ END_OF_LUA
     if event_name then
          return 'ok', event_name, xbnf.event_starts_active
     end
-    local l0g = lyr_l0.lmw_g
+    local l0g = lyr_l0
     local lhs_id = l0g:rule_lhs(irlid)
     if lhs_id ~= lex_discard_symbol_id then
         return 'next RULE_ID'
@@ -736,7 +736,7 @@ END_OF_LUA
               $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
                 <<'END_OF_LUA', 'i>*', $irlid );
     local slg, irlid = ...
-    local irl = slg.l0.lmw_g.irls[irlid]
+    local irl = slg.l0.irls[irlid]
     -- at this point, xbnf must be defined
     local xbnf = irl.xbnf
     return xbnf.symbol_as_event
@@ -874,14 +874,14 @@ END_OF_LUA
         <<'END_OF_LUA',
     local g, lexer_rule_id, g1_lexeme_id, assertion_id, discard_symbol_id = ...
     if lexer_rule_id >= 0 then
-        g.l0.lmw_g.irls[lexer_rule_id].g1_lexeme = g1_lexeme_id
+        g.l0.irls[lexer_rule_id].g1_lexeme = g1_lexeme_id
         if g1_lexeme_id >= 0 then
             local eager = g.g1.isys[g1_lexeme_id].eager
-            if eager then g.l0.lmw_g.irls[lexer_rule_id].eager = true end
+            if eager then g.l0.irls[lexer_rule_id].eager = true end
         end
-        local eager = g.l0.lmw_g.isys[discard_symbol_id].eager
+        local eager = g.l0.isys[discard_symbol_id].eager
         if eager then
-            g.l0.lmw_g.irls[lexer_rule_id].eager = true
+            g.l0.irls[lexer_rule_id].eager = true
         end
     end
     if g1_lexeme_id >= 0 then
@@ -899,7 +899,7 @@ END_OF_LUA
             -- print(inspect(discard_event))
             local event_name = discard_event[1]
             local is_active = discard_event[2] == "1"
-            local l0_rules = slg.l0.lmw_g.irls
+            local l0_rules = slg.l0.irls
 
             local event_desc = {
                name = event_name,
@@ -1504,7 +1504,7 @@ sub add_L0_user_rule {
           $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
           <<'END_OF_LUA', 's', ($xbnf_name // ''));
     local slg, xbnf_name = ...
-    local default_rank = slg.l0.lmw_g:default_rank()
+    local default_rank = slg.l0:default_rank()
     -- io.stderr:write('xbnf_name: ', inspect(xbnf_name), '\n')
     local xbnf_id = -1
     if #xbnf_name > 0 then
@@ -1542,11 +1542,11 @@ END_OF_LUA
     -- remove the test for nil or less than zero
     -- once refactoring is complete?
     _M.throw = false
-    local base_irl_id = g.l0.lmw_g:rule_new(rule)
+    local base_irl_id = g.l0:rule_new(rule)
     -- print('base_irl_id: ', inspect(base_irl_id))
     _M.throw = true
     if not base_irl_id or base_irl_id < 0 then return -1 end
-    g.l0.lmw_g.irls[base_irl_id] = { id = base_irl_id }
+    g.l0.irls[base_irl_id] = { id = base_irl_id }
     return base_irl_id
 END_OF_LUA
 
@@ -1581,14 +1581,14 @@ END_OF_LUA
     -- print('arg_hash: ', inspect(arg_hash))
     arg_hash.proper = (arg_hash.proper ~= 0)
     _M.throw = false
-    local base_irl_id = g.l0.lmw_g:sequence_new(arg_hash)
+    local base_irl_id = g.l0:sequence_new(arg_hash)
     _M.throw = true
     -- remove the test for nil or less than zero
     -- once refactoring is complete?
     if not base_irl_id or base_irl_id < 0 then return end
     local l0_rule = setmetatable({}, _M.class_irl)
     l0_rule.id = base_irl_id
-    g.l0.lmw_g.irls[base_irl_id] = l0_rule
+    g.l0.irls[base_irl_id] = l0_rule
     return base_irl_id
 END_OF_LUA
 
@@ -1600,7 +1600,7 @@ END_OF_LUA
         $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
             <<'END_OF_LUA', 's', $rule_description );
             local grammar, rule_description = ...
-            local l0g = grammar.l0.lmw_g
+            local l0g = grammar.l0
             local error_code = l0g:error_code()
             local problem_description
             if error_code == _M.err.DUPLICATE_RULE then
@@ -1617,12 +1617,12 @@ END_OF_LUA
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'iiii',
         local slg, irl_id, ranking_is_high, rank, xbnf_id = ...
-        local l0g = slg.l0.lmw_g
+        local l0g = slg.l0
         l0g:rule_null_high_set(irl_id, ranking_is_high)
         l0g:rule_rank_set(irl_id, rank)
         if xbnf_id >= 0 then
             local xbnf = slg.l0.xbnfs[xbnf_id]
-            local irl = slg.l0.lmw_g.irls[irl_id]
+            local irl = slg.l0.irls[irl_id]
             irl.xbnf = xbnf
             -- right now, the action & mask of an irl
             -- is always the action/mask of its xbnf.
