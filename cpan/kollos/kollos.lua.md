@@ -1747,9 +1747,43 @@ Read alternatives into the G1 grammar.
                 table.unpack(this_event)
 
             if slr.trace_terminals > 2 then
-                local q = slr.event_queue
-                q[#q+1] = { '!trace', 'g1 attempting lexeme',
-                    block_ix, lexeme_start, lexeme_end, g1_lexeme}
+                local xsy = g1g:xsy(g1_lexeme)
+                if xsy then
+                    local q = slr.event_queue
+                    local event = { '!trace', 'g1 attempting lexeme',
+                        block_ix, lexeme_start, lexeme_end, g1_lexeme}
+                    local working_earley_set = slr.g1:latest_earley_set() + 1
+                    event.msg = string.format(
+                        'Attempting to read lexeme %s e%d: %s; value=%q',
+                        slr:lc_range_brief(block_ix, lexeme_start, block_ix, lexeme_end - 1),
+                        working_earley_set,
+                        xsy:display_form(),
+                        slr:l0_literal( lexeme_start,  lexeme_end - lexeme_start, block_ix )
+                    )
+                    q[#q+1] = event
+                end
+
+    --[[ 'g1 attempting lexeme' => sub {
+        my ( $slr, $event ) = @_;
+        my ( undef, undef, $block, $lexeme_start_pos, $lexeme_end_pos, $g1_lexeme ) =
+            @{$event};
+        my $raw_token_value =
+            $slr->literal( $lexeme_start_pos,
+            $lexeme_end_pos - $lexeme_start_pos );
+        my $trace_file_handle =
+            $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
+        my $slg              = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+        say {$trace_file_handle}
+            'Attempting to read lexeme ',
+            lc_range_brief( $slr, $block, $lexeme_start_pos,
+                $block, $lexeme_end_pos - 1 ),
+            q{ e}, $slr->g1_pos(),
+            q{: },
+            $slg->symbol_display_form($g1_lexeme),
+            qq{; value="$raw_token_value"}
+            or Marpa::R3::exception("Could not say(): $ERRNO");
+    }, --]]
+
             end
             local g1r = slr.g1
             local kollos = getmetatable(g1r).kollos
