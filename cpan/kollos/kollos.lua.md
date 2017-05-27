@@ -1176,7 +1176,7 @@ This is a registry object.
         for i = 0, count -1 do
             local ix = i + 1
             local terminal = slr.terminals_expected[ix]
-            local assertion = slr.slg.g1.lmw_g.isys[terminal].assertion
+            local assertion = slr.slg.g1.isys[terminal].assertion
             assertion = assertion or -1
             if assertion >= 0 then
                 local result = l0r:zwa_default_set(assertion, 1)
@@ -1926,7 +1926,7 @@ acceptance is caught here via rejection).  Ignore
             -- Current, we do nothing with an exhausted error code
             -- here
 
-            -- local error_code = slr.slg.g1.lmw_g:error_code()
+            -- local error_code = slr.slg.g1:error_code()
             -- if error_code == _M.err.PARSE_EXHAUSTED then
                 -- local q = slr.event_queue
                 -- q[#q+1] = { 'no acceptable input' }
@@ -1934,7 +1934,7 @@ acceptance is caught here via rejection).  Ignore
             return 0
         end
         error('Problem in slr->g1_lexeme_complete(): '
-            ..  slr.slg.g1.lmw_g:error_description())
+            ..  slr.slg.g1:error_description())
     end
 ```
 
@@ -2306,7 +2306,7 @@ an L0 range
 
     function _M.class_slr.g1_convert_events(slr)
         local perl_pos = slr.perl_pos
-        local g1g = slr.slg.g1.lmw_g
+        local g1g = slr.slg.g1
         local q = slr.event_queue
         local events = g1g:events()
         for i = 1, #events, 2 do
@@ -2430,7 +2430,7 @@ an L0 range
 
         events = slg.lexeme_event_by_name[event_name]
         if events then
-            local g_g1_symbols = slg.g1.lmw_g.isys
+            local g_g1_symbols = slg.g1.isys
             local r_g1_symbols = slr.g1_isys
             for ix = 1, #events do
                     local event_data = events[ix]
@@ -2464,7 +2464,7 @@ or nil if there was none.
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.last_completed(slr, symbol_id)
          local g1r = slr.g1
-         local g1g = slr.slg.g1.lmw_g
+         local g1g = slr.slg.g1
          local latest_earley_set = g1r:latest_earley_set()
          local first_origin = latest_earley_set + 1
          local earley_set = latest_earley_set
@@ -2723,7 +2723,7 @@ part of a "Pure Lua" implementation.
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.show_leo_item(slr)
         local g1r = slr.g1
-        local g1g = slr.slg.g1.lmw_g
+        local g1g = slr.slg.g1
         local leo_base_state = g1r:_leo_base_state()
         if not leo_base_state then return '' end
         local trace_earley_set = g1r:_trace_earley_set()

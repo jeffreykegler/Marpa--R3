@@ -327,7 +327,7 @@ END_OF_LUA
         ('@' .__FILE__ . ':' .  __LINE__),
         <<'END_OF_LUA', '');
         local grammar = ...
-        local g1g = grammar.g1.lmw_g
+        local g1g = grammar.g1
         g1g.start_name = '[:start]'
 END_OF_LUA
 
@@ -354,7 +354,7 @@ END_OF_LUA
         ('@' .__FILE__ . ':' .  __LINE__),
         <<'END_OF_LUA', 's', $hashed_source );
         local slg, hashed_source = ...
-        local g1g = slg.g1.lmw_g
+        local g1g = slg.g1
 
         local function event_setup(g1g, events, set_fn, activate_fn)
             local event_by_isy = {}
@@ -439,7 +439,7 @@ END_OF_LUA
         ('@' .__FILE__ . ':' .  __LINE__),
         <<'END_OF_LUA', 'i', $symbol_id);
         local grammar, symbol_id = ...
-        local g1g = grammar.g1.lmw_g
+        local g1g = grammar.g1
         return g1g:symbol_is_terminal(symbol_id)
 END_OF_LUA
 
@@ -787,7 +787,7 @@ END_OF_LUA
         g1_lexeme_id = math.tointeger(g1_lexeme_id)
         local declarations = lexeme_declarations[lexeme_name] or {}
 
-        local lexeme_data = slg.g1.lmw_g.isys[g1_lexeme_id]
+        local lexeme_data = slg.g1.isys[g1_lexeme_id]
         local priority = 0
         if declarations.priority then
             priority = declarations.priority + 0
@@ -813,7 +813,7 @@ END_OF_LUA
         local pause_value = declarations.pause
         if pause_value then
             pause_value = math.tointeger(pause_value)
-            local lexeme_data = slg.g1.lmw_g.isys[g1_lexeme_id]
+            local lexeme_data = slg.g1.isys[g1_lexeme_id]
             if pause_value == 1 then
                  lexeme_data.pause_after = true
             elseif pause_value == -1 then
@@ -838,7 +838,7 @@ END_OF_LUA
                     name_entry[#name_entry+1] = event_desc
                 end
 
-                local lexeme_data = slg.g1.lmw_g.isys[g1_lexeme_id]
+                local lexeme_data = slg.g1.isys[g1_lexeme_id]
                 if is_active then
                     -- activate only if event is enabled
                     lexeme_data.pause_after_active = lexeme_data.pause_after
@@ -876,7 +876,7 @@ END_OF_LUA
     if lexer_rule_id >= 0 then
         g.l0.lmw_g.irls[lexer_rule_id].g1_lexeme = g1_lexeme_id
         if g1_lexeme_id >= 0 then
-            local eager = g.g1.lmw_g.isys[g1_lexeme_id].eager
+            local eager = g.g1.isys[g1_lexeme_id].eager
             if eager then g.l0.lmw_g.irls[lexer_rule_id].eager = true end
         end
         local eager = g.l0.lmw_g.isys[discard_symbol_id].eager
@@ -885,7 +885,7 @@ END_OF_LUA
         end
     end
     if g1_lexeme_id >= 0 then
-        g.g1.lmw_g.isys[g1_lexeme_id].assertion = assertion_id
+        g.g1.isys[g1_lexeme_id].assertion = assertion_id
     end
 END_OF_LUA
         'iiii', $lexer_rule_id, $g1_lexeme_id, $assertion_id, $discard_symbol_id );
@@ -1331,7 +1331,7 @@ sub add_G1_user_rule {
           $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
           <<'END_OF_LUA', 's', $xbnf_name);
     local grammar, xbnf_name = ...
-    local default_rank = grammar.g1.lmw_g:default_rank()
+    local default_rank = grammar.g1:default_rank()
     local xbnf_id = grammar.g1.xbnfs[xbnf_name].id
     return default_rank, xbnf_id
 END_OF_LUA
@@ -1365,11 +1365,11 @@ END_OF_LUA
     -- remove the test for nil or less than zero
     -- once refactoring is complete?
     _M.throw = false
-    local base_irl_id = g.g1.lmw_g:rule_new(rule)
+    local base_irl_id = g.g1:rule_new(rule)
     -- print('base_irl_id: ', inspect(base_irl_id))
     _M.throw = true
     if not base_irl_id or base_irl_id < 0 then return -1 end
-    g.g1.lmw_g.irls[base_irl_id] = { id = base_irl_id }
+    g.g1.irls[base_irl_id] = { id = base_irl_id }
     return base_irl_id
 END_OF_LUA
 
@@ -1403,7 +1403,7 @@ END_OF_LUA
     -- print('arg_hash: ', inspect(arg_hash))
     arg_hash.proper = (arg_hash.proper ~= 0)
     _M.throw = false
-    local base_irl_id = g.g1.lmw_g:sequence_new(arg_hash)
+    local base_irl_id = g.g1:sequence_new(arg_hash)
     _M.throw = true
     -- remove the test for nil or less than zero
     -- once refactoring is complete?
@@ -1411,7 +1411,7 @@ END_OF_LUA
 
     local g1_rule = setmetatable({}, _M.class_irl)
     g1_rule.id = base_irl_id
-    g.g1.lmw_g.irls[base_irl_id] = g1_rule
+    g.g1.irls[base_irl_id] = g1_rule
     return base_irl_id
 END_OF_LUA
 
@@ -1423,7 +1423,7 @@ END_OF_LUA
         $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
             <<'END_OF_LUA', 's', $rule_description );
             local grammar, rule_description = ...
-            local g1g = grammar.g1.lmw_g
+            local g1g = grammar.g1
             local error_code = g1g:error_code()
             local problem_description
             if error_code == _M.err.DUPLICATE_RULE then
@@ -1440,11 +1440,11 @@ END_OF_LUA
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'iiii',
         local slg, irl_id, ranking_is_high, rank, xbnf_id = ...
-        local g1g = slg.g1.lmw_g
+        local g1g = slg.g1
         g1g:rule_null_high_set(irl_id, ranking_is_high)
         g1g:rule_rank_set(irl_id, rank)
         local xbnf = slg.g1.xbnfs[xbnf_id]
-        local irl = slg.g1.lmw_g.irls[irl_id]
+        local irl = slg.g1.irls[irl_id]
         irl.xbnf = xbnf
         -- right now, the action & mask of an irl
         -- is always the action/mask of its xbnf.
@@ -1651,7 +1651,7 @@ sub Marpa::R3::Scanless::G::start_symbol_id {
     ('@' .__FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', '>*' ) ;
     local grammar = ...
-    return grammar.g1.lmw_g:start_symbol()
+    return grammar.g1:start_symbol()
 END_OF_LUA
     return $start_symbol;
 }
@@ -1664,16 +1664,16 @@ sub Marpa::R3::Scanless::G::rule_name {
       <<'END_OF_LUA', 'i', $irlid);
     local slg, irlid = ...
     local g1 = slg.g1
-    local irl = g1.lmw_g.irls[irlid]
+    local irl = g1.irls[irlid]
     local xbnf = irl.xbnf
     if not xbnf then
         return string.format('Non-existent rule %d', irlid)
     end
     local name = xbnf.name
     if name then return name end
-    local lmw_g = g1.lmw_g
+    local lmw_g = g1
     local lhs_isyid = lmw_g:rule_lhs(irlid)
-    return slg.g1.lmw_g:symbol_name(lhs_isyid)
+    return slg.g1:symbol_name(lhs_isyid)
 END_OF_LUA
 
     return $rule_name;
@@ -1810,7 +1810,7 @@ sub Marpa::R3::Scanless::G::symbol_is_accessible {
     ('@' .__FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', 'i>*', $symid ) ;
     local grammar, symid = ...
-    local g1g = grammar.g1.lmw_g
+    local g1g = grammar.g1
     return g1g:symbol_is_accessible(symid)
 END_OF_LUA
 
@@ -1823,7 +1823,7 @@ sub Marpa::R3::Scanless::G::symbol_is_productive {
     ('@' .__FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', 'i>*', $symid ) ;
     local grammar, symid = ...
-    local g1g = grammar.g1.lmw_g
+    local g1g = grammar.g1
     return g1g:symbol_is_productive(symid)
 END_OF_LUA
 
@@ -1836,7 +1836,7 @@ sub Marpa::R3::Scanless::G::symbol_is_nulling {
     ('@' .__FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', 'i>*', $symid ) ;
     local grammar, symid = ...
-    local g1g = grammar.g1.lmw_g
+    local g1g = grammar.g1
     return g1g:symbol_is_nulling(symid)
 END_OF_LUA
 
@@ -1853,7 +1853,7 @@ sub Marpa::R3::Scanless::G::show_dotted_rule {
     ('@' .__FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', 'i>*', $irlid ) ;
     local grammar, irlid = ...
-    local g1g = grammar.g1.lmw_g
+    local g1g = grammar.g1
     local minimum = g1g:sequence_min(irlid)
     if not minimum then return 0, -1 end
     return 1, minimum
@@ -2226,7 +2226,7 @@ sub Marpa::R3::Scanless::G::show_nrls {
         ('@' . __FILE__ . ':' .  __LINE__),
 	<<'END_OF_LUA', '' );
     local grammar = ...
-    local g1g = grammar.g1.lmw_g
+    local g1g = grammar.g1
     local nrl_count = g1g:_irl_count()
     local pieces = {}
     for nrl_id = 0, nrl_count - 1 do
@@ -2246,7 +2246,7 @@ sub Marpa::R3::Scanless::G::show_nsys {
         ('@' . __FILE__ . ':' .  __LINE__),
 	<<'END_OF_LUA', '' );
     local grammar = ...
-    local g1g = grammar.g1.lmw_g
+    local g1g = grammar.g1
     local nsy_count = g1g:_nsy_count()
     local pieces = {}
     for nsy_id = 0, nsy_count - 1 do
@@ -2265,7 +2265,7 @@ sub Marpa::R3::Scanless::G::show_ahms {
         ('@' . __FILE__ . ':' .  __LINE__),
 	<<'END_OF_LUA', '' );
     local grammar = ...
-    local g1g = grammar.g1.lmw_g
+    local g1g = grammar.g1
     return g1g:show_ahms()
 END_OF_LUA
 
@@ -2281,7 +2281,7 @@ sub Marpa::R3::Scanless::G::show_dotted_irl {
         ('@' . __FILE__ . ':' .  __LINE__),
 	<<'END_OF_LUA', 'ii', $irl_id, $dot_position );
     local grammar, irl_id, dot_position = ...
-    local g1g = grammar.g1.lmw_g
+    local g1g = grammar.g1
     return g1g:show_dotted_irl(irl_id, dot_position)
 END_OF_LUA
     return $result;
@@ -2295,7 +2295,7 @@ sub Marpa::R3::Scanless::G::show_briefer_ahm {
         ('@' . __FILE__ . ':' .  __LINE__),
 	<<'END_OF_LUA', 'i', $item_id );
     local grammar, item_id = ...
-    local g1g = grammar.g1.lmw_g
+    local g1g = grammar.g1
     local irl_id = g1g:_ahm_irl(item_id)
     local dot_position = g1g:_ahm_position(item_id)
     if (dot_position < 0 ) then
@@ -2314,7 +2314,7 @@ sub Marpa::R3::Scanless::G::brief_nrl {
     my ($text) = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'i', $nrl_id );
     local grammar, nrl_id = ...
-    local g1g = grammar.g1.lmw_g
+    local g1g = grammar.g1
     return g1g:brief_nrl(nrl_id)
 END_OF_LUA
 

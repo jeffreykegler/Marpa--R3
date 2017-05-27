@@ -333,7 +333,7 @@ sub resolve_rule_by_id {
           $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
             <<'END_OF_LUA', 'i>*', $irlid );
     local slg, irl_id = ...
-    return slg.g1.lmw_g.irls[irl_id].action
+    return slg.g1.irls[irl_id].action
 END_OF_LUA
 
     my $resolve_error;
@@ -378,7 +378,7 @@ sub rule_blessing_find {
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'is>*', $irlid, ($bless_package // ''));
         local slg, irlid, bless_package = ...
-        local irl = slg.g1.lmw_g.irls[irlid]
+        local irl = slg.g1.irls[irlid]
         local blessing = '::undef'
         local xbnf = irl.xbnf
         if xbnf then
@@ -430,7 +430,7 @@ sub resolve_grammar {
               $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
                 <<'END_OF_LUA', 'is>*', $irlid );
     local slg, irl_id, rule_desc = ...
-    local action = slg.g1.lmw_g.irls[irl_id].action
+    local action = slg.g1.irls[irl_id].action
     local message = string.format(
         "Could not resolve action\n  Rule was %s\n",
         rule_desc)
@@ -477,7 +477,7 @@ qq{Attempt to bless, but improper semantics: "$semantics"\n},
           $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
             <<'END_OF_LUA', '>*' );
     local grammar = ...
-    local g1g = grammar.g1.lmw_g
+    local g1g = grammar.g1
     return g1g:highest_rule_id()
 END_OF_LUA
 
@@ -497,7 +497,7 @@ END_OF_LUA
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', '>*' );
     local grammar = ...
-    local g1g = grammar.g1.lmw_g
+    local g1g = grammar.g1
     return g1g:highest_symbol_id()
 END_OF_LUA
 
@@ -739,7 +739,7 @@ sub registrations_find {
               $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
                 <<'END_OF_LUA', 'i>*', $irlid );
     local grammar, irlid = ...
-    local g1g = grammar.g1.lmw_g
+    local g1g = grammar.g1
     return g1g:rule_lhs(irlid)
 END_OF_LUA
 
@@ -824,7 +824,7 @@ qq{  Cannot bless rule when it resolves to a scalar constant},
           $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
             <<'END_OF_LUA', 'i>*', $irlid );
     local grammar, irlid = ...
-    local g1g = grammar.g1.lmw_g
+    local g1g = grammar.g1
     return g1g:rule_lhs(irlid), g1g:rule_is_nullable(irlid)
 END_OF_LUA
 
@@ -868,7 +868,7 @@ END_OF_LUA
           $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
             <<'END_OF_LUA', 'i>*', $irlids );
     local grammar, irlids = ...
-    local g1g = grammar.g1.lmw_g
+    local g1g = grammar.g1
     local empty_rules = {}
     for ix = 1, #irlids do
         local irlid = irlids[ix]
@@ -955,7 +955,7 @@ END_OF_LUA
           $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
             <<'END_OF_LUA', '>*' );
     local grammar = ...
-    local g1g = grammar.g1.lmw_g
+    local g1g = grammar.g1
     return g1g:highest_symbol_id()
 END_OF_LUA
 
@@ -1061,7 +1061,7 @@ END_OF_LUA
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', '' );
         local grammar = ...
-        return grammar.g1.lmw_g:highest_symbol_id()
+        return grammar.g1:highest_symbol_id()
 END_OF_LUA
 
   LEXEME: for my $lexeme_id ( 0 .. $highest_symbol_id ) {
@@ -1099,9 +1099,9 @@ END_OF_LUA
               $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
                 <<'END_OF_LUA', 'i', $irlid );
         local slg, irlid = ...
-        local g1g = slg.g1.lmw_g
+        local g1g = slg.g1
         local is_sequence_rule = g1g:sequence_min(irlid) and 1 or 0
-        local irl = slg.g1.lmw_g.irls[irlid]
+        local irl = slg.g1.irls[irlid]
         local xbnf = irl.xbnf
         local is_discard_sequence = false
         if xbnf and xbnf.discard_separation and is_sequence_rule then
@@ -1203,7 +1203,7 @@ END_OF_LUA
                     ( '@' . __FILE__ . ':' . __LINE__ ),
                     <<'END_OF_LUA', 'i>0', $irlid );
                         local slg, irlid = ...
-                        return slg.g1.lmw_g.irls[irlid].mask
+                        return slg.g1.irls[irlid].mask
 END_OF_LUA
 
                 my @elements =
@@ -1279,7 +1279,7 @@ qq{    Semantics were specified as "$original_semantics"\n}
                             ( '@' . __FILE__ . ':' . __LINE__ ),
                             <<'END_OF_LUA', 'i>*', $irlid );
     local grammar, irlid = ...
-    local g1g = grammar.g1.lmw_g
+    local g1g = grammar.g1
     return g1g:rule_lhs(irlid)
 END_OF_LUA
                         push @push_ops, $op_lua, $op_push_constant_key,
@@ -1321,7 +1321,7 @@ END_OF_LUA
                             ( '@' . __FILE__ . ':' . __LINE__ ),
                             <<'END_OF_LUA', 'i>*', $irlid );
     local grammar, irlid = ...
-    local g1g = grammar.g1.lmw_g
+    local g1g = grammar.g1
     local lhs_id = g1g:rule_lhs(irlid)
     return g1g:symbol_name(lhs_id)
 END_OF_LUA
@@ -1367,7 +1367,7 @@ END_OF_LUA
                     ( '@' . __FILE__ . ':' . __LINE__ ),
                     <<'END_OF_LUA', 'i>0', $irlid );
                         local slg, irlid = ...
-                        return slg.g1.lmw_g.irls[irlid].mask
+                        return slg.g1.irls[irlid].mask
 END_OF_LUA
 
                     if ( $rule_length > 0 ) {
@@ -1417,7 +1417,7 @@ END_OF_LUA
           $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
             <<'END_OF_LUA', 'i>*', $start_symbol_id );
     local grammar, irlid = ...
-    local g1g = grammar.g1.lmw_g
+    local g1g = grammar.g1
     return (g1g:symbol_is_nullable(irlid) and 1 or 0)
 END_OF_LUA
 
@@ -1866,7 +1866,7 @@ sub trace_op {
     local b = slr.lmw_b
     local o = slr.lmw_o
     local t = slr.lmw_t
-    local g1g = slr.slg.g1.lmw_g
+    local g1g = slr.slg.g1
     local or_node_id = t:_nook_or_node(nook_ix)
     local choice = t:_nook_choice(nook_ix)
     local trace_irl_id = b:_or_node_irl(or_node_id)

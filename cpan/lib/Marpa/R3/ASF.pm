@@ -235,8 +235,8 @@ sub nook_has_semantic_cause {
     local recce, or_node = ...
     local irl_id = recce.lmw_b:_or_node_irl(or_node)
     local predot_position = recce.lmw_b:_or_node_position(or_node) - 1
-    local predot_isyid = recce.slg.g1.lmw_g:_irl_rhs(irl_id, predot_position)
-    return recce.slg.g1.lmw_g:_nsy_is_semantic(predot_isyid)
+    local predot_isyid = recce.slg.g1:_irl_rhs(irl_id, predot_position)
+    return recce.slg.g1:_nsy_is_semantic(predot_isyid)
 END_OF_LUA
      return $result;
 } ## end sub nook_has_semantic_cause
@@ -308,7 +308,7 @@ sub Marpa::R3::Internal::ASF::blessings_set {
         <<'END_OF_LUA', '>*' );
     local recce = ...
     local grammar = recce.slg
-    local g1g = grammar.g1.lmw_g
+    local g1g = grammar.g1
     return g1g:highest_rule_id()
 END_OF_LUA
 
@@ -318,7 +318,7 @@ END_OF_LUA
             <<'END_OF_LUA', 'i>*', $irlid );
     local recce, irlid = ...
     local slg = recce.slg
-    local irl = slg.g1.lmw_g.irls[irlid]
+    local irl = slg.g1.irls[irlid]
     local xbnf = irl.xbnf
     if xbnf then
         local blessing = xbnf.bless
@@ -327,7 +327,7 @@ END_OF_LUA
         end
     end
 
-    local g1g = slg.g1.lmw_g
+    local g1g = slg.g1
     local lhs_id = g1g:rule_lhs(irlid)
     return 'continue', g1g:symbol_name(lhs_id)
 END_OF_LUA
@@ -348,7 +348,7 @@ END_OF_LUA
         <<'END_OF_LUA', '>*' );
     local recce = ...
     local grammar = recce.slg
-    local g1g = grammar.g1.lmw_g
+    local g1g = grammar.g1
     return g1g:highest_symbol_id()
 END_OF_LUA
 
@@ -526,7 +526,7 @@ sub nid_sort_ix {
         <<'END_OF_LUA', 'i', $nid);
         local slr, nid = ...
         local irl_id = slr.lmw_b:_or_node_irl(nid)
-        return slr.slg.g1.lmw_g:_source_xrl(irl_id)
+        return slr.slg.g1:_source_xrl(irl_id)
 END_OF_LUA
         return $result;
     }
@@ -538,7 +538,7 @@ END_OF_LUA
     <<'END_OF_LUA', 'i', $and_node_id);
     local slr, and_node_id = ...
     local token_nsy_id = slr.lmw_b:_and_node_symbol(and_node_id)
-    local token_id = slr.slg.g1.lmw_g:_source_xsy(token_nsy_id)
+    local token_id = slr.slg.g1:_source_xsy(token_nsy_id)
     -- -2 is reserved for 'end of data'
     return -token_id - 3
 END_OF_LUA
@@ -569,7 +569,7 @@ sub nid_rule_id {
     <<'END_OF_LUA', 'i', $nid);
     local recce, nid = ...
     local irl_id = recce.lmw_b:_or_node_irl(nid)
-    local xrl_id = recce.slg.g1.lmw_g:_source_xrl(irl_id)
+    local xrl_id = recce.slg.g1:_source_xrl(irl_id)
     return xrl_id
 END_OF_LUA
     return $xrl_id;
@@ -666,7 +666,7 @@ sub nid_token_id {
     <<'END_OF_LUA',
         local slr, and_node_id = ...
         local token_nsy_id = slr.lmw_b:_and_node_symbol(and_node_id)
-        local token_id = slr.slg.g1.lmw_g:_source_xsy(token_nsy_id)
+        local token_id = slr.slg.g1:_source_xsy(token_nsy_id)
         return token_id
 END_OF_LUA
         'i', $and_node_id);
@@ -687,7 +687,7 @@ sub nid_symbol_id {
     <<'END_OF_LUA',
         local slr, nid = ...
         local irl_id = slr.lmw_b:_or_node_irl(nid)
-        local g1g = slr.slg.g1.lmw_g
+        local g1g = slr.slg.g1
         local xrl_id = g1g:_source_xrl(irl_id)
         local lhs_id = g1g:rule_lhs(xrl_id)
         return lhs_id
