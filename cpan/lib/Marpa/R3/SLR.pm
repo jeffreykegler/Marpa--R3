@@ -150,13 +150,13 @@ sub Marpa::R3::Scanless::R::new {
 
     local l0g = grammar.l0.lmw_g
     slr.l0 = {}
-    slr.l0.irls = {}
+    slr.l0_irls = {}
 
     local g1g = grammar.g1.lmw_g
     slr.g1 = _M.recce_new(g1g)
     -- TODO Census, eliminate most (all?) references via lmw_r, lmw_g
     slr.g1.lmw_r = slr.g1
-    slr.g1.isys = {}
+    slr.g1_isys = {}
 
     slr.codepoint = nil
     slr.inputs = {}
@@ -198,7 +198,7 @@ sub Marpa::R3::Scanless::R::new {
     slr.is_external_scanning = false
 
     local g_l0_rules = grammar.l0.lmw_g.irls
-    local r_l0_rules = slr.l0.irls
+    local r_l0_rules = slr.l0_irls
     -- print('g_l0_rules: ', inspect(g_l0_rules))
     local max_l0_rule_id = l0g:highest_rule_id()
     for rule_id = 0, max_l0_rule_id do
@@ -213,7 +213,7 @@ sub Marpa::R3::Scanless::R::new {
     end
     -- print('r_l0_rules: ', inspect(r_l0_rules))
     local g_g1_symbols = grammar.g1.lmw_g.isys
-    local r_g1_symbols = slr.g1.isys
+    local r_g1_symbols = slr.g1_isys
     local max_g1_symbol_id = g1g:highest_symbol_id()
     for symbol_id = 0, max_g1_symbol_id do
         r_g1_symbols[symbol_id] = {
@@ -1694,7 +1694,7 @@ sub Marpa::R3::Scanless::R::lexeme_priority_set {
             ))
         end
         local g_lexeme_data = slg.g1.lmw_g.isys[lexeme_id]
-        local r_lexeme_data = recce.g1.isys[lexeme_id]
+        local r_lexeme_data = recce.g1_isys[lexeme_id]
         if not g_lexeme_data.is_lexeme then
             print(inspect(lexeme_data))
             _M.userX(string.format(

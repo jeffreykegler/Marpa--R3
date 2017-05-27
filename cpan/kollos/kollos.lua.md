@@ -1095,6 +1095,8 @@ This is a registry object.
     class_slr_fields['is_external_scanning'] = true
     class_slr_fields['l0'] = true
     class_slr_fields['l0_candidate'] = true
+    class_slr_fields.g1_isys = true
+    class_slr_fields.l0_irls = true
     class_slr_fields['irls'] = true
     class_slr_fields['lexeme_queue'] = true
     class_slr_fields['lexer_start_pos'] = true
@@ -1411,7 +1413,7 @@ rule, false otherwise.
     function _M.class_slr.l0_track_candidates(slr)
         local l0r = slr.l0.lmw_r
         local l0g = slr.slg.l0.lmw_g
-        local l0_rules = slr.l0.irls
+        local l0_rules = slr.l0_irls
         local eager
         local complete_lexemes = false
         local es_id = l0r:latest_earley_set()
@@ -1556,7 +1558,7 @@ Determine which lexemes are acceptable or discards.
             if dot_position ~= -1 then
                goto NEXT_EARLEY_ITEM
             end
-            g1_lexeme = slr.l0.irls[rule_id].g1_lexeme
+            g1_lexeme = slr.l0_irls[rule_id].g1_lexeme
             g1_lexeme = g1_lexeme or -1
             if g1_lexeme == -1 then
                goto NEXT_EARLEY_ITEM
@@ -1577,7 +1579,7 @@ Determine which lexemes are acceptable or discards.
                     error(string.format('Internnal error: Marpa recognized unexpected token @%d-%d: lexme=%d',
                         slr.start_of_lexeme, slr.end_of_lexeme, g1_lexeme))
                 end
-                local this_lexeme_priority = slr.g1.isys[g1_lexeme].lexeme_priority
+                local this_lexeme_priority = slr.g1_isys[g1_lexeme].lexeme_priority
                 if this_lexeme_priority > high_lexeme_priority then
                     high_lexeme_priority = this_lexeme_priority
                 end
@@ -1642,7 +1644,7 @@ events into real trace events.
                 end
                     local g1r = slr.g1.lmw_r
                     local event_on_discard_active =
-                        slr.l0.irls[rule_id].event_on_discard_active
+                        slr.l0_irls[rule_id].event_on_discard_active
                     if event_on_discard_active then
                         local last_g1_location = g1r:latest_earley_set()
                         local q = slr.event_queue
@@ -1670,7 +1672,7 @@ Returns `true` is there was one,
             local bang_trace, event_type, lexeme_block, lexeme_start, lexeme_end,
                     g1_lexeme, priority, required_priority =
                 table.unpack(this_event)
-            local pause_before_active = slr.g1.isys[g1_lexeme].pause_before_active
+            local pause_before_active = slr.g1_isys[g1_lexeme].pause_before_active
             if pause_before_active then
                 local q = slr.event_queue
                 if slr.trace_terminals > 2 then
@@ -1781,7 +1783,7 @@ Read alternatives into the G1 grammar.
 
                 slr.start_of_pause_lexeme = lexeme_start
                 slr.end_of_pause_lexeme = lexeme_end
-                local pause_after_active = slr.g1.isys[g1_lexeme].pause_after_active
+                local pause_after_active = slr.g1_isys[g1_lexeme].pause_after_active
                 if pause_after_active then
                     local q = slr.event_queue
                     if slr.trace_terminals > 2 then
@@ -2412,7 +2414,7 @@ an L0 range
         events = slg.discard_event_by_name[event_name]
         if events then
             local g_l0_rules = slg.l0.lmw_g.irls
-            local r_l0_rules = slr.l0.irls
+            local r_l0_rules = slr.l0_irls
             for ix = 1, #events do
                 local event_data = events[ix]
                 local irlid = event_data.irlid
@@ -2429,7 +2431,7 @@ an L0 range
         events = slg.lexeme_event_by_name[event_name]
         if events then
             local g_g1_symbols = slg.g1.lmw_g.isys
-            local r_g1_symbols = slr.g1.isys
+            local r_g1_symbols = slr.g1_isys
             for ix = 1, #events do
                     local event_data = events[ix]
                     local isyid = event_data.isyid
@@ -3854,8 +3856,6 @@ necessarily unique.
     class_recce_fields._libmarpa = true
     class_recce_fields.lmw_g = true
     class_recce_fields.lmw_r = true
-    class_recce_fields.g1 = true
-    class_recce_fields.isys = true
 ```
 
 ```
@@ -7069,7 +7069,10 @@ TODO -- Do I want to turn this off after developement?
         table.__index = function (t, n)
           local v = rawget(t, n) or table[n]
           if v == nil and not table.__declared[n] then
-            error("variable '"..n.."' is not declared", 2)
+            error(string.format(
+                "member %s.%s is not declared",
+                name, n),
+            2)
           end
           return v
         end
