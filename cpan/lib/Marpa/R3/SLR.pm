@@ -154,6 +154,7 @@ sub Marpa::R3::Scanless::R::new {
 
     local g1g = grammar.g1.lmw_g
     slr.g1 = _M.recce_new(g1g)
+    -- TODO Census, eliminate most (all?) references via lmw_r, lmw_g
     slr.g1.lmw_r = slr.g1
     slr.g1.isys = {}
 
@@ -261,7 +262,7 @@ END_OF_LUA
         $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', '' );
         local recce = ...
-        local g1r = recce.g1.lmw_r
+        local g1r = recce.g1
         local return_value = g1r:start_input()
         if return_value == -1 then
             error( string.format('Recognizer start of input failed: %s',
@@ -448,7 +449,7 @@ END_OF_LUA
             <<'END_OF_LUA', 'i', $value
     local slr, value = ...
     slr.too_many_earley_items = value
-    slr.g1.lmw_r:earley_item_warning_threshold_set(value)
+    slr.g1:earley_item_warning_threshold_set(value)
 END_OF_LUA
         );
     }
@@ -1217,7 +1218,7 @@ sub Marpa::R3::Scanless::R::show_progress {
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
 
     my ($last_ordinal) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        'local recce = ...; return recce.g1.lmw_r:latest_earley_set()', '' );
+        'local recce = ...; return recce.g1:latest_earley_set()', '' );
 
     if ( not defined $start_ordinal ) {
         $start_ordinal = $last_ordinal;
@@ -1356,7 +1357,7 @@ sub Marpa::R3::Scanless::R::terminals_expected {
     ('@' . __FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', '>0');
     local recce = ...
-    local terminals_expected = recce.g1.lmw_r:terminals_expected()
+    local terminals_expected = recce.g1:terminals_expected()
     return terminals_expected
 END_OF_LUA
 
@@ -1369,7 +1370,7 @@ sub Marpa::R3::Scanless::R::exhausted {
     ('@' . __FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', '');
     local recce = ...
-    local is_exhausted = recce.g1.lmw_r:is_exhausted()
+    local is_exhausted = recce.g1:is_exhausted()
     return is_exhausted
 END_OF_LUA
     return $is_exhausted;
@@ -1382,7 +1383,7 @@ sub Marpa::R3::Scanless::R::g1_pos {
     ('@' . __FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', '');
     local recce = ...
-    local latest_earley_set = recce.g1.lmw_r:latest_earley_set()
+    local latest_earley_set = recce.g1:latest_earley_set()
     return latest_earley_set
 END_OF_LUA
     return $latest_earley_set;
@@ -1394,7 +1395,7 @@ sub Marpa::R3::Scanless::R::current_earleme {
     ('@' . __FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', '');
     local recce = ...
-    local current_earleme = recce.g1.lmw_r:current_earleme()
+    local current_earleme = recce.g1:current_earleme()
     return current_earleme
 END_OF_LUA
     return $current_earleme;
@@ -1407,7 +1408,7 @@ sub Marpa::R3::Scanless::R::furthest_earleme {
     ('@' . __FILE__ . ':' . __LINE__),
         <<'END_OF_LUA', '');
     local recce = ...
-    local furthest_earleme = recce.g1.lmw_r:furthest_earleme()
+    local furthest_earleme = recce.g1:furthest_earleme()
     return furthest_earleme
 END_OF_LUA
     return $furthest_earleme;
@@ -1419,7 +1420,7 @@ sub Marpa::R3::Scanless::R::earleme {
     ('@' . __FILE__ . ':' . __LINE__),
         <<'END_OF_LUA', 'i', $earley_set_id);
     local recce, earley_set_id = ...
-    local earleme = recce.g1.lmw_r:earleme(earley_set_id)
+    local earleme = recce.g1:earleme(earley_set_id)
     return earleme
 END_OF_LUA
     return $earleme;
@@ -1452,7 +1453,7 @@ sub Marpa::R3::Scanless::R::lexeme_alternative {
                 <<'END_OF_LUA', 'i', $symbol_id );
         local slr, symbol_id = ...
         local token_ix = _M.defines.TOKEN_VALUE_IS_LITERAL
-        local g1r = slr.g1.lmw_r
+        local g1r = slr.g1
         slr.is_external_scanning = true
         local return_value = g1r:alternative(symbol_id, token_ix, 1)
         return return_value
@@ -1465,7 +1466,7 @@ END_OF_LUA
                 <<'END_OF_LUA', 'i', $symbol_id );
         local slr, symbol_id = ...
         local token_ix = _M.defines.TOKEN_VALUE_IS_UNDEF
-        local g1r = slr.g1.lmw_r
+        local g1r = slr.g1
         slr.is_external_scanning = true
         local return_value = g1r:alternative(symbol_id, token_ix, 1)
         return return_value
@@ -1477,7 +1478,7 @@ END_OF_LUA
         local slr, symbol_id, token_sv = ...
         local token_ix = #slr.token_values + 1
         slr.token_values[token_ix] = token_sv
-        local g1r = slr.g1.lmw_r
+        local g1r = slr.g1
         slr.is_external_scanning = true
         local return_value = g1r:alternative(symbol_id, token_ix, 1)
         return return_value
@@ -1728,7 +1729,7 @@ sub Marpa::R3::Scanless::R::earley_set_size {
     ('@' . __FILE__ . ':' . __LINE__),
         <<'END_OF_LUA', 'i', ($set_id // -1));
     local recce, set_id = ...
-    local g1r = recce.g1.lmw_r
+    local g1r = recce.g1
     if set_id < 0 then set_id = g1r:lastest_earley_set() end
     return g1r:_earley_set_size(set_id)
 END_OF_LUA
@@ -1743,7 +1744,7 @@ sub Marpa::R3::Scanless::R::show_earley_sets {
     ('@' . __FILE__ . ':' . __LINE__),
         <<'END_OF_LUA', '');
         local recce = ...
-        local g1r = recce.g1.lmw_r
+        local g1r = recce.g1
         return g1r:current_earleme(), g1r:furthest_earleme()
 END_OF_LUA
 
@@ -2148,7 +2149,7 @@ sub Marpa::R3::Scanless::R::verbose_or_node {
         local set = bocage:_or_node_set(or_node_id)
         local irl_id = bocage:_or_node_irl(or_node_id)
         local position = bocage:_or_node_position(or_node_id)
-        local g1r = recce.g1.lmw_r
+        local g1r = recce.g1
         local origin_earleme = g1r:earleme(origin)
         local current_earleme = g1r:earleme(set)
         local text = string.format(
