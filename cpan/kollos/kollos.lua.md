@@ -1619,10 +1619,22 @@ events into real trace events.
                     table.unpack(this_event)
                 if priority < high_lexeme_priority then
                     if slr.trace_terminals > 0 then
-                        local q = slr.event_queue
-                        q[#q+1] = { '!trace', 'outprioritized lexeme',
-                           block_ix, lexeme_start, lexeme_end, g1_lexeme,
-                           priority, high_lexeme_priority}
+                        local xsy = g1g:xsy(g1_lexeme)
+                        if xsy then
+                            local q = slr.event_queue
+                            local event = { '!trace', 'outprioritized lexeme',
+                               block_ix, lexeme_start, lexeme_end, g1_lexeme,
+                               priority, high_lexeme_priority}
+                            event.msg = string.format(
+                                "Outprioritized lexeme %s: %s; value=%q;\z
+                                 priority was %d, but %d is required",
+                                slr:lc_range_brief(block_ix, lexeme_start, block_ix, lexeme_end - 1),
+                                xsy:display_form(),
+                                slr:l0_literal( lexeme_start,  lexeme_end - lexeme_start, block_ix ),
+                                priority, high_lexeme_priority
+                            )
+                            q[#q+1] = event
+                        end
                     end
                     goto NEXT_LEXEME
                 end
