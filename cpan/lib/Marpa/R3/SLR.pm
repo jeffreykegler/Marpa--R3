@@ -634,27 +634,6 @@ END_OF_LUA
 
 my $libmarpa_trace_event_handlers = {
 
-    'outprioritized lexeme' => sub {
-        my ( $slr, $event ) = @_;
-        my ( undef, undef, $block, $lexeme_start_pos, $lexeme_end_pos, $g1_lexeme,
-            $lexeme_priority, $required_priority )
-            = @{$event};
-        my $raw_token_value =
-            $slr->literal( $lexeme_start_pos,
-            $lexeme_end_pos - $lexeme_start_pos );
-        my $trace_file_handle =
-            $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
-        my $slg              = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-        say {$trace_file_handle}
-            qq{Outprioritized lexeme },
-            lc_range_brief( $slr, $block, $lexeme_start_pos,
-                $block, $lexeme_end_pos - 1 ),
-            q{: },
-            $slg->symbol_display_form($g1_lexeme),
-            qq{; value="$raw_token_value"; },
-            qq{priority was $lexeme_priority, but $required_priority was required}
-            or Marpa::R3::exception("Could not say(): $ERRNO");
-    },
     'g1 duplicate lexeme' => sub {
         my ( $slr, $event ) = @_;
         my ( undef, undef, $block, $lexeme_start_pos, $lexeme_end_pos, $g1_lexeme ) =
