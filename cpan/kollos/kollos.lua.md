@@ -1157,6 +1157,7 @@ This is a registry object.
             error('Internal error: l0r_new() failed %s',
                 slr.slg.l0.lmw_g:error_description())
         end
+        slr.l0 = l0r
         slr.l0.lmw_r = l0r
         -- reset the candidate in the lexer
         slr.l0_candidate = nil
