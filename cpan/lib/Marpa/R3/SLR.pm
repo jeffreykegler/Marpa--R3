@@ -791,44 +791,6 @@ my $libmarpa_trace_event_handlers = {
     },
 };
 
-my $libmarpa_event_handlers = {
-    q{!trace} => sub {
-        my ( $slr, $event ) = @_;
-        my $handler = $libmarpa_trace_event_handlers->{ $event->[1] };
-        if ( defined $handler ) {
-            $handler->( $slr, $event );
-        }
-        else {
-            my $trace_file_handle =
-                $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
-            say {$trace_file_handle} join q{ }, qw(Trace event:), @{$event}[1 .. $#{$event}]
-                or Marpa::R3::exception("Could not say(): $ERRNO");
-        } ## end else [ if ( defined $handler ) ]
-        return 0;
-    },
-
-    'l0 earley item threshold exceeded' => sub {
-        my ( $slr, $event ) = @_;
-        my ( undef, $position, $yim_count) = @{$event};
-        my $trace_file_handle =
-            $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
-        say {$trace_file_handle}
-            qq{L0 exceeded earley item threshold at pos $position: $yim_count Earley items}
-            or Marpa::R3::exception("Could not say(): $ERRNO");
-    },
-
-    'g1 earley item threshold exceeded' => sub {
-        my ( $slr, $event ) = @_;
-        my ( undef, $position, $yim_count) = @{$event};
-        my $trace_file_handle =
-            $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
-        say {$trace_file_handle}
-            qq{G1 exceeded earley item threshold at pos $position: $yim_count Earley items}
-            or Marpa::R3::exception("Could not say(): $ERRNO");
-    },
-
-};
-
 # Return 1 if internal scanning should pause
 sub Marpa::R3::Internal::Scanless::convert_libmarpa_events {
     my ($slr)    = @_;
