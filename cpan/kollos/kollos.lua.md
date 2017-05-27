@@ -1240,7 +1240,7 @@ The top-level read function.
                 slr.perl_pos = lexer_start_pos
                 slr.start_of_lexeme = lexer_start_pos
                 slr.lexer_start_pos = -1
-                slr.l0.lmw_r = nil
+                slr.l0 = nil
                 if slr.trace_terminals >= 1 then
                     local q = slr.event_queue
                     q[#q+1] = { '!trace', 'lexer restarted recognizer', slr.perl_pos}
