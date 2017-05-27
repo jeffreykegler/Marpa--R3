@@ -154,8 +154,7 @@ sub Marpa::R3::Scanless::R::new {
 
     local g1g = grammar.g1.lmw_g
     slr.g1 = _M.recce_new(g1g)
-    -- TODO Census, eliminate most (all?) references via lmw_r, lmw_g
-    slr.g1.lmw_r = slr.g1
+    -- TODO Census, eliminate most (all?) references via lmw_g
     slr.g1_isys = {}
 
     slr.codepoint = nil

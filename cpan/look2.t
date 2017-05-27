@@ -31,6 +31,10 @@ use Marpa::R3;
 
 ## no critic (Subroutines::RequireArgUnpacking)
 
+# Non-working code, not kept up to date
+# Kept for reference
+die "Non-working code";
+
 sub default_action {
     my (undef, $v) = @_;
     my $v_count = scalar @{$v};

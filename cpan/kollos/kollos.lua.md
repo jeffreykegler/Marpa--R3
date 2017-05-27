@@ -1158,7 +1158,6 @@ This is a registry object.
                 slr.slg.l0.lmw_g:error_description())
         end
         slr.l0 = l0r
-        slr.l0.lmw_r = l0r
         -- reset the candidate in the lexer
         slr.l0_candidate = nil
         local too_many_earley_items = slr.too_many_earley_items
@@ -3856,7 +3855,6 @@ necessarily unique.
     -- miranda: section+ class_recce field declarations
     class_recce_fields._libmarpa = true
     class_recce_fields.lmw_g = true
-    class_recce_fields.lmw_r = true
 ```
 
 ```
