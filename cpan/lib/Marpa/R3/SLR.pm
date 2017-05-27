@@ -933,11 +933,12 @@ END_OF_LUA
 
         my $event = $events[$event_ix-1];
         my $event_type = $event->[0];
-        my $handler = $libmarpa_event_handlers->{$event_type};
+
+        my $handler = $libmarpa_trace_event_handlers->{ $event->[1] };
         Marpa::R3::exception( ( join q{ }, 'Unknown event:', $event ) )
-            if not defined $handler;
-        $this_pause = 1 if $handler->( $slr, $event );
-        $pause = ($pause or $this_pause);
+           if not defined $handler;
+
+        $handler->( $slr, $event );
     }
 
     return $pause;

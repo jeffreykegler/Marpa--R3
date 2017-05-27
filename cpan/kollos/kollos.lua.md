@@ -2328,9 +2328,10 @@ an L0 range
                 goto NEXT_EVENT
             end
             if event_type == _M.event["EARLEY_ITEM_THRESHOLD"] then
-                local event = { 'g1 earley item threshold exceeded',
+                local event = { '!trace',
+                    'g1 earley item threshold exceeded',
                     perl_pos, event_value}
-                event.msg = string.format('!trace',
+                event.msg = string.format(
                     'G1 exceeded earley item threshold at pos %d: %d Earley items',
                     perl_pos, event_value)
                 q[#q+1] = event
@@ -2362,10 +2363,11 @@ an L0 range
                 goto NEXT_EVENT
             end
             if event_type == _M.event["EARLEY_ITEM_THRESHOLD"] then
-                local event = { 'l0 earley item threshold exceeded',
+                local event = { '!trace',
+                    'l0 earley item threshold exceeded',
                     perl_pos, event_value,
                     }
-                event.msg = string.format('!trace',
+                event.msg = string.format(
                     'L0 exceeded earley item threshold at pos %d: %d Earley items',
                     perl_pos, event_value)
                 q[#q+1] = event
