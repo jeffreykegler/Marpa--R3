@@ -1346,7 +1346,15 @@ otherwise an error code string.
 
         if slr.trace_terminals >= 1 then
            local q = slr.event_queue
-           q[#q+1] = { '!trace', 'lexer reading codepoint', codepoint, slr.perl_pos}
+           local perl_pos = slr.perl_pos
+           local event = { '!trace', 'lexer reading codepoint', codepoint, perl_pos}
+           event.msg = string.format(
+               'Reading codepoint %q 0x%04x at %s',
+               utf8.char(codepoint),
+               codepoint,
+                slr:lc_brief(perl_pos)
+           )
+           q[#q+1] = event
         end
         local tokens_accepted = 0
         for ix = 1, op_count do
@@ -1762,28 +1770,6 @@ Read alternatives into the G1 grammar.
                     )
                     q[#q+1] = event
                 end
-
-    --[[ 'g1 attempting lexeme' => sub {
-        my ( $slr, $event ) = @_;
-        my ( undef, undef, $block, $lexeme_start_pos, $lexeme_end_pos, $g1_lexeme ) =
-            @{$event};
-        my $raw_token_value =
-            $slr->literal( $lexeme_start_pos,
-            $lexeme_end_pos - $lexeme_start_pos );
-        my $trace_file_handle =
-            $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
-        my $slg              = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-        say {$trace_file_handle}
-            'Attempting to read lexeme ',
-            lc_range_brief( $slr, $block, $lexeme_start_pos,
-                $block, $lexeme_end_pos - 1 ),
-            q{ e}, $slr->g1_pos(),
-            q{: },
-            $slg->symbol_display_form($g1_lexeme),
-            qq{; value="$raw_token_value"}
-            or Marpa::R3::exception("Could not say(): $ERRNO");
-    }, --]]
-
             end
             local g1r = slr.g1
             local kollos = getmetatable(g1r).kollos

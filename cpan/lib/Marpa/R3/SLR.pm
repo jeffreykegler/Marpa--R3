@@ -634,23 +634,6 @@ END_OF_LUA
 
 my $libmarpa_trace_event_handlers = {
 
-    'lexer reading codepoint' => sub {
-        my ( $slr, $event ) = @_;
-        my ( undef, undef, $codepoint, $position, ) = @{$event};
-        my $char      = chr $codepoint;
-        my @char_desc = ();
-        push @char_desc, qq{"$char"}
-            if $char =~ /[\p{IsGraph}]/xms;
-        push @char_desc, ( sprintf '0x%04x', $codepoint );
-        my $char_desc = join q{ }, @char_desc;
-        my ( $line, $column ) = $slr->line_column($position);
-        my $trace_file_handle =
-            $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
-        my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-        say {$trace_file_handle}
-            qq{Reading codepoint $char_desc at line $line, column $column}
-            or Marpa::R3::exception("Could not say(): $ERRNO");
-    },
     'lexer accepted codepoint' => sub {
         my ( $slr, $event ) = @_;
         my ( undef, undef, $codepoint, $position, $token_id ) =
