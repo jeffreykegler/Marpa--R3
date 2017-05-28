@@ -634,26 +634,6 @@ END_OF_LUA
 
 my $libmarpa_trace_event_handlers = {
 
-    'lexer rejected codepoint' => sub {
-        my ( $slr, $event ) = @_;
-        my ( undef, undef, $codepoint, $position, $token_id ) =
-            @{$event};
-        my $char      = chr $codepoint;
-        my @char_desc = ();
-        push @char_desc, qq{"$char"}
-            if $char =~ /[\p{IsGraph}]/xms;
-        push @char_desc, ( sprintf '0x%04x', $codepoint );
-        my $char_desc = join q{ }, @char_desc;
-        my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-        my $symbol_display_form =
-            $slg->l0_symbol_display_form($token_id);
-        my ( $line, $column ) = $slr->line_column($position);
-        my $trace_file_handle =
-            $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
-        say {$trace_file_handle}
-            qq{Codepoint $char_desc rejected as $symbol_display_form at line $line, column $column}
-            or Marpa::R3::exception("Could not say(): $ERRNO");
-    },
     'lexer restarted recognizer' => sub {
         my ( $slr, $event ) = @_;
         my ( undef, undef, $position ) = @{$event};

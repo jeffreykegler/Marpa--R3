@@ -1324,8 +1324,17 @@ which will be 1 or 0.
         if result == _M.err.UNEXPECTED_TOKEN_ID then
             if slr.trace_terminals >= 1 then
                 local q = slr.event_queue
-                q[#q+1] = { '!trace', 'lexer rejected codepoint', codepoint,
-                     slr.perl_pos, symbol_id}
+                local perl_pos = slr.perl_pos
+                local event = { '!trace', 'lexer accepted codepoint', codepoint,
+                    perl_pos, symbol_id }
+                event.msg = string.format(
+                    'Codepoint %q 0x%04x rejected as %s at %s',
+                    utf8.char(codepoint),
+                    codepoint,
+                    l0g:force_form(symbol_id),
+                    slr:lc_brief(perl_pos)
+                )
+                q[#q+1] = event
             end
             return 0
         end
