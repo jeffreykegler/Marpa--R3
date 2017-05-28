@@ -632,10 +632,6 @@ END_OF_LUA
 
 } ## end sub Marpa::R3::Scanless::R::read
 
-my $libmarpa_trace_event_handlers = {
-
-};
-
 # Return 1 if internal scanning should pause
 sub Marpa::R3::Internal::Scanless::convert_libmarpa_events {
     my ($slr)    = @_;
@@ -736,16 +732,7 @@ END_OF_LUA
         }
         my $this_pause = $value;
         $pause = ($pause or $this_pause);
-        next EVENT if $cmd ne 'nyi';
 
-        my $event = $events[$event_ix-1];
-        my $event_type = $event->[0];
-
-        my $handler = $libmarpa_trace_event_handlers->{ $event->[1] };
-        Marpa::R3::exception( ( join q{ }, 'Unknown event:', $event ) )
-           if not defined $handler;
-
-        $handler->( $slr, $event );
     }
 
     return $pause;
