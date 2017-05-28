@@ -637,102 +637,98 @@ sub Marpa::R3::Internal::Scanless::convert_libmarpa_events {
     my ($slr)    = @_;
     my $trace_file_handle =
         $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
+    my ($trace_msgs, $pause) = $slr->call_by_tag(( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', '');
+        local slr = ...
+        local trace_msgs = {}
+        local event_q = slr.event_queue
+        local pause = 0
+        for event_ix = 1, #event_q do
+            local event = slr.event_queue[event_ix]
+            -- print(inspect(event))
+            local event_type = event[1]
 
-    my $pause    = 0;
-    my @events = $slr->xs_events();
-
-    EVENT: for (my $event_ix = 1; $event_ix <= scalar @events; $event_ix++) {
-
-       my ($cmd, $value) = $slr->call_by_tag(( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 'i', $event_ix);
-        local slr, event_ix = ...
-        local event = slr.event_queue[event_ix]
-        -- print(inspect(event))
-        local event_type = event[1]
-
-        if event_type == "!trace" then
-            local msg = event.msg
-            if msg then return 'trace', msg end
-        end
-
-        if event_type == "'exhausted" then
-            local events = slr.external_events
-            events[#events+1] = { event_type }
-            return '', 1
-        end
-
-        if event_type == "'rejected" then
-            local events = slr.external_events
-            events[#events+1] = { event_type }
-            return '', 1
-        end
-
-        -- The code next set of events is highly similar -- an isyid at
-        -- event[2] is looked up in a table of event names.  Does it
-        -- make sense to share code, perhaps using closures?
-        if event_type == 'symbol completed' then
-            local completed_isyid = event[2]
-            local slg = slr.slg
-            local event_name = slg.completion_event_by_isy[completed_isyid].name
-            local events = slr.external_events
-            events[#events+1] = { event_name }
-            return '', 1
-        end
-
-        if event_type == 'symbol nulled' then
-            local nulled_isyid = event[2]
-            local slg = slr.slg
-            local event_name = slg.nulled_event_by_isy[nulled_isyid].name
-            local events = slr.external_events
-            events[#events+1] = { event_name }
-            return '', 1
-        end
-
-        if event_type == 'symbol predicted' then
-            local predicted_isyid = event[2]
-            local slg = slr.slg
-            local event_name = slg.prediction_event_by_isy[predicted_isyid].name
-            local events = slr.external_events
-            events[#events+1] = { event_name }
-            return '', 1
-        end
-
-        if event_type == 'after lexeme'
-            or event_type == 'before lexeme'
-        then
-            local lexeme_isyid = event[2]
-            local slg = slr.slg
-            local event_name = slg.lexeme_event_by_isy[lexeme_isyid].name
-            local events = slr.external_events
-            events[#events+1] = { event_name }
-            return '', 1
-        end
-
-        -- end of run of highly similar events
-
-        if event_type == 'discarded lexeme' then
-            local lexeme_irlid = event[2]
-            local slg = slr.slg
-            local event_name = slg.discard_event_by_irl[lexeme_irlid].name
-            local new_event = { event_name }
-            for ix = 3, #event do
-                new_event[#new_event+1] = event[ix]
+            if event_type == "!trace" then
+                local msg = event.msg
+                if msg then
+                trace_msgs[#trace_msgs+1] = msg
+                end
             end
-            local events = slr.external_events
-            events[#events+1] = new_event
-            return '', 1
+
+            if event_type == "'exhausted" then
+                local events = slr.external_events
+                events[#events+1] = { event_type }
+                pause = 1
+            end
+
+            if event_type == "'rejected" then
+                local events = slr.external_events
+                events[#events+1] = { event_type }
+                pause = 1
+            end
+
+            -- The code next set of events is highly similar -- an isyid at
+            -- event[2] is looked up in a table of event names.  Does it
+            -- make sense to share code, perhaps using closures?
+            if event_type == 'symbol completed' then
+                local completed_isyid = event[2]
+                local slg = slr.slg
+                local event_name = slg.completion_event_by_isy[completed_isyid].name
+                local events = slr.external_events
+                events[#events+1] = { event_name }
+                pause = 1
+            end
+
+            if event_type == 'symbol nulled' then
+                local nulled_isyid = event[2]
+                local slg = slr.slg
+                local event_name = slg.nulled_event_by_isy[nulled_isyid].name
+                local events = slr.external_events
+                events[#events+1] = { event_name }
+                pause = 1
+            end
+
+            if event_type == 'symbol predicted' then
+                local predicted_isyid = event[2]
+                local slg = slr.slg
+                local event_name = slg.prediction_event_by_isy[predicted_isyid].name
+                local events = slr.external_events
+                events[#events+1] = { event_name }
+                pause = 1
+            end
+
+            if event_type == 'after lexeme'
+                or event_type == 'before lexeme'
+            then
+                local lexeme_isyid = event[2]
+                local slg = slr.slg
+                local event_name = slg.lexeme_event_by_isy[lexeme_isyid].name
+                local events = slr.external_events
+                events[#events+1] = { event_name }
+                pause = 1
+            end
+
+            -- end of run of highly similar events
+
+            if event_type == 'discarded lexeme' then
+                local lexeme_irlid = event[2]
+                local slg = slr.slg
+                local event_name = slg.discard_event_by_irl[lexeme_irlid].name
+                local new_event = { event_name }
+                for ix = 3, #event do
+                    new_event[#new_event+1] = event[ix]
+                end
+                local events = slr.external_events
+                events[#events+1] = new_event
+                pause = 1
+            end
         end
 
-        return 'nyi', 0
+        return trace_msgs, pause
 END_OF_LUA
 
-        if ($cmd eq 'trace') {
-            say {$trace_file_handle} $value;
-            next EVENT;
-        }
-        my $this_pause = $value;
-        $pause = ($pause or $this_pause);
-
+    for my $msg (@{$trace_msgs}) {
+        say {$trace_file_handle} $msg;
     }
 
     return $pause;
