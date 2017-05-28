@@ -564,6 +564,22 @@ Marpa::R2's Libmarpa.
     declarations(_M.class_isy, class_isy_fields, 'isy')
 ```
 
+## ISY Accessors
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_isy.display_form(isy)
+        local form = isy.name
+        if not form:find(' ', 1, true) then
+            return form
+        end
+        return '<' .. form .. '>'
+    end
+    function _M.class_isy.force_form(isy)
+        return isy:display_form()
+    end
+```
+
 ## XSY Fields
 
 ```
@@ -602,6 +618,11 @@ Marpa::R2's Libmarpa.
             return '<' .. form1 .. '>'
         end
         return form1
+    end
+    function _M.class_xsy.force_form(xsy)
+        local form = xsy.display_form()
+        if form then return form end
+        return '<xsyid ' .. xsy.id .. '>'
     end
 ```
 
@@ -3856,14 +3877,6 @@ TODO: Perhaps `isy_key` should also allow isy tables.
     end
 ```
 
-```
-    -- miranda: section+ most Lua function definitions
-    function _M.class_grammar.xsy_name(grammar, isy_key)
-        local xsy = grammar:xsy(isy_key)
-        return xsy and xsy.name
-    end
-```
-
 "Force" there to be an XSY name for an ISYID,
 pulling one out of thin air if need be.
 Unlike real XSY names, the "forced" one is not
@@ -3871,32 +3884,22 @@ necessarily unique.
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_grammar.force_xsy_name(grammar, isyid)
-         return grammar:xsy_name(isyid) or
-             string.format("ISYID%d", isyid)
+    function _M.class_grammar.force_name(grammar, isyid)
+        local xsy = grammar.xsys[isyid]
+        if xsy then return xsy:force_name() end
+        local isy = grammar.isys[isyid]
+        if isy then return isy:force_name() end
+        return '<isyid ' .. isyid .. '>'
     end
 ```
 
 ```
     -- miranda: section+ most Lua function definitions
+    -- TODO keep this?
     function _M.class_grammar.symbol_dsl_form(grammar, isyid)
         local xsy = grammar.xsys[isyid]
         if not xsy then return end
-        return xsy.dsl_form
-    end
-    function _M.class_grammar.symbol_display_form(grammar, isyid)
-        local xsy = grammar.xsys[isyid]
-        if not xsy then
-            return string.format('<ISYID %d>', isyid)
-        end
-        local dsl_form = xsy.dsl_form
-        if not dsl_form then
-            return string.format('<XSYID %d>', xsy.id)
-        end
-        if dsl_form:match('[ ]') then
-            return string.format('<%s>', dsl_form)
-        end
-        return dsl_form
+        return xsy:dsl_form()
     end
 ```
 
