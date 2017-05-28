@@ -1586,6 +1586,33 @@ a string indicating the error otherwise.
     end
 ```
 
+A utility function to create discard traces,
+because this is done in two different places.
+
+```
+    -- miranda: section+ forward declarations
+    local discard_event_gen
+    -- miranda: section+ most Lua function definitions
+    function discard_event_gen(slr, irlid, lexeme_start, lexeme_end)
+        local l0g = slr.slg.l0
+        local discarded_isyid = l0g:rule_rhs(irlid, 0)
+        local discard_desc =
+            discarded_isyid and l0g:force_form(discarded_isyid)
+                or '<Bad irlid ' .. irlid .. '>'
+        local block = slr.current_block
+        local block_ix = block.index
+        local event = { '!trace', 'discarded lexeme',
+            irlid, block_ix, lexeme_start, lexeme_end }
+        event.msg = string.format(
+            'Discarded lexeme %s: %s',
+            slr:lc_range_brief(block_ix, lexeme_start, block_ix, lexeme_end - 1),
+            discard_desc
+        )
+        return event
+    end
+
+```
+
 Determine which lexemes are acceptable or discards.
 
 ```
@@ -1621,8 +1648,7 @@ Determine which lexemes are acceptable or discards.
             if g1_lexeme <= -2 then
                discarded = discarded + 1
                local q = slr.lexeme_queue
-               q[#q+1] = { '!trace', 'discarded lexeme',
-                   rule_id, block_ix, slr.start_of_lexeme, slr.end_of_lexeme}
+               q[#q+1] = discard_event_gen(slr, rule_id, slr.start_of_lexeme, slr.end_of_lexeme)
                goto NEXT_EARLEY_ITEM
             end
             -- this block hides the local's and allows the goto to work
@@ -1704,8 +1730,7 @@ events into real trace events.
                 -- so we will let the upper layer figure things out.
                 if slr.trace_terminals > 0 then
                     local q = slr.event_queue
-                    q[#q+1] = { '!trace', 'discarded lexeme',
-                        rule_id, lexeme_block, lexeme_start, lexeme_end}
+                    q[#q+1] = discard_event_gen(slr, rule_id, lexeme_start, lexeme_end)
                 end
                     local g1r = slr.g1
                     local event_on_discard_active =
@@ -1873,9 +1898,16 @@ Read alternatives into the G1 grammar.
                 local pause_after_active = slr.g1_isys[g1_lexeme].pause_after_active
                 if pause_after_active then
                     local q = slr.event_queue
+                    local force_form = g1g:force_form(g1_lexeme)
                     if slr.trace_terminals > 2 then
-                        q[#q+1] = { '!trace', 'g1 pausing after lexeme',
+                        local event = { '!trace', 'g1 pausing after lexeme',
                             block_ix, lexeme_start, lexeme_end, g1_lexeme}
+                        event.msg = string.format(
+                            'Paused after lexeme %s: %s',
+                            slr:lc_range_brief(block_ix, lexeme_start, block_ix, lexeme_end - 1),
+                            force_form
+                        )
+                        q[#q+1] = event
                     end
                     q[#q+1] = { 'after lexeme', g1_lexeme}
                 end

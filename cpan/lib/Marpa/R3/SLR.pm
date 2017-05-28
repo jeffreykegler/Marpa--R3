@@ -634,34 +634,6 @@ END_OF_LUA
 
 my $libmarpa_trace_event_handlers = {
 
-    'discarded lexeme' => sub {
-        my ( $slr, $event ) = @_;
-        my ( undef, undef, $lex_rule_id, $block, $start, $end ) =
-            @{$event};
-        my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-        my @rhs_ids = $slg->l0_irl_isyids($lex_rule_id);
-        shift @rhs_ids;
-        my @rhs =
-            map { $slg->l0_symbol_display_form($_) } @rhs_ids;
-        my $trace_file_handle =
-            $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
-        say {$trace_file_handle} qq{Discarded lexeme },
-            lc_range_brief( $slr, $block, $start, $block, $end - 1 ), q{: }, join q{ },
-            @rhs
-            or Marpa::R3::exception("Could not say(): $ERRNO");
-    },
-    'g1 pausing after lexeme' => sub {
-        my ( $slr, $event ) = @_;
-        my ( undef, undef, $block_ix, $start, $end, $lexeme_id ) = @{$event};
-        my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-        my $lexeme_name = $slg->symbol_display_form($lexeme_id);
-        my $trace_file_handle =
-            $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
-        say {$trace_file_handle} 'Paused after lexeme ',
-            lc_range_brief( $slr, $block_ix, $start, $block_ix, $end - 1 ),
-                ": $lexeme_name"
-            or Marpa::R3::exception("Could not say(): $ERRNO");
-    },
 };
 
 # Return 1 if internal scanning should pause
