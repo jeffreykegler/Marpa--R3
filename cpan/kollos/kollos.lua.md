@@ -1263,7 +1263,12 @@ The top-level read function.
                 slr.l0 = nil
                 if slr.trace_terminals >= 1 then
                     local q = slr.event_queue
-                    q[#q+1] = { '!trace', 'lexer restarted recognizer', slr.perl_pos}
+                    local event = { '!trace', 'lexer restarted recognizer', lexer_start_pos}
+                    event.msg = string.format(
+                        'Restarted recognizer at %s',
+                        slr:lc_brief(lexer_start_pos)
+                    )
+                    q[#q+1] = event
                 end
             end
             local g1r = slr.g1

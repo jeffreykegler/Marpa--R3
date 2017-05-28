@@ -634,17 +634,6 @@ END_OF_LUA
 
 my $libmarpa_trace_event_handlers = {
 
-    'lexer restarted recognizer' => sub {
-        my ( $slr, $event ) = @_;
-        my ( undef, undef, $position ) = @{$event};
-        my ( $line, $column ) = $slr->line_column($position);
-        my $trace_file_handle =
-            $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
-        my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-        say {$trace_file_handle}
-            qq{Restarted recognizer at line $line, column $column}
-            or Marpa::R3::exception("Could not say(): $ERRNO");
-    },
     'discarded lexeme' => sub {
         my ( $slr, $event ) = @_;
         my ( undef, undef, $lex_rule_id, $block, $start, $end ) =

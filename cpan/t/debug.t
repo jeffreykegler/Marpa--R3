@@ -309,7 +309,7 @@ Test::More::is_deeply( Data::Dumper::Dumper($latest_report),
 Marpa::R3::Test::is( $trace_output, <<'END_TRACE_OUTPUT', 'trace output' );
 Setting trace_terminals option
 Setting trace_values option to 1
-Restarted recognizer at line 1, column 1
+Restarted recognizer at B1L1c1
 Reading codepoint "a" 0x0061 at B1L1c1
 Codepoint "a" 0x0061 accepted as [\w] at B1L1c1
 Codepoint "a" 0x0061 rejected as [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] at B1L1c1
@@ -317,7 +317,7 @@ Reading codepoint " " 0x0020 at B1L1c2
 Codepoint " " 0x0020 rejected as [\s] at B1L1c2
 Codepoint " " 0x0020 rejected as [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] at B1L1c2
 Accepted lexeme B1L1c1 e1: variable; value="a"
-Restarted recognizer at line 1, column 2
+Restarted recognizer at B1L1c2
 Reading codepoint " " 0x0020 at B1L1c2
 Codepoint " " 0x0020 accepted as [\s] at B1L1c2
 Codepoint " " 0x0020 rejected as [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] at B1L1c2
@@ -325,12 +325,12 @@ Reading codepoint "=" 0x003d at B1L1c3
 Codepoint "=" 0x003d rejected as [\=] at B1L1c3
 Codepoint "=" 0x003d rejected as [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] at B1L1c3
 Discarded lexeme B1L1c2: whitespace
-Restarted recognizer at line 1, column 3
+Restarted recognizer at B1L1c3
 Reading codepoint "=" 0x003d at B1L1c3
 Codepoint "=" 0x003d accepted as [\=] at B1L1c3
 Codepoint "=" 0x003d rejected as [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] at B1L1c3
 Accepted lexeme B1L1c3 e2: '='; value="="
-Restarted recognizer at line 1, column 4
+Restarted recognizer at B1L1c4
 Reading codepoint " " 0x0020 at B1L1c4
 Codepoint " " 0x0020 accepted as [\s] at B1L1c4
 Codepoint " " 0x0020 rejected as [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] at B1L1c4
@@ -339,7 +339,7 @@ Codepoint "8" 0x0038 rejected as [\d] at B1L1c5
 Codepoint "8" 0x0038 rejected as [\w] at B1L1c5
 Codepoint "8" 0x0038 rejected as [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] at B1L1c5
 Discarded lexeme B1L1c4: whitespace
-Restarted recognizer at line 1, column 5
+Restarted recognizer at B1L1c5
 Reading codepoint "8" 0x0038 at B1L1c5
 Codepoint "8" 0x0038 rejected as [\d] at B1L1c5
 Codepoint "8" 0x0038 accepted as [\w] at B1L1c5
@@ -372,7 +372,7 @@ Reading codepoint " " 0x0020 at B1L1c12
 Codepoint " " 0x0020 rejected as [\s] at B1L1c12
 Codepoint " " 0x0020 rejected as [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] at B1L1c12
 Accepted lexeme B1L1c5-11 e3: variable; value="8675309"
-Restarted recognizer at line 1, column 12
+Restarted recognizer at B1L1c12
 Reading codepoint " " 0x0020 at B1L1c12
 Codepoint " " 0x0020 accepted as [\s] at B1L1c12
 Codepoint " " 0x0020 rejected as [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] at B1L1c12
@@ -380,12 +380,12 @@ Reading codepoint "+" 0x002b at B1L1c13
 Codepoint "+" 0x002b rejected as [\+] at B1L1c13
 Codepoint "+" 0x002b rejected as [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] at B1L1c13
 Discarded lexeme B1L1c12: whitespace
-Restarted recognizer at line 1, column 13
+Restarted recognizer at B1L1c13
 Reading codepoint "+" 0x002b at B1L1c13
 Codepoint "+" 0x002b accepted as [\+] at B1L1c13
 Codepoint "+" 0x002b rejected as [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] at B1L1c13
 Accepted lexeme B1L1c13 e4: '+'; value="+"
-Restarted recognizer at line 1, column 14
+Restarted recognizer at B1L1c14
 Reading codepoint " " 0x0020 at B1L1c14
 Codepoint " " 0x0020 accepted as [\s] at B1L1c14
 Codepoint " " 0x0020 rejected as [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] at B1L1c14
@@ -394,7 +394,7 @@ Codepoint "4" 0x0034 rejected as [\d] at B1L1c15
 Codepoint "4" 0x0034 rejected as [\w] at B1L1c15
 Codepoint "4" 0x0034 rejected as [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] at B1L1c15
 Discarded lexeme B1L1c14: whitespace
-Restarted recognizer at line 1, column 15
+Restarted recognizer at B1L1c15
 Reading codepoint "4" 0x0034 at B1L1c15
 Codepoint "4" 0x0034 rejected as [\d] at B1L1c15
 Codepoint "4" 0x0034 accepted as [\w] at B1L1c15
@@ -407,7 +407,7 @@ Reading codepoint " " 0x0020 at B1L1c17
 Codepoint " " 0x0020 rejected as [\s] at B1L1c17
 Codepoint " " 0x0020 rejected as [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] at B1L1c17
 Accepted lexeme B1L1c15-16 e5: variable; value="42"
-Restarted recognizer at line 1, column 17
+Restarted recognizer at B1L1c17
 Reading codepoint " " 0x0020 at B1L1c17
 Codepoint " " 0x0020 accepted as [\s] at B1L1c17
 Codepoint " " 0x0020 rejected as [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] at B1L1c17

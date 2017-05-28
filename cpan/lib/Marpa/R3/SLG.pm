@@ -2206,6 +2206,7 @@ sub Marpa::R3::Scanless::G::l0_irl_isyids {
     return $slg->lmg_irl_isyids('l0', $irlid);
 }
 
+# TODO -- delete after development?
 sub Marpa::R3::Scanless::G::lmg_irl_isyids {
     my ($slg, $subg_name, $irlid) = @_;
     my ($symbols) = $slg->call_by_tag(
