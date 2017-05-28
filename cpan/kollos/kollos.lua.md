@@ -620,7 +620,7 @@ Marpa::R2's Libmarpa.
         return form1
     end
     function _M.class_xsy.force_form(xsy)
-        local form = xsy.display_form()
+        local form = xsy:display_form()
         if form then return form end
         return '<xsyid ' .. xsy.id .. '>'
     end
@@ -1318,6 +1318,7 @@ which will be 1 or 0.
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.l0_alternative(slr, symbol_id)
         local l0r = slr.l0
+        local l0g = slr.slg.l0
         local codepoint = slr.codepoint
         local result = l0r:alternative(symbol_id, 1, 1)
         if result == _M.err.UNEXPECTED_TOKEN_ID then
@@ -1330,9 +1331,18 @@ which will be 1 or 0.
         end
         if result == _M.err.NONE then
             if slr.trace_terminals >= 1 then
-            local q = slr.event_queue
-            q[#q+1] = { '!trace', 'lexer accepted codepoint', codepoint,
-                slr.perl_pos, symbol_id}
+                local q = slr.event_queue
+                local perl_pos = slr.perl_pos
+                local event = { '!trace', 'lexer accepted codepoint', codepoint,
+                    perl_pos, symbol_id }
+                event.msg = string.format(
+                    'Codepoint %q 0x%04x accepted as %s at %s',
+                    utf8.char(codepoint),
+                    codepoint,
+                    l0g:force_form(symbol_id),
+                    slr:lc_brief(perl_pos)
+                )
+                q[#q+1] = event
             end
             return 1
         end
@@ -1373,7 +1383,7 @@ otherwise an error code string.
                'Reading codepoint %q 0x%04x at %s',
                utf8.char(codepoint),
                codepoint,
-                slr:lc_brief(perl_pos)
+               slr:lc_brief(perl_pos)
            )
            q[#q+1] = event
         end
@@ -3884,11 +3894,11 @@ necessarily unique.
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_grammar.force_name(grammar, isyid)
+    function _M.class_grammar.force_form(grammar, isyid)
         local xsy = grammar.xsys[isyid]
-        if xsy then return xsy:force_name() end
+        if xsy then return xsy:force_form() end
         local isy = grammar.isys[isyid]
-        if isy then return isy:force_name() end
+        if isy then return isy:force_form() end
         return '<isyid ' .. isyid .. '>'
     end
 ```
