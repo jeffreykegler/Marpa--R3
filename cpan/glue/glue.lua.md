@@ -423,6 +423,15 @@ and error codes.
     -- miranda: section+ most Lua function declarations
     function glue.convert_libmarpa_events(slr)
         local trace_msgs = {}
+        local trace_q = slr.trace_queue
+        for ix = 1, #trace_q do
+            local trace = trace_q[ix]
+            local msg = trace.msg
+            -- TODO delete after development
+            if not msg then error( "No message in " .. inspect(trace)) end
+            trace_msgs[#trace_msgs+1] = msg
+        end
+
         local in_q = slr.event_queue
         local out_q = {}
         local pause = 0
