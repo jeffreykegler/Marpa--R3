@@ -1998,25 +1998,27 @@ acceptance is caught here via rejection).  Ignore
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slr.ext_lexeme_complete(slr,
-            start_pos_defined, start_pos, length_is_defined, length_arg)
+    function _M.class_slr.ext_lexeme_complete(slr, start_arg, length_arg)
         local perl_pos = slr.perl_pos
         local lexeme_length = -1
-        if length_is_defined ~= 0 then
-             lexeme_length = length_arg
+        local longeur = length_arg
+        if length_arg then
+            lexeme_length = length_arg
         elseif perl_pos == slr.start_of_pause_lexeme then
-             lexeme_length = slr.end_of_pause_lexeme - slr.start_of_pause_lexeme
+            lexeme_length = slr.end_of_pause_lexeme - slr.start_of_pause_lexeme
+        else
+            longueur = 0
         end
-        if start_pos_defined == 0 then start_pos = slr.perl_pos end
+        local start_pos = start_arg or slr.perl_pos
         local input_length = #slr.current_block
         if start_pos < 0 then
             start_pos = input_length + start_pos
         end
         if start_pos < 0 or start_pos > input_length then
-           error(string.format(
-               'Bad start position in lexeme_complete(): %d',
-                  start_pos
-           ))
+            error(string.format(
+                'Bad start position in lexeme_complete(): %s',
+                    start_arg
+            ))
         end
         slr.perl_pos = start_pos
         local end_pos
@@ -2028,8 +2030,7 @@ acceptance is caught here via rejection).  Ignore
         if end_pos < 0 or end_pos > input_length then
            -- undefined length should not cause this error
            error(string.format(
-               'Bad length in lexeme_complete(): %d',
-                  (length_arg or math.mininteger)
+               'Bad length in lexeme_complete(): %s', length_arg
            ))
         end
         local g1r = slr.g1

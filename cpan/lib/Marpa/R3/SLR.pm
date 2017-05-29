@@ -1201,26 +1201,21 @@ sub Marpa::R3::Scanless::R::lexeme_complete {
         <<'END_OF_LUA', 'ii', $start, $length );
       local slr, start_arg, length_arg = ...
       slr.external_events = {}
-      local start_defined = 0
-      local start = 0
-      if start_arg then
-         start_defined = 1
-         start = math.tointeger(start_arg)
+      local start = start_arg
+      if start then
+         start = math.tointeger(start)
          if not start then
              error("lexeme_complete(): %s is not an integer", start_arg)
          end
       end
-      local longueur = 0
-      local length_defined = 0
-      if length_arg then
-         longueur = math.tointeger(length_arg)
-         length_defined = 1
-         if not longueur then
-             error("lexeme_complete(): %s is not an integer", length_arg)
-         end
+      local longueur = length_arg
+      if longueur then
+          longueur = math.tointeger(longueur)
+          if not longueur then
+              error("lexeme_complete(): %s is not an integer", length_arg)
+          end
       end
-      local complete_val = slr:ext_lexeme_complete(
-          start_defined, start, length_defined, longueur)
+      local complete_val = slr:ext_lexeme_complete(start, longueur)
       if complete_val == 0 then
           local slg = slr.slg
           slg.g1.error()
