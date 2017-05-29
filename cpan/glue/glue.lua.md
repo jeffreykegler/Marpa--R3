@@ -45,6 +45,32 @@ Can I assume this "glue" code is in charge of the global
 namespace, or should it be organized as a package?
 For now, I am just dumping everything into the global namespace.
 
+## The `glue` namespace
+
+Many variables are declared directly into the glue namespace.
+This module is not for general use, but only for use
+in "glueing" Kollos to Perl.
+It can safely assume that is has a dedicated
+Lua interpreter, and that it has complete control of the
+global namespace in that interpreter.
+
+For maintenance reasons,
+it pays to make sparing use even of namespaces
+that you control.
+But we do assume that this module will always be named
+`glue`.
+
+For this reason the `_M` in this module
+is not necessary for the usual purpose.
+We use it to refer to `kollos` instead.
+This makes it easy to move code back and forth
+between the `kollos` module and this one.
+
+```
+    -- miranda: section point _M to kollos
+    _M = kollos
+```
+
 ## The by-tag code cache
 
 Caches functions by "tag".
@@ -72,9 +98,7 @@ But that may take a while.
     inspect = require "inspect"
     kollos = require "kollos"
 
-    -- so that inlined code can refer to the kollos package
-    -- the same way as package code
-    _M = kollos
+    -- miranda: insert point _M to kollos
 
     -- This is a useful point to check the namespaces
     -- print('_G: ', inspect(_G, { depth = 1 }))
@@ -394,19 +418,6 @@ and error codes.
 ```
 
 ## Glue utilities
-
-These are declared into the glue namespace.
-This module is not for general use, but only for use
-in "glueing" Kollos to Perl, so it can assume that its
-Perl module has given it and Kollos a dedicated
-Lua interpreter and that it has complete control of the
-global namespace in that interpreter.
-
-For maintenance reasons,
-it pays to make sparing use even of namespaces
-that you can monopolize.
-But we do assume that this module will always be named
-`glue`.
 
 ```
     -- miranda: section+ most Lua function declarations
