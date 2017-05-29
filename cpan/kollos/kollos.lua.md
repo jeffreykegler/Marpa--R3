@@ -1212,9 +1212,9 @@ This is a registry object.
             if slr.trace_terminals >= 3 then
                 local xsy = g1g:xsy(terminal)
                 if xsy then
-                    local q = slr.event_queue
+                    local q = slr.trace_queue
                     -- TODO -- needs block_ix
-                    local event = { '!trace', 'expected lexeme', perl_pos, terminal, assertion }
+                    local event = { 'expected lexeme', perl_pos, terminal, assertion }
                     local display_form = xsy:display_form()
                     event.msg = string.format(
                         "Expected lexeme %s at %s; assertion ID = %d",
@@ -1263,8 +1263,8 @@ The top-level read function.
                 slr.lexer_start_pos = -1
                 slr.l0 = nil
                 if slr.trace_terminals >= 1 then
-                    local q = slr.event_queue
-                    local event = { '!trace', 'lexer restarted recognizer', lexer_start_pos}
+                    local q = slr.trace_queue
+                    local event = { 'lexer restarted recognizer', lexer_start_pos}
                     event.msg = string.format(
                         'Restarted recognizer at %s',
                         slr:lc_brief(lexer_start_pos)
@@ -1329,9 +1329,9 @@ which will be 1 or 0.
         local result = l0r:alternative(symbol_id, 1, 1)
         if result == _M.err.UNEXPECTED_TOKEN_ID then
             if slr.trace_terminals >= 1 then
-                local q = slr.event_queue
+                local q = slr.trace_queue
                 local perl_pos = slr.perl_pos
-                local event = { '!trace', 'lexer accepted codepoint', codepoint,
+                local event = { 'lexer accepted codepoint', codepoint,
                     perl_pos, symbol_id }
                 event.msg = string.format(
                     'Codepoint %q 0x%04x rejected as %s at %s',
@@ -1346,9 +1346,9 @@ which will be 1 or 0.
         end
         if result == _M.err.NONE then
             if slr.trace_terminals >= 1 then
-                local q = slr.event_queue
+                local q = slr.trace_queue
                 local perl_pos = slr.perl_pos
-                local event = { '!trace', 'lexer accepted codepoint', codepoint,
+                local event = { 'lexer accepted codepoint', codepoint,
                     perl_pos, symbol_id }
                 event.msg = string.format(
                     'Codepoint %q 0x%04x accepted as %s at %s',
@@ -1391,9 +1391,9 @@ otherwise an error code string.
         end
 
         if slr.trace_terminals >= 1 then
-           local q = slr.event_queue
+           local q = slr.trace_queue
            local perl_pos = slr.perl_pos
-           local event = { '!trace', 'lexer reading codepoint', codepoint, perl_pos}
+           local event = { 'lexer reading codepoint', codepoint, perl_pos}
            event.msg = string.format(
                'Reading codepoint %q 0x%04x at %s',
                utf8.char(codepoint),
@@ -1701,8 +1701,8 @@ events into real trace events.
                     if slr.trace_terminals > 0 then
                         local xsy = g1g:xsy(g1_lexeme)
                         if xsy then
-                            local q = slr.event_queue
-                            local event = { '!trace', 'outprioritized lexeme',
+                            local q = slr.trace_queue
+                            local event = { 'outprioritized lexeme',
                                block_ix, lexeme_start, lexeme_end, g1_lexeme,
                                priority, high_lexeme_priority}
                             event.msg = string.format(
@@ -1765,10 +1765,11 @@ Returns `true` is there was one,
                 table.unpack(this_event)
             local pause_before_active = slr.g1_isys[g1_lexeme].pause_before_active
             if pause_before_active then
-                local q = slr.event_queue
                 if slr.trace_terminals > 2 then
-                    q[#q+1] = { '!trace', 'g1 before lexeme event', g1_lexeme}
+                    q = slr.trace_queue
+                    q[#q+1] = { 'g1 before lexeme event', g1_lexeme}
                 end
+                local q = slr.event_queue
                 q[#q+1] = { 'before lexeme', g1_lexeme}
                 slr.start_of_pause_lexeme = lexeme_start
                 slr.end_of_pause_lexeme = lexeme_end
@@ -1828,8 +1829,8 @@ Read alternatives into the G1 grammar.
             if slr.trace_terminals > 2 then
                 local xsy = g1g:xsy(g1_lexeme)
                 if xsy then
-                    local q = slr.event_queue
-                    local event = { '!trace', 'g1 attempting lexeme',
+                    local q = slr.trace_queue
+                    local event = { 'g1 attempting lexeme',
                         block_ix, lexeme_start, lexeme_end, g1_lexeme}
                     local working_earley_set = slr.g1:latest_earley_set() + 1
                     event.msg = string.format(
@@ -1851,10 +1852,10 @@ Read alternatives into the G1 grammar.
                 error('Internal error: Marpa rejected expected token')
             end
             if return_value == _M.err.DUPLICATE_TOKEN then
-                local q = slr.event_queue
+                local q = slr.trace_queue
                 local xsy = g1g:xsy(g1_lexeme)
                 if xsy then
-                    local event = { '!trace', 'g1 duplicate lexeme', block_ix, lexeme_start, lexeme_end, g1_lexeme}
+                    local event = { 'g1 duplicate lexeme', block_ix, lexeme_start, lexeme_end, g1_lexeme}
                     event.msg = string.format(
                         'Rejected as duplicate lexeme %s: %s; value=%q',
                         slr:lc_range_brief(block_ix, lexeme_start, block_ix, lexeme_end - 1),
@@ -1879,8 +1880,8 @@ Read alternatives into the G1 grammar.
                 if slr.trace_terminals > 0 then
                     local xsy = g1g:xsy(g1_lexeme)
                     if xsy then
-                        local q = slr.event_queue
-                        local event = { '!trace', 'g1 accepted lexeme', block_ix, lexeme_start, lexeme_end, g1_lexeme}
+                        local q = slr.trace_queue
+                        local event = { 'g1 accepted lexeme', block_ix, lexeme_start, lexeme_end, g1_lexeme}
                         local display_form = xsy:display_form()
                         local working_earley_set = slr.g1:latest_earley_set() + 1
                         event.msg = string.format(
@@ -1898,10 +1899,10 @@ Read alternatives into the G1 grammar.
                 slr.end_of_pause_lexeme = lexeme_end
                 local pause_after_active = slr.g1_isys[g1_lexeme].pause_after_active
                 if pause_after_active then
-                    local q = slr.event_queue
                     local force_form = g1g:force_form(g1_lexeme)
                     if slr.trace_terminals > 2 then
-                        local event = { '!trace', 'g1 pausing after lexeme',
+                        local q = slr.trace_queue
+                        local event = { 'g1 pausing after lexeme',
                             block_ix, lexeme_start, lexeme_end, g1_lexeme}
                         event.msg = string.format(
                             'Paused after lexeme %s: %s',
@@ -1910,6 +1911,7 @@ Read alternatives into the G1 grammar.
                         )
                         q[#q+1] = event
                     end
+                    local q = slr.event_queue
                     q[#q+1] = { 'after lexeme', g1_lexeme}
                 end
             end
@@ -2449,13 +2451,14 @@ an L0 range
                 goto NEXT_EVENT
             end
             if event_type == _M.event["EARLEY_ITEM_THRESHOLD"] then
-                local event = { '!trace',
+                local trace_q = slr.event_queue -- TODO
+                local event = {
                     'g1 earley item threshold exceeded',
                     perl_pos, event_value}
-                event.msg = string.format(
+                event.msg = string.format( '!trace',
                     'G1 exceeded earley item threshold at pos %d: %d Earley items',
                     perl_pos, event_value)
-                q[#q+1] = event
+                trace_q[#trace_q+1] = event
                 goto NEXT_EVENT
             end
             local event_data = _M.event[event_type]
@@ -2484,6 +2487,7 @@ an L0 range
                 goto NEXT_EVENT
             end
             if event_type == _M.event["EARLEY_ITEM_THRESHOLD"] then
+                local trace_q = slr.event_queue -- TODO
                 local event = { '!trace',
                     'l0 earley item threshold exceeded',
                     perl_pos, event_value,
@@ -2491,7 +2495,7 @@ an L0 range
                 event.msg = string.format(
                     'L0 exceeded earley item threshold at pos %d: %d Earley items',
                     perl_pos, event_value)
-                q[#q+1] = event
+                trace_q[#trace_q+1] = event
                 goto NEXT_EVENT
             end
             local event_data = _M.event[event_type]
