@@ -1602,7 +1602,7 @@ because this is done in two different places.
                 or '<Bad irlid ' .. irlid .. '>'
         local block = slr.current_block
         local block_ix = block.index
-        local event = { '!trace', 'discarded lexeme',
+        local event = { 'discarded lexeme',
             irlid, block_ix, lexeme_start, lexeme_end }
         event.msg = string.format(
             'Discarded lexeme %s: %s',
@@ -1666,7 +1666,7 @@ Determine which lexemes are acceptable or discards.
                 local q = slr.lexeme_queue
                 -- at this point we know the lexeme will be accepted by the grammar
                 -- but we do not yet know about priority
-                q[#q+1] = { '!trace', 'acceptable lexeme',
+                q[#q+1] = { 'acceptable lexeme',
                    block_ix, slr.start_of_lexeme, slr.end_of_lexeme,
                    g1_lexeme, this_lexeme_priority, this_lexeme_priority}
             end
@@ -1692,9 +1692,9 @@ events into real trace events.
         local block_ix = block.index
         for ix = 1, #slr.lexeme_queue do
             local this_event = lexeme_q[ix]
-            local event_type = this_event[2]
+            local event_type = this_event[1]
             if event_type == 'acceptable lexeme' then
-                local bang_trace, event_type, lexeme_block, lexeme_start, lexeme_end,
+                local event_type, lexeme_block, lexeme_start, lexeme_end,
                 g1_lexeme, priority, required_priority =
                     table.unpack(this_event)
                 if priority < high_lexeme_priority then
@@ -1724,13 +1724,13 @@ events into real trace events.
                 goto NEXT_LEXEME
             end
             if event_type == 'discarded lexeme' then
-                local bang_trace, event_type, rule_id,
+                local event_type, rule_id,
                         lexeme_block, lexeme_start, lexeme_end
                     = table.unpack(this_event)
                 -- we do not have the lexeme, only the lexer rule,
                 -- so we will let the upper layer figure things out.
                 if slr.trace_terminals > 0 then
-                    local q = slr.event_queue
+                    local q = slr.trace_queue
                     q[#q+1] = discard_event_gen(slr, rule_id, lexeme_start, lexeme_end)
                 end
                     local g1r = slr.g1
@@ -1760,7 +1760,7 @@ Returns `true` is there was one,
         for ix = 1, #accept_q do
             local this_event = accept_q[ix]
                 -- TODO accept_queue
-            local bang_trace, event_type, lexeme_block, lexeme_start, lexeme_end,
+            local event_type, lexeme_block, lexeme_start, lexeme_end,
                     g1_lexeme, priority, required_priority =
                 table.unpack(this_event)
             local pause_before_active = slr.g1_isys[g1_lexeme].pause_before_active
@@ -1822,7 +1822,7 @@ Read alternatives into the G1 grammar.
         for ix = 1, #accept_q do
             local this_event = accept_q[ix]
                 -- TODO accept_queue
-            local bang_trace, event_type, lexeme_block, lexeme_start, lexeme_end,
+            local event_type, lexeme_block, lexeme_start, lexeme_end,
                     g1_lexeme, priority, required_priority =
                 table.unpack(this_event)
 
@@ -1970,26 +1970,26 @@ and counter-productive for this call, which often
 is used to override them
 
 ```
-  { '!trace', 'g1 pausing after lexeme', lexeme_start, lexeme_end, lexeme}
-  { '!trace', 'g1 before lexeme event', g1_lexeme}
+  { 'g1 pausing after lexeme', lexeme_start, lexeme_end, lexeme}
+  { 'g1 before lexeme event', g1_lexeme}
 
 Yes, at trace level > 0
- { "!trace", "g1 duplicate lexeme" ...
- { '!trace', 'g1 accepted lexeme', lexeme_start, lexeme_end, lexeme}
+ { "g1 duplicate lexeme" ...
+ { 'g1 accepted lexeme', lexeme_start, lexeme_end, lexeme}
 
 Yes, at trace level > 0
- { '!trace', 'g1 attempting lexeme', lexeme_start, lexeme_end, lexeme}
+ { 'g1 attempting lexeme', lexeme_start, lexeme_end, lexeme}
 
 Irrelevant, cannot happen
-  { "!trace", "discarded lexeme" }
+  { "discarded lexeme" }
 
 Irrelevant, because this call overrides priorities
-  { "!trace", "outprioritized lexeme" }
+  { "outprioritized lexeme" }
 
 These are about lexeme expectations, which are
 regarded as known before this call (or alternatively non-
 acceptance is caught here via rejection).  Ignore
-  { '!trace', 'expected lexeme', perl_pos, lexeme, assertion }
+  { 'expected lexeme', perl_pos, lexeme, assertion }
 
 ```
 
