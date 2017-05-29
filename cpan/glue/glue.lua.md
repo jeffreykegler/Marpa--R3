@@ -50,15 +50,14 @@ For now, I am just dumping everything into the global namespace.
 Caches functions by "tag".
 This is done to avoid the overhead of repeatedly compiling
 the Lua code.
-Eventually all such code should be named and
+Eventually most of this code will be named and
 moved into Kollos,
 or into these "glue" routines.
-But that may take a while, and in the meantime
-we may want meaningful performance numbers.
+But that may take a while.
 
 ```
     -- miranda: section+ Lua declarations
-    _M.code_by_tag = {}
+    glue.code_by_tag = {}
 
 ```
 
@@ -83,12 +82,14 @@ we may want meaningful performance numbers.
     -- print('kollos.event: ', inspect(kollos.event ))
     -- print('kollos.step: ', inspect(kollos.step ))
 
-    local _M = {}
+    -- a global -- we have total control of the interpreter
+    -- namespace
+    glue = {}
 
     -- miranda: insert Lua declarations
     -- miranda: insert most Lua function declarations
 
-    return _M
+    return glue
 
     -- vim: set expandtab shiftwidth=4:
 ```
@@ -392,12 +393,109 @@ and error codes.
     ]==]
 ```
 
-## Kollos utilities
+## Glue utilities
+
+These are declared into the glue namespace.
+This module is not for general use, but only for use
+in "glueing" Kollos to Perl, so it can assume that its
+Perl module has given it and Kollos a dedicated
+Lua interpreter and that it has complete control of the
+global namespace in that interpreter.
+
+For maintenance reasons,
+it pays to make sparing use even of namespaces
+that you can monopolize.
+But we do assume that this module will always be named
+`glue`.
 
 ```
     -- miranda: section+ most Lua function declarations
-    function _M.posix_lc(str)
-       return str:gsub('[A-Z]', function(str) return string.char(string.byte(str)) end)
+    function glue.convert_libmarpa_events(slr)
+        local trace_msgs = {}
+        local event_q = slr.event_queue
+        local pause = 0
+        for event_ix = 1, #event_q do
+            local event = slr.event_queue[event_ix]
+            -- print(inspect(event))
+            local event_type = event[1]
+
+            if event_type == "!trace" then
+                local msg = event.msg
+                if msg then
+                trace_msgs[#trace_msgs+1] = msg
+                end
+            end
+
+            if event_type == "'exhausted" then
+                local events = slr.external_events
+                events[#events+1] = { event_type }
+                pause = 1
+            end
+
+            if event_type == "'rejected" then
+                local events = slr.external_events
+                events[#events+1] = { event_type }
+                pause = 1
+            end
+
+            -- The code next set of events is highly similar -- an isyid at
+            -- event[2] is looked up in a table of event names.  Does it
+            -- make sense to share code, perhaps using closures?
+            if event_type == 'symbol completed' then
+                local completed_isyid = event[2]
+                local slg = slr.slg
+                local event_name = slg.completion_event_by_isy[completed_isyid].name
+                local events = slr.external_events
+                events[#events+1] = { event_name }
+                pause = 1
+            end
+
+            if event_type == 'symbol nulled' then
+                local nulled_isyid = event[2]
+                local slg = slr.slg
+                local event_name = slg.nulled_event_by_isy[nulled_isyid].name
+                local events = slr.external_events
+                events[#events+1] = { event_name }
+                pause = 1
+            end
+
+            if event_type == 'symbol predicted' then
+                local predicted_isyid = event[2]
+                local slg = slr.slg
+                local event_name = slg.prediction_event_by_isy[predicted_isyid].name
+                local events = slr.external_events
+                events[#events+1] = { event_name }
+                pause = 1
+            end
+
+            if event_type == 'after lexeme'
+                or event_type == 'before lexeme'
+            then
+                local lexeme_isyid = event[2]
+                local slg = slr.slg
+                local event_name = slg.lexeme_event_by_isy[lexeme_isyid].name
+                local events = slr.external_events
+                events[#events+1] = { event_name }
+                pause = 1
+            end
+
+            -- end of run of highly similar events
+
+            if event_type == 'discarded lexeme' then
+                local lexeme_irlid = event[2]
+                local slg = slr.slg
+                local event_name = slg.discard_event_by_irl[lexeme_irlid].name
+                local new_event = { event_name }
+                for ix = 3, #event do
+                    new_event[#new_event+1] = event[ix]
+                end
+                local events = slr.external_events
+                events[#events+1] = new_event
+                pause = 1
+            end
+        end
+
+        return trace_msgs, pause
     end
 
 ```
