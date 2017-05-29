@@ -424,6 +424,8 @@ and error codes.
     function glue.convert_libmarpa_events(slr)
         local trace_msgs = {}
         local trace_q = slr.trace_queue
+        local pause = 0
+
         for ix = 1, #trace_q do
             local trace = trace_q[ix]
             local msg = trace.msg
@@ -434,7 +436,6 @@ and error codes.
 
         local in_q = slr.event_queue
         local out_q = {}
-        local pause = 0
         local external_events = {}
         for event_ix = 1, #in_q do
             local event = in_q[event_ix]

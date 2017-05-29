@@ -1280,7 +1280,8 @@ The top-level read function.
             if result then return result end
             local event_count = #slr.event_queue
             if event_count >= 1 then return 'event' end
-            if slr.trace_terminals ~= 0 then return 'trace' end
+            local trace_count = #slr.trace_queue
+            if trace_count >= 1 or slr.trace_terminals ~= 0 then return 'trace' end
         end
         error('Internal error: unexcepted end of read loop')
     end
@@ -2451,7 +2452,7 @@ an L0 range
                 goto NEXT_EVENT
             end
             if event_type == _M.event["EARLEY_ITEM_THRESHOLD"] then
-                local trace_q = slr.event_queue -- TODO
+                local trace_q = slr.trace_queue -- TODO
                 local event = { '!trace',
                     'g1 earley item threshold exceeded',
                     perl_pos, event_value}
