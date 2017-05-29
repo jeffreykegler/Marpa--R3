@@ -128,7 +128,7 @@ sub Marpa::R3::Scanless::R::new {
     } ## end if ( not blessed $slg or not $slg->isa($slg_class) )
 
     $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE] =
-         $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE];
+        $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE];
 
     my $lua = $slg->[Marpa::R3::Internal::Scanless::G::L];
     $slr->[Marpa::R3::Internal::Scanless::R::L] = $lua;
@@ -226,6 +226,9 @@ END_OF_LUA
 
     common_set( $slr, "new",  $flat_args );
 
+    my $trace_file_handle =
+        $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
+
     my $event_is_active_arg = $flat_args->{event_is_active} // {};
     if (ref $event_is_active_arg ne 'HASH') {
         Marpa::R3::exception( 'event_is_active named argument must be ref to hash' );
@@ -281,31 +284,34 @@ END_OF_LUA
 
        # We may have set and reset the trace file handle during this method,
        # so we do not memoize its value, bjut get it directly
-                say { $slr->[
-                      Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE] }
+                say { $trace_file_handle }
                   qq{Expecting "$terminal" at earleme 0}
                   or Marpa::R3::exception("Cannot print: $ERRNO");
             }
         }
     }
 
-    Marpa::R3::Internal::Scanless::convert_libmarpa_events($slr);
-
-    $slr->call_by_tag(
+    my (undef, $trace_msgs) = $slr->call_by_tag(
     ('@' . __FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', '');
-    local recce = ...
+    local slr = ...
 
-    recce.token_values = {}
-    recce.token_is_undef = 1
-    recce.token_values[recce.token_is_undef] = glue.sv.undef()
+    slr.token_values = {}
+    slr.token_is_undef = 1
+    slr.token_values[slr.token_is_undef] = glue.sv.undef()
 
     -- token is literal is a pseudo-index, and the SV undef
     -- is just a place holder
-    recce.token_is_literal = 2
-    recce.token_values[recce.token_is_literal] = glue.sv.undef()
+    slr.token_is_literal = 2
+    slr.token_values[slr.token_is_literal] = glue.sv.undef()
+
+    return glue.convert_libmarpa_events(slr)
 
 END_OF_LUA
+
+    for my $msg (@{$trace_msgs}) {
+        say {$trace_file_handle} $msg;
+    }
 
     return $slr;
 } ## end sub Marpa::R3::Scanless::R::new
