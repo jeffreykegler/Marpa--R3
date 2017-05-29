@@ -1195,36 +1195,32 @@ END_OF_LUA
 # Returns 0 on unthrown failure, current location on success
 sub Marpa::R3::Scanless::R::lexeme_complete {
     my ( $slr, $start, $length ) = @_;
-    my $slg  = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
 
-    $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', '' );
-      local slr = ...
+    my ($return_value) = $slr->call_by_tag(
+        ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 'ii', $start, $length );
+      local slr, start_arg, length_arg = ...
       slr.external_events = {}
-END_OF_LUA
-
-    my $start_defined = 1;
-    if (defined $start) {
-        Marpa::R3::exception( 'Start value is not a number: ', $start)
-            if not Scalar::Util::looks_like_number($start);
-    } else { 
-        $start = 0;
-        $start_defined = 0;
-    }
-    my $length_defined = 1;
-    if (defined $length) {
-        Marpa::R3::exception( 'Start value is not a number: ', $length)
-            if not Scalar::Util::looks_like_number($length);
-    } else { 
-        $length = 0;
-        $length_defined = 0;
-    }
-
-    my ($return_value) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 'iiii', $start_defined, $start, $length_defined, $length );
-      local slr, start_pos_defined, start_pos, length_is_defined, length_arg = ...
+      local start_defined = 0
+      local start = 0
+      if start_arg then
+         start_defined = 1
+         start = math.tointeger(start_arg)
+         if not start then
+             error("lexeme_complete(): %s is not an integer", start_arg)
+         end
+      end
+      local longueur = 0
+      local length_defined = 0
+      if length_arg then
+         longueur = math.tointeger(length_arg)
+         length_defined = 1
+         if not longueur then
+             error("lexeme_complete(): %s is not an integer", length_arg)
+         end
+      end
       local complete_val = slr:ext_lexeme_complete(
-          start_pos_defined, start_pos, length_is_defined, length_arg)
+          start_defined, start, length_defined, longueur)
       if complete_val == 0 then
           local slg = slr.slg
           slg.g1.error()
