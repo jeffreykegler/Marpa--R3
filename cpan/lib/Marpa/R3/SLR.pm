@@ -706,12 +706,12 @@ END_OF_LUA
                         ''
                     );
 
-                    last OUTER_READ if $problem_code eq q{};
                     my $pause =
                       Marpa::R3::Internal::Scanless::convert_libmarpa_events(
                         $slr);
 
                     last OUTER_READ if $pause;
+                    last OUTER_READ if $problem_code eq q{};
                     next OUTER_READ if $problem_code eq 'event';
                     next OUTER_READ if $problem_code eq 'trace';
 
