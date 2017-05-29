@@ -1223,16 +1223,18 @@ END_OF_LUA
     my ($return_value) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'iiii', $start_defined, $start, $length_defined, $length );
       local slr, start_pos_defined, start_pos, length_is_defined, length_arg = ...
-      return slr:ext_lexeme_complete(start_pos_defined, start_pos, length_is_defined, length_arg)
+      local complete_val = slr:ext_lexeme_complete(
+          start_pos_defined, start_pos, length_is_defined, length_arg)
+      if complete_val == 0 then
+          local slg = slr.slg
+          slg.g1.error()
+      end
+      glue.convert_libmarpa_events(slr)
+      return complete_val
 END_OF_LUA
 
-    if ($return_value == 0) {
-        $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-            'local grammar = ...; grammar.g1.error()', '' );
-    }
-    Marpa::R3::Internal::Scanless::convert_libmarpa_events($slr);
-
     return $return_value;
+
 } ## end sub Marpa::R3::Scanless::R::lexeme_complete
 
 # Returns 0 on unthrown failure, current location on success,
