@@ -1196,7 +1196,7 @@ END_OF_LUA
 sub Marpa::R3::Scanless::R::lexeme_complete {
     my ( $slr, $start, $length ) = @_;
 
-    my ($return_value) = $slr->call_by_tag(
+    my ($return_value, $trace_msgs) = $slr->call_by_tag(
         ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'ii', $start, $length );
       local slr, start_arg, length_arg = ...
@@ -1220,9 +1220,15 @@ sub Marpa::R3::Scanless::R::lexeme_complete {
           local slg = slr.slg
           slg.g1.error()
       end
-      glue.convert_libmarpa_events(slr)
+      local _, trace_msgs = glue.convert_libmarpa_events(slr)
       return complete_val
 END_OF_LUA
+
+    my $trace_file_handle =
+        $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
+    for my $msg (@{$trace_msgs}) {
+        say {$trace_file_handle} $msg;
+    }
 
     return $return_value;
 
