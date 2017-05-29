@@ -423,10 +423,12 @@ and error codes.
     -- miranda: section+ most Lua function declarations
     function glue.convert_libmarpa_events(slr)
         local trace_msgs = {}
-        local event_q = slr.event_queue
+        local in_q = slr.event_queue
+        local out_q = {}
         local pause = 0
-        for event_ix = 1, #event_q do
-            local event = slr.event_queue[event_ix]
+        local external_events = {}
+        for event_ix = 1, #in_q do
+            local event = in_q[event_ix]
             -- print(inspect(event))
             local event_type = event[1]
 
@@ -438,14 +440,12 @@ and error codes.
             end
 
             if event_type == "'exhausted" then
-                local events = slr.external_events
-                events[#events+1] = { event_type }
+                out_q[#out_q+1] = { event_type }
                 pause = 1
             end
 
             if event_type == "'rejected" then
-                local events = slr.external_events
-                events[#events+1] = { event_type }
+                out_q[#out_q+1] = { event_type }
                 pause = 1
             end
 
@@ -456,8 +456,7 @@ and error codes.
                 local completed_isyid = event[2]
                 local slg = slr.slg
                 local event_name = slg.completion_event_by_isy[completed_isyid].name
-                local events = slr.external_events
-                events[#events+1] = { event_name }
+                out_q[#out_q+1] = { event_name }
                 pause = 1
             end
 
@@ -465,8 +464,7 @@ and error codes.
                 local nulled_isyid = event[2]
                 local slg = slr.slg
                 local event_name = slg.nulled_event_by_isy[nulled_isyid].name
-                local events = slr.external_events
-                events[#events+1] = { event_name }
+                out_q[#out_q+1] = { event_name }
                 pause = 1
             end
 
@@ -474,8 +472,7 @@ and error codes.
                 local predicted_isyid = event[2]
                 local slg = slr.slg
                 local event_name = slg.prediction_event_by_isy[predicted_isyid].name
-                local events = slr.external_events
-                events[#events+1] = { event_name }
+                out_q[#out_q+1] = { event_name }
                 pause = 1
             end
 
@@ -485,8 +482,7 @@ and error codes.
                 local lexeme_isyid = event[2]
                 local slg = slr.slg
                 local event_name = slg.lexeme_event_by_isy[lexeme_isyid].name
-                local events = slr.external_events
-                events[#events+1] = { event_name }
+                out_q[#out_q+1] = { event_name }
                 pause = 1
             end
 
@@ -500,13 +496,14 @@ and error codes.
                 for ix = 3, #event do
                     new_event[#new_event+1] = event[ix]
                 end
-                local events = slr.external_events
-                events[#events+1] = new_event
+                out_q[#out_q+1] = new_event
                 pause = 1
             end
         end
 
-        return trace_msgs, pause
+        -- TODO Delete slr.external_events after development?
+        slr.external_events = out_q
+        return pause, trace_msgs, out_q
     end
 
 ```

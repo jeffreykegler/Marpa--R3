@@ -637,7 +637,7 @@ sub Marpa::R3::Internal::Scanless::convert_libmarpa_events {
     my ($slr)    = @_;
     my $trace_file_handle =
         $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
-    my ($trace_msgs, $pause) = $slr->call_by_tag(( '@' . __FILE__ . ':' . __LINE__ ),
+    my ($pause, $trace_msgs) = $slr->call_by_tag(( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', '');
         local slr = ...
         return glue.convert_libmarpa_events(slr)
