@@ -442,13 +442,6 @@ and error codes.
             -- print(inspect(event))
             local event_type = event[1]
 
-            if event_type == "!trace" then
-                local msg = event.msg
-                if msg then
-                trace_msgs[#trace_msgs+1] = msg
-                end
-            end
-
             if event_type == "'exhausted" then
                 out_q[#out_q+1] = { event_type }
                 pause = 1

@@ -2453,7 +2453,7 @@ an L0 range
             end
             if event_type == _M.event["EARLEY_ITEM_THRESHOLD"] then
                 local trace_q = slr.trace_queue -- TODO
-                local event = { '!trace',
+                local event = {
                     'g1 earley item threshold exceeded',
                     perl_pos, event_value}
                 event.msg = string.format(
@@ -2488,8 +2488,8 @@ an L0 range
                 goto NEXT_EVENT
             end
             if event_type == _M.event["EARLEY_ITEM_THRESHOLD"] then
-                local trace_q = slr.event_queue -- TODO
-                local event = { '!trace',
+                local trace_q = slr.trace_queue -- TODO
+                local event = {
                     'l0 earley item threshold exceeded',
                     perl_pos, event_value,
                     }
