@@ -169,13 +169,6 @@ sub Marpa::R3::Scanless::R::new {
     -- necessarily a sequence.
     slr.trailers = {}
 
-    -- Events are higher priority, and are cleared
-    --   at the beginning of many methods.
-    --   Traces are lower priority, and are cleared
-    --   only when returned to Perl.
-    -- TODO but there are also traces in event queue
-    --   What to do?
-    -- TODO Do I need trace_queue
     slr.event_queue = {}
     slr.trace_queue = {}
 

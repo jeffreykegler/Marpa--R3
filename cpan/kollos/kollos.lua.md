@@ -1245,11 +1245,12 @@ The top-level read function.
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.read(slr)
         if slr.is_external_scanning then
-           return 'unpermitted mix of external and internal scanning'
+           _M.userX( 'unpermitted mix of external and internal scanning' )
         end
         slr.start_of_pause_lexeme = -1
         slr.end_of_pause_lexeme = -1
         slr.event_queue = {}
+        slr.trace_queue = {}
         while true do
             local lexer_start_pos = slr.lexer_start_pos
             if lexer_start_pos >= slr.end_pos then
@@ -2030,6 +2031,7 @@ acceptance is caught here via rejection).  Ignore
         end
         local g1r = slr.g1
         slr.event_queue = {}
+        slr.trace_queue = {}
         slr.is_external_scanning = false
         local result = g1r:earleme_complete()
         if result >= 0 then
