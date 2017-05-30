@@ -424,7 +424,6 @@ and error codes.
     function glue.convert_libmarpa_events(slr)
         local trace_msgs = {}
         local trace_q = slr.trace_queue
-        local pause = false
 
         for ix = 1, #trace_q do
             local trace = trace_q[ix]
@@ -444,12 +443,10 @@ and error codes.
 
             if event_type == "'exhausted" then
                 out_q[#out_q+1] = { event_type }
-                pause = true
             end
 
             if event_type == "'rejected" then
                 out_q[#out_q+1] = { event_type }
-                pause = true
             end
 
             -- The code next set of events is highly similar -- an isyid at
@@ -460,7 +457,6 @@ and error codes.
                 local slg = slr.slg
                 local event_name = slg.completion_event_by_isy[completed_isyid].name
                 out_q[#out_q+1] = { event_name }
-                pause = true
             end
 
             if event_type == 'symbol nulled' then
@@ -468,7 +464,6 @@ and error codes.
                 local slg = slr.slg
                 local event_name = slg.nulled_event_by_isy[nulled_isyid].name
                 out_q[#out_q+1] = { event_name }
-                pause = true
             end
 
             if event_type == 'symbol predicted' then
@@ -476,7 +471,6 @@ and error codes.
                 local slg = slr.slg
                 local event_name = slg.prediction_event_by_isy[predicted_isyid].name
                 out_q[#out_q+1] = { event_name }
-                pause = true
             end
 
             if event_type == 'after lexeme'
@@ -486,7 +480,6 @@ and error codes.
                 local slg = slr.slg
                 local event_name = slg.lexeme_event_by_isy[lexeme_isyid].name
                 out_q[#out_q+1] = { event_name }
-                pause = true
             end
 
             -- end of run of highly similar events
@@ -500,11 +493,10 @@ and error codes.
                     new_event[#new_event+1] = event[ix]
                 end
                 out_q[#out_q+1] = new_event
-                pause = true
             end
         end
 
-        return pause, trace_msgs, out_q
+        return trace_msgs, out_q
     end
 
 ```

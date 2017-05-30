@@ -289,7 +289,7 @@ END_OF_LUA
         }
     }
 
-    my (undef, $trace_msgs, $events) = $slr->call_by_tag(
+    my ($trace_msgs, $events) = $slr->call_by_tag(
     ('@' . __FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', '');
     local slr = ...
@@ -692,7 +692,7 @@ END_OF_LUA
                         <<'END_OF_LUA', '' );
             local slr = ...
             local ok = slr:read()
-            local _, trace_msgs, events = glue.convert_libmarpa_events(slr)
+            local trace_msgs, events = glue.convert_libmarpa_events(slr)
             return ok, trace_msgs, events
 END_OF_LUA
 
@@ -1190,7 +1190,7 @@ sub Marpa::R3::Scanless::R::lexeme_complete {
           local slg = slr.slg
           slg.g1.error()
       end
-      local _, trace_msgs, events = glue.convert_libmarpa_events(slr)
+      local trace_msgs, events = glue.convert_libmarpa_events(slr)
       return complete_val, trace_msgs, events
 END_OF_LUA
 
