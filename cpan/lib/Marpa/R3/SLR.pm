@@ -691,8 +691,7 @@ END_OF_LUA
                       $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
                         <<'END_OF_LUA', '' );
             local slr = ...
-            local ok = 0
-            if not slr:read() then ok = 1 end
+            local ok = slr:read()
             local _, trace_msgs, events = glue.convert_libmarpa_events(slr)
             return ok, trace_msgs, events
 END_OF_LUA
