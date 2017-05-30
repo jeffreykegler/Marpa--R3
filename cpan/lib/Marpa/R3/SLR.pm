@@ -710,9 +710,17 @@ END_OF_LUA
             return slr:read() or 'pause'
 END_OF_LUA
 
-                    my $pause =
-                      Marpa::R3::Internal::Scanless::convert_libmarpa_events(
-                        $slr);
+    my $trace_file_handle =
+        $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
+    my ($pause, $trace_msgs) = $slr->call_by_tag(( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', '');
+        local slr = ...
+        return glue.convert_libmarpa_events(slr)
+END_OF_LUA
+
+    for my $msg (@{$trace_msgs}) {
+        say {$trace_file_handle} $msg;
+    }
 
                     $problem_code = 'pause' if $pause;
                     last OUTER_READ if $problem_code eq 'pause';
