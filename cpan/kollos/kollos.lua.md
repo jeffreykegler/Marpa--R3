@@ -1119,7 +1119,6 @@ This is a registry object.
     class_slr_fields.l0_irls = true
     class_slr_fields['irls'] = true
     class_slr_fields['lexeme_queue'] = true
-    class_slr_fields['lexer_start_pos'] = true
     class_slr_fields['lmw_b'] = true
     class_slr_fields['lmw_o'] = true
     class_slr_fields['lmw_t'] = true
@@ -1251,22 +1250,20 @@ The top-level read function.
         slr.event_queue = {}
         slr.trace_queue = {}
         while true do
-            local lexer_start_pos = slr.lexer_start_pos
-            if lexer_start_pos >= slr.end_pos then
+            local perl_pos = slr.perl_pos
+            if perl_pos >= slr.end_pos then
                 -- a 'normal' return
                 return true
             end
-            if lexer_start_pos >= 0 then
-                slr.perl_pos = lexer_start_pos
-                slr.start_of_lexeme = lexer_start_pos
-                slr.lexer_start_pos = -1
+            if perl_pos >= 0 then
+                slr.start_of_lexeme = perl_pos
                 slr.l0 = nil
                 if slr.trace_terminals >= 1 then
                     local q = slr.trace_queue
-                    local event = { 'lexer restarted recognizer', lexer_start_pos}
+                    local event = { 'lexer restarted recognizer', perl_pos}
                     event.msg = string.format(
                         'Restarted recognizer at %s',
-                        slr:lc_brief(lexer_start_pos)
+                        slr:lc_brief(perl_pos)
                     )
                     q[#q+1] = event
                 end
@@ -1524,7 +1521,6 @@ not find an acceptable lexeme.
                 )
         end
         local start_of_lexeme = slr.start_of_lexeme
-        slr.lexer_start_pos = start_of_lexeme
         slr.perl_pos = start_of_lexeme
         return slr:no_lexeme_handle()
     end
@@ -1564,7 +1560,6 @@ and a string indicating the error.
         if #accept_q <= 0 then
             if discarded <= 0 then return false, exhausted() end
             -- if here, no accepted lexemes, but discarded ones
-            slr.lexer_start_pos = working_pos
             slr.perl_pos = working_pos
             local latest_es = slr.g1:latest_earley_set()
             local trailers = slr.trailers
@@ -1771,7 +1766,6 @@ Returns `true` is there was one,
                 slr.start_of_pause_lexeme = lexeme_start
                 slr.end_of_pause_lexeme = lexeme_end
                 local start_of_lexeme = slr.start_of_lexeme
-                slr.lexer_start_pos = start_of_lexeme
                 slr.perl_pos = start_of_lexeme
                 return true
             end
@@ -1793,7 +1787,6 @@ Returns `true` is there was one,
             ))
         end
         local end_of_lexeme = slr.end_of_lexeme
-        slr.lexer_start_pos = end_of_lexeme
         slr.perl_pos = end_of_lexeme
         if result > 0 then slr:g1_convert_events() end
         local start_of_lexeme = slr.start_of_lexeme
@@ -1920,29 +1913,18 @@ Read alternatives into the G1 grammar.
 
 Set the position and length of input string.
 
+TODO: Now that I have a glue wrapper,
+make this more internal?
+
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.pos_set(slr, start_pos_arg, length_arg)
         local input_length = #slr.current_block
-        local new_perl_pos = start_pos_arg >=0  and start_pos_arg or input_length + start_pos_arg
-        if new_perl_pos < 0 then
-            error(string.format('Bad start position in pos_set: %d', start_pos_arg))
-        end
-        if new_perl_pos > input_length then
-            error(string.format('Start position in pos_set (%d) is after input end (%d)',
-                start_pos_arg, input_length))
-        end
+        local new_perl_pos = start_pos_arg >=0  and start_pos_arg
+            or input_length + start_pos_arg
         local new_end_pos = length_arg >= 0 and new_perl_pos + length_arg
             or input_length + length_arg + 1
-        if new_end_pos < 0 then
-            error(string.format('Bad end position in pos_set: %d', new_end_pos))
-        end
-        if new_end_pos > input_length then
-            error(string.format('End position in pos_set (%d) is after input end (%d)',
-                new_end_pos, input_length))
-        end
         slr.perl_pos = new_perl_pos
-        slr.lexer_start_pos = new_perl_pos
         slr.end_pos = new_end_pos
         return
     end

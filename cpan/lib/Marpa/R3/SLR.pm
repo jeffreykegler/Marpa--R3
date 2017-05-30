@@ -184,7 +184,6 @@ sub Marpa::R3::Scanless::R::new {
     slr.end_of_lexeme = 0
     slr.start_of_pause_lexeme = -1
     slr.end_of_pause_lexeme = -1
-    slr.lexer_start_pos = 0
     slr.is_external_scanning = false
 
     local g_l0_rules = grammar.l0.irls
