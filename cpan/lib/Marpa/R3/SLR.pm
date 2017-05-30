@@ -653,6 +653,8 @@ sub Marpa::R3::Scanless::R::resume {
     my ( $slr, $start_pos, $length ) = @_;
     my $length_arg    = $length    // -1;
     my $start_pos_arg = $start_pos // 'undef';
+    my $trace_file_handle =
+        $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
 
     my $result;
     my $eval_error;
@@ -703,19 +705,13 @@ END_OF_LUA
 
               OUTER_READ: while (1) {
 
-                    my ($problem_code) = $slr->call_by_tag(
+                    my ($problem_code, $pause, $trace_msgs) = $slr->call_by_tag(
                         ( '@' . __FILE__ . ':' . __LINE__ ),
                         <<'END_OF_LUA', '');
             local slr = ...
-            return slr:read() or 'pause'
-END_OF_LUA
-
-    my $trace_file_handle =
-        $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
-    my ($pause, $trace_msgs) = $slr->call_by_tag(( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', '');
-        local slr = ...
-        return glue.convert_libmarpa_events(slr)
+            local problem_code = slr:read() or 'pause'
+            local pause, trace_msgs = glue.convert_libmarpa_events(slr)
+            return problem_code, pause, trace_msgs
 END_OF_LUA
 
     for my $msg (@{$trace_msgs}) {
