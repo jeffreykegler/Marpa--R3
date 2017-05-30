@@ -1372,8 +1372,8 @@ which will be 1 or 0.
 ```
 
 Read the current codepoint in L0.
-Returns nil on success,
-otherwise an error code string.
+Returns `true` on success,
+otherwise `false` and an error code string.
 
 ```
     -- miranda: section+ most Lua function definitions
@@ -1408,16 +1408,17 @@ otherwise an error code string.
                  slr:l0_alternative(symbol_id)
         end
 
-        if tokens_accepted < 1 then return 'rejected char' end
+        if tokens_accepted < 1 then return false, 'rejected char' end
         local complete_result = slr:l0_earleme_complete()
-        if complete_result then return complete_result end
-        return
+        if complete_result then return false, complete_result end
+        return true
     end
 
 ```
 
 Read a lexeme from the L0 recognizer.
-Returns a status string.
+Returns `true` on success,
+otherwise `false` and a status string.
 
 ```
     -- miranda: section+ most Lua function definitions
@@ -1432,11 +1433,11 @@ Returns a status string.
             end
             -- +1 because codepoints array is 1-based
             slr.codepoint = slr:codepoint_from_pos(block_ix, slr.perl_pos)
-            local errmsg = slr:l0_read_codepoint()
+            local ok, errmsg = slr:l0_read_codepoint()
             local this_candidate, eager = slr:l0_track_candidates()
             if this_candidate then slr.l0_candidate = this_candidate end
             if eager then return true end
-            if errmsg then return false, errmsg end
+            if not ok then return false, errmsg end
             slr.perl_pos = slr.perl_pos + 1
         end
         error('Unexpected fall through in l0_read()')
