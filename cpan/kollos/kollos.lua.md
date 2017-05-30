@@ -1273,15 +1273,15 @@ The top-level read function.
             end
             local g1r = slr.g1
             local result = slr:l0_read_lexeme()
-            if result == 'trace' then return false, result end
+            if result == 'trace' then return false end
             local discard_mode = (g1r:is_exhausted() ~= 0)
             local err_msg
             result, err_msg = slr:alternatives(discard_mode)
-            if not result then return false, err_msg end
+            if not result then return false end
             local event_count = #slr.event_queue
-            if event_count >= 1 then return false, 'event' end
+            if event_count >= 1 then return false end
             local trace_count = #slr.trace_queue
-            if trace_count >= 1 or slr.trace_terminals ~= 0 then return false, 'trace' end
+            if trace_count >= 1 or slr.trace_terminals ~= 0 then return false end
         end
         error('Internal error: unexcepted end of read loop')
     end
