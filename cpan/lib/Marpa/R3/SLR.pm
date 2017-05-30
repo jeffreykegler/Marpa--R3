@@ -705,19 +705,17 @@ END_OF_LUA
 
                     my ($problem_code) = $slr->call_by_tag(
                         ( '@' . __FILE__ . ':' . __LINE__ ),
-                        <<'END_OF_LUA',
-            local recce = ...
-            return recce:read() or ''
+                        <<'END_OF_LUA', '');
+            local slr = ...
+            return slr:read() or 'pause'
 END_OF_LUA
-                        ''
-                    );
 
                     my $pause =
                       Marpa::R3::Internal::Scanless::convert_libmarpa_events(
                         $slr);
 
                     last OUTER_READ if $pause;
-                    last OUTER_READ if $problem_code eq q{};
+                    last OUTER_READ if $problem_code eq 'pause';
                     next OUTER_READ if $problem_code eq 'event';
                     next OUTER_READ if $problem_code eq 'trace';
 
