@@ -637,7 +637,7 @@ sub Marpa::R3::Scanless::R::resume {
     my $length_arg    = $length    // -1;
     my $start_pos_arg = $start_pos // 'undef';
     my $trace_file_handle =
-        $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
+      $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
 
     my $result;
     my $eval_error;
@@ -687,9 +687,9 @@ END_OF_LUA
 
               OUTER_READ: while (1) {
 
-                    my ($problem_code, $trace_msgs, $events) = $slr->call_by_tag(
-                        ( '@' . __FILE__ . ':' . __LINE__ ),
-                        <<'END_OF_LUA', '');
+                    my ( $problem_code, $trace_msgs, $events ) =
+                      $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+                        <<'END_OF_LUA', '' );
             local slr = ...
             local problem_code = slr:read() or 'pause'
             local pause, trace_msgs, events = glue.convert_libmarpa_events(slr)
@@ -697,38 +697,33 @@ END_OF_LUA
             return problem_code, trace_msgs, events
 END_OF_LUA
 
-    $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] = $events;
+                    $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] = $events;
 
-    for my $msg (@{$trace_msgs}) {
-        say {$trace_file_handle} $msg;
-    }
+                    for my $msg ( @{$trace_msgs} ) {
+                        say {$trace_file_handle} $msg;
+                    }
 
                     last OUTER_READ if $problem_code eq 'pause';
                     next OUTER_READ if $problem_code eq 'event';
                     next OUTER_READ if $problem_code eq 'trace';
 
+                    die $problem_code;
+
                     last FOR_LUA;
 
                 } ## end OUTER_READ: while (1)
 
-                # say STDERR join " ", __FILE__, __LINE__, $slr->pos();
                 $result = $slr->pos();
             }
 
-            # say STDERR join " ", __FILE__, __LINE__, $result;
             return 1;
         };
         $eval_error = $@;
     }
 
-    # say STDERR join " ", __FILE__, __LINE__, Data::Dumper::Dumper($eval_ok);
     if ( not $eval_ok ) {
-
-        # say STDERR join " ", __FILE__, __LINE__;
         Marpa::R3::exception($eval_error);
     }
-
-    # say STDERR join " ", __FILE__, __LINE__, $result;
 
     return $result;
 } ## end sub Marpa::R3::Scanless::R::resume
