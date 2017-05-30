@@ -109,5 +109,6 @@ use constant SLG => 0;
 use constant L => 1;
 use constant REGIX => 2;
 use constant TRACE_FILE_HANDLE => 3;
+use constant EVENTS => 4;
 
 1;

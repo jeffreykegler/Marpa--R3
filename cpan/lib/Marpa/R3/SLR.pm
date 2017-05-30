@@ -291,7 +291,7 @@ END_OF_LUA
         }
     }
 
-    my (undef, $trace_msgs) = $slr->call_by_tag(
+    my (undef, $trace_msgs, $events) = $slr->call_by_tag(
     ('@' . __FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', '');
     local slr = ...
@@ -312,6 +312,8 @@ END_OF_LUA
     for my $msg (@{$trace_msgs}) {
         say {$trace_file_handle} $msg;
     }
+
+    $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] = $events;
 
     return $slr;
 } ## end sub Marpa::R3::Scanless::R::new
@@ -687,15 +689,17 @@ END_OF_LUA
 
               OUTER_READ: while (1) {
 
-                    my ($problem_code, $trace_msgs) = $slr->call_by_tag(
+                    my ($problem_code, $trace_msgs, $events) = $slr->call_by_tag(
                         ( '@' . __FILE__ . ':' . __LINE__ ),
                         <<'END_OF_LUA', '');
             local slr = ...
             local problem_code = slr:read() or 'pause'
-            local pause, trace_msgs = glue.convert_libmarpa_events(slr)
+            local pause, trace_msgs, events = glue.convert_libmarpa_events(slr)
             problem_code = pause and 'pause' or problem_code
-            return problem_code, trace_msgs
+            return problem_code, trace_msgs, events
 END_OF_LUA
+
+    $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] = $events;
 
     for my $msg (@{$trace_msgs}) {
         say {$trace_file_handle} $msg;
@@ -1180,7 +1184,7 @@ END_OF_LUA
 sub Marpa::R3::Scanless::R::lexeme_complete {
     my ( $slr, $start, $length ) = @_;
 
-    my ($return_value, $trace_msgs) = $slr->call_by_tag(
+    my ($return_value, $trace_msgs, $events) = $slr->call_by_tag(
         ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'ii', $start, $length );
       local slr, start_arg, length_arg = ...
@@ -1204,7 +1208,7 @@ sub Marpa::R3::Scanless::R::lexeme_complete {
           local slg = slr.slg
           slg.g1.error()
       end
-      local _, trace_msgs = glue.convert_libmarpa_events(slr)
+      local _, trace_msgs, events = glue.convert_libmarpa_events(slr)
       return complete_val
 END_OF_LUA
 
@@ -1213,6 +1217,8 @@ END_OF_LUA
     for my $msg (@{$trace_msgs}) {
         say {$trace_file_handle} $msg;
     }
+
+    $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] = $events;
 
     return $return_value;
 

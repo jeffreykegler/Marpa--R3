@@ -225,6 +225,7 @@ __DATA__
         a valid Lua index but not a pseudo-index. }
 
     TRACE_FILE_HANDLE
+    EVENTS { Events converted to an external, Perl-ish form }
 
     { vim: set expandtab shiftwidth=4:
     }
