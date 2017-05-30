@@ -1275,8 +1275,9 @@ The top-level read function.
             local result = slr:l0_read_lexeme()
             if result == 'trace' then return result end
             local discard_mode = (g1r:is_exhausted() ~= 0)
-            result = slr:alternatives(discard_mode)
-            if result then return result end
+            local err_msg
+            result, err_msg = slr:alternatives(discard_mode)
+            if not result then return err_msg end
             local event_count = #slr.event_queue
             if event_count >= 1 then return 'event' end
             local trace_count = #slr.trace_queue
@@ -1536,8 +1537,9 @@ not find an acceptable lexeme.
 ```
 
 Read find and read the alternatives in the SLIF.
-Returns `nil` on success,
-a string indicating the error otherwise.
+Returns `true` on success.
+On failure, returns `false`
+and a string indicating the error.
 
 ```
     -- miranda: section+ most Lua function definitions
@@ -1554,7 +1556,7 @@ a string indicating the error otherwise.
         end
         local elect_earley_set = slr.l0_candidate
         -- no zero-length lexemes, so Earley set 0 is ignored
-        if not elect_earley_set then return exhausted() end
+        if not elect_earley_set then return false, exhausted() end
         local working_pos = slr.start_of_lexeme + elect_earley_set
         local return_value = l0r:progress_report_start(elect_earley_set)
         if return_value < 0 then
@@ -1566,7 +1568,7 @@ a string indicating the error otherwise.
         slr:lexeme_queue_examine(high_lexeme_priority)
         local accept_q = slr.accept_queue
         if #accept_q <= 0 then
-            if discarded <= 0 then return exhausted() end
+            if discarded <= 0 then return false, exhausted() end
             -- if here, no accepted lexemes, but discarded ones
             slr.lexer_start_pos = working_pos
             slr.perl_pos = working_pos
@@ -1578,12 +1580,13 @@ a string indicating the error otherwise.
                     slr.start_of_lexeme,
                     working_pos - slr.start_of_lexeme
                 )
-            return
+            return true
         end
         -- PASS 3 --
         local result = slr:do_pause_before()
-        if result then return end
+        if result then return true end
         slr:g1_earleme_complete()
+        return true
     end
 ```
 
