@@ -1272,10 +1272,9 @@ The top-level read function.
                 end
             end
             local g1r = slr.g1
-            local result = slr:l0_read_lexeme()
+            slr:l0_read_lexeme()
             local discard_mode = (g1r:is_exhausted() ~= 0)
-            local err_msg
-            result, err_msg = slr:alternatives(discard_mode)
+            local result = slr:alternatives(discard_mode)
             if not result then return false end
             local event_count = #slr.event_queue
             if event_count >= 1 then return false end
@@ -1429,15 +1428,15 @@ Returns a status string.
         end
         while true do
             if slr.perl_pos >= slr.end_pos then
-                return 'ok'
+                return true
             end
             -- +1 because codepoints array is 1-based
             slr.codepoint = slr:codepoint_from_pos(block_ix, slr.perl_pos)
             local errmsg = slr:l0_read_codepoint()
             local this_candidate, eager = slr:l0_track_candidates()
             if this_candidate then slr.l0_candidate = this_candidate end
-            if eager then return 'ok' end
-            if errmsg then return errmsg end
+            if eager then return true end
+            if errmsg then return false, errmsg end
             slr.perl_pos = slr.perl_pos + 1
         end
         error('Unexpected fall through in l0_read()')
