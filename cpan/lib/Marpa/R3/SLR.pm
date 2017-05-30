@@ -704,12 +704,6 @@ END_OF_LUA
                     }
 
                     last OUTER_READ if $problem_code eq 'pause';
-                    next OUTER_READ if $problem_code eq 'event';
-                    next OUTER_READ if $problem_code eq 'trace';
-
-                    die $problem_code;
-
-                    last FOR_LUA;
 
                 } ## end OUTER_READ: while (1)
 
