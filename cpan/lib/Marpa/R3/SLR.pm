@@ -634,8 +634,6 @@ END_OF_LUA
 
 sub Marpa::R3::Scanless::R::resume {
     my ( $slr, $start_pos, $length ) = @_;
-    my $length_arg    = $length    // -1;
-    my $start_pos_arg = $start_pos // 'undef';
     my $trace_file_handle =
       $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
 
@@ -649,7 +647,7 @@ sub Marpa::R3::Scanless::R::resume {
        # say STDERR join " ", __FILE__, __LINE__, Data::Dumper::Dumper($result);
           FOR_LUA: {
                 $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-                    <<'END_OF_LUA', 'si', $start_pos_arg, $length_arg );
+                    <<'END_OF_LUA', 'ii', $start_pos, $length );
             local slr, start_pos_arg, length_arg = ...
 
             if #slr.inputs <= 0 then
@@ -672,17 +670,9 @@ sub Marpa::R3::Scanless::R::resume {
                 )
             end
 
-            local start_pos
-            if start_pos_arg == 'undef' then
-                start_pos = slr.perl_pos
-            else
-                start_pos = math.tointeger(start_pos_arg)
-                if not start_pos then
-                    error(string.format('Bad start arg in resume: %q',
-                        start_pos_arg))
-                end
-            end
-            slr:pos_set(start_pos, length_arg)
+           print("calling slr:pos_set:", (start_pos_arg or slr.perl_pos), (length_arg or -1))
+           slr:pos_set((start_pos_arg or slr.perl_pos), (length_arg or -1))
+           -- glue.pos_set(slr, start_pos_arg, length_arg)
 END_OF_LUA
 
               OUTER_READ: while (1) {
