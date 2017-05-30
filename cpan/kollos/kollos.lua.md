@@ -1166,7 +1166,7 @@ This is a registry object.
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slr.l0r_new(slr, perl_pos)
+    function _M.class_slr.l0r_new(slr)
         local l0r = _M.recce_new(slr.slg.l0)
 
         local block_ix = slr.current_block.index
@@ -1304,7 +1304,7 @@ otherwise `false` and a status string.
             l0r:error_description())
         end
         if complete_result > 0 then
-            slr:l0_convert_events(slr.perl_pos)
+            slr:l0_convert_events()
             local is_exhausted = l0r:is_exhausted()
             if is_exhausted ~= 0 then
                 return false, 'exhausted on success'
@@ -2474,8 +2474,9 @@ an L0 range
 
     -- TODO: perl_pos arg is development hack --
     -- eventually use slr.perl_pos
-    function _M.class_slr.l0_convert_events(slr, perl_pos)
+    function _M.class_slr.l0_convert_events(slr)
         local l0g = slr.slg.l0
+        local perl_pos = slr.perl_pos
         local q = slr.event_queue
         local events = l0g:events()
         for i = 1, #events, 2 do
