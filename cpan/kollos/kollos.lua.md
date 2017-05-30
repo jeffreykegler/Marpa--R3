@@ -1286,8 +1286,8 @@ The top-level read function.
 ```
 
 "Complete" an earleme in L0.
-Return nil on success,
-otherwise a failure code.
+Return `true` if parsing can continue.
+otherwise `false` and a status string.
 
 ```
     -- miranda: section+ most Lua function definitions
@@ -1296,7 +1296,7 @@ otherwise a failure code.
         local complete_result = l0r:earleme_complete()
         if complete_result == -2 then
             if l0r:error_code() == _M.err.PARSE_EXHAUSTED then
-                return 'exhausted on failure'
+                return false, 'exhausted on failure'
             end
         end
         if complete_result < 0 then
@@ -1307,10 +1307,10 @@ otherwise a failure code.
             slr:l0_convert_events(slr.perl_pos)
             local is_exhausted = l0r:is_exhausted()
             if is_exhausted ~= 0 then
-                return 'exhausted on success'
+                return false, 'exhausted on success'
             end
         end
-        return
+        return true
     end
 
 ```
@@ -1409,9 +1409,7 @@ otherwise `false` and an error code string.
         end
 
         if tokens_accepted < 1 then return false, 'rejected char' end
-        local complete_result = slr:l0_earleme_complete()
-        if complete_result then return false, complete_result end
-        return true
+        return slr:l0_earleme_complete()
     end
 
 ```
