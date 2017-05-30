@@ -132,6 +132,7 @@ sub Marpa::R3::Scanless::R::new {
 
     my $lua = $slg->[Marpa::R3::Internal::Scanless::G::L];
     $slr->[Marpa::R3::Internal::Scanless::R::L] = $lua;
+    $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] = [];
 
   my $slg_regix = $slg->[Marpa::R3::Internal::Scanless::G::REGIX];
 
@@ -174,9 +175,6 @@ sub Marpa::R3::Scanless::R::new {
 
     slr.lexeme_queue = {}
     slr.accept_queue = {}
-
-    -- The external event queue
-    slr.external_events = {}
 
     slr.end_pos = 0
     slr.perl_pos = 0
@@ -606,8 +604,7 @@ qq{Registering character $char_desc as symbol $symbol_id: },
     # The other command is "is_graphic".  It set or unsets the
     # `is_graphic` boolean for the codepoint.  The per-codepoint
     # structure must already exist.
-    my ($event_count) = $slr->call_by_tag(
-    ('@' . __FILE__ . ':' . __LINE__),
+    $slr->call_by_tag( ('@' . __FILE__ . ':' . __LINE__),
         <<'END_OF_LUA', 'i', \@codepoint_cmds);
         local slr, codepoint_cmds = ...
         local per_codepoint = slr.slg.per_codepoint
@@ -624,8 +621,10 @@ qq{Registering character $char_desc as symbol $symbol_id: },
              end
              ::NEXT_COMMAND::
         end
-        return #slr.external_events
 END_OF_LUA
+
+    my $event_count = scalar
+        @{$slr->[Marpa::R3::Internal::Scanless::R::EVENTS]};
 
     return 0 if $event_count > 0;
 
@@ -684,7 +683,6 @@ sub Marpa::R3::Scanless::R::resume {
                 end
             end
             slr:pos_set(start_pos, length_arg)
-            slr.external_events = {}
 END_OF_LUA
 
               OUTER_READ: while (1) {
@@ -1184,7 +1182,6 @@ sub Marpa::R3::Scanless::R::lexeme_complete {
         ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'ii', $start, $length );
       local slr, start_arg, length_arg = ...
-      slr.external_events = {}
       local start = start_arg
       if start then
          start = math.tointeger(start)

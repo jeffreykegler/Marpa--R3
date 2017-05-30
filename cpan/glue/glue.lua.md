@@ -504,8 +504,6 @@ and error codes.
             end
         end
 
-        -- TODO Delete slr.external_events after development?
-        slr.external_events = out_q
         return pause, trace_msgs, out_q
     end
 
