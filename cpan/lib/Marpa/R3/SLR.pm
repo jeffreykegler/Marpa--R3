@@ -631,24 +631,6 @@ END_OF_LUA
 
 } ## end sub Marpa::R3::Scanless::R::read
 
-# Return 1 if internal scanning should pause
-sub Marpa::R3::Internal::Scanless::convert_libmarpa_events {
-    my ($slr)    = @_;
-    my $trace_file_handle =
-        $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
-    my ($pause, $trace_msgs) = $slr->call_by_tag(( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', '');
-        local slr = ...
-        return glue.convert_libmarpa_events(slr)
-END_OF_LUA
-
-    for my $msg (@{$trace_msgs}) {
-        say {$trace_file_handle} $msg;
-    }
-
-    return $pause;
-} ## end sub Marpa::R3::Internal::Scanless::convert_libmarpa_events
-
 sub Marpa::R3::Scanless::R::resume {
     my ( $slr, $start_pos, $length ) = @_;
     my $length_arg    = $length    // -1;
@@ -705,20 +687,20 @@ END_OF_LUA
 
               OUTER_READ: while (1) {
 
-                    my ($problem_code, $pause, $trace_msgs) = $slr->call_by_tag(
+                    my ($problem_code, $trace_msgs) = $slr->call_by_tag(
                         ( '@' . __FILE__ . ':' . __LINE__ ),
                         <<'END_OF_LUA', '');
             local slr = ...
             local problem_code = slr:read() or 'pause'
             local pause, trace_msgs = glue.convert_libmarpa_events(slr)
-            return problem_code, pause, trace_msgs
+            problem_code = pause and 'pause' or problem_code
+            return problem_code, trace_msgs
 END_OF_LUA
 
     for my $msg (@{$trace_msgs}) {
         say {$trace_file_handle} $msg;
     }
 
-                    $problem_code = 'pause' if $pause;
                     last OUTER_READ if $problem_code eq 'pause';
                     next OUTER_READ if $problem_code eq 'event';
                     next OUTER_READ if $problem_code eq 'trace';
