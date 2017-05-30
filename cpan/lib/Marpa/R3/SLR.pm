@@ -670,9 +670,7 @@ sub Marpa::R3::Scanless::R::resume {
                 )
             end
 
-           print("calling slr:pos_set:", (start_pos_arg or slr.perl_pos), (length_arg or -1))
-           slr:pos_set((start_pos_arg or slr.perl_pos), (length_arg or -1))
-           -- glue.pos_set(slr, start_pos_arg, length_arg)
+           glue.pos_set(slr, (start_pos_arg or slr.perl_pos), (length_arg or -1))
 END_OF_LUA
 
               OUTER_READ: while (1) {

@@ -515,13 +515,9 @@ and error codes.
         end
         local input_length = #block
 
-        print(inspect(current_pos_arg))
         local current_pos = current_pos_arg or slr.perl_pos
-        print(inspect(current_pos))
         current_pos = math.tointeger(current_pos)
-        print(inspect(current_pos))
         if not current_pos then
-            io.stderr:write(inspect(current_pos))
             error(string.format('pos_set(): Bad current position argument %s', current_pos_arg))
         end
         if current_pos < 0 then
@@ -531,7 +527,6 @@ and error codes.
             error(string.format('pos_set(): Current position is before start of block: %s', current_pos_arg))
         end
         if current_pos > input_length then
-            print("current_pos, input_length, slr.perl_pos:", current_pos, input_length, slr.perl_pos)
             error(string.format('pos_set(): Current position is after end of block: %s', current_pos_arg))
         end
 
@@ -540,22 +535,15 @@ and error codes.
         if not longueur then
             error(string.format('pos_set(): Bad length argument %s', length_arg))
         end
-        print("longueur:", longueur)
-        if longueur < 0 then
-            longueur = (input_length - current_pos) + longueur + 1
-        end
-        print("longueur:", longueur)
-        local last_pos = current_pos + longueur - 1
-        if last_pos < 0 then
+        local end_pos = longueur >= 0 and current_pos + longueur or
+            input_length + longueur + 1
+        if end_pos < 0 then
             error(string.format('pos_set(): Last position is before start of block: %s', length_arg))
         end
-        if last_pos >= input_length then
-            print("current_pos, input_length, slr.perl_pos:", current_pos, input_length, slr.perl_pos)
-            print("last_pos, input_length, slr.perl_pos:", last_pos, input_length, slr.perl_pos)
+        if end_pos > input_length then
             error(string.format('pos_set(): Last position is after end of block: %s', length_arg))
         end
 
-        print("Would call slr:pos_set", current_pos, longueur, block_ix)
         return slr:pos_set(current_pos, longueur, block_ix)
     end
 ```
