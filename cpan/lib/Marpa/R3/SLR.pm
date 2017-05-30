@@ -687,14 +687,14 @@ END_OF_LUA
 
               OUTER_READ: while (1) {
 
-                    my ( $problem_code, $trace_msgs, $events ) =
+                    my ( $ok, $trace_msgs, $events ) =
                       $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
                         <<'END_OF_LUA', '' );
             local slr = ...
-            local problem_code = slr:read() or 'pause'
-            local pause, trace_msgs, events = glue.convert_libmarpa_events(slr)
-            problem_code = pause and 'pause' or problem_code
-            return problem_code, trace_msgs, events
+            local ok = 0
+            if not slr:read() then ok = 1 end
+            local _, trace_msgs, events = glue.convert_libmarpa_events(slr)
+            return ok, trace_msgs, events
 END_OF_LUA
 
                     $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] = $events;
@@ -703,7 +703,8 @@ END_OF_LUA
                         say {$trace_file_handle} $msg;
                     }
 
-                    last OUTER_READ if $problem_code eq 'pause';
+                    last OUTER_READ if $ok;
+                    last OUTER_READ if scalar @{$events}
 
                 } ## end OUTER_READ: while (1)
 
