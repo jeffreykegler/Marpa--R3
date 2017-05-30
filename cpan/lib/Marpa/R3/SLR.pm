@@ -737,13 +737,9 @@ END_OF_LUA
 
 sub Marpa::R3::Scanless::R::events {
     my ($slr) = @_;
-    my ($events) = $slr->call_by_tag(
-    ('@' . __FILE__ . ':' . __LINE__),
-    <<'END_OF_LUA', '>0');
-        local slr = ...
-        return slr.external_events
-END_OF_LUA
-    return $events;
+    my $events = $slr->[Marpa::R3::Internal::Scanless::R::EVENTS];
+    # say Data::Dumper::Dumper($events);
+    return $events // [];
 }
 
 sub character_describe {
