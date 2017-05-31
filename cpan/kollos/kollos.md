@@ -1612,7 +1612,7 @@ not find an acceptable lexeme.
                 )
         end
         local start_of_lexeme = slr.start_of_lexeme
-        slr.perl_pos = start_of_lexeme
+        slr:l0_where_set(nil, start_of_lexeme)
         return slr:no_lexeme_handle()
     end
 ```
@@ -1651,7 +1651,7 @@ and a string indicating the error.
         if #accept_q <= 0 then
             if discarded <= 0 then return false, exhausted() end
             -- if here, no accepted lexemes, but discarded ones
-            slr.perl_pos = working_pos
+            slr:l0_where_set(nil, working_pos)
             local latest_es = slr.g1:latest_earley_set()
             local trailers = slr.trailers
             trailers[latest_es] =
