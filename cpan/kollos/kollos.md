@@ -1189,7 +1189,13 @@ together.
 
 ```
 
-### Constructor
+### Constructors
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.slr_new(slg)
+    end
+```
 
 ```
     -- miranda: section+ most Lua function definitions

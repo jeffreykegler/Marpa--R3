@@ -136,24 +136,23 @@ sub Marpa::R3::Scanless::R::new {
 
   my $slg_regix = $slg->[Marpa::R3::Internal::Scanless::G::REGIX];
 
-  my ($regix) = $lua->call_by_tag (-1, 
+  my ($regix) = $slg->call_by_tag (
     ('@' . __FILE__ . ':' . __LINE__),
-    <<'END_OF_LUA', 'i', $slg_regix);
-    local slg_lua_ref = ...
+    <<'END_OF_LUA', '');
+    local slg = ...
     local slr = {}
-    slr.phase = 'initial'
-    local registry = debug.getregistry()
     setmetatable(slr, _M.class_slr)
-    local grammar = registry[slg_lua_ref]
-    slr.slg = grammar
+    slr.phase = 'initial'
+    slr.slg = slg
+    local registry = debug.getregistry()
     local lua_ref = _M.register(registry, slr)
     slr.ref_count = 1
 
-    local l0g = grammar.l0
+    local l0g = slg.l0
     slr.l0 = {}
     slr.l0_irls = {}
 
-    local g1g = grammar.g1
+    local g1g = slg.g1
     slr.g1 = _M.recce_new(g1g)
     -- TODO Census, eliminate most (all?) references via lmw_g
     slr.g1_isys = {}
@@ -186,7 +185,7 @@ sub Marpa::R3::Scanless::R::new {
     slr.end_of_pause_lexeme = -1
     slr.is_external_scanning = false
 
-    local g_l0_rules = grammar.l0.irls
+    local g_l0_rules = slg.l0.irls
     local r_l0_rules = slr.l0_irls
     -- print('g_l0_rules: ', inspect(g_l0_rules))
     local max_l0_rule_id = l0g:highest_rule_id()
@@ -201,7 +200,7 @@ sub Marpa::R3::Scanless::R::new {
         r_l0_rules[rule_id] = r_l0_rule
     end
     -- print('r_l0_rules: ', inspect(r_l0_rules))
-    local g_g1_symbols = grammar.g1.isys
+    local g_g1_symbols = slg.g1.isys
     local r_g1_symbols = slr.g1_isys
     local max_g1_symbol_id = g1g:highest_symbol_id()
     for symbol_id = 0, max_g1_symbol_id do
