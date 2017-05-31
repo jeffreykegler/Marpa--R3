@@ -1516,17 +1516,18 @@ otherwise `false` and a status string.
             slr:l0r_new()
         end
         while true do
-            if slr.perl_pos >= slr.end_pos then
+            local _, l0_pos, end_pos = slr:l0_where()
+            if l0_pos >= end_pos then
                 return true
             end
             -- +1 because codepoints array is 1-based
-            slr.codepoint = slr:codepoint_from_pos(block_ix, slr.perl_pos)
+            slr.codepoint = slr:codepoint_from_pos(block_ix, l0_pos)
             local ok, errmsg = slr:l0_read_codepoint()
             local this_candidate, eager = slr:l0_track_candidates()
             if this_candidate then slr.l0_candidate = this_candidate end
             if eager then return true end
             if not ok then return false, errmsg end
-            slr.perl_pos = slr.perl_pos + 1
+            slr.perl_pos = l0_pos + 1
         end
         error('Unexpected fall through in l0_read()')
     end
