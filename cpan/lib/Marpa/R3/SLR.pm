@@ -186,7 +186,7 @@ END_OF_LUA
             error( string.format('Problem in start_input(): %s',
                 recce.slg.g1.error_description()))
         end
-        recce:g1_convert_events(recce.perl_pos)
+        recce:g1_convert_events()
 END_OF_LUA
 
     {
@@ -1201,13 +1201,32 @@ END_OF_LUA
     return $line_no, $column_no;
 } ## end sub Marpa::R3::Scanless::R::line_column
 
+# TODO -- Document block_ix result
+# TODO -- Delete this in favor of l0_where()?
 sub Marpa::R3::Scanless::R::pos {
     my ($slr) = @_;
-    my ($perl_pos) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        'local slr = ...; return slr.perl_pos', '' );
-    return $perl_pos;
+    my ($l0_pos) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+            <<'END_OF_LUA', '' );
+        local slr = ...
+        local _, l0_pos = slr:l0_where()
+        return l0_pos
+END_OF_LUA
+    return $l0_pos;
 }
 
+# TODO -- Document block_ix result
+sub Marpa::R3::Scanless::R::l0_where {
+    my ($slr) = @_;
+    my ($l0_pos, $block_ix) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+            <<'END_OF_LUA', '' );
+        local slr = ...
+        local block_ix, l0_pos = slr:l0_where()
+        return l0_pos, block_ix
+END_OF_LUA
+    return $l0_pos, $block_ix;
+}
+
+# TODO -- Document block_ix argument
 sub Marpa::R3::Scanless::R::input_length {
     my ( $slr, $block_ix ) = @_;
     my ($length) = $slr->call_by_tag(
