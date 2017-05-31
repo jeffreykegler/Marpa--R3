@@ -31,7 +31,6 @@ cd kollos && ../lua/lua toc.lua < kollos.md
     * [TODO notes](#todo-notes)
   * [Use generations in Libmarpa trees](#use-generations-in-libmarpa-trees)
   * [Kollos assumes core libraries are loaded](#kollos-assumes-core-libraries-are-loaded)
-  * [Kollos assumes global name "kollos"](#kollos-assumes-global-name-kollos)
   * [New lexer features](#new-lexer-features)
   * [Discard events](#discard-events)
 * [Kollos object](#kollos-object)
@@ -39,19 +38,22 @@ cd kollos && ../lua/lua toc.lua < kollos.md
   * [External, inner and internal](#external-inner-and-internal)
 * [Symbols](#symbols)
 * [ISY Fields](#isy-fields)
+* [ISY Accessors](#isy-accessors)
 * [XSY Fields](#xsy-fields)
+* [XSY Accessors](#xsy-accessors)
 * [Rules](#rules)
 * [IRL Fields](#irl-fields)
 * [XRL Fields](#xrl-fields)
 * [Layers and wrappers](#layers-and-wrappers)
 * [Kollos SLIF grammar object](#kollos-slif-grammar-object)
   * [Fields](#fields)
-  * [Ranking methods](#ranking-methods)
+  * [Mutators](#mutators)
+  * [Constanst: Ranking methods](#constanst-ranking-methods)
   * [Hash to runtime processing](#hash-to-runtime-processing)
   * [Diagnostics](#diagnostics)
 * [Kollos SLIF recognizer object](#kollos-slif-recognizer-object)
   * [Fields](#fields)
-  * [Constructor](#constructor)
+  * [Constructors](#constructors)
   * [Reading](#reading)
     * [External reading](#external-reading)
       * [Notes on tracing](#notes-on-tracing)
@@ -97,13 +99,10 @@ cd kollos && ../lua/lua toc.lua < kollos.md
     * [Return the value of a stack entry](#return-the-value-of-a-stack-entry)
     * [Set the value of a stack entry](#set-the-value-of-a-stack-entry)
     * [Convert current, origin Earley set to L0 span](#convert-current-origin-earley-set-to-l0-span)
-* [The subgrammar](#the-subgrammar)
-  * [Fields](#fields)
-  * [Constructor](#constructor)
-  * [Layer grammar accessors](#layer-grammar-accessors)
 * [The grammar Libmarpa wrapper](#the-grammar-libmarpa-wrapper)
   * [Fields](#fields)
   * [Constructor](#constructor)
+  * [Layer grammar accessors](#layer-grammar-accessors)
 * [The recognizer Libmarpa wrapper](#the-recognizer-libmarpa-wrapper)
   * [Fields](#fields)
 * [The valuator Libmarpa wrapper](#the-valuator-libmarpa-wrapper)
@@ -672,24 +671,6 @@ Marpa::R2's Libmarpa.
     -- miranda: insert class_xrl field declarations
     declarations(_M.class_xrl, class_xrl_fields, 'xrl')
 ```
-
-## Layers and wrappers
-
-There is a SLIF grammar object and
-a SLIF recce object.
-The SLIF has two *layers*, G1 and L0.
-
-Each SLIF object contains two layer objects.
-SLIF grammars contain
-a G1 layer grammar object
-and an L0 layer grammar object.
-Each layer grammar object, in turn,
-contains a Libmarpa grammar wrapper object.
-
-SLIF recognizers contain
-a G1 layer recognizer object
-Each layer recognizer object, in turn,
-contains a Libmarpa recognizer wrapper object.
 
 ## Kollos SLIF grammar object
 
@@ -1362,20 +1343,20 @@ The top-level read function.
         slr.event_queue = {}
         slr.trace_queue = {}
         while true do
-            local perl_pos = slr.perl_pos
-            if perl_pos >= slr.end_pos then
+            local _, l0_pos, end_pos = slr:l0_where()
+            if l0_pos >= end_pos then
                 -- a 'normal' return
                 return true
             end
-            if perl_pos >= 0 then
-                slr.start_of_lexeme = perl_pos
+            if l0_pos >= 0 then
+                slr.start_of_lexeme = l0_pos
                 slr.l0 = nil
                 if slr.trace_terminals >= 1 then
                     local q = slr.trace_queue
-                    local event = { 'lexer restarted recognizer', perl_pos}
+                    local event = { 'lexer restarted recognizer', l0_pos}
                     event.msg = string.format(
                         'Restarted recognizer at %s',
-                        slr:lc_brief(perl_pos)
+                        slr:lc_brief(l0_pos)
                     )
                     q[#q+1] = event
                 end
@@ -2547,6 +2528,60 @@ an L0 range
        return string.format("B%dL%dc%d",
              block1, line1, column1)
     end
+```
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slr.l0_where(slr)
+        local block = slr.current_block
+        return block.index, slr.perl_pos,
+            slr.end_pos
+    end
+```
+
+Returns byte position, line and column of `pos`
+in block with index `block_ix`.
+Caller must ensure `block` and `pos` are valid.
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slr.per_pos(slr, block_ix, pos)
+        local block = slr.inputs[block_ix]
+        -- codepoints array is 1-based
+        local codepoint_ix = pos+1
+        local text = block.text
+        if codepoint_ix > #block then
+            -- It is useful to have an "end of block"
+            -- position.  No codepoint, but line is
+            -- last line and byte_p and column are one
+            -- after the end
+            if codepoint_ix == #block + 1 then
+                local vlq = block[#block]
+                local last_byte_p, last_line_no, last_column_no
+                    = table.unpack(_M.from_vlq(vlq))
+                return #text+1, last_line_no, last_column_no+1
+            end
+            error(string.format(
+                "Internal error: invalid block,pos: %d, %d\n\z
+                \u{20}   pos must be from 0-%d\n",
+                block_ix, pos, #block))
+        end
+        local vlq = block[codepoint_ix]
+        -- print(inspect(_M.from_vlq(vlq)))
+        return table.unpack(_M.from_vlq(vlq))
+    end
+```
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slr.codepoint_from_pos(slr, block, pos)
+        local byte_p = slr:per_pos(block, pos)
+        local input = slr.inputs[block]
+        local text = input.text
+        if byte_p > #text then return end
+        return utf8.codepoint(text, byte_p)
+    end
+
 ```
 
 ### Events
@@ -4603,49 +4638,6 @@ It should free all memory associated with the valuation.
 ```
 
 ### Input
-
-Returns byte position, line and column of `pos`
-in block with index `block_ix`.
-Caller must ensure `block` and `pos` are valid.
-
-```
-    -- miranda: section+ most Lua function definitions
-    function _M.class_slr.per_pos(slr, block_ix, pos)
-        local block = slr.inputs[block_ix]
-        -- codepoints array is 1-based
-        local codepoint_ix = pos+1
-        local text = block.text
-        if codepoint_ix > #block then
-            -- It is useful to have an "end of block"
-            -- position.  No codepoint, but line is
-            -- last line and byte_p and column are one
-            -- after the end
-            if codepoint_ix == #block + 1 then
-                local vlq = block[#block]
-                local last_byte_p, last_line_no, last_column_no
-                    = table.unpack(_M.from_vlq(vlq))
-                return #text+1, last_line_no, last_column_no+1
-            end
-            error(string.format(
-                "Internal error: invalid block,pos: %d, %d\n\z
-                \u{20}   pos must be from 0-%d\n",
-                block_ix, pos, #block))
-        end
-        local vlq = block[codepoint_ix]
-        -- print(inspect(_M.from_vlq(vlq)))
-        return table.unpack(_M.from_vlq(vlq))
-    end
-
-    -- miranda: section+ most Lua function definitions
-    function _M.class_slr.codepoint_from_pos(slr, block, pos)
-        local byte_p = slr:per_pos(block, pos)
-        local input = slr.inputs[block]
-        local text = input.text
-        if byte_p > #text then return end
-        return utf8.codepoint(text, byte_p)
-    end
-
-```
 
 ```
     -- miranda: section+ diagnostics
