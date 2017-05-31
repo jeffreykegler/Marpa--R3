@@ -1857,7 +1857,7 @@ Returns `true` is there was one,
                 slr.start_of_pause_lexeme = lexeme_start
                 slr.end_of_pause_lexeme = lexeme_end
                 local start_of_lexeme = slr.start_of_lexeme
-                slr.perl_pos = start_of_lexeme
+                slr:l0_where_set(nil, start_of_lexeme)
                 return true
             end
         end
@@ -1878,7 +1878,7 @@ Returns `true` is there was one,
             ))
         end
         local end_of_lexeme = slr.end_of_lexeme
-        slr.perl_pos = end_of_lexeme
+        slr:l0_where_set(nil, end_of_lexeme)
         if result > 0 then slr:g1_convert_events() end
         local start_of_lexeme = slr.start_of_lexeme
         local end_of_lexeme = slr.end_of_lexeme
@@ -2051,9 +2051,7 @@ make this more internal?
             error(string.format('pos_set(): Last position is after end of block: %s', length_arg))
         end
 
-        slr.perl_pos = current_pos
-        slr.end_pos = end_pos
-        return
+        return slr:l0_where_set(block_ix, current_pos, end_pos)
     end
 ```
 
