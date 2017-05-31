@@ -115,15 +115,15 @@ test ::
 test_dynamic ::
 	$(NOECHO) $(NOOP)
 
-glue.lua: glue.lua.md
-	LUA_PATH=$(LUA_PATH) $(LUA_INTERP) $(MIRANDA) glue.lua.md main=glue.lua
+glue.lua: glue.md
+	LUA_PATH=$(LUA_PATH) $(LUA_INTERP) $(MIRANDA) glue.md main=glue.lua
 
-glue.c: glue.lua.md \
+glue.c: glue.md \
 	  glue.h
-	LUA_PATH=$(LUA_PATH) $(LUA_INTERP) $(MIRANDA) glue.lua.md glue_c=glue.c
+	LUA_PATH=$(LUA_PATH) $(LUA_INTERP) $(MIRANDA) glue.md glue_c=glue.c
 
-glue.h: glue.lua.md
-	LUA_PATH=$(LUA_PATH) $(LUA_INTERP) $(MIRANDA) glue.lua.md glue_h=glue.h
+glue.h: glue.md
+	LUA_PATH=$(LUA_PATH) $(LUA_INTERP) $(MIRANDA) glue.md glue_h=glue.h
 
 };
 

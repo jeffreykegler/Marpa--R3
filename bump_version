@@ -87,7 +87,7 @@ for my $versioned_file (@versioned_files) {
 
 {
     # Update the version of Libmarpa that XS is expecting
-    my $expecting_file = 'cpan/kollos/kollos.lua.md';
+    my $expecting_file = 'cpan/kollos/kollos.md';
     say STDERR $expecting_file;
     my $file = do { local ( @ARGV, $/ ) = ($expecting_file); <> };
     $file =~ s{

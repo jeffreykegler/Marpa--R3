@@ -389,7 +389,7 @@ inc/Marpa/R3/Lua/Test/More.pm: inc/Marpa/R3/Lua/Test/More.lua inc/Marpa/R3/Lua/T
 END_OF_POSTAMBLE_PIECE
 }
     push @postamble_pieces, sprintf <<'END_OF_POSTAMBLE_PIECE',
-kollos/kollos.lua: lua/lua kollos/kollos.lua.md
+kollos/kollos.lua: lua/lua kollos/kollos.md
 	%s
 END_OF_POSTAMBLE_PIECE
 	$self->cd(File::Spec->catdir(qw(kollos)), '$(MAKE)');
@@ -401,7 +401,7 @@ END_OF_POSTAMBLE_PIECE
 	$self->cd(File::Spec->catdir(qw(lua)), '$(MAKE)');
 
     push @postamble_pieces, sprintf <<'END_OF_POSTAMBLE_PIECE',
-glue/glue.lua: lua/lua glue/glue.lua.md
+glue/glue.lua: lua/lua glue/glue.md
 	%s
 END_OF_POSTAMBLE_PIECE
 	$self->cd(File::Spec->catdir(qw(glue)), '$(MAKE)');

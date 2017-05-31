@@ -106,7 +106,7 @@ etc/pod_inlinks.pl
 etc/pod_links.pl
 etc/reserved_check.sh
 glue/Makefile.PL
-glue/glue.lua.md
+glue/glue.md
 glue/hex2h.lua
 glue/string2h.lua
 inc/Marpa/R3/Config.pm
@@ -122,7 +122,7 @@ kollos/gen_error_table.lua
 kollos/gen_event_table.lua
 kollos/gen_step_table.lua
 kollos/inspect.lua
-kollos/kollos.lua.md
+kollos/kollos.md
 kollos/miranda
 kollos/strict.lua
 lib/Marpa/R3.pm
