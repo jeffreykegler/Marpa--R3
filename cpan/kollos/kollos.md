@@ -1258,8 +1258,7 @@ together.
     function _M.class_slr.l0r_new(slr)
         local l0r = _M.recce_new(slr.slg.l0)
 
-        local block_ix = slr.current_block.index
-        local perl_pos = slr.perl_pos
+        local block_ix, l0_pos = slr:l0_where()
         local g1g = slr.slg.g1
 
         if not l0r then
@@ -1302,12 +1301,12 @@ together.
                 if xsy then
                     local q = slr.trace_queue
                     -- TODO -- needs block_ix
-                    local event = { 'expected lexeme', perl_pos, terminal, assertion }
+                    local event = { 'expected lexeme', l0_pos, terminal, assertion }
                     local display_form = xsy:display_form()
                     event.msg = string.format(
                         "Expected lexeme %s at %s; assertion ID = %d",
                         display_form,
-                        slr:lc_brief(perl_pos),
+                        slr:lc_brief(l0_pos),
                         assertion
                     )
                     q[#q+1] = event
@@ -2511,10 +2510,15 @@ an L0 range
         else
             block = slr.current_block
         end
-        block.l0_pos = l0_pos
-        block.end_pos = end_pos
-        slr.perl_pos = l0_pos
-        slr.end_pos = l0_pos
+        if l0_pos then
+            block.l0_pos = l0_pos
+            slr.perl_pos = l0_pos
+        end
+        if end_pos then
+            block.end_pos = end_pos
+            slr.end_pos = l0_pos
+        end
+        return slr:l0_where()
     end
 ```
 
