@@ -23,7 +23,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 # Table of contents
 <!--
-../lua/lua ../kollos/toc.lua < glue.lua.md
+../lua/lua ../kollos/toc.lua < glue.md
 -->
 * [About the glue code](#about-the-glue-code)
 * [The by-tag code cache](#the-by-tag-code-cache)

@@ -23,7 +23,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 # Table of contents
 <!--
-cd kollos && ../lua/lua toc.lua < kollos.lua.md
+cd kollos && ../lua/lua toc.lua < kollos.md
 -->
 * [About Kollos](#about-kollos)
 * [Development Notes](#development-notes)
