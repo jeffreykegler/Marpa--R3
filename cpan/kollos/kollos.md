@@ -1416,18 +1416,18 @@ which will be 1 or 0.
         local l0g = slr.slg.l0
         local codepoint = slr.codepoint
         local result = l0r:alternative(symbol_id, 1, 1)
+        local _, l0_pos = slr:l0_where()
         if result == _M.err.UNEXPECTED_TOKEN_ID then
             if slr.trace_terminals >= 1 then
                 local q = slr.trace_queue
-                local perl_pos = slr.perl_pos
                 local event = { 'lexer accepted codepoint', codepoint,
-                    perl_pos, symbol_id }
+                    l0_pos, symbol_id }
                 event.msg = string.format(
                     'Codepoint %q 0x%04x rejected as %s at %s',
                     utf8.char(codepoint),
                     codepoint,
                     l0g:force_form(symbol_id),
-                    slr:lc_brief(perl_pos)
+                    slr:lc_brief(l0_pos)
                 )
                 q[#q+1] = event
             end
@@ -1436,15 +1436,14 @@ which will be 1 or 0.
         if result == _M.err.NONE then
             if slr.trace_terminals >= 1 then
                 local q = slr.trace_queue
-                local perl_pos = slr.perl_pos
                 local event = { 'lexer accepted codepoint', codepoint,
-                    perl_pos, symbol_id }
+                    l0_pos, symbol_id }
                 event.msg = string.format(
                     'Codepoint %q 0x%04x accepted as %s at %s',
                     utf8.char(codepoint),
                     codepoint,
                     l0g:force_form(symbol_id),
-                    slr:lc_brief(perl_pos)
+                    slr:lc_brief(l0_pos)
                 )
                 q[#q+1] = event
             end
@@ -1454,7 +1453,7 @@ which will be 1 or 0.
              Problem alternative() failed at char ix %d; symbol id %d; codepoint 0x%x
              Problem in l0_read(), alternative() failed: %s
         ]],
-            slr.perl_pos, symbol_id, codepoint, l0r:error_description()
+            l0_pos, symbol_id, codepoint, l0r:error_description()
         ))
     end
 
