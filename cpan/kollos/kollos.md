@@ -1101,48 +1101,76 @@ This is a registry object.
 
 ```
     -- miranda: section+ class_slr field declarations
-    class_slr_fields['accept_queue'] = true
-    class_slr_fields['codepoint'] = true
-    class_slr_fields['current_block'] = true
-    class_slr_fields['end_of_lexeme'] = true
-    class_slr_fields['end_of_parse'] = true
-    class_slr_fields['end_of_pause_lexeme'] = true
-    class_slr_fields['end_pos'] = true
-    class_slr_fields['event_queue'] = true
-    class_slr_fields['g1'] = true
-    class_slr_fields['has_parse'] = true
-    class_slr_fields['inputs'] = true
-    class_slr_fields['is_external_scanning'] = true
-    class_slr_fields['l0'] = true
-    class_slr_fields['l0_candidate'] = true
+    class_slr_fields.accept_queue = true
+    class_slr_fields.codepoint = true
+    class_slr_fields.current_block = true
+    class_slr_fields.end_of_lexeme = true
+    class_slr_fields.end_of_parse = true
+    class_slr_fields.end_of_pause_lexeme = true
+    class_slr_fields.end_pos = true
+    class_slr_fields.event_queue = true
+    class_slr_fields.g1 = true
+    class_slr_fields.has_parse = true
+    class_slr_fields.inputs = true
+    class_slr_fields.is_external_scanning = true
+    class_slr_fields.l0 = true
+    class_slr_fields.l0_candidate = true
     class_slr_fields.g1_isys = true
     class_slr_fields.l0_irls = true
-    class_slr_fields['irls'] = true
-    class_slr_fields['lexeme_queue'] = true
-    class_slr_fields['lmw_b'] = true
-    class_slr_fields['lmw_o'] = true
-    class_slr_fields['lmw_t'] = true
-    class_slr_fields['lmw_v'] = true
-    class_slr_fields['max_parses'] = true
-    class_slr_fields['per_es'] = true
-    class_slr_fields['perl_pos'] = true
-    class_slr_fields['phase'] = true
-    class_slr_fields['ref_count'] = true
-    class_slr_fields['slg'] = true
-    class_slr_fields['start_of_lexeme'] = true
-    class_slr_fields['start_of_pause_lexeme'] = true
-    class_slr_fields['terminals_expected'] = true
-    class_slr_fields['this_step'] = true
-    class_slr_fields['too_many_earley_items'] = true
-    class_slr_fields['token_is_literal'] = true
-    class_slr_fields['token_is_undef'] = true
-    class_slr_fields['token_values'] = true
-    class_slr_fields['trace_queue'] = true
-    class_slr_fields['trace_terminals'] = true
-    class_slr_fields['trace_values'] = true
-    class_slr_fields['trace_values_queue'] = true
-    class_slr_fields['tree_mode'] = true
-    class_slr_fields['trailers'] = true
+    class_slr_fields.irls = true
+    class_slr_fields.lexeme_queue = true
+    class_slr_fields.lmw_b = true
+    class_slr_fields.lmw_o = true
+    class_slr_fields.lmw_t = true
+    class_slr_fields.lmw_v = true
+    class_slr_fields.max_parses = true
+    class_slr_fields.per_es = true
+    class_slr_fields.perl_pos = true
+    class_slr_fields.phase = true
+    class_slr_fields.ref_count = true
+    class_slr_fields.slg = true
+    class_slr_fields.start_of_lexeme = true
+    class_slr_fields.start_of_pause_lexeme = true
+    class_slr_fields.terminals_expected = true
+    class_slr_fields.this_step = true
+    class_slr_fields.too_many_earley_items = true
+    class_slr_fields.token_is_literal = true
+    class_slr_fields.token_is_undef = true
+    class_slr_fields.token_values = true
+    class_slr_fields.trace_queue = true
+    class_slr_fields.trace_terminals = true
+    class_slr_fields.trace_values = true
+    class_slr_fields.trace_values_queue = true
+    class_slr_fields.tree_mode = true
+    class_slr_fields.trailers = true
+```
+
+*At end of input* field:
+`true` when at "end of input",
+nil otherwise.
+It is "end of input" because
+a Kollos input can traverse multiple
+files.
+This is a common requirement:
+It is necessary, for example,
+for parsing C language.
+
+```
+    -- miranda: section+ class_slr field declarations
+    class_slr_fields.at_eoi = true
+```
+
+*Block mode*:
+`true` in block mode,
+`nil` otherwise.
+Kollos read method and its block-by-block
+methods are not compatible.
+This boolean keeps them from begin used
+together.
+
+```
+    -- miranda: section+ class_slr field declarations
+    class_slr_fields.block_mode = true
 ```
 
 ```
@@ -1244,6 +1272,9 @@ The top-level read function.
     function _M.class_slr.read(slr)
         if slr.is_external_scanning then
            _M.userX( 'unpermitted mix of external and internal scanning' )
+        end
+        if slr.block_mode then
+           _M.userX( 'unpermitted use of slr.read() in block mode' )
         end
         slr.start_of_pause_lexeme = -1
         slr.end_of_pause_lexeme = -1
@@ -1918,14 +1949,49 @@ make this more internal?
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slr.pos_set(slr, start_pos_arg, length_arg)
-        local input_length = #slr.current_block
-        local new_perl_pos = start_pos_arg >=0  and start_pos_arg
-            or input_length + start_pos_arg
-        local new_end_pos = length_arg >= 0 and new_perl_pos + length_arg
-            or input_length + length_arg + 1
-        slr.perl_pos = new_perl_pos
-        slr.end_pos = new_end_pos
+    function _M.class_slr.pos_set(slr, current_pos_arg, length_arg, block_ix)
+        local block
+        if block_ix then
+            block = slr.inputs[block_ix]
+            if not block then
+                error(string.format('pos_set(): No block at index %d', block_ix))
+            end
+        else
+            block = slr.current_block
+        end
+        local input_length = #block
+
+        local current_pos = current_pos_arg or slr.perl_pos
+        current_pos = math.tointeger(current_pos)
+        if not current_pos then
+            error(string.format('pos_set(): Bad current position argument %s', current_pos_arg))
+        end
+        if current_pos < 0 then
+            current_pos = input_length + current_pos
+        end
+        if current_pos < 0 then
+            error(string.format('pos_set(): Current position is before start of block: %s', current_pos_arg))
+        end
+        if current_pos > input_length then
+            error(string.format('pos_set(): Current position is after end of block: %s', current_pos_arg))
+        end
+
+        local longueur = length_arg or -1
+        longueur = math.tointeger(longueur)
+        if not longueur then
+            error(string.format('pos_set(): Bad length argument %s', length_arg))
+        end
+        local end_pos = longueur >= 0 and current_pos + longueur or
+            input_length + longueur + 1
+        if end_pos < 0 then
+            error(string.format('pos_set(): Last position is before start of block: %s', length_arg))
+        end
+        if end_pos > input_length then
+            error(string.format('pos_set(): Last position is after end of block: %s', length_arg))
+        end
+
+        slr.perl_pos = current_pos
+        slr.end_pos = end_pos
         return
     end
 ```
