@@ -2503,6 +2503,19 @@ an L0 range
         return block.index, slr.perl_pos,
             slr.end_pos
     end
+    function _M.class_slr.l0_where_set(slr, block_ix, l0_pos, end_pos)
+        local block
+        if block_ix then
+            block = slr.inputs[block_ix]
+            slr.current_block = block
+        else
+            block = slr.current_block
+        end
+        block.l0_pos = l0_pos
+        block.end_pos = end_pos
+        slr.perl_pos = l0_pos
+        slr.end_pos = l0_pos
+    end
 ```
 
 Returns byte position, line and column of `pos`
@@ -2957,11 +2970,9 @@ It is designed to be convenient for use as a tail call.
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.throw_at_pos(slr, desc, block_ix, pos)
       desc = desc or ''
-      if not block_ix then
-          local block = slr.current_block
-          block_ix = block.index
-      end
-      pos = pos or slr.perl_pos
+      local current_block_ix, l0_pos = slr:l0_where()
+      block_ix = block_ix or current_block_ix
+      pos = pos or l0_pos
       local codepoint = slr:codepoint_from_pos(block_ix, pos)
       return _M.userX(string.format(
              "Error in SLIF parse: %s\n\z
