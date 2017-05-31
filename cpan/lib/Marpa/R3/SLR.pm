@@ -134,87 +134,11 @@ sub Marpa::R3::Scanless::R::new {
     $slr->[Marpa::R3::Internal::Scanless::R::L] = $lua;
     $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] = [];
 
-  my $slg_regix = $slg->[Marpa::R3::Internal::Scanless::G::REGIX];
-
   my ($regix) = $slg->call_by_tag (
     ('@' . __FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', '');
     local slg = ...
-    local slr = {}
-    setmetatable(slr, _M.class_slr)
-    slr.phase = 'initial'
-    slr.slg = slg
-    local registry = debug.getregistry()
-    local lua_ref = _M.register(registry, slr)
-    slr.ref_count = 1
-
-    local l0g = slg.l0
-    slr.l0 = {}
-    slr.l0_irls = {}
-
-    local g1g = slg.g1
-    slr.g1 = _M.recce_new(g1g)
-    -- TODO Census, eliminate most (all?) references via lmw_g
-    slr.g1_isys = {}
-
-    slr.codepoint = nil
-    slr.inputs = {}
-
-    slr.max_parses = nil
-    slr.per_es = {}
-    slr.current_block = nil
-
-    -- Trailing (that is, discarded) sweeps by
-    -- G0 Earley set index.  Integer indices, but not
-    -- necessarily a sequence.
-    slr.trailers = {}
-
-    slr.event_queue = {}
-    slr.trace_queue = {}
-
-    slr.lexeme_queue = {}
-    slr.accept_queue = {}
-
-    slr.end_pos = 0
-    slr.perl_pos = 0
-    slr.too_many_earley_items = -1
-    slr.trace_terminals = 0
-    slr.start_of_lexeme = 0
-    slr.end_of_lexeme = 0
-    slr.start_of_pause_lexeme = -1
-    slr.end_of_pause_lexeme = -1
-    slr.is_external_scanning = false
-
-    local g_l0_rules = slg.l0.irls
-    local r_l0_rules = slr.l0_irls
-    -- print('g_l0_rules: ', inspect(g_l0_rules))
-    local max_l0_rule_id = l0g:highest_rule_id()
-    for rule_id = 0, max_l0_rule_id do
-        local r_l0_rule = {}
-        local g_l0_rule = g_l0_rules[rule_id]
-        if g_l0_rule then
-            for field, value in pairs(g_l0_rule) do
-                r_l0_rule[field] = value
-            end
-        end
-        r_l0_rules[rule_id] = r_l0_rule
-    end
-    -- print('r_l0_rules: ', inspect(r_l0_rules))
-    local g_g1_symbols = slg.g1.isys
-    local r_g1_symbols = slr.g1_isys
-    local max_g1_symbol_id = g1g:highest_symbol_id()
-    for symbol_id = 0, max_g1_symbol_id do
-        r_g1_symbols[symbol_id] = {
-            lexeme_priority =
-                g_g1_symbols[symbol_id].priority,
-            pause_before_active =
-                g_g1_symbols[symbol_id].pause_before_active,
-            pause_after_active =
-                g_g1_symbols[symbol_id].pause_after_active
-        }
-    end
-    slr:valuation_reset()
-    return lua_ref
+    return slg:slr_new()
 END_OF_LUA
 
     $slr->[Marpa::R3::Internal::Scanless::R::REGIX]      = $regix;
