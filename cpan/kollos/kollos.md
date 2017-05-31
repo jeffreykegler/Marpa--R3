@@ -1509,12 +1509,11 @@ otherwise `false` and a status string.
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.l0_read_lexeme(slr)
-        local block_ix = slr.current_block.index
         if not slr.l0 then
             slr:l0r_new()
         end
         while true do
-            local _, l0_pos, end_pos = slr:l0_where()
+            local block_ix, l0_pos, end_pos = slr:l0_where()
             if l0_pos >= end_pos then
                 return true
             end
@@ -1525,7 +1524,7 @@ otherwise `false` and a status string.
             if this_candidate then slr.l0_candidate = this_candidate end
             if eager then return true end
             if not ok then return false, errmsg end
-            slr.perl_pos = l0_pos + 1
+            slr:l0_where_set(nil, l0_pos + 1)
         end
         error('Unexpected fall through in l0_read()')
     end
@@ -2516,7 +2515,7 @@ an L0 range
         end
         if end_pos then
             block.end_pos = end_pos
-            slr.end_pos = l0_pos
+            slr.end_pos = end_pos
         end
         return slr:l0_where()
     end
