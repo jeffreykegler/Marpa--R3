@@ -214,12 +214,11 @@ sub Marpa::R3::Scanless::R::new {
                 g_g1_symbols[symbol_id].pause_after_active
         }
     end
+    slr:valuation_reset()
     return lua_ref
 END_OF_LUA
 
     $slr->[Marpa::R3::Internal::Scanless::R::REGIX]      = $regix;
-
-    $slr->reset_evaluation();
 
     common_set( $slr, "new",  $flat_args );
 
@@ -829,9 +828,8 @@ sub Marpa::R3::Scanless::R::reset_evaluation {
 
     $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
     <<'END_OF_LUA', '' );
-        local recce = ...
-        recce.tree_mode = nil
-        recce:valuation_reset()
+        local slr = ...
+        slr:valuation_reset()
 END_OF_LUA
 
     return;
