@@ -1480,13 +1480,13 @@ otherwise `false` and an error code string.
 
         if slr.trace_terminals >= 1 then
            local q = slr.trace_queue
-           local perl_pos = slr.perl_pos
-           local event = { 'lexer reading codepoint', codepoint, perl_pos}
+           local _, l0_pos = slr:l0_where()
+           local event = { 'lexer reading codepoint', codepoint, l0_pos}
            event.msg = string.format(
                'Reading codepoint %q 0x%04x at %s',
                utf8.char(codepoint),
                codepoint,
-               slr:lc_brief(perl_pos)
+               slr:lc_brief(l0_pos)
            )
            q[#q+1] = event
         end
@@ -1951,10 +1951,11 @@ Read alternatives into the G1 grammar.
             end
             if return_value ~= _M.err.NONE then
                 local l0r = slr.l0
+                local _, l0_pos  = slr:l0_where()
                 error(string.format([[
                      'Problem SLR->read() failed on symbol id %d at position %d: %s'
                 ]],
-                    g1_lexeme, slr.perl_pos, l0r:error_description()
+                    g1_lexeme, l0_pos, l0r:error_description()
                 ))
                 goto NEXT_EVENT
             end
@@ -2063,42 +2064,6 @@ make this more internal?
 These functions are for "external" reading of tokens --
 that is reading tokens by a means other than Marpa's own
 lexer.
-
-##### Notes on tracing
-
-The following is
-from my notes on the XS code, about adding tracing to
-the external reading methods:
-
-TODO: Currently end location is not known at this
-point.  Once it is, add tracing:
-Don't bother with lexeme events as unnecessary
-and counter-productive for this call, which often
-is used to override them
-
-```
-  { 'g1 pausing after lexeme', lexeme_start, lexeme_end, lexeme}
-  { 'g1 before lexeme event', g1_lexeme}
-
-Yes, at trace level > 0
- { "g1 duplicate lexeme" ...
- { 'g1 accepted lexeme', lexeme_start, lexeme_end, lexeme}
-
-Yes, at trace level > 0
- { 'g1 attempting lexeme', lexeme_start, lexeme_end, lexeme}
-
-Irrelevant, cannot happen
-  { "discarded lexeme" }
-
-Irrelevant, because this call overrides priorities
-  { "outprioritized lexeme" }
-
-These are about lexeme expectations, which are
-regarded as known before this call (or alternatively non-
-acceptance is caught here via rejection).  Ignore
-  { 'expected lexeme', perl_pos, lexeme, assertion }
-
-```
 
 ##### Methods
 
@@ -2534,6 +2499,7 @@ an L0 range
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.l0_where(slr)
         local block = slr.current_block
+        if not block then return 0, 0, 0 end
         return block.index, slr.perl_pos,
             slr.end_pos
     end
@@ -2590,7 +2556,7 @@ Caller must ensure `block` and `pos` are valid.
     -- miranda: section+ most Lua function definitions
 
     function _M.class_slr.g1_convert_events(slr)
-        local perl_pos = slr.perl_pos
+        local _, l0_pos = slr:l0_where()
         local g1g = slr.slg.g1
         local q = slr.event_queue
         local events = g1g:events()
@@ -2616,10 +2582,10 @@ Caller must ensure `block` and `pos` are valid.
                 local trace_q = slr.trace_queue -- TODO
                 local event = {
                     'g1 earley item threshold exceeded',
-                    perl_pos, event_value}
+                    l0_pos, event_value}
                 event.msg = string.format(
                     'G1 exceeded earley item threshold at pos %d: %d Earley items',
-                    perl_pos, event_value)
+                    l0_pos, event_value)
                 trace_q[#trace_q+1] = event
                 goto NEXT_EVENT
             end
@@ -2636,11 +2602,9 @@ Caller must ensure `block` and `pos` are valid.
         end
     end
 
-    -- TODO: perl_pos arg is development hack --
-    -- eventually use slr.perl_pos
     function _M.class_slr.l0_convert_events(slr)
         local l0g = slr.slg.l0
-        local perl_pos = slr.perl_pos
+        local _, l0_pos = slr:l0_where()
         local q = slr.event_queue
         local events = l0g:events()
         for i = 1, #events, 2 do
@@ -2653,11 +2617,11 @@ Caller must ensure `block` and `pos` are valid.
                 local trace_q = slr.trace_queue -- TODO
                 local event = {
                     'l0 earley item threshold exceeded',
-                    perl_pos, event_value,
+                    l0_pos, event_value,
                     }
                 event.msg = string.format(
                     'L0 exceeded earley item threshold at pos %d: %d Earley items',
-                    perl_pos, event_value)
+                    l0_pos, event_value)
                 trace_q[#trace_q+1] = event
                 goto NEXT_EVENT
             end
