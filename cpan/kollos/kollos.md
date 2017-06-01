@@ -2052,7 +2052,7 @@ make this more internal?
             error(string.format('pos_set(): Last position is after end of block: %s', length_arg))
         end
 
-        return slr:l0_where_set(block_ix, new_current_pos, new_end_pos)
+        slr:l0_where_set(block_ix, new_current_pos, new_end_pos)
     end
 ```
 
@@ -2067,18 +2067,37 @@ lexer.
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.ext_lexeme_complete(slr, start_arg, length_arg)
-        local perl_pos = slr.perl_pos
-        local lexeme_length = -1
-        local longeur = length_arg
-        if length_arg then
-            lexeme_length = length_arg
-        elseif perl_pos == slr.start_of_pause_lexeme then
-            lexeme_length = slr.end_of_pause_lexeme - slr.start_of_pause_lexeme
-        else
+        local block_ix, l0_pos = slr:l0_where()
+        local longueur = 0
+        do
+            if length_arg then
+                longueur = length_arg
+                goto LONGUEUR_IS_SET
+            end
+            if l0_pos == slr.start_of_pause_lexeme then
+                longueur = slr.end_of_pause_lexeme - slr.start_of_pause_lexeme
+                goto LONGUEUR_IS_SET
+           end
             longueur = 0
         end
-        local start_pos = start_arg or slr.perl_pos
+        ::LONGUEUR_IS_SET::
+        longueur = math.tointeger(longueur)
+        if not longueur then
+            error(string.format(
+                'Bad length in lexeme_complete(): %s',
+                    length_arg
+            ))
+        end
+
         local input_length = #slr.current_block
+        local start_pos = start_arg or l0_pos
+        start_pos = math.tointeger(start_pos)
+        if not start_pos then
+            error(string.format(
+                'Bad length in lexeme_complete(): %s',
+                    start_pos
+            ))
+        end
         if start_pos < 0 then
             start_pos = input_length + start_pos
         end
@@ -2088,18 +2107,19 @@ lexer.
                     start_arg
             ))
         end
-        slr.perl_pos = start_pos
-        local end_pos
-        if lexeme_length < 0 then
-           end_pos = input_length + lexeme_length + 1
-        else
-           end_pos = start_pos + lexeme_length
-        end
-        if end_pos < 0 or end_pos > input_length then
-           -- undefined length should not cause this error
-           error(string.format(
-               'Bad length in lexeme_complete(): %s', length_arg
-           ))
+        slr:l0_where_set(nil, start_pos)
+        do
+            local end_pos
+            if longueur < 0 then
+               end_pos = input_length + longueur + 1
+            else
+               end_pos = start_pos + longueur
+            end
+            if end_pos < 0 or end_pos > input_length then
+                error(string.format(
+                   'Bad length in lexeme_complete(): %s', length_arg
+               ))
+            end
         end
         local g1r = slr.g1
         slr.event_queue = {}
@@ -2111,9 +2131,10 @@ lexer.
             local g1r = slr.g1
             local latest_earley_set = g1r:latest_earley_set()
             slr.per_es[latest_earley_set] =
-                { slr.current_block.index, start_pos, lexeme_length }
-            slr.perl_pos = start_pos + lexeme_length
-            return slr.perl_pos
+                { slr.current_block.index, start_pos, longueur }
+            local new_l0_pos = start_pos + longueur
+            slr:l0_where_set(nil, new_l0_pos)
+            return new_l0_pos
         end
         if result == -2 then
             -- Current, we do nothing with an exhausted error code
@@ -2516,7 +2537,6 @@ an L0 range
             block.end_pos = end_pos
             slr.end_pos = end_pos
         end
-        return slr:l0_where()
     end
 ```
 
