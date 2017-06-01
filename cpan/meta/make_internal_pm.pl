@@ -194,10 +194,9 @@ __DATA__
 
     TRACE_FILE_HANDLE
     CONSTANTS
+    CHARACTER_CLASS_TABLE
 
     { TODO -- Convert fields after here to Lua? }
-
-    CHARACTER_CLASS_TABLE
 
     BLESS_PACKAGE { Default package into which nodes are blessed }
     IF_INACCESSIBLE { default for symbols }

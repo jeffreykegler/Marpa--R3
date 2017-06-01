@@ -414,60 +414,74 @@ sub Marpa::R3::Scanless::R::read {
             '  It should be a ref to a defined scalar' );
     } ## end if ( ( my $ref_type = ref $p_string ) ne 'SCALAR' )
 
-    my ($new_codepoints, $trace_terminals) = $slr->call_by_tag(
+    $slr->call_by_tag(
     ('@' . __FILE__ . ':' . __LINE__),
         <<'END_OF_LUA', 's', ${$p_string});
             local slr, input_string = ...
-            local inputs = slr.inputs
-            local this_input = {}
-            inputs[#inputs + 1] = this_input
-            slr.current_block = this_input
-            this_input.text = input_string
-            this_input.index = #inputs
-            local ix = 1
+            _M.child_coro = coroutine.wrap(function()
+                local inputs = slr.inputs
+                local this_input = {}
+                inputs[#inputs + 1] = this_input
+                slr.current_block = this_input
+                this_input.text = input_string
+                this_input.index = #inputs
+                local ix = 1
 
-            local eols = {
-                [0x0A] = 0x0A,
-                [0x0D] = 0x0D,
-                [0x0085] = 0x0085,
-                [0x000B] = 0x000B,
-                [0x000C] = 0x000C,
-                [0x2028] = 0x2028,
-                [0x2029] = 0x2029
-            }
-            local eol_seen = false
-            local line_no = 1
-            local column_no = 0
-            local codepoint_seen = {}
-            local per_codepoint = slr.slg.per_codepoint
-            for byte_p, codepoint in utf8.codes(input_string) do
+                local eols = {
+                    [0x0A] = 0x0A,
+                    [0x0D] = 0x0D,
+                    [0x0085] = 0x0085,
+                    [0x000B] = 0x000B,
+                    [0x000C] = 0x000C,
+                    [0x2028] = 0x2028,
+                    [0x2029] = 0x2029
+                }
+                local eol_seen = false
+                local line_no = 1
+                local column_no = 0
+                local codepoint_seen = {}
+                local per_codepoint = slr.slg.per_codepoint
+                for byte_p, codepoint in utf8.codes(input_string) do
 
-                if not per_codepoint[codepoint] then
-                   codepoint_seen[codepoint] = true
+                    if not per_codepoint[codepoint] then
+                       codepoint_seen[codepoint] = true
+                    end
+
+                    -- line numbering logic
+                    if eol_seen and
+                       (eol_seen ~= 0x0D or codepoint ~= 0x0A) then
+                       eol_seen = false
+                       line_no = line_no + 1
+                       column_no = 0
+                    end
+                    column_no = column_no + 1
+                    eol_seen = eols[codepoint]
+
+                    local vlq = _M.to_vlq({ byte_p, line_no, column_no })
+                    this_input[#this_input+1] = vlq
                 end
 
-                -- line numbering logic
-                if eol_seen and
-                   (eol_seen ~= 0x0D or codepoint ~= 0x0A) then
-                   eol_seen = false
-                   line_no = line_no + 1
-                   column_no = 0
+                slr.phase = 'read'
+
+                local new_codepoints = {}
+                for codepoint, _ in pairs(codepoint_seen) do
+                    new_codepoints[#new_codepoints+1] = codepoint
                 end
-                column_no = column_no + 1
-                eol_seen = eols[codepoint]
-
-                local vlq = _M.to_vlq({ byte_p, line_no, column_no })
-                this_input[#this_input+1] = vlq
+                return 'ok', new_codepoints, slr.trace_terminals
             end
-
-            slr.phase = 'read'
-
-            local new_codepoints = {}
-            for codepoint, _ in pairs(codepoint_seen) do
-                new_codepoints[#new_codepoints+1] = codepoint
-            end
-            return new_codepoints, slr.trace_terminals
+        )
 END_OF_LUA
+
+    my ($new_codepoints, $trace_terminals);
+    CORO_LOOP: while (1) {
+        my $cmd;
+        ($cmd, $new_codepoints, $trace_terminals) = $slr->call_by_tag(
+        ('@' . __FILE__ . ':' . __LINE__),
+            <<'END_OF_LUA', 's', ${$p_string});
+            return _M.child_coro()
+END_OF_LUA
+        last CORO_LOOP if $cmd eq 'ok';
+    }
 
     my $character_class_table =
       $slg->[Marpa::R3::Internal::Scanless::G::CHARACTER_CLASS_TABLE];
