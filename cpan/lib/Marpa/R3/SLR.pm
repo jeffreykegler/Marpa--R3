@@ -560,9 +560,8 @@ sub Marpa::R3::Scanless::R::resume {
     my $result;
 
     # say STDERR join " ", __FILE__, __LINE__, Data::Dumper::Dumper($result);
-  FOR_LUA: {
-        $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-            <<'END_OF_LUA', 'ii', $start_pos, $length );
+    $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 'ii', $start_pos, $length );
             local slr, start_pos_arg, length_arg = ...
 
             if #slr.inputs <= 0 then
@@ -588,31 +587,29 @@ sub Marpa::R3::Scanless::R::resume {
            slr:pos_set(start_pos_arg, length_arg)
 END_OF_LUA
 
-      OUTER_READ: while (1) {
+  OUTER_READ: while (1) {
 
-            my ( $ok, $trace_msgs, $events ) =
-              $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-                <<'END_OF_LUA', '' );
+        my ( $ok, $trace_msgs, $events ) =
+          $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+            <<'END_OF_LUA', '' );
             local slr = ...
             local ok = slr:read()
             local trace_msgs, events = glue.convert_libmarpa_events(slr)
             return ok, trace_msgs, events
 END_OF_LUA
 
-            $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] = $events;
+        $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] = $events;
 
-            for my $msg ( @{$trace_msgs} ) {
-                say {$trace_file_handle} $msg;
-            }
+        for my $msg ( @{$trace_msgs} ) {
+            say {$trace_file_handle} $msg;
+        }
 
-            last OUTER_READ if $ok;
-            last OUTER_READ if scalar @{$events}
+        last OUTER_READ if $ok;
+        last OUTER_READ if scalar @{$events}
 
-        } ## end OUTER_READ: while (1)
+    } ## end OUTER_READ: while (1)
 
-        $result = $slr->pos();
-    }
-    return $result;
+    return $slr->pos();
 } ## end sub Marpa::R3::Scanless::R::resume
 
 sub Marpa::R3::Scanless::R::events {
