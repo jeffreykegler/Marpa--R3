@@ -557,18 +557,12 @@ sub Marpa::R3::Scanless::R::resume {
     my ( $slr, $start_pos, $length ) = @_;
     my $trace_file_handle =
       $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
-
     my $result;
-    my $eval_error;
-    my $eval_ok;
-    {
-        local $@;
-        $eval_ok = eval {
 
-       # say STDERR join " ", __FILE__, __LINE__, Data::Dumper::Dumper($result);
-          FOR_LUA: {
-                $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-                    <<'END_OF_LUA', 'ii', $start_pos, $length );
+    # say STDERR join " ", __FILE__, __LINE__, Data::Dumper::Dumper($result);
+  FOR_LUA: {
+        $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+            <<'END_OF_LUA', 'ii', $start_pos, $length );
             local slr, start_pos_arg, length_arg = ...
 
             if #slr.inputs <= 0 then
@@ -594,40 +588,30 @@ sub Marpa::R3::Scanless::R::resume {
            slr:pos_set(start_pos_arg, length_arg)
 END_OF_LUA
 
-              OUTER_READ: while (1) {
+      OUTER_READ: while (1) {
 
-                    my ( $ok, $trace_msgs, $events ) =
-                      $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-                        <<'END_OF_LUA', '' );
+            my ( $ok, $trace_msgs, $events ) =
+              $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+                <<'END_OF_LUA', '' );
             local slr = ...
             local ok = slr:read()
             local trace_msgs, events = glue.convert_libmarpa_events(slr)
             return ok, trace_msgs, events
 END_OF_LUA
 
-                    $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] = $events;
+            $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] = $events;
 
-                    for my $msg ( @{$trace_msgs} ) {
-                        say {$trace_file_handle} $msg;
-                    }
-
-                    last OUTER_READ if $ok;
-                    last OUTER_READ if scalar @{$events}
-
-                } ## end OUTER_READ: while (1)
-
-                $result = $slr->pos();
+            for my $msg ( @{$trace_msgs} ) {
+                say {$trace_file_handle} $msg;
             }
 
-            return 1;
-        };
-        $eval_error = $@;
-    }
+            last OUTER_READ if $ok;
+            last OUTER_READ if scalar @{$events}
 
-    if ( not $eval_ok ) {
-        Marpa::R3::exception($eval_error);
-    }
+        } ## end OUTER_READ: while (1)
 
+        $result = $slr->pos();
+    }
     return $result;
 } ## end sub Marpa::R3::Scanless::R::resume
 
@@ -1305,10 +1289,25 @@ END_OF_LUA
 # not to be documented
 sub Marpa::R3::Scanless::R::call_by_tag {
     my ( $slr, $tag, $codestr, $signature, @args ) = @_;
-    my $lua = $slr->[Marpa::R3::Internal::Scanless::R::L];
+    my $lua   = $slr->[Marpa::R3::Internal::Scanless::R::L];
     my $regix = $slr->[Marpa::R3::Internal::Scanless::R::REGIX];
+
     # $DB::single = 1 if grep { not defined $_ } @args;
-    my @results = $lua->call_by_tag($regix, $tag, $codestr, $signature, @args);
+    my @results;
+    my $eval_error;
+    my $eval_ok;
+    {
+        local $@;
+        $eval_ok = eval {
+            @results =
+              $lua->call_by_tag( $regix, $tag, $codestr, $signature, @args );
+            return 1;
+        };
+        $eval_error = $@;
+    }
+    if ( not $eval_ok ) {
+        Marpa::R3::exception($eval_error);
+    }
     return @results;
 }
 
