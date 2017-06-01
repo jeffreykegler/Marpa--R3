@@ -1106,7 +1106,6 @@ This is a registry object.
     class_slr_fields.lmw_v = true
     class_slr_fields.max_parses = true
     class_slr_fields.per_es = true
-    class_slr_fields.perl_pos = true
     class_slr_fields.phase = true
     class_slr_fields.ref_count = true
     class_slr_fields.slg = true
@@ -1211,7 +1210,6 @@ together.
         slr.accept_queue = {}
 
         slr.end_pos = 0
-        slr.perl_pos = 0
         slr.too_many_earley_items = -1
         slr.trace_terminals = 0
         slr.start_of_lexeme = 0
@@ -2518,7 +2516,7 @@ an L0 range
     function _M.class_slr.l0_where(slr)
         local block = slr.current_block
         if not block then return 0, 0, 0 end
-        return block.index, slr.perl_pos,
+        return block.index, block.l0_pos,
             slr.end_pos
     end
     function _M.class_slr.l0_where_set(slr, block_ix, l0_pos, end_pos)
@@ -2531,7 +2529,6 @@ an L0 range
         end
         if l0_pos then
             block.l0_pos = l0_pos
-            slr.perl_pos = l0_pos
         end
         if end_pos then
             block.end_pos = end_pos
