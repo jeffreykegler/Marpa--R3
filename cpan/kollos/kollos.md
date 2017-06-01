@@ -1088,7 +1088,6 @@ This is a registry object.
     class_slr_fields.end_of_lexeme = true
     class_slr_fields.end_of_parse = true
     class_slr_fields.end_of_pause_lexeme = true
-    class_slr_fields.end_pos = true
     class_slr_fields.event_queue = true
     class_slr_fields.g1 = true
     class_slr_fields.has_parse = true
@@ -1209,7 +1208,6 @@ together.
         slr.lexeme_queue = {}
         slr.accept_queue = {}
 
-        slr.end_pos = 0
         slr.too_many_earley_items = -1
         slr.trace_terminals = 0
         slr.start_of_lexeme = 0
@@ -2021,7 +2019,7 @@ make this more internal?
         local input_length = #block
 
         local new_block_ix, l0_pos, end_pos = slr:l0_where()
-        local current_pos = current_pos_arg or l0_pos
+        local current_pos = current_pos_arg or l0_pos or 0
         local new_current_pos = math.tointeger(current_pos)
         if not new_current_pos then
             error(string.format('pos_set(): Bad current position argument %s', current_pos_arg))
@@ -2517,7 +2515,7 @@ an L0 range
         local block = slr.current_block
         if not block then return 0, 0, 0 end
         return block.index, block.l0_pos,
-            slr.end_pos
+            block.end_pos
     end
     function _M.class_slr.l0_where_set(slr, block_ix, l0_pos, end_pos)
         local block
@@ -2532,7 +2530,6 @@ an L0 range
         end
         if end_pos then
             block.end_pos = end_pos
-            slr.end_pos = end_pos
         end
     end
 ```
