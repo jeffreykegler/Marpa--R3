@@ -449,8 +449,19 @@ sub Marpa::R3::Scanless::R::read {
                 for byte_p, codepoint in utf8.codes(input_string) do
 
                     if not per_codepoint[codepoint] then
+                       local new_codepoint = {}
+                       per_codepoint[codepoint] = new_codepoint
                        codepoint_seen[codepoint] = true
-                       -- print(inspect(coroutine.yield('trace', codepoint)) )
+                       local codepoint_data = coroutine.yield('trace', codepoint)
+                       -- print('coro_ret: ', inspect(codepoint_data) )
+                       if codepoint_data.is_graphic == 'true' then
+                           new_codepoint.is_graphic = true
+                       end
+                       local symbols = codepoint_data.symbols or {}
+                       for ix = 1, #symbols do
+                           new_codepoint[ix] = math.tointeger(symbols[ix])
+                       end
+                       -- print('new_codepoint:', inspect(new_codepoint))
                     end
 
                     -- line numbering logic
@@ -497,16 +508,8 @@ END_OF_LUA
         }
         if ($cmd eq 'trace') {
            my ($codepoint) = @coro_rets;
-           $coro_arg = [ 42, $codepoint ] ;
-        }
-    }
-
-    my @codepoint_cmds = ();
-    # say STDERR "new_codepoints: ", Data::Dumper::Dumper($new_codepoints);
-        for my $codepoint (@{$new_codepoints})
-        {
             my $character = pack('U', $codepoint);
-            my $is_graphic = ( $character =~ m/[[:graph:]]+/ ) ? 1 : 0;
+            my $is_graphic = ( $character =~ m/[[:graph:]]+/ );
 
             my @symbols;
             for my $entry ( @{$character_class_table} ) {
@@ -536,42 +539,10 @@ qq{Registering character $char_desc as symbol $symbol_id: },
                 my $char_desc = character_describe($slr, $codepoint);
                 Marpa::R3::exception("Character in input is not in alphabet of grammar: $char_desc\n");
             }
-            push @codepoint_cmds, [ 'symbols', $codepoint, \@symbols ];
-            push @codepoint_cmds, [ 'is_graphic', $codepoint, $is_graphic ]
-               if $is_graphic;
-
+            $coro_arg = { symbols => \@symbols };
+            $coro_arg->{is_graphic} = 'true' if $is_graphic;
         }
-
-    # The argument is a sequence of "codepoint commands", each
-    # of which is a sequence: `[command, codepoint, value ]`
-    #
-    # There are two commands.  The "symbols" command tells Kollos
-    # to create a per-codepoint structure.  The `value` is a sequence
-    # of symbols, used to populate the codepoint.  Kollos will recognize
-    # that codepoint as each of that set of symbols.  (Codepoints can
-    # be, and often are, ambiguous.)
-    #
-    # The other command is "is_graphic".  It set or unsets the
-    # `is_graphic` boolean for the codepoint.  The per-codepoint
-    # structure must already exist.
-    $slr->call_by_tag( ('@' . __FILE__ . ':' . __LINE__),
-        <<'END_OF_LUA', 'i', \@codepoint_cmds);
-        local slr, codepoint_cmds = ...
-        local per_codepoint = slr.slg.per_codepoint
-        for cmd_ix = 1, #codepoint_cmds do
-             local cmd, codepoint, value = table.unpack(codepoint_cmds[cmd_ix])
-             if cmd == 'symbols' then
-                  per_codepoint[codepoint] = value
-                  goto NEXT_COMMAND
-             end
-             if cmd == 'is_graphic' then
-                  per_codepoint[codepoint].is_graphic
-                      = value ~= 0 and true or nil
-                  goto NEXT_COMMAND
-             end
-             ::NEXT_COMMAND::
-        end
-END_OF_LUA
+    }
 
     my $event_count = scalar
         @{$slr->[Marpa::R3::Internal::Scanless::R::EVENTS]};

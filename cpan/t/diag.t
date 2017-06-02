@@ -168,18 +168,18 @@ Setting trace_terminals option
 Expecting "Number" at earleme 0
 Expecting "[Lex-0]" at earleme 0
 Expecting "[Lex-1]" at earleme 0
+Registering character U+002b "+" as symbol 5: [\+]
+Registering character U+002b "+" as symbol 9: [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
 Registering character U+0020 " " as symbol 7: [\s]
 Registering character U+0020 " " as symbol 9: [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
 Registering character U+0031 "1" as symbol 6: [\d]
 Registering character U+0031 "1" as symbol 9: [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
 Registering character U+0032 "2" as symbol 6: [\d]
 Registering character U+0032 "2" as symbol 9: [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
-Registering character U+002b "+" as symbol 5: [\+]
-Registering character U+002b "+" as symbol 9: [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
-Registering character U+0034 "4" as symbol 6: [\d]
-Registering character U+0034 "4" as symbol 9: [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
 Registering character U+0033 "3" as symbol 6: [\d]
 Registering character U+0033 "3" as symbol 9: [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
+Registering character U+0034 "4" as symbol 6: [\d]
+Registering character U+0034 "4" as symbol 9: [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
 Restarted recognizer at B1L1c1
 Expected lexeme Number at B1L1c1; assertion ID = 0
 Expected lexeme 'say' at B1L1c1; assertion ID = 1
