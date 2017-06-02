@@ -414,6 +414,9 @@ sub Marpa::R3::Scanless::R::read {
             '  It should be a ref to a defined scalar' );
     } ## end if ( ( my $ref_type = ref $p_string ) ne 'SCALAR' )
 
+    my $character_class_table =
+      $slg->[Marpa::R3::Internal::Scanless::G::CHARACTER_CLASS_TABLE];
+
     $slr->call_by_tag(
     ('@' . __FILE__ . ':' . __LINE__),
         <<'END_OF_LUA', 's', ${$p_string});
@@ -473,18 +476,19 @@ sub Marpa::R3::Scanless::R::read {
 END_OF_LUA
 
     my ($new_codepoints, $trace_terminals);
+    my $coro_arg = undef;
     CORO_LOOP: while (1) {
         my $cmd;
         ($cmd, $new_codepoints, $trace_terminals) = $slr->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__),
-            <<'END_OF_LUA', 's', ${$p_string});
-            return _M.child_coro()
+            <<'END_OF_LUA', 's', $coro_arg);
+            local slr, coro_arg = ...
+            return _M.child_coro(coro_arg)
 END_OF_LUA
+        last CORO_LOOP if not $cmd;
         last CORO_LOOP if $cmd eq 'ok';
+        last CORO_LOOP if $cmd eq '';
     }
-
-    my $character_class_table =
-      $slg->[Marpa::R3::Internal::Scanless::G::CHARACTER_CLASS_TABLE];
 
     my @codepoint_cmds = ();
     # say STDERR "new_codepoints: ", Data::Dumper::Dumper($new_codepoints);
