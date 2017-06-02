@@ -422,6 +422,7 @@ sub Marpa::R3::Scanless::R::read {
         <<'END_OF_LUA', 's', ${$p_string});
             local slr, input_string = ...
             _M.child_coro = coroutine.wrap(function()
+                coroutine.yield('trace_terminals', slr.trace_terminals)
                 local inputs = slr.inputs
                 local this_input = {}
                 inputs[#inputs + 1] = this_input
@@ -448,6 +449,7 @@ sub Marpa::R3::Scanless::R::read {
 
                     if not per_codepoint[codepoint] then
                        codepoint_seen[codepoint] = true
+                       -- print(inspect(coroutine.yield('trace', codepoint)) )
                     end
 
                     -- line numbering logic
@@ -478,16 +480,24 @@ END_OF_LUA
     my ($new_codepoints, $trace_terminals);
     my $coro_arg = undef;
     CORO_LOOP: while (1) {
-        my $cmd;
-        ($cmd, $new_codepoints, $trace_terminals) = $slr->call_by_tag(
+        my ($cmd, @coro_rets) = $slr->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__),
             <<'END_OF_LUA', 's', $coro_arg);
             local slr, coro_arg = ...
             return _M.child_coro(coro_arg)
 END_OF_LUA
+        ($new_codepoints, $trace_terminals) = @coro_rets;
         last CORO_LOOP if not $cmd;
         last CORO_LOOP if $cmd eq 'ok';
         last CORO_LOOP if $cmd eq '';
+        if ($cmd eq 'trace_terminals') {
+           ($trace_terminals) = @coro_rets;
+           $coro_arg = undef;
+        }
+        if ($cmd eq 'trace') {
+           my ($codepoint) = @coro_rets;
+           $coro_arg = [ 42, $codepoint ] ;
+        }
     }
 
     my @codepoint_cmds = ();
