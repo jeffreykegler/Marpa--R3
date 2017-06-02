@@ -421,6 +421,15 @@ sub Marpa::R3::Scanless::R::read {
     ('@' . __FILE__ . ':' . __LINE__),
         <<'END_OF_LUA', 's', ${$p_string});
             local slr, input_string = ...
+            local eols = {
+                [0x0A] = 0x0A,
+                [0x0D] = 0x0D,
+                [0x0085] = 0x0085,
+                [0x000B] = 0x000B,
+                [0x000C] = 0x000C,
+                [0x2028] = 0x2028,
+                [0x2029] = 0x2029
+            }
             local trace_terminals = slr.trace_terminals
             _M.child_coro = coroutine.wrap(function()
                 coroutine.yield('trace_terminals', trace_terminals)
@@ -432,27 +441,16 @@ sub Marpa::R3::Scanless::R::read {
                 this_input.index = #inputs
                 local ix = 1
 
-                local eols = {
-                    [0x0A] = 0x0A,
-                    [0x0D] = 0x0D,
-                    [0x0085] = 0x0085,
-                    [0x000B] = 0x000B,
-                    [0x000C] = 0x000C,
-                    [0x2028] = 0x2028,
-                    [0x2029] = 0x2029
-                }
                 local eol_seen = false
                 local line_no = 1
                 local column_no = 0
-                local codepoint_seen = {}
                 local per_codepoint = slr.slg.per_codepoint
                 for byte_p, codepoint in utf8.codes(input_string) do
 
                     if not per_codepoint[codepoint] then
                        local new_codepoint = {}
                        per_codepoint[codepoint] = new_codepoint
-                       codepoint_seen[codepoint] = true
-                       local codepoint_data = coroutine.yield('trace', codepoint)
+                       local codepoint_data = coroutine.yield('codepoint', codepoint)
                        -- print('coro_ret: ', inspect(codepoint_data) )
                        if codepoint_data.is_graphic == 'true' then
                            new_codepoint.is_graphic = true
@@ -480,16 +478,12 @@ sub Marpa::R3::Scanless::R::read {
 
                 slr.phase = 'read'
 
-                local new_codepoints = {}
-                for codepoint, _ in pairs(codepoint_seen) do
-                    new_codepoints[#new_codepoints+1] = codepoint
-                end
-                return 'ok', new_codepoints
+                return 'ok'
             end
         )
 END_OF_LUA
 
-    my ($new_codepoints, $trace_terminals);
+    my $trace_terminals;
     my $coro_arg = undef;
     CORO_LOOP: while (1) {
         my ($cmd, @coro_rets) = $slr->call_by_tag(
@@ -498,7 +492,6 @@ END_OF_LUA
             local slr, coro_arg = ...
             return _M.child_coro(coro_arg)
 END_OF_LUA
-        ($new_codepoints) = @coro_rets;
         last CORO_LOOP if not $cmd;
         last CORO_LOOP if $cmd eq 'ok';
         last CORO_LOOP if $cmd eq '';
@@ -506,7 +499,7 @@ END_OF_LUA
            ($trace_terminals) = @coro_rets;
            $coro_arg = undef;
         }
-        if ($cmd eq 'trace') {
+        if ($cmd eq 'codepoint') {
            my ($codepoint) = @coro_rets;
             my $character = pack('U', $codepoint);
             my $is_graphic = ( $character =~ m/[[:graph:]]+/ );
