@@ -421,8 +421,9 @@ sub Marpa::R3::Scanless::R::read {
     ('@' . __FILE__ . ':' . __LINE__),
         <<'END_OF_LUA', 's', ${$p_string});
             local slr, input_string = ...
+            local trace_terminals = slr.trace_terminals
             _M.child_coro = coroutine.wrap(function()
-                coroutine.yield('trace_terminals', slr.trace_terminals)
+                coroutine.yield('trace_terminals', trace_terminals)
                 local inputs = slr.inputs
                 local this_input = {}
                 inputs[#inputs + 1] = this_input
@@ -472,7 +473,7 @@ sub Marpa::R3::Scanless::R::read {
                 for codepoint, _ in pairs(codepoint_seen) do
                     new_codepoints[#new_codepoints+1] = codepoint
                 end
-                return 'ok', new_codepoints, slr.trace_terminals
+                return 'ok', new_codepoints
             end
         )
 END_OF_LUA
@@ -486,7 +487,7 @@ END_OF_LUA
             local slr, coro_arg = ...
             return _M.child_coro(coro_arg)
 END_OF_LUA
-        ($new_codepoints, $trace_terminals) = @coro_rets;
+        ($new_codepoints) = @coro_rets;
         last CORO_LOOP if not $cmd;
         last CORO_LOOP if $cmd eq 'ok';
         last CORO_LOOP if $cmd eq '';
