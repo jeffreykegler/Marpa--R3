@@ -44,7 +44,6 @@ cd kollos && ../lua/lua toc.lua < kollos.md
 * [Rules](#rules)
 * [IRL Fields](#irl-fields)
 * [XRL Fields](#xrl-fields)
-* [Layers and wrappers](#layers-and-wrappers)
 * [Kollos SLIF grammar object](#kollos-slif-grammar-object)
   * [Fields](#fields)
   * [Mutators](#mutators)
@@ -56,7 +55,6 @@ cd kollos && ../lua/lua toc.lua < kollos.md
   * [Constructors](#constructors)
   * [Reading](#reading)
     * [External reading](#external-reading)
-      * [Notes on tracing](#notes-on-tracing)
       * [Methods](#methods)
   * [Evaluation](#evaluation)
   * [Locations](#locations)
@@ -2822,6 +2820,46 @@ or nil if there was none.
         return result
     end
 
+```
+
+### Coroutines
+
+We use coroutines as "better callbacks".
+They allow the upper layer to be called upon for processing
+at any point in Kollos's Lua layers.
+At this point, we allow the upper layers only one active coroutine
+(though it may have child coroutines).
+Also, this "upper layer child coroutine" must be run until
+it returns before other processing is performed.
+Obeying this constraint is currently up to the upper layer --
+nothing in the code enforces it.
+
+```
+    -- miranda: section+ class_slr field declarations
+    class_slr_fields.current_coro = true
+```
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slr.wrap(slr, f)
+        if slr.current_coro then
+           -- error('Attempt to overwrite active Kollos coro')
+        end
+        slr.current_coro = coroutine.wrap(f)
+    end
+    function _M.class_slr.resume(slr, ...)
+        local coro = slr.current_coro
+        if not coro then
+           error('Attempt to resume non-existent Kollos coro')
+        end
+        local retours = {coro(...)}
+        local cmd = retours[1]
+        if not cmd or cmd == '' or cmd == 'ok' then
+            retours[1] = false
+            slr.current_coro = nil
+        end
+        return table.unpack{retours}
+    end
 ```
 
 ### Exceptions

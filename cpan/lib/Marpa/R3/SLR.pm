@@ -431,7 +431,7 @@ sub Marpa::R3::Scanless::R::read {
                 [0x2029] = 0x2029
             }
             local trace_terminals = slr.trace_terminals
-            _M.child_coro = coroutine.wrap(function()
+            slr:wrap(function()
                 coroutine.yield('trace_terminals', trace_terminals)
                 local inputs = slr.inputs
                 local this_input = {}
@@ -490,7 +490,7 @@ END_OF_LUA
         ('@' . __FILE__ . ':' . __LINE__),
             <<'END_OF_LUA', 's', $coro_arg);
             local slr, coro_arg = ...
-            return _M.child_coro(coro_arg)
+            return slr.current_coro(coro_arg)
 END_OF_LUA
         last CORO_LOOP if not $cmd;
         last CORO_LOOP if $cmd eq 'ok';
@@ -1290,6 +1290,36 @@ sub Marpa::R3::Scanless::R::call_by_tag {
         local $@;
         $eval_ok = eval {
             @results =
+              $lua->call_by_tag( $regix, $tag, $codestr, $signature, @args );
+            return 1;
+        };
+        $eval_error = $@;
+    }
+    if ( not $eval_ok ) {
+        Marpa::R3::exception($eval_error);
+    }
+    return @results;
+}
+
+# not to be documented
+sub Marpa::R3::Scanless::R::coro_by_tag {
+    my ( $slr, $tag, $codestr, $args ) = @_;
+    # my ( $slr, $tag, $codestr, $signature, @args ) = @_;
+    my $lua   = $slr->[Marpa::R3::Internal::Scanless::R::L];
+    my $regix = $slr->[Marpa::R3::Internal::Scanless::R::REGIX];
+    my $signature = $args->{sig} // '';
+    my @args = ();
+    my $p_args = $args->{args};
+    @args = @{$p_args} if $p_args;
+
+    my @results;
+    my $eval_error;
+    my $eval_ok;
+    {
+        local $@;
+        $eval_ok = eval {
+            my $cmd;
+            ($cmd, @results) =
               $lua->call_by_tag( $regix, $tag, $codestr, $signature, @args );
             return 1;
         };
