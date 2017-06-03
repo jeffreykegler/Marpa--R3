@@ -2853,12 +2853,12 @@ nothing in the code enforces it.
            error('Attempt to resume non-existent Kollos coro')
         end
         local retours = {coro(...)}
-        local cmd = retours[1]
+        local cmd = table.remove(retours, 1)
         if not cmd or cmd == '' or cmd == 'ok' then
-            retours[1] = false
+            cmd = false
             slr.current_coro = nil
         end
-        return table.unpack{retours}
+        return cmd, retours
     end
 ```
 

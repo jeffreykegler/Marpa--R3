@@ -391,12 +391,12 @@ END_OF_LUA
 
 sub Marpa::R3::Scanless::R::read {
     my ( $slr, $p_string, $start_pos, $length ) = @_;
-    my $slg              = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
 
     Marpa::R3::exception(
-    q{Attempt to use a tainted input string in $slr->read()},
-    qq{\n  Marpa::R3 is insecure for use with tainted data\n}
-    ) if Scalar::Util::tainted(${$p_string});
+        q{Attempt to use a tainted input string in $slr->read()},
+        qq{\n  Marpa::R3 is insecure for use with tainted data\n}
+    ) if Scalar::Util::tainted( ${$p_string} );
 
     $start_pos //= 0;
     $length    //= -1;
@@ -417,9 +417,64 @@ sub Marpa::R3::Scanless::R::read {
     my $character_class_table =
       $slg->[Marpa::R3::Internal::Scanless::G::CHARACTER_CLASS_TABLE];
 
-    $slr->call_by_tag(
-    ('@' . __FILE__ . ':' . __LINE__),
-        <<'END_OF_LUA', 's', ${$p_string});
+    my $trace_terminals;
+    my $coro_arg = undef;
+    $slr->coro_by_tag(
+        ( '@' . __FILE__ . ':' . __LINE__ ),
+        {
+            signature => 's',
+            args      => [ ${$p_string} ],
+            handlers  => {
+                trace_terminals => sub {
+                    ($trace_terminals) = @_;
+                    return;
+                },
+                codepoint => sub {
+                    my ($codepoint) = @_;
+                    my $character = pack( 'U', $codepoint );
+                    my $is_graphic = ( $character =~ m/[[:graph:]]+/ );
+
+                    my @symbols;
+                    for my $entry ( @{$character_class_table} ) {
+
+                        my ( $symbol_id, $re ) = @{$entry};
+
+                        # say STDERR "Codepoint %x vs $re\n";
+
+                        if ( $character =~ $re ) {
+
+                            if ( $trace_terminals >= 2 ) {
+                                my $trace_file_handle =
+                                  $slr->[
+                                  Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE
+                                  ];
+                                my $char_desc =
+                                  character_describe( $slr, $codepoint );
+                                say {$trace_file_handle}
+qq{Registering character $char_desc as symbol $symbol_id: },
+                                  $slg->l0_symbol_display_form($symbol_id)
+                                  or Marpa::R3::exception(
+                                    "Could not say(): $ERRNO");
+                            } ## end if ( $trace_terminals >= 2 )
+
+                            push @symbols, $symbol_id;
+
+                        } ## end if ( $character =~ $re )
+                    } ## end for my $entry ( @{$character_class_table} )
+
+                    if ( not scalar @symbols ) {
+                        my $char_desc = character_describe( $slr, $codepoint );
+                        Marpa::R3::exception(
+"Character in input is not in alphabet of grammar: $char_desc\n"
+                        );
+                    }
+                    $coro_arg = { symbols => \@symbols };
+                    $coro_arg->{is_graphic} = 'true' if $is_graphic;
+                    return $coro_arg;
+                }
+            }
+        },
+        <<'END_OF_LUA');
             local slr, input_string = ...
             local eols = {
                 [0x0A] = 0x0A,
@@ -483,62 +538,8 @@ sub Marpa::R3::Scanless::R::read {
         )
 END_OF_LUA
 
-    my $trace_terminals;
-    my $coro_arg = undef;
-    CORO_LOOP: while (1) {
-        my ($cmd, @coro_rets) = $slr->call_by_tag(
-        ('@' . __FILE__ . ':' . __LINE__),
-            <<'END_OF_LUA', 's', $coro_arg);
-            local slr, coro_arg = ...
-            return slr.current_coro(coro_arg)
-END_OF_LUA
-        last CORO_LOOP if not $cmd;
-        last CORO_LOOP if $cmd eq 'ok';
-        last CORO_LOOP if $cmd eq '';
-        if ($cmd eq 'trace_terminals') {
-           ($trace_terminals) = @coro_rets;
-           $coro_arg = undef;
-        }
-        if ($cmd eq 'codepoint') {
-           my ($codepoint) = @coro_rets;
-            my $character = pack('U', $codepoint);
-            my $is_graphic = ( $character =~ m/[[:graph:]]+/ );
-
-            my @symbols;
-            for my $entry ( @{$character_class_table} ) {
-
-                my ( $symbol_id, $re ) = @{$entry};
-
-                # say STDERR "Codepoint %x vs $re\n";
-
-                if ( $character =~ $re ) {
-
-                    if ( $trace_terminals >= 2 ) {
-                        my $trace_file_handle = $slr->[
-                          Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
-                        my $char_desc = character_describe($slr, $codepoint);
-                        say {$trace_file_handle}
-qq{Registering character $char_desc as symbol $symbol_id: },
-                          $slg->l0_symbol_display_form($symbol_id)
-                          or Marpa::R3::exception("Could not say(): $ERRNO");
-                    } ## end if ( $trace_terminals >= 2 )
-
-                    push @symbols, $symbol_id;
-
-                } ## end if ( $character =~ $re )
-            } ## end for my $entry ( @{$character_class_table} )
-
-            if (not scalar @symbols) {
-                my $char_desc = character_describe($slr, $codepoint);
-                Marpa::R3::exception("Character in input is not in alphabet of grammar: $char_desc\n");
-            }
-            $coro_arg = { symbols => \@symbols };
-            $coro_arg->{is_graphic} = 'true' if $is_graphic;
-        }
-    }
-
-    my $event_count = scalar
-        @{$slr->[Marpa::R3::Internal::Scanless::R::EVENTS]};
+    my $event_count =
+      scalar @{ $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] };
 
     return 0 if $event_count > 0;
 
@@ -1303,14 +1304,13 @@ sub Marpa::R3::Scanless::R::call_by_tag {
 
 # not to be documented
 sub Marpa::R3::Scanless::R::coro_by_tag {
-    my ( $slr, $tag, $codestr, $args ) = @_;
-    # my ( $slr, $tag, $codestr, $signature, @args ) = @_;
-    my $lua   = $slr->[Marpa::R3::Internal::Scanless::R::L];
-    my $regix = $slr->[Marpa::R3::Internal::Scanless::R::REGIX];
-    my $signature = $args->{sig} // '';
-    my @args = ();
-    my $p_args = $args->{args};
-    @args = @{$p_args} if $p_args;
+    my ( $slr, $tag, $args, $codestr ) = @_;
+    my $lua        = $slr->[Marpa::R3::Internal::Scanless::R::L];
+    my $regix      = $slr->[Marpa::R3::Internal::Scanless::R::REGIX];
+    my $handler    = $args->{handlers} // {};
+    my $resume_tag = $tag . '[R]';
+    my $signature  = $args->{signature} // '';
+    my $p_args     = $args->{args} // [];
 
     my @results;
     my $eval_error;
@@ -1318,9 +1318,23 @@ sub Marpa::R3::Scanless::R::coro_by_tag {
     {
         local $@;
         $eval_ok = eval {
-            my $cmd;
-            ($cmd, @results) =
-              $lua->call_by_tag( $regix, $tag, $codestr, $signature, @args );
+            $lua->call_by_tag( $regix, $tag, $codestr, $signature, @{$p_args} );
+            my $coro_arg;
+          CORO_CALL: while (1) {
+                my ( $cmd, $handler_args ) =
+                  $lua->call_by_tag( $regix, $resume_tag,
+                    'local slr, coro_arg = ...; return slr:resume(coro_arg)',
+                    's', $coro_arg );
+
+                    # say STDERR Data::Dumper::Dumper($handler_args);
+
+                last CORO_CALL if not $cmd;
+                my $handler = $handler->{$cmd};
+                Marpa::R3::exception(qq{No coro handler for "$cmd"})
+                  if not $handler;
+                $handler_args //= [];
+                ($coro_arg) = $handler->(@{$handler_args});
+            }
             return 1;
         };
         $eval_error = $@;
