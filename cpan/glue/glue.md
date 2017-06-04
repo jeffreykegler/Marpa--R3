@@ -422,8 +422,6 @@ and error codes.
 ```
     -- miranda: section+ most Lua function definitions
     function glue.convert_libmarpa_events(slr)
-        local trace_msgs = {}
-
         local in_q = slr.event_queue
         local out_q = {}
         local external_events = {}
@@ -487,7 +485,7 @@ and error codes.
             end
         end
 
-        return trace_msgs, out_q
+        return out_q
     end
 
 ```

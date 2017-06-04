@@ -232,10 +232,7 @@ END_OF_LUA
     slr.token_values[slr.token_is_literal] = glue.sv.undef()
 
     slr:wrap(function ()
-          local trace_msgs, events = glue.convert_libmarpa_events(slr)
-          for ix = 1, #trace_msgs do
-              coroutine.yield('trace', { trace_msgs[ix] } )
-          end
+          local events = glue.convert_libmarpa_events(slr)
           return 'ok', events
       end
   )
@@ -601,11 +598,7 @@ sub Marpa::R3::Scanless::R::resume {
                 local events = {}
                 while true do
                     local read_ok = slr:read()
-                    local trace_msgs
-                    trace_msgs, events = glue.convert_libmarpa_events(slr)
-                    for ix = 1, #trace_msgs do
-                        coroutine.yield('trace', trace_msgs[ix] )
-                    end
+                    events = glue.convert_libmarpa_events(slr)
                     if read_ok or #events > 0 then break end
                 end
                 return 'ok', events
@@ -1099,10 +1092,7 @@ sub Marpa::R3::Scanless::R::lexeme_complete {
           slg.g1.error()
       end
       slr:wrap(function ()
-          local trace_msgs, events = glue.convert_libmarpa_events(slr)
-          for ix = 1, #trace_msgs do
-              coroutine.yield('trace', trace_msgs[ix] )
-          end
+          local events = glue.convert_libmarpa_events(slr)
           return 'ok', complete_val, events
       end
       )
