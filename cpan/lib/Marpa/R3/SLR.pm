@@ -604,8 +604,8 @@ END_OF_LUA
         },
         <<'END_OF_LUA');
             local slr = ...
-            local read_ok = slr:read()
             slr:wrap(function ()
+                local read_ok = slr:read()
                 local trace_msgs, events = glue.convert_libmarpa_events(slr)
                 for ix = 1, #trace_msgs do
                     coroutine.yield('trace', trace_msgs[ix] )
