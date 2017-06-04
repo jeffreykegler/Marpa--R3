@@ -561,9 +561,19 @@ sub Marpa::R3::Scanless::R::resume {
     my $trace_file_handle =
       $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
 
-    # say STDERR join " ", __FILE__, __LINE__, Data::Dumper::Dumper($result);
-    $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 'ii', $start_pos, $length );
+    my ($events) = $slr->coro_by_tag(
+        ( '@' . __FILE__ . ':' . __LINE__ ),
+        {
+            signature => 'ii',
+            args => [ $start_pos, $length ],
+            handlers => {
+                trace => sub {
+                    my ($msg) = @_;
+                    say {$trace_file_handle} $msg;
+                }
+            }
+        },
+        <<'END_OF_LUA');
             local slr, start_pos_arg, length_arg = ...
 
             if #slr.inputs <= 0 then
@@ -587,20 +597,6 @@ sub Marpa::R3::Scanless::R::resume {
             end
 
            slr:pos_set(start_pos_arg, length_arg)
-END_OF_LUA
-
-    my ($events) = $slr->coro_by_tag(
-        ( '@' . __FILE__ . ':' . __LINE__ ),
-        {
-            handlers => {
-                trace => sub {
-                    my ($msg) = @_;
-                    say {$trace_file_handle} $msg;
-                }
-            }
-        },
-        <<'END_OF_LUA');
-            local slr = ...
             slr:wrap(function ()
                 local events = {}
                 while true do
