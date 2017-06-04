@@ -591,22 +591,32 @@ END_OF_LUA
 
   OUTER_READ: while (1) {
 
-        my ( $ok, $trace_msgs, $events ) =
-          $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-            <<'END_OF_LUA', '' );
+        my ( $read_ok, $events ) = $slr->coro_by_tag(
+        ( '@' . __FILE__ . ':' . __LINE__ ),
+        {
+           handlers => {
+               trace => sub {
+                    my ($yield_args) = @_;
+                    say {$trace_file_handle} $yield_args->[0];
+               }
+           }
+        },
+        <<'END_OF_LUA');
             local slr = ...
-            local ok = slr:read()
-            local trace_msgs, events = glue.convert_libmarpa_events(slr)
-            return ok, trace_msgs, events
+            local read_ok = slr:read()
+            slr:wrap(function ()
+                local trace_msgs, events = glue.convert_libmarpa_events(slr)
+                for ix = 1, #trace_msgs do
+                    coroutine.yield('trace', { trace_msgs[ix] } )
+                end
+                return 'ok', read_ok, events
+            end
+  )
 END_OF_LUA
 
         $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] = $events;
 
-        for my $msg ( @{$trace_msgs} ) {
-            say {$trace_file_handle} $msg;
-        }
-
-        last OUTER_READ if $ok;
+        last OUTER_READ if $read_ok;
         last OUTER_READ if scalar @{$events}
 
     } ## end OUTER_READ: while (1)
@@ -1345,8 +1355,6 @@ sub Marpa::R3::Scanless::R::coro_by_tag {
                   $lua->call_by_tag( $regix, $resume_tag,
                     'local slr, coro_arg = ...; return slr:resume(coro_arg)',
                     's', $coro_arg );
-
-                    # say STDERR Data::Dumper::Dumper($yield_data);
 
                 if (not $cmd) {
                    @results = @{$yield_data};
