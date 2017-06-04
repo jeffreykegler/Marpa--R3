@@ -1114,7 +1114,6 @@ This is a registry object.
     class_slr_fields.token_is_literal = true
     class_slr_fields.token_is_undef = true
     class_slr_fields.token_values = true
-    class_slr_fields.trace_queue = true
     class_slr_fields.trace_terminals = true
     class_slr_fields.trace_values = true
     class_slr_fields.trace_values_queue = true
@@ -1201,7 +1200,6 @@ together.
         slr.trailers = {}
 
         slr.event_queue = {}
-        slr.trace_queue = {}
 
         slr.lexeme_queue = {}
         slr.accept_queue = {}
@@ -1330,7 +1328,6 @@ The top-level read function.
         slr.start_of_pause_lexeme = -1
         slr.end_of_pause_lexeme = -1
         slr.event_queue = {}
-        slr.trace_queue = {}
         while true do
             local _, l0_pos, end_pos = slr:l0_where()
             if l0_pos >= end_pos then
@@ -1354,8 +1351,6 @@ The top-level read function.
             if not result then return false end
             local event_count = #slr.event_queue
             if event_count >= 1 then return false end
-            local trace_count = #slr.trace_queue
-            if trace_count >= 1 then return false end
         end
         error('Internal error: unexcepted end of read loop')
     end
@@ -2079,7 +2074,6 @@ lexer.
         end
         local g1r = slr.g1
         slr.event_queue = {}
-        slr.trace_queue = {}
         slr.is_external_scanning = false
         local result = g1r:earleme_complete()
         if result >= 0 then
