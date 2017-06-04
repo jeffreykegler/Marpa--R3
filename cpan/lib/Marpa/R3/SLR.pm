@@ -423,7 +423,6 @@ sub Marpa::R3::Scanless::R::read {
     my $character_class_table =
       $slg->[Marpa::R3::Internal::Scanless::G::CHARACTER_CLASS_TABLE];
 
-    my $trace_terminals;
     my $coro_arg = undef;
     $slr->coro_by_tag(
         ( '@' . __FILE__ . ':' . __LINE__ ),
@@ -431,12 +430,8 @@ sub Marpa::R3::Scanless::R::read {
             signature => 's',
             args      => [ ${$p_string} ],
             handlers  => {
-                trace_terminals => sub {
-                    ($trace_terminals) = @_;
-                    return;
-                },
                 codepoint => sub {
-                    my ($codepoint) = @_;
+                    my ($codepoint, $trace_terminals) = @_;
                     my $character = pack( 'U', $codepoint );
                     my $is_graphic = ( $character =~ m/[[:graph:]]+/ );
 
@@ -493,7 +488,6 @@ qq{Registering character $char_desc as symbol $symbol_id: },
             }
             local trace_terminals = slr.trace_terminals
             slr:wrap(function()
-                coroutine.yield('trace_terminals', trace_terminals)
                 local inputs = slr.inputs
                 local this_input = {}
                 inputs[#inputs + 1] = this_input
@@ -511,7 +505,7 @@ qq{Registering character $char_desc as symbol $symbol_id: },
                     if not per_codepoint[codepoint] then
                        local new_codepoint = {}
                        per_codepoint[codepoint] = new_codepoint
-                       local codepoint_data = coroutine.yield('codepoint', codepoint)
+                       local codepoint_data = coroutine.yield('codepoint', codepoint, trace_terminals)
                        -- print('coro_ret: ', inspect(codepoint_data) )
                        if codepoint_data.is_graphic == 'true' then
                            new_codepoint.is_graphic = true
