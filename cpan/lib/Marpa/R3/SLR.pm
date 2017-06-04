@@ -215,7 +215,8 @@ END_OF_LUA
         {
            handlers => {
                trace => sub {
-                    say {$trace_file_handle} $_->{msg};
+                   my ($msg) = @_;
+                   say {$trace_file_handle} $msg;
                }
            }
         },
@@ -233,7 +234,7 @@ END_OF_LUA
     slr:wrap(function ()
           local trace_msgs, events = glue.convert_libmarpa_events(slr)
           for ix = 1, #trace_msgs do
-              coroutine.yield('trace', { msg = trace_msgs[ix] } )
+              coroutine.yield('trace', { trace_msgs[ix] } )
           end
           return 'ok', events
       end
@@ -596,8 +597,8 @@ END_OF_LUA
         {
            handlers => {
                trace => sub {
-                    my ($yield_args) = @_;
-                    say {$trace_file_handle} $yield_args->[0];
+                    my ($msg) = @_;
+                    say {$trace_file_handle} $msg;
                }
            }
         },
@@ -607,7 +608,7 @@ END_OF_LUA
             slr:wrap(function ()
                 local trace_msgs, events = glue.convert_libmarpa_events(slr)
                 for ix = 1, #trace_msgs do
-                    coroutine.yield('trace', { trace_msgs[ix] } )
+                    coroutine.yield('trace', trace_msgs[ix] )
                 end
                 return 'ok', read_ok, events
             end
@@ -1078,7 +1079,8 @@ sub Marpa::R3::Scanless::R::lexeme_complete {
            args => [ $start, $length ],
            handlers => {
                trace => sub {
-                    say {$trace_file_handle} $_->{msg};
+                    my ($msg) = @_;
+                    say {$trace_file_handle} $msg;
                }
            }
         },
@@ -1106,7 +1108,7 @@ sub Marpa::R3::Scanless::R::lexeme_complete {
       slr:wrap(function ()
           local trace_msgs, events = glue.convert_libmarpa_events(slr)
           for ix = 1, #trace_msgs do
-              coroutine.yield('trace', { msg = trace_msgs[ix] } )
+              coroutine.yield('trace', trace_msgs[ix] )
           end
           return 'ok', complete_val, events
       end
