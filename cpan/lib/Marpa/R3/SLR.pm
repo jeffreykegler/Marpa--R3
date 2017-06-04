@@ -210,11 +210,17 @@ END_OF_LUA
         }
     }
 
-    my ($trace_msgs, $events) = $slr->call_by_tag(
-    ('@' . __FILE__ . ':' . __LINE__),
-    <<'END_OF_LUA', '');
+    my ($events) = $slr->coro_by_tag(
+        ( '@' . __FILE__ . ':' . __LINE__ ),
+        {
+           handlers => {
+               trace => sub {
+                    say {$trace_file_handle} $_->{msg};
+               }
+           }
+        },
+        <<'END_OF_LUA');
     local slr = ...
-
     slr.token_values = {}
     slr.token_is_undef = 1
     slr.token_values[slr.token_is_undef] = glue.sv.undef()
@@ -224,13 +230,15 @@ END_OF_LUA
     slr.token_is_literal = 2
     slr.token_values[slr.token_is_literal] = glue.sv.undef()
 
-    return glue.convert_libmarpa_events(slr)
-
+    slr:wrap(function ()
+          local trace_msgs, events = glue.convert_libmarpa_events(slr)
+          for ix = 1, #trace_msgs do
+              coroutine.yield('trace', { msg = trace_msgs[ix] } )
+          end
+          return 'ok', events
+      end
+  )
 END_OF_LUA
-
-    for my $msg (@{$trace_msgs}) {
-        say {$trace_file_handle} $msg;
-    }
 
     $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] = $events;
 
