@@ -1297,13 +1297,12 @@ together.
                     -- TODO -- needs block_ix
                     local event = { 'expected lexeme', l0_pos, terminal, assertion }
                     local display_form = xsy:display_form()
-                    event.msg = string.format(
+                    coroutine.yield('trace', string.format(
                         "Expected lexeme %s at %s; assertion ID = %d",
                         display_form,
                         slr:lc_brief(l0_pos),
                         assertion
-                    )
-                    q[#q+1] = event
+                    ))
                 end
             end
 
@@ -1347,11 +1346,10 @@ The top-level read function.
                 if slr.trace_terminals >= 1 then
                     local q = slr.trace_queue
                     local event = { 'lexer restarted recognizer', l0_pos}
-                    event.msg = string.format(
+                    coroutine.yield('trace', string.format(
                         'Restarted recognizer at %s',
                         slr:lc_brief(l0_pos)
-                    )
-                    q[#q+1] = event
+                    ))
                 end
             end
             local g1r = slr.g1
@@ -1415,14 +1413,13 @@ which will be 1 or 0.
                 local q = slr.trace_queue
                 local event = { 'lexer accepted codepoint', codepoint,
                     l0_pos, symbol_id }
-                event.msg = string.format(
+                coroutine.yield('trace', string.format(
                     'Codepoint %q 0x%04x rejected as %s at %s',
                     utf8.char(codepoint),
                     codepoint,
                     l0g:force_form(symbol_id),
                     slr:lc_brief(l0_pos)
-                )
-                q[#q+1] = event
+                ))
             end
             return 0
         end
@@ -1431,14 +1428,13 @@ which will be 1 or 0.
                 local q = slr.trace_queue
                 local event = { 'lexer accepted codepoint', codepoint,
                     l0_pos, symbol_id }
-                event.msg = string.format(
+                coroutine.yield('trace', string.format(
                     'Codepoint %q 0x%04x accepted as %s at %s',
                     utf8.char(codepoint),
                     codepoint,
                     l0g:force_form(symbol_id),
                     slr:lc_brief(l0_pos)
-                )
-                q[#q+1] = event
+                ))
             end
             return 1
         end
@@ -1475,13 +1471,12 @@ otherwise `false` and an error code string.
            local q = slr.trace_queue
            local _, l0_pos = slr:l0_where()
            local event = { 'lexer reading codepoint', codepoint, l0_pos}
-           event.msg = string.format(
+           coroutine.yield('trace', string.format(
                'Reading codepoint %q 0x%04x at %s',
                utf8.char(codepoint),
                codepoint,
                slr:lc_brief(l0_pos)
-           )
-           q[#q+1] = event
+           ))
         end
         local tokens_accepted = 0
         for ix = 1, op_count do
@@ -1782,15 +1777,14 @@ events into real trace events.
                             local event = { 'outprioritized lexeme',
                                block_ix, lexeme_start, lexeme_end, g1_lexeme,
                                priority, high_lexeme_priority}
-                            event.msg = string.format(
+                            coroutine.yield('trace', string.format(
                                 "Outprioritized lexeme %s: %s; value=%q;\z
                                  priority was %d, but %d is required",
                                 slr:lc_range_brief(block_ix, lexeme_start, block_ix, lexeme_end - 1),
                                 xsy:display_form(),
                                 slr:l0_literal( lexeme_start,  lexeme_end - lexeme_start, block_ix ),
                                 priority, high_lexeme_priority
-                            )
-                            q[#q+1] = event
+                            ))
                         end
                     end
                     goto NEXT_LEXEME
@@ -1808,7 +1802,8 @@ events into real trace events.
                 -- so we will let the upper layer figure things out.
                 if slr.trace_terminals > 0 then
                     local q = slr.trace_queue
-                    q[#q+1] = discard_event_gen(slr, rule_id, lexeme_start, lexeme_end)
+                    local event = discard_event_gen(slr, rule_id, lexeme_start, lexeme_end)
+                    coroutine.yield('trace', event.msg)
                 end
                     local g1r = slr.g1
                     local event_on_discard_active =
@@ -1844,7 +1839,7 @@ Returns `true` is there was one,
             if pause_before_active then
                 if slr.trace_terminals > 2 then
                     q = slr.trace_queue
-                    q[#q+1] = { 'g1 before lexeme event', g1_lexeme}
+                    coroutine.yield('trace', 'g1 before lexeme event')
                 end
                 local q = slr.event_queue
                 q[#q+1] = { 'before lexeme', g1_lexeme}
@@ -1908,14 +1903,13 @@ Read alternatives into the G1 grammar.
                     local event = { 'g1 attempting lexeme',
                         block_ix, lexeme_start, lexeme_end, g1_lexeme}
                     local working_earley_set = slr.g1:latest_earley_set() + 1
-                    event.msg = string.format(
+                    coroutine.yield('trace', string.format(
                         'Attempting to read lexeme %s e%d: %s; value=%q',
                         slr:lc_range_brief(block_ix, lexeme_start, block_ix, lexeme_end - 1),
                         working_earley_set,
                         xsy:display_form(),
                         slr:l0_literal( lexeme_start,  lexeme_end - lexeme_start, block_ix )
-                    )
-                    q[#q+1] = event
+                    ))
                 end
             end
             local g1r = slr.g1
@@ -1931,13 +1925,12 @@ Read alternatives into the G1 grammar.
                 local xsy = g1g:xsy(g1_lexeme)
                 if xsy then
                     local event = { 'g1 duplicate lexeme', block_ix, lexeme_start, lexeme_end, g1_lexeme}
-                    event.msg = string.format(
+                    coroutine.yield('trace', string.format(
                         'Rejected as duplicate lexeme %s: %s; value=%q',
                         slr:lc_range_brief(block_ix, lexeme_start, block_ix, lexeme_end - 1),
                         xsy:display_form(),
                         slr:l0_literal( lexeme_start,  lexeme_end - lexeme_start, block_ix )
-                    )
-                    q[#q+1] = event
+                    ))
                 end
                 goto NEXT_EVENT
             end
@@ -1960,14 +1953,13 @@ Read alternatives into the G1 grammar.
                         local event = { 'g1 accepted lexeme', block_ix, lexeme_start, lexeme_end, g1_lexeme}
                         local display_form = xsy:display_form()
                         local working_earley_set = slr.g1:latest_earley_set() + 1
-                        event.msg = string.format(
+                        coroutine.yield('trace', string.format(
                             "Accepted lexeme %s e%d: %s; value=%q",
                             slr:lc_range_brief(block_ix, lexeme_start, block_ix, lexeme_end - 1),
                             working_earley_set,
                             display_form,
                             slr:l0_literal( lexeme_start,  lexeme_end - lexeme_start, block_ix )
-                        )
-                        q[#q+1] = event
+                        ))
                     end
                 end
 
@@ -1980,12 +1972,11 @@ Read alternatives into the G1 grammar.
                         local q = slr.trace_queue
                         local event = { 'g1 pausing after lexeme',
                             block_ix, lexeme_start, lexeme_end, g1_lexeme}
-                        event.msg = string.format(
+                        coroutine.yield('trace', string.format(
                             'Paused after lexeme %s: %s',
                             slr:lc_range_brief(block_ix, lexeme_start, block_ix, lexeme_end - 1),
                             force_form
-                        )
-                        q[#q+1] = event
+                        ))
                     end
                     local q = slr.event_queue
                     q[#q+1] = { 'after lexeme', g1_lexeme}
@@ -2610,10 +2601,9 @@ Caller must ensure `block` and `pos` are valid.
                 local event = {
                     'g1 earley item threshold exceeded',
                     l0_pos, event_value}
-                event.msg = string.format(
+                coroutine.yield('trace', string.format(
                     'G1 exceeded earley item threshold at pos %d: %d Earley items',
-                    l0_pos, event_value)
-                trace_q[#trace_q+1] = event
+                    l0_pos, event_value))
                 goto NEXT_EVENT
             end
             local event_data = _M.event[event_type]
@@ -2646,10 +2636,9 @@ Caller must ensure `block` and `pos` are valid.
                     'l0 earley item threshold exceeded',
                     l0_pos, event_value,
                     }
-                event.msg = string.format(
+                coroutine.yield('trace', string.format(
                     'L0 exceeded earley item threshold at pos %d: %d Earley items',
-                    l0_pos, event_value)
-                trace_q[#trace_q+1] = event
+                    l0_pos, event_value))
                 goto NEXT_EVENT
             end
             local event_data = _M.event[event_type]
