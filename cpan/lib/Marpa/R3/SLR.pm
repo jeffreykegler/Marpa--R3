@@ -560,7 +560,6 @@ sub Marpa::R3::Scanless::R::resume {
     my ( $slr, $start_pos, $length ) = @_;
     my $trace_file_handle =
       $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
-    my $result;
 
     # say STDERR join " ", __FILE__, __LINE__, Data::Dumper::Dumper($result);
     $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
@@ -590,38 +589,35 @@ sub Marpa::R3::Scanless::R::resume {
            slr:pos_set(start_pos_arg, length_arg)
 END_OF_LUA
 
-  {
-
-        my ( $read_ok, $events ) = $slr->coro_by_tag(
+    my ($events) = $slr->coro_by_tag(
         ( '@' . __FILE__ . ':' . __LINE__ ),
         {
-           handlers => {
-               trace => sub {
+            handlers => {
+                trace => sub {
                     my ($msg) = @_;
                     say {$trace_file_handle} $msg;
-               }
-           }
+                }
+            }
         },
         <<'END_OF_LUA');
             local slr = ...
             slr:wrap(function ()
+                local events = {}
                 while true do
                     local read_ok = slr:read()
-                    local trace_msgs, events = glue.convert_libmarpa_events(slr)
+                    local trace_msgs
+                    trace_msgs, events = glue.convert_libmarpa_events(slr)
                     for ix = 1, #trace_msgs do
                         coroutine.yield('trace', trace_msgs[ix] )
                     end
-                    if read_ok or #events > 0 then
-                        return 'ok', read_ok, events
-                    end
+                    if read_ok or #events > 0 then break end
                 end
+                return 'ok', events
             end
   )
 END_OF_LUA
 
-        $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] = $events;
-
-    }
+    $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] = $events;
 
     return $slr->pos();
 } ## end sub Marpa::R3::Scanless::R::resume
