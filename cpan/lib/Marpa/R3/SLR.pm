@@ -1050,9 +1050,21 @@ END_OF_LUA
 sub Marpa::R3::Scanless::R::lexeme_complete {
     my ( $slr, $start, $length ) = @_;
 
-    my ($return_value, $trace_msgs, $events) = $slr->call_by_tag(
+    my $trace_file_handle =
+        $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
+
+    my ($return_value, $events) = $slr->coro_by_tag(
         ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 'ii', $start, $length );
+        {
+           signature => 'ii',
+           args => [ $start, $length ],
+           handlers => {
+               trace => sub {
+                    say {$trace_file_handle} $_->{msg};
+               }
+           }
+        },
+        <<'END_OF_LUA');
       local slr, start_arg, length_arg = ...
       local start = start_arg
       if start then
@@ -1073,15 +1085,15 @@ sub Marpa::R3::Scanless::R::lexeme_complete {
           local slg = slr.slg
           slg.g1.error()
       end
-      local trace_msgs, events = glue.convert_libmarpa_events(slr)
-      return complete_val, trace_msgs, events
+      slr:wrap(function ()
+          local trace_msgs, events = glue.convert_libmarpa_events(slr)
+          for ix = 1, #trace_msgs do
+              coroutine.yield('trace', { msg = trace_msgs[ix] } )
+          end
+          return 'ok', complete_val, events
+      end
+      )
 END_OF_LUA
-
-    my $trace_file_handle =
-        $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
-    for my $msg (@{$trace_msgs}) {
-        say {$trace_file_handle} $msg;
-    }
 
     $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] = $events;
 
@@ -1321,19 +1333,22 @@ sub Marpa::R3::Scanless::R::coro_by_tag {
             $lua->call_by_tag( $regix, $tag, $codestr, $signature, @{$p_args} );
             my $coro_arg;
           CORO_CALL: while (1) {
-                my ( $cmd, $handler_args ) =
+                my ( $cmd, $yield_data ) =
                   $lua->call_by_tag( $regix, $resume_tag,
                     'local slr, coro_arg = ...; return slr:resume(coro_arg)',
                     's', $coro_arg );
 
-                    # say STDERR Data::Dumper::Dumper($handler_args);
+                    # say STDERR Data::Dumper::Dumper($yield_data);
 
-                last CORO_CALL if not $cmd;
+                if (not $cmd) {
+                   @results = @{$yield_data};
+                   return 1;
+                }
                 my $handler = $handler->{$cmd};
                 Marpa::R3::exception(qq{No coro handler for "$cmd"})
                   if not $handler;
-                $handler_args //= [];
-                ($coro_arg) = $handler->(@{$handler_args});
+                $yield_data //= [];
+                ($coro_arg) = $handler->(@{$yield_data});
             }
             return 1;
         };
