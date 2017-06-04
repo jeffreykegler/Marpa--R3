@@ -590,7 +590,7 @@ sub Marpa::R3::Scanless::R::resume {
            slr:pos_set(start_pos_arg, length_arg)
 END_OF_LUA
 
-  OUTER_READ: while (1) {
+  {
 
         my ( $read_ok, $events ) = $slr->coro_by_tag(
         ( '@' . __FILE__ . ':' . __LINE__ ),
@@ -605,22 +605,23 @@ END_OF_LUA
         <<'END_OF_LUA');
             local slr = ...
             slr:wrap(function ()
-                local read_ok = slr:read()
-                local trace_msgs, events = glue.convert_libmarpa_events(slr)
-                for ix = 1, #trace_msgs do
-                    coroutine.yield('trace', trace_msgs[ix] )
+                while true do
+                    local read_ok = slr:read()
+                    local trace_msgs, events = glue.convert_libmarpa_events(slr)
+                    for ix = 1, #trace_msgs do
+                        coroutine.yield('trace', trace_msgs[ix] )
+                    end
+                    if read_ok or #events > 0 then
+                        return 'ok', read_ok, events
+                    end
                 end
-                return 'ok', read_ok, events
             end
   )
 END_OF_LUA
 
         $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] = $events;
 
-        last OUTER_READ if $read_ok;
-        last OUTER_READ if scalar @{$events}
-
-    } ## end OUTER_READ: while (1)
+    }
 
     return $slr->pos();
 } ## end sub Marpa::R3::Scanless::R::resume
