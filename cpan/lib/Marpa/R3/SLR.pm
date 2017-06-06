@@ -397,6 +397,7 @@ sub common_set {
                            "event_is_active" named argument: %s',
                            inspect(raw_activate,{depth=1})))
                     end
+                    activate = activate == 1 and true or false
                     slr:activate_by_event_name(event_name, activate)
                 end
             end
