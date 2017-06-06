@@ -1768,7 +1768,7 @@ sub Marpa::R3::Scanless::G::coro_by_tag {
           CORO_CALL: while (1) {
                 my ( $cmd, $yield_data ) =
                   $lua->call_by_tag( $regix, $resume_tag,
-                    'local slg, coro_arg = ...; return slg:resume(coro_arg)',
+                    'local slg, coro_arg = ...; return _M.resume(coro_arg)',
                     's', $coro_arg );
 
                 if (not $cmd) {
@@ -1790,6 +1790,7 @@ sub Marpa::R3::Scanless::G::coro_by_tag {
     }
     return @results;
 }
+
 sub slg_rule_show {
     my ( $slg, $subg_name, $irlid ) = @_;
 

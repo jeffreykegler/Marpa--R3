@@ -191,7 +191,7 @@ END_OF_LUA
     end
     slr:g1_convert_events()
 
-    slr:wrap(function ()
+    _M.wrap(function ()
         if trace_terminals > 1 then
             local terminals_expected = slr.g1:terminals_expected()
             table.sort(terminals_expected)
@@ -383,7 +383,7 @@ qq{Registering character $char_desc as symbol $symbol_id: },
                 [0x2029] = 0x2029
             }
             local trace_terminals = slr.trace_terminals
-            slr:wrap(function()
+            _M.wrap(function()
                 local inputs = slr.inputs
                 local this_input = {}
                 inputs[#inputs + 1] = this_input
@@ -484,7 +484,7 @@ sub Marpa::R3::Scanless::R::resume {
             end
 
            slr:pos_set(start_pos_arg, length_arg)
-            slr:wrap(function ()
+            _M.wrap(function ()
                 local events = {}
                 while true do
                     local read_ok = slr:read()
@@ -982,7 +982,7 @@ sub Marpa::R3::Scanless::R::lexeme_complete {
           local slg = slr.slg
           slg.g1.error()
       end
-      slr:wrap(function ()
+      _M.wrap(function ()
           local events = glue.convert_libmarpa_events(slr)
           return 'ok', complete_val, events
       end
@@ -1229,7 +1229,7 @@ sub Marpa::R3::Scanless::R::coro_by_tag {
           CORO_CALL: while (1) {
                 my ( $cmd, $yield_data ) =
                   $lua->call_by_tag( $regix, $resume_tag,
-                    'local slr, coro_arg = ...; return slr:resume(coro_arg)',
+                    'local slr, coro_arg = ...; return _M.resume(coro_arg)',
                     's', $coro_arg );
 
                 if (not $cmd) {

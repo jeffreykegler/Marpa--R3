@@ -1342,7 +1342,7 @@ the recognizer's Lua-level settings.
            end
         end
 
-        slr:wrap(function ()
+        _M.wrap(function ()
             local raw_value
 
             -- trace_terminals named argument --
@@ -2920,20 +2920,16 @@ Obeying this constraint is currently up to the upper layer --
 nothing in the code enforces it.
 
 ```
-    -- miranda: section+ class_slr field declarations
-    class_slr_fields.current_coro = true
-```
-
-```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slr.wrap(slr, f)
-        if slr.current_coro then
+    function _M.wrap(f)
+        if _M.current_coro then
            -- error('Attempt to overwrite active Kollos coro')
         end
-        slr.current_coro = coroutine.wrap(f)
+        _M.current_coro = coroutine.wrap(f)
     end
-    function _M.class_slr.resume(slr, ...)
-        local coro = slr.current_coro
+
+    function _M.resume(...)
+        local coro = _M.current_coro
         if not coro then
            error('Attempt to resume non-existent Kollos coro')
         end
@@ -2941,7 +2937,7 @@ nothing in the code enforces it.
         local cmd = table.remove(retours, 1)
         if not cmd or cmd == '' or cmd == 'ok' then
             cmd = false
-            slr.current_coro = nil
+            _M.current_coro = nil
         end
         return cmd, retours
     end
