@@ -357,35 +357,38 @@ sub common_set {
                 slr.trace_terminals = value
             end
             flat_arg.trace_terminals = nil
+
+            -- max_parses named argument --
+            raw_value = flat_arg.max_parses
+            if raw_value then
+                local value = math.tointeger(raw_value)
+                if not value then
+                   error(string.format(
+                       'Bad value for "max_parses" named argument: %s',
+                       inspect(raw_value)))
+                end
+                slr.max_parses = value
+            end
+            flat_arg.max_parses = nil
+
+            -- trace_values named argument --
+            raw_value = flat_arg.trace_values
+            if raw_value then
+                local value = math.tointeger(raw_value)
+                if not value then
+                   error(string.format(
+                       'Bad value for "trace_values" named argument: %s',
+                       inspect(raw_value)))
+                end
+                if value ~= 0 then
+                    coroutine.yield('trace', 'Setting trace_values option to ' .. value)
+                end
+                slr.trace_values = value
+            end
+            flat_arg.trace_values = nil
+
         end)
 END_OF_LUA
-
-    if ( defined( my $value = $flat_args->{'max_parses'}) ) {
-        $slr->call_by_tag(
-            ( '@' . __FILE__ . ':' . __LINE__ ),
-            <<'END_OF_LUA', 'i', $value
-    local slr, value = ...
-    slr.max_parses = value
-END_OF_LUA
-        );
-    }
-
-    if ( defined( my $value = $flat_args->{'trace_values'} ) ) {
-        my $value = $flat_args->{'trace_values'};
-        my $normalized_value =
-          Scalar::Util::looks_like_number($value) ? $value : 0;
-        if ($normalized_value) {
-            say {$trace_file_handle} qq{Setting trace_values option to $value};
-        }
-        $slr->call_by_tag(
-    ('@' . __FILE__ . ':' . __LINE__),
-        <<'END_OF_LUA',
-            local slr, trace_values = ...
-            slr.trace_values = trace_values
-END_OF_LUA
-            'i', $normalized_value);
-
-    } ## end if ( defined( my $value = $flat_args->{'trace_values'} ) )
 
     if ( defined( my $value = $flat_args->{'too_many_earley_items'} ) ) {
         $slr->call_by_tag(
