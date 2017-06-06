@@ -1316,6 +1316,10 @@ together.
 
 The top-level read function.
 
+TODO: This function now either succeeds, creates an
+event, or throws an exception.  Therefore, we no longer
+need a success/failure return code.
+
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.read(slr)
@@ -1347,8 +1351,9 @@ The top-level read function.
             local g1r = slr.g1
             slr:l0_read_lexeme()
             local discard_mode = (g1r:is_exhausted() ~= 0)
-            local result = slr:alternatives(discard_mode)
-            if not result then return false end
+            -- TODO: exhaustion is now either fatal or an
+            -- event, so we can always return `true`
+            slr:alternatives(discard_mode)
             local event_count = #slr.event_queue
             if event_count >= 1 then return false end
         end
@@ -1558,7 +1563,7 @@ not find an acceptable lexeme.
        if slr.slg.rejection_action == 'event' then
            local q = slr.event_queue
            q[#q+1] = { "'rejected" }
-           return 'event'
+           return
        end
        return slr:throw_at_pos(string.format(
             "No lexeme found at %s",
@@ -1575,7 +1580,7 @@ not find an acceptable lexeme.
            if slr.slg.exhaustion_action == 'event' then
                local q = slr.event_queue
                q[#q+1] = { "'exhausted" }
-               return 'event'
+               return
            end
            return slr:throw_at_pos(string.format(
                 "Parse exhausted, but lexemes remain, at %s",
@@ -1608,7 +1613,7 @@ and a string indicating the error.
         end
         local elect_earley_set = slr.l0_candidate
         -- no zero-length lexemes, so Earley set 0 is ignored
-        if not elect_earley_set then return false, exhausted() end
+        if not elect_earley_set then return exhausted() end
         local working_pos = slr.start_of_lexeme + elect_earley_set
         local return_value = l0r:progress_report_start(elect_earley_set)
         if return_value < 0 then
@@ -1620,7 +1625,7 @@ and a string indicating the error.
         slr:lexeme_queue_examine(high_lexeme_priority)
         local accept_q = slr.accept_queue
         if #accept_q <= 0 then
-            if discarded <= 0 then return false, exhausted() end
+            if discarded <= 0 then return exhausted() end
             -- if here, no accepted lexemes, but discarded ones
             slr:l0_where_set(nil, working_pos)
             local latest_es = slr.g1:latest_earley_set()
@@ -1631,13 +1636,13 @@ and a string indicating the error.
                     slr.start_of_lexeme,
                     working_pos - slr.start_of_lexeme
                 )
-            return true
+            return
         end
         -- PASS 3 --
         local result = slr:do_pause_before()
-        if result then return true end
+        if result then return end
         slr:g1_earleme_complete()
-        return true
+        return
     end
 ```
 
