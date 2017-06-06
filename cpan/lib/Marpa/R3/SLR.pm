@@ -289,36 +289,6 @@ sub common_set {
 
     my ( $slr, $method, $flat_args ) = @_;
 
-    # These recce args are allowed in all contexts
-    state $common_recce_args = {
-        map { ( $_, 1 ); }
-          qw(trace_terminals trace_file_handle
-          end max_parses too_many_earley_items
-          trace_values)
-    };
-    state $set_method_args = { map { ( $_, 1 ); } keys %{$common_recce_args} };
-    state $new_method_args = {
-        map { ( $_, 1 ); }
-          qw(grammar event_is_active),
-        keys %{$set_method_args}
-    };
-    state $series_restart_method_args =
-      { map { ( $_, 1 ); } keys %{$common_recce_args} };
-
-    my $ok_args = $set_method_args;
-    $ok_args = $new_method_args            if $method eq 'new';
-    $ok_args = $series_restart_method_args if $method eq 'series_restart';
-    my @bad_args = grep { not $ok_args->{$_} } keys %{$flat_args};
-    if ( scalar @bad_args ) {
-        Marpa::R3::exception(
-            q{Bad named argument(s) to $slr->}
-              . $method
-              . q{() method: }
-              . join q{ },
-            @bad_args
-        );
-    } ## end if ( scalar @bad_args )
-
     if ( my $value = $flat_args->{'trace_file_handle'} ) {
         $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE] = $value;
     }
@@ -328,8 +298,8 @@ sub common_set {
     $slr->coro_by_tag(
         ( '@' . __FILE__ . ':' . __LINE__ ),
         {
-            signature => 's',
-            args      => [ $flat_args ],
+            signature => 'ss',
+            args      => [ $flat_args, $method ],
             handlers  => {
                 trace => sub {
                     my ($msg) = @_;
@@ -338,9 +308,31 @@ sub common_set {
             }
         },
         <<'END_OF_LUA');
-        local slr, flat_args = ...
+        local slr, flat_args, method = ...
 
-        -- these are handled elsewhere
+        local ok_args = {}
+        ok_args.trace_terminals = true
+        ok_args.trace_file_handle = true
+        ok_args['end'] = true
+        ok_args.max_parses = true
+        ok_args.too_many_earley_items = true
+        ok_args.trace_values = true
+        if method == 'new' then
+            ok_args.grammar = true
+            ok_args.event_is_active = true
+        end
+
+        for name, value in pairs(flat_args) do
+           if not ok_args[name] then
+               error(string.format(
+                   'Bad slr named argument: %s => %s',
+                   inspect(name),
+                   inspect(value)
+               ))
+           end
+        end
+
+        -- these are handled at the Perl level
         flat_args.grammar = nil
         flat_args.trace_file_handle = nil
         flat_args.event_is_active = nil
@@ -422,14 +414,6 @@ sub common_set {
                 slr.end_of_parse = value
             end
             flat_args["end"] = nil
-
-            for name, value in pairs(flat_args) do
-               error(string.format(
-                   'Bad slr named argument: %s => %s',
-                   inspect(name),
-                   inspect(value)
-                   ))
-            end
 
         end)
 END_OF_LUA
