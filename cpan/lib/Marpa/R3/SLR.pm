@@ -175,22 +175,6 @@ END_OF_LUA
 
     } ## end EVENT: for my $event_name ( keys %{$event_is_active_arg} )
 
-        $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', '' );
-        local recce = ...
-        local g1r = recce.g1
-        local return_value = g1r:start_input()
-        if return_value == -1 then
-            error( string.format('Recognizer start of input failed: %s',
-                recce.slg.g1.error_description()))
-        end
-        if return_value < 0 then
-            error( string.format('Problem in start_input(): %s',
-                recce.slg.g1.error_description()))
-        end
-        recce:g1_convert_events()
-END_OF_LUA
-
     my ($events) = $slr->coro_by_tag(
         ( '@' . __FILE__ . ':' . __LINE__ ),
         {
@@ -203,8 +187,20 @@ END_OF_LUA
         },
         <<'END_OF_LUA');
     local slr = ...
+    local g1r = slr.g1
     local slg = slr.slg
+    local g1g = slg.g1
     local trace_terminals = slr.trace_terminals
+    local start_input_return = g1r:start_input()
+    if start_input_return == -1 then
+        error( string.format('Recognizer start of input failed: %s',
+            g1g.error_description()))
+    end
+    if start_input_return < 0 then
+        error( string.format('Problem in start_input(): %s',
+            g1g.error_description()))
+    end
+    slr:g1_convert_events()
 
     slr:wrap(function ()
         if trace_terminals > 1 then
