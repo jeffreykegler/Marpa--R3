@@ -151,7 +151,8 @@ sub Marpa::R3::Scanless::R::new {
     ('@' . __FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', '');
     local slg = ...
-    return slg:slr_new()
+    local slr = slg:slr_new()
+    return slr.regix
 END_OF_LUA
 
     $slr->[Marpa::R3::Internal::Scanless::R::REGIX]      = $regix;

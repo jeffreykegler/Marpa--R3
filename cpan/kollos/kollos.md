@@ -1104,6 +1104,7 @@ This is a registry object.
     class_slr_fields.max_parses = true
     class_slr_fields.per_es = true
     class_slr_fields.phase = true
+    class_slr_fields.regix = true
     class_slr_fields.ref_count = true
     class_slr_fields.slg = true
     class_slr_fields.start_of_lexeme = true
@@ -1175,7 +1176,7 @@ together.
         slr.phase = 'initial'
         slr.slg = slg
         local registry = debug.getregistry()
-        local lua_ref = _M.register(registry, slr)
+        slr.regix = _M.register(registry, slr)
         slr.ref_count = 1
 
         local l0g = slg.l0
@@ -1241,7 +1242,7 @@ together.
             }
         end
         slr:valuation_reset()
-        return lua_ref
+        return slr
     end
 ```
 
