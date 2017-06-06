@@ -1342,108 +1342,105 @@ the recognizer's Lua-level settings.
            end
         end
 
-        _M.wrap(function ()
-            local raw_value
+        local raw_value
 
-            -- trace_terminals named argument --
-            raw_value = flat_args.trace_terminals
-            if raw_value then
-                local value = math.tointeger(raw_value)
-                if not value then
-                   error(string.format(
-                       'Bad value for "trace_terminals" named argument: %s',
-                       inspect(raw_value)))
-                end
-                if value ~= 0 then
-                    coroutine.yield('trace', 'Setting trace_terminals option')
-                end
-                slr.trace_terminals = value
+        -- trace_terminals named argument --
+        raw_value = flat_args.trace_terminals
+        if raw_value then
+            local value = math.tointeger(raw_value)
+            if not value then
+               error(string.format(
+                   'Bad value for "trace_terminals" named argument: %s',
+                   inspect(raw_value)))
             end
-
-            -- max_parses named argument --
-            raw_value = flat_args.max_parses
-            if raw_value then
-                local value = math.tointeger(raw_value)
-                if not value then
-                   error(string.format(
-                       'Bad value for "max_parses" named argument: %s',
-                       inspect(raw_value)))
-                end
-                slr.max_parses = value
+            if value ~= 0 then
+                coroutine.yield('trace', 'Setting trace_terminals option')
             end
+            slr.trace_terminals = value
+        end
 
-            -- trace_values named argument --
-            raw_value = flat_args.trace_values
-            if raw_value then
-                local value = math.tointeger(raw_value)
-                if not value then
-                   error(string.format(
-                       'Bad value for "trace_values" named argument: %s',
-                       inspect(raw_value)))
-                end
-                if value ~= 0 then
-                    coroutine.yield('trace', 'Setting trace_values option to ' .. value)
-                end
-                slr.trace_values = value
+        -- max_parses named argument --
+        raw_value = flat_args.max_parses
+        if raw_value then
+            local value = math.tointeger(raw_value)
+            if not value then
+               error(string.format(
+                   'Bad value for "max_parses" named argument: %s',
+                   inspect(raw_value)))
             end
+            slr.max_parses = value
+        end
 
-            -- too_many_earley_items named argument --
-            raw_value = flat_args.too_many_earley_items
-            if raw_value then
-                local value = math.tointeger(raw_value)
-                if not value then
-                   error(string.format(
-                       'Bad value for "too_many_earley_items" named argument: %s',
-                       inspect(raw_value)))
-                end
-                slr.too_many_earley_items = value
-                slr.g1:earley_item_warning_threshold_set(value)
+        -- trace_values named argument --
+        raw_value = flat_args.trace_values
+        if raw_value then
+            local value = math.tointeger(raw_value)
+            if not value then
+               error(string.format(
+                   'Bad value for "trace_values" named argument: %s',
+                   inspect(raw_value)))
             end
-
-            -- 'end' named argument --
-            raw_value = flat_args["end"]
-            if raw_value then
-                local value = math.tointeger(raw_value)
-                if not value then
-                   error(string.format(
-                       'Bad value for "end" named argument: %s',
-                       inspect(raw_value)))
-                end
-                if slr.lmw_b then
-                    error'Cannot reset end of parse once evaluation has started'
-                end
-                slr.end_of_parse = value
+            if value ~= 0 then
+                coroutine.yield('trace', 'Setting trace_values option to ' .. value)
             end
+            slr.trace_values = value
+        end
 
-            -- 'event_is_active' named argument --
-            -- Completion/nulled/prediction events are always initialized by
-            -- Libmarpa to 'on'.  So here we need to override that if and only
-            -- if we in fact want to initialize them to 'off'.
-            --
-            -- Events are already initialized as described by
-            -- the DSL.  Here we override that with the recce arg, if
-            -- necessary.
-            raw_value = flat_args.event_is_active
-            if raw_value then
-                if type(raw_value) ~= 'table' then
-                   error(string.format(
-                       'Bad value for "event_is_active" named argument: %s',
-                       inspect(raw_value,{depth=1})))
-                end
-                for event_name, raw_activate in pairs(raw_value) do
-                    local activate = math.tointeger(raw_activate)
-                    if not activate or activate > 1 or activate < 0 then
-                       error(string.format(
-                           'Bad activation value for %q event in\z
-                           "event_is_active" named argument: %s',
-                           inspect(raw_activate,{depth=1})))
-                    end
-                    activate = activate == 1 and true or false
-                    slr:activate_by_event_name(event_name, activate)
-                end
+        -- too_many_earley_items named argument --
+        raw_value = flat_args.too_many_earley_items
+        if raw_value then
+            local value = math.tointeger(raw_value)
+            if not value then
+               error(string.format(
+                   'Bad value for "too_many_earley_items" named argument: %s',
+                   inspect(raw_value)))
             end
+            slr.too_many_earley_items = value
+            slr.g1:earley_item_warning_threshold_set(value)
+        end
 
-        end)
+        -- 'end' named argument --
+        raw_value = flat_args["end"]
+        if raw_value then
+            local value = math.tointeger(raw_value)
+            if not value then
+               error(string.format(
+                   'Bad value for "end" named argument: %s',
+                   inspect(raw_value)))
+            end
+            if slr.lmw_b then
+                error'Cannot reset end of parse once evaluation has started'
+            end
+            slr.end_of_parse = value
+        end
+
+        -- 'event_is_active' named argument --
+        -- Completion/nulled/prediction events are always initialized by
+        -- Libmarpa to 'on'.  So here we need to override that if and only
+        -- if we in fact want to initialize them to 'off'.
+        --
+        -- Events are already initialized as described by
+        -- the DSL.  Here we override that with the recce arg, if
+        -- necessary.
+        raw_value = flat_args.event_is_active
+        if raw_value then
+            if type(raw_value) ~= 'table' then
+               error(string.format(
+                   'Bad value for "event_is_active" named argument: %s',
+                   inspect(raw_value,{depth=1})))
+            end
+            for event_name, raw_activate in pairs(raw_value) do
+                local activate = math.tointeger(raw_activate)
+                if not activate or activate > 1 or activate < 0 then
+                   error(string.format(
+                       'Bad activation value for %q event in\z
+                       "event_is_active" named argument: %s',
+                       inspect(raw_activate,{depth=1})))
+                end
+                activate = activate == 1 and true or false
+                slr:activate_by_event_name(event_name, activate)
+            end
+        end
     end
 ```
 

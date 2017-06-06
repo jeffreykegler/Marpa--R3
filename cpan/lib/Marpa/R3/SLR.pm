@@ -143,26 +143,35 @@ sub Marpa::R3::Scanless::R::new {
     $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE] //=
         $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE];
 
+    my $trace_file_handle =
+        $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
+
     my $lua = $slg->[Marpa::R3::Internal::Scanless::G::L];
     $slr->[Marpa::R3::Internal::Scanless::R::L] = $lua;
     $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] = [];
 
-  my ($regix) = $slg->call_by_tag (
-    ('@' . __FILE__ . ':' . __LINE__),
-    <<'END_OF_LUA', '');
-    local slg = ...
-    local slr = slg:slr_new()
-    return slr.regix
+    my ($regix) = $slg->coro_by_tag(
+        ( '@' . __FILE__ . ':' . __LINE__ ),
+        {
+            signature => 's',
+            args      => [ $flat_args ],
+            handlers  => {
+                trace => sub {
+                    my ($msg) = @_;
+                    say {$trace_file_handle} $msg;
+                }
+            }
+        },
+        <<'END_OF_LUA');
+        local slg, flat_args = ...
+        _M.wrap(function ()
+            local slr = slg:slr_new()
+            slr:common_set(flat_args, {'event_is_active'})
+            return 'ok', slr.regix
+        end)
 END_OF_LUA
 
     $slr->[Marpa::R3::Internal::Scanless::R::REGIX]      = $regix;
-
-    common_set( $slr, $flat_args, ['event_is_active'] );
-
-    # Trace file handle may have changed,
-    # so get the latest value
-    my $trace_file_handle =
-        $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
 
     my ($events) = $slr->coro_by_tag(
         ( '@' . __FILE__ . ':' . __LINE__ ),
@@ -286,7 +295,10 @@ sub common_set {
         },
         <<'END_OF_LUA');
         local slr, flat_args, extra_args = ...
-        return slr:common_set(flat_args, extra_args)
+        return _M.wrap(function ()
+                slr:common_set(flat_args, extra_args)
+            end
+        )
 END_OF_LUA
 
 }

@@ -1750,8 +1750,8 @@ sub Marpa::R3::Scanless::G::call_by_tag {
 # not to be documented
 sub Marpa::R3::Scanless::G::coro_by_tag {
     my ( $slg, $tag, $args, $codestr ) = @_;
-    my $lua        = $slg->[Marpa::R3::Internal::Scanless::R::L];
-    my $regix      = $slg->[Marpa::R3::Internal::Scanless::R::REGIX];
+    my $lua        = $slg->[Marpa::R3::Internal::Scanless::G::L];
+    my $regix      = $slg->[Marpa::R3::Internal::Scanless::G::REGIX];
     my $handler    = $args->{handlers} // {};
     my $resume_tag = $tag . '[R]';
     my $signature  = $args->{signature} // '';
