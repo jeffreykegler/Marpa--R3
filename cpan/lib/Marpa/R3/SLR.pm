@@ -338,12 +338,18 @@ sub common_set {
             }
         },
         <<'END_OF_LUA');
-        local slr, flat_arg = ...
+        local slr, flat_args = ...
+
+        -- these are handled elsewhere
+        flat_args.grammar = nil
+        flat_args.trace_file_handle = nil
+        flat_args.event_is_active = nil
+
         slr:wrap(function ()
             local raw_value
 
             -- trace_terminals named argument --
-            raw_value = flat_arg.trace_terminals
+            raw_value = flat_args.trace_terminals
             if raw_value then
                 local value = math.tointeger(raw_value)
                 if not value then
@@ -356,10 +362,10 @@ sub common_set {
                 end
                 slr.trace_terminals = value
             end
-            flat_arg.trace_terminals = nil
+            flat_args.trace_terminals = nil
 
             -- max_parses named argument --
-            raw_value = flat_arg.max_parses
+            raw_value = flat_args.max_parses
             if raw_value then
                 local value = math.tointeger(raw_value)
                 if not value then
@@ -369,10 +375,10 @@ sub common_set {
                 end
                 slr.max_parses = value
             end
-            flat_arg.max_parses = nil
+            flat_args.max_parses = nil
 
             -- trace_values named argument --
-            raw_value = flat_arg.trace_values
+            raw_value = flat_args.trace_values
             if raw_value then
                 local value = math.tointeger(raw_value)
                 if not value then
@@ -385,35 +391,48 @@ sub common_set {
                 end
                 slr.trace_values = value
             end
-            flat_arg.trace_values = nil
+            flat_args.trace_values = nil
+
+            -- too_many_earley_items named argument --
+            raw_value = flat_args.too_many_earley_items
+            if raw_value then
+                local value = math.tointeger(raw_value)
+                if not value then
+                   error(string.format(
+                       'Bad value for "too_many_earley_items" named argument: %s',
+                       inspect(raw_value)))
+                end
+                slr.too_many_earley_items = value
+                slr.g1:earley_item_warning_threshold_set(value)
+            end
+            flat_args.too_many_earley_items = nil
+
+            -- 'end' named argument --
+            raw_value = flat_args["end"]
+            if raw_value then
+                local value = math.tointeger(raw_value)
+                if not value then
+                   error(string.format(
+                       'Bad value for "end" named argument: %s',
+                       inspect(raw_value)))
+                end
+                if slr.lmw_b then
+                    error'Cannot reset end once evaluation has started'
+                end
+                slr.end_of_parse = value
+            end
+            flat_args["end"] = nil
+
+            for name, value in pairs(flat_args) do
+               error(string.format(
+                   'Bad slr named argument: %s => %s',
+                   inspect(name),
+                   inspect(value)
+                   ))
+            end
 
         end)
 END_OF_LUA
-
-    if ( defined( my $value = $flat_args->{'too_many_earley_items'} ) ) {
-        $slr->call_by_tag(
-            ('@' . __FILE__ . ':' . __LINE__ ),
-            <<'END_OF_LUA', 'i', $value
-    local slr, value = ...
-    slr.too_many_earley_items = value
-    slr.g1:earley_item_warning_threshold_set(value)
-END_OF_LUA
-        );
-    }
-
-    if ( defined( my $value = $flat_args->{'end'} ) ) {
-
-        $slr->call_by_tag(
-    ('@' . __FILE__ . ':' . __LINE__),
-            <<'END_OF_LUA', 'i', $value);
-            local recce, value = ...
-            -- Not allowed once evaluation is started
-            if recce.lmw_b then
-                error'Cannot reset end once evaluation has started'
-            end
-            recce.end_of_parse = value
-END_OF_LUA
-    } ## end if ( defined( my $value = $arg_hash->{'end'} ) )
 
 }
 
