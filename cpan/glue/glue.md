@@ -179,6 +179,7 @@ Set "strict" globals, using code taken from strict.lua.
            _G = true,
            _M = true,
            last_exception = true, -- TODO -- should this be here?
+           current_coro = true,
            glue = true,
            inspect = true,
            kollos = true,

@@ -1747,6 +1747,49 @@ sub Marpa::R3::Scanless::G::call_by_tag {
     return @results;
 }
 
+# not to be documented
+sub Marpa::R3::Scanless::G::coro_by_tag {
+    my ( $slg, $tag, $args, $codestr ) = @_;
+    my $lua        = $slg->[Marpa::R3::Internal::Scanless::R::L];
+    my $regix      = $slg->[Marpa::R3::Internal::Scanless::R::REGIX];
+    my $handler    = $args->{handlers} // {};
+    my $resume_tag = $tag . '[R]';
+    my $signature  = $args->{signature} // '';
+    my $p_args     = $args->{args} // [];
+
+    my @results;
+    my $eval_error;
+    my $eval_ok;
+    {
+        local $@;
+        $eval_ok = eval {
+            $lua->call_by_tag( $regix, $tag, $codestr, $signature, @{$p_args} );
+            my $coro_arg;
+          CORO_CALL: while (1) {
+                my ( $cmd, $yield_data ) =
+                  $lua->call_by_tag( $regix, $resume_tag,
+                    'local slg, coro_arg = ...; return slg:resume(coro_arg)',
+                    's', $coro_arg );
+
+                if (not $cmd) {
+                   @results = @{$yield_data};
+                   return 1;
+                }
+                my $handler = $handler->{$cmd};
+                Marpa::R3::exception(qq{No coro handler for "$cmd"})
+                  if not $handler;
+                $yield_data //= [];
+                ($coro_arg) = $handler->(@{$yield_data});
+            }
+            return 1;
+        };
+        $eval_error = $@;
+    }
+    if ( not $eval_ok ) {
+        Marpa::R3::exception($eval_error);
+    }
+    return @results;
+}
 sub slg_rule_show {
     my ( $slg, $subg_name, $irlid ) = @_;
 
