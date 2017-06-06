@@ -325,21 +325,40 @@ sub common_set {
     my $trace_file_handle =
       $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
 
-    if ( exists $flat_args->{'trace_terminals'} ) {
-        my $value = $flat_args->{'trace_terminals'};
-        my $normalized_value =
-          Scalar::Util::looks_like_number($value) ? $value : 0;
-        if ($normalized_value) {
-            say {$trace_file_handle} qq{Setting trace_terminals option};
-        }
-        $slr->call_by_tag(
-    ('@' . __FILE__ . ':' . __LINE__),
-        <<'END_OF_LUA',
-            local slr, trace_terminals = ...
-            slr.trace_terminals = trace_terminals
+    $slr->coro_by_tag(
+        ( '@' . __FILE__ . ':' . __LINE__ ),
+        {
+            signature => 's',
+            args      => [ $flat_args ],
+            handlers  => {
+                trace => sub {
+                    my ($msg) = @_;
+                    say {$trace_file_handle} $msg;
+                }
+            }
+        },
+        <<'END_OF_LUA');
+        local slr, flat_arg = ...
+        slr:wrap(function ()
+            local raw_value
+
+            -- trace_terminals named argument --
+            raw_value = flat_arg.trace_terminals
+            if raw_value then
+                local value = math.tointeger(raw_value)
+                if not value then
+                   error(string.format(
+                       'Bad value for "trace_terminals" named argument: %s',
+                       inspect(raw_value)))
+                end
+                if value ~= 0 then
+                    coroutine.yield('trace', 'Setting trace_terminals option')
+                end
+                slr.trace_terminals = value
+            end
+            flat_arg.trace_terminals = nil
+        end)
 END_OF_LUA
-            'i', $normalized_value);
-    }
 
     if ( defined( my $value = $flat_args->{'max_parses'}) ) {
         $slr->call_by_tag(
