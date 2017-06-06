@@ -145,6 +145,8 @@ END_OF_LUA
 
     common_set( $slr, "new",  $flat_args );
 
+    # Trace file handle may have changed,
+    # so get the latest value
     my $trace_file_handle =
         $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
 
@@ -189,27 +191,6 @@ END_OF_LUA
         recce:g1_convert_events()
 END_OF_LUA
 
-    {
-        my ($trace_terminals) = $slr->call_by_tag(
-    ('@' . __FILE__ . ':' . __LINE__),
-            <<'END_OF_LUA', '');
-        local recce = ...
-        return recce.trace_terminals
-END_OF_LUA
-
-        if ( $trace_terminals > 1 ) {
-            my $terminals_expected = $slr->terminals_expected();
-            for my $terminal ( sort @{$terminals_expected} ) {
-
-       # We may have set and reset the trace file handle during this method,
-       # so we do not memoize its value, bjut get it directly
-                say { $trace_file_handle }
-                  qq{Expecting "$terminal" at earleme 0}
-                  or Marpa::R3::exception("Cannot print: $ERRNO");
-            }
-        }
-    }
-
     my ($events) = $slr->coro_by_tag(
         ( '@' . __FILE__ . ':' . __LINE__ ),
         {
@@ -222,18 +203,31 @@ END_OF_LUA
         },
         <<'END_OF_LUA');
     local slr = ...
-    slr.token_values = {}
-    slr.token_is_undef = 1
-    slr.token_values[slr.token_is_undef] = glue.sv.undef()
-
-    -- token is literal is a pseudo-index, and the SV undef
-    -- is just a place holder
-    slr.token_is_literal = 2
-    slr.token_values[slr.token_is_literal] = glue.sv.undef()
+    local slg = slr.slg
+    local trace_terminals = slr.trace_terminals
 
     slr:wrap(function ()
-          local events = glue.convert_libmarpa_events(slr)
-          return 'ok', events
+        if trace_terminals > 1 then
+            local terminals_expected = slr.g1:terminals_expected()
+            table.sort(terminals_expected)
+            for ix = 1, #terminals_expected do
+                local terminal = terminals_expected[ix]
+                coroutine.yield('trace',
+                    string.format('Expecting %q at earleme 0',
+                    slg:g1_symbol_name(terminal)))
+            end
+        end
+        slr.token_values = {}
+        slr.token_is_undef = 1
+        slr.token_values[slr.token_is_undef] = glue.sv.undef()
+
+        -- token is literal is a pseudo-index, and the SV undef
+        -- is just a place holder
+        slr.token_is_literal = 2
+        slr.token_values[slr.token_is_literal] = glue.sv.undef()
+
+        local events = glue.convert_libmarpa_events(slr)
+        return 'ok', events
       end
   )
 END_OF_LUA
