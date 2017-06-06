@@ -99,6 +99,18 @@ sub Marpa::R3::Scanless::R::rule_show {
     return $slg->rule_show($rule_id);
 }
 
+# Set those common args which are at the Perl level.
+sub perl_common_set {
+    my ( $slr, $method, $flat_args ) = @_;
+    if ( my $value = $flat_args->{'trace_file_handle'} ) {
+        $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE] = $value;
+    }
+    my $trace_file_handle =
+      $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
+    delete $flat_args->{'trace_file_handle'};
+    return $flat_args;
+}
+
 sub Marpa::R3::Scanless::R::new {
     my ( $class, @args ) = @_;
 
@@ -110,6 +122,7 @@ sub Marpa::R3::Scanless::R::new {
 
     my ($flat_args, $error_message) = Marpa::R3::flatten_hash_args(\@args);
     Marpa::R3::exception( sprintf $error_message, '$slr->new' ) if not $flat_args;
+    $flat_args = perl_common_set($slr, "new", $flat_args);
 
     my $slg = $flat_args->{grammar};
     Marpa::R3::exception(
@@ -127,7 +140,7 @@ sub Marpa::R3::Scanless::R::new {
             "  It should be a ref to $slg_class\n" );
     } ## end if ( not blessed $slg or not $slg->isa($slg_class) )
 
-    $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE] =
+    $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE] //=
         $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE];
 
     my $lua = $slg->[Marpa::R3::Internal::Scanless::G::L];
@@ -238,6 +251,7 @@ sub Marpa::R3::Scanless::R::set {
     my ( $slr, @args ) = @_;
     my ($flat_args, $error_message) = Marpa::R3::flatten_hash_args(\@args);
     Marpa::R3::exception( sprintf $error_message, '$slr->set()' ) if not $flat_args;
+    $flat_args = perl_common_set($slr, "set", $flat_args);
     common_set( $slr, "set", $flat_args );
     return $slr;
 } ## end sub Marpa::R3::Scanless::R::set
@@ -254,11 +268,8 @@ sub common_set {
 
     my ( $slr, $method, $flat_args ) = @_;
 
-    if ( my $value = $flat_args->{'trace_file_handle'} ) {
-        $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE] = $value;
-    }
-    my $trace_file_handle =
-      $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
+    my $trace_file_handle
+        = $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
 
     $slr->coro_by_tag(
         ( '@' . __FILE__ . ':' . __LINE__ ),
@@ -277,13 +288,11 @@ sub common_set {
 
         local ok_args = {}
         ok_args.trace_terminals = true
-        ok_args.trace_file_handle = true
         ok_args['end'] = true
         ok_args.max_parses = true
         ok_args.too_many_earley_items = true
         ok_args.trace_values = true
         if method == 'new' then
-            ok_args.grammar = true
             ok_args.event_is_active = true
         end
 
@@ -296,10 +305,6 @@ sub common_set {
                ))
            end
         end
-
-        -- these are handled at the Perl level
-        flat_args.grammar = nil
-        flat_args.trace_file_handle = nil
 
         slr:wrap(function ()
             local raw_value
@@ -711,6 +716,7 @@ sub Marpa::R3::Scanless::R::series_restart {
 
     my ($flat_args, $error_message) = Marpa::R3::flatten_hash_args(\@args);
     Marpa::R3::exception( sprintf $error_message, '$slr->series_restart()' ) if not $flat_args;
+    $flat_args = perl_common_set($slr, "series_restart", $flat_args);
     common_set($slr, "series_restart", $flat_args );
     return 1;
 }
