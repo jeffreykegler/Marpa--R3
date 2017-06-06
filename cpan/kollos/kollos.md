@@ -1313,19 +1313,23 @@ together.
 
 ```
 
-Process the Lua-level settings common to all calls.
+A common processor for
+the recognizer's Lua-level settings.
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slr.common_set(slr, flat_args, method)
-        local ok_args = {}
-        ok_args.trace_terminals = true
-        ok_args['end'] = true
-        ok_args.max_parses = true
-        ok_args.too_many_earley_items = true
-        ok_args.trace_values = true
-        if method == 'new' then
-            ok_args.event_is_active = true
+    function _M.class_slr.common_set(slr, flat_args, extra_args)
+        local ok_args = {
+            trace_terminals = true,
+            ['end'] = true,
+            max_parses = true,
+            too_many_earley_items = true,
+            trace_values = true
+        }
+        if extra_args then
+            for ix = 1, #extra_args do
+                ok_args[extra_args[ix]] = true
+            end
         end
 
         for name, value in pairs(flat_args) do

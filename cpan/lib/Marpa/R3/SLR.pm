@@ -101,7 +101,7 @@ sub Marpa::R3::Scanless::R::rule_show {
 
 # Set those common args which are at the Perl level.
 sub perl_common_set {
-    my ( $slr, $method, $flat_args ) = @_;
+    my ( $slr, $flat_args ) = @_;
     if ( my $value = $flat_args->{'trace_file_handle'} ) {
         $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE] = $value;
     }
@@ -122,7 +122,7 @@ sub Marpa::R3::Scanless::R::new {
 
     my ($flat_args, $error_message) = Marpa::R3::flatten_hash_args(\@args);
     Marpa::R3::exception( sprintf $error_message, '$slr->new' ) if not $flat_args;
-    $flat_args = perl_common_set($slr, "new", $flat_args);
+    $flat_args = perl_common_set($slr, $flat_args);
 
     my $slg = $flat_args->{grammar};
     Marpa::R3::exception(
@@ -157,7 +157,7 @@ END_OF_LUA
 
     $slr->[Marpa::R3::Internal::Scanless::R::REGIX]      = $regix;
 
-    common_set( $slr, "new",  $flat_args );
+    common_set( $slr, $flat_args, ['event_is_active'] );
 
     # Trace file handle may have changed,
     # so get the latest value
@@ -252,8 +252,8 @@ sub Marpa::R3::Scanless::R::set {
     my ( $slr, @args ) = @_;
     my ($flat_args, $error_message) = Marpa::R3::flatten_hash_args(\@args);
     Marpa::R3::exception( sprintf $error_message, '$slr->set()' ) if not $flat_args;
-    $flat_args = perl_common_set($slr, "set", $flat_args);
-    common_set( $slr, "set", $flat_args );
+    $flat_args = perl_common_set($slr, $flat_args);
+    common_set( $slr, $flat_args );
     return $slr;
 } ## end sub Marpa::R3::Scanless::R::set
 
@@ -267,7 +267,7 @@ sub Marpa::R3::Scanless::R::set {
 #
 sub common_set {
 
-    my ( $slr, $method, $flat_args ) = @_;
+    my ( $slr, $flat_args, $extra_args ) = @_;
 
     my $trace_file_handle
         = $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
@@ -276,7 +276,7 @@ sub common_set {
         ( '@' . __FILE__ . ':' . __LINE__ ),
         {
             signature => 'ss',
-            args      => [ $flat_args, $method ],
+            args      => [ $flat_args, $extra_args ],
             handlers  => {
                 trace => sub {
                     my ($msg) = @_;
@@ -285,8 +285,8 @@ sub common_set {
             }
         },
         <<'END_OF_LUA');
-        local slr, flat_args, method = ...
-        return slr:common_set(flat_args, method)
+        local slr, flat_args, extra_args = ...
+        return slr:common_set(flat_args, extra_args)
 END_OF_LUA
 
 }
@@ -595,8 +595,8 @@ sub Marpa::R3::Scanless::R::series_restart {
 
     my ($flat_args, $error_message) = Marpa::R3::flatten_hash_args(\@args);
     Marpa::R3::exception( sprintf $error_message, '$slr->series_restart()' ) if not $flat_args;
-    $flat_args = perl_common_set($slr, "series_restart", $flat_args);
-    common_set($slr, "series_restart", $flat_args );
+    $flat_args = perl_common_set($slr, $flat_args);
+    common_set($slr, $flat_args );
     return 1;
 }
 
