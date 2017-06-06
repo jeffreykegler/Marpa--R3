@@ -150,31 +150,6 @@ END_OF_LUA
     my $trace_file_handle =
         $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
 
-    my $event_is_active_arg = $flat_args->{event_is_active} // {};
-    if (ref $event_is_active_arg ne 'HASH') {
-        Marpa::R3::exception( 'event_is_active named argument must be ref to hash' );
-    }
-
-    # Completion/nulled/prediction events are always initialized by
-    # Libmarpa to 'on'.  So here we need to override that if and only
-    # if we in fact want to initialize them to 'off'.
-
-    # Events are already initialized as described by
-    # the DSL.  Here we override that with the recce arg, if
-    # necessary.
-
-    EVENT: for my $event_name ( keys %{$event_is_active_arg} ) {
-
-        my $is_active = $event_is_active_arg->{$event_name};
-
-    $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 'si', $event_name, ($is_active ? 1 : undef));
-        local slr, event_name, activate = ...
-        return slr:activate_by_event_name(event_name, activate)
-END_OF_LUA
-
-    } ## end EVENT: for my $event_name ( keys %{$event_is_active_arg} )
-
     my ($events) = $slr->coro_by_tag(
         ( '@' . __FILE__ . ':' . __LINE__ ),
         {
@@ -325,7 +300,6 @@ sub common_set {
         -- these are handled at the Perl level
         flat_args.grammar = nil
         flat_args.trace_file_handle = nil
-        flat_args.event_is_active = nil
 
         slr:wrap(function ()
             local raw_value
@@ -344,7 +318,6 @@ sub common_set {
                 end
                 slr.trace_terminals = value
             end
-            flat_args.trace_terminals = nil
 
             -- max_parses named argument --
             raw_value = flat_args.max_parses
@@ -357,7 +330,6 @@ sub common_set {
                 end
                 slr.max_parses = value
             end
-            flat_args.max_parses = nil
 
             -- trace_values named argument --
             raw_value = flat_args.trace_values
@@ -373,7 +345,6 @@ sub common_set {
                 end
                 slr.trace_values = value
             end
-            flat_args.trace_values = nil
 
             -- too_many_earley_items named argument --
             raw_value = flat_args.too_many_earley_items
@@ -387,7 +358,6 @@ sub common_set {
                 slr.too_many_earley_items = value
                 slr.g1:earley_item_warning_threshold_set(value)
             end
-            flat_args.too_many_earley_items = nil
 
             -- 'end' named argument --
             raw_value = flat_args["end"]
@@ -399,11 +369,37 @@ sub common_set {
                        inspect(raw_value)))
                 end
                 if slr.lmw_b then
-                    error'Cannot reset end once evaluation has started'
+                    error'Cannot reset end of parse once evaluation has started'
                 end
                 slr.end_of_parse = value
             end
-            flat_args["end"] = nil
+
+            -- 'event_is_active' named argument --
+            -- Completion/nulled/prediction events are always initialized by
+            -- Libmarpa to 'on'.  So here we need to override that if and only
+            -- if we in fact want to initialize them to 'off'.
+            --
+            -- Events are already initialized as described by
+            -- the DSL.  Here we override that with the recce arg, if
+            -- necessary.
+            raw_value = flat_args.event_is_active
+            if raw_value then
+                if type(raw_value) ~= 'table' then
+                   error(string.format(
+                       'Bad value for "event_is_active" named argument: %s',
+                       inspect(raw_value,{depth=1})))
+                end
+                for event_name, raw_activate in pairs(raw_value) do
+                    local activate = math.tointeger(raw_activate)
+                    if not activate or activate > 1 or activate < 0 then
+                       error(string.format(
+                           'Bad activation value for %q event in\z
+                           "event_is_active" named argument: %s',
+                           inspect(raw_activate,{depth=1})))
+                    end
+                    slr:activate_by_event_name(event_name, activate)
+                end
+            end
 
         end)
 END_OF_LUA
