@@ -1092,28 +1092,29 @@ END_OF_LUA
 } ## end sub Marpa::R3::Scanless::R::line_column
 
 # TODO -- Document block_ix result
-# TODO -- Delete this in favor of l0_where()?
+# TODO -- Delete this in favor of block_where()?
 sub Marpa::R3::Scanless::R::pos {
     my ($slr) = @_;
     my ($l0_pos) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
             <<'END_OF_LUA', '' );
         local slr = ...
-        local _, l0_pos = slr:l0_where()
+        local _, l0_pos = slr:block_where()
         return l0_pos
 END_OF_LUA
     return $l0_pos;
 }
 
 # TODO -- Document block_ix result
-sub Marpa::R3::Scanless::R::l0_where {
+sub Marpa::R3::Scanless::R::block_where {
     my ($slr) = @_;
-    my ($l0_pos, $block_ix) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+    my ($block_ix, $l0_pos, $l0_end)
+        = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
             <<'END_OF_LUA', '' );
         local slr = ...
-        local block_ix, l0_pos = slr:l0_where()
-        return l0_pos, block_ix
+        local block_ix, l0_pos, l0_end = slr:block_where()
+        return block_ix, l0_pos, l0_end
 END_OF_LUA
-    return $l0_pos, $block_ix;
+    return $block_ix, $l0_pos, $l0_end;
 }
 
 # TODO -- Document block_ix argument

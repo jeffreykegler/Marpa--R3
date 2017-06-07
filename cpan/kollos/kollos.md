@@ -1286,7 +1286,7 @@ together.
     function _M.class_slr.l0r_new(slr)
         local l0r = _M.recce_new(slr.slg.l0)
 
-        local block_ix, l0_pos = slr:l0_where()
+        local block_ix, l0_pos = slr:block_where()
         local g1g = slr.slg.g1
 
         if not l0r then
@@ -1500,7 +1500,7 @@ need a success/failure return code.
         slr.end_of_pause_lexeme = -1
         slr.event_queue = {}
         while true do
-            local _, l0_pos, end_pos = slr:l0_where()
+            local _, l0_pos, end_pos = slr:block_where()
             if l0_pos >= end_pos then
                 -- a 'normal' return
                 return true
@@ -1569,7 +1569,7 @@ which will be 1 or 0.
         local l0g = slr.slg.l0
         local codepoint = slr.codepoint
         local result = l0r:alternative(symbol_id, 1, 1)
-        local _, l0_pos = slr:l0_where()
+        local _, l0_pos = slr:block_where()
         if result == _M.err.UNEXPECTED_TOKEN_ID then
             if slr.trace_terminals >= 1 then
                 coroutine.yield('trace', string.format(
@@ -1624,7 +1624,7 @@ otherwise `false` and an error code string.
         end
 
         if slr.trace_terminals >= 1 then
-           local _, l0_pos = slr:l0_where()
+           local _, l0_pos = slr:block_where()
            coroutine.yield('trace', string.format(
                'Reading codepoint %q 0x%04x at %s',
                utf8.char(codepoint),
@@ -1656,7 +1656,7 @@ otherwise `false` and a status string.
             slr:l0r_new()
         end
         while true do
-            local block_ix, l0_pos, end_pos = slr:l0_where()
+            local block_ix, l0_pos, end_pos = slr:block_where()
             if l0_pos >= end_pos then
                 return true
             end
@@ -1667,7 +1667,7 @@ otherwise `false` and a status string.
             if this_candidate then slr.l0_candidate = this_candidate end
             if eager then return true end
             if not ok then return false, errmsg end
-            slr:l0_where_set(nil, l0_pos + 1)
+            slr:block_set(nil, l0_pos + 1)
         end
         error('Unexpected fall through in l0_read()')
     end
@@ -1755,7 +1755,7 @@ not find an acceptable lexeme.
                 )
         end
         local start_of_lexeme = slr.start_of_lexeme
-        slr:l0_where_set(nil, start_of_lexeme)
+        slr:block_set(nil, start_of_lexeme)
         return slr:no_lexeme_handle()
     end
 ```
@@ -1794,7 +1794,7 @@ and a string indicating the error.
         if #accept_q <= 0 then
             if discarded <= 0 then return exhausted() end
             -- if here, no accepted lexemes, but discarded ones
-            slr:l0_where_set(nil, working_pos)
+            slr:block_set(nil, working_pos)
             local latest_es = slr.g1:latest_earley_set()
             local trailers = slr.trailers
             trailers[latest_es] =
@@ -1994,7 +1994,7 @@ Returns `true` is there was one,
                 slr.start_of_pause_lexeme = lexeme_start
                 slr.end_of_pause_lexeme = lexeme_end
                 local start_of_lexeme = slr.start_of_lexeme
-                slr:l0_where_set(nil, start_of_lexeme)
+                slr:block_set(nil, start_of_lexeme)
                 return true
             end
         end
@@ -2015,7 +2015,7 @@ Returns `true` is there was one,
             ))
         end
         local end_of_lexeme = slr.end_of_lexeme
-        slr:l0_where_set(nil, end_of_lexeme)
+        slr:block_set(nil, end_of_lexeme)
         if result > 0 then slr:g1_convert_events() end
         local start_of_lexeme = slr.start_of_lexeme
         local end_of_lexeme = slr.end_of_lexeme
@@ -2079,7 +2079,7 @@ Read alternatives into the G1 grammar.
             end
             if return_value ~= _M.err.NONE then
                 local l0r = slr.l0
-                local _, l0_pos  = slr:l0_where()
+                local _, l0_pos  = slr:block_where()
                 error(string.format([[
                      'Problem SLR->read() failed on symbol id %d at position %d: %s'
                 ]],
@@ -2145,7 +2145,7 @@ make this more internal?
         end
         local input_length = #block
 
-        local new_block_ix, l0_pos, end_pos = slr:l0_where()
+        local new_block_ix, l0_pos, end_pos = slr:block_where()
         local current_pos = current_pos_arg or l0_pos or 0
         local new_current_pos = math.tointeger(current_pos)
         if not new_current_pos then
@@ -2175,7 +2175,7 @@ make this more internal?
             error(string.format('pos_set(): Last position is after end of block: %s', length_arg))
         end
 
-        slr:l0_where_set(block_ix, new_current_pos, new_end_pos)
+        slr:block_set(block_ix, new_current_pos, new_end_pos)
     end
 ```
 
@@ -2190,7 +2190,7 @@ lexer.
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.ext_lexeme_complete(slr, start_arg, length_arg)
-        local block_ix, l0_pos = slr:l0_where()
+        local block_ix, l0_pos = slr:block_where()
         local longueur = 0
         do
             if length_arg then
@@ -2230,7 +2230,7 @@ lexer.
                     start_arg
             ))
         end
-        slr:l0_where_set(nil, start_pos)
+        slr:block_set(nil, start_pos)
         do
             local end_pos
             if longueur < 0 then
@@ -2255,7 +2255,7 @@ lexer.
             slr.per_es[latest_earley_set] =
                 { slr.current_block.index, start_pos, longueur }
             local new_l0_pos = start_pos + longueur
-            slr:l0_where_set(nil, new_l0_pos)
+            slr:block_set(nil, new_l0_pos)
             return new_l0_pos
         end
         if result == -2 then
@@ -2637,13 +2637,13 @@ an L0 range
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slr.l0_where(slr)
+    function _M.class_slr.block_where(slr)
         local block = slr.current_block
         if not block then return 0, 0, 0 end
         return block.index, block.l0_pos,
             block.end_pos
     end
-    function _M.class_slr.l0_where_set(slr, block_ix, l0_pos, end_pos)
+    function _M.class_slr.block_set(slr, block_ix, l0_pos, end_pos)
         local block
         if block_ix then
             block = slr.inputs[block_ix]
@@ -2711,7 +2711,7 @@ Caller must ensure `block` and `pos` are valid.
     -- miranda: section+ most Lua function definitions
 
     function _M.class_slr.g1_convert_events(slr)
-        local _, l0_pos = slr:l0_where()
+        local _, l0_pos = slr:block_where()
         local g1g = slr.slg.g1
         local q = slr.event_queue
         local events = g1g:events()
@@ -2754,7 +2754,7 @@ Caller must ensure `block` and `pos` are valid.
 
     function _M.class_slr.l0_convert_events(slr)
         local l0g = slr.slg.l0
-        local _, l0_pos = slr:l0_where()
+        local _, l0_pos = slr:block_where()
         local q = slr.event_queue
         local events = l0g:events()
         for i = 1, #events, 2 do
@@ -3137,7 +3137,7 @@ It is designed to be convenient for use as a tail call.
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.throw_at_pos(slr, desc, block_ix, pos)
       desc = desc or ''
-      local current_block_ix, l0_pos = slr:l0_where()
+      local current_block_ix, l0_pos = slr:block_where()
       block_ix = block_ix or current_block_ix
       pos = pos or l0_pos
       local codepoint = slr:codepoint_from_pos(block_ix, pos)
