@@ -249,33 +249,18 @@ END_OF_LUA
 
 sub Marpa::R3::Scanless::R::set {
     my ( $slr, @args ) = @_;
+
     my ($flat_args, $error_message) = Marpa::R3::flatten_hash_args(\@args);
     Marpa::R3::exception( sprintf $error_message, '$slr->set()' ) if not $flat_args;
     $flat_args = perl_common_set($slr, $flat_args);
-    common_set( $slr, $flat_args );
-    return $slr;
-} ## end sub Marpa::R3::Scanless::R::set
-
-# The context flag indicates whether this set is called directly by the user
-# or is for series reset or the constructor.  "Context" flags of this kind
-# are much decried practice, and for good reason, but in this case
-# I think it is justified.
-# This logic is best kept all in one place, and a flag
-# to trigger the minor differences needed by the various calling
-# contexts is a small price to pay for that.
-#
-sub common_set {
-
-    my ( $slr, $flat_args, $extra_args ) = @_;
-
-    my $trace_file_handle
-        = $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
+    my $trace_file_handle =
+      $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
 
     $slr->coro_by_tag(
         ( '@' . __FILE__ . ':' . __LINE__ ),
         {
-            signature => 'ss',
-            args      => [ $flat_args, $extra_args ],
+            signature => 's',
+            args      => [ $flat_args ],
             handlers  => {
                 trace => sub {
                     my ($msg) = @_;
@@ -284,14 +269,14 @@ sub common_set {
             }
         },
         <<'END_OF_LUA');
-        local slr, flat_args, extra_args = ...
+        local slr, flat_args = ...
         return _M.wrap(function ()
-                slr:common_set(flat_args, extra_args)
+                slr:common_set(flat_args)
             end
         )
 END_OF_LUA
-
-}
+    return $slr;
+} ## end sub Marpa::R3::Scanless::R::set
 
 sub Marpa::R3::Scanless::R::read {
     my ( $slr, $p_string, $start_pos, $length ) = @_;
@@ -596,13 +581,29 @@ sub Marpa::R3::Scanless::R::series_restart {
     Marpa::R3::exception( sprintf $error_message, '$slr->series_restart()' ) if not $flat_args;
 
     $flat_args = perl_common_set($slr, $flat_args);
+    my $trace_file_handle =
+      $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
 
-    $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 's', $flat_args );
+    $slr->coro_by_tag(
+        ( '@' . __FILE__ . ':' . __LINE__ ),
+        {
+            signature => 's',
+            args      => [ $flat_args ],
+            handlers  => {
+                trace => sub {
+                    my ($msg) = @_;
+                    say {$trace_file_handle} $msg;
+                }
+            }
+        },
+        <<'END_OF_LUA');
         local slr, flat_args = ...
-        slr.phase = "read"
-        slr:valuation_reset()
-        slr:common_set(flat_args)
+        return _M.wrap(function ()
+                slr.phase = "read"
+                slr:valuation_reset()
+                slr:common_set(flat_args)
+            end
+        )
 END_OF_LUA
     return 1;
 }
