@@ -120,16 +120,29 @@ sub Marpa::R3::Scanless::R::new {
     # Set recognizer args to default
     # Lua equivalent is set below
 
-    my ($flat_args, $error_message) = Marpa::R3::flatten_hash_args(\@args);
-    Marpa::R3::exception( sprintf $error_message, '$slr->new' ) if not $flat_args;
-    $flat_args = perl_common_set($slr, $flat_args);
+    my ( $flat_args, $error_message ) = Marpa::R3::flatten_hash_args( \@args );
+    Marpa::R3::exception( sprintf $error_message, '$slr->new' )
+      if not $flat_args;
+    $flat_args = perl_common_set( $slr, $flat_args );
 
     my $slg = $flat_args->{grammar};
     Marpa::R3::exception(
-        qq{Marpa::R3::Scanless::R::new() called without a "grammar" argument}
-    ) if not defined $slg;
+        qq{Marpa::R3::Scanless::R::new() called without a "grammar" argument} )
+      if not defined $slg;
     $slr->[Marpa::R3::Internal::Scanless::R::SLG] = $slg;
     delete $flat_args->{grammar};
+
+    my $event_handlers = $flat_args->{event_handlers} // {};
+    $slr->[Marpa::R3::Internal::Scanless::R::EVENT_HANDLERS] = $event_handlers;
+    if ( ref $event_handlers ne 'HASH' ) {
+        my $ref_type = ref $event_handlers;
+        Marpa::R3::exception(
+            qq{'event_handlers' named argument to new() is $ref_type\n},
+            "  It should be a ref to a hash\n",
+            "  whose keys are event names and\n",
+            "  whose values are code refs\n"
+        );
+    }
 
     my $slg_class = 'Marpa::R3::Scanless::G';
     if ( not blessed $slg or not $slg->isa($slg_class) ) {
@@ -137,28 +150,46 @@ sub Marpa::R3::Scanless::R::new {
         my $desc = $ref_type ? "a ref to $ref_type" : 'not a ref';
         Marpa::R3::exception(
             qq{'grammar' named argument to new() is $desc\n},
-            "  It should be a ref to $slg_class\n" );
+            "  It should be a ref to $slg_class\n"
+        );
     } ## end if ( not blessed $slg or not $slg->isa($slg_class) )
 
     $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE] //=
-        $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE];
+      $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE];
 
     my $trace_file_handle =
-        $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
+      $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
 
     my $lua = $slg->[Marpa::R3::Internal::Scanless::G::L];
     $slr->[Marpa::R3::Internal::Scanless::R::L] = $lua;
 
-    my ($regix, $events) = $slg->coro_by_tag(
+    my ( $regix, $events ) = $slg->coro_by_tag(
         ( '@' . __FILE__ . ':' . __LINE__ ),
         {
             signature => 's',
-            args      => [ $flat_args ],
+            args      => [$flat_args],
             handlers  => {
                 trace => sub {
                     my ($msg) = @_;
                     say {$trace_file_handle} $msg;
-                }
+                },
+                event => sub {
+                    my ( $event_name, @data ) = @_;
+                    my $handler = $event_handlers->{$event_name};
+                    if ( not $handler ) {
+                        Marpa::R3::exception(
+                            qq{'No event handler for event "$event_name"\n});
+                    }
+                    if ( ref $handler ne 'CODE' ) {
+                        my $ref_type = ref $handler;
+                        Marpa::R3::exception(
+                            qq{Bad event handler for event "$event_name"\n},
+                            qq{  Handler is a ref to $ref_type\n},
+                            qq{  A handler should be a ref to code\n}
+                        );
+                    }
+                    my $retour = $handler->(@data);
+                },
             }
         },
         <<'END_OF_LUA');
@@ -170,7 +201,7 @@ sub Marpa::R3::Scanless::R::new {
         end)
 END_OF_LUA
 
-    $slr->[Marpa::R3::Internal::Scanless::R::REGIX]      = $regix;
+    $slr->[Marpa::R3::Internal::Scanless::R::REGIX]  = $regix;
     $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] = $events;
 
     return $slr;
