@@ -592,15 +592,18 @@ sub Marpa::R3::Scanless::G::parse {
 
 sub Marpa::R3::Scanless::R::series_restart {
     my ( $slr , @args ) = @_;
-
-    $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        'local recce = ...; recce.phase = "read"', '' );
-    $slr->reset_evaluation();
-
     my ($flat_args, $error_message) = Marpa::R3::flatten_hash_args(\@args);
     Marpa::R3::exception( sprintf $error_message, '$slr->series_restart()' ) if not $flat_args;
+
     $flat_args = perl_common_set($slr, $flat_args);
-    common_set($slr, $flat_args );
+
+    $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 's', $flat_args );
+        local slr, flat_args = ...
+        slr.phase = "read"
+        slr:valuation_reset()
+        slr:common_set(flat_args)
+END_OF_LUA
     return 1;
 }
 
