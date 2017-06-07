@@ -111,6 +111,36 @@ sub perl_common_set {
     return $flat_args;
 }
 
+sub gen_app_event_handler {
+    my ($slr) = @_;
+    my $event_handlers =
+      $slr->[Marpa::R3::Internal::Scanless::R::EVENT_HANDLERS];
+    return sub {
+        my ( $event_name, @data ) = @_;
+        my $handler = $event_handlers->{$event_name};
+        if ( not $handler ) {
+            Marpa::R3::exception(
+                qq{'No event handler for event "$event_name"\n});
+        }
+        if ( ref $handler ne 'CODE' ) {
+            my $ref_type = ref $handler;
+            Marpa::R3::exception(
+                qq{Bad event handler for event "$event_name"\n},
+                qq{  Handler is a ref to $ref_type\n},
+                qq{  A handler should be a ref to code\n}
+            );
+        }
+        my $retour = $handler->( $event_name, @data );
+        if ( $retour ne 'ok' and $retour ne 'pause' ) {
+            Marpa::R3::exception(
+                qq{Bad return from event handler for event "$event_name"\n},
+                qq{  Return from handler was "$retour"\n},
+                qq{  Handler must return "ok" or "pause"\n},
+            );
+        }
+    };
+}
+
 sub Marpa::R3::Scanless::R::new {
     my ( $class, @args ) = @_;
 
@@ -173,23 +203,7 @@ sub Marpa::R3::Scanless::R::new {
                     my ($msg) = @_;
                     say {$trace_file_handle} $msg;
                 },
-                event => sub {
-                    my ( $event_name, @data ) = @_;
-                    my $handler = $event_handlers->{$event_name};
-                    if ( not $handler ) {
-                        Marpa::R3::exception(
-                            qq{'No event handler for event "$event_name"\n});
-                    }
-                    if ( ref $handler ne 'CODE' ) {
-                        my $ref_type = ref $handler;
-                        Marpa::R3::exception(
-                            qq{Bad event handler for event "$event_name"\n},
-                            qq{  Handler is a ref to $ref_type\n},
-                            qq{  A handler should be a ref to code\n}
-                        );
-                    }
-                    my $retour = $handler->(@data);
-                },
+                event => gen_app_event_handler($slr),
             }
         },
         <<'END_OF_LUA');
@@ -356,8 +370,9 @@ qq{Registering character $char_desc as symbol $symbol_id: },
                     $coro_arg = { symbols => \@symbols };
                     $coro_arg->{is_graphic} = 'true' if $is_graphic;
                     return $coro_arg;
-                }
-            }
+                },
+                event => gen_app_event_handler($slr),
+            },
         },
         <<'END_OF_LUA');
             local slr, input_string = ...
@@ -445,7 +460,8 @@ sub Marpa::R3::Scanless::R::resume {
                 trace => sub {
                     my ($msg) = @_;
                     say {$trace_file_handle} $msg;
-                }
+                },
+                event => gen_app_event_handler($slr),
             }
         },
         <<'END_OF_LUA');
@@ -946,7 +962,8 @@ sub Marpa::R3::Scanless::R::lexeme_complete {
                trace => sub {
                     my ($msg) = @_;
                     say {$trace_file_handle} $msg;
-               }
+               },
+               event => gen_app_event_handler($slr),
            }
         },
         <<'END_OF_LUA');
