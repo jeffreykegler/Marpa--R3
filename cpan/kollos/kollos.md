@@ -1170,7 +1170,7 @@ together.
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slg.slr_new(slg)
+    function _M.class_slg.slr_new(slg, flat_args)
         local slr = {}
         setmetatable(slr, _M.class_slr)
         slr.phase = 'initial'
@@ -1185,6 +1185,8 @@ together.
 
         local g1g = slg.g1
         slr.g1 = _M.recce_new(g1g)
+        local g1r = slr.g1
+
         -- TODO Census, eliminate most (all?) references via lmw_g
         slr.g1_isys = {}
 
@@ -1242,6 +1244,39 @@ together.
             }
         end
         slr:valuation_reset()
+
+        slr:common_set(flat_args, {'event_is_active'})
+        local trace_terminals = slr.trace_terminals
+        local start_input_return = g1r:start_input()
+        if start_input_return == -1 then
+            error( string.format('Recognizer start of input failed: %s',
+                g1g.error_description()))
+        end
+        if start_input_return < 0 then
+            error( string.format('Problem in start_input(): %s',
+                g1g.error_description()))
+        end
+        slr:g1_convert_events()
+
+        if trace_terminals > 1 then
+            local terminals_expected = slr.g1:terminals_expected()
+            table.sort(terminals_expected)
+            for ix = 1, #terminals_expected do
+                local terminal = terminals_expected[ix]
+                coroutine.yield('trace',
+                    string.format('Expecting %q at earleme 0',
+                    slg:g1_symbol_name(terminal)))
+            end
+        end
+        slr.token_values = {}
+        slr.token_is_undef = 1
+        slr.token_values[slr.token_is_undef] = glue.sv.undef()
+
+        -- token is literal is a pseudo-index, and the SV undef
+        -- is just a place holder
+        slr.token_is_literal = 2
+        slr.token_values[slr.token_is_literal] = glue.sv.undef()
+
         return slr
     end
 ```

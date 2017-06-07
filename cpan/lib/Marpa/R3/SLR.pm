@@ -148,7 +148,6 @@ sub Marpa::R3::Scanless::R::new {
 
     my $lua = $slg->[Marpa::R3::Internal::Scanless::G::L];
     $slr->[Marpa::R3::Internal::Scanless::R::L] = $lua;
-    $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] = [];
 
     my ($regix, $events) = $slg->coro_by_tag(
         ( '@' . __FILE__ . ':' . __LINE__ ),
@@ -165,44 +164,8 @@ sub Marpa::R3::Scanless::R::new {
         <<'END_OF_LUA');
         local slg, flat_args = ...
         _M.wrap(function ()
-            local slr = slg:slr_new()
-            local g1g = slg.g1
-            local g1r = slr.g1
-            local slg = slr.slg
-            slr:common_set(flat_args, {'event_is_active'})
-            local trace_terminals = slr.trace_terminals
-            local start_input_return = g1r:start_input()
-            if start_input_return == -1 then
-                error( string.format('Recognizer start of input failed: %s',
-                    g1g.error_description()))
-            end
-            if start_input_return < 0 then
-                error( string.format('Problem in start_input(): %s',
-                    g1g.error_description()))
-            end
-            slr:g1_convert_events()
-
-            if trace_terminals > 1 then
-                local terminals_expected = slr.g1:terminals_expected()
-                table.sort(terminals_expected)
-                for ix = 1, #terminals_expected do
-                    local terminal = terminals_expected[ix]
-                    coroutine.yield('trace',
-                        string.format('Expecting %q at earleme 0',
-                        slg:g1_symbol_name(terminal)))
-                end
-            end
-            slr.token_values = {}
-            slr.token_is_undef = 1
-            slr.token_values[slr.token_is_undef] = glue.sv.undef()
-
-            -- token is literal is a pseudo-index, and the SV undef
-            -- is just a place holder
-            slr.token_is_literal = 2
-            slr.token_values[slr.token_is_literal] = glue.sv.undef()
-
+            local slr = slg:slr_new(flat_args)
             local events = glue.convert_libmarpa_events(slr)
-
             return 'ok', slr.regix, events
         end)
 END_OF_LUA
