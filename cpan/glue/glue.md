@@ -420,6 +420,51 @@ and error codes.
 
 ## Glue utilities
 
+Assuming that a current block is set,
+check that a range is correct
+and return the normalized value.
+If either arg is nil, return the default.
+In case of error, return `nil` followed by
+a message
+
+```
+    -- miranda: section+ most Lua function definitions
+    function glue.check_perl_l0_range(slr, current_pos_arg, length_arg)
+        local new_block_ix, l0_pos, end_pos = slr:block_where()
+        local block_length = #slr.current_block
+        local current_pos = current_pos_arg or l0_pos or 0
+        local new_current_pos = math.tointeger(current_pos)
+        if not new_current_pos then
+            return nil, string.format('Bad current position argument %s', current_pos_arg)
+        end
+        if new_current_pos < 0 then
+            new_current_pos = block_length + new_current_pos
+        end
+        if new_current_pos < 0 then
+            return nil, string.format('Current position is before start of block: %s', current_pos_arg)
+        end
+        if new_current_pos > block_length then
+            return nil, string.format('Current position is after end of block: %s', current_pos_arg)
+        end
+
+        local longueur = length_arg or -1
+        longueur = math.tointeger(longueur)
+        if not longueur then
+            return nil, string.format('Bad length argument %s', length_arg)
+        end
+        local new_end_pos = longueur >= 0 and new_current_pos + longueur or
+            block_length + longueur + 1
+        if new_end_pos < 0 then
+            return nil, string.format('Last position is before start of block: %s', length_arg)
+        end
+        if new_end_pos > block_length then
+            return nil, string.format('Last position is after end of block: %s', length_arg)
+        end
+
+        return new_current_pos, new_end_pos
+    end
+```
+
 ```
     -- miranda: section+ most Lua function definitions
     function glue.convert_libmarpa_events(slr)

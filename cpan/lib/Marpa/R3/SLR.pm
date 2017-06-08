@@ -361,62 +361,10 @@ qq{Registering character $char_desc as symbol $symbol_id: },
         },
         <<'END_OF_LUA');
             local slr, input_string = ...
-            local eols = {
-                [0x0A] = 0x0A,
-                [0x0D] = 0x0D,
-                [0x0085] = 0x0085,
-                [0x000B] = 0x000B,
-                [0x000C] = 0x000C,
-                [0x2028] = 0x2028,
-                [0x2029] = 0x2029
-            }
-            local trace_terminals = slr.trace_terminals
             _M.wrap(function()
-                local inputs = slr.inputs
-                local this_input = {}
-                inputs[#inputs + 1] = this_input
-                slr.current_block = this_input
-                this_input.text = input_string
-                this_input.index = #inputs
-                local ix = 1
-
-                local eol_seen = false
-                local line_no = 1
-                local column_no = 0
-                local per_codepoint = slr.slg.per_codepoint
-                for byte_p, codepoint in utf8.codes(input_string) do
-
-                    if not per_codepoint[codepoint] then
-                       local new_codepoint = {}
-                       per_codepoint[codepoint] = new_codepoint
-                       local codepoint_data = coroutine.yield('codepoint', codepoint, trace_terminals)
-                       -- print('coro_ret: ', inspect(codepoint_data) )
-                       if codepoint_data.is_graphic == 'true' then
-                           new_codepoint.is_graphic = true
-                       end
-                       local symbols = codepoint_data.symbols or {}
-                       for ix = 1, #symbols do
-                           new_codepoint[ix] = math.tointeger(symbols[ix])
-                       end
-                       -- print('new_codepoint:', inspect(new_codepoint))
-                    end
-
-                    -- line numbering logic
-                    if eol_seen and
-                       (eol_seen ~= 0x0D or codepoint ~= 0x0A) then
-                       eol_seen = false
-                       line_no = line_no + 1
-                       column_no = 0
-                    end
-                    column_no = column_no + 1
-                    eol_seen = eols[codepoint]
-
-                    local vlq = _M.to_vlq({ byte_p, line_no, column_no })
-                    this_input[#this_input+1] = vlq
-                end
-
+                local new_block_ix = slr:block_new(input_string)
+                slr:block_set(new_block_ix)
                 slr.phase = 'read'
-
                 return 'ok'
             end
         )
@@ -472,47 +420,24 @@ sub Marpa::R3::Scanless::R::resume {
                 )
             end
 
-            local new_block_ix, l0_pos, end_pos = slr:block_where()
-            local block_length = #slr.current_block
-            local current_pos = current_pos_arg or l0_pos or 0
-            local new_current_pos = math.tointeger(current_pos)
-            if not new_current_pos then
-                error(string.format('pos_set(): Bad current position argument %s', current_pos_arg))
-            end
-            if new_current_pos < 0 then
-                new_current_pos = block_length + new_current_pos
-            end
-            if new_current_pos < 0 then
-                error(string.format('pos_set(): Current position is before start of block: %s', current_pos_arg))
-            end
-            if new_current_pos > block_length then
-                error(string.format('pos_set(): Current position is after end of block: %s', current_pos_arg))
-            end
 
-            local longueur = length_arg or -1
-            longueur = math.tointeger(longueur)
-            if not longueur then
-                error(string.format('pos_set(): Bad length argument %s', length_arg))
-            end
-            local new_end_pos = longueur >= 0 and new_current_pos + longueur or
-                block_length + longueur + 1
-            if new_end_pos < 0 then
-                error(string.format('pos_set(): Last position is before start of block: %s', length_arg))
-            end
-            if new_end_pos > block_length then
-                error(string.format('pos_set(): Last position is after end of block: %s', length_arg))
-            end
-
+           local new_current_pos, new_end_pos
+               = glue.check_perl_l0_range(slr, current_pos_arg, length_arg)
+           if not new_current_pos then
+               -- if `new_current_pos = nil` then 2nd return value
+               -- is an error message
+               error('slr->resume(): ' .. new_end_pos)
+           end
            slr:block_set(nil, new_current_pos, new_end_pos)
-            _M.wrap(function ()
-                local events = {}
-                while true do
-                    local read_ok = slr:read()
-                    events = glue.convert_libmarpa_events(slr)
-                    if read_ok or #events > 0 then break end
-                end
-                return 'ok', events
-            end
+           _M.wrap(function ()
+               local events = {}
+               while true do
+                   local read_ok = slr:read()
+                   events = glue.convert_libmarpa_events(slr)
+                   if read_ok or #events > 0 then break end
+               end
+               return 'ok', events
+           end
   )
 END_OF_LUA
 

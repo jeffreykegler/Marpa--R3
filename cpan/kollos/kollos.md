@@ -2582,6 +2582,72 @@ an L0 range
     end
 ```
 
+`block_new` must be called in a coroutine which handles
+the `codepoint` command.
+
+```
+    -- miranda: section+ most Lua function definitions
+    local eols = {
+        [0x0A] = 0x0A,
+        [0x0D] = 0x0D,
+        [0x0085] = 0x0085,
+        [0x000B] = 0x000B,
+        [0x000C] = 0x000C,
+        [0x2028] = 0x2028,
+        [0x2029] = 0x2029
+    }
+
+    function _M.class_slr.block_new(slr, input_string, current_pos, last_pos)
+        local trace_terminals = slr.trace_terminals
+        local inputs = slr.inputs
+        local new_block = {}
+        local this_index = #inputs + 1
+        inputs[this_index] = new_block
+        new_block.text = input_string
+        new_block.index = #inputs
+        local ix = 1
+
+        local eol_seen = false
+        local line_no = 1
+        local column_no = 0
+        local per_codepoint = slr.slg.per_codepoint
+        for byte_p, codepoint in utf8.codes(input_string) do
+
+            if not per_codepoint[codepoint] then
+               local new_codepoint = {}
+               per_codepoint[codepoint] = new_codepoint
+               local codepoint_data = coroutine.yield('codepoint', codepoint, trace_terminals)
+               -- print('coro_ret: ', inspect(codepoint_data) )
+               if codepoint_data.is_graphic == 'true' then
+                   new_codepoint.is_graphic = true
+               end
+               local symbols = codepoint_data.symbols or {}
+               for ix = 1, #symbols do
+                   new_codepoint[ix] = math.tointeger(symbols[ix])
+               end
+               -- print('new_codepoint:', inspect(new_codepoint))
+            end
+
+            -- line numbering logic
+            if eol_seen and
+               (eol_seen ~= 0x0D or codepoint ~= 0x0A) then
+               eol_seen = false
+               line_no = line_no + 1
+               column_no = 0
+            end
+            column_no = column_no + 1
+            eol_seen = eols[codepoint]
+
+            local vlq = _M.to_vlq({ byte_p, line_no, column_no })
+            new_block[#new_block+1] = vlq
+        end
+        current_pos = current_pos or 0
+        last_pos = last_pos or #new_block
+        slr:block_set(this_index, current_pos, last_pos)
+        return this_index
+    end
+```
+
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.block_where(slr)
