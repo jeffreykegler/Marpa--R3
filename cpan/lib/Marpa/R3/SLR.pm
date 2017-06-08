@@ -450,7 +450,7 @@ sub Marpa::R3::Scanless::R::resume {
             }
         },
         <<'END_OF_LUA');
-            local slr, start_pos_arg, length_arg = ...
+            local slr, current_pos_arg, length_arg = ...
 
             if #slr.inputs <= 0 then
                 error(
@@ -472,7 +472,38 @@ sub Marpa::R3::Scanless::R::resume {
                 )
             end
 
-           slr:pos_set(start_pos_arg, length_arg)
+            local new_block_ix, l0_pos, end_pos = slr:block_where()
+            local block_length = #slr.current_block
+            local current_pos = current_pos_arg or l0_pos or 0
+            local new_current_pos = math.tointeger(current_pos)
+            if not new_current_pos then
+                error(string.format('pos_set(): Bad current position argument %s', current_pos_arg))
+            end
+            if new_current_pos < 0 then
+                new_current_pos = block_length + new_current_pos
+            end
+            if new_current_pos < 0 then
+                error(string.format('pos_set(): Current position is before start of block: %s', current_pos_arg))
+            end
+            if new_current_pos > block_length then
+                error(string.format('pos_set(): Current position is after end of block: %s', current_pos_arg))
+            end
+
+            local longueur = length_arg or -1
+            longueur = math.tointeger(longueur)
+            if not longueur then
+                error(string.format('pos_set(): Bad length argument %s', length_arg))
+            end
+            local new_end_pos = longueur >= 0 and new_current_pos + longueur or
+                block_length + longueur + 1
+            if new_end_pos < 0 then
+                error(string.format('pos_set(): Last position is before start of block: %s', length_arg))
+            end
+            if new_end_pos > block_length then
+                error(string.format('pos_set(): Last position is after end of block: %s', length_arg))
+            end
+
+           slr:block_set(nil, new_current_pos, new_end_pos)
             _M.wrap(function ()
                 local events = {}
                 while true do

@@ -2126,59 +2126,6 @@ Read alternatives into the G1 grammar.
     end
 ```
 
-Set the position and length of input string.
-
-TODO: Now that I have a glue wrapper,
-make this more internal?
-
-```
-    -- miranda: section+ most Lua function definitions
-    function _M.class_slr.pos_set(slr, current_pos_arg, length_arg, block_ix)
-        local block
-        if block_ix then
-            block = slr.inputs[block_ix]
-            if not block then
-                error(string.format('pos_set(): No block at index %d', block_ix))
-            end
-        else
-            block = slr.current_block
-        end
-        local input_length = #block
-
-        local new_block_ix, l0_pos, end_pos = slr:block_where()
-        local current_pos = current_pos_arg or l0_pos or 0
-        local new_current_pos = math.tointeger(current_pos)
-        if not new_current_pos then
-            error(string.format('pos_set(): Bad current position argument %s', current_pos_arg))
-        end
-        if new_current_pos < 0 then
-            new_current_pos = input_length + new_current_pos
-        end
-        if new_current_pos < 0 then
-            error(string.format('pos_set(): Current position is before start of block: %s', current_pos_arg))
-        end
-        if new_current_pos > input_length then
-            error(string.format('pos_set(): Current position is after end of block: %s', current_pos_arg))
-        end
-
-        local longueur = length_arg or -1
-        longueur = math.tointeger(longueur)
-        if not longueur then
-            error(string.format('pos_set(): Bad length argument %s', length_arg))
-        end
-        local new_end_pos = longueur >= 0 and new_current_pos + longueur or
-            input_length + longueur + 1
-        if new_end_pos < 0 then
-            error(string.format('pos_set(): Last position is before start of block: %s', length_arg))
-        end
-        if new_end_pos > input_length then
-            error(string.format('pos_set(): Last position is after end of block: %s', length_arg))
-        end
-
-        slr:block_set(block_ix, new_current_pos, new_end_pos)
-    end
-```
-
 #### External reading
 
 These functions are for "external" reading of tokens --
