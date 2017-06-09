@@ -144,18 +144,15 @@ sub test {
                        "Preliminary target at $pos: ",
                        $slr->g1_literal(@shortest_span)
                    ) if $verbose;
-                  say STDERR join ' ', __FILE__, __LINE__;
                   return 'ok';
               },
               q{'exhausted} => sub {
-                  say STDERR join ' ', __FILE__, __LINE__;
                   return 'pause';
               }
         );
         my $recce =
           Marpa::R3::Scanless::R->new( { grammar => $g,
               event_handlers => \%event_handlers,
-              trace_terminals => 99,
           }, $recce_debug_args );
         my $pos = $recce->read( \$string, $target_start );
 

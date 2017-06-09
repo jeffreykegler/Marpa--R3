@@ -238,11 +238,12 @@ sub Marpa::R3::Scanless::R::DESTROY {
     # say STDERR "In Marpa::R3::Scanless::R::DESTROY after test";
 
     my $regix = $slr->[Marpa::R3::Internal::Scanless::R::REGIX];
-    $lua->call_by_tag($regix,
+    $slr->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__),
-        <<'END_OF_LUA', 'i', $regix);
-    local slr, regix = ...
+        <<'END_OF_LUA', '');
+    local slr = ...
     slr:valuation_reset()
+    local regix = slr.regix
     local registry = debug.getregistry()
     _M.unregister(registry, regix)
 END_OF_LUA
