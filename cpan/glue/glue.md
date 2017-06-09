@@ -469,17 +469,19 @@ a message
     -- miranda: section+ most Lua function definitions
     function glue.convert_libmarpa_events(slr)
         local in_q = slr.event_queue
+        local out_q = {}
+        local external_events = {}
         for event_ix = 1, #in_q do
             local event = in_q[event_ix]
             -- print(inspect(event))
             local event_type = event[1]
 
             if event_type == "'exhausted" then
-                coroutine.yield ( 'event', event_type )
+                out_q[#out_q+1] = { event_type }
             end
 
             if event_type == "'rejected" then
-                coroutine.yield ( 'event', event_type )
+                out_q[#out_q+1] = { event_type }
             end
 
             -- The code next set of events is highly similar -- an isyid at
@@ -489,21 +491,21 @@ a message
                 local completed_isyid = event[2]
                 local slg = slr.slg
                 local event_name = slg.completion_event_by_isy[completed_isyid].name
-                coroutine.yield ( 'event', event_name )
+                out_q[#out_q+1] = { event_name }
             end
 
             if event_type == 'symbol nulled' then
                 local nulled_isyid = event[2]
                 local slg = slr.slg
                 local event_name = slg.nulled_event_by_isy[nulled_isyid].name
-                coroutine.yield ( 'event', event_name )
+                out_q[#out_q+1] = { event_name }
             end
 
             if event_type == 'symbol predicted' then
                 local predicted_isyid = event[2]
                 local slg = slr.slg
                 local event_name = slg.prediction_event_by_isy[predicted_isyid].name
-                coroutine.yield ( 'event', event_name )
+                out_q[#out_q+1] = { event_name }
             end
 
             if event_type == 'after lexeme'
@@ -512,7 +514,7 @@ a message
                 local lexeme_isyid = event[2]
                 local slg = slr.slg
                 local event_name = slg.lexeme_event_by_isy[lexeme_isyid].name
-                coroutine.yield ( 'event', event_name )
+                out_q[#out_q+1] = { event_name }
             end
 
             -- end of run of highly similar events
@@ -521,16 +523,15 @@ a message
                 local lexeme_irlid = event[2]
                 local slg = slr.slg
                 local event_name = slg.discard_event_by_irl[lexeme_irlid].name
-                local new_event = { 'event', event_name }
-                for ix = 4, #event do
+                local new_event = { event_name }
+                for ix = 3, #event do
                     new_event[#new_event+1] = event[ix]
                 end
-                coroutine.yield( 'event', event_name, table.unpack(event, 3) )
+                out_q[#out_q+1] = new_event
             end
         end
 
-        -- TODO -- after development, change to no return
-        return {}
+        return out_q
     end
 
 ```

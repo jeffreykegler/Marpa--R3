@@ -135,26 +135,26 @@ sub test {
 # name: SLIF exhaustion grammar setting synopsis part 2
 
         my @shortest_span = ();
-        my %event_handlers = (
-              'target' => sub {
-                   my ($slr) = @_;
-                   my $pos = $slr->pos();
-                   @shortest_span = $slr->last_completed('target');
-                   diag(
-                       "Preliminary target at $pos: ",
-                       $slr->g1_literal(@shortest_span)
-                   ) if $verbose;
-                  return 'ok';
-              },
-              q{'exhausted} => sub {
-                  return 'pause';
-              }
-        );
         my $recce =
-          Marpa::R3::Scanless::R->new( { grammar => $g,
-              event_handlers => \%event_handlers,
-          }, $recce_debug_args );
+          Marpa::R3::Scanless::R->new( { grammar => $g, }, $recce_debug_args );
         my $pos = $recce->read( \$string, $target_start );
+
+        EVENT:
+        for my $event ( @{ $recce->events() } ) {
+            my ($name) = @{$event};
+            if ( $name eq 'target' ) {
+                @shortest_span = $recce->last_completed('target');
+                diag(
+                    "Preliminary target at $pos: ",
+                    $recce->g1_literal(@shortest_span)
+                ) if $verbose;
+                next EVENT;
+            } ## end if ( $name eq 'target' )
+                # Not all exhaustion has an exhaustion event,
+                # so we look for exhaustion explicitly below.
+            next EVENT if $name eq q('exhausted);
+            die join q{ }, "Spurious event at position $pos: '$name'";
+        } ## end EVENT: for my $event ( @{ $recce->events() } )
 
 # Marpa::R3::Display::End
 
@@ -172,7 +172,6 @@ sub test {
 
         $recce = Marpa::R3::Scanless::R->new(
             {   grammar    => $g,
-              event_handlers => \%event_handlers,
             },
             $recce_debug_args
         );

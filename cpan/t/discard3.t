@@ -15,8 +15,7 @@
 use 5.010001;
 use strict;
 use warnings;
-# use Test::More tests => 342;
-use Test::More skip_all => 'new event logic';
+use Test::More tests => 342;
 use English qw( -no_match_vars );
 use Scalar::Util;
 use POSIX qw(setlocale LC_ALL);
@@ -25,6 +24,8 @@ POSIX::setlocale(LC_ALL, "C");
 
 use lib 'inc';
 use Marpa::R3::Test;
+
+die("Infinite loop");
 
 ## no critic (ErrorHandling::RequireCarping);
 
