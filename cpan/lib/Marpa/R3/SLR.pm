@@ -130,7 +130,7 @@ sub gen_app_event_handler {
                 qq{  A handler should be a ref to code\n}
             );
         }
-        my $retour = $handler->( $event_name, @data );
+        my $retour = $handler->( $slr, $event_name, @data ) // 'ok';
         if ( $retour ne 'ok' and $retour ne 'pause' ) {
             Marpa::R3::exception(
                 qq{Bad return from event handler for event "$event_name"\n},
@@ -173,6 +173,7 @@ sub Marpa::R3::Scanless::R::new {
             "  whose values are code refs\n"
         );
     }
+    delete $flat_args->{event_handlers};
 
     my $slg_class = 'Marpa::R3::Scanless::G';
     if ( not blessed $slg or not $slg->isa($slg_class) ) {
