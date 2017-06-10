@@ -1541,7 +1541,8 @@ need a success/failure return code.
 ```
 
 "Complete" an earleme in L0.
-Return `true` if parsing can continue.
+Return `true` if the parser is "alive",
+that is, not exhausted.
 otherwise `false` and a status string.
 
 ```
@@ -1618,8 +1619,9 @@ which will be 1 or 0.
 ```
 
 Read the current codepoint in L0.
-Returns `true` on success,
-otherwise `false` and an error code string.
+Returns `true` if the parser is "alive"
+(not exhausted)/
+Otherwise returns `false` and a status string.
 
 ```
     -- miranda: section+ most Lua function definitions
@@ -1674,11 +1676,11 @@ otherwise `false` and a status string.
             end
             -- +1 because codepoints array is 1-based
             slr.codepoint = slr:codepoint_from_pos(block_ix, l0_pos)
-            local ok, errmsg = slr:l0_read_codepoint()
+            local alive, status = slr:l0_read_codepoint()
             local this_candidate, eager = slr:l0_track_candidates()
             if this_candidate then slr.l0_candidate = this_candidate end
             if eager then return true end
-            if not ok then return false, errmsg end
+            if not alive then return false, status end
             slr:block_set(nil, l0_pos + 1)
         end
         error('Unexpected fall through in l0_read()')
@@ -1718,13 +1720,8 @@ rule, false otherwise.
             -- ignore non-completions
             if dot >= 0 then goto NEXT_EIM end
             complete_lexemes = true
-            -- ignore rules which are not lexeme rules
-            -- io.stderr:write(string.format("%s\n", inspect(l0_rules[rule_id])))
             local g1_lexeme = l0_rules[rule_id].g1_lexeme
-            -- io.stderr:write(string.format("%s\n", l0g:brief_nrl(rule_id)))
             eager = eager or l0_rules[rule_id].eager
-            -- io.stderr:write(string.format('in track_candidates(): rule_id=%s, eager=%s\n',
-                -- inspect(rule_id), inspect(eager)))
             ::NEXT_EIM::
         end
         ::LAST_EIM::
