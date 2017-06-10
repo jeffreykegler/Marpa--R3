@@ -1247,7 +1247,10 @@ together.
         end
         slr:valuation_reset()
 
-        slr:common_set(flat_args, {'event_is_active'})
+        slr:common_set(flat_args, {'event_is_active',
+            -- TODO delete after development
+            'event_handlers'
+        })
         local trace_terminals = slr.trace_terminals
         local start_input_return = g1r:start_input()
         if start_input_return == -1 then
@@ -1528,7 +1531,8 @@ need a success/failure return code.
             local discard_mode = (g1r:is_exhausted() ~= 0)
             -- TODO: exhaustion is now either fatal or an
             -- event, so we can always return `true`
-            slr:alternatives(discard_mode)
+            local retour = slr:alternatives(discard_mode)
+            if not retour then return false end
             local event_count = #slr.event_queue
             if event_count >= 1 then return false end
         end
@@ -1788,7 +1792,7 @@ and a string indicating the error.
         end
         local elect_earley_set = slr.l0_candidate
         -- no zero-length lexemes, so Earley set 0 is ignored
-        if not elect_earley_set then return exhausted() end
+        if not elect_earley_set then return false, exhausted() end
         local working_pos = slr.start_of_lexeme + elect_earley_set
         local return_value = l0r:progress_report_start(elect_earley_set)
         if return_value < 0 then
@@ -1800,7 +1804,7 @@ and a string indicating the error.
         slr:lexeme_queue_examine(high_lexeme_priority)
         local accept_q = slr.accept_queue
         if #accept_q <= 0 then
-            if discarded <= 0 then return exhausted() end
+            if discarded <= 0 then return false, exhausted() end
             -- if here, no accepted lexemes, but discarded ones
             slr:block_set(nil, working_pos)
             local latest_es = slr.g1:latest_earley_set()
@@ -1811,13 +1815,13 @@ and a string indicating the error.
                     slr.start_of_lexeme,
                     working_pos - slr.start_of_lexeme
                 )
-            return
+            return true
         end
         -- PASS 3 --
         local result = slr:do_pause_before()
-        if result then return end
+        if result then return true end
         slr:g1_earleme_complete()
-        return
+        return true
     end
 ```
 
