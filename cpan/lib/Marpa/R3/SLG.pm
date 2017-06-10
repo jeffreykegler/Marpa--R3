@@ -1779,7 +1779,8 @@ sub Marpa::R3::Scanless::G::coro_by_tag {
                 Marpa::R3::exception(qq{No coro handler for "$cmd"})
                   if not $handler;
                 $yield_data //= [];
-                ($coro_arg) = $handler->(@{$yield_data});
+                my $handler_cmd;
+                ($handler_cmd, $coro_arg) = $handler->(@{$yield_data});
             }
             return 1;
         };

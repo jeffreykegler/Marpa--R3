@@ -138,6 +138,7 @@ sub gen_app_event_handler {
                 qq{  Handler must return "ok" or "pause"\n},
             );
         }
+        return $retour;
     };
 }
 
@@ -204,6 +205,7 @@ sub Marpa::R3::Scanless::R::new {
                 trace => sub {
                     my ($msg) = @_;
                     say {$trace_file_handle} $msg;
+                    return 'ok';
                 },
                 event => gen_app_event_handler($slr),
             }
@@ -268,6 +270,7 @@ sub Marpa::R3::Scanless::R::set {
                 trace => sub {
                     my ($msg) = @_;
                     say {$trace_file_handle} $msg;
+                    return 'ok';
                 }
             }
         },
@@ -357,7 +360,7 @@ qq{Registering character $char_desc as symbol $symbol_id: },
                     }
                     $coro_arg = { symbols => \@symbols };
                     $coro_arg->{is_graphic} = 'true' if $is_graphic;
-                    return $coro_arg;
+                    return 'ok', $coro_arg;
                 },
                 event => gen_app_event_handler($slr),
             },
@@ -396,6 +399,7 @@ sub Marpa::R3::Scanless::R::resume {
                 trace => sub {
                     my ($msg) = @_;
                     say {$trace_file_handle} $msg;
+                    return 'ok';
                 },
                 event => gen_app_event_handler($slr),
             }
@@ -546,6 +550,7 @@ sub Marpa::R3::Scanless::R::series_restart {
                 trace => sub {
                     my ($msg) = @_;
                     say {$trace_file_handle} $msg;
+                    return 'ok';
                 }
             }
         },
@@ -919,6 +924,7 @@ sub Marpa::R3::Scanless::R::lexeme_complete {
                trace => sub {
                     my ($msg) = @_;
                     say {$trace_file_handle} $msg;
+                    return 'ok';
                },
                event => gen_app_event_handler($slr),
            }
@@ -1203,7 +1209,8 @@ sub Marpa::R3::Scanless::R::coro_by_tag {
                 Marpa::R3::exception(qq{No coro handler for "$cmd"})
                   if not $handler;
                 $yield_data //= [];
-                ($coro_arg) = $handler->(@{$yield_data});
+                my $handler_cmd;
+                ($handler_cmd, $coro_arg) = $handler->(@{$yield_data});
             }
             return 1;
         };
