@@ -1824,7 +1824,7 @@ and a string indicating the error.
         end
         -- PASS 3 --
         local result = slr:do_pause_before()
-        if result then return true end
+        if result then return false end
         slr:g1_earleme_complete()
         return true
     end
