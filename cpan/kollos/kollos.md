@@ -1695,9 +1695,15 @@ Right now this is a prototype:
 Only LATM is implemented;
 a candidate is an earley set ID;
 candidates are moved
-and seconded at once;
-and the candidate chosen is the last one
-moved.
+and seconded at once.
+
+The candidate eventually
+chosen is the last one
+moved, unless one of the candidates is
+eager.
+That is decided by the caller --
+the candidate and an `eager` boolean are
+returned  so it can make that decision.
 
 Return earley set ID if we have the completion of a lexeme
 rule, false otherwise.
@@ -1708,7 +1714,7 @@ rule, false otherwise.
         local l0r = slr.l0
         local l0g = slr.slg.l0
         local l0_rules = slr.l0_irls
-        local eager
+        local eager = false
         local complete_lexemes = false
         local es_id = l0r:latest_earley_set()
         -- Do we have a completion of a lexeme rule?
@@ -1720,7 +1726,9 @@ rule, false otherwise.
             -- ignore non-completions
             if dot >= 0 then goto NEXT_EIM end
             complete_lexemes = true
-            local g1_lexeme = l0_rules[rule_id].g1_lexeme
+            -- when we expand this, the ID of the g1 lexeme
+            -- will matter; right now it does not.
+            -- local g1_lexeme = l0_rules[rule_id].g1_lexeme
             eager = eager or l0_rules[rule_id].eager
             ::NEXT_EIM::
         end
