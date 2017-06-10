@@ -2883,6 +2883,76 @@ Caller must ensure `block` and `pos` are valid.
     end
 ```
 
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slr.convert_libmarpa_events(slr)
+        local in_q = slr.event_queue
+        for event_ix = 1, #in_q do
+            local event = in_q[event_ix]
+            -- print(inspect(event))
+            local event_type = event[1]
+
+            if event_type == "'exhausted" then
+                coroutine.yield ( 'event', event_type )
+            end
+
+            if event_type == "'rejected" then
+                coroutine.yield ( 'event', event_type )
+            end
+
+            -- The code next set of events is highly similar -- an isyid at
+            -- event[2] is looked up in a table of event names.  Does it
+            -- make sense to share code, perhaps using closures?
+            if event_type == 'symbol completed' then
+                local completed_isyid = event[2]
+                local slg = slr.slg
+                local event_name = slg.completion_event_by_isy[completed_isyid].name
+                coroutine.yield ( 'event', event_name )
+            end
+
+            if event_type == 'symbol nulled' then
+                local nulled_isyid = event[2]
+                local slg = slr.slg
+                local event_name = slg.nulled_event_by_isy[nulled_isyid].name
+                coroutine.yield ( 'event', event_name )
+            end
+
+            if event_type == 'symbol predicted' then
+                local predicted_isyid = event[2]
+                local slg = slr.slg
+                local event_name = slg.prediction_event_by_isy[predicted_isyid].name
+                coroutine.yield ( 'event', event_name )
+            end
+
+            if event_type == 'after lexeme'
+                or event_type == 'before lexeme'
+            then
+                local lexeme_isyid = event[2]
+                local slg = slr.slg
+                local event_name = slg.lexeme_event_by_isy[lexeme_isyid].name
+                coroutine.yield ( 'event', event_name )
+            end
+
+            -- end of run of highly similar events
+
+            if event_type == 'discarded lexeme' then
+                local lexeme_irlid = event[2]
+                local slg = slr.slg
+                local event_name = slg.discard_event_by_irl[lexeme_irlid].name
+                local new_event = { 'event', event_name }
+                for ix = 4, #event do
+                    new_event[#new_event+1] = event[ix]
+                end
+                coroutine.yield( 'event', event_name, table.unpack(event, 3) )
+            end
+        end
+
+        -- TODO -- after development, change to no return
+        return {}
+    end
+
+```
+
 ### Progress reporting
 
 Given a scanless
