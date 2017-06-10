@@ -468,6 +468,10 @@ a message
 ```
     -- miranda: section+ most Lua function definitions
     function glue.convert_libmarpa_events(slr)
+        if slr.has_event_handlers then
+            -- TODO replace glue method with this after development
+            return slr:convert_libmarpa_events()
+        end
         local in_q = slr.event_queue
         local out_q = {}
         local external_events = {}
