@@ -25,8 +25,6 @@ POSIX::setlocale(LC_ALL, "C");
 use lib 'inc';
 use Marpa::R3::Test;
 
-die("Infinite loop");
-
 ## no critic (ErrorHandling::RequireCarping);
 
 use Marpa::R3;

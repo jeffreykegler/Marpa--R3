@@ -432,15 +432,9 @@ sub Marpa::R3::Scanless::R::resume {
            end
            slr:block_set(nil, new_current_pos, new_end_pos)
            _M.wrap(function ()
-               local events = {}
-               while true do
-                   local read_ok = slr:read()
-                   events = glue.convert_libmarpa_events(slr)
-                   if read_ok or #events > 0 then break end
-               end
-               return 'ok', events
+               return slr:block_read()
            end
-  )
+      )
 END_OF_LUA
 
     $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] = $events;

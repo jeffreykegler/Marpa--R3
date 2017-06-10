@@ -1496,10 +1496,6 @@ need a success/failure return code.
         if slr.block_mode then
            _M.userX( 'unpermitted use of slr.read() in block mode' )
         end
-
-        local g1r = slr.g1
-        if g1r:is_exhausted() ~= 0 then return true end
-
         slr.start_of_pause_lexeme = -1
         slr.end_of_pause_lexeme = -1
         slr.event_queue = {}
@@ -1519,6 +1515,7 @@ need a success/failure return code.
                     ))
                 end
             end
+            local g1r = slr.g1
             slr:l0_read_lexeme()
             local discard_mode = (g1r:is_exhausted() ~= 0)
             -- TODO: exhaustion is now either fatal or an
@@ -2673,6 +2670,19 @@ the `codepoint` command.
         if end_pos then
             block.end_pos = end_pos
         end
+    end
+```
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slr.block_read(slr)
+        local events = {}
+        while true do
+            local read_ok = slr:read()
+            events = glue.convert_libmarpa_events(slr)
+            if read_ok or #events > 0 then break end
+        end
+        return 'ok', events
     end
 ```
 
