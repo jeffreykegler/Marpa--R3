@@ -1120,6 +1120,8 @@ This is a registry object.
     class_slr_fields.trace_values_queue = true
     class_slr_fields.tree_mode = true
     class_slr_fields.trailers = true
+    -- TODO delete after development
+    class_slr_fields.has_event_handlers = true
 ```
 
 *At end of input* field:
@@ -1378,6 +1380,12 @@ the recognizer's Lua-level settings.
         end
 
         local raw_value
+
+        -- TODO delete after development
+        raw_value = flat_args.event_handlers
+        if raw_value then
+            slr.has_event_handlers = true
+        end
 
         -- trace_terminals named argument --
         raw_value = flat_args.trace_terminals
