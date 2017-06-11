@@ -435,7 +435,7 @@ sub Marpa::R3::Scanless::R::resume {
                -- is an error message
                error('slr->resume(): ' .. new_end_pos)
            end
-           slr:block_set(nil, new_current_pos, new_end_pos)
+           slr:block_reset(new_current_pos, new_end_pos)
            _M.wrap(function ()
                return slr:block_read()
            end
