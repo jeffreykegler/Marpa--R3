@@ -1194,12 +1194,12 @@ sub Marpa::R3::Scanless::R::coro_by_tag {
         local $@;
         $eval_ok = eval {
             $lua->call_by_tag( $regix, $tag, $codestr, $signature, @{$p_args} );
-            my $coro_arg;
+            my $resume_arg;
           CORO_CALL: while (1) {
                 my ( $cmd, $yield_data ) =
                   $lua->call_by_tag( $regix, $resume_tag,
-                    'local slr, coro_arg = ...; return _M.resume(coro_arg)',
-                    's', $coro_arg );
+                    'local slr, resume_arg = ...; return _M.resume(resume_arg)',
+                    's', $resume_arg );
 
                 if (not $cmd) {
                    @results = @{$yield_data};
@@ -1210,7 +1210,7 @@ sub Marpa::R3::Scanless::R::coro_by_tag {
                   if not $handler;
                 $yield_data //= [];
                 my $handler_cmd;
-                ($handler_cmd, $coro_arg) = $handler->(@{$yield_data});
+                ($handler_cmd, $resume_arg) = $handler->(@{$yield_data});
             }
             return 1;
         };
