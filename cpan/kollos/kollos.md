@@ -2974,7 +2974,7 @@ Caller must ensure `block` and `pos` are valid.
         end
 
         -- TODO -- after development, change to no return
-        return 'ok', {}
+        return (pause and 'pause' or 'ok'), {}
     end
 
 ```
