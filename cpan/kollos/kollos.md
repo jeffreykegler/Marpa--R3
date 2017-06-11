@@ -1498,10 +1498,6 @@ Return `true` if the read is alive (this is,
 if there is some way to continue it),
 `false` otherwise.
 
-TODO: This function now either succeeds, creates an
-event, or throws an exception.  Therefore, we no longer
-need a success/failure return code.
-
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.read(slr)
