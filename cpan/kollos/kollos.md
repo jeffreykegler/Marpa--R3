@@ -1494,6 +1494,10 @@ the recognizer's Lua-level settings.
 
 The top-level read function.
 
+Return `true` if the read is alive (this is,
+if there is some way to continue it),
+`false` otherwise.
+
 TODO: This function now either succeeds, creates an
 event, or throws an exception.  Therefore, we no longer
 need a success/failure return code.
@@ -1514,7 +1518,7 @@ need a success/failure return code.
             local _, l0_pos, end_pos = slr:block_where()
             if l0_pos >= end_pos then
                 -- a 'normal' return
-                return true
+                return false
             end
             if l0_pos >= 0 then
                 slr.start_of_lexeme = l0_pos
@@ -1529,12 +1533,11 @@ need a success/failure return code.
             local g1r = slr.g1
             slr:l0_read_lexeme()
             local discard_mode = (g1r:is_exhausted() ~= 0)
-            -- TODO: exhaustion is now either fatal or an
-            -- event, so we can always return `true`
-            local retour = slr:alternatives(discard_mode)
-            if not retour then return false end
+            -- TODO: work on this
+            local alive = slr:alternatives(discard_mode)
+            if not alive then return false end
             local event_count = #slr.event_queue
-            if event_count >= 1 then return false end
+            if event_count >= 1 then return true end
         end
         error('Internal error: unexcepted end of read loop')
     end
@@ -1778,9 +1781,16 @@ not find an acceptable lexeme.
 ```
 
 Read find and read the alternatives in the SLIF.
-Returns `true` on success.
-On failure, returns `false`
-and a string indicating the error.
+Returns `true` if the parse is alive,
+`false` if it's exhausted.
+Also returns `false` on "pause before" because
+special action is probably needed before the parse
+should resume.
+When `false` is returned, `alternatives()`
+may also return
+a string indicating the status.
+
+TODO: Is the status string needed/used?
 
 ```
     -- miranda: section+ most Lua function definitions
@@ -1824,7 +1834,7 @@ and a string indicating the error.
         end
         -- PASS 3 --
         local result = slr:do_pause_before()
-        if result then return false end
+        if result then return false, 'pause before' end
         slr:g1_earleme_complete()
         return true
     end
@@ -2696,9 +2706,9 @@ the `codepoint` command.
         local events = {}
         local event_status
         while true do
-            local read_ok = slr:read()
+            local alive = slr:read()
             event_status, events = glue.convert_libmarpa_events(slr)
-            if read_ok or #events > 0 or event_status == 'pause' then
+            if not alive or #events > 0 or event_status == 'pause' then
                 break
             end
         end
