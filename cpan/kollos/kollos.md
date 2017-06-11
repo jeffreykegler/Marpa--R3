@@ -2684,9 +2684,11 @@ the `codepoint` command.
         if block_ix then
             block = slr.inputs[block_ix]
             slr.current_block = block
-        else
-            block = slr.current_block
         end
+        return slr:block_reset(l0_pos, end_pos)
+    end
+    function _M.class_slr.block_reset(slr, l0_pos, end_pos)
+        local block = slr.current_block
         if l0_pos then
             block.l0_pos = l0_pos
         end

@@ -429,7 +429,7 @@ a message
 
 ```
     -- miranda: section+ most Lua function definitions
-    function glue.check_perl_l0_range(slr, current_pos_arg, length_arg)
+    function glue.check_perl_l0_current_pos(slr, current_pos_arg)
         local new_block_ix, l0_pos, end_pos = slr:block_where()
         local block_length = #slr.current_block
         local current_pos = current_pos_arg or l0_pos or 0
@@ -446,13 +446,19 @@ a message
         if new_current_pos > block_length then
             return nil, string.format('Current position is after end of block: %s', current_pos_arg)
         end
+        return new_current_pos
+    end
 
+    -- Note: uses a hypothetical `current_pos`, not the one actually
+    -- in the block
+    function glue.check_perl_l0_length(slr, current_pos, length_arg)
         local longueur = length_arg or -1
         longueur = math.tointeger(longueur)
         if not longueur then
             return nil, string.format('Bad length argument %s', length_arg)
         end
-        local new_end_pos = longueur >= 0 and new_current_pos + longueur or
+        local block_length = #slr.current_block
+        local new_end_pos = longueur >= 0 and current_pos + longueur or
             block_length + longueur + 1
         if new_end_pos < 0 then
             return nil, string.format('Last position is before start of block: %s', length_arg)
@@ -460,7 +466,14 @@ a message
         if new_end_pos > block_length then
             return nil, string.format('Last position is after end of block: %s', length_arg)
         end
+        return new_end_pos
+    end
 
+    function glue.check_perl_l0_range(slr, current_pos_arg, length_arg)
+        local new_current_pos, erreur = glue.check_perl_l0_current_pos(slr, current_pos_arg)
+        if not new_current_pos then return nil, erreur end
+        local new_end_pos, erreur = glue.check_perl_l0_length(slr, new_current_pos, length_arg)
+        if not new_end_pos then return nil, erreur end
         return new_current_pos, new_end_pos
     end
 ```
