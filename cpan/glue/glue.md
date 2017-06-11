@@ -535,7 +535,7 @@ a message
             end
         end
 
-        return out_q
+        return 'ok', out_q
     end
 
 ```

@@ -214,7 +214,7 @@ sub Marpa::R3::Scanless::R::new {
         local slg, flat_args = ...
         _M.wrap(function ()
             local slr = slg:slr_new(flat_args)
-            local events = glue.convert_libmarpa_events(slr)
+            local _, events = glue.convert_libmarpa_events(slr)
             return 'ok', slr.regix, events
         end)
 END_OF_LUA
@@ -951,7 +951,7 @@ sub Marpa::R3::Scanless::R::lexeme_complete {
           slg.g1.error()
       end
       _M.wrap(function ()
-          local events = glue.convert_libmarpa_events(slr)
+          local _, events = glue.convert_libmarpa_events(slr)
           return 'ok', complete_val, events
       end
       )

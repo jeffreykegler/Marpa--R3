@@ -2694,9 +2694,10 @@ the `codepoint` command.
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.block_read(slr)
         local events = {}
+        local event_status
         while true do
             local read_ok = slr:read()
-            events = glue.convert_libmarpa_events(slr)
+            event_status, events = glue.convert_libmarpa_events(slr)
             if read_ok or #events > 0 then break end
         end
         return 'ok', events
@@ -2965,7 +2966,7 @@ Caller must ensure `block` and `pos` are valid.
         end
 
         -- TODO -- after development, change to no return
-        return {}
+        return 'ok', {}
     end
 
 ```
