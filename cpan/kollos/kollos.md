@@ -2698,7 +2698,9 @@ the `codepoint` command.
         while true do
             local read_ok = slr:read()
             event_status, events = glue.convert_libmarpa_events(slr)
-            if read_ok or #events > 0 then break end
+            if read_ok or #events > 0 or event_status == 'pause' then
+                break
+            end
         end
         return 'ok', events
     end
@@ -2973,8 +2975,10 @@ Caller must ensure `block` and `pos` are valid.
             end
         end
 
-        -- TODO -- after development, change to no return
-        return (pause and 'pause' or 'ok'), {}
+        -- TODO -- after development, change to just return status?
+        local event_status = pause and 'pause' or 'ok'
+        -- print('event_status:', event_status)
+        return event_status, {}
     end
 
 ```
