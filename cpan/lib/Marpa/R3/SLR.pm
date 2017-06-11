@@ -138,7 +138,7 @@ sub gen_app_event_handler {
                 qq{  Handler must return "ok" or "pause"\n},
             );
         }
-        return $retour;
+        return 'ok', $retour;
     };
 }
 
