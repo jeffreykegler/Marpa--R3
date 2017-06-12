@@ -288,92 +288,15 @@ sub Marpa::R3::Scanless::R::read {
     my ( $slr, $p_string, $start_pos, $length ) = @_;
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
 
-    Marpa::R3::exception(
-        q{Attempt to use a tainted input string in $slr->read()},
-        qq{\n  Marpa::R3 is insecure for use with tainted data\n}
-    ) if Scalar::Util::tainted( ${$p_string} );
-
-    $start_pos //= 0;
-    $length    //= -1;
-
-    if ( ( my $ref_type = ref $p_string ) ne 'SCALAR' ) {
-        my $desc = $ref_type ? "a ref to $ref_type" : 'not a ref';
-        Marpa::R3::exception(
-            qq{Arg to Marpa::R3::Scanless::R::read() is $desc\n},
-            '  It should be a ref to scalar' );
-    } ## end if ( ( my $ref_type = ref $p_string ) ne 'SCALAR' )
-
-    if ( not defined ${$p_string} ) {
-        Marpa::R3::exception(
-            qq{Arg to Marpa::R3::Scanless::R::read() is a ref to an undef\n},
-            '  It should be a ref to a defined scalar' );
-    } ## end if ( ( my $ref_type = ref $p_string ) ne 'SCALAR' )
-
-    my $character_class_table =
-      $slg->[Marpa::R3::Internal::Scanless::G::CHARACTER_CLASS_TABLE];
-
+    my $block_ix = $slr->block_new($p_string, $start_pos, $length);
     my $coro_arg = undef;
-    $slr->coro_by_tag(
+    $slr->call_by_tag(
         ( '@' . __FILE__ . ':' . __LINE__ ),
-        {
-            signature => 's',
-            args      => [ ${$p_string} ],
-            handlers  => {
-                codepoint => sub {
-                    my ($codepoint, $trace_terminals) = @_;
-                    my $character = pack( 'U', $codepoint );
-                    my $is_graphic = ( $character =~ m/[[:graph:]]+/ );
-
-                    my @symbols;
-                    for my $entry ( @{$character_class_table} ) {
-
-                        my ( $symbol_id, $re ) = @{$entry};
-
-                        # say STDERR "Codepoint %x vs $re\n";
-
-                        if ( $character =~ $re ) {
-
-                            if ( $trace_terminals >= 2 ) {
-                                my $trace_file_handle =
-                                  $slr->[
-                                  Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE
-                                  ];
-                                my $char_desc =
-                                  character_describe( $slr, $codepoint );
-                                say {$trace_file_handle}
-qq{Registering character $char_desc as symbol $symbol_id: },
-                                  $slg->l0_symbol_display_form($symbol_id)
-                                  or Marpa::R3::exception(
-                                    "Could not say(): $ERRNO");
-                            } ## end if ( $trace_terminals >= 2 )
-
-                            push @symbols, $symbol_id;
-
-                        } ## end if ( $character =~ $re )
-                    } ## end for my $entry ( @{$character_class_table} )
-
-                    if ( not scalar @symbols ) {
-                        my $char_desc = character_describe( $slr, $codepoint );
-                        Marpa::R3::exception(
-"Character in input is not in alphabet of grammar: $char_desc\n"
-                        );
-                    }
-                    $coro_arg = { symbols => \@symbols };
-                    $coro_arg->{is_graphic} = 'true' if $is_graphic;
-                    return 'ok', $coro_arg;
-                },
-                event => gen_app_event_handler($slr),
-            },
-        },
-        <<'END_OF_LUA');
-            local slr, input_string = ...
-            _M.wrap(function()
-                local new_block_ix = slr:block_new(input_string)
-                slr:block_set(new_block_ix)
-                slr.phase = 'read'
-                return 'ok'
-            end
-        )
+        <<'END_OF_LUA', 'i', $block_ix);
+            local slr, block_ix = ...
+            slr:block_set(block_ix)
+            slr.phase = 'read'
+            return 'ok'
 END_OF_LUA
 
     my $event_count =
@@ -1061,6 +984,101 @@ sub Marpa::R3::Scanless::R::pos {
         return l0_pos
 END_OF_LUA
     return $l0_pos;
+}
+
+# TODO -- Document this
+sub Marpa::R3::Scanless::R::block_new {
+    my ( $slr, $p_string, $start_pos, $length ) = @_;
+    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+
+    Marpa::R3::exception(
+        q{Attempt to use a tainted input string in $slr->read()},
+        qq{\n  Marpa::R3 is insecure for use with tainted data\n}
+    ) if Scalar::Util::tainted( ${$p_string} );
+
+    if ( ( my $ref_type = ref $p_string ) ne 'SCALAR' ) {
+        my $desc = $ref_type ? "a ref to $ref_type" : 'not a ref';
+        Marpa::R3::exception(
+            qq{Arg to Marpa::R3::Scanless::R::read() is $desc\n},
+            '  It should be a ref to scalar' );
+    } ## end if ( ( my $ref_type = ref $p_string ) ne 'SCALAR' )
+
+    if ( not defined ${$p_string} ) {
+        Marpa::R3::exception(
+            qq{Arg to Marpa::R3::Scanless::R::read() is a ref to an undef\n},
+            '  It should be a ref to a defined scalar' );
+    } ## end if ( ( my $ref_type = ref $p_string ) ne 'SCALAR' )
+
+    my $character_class_table =
+      $slg->[Marpa::R3::Internal::Scanless::G::CHARACTER_CLASS_TABLE];
+
+    my $coro_arg = undef;
+    my ($block_ix) = $slr->coro_by_tag(
+        ( '@' . __FILE__ . ':' . __LINE__ ),
+        {
+            signature => 'sii',
+            args      => [ ${$p_string}, $start_pos, $length ],
+            handlers  => {
+                codepoint => sub {
+                    my ($codepoint, $trace_terminals) = @_;
+                    my $character = pack( 'U', $codepoint );
+                    my $is_graphic = ( $character =~ m/[[:graph:]]+/ );
+
+                    my @symbols;
+                    for my $entry ( @{$character_class_table} ) {
+
+                        my ( $symbol_id, $re ) = @{$entry};
+
+                        # say STDERR "Codepoint %x vs $re\n";
+
+                        if ( $character =~ $re ) {
+
+                            if ( $trace_terminals >= 2 ) {
+                                my $trace_file_handle =
+                                  $slr->[
+                                  Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE
+                                  ];
+                                my $char_desc =
+                                  character_describe( $slr, $codepoint );
+                                say {$trace_file_handle}
+qq{Registering character $char_desc as symbol $symbol_id: },
+                                  $slg->l0_symbol_display_form($symbol_id)
+                                  or Marpa::R3::exception(
+                                    "Could not say(): $ERRNO");
+                            } ## end if ( $trace_terminals >= 2 )
+
+                            push @symbols, $symbol_id;
+
+                        } ## end if ( $character =~ $re )
+                    } ## end for my $entry ( @{$character_class_table} )
+
+                    if ( not scalar @symbols ) {
+                        my $char_desc = character_describe( $slr, $codepoint );
+                        Marpa::R3::exception(
+"Character in input is not in alphabet of grammar: $char_desc\n"
+                        );
+                    }
+                    $coro_arg = { symbols => \@symbols };
+                    $coro_arg->{is_graphic} = 'true' if $is_graphic;
+                    return 'ok', $coro_arg;
+                },
+                event => gen_app_event_handler($slr),
+            },
+        },
+        <<'END_OF_LUA');
+            local slr, input_string, current_pos_arg, length_arg = ...
+            local new_block_ix
+            _M.wrap(function()
+                    new_block_ix = slr:block_new(input_string)
+                    local current_pos, end_pos
+                        = glue.check_perl_l0_range(slr, current_pos_arg, length_arg)
+                    slr:block_reset(current_pos, end_pos)
+                end
+            )
+            return new_block_ix
+END_OF_LUA
+
+    return $block_ix;
 }
 
 # TODO -- Document block_ix result
