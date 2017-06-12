@@ -2673,8 +2673,9 @@ the `codepoint` command.
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slr.block_where(slr)
-        local block = slr.current_block
+    function _M.class_slr.block_where(slr, block_ix)
+        local block =
+            block_ix and slr.inputs[block_ix] or slr.current_block
         if not block then return 0, 0, 0 end
         return block.index, block.l0_pos,
             block.end_pos
@@ -2686,6 +2687,16 @@ the `codepoint` command.
             slr.current_block = block
         end
         return slr:block_reset(l0_pos, end_pos)
+    end
+    function _M.class_slr.block_move(slr, l0_pos, end_pos, block_ix)
+        local block =
+            block_ix and slr.inputs[block_ix] or slr.current_block
+        if l0_pos then
+            block.l0_pos = l0_pos
+        end
+        if end_pos then
+            block.end_pos = end_pos
+        end
     end
     function _M.class_slr.block_reset(slr, l0_pos, end_pos)
         local block = slr.current_block
