@@ -1680,7 +1680,7 @@ otherwise `false` and a status string.
             if this_candidate then slr.l0_candidate = this_candidate end
             if eager then return true end
             if not alive then return false, status end
-            slr:block_set(nil, l0_pos + 1)
+            slr:block_move(l0_pos + 1)
         end
         error('Unexpected fall through in l0_read()')
     end
@@ -1771,7 +1771,7 @@ not find an acceptable lexeme.
                 )
         end
         local start_of_lexeme = slr.start_of_lexeme
-        slr:block_set(nil, start_of_lexeme)
+        slr:block_move(start_of_lexeme)
         return slr:no_lexeme_handle()
     end
 ```
@@ -1817,7 +1817,7 @@ TODO: Is the status string needed/used?
         if #accept_q <= 0 then
             if discarded <= 0 then return false, exhausted() end
             -- if here, no accepted lexemes, but discarded ones
-            slr:block_set(nil, working_pos)
+            slr:block_move(working_pos)
             local latest_es = slr.g1:latest_earley_set()
             local trailers = slr.trailers
             trailers[latest_es] =
@@ -2017,7 +2017,7 @@ Returns `true` is there was one,
                 slr.start_of_pause_lexeme = lexeme_start
                 slr.end_of_pause_lexeme = lexeme_end
                 local start_of_lexeme = slr.start_of_lexeme
-                slr:block_set(nil, start_of_lexeme)
+                slr:block_move(start_of_lexeme)
                 return true
             end
         end
@@ -2038,7 +2038,7 @@ Returns `true` is there was one,
             ))
         end
         local end_of_lexeme = slr.end_of_lexeme
-        slr:block_set(nil, end_of_lexeme)
+        slr:block_move(end_of_lexeme)
         if result > 0 then slr:g1_convert_events() end
         local start_of_lexeme = slr.start_of_lexeme
         local end_of_lexeme = slr.end_of_lexeme
@@ -2200,7 +2200,7 @@ lexer.
                     start_arg
             ))
         end
-        slr:block_set(nil, start_pos)
+        slr:block_move(start_pos)
         do
             local end_pos
             if longueur < 0 then
@@ -2225,7 +2225,7 @@ lexer.
             slr.per_es[latest_earley_set] =
                 { slr.current_block.index, start_pos, longueur }
             local new_l0_pos = start_pos + longueur
-            slr:block_set(nil, new_l0_pos)
+            slr:block_move(new_l0_pos)
             return new_l0_pos
         end
         if result == -2 then
@@ -2684,13 +2684,9 @@ the `codepoint` command.
         return block.index, block.l0_pos,
             block.end_pos
     end
-    function _M.class_slr.block_set(slr, block_ix, l0_pos, end_pos)
-        local block
-        if block_ix then
-            block = slr.inputs[block_ix]
-            slr.current_block = block
-        end
-        return slr:block_reset(l0_pos, end_pos)
+    function _M.class_slr.block_set(slr, block_ix)
+        local block = slr.inputs[block_ix]
+        slr.current_block = block
     end
     function _M.class_slr.block_move(slr, l0_pos, end_pos, block_ix)
         local block =
