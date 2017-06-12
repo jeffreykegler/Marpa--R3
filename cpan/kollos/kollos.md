@@ -2620,7 +2620,7 @@ the `codepoint` command.
         [0x2029] = 0x2029
     }
 
-    function _M.class_slr.block_new(slr, input_string, current_pos, last_pos)
+    function _M.class_slr.block_new(slr, input_string)
         local trace_terminals = slr.trace_terminals
         local inputs = slr.inputs
         local new_block = {}
@@ -2664,9 +2664,8 @@ the `codepoint` command.
             local vlq = _M.to_vlq({ byte_p, line_no, column_no })
             new_block[#new_block+1] = vlq
         end
-        current_pos = current_pos or 0
-        last_pos = last_pos or #new_block
-        slr:block_set(this_index, current_pos, last_pos)
+        new_block.l0_pos = 0
+        new_block.end_pos = #new_block
         return this_index
     end
 ```
@@ -2674,8 +2673,13 @@ the `codepoint` command.
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.block_where(slr, block_ix)
-        local block =
-            block_ix and slr.inputs[block_ix] or slr.current_block
+        local block
+        if block_ix then
+            block = slr.inputs[block_ix]
+            if not block then return end
+        else
+            block = slr.current_block
+        end
         if not block then return 0, 0, 0 end
         return block.index, block.l0_pos,
             block.end_pos

@@ -429,11 +429,16 @@ a message
 
 ```
     -- miranda: section+ most Lua function definitions
-    function glue.check_perl_l0_current_pos(slr, block_ix_arg, current_pos_arg)
+    function glue.check_perl_l0_block_ix(slr, block_ix_arg)
         local block_ix, l0_pos, end_pos = slr:block_where(block_ix_arg)
-        if block_ix == 0 then
+        if not block_ix then
             return nil, string.format('Bad block index' .. block_ix_arg)
         end
+        return block_ix
+    end
+
+    function glue.check_perl_l0_current_pos(slr, block_ix, current_pos_arg)
+        local block_ix, l0_pos, end_pos = slr:block_where(block_ix)
         local block = slr.inputs[block_ix]
         local block_length = #block
         local current_pos = current_pos_arg or l0_pos or 0
@@ -455,11 +460,7 @@ a message
 
     -- Note: uses a hypothetical `current_pos`, not the one actually
     -- in the block
-    function glue.check_perl_l0_length(slr, block_ix_arg, current_pos, length_arg)
-        local block_ix = slr:block_where(block_ix_arg)
-        if block_ix == 0 then
-            return nil, string.format('Bad block index' .. block_ix_arg)
-        end
+    function glue.check_perl_l0_length(slr, block_ix, current_pos, length_arg)
         local block = slr.inputs[block_ix]
         local block_length = #block
 
@@ -479,7 +480,10 @@ a message
         return new_end_pos
     end
 
-    function glue.check_perl_l0_range(slr, block_ix, current_pos_arg, length_arg)
+    function glue.check_perl_l0_range(slr, block_ix_arg, current_pos_arg, length_arg)
+        local block_ix, erreur
+            = glue.check_perl_l0_block_ix(slr, block_ix_arg, current_pos_arg)
+        if not block_ix then return nil, erreur end
         local new_current_pos, erreur
             = glue.check_perl_l0_current_pos(slr, block_ix, current_pos_arg)
         if not new_current_pos then return nil, erreur end

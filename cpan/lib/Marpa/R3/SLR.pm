@@ -288,13 +288,14 @@ sub Marpa::R3::Scanless::R::read {
     my ( $slr, $p_string, $start_pos, $length ) = @_;
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
 
-    my $block_ix = $slr->block_new($p_string, $start_pos, $length);
+    my $block_ix = $slr->block_new($p_string);
     my $coro_arg = undef;
     $slr->call_by_tag(
         ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 'i', $block_ix);
-            local slr, block_ix = ...
+        <<'END_OF_LUA', 'iii', $block_ix, $start_pos, $length);
+            local slr, block_ix, start_pos, length = ...
             slr:block_set(block_ix)
+            slr:block_move(start_pos, length)
             slr.phase = 'read'
             return 'ok'
 END_OF_LUA
@@ -988,7 +989,7 @@ END_OF_LUA
 
 # TODO -- Document this
 sub Marpa::R3::Scanless::R::block_new {
-    my ( $slr, $p_string, $start_pos, $length ) = @_;
+    my ( $slr, $p_string ) = @_;
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
 
     Marpa::R3::exception(
@@ -1016,8 +1017,8 @@ sub Marpa::R3::Scanless::R::block_new {
     my ($block_ix) = $slr->coro_by_tag(
         ( '@' . __FILE__ . ':' . __LINE__ ),
         {
-            signature => 'sii',
-            args      => [ ${$p_string}, $start_pos, $length ],
+            signature => 's',
+            args      => [ ${$p_string} ],
             handlers  => {
                 codepoint => sub {
                     my ($codepoint, $trace_terminals) = @_;
@@ -1066,16 +1067,13 @@ qq{Registering character $char_desc as symbol $symbol_id: },
             },
         },
         <<'END_OF_LUA');
-            local slr, input_string, current_pos_arg, length_arg = ...
+            local slr, input_string = ...
             local new_block_ix
             _M.wrap(function()
                     new_block_ix = slr:block_new(input_string)
-                    local current_pos, end_pos
-                        = glue.check_perl_l0_range(slr, new_block_ix, current_pos_arg, length_arg)
-                    slr:block_reset(current_pos, end_pos)
+                    return 'ok', new_block_ix
                 end
             )
-            return new_block_ix
 END_OF_LUA
 
     return $block_ix;
