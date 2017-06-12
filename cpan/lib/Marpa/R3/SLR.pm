@@ -352,7 +352,7 @@ sub Marpa::R3::Scanless::R::resume {
 
 
            local new_current_pos, new_end_pos
-               = glue.check_perl_l0_range(slr, current_pos_arg, length_arg)
+               = glue.check_perl_l0_range(slr, nil, current_pos_arg, length_arg)
            if not new_current_pos then
                -- if `new_current_pos = nil` then 2nd return value
                -- is an error message
@@ -1071,7 +1071,7 @@ qq{Registering character $char_desc as symbol $symbol_id: },
             _M.wrap(function()
                     new_block_ix = slr:block_new(input_string)
                     local current_pos, end_pos
-                        = glue.check_perl_l0_range(slr, current_pos_arg, length_arg)
+                        = glue.check_perl_l0_range(slr, new_block_ix, current_pos_arg, length_arg)
                     slr:block_reset(current_pos, end_pos)
                 end
             )
