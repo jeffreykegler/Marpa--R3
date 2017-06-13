@@ -289,12 +289,11 @@ sub Marpa::R3::Scanless::R::read {
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
 
     my $block_ix = $slr->block_new($p_string);
-    my $coro_arg = undef;
+    $slr->block_set($block_ix);
     $slr->call_by_tag(
         ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'iii', $block_ix, $start_pos, $length);
             local slr, block_ix, start_pos, length = ...
-            slr:block_set(block_ix)
             slr:block_move(start_pos, length)
             slr.phase = 'read'
             return 'ok'
@@ -359,7 +358,7 @@ sub Marpa::R3::Scanless::R::resume {
                -- is an error message
                error('slr->resume(): ' .. new_end_pos)
            end
-           slr:block_reset(new_current_pos, new_end_pos)
+           slr:block_move(new_current_pos, new_end_pos)
            _M.wrap(function ()
                return slr:block_read()
            end
@@ -1079,14 +1078,35 @@ END_OF_LUA
     return $block_ix;
 }
 
-# TODO -- Document block_ix result
+# TODO -- Document this method
+sub Marpa::R3::Scanless::R::block_set {
+    my ($slr, $block_ix) = @_;
+    $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+            <<'END_OF_LUA', 'i', $block_ix );
+        local slr, block_ix_arg = ...
+        local block_ix, erreur = glue.check_perl_l0_block_ix(slr, block_ix_arg)
+        if not block_ix then
+           error(erreur)
+        end
+        return slr:block_set(block_ix)
+END_OF_LUA
+    return;
+}
+
+# TODO -- Document this method
 sub Marpa::R3::Scanless::R::block_where {
-    my ($slr) = @_;
-    my ($block_ix, $l0_pos, $l0_end)
+    my ($slr, $block_ix) = @_;
+    my ($l0_pos, $l0_end);
+    ($block_ix, $l0_pos, $l0_end)
         = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-            <<'END_OF_LUA', '' );
-        local slr = ...
-        local block_ix, l0_pos, l0_end = slr:block_where()
+            <<'END_OF_LUA', 'i', $block_ix );
+        local slr, block_ix_arg = ...
+        local block_ix, erreur = glue.check_perl_l0_block_ix(slr, block_ix_arg)
+        if not block_ix then
+           error(erreur)
+        end
+        local l0_pos, l0_end
+        block_ix, l0_pos, l0_end = slr:block_where(block_ix)
         return block_ix, l0_pos, l0_end
 END_OF_LUA
     return $block_ix, $l0_pos, $l0_end;

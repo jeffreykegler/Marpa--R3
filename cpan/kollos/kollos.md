@@ -2698,15 +2698,6 @@ the `codepoint` command.
             block.end_pos = end_pos
         end
     end
-    function _M.class_slr.block_reset(slr, l0_pos, end_pos)
-        local block = slr.current_block
-        if l0_pos then
-            block.l0_pos = l0_pos
-        end
-        if end_pos then
-            block.end_pos = end_pos
-        end
-    end
 ```
 
 ```
