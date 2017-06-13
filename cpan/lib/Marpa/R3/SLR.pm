@@ -1079,21 +1079,6 @@ END_OF_LUA
 }
 
 # TODO -- Document this method
-sub Marpa::R3::Scanless::R::block_set {
-    my ($slr, $block_ix) = @_;
-    $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-            <<'END_OF_LUA', 'i', $block_ix );
-        local slr, block_ix_arg = ...
-        local block_ix, erreur = glue.check_perl_l0_block_ix(slr, block_ix_arg)
-        if not block_ix then
-           error(erreur)
-        end
-        return slr:block_set(block_ix)
-END_OF_LUA
-    return;
-}
-
-# TODO -- Document this method
 sub Marpa::R3::Scanless::R::block_where {
     my ($slr, $block_ix) = @_;
     my ($l0_pos, $l0_end);
@@ -1110,6 +1095,39 @@ sub Marpa::R3::Scanless::R::block_where {
         return block_ix, l0_pos, l0_end
 END_OF_LUA
     return $block_ix, $l0_pos, $l0_end;
+}
+
+# TODO -- Document this method
+sub Marpa::R3::Scanless::R::block_set {
+    my ($slr, $block_ix) = @_;
+    $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+            <<'END_OF_LUA', 'i', $block_ix );
+        local slr, block_ix_arg = ...
+        local block_ix, erreur = glue.check_perl_l0_block_ix(slr, block_ix_arg)
+        if not block_ix then
+           error(erreur)
+        end
+        return slr:block_set(block_ix)
+END_OF_LUA
+    return;
+}
+
+# TODO -- Document this method
+sub Marpa::R3::Scanless::R::block_move {
+    my ($slr, $current_pos, $length, $block_ix) = @_;
+    $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+            <<'END_OF_LUA', 'iii', $block_ix, $current_pos, $length );
+        local slr, block_ix_arg, current_pos_arg, length_arg = ...
+        local new_current_pos, retour2
+            = glue.check_perl_l0_range(slr, block_ix_arg, current_pos_arg, length_arg)
+        if not new_current_pos then
+           -- retour2 is error message
+           error(retour2)
+        end
+        -- retour2 is end position
+        return slr:block_move(block_ix, new_current_pos, retour2)
+END_OF_LUA
+    return;
 }
 
 # TODO -- Document block_ix argument
