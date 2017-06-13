@@ -107,35 +107,33 @@ END_OF_EVENTS
 my %expected_events = %base_expected_events;
 
 sub do_test {
-    my ($test, $grammar, $extra_args) = @_;
+    my ( $test, $grammar, $extra_args ) = @_;
     $extra_args //= {};
-    my $slr = Marpa::R3::Scanless::R->new( { grammar => $grammar }, $extra_args );
+    my $slr =
+      Marpa::R3::Scanless::R->new( { grammar => $grammar }, $extra_args );
     state $string = q{aabbbcccdaaabccddddabcd};
     state $length = length $string;
-    my $pos = $slr->read( \$string );
+    my $pos           = $slr->read( \$string );
     my $actual_events = q{};
     my $deactivated_event_name;
-    READ: while (1) {
+  READ: while (1) {
         my @actual_events = ();
         my $event_name;
-        EVENT:
+      EVENT:
         for my $event ( @{ $slr->events() } ) {
             my ($event_name) = @{$event};
             die "event name is undef" if not defined $event_name;
             die "Unexpected event: $event_name"
-                if not $event_name =~ m/\A (before|after) \s [abcd] \z/xms;
-            ACTIVATION_LOGIC: {
-                last ACTIVATION_LOGIC if $test eq 'all';
-                if ( $test eq 'once' ) {
-                    $slr->activate( $event_name, 0 );
-                }
-                if ( $test eq 'seq' ) {
-                    $slr->activate( $deactivated_event_name, 1 )
-                        if defined $deactivated_event_name;
-                    $slr->activate( $event_name, 0 );
-                    $deactivated_event_name = $event_name;
-                } ## end if ( $test eq 'seq' )
-            } ## end ACTIVATION_LOGIC:
+              if not $event_name =~ m/\A (before|after) \s [abcd] \z/xms;
+            if ( $test eq 'once' ) {
+                $slr->activate( $event_name, 0 );
+            }
+            if ( $test eq 'seq' ) {
+                $slr->activate( $deactivated_event_name, 1 )
+                  if defined $deactivated_event_name;
+                $slr->activate( $event_name, 0 );
+                $deactivated_event_name = $event_name;
+            } ## end if ( $test eq 'seq' )
             push @actual_events, $event_name;
         } ## end for my $event ( @{ $slr->events() } )
         if (@actual_events) {

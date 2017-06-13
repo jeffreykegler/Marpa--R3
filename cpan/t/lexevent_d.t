@@ -60,8 +60,7 @@ END_OF_EVENTS
 my $grammar = Marpa::R3::Scanless::G->new(
     { semantics_package => 'My_Actions', source => \$rules } );
 
-my %base_expected_events;
-$base_expected_events{'all'} = <<'END_OF_EVENTS';
+my $expected_events = <<'END_OF_EVENTS';
 0 before a
 1 before a
 3 after b
@@ -86,32 +85,9 @@ $base_expected_events{'all'} = <<'END_OF_EVENTS';
 21 before c
 23 after d
 END_OF_EVENTS
-$base_expected_events{'once'} = <<'END_OF_EVENTS';
-0 before a
-3 after b
-5 before c
-9 after d
-END_OF_EVENTS
-$base_expected_events{'seq'} = <<'END_OF_EVENTS';
-0 before a
-3 after b
-5 before c
-9 after d
-9 before a
-13 after b
-13 before c
-16 after d
-19 before a
-21 after b
-21 before c
-23 after d
-END_OF_EVENTS
-
-my %expected_events = %base_expected_events;
 
 # Yet another time, with initializers
-%expected_events = %base_expected_events;
-$expected_events{'all'} =~ s/^\d+ \s after \s b \n//gxms;
+$expected_events =~ s/^\d+ \s after \s b \n//gxms;
 $rules   = $base_rules;
 $grammar = Marpa::R3::Scanless::G->new(
     {
@@ -132,7 +108,6 @@ my $slr = Marpa::R3::Scanless::R->new(
 
 # Marpa::R3::Display::End
 
-my $test = 'all';
 state $string = q{aabbbcccdaaabccddddabcd};
 state $length = length $string;
 my $pos           = $slr->read( \$string );
@@ -147,18 +122,6 @@ READ: while (1) {
         die "event name is undef" if not defined $event_name;
         die "Unexpected event: $event_name"
           if not $event_name =~ m/\A (before|after) \s [abcd] \z/xms;
-      ACTIVATION_LOGIC: {
-            last ACTIVATION_LOGIC if $test eq 'all';
-            if ( $test eq 'once' ) {
-                $slr->activate( $event_name, 0 );
-            }
-            if ( $test eq 'seq' ) {
-                $slr->activate( $deactivated_event_name, 1 )
-                  if defined $deactivated_event_name;
-                $slr->activate( $event_name, 0 );
-                $deactivated_event_name = $event_name;
-            } ## end if ( $test eq 'seq' )
-        } ## end ACTIVATION_LOGIC:
         push @actual_events, $event_name;
     } ## end for my $event ( @{ $slr->events() } )
     if (@actual_events) {
@@ -175,10 +138,9 @@ if ( not defined $value_ref ) {
     die "No parse\n";
 }
 my $actual_value = ${$value_ref};
-Test::More::is( $actual_value, q{1792}, qq{Value for test "$test"} );
-my $expected_events = q{};
-Marpa::R3::Test::is( $actual_events, $expected_events{$test},
-    qq{Events for test "$test"} );
+Test::More::is( $actual_value, q{1792}, qq{Value} );
+Marpa::R3::Test::is( $actual_events, $expected_events,
+    qq{Events} );
 
 sub My_Actions::OK { return 1792 }
 
