@@ -127,6 +127,8 @@ sub test {
 
     TARGET: while ( $target_start < $input_length ) {
 
+        # PHASE 1
+
         # First we find the "shortest span" -- the one which ends earliest.
         # This tells us where the prefix should end.
         # No prefix should go beyond the first location of the shortest span.
@@ -135,30 +137,34 @@ sub test {
 # name: SLIF exhaustion grammar setting synopsis part 2
 
         my @shortest_span = ();
-        my $recce =
-          Marpa::R3::Scanless::R->new( { grammar => $g, }, $recce_debug_args );
-        my $pos = $recce->read( \$string, $target_start );
 
-        EVENT:
-        for my $event ( @{ $recce->events() } ) {
-            my ($name) = @{$event};
-            if ( $name eq 'target' ) {
-                @shortest_span = $recce->last_completed('target');
-                diag(
-                    "Preliminary target at $pos: ",
-                    $recce->g1_literal(@shortest_span)
-                ) if $verbose;
-                next EVENT;
-            } ## end if ( $name eq 'target' )
-                # Not all exhaustion has an exhaustion event,
-                # so we look for exhaustion explicitly below.
-            next EVENT if $name eq q('exhausted);
-            die join q{ }, "Spurious event at position $pos: '$name'";
-        } ## end EVENT: for my $event ( @{ $recce->events() } )
+        my %event_handlers1 = (
+              'target' => sub {
+                   my ($slr) = @_;
+                   my $pos = $slr->pos();
+                   @shortest_span = $slr->last_completed('target');
+                   diag(
+                       "Preliminary target at $pos: ",
+                       $slr->g1_literal(@shortest_span)
+                   ) if $verbose;
+                  return 'pause';
+              },
+              q{'exhausted} => sub {
+                  return 'pause';
+              }
+        );
+
+        my $recce =
+          Marpa::R3::Scanless::R->new( { grammar => $g,
+              event_handlers => \%event_handlers1,
+          }, $recce_debug_args );
+        my $pos = $recce->read( \$string, $target_start );
 
 # Marpa::R3::Display::End
 
         last TARGET if not scalar @shortest_span;
+
+        # PHASE 2
 
         # We now have found the longest allowed prefix.
         # Our "longest match" will begin at the end of this prefix,
@@ -170,8 +176,18 @@ sub test {
         diag( join q{ }, @shortest_span ) if $verbose;
         my (undef, $prefix_end) = $recce->g1_to_l0_first($shortest_span[0]);
 
+        my %event_handlers2 = (
+              q{'exhausted} => sub {
+                  return 'pause';
+              },
+              q{'rejected} => sub {
+                  return 'pause';
+              }
+        );
+
         $recce = Marpa::R3::Scanless::R->new(
             {   grammar    => $g,
+              event_handlers => \%event_handlers2,
             },
             $recce_debug_args
         );
