@@ -84,29 +84,28 @@ sub test {
 # Marpa::R3::Display
 # name: SLIF rejection grammar setting synopsis part 2
 
-    my $recce =
-      Marpa::R3::Scanless::R->new( { grammar => $g, }, $recce_debug_args );
-    my $pos = $recce->read( \$suffixed_string, 0, $original_length );
+    my $rejection = 0;
+    my $pos;
 
-    READ_LOOP: while (1) {
-        my $rejection = 0;
-        my $pos       = $recce->pos();
-        EVENT:
-        for my $event ( @{ $recce->events() } ) {
-            my ($name) = @{$event};
-            if ( $name eq q('rejected) ) {
+    my $recce =
+      Marpa::R3::Scanless::R->new( { grammar => $g,
+         event_handlers => {
+             q{'rejected} => sub {
                 $rejection = 1;
                 diag("You fool! you forget the semi-colon at location $pos!")
                     if $verbose;
-                next EVENT;
+                return 'pause'
+             }
+         },
+      }, $recce_debug_args );
+    $pos = $recce->read( \$suffixed_string, 0, $original_length );
 
-            } ## end if ( $name eq q('rejected) )
-            die join q{ }, "Spurious event at position $pos: '$name'";
-        } ## end EVENT: for my $event ( @{ $recce->events() } )
-
+    READ_LOOP: while (1) {
+        $pos       = $recce->pos();
         last READ_LOOP if not $rejection;
         $recce->resume( $original_length, 1 );
         diag("I fixed it for you.  Now you owe me.") if $verbose;
+        $rejection = 0;
         $recce->resume( $pos, $original_length - $pos );
     } ## end READ_LOOP: while (1)
 
