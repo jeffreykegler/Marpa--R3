@@ -38,15 +38,10 @@ b ~ 'b'
 c ~ 'c'
 d ~ 'd'
 
-# Marpa::R3::Display
-# name: SLIF named lexeme event synopsis
-
 :lexeme ~ <a> pause => before event => 'before a'
 :lexeme ~ <b> pause => after event => 'after b'=on
 :lexeme ~ <c> pause => before event => 'before c'=off
 :lexeme ~ <d> pause => after event => 'after d'
-
-# Marpa::R3::Display::End
 
 END_OF_GRAMMAR
 
@@ -112,7 +107,9 @@ END_OF_EVENTS
 my %expected_events = %base_expected_events;
 
 sub do_test {
-    my ($slr, $test) = @_;
+    my ($test, $grammar, $extra_args) = @_;
+    $extra_args //= {};
+    my $slr = Marpa::R3::Scanless::R->new( { grammar => $grammar }, $extra_args );
     state $string = q{aabbbcccdaaabccddddabcd};
     state $length = length $string;
     my $pos = $slr->read( \$string );
@@ -161,12 +158,9 @@ sub do_test {
         qq{Events for test "$test"} );
 } ## end sub do_test
 
-my $slr = Marpa::R3::Scanless::R->new( { grammar => $grammar, } );
-do_test( $slr, 'all' );
-$slr = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
-do_test( $slr, 'once' );
-$slr = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
-do_test( $slr, 'seq' );
+do_test( 'all', $grammar );
+do_test( 'once', $grammar );
+do_test( 'seq', $grammar);
 
 # Yet another time, with initializers
 %expected_events = %base_expected_events;
@@ -178,8 +172,7 @@ $grammar = Marpa::R3::Scanless::G->new(
         source            => \$rules
     }
 );
-$slr = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
-do_test( $slr, 'all' );
+do_test( 'all', $grammar );
 
 # Yet another time, with initializers
 %expected_events = %base_expected_events;
@@ -191,20 +184,9 @@ $grammar = Marpa::R3::Scanless::G->new(
         source            => \$rules
     }
 );
-
-# Marpa::R3::Display
-# name: SLIF recce event_is_active named arg example
-
-$slr = Marpa::R3::Scanless::R->new(
-    {
-        grammar         => $grammar,
-        event_is_active => { 'before c' => 1, 'after b' => 0 }
-    }
+do_test('all', $grammar,
+    { event_is_active => { 'before c' => 1, 'after b' => 0 } }
 );
-
-# Marpa::R3::Display::End
-
-do_test($slr, 'all');
 
 sub My_Actions::OK { return 1792 }
 
