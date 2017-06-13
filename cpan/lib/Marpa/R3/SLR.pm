@@ -290,11 +290,11 @@ sub Marpa::R3::Scanless::R::read {
 
     my $block_ix = $slr->block_new($p_string);
     $slr->block_set($block_ix);
+    $slr->block_move($start_pos, $length);
     $slr->call_by_tag(
         ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 'iii', $block_ix, $start_pos, $length);
-            local slr, block_ix, start_pos, length = ...
-            slr:block_move(start_pos, length)
+        <<'END_OF_LUA', '');
+            local slr = ...
             slr.phase = 'read'
             return 'ok'
 END_OF_LUA
@@ -1118,6 +1118,11 @@ sub Marpa::R3::Scanless::R::block_move {
     $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
             <<'END_OF_LUA', 'iii', $block_ix, $current_pos, $length );
         local slr, block_ix_arg, current_pos_arg, length_arg = ...
+        local block_ix, erreur
+        if block_ix_arg then
+            block_ix, erreur = glue.check_perl_l0_block_ix(slr, block_ix_arg)
+            if not block_ix then error(erreur) end
+        end
         local new_current_pos, retour2
             = glue.check_perl_l0_range(slr, block_ix_arg, current_pos_arg, length_arg)
         if not new_current_pos then
@@ -1125,7 +1130,7 @@ sub Marpa::R3::Scanless::R::block_move {
            error(retour2)
         end
         -- retour2 is end position
-        return slr:block_move(block_ix, new_current_pos, retour2)
+        return slr:block_move(new_current_pos, retour2, block_ix)
 END_OF_LUA
     return;
 }
