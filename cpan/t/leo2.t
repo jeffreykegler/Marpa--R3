@@ -165,11 +165,29 @@ END_OF_HISTORY
 
 sub do_test {
     my ( $grammar, $input, $expected_history ) = @_;
-    my $slr = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
-    my @event_history;
+    my @events = ();
+    my @event_history = ();
+    my $common_handler = sub () {
+        my ($slr, $event_name) = @_;
+        push @events, $event_name;
+        'pause';
+    };
+    my $slr = Marpa::R3::Scanless::R->new(
+        { grammar => $grammar },
+        {
+            event_handlers => {
+                add      => $common_handler,
+                divide   => $common_handler,
+                multiply => $common_handler,
+                plain    => $common_handler,
+                subtract => $common_handler,
+            }
+        }
+    );
     my $pos = $slr->read( \$input );
     READ: while (1) {
-        push @event_history, join q{ }, sort map { $_->[0] } @{ $slr->events()};
+        push @event_history, join q{ }, sort @events;
+        @events = ();
         last READ if $pos >= length $input;
         $pos = $slr->resume();
     } ## end READ: while (1)
