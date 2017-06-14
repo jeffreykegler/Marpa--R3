@@ -55,19 +55,40 @@ END_OF_DSL
     }
 );
 
-my $recce         = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
+my %events;
+my $common_handler = sub () {
+    my ($slr, $event_name) = @_;
+    $events{$event_name} = 1;
+    'pause';
+};
+
+my $recce = Marpa::R3::Scanless::R->new(
+    {
+        grammar => $grammar,
+        event_handlers => {
+            A     => $common_handler,
+            C     => $common_handler,
+            S     => $common_handler,
+            'A[]' => $common_handler,
+            'C[]' => $common_handler,
+            'S[]' => $common_handler,
+        }
+    },
+);
+
+my $pos           = 0;
 my $input         = 'aaa';
-my $event_history = q{};
-my $pos           = $recce->read( \$input );
+my @event_history = (join q{ }, $pos, sort keys %events);
+$pos           = $recce->read( \$input );
 READ: while (1) {
-    $event_history .= join q{ }, $pos, sort map { $_->[0] } @{ $recce->events()};
-    $event_history .= "\n";
+    push @event_history, join q{ }, $pos, sort keys %events;
     last READ if $pos >= length $input;
     $pos = $recce->resume();
 } ## end READ: while (1)
 my $value_ref = $recce->value();
 my $value = $value_ref ? ${$value_ref} : 'No parse';
 Marpa::R3::Test::is( $value,         'aaa',           'Leo SLIF parse' );
+my $event_history = join "\n", @event_history, '';
 Marpa::R3::Test::is( $event_history, <<'END_OF_TEXT', 'Event history' );
 0 S[]
 1 A[] C[] S S[]
