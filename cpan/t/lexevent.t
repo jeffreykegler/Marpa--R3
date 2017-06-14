@@ -109,46 +109,72 @@ my %expected_events = %base_expected_events;
 sub do_test {
     my ( $test, $grammar, $extra_args ) = @_;
     $extra_args //= {};
-    my $slr =
-      Marpa::R3::Scanless::R->new( { grammar => $grammar }, $extra_args );
     state $string = q{aabbbcccdaaabccddddabcd};
     state $length = length $string;
-    my $pos           = $slr->read( \$string );
-    my $actual_events = q{};
+    my @actual_events = ();
+    my $current_position = 0;
+
     my $deactivated_event_name;
-  READ: while (1) {
-        my @actual_events = ();
-        my $event_name;
-      EVENT:
-        for my $event ( @{ $slr->events() } ) {
-            my ($event_name) = @{$event};
-            die "event name is undef" if not defined $event_name;
-            die "Unexpected event: $event_name"
-              if not $event_name =~ m/\A (before|after) \s [abcd] \z/xms;
-            if ( $test eq 'once' ) {
-                $slr->activate( $event_name, 0 );
-            }
-            if ( $test eq 'seq' ) {
-                $slr->activate( $deactivated_event_name, 1 )
-                  if defined $deactivated_event_name;
-                $slr->activate( $event_name, 0 );
-                $deactivated_event_name = $event_name;
-            } ## end if ( $test eq 'seq' )
-            push @actual_events, $event_name;
-        } ## end for my $event ( @{ $slr->events() } )
-        if (@actual_events) {
-            $actual_events .= join q{ }, $pos, sort @actual_events;
-            $actual_events .= "\n";
-            my ( $start_of_lexeme, $length_of_lexeme ) = $slr->pause_span();
-            $pos = $start_of_lexeme + $length_of_lexeme;
-        }
-        last READ if $pos >= $length;
-        $pos = $slr->resume($pos);
-    } ## end READ: while (1)
+    my $do_activations = sub () {;};
+    if ( $test eq 'once' ) {
+        $do_activations = sub () {
+            my ($slr, $event_name) = @_;
+            $slr->activate( $event_name, 0 );
+          };
+    }
+    if ( $test eq 'seq' ) {
+        $do_activations = sub () {
+            my ($slr, $event_name) = @_;
+            $slr->activate( $deactivated_event_name, 1 )
+              if defined $deactivated_event_name;
+            $slr->activate( $event_name, 0 );
+            $deactivated_event_name = $event_name;
+          };
+    }
+
+    my $before_handler = sub () {
+        my ( $slr, $event_name ) = @_;
+        $do_activations->($slr, $event_name);
+        my ( $start_of_lexeme, $length_of_lexeme ) = $slr->pause_span();
+        $current_position = $start_of_lexeme + $length_of_lexeme;
+        push @actual_events, "$start_of_lexeme $event_name";
+        'pause';
+    };
+
+    my $after_handler = sub () {
+       my ($slr, $event_name) = @_;
+       $do_activations->($slr, $event_name);
+       my ( $start_of_lexeme, $length_of_lexeme ) = $slr->pause_span();
+       $current_position = $start_of_lexeme + $length_of_lexeme;
+       push @actual_events, "$current_position $event_name";
+       'pause';
+    };
+
+    my $slr =
+      Marpa::R3::Scanless::R->new( { grammar => $grammar }, $extra_args,
+        { event_handlers  => {
+            'after a'  => $after_handler,
+            'after b'  => $after_handler,
+            'after c'  => $after_handler,
+            'after d'  => $after_handler,
+            'before a' => $before_handler,
+            'before b' => $before_handler,
+            'before c' => $before_handler,
+            'before d' => $before_handler,
+        } }
+      );
+
+    my $retour = $slr->read( \$string );
+    $current_position = $retour if $retour > $current_position;
+    while ( $current_position < $length ) {
+        $retour = $slr->resume($current_position);
+        $current_position = $retour if $retour > $current_position;
+    }
     my $value_ref = $slr->value();
     if ( not defined $value_ref ) {
         die "No parse\n";
     }
+    my $actual_events .= join qq{\n}, @actual_events, '';
     my $actual_value = ${$value_ref};
     Test::More::is( $actual_value, q{1792}, qq{Value for test "$test"} );
     my $expected_events = q{};

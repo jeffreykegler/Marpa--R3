@@ -101,10 +101,11 @@ my @actual_events = ();
 my $current_position;
 
 my $before_handler = sub () {
-    my ( $slr, $event_name ) = @_;
-    my ($start_of_lexeme) = $slr->pause_span();
-    push @actual_events, "$start_of_lexeme $event_name";
-    'pause';
+   my ($slr, $event_name) = @_;
+   my ( $start_of_lexeme, $length_of_lexeme ) = $slr->pause_span();
+   $current_position = $start_of_lexeme + $length_of_lexeme;
+   push @actual_events, "$start_of_lexeme $event_name";
+   'pause';
 };
 
 my $after_handler = sub () {
