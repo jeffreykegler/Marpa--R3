@@ -894,6 +894,7 @@ sub Marpa::R3::Scanless::R::lexeme_read {
     return $slr->lexeme_complete( $start, $length );
 }
 
+# TODO -- deprecated -- remove this
 sub Marpa::R3::Scanless::R::pause_span {
     my ($slr) = @_;
     my ($start, $end) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),

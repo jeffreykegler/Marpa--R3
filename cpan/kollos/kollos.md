@@ -1085,7 +1085,6 @@ This is a registry object.
     class_slr_fields.current_block = true
     class_slr_fields.end_of_lexeme = true
     class_slr_fields.end_of_parse = true
-    class_slr_fields.end_of_pause_lexeme = true
     class_slr_fields.event_queue = true
     class_slr_fields.g1 = true
     class_slr_fields.has_parse = true
@@ -1108,7 +1107,6 @@ This is a registry object.
     class_slr_fields.ref_count = true
     class_slr_fields.slg = true
     class_slr_fields.start_of_lexeme = true
-    class_slr_fields.start_of_pause_lexeme = true
     class_slr_fields.terminals_expected = true
     class_slr_fields.this_step = true
     class_slr_fields.too_many_earley_items = true
@@ -1122,6 +1120,8 @@ This is a registry object.
     class_slr_fields.trailers = true
     -- TODO delete after development
     class_slr_fields.has_event_handlers = true
+    class_slr_fields.end_of_pause_lexeme = true
+    class_slr_fields.start_of_pause_lexeme = true
 ```
 
 *At end of input* field:

@@ -22,8 +22,8 @@ use POSIX qw(setlocale LC_ALL);
 
 POSIX::setlocale(LC_ALL, "C");
 
-# use Test::More tests => 2;
-use Test::More skip_all => 'NYI';
+use Test::More tests => 2;
+# use Test::More skip_all => 'NYI';
 use lib 'inc';
 use Marpa::R3::Test;
 use Marpa::R3;
@@ -100,12 +100,19 @@ $grammar = Marpa::R3::Scanless::G->new(
 my @actual_events = ();
 my $current_position;
 
-my $common_handler = sub () {
+my $before_handler = sub () {
    my ($slr, $event_name) = @_;
    my ( $start_of_lexeme, $length_of_lexeme ) = $slr->pause_span();
    $current_position = $start_of_lexeme + $length_of_lexeme;
-   say STDERR $current_position;
-   push @actual_events, $current_position . 'after a';
+   push @actual_events, "$start_of_lexeme $event_name";
+   'pause';
+};
+
+my $after_handler = sub () {
+   my ($slr, $event_name) = @_;
+   my ( $start_of_lexeme, $length_of_lexeme ) = $slr->pause_span();
+   $current_position = $start_of_lexeme + $length_of_lexeme;
+   push @actual_events, "$current_position $event_name";
    'pause';
 };
 
@@ -117,14 +124,14 @@ my $slr = Marpa::R3::Scanless::R->new(
         grammar         => $grammar,
         event_is_active => { 'before c' => 1, 'after b' => 0 },
         event_handlers  => {
-            'after a'  => $common_handler,
-            'after b'  => $common_handler,
-            'after c'  => $common_handler,
-            'after d'  => $common_handler,
-            'before a' => $common_handler,
-            'before b' => $common_handler,
-            'before c' => $common_handler,
-            'before d' => $common_handler,
+            'after a'  => $after_handler,
+            'after b'  => $after_handler,
+            'after c'  => $after_handler,
+            'after d'  => $after_handler,
+            'before a' => $before_handler,
+            'before b' => $before_handler,
+            'before c' => $before_handler,
+            'before d' => $before_handler,
         }
     }
 );
@@ -133,12 +140,11 @@ my $slr = Marpa::R3::Scanless::R->new(
 
 my $string = q{aabbbcccdaaabccddddabcd};
 my $length = length $string;
-$current_position           = $slr->read( \$string );
+$slr->read( \$string );
 
-READ: while (1) {
-    last READ if $current_position >= $length;
-    $current_position = $slr->resume($current_position);
-} ## end READ: while (1)
+while ($current_position < $length) {
+    $slr->resume($current_position);
+}
 
 my $actual_events .= join "\n", @actual_events, q{};
 
