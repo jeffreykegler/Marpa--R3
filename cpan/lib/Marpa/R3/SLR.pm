@@ -129,7 +129,7 @@ sub gen_app_event_handler {
         }
         my $handler = $event_handlers->{$event_name};
         if ( not $handler ) {
-            $handler = $event_handlers->{'*'};
+            $handler = $event_handlers->{"'default"};
         }
         if ( not $handler ) {
             Marpa::R3::exception(

@@ -67,9 +67,9 @@ EVENTS
 my $loc0_input = '    1 2';
 my $loc0_grammar = Marpa::R3::Scanless::G->new( { source  => \$loc0_dsl } );
 my $loc0_events = <<'END_OF_EXPECTED_EVENTS';
-^Script ^digits1 null1[] null2[]
-^digits2 digits1$ null3[] null4[]
-Script$ digits2$ null5[]
+0: ^Script ^digits1 null1[] null2[]
+1: ^digits2 digits1$ null3[] null4[]
+2: Script$ digits2$ null5[]
 END_OF_EXPECTED_EVENTS
 
 push @tests_data, [ $loc0_grammar, $loc0_input, $loc0_events, 'Location 0 events' ];
@@ -92,7 +92,7 @@ END_OF_DSL
     my $reject_dup_grammar =
         Marpa::R3::Scanless::G->new( { source => \$reject_dup_dsl } );
     my $reject_dup_input = " x y\n\n";
-    my $reject_dup_events = join "\n", 'DUP$', q{}, q{};
+    my $reject_dup_events = '1: DUP$' . "\n";
     push @tests_data,
         [
         $reject_dup_grammar, $reject_dup_input,
@@ -126,14 +126,15 @@ END_OF_DSL
     my $grammar =
         Marpa::R3::Scanless::G->new( { source => \$dsl } );
     my $input = "1,2; 3,42.  1729,8675309; 8675311,711.";
-    my $events = $input;
-    $events =~ s/ \s+ /!/gxms;
-    $events =~ s/ [^!;.] //gxms;
-    $events =~ s/ [.]/ period /gxms;
-    $events =~ s/ [;] / semicolon /gxms;
-    $events =~ s/ [!] / ws /gxms;
-    $events =~ s/ \A \s+ //gxms;
-    $events =~ s/ \s+ /\n/gxms;
+    my $events = <<'END_OF_EVENTS';
+1: semicolon
+2: ws
+3: period
+4: ws
+5: semicolon
+6: ws
+7: period
+END_OF_EVENTS
 
     push @tests_data,
         [
@@ -172,20 +173,22 @@ END_OF_DSL
 
     my $grammar = Marpa::R3::Scanless::G->new( { source => \$dsl } );
     my $input   = "1,2; 3,42.  1729,8675309; 8675311,711.";
-    my $events  = "\n";
+    my $events  = q{};
     if ( $default eq 'on' ) {
-        $events = $input;
-        $events =~ s/ \s+ /!/gxms;
-        $events =~ s/ [^!;.] //gxms;
-        $events =~ s/ [.]/ period /gxms;
-        $events =~ s/ [;] / semicolon /gxms;
-        $events =~ s/ [!] / ws /gxms;
-        $events =~ s/ \A \s+ //gxms;
-        $events =~ s/ \s+ /\n/gxms;
+        $events  = <<'END_OF_EVENTS';
+1: semicolon
+2: ws
+3: period
+4: ws
+5: semicolon
+6: ws
+7: period
+END_OF_EVENTS
     } ## end if ( $default eq 'on' )
 
     push @tests_data,
-        [ $grammar, $input, $events, 'Discard events for synopsis' ];
+        [ $grammar, $input, $events,
+            "Discard events for synopsis, default = $default" ];
 }
 
 {
@@ -210,14 +213,15 @@ END_OF_DSL
     my $grammar =
         Marpa::R3::Scanless::G->new( { source => \$dsl } );
     my $input = "1,2; 3,42.  1729,8675309; 8675311,711.";
-    my $events = $input;
-    $events =~ s/ \s+ /!/gxms;
-    $events =~ s/ [^!;.] //gxms;
-    $events =~ s/ [.]/ period /gxms;
-    $events =~ s/ [;] / semicolon /gxms;
-    $events =~ s/ [!] / ws /gxms;
-    $events =~ s/ \A \s+ //gxms;
-    $events =~ s/ \s+ /\n/gxms;
+    my $events  = <<'END_OF_EVENTS';
+1: semicolon
+2: ws
+3: period
+4: ws
+5: semicolon
+6: ws
+7: period
+END_OF_EVENTS
 
     push @tests_data,
         [
@@ -246,14 +250,15 @@ END_OF_DSL
     my $grammar =
         Marpa::R3::Scanless::G->new( { source => \$dsl } );
     my $input = "1,2; 3,42.  1729,8675309; 8675311,711.";
-    my $events = $input;
-    $events =~ s/ \s+ /!/gxms;
-    $events =~ s/ [^!;.] //gxms;
-    $events =~ s/ [.]/ [.] /gxms;
-    $events =~ s/ [;] / [\\x3B] /gxms;
-    $events =~ s/ [!] / ws /gxms;
-    $events =~ s/ \A \s+ //gxms;
-    $events =~ s/ \s+ /\n/gxms;
+    my $events = <<'END_OF_EVENTS';
+1: [\x3B]
+2: ws
+3: [.]
+4: ws
+5: [\x3B]
+6: ws
+7: [.]
+END_OF_EVENTS
 
     push @tests_data,
         [
@@ -288,14 +293,15 @@ END_OF_DSL
     my $grammar =
         Marpa::R3::Scanless::G->new( { source => \$dsl } );
     my $input = "1,2; 3,42.  1729,8675309; 8675311,711.";
-    my $events = $input;
-    $events =~ s/ \s+ /!/gxms;
-    $events =~ s/ [^!;.] //gxms;
-    $events =~ s/ [.]/ [.] /gxms;
-    $events =~ s/ [;] / [\\x3B] /gxms;
-    $events =~ s/ [!] / ws /gxms;
-    $events =~ s/ \A \s+ //gxms;
-    $events =~ s/ \s+ /\n/gxms;
+    my $events = <<'END_OF_EVENTS';
+1: [\x3B]
+2: ws
+3: [.]
+4: ws
+5: [\x3B]
+6: ws
+7: [.]
+END_OF_EVENTS
 
     push @tests_data,
         [
@@ -306,26 +312,44 @@ END_OF_DSL
 
 TEST:
 for my $test_data (@tests_data) {
-    my ( $grammar, $test_string, $expected_events, $test_name ) =
-        @{$test_data};
-    my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
+    my ( $grammar, $test_string, $expected_events, $test_name ) = @{$test_data};
+    my @events        = ();
+    my @event_history = ();
+    my $recce         = Marpa::R3::Scanless::R->new(
+        {
+            grammar        => $grammar,
+            event_handlers => {
+                "'default" => sub () {
+                    my ( $slr, $event_name ) = @_;
+                    push @events, $event_name;
+                    'pause';
+                }
+            }
+        }
+    );
 
-    my $pos           = -1;
-    my $length        = length $test_string;
-    my $actual_events = q{};
-    for ( my $pass = 0; $pos < $length; $pass++ ) {
+    push @event_history, '0: ' .join q{ }, sort @events if @events;
+    @events = ();
+    my $pos    = -1;
+    my $length = length $test_string;
+    for ( my $pass = 1 ; $pos < $length ; $pass++ ) {
         my $eval_ok;
-        if ($pass) {
+        if ($pass > 1) {
             $eval_ok = eval { $pos = $recce->resume(); 1 };
         }
         else {
             $eval_ok = eval { $pos = $recce->read( \$test_string ); 1 };
         }
         die $EVAL_ERROR if not $eval_ok;
-        $actual_events .= (join q{ }, sort map { $_->[0] } @{$recce->events()}) . "\n";
+        push @event_history, "$pass: " .join q{ }, sort @events
+            if @events;
+        @events = ();
     } ## end for ( my $pass = 0; $pos < $length; $pass++ )
 
+    my $actual_events = join "\n", @event_history, '';
+    # say "actual: $actual_events";
+    # say "expected: $expected_events";
     Test::More::is( $actual_events, $expected_events, $test_name );
-} ## end for my $test_data (@tests_data)
+}
 
 # vim: expandtab shiftwidth=4:
