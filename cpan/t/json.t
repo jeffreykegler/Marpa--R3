@@ -337,29 +337,29 @@ sub trace_json {
 # Marpa::R3::Display
 # name: SLIF trace example
 
-    my $re = Marpa::R3::Scanless::R->new( { grammar => $parser->{grammar} } );
-    my $length = length $string;
-    for (
-        my $pos = $re->read( \$string );
-        $pos < $length;
-        $pos = $re->resume()
-        )
-    {
-        for my $event ( @{ $re->events() } ) {
-            my ($event_name) = @{$event};
-            die "Unexpected event: $event name" if $event_name ne 'before lstring';
+        my $recce = Marpa::R3::Scanless::R->new(
+            {
+                grammar        => $parser->{grammar},
+                event_handlers => {
+                    'before lstring' => sub () { 'pause' },
+                }
+            }
+        );
+        my $length = length $string;
+        my $pos    = $recce->read( \$string );
+        while ( $pos < $length ) {
+            my ( $start, $span_length ) = $recce->pause_span();
+            my ( $line,  $column )      = $recce->line_column($start);
             my $lexeme = 'lstring';
-            my ( $start, $span_length ) = $re->pause_span();
-            my ( $line,  $column )      = $re->line_column($start);
-            my $literal_string = $re->literal( $start, $span_length );
-            $trace_desc
-                 .= qq{Line $line, column $column, lexeme <$lexeme>, literal "$literal_string"\n};
+            my $literal_string = $recce->literal( $start, $span_length );
+            $trace_desc .=
+                qq{Line $line, column $column, lexeme <$lexeme>, literal "$literal_string"\n};
             my $value = substr $string, $start + 1, $span_length - 2;
             $value = decode_string($value) if -1 != index $value, q{\\};
-            $re->lexeme_read( $lexeme, $start, $span_length, $value ) // die;
+            $recce->lexeme_read( $lexeme, $start, $span_length, $value ) // die;
+            $pos = $recce->resume();
         }
-    } ## end for ( my $pos = $re->read( \$string ); $pos < $length...)
-    return $trace_desc;
+        return $trace_desc;
 
 # Marpa::R3::Display::End
 
