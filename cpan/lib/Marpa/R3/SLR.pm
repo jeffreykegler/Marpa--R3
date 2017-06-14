@@ -117,7 +117,20 @@ sub gen_app_event_handler {
       $slr->[Marpa::R3::Internal::Scanless::R::EVENT_HANDLERS];
     return sub {
         my ( $event_name, @data ) = @_;
+        my $current_event =
+          $slr->[Marpa::R3::Internal::Scanless::R::CURRENT_EVENT];
+        if ($current_event) {
+            Marpa::R3::exception(
+                qq{Attempt to throw call one event handler inside another\n},
+                qq{  This is not allowed\n},
+                qq{  The currently active handler is for a "$current_event" event\n},
+                qq{  The attempted handler call is for a "$event_name" event\n}
+            );
+        }
         my $handler = $event_handlers->{$event_name};
+        if ( not $handler ) {
+            $handler = $event_handlers->{'*'};
+        }
         if ( not $handler ) {
             Marpa::R3::exception(
                 qq{'No event handler for event "$event_name"\n});
@@ -130,7 +143,9 @@ sub gen_app_event_handler {
                 qq{  A handler should be a ref to code\n}
             );
         }
+        $slr->[Marpa::R3::Internal::Scanless::R::CURRENT_EVENT] = $event_name;
         my $retour = $handler->( $slr, $event_name, @data ) // 'ok';
+        $slr->[Marpa::R3::Internal::Scanless::R::CURRENT_EVENT] = undef;
         if ( $retour ne 'ok' and $retour ne 'pause' ) {
             Marpa::R3::exception(
                 qq{Bad return from event handler for event "$event_name"\n},

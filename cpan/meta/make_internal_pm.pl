@@ -225,6 +225,7 @@ __DATA__
 
     TRACE_FILE_HANDLE
     EVENT_HANDLERS { Application-level event handlers }
+    CURRENT_EVENT
 
     EVENTS { TODO -- Delete after development
     Events converted to an external, Perl-ish form }

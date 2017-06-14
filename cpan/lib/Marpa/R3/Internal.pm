@@ -110,6 +110,7 @@ use constant L => 1;
 use constant REGIX => 2;
 use constant TRACE_FILE_HANDLE => 3;
 use constant EVENT_HANDLERS => 4;
-use constant EVENTS => 5;
+use constant CURRENT_EVENT => 5;
+use constant EVENTS => 6;
 
 1;
