@@ -211,7 +211,7 @@ sub Marpa::R3::Scanless::R::new {
     my $lua = $slg->[Marpa::R3::Internal::Scanless::G::L];
     $slr->[Marpa::R3::Internal::Scanless::R::L] = $lua;
 
-    my ( $regix, $events ) = $slg->coro_by_tag(
+    my ( $regix ) = $slg->coro_by_tag(
         ( '@' . __FILE__ . ':' . __LINE__ ),
         {
             signature => 's',
@@ -229,12 +229,34 @@ sub Marpa::R3::Scanless::R::new {
         local slg, flat_args = ...
         _M.wrap(function ()
             local slr = slg:slr_new(flat_args)
-            local _, events = glue.convert_libmarpa_events(slr)
-            return 'ok', slr.regix, events
+            return 'ok', slr.regix
         end)
 END_OF_LUA
 
     $slr->[Marpa::R3::Internal::Scanless::R::REGIX]  = $regix;
+
+    my ( $events ) = $slr->coro_by_tag(
+        ( '@' . __FILE__ . ':' . __LINE__ ),
+        {
+            signature => 's',
+            args      => [$flat_args],
+            handlers  => {
+                trace => sub {
+                    my ($msg) = @_;
+                    say {$trace_file_handle} $msg;
+                    return 'ok';
+                },
+                event => gen_app_event_handler($slr),
+            }
+        },
+        <<'END_OF_LUA');
+        local slr, flat_args = ...
+        _M.wrap(function ()
+            local _, events = glue.convert_libmarpa_events(slr)
+            return 'ok', events
+        end)
+END_OF_LUA
+
     $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] = $events;
 
     return $slr;
@@ -1233,6 +1255,8 @@ sub Marpa::R3::Scanless::R::call_by_tag {
     my $lua   = $slr->[Marpa::R3::Internal::Scanless::R::L];
     my $regix = $slr->[Marpa::R3::Internal::Scanless::R::REGIX];
 
+    $DB::single = 1 if not $slr;
+    $DB::single = 1 if not $regix;
     # $DB::single = 1 if grep { not defined $_ } @args;
     my @results;
     my $eval_error;

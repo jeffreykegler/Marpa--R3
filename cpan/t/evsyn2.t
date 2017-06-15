@@ -156,8 +156,19 @@ sub show_last_subtext {
 sub do_test {
     my ( $test, $slg, $string, $expected_events, $reactivate_events, $recce_args ) = @_;
     $recce_args //= {};
+    my @actual_events = ();
+
     my $recce =
-      Marpa::R3::Scanless::R->new( { grammar => $grammar }, $recce_args );
+      Marpa::R3::Scanless::R->new( { grammar => $grammar,
+         event_handlers => {
+             "'default" => sub () {
+                 my ($recce, $event_name) = @_;
+                 my $pos = $recce->pos();
+                 push @{$actual_events[$pos]}, $event_name;
+                 'ok';
+             }
+         }
+      }, $recce_args );
     if (defined $reactivate_events) {
 
 # Marpa::R3::Display
@@ -171,17 +182,9 @@ sub do_test {
 
     }
 
-    my @actual_events = ();
     my $length = length $string;
     my $pos    = $recce->read( \$string );
     READ: while (1) {
-
-        EVENT:
-        for my $event ( @{ $recce->events() } ) {
-            my ($name) = @{$event};
-            push @{$actual_events[$pos]}, $name;
-        }
-
         last READ if $pos >= $length;
         $pos = $recce->resume($pos);
     } ## end READ: while (1)
