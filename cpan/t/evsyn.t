@@ -107,37 +107,43 @@ my $grammar = Marpa::R3::Scanless::G->new(
         semantics_package => 'My_Actions'
     }
 );
-my $slr = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
+
+my @events = ();
+my @event_history = ();
+my $next_lexeme;
+
+my $slr = Marpa::R3::Scanless::R->new( { grammar => $grammar,
+    event_handlers => {
+        "'default" => sub () {
+            my ($slr, $event_name) = @_;
+            if ($event_name eq 'insert d') {
+               my (undef, $length) = $slr->pause_span();
+               $next_lexeme = ['real d', undef, $length];
+            }
+            push @events, $event_name;
+            'pause';
+        }
+    }
+} );
+
+push @event_history, join q{ }, "Events at position 0:", sort @events
+   if @events;
+@events = ();
 
 my $input = q{a b c "insert d here" e e f h};
 my $length = length $input;
 my $pos    = $slr->read( \$input );
 
-my $actual_events = q{};
-
 READ: while (1) {
 
-    my @actual_events = ();
-
-    my $next_lexeme;
-    EVENT:
-    for my $event ( @{ $slr->events() } ) {
-        my ($name) = @{$event};
-        if ($name eq 'insert d') {
-           my (undef, $length) = $slr->pause_span();
-           $next_lexeme = ['real d', undef, $length];
-        }
-        push @actual_events, $name;
-    }
-
-    if (@actual_events) {
-        $actual_events .= join q{ }, "Events at position $pos:", sort @actual_events;
-        $actual_events .= "\n";
-    }
+    push @event_history, join q{ }, "Events at position $pos:", sort @events
+       if @events;
+    @events = ();
 
     if ($next_lexeme) {
         $slr->lexeme_read(@{$next_lexeme});
         $pos = $slr->pos();
+        $next_lexeme = undef;
         next READ;
     }
     if ($pos < $length) {
@@ -165,6 +171,7 @@ Events at position 29: "h" test$
 my $value_ref = $slr->value();
 my $value = $value_ref ? ${$value_ref} : 'No Parse';
 
+my $actual_events = join "\n", @event_history, '';
 Marpa::R3::Test::is( $actual_events, $expected_events, 'SLIF parse event synopsis' );
 
 Test::More::is( $value, 42, 'SLIF parse event synopsis value' );
