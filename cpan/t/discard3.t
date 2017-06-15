@@ -67,20 +67,15 @@ END_OF_SOURCE
 
         for my $input ( q{}, ' ', '  ' ) {
 
-            my $recce =
-                Marpa::R3::Scanless::R->new( { grammar => $null_grammar },
-                $recce_arg );
-
-            my $length = length $input;
-            my $pos    = $recce->read( \$input );
-
-            my $p_events = gather_events( $recce, $pos, $length );
+            my ($recce, $p_events) = gather_events( $null_grammar,
+                $recce_arg, $input );
             my $actual_events = join q{ },
                 map { $_->[0], $_->[-1] } @{$p_events};
 
             my $expected_events = q{};
+            my $length = length $input;
             if ($event_is_on) {
-                $expected_events = join q{ }, ( ('ws 0') x $length );
+                $expected_events = join q{ }, ( ('ws 0') x $length);
             }
 
             my $test_name = "Test of $length discarded spaces";
@@ -138,15 +133,10 @@ END_OF_SOURCE
             # say join q{}, '^', @input, '$';
             my $input = join q{}, @input;
 
-            my $recce = Marpa::R3::Scanless::R->new(
-                { grammar => $non_trivial_grammar }, $recce_arg );
-
-            my $length = length $input;
-            my $pos    = $recce->read( \$input );
-
-            my $p_events = gather_events( $recce, $pos, $length );
+            my ($recce, $p_events) =
+              gather_events( $non_trivial_grammar, $recce_arg, $input );
             my $actual_events = join q{ },
-                map { $_->[0], $_->[-1] } @{$p_events};
+              map { $_->[0], $_->[-1] } @{$p_events};
             my $expected_events = q{};
             if ($event_is_on) {
                 $expected_events = join q{ }, @expected;
@@ -214,19 +204,12 @@ END_OF_SOURCE
                     $event_is_on{bracketed} = 0
                         if $bracketed_g_setting eq '=off';
                 }
-                my @extra_recce_args =
-                    ( { event_is_active => \%event_is_active_value } )
+                my $extra_recce_args = {};
+                $extra_recce_args = { event_is_active => \%event_is_active_value }
                     if scalar %event_is_active_value;
 
                 for my $input ( q{ (x) }, q{(x) }, q{ (x)} ) {
-                    my $recce =
-                        Marpa::R3::Scanless::R->new( { grammar => $grammar2 },
-                        @extra_recce_args );
-
-                    my $length = length $input;
-                    my $pos    = $recce->read( \$input );
-
-                    my $p_events = gather_events( $recce, $pos, $length );
+                    my ($recce, $p_events) = gather_events( $grammar2, $extra_recce_args, $input );
                     my $actual_events = join q{ },
                         map { $_->[0], $_->[-1] } @{$p_events};
                     my $expected_events = $input;
@@ -276,8 +259,14 @@ END_OF_SOURCE
 } ## end for my $ws_g_setting (@settings)
 
 sub gather_events {
-    my ($recce, $pos, $length) = @_;
+    my ($grammar, $extra_recce_args, $input) = @_;
+    my $recce =
+        Marpa::R3::Scanless::R->new( { grammar => $grammar },
+        $extra_recce_args );
+
     my @actual_events;
+    my $length = length $input;
+    my $pos    = $recce->read( \$input );
     READ: while (1) {
 
         EVENT:
@@ -290,6 +279,6 @@ sub gather_events {
         last READ if $pos >= $length;
         $pos = $recce->resume($pos);
     } ## end READ: while (1)
-    return \@actual_events;
+    return $recce, \@actual_events;
 } ## end sub gather_event
 # vim: expandtab shiftwidth=4:
