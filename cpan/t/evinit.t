@@ -134,30 +134,26 @@ sub show_last_subtext {
 
 sub do_test {
     my ( $test, $slg, $string, $expected_events, $active_events ) = @_;
-    my $actual_events = q{};
     my $extra_recce_args = {};
     $extra_recce_args = { event_is_active => $active_events }
         if defined $active_events;
 
+    my @events = ();
     my $recce =
-      Marpa::R3::Scanless::R->new( { grammar => $grammar }, $extra_recce_args );
+      Marpa::R3::Scanless::R->new( { grammar => $grammar,
+          event_handlers => {
+              "'default" => sub () {
+                  my ($slr, $event_name) = @_;
+                  my $pos = $slr->pos();
+                  $events[$pos]{$event_name} = 1;
+                  'ok';
+              }
+          }
+      }, $extra_recce_args );
 
     my $length = length $string;
     my $pos    = $recce->read( \$string );
     READ: while (1) {
-
-        my @actual_events = ();
-
-        EVENT:
-        for my $event ( @{ $recce->events() } ) {
-            my ($name) = @{$event};
-            push @actual_events, $name;
-        }
-
-        if (@actual_events) {
-            $actual_events .= join q{ }, $pos, sort @actual_events;
-            $actual_events .= "\n";
-        }
         last READ if $pos >= $length;
         $pos = $recce->resume($pos);
     } ## end READ: while (1)
@@ -168,6 +164,14 @@ sub do_test {
     }
     my $actual_value = ${$value_ref};
     Test::More::is( $actual_value, q{1792}, qq{Value for $test} );
+
+    my @actual_events = ();
+    for (my $ix = 0; $ix <= $#events; $ix++) {
+        my @these_events = keys %{$events[$ix]};
+        push @actual_events, "$ix " . join q{ }, sort @these_events
+           if @these_events;
+    }
+    my $actual_events = join "\n", @actual_events, q{};
 
     Marpa::R3::Test::is( $actual_events, $expected_events,
         qq{Events for $test} );
