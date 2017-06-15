@@ -2013,7 +2013,10 @@ Returns `true` is there was one,
                     coroutine.yield('trace', 'g1 before lexeme event')
                 end
                 local q = slr.event_queue
-                q[#q+1] = { 'before lexeme', g1_lexeme}
+                q[#q+1] = {
+                    'before lexeme', g1_lexeme, lexeme_start,
+                    lexeme_end - lexeme_start
+                }
                 slr.start_of_pause_lexeme = lexeme_start
                 slr.end_of_pause_lexeme = lexeme_end
                 local start_of_lexeme = slr.start_of_lexeme
@@ -2140,7 +2143,7 @@ Read alternatives into the G1 grammar.
                         ))
                     end
                     local q = slr.event_queue
-                    q[#q+1] = { 'after lexeme', g1_lexeme}
+                    q[#q+1] = { 'after lexeme', g1_lexeme, lexeme_start, lexeme_end - lexeme_start}
                 end
             end
             ::NEXT_EVENT::
@@ -2965,8 +2968,16 @@ Caller must ensure `block` and `pos` are valid.
             then
                 local lexeme_isyid = event[2]
                 local slg = slr.slg
+                local g1g = slg.g1
                 local event_name = slg.lexeme_event_by_isy[lexeme_isyid].name
-                local yield_result = coroutine.yield ( 'event', event_name )
+                local lexeme_xsy = g1g:xsy(lexeme_isyid)
+                local lexeme_xsyid
+                if lexeme_xsy then
+                    lexeme_xsyid = lexeme_xsy.id
+                end
+                local yield_result = coroutine.yield ( 'event', event_name,
+                    lexeme_xsyid,
+                    table.unpack(event, 3) )
                 pause = pause or yield_result == 'pause'
             end
 
