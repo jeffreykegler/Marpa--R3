@@ -58,7 +58,16 @@ my $grammar = Marpa::R3::Scanless::G->new(
         source            => \$dsl
     }
 );
-my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
+my @events = ();
+my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar,
+    event_handlers => {
+        "'default" => sub () {
+            my ($slr, @event) = @_;
+            push @events, \@event;
+            'pause';
+        }
+    }
+} );
 
 my $input = 'A2(A2(S3(Hey)S13(Hello, World!))S5(Ciao!))';
 
@@ -71,8 +80,8 @@ for (
     $pos = $recce->resume($pos)
     )
 {
-    EVENT: for my $event ( @{ $recce->events() } ) {
-        my ($name) = @{$event};
+    EVENT: for my $event ( @events ) {
+        my ($name, @event_data) = @{$event};
         if ( $name eq 'expecting text' ) {
             my $text_length = $last_string_length;
             $recce->lexeme_read( 'text', $pos, $text_length );
@@ -80,13 +89,14 @@ for (
             next EVENT;
         } ## end if ( $name eq 'expecting text' )
         if ( $name eq 'string length' ) {
-            my ( $start_pos, $length ) = $recce->pause_span();
+            my ( undef, $start_pos, $length ) = @event_data;
             $last_string_length = $recce->literal( $start_pos, $length ) + 0;
             $pos = $start_pos + $length;
             next EVENT;
         } ## end if ( $name eq 'string length' )
         die "Unexpected event: ", join q{ }, @{$event};
-    } ## end EVENT: for my $event ( @{ $recce->events() } )
+    }
+    @events = ();
 } ## end INPUT: for ( my $pos = $recce->read( \$input ); $pos < $input_length...)
 
 my $result = $recce->value();
