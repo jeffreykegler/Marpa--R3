@@ -2970,11 +2970,9 @@ Caller must ensure `block` and `pos` are valid.
                 local slg = slr.slg
                 local g1g = slg.g1
                 local event_name = slg.lexeme_event_by_isy[lexeme_isyid].name
+                -- there must be an XSY
                 local lexeme_xsy = g1g:xsy(lexeme_isyid)
-                local lexeme_xsyid
-                if lexeme_xsy then
-                    lexeme_xsyid = lexeme_xsy.id
-                end
+                local lexeme_xsyid = lexeme_xsy.id
                 local yield_result = coroutine.yield ( 'event', event_name,
                     lexeme_xsyid,
                     table.unpack(event, 3) )
