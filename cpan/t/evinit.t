@@ -125,13 +125,6 @@ EVENT: for my $event (@events) {
         { $event => 1 } );
 } ## end EVENT: for my $event (@events)
 
-sub show_last_subtext {
-    my ($recce) = @_;
-    my ( $start, $length ) = $recce->last_completed('subtext');
-    return 'No expression was successfully parsed' if not defined $start;
-    return $recce->g1_literal( $start, $length );
-}
-
 sub do_test {
     my ( $test, $slg, $string, $expected_events, $active_events ) = @_;
     my $extra_recce_args = {};

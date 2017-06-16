@@ -146,13 +146,6 @@ EOS
 do_test( 'all events deactivated in $recce->new(), then deactivated again',
     $grammar, q{abcd}, $events_expected, [], $extra_recce_arg );
 
-sub show_last_subtext {
-    my ($recce) = @_;
-    my ( $start, $length ) = $recce->last_completed('subtext');
-    return 'No expression was successfully parsed' if not defined $start;
-    return $recce->g1_literal( $start, $length );
-}
-
 sub do_test {
     my ( $test, $slg, $string, $expected_events, $reactivate_events, $recce_args ) = @_;
     $recce_args //= {};

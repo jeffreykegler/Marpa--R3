@@ -78,75 +78,76 @@ my $input = <<'EOI';
 EOI
 
 my $output_re =
-            qr/\A 86[.]3\d+ \s+ 126 \s+ 125 \s+ 16 \s+ 1729 \s+ 1729 \s+ 1729 .*\z/xms;
+  qr/\A 86[.]3\d+ \s+ 126 \s+ 125 \s+ 16 \s+ 1729 \s+ 1729 \s+ 1729 .*\z/xms;
 
-
-    my $length = length $input;
-    my @events = ();
-    my $recce = Marpa::R3::Scanless::R->new(
-        {
-            grammar        => $grammar,
-            event_handlers => {
-                "'default" => sub () {
-                    my ( $slr, @event ) = @_;
-                    push @events, \@event;
-                    'ok';
-                }
+my $length = length $input;
+my @events = ();
+my $recce  = Marpa::R3::Scanless::R->new(
+    {
+        grammar        => $grammar,
+        event_handlers => {
+            "'default" => sub () {
+                my ( $slr, @event ) = @_;
+                push @events, \@event;
+                'ok';
             }
         }
-    );
-
-    my $pos = $recce->read(\$input);
-    READ: while ( $pos < $length ) {
-        $pos = $recce->resume($pos);
     }
+);
 
-    my $value_ref = $recce->value();
-    if ( not defined $value_ref ) {
-        die "No parse was found, after reading the entire input\n";
-    }
+my $pos = $recce->read( \$input );
+READ: while ( $pos < $length ) {
+    $pos = $recce->resume($pos);
+}
 
-    my $event_ix = 0;
-    my $result = '';
-    for my $expression (@{${$value_ref}}) {
-        my ($g1start, $g1length, $value) = @{$expression};
-        my $g1end = $g1start+$g1length-1;
-        $result .= qq{expression: "} . $recce->g1_literal( $g1start, $g1length-1 ) .
-            qq{" = } . round_value($value);
-        $result .= "\n";
-        EVENT: while ($event_ix <= $#events) {
-            my $event = $events[$event_ix];
-            my $g1loc = $event->[3];
-            last EVENT if $g1loc >= $g1end;
-            my $type = $g1loc == $g1start ? 'preceding' : 'internal';
-            $result .= join q{ }, $type, display_event($recce, @{$event});
-            $result .= "\n";
-            $event_ix++;
-        }
-        $result .= "\n";
-    }
+my $value_ref = $recce->value();
+if ( not defined $value_ref ) {
+    die "No parse was found, after reading the entire input\n";
+}
 
-    EVENT: while ( $event_ix <= $#events ) {
+my $event_ix = 0;
+my $result   = '';
+for my $expression ( @{ ${$value_ref} } ) {
+    my ( $g1start, $g1length, $value ) = @{$expression};
+    my $g1end = $g1start + $g1length - 1;
+    $result .=
+        qq{expression: "}
+      . $recce->g1_literal( $g1start, $g1length - 1 )
+      . qq{" = }
+      . round_value($value);
+    $result .= "\n";
+  EVENT: while ( $event_ix <= $#events ) {
         my $event = $events[$event_ix];
-        $result .= join q{ }, 'trailing', display_event($recce, @{$event});
+        my $g1loc = $event->[3];
+        last EVENT if $g1loc >= $g1end;
+        my $type = $g1loc == $g1start ? 'preceding' : 'internal';
+        $result .= join q{ }, $type, display_event( $recce, @{$event} );
         $result .= "\n";
         $event_ix++;
-    } ## end EVENT: while ( $event_ix <= $#events )
+    }
+    $result .= "\n";
+}
 
+EVENT: while ( $event_ix <= $#events ) {
+    my $event = $events[$event_ix];
+    $result .= join q{ }, 'trailing', display_event( $recce, @{$event} );
+    $result .= "\n";
+    $event_ix++;
+} ## end EVENT: while ( $event_ix <= $#events )
 
 # round value down, for testing on platforms
 # with various float precisions
 sub round_value {
-    my ( $value ) = @_;
-    return (int $value*100)/100;
+    my ($value) = @_;
+    return ( int $value * 100 ) / 100;
 }
 
 sub display_event {
     my ( $recce, $event_name, $start, $end ) = @_;
-    if ($event_name eq 'ws') {
-       return "ws of length " . ($end-$start);
+    if ( $event_name eq 'ws' ) {
+        return "ws of length " . ( $end - $start );
     }
-    my $literal = $recce->literal($start, ($end-$start));
+    my $literal = $recce->literal( $start, ( $end - $start ) );
     $literal =~ s/\n/\\n/xmsg;
     return qq{$event_name: "$literal"};
 }
@@ -191,57 +192,59 @@ expression: "255**3+414**3" = 87539319
 trailing ws of length 1
 END_OF_RESULT
 
-Marpa::R3::Test::is($result, $expected_result, "interweave of events and parse tree");
+Marpa::R3::Test::is( $result, $expected_result,
+    "interweave of events and parse tree" );
 
 package My_Nodes;
 
 sub My_Nodes::do_expression {
-    my ($parse, $v) = @_;
+    my ( $parse, $v ) = @_;
     my @values = @{$v};
     return \@values;
+
     # say STDERR "pushing value: ", Data::Dumper::Dumper(\@_);
 }
 
 sub My_Nodes::do_number {
-    my ($parse, $v) = @_;
+    my ( $parse, $v ) = @_;
     my ($number) = @{$v};
-    return $number+0;
+    return $number + 0;
 }
 
-sub My_Nodes::do_paren  {
-    my ($parse, $v) = @_;
+sub My_Nodes::do_paren {
+    my ( $parse, $v ) = @_;
     my ($expr) = @{$v};
     return $expr;
 }
 
 sub My_Nodes::do_add {
-    my ($parse, $v) = @_;
-    my ($right, $left) = @{$v};
+    my ( $parse, $v )    = @_;
+    my ( $right, $left ) = @{$v};
     return $right + $left;
 }
 
 sub My_Nodes::do_subtract {
-    my ($parse, $v) = @_;
-    my ($right, $left) = @{$v};
+    my ( $parse, $v )    = @_;
+    my ( $right, $left ) = @{$v};
     return $right - $left;
 }
 
 sub My_Nodes::do_multiply {
-    my ($parse, $v) = @_;
-    my ($right, $left) = @{$v};
+    my ( $parse, $v )    = @_;
+    my ( $right, $left ) = @{$v};
     return $right * $left;
 }
 
 sub My_Nodes::do_divide {
-    my ($parse, $v) = @_;
-    my ($right, $left) = @{$v};
+    my ( $parse, $v )    = @_;
+    my ( $right, $left ) = @{$v};
     return $right / $left;
 }
 
 sub My_Nodes::do_power {
-    my ($parse, $v) = @_;
-    my ($right, $left) = @{$v};
-    return $right ** $left;
+    my ( $parse, $v )    = @_;
+    my ( $right, $left ) = @{$v};
+    return $right**$left;
 }
 
 # vim: expandtab shiftwidth=4:

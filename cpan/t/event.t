@@ -125,13 +125,6 @@ EVENT: for my $event (@events) {
     do_test( qq{event "$event" reactivated}, $grammar, q{abcdfhijl}, $expected_events, [$event] );
 }
 
-sub show_last_subtext {
-    my ($recce) = @_;
-    my ( $start, $length ) = $recce->last_completed('subtext');
-    return 'No expression was successfully parsed' if not defined $start;
-    return $recce->g1_literal( $start, $length );
-}
-
 sub do_test {
     my ( $test, $slg, $string, $expected_events, $reactivate_events ) = @_;
     my @actual_events = ();
