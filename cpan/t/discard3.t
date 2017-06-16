@@ -259,26 +259,28 @@ END_OF_SOURCE
 } ## end for my $ws_g_setting (@settings)
 
 sub gather_events {
-    my ($grammar, $extra_recce_args, $input) = @_;
-    my $recce =
-        Marpa::R3::Scanless::R->new( { grammar => $grammar },
-        $extra_recce_args );
-
+    my ( $grammar, $extra_recce_args, $input ) = @_;
     my @actual_events;
+    my $recce = Marpa::R3::Scanless::R->new(
+        {
+            grammar        => $grammar,
+            event_handlers => {
+                "'default" => sub () {
+                    my ( $slr, @event ) = @_;
+                    push @actual_events, \@event;
+                    'ok';
+                }
+              }
+
+        },
+        $extra_recce_args
+    );
     my $length = length $input;
     my $pos    = $recce->read( \$input );
-    READ: while (1) {
-
-        EVENT:
-        for my $event ( @{ $recce->events() } ) {
-            my ( $name, @other_stuff ) = @{$event};
-            # say STDERR 'Event received!!! -- ', Data::Dumper::Dumper($event);
-            push @actual_events, $event;
-        }
-
-        last READ if $pos >= $length;
+  READ: while ( $pos < $length ) {
         $pos = $recce->resume($pos);
-    } ## end READ: while (1)
+    }
     return $recce, \@actual_events;
-} ## end sub gather_event
+}
+
 # vim: expandtab shiftwidth=4:
