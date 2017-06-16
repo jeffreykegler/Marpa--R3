@@ -30,8 +30,9 @@ use Marpa::R3::Test;
 
 use Marpa::R3;
 
-my $g = Marpa::R3::Scanless::G->new({
-    source => \q{
+my $g = Marpa::R3::Scanless::G->new(
+    {
+        source => \q{
         Top::= 'start' TOKEN OTHER_TOKEN
         TOKEN       ~ [^\s\S]
         OTHER_TOKEN ~ [^\s\S]
@@ -39,25 +40,31 @@ my $g = Marpa::R3::Scanless::G->new({
         event ev_other_token    = predicted OTHER_TOKEN
         :discard ~ [_]
     },
-});
-my $r = Marpa::R3::Scanless::R->new({ grammar => $g });
+    }
+);
+
+my @events = ();
+my $recce = Marpa::R3::Scanless::R->new(
+    {
+        grammar        => $g,
+        event_handlers => {
+            ev_token       => sub () { push @events, 'ev_token';       'ok' },
+            ev_other_token => sub () { push @events, 'ev_other_token'; 'ok' }
+        }
+    }
+);
+@events = ();
 
 # This is the "control" -- a test before where the bug
 # occurred, just to make sure the context is right.
-$r->read(\"start_");
-{
-    my @events = map { $_->[0] } @{ $r->events };
-    Test::More::is( (join q{ }, @events), q{ev_token}, 'before' );
-}
+$recce->read(\"start_");
+Test::More::is( (join q{ }, @events), q{ev_token}, 'before' );
+@events = ();
 
 # Now look where the bug occurred.
 # The problem was that the "ev_token" from the previous
 # check for events was not cleared.
-$r->lexeme_read(TOKEN => 0, 1, "_");
-{
-    my @events = map { $_->[0] } @{ $r->events };
-    # ev_token should NOT be reported here.
-    Test::More::is( (join q{ }, @events), q{ev_other_token}, 'after' );
-}
+$recce->lexeme_read(TOKEN => 0, 1, "_");
+Test::More::is( (join q{ }, @events), q{ev_other_token}, 'after' );
 
 # vim: expandtab shiftwidth=4:
