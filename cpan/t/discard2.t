@@ -44,15 +44,9 @@ END_OF_SOURCE
 );
 
 for my $input ( q{}, ' ', '  ', '   ' ) {
-    my $recce = Marpa::R3::Scanless::R->new(
-        { grammar => $null_grammar },
-    );
-
-    my $length = length $input;
-    my $pos = $recce->read( \$input );
-
-    my $p_events = gather_events( $recce, $pos, $length );
+    my ($recce, $p_events) = gather_events( $null_grammar, {}, $input );
     my $actual_events = join q{ }, map { $_->[0], $_->[-1] } @{$p_events};
+    my $length = length $input;
     my $expected_events = join q{ }, ( ('ws 0') x $length );
     Test::More::is( $actual_events, $expected_events,
         "Test of $length discarded spaces" );
@@ -85,12 +79,7 @@ END_OF_SOURCE
 
 for my $input ( q{ (x) }, q{(x) }, q{ (x)})
 {
-    my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar2 }, );
-
-    my $length = length $input;
-    my $pos = $recce->read( \$input );
-
-    my $p_events = gather_events( $recce, $pos, $length );
+    my ($recce, $p_events) = gather_events( $grammar2, {}, $input );
     my $actual_events = join q{ }, map { $_->[0], $_->[-1] } @{$p_events};
     my $expected_events = $input;
     $expected_events =~ s/[(] [x]+ [)]/bracketed 0/xms;
@@ -145,12 +134,7 @@ for my $pattern (0 .. 15)
     # say join q{}, '^', @input, '$';
     my $input = join q{}, @input;
 
-    my $recce = Marpa::R3::Scanless::R->new( { grammar => $non_trivial_grammar }, );
-
-    my $length = length $input;
-    my $pos = $recce->read( \$input );
-
-    my $p_events = gather_events( $recce, $pos, $length );
+    my ($recce, $p_events) = gather_events( $non_trivial_grammar, {}, $input );
     my $actual_events = join q{ }, map { $_->[0], $_->[-1] } @{$p_events};
     my $expected_events = join q{ }, @expected;
     Test::More::is( $actual_events, $expected_events,
@@ -163,20 +147,28 @@ for my $pattern (0 .. 15)
 }
 
 sub gather_events {
-    my ($recce, $pos, $length) = @_;
+    my ( $grammar, $extra_recce_args, $input ) = @_;
     my @actual_events;
-    READ: while (1) {
+    my $recce = Marpa::R3::Scanless::R->new(
+        {
+            grammar        => $grammar,
+            event_handlers => {
+                "'default" => sub () {
+                    my ( $slr, @event ) = @_;
+                    push @actual_events, \@event;
+                    'ok';
+                }
+              }
 
-        EVENT:
-        for my $event ( @{ $recce->events() } ) {
-            my ( $name, @other_stuff ) = @{$event};
-            # say STDERR 'Event received!!! -- ', Data::Dumper::Dumper($event);
-            push @actual_events, $event;
-        }
-
-        last READ if $pos >= $length;
+        },
+        $extra_recce_args
+    );
+    my $length = length $input;
+    my $pos    = $recce->read( \$input );
+  READ: while ( $pos < $length ) {
         $pos = $recce->resume($pos);
-    } ## end READ: while (1)
-    return \@actual_events;
-} ## end sub gather_event
+    }
+    return $recce, \@actual_events;
+}
+
 # vim: expandtab shiftwidth=4:
