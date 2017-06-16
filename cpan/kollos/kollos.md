@@ -1039,7 +1039,9 @@ and eliminate the redundant ones.
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_slg.symbol_name(slg, xsyid)
-        return slg.xsys[xsyid]
+        local xsy = slg.xsys[xsyid]
+        if not xsy then return end
+        return xsy.name
     end
     function _M.class_slg.lmg_symbol_name(slg, symbol_id, subg_name)
         local subg = slg[subg_name]

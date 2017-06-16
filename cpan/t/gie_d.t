@@ -35,21 +35,19 @@ use Marpa::R3;
 # Marpa::R3::Display
 # name: event examples: grammar 1
 
-my $g = Marpa::R3::Scanless::G->new(
-    {
-        source => \<<'END_OF_DSL'
-        top ::= A B C
-        A ::= 'a'
-        B ::= 'b'
-        C ::= 'c'
-        event A = completed A
-        event B = completed B
-        event C = completed C
-        :discard ~ ws
-        ws ~ [\s]+
+my $dsl = <<'END_OF_DSL';
+    top ::= A B C
+    A ::= 'a'
+    B ::= 'b'
+    C ::= 'c'
+    event A = completed A
+    event B = completed B
+    event C = completed C
+    :discard ~ ws
+    ws ~ [\s]+
 END_OF_DSL
-    },
-);
+
+my $g = Marpa::R3::Scanless::G->new( { source => \$dsl } );
 
 # Marpa::R3::Display::End
 
@@ -166,7 +164,51 @@ Test::More::is( ( join q{ }, @results ), 'rejected', 'rejected' );
 $recce->read( \"a b c a" );
 Test::More::is( ( join q{ }, @results ), 'exhausted', 'exhausted' );
 
-## Data (using after lexeme)
+# Marpa::R3::Display
+# name: event examples: event with data
+
+$dsl = <<'END_OF_DSL';
+        top ::= A B C
+        A ~ 'a' B ~ 'b' C ~ 'c'
+        :lexeme ~ <A> pause => after event => 'A'
+        :lexeme ~ <B> pause => after event => 'B'
+        :lexeme ~ <C> pause => after event => 'C'
+        :discard ~ ws
+        ws ~ [\s]+
+END_OF_DSL
+
+$g = Marpa::R3::Scanless::G->new(
+    {
+        source => \$dsl,
+        rejection => 'event',
+        exhaustion => 'event',
+    },
+);
+
+@results = ();
+$recce = Marpa::R3::Scanless::R->new(
+    {
+        grammar        => $g,
+        event_handlers => {
+            "'default" => sub () {
+                my ( $slr, $event_name, $symid, $start, $length ) = @_;
+                my $symbol_name = $g->symbol_name($symid);
+                push @results,
+                    "event $event_name for symbol $symbol_name at location $start, length=$length";
+                'ok';
+            },
+        }
+    }
+);
+
+# Marpa::R3::Display::End
+
+$recce->read( \"a b c" );
+Test::More::is( ( join qq{\n}, @results, q{} ), <<'END_OF_EXPECTED', 'event with data' );
+event A for symbol A at location 0, length=1
+event B for symbol B at location 2, length=1
+event C for symbol C at location 4, length=1
+END_OF_EXPECTED
 
 ## Data using factory
 
