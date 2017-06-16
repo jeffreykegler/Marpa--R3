@@ -121,9 +121,50 @@ $recce = Marpa::R3::Scanless::R->new(
 $recce->read( \"a b c" );
 Test::More::is( ( join q{ }, @results ), 'A !A=B !A=C', 'example 1' );
 
-## Basic (with default)
+sub make_recce() {
 
-## Rejected, Exhausted
+# Marpa::R3::Display
+# name: event examples: rejected and exhausted
+
+my $dsl = <<'END_OF_DSL';
+        top ::= A B C
+        A ::= 'a'
+        B ::= 'b'
+        C ::= 'c'
+        :discard ~ ws
+        ws ~ [\s]+
+END_OF_DSL
+
+my $g = Marpa::R3::Scanless::G->new(
+    {
+        source => \$dsl,
+        rejection => 'event',
+        exhaustion => 'event',
+    },
+);
+
+@results = ();
+$recce = Marpa::R3::Scanless::R->new(
+    {
+        grammar        => $g,
+        event_handlers => {
+            "'rejected" => sub () { @results = ('rejected'); 'pause' },
+            "'exhausted" => sub () { @results = ('exhausted'); 'pause' },
+        }
+    }
+);
+
+# Marpa::R3::Display::End
+
+   return $recce, \@results;
+}
+
+($recce, @results) = make_recce();
+$recce->read( \"a a a" );
+Test::More::is( ( join q{ }, @results ), 'rejected', 'rejected' );
+($recce, @results) = make_recce();
+$recce->read( \"a b c a" );
+Test::More::is( ( join q{ }, @results ), 'exhausted', 'exhausted' );
 
 ## Data (using after lexeme)
 
