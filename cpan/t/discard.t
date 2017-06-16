@@ -82,25 +82,24 @@ my $output_re =
 
 
     my $length = length $input;
-    my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
+    my @events = ();
+    my $recce = Marpa::R3::Scanless::R->new(
+        {
+            grammar        => $grammar,
+            event_handlers => {
+                "'default" => sub () {
+                    my ( $slr, @event ) = @_;
+                    push @events, \@event;
+                    'ok';
+                }
+            }
+        }
+    );
 
     my $pos = $recce->read(\$input);
-
-    my @events = ();
-    READ: while (1) {
-
-        my @actual_events = ();
-
-        EVENT:
-        for my $event ( @{ $recce->events() } ) {
-            my ( $name, @other_stuff ) = @{$event};
-            # say STDERR 'Event received!!! -- ', Data::Dumper::Dumper($event);
-            push @events, $event;
-        }
-
-        last READ if $pos >= $length;
+    READ: while ( $pos < $length ) {
         $pos = $recce->resume($pos);
-    } ## end READ: while (1)
+    }
 
     my $value_ref = $recce->value();
     if ( not defined $value_ref ) {
