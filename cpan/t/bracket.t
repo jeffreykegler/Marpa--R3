@@ -181,8 +181,20 @@ sub test {
     # state $recce_debug_args = { trace_terminals => 1, trace_values => 1 };
     state $recce_debug_args = {};
 
+    my $rejection_is_fatal = undef;
+    my $rejection = undef;
+
     my $recce = Marpa::R3::Scanless::R->new(
-        {   grammar => $g,
+        {
+            grammar        => $g,
+            event_handlers => {
+                "'rejected" => sub () {
+                    die "Rejection at end of string"
+                      if $rejection_is_fatal;
+                    $rejection = 1;
+                    'pause';
+                }
+            }
         },
         $recce_debug_args
     );
@@ -193,20 +205,6 @@ sub test {
     # For the entire input string ...
     READ: while ( $pos < $input_length ) {
 
-        # Check if we stopped due to a rejection event.
-        # Any other event is an error.
-        my $rejection = 0;
-        EVENT:
-        for my $event ( @{ $recce->events() } ) {
-            my ($name) = @{$event};
-            if ( $name eq q{'rejected} ) {
-                $rejection = 1;
-                next EVENT;
-            }
-            die join q{ }, "Spurious event at position $pos: '$name'";
-        } ## end EVENT: for my $event ( @{ $recce->events() } )
-
-        # No rejection event?
         # Then just start up again
         if ( not $rejection ) {
 
@@ -215,6 +213,7 @@ sub test {
             next READ;
 
         } ## end if ( not $rejection )
+        $rejection = undef;
 
         # If here, we rejected the next input token
 
@@ -353,18 +352,7 @@ sub test {
         # And for efficiency purposes, this is a kind of "hand-unrolling"
         # of a loop, with optimization of the code.
 
-        my $rejection = 0;
-        EVENT:
-        for my $event ( @{ $recce->events() } ) {
-            my ($name) = @{$event};
-            if ( $name eq q{'rejected} ) {
-                $rejection = 1;
-                next EVENT;
-            }
-            die join q{ }, "Spurious event at position $pos: '$name'";
-        } ## end EVENT: for my $event ( @{ $recce->events() } )
-
-        die "Rejection at end of string" if $rejection;
+        $rejection_is_fatal = 1;
 
         my @expected = @{ $recce->terminals_expected() };
 

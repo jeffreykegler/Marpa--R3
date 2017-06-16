@@ -63,20 +63,24 @@ sub show_last_subtext {
 sub do_test {
     my ( $grammar, $string, $expected_events ) = @_;
     my @actual_events;
-    my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
+    my $recce = Marpa::R3::Scanless::R->new(
+        {
+            grammar        => $grammar,
+            event_handlers => {
+                "'default" => sub () { 'ok' },
+                "subtext"  => sub () {
+                    my ($recce) = @_;
+                    push @actual_events, show_last_subtext($recce);
+                    'ok';
+                }
+            }
+        }
+    );
     my $length = length $string;
     my $pos    = $recce->read( \$string );
-  READ: while (1) {
-
-      EVENT: for my $event ( @{ $recce->events() } ) {
-            my ($name) = @{$event};
-            next EVENT if $name ne 'subtext';
-            push @actual_events, show_last_subtext($recce);
-        }
-
-        last READ if $pos >= $length;
+    while ( $pos < $length ) {
         $pos = $recce->resume($pos);
-    } ## end READ: while (1)
+    }
     my $value_ref = $recce->value();
     if ( not defined $value_ref ) {
         die "No parse\n";
@@ -85,7 +89,7 @@ sub do_test {
     Test::More::is( $actual_value, q{1792}, qq{Value for "$string"} );
     Test::More::is_deeply( \@actual_events, $expected_events,
         qq{Events for "$string"} );
-} ## end sub do_test
+}
 
 sub My_Actions::OK { return 1792 };
 
