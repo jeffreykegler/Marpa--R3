@@ -266,9 +266,9 @@ name: SLIF debug example error message
 partial: 1
 normalize-whitespace: 1
 
-    Error in SLIF parse: No lexeme found at line 1, column 18
+    Error in SLIF parse: No lexeme found at B1L1c18
     * String before error: a = 8675309 + 42\s
-    * The error was at line 1, column 18, and at character U+002a "*", ...
+    * The error was at B1L1c18, and at character U+002a "*", ...
     * here: * 711
 
 =for Marpa::R3::Display::End
@@ -1004,9 +1004,9 @@ partial: 1
 remove-display-indent: 1
 remove-blank-last-line: 1
 
-    Error in SLIF parse: No lexeme found at line 1, column 18
+    Error in SLIF parse: No lexeme found at B1L1c18
     * String before error: a = 8675309 + 42\s
-    * The error was at line 1, column 18, and at character U+002a "*", ...
+    * The error was at B1L1c18, and at character U+002a "*", ...
     * here: * 711
 
 =for Marpa::R3::Display::End
@@ -1054,116 +1054,116 @@ remove-blank-last-line: 1
 
     Setting trace_terminals option
     Setting trace_values option to 1
-    Restarted recognizer at line 1, column 1
-    Reading codepoint "a" 0x0061 at line 1, column 1
-    Codepoint "a" 0x0061 accepted as [\w] at line 1, column 1
-    Codepoint "a" 0x0061 rejected as [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] at line 1, column 1
-    Reading codepoint 0x0020 at line 1, column 2
-    Codepoint 0x0020 rejected as [\s] at line 1, column 2
-    Codepoint 0x0020 rejected as [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] at line 1, column 2
+    Restarted recognizer at B1L1c1
+    Reading codepoint "a" 0x0061 at B1L1c1
+    Codepoint "a" 0x0061 accepted as [\w] at B1L1c1
+    Codepoint "a" 0x0061 rejected as [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] at B1L1c1
+    Reading codepoint " " 0x0020 at B1L1c2
+    Codepoint " " 0x0020 rejected as [\s] at B1L1c2
+    Codepoint " " 0x0020 rejected as [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] at B1L1c2
     Accepted lexeme B1L1c1 e1: variable; value="a"
-    Restarted recognizer at line 1, column 2
-    Reading codepoint 0x0020 at line 1, column 2
-    Codepoint 0x0020 accepted as [\s] at line 1, column 2
-    Codepoint 0x0020 rejected as [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] at line 1, column 2
-    Reading codepoint "=" 0x003d at line 1, column 3
-    Codepoint "=" 0x003d rejected as [\=] at line 1, column 3
-    Codepoint "=" 0x003d rejected as [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] at line 1, column 3
+    Restarted recognizer at B1L1c2
+    Reading codepoint " " 0x0020 at B1L1c2
+    Codepoint " " 0x0020 accepted as [\s] at B1L1c2
+    Codepoint " " 0x0020 rejected as [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] at B1L1c2
+    Reading codepoint "=" 0x003d at B1L1c3
+    Codepoint "=" 0x003d rejected as [\=] at B1L1c3
+    Codepoint "=" 0x003d rejected as [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] at B1L1c3
     Discarded lexeme B1L1c2: whitespace
-    Restarted recognizer at line 1, column 3
-    Reading codepoint "=" 0x003d at line 1, column 3
-    Codepoint "=" 0x003d accepted as [\=] at line 1, column 3
-    Codepoint "=" 0x003d rejected as [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] at line 1, column 3
+    Restarted recognizer at B1L1c3
+    Reading codepoint "=" 0x003d at B1L1c3
+    Codepoint "=" 0x003d accepted as [\=] at B1L1c3
+    Codepoint "=" 0x003d rejected as [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] at B1L1c3
     Accepted lexeme B1L1c3 e2: '='; value="="
-    Restarted recognizer at line 1, column 4
-    Reading codepoint 0x0020 at line 1, column 4
-    Codepoint 0x0020 accepted as [\s] at line 1, column 4
-    Codepoint 0x0020 rejected as [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] at line 1, column 4
-    Reading codepoint "8" 0x0038 at line 1, column 5
-    Codepoint "8" 0x0038 rejected as [\d] at line 1, column 5
-    Codepoint "8" 0x0038 rejected as [\w] at line 1, column 5
-    Codepoint "8" 0x0038 rejected as [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] at line 1, column 5
+    Restarted recognizer at B1L1c4
+    Reading codepoint " " 0x0020 at B1L1c4
+    Codepoint " " 0x0020 accepted as [\s] at B1L1c4
+    Codepoint " " 0x0020 rejected as [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] at B1L1c4
+    Reading codepoint "8" 0x0038 at B1L1c5
+    Codepoint "8" 0x0038 rejected as [\d] at B1L1c5
+    Codepoint "8" 0x0038 rejected as [\w] at B1L1c5
+    Codepoint "8" 0x0038 rejected as [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] at B1L1c5
     Discarded lexeme B1L1c4: whitespace
-    Restarted recognizer at line 1, column 5
-    Reading codepoint "8" 0x0038 at line 1, column 5
-    Codepoint "8" 0x0038 rejected as [\d] at line 1, column 5
-    Codepoint "8" 0x0038 accepted as [\w] at line 1, column 5
-    Codepoint "8" 0x0038 rejected as [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] at line 1, column 5
-    Reading codepoint "6" 0x0036 at line 1, column 6
-    Codepoint "6" 0x0036 rejected as [\d] at line 1, column 6
-    Codepoint "6" 0x0036 accepted as [\w] at line 1, column 6
-    Codepoint "6" 0x0036 rejected as [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] at line 1, column 6
-    Reading codepoint "7" 0x0037 at line 1, column 7
-    Codepoint "7" 0x0037 rejected as [\d] at line 1, column 7
-    Codepoint "7" 0x0037 accepted as [\w] at line 1, column 7
-    Codepoint "7" 0x0037 rejected as [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] at line 1, column 7
-    Reading codepoint "5" 0x0035 at line 1, column 8
-    Codepoint "5" 0x0035 rejected as [\d] at line 1, column 8
-    Codepoint "5" 0x0035 accepted as [\w] at line 1, column 8
-    Codepoint "5" 0x0035 rejected as [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] at line 1, column 8
-    Reading codepoint "3" 0x0033 at line 1, column 9
-    Codepoint "3" 0x0033 rejected as [\d] at line 1, column 9
-    Codepoint "3" 0x0033 accepted as [\w] at line 1, column 9
-    Codepoint "3" 0x0033 rejected as [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] at line 1, column 9
-    Reading codepoint "0" 0x0030 at line 1, column 10
-    Codepoint "0" 0x0030 rejected as [\d] at line 1, column 10
-    Codepoint "0" 0x0030 accepted as [\w] at line 1, column 10
-    Codepoint "0" 0x0030 rejected as [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] at line 1, column 10
-    Reading codepoint "9" 0x0039 at line 1, column 11
-    Codepoint "9" 0x0039 rejected as [\d] at line 1, column 11
-    Codepoint "9" 0x0039 accepted as [\w] at line 1, column 11
-    Codepoint "9" 0x0039 rejected as [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] at line 1, column 11
-    Reading codepoint 0x0020 at line 1, column 12
-    Codepoint 0x0020 rejected as [\s] at line 1, column 12
-    Codepoint 0x0020 rejected as [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] at line 1, column 12
+    Restarted recognizer at B1L1c5
+    Reading codepoint "8" 0x0038 at B1L1c5
+    Codepoint "8" 0x0038 rejected as [\d] at B1L1c5
+    Codepoint "8" 0x0038 accepted as [\w] at B1L1c5
+    Codepoint "8" 0x0038 rejected as [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] at B1L1c5
+    Reading codepoint "6" 0x0036 at B1L1c6
+    Codepoint "6" 0x0036 rejected as [\d] at B1L1c6
+    Codepoint "6" 0x0036 accepted as [\w] at B1L1c6
+    Codepoint "6" 0x0036 rejected as [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] at B1L1c6
+    Reading codepoint "7" 0x0037 at B1L1c7
+    Codepoint "7" 0x0037 rejected as [\d] at B1L1c7
+    Codepoint "7" 0x0037 accepted as [\w] at B1L1c7
+    Codepoint "7" 0x0037 rejected as [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] at B1L1c7
+    Reading codepoint "5" 0x0035 at B1L1c8
+    Codepoint "5" 0x0035 rejected as [\d] at B1L1c8
+    Codepoint "5" 0x0035 accepted as [\w] at B1L1c8
+    Codepoint "5" 0x0035 rejected as [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] at B1L1c8
+    Reading codepoint "3" 0x0033 at B1L1c9
+    Codepoint "3" 0x0033 rejected as [\d] at B1L1c9
+    Codepoint "3" 0x0033 accepted as [\w] at B1L1c9
+    Codepoint "3" 0x0033 rejected as [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] at B1L1c9
+    Reading codepoint "0" 0x0030 at B1L1c10
+    Codepoint "0" 0x0030 rejected as [\d] at B1L1c10
+    Codepoint "0" 0x0030 accepted as [\w] at B1L1c10
+    Codepoint "0" 0x0030 rejected as [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] at B1L1c10
+    Reading codepoint "9" 0x0039 at B1L1c11
+    Codepoint "9" 0x0039 rejected as [\d] at B1L1c11
+    Codepoint "9" 0x0039 accepted as [\w] at B1L1c11
+    Codepoint "9" 0x0039 rejected as [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] at B1L1c11
+    Reading codepoint " " 0x0020 at B1L1c12
+    Codepoint " " 0x0020 rejected as [\s] at B1L1c12
+    Codepoint " " 0x0020 rejected as [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] at B1L1c12
     Accepted lexeme B1L1c5-11 e3: variable; value="8675309"
-    Restarted recognizer at line 1, column 12
-    Reading codepoint 0x0020 at line 1, column 12
-    Codepoint 0x0020 accepted as [\s] at line 1, column 12
-    Codepoint 0x0020 rejected as [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] at line 1, column 12
-    Reading codepoint "+" 0x002b at line 1, column 13
-    Codepoint "+" 0x002b rejected as [\+] at line 1, column 13
-    Codepoint "+" 0x002b rejected as [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] at line 1, column 13
+    Restarted recognizer at B1L1c12
+    Reading codepoint " " 0x0020 at B1L1c12
+    Codepoint " " 0x0020 accepted as [\s] at B1L1c12
+    Codepoint " " 0x0020 rejected as [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] at B1L1c12
+    Reading codepoint "+" 0x002b at B1L1c13
+    Codepoint "+" 0x002b rejected as [\+] at B1L1c13
+    Codepoint "+" 0x002b rejected as [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] at B1L1c13
     Discarded lexeme B1L1c12: whitespace
-    Restarted recognizer at line 1, column 13
-    Reading codepoint "+" 0x002b at line 1, column 13
-    Codepoint "+" 0x002b accepted as [\+] at line 1, column 13
-    Codepoint "+" 0x002b rejected as [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] at line 1, column 13
+    Restarted recognizer at B1L1c13
+    Reading codepoint "+" 0x002b at B1L1c13
+    Codepoint "+" 0x002b accepted as [\+] at B1L1c13
+    Codepoint "+" 0x002b rejected as [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] at B1L1c13
     Accepted lexeme B1L1c13 e4: '+'; value="+"
-    Restarted recognizer at line 1, column 14
-    Reading codepoint 0x0020 at line 1, column 14
-    Codepoint 0x0020 accepted as [\s] at line 1, column 14
-    Codepoint 0x0020 rejected as [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] at line 1, column 14
-    Reading codepoint "4" 0x0034 at line 1, column 15
-    Codepoint "4" 0x0034 rejected as [\d] at line 1, column 15
-    Codepoint "4" 0x0034 rejected as [\w] at line 1, column 15
-    Codepoint "4" 0x0034 rejected as [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] at line 1, column 15
+    Restarted recognizer at B1L1c14
+    Reading codepoint " " 0x0020 at B1L1c14
+    Codepoint " " 0x0020 accepted as [\s] at B1L1c14
+    Codepoint " " 0x0020 rejected as [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] at B1L1c14
+    Reading codepoint "4" 0x0034 at B1L1c15
+    Codepoint "4" 0x0034 rejected as [\d] at B1L1c15
+    Codepoint "4" 0x0034 rejected as [\w] at B1L1c15
+    Codepoint "4" 0x0034 rejected as [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] at B1L1c15
     Discarded lexeme B1L1c14: whitespace
-    Restarted recognizer at line 1, column 15
-    Reading codepoint "4" 0x0034 at line 1, column 15
-    Codepoint "4" 0x0034 rejected as [\d] at line 1, column 15
-    Codepoint "4" 0x0034 accepted as [\w] at line 1, column 15
-    Codepoint "4" 0x0034 rejected as [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] at line 1, column 15
-    Reading codepoint "2" 0x0032 at line 1, column 16
-    Codepoint "2" 0x0032 rejected as [\d] at line 1, column 16
-    Codepoint "2" 0x0032 accepted as [\w] at line 1, column 16
-    Codepoint "2" 0x0032 rejected as [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] at line 1, column 16
-    Reading codepoint 0x0020 at line 1, column 17
-    Codepoint 0x0020 rejected as [\s] at line 1, column 17
-    Codepoint 0x0020 rejected as [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] at line 1, column 17
+    Restarted recognizer at B1L1c15
+    Reading codepoint "4" 0x0034 at B1L1c15
+    Codepoint "4" 0x0034 rejected as [\d] at B1L1c15
+    Codepoint "4" 0x0034 accepted as [\w] at B1L1c15
+    Codepoint "4" 0x0034 rejected as [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] at B1L1c15
+    Reading codepoint "2" 0x0032 at B1L1c16
+    Codepoint "2" 0x0032 rejected as [\d] at B1L1c16
+    Codepoint "2" 0x0032 accepted as [\w] at B1L1c16
+    Codepoint "2" 0x0032 rejected as [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] at B1L1c16
+    Reading codepoint " " 0x0020 at B1L1c17
+    Codepoint " " 0x0020 rejected as [\s] at B1L1c17
+    Codepoint " " 0x0020 rejected as [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] at B1L1c17
     Accepted lexeme B1L1c15-16 e5: variable; value="42"
-    Restarted recognizer at line 1, column 17
-    Reading codepoint 0x0020 at line 1, column 17
-    Codepoint 0x0020 accepted as [\s] at line 1, column 17
-    Codepoint 0x0020 rejected as [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] at line 1, column 17
-    Reading codepoint "*" 0x002a at line 1, column 18
-    Codepoint "*" 0x002a rejected as [\*] at line 1, column 18
-    Codepoint "*" 0x002a rejected as [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] at line 1, column 18
+    Restarted recognizer at B1L1c17
+    Reading codepoint " " 0x0020 at B1L1c17
+    Codepoint " " 0x0020 accepted as [\s] at B1L1c17
+    Codepoint " " 0x0020 rejected as [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] at B1L1c17
+    Reading codepoint "*" 0x002a at B1L1c18
+    Codepoint "*" 0x002a rejected as [\*] at B1L1c18
+    Codepoint "*" 0x002a rejected as [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] at B1L1c18
     Discarded lexeme B1L1c17: whitespace
-    Restarted recognizer at line 1, column 18
-    Reading codepoint "*" 0x002a at line 1, column 18
-    Codepoint "*" 0x002a rejected as [\*] at line 1, column 18
-    Codepoint "*" 0x002a rejected as [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] at line 1, column 18
+    Restarted recognizer at B1L1c18
+    Reading codepoint "*" 0x002a at B1L1c18
+    Codepoint "*" 0x002a rejected as [\*] at B1L1c18
+    Codepoint "*" 0x002a rejected as [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] at B1L1c18
 
 =for Marpa::R3::Display::End
 

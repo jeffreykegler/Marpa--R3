@@ -304,21 +304,21 @@ sub parse {
 # Marpa::R3::Display
 # name: SLIF read/resume example
 
-    my $re = Marpa::R3::Scanless::R->new( { grammar => $parser->{grammar} } );
+    my $recce = Marpa::R3::Scanless::R->new( { grammar => $parser->{grammar} } );
     my $length = length $string;
     for (
-        my $pos = $re->read( \$string );
+        my $pos = $recce->read( \$string );
         $pos < $length;
-        $pos = $re->resume()
+        $pos = $recce->resume()
         )
     {
-        my ( $start, $length ) = $re->pause_span();
+        my ( $start, $length ) = $recce->pause_span();
         my $value = substr $string, $start + 1, $length - 2;
         $value = decode_string($value) if -1 != index $value, '\\';
-        $re->lexeme_read( 'lstring', $start, $length, $value ) // die;
-    } ## end for ( my $pos = $re->read( \$string ); $pos < $length...)
+        $recce->lexeme_read( 'lstring', $start, $length, $value ) // die;
+    } ## end for ( my $pos = $recce->read( \$string ); $pos < $length...)
     my $per_parse_arg = bless {}, 'MarpaX::JSON::Actions';
-    my $value_ref = $re->value($per_parse_arg);
+    my $value_ref = $recce->value($per_parse_arg);
     return ${$value_ref};
 
 # Marpa::R3::Display::End

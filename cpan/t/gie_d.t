@@ -33,7 +33,7 @@ use Marpa::R3::Test;
 use Marpa::R3;
 
 # Marpa::R3::Display
-# name: event examples: grammar 1
+# name: event examples; grammar 1
 
 my $dsl1 = <<'END_OF_DSL';
     top ::= A B C
@@ -55,7 +55,7 @@ my @results = ();
 my $recce;
 
 # Marpa::R3::Display
-# name: event examples: basic
+# name: event examples; basic
 
 @results = ();
 $recce   = Marpa::R3::Scanless::R->new(
@@ -75,7 +75,7 @@ $recce->read( \"a b c" );
 Test::More::is( ( join q{ }, @results ), 'A B C', 'example 1' );
 
 # Marpa::R3::Display
-# name: event examples: default
+# name: event examples; default
 
 @results = ();
 $recce = Marpa::R3::Scanless::R->new(
@@ -97,7 +97,7 @@ $recce->read( \"a b c" );
 Test::More::is( ( join q{ }, @results ), 'A B C', 'example 1' );
 
 # Marpa::R3::Display
-# name: event examples: default and explicit
+# name: event examples - default and explicit
 
 @results = ();
 $recce = Marpa::R3::Scanless::R->new(
@@ -122,7 +122,7 @@ Test::More::is( ( join q{ }, @results ), 'A !A=B !A=C', 'example 1' );
 sub make_recce() {
 
 # Marpa::R3::Display
-# name: event examples: rejected and exhausted
+# name: event examples - rejected and exhausted
 
 my $dsl2 = <<'END_OF_DSL';
         top ::= A B C
@@ -165,7 +165,7 @@ $recce->read( \"a b c a" );
 Test::More::is( ( join q{ }, @results ), 'exhausted', 'exhausted' );
 
 # Marpa::R3::Display
-# name: event examples: event with data
+# name: event examples - event with data
 
 my $dsl3 = <<'END_OF_DSL';
         top ::= A B C
@@ -213,7 +213,7 @@ END_OF_EXPECTED
 ## Data using factory
 
 # Marpa::R3::Display
-# name: event examples: data, using factory
+# name: event examples - data, using factory
 
 @results = ();
 my $A_global = 'A';
@@ -254,7 +254,7 @@ Test::More::is( ( join q{ }, @results ), 'A B C', 'data, using factory' );
 ## Per-location processing, using pause
 
 # Marpa::R3::Display
-# name: event examples: event with data
+# name: event examples - event with data
 
 my $dsl4 = <<'END_OF_DSL';
         top ::= A B C
@@ -321,7 +321,7 @@ END_OF_TEXT
 
 ## Per-location processing, using array
 # Marpa::R3::Display
-# name: event examples: per-location processing, using array
+# name: event examples - per-location processing, using array
 
 @results = ();
 $recce = Marpa::R3::Scanless::R->new(

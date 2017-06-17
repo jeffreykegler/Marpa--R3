@@ -1690,6 +1690,7 @@ sub Marpa::R3::Scanless::G::l0_rule_expand {
     return $slg->l0_irl_isyids($rule_id);
 }
 
+# TODO: Document this!
 sub Marpa::R3::Scanless::G::symbol_name {
     my ( $slg, $symbol_id ) = @_;
     my ($symbol_name) = $slg->call_by_tag(
@@ -1703,6 +1704,9 @@ END_OF_LUA
 
 }
 
+# TODO: Census all uses of Marpa::R3::Scanless::G::g1_symbol_name
+# in pod and tests, and make sure that they are appropriate --
+# that is, that they should not be symbol_name() instead.
 sub Marpa::R3::Scanless::G::g1_symbol_name {
     my ( $slg, $symbol_id ) = @_;
     $symbol_id += 0;

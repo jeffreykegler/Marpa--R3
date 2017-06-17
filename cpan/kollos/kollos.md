@@ -3291,7 +3291,7 @@ It is designed to be convenient for use as a tail call.
       return _M.userX(string.format(
              "Error in SLIF parse: %s\n\z
               * String before error: %s\n\z
-              * The error was at %s and at character %s, ...\n\z
+              * The error was at %s, and at character %s, ...\n\z
               * here: %s\n",
               desc,
               slr:reversed_input_escape(block_ix, pos, 50),

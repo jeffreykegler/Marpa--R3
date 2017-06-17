@@ -465,24 +465,21 @@ Returns a list of the L0 grammar symbol ID's as an array.
 =head2 symbol_name()
 
 =for Marpa::R3::Display
-name: SLG symbol_name() synopsis
+name: SLG g1_symbol_name() synopsis
 
-    my $name = $grammar->symbol_name($symbol_id);
+    my $name = $grammar->g1_symbol_name($symbol_id);
     $text .= "symbol number: $symbol_id  name: $name\n";
 
 =for Marpa::R3::Display::End
 
 The first and only argument, which is required, is a G1 grammar
-symbol ID.
+ISY ID.
 The return value is the name of the symbol, if the symbol exists,
 and a Perl C<undef> if the symbol does not exist.
 
-For every symbol ID, this method's return value will be defined
-and will be unique to that symbol ID,
-so that it is suitable for use as a symbol name.
-If the SLIF DSL explicitly specifies a name,
-the return value is that explicitly specified name.
-Otherwise, the return value is an internal name,
+For every ISY ID, this method's return value will be defined
+and will be unique to that symbol ID.
+The return value may be an internal name,
 which is subject to change in future versions of Marpa::R3.
 
 =head2 l0_symbol_name()
