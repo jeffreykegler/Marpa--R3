@@ -35,7 +35,7 @@ use Marpa::R3;
 # Marpa::R3::Display
 # name: event examples: grammar 1
 
-my $dsl = <<'END_OF_DSL';
+my $dsl1 = <<'END_OF_DSL';
     top ::= A B C
     A ::= 'a'
     B ::= 'b'
@@ -47,7 +47,7 @@ my $dsl = <<'END_OF_DSL';
     ws ~ [\s]+
 END_OF_DSL
 
-my $g = Marpa::R3::Scanless::G->new( { source => \$dsl } );
+my $grammar1 = Marpa::R3::Scanless::G->new( { source => \$dsl1 } );
 
 # Marpa::R3::Display::End
 
@@ -60,7 +60,7 @@ my $recce;
 @results = ();
 $recce   = Marpa::R3::Scanless::R->new(
     {
-        grammar        => $g,
+        grammar        => $grammar1,
         event_handlers => {
             A => sub () { push @results, 'A'; 'ok' },
             B => sub () { push @results, 'B'; 'ok' },
@@ -80,7 +80,7 @@ Test::More::is( ( join q{ }, @results ), 'A B C', 'example 1' );
 @results = ();
 $recce = Marpa::R3::Scanless::R->new(
     {
-        grammar        => $g,
+        grammar        => $grammar1,
         event_handlers => {
             "'default" => sub () {
                 my ( $slr, $event_name ) = @_;
@@ -102,7 +102,7 @@ Test::More::is( ( join q{ }, @results ), 'A B C', 'example 1' );
 @results = ();
 $recce = Marpa::R3::Scanless::R->new(
     {
-        grammar        => $g,
+        grammar        => $grammar1,
         event_handlers => {
             A => sub () { push @results, 'A'; 'ok' },
             "'default" => sub () {
@@ -124,7 +124,7 @@ sub make_recce() {
 # Marpa::R3::Display
 # name: event examples: rejected and exhausted
 
-my $dsl = <<'END_OF_DSL';
+my $dsl2 = <<'END_OF_DSL';
         top ::= A B C
         A ::= 'a'
         B ::= 'b'
@@ -133,9 +133,9 @@ my $dsl = <<'END_OF_DSL';
         ws ~ [\s]+
 END_OF_DSL
 
-my $g = Marpa::R3::Scanless::G->new(
+my $grammar2 = Marpa::R3::Scanless::G->new(
     {
-        source => \$dsl,
+        source => \$dsl2,
         rejection => 'event',
         exhaustion => 'event',
     },
@@ -144,7 +144,7 @@ my $g = Marpa::R3::Scanless::G->new(
 @results = ();
 $recce = Marpa::R3::Scanless::R->new(
     {
-        grammar        => $g,
+        grammar        => $grammar2,
         event_handlers => {
             "'rejected" => sub () { @results = ('rejected'); 'pause' },
             "'exhausted" => sub () { @results = ('exhausted'); 'pause' },
@@ -167,7 +167,7 @@ Test::More::is( ( join q{ }, @results ), 'exhausted', 'exhausted' );
 # Marpa::R3::Display
 # name: event examples: event with data
 
-$dsl = <<'END_OF_DSL';
+my $dsl3 = <<'END_OF_DSL';
         top ::= A B C
         A ~ 'a' B ~ 'b' C ~ 'c'
         :lexeme ~ <A> pause => after event => 'A'
@@ -177,9 +177,9 @@ $dsl = <<'END_OF_DSL';
         ws ~ [\s]+
 END_OF_DSL
 
-$g = Marpa::R3::Scanless::G->new(
+my $grammar3 = Marpa::R3::Scanless::G->new(
     {
-        source => \$dsl,
+        source => \$dsl3,
         rejection => 'event',
         exhaustion => 'event',
     },
@@ -188,11 +188,11 @@ $g = Marpa::R3::Scanless::G->new(
 @results = ();
 $recce = Marpa::R3::Scanless::R->new(
     {
-        grammar        => $g,
+        grammar        => $grammar3,
         event_handlers => {
             "'default" => sub () {
                 my ( $slr, $event_name, $symid, $start, $length ) = @_;
-                my $symbol_name = $g->symbol_name($symid);
+                my $symbol_name = $grammar3->symbol_name($symid);
                 push @results,
                     "event $event_name for symbol $symbol_name at location $start, length=$length";
                 'ok';
@@ -211,6 +211,45 @@ event C for symbol C at location 4, length=1
 END_OF_EXPECTED
 
 ## Data using factory
+
+# Marpa::R3::Display
+# name: event examples: data, using factory
+
+@results = ();
+my $A_global = 'A';
+
+sub factory {
+    my ($local_arg) = @_;
+    my $B_non_local = 'B';
+    return sub () {
+       my ($slr, $event_name) = @_;
+       my $result;
+       $result = $A_global if $event_name eq 'A';
+       $result = $B_non_local if $event_name eq 'B';
+       $result = $local_arg if $event_name eq 'C';
+       push @results, $result;
+       'ok';
+    }
+}
+
+
+sub example_closure {
+    my $C_local = 'C';
+    return Marpa::R3::Scanless::R->new(
+        {
+            grammar        => $grammar1,
+            event_handlers => {
+                "'default" => factory($C_local),
+            }
+        }
+    );
+}
+
+# Marpa::R3::Display::End
+
+$recce = example_closure();
+$recce->read( \"a b c" );
+Test::More::is( ( join q{ }, @results ), 'A B C', 'data, using factory' );
 
 ## Per-location processing, using pause
 
