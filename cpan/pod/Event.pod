@@ -20,43 +20,44 @@ name: SLIF Event synopsis
 normalize-whitespace: 1
 partial: 1
 
+    my @events = ();
+    my @event_history = ();
+    my $next_lexeme;
+
+    my $slr = Marpa::R3::Scanless::R->new( { grammar => $grammar,
+        event_handlers => {
+            "'default" => sub () {
+                my ($slr, $event_name) = @_;
+                if ($event_name eq 'insert d') {
+                   my (undef, $length) = $slr->pause_span();
+                   $next_lexeme = ['real d', undef, $length];
+                }
+                push @events, $event_name;
+                'pause';
+            }
+        }
+    } );
+
+    push @event_history, join q{ }, "Events at position 0:", sort @events
+       if @events;
+    @events = ();
+
     my $input = q{a b c "insert d here" e e f h};
     my $length = length $input;
     my $pos    = $slr->read( \$input );
 
-    my $actual_events = q{};
-
     READ: while (1) {
 
-        my @actual_events = ();
+        push @event_history, join q{ }, "Events at position $pos:", sort @events
+           if @events;
+        @events = ();
 
-        my $next_lexeme;
-        EVENT:
-        for my $event ( @{ $slr->events() } ) {
-            my ($name) = @{$event};
-
-=for Marpa::R3::Display::End
-
-=for Marpa::R3::Display
-name: SLIF Event synopsis
-normalize-whitespace: 1
-partial: 1
-
-            push @actual_events, $name;
+        if ($next_lexeme) {
+            $slr->lexeme_read(@{$next_lexeme});
+            $pos = $slr->pos();
+            $next_lexeme = undef;
+            next READ;
         }
-
-        if (@actual_events) {
-            $actual_events .= join q{ }, "Events at position $pos:", sort @actual_events;
-            $actual_events .= "\n";
-        }
-
-=for Marpa::R3::Display::End
-
-=for Marpa::R3::Display
-name: SLIF Event synopsis
-normalize-whitespace: 1
-partial: 1
-
         if ($pos < $length) {
             $pos = $slr->resume();
             next READ;
@@ -1241,12 +1242,15 @@ C<< $slr->lexeme_read() >> methods.
 
 =head1 An example
 
+=head1 A messy example
+
 The SLIF DSL in this example
 is designed to
 include the unusual and "corner"
 cases described in this document.
-It is not like any grammar that you are likely
-to encounter in normal practice.
+It will not resemble any grammar that you
+encounter in normal practice --
+or at least one hopes not.
 
 =for Marpa::R3::Display
 name: SLIF Event synopsis
@@ -1324,44 +1328,49 @@ normalize-whitespace: 1
     whitespace ~ [\s]+
     END_OF_DSL
 
-
     my $grammar = Marpa::R3::Scanless::G->new(
         {
             source            => \$dsl,
             semantics_package => 'My_Actions'
         }
     );
-    my $slr = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
+
+    my @events = ();
+    my @event_history = ();
+    my $next_lexeme;
+
+    my $slr = Marpa::R3::Scanless::R->new( { grammar => $grammar,
+        event_handlers => {
+            "'default" => sub () {
+                my ($slr, $event_name) = @_;
+                if ($event_name eq 'insert d') {
+                   my (undef, $length) = $slr->pause_span();
+                   $next_lexeme = ['real d', undef, $length];
+                }
+                push @events, $event_name;
+                'pause';
+            }
+        }
+    } );
+
+    push @event_history, join q{ }, "Events at position 0:", sort @events
+       if @events;
+    @events = ();
 
     my $input = q{a b c "insert d here" e e f h};
     my $length = length $input;
     my $pos    = $slr->read( \$input );
 
-    my $actual_events = q{};
-
     READ: while (1) {
 
-        my @actual_events = ();
-
-        my $next_lexeme;
-        EVENT:
-        for my $event ( @{ $slr->events() } ) {
-            my ($name) = @{$event};
-            if ($name eq 'insert d') {
-               my (undef, $length) = $slr->pause_span();
-               $next_lexeme = ['real d', undef, $length];
-            }
-            push @actual_events, $name;
-        }
-
-        if (@actual_events) {
-            $actual_events .= join q{ }, "Events at position $pos:", sort @actual_events;
-            $actual_events .= "\n";
-        }
+        push @event_history, join q{ }, "Events at position $pos:", sort @events
+           if @events;
+        @events = ();
 
         if ($next_lexeme) {
             $slr->lexeme_read(@{$next_lexeme});
             $pos = $slr->pos();
+            $next_lexeme = undef;
             next READ;
         }
         if ($pos < $length) {
