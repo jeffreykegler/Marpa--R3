@@ -21,7 +21,7 @@ use POSIX qw(setlocale LC_ALL);
 
 POSIX::setlocale(LC_ALL, "C");
 
-use Test::More tests => 6;
+use Test::More tests => 9;
 
 use lib 'inc';
 use Marpa::R3::Test;
@@ -253,6 +253,106 @@ Test::More::is( ( join q{ }, @results ), 'A B C', 'data, using factory' );
 
 ## Per-location processing, using pause
 
+# Marpa::R3::Display
+# name: event examples: event with data
+
+my $dsl4 = <<'END_OF_DSL';
+        top ::= A B C
+        A ::= 'a' B ::= 'b' C ::= 'c'
+        event '^A' = predicted A
+        event 'A$' = completed A
+        event '^B' = predicted B
+        event 'B$' = completed B
+        event '^C' = predicted C
+        event 'C$' = completed C
+        :discard ~ ws
+        ws ~ [\s]+
+END_OF_DSL
+
+my $grammar4 = Marpa::R3::Scanless::G->new(
+    {
+        source => \$dsl4,
+    },
+);
+
+@results = ();
+$recce = Marpa::R3::Scanless::R->new(
+    {
+        grammar        => $grammar4,
+        event_handlers => {
+            "'default" => sub () {
+                my ( $slr, $event_name ) = @_;
+                push @results, $event_name;
+                'pause';
+            },
+        }
+    }
+);
+
+# Marpa::R3::Display::End
+
+    my $expected_history = <<'END_OF_TEXT';
+0 ^A
+1 A$ ^B
+3 B$ ^C
+5 C$
+END_OF_TEXT
+
+{
+    my $pos           = 0;
+    my $input         = 'a b c';
+    my @event_history = ( join q{ }, $pos, sort @results )
+      if @results;
+    @results = ();
+    $pos     = $recce->read( \$input );
+    push @event_history, join q{ }, $pos, sort @results
+      if @results;
+    @results = ();
+    while ( $pos < length $input ) {
+        $pos = $recce->resume();
+        push @event_history, join q{ }, $pos, sort @results
+          if @results;
+        @results = ();
+    } ## end READ: while (1)
+    my $event_history = join "\n", @event_history, '';
+    Marpa::R3::Test::is( $event_history, $expected_history,
+        'per-location, using pause' );
+}
+
 ## Per-location processing, using array
+# Marpa::R3::Display
+# name: event examples: per-location processing, using array
+
+@results = ();
+$recce = Marpa::R3::Scanless::R->new(
+    {
+        grammar        => $grammar4,
+        event_handlers => {
+            "'default" => sub () {
+                my ( $slr, $event_name ) = @_;
+                my $pos = $slr->pos();
+                $results[$pos]{$event_name} = 1;
+                'ok';
+            },
+        }
+    }
+);
+
+# Marpa::R3::Display::End
+
+{
+    my $input         = 'a b c';
+    $recce->read( \$input );
+    my @events_by_pos = ();
+    for (my $ix = 0; $ix <= $#results; $ix++) {
+        my @these_events = keys %{$results[$ix]};
+        push @events_by_pos, "$ix " . join q{ }, sort @these_events
+           if @these_events;
+    }
+    my $actual_history = join "\n", @events_by_pos, q{};
+
+    Marpa::R3::Test::is( $actual_history, $expected_history,
+        'per-location, using array');
+}
 
 # vim: expandtab shiftwidth=4:

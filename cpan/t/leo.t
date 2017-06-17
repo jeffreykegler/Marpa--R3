@@ -79,9 +79,11 @@ my $recce = Marpa::R3::Scanless::R->new(
 my $pos           = 0;
 my $input         = 'aaa';
 my @event_history = (join q{ }, $pos, sort keys %events);
+%events = ();
 $pos           = $recce->read( \$input );
 READ: while (1) {
     push @event_history, join q{ }, $pos, sort keys %events;
+    %events = ();
     last READ if $pos >= length $input;
     $pos = $recce->resume();
 } ## end READ: while (1)
