@@ -638,10 +638,20 @@ and L<C<series_restart()>|"series_restart()"> methods.
 name: SLIF recce event_is_active named arg example
 normalize-whitespace: 1
 
-    $slr = Marpa::R3::Scanless::R->new(
+    my $slr = Marpa::R3::Scanless::R->new(
         {
             grammar         => $grammar,
-            event_is_active => { 'before c' => 1, 'after b' => 0 }
+            event_is_active => { 'before c' => 1, 'after b' => 0 },
+            event_handlers  => {
+                'after a'  => $after_handler,
+                'after b'  => $after_handler,
+                'after c'  => $after_handler,
+                'after d'  => $after_handler,
+                'before a' => $before_handler,
+                'before b' => $before_handler,
+                'before c' => $before_handler,
+                'before d' => $before_handler,
+            }
         }
     );
 
@@ -1294,7 +1304,7 @@ name: SLIF read/resume example
 partial: 1
 normalize-whitespace: 1
 
-    my $re = Marpa::R3::Scanless::R->new( { grammar => $parser->{grammar} } );
+    my $recce = Marpa::R3::Scanless::R->new( { grammar => $parser->{grammar} } );
     my $length = length $string;
     for (
         my $pos = $recce->read( \$string );
@@ -1393,49 +1403,6 @@ name: Scanless g1_pos() synopsis
 =for Marpa::R3::Display::End
 
 Returns the current G1 location.
-
-=head2 events()
-
-=for Marpa::R3::Display
-name: SLIF events() method synopsis
-normalize-whitespace: 1
-partial: 1
-
-        EVENT:
-        for my $event ( @{ $recce->events() } ) {
-            my ($name) = @{$event};
-            push @actual_events, $name;
-        }
-
-=for Marpa::R3::Display::End
-
-The C<events()> method takes no arguments,
-and returns an array of SLIF parse event descriptors.
-It returns the empty array
-if there were no event.
-
-SLIF parse events are described in detail in
-L<a separate
-document|Marpa::R3::Event>.
-Each SLIF parse event descriptor is a reference to an array of one
-or more elements.
-The first element of every named event descriptor is a string
-containing the name of the event.
-Typically the name of the event is only element.
-Other elements
-will be as
-L<described for each type of parse
-event|Marpa::R3::Event/"Types of parse event">.
-
-Any other SLIF recognizer mutator
-may clear the events.
-It is expected that
-an application interested in events
-will call
-the C<events()> method immediately after the
-event-triggering event.
-the C<events()> method returns
-events in arbitrary order.
 
 =head2 exhausted()
 

@@ -55,7 +55,7 @@ my @results = ();
 my $recce;
 
 # Marpa::R3::Display
-# name: event examples; basic
+# name: event examples - basic
 
 @results = ();
 $recce   = Marpa::R3::Scanless::R->new(
@@ -75,7 +75,7 @@ $recce->read( \"a b c" );
 Test::More::is( ( join q{ }, @results ), 'A B C', 'example 1' );
 
 # Marpa::R3::Display
-# name: event examples; default
+# name: event examples - default
 
 @results = ();
 $recce = Marpa::R3::Scanless::R->new(
@@ -254,7 +254,7 @@ Test::More::is( ( join q{ }, @results ), 'A B C', 'data, using factory' );
 ## Per-location processing, using pause
 
 # Marpa::R3::Display
-# name: event examples - event with data
+# name: event examples - per-location using pause
 
 my $dsl4 = <<'END_OF_DSL';
         top ::= A B C
