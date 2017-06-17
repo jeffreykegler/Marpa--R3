@@ -27,6 +27,36 @@ and tools to Marpa::R3.
 
 =head1 Changes
 
+=head2 Events
+
+In Marpa::R3, events have been changed from an event-driven
+mechanism to a callback mechanism.
+A new C<events_handlers> named argument has been added to
+C<< Marpa::R3::Scanless::R::new() >>.
+The
+C<< $slr->events() >> method is severely deprecated
+as of the writing.
+and will soon be eliminated.
+
+=head2 External and internal symbols
+
+In Marpa::R3, there is greater use of grammar rewriting,
+and therefore a division between external (pre-rewrite)
+symbols and internal (post-rewrite) symbols.  In R2, these
+were essentially the same, but in R3 they will be quite
+different.
+
+In R3, the user will, most of the time, work in terms
+of external symbols (XSYs),
+and will not need to deal with internal symbols (ISYs).
+But there will be exceptions.
+
+At the point the C<< $grammar->symbol_name() >> method
+is in terms of XSYs.
+A C<< $grammar->g1_symbol_name() >> is
+equivalent to Marpa::R2's 
+C<< $grammar->symbol_name() >> method.
+
 =head2 Multiple C<< slr->read() >> calls allowed
 
 The C<< slr->read() >> method may now called multiple
