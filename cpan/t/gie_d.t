@@ -21,7 +21,7 @@ use POSIX qw(setlocale LC_ALL);
 
 POSIX::setlocale(LC_ALL, "C");
 
-use Test::More tests => 1;
+use Test::More tests => 6;
 
 use lib 'inc';
 use Marpa::R3::Test;

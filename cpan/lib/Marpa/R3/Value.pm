@@ -508,7 +508,7 @@ END_OF_LUA
             my $message =
                 "Could not determine lexeme's semantics\n"
               . q{  Lexeme was }
-              . $slg->symbol_name($lexeme_id) . "\n";
+              . $slg->g1_symbol_name($lexeme_id) . "\n";
             Marpa::R3::exception($message);
         } ## end if ( not defined $semantics )
         my $blessing = lexeme_blessing_find( $slg, $lexeme_id );
@@ -516,7 +516,7 @@ END_OF_LUA
             my $message =
                 "Could not determine lexeme's blessing\n"
               . q{  Lexeme was }
-              . $slg->symbol_name($lexeme_id) . "\n";
+              . $slg->g1_symbol_name($lexeme_id) . "\n";
             Marpa::R3::exception($message);
         } ## end if ( not defined $blessing )
         $lexeme_resolutions[$lexeme_id] = [ $semantics, $blessing ];
@@ -655,7 +655,7 @@ sub registrations_set {
             if ( $type eq 'nulling' ) {
                 say {$trace_file_handle}
                   "Registering semantics for nulling symbol: ",
-                  $slg->symbol_name($id),
+                  $slg->g1_symbol_name($id),
                   "\n", '  Semantics are ', $slg->show_semantics(@raw_ops)
                   or Marpa::R3::exception('Cannot say to trace file handle');
                 last PRINT_TRACES;
@@ -671,7 +671,7 @@ sub registrations_set {
             if ( $type eq 'token' ) {
                 say {$trace_file_handle}
                   "Registering semantics for $type: ",
-                  $slg->symbol_name($id),
+                  $slg->g1_symbol_name($id),
                   "\n", '  Semantics are ', $slg->show_semantics(@raw_ops)
                   or Marpa::R3::exception('Cannot say to trace file handle');
                 last PRINT_TRACES;
@@ -851,7 +851,7 @@ END_OF_LUA
             my ( $resolution_name, $closure ) =
               @{ $rule_resolutions->[$resolution_rule] };
             if ($trace_actions) {
-                my $lhs_name = $slg->symbol_name($lhs_id);
+                my $lhs_name = $slg->g1_symbol_name($lhs_id);
                 say {$trace_file_handle}
                   qq{Nulled symbol "$lhs_name" },
                   qq{ resolved to "$resolution_name" from rule },
@@ -885,7 +885,7 @@ END_OF_LUA
             my ( $resolution_name, $closure ) =
               @{ $rule_resolutions->[$resolution_rule] };
             if ($trace_actions) {
-                my $lhs_name = $slg->symbol_name($lhs_id);
+                my $lhs_name = $slg->g1_symbol_name($lhs_id);
                 say {$trace_file_handle}
                   qq{Nulled symbol "$lhs_name" },
                   qq{ resolved to "$resolution_name" from rule },
@@ -914,7 +914,7 @@ END_OF_LUA
             {
                 Marpa::R3::exception(
                     'When nulled, symbol ',
-                    $slg->symbol_name($lhs_id),
+                    $slg->g1_symbol_name($lhs_id),
                     qq{  can have more than one semantics\n},
                     qq{  Marpa needs there to be only one semantics\n},
                     qq{  The rules involved are:\n},
@@ -929,7 +929,7 @@ END_OF_LUA
         my ( $resolution_name, $closure ) =
           @{ $rule_resolutions->[$resolution_rule] };
         if ($trace_actions) {
-            my $lhs_name = $slg->symbol_name($lhs_id);
+            my $lhs_name = $slg->g1_symbol_name($lhs_id);
             say {$trace_file_handle}
               qq{Nulled symbol "$lhs_name" },
               qq{ resolved to "$resolution_name" from rule },
@@ -978,7 +978,7 @@ END_OF_LUA
                 if ( not $allowed_semantics->{$semantics} ) {
                     Marpa::R3::exception(
                         q{Unknown semantics for lexeme },
-                        $slg->symbol_name($lexeme_id),
+                        $slg->g1_symbol_name($lexeme_id),
                         "\n",
                         qq{    Semantics were specified as "$semantics"\n}
                     );
@@ -995,7 +995,7 @@ END_OF_LUA
                   if $blessing =~ /\A [[:alpha:]] [:\w]* \z /xms;
                 Marpa::R3::exception(
                     q{Unknown blessing for lexeme },
-                    $slg->symbol_name($lexeme_id),
+                    $slg->g1_symbol_name($lexeme_id),
                     "\n",
                     qq{    Blessing as specified as "$blessing"\n}
                 );
@@ -1302,12 +1302,12 @@ END_OF_LUA
                         next RESULT_DESCRIPTOR;
                     }
                     if ( defined $lexeme_id ) {
-                        my $name = $slg->symbol_name($lexeme_id);
+                        my $name = $slg->g1_symbol_name($lexeme_id);
                         push @push_ops, $op_lua, $op_push_constant_key, \$name;
                         next RESULT_DESCRIPTOR;
                     }
                     if ( defined $nulling_symbol_id ) {
-                        my $name = $slg->symbol_name($nulling_symbol_id);
+                        my $name = $slg->g1_symbol_name($nulling_symbol_id);
                         push @push_ops, $op_lua, $op_push_constant_key, \$name;
                         next RESULT_DESCRIPTOR;
                     }
@@ -1329,12 +1329,12 @@ END_OF_LUA
                         next RESULT_DESCRIPTOR;
                     } ## end if ( defined $irlid )
                     if ( defined $lexeme_id ) {
-                        my $name = $slg->symbol_name($lexeme_id);
+                        my $name = $slg->g1_symbol_name($lexeme_id);
                         push @push_ops, $op_lua, $op_push_constant_key, \$name;
                         next RESULT_DESCRIPTOR;
                     }
                     if ( defined $nulling_symbol_id ) {
-                        my $name = $slg->symbol_name($nulling_symbol_id);
+                        my $name = $slg->g1_symbol_name($nulling_symbol_id);
                         push @push_ops, $op_lua, $op_push_constant_key, \$name;
                         next RESULT_DESCRIPTOR;
                     }
@@ -1650,7 +1650,7 @@ END_OF_LUA
                         warnings    => \@warnings,
                         where       => 'computing value',
                         long_where  => 'Computing value for null symbol: '
-                          . $slg->symbol_name($token_id),
+                          . $slg->g1_symbol_name($token_id),
                     }
                 );
             } ## end if ( not $eval_ok or @warnings )
@@ -1805,7 +1805,7 @@ END_OF_LUA
     }
     my $token_name;
     if ( defined $token_id ) {
-        $token_name = $slg->symbol_name($token_id);
+        $token_name = $slg->g1_symbol_name($token_id);
     }
 
     print {$trace_file_handle}

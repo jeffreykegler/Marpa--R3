@@ -446,7 +446,7 @@ END_OF_LUA
         # Not a lexeme, according to G1
         next SYMBOL if not $is_terminal;
 
-        my $symbol_name = $slg->symbol_name($symbol_id);
+        my $symbol_name = $slg->g1_symbol_name($symbol_id);
         $g1_id_by_lexeme_name{$symbol_name} = $symbol_id;
 
     }
@@ -629,7 +629,7 @@ END_OF_LUA
         my $lexeme_id = $lex_lexeme_to_g1_symbol[$lexer_lexeme_id] // -1;
         $lex_rule_to_g1_lexeme[$rule_id] = $lexeme_id;
         next RULE_ID if $lexeme_id < 0;
-        my $lexeme_name = $slg->symbol_name($lexeme_id);
+        my $lexeme_name = $slg->g1_symbol_name($lexeme_id);
 
         my $assertion_id =
           $lexeme_data{$lexeme_name}{lexer}{'assertion'};
@@ -864,7 +864,7 @@ END_OF_LUA
   RULE_ID: for my $lexer_rule_id ( 0 .. $#lex_rule_to_g1_lexeme ) {
         my $g1_lexeme_id = $lex_rule_to_g1_lexeme[$lexer_rule_id];
         my $assertion_id = -1;
-        my $lexeme_name  = $slg->symbol_name($g1_lexeme_id);
+        my $lexeme_name  = $slg->g1_symbol_name($g1_lexeme_id);
         if (defined $lexeme_name) {
             $assertion_id = $lexeme_data{$lexeme_name}{lexer}{'assertion'};
         }
@@ -1014,7 +1014,7 @@ qq{   It contained non-word characters and that is not allowed\n},
                 my $bless_package =
                   $slg->[Marpa::R3::Internal::Scanless::G::BLESS_PACKAGE];
                 if ( not defined $bless_package ) {
-                    my $lexeme_name = $slg->symbol_name($g1_lexeme_id);
+                    my $lexeme_name = $slg->g1_symbol_name($g1_lexeme_id);
                     Marpa::R3::exception(
 qq{Symbol "$lexeme_name" needs a blessing package, but grammar has none\n},
                         qq{  The blessing for "$lexeme_name" was "$blessing"\n}
@@ -1692,6 +1692,19 @@ sub Marpa::R3::Scanless::G::l0_rule_expand {
 
 sub Marpa::R3::Scanless::G::symbol_name {
     my ( $slg, $symbol_id ) = @_;
+    my ($symbol_name) = $slg->call_by_tag(
+        ('@' . __FILE__ . ':' .  __LINE__),
+      <<'END_OF_LUA', 'i', $symbol_id);
+    local slg, xrlid = ...
+    return slg:symbol_name(xrlid)
+END_OF_LUA
+
+    return $symbol_name;
+
+}
+
+sub Marpa::R3::Scanless::G::g1_symbol_name {
+    my ( $slg, $symbol_id ) = @_;
     $symbol_id += 0;
     return $slg->lmg_symbol_name('g1', $symbol_id);
 }
@@ -1980,7 +1993,7 @@ END_OF_LUA
 
 sub Marpa::R3::Scanless::G::formatted_symbol_name {
     my ( $slg, $symbol_id ) = @_;
-    my $symbol_name = $slg->symbol_name($symbol_id);
+    my $symbol_name = $slg->g1_symbol_name($symbol_id);
     # As-is if all word characters
     return $symbol_name if $symbol_name =~ m/ \A \w* \z/xms;
     # As-is if ends in right bracket

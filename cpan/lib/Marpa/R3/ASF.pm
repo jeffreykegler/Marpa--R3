@@ -367,7 +367,7 @@ END_OF_LUA
             $symbol_blessing[$isyid] = $blessing;
             next SYMBOL;
         }
-        my $name = $slg->symbol_name($isyid);
+        my $name = $slg->g1_symbol_name($isyid);
         $symbol_blessing[$isyid] = join q{::},
           $default_token_blessing_package,
           normalize_asf_blessing($name);
@@ -702,7 +702,7 @@ sub nid_symbol_name {
     my $slr       = $asf->[Marpa::R3::Internal::ASF::SLR];
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $symbol_id = nid_symbol_id($asf, $nid);
-    return $slg->symbol_name($symbol_id);
+    return $slg->g1_symbol_name($symbol_id);
 }
 
 sub nid_token_name {
@@ -711,7 +711,7 @@ sub nid_token_name {
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $token_id = nid_token_id($asf, $nid);
     return if not defined $token_id;
-    return $slg->symbol_name($token_id);
+    return $slg->g1_symbol_name($token_id);
 }
 
 # Memoization is heavily used -- it needs to be to keep the worst cases from

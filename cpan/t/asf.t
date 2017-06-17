@@ -89,7 +89,7 @@ sub full_traverser {
     my ( $glade, $scratch ) = @_;
     my $rule_id     = $glade->rule_id();
     my $symbol_id   = $glade->symbol_id();
-    my $symbol_name = $g->symbol_name($symbol_id);
+    my $symbol_name = $g->g1_symbol_name($symbol_id);
 
     # A token is a single choice, and we know enough to return it
     if ( not defined $rule_id ) {

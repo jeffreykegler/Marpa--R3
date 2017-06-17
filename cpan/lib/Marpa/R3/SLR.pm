@@ -729,7 +729,7 @@ sub Marpa::R3::Scanless::R::terminals_expected {
     return terminals_expected
 END_OF_LUA
 
-    return [ map { $slg->symbol_name($_) } @{$terminals_expected} ];
+    return [ map { $slg->g1_symbol_name($_) } @{$terminals_expected} ];
 }
 
 sub Marpa::R3::Scanless::R::exhausted {

@@ -1025,7 +1025,7 @@ for my $symbol_id ( $grammar->symbol_ids() ) {
 # Marpa::R3::Display
 # name: SLG symbol_name() synopsis
 
-    my $name = $grammar->symbol_name($symbol_id);
+    my $name = $grammar->g1_symbol_name($symbol_id);
     $text .= "symbol number: $symbol_id  name: $name\n";
 
 # Marpa::R3::Display::End
