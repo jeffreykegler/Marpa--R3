@@ -129,58 +129,25 @@ for all strings,
 all of its instances in valid parses are nulled instances.
 A symbol is B<non-nulling> if it is not nulling.
 
-=back
-
-Intuitively, a string is actual to I<L> if we
+=item * A string is actual to I<L> if we
 know the actual input as far as I<L>,
 and the string is consistent with the input.
-Restating the same thing,
-but in more formal terms:
-Let C<A> be the actual input to a parse.
-Let C<prefix(A, L)> be the prefix of C<A> of length I<L>.
-Let C<S> be an arbitrary string in the same alphabet as C<A>.
-Let C<prefix(S, L)> be the prefix of C<S> of length I<L>.
-If C<prefix(A, L) = prefix(S, L)>,
-then we say that
-string C<S> is B<consistent with
-the actual input up to location L>.
-For brevity,
-we will often say
-that C<S> is B<actual to L>.
 
-Intuitively, if we know the input as far as location I<L>
+=item * If we know the input as far as location I<L>
 and a symbol I<< <S> >> is in some parse that starts at I<L>,
 we say that symbol I<< <S> >> is B<acceptable> at
 a location I<L>.
 Where location I<L> is understood, we just say
 that symbol I<< <S> >> is B<acceptable>.
-Restating this more formally,
-if an instance of symbol I<< <S> >>
-that starts at location I<L> is in a valid parse
-of some string actual to I<L>,
-we say that a symbol I<< <S> >> is B<acceptable> at
-a location I<L>.
-To say that a symbol
-is B<acceptable> at
-a location I<L> is to say that it is the symbol of
-a symbol instance acceptable at location I<L>.
 
-Intuitively, once we know the parse as far
+=item * If a symbol I<< <S> >> ends at I<L>,
+and we know the parse as far
 as location I<L>,
-if a symbol I<< <S> >> ends at I<L>,
 we say that symbol I<< <S> >> is 
 is B<recognized> at
 a location I<L>.
-Restating this more formally,
-if an instance of symbol I<< <S> >>
-that ends at location I<L> is in a valid parse
-of some string actual to I<L>,
-we say that the instance of symbol I<S> is B<recognized> at
-a location I<L>.
-We say that a symbol
-is B<recognized> at
-a location I<L> if it is the symbol of
-a symbol instance recognized at location I<L>.
+
+=back
 
 =head1 The life cycle of events
 
@@ -1795,6 +1762,55 @@ normalize-whitespace: 1
     === EOS ===
 
 =for Marpa::R3::Display::End
+
+=head1 Details
+
+This section contains additional explanations, not essential to understanding
+the rest of this document.
+Often they are formal or mathematical.
+While some people find these helpful, others find them distracting,
+which is why
+they are segregated here.
+
+=head2 Terminology
+
+The following are more formal definitions of terms
+previously defined in intuitive terms.
+
+B<Actual input>:
+Let C<A> be the actual input to a parse.
+Let C<prefix(A, L)> be the prefix of C<A> of length I<L>.
+Let C<S> be an arbitrary string in the same alphabet as C<A>.
+Let C<prefix(S, L)> be the prefix of C<S> of length I<L>.
+If C<prefix(A, L) = prefix(S, L)>,
+then we say that
+string C<S> is B<consistent with
+the actual input up to location L>.
+For brevity,
+we will often say
+that C<S> is B<actual to L>.
+
+B<Acceptable>:
+if an instance of symbol I<< <S> >>
+that starts at location I<L> is in a valid parse
+of some string actual to I<L>,
+we say that a symbol I<< <S> >> is B<acceptable> at
+a location I<L>.
+To say that a symbol
+is B<acceptable> at
+a location I<L> is to say that it is the symbol of
+a symbol instance acceptable at location I<L>.
+
+B<Recognized>:
+if an instance of symbol I<< <S> >>
+that ends at location I<L> is in a valid parse
+of some string actual to I<L>,
+we say that the instance of symbol I<S> is B<recognized> at
+a location I<L>.
+We say that a symbol
+is B<recognized> at
+a location I<L> if it is the symbol of
+a symbol instance recognized at location I<L>.
 
 =head1 COPYRIGHT AND LICENSE
 
