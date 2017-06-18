@@ -108,8 +108,9 @@ has exactly one end location.
 =item * For a specific string
 and a specific grammar,
 we say that a parse is B<valid>
-if the parse of the string
-is valid according to the grammar.
+if some parse of the string
+exists
+according to the grammar.
 
 =item * In a parse,
 a B<nulled symbol instance>,
@@ -145,11 +146,16 @@ that symbol I<< <S> >> is B<acceptable>.
 =item * If a symbol I<< <S> >> ends at I<L>,
 and we know the parse as far
 as location I<L>,
-we say that symbol I<< <S> >> is 
+we say that symbol I<< <S> >>
 is B<recognized> at
 a location L>.
 
 =back
+
+For those readers who find formal definitions useful,
+some of this terminology is defined more
+carefully
+L<below|"Details">.
 
 =head1 The life cycle of events
 
@@ -162,26 +168,28 @@ a location L>.
 =back
 
 A parse event is either a B<parse location event>
-or a B<parse instance event>.
-B<Parse location events>
+(aka B<location event>)
+or a B<parse instance event>
+(aka B<instance event>).
+B<Location events>
 are those which are deal with the status of the
 parse at a particular parse location.
 They are declared using named arguments of
 the SLIF recognizer constructor.
 
-B<Parse instance events> are those which report
+B<Instance events> are those which report
 deal with the status of a symbol instance.
 They are declared in the SLIF DSL.
 
 There are two types
-of parse location event:
+of location event:
 rejection and exhaustion.
 A rejection event is declared using
 the grammar's C<rejection> named argument.
 A exhaustion event is declared using
 the grammar's C<exhaustion> named argument.
 
-A parse instance event is either
+An instance event is either
 a lexeme event or
 a non-lexeme event.
 A lexeme event is declared using a
@@ -193,7 +201,7 @@ The various types of parse events are described in detail
 L<below|/"Types of parse event">.
 The description of
 each type of parse event
-will state whether it is a parse location event,
+will state whether it is a location event,
 a lexeme event
 or a non-lexeme event.
 
@@ -211,7 +219,7 @@ L<C<lexeme_complete()>|Marpa::R3::Scanless::R/"lexeme_complete()">.
 The location at which a parse event triggers is the B<trigger location>.
 An event may trigger at any location, including location 0.
 It is important to keep in mind that location 0 events will
-trigger in 
+trigger in
 L<the recognizer's C<new()>
 constructor|Marpa::R3::Scanless::R/Constructor>.
 
@@ -228,7 +236,7 @@ When an event triggers,
 the event handler may B<pause> the recognizer.
 If an event pauses the recognizer,
 it causes the
-event-triggering method 
+event-triggering method
 to return as soon as all processing at the
 B<event location>
 is finished, but before
@@ -1169,7 +1177,7 @@ name: SLIF Event synopsis
 normalize-whitespace: 1
 partial: 1
 
-    Events at position 21: ^e ^f d$ e[] mid1$ mid2$ 
+    Events at position 21: ^e ^f d$ e[] mid1$ mid2$
 
 =for Marpa::R3::Display::End
 
@@ -1216,7 +1224,7 @@ name: SLIF Event synopsis
 normalize-whitespace: 1
 partial: 1
 
-    Events at position 21: ^e ^f d$ e[] mid1$ mid2$ 
+    Events at position 21: ^e ^f d$ e[] mid1$ mid2$
 
 =for Marpa::R3::Display::End
 
@@ -1477,7 +1485,7 @@ by C<factory()> requires a global, a non-local
 and a local variable to do its job.
 Call this anonymous handler, I<anon>.
 The global C<$A_global> is accessible to I<anon>
-at event processing time because I<anon> is a 
+at event processing time because I<anon> is a
 closure.
 
 The variable C<$B_non_local> is not a global --
@@ -1541,7 +1549,7 @@ Callback handlers easily handle situations where the
 events are indifferent to whether they occur together
 at I<pos> or not.
 But, for many apps, it is very important
-to be able to handle all the events occuring 
+to be able to handle all the events occuring
 at I<pos> together.
 
 There are two ways to do this.
