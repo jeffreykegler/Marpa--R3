@@ -154,16 +154,11 @@ sub do_test {
 
     }
 
-# Marpa::R3::Display
-# name: SLIF events() method synopsis
-
     my $length = length $string;
     my $pos    = $recce->read( \$string );
     while ( $pos < $length ) {
         $pos = $recce->resume($pos);
     } ## end READ: while (1)
-
-# Marpa::R3::Display::End
 
     my $value_ref = $recce->value();
     if ( not defined $value_ref ) {
