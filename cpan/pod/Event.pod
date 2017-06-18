@@ -1241,6 +1241,10 @@ C<< $slr->lexeme_read() >> methods.
 
 =head1 Examples
 
+=head1 Grammar 1
+
+This grammar will be used in the next few examples.
+
 =for Marpa::R3::Display
 name: event examples; grammar 1
 normalize-whitespace: 1
@@ -1261,6 +1265,8 @@ normalize-whitespace: 1
 
 =for Marpa::R3::Display::End
 
+=head2 Basic example
+
 =for Marpa::R3::Display
 name: event examples - basic
 normalize-whitespace: 1
@@ -1278,6 +1284,8 @@ normalize-whitespace: 1
     );
 
 =for Marpa::R3::Display::End
+
+=head2 A default event handler
 
 =for Marpa::R3::Display
 name: event examples - default
@@ -1299,6 +1307,12 @@ normalize-whitespace: 1
 
 =for Marpa::R3::Display::End
 
+=head2 Using both default and explicit handlers
+
+The next example processes event "C<A>" with
+an explicit handler,
+and leaves the others with a default handler.
+
 =for Marpa::R3::Display
 name: event examples - default and explicit
 normalize-whitespace: 1
@@ -1319,6 +1333,16 @@ normalize-whitespace: 1
     );
 
 =for Marpa::R3::Display::End
+
+=head2 Exhaustion and rejection events
+
+The next example shows how exhaustion and
+rejection events can be handled.
+Note that, in this example, the event
+handler pauses the recognizer so that
+it can process these events outside the
+recognizer, perhaps ending or abending
+the parse.
 
 =for Marpa::R3::Display
 name: event examples - rejected and exhausted
@@ -1353,6 +1377,14 @@ normalize-whitespace: 1
     );
 
 =for Marpa::R3::Display::End
+
+=head2 Events with associated data
+
+The next two examples show on how event handlers can
+access data.
+This example shows an event which has data associated
+directly with it.
+This data is passed in the arguments to the handler.
 
 =for Marpa::R3::Display
 name: event examples - event with data
@@ -1394,6 +1426,43 @@ normalize-whitespace: 1
 
 =for Marpa::R3::Display::End
 
+=head2 Handlers which require local and non-local data.
+
+We've already shown handlers which use global data.
+We took advantage of the fact that hanlders, like all
+Perl functions, are closures.
+
+The next example shows the use of a "factory" for making
+handlers.
+This is the most powerful and general method of making
+data available in a wide variety of scopes
+to the handler at event processing time.
+
+The anonymous handler returned
+by C<factory()> requires a global, a non-local
+and a local variable to do its job.
+Call this anonymous handler, I<anon>.
+The global C<$A_global> is accessible to I<anon>
+at event processing time because I<anon> is a 
+closure.
+
+The variable C<$B_non_local> is not a global --
+it is local to
+C<factory()>.
+But C<$B_non_local> is non-local to
+I<anon>.
+Nonetheless,
+Because I<anon> is a closure,
+C<$B_non_local> is available to I<anon>
+at event processing time.
+
+Finally, C<$C_local> is not available
+when I<anon> is defined,
+but is local in the scope
+in which I<anon> is instantiated.
+C<$C_local> is passed as an argument
+to C<factory()>.
+
 =for Marpa::R3::Display
 name: event examples - data, using factory
 normalize-whitespace: 1
@@ -1429,6 +1498,24 @@ normalize-whitespace: 1
     }
 
 =for Marpa::R3::Display::End
+
+=head2 Per-location event processing, using pause
+
+Multiple events can occur at one parse location.
+Call this parse location I<pos>.
+Callback handlers easily handle situations where the
+events are indifferent to whether they occur together
+at I<pos> or not.
+But, for many apps, it is very important
+to be able to handle all the events occuring 
+at I<pos> together.
+
+There are two ways to do this.
+One is to return C<'pause'> from any of the event
+handlers at I<pos>.
+The recognizer will return control to the app
+once all processing at I<pos> is complete,
+and the app can do as it wishes.
 
 =for Marpa::R3::Display
 name: event examples - per-location using pause
@@ -1469,6 +1556,17 @@ normalize-whitespace: 1
 
 =for Marpa::R3::Display::End
 
+=head2 Per-location event processing, using an array
+
+This example also addresses the issue of processing events
+when the events which occur at a single location
+(call it I<pos>) must be processed as a group.
+The events are gathered into an array,
+and processed when the recognizer is finished.
+This method can be more elegant
+than pausing the recognizer,
+but this method is also less general.
+
 =for Marpa::R3::Display
 name: event examples - per-location processing, using array
 normalize-whitespace: 1
@@ -1490,15 +1588,20 @@ normalize-whitespace: 1
 
 =for Marpa::R3::Display::End
 
-=head1 A messy example
+=head2 A messy example
 
+This is a second example of per-location processing
+by pausing the recognizer.
 The SLIF DSL in this example
 is designed to
-include the unusual and "corner"
+include the unusual
 cases described in this document.
-It will not resemble any grammar that you
-encounter in normal practice --
-or at least one hopes not.
+These "corner" cases are unlikely to occur
+all in a single app,
+and hopefully
+this grammar
+will not resemble any grammar that you
+encounter in practice.
 
 =for Marpa::R3::Display
 name: SLIF Event synopsis

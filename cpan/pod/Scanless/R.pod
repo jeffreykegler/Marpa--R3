@@ -704,6 +704,47 @@ to set that event
 to be inactive
 at earleme 0.
 
+=head2 event_handlers
+
+=for Marpa::R3::Display
+name: event examples - basic
+normalize-whitespace: 1
+
+    @results = ();
+    $recce   = Marpa::R3::Scanless::R->new(
+        {
+            grammar        => $grammar1,
+            event_handlers => {
+                A => sub () { push @results, 'A'; 'ok' },
+                B => sub () { push @results, 'B'; 'ok' },
+                C => sub () { push @results, 'C'; 'ok' },
+            }
+        }
+    );
+
+=for Marpa::R3::Display::End
+
+The C<event_handlers> recognizer setting
+sets the callbacks which handle events.
+Its value should be a reference to a hash,
+in which the key of every entry is an event name,
+call it C<ev>.
+The values of the hash must be anonymous functions.
+For event C<ev>,
+call C<fn> the anonymous function that is
+the value of the C<event_handlers> hash.
+Then event C<ev> will be handled by calling function
+C<fn>.
+
+If any event occurs which does not have a handler,
+it is a fatal error.
+The C<event_handler> named argument is only allowed
+by the L<C<recognizer's new() method>|/"Constructor">.
+Full details of the use of event handlers,
+with many examples,
+are in
+L<a separate document|Marpa::R3::Event>.
+
 =head2 grammar
 
 The value of the C<grammar> setting must be
