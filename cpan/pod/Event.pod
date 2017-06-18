@@ -190,27 +190,47 @@ a symbol instance recognized at location I<L>.
 
 =item * A declared event may B<trigger>.
 
-=item * Once an event triggers, it may be B<accessed>.
-
 =back
 
 Parse events are declared in the SLIF DSL.
-A parse event is either a lexeme event
-or a non-lexeme event.
+A parse event is either a B<global parse status event>
+or a B<parse instance event>.
+B<Global parse status events>
+are those which are deal with the status of the
+parse as a whole.
+B<Parse instance events> are those which report
+deal with the status of a symbol instance.
+
+There are two types
+of global parse status event:
+rejection and exhaustion.
+A rejection event is declared using
+the grammar's C<rejection> named argument.
+A exhaustion event is declared using
+the grammar's C<exhaustion> named argument.
+
+A parse instance event is either
+a lexeme event or
+a non-lexeme event.
 A lexeme event is declared using a
 L<C<:lexeme> pseudo-rule|Marpa::R3::Scanless::DSL/"Lexeme pseudo-rule">.
 A non-lexeme event is declared using a
 L<named event statement|Marpa::R3::Scanless::DSL/"Named event statement">.
+
 The various types of parse events are described in detail
 L<below|/"Types of parse event">.
 The description of
 each type of parse event
-will state whether it is a lexeme or a non-lexeme event.
+will state whether it is a global parse status event,
+a lexeme event
+or a non-lexeme event.
 
 Once declared, a parse event
 may trigger during any event-triggering SLIF
 recognizer method.
 The event-triggering SLIF recognizer methods are
+L<the recognizer's C<new()>
+constructor|Marpa::R3::Scanless::R/Constructor>,
 L<C<read()>|Marpa::R3::Scanless::R/"read()">,
 L<C<resume()>|Marpa::R3::Scanless::R/"resume()">,
 L<C<lexeme_read()>|Marpa::R3::Scanless::R/"lexeme_read()"> and
@@ -218,30 +238,47 @@ L<C<lexeme_complete()>|Marpa::R3::Scanless::R/"lexeme_complete()">.
 
 The location at which a parse event triggers is the B<event location>.
 An event may trigger at any location, including location 0.
-When an event triggers, it causes the event-triggering
-method to return immediately, with the current location
-at the B<trigger location>.
+It is important to keep in mind that location 0 events will
+trigger in 
+L<the recognizer's C<new()>
+constructor|Marpa::R3::Scanless::R/Constructor>.
+
+When an event triggers,
+the event handler may B<pause> the recognizer.
+If an event pauses the recognizer,
+it causes the
+event-triggering method 
+to return as soon as all processing at the
+B<event location>
+is finished, but before
+any processing at later locations.
+Some event-triggering methods return,
+in any case,
+after processing at a single location is finished,
+and for those methods, it makes no difference
+whether an event handler pauses the recognizer.
+But in the case of the
+L<C<read()>|Marpa::R3::Scanless::R/"read()"> and
+the L<C<resume()>|Marpa::R3::Scanless::R/"resume()">
+methods,
+if an event pauses the recognizer,
+the method may return control to the user
+earlier than they otherwise would.
+
 The trigger location is the same as the event location,
 except in the case of
 L<pre-lexeme events|/"Pre-lexeme events">.
+In the case of a pre-lexeme event, the recognizer
+will only parse as far as the event location,
+which will be earlier than the trigger location.
+This means that pre-lexeme events act as a form
+of look-ahead.
 
-A non-lexeme event may trigger during any of the event-triggering
-methods.
-A lexeme event will only trigger during calls of the
-C<< $slr->read() >> and C<< $slr->resume() >> methods.
-
-The triggering of events may be controlled with
+The triggering of
+parse instance events may be controlled with
 the L<activate() method|Marpa::R3::Scanless::R/"activate()">.
 An event will only trigger if activated.
 All events are automatically activated when declared.
-
-Events may be accessed using
-L<the Scanless recognizer's events()
-method|Marpa::R3::Scanless::R/"events()">.
-The beginning and end of the lexeme triggering a lexeme event
-may be found using
-L<the Scanless recognizer's pause_span()
-method|Marpa::R3::Scanless::R/"pause_span()">.
 
 =head1 Types of parse event
 
