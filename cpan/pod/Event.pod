@@ -105,7 +105,8 @@ A consequence of this definition
 is that every symbol instance
 has exactly one end location.
 
-=item * For some string and grammar,
+=item * For a specific string
+and a specific grammar,
 we say that a parse is B<valid>
 if the parse of the string
 is valid according to the grammar.
@@ -136,7 +137,7 @@ and the string is consistent with the input.
 
 =item * If we know the input as far as location I<L>
 and a symbol I<< <S> >> is in some parse that starts at I<L>,
-we say that symbol I<< <S> >> is B<acceptable> at
+we say that symbol I<< <S> >> is B<acceptable at
 a location L>.
 Where location I<L> is understood, we just say
 that symbol I<< <S> >> is B<acceptable>.
@@ -146,7 +147,7 @@ and we know the parse as far
 as location I<L>,
 we say that symbol I<< <S> >> is 
 is B<recognized> at
-a location <L>.
+a location L>.
 
 =back
 
@@ -160,14 +161,17 @@ a location <L>.
 
 =back
 
-Parse events are declared in the SLIF DSL.
 A parse event is either a B<parse location event>
 or a B<parse instance event>.
 B<Parse location events>
 are those which are deal with the status of the
 parse at a particular parse location.
+They are declared using named arguments of
+the SLIF recognizer constructor.
+
 B<Parse instance events> are those which report
 deal with the status of a symbol instance.
+They are declared in the SLIF DSL.
 
 There are two types
 of parse location event:
