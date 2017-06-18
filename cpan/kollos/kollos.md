@@ -163,6 +163,14 @@ for action during or after development.
 Not all of these are included or mentioned
 in these "Development Notes".
 
+### Terminology fixes
+
+* Check all uses of "pauses", eliminating those where
+  it refers to parse events.
+
+* Eliminate all uses of "physical" and "virtual" wrt
+  parse location.
+
 ### Use generations in Libmarpa trees
 
 Currently a valuator "pauses" its base tree, so
