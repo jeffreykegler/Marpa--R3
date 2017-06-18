@@ -88,8 +88,9 @@ any point.
 =head1 Terminology
 
 SLIF parse events are called B<parse events>
-or simply B<events>,
-in contexts where the meaning is clear.
+or,
+in contexts where the meaning is clear,
+simply B<events>.
 
 SLIF parse events evolved over time from simpler
 mechanisms,
