@@ -658,12 +658,12 @@ L<a separate document|Marpa::R3::Exhaustion>.
 name: SLIF rejection grammar setting synopsis part 1
 normalize-whitespace: 1
 
-my $g = Marpa::R3::Scanless::G->new(
-    {
-        source    => \($grammar),
-        rejection => 'event'
-    }
-);
+    my $g = Marpa::R3::Scanless::G->new(
+        {
+            source    => \($grammar),
+            rejection => 'event'
+        }
+    );
 
 =for Marpa::R3::Display::End
 
@@ -709,7 +709,7 @@ and indicates it is a reserved name,
 which will not conflict with the name
 of any user-named event.)
 
-=head1 Lexeme events
+=head2 Lexeme events
 
 SLIF parse events are divided
 into lexeme and non-lexeme events,
