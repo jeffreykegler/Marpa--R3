@@ -92,16 +92,6 @@ or,
 in contexts where the meaning is clear,
 simply B<events>.
 
-SLIF parse events evolved over time from simpler
-mechanisms,
-and the term SLIF parse event was introduced late
-in the development of Marpa::R3.
-In previous versions of Marpa::R3,
-SLIF parse events and their precursors are called "pauses" or simply "events".
-For historical reasons,
-some of the method names dealing with SLIF parse events
-still have the word "pause" as part of their name.
-
 In this document, an B<instance> of a symbol
 in a parse
 means an occurrence
@@ -113,35 +103,43 @@ A consequence of this definition
 is that every symbol instance
 has exactly one end location.
 
-For some string and grammar,
+=over 4
+
+=item * For some string and grammar,
 we say that a parse is B<valid>
 if the parse of the string
 is valid according to the grammar.
-In a parse,
+
+=item * In a parse,
 a nulled symbol instance,
 or B<nulled symbol>, is a symbol instance with a length of zero.
-A non-nulled symbol instance, non-nulled instance,
+
+=item * A non-nulled symbol instance, non-nulled instance,
 or B<non-nulled symbol>, is a symbol instance which is not
 nulled.
-A symbol in a grammar is
+
+=item * A symbol in a grammar is
 a B<nullable symbol> if it has
 at least one nulled instance
 in at least one valid parse of at least one string.
-A symbol in a grammar is
+
+=item * A symbol in a grammar is
 a B<nulling symbol> if,
 for all strings,
 all of its instances in valid parses are nulled instances.
 A symbol is B<non-nulling> if it is not nulling.
 
+=back
+
 Intuitively, a string is actual to I<L> if we
 know the actual input as far as I<L>,
 and the string is consistent with the input.
-More formally,
-let C<A> be the actual input to a parse.
-Let C<S> be an arbitrary string in the same alphabet.
-Let C<prefix(A, L)> be the prefix of length I<L>
-that is of length C<L>,
-and let C<prefix(S, L)> be defined in the same way.
+Restating the same thing,
+but in more formal terms:
+Let C<A> be the actual input to a parse.
+Let C<prefix(A, L)> be the prefix of C<A> of length I<L>.
+Let C<S> be an arbitrary string in the same alphabet as C<A>.
+Let C<prefix(S, L)> be the prefix of C<S> of length I<L>.
 If C<prefix(A, L) = prefix(S, L)>,
 then we say that
 string C<S> is B<consistent with
@@ -150,20 +148,34 @@ For brevity,
 we will often say
 that C<S> is B<actual to L>.
 
-If an instance of symbol I<S>
+Intuitively, if we know the input as far as location I<L>
+and a symbol I<S> is in some parse that starts at I<L>,
+we say that symbol I<S> is B<acceptable> at
+a location I<L>.
+Where location I<L> is understood, we just say
+that symbol I<S> is B<acceptable>.
+Restating this more formally,
+if an instance of symbol I<S>
 that starts at location I<L> is in a valid parse
 of some string actual to I<L>,
 we say that a symbol I<S> is B<acceptable> at
 a location I<L>.
-We say that a symbol
+To say that a symbol
 is B<acceptable> at
-a location I<L> if it is the symbol of
+a location I<L> is to say that it is the symbol of
 a symbol instance acceptable at location I<L>.
 
-If an instance of symbol I<S>
+Intuitively, once we know the parse as far
+as location I<L>,
+if a symbol I<< <S> >> ends at I<L>,
+we say that symbol I<< <S> >> is 
+is B<recognized> at
+a location I<L>.
+Restating this more formally,
+if am instance of symbol I<< <S> >>
 that ends at location I<L> is in a valid parse
 of some string actual to I<L>,
-we say that a symbol I<S> is B<recognized> at
+we say that the instance of symbol I<S> is B<recognized> at
 a location I<L>.
 We say that a symbol
 is B<recognized> at
