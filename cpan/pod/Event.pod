@@ -595,13 +595,13 @@ the name of pre-lexeme event is the only element.
 =for Marpa::R3::Display
 name: SLIF exhaustion grammar setting synopsis part 1
 
-my $g = Marpa::R3::Scanless::G->new(
-    {
-        source     => \($grammar),
-        exhaustion => 'event',
-        rejection  => 'event',
-    }
-);
+    my $g = Marpa::R3::Scanless::G->new(
+        {
+            source     => \($grammar),
+            exhaustion => 'event',
+            rejection  => 'event',
+        }
+    );
 
 =for Marpa::R3::Display::End
 
