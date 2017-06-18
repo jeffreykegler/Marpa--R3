@@ -149,16 +149,16 @@ we will often say
 that C<S> is B<actual to L>.
 
 Intuitively, if we know the input as far as location I<L>
-and a symbol I<S> is in some parse that starts at I<L>,
-we say that symbol I<S> is B<acceptable> at
+and a symbol I<< <S> >> is in some parse that starts at I<L>,
+we say that symbol I<< <S> >> is B<acceptable> at
 a location I<L>.
 Where location I<L> is understood, we just say
-that symbol I<S> is B<acceptable>.
+that symbol I<< <S> >> is B<acceptable>.
 Restating this more formally,
-if an instance of symbol I<S>
+if an instance of symbol I<< <S> >>
 that starts at location I<L> is in a valid parse
 of some string actual to I<L>,
-we say that a symbol I<S> is B<acceptable> at
+we say that a symbol I<< <S> >> is B<acceptable> at
 a location I<L>.
 To say that a symbol
 is B<acceptable> at
@@ -172,7 +172,7 @@ we say that symbol I<< <S> >> is
 is B<recognized> at
 a location I<L>.
 Restating this more formally,
-if am instance of symbol I<< <S> >>
+if an instance of symbol I<< <S> >>
 that ends at location I<L> is in a valid parse
 of some string actual to I<L>,
 we say that the instance of symbol I<S> is B<recognized> at
