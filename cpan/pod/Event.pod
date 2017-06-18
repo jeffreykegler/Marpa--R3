@@ -87,12 +87,14 @@ any point.
 
 =head1 Terminology
 
-SLIF parse events are called B<parse events>
+=over 4
+
+=item * SLIF parse events are called B<parse events>
 or,
 in contexts where the meaning is clear,
 simply B<events>.
 
-In this document, an B<instance> of a symbol
+=item * In this document, an B<instance> of a symbol
 in a parse
 means an occurrence
 of the symbol in that parse
@@ -103,18 +105,17 @@ A consequence of this definition
 is that every symbol instance
 has exactly one end location.
 
-=over 4
-
 =item * For some string and grammar,
 we say that a parse is B<valid>
 if the parse of the string
 is valid according to the grammar.
 
 =item * In a parse,
-a nulled symbol instance,
+a B<nulled symbol instance>,
 or B<nulled symbol>, is a symbol instance with a length of zero.
 
-=item * A non-nulled symbol instance, non-nulled instance,
+=item * A B<non-nulled symbol instance>,
+non-nulled instance,
 or B<non-nulled symbol>, is a symbol instance which is not
 nulled.
 
@@ -129,14 +130,14 @@ for all strings,
 all of its instances in valid parses are nulled instances.
 A symbol is B<non-nulling> if it is not nulling.
 
-=item * A string is actual to I<L> if we
+=item * A string is B<actual to L> if we
 know the actual input as far as I<L>,
 and the string is consistent with the input.
 
 =item * If we know the input as far as location I<L>
 and a symbol I<< <S> >> is in some parse that starts at I<L>,
 we say that symbol I<< <S> >> is B<acceptable> at
-a location I<L>.
+a location L>.
 Where location I<L> is understood, we just say
 that symbol I<< <S> >> is B<acceptable>.
 
@@ -145,7 +146,7 @@ and we know the parse as far
 as location I<L>,
 we say that symbol I<< <S> >> is 
 is B<recognized> at
-a location I<L>.
+a location <L>.
 
 =back
 
@@ -160,16 +161,16 @@ a location I<L>.
 =back
 
 Parse events are declared in the SLIF DSL.
-A parse event is either a B<global parse status event>
+A parse event is either a B<parse location event>
 or a B<parse instance event>.
-B<Global parse status events>
+B<Parse location events>
 are those which are deal with the status of the
-parse as a whole.
+parse at a particular parse location.
 B<Parse instance events> are those which report
 deal with the status of a symbol instance.
 
 There are two types
-of global parse status event:
+of parse location event:
 rejection and exhaustion.
 A rejection event is declared using
 the grammar's C<rejection> named argument.
@@ -188,7 +189,7 @@ The various types of parse events are described in detail
 L<below|/"Types of parse event">.
 The description of
 each type of parse event
-will state whether it is a global parse status event,
+will state whether it is a parse location event,
 a lexeme event
 or a non-lexeme event.
 
@@ -203,12 +204,21 @@ L<C<resume()>|Marpa::R3::Scanless::R/"resume()">,
 L<C<lexeme_read()>|Marpa::R3::Scanless::R/"lexeme_read()"> and
 L<C<lexeme_complete()>|Marpa::R3::Scanless::R/"lexeme_complete()">.
 
-The location at which a parse event triggers is the B<event location>.
+The location at which a parse event triggers is the B<trigger location>.
 An event may trigger at any location, including location 0.
 It is important to keep in mind that location 0 events will
 trigger in 
 L<the recognizer's C<new()>
 constructor|Marpa::R3::Scanless::R/Constructor>.
+
+In addition to a trigger location,
+an event has an B<event location>.
+The event location is the same as
+the trigger location,
+except for pre-lexeme events.
+For pre-lexeme events,
+the event location is before the
+the trigger location.
 
 When an event triggers,
 the event handler may B<pause> the recognizer.
@@ -219,12 +229,14 @@ to return as soon as all processing at the
 B<event location>
 is finished, but before
 any processing at later locations.
-Some event-triggering methods return,
-in any case,
-after processing at a single location is finished,
+
+Some event-triggering methods always return
+after processing at each parse location is finished,
 and for those methods, it makes no difference
-whether an event handler pauses the recognizer.
-But in the case of the
+if one of the event handlers
+pauses the recognizer.
+But,
+in the case of the
 L<C<read()>|Marpa::R3::Scanless::R/"read()"> and
 the L<C<resume()>|Marpa::R3::Scanless::R/"resume()">
 methods,
@@ -232,20 +244,21 @@ if an event pauses the recognizer,
 the method may return control to the user
 earlier than it otherwise would.
 
-The trigger location is the same as the event location,
-except in the case of
-L<pre-lexeme events|/"Pre-lexeme events">.
-In the case of a pre-lexeme event, the recognizer
-will only parse as far as the event location,
-which will be earlier than the trigger location.
-This means that pre-lexeme events act as a form
-of look-ahead.
+Recall that, in the case of
+L<pre-lexeme events|/"Pre-lexeme events">,
+the event location is before
+the trigger location.
+This means,
+by using a pre-lexeme event to pause
+the recognizer,
+the app can enforce a form of look-ahead.
 
 The triggering of
 parse instance events may be controlled with
 the L<activate() method|Marpa::R3::Scanless::R/"activate()">.
 An event will only trigger if activated.
-All events are automatically activated when declared.
+By default,
+all events are activated when declared.
 
 =head1 Types of parse event
 
