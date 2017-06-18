@@ -147,7 +147,7 @@ that symbol I<< <S> >> is B<acceptable>.
 and we know the parse as far
 as location I<L>,
 we say that symbol I<< <S> >>
-is B<recognized> at
+is B<recognized at
 a location L>.
 
 =back
@@ -179,7 +179,13 @@ the SLIF recognizer constructor.
 
 B<Instance events> are those which report
 deal with the status of a symbol instance.
-They are declared in the SLIF DSL.
+The symbol instance whose status the event
+report may be potential,
+and not necessarily actual.
+This is the case,
+for example,
+for prediction events.
+Instance events are declared in the SLIF DSL.
 
 There are two types
 of location event:
