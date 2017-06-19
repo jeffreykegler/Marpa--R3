@@ -1995,7 +1995,8 @@ events into real trace events.
                         local q = slr.event_queue
                         q[#q+1] = { 'discarded lexeme',
                             rule_id,
-                            lexeme_block, lexeme_start, lexeme_end, last_g1_location}
+                            lexeme_block, lexeme_start, lexeme_end - lexeme_start,
+                            last_g1_location}
                      end
             end
             ::NEXT_LEXEME::
