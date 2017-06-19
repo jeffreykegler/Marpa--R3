@@ -178,13 +178,13 @@ They are declared using named arguments of
 the SLIF recognizer constructor.
 
 B<Instance events> are those which report
-deal with the status of a symbol instance.
+the status of a symbol instance.
 The symbol instance whose status the event
-report may be potential,
-and not necessarily actual.
-This is the case,
+reports does have be an
+actual symbol instance.
+Prediction events
 for example,
-for prediction events.
+report potential symbol instances.
 Instance events are declared in the SLIF DSL.
 
 There are two types
@@ -277,6 +277,90 @@ the L<activate() method|Marpa::R3::Scanless::R/"activate()">.
 An event will only trigger if activated.
 By default,
 all events are activated when declared.
+
+=head1 Event handlers
+
+Events are processed using Perl closures 
+called B<event handlers>.
+The event handlers are specified using the
+L<C<event_handlers> name
+argument|Marpa::R3::Scanless::R/"event_handlers">
+of the 
+L<the recognizer's C<new()>
+constructor|Marpa::R3::Scanless::R/Constructor>.
+
+A variable number of arguments is
+passed to the event handler.
+The first argument is always the the recognizer.
+The subsequent arguments are the event data.
+The first argument of the event data is
+always the event name.
+Whether there is more than one argument in the
+event data,
+and what the second and later arguments are,
+depends on the type of event.
+The details of the event data arguments are
+described, for each type of event,
+L<below|/"Types of parse event">.
+
+An event handler is expected to return a single
+value.
+This value may be either a string,
+or a Perl C<undef>.
+If the return value of the event handler is
+a string,
+it must be either C<'pause'> or C<'ok'>.
+If the return value of the event handler is
+a Perl C<undef>,
+it will be treated as if it was the string
+C<'ok'>.
+
+If any of event handlers triggered
+at a parse location return
+C<'pause'>,
+the recognizer pauses at that
+parse location.
+If none of event handlers triggered
+at a parse location return
+C<'pause'>,
+the recognizer only pauses at that
+parse location if the method
+that triggered the event would ordinarily
+pause at that parse location.
+
+Readers might find it intuitive to
+think of a return of C<'ok'>
+by a parse handler
+as a command to
+"continue as you ordinarily would".
+and to think of a
+C<'pause'> return
+as an instruction to pause
+the recognizer at the current
+location.
+Thinking in this way,
+a C<'pause'> commands overrides
+any number of C<'ok'> commands.
+
+Another way to understand the return values
+from event handlers,
+is to think of
+a return value of C<'ok'> from an event
+handler as a no-op.
+
+Event handlers are Perl closures,
+and an event handler has access to those variables
+in scope at the point where it is defined.
+When a handler needs to access data
+visible only in
+multiple, distant scopes,
+a "factory" can be used.
+L<Below|/"Examples">
+are several examples of event
+handlers,
+including one where
+the event handlers are instantiated
+by a factory closure.
 
 =head1 Types of parse event
 
