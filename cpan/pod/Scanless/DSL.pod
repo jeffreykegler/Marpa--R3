@@ -923,7 +923,7 @@ If the condition described
 by the named event statement
 occurs during an event-triggering method,
 the method will return immediately,
-with the current location at the trigger location.
+with the current location at the event location.
 Once triggered,
 named events may be queried using
 L<the Scanless recognizer's events()

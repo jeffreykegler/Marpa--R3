@@ -386,12 +386,12 @@ whenever a non-nulled instance of its symbol
 is recognized at the current location.
 
 When a completion event triggers,
-its trigger location and its event location
+its event location
 are set to the current location,
 which will be the end location
 of the instance that triggered the event.
 The event is called a "completion"
-because, at the trigger location,
+because, at the event location,
 the recognition of its symbol
 is "complete".
 
@@ -424,7 +424,8 @@ grammar and discarded symbols
 are discarded
 before the G1 grammar can see them.
 
-When a discard event triggers, its trigger location and its event location are set to the current location.
+When a discard event triggers,
+its event location is set to the current location.
 This will be the end location of the discarded text.
 
 A discard event passes
@@ -503,8 +504,8 @@ normalize-whitespace: 1
 A nulling SLIF parse event occurs whenever a nulled instance
 of its symbol is recognized at the current location.
 When a nulling event triggers,
-its trigger location and its event location
-are set to the current location,
+its event location
+is set to the current location,
 which will be
 the location where the triggering instance both begins and ends.
 
@@ -556,8 +557,8 @@ normalize-whitespace: 1
 A prediction event triggers whenever
 a non-nulling symbol is acceptable at the current location.
 When a prediction event triggers,
-its trigger location and its event location
-are set to the current location.
+its event location
+is set to the current location.
 A prediction may not result in an actual instance of the symbol,
 but no actual symbol instance can start
 at the event location unless a prediction,
@@ -592,8 +593,8 @@ already read the lexeme
 when its post-lexeme event triggers.
 
 When a post-lexeme event triggers,
-its trigger location and its event location
-are set to the current location,
+its event location
+is set to the current location,
 which will also be the location where the lexeme ends.
 A post-lexeme event also sets the
 L<C<pause span>|"Pause span">.
@@ -645,9 +646,8 @@ A pre-lexeme event is a lexeme event.
 It triggers if the lexeme is scanned at the current location.
 When a pre-lexeme event triggers,
 its event location
-is set to the current location.
-Its trigger location is set to the location where the lexeme starts,
-which will be before the event location.
+is set to the location where the lexeme starts,
+which will be before the trigger location.
 A pre-lexeme event also sets the
 L<C<pause span>|"Pause span">.
 
@@ -656,10 +656,11 @@ read the lexeme
 when its pre-lexeme event triggers.
 In effect, it "rewinds" the scanning.
 
-For most events, the trigger location is the current location,
+For most events, the trigger location is the event location,
 but pre-lexeme events are the exception.
-Its setting of the trigger location to the start of the lexeme
-is consistent with the pre-lexeme event's behavior as a "rewind".
+Pre-lexeme events set
+the event location to the start of the lexeme,
+which is consistent with the pre-lexeme event's behavior as a "rewind".
 An intended use of pre-lexeme events
 is catching a lexeme which
 is about to be read, and giving it special treatment.
@@ -686,9 +687,9 @@ actually be found in the input.
 =item *
 
 Even though they have the same
-trigger location,
+event location,
 pre-lexeme and prediction events
-do not occur at the same time,
+do not trigger at the same time,
 because pre-lexeme events
 require a scan of the lexeme,
 while prediction events do not.
@@ -705,14 +706,6 @@ Pre-lexeme events can be defined only
 for lexemes.
 Prediction events can be defined for any
 symbol.
-
-=item *
-
-In common with most other event types,
-prediction events will trigger at their event location.
-Pre-lexeme events will not trigger
-at the event location --
-they will trigger later in the parse.
 
 =back
 
@@ -909,17 +902,6 @@ The G1 grammar would accept its lexeme at that location.
 
 =item *
 
-The lexeme is not scanned externally,
-that is,
-it is not scanned
-by a call of the
-L<C<< $slr->lexeme_complete() >> method|Marpa::R3::Scanless::R/"lexeme_complete()">
-or of the
-L<C<< $slr->lexeme_read() >> method|Marpa::R3::Scanless::R/"lexeme_read()">
-method.
-
-=item *
-
 The event is activated.
 An event is activated by default when it
 is declared.
@@ -945,7 +927,7 @@ post-lexeme events from triggering at the same location.)
 
 Marpa allows ambiguous lexemes and,
 even after all the above criteria have been applied,
-there may be more than one lexeme event at a G1 location.
+there may be more than one lexeme event at a location.
 
 =head2 Pause span
 
@@ -1390,25 +1372,6 @@ L<C<< $slr->lexeme_complete() >>|Marpa::R3::Scanless::R/"lexeme_complete()"> and
 L<C<< $slr->lexeme_read() >>|Marpa::R3::Scanless::R/"lexeme_read()"> methods.
 Non-lexeme events may trigger during these methods, as was discussed
 in L</"Hidden events">.
-However, lexeme events that would occur during the
-C<< $slr->lexeme_complete() >> and
-C<< $slr->lexeme_read() >> methods are ignored,
-and will never trigger.
-
-This behavior may seem non-orthogonal,
-but in fact it is the most consistent course of action.
-A pre-lexeme event occuring during
-a C<< $slr->lexeme_complete() >> and
-C<< $slr->lexeme_read() >> method call would reverse its effect,
-a behavior which is at best pointless.
-A post-lexeme event would be less dangerous,
-but it would be completely redundant --
-its presence or absence
-would tell the application only what
-the application already knows from the
-return of success or failure by the
-C<< $slr->lexeme_complete() >> or
-C<< $slr->lexeme_read() >> methods.
 
 =head1 Examples
 

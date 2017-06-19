@@ -255,7 +255,7 @@ current location will depend on the reason for the return.
 If a
 L<SLIF parse event|Marpa::R3::Event>
 triggered, the current location will be
-the trigger location;
+the event location;
 otherwise the current location will be at the end of the
 input string.
 
@@ -273,7 +273,7 @@ On successful return from the
 L<C<resume()>|/"resume()"> method,
 the current location is set in the same way as it for the
 L<C<read()>|/"read()"> method:
-the trigger location, if an event triggered;
+the event location, if an event triggered;
 otherwise, the end of string.
 The L<C<resume()>|/"resume()"> method may be called repeatedly,
 until the application considers the virtual input stream
@@ -973,7 +973,7 @@ C<read()> returns success if it parses to the end
 of the input string,
 or if it triggers a SLIF parse event.
 If a SLIF parse event occurs during the C<read()> method,
-the current location is set to the trigger location.
+the current location is set to the event location.
 SLIF parse events are described in detail in
 L<a separate document|Marpa::R3::Event>.
 If no SLIF parse event triggers,
@@ -1308,19 +1308,14 @@ ignore: 1
 
 Non-lexeme
 SLIF parse events may trigger during the C<lexeme_read()> method.
-Lexeme SLIF parse events are ignored because they are designed
-to allow switching over to external scanning, and
-make no sense when external scanning is already in progress.
 SLIF parse events are described in detail in
 L<a separate document|Marpa::R3::Event>.
 
 Current input stream location will be set
-to C<$start+$length>.
-If a SLIF parse event triggers, current input stream location
-will be set to the trigger location.
-Currently the trigger location and
-C<$start+$length> will always be the same,
-but that may change.
+to C<$start+$length>,
+unless a pre-lexeme event triggers.
+If a pre-lexeme event triggers,
+current location will be set to the event location.
 
 When successful,
 C<lexeme_read()> advances
@@ -1383,7 +1378,7 @@ Negative arguments are interpreted
 as L<described above|/"Spans">.
 
 If a SLIF parse event occurs during the C<read()> method,
-the current location is set to the trigger location.
+the current location is set to the event location.
 SLIF parse events are described in detail in
 L<a separate document|Marpa::R3::Event>.
 If no SLIF parse event triggers,
