@@ -618,22 +618,17 @@ The symbol ID of the lexeme.
 
 =item *
 
-The index of the block containing the discarded text.
+The index of the block containing the lexeme.
 
 =item *
 
-The start location of the discarded text.
+The start location of the lexeme.
 
 =item *
 
-The length, in codepoints, of the discarded text.
-
-=item *
-
-The G1 location of the last lexeme read.
+The length, in codepoints, of the lexeme.
 
 =back
-
 
 =head2 Pre-lexeme events
 
@@ -670,9 +665,6 @@ is catching a lexeme which
 is about to be read, and giving it special treatment.
 For more on this, see
 L<below|"External scanning">.
-Pre-lexeme events which trigger during
-C<< $slr->lexeme_complete() >> and
-C<< $slr->lexeme_read() >> calls are discarded.
 
 There is a lot of similarity
 between pre-lexeme events and predictions,
@@ -725,11 +717,37 @@ start of the lexeme as a convenience.
 
 =back
 
-In the SLIF parse event descriptor returned
-by the
-L<the C<< $slr->events() >>
-method|Marpa::R3::Scanless::R/"events()">,
-the name of pre-lexeme event is the only element.
+A post_lexeme event passes
+the following arguments to its event handler,
+in order:
+
+=over 4
+
+=item *
+
+The recognizer.
+
+=item *
+
+The name of the post_lexeme event.
+
+=item *
+
+The symbol ID of the lexeme.
+
+=item *
+
+The index of the block containing the lexeme.
+
+=item *
+
+The start location of the lexeme.
+
+=item *
+
+The length, in codepoints, of the lexeme.
+
+=back
 
 =head2 Exhaustion events
 
