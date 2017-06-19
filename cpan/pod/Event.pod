@@ -598,7 +598,7 @@ which will also be the location where the lexeme ends.
 A post-lexeme event also sets the
 L<C<pause span>|"Pause span">.
 
-A post_lexeme event passes
+A post-lexeme event passes
 the following arguments to its event handler,
 in order:
 
@@ -610,7 +610,7 @@ The recognizer.
 
 =item *
 
-The name of the post_lexeme event.
+The name of the post-lexeme event.
 
 =item *
 
@@ -717,7 +717,7 @@ start of the lexeme as a convenience.
 
 =back
 
-A post_lexeme event passes
+A pre-lexeme event passes
 the following arguments to its event handler,
 in order:
 
@@ -729,7 +729,7 @@ The recognizer.
 
 =item *
 
-The name of the post_lexeme event.
+The name of the pre-lexeme event.
 
 =item *
 
