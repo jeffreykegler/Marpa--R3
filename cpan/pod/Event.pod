@@ -358,6 +358,19 @@ including one where
 the event handlers are instantiated
 by a factory closure.
 
+Some recognizer methods
+may not called inside a event handler for
+the same recognizer.
+The restricted methods include all those
+recognizer methods which may themselves
+trigger parse events are not allowed.
+Restricted methods include
+L<C<read()>|Marpa::R3::Scanless::R/"read()">,
+L<C<resume()>|Marpa::R3::Scanless::R/"resume()">,
+L<C<lexeme_read()>|Marpa::R3::Scanless::R/"lexeme_read()"> and
+L<C<lexeme_complete()>|Marpa::R3::Scanless::R/"lexeme_complete()">.
+Methods called for different recognizers are allowed.
+
 =head1 Types of parse event
 
 =head2 Completion events
@@ -748,7 +761,7 @@ name: SLIF exhaustion grammar setting synopsis part 1
 
     my $g = Marpa::R3::Scanless::G->new(
         {
-            source     => \($grammar),
+            source     => \$dsl,
             exhaustion => 'event',
             rejection  => 'event',
         }
@@ -1306,73 +1319,6 @@ would always occur together.
 This very special nature of nulled symbols motivates their
 treatment as a special case.
 
-=head2 Hidden events
-
-An important aspect of the event mechanism is that
-it triggers a return from the event-triggering
-method at the trigger location.
-It may happen, however, that the method would return
-at that location in any case,
-and in this circumstance
-the triggering
-can be said to be B<hidden>.
-A event which causes hidden triggering is called
-a B<hidden event>.
-
-As one example,
-the
-L<C<lexeme_complete()>|Marpa::R3::Scanless::R/"lexeme_complete()"> and
-L<C<lexeme_read()>|Marpa::R3::Scanless::R/"lexeme_read()">
-methods return at every lexeme at which a lexeme is read, so
-all triggering in those methods is hidden triggering.
-In L<the example code in this
-document|/"An example">,
-the events at this location were all caused by hidden
-triggering inside a call to C<< $slr->lexeme_complete() >>:
-
-=for Marpa::R3::Display
-name: SLIF Event synopsis
-normalize-whitespace: 1
-partial: 1
-
-    Events at position 21: ^e ^f d$ e[] mid1$ mid2$
-
-=for Marpa::R3::Display::End
-
-As another example,
-the C<< $slr->read() >> and C<< $slr->resume() >> methods
-return at end of string,
-but events may also trigger at end of string.
-The events at this location were caused by hidden
-triggering inside C<< $slr->resume() >>
-at end of string:
-
-=for Marpa::R3::Display
-name: SLIF Event synopsis
-normalize-whitespace: 1
-partial: 1
-
-    Events at position 29: "h" test$
-
-=for Marpa::R3::Display::End
-
-The L<example code for this document|/"An example">
-is programmed with the possibility of hidden
-triggering in mind.
-To do this, it is careful to access events after its
-calls to the
-C<< $slr->lexeme_read() >>
-as well as to make an additional pass through the event-accessing loop
-after an end of string is encountered.
-
-=head2 Lexeme events and external scanning
-
-During external scanning, lexemes are read using the
-L<C<< $slr->lexeme_complete() >>|Marpa::R3::Scanless::R/"lexeme_complete()"> and
-L<C<< $slr->lexeme_read() >>|Marpa::R3::Scanless::R/"lexeme_read()"> methods.
-Non-lexeme events may trigger during these methods, as was discussed
-in L</"Hidden events">.
-
 =head1 Examples
 
 =head2 Grammar 1
@@ -1548,10 +1494,10 @@ normalize-whitespace: 1
             grammar        => $grammar3,
             event_handlers => {
                 "'default" => sub () {
-                    my ( $slr, $event_name, $symid, $start, $length ) = @_;
+                    my ( $slr, $event_name, $symid, $block_ix, $start, $length ) = @_;
                     my $symbol_name = $grammar3->symbol_name($symid);
                     push @results,
-                        "event $event_name for symbol $symbol_name at location $start, length=$length";
+                        "event $event_name for symbol $symbol_name; block $block_ix, location $start, length=$length";
                     'ok';
                 },
             }

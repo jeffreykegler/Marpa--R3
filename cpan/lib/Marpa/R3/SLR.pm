@@ -323,6 +323,15 @@ END_OF_LUA
 
 sub Marpa::R3::Scanless::R::read {
     my ( $slr, $p_string, $start_pos, $length ) = @_;
+    if ( $slr->[Marpa::R3::Internal::Scanless::R::CURRENT_EVENT] ) {
+        Marpa::R3::exception(
+            "$slr->read() called from inside a handler\n",
+            "   This is not allowed\n",
+            "   The event was ",
+            $slr->[Marpa::R3::Internal::Scanless::R::CURRENT_EVENT],
+            "\n",
+        );
+    }
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
 
     my $block_ix = $slr->block_new($p_string);
@@ -347,6 +356,15 @@ END_OF_LUA
 
 sub Marpa::R3::Scanless::R::resume {
     my ( $slr, $start_pos, $length ) = @_;
+    if ( $slr->[Marpa::R3::Internal::Scanless::R::CURRENT_EVENT] ) {
+        Marpa::R3::exception(
+            "$slr->resume() called from inside a handler\n",
+            "   This is not allowed\n",
+            "   The event was ",
+            $slr->[Marpa::R3::Internal::Scanless::R::CURRENT_EVENT],
+            "\n",
+        );
+    }
     my $trace_file_handle =
       $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
 
@@ -871,6 +889,15 @@ END_OF_LUA
 # Returns 0 on unthrown failure, current location on success
 sub Marpa::R3::Scanless::R::lexeme_complete {
     my ( $slr, $start, $length ) = @_;
+    if ( $slr->[Marpa::R3::Internal::Scanless::R::CURRENT_EVENT] ) {
+        Marpa::R3::exception(
+            "$slr->lexeme_complete() called from inside a handler\n",
+            "   This is not allowed\n",
+            "   The event was ",
+            $slr->[Marpa::R3::Internal::Scanless::R::CURRENT_EVENT],
+            "\n",
+        );
+    }
 
     my $trace_file_handle =
         $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
@@ -927,6 +954,15 @@ END_OF_LUA
 # undef if lexeme not accepted.
 sub Marpa::R3::Scanless::R::lexeme_read {
     my ( $slr, $symbol_name, $start, $length, @value ) = @_;
+    if ( $slr->[Marpa::R3::Internal::Scanless::R::CURRENT_EVENT] ) {
+        Marpa::R3::exception(
+            "$slr->lexeme_read() called from inside a handler\n",
+            "   This is not allowed\n",
+            "   The event was ",
+            $slr->[Marpa::R3::Internal::Scanless::R::CURRENT_EVENT],
+            "\n",
+        );
+    }
     return if not $slr->lexeme_alternative( $symbol_name, @value );
     return $slr->lexeme_complete( $start, $length );
 }
@@ -1138,6 +1174,15 @@ END_OF_LUA
 # TODO -- Document this method
 sub Marpa::R3::Scanless::R::block_set {
     my ($slr, $block_ix) = @_;
+    if ( $slr->[Marpa::R3::Internal::Scanless::R::CURRENT_EVENT] ) {
+        Marpa::R3::exception(
+            "$slr->block_set() called from inside a handler\n",
+            "   This is not allowed\n",
+            "   The event was ",
+            $slr->[Marpa::R3::Internal::Scanless::R::CURRENT_EVENT],
+            "\n",
+        );
+    }
     $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
             <<'END_OF_LUA', 'i', $block_ix );
         local slr, block_ix_arg = ...

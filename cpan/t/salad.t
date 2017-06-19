@@ -34,7 +34,7 @@ use Marpa::R3;
 my $verbose;
 die if not Getopt::Long::GetOptions( verbose => \$verbose );
 
-my $grammar = << '=== GRAMMAR ===';
+my $dsl = << '=== GRAMMAR ===';
 lexeme default = action => [ name, value ] # to add token names to ast
 
 <prefixed target> ::= prefix target
@@ -86,13 +86,13 @@ rsquare ~ <deep rsquare>
 # Marpa::R3::Display
 # name: SLIF exhaustion grammar setting synopsis part 1
 
-my $g = Marpa::R3::Scanless::G->new(
-    {
-        source     => \($grammar),
-        exhaustion => 'event',
-        rejection  => 'event',
-    }
-);
+    my $g = Marpa::R3::Scanless::G->new(
+        {
+            source     => \$dsl,
+            exhaustion => 'event',
+            rejection  => 'event',
+        }
+    );
 
 # Marpa::R3::Display::End
 
