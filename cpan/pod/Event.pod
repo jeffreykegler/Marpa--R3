@@ -395,11 +395,10 @@ because, at the trigger location,
 the recognition of its symbol
 is "complete".
 
-In the SLIF parse event descriptor returned
-by the
-L<the C<< $slr->events() >>
-method|Marpa::R3::Scanless::R/"events()">,
-the name of completed event is the only element.
+A completed event passes two arguments to
+its event handler:
+the recognizer,
+and the event name.
 
 =head2 Discard events
 
