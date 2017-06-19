@@ -240,7 +240,7 @@ the trigger location.
 
 When an event triggers,
 the event handler may B<pause> the recognizer.
-If an event pauses the recognizer,
+If an event handler pauses the recognizer,
 it causes the
 event-triggering method
 to return as soon as all processing at the
@@ -269,7 +269,7 @@ the trigger location.
 This means,
 by using a pre-lexeme event to pause
 the recognizer,
-the app can enforce a form of look-ahead.
+a Marpa::R3 app can enforce a form of look-ahead.
 
 The triggering of
 parse instance events may be controlled with
