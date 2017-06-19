@@ -395,7 +395,7 @@ because, at the trigger location,
 the recognition of its symbol
 is "complete".
 
-A completed event passes two arguments to
+A completion event passes two arguments to
 its event handler:
 the recognizer,
 and the event name.
