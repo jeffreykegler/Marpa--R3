@@ -369,7 +369,8 @@ L<C<read()>|Marpa::R3::Scanless::R/"read()">,
 L<C<resume()>|Marpa::R3::Scanless::R/"resume()">,
 L<C<lexeme_read()>|Marpa::R3::Scanless::R/"lexeme_read()"> and
 L<C<lexeme_complete()>|Marpa::R3::Scanless::R/"lexeme_complete()">.
-Methods called for different recognizers are allowed.
+It is allowed to call a method of one recognizer inside
+an event handler belonging to a different recognizer.
 
 =head1 Types of parse event
 
