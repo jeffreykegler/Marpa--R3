@@ -318,7 +318,6 @@ C<'ok'>.
 
 Let I<L> be a parse location.
 The recognizer pauses at I<L>
-parse location,
 if any of event handlers triggered
 at I<L> return C<'pause'>.
 If none of event handlers triggered
