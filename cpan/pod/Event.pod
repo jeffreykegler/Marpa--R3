@@ -451,7 +451,7 @@ The start location of the discarded text.
 
 =item *
 
-The end location of the discarded text.
+The length, in codepoints, of the discarded text.
 
 =item *
 
