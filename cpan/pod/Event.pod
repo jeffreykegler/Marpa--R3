@@ -196,8 +196,8 @@ A exhaustion event is declared using
 the grammar's C<exhaustion> named argument.
 
 An instance event is either
-a lexeme event or
-a non-lexeme event.
+a B<lexeme event> or
+a B<non-lexeme event>.
 A lexeme event is declared using a
 L<C<:lexeme> pseudo-rule|Marpa::R3::Scanless::DSL/"Lexeme pseudo-rule">.
 A non-lexeme event is declared using a
