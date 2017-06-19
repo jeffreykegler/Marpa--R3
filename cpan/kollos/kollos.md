@@ -2026,7 +2026,7 @@ Returns `true` is there was one,
                 end
                 local q = slr.event_queue
                 q[#q+1] = {
-                    'before lexeme', g1_lexeme, lexeme_start,
+                    'before lexeme', g1_lexeme, lexeme_block, lexeme_start,
                     lexeme_end - lexeme_start
                 }
                 slr.start_of_pause_lexeme = lexeme_start
@@ -2155,7 +2155,7 @@ Read alternatives into the G1 grammar.
                         ))
                     end
                     local q = slr.event_queue
-                    q[#q+1] = { 'after lexeme', g1_lexeme, lexeme_start, lexeme_end - lexeme_start}
+                    q[#q+1] = { 'after lexeme', g1_lexeme, block_ix, lexeme_start, lexeme_end - lexeme_start}
                 end
             end
             ::NEXT_EVENT::

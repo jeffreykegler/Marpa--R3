@@ -191,10 +191,10 @@ $recce = Marpa::R3::Scanless::R->new(
         grammar        => $grammar3,
         event_handlers => {
             "'default" => sub () {
-                my ( $slr, $event_name, $symid, $start, $length ) = @_;
+                my ( $slr, $event_name, $symid, $block_ix, $start, $length ) = @_;
                 my $symbol_name = $grammar3->symbol_name($symid);
                 push @results,
-                    "event $event_name for symbol $symbol_name at location $start, length=$length";
+                    "event $event_name for symbol $symbol_name; block $block_ix, location $start, length=$length";
                 'ok';
             },
         }
@@ -205,9 +205,9 @@ $recce = Marpa::R3::Scanless::R->new(
 
 $recce->read( \"a b c" );
 Test::More::is( ( join qq{\n}, @results, q{} ), <<'END_OF_EXPECTED', 'event with data' );
-event A for symbol A at location 0, length=1
-event B for symbol B at location 2, length=1
-event C for symbol C at location 4, length=1
+event A for symbol A; block 1, location 0, length=1
+event B for symbol B; block 1, location 2, length=1
+event C for symbol C; block 1, location 4, length=1
 END_OF_EXPECTED
 
 ## Data using factory

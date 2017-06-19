@@ -89,8 +89,8 @@ for (
             next EVENT;
         } ## end if ( $name eq 'expecting text' )
         if ( $name eq 'string length' ) {
-            my ( undef, $start_pos, $length ) = @event_data;
-            $last_string_length = $recce->literal( $start_pos, $length ) + 0;
+            my ( undef, $block_ix, $start_pos, $length ) = @event_data;
+            $last_string_length = $recce->literal( $start_pos, $length, $block_ix ) + 0;
             $pos = $start_pos + $length;
             next EVENT;
         } ## end if ( $name eq 'string length' )
