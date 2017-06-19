@@ -318,7 +318,7 @@ C<'ok'>.
 
 Let I<L> be a parse location.
 The recognizer pauses at I<L>
-parse location.
+parse location,
 if any of event handlers triggered
 at I<L> return C<'pause'>.
 If none of event handlers triggered
@@ -334,21 +334,16 @@ Readers might find it intuitive to
 think of a return of C<'ok'>
 by a parse handler
 as a command to
-"continue as you ordinarily would".
+"continue as you ordinarily would",
 and to think of a
 C<'pause'> return
 as an instruction to pause
 the recognizer at the current
 location.
 Thinking in this way,
-a C<'pause'> commands overrides
-any number of C<'ok'> commands.
-
-Another way to understand the return values
-from event handlers,
-is to think of
-a return value of C<'ok'> from an event
-handler as a no-op.
+a C<'pause'> return value overrides
+any number of C<'ok'> return values
+at the same parse location.
 
 Event handlers are Perl closures,
 and an event handler has access to those variables
