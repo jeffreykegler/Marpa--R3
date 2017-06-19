@@ -258,7 +258,7 @@ in the case of the
 L<C<read()>|Marpa::R3::Scanless::R/"read()"> and
 the L<C<resume()>|Marpa::R3::Scanless::R/"resume()">
 methods,
-if an event pauses the recognizer,
+if an event handler pauses the recognizer,
 the method may return control to the user
 earlier than it otherwise would.
 
@@ -271,12 +271,12 @@ by using a pre-lexeme event to pause
 the recognizer,
 a Marpa::R3 app can enforce a form of look-ahead.
 
-The triggering of
-parse instance events may be controlled with
-the L<activate() method|Marpa::R3::Scanless::R/"activate()">.
 An event will only trigger if activated.
 By default,
 all events are activated when declared.
+The triggering of
+parse instance events may be controlled with
+the L<activate() method|Marpa::R3::Scanless::R/"activate()">.
 
 =head1 Event handlers
 
