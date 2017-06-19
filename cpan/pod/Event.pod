@@ -502,7 +502,7 @@ normalize-whitespace: 1
 
 A nulling SLIF parse event occurs whenever a nulled instance
 of its symbol is recognized at the current location.
-When a completion event triggers,
+When a nulling event triggers,
 its trigger location and its event location
 are set to the current location,
 which will be
@@ -533,11 +533,10 @@ Nulled forests are described in more detail
 in L<a separate
 section|"Nulled forests">.
 
-In the SLIF parse event descriptor returned
-by the
-L<the C<< $slr->events() >>
-method|Marpa::R3::Scanless::R/"events()">,
-the name of nulling event is the only element.
+A nulling event passes two arguments to
+its event handler:
+the recognizer,
+and the event name.
 
 =head2 Prediction events
 
