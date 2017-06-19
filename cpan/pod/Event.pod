@@ -517,7 +517,7 @@ because a null derivation may be ambiguous,
 a nulled symbol may derive more than one nulled
 tree.
 A set of one or more nulled trees
-is called a nulled forest.
+is called a B<nulled forest>.
 
 When a nulling event triggers for a symbol instance,
 all activated nulling events declared
@@ -569,11 +569,10 @@ whether it is a lexeme or not.
 But prediction events are non-lexeme events,
 even when their symbol is a lexeme.
 
-In the SLIF parse event descriptor returned
-by the
-L<the C<< $slr->events() >>
-method|Marpa::R3::Scanless::R/"events()">,
-the name of prediction event is the only element.
+A prediction event passes two arguments to
+its event handler:
+the recognizer,
+and the event name.
 
 =head2 Post-lexeme events
 
