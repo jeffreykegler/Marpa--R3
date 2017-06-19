@@ -427,11 +427,9 @@ before the G1 grammar can see them.
 When a discard event triggers, its trigger location and its event location are set to the current location.
 This will be the end location of the discarded text.
 
-In the SLIF parse event descriptor returned
-by the
-L<the C<< $slr->events() >>
-method|Marpa::R3::Scanless::R/"events()">,
-there will be 4 elements:
+A discard event passes
+the following arguments to its event handler,
+in order:
 
 =over 4
 
