@@ -1994,7 +1994,8 @@ events into real trace events.
                         local last_g1_location = g1r:latest_earley_set()
                         local q = slr.event_queue
                         q[#q+1] = { 'discarded lexeme',
-                            rule_id, lexeme_start, lexeme_end, last_g1_location}
+                            rule_id,
+                            lexeme_block, lexeme_start, lexeme_end, last_g1_location}
                      end
             end
             ::NEXT_LEXEME::

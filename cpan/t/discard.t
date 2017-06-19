@@ -118,7 +118,7 @@ for my $expression ( @{ ${$value_ref} } ) {
     $result .= "\n";
   EVENT: while ( $event_ix <= $#events ) {
         my $event = $events[$event_ix];
-        my $g1loc = $event->[3];
+        my $g1loc = $event->[4];
         last EVENT if $g1loc >= $g1end;
         my $type = $g1loc == $g1start ? 'preceding' : 'internal';
         $result .= join q{ }, $type, display_event( $recce, @{$event} );
@@ -143,7 +143,7 @@ sub round_value {
 }
 
 sub display_event {
-    my ( $recce, $event_name, $start, $end ) = @_;
+    my ( $recce, $event_name, $block_ix, $start, $end ) = @_;
     if ( $event_name eq 'ws' ) {
         return "ws of length " . ( $end - $start );
     }

@@ -437,17 +437,23 @@ there will be 4 elements:
 
 =item *
 
+The recognizer.
+
+=item *
+
 The name of the discard event.
 
 =item *
 
-The start location of the discarded text,
-as an offset in the physical input stream.
+The index of the block containing the discarded text.
 
 =item *
 
-The end location of the discarded text,
-as an offset in the physical input stream.
+The start location of the discarded text.
+
+=item *
+
+The end location of the discarded text.
 
 =item *
 
@@ -456,26 +462,23 @@ The G1 location of the last lexeme read.
 =back
 
 An intended purpose of the G1 location is to allow
-the synchronization of data taken from a series of discard events,
-with data taken from a parse tree.
-Physical input stream locations can often
-be used for this purpose,
-but an application is allowed to move around
-in the physical input stream.
-If an application does not move monotonically
-through the physical input stream,
-physical input stream locations will not
-necessarily indicate the order from the point
-of view of the parse tree,
-and of the virtual input stream.
+the synchronization of data taken from discard events
+with the parse tree.
+L0 locations are not sufficient to do this,
+because Marpa::R3 allows an app to move
+backward and forward both within
+and between blocks of input.
 G1 locations are always in left-to-right order
-from the point of view of parse tree,
-and of the virtual input stream on which it is based.
+from the point of view of parse tree.
 
-Since discarded text is not seen by G1,
-it does not really have a G1 location, so the G1 location
-reported with the event
-is that of the last lexeme read.
+Note that, since discarded text is never
+actually seen by G1,
+in the strict sense
+it cannot have a G1 location.
+The G1 location
+reported with the discard event
+is that of the last lexeme read before
+the discarded text.
 All lexemes have G1 locations.
 If the discarded text is at the beginning of the parse,
 before any lexemes have been read,
