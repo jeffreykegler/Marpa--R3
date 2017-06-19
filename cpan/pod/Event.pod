@@ -235,7 +235,7 @@ The event location is the same as
 the trigger location,
 except for pre-lexeme events.
 For pre-lexeme events,
-the event location is before the
+the event location is before
 the trigger location.
 
 When an event triggers,
@@ -283,21 +283,22 @@ all events are activated when declared.
 Events are processed using Perl closures 
 called B<event handlers>.
 The event handlers are specified using the
-L<C<event_handlers> name
+L<C<event_handlers> named
 argument|Marpa::R3::Scanless::R/"event_handlers">
-of the 
+of
 L<the recognizer's C<new()>
 constructor|Marpa::R3::Scanless::R/Constructor>.
 
-A variable number of arguments is
+Two or more arguments are
 passed to the event handler.
-The first argument is always the the recognizer.
-The subsequent arguments are the event data.
+The first argument is always the recognizer.
+Subsequent arguments are the event data.
 The first argument of the event data is
 always the event name.
 Whether there is more than one argument in the
 event data,
-and what the second and later arguments are,
+and what the third and later arguments
+to the event handler are,
 depends on the type of event.
 The details of the event data arguments are
 described, for each type of event,
@@ -315,18 +316,19 @@ a Perl C<undef>,
 it will be treated as if it was the string
 C<'ok'>.
 
-If any of event handlers triggered
-at a parse location return
-C<'pause'>,
-the recognizer pauses at that
+Let I<L> be a parse location.
+The recognizer pauses at I<L>
 parse location.
+if any of event handlers triggered
+at I<L> return C<'pause'>.
 If none of event handlers triggered
-at a parse location return
+at I<L> return
 C<'pause'>,
-the recognizer only pauses at that
-parse location if the method
+the recognizer returns control to
+the app at I<L>
+only if the method
 that triggered the event would ordinarily
-pause at that parse location.
+return control to the app at I<L>.
 
 Readers might find it intuitive to
 think of a return of C<'ok'>
