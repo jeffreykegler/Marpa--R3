@@ -74,9 +74,11 @@ L<below|/"An example">.
 
 This document is an overview of B<SLIF parse events>.
 SLIF parse events
-B<trigger> based on conditions declared in the DSL.
-Typical events are the prediction or recognition
-of a symbol.
+One example of a circumstance for
+which event an event can be created is the prediction of a symbol
+in the parse.
+Another example is the recognition of a symbol in the parse.
+A third example is parse exhaustion.
 
 SLIF parse events are often used to allow an application to
 switch over to its own custom procedural logic.
