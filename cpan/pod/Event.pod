@@ -413,7 +413,7 @@ symbol that is not a lexeme.
 
 When a completion event triggers,
 its event location
-are set to the current location,
+is set to the current location,
 which will be the end location
 of the instance that triggered the event.
 The event is called a "completion"
