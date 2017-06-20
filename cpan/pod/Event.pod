@@ -304,14 +304,15 @@ Subsequent arguments are the event data.
 The first element of the event data,
 which is the second argument of the event handler,
 is always the event name.
-Whether there is more than one argument in the
+Whether there is more than one element in the
 event data,
-and what the third and later arguments
+and therefore what the third and later arguments
 to the event handler are,
 depends on the type of event.
-The details of the event data arguments are
-described, for each type of event,
-L<below|/"Types of parse event">.
+L<Below|/"Types of parse event">,
+the details of the event data arguments are
+described
+for each type of event.
 
 An event handler is expected to return a single
 value.
