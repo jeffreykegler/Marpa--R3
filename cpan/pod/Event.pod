@@ -1673,14 +1673,26 @@ events are indifferent to whether they occur together
 at I<pos> or not.
 But, for many apps, it is very important
 to be able to handle all the events occuring
-at I<pos> together.
+at I<pos> as a group.
 
 There are two ways to do this.
-One is to return C<'pause'> from any of the event
+
+=over 4
+
+=item * Return C<'pause'> from any of the event
 handlers at I<pos>.
 The recognizer will return control to the app
 once all processing at I<pos> is complete,
 and the app can do as it wishes.
+
+=item * Store the data for the event in
+an array indexed by I<pos>,
+and process the events later,
+from the array.
+
+=back
+
+The next example illustrates the "pause" method.
 
 =for Marpa::R3::Display
 name: event examples - per-location using pause
