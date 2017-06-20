@@ -446,7 +446,8 @@ L<discard pseudo-rules|Marpa::R3::Scanless::DSL/"Discard pseudo-rule">.
 They are non-lexeme events.
 This may seem counter-intuitive,
 but a lexeme must be a symbol visible to the G1
-grammar and discarded symbols
+grammar --
+discarded symbols
 are discarded
 before the G1 grammar can see them.
 
