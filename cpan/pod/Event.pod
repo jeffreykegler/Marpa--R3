@@ -856,6 +856,7 @@ read input -- they never try to continue reading input.
 Parse exhausion in
 the L<C<read()>|Marpa::R3::Scanless::R/"read()">
 or the L<C<resume()>|Marpa::R3::Scanless::R/"resume()">
+methods
 may be either synchronous or
 asynchronous.
 
