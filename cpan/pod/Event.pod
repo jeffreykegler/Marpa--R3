@@ -1540,10 +1540,10 @@ normalize-whitespace: 1
 
 =head2 Events with associated data
 
-The next two examples show on how event handlers can
+The next two examples show how event handlers
 access data.
-This example shows an event which has data associated
-directly with it.
+This example shows an event which has event data
+directly associated with it.
 This data is passed in the arguments to the handler.
 
 =for Marpa::R3::Display
