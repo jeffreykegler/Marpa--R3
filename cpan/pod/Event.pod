@@ -942,12 +942,6 @@ of any user-named event.)
 
 =head2 Lexeme events
 
-SLIF parse events are divided
-into lexeme and non-lexeme events,
-based on their type.
-The lexeme events are the pre-lexeme event
-and post-lexeme event.
-
 A lexeme event will trigger at the current location
 if all of the following criteria,
 applied in order, are true:
