@@ -826,11 +826,11 @@ the name of any user-named event.)
 
 Intuitively, parse exhaustion events are created only when
 needed for control to return to the application.
-Stated another way,
+More formally,
 a parse exhaustion event is called B<asynchronous> if it
 occurs
 in a method, and at a location,
-where the method would "ordinarily" had continued
+where the method would "ordinarily" have continued
 reading.
 Here "ordinarily" means
 
@@ -847,13 +847,13 @@ asynchronous.
 
 Parse exhaustion in the
 L<C<lexeme_read()>|Marpa::R3::Scanless::R/"lexeme_read()"> and
-L<C<lexeme_complete()>|Marpa::R3::Scanless::R/"lexeme_complete()">.
+L<C<lexeme_complete()>|Marpa::R3::Scanless::R/"lexeme_complete()">
 methods is always synchronous,
 because they
 always
 return control to the app after every attempt to
 read input -- they never try to continue reading input.
-Parse exhausion in the
+Parse exhausion in
 the L<C<read()>|Marpa::R3::Scanless::R/"read()">
 or the L<C<resume()>|Marpa::R3::Scanless::R/"resume()">
 may be either synchronous or
@@ -875,7 +875,7 @@ the parse is exhausted,
 but will instead call
 the L<C<exhausted()> method|Marpa::R3::Scanless::R/"exhausted()">
 method.
-<C<exhausted()> method
+The C<exhausted()> method
 reports
 both asynchronous and synchronous parse exhaustion.
 Exhaustion is discussed further in
