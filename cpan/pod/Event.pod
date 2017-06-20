@@ -625,7 +625,8 @@ L<C<pause span>|"Pause span">.
 The SLIF recognizer will B<not> have
 read the lexeme
 when its pre-lexeme event triggers.
-In effect, it "rewinds" the scanning.
+In effect,
+a pre-lexeme event "rewinds" the scanning.
 
 For most events, the trigger location is the event location,
 but pre-lexeme events are the exception.
