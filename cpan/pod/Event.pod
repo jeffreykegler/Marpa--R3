@@ -290,7 +290,7 @@ the L<activate() method|Marpa::R3::Scanless::R/"activate()">.
 
 Events are processed using Perl closures 
 called B<event handlers>.
-The event handlers are specified using the
+Event handlers are specified using the
 L<C<event_handlers> named
 argument|Marpa::R3::Scanless::R/"event_handlers">
 of
@@ -301,8 +301,9 @@ Two or more arguments are
 passed to the event handler.
 The first argument is always the recognizer.
 Subsequent arguments are the event data.
-The first argument of the event data is
-always the event name.
+The first element of the event data,
+which is the second argument of the event handler,
+is always the event name.
 Whether there is more than one argument in the
 event data,
 and what the third and later arguments
