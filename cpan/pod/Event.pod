@@ -404,12 +404,12 @@ normalize-whitespace: 1
 
 =for Marpa::R3::Display::End
 
-A completion SLIF parse event can be specified for any
-symbol that is not a lexeme.
-Completion events are non-lexeme events.
 A completion event triggers
 whenever a non-nulled instance of its symbol
 is recognized at the current location.
+Completion events are non-lexeme events.
+A completion SLIF parse event can be specified for any
+symbol that is not a lexeme.
 
 When a completion event triggers,
 its event location
