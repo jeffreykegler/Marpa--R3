@@ -88,15 +88,15 @@ and the L<lexeme_read()|Marpa::R3::Scanless::R/"lexeme_read()"> method.
 A parse exhaustion event is called B<asynchronous> if it
 occurs
 in a method, and at a location,
-where the method would "ordinarily" have continued
-reading.
-Here "ordinarily" means
+where the method would have continued
+reading under "ordinary circumstances".
+In this context, "ordinar circumstances" means
 
 =over 4
 
-=item * if parse exhaustion had not occurred, and
+=item * that parse exhaustion has not occurred, and
 
-=item * if no event handler had paused the recognizer.
+=item * that no event handler has paused the recognizer.
 
 =back
 

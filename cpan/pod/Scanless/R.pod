@@ -1429,6 +1429,80 @@ The best metric is, of course,
 would be the exact parse count,
 but determining that is expensive.
 
+=head2 g1_to_l0_first()
+
+=for Marpa::R3::Display
+name: Scanless g1_to_l0_first() synopsis
+
+        my ( $first_block, $first_l0_pos ) =
+            $recce->g1_to_l0_first($g1_location);
+
+=for Marpa::R3::Display::End
+
+C<g1_to_l0_first()> takes an G1 position as its
+only argument.
+It returns two arguments:
+the block index and the L0 position that
+correspond to the G1 position.
+Failure is always thrown.
+
+=head2 g1_to_l0_last()
+
+=for Marpa::R3::Display
+name: Scanless g1_to_l0_last() synopsis
+
+        my ( $last_block, $last_l0_pos ) =
+            $recce->g1_to_l0_last($g1_location);
+
+=for Marpa::R3::Display::End
+
+C<g1_to_l0_last()> takes an G1 position as its
+only argument.
+It returns two arguments:
+the block index and the L0 position
+of the last L0 position that
+correspond to the G1 position.
+Failure is always thrown.
+
+Note that apps are allowed to use
+inputs which
+involve multiple blocks,
+which are not continuous,
+which do not move
+forward monotonically,
+and which may contain overlaps.
+For these apps, 
+C<g1_to_l0_first()>
+and 
+C<g1_to_l0_last()>
+will not always be sufficient to completely
+describe the L0 locations that correspond
+to a G1 location.
+
+=head2 g1_literal()
+
+=for Marpa::R3::Display
+name: Scanless recognizer diagnostics
+partial: 1
+normalize-whitespace: 1
+
+    my $last_expression = $recce->g1_literal( $g1_start, $g1_length );
+
+=for Marpa::R3::Display::End
+
+Given a G1 span -- that is, a G1 start location and a length in G1 locations --
+the C<g1_literal()> method
+returns a substring of the input
+stream.
+A G1 length of zero will produce the zero-length string.
+
+The substring of the input stream is determined on the assumption
+that the application reads the input in lexical order and
+without gaps
+except for whitespace and other normal discards.
+When this is not the case, the substring is determined as
+L<described above|/"Literals and G1 spans">.
+
 =head2 g1_pos
 
 =for Marpa::R3::Display
@@ -1725,30 +1799,6 @@ by a SLIF recognizer.
 The output is intended only for reading by humans.
 The exact format is subject to change
 and should not be relied on by applications.
-
-=head2 g1_literal()
-
-=for Marpa::R3::Display
-name: Scanless recognizer diagnostics
-partial: 1
-normalize-whitespace: 1
-
-    my $last_expression = $recce->g1_literal( $g1_start, $g1_length );
-
-=for Marpa::R3::Display::End
-
-Given a G1 span -- that is, a G1 start location and a length in G1 locations --
-the C<g1_literal()> method
-returns a substring of the input
-stream.
-A G1 length of zero will produce the zero-length string.
-
-The substring of the input stream is determined on the assumption
-that the application reads the input in lexical order and
-without gaps
-except for whitespace and other normal discards.
-When this is not the case, the substring is determined as
-L<described above|/"Literals and G1 spans">.
 
 =head2 terminals_expected()
 
