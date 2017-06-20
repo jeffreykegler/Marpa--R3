@@ -1952,7 +1952,7 @@ then we say that
 string C<S> is B<consistent with
 the actual input up to location L>.
 For brevity,
-we will often say
+we say
 that C<S> is B<actual to L>.
 
 B<Acceptable>:
