@@ -338,18 +338,17 @@ only if the method
 that triggered the event would ordinarily
 return control to the app at I<L>.
 
-Readers might find it intuitive to
-think of a return of C<'ok'>
+A return of C<'ok'>
 by a parse handler
-as a command to
+can be thought of as a command to
 "continue as you ordinarily would",
-and to think of a
-C<'pause'> return
+and a C<'pause'> return
 as an instruction to pause
 the recognizer at the current
 location.
-Thinking in this way,
-a C<'pause'> return value overrides
+From this point of view,
+a C<'pause'> return value is seen to
+override
 any number of C<'ok'> return values
 at the same parse location.
 
