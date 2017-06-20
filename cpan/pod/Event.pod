@@ -1771,15 +1771,16 @@ normalize-whitespace: 1
 
 =head2 A messy example
 
-This is a second example of per-location processing
-by pausing the recognizer.
 The SLIF DSL in this example
 is designed to
 include the unusual
 cases described in this document.
+It is also a second example of the "pause"
+method for per-location processing.
+
 These "corner" cases are unlikely to occur
-all in a single app,
-and hopefully
+all in a single app.
+Hopefully
 this grammar
 will not resemble any grammar that you
 encounter in practice.
