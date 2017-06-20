@@ -1038,6 +1038,38 @@ It is a prediction and its symbol is acceptable at the current location; or
 it is a completion or a nulling event and its symbol is recognized
 at the current location; or
 
+=back
+
+=item *
+
+The event is activated.
+An event is activated by default when it
+is declared.
+Deactivation and reactivation of events is
+done with the SLIF recognizer's
+L<activate() method|Marpa::R3::Scanless::R/"activate()">.
+
+=back
+
+=head2 Location events
+
+A location-lexeme event will trigger at the current location
+if all of the following are true:
+
+=over 4
+
+=item *
+
+It is declared using the appropriate named argument of
+L<the recognizer's C<new()>
+constructor|Marpa::R3::Scanless::R/Constructor>.
+
+=item *
+
+Its B<triggering condition> is true.  Specifically,
+
+=over 4
+
 =item *
 
 it is an exhaustion event, and asynchronous parse exhaustion,
