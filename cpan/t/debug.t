@@ -1048,7 +1048,7 @@ for my $symbol_id ( $grammar->g1_symbol_ids() ) {
 
 # Marpa::R3::Display::End
 
-} ## end for my $symbol_id ( $grammar->symbol_ids() )
+}
 
 Marpa::R3::Test::is( $text, <<'END_OF_TEXT', 'G1 symbol names and description');
 symbol number: 0  name: [:start]

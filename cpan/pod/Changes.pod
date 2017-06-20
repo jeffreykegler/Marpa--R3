@@ -184,8 +184,6 @@ G1 and L0 grammars:
 
 =over 4
 
-=item * C<Marpa::R2::Scanless::G::g1_symbol_ids()>
-
 =item * C<Marpa::R2::Scanless::G::g1_symbol_name()>
 
 =item * C<Marpa::R2::Scanless::G::l0_symbol_dsl_form()>
