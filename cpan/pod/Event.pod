@@ -1594,8 +1594,11 @@ Perl functions, are closures.
 
 The next example shows the use of a "factory" for making
 handlers.
-This is the most powerful and general method of making
-data available in a wide variety of scopes
+This is the most powerful and general method,
+capable of taking
+data that is only available
+in several widely dispersed scopes,
+and making it available
 to the handler at event processing time.
 
 The anonymous handler returned
@@ -1612,7 +1615,7 @@ C<factory()>.
 But C<$B_non_local> is non-local to
 I<anon>.
 Nonetheless,
-Because I<anon> is a closure,
+because I<anon> is a closure,
 C<$B_non_local> is available to I<anon>
 at event processing time.
 
@@ -1620,7 +1623,9 @@ Finally, C<$C_local> is not available
 when I<anon> is defined,
 but is local in the scope
 in which I<anon> is instantiated.
-C<$C_local> is passed as an argument
+C<$C_local> is made available
+to anon by passing it
+as an argument
 to C<factory()>.
 
 =for Marpa::R3::Display
