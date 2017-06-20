@@ -369,7 +369,7 @@ by a factory closure.
 
 An event handler
 may not call, directly or indirectly,
-some methods of the same recognizer.
+certain methods of the same recognizer.
 The restricted methods include all those
 recognizer methods which may themselves
 trigger parse events.
