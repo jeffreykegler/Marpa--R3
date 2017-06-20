@@ -1692,7 +1692,8 @@ from the array.
 
 =back
 
-The next example illustrates the "pause" method.
+The "pause" method is the most general.
+The next example illustrates it.
 
 =for Marpa::R3::Display
 name: event examples - per-location using pause
