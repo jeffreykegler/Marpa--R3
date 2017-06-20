@@ -1442,7 +1442,7 @@ name: Scanless g1_to_l0_first() synopsis
 C<g1_to_l0_first()> takes an G1 position as its
 only argument.
 It returns two arguments:
-the block index and the L0 position that
+the block index and the first L0 position that
 correspond to the G1 position.
 Failure is always thrown.
 
@@ -1464,7 +1464,15 @@ of the last L0 position that
 correspond to the G1 position.
 Failure is always thrown.
 
-Note that apps are allowed to use
+For most apps,
+the return values
+of C<g1_to_l0_first()>
+and 
+C<g1_to_l0_last()>
+will be the elements of an
+L0 span which corresponds exactly
+to the G1 position.
+But note that apps are allowed to use
 inputs which
 involve multiple blocks,
 which are not continuous,
@@ -1472,10 +1480,11 @@ which do not move
 forward monotonically,
 and which may contain overlaps.
 For these apps, 
+the return values of
 C<g1_to_l0_first()>
 and 
 C<g1_to_l0_last()>
-will not always be sufficient to completely
+will not be sufficient to
 describe the L0 locations that correspond
 to a G1 location.
 
