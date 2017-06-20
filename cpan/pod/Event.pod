@@ -367,19 +367,22 @@ including one where
 the event handlers are instantiated
 by a factory closure.
 
-Some recognizer methods
-may not called inside a event handler for
-the same recognizer.
+An event handler
+may not call, directly or indirectly,
+some methods of the same recognizer.
 The restricted methods include all those
 recognizer methods which may themselves
-trigger parse events are not allowed.
-Restricted methods include
+trigger parse events.
+The restricted methods are
 L<C<read()>|Marpa::R3::Scanless::R/"read()">,
 L<C<resume()>|Marpa::R3::Scanless::R/"resume()">,
 L<C<lexeme_read()>|Marpa::R3::Scanless::R/"lexeme_read()"> and
 L<C<lexeme_complete()>|Marpa::R3::Scanless::R/"lexeme_complete()">.
-It is allowed to call a method of one recognizer inside
-an event handler belonging to a different recognizer.
+
+This restriction applies only to methods of the recognizer
+to which the event handler belongs.
+Calls to methods of a different recognizer are
+not restricted.
 
 =head1 Types of parse event
 
