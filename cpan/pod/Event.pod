@@ -648,7 +648,7 @@ but there are also very important differences.
 =item *
 
 A pre-lexeme event does not occur
-unless triggering lexeme is actually
+unless the triggering lexeme is actually
 found in the input.
 On the other hand,
 a prediction event is,
@@ -669,7 +669,7 @@ If both
 are defined for a symbol,
 the prediction event will trigger first,
 B<before> the lexeme is scanned.
-The pre-lexeme event will trigger next,
+The pre-lexeme event will trigger later,
 B<after> the lexeme is scanned.
 
 =item *
