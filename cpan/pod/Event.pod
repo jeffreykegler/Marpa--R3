@@ -1736,14 +1736,17 @@ normalize-whitespace: 1
 
 =head2 Per-location event processing, using an array
 
-This example also addresses the issue of processing events
-when the events which occur at a single location
-(call it I<pos>) must be processed as a group.
+This example
+illustrates the "array" method of handling events
+which need to be processed together in groups,
+based on their trigger location.
 The events are gathered into an array,
 and processed when the recognizer is finished.
-This method can be more elegant
-than pausing the recognizer,
-but this method is also less general.
+
+The previous example illustrated the more powerful
+and general "pause" method.
+The "array" method can be more elegant,
+and is powerful enough for many cases.
 
 =for Marpa::R3::Display
 name: event examples - per-location processing, using array
