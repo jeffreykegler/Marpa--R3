@@ -1444,7 +1444,7 @@ only argument.
 It returns two arguments:
 the block index and the L0 position
 of the first L0 position that
-correspond to the G1 position.
+corresponds to the G1 position.
 Failure is always thrown.
 
 =head2 g1_to_l0_last()
@@ -1462,7 +1462,7 @@ only argument.
 It returns two arguments:
 the block index and the L0 position
 of the last L0 position that
-correspond to the G1 position.
+corresponds to the G1 position.
 Failure is always thrown.
 
 For most apps,
