@@ -938,6 +938,8 @@ and indicates it is a reserved name,
 which will not conflict with the name
 of any user-named event.)
 
+=head1 Triggering
+
 =head2 Lexeme events
 
 SLIF parse events are divided
@@ -1011,7 +1013,7 @@ with the
 L<C<< $slr->pause_span() >>
 method|Marpa::R3::Scanless::R/"pause_span()">.
 
-=head1 Non-lexeme events
+=head2 Non-lexeme events
 
 Prediction, completion and nulling events are non-lexeme events.
 The conditions for a non-lexeme event are simpler than those for
