@@ -73,7 +73,6 @@ L<below|/"An example">.
 =head1 About this document
 
 This document is an overview of B<SLIF parse events>.
-SLIF parse events
 One example of a circumstance for
 which event an event can be created is the prediction of a symbol
 in the parse.
