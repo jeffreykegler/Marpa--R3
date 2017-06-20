@@ -874,8 +874,7 @@ only occurs on asynchronous exhaustion,
 apps will often not use the event to determine whether
 the parse is exhausted,
 but will instead call
-the L<C<exhausted()> method|Marpa::R3::Scanless::R/"exhausted()">
-method.
+the L<C<exhausted()> method|Marpa::R3::Scanless::R/"exhausted()">.
 The C<exhausted()> method
 reports
 both asynchronous and synchronous parse exhaustion.
