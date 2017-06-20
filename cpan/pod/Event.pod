@@ -74,7 +74,7 @@ L<below|/"An example">.
 
 This document is an overview of B<SLIF parse events>.
 One example of a circumstance for
-which event an event can be created is the prediction of a symbol
+which an event can be created is the prediction of a symbol
 in the parse.
 Another example is the recognition of a symbol in the parse.
 A third example is parse exhaustion.
@@ -99,7 +99,8 @@ simply B<events>.
 in a parse
 means an occurrence
 of the symbol in that parse
-with a specific start location and length.
+with a specific start location and
+a specific length.
 An instance of a symbol is also called
 a B<symbol instance>.
 A consequence of this definition
@@ -135,10 +136,14 @@ A symbol is B<non-nulling> if it is not nulling.
 
 =item * A string is B<actual to L> if we
 know the actual input as far as I<L>,
-and the string is consistent with the input.
+and the string is consistent with the
+actual input.
 
 =item * If we know the input as far as location I<L>
-and a symbol I<< <S> >> is in some parse that starts at I<L>,
+and a symbol I<< <S> >>
+that starts at I<L>
+is in some parse of some string actual to I<L>,
+then
 we say that symbol I<< <S> >> is B<acceptable at
 a location L>.
 Where location I<L> is understood, we just say
