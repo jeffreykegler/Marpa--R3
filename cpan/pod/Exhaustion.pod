@@ -76,7 +76,6 @@ We can call those languages B<exhaustion-conflicted>.
 
 Any of the the event-triggering methods
 may encounter parse exhaustion:
-that read input:
 L<the recognizer's C<new()>
 constructor|Marpa::R3::Scanless::R/Constructor>,
 the L<read()|Marpa::R3::Scanless::R/"read()"> method,
