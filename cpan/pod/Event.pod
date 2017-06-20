@@ -528,7 +528,7 @@ normalize-whitespace: 1
 
 =for Marpa::R3::Display::End
 
-A nulling SLIF parse event occurs when a nulled instance
+A nulling parse event occurs when a nulled instance
 of its symbol is recognized at the current location.
 When a nulling event triggers,
 its event location
