@@ -190,7 +190,7 @@ the status of a symbol instance.
 The symbol instance whose status the event
 reports does have be an
 actual symbol instance.
-Prediction events
+Prediction events,
 for example,
 report potential symbol instances.
 Instance events are declared in the SLIF DSL.
@@ -231,7 +231,7 @@ L<C<lexeme_read()>|Marpa::R3::Scanless::R/"lexeme_read()"> and
 L<C<lexeme_complete()>|Marpa::R3::Scanless::R/"lexeme_complete()">.
 
 The location at which a parse event triggers is the B<trigger location>.
-An event may trigger at any location, including location 0.
+An event may trigger at any parse location, including location 0.
 It is important to keep in mind that location 0 events will
 trigger in
 L<the recognizer's C<new()>
