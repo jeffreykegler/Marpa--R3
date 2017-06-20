@@ -1053,7 +1053,7 @@ L<activate() method|Marpa::R3::Scanless::R/"activate()">.
 
 =head2 Location events
 
-A location-lexeme event will trigger at the current location
+A location event will trigger at the current location
 if all of the following are true:
 
 =over 4
