@@ -72,16 +72,17 @@ exhaustion-loving at some points
 and exhaustion-hating at others.
 We can call those languages B<exhaustion-conflicted>.
 
-=head1 Reading methods
+=head1 Event-triggering methods
 
-The methods that may encounter parse exhaustion are those
+Any of the the event-triggering methods
+may encounter parse exhaustion:
 that read input:
-L<read()|Marpa::R3::Scanless::R/"read()">,
-L<resume()|Marpa::R3::Scanless::R/"resume()">,
-L<lexeme_complete()|Marpa::R3::Scanless::R/"lexeme_complete()">,
-and L<lexeme_read()|Marpa::R3::Scanless::R/"lexeme_read()">.
-These are also, and not by coincidence, the event-triggering methods.
-In this document, we will call them the B<reading methods>.
+L<the recognizer's C<new()>
+constructor|Marpa::R3::Scanless::R/Constructor>,
+the L<read()|Marpa::R3::Scanless::R/"read()"> method,
+the L<resume()|Marpa::R3::Scanless::R/"resume()"> method,
+the L<lexeme_complete()|Marpa::R3::Scanless::R/"lexeme_complete()"> method,
+and the L<lexeme_read()|Marpa::R3::Scanless::R/"lexeme_read()"> method.
 
 =head1 Synchronous and asynchronous parse exhaustion
 
@@ -111,6 +112,11 @@ because they
 always
 return control to the app after every attempt to
 read input -- they never try to continue reading input.
+Parse exhaustion in
+L<the recognizer's C<new()>
+constructor|Marpa::R3::Scanless::R/Constructor>
+is always synchronous, because it can only occur
+if the grammar is nulling.
 Parse exhausion in
 the L<C<read()>|Marpa::R3::Scanless::R/"read()">
 or the L<C<resume()>|Marpa::R3::Scanless::R/"resume()">
@@ -161,7 +167,7 @@ so that every parse exhaustion is synchronous.
 =head1 Detecting parse exhaustion
 
 The return value of
-a reading method
+an event-triggering method
 does not indicate whether exhaustion occurred or not.
 In most cases, you will either know
 from the the context whether the parse is exhausted,
@@ -265,9 +271,9 @@ when the application tries to evaluate the parse.
 Exhaustion-hating applications, if they want to be stricter
 than this,
 can check for exhaustion explicitly whenever
-a reading method returns.
+an event-triggering method returns.
 A possible annoyance is that, depending where it happens,
-exhaustion may also cause the reading method to throw an exception.
+exhaustion may also cause the event-triggering method to throw an exception.
 Applications which want more orthogonality in their exhaustion handling
 can enable exhaustion events,
 which will prevent exceptions being thrown due to parse exhaustion.
