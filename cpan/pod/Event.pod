@@ -132,9 +132,11 @@ in at least one valid parse of at least one string.
 a B<nulling symbol> if,
 for all strings,
 all of its instances in valid parses are nulled instances.
-A symbol is B<non-nulling> if it is not nulling.
 
-=item * A string is B<actual to L> if we
+=item * A symbol in a grammar is
+B<non-nulling> if it is not a nulling symbol.
+
+=item * A string is B<actual to location L> if we
 know the actual input as far as I<L>,
 and the string is consistent with the
 actual input.
