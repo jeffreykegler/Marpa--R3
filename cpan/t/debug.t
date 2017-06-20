@@ -892,9 +892,9 @@ Marpa::R3::Test::is(
 @TEST_ARRAY = ();
 
 # Marpa::R3::Display
-# name: SLG symbol_ids() synopsis
+# name: SLG g1_symbol_ids() synopsis
 
-do_something($_) for $grammar->symbol_ids();
+do_something($_) for $grammar->g1_symbol_ids();
 
 # Marpa::R3::Display::End
 
@@ -1020,10 +1020,10 @@ END_OF_TEXT
 
 $text = q{};
 
-for my $symbol_id ( $grammar->symbol_ids() ) {
+for my $symbol_id ( $grammar->g1_symbol_ids() ) {
 
 # Marpa::R3::Display
-# name: SLG symbol_name() synopsis
+# name: SLG g1_symbol_name() synopsis
 
     my $name = $grammar->g1_symbol_name($symbol_id);
     $text .= "symbol number: $symbol_id  name: $name\n";

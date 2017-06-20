@@ -448,6 +448,18 @@ normalize-whitespace: 1
 
 =for Marpa::R3::Display::End
 
+Returns a list of the external grammar symbol ID's as an array.
+
+=head2 g1_symbol_ids()
+
+=for Marpa::R3::Display
+name: SLG g1_symbol_ids() synopsis
+normalize-whitespace: 1
+
+    do_something($_) for $grammar->g1_symbol_ids();
+
+=for Marpa::R3::Display::End
+
 Returns a list of the G1 grammar symbol ID's as an array.
 
 =head2 l0_symbol_ids()

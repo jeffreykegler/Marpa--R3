@@ -433,7 +433,7 @@ END_OF_LUA
 
     # Find out the list of lexemes according to G1
     my %g1_id_by_lexeme_name = ();
-  SYMBOL: for my $symbol_id ( $slg->symbol_ids() ) {
+  SYMBOL: for my $symbol_id ( $slg->g1_symbol_ids() ) {
 
     my ($is_terminal) = $slg->call_by_tag(
         ('@' .__FILE__ . ':' .  __LINE__),
@@ -570,7 +570,7 @@ END_OF_LUA
     my $lex_discard_symbol_id =
       $slg->l0_symbol_by_name($discard_symbol_name) // -1;
     my @lex_lexeme_to_g1_symbol;
-    $lex_lexeme_to_g1_symbol[$_] = -1 for $slg->symbol_ids();
+    $lex_lexeme_to_g1_symbol[$_] = -1 for $slg->g1_symbol_ids();
 
   LEXEME_NAME: for my $lexeme_name (@lex_lexeme_names) {
         next LEXEME_NAME if $lexeme_name eq $discard_symbol_name;
@@ -1944,7 +1944,7 @@ sub Marpa::R3::Scanless::G::l0_rule_ids {
     return $slg->lmg_rule_ids('l0');
 }
 
-sub Marpa::R3::Scanless::G::symbol_ids {
+sub Marpa::R3::Scanless::G::g1_symbol_ids {
     my ($slg) = @_;
     return $slg->lmg_symbol_ids('g1');
 }

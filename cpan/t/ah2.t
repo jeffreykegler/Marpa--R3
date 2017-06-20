@@ -101,17 +101,17 @@ EOS
 # TODO This is in term of ISYs. What about external symbols?
 
 my $nulling_symbols = join q{ }, sort map { $grammar->g1_symbol_name($_) }
-  grep { $grammar->symbol_is_nulling($_) } $grammar->symbol_ids();
+  grep { $grammar->symbol_is_nulling($_) } $grammar->g1_symbol_ids();
 Marpa::R3::Test::is( $nulling_symbols, q{},
     'Aycock/Horspool Nulling Symbols' );
 
 my $productive_symbols = join q{ }, sort map { $grammar->g1_symbol_name($_) }
-  grep { $grammar->symbol_is_productive($_) } $grammar->symbol_ids();
+  grep { $grammar->symbol_is_productive($_) } $grammar->g1_symbol_ids();
 Marpa::R3::Test::is( $productive_symbols, q{A S [:start] [Lex-0]},
     'Aycock/Horspool Productive Symbols' );
 
 my $accessible_symbols = join q{ }, sort map { $grammar->g1_symbol_name($_) }
-  grep { $grammar->symbol_is_accessible($_) } $grammar->symbol_ids();
+  grep { $grammar->symbol_is_accessible($_) } $grammar->g1_symbol_ids();
 Marpa::R3::Test::is( $accessible_symbols, q{A S [:start] [Lex-0]},
     'Aycock/Horspool Accessible Symbols' );
 
