@@ -581,7 +581,7 @@ normalize-whitespace: 1
 
 =for Marpa::R3::Display::End
 
-A prediction event triggers whenever
+A prediction event triggers when
 a non-nulling symbol is acceptable at the current location.
 When a prediction event triggers,
 its event location
