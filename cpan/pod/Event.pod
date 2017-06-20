@@ -826,21 +826,58 @@ the name of any user-named event.)
 
 Intuitively, parse exhaustion events are created only when
 needed for control to return to the application.
-More precisely,
-a parse exhaustion event is called B<synchronous> if it
-occurs at a G1 location where control would return to the application
-in any case, either due to end of string or another event.
-A parse exhaustion event is called B<asynchronous> if it is not
-synchronous.
+Stated another way,
+a parse exhaustion event is called B<asynchronous> if it
+occurs
+in a method, and at a location,
+where the method would "ordinarily" had continued
+reading.
+Here "ordinarily" means
 
-The event itself is often simply discarded,
-because an application typically
-does not care whether
-exhaustion is synchronous or asynchronous.
-The L<C<exhausted()> method|Marpa::R3::Scanless::R/"exhausted()">
-can be relied on to report
-both asynchronous and synchronous parse exhaustion,
-and it is usually used instead.
+=over 4
+
+=item * if parse exhaustion had not occurred, and
+
+=item * if no event handler had paused the recognizer.
+
+=back
+
+A parse exhaustion event is called B<synchronous> if it is not
+asynchronous.
+
+Parse exhaustion in the
+L<C<lexeme_read()>|Marpa::R3::Scanless::R/"lexeme_read()"> and
+L<C<lexeme_complete()>|Marpa::R3::Scanless::R/"lexeme_complete()">.
+methods is always synchronous,
+because they
+always
+return control to the app after every attempt to
+read input -- they never try to continue reading input.
+Parse exhausion in the
+the L<C<read()>|Marpa::R3::Scanless::R/"read()">
+or the L<C<resume()>|Marpa::R3::Scanless::R/"resume()">
+may be either synchronous or
+asynchronous.
+
+Exhaustion events
+are typically used to ensure that the recognizer
+pauses,
+instead of throwing a fatal error.
+For purposes of subsequent processing,
+an app often cares whether a parse is exhausted
+or not,
+but far less often cares
+whether that exhaustion is synchronous or asynchronous.
+Since an exhaustion event
+only occurs on asynchronous exhaustion,
+apps will often not use the event to determine whether
+the parse is exhausted,
+but will instead call
+the L<C<exhausted()> method|Marpa::R3::Scanless::R/"exhausted()">
+method.
+<C<exhausted()> method
+reports
+both asynchronous and synchronous parse exhaustion.
 Exhaustion is discussed further in
 L<a separate document|Marpa::R3::Exhaustion>.
 

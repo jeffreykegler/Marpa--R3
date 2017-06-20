@@ -85,41 +85,27 @@ In this document, we will call them the B<reading methods>.
 
 =head1 Synchronous and asynchronous parse exhaustion
 
-Intuitively, parse exhaustion is B<synchonous> if it
-occurs at a location where control would return to
-the user anyway, and asynchronous otherwise.
-More precisely,
-we say that parse exhaustion is B<synchronous>
-if it occurs at a point when control
-would normally return from SLIF to the application,
-due to either
-
-=over 4
-
-=item *
-
-the parse reaching end of string (EOS), or
-
-=item *
-
-the occurrence of
-a parse event other than an exhaustion event.
-
-=back
+Parse exhaustion is B<synchonous> if it
+occurs at a location where
+the method would have stopped
+reading input anyway,
+and asynchronous otherwise.
+The
+L<lexeme_complete()|Marpa::R3::Scanless::R/"lexeme_complete()">,
+and L<lexeme_read()|Marpa::R3::Scanless::R/"lexeme_read()">
+read the input one lexeme at a time,
+so in those methods exhaustion is
+B<always> synchronous.
+In the
+L<read()|Marpa::R3::Scanless::R/"read()"> and
+L<resume()|Marpa::R3::Scanless::R/"resume()">
+methods,
+whether exhaustion is synchronous depends on
+where the method would have stopped reading
+input, had parse exhaustion not occurred.
 
 Marpa can be set up so that an event occurs on
 asynchronous exhaustion.
-Note that in The definition above
-the occurrence of an exhaustion event
-does not makes the parse exhaustion synchronous.
-This wording is chosen to avoid a paradox.
-If a parse exhaustion event could made exhaustion synchronous,
-then it B<should not> occur, because parse exhaustion events
-only occur on asynchronous parse exhaustion.
-But if the parse exhaustion event did not occur,
-then the parse exhaustion would be asynchronous, so that
-then a parse exhaustion event B<should> occur.
-
 In this document, an B<exhaustion location> is
 a location at which parse exhaustion occurs.
 
