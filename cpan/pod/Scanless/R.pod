@@ -1442,7 +1442,8 @@ name: Scanless g1_to_l0_first() synopsis
 C<g1_to_l0_first()> takes an G1 position as its
 only argument.
 It returns two arguments:
-the block index and the first L0 position that
+the block index and the L0 position
+of the first L0 position that
 correspond to the G1 position.
 Failure is always thrown.
 
