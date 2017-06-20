@@ -602,62 +602,6 @@ its event handler:
 the recognizer,
 and the event name.
 
-=head2 Post-lexeme events
-
-=for Marpa::R3::Display
-name: SLIF Event synopsis
-partial: 1
-normalize-whitespace: 1
-
-    :lexeme ~ <a> pause => after event => '"a"'
-
-=for Marpa::R3::Display::End
-
-A post-lexeme event is a lexeme event.
-It triggers if the lexeme is scanned at the current location.
-The SLIF recognizer will have
-already read the lexeme
-when its post-lexeme event triggers.
-
-When a post-lexeme event triggers,
-its event location
-is set to the current location,
-which will also be the location where the lexeme ends.
-A post-lexeme event also sets the
-L<C<pause span>|"Pause span">.
-
-A post-lexeme event passes
-the following arguments to its event handler,
-in order:
-
-=over 4
-
-=item *
-
-The recognizer.
-
-=item *
-
-The name of the post-lexeme event.
-
-=item *
-
-The symbol ID of the lexeme.
-
-=item *
-
-The index of the block containing the lexeme.
-
-=item *
-
-The start location of the lexeme.
-
-=item *
-
-The length, in codepoints, of the lexeme.
-
-=back
-
 =head2 Pre-lexeme events
 
 =for Marpa::R3::Display
@@ -749,6 +693,62 @@ The recognizer.
 =item *
 
 The name of the pre-lexeme event.
+
+=item *
+
+The symbol ID of the lexeme.
+
+=item *
+
+The index of the block containing the lexeme.
+
+=item *
+
+The start location of the lexeme.
+
+=item *
+
+The length, in codepoints, of the lexeme.
+
+=back
+
+=head2 Post-lexeme events
+
+=for Marpa::R3::Display
+name: SLIF Event synopsis
+partial: 1
+normalize-whitespace: 1
+
+    :lexeme ~ <a> pause => after event => '"a"'
+
+=for Marpa::R3::Display::End
+
+A post-lexeme event is a lexeme event.
+It triggers if the lexeme is scanned at the current location.
+The SLIF recognizer will have
+already read the lexeme
+when its post-lexeme event triggers.
+
+When a post-lexeme event triggers,
+its event location
+is set to the current location,
+which will also be the location where the lexeme ends.
+A post-lexeme event also sets the
+L<C<pause span>|"Pause span">.
+
+A post-lexeme event passes
+the following arguments to its event handler,
+in order:
+
+=over 4
+
+=item *
+
+The recognizer.
+
+=item *
+
+The name of the post-lexeme event.
 
 =item *
 
