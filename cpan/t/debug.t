@@ -907,9 +907,9 @@ Marpa::R3::Test::is(
 @TEST_ARRAY = ();
 
 # Marpa::R3::Display
-# name: SLG rule_ids() synopsis
+# name: SLG g1_rule_ids() synopsis
 
-do_something($_) for $grammar->rule_ids();
+do_something($_) for $grammar->g1_rule_ids();
 
 # Marpa::R3::Display::End
 
@@ -938,7 +938,7 @@ my $text;
 
 $text = q{};
 
-for my $rule_id ( $grammar->rule_ids() ) {
+for my $rule_id ( $grammar->g1_rule_ids() ) {
 
 # Marpa::R3::Display
 # name: SLG g1_rule_expand() synopsis
@@ -1130,7 +1130,7 @@ END_OF_TEXT
 
 $text = q{};
 
-for my $rule_id ( $grammar->rule_ids() ) {
+for my $rule_id ( $grammar->g1_rule_ids() ) {
 
 # Marpa::R3::Display
 # name: SLG rule_show() synopsis

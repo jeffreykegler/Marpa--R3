@@ -92,13 +92,6 @@ sub Marpa::R3::Internal::Scanless::meta_recce {
     return $self;
 } ## end sub Marpa::R3::Internal::Scanless::meta_recce
 
-# For error messages, make it convenient to use an SLR
-sub Marpa::R3::Scanless::R::rule_show {
-    my ( $slr, $rule_id ) = @_;
-    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    return $slg->rule_show($rule_id);
-}
-
 # Set those common args which are at the Perl level.
 sub perl_common_set {
     my ( $slr, $flat_args ) = @_;

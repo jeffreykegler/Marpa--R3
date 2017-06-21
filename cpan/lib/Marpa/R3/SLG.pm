@@ -1656,7 +1656,7 @@ END_OF_LUA
     return $start_symbol;
 }
 
-sub Marpa::R3::Scanless::G::rule_name {
+sub Marpa::R3::Scanless::G::g1_rule_name {
     my ( $slg, $irlid ) = @_;
 
     my ($rule_name) = $slg->call_by_tag(
@@ -1934,7 +1934,7 @@ END_OF_LUA
     }
 }
 
-sub Marpa::R3::Scanless::G::rule_ids {
+sub Marpa::R3::Scanless::G::g1_rule_ids {
     my ($slg) = @_;
     return $slg->lmg_rule_ids('g1');
 }

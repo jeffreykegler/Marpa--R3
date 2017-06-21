@@ -418,7 +418,7 @@ sub resolve_grammar {
 
     my $rule_resolutions = [];
 
-  RULE: for my $irlid ( $slg->rule_ids() ) {
+  RULE: for my $irlid ( $slg->g1_rule_ids() ) {
 
         my $rule_resolution = resolve_rule_by_id( $slg, $irlid );
         $rule_resolution //= $default_action_resolution;
@@ -469,7 +469,7 @@ qq{Attempt to bless, but improper semantics: "$semantics"\n},
 
         $rule_resolutions->[$irlid] = $rule_resolution;
 
-    } ## end RULE: for my $rule_id ( $slg->rule_ids() )
+    }
 
     if ( $trace_actions >= 2 ) {
 
@@ -732,7 +732,7 @@ sub registrations_find {
     # we received
     {
       RULE:
-        for my $irlid ( $slg->rule_ids() ) {
+        for my $irlid ( $slg->g1_rule_ids() ) {
             my ( $new_resolution, $closure, $semantics, $blessing ) =
               @{ $rule_resolutions->[$irlid] };
             my ($lhs_id) =
@@ -818,7 +818,7 @@ qq{  Cannot bless rule when it resolves to a scalar constant},
     # and that means more than one semantics might be specified for
     # the nullable symbol.  This logic deals with that.
     my @nullable_rule_ids_by_lhs = ();
-  RULE: for my $irlid ( $slg->rule_ids() ) {
+  RULE: for my $irlid ( $slg->g1_rule_ids() ) {
 
         my ( $lhs_id, $rule_is_nullable ) =
           $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
@@ -1045,7 +1045,7 @@ END_OF_LUA
     } ## end NULLING_SYMBOL: for my $nulling_symbol ( 0 .. $#{$null_values} )
 
     my @work_list = ();
-  RULE: for my $irlid ( $slg->rule_ids() ) {
+  RULE: for my $irlid ( $slg->g1_rule_ids() ) {
 
         my $semantics = $semantics_by_irlid[$irlid];
         my $blessing  = $blessing_by_irlid[$irlid];
@@ -1297,7 +1297,7 @@ END_OF_LUA
 
                 if ( $result_descriptor eq 'name' ) {
                     if ( defined $irlid ) {
-                        my $name = $slg->rule_name($irlid);
+                        my $name = $slg->g1_rule_name($irlid);
                         push @push_ops, $op_lua, $op_push_constant_key, \$name;
                         next RESULT_DESCRIPTOR;
                     }
@@ -1424,7 +1424,7 @@ END_OF_LUA
         last SLR_NULLING_GRAMMAR_HACK if not $symbol_is_nullable;
 
         my $start_rhs_symbol_id;
-      RULE: for my $irlid ( $slg->rule_ids() ) {
+      RULE: for my $irlid ( $slg->g1_rule_ids() ) {
             my ( $lhs, $rhs0 ) = $slg->g1_irl_isyids($irlid);
             if ( $start_symbol_id == $lhs ) {
                 $start_rhs_symbol_id = $rhs0;

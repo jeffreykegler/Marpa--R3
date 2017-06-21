@@ -673,9 +673,9 @@ END_OF_SOURCE
     my @rule_names = ();
 
 # Marpa::R3::Display
-# name: $grammar->rule_name() example
+# name: $grammar->g1_rule_name() example
 
-    push @rule_names, $grammar->rule_name($_) for $grammar->rule_ids();
+    push @rule_names, $grammar->g1_rule_name($_) for $grammar->g1_rule_ids();
 
 # Marpa::R3::Display::End
 
@@ -683,7 +683,7 @@ END_OF_SOURCE
     Test::More::is(
         $rule_names,
         'first start rule:second start rule:start1:start2:[:start]',
-        q{Test of $grammar->rule_name()}
+        q{Test of $grammar->g1_rule_name()}
     );
 
     do_test(
