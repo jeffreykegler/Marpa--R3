@@ -314,6 +314,18 @@ event names,
 event though both classes
 specify exactly the same set of characters.
 
+Special characters are allowed in event names.
+For example, SLIF authors sometimes write
+predictions starting with a caret (C<'^a'>),
+completions ending with a dollar sigh (C<'a$'>)
+and nulling events ending with empty brackets
+(C<'a[]'>)
+or starting with a bang
+(C<'!a'>).
+These are conventions,
+entirely to the SLIF author,
+and are not enforced by Marpa::R3.
+
 =head1 Event initializer
 
 =for Marpa::R3::Display

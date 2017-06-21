@@ -68,7 +68,7 @@ partial: 1
 =for Marpa::R3::Display::End
 
 The synopsis is extracted from an example given in full
-L<below|/"An example">.
+L<below|/"A messy example">.
 
 =head1 About this document
 
@@ -475,7 +475,9 @@ The index of the block containing the discarded text.
 
 =item *
 
-The start location of the discarded text.
+The start position of the discarded text,
+as a zero-based offset from the start of the
+block.
 
 =item *
 
@@ -705,7 +707,9 @@ The index of the block containing the lexeme.
 
 =item *
 
-The start location of the lexeme.
+The start position of the discarded text,
+as a zero-based offset from the start of the
+block.
 
 =item *
 
@@ -761,7 +765,9 @@ The index of the block containing the lexeme.
 
 =item *
 
-The start location of the lexeme.
+The start position of the discarded text,
+as a zero-based offset from the start of the
+block.
 
 =item *
 
@@ -1110,7 +1116,7 @@ the behavior of pre-lexeme events
 is most intuitive when thought about with
 external scanning in mind.
 
-L<The example code for this document|/"An example">
+L<The example code for this document|/"A messy example">
 contains an artificially simple example of external
 scanning.
 The symbol C<< <insert d> >> has a pre-lexeme event
@@ -1125,12 +1131,21 @@ normalize-whitespace: 1
 
 =for Marpa::R3::Display::End
 
-When this triggers, the code in the example switches to
-external scanning:
-It reads a C<< <d> >> symbol externally,
-skips over the lexeme actually found
-in the physical input,
-and resumes internal scanning.
+When this event triggers,
+
+=over 4
+
+=item * Marpa::R3 returns control to the app
+without reading the lexeme actually found
+in the physical input;
+
+=item * the app
+reads a C<< <d> >> symbol externally,
+and
+
+=item * the app resumes internal scanning.
+
+=back
 
 =head2 Markers
 
@@ -1169,7 +1184,7 @@ If a parse is ambiguous, events trigger for
 B<all> the possible symbols.
 A user thinking in terms of one of the parses,
 and unaware of the ambiguity, may find this unexpected.
-In L<the example|/"An example">,
+In L<one of the examples|/"A messy example">,
 events for both the symbols C<< <ambig1> >>
 and C<< <ambig2> >>, as well as all their
 derived symbols, trigger.
@@ -1193,7 +1208,7 @@ none of the parse trees
 will actually contain the symbol instance
 that triggered an event.
 
-In L<the example|/"An example">,
+In L<one of the examples|/"A messy example">,
 prediction and completion
 events are reported for the symbols
 C<< <start1> >>,
@@ -1256,7 +1271,7 @@ rejection events are tentative.
 When a symbol is nulled, any symbol which can be null-derived
 from it
 is also nulled.
-In L<the example|/"An example">,
+In L<one of the examples|/"A messy example">,
 when the
 symbol C<< <g> >> is nulled,
 derived symbols
@@ -1324,7 +1339,7 @@ Some cases may seem to violate this rule.
 For example
 at position 23
 in the parse in
-L<the code below|/"An example">,
+L<the code below|/"A messy example">,
 we have four events
 of four different types,
 all for the symbol C<< <e> >>.
