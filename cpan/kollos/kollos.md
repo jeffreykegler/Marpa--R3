@@ -1001,6 +1001,10 @@ and eliminate the redundant ones.
         return slg:lmg_symbol_by_name(symbol_name, 'l0')
     end
 
+    function _M.class_slg.lmg_symbol_dsl_form(slg, symbol_id, subg_name)
+        local subg = slg[subg_name]
+        return subg:symbol_dsl_form(symbol_id)
+    end
     function _M.class_slg.g1_symbol_dsl_form(slg, symbol_id)
         return slg:lmg_symbol_dsl_form(symbol_id, 'g1')
     end

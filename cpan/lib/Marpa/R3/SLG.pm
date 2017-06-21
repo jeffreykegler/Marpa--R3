@@ -2071,6 +2071,8 @@ sub Marpa::R3::Scanless::G::lmg_symbol_dsl_form {
 
     my ($ok, $dsl_form) = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'is', $isyid, $subg_name );
+        local grammar, isyid, subg_name = ...
+        local lmw_g = grammar[subg_name].lmw_g
         local slg, isyid, subg_name = ...
         local xsy = slg[subg_name].xsys[isyid]
         if not xsy then return '' end
