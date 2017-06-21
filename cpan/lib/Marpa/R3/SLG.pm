@@ -1995,16 +1995,6 @@ END_OF_LUA
 
 } ## end sub symbol_name
 
-sub Marpa::R3::Scanless::G::g1_formatted_symbol_name {
-    my ( $slg, $symbol_id ) = @_;
-    my $symbol_name = $slg->g1_symbol_name($symbol_id);
-    # As-is if all word characters
-    return $symbol_name if $symbol_name =~ m/ \A \w* \z/xms;
-    # As-is if ends in right bracket
-    return $symbol_name if $symbol_name =~ m/ \] \z/xms;
-    return '<' . $symbol_name . '>';
-}
-
 sub Marpa::R3::Scanless::G::g1_brief_rule {
     my ($slg, $irlid) = @_;
     return $slg->lmg_brief_rule('g1', $irlid);
@@ -2012,12 +2002,12 @@ sub Marpa::R3::Scanless::G::g1_brief_rule {
 
 sub Marpa::R3::Scanless::G::lmg_brief_rule {
     my ( $slg, $subg_name, $irlid ) = @_;
-    my ($lhs_id, @rhs_ids) = $slg->g1_irl_isyids($irlid);
-    my $lhs = $slg->g1_formatted_symbol_name( $lhs_id );
-    my @rhs = map { $slg->g1_formatted_symbol_name( $_ ) } @rhs_ids;
-    my ($has_minimum, $minimum) = $slg->call_by_tag(
-    ('@' .__FILE__ . ':' . __LINE__),
-    <<'END_OF_LUA', 'si>*', $subg_name, $irlid ) ;
+    my ( $lhs_id, @rhs_ids ) = $slg->g1_irl_isyids($irlid);
+    my $lhs = $slg->lmg_symbol_display_form( $subg_name, $lhs_id );
+    my @rhs = map { $slg->lmg_symbol_display_form( $subg_name, $_ ) } @rhs_ids;
+    my ( $has_minimum, $minimum ) =
+      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 'si>*', $subg_name, $irlid );
     local grammar, subg_name, irlid = ...
     local lmw_g = grammar[subg_name].lmw_g
     local minimum = lmw_g:sequence_min(irlid)
