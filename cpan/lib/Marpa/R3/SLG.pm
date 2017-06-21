@@ -2069,17 +2069,12 @@ END_OF_LUA
 sub Marpa::R3::Scanless::G::lmg_symbol_dsl_form {
     my ( $slg, $subg_name, $isyid ) = @_;
 
-    my ($ok, $dsl_form) = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+    my ($dsl_form) = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'is', $isyid, $subg_name );
         local grammar, isyid, subg_name = ...
-        local lmw_g = grammar[subg_name].lmw_g
-        local slg, isyid, subg_name = ...
-        local xsy = slg[subg_name].xsys[isyid]
-        if not xsy then return '' end
-        return 'ok', xsy.dsl_form
+        return grammar:lmg_symbol_dsl_form(isyid, subg_name)
 END_OF_LUA
 
-    return if $ok ne 'ok';
     return $dsl_form;
 }
 

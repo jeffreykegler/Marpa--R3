@@ -547,9 +547,6 @@ Marpa::R2's Libmarpa.
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_xsy.dsl_form(xsy)
-        return xsy.dsl_form
-    end
     function _M.class_xsy.display_form(xsy)
         local form1 = xsy.dsl_form or xsy.name
         if form1:find(' ', 1, true) then
@@ -4349,7 +4346,7 @@ TODO: Perhaps `isy_key` should also allow isy tables.
     function _M.class_grammar.symbol_dsl_form(grammar, isyid)
         local xsy = grammar.xsys[isyid]
         if not xsy then return end
-        return xsy:dsl_form()
+        return xsy.dsl_form
     end
 ```
 
