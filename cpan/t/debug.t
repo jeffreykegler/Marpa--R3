@@ -476,7 +476,7 @@ Test::More::is_deeply($value_ref, $expected_value_after_fix, 'Value after fix');
 
 my $show_rules_output;
 $show_rules_output .= "G1 Rules:\n";
-$show_rules_output .= $grammar->show_rules(3);
+$show_rules_output .= $grammar->g1_show_rules(3);
 $show_rules_output .= "Lex (L0) Rules:\n";
 
 # Marpa::R3::Display
@@ -487,12 +487,12 @@ $show_rules_output .= $grammar->l0_show_rules(3);
 # Marpa::R3::Display::End
 
 # Marpa::R3::Display
-# name: SLIF debug example show_rules() output
+# name: SLIF debug example g1_show_rules() output
 # start-after-line: END_OF_SHOW_RULES_OUTPUT
 # end-before-line: '^END_OF_SHOW_RULES_OUTPUT$'
 
 Marpa::R3::Test::is( $show_rules_output,
-    <<'END_OF_SHOW_RULES_OUTPUT', 'SLIF show_rules()' );
+    <<'END_OF_SHOW_RULES_OUTPUT', 'SLIF g1_show_rules()' );
 G1 Rules:
 G1 R0 statements ::= statement *
   Symbol IDs: <22> ::= <21>
@@ -644,23 +644,23 @@ END_OF_SHOW_RULES_OUTPUT
 # Marpa::R3::Display::End
 
 # Marpa::R3::Display
-# name: SLIF show_symbols() synopsis
+# name: SLIF g1_show_symbols() synopsis
 
 my $show_symbols_output;
 $show_symbols_output .= "G1 Symbols:\n";
-$show_symbols_output .= $grammar->show_symbols(3);
+$show_symbols_output .= $grammar->g1_show_symbols(3);
 $show_symbols_output .= "Lex (L0) Symbols:\n";
 $show_symbols_output .= $grammar->l0_show_symbols(3);
 
 # Marpa::R3::Display::End
 
 # Marpa::R3::Display
-# name: SLIF debug example show_symbols() output
+# name: SLIF debug example g1_show_symbols() output
 # start-after-line: END_OF_SHOW_SYMBOLS_OUTPUT
 # end-before-line: '^END_OF_SHOW_SYMBOLS_OUTPUT$'
 
 Marpa::R3::Test::is( $show_symbols_output,
-    <<'END_OF_SHOW_SYMBOLS_OUTPUT', 'SLIF show_symbols()' );
+    <<'END_OF_SHOW_SYMBOLS_OUTPUT', 'SLIF g1_show_symbols()' );
 G1 Symbols:
 G1 S0 [:start]
   Internal name: <[:start]>

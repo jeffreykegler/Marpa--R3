@@ -86,7 +86,7 @@ sub My_Actions::do_Expression {
 
 ## use critic
 
-my $show_symbols_output = $grammar->show_symbols();
+my $show_symbols_output = $grammar->g1_show_symbols();
 
 Marpa::R3::Test::is( $show_symbols_output,
     <<'END_SYMBOLS', 'Leo Example Symbols' );
@@ -101,7 +101,7 @@ G1 S7 Variable
 G1 S8 [:start]
 END_SYMBOLS
 
-my $show_rules_output = $grammar->show_rules();
+my $show_rules_output = $grammar->g1_show_rules();
 
 Marpa::R3::Test::is( $show_rules_output, <<'END_RULES', 'Leo Example Rules' );
 G1 R0 Statement ::= Expression

@@ -1842,7 +1842,7 @@ END_OF_LUA
     return join q{ }, $lhs, q{::=}, @rhs, @quantifier;
 }
 
-sub Marpa::R3::Scanless::G::show_rules {
+sub Marpa::R3::Scanless::G::g1_show_rules {
     my ( $slg, $verbose ) = @_;
     $verbose //= 0;
     return $slg->lmg_show_rules('g1', $verbose);
@@ -1854,7 +1854,7 @@ sub Marpa::R3::Scanless::G::l0_show_rules {
     return $slg->lmg_show_rules('l0', $verbose);
 }
 
-sub Marpa::R3::Scanless::G::show_symbols {
+sub Marpa::R3::Scanless::G::g1_show_symbols {
     my ( $slg, $verbose ) = @_;
     $verbose //= 0;
     return $slg->lmg_show_symbols('g1', $verbose);

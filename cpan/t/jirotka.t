@@ -83,7 +83,7 @@ END_OF_DSL
 my $input = q{Create Metric m As Select 1 Where True};
 
 Marpa::R3::Test::is(
-    $grammar->show_symbols(),
+    $grammar->g1_show_symbols(),
     <<'END_OF_SYMBOLS', 'Symbols' );
 G1 S0 AS
 G1 S1 BY
@@ -112,7 +112,7 @@ G1 S23 [:start]
 G1 S24 SEPARATOR
 END_OF_SYMBOLS
 
-Marpa::R3::Test::is( $grammar->show_rules(),
+Marpa::R3::Test::is( $grammar->g1_show_rules(),
 <<'END_OF_RULES', 'Rules' );
 G1 R0 Input ::= Statement +
 G1 R1 Statement ::= CREATE TypeDef

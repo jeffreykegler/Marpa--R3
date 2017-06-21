@@ -53,14 +53,14 @@ my $grammar = Marpa::R3::Scanless::G->new( {   source => \$dsl });
 
 GRAMMAR_TESTS_FOLDED_FROM_ah2_t: {
 
-Marpa::R3::Test::is( $grammar->show_rules, <<'EOS', 'Aycock/Horspool Rules' );
+Marpa::R3::Test::is( $grammar->g1_show_rules, <<'EOS', 'Aycock/Horspool Rules' );
 G1 R0 S ::= A A A A
 G1 R1 A ::=
 G1 R2 A ::= 'a'
 G1 R3 [:start] ::= S
 EOS
 
-Marpa::R3::Test::is( $grammar->show_symbols,
+Marpa::R3::Test::is( $grammar->g1_show_symbols,
     <<'EOS', 'Aycock/Horspool Symbols' );
 G1 S0 A
 G1 S1 S

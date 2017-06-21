@@ -54,7 +54,7 @@ END_OF_DSL
     }
 );
 
-Marpa::R3::Test::is( $grammar->show_symbols(),
+Marpa::R3::Test::is( $grammar->g1_show_symbols(),
     <<'END_OF_STRING', 'Leo166 Symbols' );
 G1 S0 A
 G1 S1 B
@@ -64,7 +64,7 @@ G1 S4 [:start]
 G1 S5 a
 END_OF_STRING
 
-Marpa::R3::Test::is( $grammar->show_rules,
+Marpa::R3::Test::is( $grammar->g1_show_rules,
     <<'END_OF_STRING', 'Leo166 Rules' );
 G1 R0 S ::= a A
 G1 R1 A ::= B

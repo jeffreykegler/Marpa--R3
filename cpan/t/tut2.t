@@ -89,7 +89,7 @@ Test::More::is( $value, 49, 'Tutorial 2 synopsis value' );
 
 $recce->series_restart();
 
-my $show_symbols_output = $grammar->show_symbols();
+my $show_symbols_output = $grammar->g1_show_symbols();
 
 Marpa::R3::Test::is( $show_symbols_output,
     <<'END_SYMBOLS', 'Implementation Example Symbols' );
@@ -103,7 +103,7 @@ G1 S6 '*'
 G1 S7 '+'
 END_SYMBOLS
 
-my $show_rules_output = $grammar->show_rules();
+my $show_rules_output = $grammar->g1_show_rules();
 
 Marpa::R3::Test::is( $show_rules_output,
     <<'END_RULES', 'Implementation Example Rules' );
