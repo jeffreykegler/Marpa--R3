@@ -1012,6 +1012,17 @@ and eliminate the redundant ones.
         return slg:lmg_symbol_dsl_form(symbol_id, 'l0')
     end
 
+    function _M.class_slg.lmg_symbol_display_form(slg, symbol_id, subg_name)
+        local subg = slg[subg_name]
+        return subg:symbol_display_form(symbol_id)
+    end
+    function _M.class_slg.g1_symbol_display_form(slg, symbol_id)
+        return slg:lmg_symbol_display_form(symbol_id, 'g1')
+    end
+    function _M.class_slg.l0_symbol_display_form(slg, symbol_id)
+        return slg:lmg_symbol_display_form(symbol_id, 'l0')
+    end
+
 ```
 
 ## Kollos SLIF recognizer object
@@ -1530,7 +1541,7 @@ which will be 1 or 0.
                     'Codepoint %q 0x%04x rejected as %s at %s',
                     utf8.char(codepoint),
                     codepoint,
-                    l0g:force_form(symbol_id),
+                    l0g:symbol_display_form(symbol_id),
                     slr:lc_brief(l0_pos)
                 ))
             end
@@ -1542,7 +1553,7 @@ which will be 1 or 0.
                     'Codepoint %q 0x%04x accepted as %s at %s',
                     utf8.char(codepoint),
                     codepoint,
-                    l0g:force_form(symbol_id),
+                    l0g:symbol_display_form(symbol_id),
                     slr:lc_brief(l0_pos)
                 ))
             end
@@ -1789,7 +1800,7 @@ because this is done in two different places.
         local l0g = slr.slg.l0
         local discarded_isyid = l0g:rule_rhs(irlid, 0)
         local discard_desc =
-            discarded_isyid and l0g:force_form(discarded_isyid)
+            discarded_isyid and l0g:symbol_display_form(discarded_isyid)
                 or '<Bad irlid ' .. irlid .. '>'
         local block = slr.current_block
         local block_ix = block.index
@@ -2078,12 +2089,12 @@ Read alternatives into the G1 grammar.
                 slr.end_of_pause_lexeme = lexeme_end
                 local pause_after_active = slr.g1_isys[g1_lexeme].pause_after_active
                 if pause_after_active then
-                    local force_form = g1g:force_form(g1_lexeme)
+                    local display_form = g1g:symbol_display_form(g1_lexeme)
                     if slr.trace_terminals > 2 then
                         coroutine.yield('trace', string.format(
                             'Paused after lexeme %s: %s',
                             slr:lc_range_brief(block_ix, lexeme_start, block_ix, lexeme_end - 1),
-                            force_form
+                            display_form
                         ))
                     end
                     local q = slr.event_queue
@@ -4333,29 +4344,29 @@ TODO: Perhaps `isy_key` should also allow isy tables.
     end
 ```
 
-"Force" there to be an XSY name for an ISYID,
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_grammar.symbol_dsl_form(grammar, isyid)
+        local xsy = grammar.xsys[isyid]
+        if not xsy then return end
+        return xsy:dsl_form()
+    end
+```
+
+Finds a displayable
+name for an ISYID,
 pulling one out of thin air if need be.
-Unlike real XSY names, the "forced" one is not
+The "forced" name is not
 necessarily unique.
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_grammar.force_form(grammar, isyid)
+    function _M.class_grammar.symbol_display_form(grammar, isyid)
         local xsy = grammar.xsys[isyid]
         if xsy then return xsy:display_form() end
         local isy = grammar.isys[isyid]
         if isy then return isy:display_form() end
         return '<isyid ' .. isyid .. '>'
-    end
-```
-
-```
-    -- miranda: section+ most Lua function definitions
-    -- TODO keep this?
-    function _M.class_grammar.symbol_dsl_form(grammar, isyid)
-        local xsy = grammar.xsys[isyid]
-        if not xsy then return end
-        return xsy:dsl_form()
     end
 ```
 
