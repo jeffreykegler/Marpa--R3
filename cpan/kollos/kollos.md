@@ -516,9 +516,6 @@ Marpa::R2's Libmarpa.
         end
         return '<' .. form .. '>'
     end
-    function _M.class_isy.force_form(isy)
-        return isy:display_form()
-    end
 ```
 
 ## XSY Fields
@@ -559,11 +556,6 @@ Marpa::R2's Libmarpa.
             return '<' .. form1 .. '>'
         end
         return form1
-    end
-    function _M.class_xsy.force_form(xsy)
-        local form = xsy:display_form()
-        if form then return form end
-        return '<xsyid ' .. xsy.id .. '>'
     end
 ```
 
@@ -4346,9 +4338,9 @@ necessarily unique.
     -- miranda: section+ most Lua function definitions
     function _M.class_grammar.force_form(grammar, isyid)
         local xsy = grammar.xsys[isyid]
-        if xsy then return xsy:force_form() end
+        if xsy then return xsy:display_form() end
         local isy = grammar.isys[isyid]
-        if isy then return isy:force_form() end
+        if isy then return isy:display_form() end
         return '<isyid ' .. isyid .. '>'
     end
 ```

@@ -316,6 +316,7 @@ specify exactly the same set of characters.
 
 Special characters are allowed in event names.
 For example, SLIF authors sometimes write
+lexeme events using quote (C<'"a"'>),
 predictions starting with a caret (C<'^a'>),
 completions ending with a dollar sigh (C<'a$'>)
 and nulling events ending with empty brackets
@@ -323,8 +324,10 @@ and nulling events ending with empty brackets
 or starting with a bang
 (C<'!a'>).
 These are conventions,
-entirely to the SLIF author,
-and are not enforced by Marpa::R3.
+and 
+entirely up to the SLIF author.
+The SLIF allows any event to have any legal
+event name.
 
 =head1 Event initializer
 
