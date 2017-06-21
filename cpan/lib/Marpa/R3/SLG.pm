@@ -1680,9 +1680,9 @@ END_OF_LUA
 
 }
 
-sub Marpa::R3::Scanless::G::rule_expand {
+sub Marpa::R3::Scanless::G::g1_rule_expand {
     my ( $slg, $rule_id ) = @_;
-    return $slg->irl_isyids($rule_id);
+    return $slg->g1_irl_isyids($rule_id);
 }
 
 sub Marpa::R3::Scanless::G::l0_rule_expand {
@@ -1908,7 +1908,7 @@ END_OF_LUA
 sub Marpa::R3::Scanless::G::show_dotted_rule {
     my ( $slg, $irlid, $dot_position ) = @_;
     my ( $lhs, @rhs ) =
-    map { $slg->lmg_symbol_display_form('g1', $_) } $slg->irl_isyids($irlid);
+    map { $slg->lmg_symbol_display_form('g1', $_) } $slg->g1_irl_isyids($irlid);
     my $rhs_length = scalar @rhs;
 
     my ($has_minimum, $minimum) = $slg->call_by_tag(
@@ -2012,7 +2012,7 @@ sub Marpa::R3::Scanless::G::g1_brief_rule {
 
 sub Marpa::R3::Scanless::G::lmg_brief_rule {
     my ( $slg, $subg_name, $irlid ) = @_;
-    my ($lhs_id, @rhs_ids) = $slg->irl_isyids($irlid);
+    my ($lhs_id, @rhs_ids) = $slg->g1_irl_isyids($irlid);
     my $lhs = $slg->g1_formatted_symbol_name( $lhs_id );
     my @rhs = map { $slg->g1_formatted_symbol_name( $_ ) } @rhs_ids;
     my ($has_minimum, $minimum) = $slg->call_by_tag(
@@ -2258,7 +2258,7 @@ END_OF_LUA
     return $text;
 }
 
-sub Marpa::R3::Scanless::G::irl_isyids {
+sub Marpa::R3::Scanless::G::g1_irl_isyids {
     my ($slg, $irlid) = @_;
     return $slg->lmg_irl_isyids('g1', $irlid);
 }

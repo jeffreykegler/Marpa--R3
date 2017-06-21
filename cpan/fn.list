@@ -1,4 +1,3 @@
-sub Marpa::R3::Scanless::G::rule_expand {
 sub Marpa::R3::Scanless::G::rule_ids {
 sub Marpa::R3::Scanless::G::rule_name {
 sub Marpa::R3::Scanless::G::rule_show

@@ -941,9 +941,9 @@ $text = q{};
 for my $rule_id ( $grammar->rule_ids() ) {
 
 # Marpa::R3::Display
-# name: SLG rule_expand() synopsis
+# name: SLG g1_rule_expand() synopsis
 
-    my ($lhs_id, @rhs_ids) = $grammar->rule_expand($rule_id);
+    my ($lhs_id, @rhs_ids) = $grammar->g1_rule_expand($rule_id);
     $text .= "Rule #$rule_id: $lhs_id ::= " . (join q{ }, @rhs_ids) . "\n";
 
 # Marpa::R3::Display::End

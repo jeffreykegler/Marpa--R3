@@ -96,8 +96,8 @@ EOS
 }
 
 my ($S_sym) = grep { $grammar->g1_symbol_name($_) eq 'S' } $grammar->g1_symbol_ids();
-my ($target_rule) = grep { ($grammar->rule_expand($_))[0] eq $S_sym } $grammar->rule_ids();
-my $target_rule_length = -1 + scalar (() = $grammar->rule_expand($target_rule));
+my ($target_rule) = grep { ($grammar->g1_rule_expand($_))[0] eq $S_sym } $grammar->rule_ids();
+my $target_rule_length = -1 + scalar (() = $grammar->g1_rule_expand($target_rule));
 
 my $recce = Marpa::R3::Scanless::R->new( {   grammar => $grammar });
 my $input_length = 7;
