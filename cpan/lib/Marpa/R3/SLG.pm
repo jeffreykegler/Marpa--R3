@@ -580,7 +580,7 @@ END_OF_LUA
             Marpa::R3::exception(
                 "A lexeme in L0 is not a lexeme in G1: $lexeme_name");
         }
-        if ( not $slg->symbol_is_accessible($g1_symbol_id) ) {
+        if ( not $slg->g1_symbol_is_accessible($g1_symbol_id) ) {
             my $message =
 "A lexeme in L0 is not accessible from the G1 start symbol: $lexeme_name";
             say {$trace_fh} $message
@@ -1866,7 +1866,7 @@ sub Marpa::R3::Scanless::G::l0_show_symbols {
     return $slg->lmg_show_symbols('l0', $verbose);
 }
 
-sub Marpa::R3::Scanless::G::symbol_is_accessible {
+sub Marpa::R3::Scanless::G::g1_symbol_is_accessible {
     my ( $slg, $symid ) = @_;
     my ($is_accessible) = $slg->call_by_tag(
     ('@' .__FILE__ . ':' . __LINE__),
@@ -1879,7 +1879,7 @@ END_OF_LUA
     return $is_accessible;
 }
 
-sub Marpa::R3::Scanless::G::symbol_is_productive {
+sub Marpa::R3::Scanless::G::g1_symbol_is_productive {
     my ( $slg, $symid ) = @_;
     my ($is_productive) = $slg->call_by_tag(
     ('@' .__FILE__ . ':' . __LINE__),
@@ -1892,7 +1892,7 @@ END_OF_LUA
     return $is_productive;
 }
 
-sub Marpa::R3::Scanless::G::symbol_is_nulling {
+sub Marpa::R3::Scanless::G::g1_symbol_is_nulling {
     my ( $slg, $symid ) = @_;
     my ($is_nulling) = $slg->call_by_tag(
     ('@' .__FILE__ . ':' . __LINE__),
