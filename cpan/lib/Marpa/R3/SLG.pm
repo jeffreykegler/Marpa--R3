@@ -1191,7 +1191,7 @@ END_OF_LUA
 
             next RULE unless $rule_is_loop;
             print {$trace_fh}
-              'Cycle found involving rule: ', $slg->brief_rule($rule_id), "\n"
+              'Cycle found involving rule: ', $slg->g1_brief_rule($rule_id), "\n"
               or Marpa::R3::exception("Could not print: $ERRNO");
         } ## end for my $rule_id (@loop_rules)
         Marpa::R3::exception('Cycles in grammar, fatal error');
@@ -1995,7 +1995,7 @@ END_OF_LUA
 
 } ## end sub symbol_name
 
-sub Marpa::R3::Scanless::G::formatted_symbol_name {
+sub Marpa::R3::Scanless::G::g1_formatted_symbol_name {
     my ( $slg, $symbol_id ) = @_;
     my $symbol_name = $slg->g1_symbol_name($symbol_id);
     # As-is if all word characters
@@ -2005,7 +2005,7 @@ sub Marpa::R3::Scanless::G::formatted_symbol_name {
     return '<' . $symbol_name . '>';
 }
 
-sub Marpa::R3::Scanless::G::brief_rule {
+sub Marpa::R3::Scanless::G::g1_brief_rule {
     my ($slg, $irlid) = @_;
     return $slg->lmg_brief_rule('g1', $irlid);
 }
@@ -2013,8 +2013,8 @@ sub Marpa::R3::Scanless::G::brief_rule {
 sub Marpa::R3::Scanless::G::lmg_brief_rule {
     my ( $slg, $subg_name, $irlid ) = @_;
     my ($lhs_id, @rhs_ids) = $slg->irl_isyids($irlid);
-    my $lhs = $slg->formatted_symbol_name( $lhs_id );
-    my @rhs = map { $slg->formatted_symbol_name( $_ ) } @rhs_ids;
+    my $lhs = $slg->g1_formatted_symbol_name( $lhs_id );
+    my @rhs = map { $slg->g1_formatted_symbol_name( $_ ) } @rhs_ids;
     my ($has_minimum, $minimum) = $slg->call_by_tag(
     ('@' .__FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', 'si>*', $subg_name, $irlid ) ;
