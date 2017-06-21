@@ -1190,8 +1190,8 @@ END_OF_LUA
 END_OF_LUA
 
             next RULE unless $rule_is_loop;
-            print {$trace_fh}
-              'Cycle found involving rule: ', $slg->g1_brief_rule($rule_id), "\n"
+            print {$trace_fh} 'Cycle found involving rule: ',
+              $slg->lmg_brief_rule( $subg_name, $rule_id ), "\n"
               or Marpa::R3::exception("Could not print: $ERRNO");
         } ## end for my $rule_id (@loop_rules)
         Marpa::R3::exception('Cycles in grammar, fatal error');
@@ -2027,7 +2027,7 @@ END_OF_LUA
 
     my @quantifier = ();
     if ($has_minimum) {
-         push @quantifier, ($minimum <= 0 ? q{ *} : q{ +});
+        push @quantifier, ( $minimum <= 0 ? q{ *} : q{ +} );
     }
     return join q{ }, $lhs, q{::=}, @rhs, @quantifier;
 }
