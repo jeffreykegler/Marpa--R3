@@ -1591,10 +1591,10 @@ normalize-whitespace: 1
 
 =for Marpa::R3::Display::End
 
-=head2 Handlers which require local and non-local data.
+=head2 Handlers requiring local and non-local data.
 
 We've already shown handlers which use global data.
-We took advantage of the fact that hanlders, like all
+We took advantage of the fact that handlers, like all
 Perl functions, are closures.
 
 The next example shows the use of a "factory" for making
