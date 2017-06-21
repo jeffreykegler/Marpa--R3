@@ -707,7 +707,7 @@ END_OF_LUA
 
                 push @item_text, $input_range;
 
-                push @item_text, $slg->show_dotted_rule( $rule_id, $position );
+                push @item_text, $slg->g1_show_dotted_rule( $rule_id, $position );
                 $text .= ( join q{ }, @item_text ) . "\n";
             } ## end for my $position ( sort { $a <=> $b } keys %{...})
         } ## end for my $rule_id ( sort { $a <=> $b } keys ...)

@@ -662,13 +662,13 @@ END_OF_SOURCE
     my $grammar = Marpa::R3::Scanless::G->new( { source => \$source } );
 
 # Marpa::R3::Display
-# name: $grammar->start_symbol_id() example
+# name: $grammar->g1_start_symbol_id() example
 
-    my $start_id = $grammar->start_symbol_id();
+    my $start_id = $grammar->g1_start_symbol_id();
 
 # Marpa::R3::Display::End
 
-    Test::More::is( $start_id, 2, q{Test of $grammar->start_symbol_id()} );
+    Test::More::is( $start_id, 2, q{Test of $grammar->g1_start_symbol_id()} );
 
     my @rule_names = ();
 

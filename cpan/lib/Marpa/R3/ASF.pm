@@ -1387,7 +1387,7 @@ END_OF_LUA
                     next SYMCH_IX;
                 }
                 $result .= "  Symch $symch_ix is a rule: "
-                    . $grammar->rule_show($rule_id) . "\n";
+                    . $grammar->g1_rule_show($rule_id) . "\n";
             } ## end SYMCH_IX: for my $symch_ix ( 0 .. $display_symch_count - 1 )
 
             next AMBIGUITY;
@@ -1730,7 +1730,7 @@ sub Marpa::R3::ASF::dump_glade {
             push @lines,
                 [
                 $symch_indent, $glade_id,
-                "Rule $rule_id: " . $grammar->rule_show($rule_id)
+                "Rule $rule_id: " . $grammar->g1_rule_show($rule_id)
                 ];
             for my $line (
                 @{ dump_factorings(

@@ -114,7 +114,7 @@ sub earley_set_display {
         my $desc .=
             "S:$dot " . '@'
           . "$origin-$earley_set "
-          . $grammar->show_dotted_rule( $rule_id, $dot );
+          . $grammar->g1_show_dotted_rule( $rule_id, $dot );
         my $raw_dot = $dot < 0 ? $target_rule_length : $dot;
         my @datum = ( $raw_dot, $origin, $rule_id, $dot, $origin, $desc );
         push @data, \@datum;

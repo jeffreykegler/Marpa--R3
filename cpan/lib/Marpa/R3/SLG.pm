@@ -1645,7 +1645,7 @@ sub rule_describe {
     return "$lhs_name -> " . ( join q{ }, map { / / ? "<$_>" : $_ } @{$rhs_names} );
 } ## end sub rule_describe
 
-sub Marpa::R3::Scanless::G::start_symbol_id {
+sub Marpa::R3::Scanless::G::g1_start_symbol_id {
     my ( $slg ) = @_;
     my ($start_symbol) = $slg->call_by_tag(
     ('@' .__FILE__ . ':' . __LINE__),
@@ -1738,7 +1738,7 @@ sub Marpa::R3::Scanless::G::l0_symbol_dsl_form {
     return $slg->lmg_symbol_dsl_form('l0', $symbol_id);
 }
 
-sub Marpa::R3::Scanless::G::rule_show
+sub Marpa::R3::Scanless::G::g1_rule_show
 {
     my ( $slg, $rule_id ) = @_;
     return slg_rule_show($slg, 'g1', $rule_id);
@@ -1905,7 +1905,7 @@ END_OF_LUA
     return $is_nulling;
 }
 
-sub Marpa::R3::Scanless::G::show_dotted_rule {
+sub Marpa::R3::Scanless::G::g1_show_dotted_rule {
     my ( $slg, $irlid, $dot_position ) = @_;
     my ( $lhs, @rhs ) =
     map { $slg->lmg_symbol_display_form('g1', $_) } $slg->g1_irl_isyids($irlid);

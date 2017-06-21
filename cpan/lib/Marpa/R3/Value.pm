@@ -341,7 +341,7 @@ END_OF_LUA
     my $resolution = resolve_action( $slg, $action_name, \$resolve_error );
 
     if ( not $resolution ) {
-        my $rule_desc = $slg->rule_show($irlid);
+        my $rule_desc = $slg->g1_rule_show($irlid);
         Marpa::R3::exception(
             "Could not resolve rule action named '$action_name'\n",
             "  Rule was $rule_desc\n",
@@ -424,7 +424,7 @@ sub resolve_grammar {
         $rule_resolution //= $default_action_resolution;
 
         if ( not $rule_resolution ) {
-            my $rule_desc = $slg->rule_show($irlid);
+            my $rule_desc = $slg->g1_rule_show($irlid);
 
             my ($action) =
               $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
@@ -1142,7 +1142,7 @@ END_OF_LUA
                 last CHECK_TYPE if not defined $thingy_ref;
                 my $ref_type = Scalar::Util::reftype $thingy_ref;
                 if ( $ref_type eq q{} ) {
-                    my $rule_desc = $slg->rule_show($irlid);
+                    my $rule_desc = $slg->g1_rule_show($irlid);
                     Marpa::R3::exception(
                         qq{An action resolved to a scalar.\n},
                         qq{  This is not allowed.\n},
@@ -1160,7 +1160,7 @@ END_OF_LUA
                     last CHECK_TYPE;
                 } ## end if ( $ref_type eq 'CODE' )
 
-                my $rule_desc = $slg->rule_show($irlid);
+                my $rule_desc = $slg->g1_rule_show($irlid);
                 Marpa::R3::exception(
                     qq{Constant action is not of an allowed type.\n},
                     qq{  It was of type reference to $ref_type.\n},

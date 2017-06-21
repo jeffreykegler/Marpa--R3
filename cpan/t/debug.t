@@ -1133,9 +1133,9 @@ $text = q{};
 for my $rule_id ( $grammar->g1_rule_ids() ) {
 
 # Marpa::R3::Display
-# name: SLG rule_show() synopsis
+# name: SLG g1_rule_show() synopsis
 
-    my $rule_description = $grammar->rule_show($rule_id);
+    my $rule_description = $grammar->g1_rule_show($rule_id);
 
 # Marpa::R3::Display::End
 
