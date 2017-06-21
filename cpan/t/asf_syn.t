@@ -103,10 +103,10 @@ sub glade_to_basic_tree {
     my @symches     = ();
     my $symch_count = $asf->glade_symch_count($glade);
     SYMCH: for ( my $symch_ix = 0; $symch_ix < $symch_count; $symch_ix++ ) {
-        my $rule_id = $asf->symch_rule_id( $glade, $symch_ix );
+        my $rule_id = $asf->g1_symch_rule_id( $glade, $symch_ix );
         if ( $rule_id < 0 ) {
             my $literal      = $asf->glade_literal($glade);
-            my $symbol_id    = $asf->glade_symbol_id($glade);
+            my $symbol_id    = $asf->g1_glade_symbol_id($glade);
             my $display_form = $grammar->g1_symbol_display_form($symbol_id);
             push @symches,
                 bless [qq{Glade $glade, Symbol $display_form: "$literal"}],

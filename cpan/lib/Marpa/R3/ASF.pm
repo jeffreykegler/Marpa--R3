@@ -1026,15 +1026,15 @@ sub glade_obtain {
             undef;
         my $symch_nidset = $choicepoint_powerset->nidset($asf, $symch_ix);
         my $choicepoint_nid = $symch_nidset->nid(0);
-        my $symch_rule_id = nid_rule_id($asf, $choicepoint_nid) // -1;
+        my $g1_symch_rule_id = nid_rule_id($asf, $choicepoint_nid) // -1;
 
         # Initial undef indicates no factorings omitted
-        my @factorings = ( $symch_rule_id, undef );
+        my @factorings = ( $g1_symch_rule_id, undef );
 
         # For a token
         # There will not be multiple factorings or nids,
         # it is assumed, for a token
-        if ( $symch_rule_id < 0 ) {
+        if ( $g1_symch_rule_id < 0 ) {
             my $base_nidset = Marpa::R3::Nidset->obtain( $asf, $choicepoint_nid );
             my $glade_id    = $base_nidset->id();
 
@@ -1043,7 +1043,7 @@ sub glade_obtain {
             push @factorings, [$glade_id];
             push @symches, \@factorings;
             next SYMCH;
-        } ## end if ( $symch_rule_id < 0 )
+        } ## end if ( $g1_symch_rule_id < 0 )
 
         my $symch = $choicepoint_powerset->nidset($asf, $symch_ix);
         my $nid_count = $symch->count();
@@ -1124,7 +1124,7 @@ END_OF_LUA
     return $l0_length;
 }
 
-sub Marpa::R3::ASF::glade_symbol_id {
+sub Marpa::R3::ASF::g1_glade_symbol_id {
     my ( $asf, $glade_id ) = @_;
     my $nidset_by_id = $asf->[Marpa::R3::Internal::ASF::NIDSET_BY_ID];
     my $nidset       = $nidset_by_id->[$glade_id];
@@ -1133,14 +1133,14 @@ sub Marpa::R3::ASF::glade_symbol_id {
     return nid_symbol_id($asf, $nid0);
 }
 
-sub Marpa::R3::ASF::symch_rule_id {
+sub Marpa::R3::ASF::g1_symch_rule_id {
     my ( $asf, $glade_id, $symch_ix ) = @_;
     my $glade = glade_obtain( $asf, $glade_id );
     my $symches = $glade->[Marpa::R3::Internal::Glade::SYMCHES];
     return if $symch_ix > $#{$symches};
     my ($rule_id) = @{ $symches->[$symch_ix] };
     return $rule_id;
-} ## end sub Marpa::R3::ASF::symch_rule_id
+}
 
 sub Marpa::R3::ASF::symch_factoring_count {
     my ( $asf, $glade_id, $symch_ix ) = @_;
@@ -1195,11 +1195,11 @@ sub Marpa::R3::Internal::ASF::glade_ambiguities {
     my $symch_count = $asf->glade_symch_count($glade);
     if ( $symch_count > 1 ) {
         my $literal      = $asf->glade_literal($glade);
-        my $symbol_id    = $asf->glade_symbol_id($glade);
+        my $symbol_id    = $asf->g1_glade_symbol_id($glade);
         my $display_form = $grammar->g1_symbol_display_form($symbol_id);
         return [ [ 'symch', $glade, ] ];
     } ## end if ( $symch_count > 1 )
-    my $rule_id = $asf->symch_rule_id( $glade, 0 );
+    my $rule_id = $asf->g1_symch_rule_id( $glade, 0 );
     return [] if $rule_id < 0;       # no ambiguities if a token
 
     # ignore any truncation of the factorings
@@ -1346,7 +1346,7 @@ sub Marpa::R3::Internal::ASF::ambiguities_show {
             my ( undef, $glade ) = @{$ambiguity};
             my $symbol_display_form =
                 $grammar->g1_symbol_display_form(
-                $asf->glade_symbol_id($glade) );
+                $asf->g1_glade_symbol_id($glade) );
 
             my $l0_length = $asf->glade_L0_length($glade);
             my ( $g1_start, $g1_length )       = $asf->glade_g1_span($glade);
@@ -1381,7 +1381,7 @@ END_OF_LUA
                 ? "  There are $symch_count symches\n"
                 : "  There are $symch_count symches -- showing only the first $display_symch_count\n";
             SYMCH_IX: for my $symch_ix ( 0 .. $display_symch_count - 1 ) {
-                my $rule_id = $asf->symch_rule_id( $glade, $symch_ix );
+                my $rule_id = $asf->g1_symch_rule_id( $glade, $symch_ix );
                 if ( $rule_id < 0 ) {
                     $result .= "  Symch $symch_ix is a token\n";
                     next SYMCH_IX;
@@ -1407,7 +1407,7 @@ END_OF_LUA
                 my $this_downglade = $these_downglades->[$factor_ix2];
                 my $symbol_display_form =
                     $grammar->g1_symbol_display_form(
-                    $asf->glade_symbol_id($first_downglade) );
+                    $asf->g1_glade_symbol_id($first_downglade) );
 
                 my ( $g1_start, $g1_length ) =
                     $asf->glade_g1_span($first_downglade);
@@ -1573,7 +1573,7 @@ sub Marpa::R3::Internal::ASF::Traverse::symbol_id {
     my $asf = $traverser->[Marpa::R3::Internal::ASF::Traverse::ASF];
     my $glade = $traverser->[Marpa::R3::Internal::ASF::Traverse::GLADE];
     my $glade_id = $glade->[Marpa::R3::Internal::Glade::ID];
-    return $asf->glade_symbol_id($glade_id);
+    return $asf->g1_glade_symbol_id($glade_id);
 }
 
 sub Marpa::R3::Internal::ASF::Traverse::rule_id {
@@ -1711,7 +1711,7 @@ sub Marpa::R3::ASF::dump_glade {
         $item_ix //= 0;
         push @lines,
               [ 0, undef, "Symbol #$item_ix "
-            . $grammar->g1_symbol_display_form($asf->glade_symbol_id($glade_id))
+            . $grammar->g1_symbol_display_form($asf->g1_glade_symbol_id($glade_id))
             . " has $symch_count symches" ];
         $symch_indent += 2;
         $symch_choice = form_choice( $parent_choice, $item_ix );
@@ -1725,7 +1725,7 @@ sub Marpa::R3::ASF::dump_glade {
         if ( $symch_count > 1 ) {
             push @lines, [ $symch_indent , undef, "Symch #$current_choice" ];
         }
-        my $rule_id = $asf->symch_rule_id( $glade_id, $symch_ix );
+        my $rule_id = $asf->g1_symch_rule_id( $glade_id, $symch_ix );
         if ( $rule_id >= 0 ) {
             push @lines,
                 [
@@ -1798,7 +1798,7 @@ sub dump_terminal {
     # There can only be one symbol in a terminal and therefore only one factoring
     my $current_choice = $parent_choice;
     my $literal        = $asf->glade_literal($glade_id);
-    my $symbol_id    = $asf->glade_symbol_id($glade_id);
+    my $symbol_id    = $asf->g1_glade_symbol_id($glade_id);
     my $grammar = $asf->grammar();
     my $display_form = $grammar->g1_symbol_display_form($symbol_id);
     return [0, $glade_id, qq{Symbol $display_form: "$literal"}];
