@@ -2064,8 +2064,8 @@ END_OF_LUA
     return 0 .. $highest_symbol_id;
 }
 
-# Return DSL form of symbol
-# Does no checking
+# Returns DSL form of symbol
+# Does not check whether there is one
 sub Marpa::R3::Scanless::G::lmg_symbol_dsl_form {
     my ( $slg, $subg_name, $isyid ) = @_;
 
@@ -2078,15 +2078,19 @@ END_OF_LUA
     return $dsl_form;
 }
 
-# Return display form of symbol
-# Does lots of checking and makes use of alternatives.
+# Returns display form of symbol
 sub Marpa::R3::Scanless::G::lmg_symbol_display_form {
     my ( $slg, $subg_name, $isyid ) = @_;
-    my $text = $slg->lmg_symbol_dsl_form( $subg_name, $isyid )
-      // $slg->lmg_symbol_name($subg_name, $isyid);
-    return "<!No symbol with ID $isyid!>" if not defined $text;
-    return ( $text =~ m/\s/xms ) ? "<$text>" : $text;
+
+    my ($display_form) = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 'is', $isyid, $subg_name );
+        local grammar, isyid, subg_name = ...
+        return grammar:lmg_symbol_display_form(isyid, subg_name)
+END_OF_LUA
+
+    return $display_form;
 }
+
 
 sub Marpa::R3::Scanless::G::lmg_show_symbols {
     my ( $slg, $subg_name, $verbose ) = @_;
