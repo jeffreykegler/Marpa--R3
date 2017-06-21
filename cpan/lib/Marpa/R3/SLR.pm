@@ -38,7 +38,7 @@ our $PACKAGE = 'Marpa::R3::Scanless::R';
 sub Marpa::R3::Scanless::R::last_completed {
     my ( $slr, $symbol_name ) = @_;
     my $slg  = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $symbol_id       = $slg->symbol_by_name($symbol_name);
+    my $symbol_id       = $slg->g1_symbol_by_name($symbol_name);
 
     my ($start, $length) = $slr->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__),
@@ -814,7 +814,7 @@ sub Marpa::R3::Scanless::R::lexeme_alternative {
     ) if not defined $symbol_name;
 
     my $slg        = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $symbol_id  = $slg->symbol_by_name($symbol_name);
+    my $symbol_id  = $slg->g1_symbol_by_name($symbol_name);
     if ( not defined $symbol_id ) {
         Marpa::R3::exception(
             qq{slr->alternative(): symbol "$symbol_name" does not exist});

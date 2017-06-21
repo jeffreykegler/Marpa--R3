@@ -1031,18 +1031,18 @@ for my $symbol_id ( $grammar->g1_symbol_ids() ) {
 # Marpa::R3::Display::End
 
 # Marpa::R3::Display
-# name: SLG symbol_display_form() synopsis
+# name: SLG g1_symbol_display_form() synopsis
 
-    my $display_form = $grammar->symbol_display_form($symbol_id);
+    my $display_form = $grammar->g1_symbol_display_form($symbol_id);
     $text
         .= "symbol number: $symbol_id  name in display form: $display_form\n";
 
 # Marpa::R3::Display::End
 
 # Marpa::R3::Display
-# name: SLG symbol_dsl_form() synopsis
+# name: SLG g1_symbol_dsl_form() synopsis
 
-    my $dsl_form = $grammar->symbol_dsl_form($symbol_id)
+    my $dsl_form = $grammar->g1_symbol_dsl_form($symbol_id)
         // '[No name in DSL form]';
     $text .= "symbol number: $symbol_id  DSL form: $dsl_form\n";
 

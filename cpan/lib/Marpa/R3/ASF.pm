@@ -1196,7 +1196,7 @@ sub Marpa::R3::Internal::ASF::glade_ambiguities {
     if ( $symch_count > 1 ) {
         my $literal      = $asf->glade_literal($glade);
         my $symbol_id    = $asf->glade_symbol_id($glade);
-        my $display_form = $grammar->symbol_display_form($symbol_id);
+        my $display_form = $grammar->g1_symbol_display_form($symbol_id);
         return [ [ 'symch', $glade, ] ];
     } ## end if ( $symch_count > 1 )
     my $rule_id = $asf->symch_rule_id( $glade, 0 );
@@ -1345,7 +1345,7 @@ sub Marpa::R3::Internal::ASF::ambiguities_show {
 
             my ( undef, $glade ) = @{$ambiguity};
             my $symbol_display_form =
-                $grammar->symbol_display_form(
+                $grammar->g1_symbol_display_form(
                 $asf->glade_symbol_id($glade) );
 
             my $l0_length = $asf->glade_L0_length($glade);
@@ -1406,7 +1406,7 @@ END_OF_LUA
                     $factoring_ix2 );
                 my $this_downglade = $these_downglades->[$factor_ix2];
                 my $symbol_display_form =
-                    $grammar->symbol_display_form(
+                    $grammar->g1_symbol_display_form(
                     $asf->glade_symbol_id($first_downglade) );
 
                 my ( $g1_start, $g1_length ) =
@@ -1711,7 +1711,7 @@ sub Marpa::R3::ASF::dump_glade {
         $item_ix //= 0;
         push @lines,
               [ 0, undef, "Symbol #$item_ix "
-            . $grammar->symbol_display_form($asf->glade_symbol_id($glade_id))
+            . $grammar->g1_symbol_display_form($asf->glade_symbol_id($glade_id))
             . " has $symch_count symches" ];
         $symch_indent += 2;
         $symch_choice = form_choice( $parent_choice, $item_ix );
@@ -1800,7 +1800,7 @@ sub dump_terminal {
     my $literal        = $asf->glade_literal($glade_id);
     my $symbol_id    = $asf->glade_symbol_id($glade_id);
     my $grammar = $asf->grammar();
-    my $display_form = $grammar->symbol_display_form($symbol_id);
+    my $display_form = $grammar->g1_symbol_display_form($symbol_id);
     return [0, $glade_id, qq{Symbol $display_form: "$literal"}];
 } ## end sub dump_terminal
 

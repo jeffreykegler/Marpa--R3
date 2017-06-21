@@ -1,6 +1,3 @@
-sub Marpa::R3::Scanless::G::symbol_by_name {
-sub Marpa::R3::Scanless::G::symbol_display_form {
-sub Marpa::R3::Scanless::G::symbol_dsl_form {
 sub Marpa::R3::Scanless::G::symbol_is_accessible {
 sub Marpa::R3::Scanless::G::symbol_is_nulling {
 sub Marpa::R3::Scanless::G::symbol_is_productive {
