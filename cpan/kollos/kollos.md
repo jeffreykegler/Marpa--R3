@@ -603,6 +603,43 @@ Marpa::R2's Libmarpa.
     declarations(_M.class_xrl, class_xrl_fields, 'xrl')
 ```
 
+## XBNF Fields
+
+```
+    -- miranda: section+ class_xbnf field declarations
+    class_xbnf_fields.action = true
+    class_xbnf_fields.bless = true
+    class_xbnf_fields.discard_separation = true
+    class_xbnf_fields.event_name = true
+    class_xbnf_fields.event_starts_active = true
+    class_xbnf_fields.id = true
+    class_xbnf_fields.length = true
+    class_xbnf_fields.lhs = true
+    class_xbnf_fields.mask = true
+    class_xbnf_fields.min = true
+    class_xbnf_fields.name = true
+    class_xbnf_fields.null_ranking = true
+    class_xbnf_fields.proper = true
+    class_xbnf_fields.rank = true
+    class_xbnf_fields.rhs = true
+    class_xbnf_fields.separator = true
+    class_xbnf_fields.start = true
+    class_xbnf_fields.symbol_as_event = true
+    class_xbnf_fields.xrl_name = true
+```
+
+```
+    -- miranda: section+ create nonmetallic metatables
+    _M.class_xbnf = {}
+    -- miranda: section+ populate metatables
+    local class_xbnf_fields = {}
+
+    class_xbnf_fields.id = true
+
+    -- miranda: insert class_xbnf field declarations
+    declarations(_M.class_xbnf, class_xbnf_fields, 'xbnf')
+```
+
 ## Kollos SLIF grammar object
 
 ### Fields
@@ -901,10 +938,8 @@ one for each subgrammar.
         )
         for xbnf_id = 1, #xbnf_names do
             local xbnf_name = xbnf_names[xbnf_id]
-            local runtime_xbnf = {
-                id = xbnf_id,
-                name = xbnf_name
-            }
+            local runtime_xbnf = setmetatable({}, _M.class_xbnf)
+            runtime_xbnf.id = xbnf_id
 
             local xbnf_source = hash_xbnf_data[xbnf_name]
 
@@ -1025,17 +1060,17 @@ and eliminate the redundant ones.
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_slg.lmg_brief_rule(slg, irlid, subg_name)
-        local lmw_g = slg[subg_name]
-        local irl_isyids = lmw_g:irl_isyids(irlid)
+        local subg = slg[subg_name]
+        local irl_isyids = subg:irl_isyids(irlid)
         local pieces = {}
         pieces[#pieces+1]
-            = lmw_g:symbol_display_form(irl_isyids[1])
+            = subg:symbol_display_form(irl_isyids[1])
         pieces[#pieces+1] = '::='
         for ix = 2, #irl_isyids do
             pieces[#pieces+1]
-                = lmw_g:symbol_display_form(irl_isyids[ix])
+                = subg:symbol_display_form(irl_isyids[ix])
         end
-        local minimum = lmw_g:sequence_min(irlid)
+        local minimum = subg:sequence_min(irlid)
         if minimum then
             pieces[#pieces+1] =
                 minimum <= '0' and '*' or '+'
