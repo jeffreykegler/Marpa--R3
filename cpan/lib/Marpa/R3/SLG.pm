@@ -2002,7 +2002,7 @@ sub Marpa::R3::Scanless::G::g1_brief_rule {
 
 sub Marpa::R3::Scanless::G::lmg_brief_rule {
     my ( $slg, $subg_name, $irlid ) = @_;
-    my ( $lhs_id, @rhs_ids ) = $slg->g1_irl_isyids($irlid);
+    my ( $lhs_id, @rhs_ids ) = $slg->lmg_irl_isyids($subg_name, $irlid);
     my $lhs = $slg->lmg_symbol_display_form( $subg_name, $lhs_id );
     my @rhs = map { $slg->lmg_symbol_display_form( $subg_name, $_ ) } @rhs_ids;
     my ( $has_minimum, $minimum ) =
