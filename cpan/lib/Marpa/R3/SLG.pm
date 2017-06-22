@@ -1760,7 +1760,21 @@ sub Marpa::R3::Scanless::G::call_by_tag {
     # $DB::single = 1 if not defined $codestr;
     # $DB::single = 1 if not defined $sig;
     # $DB::single = 1 if grep { not defined $_ } @args;
-    my @results = $lua->call_by_tag($regix, $tag, $codestr, $sig, @args);
+    my @results;
+    my $eval_error;
+    my $eval_ok;
+    {
+        local $@;
+        $eval_ok = eval {
+            @results = $lua->call_by_tag($regix, $tag, $codestr, $sig, @args);
+            return 1;
+        };
+        $eval_error = $@;
+    }
+    if ( not $eval_ok ) {
+        Marpa::R3::exception($eval_error);
+    }
+
     return @results;
 }
 
@@ -2002,24 +2016,29 @@ sub Marpa::R3::Scanless::G::g1_brief_rule {
 
 sub Marpa::R3::Scanless::G::lmg_brief_rule {
     my ( $slg, $subg_name, $irlid ) = @_;
-    my ( $lhs_id, @rhs_ids ) = $slg->lmg_irl_isyids($subg_name, $irlid);
-    my $lhs = $slg->lmg_symbol_display_form( $subg_name, $lhs_id );
-    my @rhs = map { $slg->lmg_symbol_display_form( $subg_name, $_ ) } @rhs_ids;
-    my ( $has_minimum, $minimum ) =
+    my ( $desc ) =
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'si>*', $subg_name, $irlid );
     local grammar, subg_name, irlid = ...
     local lmw_g = grammar[subg_name].lmw_g
+    local irl_isyids = lmw_g:irl_isyids(irlid)
+    local pieces = {}
+    pieces[#pieces+1]
+        = lmw_g:symbol_display_form(irl_isyids[1])
+    pieces[#pieces+1] = '::='
+    for ix = 2, #irl_isyids do
+        pieces[#pieces+1]
+            = lmw_g:symbol_display_form(irl_isyids[ix])
+    end
     local minimum = lmw_g:sequence_min(irlid)
-    if not minimum then return 0, -1 end
-    return 1, minimum
+    if minimum then
+        pieces[#pieces+1] =
+            minimum <= '0' and '*' or '+'
+    end
+    return table.concat(pieces, ' ')
 END_OF_LUA
 
-    my @quantifier = ();
-    if ($has_minimum) {
-        push @quantifier, ( $minimum <= 0 ? q{ *} : q{ +} );
-    }
-    return join q{ }, $lhs, q{::=}, @rhs, @quantifier;
+    return $desc;
 }
 
 # This logic deals with gaps in the rule numbering.

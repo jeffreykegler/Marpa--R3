@@ -1426,7 +1426,7 @@ PPCODE:
         if (status != 0) {
             const char *error_string = marpa_lua_tostring (L, -1);
             marpa_lua_pop (L, 1);
-            croak ("Marpa::R3 error in call_by_tag(): %s", error_string);
+            croak ("Marpa::R3 error in call_by_tag(): %s\n", error_string);
         }
         marpa_lua_pushvalue (L, -1);
         marpa_lua_setfield (L, cache_ix, tag);
@@ -1489,7 +1489,7 @@ PPCODE:
         if (status != 0) {
             const char *exception_string = handle_pcall_error(L, status);
             marpa_lua_settop (L, base_of_stack);
-            croak(exception_string);
+            croak("%s\n", exception_string);
         }
 
         marpa_luaL_checkstack(L, 20, "xlua EXEC_SIG_BODY");
