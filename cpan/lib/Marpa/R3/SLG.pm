@@ -2009,35 +2009,37 @@ END_OF_LUA
 
 } ## end sub symbol_name
 
-sub Marpa::R3::Scanless::G::g1_brief_rule {
-    my ($slg, $irlid) = @_;
-    return $slg->lmg_brief_rule('g1', $irlid);
-}
-
 sub Marpa::R3::Scanless::G::lmg_brief_rule {
     my ( $slg, $subg_name, $irlid ) = @_;
+
     my ( $desc ) =
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'si>*', $subg_name, $irlid );
     local grammar, subg_name, irlid = ...
-    local lmw_g = grammar[subg_name].lmw_g
-    local irl_isyids = lmw_g:irl_isyids(irlid)
-    local pieces = {}
-    pieces[#pieces+1]
-        = lmw_g:symbol_display_form(irl_isyids[1])
-    pieces[#pieces+1] = '::='
-    for ix = 2, #irl_isyids do
-        pieces[#pieces+1]
-            = lmw_g:symbol_display_form(irl_isyids[ix])
-    end
-    local minimum = lmw_g:sequence_min(irlid)
-    if minimum then
-        pieces[#pieces+1] =
-            minimum <= '0' and '*' or '+'
-    end
-    return table.concat(pieces, ' ')
+    return grammar:lmg_brief_rule(irlid, subg_name)
 END_OF_LUA
+    return $desc;
+}
 
+sub Marpa::R3::Scanless::G::g1_brief_rule {
+    my ( $slg, $irlid ) = @_;
+    my ( $desc ) =
+      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 'i>*', $irlid );
+    local grammar, irlid = ...
+    return grammar:g1_brief_rule(irlid)
+END_OF_LUA
+    return $desc;
+}
+
+sub Marpa::R3::Scanless::G::l0_brief_rule {
+    my ( $slg, $irlid ) = @_;
+    my ( $desc ) =
+      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 'i>*', $irlid );
+    local grammar, irlid = ...
+    return grammar:l0_brief_rule(irlid)
+END_OF_LUA
     return $desc;
 }
 

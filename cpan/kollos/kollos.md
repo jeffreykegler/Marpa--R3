@@ -1022,6 +1022,33 @@ and eliminate the redundant ones.
 
 ```
 
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slg.lmg_brief_rule(slg, irlid, subg_name)
+        local lmw_g = slg[subg_name]
+        local irl_isyids = lmw_g:irl_isyids(irlid)
+        local pieces = {}
+        pieces[#pieces+1]
+            = lmw_g:symbol_display_form(irl_isyids[1])
+        pieces[#pieces+1] = '::='
+        for ix = 2, #irl_isyids do
+            pieces[#pieces+1]
+                = lmw_g:symbol_display_form(irl_isyids[ix])
+        end
+        local minimum = lmw_g:sequence_min(irlid)
+        if minimum then
+            pieces[#pieces+1] =
+                minimum <= '0' and '*' or '+'
+        end
+        return table.concat(pieces, ' ')
+    end
+    function _M.class_slg.g1_brief_rule(slg, irlid)
+        return slg:lmg_brief_rule(irlid, 'g1')
+    end
+    function _M.class_slg.l0_brief_rule(slg, irlid)
+        return slg:lmg_brief_rule(irlid, 'l0')
+    end
+```
 ## Kollos SLIF recognizer object
 
 This is a registry object.
