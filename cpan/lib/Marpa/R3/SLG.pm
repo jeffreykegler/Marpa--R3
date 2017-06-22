@@ -1191,7 +1191,7 @@ END_OF_LUA
 
             next RULE unless $rule_is_loop;
             print {$trace_fh} 'Cycle found involving rule: ',
-              $slg->lmg_brief_rule( $subg_name, $rule_id ), "\n"
+              $slg->lmg_rule_show( $subg_name, $rule_id ), "\n"
               or Marpa::R3::exception("Could not print: $ERRNO");
         } ## end for my $rule_id (@loop_rules)
         Marpa::R3::exception('Cycles in grammar, fatal error');
@@ -1738,18 +1738,6 @@ sub Marpa::R3::Scanless::G::l0_symbol_dsl_form {
     return $slg->lmg_symbol_dsl_form('l0', $symbol_id);
 }
 
-sub Marpa::R3::Scanless::G::g1_rule_show
-{
-    my ( $slg, $rule_id ) = @_;
-    return slg_rule_show($slg, 'g1', $rule_id);
-}
-
-sub Marpa::R3::Scanless::G::l0_rule_show
-{
-    my ( $slg, $rule_id ) = @_;
-    return slg_rule_show($slg, 'l0', $rule_id);
-}
-
 sub Marpa::R3::Scanless::G::call_by_tag {
     my ( $slg, $tag, $codestr, $sig, @args ) = @_;
     my $lua = $slg->[Marpa::R3::Internal::Scanless::G::L];
@@ -1821,39 +1809,6 @@ sub Marpa::R3::Scanless::G::coro_by_tag {
         Marpa::R3::exception($eval_error);
     }
     return @results;
-}
-
-sub slg_rule_show {
-    my ( $slg, $subg_name, $irlid ) = @_;
-
-    my ($symbol_ids) = $slg->call_by_tag(
-    ('@' .__FILE__ . ':' . __LINE__),
-    <<'END_OF_LUA', 'si>*', $subg_name, $irlid ) ;
-    local grammar, subg_name, irlid = ...
-    local lmw_g = grammar[subg_name].lmw_g
-    return lmw_g:irl_isyids(irlid)
-END_OF_LUA
-
-    return if not scalar @{$symbol_ids};
-    my ( $lhs, @rhs ) =
-        map { $slg->lmg_symbol_display_form($subg_name, $_) } @{$symbol_ids};
-
-    my ($has_minimum, $minimum) = $slg->call_by_tag(
-    ('@' .__FILE__ . ':' . __LINE__),
-    <<'END_OF_LUA', 'si>*', $subg_name, $irlid ) ;
-    local grammar, subg_name, irlid = ...
-    local lmw_g = grammar[subg_name].lmw_g
-    local minimum = lmw_g:sequence_min(irlid)
-    if not minimum then return 0, -1 end
-    return 1, minimum
-END_OF_LUA
-
-    my @quantifier = ();
-
-    if ( $has_minimum ) {
-        @quantifier = ( $minimum <= 0 ? q{*} : q{+} );
-    }
-    return join q{ }, $lhs, q{::=}, @rhs, @quantifier;
 }
 
 sub Marpa::R3::Scanless::G::g1_show_rules {
@@ -2009,36 +1964,36 @@ END_OF_LUA
 
 } ## end sub symbol_name
 
-sub Marpa::R3::Scanless::G::lmg_brief_rule {
+sub Marpa::R3::Scanless::G::lmg_rule_show {
     my ( $slg, $subg_name, $irlid ) = @_;
 
     my ( $desc ) =
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'si>*', $subg_name, $irlid );
     local grammar, subg_name, irlid = ...
-    return grammar:lmg_brief_rule(irlid, subg_name)
+    return grammar:lmg_rule_show(irlid, subg_name)
 END_OF_LUA
     return $desc;
 }
 
-sub Marpa::R3::Scanless::G::g1_brief_rule {
+sub Marpa::R3::Scanless::G::g1_rule_show {
     my ( $slg, $irlid ) = @_;
     my ( $desc ) =
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'i>*', $irlid );
     local grammar, irlid = ...
-    return grammar:g1_brief_rule(irlid)
+    return grammar:g1_rule_show(irlid)
 END_OF_LUA
     return $desc;
 }
 
-sub Marpa::R3::Scanless::G::l0_brief_rule {
+sub Marpa::R3::Scanless::G::l0_rule_show {
     my ( $slg, $irlid ) = @_;
     my ( $desc ) =
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'i>*', $irlid );
     local grammar, irlid = ...
-    return grammar:l0_brief_rule(irlid)
+    return grammar:l0_rule_show(irlid)
 END_OF_LUA
     return $desc;
 }

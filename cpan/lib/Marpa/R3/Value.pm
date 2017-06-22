@@ -458,7 +458,7 @@ END_OF_LUA
 qq{Attempt to bless, but improper semantics: "$semantics"\n},
                         qq{  Blessing: "$blessing"\n},
                         '  Rule: ',
-                        $slg->g1_brief_rule($irlid)
+                        $slg->g1_rule_show($irlid)
                     );
                 } ## end CHECK_SEMANTICS:
             } ## end if ( $blessing ne '::undef' )
@@ -485,7 +485,7 @@ END_OF_LUA
             my ( $resolution_name, $closure ) =
               @{ $rule_resolutions->[$rule_id] };
             say {$trace_file_handle} 'Rule ',
-              $slg->g1_brief_rule($rule_id),
+              $slg->g1_rule_show($rule_id),
               qq{ resolves to "$resolution_name"}
               or Marpa::R3::exception('print to trace handle failed');
         }
@@ -634,10 +634,10 @@ END_OF_LUA
 }
 
 # For diagnostics
-sub g1_brief_rule_list {
+sub g1_show_rule_list {
     my ( $slg, $rule_ids ) = @_;
-    my @brief_rules = map { $slg->g1_brief_rule($_) } @{$rule_ids};
-    return join q{}, map { q{    } . $_ . "\n" } @brief_rules;
+    my @rules = map { $slg->g1_rule_show($_) } @{$rule_ids};
+    return join q{}, map { q{    } . $_ . "\n" } @rules;
 }
 
 sub registrations_set {
@@ -663,7 +663,7 @@ sub registrations_set {
             if ( $type eq 'rule' ) {
                 say {$trace_file_handle}
                   "Registering semantics for $type: ",
-                  $slg->g1_brief_rule($id),
+                  $slg->g1_rule_show($id),
                   '  Semantics are ', $slg->show_semantics(@raw_ops)
                   or Marpa::R3::exception('Cannot say to trace file handle');
                 last PRINT_TRACES;
@@ -766,7 +766,7 @@ END_OF_LUA
 
                 Marpa::R3::exception(
                     q{Unknown semantics for rule },
-                    $slg->g1_brief_rule($irlid),
+                    $slg->g1_rule_show($irlid),
                     "\n",
                     qq{    Semantics were specified as "$semantics"\n}
                 );
@@ -790,7 +790,7 @@ qq{Fatal error: Attempt to bless a rule that resolves to a scalar constant\n},
                             Data::Dumper::Dumper($closure),
                             qq{  Blessing is "$blessing"\n},
                             q{  Rule is: },
-                            $slg->g1_brief_rule($irlid),
+                            $slg->g1_rule_show($irlid),
                             "\n",
 qq{  Cannot bless rule when it resolves to a scalar constant},
                             "\n",
@@ -803,7 +803,7 @@ qq{  Cannot bless rule when it resolves to a scalar constant},
                 Marpa::R3::exception(
                     qq{Cannot bless rule when the semantics are "$semantics"},
                     q{  Rule is: },
-                    $slg->g1_brief_rule($irlid),
+                    $slg->g1_rule_show($irlid),
                     "\n",
                     qq{  Blessing is "$blessing"\n},
                     qq{  Semantics are "$semantics"\n}
@@ -855,7 +855,7 @@ END_OF_LUA
                 say {$trace_file_handle}
                   qq{Nulled symbol "$lhs_name" },
                   qq{ resolved to "$resolution_name" from rule },
-                  $slg->g1_brief_rule($resolution_rule)
+                  $slg->g1_rule_show($resolution_rule)
                   or Marpa::R3::exception('print to trace handle failed');
             } ## end if ($trace_actions)
             $null_symbol_closures[$lhs_id] = $resolution_rule;
@@ -889,7 +889,7 @@ END_OF_LUA
                 say {$trace_file_handle}
                   qq{Nulled symbol "$lhs_name" },
                   qq{ resolved to "$resolution_name" from rule },
-                  $slg->g1_brief_rule($resolution_rule)
+                  $slg->g1_rule_show($resolution_rule)
                   or Marpa::R3::exception('print to trace handle failed');
             } ## end if ($trace_actions)
             $null_symbol_closures[$lhs_id] = $resolution_rule;
@@ -918,7 +918,7 @@ END_OF_LUA
                     qq{  can have more than one semantics\n},
                     qq{  Marpa needs there to be only one semantics\n},
                     qq{  The rules involved are:\n},
-                    g1_brief_rule_list( $slg, $irlids )
+                    g1_show_rule_list( $slg, $irlids )
                 );
             } ## end if ( $first_closure_name ne $other_closure_name or ...)
         } ## end OTHER_RESOLUTION: for my $other_resolution (@other_resolutions)
@@ -933,7 +933,7 @@ END_OF_LUA
             say {$trace_file_handle}
               qq{Nulled symbol "$lhs_name" },
               qq{ resolved to "$resolution_name" from rule },
-              $slg->g1_brief_rule($resolution_rule)
+              $slg->g1_rule_show($resolution_rule)
               or Marpa::R3::exception('print to trace handle failed');
         } ## end if ($trace_actions)
         $null_symbol_closures[$lhs_id] = $resolution_rule;
@@ -1212,7 +1212,7 @@ END_OF_LUA
                     my $original_semantics = $semantics_by_irlid[$irlid];
                     Marpa::R3::exception(
                         q{Impossible semantics for empty rule: },
-                        $slg->g1_brief_rule($irlid),
+                        $slg->g1_rule_show($irlid),
                         "\n",
 qq{    Semantics were specified as "$original_semantics"\n}
                     );
@@ -1223,7 +1223,7 @@ qq{    Semantics were specified as "$original_semantics"\n}
                     my $original_semantics = $semantics_by_irlid[$irlid];
                     Marpa::R3::exception(
                         q{Impossible semantics for rule: },
-                        $slg->g1_brief_rule($irlid),
+                        $slg->g1_rule_show($irlid),
                         "\n",
 qq{    Semantics were specified as "$original_semantics"\n}
                     );
@@ -1706,7 +1706,7 @@ END_OF_LUA
                             warnings    => \@warnings,
                             where       => 'computing value',
                             long_where  => 'Computing value for rule: '
-                              . $slg->g1_brief_rule($rule_id),
+                              . $slg->g1_rule_show($rule_id),
                         }
                     );
                 } ## end if ( not $eval_ok or @warnings )
@@ -1840,7 +1840,7 @@ END_OF_LUA
     return 'Popping ', $argc,
       ' values to evaluate ',
       $slr->and_node_tag($and_node_id),
-      ', rule: ', $slg->g1_brief_rule($rule_id);
+      ', rule: ', $slg->g1_rule_show($rule_id);
 
 } ## end sub trace_stack_1
 

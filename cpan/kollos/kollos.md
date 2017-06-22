@@ -1059,7 +1059,7 @@ and eliminate the redundant ones.
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slg.lmg_brief_rule(slg, irlid, subg_name)
+    function _M.class_slg.lmg_rule_show(slg, irlid, subg_name)
         local subg = slg[subg_name]
         local irl_isyids = subg:irl_isyids(irlid)
         local pieces = {}
@@ -1073,15 +1073,15 @@ and eliminate the redundant ones.
         local minimum = subg:sequence_min(irlid)
         if minimum then
             pieces[#pieces+1] =
-                minimum <= '0' and '*' or '+'
+                minimum <= 0 and '*' or '+'
         end
         return table.concat(pieces, ' ')
     end
-    function _M.class_slg.g1_brief_rule(slg, irlid)
-        return slg:lmg_brief_rule(irlid, 'g1')
+    function _M.class_slg.g1_rule_show(slg, irlid)
+        return slg:lmg_rule_show(irlid, 'g1')
     end
-    function _M.class_slg.l0_brief_rule(slg, irlid)
-        return slg:lmg_brief_rule(irlid, 'l0')
+    function _M.class_slg.l0_rule_show(slg, irlid)
+        return slg:lmg_rule_show(irlid, 'l0')
     end
 ```
 ## Kollos SLIF recognizer object
