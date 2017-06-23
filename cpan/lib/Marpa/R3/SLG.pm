@@ -1333,7 +1333,7 @@ sub add_G1_user_rule {
           <<'END_OF_LUA', 's', $xbnf_name);
     local grammar, xbnf_name = ...
     local default_rank = grammar.g1:default_rank()
-    local xbnf_id = grammar.xbnfs[xbnf_name].new_id
+    local xbnf_id = grammar.xbnfs[xbnf_name].id
     return default_rank, xbnf_id
 END_OF_LUA
 
@@ -1511,7 +1511,7 @@ sub add_L0_user_rule {
     -- io.stderr:write('xbnf_name: ', inspect(xbnf_name), '\n')
     local xbnf_id = -1
     if #xbnf_name > 0 then
-        xbnf_id = slg.xbnfs[xbnf_name].new_id
+        xbnf_id = slg.xbnfs[xbnf_name].id
     end
     return default_rank, xbnf_id
 END_OF_LUA
