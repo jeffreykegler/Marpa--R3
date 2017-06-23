@@ -916,7 +916,7 @@ one for each subgrammar.
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slg.xbnfs_populate(slg, source_hash, subgrammar)
+    function _M.class_slg.xbnfs_subg_populate(slg, source_hash, subgrammar)
         local xbnfs = {}
         local hash_subg = string.upper(subgrammar)
 
@@ -993,6 +993,10 @@ one for each subgrammar.
             xbnfs[xbnf_id] = runtime_xbnf
         end
         slg[subgrammar].xbnfs = xbnfs
+    end
+    function _M.class_slg.xbnfs_populate(slg, source_hash)
+        slg:xbnfs_subg_populate(source_hash, 'l0')
+        return slg:xbnfs_subg_populate(source_hash, 'g1')
     end
 ```
 
@@ -1084,6 +1088,20 @@ and eliminate the redundant ones.
         return slg:lmg_rule_show(irlid, 'l0')
     end
 ```
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slg.irl_isyids(lmw_g, rule_id)
+        local lhs = lmw_g:rule_lhs(rule_id)
+        if not lhs then return {} end
+        local symbols = { lhs }
+        for rhsix = 0, lmw_g:rule_length(rule_id) - 1 do
+             symbols[#symbols+1] = lmw_g:rule_rhs(rule_id, rhsix)
+        end
+        return symbols
+    end
+```
+
 ## Kollos SLIF recognizer object
 
 This is a registry object.

@@ -298,8 +298,7 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
         slg.l0 = _M.grammar_new(slg)
         slg:xsys_populate( source_hash)
         slg:xrls_populate(source_hash)
-        slg:xbnfs_populate(source_hash, 'l0')
-        slg:xbnfs_populate(source_hash, 'g1')
+        slg:xbnfs_populate(source_hash)
 END_OF_LUA
 
     my $if_inaccessible_default_arg =
