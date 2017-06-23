@@ -612,8 +612,7 @@ Marpa::R2's Libmarpa.
     class_xbnf_fields.discard_separation = true
     class_xbnf_fields.event_name = true
     class_xbnf_fields.event_starts_active = true
-    class_xbnf_fields.id = true -- TODO replace this ...
-    class_xbnf_fields.new_id = true -- .. with this
+    class_xbnf_fields.new_id = true -- TODO rename this to id
     class_xbnf_fields.length = true
     class_xbnf_fields.lhs = true
     class_xbnf_fields.mask = true
@@ -937,10 +936,9 @@ one for each subgrammar.
                 return subkey_a < subkey_b
            end
         )
-        for xbnf_id = 1, #xbnf_names do
-            local xbnf_name = xbnf_names[xbnf_id]
+        for ix = 1, #xbnf_names do
+            local xbnf_name = xbnf_names[ix]
             local runtime_xbnf = setmetatable({}, _M.class_xbnf)
-            runtime_xbnf.id = xbnf_id
 
             local xbnf_source = hash_xbnf_data[xbnf_name]
 
@@ -991,7 +989,7 @@ one for each subgrammar.
             end
 
             old_xbnfs[xbnf_name] = runtime_xbnf
-            old_xbnfs[xbnf_id] = runtime_xbnf
+            old_xbnfs[ix] = runtime_xbnf
             local next_xbnf_id = #xbnfs + 1
             runtime_xbnf.new_id = next_xbnf_id
             xbnfs[xbnf_name] = runtime_xbnf
