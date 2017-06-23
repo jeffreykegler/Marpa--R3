@@ -918,7 +918,6 @@ one for each subgrammar.
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_slg.xbnfs_subg_populate(slg, source_hash, subgrammar)
-        local old_xbnfs = {} -- TODO delete this
         local xbnfs = slg.xbnfs
         -- io.stderr:write(inspect(source_hash))
         local xbnf_names = {}
@@ -988,14 +987,11 @@ one for each subgrammar.
                 end
             end
 
-            old_xbnfs[xbnf_name] = runtime_xbnf
-            old_xbnfs[ix] = runtime_xbnf
             local next_xbnf_id = #xbnfs + 1
             runtime_xbnf.new_id = next_xbnf_id
             xbnfs[xbnf_name] = runtime_xbnf
             xbnfs[next_xbnf_id] = runtime_xbnf
         end
-        slg[subgrammar].xbnfs = old_xbnfs
     end
     function _M.class_slg.xbnfs_populate(slg, source_hash)
         slg.xbnfs = {}
@@ -4200,7 +4196,6 @@ is zero.
     class_grammar_fields.slg = true
     class_grammar_fields.start_name = true
     class_grammar_fields.xbnf_by_irlid = true
-    class_grammar_fields.xbnfs = true
 ```
 
 A per-grammar table of the XSY's,
@@ -4233,7 +4228,6 @@ indexed by isyid.
         grammar.irls = {}
         grammar.isys = {}
         grammar.slg = slg
-        grammar.xbnfs = {}
         grammar.xbnf_by_irlid = {}
         grammar.xsys = {}
 
