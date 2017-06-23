@@ -1851,7 +1851,7 @@ sub Marpa::R3::Internal::MetaAST::Parse::xbnf_create {
     # slightly adjusted.
     $subgrammar //= 'g1';
     $args->{subkey} //= 0;
-    my $rule_id = join q{,}, $args->{lhs}, @{$args->{rhs}};
+    my $rule_id = join q{,}, $subgrammar, $args->{lhs}, @{$args->{rhs}};
     my $hash_by_xbnfid = $parse->{xbnf}->{$subgrammar};
     if ( exists $hash_by_xbnfid->{$rule_id} ) {
         Marpa::R3::Internal::X->new(
