@@ -918,11 +918,9 @@ one for each subgrammar.
     -- miranda: section+ most Lua function definitions
     function _M.class_slg.xbnfs_subg_populate(slg, source_hash, subgrammar)
         local xbnfs = {}
-        local hash_subg = string.upper(subgrammar)
-
         -- io.stderr:write(inspect(source_hash))
         local xbnf_names = {}
-        local hash_xbnf_data = source_hash.xbnf[hash_subg]
+        local hash_xbnf_data = source_hash.xbnf[subgrammar]
         for xbnf_name, _ in pairs(hash_xbnf_data) do
              xbnf_names[#xbnf_names+1] = xbnf_name
         end

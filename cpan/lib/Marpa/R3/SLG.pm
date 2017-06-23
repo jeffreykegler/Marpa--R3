@@ -330,12 +330,12 @@ END_OF_LUA
         g1g.start_name = '[:start]'
 END_OF_LUA
 
-    for my $symbol ( sort keys %{ $hashed_source->{symbols}->{G1} } ) {
+    for my $symbol ( sort keys %{ $hashed_source->{symbols}->{g1} } ) {
         assign_G1_symbol( $slg, $symbol,
-            $hashed_source->{symbols}->{G1}->{$symbol} );
+            $hashed_source->{symbols}->{g1}->{$symbol} );
     }
 
-    add_G1_user_rules( $slg, $hashed_source->{rules}->{G1} );
+    add_G1_user_rules( $slg, $hashed_source->{rules}->{g1} );
 
     my @bad_arguments = keys %{$g1_args};
     if ( scalar @bad_arguments ) {
@@ -466,9 +466,9 @@ END_OF_LUA
     state $lex_start_symbol_name = '[:start_lex]';
     state $discard_symbol_name   = '[:discard]';
 
-    my $lexer_rules          = $hashed_source->{rules}->{'L0'};
+    my $lexer_rules          = $hashed_source->{rules}->{'l0'};
     my $character_class_hash = $hashed_source->{character_classes};
-    my $lexer_symbols        = $hashed_source->{symbols}->{'L0'};
+    my $lexer_symbols        = $hashed_source->{symbols}->{'l0'};
 
     # If no lexer rules, fake a lexer
     # Fake a lexer -- it discards symbols in character classes which
