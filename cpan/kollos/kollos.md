@@ -612,7 +612,8 @@ Marpa::R2's Libmarpa.
     class_xbnf_fields.discard_separation = true
     class_xbnf_fields.event_name = true
     class_xbnf_fields.event_starts_active = true
-    class_xbnf_fields.id = true
+    class_xbnf_fields.id = true -- TODO replace this ...
+    class_xbnf_fields.new_id = true -- .. with this
     class_xbnf_fields.length = true
     class_xbnf_fields.lhs = true
     class_xbnf_fields.mask = true
@@ -671,7 +672,8 @@ Marpa::R2's Libmarpa.
     class_slg_fields['rule_semantics'] = true
     class_slg_fields['token_semantics'] = true
 
-    class_slg_fields['xrls'] = true
+    class_slg_fields.xrls = true
+    class_slg_fields.xbnfs = true
     class_slg_fields.xsys = true
 ```
 
@@ -917,7 +919,8 @@ one for each subgrammar.
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_slg.xbnfs_subg_populate(slg, source_hash, subgrammar)
-        local xbnfs = {}
+        local old_xbnfs = {} -- TODO delete this
+        local xbnfs = slg.xbnfs
         -- io.stderr:write(inspect(source_hash))
         local xbnf_names = {}
         local hash_xbnf_data = source_hash.xbnf[subgrammar]
@@ -987,12 +990,17 @@ one for each subgrammar.
                 end
             end
 
+            old_xbnfs[xbnf_name] = runtime_xbnf
+            old_xbnfs[xbnf_id] = runtime_xbnf
+            local next_xbnf_id = #xbnfs + 1
+            runtime_xbnf.new_id = next_xbnf_id
             xbnfs[xbnf_name] = runtime_xbnf
-            xbnfs[xbnf_id] = runtime_xbnf
+            xbnfs[next_xbnf_id] = runtime_xbnf
         end
-        slg[subgrammar].xbnfs = xbnfs
+        slg[subgrammar].xbnfs = old_xbnfs
     end
     function _M.class_slg.xbnfs_populate(slg, source_hash)
+        slg.xbnfs = {}
         slg:xbnfs_subg_populate(source_hash, 'l0')
         return slg:xbnfs_subg_populate(source_hash, 'g1')
     end
