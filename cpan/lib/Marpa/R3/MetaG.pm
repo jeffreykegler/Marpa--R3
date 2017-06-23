@@ -285,6 +285,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'statements'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,[:start],statements'
                                          },
                                          {
@@ -295,6 +296,7 @@ $hashed_metag = {
                                                       '[Lex-34]',
                                                       'action name'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,action,[Lex-33],[Lex-34],action name'
                                          },
                                          {
@@ -303,6 +305,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'Perl name'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,action name,Perl name'
                                          },
                                          {
@@ -311,6 +314,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'array descriptor'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,action name,array descriptor'
                                          },
                                          {
@@ -319,6 +323,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'reserved action name'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,action name,reserved action name'
                                          },
                                          {
@@ -327,6 +332,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'action'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,adverb item,action'
                                          },
                                          {
@@ -335,6 +341,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'blessing'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,adverb item,blessing'
                                          },
                                          {
@@ -343,6 +350,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'eager specification'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,adverb item,eager specification'
                                          },
                                          {
@@ -351,6 +359,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'event specification'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,adverb item,event specification'
                                          },
                                          {
@@ -359,6 +368,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'group association'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,adverb item,group association'
                                          },
                                          {
@@ -367,6 +377,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'left association'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,adverb item,left association'
                                          },
                                          {
@@ -375,6 +386,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'naming'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,adverb item,naming'
                                          },
                                          {
@@ -383,6 +395,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'null adverb'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,adverb item,null adverb'
                                          },
                                          {
@@ -391,6 +404,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'null ranking specification'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,adverb item,null ranking specification'
                                          },
                                          {
@@ -399,6 +413,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'pause specification'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,adverb item,pause specification'
                                          },
                                          {
@@ -407,6 +422,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'priority specification'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,adverb item,priority specification'
                                          },
                                          {
@@ -415,6 +431,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'proper specification'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,adverb item,proper specification'
                                          },
                                          {
@@ -423,6 +440,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'rank specification'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,adverb item,rank specification'
                                          },
                                          {
@@ -431,6 +449,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'right association'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,adverb item,right association'
                                          },
                                          {
@@ -439,6 +458,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'separator specification'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,adverb item,separator specification'
                                          },
                                          {
@@ -447,6 +467,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'adverb list items'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,adverb list,adverb list items'
                                          },
                                          {
@@ -456,6 +477,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'adverb item'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,adverb list items,adverb item'
                                          },
                                          {
@@ -465,6 +487,7 @@ $hashed_metag = {
                                                       'rhs',
                                                       'adverb list'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,alternative,rhs,adverb list'
                                          },
                                          {
@@ -473,6 +496,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'single quoted name'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,alternative name,single quoted name'
                                          },
                                          {
@@ -481,6 +505,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'standard name'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,alternative name,standard name'
                                          },
                                          {
@@ -492,6 +517,7 @@ $hashed_metag = {
                                                       'alternative'
                                                     ],
                                            'separator' => 'op equal priority',
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,alternatives,alternative'
                                          },
                                          {
@@ -502,6 +528,7 @@ $hashed_metag = {
                                                       '[Lex-69]',
                                                       'blessing name'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,blessing,[Lex-68],[Lex-69],blessing name'
                                          },
                                          {
@@ -510,6 +537,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'reserved blessing name'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,blessing name,reserved blessing name'
                                          },
                                          {
@@ -518,6 +546,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'standard name'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,blessing name,standard name'
                                          },
                                          {
@@ -530,6 +559,7 @@ $hashed_metag = {
                                                       '[Lex-18]',
                                                       'symbol name'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,completion event declaration,[Lex-16],event initialization,[Lex-17],[Lex-18],symbol name'
                                          },
                                          {
@@ -540,6 +570,7 @@ $hashed_metag = {
                                                       'op declare bnf',
                                                       'adverb list'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,default rule,[Lex-7],op declare bnf,adverb list'
                                          },
                                          {
@@ -551,6 +582,7 @@ $hashed_metag = {
                                                       '[Lex-13]',
                                                       'adverb list'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,discard default statement,[Lex-11],[Lex-12],[Lex-13],adverb list'
                                          },
                                          {
@@ -562,6 +594,7 @@ $hashed_metag = {
                                                       'single symbol',
                                                       'adverb list'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,discard rule,[Lex-14],op declare match,single symbol,adverb list'
                                          },
                                          {
@@ -572,6 +605,7 @@ $hashed_metag = {
                                                       '[Lex-49]',
                                                       'boolean'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,eager specification,[Lex-48],[Lex-49],boolean'
                                          },
                                          {
@@ -582,6 +616,7 @@ $hashed_metag = {
                                                       'op declare',
                                                       'adverb list'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,empty rule,lhs,op declare,adverb list'
                                          },
                                          {
@@ -591,12 +626,14 @@ $hashed_metag = {
                                                       'event name',
                                                       'event initializer'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,event initialization,event name,event initializer'
                                          },
                                          {
                                            'action' => '[start,length,values]',
                                            'lhs' => 'event initializer',
                                            'rhs' => [],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,event initializer'
                                          },
                                          {
@@ -606,6 +643,7 @@ $hashed_metag = {
                                                       '[Lex-65]',
                                                       'on or off'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,event initializer,[Lex-65],on or off'
                                          },
                                          {
@@ -614,6 +652,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'reserved event name'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,event name,reserved event name'
                                          },
                                          {
@@ -622,6 +661,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'single quoted name'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,event name,single quoted name'
                                          },
                                          {
@@ -630,6 +670,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'standard name'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,event name,standard name'
                                          },
                                          {
@@ -640,6 +681,7 @@ $hashed_metag = {
                                                       '[Lex-64]',
                                                       'event initialization'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,event specification,[Lex-63],[Lex-64],event initialization'
                                          },
                                          {
@@ -650,6 +692,7 @@ $hashed_metag = {
                                                       '[Lex-42]',
                                                       '[Lex-43]'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,group association,[Lex-41],[Lex-42],[Lex-43]'
                                          },
                                          {
@@ -662,6 +705,7 @@ $hashed_metag = {
                                                       '[Lex-27]',
                                                       '[Lex-28]'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,inaccessible statement,[Lex-25],[Lex-26],inaccessible treatment,[Lex-27],[Lex-28]'
                                          },
                                          {
@@ -670,6 +714,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[Lex-29]'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,inaccessible treatment,[Lex-29]'
                                          },
                                          {
@@ -678,6 +723,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[Lex-30]'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,inaccessible treatment,[Lex-30]'
                                          },
                                          {
@@ -686,6 +732,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[Lex-31]'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,inaccessible treatment,[Lex-31]'
                                          },
                                          {
@@ -696,6 +743,7 @@ $hashed_metag = {
                                                       '[Lex-36]',
                                                       '[Lex-37]'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,left association,[Lex-35],[Lex-36],[Lex-37]'
                                          },
                                          {
@@ -707,6 +755,7 @@ $hashed_metag = {
                                                       '[Lex-10]',
                                                       'adverb list'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,lexeme default statement,[Lex-8],[Lex-9],[Lex-10],adverb list'
                                          },
                                          {
@@ -718,6 +767,7 @@ $hashed_metag = {
                                                       'symbol',
                                                       'adverb list'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,lexeme rule,[Lex-15],op declare match,symbol,adverb list'
                                          },
                                          {
@@ -726,6 +776,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'symbol name'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,lhs,symbol name'
                                          },
                                          {
@@ -736,6 +787,7 @@ $hashed_metag = {
                                                       '[Lex-71]',
                                                       'alternative name'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,naming,[Lex-70],[Lex-71],alternative name'
                                          },
                                          {
@@ -744,6 +796,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[Lex-32]'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,null adverb,[Lex-32]'
                                          },
                                          {
@@ -752,6 +805,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[Lex-57]'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,null ranking constant,[Lex-57]'
                                          },
                                          {
@@ -760,6 +814,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[Lex-58]'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,null ranking constant,[Lex-58]'
                                          },
                                          {
@@ -770,6 +825,7 @@ $hashed_metag = {
                                                       '[Lex-53]',
                                                       'null ranking constant'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,null ranking specification,[Lex-52],[Lex-53],null ranking constant'
                                          },
                                          {
@@ -781,6 +837,7 @@ $hashed_metag = {
                                                       '[Lex-56]',
                                                       'null ranking constant'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,null ranking specification,[Lex-54],[Lex-55],[Lex-56],null ranking constant'
                                          },
                                          {
@@ -789,6 +846,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[Lex-0]'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,null statement,[Lex-0]'
                                          },
                                          {
@@ -801,6 +859,7 @@ $hashed_metag = {
                                                       '[Lex-21]',
                                                       'symbol name'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,nulled event declaration,[Lex-19],event initialization,[Lex-20],[Lex-21],symbol name'
                                          },
                                          {
@@ -809,6 +868,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[Lex-66]'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,on or off,[Lex-66]'
                                          },
                                          {
@@ -817,6 +877,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[Lex-67]'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,on or off,[Lex-67]'
                                          },
                                          {
@@ -825,6 +886,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'op declare bnf'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,op declare,op declare bnf'
                                          },
                                          {
@@ -833,6 +895,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'op declare match'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,op declare,op declare match'
                                          },
                                          {
@@ -843,6 +906,7 @@ $hashed_metag = {
                                                       'rhs primary list',
                                                       '[Lex-73]'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,parenthesized rhs primary list,[Lex-72],rhs primary list,[Lex-73]'
                                          },
                                          {
@@ -853,6 +917,7 @@ $hashed_metag = {
                                                       '[Lex-62]',
                                                       'before or after'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,pause specification,[Lex-61],[Lex-62],before or after'
                                          },
                                          {
@@ -865,6 +930,7 @@ $hashed_metag = {
                                                       '[Lex-24]',
                                                       'symbol name'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,prediction event declaration,[Lex-22],event initialization,[Lex-23],[Lex-24],symbol name'
                                          },
                                          {
@@ -876,6 +942,7 @@ $hashed_metag = {
                                                       'alternatives'
                                                     ],
                                            'separator' => 'op loosen',
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,priorities,alternatives'
                                          },
                                          {
@@ -886,6 +953,7 @@ $hashed_metag = {
                                                       'op declare',
                                                       'priorities'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,priority rule,lhs,op declare,priorities'
                                          },
                                          {
@@ -896,6 +964,7 @@ $hashed_metag = {
                                                       '[Lex-60]',
                                                       'signed integer'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,priority specification,[Lex-59],[Lex-60],signed integer'
                                          },
                                          {
@@ -906,6 +975,7 @@ $hashed_metag = {
                                                       '[Lex-47]',
                                                       'boolean'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,proper specification,[Lex-46],[Lex-47],boolean'
                                          },
                                          {
@@ -918,6 +988,7 @@ $hashed_metag = {
                                                       'quantifier',
                                                       'adverb list'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,quantified rule,lhs,op declare,single symbol,quantifier,adverb list'
                                          },
                                          {
@@ -926,6 +997,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[Lex-74]'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,quantifier,[Lex-74]'
                                          },
                                          {
@@ -934,6 +1006,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[Lex-75]'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,quantifier,[Lex-75]'
                                          },
                                          {
@@ -944,6 +1017,7 @@ $hashed_metag = {
                                                       '[Lex-51]',
                                                       'signed integer'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,rank specification,[Lex-50],[Lex-51],signed integer'
                                          },
                                          {
@@ -953,6 +1027,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'rhs primary'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,rhs,rhs primary'
                                          },
                                          {
@@ -961,6 +1036,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'parenthesized rhs primary list'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,rhs primary,parenthesized rhs primary list'
                                          },
                                          {
@@ -969,6 +1045,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'single quoted string'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,rhs primary,single quoted string'
                                          },
                                          {
@@ -977,6 +1054,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'single symbol'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,rhs primary,single symbol'
                                          },
                                          {
@@ -986,6 +1064,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'rhs primary'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,rhs primary list,rhs primary'
                                          },
                                          {
@@ -996,6 +1075,7 @@ $hashed_metag = {
                                                       '[Lex-39]',
                                                       '[Lex-40]'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,right association,[Lex-38],[Lex-39],[Lex-40]'
                                          },
                                          {
@@ -1006,6 +1086,7 @@ $hashed_metag = {
                                                       '[Lex-45]',
                                                       'single symbol'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,separator specification,[Lex-44],[Lex-45],single symbol'
                                          },
                                          {
@@ -1014,6 +1095,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'character class'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,single symbol,character class'
                                          },
                                          {
@@ -1022,6 +1104,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'symbol'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,single symbol,symbol'
                                          },
                                          {
@@ -1032,6 +1115,7 @@ $hashed_metag = {
                                                       'op declare bnf',
                                                       'symbol'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,start rule,[Lex-3],op declare bnf,symbol'
                                          },
                                          {
@@ -1043,6 +1127,7 @@ $hashed_metag = {
                                                       '[Lex-6]',
                                                       'symbol'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,start rule,[Lex-4],[Lex-5],[Lex-6],symbol'
                                          },
                                          {
@@ -1051,6 +1136,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'completion event declaration'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,statement,completion event declaration'
                                          },
                                          {
@@ -1059,6 +1145,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'default rule'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,statement,default rule'
                                          },
                                          {
@@ -1067,6 +1154,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'discard default statement'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,statement,discard default statement'
                                          },
                                          {
@@ -1075,6 +1163,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'discard rule'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,statement,discard rule'
                                          },
                                          {
@@ -1083,6 +1172,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'empty rule'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,statement,empty rule'
                                          },
                                          {
@@ -1091,6 +1181,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'inaccessible statement'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,statement,inaccessible statement'
                                          },
                                          {
@@ -1099,6 +1190,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'lexeme default statement'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,statement,lexeme default statement'
                                          },
                                          {
@@ -1107,6 +1199,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'lexeme rule'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,statement,lexeme rule'
                                          },
                                          {
@@ -1115,6 +1208,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'null statement'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,statement,null statement'
                                          },
                                          {
@@ -1123,6 +1217,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'nulled event declaration'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,statement,nulled event declaration'
                                          },
                                          {
@@ -1131,6 +1226,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'prediction event declaration'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,statement,prediction event declaration'
                                          },
                                          {
@@ -1139,6 +1235,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'priority rule'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,statement,priority rule'
                                          },
                                          {
@@ -1147,6 +1244,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'quantified rule'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,statement,quantified rule'
                                          },
                                          {
@@ -1155,6 +1253,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'start rule'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,statement,start rule'
                                          },
                                          {
@@ -1163,6 +1262,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'statement group'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,statement,statement group'
                                          },
                                          {
@@ -1173,6 +1273,7 @@ $hashed_metag = {
                                                       'statements',
                                                       '[Lex-2]'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,statement group,[Lex-1],statements,[Lex-2]'
                                          },
                                          {
@@ -1182,6 +1283,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'statement'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,statements,statement'
                                          },
                                          {
@@ -1190,6 +1292,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'symbol name'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,symbol,symbol name'
                                          },
                                          {
@@ -1198,6 +1301,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'bare name'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,symbol name,bare name'
                                          },
                                          {
@@ -1206,6 +1310,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'bracketed name'
                                                     ],
+                                           'subgrammar' => 'g1',
                                            'xbnfid' => 'g1,symbol name,bracketed name'
                                          }
                                        ],
@@ -1216,6 +1321,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[[\\w]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,Perl identifier,[[\\w]]'
                                          },
                                          {
@@ -1226,6 +1332,7 @@ $hashed_metag = {
                                                       'Perl identifier'
                                                     ],
                                            'separator' => 'double colon',
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,Perl name,Perl identifier'
                                          },
                                          {
@@ -1233,6 +1340,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'hash comment'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[:discard],hash comment'
                                          },
                                          {
@@ -1240,6 +1348,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'whitespace'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[:discard],whitespace'
                                          },
                                          {
@@ -1247,6 +1356,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[[\\;]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-0],[[\\;]]'
                                          },
                                          {
@@ -1254,6 +1364,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[[\\=]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-10],[[\\=]]'
                                          },
                                          {
@@ -1267,6 +1378,7 @@ $hashed_metag = {
                                                       '[[r]]',
                                                       '[[d]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-11],[[d]],[[i]],[[s]],[[c]],[[a]],[[r]],[[d]]'
                                          },
                                          {
@@ -1280,6 +1392,7 @@ $hashed_metag = {
                                                       '[[l]]',
                                                       '[[t]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-12],[[d]],[[e]],[[f]],[[a]],[[u]],[[l]],[[t]]'
                                          },
                                          {
@@ -1287,6 +1400,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[[\\=]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-13],[[\\=]]'
                                          },
                                          {
@@ -1301,6 +1415,7 @@ $hashed_metag = {
                                                       '[[r]]',
                                                       '[[d]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-14],[[\\:]],[[d]],[[i]],[[s]],[[c]],[[a]],[[r]],[[d]]'
                                          },
                                          {
@@ -1314,6 +1429,7 @@ $hashed_metag = {
                                                       '[[m]]',
                                                       '[[e]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-15],[[\\:]],[[l]],[[e]],[[x]],[[e]],[[m]],[[e]]'
                                          },
                                          {
@@ -1325,6 +1441,7 @@ $hashed_metag = {
                                                       '[[n]]',
                                                       '[[t]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-16],[[e]],[[v]],[[e]],[[n]],[[t]]'
                                          },
                                          {
@@ -1332,6 +1449,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[[\\=]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-17],[[\\=]]'
                                          },
                                          {
@@ -1347,6 +1465,7 @@ $hashed_metag = {
                                                       '[[e]]',
                                                       '[[d]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-18],[[c]],[[o]],[[m]],[[p]],[[l]],[[e]],[[t]],[[e]],[[d]]'
                                          },
                                          {
@@ -1358,6 +1477,7 @@ $hashed_metag = {
                                                       '[[n]]',
                                                       '[[t]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-19],[[e]],[[v]],[[e]],[[n]],[[t]]'
                                          },
                                          {
@@ -1365,6 +1485,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[[\\{]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-1],[[\\{]]'
                                          },
                                          {
@@ -1372,6 +1493,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[[\\=]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-20],[[\\=]]'
                                          },
                                          {
@@ -1384,6 +1506,7 @@ $hashed_metag = {
                                                       '[[e]]',
                                                       '[[d]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-21],[[n]],[[u]],[[l]],[[l]],[[e]],[[d]]'
                                          },
                                          {
@@ -1395,6 +1518,7 @@ $hashed_metag = {
                                                       '[[n]]',
                                                       '[[t]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-22],[[e]],[[v]],[[e]],[[n]],[[t]]'
                                          },
                                          {
@@ -1402,6 +1526,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[[\\=]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-23],[[\\=]]'
                                          },
                                          {
@@ -1417,6 +1542,7 @@ $hashed_metag = {
                                                       '[[e]]',
                                                       '[[d]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-24],[[p]],[[r]],[[e]],[[d]],[[i]],[[c]],[[t]],[[e]],[[d]]'
                                          },
                                          {
@@ -1435,6 +1561,7 @@ $hashed_metag = {
                                                       '[[l]]',
                                                       '[[e]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-25],[[i]],[[n]],[[a]],[[c]],[[c]],[[e]],[[s]],[[s]],[[i]],[[b]],[[l]],[[e]]'
                                          },
                                          {
@@ -1443,6 +1570,7 @@ $hashed_metag = {
                                                       '[[i]]',
                                                       '[[s]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-26],[[i]],[[s]]'
                                          },
                                          {
@@ -1451,6 +1579,7 @@ $hashed_metag = {
                                                       '[[b]]',
                                                       '[[y]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-27],[[b]],[[y]]'
                                          },
                                          {
@@ -1464,6 +1593,7 @@ $hashed_metag = {
                                                       '[[l]]',
                                                       '[[t]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-28],[[d]],[[e]],[[f]],[[a]],[[u]],[[l]],[[t]]'
                                          },
                                          {
@@ -1474,6 +1604,7 @@ $hashed_metag = {
                                                       '[[r]]',
                                                       '[[n]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-29],[[w]],[[a]],[[r]],[[n]]'
                                          },
                                          {
@@ -1481,6 +1612,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[[\\}]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-2],[[\\}]]'
                                          },
                                          {
@@ -1489,6 +1621,7 @@ $hashed_metag = {
                                                       '[[o]]',
                                                       '[[k]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-30],[[o]],[[k]]'
                                          },
                                          {
@@ -1500,6 +1633,7 @@ $hashed_metag = {
                                                       '[[a]]',
                                                       '[[l]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-31],[[f]],[[a]],[[t]],[[a]],[[l]]'
                                          },
                                          {
@@ -1507,6 +1641,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[[\\,]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-32],[[\\,]]'
                                          },
                                          {
@@ -1519,6 +1654,7 @@ $hashed_metag = {
                                                       '[[o]]',
                                                       '[[n]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-33],[[a]],[[c]],[[t]],[[i]],[[o]],[[n]]'
                                          },
                                          {
@@ -1527,6 +1663,7 @@ $hashed_metag = {
                                                       '[[\\=]]',
                                                       '[[\\>]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-34],[[\\=]],[[\\>]]'
                                          },
                                          {
@@ -1538,6 +1675,7 @@ $hashed_metag = {
                                                       '[[o]]',
                                                       '[[c]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-35],[[a]],[[s]],[[s]],[[o]],[[c]]'
                                          },
                                          {
@@ -1546,6 +1684,7 @@ $hashed_metag = {
                                                       '[[\\=]]',
                                                       '[[\\>]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-36],[[\\=]],[[\\>]]'
                                          },
                                          {
@@ -1556,6 +1695,7 @@ $hashed_metag = {
                                                       '[[f]]',
                                                       '[[t]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-37],[[l]],[[e]],[[f]],[[t]]'
                                          },
                                          {
@@ -1567,6 +1707,7 @@ $hashed_metag = {
                                                       '[[o]]',
                                                       '[[c]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-38],[[a]],[[s]],[[s]],[[o]],[[c]]'
                                          },
                                          {
@@ -1575,6 +1716,7 @@ $hashed_metag = {
                                                       '[[\\=]]',
                                                       '[[\\>]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-39],[[\\=]],[[\\>]]'
                                          },
                                          {
@@ -1587,6 +1729,7 @@ $hashed_metag = {
                                                       '[[r]]',
                                                       '[[t]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-3],[[\\:]],[[s]],[[t]],[[a]],[[r]],[[t]]'
                                          },
                                          {
@@ -1598,6 +1741,7 @@ $hashed_metag = {
                                                       '[[h]]',
                                                       '[[t]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-40],[[r]],[[i]],[[g]],[[h]],[[t]]'
                                          },
                                          {
@@ -1609,6 +1753,7 @@ $hashed_metag = {
                                                       '[[o]]',
                                                       '[[c]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-41],[[a]],[[s]],[[s]],[[o]],[[c]]'
                                          },
                                          {
@@ -1617,6 +1762,7 @@ $hashed_metag = {
                                                       '[[\\=]]',
                                                       '[[\\>]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-42],[[\\=]],[[\\>]]'
                                          },
                                          {
@@ -1628,6 +1774,7 @@ $hashed_metag = {
                                                       '[[u]]',
                                                       '[[p]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-43],[[g]],[[r]],[[o]],[[u]],[[p]]'
                                          },
                                          {
@@ -1643,6 +1790,7 @@ $hashed_metag = {
                                                       '[[o]]',
                                                       '[[r]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-44],[[s]],[[e]],[[p]],[[a]],[[r]],[[a]],[[t]],[[o]],[[r]]'
                                          },
                                          {
@@ -1651,6 +1799,7 @@ $hashed_metag = {
                                                       '[[\\=]]',
                                                       '[[\\>]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-45],[[\\=]],[[\\>]]'
                                          },
                                          {
@@ -1663,6 +1812,7 @@ $hashed_metag = {
                                                       '[[e]]',
                                                       '[[r]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-46],[[p]],[[r]],[[o]],[[p]],[[e]],[[r]]'
                                          },
                                          {
@@ -1671,6 +1821,7 @@ $hashed_metag = {
                                                       '[[\\=]]',
                                                       '[[\\>]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-47],[[\\=]],[[\\>]]'
                                          },
                                          {
@@ -1682,6 +1833,7 @@ $hashed_metag = {
                                                       '[[e]]',
                                                       '[[r]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-48],[[e]],[[a]],[[g]],[[e]],[[r]]'
                                          },
                                          {
@@ -1690,6 +1842,7 @@ $hashed_metag = {
                                                       '[[\\=]]',
                                                       '[[\\>]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-49],[[\\=]],[[\\>]]'
                                          },
                                          {
@@ -1701,6 +1854,7 @@ $hashed_metag = {
                                                       '[[r]]',
                                                       '[[t]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-4],[[s]],[[t]],[[a]],[[r]],[[t]]'
                                          },
                                          {
@@ -1711,6 +1865,7 @@ $hashed_metag = {
                                                       '[[n]]',
                                                       '[[k]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-50],[[r]],[[a]],[[n]],[[k]]'
                                          },
                                          {
@@ -1719,6 +1874,7 @@ $hashed_metag = {
                                                       '[[\\=]]',
                                                       '[[\\>]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-51],[[\\=]],[[\\>]]'
                                          },
                                          {
@@ -1737,6 +1893,7 @@ $hashed_metag = {
                                                       '[[n]]',
                                                       '[[g]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-52],[[n]],[[u]],[[l]],[[l]],[[\\-]],[[r]],[[a]],[[n]],[[k]],[[i]],[[n]],[[g]]'
                                          },
                                          {
@@ -1745,6 +1902,7 @@ $hashed_metag = {
                                                       '[[\\=]]',
                                                       '[[\\>]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-53],[[\\=]],[[\\>]]'
                                          },
                                          {
@@ -1755,6 +1913,7 @@ $hashed_metag = {
                                                       '[[l]]',
                                                       '[[l]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-54],[[n]],[[u]],[[l]],[[l]]'
                                          },
                                          {
@@ -1765,6 +1924,7 @@ $hashed_metag = {
                                                       '[[n]]',
                                                       '[[k]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-55],[[r]],[[a]],[[n]],[[k]]'
                                          },
                                          {
@@ -1773,6 +1933,7 @@ $hashed_metag = {
                                                       '[[\\=]]',
                                                       '[[\\>]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-56],[[\\=]],[[\\>]]'
                                          },
                                          {
@@ -1782,6 +1943,7 @@ $hashed_metag = {
                                                       '[[o]]',
                                                       '[[w]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-57],[[l]],[[o]],[[w]]'
                                          },
                                          {
@@ -1792,6 +1954,7 @@ $hashed_metag = {
                                                       '[[g]]',
                                                       '[[h]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-58],[[h]],[[i]],[[g]],[[h]]'
                                          },
                                          {
@@ -1806,6 +1969,7 @@ $hashed_metag = {
                                                       '[[t]]',
                                                       '[[y]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-59],[[p]],[[r]],[[i]],[[o]],[[r]],[[i]],[[t]],[[y]]'
                                          },
                                          {
@@ -1818,6 +1982,7 @@ $hashed_metag = {
                                                       '[[o]]',
                                                       '[[l]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-5],[[s]],[[y]],[[m]],[[b]],[[o]],[[l]]'
                                          },
                                          {
@@ -1826,6 +1991,7 @@ $hashed_metag = {
                                                       '[[\\=]]',
                                                       '[[\\>]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-60],[[\\=]],[[\\>]]'
                                          },
                                          {
@@ -1837,6 +2003,7 @@ $hashed_metag = {
                                                       '[[s]]',
                                                       '[[e]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-61],[[p]],[[a]],[[u]],[[s]],[[e]]'
                                          },
                                          {
@@ -1845,6 +2012,7 @@ $hashed_metag = {
                                                       '[[\\=]]',
                                                       '[[\\>]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-62],[[\\=]],[[\\>]]'
                                          },
                                          {
@@ -1856,6 +2024,7 @@ $hashed_metag = {
                                                       '[[n]]',
                                                       '[[t]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-63],[[e]],[[v]],[[e]],[[n]],[[t]]'
                                          },
                                          {
@@ -1864,6 +2033,7 @@ $hashed_metag = {
                                                       '[[\\=]]',
                                                       '[[\\>]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-64],[[\\=]],[[\\>]]'
                                          },
                                          {
@@ -1871,6 +2041,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[[\\=]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-65],[[\\=]]'
                                          },
                                          {
@@ -1879,6 +2050,7 @@ $hashed_metag = {
                                                       '[[o]]',
                                                       '[[n]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-66],[[o]],[[n]]'
                                          },
                                          {
@@ -1888,6 +2060,7 @@ $hashed_metag = {
                                                       '[[f]]',
                                                       '[[f]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-67],[[o]],[[f]],[[f]]'
                                          },
                                          {
@@ -1899,6 +2072,7 @@ $hashed_metag = {
                                                       '[[s]]',
                                                       '[[s]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-68],[[b]],[[l]],[[e]],[[s]],[[s]]'
                                          },
                                          {
@@ -1907,6 +2081,7 @@ $hashed_metag = {
                                                       '[[\\=]]',
                                                       '[[\\>]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-69],[[\\=]],[[\\>]]'
                                          },
                                          {
@@ -1915,6 +2090,7 @@ $hashed_metag = {
                                                       '[[i]]',
                                                       '[[s]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-6],[[i]],[[s]]'
                                          },
                                          {
@@ -1925,6 +2101,7 @@ $hashed_metag = {
                                                       '[[m]]',
                                                       '[[e]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-70],[[n]],[[a]],[[m]],[[e]]'
                                          },
                                          {
@@ -1933,6 +2110,7 @@ $hashed_metag = {
                                                       '[[\\=]]',
                                                       '[[\\>]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-71],[[\\=]],[[\\>]]'
                                          },
                                          {
@@ -1940,6 +2118,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[[\\(]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-72],[[\\(]]'
                                          },
                                          {
@@ -1947,6 +2126,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[[\\)]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-73],[[\\)]]'
                                          },
                                          {
@@ -1954,6 +2134,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[[\\*]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-74],[[\\*]]'
                                          },
                                          {
@@ -1961,6 +2142,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[[\\+]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-75],[[\\+]]'
                                          },
                                          {
@@ -1975,6 +2157,7 @@ $hashed_metag = {
                                                       '[[l]]',
                                                       '[[t]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-7],[[\\:]],[[d]],[[e]],[[f]],[[a]],[[u]],[[l]],[[t]]'
                                          },
                                          {
@@ -1987,6 +2170,7 @@ $hashed_metag = {
                                                       '[[m]]',
                                                       '[[e]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-8],[[l]],[[e]],[[x]],[[e]],[[m]],[[e]]'
                                          },
                                          {
@@ -2000,6 +2184,7 @@ $hashed_metag = {
                                                       '[[l]]',
                                                       '[[t]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,[Lex-9],[[d]],[[e]],[[f]],[[a]],[[u]],[[l]],[[t]]'
                                          },
                                          {
@@ -2009,6 +2194,7 @@ $hashed_metag = {
                                                       'result item descriptor list',
                                                       'array descriptor right bracket'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,array descriptor,array descriptor left bracket,result item descriptor list,array descriptor right bracket'
                                          },
                                          {
@@ -2016,6 +2202,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[[\\[]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,array descriptor left bracket,[[\\[]]'
                                          },
                                          {
@@ -2024,6 +2211,7 @@ $hashed_metag = {
                                                       '[[\\[]]',
                                                       'whitespace'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,array descriptor left bracket,[[\\[]],whitespace'
                                          },
                                          {
@@ -2031,6 +2219,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[[\\]]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,array descriptor right bracket,[[\\]]]'
                                          },
                                          {
@@ -2039,6 +2228,7 @@ $hashed_metag = {
                                                       'whitespace',
                                                       '[[\\]]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,array descriptor right bracket,whitespace,[[\\]]]'
                                          },
                                          {
@@ -2047,6 +2237,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[[\\w]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,bare name,[[\\w]]'
                                          },
                                          {
@@ -2058,6 +2249,7 @@ $hashed_metag = {
                                                       '[[e]]',
                                                       '[[r]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,before or after,[[a]],[[f]],[[t]],[[e]],[[r]]'
                                          },
                                          {
@@ -2070,6 +2262,7 @@ $hashed_metag = {
                                                       '[[r]]',
                                                       '[[e]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,before or after,[[b]],[[e]],[[f]],[[o]],[[r]],[[e]]'
                                          },
                                          {
@@ -2077,6 +2270,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[[01]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,boolean,[[01]]'
                                          },
                                          {
@@ -2086,6 +2280,7 @@ $hashed_metag = {
                                                       'bracketed name string',
                                                       '[[\\>]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,bracketed name,[[\\<]],bracketed name string,[[\\>]]'
                                          },
                                          {
@@ -2094,6 +2289,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[[\\s\\w]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,bracketed name string,[[\\s\\w]]'
                                          },
                                          {
@@ -2101,6 +2297,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'escaped cc character'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,cc element,escaped cc character'
                                          },
                                          {
@@ -2108,6 +2305,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'negated posix char class'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,cc element,negated posix char class'
                                          },
                                          {
@@ -2115,6 +2313,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'posix char class'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,cc element,posix char class'
                                          },
                                          {
@@ -2122,6 +2321,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'safe cc character'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,cc element,safe cc character'
                                          },
                                          {
@@ -2130,6 +2330,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'cc element'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,cc elements,cc element'
                                          },
                                          {
@@ -2140,6 +2341,7 @@ $hashed_metag = {
                                                       '[[\\]]]',
                                                       'character class modifiers'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,character class,[[\\[]],cc elements,[[\\]]],character class modifiers'
                                          },
                                          {
@@ -2148,6 +2350,7 @@ $hashed_metag = {
                                                       '[[\\:]]',
                                                       '[[i]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,character class modifier,[[\\:]],[[i]]'
                                          },
                                          {
@@ -2157,6 +2360,7 @@ $hashed_metag = {
                                                       '[[i]]',
                                                       '[[c]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,character class modifier,[[\\:]],[[i]],[[c]]'
                                          },
                                          {
@@ -2165,6 +2369,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'character class modifier'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,character class modifiers,character class modifier'
                                          },
                                          {
@@ -2173,6 +2378,7 @@ $hashed_metag = {
                                                       '[[\\:]]',
                                                       '[[\\:]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,double colon,[[\\:]],[[\\:]]'
                                          },
                                          {
@@ -2181,6 +2387,7 @@ $hashed_metag = {
                                                       '[[\\\\]]',
                                                       'horizontal character'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,escaped cc character,[[\\\\]],horizontal character'
                                          },
                                          {
@@ -2188,6 +2395,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'terminated hash comment'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,hash comment,terminated hash comment'
                                          },
                                          {
@@ -2195,6 +2403,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'unterminated final hash comment'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,hash comment,unterminated final hash comment'
                                          },
                                          {
@@ -2203,6 +2412,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'hash comment char'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,hash comment body,hash comment char'
                                          },
                                          {
@@ -2210,6 +2420,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[[^\\x{A}\\x{B}\\x{C}\\x{D}\\x{2028}\\x{2029}]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,hash comment char,[[^\\x{A}\\x{B}\\x{C}\\x{D}\\x{2028}\\x{2029}]]'
                                          },
                                          {
@@ -2217,6 +2428,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[[^\\x{A}\\x{B}\\x{C}\\x{D}\\x{2028}\\x{2029}]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,horizontal character,[[^\\x{A}\\x{B}\\x{C}\\x{D}\\x{2028}\\x{2029}]]'
                                          },
                                          {
@@ -2225,6 +2437,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[[\\d]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,integer,[[\\d]]'
                                          },
                                          {
@@ -2237,6 +2450,7 @@ $hashed_metag = {
                                                       '[[\\:]]',
                                                       '[[\\]]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,negated posix char class,[[\\[]],[[\\:]],[[\\^]],posix char class name,[[\\:]],[[\\]]]'
                                          },
                                          {
@@ -2245,6 +2459,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[[\\w]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,one or more word characters,[[\\w]]'
                                          },
                                          {
@@ -2254,6 +2469,7 @@ $hashed_metag = {
                                                       '[[\\:]]',
                                                       '[[\\=]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,op declare bnf,[[\\:]],[[\\:]],[[\\=]]'
                                          },
                                          {
@@ -2261,6 +2477,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[[\\~]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,op declare match,[[\\~]]'
                                          },
                                          {
@@ -2268,6 +2485,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[[\\|]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,op equal priority,[[\\|]]'
                                          },
                                          {
@@ -2276,6 +2494,7 @@ $hashed_metag = {
                                                       '[[\\|]]',
                                                       '[[\\|]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,op loosen,[[\\|]],[[\\|]]'
                                          },
                                          {
@@ -2287,6 +2506,7 @@ $hashed_metag = {
                                                       '[[\\:]]',
                                                       '[[\\]]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,posix char class,[[\\[]],[[\\:]],posix char class name,[[\\:]],[[\\]]]'
                                          },
                                          {
@@ -2295,6 +2515,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[[[:alnum:]]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,posix char class name,[[[:alnum:]]]'
                                          },
                                          {
@@ -2304,6 +2525,7 @@ $hashed_metag = {
                                                       '[[\\:]]',
                                                       'one or more word characters'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,reserved action name,[[\\:]],[[\\:]],one or more word characters'
                                          },
                                          {
@@ -2313,6 +2535,7 @@ $hashed_metag = {
                                                       '[[\\:]]',
                                                       'one or more word characters'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,reserved blessing name,[[\\:]],[[\\:]],one or more word characters'
                                          },
                                          {
@@ -2326,6 +2549,7 @@ $hashed_metag = {
                                                       '[[o]]',
                                                       '[[l]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,reserved event name,[[\\:]],[[s]],[[y]],[[m]],[[b]],[[o]],[[l]]'
                                          },
                                          {
@@ -2335,6 +2559,7 @@ $hashed_metag = {
                                                       '[[h]]',
                                                       '[[s]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,result item descriptor,[[l]],[[h]],[[s]]'
                                          },
                                          {
@@ -2345,6 +2570,7 @@ $hashed_metag = {
                                                       '[[m]]',
                                                       '[[e]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,result item descriptor,[[n]],[[a]],[[m]],[[e]]'
                                          },
                                          {
@@ -2355,6 +2581,7 @@ $hashed_metag = {
                                                       '[[l]]',
                                                       '[[e]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,result item descriptor,[[r]],[[u]],[[l]],[[e]]'
                                          },
                                          {
@@ -2366,6 +2593,7 @@ $hashed_metag = {
                                                       '[[r]]',
                                                       '[[t]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,result item descriptor,[[s]],[[t]],[[a]],[[r]],[[t]]'
                                          },
                                          {
@@ -2377,6 +2605,7 @@ $hashed_metag = {
                                                       '[[u]]',
                                                       '[[e]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,result item descriptor,[[v]],[[a]],[[l]],[[u]],[[e]]'
                                          },
                                          {
@@ -2389,6 +2618,7 @@ $hashed_metag = {
                                                       '[[t]]',
                                                       '[[h]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,result item descriptor,[[l]],[[e]],[[n]],[[g]],[[t]],[[h]]'
                                          },
                                          {
@@ -2401,6 +2631,7 @@ $hashed_metag = {
                                                       '[[o]]',
                                                       '[[l]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,result item descriptor,[[s]],[[y]],[[m]],[[b]],[[o]],[[l]]'
                                          },
                                          {
@@ -2413,6 +2644,7 @@ $hashed_metag = {
                                                       '[[e]]',
                                                       '[[s]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,result item descriptor,[[v]],[[a]],[[l]],[[u]],[[e]],[[s]]'
                                          },
                                          {
@@ -2426,6 +2658,7 @@ $hashed_metag = {
                                                       '[[r]]',
                                                       '[[t]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,result item descriptor,[[g]],[[1]],[[s]],[[t]],[[a]],[[r]],[[t]]'
                                          },
                                          {
@@ -2440,6 +2673,7 @@ $hashed_metag = {
                                                       '[[t]]',
                                                       '[[h]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,result item descriptor,[[g]],[[1]],[[l]],[[e]],[[n]],[[g]],[[t]],[[h]]'
                                          },
                                          {
@@ -2449,6 +2683,7 @@ $hashed_metag = {
                                                       'result item descriptor'
                                                     ],
                                            'separator' => 'result item descriptor separator',
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,result item descriptor list,result item descriptor'
                                          },
                                          {
@@ -2456,6 +2691,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[[,]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,result item descriptor separator,[[,]]'
                                          },
                                          {
@@ -2464,6 +2700,7 @@ $hashed_metag = {
                                                       '[[,]]',
                                                       'whitespace'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,result item descriptor separator,[[,]],whitespace'
                                          },
                                          {
@@ -2471,6 +2708,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[[^\\x{5d}\\x{0A}\\x{0B}\\x{0C}\\x{0D}\\x{0085}\\x{2028}\\x{2029}]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,safe cc character,[[^\\x{5d}\\x{0A}\\x{0B}\\x{0C}\\x{0D}\\x{0085}\\x{2028}\\x{2029}]]'
                                          },
                                          {
@@ -2478,6 +2716,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[[+-]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,sign,[[+-]]'
                                          },
                                          {
@@ -2485,6 +2724,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       'integer'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,signed integer,integer'
                                          },
                                          {
@@ -2493,6 +2733,7 @@ $hashed_metag = {
                                                       'sign',
                                                       'integer'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,signed integer,sign,integer'
                                          },
                                          {
@@ -2502,6 +2743,7 @@ $hashed_metag = {
                                                       'string without single quote or vertical space',
                                                       '[[\']]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,single quoted name,[[\']],string without single quote or vertical space,[[\']]'
                                          },
                                          {
@@ -2512,6 +2754,7 @@ $hashed_metag = {
                                                       '[[\']]',
                                                       'character class modifiers'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,single quoted string,[[\']],string without single quote or vertical space,[[\']],character class modifiers'
                                          },
                                          {
@@ -2520,6 +2763,7 @@ $hashed_metag = {
                                                       '[[a-zA-Z]]',
                                                       'zero or more word characters'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,standard name,[[a-zA-Z]],zero or more word characters'
                                          },
                                          {
@@ -2528,6 +2772,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[[^\'\\x{0A}\\x{0B}\\x{0C}\\x{0D}\\x{0085}\\x{2028}\\x{2029}]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,string without single quote or vertical space,[[^\'\\x{0A}\\x{0B}\\x{0C}\\x{0D}\\x{0085}\\x{2028}\\x{2029}]]'
                                          },
                                          {
@@ -2537,6 +2782,7 @@ $hashed_metag = {
                                                       'hash comment body',
                                                       'vertical space char'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,terminated hash comment,[[\\#]],hash comment body,vertical space char'
                                          },
                                          {
@@ -2545,6 +2791,7 @@ $hashed_metag = {
                                                       '[[\\#]]',
                                                       'hash comment body'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,unterminated final hash comment,[[\\#]],hash comment body'
                                          },
                                          {
@@ -2552,6 +2799,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[[\\x{A}\\x{B}\\x{C}\\x{D}\\x{2028}\\x{2029}]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,vertical space char,[[\\x{A}\\x{B}\\x{C}\\x{D}\\x{2028}\\x{2029}]]'
                                          },
                                          {
@@ -2560,6 +2808,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[[\\s]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,whitespace,[[\\s]]'
                                          },
                                          {
@@ -2568,6 +2817,7 @@ $hashed_metag = {
                                            'rhs' => [
                                                       '[[\\w]]'
                                                     ],
+                                           'subgrammar' => 'l0',
                                            'xbnfid' => 'l0,zero or more word characters,[[\\w]]'
                                          }
                                        ]

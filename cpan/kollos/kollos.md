@@ -624,6 +624,7 @@ Marpa::R2's Libmarpa.
     class_xbnf_fields.rhs = true
     class_xbnf_fields.separator = true
     class_xbnf_fields.start = true
+    class_xbnf_fields.subgrammar = true
     class_xbnf_fields.symbol_as_event = true
     class_xbnf_fields.xrl_name = true
 ```
@@ -945,6 +946,7 @@ one for each subgrammar.
 
             runtime_xbnf.xrl_name = xbnf_source.xrlid
             runtime_xbnf.name = xbnf_source.name
+            runtime_xbnf.subgrammar = xbnf_source.subgrammar
             runtime_xbnf.lhs = xbnf_source.lhs
             runtime_xbnf.rhs = xbnf_source.rhs
             runtime_xbnf.rank = xbnf_source.rank

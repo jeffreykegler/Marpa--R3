@@ -1295,6 +1295,7 @@ sub add_G1_user_rule {
     my $proper_separation = 0;
     my $xbnf_name;
     my $xbnf_id;
+    my $subgrammar;
 
   OPTION: for my $option ( keys %{$options} ) {
         my $value = $options->{$option};
@@ -1306,6 +1307,7 @@ sub add_G1_user_rule {
         if ( $option eq 'lhs' )    { $lhs_name  = $value; next OPTION }
         if ( $option eq 'action' ) { $action    = $value; next OPTION }
         if ( $option eq 'rank' )   { $rank      = $value; next OPTION }
+        if ( $option eq 'subgrammar' ) { $subgrammar      = $value; next OPTION }
         if ( $option eq 'null_ranking' ) {
             $null_ranking = $value;
             next OPTION;
@@ -1469,6 +1471,7 @@ sub add_L0_user_rule {
     my $proper_separation = 0;
     my $xbnf_name;
     my $xbnf_id;
+    my $subgrammar;
 
   OPTION: for my $option ( keys %{$options} ) {
         my $value = $options->{$option};
@@ -1480,6 +1483,7 @@ sub add_L0_user_rule {
         if ( $option eq 'lhs' )    { $lhs_name  = $value; next OPTION }
         if ( $option eq 'action' ) { $action    = $value; next OPTION }
         if ( $option eq 'rank' )   { $rank      = $value; next OPTION }
+        if ( $option eq 'subgrammar' ) { $subgrammar      = $value; next OPTION }
         if ( $option eq 'null_ranking' ) {
             $null_ranking = $value;
             next OPTION;

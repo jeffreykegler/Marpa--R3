@@ -1889,7 +1889,10 @@ sub Marpa::R3::Internal::MetaAST::Parse::xbnf_create {
     $hash_by_xbnfid->{$rule_id} = $args;
 
     # Now create the initial working rule
-    my %wrl = ( xbnfid => $rule_id );
+    my %wrl = (
+        xbnfid => $rule_id,
+        subgrammar => $subgrammar,
+    );
     for my $field (
         qw(lhs action rank
         null_ranking min separator proper )
