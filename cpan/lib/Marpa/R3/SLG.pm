@@ -1331,7 +1331,7 @@ sub add_G1_user_rule {
           <<'END_OF_LUA', 's', $xbnf_name);
     local grammar, xbnf_name = ...
     local default_rank = grammar.g1:default_rank()
-    local xbnf_id = grammar.g1.xbnfs[xbnf_name].new_id
+    local xbnf_id = grammar.xbnfs[xbnf_name].new_id
     return default_rank, xbnf_id
 END_OF_LUA
 
@@ -1507,7 +1507,7 @@ sub add_L0_user_rule {
     -- io.stderr:write('xbnf_name: ', inspect(xbnf_name), '\n')
     local xbnf_id = -1
     if #xbnf_name > 0 then
-        xbnf_id = slg.l0.xbnfs[xbnf_name].new_id
+        xbnf_id = slg.xbnfs[xbnf_name].new_id
     end
     return default_rank, xbnf_id
 END_OF_LUA
@@ -1620,7 +1620,7 @@ END_OF_LUA
         l0g:rule_null_high_set(irl_id, ranking_is_high)
         l0g:rule_rank_set(irl_id, rank)
         if xbnf_id >= 0 then
-            local xbnf = slg.l0.xbnfs[xbnf_id]
+            local xbnf = slg.xbnfs[xbnf_id]
             local irl = slg.l0.irls[irl_id]
             irl.xbnf = xbnf
             -- right now, the action & mask of an irl
