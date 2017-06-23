@@ -694,6 +694,31 @@ This is a registry object.
 
 ```
 
+### Accessors
+
+Display any XBNF
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slg.xbnf_display(slg, xbnf, options)
+        local xbnf_xsyids = slg:xbnf_xsyids(irlid)
+        local pieces = {}
+        pieces[#pieces+1]
+            = xbnf.lhs:symbol_display_form()
+        pieces[#pieces+1] = '::='
+        for ix = 2, #c do
+            pieces[#pieces+1]
+                = xbnf.rhs[ix]:symbol_display_form()
+        end
+        local minimum = xbnf.min
+        if minimum then
+            pieces[#pieces+1] =
+                minimum <= 0 and '*' or '+'
+        end
+        return table.concat(pieces, ' ')
+    end
+```
+
 ### Mutators
 
 ```
@@ -922,6 +947,7 @@ one for each subgrammar.
         local xbnfs = slg.xbnfs
         -- io.stderr:write(inspect(source_hash))
         local xbnf_names = {}
+        local xsys = slg.xsys
         local hash_xbnf_data = source_hash.xbnf[subgrammar]
         for xbnf_name, _ in pairs(hash_xbnf_data) do
              xbnf_names[#xbnf_names+1] = xbnf_name
@@ -947,8 +973,13 @@ one for each subgrammar.
             runtime_xbnf.xrl_name = xbnf_source.xrlid
             runtime_xbnf.name = xbnf_source.name
             runtime_xbnf.subgrammar = xbnf_source.subgrammar
-            runtime_xbnf.lhs = xbnf_source.lhs
-            runtime_xbnf.rhs = xbnf_source.rhs
+            runtime_xbnf.lhs = xsys[xbnf_source.lhs]
+            local to_rhs = {}
+            local from_rhs = xbnf_source.rhs
+            for ix = 1, #from_rhs do
+                to_rhs[ix] = xsys[xbnf_source.rhs[ix]]
+            end
+            runtime_xbnf.rhs = to_rhs
             runtime_xbnf.rank = xbnf_source.rank
             runtime_xbnf.null_ranking = xbnf_source.null_ranking
 
