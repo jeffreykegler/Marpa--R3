@@ -479,6 +479,43 @@ Marpa::R2's Libmarpa.
 
 ## Symbols
 
+Symbols are show several "forms".
+
+Name and ID are unique identifiers, available for
+all valid symbols,
+and only for valid symbols.
+IDs are integers.
+Names are strings.
+The symbol name may be an internal creation,
+subject to change in future versions of Kollos.
+
+*DSL form* is the form as it appears in the SLIF DSL.
+It does not vary as long as the DSL does not vary.
+It is not guaranteed unique and many valid symbols
+will not have a DSL form.
+
+*Display form* is a string
+available
+for all valid symbols,
+and for invalid symbols IDs as well.
+It is Kollos's idea of "best" form for
+display.
+Display forms are not necessarily unique.
+
+In the case of an invalid symbol,
+display form dummies up a symbol name
+describing the problem.
+This may be consider a kind of "soft failure".
+
+The display form of an ISY
+will be the display form of the XSY when
+possible,
+and a "soft failure" otherwise.
+Because of this,
+code which requires the display form of the XSY
+corresponding to an ISY
+will usually just ask for the display form of the ISY.
+
 ## ISY Fields
 
 ```
@@ -700,15 +737,15 @@ Display any XBNF
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slg.xbnf_display(slg, xbnf, options)
-        local xbnf_xsyids = slg:xbnf_xsyids(irlid)
+    function _M.class_slg.xbnf_display(slg, xbnf)
         local pieces = {}
         pieces[#pieces+1]
-            = xbnf.lhs:symbol_display_form()
+            = xbnf.lhs:display_form()
         pieces[#pieces+1] = '::='
-        for ix = 2, #c do
+        local rhs = xbnf.rhs
+        for ix = 1, #rhs do
             pieces[#pieces+1]
-                = xbnf.rhs[ix]:symbol_display_form()
+                = rhs[ix]:display_form()
         end
         local minimum = xbnf.min
         if minimum then
@@ -1119,6 +1156,25 @@ and eliminate the redundant ones.
     end
     function _M.class_slg.l0_rule_show(slg, irlid)
         return slg:lmg_rule_show(irlid, 'l0')
+    end
+
+    function _M.class_slg.lmg_rule_display(slg, irlid, subg_name)
+        local subg = slg[subg_name]
+        local irl = subg.irls[irlid]
+        if not irl then
+            return '(bad irlid ' .. irlid .. ')'
+        end
+        local xbnf = irl.xbnf
+        if xbnf then
+             return slg:xbnf_display(xbnf)
+        end
+        return slg:lmg_rule_show(irlid, subg_name)
+    end
+    function _M.class_slg.g1_rule_display(slg, irlid)
+        return slg:lmg_rule_display(irlid, 'g1')
+    end
+    function _M.class_slg.l0_rule_display(slg, irlid)
+        return slg:lmg_rule_display(irlid, 'l0')
     end
 ```
 

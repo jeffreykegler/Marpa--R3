@@ -2001,6 +2001,40 @@ END_OF_LUA
     return $desc;
 }
 
+sub Marpa::R3::Scanless::G::lmg_rule_display {
+    my ( $slg, $subg_name, $irlid ) = @_;
+
+    my ( $desc ) =
+      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 'si>*', $subg_name, $irlid );
+    local grammar, subg_name, irlid = ...
+    return grammar:lmg_rule_display(irlid, subg_name)
+END_OF_LUA
+    return $desc;
+}
+
+sub Marpa::R3::Scanless::G::g1_rule_display {
+    my ( $slg, $irlid ) = @_;
+    my ( $desc ) =
+      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 'i>*', $irlid );
+    local grammar, irlid = ...
+    return grammar:g1_rule_display(irlid)
+END_OF_LUA
+    return $desc;
+}
+
+sub Marpa::R3::Scanless::G::l0_rule_display {
+    my ( $slg, $irlid ) = @_;
+    my ( $desc ) =
+      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 'i>*', $irlid );
+    local grammar, irlid = ...
+    return grammar:l0_rule_display(irlid)
+END_OF_LUA
+    return $desc;
+}
+
 # This logic deals with gaps in the rule numbering.
 # Currently there are none, but Libmarpa does not
 # guarantee this.

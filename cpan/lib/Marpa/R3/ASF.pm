@@ -1199,8 +1199,8 @@ sub Marpa::R3::Internal::ASF::glade_ambiguities {
         my $display_form = $grammar->g1_symbol_display_form($symbol_id);
         return [ [ 'symch', $glade, ] ];
     } ## end if ( $symch_count > 1 )
-    my $rule_id = $asf->g1_symch_rule_id( $glade, 0 );
-    return [] if $rule_id < 0;       # no ambiguities if a token
+    my $g1_rule_id = $asf->g1_symch_rule_id( $glade, 0 );
+    return [] if $g1_rule_id < 0;       # no ambiguities if a token
 
     # ignore any truncation of the factorings
 
@@ -1381,13 +1381,13 @@ END_OF_LUA
                 ? "  There are $symch_count symches\n"
                 : "  There are $symch_count symches -- showing only the first $display_symch_count\n";
             SYMCH_IX: for my $symch_ix ( 0 .. $display_symch_count - 1 ) {
-                my $rule_id = $asf->g1_symch_rule_id( $glade, $symch_ix );
-                if ( $rule_id < 0 ) {
+                my $g1_rule_id = $asf->g1_symch_rule_id( $glade, $symch_ix );
+                if ( $g1_rule_id < 0 ) {
                     $result .= "  Symch $symch_ix is a token\n";
                     next SYMCH_IX;
                 }
                 $result .= "  Symch $symch_ix is a rule: "
-                    . $grammar->g1_rule_show($rule_id) . "\n";
+                    . $grammar->g1_rule_display($g1_rule_id) . "\n";
             } ## end SYMCH_IX: for my $symch_ix ( 0 .. $display_symch_count - 1 )
 
             next AMBIGUITY;
