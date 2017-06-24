@@ -95,17 +95,21 @@ sub ast_to_hash {
         Marpa::R3::exception('No rules in SLIF grammar')
           if not defined $start_lhs;
         my $augment_lhs = '[:start]';
+        my $symbol_data = {
+            dsl_form    => $augment_lhs,
+            name_source => 'internal',
+        };
+        $hashed_ast->xsy_create( $augment_lhs, $symbol_data );
+        $hashed_ast->symbol_names_set( $augment_lhs, 'g1', { xsy => $augment_lhs } );
 
-        # description  => 'Internal G1 start symbol'
-        $hashed_ast->{'symbols'}->{'g1'}->{$augment_lhs} = {};
         my $rule_data = {
-            start => 0,
+            start  => 0,
             length => 0,
             lhs    => $augment_lhs,
             rhs    => [$start_lhs],
             action => '::first'
-          };
-        my $wrl= $hashed_ast->xbnf_create( $rule_data, 'g1' );
+        };
+        my $wrl = $hashed_ast->xbnf_create( $rule_data, 'g1' );
         push @{ $hashed_ast->{rules}->{g1} }, $wrl;
     } ## end sub Marpa::R3::Internal::MetaAST::start_rule_create
 

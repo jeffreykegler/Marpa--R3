@@ -2826,10 +2826,13 @@ $hashed_metag = {
                   'symbols' => {
                                  'g1' => {
                                            'Perl name' => {
-                                                            'wsyid' => 708,
+                                                            'wsyid' => 709,
                                                             'xsy' => 'Perl name'
                                                           },
-                                           '[:start]' => {},
+                                           '[:start]' => {
+                                                           'wsyid' => 592,
+                                                           'xsy' => '[:start]'
+                                                         },
                                            '[Lex-0]' => {
                                                           'wsyid' => 1,
                                                           'xsy' => '[Lex-0]'
@@ -3135,301 +3138,301 @@ $hashed_metag = {
                                                           'xsy' => '[Lex-9]'
                                                         },
                                            'action' => {
-                                                         'wsyid' => 664,
+                                                         'wsyid' => 665,
                                                          'xsy' => 'action'
                                                        },
                                            'action name' => {
-                                                              'wsyid' => 693,
+                                                              'wsyid' => 694,
                                                               'xsy' => 'action name'
                                                             },
                                            'adverb item' => {
-                                                              'wsyid' => 662,
+                                                              'wsyid' => 663,
                                                               'xsy' => 'adverb item'
                                                             },
                                            'adverb list' => {
-                                                              'wsyid' => 660,
+                                                              'wsyid' => 661,
                                                               'xsy' => 'adverb list'
                                                             },
                                            'adverb list items' => {
-                                                                    'wsyid' => 661,
+                                                                    'wsyid' => 662,
                                                                     'xsy' => 'adverb list items'
                                                                   },
                                            'alternative' => {
-                                                              'wsyid' => 659,
+                                                              'wsyid' => 660,
                                                               'xsy' => 'alternative'
                                                             },
                                            'alternative name' => {
-                                                                   'wsyid' => 682,
+                                                                   'wsyid' => 683,
                                                                    'xsy' => 'alternative name'
                                                                  },
                                            'alternatives' => {
-                                                               'wsyid' => 658,
+                                                               'wsyid' => 659,
                                                                'xsy' => 'alternatives'
                                                              },
                                            'array descriptor' => {
-                                                                   'wsyid' => 710,
+                                                                   'wsyid' => 711,
                                                                    'xsy' => 'array descriptor'
                                                                  },
                                            'bare name' => {
-                                                            'wsyid' => 706,
+                                                            'wsyid' => 707,
                                                             'xsy' => 'bare name'
                                                           },
                                            'before or after' => {
-                                                                  'wsyid' => 699,
+                                                                  'wsyid' => 700,
                                                                   'xsy' => 'before or after'
                                                                 },
                                            'blessing' => {
-                                                           'wsyid' => 680,
+                                                           'wsyid' => 681,
                                                            'xsy' => 'blessing'
                                                          },
                                            'blessing name' => {
-                                                                'wsyid' => 684,
+                                                                'wsyid' => 685,
                                                                 'xsy' => 'blessing name'
                                                               },
                                            'boolean' => {
-                                                          'wsyid' => 697,
+                                                          'wsyid' => 698,
                                                           'xsy' => 'boolean'
                                                         },
                                            'bracketed name' => {
-                                                                 'wsyid' => 707,
+                                                                 'wsyid' => 708,
                                                                  'xsy' => 'bracketed name'
                                                                },
                                            'character class' => {
-                                                                  'wsyid' => 705,
+                                                                  'wsyid' => 706,
                                                                   'xsy' => 'character class'
                                                                 },
                                            'completion event declaration' => {
-                                                                               'wsyid' => 651,
+                                                                               'wsyid' => 652,
                                                                                'xsy' => 'completion event declaration'
                                                                              },
                                            'default rule' => {
-                                                               'wsyid' => 643,
+                                                               'wsyid' => 644,
                                                                'xsy' => 'default rule'
                                                              },
                                            'discard default statement' => {
-                                                                            'wsyid' => 645,
+                                                                            'wsyid' => 646,
                                                                             'xsy' => 'discard default statement'
                                                                           },
                                            'discard rule' => {
-                                                               'wsyid' => 649,
+                                                               'wsyid' => 650,
                                                                'xsy' => 'discard rule'
                                                              },
                                            'eager specification' => {
-                                                                      'wsyid' => 670,
+                                                                      'wsyid' => 671,
                                                                       'xsy' => 'eager specification'
                                                                     },
                                            'empty rule' => {
-                                                             'wsyid' => 647,
+                                                             'wsyid' => 648,
                                                              'xsy' => 'empty rule'
                                                            },
                                            'event initialization' => {
-                                                                       'wsyid' => 677,
+                                                                       'wsyid' => 678,
                                                                        'xsy' => 'event initialization'
                                                                      },
                                            'event initializer' => {
-                                                                    'wsyid' => 678,
+                                                                    'wsyid' => 679,
                                                                     'xsy' => 'event initializer'
                                                                   },
                                            'event name' => {
-                                                             'wsyid' => 683,
+                                                             'wsyid' => 684,
                                                              'xsy' => 'event name'
                                                            },
                                            'event specification' => {
-                                                                      'wsyid' => 676,
+                                                                      'wsyid' => 677,
                                                                       'xsy' => 'event specification'
                                                                     },
                                            'group association' => {
-                                                                    'wsyid' => 667,
+                                                                    'wsyid' => 668,
                                                                     'xsy' => 'group association'
                                                                   },
                                            'inaccessible statement' => {
-                                                                         'wsyid' => 654,
+                                                                         'wsyid' => 655,
                                                                          'xsy' => 'inaccessible statement'
                                                                        },
                                            'inaccessible treatment' => {
-                                                                         'wsyid' => 655,
+                                                                         'wsyid' => 656,
                                                                          'xsy' => 'inaccessible treatment'
                                                                        },
                                            'left association' => {
-                                                                   'wsyid' => 665,
+                                                                   'wsyid' => 666,
                                                                    'xsy' => 'left association'
                                                                  },
                                            'lexeme default statement' => {
-                                                                           'wsyid' => 644,
+                                                                           'wsyid' => 645,
                                                                            'xsy' => 'lexeme default statement'
                                                                          },
                                            'lexeme rule' => {
-                                                              'wsyid' => 650,
+                                                              'wsyid' => 651,
                                                               'xsy' => 'lexeme rule'
                                                             },
                                            'lhs' => {
-                                                      'wsyid' => 685,
+                                                      'wsyid' => 686,
                                                       'xsy' => 'lhs'
                                                     },
                                            'naming' => {
-                                                         'wsyid' => 681,
+                                                         'wsyid' => 682,
                                                          'xsy' => 'naming'
                                                        },
                                            'null adverb' => {
-                                                              'wsyid' => 663,
+                                                              'wsyid' => 664,
                                                               'xsy' => 'null adverb'
                                                             },
                                            'null ranking constant' => {
-                                                                        'wsyid' => 673,
+                                                                        'wsyid' => 674,
                                                                         'xsy' => 'null ranking constant'
                                                                       },
                                            'null ranking specification' => {
-                                                                             'wsyid' => 672,
+                                                                             'wsyid' => 673,
                                                                              'xsy' => 'null ranking specification'
                                                                            },
                                            'null statement' => {
-                                                                 'wsyid' => 640,
+                                                                 'wsyid' => 641,
                                                                  'xsy' => 'null statement'
                                                                },
                                            'nulled event declaration' => {
-                                                                           'wsyid' => 652,
+                                                                           'wsyid' => 653,
                                                                            'xsy' => 'nulled event declaration'
                                                                          },
                                            'on or off' => {
-                                                            'wsyid' => 679,
+                                                            'wsyid' => 680,
                                                             'xsy' => 'on or off'
                                                           },
                                            'op declare' => {
-                                                             'wsyid' => 656,
+                                                             'wsyid' => 657,
                                                              'xsy' => 'op declare'
                                                            },
                                            'op declare bnf' => {
-                                                                 'wsyid' => 695,
+                                                                 'wsyid' => 696,
                                                                  'xsy' => 'op declare bnf'
                                                                },
                                            'op declare match' => {
-                                                                   'wsyid' => 696,
+                                                                   'wsyid' => 697,
                                                                    'xsy' => 'op declare match'
                                                                  },
                                            'parenthesized rhs primary list' => {
-                                                                                 'wsyid' => 688,
+                                                                                 'wsyid' => 689,
                                                                                  'xsy' => 'parenthesized rhs primary list'
                                                                                },
                                            'pause specification' => {
-                                                                      'wsyid' => 675,
+                                                                      'wsyid' => 676,
                                                                       'xsy' => 'pause specification'
                                                                     },
                                            'prediction event declaration' => {
-                                                                               'wsyid' => 653,
+                                                                               'wsyid' => 654,
                                                                                'xsy' => 'prediction event declaration'
                                                                              },
                                            'priorities' => {
-                                                             'wsyid' => 657,
+                                                             'wsyid' => 658,
                                                              'xsy' => 'priorities'
                                                            },
                                            'priority rule' => {
-                                                                'wsyid' => 646,
+                                                                'wsyid' => 647,
                                                                 'xsy' => 'priority rule'
                                                               },
                                            'priority specification' => {
-                                                                         'wsyid' => 674,
+                                                                         'wsyid' => 675,
                                                                          'xsy' => 'priority specification'
                                                                        },
                                            'proper specification' => {
-                                                                       'wsyid' => 669,
+                                                                       'wsyid' => 670,
                                                                        'xsy' => 'proper specification'
                                                                      },
                                            'quantified rule' => {
-                                                                  'wsyid' => 648,
+                                                                  'wsyid' => 649,
                                                                   'xsy' => 'quantified rule'
                                                                 },
                                            'quantifier' => {
-                                                             'wsyid' => 694,
+                                                             'wsyid' => 695,
                                                              'xsy' => 'quantifier'
                                                            },
                                            'rank specification' => {
-                                                                     'wsyid' => 671,
+                                                                     'wsyid' => 672,
                                                                      'xsy' => 'rank specification'
                                                                    },
                                            'reserved action name' => {
-                                                                       'wsyid' => 709,
+                                                                       'wsyid' => 710,
                                                                        'xsy' => 'reserved action name'
                                                                      },
                                            'reserved blessing name' => {
-                                                                         'wsyid' => 703,
+                                                                         'wsyid' => 704,
                                                                          'xsy' => 'reserved blessing name'
                                                                        },
                                            'reserved event name' => {
-                                                                      'wsyid' => 702,
+                                                                      'wsyid' => 703,
                                                                       'xsy' => 'reserved event name'
                                                                     },
                                            'rhs' => {
-                                                      'wsyid' => 686,
+                                                      'wsyid' => 687,
                                                       'xsy' => 'rhs'
                                                     },
                                            'rhs primary' => {
-                                                              'wsyid' => 687,
+                                                              'wsyid' => 688,
                                                               'xsy' => 'rhs primary'
                                                             },
                                            'rhs primary list' => {
-                                                                   'wsyid' => 689,
+                                                                   'wsyid' => 690,
                                                                    'xsy' => 'rhs primary list'
                                                                  },
                                            'right association' => {
-                                                                    'wsyid' => 666,
+                                                                    'wsyid' => 667,
                                                                     'xsy' => 'right association'
                                                                   },
                                            'separator specification' => {
-                                                                          'wsyid' => 668,
+                                                                          'wsyid' => 669,
                                                                           'xsy' => 'separator specification'
                                                                         },
                                            'signed integer' => {
-                                                                 'wsyid' => 698,
+                                                                 'wsyid' => 699,
                                                                  'xsy' => 'signed integer'
                                                                },
                                            'single quoted name' => {
-                                                                     'wsyid' => 701,
+                                                                     'wsyid' => 702,
                                                                      'xsy' => 'single quoted name'
                                                                    },
                                            'single quoted string' => {
-                                                                       'wsyid' => 704,
+                                                                       'wsyid' => 705,
                                                                        'xsy' => 'single quoted string'
                                                                      },
                                            'single symbol' => {
-                                                                'wsyid' => 690,
+                                                                'wsyid' => 691,
                                                                 'xsy' => 'single symbol'
                                                               },
                                            'standard name' => {
-                                                                'wsyid' => 700,
+                                                                'wsyid' => 701,
                                                                 'xsy' => 'standard name'
                                                               },
                                            'start rule' => {
-                                                             'wsyid' => 642,
+                                                             'wsyid' => 643,
                                                              'xsy' => 'start rule'
                                                            },
                                            'statement' => {
-                                                            'wsyid' => 639,
+                                                            'wsyid' => 640,
                                                             'xsy' => 'statement'
                                                           },
                                            'statement group' => {
-                                                                  'wsyid' => 641,
+                                                                  'wsyid' => 642,
                                                                   'xsy' => 'statement group'
                                                                 },
                                            'statements' => {
-                                                             'wsyid' => 638,
+                                                             'wsyid' => 639,
                                                              'xsy' => 'statements'
                                                            },
                                            'symbol' => {
-                                                         'wsyid' => 691,
+                                                         'wsyid' => 692,
                                                          'xsy' => 'symbol'
                                                        },
                                            'symbol name' => {
-                                                              'wsyid' => 692,
+                                                              'wsyid' => 693,
                                                               'xsy' => 'symbol name'
                                                             }
                                          },
                                  'l0' => {
                                            'Perl identifier' => {
-                                                                  'wsyid' => 611,
+                                                                  'wsyid' => 612,
                                                                   'xsy' => 'Perl identifier'
                                                                 },
                                            'Perl name' => {
-                                                            'wsyid' => 613,
+                                                            'wsyid' => 614,
                                                             'xsy' => 'Perl name'
                                                           },
                                            '[:discard]' => {
@@ -3972,63 +3975,63 @@ $hashed_metag = {
                                                         'xsy' => '[[y]]'
                                                       },
                                            'array descriptor' => {
-                                                                   'wsyid' => 618,
+                                                                   'wsyid' => 619,
                                                                    'xsy' => 'array descriptor'
                                                                  },
                                            'array descriptor left bracket' => {
-                                                                                'wsyid' => 619,
+                                                                                'wsyid' => 620,
                                                                                 'xsy' => 'array descriptor left bracket'
                                                                               },
                                            'array descriptor right bracket' => {
-                                                                                 'wsyid' => 620,
+                                                                                 'wsyid' => 621,
                                                                                  'xsy' => 'array descriptor right bracket'
                                                                                },
                                            'bare name' => {
-                                                            'wsyid' => 614,
+                                                            'wsyid' => 615,
                                                             'xsy' => 'bare name'
                                                           },
                                            'before or after' => {
-                                                                  'wsyid' => 602,
+                                                                  'wsyid' => 603,
                                                                   'xsy' => 'before or after'
                                                                 },
                                            'boolean' => {
-                                                          'wsyid' => 606,
+                                                          'wsyid' => 607,
                                                           'xsy' => 'boolean'
                                                         },
                                            'bracketed name' => {
-                                                                 'wsyid' => 616,
+                                                                 'wsyid' => 617,
                                                                  'xsy' => 'bracketed name'
                                                                },
                                            'bracketed name string' => {
-                                                                        'wsyid' => 617,
+                                                                        'wsyid' => 618,
                                                                         'xsy' => 'bracketed name string'
                                                                       },
                                            'cc element' => {
-                                                             'wsyid' => 629,
+                                                             'wsyid' => 630,
                                                              'xsy' => 'cc element'
                                                            },
                                            'cc elements' => {
-                                                              'wsyid' => 628,
+                                                              'wsyid' => 629,
                                                               'xsy' => 'cc elements'
                                                             },
                                            'character class' => {
-                                                                  'wsyid' => 627,
+                                                                  'wsyid' => 628,
                                                                   'xsy' => 'character class'
                                                                 },
                                            'character class modifier' => {
-                                                                           'wsyid' => 633,
+                                                                           'wsyid' => 634,
                                                                            'xsy' => 'character class modifier'
                                                                          },
                                            'character class modifiers' => {
-                                                                            'wsyid' => 632,
+                                                                            'wsyid' => 633,
                                                                             'xsy' => 'character class modifiers'
                                                                           },
                                            'double colon' => {
-                                                               'wsyid' => 612,
+                                                               'wsyid' => 613,
                                                                'xsy' => 'double colon'
                                                              },
                                            'escaped cc character' => {
-                                                                       'wsyid' => 631,
+                                                                       'wsyid' => 632,
                                                                        'xsy' => 'escaped cc character'
                                                                      },
                                            'hash comment' => {
@@ -4036,115 +4039,115 @@ $hashed_metag = {
                                                                'xsy' => 'hash comment'
                                                              },
                                            'hash comment body' => {
-                                                                    'wsyid' => 595,
+                                                                    'wsyid' => 596,
                                                                     'xsy' => 'hash comment body'
                                                                   },
                                            'hash comment char' => {
-                                                                    'wsyid' => 597,
+                                                                    'wsyid' => 598,
                                                                     'xsy' => 'hash comment char'
                                                                   },
                                            'horizontal character' => {
-                                                                       'wsyid' => 637,
+                                                                       'wsyid' => 638,
                                                                        'xsy' => 'horizontal character'
                                                                      },
                                            'integer' => {
-                                                          'wsyid' => 605,
+                                                          'wsyid' => 606,
                                                           'xsy' => 'integer'
                                                         },
                                            'negated posix char class' => {
-                                                                           'wsyid' => 635,
+                                                                           'wsyid' => 636,
                                                                            'xsy' => 'negated posix char class'
                                                                          },
                                            'one or more word characters' => {
-                                                                              'wsyid' => 609,
+                                                                              'wsyid' => 610,
                                                                               'xsy' => 'one or more word characters'
                                                                             },
                                            'op declare bnf' => {
-                                                                 'wsyid' => 598,
+                                                                 'wsyid' => 599,
                                                                  'xsy' => 'op declare bnf'
                                                                },
                                            'op declare match' => {
-                                                                   'wsyid' => 599,
+                                                                   'wsyid' => 600,
                                                                    'xsy' => 'op declare match'
                                                                  },
                                            'op equal priority' => {
-                                                                    'wsyid' => 601,
+                                                                    'wsyid' => 602,
                                                                     'xsy' => 'op equal priority'
                                                                   },
                                            'op loosen' => {
-                                                            'wsyid' => 600,
+                                                            'wsyid' => 601,
                                                             'xsy' => 'op loosen'
                                                           },
                                            'posix char class' => {
-                                                                   'wsyid' => 634,
+                                                                   'wsyid' => 635,
                                                                    'xsy' => 'posix char class'
                                                                  },
                                            'posix char class name' => {
-                                                                        'wsyid' => 636,
+                                                                        'wsyid' => 637,
                                                                         'xsy' => 'posix char class name'
                                                                       },
                                            'reserved action name' => {
-                                                                       'wsyid' => 607,
+                                                                       'wsyid' => 608,
                                                                        'xsy' => 'reserved action name'
                                                                      },
                                            'reserved blessing name' => {
-                                                                         'wsyid' => 608,
+                                                                         'wsyid' => 609,
                                                                          'xsy' => 'reserved blessing name'
                                                                        },
                                            'reserved event name' => {
-                                                                      'wsyid' => 592,
+                                                                      'wsyid' => 593,
                                                                       'xsy' => 'reserved event name'
                                                                     },
                                            'result item descriptor' => {
-                                                                         'wsyid' => 623,
+                                                                         'wsyid' => 624,
                                                                          'xsy' => 'result item descriptor'
                                                                        },
                                            'result item descriptor list' => {
-                                                                              'wsyid' => 621,
+                                                                              'wsyid' => 622,
                                                                               'xsy' => 'result item descriptor list'
                                                                             },
                                            'result item descriptor separator' => {
-                                                                                   'wsyid' => 622,
+                                                                                   'wsyid' => 623,
                                                                                    'xsy' => 'result item descriptor separator'
                                                                                  },
                                            'safe cc character' => {
-                                                                    'wsyid' => 630,
+                                                                    'wsyid' => 631,
                                                                     'xsy' => 'safe cc character'
                                                                   },
                                            'sign' => {
-                                                       'wsyid' => 604,
+                                                       'wsyid' => 605,
                                                        'xsy' => 'sign'
                                                      },
                                            'signed integer' => {
-                                                                 'wsyid' => 603,
+                                                                 'wsyid' => 604,
                                                                  'xsy' => 'signed integer'
                                                                },
                                            'single quoted name' => {
-                                                                     'wsyid' => 625,
+                                                                     'wsyid' => 626,
                                                                      'xsy' => 'single quoted name'
                                                                    },
                                            'single quoted string' => {
-                                                                       'wsyid' => 624,
+                                                                       'wsyid' => 625,
                                                                        'xsy' => 'single quoted string'
                                                                      },
                                            'standard name' => {
-                                                                'wsyid' => 615,
+                                                                'wsyid' => 616,
                                                                 'xsy' => 'standard name'
                                                               },
                                            'string without single quote or vertical space' => {
-                                                                                                'wsyid' => 626,
+                                                                                                'wsyid' => 627,
                                                                                                 'xsy' => 'string without single quote or vertical space'
                                                                                               },
                                            'terminated hash comment' => {
-                                                                          'wsyid' => 593,
+                                                                          'wsyid' => 594,
                                                                           'xsy' => 'terminated hash comment'
                                                                         },
                                            'unterminated final hash comment' => {
-                                                                                  'wsyid' => 594,
+                                                                                  'wsyid' => 595,
                                                                                   'xsy' => 'unterminated final hash comment'
                                                                                 },
                                            'vertical space char' => {
-                                                                      'wsyid' => 596,
+                                                                      'wsyid' => 597,
                                                                       'xsy' => 'vertical space char'
                                                                     },
                                            'whitespace' => {
@@ -4152,7 +4155,7 @@ $hashed_metag = {
                                                              'xsy' => 'whitespace'
                                                            },
                                            'zero or more word characters' => {
-                                                                               'wsyid' => 610,
+                                                                               'wsyid' => 611,
                                                                                'xsy' => 'zero or more word characters'
                                                                              }
                                          }
@@ -9224,6 +9227,10 @@ $hashed_metag = {
                                               'dsl_form' => 'Perl name',
                                               'name_source' => 'lexical'
                                             },
+                             '[:start]' => {
+                                             'dsl_form' => '[:start]',
+                                             'name_source' => 'internal'
+                                           },
                              '[Lex-0]' => {
                                             'dsl_form' => '\';\'',
                                             'name_source' => 'internal'

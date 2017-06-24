@@ -664,6 +664,7 @@ Marpa::R3::Test::is( $show_symbols_output,
 G1 Symbols:
 G1 S0 [:start]
   Internal name: <[:start]>
+  SLIF name: [:start]
 G1 S1 'set'
   /* terminal */
   Internal name: <[Lex-0]>
@@ -1053,7 +1054,7 @@ for my $symbol_id ( $grammar->g1_symbol_ids() ) {
 Marpa::R3::Test::is( $text, <<'END_OF_TEXT', 'G1 symbol names and description');
 symbol number: 0  name: [:start]
 symbol number: 0  name in display form: [:start]
-symbol number: 0  DSL form: [No name in DSL form]
+symbol number: 0  DSL form: [:start]
 symbol number: 1  name: [Lex-0]
 symbol number: 1  name in display form: 'set'
 symbol number: 1  DSL form: 'set'

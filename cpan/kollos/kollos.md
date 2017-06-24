@@ -766,6 +766,7 @@ Display any XBNF
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_slg.xbnf_name_o(slg, xbnf)
+        print(inspect(xbnf, {depth=4}))
         local name = xbnf.name
         if name then return name end
         local lhs = xbnf.lhs
