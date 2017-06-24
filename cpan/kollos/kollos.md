@@ -756,6 +756,119 @@ Display any XBNF
     end
 ```
 
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slg.last_xbnfid(slg)
+        return #slg.xbnfs
+    end
+```
+
+TODO -- Turn lmg_*() forms into local functions?
+
+TODO -- Census all Lua and perl symbol name functions, including
+but not limited to lmg_*(), *_name(), *_{dsl,display}_form()
+and eliminate the redundant ones.
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slg.symbol_name(slg, xsyid)
+        local xsy = slg.xsys[xsyid]
+        if not xsy then return end
+        return xsy.name
+    end
+    function _M.class_slg.lmg_symbol_name(slg, symbol_id, subg_name)
+        local subg = slg[subg_name]
+        return subg:symbol_name(symbol_id)
+    end
+    function _M.class_slg.g1_symbol_name(slg, symbol_id)
+        return slg:lmg_symbol_name(symbol_id, 'g1')
+    end
+    function _M.class_slg.l0_symbol_name(slg, symbol_id)
+        return slg:lmg_symbol_name(symbol_id, 'l0')
+    end
+
+    function _M.class_slg.lmg_symbol_by_name(slg, symbol_name, subg_name)
+        local subg = slg[subg_name]
+        return subg.isyid_by_name[symbol_name]
+    end
+    function _M.class_slg.g1_symbol_by_name(slg, symbol_name)
+        return slg:lmg_symbol_by_name(symbol_name, 'g1')
+    end
+    function _M.class_slg.l0_symbol_by_name(slg, symbol_name)
+        return slg:lmg_symbol_by_name(symbol_name, 'l0')
+    end
+
+    function _M.class_slg.lmg_symbol_dsl_form(slg, symbol_id, subg_name)
+        local subg = slg[subg_name]
+        return subg:symbol_dsl_form(symbol_id)
+    end
+    function _M.class_slg.g1_symbol_dsl_form(slg, symbol_id)
+        return slg:lmg_symbol_dsl_form(symbol_id, 'g1')
+    end
+    function _M.class_slg.l0_symbol_dsl_form(slg, symbol_id)
+        return slg:lmg_symbol_dsl_form(symbol_id, 'l0')
+    end
+
+    function _M.class_slg.lmg_symbol_display_form(slg, symbol_id, subg_name)
+        local subg = slg[subg_name]
+        return subg:symbol_display_form(symbol_id)
+    end
+    function _M.class_slg.g1_symbol_display_form(slg, symbol_id)
+        return slg:lmg_symbol_display_form(symbol_id, 'g1')
+    end
+    function _M.class_slg.l0_symbol_display_form(slg, symbol_id)
+        return slg:lmg_symbol_display_form(symbol_id, 'l0')
+    end
+
+```
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slg.lmg_rule_show(slg, irlid, subg_name)
+        local subg = slg[subg_name]
+        local irl_isyids = subg:irl_isyids(irlid)
+        local pieces = {}
+        pieces[#pieces+1]
+            = subg:symbol_display_form(irl_isyids[1])
+        pieces[#pieces+1] = '::='
+        for ix = 2, #irl_isyids do
+            pieces[#pieces+1]
+                = subg:symbol_display_form(irl_isyids[ix])
+        end
+        local minimum = subg:sequence_min(irlid)
+        if minimum then
+            pieces[#pieces+1] =
+                minimum <= 0 and '*' or '+'
+        end
+        return table.concat(pieces, ' ')
+    end
+    function _M.class_slg.g1_rule_show(slg, irlid)
+        return slg:lmg_rule_show(irlid, 'g1')
+    end
+    function _M.class_slg.l0_rule_show(slg, irlid)
+        return slg:lmg_rule_show(irlid, 'l0')
+    end
+
+    function _M.class_slg.lmg_rule_display(slg, irlid, subg_name)
+        local subg = slg[subg_name]
+        local irl = subg.irls[irlid]
+        if not irl then
+            return '(bad irlid ' .. irlid .. ')'
+        end
+        local xbnf = irl.xbnf
+        if xbnf then
+             return slg:xbnf_display(xbnf)
+        end
+        return slg:lmg_rule_show(irlid, subg_name)
+    end
+    function _M.class_slg.g1_rule_display(slg, irlid)
+        return slg:lmg_rule_display(irlid, 'g1')
+    end
+    function _M.class_slg.l0_rule_display(slg, irlid)
+        return slg:lmg_rule_display(irlid, 'l0')
+    end
+```
+
 ### Mutators
 
 ```
@@ -871,7 +984,7 @@ Display any XBNF
     end
 ```
 
-### Constanst: Ranking methods
+### Constants: Ranking methods
 
 ```
     -- miranda: section+ constant Lua tables
@@ -1069,127 +1182,6 @@ one for each subgrammar.
         slg.xbnfs = {}
         slg:xbnfs_subg_populate(source_hash, 'l0')
         return slg:xbnfs_subg_populate(source_hash, 'g1')
-    end
-```
-
-### Diagnostics
-
-TODO -- Turn lmg_*() forms into local functions?
-
-TODO -- Census all Lua and perl symbol name functions, including
-but not limited to lmg_*(), *_name(), *_{dsl,display}_form()
-and eliminate the redundant ones.
-
-```
-    -- miranda: section+ most Lua function definitions
-    function _M.class_slg.symbol_name(slg, xsyid)
-        local xsy = slg.xsys[xsyid]
-        if not xsy then return end
-        return xsy.name
-    end
-    function _M.class_slg.lmg_symbol_name(slg, symbol_id, subg_name)
-        local subg = slg[subg_name]
-        return subg:symbol_name(symbol_id)
-    end
-    function _M.class_slg.g1_symbol_name(slg, symbol_id)
-        return slg:lmg_symbol_name(symbol_id, 'g1')
-    end
-    function _M.class_slg.l0_symbol_name(slg, symbol_id)
-        return slg:lmg_symbol_name(symbol_id, 'l0')
-    end
-
-    function _M.class_slg.lmg_symbol_by_name(slg, symbol_name, subg_name)
-        local subg = slg[subg_name]
-        return subg.isyid_by_name[symbol_name]
-    end
-    function _M.class_slg.g1_symbol_by_name(slg, symbol_name)
-        return slg:lmg_symbol_by_name(symbol_name, 'g1')
-    end
-    function _M.class_slg.l0_symbol_by_name(slg, symbol_name)
-        return slg:lmg_symbol_by_name(symbol_name, 'l0')
-    end
-
-    function _M.class_slg.lmg_symbol_dsl_form(slg, symbol_id, subg_name)
-        local subg = slg[subg_name]
-        return subg:symbol_dsl_form(symbol_id)
-    end
-    function _M.class_slg.g1_symbol_dsl_form(slg, symbol_id)
-        return slg:lmg_symbol_dsl_form(symbol_id, 'g1')
-    end
-    function _M.class_slg.l0_symbol_dsl_form(slg, symbol_id)
-        return slg:lmg_symbol_dsl_form(symbol_id, 'l0')
-    end
-
-    function _M.class_slg.lmg_symbol_display_form(slg, symbol_id, subg_name)
-        local subg = slg[subg_name]
-        return subg:symbol_display_form(symbol_id)
-    end
-    function _M.class_slg.g1_symbol_display_form(slg, symbol_id)
-        return slg:lmg_symbol_display_form(symbol_id, 'g1')
-    end
-    function _M.class_slg.l0_symbol_display_form(slg, symbol_id)
-        return slg:lmg_symbol_display_form(symbol_id, 'l0')
-    end
-
-```
-
-```
-    -- miranda: section+ most Lua function definitions
-    function _M.class_slg.lmg_rule_show(slg, irlid, subg_name)
-        local subg = slg[subg_name]
-        local irl_isyids = subg:irl_isyids(irlid)
-        local pieces = {}
-        pieces[#pieces+1]
-            = subg:symbol_display_form(irl_isyids[1])
-        pieces[#pieces+1] = '::='
-        for ix = 2, #irl_isyids do
-            pieces[#pieces+1]
-                = subg:symbol_display_form(irl_isyids[ix])
-        end
-        local minimum = subg:sequence_min(irlid)
-        if minimum then
-            pieces[#pieces+1] =
-                minimum <= 0 and '*' or '+'
-        end
-        return table.concat(pieces, ' ')
-    end
-    function _M.class_slg.g1_rule_show(slg, irlid)
-        return slg:lmg_rule_show(irlid, 'g1')
-    end
-    function _M.class_slg.l0_rule_show(slg, irlid)
-        return slg:lmg_rule_show(irlid, 'l0')
-    end
-
-    function _M.class_slg.lmg_rule_display(slg, irlid, subg_name)
-        local subg = slg[subg_name]
-        local irl = subg.irls[irlid]
-        if not irl then
-            return '(bad irlid ' .. irlid .. ')'
-        end
-        local xbnf = irl.xbnf
-        if xbnf then
-             return slg:xbnf_display(xbnf)
-        end
-        return slg:lmg_rule_show(irlid, subg_name)
-    end
-    function _M.class_slg.g1_rule_display(slg, irlid)
-        return slg:lmg_rule_display(irlid, 'g1')
-    end
-    function _M.class_slg.l0_rule_display(slg, irlid)
-        return slg:lmg_rule_display(irlid, 'l0')
-    end
-```
-
-```
-    -- miranda: section+ most Lua function definitions
-    function _M.class_slg.irl_isyids(lmw_g, rule_id)
-        local lhs = lmw_g:rule_lhs(rule_id)
-        if not lhs then return {} end
-        local symbols = { lhs }
-        for rhsix = 0, lmw_g:rule_length(rule_id) - 1 do
-             symbols[#symbols+1] = lmw_g:rule_rhs(rule_id, rhsix)
-        end
-        return symbols
     end
 ```
 

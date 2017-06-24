@@ -1906,16 +1906,6 @@ END_OF_LUA
     }
 }
 
-sub Marpa::R3::Scanless::G::g1_rule_ids {
-    my ($slg) = @_;
-    return $slg->lmg_rule_ids('g1');
-}
-
-sub Marpa::R3::Scanless::G::l0_rule_ids {
-    my ($slg) = @_;
-    return $slg->lmg_rule_ids('l0');
-}
-
 sub Marpa::R3::Scanless::G::g1_symbol_ids {
     my ($slg) = @_;
     return $slg->lmg_symbol_ids('g1');
@@ -2035,9 +2025,22 @@ END_OF_LUA
     return $desc;
 }
 
-# This logic deals with gaps in the rule numbering.
-# Currently there are none, but Libmarpa does not
-# guarantee this.
+# Currently there are no gaps in the rule ids.
+# TODO -- Will I guarantee this?
+sub Marpa::R3::Scanless::G::alt_ids {
+    my ($slg) = @_;
+    my ($last_alt_id) = $slg->call_by_tag(
+    ('@' .__FILE__ . ':' . __LINE__),
+    <<'END_OF_LUA', '' ) ;
+    local slg = ...
+    return slg:last_xbnfid()
+END_OF_LUA
+
+    return 1 .. $last_alt_id;
+}
+
+# Currently there are no gaps in the rule ids.
+# TODO -- Will I guarantee this?
 sub Marpa::R3::Scanless::G::lmg_rule_ids {
     my ($slg, $subg_name) = @_;
     my ($highest_rule_id) = $slg->call_by_tag(
@@ -2049,6 +2052,16 @@ sub Marpa::R3::Scanless::G::lmg_rule_ids {
 END_OF_LUA
 
     return 0 .. $highest_rule_id;
+}
+
+sub Marpa::R3::Scanless::G::g1_rule_ids {
+    my ($slg) = @_;
+    return $slg->lmg_rule_ids('g1');
+}
+
+sub Marpa::R3::Scanless::G::l0_rule_ids {
+    my ($slg) = @_;
+    return $slg->lmg_rule_ids('l0');
 }
 
 # This logic deals with gaps in the symbol numbering.
