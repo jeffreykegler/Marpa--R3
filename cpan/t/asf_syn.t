@@ -103,8 +103,8 @@ sub glade_to_basic_tree {
     my @symches     = ();
     my $symch_count = $asf->glade_symch_count($glade);
     SYMCH: for ( my $symch_ix = 0; $symch_ix < $symch_count; $symch_ix++ ) {
-        my $rule_id = $asf->g1_symch_rule_id( $glade, $symch_ix );
-        if ( $rule_id < 0 ) {
+        my $g1_rule_id = $asf->g1_symch_rule_id( $glade, $symch_ix );
+        if ( $g1_rule_id < 0 ) {
             my $literal      = $asf->glade_literal($glade);
             my $symbol_id    = $asf->g1_glade_symbol_id($glade);
             my $display_form = $grammar->g1_symbol_display_form($symbol_id);
@@ -112,14 +112,14 @@ sub glade_to_basic_tree {
                 bless [qq{Glade $glade, Symbol $display_form: "$literal"}],
                 'My_Token';
             next SYMCH;
-        } ## end if ( $rule_id < 0 )
+        } ## end if ( $g1_rule_id < 0 )
 
         # ignore any truncation of the factorings
         my $factoring_count =
             $asf->symch_factoring_count( $glade, $symch_ix );
         my @symch_description = ("Glade $glade");
         push @symch_description, "Symch $symch_ix" if $symch_count > 1;
-        push @symch_description, $grammar->g1_rule_show($rule_id);
+        push @symch_description, $grammar->g1_rule_show($g1_rule_id);
         my $symch_description = join q{, }, @symch_description;
 
         my @factorings = ($symch_description);

@@ -1030,7 +1030,9 @@ one for each subgrammar.
                     = (math.tointeger(source_event[2]) ~= 0)
             end
 
-            runtime_xbnf.min = xbnf_source.min
+            if xbnf_source.min then
+                runtime_xbnf.min = math.tointeger(xbnf_source.min)
+            end
             runtime_xbnf.separator = xbnf_source.separator
             runtime_xbnf.proper = xbnf_source.proper
             runtime_xbnf.bless = xbnf_source.bless
