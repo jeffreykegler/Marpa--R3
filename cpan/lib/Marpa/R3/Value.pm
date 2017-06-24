@@ -341,7 +341,7 @@ END_OF_LUA
     my $resolution = resolve_action( $slg, $action_name, \$resolve_error );
 
     if ( not $resolution ) {
-        my $rule_desc = $slg->g1_rule_show($irlid);
+        my $rule_desc = $slg->g1_rule_display($irlid);
         Marpa::R3::exception(
             "Could not resolve rule action named '$action_name'\n",
             "  Rule was $rule_desc\n",
@@ -424,7 +424,7 @@ sub resolve_grammar {
         $rule_resolution //= $default_action_resolution;
 
         if ( not $rule_resolution ) {
-            my $rule_desc = $slg->g1_rule_show($irlid);
+            my $rule_desc = $slg->g1_rule_display($irlid);
 
             my ($action) =
               $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
@@ -458,7 +458,7 @@ END_OF_LUA
 qq{Attempt to bless, but improper semantics: "$semantics"\n},
                         qq{  Blessing: "$blessing"\n},
                         '  Rule: ',
-                        $slg->g1_rule_show($irlid)
+                        $slg->g1_rule_display($irlid)
                     );
                 } ## end CHECK_SEMANTICS:
             } ## end if ( $blessing ne '::undef' )
@@ -485,7 +485,7 @@ END_OF_LUA
             my ( $resolution_name, $closure ) =
               @{ $rule_resolutions->[$rule_id] };
             say {$trace_file_handle} 'Rule ',
-              $slg->g1_rule_show($rule_id),
+              $slg->g1_rule_display($rule_id),
               qq{ resolves to "$resolution_name"}
               or Marpa::R3::exception('print to trace handle failed');
         }
