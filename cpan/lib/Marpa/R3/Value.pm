@@ -889,7 +889,7 @@ END_OF_LUA
                 say {$trace_file_handle}
                   qq{Nulled symbol "$lhs_name" },
                   qq{ resolved to "$resolution_name" from rule },
-                  $slg->g1_rule_show($resolution_rule)
+                  $slg->g1_rule_display($resolution_rule)
                   or Marpa::R3::exception('print to trace handle failed');
             } ## end if ($trace_actions)
             $null_symbol_closures[$lhs_id] = $resolution_rule;
@@ -933,7 +933,7 @@ END_OF_LUA
             say {$trace_file_handle}
               qq{Nulled symbol "$lhs_name" },
               qq{ resolved to "$resolution_name" from rule },
-              $slg->g1_rule_show($resolution_rule)
+              $slg->g1_rule_display($resolution_rule)
               or Marpa::R3::exception('print to trace handle failed');
         } ## end if ($trace_actions)
         $null_symbol_closures[$lhs_id] = $resolution_rule;
@@ -1142,7 +1142,7 @@ END_OF_LUA
                 last CHECK_TYPE if not defined $thingy_ref;
                 my $ref_type = Scalar::Util::reftype $thingy_ref;
                 if ( $ref_type eq q{} ) {
-                    my $rule_desc = $slg->g1_rule_show($irlid);
+                    my $rule_desc = $slg->g1_rule_display($irlid);
                     Marpa::R3::exception(
                         qq{An action resolved to a scalar.\n},
                         qq{  This is not allowed.\n},
@@ -1160,7 +1160,7 @@ END_OF_LUA
                     last CHECK_TYPE;
                 } ## end if ( $ref_type eq 'CODE' )
 
-                my $rule_desc = $slg->g1_rule_show($irlid);
+                my $rule_desc = $slg->g1_rule_display($irlid);
                 Marpa::R3::exception(
                     qq{Constant action is not of an allowed type.\n},
                     qq{  It was of type reference to $ref_type.\n},
@@ -1212,7 +1212,7 @@ END_OF_LUA
                     my $original_semantics = $semantics_by_irlid[$irlid];
                     Marpa::R3::exception(
                         q{Impossible semantics for empty rule: },
-                        $slg->g1_rule_show($irlid),
+                        $slg->g1_rule_display($irlid),
                         "\n",
 qq{    Semantics were specified as "$original_semantics"\n}
                     );
@@ -1223,7 +1223,7 @@ qq{    Semantics were specified as "$original_semantics"\n}
                     my $original_semantics = $semantics_by_irlid[$irlid];
                     Marpa::R3::exception(
                         q{Impossible semantics for rule: },
-                        $slg->g1_rule_show($irlid),
+                        $slg->g1_rule_display($irlid),
                         "\n",
 qq{    Semantics were specified as "$original_semantics"\n}
                     );
@@ -1706,7 +1706,7 @@ END_OF_LUA
                             warnings    => \@warnings,
                             where       => 'computing value',
                             long_where  => 'Computing value for rule: '
-                              . $slg->g1_rule_show($rule_id),
+                              . $slg->g1_rule_display($rule_id),
                         }
                     );
                 } ## end if ( not $eval_ok or @warnings )
@@ -1840,7 +1840,7 @@ END_OF_LUA
     return 'Popping ', $argc,
       ' values to evaluate ',
       $slr->and_node_tag($and_node_id),
-      ', rule: ', $slg->g1_rule_show($rule_id);
+      ', rule: ', $slg->g1_rule_display($rule_id);
 
 } ## end sub trace_stack_1
 
