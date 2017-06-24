@@ -1659,28 +1659,48 @@ END_OF_LUA
     return $start_symbol;
 }
 
-sub Marpa::R3::Scanless::G::g1_rule_name {
-    my ( $slg, $irlid ) = @_;
-
-    my ($rule_name) = $slg->call_by_tag(
+sub Marpa::R3::Scanless::G::alt_name {
+    my ( $slg, $altid ) = @_;
+    my ($alt_name) = $slg->call_by_tag(
         ('@' . __FILE__ . ':' .  __LINE__),
-      <<'END_OF_LUA', 'i', $irlid);
-    local slg, irlid = ...
-    local g1 = slg.g1
-    local irl = g1.irls[irlid]
-    local xbnf = irl.xbnf
-    if not xbnf then
-        return string.format('Non-existent rule %d', irlid)
-    end
-    local name = xbnf.name
-    if name then return name end
-    local lmw_g = g1
-    local lhs_isyid = lmw_g:rule_lhs(irlid)
-    return slg.g1:symbol_name(lhs_isyid)
+      <<'END_OF_LUA', 'i', $altid);
+    local slg, altid = ...
+    return slg:xbnf_name(altid)
 END_OF_LUA
+    return $alt_name;
+}
 
-    return $rule_name;
+sub Marpa::R3::Scanless::G::lmg_rule_to_altid {
+    my ( $slg, $subg_name, $irlid ) = @_;
+    my ( $desc ) =
+      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 'si', $subg_name, $irlid );
+    local grammar, subg_name, irlid = ...
+    return grammar:lmg_rule_to_xbnfid(irlid, subg_name)
+END_OF_LUA
+    return $desc;
+}
 
+sub Marpa::R3::Scanless::G::g1_rule_to_altid {
+    my ( $slg, $irlid ) = @_;
+    my ( $desc ) =
+      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 'i', $irlid );
+    local grammar, irlid = ...
+    return grammar:g1_rule_to_xbnfid(irlid)
+END_OF_LUA
+    return $desc;
+}
+
+sub Marpa::R3::Scanless::G::l0_rule_to_altid {
+    my ( $slg, $irlid ) = @_;
+    my ( $desc ) =
+      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 'i', $irlid );
+    local grammar, irlid = ...
+    return grammar:l0_rule_to_xbnfid(irlid)
+END_OF_LUA
+    return $desc;
 }
 
 sub Marpa::R3::Scanless::G::g1_rule_expand {

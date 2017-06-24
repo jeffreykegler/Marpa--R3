@@ -763,6 +763,40 @@ Display any XBNF
     end
 ```
 
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slg.xbnf_name_o(slg, xbnf)
+        local name = xbnf.name
+        if name then return name end
+        local lhs = xbnf.lhs
+        return lhs.name
+    end
+    function _M.class_slg.xbnf_name(slg, xbnfid)
+        local xbnf = slg.xbnfs[xbnfid]
+        if xbnf then return slg:xbnf_name_o(xbnf) end
+        return internal_error('xbnf_name(), bad argument = ' .. xbnfid)
+    end
+```
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slg.lmg_rule_to_xbnfid(slg, irlid, subg_name)
+        local subg = slg[subg_name]
+        local irl = subg.irls[irlid]
+        if not irl then
+            return internal_error('lmg_rule_to_xbnfid(), bad argument = ' .. irlid)
+        end
+        local xbnf = irl.xbnf
+        if xbnf then return xbnf.id end
+    end
+    function _M.class_slg.g1_rule_to_xbnfid(slg, irlid)
+        return slg:lmg_rule_to_xbnfid(irlid, 'g1')
+    end
+    function _M.class_slg.l0_rule_to_xbnfid(slg, irlid)
+        return slg:lmg_rule_to_xbnfid(irlid, 'l0')
+    end
+```
+
 TODO -- Turn lmg_*() forms into local functions?
 
 TODO -- Census all Lua and perl symbol name functions, including
@@ -7718,6 +7752,12 @@ TODO -- Do I want to turn this off after developement?
     end
 ```
 
+```
+    -- miranda: section+ internal utilities
+    local function internal_error(msg)
+        error("Kollos internal error: " .. msg)
+    end
+```
 ## Meta-coding utilities
 
 ### Metacode execution sequence

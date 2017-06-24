@@ -1297,7 +1297,8 @@ END_OF_LUA
 
                 if ( $result_descriptor eq 'name' ) {
                     if ( defined $irlid ) {
-                        my $name = $slg->g1_rule_name($irlid);
+                        my $altid = $slg->g1_rule_to_altid($irlid);
+                        my $name = $slg->alt_name($altid);
                         push @push_ops, $op_lua, $op_push_constant_key, \$name;
                         next RESULT_DESCRIPTOR;
                     }

@@ -670,20 +670,20 @@ END_OF_SOURCE
 
     Test::More::is( $start_id, 2, q{Test of $grammar->g1_start_symbol_id()} );
 
-    my @rule_names = ();
+    my @alt_names = ();
 
 # Marpa::R3::Display
-# name: $grammar->g1_rule_name() example
+# name: $grammar->alt_name() example
 
-    push @rule_names, $grammar->g1_rule_name($_) for $grammar->g1_rule_ids();
+    push @alt_names, $grammar->alt_name($_) for $grammar->alt_ids();
 
 # Marpa::R3::Display::End
 
-    my $rule_names = join q{:}, @rule_names;
+    my $alt_names = join q{:}, @alt_names;
     Test::More::is(
-        $rule_names,
+        $alt_names,
         'first start rule:second start rule:start1:start2:[:start]',
-        q{Test of $grammar->g1_rule_name()}
+        q{Test of $grammar->alt_name()}
     );
 
     do_test(
