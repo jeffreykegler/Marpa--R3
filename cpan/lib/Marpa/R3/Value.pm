@@ -636,7 +636,7 @@ END_OF_LUA
 # For diagnostics
 sub g1_show_rule_list {
     my ( $slg, $rule_ids ) = @_;
-    my @rules = map { $slg->g1_rule_show($_) } @{$rule_ids};
+    my @rules = map { $slg->g1_rule_display($_) } @{$rule_ids};
     return join q{}, map { q{    } . $_ . "\n" } @rules;
 }
 
