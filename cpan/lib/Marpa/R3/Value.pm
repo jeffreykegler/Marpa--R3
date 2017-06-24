@@ -663,7 +663,7 @@ sub registrations_set {
             if ( $type eq 'rule' ) {
                 say {$trace_file_handle}
                   "Registering semantics for $type: ",
-                  $slg->g1_rule_show($id),
+                  $slg->g1_rule_display($id),
                   '  Semantics are ', $slg->show_semantics(@raw_ops)
                   or Marpa::R3::exception('Cannot say to trace file handle');
                 last PRINT_TRACES;
@@ -766,7 +766,7 @@ END_OF_LUA
 
                 Marpa::R3::exception(
                     q{Unknown semantics for rule },
-                    $slg->g1_rule_show($irlid),
+                    $slg->g1_rule_display($irlid),
                     "\n",
                     qq{    Semantics were specified as "$semantics"\n}
                 );
@@ -790,7 +790,7 @@ qq{Fatal error: Attempt to bless a rule that resolves to a scalar constant\n},
                             Data::Dumper::Dumper($closure),
                             qq{  Blessing is "$blessing"\n},
                             q{  Rule is: },
-                            $slg->g1_rule_show($irlid),
+                            $slg->g1_rule_display($irlid),
                             "\n",
 qq{  Cannot bless rule when it resolves to a scalar constant},
                             "\n",
@@ -803,7 +803,7 @@ qq{  Cannot bless rule when it resolves to a scalar constant},
                 Marpa::R3::exception(
                     qq{Cannot bless rule when the semantics are "$semantics"},
                     q{  Rule is: },
-                    $slg->g1_rule_show($irlid),
+                    $slg->g1_rule_display($irlid),
                     "\n",
                     qq{  Blessing is "$blessing"\n},
                     qq{  Semantics are "$semantics"\n}
@@ -855,7 +855,7 @@ END_OF_LUA
                 say {$trace_file_handle}
                   qq{Nulled symbol "$lhs_name" },
                   qq{ resolved to "$resolution_name" from rule },
-                  $slg->g1_rule_show($resolution_rule)
+                  $slg->g1_rule_display($resolution_rule)
                   or Marpa::R3::exception('print to trace handle failed');
             } ## end if ($trace_actions)
             $null_symbol_closures[$lhs_id] = $resolution_rule;
