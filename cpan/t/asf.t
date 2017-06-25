@@ -119,7 +119,7 @@ sub full_traverser {
         } ## end for my $rh_ix ( 0 .. $length - 1 )
 
         # Special case for the start rule
-        if ( $symbol_name eq '[:start]' ) {
+        if ( $symbol_name eq '[:start:]' ) {
             return [ map { join q{}, @{$_} } @results ];
         }
 

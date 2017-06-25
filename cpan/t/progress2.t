@@ -59,7 +59,7 @@ G1 R0 S ::= SS SS
 G1 R1 SS ::= A A A A A A A
 G1 R2 A ::=
 G1 R3 A ::= 'a'
-G1 R4 [:start] ::= S
+G1 R4 [:start:] ::= S
 EOS
 
 Marpa::R3::Test::is( $grammar->g1_show_symbols,
@@ -67,7 +67,7 @@ Marpa::R3::Test::is( $grammar->g1_show_symbols,
 G1 S0 A
 G1 S1 S
 G1 S2 SS
-G1 S3 [:start]
+G1 S3 [:start:]
 G1 S4 'a'
 EOS
 
@@ -95,8 +95,8 @@ Marpa::R3::Test::is( $grammar->show_nrls,
 19: SS[R1:5] -> A A[]
 20: SS[R1:5] -> A[] A
 21: A -> [Lex-0]
-22: [:start] -> S
-23: [:start]['] -> [:start]
+22: [:start:] -> S
+23: [:start:]['] -> [:start:]
 EOS
 
 }

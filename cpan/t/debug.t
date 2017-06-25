@@ -154,7 +154,7 @@ P1 @0-0 B0L0c0 statement -> . assignment
 P2 @0-0 B0L0c0 statement -> . <numeric assignment>
 P3 @0-0 B0L0c0 assignment -> . 'set' variable 'to' expression
 P4 @0-0 B0L0c0 <numeric assignment> -> . variable '=' expression
-P19 @0-0 B0L0c0 [:start] -> . statements
+P19 @0-0 B0L0c0 [:start:] -> . statements
 R4:1 @0-1 B1L1c1 <numeric assignment> -> variable . '=' expression
 R4:2 @0-2 B1L1c1-3 <numeric assignment> -> variable '=' . expression
 P5 @2-2 B1L1c5 expression -> . expression
@@ -176,7 +176,7 @@ F6 @2-3 B1L1c5-11 expression -> expression .
 F7 @2-3 B1L1c5-11 expression -> expression .
 F8 @2-3 B1L1c5-11 expression -> variable .
 R11:1 @2-3 B1L1c5-11 expression -> expression . '+' expression
-F19 @0-3 B1L1c1-11 [:start] -> statements .
+F19 @0-3 B1L1c1-11 [:start:] -> statements .
 P7 @4-4 B1L1c15 expression -> . expression
 P8 @4-4 B1L1c15 expression -> . variable
 P9 @4-4 B1L1c15 expression -> . string
@@ -194,7 +194,7 @@ F7 @4-5 B1L1c15-16 expression -> expression .
 F8 @4-5 B1L1c15-16 expression -> variable .
 R11:1 @2-5 B1L1c5-16 expression -> expression . '+' expression
 F11 @2-5 B1L1c5-16 expression -> expression '+' expression .
-F19 @0-5 B1L1c1-16 [:start] -> statements .
+F19 @0-5 B1L1c1-16 [:start:] -> statements .
 END_PROGRESS_REPORT
 
 # Marpa::R3::Display::End
@@ -551,9 +551,9 @@ G1 R17 <numeric expression> ::= <numeric expression> '+' <numeric expression>
 G1 R18 <numeric expression> ::= <numeric expression> '*' <numeric expression>
   Symbol IDs: <18> ::= <18> <9> <19>
   Internal symbols: <numeric expression[0]> ::= <numeric expression[0]> <[Lex-8]> <numeric expression[1]>
-G1 R19 [:start] ::= statements
+G1 R19 [:start:] ::= statements
   Symbol IDs: <0> ::= <22>
-  Internal symbols: <[:start]> ::= <statements>
+  Internal symbols: <[:start:]> ::= <statements>
 Lex (L0) Rules:
 L0 R0 'set' ::= [s] [e] [t]
   Symbol IDs: <1> ::= <26> <20> <27>
@@ -662,9 +662,9 @@ $show_symbols_output .= $grammar->l0_show_symbols(3);
 Marpa::R3::Test::is( $show_symbols_output,
     <<'END_OF_SHOW_SYMBOLS_OUTPUT', 'SLIF g1_show_symbols()' );
 G1 Symbols:
-G1 S0 [:start]
-  Internal name: <[:start]>
-  SLIF name: [:start]
+G1 S0 [:start:]
+  Internal name: <[:start:]>
+  SLIF name: [:start:]
 G1 S1 'set'
   /* terminal */
   Internal name: <[Lex-0]>
@@ -1052,9 +1052,9 @@ for my $symbol_id ( $grammar->g1_symbol_ids() ) {
 }
 
 Marpa::R3::Test::is( $text, <<'END_OF_TEXT', 'G1 symbol names and description');
-symbol number: 0  name: [:start]
-symbol number: 0  name in display form: [:start]
-symbol number: 0  DSL form: [:start]
+symbol number: 0  name: [:start:]
+symbol number: 0  name in display form: [:start:]
+symbol number: 0  DSL form: [:start:]
 symbol number: 1  name: [Lex-0]
 symbol number: 1  name in display form: 'set'
 symbol number: 1  DSL form: 'set'
@@ -1168,7 +1168,7 @@ expression ::= expression '+' expression
 <numeric expression> ::= number
 <numeric expression> ::= <numeric expression> '+' <numeric expression>
 <numeric expression> ::= <numeric expression> '*' <numeric expression>
-[:start] ::= statements
+[:start:] ::= statements
 END_OF_TEXT
 
 $text = q{};

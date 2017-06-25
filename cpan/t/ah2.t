@@ -57,14 +57,14 @@ Marpa::R3::Test::is( $grammar->g1_show_rules, <<'EOS', 'Aycock/Horspool Rules' )
 G1 R0 S ::= A A A A
 G1 R1 A ::=
 G1 R2 A ::= 'a'
-G1 R3 [:start] ::= S
+G1 R3 [:start:] ::= S
 EOS
 
 Marpa::R3::Test::is( $grammar->g1_show_symbols,
     <<'EOS', 'Aycock/Horspool Symbols' );
 G1 S0 A
 G1 S1 S
-G1 S2 [:start]
+G1 S2 [:start:]
 G1 S3 'a'
 EOS
 
@@ -74,12 +74,12 @@ Marpa::R3::Test::is( $grammar->show_nsys,
 1: A[], nulling
 2: S
 3: S[], nulling
-4: [:start]
-5: [:start][], nulling
+4: [:start:]
+5: [:start:][], nulling
 6: [Lex-0]
 7: S[R0:1]
 8: S[R0:2]
-9: [:start][']
+9: [:start:][']
 EOS
 
 Marpa::R3::Test::is( $grammar->show_nrls,
@@ -94,8 +94,8 @@ Marpa::R3::Test::is( $grammar->show_nrls,
 7: S[R0:2] -> A A[]
 8: S[R0:2] -> A[] A
 9: A -> [Lex-0]
-10: [:start] -> S
-11: [:start]['] -> [:start]
+10: [:start:] -> S
+11: [:start:]['] -> [:start:]
 EOS
 
 # TODO This is in term of ISYs. What about external symbols?
@@ -107,12 +107,12 @@ Marpa::R3::Test::is( $nulling_symbols, q{},
 
 my $productive_symbols = join q{ }, sort map { $grammar->g1_symbol_name($_) }
   grep { $grammar->g1_symbol_is_productive($_) } $grammar->g1_symbol_ids();
-Marpa::R3::Test::is( $productive_symbols, q{A S [:start] [Lex-0]},
+Marpa::R3::Test::is( $productive_symbols, q{A S [:start:] [Lex-0]},
     'Aycock/Horspool Productive Symbols' );
 
 my $accessible_symbols = join q{ }, sort map { $grammar->g1_symbol_name($_) }
   grep { $grammar->g1_symbol_is_accessible($_) } $grammar->g1_symbol_ids();
-Marpa::R3::Test::is( $accessible_symbols, q{A S [:start] [Lex-0]},
+Marpa::R3::Test::is( $accessible_symbols, q{A S [:start:] [Lex-0]},
     'Aycock/Horspool Accessible Symbols' );
 
 Marpa::R3::Test::is( $grammar->show_ahms(),
@@ -164,13 +164,13 @@ AHM 21: postdot = "[Lex-0]"
 AHM 22: completion
     A ::= [Lex-0] .
 AHM 23: postdot = "S"
-    [:start] ::= . S
+    [:start:] ::= . S
 AHM 24: completion
-    [:start] ::= S .
-AHM 25: postdot = "[:start]"
-    [:start]['] ::= . [:start]
+    [:start:] ::= S .
+AHM 25: postdot = "[:start:]"
+    [:start:]['] ::= . [:start:]
 AHM 26: completion
-    [:start]['] ::= [:start] .
+    [:start:]['] ::= [:start:] .
 EOS
 
 }
@@ -492,9 +492,9 @@ my $expected_earley_sets = <<'END_OF_SETS';
 Last Completed: 4; Furthest: 4
 Earley Set 0
 ahm25: R11:0@0-0
-  R11:0: [:start]['] ::= . [:start]
+  R11:0: [:start:]['] ::= . [:start:]
 ahm23: R10:0@0-0
-  R10:0: [:start] ::= . S
+  R10:0: [:start:] ::= . S
 ahm0: R0:0@0-0
   R0:0: S ::= . A S[R0:1]
 ahm3: R1:0@0-0
@@ -541,11 +541,11 @@ ahm1: R0:1@0-1
   R0:1: S ::= A . S[R0:1]
   [p=R0:0@0-0; c=R9$@0-1]
 ahm24: R10$@0-1
-  R10$: [:start] ::= S .
+  R10$: [:start:] ::= S .
   [p=R10:0@0-0; c=R1$@0-1]
   [p=R10:0@0-0; c=R2$@0-1]
 ahm26: R11$@0-1
-  R11$: [:start]['] ::= [:start] .
+  R11$: [:start:]['] ::= [:start:] .
   [p=R11:0@0-0; c=R10$@0-1]
 ahm6: R2$@0-1
   R2$: S ::= A[] S[R0:1] .
@@ -599,11 +599,11 @@ ahm6: R2$@0-2
   [p=R2:1@0-0; c=R3$@0-2]
   [p=R2:1@0-0; c=R5$@0-2]
 ahm24: R10$@0-2
-  R10$: [:start] ::= S .
+  R10$: [:start:] ::= S .
   [p=R10:0@0-0; c=R0$@0-2]
   [p=R10:0@0-0; c=R2$@0-2]
 ahm26: R11$@0-2
-  R11$: [:start]['] ::= [:start] .
+  R11$: [:start:]['] ::= [:start:] .
   [p=R11:0@0-0; c=R10$@0-2]
 ahm13: R5$@1-2
   R5$: S[R0:1] ::= A[] S[R0:2] .
@@ -651,11 +651,11 @@ ahm6: R2$@0-3
   R2$: S ::= A[] S[R0:1] .
   [p=R2:1@0-0; c=R3$@0-3]
 ahm24: R10$@0-3
-  R10$: [:start] ::= S .
+  R10$: [:start:] ::= S .
   [p=R10:0@0-0; c=R0$@0-3]
   [p=R10:0@0-0; c=R2$@0-3]
 ahm26: R11$@0-3
-  R11$: [:start]['] ::= [:start] .
+  R11$: [:start:]['] ::= [:start:] .
   [p=R11:0@0-0; c=R10$@0-3]
 ahm2: R0$@0-3
   R0$: S ::= A S[R0:1] .
@@ -681,10 +681,10 @@ ahm2: R0$@0-4
   R0$: S ::= A S[R0:1] .
   [p=R0:1@0-1; c=R3$@1-4]
 ahm24: R10$@0-4
-  R10$: [:start] ::= S .
+  R10$: [:start:] ::= S .
   [p=R10:0@0-0; c=R0$@0-4]
 ahm26: R11$@0-4
-  R11$: [:start]['] ::= [:start] .
+  R11$: [:start:]['] ::= [:start:] .
   [p=R11:0@0-0; c=R10$@0-4]
 END_OF_SETS
 

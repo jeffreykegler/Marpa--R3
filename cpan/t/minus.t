@@ -111,7 +111,7 @@ G1 R2 E ::= MinusMinus E
 G1 R3 E ::= Minus E
 G1 R4 E ::= Number
 G1 R5 MinusMinus ::= Minus Minus
-G1 R6 [:start] ::= E
+G1 R6 [:start:] ::= E
 END_RULES
 
 Marpa::R3::Test::is( $grammar->show_ahms,
@@ -153,13 +153,13 @@ AHM 16: postdot = "Minus"
 AHM 17: completion
     MinusMinus ::= Minus Minus .
 AHM 18: postdot = "E"
-    [:start] ::= . E
+    [:start:] ::= . E
 AHM 19: completion
-    [:start] ::= E .
-AHM 20: postdot = "[:start]"
-    [:start]['] ::= . [:start]
+    [:start:] ::= E .
+AHM 20: postdot = "[:start:]"
+    [:start:]['] ::= . [:start:]
 AHM 21: completion
-    [:start]['] ::= [:start] .
+    [:start:]['] ::= [:start:] .
 END_AHMS
 
 my %expected = map { ( $_ => 1 ) } (

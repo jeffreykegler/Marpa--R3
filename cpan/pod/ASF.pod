@@ -132,7 +132,7 @@ normalize-whitespace: 1
         my @return_value = map { $glade->rh_value($_) } 0 .. $length - 1;
 
         # Special case for the start rule
-        return ( join q{ }, @return_value ) . "\n" if $symbol_name eq '[:start]';
+        return ( join q{ }, @return_value ) . "\n" if $symbol_name eq '[:start:]';
 
         my $join_ws = q{ };
         $join_ws = qq{\n   } if $symbol_name eq 'S';
@@ -305,7 +305,7 @@ The C<rh_length()> method returns the length of the RHS,
 and the C<rh_value()> method returns the value of one of the
 RHS children, as determined using the traverser.
 
-At the peak of the ASF, the symbol will be named 'C<[:start]>'.
+At the peak of the ASF, the symbol will be named 'C<[:start:]>'.
 This case often requires special treatment.
 Note that it is entirely possible for the peak glade to be non-trivial.
 
@@ -672,7 +672,7 @@ normalize-whitespace: 1
             } ## end for my $rh_ix ( 0 .. $length - 1 )
 
             # Special case for the start rule
-            if ( $symbol_name eq '[:start]' ) {
+            if ( $symbol_name eq '[:start:]' ) {
                 return [ map { join q{}, @{$_} } @results ];
             }
 

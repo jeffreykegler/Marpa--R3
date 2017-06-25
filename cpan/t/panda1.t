@@ -133,7 +133,7 @@ sub full_traverser {
 # Marpa::R3::Display::End
 
         # Special case for the start rule: just collapse one level of lists
-        if ( $symbol_name eq '[:start]' ) {
+        if ( $symbol_name eq '[:start:]' ) {
             return [ map { join q{}, @{$_} } @results ];
         }
 
@@ -191,7 +191,7 @@ sub pruning_traverser {
 # Marpa::R3::Display::End
 
     # Special case for the start rule
-    return (join q{ }, @return_value) . "\n" if  $symbol_name eq '[:start]' ;
+    return (join q{ }, @return_value) . "\n" if  $symbol_name eq '[:start:]' ;
 
     my $join_ws = q{ };
     $join_ws = qq{\n   } if $symbol_name eq 'S';

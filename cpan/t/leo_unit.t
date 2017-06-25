@@ -54,7 +54,7 @@ Marpa::R3::Test::is( $grammar->g1_show_symbols(),
 G1 S0 A
 G1 S1 B
 G1 S2 C
-G1 S3 [:start]
+G1 S3 [:start:]
 G1 S4 a
 G1 S5 c
 END_OF_STRING
@@ -65,7 +65,7 @@ G1 R0 A ::= a B
 G1 R1 B ::= C
 G1 R2 C ::= c A
 G1 R3 C ::= c
-G1 R4 [:start] ::= A
+G1 R4 [:start:] ::= A
 END_OF_STRING
 
 
@@ -91,13 +91,13 @@ AHM 8: postdot = "c"
 AHM 9: completion
     C ::= c .
 AHM 10: postdot = "A"
-    [:start] ::= . A
+    [:start:] ::= . A
 AHM 11: completion
-    [:start] ::= A .
-AHM 12: postdot = "[:start]"
-    [:start]['] ::= . [:start]
+    [:start:] ::= A .
+AHM 12: postdot = "[:start:]"
+    [:start:]['] ::= . [:start:]
 AHM 13: completion
-    [:start]['] ::= [:start] .
+    [:start:]['] ::= [:start:] .
 END_OF_STRING
 
 my $recce = Marpa::R3::Scanless::R->new(

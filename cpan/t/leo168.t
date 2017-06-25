@@ -65,7 +65,7 @@ Marpa::R3::Test::is( $grammar->g1_show_symbols(),
     <<'END_OF_STRING', 'Leo168 Symbols' );
 G1 S0 C
 G1 S1 S
-G1 S2 [:start]
+G1 S2 [:start:]
 G1 S3 a
 G1 S4 b
 END_OF_STRING
@@ -76,7 +76,7 @@ G1 R0 S ::= a S
 G1 R1 S ::= C
 G1 R2 C ::= a C b
 G1 R3 C ::=
-G1 R4 [:start] ::= S
+G1 R4 [:start:] ::= S
 END_OF_STRING
 
 Marpa::R3::Test::is( $grammar->show_ahms, <<'END_OF_STRING', 'Leo168 AHMs' );
@@ -109,13 +109,13 @@ AHM 12: postdot = "b"
 AHM 13: completion
     C ::= a C[] b .
 AHM 14: postdot = "S"
-    [:start] ::= . S
+    [:start:] ::= . S
 AHM 15: completion
-    [:start] ::= S .
-AHM 16: postdot = "[:start]"
-    [:start]['] ::= . [:start]
+    [:start:] ::= S .
+AHM 16: postdot = "[:start:]"
+    [:start:]['] ::= . [:start:]
 AHM 17: completion
-    [:start]['] ::= [:start] .
+    [:start:]['] ::= [:start:] .
 END_OF_STRING
 
 my %expected = (

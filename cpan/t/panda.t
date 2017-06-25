@@ -163,7 +163,7 @@ sub full_traverser {
         } ## end for my $rh_ix ( 0 .. $length - 1 )
 
         # Special case for the start rule
-        if ( $symbol_name eq '[:start]' ) {
+        if ( $symbol_name eq '[:start:]' ) {
             return [ map { join q{}, @{$_} } @results ];
         }
 
@@ -224,7 +224,7 @@ sub pruning_traverser {
     my @return_value = map { $glade->rh_value($_) } 0 .. $length - 1;
 
     # Special case for the start rule
-    return ( join q{ }, @return_value ) . "\n" if  $symbol_name eq '[:start]';
+    return ( join q{ }, @return_value ) . "\n" if  $symbol_name eq '[:start:]';
 
     my $join_ws = q{ };
     $join_ws = qq{\n   } if $symbol_name eq 'S';
@@ -272,7 +272,7 @@ sub located_traverser {
     my @return_value = map { $glade->rh_value($_) } 0 .. $rh_length - 1;
 
     # Special case for the start rule
-    return ( join q{ }, @return_value) . "\n" if  $symbol_name eq '[:start]' ;
+    return ( join q{ }, @return_value) . "\n" if  $symbol_name eq '[:start:]' ;
 
 # Marpa::R3::Display::Start
 # name: ASF g1_span() traverser method example

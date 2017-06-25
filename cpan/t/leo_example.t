@@ -98,7 +98,7 @@ G1 S4 MinusAssignOp
 G1 S5 MultiplyAssignOp
 G1 S6 Statement
 G1 S7 Variable
-G1 S8 [:start]
+G1 S8 [:start:]
 END_SYMBOLS
 
 my $show_rules_output = $grammar->g1_show_rules();
@@ -111,7 +111,7 @@ G1 R3 Expression ::= Lvalue MinusAssignOp Expression
 G1 R4 Expression ::= Lvalue MultiplyAssignOp Expression
 G1 R5 Expression ::= Variable
 G1 R6 Lvalue ::= Variable
-G1 R7 [:start] ::= Statement
+G1 R7 [:start:] ::= Statement
 END_RULES
 
 my $show_ahms_output = $grammar->show_ahms();
@@ -162,13 +162,13 @@ AHM 20: postdot = "Variable"
 AHM 21: completion
     Lvalue ::= Variable .
 AHM 22: postdot = "Statement"
-    [:start] ::= . Statement
+    [:start:] ::= . Statement
 AHM 23: completion
-    [:start] ::= Statement .
-AHM 24: postdot = "[:start]"
-    [:start]['] ::= . [:start]
+    [:start:] ::= Statement .
+AHM 24: postdot = "[:start:]"
+    [:start:]['] ::= . [:start:]
 AHM 25: completion
-    [:start]['] ::= [:start] .
+    [:start:]['] ::= [:start:] .
 END_AHMS
 
 my $show_earley_sets_output_before = $recce->show_earley_sets();
@@ -178,9 +178,9 @@ Marpa::R3::Test::is( $show_earley_sets_output_before,
 Last Completed: 9; Furthest: 9
 Earley Set 0
 ahm24: R8:0@0-0
-  R8:0: [:start]['] ::= . [:start]
+  R8:0: [:start:]['] ::= . [:start:]
 ahm22: R7:0@0-0
-  R7:0: [:start] ::= . Statement
+  R7:0: [:start:] ::= . Statement
 ahm0: R0:0@0-0
   R0:0: Statement ::= . Expression
 ahm2: R1:0@0-0
@@ -206,10 +206,10 @@ ahm1: R0$@0-1
   R0$: Statement ::= Expression .
   [p=R0:0@0-0; c=R5$@0-1]
 ahm23: R7$@0-1
-  R7$: [:start] ::= Statement .
+  R7$: [:start:] ::= Statement .
   [p=R7:0@0-0; c=R0$@0-1]
 ahm25: R8$@0-1
-  R8$: [:start]['] ::= [:start] .
+  R8$: [:start:]['] ::= [:start:] .
   [p=R8:0@0-0; c=R7$@0-1]
 ahm15: R4:1@0-1
   R4:1: Expression ::= Lvalue . MultiplyAssignOp Expression
@@ -254,10 +254,10 @@ ahm1: R0$@0-3
   R0$: Statement ::= Expression .
   [p=R0:0@0-0; c=R1$@0-3]
 ahm23: R7$@0-3
-  R7$: [:start] ::= Statement .
+  R7$: [:start:] ::= Statement .
   [p=R7:0@0-0; c=R0$@0-3]
 ahm25: R8$@0-3
-  R8$: [:start]['] ::= [:start] .
+  R8$: [:start:]['] ::= [:start:] .
   [p=R8:0@0-0; c=R7$@0-3]
 ahm15: R4:1@2-3
   R4:1: Expression ::= Lvalue . MultiplyAssignOp Expression
@@ -302,10 +302,10 @@ ahm1: R0$@0-5
   R0$: Statement ::= Expression .
   [p=R0:0@0-0; c=R1$@0-5]
 ahm23: R7$@0-5
-  R7$: [:start] ::= Statement .
+  R7$: [:start:] ::= Statement .
   [p=R7:0@0-0; c=R0$@0-5]
 ahm25: R8$@0-5
-  R8$: [:start]['] ::= [:start] .
+  R8$: [:start:]['] ::= [:start:] .
   [p=R8:0@0-0; c=R7$@0-5]
 ahm15: R4:1@4-5
   R4:1: Expression ::= Lvalue . MultiplyAssignOp Expression
@@ -350,10 +350,10 @@ ahm1: R0$@0-7
   R0$: Statement ::= Expression .
   [p=R0:0@0-0; c=R1$@0-7]
 ahm23: R7$@0-7
-  R7$: [:start] ::= Statement .
+  R7$: [:start:] ::= Statement .
   [p=R7:0@0-0; c=R0$@0-7]
 ahm25: R8$@0-7
-  R8$: [:start]['] ::= [:start] .
+  R8$: [:start:]['] ::= [:start:] .
   [p=R8:0@0-0; c=R7$@0-7]
 ahm15: R4:1@6-7
   R4:1: Expression ::= Lvalue . MultiplyAssignOp Expression
@@ -398,10 +398,10 @@ ahm1: R0$@0-9
   R0$: Statement ::= Expression .
   [p=R0:0@0-0; c=R1$@0-9]
 ahm23: R7$@0-9
-  R7$: [:start] ::= Statement .
+  R7$: [:start:] ::= Statement .
   [p=R7:0@0-0; c=R0$@0-9]
 ahm25: R8$@0-9
-  R8$: [:start]['] ::= [:start] .
+  R8$: [:start:]['] ::= [:start:] .
   [p=R8:0@0-0; c=R7$@0-9]
 ahm15: R4:1@8-9
   R4:1: Expression ::= Lvalue . MultiplyAssignOp Expression
@@ -442,7 +442,7 @@ Popping 3 values to evaluate R1:3@0-9C2@2, rule: Expression ::= Lvalue AssignOp 
 Calculated and pushed value: 42
 Popping 1 values to evaluate R0:1@0-9C1@0, rule: Statement ::= Expression
 Calculated and pushed value: 'a=42 b=42 c=-5 d=6 e=3'
-New Virtual Rule: R8:1@0-9C7@0, rule: 8: [:start]['] -> [:start]
+New Virtual Rule: R8:1@0-9C7@0, rule: 8: [:start:]['] -> [:start:]
 Real symbol count is 1
 END_TRACE_OUTPUT
 

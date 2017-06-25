@@ -60,7 +60,7 @@ G1 S0 A
 G1 S1 B
 G1 S2 C
 G1 S3 S
-G1 S4 [:start]
+G1 S4 [:start:]
 G1 S5 a
 END_OF_STRING
 
@@ -71,7 +71,7 @@ G1 R1 A ::= B
 G1 R2 B ::= C
 G1 R3 C ::= S
 G1 R4 S ::=
-G1 R5 [:start] ::= S
+G1 R5 [:start:] ::= S
 END_OF_STRING
 
 Marpa::R3::Test::is( $grammar->show_ahms, <<'END_OF_STRING', 'Leo166 AHMs' );
@@ -98,13 +98,13 @@ AHM 9: postdot = "S"
 AHM 10: completion
     C ::= S .
 AHM 11: postdot = "S"
-    [:start] ::= . S
+    [:start:] ::= . S
 AHM 12: completion
-    [:start] ::= S .
-AHM 13: postdot = "[:start]"
-    [:start]['] ::= . [:start]
+    [:start:] ::= S .
+AHM 13: postdot = "[:start:]"
+    [:start:]['] ::= . [:start:]
 AHM 14: completion
-    [:start]['] ::= [:start] .
+    [:start:]['] ::= [:start:] .
 END_OF_STRING
 
 my $length = 20;

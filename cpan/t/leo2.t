@@ -140,7 +140,7 @@ R10:1 @40-41 B1L2c40 <subtract assignment> -> 'x' . '-=' expression
 F10 x2 @4,14-41 B1L1c10-L2c40 <subtract assignment> -> 'x' '-=' expression .
 R11:1 @40-41 B1L2c40 <plain assignment> -> 'x' . '=' expression
 F11 x12 @0...38-41 B1L1c1-L2c40 <plain assignment> -> 'x' '=' expression .
-F12 @0-41 B1L1c1-L2c40 [:start] -> expression .
+F12 @0-41 B1L1c1-L2c40 [:start:] -> expression .
 END_OF_OUTPUT
 
 # Marpa::R3::Display::End

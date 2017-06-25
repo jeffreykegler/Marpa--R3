@@ -62,7 +62,7 @@ G1 R0 S ::= p p p n
 G1 R1 p ::= a
 G1 R2 p ::=
 G1 R3 n ::= a
-G1 R4 [:start] ::= S
+G1 R4 [:start:] ::= S
 END_OF_STRING
 
 Marpa::R3::Test::is( $grammar->show_ahms,
@@ -110,13 +110,13 @@ AHM 19: postdot = "a"
 AHM 20: completion
     n ::= a .
 AHM 21: postdot = "S"
-    [:start] ::= . S
+    [:start:] ::= . S
 AHM 22: completion
-    [:start] ::= S .
-AHM 23: postdot = "[:start]"
-    [:start]['] ::= . [:start]
+    [:start:] ::= S .
+AHM 23: postdot = "[:start:]"
+    [:start:]['] ::= . [:start:]
 AHM 24: completion
-    [:start]['] ::= [:start] .
+    [:start:]['] ::= [:start:] .
 END_OF_STRING
 
 my @expected = map {

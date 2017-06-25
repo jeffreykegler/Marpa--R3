@@ -327,7 +327,7 @@ END_OF_LUA
         <<'END_OF_LUA', '');
         local grammar = ...
         local g1g = grammar.g1
-        g1g.start_name = '[:start]'
+        g1g.start_name = '[:start:]'
 END_OF_LUA
 
     for my $symbol ( sort keys %{ $hashed_source->{symbols}->{g1} } ) {

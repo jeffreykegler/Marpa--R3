@@ -57,7 +57,7 @@ G1 R1 A ::= 'a'
 G1 R2 B ::= 'a'
 G1 R3 B ::=
 G1 R4 C ::=
-G1 R5 [:start] ::= S
+G1 R5 [:start:] ::= S
 EOS
 
 my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );

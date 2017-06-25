@@ -107,7 +107,7 @@ Marpa::R3::Test::is( ${$actual_ref},
 G1 S0 E
 G1 S1 Number
 G1 S2 Op
-G1 S3 [:start]
+G1 S3 [:start:]
 END_SYMBOLS
 
 $actual_ref = save_stdout();
@@ -121,7 +121,7 @@ Marpa::R3::Test::is( ${$actual_ref},
     <<'END_RULES', 'Ambiguous Equation Rules' );
 G1 R0 E ::= E Op E
 G1 R1 E ::= Number
-G1 R2 [:start] ::= E
+G1 R2 [:start:] ::= E
 END_RULES
 
 $actual_ref = save_stdout();
@@ -146,13 +146,13 @@ AHM 4: postdot = "Number"
 AHM 5: completion
     E ::= Number .
 AHM 6: postdot = "E"
-    [:start] ::= . E
+    [:start:] ::= . E
 AHM 7: completion
-    [:start] ::= E .
-AHM 8: postdot = "[:start]"
-    [:start]['] ::= . [:start]
+    [:start:] ::= E .
+AHM 8: postdot = "[:start:]"
+    [:start:]['] ::= . [:start:]
 AHM 9: completion
-    [:start]['] ::= [:start] .
+    [:start:]['] ::= [:start:] .
 EOS
 
 my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
@@ -168,9 +168,9 @@ my $expected_earley_sets = <<'END_OF_EARLEY_SETS';
 Last Completed: 7; Furthest: 7
 Earley Set 0
 ahm8: R3:0@0-0
-  R3:0: [:start]['] ::= . [:start]
+  R3:0: [:start:]['] ::= . [:start:]
 ahm6: R2:0@0-0
-  R2:0: [:start] ::= . E
+  R2:0: [:start:] ::= . E
 ahm0: R0:0@0-0
   R0:0: E ::= . E Op E
 ahm4: R1:0@0-0
@@ -183,10 +183,10 @@ ahm1: R0:1@0-1
   R0:1: E ::= E . Op E
   [p=R0:0@0-0; c=R1$@0-1]
 ahm7: R2$@0-1
-  R2$: [:start] ::= E .
+  R2$: [:start:] ::= E .
   [p=R2:0@0-0; c=R1$@0-1]
 ahm9: R3$@0-1
-  R3$: [:start]['] ::= [:start] .
+  R3$: [:start:]['] ::= [:start:] .
   [p=R3:0@0-0; c=R2$@0-1]
 Earley Set 2
 ahm2: R0:2@0-2
@@ -210,10 +210,10 @@ ahm1: R0:1@0-3
   R0:1: E ::= E . Op E
   [p=R0:0@0-0; c=R0$@0-3]
 ahm7: R2$@0-3
-  R2$: [:start] ::= E .
+  R2$: [:start:] ::= E .
   [p=R2:0@0-0; c=R0$@0-3]
 ahm9: R3$@0-3
-  R3$: [:start]['] ::= [:start] .
+  R3$: [:start:]['] ::= [:start:] .
   [p=R3:0@0-0; c=R2$@0-3]
 Earley Set 4
 ahm2: R0:2@0-4
@@ -244,10 +244,10 @@ ahm1: R0:1@0-5
   R0:1: E ::= E . Op E
   [p=R0:0@0-0; c=R0$@0-5]
 ahm7: R2$@0-5
-  R2$: [:start] ::= E .
+  R2$: [:start:] ::= E .
   [p=R2:0@0-0; c=R0$@0-5]
 ahm9: R3$@0-5
-  R3$: [:start]['] ::= [:start] .
+  R3$: [:start:]['] ::= [:start:] .
   [p=R3:0@0-0; c=R2$@0-5]
 ahm1: R0:1@2-5
   R0:1: E ::= E . Op E
@@ -292,10 +292,10 @@ ahm1: R0:1@0-7
   R0:1: E ::= E . Op E
   [p=R0:0@0-0; c=R0$@0-7]
 ahm7: R2$@0-7
-  R2$: [:start] ::= E .
+  R2$: [:start:] ::= E .
   [p=R2:0@0-0; c=R0$@0-7]
 ahm9: R3$@0-7
-  R3$: [:start]['] ::= [:start] .
+  R3$: [:start:]['] ::= [:start:] .
   [p=R3:0@0-0; c=R2$@0-7]
 ahm1: R0:1@4-7
   R0:1: E ::= E . Op E
@@ -317,7 +317,7 @@ Marpa::R3::Test::is( ${$actual_ref},
 R0:1 x4 @0...6-7 B1L1c1-7 E -> E . Op E
 F0 x3 @0,2,4-7 B1L1c1-7 E -> E Op E .
 F1 @6-7 B1L1c7 E -> Number .
-F2 @0-7 B1L1c1-7 [:start] -> E .
+F2 @0-7 B1L1c1-7 [:start:] -> E .
 END_OF_PROGRESS_REPORT
 
 restore_stdout();

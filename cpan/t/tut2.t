@@ -98,7 +98,7 @@ G1 S1 Expression
 G1 S2 Factor
 G1 S3 Number
 G1 S4 Term
-G1 S5 [:start]
+G1 S5 [:start:]
 G1 S6 '*'
 G1 S7 '+'
 END_SYMBOLS
@@ -113,7 +113,7 @@ G1 R2 Term ::= Term '*' Factor
 G1 R3 Term ::= Factor
 G1 R4 Expression ::= Expression '+' Term
 G1 R5 Expression ::= Term
-G1 R6 [:start] ::= Calculator
+G1 R6 [:start:] ::= Calculator
 END_RULES
 
 my $show_ahms_output = $grammar->show_ahms();
@@ -153,13 +153,13 @@ AHM 14: postdot = "Term"
 AHM 15: completion
     Expression ::= Term .
 AHM 16: postdot = "Calculator"
-    [:start] ::= . Calculator
+    [:start:] ::= . Calculator
 AHM 17: completion
-    [:start] ::= Calculator .
-AHM 18: postdot = "[:start]"
-    [:start]['] ::= . [:start]
+    [:start:] ::= Calculator .
+AHM 18: postdot = "[:start:]"
+    [:start:]['] ::= . [:start:]
 AHM 19: completion
-    [:start]['] ::= [:start] .
+    [:start:]['] ::= [:start:] .
 END_AHM
 
 my $show_earley_sets_output = $recce->show_earley_sets();
@@ -168,9 +168,9 @@ my $expected_earley_sets = <<'END_EARLEY_SETS';
 Last Completed: 5; Furthest: 5
 Earley Set 0
 ahm18: R7:0@0-0
-  R7:0: [:start]['] ::= . [:start]
+  R7:0: [:start:]['] ::= . [:start:]
 ahm16: R6:0@0-0
-  R6:0: [:start] ::= . Calculator
+  R6:0: [:start:] ::= . Calculator
 ahm0: R0:0@0-0
   R0:0: Calculator ::= . Expression
 ahm10: R4:0@0-0
@@ -203,10 +203,10 @@ ahm1: R0$@0-1
   R0$: Calculator ::= Expression .
   [p=R0:0@0-0; c=R5$@0-1]
 ahm17: R6$@0-1
-  R6$: [:start] ::= Calculator .
+  R6$: [:start:] ::= Calculator .
   [p=R6:0@0-0; c=R0$@0-1]
 ahm19: R7$@0-1
-  R7$: [:start]['] ::= [:start] .
+  R7$: [:start:]['] ::= [:start:] .
   [p=R7:0@0-0; c=R6$@0-1]
 Earley Set 2
 ahm6: R2:2@0-2
@@ -234,10 +234,10 @@ ahm1: R0$@0-3
   R0$: Calculator ::= Expression .
   [p=R0:0@0-0; c=R5$@0-3]
 ahm17: R6$@0-3
-  R6$: [:start] ::= Calculator .
+  R6$: [:start:] ::= Calculator .
   [p=R6:0@0-0; c=R0$@0-3]
 ahm19: R7$@0-3
-  R7$: [:start]['] ::= [:start] .
+  R7$: [:start:]['] ::= [:start:] .
   [p=R7:0@0-0; c=R6$@0-3]
 Earley Set 4
 ahm12: R4:2@0-4
@@ -269,10 +269,10 @@ ahm1: R0$@0-5
   R0$: Calculator ::= Expression .
   [p=R0:0@0-0; c=R4$@0-5]
 ahm17: R6$@0-5
-  R6$: [:start] ::= Calculator .
+  R6$: [:start:] ::= Calculator .
   [p=R6:0@0-0; c=R0$@0-5]
 ahm19: R7$@0-5
-  R7$: [:start]['] ::= [:start] .
+  R7$: [:start:]['] ::= [:start:] .
   [p=R7:0@0-0; c=R6$@0-5]
 END_EARLEY_SETS
 
@@ -337,7 +337,7 @@ value event: starting op MARPA_STEP_RULE lua
 value event: starting lua op MARPA_STEP_RULE result_is_n_of_rhs
 value event: starting op MARPA_STEP_RULE lua
 value event: starting lua op MARPA_STEP_RULE result_is_n_of_rhs
-New Virtual Rule: R7:1@0-5C6@0, rule: 7: [:start]['] -> [:start]
+New Virtual Rule: R7:1@0-5C6@0, rule: 7: [:start:]['] -> [:start:]
 Real symbol count is 1
 END_TRACE_OUTPUT
 

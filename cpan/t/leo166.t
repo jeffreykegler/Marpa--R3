@@ -46,14 +46,14 @@ my $grammar = Marpa::R3::Scanless::G->new( { source => \$dsl } );
 Marpa::R3::Test::is( $grammar->g1_show_symbols(),
     <<'END_OF_STRING', 'Leo166 Symbols' );
 G1 S0 S
-G1 S1 [:start]
+G1 S1 [:start:]
 G1 S2 a
 END_OF_STRING
 
 Marpa::R3::Test::is( $grammar->g1_show_rules, <<'END_OF_STRING', 'Leo166 Rules' );
 G1 R0 S ::= a S
 G1 R1 S ::=
-G1 R2 [:start] ::= S
+G1 R2 [:start:] ::= S
 END_OF_STRING
 
 Marpa::R3::Test::is( $grammar->show_ahms, <<'END_OF_STRING', 'Leo166 AHMs' );
@@ -68,13 +68,13 @@ AHM 3: postdot = "a"
 AHM 4: completion
     S ::= a S[] .
 AHM 5: postdot = "S"
-    [:start] ::= . S
+    [:start:] ::= . S
 AHM 6: completion
-    [:start] ::= S .
-AHM 7: postdot = "[:start]"
-    [:start]['] ::= . [:start]
+    [:start:] ::= S .
+AHM 7: postdot = "[:start:]"
+    [:start:]['] ::= . [:start:]
 AHM 8: completion
-    [:start]['] ::= [:start] .
+    [:start:]['] ::= [:start:] .
 END_OF_STRING
 
 my $length = 50;

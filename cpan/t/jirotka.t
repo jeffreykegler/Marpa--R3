@@ -108,7 +108,7 @@ G1 S19 TypeDef
 G1 S20 WHERE
 G1 S21 WITH
 G1 S22 WithPf
-G1 S23 [:start]
+G1 S23 [:start:]
 G1 S24 SEPARATOR
 END_OF_SYMBOLS
 
@@ -129,7 +129,7 @@ G1 R11 FilterExpr ::= TRUE
 G1 R12 FilterExpr ::= FALSE
 G1 R13 WithPf ::=
 G1 R14 WithPf ::= WITH PF
-G1 R15 [:start] ::= Input
+G1 R15 [:start:] ::= Input
 END_OF_RULES
 
 Marpa::R3::Test::is( $grammar->show_ahms(),
@@ -265,13 +265,13 @@ AHM 63: postdot = "PF"
 AHM 64: completion
     WithPf ::= WITH PF .
 AHM 65: postdot = "Input"
-    [:start] ::= . Input
+    [:start:] ::= . Input
 AHM 66: completion
-    [:start] ::= Input .
-AHM 67: postdot = "[:start]"
-    [:start]['] ::= . [:start]
+    [:start:] ::= Input .
+AHM 67: postdot = "[:start:]"
+    [:start:]['] ::= . [:start:]
 AHM 68: completion
-    [:start]['] ::= [:start] .
+    [:start:]['] ::= [:start:] .
 END_OF_AHMS
 
 my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
@@ -283,9 +283,9 @@ Marpa::R3::Test::is( $recce->show_earley_sets(),
 Last Completed: 8; Furthest: 8
 Earley Set 0
 ahm67: R24:0@0-0
-  R24:0: [:start]['] ::= . [:start]
+  R24:0: [:start:]['] ::= . [:start:]
 ahm65: R23:0@0-0
-  R23:0: [:start] ::= . Input
+  R23:0: [:start:] ::= . Input
 ahm0: R0:0@0-0
   R0:0: Input ::= . Input[Seq]
 ahm2: R1:0@0-0
@@ -372,10 +372,10 @@ ahm1: R0$@0-6
   R0$: Input ::= Input[Seq] .
   [p=R0:0@0-0; c=R2$@0-6]
 ahm66: R23$@0-6
-  R23$: [:start] ::= Input .
+  R23$: [:start:] ::= Input .
   [p=R23:0@0-0; c=R0$@0-6]
 ahm68: R24$@0-6
-  R24$: [:start]['] ::= [:start] .
+  R24$: [:start:]['] ::= [:start:] .
   [p=R24:0@0-0; c=R23$@0-6]
 ahm51: R17:0@6-6
   R17:0: ByClause ::= . BY
@@ -443,10 +443,10 @@ ahm1: R0$@0-8
   R0$: Input ::= Input[Seq] .
   [p=R0:0@0-0; c=R2$@0-8]
 ahm66: R23$@0-8
-  R23$: [:start] ::= Input .
+  R23$: [:start:] ::= Input .
   [p=R23:0@0-0; c=R0$@0-8]
 ahm68: R24$@0-8
-  R24$: [:start]['] ::= [:start] .
+  R24$: [:start:]['] ::= [:start:] .
   [p=R24:0@0-0; c=R23$@0-8]
 ahm62: R22:0@8-8
   R22:0: WithPf ::= . WITH PF

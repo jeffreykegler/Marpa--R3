@@ -244,12 +244,12 @@ $hashed_metag = {
                                'g1' => [
                                          {
                                            'action' => '::first',
-                                           'lhs' => '[:start]',
+                                           'lhs' => '[:start:]',
                                            'rhs' => [
                                                       'statements'
                                                     ],
                                            'subgrammar' => 'g1',
-                                           'xbnfid' => 'g1,[:start],statements'
+                                           'xbnfid' => 'g1,[:start:],statements'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -2792,10 +2792,10 @@ $hashed_metag = {
                                                             'wsyid' => 709,
                                                             'xsy' => 'Perl name'
                                                           },
-                                           '[:start]' => {
-                                                           'wsyid' => 592,
-                                                           'xsy' => '[:start]'
-                                                         },
+                                           '[:start:]' => {
+                                                            'wsyid' => 592,
+                                                            'xsy' => '[:start:]'
+                                                          },
                                            '[Lex-0]' => {
                                                           'wsyid' => 1,
                                                           'xsy' => '[Lex-0]'
@@ -4125,16 +4125,16 @@ $hashed_metag = {
                                },
                   'xbnf' => {
                               'g1' => {
-                                        'g1,[:start],statements' => {
-                                                                      'action' => '::first',
-                                                                      'length' => 0,
-                                                                      'lhs' => '[:start]',
-                                                                      'rhs' => [
-                                                                                 'statements'
-                                                                               ],
-                                                                      'start' => 0,
-                                                                      'subkey' => 0
-                                                                    },
+                                        'g1,[:start:],statements' => {
+                                                                       'action' => '::first',
+                                                                       'length' => 0,
+                                                                       'lhs' => '[:start:]',
+                                                                       'rhs' => [
+                                                                                  'statements'
+                                                                                ],
+                                                                       'start' => 0,
+                                                                       'subkey' => 0
+                                                                     },
                                         'g1,action name,Perl name' => {
                                                                         'action' => '[start,length,values]',
                                                                         'bless' => 'action_name',
@@ -9190,10 +9190,10 @@ $hashed_metag = {
                                               'dsl_form' => 'Perl name',
                                               'name_source' => 'lexical'
                                             },
-                             '[:start]' => {
-                                             'dsl_form' => '[:start]',
-                                             'name_source' => 'internal'
-                                           },
+                             '[:start:]' => {
+                                              'dsl_form' => '[:start:]',
+                                              'name_source' => 'internal'
+                                            },
                              '[Lex-0]' => {
                                             'dsl_form' => '\';\'',
                                             'name_source' => 'internal'

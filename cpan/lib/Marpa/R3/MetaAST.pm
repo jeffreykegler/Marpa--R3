@@ -94,7 +94,7 @@ sub ast_to_hash {
           // $hashed_ast->{'first_lhs'};
         Marpa::R3::exception('No rules in SLIF grammar')
           if not defined $start_lhs;
-        my $augment_lhs = '[:start]';
+        my $augment_lhs = '[:start:]';
         my $symbol_data = {
             dsl_form    => $augment_lhs,
             name_source => 'internal',
