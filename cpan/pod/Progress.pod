@@ -1336,15 +1336,15 @@ partial: 1
     L0 R12 <string contents> ::= [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] +
       Symbol IDs: <30> ::= <19>
       Internal symbols: <string contents> ::= <[[^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}]]>
-    L0 R13 [:discard] ::= whitespace
+    L0 R13 [:discard:] ::= whitespace
       Symbol IDs: <0> ::= <32>
-      Internal symbols: <[:discard]> ::= <whitespace>
+      Internal symbols: <[:discard:]> ::= <whitespace>
     L0 R14 whitespace ::= [\s] +
       Symbol IDs: <32> ::= <17>
       Internal symbols: <whitespace> ::= <[[\s]]>
-    L0 R15 [:start_lex] ::= [:discard]
+    L0 R15 [:start_lex] ::= [:discard:]
       Symbol IDs: <33> ::= <0>
-      Internal symbols: <[:start_lex]> ::= <[:discard]>
+      Internal symbols: <[:start_lex]> ::= <[:discard:]>
     L0 R16 [:start_lex] ::= 'set'
       Symbol IDs: <33> ::= <1>
       Internal symbols: <[:start_lex]> ::= <[Lex-0]>
@@ -1480,8 +1480,8 @@ partial: 1
       Internal name: <variable>
       SLIF name: variable
     Lex (L0) Symbols:
-    L0 S0 [:discard]
-      Internal name: <[:discard]>
+    L0 S0 [:discard:]
+      Internal name: <[:discard:]>
     L0 S1 'set'
       Internal name: <[Lex-0]>
       SLIF name: 'set'

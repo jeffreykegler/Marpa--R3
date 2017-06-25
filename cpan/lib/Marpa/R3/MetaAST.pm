@@ -1175,7 +1175,7 @@ sub Marpa::R3::Internal::MetaAST_Nodes::discard_rule::evaluate {
     my ( $start, $length, $symbol, $raw_adverb_list ) = @{$values};
 
     local $Marpa::R3::Internal::SUBGRAMMAR = 'l0';
-    my $pseudo_lhs = '[:discard]';
+    my $pseudo_lhs = '[:discard:]';
     $parse->symbol_names_set(
         $pseudo_lhs,
         'l0',

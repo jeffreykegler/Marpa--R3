@@ -594,15 +594,15 @@ L0 R11 string ::= ['] <string contents> [']
 L0 R12 <string contents> ::= [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] +
   Symbol IDs: <30> ::= <19>
   Internal symbols: <string contents> ::= <[[^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}]]>
-L0 R13 [:discard] ::= whitespace
+L0 R13 [:discard:] ::= whitespace
   Symbol IDs: <0> ::= <32>
-  Internal symbols: <[:discard]> ::= <whitespace>
+  Internal symbols: <[:discard:]> ::= <whitespace>
 L0 R14 whitespace ::= [\s] +
   Symbol IDs: <32> ::= <17>
   Internal symbols: <whitespace> ::= <[[\s]]>
-L0 R15 [:start_lex] ::= [:discard]
+L0 R15 [:start_lex] ::= [:discard:]
   Symbol IDs: <33> ::= <0>
-  Internal symbols: <[:start_lex]> ::= <[:discard]>
+  Internal symbols: <[:start_lex]> ::= <[:discard:]>
 L0 R16 [:start_lex] ::= 'set'
   Symbol IDs: <33> ::= <1>
   Internal symbols: <[:start_lex]> ::= <[Lex-0]>
@@ -750,8 +750,8 @@ G1 S24 variable
   Internal name: <variable>
   SLIF name: variable
 Lex (L0) Symbols:
-L0 S0 [:discard]
-  Internal name: <[:discard]>
+L0 S0 [:discard:]
+  Internal name: <[:discard:]>
 L0 S1 'set'
   Internal name: <[Lex-0]>
   SLIF name: 'set'
@@ -1204,9 +1204,9 @@ variable ::= [\w] +
 number ::= [\d] +
 string ::= ['] <string contents> [']
 <string contents> ::= [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] +
-[:discard] ::= whitespace
+[:discard:] ::= whitespace
 whitespace ::= [\s] +
-[:start_lex] ::= [:discard]
+[:start_lex] ::= [:discard:]
 [:start_lex] ::= 'set'
 [:start_lex] ::= 'to'
 [:start_lex] ::= '='
@@ -1254,8 +1254,8 @@ for my $symbol_id ( $grammar->l0_symbol_ids() ) {
 }
 
 Marpa::R3::Test::is( $text, <<'END_OF_TEXT', 'L0 symbol names and description');
-L0 symbol number: 0  name: [:discard]
-L0 symbol number: 0  name in display form: [:discard]
+L0 symbol number: 0  name: [:discard:]
+L0 symbol number: 0  name in display form: [:discard:]
 L0 symbol number: 0  DSL form: [No name in DSL form]
 L0 symbol number: 1  name: [Lex-0]
 L0 symbol number: 1  name in display form: 'set'

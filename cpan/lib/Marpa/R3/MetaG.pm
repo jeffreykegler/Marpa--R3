@@ -1336,20 +1336,20 @@ $hashed_metag = {
                                            'xbnfid' => 'l0,Perl name,Perl identifier'
                                          },
                                          {
-                                           'lhs' => '[:discard]',
+                                           'lhs' => '[:discard:]',
                                            'rhs' => [
                                                       'hash comment'
                                                     ],
                                            'subgrammar' => 'l0',
-                                           'xbnfid' => 'l0,[:discard],hash comment'
+                                           'xbnfid' => 'l0,[:discard:],hash comment'
                                          },
                                          {
-                                           'lhs' => '[:discard]',
+                                           'lhs' => '[:discard:]',
                                            'rhs' => [
                                                       'whitespace'
                                                     ],
                                            'subgrammar' => 'l0',
-                                           'xbnfid' => 'l0,[:discard],whitespace'
+                                           'xbnfid' => 'l0,[:discard:],whitespace'
                                          },
                                          {
                                            'lhs' => '[Lex-0]',
@@ -3435,9 +3435,9 @@ $hashed_metag = {
                                                             'wsyid' => 614,
                                                             'xsy' => 'Perl name'
                                                           },
-                                           '[:discard]' => {
-                                                             'wsyid' => 460
-                                                           },
+                                           '[:discard:]' => {
+                                                              'wsyid' => 460
+                                                            },
                                            '[Lex-0]' => {
                                                           'wsyid' => 2,
                                                           'xsy' => '[Lex-0]'
@@ -6013,26 +6013,26 @@ $hashed_metag = {
                                                                             'subkey' => 0,
                                                                             'xrlid' => 'Perl name@5865+72'
                                                                           },
-                                        'l0,[:discard],hash comment' => {
-                                                                          'length' => 25,
-                                                                          'lhs' => '[:discard]',
-                                                                          'rhs' => [
-                                                                                     'hash comment'
-                                                                                   ],
-                                                                          'start' => 4802,
-                                                                          'subkey' => 0,
-                                                                          'symbol_as_event' => 'hash comment'
-                                                                        },
-                                        'l0,[:discard],whitespace' => {
-                                                                        'length' => 21,
-                                                                        'lhs' => '[:discard]',
-                                                                        'rhs' => [
-                                                                                   'whitespace'
-                                                                                 ],
-                                                                        'start' => 4743,
-                                                                        'subkey' => 0,
-                                                                        'symbol_as_event' => 'whitespace'
-                                                                      },
+                                        'l0,[:discard:],hash comment' => {
+                                                                           'length' => 25,
+                                                                           'lhs' => '[:discard:]',
+                                                                           'rhs' => [
+                                                                                      'hash comment'
+                                                                                    ],
+                                                                           'start' => 4802,
+                                                                           'subkey' => 0,
+                                                                           'symbol_as_event' => 'hash comment'
+                                                                         },
+                                        'l0,[:discard:],whitespace' => {
+                                                                         'length' => 21,
+                                                                         'lhs' => '[:discard:]',
+                                                                         'rhs' => [
+                                                                                    'whitespace'
+                                                                                  ],
+                                                                         'start' => 4743,
+                                                                         'subkey' => 0,
+                                                                         'symbol_as_event' => 'whitespace'
+                                                                       },
                                         'l0,[Lex-0],[[\\;]]' => {
                                                                   'length' => 3,
                                                                   'lhs' => '[Lex-0]',

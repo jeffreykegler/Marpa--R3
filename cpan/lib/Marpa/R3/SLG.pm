@@ -464,7 +464,7 @@ END_OF_LUA
 
     my @discard_event_by_lexer_rule_id = ();
     state $lex_start_symbol_name = '[:start_lex]';
-    state $discard_symbol_name   = '[:discard]';
+    state $discard_symbol_name   = '[:discard:]';
 
     my $lexer_rules          = $hashed_source->{rules}->{'l0'};
     my $character_class_hash = $hashed_source->{character_classes};
@@ -478,14 +478,14 @@ END_OF_LUA
         $lexer_rules = [
             {
                 'rhs'             => ['[[^\\d\\D]]'],
-                'lhs'             => '[:discard]',
+                'lhs'             => '[:discard:]',
                 'symbol_as_event' => '[^\\d\\D]',
 
                 # 'description' => 'Discard rule for <[[^\\d\\D]]>'
             },
         ];
         $lexer_symbols = {
-            '[:discard]' => {
+            '[:discard:]' => {
 
                 # 'description'  => 'Internal LHS for lexer "L0" discard'
             },
