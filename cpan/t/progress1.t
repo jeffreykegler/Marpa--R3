@@ -70,27 +70,27 @@ EOS
 
 Marpa::R3::Test::is( $grammar->show_nrls,
     <<'EOS', 'Aycock/Horspool IRLs' );
-0: S -> A S[R0:1]
-1: S -> A A[] A[] A[] A[] A[] A[]
-2: S -> A[] S[R0:1]
-3: S[R0:1] -> A S[R0:2]
-4: S[R0:1] -> A A[] A[] A[] A[] A[]
-5: S[R0:1] -> A[] S[R0:2]
-6: S[R0:2] -> A S[R0:3]
-7: S[R0:2] -> A A[] A[] A[] A[]
-8: S[R0:2] -> A[] S[R0:3]
-9: S[R0:3] -> A S[R0:4]
-10: S[R0:3] -> A A[] A[] A[]
-11: S[R0:3] -> A[] S[R0:4]
-12: S[R0:4] -> A S[R0:5]
-13: S[R0:4] -> A A[] A[]
-14: S[R0:4] -> A[] S[R0:5]
-15: S[R0:5] -> A A
-16: S[R0:5] -> A A[]
-17: S[R0:5] -> A[] A
-18: A -> [Lex-0]
-19: [:start:] -> S
-20: [:start:]['] -> [:start:]
+0: S ::= A S[R0:1]
+1: S ::= A A[] A[] A[] A[] A[] A[]
+2: S ::= A[] S[R0:1]
+3: S[R0:1] ::= A S[R0:2]
+4: S[R0:1] ::= A A[] A[] A[] A[] A[]
+5: S[R0:1] ::= A[] S[R0:2]
+6: S[R0:2] ::= A S[R0:3]
+7: S[R0:2] ::= A A[] A[] A[] A[]
+8: S[R0:2] ::= A[] S[R0:3]
+9: S[R0:3] ::= A S[R0:4]
+10: S[R0:3] ::= A A[] A[] A[]
+11: S[R0:3] ::= A[] S[R0:4]
+12: S[R0:4] ::= A S[R0:5]
+13: S[R0:4] ::= A A[] A[]
+14: S[R0:4] ::= A[] S[R0:5]
+15: S[R0:5] ::= A A
+16: S[R0:5] ::= A A[]
+17: S[R0:5] ::= A[] A
+18: A ::= [Lex-0]
+19: [:start:] ::= S
+20: [:start:]['] ::= [:start:]
 EOS
 
 }
@@ -114,7 +114,7 @@ sub earley_set_display {
         my $desc .=
             "S:$dot " . '@'
           . "$origin-$earley_set "
-          . $grammar->g1_show_dotted_rule( $rule_id, $dot );
+          . $grammar->g1_dotted_rule_show( $rule_id, $dot );
         my $raw_dot = $dot < 0 ? $target_rule_length : $dot;
         my @datum = ( $raw_dot, $origin, $rule_id, $dot, $origin, $desc );
         push @data, \@datum;
@@ -125,69 +125,69 @@ sub earley_set_display {
 
 Marpa::R3::Test::is( earley_set_display(0), <<'EOS', 'Earley Set 0' );
 === Earley Set 0 ===
-S:0 @0-0 S -> . A A A A A A A
-S:1 @0-0 S -> A . A A A A A A
-S:2 @0-0 S -> A A . A A A A A
-S:3 @0-0 S -> A A A . A A A A
-S:4 @0-0 S -> A A A A . A A A
-S:5 @0-0 S -> A A A A A . A A
-S:6 @0-0 S -> A A A A A A . A
+S:0 @0-0 S ::= . A A A A A A A
+S:1 @0-0 S ::= A . A A A A A A
+S:2 @0-0 S ::= A A . A A A A A
+S:3 @0-0 S ::= A A A . A A A A
+S:4 @0-0 S ::= A A A A . A A A
+S:5 @0-0 S ::= A A A A A . A A
+S:6 @0-0 S ::= A A A A A A . A
 EOS
 
 Marpa::R3::Test::is( earley_set_display(1), <<'EOS', 'Earley Set 1' );
 === Earley Set 1 ===
-S:1 @0-1 S -> A . A A A A A A
-S:2 @0-1 S -> A A . A A A A A
-S:3 @0-1 S -> A A A . A A A A
-S:4 @0-1 S -> A A A A . A A A
-S:5 @0-1 S -> A A A A A . A A
-S:6 @0-1 S -> A A A A A A . A
-S:-1 @0-1 S -> A A A A A A A .
+S:1 @0-1 S ::= A . A A A A A A
+S:2 @0-1 S ::= A A . A A A A A
+S:3 @0-1 S ::= A A A . A A A A
+S:4 @0-1 S ::= A A A A . A A A
+S:5 @0-1 S ::= A A A A A . A A
+S:6 @0-1 S ::= A A A A A A . A
+S:-1 @0-1 S ::= A A A A A A A .
 EOS
 
 Marpa::R3::Test::is( earley_set_display(2), <<'EOS', 'Earley Set 2' );
 === Earley Set 2 ===
-S:2 @0-2 S -> A A . A A A A A
-S:3 @0-2 S -> A A A . A A A A
-S:4 @0-2 S -> A A A A . A A A
-S:5 @0-2 S -> A A A A A . A A
-S:6 @0-2 S -> A A A A A A . A
-S:-1 @0-2 S -> A A A A A A A .
+S:2 @0-2 S ::= A A . A A A A A
+S:3 @0-2 S ::= A A A . A A A A
+S:4 @0-2 S ::= A A A A . A A A
+S:5 @0-2 S ::= A A A A A . A A
+S:6 @0-2 S ::= A A A A A A . A
+S:-1 @0-2 S ::= A A A A A A A .
 EOS
 
 Marpa::R3::Test::is( earley_set_display(3), <<'EOS', 'Earley Set 3' );
 === Earley Set 3 ===
-S:3 @0-3 S -> A A A . A A A A
-S:4 @0-3 S -> A A A A . A A A
-S:5 @0-3 S -> A A A A A . A A
-S:6 @0-3 S -> A A A A A A . A
-S:-1 @0-3 S -> A A A A A A A .
+S:3 @0-3 S ::= A A A . A A A A
+S:4 @0-3 S ::= A A A A . A A A
+S:5 @0-3 S ::= A A A A A . A A
+S:6 @0-3 S ::= A A A A A A . A
+S:-1 @0-3 S ::= A A A A A A A .
 EOS
 
 Marpa::R3::Test::is( earley_set_display(4), <<'EOS', 'Earley Set 4' );
 === Earley Set 4 ===
-S:4 @0-4 S -> A A A A . A A A
-S:5 @0-4 S -> A A A A A . A A
-S:6 @0-4 S -> A A A A A A . A
-S:-1 @0-4 S -> A A A A A A A .
+S:4 @0-4 S ::= A A A A . A A A
+S:5 @0-4 S ::= A A A A A . A A
+S:6 @0-4 S ::= A A A A A A . A
+S:-1 @0-4 S ::= A A A A A A A .
 EOS
 
 Marpa::R3::Test::is( earley_set_display(5), <<'EOS', 'Earley Set 5' );
 === Earley Set 5 ===
-S:5 @0-5 S -> A A A A A . A A
-S:6 @0-5 S -> A A A A A A . A
-S:-1 @0-5 S -> A A A A A A A .
+S:5 @0-5 S ::= A A A A A . A A
+S:6 @0-5 S ::= A A A A A A . A
+S:-1 @0-5 S ::= A A A A A A A .
 EOS
 
 Marpa::R3::Test::is( earley_set_display(6), <<'EOS', 'Earley Set 6' );
 === Earley Set 6 ===
-S:6 @0-6 S -> A A A A A A . A
-S:-1 @0-6 S -> A A A A A A A .
+S:6 @0-6 S ::= A A A A A A . A
+S:-1 @0-6 S ::= A A A A A A A .
 EOS
 
 Marpa::R3::Test::is( earley_set_display(7), <<'EOS', 'Earley Set 7' );
 === Earley Set 7 ===
-S:-1 @0-7 S -> A A A A A A A .
+S:-1 @0-7 S ::= A A A A A A A .
 EOS
 
 # vim: expandtab shiftwidth=4:

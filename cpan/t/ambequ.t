@@ -314,10 +314,10 @@ print $recce->g1_show_progress()
 
 Marpa::R3::Test::is( ${$actual_ref},
     <<'END_OF_PROGRESS_REPORT', 'Ambiguous Equation Progress Report' );
-R0:1 x4 @0...6-7 B1L1c1-7 E -> E . Op E
-F0 x3 @0,2,4-7 B1L1c1-7 E -> E Op E .
-F1 @6-7 B1L1c7 E -> Number .
-F2 @0-7 B1L1c1-7 [:start:] -> E .
+R0:1 x4 @0...6-7 B1L1c1-7 E ::= E . Op E
+F0 x3 @0,2,4-7 B1L1c1-7 E ::= E Op E .
+F1 @6-7 B1L1c7 E ::= Number .
+F2 @0-7 B1L1c1-7 [:start:] ::= E .
 END_OF_PROGRESS_REPORT
 
 restore_stdout();

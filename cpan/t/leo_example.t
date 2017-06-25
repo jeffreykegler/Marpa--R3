@@ -442,7 +442,7 @@ Popping 3 values to evaluate R1:3@0-9C2@2, rule: Expression ::= Lvalue AssignOp 
 Calculated and pushed value: 42
 Popping 1 values to evaluate R0:1@0-9C1@0, rule: Statement ::= Expression
 Calculated and pushed value: 'a=42 b=42 c=-5 d=6 e=3'
-New Virtual Rule: R8:1@0-9C7@0, rule: 8: [:start:]['] -> [:start:]
+New Virtual Rule: R8:1@0-9C7@0, rule: 8: [:start:]['] ::= [:start:]
 Real symbol count is 1
 END_TRACE_OUTPUT
 

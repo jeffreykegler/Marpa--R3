@@ -149,52 +149,52 @@ Test::More::is_deeply( $value_ref, $expected_output, 'Value before fix' );
 
 Marpa::R3::Test::is( $progress_report,
     <<'END_PROGRESS_REPORT', 'progress report' );
-P0 @0-0 B0L0c0 statements -> . statement *
-P1 @0-0 B0L0c0 statement -> . assignment
-P2 @0-0 B0L0c0 statement -> . <numeric assignment>
-P3 @0-0 B0L0c0 assignment -> . 'set' variable 'to' expression
-P4 @0-0 B0L0c0 <numeric assignment> -> . variable '=' expression
-P19 @0-0 B0L0c0 [:start:] -> . statements
-R4:1 @0-1 B1L1c1 <numeric assignment> -> variable . '=' expression
-R4:2 @0-2 B1L1c1-3 <numeric assignment> -> variable '=' . expression
-P5 @2-2 B1L1c5 expression -> . expression
-P6 @2-2 B1L1c5 expression -> . expression
-P7 @2-2 B1L1c5 expression -> . expression
-P8 @2-2 B1L1c5 expression -> . variable
-P9 @2-2 B1L1c5 expression -> . string
-P10 @2-2 B1L1c5 expression -> . 'string' '(' <numeric expression> ')'
-P11 @2-2 B1L1c5 expression -> . expression '+' expression
-F0 @0-3 B1L1c1-11 statements -> statement * .
-P1 @3-3 B1L1c13 statement -> . assignment
-P2 @3-3 B1L1c13 statement -> . <numeric assignment>
-F2 @0-3 B1L1c1-11 statement -> <numeric assignment> .
-P3 @3-3 B1L1c13 assignment -> . 'set' variable 'to' expression
-P4 @3-3 B1L1c13 <numeric assignment> -> . variable '=' expression
-F4 @0-3 B1L1c1-11 <numeric assignment> -> variable '=' expression .
-F5 @2-3 B1L1c5-11 expression -> expression .
-F6 @2-3 B1L1c5-11 expression -> expression .
-F7 @2-3 B1L1c5-11 expression -> expression .
-F8 @2-3 B1L1c5-11 expression -> variable .
-R11:1 @2-3 B1L1c5-11 expression -> expression . '+' expression
-F19 @0-3 B1L1c1-11 [:start:] -> statements .
-P7 @4-4 B1L1c15 expression -> . expression
-P8 @4-4 B1L1c15 expression -> . variable
-P9 @4-4 B1L1c15 expression -> . string
-P10 @4-4 B1L1c15 expression -> . 'string' '(' <numeric expression> ')'
-R11:2 @2-4 B1L1c5-13 expression -> expression '+' . expression
-F0 @0-5 B1L1c1-16 statements -> statement * .
-P1 @5-5 B1L1c17 statement -> . assignment
-P2 @5-5 B1L1c17 statement -> . <numeric assignment>
-F2 @0-5 B1L1c1-16 statement -> <numeric assignment> .
-P3 @5-5 B1L1c17 assignment -> . 'set' variable 'to' expression
-P4 @5-5 B1L1c17 <numeric assignment> -> . variable '=' expression
-F4 @0-5 B1L1c1-16 <numeric assignment> -> variable '=' expression .
-F5 @2-5 B1L1c5-16 expression -> expression .
-F7 @4-5 B1L1c15-16 expression -> expression .
-F8 @4-5 B1L1c15-16 expression -> variable .
-R11:1 @2-5 B1L1c5-16 expression -> expression . '+' expression
-F11 @2-5 B1L1c5-16 expression -> expression '+' expression .
-F19 @0-5 B1L1c1-16 [:start:] -> statements .
+P0 @0-0 B0L0c0 statements ::= . statement *
+P1 @0-0 B0L0c0 statement ::= . assignment
+P2 @0-0 B0L0c0 statement ::= . <numeric assignment>
+P3 @0-0 B0L0c0 assignment ::= . 'set' variable 'to' expression
+P4 @0-0 B0L0c0 <numeric assignment> ::= . variable '=' expression
+P19 @0-0 B0L0c0 [:start:] ::= . statements
+R4:1 @0-1 B1L1c1 <numeric assignment> ::= variable . '=' expression
+R4:2 @0-2 B1L1c1-3 <numeric assignment> ::= variable '=' . expression
+P5 @2-2 B1L1c5 expression ::= . expression
+P6 @2-2 B1L1c5 expression ::= . expression
+P7 @2-2 B1L1c5 expression ::= . expression
+P8 @2-2 B1L1c5 expression ::= . variable
+P9 @2-2 B1L1c5 expression ::= . string
+P10 @2-2 B1L1c5 expression ::= . 'string' '(' <numeric expression> ')'
+P11 @2-2 B1L1c5 expression ::= . expression '+' expression
+F0 @0-3 B1L1c1-11 statements ::= statement * .
+P1 @3-3 B1L1c13 statement ::= . assignment
+P2 @3-3 B1L1c13 statement ::= . <numeric assignment>
+F2 @0-3 B1L1c1-11 statement ::= <numeric assignment> .
+P3 @3-3 B1L1c13 assignment ::= . 'set' variable 'to' expression
+P4 @3-3 B1L1c13 <numeric assignment> ::= . variable '=' expression
+F4 @0-3 B1L1c1-11 <numeric assignment> ::= variable '=' expression .
+F5 @2-3 B1L1c5-11 expression ::= expression .
+F6 @2-3 B1L1c5-11 expression ::= expression .
+F7 @2-3 B1L1c5-11 expression ::= expression .
+F8 @2-3 B1L1c5-11 expression ::= variable .
+R11:1 @2-3 B1L1c5-11 expression ::= expression . '+' expression
+F19 @0-3 B1L1c1-11 [:start:] ::= statements .
+P7 @4-4 B1L1c15 expression ::= . expression
+P8 @4-4 B1L1c15 expression ::= . variable
+P9 @4-4 B1L1c15 expression ::= . string
+P10 @4-4 B1L1c15 expression ::= . 'string' '(' <numeric expression> ')'
+R11:2 @2-4 B1L1c5-13 expression ::= expression '+' . expression
+F0 @0-5 B1L1c1-16 statements ::= statement * .
+P1 @5-5 B1L1c17 statement ::= . assignment
+P2 @5-5 B1L1c17 statement ::= . <numeric assignment>
+F2 @0-5 B1L1c1-16 statement ::= <numeric assignment> .
+P3 @5-5 B1L1c17 assignment ::= . 'set' variable 'to' expression
+P4 @5-5 B1L1c17 <numeric assignment> ::= . variable '=' expression
+F4 @0-5 B1L1c1-16 <numeric assignment> ::= variable '=' expression .
+F5 @2-5 B1L1c5-16 expression ::= expression .
+F7 @4-5 B1L1c15-16 expression ::= expression .
+F8 @4-5 B1L1c15-16 expression ::= variable .
+R11:1 @2-5 B1L1c5-16 expression ::= expression . '+' expression
+F11 @2-5 B1L1c5-16 expression ::= expression '+' expression .
+F19 @0-5 B1L1c1-16 [:start:] ::= statements .
 END_PROGRESS_REPORT
 
 # Marpa::R3::Display::End

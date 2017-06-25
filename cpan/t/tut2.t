@@ -337,7 +337,7 @@ value event: starting op MARPA_STEP_RULE lua
 value event: starting lua op MARPA_STEP_RULE result_is_n_of_rhs
 value event: starting op MARPA_STEP_RULE lua
 value event: starting lua op MARPA_STEP_RULE result_is_n_of_rhs
-New Virtual Rule: R7:1@0-5C6@0, rule: 7: [:start:]['] -> [:start:]
+New Virtual Rule: R7:1@0-5C6@0, rule: 7: [:start:]['] ::= [:start:]
 Real symbol count is 1
 END_TRACE_OUTPUT
 

@@ -908,6 +908,56 @@ and eliminate the redundant ones.
         return slg:lmg_rule_display(irlid, 'l0')
     end
 
+    -- library IF
+    function _M.class_slg.lmg_dotted_rule_show(slg, irlid, dot_arg, subg_name)
+        local subg = slg[subg_name]
+        local irl_isyids = subg:irl_isyids(irlid)
+        if not irl_isyids then
+             _M.userX(string.format(
+                 "dotted_rule_show(%s, %s, %s): %s is not a valid irlid",
+                 irlid, dot_arg, subg_name, irlid
+             ))
+        end
+        local pieces = {}
+        pieces[#pieces+1]
+            = subg:symbol_display_form(irl_isyids[1])
+        pieces[#pieces+1] = '::='
+        local dot_used
+        local dot = dot_arg == -1 and #irl_isyids + 1 or dot_arg + 2
+        for ix = 2, #irl_isyids do
+            if dot == ix then
+                pieces[#pieces+1] = '.'
+                dot_used = true
+            end
+            pieces[#pieces+1]
+                = subg:symbol_display_form(irl_isyids[ix])
+        end
+        local minimum = subg:sequence_min(irlid)
+        if minimum then
+            pieces[#pieces+1] =
+                minimum <= 0 and '*' or '+'
+        end
+        if dot == #irl_isyids + 1 then
+            pieces[#pieces+1] = '.'
+            dot_used = true
+        end
+        if not dot_used then
+             _M.userX(string.format(
+                 "dotted_rule_show(%s, %s, %s): dot is %s; must be -1, or 0-%d",
+                 irlid, dot_arg, subg_name, dot_arg, #irl_isyids + 1
+             ))
+        end
+        return table.concat(pieces, ' ')
+    end
+    -- library IF
+    function _M.class_slg.g1_dotted_rule_show(slg, irlid, dot)
+        return slg:lmg_dotted_rule_show(irlid, dot, 'g1')
+    end
+    -- library IF
+    function _M.class_slg.l0_dotted_rule_show(slg, irlid, dot)
+        return slg:lmg_dotted_rule_show(irlid, dot, 'l0')
+    end
+
     function _M.class_slg.lmg_rules_show(slg, subg_name, verbose)
         verbose = verbose or 0
         local lmw_g = slg[subg_name].lmw_g
@@ -4473,7 +4523,7 @@ indexed by isyid.
 
     function _M.class_grammar.irl_isyids(lmw_g, rule_id)
         local lhs = lmw_g:rule_lhs(rule_id)
-        if not lhs then return {} end
+        if not lhs then return end
         local symbols = { lhs }
         for rhsix = 0, lmw_g:rule_length(rule_id) - 1 do
              symbols[#symbols+1] = lmw_g:rule_rhs(rule_id, rhsix)
@@ -4599,20 +4649,18 @@ indexed by isyid.
     end
 
     function _M.class_grammar.brief_nrl(lmw_g, nrl_id)
-        local pieces = { string.format("%d: ", nrl_id) }
+        local pieces = { string.format("%d:", nrl_id) }
         local lhs_id = lmw_g:_irl_lhs(nrl_id)
         pieces[#pieces+1] = lmw_g:nsy_name(lhs_id)
-        pieces[#pieces+1] = " ->"
+        pieces[#pieces+1] = "::="
         local rh_length = lmw_g:_irl_length(nrl_id)
         if rh_length > 0 then
-           local rhs_names = {}
            for rhs_ix = 0, rh_length - 1 do
               local this_rhs_id = lmw_g:_irl_rhs(nrl_id, rhs_ix)
-              rhs_names[#rhs_names+1] = lmw_g:nsy_name(this_rhs_id)
+              pieces[#pieces+1] = lmw_g:nsy_name(this_rhs_id)
            end
-           pieces[#pieces+1] = " " .. table.concat(rhs_names, " ")
         end
-        return table.concat(pieces)
+        return table.concat(pieces, " ")
     end
 
 ```

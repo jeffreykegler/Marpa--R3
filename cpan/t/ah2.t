@@ -84,18 +84,18 @@ EOS
 
 Marpa::R3::Test::is( $grammar->show_nrls,
     <<'EOS', 'Aycock/Horspool IRLs' );
-0: S -> A S[R0:1]
-1: S -> A A[] A[] A[]
-2: S -> A[] S[R0:1]
-3: S[R0:1] -> A S[R0:2]
-4: S[R0:1] -> A A[] A[]
-5: S[R0:1] -> A[] S[R0:2]
-6: S[R0:2] -> A A
-7: S[R0:2] -> A A[]
-8: S[R0:2] -> A[] A
-9: A -> [Lex-0]
-10: [:start:] -> S
-11: [:start:]['] -> [:start:]
+0: S ::= A S[R0:1]
+1: S ::= A A[] A[] A[]
+2: S ::= A[] S[R0:1]
+3: S[R0:1] ::= A S[R0:2]
+4: S[R0:1] ::= A A[] A[]
+5: S[R0:1] ::= A[] S[R0:2]
+6: S[R0:2] ::= A A
+7: S[R0:2] ::= A A[]
+8: S[R0:2] ::= A[] A
+9: A ::= [Lex-0]
+10: [:start:] ::= S
+11: [:start:]['] ::= [:start:]
 EOS
 
 # TODO This is in term of ISYs. What about external symbols?

@@ -1889,35 +1889,6 @@ END_OF_LUA
     return $is_nulling;
 }
 
-sub Marpa::R3::Scanless::G::g1_show_dotted_rule {
-    my ( $slg, $irlid, $dot_position ) = @_;
-    my ( $lhs, @rhs ) =
-    map { $slg->lmg_symbol_display_form('g1', $_) } $slg->g1_irl_isyids($irlid);
-    my $rhs_length = scalar @rhs;
-
-    my ($has_minimum, $minimum) = $slg->call_by_tag(
-    ('@' .__FILE__ . ':' . __LINE__),
-    <<'END_OF_LUA', 'i>*', $irlid ) ;
-    local slg, irlid = ...
-    local g1g = slg.g1
-    local minimum = g1g:sequence_min(irlid)
-    if not minimum then return 0, -1 end
-    return 1, minimum
-END_OF_LUA
-
-    my @quantifier = ();
-    if ($has_minimum) {
-        @quantifier = ($minimum <= 0 ? q{*} : q{+} );
-    }
-    $dot_position = $rhs_length + $dot_position + 1 if $dot_position < 0;
-    if ($dot_position < $rhs_length) {
-        splice @rhs, $dot_position, 0, q{.};
-        return join q{ }, $lhs, q{->}, @rhs, @quantifier;
-    } else {
-        return join q{ }, $lhs, q{->}, @rhs, @quantifier, q{.};
-    }
-}
-
 sub Marpa::R3::Scanless::G::g1_symbol_ids {
     my ($slg) = @_;
     return $slg->lmg_symbol_ids('g1');
@@ -1999,6 +1970,40 @@ sub Marpa::R3::Scanless::G::l0_rule_show {
         <<'END_OF_LUA', 'i>*', $irlid );
     local slg, irlid = ...
     return slg:l0_rule_show(irlid)
+END_OF_LUA
+    return $desc;
+}
+
+sub Marpa::R3::Scanless::G::lmg_dotted_rule_show {
+    my ( $slg, $subg_name, $irlid, $dot ) = @_;
+
+    my ( $desc ) =
+      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 'sii', $subg_name, $irlid, $dot );
+    local slg, subg_name, irlid, dot = ...
+    return slg:lmg_dotted_rule_show(irlid, dot, subg_name)
+END_OF_LUA
+    return $desc;
+}
+
+sub Marpa::R3::Scanless::G::g1_dotted_rule_show {
+    my ( $slg, $irlid, $dot ) = @_;
+    my ( $desc ) =
+      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 'ii', $irlid, $dot );
+    local slg, irlid, dot = ...
+    return slg:g1_dotted_rule_show(irlid, dot)
+END_OF_LUA
+    return $desc;
+}
+
+sub Marpa::R3::Scanless::G::l0_dotted_rule_show {
+    my ( $slg, $irlid, $dot ) = @_;
+    my ( $desc ) =
+      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 'ii', $irlid, $dot );
+    local slg, irlid, dot = ...
+    return slg:l0_dotted_rule_show(irlid, dot)
 END_OF_LUA
     return $desc;
 }

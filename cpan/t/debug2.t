@@ -101,22 +101,22 @@ Test::More::is( $value, 42, 'value' );
 
 Marpa::R3::Test::is( $progress_report,
     <<'END_PROGRESS_REPORT', 'progress report' );
-P0 @0-0 B0L0c0 Expression -> . Factor
-P2 @0-0 B0L0c0 Factor -> . Number
-P4 @0-0 B0L0c0 Factor -> . Factor Multiply Factor
-P5 @0-0 B0L0c0 [:start:] -> . Expression
-F0 @0-1 B1L1c1-2 Expression -> Factor .
-F2 @0-1 B1L1c1-2 Factor -> Number .
-R4:1 @0-1 B1L1c1-2 Factor -> Factor . Multiply Factor
-F5 @0-1 B1L1c1-2 [:start:] -> Expression .
-P2 @2-2 B1L1c4 Factor -> . Number
-P4 @2-2 B1L1c4 Factor -> . Factor Multiply Factor
-R4:2 @0-2 B1L1c1-3 Factor -> Factor Multiply . Factor
-F0 @0-3 B1L1c1-4 Expression -> Factor .
-F2 @2-3 B1L1c4 Factor -> Number .
-R4:1 x2 @0,2-3 B1L1c1-4 Factor -> Factor . Multiply Factor
-F4 @0-3 B1L1c1-4 Factor -> Factor Multiply Factor .
-F5 @0-3 B1L1c1-4 [:start:] -> Expression .
+P0 @0-0 B0L0c0 Expression ::= . Factor
+P2 @0-0 B0L0c0 Factor ::= . Number
+P4 @0-0 B0L0c0 Factor ::= . Factor Multiply Factor
+P5 @0-0 B0L0c0 [:start:] ::= . Expression
+F0 @0-1 B1L1c1-2 Expression ::= Factor .
+F2 @0-1 B1L1c1-2 Factor ::= Number .
+R4:1 @0-1 B1L1c1-2 Factor ::= Factor . Multiply Factor
+F5 @0-1 B1L1c1-2 [:start:] ::= Expression .
+P2 @2-2 B1L1c4 Factor ::= . Number
+P4 @2-2 B1L1c4 Factor ::= . Factor Multiply Factor
+R4:2 @0-2 B1L1c1-3 Factor ::= Factor Multiply . Factor
+F0 @0-3 B1L1c1-4 Expression ::= Factor .
+F2 @2-3 B1L1c4 Factor ::= Number .
+R4:1 x2 @0,2-3 B1L1c1-4 Factor ::= Factor . Multiply Factor
+F4 @0-3 B1L1c1-4 Factor ::= Factor Multiply Factor .
+F5 @0-3 B1L1c1-4 [:start:] ::= Expression .
 END_PROGRESS_REPORT
 
 $Data::Dumper::Indent = 0;
