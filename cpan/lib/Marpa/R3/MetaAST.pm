@@ -1858,37 +1858,21 @@ sub Marpa::R3::Internal::MetaAST::Parse::xbnf_create {
     my $rule_id = join q{,}, $subgrammar, $args->{lhs}, @{$args->{rhs}};
     my $hash_by_xbnfid = $parse->{xbnf}->{$subgrammar};
     if ( exists $hash_by_xbnfid->{$rule_id} ) {
-        Marpa::R3::Internal::X->new(
-            {
-                desc       => 'Duplicate rule',
-                lhs        => $args->{lhs},
-                rhs        => $args->{rhs},
-                start      => $args->{start},
-                length     => $args->{length},
-                other_xbnf => $hash_by_xbnfid->{$rule_id},
-                to_string => sub {
-                    my $self = shift;
-                    my $pos1 = $self->{other_xbnf}->{start};
-                    my $len1 = $self->{other_xbnf}->{length};
-                    my $pos2 = $self->{start};
-                    my $len2 = $self->{length};
-
-                    my @string = ("Duplicate rules:",
-                      Marpa::R3::Internal::substr_as_2lines(
-                      'First rule',
-                      $parse->{p_dsl},
-                        $pos1, $len1, 74 ),
-                      Marpa::R3::Internal::substr_as_2lines(
-                      'Second rule',
-                      $parse->{p_dsl},
-                        $pos2, $len2, 74 )
-                        );
-
-                    push @string, q{};
-                    return join "\n", @string;
-                }
-            }
-        )->throw();
+        my $other_xbnf = $hash_by_xbnfid->{$rule_id};
+        my $pos1   = $other_xbnf->{start};
+        my $len1   = $other_xbnf->{length};
+        my $pos2   = $args->{start};
+        my $len2   = $args->{length};
+        my @string = (
+            "Duplicate rules:",
+            Marpa::R3::Internal::substr_as_2lines(
+                'First rule', $parse->{p_dsl}, $pos1, $len1, 74
+            ),
+            Marpa::R3::Internal::substr_as_2lines(
+                'Second rule', $parse->{p_dsl}, $pos2, $len2, 74
+            )
+        );
+        Marpa::R3::exception( join "\n", @string, q{} );
     }
     $hash_by_xbnfid->{$rule_id} = $args;
 
@@ -1897,6 +1881,7 @@ sub Marpa::R3::Internal::MetaAST::Parse::xbnf_create {
         xbnfid => $rule_id,
         subgrammar => $subgrammar,
     );
+    # Shallow copy
     for my $field (
         qw(lhs action rank
         null_ranking min separator proper )
@@ -1904,12 +1889,14 @@ sub Marpa::R3::Internal::MetaAST::Parse::xbnf_create {
     {
         $wrl{$field} = $args->{$field} if defined $args->{$field};
     }
-    # Deep copy these arrays
-    FIELD: for my $field ( qw(rhs) ) {
-        my $xbnf_datum = $args->{$field};
-        next FIELD if not defined $xbnf_datum;
-        my @array = @{$args->{$field}};
-        $wrl{$field} = \@array;
+    # 'rhs' needs special treatment --
+    #    a deeper code and creation of the xbnf_dot field
+    {
+        my $rhs = $args->{rhs};
+        my $xbnf_datum = $rhs;
+        my @array = @{$rhs};
+        $wrl{rhs} = \@array;
+        $wrl{xbnf_dot} = [0 .. (scalar @array) ]
     }
 
     # Return the initial working rule

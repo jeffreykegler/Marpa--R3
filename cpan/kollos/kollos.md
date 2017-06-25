@@ -604,6 +604,7 @@ will usually just ask for the display form of the ISY.
     class_irl_fields.action = true
     class_irl_fields.mask = true
     class_irl_fields.g1_lexeme = true
+    class_irl_fields.xrl_dot = true
 ```
 
 ```

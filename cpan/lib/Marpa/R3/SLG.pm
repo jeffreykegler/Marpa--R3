@@ -1296,6 +1296,7 @@ sub add_G1_user_rule {
     my $xbnf_name;
     my $xbnf_id;
     my $subgrammar;
+    my $xbnf_dot;
 
   OPTION: for my $option ( keys %{$options} ) {
         my $value = $options->{$option};
@@ -1307,7 +1308,6 @@ sub add_G1_user_rule {
         if ( $option eq 'lhs' )    { $lhs_name  = $value; next OPTION }
         if ( $option eq 'action' ) { $action    = $value; next OPTION }
         if ( $option eq 'rank' )   { $rank      = $value; next OPTION }
-        if ( $option eq 'subgrammar' ) { $subgrammar      = $value; next OPTION }
         if ( $option eq 'null_ranking' ) {
             $null_ranking = $value;
             next OPTION;
@@ -1321,6 +1321,8 @@ sub add_G1_user_rule {
             $proper_separation = $value;
             next OPTION;
         }
+        if ( $option eq 'subgrammar' ) { $subgrammar      = $value; next OPTION }
+        if ( $option eq 'xbnf_dot' ) { $xbnf_dot      = $value; next OPTION }
         Marpa::R3::exception("Unknown user rule option: $option");
     } ## end OPTION: for my $option ( keys %{$options} )
 
@@ -1472,6 +1474,7 @@ sub add_L0_user_rule {
     my $xbnf_name;
     my $xbnf_id;
     my $subgrammar;
+    my $xbnf_dot;
 
   OPTION: for my $option ( keys %{$options} ) {
         my $value = $options->{$option};
@@ -1483,7 +1486,6 @@ sub add_L0_user_rule {
         if ( $option eq 'lhs' )    { $lhs_name  = $value; next OPTION }
         if ( $option eq 'action' ) { $action    = $value; next OPTION }
         if ( $option eq 'rank' )   { $rank      = $value; next OPTION }
-        if ( $option eq 'subgrammar' ) { $subgrammar      = $value; next OPTION }
         if ( $option eq 'null_ranking' ) {
             $null_ranking = $value;
             next OPTION;
@@ -1497,8 +1499,10 @@ sub add_L0_user_rule {
             $proper_separation = $value;
             next OPTION;
         }
+        if ( $option eq 'subgrammar' ) { $subgrammar = $value; next OPTION }
+        if ( $option eq 'xbnf_dot' )    { $xbnf_dot    = $value; next OPTION }
         Marpa::R3::exception("Unknown user rule option: $option");
-    } ## end OPTION: for my $option ( keys %{$options} )
+    }
 
     $rhs_names //= [];
 

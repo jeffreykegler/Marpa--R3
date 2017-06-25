@@ -88,13 +88,11 @@ if (1) {
 END_OF_DSL
         test_grammar( 'duplicate rule',
             $duplicate_rule_grammar, <<'EOS');
-========= Marpa::R3 Fatal error =========
 Duplicate rules:
 First rule is at line 2, column 5:
   Dup ::= Item
 Second rule is at line 3, column 5:
   Dup ::= Item
-=========================================
 EOS
 }
 
@@ -106,13 +104,11 @@ if (1) {
     Item ::= a
 END_OF_DSL
         test_grammar( 'unique_lhs', $unique_lhs_grammar, <<'EOS');
-========= Marpa::R3 Fatal error =========
 Duplicate rules:
 First rule is at line 2, column 5:
   Dup ::= Item*
 Second rule is at line 3, column 5:
   Dup ::= Item
-=========================================
 EOS
 }
 
