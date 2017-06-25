@@ -99,13 +99,6 @@ END_OF_HEADER
 
 __DATA__
 
-    :package=Marpa::R3::Internal::Progress_Report
-
-    RULE_ID
-    POSITION
-    ORIGIN
-    CURRENT
-
     :package=Marpa::R3::Internal::Glade
 
     ID

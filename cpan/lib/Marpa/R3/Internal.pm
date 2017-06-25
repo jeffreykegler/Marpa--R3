@@ -25,12 +25,6 @@ $STRING_VERSION = $VERSION;
 $VERSION = eval $VERSION;
 
 
-package Marpa::R3::Internal::Progress_Report;
-use constant RULE_ID => 0;
-use constant POSITION => 1;
-use constant ORIGIN => 2;
-use constant CURRENT => 3;
-
 package Marpa::R3::Internal::Glade;
 use constant ID => 0;
 use constant SYMCHES => 1;
