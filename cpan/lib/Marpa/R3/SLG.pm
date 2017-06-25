@@ -2204,8 +2204,6 @@ sub Marpa::R3::Scanless::G::lmg_show_rules {
     my $text = q{};
     $verbose //= 0;
 
-    my $grammar_name = uc $subg_name;
-
     my ($highest_rule_id) = $slg->call_by_tag(
     ('@' .__FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', 's>*', $subg_name ) ;
@@ -2216,24 +2214,18 @@ END_OF_LUA
 
     for my $irlid ( 0 .. $highest_rule_id ) {
 
-        my ( $piece ) =
-          $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-            <<'END_OF_LUA', 'si>*', $subg_name, $irlid );
-    local slg, subg_name, irlid = ...
-    local pieces = {}
-    pieces[#pieces+1] = string.upper(subg_name)
-    pieces[#pieces+1] = 'R' .. irlid
-    pieces[#pieces+1] = slg:lmg_rule_show(irlid, subg_name)
-    return table.concat(pieces, ' ')
-END_OF_LUA
+          my ($rule_piece) = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+                <<'END_OF_LUA', 'sii', $subg_name, $irlid, $verbose );
+    local slg, subg_name, irlid, verbose = ...
 
-        $text .= $piece . "\n";
+    local pcs = {}
+    local pcs2 = {}
+    pcs2[#pcs2+1] = string.upper(subg_name)
+    pcs2[#pcs2+1] = 'R' .. irlid
+    pcs2[#pcs2+1] = slg:lmg_rule_show(irlid, subg_name)
+    pcs[#pcs+1] = table.concat(pcs2, ' ')
+    pcs[#pcs+1] = "\n"
 
-        if ( $verbose >= 2 ) {
-
-          ($text) = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-                <<'END_OF_LUA', 'sisi', $subg_name, $irlid, $text, $verbose );
-    local slg, subg_name, irlid, text, verbose = ...
     local lmw_g = slg[subg_name].lmw_g
     local lhsid
     local rhsids = {}
@@ -2263,41 +2255,45 @@ END_OF_LUA
             end
         end
         if #comments > 0 then
-            local pieces = {}
+            local pcs3 = {}
             for ix = 1, #comments do
-                pieces[#pieces+1] = "/*" .. comments[ix] .. "*/"
+                pcs3[#pcs3+1] = "/*" .. comments[ix] .. "*/"
             end
-            text = text .. table.concat(pieces, ' ') .. "\n"
+            pcs[#pcs+1] = table.concat(pcs3, ' ')
+            pcs[#pcs+1] = "\n"
         end
-        local pieces = {}
-        pieces[#pieces+1] = '  Symbol IDs:'
+        pcs2 = {}
+        pcs2[#pcs2+1] = '  Symbol IDs:'
         for ix = 0, rule_length - 1 do
            rhsids[ix] = lmw_g:rule_rhs(irlid, ix)
         end
-        pieces[#pieces+1] = '<' .. lhsid .. '>'
-        pieces[#pieces+1] = '::='
+        pcs2[#pcs2+1] = '<' .. lhsid .. '>'
+        pcs2[#pcs2+1] = '::='
         for ix = 0, rule_length - 1 do
-            pieces[#pieces+1] = '<' .. rhsids[ix] .. '>'
+            pcs2[#pcs2+1] = '<' .. rhsids[ix] .. '>'
         end
-        text = text .. table.concat(pieces, ' ') .. "\n"
+        pcs[#pcs+1] = table.concat(pcs2, ' ')
+        pcs[#pcs+1] = "\n"
     end
     if verbose >= 3 then
-        local pieces = {}
-        pieces[#pieces+1] = '  Internal symbols:'
-        pieces[#pieces+1] = '<' .. slg:lmg_symbol_name(lhsid, subg_name) .. '>'
-        pieces[#pieces+1] = '::='
+        local pcs2 = {}
+        pcs2[#pcs2+1] = '  Internal symbols:'
+        pcs2[#pcs2+1] = '<' .. slg:lmg_symbol_name(lhsid, subg_name) .. '>'
+        pcs2[#pcs2+1] = '::='
         for ix = 0, rule_length - 1 do
-            pieces[#pieces+1]
+            pcs2[#pcs2+1]
                 = '<'
                     ..  slg:lmg_symbol_name(rhsids[ix], subg_name)
                     ..  '>'
         end
-        text = text .. table.concat(pieces, ' ') .. "\n"
+        pcs[#pcs+1] = table.concat(pcs2, ' ')
+        pcs[#pcs+1] = "\n"
     end
-    return text
+    return table.concat(pcs)
 END_OF_LUA
 
-    }
+        $text .= $rule_piece;
+
     }
 
     return $text;
