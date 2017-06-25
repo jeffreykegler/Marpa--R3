@@ -115,14 +115,14 @@ add divide multiply plain subtract
 END_OF_HISTORY
 );
 
-my $show_progress_output = $test_slr->show_progress();
+my $g1_show_progress_output = $test_slr->g1_show_progress();
 
 # Marpa::R3::Display
-# name: SLIF Leo show_progress() example
+# name: SLIF Leo g1_show_progress() example
 # start-after-line: END_OF_OUTPUT
 # end-before-line: '^END_OF_OUTPUT$'
 
-my $expected_show_progress_output = <<'END_OF_OUTPUT';
+my $expected_g1_show_progress_output = <<'END_OF_OUTPUT';
 F0 @40-41 B1L2c40 expression -> 'x' .
 F1 x20 @0...38-41 B1L1c1-L2c40 expression -> assignment .
 F2 x2 @8,18-41 B1L1c20-L2c40 assignment -> <divide assignment> .
@@ -146,9 +146,9 @@ END_OF_OUTPUT
 # Marpa::R3::Display::End
 
 Marpa::R3::Test::is(
-    $show_progress_output,
-    $expected_show_progress_output,
-    "SLIF Leo show_progress() example"
+    $g1_show_progress_output,
+    $expected_g1_show_progress_output,
+    "SLIF Leo g1_show_progress() example"
 );
 
 # Never reaches closure

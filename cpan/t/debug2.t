@@ -92,7 +92,7 @@ TOKEN: for my $token_and_value (@tokens) {
     last TOKEN if not defined $recce->lexeme_read( $name, $recce->pos(), (length $value), $value );
 }
 
-$progress_report = $recce->show_progress( 0, -1 );
+$progress_report = $recce->g1_show_progress( 0, -1 );
 
 my $value_ref = $recce->value;
 my $value = $value_ref ? ${$value_ref} : 'No Parse';
@@ -122,62 +122,62 @@ END_PROGRESS_REPORT
 $Data::Dumper::Indent = 0;
 $Data::Dumper::Terse  = 1;
 
-my $report0 = $recce->progress(0);
+my $report0 = $recce->g1_progress(0);
 
 chomp( my $expected_report0 = <<'END_PROGRESS_REPORT');
 [[0,0,0],[2,0,0],[4,0,0],[5,0,0]]
 END_PROGRESS_REPORT
 Marpa::R3::Test::is( Data::Dumper::Dumper($report0),
-    $expected_report0, 'progress report at location 0' );
+    $expected_report0, 'g1_progress report at location 0' );
 
 # Try again with negative index
-$report0 = $recce->progress(-4);
+$report0 = $recce->g1_progress(-4);
 Marpa::R3::Test::is( Data::Dumper::Dumper($report0),
-    $expected_report0, 'progress report at location -4' );
+    $expected_report0, 'g1_progress report at location -4' );
 
-my $report1 = $recce->progress(1);
+my $report1 = $recce->g1_progress(1);
 
 chomp( my $expected_report1 = <<'END_PROGRESS_REPORT');
 [[0,-1,0],[2,-1,0],[5,-1,0],[4,1,0]]
 END_PROGRESS_REPORT
 Marpa::R3::Test::is( Data::Dumper::Dumper($report1),
-    $expected_report1, 'progress report at location 1' );
+    $expected_report1, 'g1_progress report at location 1' );
 
 # Try again with negative index
-$report1 = $recce->progress(-3);
+$report1 = $recce->g1_progress(-3);
 Marpa::R3::Test::is( Data::Dumper::Dumper($report1),
-    $expected_report1, 'progress report at location -3' );
+    $expected_report1, 'g1_progress report at location -3' );
 
-my $report2 = $recce->progress(2);
+my $report2 = $recce->g1_progress(2);
 
 chomp( my $expected_report2 = <<'END_PROGRESS_REPORT');
 [[2,0,2],[4,0,2],[4,2,0]]
 END_PROGRESS_REPORT
 Marpa::R3::Test::is( Data::Dumper::Dumper($report2),
-    $expected_report2, 'progress report at location 2' );
+    $expected_report2, 'g1_progress report at location 2' );
 
 # Try again with negative index
-$report2 = $recce->progress(-2);
+$report2 = $recce->g1_progress(-2);
 Marpa::R3::Test::is( Data::Dumper::Dumper($report2),
-    $expected_report2, 'progress report at location -2' );
+    $expected_report2, 'g1_progress report at location -2' );
 
-my $latest_report = $recce->progress();
+my $latest_report = $recce->g1_progress();
 
 chomp( my $expected_report3 = <<'END_PROGRESS_REPORT');
 [[0,-1,0],[2,-1,2],[4,-1,0],[5,-1,0],[4,1,0],[4,1,2]]
 END_PROGRESS_REPORT
 Marpa::R3::Test::is( Data::Dumper::Dumper($latest_report),
-    $expected_report3, 'progress report at location 3' );
+    $expected_report3, 'g1_progress report at location 3' );
 
 # Try latest report again with explicit index
-my $report3 = $recce->progress(3);
+my $report3 = $recce->g1_progress(3);
 Marpa::R3::Test::is( Data::Dumper::Dumper($report3),
-    $expected_report3, 'progress report at location 3' );
+    $expected_report3, 'g1_progress report at location 3' );
 
 # Try latest report again with negative index
-$latest_report = $recce->progress(-1);
+$latest_report = $recce->g1_progress(-1);
 Marpa::R3::Test::is( Data::Dumper::Dumper($latest_report),
-    $expected_report3, 'progress report at location -1' );
+    $expected_report3, 'g1_progress report at location -1' );
 
 # Currently external scanning does not show up in trace_terminals
 Marpa::R3::Test::is( $trace_output, <<'END_TRACE_OUTPUT', 'trace output' );

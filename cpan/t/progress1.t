@@ -107,7 +107,7 @@ $recce->read( \$input );
 sub earley_set_display {
     my ($earley_set) = @_;
     my @target_items =
-      grep { $_->[0] eq $target_rule } @{ $recce->progress($earley_set) };
+      grep { $_->[0] eq $target_rule } @{ $recce->g1_progress($earley_set) };
     my @data = ();
     for my $target_item (@target_items) {
         my ( $rule_id, $dot, $origin ) = @{$target_item};

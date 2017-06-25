@@ -594,7 +594,7 @@ END_OF_LUA
 
 }
 
-sub Marpa::R3::Scanless::R::show_progress {
+sub Marpa::R3::Scanless::R::g1_show_progress {
     my ( $slr, $start_ordinal, $end_ordinal ) = @_;
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
 
@@ -610,7 +610,7 @@ sub Marpa::R3::Scanless::R::show_progress {
     else {
         if ( $start_ordinal < 0 or $start_ordinal > $last_ordinal ) {
             return
-"Marpa::R3::Scanless::R::show_progress start index is $start_ordinal, "
+"Marpa::R3::Scanless::R::g1_show_progress start index is $start_ordinal, "
               . "must be in range 0-$last_ordinal";
         }
     } ## end else [ if ( $start_ordinal < 0 ) ]
@@ -625,7 +625,7 @@ sub Marpa::R3::Scanless::R::show_progress {
         }
         if ( $end_ordinal < 0 ) {
             return
-"Marpa::R3::Scanless::R::show_progress end index is $end_ordinal_argument, "
+"Marpa::R3::Scanless::R::g1_show_progress end index is $end_ordinal_argument, "
               . sprintf ' must be in range %d-%d', -( $last_ordinal + 1 ),
               $last_ordinal;
         } ## end if ( $end_ordinal < 0 )
@@ -635,7 +635,7 @@ sub Marpa::R3::Scanless::R::show_progress {
     for my $current_ordinal ( $start_ordinal .. $end_ordinal ) {
         my $current_earleme     = $slr->earleme($current_ordinal);
         my %by_rule_by_position = ();
-        for my $progress_item ( @{ $slr->progress($current_ordinal) } ) {
+        for my $progress_item ( @{ $slr->g1_progress($current_ordinal) } ) {
             my ( $rule_id, $position, $origin ) = @{$progress_item};
             if ( $position < 0 ) {
                 ($position) = $slg->call_by_tag(
@@ -646,7 +646,7 @@ sub Marpa::R3::Scanless::R::show_progress {
                 );
             }
             $by_rule_by_position{$rule_id}->{$position}->{$origin}++;
-        } ## end for my $progress_item ( @{ $recce->progress($current_ordinal...)})
+        } ## end for my $progress_item ( @{ $recce->g1_progress($current_ordinal...)})
 
         for my $rule_id ( sort { $a <=> $b } keys %by_rule_by_position ) {
             my $by_position = $by_rule_by_position{$rule_id};
@@ -718,14 +718,14 @@ END_OF_LUA
     return $text;
 }
 
-sub Marpa::R3::Scanless::R::progress {
+sub Marpa::R3::Scanless::R::g1_progress {
     my ( $slr, $ordinal_arg ) = @_;
 
     my ($result) = $slr->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', 'i>0', ($ordinal_arg // -1));
-    local recce, ordinal_arg = ...
-    return recce:progress(ordinal_arg)
+    local slr, ordinal_arg = ...
+    return slr:g1_progress(ordinal_arg)
 END_OF_LUA
 
     return $result;

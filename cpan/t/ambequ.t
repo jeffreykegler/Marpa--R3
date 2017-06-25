@@ -309,7 +309,7 @@ restore_stdout();
 
 $actual_ref = save_stdout();
 
-print $recce->show_progress()
+print $recce->g1_show_progress()
     or die "print failed: $ERRNO";
 
 Marpa::R3::Test::is( ${$actual_ref},

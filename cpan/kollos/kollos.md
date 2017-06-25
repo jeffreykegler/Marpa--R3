@@ -1951,7 +1951,7 @@ TODO: Is the status string needed/used?
         slr.accept_queue = {}
         local l0r = slr.l0
         if not l0r then
-            error('Internal error: No l0r in slr_alternatives(): %s',
+            internal_error('No l0r in slr_alternatives(): %s',
                 slr.slg.l0:error_description())
         end
         local elect_earley_set = slr.l0_candidate
@@ -1960,7 +1960,7 @@ TODO: Is the status string needed/used?
         local working_pos = slr.start_of_lexeme + elect_earley_set
         local return_value = l0r:progress_report_start(elect_earley_set)
         if return_value < 0 then
-            error(string.format('Problem in slr:progress_report_start(...,%d): %s'),
+            internal_error(string.format('Problem in slr:progress_report_start(...,%d): %s'),
                 elect_earley_set, l0r:error_description())
         end
         local discarded, high_lexeme_priority = slr:l0_earley_set_examine(working_pos)
@@ -3207,7 +3207,7 @@ or nil if there was none.
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slr.progress(slr, ordinal_arg)
+    function _M.class_slr.g1_progress(slr, ordinal_arg)
         local g1r = slr.g1
         local ordinal = ordinal_arg
         local latest_earley_set = g1r:latest_earley_set()

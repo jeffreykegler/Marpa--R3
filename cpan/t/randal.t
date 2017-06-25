@@ -122,7 +122,7 @@ TEST: for my $test_data (@test_data) {
 
     $recce->read( \$test_input );
 
-    # say STDERR $recce->show_progress(0, -1) if $test_name eq 'sin';
+    # say STDERR $recce->g1_show_progress(0, -1) if $test_name eq 'sin';
 
     my @parses;
     while ( defined( my $value_ref = $recce->value() ) ) {
