@@ -180,7 +180,7 @@ qq{'source' name argument to Marpa::R3::Scanless::G->new() is a ref to a an unde
         delete $flat_args->{'trace_file_handle'};
     }
 
-    my $trace_file_handle = 
+    my $trace_file_handle =
         $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE];
 
     if ( exists $flat_args->{'trace_actions'} ) {
@@ -1159,7 +1159,7 @@ END_OF_LUA
     # Above I went through the error events
     # Here I go through the events for situations where there was no
     # hard error returned from libmarpa
-      my ($loop_rule_count) = 
+      my ($loop_rule_count) =
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 's', $subg_name );
         local grammar, subg_name = ...
@@ -1399,7 +1399,7 @@ END_OF_LUA
             min       => $min,
         };
 
-      ($base_irl_id) = 
+      ($base_irl_id) =
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'i', $arg_hash);
     local g, arg_hash = ...
@@ -1581,7 +1581,7 @@ END_OF_LUA
             min       => $min,
         };
 
-      ($base_irl_id) = 
+      ($base_irl_id) =
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'i', $arg_hash);
     local g, arg_hash = ...
@@ -2179,7 +2179,7 @@ END_OF_LUA
         pieces[#pieces+1] = table.concat(tags, ' ')
         pieces[#pieces+1] =  '\n'
     end
-    pieces[#pieces+1] =  "  Internal name: <" 
+    pieces[#pieces+1] =  "  Internal name: <"
     pieces[#pieces+1] =  lmw_g:symbol_name(symbol_id)
     pieces[#pieces+1] =  ">\n"
     return table.concat(pieces)
@@ -2216,41 +2216,30 @@ END_OF_LUA
 
     for my $irlid ( 0 .. $highest_rule_id ) {
 
-        my ( $has_minimum, $minimum ) =
+        my ( $piece ) =
           $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
             <<'END_OF_LUA', 'si>*', $subg_name, $irlid );
-    local grammar, subg_name, irlid = ...
-    local lmw_g = grammar[subg_name].lmw_g
-    local minimum = lmw_g:sequence_min(irlid)
-    if not minimum then return 0, -1 end
-    return 1, minimum
+    local slg, subg_name, irlid = ...
+    local pieces = {}
+    pieces[#pieces+1] = string.upper(subg_name)
+    pieces[#pieces+1] = 'R' .. irlid
+    pieces[#pieces+1] = slg:lmg_rule_show(irlid, subg_name)
+    return table.concat(pieces, ' ')
 END_OF_LUA
 
-        my @quantifier = ();
-
-        if ($has_minimum) {
-            @quantifier = ( $minimum <= 0 ? q{*} : q{+} );
-        }
-
-        my ( $lhs_id, @rhs_ids ) = $slg->lmg_irl_isyids( $subg_name, $irlid );
-        $text .= join q{ }, $grammar_name, "R$irlid",
-          $slg->lmg_symbol_display_form( $subg_name, $lhs_id ),
-          '::=',
-          ( map { $slg->lmg_symbol_display_form( $subg_name, $_ ) } @rhs_ids ),
-          @quantifier;
-        $text .= "\n";
+        $text .= $piece . "\n";
 
         if ( $verbose >= 2 ) {
 
-            my $comments = [];
-            ( scalar @rhs_ids ) == 0
-              and push @{$comments}, 'empty';
-
-            ($comments) =
-              $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-                <<'END_OF_LUA', 'sis', $subg_name, $irlid, $comments );
-    local slg, subg_name, irlid, comments = ...
+          ($text) = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+                <<'END_OF_LUA', 'sisi', $subg_name, $irlid, $text, $verbose );
+    local slg, subg_name, irlid, text, verbose = ...
     local lmw_g = slg[subg_name].lmw_g
+    local comments = {}
+    local rule_length = lmw_g:rule_length(irlid)
+    if lmw_g:rule_length(irlid) == 0 then
+        comments[#comments+1] = 'empty'
+    end
     if lmw_g:_rule_is_used(irlid) == 0 then
         comments[#comments+1] = '!used'
     end
@@ -2267,34 +2256,44 @@ END_OF_LUA
             comments[#comments+1] = 'discard_sep'
         end
     end
-    return comments
+    if #comments > 0 then
+        local pieces = {}
+        for ix = 1, #comments do
+            pieces[#pieces+1] = "/*" .. comments[ix] .. "*/"
+        end
+        text = text .. table.concat(pieces, ' ') .. "\n"
+    end
+    local pieces = {}
+    pieces[#pieces+1] = '  Symbol IDs:'
+    local lhsid = lmw_g:rule_lhs(irlid)
+    local rhsids = {}
+    for ix = 0, rule_length - 1 do
+       rhsids[ix] = lmw_g:rule_rhs(irlid, ix)
+    end
+    pieces[#pieces+1] = '<' .. lhsid .. '>'
+    pieces[#pieces+1] = '::='
+    for ix = 0, rule_length - 1 do
+        pieces[#pieces+1] = '<' .. rhsids[ix] .. '>'
+    end
+    text = text .. table.concat(pieces, ' ') .. "\n"
+    if verbose >= 3 then
+        pieces = {}
+        pieces[#pieces+1] = '  Internal symbols:'
+        pieces[#pieces+1] = '<' .. slg:lmg_symbol_name(lhsid, subg_name) .. '>'
+        pieces[#pieces+1] = '::='
+        for ix = 0, rule_length - 1 do
+            pieces[#pieces+1]
+                = '<'
+                    ..  slg:lmg_symbol_name(rhsids[ix], subg_name)
+                    ..  '>'
+        end
+        text = text .. table.concat(pieces, ' ') .. "\n"
+    end
+    return text
 END_OF_LUA
 
-            if ( @{$comments} ) {
-                $text .=
-                  q{  } . ( join q{ }, q{/*}, @{$comments}, q{*/} ) . "\n";
-            }
-
-            $text .= "  Symbol IDs: <$lhs_id> ::= "
-              . ( join q{ }, map { "<$_>" } @rhs_ids ) . "\n";
-
-        } ## end if ( $verbose >= 2 )
-
-        if ( $verbose >= 3 ) {
-
-            $text .=
-                "  Internal symbols: <"
-              . $slg->lmg_symbol_name( $subg_name, $lhs_id )
-              . q{> ::= }
-              . (
-                join q{ },
-                map { '<' . $slg->lmg_symbol_name( $subg_name, $_ ) . '>' }
-                  @rhs_ids
-              ) . "\n";
-
-        } ## end if ( $verbose >= 3 )
-
-    } ## end for my $rule ( @{$rules} )
+    }
+    }
 
     return $text;
 }
