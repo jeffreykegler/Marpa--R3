@@ -107,6 +107,12 @@ A consequence of this definition
 is that every symbol instance
 has exactly one end location.
 
+=item * A B<potential symbol instance> is one
+which might appear in the parse.
+
+=item * An B<actual symbol instance> is one which
+actually appears in the parse.
+
 =item * For a specific string
 and a specific grammar,
 we say that a parse is B<valid>
@@ -182,13 +188,13 @@ or a B<parse instance event>
 B<Location events>
 are those which are deal with the status of the
 parse at a particular parse location.
-They are declared using named arguments of
+Location events are declared using named arguments of
 the SLIF recognizer constructor.
 
 B<Instance events> are those which report
 the status of a symbol instance.
 The symbol instance whose status the event
-reports does have be an
+reports does not have to be an
 actual symbol instance.
 Prediction events,
 for example,
