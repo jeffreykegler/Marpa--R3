@@ -463,7 +463,7 @@ END_OF_LUA
     # Lexers
 
     my @discard_event_by_lexer_rule_id = ();
-    state $lex_start_symbol_name = '[:start_lex]';
+    state $lex_start_symbol_name = '[:lex_start:]';
     state $discard_symbol_name   = '[:discard:]';
 
     my $lexer_rules          = $hashed_source->{rules}->{'l0'};

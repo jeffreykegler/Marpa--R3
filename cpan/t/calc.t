@@ -98,16 +98,16 @@ L0 R15 <unterminated final hash comment> ::= [\#] <hash comment body>
 L0 R16 <hash comment body> ::= <hash comment char> *
 L0 R17 <vertical space char> ::= [\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
 L0 R18 <hash comment char> ::= [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
-L0 R19 [:start_lex] ::= Number
-L0 R20 [:start_lex] ::= [:discard:]
-L0 R21 [:start_lex] ::= '('
-L0 R22 [:start_lex] ::= ')'
-L0 R23 [:start_lex] ::= '**'
-L0 R24 [:start_lex] ::= '*'
-L0 R25 [:start_lex] ::= '/'
-L0 R26 [:start_lex] ::= '+'
-L0 R27 [:start_lex] ::= '-'
-L0 R28 [:start_lex] ::= comma
+L0 R19 [:lex_start:] ::= Number
+L0 R20 [:lex_start:] ::= [:discard:]
+L0 R21 [:lex_start:] ::= '('
+L0 R22 [:lex_start:] ::= ')'
+L0 R23 [:lex_start:] ::= '**'
+L0 R24 [:lex_start:] ::= '*'
+L0 R25 [:lex_start:] ::= '/'
+L0 R26 [:lex_start:] ::= '+'
+L0 R27 [:lex_start:] ::= '-'
+L0 R28 [:lex_start:] ::= comma
 END_OF_SHOW_RULES_OUTPUT
 
 do_test('Calculator 1', $calculator_grammar,

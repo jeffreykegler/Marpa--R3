@@ -600,45 +600,45 @@ L0 R13 [:discard:] ::= whitespace
 L0 R14 whitespace ::= [\s] +
   Symbol IDs: <32> ::= <17>
   Internal symbols: <whitespace> ::= <[[\s]]>
-L0 R15 [:start_lex] ::= [:discard:]
+L0 R15 [:lex_start:] ::= [:discard:]
   Symbol IDs: <33> ::= <0>
-  Internal symbols: <[:start_lex]> ::= <[:discard:]>
-L0 R16 [:start_lex] ::= 'set'
+  Internal symbols: <[:lex_start:]> ::= <[:discard:]>
+L0 R16 [:lex_start:] ::= 'set'
   Symbol IDs: <33> ::= <1>
-  Internal symbols: <[:start_lex]> ::= <[Lex-0]>
-L0 R17 [:start_lex] ::= 'to'
+  Internal symbols: <[:lex_start:]> ::= <[Lex-0]>
+L0 R17 [:lex_start:] ::= 'to'
   Symbol IDs: <33> ::= <2>
-  Internal symbols: <[:start_lex]> ::= <[Lex-1]>
-L0 R18 [:start_lex] ::= '='
+  Internal symbols: <[:lex_start:]> ::= <[Lex-1]>
+L0 R18 [:lex_start:] ::= '='
   Symbol IDs: <33> ::= <3>
-  Internal symbols: <[:start_lex]> ::= <[Lex-2]>
-L0 R19 [:start_lex] ::= 'string'
+  Internal symbols: <[:lex_start:]> ::= <[Lex-2]>
+L0 R19 [:lex_start:] ::= 'string'
   Symbol IDs: <33> ::= <4>
-  Internal symbols: <[:start_lex]> ::= <[Lex-3]>
-L0 R20 [:start_lex] ::= '('
+  Internal symbols: <[:lex_start:]> ::= <[Lex-3]>
+L0 R20 [:lex_start:] ::= '('
   Symbol IDs: <33> ::= <5>
-  Internal symbols: <[:start_lex]> ::= <[Lex-4]>
-L0 R21 [:start_lex] ::= ')'
+  Internal symbols: <[:lex_start:]> ::= <[Lex-4]>
+L0 R21 [:lex_start:] ::= ')'
   Symbol IDs: <33> ::= <6>
-  Internal symbols: <[:start_lex]> ::= <[Lex-5]>
-L0 R22 [:start_lex] ::= '+'
+  Internal symbols: <[:lex_start:]> ::= <[Lex-5]>
+L0 R22 [:lex_start:] ::= '+'
   Symbol IDs: <33> ::= <7>
-  Internal symbols: <[:start_lex]> ::= <[Lex-6]>
-L0 R23 [:start_lex] ::= '+'
+  Internal symbols: <[:lex_start:]> ::= <[Lex-6]>
+L0 R23 [:lex_start:] ::= '+'
   Symbol IDs: <33> ::= <8>
-  Internal symbols: <[:start_lex]> ::= <[Lex-7]>
-L0 R24 [:start_lex] ::= '*'
+  Internal symbols: <[:lex_start:]> ::= <[Lex-7]>
+L0 R24 [:lex_start:] ::= '*'
   Symbol IDs: <33> ::= <9>
-  Internal symbols: <[:start_lex]> ::= <[Lex-8]>
-L0 R25 [:start_lex] ::= number
+  Internal symbols: <[:lex_start:]> ::= <[Lex-8]>
+L0 R25 [:lex_start:] ::= number
   Symbol IDs: <33> ::= <28>
-  Internal symbols: <[:start_lex]> ::= <number>
-L0 R26 [:start_lex] ::= string
+  Internal symbols: <[:lex_start:]> ::= <number>
+L0 R26 [:lex_start:] ::= string
   Symbol IDs: <33> ::= <29>
-  Internal symbols: <[:start_lex]> ::= <string>
-L0 R27 [:start_lex] ::= variable
+  Internal symbols: <[:lex_start:]> ::= <string>
+L0 R27 [:lex_start:] ::= variable
   Symbol IDs: <33> ::= <31>
-  Internal symbols: <[:start_lex]> ::= <variable>
+  Internal symbols: <[:lex_start:]> ::= <variable>
 END_OF_SHOW_RULES_OUTPUT
 
 # Marpa::R3::Display::End
@@ -866,8 +866,8 @@ L0 S31 variable
 L0 S32 whitespace
   Internal name: <whitespace>
   SLIF name: whitespace
-L0 S33 [:start_lex]
-  Internal name: <[:start_lex]>
+L0 S33 [:lex_start:]
+  Internal name: <[:lex_start:]>
 END_OF_SHOW_SYMBOLS_OUTPUT
 
 # Marpa::R3::Display::End
@@ -1206,19 +1206,19 @@ string ::= ['] <string contents> [']
 <string contents> ::= [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] +
 [:discard:] ::= whitespace
 whitespace ::= [\s] +
-[:start_lex] ::= [:discard:]
-[:start_lex] ::= 'set'
-[:start_lex] ::= 'to'
-[:start_lex] ::= '='
-[:start_lex] ::= 'string'
-[:start_lex] ::= '('
-[:start_lex] ::= ')'
-[:start_lex] ::= '+'
-[:start_lex] ::= '+'
-[:start_lex] ::= '*'
-[:start_lex] ::= number
-[:start_lex] ::= string
-[:start_lex] ::= variable
+[:lex_start:] ::= [:discard:]
+[:lex_start:] ::= 'set'
+[:lex_start:] ::= 'to'
+[:lex_start:] ::= '='
+[:lex_start:] ::= 'string'
+[:lex_start:] ::= '('
+[:lex_start:] ::= ')'
+[:lex_start:] ::= '+'
+[:lex_start:] ::= '+'
+[:lex_start:] ::= '*'
+[:lex_start:] ::= number
+[:lex_start:] ::= string
+[:lex_start:] ::= variable
 END_OF_TEXT
 
 $text = '';
@@ -1353,8 +1353,8 @@ L0 symbol number: 31  DSL form: variable
 L0 symbol number: 32  name: whitespace
 L0 symbol number: 32  name in display form: whitespace
 L0 symbol number: 32  DSL form: whitespace
-L0 symbol number: 33  name: [:start_lex]
-L0 symbol number: 33  name in display form: [:start_lex]
+L0 symbol number: 33  name: [:lex_start:]
+L0 symbol number: 33  name in display form: [:lex_start:]
 L0 symbol number: 33  DSL form: [No name in DSL form]
 END_OF_TEXT
 
