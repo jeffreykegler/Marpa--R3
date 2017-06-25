@@ -1606,8 +1606,8 @@ END_OF_LUA
         my ($ok, $problem) =
         $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
             <<'END_OF_LUA', 's', $rule_description );
-            local grammar, rule_description = ...
-            local l0g = grammar.l0
+            local slg, rule_description = ...
+            local l0g = slg.l0
             local error_code = l0g:error_code()
             local problem_description
             if error_code == _M.err.DUPLICATE_RULE then
@@ -1657,8 +1657,8 @@ sub Marpa::R3::Scanless::G::g1_start_symbol_id {
     my ($start_symbol) = $slg->call_by_tag(
     ('@' .__FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', '>*' ) ;
-    local grammar = ...
-    return grammar.g1:start_symbol()
+    local slg = ...
+    return slg.g1:start_symbol()
 END_OF_LUA
     return $start_symbol;
 }
@@ -1679,8 +1679,8 @@ sub Marpa::R3::Scanless::G::lmg_rule_to_altid {
     my ( $desc ) =
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'si', $subg_name, $irlid );
-    local grammar, subg_name, irlid = ...
-    return grammar:lmg_rule_to_xbnfid(irlid, subg_name)
+    local slg, subg_name, irlid = ...
+    return slg:lmg_rule_to_xbnfid(irlid, subg_name)
 END_OF_LUA
     return $desc;
 }
@@ -1690,8 +1690,8 @@ sub Marpa::R3::Scanless::G::g1_rule_to_altid {
     my ( $desc ) =
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'i', $irlid );
-    local grammar, irlid = ...
-    return grammar:g1_rule_to_xbnfid(irlid)
+    local slg, irlid = ...
+    return slg:g1_rule_to_xbnfid(irlid)
 END_OF_LUA
     return $desc;
 }
@@ -1701,8 +1701,8 @@ sub Marpa::R3::Scanless::G::l0_rule_to_altid {
     my ( $desc ) =
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'i', $irlid );
-    local grammar, irlid = ...
-    return grammar:l0_rule_to_xbnfid(irlid)
+    local slg, irlid = ...
+    return slg:l0_rule_to_xbnfid(irlid)
 END_OF_LUA
     return $desc;
 }
@@ -1838,18 +1838,6 @@ sub Marpa::R3::Scanless::G::coro_by_tag {
     return @results;
 }
 
-sub Marpa::R3::Scanless::G::g1_show_rules {
-    my ( $slg, $verbose ) = @_;
-    $verbose //= 0;
-    return $slg->lmg_show_rules('g1', $verbose);
-}
-
-sub Marpa::R3::Scanless::G::l0_show_rules {
-    my ( $slg, $verbose ) = @_;
-    $verbose //= 0;
-    return $slg->lmg_show_rules('l0', $verbose);
-}
-
 sub Marpa::R3::Scanless::G::g1_show_symbols {
     my ( $slg, $verbose ) = @_;
     $verbose //= 0;
@@ -1867,8 +1855,8 @@ sub Marpa::R3::Scanless::G::g1_symbol_is_accessible {
     my ($is_accessible) = $slg->call_by_tag(
     ('@' .__FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', 'i>*', $symid ) ;
-    local grammar, symid = ...
-    local g1g = grammar.g1
+    local slg, symid = ...
+    local g1g = slg.g1
     return g1g:symbol_is_accessible(symid)
 END_OF_LUA
 
@@ -1880,8 +1868,8 @@ sub Marpa::R3::Scanless::G::g1_symbol_is_productive {
     my ($is_productive) = $slg->call_by_tag(
     ('@' .__FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', 'i>*', $symid ) ;
-    local grammar, symid = ...
-    local g1g = grammar.g1
+    local slg, symid = ...
+    local g1g = slg.g1
     return g1g:symbol_is_productive(symid)
 END_OF_LUA
 
@@ -1893,8 +1881,8 @@ sub Marpa::R3::Scanless::G::g1_symbol_is_nulling {
     my ($is_nulling) = $slg->call_by_tag(
     ('@' .__FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', 'i>*', $symid ) ;
-    local grammar, symid = ...
-    local g1g = grammar.g1
+    local slg, symid = ...
+    local g1g = slg.g1
     return g1g:symbol_is_nulling(symid)
 END_OF_LUA
 
@@ -1910,8 +1898,8 @@ sub Marpa::R3::Scanless::G::g1_show_dotted_rule {
     my ($has_minimum, $minimum) = $slg->call_by_tag(
     ('@' .__FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', 'i>*', $irlid ) ;
-    local grammar, irlid = ...
-    local g1g = grammar.g1
+    local slg, irlid = ...
+    local g1g = slg.g1
     local minimum = g1g:sequence_min(irlid)
     if not minimum then return 0, -1 end
     return 1, minimum
@@ -1987,8 +1975,8 @@ sub Marpa::R3::Scanless::G::lmg_rule_show {
     my ( $desc ) =
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'si>*', $subg_name, $irlid );
-    local grammar, subg_name, irlid = ...
-    return grammar:lmg_rule_show(irlid, subg_name)
+    local slg, subg_name, irlid = ...
+    return slg:lmg_rule_show(irlid, subg_name)
 END_OF_LUA
     return $desc;
 }
@@ -1998,8 +1986,8 @@ sub Marpa::R3::Scanless::G::g1_rule_show {
     my ( $desc ) =
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'i>*', $irlid );
-    local grammar, irlid = ...
-    return grammar:g1_rule_show(irlid)
+    local slg, irlid = ...
+    return slg:g1_rule_show(irlid)
 END_OF_LUA
     return $desc;
 }
@@ -2009,8 +1997,8 @@ sub Marpa::R3::Scanless::G::l0_rule_show {
     my ( $desc ) =
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'i>*', $irlid );
-    local grammar, irlid = ...
-    return grammar:l0_rule_show(irlid)
+    local slg, irlid = ...
+    return slg:l0_rule_show(irlid)
 END_OF_LUA
     return $desc;
 }
@@ -2021,8 +2009,8 @@ sub Marpa::R3::Scanless::G::lmg_rule_display {
     my ( $desc ) =
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'si>*', $subg_name, $irlid );
-    local grammar, subg_name, irlid = ...
-    return grammar:lmg_rule_display(irlid, subg_name)
+    local slg, subg_name, irlid = ...
+    return slg:lmg_rule_display(irlid, subg_name)
 END_OF_LUA
     return $desc;
 }
@@ -2032,8 +2020,8 @@ sub Marpa::R3::Scanless::G::g1_rule_display {
     my ( $desc ) =
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'i>*', $irlid );
-    local grammar, irlid = ...
-    return grammar:g1_rule_display(irlid)
+    local slg, irlid = ...
+    return slg:g1_rule_display(irlid)
 END_OF_LUA
     return $desc;
 }
@@ -2043,8 +2031,41 @@ sub Marpa::R3::Scanless::G::l0_rule_display {
     my ( $desc ) =
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'i>*', $irlid );
-    local grammar, irlid = ...
-    return grammar:l0_rule_display(irlid)
+    local slg, irlid = ...
+    return slg:l0_rule_display(irlid)
+END_OF_LUA
+    return $desc;
+}
+
+sub Marpa::R3::Scanless::G::lmg_rules_show {
+    my ( $slg, $subg_name, $verbose ) = @_;
+    my ( $desc ) =
+      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 'si', $subg_name, $verbose);
+    local slg, subg_name, verbose = ...
+    return slg:lmg_rules_show(subg_name, verbose)
+END_OF_LUA
+    return $desc;
+}
+
+sub Marpa::R3::Scanless::G::g1_rules_show {
+    my ( $slg, $verbose ) = @_;
+    my ( $desc ) =
+      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 'i', $verbose );
+    local slg, verbose = ...
+    return slg:g1_rules_show(verbose)
+END_OF_LUA
+    return $desc;
+}
+
+sub Marpa::R3::Scanless::G::l0_rules_show {
+    my ( $slg, $verbose ) = @_;
+    my ( $desc ) =
+      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 'i', $verbose);
+    local slg, verbose = ...
+    return slg:l0_rules_show(verbose)
 END_OF_LUA
     return $desc;
 }
@@ -2193,106 +2214,6 @@ END_OF_LUA
             if ($dsl_form) { $text .= qq{  SLIF name: $dsl_form\n}; }
 
         } ## end if ( $verbose >= 3 )
-
-    }
-
-    return $text;
-}
-
-sub Marpa::R3::Scanless::G::lmg_show_rules {
-    my ( $slg, $subg_name, $verbose ) = @_;
-    my $text = q{};
-    $verbose //= 0;
-
-    my ($highest_rule_id) = $slg->call_by_tag(
-    ('@' .__FILE__ . ':' . __LINE__),
-    <<'END_OF_LUA', 's>*', $subg_name ) ;
-    local grammar, subg_name = ...
-    local lmw_g = grammar[subg_name].lmw_g
-    return lmw_g:highest_rule_id()
-END_OF_LUA
-
-    for my $irlid ( 0 .. $highest_rule_id ) {
-
-          my ($rule_piece) = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-                <<'END_OF_LUA', 'sii', $subg_name, $irlid, $verbose );
-    local slg, subg_name, irlid, verbose = ...
-
-    local pcs = {}
-    local pcs2 = {}
-    pcs2[#pcs2+1] = string.upper(subg_name)
-    pcs2[#pcs2+1] = 'R' .. irlid
-    pcs2[#pcs2+1] = slg:lmg_rule_show(irlid, subg_name)
-    pcs[#pcs+1] = table.concat(pcs2, ' ')
-    pcs[#pcs+1] = "\n"
-
-    local lmw_g = slg[subg_name].lmw_g
-    local lhsid
-    local rhsids = {}
-    local rule_length
-    if verbose >= 2 then
-        lhsid = lmw_g:rule_lhs(irlid)
-        rhsids = {}
-        rule_length = lmw_g:rule_length(irlid)
-        local comments = {}
-        if lmw_g:rule_length(irlid) == 0 then
-            comments[#comments+1] = 'empty'
-        end
-        if lmw_g:_rule_is_used(irlid) == 0 then
-            comments[#comments+1] = '!used'
-        end
-        if lmw_g:rule_is_productive(irlid) == 0 then
-            comments[#comments+1] = 'unproductive'
-        end
-        if lmw_g:rule_is_accessible(irlid) == 0 then
-            comments[#comments+1] = 'inaccessible'
-        end
-        local irl = slg[subg_name].lmw_g.irls[irlid]
-        local xbnf = irl.xbnf
-        if xbnf then
-            if xbnf.discard_separation then
-                comments[#comments+1] = 'discard_sep'
-            end
-        end
-        if #comments > 0 then
-            local pcs3 = {}
-            for ix = 1, #comments do
-                pcs3[#pcs3+1] = "/*" .. comments[ix] .. "*/"
-            end
-            pcs[#pcs+1] = table.concat(pcs3, ' ')
-            pcs[#pcs+1] = "\n"
-        end
-        pcs2 = {}
-        pcs2[#pcs2+1] = '  Symbol IDs:'
-        for ix = 0, rule_length - 1 do
-           rhsids[ix] = lmw_g:rule_rhs(irlid, ix)
-        end
-        pcs2[#pcs2+1] = '<' .. lhsid .. '>'
-        pcs2[#pcs2+1] = '::='
-        for ix = 0, rule_length - 1 do
-            pcs2[#pcs2+1] = '<' .. rhsids[ix] .. '>'
-        end
-        pcs[#pcs+1] = table.concat(pcs2, ' ')
-        pcs[#pcs+1] = "\n"
-    end
-    if verbose >= 3 then
-        local pcs2 = {}
-        pcs2[#pcs2+1] = '  Internal symbols:'
-        pcs2[#pcs2+1] = '<' .. slg:lmg_symbol_name(lhsid, subg_name) .. '>'
-        pcs2[#pcs2+1] = '::='
-        for ix = 0, rule_length - 1 do
-            pcs2[#pcs2+1]
-                = '<'
-                    ..  slg:lmg_symbol_name(rhsids[ix], subg_name)
-                    ..  '>'
-        end
-        pcs[#pcs+1] = table.concat(pcs2, ' ')
-        pcs[#pcs+1] = "\n"
-    end
-    return table.concat(pcs)
-END_OF_LUA
-
-        $text .= $rule_piece;
 
     }
 

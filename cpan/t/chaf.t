@@ -51,7 +51,7 @@ END_OF_DSL
     }
 );
 
-Marpa::R3::Test::is( $grammar->g1_show_rules, <<'EOS', 'Aycock/Horspool Rules' );
+Marpa::R3::Test::is( $grammar->g1_rules_show, <<'EOS', 'Aycock/Horspool Rules' );
 G1 R0 S ::= A B B B C C
 G1 R1 A ::= 'a'
 G1 R2 B ::= 'a'

@@ -70,7 +70,7 @@ G1 S3 a
 G1 S4 b
 END_OF_STRING
 
-Marpa::R3::Test::is( $grammar->g1_show_rules,
+Marpa::R3::Test::is( $grammar->g1_rules_show,
     <<'END_OF_STRING', 'Leo168 Rules' );
 G1 R0 S ::= a S
 G1 R1 S ::= C

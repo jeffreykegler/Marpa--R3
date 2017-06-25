@@ -103,7 +103,7 @@ my $recce = Marpa::R3::Scanless::R->new(
     }
 );
 
-Marpa::R3::Test::is( $grammar->g1_show_rules,
+Marpa::R3::Test::is( $grammar->g1_rules_show,
     <<'END_RULES', 'Minuses Equation Rules' );
 G1 R0 E ::= E Minus E
 G1 R1 E ::= E MinusMinus

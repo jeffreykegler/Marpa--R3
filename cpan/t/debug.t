@@ -474,25 +474,25 @@ my $expected_value_after_fix = \bless(
 );
 Test::More::is_deeply($value_ref, $expected_value_after_fix, 'Value after fix');
 
-my $show_rules_output;
-$show_rules_output .= "G1 Rules:\n";
-$show_rules_output .= $grammar->g1_show_rules(3);
-$show_rules_output .= "Lex (L0) Rules:\n";
+my $rules_show_output;
+$rules_show_output .= "G1 Rules:\n";
+$rules_show_output .= $grammar->g1_rules_show(3);
+$rules_show_output .= "Lex (L0) Rules:\n";
 
 # Marpa::R3::Display
-# name: SLG l0_show_rules() synopsis
+# name: SLG l0_rules_show() synopsis
 
-$show_rules_output .= $grammar->l0_show_rules(3);
+$rules_show_output .= $grammar->l0_rules_show(3);
 
 # Marpa::R3::Display::End
 
 # Marpa::R3::Display
-# name: SLIF debug example g1_show_rules() output
+# name: SLIF debug example g1_rules_show() output
 # start-after-line: END_OF_SHOW_RULES_OUTPUT
 # end-before-line: '^END_OF_SHOW_RULES_OUTPUT$'
 
-Marpa::R3::Test::is( $show_rules_output,
-    <<'END_OF_SHOW_RULES_OUTPUT', 'SLIF g1_show_rules()' );
+Marpa::R3::Test::is( $rules_show_output,
+    <<'END_OF_SHOW_RULES_OUTPUT', 'SLIF g1_rules_show()' );
 G1 Rules:
 G1 R0 statements ::= statement *
   Symbol IDs: <22> ::= <21>

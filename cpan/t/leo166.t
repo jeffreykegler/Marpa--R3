@@ -50,7 +50,7 @@ G1 S1 [:start:]
 G1 S2 a
 END_OF_STRING
 
-Marpa::R3::Test::is( $grammar->g1_show_rules, <<'END_OF_STRING', 'Leo166 Rules' );
+Marpa::R3::Test::is( $grammar->g1_rules_show, <<'END_OF_STRING', 'Leo166 Rules' );
 G1 R0 S ::= a S
 G1 R1 S ::=
 G1 R2 [:start:] ::= S

@@ -907,6 +907,91 @@ and eliminate the redundant ones.
     function _M.class_slg.l0_rule_display(slg, irlid)
         return slg:lmg_rule_display(irlid, 'l0')
     end
+
+    function _M.class_slg.lmg_rules_show(slg, subg_name, verbose)
+        verbose = verbose or 0
+        local lmw_g = slg[subg_name].lmw_g
+        local pcs = {}
+        for irlid = 0, lmw_g:highest_rule_id() do
+
+            local pcs2 = {}
+            pcs2[#pcs2+1] = string.upper(subg_name)
+            pcs2[#pcs2+1] = 'R' .. irlid
+            pcs2[#pcs2+1] = slg:lmg_rule_show(irlid, subg_name)
+            pcs[#pcs+1] = table.concat(pcs2, ' ')
+            pcs[#pcs+1] = "\n"
+
+            local lhsid
+            local rhsids = {}
+            local rule_length
+            if verbose >= 2 then
+                lhsid = lmw_g:rule_lhs(irlid)
+                rhsids = {}
+                rule_length = lmw_g:rule_length(irlid)
+                local comments = {}
+                if lmw_g:rule_length(irlid) == 0 then
+                    comments[#comments+1] = 'empty'
+                end
+                if lmw_g:_rule_is_used(irlid) == 0 then
+                    comments[#comments+1] = '!used'
+                end
+                if lmw_g:rule_is_productive(irlid) == 0 then
+                    comments[#comments+1] = 'unproductive'
+                end
+                if lmw_g:rule_is_accessible(irlid) == 0 then
+                    comments[#comments+1] = 'inaccessible'
+                end
+                local irl = slg[subg_name].lmw_g.irls[irlid]
+                local xbnf = irl.xbnf
+                if xbnf then
+                    if xbnf.discard_separation then
+                        comments[#comments+1] = 'discard_sep'
+                    end
+                end
+                if #comments > 0 then
+                    local pcs3 = {}
+                    for ix = 1, #comments do
+                        pcs3[#pcs3+1] = "/*" .. comments[ix] .. "*/"
+                    end
+                    pcs[#pcs+1] = table.concat(pcs3, ' ')
+                    pcs[#pcs+1] = "\n"
+                end
+                pcs2 = {}
+                pcs2[#pcs2+1] = '  Symbol IDs:'
+                for ix = 0, rule_length - 1 do
+                   rhsids[ix] = lmw_g:rule_rhs(irlid, ix)
+                end
+                pcs2[#pcs2+1] = '<' .. lhsid .. '>'
+                pcs2[#pcs2+1] = '::='
+                for ix = 0, rule_length - 1 do
+                    pcs2[#pcs2+1] = '<' .. rhsids[ix] .. '>'
+                end
+                pcs[#pcs+1] = table.concat(pcs2, ' ')
+                pcs[#pcs+1] = "\n"
+            end
+            if verbose >= 3 then
+                local pcs2 = {}
+                pcs2[#pcs2+1] = '  Internal symbols:'
+                pcs2[#pcs2+1] = '<' .. slg:lmg_symbol_name(lhsid, subg_name) .. '>'
+                pcs2[#pcs2+1] = '::='
+                for ix = 0, rule_length - 1 do
+                    pcs2[#pcs2+1]
+                        = '<'
+                            ..  slg:lmg_symbol_name(rhsids[ix], subg_name)
+                            ..  '>'
+                end
+                pcs[#pcs+1] = table.concat(pcs2, ' ')
+                pcs[#pcs+1] = "\n"
+            end
+        end
+        return table.concat(pcs)
+    end
+    function _M.class_slg.g1_rules_show(slg, verbose)
+        return slg:lmg_rules_show('g1', verbose)
+    end
+    function _M.class_slg.l0_rules_show(slg, verbose)
+        return slg:lmg_rules_show('l0', verbose)
+    end
 ```
 
 ### Mutators

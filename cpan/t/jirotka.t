@@ -112,7 +112,7 @@ G1 S23 [:start:]
 G1 S24 SEPARATOR
 END_OF_SYMBOLS
 
-Marpa::R3::Test::is( $grammar->g1_show_rules(),
+Marpa::R3::Test::is( $grammar->g1_rules_show(),
 <<'END_OF_RULES', 'Rules' );
 G1 R0 Input ::= Statement +
 G1 R1 Statement ::= CREATE TypeDef

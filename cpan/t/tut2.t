@@ -103,9 +103,9 @@ G1 S6 '*'
 G1 S7 '+'
 END_SYMBOLS
 
-my $show_rules_output = $grammar->g1_show_rules();
+my $rules_show_output = $grammar->g1_rules_show();
 
-Marpa::R3::Test::is( $show_rules_output,
+Marpa::R3::Test::is( $rules_show_output,
     <<'END_RULES', 'Implementation Example Rules' );
 G1 R0 Calculator ::= Expression
 G1 R1 Factor ::= Number

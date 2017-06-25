@@ -61,11 +61,11 @@ END_OF_SOURCE
     }
 );
 
-my $show_rules_output = $calculator_grammar->g1_show_rules();
-$show_rules_output .= $calculator_grammar->l0_show_rules(1);
+my $rules_show_output = $calculator_grammar->g1_rules_show();
+$rules_show_output .= $calculator_grammar->l0_rules_show(1);
 
-Marpa::R3::Test::is( $show_rules_output,
-    <<'END_OF_SHOW_RULES_OUTPUT', 'Scanless g1_show_rules()' );
+Marpa::R3::Test::is( $rules_show_output,
+    <<'END_OF_SHOW_RULES_OUTPUT', 'Scanless g1_rules_show()' );
 G1 R0 Script ::= Expression +
 G1 R1 Expression ::= Expression
 G1 R2 Expression ::= Expression

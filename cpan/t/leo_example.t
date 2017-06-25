@@ -101,9 +101,9 @@ G1 S7 Variable
 G1 S8 [:start:]
 END_SYMBOLS
 
-my $show_rules_output = $grammar->g1_show_rules();
+my $rules_show_output = $grammar->g1_rules_show();
 
-Marpa::R3::Test::is( $show_rules_output, <<'END_RULES', 'Leo Example Rules' );
+Marpa::R3::Test::is( $rules_show_output, <<'END_RULES', 'Leo Example Rules' );
 G1 R0 Statement ::= Expression
 G1 R1 Expression ::= Lvalue AssignOp Expression
 G1 R2 Expression ::= Lvalue AddAssignOp Expression

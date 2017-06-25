@@ -112,7 +112,7 @@ END_SYMBOLS
 
 $actual_ref = save_stdout();
 
-print $grammar->g1_show_rules()
+print $grammar->g1_rules_show()
     or die "print failed: $ERRNO";
 
 restore_stdout();

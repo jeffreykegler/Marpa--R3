@@ -56,7 +56,7 @@ DSL
     }
 );
 
-Marpa::R3::Test::is( $grammar->g1_show_rules(1),
+Marpa::R3::Test::is( $grammar->g1_rules_show(1),
     <<'END_OF_STRING', 'final nonnulling Rules' );
 G1 R0 S ::= p p p n
 G1 R1 p ::= a
