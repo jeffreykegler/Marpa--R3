@@ -1651,7 +1651,7 @@ END_OF_LUA
                         warnings    => \@warnings,
                         where       => 'computing value',
                         long_where  => 'Computing value for null symbol: '
-                          . $slg->g1_symbol_name($token_id),
+                          . $slg->g1_symbol_display($token_id),
                     }
                 );
             } ## end if ( not $eval_ok or @warnings )
@@ -1806,7 +1806,7 @@ END_OF_LUA
     }
     my $token_name;
     if ( defined $token_id ) {
-        $token_name = $slg->g1_symbol_name($token_id);
+        $token_name = $slg->g1_symbol_display($token_id);
     }
 
     print {$trace_file_handle}

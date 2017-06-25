@@ -37,16 +37,18 @@ our $PACKAGE = 'Marpa::R3::Scanless::R';
 # undef if there was none.
 sub Marpa::R3::Scanless::R::last_completed {
     my ( $slr, $symbol_name ) = @_;
-    my $slg  = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $symbol_id       = $slg->g1_symbol_by_name($symbol_name);
-
     my ($start, $length) = $slr->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__),
-    <<'END_OF_LUA', 'i>*', $symbol_id);
-        local recce, symbol_id  = ...
-        return recce:last_completed(symbol_id)
+    <<'END_OF_LUA', 'i', $symbol_name);
+        local slr, xsy_name  = ...
+        local xsyid = slr.slg:symbol_by_name(xsy_name)
+        if not xsyid then
+            _M.userX(string.format(
+                "last_completed(%q): no symbol with that name",
+                xsy_name))
+        end
+        return slr:last_completed(xsyid)
 END_OF_LUA
-
     return if not defined $start;
     return $start, $length;
 } ## end sub Marpa::R3::Scanless::R::last_completed
@@ -982,6 +984,12 @@ sub Marpa::R3::Scanless::R::g1_to_l0_first {
     return $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'i', $g1_pos  );
         local slr, g1_pos = ...
+        g1_pos = math.tointeger(g1_pos)
+        if not g1_pos then
+            _M.userX(string.format(
+                "g1_to_l0_first(%s): argument must be an integer",
+                g1_pos))
+        end
         return slr:g1_pos_to_l0_first(g1_pos)
 END_OF_LUA
 }
@@ -992,6 +1000,12 @@ sub Marpa::R3::Scanless::R::g1_to_l0_last {
     return $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'i', $g1_pos  );
         local slr, g1_pos = ...
+        g1_pos = math.tointeger(g1_pos)
+        if not g1_pos then
+            _M.userX(string.format(
+                "g1_to_l0_last(%s): argument must be an integer",
+                g1_pos))
+        end
         return slr:g1_pos_to_l0_last(g1_pos)
 END_OF_LUA
 }

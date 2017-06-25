@@ -821,6 +821,11 @@ and eliminate the redundant ones.
         return slg:lmg_symbol_name(symbol_id, 'l0')
     end
 
+    function _M.class_slg.symbol_by_name(slg, xsy_name)
+        local xsy = slg.xsys[xsy_name]
+        if not xsy then return end
+        return xsy.id
+    end
     function _M.class_slg.lmg_symbol_by_name(slg, symbol_name, subg_name)
         local subg = slg[subg_name]
         return subg.isyid_by_name[symbol_name]
@@ -3163,7 +3168,7 @@ or nil if there was none.
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slr.last_completed(slr, symbol_id)
+    function _M.class_slr.last_completed(slr, xsyid)
          local g1r = slr.g1
          local g1g = slr.slg.g1
          local latest_earley_set = g1r:latest_earley_set()
@@ -3176,7 +3181,10 @@ or nil if there was none.
                  if not rule_id then goto LAST_ITEM end
                  if dot_position ~= -1 then goto NEXT_ITEM end
                  local lhs_id = g1g:rule_lhs(rule_id)
-                 if symbol_id ~= lhs_id then goto NEXT_ITEM end
+                 local lhs_xsy = g1g:xsy(lhs_id)
+                 if not lhs_xsy then goto NEXT_ITEM end
+                 local lhs_xsyid = lhs_xsy.id
+                 if xsyid ~= lhs_xsyid then goto NEXT_ITEM end
                  if origin < first_origin then
                      first_origin = origin
                  end
