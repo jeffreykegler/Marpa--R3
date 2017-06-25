@@ -2235,49 +2235,54 @@ END_OF_LUA
                 <<'END_OF_LUA', 'sisi', $subg_name, $irlid, $text, $verbose );
     local slg, subg_name, irlid, text, verbose = ...
     local lmw_g = slg[subg_name].lmw_g
-    local comments = {}
-    local rule_length = lmw_g:rule_length(irlid)
-    if lmw_g:rule_length(irlid) == 0 then
-        comments[#comments+1] = 'empty'
-    end
-    if lmw_g:_rule_is_used(irlid) == 0 then
-        comments[#comments+1] = '!used'
-    end
-    if lmw_g:rule_is_productive(irlid) == 0 then
-        comments[#comments+1] = 'unproductive'
-    end
-    if lmw_g:rule_is_accessible(irlid) == 0 then
-        comments[#comments+1] = 'inaccessible'
-    end
-    local irl = slg[subg_name].lmw_g.irls[irlid]
-    local xbnf = irl.xbnf
-    if xbnf then
-        if xbnf.discard_separation then
-            comments[#comments+1] = 'discard_sep'
+    local lhsid
+    local rhsids = {}
+    local rule_length
+    if verbose >= 2 then
+        lhsid = lmw_g:rule_lhs(irlid)
+        rhsids = {}
+        rule_length = lmw_g:rule_length(irlid)
+        local comments = {}
+        if lmw_g:rule_length(irlid) == 0 then
+            comments[#comments+1] = 'empty'
         end
-    end
-    if #comments > 0 then
+        if lmw_g:_rule_is_used(irlid) == 0 then
+            comments[#comments+1] = '!used'
+        end
+        if lmw_g:rule_is_productive(irlid) == 0 then
+            comments[#comments+1] = 'unproductive'
+        end
+        if lmw_g:rule_is_accessible(irlid) == 0 then
+            comments[#comments+1] = 'inaccessible'
+        end
+        local irl = slg[subg_name].lmw_g.irls[irlid]
+        local xbnf = irl.xbnf
+        if xbnf then
+            if xbnf.discard_separation then
+                comments[#comments+1] = 'discard_sep'
+            end
+        end
+        if #comments > 0 then
+            local pieces = {}
+            for ix = 1, #comments do
+                pieces[#pieces+1] = "/*" .. comments[ix] .. "*/"
+            end
+            text = text .. table.concat(pieces, ' ') .. "\n"
+        end
         local pieces = {}
-        for ix = 1, #comments do
-            pieces[#pieces+1] = "/*" .. comments[ix] .. "*/"
+        pieces[#pieces+1] = '  Symbol IDs:'
+        for ix = 0, rule_length - 1 do
+           rhsids[ix] = lmw_g:rule_rhs(irlid, ix)
+        end
+        pieces[#pieces+1] = '<' .. lhsid .. '>'
+        pieces[#pieces+1] = '::='
+        for ix = 0, rule_length - 1 do
+            pieces[#pieces+1] = '<' .. rhsids[ix] .. '>'
         end
         text = text .. table.concat(pieces, ' ') .. "\n"
     end
-    local pieces = {}
-    pieces[#pieces+1] = '  Symbol IDs:'
-    local lhsid = lmw_g:rule_lhs(irlid)
-    local rhsids = {}
-    for ix = 0, rule_length - 1 do
-       rhsids[ix] = lmw_g:rule_rhs(irlid, ix)
-    end
-    pieces[#pieces+1] = '<' .. lhsid .. '>'
-    pieces[#pieces+1] = '::='
-    for ix = 0, rule_length - 1 do
-        pieces[#pieces+1] = '<' .. rhsids[ix] .. '>'
-    end
-    text = text .. table.concat(pieces, ' ') .. "\n"
     if verbose >= 3 then
-        pieces = {}
+        local pieces = {}
         pieces[#pieces+1] = '  Internal symbols:'
         pieces[#pieces+1] = '<' .. slg:lmg_symbol_name(lhsid, subg_name) .. '>'
         pieces[#pieces+1] = '::='
