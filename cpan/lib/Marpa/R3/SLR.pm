@@ -692,26 +692,36 @@ END_OF_LUA
 
                 my ($pieces) =
                   $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-                    <<'END_OF_LUA', 'sii', $dotted_type, ($origins[0]+0), $current_ordinal );
-    local slr, dotted_type, g1_first, current_ordinal = ...
+                    <<'END_OF_LUA', 'siiii', $dotted_type, ($origins[0]+0), $current_ordinal, $rule_id, $position );
+    local slr, dotted_type, g1_first, current_ordinal, rule_id, position = ...
+    local slg = slr.slg
     local pcs = {}
-    if current_ordinal <= 0 then return 'B0L0c0' end
+
+    -- find the range
+    if current_ordinal <= 0 then
+        pcs[#pcs+1] = 'B0L0c0'
+        goto HAVE_RANGE
+    end
     if dotted_type == 'P' then
         local block, pos = slr:g1_pos_to_l0_first(current_ordinal)
         pcs[#pcs+1] = slr:lc_brief(pos, block)
-    else
+        goto HAVE_RANGE
+    end
+    do
         if g1_first < 0 then g1_first = 0 end
         local g1_last = current_ordinal - 1
         local l0_first_b, l0_first_p = slr:g1_pos_to_l0_first(g1_first)
         local l0_last_b, l0_last_p = slr:g1_pos_to_l0_last(g1_last)
         pcs[#pcs+1] = slr:lc_range_brief(l0_first_b, l0_first_p, l0_last_b, l0_last_p)
+        goto HAVE_RANGE
     end
+    ::HAVE_RANGE::
+    pcs[#pcs+1] = slg:g1_dotted_rule_show(rule_id, position)
     return table.concat(pcs, ' ');
 END_OF_LUA
 
                 push @item_text, $pieces;
 
-                push @item_text, $slg->g1_dotted_rule_show( $rule_id, $position );
                 $text .= ( join q{ }, @item_text ) . "\n";
             } ## end for my $position ( sort { $a <=> $b } keys %{...})
         } ## end for my $rule_id ( sort { $a <=> $b } keys ...)
