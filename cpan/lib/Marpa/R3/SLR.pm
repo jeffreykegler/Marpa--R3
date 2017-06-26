@@ -660,42 +660,36 @@ END_OF_LUA
                     $origin_desc = $origins[0] . q{...} . $origins[-1];
                 }
 
-                my ($rhs_length) = $slg->call_by_tag(
-                    ( '@' . __FILE__ . ':' . __LINE__ ),
-'local grammar, rule_id = ...; return grammar.g1:rule_length(rule_id)',
-                    'i',
-                    $rule_id
-                );
-                my @item_text;
-
-                my $dotted_type = "R";
-                if ( $position >= $rhs_length ) {
-                    $dotted_type = "F";
-                    push @item_text, "F$rule_id";
-                }
-                elsif ($position) {
-                    push @item_text, "R$rule_id:$position";
-                }
-                else {
-                    $dotted_type = "P";
-                    push @item_text, "P$rule_id";
-                }
-
                 my ($pieces) =
                   $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-                    <<'END_OF_LUA', 'siiiis', $dotted_type, \@origins, $current_ordinal, $rule_id, $position, $origin_desc );
-    local slr, dotted_type, origins, current_ordinal, rule_id, position, origin_desc = ...
+                    <<'END_OF_LUA', 'iiiis', $current_ordinal, [map { $_+0; } @origins], $rule_id+0, $position+0, $origin_desc );
+    local slr, current_ordinal, origins, rule_id, position, origin_desc = ...
 
     -- For origins[0], we apply
     --     -1 to convert earley set to G1, then
     --     +1 because it is an origin and the character
     --        doesn't begin until the next Earley set
     -- In other words, they balance and we do nothing
-    local g1_first = math.tointeger(origins[1])
+    local g1_first = origins[1]
 
     local slg = slr.slg
     local g1g = slg.g1
     local pcs = {}
+
+    local dotted_type
+    if position >= g1g:rule_length(rule_id) then
+        dotted_type = 'F'
+        pcs[#pcs+1] = 'F' .. rule_id
+        goto TAG_FOUND
+    end
+    if position > 0 then
+        dotted_type = 'R'
+        pcs[#pcs+1] = 'R' .. rule_id .. ':' .. position
+        goto TAG_FOUND
+    end
+    dotted_type = 'P'
+    pcs[#pcs+1] = 'P' .. rule_id
+    ::TAG_FOUND::
 
     if #origins > 1 then
         pcs[#pcs+1] = 'x' .. #origins
@@ -727,9 +721,7 @@ END_OF_LUA
     return table.concat(pcs, ' ');
 END_OF_LUA
 
-                push @item_text, $pieces;
-
-                $text .= ( join q{ }, @item_text ) . "\n";
+                $text .= $pieces . "\n";
             } ## end for my $position ( sort { $a <=> $b } keys %{...})
         } ## end for my $rule_id ( sort { $a <=> $b } keys ...)
 
