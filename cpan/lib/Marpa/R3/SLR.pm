@@ -681,8 +681,6 @@ END_OF_LUA
                     push @item_text, "P$rule_id";
                 }
                 push @item_text, "x$origins_count" if $origins_count > 1;
-                my $current_earleme     = $slr->earleme($current_ordinal);
-                push @item_text, q{@} . $origin_desc . q{-} . $current_earleme;
 
                 # For origins[0], we apply
                 # -1 to convert earley set to G1, then
@@ -692,10 +690,15 @@ END_OF_LUA
 
                 my ($pieces) =
                   $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-                    <<'END_OF_LUA', 'siiii', $dotted_type, ($origins[0]+0), $current_ordinal, $rule_id, $position );
-    local slr, dotted_type, g1_first, current_ordinal, rule_id, position = ...
+                    <<'END_OF_LUA', 'siiiis', $dotted_type, \@origins, $current_ordinal, $rule_id, $position, $origin_desc );
+    local slr, dotted_type, origins, current_ordinal, rule_id, position, origin_desc = ...
+    local g1_first = math.tointeger(origins[1])
     local slg = slr.slg
+    local g1g = slg.g1
     local pcs = {}
+
+    local current_earleme = slr.g1:earleme(current_ordinal)
+    pcs[#pcs+1] = '@' .. origin_desc .. '-' .. current_earleme
 
     -- find the range
     if current_ordinal <= 0 then
