@@ -636,9 +636,9 @@ sub Marpa::R3::Scanless::R::g1_show_progress {
         my %by_rule_by_position = ();
         for my $progress_item ( @{ $slr->g1_progress($current_ordinal) } ) {
             my ( $rule_id, $position, $origin ) = @{$progress_item};
-            ($position) = $slg->call_by_tag(
-                    ( '@' . __FILE__ . ':' . __LINE__ ),
-                    <<'END_OF_LUA', 'ii', $rule_id, $position);
+            ($position) =
+              $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+                <<'END_OF_LUA', 'ii', $rule_id, $position );
     local grammar, rule_id, position = ...
     if position >= 0 then return position end
     return grammar.g1:rule_length(rule_id)
@@ -649,75 +649,20 @@ END_OF_LUA
         for my $rule_id ( sort { $a <=> $b } keys %by_rule_by_position ) {
             my $by_position = $by_rule_by_position{$rule_id};
             for my $position ( sort { $a <=> $b } keys %{$by_position} ) {
-                my $raw_origins   = $by_position->{$position};
-                my @origins       = sort { $a <=> $b } keys %{$raw_origins};
+                my $raw_origins = $by_position->{$position};
+                my @origins = sort { $a <=> $b } keys %{$raw_origins};
 
-                my ($pieces) =
-                  $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-                    <<'END_OF_LUA', 'iiii', $current_ordinal, [map { $_+0; } @origins], $rule_id+0, $position+0 );
+                my ($piece) = $slr->call_by_tag(
+                    ( '@' . __FILE__ . ':' . __LINE__ ),
+                    <<'END_OF_LUA', 'iiii', $current_ordinal, [ map { $_ + 0; } @origins ], $rule_id + 0, $position + 0 );
     local slr, current_ordinal, origins, rule_id, position = ...
-
-    -- For origins[0], we apply
-    --     -1 to convert earley set to G1, then
-    --     +1 because it is an origin and the character
-    --        doesn't begin until the next Earley set
-    -- In other words, they balance and we do nothing
-    local g1_first = origins[1]
-
-    local slg = slr.slg
-    local g1g = slg.g1
-    local pcs = {}
-
-    local origins_desc = #origins <= 3
-         and table.concat(origins, ',')
-         or origins[1] .. '...' .. origins[#origins]
-
-    local dotted_type
-    if position >= g1g:rule_length(rule_id) then
-        dotted_type = 'F'
-        pcs[#pcs+1] = 'F' .. rule_id
-        goto TAG_FOUND
-    end
-    if position > 0 then
-        dotted_type = 'R'
-        pcs[#pcs+1] = 'R' .. rule_id .. ':' .. position
-        goto TAG_FOUND
-    end
-    dotted_type = 'P'
-    pcs[#pcs+1] = 'P' .. rule_id
-    ::TAG_FOUND::
-
-    if #origins > 1 then
-        pcs[#pcs+1] = 'x' .. #origins
-    end
-
-    local current_earleme = slr.g1:earleme(current_ordinal)
-    pcs[#pcs+1] = '@' .. origins_desc .. '-' .. current_earleme
-
-    -- find the range
-    if current_ordinal <= 0 then
-        pcs[#pcs+1] = 'B0L0c0'
-        goto HAVE_RANGE
-    end
-    if dotted_type == 'P' then
-        local block, pos = slr:g1_pos_to_l0_first(current_ordinal)
-        pcs[#pcs+1] = slr:lc_brief(pos, block)
-        goto HAVE_RANGE
-    end
-    do
-        if g1_first < 0 then g1_first = 0 end
-        local g1_last = current_ordinal - 1
-        local l0_first_b, l0_first_p = slr:g1_pos_to_l0_first(g1_first)
-        local l0_last_b, l0_last_p = slr:g1_pos_to_l0_last(g1_last)
-        pcs[#pcs+1] = slr:lc_range_brief(l0_first_b, l0_first_p, l0_last_b, l0_last_p)
-        goto HAVE_RANGE
-    end
-    ::HAVE_RANGE::
-    pcs[#pcs+1] = slg:g1_dotted_rule_show(rule_id, position)
-    return table.concat(pcs, ' ');
+    local piece = slr:_progress_line_do(
+        current_ordinal, origins, rule_id, position
+    )
+    return piece
 END_OF_LUA
 
-                $text .= $pieces . "\n";
+                $text .= $piece . "\n";
             } ## end for my $position ( sort { $a <=> $b } keys %{...})
         } ## end for my $rule_id ( sort { $a <=> $b } keys ...)
 

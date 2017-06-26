@@ -3699,7 +3699,7 @@ part of a "Pure Lua" implementation.
         end
         ::HAVE_RANGE::
         pcs[#pcs+1] = slg:g1_dotted_rule_show(rule_id, position)
-        return table.concat(pcs, ' ');
+        return table.concat(pcs, ' '), { current_ordinal, rule_id, position } ;
     end
 ```
 
