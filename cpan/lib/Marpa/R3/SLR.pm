@@ -680,22 +680,26 @@ END_OF_LUA
                     $dotted_type = "P";
                     push @item_text, "P$rule_id";
                 }
-                push @item_text, "x$origins_count" if $origins_count > 1;
-
-                # For origins[0], we apply
-                # -1 to convert earley set to G1, then
-                # +1 one because it is an origin and the character
-                # don't begin until the next Earley set
-                # -- in other words, they balance and we do nothing
 
                 my ($pieces) =
                   $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
                     <<'END_OF_LUA', 'siiiis', $dotted_type, \@origins, $current_ordinal, $rule_id, $position, $origin_desc );
     local slr, dotted_type, origins, current_ordinal, rule_id, position, origin_desc = ...
+
+    -- For origins[0], we apply
+    --     -1 to convert earley set to G1, then
+    --     +1 because it is an origin and the character
+    --        doesn't begin until the next Earley set
+    -- In other words, they balance and we do nothing
     local g1_first = math.tointeger(origins[1])
+
     local slg = slr.slg
     local g1g = slg.g1
     local pcs = {}
+
+    if #origins > 1 then
+        pcs[#pcs+1] = 'x' .. #origins
+    end
 
     local current_earleme = slr.g1:earleme(current_ordinal)
     pcs[#pcs+1] = '@' .. origin_desc .. '-' .. current_earleme
