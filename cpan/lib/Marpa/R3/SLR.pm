@@ -633,18 +633,16 @@ sub Marpa::R3::Scanless::R::g1_show_progress {
 
     my $text = q{};
     for my $current_ordinal ( $start_ordinal .. $end_ordinal ) {
-        my $current_earleme     = $slr->earleme($current_ordinal);
         my %by_rule_by_position = ();
         for my $progress_item ( @{ $slr->g1_progress($current_ordinal) } ) {
             my ( $rule_id, $position, $origin ) = @{$progress_item};
-            if ( $position < 0 ) {
-                ($position) = $slg->call_by_tag(
+            ($position) = $slg->call_by_tag(
                     ( '@' . __FILE__ . ':' . __LINE__ ),
-'local grammar, rule_id = ...; return grammar.g1:rule_length(rule_id)',
-                    'i',
-                    $rule_id
-                );
-            }
+                    <<'END_OF_LUA', 'ii', $rule_id, $position);
+    local grammar, rule_id, position = ...
+    if position >= 0 then return position end
+    return grammar.g1:rule_length(rule_id)
+END_OF_LUA
             $by_rule_by_position{$rule_id}->{$position}->{$origin}++;
         } ## end for my $progress_item ( @{ $recce->g1_progress($current_ordinal...)})
 
@@ -683,6 +681,7 @@ sub Marpa::R3::Scanless::R::g1_show_progress {
                     push @item_text, "P$rule_id";
                 }
                 push @item_text, "x$origins_count" if $origins_count > 1;
+                my $current_earleme     = $slr->earleme($current_ordinal);
                 push @item_text, q{@} . $origin_desc . q{-} . $current_earleme;
 
                 # For origins[0], we apply
