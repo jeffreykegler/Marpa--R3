@@ -29,10 +29,11 @@ cd kollos && ../lua/lua toc.lua < kollos.md
 * [Development Notes](#development-notes)
   * [To Do](#to-do)
     * [TODO notes](#todo-notes)
+  * [Terminology fixes](#terminology-fixes)
   * [Use generations in Libmarpa trees](#use-generations-in-libmarpa-trees)
   * [Kollos assumes core libraries are loaded](#kollos-assumes-core-libraries-are-loaded)
   * [New lexer features](#new-lexer-features)
-  * [Discard events](#discard-events)
+  * [Discard default statement?](#discard-default-statement)
 * [Kollos object](#kollos-object)
 * [Kollos registry objects](#kollos-registry-objects)
   * [External, inner and internal](#external-inner-and-internal)
@@ -44,12 +45,13 @@ cd kollos && ../lua/lua toc.lua < kollos.md
 * [Rules](#rules)
 * [IRL Fields](#irl-fields)
 * [XRL Fields](#xrl-fields)
+* [XBNF Fields](#xbnf-fields)
 * [Kollos SLIF grammar object](#kollos-slif-grammar-object)
   * [Fields](#fields)
+  * [Accessors](#accessors)
   * [Mutators](#mutators)
-  * [Constanst: Ranking methods](#constanst-ranking-methods)
+  * [Constants: Ranking methods](#constants-ranking-methods)
   * [Hash to runtime processing](#hash-to-runtime-processing)
-  * [Diagnostics](#diagnostics)
 * [Kollos SLIF recognizer object](#kollos-slif-recognizer-object)
   * [Fields](#fields)
   * [Constructors](#constructors)
@@ -60,6 +62,7 @@ cd kollos && ../lua/lua toc.lua < kollos.md
   * [Locations](#locations)
   * [Events](#events)
   * [Progress reporting](#progress-reporting)
+  * [Coroutines](#coroutines)
   * [Exceptions](#exceptions)
   * [Diagnostics](#diagnostics)
 * [Kollos semantics](#kollos-semantics)
@@ -3631,6 +3634,73 @@ part of a "Pure Lua" implementation.
              table.concat(link_texts, '; '));
     end
 
+```
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slr._progress_line_do(
+        slr, current_ordinal, origins, rule_id, position
+    )
+
+        -- For origins[0], we apply
+        --     -1 to convert earley set to G1, then
+        --     +1 because it is an origin and the character
+        --        doesn't begin until the next Earley set
+        -- In other words, they balance and we do nothing
+        local g1_first = origins[1]
+
+        local slg = slr.slg
+        local g1g = slg.g1
+        local pcs = {}
+
+        local origins_desc = #origins <= 3
+             and table.concat(origins, ',')
+             or origins[1] .. '...' .. origins[#origins]
+
+        local dotted_type
+        if position >= g1g:rule_length(rule_id) then
+            dotted_type = 'F'
+            pcs[#pcs+1] = 'F' .. rule_id
+            goto TAG_FOUND
+        end
+        if position > 0 then
+            dotted_type = 'R'
+            pcs[#pcs+1] = 'R' .. rule_id .. ':' .. position
+            goto TAG_FOUND
+        end
+        dotted_type = 'P'
+        pcs[#pcs+1] = 'P' .. rule_id
+        ::TAG_FOUND::
+
+        if #origins > 1 then
+            pcs[#pcs+1] = 'x' .. #origins
+        end
+
+        local current_earleme = slr.g1:earleme(current_ordinal)
+        pcs[#pcs+1] = '@' .. origins_desc .. '-' .. current_earleme
+
+        -- find the range
+        if current_ordinal <= 0 then
+            pcs[#pcs+1] = 'B0L0c0'
+            goto HAVE_RANGE
+        end
+        if dotted_type == 'P' then
+            local block, pos = slr:g1_pos_to_l0_first(current_ordinal)
+            pcs[#pcs+1] = slr:lc_brief(pos, block)
+            goto HAVE_RANGE
+        end
+        do
+            if g1_first < 0 then g1_first = 0 end
+            local g1_last = current_ordinal - 1
+            local l0_first_b, l0_first_p = slr:g1_pos_to_l0_first(g1_first)
+            local l0_last_b, l0_last_p = slr:g1_pos_to_l0_last(g1_last)
+            pcs[#pcs+1] = slr:lc_range_brief(l0_first_b, l0_first_p, l0_last_b, l0_last_p)
+            goto HAVE_RANGE
+        end
+        ::HAVE_RANGE::
+        pcs[#pcs+1] = slg:g1_dotted_rule_show(rule_id, position)
+        return table.concat(pcs, ' ');
+    end
 ```
 
 ## Kollos semantics
