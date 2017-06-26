@@ -651,19 +651,11 @@ END_OF_LUA
             for my $position ( sort { $a <=> $b } keys %{$by_position} ) {
                 my $raw_origins   = $by_position->{$position};
                 my @origins       = sort { $a <=> $b } keys %{$raw_origins};
-                my $origins_count = scalar @origins;
-                my $origin_desc;
-                if ( $origins_count <= 3 ) {
-                    $origin_desc = join q{,}, @origins;
-                }
-                else {
-                    $origin_desc = $origins[0] . q{...} . $origins[-1];
-                }
 
                 my ($pieces) =
                   $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-                    <<'END_OF_LUA', 'iiiis', $current_ordinal, [map { $_+0; } @origins], $rule_id+0, $position+0, $origin_desc );
-    local slr, current_ordinal, origins, rule_id, position, origin_desc = ...
+                    <<'END_OF_LUA', 'iiii', $current_ordinal, [map { $_+0; } @origins], $rule_id+0, $position+0 );
+    local slr, current_ordinal, origins, rule_id, position = ...
 
     -- For origins[0], we apply
     --     -1 to convert earley set to G1, then
@@ -675,6 +667,10 @@ END_OF_LUA
     local slg = slr.slg
     local g1g = slg.g1
     local pcs = {}
+
+    local origins_desc = #origins <= 3
+         and table.concat(origins, ',')
+         or origins[1] .. '...' .. origins[#origins]
 
     local dotted_type
     if position >= g1g:rule_length(rule_id) then
@@ -696,7 +692,7 @@ END_OF_LUA
     end
 
     local current_earleme = slr.g1:earleme(current_ordinal)
-    pcs[#pcs+1] = '@' .. origin_desc .. '-' .. current_earleme
+    pcs[#pcs+1] = '@' .. origins_desc .. '-' .. current_earleme
 
     -- find the range
     if current_ordinal <= 0 then

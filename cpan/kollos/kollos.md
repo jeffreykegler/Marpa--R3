@@ -5071,15 +5071,7 @@ It should free all memory associated with the valuation.
         end
         -- print('data:', inspect(data))
 
-        local function cmp_data(i, j)
-            for ix = 1, #i do
-                if i[ix] < j[ix] then return true end
-                if i[ix] > j[ix] then return false end
-            end
-            return false
-        end
-
-        table.sort(data, cmp_data)
+        table.sort(data, _M.cmp_seq)
         local result = {}
         for _,datum in pairs(data) do
             result[#result+1] = datum[#datum]
@@ -7900,6 +7892,30 @@ TODO -- Do I want to turn this off after developement?
         error("Kollos internal error: " .. msg)
     end
 ```
+
+Eventually make this local.
+Right now it's a static class method,
+so that it can be used from the Lua inlined
+in the Perl code.
+
+Compares two sequences.
+They must have the same length,
+and every element at a given index
+in one sequence must be comparable
+to every elememt at the same index
+in every other sequence.
+
+```
+    -- miranda: section+ internal utilities
+    function _M.cmp_seq(i, j)
+        for ix = 1, #i do
+            if i[ix] < j[ix] then return true end
+            if i[ix] > j[ix] then return false end
+        end
+        return false
+    end
+```
+
 ## Meta-coding utilities
 
 ### Metacode execution sequence
