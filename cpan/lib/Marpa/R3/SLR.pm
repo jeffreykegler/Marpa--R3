@@ -691,23 +691,26 @@ sub Marpa::R3::Scanless::R::g1_show_progress {
                 # don't begin until the next Earley set
                 # -- in other words, they balance and we do nothing
 
-                my ($input_range) =
+                my ($pieces) =
                   $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
                     <<'END_OF_LUA', 'sii', $dotted_type, ($origins[0]+0), $current_ordinal );
     local slr, dotted_type, g1_first, current_ordinal = ...
+    local pcs = {}
     if current_ordinal <= 0 then return 'B0L0c0' end
     if dotted_type == 'P' then
         local block, pos = slr:g1_pos_to_l0_first(current_ordinal)
-        return slr:lc_brief(pos, block)
+        pcs[#pcs+1] = slr:lc_brief(pos, block)
+    else
+        if g1_first < 0 then g1_first = 0 end
+        local g1_last = current_ordinal - 1
+        local l0_first_b, l0_first_p = slr:g1_pos_to_l0_first(g1_first)
+        local l0_last_b, l0_last_p = slr:g1_pos_to_l0_last(g1_last)
+        pcs[#pcs+1] = slr:lc_range_brief(l0_first_b, l0_first_p, l0_last_b, l0_last_p)
     end
-    if g1_first < 0 then g1_first = 0 end
-    local g1_last = current_ordinal - 1
-    local l0_first_b, l0_first_p = slr:g1_pos_to_l0_first(g1_first)
-    local l0_last_b, l0_last_p = slr:g1_pos_to_l0_last(g1_last)
-    return slr:lc_range_brief(l0_first_b, l0_first_p, l0_last_b, l0_last_p)
+    return table.concat(pcs, ' ');
 END_OF_LUA
 
-                push @item_text, $input_range;
+                push @item_text, $pieces;
 
                 push @item_text, $slg->g1_dotted_rule_show( $rule_id, $position );
                 $text .= ( join q{ }, @item_text ) . "\n";
