@@ -1283,6 +1283,15 @@ sub add_L0_user_rules {
     return;
 }
 
+# For diagnostics, describe a rule we were unable to create,
+# and for which we have only the symbol names
+sub proto_rule_describe {
+    my ( $lhs_name, $rhs_names ) = @_;
+    # wrap symbol names with whitespaces allowed by SLIF
+    $lhs_name = "<$lhs_name>" if $lhs_name =~ / /;
+    return "$lhs_name -> " . ( join q{ }, map { / / ? "<$_>" : $_ } @{$rhs_names} );
+}
+
 sub add_G1_user_rule {
     my ( $slg, $options ) = @_;
 
@@ -1419,7 +1428,7 @@ END_OF_LUA
     }
 
     if ( not defined $base_irl_id or $base_irl_id < 0 ) {
-        my $rule_description = rule_describe( $lhs_name, $rhs_names );
+        my $rule_description = proto_rule_describe( $lhs_name, $rhs_names );
         my ($ok, $problem) =
         $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
             <<'END_OF_LUA', 's', $rule_description );
@@ -1600,7 +1609,7 @@ END_OF_LUA
     }
 
     if ( not defined $base_irl_id or $base_irl_id < 0 ) {
-        my $rule_description = rule_describe( $lhs_name, $rhs_names );
+        my $rule_description = proto_rule_describe( $lhs_name, $rhs_names );
         my ($ok, $problem) =
         $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
             <<'END_OF_LUA', 's', $rule_description );
@@ -1643,13 +1652,6 @@ END_OF_LUA
 
 }
 
-sub rule_describe {
-    my ( $lhs_name, $rhs_names ) = @_;
-    # wrap symbol names with whitespaces allowed by SLIF
-    $lhs_name = "<$lhs_name>" if $lhs_name =~ / /;
-    return "$lhs_name -> " . ( join q{ }, map { / / ? "<$_>" : $_ } @{$rhs_names} );
-} ## end sub rule_describe
-
 sub Marpa::R3::Scanless::G::g1_start_symbol_id {
     my ( $slg ) = @_;
     my ($start_symbol) = $slg->call_by_tag(
@@ -1661,59 +1663,6 @@ END_OF_LUA
     return $start_symbol;
 }
 
-sub Marpa::R3::Scanless::G::alt_name {
-    my ( $slg, $altid ) = @_;
-    my ($alt_name) = $slg->call_by_tag(
-        ('@' . __FILE__ . ':' .  __LINE__),
-      <<'END_OF_LUA', 'i', $altid);
-    local slg, altid = ...
-    return slg:xbnf_name(altid)
-END_OF_LUA
-    return $alt_name;
-}
-
-sub Marpa::R3::Scanless::G::lmg_rule_to_altid {
-    my ( $slg, $subg_name, $irlid ) = @_;
-    my ( $desc ) =
-      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 'si', $subg_name, $irlid );
-    local slg, subg_name, irlid = ...
-    return slg:lmg_rule_to_xbnfid(irlid, subg_name)
-END_OF_LUA
-    return $desc;
-}
-
-sub Marpa::R3::Scanless::G::g1_rule_to_altid {
-    my ( $slg, $irlid ) = @_;
-    my ( $desc ) =
-      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 'i', $irlid );
-    local slg, irlid = ...
-    return slg:g1_rule_to_xbnfid(irlid)
-END_OF_LUA
-    return $desc;
-}
-
-sub Marpa::R3::Scanless::G::l0_rule_to_altid {
-    my ( $slg, $irlid ) = @_;
-    my ( $desc ) =
-      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 'i', $irlid );
-    local slg, irlid = ...
-    return slg:l0_rule_to_xbnfid(irlid)
-END_OF_LUA
-    return $desc;
-}
-
-sub Marpa::R3::Scanless::G::g1_rule_expand {
-    my ( $slg, $rule_id ) = @_;
-    return $slg->g1_irl_isyids($rule_id);
-}
-
-sub Marpa::R3::Scanless::G::l0_rule_expand {
-    my ( $slg, $rule_id ) = @_;
-    return $slg->l0_irl_isyids($rule_id);
-}
 
 # TODO: Document this!
 sub Marpa::R3::Scanless::G::symbol_name {
@@ -1743,6 +1692,19 @@ sub Marpa::R3::Scanless::G::l0_symbol_name {
     return $slg->lmg_symbol_name('l0', $symbol_id);
 }
 
+# Returns display form of symbol
+sub Marpa::R3::Scanless::G::lmg_symbol_display_form {
+    my ( $slg, $subg_name, $isyid ) = @_;
+
+    my ($display_form) = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 'is', $isyid, $subg_name );
+        local grammar, isyid, subg_name = ...
+        return grammar:lmg_symbol_display_form(isyid, subg_name)
+END_OF_LUA
+
+    return $display_form;
+}
+
 sub Marpa::R3::Scanless::G::g1_symbol_display_form {
     my ( $slg, $symbol_id ) = @_;
     return $slg->lmg_symbol_display_form('g1', $symbol_id);
@@ -1751,6 +1713,20 @@ sub Marpa::R3::Scanless::G::g1_symbol_display_form {
 sub Marpa::R3::Scanless::G::l0_symbol_display_form {
     my ( $slg, $symbol_id ) = @_;
     return $slg->lmg_symbol_display_form('l0', $symbol_id);
+}
+
+# Returns DSL form of symbol
+# Does not check whether there is one
+sub Marpa::R3::Scanless::G::lmg_symbol_dsl_form {
+    my ( $slg, $subg_name, $isyid ) = @_;
+
+    my ($dsl_form) = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 'is', $isyid, $subg_name );
+        local grammar, isyid, subg_name = ...
+        return grammar:lmg_symbol_dsl_form(isyid, subg_name)
+END_OF_LUA
+
+    return $dsl_form;
 }
 
 sub Marpa::R3::Scanless::G::g1_symbol_dsl_form {
@@ -1836,6 +1812,73 @@ sub Marpa::R3::Scanless::G::coro_by_tag {
     return @results;
 }
 
+sub Marpa::R3::Scanless::G::lmg_show_symbols {
+    my ( $slg, $subg_name, $verbose ) = @_;
+    my $text = q{};
+    $verbose //= 0;
+
+    my $grammar_name = uc $subg_name;
+
+    my ($highest_symbol_id) =
+      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 's>*', $subg_name );
+    local grammar, subg_name = ...
+    local lmw_g = grammar[subg_name].lmw_g
+    return lmw_g:highest_symbol_id()
+END_OF_LUA
+
+    for my $symbol_id ( 0 .. $highest_symbol_id ) {
+
+        $text .= join q{ }, $grammar_name, "S$symbol_id",
+          $slg->lmg_symbol_display_form( $subg_name, $symbol_id );
+        $text .= "\n";
+
+        if ( $verbose >= 2 ) {
+
+            ($text) = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+                <<'END_OF_LUA', 'sis', $subg_name, $symbol_id, $text );
+    local g, subg_name, symbol_id, text = ...
+    local pieces = { text }
+    local tags = { ' /*' }
+    local lmw_g = g[subg_name].lmw_g
+    if lmw_g:symbol_is_productive(symbol_id) == 0 then
+        tags[#tags+1] = 'unproductive'
+    end
+    if lmw_g:symbol_is_accessible(symbol_id) == 0 then
+        tags[#tags+1] = 'inaccessible'
+    end
+    if lmw_g:symbol_is_nulling(symbol_id) ~= 0 then
+        tags[#tags+1] = 'nulling'
+    end
+    if lmw_g:symbol_is_terminal(symbol_id) ~= 0 then
+        tags[#tags+1] = 'terminal'
+    end
+    if #tags >= 2 then
+        tags[#tags+1] = '*/'
+        pieces[#pieces+1] = " "
+        pieces[#pieces+1] = table.concat(tags, ' ')
+        pieces[#pieces+1] =  '\n'
+    end
+    pieces[#pieces+1] =  "  Internal name: <"
+    pieces[#pieces+1] =  lmw_g:symbol_name(symbol_id)
+    pieces[#pieces+1] =  ">\n"
+    return table.concat(pieces)
+END_OF_LUA
+
+        } ## end if ( $verbose >= 2 )
+
+        if ( $verbose >= 3 ) {
+
+            my $dsl_form = $slg->lmg_symbol_dsl_form( $subg_name, $symbol_id );
+            if ($dsl_form) { $text .= qq{  SLIF name: $dsl_form\n}; }
+
+        } ## end if ( $verbose >= 3 )
+
+    }
+
+    return $text;
+}
+
 sub Marpa::R3::Scanless::G::g1_show_symbols {
     my ( $slg, $verbose ) = @_;
     $verbose //= 0;
@@ -1885,6 +1928,22 @@ sub Marpa::R3::Scanless::G::g1_symbol_is_nulling {
 END_OF_LUA
 
     return $is_nulling;
+}
+
+# This logic deals with gaps in the symbol numbering.
+# Currently there are none, but Libmarpa does not
+# guarantee this.
+sub Marpa::R3::Scanless::G::lmg_symbol_ids {
+    my ($slg, $subg_name) = @_;
+    my ($highest_symbol_id) = $slg->call_by_tag(
+    ('@' .__FILE__ . ':' . __LINE__),
+    <<'END_OF_LUA', 's>*', $subg_name ) ;
+    local grammar, subg_name = ...
+    local lmw_g = grammar[subg_name].lmw_g
+    return lmw_g:highest_symbol_id()
+END_OF_LUA
+
+    return 0 .. $highest_symbol_id;
 }
 
 sub Marpa::R3::Scanless::G::g1_symbol_ids {
@@ -1937,6 +1996,60 @@ END_OF_LUA
     return $name;
 
 } ## end sub symbol_name
+
+sub Marpa::R3::Scanless::G::alt_name {
+    my ( $slg, $altid ) = @_;
+    my ($alt_name) = $slg->call_by_tag(
+        ('@' . __FILE__ . ':' .  __LINE__),
+      <<'END_OF_LUA', 'i', $altid);
+    local slg, altid = ...
+    return slg:xbnf_name(altid)
+END_OF_LUA
+    return $alt_name;
+}
+
+sub Marpa::R3::Scanless::G::lmg_rule_to_altid {
+    my ( $slg, $subg_name, $irlid ) = @_;
+    my ( $desc ) =
+      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 'si', $subg_name, $irlid );
+    local slg, subg_name, irlid = ...
+    return slg:lmg_rule_to_xbnfid(irlid, subg_name)
+END_OF_LUA
+    return $desc;
+}
+
+sub Marpa::R3::Scanless::G::g1_rule_to_altid {
+    my ( $slg, $irlid ) = @_;
+    my ( $desc ) =
+      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 'i', $irlid );
+    local slg, irlid = ...
+    return slg:g1_rule_to_xbnfid(irlid)
+END_OF_LUA
+    return $desc;
+}
+
+sub Marpa::R3::Scanless::G::l0_rule_to_altid {
+    my ( $slg, $irlid ) = @_;
+    my ( $desc ) =
+      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 'i', $irlid );
+    local slg, irlid = ...
+    return slg:l0_rule_to_xbnfid(irlid)
+END_OF_LUA
+    return $desc;
+}
+
+sub Marpa::R3::Scanless::G::g1_rule_expand {
+    my ( $slg, $rule_id ) = @_;
+    return $slg->g1_irl_isyids($rule_id);
+}
+
+sub Marpa::R3::Scanless::G::l0_rule_expand {
+    my ( $slg, $rule_id ) = @_;
+    return $slg->l0_irl_isyids($rule_id);
+}
 
 sub Marpa::R3::Scanless::G::lmg_rule_show {
     my ( $slg, $subg_name, $irlid ) = @_;
@@ -2112,116 +2225,6 @@ sub Marpa::R3::Scanless::G::l0_rule_ids {
     return $slg->lmg_rule_ids('l0');
 }
 
-# This logic deals with gaps in the symbol numbering.
-# Currently there are none, but Libmarpa does not
-# guarantee this.
-sub Marpa::R3::Scanless::G::lmg_symbol_ids {
-    my ($slg, $subg_name) = @_;
-    my ($highest_symbol_id) = $slg->call_by_tag(
-    ('@' .__FILE__ . ':' . __LINE__),
-    <<'END_OF_LUA', 's>*', $subg_name ) ;
-    local grammar, subg_name = ...
-    local lmw_g = grammar[subg_name].lmw_g
-    return lmw_g:highest_symbol_id()
-END_OF_LUA
-
-    return 0 .. $highest_symbol_id;
-}
-
-# Returns DSL form of symbol
-# Does not check whether there is one
-sub Marpa::R3::Scanless::G::lmg_symbol_dsl_form {
-    my ( $slg, $subg_name, $isyid ) = @_;
-
-    my ($dsl_form) = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 'is', $isyid, $subg_name );
-        local grammar, isyid, subg_name = ...
-        return grammar:lmg_symbol_dsl_form(isyid, subg_name)
-END_OF_LUA
-
-    return $dsl_form;
-}
-
-# Returns display form of symbol
-sub Marpa::R3::Scanless::G::lmg_symbol_display_form {
-    my ( $slg, $subg_name, $isyid ) = @_;
-
-    my ($display_form) = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 'is', $isyid, $subg_name );
-        local grammar, isyid, subg_name = ...
-        return grammar:lmg_symbol_display_form(isyid, subg_name)
-END_OF_LUA
-
-    return $display_form;
-}
-
-
-sub Marpa::R3::Scanless::G::lmg_show_symbols {
-    my ( $slg, $subg_name, $verbose ) = @_;
-    my $text = q{};
-    $verbose //= 0;
-
-    my $grammar_name = uc $subg_name;
-
-    my ($highest_symbol_id) =
-      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 's>*', $subg_name );
-    local grammar, subg_name = ...
-    local lmw_g = grammar[subg_name].lmw_g
-    return lmw_g:highest_symbol_id()
-END_OF_LUA
-
-    for my $symbol_id ( 0 .. $highest_symbol_id ) {
-
-        $text .= join q{ }, $grammar_name, "S$symbol_id",
-          $slg->lmg_symbol_display_form( $subg_name, $symbol_id );
-        $text .= "\n";
-
-        if ( $verbose >= 2 ) {
-
-            ($text) = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-                <<'END_OF_LUA', 'sis', $subg_name, $symbol_id, $text );
-    local g, subg_name, symbol_id, text = ...
-    local pieces = { text }
-    local tags = { ' /*' }
-    local lmw_g = g[subg_name].lmw_g
-    if lmw_g:symbol_is_productive(symbol_id) == 0 then
-        tags[#tags+1] = 'unproductive'
-    end
-    if lmw_g:symbol_is_accessible(symbol_id) == 0 then
-        tags[#tags+1] = 'inaccessible'
-    end
-    if lmw_g:symbol_is_nulling(symbol_id) ~= 0 then
-        tags[#tags+1] = 'nulling'
-    end
-    if lmw_g:symbol_is_terminal(symbol_id) ~= 0 then
-        tags[#tags+1] = 'terminal'
-    end
-    if #tags >= 2 then
-        tags[#tags+1] = '*/'
-        pieces[#pieces+1] = " "
-        pieces[#pieces+1] = table.concat(tags, ' ')
-        pieces[#pieces+1] =  '\n'
-    end
-    pieces[#pieces+1] =  "  Internal name: <"
-    pieces[#pieces+1] =  lmw_g:symbol_name(symbol_id)
-    pieces[#pieces+1] =  ">\n"
-    return table.concat(pieces)
-END_OF_LUA
-
-        } ## end if ( $verbose >= 2 )
-
-        if ( $verbose >= 3 ) {
-
-            my $dsl_form = $slg->lmg_symbol_dsl_form( $subg_name, $symbol_id );
-            if ($dsl_form) { $text .= qq{  SLIF name: $dsl_form\n}; }
-
-        } ## end if ( $verbose >= 3 )
-
-    }
-
-    return $text;
-}
 
 sub Marpa::R3::Scanless::G::g1_irl_isyids {
     my ($slg, $irlid) = @_;
