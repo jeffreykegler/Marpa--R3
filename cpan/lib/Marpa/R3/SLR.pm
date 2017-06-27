@@ -1423,14 +1423,14 @@ END_OF_LUA
 
         my %item_data = @{$item_data};
 
-        my $irl_id       = $item_data{irl_id};
+        my $nrl_id       = $item_data{nrl_id};
         my $dot_position = $item_data{dot_position};
         my $ahm_desc;
         if ( $dot_position < 0 ) {
-            $ahm_desc = sprintf( 'R%d$', $irl_id );
+            $ahm_desc = sprintf( 'R%d$', $nrl_id );
         }
         else {
-            $ahm_desc = sprintf( 'R%d:%d', $irl_id, $dot_position );
+            $ahm_desc = sprintf( 'R%d:%d', $nrl_id, $dot_position );
         }
         my $ahm_id_of_yim  = $item_data{ahm_id_of_yim};
         my $origin_earleme = $item_data{origin_earleme};
@@ -1443,7 +1443,7 @@ END_OF_LUA
         push @lines,
             qq{  }
           . $ahm_desc . q{: }
-          . $slg->show_dotted_irl( $irl_id, $dot_position );
+          . $slg->dotted_nrl_show( $nrl_id, $dot_position );
 
         push @sorted_data, @lines;
 
@@ -1775,7 +1775,7 @@ END_OF_LUA
 # not to be documented
 sub Marpa::R3::Scanless::R::verbose_or_node {
     my ( $slr, $or_node_id ) = @_;
-    my ($text, $irl_id, $position)
+    my ($text, $nrl_id, $position)
         = $slr->call_by_tag(
     ('@' . __FILE__ . ':' . __LINE__),
         <<'END_OF_LUA', 'i', $or_node_id);
@@ -1784,7 +1784,6 @@ sub Marpa::R3::Scanless::R::verbose_or_node {
         local origin = bocage:_or_node_origin(or_node_id)
         if not origin then return end
         local set = bocage:_or_node_set(or_node_id)
-        local irl_id = bocage:_or_node_irl(or_node_id)
         local position = bocage:_or_node_position(or_node_id)
         local g1r = recce.g1
         local origin_earleme = g1r:earleme(origin)
@@ -1802,7 +1801,7 @@ END_OF_LUA
 
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     $text .= ( q{ } x 4 )
-        . $slg->show_dotted_irl( $irl_id, $position ) . "\n";
+        . $slg->dotted_nrl_show( $nrl_id, $position ) . "\n";
     return $text;
 }
 

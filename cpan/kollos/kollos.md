@@ -4610,23 +4610,23 @@ indexed by isyid.
         return string.format('R%d:%d', irl_id, dot_position)
     end
 
-    function _M.class_grammar.show_dotted_irl(lmw_g, irl_id, dot_position)
-        local lhs_id = lmw_g:_irl_lhs(irl_id)
-        local irl_length = lmw_g:_irl_length(irl_id)
+    function _M.class_grammar._dotted_nrl_show(lmw_g, nrl_id, dot_position)
+        local lhs_id = lmw_g:_irl_lhs(nrl_id)
+        local nrl_length = lmw_g:_irl_length(nrl_id)
         local lhs_name = lmw_g:nsy_name(lhs_id)
         local pieces = { lhs_name, '::=' }
         if dot_position < 0 then
-            dot_position = irl_length
+            dot_position = nrl_length
         end
-        for ix = 0, irl_length - 1 do
-            local rhs_nsy_id = lmw_g:_irl_rhs(irl_id, ix)
+        for ix = 0, nrl_length - 1 do
+            local rhs_nsy_id = lmw_g:_irl_rhs(nrl_id, ix)
             local rhs_nsy_name = lmw_g:nsy_name(rhs_nsy_id)
             if ix == dot_position then
                 pieces[#pieces+1] = '.'
             end
             pieces[#pieces+1] = rhs_nsy_name
         end
-        if dot_position >= irl_length then
+        if dot_position >= nrl_length then
             pieces[#pieces+1] = '.'
         end
         return table.concat(pieces, ' ')
@@ -4689,7 +4689,7 @@ indexed by isyid.
         pieces[#pieces+1] = "\n    "
         local irl_id = lmw_g:_ahm_irl(item_id)
         local dot_position = lmw_g:_ahm_position(item_id)
-        pieces[#pieces+1] = lmw_g:show_dotted_irl(irl_id, dot_position)
+        pieces[#pieces+1] = lmw_g:_dotted_nrl_show(irl_id, dot_position)
         pieces[#pieces+1] = '\n'
         return table.concat(pieces)
     end
@@ -4891,7 +4891,7 @@ Functions for tracing Earley sets
         local origin_earleme = lmw_r:earleme(origin_set_id)
         local current_earleme = lmw_r:earleme(set_id)
 
-        local irl_id = lmw_g:_ahm_irl(ahm_id_of_yim)
+        local nrl_id = lmw_g:_ahm_irl(ahm_id_of_yim)
         local dot_position = lmw_g:_ahm_position(ahm_id_of_yim)
 
         item_data.current_set_id = set_id
@@ -4899,7 +4899,7 @@ Functions for tracing Earley sets
         item_data.ahm_id_of_yim = ahm_id_of_yim
         item_data.origin_set_id = origin_set_id
         item_data.origin_earleme = origin_earleme
-        item_data.irl_id = irl_id
+        item_data.nrl_id = nrl_id
         item_data.dot_position = dot_position
 
         do -- token links
@@ -5078,10 +5078,10 @@ It should free all memory associated with the valuation.
         local middle_earleme = slr.g1:earleme(middle_earley_set)
 
         local position = bocage:_or_node_position(parent_or_node_id)
-        local irl_id = bocage:_or_node_irl(parent_or_node_id)
+        local nrl_id = bocage:_or_node_irl(parent_or_node_id)
 
         local tag = { string.format("R%d:%d@%d-%d",
-            irl_id,
+            nrl_id,
             position,
             origin_earleme,
             current_earleme)
@@ -5111,7 +5111,7 @@ It should free all memory associated with the valuation.
             local symbol = bocage:_and_node_symbol(id)
             local origin = bocage:_or_node_origin(parent)
             local set = bocage:_or_node_set(parent)
-            local irl_id = bocage:_or_node_irl(parent)
+            local nrl_id = bocage:_or_node_irl(parent)
             local position = bocage:_or_node_position(parent)
             local origin_earleme = g1r:earleme(origin)
             local current_earleme = g1r:earleme(set)
@@ -5120,18 +5120,18 @@ It should free all memory associated with the valuation.
             local desc = {string.format(
                 "And-node #%d: R%d:%d@%d-%d",
                 id,
-                irl_id,
+                nrl_id,
                 position,
                 origin_earleme,
                 current_earleme)}
             -- Marpa::R2's show_and_nodes() had a minor bug:
-            -- cause_irl_id was not set properly and therefore
+            -- cause_nrl_id was not set properly and therefore
             -- not used in the sort.  That problem is fixed
             -- here.
-            local cause_irl_id = -1
+            local cause_nrl_id = -1
             if cause then
-                cause_irl_id = bocage:_or_node_irl(cause)
-                desc[#desc+1] = 'C' .. cause_irl_id
+                cause_nrl_id = bocage:_or_node_irl(cause)
+                desc[#desc+1] = 'C' .. cause_nrl_id
             else
                 desc[#desc+1] = 'S' .. symbol
             end
@@ -5140,11 +5140,11 @@ It should free all memory associated with the valuation.
             data[#data+1] = {
                 origin_earleme,
                 current_earleme,
-                irl_id,
+                nrl_id,
                 position,
                 middle_earleme,
                 symbol,
-                cause_irl_id,
+                cause_nrl_id,
                 table.concat(desc)
             }
         end
@@ -5162,11 +5162,11 @@ It should free all memory associated with the valuation.
     function _M.class_slr.or_node_tag(slr, or_node_id)
         local bocage = slr.lmw_b
         local set = bocage:_or_node_set(or_node_id)
-        local irl_id = bocage:_or_node_irl(or_node_id)
+        local nrl_id = bocage:_or_node_irl(or_node_id)
         local origin = bocage:_or_node_origin(or_node_id)
         local position = bocage:_or_node_position(or_node_id)
         return string.format("R%d:%d@%d-%d",
-            irl_id,
+            nrl_id,
             position,
             origin,
             set)
@@ -5182,21 +5182,21 @@ It should free all memory associated with the valuation.
             local origin = bocage:_or_node_origin(id)
             if not origin then break end
             local set = bocage:_or_node_set(id)
-            local irl_id = bocage:_or_node_irl(id)
+            local nrl_id = bocage:_or_node_irl(id)
             local position = bocage:_or_node_position(id)
             local origin_earleme = g1r:earleme(origin)
             local current_earleme = g1r:earleme(set)
 
             local desc = {string.format(
                 "R%d:%d@%d-%d",
-                irl_id,
+                nrl_id,
                 position,
                 origin_earleme,
                 current_earleme)}
             data[#data+1] = {
                 origin_earleme,
                 current_earleme,
-                irl_id,
+                nrl_id,
                 table.concat(desc)
             }
         end

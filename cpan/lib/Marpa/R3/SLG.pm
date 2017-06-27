@@ -2302,15 +2302,15 @@ END_OF_LUA
 } ## end sub show_ahms
 
 # not to be documented
-sub Marpa::R3::Scanless::G::show_dotted_irl {
-    my ( $slg, $irl_id, $dot_position ) = @_;
+sub Marpa::R3::Scanless::G::dotted_nrl_show {
+    my ( $slg, $nrl_id, $dot_position ) = @_;
     my ($result) =
       $slg->call_by_tag(
         ('@' . __FILE__ . ':' .  __LINE__),
-	<<'END_OF_LUA', 'ii', $irl_id, $dot_position );
-    local grammar, irl_id, dot_position = ...
+	<<'END_OF_LUA', 'ii', $nrl_id, $dot_position );
+    local grammar, nrl_id, dot_position = ...
     local g1g = grammar.g1
-    return g1g:show_dotted_irl(irl_id, dot_position)
+    return g1g:_dotted_nrl_show(nrl_id, dot_position)
 END_OF_LUA
     return $result;
 }
