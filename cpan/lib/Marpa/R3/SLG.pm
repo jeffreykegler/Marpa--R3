@@ -444,6 +444,18 @@ END_OF_LUA
         if is_lexeme then
              local xsy = g1g:_xsy(g1_isyid)
              if xsy then
+                 if xsy.g1_lexeme_id then
+
+                     local g1_isyid2 = xsy.g1_lexeme_id
+                     _M._internal_error(
+                         "Xsymbol %q (id=%d) has 2 g1 lexemes: \n\z
+                         \u{20}   %q (id=%d), and\n\z
+                         \u{20}   %q (id=%d)\n",
+                         xsy:display_name(), xsy.id,
+                         g1g:symbol_name(g1_isyid), g1_isyid,
+                         g1g:symbol_name(g1_isyid2), g1_isyid2
+                     )
+                 end
                  xsy.g1_lexeme_id = g1_isyid
              end
         end

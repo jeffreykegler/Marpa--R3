@@ -802,7 +802,7 @@ Display any XBNF
     function _M.class_slg.xbnf_name(slg, xbnfid)
         local xbnf = slg.xbnfs[xbnfid]
         if xbnf then return slg:xbnf_name_o(xbnf) end
-        return _M._internal_error('xbnf_name(), bad argument = ' .. xbnfid)
+        return _M._internal_error('xbnf_name(), bad argument = %d', xbnfid)
     end
 ```
 
@@ -812,7 +812,7 @@ Display any XBNF
         local subg = slg[subg_name]
         local irl = subg.irls[irlid]
         if not irl then
-            return _M._internal_error('lmg_rule_to_xbnfid(), bad argument = ' .. irlid)
+            return _M._internal_error('lmg_rule_to_xbnfid(), bad argument = %d', irlid)
         end
         local xbnf = irl.xbnf
         if xbnf then return xbnf.id end
@@ -2122,7 +2122,7 @@ TODO: Is the status string needed/used?
         local working_pos = slr.start_of_lexeme + elect_earley_set
         local return_value = l0r:progress_report_start(elect_earley_set)
         if return_value < 0 then
-            _M._internal_error(string.format('Problem in slr:progress_report_start(...,%d): %s'),
+            _M._internal_error('Problem in slr:progress_report_start(...,%d): %s',
                 elect_earley_set, l0r:error_description())
         end
         local discarded, high_lexeme_priority = slr:l0_earley_set_examine(working_pos)
@@ -8001,8 +8001,9 @@ that code inlined in Perl can use it.
 
 ```
     -- miranda: section+ internal utilities
-    function _M._internal_error(msg)
-        error("Kollos internal error: " .. msg)
+    function _M._internal_error(...)
+        error("Kollos internal error: "
+            .. string.format(...))
     end
 ```
 
