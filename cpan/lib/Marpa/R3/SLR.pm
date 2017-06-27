@@ -645,16 +645,16 @@ sub Marpa::R3::Scanless::R::g1_show_progress {
             if i[1] < j[1] then return true end
             if i[1] > j[1] then return false end
             if i[2] < j[2] then return true end
+            if i[2] > j[2] then return false end
+            if i[3] < j[3] then return true end
             return false
         end)
     local function item_iter()
         return coroutine.wrap(function ()
+            if #items < 1 then return end
             local this_item = items[1]
             local work_rule_id = this_item[1]
             local work_position = this_item[2]
-            if work_position == -1 then
-                work_position = g1g:rule_length(work_rule_id)
-            end
             local origins = { this_item[3] }
             for ix = 2, #items do
                 local this_item = items[ix]
@@ -677,18 +677,24 @@ sub Marpa::R3::Scanless::R::g1_show_progress {
     end
     local lines = {}
     for rule_id, position, origins in item_iter() do
+        if position == -1 then
+            position = g1g:rule_length(rule_id)
+        end
+        -- io.stderr:write('origins: ', inspect(origins, {depth=3}), "\n")
         lines[#lines+1] = {slr:_progress_line_do(
             current_ordinal, origins, rule_id, position
         )}
+        -- io.stderr:write('do result: ', inspect(lines[#lines], {depth=3}), "\n")
     end
-    io.stderr:write(inspect(lines, {depth=3}), "\n")
+    -- io.stderr:write(inspect(lines, {depth=3}), "\n")
     table.sort(lines, function(i, j)
-        io.stderr:write('i: ', inspect(i, {depth=3}), "\n")
-        io.stderr:write('j: ', inspect(j, {depth=3}), "\n")
+        -- io.stderr:write('i: ', inspect(i, {depth=3}), "\n")
+        -- io.stderr:write('j: ', inspect(j, {depth=3}), "\n")
     return _M.cmp_seq(i[2], j[2]) end)
     for ix = 1, #lines do
         lines[ix] = lines[ix][1]
     end
+    lines[#lines+1] = '' -- to get a final "\n"
     return table.concat(lines, "\n")
 END_OF_LUA
 
