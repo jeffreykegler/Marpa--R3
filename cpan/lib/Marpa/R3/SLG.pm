@@ -440,19 +440,14 @@ END_OF_LUA
         local slg, g1_isyid = ...
         local g1g = slg.g1
         local is_lexeme = 0 ~= g1g:symbol_is_terminal(g1_isyid)
-        --[=[ if is_lexeme then
+
+        if is_lexeme then
              local xsy = g1g:_xsy(g1_isyid)
-             if not xsy then
-                print(inspect(g1g.xsys))
-                _M._internal_error(string.format(
-                    "Lexeme %q (id=%d) has no xsymbol",
-                    slg:g1_symbol_name(g1_isyid),
-                    g1_isyid
-                ))
+             if xsy then
+                 xsy.g1_lexeme_id = g1_isyid
              end
-             xsy.g1_lexeme_id = g1_isyid
         end
-        ]=]
+
         return is_lexeme
 END_OF_LUA
 
