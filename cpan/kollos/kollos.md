@@ -1621,7 +1621,7 @@ together.
             end
 
             if slr.trace_terminals >= 3 then
-                local xsy = g1g:xsy(terminal)
+                local xsy = g1g:_xsy(terminal)
                 if xsy then
                     local display_form = xsy:display_form()
                     coroutine.yield('trace', string.format(
@@ -2239,7 +2239,7 @@ events into real trace events.
                     table.unpack(this_event)
                 if priority < high_lexeme_priority then
                     if slr.trace_terminals > 0 then
-                        local xsy = g1g:xsy(g1_lexeme)
+                        local xsy = g1g:_xsy(g1_lexeme)
                         if xsy then
                             coroutine.yield('trace', string.format(
                                 "Outprioritized lexeme %s: %s; value=%q;\z
@@ -2364,7 +2364,7 @@ Read alternatives into the G1 grammar.
                 table.unpack(this_event)
 
             if slr.trace_terminals > 2 then
-                local xsy = g1g:xsy(g1_lexeme)
+                local xsy = g1g:_xsy(g1_lexeme)
                 if xsy then
                     local working_earley_set = slr.g1:latest_earley_set() + 1
                     coroutine.yield('trace', string.format(
@@ -2385,7 +2385,7 @@ Read alternatives into the G1 grammar.
                 error('Internal error: Marpa rejected expected token')
             end
             if return_value == _M.err.DUPLICATE_TOKEN then
-                local xsy = g1g:xsy(g1_lexeme)
+                local xsy = g1g:_xsy(g1_lexeme)
                 if xsy then
                     coroutine.yield('trace', string.format(
                         'Rejected as duplicate lexeme %s: %s; value=%q',
@@ -2409,7 +2409,7 @@ Read alternatives into the G1 grammar.
             do
 
                 if slr.trace_terminals > 0 then
-                    local xsy = g1g:xsy(g1_lexeme)
+                    local xsy = g1g:_xsy(g1_lexeme)
                     if xsy then
                         local display_form = xsy:display_form()
                         local working_earley_set = slr.g1:latest_earley_set() + 1
@@ -3264,7 +3264,7 @@ Caller must ensure `block` and `pos` are valid.
                 local g1g = slg.g1
                 local event_name = slg.lexeme_event_by_isy[lexeme_isyid].name
                 -- there must be an XSY
-                local lexeme_xsy = g1g:xsy(lexeme_isyid)
+                local lexeme_xsy = g1g:_xsy(lexeme_isyid)
                 local lexeme_xsyid = lexeme_xsy.id
                 local yield_result = coroutine.yield ( 'event', event_name,
                     lexeme_xsyid,
@@ -3320,7 +3320,7 @@ or nil if there was none.
                  if not rule_id then goto LAST_ITEM end
                  if dot_position ~= -1 then goto NEXT_ITEM end
                  local lhs_id = g1g:rule_lhs(rule_id)
-                 local lhs_xsy = g1g:xsy(lhs_id)
+                 local lhs_xsy = g1g:_xsy(lhs_id)
                  if not lhs_xsy then goto NEXT_ITEM end
                  local lhs_xsyid = lhs_xsy.id
                  if xsyid ~= lhs_xsyid then goto NEXT_ITEM end
@@ -4743,8 +4743,17 @@ TODO: Perhaps `isy_key` should also allow isy tables.
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_grammar.xsy(grammar, isy_key)
+    function _M.class_grammar._xsy(grammar, isy_key)
         return grammar.xsys[isy_key]
+    end
+    function _M.class_grammar.xsyid(grammar, isy_key)
+        local xsy = grammar:xsy(isy_key)
+        if not xsy then
+            _M.userX(string.format(
+               "grammar:xsyid(%s): no such xsy",
+               inspect(isy_key)))
+        end
+        return xsy.id
     end
 ```
 
