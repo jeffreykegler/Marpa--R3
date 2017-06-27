@@ -633,38 +633,66 @@ sub Marpa::R3::Scanless::R::g1_show_progress {
 
     my $text = q{};
     for my $current_ordinal ( $start_ordinal .. $end_ordinal ) {
-        my %by_rule_by_position = ();
-        for my $progress_item ( @{ $slr->g1_progress($current_ordinal) } ) {
-            my ( $rule_id, $position, $origin ) = @{$progress_item};
-            ($position) =
-              $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-                <<'END_OF_LUA', 'ii', $rule_id, $position );
-    local grammar, rule_id, position = ...
-    if position >= 0 then return position end
-    return grammar.g1:rule_length(rule_id)
+
+        my ($piece) = $slr->call_by_tag(
+            ( '@' . __FILE__ . ':' . __LINE__ ),
+            <<'END_OF_LUA', 'i', $current_ordinal );
+    local slr, current_ordinal = ...
+    local slg = slr.slg
+    local g1g = slg.g1
+    local items = slr:g1_progress(current_ordinal)
+    table.sort(items, function(i, j)
+            if i[1] < j[1] then return true end
+            if i[1] > j[1] then return false end
+            if i[2] < j[2] then return true end
+            return false
+        end)
+    local function item_iter()
+        return coroutine.wrap(function ()
+            local this_item = items[1]
+            local work_rule_id = this_item[1]
+            local work_position = this_item[2]
+            if work_position == -1 then
+                work_position = g1g:rule_length(work_rule_id)
+            end
+            local origins = { this_item[3] }
+            for ix = 2, #items do
+                local this_item = items[ix]
+                local this_rule_id = this_item[1]
+                local this_position = this_item[2]
+                local this_origin = this_item[3]
+                if this_rule_id == work_rule_id
+                   and this_position == work_position
+                then
+                    origins[#origins+1] = this_origin
+                else
+                    coroutine.yield(work_rule_id, work_position, origins)
+                    work_rule_id = this_rule_id
+                    work_position = this_position
+                    origins = { this_origin }
+                end
+            end
+            coroutine.yield(work_rule_id, work_position, origins)
+        end)
+    end
+    local lines = {}
+    for rule_id, position, origins in item_iter() do
+        lines[#lines+1] = {slr:_progress_line_do(
+            current_ordinal, origins, rule_id, position
+        )}
+    end
+    io.stderr:write(inspect(lines, {depth=3}), "\n")
+    table.sort(lines, function(i, j)
+        io.stderr:write('i: ', inspect(i, {depth=3}), "\n")
+        io.stderr:write('j: ', inspect(j, {depth=3}), "\n")
+    return _M.cmp_seq(i[2], j[2]) end)
+    for ix = 1, #lines do
+        lines[ix] = lines[ix][1]
+    end
+    return table.concat(lines, "\n")
 END_OF_LUA
-            $by_rule_by_position{$rule_id}->{$position}->{$origin}++;
-        } ## end for my $progress_item ( @{ $recce->g1_progress($current_ordinal...)})
 
-        for my $rule_id ( sort { $a <=> $b } keys %by_rule_by_position ) {
-            my $by_position = $by_rule_by_position{$rule_id};
-            for my $position ( sort { $a <=> $b } keys %{$by_position} ) {
-                my $raw_origins = $by_position->{$position};
-                my @origins = sort { $a <=> $b } keys %{$raw_origins};
-
-                my ($piece) = $slr->call_by_tag(
-                    ( '@' . __FILE__ . ':' . __LINE__ ),
-                    <<'END_OF_LUA', 'iiii', $current_ordinal, [ map { $_ + 0; } @origins ], $rule_id + 0, $position + 0 );
-    local slr, current_ordinal, origins, rule_id, position = ...
-    local piece = slr:_progress_line_do(
-        current_ordinal, origins, rule_id, position
-    )
-    return piece
-END_OF_LUA
-
-                $text .= $piece . "\n";
-            } ## end for my $position ( sort { $a <=> $b } keys %{...})
-        } ## end for my $rule_id ( sort { $a <=> $b } keys ...)
+        $text .= $piece;
 
     } ## end for my $current_ordinal ( $start_ordinal .. $end_ordinal)
     return $text;
