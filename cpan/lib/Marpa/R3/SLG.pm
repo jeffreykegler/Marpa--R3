@@ -1663,6 +1663,29 @@ END_OF_LUA
     return $start_symbol;
 }
 
+# TODO: Document this!
+sub Marpa::R3::Scanless::G::g1_xsymbol_id {
+    my ( $slg, $symbol_id ) = @_;
+    my ($xsyid) = $slg->call_by_tag(
+    ('@' .__FILE__ . ':' . __LINE__),
+    <<'END_OF_LUA', 'i', $symbol_id ) ;
+    local slg, symbol_id = ...
+    return slg:g1_xsyid(symbol_id)
+END_OF_LUA
+    return $xsyid;
+}
+
+# TODO: Document this!
+sub Marpa::R3::Scanless::G::l0_xsymbol_id {
+    my ( $slg, $symbol_id ) = @_;
+    my ($xsyid) = $slg->call_by_tag(
+    ('@' .__FILE__ . ':' . __LINE__),
+    <<'END_OF_LUA', 'i', $symbol_id ) ;
+    local slg, symbol_id = ...
+    return slg:l0_xsyid(symbol_id)
+END_OF_LUA
+    return $xsyid;
+}
 
 # TODO: Document this!
 sub Marpa::R3::Scanless::G::symbol_name {
@@ -1670,12 +1693,10 @@ sub Marpa::R3::Scanless::G::symbol_name {
     my ($symbol_name) = $slg->call_by_tag(
         ('@' . __FILE__ . ':' .  __LINE__),
       <<'END_OF_LUA', 'i', $symbol_id);
-    local slg, xrlid = ...
-    return slg:symbol_name(xrlid)
+    local slg, xsyid = ...
+    return slg:symbol_name(xsyid)
 END_OF_LUA
-
     return $symbol_name;
-
 }
 
 # TODO: Census all uses of Marpa::R3::Scanless::G::g1_symbol_name

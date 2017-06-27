@@ -4755,6 +4755,12 @@ TODO: Perhaps `isy_key` should also allow isy tables.
         end
         return xsy.id
     end
+    function _M.class_slg.g1_xsyid(slg, isy_key)
+        return slg.g1:xsyid(isy_key)
+    end
+    function _M.class_slg.l0_xsyid(slg, isy_key)
+        return slg.l0:xsyid(isy_key)
+    end
 ```
 
 ```
