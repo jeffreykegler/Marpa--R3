@@ -149,6 +149,28 @@ all the code in this file will be "pure"
 Kollos -- no Perl knowledge.
 That is not the case at the moment.
 
+## Abbreviations
+
+* desc -- Short for "description".  Used a lot for
+strings which "describe" something, usually for the
+purpose of being assembled into a larger string,
+and usually as part of some message.
+
+* giter -- An *Iter*ator factory (aka generator).
+In _Programming Lua_,
+Roberto insists that the argument of the generic
+for is not an iterator, but an iterator generator.
+
+* iter -- An *Iter*ator.
+But see also "giter".
+
+* ix -- Index
+
+* pcs -- Short for "pieces".  Often used as table name,
+where the tables purposes is to assemble a larger string,
+which is usually a message,
+and which is usually assembled using `table.concat()`.
+
 ## Development Notes
 
 This section is first for the convenience of the
@@ -578,6 +600,8 @@ will usually just ask for the display form of the ISY.
     class_xsy_fields.dsl_form = true
     class_xsy_fields.if_inaccessible = true
     class_xsy_fields.name_source = true
+    class_xsy_fields.g1_lexeme_id = true
+    class_xsy_fields.l0_lexeme_id = true
 
     -- miranda: insert class_xsy field declarations
     declarations(_M.class_xsy, class_xsy_fields, 'xsy')
@@ -778,7 +802,7 @@ Display any XBNF
     function _M.class_slg.xbnf_name(slg, xbnfid)
         local xbnf = slg.xbnfs[xbnfid]
         if xbnf then return slg:xbnf_name_o(xbnf) end
-        return internal_error('xbnf_name(), bad argument = ' .. xbnfid)
+        return _M._internal_error('xbnf_name(), bad argument = ' .. xbnfid)
     end
 ```
 
@@ -788,7 +812,7 @@ Display any XBNF
         local subg = slg[subg_name]
         local irl = subg.irls[irlid]
         if not irl then
-            return internal_error('lmg_rule_to_xbnfid(), bad argument = ' .. irlid)
+            return _M._internal_error('lmg_rule_to_xbnfid(), bad argument = ' .. irlid)
         end
         local xbnf = irl.xbnf
         if xbnf then return xbnf.id end
@@ -2089,7 +2113,7 @@ TODO: Is the status string needed/used?
         slr.accept_queue = {}
         local l0r = slr.l0
         if not l0r then
-            internal_error('No l0r in slr_alternatives(): %s',
+            _M._internal_error('No l0r in slr_alternatives(): %s',
                 slr.slg.l0:error_description())
         end
         local elect_earley_set = slr.l0_candidate
@@ -2098,7 +2122,7 @@ TODO: Is the status string needed/used?
         local working_pos = slr.start_of_lexeme + elect_earley_set
         local return_value = l0r:progress_report_start(elect_earley_set)
         if return_value < 0 then
-            internal_error(string.format('Problem in slr:progress_report_start(...,%d): %s'),
+            _M._internal_error(string.format('Problem in slr:progress_report_start(...,%d): %s'),
                 elect_earley_set, l0r:error_description())
         end
         local discarded, high_lexeme_priority = slr:l0_earley_set_examine(working_pos)
@@ -7971,9 +7995,13 @@ TODO -- Do I want to turn this off after developement?
     end
 ```
 
+This is
+an exported internal, at least for now, so
+that code inlined in Perl can use it.
+
 ```
     -- miranda: section+ internal utilities
-    local function internal_error(msg)
+    function _M._internal_error(msg)
         error("Kollos internal error: " .. msg)
     end
 ```

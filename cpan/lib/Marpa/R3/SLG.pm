@@ -434,16 +434,30 @@ END_OF_LUA
     my %g1_id_by_lexeme_name = ();
   SYMBOL: for my $symbol_id ( $slg->g1_symbol_ids() ) {
 
-    my ($is_terminal) = $slg->call_by_tag(
-        ('@' .__FILE__ . ':' .  __LINE__),
-        <<'END_OF_LUA', 'i', $symbol_id);
-        local grammar, symbol_id = ...
-        local g1g = grammar.g1
-        return g1g:symbol_is_terminal(symbol_id)
+        my ($is_lexeme) =
+          $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+            <<'END_OF_LUA', 'i', $symbol_id );
+        local slg, g1_isyid = ...
+        local g1g = slg.g1
+        local is_lexeme = 0 ~= g1g:symbol_is_terminal(g1_isyid)
+        --[=[ if is_lexeme then
+             local xsy = g1g:_xsy(g1_isyid)
+             if not xsy then
+                print(inspect(g1g.xsys))
+                _M._internal_error(string.format(
+                    "Lexeme %q (id=%d) has no xsymbol",
+                    slg:g1_symbol_name(g1_isyid),
+                    g1_isyid
+                ))
+             end
+             xsy.g1_lexeme_id = g1_isyid
+        end
+        ]=]
+        return is_lexeme
 END_OF_LUA
 
         # Not a lexeme, according to G1
-        next SYMBOL if not $is_terminal;
+        next SYMBOL if not $is_lexeme;
 
         my $symbol_name = $slg->g1_symbol_name($symbol_id);
         $g1_id_by_lexeme_name{$symbol_name} = $symbol_id;
