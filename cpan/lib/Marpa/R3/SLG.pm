@@ -520,11 +520,9 @@ END_OF_LUA
           if defined $symbol_data;
     } ## end SYMBOL: for my $symbol_name ( ( keys %lex_lhs ), ( keys %lex_rhs...))
 
-    my %is_lexeme_in_this_lexer = map { $_ => 1 }
+    my @lex_lexeme_names = 
       grep { not $lex_rhs{$_} and not $lex_separator{$_} }
-      keys %lex_lhs;
-
-    my @lex_lexeme_names = keys %is_lexeme_in_this_lexer;
+      sort keys %lex_lhs;
 
     Marpa::R3::exception( "No lexemes in lexer\n",
         "  An SLIF grammar must have at least one lexeme\n" )
@@ -549,7 +547,7 @@ END_OF_LUA
             lhs => $lex_start_symbol_name,
             rhs => [$_]
         }
-    } sort keys %is_lexeme_in_this_lexer;
+    } @lex_lexeme_names;
 
     $slg->call_by_tag(
         ('@' .__FILE__ . ':' .  __LINE__),
