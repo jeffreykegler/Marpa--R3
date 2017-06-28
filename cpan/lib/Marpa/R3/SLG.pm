@@ -775,7 +775,7 @@ END_OF_LUA
 
     # Post-lexer G1 processing
 
-  LEXEME: for my $lexeme_name ( keys %g1_id_by_lexeme_name ) {
+    for my $lexeme_name ( keys %g1_id_by_lexeme_name ) {
         Marpa::R3::exception(
             "A lexeme in G1 is not a lexeme in L0: $lexeme_name")
           if not defined $lexeme_data{$lexeme_name}{'lexer'};
@@ -977,7 +977,7 @@ END_OF_LUA
   APPLY_DEFAULT_LEXEME_BLESSING: {
         my $default_blessing = $lexeme_default_adverbs->{bless};
 
-      LEXEME:
+      G1_SYMBOL:
         for my $lexeme_name ( keys %g1_id_by_lexeme_name ) {
             my $g1_lexeme_id = $g1_id_by_lexeme_name{$lexeme_name};
 
@@ -986,16 +986,16 @@ END_OF_LUA
         <<'END_OF_LUA', 'is', $g1_lexeme_id, ($default_blessing // '::undef'));
         local slg, isyid, default_blessing = ...
         local xsy = slg.g1.xsys[isyid]
-        if not xsy then return 'next lexeme', default_blessing end
+        if not xsy then return 'next G1_SYMBOL', default_blessing end
         local name_source = xsy.name_source
-        if name_source ~= 'lexical' then return 'next lexeme', default_blessing end
+        if name_source ~= 'lexical' then return 'next G1_SYMBOL', default_blessing end
         if not xsy.blessing then
             xsy.blessing = default_blessing
         end
         return 'ok', xsy.blessing
 END_OF_LUA
 
-            next LEXEME if $cmd eq 'next lexeme';
+            next G1_SYMBOL if $cmd eq 'next G1_SYMBOL';
 
           FIND_BASE_BLESSING: {
                 if ( $blessing eq '::undef' ) {
@@ -1049,7 +1049,7 @@ qq{Symbol "$lexeme_name" needs a blessing package, but grammar has none\n},
             xsy.blessing = blessing
 END_OF_LUA
 
-        } ## end LEXEME: for my $lexeme_name ( keys %g1_id_by_lexeme_name )
+        }
 
     }
 
