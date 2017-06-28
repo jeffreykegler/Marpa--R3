@@ -831,6 +831,15 @@ TODO -- Census all Lua and perl symbol name functions, including
 but not limited to lmg_*(), *_name(), *_{dsl,display}_form()
 and eliminate the redundant ones.
 
+Lowest XSYID is 1.
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slg.highest_symbol_id(slg)
+        return #slg.xsys
+    end
+```
+
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_slg.symbol_name(slg, xsyid)
