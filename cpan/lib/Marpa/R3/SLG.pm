@@ -434,14 +434,15 @@ END_OF_LUA
     my %g1_id_by_lexeme_name = ();
   SYMBOL: for my $symbol_id ( $slg->g1_symbol_ids() ) {
 
-        my ($is_lexeme) =
+        my ($is_lexeme, $xsy_name) =
           $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
             <<'END_OF_LUA', 'i', $symbol_id );
         local slg, g1_isyid = ...
         local g1g = slg.g1
-        local is_lexeme = 0 ~= g1g:symbol_is_terminal(g1_isyid)
+        local is_terminal = 0 ~= g1g:symbol_is_terminal(g1_isyid)
+        local is_lexeme
 
-        if is_lexeme then
+        if is_terminal then
              local xsy = g1g:_xsy(g1_isyid)
              if xsy then
                  if xsy.g1_lexeme_id then
@@ -457,10 +458,22 @@ END_OF_LUA
                      )
                  end
                  xsy.g1_lexeme_id = g1_isyid
+
+                 -- TODO delete this check after development
+                 if xsy.name ~= slg.g1:symbol_name(g1_isyid) then
+                     _M._internal_error(
+                         "1: Lexeme name mismatch xsy=%q, g1 isy = %q",
+                         xsy.name,
+                         slg.g1:symbol_name(g1_isyid)
+                     )
+                 end
+
+                 return true,  xsy.name
              end
+             return true
         end
 
-        return is_lexeme
+        return
 END_OF_LUA
 
         # Not a lexeme, according to G1
@@ -991,6 +1004,16 @@ END_OF_LUA
         if not xsy.blessing then
             xsy.blessing = default_blessing
         end
+
+        -- TODO delete the following check after development
+        if xsy.name ~= slg.g1:symbol_name(g1_lexeme_id) then
+            _M._internal_error(
+                "Lexeme name mismatch xsy=%q, g1 isy = %q",
+                xsy.name,
+                slg.g1:symbol_name(g1_lexeme_id)
+            )
+        end
+
         return 'ok', xsy.blessing, g1_lexeme_id, xsy.name
 END_OF_LUA
 
