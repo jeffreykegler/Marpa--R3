@@ -434,7 +434,7 @@ END_OF_LUA
     my %g1_id_by_lexeme_name = ();
   SYMBOL: for my $symbol_id ( $slg->g1_symbol_ids() ) {
 
-        my ($is_lexeme, $xsy_name) =
+        my ($is_lexeme) =
           $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
             <<'END_OF_LUA', 'i', $symbol_id );
         local slg, g1_isyid = ...
@@ -443,6 +443,7 @@ END_OF_LUA
         local is_lexeme
 
         if is_terminal then
+             g1g.isys[g1_isyid].is_lexeme = true
              local xsy = g1g:_xsy(g1_isyid)
              if xsy then
                  if xsy.g1_lexeme_id then
@@ -468,7 +469,7 @@ END_OF_LUA
                      )
                  end
 
-                 return true,  xsy.name
+                 return true
              end
              return true
         end
@@ -807,6 +808,7 @@ END_OF_LUA
     $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'ss', \%g1_id_by_lexeme_name, ($lexeme_declarations // {}));
     local slg, g1_id_by_lexeme_name, lexeme_declarations = ...
+    local g1g = slg.g1
     -- local slg, lexeme_name, g1_lexeme_id, declarations = ...
 
     local lexeme_event_by_isy = {}
@@ -814,8 +816,10 @@ END_OF_LUA
     local lexeme_event_by_name = {}
     slg.lexeme_event_by_name = lexeme_event_by_name
 
-    for lexeme_name, g1_lexeme_id in pairs(g1_id_by_lexeme_name) do
-        g1_lexeme_id = math.tointeger(g1_lexeme_id)
+    for g1_lexeme_id = 0, g1g:highest_symbol_id() do
+        local isy = g1g.isys[g1_lexeme_id]
+        if not isy.is_lexeme then goto NEXT_SYMBOL end
+        local lexeme_name = isy.name
         local declarations = lexeme_declarations[lexeme_name] or {}
 
         local lexeme_data = slg.g1.isys[g1_lexeme_id]
@@ -881,6 +885,7 @@ END_OF_LUA
 
             end
         end
+        ::NEXT_SYMBOL::
     end
 END_OF_LUA
 
