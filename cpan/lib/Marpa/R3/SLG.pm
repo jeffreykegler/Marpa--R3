@@ -954,16 +954,11 @@ END_OF_LUA
 
         my $default_lexeme_action = $lexeme_default_adverbs->{action};
 
-      LEXEME:
-        for my $lexeme_name ( keys %g1_id_by_lexeme_name ) {
-            my $g1_lexeme_id = $g1_id_by_lexeme_name{$lexeme_name};
-
         $slg->call_by_tag(
         ('@' .__FILE__ . ':' .  __LINE__),
-        <<'END_OF_LUA', 'is', $g1_lexeme_id, $default_lexeme_action);
-        local slg, isyid, default_lexeme_action = ...
-        local xsy = slg.g1.xsys[isyid]
-        if xsy then
+        <<'END_OF_LUA', 's', $default_lexeme_action);
+        local slg, default_lexeme_action = ...
+        for _, xsy in pairs(slg.xsys) do
             local name_source = xsy.name_source
             if name_source == 'lexical' and not xsy.lexeme_semantics then
                 xsy.lexeme_semantics = default_lexeme_action
@@ -971,7 +966,6 @@ END_OF_LUA
         end
 END_OF_LUA
 
-        } ## end LEXEME: for my $lexeme_name ( keys %g1_id_by_lexeme_name )
     }
 
   APPLY_DEFAULT_LEXEME_BLESSING: {
