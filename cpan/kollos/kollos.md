@@ -91,25 +91,24 @@ cd kollos && ../lua/lua toc.lua < kollos.md
     * [Return the value of a stack entry](#return-the-value-of-a-stack-entry)
     * [Set the value of a stack entry](#set-the-value-of-a-stack-entry)
     * [Convert current, origin Earley set to L0 span](#convert-current-origin-earley-set-to-l0-span)
-* [The valuator Libmarpa wrapper](#the-valuator-libmarpa-wrapper)
-  * [Initialize a valuator](#initialize-a-valuator)
-  * [Reset a valuator](#reset-a-valuator)
-* [Diagnostics](#diagnostics)
   * [Input](#input)
-* [Libmarpa grammar class](#libmarpa-grammar-class)
+* [Libmarpa grammar wrapper class](#libmarpa-grammar-wrapper-class)
   * [Fields](#fields)
   * [Constructor](#constructor)
   * [Layer grammar accessors](#layer-grammar-accessors)
-* [The recognizer Libmarpa wrapper](#the-recognizer-libmarpa-wrapper)
+* [Libmarpa recognizer wrapper class](#libmarpa-recognizer-wrapper-class)
   * [Fields](#fields)
   * [Functions for tracing Earley sets](#functions-for-tracing-earley-sets)
-* [External symbol (XSY) class](#external-symbol-xsy-class)
-  * [Fields](#fields)
-* [Accessors](#accessors)
-* [Rules](#rules)
+* [Libmarpa valuer wrapper class](#libmarpa-valuer-wrapper-class)
+  * [Initialize a valuator](#initialize-a-valuator)
+  * [Reset a valuator](#reset-a-valuator)
+  * [Diagnostics](#diagnostics)
 * [IRL Fields](#irl-fields)
 * [XRL Fields](#xrl-fields)
 * [XBNF Fields](#xbnf-fields)
+* [External symbol (XSY) class](#external-symbol-xsy-class)
+  * [Fields](#fields)
+  * [Accessors](#accessors)
 * [Inner symbol (ISY) class](#inner-symbol-isy-class)
   * [Fields](#fields)
   * [Accessors](#accessors)
@@ -4552,7 +4551,180 @@ is zero.
 
 ```
 
-## Libmarpa grammar class
+## External rule (XRL) class
+
+### Fields
+
+```
+    -- miranda: section+ class_xrl field declarations
+    class_xrl_fields.id = true
+    class_xrl_fields.name = true
+    class_xrl_fields.assertion = true
+    class_xrl_fields.precedence_count = true
+    class_xrl_fields.lhs = true
+    class_xrl_fields.start = true
+    class_xrl_fields.length = true
+```
+
+```
+    -- miranda: section+ create nonmetallic metatables
+    _M.class_xrl = {}
+    -- miranda: section+ populate metatables
+    local class_xrl_fields = {}
+
+    class_xrl_fields.id = true
+
+    -- miranda: insert class_xrl field declarations
+    declarations(_M.class_xrl, class_xrl_fields, 'xrl')
+```
+
+## External BNF (XBNF) class
+
+### Fields
+
+```
+    -- miranda: section+ class_xbnf field declarations
+    class_xbnf_fields.action = true
+    class_xbnf_fields.bless = true
+    class_xbnf_fields.discard_separation = true
+    class_xbnf_fields.event_name = true
+    class_xbnf_fields.event_starts_active = true
+    class_xbnf_fields.id = true
+    class_xbnf_fields.length = true
+    class_xbnf_fields.lhs = true
+    class_xbnf_fields.mask = true
+    class_xbnf_fields.min = true
+    class_xbnf_fields.name = true
+    class_xbnf_fields.null_ranking = true
+    class_xbnf_fields.proper = true
+    class_xbnf_fields.rank = true
+    class_xbnf_fields.rhs = true
+    class_xbnf_fields.separator = true
+    class_xbnf_fields.start = true
+    class_xbnf_fields.subgrammar = true
+    class_xbnf_fields.symbol_as_event = true
+    class_xbnf_fields.xrl_name = true
+```
+
+```
+    -- miranda: section+ create nonmetallic metatables
+    _M.class_xbnf = {}
+    -- miranda: section+ populate metatables
+    local class_xbnf_fields = {}
+
+    class_xbnf_fields.id = true
+
+    -- miranda: insert class_xbnf field declarations
+    declarations(_M.class_xbnf, class_xbnf_fields, 'xbnf')
+```
+
+## Internal rule (IRL) class
+
+### Fields
+
+```
+    -- miranda: section+ class_irl field declarations
+    class_irl_fields.id = true
+    class_irl_fields.xbnf = true
+    class_irl_fields.action = true
+    class_irl_fields.mask = true
+    class_irl_fields.g1_lexeme = true
+    class_irl_fields.xrl_dot = true
+```
+
+```
+    -- miranda: section+ create nonmetallic metatables
+    _M.class_irl = {}
+    -- miranda: section+ populate metatables
+    local class_irl_fields = {}
+    -- miranda: insert class_irl field declarations
+    declarations(_M.class_irl, class_irl_fields, 'irl')
+```
+
+## External symbol (XSY) class
+
+### Fields
+
+```
+    -- miranda: section+ class_xsy field declarations
+    class_xsy_fields.assertion = true
+```
+
+```
+    -- miranda: section+ create nonmetallic metatables
+    _M.class_xsy = {}
+    -- miranda: section+ populate metatables
+    local class_xsy_fields = {}
+
+    class_xsy_fields.id = true
+    class_xsy_fields.name = true
+    class_xsy_fields.lexeme_semantics = true
+    class_xsy_fields.blessing = true
+    class_xsy_fields.dsl_form = true
+    class_xsy_fields.if_inaccessible = true
+    class_xsy_fields.name_source = true
+    class_xsy_fields.g1_lexeme_id = true
+    class_xsy_fields.l0_lexeme_id = true
+
+    -- miranda: insert class_xsy field declarations
+    declarations(_M.class_xsy, class_xsy_fields, 'xsy')
+```
+
+### Accessors
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_xsy.display_form(xsy)
+        local form1 = xsy.dsl_form or xsy.name
+        if form1:find(' ', 1, true) then
+            return '<' .. form1 .. '>'
+        end
+        return form1
+    end
+```
+
+## Inner symbol (ISY) class
+
+### Fields
+
+```
+    -- miranda: section+ class_isy field declarations
+    class_isy_fields.id = true
+    class_isy_fields.name = true
+    -- fields for use by upper layers?
+    class_isy_fields.assertion = true
+    class_isy_fields.pause_after = true
+    class_isy_fields.pause_after_active = true
+    class_isy_fields.pause_before = true
+    class_isy_fields.pause_before_active = true
+    class_isy_fields.priority = true
+    class_isy_fields.is_lexeme = true
+    class_isy_fields.eager = true
+```
+
+```
+    -- miranda: section+ create nonmetallic metatables
+    _M.class_isy = {}
+    -- miranda: section+ populate metatables
+    local class_isy_fields = {}
+    -- miranda: insert class_isy field declarations
+    declarations(_M.class_isy, class_isy_fields, 'isy')
+```
+
+### Accessors
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_isy.display_form(isy)
+        local form = isy.name
+        if not form:find(' ', 1, true) then
+            return form
+        end
+        return '<' .. form .. '>'
+    end
+```
+
+## Libmarpa grammar wrapper class
 
 ### Fields
 
@@ -4823,7 +4995,7 @@ necessarily unique.
     end
 ```
 
-## The recognizer Libmarpa wrapper
+## Libmarpa recognizer wrapper class
 
 ### Fields
 
@@ -4892,11 +5064,18 @@ necessarily unique.
     end
 ```
 
-## The valuator Libmarpa wrapper
+## Libmarpa valuer wrapper class
 
 The "valuator" portion of Kollos produces the
 value of a
 Kollos parse.
+
+TODO:
+Currently this is part of SLIF recognizer.
+Part of this will be broken out into a new "SLIF valuer"
+object
+and the rest will become a cleaner
+Libmarpa wrapper class.
 
 ### Initialize a valuator
 
@@ -4955,7 +5134,7 @@ It should free all memory associated with the valuation.
 
 ```
 
-## Diagnostics
+### Diagnostics
 
 ```
     -- miranda: section+ diagnostics
@@ -5179,173 +5358,6 @@ It should free all memory associated with the valuation.
 
     end
 
-```
-
-## IRL Fields
-
-```
-    -- miranda: section+ class_irl field declarations
-    class_irl_fields.id = true
-    class_irl_fields.xbnf = true
-    class_irl_fields.action = true
-    class_irl_fields.mask = true
-    class_irl_fields.g1_lexeme = true
-    class_irl_fields.xrl_dot = true
-```
-
-```
-    -- miranda: section+ create nonmetallic metatables
-    _M.class_irl = {}
-    -- miranda: section+ populate metatables
-    local class_irl_fields = {}
-    -- miranda: insert class_irl field declarations
-    declarations(_M.class_irl, class_irl_fields, 'irl')
-```
-
-## XRL Fields
-
-```
-    -- miranda: section+ class_xrl field declarations
-    class_xrl_fields.id = true
-    class_xrl_fields.name = true
-    class_xrl_fields.assertion = true
-    class_xrl_fields.precedence_count = true
-    class_xrl_fields.lhs = true
-    class_xrl_fields.start = true
-    class_xrl_fields.length = true
-```
-
-```
-    -- miranda: section+ create nonmetallic metatables
-    _M.class_xrl = {}
-    -- miranda: section+ populate metatables
-    local class_xrl_fields = {}
-
-    class_xrl_fields.id = true
-
-    -- miranda: insert class_xrl field declarations
-    declarations(_M.class_xrl, class_xrl_fields, 'xrl')
-```
-
-## XBNF Fields
-
-```
-    -- miranda: section+ class_xbnf field declarations
-    class_xbnf_fields.action = true
-    class_xbnf_fields.bless = true
-    class_xbnf_fields.discard_separation = true
-    class_xbnf_fields.event_name = true
-    class_xbnf_fields.event_starts_active = true
-    class_xbnf_fields.id = true
-    class_xbnf_fields.length = true
-    class_xbnf_fields.lhs = true
-    class_xbnf_fields.mask = true
-    class_xbnf_fields.min = true
-    class_xbnf_fields.name = true
-    class_xbnf_fields.null_ranking = true
-    class_xbnf_fields.proper = true
-    class_xbnf_fields.rank = true
-    class_xbnf_fields.rhs = true
-    class_xbnf_fields.separator = true
-    class_xbnf_fields.start = true
-    class_xbnf_fields.subgrammar = true
-    class_xbnf_fields.symbol_as_event = true
-    class_xbnf_fields.xrl_name = true
-```
-
-```
-    -- miranda: section+ create nonmetallic metatables
-    _M.class_xbnf = {}
-    -- miranda: section+ populate metatables
-    local class_xbnf_fields = {}
-
-    class_xbnf_fields.id = true
-
-    -- miranda: insert class_xbnf field declarations
-    declarations(_M.class_xbnf, class_xbnf_fields, 'xbnf')
-```
-
-## External symbol (XSY) class
-
-### Fields
-
-```
-    -- miranda: section+ class_xsy field declarations
-    class_xsy_fields.assertion = true
-```
-
-```
-    -- miranda: section+ create nonmetallic metatables
-    _M.class_xsy = {}
-    -- miranda: section+ populate metatables
-    local class_xsy_fields = {}
-
-    class_xsy_fields.id = true
-    class_xsy_fields.name = true
-    class_xsy_fields.lexeme_semantics = true
-    class_xsy_fields.blessing = true
-    class_xsy_fields.dsl_form = true
-    class_xsy_fields.if_inaccessible = true
-    class_xsy_fields.name_source = true
-    class_xsy_fields.g1_lexeme_id = true
-    class_xsy_fields.l0_lexeme_id = true
-
-    -- miranda: insert class_xsy field declarations
-    declarations(_M.class_xsy, class_xsy_fields, 'xsy')
-```
-
-### Accessors
-
-```
-    -- miranda: section+ most Lua function definitions
-    function _M.class_xsy.display_form(xsy)
-        local form1 = xsy.dsl_form or xsy.name
-        if form1:find(' ', 1, true) then
-            return '<' .. form1 .. '>'
-        end
-        return form1
-    end
-```
-
-## Inner symbol (ISY) class
-
-### Fields
-
-```
-    -- miranda: section+ class_isy field declarations
-    class_isy_fields.id = true
-    class_isy_fields.name = true
-    -- fields for use by upper layers?
-    class_isy_fields.assertion = true
-    class_isy_fields.pause_after = true
-    class_isy_fields.pause_after_active = true
-    class_isy_fields.pause_before = true
-    class_isy_fields.pause_before_active = true
-    class_isy_fields.priority = true
-    class_isy_fields.is_lexeme = true
-    class_isy_fields.eager = true
-```
-
-```
-    -- miranda: section+ create nonmetallic metatables
-    _M.class_isy = {}
-    -- miranda: section+ populate metatables
-    local class_isy_fields = {}
-    -- miranda: insert class_isy field declarations
-    declarations(_M.class_isy, class_isy_fields, 'isy')
-```
-
-### Accessors
-
-```
-    -- miranda: section+ most Lua function definitions
-    function _M.class_isy.display_form(isy)
-        local form = isy.name
-        if not form:find(' ', 1, true) then
-            return form
-        end
-        return '<' .. form .. '>'
-    end
 ```
 
 ## Libmarpa interface
