@@ -6771,6 +6771,8 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
         return 1;
     }
 
+```
+
 `lca_grammar_sequence_new` wraps the Libmarpa method `marpa_g_sequence_new()`.
 If the rule is 7 symbols or fewer, I put it on the stack.  As an old
 kernel driver programmer, I was trained to avoid putting even small
@@ -6780,6 +6782,7 @@ like close to a modern architecture.
 Perhaps I will eventually limit Libmarpa's
 rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
 
+```
     -- miranda: section+ non-standard wrappers
 
     static int lca_grammar_sequence_new(lua_State *L)
