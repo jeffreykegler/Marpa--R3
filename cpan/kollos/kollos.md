@@ -541,171 +541,6 @@ code which requires the display form of the XSY
 corresponding to an ISY
 will usually just ask for the display form of the ISY.
 
-## ISY Fields
-
-```
-    -- miranda: section+ class_isy field declarations
-    class_isy_fields.id = true
-    class_isy_fields.name = true
-    -- fields for use by upper layers?
-    class_isy_fields.assertion = true
-    class_isy_fields.pause_after = true
-    class_isy_fields.pause_after_active = true
-    class_isy_fields.pause_before = true
-    class_isy_fields.pause_before_active = true
-    class_isy_fields.priority = true
-    class_isy_fields.is_lexeme = true
-    class_isy_fields.eager = true
-```
-
-```
-    -- miranda: section+ create nonmetallic metatables
-    _M.class_isy = {}
-    -- miranda: section+ populate metatables
-    local class_isy_fields = {}
-    -- miranda: insert class_isy field declarations
-    declarations(_M.class_isy, class_isy_fields, 'isy')
-```
-
-## ISY Accessors
-
-```
-    -- miranda: section+ most Lua function definitions
-    function _M.class_isy.display_form(isy)
-        local form = isy.name
-        if not form:find(' ', 1, true) then
-            return form
-        end
-        return '<' .. form .. '>'
-    end
-```
-
-## XSY Fields
-
-```
-    -- miranda: section+ class_xsy field declarations
-    class_xsy_fields.assertion = true
-```
-
-```
-    -- miranda: section+ create nonmetallic metatables
-    _M.class_xsy = {}
-    -- miranda: section+ populate metatables
-    local class_xsy_fields = {}
-
-    class_xsy_fields.id = true
-    class_xsy_fields.name = true
-    class_xsy_fields.lexeme_semantics = true
-    class_xsy_fields.blessing = true
-    class_xsy_fields.dsl_form = true
-    class_xsy_fields.if_inaccessible = true
-    class_xsy_fields.name_source = true
-    class_xsy_fields.g1_lexeme_id = true
-    class_xsy_fields.l0_lexeme_id = true
-
-    -- miranda: insert class_xsy field declarations
-    declarations(_M.class_xsy, class_xsy_fields, 'xsy')
-```
-
-## XSY Accessors
-
-```
-    -- miranda: section+ most Lua function definitions
-    function _M.class_xsy.display_form(xsy)
-        local form1 = xsy.dsl_form or xsy.name
-        if form1:find(' ', 1, true) then
-            return '<' .. form1 .. '>'
-        end
-        return form1
-    end
-```
-
-## Rules
-
-## IRL Fields
-
-```
-    -- miranda: section+ class_irl field declarations
-    class_irl_fields.id = true
-    class_irl_fields.xbnf = true
-    class_irl_fields.action = true
-    class_irl_fields.mask = true
-    class_irl_fields.g1_lexeme = true
-    class_irl_fields.xrl_dot = true
-```
-
-```
-    -- miranda: section+ create nonmetallic metatables
-    _M.class_irl = {}
-    -- miranda: section+ populate metatables
-    local class_irl_fields = {}
-    -- miranda: insert class_irl field declarations
-    declarations(_M.class_irl, class_irl_fields, 'irl')
-```
-
-## XRL Fields
-
-```
-    -- miranda: section+ class_xrl field declarations
-    class_xrl_fields.id = true
-    class_xrl_fields.name = true
-    class_xrl_fields.assertion = true
-    class_xrl_fields.precedence_count = true
-    class_xrl_fields.lhs = true
-    class_xrl_fields.start = true
-    class_xrl_fields.length = true
-```
-
-```
-    -- miranda: section+ create nonmetallic metatables
-    _M.class_xrl = {}
-    -- miranda: section+ populate metatables
-    local class_xrl_fields = {}
-
-    class_xrl_fields.id = true
-
-    -- miranda: insert class_xrl field declarations
-    declarations(_M.class_xrl, class_xrl_fields, 'xrl')
-```
-
-## XBNF Fields
-
-```
-    -- miranda: section+ class_xbnf field declarations
-    class_xbnf_fields.action = true
-    class_xbnf_fields.bless = true
-    class_xbnf_fields.discard_separation = true
-    class_xbnf_fields.event_name = true
-    class_xbnf_fields.event_starts_active = true
-    class_xbnf_fields.id = true
-    class_xbnf_fields.length = true
-    class_xbnf_fields.lhs = true
-    class_xbnf_fields.mask = true
-    class_xbnf_fields.min = true
-    class_xbnf_fields.name = true
-    class_xbnf_fields.null_ranking = true
-    class_xbnf_fields.proper = true
-    class_xbnf_fields.rank = true
-    class_xbnf_fields.rhs = true
-    class_xbnf_fields.separator = true
-    class_xbnf_fields.start = true
-    class_xbnf_fields.subgrammar = true
-    class_xbnf_fields.symbol_as_event = true
-    class_xbnf_fields.xrl_name = true
-```
-
-```
-    -- miranda: section+ create nonmetallic metatables
-    _M.class_xbnf = {}
-    -- miranda: section+ populate metatables
-    local class_xbnf_fields = {}
-
-    class_xbnf_fields.id = true
-
-    -- miranda: insert class_xbnf field declarations
-    declarations(_M.class_xbnf, class_xbnf_fields, 'xbnf')
-```
-
 ## Kollos SLIF grammar object
 
 ### Fields
@@ -1192,207 +1027,6 @@ Lowest XSYID is 1.
             ::NEXT_PROPERTY::
         end
         return isyid
-    end
-```
-
-### Constants: Ranking methods
-
-```
-    -- miranda: section+ constant Lua tables
-    _M.ranking_methods = { none = true, high_rule_only = true, rule = true }
-```
-
-### Hash to runtime processing
-
-The object, in computing the hash, is to get as much
-precomputation in as possible, without using undue space.
-That means CPU-intensive processing should tend to be done
-before or during hash creation, and space-intensive processing
-should tend to be done here, in the code that converts the
-hash to its runtime equivalent.
-
-Populate the `xsys` table.
-
-```
-    -- miranda: section+ most Lua function definitions
-    function _M.class_slg.xsys_populate(slg, source_hash)
-        local xsys = {}
-        slg.xsys = xsys
-
-        -- io.stderr:write(inspect(source_hash))
-        local xsy_names = {}
-        local hash_xsy_data = source_hash.xsy
-        for xsy_name, _ in pairs(hash_xsy_data) do
-             xsy_names[#xsy_names+1] = xsy_name
-        end
-        table.sort(xsy_names)
-        for xsy_id = 1, #xsy_names do
-            local xsy_name = xsy_names[xsy_id]
-
-            local runtime_xsy = setmetatable({}, _M.class_xsy)
-            local xsy_source = hash_xsy_data[xsy_name]
-
-            runtime_xsy.id = xsy_id
-            runtime_xsy.name = xsy_name
-            -- copy, so that we can destroy `source_hash`
-            runtime_xsy.lexeme_semantics = xsy_source.action
-            runtime_xsy.blessing = xsy_source.blessing
-            runtime_xsy.dsl_form = xsy_source.dsl_form
-            runtime_xsy.if_inaccessible = xsy_source.if_inaccessible
-            runtime_xsy.name_source = xsy_source.name_source
-
-            xsys[xsy_name] = runtime_xsy
-            xsys[xsy_id] = runtime_xsy
-        end
-    end
-```
-
-Populate the `xrls` table.
-The contents of this table are not used,
-currently,
-but Jeffrey thinks they might be used someday,
-for example in error messages.
-
-```
-    -- miranda: section+ most Lua function definitions
-    function _M.class_slg.xrls_populate(slg, source_hash)
-        local xrls = {}
-        slg.xrls = xrls
-
-        -- io.stderr:write(inspect(source_hash))
-        local xrl_names = {}
-        local hash_xrl_data = source_hash.xrl
-        for xrl_name, _ in pairs(hash_xrl_data) do
-             xrl_names[#xrl_names+1] = xrl_name
-        end
-        table.sort(xrl_names,
-           function(a, b)
-                if a ~= b then return a < b end
-                local start_a = hash_xrl_data[a].start
-                local start_b = hash_xrl_data[b].start
-                return start_a < start_b
-           end
-        )
-        for xrl_id = 1, #xrl_names do
-            local xrl_name = xrl_names[xrl_id]
-            local runtime_xrl = setmetatable({}, _M.class_xrl)
-            local xrl_source = hash_xrl_data[xrl_name]
-
-            runtime_xrl.id = xrl_id
-            runtime_xrl.name = xrl_name
-            -- copy, so that we can destroy `source_hash`
-            runtime_xrl.precedence_count = xrl_source.precedence_count
-            runtime_xrl.lhs = xrl_source.lhs
-            runtime_xrl.start = xrl_source.start
-            runtime_xrl.length = xrl_source.length
-
-            xrls[xrl_name] = runtime_xrl
-            xrls[xrl_id] = runtime_xrl
-        end
-    end
-```
-
-Populate xbnfs.
-"xbnfs" are eXternal BNF rules.
-They are actually not fully external,
-but are first translation of the XRLs into
-BNF form.
-One symptom of their less-than-fully external
-nature is that they are two `xbnfs` tables,
-one for each subgrammar.
-(The subgrammars are only visible internally.)
-
-```
-    -- miranda: section+ most Lua function definitions
-    function _M.class_slg.xbnfs_subg_populate(slg, source_hash, subgrammar)
-        local xbnfs = slg.xbnfs
-        -- io.stderr:write(inspect(source_hash))
-        local xbnf_names = {}
-        local xsys = slg.xsys
-        local hash_xbnf_data = source_hash.xbnf[subgrammar]
-        for xbnf_name, _ in pairs(hash_xbnf_data) do
-             xbnf_names[#xbnf_names+1] = xbnf_name
-        end
-        table.sort(xbnf_names,
-           function(a, b)
-                local start_a = hash_xbnf_data[a].start
-                local start_b = hash_xbnf_data[b].start
-                if start_a ~= start_b then return start_a < start_b end
-                local subkey_a = hash_xbnf_data[a].subkey
-                local subkey_b = hash_xbnf_data[b].subkey
-                return subkey_a < subkey_b
-           end
-        )
-        for ix = 1, #xbnf_names do
-            local xbnf_name = xbnf_names[ix]
-            local runtime_xbnf = setmetatable({}, _M.class_xbnf)
-
-            local xbnf_source = hash_xbnf_data[xbnf_name]
-
-            -- copy, so that we can destroy `source_hash`
-
-            runtime_xbnf.xrl_name = xbnf_source.xrlid
-            runtime_xbnf.name = xbnf_source.name
-            runtime_xbnf.subgrammar = xbnf_source.subgrammar
-            runtime_xbnf.lhs = xsys[xbnf_source.lhs]
-            local to_rhs = {}
-            local from_rhs = xbnf_source.rhs
-            for ix = 1, #from_rhs do
-                to_rhs[ix] = xsys[xbnf_source.rhs[ix]]
-            end
-            runtime_xbnf.rhs = to_rhs
-            runtime_xbnf.rank = xbnf_source.rank
-            runtime_xbnf.null_ranking = xbnf_source.null_ranking
-
-            runtime_xbnf.symbol_as_event = xbnf_source.symbol_as_event
-            local source_event = xbnf_source.event
-            if source_event then
-                runtime_xbnf.event_name = source_event[1]
-                -- TODO revisit type (boolean? string? integer?)
-                --   once conversion to Lua is complete
-                runtime_xbnf.event_starts_active
-                    = (math.tointeger(source_event[2]) ~= 0)
-            end
-
-            if xbnf_source.min then
-                runtime_xbnf.min = math.tointeger(xbnf_source.min)
-            end
-            runtime_xbnf.separator = xbnf_source.separator
-            runtime_xbnf.proper = xbnf_source.proper
-            runtime_xbnf.bless = xbnf_source.bless
-            runtime_xbnf.action = xbnf_source.action
-            runtime_xbnf.start = xbnf_source.start
-            runtime_xbnf.length = xbnf_source.length
-
-            runtime_xbnf.discard_separation =
-                xbnf_source.separator and
-                    not xbnf_source.keep
-
-            local rhs_length = #xbnf_source.rhs
-
-            -- min defined if sequence rule
-            if not xbnf_source.min or rhs_length == 0 then
-                if xbnf_source.mask then
-                    runtime_xbnf.mask = xbnf_source.mask
-                else
-                    local mask = {}
-                    for i = 1, rhs_length do
-                        mask[i] = 1
-                    end
-                    runtime_xbnf.mask = mask
-                end
-            end
-
-            local next_xbnf_id = #xbnfs + 1
-            runtime_xbnf.id = next_xbnf_id
-            xbnfs[xbnf_name] = runtime_xbnf
-            xbnfs[next_xbnf_id] = runtime_xbnf
-        end
-    end
-    function _M.class_slg.xbnfs_populate(slg, source_hash)
-        slg.xbnfs = {}
-        slg:xbnfs_subg_populate(source_hash, 'l0')
-        return slg:xbnfs_subg_populate(source_hash, 'g1')
     end
 ```
 
@@ -3411,6 +3045,376 @@ or nil if there was none.
         return result
     end
 
+```
+
+## Inner symbol (ISY) class
+
+### Fields
+
+```
+    -- miranda: section+ class_isy field declarations
+    class_isy_fields.id = true
+    class_isy_fields.name = true
+    -- fields for use by upper layers?
+    class_isy_fields.assertion = true
+    class_isy_fields.pause_after = true
+    class_isy_fields.pause_after_active = true
+    class_isy_fields.pause_before = true
+    class_isy_fields.pause_before_active = true
+    class_isy_fields.priority = true
+    class_isy_fields.is_lexeme = true
+    class_isy_fields.eager = true
+```
+
+```
+    -- miranda: section+ create nonmetallic metatables
+    _M.class_isy = {}
+    -- miranda: section+ populate metatables
+    local class_isy_fields = {}
+    -- miranda: insert class_isy field declarations
+    declarations(_M.class_isy, class_isy_fields, 'isy')
+```
+
+### Accessors
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_isy.display_form(isy)
+        local form = isy.name
+        if not form:find(' ', 1, true) then
+            return form
+        end
+        return '<' .. form .. '>'
+    end
+```
+
+## External symbol (XSY) class
+
+### Fields
+
+```
+    -- miranda: section+ class_xsy field declarations
+    class_xsy_fields.assertion = true
+```
+
+```
+    -- miranda: section+ create nonmetallic metatables
+    _M.class_xsy = {}
+    -- miranda: section+ populate metatables
+    local class_xsy_fields = {}
+
+    class_xsy_fields.id = true
+    class_xsy_fields.name = true
+    class_xsy_fields.lexeme_semantics = true
+    class_xsy_fields.blessing = true
+    class_xsy_fields.dsl_form = true
+    class_xsy_fields.if_inaccessible = true
+    class_xsy_fields.name_source = true
+    class_xsy_fields.g1_lexeme_id = true
+    class_xsy_fields.l0_lexeme_id = true
+
+    -- miranda: insert class_xsy field declarations
+    declarations(_M.class_xsy, class_xsy_fields, 'xsy')
+```
+
+## Accessors
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_xsy.display_form(xsy)
+        local form1 = xsy.dsl_form or xsy.name
+        if form1:find(' ', 1, true) then
+            return '<' .. form1 .. '>'
+        end
+        return form1
+    end
+```
+
+## Rules
+
+## IRL Fields
+
+```
+    -- miranda: section+ class_irl field declarations
+    class_irl_fields.id = true
+    class_irl_fields.xbnf = true
+    class_irl_fields.action = true
+    class_irl_fields.mask = true
+    class_irl_fields.g1_lexeme = true
+    class_irl_fields.xrl_dot = true
+```
+
+```
+    -- miranda: section+ create nonmetallic metatables
+    _M.class_irl = {}
+    -- miranda: section+ populate metatables
+    local class_irl_fields = {}
+    -- miranda: insert class_irl field declarations
+    declarations(_M.class_irl, class_irl_fields, 'irl')
+```
+
+## XRL Fields
+
+```
+    -- miranda: section+ class_xrl field declarations
+    class_xrl_fields.id = true
+    class_xrl_fields.name = true
+    class_xrl_fields.assertion = true
+    class_xrl_fields.precedence_count = true
+    class_xrl_fields.lhs = true
+    class_xrl_fields.start = true
+    class_xrl_fields.length = true
+```
+
+```
+    -- miranda: section+ create nonmetallic metatables
+    _M.class_xrl = {}
+    -- miranda: section+ populate metatables
+    local class_xrl_fields = {}
+
+    class_xrl_fields.id = true
+
+    -- miranda: insert class_xrl field declarations
+    declarations(_M.class_xrl, class_xrl_fields, 'xrl')
+```
+
+## XBNF Fields
+
+```
+    -- miranda: section+ class_xbnf field declarations
+    class_xbnf_fields.action = true
+    class_xbnf_fields.bless = true
+    class_xbnf_fields.discard_separation = true
+    class_xbnf_fields.event_name = true
+    class_xbnf_fields.event_starts_active = true
+    class_xbnf_fields.id = true
+    class_xbnf_fields.length = true
+    class_xbnf_fields.lhs = true
+    class_xbnf_fields.mask = true
+    class_xbnf_fields.min = true
+    class_xbnf_fields.name = true
+    class_xbnf_fields.null_ranking = true
+    class_xbnf_fields.proper = true
+    class_xbnf_fields.rank = true
+    class_xbnf_fields.rhs = true
+    class_xbnf_fields.separator = true
+    class_xbnf_fields.start = true
+    class_xbnf_fields.subgrammar = true
+    class_xbnf_fields.symbol_as_event = true
+    class_xbnf_fields.xrl_name = true
+```
+
+```
+    -- miranda: section+ create nonmetallic metatables
+    _M.class_xbnf = {}
+    -- miranda: section+ populate metatables
+    local class_xbnf_fields = {}
+
+    class_xbnf_fields.id = true
+
+    -- miranda: insert class_xbnf field declarations
+    declarations(_M.class_xbnf, class_xbnf_fields, 'xbnf')
+```
+
+### Constants: Ranking methods
+
+```
+    -- miranda: section+ constant Lua tables
+    _M.ranking_methods = { none = true, high_rule_only = true, rule = true }
+```
+
+### Hash to runtime processing
+
+The object, in computing the hash, is to get as much
+precomputation in as possible, without using undue space.
+That means CPU-intensive processing should tend to be done
+before or during hash creation, and space-intensive processing
+should tend to be done here, in the code that converts the
+hash to its runtime equivalent.
+
+Populate the `xsys` table.
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slg.xsys_populate(slg, source_hash)
+        local xsys = {}
+        slg.xsys = xsys
+
+        -- io.stderr:write(inspect(source_hash))
+        local xsy_names = {}
+        local hash_xsy_data = source_hash.xsy
+        for xsy_name, _ in pairs(hash_xsy_data) do
+             xsy_names[#xsy_names+1] = xsy_name
+        end
+        table.sort(xsy_names)
+        for xsy_id = 1, #xsy_names do
+            local xsy_name = xsy_names[xsy_id]
+
+            local runtime_xsy = setmetatable({}, _M.class_xsy)
+            local xsy_source = hash_xsy_data[xsy_name]
+
+            runtime_xsy.id = xsy_id
+            runtime_xsy.name = xsy_name
+            -- copy, so that we can destroy `source_hash`
+            runtime_xsy.lexeme_semantics = xsy_source.action
+            runtime_xsy.blessing = xsy_source.blessing
+            runtime_xsy.dsl_form = xsy_source.dsl_form
+            runtime_xsy.if_inaccessible = xsy_source.if_inaccessible
+            runtime_xsy.name_source = xsy_source.name_source
+
+            xsys[xsy_name] = runtime_xsy
+            xsys[xsy_id] = runtime_xsy
+        end
+    end
+```
+
+Populate the `xrls` table.
+The contents of this table are not used,
+currently,
+but Jeffrey thinks they might be used someday,
+for example in error messages.
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slg.xrls_populate(slg, source_hash)
+        local xrls = {}
+        slg.xrls = xrls
+
+        -- io.stderr:write(inspect(source_hash))
+        local xrl_names = {}
+        local hash_xrl_data = source_hash.xrl
+        for xrl_name, _ in pairs(hash_xrl_data) do
+             xrl_names[#xrl_names+1] = xrl_name
+        end
+        table.sort(xrl_names,
+           function(a, b)
+                if a ~= b then return a < b end
+                local start_a = hash_xrl_data[a].start
+                local start_b = hash_xrl_data[b].start
+                return start_a < start_b
+           end
+        )
+        for xrl_id = 1, #xrl_names do
+            local xrl_name = xrl_names[xrl_id]
+            local runtime_xrl = setmetatable({}, _M.class_xrl)
+            local xrl_source = hash_xrl_data[xrl_name]
+
+            runtime_xrl.id = xrl_id
+            runtime_xrl.name = xrl_name
+            -- copy, so that we can destroy `source_hash`
+            runtime_xrl.precedence_count = xrl_source.precedence_count
+            runtime_xrl.lhs = xrl_source.lhs
+            runtime_xrl.start = xrl_source.start
+            runtime_xrl.length = xrl_source.length
+
+            xrls[xrl_name] = runtime_xrl
+            xrls[xrl_id] = runtime_xrl
+        end
+    end
+```
+
+Populate xbnfs.
+"xbnfs" are eXternal BNF rules.
+They are actually not fully external,
+but are first translation of the XRLs into
+BNF form.
+One symptom of their less-than-fully external
+nature is that they are two `xbnfs` tables,
+one for each subgrammar.
+(The subgrammars are only visible internally.)
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slg.xbnfs_subg_populate(slg, source_hash, subgrammar)
+        local xbnfs = slg.xbnfs
+        -- io.stderr:write(inspect(source_hash))
+        local xbnf_names = {}
+        local xsys = slg.xsys
+        local hash_xbnf_data = source_hash.xbnf[subgrammar]
+        for xbnf_name, _ in pairs(hash_xbnf_data) do
+             xbnf_names[#xbnf_names+1] = xbnf_name
+        end
+        table.sort(xbnf_names,
+           function(a, b)
+                local start_a = hash_xbnf_data[a].start
+                local start_b = hash_xbnf_data[b].start
+                if start_a ~= start_b then return start_a < start_b end
+                local subkey_a = hash_xbnf_data[a].subkey
+                local subkey_b = hash_xbnf_data[b].subkey
+                return subkey_a < subkey_b
+           end
+        )
+        for ix = 1, #xbnf_names do
+            local xbnf_name = xbnf_names[ix]
+            local runtime_xbnf = setmetatable({}, _M.class_xbnf)
+
+            local xbnf_source = hash_xbnf_data[xbnf_name]
+
+            -- copy, so that we can destroy `source_hash`
+
+            runtime_xbnf.xrl_name = xbnf_source.xrlid
+            runtime_xbnf.name = xbnf_source.name
+            runtime_xbnf.subgrammar = xbnf_source.subgrammar
+            runtime_xbnf.lhs = xsys[xbnf_source.lhs]
+            local to_rhs = {}
+            local from_rhs = xbnf_source.rhs
+            for ix = 1, #from_rhs do
+                to_rhs[ix] = xsys[xbnf_source.rhs[ix]]
+            end
+            runtime_xbnf.rhs = to_rhs
+            runtime_xbnf.rank = xbnf_source.rank
+            runtime_xbnf.null_ranking = xbnf_source.null_ranking
+
+            runtime_xbnf.symbol_as_event = xbnf_source.symbol_as_event
+            local source_event = xbnf_source.event
+            if source_event then
+                runtime_xbnf.event_name = source_event[1]
+                -- TODO revisit type (boolean? string? integer?)
+                --   once conversion to Lua is complete
+                runtime_xbnf.event_starts_active
+                    = (math.tointeger(source_event[2]) ~= 0)
+            end
+
+            if xbnf_source.min then
+                runtime_xbnf.min = math.tointeger(xbnf_source.min)
+            end
+            runtime_xbnf.separator = xbnf_source.separator
+            runtime_xbnf.proper = xbnf_source.proper
+            runtime_xbnf.bless = xbnf_source.bless
+            runtime_xbnf.action = xbnf_source.action
+            runtime_xbnf.start = xbnf_source.start
+            runtime_xbnf.length = xbnf_source.length
+
+            runtime_xbnf.discard_separation =
+                xbnf_source.separator and
+                    not xbnf_source.keep
+
+            local rhs_length = #xbnf_source.rhs
+
+            -- min defined if sequence rule
+            if not xbnf_source.min or rhs_length == 0 then
+                if xbnf_source.mask then
+                    runtime_xbnf.mask = xbnf_source.mask
+                else
+                    local mask = {}
+                    for i = 1, rhs_length do
+                        mask[i] = 1
+                    end
+                    runtime_xbnf.mask = mask
+                end
+            end
+
+            local next_xbnf_id = #xbnfs + 1
+            runtime_xbnf.id = next_xbnf_id
+            xbnfs[xbnf_name] = runtime_xbnf
+            xbnfs[next_xbnf_id] = runtime_xbnf
+        end
+    end
+    function _M.class_slg.xbnfs_populate(slg, source_hash)
+        slg.xbnfs = {}
+        slg:xbnfs_subg_populate(source_hash, 'l0')
+        return slg:xbnfs_subg_populate(source_hash, 'g1')
+    end
 ```
 
 ### Coroutines
