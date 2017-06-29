@@ -43,6 +43,7 @@ cd kollos && ../lua/lua toc.lua < kollos.md
   * [Fields](#fields)
   * [Accessors](#accessors)
   * [Mutators](#mutators)
+  * [Hash to runtime processing](#hash-to-runtime-processing)
 * [Kollos SLIF recognizer object](#kollos-slif-recognizer-object)
   * [Fields](#fields)
   * [Constructors](#constructors)
@@ -56,17 +57,7 @@ cd kollos && ../lua/lua toc.lua < kollos.md
 * [Inner symbol (ISY) class](#inner-symbol-isy-class)
   * [Fields](#fields)
   * [Accessors](#accessors)
-* [External symbol (XSY) class](#external-symbol-xsy-class)
-  * [Fields](#fields)
-* [Accessors](#accessors)
-* [Rules](#rules)
-* [IRL Fields](#irl-fields)
-* [XRL Fields](#xrl-fields)
-* [XBNF Fields](#xbnf-fields)
   * [Constants: Ranking methods](#constants-ranking-methods)
-  * [Hash to runtime processing](#hash-to-runtime-processing)
-  * [Coroutines](#coroutines)
-  * [Exceptions](#exceptions)
   * [Diagnostics](#diagnostics)
 * [Kollos semantics](#kollos-semantics)
   * [VM operations](#vm-operations)
@@ -103,17 +94,25 @@ cd kollos && ../lua/lua toc.lua < kollos.md
     * [Return the value of a stack entry](#return-the-value-of-a-stack-entry)
     * [Set the value of a stack entry](#set-the-value-of-a-stack-entry)
     * [Convert current, origin Earley set to L0 span](#convert-current-origin-earley-set-to-l0-span)
-* [The grammar Libmarpa wrapper](#the-grammar-libmarpa-wrapper)
-  * [Fields](#fields)
-  * [Constructor](#constructor)
-  * [Layer grammar accessors](#layer-grammar-accessors)
-* [The recognizer Libmarpa wrapper](#the-recognizer-libmarpa-wrapper)
-  * [Fields](#fields)
 * [The valuator Libmarpa wrapper](#the-valuator-libmarpa-wrapper)
   * [Initialize a valuator](#initialize-a-valuator)
   * [Reset a valuator](#reset-a-valuator)
 * [Diagnostics](#diagnostics)
   * [Input](#input)
+* [Libmarpa grammar class](#libmarpa-grammar-class)
+  * [Fields](#fields)
+  * [Constructor](#constructor)
+  * [Layer grammar accessors](#layer-grammar-accessors)
+* [The recognizer Libmarpa wrapper](#the-recognizer-libmarpa-wrapper)
+  * [Fields](#fields)
+  * [Functions for tracing Earley sets](#functions-for-tracing-earley-sets)
+* [External symbol (XSY) class](#external-symbol-xsy-class)
+  * [Fields](#fields)
+* [Accessors](#accessors)
+* [Rules](#rules)
+* [IRL Fields](#irl-fields)
+* [XRL Fields](#xrl-fields)
+* [XBNF Fields](#xbnf-fields)
 * [Libmarpa interface](#libmarpa-interface)
   * [Standard template methods](#standard-template-methods)
   * [Constructors](#constructors)
@@ -127,7 +126,9 @@ cd kollos && ../lua/lua toc.lua < kollos.md
 * [The Kollos C header file](#the-kollos-c-header-file)
   * [Preliminaries to the C header file](#preliminaries-to-the-c-header-file)
 * [Internal utilities](#internal-utilities)
-* [Meta-coding utilities](#meta-coding-utilities)
+  * [Coroutines](#coroutines)
+  * [Exceptions](#exceptions)
+* [Meta-coding](#meta-coding)
   * [Metacode execution sequence](#metacode-execution-sequence)
   * [Dedent method](#dedent-method)
   * [`c_safe_string` method](#c-safe-string-method)
@@ -239,6 +240,102 @@ The `discard default` statement would be modeled on the
 ```
    discard default => event => ::name=off
 ```
+
+## Concepts
+
+This section describes those Kollos concepts who do
+not fall conveniently into one of the code sections.
+
+### External, inner and internal
+
+The Kollos upper layers and Libmarpa both
+makes substantial use of rule rewriting.
+As a result,
+Kollos has external rules (xrl's),
+inner rules (irl's)
+and internal rules (nrl's).
+External rules contain external symbols (xsy's).
+Inner rules contain inner symbols (isy's).
+Internal rules contain internal symbols (nsy's).
+
+Xrl's and xsy's are the
+only rules and symbols
+intended to be visible to the SLIF user.
+Irl's, isy's, nrl's and nsy's are
+intended to be seen by Kollos
+developers and maintainers only.
+
+Libmarpa and the
+Kollos upper layers
+each have
+two sets of rules and symbols,
+one pre-rewrite and one post-rewrite.
+The xrl's and xsy's are the Kollos upper
+layer's pre-rewrite rules and symbols.
+
+The irl's and isy's are the Kollos upper
+layer's post-rewrite rules and symbols.
+The irl's and isy's are also Libmarpa's
+pre-rewrite rules and symbols.
+Irl's and isy's
+are, therefore, a "common language"
+that Libmarpa and the Kollos upper layers share.
+
+Libmarpa's post-rewrite symbols are
+the nrl's and nsy's.
+Nrl's and nsy's are
+intended to be known only to Libmarpa,
+and to Libmarpa's developers and maintainers.
+
+For historical reasons,
+and confusingly,
+some of Libmarpa's
+internal methods refer to nrl's as irl's.
+The names of these methods will eventually be
+changed.
+They are being kept for now so that
+Kollos's Libmarpa does not diverge
+too far from
+Marpa::R2's Libmarpa.
+
+### Symbol names, IDs and forms
+
+Symbols are show several "forms".
+
+Name and ID are unique identifiers, available for
+all valid symbols,
+and only for valid symbols.
+IDs are integers.
+Names are strings.
+The symbol name may be an internal creation,
+subject to change in future versions of Kollos.
+
+*DSL form* is the form as it appears in the SLIF DSL.
+It does not vary as long as the DSL does not vary.
+It is not guaranteed unique and many valid symbols
+will not have a DSL form.
+
+*Display form* is a string
+available
+for all valid symbols,
+and for invalid symbols IDs as well.
+It is Kollos's idea of "best" form for
+display.
+Display forms are not necessarily unique.
+
+In the case of an invalid symbol,
+display form dummies up a symbol name
+describing the problem.
+This may be consider a kind of "soft failure".
+
+The display form of an ISY
+will be the display form of the XSY when
+possible,
+and a "soft failure" otherwise.
+Because of this,
+code which requires the display form of the XSY
+corresponding to an ISY
+will usually just ask for the display form of the ISY.
 
 ## Kollos object
 
@@ -452,97 +549,6 @@ Deletes the interpreter if the reference count drops to zero.
     }
 
 ```
-
-### External, inner and internal
-
-The Kollos upper layers and Libmarpa both
-makes substantial use of rule rewriting.
-As a result,
-Kollos has external rules (xrl's),
-inner rules (irl's)
-and internal rules (nrl's).
-External rules contain external symbols (xsy's).
-Inner rules contain inner symbols (isy's).
-Internal rules contain internal symbols (nsy's).
-
-Xrl's and xsy's are the
-only rules and symbols
-intended to be visible to the SLIF user.
-Irl's, isy's, nrl's and nsy's are
-intended to be seen by Kollos
-developers and maintainers only.
-
-Libmarpa and the
-Kollos upper layers
-each have
-two sets of rules and symbols,
-one pre-rewrite and one post-rewrite.
-The xrl's and xsy's are the Kollos upper
-layer's pre-rewrite rules and symbols.
-
-The irl's and isy's are the Kollos upper
-layer's post-rewrite rules and symbols.
-The irl's and isy's are also Libmarpa's
-pre-rewrite rules and symbols.
-Irl's and isy's
-are, therefore, a "common language"
-that Libmarpa and the Kollos upper layers share.
-
-Libmarpa's post-rewrite symbols are
-the nrl's and nsy's.
-Nrl's and nsy's are
-intended to be known only to Libmarpa,
-and to Libmarpa's developers and maintainers.
-
-For historical reasons,
-and confusingly,
-some of Libmarpa's
-internal methods refer to nrl's as irl's.
-The names of these methods will eventually be
-changed.
-They are being kept for now so that
-Kollos's Libmarpa does not diverge
-too far from
-Marpa::R2's Libmarpa.
-
-## Symbols
-
-Symbols are show several "forms".
-
-Name and ID are unique identifiers, available for
-all valid symbols,
-and only for valid symbols.
-IDs are integers.
-Names are strings.
-The symbol name may be an internal creation,
-subject to change in future versions of Kollos.
-
-*DSL form* is the form as it appears in the SLIF DSL.
-It does not vary as long as the DSL does not vary.
-It is not guaranteed unique and many valid symbols
-will not have a DSL form.
-
-*Display form* is a string
-available
-for all valid symbols,
-and for invalid symbols IDs as well.
-It is Kollos's idea of "best" form for
-display.
-Display forms are not necessarily unique.
-
-In the case of an invalid symbol,
-display form dummies up a symbol name
-describing the problem.
-This may be consider a kind of "soft failure".
-
-The display form of an ISY
-will be the display form of the XSY when
-possible,
-and a "soft failure" otherwise.
-Because of this,
-code which requires the display form of the XSY
-corresponding to an ISY
-will usually just ask for the display form of the ISY.
 
 ## Kollos SLIF grammar object
 
@@ -3314,54 +3320,6 @@ or nil if there was none.
 
 ```
 
-## Inner symbol (ISY) class
-
-### Fields
-
-```
-    -- miranda: section+ class_isy field declarations
-    class_isy_fields.id = true
-    class_isy_fields.name = true
-    -- fields for use by upper layers?
-    class_isy_fields.assertion = true
-    class_isy_fields.pause_after = true
-    class_isy_fields.pause_after_active = true
-    class_isy_fields.pause_before = true
-    class_isy_fields.pause_before_active = true
-    class_isy_fields.priority = true
-    class_isy_fields.is_lexeme = true
-    class_isy_fields.eager = true
-```
-
-```
-    -- miranda: section+ create nonmetallic metatables
-    _M.class_isy = {}
-    -- miranda: section+ populate metatables
-    local class_isy_fields = {}
-    -- miranda: insert class_isy field declarations
-    declarations(_M.class_isy, class_isy_fields, 'isy')
-```
-
-### Accessors
-
-```
-    -- miranda: section+ most Lua function definitions
-    function _M.class_isy.display_form(isy)
-        local form = isy.name
-        if not form:find(' ', 1, true) then
-            return form
-        end
-        return '<' .. form .. '>'
-    end
-```
-
-### Constants: Ranking methods
-
-```
-    -- miranda: section+ constant Lua tables
-    _M.ranking_methods = { none = true, high_rule_only = true, rule = true }
-```
-
 ### Diagnostics
 
 TODO -- after development, this should be a local function.
@@ -5348,6 +5306,47 @@ necessarily unique.
     declarations(_M.class_xbnf, class_xbnf_fields, 'xbnf')
 ```
 
+## Inner symbol (ISY) class
+
+### Fields
+
+```
+    -- miranda: section+ class_isy field declarations
+    class_isy_fields.id = true
+    class_isy_fields.name = true
+    -- fields for use by upper layers?
+    class_isy_fields.assertion = true
+    class_isy_fields.pause_after = true
+    class_isy_fields.pause_after_active = true
+    class_isy_fields.pause_before = true
+    class_isy_fields.pause_before_active = true
+    class_isy_fields.priority = true
+    class_isy_fields.is_lexeme = true
+    class_isy_fields.eager = true
+```
+
+```
+    -- miranda: section+ create nonmetallic metatables
+    _M.class_isy = {}
+    -- miranda: section+ populate metatables
+    local class_isy_fields = {}
+    -- miranda: insert class_isy field declarations
+    declarations(_M.class_isy, class_isy_fields, 'isy')
+```
+
+### Accessors
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_isy.display_form(isy)
+        local form = isy.name
+        if not form:find(' ', 1, true) then
+            return form
+        end
+        return '<' .. form .. '>'
+    end
+```
+
 ## Libmarpa interface
 
 ```
@@ -5963,7 +5962,9 @@ a special "configuration" argument.
 
 ```
 
-## The main Lua code file
+## Output
+
+### The main Lua code file
 
 ```
   -- miranda: section create metal tables
@@ -6021,7 +6022,7 @@ a special "configuration" argument.
     -- vim: set expandtab shiftwidth=4:
 ```
 
-### Preliminaries to the main code
+#### Preliminaries to the main code
 
 Licensing, etc.
 
@@ -6063,7 +6064,7 @@ Luacheck declarations
 
 ```
 
-## The Kollos C code file
+### The Kollos C code file
 
 ```
     -- miranda: section kollos_c
@@ -6103,7 +6104,7 @@ Luacheck declarations
     /* vim: set expandtab shiftwidth=4: */
 ```
 
-### Stuff from okollos
+#### Stuff from okollos
 
 ```
 
@@ -7391,7 +7392,7 @@ is returned.
 
 ```
 
-### Kollos metal loader
+#### Kollos metal loader
 
 To make this a real module, this fuction must be named "luaopen_kollos_metal".
 The LUAOPEN_KOLLOS_METAL define allows us to override this for a declaration
@@ -7696,28 +7697,7 @@ Marpa::R3.
 
 ```
 
-### Create a sandbox
-
-Create a table, which can be used
-as a "sandbox" for protect the global environment
-from user code.
-This code only creates the sandbox, it does not
-set it as an environment -- it is assumed that
-that will be done later,
-after to-be-sandboxed Lua code is loaded,
-but before it is executed.
-
-```
-    -- miranda: section create sandbox table
-
-    local sandbox = {}
-    _M.sandbox = sandbox
-    sandbox.__index = _G
-    setmetatable(sandbox, sandbox)
-
-```
-
-### Preliminaries to the C library code
+#### Preliminaries to the C library code
 ```
     -- miranda: section preliminaries to the c library code
     /*
@@ -7768,7 +7748,7 @@ but before it is executed.
 
 ```
 
-## The Kollos C header file
+### The Kollos C header file
 
 ```
     -- miranda: section kollos_h
@@ -7791,7 +7771,7 @@ but before it is executed.
     /* vim: set expandtab shiftwidth=4: */
 ```
 
-### Preliminaries to the C header file
+#### Preliminaries to the C header file
 ```
     -- miranda: section preliminary comments of the c header file
 
@@ -7936,7 +7916,7 @@ nothing in the code enforces it.
     end
 ```
 
-### Exceptions
+## Exceptions
 
 ```
     -- miranda: section+ C extern variables
@@ -8150,6 +8130,36 @@ and error codes.
        else return nil, "Bad id in options: ", id end
     end
     ]==]
+```
+
+## Kollos non-locals
+
+### Create a sandbox
+
+Create a table, which can be used
+as a "sandbox" for protect the global environment
+from user code.
+This code only creates the sandbox, it does not
+set it as an environment -- it is assumed that
+that will be done later,
+after to-be-sandboxed Lua code is loaded,
+but before it is executed.
+
+```
+    -- miranda: section create sandbox table
+
+    local sandbox = {}
+    _M.sandbox = sandbox
+    sandbox.__index = _G
+    setmetatable(sandbox, sandbox)
+
+```
+
+### Constants: Ranking methods
+
+```
+    -- miranda: section+ constant Lua tables
+    _M.ranking_methods = { none = true, high_rule_only = true, rule = true }
 ```
 
 ## Kollos utilities
