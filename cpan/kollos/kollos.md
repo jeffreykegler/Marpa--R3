@@ -4271,6 +4271,8 @@ is zero.
 
 ```
 
+```
+
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.earley_item_data(slr, lmw_r, set_id, item_id)
         local item_data = {}
