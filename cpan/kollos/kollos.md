@@ -2612,6 +2612,66 @@ TODO: Allow for leading trailer, final trailer.
          return coroutine.wrap(iter)
     end
 
+    function _M.sweep_add(sweep, block, start, len)
+        -- io.stderr:write(string.format("Call: sweep, block,start,len = %s,%s,%s,%s\n",
+            -- inspect(sweep), inspect(block), inspect(start), inspect(len)))
+
+        if not sweep then
+            return { block, start, len }
+        end
+        local last_block, last_start, last_len =
+            table.unpack(sweep, (#sweep-2))
+
+        -- io.stderr:write(string.format("sweep, last block,start,len = %s,%s,%s,%s\n",
+            -- inspect(sweep), inspect(last_block), inspect(last_start), inspect(last_len)))
+
+        -- As a special case, if the new sweep
+        -- abuts the last one, we simply extend
+        -- the last one
+        if (block == last_block)
+            and (last_start + last_len ==  start)
+        then
+            sweep[#sweep] = last_len + len
+            -- io.stderr:write('Special case: ', inspect(sweep), "\n")
+            return sweep
+        end
+        sweep[#sweep+1] = block
+        sweep[#sweep+1] = start
+        sweep[#sweep+1] = len
+        -- io.stderr:write('Main case: ', inspect(sweep), "\n")
+        return sweep
+    end
+
+```
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slr.token_link_data(slr, lmw_r)
+        local lmw_g = lmw_r.lmw_g
+        local result = {}
+        local token_id, value_ix = lmw_r:_source_token()
+        local predecessor_ahm = lmw_r:_source_predecessor_state()
+        local origin_set_id = lmw_r:_earley_item_origin()
+        local origin_earleme = lmw_r:earleme(origin_set_id)
+        local middle_earleme = origin_earleme
+        local middle_set_id = lmw_r:_source_middle()
+        if predecessor_ahm then
+            middle_earleme = lmw_r:earleme(middle_set_id)
+        end
+        local token_name = lmw_g:nsy_name(token_id)
+        result.predecessor_ahm = predecessor_ahm
+        result.origin_earleme = origin_earleme
+        result.middle_set_id = middle_set_id
+        result.middle_earleme = middle_earleme
+        result.token_name = token_name
+        result.token_id = token_id
+        result.value_ix = value_ix
+        if value_ix ~= 2 then
+            result.value = slr.token_values[value_ix]
+        end
+        return result
+    end
+
 ```
 
 ```
@@ -4376,371 +4436,7 @@ is zero.
 
 ```
 
-## The grammar Libmarpa wrapper
-
-### Fields
-
-```
-    -- miranda: section+ class_grammar field declarations
-    class_grammar_fields._libmarpa = true
-    class_grammar_fields.irls = true
-    class_grammar_fields.isyid_by_name = true
-    class_grammar_fields.isys = true
-    class_grammar_fields.lmw_g = true
-    class_grammar_fields.name_by_isyid = true
-    class_grammar_fields.slg = true
-    class_grammar_fields.start_name = true
-    class_grammar_fields.xbnf_by_irlid = true
-```
-
-A per-grammar table of the XSY's,
-indexed by isyid.
-
-```
-    -- miranda: section+ class_grammar field declarations
-    class_grammar_fields.xsys = true
-```
-
-```
-    -- miranda: section+ populate metatables
-    local class_grammar_fields = {}
-    -- miranda: insert class_grammar field declarations
-    declarations(_M.class_grammar, class_grammar_fields, 'grammar')
-```
-
-### Constructor
-
-```
-    -- miranda: section+ copy metal tables
-    _M.metal.grammar_new = _M.grammar_new
     -- miranda: section+ most Lua function definitions
-    function _M.grammar_new(slg)
-        local grammar = _M.metal.grammar_new()
-        setmetatable(grammar, _M.class_grammar)
-        grammar:force_valued()
-        grammar.isyid_by_name = {}
-        grammar.name_by_isyid = {}
-        grammar.irls = {}
-        grammar.isys = {}
-        grammar.slg = slg
-        grammar.xbnf_by_irlid = {}
-        grammar.xsys = {}
-
-        return grammar
-    end
-
-```
-
-```
-    -- miranda: section+ copy metal tables
-    _M.metal_grammar.symbol_new = _M.class_grammar.symbol_new
-    -- miranda: section+ most Lua function definitions
-    function _M.class_grammar.symbol_new(grammar, symbol_name)
-        local symbol_id = _M.metal_grammar.symbol_new(grammar)
-        local symbol = setmetatable({}, _M.class_isy)
-        symbol.id = symbol_id
-        symbol.name = symbol_name
-        grammar.isyid_by_name[symbol_name] = symbol_id
-        grammar.name_by_isyid[symbol_id] = symbol_name
-        return symbol
-    end
-
-```
-
-```
-    -- miranda: section+ grammar Libmarpa wrapper Lua functions
-
-    function _M.class_grammar.symbol_name(lmw_g, symbol_id)
-        local symbol_name = lmw_g.name_by_isyid[symbol_id]
-        return symbol_name
-    end
-
-    function _M.class_grammar.irl_isyids(lmw_g, rule_id)
-        local lhs = lmw_g:rule_lhs(rule_id)
-        if not lhs then return end
-        local symbols = { lhs }
-        for rhsix = 0, lmw_g:rule_length(rule_id) - 1 do
-             symbols[#symbols+1] = lmw_g:rule_rhs(rule_id, rhsix)
-        end
-        return symbols
-    end
-
-    function _M.class_grammar.ahm_describe(lmw_g, ahm_id)
-        local irl_id = lmw_g:_ahm_irl(ahm_id)
-        local dot_position = lmw_g:_ahm_position(ahm_id)
-        if dot_position < 0 then
-            return string.format('R%d$', irl_id)
-        end
-        return string.format('R%d:%d', irl_id, dot_position)
-    end
-
-    function _M.class_grammar._dotted_nrl_show(lmw_g, nrl_id, dot_position)
-        local lhs_id = lmw_g:_irl_lhs(nrl_id)
-        local nrl_length = lmw_g:_irl_length(nrl_id)
-        local lhs_name = lmw_g:nsy_name(lhs_id)
-        local pieces = { lhs_name, '::=' }
-        if dot_position < 0 then
-            dot_position = nrl_length
-        end
-        for ix = 0, nrl_length - 1 do
-            local rhs_nsy_id = lmw_g:_irl_rhs(nrl_id, ix)
-            local rhs_nsy_name = lmw_g:nsy_name(rhs_nsy_id)
-            if ix == dot_position then
-                pieces[#pieces+1] = '.'
-            end
-            pieces[#pieces+1] = rhs_nsy_name
-        end
-        if dot_position >= nrl_length then
-            pieces[#pieces+1] = '.'
-        end
-        return table.concat(pieces, ' ')
-    end
-
-```
-
-```
-    -- miranda: section+ grammar Libmarpa wrapper Lua functions
-
-    function _M.class_grammar.nsy_name(lmw_g, nsy_id_arg)
-         -- start symbol
-         local nsy_id = math.tointeger(nsy_id_arg)
-         if not nsy_id then error('Bad nsy_name() symbol ID arg: ' .. inspect(nsy_id_arg)) end
-         local nsy_is_start = 0 ~= lmw_g:_nsy_is_start(nsy_id)
-         if nsy_is_start then
-             local xsy_id = lmw_g:_source_xsy(nsy_id)
-             local xsy_name = lmw_g:symbol_name(xsy_id)
-             return xsy_name .. "[']"
-         end
-
-         -- sequence LHS
-         local lhs_xrl = lmw_g:_nsy_lhs_xrl(nsy_id)
-         if lhs_xrl and lmw_g:sequence_min(lhs_xrl) then
-             local original_lhs_id = lmw_g:rule_lhs(lhs_xrl)
-             local lhs_name = lmw_g:symbol_name(original_lhs_id)
-             return lhs_name .. "[Seq]"
-         end
-
-         -- virtual symbol
-         local xrl_offset = lmw_g:_nsy_xrl_offset(nsy_id)
-         if xrl_offset and xrl_offset > 0 then
-             local original_lhs_id = lmw_g:rule_lhs(lhs_xrl)
-             local lhs_name = lmw_g:symbol_name(original_lhs_id)
-             return string.format("%s[R%d:%d]",
-                 lhs_name, lhs_xrl, xrl_offset)
-         end
-
-         -- real, named symbol or its nulling equivalent
-         local xsy_id = lmw_g:_source_xsy(nsy_id)
-         local xsy_name = lmw_g:symbol_name(xsy_id)
-         local is_nulling = 0 ~= lmw_g:_nsy_is_nulling(nsy_id)
-         if is_nulling then
-             xsy_name = xsy_name .. "[]"
-         end
-         return xsy_name
-    end
-
-    function _M.class_grammar.show_ahm(lmw_g, item_id)
-        local postdot_id = lmw_g:_ahm_postdot(item_id)
-        local pieces = { "AHM " .. item_id .. ': ' }
-        local properties = {}
-        if not postdot_id then
-            properties[#properties+1] = 'completion'
-        else
-            properties[#properties+1] =
-               'postdot = "' ..  lmw_g:nsy_name(postdot_id) .. '"'
-        end
-        pieces[#pieces+1] = table.concat(properties, '; ')
-        pieces[#pieces+1] = "\n    "
-        local irl_id = lmw_g:_ahm_irl(item_id)
-        local dot_position = lmw_g:_ahm_position(item_id)
-        pieces[#pieces+1] = lmw_g:_dotted_nrl_show(irl_id, dot_position)
-        pieces[#pieces+1] = '\n'
-        return table.concat(pieces)
-    end
-
-    function _M.class_grammar.show_ahms(lmw_g)
-        local pieces = {}
-        local count = lmw_g:_ahm_count()
-        for i = 0, count -1 do
-            pieces[#pieces+1] = lmw_g:show_ahm(i)
-        end
-        return table.concat(pieces)
-    end
-
-    function _M.class_grammar.show_nsy(lmw_g, nsy_id)
-        local name = lmw_g:nsy_name(nsy_id)
-        local pieces = { string.format("%d: %s", nsy_id, name) }
-        local tags = {}
-        local is_nulling = 0 ~= lmw_g:_nsy_is_nulling(nsy_id)
-        if is_nulling then
-        tags[#tags+1] = 'nulling'
-        end
-        if #tags > 0 then
-            pieces[#pieces+1] = ', ' .. table.concat(tags, ' ')
-        end
-        pieces[#pieces+1] = '\n'
-        return table.concat(pieces)
-    end
-
-    function _M.class_grammar.brief_nrl(lmw_g, nrl_id)
-        local pieces = { string.format("%d:", nrl_id) }
-        local lhs_id = lmw_g:_irl_lhs(nrl_id)
-        pieces[#pieces+1] = lmw_g:nsy_name(lhs_id)
-        pieces[#pieces+1] = "::="
-        local rh_length = lmw_g:_irl_length(nrl_id)
-        if rh_length > 0 then
-           for rhs_ix = 0, rh_length - 1 do
-              local this_rhs_id = lmw_g:_irl_rhs(nrl_id, rhs_ix)
-              pieces[#pieces+1] = lmw_g:nsy_name(this_rhs_id)
-           end
-        end
-        return table.concat(pieces, " ")
-    end
-
-```
-
-### Layer grammar accessors
-
-`isy_key` is an ISY id.
-
-TODO: Perhaps `isy_key` should also allow isy tables.
-
-```
-    -- miranda: section+ most Lua function definitions
-    function _M.class_grammar._xsy(grammar, isy_key)
-        return grammar.xsys[isy_key]
-    end
-    function _M.class_grammar.xsyid(grammar, isy_key)
-        local xsy = grammar:xsy(isy_key)
-        if not xsy then
-            _M.userX(string.format(
-               "grammar:xsyid(%s): no such xsy",
-               inspect(isy_key)))
-        end
-        return xsy.id
-    end
-```
-
-```
-    -- miranda: section+ most Lua function definitions
-    function _M.class_grammar.symbol_dsl_form(grammar, isyid)
-        local xsy = grammar.xsys[isyid]
-        if not xsy then return end
-        return xsy.dsl_form
-    end
-```
-
-Finds a displayable
-name for an ISYID,
-pulling one out of thin air if need be.
-The "forced" name is not
-necessarily unique.
-
-```
-    -- miranda: section+ most Lua function definitions
-    function _M.class_grammar.symbol_display_form(grammar, isyid)
-        local xsy = grammar.xsys[isyid]
-        if xsy then return xsy:display_form() end
-        local isy = grammar.isys[isyid]
-        if isy then return isy:display_form() end
-        return '<isyid ' .. isyid .. '>'
-    end
-```
-
-## The recognizer Libmarpa wrapper
-
-### Fields
-
-```
-    -- miranda: section+ class_recce field declarations
-    class_recce_fields._libmarpa = true
-    class_recce_fields.lmw_g = true
-```
-
-```
-    -- miranda: section+ populate metatables
-    local class_recce_fields = {}
-    -- miranda: insert class_recce field declarations
-    declarations(_M.class_recce, class_recce_fields, 'recce')
-```
-
-Functions for tracing Earley sets
-
-```
-    -- miranda: section+ recognizer Libmarpa wrapper Lua functions
-    function _M.class_recce.leo_item_data(lmw_r)
-        local lmw_g = lmw_r.lmw_g
-        local leo_base_state = lmw_r:_leo_base_state()
-        if not leo_base_state then return end
-        local trace_earley_set = lmw_r:_trace_earley_set()
-        local trace_earleme = lmw_r:earleme(trace_earley_set)
-        local postdot_symbol_id = lmw_r:_postdot_item_symbol()
-        local postdot_symbol_name = lmw_g:nsy_name(postdot_symbol_id)
-        local predecessor_symbol_id = lmw_r:_leo_predecessor_symbol()
-        local base_origin_set_id = lmw_r:_leo_base_origin()
-        local base_origin_earleme = lmw_r:earleme(base_origin_set_id)
-        return {
-            postdot_symbol_name = postdot_symbol_name,
-            postdot_symbol_id = postdot_symbol_id,
-            predecessor_symbol_id = predecessor_symbol_id,
-            base_origin_earleme = base_origin_earleme,
-            leo_base_state = leo_base_state,
-            trace_earleme = trace_earleme
-        }
-    end
-
-    function _M.class_slr.token_link_data(slr, lmw_r)
-        local lmw_g = lmw_r.lmw_g
-        local result = {}
-        local token_id, value_ix = lmw_r:_source_token()
-        local predecessor_ahm = lmw_r:_source_predecessor_state()
-        local origin_set_id = lmw_r:_earley_item_origin()
-        local origin_earleme = lmw_r:earleme(origin_set_id)
-        local middle_earleme = origin_earleme
-        local middle_set_id = lmw_r:_source_middle()
-        if predecessor_ahm then
-            middle_earleme = lmw_r:earleme(middle_set_id)
-        end
-        local token_name = lmw_g:nsy_name(token_id)
-        result.predecessor_ahm = predecessor_ahm
-        result.origin_earleme = origin_earleme
-        result.middle_set_id = middle_set_id
-        result.middle_earleme = middle_earleme
-        result.token_name = token_name
-        result.token_id = token_id
-        result.value_ix = value_ix
-        if value_ix ~= 2 then
-            result.value = slr.token_values[value_ix]
-        end
-        return result
-    end
-
-    function _M.class_recce.completion_link_data(lmw_r, ahm_id)
-        local result = {}
-        local predecessor_state = lmw_r:_source_predecessor_state()
-        local origin_set_id = lmw_r:_earley_item_origin()
-        local origin_earleme = lmw_r:earleme(origin_set_id)
-        local middle_set_id = lmw_r:_source_middle()
-        local middle_earleme = lmw_r:earleme(middle_set_id)
-        result.predecessor_state = predecessor_state
-        result.origin_earleme = origin_earleme
-        result.middle_earleme = middle_earleme
-        result.middle_set_id = middle_set_id
-        result.ahm_id = ahm_id
-        return result
-    end
-
-    function _M.class_recce.leo_link_data(lmw_r, ahm_id)
-        local result = {}
-        local middle_set_id = lmw_r:_source_middle()
-        local middle_earleme = lmw_r:earleme(middle_set_id)
-        local leo_transition_symbol = lmw_r:_source_leo_transition_symbol()
-        result.middle_earleme = middle_earleme
-        result.leo_transition_symbol = leo_transition_symbol
-        result.ahm_id = ahm_id
-        return result
-    end
-
     function _M.class_slr.earley_item_data(slr, lmw_r, set_id, item_id)
         local item_data = {}
         local lmw_g = lmw_r.lmw_g
@@ -5311,6 +5007,345 @@ It should free all memory associated with the valuation.
     end
 
 ```
+
+## Libmarpa grammar class
+
+### Fields
+
+```
+    -- miranda: section+ class_grammar field declarations
+    class_grammar_fields._libmarpa = true
+    class_grammar_fields.irls = true
+    class_grammar_fields.isyid_by_name = true
+    class_grammar_fields.isys = true
+    class_grammar_fields.lmw_g = true
+    class_grammar_fields.name_by_isyid = true
+    class_grammar_fields.slg = true
+    class_grammar_fields.start_name = true
+    class_grammar_fields.xbnf_by_irlid = true
+```
+
+A per-grammar table of the XSY's,
+indexed by isyid.
+
+```
+    -- miranda: section+ class_grammar field declarations
+    class_grammar_fields.xsys = true
+```
+
+```
+    -- miranda: section+ populate metatables
+    local class_grammar_fields = {}
+    -- miranda: insert class_grammar field declarations
+    declarations(_M.class_grammar, class_grammar_fields, 'grammar')
+```
+
+### Constructor
+
+```
+    -- miranda: section+ copy metal tables
+    _M.metal.grammar_new = _M.grammar_new
+    -- miranda: section+ most Lua function definitions
+    function _M.grammar_new(slg)
+        local grammar = _M.metal.grammar_new()
+        setmetatable(grammar, _M.class_grammar)
+        grammar:force_valued()
+        grammar.isyid_by_name = {}
+        grammar.name_by_isyid = {}
+        grammar.irls = {}
+        grammar.isys = {}
+        grammar.slg = slg
+        grammar.xbnf_by_irlid = {}
+        grammar.xsys = {}
+
+        return grammar
+    end
+
+```
+
+```
+    -- miranda: section+ copy metal tables
+    _M.metal_grammar.symbol_new = _M.class_grammar.symbol_new
+    -- miranda: section+ most Lua function definitions
+    function _M.class_grammar.symbol_new(grammar, symbol_name)
+        local symbol_id = _M.metal_grammar.symbol_new(grammar)
+        local symbol = setmetatable({}, _M.class_isy)
+        symbol.id = symbol_id
+        symbol.name = symbol_name
+        grammar.isyid_by_name[symbol_name] = symbol_id
+        grammar.name_by_isyid[symbol_id] = symbol_name
+        return symbol
+    end
+
+```
+
+```
+    -- miranda: section+ grammar Libmarpa wrapper Lua functions
+
+    function _M.class_grammar.symbol_name(lmw_g, symbol_id)
+        local symbol_name = lmw_g.name_by_isyid[symbol_id]
+        return symbol_name
+    end
+
+    function _M.class_grammar.irl_isyids(lmw_g, rule_id)
+        local lhs = lmw_g:rule_lhs(rule_id)
+        if not lhs then return end
+        local symbols = { lhs }
+        for rhsix = 0, lmw_g:rule_length(rule_id) - 1 do
+             symbols[#symbols+1] = lmw_g:rule_rhs(rule_id, rhsix)
+        end
+        return symbols
+    end
+
+    function _M.class_grammar.ahm_describe(lmw_g, ahm_id)
+        local irl_id = lmw_g:_ahm_irl(ahm_id)
+        local dot_position = lmw_g:_ahm_position(ahm_id)
+        if dot_position < 0 then
+            return string.format('R%d$', irl_id)
+        end
+        return string.format('R%d:%d', irl_id, dot_position)
+    end
+
+    function _M.class_grammar._dotted_nrl_show(lmw_g, nrl_id, dot_position)
+        local lhs_id = lmw_g:_irl_lhs(nrl_id)
+        local nrl_length = lmw_g:_irl_length(nrl_id)
+        local lhs_name = lmw_g:nsy_name(lhs_id)
+        local pieces = { lhs_name, '::=' }
+        if dot_position < 0 then
+            dot_position = nrl_length
+        end
+        for ix = 0, nrl_length - 1 do
+            local rhs_nsy_id = lmw_g:_irl_rhs(nrl_id, ix)
+            local rhs_nsy_name = lmw_g:nsy_name(rhs_nsy_id)
+            if ix == dot_position then
+                pieces[#pieces+1] = '.'
+            end
+            pieces[#pieces+1] = rhs_nsy_name
+        end
+        if dot_position >= nrl_length then
+            pieces[#pieces+1] = '.'
+        end
+        return table.concat(pieces, ' ')
+    end
+
+```
+
+```
+    -- miranda: section+ grammar Libmarpa wrapper Lua functions
+
+    function _M.class_grammar.nsy_name(lmw_g, nsy_id_arg)
+         -- start symbol
+         local nsy_id = math.tointeger(nsy_id_arg)
+         if not nsy_id then error('Bad nsy_name() symbol ID arg: ' .. inspect(nsy_id_arg)) end
+         local nsy_is_start = 0 ~= lmw_g:_nsy_is_start(nsy_id)
+         if nsy_is_start then
+             local xsy_id = lmw_g:_source_xsy(nsy_id)
+             local xsy_name = lmw_g:symbol_name(xsy_id)
+             return xsy_name .. "[']"
+         end
+
+         -- sequence LHS
+         local lhs_xrl = lmw_g:_nsy_lhs_xrl(nsy_id)
+         if lhs_xrl and lmw_g:sequence_min(lhs_xrl) then
+             local original_lhs_id = lmw_g:rule_lhs(lhs_xrl)
+             local lhs_name = lmw_g:symbol_name(original_lhs_id)
+             return lhs_name .. "[Seq]"
+         end
+
+         -- virtual symbol
+         local xrl_offset = lmw_g:_nsy_xrl_offset(nsy_id)
+         if xrl_offset and xrl_offset > 0 then
+             local original_lhs_id = lmw_g:rule_lhs(lhs_xrl)
+             local lhs_name = lmw_g:symbol_name(original_lhs_id)
+             return string.format("%s[R%d:%d]",
+                 lhs_name, lhs_xrl, xrl_offset)
+         end
+
+         -- real, named symbol or its nulling equivalent
+         local xsy_id = lmw_g:_source_xsy(nsy_id)
+         local xsy_name = lmw_g:symbol_name(xsy_id)
+         local is_nulling = 0 ~= lmw_g:_nsy_is_nulling(nsy_id)
+         if is_nulling then
+             xsy_name = xsy_name .. "[]"
+         end
+         return xsy_name
+    end
+
+    function _M.class_grammar.show_ahm(lmw_g, item_id)
+        local postdot_id = lmw_g:_ahm_postdot(item_id)
+        local pieces = { "AHM " .. item_id .. ': ' }
+        local properties = {}
+        if not postdot_id then
+            properties[#properties+1] = 'completion'
+        else
+            properties[#properties+1] =
+               'postdot = "' ..  lmw_g:nsy_name(postdot_id) .. '"'
+        end
+        pieces[#pieces+1] = table.concat(properties, '; ')
+        pieces[#pieces+1] = "\n    "
+        local irl_id = lmw_g:_ahm_irl(item_id)
+        local dot_position = lmw_g:_ahm_position(item_id)
+        pieces[#pieces+1] = lmw_g:_dotted_nrl_show(irl_id, dot_position)
+        pieces[#pieces+1] = '\n'
+        return table.concat(pieces)
+    end
+
+    function _M.class_grammar.show_ahms(lmw_g)
+        local pieces = {}
+        local count = lmw_g:_ahm_count()
+        for i = 0, count -1 do
+            pieces[#pieces+1] = lmw_g:show_ahm(i)
+        end
+        return table.concat(pieces)
+    end
+
+    function _M.class_grammar.show_nsy(lmw_g, nsy_id)
+        local name = lmw_g:nsy_name(nsy_id)
+        local pieces = { string.format("%d: %s", nsy_id, name) }
+        local tags = {}
+        local is_nulling = 0 ~= lmw_g:_nsy_is_nulling(nsy_id)
+        if is_nulling then
+        tags[#tags+1] = 'nulling'
+        end
+        if #tags > 0 then
+            pieces[#pieces+1] = ', ' .. table.concat(tags, ' ')
+        end
+        pieces[#pieces+1] = '\n'
+        return table.concat(pieces)
+    end
+
+    function _M.class_grammar.brief_nrl(lmw_g, nrl_id)
+        local pieces = { string.format("%d:", nrl_id) }
+        local lhs_id = lmw_g:_irl_lhs(nrl_id)
+        pieces[#pieces+1] = lmw_g:nsy_name(lhs_id)
+        pieces[#pieces+1] = "::="
+        local rh_length = lmw_g:_irl_length(nrl_id)
+        if rh_length > 0 then
+           for rhs_ix = 0, rh_length - 1 do
+              local this_rhs_id = lmw_g:_irl_rhs(nrl_id, rhs_ix)
+              pieces[#pieces+1] = lmw_g:nsy_name(this_rhs_id)
+           end
+        end
+        return table.concat(pieces, " ")
+    end
+
+```
+
+### Layer grammar accessors
+
+`isy_key` is an ISY id.
+
+TODO: Perhaps `isy_key` should also allow isy tables.
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_grammar._xsy(grammar, isy_key)
+        return grammar.xsys[isy_key]
+    end
+    function _M.class_grammar.xsyid(grammar, isy_key)
+        local xsy = grammar:xsy(isy_key)
+        if not xsy then
+            _M.userX(string.format(
+               "grammar:xsyid(%s): no such xsy",
+               inspect(isy_key)))
+        end
+        return xsy.id
+    end
+```
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_grammar.symbol_dsl_form(grammar, isyid)
+        local xsy = grammar.xsys[isyid]
+        if not xsy then return end
+        return xsy.dsl_form
+    end
+```
+
+Finds a displayable
+name for an ISYID,
+pulling one out of thin air if need be.
+The "forced" name is not
+necessarily unique.
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_grammar.symbol_display_form(grammar, isyid)
+        local xsy = grammar.xsys[isyid]
+        if xsy then return xsy:display_form() end
+        local isy = grammar.isys[isyid]
+        if isy then return isy:display_form() end
+        return '<isyid ' .. isyid .. '>'
+    end
+```
+
+## The recognizer Libmarpa wrapper
+
+### Fields
+
+```
+    -- miranda: section+ class_recce field declarations
+    class_recce_fields._libmarpa = true
+    class_recce_fields.lmw_g = true
+```
+
+```
+    -- miranda: section+ populate metatables
+    local class_recce_fields = {}
+    -- miranda: insert class_recce field declarations
+    declarations(_M.class_recce, class_recce_fields, 'recce')
+```
+
+Functions for tracing Earley sets
+
+```
+    -- miranda: section+ recognizer Libmarpa wrapper Lua functions
+    function _M.class_recce.leo_item_data(lmw_r)
+        local lmw_g = lmw_r.lmw_g
+        local leo_base_state = lmw_r:_leo_base_state()
+        if not leo_base_state then return end
+        local trace_earley_set = lmw_r:_trace_earley_set()
+        local trace_earleme = lmw_r:earleme(trace_earley_set)
+        local postdot_symbol_id = lmw_r:_postdot_item_symbol()
+        local postdot_symbol_name = lmw_g:nsy_name(postdot_symbol_id)
+        local predecessor_symbol_id = lmw_r:_leo_predecessor_symbol()
+        local base_origin_set_id = lmw_r:_leo_base_origin()
+        local base_origin_earleme = lmw_r:earleme(base_origin_set_id)
+        return {
+            postdot_symbol_name = postdot_symbol_name,
+            postdot_symbol_id = postdot_symbol_id,
+            predecessor_symbol_id = predecessor_symbol_id,
+            base_origin_earleme = base_origin_earleme,
+            leo_base_state = leo_base_state,
+            trace_earleme = trace_earleme
+        }
+    end
+
+    function _M.class_recce.completion_link_data(lmw_r, ahm_id)
+        local result = {}
+        local predecessor_state = lmw_r:_source_predecessor_state()
+        local origin_set_id = lmw_r:_earley_item_origin()
+        local origin_earleme = lmw_r:earleme(origin_set_id)
+        local middle_set_id = lmw_r:_source_middle()
+        local middle_earleme = lmw_r:earleme(middle_set_id)
+        result.predecessor_state = predecessor_state
+        result.origin_earleme = origin_earleme
+        result.middle_earleme = middle_earleme
+        result.middle_set_id = middle_set_id
+        result.ahm_id = ahm_id
+        return result
+    end
+
+    function _M.class_recce.leo_link_data(lmw_r, ahm_id)
+        local result = {}
+        local middle_set_id = lmw_r:_source_middle()
+        local middle_earleme = lmw_r:earleme(middle_set_id)
+        local leo_transition_symbol = lmw_r:_source_leo_transition_symbol()
+        result.middle_earleme = middle_earleme
+        result.leo_transition_symbol = leo_transition_symbol
+        result.ahm_id = ahm_id
+        return result
+    end
 
 ## Libmarpa interface
 
@@ -8145,36 +8180,6 @@ and error codes.
             return string.format("\\x{%02x}", codepoint)
         end
         return string.format("\\x{%04x}", codepoint)
-    end
-
-    function _M.sweep_add(sweep, block, start, len)
-        -- io.stderr:write(string.format("Call: sweep, block,start,len = %s,%s,%s,%s\n",
-            -- inspect(sweep), inspect(block), inspect(start), inspect(len)))
-
-        if not sweep then
-            return { block, start, len }
-        end
-        local last_block, last_start, last_len =
-            table.unpack(sweep, (#sweep-2))
-
-        -- io.stderr:write(string.format("sweep, last block,start,len = %s,%s,%s,%s\n",
-            -- inspect(sweep), inspect(last_block), inspect(last_start), inspect(last_len)))
-
-        -- As a special case, if the new sweep
-        -- abuts the last one, we simply extend
-        -- the last one
-        if (block == last_block)
-            and (last_start + last_len ==  start)
-        then
-            sweep[#sweep] = last_len + len
-            -- io.stderr:write('Special case: ', inspect(sweep), "\n")
-            return sweep
-        end
-        sweep[#sweep+1] = block
-        sweep[#sweep+1] = start
-        sweep[#sweep+1] = len
-        -- io.stderr:write('Main case: ', inspect(sweep), "\n")
-        return sweep
     end
 
 ```
