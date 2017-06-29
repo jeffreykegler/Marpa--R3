@@ -26,6 +26,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 cd kollos && ../lua/lua toc.lua < kollos.md
 -->
 * [About Kollos](#about-kollos)
+* [Abbreviations](#abbreviations)
 * [Development Notes](#development-notes)
   * [To Do](#to-do)
     * [TODO notes](#todo-notes)
@@ -38,20 +39,10 @@ cd kollos && ../lua/lua toc.lua < kollos.md
 * [Kollos registry objects](#kollos-registry-objects)
   * [External, inner and internal](#external-inner-and-internal)
 * [Symbols](#symbols)
-* [ISY Fields](#isy-fields)
-* [ISY Accessors](#isy-accessors)
-* [XSY Fields](#xsy-fields)
-* [XSY Accessors](#xsy-accessors)
-* [Rules](#rules)
-* [IRL Fields](#irl-fields)
-* [XRL Fields](#xrl-fields)
-* [XBNF Fields](#xbnf-fields)
 * [Kollos SLIF grammar object](#kollos-slif-grammar-object)
   * [Fields](#fields)
   * [Accessors](#accessors)
   * [Mutators](#mutators)
-  * [Constants: Ranking methods](#constants-ranking-methods)
-  * [Hash to runtime processing](#hash-to-runtime-processing)
 * [Kollos SLIF recognizer object](#kollos-slif-recognizer-object)
   * [Fields](#fields)
   * [Constructors](#constructors)
@@ -62,6 +53,18 @@ cd kollos && ../lua/lua toc.lua < kollos.md
   * [Locations](#locations)
   * [Events](#events)
   * [Progress reporting](#progress-reporting)
+* [Inner symbol (ISY) class](#inner-symbol-isy-class)
+  * [Fields](#fields)
+  * [Accessors](#accessors)
+* [External symbol (XSY) class](#external-symbol-xsy-class)
+  * [Fields](#fields)
+* [Accessors](#accessors)
+* [Rules](#rules)
+* [IRL Fields](#irl-fields)
+* [XRL Fields](#xrl-fields)
+* [XBNF Fields](#xbnf-fields)
+  * [Constants: Ranking methods](#constants-ranking-methods)
+  * [Hash to runtime processing](#hash-to-runtime-processing)
   * [Coroutines](#coroutines)
   * [Exceptions](#exceptions)
   * [Diagnostics](#diagnostics)
@@ -1027,6 +1030,210 @@ Lowest XSYID is 1.
             ::NEXT_PROPERTY::
         end
         return isyid
+    end
+```
+
+### Hash to runtime processing
+
+The object, in computing the hash, is to get as much
+precomputation in as possible, without using undue space.
+That means CPU-intensive processing should tend to be done
+before or during hash creation, and space-intensive processing
+should tend to be done here, in the code that converts the
+hash to its runtime equivalent.
+
+Populate the `xsys` table.
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slg.xsys_populate(slg, source_hash)
+        local xsys = {}
+        slg.xsys = xsys
+
+        -- io.stderr:write(inspect(source_hash))
+        local xsy_names = {}
+        local hash_xsy_data = source_hash.xsy
+        for xsy_name, _ in pairs(hash_xsy_data) do
+             xsy_names[#xsy_names+1] = xsy_name
+        end
+        table.sort(xsy_names)
+        for xsy_id = 1, #xsy_names do
+            local xsy_name = xsy_names[xsy_id]
+
+            local runtime_xsy = setmetatable({}, _M.class_xsy)
+            local xsy_source = hash_xsy_data[xsy_name]
+
+            runtime_xsy.id = xsy_id
+            runtime_xsy.name = xsy_name
+            -- copy, so that we can destroy `source_hash`
+            runtime_xsy.lexeme_semantics = xsy_source.action
+            runtime_xsy.blessing = xsy_source.blessing
+            runtime_xsy.dsl_form = xsy_source.dsl_form
+            runtime_xsy.if_inaccessible = xsy_source.if_inaccessible
+            runtime_xsy.name_source = xsy_source.name_source
+
+            xsys[xsy_name] = runtime_xsy
+            xsys[xsy_id] = runtime_xsy
+        end
+    end
+```
+
+Populate the `xrls` table.
+The contents of this table are not used,
+currently,
+but Jeffrey thinks they might be used someday,
+for example in error messages.
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slg.xrls_populate(slg, source_hash)
+        local xrls = {}
+        slg.xrls = xrls
+
+        -- io.stderr:write(inspect(source_hash))
+        local xrl_names = {}
+        local hash_xrl_data = source_hash.xrl
+        for xrl_name, _ in pairs(hash_xrl_data) do
+             xrl_names[#xrl_names+1] = xrl_name
+        end
+        table.sort(xrl_names,
+           function(a, b)
+                if a ~= b then return a < b end
+                local start_a = hash_xrl_data[a].start
+                local start_b = hash_xrl_data[b].start
+                return start_a < start_b
+           end
+        )
+        for xrl_id = 1, #xrl_names do
+            local xrl_name = xrl_names[xrl_id]
+            local runtime_xrl = setmetatable({}, _M.class_xrl)
+            local xrl_source = hash_xrl_data[xrl_name]
+
+            runtime_xrl.id = xrl_id
+            runtime_xrl.name = xrl_name
+            -- copy, so that we can destroy `source_hash`
+            runtime_xrl.precedence_count = xrl_source.precedence_count
+            runtime_xrl.lhs = xrl_source.lhs
+            runtime_xrl.start = xrl_source.start
+            runtime_xrl.length = xrl_source.length
+
+            xrls[xrl_name] = runtime_xrl
+            xrls[xrl_id] = runtime_xrl
+        end
+    end
+```
+
+Populate xbnfs.
+"xbnfs" are eXternal BNF rules.
+They are actually not fully external,
+but are first translation of the XRLs into
+BNF form.
+One symptom of their less-than-fully external
+nature is that they are two `xbnfs` tables,
+one for each subgrammar.
+(The subgrammars are only visible internally.)
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slg.xbnfs_subg_populate(slg, source_hash, subgrammar)
+        local xbnfs = slg.xbnfs
+        -- io.stderr:write(inspect(source_hash))
+        local xbnf_names = {}
+        local xsys = slg.xsys
+        local hash_xbnf_data = source_hash.xbnf[subgrammar]
+        for xbnf_name, _ in pairs(hash_xbnf_data) do
+             xbnf_names[#xbnf_names+1] = xbnf_name
+        end
+        table.sort(xbnf_names,
+           function(a, b)
+                local start_a = hash_xbnf_data[a].start
+                local start_b = hash_xbnf_data[b].start
+                if start_a ~= start_b then return start_a < start_b end
+                local subkey_a = hash_xbnf_data[a].subkey
+                local subkey_b = hash_xbnf_data[b].subkey
+                return subkey_a < subkey_b
+           end
+        )
+        for ix = 1, #xbnf_names do
+            local xbnf_name = xbnf_names[ix]
+            local runtime_xbnf = setmetatable({}, _M.class_xbnf)
+
+            local xbnf_source = hash_xbnf_data[xbnf_name]
+
+            -- copy, so that we can destroy `source_hash`
+
+            runtime_xbnf.xrl_name = xbnf_source.xrlid
+            runtime_xbnf.name = xbnf_source.name
+            runtime_xbnf.subgrammar = xbnf_source.subgrammar
+            runtime_xbnf.lhs = xsys[xbnf_source.lhs]
+            local to_rhs = {}
+            local from_rhs = xbnf_source.rhs
+            for ix = 1, #from_rhs do
+                to_rhs[ix] = xsys[xbnf_source.rhs[ix]]
+            end
+            runtime_xbnf.rhs = to_rhs
+            runtime_xbnf.rank = xbnf_source.rank
+            runtime_xbnf.null_ranking = xbnf_source.null_ranking
+
+            runtime_xbnf.symbol_as_event = xbnf_source.symbol_as_event
+            local source_event = xbnf_source.event
+            if source_event then
+                runtime_xbnf.event_name = source_event[1]
+                -- TODO revisit type (boolean? string? integer?)
+                --   once conversion to Lua is complete
+                runtime_xbnf.event_starts_active
+                    = (math.tointeger(source_event[2]) ~= 0)
+            end
+
+            if xbnf_source.min then
+                runtime_xbnf.min = math.tointeger(xbnf_source.min)
+            end
+            runtime_xbnf.separator = xbnf_source.separator
+            runtime_xbnf.proper = xbnf_source.proper
+            runtime_xbnf.bless = xbnf_source.bless
+            runtime_xbnf.action = xbnf_source.action
+            runtime_xbnf.start = xbnf_source.start
+            runtime_xbnf.length = xbnf_source.length
+
+            runtime_xbnf.discard_separation =
+                xbnf_source.separator and
+                    not xbnf_source.keep
+
+            local rhs_length = #xbnf_source.rhs
+
+            -- min defined if sequence rule
+            if not xbnf_source.min or rhs_length == 0 then
+                if xbnf_source.mask then
+                    runtime_xbnf.mask = xbnf_source.mask
+                else
+                    local mask = {}
+                    for i = 1, rhs_length do
+                        mask[i] = 1
+                    end
+                    runtime_xbnf.mask = mask
+                end
+            end
+
+            local next_xbnf_id = #xbnfs + 1
+            runtime_xbnf.id = next_xbnf_id
+            xbnfs[xbnf_name] = runtime_xbnf
+            xbnfs[next_xbnf_id] = runtime_xbnf
+        end
+    end
+    function _M.class_slg.xbnfs_populate(slg, source_hash)
+        slg.xbnfs = {}
+        slg:xbnfs_subg_populate(source_hash, 'l0')
+        return slg:xbnfs_subg_populate(source_hash, 'g1')
+    end
+```
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slg.g1_xsyid(slg, isy_key)
+        return slg.g1:xsyid(isy_key)
+    end
+    function _M.class_slg.l0_xsyid(slg, isy_key)
+        return slg.l0:xsyid(isy_key)
     end
 ```
 
@@ -3223,386 +3430,6 @@ or nil if there was none.
     _M.ranking_methods = { none = true, high_rule_only = true, rule = true }
 ```
 
-### Hash to runtime processing
-
-The object, in computing the hash, is to get as much
-precomputation in as possible, without using undue space.
-That means CPU-intensive processing should tend to be done
-before or during hash creation, and space-intensive processing
-should tend to be done here, in the code that converts the
-hash to its runtime equivalent.
-
-Populate the `xsys` table.
-
-```
-    -- miranda: section+ most Lua function definitions
-    function _M.class_slg.xsys_populate(slg, source_hash)
-        local xsys = {}
-        slg.xsys = xsys
-
-        -- io.stderr:write(inspect(source_hash))
-        local xsy_names = {}
-        local hash_xsy_data = source_hash.xsy
-        for xsy_name, _ in pairs(hash_xsy_data) do
-             xsy_names[#xsy_names+1] = xsy_name
-        end
-        table.sort(xsy_names)
-        for xsy_id = 1, #xsy_names do
-            local xsy_name = xsy_names[xsy_id]
-
-            local runtime_xsy = setmetatable({}, _M.class_xsy)
-            local xsy_source = hash_xsy_data[xsy_name]
-
-            runtime_xsy.id = xsy_id
-            runtime_xsy.name = xsy_name
-            -- copy, so that we can destroy `source_hash`
-            runtime_xsy.lexeme_semantics = xsy_source.action
-            runtime_xsy.blessing = xsy_source.blessing
-            runtime_xsy.dsl_form = xsy_source.dsl_form
-            runtime_xsy.if_inaccessible = xsy_source.if_inaccessible
-            runtime_xsy.name_source = xsy_source.name_source
-
-            xsys[xsy_name] = runtime_xsy
-            xsys[xsy_id] = runtime_xsy
-        end
-    end
-```
-
-Populate the `xrls` table.
-The contents of this table are not used,
-currently,
-but Jeffrey thinks they might be used someday,
-for example in error messages.
-
-```
-    -- miranda: section+ most Lua function definitions
-    function _M.class_slg.xrls_populate(slg, source_hash)
-        local xrls = {}
-        slg.xrls = xrls
-
-        -- io.stderr:write(inspect(source_hash))
-        local xrl_names = {}
-        local hash_xrl_data = source_hash.xrl
-        for xrl_name, _ in pairs(hash_xrl_data) do
-             xrl_names[#xrl_names+1] = xrl_name
-        end
-        table.sort(xrl_names,
-           function(a, b)
-                if a ~= b then return a < b end
-                local start_a = hash_xrl_data[a].start
-                local start_b = hash_xrl_data[b].start
-                return start_a < start_b
-           end
-        )
-        for xrl_id = 1, #xrl_names do
-            local xrl_name = xrl_names[xrl_id]
-            local runtime_xrl = setmetatable({}, _M.class_xrl)
-            local xrl_source = hash_xrl_data[xrl_name]
-
-            runtime_xrl.id = xrl_id
-            runtime_xrl.name = xrl_name
-            -- copy, so that we can destroy `source_hash`
-            runtime_xrl.precedence_count = xrl_source.precedence_count
-            runtime_xrl.lhs = xrl_source.lhs
-            runtime_xrl.start = xrl_source.start
-            runtime_xrl.length = xrl_source.length
-
-            xrls[xrl_name] = runtime_xrl
-            xrls[xrl_id] = runtime_xrl
-        end
-    end
-```
-
-Populate xbnfs.
-"xbnfs" are eXternal BNF rules.
-They are actually not fully external,
-but are first translation of the XRLs into
-BNF form.
-One symptom of their less-than-fully external
-nature is that they are two `xbnfs` tables,
-one for each subgrammar.
-(The subgrammars are only visible internally.)
-
-```
-    -- miranda: section+ most Lua function definitions
-    function _M.class_slg.xbnfs_subg_populate(slg, source_hash, subgrammar)
-        local xbnfs = slg.xbnfs
-        -- io.stderr:write(inspect(source_hash))
-        local xbnf_names = {}
-        local xsys = slg.xsys
-        local hash_xbnf_data = source_hash.xbnf[subgrammar]
-        for xbnf_name, _ in pairs(hash_xbnf_data) do
-             xbnf_names[#xbnf_names+1] = xbnf_name
-        end
-        table.sort(xbnf_names,
-           function(a, b)
-                local start_a = hash_xbnf_data[a].start
-                local start_b = hash_xbnf_data[b].start
-                if start_a ~= start_b then return start_a < start_b end
-                local subkey_a = hash_xbnf_data[a].subkey
-                local subkey_b = hash_xbnf_data[b].subkey
-                return subkey_a < subkey_b
-           end
-        )
-        for ix = 1, #xbnf_names do
-            local xbnf_name = xbnf_names[ix]
-            local runtime_xbnf = setmetatable({}, _M.class_xbnf)
-
-            local xbnf_source = hash_xbnf_data[xbnf_name]
-
-            -- copy, so that we can destroy `source_hash`
-
-            runtime_xbnf.xrl_name = xbnf_source.xrlid
-            runtime_xbnf.name = xbnf_source.name
-            runtime_xbnf.subgrammar = xbnf_source.subgrammar
-            runtime_xbnf.lhs = xsys[xbnf_source.lhs]
-            local to_rhs = {}
-            local from_rhs = xbnf_source.rhs
-            for ix = 1, #from_rhs do
-                to_rhs[ix] = xsys[xbnf_source.rhs[ix]]
-            end
-            runtime_xbnf.rhs = to_rhs
-            runtime_xbnf.rank = xbnf_source.rank
-            runtime_xbnf.null_ranking = xbnf_source.null_ranking
-
-            runtime_xbnf.symbol_as_event = xbnf_source.symbol_as_event
-            local source_event = xbnf_source.event
-            if source_event then
-                runtime_xbnf.event_name = source_event[1]
-                -- TODO revisit type (boolean? string? integer?)
-                --   once conversion to Lua is complete
-                runtime_xbnf.event_starts_active
-                    = (math.tointeger(source_event[2]) ~= 0)
-            end
-
-            if xbnf_source.min then
-                runtime_xbnf.min = math.tointeger(xbnf_source.min)
-            end
-            runtime_xbnf.separator = xbnf_source.separator
-            runtime_xbnf.proper = xbnf_source.proper
-            runtime_xbnf.bless = xbnf_source.bless
-            runtime_xbnf.action = xbnf_source.action
-            runtime_xbnf.start = xbnf_source.start
-            runtime_xbnf.length = xbnf_source.length
-
-            runtime_xbnf.discard_separation =
-                xbnf_source.separator and
-                    not xbnf_source.keep
-
-            local rhs_length = #xbnf_source.rhs
-
-            -- min defined if sequence rule
-            if not xbnf_source.min or rhs_length == 0 then
-                if xbnf_source.mask then
-                    runtime_xbnf.mask = xbnf_source.mask
-                else
-                    local mask = {}
-                    for i = 1, rhs_length do
-                        mask[i] = 1
-                    end
-                    runtime_xbnf.mask = mask
-                end
-            end
-
-            local next_xbnf_id = #xbnfs + 1
-            runtime_xbnf.id = next_xbnf_id
-            xbnfs[xbnf_name] = runtime_xbnf
-            xbnfs[next_xbnf_id] = runtime_xbnf
-        end
-    end
-    function _M.class_slg.xbnfs_populate(slg, source_hash)
-        slg.xbnfs = {}
-        slg:xbnfs_subg_populate(source_hash, 'l0')
-        return slg:xbnfs_subg_populate(source_hash, 'g1')
-    end
-```
-
-### Coroutines
-
-We use coroutines as "better callbacks".
-They allow the upper layer to be called upon for processing
-at any point in Kollos's Lua layers.
-At this point, we allow the upper layers only one active coroutine
-(though it may have child coroutines).
-Also, this "upper layer child coroutine" must be run until
-it returns before other processing is performed.
-Obeying this constraint is currently up to the upper layer --
-nothing in the code enforces it.
-
-```
-    -- miranda: section+ most Lua function definitions
-    function _M.wrap(f)
-        if _M.current_coro then
-           -- error('Attempt to overwrite active Kollos coro')
-        end
-        _M.current_coro = coroutine.wrap(f)
-    end
-
-    function _M.resume(...)
-        local coro = _M.current_coro
-        if not coro then
-           error('Attempt to resume non-existent Kollos coro')
-        end
-        local retours = {coro(...)}
-        local cmd = table.remove(retours, 1)
-        if not cmd or cmd == '' or cmd == 'ok' then
-            cmd = false
-            _M.current_coro = nil
-        end
-        return cmd, retours
-    end
-```
-
-### Exceptions
-
-```
-    -- miranda: section+ C extern variables
-    extern char kollos_X_fallback_mt_key;
-    extern char kollos_X_proto_asis_mt_key;
-    extern char kollos_X_proto_mt_key;
-    extern char kollos_X_mt_key;
-    -- miranda: section+ metatable keys
-    char kollos_X_fallback_mt_key;
-    char kollos_X_proto_asis_mt_key;
-    char kollos_X_proto_mt_key;
-    char kollos_X_mt_key;
-    -- miranda: section+ set up empty metatables
-
-    /* mt_X_fallback = {} */
-    marpa_lua_newtable (L);
-    marpa_lua_pushvalue (L, -1);
-    marpa_lua_rawsetp (L, LUA_REGISTRYINDEX, &kollos_X_fallback_mt_key);
-    /* kollos.mt_X_fallback = mt_X_fallback */
-    marpa_lua_setfield (L, kollos_table_stack_ix, "mt_X_fallback");
-
-    /* mt_X_proto = {} */
-    marpa_lua_newtable (L);
-    marpa_lua_pushvalue (L, -1);
-    marpa_lua_rawsetp (L, LUA_REGISTRYINDEX, &kollos_X_proto_mt_key);
-    /* kollos.mt_X_proto = mt_X_proto */
-    marpa_lua_setfield (L, kollos_table_stack_ix, "mt_X_proto");
-
-    /* mt_X_proto_asis = {} */
-    marpa_lua_newtable (L);
-    marpa_lua_pushvalue (L, -1);
-    marpa_lua_rawsetp (L, LUA_REGISTRYINDEX, &kollos_X_proto_asis_mt_key);
-    /* kollos.mt_X_proto_asis = mt_X_proto_asis */
-    marpa_lua_setfield (L, kollos_table_stack_ix, "mt_X_proto_asis");
-
-    /* Set up exception metatables, initially empty */
-    /* mt_X = {} */
-    marpa_lua_newtable (L);
-    marpa_lua_pushvalue (L, -1);
-    marpa_lua_rawsetp (L, LUA_REGISTRYINDEX, &kollos_X_mt_key);
-    /* kollos.mt_X = mt_X */
-    marpa_lua_setfield (L, kollos_table_stack_ix, "mt_X");
-
-```
-
-The "fallback" for converting an exception is make it part
-of a table with a fallback __tostring method, which uses the
-inspect package to dump it.
-
-```
-    -- miranda: section+ populate metatables
-
-    -- `inspect` is used in our __tostring methods, but
-    -- it also calls __tostring.  This global is used to
-    -- prevent any recursive calls.
-    _M.recursive_tostring = false
-
-    local function X_fallback_tostring(self)
-         -- print("in X_fallback_tostring")
-         local desc
-         if _M.recursive_tostring then
-             desc = '[Recursive call of inspect]'
-         else
-             _M.recursive_tostring = 'X_fallback_tostring'
-             desc = inspect(self, { depth = 3 })
-             _M.recursive_tostring = false
-         end
-         local nl = ''
-         local where = ''
-         if type(self) == 'table' then
-             local where = self.where
-             if where and desc:sub(-1) ~= '\n' then
-                 nl = '\n'
-             end
-         end
-         local traceback = debug.traceback("Kollos internal error: bad exception object")
-         return desc .. nl .. where .. '\n' .. traceback
-    end
-
-    local function X_tostring(self)
-         -- print("in X_tostring")
-         if type(self) ~= 'table' then
-              return X_fallback_tostring(self)
-         end
-         local desc = self.msg
-         local desc_type = type(desc)
-         if desc_type == "string" then
-             local nl = ''
-             local where = self.where
-             if where then
-                 if desc:sub(-1) ~= '\n' then nl = '\n' end
-             else
-                 where = ''
-             end
-             return desc .. nl .. where
-         end
-
-         -- no `msg` so look for a code
-         local error_code = self.code
-         if error_code then
-              local description = _M.error_description(error_code)
-              local details = self.details
-              local pieces = {}
-              if details then
-                  pieces[#pieces+1] = details
-                  pieces[#pieces+1] = ': '
-              end
-              pieces[#pieces+1] = description
-              local where = self.where
-              if where then
-                  pieces[#pieces+1] = '\n'
-                  pieces[#pieces+1] = where
-              end
-              return table.concat(pieces)
-         end
-
-         -- no `msg` or `code` so we fall back
-         return X_fallback_tostring(self)
-    end
-
-    local function error_tostring(self)
-         print("Calling error_tostring")
-         return '[error_tostring]'
-    end
-
-    _M.mt_X.__tostring = X_tostring
-    _M.mt_X_proto.__tostring = X_tostring
-    _M.mt_X_proto_asis.__tostring = X_tostring
-    _M.mt_X_fallback.__tostring = X_fallback_tostring
-
-```
-
-A function to throw exceptions which do not carry a
-traceback.  This is for "user" errors, where "user"
-means the error can be explained in user-friendly terms
-and things like stack traces are unnecessary.
-(These errors are also usually "user" errors in the sense
-that the user caused them,
-but that is not necessarily the case.)
-
-```
-    -- miranda: section+ most Lua function definitions
-    function _M.userX(msg)
-        local X = { msg = msg, traceback = false }
-        setmetatable(X, _M.mt_X)
-        error(X)
-    end
-```
-
 ### Diagnostics
 
 TODO -- after development, this should be a local function.
@@ -4791,12 +4618,6 @@ TODO: Perhaps `isy_key` should also allow isy tables.
                inspect(isy_key)))
         end
         return xsy.id
-    end
-    function _M.class_slg.g1_xsyid(slg, isy_key)
-        return slg.g1:xsyid(isy_key)
-    end
-    function _M.class_slg.l0_xsyid(slg, isy_key)
-        return slg.l0:xsyid(isy_key)
     end
 ```
 
@@ -8043,7 +7864,193 @@ in every other sequence.
     end
 ```
 
-## Meta-coding utilities
+### Coroutines
+
+We use coroutines as "better callbacks".
+They allow the upper layer to be called upon for processing
+at any point in Kollos's Lua layers.
+At this point, we allow the upper layers only one active coroutine
+(though it may have child coroutines).
+Also, this "upper layer child coroutine" must be run until
+it returns before other processing is performed.
+Obeying this constraint is currently up to the upper layer --
+nothing in the code enforces it.
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.wrap(f)
+        if _M.current_coro then
+           -- error('Attempt to overwrite active Kollos coro')
+        end
+        _M.current_coro = coroutine.wrap(f)
+    end
+
+    function _M.resume(...)
+        local coro = _M.current_coro
+        if not coro then
+           error('Attempt to resume non-existent Kollos coro')
+        end
+        local retours = {coro(...)}
+        local cmd = table.remove(retours, 1)
+        if not cmd or cmd == '' or cmd == 'ok' then
+            cmd = false
+            _M.current_coro = nil
+        end
+        return cmd, retours
+    end
+```
+
+### Exceptions
+
+```
+    -- miranda: section+ C extern variables
+    extern char kollos_X_fallback_mt_key;
+    extern char kollos_X_proto_asis_mt_key;
+    extern char kollos_X_proto_mt_key;
+    extern char kollos_X_mt_key;
+    -- miranda: section+ metatable keys
+    char kollos_X_fallback_mt_key;
+    char kollos_X_proto_asis_mt_key;
+    char kollos_X_proto_mt_key;
+    char kollos_X_mt_key;
+    -- miranda: section+ set up empty metatables
+
+    /* mt_X_fallback = {} */
+    marpa_lua_newtable (L);
+    marpa_lua_pushvalue (L, -1);
+    marpa_lua_rawsetp (L, LUA_REGISTRYINDEX, &kollos_X_fallback_mt_key);
+    /* kollos.mt_X_fallback = mt_X_fallback */
+    marpa_lua_setfield (L, kollos_table_stack_ix, "mt_X_fallback");
+
+    /* mt_X_proto = {} */
+    marpa_lua_newtable (L);
+    marpa_lua_pushvalue (L, -1);
+    marpa_lua_rawsetp (L, LUA_REGISTRYINDEX, &kollos_X_proto_mt_key);
+    /* kollos.mt_X_proto = mt_X_proto */
+    marpa_lua_setfield (L, kollos_table_stack_ix, "mt_X_proto");
+
+    /* mt_X_proto_asis = {} */
+    marpa_lua_newtable (L);
+    marpa_lua_pushvalue (L, -1);
+    marpa_lua_rawsetp (L, LUA_REGISTRYINDEX, &kollos_X_proto_asis_mt_key);
+    /* kollos.mt_X_proto_asis = mt_X_proto_asis */
+    marpa_lua_setfield (L, kollos_table_stack_ix, "mt_X_proto_asis");
+
+    /* Set up exception metatables, initially empty */
+    /* mt_X = {} */
+    marpa_lua_newtable (L);
+    marpa_lua_pushvalue (L, -1);
+    marpa_lua_rawsetp (L, LUA_REGISTRYINDEX, &kollos_X_mt_key);
+    /* kollos.mt_X = mt_X */
+    marpa_lua_setfield (L, kollos_table_stack_ix, "mt_X");
+
+```
+
+The "fallback" for converting an exception is make it part
+of a table with a fallback __tostring method, which uses the
+inspect package to dump it.
+
+```
+    -- miranda: section+ populate metatables
+
+    -- `inspect` is used in our __tostring methods, but
+    -- it also calls __tostring.  This global is used to
+    -- prevent any recursive calls.
+    _M.recursive_tostring = false
+
+    local function X_fallback_tostring(self)
+         -- print("in X_fallback_tostring")
+         local desc
+         if _M.recursive_tostring then
+             desc = '[Recursive call of inspect]'
+         else
+             _M.recursive_tostring = 'X_fallback_tostring'
+             desc = inspect(self, { depth = 3 })
+             _M.recursive_tostring = false
+         end
+         local nl = ''
+         local where = ''
+         if type(self) == 'table' then
+             local where = self.where
+             if where and desc:sub(-1) ~= '\n' then
+                 nl = '\n'
+             end
+         end
+         local traceback = debug.traceback("Kollos internal error: bad exception object")
+         return desc .. nl .. where .. '\n' .. traceback
+    end
+
+    local function X_tostring(self)
+         -- print("in X_tostring")
+         if type(self) ~= 'table' then
+              return X_fallback_tostring(self)
+         end
+         local desc = self.msg
+         local desc_type = type(desc)
+         if desc_type == "string" then
+             local nl = ''
+             local where = self.where
+             if where then
+                 if desc:sub(-1) ~= '\n' then nl = '\n' end
+             else
+                 where = ''
+             end
+             return desc .. nl .. where
+         end
+
+         -- no `msg` so look for a code
+         local error_code = self.code
+         if error_code then
+              local description = _M.error_description(error_code)
+              local details = self.details
+              local pieces = {}
+              if details then
+                  pieces[#pieces+1] = details
+                  pieces[#pieces+1] = ': '
+              end
+              pieces[#pieces+1] = description
+              local where = self.where
+              if where then
+                  pieces[#pieces+1] = '\n'
+                  pieces[#pieces+1] = where
+              end
+              return table.concat(pieces)
+         end
+
+         -- no `msg` or `code` so we fall back
+         return X_fallback_tostring(self)
+    end
+
+    local function error_tostring(self)
+         print("Calling error_tostring")
+         return '[error_tostring]'
+    end
+
+    _M.mt_X.__tostring = X_tostring
+    _M.mt_X_proto.__tostring = X_tostring
+    _M.mt_X_proto_asis.__tostring = X_tostring
+    _M.mt_X_fallback.__tostring = X_fallback_tostring
+
+```
+
+A function to throw exceptions which do not carry a
+traceback.  This is for "user" errors, where "user"
+means the error can be explained in user-friendly terms
+and things like stack traces are unnecessary.
+(These errors are also usually "user" errors in the sense
+that the user caused them,
+but that is not necessarily the case.)
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.userX(msg)
+        local X = { msg = msg, traceback = false }
+        setmetatable(X, _M.mt_X)
+        error(X)
+    end
+```
+
+## Meta-coding
 
 ### Metacode execution sequence
 
