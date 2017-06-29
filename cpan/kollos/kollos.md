@@ -5774,6 +5774,7 @@ constructor.
 It is specified directly, which can be easier for a first reading.
 
 
+```
   -- miranda: section object constructors
   --[==[ miranda: exec object constructors
         local result = {}
@@ -5853,6 +5854,7 @@ It is specified directly, which can be easier for a first reading.
         end
         return table.concat(result, "\n")
   ]==]
+```
 
 The bocage constructor takes an extra argument, so it's a special
 case.
@@ -5862,6 +5864,7 @@ The template saves repetition, but is harder on a first reading.
 This bocage constructor is specified directly,
 so you may find it easer to read it first.
 
+```
     -- miranda: section+ object constructors
     static int
     wrap_bocage_new (lua_State * L)
@@ -5935,6 +5938,7 @@ so you may find it easer to read it first.
 The grammar constructor is a special case, because its argument is
 a special "configuration" argument.
 
+```
     -- miranda: section+ object constructors
     static int
     lca_grammar_new (lua_State * L)
