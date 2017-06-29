@@ -35,10 +35,11 @@ cd kollos && ../lua/lua toc.lua < kollos.md
   * [Kollos assumes core libraries are loaded](#kollos-assumes-core-libraries-are-loaded)
   * [New lexer features](#new-lexer-features)
   * [Discard default statement?](#discard-default-statement)
+* [Concepts](#concepts)
+  * [External, inner and internal](#external-inner-and-internal)
+  * [Symbol names, IDs and forms](#symbol-names-ids-and-forms)
 * [Kollos object](#kollos-object)
 * [Kollos registry objects](#kollos-registry-objects)
-  * [External, inner and internal](#external-inner-and-internal)
-* [Symbols](#symbols)
 * [Kollos SLIF grammar object](#kollos-slif-grammar-object)
   * [Fields](#fields)
   * [Accessors](#accessors)
@@ -54,10 +55,6 @@ cd kollos && ../lua/lua toc.lua < kollos.md
   * [Locations](#locations)
   * [Events](#events)
   * [Progress reporting](#progress-reporting)
-* [Inner symbol (ISY) class](#inner-symbol-isy-class)
-  * [Fields](#fields)
-  * [Accessors](#accessors)
-  * [Constants: Ranking methods](#constants-ranking-methods)
   * [Diagnostics](#diagnostics)
 * [Kollos semantics](#kollos-semantics)
   * [VM operations](#vm-operations)
@@ -113,26 +110,32 @@ cd kollos && ../lua/lua toc.lua < kollos.md
 * [IRL Fields](#irl-fields)
 * [XRL Fields](#xrl-fields)
 * [XBNF Fields](#xbnf-fields)
+* [Inner symbol (ISY) class](#inner-symbol-isy-class)
+  * [Fields](#fields)
+  * [Accessors](#accessors)
 * [Libmarpa interface](#libmarpa-interface)
   * [Standard template methods](#standard-template-methods)
   * [Constructors](#constructors)
-* [The main Lua code file](#the-main-lua-code-file)
-  * [Preliminaries to the main code](#preliminaries-to-the-main-code)
-* [The Kollos C code file](#the-kollos-c-code-file)
-  * [Stuff from okollos](#stuff-from-okollos)
-  * [Kollos metal loader](#kollos-metal-loader)
-  * [Create a sandbox](#create-a-sandbox)
-  * [Preliminaries to the C library code](#preliminaries-to-the-c-library-code)
-* [The Kollos C header file](#the-kollos-c-header-file)
-  * [Preliminaries to the C header file](#preliminaries-to-the-c-header-file)
+* [Output](#output)
+  * [The main Lua code file](#the-main-lua-code-file)
+    * [Preliminaries to the main code](#preliminaries-to-the-main-code)
+  * [The Kollos C code file](#the-kollos-c-code-file)
+    * [Stuff from okollos](#stuff-from-okollos)
+    * [Kollos metal loader](#kollos-metal-loader)
+    * [Preliminaries to the C library code](#preliminaries-to-the-c-library-code)
+  * [The Kollos C header file](#the-kollos-c-header-file)
+    * [Preliminaries to the C header file](#preliminaries-to-the-c-header-file)
 * [Internal utilities](#internal-utilities)
   * [Coroutines](#coroutines)
-  * [Exceptions](#exceptions)
+* [Exceptions](#exceptions)
 * [Meta-coding](#meta-coding)
   * [Metacode execution sequence](#metacode-execution-sequence)
   * [Dedent method](#dedent-method)
   * [`c_safe_string` method](#c-safe-string-method)
   * [Meta code argument processing](#meta-code-argument-processing)
+* [Kollos non-locals](#kollos-non-locals)
+  * [Create a sandbox](#create-a-sandbox)
+  * [Constants: Ranking methods](#constants-ranking-methods)
 * [Kollos utilities](#kollos-utilities)
   * [VLQ (Variable-Length Quantity)](#vlq-variable-length-quantity)
 
@@ -4385,295 +4388,6 @@ is zero.
 
 ```
 
-## The valuator Libmarpa wrapper
-
-The "valuator" portion of Kollos produces the
-value of a
-Kollos parse.
-
-### Initialize a valuator
-
-Called when a valuator is set up.
-
-```
-    -- miranda: section+ valuator Libmarpa wrapper Lua functions
-
-    function _M.class_slr.value_init(slr, trace_values)
-
-        if not slr.lmw_v then
-            error('no slr.lmw_v in value_init()')
-        end
-
-        slr.trace_values = trace_values;
-        slr.trace_values_queue = {};
-        if slr.trace_values > 0 then
-          local top_of_queue = #slr.trace_values_queue;
-          slr.trace_values_queue[top_of_queue+1] = {
-            "valuator trace level", 0,
-            slr.trace_values,
-          }
-        end
-
-        slr.lmw_v.stack = {}
-    end
-
-```
-
-### Reset a valuator
-
-A function to be called whenever a valuator is reset.
-It should free all memory associated with the valuation.
-
-```
-
-    -- miranda: section+ valuator Libmarpa wrapper Lua functions
-
-    function _M.class_slr.valuation_reset(slr)
-        -- io.stderr:write('Initializing rule semantics to nil\n')
-
-        slr.trace_values = 0;
-        slr.trace_values_queue = {};
-
-        slr.lmw_b = nil
-        slr.lmw_o = nil
-        slr.lmw_t = nil
-        slr.lmw_v = nil
-
-        slr.tree_mode = nil
-        -- Libmarpa's tree pausing requires value objects to
-        -- be destroyed quickly
-        -- print("About to collect garbage")
-        collectgarbage()
-    end
-
-```
-
-## Diagnostics
-
-```
-    -- miranda: section+ diagnostics
-    function _M.class_slr.and_node_tag(slr, and_node_id)
-        local bocage = slr.lmw_b
-        local parent_or_node_id = bocage:_and_node_parent(and_node_id)
-        local origin = bocage:_or_node_origin(parent_or_node_id)
-        local origin_earleme = slr.g1:earleme(origin)
-
-        local current_earley_set = bocage:_or_node_set(parent_or_node_id)
-        local current_earleme = slr.g1:earleme(current_earley_set)
-
-        local cause_id = bocage:_and_node_cause(and_node_id)
-        local predecessor_id = bocage:_and_node_predecessor(and_node_id)
-
-        local middle_earley_set = bocage:_and_node_middle(and_node_id)
-        local middle_earleme = slr.g1:earleme(middle_earley_set)
-
-        local position = bocage:_or_node_position(parent_or_node_id)
-        local nrl_id = bocage:_or_node_irl(parent_or_node_id)
-
-        local tag = { string.format("R%d:%d@%d-%d",
-            nrl_id,
-            position,
-            origin_earleme,
-            current_earleme)
-        }
-
-        if cause_id then
-            tag[#tag+1] = string.format("C%d", bocage:_or_node_irl(cause_id))
-        else
-            tag[#tag+1] = string.format("S%d", bocage:_and_node_symbol(and_node_id))
-        end
-        tag[#tag+1] = string.format("@%d", middle_earleme)
-        return table.concat(tag)
-    end
-
-    function _M.class_slr.show_and_nodes(slr)
-        local bocage = slr.lmw_b
-        local g1r = slr.g1
-        local data = {}
-        local id = -1
-        while true do
-            id = id + 1
-            local parent = bocage:_and_node_parent(id)
-            -- print('parent:', parent)
-            if not parent then break end
-            local predecessor = bocage:_and_node_predecessor(id)
-            local cause = bocage:_and_node_cause(id)
-            local symbol = bocage:_and_node_symbol(id)
-            local origin = bocage:_or_node_origin(parent)
-            local set = bocage:_or_node_set(parent)
-            local nrl_id = bocage:_or_node_irl(parent)
-            local position = bocage:_or_node_position(parent)
-            local origin_earleme = g1r:earleme(origin)
-            local current_earleme = g1r:earleme(set)
-            local middle_earley_set = bocage:_and_node_middle(id)
-            local middle_earleme = g1r:earleme(middle_earley_set)
-            local desc = {string.format(
-                "And-node #%d: R%d:%d@%d-%d",
-                id,
-                nrl_id,
-                position,
-                origin_earleme,
-                current_earleme)}
-            -- Marpa::R2's show_and_nodes() had a minor bug:
-            -- cause_nrl_id was not set properly and therefore
-            -- not used in the sort.  That problem is fixed
-            -- here.
-            local cause_nrl_id = -1
-            if cause then
-                cause_nrl_id = bocage:_or_node_irl(cause)
-                desc[#desc+1] = 'C' .. cause_nrl_id
-            else
-                desc[#desc+1] = 'S' .. symbol
-            end
-            desc[#desc+1] = '@' .. middle_earleme
-            if not symbol then symbol = -1 end
-            data[#data+1] = {
-                origin_earleme,
-                current_earleme,
-                nrl_id,
-                position,
-                middle_earleme,
-                symbol,
-                cause_nrl_id,
-                table.concat(desc)
-            }
-        end
-        -- print('data:', inspect(data))
-
-        table.sort(data, _M.cmp_seq)
-        local result = {}
-        for _,datum in pairs(data) do
-            result[#result+1] = datum[#datum]
-        end
-        result[#result+1] = '' -- so concat adds a final '\n'
-        return table.concat(result, '\n')
-    end
-
-    function _M.class_slr.or_node_tag(slr, or_node_id)
-        local bocage = slr.lmw_b
-        local set = bocage:_or_node_set(or_node_id)
-        local nrl_id = bocage:_or_node_irl(or_node_id)
-        local origin = bocage:_or_node_origin(or_node_id)
-        local position = bocage:_or_node_position(or_node_id)
-        return string.format("R%d:%d@%d-%d",
-            nrl_id,
-            position,
-            origin,
-            set)
-    end
-
-    function _M.class_slr.show_or_nodes(slr)
-        local bocage = slr.lmw_b
-        local g1r = slr.g1
-        local data = {}
-        local id = -1
-        while true do
-            id = id + 1
-            local origin = bocage:_or_node_origin(id)
-            if not origin then break end
-            local set = bocage:_or_node_set(id)
-            local nrl_id = bocage:_or_node_irl(id)
-            local position = bocage:_or_node_position(id)
-            local origin_earleme = g1r:earleme(origin)
-            local current_earleme = g1r:earleme(set)
-
-            local desc = {string.format(
-                "R%d:%d@%d-%d",
-                nrl_id,
-                position,
-                origin_earleme,
-                current_earleme)}
-            data[#data+1] = {
-                origin_earleme,
-                current_earleme,
-                nrl_id,
-                table.concat(desc)
-            }
-        end
-
-        local function cmp_data(i, j)
-            for ix = 1, #i do
-                if i[ix] < j[ix] then return true end
-                if i[ix] > j[ix] then return false end
-            end
-            return false
-        end
-
-        table.sort(data, cmp_data)
-        local result = {}
-        for _,datum in pairs(data) do
-            result[#result+1] = datum[#datum]
-        end
-        result[#result+1] = '' -- so concat adds a final '\n'
-        return table.concat(result, '\n')
-    end
-
-`show_bocage` returns a string which describes the bocage.
-
-    -- miranda: section+ diagnostics
-    function _M.class_slr.show_bocage(slr)
-        local bocage = slr.lmw_b
-        local data = {}
-        local or_node_id = -1
-        while true do
-            or_node_id = or_node_id + 1
-            local irl_id = bocage:_or_node_irl(or_node_id)
-            if not irl_id then goto LAST_OR_NODE end
-            local position = bocage:_or_node_position(or_node_id)
-            local or_origin = bocage:_or_node_origin(or_node_id)
-            local origin_earleme = slr.g1:earleme(or_origin)
-            local or_set = bocage:_or_node_set(or_node_id)
-            local current_earleme = slr.g1:earleme(or_set)
-            local and_node_ids = {}
-            local first_and_id = bocage:_or_node_first_and(or_node_id)
-            local last_and_id = bocage:_or_node_last_and(or_node_id)
-            for and_node_id = first_and_id, last_and_id do
-                local symbol = bocage:_and_node_symbol(and_node_id)
-                local cause_tag
-                if symbol then cause_tag = 'S' .. symbol end
-                local cause_id = bocage:_and_node_cause(and_node_id)
-                local cause_irl_id
-                if cause_id then
-                    cause_irl_id = bocage:_or_node_irl(cause_id)
-                    cause_tag = slr:or_node_tag(cause_id)
-                end
-                local parent_tag = slr:or_node_tag(or_node_id)
-                local predecessor_id = bocage:_and_node_predecessor(and_node_id)
-                local predecessor_tag = "-"
-                if predecessor_id then
-                    predecessor_tag = slr:or_node_tag(predecessor_id)
-                end
-                local tag = string.format(
-                    "%d: %d=%s %s %s",
-                    and_node_id,
-                    or_node_id,
-                    parent_tag,
-                    predecessor_tag,
-                    cause_tag
-                )
-                data[#data+1] = { and_node_id, tag }
-            end
-            ::LAST_AND_NODE::
-        end
-        ::LAST_OR_NODE::
-
-        local function cmp_data(i, j)
-            if i[1] < j[1] then return true end
-            return false
-        end
-
-        table.sort(data, cmp_data)
-        local result = {}
-        for _,datum in pairs(data) do
-            result[#result+1] = datum[#datum]
-        end
-        result[#result+1] = '' -- so concat adds a final '\n'
-        return table.concat(result, '\n')
-
-    end
-
-```
-
 ### Input
 
 ```
@@ -5178,49 +4892,294 @@ necessarily unique.
     end
 ```
 
-## External symbol (XSY) class
+## The valuator Libmarpa wrapper
 
-### Fields
+The "valuator" portion of Kollos produces the
+value of a
+Kollos parse.
 
-```
-    -- miranda: section+ class_xsy field declarations
-    class_xsy_fields.assertion = true
-```
+### Initialize a valuator
 
-```
-    -- miranda: section+ create nonmetallic metatables
-    _M.class_xsy = {}
-    -- miranda: section+ populate metatables
-    local class_xsy_fields = {}
-
-    class_xsy_fields.id = true
-    class_xsy_fields.name = true
-    class_xsy_fields.lexeme_semantics = true
-    class_xsy_fields.blessing = true
-    class_xsy_fields.dsl_form = true
-    class_xsy_fields.if_inaccessible = true
-    class_xsy_fields.name_source = true
-    class_xsy_fields.g1_lexeme_id = true
-    class_xsy_fields.l0_lexeme_id = true
-
-    -- miranda: insert class_xsy field declarations
-    declarations(_M.class_xsy, class_xsy_fields, 'xsy')
-```
-
-## Accessors
+Called when a valuator is set up.
 
 ```
-    -- miranda: section+ most Lua function definitions
-    function _M.class_xsy.display_form(xsy)
-        local form1 = xsy.dsl_form or xsy.name
-        if form1:find(' ', 1, true) then
-            return '<' .. form1 .. '>'
+    -- miranda: section+ valuator Libmarpa wrapper Lua functions
+
+    function _M.class_slr.value_init(slr, trace_values)
+
+        if not slr.lmw_v then
+            error('no slr.lmw_v in value_init()')
         end
-        return form1
+
+        slr.trace_values = trace_values;
+        slr.trace_values_queue = {};
+        if slr.trace_values > 0 then
+          local top_of_queue = #slr.trace_values_queue;
+          slr.trace_values_queue[top_of_queue+1] = {
+            "valuator trace level", 0,
+            slr.trace_values,
+          }
+        end
+
+        slr.lmw_v.stack = {}
     end
+
 ```
 
-## Rules
+### Reset a valuator
+
+A function to be called whenever a valuator is reset.
+It should free all memory associated with the valuation.
+
+```
+
+    -- miranda: section+ valuator Libmarpa wrapper Lua functions
+
+    function _M.class_slr.valuation_reset(slr)
+        -- io.stderr:write('Initializing rule semantics to nil\n')
+
+        slr.trace_values = 0;
+        slr.trace_values_queue = {};
+
+        slr.lmw_b = nil
+        slr.lmw_o = nil
+        slr.lmw_t = nil
+        slr.lmw_v = nil
+
+        slr.tree_mode = nil
+        -- Libmarpa's tree pausing requires value objects to
+        -- be destroyed quickly
+        -- print("About to collect garbage")
+        collectgarbage()
+    end
+
+```
+
+## Diagnostics
+
+```
+    -- miranda: section+ diagnostics
+    function _M.class_slr.and_node_tag(slr, and_node_id)
+        local bocage = slr.lmw_b
+        local parent_or_node_id = bocage:_and_node_parent(and_node_id)
+        local origin = bocage:_or_node_origin(parent_or_node_id)
+        local origin_earleme = slr.g1:earleme(origin)
+
+        local current_earley_set = bocage:_or_node_set(parent_or_node_id)
+        local current_earleme = slr.g1:earleme(current_earley_set)
+
+        local cause_id = bocage:_and_node_cause(and_node_id)
+        local predecessor_id = bocage:_and_node_predecessor(and_node_id)
+
+        local middle_earley_set = bocage:_and_node_middle(and_node_id)
+        local middle_earleme = slr.g1:earleme(middle_earley_set)
+
+        local position = bocage:_or_node_position(parent_or_node_id)
+        local nrl_id = bocage:_or_node_irl(parent_or_node_id)
+
+        local tag = { string.format("R%d:%d@%d-%d",
+            nrl_id,
+            position,
+            origin_earleme,
+            current_earleme)
+        }
+
+        if cause_id then
+            tag[#tag+1] = string.format("C%d", bocage:_or_node_irl(cause_id))
+        else
+            tag[#tag+1] = string.format("S%d", bocage:_and_node_symbol(and_node_id))
+        end
+        tag[#tag+1] = string.format("@%d", middle_earleme)
+        return table.concat(tag)
+    end
+
+    function _M.class_slr.show_and_nodes(slr)
+        local bocage = slr.lmw_b
+        local g1r = slr.g1
+        local data = {}
+        local id = -1
+        while true do
+            id = id + 1
+            local parent = bocage:_and_node_parent(id)
+            -- print('parent:', parent)
+            if not parent then break end
+            local predecessor = bocage:_and_node_predecessor(id)
+            local cause = bocage:_and_node_cause(id)
+            local symbol = bocage:_and_node_symbol(id)
+            local origin = bocage:_or_node_origin(parent)
+            local set = bocage:_or_node_set(parent)
+            local nrl_id = bocage:_or_node_irl(parent)
+            local position = bocage:_or_node_position(parent)
+            local origin_earleme = g1r:earleme(origin)
+            local current_earleme = g1r:earleme(set)
+            local middle_earley_set = bocage:_and_node_middle(id)
+            local middle_earleme = g1r:earleme(middle_earley_set)
+            local desc = {string.format(
+                "And-node #%d: R%d:%d@%d-%d",
+                id,
+                nrl_id,
+                position,
+                origin_earleme,
+                current_earleme)}
+            -- Marpa::R2's show_and_nodes() had a minor bug:
+            -- cause_nrl_id was not set properly and therefore
+            -- not used in the sort.  That problem is fixed
+            -- here.
+            local cause_nrl_id = -1
+            if cause then
+                cause_nrl_id = bocage:_or_node_irl(cause)
+                desc[#desc+1] = 'C' .. cause_nrl_id
+            else
+                desc[#desc+1] = 'S' .. symbol
+            end
+            desc[#desc+1] = '@' .. middle_earleme
+            if not symbol then symbol = -1 end
+            data[#data+1] = {
+                origin_earleme,
+                current_earleme,
+                nrl_id,
+                position,
+                middle_earleme,
+                symbol,
+                cause_nrl_id,
+                table.concat(desc)
+            }
+        end
+        -- print('data:', inspect(data))
+
+        table.sort(data, _M.cmp_seq)
+        local result = {}
+        for _,datum in pairs(data) do
+            result[#result+1] = datum[#datum]
+        end
+        result[#result+1] = '' -- so concat adds a final '\n'
+        return table.concat(result, '\n')
+    end
+
+    function _M.class_slr.or_node_tag(slr, or_node_id)
+        local bocage = slr.lmw_b
+        local set = bocage:_or_node_set(or_node_id)
+        local nrl_id = bocage:_or_node_irl(or_node_id)
+        local origin = bocage:_or_node_origin(or_node_id)
+        local position = bocage:_or_node_position(or_node_id)
+        return string.format("R%d:%d@%d-%d",
+            nrl_id,
+            position,
+            origin,
+            set)
+    end
+
+    function _M.class_slr.show_or_nodes(slr)
+        local bocage = slr.lmw_b
+        local g1r = slr.g1
+        local data = {}
+        local id = -1
+        while true do
+            id = id + 1
+            local origin = bocage:_or_node_origin(id)
+            if not origin then break end
+            local set = bocage:_or_node_set(id)
+            local nrl_id = bocage:_or_node_irl(id)
+            local position = bocage:_or_node_position(id)
+            local origin_earleme = g1r:earleme(origin)
+            local current_earleme = g1r:earleme(set)
+
+            local desc = {string.format(
+                "R%d:%d@%d-%d",
+                nrl_id,
+                position,
+                origin_earleme,
+                current_earleme)}
+            data[#data+1] = {
+                origin_earleme,
+                current_earleme,
+                nrl_id,
+                table.concat(desc)
+            }
+        end
+
+        local function cmp_data(i, j)
+            for ix = 1, #i do
+                if i[ix] < j[ix] then return true end
+                if i[ix] > j[ix] then return false end
+            end
+            return false
+        end
+
+        table.sort(data, cmp_data)
+        local result = {}
+        for _,datum in pairs(data) do
+            result[#result+1] = datum[#datum]
+        end
+        result[#result+1] = '' -- so concat adds a final '\n'
+        return table.concat(result, '\n')
+    end
+
+`show_bocage` returns a string which describes the bocage.
+
+    -- miranda: section+ diagnostics
+    function _M.class_slr.show_bocage(slr)
+        local bocage = slr.lmw_b
+        local data = {}
+        local or_node_id = -1
+        while true do
+            or_node_id = or_node_id + 1
+            local irl_id = bocage:_or_node_irl(or_node_id)
+            if not irl_id then goto LAST_OR_NODE end
+            local position = bocage:_or_node_position(or_node_id)
+            local or_origin = bocage:_or_node_origin(or_node_id)
+            local origin_earleme = slr.g1:earleme(or_origin)
+            local or_set = bocage:_or_node_set(or_node_id)
+            local current_earleme = slr.g1:earleme(or_set)
+            local and_node_ids = {}
+            local first_and_id = bocage:_or_node_first_and(or_node_id)
+            local last_and_id = bocage:_or_node_last_and(or_node_id)
+            for and_node_id = first_and_id, last_and_id do
+                local symbol = bocage:_and_node_symbol(and_node_id)
+                local cause_tag
+                if symbol then cause_tag = 'S' .. symbol end
+                local cause_id = bocage:_and_node_cause(and_node_id)
+                local cause_irl_id
+                if cause_id then
+                    cause_irl_id = bocage:_or_node_irl(cause_id)
+                    cause_tag = slr:or_node_tag(cause_id)
+                end
+                local parent_tag = slr:or_node_tag(or_node_id)
+                local predecessor_id = bocage:_and_node_predecessor(and_node_id)
+                local predecessor_tag = "-"
+                if predecessor_id then
+                    predecessor_tag = slr:or_node_tag(predecessor_id)
+                end
+                local tag = string.format(
+                    "%d: %d=%s %s %s",
+                    and_node_id,
+                    or_node_id,
+                    parent_tag,
+                    predecessor_tag,
+                    cause_tag
+                )
+                data[#data+1] = { and_node_id, tag }
+            end
+            ::LAST_AND_NODE::
+        end
+        ::LAST_OR_NODE::
+
+        local function cmp_data(i, j)
+            if i[1] < j[1] then return true end
+            return false
+        end
+
+        table.sort(data, cmp_data)
+        local result = {}
+        for _,datum in pairs(data) do
+            result[#result+1] = datum[#datum]
+        end
+        result[#result+1] = '' -- so concat adds a final '\n'
+        return table.concat(result, '\n')
+
+    end
+
+```
 
 ## IRL Fields
 
@@ -5304,6 +5263,48 @@ necessarily unique.
 
     -- miranda: insert class_xbnf field declarations
     declarations(_M.class_xbnf, class_xbnf_fields, 'xbnf')
+```
+
+## External symbol (XSY) class
+
+### Fields
+
+```
+    -- miranda: section+ class_xsy field declarations
+    class_xsy_fields.assertion = true
+```
+
+```
+    -- miranda: section+ create nonmetallic metatables
+    _M.class_xsy = {}
+    -- miranda: section+ populate metatables
+    local class_xsy_fields = {}
+
+    class_xsy_fields.id = true
+    class_xsy_fields.name = true
+    class_xsy_fields.lexeme_semantics = true
+    class_xsy_fields.blessing = true
+    class_xsy_fields.dsl_form = true
+    class_xsy_fields.if_inaccessible = true
+    class_xsy_fields.name_source = true
+    class_xsy_fields.g1_lexeme_id = true
+    class_xsy_fields.l0_lexeme_id = true
+
+    -- miranda: insert class_xsy field declarations
+    declarations(_M.class_xsy, class_xsy_fields, 'xsy')
+```
+
+### Accessors
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_xsy.display_form(xsy)
+        local form1 = xsy.dsl_form or xsy.name
+        if form1:find(' ', 1, true) then
+            return '<' .. form1 .. '>'
+        end
+        return form1
+    end
 ```
 
 ## Inner symbol (ISY) class
