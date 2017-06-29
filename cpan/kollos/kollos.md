@@ -3355,134 +3355,6 @@ or nil if there was none.
     end
 ```
 
-## External symbol (XSY) class
-
-### Fields
-
-```
-    -- miranda: section+ class_xsy field declarations
-    class_xsy_fields.assertion = true
-```
-
-```
-    -- miranda: section+ create nonmetallic metatables
-    _M.class_xsy = {}
-    -- miranda: section+ populate metatables
-    local class_xsy_fields = {}
-
-    class_xsy_fields.id = true
-    class_xsy_fields.name = true
-    class_xsy_fields.lexeme_semantics = true
-    class_xsy_fields.blessing = true
-    class_xsy_fields.dsl_form = true
-    class_xsy_fields.if_inaccessible = true
-    class_xsy_fields.name_source = true
-    class_xsy_fields.g1_lexeme_id = true
-    class_xsy_fields.l0_lexeme_id = true
-
-    -- miranda: insert class_xsy field declarations
-    declarations(_M.class_xsy, class_xsy_fields, 'xsy')
-```
-
-## Accessors
-
-```
-    -- miranda: section+ most Lua function definitions
-    function _M.class_xsy.display_form(xsy)
-        local form1 = xsy.dsl_form or xsy.name
-        if form1:find(' ', 1, true) then
-            return '<' .. form1 .. '>'
-        end
-        return form1
-    end
-```
-
-## Rules
-
-## IRL Fields
-
-```
-    -- miranda: section+ class_irl field declarations
-    class_irl_fields.id = true
-    class_irl_fields.xbnf = true
-    class_irl_fields.action = true
-    class_irl_fields.mask = true
-    class_irl_fields.g1_lexeme = true
-    class_irl_fields.xrl_dot = true
-```
-
-```
-    -- miranda: section+ create nonmetallic metatables
-    _M.class_irl = {}
-    -- miranda: section+ populate metatables
-    local class_irl_fields = {}
-    -- miranda: insert class_irl field declarations
-    declarations(_M.class_irl, class_irl_fields, 'irl')
-```
-
-## XRL Fields
-
-```
-    -- miranda: section+ class_xrl field declarations
-    class_xrl_fields.id = true
-    class_xrl_fields.name = true
-    class_xrl_fields.assertion = true
-    class_xrl_fields.precedence_count = true
-    class_xrl_fields.lhs = true
-    class_xrl_fields.start = true
-    class_xrl_fields.length = true
-```
-
-```
-    -- miranda: section+ create nonmetallic metatables
-    _M.class_xrl = {}
-    -- miranda: section+ populate metatables
-    local class_xrl_fields = {}
-
-    class_xrl_fields.id = true
-
-    -- miranda: insert class_xrl field declarations
-    declarations(_M.class_xrl, class_xrl_fields, 'xrl')
-```
-
-## XBNF Fields
-
-```
-    -- miranda: section+ class_xbnf field declarations
-    class_xbnf_fields.action = true
-    class_xbnf_fields.bless = true
-    class_xbnf_fields.discard_separation = true
-    class_xbnf_fields.event_name = true
-    class_xbnf_fields.event_starts_active = true
-    class_xbnf_fields.id = true
-    class_xbnf_fields.length = true
-    class_xbnf_fields.lhs = true
-    class_xbnf_fields.mask = true
-    class_xbnf_fields.min = true
-    class_xbnf_fields.name = true
-    class_xbnf_fields.null_ranking = true
-    class_xbnf_fields.proper = true
-    class_xbnf_fields.rank = true
-    class_xbnf_fields.rhs = true
-    class_xbnf_fields.separator = true
-    class_xbnf_fields.start = true
-    class_xbnf_fields.subgrammar = true
-    class_xbnf_fields.symbol_as_event = true
-    class_xbnf_fields.xrl_name = true
-```
-
-```
-    -- miranda: section+ create nonmetallic metatables
-    _M.class_xbnf = {}
-    -- miranda: section+ populate metatables
-    local class_xbnf_fields = {}
-
-    class_xbnf_fields.id = true
-
-    -- miranda: insert class_xbnf field declarations
-    declarations(_M.class_xbnf, class_xbnf_fields, 'xbnf')
-```
-
 ### Constants: Ranking methods
 
 ```
@@ -5296,7 +5168,7 @@ necessarily unique.
     declarations(_M.class_recce, class_recce_fields, 'recce')
 ```
 
-Functions for tracing Earley sets
+### Functions for tracing Earley sets
 
 ```
     -- miranda: section+ recognizer Libmarpa wrapper Lua functions
@@ -5346,6 +5218,135 @@ Functions for tracing Earley sets
         result.ahm_id = ahm_id
         return result
     end
+```
+
+## External symbol (XSY) class
+
+### Fields
+
+```
+    -- miranda: section+ class_xsy field declarations
+    class_xsy_fields.assertion = true
+```
+
+```
+    -- miranda: section+ create nonmetallic metatables
+    _M.class_xsy = {}
+    -- miranda: section+ populate metatables
+    local class_xsy_fields = {}
+
+    class_xsy_fields.id = true
+    class_xsy_fields.name = true
+    class_xsy_fields.lexeme_semantics = true
+    class_xsy_fields.blessing = true
+    class_xsy_fields.dsl_form = true
+    class_xsy_fields.if_inaccessible = true
+    class_xsy_fields.name_source = true
+    class_xsy_fields.g1_lexeme_id = true
+    class_xsy_fields.l0_lexeme_id = true
+
+    -- miranda: insert class_xsy field declarations
+    declarations(_M.class_xsy, class_xsy_fields, 'xsy')
+```
+
+## Accessors
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_xsy.display_form(xsy)
+        local form1 = xsy.dsl_form or xsy.name
+        if form1:find(' ', 1, true) then
+            return '<' .. form1 .. '>'
+        end
+        return form1
+    end
+```
+
+## Rules
+
+## IRL Fields
+
+```
+    -- miranda: section+ class_irl field declarations
+    class_irl_fields.id = true
+    class_irl_fields.xbnf = true
+    class_irl_fields.action = true
+    class_irl_fields.mask = true
+    class_irl_fields.g1_lexeme = true
+    class_irl_fields.xrl_dot = true
+```
+
+```
+    -- miranda: section+ create nonmetallic metatables
+    _M.class_irl = {}
+    -- miranda: section+ populate metatables
+    local class_irl_fields = {}
+    -- miranda: insert class_irl field declarations
+    declarations(_M.class_irl, class_irl_fields, 'irl')
+```
+
+## XRL Fields
+
+```
+    -- miranda: section+ class_xrl field declarations
+    class_xrl_fields.id = true
+    class_xrl_fields.name = true
+    class_xrl_fields.assertion = true
+    class_xrl_fields.precedence_count = true
+    class_xrl_fields.lhs = true
+    class_xrl_fields.start = true
+    class_xrl_fields.length = true
+```
+
+```
+    -- miranda: section+ create nonmetallic metatables
+    _M.class_xrl = {}
+    -- miranda: section+ populate metatables
+    local class_xrl_fields = {}
+
+    class_xrl_fields.id = true
+
+    -- miranda: insert class_xrl field declarations
+    declarations(_M.class_xrl, class_xrl_fields, 'xrl')
+```
+
+## XBNF Fields
+
+```
+    -- miranda: section+ class_xbnf field declarations
+    class_xbnf_fields.action = true
+    class_xbnf_fields.bless = true
+    class_xbnf_fields.discard_separation = true
+    class_xbnf_fields.event_name = true
+    class_xbnf_fields.event_starts_active = true
+    class_xbnf_fields.id = true
+    class_xbnf_fields.length = true
+    class_xbnf_fields.lhs = true
+    class_xbnf_fields.mask = true
+    class_xbnf_fields.min = true
+    class_xbnf_fields.name = true
+    class_xbnf_fields.null_ranking = true
+    class_xbnf_fields.proper = true
+    class_xbnf_fields.rank = true
+    class_xbnf_fields.rhs = true
+    class_xbnf_fields.separator = true
+    class_xbnf_fields.start = true
+    class_xbnf_fields.subgrammar = true
+    class_xbnf_fields.symbol_as_event = true
+    class_xbnf_fields.xrl_name = true
+```
+
+```
+    -- miranda: section+ create nonmetallic metatables
+    _M.class_xbnf = {}
+    -- miranda: section+ populate metatables
+    local class_xbnf_fields = {}
+
+    class_xbnf_fields.id = true
+
+    -- miranda: insert class_xbnf field declarations
+    declarations(_M.class_xbnf, class_xbnf_fields, 'xbnf')
+```
 
 ## Libmarpa interface
 
