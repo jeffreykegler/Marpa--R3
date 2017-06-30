@@ -40,14 +40,14 @@ cd kollos && ../lua/lua toc.lua < kollos.md
   * [Symbol names, IDs and forms](#symbol-names-ids-and-forms)
 * [Kollos object](#kollos-object)
 * [Kollos registry objects](#kollos-registry-objects)
-* [Kollos SLIF grammar object](#kollos-slif-grammar-object)
-  * [Fields](#fields)
-  * [Accessors](#accessors)
+* [SLIF grammar (SLG) class](#slif-grammar-slg-class)
+  * [SLG fields](#slg-fields)
+  * [SLG accessors](#slg-accessors)
   * [Mutators](#mutators)
   * [Hash to runtime processing](#hash-to-runtime-processing)
-* [Kollos SLIF recognizer object](#kollos-slif-recognizer-object)
-  * [Fields](#fields-DUP)
-  * [Constructors](#constructors)
+* [SLIF recognizer (SLR) class](#slif-recognizer-slr-class)
+  * [SLR fields](#slr-fields)
+  * [SLR constructors](#slr-constructors)
   * [Reading](#reading)
     * [External reading](#external-reading)
       * [Methods](#methods)
@@ -55,11 +55,11 @@ cd kollos && ../lua/lua toc.lua < kollos.md
   * [Locations](#locations)
   * [Events](#events)
   * [Progress reporting](#progress-reporting)
-  * [Diagnostics](#diagnostics)
+  * [SLR diagnostics](#slr-diagnostics)
 * [Kollos semantics](#kollos-semantics)
   * [VM operations](#vm-operations)
+    * [VM add op utility](#vm-add-op-utility)
     * [VM debug operation](#vm-debug-operation)
-    * [VM debug operation](#vm-debug-operation-DUP)
     * [VM no-op operation](#vm-no-op-operation)
     * [VM bail operation](#vm-bail-operation)
     * [VM result operations](#vm-result-operations)
@@ -93,31 +93,31 @@ cd kollos && ../lua/lua toc.lua < kollos.md
     * [Convert current, origin Earley set to L0 span](#convert-current-origin-earley-set-to-l0-span)
   * [Input](#input)
 * [External rule (XRL) class](#external-rule-xrl-class)
-  * [Fields](#fields-DUP)
+  * [XRL fields](#xrl-fields)
 * [External BNF (XBNF) class](#external-bnf-xbnf-class)
-  * [Fields](#fields-DUP)
+  * [XBNF fields](#xbnf-fields)
 * [Internal rule (IRL) class](#internal-rule-irl-class)
-  * [Fields](#fields-DUP)
+  * [IRL fields](#irl-fields)
 * [External symbol (XSY) class](#external-symbol-xsy-class)
-  * [Fields](#fields-DUP)
-  * [Accessors](#accessors-DUP)
+  * [XSY fields](#xsy-fields)
+  * [XSY accessors](#xsy-accessors)
 * [Inner symbol (ISY) class](#inner-symbol-isy-class)
-  * [Fields](#fields-DUP)
-  * [Accessors](#accessors-DUP)
-* [Libmarpa grammar wrapper class](#libmarpa-grammar-wrapper-class)
-  * [Fields](#fields-DUP)
-  * [Constructor](#constructor)
-  * [Layer grammar accessors](#layer-grammar-accessors)
-* [Libmarpa recognizer wrapper class](#libmarpa-recognizer-wrapper-class)
-  * [Fields](#fields-DUP)
+  * [ISY fields](#isy-fields)
+  * [ISY accessors](#isy-accessors)
+* [Libmarpa grammar wrapper (LMG) class](#libmarpa-grammar-wrapper-lmg-class)
+  * [LMG fields](#lmg-fields)
+  * [LMG constructor](#lmg-constructor)
+  * [LMG accessors](#lmg-accessors)
+* [Libmarpa recognizer wrapper (LMR) class](#libmarpa-recognizer-wrapper-lmr-class)
+  * [LMR fields](#lmr-fields)
   * [Functions for tracing Earley sets](#functions-for-tracing-earley-sets)
 * [Libmarpa valuer wrapper class](#libmarpa-valuer-wrapper-class)
   * [Initialize a valuator](#initialize-a-valuator)
   * [Reset a valuator](#reset-a-valuator)
-  * [Diagnostics](#diagnostics-DUP)
+  * [SLV diagnostics](#slv-diagnostics)
 * [Libmarpa interface](#libmarpa-interface)
   * [Standard template methods](#standard-template-methods)
-  * [Constructors](#constructors-DUP)
+  * [Libmarpa class constructors](#libmarpa-class-constructors)
 * [Output](#output)
   * [The main Lua code file](#the-main-lua-code-file)
     * [Preliminaries to the main code](#preliminaries-to-the-main-code)
@@ -555,9 +555,9 @@ Deletes the interpreter if the reference count drops to zero.
 
 ```
 
-## Kollos SLIF grammar object
+## SLIF grammar (SLG) class
 
-### Fields
+### SLG fields
 
 ```
     -- miranda: section+ class_slg field declarations
@@ -608,7 +608,7 @@ This is a registry object.
 
 ```
 
-### Accessors
+### SLG accessors
 
 Display any XBNF
 
@@ -1248,11 +1248,11 @@ one for each subgrammar.
     end
 ```
 
-## Kollos SLIF recognizer object
+## SLIF recognizer (SLR) class
 
 This is a registry object.
 
-### Fields
+### SLR fields
 
 ```
     -- miranda: section+ class_slr field declarations
@@ -1344,7 +1344,7 @@ together.
 
 ```
 
-### Constructors
+### SLR constructors
 
 ```
     -- miranda: section+ most Lua function definitions
@@ -3325,7 +3325,7 @@ or nil if there was none.
 
 ```
 
-### Diagnostics
+### SLR diagnostics
 
 TODO -- after development, this should be a local function.
 
@@ -3499,7 +3499,7 @@ In particular, while `return f(x)` is turned into a tail call,
 The next function is a utility to set
 up the VM table.
 
-#### VM debug operation
+#### VM add op utility
 
 ```
     -- miranda: section VM utilities
@@ -4558,7 +4558,7 @@ is zero.
 
 ## External rule (XRL) class
 
-### Fields
+### XRL fields
 
 ```
     -- miranda: section+ class_xrl field declarations
@@ -4585,7 +4585,7 @@ is zero.
 
 ## External BNF (XBNF) class
 
-### Fields
+### XBNF fields
 
 ```
     -- miranda: section+ class_xbnf field declarations
@@ -4625,7 +4625,7 @@ is zero.
 
 ## Internal rule (IRL) class
 
-### Fields
+### IRL fields
 
 ```
     -- miranda: section+ class_irl field declarations
@@ -4648,7 +4648,7 @@ is zero.
 
 ## External symbol (XSY) class
 
-### Fields
+### XSY fields
 
 ```
     -- miranda: section+ class_xsy field declarations
@@ -4675,7 +4675,7 @@ is zero.
     declarations(_M.class_xsy, class_xsy_fields, 'xsy')
 ```
 
-### Accessors
+### XSY accessors
 
 ```
     -- miranda: section+ most Lua function definitions
@@ -4690,7 +4690,7 @@ is zero.
 
 ## Inner symbol (ISY) class
 
-### Fields
+### ISY fields
 
 ```
     -- miranda: section+ class_isy field declarations
@@ -4716,7 +4716,7 @@ is zero.
     declarations(_M.class_isy, class_isy_fields, 'isy')
 ```
 
-### Accessors
+### ISY accessors
 
 ```
     -- miranda: section+ most Lua function definitions
@@ -4729,9 +4729,9 @@ is zero.
     end
 ```
 
-## Libmarpa grammar wrapper class
+## Libmarpa grammar wrapper (LMG) class
 
-### Fields
+### LMG fields
 
 ```
     -- miranda: section+ class_grammar field declarations
@@ -4761,7 +4761,7 @@ indexed by isyid.
     declarations(_M.class_grammar, class_grammar_fields, 'grammar')
 ```
 
-### Constructor
+### LMG constructor
 
 ```
     -- miranda: section+ copy metal tables
@@ -4952,7 +4952,7 @@ indexed by isyid.
 
 ```
 
-### Layer grammar accessors
+### LMG accessors
 
 `isy_key` is an ISY id.
 
@@ -5000,9 +5000,9 @@ necessarily unique.
     end
 ```
 
-## Libmarpa recognizer wrapper class
+## Libmarpa recognizer wrapper (LMR) class
 
-### Fields
+### LMR fields
 
 ```
     -- miranda: section+ class_recce field declarations
@@ -5139,7 +5139,7 @@ It should free all memory associated with the valuation.
 
 ```
 
-### Diagnostics
+### SLV diagnostics
 
 ```
     -- miranda: section+ diagnostics
@@ -5764,7 +5764,7 @@ the wrapper's point of view, marpa_r_alternative() always succeeds.
 
 ```
 
-### Constructors
+### Libmarpa class constructors
 
 The standard constructors are generated indirectly, from a template.
 This saves a lot of repetition, which makes for easier reading in the
