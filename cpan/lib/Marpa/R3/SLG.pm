@@ -444,12 +444,13 @@ END_OF_LUA
 
         if is_terminal then
              local g1_isy = g1g.isys[g1_isyid]
-             g1g.isys[g1_isyid].lexeme = { g1_isy = g1_isy }
+             local lexeme = { g1_isy = g1_isy }
+             g1g.isys[g1_isyid].lexeme = lexeme
              local xsy = g1g:_xsy(g1_isyid)
              if xsy then
-                 if xsy.g1_lexeme_id then
+                 if xsy.lexeme then
 
-                     local g1_isyid2 = xsy.g1_lexeme_id
+                     local g1_isyid2 = xsy.lexeme.g1_isy.id
                      _M._internal_error(
                          "Xsymbol %q (id=%d) has 2 g1 lexemes: \n\z
                          \u{20}   %q (id=%d), and\n\z
@@ -459,7 +460,8 @@ END_OF_LUA
                          g1g:symbol_name(g1_isyid2), g1_isyid2
                      )
                  end
-                 xsy.g1_lexeme_id = g1_isyid
+                 lexeme.xsy = xsy
+                 xsy.lexeme = lexeme
 
                  -- TODO delete this check after development
                  if xsy.name ~= slg.g1:symbol_name(g1_isyid) then
@@ -1012,10 +1014,11 @@ END_OF_LUA
         if not xsy then
             return 'next G1_SYMBOL', default_blessing
         end
-        local g1_lexeme_id = xsy.g1_lexeme_id
-        if not g1_lexeme_id then
+        local lexeme = xsy.lexeme
+        if not lexeme then
             return 'next G1_SYMBOL', default_blessing
         end
+        local g1_lexeme_id = lexeme.g1_isy.id
         local name_source = xsy.name_source
         if name_source ~= 'lexical' then return 'next G1_SYMBOL', default_blessing end
         if not xsy.blessing then

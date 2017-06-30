@@ -4565,6 +4565,8 @@ is zero.
     class_lex_fields.xsy = true
     class_lex_fields.g1_isy = true
     class_lex_fields.l0_isy = true
+    class_lex_fields.l0_irl = true
+    class_lex_fields.assertion_id = true
 ```
 
 ```
@@ -4691,8 +4693,7 @@ is zero.
     class_xsy_fields.dsl_form = true
     class_xsy_fields.if_inaccessible = true
     class_xsy_fields.name_source = true
-    class_xsy_fields.g1_lexeme_id = true
-    class_xsy_fields.l0_lexeme_id = true
+    class_xsy_fields.lexeme = true
 
     -- miranda: insert class_xsy field declarations
     declarations(_M.class_xsy, class_xsy_fields, 'xsy')
