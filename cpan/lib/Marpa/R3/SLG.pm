@@ -807,8 +807,8 @@ END_OF_LUA
     }
 
     $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 'ss', \%g1_id_by_lexeme_name, ($lexeme_declarations // {}));
-    local slg, g1_id_by_lexeme_name, lexeme_declarations = ...
+        <<'END_OF_LUA', 's', ($lexeme_declarations // {}));
+    local slg, lexeme_declarations = ...
     local g1g = slg.g1
     -- local slg, lexeme_name, g1_lexeme_id, declarations = ...
 
