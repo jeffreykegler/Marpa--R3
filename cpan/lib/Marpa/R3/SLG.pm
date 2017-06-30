@@ -443,7 +443,8 @@ END_OF_LUA
         local is_lexeme
 
         if is_terminal then
-             g1g.isys[g1_isyid].is_lexeme = true
+             local g1_isy = g1g.isys[g1_isyid]
+             g1g.isys[g1_isyid].lexeme = { g1_isy = g1_isy }
              local xsy = g1g:_xsy(g1_isyid)
              if xsy then
                  if xsy.g1_lexeme_id then
@@ -818,17 +819,17 @@ END_OF_LUA
 
     for g1_lexeme_id = 0, g1g:highest_symbol_id() do
         local isy = g1g.isys[g1_lexeme_id]
-        if not isy.is_lexeme then goto NEXT_SYMBOL end
+        if not isy.lexeme then goto NEXT_SYMBOL end
         local lexeme_name = isy.name
         local declarations = lexeme_declarations[lexeme_name] or {}
 
-        local lexeme_data = slg.g1.isys[g1_lexeme_id]
+        local g1_isy = slg.g1.isys[g1_lexeme_id]
         local priority = 0
         if declarations.priority then
             priority = declarations.priority + 0
         end
-        lexeme_data.priority = priority
-        if declarations.eager then lexeme_data.eager = true end
+        g1_isy.priority = priority
+        if declarations.eager then g1_isy.eager = true end
         if slg.completion_event_by_isy[lexeme_name] then
             error(string.format(
                 "A completion event is declared for <%s>, but it is a lexeme.\n\z
@@ -843,16 +844,15 @@ END_OF_LUA
                 lexeme_name
             ))
         end
-        lexeme_data.is_lexeme = true
 
         local pause_value = declarations.pause
         if pause_value then
             pause_value = math.tointeger(pause_value)
-            local lexeme_data = slg.g1.isys[g1_lexeme_id]
+            local g1_isy = slg.g1.isys[g1_lexeme_id]
             if pause_value == 1 then
-                 lexeme_data.pause_after = true
+                 g1_isy.pause_after = true
             elseif pause_value == -1 then
-                 lexeme_data.pause_before = true
+                 g1_isy.pause_before = true
             end
             local event = declarations.event
             local is_active = 1
@@ -873,14 +873,14 @@ END_OF_LUA
                     name_entry[#name_entry+1] = event_desc
                 end
 
-                local lexeme_data = slg.g1.isys[g1_lexeme_id]
+                local g1_isy = slg.g1.isys[g1_lexeme_id]
                 if is_active then
                     -- activate only if event is enabled
-                    lexeme_data.pause_after_active = lexeme_data.pause_after
-                    lexeme_data.pause_before_active = lexeme_data.pause_before
+                    g1_isy.pause_after_active = g1_isy.pause_after
+                    g1_isy.pause_before_active = g1_isy.pause_before
                 else
-                    lexeme_data.pause_after_active = nil
-                    lexeme_data.pause_before_active = nil
+                    g1_isy.pause_after_active = nil
+                    g1_isy.pause_before_active = nil
                 end
 
             end

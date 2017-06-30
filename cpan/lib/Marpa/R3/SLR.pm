@@ -1270,7 +1270,7 @@ sub Marpa::R3::Scanless::R::lexeme_priority_set {
         end
         local g_lexeme_data = slg.g1.isys[lexeme_id]
         local r_lexeme_data = recce.g1_isys[lexeme_id]
-        if not g_lexeme_data.is_lexeme then
+        if not g_lexeme_data.lexeme then
             print(inspect(lexeme_data))
             _M.userX(string.format(
                 "lexeme_priority_set(): %q is not a lexeme",

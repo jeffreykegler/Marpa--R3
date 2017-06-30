@@ -4556,6 +4556,29 @@ is zero.
 
 ```
 
+## Lexeme (LEX) class
+
+### LEX fields
+
+```
+    -- miranda: section+ class_lex field declarations
+    class_lex_fields.xsy = true
+    class_lex_fields.g1_isy = true
+    class_lex_fields.l0_isy = true
+```
+
+```
+    -- miranda: section+ create nonmetallic metatables
+    _M.class_lex = {}
+    -- miranda: section+ populate metatables
+    local class_lex_fields = {}
+
+    class_lex_fields.id = true
+
+    -- miranda: insert class_lex field declarations
+    declarations(_M.class_lex, class_lex_fields, 'xrl')
+```
+
 ## External rule (XRL) class
 
 ### XRL fields
@@ -4703,7 +4726,7 @@ is zero.
     class_isy_fields.pause_before = true
     class_isy_fields.pause_before_active = true
     class_isy_fields.priority = true
-    class_isy_fields.is_lexeme = true
+    class_isy_fields.lexeme = true
     class_isy_fields.eager = true
 ```
 
