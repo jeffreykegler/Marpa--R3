@@ -819,9 +819,22 @@ END_OF_LUA
 
     for g1_lexeme_id = 0, g1g:highest_symbol_id() do
         local isy = g1g.isys[g1_lexeme_id]
-        if not isy.lexeme then goto NEXT_SYMBOL end
         local lexeme_name = isy.name
-        local declarations = lexeme_declarations[lexeme_name] or {}
+        local declarations = lexeme_declarations[lexeme_name]
+        if not isy.lexeme then
+            -- Check for lexeme declarations of
+            -- symbols that are, in fact, not actually lexemes
+            if declarations then
+                _M.userX(string.format(
+                    "Symbol <%s> is declared as a lexeme, \z
+                    but it is not used as one.\n",
+                    lexeme_name
+                )
+                )
+            end
+            goto NEXT_SYMBOL
+        end
+        declarations = declarations or {}
 
         local g1_isy = slg.g1.isys[g1_lexeme_id]
         local priority = 0
