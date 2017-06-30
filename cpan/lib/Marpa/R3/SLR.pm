@@ -230,7 +230,7 @@ END_OF_LUA
 
     $slr->[Marpa::R3::Internal::Scanless::R::REGIX]  = $regix;
 
-    my ( $events ) = $slr->coro_by_tag(
+    $slr->coro_by_tag(
         ( '@' . __FILE__ . ':' . __LINE__ ),
         {
             signature => 's',
@@ -247,12 +247,10 @@ END_OF_LUA
         <<'END_OF_LUA');
         local slr, flat_args = ...
         _M.wrap(function ()
-            local _, events = glue.convert_libmarpa_events(slr)
-            return 'ok', events
+            slr:convert_libmarpa_events(slr)
+            return 'ok'
         end)
 END_OF_LUA
-
-    $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] = $events;
 
     return $slr;
 } ## end sub Marpa::R3::Scanless::R::new
@@ -340,11 +338,6 @@ sub Marpa::R3::Scanless::R::read {
             return 'ok'
 END_OF_LUA
 
-    my $event_count =
-      scalar @{ $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] };
-
-    return 0 if $event_count > 0;
-
     return $slr->resume( $start_pos, $length );
 
 } ## end sub Marpa::R3::Scanless::R::read
@@ -363,7 +356,7 @@ sub Marpa::R3::Scanless::R::resume {
     my $trace_file_handle =
       $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
 
-    my ($events) = $slr->coro_by_tag(
+    $slr->coro_by_tag(
         ( '@' . __FILE__ . ':' . __LINE__ ),
         {
             signature => 'ii',
@@ -415,17 +408,8 @@ sub Marpa::R3::Scanless::R::resume {
       )
 END_OF_LUA
 
-    $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] = $events;
-
     return $slr->pos();
 } ## end sub Marpa::R3::Scanless::R::resume
-
-sub Marpa::R3::Scanless::R::events {
-    my ($slr) = @_;
-    my $events = $slr->[Marpa::R3::Internal::Scanless::R::EVENTS];
-    # say Data::Dumper::Dumper($events);
-    return $events // [];
-}
 
 sub character_describe {
     my ($slr, $codepoint) = @_;
@@ -883,7 +867,7 @@ sub Marpa::R3::Scanless::R::lexeme_complete {
     my $trace_file_handle =
         $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
 
-    my ($return_value, $events) = $slr->coro_by_tag(
+    my ($return_value) = $slr->coro_by_tag(
         ( '@' . __FILE__ . ':' . __LINE__ ),
         {
            signature => 'ii',
@@ -919,13 +903,11 @@ sub Marpa::R3::Scanless::R::lexeme_complete {
           slg.g1.error()
       end
       _M.wrap(function ()
-          local _, events = glue.convert_libmarpa_events(slr)
-          return 'ok', complete_val, events
+          slr:convert_libmarpa_events(slr)
+          return 'ok', complete_val
       end
       )
 END_OF_LUA
-
-    $slr->[Marpa::R3::Internal::Scanless::R::EVENTS] = $events;
 
     return $return_value;
 

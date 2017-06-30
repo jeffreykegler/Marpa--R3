@@ -2948,7 +2948,7 @@ the `codepoint` command.
         local event_status
         while true do
             local alive = slr:read()
-            event_status, events = glue.convert_libmarpa_events(slr)
+            event_status, events = slr:convert_libmarpa_events()
             if not alive or #events > 0 or event_status == 'pause' then
                 break
             end

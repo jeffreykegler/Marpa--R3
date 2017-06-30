@@ -220,8 +220,5 @@ __DATA__
     EVENT_HANDLERS { Application-level event handlers }
     CURRENT_EVENT
 
-    EVENTS { TODO -- Delete after development
-    Events converted to an external, Perl-ish form }
-
     { vim: set expandtab shiftwidth=4:
     }

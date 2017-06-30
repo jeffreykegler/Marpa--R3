@@ -131,7 +131,14 @@ for my $test_data (@tests) {
             my $full_dsl = $base_dsl . $suit_line;
             my $grammar =
                 Marpa::R3::Scanless::G->new( { source => \$full_dsl } );
-            my $re = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
+            my $re = Marpa::R3::Scanless::R->new(
+                {
+                    grammar        => $grammar,
+                    event_handlers => {
+                        'card' => sub () { 'pause' },
+                    }
+                }
+            );
             my $length = length $input;
 
             my %played = ();

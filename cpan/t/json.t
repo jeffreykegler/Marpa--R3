@@ -304,7 +304,14 @@ sub parse {
 # Marpa::R3::Display
 # name: SLIF read/resume example
 
-    my $recce = Marpa::R3::Scanless::R->new( { grammar => $parser->{grammar} } );
+    my $recce = Marpa::R3::Scanless::R->new(
+        {
+            grammar        => $parser->{grammar},
+            event_handlers => {
+                'before lstring' => sub () { 'pause' },
+            }
+        }
+    );
     my $length = length $string;
     for (
         my $pos = $recce->read( \$string );
