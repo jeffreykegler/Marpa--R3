@@ -798,10 +798,10 @@ Lowest XSYID is 1.
         local subg = slg[subg_name]
         local irl_isyids = subg:irl_isyids(irlid)
         if not irl_isyids then
-             _M.userX(string.format(
+             _M.userX(
                  "dotted_rule_show(%s, %s, %s): %s is not a valid irlid",
                  irlid, dot_arg, subg_name, irlid
-             ))
+             )
         end
         local pieces = {}
         pieces[#pieces+1]
@@ -827,10 +827,10 @@ Lowest XSYID is 1.
             dot_used = true
         end
         if not dot_used then
-             _M.userX(string.format(
+             _M.userX(
                  "dotted_rule_show(%s, %s, %s): dot is %s; must be -1, or 0-%d",
                  irlid, dot_arg, subg_name, dot_arg, #irl_isyids + 1
-             ))
+             )
         end
         return table.concat(pieces, ' ')
     end
@@ -3341,7 +3341,7 @@ It is designed to be convenient for use as a tail call.
       block_ix = block_ix or current_block_ix
       pos = pos or l0_pos
       local codepoint = slr:codepoint_from_pos(block_ix, pos)
-      return _M.userX(string.format(
+      return _M.userX(
              "Error in SLIF parse: %s\n\z
               * String before error: %s\n\z
               * The error was at %s, and at character %s, ...\n\z
@@ -3351,7 +3351,7 @@ It is designed to be convenient for use as a tail call.
               slr:lc_brief(pos, block_ix),
               slr:character_describe(codepoint),
               slr:input_escape(block_ix, pos, 50)
-          ))
+          )
     end
 ```
 
@@ -4989,9 +4989,9 @@ TODO: Perhaps `isy_key` should also allow isy tables.
     function _M.class_grammar.xsyid(grammar, isy_key)
         local xsy = grammar:xsy(isy_key)
         if not xsy then
-            _M.userX(string.format(
+            _M.userX(
                "grammar:xsyid(%s): no such xsy",
-               inspect(isy_key)))
+               inspect(isy_key))
         end
         return xsy.id
     end
@@ -8110,8 +8110,12 @@ but that is not necessarily the case.)
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.userX(msg)
-        local X = { msg = msg, traceback = false }
+    function _M.userX(format, ...)
+        local message
+        if format then
+            message = string.format(format, ...)
+        end
+        local X = { msg = message, traceback = false }
         setmetatable(X, _M.mt_X)
         error(X)
     end

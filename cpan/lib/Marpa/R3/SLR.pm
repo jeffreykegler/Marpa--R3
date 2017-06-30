@@ -43,9 +43,9 @@ sub Marpa::R3::Scanless::R::last_completed {
         local slr, xsy_name  = ...
         local xsyid = slr.slg:symbol_by_name(xsy_name)
         if not xsyid then
-            _M.userX(string.format(
+            _M.userX(
                 "last_completed(%q): no symbol with that name",
-                xsy_name))
+                xsy_name)
         end
         return slr:last_completed(xsyid)
 END_OF_LUA
@@ -972,9 +972,9 @@ sub Marpa::R3::Scanless::R::g1_to_l0_first {
         local slr, g1_pos = ...
         g1_pos = math.tointeger(g1_pos)
         if not g1_pos then
-            _M.userX(string.format(
+            _M.userX(
                 "g1_to_l0_first(%s): argument must be an integer",
-                g1_pos))
+                g1_pos)
         end
         return slr:g1_pos_to_l0_first(g1_pos)
 END_OF_LUA
@@ -988,9 +988,9 @@ sub Marpa::R3::Scanless::R::g1_to_l0_last {
         local slr, g1_pos = ...
         g1_pos = math.tointeger(g1_pos)
         if not g1_pos then
-            _M.userX(string.format(
+            _M.userX(
                 "g1_to_l0_last(%s): argument must be an integer",
-                g1_pos))
+                g1_pos)
         end
         return slr:g1_pos_to_l0_last(g1_pos)
 END_OF_LUA
@@ -1257,25 +1257,25 @@ sub Marpa::R3::Scanless::R::lexeme_priority_set {
         local g1g = slg.g1
         local lexeme_id = g1g.isyid_by_name[lexeme_name]
         if not lexeme_id then
-            _M.userX(string.format(
+            _M.userX(
                 "lexeme_priority_set(): no such symbol as %q",
                 lexeme_name
-            ))
+            )
         end
         if type(new_priority) ~= 'number' then
-            _M.userX(string.format(
+            _M.userX(
                 "lexeme_priority_set(): priority is not a number, it is %s",
                 new_priority
-            ))
+            )
         end
         local g_lexeme_data = slg.g1.isys[lexeme_id]
         local r_lexeme_data = recce.g1_isys[lexeme_id]
         if not g_lexeme_data.lexeme then
             print(inspect(lexeme_data))
-            _M.userX(string.format(
+            _M.userX(
                 "lexeme_priority_set(): %q is not a lexeme",
                 lexeme_name
-            ))
+            )
         end
         local old_priority = r_lexeme_data.lexeme_priority
         r_lexeme_data.lexeme_priority = new_priority

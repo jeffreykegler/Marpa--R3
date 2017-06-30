@@ -825,11 +825,10 @@ END_OF_LUA
             -- Check for lexeme declarations of
             -- symbols that are, in fact, not actually lexemes
             if declarations then
-                _M.userX(string.format(
+                _M.userX(
                     "Symbol <%s> is declared as a lexeme, \z
                     but it is not used as one.\n",
                     lexeme_name
-                )
                 )
             end
             goto NEXT_SYMBOL
@@ -1180,7 +1179,7 @@ END_OF_LUA
             end
         end
         msgs[#msgs+1] = 'A terminal symbol cannot also be a nulling symbol'
-        _M.userX( table.concat(msgs) )
+        _M.userX( '%s', table.concat(msgs) )
     end
     if error_code == _M.err["COUNTED_NULLABLE"] then
         local msgs = {}
@@ -1195,16 +1194,17 @@ END_OF_LUA
             end
         end
         msgs[#msgs+1] = 'Counted nullables confuse Marpa -- please rewrite the grammar\n'
-        _M.userX( table.concat(msgs) )
+        _M.userX( '%s', table.concat(msgs) )
     end
     if error_code == _M.err["START_NOT_LHS"] then
-        _M.userX( "Start symbol " .. lmw_g.start_name .. " not on LHS of any rule");
+        _M.userX( "Start symbol %s not on LHS of any rule",
+            lmw_g.start_name);
     end
     if error_code == _M.err["NO_START_SYMBOL"] then
             _M.userX('No start symbol')
     end
     if error_code ~= _M.err["UNPRODUCTIVE_START"] then
-            _M.userX( lmw_g:error_description() )
+            _M.userX( '%s', lmw_g:error_description() )
     end
     return "ok"
 END_OF_LUA
