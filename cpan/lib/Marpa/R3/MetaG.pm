@@ -4720,6 +4720,14 @@ $hashed_metag = {
                                                                    'wsyid' => 697,
                                                                    'xsy' => 'op declare match'
                                                                  },
+                                           'op equal priority' => {
+                                                                    'wsyid' => 713,
+                                                                    'xsy' => 'op equal priority'
+                                                                  },
+                                           'op loosen' => {
+                                                            'wsyid' => 712,
+                                                            'xsy' => 'op loosen'
+                                                          },
                                            'parenthesized rhs primary list' => {
                                                                                  'wsyid' => 689,
                                                                                  'xsy' => 'parenthesized rhs primary list'

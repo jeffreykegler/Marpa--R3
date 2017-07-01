@@ -102,14 +102,14 @@ G1 S13 MetricSelect
 G1 S14 NUMBER
 G1 S15 PF
 G1 S16 SELECT
-G1 S17 Statement
-G1 S18 TRUE
-G1 S19 TypeDef
-G1 S20 WHERE
-G1 S21 WITH
-G1 S22 WithPf
-G1 S23 [:start:]
-G1 S24 SEPARATOR
+G1 S17 SEPARATOR
+G1 S18 Statement
+G1 S19 TRUE
+G1 S20 TypeDef
+G1 S21 WHERE
+G1 S22 WITH
+G1 S23 WithPf
+G1 S24 [:start:]
 END_OF_SYMBOLS
 
 Marpa::R3::Test::is( $grammar->g1_rules_show(),
@@ -470,12 +470,12 @@ And-node #7: R8:3@4-6S3@6
 And-node #15: R8:4@4-8C12@6
 And-node #5: R16:1@5-6S17@5
 And-node #8: R12:1@6-6S14@6
-And-node #9: R19:1@6-7S23@6
+And-node #9: R19:1@6-7S24@6
 And-node #14: R12:2@6-8C14@6
 And-node #12: R14:1@6-8C19@6
-And-node #13: R14:2@6-8S26@8
+And-node #13: R14:2@6-8S27@8
 And-node #11: R19:2@6-8C20@7
-And-node #10: R20:1@7-8S21@7
+And-node #10: R20:1@7-8S22@7
 END_OF_AND_NODES
 
 Marpa::R3::Test::is( $recce->show_or_nodes(),
