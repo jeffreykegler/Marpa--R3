@@ -1806,30 +1806,12 @@ kwgen(__LINE__, qw(l0_symbol_name l0_symbol_name i));
 kwgen(__LINE__, qw(lmg_symbol_display_form lmg_symbol_display_form si));
 kwgen(__LINE__, qw(g1_symbol_display_form g1_symbol_display_form i));
 kwgen(__LINE__, qw(l0_symbol_display_form l0_symbol_display_form i));
-
-# Returns DSL form of symbol
-# Does not check whether there is one
-sub Marpa::R3::Scanless::G::lmg_symbol_dsl_form {
-    my ( $slg, $subg_name, $isyid ) = @_;
-
-    my ($dsl_form) = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 'is', $isyid, $subg_name );
-        local grammar, isyid, subg_name = ...
-        return grammar:lmg_symbol_dsl_form(isyid, subg_name)
-END_OF_LUA
-
-    return $dsl_form;
-}
-
-sub Marpa::R3::Scanless::G::g1_symbol_dsl_form {
-    my ( $slg, $symbol_id ) = @_;
-    return $slg->lmg_symbol_dsl_form('g1', $symbol_id);
-}
-
-sub Marpa::R3::Scanless::G::l0_symbol_dsl_form {
-    my ( $slg, $symbol_id ) = @_;
-    return $slg->lmg_symbol_dsl_form('l0', $symbol_id);
-}
+kwgen(__LINE__, qw(lmg_symbol_dsl_form lmg_symbol_dsl_form si));
+kwgen(__LINE__, qw(g1_symbol_dsl_form g1_symbol_dsl_form i));
+kwgen(__LINE__, qw(l0_symbol_dsl_form l0_symbol_dsl_form i));
+kwgen(__LINE__, qw(lmg_symbol_by_name lmg_symbol_by_name si));
+kwgen(__LINE__, qw(g1_symbol_by_name g1_symbol_by_name i));
+kwgen(__LINE__, qw(l0_symbol_by_name l0_symbol_by_name i));
 
 sub Marpa::R3::Scanless::G::call_by_tag {
     my ( $slg, $tag, $codestr, $sig, @args ) = @_;
@@ -2046,32 +2028,6 @@ sub Marpa::R3::Scanless::G::g1_symbol_ids {
 sub Marpa::R3::Scanless::G::l0_symbol_ids {
     my ($slg) = @_;
     return $slg->lmg_symbol_ids('l0');
-}
-
-sub Marpa::R3::Scanless::G::g1_symbol_by_name {
-    my ($slg, $name) = @_;
-    return $slg->lmg_symbol_by_name('g1', $name);
-}
-
-sub Marpa::R3::Scanless::G::l0_symbol_by_name {
-    my ($slg, $name) = @_;
-    return $slg->lmg_symbol_by_name('l0', $name);
-}
-
-# Internal methods, not to be documented
-
-sub Marpa::R3::Scanless::G::lmg_symbol_by_name {
-    my ( $slg, $subg_name, $symbol_name ) = @_;
-
-    my ($symbol_id) = $slg->call_by_tag(
-        ('@' . __FILE__ . ':' .  __LINE__),
-      <<'END_OF_LUA', 'ss', $subg_name, $symbol_name);
-    local g, subg_name, symbol_name = ...
-    local lmw_g = g[subg_name].lmw_g
-    return lmw_g.isyid_by_name[symbol_name]
-END_OF_LUA
-
-    return $symbol_id;
 }
 
 sub Marpa::R3::Scanless::G::alt_name {
