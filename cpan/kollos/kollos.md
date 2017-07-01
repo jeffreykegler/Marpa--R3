@@ -774,7 +774,7 @@ Lowest ISYID is 0.
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slg.lmg_rule_show(slg, irlid, subg_name)
+    function _M.class_slg.lmg_rule_show(slg, subg_name, irlid)
         local subg = slg[subg_name]
         local irl_isyids = subg:irl_isyids(irlid)
         local pieces = {}
@@ -793,10 +793,10 @@ Lowest ISYID is 0.
         return table.concat(pieces, ' ')
     end
     function _M.class_slg.g1_rule_show(slg, irlid)
-        return slg:lmg_rule_show(irlid, 'g1')
+        return slg:lmg_rule_show('g1', irlid)
     end
     function _M.class_slg.l0_rule_show(slg, irlid)
-        return slg:lmg_rule_show(irlid, 'l0')
+        return slg:lmg_rule_show('l0', irlid)
     end
 
     function _M.class_slg.lmg_rule_display(slg, irlid, subg_name)
@@ -809,7 +809,7 @@ Lowest ISYID is 0.
         if xbnf then
              return slg:xbnf_display(xbnf)
         end
-        return slg:lmg_rule_show(irlid, subg_name)
+        return slg:lmg_rule_show(subg_name, irlid)
     end
     function _M.class_slg.g1_rule_display(slg, irlid)
         return slg:lmg_rule_display(irlid, 'g1')
@@ -877,7 +877,7 @@ Lowest ISYID is 0.
             local pcs2 = {}
             pcs2[#pcs2+1] = string.upper(subg_name)
             pcs2[#pcs2+1] = 'R' .. irlid
-            pcs2[#pcs2+1] = slg:lmg_rule_show(irlid, subg_name)
+            pcs2[#pcs2+1] = slg:lmg_rule_show(subg_name, irlid)
             pcs[#pcs+1] = table.concat(pcs2, ' ')
             pcs[#pcs+1] = "\n"
 

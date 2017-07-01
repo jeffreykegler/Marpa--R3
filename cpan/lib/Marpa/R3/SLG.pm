@@ -1775,6 +1775,12 @@ kwgen(__LINE__, qw(lmg_dotted_rule_show lmg_dotted_rule_show sii));
 kwgen(__LINE__, qw(g1_dotted_rule_show g1_dotted_rule_show ii));
 kwgen(__LINE__, qw(l0_dotted_rule_show l0_dotted_rule_show ii));
 
+kwgen(__LINE__, qw(lmg_rule_show lmg_rule_show si));
+kwgen(__LINE__, qw(g1_rule_show g1_rule_show i));
+kwgen(__LINE__, qw(l0_rule_show l0_rule_show i));
+
+kwgen(__LINE__, qw(alt_name xbnf_name i));
+
 kwgen(__LINE__, qw(lmg_rule_to_altid lmg_rule_to_xbnfid si));
 kwgen(__LINE__, qw(g1_rule_to_altid g1_rule_to_xbnfid i));
 kwgen(__LINE__, qw(l0_rule_to_altid l0_rule_to_xbnfid i));
@@ -1996,17 +2002,6 @@ sub Marpa::R3::Scanless::G::l0_symbol_ids {
     return $slg->lmg_symbol_ids('l0');
 }
 
-sub Marpa::R3::Scanless::G::alt_name {
-    my ( $slg, $altid ) = @_;
-    my ($alt_name) = $slg->call_by_tag(
-        ('@' . __FILE__ . ':' .  __LINE__),
-      <<'END_OF_LUA', 'i', $altid);
-    local slg, altid = ...
-    return slg:xbnf_name(altid)
-END_OF_LUA
-    return $alt_name;
-}
-
 sub Marpa::R3::Scanless::G::g1_rule_expand {
     my ( $slg, $rule_id ) = @_;
     return $slg->g1_irl_isyids($rule_id);
@@ -2015,40 +2010,6 @@ sub Marpa::R3::Scanless::G::g1_rule_expand {
 sub Marpa::R3::Scanless::G::l0_rule_expand {
     my ( $slg, $rule_id ) = @_;
     return $slg->l0_irl_isyids($rule_id);
-}
-
-sub Marpa::R3::Scanless::G::lmg_rule_show {
-    my ( $slg, $subg_name, $irlid ) = @_;
-
-    my ( $desc ) =
-      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 'si>*', $subg_name, $irlid );
-    local slg, subg_name, irlid = ...
-    return slg:lmg_rule_show(irlid, subg_name)
-END_OF_LUA
-    return $desc;
-}
-
-sub Marpa::R3::Scanless::G::g1_rule_show {
-    my ( $slg, $irlid ) = @_;
-    my ( $desc ) =
-      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 'i>*', $irlid );
-    local slg, irlid = ...
-    return slg:g1_rule_show(irlid)
-END_OF_LUA
-    return $desc;
-}
-
-sub Marpa::R3::Scanless::G::l0_rule_show {
-    my ( $slg, $irlid ) = @_;
-    my ( $desc ) =
-      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 'i>*', $irlid );
-    local slg, irlid = ...
-    return slg:l0_rule_show(irlid)
-END_OF_LUA
-    return $desc;
 }
 
 sub Marpa::R3::Scanless::G::lmg_rule_display {
