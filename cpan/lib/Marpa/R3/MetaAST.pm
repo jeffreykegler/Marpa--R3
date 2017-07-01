@@ -121,6 +121,7 @@ sub ast_to_hash {
         my $wsyms   = $hashed_ast->{symbols}->{$grammar};
         my @symbols = map { $_->{lhs} } @{$rules};
         push @symbols, map { @{ $_->{rhs} } } @{$rules};
+        push @symbols, grep { defined } map { $_->{separator} } @{$rules};
       SYM: for my $symbol_name (@symbols) {
             next SYM if defined $wsyms->{$symbol_name};
 
