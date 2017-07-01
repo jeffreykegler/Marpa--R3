@@ -1779,42 +1779,33 @@ END_OF_LUA
     return $symbol_name;
 }
 
+our $kwgen_code_template = <<'END_OF_TEMPLATE';
+END_OF_TEMPLATE
+
+sub kwgen {
+    my ($line, $perl_name, $kollos_name, $signature) = @_;
+    my $tag = '@' . __FILE__ . ':' .  $line;
+    my $code = sprintf( 'return _M.class_slg.%s(...)', $kollos_name );
+    no strict 'refs';
+    *{ 'Marpa::R3::Scanless::G::' . $perl_name }
+        = sub () {
+            my ($slg, @args) = @_;
+            my ($retour) = $slg->call_by_tag($tag, $code, $signature, @args);
+            return $retour;
+        };
+    use strict;
+}
+
 # TODO: Census all uses of Marpa::R3::Scanless::G::g1_symbol_name
 # in pod and tests, and make sure that they are appropriate --
 # that is, that they should not be symbol_name() instead.
-sub Marpa::R3::Scanless::G::g1_symbol_name {
-    my ( $slg, $symbol_id ) = @_;
-    $symbol_id += 0;
-    return $slg->lmg_symbol_name('g1', $symbol_id);
-}
 
-sub Marpa::R3::Scanless::G::l0_symbol_name {
-    my ( $slg, $symbol_id ) = @_;
-    return $slg->lmg_symbol_name('l0', $symbol_id);
-}
-
-# Returns display form of symbol
-sub Marpa::R3::Scanless::G::lmg_symbol_display_form {
-    my ( $slg, $subg_name, $isyid ) = @_;
-
-    my ($display_form) = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 'is', $isyid, $subg_name );
-        local grammar, isyid, subg_name = ...
-        return grammar:lmg_symbol_display_form(isyid, subg_name)
-END_OF_LUA
-
-    return $display_form;
-}
-
-sub Marpa::R3::Scanless::G::g1_symbol_display_form {
-    my ( $slg, $symbol_id ) = @_;
-    return $slg->lmg_symbol_display_form('g1', $symbol_id);
-}
-
-sub Marpa::R3::Scanless::G::l0_symbol_display_form {
-    my ( $slg, $symbol_id ) = @_;
-    return $slg->lmg_symbol_display_form('l0', $symbol_id);
-}
+kwgen(__LINE__, qw(lmg_symbol_name lmg_symbol_name si));
+kwgen(__LINE__, qw(g1_symbol_name g1_symbol_name i));
+kwgen(__LINE__, qw(l0_symbol_name l0_symbol_name i));
+kwgen(__LINE__, qw(lmg_symbol_display_form lmg_symbol_display_form si));
+kwgen(__LINE__, qw(g1_symbol_display_form g1_symbol_display_form i));
+kwgen(__LINE__, qw(l0_symbol_display_form l0_symbol_display_form i));
 
 # Returns DSL form of symbol
 # Does not check whether there is one
@@ -2082,21 +2073,6 @@ END_OF_LUA
 
     return $symbol_id;
 }
-
-sub Marpa::R3::Scanless::G::lmg_symbol_name {
-    my ( $slg, $subg_name, $symbol_id ) = @_;
-
-    my ($name) = $slg->call_by_tag(
-        ('@' . __FILE__ . ':' .  __LINE__),
-      <<'END_OF_LUA', 'si', $subg_name, $symbol_id);
-    local g, subg_name, symbol_id = ...
-    local lmw_g = g[subg_name].lmw_g
-    return lmw_g:symbol_name(symbol_id)
-END_OF_LUA
-
-    return $name;
-
-} ## end sub symbol_name
 
 sub Marpa::R3::Scanless::G::alt_name {
     my ( $slg, $altid ) = @_;

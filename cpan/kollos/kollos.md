@@ -696,15 +696,15 @@ Lowest XSYID is 1.
         if not xsy then return end
         return xsy.name
     end
-    function _M.class_slg.lmg_symbol_name(slg, symbol_id, subg_name)
+    function _M.class_slg.lmg_symbol_name(slg, subg_name, symbol_id)
         local subg = slg[subg_name]
         return subg:symbol_name(symbol_id)
     end
     function _M.class_slg.g1_symbol_name(slg, symbol_id)
-        return slg:lmg_symbol_name(symbol_id, 'g1')
+        return slg:lmg_symbol_name('g1', symbol_id)
     end
     function _M.class_slg.l0_symbol_name(slg, symbol_id)
-        return slg:lmg_symbol_name(symbol_id, 'l0')
+        return slg:lmg_symbol_name('l0', symbol_id)
     end
 
     function _M.class_slg.symbol_by_name(slg, xsy_name)
@@ -734,15 +734,15 @@ Lowest XSYID is 1.
         return slg:lmg_symbol_dsl_form(symbol_id, 'l0')
     end
 
-    function _M.class_slg.lmg_symbol_display_form(slg, symbol_id, subg_name)
+    function _M.class_slg.lmg_symbol_display_form(slg, subg_name, symbol_id)
         local subg = slg[subg_name]
         return subg:symbol_display_form(symbol_id)
     end
     function _M.class_slg.g1_symbol_display_form(slg, symbol_id)
-        return slg:lmg_symbol_display_form(symbol_id, 'g1')
+        return slg:lmg_symbol_display_form('g1', symbol_id)
     end
     function _M.class_slg.l0_symbol_display_form(slg, symbol_id)
-        return slg:lmg_symbol_display_form(symbol_id, 'l0')
+        return slg:lmg_symbol_display_form('l0', symbol_id)
     end
 
 ```
@@ -907,12 +907,12 @@ Lowest XSYID is 1.
             if verbose >= 3 then
                 local pcs2 = {}
                 pcs2[#pcs2+1] = '  Internal symbols:'
-                pcs2[#pcs2+1] = '<' .. slg:lmg_symbol_name(lhsid, subg_name) .. '>'
+                pcs2[#pcs2+1] = '<' .. slg:lmg_symbol_name(subg_name, lhsid) .. '>'
                 pcs2[#pcs2+1] = '::='
                 for ix = 0, rule_length - 1 do
                     pcs2[#pcs2+1]
                         = '<'
-                            ..  slg:lmg_symbol_name(rhsids[ix], subg_name)
+                            ..  slg:lmg_symbol_name(subg_name, rhsids[ix])
                             ..  '>'
                 end
                 pcs[#pcs+1] = table.concat(pcs2, ' ')
