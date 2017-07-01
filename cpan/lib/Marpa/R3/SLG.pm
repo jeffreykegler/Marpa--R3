@@ -1721,42 +1721,6 @@ sub Marpa::R3::Scanless::G::symbol_ids {
     return 1 .. $slg->highest_symbol_id();
 }
 
-# TODO: Document this!
-sub Marpa::R3::Scanless::G::g1_xsymbol_id {
-    my ( $slg, $symbol_id ) = @_;
-    my ($xsyid) = $slg->call_by_tag(
-    ('@' .__FILE__ . ':' . __LINE__),
-    <<'END_OF_LUA', 'i', $symbol_id ) ;
-    local slg, symbol_id = ...
-    return slg:g1_xsyid(symbol_id)
-END_OF_LUA
-    return $xsyid;
-}
-
-# TODO: Document this!
-sub Marpa::R3::Scanless::G::l0_xsymbol_id {
-    my ( $slg, $symbol_id ) = @_;
-    my ($xsyid) = $slg->call_by_tag(
-    ('@' .__FILE__ . ':' . __LINE__),
-    <<'END_OF_LUA', 'i', $symbol_id ) ;
-    local slg, symbol_id = ...
-    return slg:l0_xsyid(symbol_id)
-END_OF_LUA
-    return $xsyid;
-}
-
-# TODO: Document this!
-sub Marpa::R3::Scanless::G::symbol_name {
-    my ( $slg, $symbol_id ) = @_;
-    my ($symbol_name) = $slg->call_by_tag(
-        ('@' . __FILE__ . ':' .  __LINE__),
-      <<'END_OF_LUA', 'i', $symbol_id);
-    local slg, xsyid = ...
-    return slg:symbol_name(xsyid)
-END_OF_LUA
-    return $symbol_name;
-}
-
 our $kwgen_code_template = <<'END_OF_TEMPLATE';
 END_OF_TEMPLATE
 
@@ -1787,6 +1751,10 @@ kwgen(__LINE__, qw(lmg_start_symbol_id lmg_start_symbol_id i));
 kwgen(__LINE__, qw(g1_start_symbol_id g1_start_symbol_id), '');
 kwgen(__LINE__, qw(l0_start_symbol_id l0_start_symbol_id), '');
 
+kwgen(__LINE__, qw(g1_xsymbol_id g1_xsyid i));
+kwgen(__LINE__, qw(l0_xsymbol_id l0_xsyid i));
+
+kwgen(__LINE__, qw(symbol_name symbol_name i));
 kwgen(__LINE__, qw(lmg_symbol_name lmg_symbol_name si));
 kwgen(__LINE__, qw(g1_symbol_name g1_symbol_name i));
 kwgen(__LINE__, qw(l0_symbol_name l0_symbol_name i));
