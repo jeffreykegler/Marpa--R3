@@ -657,7 +657,7 @@ Display any XBNF
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slg.lmg_rule_to_xbnfid(slg, irlid, subg_name)
+    function _M.class_slg.lmg_rule_to_xbnfid(slg, subg_name, irlid)
         local subg = slg[subg_name]
         local irl = subg.irls[irlid]
         if not irl then
@@ -667,10 +667,10 @@ Display any XBNF
         if xbnf then return xbnf.id end
     end
     function _M.class_slg.g1_rule_to_xbnfid(slg, irlid)
-        return slg:lmg_rule_to_xbnfid(irlid, 'g1')
+        return slg:lmg_rule_to_xbnfid('g1', irlid)
     end
     function _M.class_slg.l0_rule_to_xbnfid(slg, irlid)
-        return slg:lmg_rule_to_xbnfid(irlid, 'l0')
+        return slg:lmg_rule_to_xbnfid('l0', irlid)
     end
 ```
 

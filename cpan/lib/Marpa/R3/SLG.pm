@@ -1814,6 +1814,10 @@ kwgen(__LINE__, qw(lmg_dotted_rule_show lmg_dotted_rule_show sii));
 kwgen(__LINE__, qw(g1_dotted_rule_show g1_dotted_rule_show ii));
 kwgen(__LINE__, qw(l0_dotted_rule_show l0_dotted_rule_show ii));
 
+kwgen(__LINE__, qw(lmg_rule_to_altid lmg_rule_to_xbnfid si));
+kwgen(__LINE__, qw(g1_rule_to_altid g1_rule_to_xbnfid i));
+kwgen(__LINE__, qw(l0_rule_to_altid l0_rule_to_xbnfid i));
+
 sub Marpa::R3::Scanless::G::call_by_tag {
     my ( $slg, $tag, $codestr, $sig, @args ) = @_;
     my $lua = $slg->[Marpa::R3::Internal::Scanless::G::L];
@@ -2040,39 +2044,6 @@ sub Marpa::R3::Scanless::G::alt_name {
     return slg:xbnf_name(altid)
 END_OF_LUA
     return $alt_name;
-}
-
-sub Marpa::R3::Scanless::G::lmg_rule_to_altid {
-    my ( $slg, $subg_name, $irlid ) = @_;
-    my ( $desc ) =
-      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 'si', $subg_name, $irlid );
-    local slg, subg_name, irlid = ...
-    return slg:lmg_rule_to_xbnfid(irlid, subg_name)
-END_OF_LUA
-    return $desc;
-}
-
-sub Marpa::R3::Scanless::G::g1_rule_to_altid {
-    my ( $slg, $irlid ) = @_;
-    my ( $desc ) =
-      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 'i', $irlid );
-    local slg, irlid = ...
-    return slg:g1_rule_to_xbnfid(irlid)
-END_OF_LUA
-    return $desc;
-}
-
-sub Marpa::R3::Scanless::G::l0_rule_to_altid {
-    my ( $slg, $irlid ) = @_;
-    my ( $desc ) =
-      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 'i', $irlid );
-    local slg, irlid = ...
-    return slg:l0_rule_to_xbnfid(irlid)
-END_OF_LUA
-    return $desc;
 }
 
 sub Marpa::R3::Scanless::G::g1_rule_expand {
