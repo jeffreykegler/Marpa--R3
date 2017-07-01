@@ -799,7 +799,7 @@ Lowest ISYID is 0.
         return slg:lmg_rule_show('l0', irlid)
     end
 
-    function _M.class_slg.lmg_rule_display(slg, irlid, subg_name)
+    function _M.class_slg.lmg_rule_display(slg, subg_name, irlid)
         local subg = slg[subg_name]
         local irl = subg.irls[irlid]
         if not irl then
@@ -812,10 +812,10 @@ Lowest ISYID is 0.
         return slg:lmg_rule_show(subg_name, irlid)
     end
     function _M.class_slg.g1_rule_display(slg, irlid)
-        return slg:lmg_rule_display(irlid, 'g1')
+        return slg:lmg_rule_display('g1', irlid)
     end
     function _M.class_slg.l0_rule_display(slg, irlid)
-        return slg:lmg_rule_display(irlid, 'l0')
+        return slg:lmg_rule_display('l0', irlid)
     end
 
     -- library IF
