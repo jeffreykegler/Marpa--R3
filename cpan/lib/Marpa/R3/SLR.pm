@@ -703,16 +703,25 @@ END_OF_LUA
 
 sub Marpa::R3::Scanless::R::terminals_expected {
     my ($slr)      = @_;
-    my $slg        = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my ($terminals_expected) = $slr->call_by_tag(
+    my ($results) = $slr->call_by_tag(
     ('@' . __FILE__ . ':' . __LINE__),
-    <<'END_OF_LUA', '>0');
-    local recce = ...
-    local terminals_expected = recce.g1:terminals_expected()
-    return terminals_expected
+    <<'END_OF_LUA', '');
+    local slr = ...
+    local slg = slr.slg
+    local g1g = slg.g1
+    local terminals_expected = slr.g1:terminals_expected()
+    local results = {}
+    for ix = 1, #terminals_expected do
+        local g1_symbol_id = terminals_expected[ix]
+        local xsy = g1g:_xsy(g1_symbol_id)
+        if xsy then
+            results[#results+1] = xsy.name
+        end
+    end
+    return results
 END_OF_LUA
 
-    return [ map { $slg->symbol_name($_) } @{$terminals_expected} ];
+    return $results;
 }
 
 sub Marpa::R3::Scanless::R::exhausted {
