@@ -681,11 +681,22 @@ but not limited to lmg_*(), *_name(), *_{dsl,display}_form()
 and eliminate the redundant ones.
 
 Lowest XSYID is 1.
+Lowest ISYID is 0.
 
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_slg.highest_symbol_id(slg)
         return #slg.xsys
+    end
+    function _M.class_slg.lmg_highest_symbol_id(slg, subg_name, symbol_id)
+        local subg = slg[subg_name]
+        return subg:highest_symbol_id();
+    end
+    function _M.class_slg.g1_highest_symbol_id(slg, symbol_id)
+        return slg:lmg_highest_symbol_id('g1', symbol_id)
+    end
+    function _M.class_slg.l0_highest_symbol_id(slg, symbol_id)
+        return slg:lmg_highest_symbol_id('l0', symbol_id)
     end
 ```
 

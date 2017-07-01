@@ -1716,17 +1716,6 @@ END_OF_LUA
 
 }
 
-sub Marpa::R3::Scanless::G::highest_symbol_id {
-    my ($slg) = @_;
-    my ($highest_symbol_id) =
-      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', '' );
-    local slg = ...
-    return slg:highest_symbol_id()
-END_OF_LUA
-    return $highest_symbol_id;
-}
-
 sub Marpa::R3::Scanless::G::symbol_ids {
     my ($slg) = @_;
     return 1 .. $slg->highest_symbol_id();
@@ -1800,15 +1789,23 @@ sub kwgen {
 # in pod and tests, and make sure that they are appropriate --
 # that is, that they should not be symbol_name() instead.
 
+kwgen(__LINE__, qw(highest_symbol_id highest_symbol_id), '');
+kwgen(__LINE__, qw(lmg_highest_symbol_id lmg_highest_symbol_id i));
+kwgen(__LINE__, qw(g1_highest_symbol_id g1_highest_symbol_id), '');
+kwgen(__LINE__, qw(l0_highest_symbol_id l0_highest_symbol_id), '');
+
 kwgen(__LINE__, qw(lmg_symbol_name lmg_symbol_name si));
 kwgen(__LINE__, qw(g1_symbol_name g1_symbol_name i));
 kwgen(__LINE__, qw(l0_symbol_name l0_symbol_name i));
+
 kwgen(__LINE__, qw(lmg_symbol_display_form lmg_symbol_display_form si));
 kwgen(__LINE__, qw(g1_symbol_display_form g1_symbol_display_form i));
 kwgen(__LINE__, qw(l0_symbol_display_form l0_symbol_display_form i));
+
 kwgen(__LINE__, qw(lmg_symbol_dsl_form lmg_symbol_dsl_form si));
 kwgen(__LINE__, qw(g1_symbol_dsl_form g1_symbol_dsl_form i));
 kwgen(__LINE__, qw(l0_symbol_dsl_form l0_symbol_dsl_form i));
+
 kwgen(__LINE__, qw(lmg_symbol_by_name lmg_symbol_by_name si));
 kwgen(__LINE__, qw(g1_symbol_by_name g1_symbol_by_name i));
 kwgen(__LINE__, qw(l0_symbol_by_name l0_symbol_by_name i));
