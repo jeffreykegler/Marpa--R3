@@ -805,7 +805,7 @@ Lowest ISYID is 0.
     end
 
     -- library IF
-    function _M.class_slg.lmg_dotted_rule_show(slg, irlid, dot_arg, subg_name)
+    function _M.class_slg.lmg_dotted_rule_show(slg, subg_name, irlid, dot_arg)
         local subg = slg[subg_name]
         local irl_isyids = subg:irl_isyids(irlid)
         if not irl_isyids then
@@ -847,11 +847,11 @@ Lowest ISYID is 0.
     end
     -- library IF
     function _M.class_slg.g1_dotted_rule_show(slg, irlid, dot)
-        return slg:lmg_dotted_rule_show(irlid, dot, 'g1')
+        return slg:lmg_dotted_rule_show('g1', irlid, dot)
     end
     -- library IF
     function _M.class_slg.l0_dotted_rule_show(slg, irlid, dot)
-        return slg:lmg_dotted_rule_show(irlid, dot, 'l0')
+        return slg:lmg_dotted_rule_show('l0', irlid, dot)
     end
 
     function _M.class_slg.lmg_rules_show(slg, subg_name, verbose)
