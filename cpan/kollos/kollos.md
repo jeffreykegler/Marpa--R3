@@ -688,15 +688,29 @@ Lowest ISYID is 0.
     function _M.class_slg.highest_symbol_id(slg)
         return #slg.xsys
     end
-    function _M.class_slg.lmg_highest_symbol_id(slg, subg_name, symbol_id)
+    function _M.class_slg.lmg_highest_symbol_id(slg, subg_name)
         local subg = slg[subg_name]
         return subg:highest_symbol_id();
     end
     function _M.class_slg.g1_highest_symbol_id(slg, symbol_id)
-        return slg:lmg_highest_symbol_id('g1', symbol_id)
+        return slg:lmg_highest_symbol_id('g1')
     end
     function _M.class_slg.l0_highest_symbol_id(slg, symbol_id)
-        return slg:lmg_highest_symbol_id('l0', symbol_id)
+        return slg:lmg_highest_symbol_id('l0')
+    end
+```
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slg.lmg_start_symbol_id(slg, subg_name)
+        local subg = slg[subg_name]
+        return subg:start_symbol();
+    end
+    function _M.class_slg.g1_start_symbol_id(slg)
+        return slg:lmg_start_symbol_id('g1')
+    end
+    function _M.class_slg.l0_start_symbol_id(slg)
+        return slg:lmg_start_symbol_id('l0')
     end
 ```
 

@@ -1721,17 +1721,6 @@ sub Marpa::R3::Scanless::G::symbol_ids {
     return 1 .. $slg->highest_symbol_id();
 }
 
-sub Marpa::R3::Scanless::G::g1_start_symbol_id {
-    my ( $slg ) = @_;
-    my ($start_symbol) = $slg->call_by_tag(
-    ('@' .__FILE__ . ':' . __LINE__),
-    <<'END_OF_LUA', '>*' ) ;
-    local slg = ...
-    return slg.g1:start_symbol()
-END_OF_LUA
-    return $start_symbol;
-}
-
 # TODO: Document this!
 sub Marpa::R3::Scanless::G::g1_xsymbol_id {
     my ( $slg, $symbol_id ) = @_;
@@ -1793,6 +1782,10 @@ kwgen(__LINE__, qw(highest_symbol_id highest_symbol_id), '');
 kwgen(__LINE__, qw(lmg_highest_symbol_id lmg_highest_symbol_id i));
 kwgen(__LINE__, qw(g1_highest_symbol_id g1_highest_symbol_id), '');
 kwgen(__LINE__, qw(l0_highest_symbol_id l0_highest_symbol_id), '');
+
+kwgen(__LINE__, qw(lmg_start_symbol_id lmg_start_symbol_id i));
+kwgen(__LINE__, qw(g1_start_symbol_id g1_start_symbol_id), '');
+kwgen(__LINE__, qw(l0_start_symbol_id l0_start_symbol_id), '');
 
 kwgen(__LINE__, qw(lmg_symbol_name lmg_symbol_name si));
 kwgen(__LINE__, qw(g1_symbol_name g1_symbol_name i));
