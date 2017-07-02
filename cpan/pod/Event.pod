@@ -1767,7 +1767,7 @@ normalize-whitespace: 1
 This example
 illustrates the AoA (Array Of Arrays)
 method of handling events
-that need to be processed is sets, grouped
+that need to be processed in sets, grouped
 by trigger location.
 The events are gathered into an array of arrays,
 and processed when the recognizer is finished.
