@@ -1738,6 +1738,20 @@ sub kwgen {
     use strict;
 }
 
+sub kwgen_arr {
+    my ($line, $perl_name, $kollos_name, $signature) = @_;
+    my $tag = '@' . __FILE__ . ':' .  $line;
+    my $code = sprintf( 'return _M.class_slg.%s(...)', $kollos_name );
+    no strict 'refs';
+    *{ 'Marpa::R3::Scanless::G::' . $perl_name }
+        = sub () {
+            my ($slg, @args) = @_;
+            my ($retour) = $slg->call_by_tag($tag, $code, $signature, @args);
+            return @{$retour};
+        };
+    use strict;
+}
+
 # TODO: Census all uses of Marpa::R3::Scanless::G::g1_symbol_name
 # in pod and tests, and make sure that they are appropriate --
 # that is, that they should not be symbol_name() instead.
@@ -1788,6 +1802,10 @@ kwgen(__LINE__, qw(alt_name xbnf_name i));
 kwgen(__LINE__, qw(lmg_rule_to_altid lmg_rule_to_xbnfid si));
 kwgen(__LINE__, qw(g1_rule_to_altid g1_rule_to_xbnfid i));
 kwgen(__LINE__, qw(l0_rule_to_altid l0_rule_to_xbnfid i));
+
+kwgen_arr(__LINE__, qw(lmg_rule_expand lmg_irl_isyids i));
+kwgen_arr(__LINE__, qw(g1_rule_expand g1_irl_isyids i));
+kwgen_arr(__LINE__, qw(l0_rule_expand l0_irl_isyids i));
 
 sub Marpa::R3::Scanless::G::call_by_tag {
     my ( $slg, $tag, $codestr, $sig, @args ) = @_;
@@ -2005,17 +2023,6 @@ sub Marpa::R3::Scanless::G::l0_symbol_ids {
     my ($slg) = @_;
     return $slg->lmg_symbol_ids('l0');
 }
-
-sub Marpa::R3::Scanless::G::g1_rule_expand {
-    my ( $slg, $rule_id ) = @_;
-    return $slg->g1_irl_isyids($rule_id);
-}
-
-sub Marpa::R3::Scanless::G::l0_rule_expand {
-    my ( $slg, $rule_id ) = @_;
-    return $slg->l0_irl_isyids($rule_id);
-}
-
 
 sub Marpa::R3::Scanless::G::lmg_rules_show {
     my ( $slg, $subg_name, $verbose ) = @_;

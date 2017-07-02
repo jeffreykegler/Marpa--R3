@@ -774,6 +774,34 @@ Lowest ISYID is 0.
 
 ```
     -- miranda: section+ most Lua function definitions
+    function _M.class_slg.lmg_xsyid(slg, subg_name, isy_key)
+        local subg = slg[subg_name]
+        return subg:xsyid(isy_key)
+    end
+    function _M.class_slg.g1_xsyid(slg, isy_key)
+        return slg:lmg_xsyid('g1', isy_key)
+    end
+    function _M.class_slg.l0_xsyid(slg, isy_key)
+        return slg:lmg_xsyid('l0', isy_key)
+    end
+```
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slg.lmg_irl_isyids(slg, subg_name, irlid)
+        local subg = slg[subg_name]
+        return subg:irl_isyids(irlid)
+    end
+    function _M.class_slg.g1_irl_isyids(slg, irlid)
+        return slg:lmg_irl_isyids('g1', irlid)
+    end
+    function _M.class_slg.l0_irl_isyids(slg, irlid)
+        return slg:lmg_irl_isyids('l0', irlid)
+    end
+```
+
+```
+    -- miranda: section+ most Lua function definitions
     function _M.class_slg.lmg_rule_show(slg, subg_name, irlid)
         local subg = slg[subg_name]
         local irl_isyids = subg:irl_isyids(irlid)
@@ -1260,16 +1288,6 @@ one for each subgrammar.
         slg.xbnfs = {}
         slg:xbnfs_subg_populate(source_hash, 'l0')
         return slg:xbnfs_subg_populate(source_hash, 'g1')
-    end
-```
-
-```
-    -- miranda: section+ most Lua function definitions
-    function _M.class_slg.g1_xsyid(slg, isy_key)
-        return slg.g1:xsyid(isy_key)
-    end
-    function _M.class_slg.l0_xsyid(slg, isy_key)
-        return slg.l0:xsyid(isy_key)
     end
 ```
 
@@ -5013,9 +5031,10 @@ TODO: Perhaps `isy_key` should also allow isy tables.
         return grammar.xsys[isy_key]
     end
     function _M.class_grammar.xsyid(grammar, isy_key)
-        local xsy = grammar:xsy(isy_key)
+        local xsy = grammar:_xsy(isy_key)
         if not xsy then
-            _M.userX(
+            _M._internal_error(
+            -- _M.userX(
                "grammar:xsyid(%s): no such xsy",
                inspect(isy_key))
         end
