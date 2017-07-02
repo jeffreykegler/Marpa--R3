@@ -10606,6 +10606,10 @@ $hashed_metag = {
                                               'dsl_form' => 'Perl name',
                                               'name_source' => 'lexical'
                                             },
+                             '[:discard:]' => {
+                                                'dsl_form' => '[:discard:]',
+                                                'name_source' => 'internal'
+                                              },
                              '[:start:]' => {
                                               'dsl_form' => '[:start:]',
                                               'name_source' => 'internal'

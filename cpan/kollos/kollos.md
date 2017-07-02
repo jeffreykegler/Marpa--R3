@@ -614,7 +614,7 @@ Display any XBNF
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slg.xbnf_display(slg, xbnf)
+    function _M.class_slg.xbnf_display_o(slg, xbnf)
         local pieces = {}
         pieces[#pieces+1]
             = xbnf.lhs:display_form()
@@ -631,11 +631,85 @@ Display any XBNF
         end
         return table.concat(pieces, ' ')
     end
+    function _M.class_slg.xbnf_display(slg, xbnfid)
+        local xbnfs = slg.xbnfs
+        local xbnf = xbnfs[xbnfid]
+        return slg:xbnf_display_o(xbnf)
+    end
 ```
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slg.last_xbnfid(slg)
+    function _M.class_slg.xbnfs_show(slg, verbose)
+        verbose = verbose or 0
+        local xbnfs = slg.xbnfs
+        local pcs = {}
+        for xbnfid = 1, slg:highest_xbnfid() do
+            local xbnf = xbnfs[xbnfid]
+
+            local pcs2 = {}
+            pcs2[#pcs2+1] = 'R' .. xbnfid
+            pcs2[#pcs2+1] = slg:xbnf_display(xbnfid)
+            pcs[#pcs+1] = table.concat(pcs2, ' ')
+            pcs[#pcs+1] = "\n"
+
+            local lhsid
+            local rhsids = {}
+            local xbnf_length
+            if verbose >= 2 then
+                lhsid = xbnf.lhs.id
+                rhsids = {}
+                xbnf_length = #xbnf.rhs
+                local comments = {}
+                if xbnf_length == 0 then
+                    comments[#comments+1] = 'empty'
+                end
+                if xbnf.discard_separation then
+                    comments[#comments+1] = 'discard_sep'
+                end
+                if #comments > 0 then
+                    local pcs3 = {}
+                    for ix = 1, #comments do
+                        pcs3[#pcs3+1] = "/*" .. comments[ix] .. "*/"
+                    end
+                    pcs[#pcs+1] = table.concat(pcs3, ' ')
+                    pcs[#pcs+1] = "\n"
+                end
+                pcs2 = {}
+                pcs2[#pcs2+1] = '  Symbol IDs:'
+                for ix = 0, xbnf_length - 1 do
+                   rhsids[ix] = xbnf.rhs[ix].id
+                end
+                pcs2[#pcs2+1] = '<' .. lhsid .. '>'
+                pcs2[#pcs2+1] = '::='
+                for ix = 0, xbnf_length - 1 do
+                    pcs2[#pcs2+1] = '<' .. rhsids[ix] .. '>'
+                end
+                pcs[#pcs+1] = table.concat(pcs2, ' ')
+                pcs[#pcs+1] = "\n"
+            end
+            if verbose >= 3 then
+                local pcs2 = {}
+                pcs2[#pcs2+1] = '  Internal symbols:'
+                pcs2[#pcs2+1] = '<' .. slg:symbol_name(lhsid) .. '>'
+                pcs2[#pcs2+1] = '::='
+                for ix = 0, xbnf_length - 1 do
+                    pcs2[#pcs2+1]
+                        = '<'
+                            ..  slg:symbol_name(rhsids[ix])
+                            ..  '>'
+                end
+                pcs[#pcs+1] = table.concat(pcs2, ' ')
+                pcs[#pcs+1] = "\n"
+            end
+        end
+        return table.concat(pcs)
+    end
+```
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slg.highest_xbnfid(slg)
         return #slg.xbnfs
     end
 ```
@@ -835,7 +909,7 @@ Lowest ISYID is 0.
         end
         local xbnf = irl.xbnf
         if xbnf then
-             return slg:xbnf_display(xbnf)
+             return slg:xbnf_display_o(xbnf)
         end
         return slg:lmg_rule_show(subg_name, irlid)
     end
@@ -898,7 +972,7 @@ Lowest ISYID is 0.
 
     function _M.class_slg.lmg_rules_show(slg, subg_name, verbose)
         verbose = verbose or 0
-        local lmw_g = slg[subg_name].lmw_g
+        local lmw_g = slg[subg_name]
         local pcs = {}
         for irlid = 0, lmw_g:highest_rule_id() do
 
@@ -1438,7 +1512,6 @@ together.
 
         local g_l0_rules = slg.l0.irls
         local r_l0_rules = slr.l0_irls
-        -- print('g_l0_rules: ', inspect(g_l0_rules))
         local max_l0_rule_id = l0g:highest_rule_id()
         for rule_id = 0, max_l0_rule_id do
             local r_l0_rule = {}
@@ -1450,7 +1523,6 @@ together.
             end
             r_l0_rules[rule_id] = r_l0_rule
         end
-        -- print('r_l0_rules: ', inspect(r_l0_rules))
         local g_g1_symbols = slg.g1.isys
         local r_g1_symbols = slr.g1_isys
         local max_g1_symbol_id = g1g:highest_symbol_id()
@@ -2308,7 +2380,6 @@ Read alternatives into the G1 grammar.
             local kollos = getmetatable(g1r).kollos
             local value_is_literal = _M.defines.TOKEN_VALUE_IS_LITERAL
             local return_value = g1r:alternative(g1_lexeme, value_is_literal, 1)
-            -- print('return value = ', inspect(return_value))
             if return_value == _M.err.UNEXPECTED_TOKEN_ID then
                 error('Internal error: Marpa rejected expected token')
             end
@@ -4404,7 +4475,6 @@ is zero.
             end
             postdot_symbol_id = lmw_r:_next_postdot_item_trace()
         end
-        -- print('earley_set_data() ->', inspect(data))
         return data
     end
 
@@ -4495,8 +4565,6 @@ is zero.
              escapes[#escapes+1] = escape
         end
 
-             -- print(inspect(escapes))
-
         -- trailing spaces get special treatment
         for i = #escapes, 1, -1 do
             if escapes[i] ~= ' ' then break end
@@ -4505,8 +4573,6 @@ is zero.
             length_so_far = length_so_far + 1
         end
 
-             -- print(inspect(escapes))
-
         -- trim back to adjust for escaped trailing spaces
         for i = #escapes, 1, -1 do
              -- print(length_so_far, max_length)
@@ -4514,8 +4580,6 @@ is zero.
             escapes[i] = ''
             length_so_far = length_so_far - 2
         end
-
-             -- print(inspect(escapes))
 
         return table.concat(escapes)
     end
@@ -5297,7 +5361,6 @@ It should free all memory associated with the valuation.
                 table.concat(desc)
             }
         end
-        -- print('data:', inspect(data))
 
         table.sort(data, _M.cmp_seq)
         local result = {}

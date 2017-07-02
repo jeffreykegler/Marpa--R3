@@ -1176,9 +1176,14 @@ sub Marpa::R3::Internal::MetaAST_Nodes::discard_rule::evaluate {
     my ( $start, $length, $symbol, $raw_adverb_list ) = @{$values};
 
     local $Marpa::R3::Internal::SUBGRAMMAR = 'l0';
-    my $pseudo_lhs = '[:discard:]';
+    my $discard_lhs = '[:discard:]';
+    my $symbol_data = {
+        dsl_form    => $discard_lhs,
+        name_source => 'internal',
+    };
+    $parse->xsy_create( $discard_lhs, $symbol_data );
     $parse->symbol_names_set(
-        $pseudo_lhs,
+        $discard_lhs,
         'l0',
         {   # description  => qq{Internal LHS for lexer discard}
         }
@@ -1210,7 +1215,7 @@ sub Marpa::R3::Internal::MetaAST_Nodes::discard_rule::evaluate {
 
     # Discard rule
     my %rule_hash = (
-        lhs => $pseudo_lhs,
+        lhs => $discard_lhs,
         rhs => [$discard_symbol],
         start => $start,
         length => $length,

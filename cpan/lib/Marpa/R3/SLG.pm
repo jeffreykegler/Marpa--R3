@@ -359,12 +359,10 @@ END_OF_LUA
             local event_by_isy = {}
             local event_by_name = {}
             for isy_name, event in pairs(events) do
-                -- print(inspect(event))
                 local event_name = event[1]
                 local is_active = (event[2] ~= "0")
                 local isyid = g1g.isyid_by_name[isy_name]
                 if not isyid then
-                    -- print(inspect(g1g.isyid_by_name))
                     error(string.format(
                         "Event defined for non-existent symbol: %s\n",
                         isy_name
@@ -946,7 +944,6 @@ END_OF_LUA
         <<'END_OF_LUA', 'is', $lexer_rule_id, $discard_event );
         local slg, lexer_rule_id, discard_event = ...
         if discard_event then
-            -- print(inspect(discard_event))
             local event_name = discard_event[1]
             local is_active = discard_event[2] == "1"
             local l0_rules = slg.l0.irls
@@ -1440,7 +1437,6 @@ END_OF_LUA
     -- once refactoring is complete?
     _M.throw = false
     local base_irl_id = g.g1:rule_new(rule)
-    -- print('base_irl_id: ', inspect(base_irl_id))
     _M.throw = true
     if not base_irl_id or base_irl_id < 0 then return -1 end
     g.g1.irls[base_irl_id] = { id = base_irl_id }
@@ -1474,7 +1470,6 @@ END_OF_LUA
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'i', $arg_hash);
     local g, arg_hash = ...
-    -- print('arg_hash: ', inspect(arg_hash))
     arg_hash.proper = (arg_hash.proper ~= 0)
     _M.throw = false
     local base_irl_id = g.g1:sequence_new(arg_hash)
@@ -1621,7 +1616,6 @@ END_OF_LUA
     -- once refactoring is complete?
     _M.throw = false
     local base_irl_id = g.l0:rule_new(rule)
-    -- print('base_irl_id: ', inspect(base_irl_id))
     _M.throw = true
     if not base_irl_id or base_irl_id < 0 then return -1 end
     g.l0.irls[base_irl_id] = { id = base_irl_id }
@@ -1656,7 +1650,6 @@ END_OF_LUA
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'i', $arg_hash);
     local g, arg_hash = ...
-    -- print('arg_hash: ', inspect(arg_hash))
     arg_hash.proper = (arg_hash.proper ~= 0)
     _M.throw = false
     local base_irl_id = g.l0:sequence_new(arg_hash)
@@ -1802,6 +1795,8 @@ kwgen(__LINE__, qw(alt_name xbnf_name i));
 kwgen(__LINE__, qw(lmg_rule_to_altid lmg_rule_to_xbnfid si));
 kwgen(__LINE__, qw(g1_rule_to_altid g1_rule_to_xbnfid i));
 kwgen(__LINE__, qw(l0_rule_to_altid l0_rule_to_xbnfid i));
+
+kwgen(__LINE__, qw(highest_altid highest_xbnfid), '');
 
 kwgen_arr(__LINE__, qw(lmg_rule_expand lmg_irl_isyids i));
 kwgen_arr(__LINE__, qw(g1_rule_expand g1_irl_isyids i));
@@ -2024,6 +2019,17 @@ sub Marpa::R3::Scanless::G::l0_symbol_ids {
     return $slg->lmg_symbol_ids('l0');
 }
 
+sub Marpa::R3::Scanless::G::rules_show {
+    my ( $slg, $verbose ) = @_;
+    my ( $desc ) =
+      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 'i', $verbose);
+    local slg, verbose = ...
+    return slg:xbnfs_show(verbose)
+END_OF_LUA
+    return $desc;
+}
+
 sub Marpa::R3::Scanless::G::lmg_rules_show {
     my ( $slg, $subg_name, $verbose ) = @_;
     my ( $desc ) =
@@ -2061,14 +2067,7 @@ END_OF_LUA
 # TODO -- Will I guarantee this?
 sub Marpa::R3::Scanless::G::alt_ids {
     my ($slg) = @_;
-    my ($last_alt_id) = $slg->call_by_tag(
-    ('@' .__FILE__ . ':' . __LINE__),
-    <<'END_OF_LUA', '' ) ;
-    local slg = ...
-    return slg:last_xbnfid()
-END_OF_LUA
-
-    return 1 .. $last_alt_id;
+    return 1 .. $slg->highest_altid();
 }
 
 # Currently there are no gaps in the rule ids.
@@ -2126,7 +2125,7 @@ sub Marpa::R3::Scanless::G::show_nrls {
     my ($result) =
       $slg->call_by_tag(
         ('@' . __FILE__ . ':' .  __LINE__),
-	<<'END_OF_LUA', '' );
+        <<'END_OF_LUA', '' );
     local grammar = ...
     local g1g = grammar.g1
     local nrl_count = g1g:_irl_count()
@@ -2146,7 +2145,7 @@ sub Marpa::R3::Scanless::G::show_nsys {
     my ($result) =
       $slg->call_by_tag(
         ('@' . __FILE__ . ':' .  __LINE__),
-	<<'END_OF_LUA', '' );
+        <<'END_OF_LUA', '' );
     local grammar = ...
     local g1g = grammar.g1
     local nsy_count = g1g:_nsy_count()
@@ -2165,7 +2164,7 @@ sub Marpa::R3::Scanless::G::show_ahms {
 
     my ($text) = $slg->call_by_tag(
         ('@' . __FILE__ . ':' .  __LINE__),
-	<<'END_OF_LUA', '' );
+        <<'END_OF_LUA', '' );
     local grammar = ...
     local g1g = grammar.g1
     return g1g:show_ahms()
@@ -2181,7 +2180,7 @@ sub Marpa::R3::Scanless::G::dotted_nrl_show {
     my ($result) =
       $slg->call_by_tag(
         ('@' . __FILE__ . ':' .  __LINE__),
-	<<'END_OF_LUA', 'ii', $nrl_id, $dot_position );
+        <<'END_OF_LUA', 'ii', $nrl_id, $dot_position );
     local grammar, nrl_id, dot_position = ...
     local g1g = grammar.g1
     return g1g:_dotted_nrl_show(nrl_id, dot_position)
@@ -2195,7 +2194,7 @@ sub Marpa::R3::Scanless::G::show_briefer_ahm {
 
     my ($text) = $slg->call_by_tag(
         ('@' . __FILE__ . ':' .  __LINE__),
-	<<'END_OF_LUA', 'i', $item_id );
+        <<'END_OF_LUA', 'i', $item_id );
     local grammar, item_id = ...
     local g1g = grammar.g1
     local irl_id = g1g:_ahm_irl(item_id)
