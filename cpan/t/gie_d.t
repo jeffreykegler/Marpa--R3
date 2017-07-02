@@ -319,9 +319,9 @@ END_OF_TEXT
         'per-location, using pause' );
 }
 
-## Per-location processing, using array
+## Per-location processing, using AoA
 # Marpa::R3::Display
-# name: event examples - per-location processing, using array
+# name: event examples - per-location processing, using AoA
 
 @results = ();
 $recce = Marpa::R3::Scanless::R->new(
@@ -329,9 +329,9 @@ $recce = Marpa::R3::Scanless::R->new(
         grammar        => $grammar4,
         event_handlers => {
             "'default" => sub () {
-                my ( $slr, $event_name ) = @_;
+                my ( $slr, @event_data ) = @_;
                 my $pos = $slr->pos();
-                $results[$pos]{$event_name} = 1;
+                push @{$results[$pos]}, \@event_data;
                 'ok';
             },
         }
@@ -345,9 +345,11 @@ $recce = Marpa::R3::Scanless::R->new(
     $recce->read( \$input );
     my @events_by_pos = ();
     for (my $ix = 0; $ix <= $#results; $ix++) {
-        my @these_events = keys %{$results[$ix]};
-        push @events_by_pos, "$ix " . join q{ }, sort @these_events
-           if @these_events;
+        my $these_events = $results[$ix];
+        if ($these_events) {
+            my @event_names = sort map { $_->[0] } @{$these_events};
+            push @events_by_pos, "$ix " . join q{ }, @event_names;
+       }
     }
     my $actual_history = join "\n", @events_by_pos, q{};
 

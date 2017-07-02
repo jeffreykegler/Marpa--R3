@@ -1705,16 +1705,18 @@ There are two ways to do this.
 
 =over 4
 
-=item * Return C<'pause'> from any of the event
+=item * B<Pause> method:
+Return C<'pause'> from any of the event
 handlers at I<pos>.
 The recognizer will return control to the app
 once all processing at I<pos> is complete,
 and the app can do as it wishes.
 
-=item * Store the data for the event in
-an array indexed by I<pos>,
+=item * B<AoA> method:
+Store the data for the event in
+an AoA (array of arrays) indexed by I<pos>,
 and process the events later,
-from the array.
+from the AoA.
 
 =back
 
@@ -1760,22 +1762,23 @@ normalize-whitespace: 1
 
 =for Marpa::R3::Display::End
 
-=head2 Per-location event processing, using an array
+=head2 Per-location event processing, using an AoA
 
 This example
-illustrates the "array" method of handling events
-which need to be processed together in groups,
-based on their trigger location.
-The events are gathered into an array,
+illustrates the AoA (Array Of Arrays)
+method of handling events
+that need to be processed is sets, grouped
+by trigger location.
+The events are gathered into an array of arrays,
 and processed when the recognizer is finished.
 
 The previous example illustrated the more powerful
 and general "pause" method.
-The "array" method can be more elegant,
+The AoA method can be more elegant,
 and is powerful enough for many cases.
 
 =for Marpa::R3::Display
-name: event examples - per-location processing, using array
+name: event examples - per-location processing, using AoA
 normalize-whitespace: 1
 
     @results = ();
@@ -1784,9 +1787,9 @@ normalize-whitespace: 1
             grammar        => $grammar4,
             event_handlers => {
                 "'default" => sub () {
-                    my ( $slr, $event_name ) = @_;
+                    my ( $slr, @event_data ) = @_;
                     my $pos = $slr->pos();
-                    $results[$pos]{$event_name} = 1;
+                    push @{$results[$pos]}, \@event_data;
                     'ok';
                 },
             }
