@@ -143,7 +143,7 @@ sub gen_app_event_handler {
 
         RETOUR_CHECK: {
             if ($retour eq 'ok') {
-                if ($event_type eq 'lexeme before') {
+                if ($event_type eq 'before lexeme') {
                     Marpa::R3::exception(
                         qq{Bad return from event handler for event "$event_name"\n},
                         qq{  Event type was "$event_type"\n},
