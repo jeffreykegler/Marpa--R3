@@ -111,7 +111,7 @@ sub gen_app_event_handler {
     my $event_handlers =
       $slr->[Marpa::R3::Internal::Scanless::R::EVENT_HANDLERS];
     return sub {
-        my ( $event_name, @data ) = @_;
+        my ( $event_type, $event_name, @data ) = @_;
         my $current_event =
           $slr->[Marpa::R3::Internal::Scanless::R::CURRENT_EVENT];
         if ($current_event) {
@@ -140,14 +140,28 @@ sub gen_app_event_handler {
         }
         $slr->[Marpa::R3::Internal::Scanless::R::CURRENT_EVENT] = $event_name;
         my $retour = $handler->( $slr, $event_name, @data ) // 'ok';
-        $slr->[Marpa::R3::Internal::Scanless::R::CURRENT_EVENT] = undef;
-        if ( $retour ne 'ok' and $retour ne 'pause' ) {
+
+        RETOUR_CHECK: {
+            if ($retour eq 'ok') {
+                if ($event_type eq 'lexeme before') {
+                    Marpa::R3::exception(
+                        qq{Bad return from event handler for event "$event_name"\n},
+                        qq{  Event type was "$event_type"\n},
+                        qq{  Return from handler was "$retour"\n},
+                        qq{  A handler of type "$event_type" must return "pause"\n},
+                    );
+                }
+                last RETOUR_CHECK;
+            }
+            last RETOUR_CHECK if $retour eq 'pause';
             Marpa::R3::exception(
                 qq{Bad return from event handler for event "$event_name"\n},
+                qq{  Event type was "$event_type"\n},
                 qq{  Return from handler was "$retour"\n},
                 qq{  Handler must return "ok" or "pause"\n},
             );
         }
+        $slr->[Marpa::R3::Internal::Scanless::R::CURRENT_EVENT] = undef;
         return 'ok', $retour;
     };
 }

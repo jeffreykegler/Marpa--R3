@@ -3279,12 +3279,12 @@ Caller must ensure `block` and `pos` are valid.
             local event_type = event[1]
 
             if event_type == "'exhausted" then
-                local yield_result = coroutine.yield ( 'event', event_type )
+                local yield_result = coroutine.yield ( 'event', event_type, event_type )
                 pause = pause or yield_result == 'pause'
             end
 
             if event_type == "'rejected" then
-                local yield_result = coroutine.yield ( 'event', event_type )
+                local yield_result = coroutine.yield ( 'event', event_type, event_type )
                 pause = pause or yield_result == 'pause'
             end
 
@@ -3295,7 +3295,7 @@ Caller must ensure `block` and `pos` are valid.
                 local completed_isyid = event[2]
                 local slg = slr.slg
                 local event_name = slg.completion_event_by_isy[completed_isyid].name
-                local yield_result = coroutine.yield ( 'event', event_name )
+                local yield_result = coroutine.yield ( 'event', event_type, event_name )
                 pause = pause or yield_result == 'pause'
             end
 
@@ -3303,7 +3303,7 @@ Caller must ensure `block` and `pos` are valid.
                 local nulled_isyid = event[2]
                 local slg = slr.slg
                 local event_name = slg.nulled_event_by_isy[nulled_isyid].name
-                local yield_result = coroutine.yield ( 'event', event_name )
+                local yield_result = coroutine.yield ( 'event', event_type, event_name )
                 pause = pause or yield_result == 'pause'
             end
 
@@ -3311,7 +3311,7 @@ Caller must ensure `block` and `pos` are valid.
                 local predicted_isyid = event[2]
                 local slg = slr.slg
                 local event_name = slg.prediction_event_by_isy[predicted_isyid].name
-                local yield_result = coroutine.yield ( 'event', event_name )
+                local yield_result = coroutine.yield ( 'event', event_type, event_name )
                 pause = pause or yield_result == 'pause'
             end
 
@@ -3325,9 +3325,8 @@ Caller must ensure `block` and `pos` are valid.
                 -- there must be an XSY
                 local lexeme_xsy = g1g:_xsy(lexeme_isyid)
                 local lexeme_xsyid = lexeme_xsy.id
-                local yield_result = coroutine.yield ( 'event', event_name,
-                    lexeme_xsyid,
-                    table.unpack(event, 3) )
+                local yield_result = coroutine.yield ( 'event', event_type,
+                    event_name, lexeme_xsyid, table.unpack(event, 3) )
                 pause = pause or yield_result == 'pause'
             end
 
@@ -3341,7 +3340,8 @@ Caller must ensure `block` and `pos` are valid.
                 for ix = 4, #event do
                     new_event[#new_event+1] = event[ix]
                 end
-                local yield_result = coroutine.yield( 'event', event_name, table.unpack(event, 3) )
+                local yield_result = coroutine.yield( 'event', event_type,
+                    event_name, table.unpack(event, 3) )
                 pause = pause or yield_result == 'pause'
             end
         end
