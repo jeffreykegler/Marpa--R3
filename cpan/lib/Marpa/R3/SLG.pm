@@ -1721,6 +1721,7 @@ sub kwgen {
     my ($line, $perl_name, $kollos_name, $signature) = @_;
     my $tag = '@' . __FILE__ . ':' .  $line;
     my $code = sprintf( 'return _M.class_slg.%s(...)', $kollos_name );
+    # my $code = sprintf( 'io.stderr:write("Calling slg.%s ", table.concat(..., "")); return _M.class_slg.%s(...)', $kollos_name, $kollos_name );
     no strict 'refs';
     *{ 'Marpa::R3::Scanless::G::' . $perl_name }
         = sub () {
@@ -1735,6 +1736,7 @@ sub kwgen_arr {
     my ($line, $perl_name, $kollos_name, $signature) = @_;
     my $tag = '@' . __FILE__ . ':' .  $line;
     my $code = sprintf( 'return _M.class_slg.%s(...)', $kollos_name );
+    # my $code = sprintf( 'io.stderr:write("Calling slg.%s ", table.concat(..., "")); return _M.class_slg.%s(...)', $kollos_name, $kollos_name );
     no strict 'refs';
     *{ 'Marpa::R3::Scanless::G::' . $perl_name }
         = sub () {
@@ -1766,6 +1768,7 @@ kwgen(__LINE__, qw(lmg_symbol_name lmg_symbol_name si));
 kwgen(__LINE__, qw(g1_symbol_name g1_symbol_name i));
 kwgen(__LINE__, qw(l0_symbol_name l0_symbol_name i));
 
+kwgen(__LINE__, qw(symbol_display_form symbol_display_form i));
 kwgen(__LINE__, qw(lmg_symbol_display_form lmg_symbol_display_form si));
 kwgen(__LINE__, qw(g1_symbol_display_form g1_symbol_display_form i));
 kwgen(__LINE__, qw(l0_symbol_display_form l0_symbol_display_form i));
@@ -1798,7 +1801,8 @@ kwgen(__LINE__, qw(l0_rule_to_altid l0_rule_to_xbnfid i));
 
 kwgen(__LINE__, qw(highest_altid highest_xbnfid), '');
 
-kwgen_arr(__LINE__, qw(lmg_rule_expand lmg_irl_isyids i));
+kwgen_arr(__LINE__, qw(rule_expand xbnf_expand i));
+kwgen_arr(__LINE__, qw(lmg_rule_expand lmg_irl_isyids si));
 kwgen_arr(__LINE__, qw(g1_rule_expand g1_irl_isyids i));
 kwgen_arr(__LINE__, qw(l0_rule_expand l0_irl_isyids i));
 
@@ -1818,7 +1822,9 @@ sub Marpa::R3::Scanless::G::call_by_tag {
     {
         local $@;
         $eval_ok = eval {
+            # say STDERR "About to call_by_tag($regix, $tag, $codestr, $sig, @args)";;
             @results = $lua->call_by_tag($regix, $tag, $codestr, $sig, @args);
+            # say STDERR "Returned from call_by_tag($regix, $tag, $codestr, $sig, @args)";;
             return 1;
         };
         $eval_error = $@;

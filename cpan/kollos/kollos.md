@@ -641,6 +641,30 @@ Display any XBNF
 
 ```
     -- miranda: section+ most Lua function definitions
+    function _M.class_slg.xbnf_expand_o(slg, xbnf)
+        local xsys = { xbnf.lhs.id }
+        local rhs = xbnf.rhs
+        for ix = 1, #rhs do
+            local xsyid = rhs[ix].id
+            xsys[#xsys+1] = xsyid
+        end
+        return xsys
+    end
+    function _M.class_slg.xbnf_expand(slg, xbnfid)
+        local xbnfs = slg.xbnfs
+        local xbnf = xbnfs[xbnfid]
+        if not xbnf then
+            _M.userX(
+                "xbnf_expand(): %s is not a valid irlid",
+                inspect(xbnfid)
+            )
+        end
+        return slg:xbnf_expand_o(xbnf)
+    end
+```
+
+```
+    -- miranda: section+ most Lua function definitions
     function _M.class_slg.xbnfs_show(slg, verbose)
         verbose = verbose or 0
         local xbnfs = slg.xbnfs
@@ -844,6 +868,16 @@ Lowest ISYID is 0.
         return slg:lmg_symbol_dsl_form('l0', symbol_id)
     end
 
+    function _M.class_slg.symbol_display_form(slg, xsyid)
+        local xsy = slg.xsys[xsyid]
+        if not xsy then
+            _M.userX(
+                "slg.symbol_display_form(): %s is not a valid xsyid",
+                inspect(xsyid)
+            )
+        end
+        return xsy:display_form();
+    end
     function _M.class_slg.lmg_symbol_display_form(slg, subg_name, symbol_id)
         local subg = slg[subg_name]
         return subg:symbol_display_form(symbol_id)

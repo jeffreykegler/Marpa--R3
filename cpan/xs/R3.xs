@@ -1401,8 +1401,7 @@ PPCODE:
     int type;
 
     /* warn("%s %d is_method=%ld lua_ref=%ld", __FILE__, __LINE__,
-     *  (long)is_method, (long)lua_ref);
-     */
+       (long)is_method, (long)lua_ref); */
 
     marpa_lua_pushcfunction(L, glue_msghandler);
     msghandler_ix = marpa_lua_gettop(L);
@@ -1475,6 +1474,7 @@ PPCODE:
         }
       endargs:;
 
+       /* warn("%s %d", __FILE__, __LINE__); */
        arg_count = marpa_lua_gettop(L) - function_stack_ix;
 
        if (arg_count - is_method != args_supplied) {

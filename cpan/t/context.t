@@ -37,12 +37,12 @@ my $trace_rules = q{};
 
 sub no_bail {
     my ($action_object) = @_;
-    my $rule_id         = $Marpa::R3::Context::rule;
+    my $altid           = $Marpa::R3::Context::altid;
     my $slg             = $Marpa::R3::Context::slg;
     my ( $lhs, @rhs ) =
-      map { $slg->g1_symbol_name($_) } $slg->g1_rule_expand($rule_id);
+      map { $slg->symbol_name($_) } $slg->rule_expand($altid);
     $action_object->{text} =
-        "rule $rule_id: $lhs ::= "
+        "rule $altid: $lhs ::= "
       . ( join q{ }, @rhs ) . "\n"
       . "locations: "
       . ( join q{-}, Marpa::R3::Context::g1_range() ) . "\n";
@@ -101,7 +101,7 @@ VALUE_TEST: {
             qq{Parse value ref type is "$ref_type"; it needs to be "HASH"});
         last VALUE_TEST;
     } ## end if ( ref $value ne 'HASH' )
-    my $expected_text = qq{rule 0: S ::= A B C D\nlocations: 0-4\n};
+    my $expected_text = qq{rule 2: S ::= A B C D\nlocations: 0-4\n};
     Test::More::is( $value->{text}, $expected_text, 'Parse ok?' );
 } ## end VALUE_TEST:
 

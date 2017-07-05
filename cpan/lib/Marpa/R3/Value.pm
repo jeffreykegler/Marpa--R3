@@ -1523,6 +1523,7 @@ END_OF_LUA
     return if not defined $result;
 
     local $Marpa::R3::Context::rule = undef;
+    local $Marpa::R3::Context::irlid = undef;
     local $Marpa::R3::Context::slr  = $slr;
     local $Marpa::R3::Context::slg =
       $slr->[Marpa::R3::Internal::Scanless::R::SLG];
@@ -1635,7 +1636,9 @@ END_OF_LUA
                 };
 
                 $eval_ok = eval {
-                    local $Marpa::R3::Context::rule = $null_values->[$token_id];
+                    my $irlid = $null_values->[$token_id];
+                    local $Marpa::R3::Context::irlid = $irlid;
+                    local $Marpa::R3::Context::altid = $slg->g1_rule_to_altid($irlid);
                     $result = $value_ref->( $semantics_arg0, [] );
                     1;
                 };
@@ -1674,8 +1677,8 @@ END_OF_LUA
         } ## end if ( $value_type eq 'MARPA_STEP_NULLING_SYMBOL' )
 
         if ( $value_type eq 'MARPA_STEP_RULE' ) {
-            my ( $rule_id, $values ) = @value_data;
-            my $closure = $rule_closures->[$rule_id];
+            my ( $irlid, $values ) = @value_data;
+            my $closure = $rule_closures->[$irlid];
 
             next STEP if not defined $closure;
             my $result;
@@ -1686,7 +1689,8 @@ END_OF_LUA
                 local $SIG{__WARN__} = sub {
                     push @warnings, [ $_[0], ( caller 0 ) ];
                 };
-                local $Marpa::R3::Context::rule = $rule_id;
+                local $Marpa::R3::Context::irlid = $irlid;
+                local $Marpa::R3::Context::altid = $slg->g1_rule_to_altid($irlid);
 
                 # say STDERR "Before tree ops: ", Data::Dumper::Dumper($values);
                 $values = do_tree_ops( $slr, $values );
@@ -1707,7 +1711,7 @@ END_OF_LUA
                             warnings    => \@warnings,
                             where       => 'computing value',
                             long_where  => 'Computing value for rule: '
-                              . $slg->g1_rule_display($rule_id),
+                              . $slg->g1_rule_display($irlid),
                         }
                     );
                 } ## end if ( not $eval_ok or @warnings )
@@ -1728,7 +1732,7 @@ END_OF_LUA
 
             if ($trace_values) {
                 say {$trace_file_handle}
-                  trace_stack_1( $slr, $values, $rule_id )
+                  trace_stack_1( $slr, $values, $irlid )
                   or Marpa::R3::exception('Could not print to trace file');
                 print {$trace_file_handle}
                   'Calculated and pushed value: ',
