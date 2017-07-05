@@ -10,12 +10,11 @@
 # or implied warranties. For details, see the full text of
 # of the licenses in the directory LICENSES.
 
-# CENSUS: ASIS
-# Note: Converted from sl_context.t
+# Converted from Marpa::R2 sl_context.t
 
 # Test of bail() and context variables in SLIF semantics
 
-# MITOSIS: TODO
+# MITOSIS: FINISHED
 
 use 5.010001;
 use strict;
