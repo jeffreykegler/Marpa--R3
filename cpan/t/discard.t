@@ -12,6 +12,8 @@
 
 # Example of use of discard events
 
+# MITOSIS: TODO
+
 use 5.010001;
 use strict;
 use warnings;

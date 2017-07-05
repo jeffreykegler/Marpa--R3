@@ -12,6 +12,8 @@
 
 # Test of scannerless parsing -- diagnostics
 
+# MITOSIS: TODO L0 PROGRESS
+
 use 5.010001;
 use strict;
 use warnings;
