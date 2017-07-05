@@ -616,9 +616,10 @@ Display any XBNF
     -- miranda: section+ most Lua function definitions
     function _M.class_slg.xbnf_display_o(slg, xbnf)
         local pieces = {}
+        local subg = xbnf.subgrammar
         pieces[#pieces+1]
             = xbnf.lhs:display_form()
-        pieces[#pieces+1] = '::='
+        pieces[#pieces+1] = subg == 'g1' and '::=' or '~'
         local rhs = xbnf.rhs
         for ix = 1, #rhs do
             pieces[#pieces+1]
@@ -643,10 +644,12 @@ Display any XBNF
     function _M.class_slg.xbnfs_show(slg, verbose)
         verbose = verbose or 0
         local xbnfs = slg.xbnfs
-        local pcs = {}
+        local xbnf_descs = {}
         for xbnfid = 1, slg:highest_xbnfid() do
             local xbnf = xbnfs[xbnfid]
+            local subg = xbnf.subgrammar
 
+            local pcs = {}
             local pcs2 = {}
             pcs2[#pcs2+1] = 'R' .. xbnfid
             pcs2[#pcs2+1] = slg:xbnf_display(xbnfid)
@@ -702,8 +705,16 @@ Display any XBNF
                 pcs[#pcs+1] = table.concat(pcs2, ' ')
                 pcs[#pcs+1] = "\n"
             end
+            xbnf_descs[#xbnf_descs+1] = {
+                (subg == 'g1' and 0 or 1), xbnfid, table.concat(pcs)
+            }
         end
-        return table.concat(pcs)
+        table.sort(xbnf_descs, _M.cmp_seq)
+        for ix = 1, #xbnf_descs do
+            local old_desc = xbnf_descs[ix]
+            xbnf_descs[ix] = old_desc[#old_desc]
+        end
+        return table.concat(xbnf_descs)
     end
 ```
 
@@ -882,7 +893,7 @@ Lowest ISYID is 0.
         local pieces = {}
         pieces[#pieces+1]
             = subg:symbol_display_form(irl_isyids[1])
-        pieces[#pieces+1] = '::='
+        pieces[#pieces+1] = subg_name == 'g1' and '::=' or '~'
         for ix = 2, #irl_isyids do
             pieces[#pieces+1]
                 = subg:symbol_display_form(irl_isyids[ix])
@@ -977,7 +988,6 @@ Lowest ISYID is 0.
         for irlid = 0, lmw_g:highest_rule_id() do
 
             local pcs2 = {}
-            pcs2[#pcs2+1] = string.upper(subg_name)
             pcs2[#pcs2+1] = 'R' .. irlid
             pcs2[#pcs2+1] = slg:lmg_rule_show(subg_name, irlid)
             pcs[#pcs+1] = table.concat(pcs2, ' ')
@@ -1274,11 +1284,13 @@ one for each subgrammar.
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_slg.xbnfs_subg_populate(slg, source_hash, subgrammar)
+        local subg = slg[subgrammar]
         local xbnfs = slg.xbnfs
         -- io.stderr:write(inspect(source_hash))
         local xbnf_names = {}
         local xsys = slg.xsys
         local hash_xbnf_data = source_hash.xbnf[subgrammar]
+        local hash_symbols = source_hash.symbols[subgrammar]
         for xbnf_name, _ in pairs(hash_xbnf_data) do
              xbnf_names[#xbnf_names+1] = xbnf_name
         end
@@ -1303,11 +1315,23 @@ one for each subgrammar.
             runtime_xbnf.xrl_name = xbnf_source.xrlid
             runtime_xbnf.name = xbnf_source.name
             runtime_xbnf.subgrammar = xbnf_source.subgrammar
-            runtime_xbnf.lhs = xsys[xbnf_source.lhs]
+            runtime_xbnf.lhs
+                = xsys[xbnf_source.lhs] or
+                    xsys[hash_symbols[xbnf_source.lhs].xsy]
+
+            -- TODO delete after development
+            if not runtime_xbnf.lhs then
+                print('missing xbnf_source.lhs: %s', inspect( hash_symbols[xbnf_source.lhs]))
+                print('missing xbnf_source.lhs: %s', inspect( subg:_xsy(xbnf_source.lhs)))
+                _M._internal_error('missing xbnf_source.lhs: %s', inspect(xbnf_source))
+            end
+
             local to_rhs = {}
             local from_rhs = xbnf_source.rhs
             for ix = 1, #from_rhs do
-                to_rhs[ix] = xsys[xbnf_source.rhs[ix]]
+                local rh_sym = xbnf_source.rhs[ix]
+                to_rhs[ix] = xsys[rh_sym] or
+                    xsys[hash_symbols[rh_sym].xsy]
             end
             runtime_xbnf.rhs = to_rhs
             runtime_xbnf.rank = xbnf_source.rank
@@ -1356,12 +1380,14 @@ one for each subgrammar.
             runtime_xbnf.id = next_xbnf_id
             xbnfs[xbnf_name] = runtime_xbnf
             xbnfs[next_xbnf_id] = runtime_xbnf
+
+            -- print('runtime_xbnf:', inspect(runtime_xbnf))
         end
     end
     function _M.class_slg.xbnfs_populate(slg, source_hash)
         slg.xbnfs = {}
-        slg:xbnfs_subg_populate(source_hash, 'l0')
-        return slg:xbnfs_subg_populate(source_hash, 'g1')
+        slg:xbnfs_subg_populate(source_hash, 'g1')
+        return slg:xbnfs_subg_populate(source_hash, 'l0')
     end
 ```
 

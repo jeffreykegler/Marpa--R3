@@ -494,149 +494,149 @@ $rules_show_output .= $grammar->l0_rules_show(3);
 Marpa::R3::Test::is( $rules_show_output,
     <<'END_OF_SHOW_RULES_OUTPUT', 'SLIF g1_rules_show()' );
 G1 Rules:
-G1 R0 statements ::= statement *
+R0 statements ::= statement *
   Symbol IDs: <22> ::= <21>
   Internal symbols: <statements> ::= <statement>
-G1 R1 statement ::= assignment
+R1 statement ::= assignment
   Symbol IDs: <21> ::= <10>
   Internal symbols: <statement> ::= <assignment>
-G1 R2 statement ::= <numeric assignment>
+R2 statement ::= <numeric assignment>
   Symbol IDs: <21> ::= <16>
   Internal symbols: <statement> ::= <numeric assignment>
-G1 R3 assignment ::= 'set' variable 'to' expression
+R3 assignment ::= 'set' variable 'to' expression
   Symbol IDs: <10> ::= <1> <24> <2> <11>
   Internal symbols: <assignment> ::= <[Lex-0]> <variable> <[Lex-1]> <expression>
-G1 R4 <numeric assignment> ::= variable '=' <numeric expression>
+R4 <numeric assignment> ::= variable '=' <numeric expression>
   Symbol IDs: <16> ::= <24> <3> <17>
   Internal symbols: <numeric assignment> ::= <variable> <[Lex-2]> <numeric expression>
-G1 R5 expression ::= expression
+R5 expression ::= expression
   Symbol IDs: <11> ::= <12>
   Internal symbols: <expression> ::= <expression[0]>
-G1 R6 expression ::= expression
+R6 expression ::= expression
   Symbol IDs: <12> ::= <13>
   Internal symbols: <expression[0]> ::= <expression[1]>
-G1 R7 expression ::= expression
+R7 expression ::= expression
   Symbol IDs: <13> ::= <14>
   Internal symbols: <expression[1]> ::= <expression[2]>
-G1 R8 expression ::= variable
+R8 expression ::= variable
   Symbol IDs: <14> ::= <24>
   Internal symbols: <expression[2]> ::= <variable>
-G1 R9 expression ::= string
+R9 expression ::= string
   Symbol IDs: <14> ::= <23>
   Internal symbols: <expression[2]> ::= <string>
-G1 R10 expression ::= 'string' '(' <numeric expression> ')'
+R10 expression ::= 'string' '(' <numeric expression> ')'
   Symbol IDs: <13> ::= <4> <5> <17> <6>
   Internal symbols: <expression[1]> ::= <[Lex-3]> <[Lex-4]> <numeric expression> <[Lex-5]>
-G1 R11 expression ::= expression '+' expression
+R11 expression ::= expression '+' expression
   Symbol IDs: <12> ::= <12> <7> <13>
   Internal symbols: <expression[0]> ::= <expression[0]> <[Lex-6]> <expression[1]>
-G1 R12 <numeric expression> ::= <numeric expression>
+R12 <numeric expression> ::= <numeric expression>
   Symbol IDs: <17> ::= <18>
   Internal symbols: <numeric expression> ::= <numeric expression[0]>
-G1 R13 <numeric expression> ::= <numeric expression>
+R13 <numeric expression> ::= <numeric expression>
   Symbol IDs: <18> ::= <19>
   Internal symbols: <numeric expression[0]> ::= <numeric expression[1]>
-G1 R14 <numeric expression> ::= <numeric expression>
+R14 <numeric expression> ::= <numeric expression>
   Symbol IDs: <19> ::= <20>
   Internal symbols: <numeric expression[1]> ::= <numeric expression[2]>
-G1 R15 <numeric expression> ::= variable
+R15 <numeric expression> ::= variable
   Symbol IDs: <20> ::= <24>
   Internal symbols: <numeric expression[2]> ::= <variable>
-G1 R16 <numeric expression> ::= number
+R16 <numeric expression> ::= number
   Symbol IDs: <20> ::= <15>
   Internal symbols: <numeric expression[2]> ::= <number>
-G1 R17 <numeric expression> ::= <numeric expression> '+' <numeric expression>
+R17 <numeric expression> ::= <numeric expression> '+' <numeric expression>
   Symbol IDs: <19> ::= <19> <8> <20>
   Internal symbols: <numeric expression[1]> ::= <numeric expression[1]> <[Lex-7]> <numeric expression[2]>
-G1 R18 <numeric expression> ::= <numeric expression> '*' <numeric expression>
+R18 <numeric expression> ::= <numeric expression> '*' <numeric expression>
   Symbol IDs: <18> ::= <18> <9> <19>
   Internal symbols: <numeric expression[0]> ::= <numeric expression[0]> <[Lex-8]> <numeric expression[1]>
-G1 R19 [:start:] ::= statements
+R19 [:start:] ::= statements
   Symbol IDs: <0> ::= <22>
   Internal symbols: <[:start:]> ::= <statements>
 Lex (L0) Rules:
-L0 R0 'set' ::= [s] [e] [t]
+R0 'set' ~ [s] [e] [t]
   Symbol IDs: <1> ::= <26> <20> <27>
   Internal symbols: <[Lex-0]> ::= <[[s]]> <[[e]]> <[[t]]>
-L0 R1 'to' ::= [t] [o]
+R1 'to' ~ [t] [o]
   Symbol IDs: <2> ::= <27> <24>
   Internal symbols: <[Lex-1]> ::= <[[t]]> <[[o]]>
-L0 R2 '=' ::= [\=]
+R2 '=' ~ [\=]
   Symbol IDs: <3> ::= <15>
   Internal symbols: <[Lex-2]> ::= <[[\=]]>
-L0 R3 'string' ::= [s] [t] [r] [i] [n] [g]
+R3 'string' ~ [s] [t] [r] [i] [n] [g]
   Symbol IDs: <4> ::= <26> <27> <25> <22> <23> <21>
   Internal symbols: <[Lex-3]> ::= <[[s]]> <[[t]]> <[[r]]> <[[i]]> <[[n]]> <[[g]]>
-L0 R4 '(' ::= [\(]
+R4 '(' ~ [\(]
   Symbol IDs: <5> ::= <11>
   Internal symbols: <[Lex-4]> ::= <[[\(]]>
-L0 R5 ')' ::= [\)]
+R5 ')' ~ [\)]
   Symbol IDs: <6> ::= <12>
   Internal symbols: <[Lex-5]> ::= <[[\)]]>
-L0 R6 '+' ::= [\+]
+R6 '+' ~ [\+]
   Symbol IDs: <7> ::= <14>
   Internal symbols: <[Lex-6]> ::= <[[\+]]>
-L0 R7 '+' ::= [\+]
+R7 '+' ~ [\+]
   Symbol IDs: <8> ::= <14>
   Internal symbols: <[Lex-7]> ::= <[[\+]]>
-L0 R8 '*' ::= [\*]
+R8 '*' ~ [\*]
   Symbol IDs: <9> ::= <13>
   Internal symbols: <[Lex-8]> ::= <[[\*]]>
-L0 R9 variable ::= [\w] +
+R9 variable ~ [\w] +
   Symbol IDs: <31> ::= <18>
   Internal symbols: <variable> ::= <[[\w]]>
-L0 R10 number ::= [\d] +
+R10 number ~ [\d] +
   Symbol IDs: <28> ::= <16>
   Internal symbols: <number> ::= <[[\d]]>
-L0 R11 string ::= ['] <string contents> [']
+R11 string ~ ['] <string contents> [']
   Symbol IDs: <29> ::= <10> <30> <10>
   Internal symbols: <string> ::= <[[']]> <string contents> <[[']]>
-L0 R12 <string contents> ::= [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] +
+R12 <string contents> ~ [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] +
   Symbol IDs: <30> ::= <19>
   Internal symbols: <string contents> ::= <[[^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}]]>
-L0 R13 [:discard:] ::= whitespace
+R13 [:discard:] ~ whitespace
   Symbol IDs: <0> ::= <32>
   Internal symbols: <[:discard:]> ::= <whitespace>
-L0 R14 whitespace ::= [\s] +
+R14 whitespace ~ [\s] +
   Symbol IDs: <32> ::= <17>
   Internal symbols: <whitespace> ::= <[[\s]]>
-L0 R15 [:lex_start:] ::= [:discard:]
+R15 [:lex_start:] ~ [:discard:]
   Symbol IDs: <33> ::= <0>
   Internal symbols: <[:lex_start:]> ::= <[:discard:]>
-L0 R16 [:lex_start:] ::= 'set'
+R16 [:lex_start:] ~ 'set'
   Symbol IDs: <33> ::= <1>
   Internal symbols: <[:lex_start:]> ::= <[Lex-0]>
-L0 R17 [:lex_start:] ::= 'to'
+R17 [:lex_start:] ~ 'to'
   Symbol IDs: <33> ::= <2>
   Internal symbols: <[:lex_start:]> ::= <[Lex-1]>
-L0 R18 [:lex_start:] ::= '='
+R18 [:lex_start:] ~ '='
   Symbol IDs: <33> ::= <3>
   Internal symbols: <[:lex_start:]> ::= <[Lex-2]>
-L0 R19 [:lex_start:] ::= 'string'
+R19 [:lex_start:] ~ 'string'
   Symbol IDs: <33> ::= <4>
   Internal symbols: <[:lex_start:]> ::= <[Lex-3]>
-L0 R20 [:lex_start:] ::= '('
+R20 [:lex_start:] ~ '('
   Symbol IDs: <33> ::= <5>
   Internal symbols: <[:lex_start:]> ::= <[Lex-4]>
-L0 R21 [:lex_start:] ::= ')'
+R21 [:lex_start:] ~ ')'
   Symbol IDs: <33> ::= <6>
   Internal symbols: <[:lex_start:]> ::= <[Lex-5]>
-L0 R22 [:lex_start:] ::= '+'
+R22 [:lex_start:] ~ '+'
   Symbol IDs: <33> ::= <7>
   Internal symbols: <[:lex_start:]> ::= <[Lex-6]>
-L0 R23 [:lex_start:] ::= '+'
+R23 [:lex_start:] ~ '+'
   Symbol IDs: <33> ::= <8>
   Internal symbols: <[:lex_start:]> ::= <[Lex-7]>
-L0 R24 [:lex_start:] ::= '*'
+R24 [:lex_start:] ~ '*'
   Symbol IDs: <33> ::= <9>
   Internal symbols: <[:lex_start:]> ::= <[Lex-8]>
-L0 R25 [:lex_start:] ::= number
+R25 [:lex_start:] ~ number
   Symbol IDs: <33> ::= <28>
   Internal symbols: <[:lex_start:]> ::= <number>
-L0 R26 [:lex_start:] ::= string
+R26 [:lex_start:] ~ string
   Symbol IDs: <33> ::= <29>
   Internal symbols: <[:lex_start:]> ::= <string>
-L0 R27 [:lex_start:] ::= variable
+R27 [:lex_start:] ~ variable
   Symbol IDs: <33> ::= <31>
   Internal symbols: <[:lex_start:]> ::= <variable>
 END_OF_SHOW_RULES_OUTPUT
@@ -1191,34 +1191,34 @@ for my $rule_id ( $grammar->l0_rule_ids() ) {
 }
 
 Marpa::R3::Test::is( $text, <<'END_OF_TEXT', 'L0 rule_show() by rule id');
-'set' ::= [s] [e] [t]
-'to' ::= [t] [o]
-'=' ::= [\=]
-'string' ::= [s] [t] [r] [i] [n] [g]
-'(' ::= [\(]
-')' ::= [\)]
-'+' ::= [\+]
-'+' ::= [\+]
-'*' ::= [\*]
-variable ::= [\w] +
-number ::= [\d] +
-string ::= ['] <string contents> [']
-<string contents> ::= [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] +
-[:discard:] ::= whitespace
-whitespace ::= [\s] +
-[:lex_start:] ::= [:discard:]
-[:lex_start:] ::= 'set'
-[:lex_start:] ::= 'to'
-[:lex_start:] ::= '='
-[:lex_start:] ::= 'string'
-[:lex_start:] ::= '('
-[:lex_start:] ::= ')'
-[:lex_start:] ::= '+'
-[:lex_start:] ::= '+'
-[:lex_start:] ::= '*'
-[:lex_start:] ::= number
-[:lex_start:] ::= string
-[:lex_start:] ::= variable
+'set' ~ [s] [e] [t]
+'to' ~ [t] [o]
+'=' ~ [\=]
+'string' ~ [s] [t] [r] [i] [n] [g]
+'(' ~ [\(]
+')' ~ [\)]
+'+' ~ [\+]
+'+' ~ [\+]
+'*' ~ [\*]
+variable ~ [\w] +
+number ~ [\d] +
+string ~ ['] <string contents> [']
+<string contents> ~ [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] +
+[:discard:] ~ whitespace
+whitespace ~ [\s] +
+[:lex_start:] ~ [:discard:]
+[:lex_start:] ~ 'set'
+[:lex_start:] ~ 'to'
+[:lex_start:] ~ '='
+[:lex_start:] ~ 'string'
+[:lex_start:] ~ '('
+[:lex_start:] ~ ')'
+[:lex_start:] ~ '+'
+[:lex_start:] ~ '+'
+[:lex_start:] ~ '*'
+[:lex_start:] ~ number
+[:lex_start:] ~ string
+[:lex_start:] ~ variable
 END_OF_TEXT
 
 $text = '';

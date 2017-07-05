@@ -114,22 +114,22 @@ END_OF_SYMBOLS
 
 Marpa::R3::Test::is( $grammar->g1_rules_show(),
 <<'END_OF_RULES', 'Rules' );
-G1 R0 Input ::= Statement +
-G1 R1 Statement ::= CREATE TypeDef
-G1 R2 TypeDef ::= METRIC ID_METRIC AS MetricSelect
-G1 R3 MetricSelect ::= SELECT MetricExpr ByClause Match Filter WithPf
-G1 R4 MetricExpr ::= NUMBER
-G1 R5 ByClause ::=
-G1 R6 ByClause ::= BY
-G1 R7 Match ::=
-G1 R8 Match ::= FOR
-G1 R9 Filter ::=
-G1 R10 Filter ::= WHERE FilterExpr
-G1 R11 FilterExpr ::= TRUE
-G1 R12 FilterExpr ::= FALSE
-G1 R13 WithPf ::=
-G1 R14 WithPf ::= WITH PF
-G1 R15 [:start:] ::= Input
+R0 Input ::= Statement +
+R1 Statement ::= CREATE TypeDef
+R2 TypeDef ::= METRIC ID_METRIC AS MetricSelect
+R3 MetricSelect ::= SELECT MetricExpr ByClause Match Filter WithPf
+R4 MetricExpr ::= NUMBER
+R5 ByClause ::=
+R6 ByClause ::= BY
+R7 Match ::=
+R8 Match ::= FOR
+R9 Filter ::=
+R10 Filter ::= WHERE FilterExpr
+R11 FilterExpr ::= TRUE
+R12 FilterExpr ::= FALSE
+R13 WithPf ::=
+R14 WithPf ::= WITH PF
+R15 [:start:] ::= Input
 END_OF_RULES
 
 Marpa::R3::Test::is( $grammar->show_ahms(),

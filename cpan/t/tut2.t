@@ -107,13 +107,13 @@ my $rules_show_output = $grammar->g1_rules_show();
 
 Marpa::R3::Test::is( $rules_show_output,
     <<'END_RULES', 'Implementation Example Rules' );
-G1 R0 Calculator ::= Expression
-G1 R1 Factor ::= Number
-G1 R2 Term ::= Term '*' Factor
-G1 R3 Term ::= Factor
-G1 R4 Expression ::= Expression '+' Term
-G1 R5 Expression ::= Term
-G1 R6 [:start:] ::= Calculator
+R0 Calculator ::= Expression
+R1 Factor ::= Number
+R2 Term ::= Term '*' Factor
+R3 Term ::= Factor
+R4 Expression ::= Expression '+' Term
+R5 Expression ::= Term
+R6 [:start:] ::= Calculator
 END_RULES
 
 my $show_ahms_output = $grammar->show_ahms();

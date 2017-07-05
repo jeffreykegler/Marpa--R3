@@ -104,14 +104,14 @@ END_SYMBOLS
 my $rules_show_output = $grammar->g1_rules_show();
 
 Marpa::R3::Test::is( $rules_show_output, <<'END_RULES', 'Leo Example Rules' );
-G1 R0 Statement ::= Expression
-G1 R1 Expression ::= Lvalue AssignOp Expression
-G1 R2 Expression ::= Lvalue AddAssignOp Expression
-G1 R3 Expression ::= Lvalue MinusAssignOp Expression
-G1 R4 Expression ::= Lvalue MultiplyAssignOp Expression
-G1 R5 Expression ::= Variable
-G1 R6 Lvalue ::= Variable
-G1 R7 [:start:] ::= Statement
+R0 Statement ::= Expression
+R1 Expression ::= Lvalue AssignOp Expression
+R2 Expression ::= Lvalue AddAssignOp Expression
+R3 Expression ::= Lvalue MinusAssignOp Expression
+R4 Expression ::= Lvalue MultiplyAssignOp Expression
+R5 Expression ::= Variable
+R6 Lvalue ::= Variable
+R7 [:start:] ::= Statement
 END_RULES
 
 my $show_ahms_output = $grammar->show_ahms();

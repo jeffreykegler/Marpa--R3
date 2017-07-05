@@ -51,9 +51,9 @@ G1 S2 a
 END_OF_STRING
 
 Marpa::R3::Test::is( $grammar->g1_rules_show, <<'END_OF_STRING', 'Leo166 Rules' );
-G1 R0 S ::= a S
-G1 R1 S ::=
-G1 R2 [:start:] ::= S
+R0 S ::= a S
+R1 S ::=
+R2 [:start:] ::= S
 END_OF_STRING
 
 Marpa::R3::Test::is( $grammar->show_ahms, <<'END_OF_STRING', 'Leo166 AHMs' );

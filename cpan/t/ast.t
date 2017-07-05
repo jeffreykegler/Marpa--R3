@@ -72,48 +72,48 @@ $rules_show_output .= $grammar->l0_rules_show(1);
 
 Marpa::R3::Test::is( $rules_show_output,
     <<'END_OF_SHOW_RULES_OUTPUT', 'Scanless l0_rules_show()' );
-G1 R0 Script ::= Expression +
-G1 R1 Expression ::= Expression
-G1 R2 Expression ::= Expression
-G1 R3 Expression ::= Expression
-G1 R4 Expression ::= Expression
-G1 R5 Expression ::= Number
-G1 R6 Expression ::= '(' Expression ')'
-G1 R7 Expression ::= Expression '**' Expression
-G1 R8 Expression ::= Expression '*' Expression
-G1 R9 Expression ::= Expression '/' Expression
-G1 R10 Expression ::= Expression '+' Expression
-G1 R11 Expression ::= Expression '-' Expression
-G1 R12 [:start:] ::= Script
-L0 R0 comma ::= [,]
-L0 R1 '(' ::= [\(]
-L0 R2 ')' ::= [\)]
-L0 R3 '**' ::= [\*] [\*]
-L0 R4 '*' ::= [\*]
-L0 R5 '/' ::= [\/]
-L0 R6 '+' ::= [\+]
-L0 R7 '-' ::= [\-]
-L0 R8 Number ::= [\d] +
-L0 R9 [:discard:] ::= whitespace
-L0 R10 whitespace ::= [\s] +
-L0 R11 [:discard:] ::= <hash comment>
-L0 R12 <hash comment> ::= <terminated hash comment>
-L0 R13 <hash comment> ::= <unterminated final hash comment>
-L0 R14 <terminated hash comment> ::= [\#] <hash comment body> <vertical space char>
-L0 R15 <unterminated final hash comment> ::= [\#] <hash comment body>
-L0 R16 <hash comment body> ::= <hash comment char> *
-L0 R17 <vertical space char> ::= [\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
-L0 R18 <hash comment char> ::= [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
-L0 R19 [:lex_start:] ::= Number
-L0 R20 [:lex_start:] ::= [:discard:]
-L0 R21 [:lex_start:] ::= '('
-L0 R22 [:lex_start:] ::= ')'
-L0 R23 [:lex_start:] ::= '**'
-L0 R24 [:lex_start:] ::= '*'
-L0 R25 [:lex_start:] ::= '/'
-L0 R26 [:lex_start:] ::= '+'
-L0 R27 [:lex_start:] ::= '-'
-L0 R28 [:lex_start:] ::= comma
+R0 Script ::= Expression +
+R1 Expression ::= Expression
+R2 Expression ::= Expression
+R3 Expression ::= Expression
+R4 Expression ::= Expression
+R5 Expression ::= Number
+R6 Expression ::= '(' Expression ')'
+R7 Expression ::= Expression '**' Expression
+R8 Expression ::= Expression '*' Expression
+R9 Expression ::= Expression '/' Expression
+R10 Expression ::= Expression '+' Expression
+R11 Expression ::= Expression '-' Expression
+R12 [:start:] ::= Script
+R0 comma ~ [,]
+R1 '(' ~ [\(]
+R2 ')' ~ [\)]
+R3 '**' ~ [\*] [\*]
+R4 '*' ~ [\*]
+R5 '/' ~ [\/]
+R6 '+' ~ [\+]
+R7 '-' ~ [\-]
+R8 Number ~ [\d] +
+R9 [:discard:] ~ whitespace
+R10 whitespace ~ [\s] +
+R11 [:discard:] ~ <hash comment>
+R12 <hash comment> ~ <terminated hash comment>
+R13 <hash comment> ~ <unterminated final hash comment>
+R14 <terminated hash comment> ~ [\#] <hash comment body> <vertical space char>
+R15 <unterminated final hash comment> ~ [\#] <hash comment body>
+R16 <hash comment body> ~ <hash comment char> *
+R17 <vertical space char> ~ [\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
+R18 <hash comment char> ~ [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
+R19 [:lex_start:] ~ Number
+R20 [:lex_start:] ~ [:discard:]
+R21 [:lex_start:] ~ '('
+R22 [:lex_start:] ~ ')'
+R23 [:lex_start:] ~ '**'
+R24 [:lex_start:] ~ '*'
+R25 [:lex_start:] ~ '/'
+R26 [:lex_start:] ~ '+'
+R27 [:lex_start:] ~ '-'
+R28 [:lex_start:] ~ comma
 END_OF_SHOW_RULES_OUTPUT
 
 sub my_parser {

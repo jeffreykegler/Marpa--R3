@@ -52,12 +52,12 @@ END_OF_DSL
 );
 
 Marpa::R3::Test::is( $grammar->g1_rules_show, <<'EOS', 'Aycock/Horspool Rules' );
-G1 R0 S ::= A B B B C C
-G1 R1 A ::= 'a'
-G1 R2 B ::= 'a'
-G1 R3 B ::=
-G1 R4 C ::=
-G1 R5 [:start:] ::= S
+R0 S ::= A B B B C C
+R1 A ::= 'a'
+R2 B ::= 'a'
+R3 B ::=
+R4 C ::=
+R5 [:start:] ::= S
 EOS
 
 my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );

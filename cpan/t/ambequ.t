@@ -119,9 +119,9 @@ restore_stdout();
 
 Marpa::R3::Test::is( ${$actual_ref},
     <<'END_RULES', 'Ambiguous Equation Rules' );
-G1 R0 E ::= E Op E
-G1 R1 E ::= Number
-G1 R2 [:start:] ::= E
+R0 E ::= E Op E
+R1 E ::= Number
+R2 [:start:] ::= E
 END_RULES
 
 $actual_ref = save_stdout();

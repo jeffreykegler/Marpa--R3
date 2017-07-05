@@ -682,7 +682,7 @@ END_OF_SOURCE
     my $alt_names = join q{:}, @alt_names;
     Test::More::is(
         $alt_names,
-        'X:Y:[:start:]:start1:start2:first start rule:second start rule',
+        '[:start:]:start1:start2:first start rule:second start rule:X:Y',
         q{Test of $grammar->alt_name()}
     );
 

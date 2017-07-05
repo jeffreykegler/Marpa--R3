@@ -56,6 +56,23 @@ sub Marpa::R3::Internal::MetaAST::Parse::line_column {
     return Marpa::R3::Internal::line_column($parse->{p_dsl}, $pos);
 }
 
+# Assign symbols, creating "ordinary" symbols if no symbol
+# already exists
+sub Marpa::R3::Internal::MetaAST::Parse::symbol_assign_ordinary {
+    my ( $parse, $symbol_name, $subg ) = @_;
+    my $wsym = $parse->{symbols}->{$subg}->{$symbol_name};
+    return $wsym if $wsym;
+    # say STDERR "symbol_assign_ordinary($symbol_name, $subg)";
+    my $symbol_data = {
+        dsl_form    => $symbol_name,
+        name_source => 'lexical'
+    };
+    $parse->xsy_assign( $symbol_name, $symbol_data );
+    $symbol_data = { xsy => $symbol_name };
+    $parse->symbol_names_set( $symbol_name, $subg,
+        $symbol_data );
+}
+
 sub ast_to_hash {
     my ($ast, $p_dsl) = @_;
     my $hashed_ast = {};
@@ -109,32 +126,10 @@ sub ast_to_hash {
             rhs    => [$start_lhs],
             action => '::first'
         };
+        $hashed_ast->symbol_assign_ordinary($start_lhs, 'g1');
         my $wrl = $hashed_ast->xbnf_create( $rule_data, 'g1' );
         push @{ $hashed_ast->{rules}->{g1} }, $wrl;
     } ## end sub Marpa::R3::Internal::MetaAST::start_rule_create
-
-    # add all the "ordinary" symbols, those with no
-    # special properties and whose name is their DSL
-    # form.
-    for my $grammar ( keys %{ $hashed_ast->{rules} } ) {
-        my $rules   = $hashed_ast->{rules}->{$grammar};
-        my $wsyms   = $hashed_ast->{symbols}->{$grammar};
-        my @symbols = map { $_->{lhs} } @{$rules};
-        push @symbols, map { @{ $_->{rhs} } } @{$rules};
-        push @symbols, grep { defined } map { $_->{separator} } @{$rules};
-      SYM: for my $symbol_name (@symbols) {
-            next SYM if defined $wsyms->{$symbol_name};
-
-            my $symbol_data = {
-                dsl_form    => $symbol_name,
-                name_source => 'lexical'
-            };
-            $hashed_ast->xsy_assign( $symbol_name, $symbol_data );
-            $symbol_data = { xsy => $symbol_name };
-            $hashed_ast->symbol_names_set( $symbol_name, $grammar,
-                $symbol_data );
-        }
-    }
 
     my %stripped_character_classes = ();
     {
@@ -640,6 +635,7 @@ sub Marpa::R3::Internal::MetaAST_Nodes::priority_rule::evaluate {
                     qq{hidden symbols are not allowed in lexical rules (rule's LHS was "$lhs")}
                 );
             }
+            $parse->symbol_assign_ordinary($_, $subgrammar) for $lhs, @rhs_names;
             my %hash_rule = (
                 start  => ( $alternative_ix ? $alternative_start  : $start ),
                 length => ( $alternative_ix ? $alternative_length : $length ),
@@ -766,6 +762,7 @@ sub Marpa::R3::Internal::MetaAST_Nodes::priority_rule::evaluate {
     @arg0_action = ( action => '::first' ) if $subgrammar eq 'g1';
 
     # Internal rule top priority rule for <$lhs>
+    $parse->symbol_assign_ordinary($lhs, $subgrammar);
     my @priority_rules = (
         {
             start => $start,
@@ -904,6 +901,7 @@ sub Marpa::R3::Internal::MetaAST_Nodes::priority_rule::evaluate {
 
         if ( not scalar @arity ) {
             $new_xs_rule{rhs} = \@new_rhs;
+            $parse->symbol_assign_ordinary($_, $subgrammar) for @new_rhs;
             my $wrl = $parse->xbnf_create( \%new_xs_rule, $subgrammar );
             push @{$rules}, $wrl;
             next RULE;
@@ -937,6 +935,7 @@ sub Marpa::R3::Internal::MetaAST_Nodes::priority_rule::evaluate {
             die qq{Unknown association type: "$assoc"};
         } ## end DO_ASSOCIATION:
 
+        $parse->symbol_assign_ordinary($_, $subgrammar) for @new_rhs;
         $new_xs_rule{rhs} = \@new_rhs;
         my $wrl = $parse->xbnf_create( \%new_xs_rule, $subgrammar );
         push @{$rules}, $wrl;
@@ -1040,6 +1039,7 @@ sub Marpa::R3::Internal::MetaAST_Nodes::empty_rule::evaluate {
     }
     $parse->bless_hash_rule( \%rule, $blessing, $naming, $lhs );
 
+    $parse->symbol_assign_ordinary($lhs, $subgrammar);
     my $wrl = $parse->xbnf_create( \%rule, $subgrammar );
     # mask not needed
     push @{ $parse->{rules}->{$subgrammar} }, $wrl;
@@ -1341,6 +1341,8 @@ sub Marpa::R3::Internal::MetaAST_Nodes::quantified_rule::evaluate {
             qq{bless option not allowed in lexical rules (rule's LHS was "$lhs")}
         );
     }
+    $parse->symbol_assign_ordinary($_, $subgrammar) for $lhs_name, @{$sequence_rule{rhs}};
+    $parse->symbol_assign_ordinary($separator, $subgrammar) if defined $separator;
     $parse->bless_hash_rule( \%sequence_rule, $blessing, $naming, $lhs_name );
 
     my $wrl = $parse->xbnf_create( \%sequence_rule, $subgrammar );
@@ -1860,6 +1862,7 @@ sub Marpa::R3::Internal::MetaAST::Parse::xbnf_create {
     # The eXternal ALTernative is the argument hash,
     # slightly adjusted.
     $subgrammar //= 'g1';
+    $args->{subgrammar} //= $subgrammar;
     $args->{subkey} //= 0;
     my $rule_id = join q{,}, $subgrammar, $args->{lhs}, @{$args->{rhs}};
     my $hash_by_xbnfid = $parse->{xbnf}->{$subgrammar};
