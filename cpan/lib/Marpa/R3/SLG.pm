@@ -1793,9 +1793,9 @@ kwgen(__LINE__, qw(lmg_symbol_dsl_form lmg_symbol_dsl_form si));
 kwgen(__LINE__, qw(g1_symbol_dsl_form g1_symbol_dsl_form i));
 kwgen(__LINE__, qw(l0_symbol_dsl_form l0_symbol_dsl_form i));
 
-kwgen_opt(__LINE__, qw(lmg_symbols_show lmg_symbols_show si), 0);
+kwgen_opt(__LINE__, qw(lmg_symbols_show lmg_symbols_show si), 0, 0);
 kwgen_opt(__LINE__, qw(g1_symbols_show g1_symbols_show i), 0);
-kwgen_opt(__LINE__, qw(l0_symbols_show g1_symbols_show i), 0);
+kwgen_opt(__LINE__, qw(l0_symbols_show l0_symbols_show i), 0);
 
 kwgen(__LINE__, qw(lmg_symbol_by_name lmg_symbol_by_name si));
 kwgen(__LINE__, qw(g1_symbol_by_name g1_symbol_by_name i));
