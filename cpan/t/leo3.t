@@ -58,12 +58,12 @@ END_OF_DSL
 
 Marpa::R3::Test::is( $grammar->g1_show_symbols(),
     <<'END_OF_STRING', 'Leo166 Symbols' );
-G1 S0 A
-G1 S1 B
-G1 S2 C
-G1 S3 S
-G1 S4 [:start:]
-G1 S5 a
+g1 S0 A
+g1 S1 B
+g1 S2 C
+g1 S3 S
+g1 S4 [:start:]
+g1 S5 a
 END_OF_STRING
 
 Marpa::R3::Test::is( $grammar->g1_rules_show,

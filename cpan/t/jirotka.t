@@ -87,31 +87,31 @@ my $input = q{Create Metric m As Select 1 Where True};
 Marpa::R3::Test::is(
     $grammar->g1_show_symbols(),
     <<'END_OF_SYMBOLS', 'Symbols' );
-G1 S0 AS
-G1 S1 BY
-G1 S2 ByClause
-G1 S3 CREATE
-G1 S4 FALSE
-G1 S5 FOR
-G1 S6 Filter
-G1 S7 FilterExpr
-G1 S8 ID_METRIC
-G1 S9 Input
-G1 S10 METRIC
-G1 S11 Match
-G1 S12 MetricExpr
-G1 S13 MetricSelect
-G1 S14 NUMBER
-G1 S15 PF
-G1 S16 SELECT
-G1 S17 SEPARATOR
-G1 S18 Statement
-G1 S19 TRUE
-G1 S20 TypeDef
-G1 S21 WHERE
-G1 S22 WITH
-G1 S23 WithPf
-G1 S24 [:start:]
+g1 S0 AS
+g1 S1 BY
+g1 S2 ByClause
+g1 S3 CREATE
+g1 S4 FALSE
+g1 S5 FOR
+g1 S6 Filter
+g1 S7 FilterExpr
+g1 S8 ID_METRIC
+g1 S9 Input
+g1 S10 METRIC
+g1 S11 Match
+g1 S12 MetricExpr
+g1 S13 MetricSelect
+g1 S14 NUMBER
+g1 S15 PF
+g1 S16 SELECT
+g1 S17 SEPARATOR
+g1 S18 Statement
+g1 S19 TRUE
+g1 S20 TypeDef
+g1 S21 WHERE
+g1 S22 WITH
+g1 S23 WithPf
+g1 S24 [:start:]
 END_OF_SYMBOLS
 
 Marpa::R3::Test::is( $grammar->g1_rules_show(),

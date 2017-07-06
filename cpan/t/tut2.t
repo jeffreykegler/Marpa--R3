@@ -95,14 +95,14 @@ my $show_symbols_output = $grammar->g1_show_symbols();
 
 Marpa::R3::Test::is( $show_symbols_output,
     <<'END_SYMBOLS', 'Implementation Example Symbols' );
-G1 S0 Calculator
-G1 S1 Expression
-G1 S2 Factor
-G1 S3 Number
-G1 S4 Term
-G1 S5 [:start:]
-G1 S6 '*'
-G1 S7 '+'
+g1 S0 Calculator
+g1 S1 Expression
+g1 S2 Factor
+g1 S3 Number
+g1 S4 Term
+g1 S5 [:start:]
+g1 S6 '*'
+g1 S7 '+'
 END_SYMBOLS
 
 my $rules_show_output = $grammar->g1_rules_show();

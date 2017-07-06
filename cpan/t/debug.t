@@ -664,211 +664,211 @@ $show_symbols_output .= $grammar->l0_show_symbols(3);
 Marpa::R3::Test::is( $show_symbols_output,
     <<'END_OF_SHOW_SYMBOLS_OUTPUT', 'SLIF g1_show_symbols()' );
 G1 Symbols:
-G1 S0 [:start:]
+g1 S0 [:start:]
   Internal name: <[:start:]>
   SLIF name: [:start:]
-G1 S1 'set'
+g1 S1 'set'
   /* terminal */
   Internal name: <[Lex-0]>
   SLIF name: 'set'
-G1 S2 'to'
+g1 S2 'to'
   /* terminal */
   Internal name: <[Lex-1]>
   SLIF name: 'to'
-G1 S3 '='
+g1 S3 '='
   /* terminal */
   Internal name: <[Lex-2]>
   SLIF name: '='
-G1 S4 'string'
+g1 S4 'string'
   /* terminal */
   Internal name: <[Lex-3]>
   SLIF name: 'string'
-G1 S5 '('
+g1 S5 '('
   /* terminal */
   Internal name: <[Lex-4]>
   SLIF name: '('
-G1 S6 ')'
+g1 S6 ')'
   /* terminal */
   Internal name: <[Lex-5]>
   SLIF name: ')'
-G1 S7 '+'
+g1 S7 '+'
   /* terminal */
   Internal name: <[Lex-6]>
   SLIF name: '+'
-G1 S8 '+'
+g1 S8 '+'
   /* terminal */
   Internal name: <[Lex-7]>
   SLIF name: '+'
-G1 S9 '*'
+g1 S9 '*'
   /* terminal */
   Internal name: <[Lex-8]>
   SLIF name: '*'
-G1 S10 assignment
+g1 S10 assignment
   Internal name: <assignment>
   SLIF name: assignment
-G1 S11 expression
+g1 S11 expression
   Internal name: <expression>
   SLIF name: expression
-G1 S12 expression
+g1 S12 expression
   Internal name: <expression[0]>
   SLIF name: expression
-G1 S13 expression
+g1 S13 expression
   Internal name: <expression[1]>
   SLIF name: expression
-G1 S14 expression
+g1 S14 expression
   Internal name: <expression[2]>
   SLIF name: expression
-G1 S15 number
+g1 S15 number
   /* terminal */
   Internal name: <number>
   SLIF name: number
-G1 S16 <numeric assignment>
+g1 S16 <numeric assignment>
   Internal name: <numeric assignment>
   SLIF name: numeric assignment
-G1 S17 <numeric expression>
+g1 S17 <numeric expression>
   Internal name: <numeric expression>
   SLIF name: numeric expression
-G1 S18 <numeric expression>
+g1 S18 <numeric expression>
   Internal name: <numeric expression[0]>
   SLIF name: numeric expression
-G1 S19 <numeric expression>
+g1 S19 <numeric expression>
   Internal name: <numeric expression[1]>
   SLIF name: numeric expression
-G1 S20 <numeric expression>
+g1 S20 <numeric expression>
   Internal name: <numeric expression[2]>
   SLIF name: numeric expression
-G1 S21 statement
+g1 S21 statement
   Internal name: <statement>
   SLIF name: statement
-G1 S22 statements
+g1 S22 statements
   Internal name: <statements>
   SLIF name: statements
-G1 S23 string
+g1 S23 string
   /* terminal */
   Internal name: <string>
   SLIF name: string
-G1 S24 variable
+g1 S24 variable
   /* terminal */
   Internal name: <variable>
   SLIF name: variable
 Lex (L0) Symbols:
-L0 S0 [:discard:]
+l0 S0 [:discard:]
   Internal name: <[:discard:]>
-L0 S1 'set'
+l0 S1 'set'
   Internal name: <[Lex-0]>
   SLIF name: 'set'
-L0 S2 'to'
+l0 S2 'to'
   Internal name: <[Lex-1]>
   SLIF name: 'to'
-L0 S3 '='
+l0 S3 '='
   Internal name: <[Lex-2]>
   SLIF name: '='
-L0 S4 'string'
+l0 S4 'string'
   Internal name: <[Lex-3]>
   SLIF name: 'string'
-L0 S5 '('
+l0 S5 '('
   Internal name: <[Lex-4]>
   SLIF name: '('
-L0 S6 ')'
+l0 S6 ')'
   Internal name: <[Lex-5]>
   SLIF name: ')'
-L0 S7 '+'
+l0 S7 '+'
   Internal name: <[Lex-6]>
   SLIF name: '+'
-L0 S8 '+'
+l0 S8 '+'
   Internal name: <[Lex-7]>
   SLIF name: '+'
-L0 S9 '*'
+l0 S9 '*'
   Internal name: <[Lex-8]>
   SLIF name: '*'
-L0 S10 [']
+l0 S10 [']
   /* terminal */
   Internal name: <[[']]>
   SLIF name: [']
-L0 S11 [\(]
+l0 S11 [\(]
   /* terminal */
   Internal name: <[[\(]]>
   SLIF name: [\(]
-L0 S12 [\)]
+l0 S12 [\)]
   /* terminal */
   Internal name: <[[\)]]>
   SLIF name: [\)]
-L0 S13 [\*]
+l0 S13 [\*]
   /* terminal */
   Internal name: <[[\*]]>
   SLIF name: [\*]
-L0 S14 [\+]
+l0 S14 [\+]
   /* terminal */
   Internal name: <[[\+]]>
   SLIF name: [\+]
-L0 S15 [\=]
+l0 S15 [\=]
   /* terminal */
   Internal name: <[[\=]]>
   SLIF name: [\=]
-L0 S16 [\d]
+l0 S16 [\d]
   /* terminal */
   Internal name: <[[\d]]>
   SLIF name: [\d]
-L0 S17 [\s]
+l0 S17 [\s]
   /* terminal */
   Internal name: <[[\s]]>
   SLIF name: [\s]
-L0 S18 [\w]
+l0 S18 [\w]
   /* terminal */
   Internal name: <[[\w]]>
   SLIF name: [\w]
-L0 S19 [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}]
+l0 S19 [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}]
   /* terminal */
   Internal name: <[[^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}]]>
   SLIF name: [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}]
-L0 S20 [e]
+l0 S20 [e]
   /* terminal */
   Internal name: <[[e]]>
   SLIF name: [e]
-L0 S21 [g]
+l0 S21 [g]
   /* terminal */
   Internal name: <[[g]]>
   SLIF name: [g]
-L0 S22 [i]
+l0 S22 [i]
   /* terminal */
   Internal name: <[[i]]>
   SLIF name: [i]
-L0 S23 [n]
+l0 S23 [n]
   /* terminal */
   Internal name: <[[n]]>
   SLIF name: [n]
-L0 S24 [o]
+l0 S24 [o]
   /* terminal */
   Internal name: <[[o]]>
   SLIF name: [o]
-L0 S25 [r]
+l0 S25 [r]
   /* terminal */
   Internal name: <[[r]]>
   SLIF name: [r]
-L0 S26 [s]
+l0 S26 [s]
   /* terminal */
   Internal name: <[[s]]>
   SLIF name: [s]
-L0 S27 [t]
+l0 S27 [t]
   /* terminal */
   Internal name: <[[t]]>
   SLIF name: [t]
-L0 S28 number
+l0 S28 number
   Internal name: <number>
   SLIF name: number
-L0 S29 string
+l0 S29 string
   Internal name: <string>
   SLIF name: string
-L0 S30 <string contents>
+l0 S30 <string contents>
   Internal name: <string contents>
   SLIF name: string contents
-L0 S31 variable
+l0 S31 variable
   Internal name: <variable>
   SLIF name: variable
-L0 S32 whitespace
+l0 S32 whitespace
   Internal name: <whitespace>
   SLIF name: whitespace
-L0 S33 [:lex_start:]
+l0 S33 [:lex_start:]
   Internal name: <[:lex_start:]>
 END_OF_SHOW_SYMBOLS_OUTPUT
 
@@ -984,41 +984,41 @@ for my $rule_id ( $grammar->l0_rule_ids() ) {
 # name: SLG l0_rule_expand() synopsis
 
     my ($lhs_id, @rhs_ids) = $grammar->l0_rule_expand($rule_id);
-    $text .= "L0 Rule #$rule_id: $lhs_id ::= " . (join q{ }, @rhs_ids) . "\n";
+    $text .= "l0 Rule #$rule_id: $lhs_id ::= " . (join q{ }, @rhs_ids) . "\n";
 
 # Marpa::R3::Display::End
 
 }
 
 Marpa::R3::Test::is( $text, <<'END_OF_TEXT', 'L0 symbol ids by rule id');
-L0 Rule #0: 1 ::= 26 20 27
-L0 Rule #1: 2 ::= 27 24
-L0 Rule #2: 3 ::= 15
-L0 Rule #3: 4 ::= 26 27 25 22 23 21
-L0 Rule #4: 5 ::= 11
-L0 Rule #5: 6 ::= 12
-L0 Rule #6: 7 ::= 14
-L0 Rule #7: 8 ::= 14
-L0 Rule #8: 9 ::= 13
-L0 Rule #9: 31 ::= 18
-L0 Rule #10: 28 ::= 16
-L0 Rule #11: 29 ::= 10 30 10
-L0 Rule #12: 30 ::= 19
-L0 Rule #13: 0 ::= 32
-L0 Rule #14: 32 ::= 17
-L0 Rule #15: 33 ::= 0
-L0 Rule #16: 33 ::= 1
-L0 Rule #17: 33 ::= 2
-L0 Rule #18: 33 ::= 3
-L0 Rule #19: 33 ::= 4
-L0 Rule #20: 33 ::= 5
-L0 Rule #21: 33 ::= 6
-L0 Rule #22: 33 ::= 7
-L0 Rule #23: 33 ::= 8
-L0 Rule #24: 33 ::= 9
-L0 Rule #25: 33 ::= 28
-L0 Rule #26: 33 ::= 29
-L0 Rule #27: 33 ::= 31
+l0 Rule #0: 1 ::= 26 20 27
+l0 Rule #1: 2 ::= 27 24
+l0 Rule #2: 3 ::= 15
+l0 Rule #3: 4 ::= 26 27 25 22 23 21
+l0 Rule #4: 5 ::= 11
+l0 Rule #5: 6 ::= 12
+l0 Rule #6: 7 ::= 14
+l0 Rule #7: 8 ::= 14
+l0 Rule #8: 9 ::= 13
+l0 Rule #9: 31 ::= 18
+l0 Rule #10: 28 ::= 16
+l0 Rule #11: 29 ::= 10 30 10
+l0 Rule #12: 30 ::= 19
+l0 Rule #13: 0 ::= 32
+l0 Rule #14: 32 ::= 17
+l0 Rule #15: 33 ::= 0
+l0 Rule #16: 33 ::= 1
+l0 Rule #17: 33 ::= 2
+l0 Rule #18: 33 ::= 3
+l0 Rule #19: 33 ::= 4
+l0 Rule #20: 33 ::= 5
+l0 Rule #21: 33 ::= 6
+l0 Rule #22: 33 ::= 7
+l0 Rule #23: 33 ::= 8
+l0 Rule #24: 33 ::= 9
+l0 Rule #25: 33 ::= 28
+l0 Rule #26: 33 ::= 29
+l0 Rule #27: 33 ::= 31
 END_OF_TEXT
 
 $text = q{};
@@ -1231,7 +1231,7 @@ for my $symbol_id ( $grammar->l0_symbol_ids() ) {
 # name: SLG l0_symbol_name() synopsis
 
     my $name = $grammar->l0_symbol_name( $symbol_id );
-    $text .= "L0 symbol number: $symbol_id  name: $name\n";
+    $text .= "l0 symbol number: $symbol_id  name: $name\n";
 
 # Marpa::R3::Display::End
 
@@ -1240,7 +1240,7 @@ for my $symbol_id ( $grammar->l0_symbol_ids() ) {
 
     my $display_form = $grammar->l0_symbol_display_form( $symbol_id );
     $text
-        .= "L0 symbol number: $symbol_id  name in display form: $display_form\n";
+        .= "l0 symbol number: $symbol_id  name in display form: $display_form\n";
 
 # Marpa::R3::Display::End
 
@@ -1249,115 +1249,115 @@ for my $symbol_id ( $grammar->l0_symbol_ids() ) {
 
     my $dsl_form = $grammar->l0_symbol_dsl_form( $symbol_id )
         // '[No name in DSL form]';
-    $text .= "L0 symbol number: $symbol_id  DSL form: $dsl_form\n";
+    $text .= "l0 symbol number: $symbol_id  DSL form: $dsl_form\n";
 
 # Marpa::R3::Display::End
 
 }
 
 Marpa::R3::Test::is( $text, <<'END_OF_TEXT', 'L0 symbol names and description');
-L0 symbol number: 0  name: [:discard:]
-L0 symbol number: 0  name in display form: [:discard:]
-L0 symbol number: 0  DSL form: [No name in DSL form]
-L0 symbol number: 1  name: [Lex-0]
-L0 symbol number: 1  name in display form: 'set'
-L0 symbol number: 1  DSL form: 'set'
-L0 symbol number: 2  name: [Lex-1]
-L0 symbol number: 2  name in display form: 'to'
-L0 symbol number: 2  DSL form: 'to'
-L0 symbol number: 3  name: [Lex-2]
-L0 symbol number: 3  name in display form: '='
-L0 symbol number: 3  DSL form: '='
-L0 symbol number: 4  name: [Lex-3]
-L0 symbol number: 4  name in display form: 'string'
-L0 symbol number: 4  DSL form: 'string'
-L0 symbol number: 5  name: [Lex-4]
-L0 symbol number: 5  name in display form: '('
-L0 symbol number: 5  DSL form: '('
-L0 symbol number: 6  name: [Lex-5]
-L0 symbol number: 6  name in display form: ')'
-L0 symbol number: 6  DSL form: ')'
-L0 symbol number: 7  name: [Lex-6]
-L0 symbol number: 7  name in display form: '+'
-L0 symbol number: 7  DSL form: '+'
-L0 symbol number: 8  name: [Lex-7]
-L0 symbol number: 8  name in display form: '+'
-L0 symbol number: 8  DSL form: '+'
-L0 symbol number: 9  name: [Lex-8]
-L0 symbol number: 9  name in display form: '*'
-L0 symbol number: 9  DSL form: '*'
-L0 symbol number: 10  name: [[']]
-L0 symbol number: 10  name in display form: [']
-L0 symbol number: 10  DSL form: [']
-L0 symbol number: 11  name: [[\(]]
-L0 symbol number: 11  name in display form: [\(]
-L0 symbol number: 11  DSL form: [\(]
-L0 symbol number: 12  name: [[\)]]
-L0 symbol number: 12  name in display form: [\)]
-L0 symbol number: 12  DSL form: [\)]
-L0 symbol number: 13  name: [[\*]]
-L0 symbol number: 13  name in display form: [\*]
-L0 symbol number: 13  DSL form: [\*]
-L0 symbol number: 14  name: [[\+]]
-L0 symbol number: 14  name in display form: [\+]
-L0 symbol number: 14  DSL form: [\+]
-L0 symbol number: 15  name: [[\=]]
-L0 symbol number: 15  name in display form: [\=]
-L0 symbol number: 15  DSL form: [\=]
-L0 symbol number: 16  name: [[\d]]
-L0 symbol number: 16  name in display form: [\d]
-L0 symbol number: 16  DSL form: [\d]
-L0 symbol number: 17  name: [[\s]]
-L0 symbol number: 17  name in display form: [\s]
-L0 symbol number: 17  DSL form: [\s]
-L0 symbol number: 18  name: [[\w]]
-L0 symbol number: 18  name in display form: [\w]
-L0 symbol number: 18  DSL form: [\w]
-L0 symbol number: 19  name: [[^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}]]
-L0 symbol number: 19  name in display form: [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}]
-L0 symbol number: 19  DSL form: [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}]
-L0 symbol number: 20  name: [[e]]
-L0 symbol number: 20  name in display form: [e]
-L0 symbol number: 20  DSL form: [e]
-L0 symbol number: 21  name: [[g]]
-L0 symbol number: 21  name in display form: [g]
-L0 symbol number: 21  DSL form: [g]
-L0 symbol number: 22  name: [[i]]
-L0 symbol number: 22  name in display form: [i]
-L0 symbol number: 22  DSL form: [i]
-L0 symbol number: 23  name: [[n]]
-L0 symbol number: 23  name in display form: [n]
-L0 symbol number: 23  DSL form: [n]
-L0 symbol number: 24  name: [[o]]
-L0 symbol number: 24  name in display form: [o]
-L0 symbol number: 24  DSL form: [o]
-L0 symbol number: 25  name: [[r]]
-L0 symbol number: 25  name in display form: [r]
-L0 symbol number: 25  DSL form: [r]
-L0 symbol number: 26  name: [[s]]
-L0 symbol number: 26  name in display form: [s]
-L0 symbol number: 26  DSL form: [s]
-L0 symbol number: 27  name: [[t]]
-L0 symbol number: 27  name in display form: [t]
-L0 symbol number: 27  DSL form: [t]
-L0 symbol number: 28  name: number
-L0 symbol number: 28  name in display form: number
-L0 symbol number: 28  DSL form: number
-L0 symbol number: 29  name: string
-L0 symbol number: 29  name in display form: string
-L0 symbol number: 29  DSL form: string
-L0 symbol number: 30  name: string contents
-L0 symbol number: 30  name in display form: <string contents>
-L0 symbol number: 30  DSL form: string contents
-L0 symbol number: 31  name: variable
-L0 symbol number: 31  name in display form: variable
-L0 symbol number: 31  DSL form: variable
-L0 symbol number: 32  name: whitespace
-L0 symbol number: 32  name in display form: whitespace
-L0 symbol number: 32  DSL form: whitespace
-L0 symbol number: 33  name: [:lex_start:]
-L0 symbol number: 33  name in display form: [:lex_start:]
-L0 symbol number: 33  DSL form: [No name in DSL form]
+l0 symbol number: 0  name: [:discard:]
+l0 symbol number: 0  name in display form: [:discard:]
+l0 symbol number: 0  DSL form: [No name in DSL form]
+l0 symbol number: 1  name: [Lex-0]
+l0 symbol number: 1  name in display form: 'set'
+l0 symbol number: 1  DSL form: 'set'
+l0 symbol number: 2  name: [Lex-1]
+l0 symbol number: 2  name in display form: 'to'
+l0 symbol number: 2  DSL form: 'to'
+l0 symbol number: 3  name: [Lex-2]
+l0 symbol number: 3  name in display form: '='
+l0 symbol number: 3  DSL form: '='
+l0 symbol number: 4  name: [Lex-3]
+l0 symbol number: 4  name in display form: 'string'
+l0 symbol number: 4  DSL form: 'string'
+l0 symbol number: 5  name: [Lex-4]
+l0 symbol number: 5  name in display form: '('
+l0 symbol number: 5  DSL form: '('
+l0 symbol number: 6  name: [Lex-5]
+l0 symbol number: 6  name in display form: ')'
+l0 symbol number: 6  DSL form: ')'
+l0 symbol number: 7  name: [Lex-6]
+l0 symbol number: 7  name in display form: '+'
+l0 symbol number: 7  DSL form: '+'
+l0 symbol number: 8  name: [Lex-7]
+l0 symbol number: 8  name in display form: '+'
+l0 symbol number: 8  DSL form: '+'
+l0 symbol number: 9  name: [Lex-8]
+l0 symbol number: 9  name in display form: '*'
+l0 symbol number: 9  DSL form: '*'
+l0 symbol number: 10  name: [[']]
+l0 symbol number: 10  name in display form: [']
+l0 symbol number: 10  DSL form: [']
+l0 symbol number: 11  name: [[\(]]
+l0 symbol number: 11  name in display form: [\(]
+l0 symbol number: 11  DSL form: [\(]
+l0 symbol number: 12  name: [[\)]]
+l0 symbol number: 12  name in display form: [\)]
+l0 symbol number: 12  DSL form: [\)]
+l0 symbol number: 13  name: [[\*]]
+l0 symbol number: 13  name in display form: [\*]
+l0 symbol number: 13  DSL form: [\*]
+l0 symbol number: 14  name: [[\+]]
+l0 symbol number: 14  name in display form: [\+]
+l0 symbol number: 14  DSL form: [\+]
+l0 symbol number: 15  name: [[\=]]
+l0 symbol number: 15  name in display form: [\=]
+l0 symbol number: 15  DSL form: [\=]
+l0 symbol number: 16  name: [[\d]]
+l0 symbol number: 16  name in display form: [\d]
+l0 symbol number: 16  DSL form: [\d]
+l0 symbol number: 17  name: [[\s]]
+l0 symbol number: 17  name in display form: [\s]
+l0 symbol number: 17  DSL form: [\s]
+l0 symbol number: 18  name: [[\w]]
+l0 symbol number: 18  name in display form: [\w]
+l0 symbol number: 18  DSL form: [\w]
+l0 symbol number: 19  name: [[^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}]]
+l0 symbol number: 19  name in display form: [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}]
+l0 symbol number: 19  DSL form: [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}]
+l0 symbol number: 20  name: [[e]]
+l0 symbol number: 20  name in display form: [e]
+l0 symbol number: 20  DSL form: [e]
+l0 symbol number: 21  name: [[g]]
+l0 symbol number: 21  name in display form: [g]
+l0 symbol number: 21  DSL form: [g]
+l0 symbol number: 22  name: [[i]]
+l0 symbol number: 22  name in display form: [i]
+l0 symbol number: 22  DSL form: [i]
+l0 symbol number: 23  name: [[n]]
+l0 symbol number: 23  name in display form: [n]
+l0 symbol number: 23  DSL form: [n]
+l0 symbol number: 24  name: [[o]]
+l0 symbol number: 24  name in display form: [o]
+l0 symbol number: 24  DSL form: [o]
+l0 symbol number: 25  name: [[r]]
+l0 symbol number: 25  name in display form: [r]
+l0 symbol number: 25  DSL form: [r]
+l0 symbol number: 26  name: [[s]]
+l0 symbol number: 26  name in display form: [s]
+l0 symbol number: 26  DSL form: [s]
+l0 symbol number: 27  name: [[t]]
+l0 symbol number: 27  name in display form: [t]
+l0 symbol number: 27  DSL form: [t]
+l0 symbol number: 28  name: number
+l0 symbol number: 28  name in display form: number
+l0 symbol number: 28  DSL form: number
+l0 symbol number: 29  name: string
+l0 symbol number: 29  name in display form: string
+l0 symbol number: 29  DSL form: string
+l0 symbol number: 30  name: string contents
+l0 symbol number: 30  name in display form: <string contents>
+l0 symbol number: 30  DSL form: string contents
+l0 symbol number: 31  name: variable
+l0 symbol number: 31  name in display form: variable
+l0 symbol number: 31  DSL form: variable
+l0 symbol number: 32  name: whitespace
+l0 symbol number: 32  name in display form: whitespace
+l0 symbol number: 32  DSL form: whitespace
+l0 symbol number: 33  name: [:lex_start:]
+l0 symbol number: 33  name in display form: [:lex_start:]
+l0 symbol number: 33  DSL form: [No name in DSL form]
 END_OF_TEXT
 
 1;    # In case used as "do" file

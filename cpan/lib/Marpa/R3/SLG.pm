@@ -1886,8 +1886,6 @@ sub Marpa::R3::Scanless::G::lmg_show_symbols {
     my $text = q{};
     $verbose //= 0;
 
-    my $grammar_name = uc $subg_name;
-
     my ($highest_symbol_id) =
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 's>*', $subg_name );
@@ -1898,19 +1896,17 @@ END_OF_LUA
 
     for my $symbol_id ( 0 .. $highest_symbol_id ) {
 
-        $text .= join q{ }, $grammar_name, "S$symbol_id",
-          $slg->lmg_symbol_display_form( $subg_name, $symbol_id );
-        $text .= "\n";
-
-        if ( $verbose >= 2 ) {
-
             ($text) = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
                 <<'END_OF_LUA', 'sisi', $subg_name, $symbol_id, $text, $verbose );
     local slg, subg_name, symbol_id, text, verbose = ...
     local pieces = { text }
+    local lmw_g = slg[subg_name].lmw_g
+    pieces[#pieces+1] = table.concat (
+        { subg_name, 'S' .. symbol_id, lmw_g:symbol_display_form( symbol_id ) },
+        " ")
+    pieces[#pieces+1] = "\n"
     if verbose >= 2 then
         local tags = { ' /*' }
-        local lmw_g = slg[subg_name].lmw_g
         if lmw_g:symbol_is_productive(symbol_id) == 0 then
             tags[#tags+1] = 'unproductive'
         end
@@ -1943,8 +1939,6 @@ END_OF_LUA
     end
     return table.concat(pieces)
 END_OF_LUA
-
-        } ## end if ( $verbose >= 2 )
 
     }
 

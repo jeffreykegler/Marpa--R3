@@ -106,10 +106,10 @@ restore_stdout();
 
 Marpa::R3::Test::is( ${$actual_ref},
     <<'END_SYMBOLS', 'Ambiguous Equation Symbols' );
-G1 S0 E
-G1 S1 Number
-G1 S2 Op
-G1 S3 [:start:]
+g1 S0 E
+g1 S1 Number
+g1 S2 Op
+g1 S3 [:start:]
 END_SYMBOLS
 
 $actual_ref = save_stdout();

@@ -64,10 +64,10 @@ EOS
 
 Marpa::R3::Test::is( $grammar->g1_show_symbols,
     <<'EOS', 'Aycock/Horspool Symbols' );
-G1 S0 A
-G1 S1 S
-G1 S2 [:start:]
-G1 S3 'a'
+g1 S0 A
+g1 S1 S
+g1 S2 [:start:]
+g1 S3 'a'
 EOS
 
 Marpa::R3::Test::is( $grammar->show_nrls,

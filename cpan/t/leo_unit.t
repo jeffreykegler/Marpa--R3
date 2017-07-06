@@ -53,12 +53,12 @@ my $grammar = Marpa::R3::Scanless::G->new( { source => \$dsl } );
 
 Marpa::R3::Test::is( $grammar->g1_show_symbols(),
     <<'END_OF_STRING', 'Leo166 Symbols' );
-G1 S0 A
-G1 S1 B
-G1 S2 C
-G1 S3 [:start:]
-G1 S4 a
-G1 S5 c
+g1 S0 A
+g1 S1 B
+g1 S2 C
+g1 S3 [:start:]
+g1 S4 a
+g1 S5 c
 END_OF_STRING
 
 Marpa::R3::Test::is( $grammar->g1_rules_show,
