@@ -1883,64 +1883,53 @@ sub Marpa::R3::Scanless::G::coro_by_tag {
 
 sub Marpa::R3::Scanless::G::lmg_show_symbols {
     my ( $slg, $subg_name, $verbose ) = @_;
-    my $text = q{};
     $verbose //= 0;
 
-    my ($highest_symbol_id) =
-      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 's>*', $subg_name );
-    local grammar, subg_name = ...
-    local lmw_g = grammar[subg_name].lmw_g
-    return lmw_g:highest_symbol_id()
-END_OF_LUA
-
-    for my $symbol_id ( 0 .. $highest_symbol_id ) {
-
-            ($text) = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-                <<'END_OF_LUA', 'sisi', $subg_name, $symbol_id, $text, $verbose );
-    local slg, subg_name, symbol_id, text, verbose = ...
-    local pieces = { text }
+    my ($text) = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 'si', $subg_name, $verbose );
+    local slg, subg_name, verbose = ...
+    local pieces = { }
     local lmw_g = slg[subg_name].lmw_g
-    pieces[#pieces+1] = table.concat (
-        { subg_name, 'S' .. symbol_id, lmw_g:symbol_display_form( symbol_id ) },
-        " ")
-    pieces[#pieces+1] = "\n"
-    if verbose >= 2 then
-        local tags = { ' /*' }
-        if lmw_g:symbol_is_productive(symbol_id) == 0 then
-            tags[#tags+1] = 'unproductive'
+    for symbol_id = 0, lmw_g:highest_symbol_id() do
+        pieces[#pieces+1] = table.concat (
+            { subg_name, 'S' .. symbol_id, lmw_g:symbol_display_form( symbol_id ) },
+            " ")
+        pieces[#pieces+1] = "\n"
+        if verbose >= 2 then
+            local tags = { ' /*' }
+            if lmw_g:symbol_is_productive(symbol_id) == 0 then
+                tags[#tags+1] = 'unproductive'
+            end
+            if lmw_g:symbol_is_accessible(symbol_id) == 0 then
+                tags[#tags+1] = 'inaccessible'
+            end
+            if lmw_g:symbol_is_nulling(symbol_id) ~= 0 then
+                tags[#tags+1] = 'nulling'
+            end
+            if lmw_g:symbol_is_terminal(symbol_id) ~= 0 then
+                tags[#tags+1] = 'terminal'
+            end
+            if #tags >= 2 then
+                tags[#tags+1] = '*/'
+                pieces[#pieces+1] = " "
+                pieces[#pieces+1] = table.concat(tags, ' ')
+                pieces[#pieces+1] =  '\n'
+            end
+            pieces[#pieces+1] =  "  Internal name: <"
+            pieces[#pieces+1] =  lmw_g:symbol_name(symbol_id)
+            pieces[#pieces+1] =  ">\n"
         end
-        if lmw_g:symbol_is_accessible(symbol_id) == 0 then
-            tags[#tags+1] = 'inaccessible'
-        end
-        if lmw_g:symbol_is_nulling(symbol_id) ~= 0 then
-            tags[#tags+1] = 'nulling'
-        end
-        if lmw_g:symbol_is_terminal(symbol_id) ~= 0 then
-            tags[#tags+1] = 'terminal'
-        end
-        if #tags >= 2 then
-            tags[#tags+1] = '*/'
-            pieces[#pieces+1] = " "
-            pieces[#pieces+1] = table.concat(tags, ' ')
-            pieces[#pieces+1] =  '\n'
-        end
-        pieces[#pieces+1] =  "  Internal name: <"
-        pieces[#pieces+1] =  lmw_g:symbol_name(symbol_id)
-        pieces[#pieces+1] =  ">\n"
-    end
-    if verbose >= 3 then
-        local dsl_form =  slg:lmg_symbol_dsl_form( subg_name, symbol_id )
-        if dsl_form then
-            pieces[#pieces+1] =  '  SLIF name: '
-            pieces[#pieces+1] =  dsl_form
-            pieces[#pieces+1] =  "\n"
+        if verbose >= 3 then
+            local dsl_form =  slg:lmg_symbol_dsl_form( subg_name, symbol_id )
+            if dsl_form then
+                pieces[#pieces+1] =  '  SLIF name: '
+                pieces[#pieces+1] =  dsl_form
+                pieces[#pieces+1] =  "\n"
+            end
         end
     end
     return table.concat(pieces)
 END_OF_LUA
-
-    }
 
     return $text;
 }
