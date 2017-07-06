@@ -1747,6 +1747,22 @@ sub kwgen_arr {
     use strict;
 }
 
+sub kwgen_opt {
+    my ($line, $perl_name, $kollos_name, $signature, @defaults) = @_;
+    my $tag = '@' . __FILE__ . ':' .  $line;
+    my $code = sprintf( 'return _M.class_slg.%s(...)', $kollos_name );
+    # my $code = sprintf( 'io.stderr:write("Calling slg.%s ", table.concat(..., "")); return _M.class_slg.%s(...)', $kollos_name, $kollos_name );
+    no strict 'refs';
+    *{ 'Marpa::R3::Scanless::G::' . $perl_name }
+        = sub () {
+            my ($slg, @args) = @_;
+            $args[$_] //= $defaults[$_] for 0 .. $#defaults;
+            my ($retour) = $slg->call_by_tag($tag, $code, $signature, @args);
+            return $retour;
+        };
+    use strict;
+}
+
 # TODO: Census all uses of Marpa::R3::Scanless::G::g1_symbol_name
 # in pod and tests, and make sure that they are appropriate --
 # that is, that they should not be symbol_name() instead.
@@ -1776,6 +1792,10 @@ kwgen(__LINE__, qw(l0_symbol_display_form l0_symbol_display_form i));
 kwgen(__LINE__, qw(lmg_symbol_dsl_form lmg_symbol_dsl_form si));
 kwgen(__LINE__, qw(g1_symbol_dsl_form g1_symbol_dsl_form i));
 kwgen(__LINE__, qw(l0_symbol_dsl_form l0_symbol_dsl_form i));
+
+kwgen_opt(__LINE__, qw(lmg_symbols_show lmg_symbols_show si), 0);
+kwgen_opt(__LINE__, qw(g1_symbols_show g1_symbols_show i), 0);
+kwgen_opt(__LINE__, qw(l0_symbols_show g1_symbols_show i), 0);
 
 kwgen(__LINE__, qw(lmg_symbol_by_name lmg_symbol_by_name si));
 kwgen(__LINE__, qw(g1_symbol_by_name g1_symbol_by_name i));
@@ -1879,71 +1899,6 @@ sub Marpa::R3::Scanless::G::coro_by_tag {
         Marpa::R3::exception($eval_error);
     }
     return @results;
-}
-
-sub Marpa::R3::Scanless::G::lmg_show_symbols {
-    my ( $slg, $subg_name, $verbose ) = @_;
-    $verbose //= 0;
-
-    my ($text) = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 'si', $subg_name, $verbose );
-    local slg, subg_name, verbose = ...
-    local pieces = { }
-    local lmw_g = slg[subg_name].lmw_g
-    for symbol_id = 0, lmw_g:highest_symbol_id() do
-        pieces[#pieces+1] = table.concat (
-            { subg_name, 'S' .. symbol_id, lmw_g:symbol_display_form( symbol_id ) },
-            " ")
-        pieces[#pieces+1] = "\n"
-        if verbose >= 2 then
-            local tags = { ' /*' }
-            if lmw_g:symbol_is_productive(symbol_id) == 0 then
-                tags[#tags+1] = 'unproductive'
-            end
-            if lmw_g:symbol_is_accessible(symbol_id) == 0 then
-                tags[#tags+1] = 'inaccessible'
-            end
-            if lmw_g:symbol_is_nulling(symbol_id) ~= 0 then
-                tags[#tags+1] = 'nulling'
-            end
-            if lmw_g:symbol_is_terminal(symbol_id) ~= 0 then
-                tags[#tags+1] = 'terminal'
-            end
-            if #tags >= 2 then
-                tags[#tags+1] = '*/'
-                pieces[#pieces+1] = " "
-                pieces[#pieces+1] = table.concat(tags, ' ')
-                pieces[#pieces+1] =  '\n'
-            end
-            pieces[#pieces+1] =  "  Internal name: <"
-            pieces[#pieces+1] =  lmw_g:symbol_name(symbol_id)
-            pieces[#pieces+1] =  ">\n"
-        end
-        if verbose >= 3 then
-            local dsl_form =  slg:lmg_symbol_dsl_form( subg_name, symbol_id )
-            if dsl_form then
-                pieces[#pieces+1] =  '  SLIF name: '
-                pieces[#pieces+1] =  dsl_form
-                pieces[#pieces+1] =  "\n"
-            end
-        end
-    end
-    return table.concat(pieces)
-END_OF_LUA
-
-    return $text;
-}
-
-sub Marpa::R3::Scanless::G::g1_show_symbols {
-    my ( $slg, $verbose ) = @_;
-    $verbose //= 0;
-    return $slg->lmg_show_symbols('g1', $verbose);
-}
-
-sub Marpa::R3::Scanless::G::l0_show_symbols {
-    my ( $slg, $verbose ) = @_;
-    $verbose //= 0;
-    return $slg->lmg_show_symbols('l0', $verbose);
 }
 
 sub Marpa::R3::Scanless::G::g1_symbol_is_accessible {

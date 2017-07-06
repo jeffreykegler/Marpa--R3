@@ -64,7 +64,7 @@ R3 A ::= 'a'
 R4 [:start:] ::= S
 EOS
 
-Marpa::R3::Test::is( $grammar->g1_show_symbols,
+Marpa::R3::Test::is( $grammar->g1_symbols_show,
     <<'EOS', 'Aycock/Horspool Symbols' );
 g1 S0 A
 g1 S1 S

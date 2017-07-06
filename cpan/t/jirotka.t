@@ -85,7 +85,7 @@ END_OF_DSL
 my $input = q{Create Metric m As Select 1 Where True};
 
 Marpa::R3::Test::is(
-    $grammar->g1_show_symbols(),
+    $grammar->g1_symbols_show(),
     <<'END_OF_SYMBOLS', 'Symbols' );
 g1 S0 AS
 g1 S1 BY

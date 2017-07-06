@@ -56,7 +56,7 @@ END_OF_DSL
     }
 );
 
-Marpa::R3::Test::is( $grammar->g1_show_symbols(),
+Marpa::R3::Test::is( $grammar->g1_symbols_show(),
     <<'END_OF_STRING', 'Leo166 Symbols' );
 g1 S0 A
 g1 S1 B

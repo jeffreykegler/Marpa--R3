@@ -45,7 +45,7 @@ END_OF_DSL
 
 my $grammar = Marpa::R3::Scanless::G->new( { source => \$dsl } );
 
-Marpa::R3::Test::is( $grammar->g1_show_symbols(),
+Marpa::R3::Test::is( $grammar->g1_symbols_show(),
     <<'END_OF_STRING', 'Leo166 Symbols' );
 g1 S0 S
 g1 S1 [:start:]

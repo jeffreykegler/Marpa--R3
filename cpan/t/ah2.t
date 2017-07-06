@@ -71,8 +71,8 @@ R3 [:start:] ::= S
 EOS
 
 SKIP: {
-    skip 'show_symbols() NYI', 1 ;
-Marpa::R3::Test::is( $grammar->show_symbols,
+    skip 'symbols_show() NYI', 1 ;
+Marpa::R3::Test::is( $grammar->symbols_show(),
     <<'EOS', 'Aycock/Horspool Symbols' );
 g1 S0 A
 g1 S1 S
@@ -81,7 +81,7 @@ g1 S3 'a'
 EOS
 };
 
-Marpa::R3::Test::is( $grammar->g1_show_symbols,
+Marpa::R3::Test::is( $grammar->g1_symbols_show(),
     <<'EOS', 'Aycock/Horspool G1 Symbols' );
 g1 S0 A
 g1 S1 S

@@ -91,9 +91,9 @@ Test::More::is( $value, 49, 'Tutorial 2 synopsis value' );
 
 $recce->series_restart();
 
-my $show_symbols_output = $grammar->g1_show_symbols();
+my $symbols_show_output = $grammar->g1_symbols_show();
 
-Marpa::R3::Test::is( $show_symbols_output,
+Marpa::R3::Test::is( $symbols_show_output,
     <<'END_SYMBOLS', 'Implementation Example Symbols' );
 g1 S0 Calculator
 g1 S1 Expression

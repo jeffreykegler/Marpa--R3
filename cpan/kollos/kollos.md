@@ -893,6 +893,59 @@ Lowest ISYID is 0.
 
 ```
     -- miranda: section+ most Lua function definitions
+    function _M.class_slg.lmg_symbols_show(slg, subg_name, verbose)
+        local pieces = { }
+        local lmw_g = slg[subg_name].lmw_g
+        for symbol_id = 0, lmw_g:highest_symbol_id() do
+            pieces[#pieces+1] = table.concat (
+                { subg_name, 'S' .. symbol_id, lmw_g:symbol_display_form( symbol_id ) },
+                " ")
+            pieces[#pieces+1] = "\n"
+            if verbose >= 2 then
+                local tags = { ' /*' }
+                if lmw_g:symbol_is_productive(symbol_id) == 0 then
+                    tags[#tags+1] = 'unproductive'
+                end
+                if lmw_g:symbol_is_accessible(symbol_id) == 0 then
+                    tags[#tags+1] = 'inaccessible'
+                end
+                if lmw_g:symbol_is_nulling(symbol_id) ~= 0 then
+                    tags[#tags+1] = 'nulling'
+                end
+                if lmw_g:symbol_is_terminal(symbol_id) ~= 0 then
+                    tags[#tags+1] = 'terminal'
+                end
+                if #tags >= 2 then
+                    tags[#tags+1] = '*/'
+                    pieces[#pieces+1] = " "
+                    pieces[#pieces+1] = table.concat(tags, ' ')
+                    pieces[#pieces+1] =  '\n'
+                end
+                pieces[#pieces+1] =  "  Internal name: <"
+                pieces[#pieces+1] =  lmw_g:symbol_name(symbol_id)
+                pieces[#pieces+1] =  ">\n"
+            end
+            if verbose >= 3 then
+                local dsl_form =  slg:lmg_symbol_dsl_form( subg_name, symbol_id )
+                if dsl_form then
+                    pieces[#pieces+1] =  '  SLIF name: '
+                    pieces[#pieces+1] =  dsl_form
+                    pieces[#pieces+1] =  "\n"
+                end
+            end
+        end
+        return table.concat(pieces)
+    end
+    function _M.class_slg.g1_symbols_show(slg, symbol_id, verbose)
+        return slg:lmg_symbols_show('g1', symbol_id, verbose)
+    end
+    function _M.class_slg.l0_symbols_show(slg, symbol_id, verbose)
+        return slg:lmg_symbols_show('l0', symbol_id, verbose)
+    end
+```
+
+```
+    -- miranda: section+ most Lua function definitions
     function _M.class_slg.lmg_xsyid(slg, subg_name, isy_key)
         local subg = slg[subg_name]
         return subg:xsyid(isy_key)

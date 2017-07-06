@@ -88,9 +88,9 @@ sub My_Actions::do_Expression {
 
 ## use critic
 
-my $show_symbols_output = $grammar->g1_show_symbols();
+my $symbols_show_output = $grammar->g1_symbols_show();
 
-Marpa::R3::Test::is( $show_symbols_output,
+Marpa::R3::Test::is( $symbols_show_output,
     <<'END_SYMBOLS', 'Leo Example Symbols' );
 g1 S0 AddAssignOp
 g1 S1 AssignOp

@@ -646,23 +646,23 @@ END_OF_SHOW_RULES_OUTPUT
 # Marpa::R3::Display::End
 
 # Marpa::R3::Display
-# name: SLIF g1_show_symbols() synopsis
+# name: SLIF g1_symbols_show() synopsis
 
-my $show_symbols_output;
-$show_symbols_output .= "G1 Symbols:\n";
-$show_symbols_output .= $grammar->g1_show_symbols(3);
-$show_symbols_output .= "Lex (L0) Symbols:\n";
-$show_symbols_output .= $grammar->l0_show_symbols(3);
+my $symbols_show_output;
+$symbols_show_output .= "G1 Symbols:\n";
+$symbols_show_output .= $grammar->g1_symbols_show(3);
+$symbols_show_output .= "Lex (L0) Symbols:\n";
+$symbols_show_output .= $grammar->l0_symbols_show(3);
 
 # Marpa::R3::Display::End
 
 # Marpa::R3::Display
-# name: SLIF debug example g1_show_symbols() output
+# name: SLIF debug example g1_symbols_show() output
 # start-after-line: END_OF_SHOW_SYMBOLS_OUTPUT
 # end-before-line: '^END_OF_SHOW_SYMBOLS_OUTPUT$'
 
-Marpa::R3::Test::is( $show_symbols_output,
-    <<'END_OF_SHOW_SYMBOLS_OUTPUT', 'SLIF g1_show_symbols()' );
+Marpa::R3::Test::is( $symbols_show_output,
+    <<'END_OF_SHOW_SYMBOLS_OUTPUT', 'SLIF g1_symbols_show()' );
 G1 Symbols:
 g1 S0 [:start:]
   Internal name: <[:start:]>

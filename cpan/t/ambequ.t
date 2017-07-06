@@ -99,7 +99,7 @@ my $grammar = Marpa::R3::Scanless::G->new( {   source => \$dsl });
 my $actual_ref;
 $actual_ref = save_stdout();
 
-print $grammar->g1_show_symbols()
+print $grammar->g1_symbols_show()
     or die "print failed: $ERRNO";
 
 restore_stdout();
