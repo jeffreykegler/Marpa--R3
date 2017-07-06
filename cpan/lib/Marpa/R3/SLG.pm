@@ -1905,43 +1905,46 @@ END_OF_LUA
         if ( $verbose >= 2 ) {
 
             ($text) = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-                <<'END_OF_LUA', 'sis', $subg_name, $symbol_id, $text );
-    local g, subg_name, symbol_id, text = ...
+                <<'END_OF_LUA', 'sisi', $subg_name, $symbol_id, $text, $verbose );
+    local slg, subg_name, symbol_id, text, verbose = ...
     local pieces = { text }
-    local tags = { ' /*' }
-    local lmw_g = g[subg_name].lmw_g
-    if lmw_g:symbol_is_productive(symbol_id) == 0 then
-        tags[#tags+1] = 'unproductive'
+    if verbose >= 2 then
+        local tags = { ' /*' }
+        local lmw_g = slg[subg_name].lmw_g
+        if lmw_g:symbol_is_productive(symbol_id) == 0 then
+            tags[#tags+1] = 'unproductive'
+        end
+        if lmw_g:symbol_is_accessible(symbol_id) == 0 then
+            tags[#tags+1] = 'inaccessible'
+        end
+        if lmw_g:symbol_is_nulling(symbol_id) ~= 0 then
+            tags[#tags+1] = 'nulling'
+        end
+        if lmw_g:symbol_is_terminal(symbol_id) ~= 0 then
+            tags[#tags+1] = 'terminal'
+        end
+        if #tags >= 2 then
+            tags[#tags+1] = '*/'
+            pieces[#pieces+1] = " "
+            pieces[#pieces+1] = table.concat(tags, ' ')
+            pieces[#pieces+1] =  '\n'
+        end
+        pieces[#pieces+1] =  "  Internal name: <"
+        pieces[#pieces+1] =  lmw_g:symbol_name(symbol_id)
+        pieces[#pieces+1] =  ">\n"
     end
-    if lmw_g:symbol_is_accessible(symbol_id) == 0 then
-        tags[#tags+1] = 'inaccessible'
+    if verbose >= 3 then
+        local dsl_form =  slg:lmg_symbol_dsl_form( subg_name, symbol_id )
+        if dsl_form then
+            pieces[#pieces+1] =  '  SLIF name: '
+            pieces[#pieces+1] =  dsl_form
+            pieces[#pieces+1] =  "\n"
+        end
     end
-    if lmw_g:symbol_is_nulling(symbol_id) ~= 0 then
-        tags[#tags+1] = 'nulling'
-    end
-    if lmw_g:symbol_is_terminal(symbol_id) ~= 0 then
-        tags[#tags+1] = 'terminal'
-    end
-    if #tags >= 2 then
-        tags[#tags+1] = '*/'
-        pieces[#pieces+1] = " "
-        pieces[#pieces+1] = table.concat(tags, ' ')
-        pieces[#pieces+1] =  '\n'
-    end
-    pieces[#pieces+1] =  "  Internal name: <"
-    pieces[#pieces+1] =  lmw_g:symbol_name(symbol_id)
-    pieces[#pieces+1] =  ">\n"
     return table.concat(pieces)
 END_OF_LUA
 
         } ## end if ( $verbose >= 2 )
-
-        if ( $verbose >= 3 ) {
-
-            my $dsl_form = $slg->lmg_symbol_dsl_form( $subg_name, $symbol_id );
-            if ($dsl_form) { $text .= qq{  SLIF name: $dsl_form\n}; }
-
-        } ## end if ( $verbose >= 3 )
 
     }
 
