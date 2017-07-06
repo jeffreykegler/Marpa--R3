@@ -10,9 +10,9 @@
 # or implied warranties. For details, see the full text of
 # of the licenses in the directory LICENSES.
 
-# Note: Converted from sl_gia.t
+# Converted from Marpa::R2's sl_gia.t
 
-# MITOSIS: TODO
+# MITOSIS: FINISHED
 
 use 5.010001;
 use strict;
@@ -53,13 +53,15 @@ END_OF_DSL
     }
 );
 
-Marpa::R3::Test::is( $grammar->g1_rules_show, <<'EOS', 'Aycock/Horspool Rules' );
-R0 S ::= A B B B C C
-R1 A ::= 'a'
-R2 B ::= 'a'
-R3 B ::=
-R4 C ::=
-R5 [:start:] ::= S
+Marpa::R3::Test::is( $grammar->rules_show(), <<'EOS', 'Aycock/Horspool Rules' );
+R1 [:start:] ::= S
+R2 S ::= A B B B C C
+R3 A ::= 'a'
+R4 B ::= 'a'
+R5 B ::=
+R6 C ::=
+R7 'a' ~ [a]
+R8 'a' ~ [a]
 EOS
 
 my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );

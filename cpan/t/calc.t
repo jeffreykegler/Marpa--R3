@@ -12,12 +12,12 @@
 
 # Various that share a calculator semantics
 
-# MITOSIS: TODO L0
+# MITOSIS: FINISHED
 
 use 5.010001;
 use strict;
 use warnings;
-use Test::More tests => 7;
+use Test::More tests => 8;
 use English qw( -no_match_vars );
 use Scalar::Util qw(blessed);
 use POSIX qw(setlocale LC_ALL);
@@ -114,7 +114,6 @@ END_OF_SHOW_RULES_OUTPUT
 # R28 [:lex_start:] ~ comma
 
 $rules_show_output = $calculator_grammar->g1_rules_show();
-$rules_show_output .= $calculator_grammar->l0_rules_show(1);
 
 Marpa::R3::Test::is( $rules_show_output,
     <<'END_OF_SHOW_RULES_OUTPUT', 'Scanless g1_rules_show()' );
@@ -131,6 +130,12 @@ R9 Expression ::= Expression '/' Expression
 R10 Expression ::= Expression '+' Expression
 R11 Expression ::= Expression '-' Expression
 R12 [:start:] ::= Script
+END_OF_SHOW_RULES_OUTPUT
+
+$rules_show_output = $calculator_grammar->l0_rules_show(1);
+
+Marpa::R3::Test::is( $rules_show_output,
+    <<'END_OF_SHOW_RULES_OUTPUT', 'Scanless l0_rules_show()' );
 R0 comma ~ [,]
 R1 '(' ~ [\(]
 R2 ')' ~ [\)]

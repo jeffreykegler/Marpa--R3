@@ -893,6 +893,29 @@ Lowest ISYID is 0.
 
 ```
     -- miranda: section+ most Lua function definitions
+    function _M.class_slg.symbols_show(slg, verbose)
+        local pieces = { }
+        for symbol_id = 1, slg:highest_symbol_id() do
+            pieces[#pieces+1] = table.concat (
+                { 'S' .. symbol_id, slg:symbol_display_form( symbol_id ) },
+                " ")
+            pieces[#pieces+1] = "\n"
+            if verbose >= 2 then
+                pieces[#pieces+1] =  "  Canonical name: <"
+                pieces[#pieces+1] =  lmw_g:symbol_name(symbol_id)
+                pieces[#pieces+1] =  ">\n"
+            end
+            if verbose >= 3 then
+                local dsl_form =  slg:symbol_dsl_form( symbol_id )
+                if dsl_form then
+                    pieces[#pieces+1] =  '  SLIF name: '
+                    pieces[#pieces+1] =  dsl_form
+                    pieces[#pieces+1] =  "\n"
+                end
+            end
+        end
+        return table.concat(pieces)
+    end
     function _M.class_slg.lmg_symbols_show(slg, subg_name, verbose)
         local pieces = { }
         local lmw_g = slg[subg_name].lmw_g

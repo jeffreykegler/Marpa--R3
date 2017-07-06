@@ -16,7 +16,7 @@
 # _The Computer Journal_, Vol. 45, No. 6, pp. 620-630,
 # in its "NNF" form
 
-# MITOSIS: TODO
+# MITOSIS: FINISHED
 
 use 5.010001;
 use strict;
@@ -70,16 +70,14 @@ R2 A ::= 'a'
 R3 [:start:] ::= S
 EOS
 
-SKIP: {
-    skip 'symbols_show() NYI', 1 ;
 Marpa::R3::Test::is( $grammar->symbols_show(),
     <<'EOS', 'Aycock/Horspool Symbols' );
-g1 S0 A
-g1 S1 S
-g1 S2 [:start:]
-g1 S3 'a'
+S1 A
+S2 S
+S3 [:start:]
+S4 'a'
+S5 [a]
 EOS
-};
 
 Marpa::R3::Test::is( $grammar->g1_symbols_show(),
     <<'EOS', 'Aycock/Horspool G1 Symbols' );
@@ -119,7 +117,8 @@ Marpa::R3::Test::is( $grammar->show_nrls,
 11: [:start:]['] ::= [:start:]
 EOS
 
-# TODO This is in term of ISYs. What about external symbols?
+# This is in term of ISYs. We don't track these properties for
+# XSYs, at least not currently
 
 my $nulling_symbols = join q{ }, sort map { $grammar->g1_symbol_name($_) }
   grep { $grammar->g1_symbol_is_nulling($_) } $grammar->g1_symbol_ids();

@@ -19,7 +19,7 @@
 # alternatives are rejected at a location.  (The default is for this to
 # be a fatal error.)
 
-# MITOSIS: TODO L0
+# MITOSIS: FINISHED
 
 use 5.010001;
 use strict;
