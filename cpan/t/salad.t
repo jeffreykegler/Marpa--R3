@@ -19,7 +19,7 @@
 # In the literature, this is called a supersequence
 # search.
 
-# MITOSIS: TODO L0
+# MITOSIS: FINISHED
 
 use 5.010001;
 use strict;
