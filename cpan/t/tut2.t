@@ -14,7 +14,7 @@
 
 # Tutorial 2 synopsis
 
-# MITOSIS: TODO
+# MITOSIS: FINISHED
 
 use 5.010001;
 use strict;
@@ -91,31 +91,44 @@ Test::More::is( $value, 49, 'Tutorial 2 synopsis value' );
 
 $recce->series_restart();
 
-my $symbols_show_output = $grammar->g1_symbols_show();
+my $symbols_show_output = $grammar->symbols_show();
 
 Marpa::R3::Test::is( $symbols_show_output,
     <<'END_SYMBOLS', 'Implementation Example Symbols' );
-g1 S0 Calculator
-g1 S1 Expression
-g1 S2 Factor
-g1 S3 Number
-g1 S4 Term
-g1 S5 [:start:]
-g1 S6 '*'
-g1 S7 '+'
+S1 Calculator
+S2 Expression
+S3 Factor
+S4 Number
+S5 Term
+S6 [:discard:]
+S7 [:start:]
+S8 '*'
+S9 '+'
+S10 [\*]
+S11 [\+]
+S12 [\d]
+S13 [\s]
+S14 digits
+S15 whitespace
 END_SYMBOLS
 
-my $rules_show_output = $grammar->g1_rules_show();
+my $rules_show_output = $grammar->rules_show();
 
 Marpa::R3::Test::is( $rules_show_output,
     <<'END_RULES', 'Implementation Example Rules' );
-R0 Calculator ::= Expression
-R1 Factor ::= Number
-R2 Term ::= Term '*' Factor
+R1 [:start:] ::= Calculator
+R2 Calculator ::= Expression
 R3 Term ::= Factor
 R4 Expression ::= Expression '+' Term
 R5 Expression ::= Term
-R6 [:start:] ::= Calculator
+R6 Factor ::= Number
+R7 Term ::= Term '*' Factor
+R8 '*' ~ [\*]
+R9 '+' ~ [\+]
+R10 Number ~ digits
+R11 digits ~ [\d] +
+R12 [:discard:] ~ whitespace
+R13 whitespace ~ [\s] +
 END_RULES
 
 my $show_ahms_output = $grammar->show_ahms();
