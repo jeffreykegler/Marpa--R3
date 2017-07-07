@@ -380,9 +380,9 @@ sub rule_blessing_find {
         local slg, irlid, bless_package = ...
         local irl = slg.g1.irls[irlid]
         local blessing = '::undef'
-        local xbnf = irl.xbnf
-        if xbnf then
-            blessing = xbnf.bless or '::undef'
+        local xpr = irl.xpr
+        if xpr then
+            blessing = xpr.bless or '::undef'
         end
         if blessing == '::undef' then return blessing end
         if #bless_package == 0 then
@@ -1102,9 +1102,9 @@ END_OF_LUA
         local g1g = slg.g1
         local is_sequence_rule = g1g:sequence_min(irlid) and 1 or 0
         local irl = slg.g1.irls[irlid]
-        local xbnf = irl.xbnf
+        local xpr = irl.xpr
         local is_discard_sequence = false
-        if xbnf and xbnf.discard_separation and is_sequence_rule then
+        if xpr and xpr.discard_separation and is_sequence_rule then
             is_discard_sequence = true
         end
         return g1g:rule_length(irlid), is_sequence_rule, is_discard_sequence

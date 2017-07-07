@@ -92,10 +92,12 @@ cd kollos && ../lua/lua toc.lua < kollos.md
     * [Set the value of a stack entry](#set-the-value-of-a-stack-entry)
     * [Convert current, origin Earley set to L0 span](#convert-current-origin-earley-set-to-l0-span)
   * [Input](#input)
+* [Lexeme (LEX) class](#lexeme-lex-class)
+  * [LEX fields](#lex-fields)
 * [External rule (XRL) class](#external-rule-xrl-class)
   * [XRL fields](#xrl-fields)
-* [External BNF (XBNF) class](#external-bnf-xbnf-class)
-  * [XBNF fields](#xbnf-fields)
+* [External production (XPR) class](#external-production-xpr-class)
+  * [XPR fields](#xpr-fields)
 * [Internal rule (IRL) class](#internal-rule-irl-class)
   * [IRL fields](#irl-fields)
 * [External symbol (XSY) class](#external-symbol-xsy-class)
@@ -587,7 +589,7 @@ Deletes the interpreter if the reference count drops to zero.
     class_slg_fields['token_semantics'] = true
 
     class_slg_fields.xrls = true
-    class_slg_fields.xbnfs = true
+    class_slg_fields.xprs = true
     class_slg_fields.xsys = true
 ```
 
@@ -610,88 +612,88 @@ This is a registry object.
 
 ### SLG accessors
 
-Display any XBNF
+Display any XPR
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slg.xbnf_display_o(slg, xbnf)
+    function _M.class_slg.xpr_display_o(slg, xpr)
         local pieces = {}
-        local subg = xbnf.subgrammar
+        local subg = xpr.subgrammar
         pieces[#pieces+1]
-            = xbnf.lhs:display_form()
+            = xpr.lhs:display_form()
         pieces[#pieces+1] = subg == 'g1' and '::=' or '~'
-        local rhs = xbnf.rhs
+        local rhs = xpr.rhs
         for ix = 1, #rhs do
             pieces[#pieces+1]
                 = rhs[ix]:display_form()
         end
-        local minimum = xbnf.min
+        local minimum = xpr.min
         if minimum then
             pieces[#pieces+1] =
                 minimum <= 0 and '*' or '+'
         end
         return table.concat(pieces, ' ')
     end
-    function _M.class_slg.xbnf_display(slg, xbnfid)
-        local xbnfs = slg.xbnfs
-        local xbnf = xbnfs[xbnfid]
-        return slg:xbnf_display_o(xbnf)
+    function _M.class_slg.xpr_display(slg, xprid)
+        local xprs = slg.xprs
+        local xpr = xprs[xprid]
+        return slg:xpr_display_o(xpr)
     end
 ```
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slg.xbnf_expand_o(slg, xbnf)
-        local xsys = { xbnf.lhs.id }
-        local rhs = xbnf.rhs
+    function _M.class_slg.xpr_expand_o(slg, xpr)
+        local xsys = { xpr.lhs.id }
+        local rhs = xpr.rhs
         for ix = 1, #rhs do
             local xsyid = rhs[ix].id
             xsys[#xsys+1] = xsyid
         end
         return xsys
     end
-    function _M.class_slg.xbnf_expand(slg, xbnfid)
-        local xbnfs = slg.xbnfs
-        local xbnf = xbnfs[xbnfid]
-        if not xbnf then
+    function _M.class_slg.xpr_expand(slg, xprid)
+        local xprs = slg.xprs
+        local xpr = xprs[xprid]
+        if not xpr then
             _M.userX(
-                "xbnf_expand(): %s is not a valid irlid",
-                inspect(xbnfid)
+                "xpr_expand(): %s is not a valid irlid",
+                inspect(xprid)
             )
         end
-        return slg:xbnf_expand_o(xbnf)
+        return slg:xpr_expand_o(xpr)
     end
 ```
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slg.xbnfs_show(slg, verbose)
+    function _M.class_slg.xprs_show(slg, verbose)
         verbose = verbose or 0
-        local xbnfs = slg.xbnfs
-        local xbnf_descs = {}
-        for xbnfid = 1, slg:highest_xbnfid() do
-            local xbnf = xbnfs[xbnfid]
-            local subg = xbnf.subgrammar
+        local xprs = slg.xprs
+        local xpr_descs = {}
+        for xprid = 1, slg:highest_xprid() do
+            local xpr = xprs[xprid]
+            local subg = xpr.subgrammar
 
             local pcs = {}
             local pcs2 = {}
-            pcs2[#pcs2+1] = 'R' .. xbnfid
-            pcs2[#pcs2+1] = slg:xbnf_display(xbnfid)
+            pcs2[#pcs2+1] = 'R' .. xprid
+            pcs2[#pcs2+1] = slg:xpr_display(xprid)
             pcs[#pcs+1] = table.concat(pcs2, ' ')
             pcs[#pcs+1] = "\n"
 
             local lhsid
             local rhsids = {}
-            local xbnf_length
+            local xpr_length
             if verbose >= 2 then
-                lhsid = xbnf.lhs.id
+                lhsid = xpr.lhs.id
                 rhsids = {}
-                xbnf_length = #xbnf.rhs
+                xpr_length = #xpr.rhs
                 local comments = {}
-                if xbnf_length == 0 then
+                if xpr_length == 0 then
                     comments[#comments+1] = 'empty'
                 end
-                if xbnf.discard_separation then
+                if xpr.discard_separation then
                     comments[#comments+1] = 'discard_sep'
                 end
                 if #comments > 0 then
@@ -704,12 +706,12 @@ Display any XBNF
                 end
                 pcs2 = {}
                 pcs2[#pcs2+1] = '  Symbol IDs:'
-                for ix = 0, xbnf_length - 1 do
-                   rhsids[ix] = xbnf.rhs[ix].id
+                for ix = 0, xpr_length - 1 do
+                   rhsids[ix] = xpr.rhs[ix].id
                 end
                 pcs2[#pcs2+1] = '<' .. lhsid .. '>'
                 pcs2[#pcs2+1] = '::='
-                for ix = 0, xbnf_length - 1 do
+                for ix = 0, xpr_length - 1 do
                     pcs2[#pcs2+1] = '<' .. rhsids[ix] .. '>'
                 end
                 pcs[#pcs+1] = table.concat(pcs2, ' ')
@@ -720,7 +722,7 @@ Display any XBNF
                 pcs2[#pcs2+1] = '  Internal symbols:'
                 pcs2[#pcs2+1] = '<' .. slg:symbol_name(lhsid) .. '>'
                 pcs2[#pcs2+1] = '::='
-                for ix = 0, xbnf_length - 1 do
+                for ix = 0, xpr_length - 1 do
                     pcs2[#pcs2+1]
                         = '<'
                             ..  slg:symbol_name(rhsids[ix])
@@ -729,57 +731,57 @@ Display any XBNF
                 pcs[#pcs+1] = table.concat(pcs2, ' ')
                 pcs[#pcs+1] = "\n"
             end
-            xbnf_descs[#xbnf_descs+1] = {
-                (subg == 'g1' and 0 or 1), xbnfid, table.concat(pcs)
+            xpr_descs[#xpr_descs+1] = {
+                (subg == 'g1' and 0 or 1), xprid, table.concat(pcs)
             }
         end
-        table.sort(xbnf_descs, _M.cmp_seq)
-        for ix = 1, #xbnf_descs do
-            local old_desc = xbnf_descs[ix]
-            xbnf_descs[ix] = old_desc[#old_desc]
+        table.sort(xpr_descs, _M.cmp_seq)
+        for ix = 1, #xpr_descs do
+            local old_desc = xpr_descs[ix]
+            xpr_descs[ix] = old_desc[#old_desc]
         end
-        return table.concat(xbnf_descs)
+        return table.concat(xpr_descs)
     end
 ```
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slg.highest_xbnfid(slg)
-        return #slg.xbnfs
+    function _M.class_slg.highest_xprid(slg)
+        return #slg.xprs
     end
 ```
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slg.xbnf_name_o(slg, xbnf)
-        local name = xbnf.name
+    function _M.class_slg.xpr_name_o(slg, xpr)
+        local name = xpr.name
         if name then return name end
-        local lhs = xbnf.lhs
+        local lhs = xpr.lhs
         return lhs.name
     end
-    function _M.class_slg.xbnf_name(slg, xbnfid)
-        local xbnf = slg.xbnfs[xbnfid]
-        if xbnf then return slg:xbnf_name_o(xbnf) end
-        return _M._internal_error('xbnf_name(), bad argument = %d', xbnfid)
+    function _M.class_slg.xpr_name(slg, xprid)
+        local xpr = slg.xprs[xprid]
+        if xpr then return slg:xpr_name_o(xpr) end
+        return _M._internal_error('xpr_name(), bad argument = %d', xprid)
     end
 ```
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slg.lmg_rule_to_xbnfid(slg, subg_name, irlid)
+    function _M.class_slg.lmg_rule_to_xprid(slg, subg_name, irlid)
         local subg = slg[subg_name]
         local irl = subg.irls[irlid]
         if not irl then
-            return _M._internal_error('lmg_rule_to_xbnfid(), bad argument = %d', irlid)
+            return _M._internal_error('lmg_rule_to_xprid(), bad argument = %d', irlid)
         end
-        local xbnf = irl.xbnf
-        if xbnf then return xbnf.id end
+        local xpr = irl.xpr
+        if xpr then return xpr.id end
     end
-    function _M.class_slg.g1_rule_to_xbnfid(slg, irlid)
-        return slg:lmg_rule_to_xbnfid('g1', irlid)
+    function _M.class_slg.g1_rule_to_xprid(slg, irlid)
+        return slg:lmg_rule_to_xprid('g1', irlid)
     end
-    function _M.class_slg.l0_rule_to_xbnfid(slg, irlid)
-        return slg:lmg_rule_to_xbnfid('l0', irlid)
+    function _M.class_slg.l0_rule_to_xprid(slg, irlid)
+        return slg:lmg_rule_to_xprid('l0', irlid)
     end
 ```
 
@@ -1028,9 +1030,9 @@ Lowest ISYID is 0.
         if not irl then
             return '(bad irlid ' .. irlid .. ')'
         end
-        local xbnf = irl.xbnf
-        if xbnf then
-             return slg:xbnf_display_o(xbnf)
+        local xpr = irl.xpr
+        if xpr then
+             return slg:xpr_display_o(xpr)
         end
         return slg:lmg_rule_show(subg_name, irlid)
     end
@@ -1124,9 +1126,9 @@ Lowest ISYID is 0.
                     comments[#comments+1] = 'inaccessible'
                 end
                 local irl = slg[subg_name].lmw_g.irls[irlid]
-                local xbnf = irl.xbnf
-                if xbnf then
-                    if xbnf.discard_separation then
+                local xpr = irl.xpr
+                if xpr then
+                    if xpr.discard_separation then
                         comments[#comments+1] = 'discard_sep'
                     end
                 end
@@ -1381,123 +1383,123 @@ for example in error messages.
     end
 ```
 
-Populate xbnfs.
-"xbnfs" are eXternal BNF rules.
+Populate xprs.
+"xprs" are eXternal productions.
 They are actually not fully external,
 but are first translation of the XRLs into
 BNF form.
 One symptom of their less-than-fully external
-nature is that they are two `xbnfs` tables,
+nature is that there are two `xprs` tables,
 one for each subgrammar.
 (The subgrammars are only visible internally.)
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slg.xbnfs_subg_populate(slg, source_hash, subgrammar)
+    function _M.class_slg.xprs_subg_populate(slg, source_hash, subgrammar)
         local subg = slg[subgrammar]
-        local xbnfs = slg.xbnfs
+        local xprs = slg.xprs
         -- io.stderr:write(inspect(source_hash))
-        local xbnf_names = {}
+        local xpr_names = {}
         local xsys = slg.xsys
-        local hash_xbnf_data = source_hash.xbnf[subgrammar]
+        local hash_xpr_data = source_hash.xpr[subgrammar]
         local hash_symbols = source_hash.symbols[subgrammar]
-        for xbnf_name, _ in pairs(hash_xbnf_data) do
-             xbnf_names[#xbnf_names+1] = xbnf_name
+        for xpr_name, _ in pairs(hash_xpr_data) do
+             xpr_names[#xpr_names+1] = xpr_name
         end
-        table.sort(xbnf_names,
+        table.sort(xpr_names,
            function(a, b)
-                local start_a = hash_xbnf_data[a].start
-                local start_b = hash_xbnf_data[b].start
+                local start_a = hash_xpr_data[a].start
+                local start_b = hash_xpr_data[b].start
                 if start_a ~= start_b then return start_a < start_b end
-                local subkey_a = hash_xbnf_data[a].subkey
-                local subkey_b = hash_xbnf_data[b].subkey
+                local subkey_a = hash_xpr_data[a].subkey
+                local subkey_b = hash_xpr_data[b].subkey
                 return subkey_a < subkey_b
            end
         )
-        for ix = 1, #xbnf_names do
-            local xbnf_name = xbnf_names[ix]
-            local runtime_xbnf = setmetatable({}, _M.class_xbnf)
+        for ix = 1, #xpr_names do
+            local xpr_name = xpr_names[ix]
+            local runtime_xpr = setmetatable({}, _M.class_xpr)
 
-            local xbnf_source = hash_xbnf_data[xbnf_name]
+            local xpr_source = hash_xpr_data[xpr_name]
 
             -- copy, so that we can destroy `source_hash`
 
-            runtime_xbnf.xrl_name = xbnf_source.xrlid
-            runtime_xbnf.name = xbnf_source.name
-            runtime_xbnf.subgrammar = xbnf_source.subgrammar
-            runtime_xbnf.lhs
-                = xsys[xbnf_source.lhs] or
-                    xsys[hash_symbols[xbnf_source.lhs].xsy]
+            runtime_xpr.xrl_name = xpr_source.xrlid
+            runtime_xpr.name = xpr_source.name
+            runtime_xpr.subgrammar = xpr_source.subgrammar
+            runtime_xpr.lhs
+                = xsys[xpr_source.lhs] or
+                    xsys[hash_symbols[xpr_source.lhs].xsy]
 
             -- TODO delete after development
-            if not runtime_xbnf.lhs then
-                print('missing xbnf_source.lhs: %s', inspect( hash_symbols[xbnf_source.lhs]))
-                print('missing xbnf_source.lhs: %s', inspect( subg:_xsy(xbnf_source.lhs)))
-                _M._internal_error('missing xbnf_source.lhs: %s', inspect(xbnf_source))
+            if not runtime_xpr.lhs then
+                print('missing xpr_source.lhs: %s', inspect( hash_symbols[xpr_source.lhs]))
+                print('missing xpr_source.lhs: %s', inspect( subg:_xsy(xpr_source.lhs)))
+                _M._internal_error('missing xpr_source.lhs: %s', inspect(xpr_source))
             end
 
             local to_rhs = {}
-            local from_rhs = xbnf_source.rhs
+            local from_rhs = xpr_source.rhs
             for ix = 1, #from_rhs do
-                local rh_sym = xbnf_source.rhs[ix]
+                local rh_sym = xpr_source.rhs[ix]
                 to_rhs[ix] = xsys[rh_sym] or
                     xsys[hash_symbols[rh_sym].xsy]
             end
-            runtime_xbnf.rhs = to_rhs
-            runtime_xbnf.rank = xbnf_source.rank
-            runtime_xbnf.null_ranking = xbnf_source.null_ranking
+            runtime_xpr.rhs = to_rhs
+            runtime_xpr.rank = xpr_source.rank
+            runtime_xpr.null_ranking = xpr_source.null_ranking
 
-            runtime_xbnf.symbol_as_event = xbnf_source.symbol_as_event
-            local source_event = xbnf_source.event
+            runtime_xpr.symbol_as_event = xpr_source.symbol_as_event
+            local source_event = xpr_source.event
             if source_event then
-                runtime_xbnf.event_name = source_event[1]
+                runtime_xpr.event_name = source_event[1]
                 -- TODO revisit type (boolean? string? integer?)
                 --   once conversion to Lua is complete
-                runtime_xbnf.event_starts_active
+                runtime_xpr.event_starts_active
                     = (math.tointeger(source_event[2]) ~= 0)
             end
 
-            if xbnf_source.min then
-                runtime_xbnf.min = math.tointeger(xbnf_source.min)
+            if xpr_source.min then
+                runtime_xpr.min = math.tointeger(xpr_source.min)
             end
-            runtime_xbnf.separator = xbnf_source.separator
-            runtime_xbnf.proper = xbnf_source.proper
-            runtime_xbnf.bless = xbnf_source.bless
-            runtime_xbnf.action = xbnf_source.action
-            runtime_xbnf.start = xbnf_source.start
-            runtime_xbnf.length = xbnf_source.length
+            runtime_xpr.separator = xpr_source.separator
+            runtime_xpr.proper = xpr_source.proper
+            runtime_xpr.bless = xpr_source.bless
+            runtime_xpr.action = xpr_source.action
+            runtime_xpr.start = xpr_source.start
+            runtime_xpr.length = xpr_source.length
 
-            runtime_xbnf.discard_separation =
-                xbnf_source.separator and
-                    not xbnf_source.keep
+            runtime_xpr.discard_separation =
+                xpr_source.separator and
+                    not xpr_source.keep
 
-            local rhs_length = #xbnf_source.rhs
+            local rhs_length = #xpr_source.rhs
 
             -- min defined if sequence rule
-            if not xbnf_source.min or rhs_length == 0 then
-                if xbnf_source.mask then
-                    runtime_xbnf.mask = xbnf_source.mask
+            if not xpr_source.min or rhs_length == 0 then
+                if xpr_source.mask then
+                    runtime_xpr.mask = xpr_source.mask
                 else
                     local mask = {}
                     for i = 1, rhs_length do
                         mask[i] = 1
                     end
-                    runtime_xbnf.mask = mask
+                    runtime_xpr.mask = mask
                 end
             end
 
-            local next_xbnf_id = #xbnfs + 1
-            runtime_xbnf.id = next_xbnf_id
-            xbnfs[xbnf_name] = runtime_xbnf
-            xbnfs[next_xbnf_id] = runtime_xbnf
+            local next_xpr_id = #xprs + 1
+            runtime_xpr.id = next_xpr_id
+            xprs[xpr_name] = runtime_xpr
+            xprs[next_xpr_id] = runtime_xpr
 
-            -- print('runtime_xbnf:', inspect(runtime_xbnf))
+            -- print('runtime_xpr:', inspect(runtime_xpr))
         end
     end
-    function _M.class_slg.xbnfs_populate(slg, source_hash)
-        slg.xbnfs = {}
-        slg:xbnfs_subg_populate(source_hash, 'g1')
-        return slg:xbnfs_subg_populate(source_hash, 'l0')
+    function _M.class_slg.xprs_populate(slg, source_hash)
+        slg.xprs = {}
+        slg:xprs_subg_populate(source_hash, 'g1')
+        return slg:xprs_subg_populate(source_hash, 'l0')
     end
 ```
 
@@ -4851,44 +4853,44 @@ is zero.
     declarations(_M.class_xrl, class_xrl_fields, 'xrl')
 ```
 
-## External BNF (XBNF) class
+## External production (XPR) class
 
-### XBNF fields
+### XPR fields
 
 ```
-    -- miranda: section+ class_xbnf field declarations
-    class_xbnf_fields.action = true
-    class_xbnf_fields.bless = true
-    class_xbnf_fields.discard_separation = true
-    class_xbnf_fields.event_name = true
-    class_xbnf_fields.event_starts_active = true
-    class_xbnf_fields.id = true
-    class_xbnf_fields.length = true
-    class_xbnf_fields.lhs = true
-    class_xbnf_fields.mask = true
-    class_xbnf_fields.min = true
-    class_xbnf_fields.name = true
-    class_xbnf_fields.null_ranking = true
-    class_xbnf_fields.proper = true
-    class_xbnf_fields.rank = true
-    class_xbnf_fields.rhs = true
-    class_xbnf_fields.separator = true
-    class_xbnf_fields.start = true
-    class_xbnf_fields.subgrammar = true
-    class_xbnf_fields.symbol_as_event = true
-    class_xbnf_fields.xrl_name = true
+    -- miranda: section+ class_xpr field declarations
+    class_xpr_fields.action = true
+    class_xpr_fields.bless = true
+    class_xpr_fields.discard_separation = true
+    class_xpr_fields.event_name = true
+    class_xpr_fields.event_starts_active = true
+    class_xpr_fields.id = true
+    class_xpr_fields.length = true
+    class_xpr_fields.lhs = true
+    class_xpr_fields.mask = true
+    class_xpr_fields.min = true
+    class_xpr_fields.name = true
+    class_xpr_fields.null_ranking = true
+    class_xpr_fields.proper = true
+    class_xpr_fields.rank = true
+    class_xpr_fields.rhs = true
+    class_xpr_fields.separator = true
+    class_xpr_fields.start = true
+    class_xpr_fields.subgrammar = true
+    class_xpr_fields.symbol_as_event = true
+    class_xpr_fields.xrl_name = true
 ```
 
 ```
     -- miranda: section+ create nonmetallic metatables
-    _M.class_xbnf = {}
+    _M.class_xpr = {}
     -- miranda: section+ populate metatables
-    local class_xbnf_fields = {}
+    local class_xpr_fields = {}
 
-    class_xbnf_fields.id = true
+    class_xpr_fields.id = true
 
-    -- miranda: insert class_xbnf field declarations
-    declarations(_M.class_xbnf, class_xbnf_fields, 'xbnf')
+    -- miranda: insert class_xpr field declarations
+    declarations(_M.class_xpr, class_xpr_fields, 'xpr')
 ```
 
 ## Internal rule (IRL) class
@@ -4898,7 +4900,7 @@ is zero.
 ```
     -- miranda: section+ class_irl field declarations
     class_irl_fields.id = true
-    class_irl_fields.xbnf = true
+    class_irl_fields.xpr = true
     class_irl_fields.action = true
     class_irl_fields.mask = true
     class_irl_fields.g1_lexeme = true
@@ -5010,7 +5012,7 @@ is zero.
     class_grammar_fields.name_by_isyid = true
     class_grammar_fields.slg = true
     class_grammar_fields.start_name = true
-    class_grammar_fields.xbnf_by_irlid = true
+    class_grammar_fields.xpr_by_irlid = true
 ```
 
 A per-grammar table of the XSY's,
@@ -5043,7 +5045,7 @@ indexed by isyid.
         grammar.irls = {}
         grammar.isys = {}
         grammar.slg = slg
-        grammar.xbnf_by_irlid = {}
+        grammar.xpr_by_irlid = {}
         grammar.xsys = {}
 
         return grammar

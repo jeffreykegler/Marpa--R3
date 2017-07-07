@@ -319,9 +319,9 @@ END_OF_LUA
     local recce, irlid = ...
     local slg = recce.slg
     local irl = slg.g1.irls[irlid]
-    local xbnf = irl.xbnf
-    if xbnf then
-        local blessing = xbnf.bless
+    local xpr = irl.xpr
+    if xpr then
+        local blessing = xpr.bless
         if blessing and string.sub(blessing, 1, 2) ~= '::' then
             return 'ok', blessing
         end

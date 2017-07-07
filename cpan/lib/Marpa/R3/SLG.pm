@@ -298,7 +298,7 @@ sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
         slg.l0 = _M.grammar_new(slg)
         slg:xsys_populate( source_hash)
         slg:xrls_populate(source_hash)
-        slg:xbnfs_populate(source_hash)
+        slg:xprs_populate(source_hash)
 END_OF_LUA
 
     my $if_inaccessible_default_arg =
@@ -734,13 +734,13 @@ END_OF_LUA
     local slg, irlid, lex_discard_symbol_id = ...
     local lyr_l0 = slg.l0
     local irl = lyr_l0.irls[irlid]
-    local xbnf = irl.xbnf
-    if not xbnf then
+    local xpr = irl.xpr
+    if not xpr then
         return 'next RULE_ID'
     end
-    local event_name = xbnf.event_name
+    local event_name = xpr.event_name
     if event_name then
-         return 'ok', event_name, xbnf.event_starts_active
+         return 'ok', event_name, xpr.event_starts_active
     end
     local l0g = lyr_l0
     local lhs_id = l0g:rule_lhs(irlid)
@@ -770,9 +770,9 @@ END_OF_LUA
                 <<'END_OF_LUA', 'i>*', $irlid );
     local slg, irlid = ...
     local irl = slg.l0.irls[irlid]
-    -- at this point, xbnf must be defined
-    local xbnf = irl.xbnf
-    return xbnf.symbol_as_event
+    -- at this point, xpr must be defined
+    local xpr = irl.xpr
+    return xpr.symbol_as_event
 END_OF_LUA
 
             $event = $symbol_as_event;
@@ -1361,15 +1361,15 @@ sub add_G1_user_rule {
     my $rank;
     my $null_ranking;
     my $proper_separation = 0;
-    my $xbnf_name;
-    my $xbnf_id;
+    my $xpr_name;
+    my $xpr_id;
     my $subgrammar;
-    my $xbnf_dot;
+    my $xpr_dot;
 
   OPTION: for my $option ( keys %{$options} ) {
         my $value = $options->{$option};
-        if ( $option eq 'xbnfid' ) {
-            $xbnf_name = $value;
+        if ( $option eq 'xprid' ) {
+            $xpr_name = $value;
             next OPTION;
         }
         if ( $option eq 'rhs' )    { $rhs_names = $value; next OPTION }
@@ -1390,7 +1390,7 @@ sub add_G1_user_rule {
             next OPTION;
         }
         if ( $option eq 'subgrammar' ) { $subgrammar      = $value; next OPTION }
-        if ( $option eq 'xbnf_dot' ) { $xbnf_dot      = $value; next OPTION }
+        if ( $option eq 'xpr_dot' ) { $xpr_dot      = $value; next OPTION }
         Marpa::R3::exception("Unknown user rule option: $option");
     } ## end OPTION: for my $option ( keys %{$options} )
 
@@ -1398,13 +1398,13 @@ sub add_G1_user_rule {
     $rhs_names //= [];
 
     my $default_rank;
-    ($default_rank, $xbnf_id) =
+    ($default_rank, $xpr_id) =
           $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-          <<'END_OF_LUA', 's', $xbnf_name);
-    local grammar, xbnf_name = ...
+          <<'END_OF_LUA', 's', $xpr_name);
+    local grammar, xpr_name = ...
     local default_rank = grammar.g1:default_rank()
-    local xbnf_id = grammar.xbnfs[xbnf_name].id
-    return default_rank, xbnf_id
+    local xpr_id = grammar.xprs[xpr_name].id
+    return default_rank, xpr_id
 END_OF_LUA
 
     $rank //= $default_rank;
@@ -1508,22 +1508,22 @@ END_OF_LUA
 
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'iiii',
-        local slg, irl_id, ranking_is_high, rank, xbnf_id = ...
+        local slg, irl_id, ranking_is_high, rank, xpr_id = ...
         local g1g = slg.g1
         g1g:rule_null_high_set(irl_id, ranking_is_high)
         g1g:rule_rank_set(irl_id, rank)
-        local xbnf = slg.xbnfs[xbnf_id]
+        local xpr = slg.xprs[xpr_id]
         local irl = slg.g1.irls[irl_id]
-        irl.xbnf = xbnf
+        irl.xpr = xpr
         -- right now, the action & mask of an irl
-        -- is always the action/mask of its xbnf.
+        -- is always the action/mask of its xpr.
         -- But some day each irl may need its own.
-        irl.action = xbnf.action
-        irl.mask = xbnf.mask
+        irl.action = xpr.action
+        irl.mask = xpr.mask
 END_OF_LUA
             $base_irl_id,
             ( $null_ranking eq 'high' ? 1 : 0 ),
-            $rank, $xbnf_id);
+            $rank, $xpr_id);
 
     return;
 
@@ -1537,15 +1537,15 @@ sub add_L0_user_rule {
     my $rank;
     my $null_ranking;
     my $proper_separation = 0;
-    my $xbnf_name;
-    my $xbnf_id;
+    my $xpr_name;
+    my $xpr_id;
     my $subgrammar;
-    my $xbnf_dot;
+    my $xpr_dot;
 
   OPTION: for my $option ( keys %{$options} ) {
         my $value = $options->{$option};
-        if ( $option eq 'xbnfid' ) {
-            $xbnf_name = $value;
+        if ( $option eq 'xprid' ) {
+            $xpr_name = $value;
             next OPTION;
         }
         if ( $option eq 'rhs' )    { $rhs_names = $value; next OPTION }
@@ -1566,24 +1566,24 @@ sub add_L0_user_rule {
             next OPTION;
         }
         if ( $option eq 'subgrammar' ) { $subgrammar = $value; next OPTION }
-        if ( $option eq 'xbnf_dot' )    { $xbnf_dot    = $value; next OPTION }
+        if ( $option eq 'xpr_dot' )    { $xpr_dot    = $value; next OPTION }
         Marpa::R3::exception("Unknown user rule option: $option");
     }
 
     $rhs_names //= [];
 
     my $default_rank;
-    ($default_rank, $xbnf_id) =
+    ($default_rank, $xpr_id) =
           $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-          <<'END_OF_LUA', 's', ($xbnf_name // ''));
-    local slg, xbnf_name = ...
+          <<'END_OF_LUA', 's', ($xpr_name // ''));
+    local slg, xpr_name = ...
     local default_rank = slg.l0:default_rank()
-    -- io.stderr:write('xbnf_name: ', inspect(xbnf_name), '\n')
-    local xbnf_id = -1
-    if #xbnf_name > 0 then
-        xbnf_id = slg.xbnfs[xbnf_name].id
+    -- io.stderr:write('xpr_name: ', inspect(xpr_name), '\n')
+    local xpr_id = -1
+    if #xpr_name > 0 then
+        xpr_id = slg.xprs[xpr_name].id
     end
-    return default_rank, xbnf_id
+    return default_rank, xpr_id
 END_OF_LUA
 
     $rank //= $default_rank;
@@ -1687,23 +1687,23 @@ END_OF_LUA
 
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'iiii',
-        local slg, irl_id, ranking_is_high, rank, xbnf_id = ...
+        local slg, irl_id, ranking_is_high, rank, xpr_id = ...
         local l0g = slg.l0
         l0g:rule_null_high_set(irl_id, ranking_is_high)
         l0g:rule_rank_set(irl_id, rank)
-        if xbnf_id >= 0 then
-            local xbnf = slg.xbnfs[xbnf_id]
+        if xpr_id >= 0 then
+            local xpr = slg.xprs[xpr_id]
             local irl = slg.l0.irls[irl_id]
-            irl.xbnf = xbnf
+            irl.xpr = xpr
             -- right now, the action & mask of an irl
-            -- is always the action/mask of its xbnf.
+            -- is always the action/mask of its xpr.
             -- But some day each irl may need its own.
-            irl.action = xbnf.action
-            irl.mask = xbnf.mask
+            irl.action = xpr.action
+            irl.mask = xpr.mask
         end
 END_OF_LUA
             $base_irl_id, ( $null_ranking eq 'high' ? 1 : 0 ),
-            $rank, $xbnf_id);
+            $rank, $xpr_id);
 
     return;
 
@@ -1814,15 +1814,15 @@ kwgen(__LINE__, qw(lmg_rule_display lmg_rule_display si));
 kwgen(__LINE__, qw(g1_rule_display g1_rule_display i));
 kwgen(__LINE__, qw(l0_rule_display l0_rule_display i));
 
-kwgen(__LINE__, qw(production_name xbnf_name i));
+kwgen(__LINE__, qw(production_name xpr_name i));
 
-kwgen(__LINE__, qw(lmg_rule_to_production_id lmg_rule_to_xbnfid si));
-kwgen(__LINE__, qw(g1_rule_to_production_id g1_rule_to_xbnfid i));
-kwgen(__LINE__, qw(l0_rule_to_production_id l0_rule_to_xbnfid i));
+kwgen(__LINE__, qw(lmg_rule_to_production_id lmg_rule_to_xprid si));
+kwgen(__LINE__, qw(g1_rule_to_production_id g1_rule_to_xprid i));
+kwgen(__LINE__, qw(l0_rule_to_production_id l0_rule_to_xprid i));
 
-kwgen(__LINE__, qw(highest_production_id highest_xbnfid), '');
+kwgen(__LINE__, qw(highest_production_id highest_xprid), '');
 
-kwgen_arr(__LINE__, qw(rule_expand xbnf_expand i));
+kwgen_arr(__LINE__, qw(rule_expand xpr_expand i));
 kwgen_arr(__LINE__, qw(lmg_rule_expand lmg_irl_isyids si));
 kwgen_arr(__LINE__, qw(g1_rule_expand g1_irl_isyids i));
 kwgen_arr(__LINE__, qw(l0_rule_expand l0_irl_isyids i));
@@ -1973,7 +1973,7 @@ sub Marpa::R3::Scanless::G::rules_show {
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'i', $verbose);
     local slg, verbose = ...
-    return slg:xbnfs_show(verbose)
+    return slg:xprs_show(verbose)
 END_OF_LUA
     return $desc;
 }

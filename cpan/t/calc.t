@@ -101,7 +101,7 @@ R31 <vertical space char> ~ [\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
 R32 <hash comment char> ~ [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
 END_OF_SHOW_RULES_OUTPUT
 
-# TODO -- Do I need the following as XBNFs?
+# TODO -- Do I need the following as XPRs?
 # R19 [:lex_start:] ~ Number
 # R20 [:lex_start:] ~ [:discard:]
 # R21 [:lex_start:] ~ '('
