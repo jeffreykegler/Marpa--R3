@@ -36,12 +36,12 @@ my $trace_rules = q{};
 
 sub no_bail {
     my ($action_object) = @_;
-    my $altid           = $Marpa::R3::Context::altid;
+    my $production_id           = $Marpa::R3::Context::production_id;
     my $slg             = $Marpa::R3::Context::slg;
     my ( $lhs, @rhs ) =
-      map { $slg->symbol_name($_) } $slg->rule_expand($altid);
+      map { $slg->symbol_name($_) } $slg->rule_expand($production_id);
     $action_object->{text} =
-        "rule $altid: $lhs ::= "
+        "rule $production_id: $lhs ::= "
       . ( join q{ }, @rhs ) . "\n"
       . "locations: "
       . ( join q{-}, Marpa::R3::Context::g1_range() ) . "\n";

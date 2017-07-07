@@ -672,20 +672,21 @@ END_OF_SOURCE
 
     Test::More::is( $start_id, 2, q{Test of $grammar->g1_start_symbol_id()} );
 
-    my @alt_names = ();
+    my @production_names = ();
 
 # Marpa::R3::Display
-# name: $grammar->alt_name() example
+# name: $grammar->production_name() example
 
-    push @alt_names, $grammar->alt_name($_) for $grammar->alt_ids();
+    push @production_names, $grammar->production_name($_)
+      for 1 .. $grammar->highest_production_id();
 
 # Marpa::R3::Display::End
 
-    my $alt_names = join q{:}, @alt_names;
+    my $production_names = join q{:}, @production_names;
     Test::More::is(
-        $alt_names,
+        $production_names,
         '[:start:]:start1:start2:first start rule:second start rule:X:Y',
-        q{Test of $grammar->alt_name()}
+        q{Test of $grammar->production_name()}
     );
 
     do_test(

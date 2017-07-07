@@ -1297,8 +1297,9 @@ END_OF_LUA
 
                 if ( $result_descriptor eq 'name' ) {
                     if ( defined $irlid ) {
-                        my $altid = $slg->g1_rule_to_altid($irlid);
-                        my $name = $slg->alt_name($altid);
+                        my $production_id =
+                          $slg->g1_rule_to_production_id($irlid);
+                        my $name = $slg->production_name($production_id);
                         push @push_ops, $op_lua, $op_push_constant_key, \$name;
                         next RESULT_DESCRIPTOR;
                     }
@@ -1638,7 +1639,8 @@ END_OF_LUA
                 $eval_ok = eval {
                     my $irlid = $null_values->[$token_id];
                     local $Marpa::R3::Context::irlid = $irlid;
-                    local $Marpa::R3::Context::altid = $slg->g1_rule_to_altid($irlid);
+                    local $Marpa::R3::Context::production_id =
+                      $slg->g1_rule_to_production_id($irlid);
                     $result = $value_ref->( $semantics_arg0, [] );
                     1;
                 };
@@ -1690,7 +1692,7 @@ END_OF_LUA
                     push @warnings, [ $_[0], ( caller 0 ) ];
                 };
                 local $Marpa::R3::Context::irlid = $irlid;
-                local $Marpa::R3::Context::altid = $slg->g1_rule_to_altid($irlid);
+                local $Marpa::R3::Context::production_id = $slg->g1_rule_to_production_id($irlid);
 
                 # say STDERR "Before tree ops: ", Data::Dumper::Dumper($values);
                 $values = do_tree_ops( $slr, $values );

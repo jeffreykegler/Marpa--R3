@@ -1814,13 +1814,13 @@ kwgen(__LINE__, qw(lmg_rule_display lmg_rule_display si));
 kwgen(__LINE__, qw(g1_rule_display g1_rule_display i));
 kwgen(__LINE__, qw(l0_rule_display l0_rule_display i));
 
-kwgen(__LINE__, qw(alt_name xbnf_name i));
+kwgen(__LINE__, qw(production_name xbnf_name i));
 
-kwgen(__LINE__, qw(lmg_rule_to_altid lmg_rule_to_xbnfid si));
-kwgen(__LINE__, qw(g1_rule_to_altid g1_rule_to_xbnfid i));
-kwgen(__LINE__, qw(l0_rule_to_altid l0_rule_to_xbnfid i));
+kwgen(__LINE__, qw(lmg_rule_to_production_id lmg_rule_to_xbnfid si));
+kwgen(__LINE__, qw(g1_rule_to_production_id g1_rule_to_xbnfid i));
+kwgen(__LINE__, qw(l0_rule_to_production_id l0_rule_to_xbnfid i));
 
-kwgen(__LINE__, qw(highest_altid highest_xbnfid), '');
+kwgen(__LINE__, qw(highest_production_id highest_xbnfid), '');
 
 kwgen_arr(__LINE__, qw(rule_expand xbnf_expand i));
 kwgen_arr(__LINE__, qw(lmg_rule_expand lmg_irl_isyids si));
@@ -2009,13 +2009,6 @@ sub Marpa::R3::Scanless::G::l0_rules_show {
     return slg:l0_rules_show(verbose)
 END_OF_LUA
     return $desc;
-}
-
-# Currently there are no gaps in the rule ids.
-# TODO -- Will I guarantee this?
-sub Marpa::R3::Scanless::G::alt_ids {
-    my ($slg) = @_;
-    return 1 .. $slg->highest_altid();
 }
 
 # Currently there are no gaps in the rule ids.

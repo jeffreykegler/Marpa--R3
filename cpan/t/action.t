@@ -37,12 +37,12 @@ my $trace_rules = q{};
 
 sub do_S {
     my ($per_parse_object) = @_;
-    my $altid         = $Marpa::R3::Context::altid;
+    my $production_id = $Marpa::R3::Context::production_id;
     my $slg             = $Marpa::R3::Context::slg;
     my ( $lhs, @rhs ) =
-        map { $slg->symbol_display_form($_) } $slg->rule_expand($altid);
+        map { $slg->symbol_display_form($_) } $slg->rule_expand($production_id);
     $per_parse_object->{text} =
-          "rule $altid: $lhs ::= "
+          "rule $production_id: $lhs ::= "
         . ( join q{ }, @rhs ) . "\n"
         . "locations: "
         . ( join q{-}, Marpa::R3::Context::g1_range() ) . "\n";
