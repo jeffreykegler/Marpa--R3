@@ -12,8 +12,6 @@
 
 # Converted from Marpa::R2's sl_gia.t
 
-# MITOSIS: FINISHED
-
 use 5.010001;
 use strict;
 use warnings;

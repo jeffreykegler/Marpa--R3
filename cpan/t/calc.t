@@ -12,8 +12,6 @@
 
 # Various that share a calculator semantics
 
-# MITOSIS: FINISHED
-
 use 5.010001;
 use strict;
 use warnings;

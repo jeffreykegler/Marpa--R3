@@ -16,8 +16,6 @@
 # _The Computer Journal_, Vol. 45, No. 6, pp. 620-630,
 # in its "NNF" form
 
-# MITOSIS: FINISHED
-
 use 5.010001;
 use strict;
 use warnings;

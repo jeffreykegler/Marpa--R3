@@ -10,8 +10,6 @@
 # or implied warranties. For details, see the full text of
 # of the licenses in the directory LICENSES.
 
-# MITOSIS: FINISHED
-
 # This example is from a Perl 6 advent blog post
 # (Day 18 2013) by Dwarring, adapted to Marpa by Jean-Damien
 # Durand.
