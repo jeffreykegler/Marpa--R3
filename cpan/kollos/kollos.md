@@ -427,23 +427,30 @@ leaving it as is.
 
 ## Kollos registry objects
 
-A Kollos registry object is an object kept in its
+A Kollos registry object is an object kept in the Lua
 registry.
-These generated ID's which allow them to be identified
+The registry references allow the objects to be identified
 safely to non-Lua code.
-They have increment and decrement methods.
 
-These increment and decrement methods are intended only
-for non-Lua code.
-They make it possible
-for the non-Lua code to be sure that the Lua
-registry object exists for as long as they
-require it.
+Only upper layer code should use the references.
+Internal Lua code should not use them,
+because it cannot know whether the upper layer
+has released it.
 
-Lua code should not use the reference counter.
-Lua code
-should simply copy the table object -- in Lua this
-is a reference and Lua's GC will do the right thing.
+Kollos does not does reference counting of its registry
+objects.
+If the upper layer wants the equivalent of reference counting,
+it should register the same object multiple times.
+This is at least as efficient as reference counting,
+and Lua's GC will do the right thing.
+
+TODO -- rather than use the Lua registry, perhaps Kollos
+should have its own registry.
+Right now the only upper layer is Perl, and there is a
+dedicated Lua interpreter, but when Kollos is a library
+it may be in an interpreter which does not follow the
+standard registry conventions,
+perhaps because it is buggy.
 
 ```
     -- miranda: section+ kollos table methods
