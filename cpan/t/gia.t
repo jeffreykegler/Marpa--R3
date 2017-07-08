@@ -13,13 +13,13 @@
 # Tests which require only grammar, input, and an output with no
 # semantics -- usually just an AST
 
-# MITOSIS: TODO
+# MITOSIS: FINISHED
 
 use 5.010001;
 use strict;
 use warnings;
 
-use Test::More tests => 74;
+use Test::More tests => 76;
 use Data::Dumper;
 use English qw( -no_match_vars );
 use POSIX qw(setlocale LC_ALL);
@@ -663,14 +663,34 @@ END_OF_SOURCE
 
     my $grammar = Marpa::R3::Scanless::G->new( { source => \$source } );
 
+my $start_id;
+
+# Marpa::R3::Display
+# name: $grammar->start_symbol_id() example
+
+    $start_id = $grammar->start_symbol_id();
+
+# Marpa::R3::Display::End
+
+    Test::More::is( $start_id, 3, q{Test of $grammar->start_symbol_id()} );
+
 # Marpa::R3::Display
 # name: $grammar->g1_start_symbol_id() example
 
-    my $start_id = $grammar->g1_start_symbol_id();
+    $start_id = $grammar->g1_start_symbol_id();
 
 # Marpa::R3::Display::End
 
     Test::More::is( $start_id, 2, q{Test of $grammar->g1_start_symbol_id()} );
+
+# Marpa::R3::Display
+# name: $grammar->l0_start_symbol_id() example
+
+    $start_id = $grammar->l0_start_symbol_id();
+
+# Marpa::R3::Display::End
+
+    Test::More::is( $start_id, 4, q{Test of $grammar->l0_start_symbol_id()} );
 
     my @production_names = ();
 

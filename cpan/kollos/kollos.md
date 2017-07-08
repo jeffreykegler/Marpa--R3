@@ -813,6 +813,9 @@ Lowest ISYID is 0.
 
 ```
     -- miranda: section+ most Lua function definitions
+    function _M.class_slg.start_symbol_id(slg)
+        return slg:symbol_by_name('[:start:]')
+    end
     function _M.class_slg.lmg_start_symbol_id(slg, subg_name)
         local subg = slg[subg_name]
         return subg:start_symbol();

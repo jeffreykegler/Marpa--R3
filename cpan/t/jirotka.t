@@ -10,9 +10,9 @@
 # or implied warranties. For details, see the full text of
 # of the licenses in the directory LICENSES.
 
-# Note: Replaces jirotka.t
+# Replaces jirotka.t from Marpa::R2
 
-# MITOSIS: TODO
+# MITOSIS: FINISHED
 
 use 5.010001;
 use strict;
@@ -85,53 +85,98 @@ END_OF_DSL
 my $input = q{Create Metric m As Select 1 Where True};
 
 Marpa::R3::Test::is(
-    $grammar->g1_symbols_show(),
+    $grammar->symbols_show(),
     <<'END_OF_SYMBOLS', 'Symbols' );
-g1 S0 AS
-g1 S1 BY
-g1 S2 ByClause
-g1 S3 CREATE
-g1 S4 FALSE
-g1 S5 FOR
-g1 S6 Filter
-g1 S7 FilterExpr
-g1 S8 ID_METRIC
-g1 S9 Input
-g1 S10 METRIC
-g1 S11 Match
-g1 S12 MetricExpr
-g1 S13 MetricSelect
-g1 S14 NUMBER
-g1 S15 PF
-g1 S16 SELECT
-g1 S17 SEPARATOR
-g1 S18 Statement
-g1 S19 TRUE
-g1 S20 TypeDef
-g1 S21 WHERE
-g1 S22 WITH
-g1 S23 WithPf
-g1 S24 [:start:]
+S1 AS
+S2 BY
+S3 ByClause
+S4 CREATE
+S5 FALSE
+S6 FOR
+S7 Filter
+S8 FilterExpr
+S9 ID_METRIC
+S10 Input
+S11 METRIC
+S12 Match
+S13 MetricExpr
+S14 MetricSelect
+S15 NUMBER
+S16 PF
+S17 SELECT
+S18 SEPARATOR
+S19 Statement
+S20 TRUE
+S21 TypeDef
+S22 WHERE
+S23 WITH
+S24 WithPf
+S25 [:discard:]
+S26 [:start:]
+S27 [1]
+S28 [A]
+S29 [B]
+S30 [C]
+S31 [F]
+S32 [M]
+S33 [P]
+S34 [S]
+S35 [T]
+S36 [W]
+S37 [\\]
+S38 [\s]
+S39 [a]
+S40 [c]
+S41 [e]
+S42 [f]
+S43 [h]
+S44 [i]
+S45 [l]
+S46 [m]
+S47 [n]
+S48 [o]
+S49 [r]
+S50 [s]
+S51 [t]
+S52 [u]
+S53 [y]
+S54 whitespace
 END_OF_SYMBOLS
 
-Marpa::R3::Test::is( $grammar->g1_rules_show(),
-<<'END_OF_RULES', 'Rules' );
-R0 Input ::= Statement +
-R1 Statement ::= CREATE TypeDef
+Marpa::R3::Test::is( $grammar->productions_show(),
+<<'END_OF_RULES', 'Productions' );
+R1 [:start:] ::= Input
 R2 TypeDef ::= METRIC ID_METRIC AS MetricSelect
 R3 MetricSelect ::= SELECT MetricExpr ByClause Match Filter WithPf
 R4 MetricExpr ::= NUMBER
 R5 ByClause ::=
 R6 ByClause ::= BY
-R7 Match ::=
-R8 Match ::= FOR
-R9 Filter ::=
-R10 Filter ::= WHERE FilterExpr
-R11 FilterExpr ::= TRUE
-R12 FilterExpr ::= FALSE
-R13 WithPf ::=
-R14 WithPf ::= WITH PF
-R15 [:start:] ::= Input
+R7 Input ::= Statement +
+R8 Match ::=
+R9 Match ::= FOR
+R10 Filter ::=
+R11 Filter ::= WHERE FilterExpr
+R12 FilterExpr ::= TRUE
+R13 FilterExpr ::= FALSE
+R14 WithPf ::=
+R15 WithPf ::= WITH PF
+R16 Statement ::= CREATE TypeDef
+R17 TRUE ~ [T] [r] [u] [e]
+R18 BY ~ [B] [y]
+R19 FALSE ~ [F] [a] [l] [s] [e]
+R20 SEPARATOR ~ [\\] [n]
+R21 PF ~ [P] [f]
+R22 [:discard:] ~ whitespace
+R23 whitespace ~ [\s] +
+R24 CREATE ~ [C] [r] [e] [a] [t] [e]
+R25 METRIC ~ [M] [e] [t] [r] [i] [c]
+R26 ID_METRIC ~ [m]
+R27 AS ~ [A] [s]
+R28 SELECT ~ [S] [e] [l] [e] [c] [t]
+R29 NUMBER ~ [1]
+R30 WHERE ~ [W] [h] [e] [r] [e]
+R31 WITH ~ [W] [i] [t] [h]
+R32 FOR ~ [F] [o] [r]
 END_OF_RULES
 
 Marpa::R3::Test::is( $grammar->show_ahms(),

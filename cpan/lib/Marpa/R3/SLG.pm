@@ -1772,7 +1772,8 @@ kwgen(__LINE__, qw(lmg_highest_symbol_id lmg_highest_symbol_id i));
 kwgen(__LINE__, qw(g1_highest_symbol_id g1_highest_symbol_id), '');
 kwgen(__LINE__, qw(l0_highest_symbol_id l0_highest_symbol_id), '');
 
-kwgen(__LINE__, qw(lmg_start_symbol_id lmg_start_symbol_id i));
+kwgen(__LINE__, qw(start_symbol_id start_symbol_id), '');
+kwgen(__LINE__, qw(lmg_start_symbol_id lmg_start_symbol_id s));
 kwgen(__LINE__, qw(g1_start_symbol_id g1_start_symbol_id), '');
 kwgen(__LINE__, qw(l0_start_symbol_id l0_start_symbol_id), '');
 
