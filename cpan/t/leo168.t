@@ -10,11 +10,11 @@
 # or implied warranties. For details, see the full text of
 # of the licenses in the directory LICENSES.
 
-# Note: Converted to SLIF from leo.t
-
 # The example from p. 168-169 of Leo's paper.
 
-# MITOSIS: TODO
+# Converted to SLIF from leo.t in Marpa::R2
+
+# MITOSIS: FINISHED
 
 use 5.010001;
 use strict;
@@ -63,22 +63,26 @@ END_OF_DSL
 
 my $grammar = Marpa::R3::Scanless::G->new( { source => \$dsl } );
 
-Marpa::R3::Test::is( $grammar->g1_symbols_show(),
+Marpa::R3::Test::is( $grammar->symbols_show(),
     <<'END_OF_STRING', 'Leo168 Symbols' );
-g1 S0 C
-g1 S1 S
-g1 S2 [:start:]
-g1 S3 a
-g1 S4 b
+S1 C
+S2 S
+S3 [:start:]
+S4 [a]
+S5 [b]
+S6 a
+S7 b
 END_OF_STRING
 
-Marpa::R3::Test::is( $grammar->g1_rules_show,
+Marpa::R3::Test::is( $grammar->productions_show(),
     <<'END_OF_STRING', 'Leo168 Rules' );
-R0 S ::= a S
-R1 S ::= C
+R1 [:start:] ::= S
 R2 C ::= a C b
 R3 C ::=
-R4 [:start:] ::= S
+R4 S ::= a S
+R5 S ::= C
+R6 a ~ [a]
+R7 b ~ [b]
 END_OF_STRING
 
 Marpa::R3::Test::is( $grammar->show_ahms, <<'END_OF_STRING', 'Leo168 AHMs' );

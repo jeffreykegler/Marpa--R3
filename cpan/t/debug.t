@@ -18,7 +18,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-use Test::More tests => 26;
+use Test::More tests => 34;
 
 use Data::Dumper;
 use English qw( -no_match_vars );
@@ -475,6 +475,52 @@ my $expected_value_after_fix = \bless(
     'My_Nodes::statements'
 );
 Test::More::is_deeply($value_ref, $expected_value_after_fix, 'Value after fix');
+
+# Marpa::R3::Display
+# name: SLG productions_show() synopsis
+
+my $productions_show_output = $grammar->productions_show();
+
+# Marpa::R3::Display::End
+
+Marpa::R3::Test::is( $productions_show_output,
+    <<'END_OF_OUTPUT', 'SLIF productions_show()' );
+R1 [:start:] ::= statements
+R2 statement ::= <numeric assignment>
+R3 assignment ::= 'set' variable 'to' expression
+R4 <numeric assignment> ::= variable '=' <numeric expression>
+R5 expression ::= expression
+R6 expression ::= expression
+R7 expression ::= expression
+R8 expression ::= variable
+R9 expression ::= string
+R10 expression ::= 'string' '(' <numeric expression> ')'
+R11 expression ::= expression '+' expression
+R12 <numeric expression> ::= <numeric expression>
+R13 <numeric expression> ::= <numeric expression>
+R14 <numeric expression> ::= <numeric expression>
+R15 <numeric expression> ::= variable
+R16 <numeric expression> ::= number
+R17 <numeric expression> ::= <numeric expression> '+' <numeric expression>
+R18 statements ::= statement *
+R19 <numeric expression> ::= <numeric expression> '*' <numeric expression>
+R20 statement ::= assignment
+R21 'set' ~ [s] [e] [t]
+R22 'to' ~ [t] [o]
+R23 '=' ~ [\=]
+R24 'string' ~ [s] [t] [r] [i] [n] [g]
+R25 '(' ~ [\(]
+R26 ')' ~ [\)]
+R27 '+' ~ [\+]
+R28 '+' ~ [\+]
+R29 '*' ~ [\*]
+R30 variable ~ [\w] +
+R31 number ~ [\d] +
+R32 string ~ ['] <string contents> [']
+R33 <string contents> ~ [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] +
+R34 [:discard:] ~ whitespace
+R35 whitespace ~ [\s] +
+END_OF_OUTPUT
 
 my $rules_show_output;
 $rules_show_output .= "G1 Rules:\n";
