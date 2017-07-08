@@ -346,8 +346,6 @@ will usually just ask for the display form of the ISY.
 
 ## Kollos object
 
-`ref_count` maintains a reference count that controls
-the destruction of Kollos interpreters.
 `warn` is for a warning callback -- it's not
 currently used.
 `buffer` is used by kollos internally, usually
@@ -514,7 +512,6 @@ is a reference and Lua's GC will do the right thing.
     class_slg_fields['nulling_semantics'] = true
     class_slg_fields['per_codepoint'] = true
     class_slg_fields['ranking_method'] = true
-    class_slg_fields['ref_count'] = true
 
     class_slg_fields['rule_semantics'] = true
     class_slg_fields['token_semantics'] = true
@@ -1495,7 +1492,6 @@ This is a registry object.
     class_slr_fields.per_es = true
     class_slr_fields.phase = true
     class_slr_fields.regix = true
-    class_slr_fields.ref_count = true
     class_slr_fields.slg = true
     class_slr_fields.start_of_lexeme = true
     class_slr_fields.terminals_expected = true
@@ -1570,7 +1566,6 @@ together.
         slr.slg = slg
         local registry = debug.getregistry()
         slr.regix = _M.register(registry, slr)
-        slr.ref_count = 1
 
         local l0g = slg.l0
         slr.l0 = {}

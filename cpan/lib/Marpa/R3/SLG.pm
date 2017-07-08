@@ -48,7 +48,6 @@ sub pre_construct {
         local registry = debug.getregistry()
         setmetatable(slg, _M.class_slg)
         local regix = _M.register(registry, slg)
-        slg.ref_count = 1
 
         slg.exhaustion_action = 'fatal'
         slg.rejection_action = 'fatal'
