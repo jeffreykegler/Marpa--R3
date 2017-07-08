@@ -13,7 +13,9 @@
 # Tests of glade traversal from rns
 # Originally to report github issue #184
 
-# MITOSIS: TODO
+# TODO -- Revisit this once I decide whether ASF operates at XRL or IRL
+# level.
+# MITOSIS: ASF
 
 use 5.010001;
 use strict;

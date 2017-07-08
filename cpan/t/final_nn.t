@@ -58,13 +58,14 @@ DSL
     }
 );
 
-Marpa::R3::Test::is( $grammar->g1_rules_show(1),
+Marpa::R3::Test::is( $grammar->productions_show(1),
     <<'END_OF_STRING', 'final nonnulling Rules' );
-R0 S ::= p p p n
-R1 p ::= a
-R2 p ::=
-R3 n ::= a
-R4 [:start:] ::= S
+R1 [:start:] ::= S
+R2 S ::= p p p n
+R3 p ::= a
+R4 p ::=
+R5 n ::= a
+R6 a ~ [\d\D]
 END_OF_STRING
 
 Marpa::R3::Test::is( $grammar->show_ahms,
