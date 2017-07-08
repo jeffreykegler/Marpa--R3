@@ -10,11 +10,11 @@
 # or implied warranties. For details, see the full text of
 # of the licenses in the directory LICENSES.
 
-# Note: Converted to SLIF from leo_unit.t
+# Converted to SLIF from Marpa::R2 leo_unit.t
 
 # Test of Leo logic for unit rule.
 
-# MITOSIS: TODO
+# MITOSIS: FINISHED
 
 use 5.010001;
 use strict;
@@ -51,23 +51,27 @@ END_OF_DSL
 
 my $grammar = Marpa::R3::Scanless::G->new( { source => \$dsl } );
 
-Marpa::R3::Test::is( $grammar->g1_symbols_show(),
+Marpa::R3::Test::is( $grammar->symbols_show(),
     <<'END_OF_STRING', 'Leo166 Symbols' );
-g1 S0 A
-g1 S1 B
-g1 S2 C
-g1 S3 [:start:]
-g1 S4 a
-g1 S5 c
+S1 A
+S2 B
+S3 C
+S4 [:start:]
+S5 [a]
+S6 [c]
+S7 a
+S8 c
 END_OF_STRING
 
-Marpa::R3::Test::is( $grammar->g1_rules_show,
-    <<'END_OF_STRING', 'Leo166 Rules' );
-R0 A ::= a B
-R1 B ::= C
-R2 C ::= c A
-R3 C ::= c
-R4 [:start:] ::= A
+Marpa::R3::Test::is( $grammar->productions_show,
+    <<'END_OF_STRING', 'Leo166 Productions' );
+R1 [:start:] ::= A
+R2 A ::= a B
+R3 B ::= C
+R4 C ::= c A
+R5 C ::= c
+R6 a ~ [a]
+R7 c ~ [c]
 END_OF_STRING
 
 

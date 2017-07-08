@@ -10,9 +10,9 @@
 # or implied warranties. For details, see the full text of
 # of the licenses in the directory LICENSES.
 
-# Note: Converted to SLIF from minus.t
+# Converted to SLIF from Marpa::R2 minus.t
 
-# MITOSIS: TODO
+# MITOSIS: FINISHED
 
 use 5.010001;
 
@@ -105,15 +105,17 @@ my $recce = Marpa::R3::Scanless::R->new(
     }
 );
 
-Marpa::R3::Test::is( $grammar->g1_rules_show,
+Marpa::R3::Test::is( $grammar->productions_show,
     <<'END_RULES', 'Minuses Equation Rules' );
-R0 E ::= E Minus E
-R1 E ::= E MinusMinus
+R1 [:start:] ::= E
 R2 E ::= MinusMinus E
 R3 E ::= Minus E
 R4 E ::= Number
 R5 MinusMinus ::= Minus Minus
-R6 [:start:] ::= E
+R6 E ::= E Minus E
+R7 E ::= E MinusMinus
+R8 Minus ~ [\-]
+R9 Number ~ [\d] +
 END_RULES
 
 Marpa::R3::Test::is( $grammar->show_ahms,
