@@ -51,7 +51,7 @@ END_OF_DSL
     }
 );
 
-Marpa::R3::Test::is( $grammar->rules_show(), <<'EOS', 'Aycock/Horspool Rules' );
+Marpa::R3::Test::is( $grammar->productions_show(), <<'EOS', 'Aycock/Horspool Productions' );
 R1 [:start:] ::= S
 R2 S ::= A B B B C C
 R3 A ::= 'a'

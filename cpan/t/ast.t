@@ -61,14 +61,14 @@ END_OF_SOURCE
     }
 );
 
-my $rules_show_output;
+my $productions_show_output;
 # Marpa::R3::Display
-# name: SLG rules_show() synopsis
+# name: SLG productions_show() synopsis
 
-$rules_show_output = $grammar->rules_show();
+$productions_show_output = $grammar->productions_show();
 
-Marpa::R3::Test::is( $rules_show_output,
-    <<'END_OF_SHOW_RULES_OUTPUT', 'Scanless rules_show()' );
+Marpa::R3::Test::is( $productions_show_output,
+    <<'END_OF_SHOW_RULES_OUTPUT', 'Scanless productions_show()' );
 R1 [:start:] ::= Script
 R2 Expression ::= Expression
 R3 Expression ::= Expression
@@ -104,6 +104,8 @@ R32 <hash comment char> ~ [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
 END_OF_SHOW_RULES_OUTPUT
 
 # Marpa::R3::Display::End
+
+my $rules_show_output;
 
 # Marpa::R3::Display
 # name: SLG g1_rules_show() synopsis

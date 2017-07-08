@@ -14,7 +14,7 @@
 # is Penn Treebank's syntactic bracketing tags.  For details, see
 # http://www.cis.upenn.edu/~treebank/
 
-# MITOSIS: TODO L0
+# MITOSIS: ASF
 
 use 5.010001;
 use strict;

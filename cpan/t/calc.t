@@ -61,10 +61,10 @@ END_OF_SOURCE
     }
 );
 
-my $rules_show_output = $calculator_grammar->rules_show();
+my $productions_show_output = $calculator_grammar->productions_show();
 
-Marpa::R3::Test::is( $rules_show_output,
-    <<'END_OF_SHOW_RULES_OUTPUT', 'Scanless rules_show()' );
+Marpa::R3::Test::is( $productions_show_output,
+    <<'END_OF_SHOW_RULES_OUTPUT', 'Scanless productions_show()' );
 R1 [:start:] ::= Script
 R2 Expression ::= Expression
 R3 Expression ::= Expression
@@ -111,6 +111,7 @@ END_OF_SHOW_RULES_OUTPUT
 # R27 [:lex_start:] ~ '-'
 # R28 [:lex_start:] ~ comma
 
+my $rules_show_output;
 $rules_show_output = $calculator_grammar->g1_rules_show();
 
 Marpa::R3::Test::is( $rules_show_output,

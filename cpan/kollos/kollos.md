@@ -895,6 +895,22 @@ Lowest ISYID is 0.
 
 ```
     -- miranda: section+ most Lua function definitions
+    function _M.class_slg.g1_symbol_is_accessible(slg, symbol_id)
+        local g1g = slg.g1
+        return g1g:symbol_is_accessible(symbol_id) ~= 0
+    end
+    function _M.class_slg.g1_symbol_is_nulling(slg, symbol_id)
+        local g1g = slg.g1
+        return g1g:symbol_is_nulling(symbol_id) ~= 0
+    end
+    function _M.class_slg.g1_symbol_is_productive(slg, symbol_id)
+        local g1g = slg.g1
+        return g1g:symbol_is_productive(symbol_id) ~= 0
+    end
+```
+
+```
+    -- miranda: section+ most Lua function definitions
     function _M.class_slg.symbols_show(slg, verbose)
         local pieces = { }
         for symbol_id = 1, slg:highest_symbol_id() do

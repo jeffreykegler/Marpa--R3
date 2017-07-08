@@ -110,10 +110,10 @@ S14 digits
 S15 whitespace
 END_SYMBOLS
 
-my $rules_show_output = $grammar->rules_show();
+my $productions_show_output = $grammar->productions_show();
 
-Marpa::R3::Test::is( $rules_show_output,
-    <<'END_RULES', 'Implementation Example Rules' );
+Marpa::R3::Test::is( $productions_show_output,
+    <<'END_RULES', 'Implementation Example Productions' );
 R1 [:start:] ::= Calculator
 R2 Calculator ::= Expression
 R3 Term ::= Factor

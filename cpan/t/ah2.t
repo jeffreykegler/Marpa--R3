@@ -53,7 +53,7 @@ my $grammar = Marpa::R3::Scanless::G->new( {   source => \$dsl });
 
 GRAMMAR_TESTS_FOLDED_FROM_ah2_t: {
 
-Marpa::R3::Test::is( $grammar->rules_show(), <<'EOS', 'Aycock/Horspool Rules' );
+Marpa::R3::Test::is( $grammar->productions_show(), <<'EOS', 'Aycock/Horspool Productions' );
 R1 [:start:] ::= S
 R2 S ::= A A A A
 R3 A ::=

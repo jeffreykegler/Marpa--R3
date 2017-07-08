@@ -1802,6 +1802,10 @@ kwgen(__LINE__, qw(lmg_symbol_by_name lmg_symbol_by_name si));
 kwgen(__LINE__, qw(g1_symbol_by_name g1_symbol_by_name i));
 kwgen(__LINE__, qw(l0_symbol_by_name l0_symbol_by_name i));
 
+kwgen(__LINE__, qw(g1_symbol_is_accessible g1_symbol_is_accessible i));
+kwgen(__LINE__, qw(g1_symbol_is_nulling g1_symbol_is_nulling i));
+kwgen(__LINE__, qw(g1_symbol_is_productive g1_symbol_is_productive i));
+
 kwgen(__LINE__, qw(lmg_dotted_rule_show lmg_dotted_rule_show sii));
 kwgen(__LINE__, qw(g1_dotted_rule_show g1_dotted_rule_show ii));
 kwgen(__LINE__, qw(l0_dotted_rule_show l0_dotted_rule_show ii));
@@ -1813,6 +1817,11 @@ kwgen(__LINE__, qw(l0_rule_show l0_rule_show i));
 kwgen(__LINE__, qw(lmg_rule_display lmg_rule_display si));
 kwgen(__LINE__, qw(g1_rule_display g1_rule_display i));
 kwgen(__LINE__, qw(l0_rule_display l0_rule_display i));
+
+kwgen_opt(__LINE__, qw(productions_show xprs_show i), 0);
+kwgen_opt(__LINE__, qw(lmg_rules_show lmg_rules_show si), 0, 0);
+kwgen_opt(__LINE__, qw(g1_rules_show g1_rules_show i), 0);
+kwgen_opt(__LINE__, qw(l0_rules_show l0_rules_show i), 0);
 
 kwgen(__LINE__, qw(production_name xpr_name i));
 
@@ -1902,48 +1911,8 @@ sub Marpa::R3::Scanless::G::coro_by_tag {
     return @results;
 }
 
-sub Marpa::R3::Scanless::G::g1_symbol_is_accessible {
-    my ( $slg, $symid ) = @_;
-    my ($is_accessible) = $slg->call_by_tag(
-    ('@' .__FILE__ . ':' . __LINE__),
-    <<'END_OF_LUA', 'i>*', $symid ) ;
-    local slg, symid = ...
-    local g1g = slg.g1
-    return g1g:symbol_is_accessible(symid)
-END_OF_LUA
-
-    return $is_accessible;
-}
-
-sub Marpa::R3::Scanless::G::g1_symbol_is_productive {
-    my ( $slg, $symid ) = @_;
-    my ($is_productive) = $slg->call_by_tag(
-    ('@' .__FILE__ . ':' . __LINE__),
-    <<'END_OF_LUA', 'i>*', $symid ) ;
-    local slg, symid = ...
-    local g1g = slg.g1
-    return g1g:symbol_is_productive(symid)
-END_OF_LUA
-
-    return $is_productive;
-}
-
-sub Marpa::R3::Scanless::G::g1_symbol_is_nulling {
-    my ( $slg, $symid ) = @_;
-    my ($is_nulling) = $slg->call_by_tag(
-    ('@' .__FILE__ . ':' . __LINE__),
-    <<'END_OF_LUA', 'i>*', $symid ) ;
-    local slg, symid = ...
-    local g1g = slg.g1
-    return g1g:symbol_is_nulling(symid)
-END_OF_LUA
-
-    return $is_nulling;
-}
-
-# This logic deals with gaps in the symbol numbering.
-# Currently there are none, but Libmarpa does not
-# guarantee this.
+# TODO -- Document that I guarantee no gaps in
+# the symbol/rule numbering
 sub Marpa::R3::Scanless::G::lmg_symbol_ids {
     my ($slg, $subg_name) = @_;
     my ($highest_symbol_id) = $slg->call_by_tag(
@@ -1965,50 +1934,6 @@ sub Marpa::R3::Scanless::G::g1_symbol_ids {
 sub Marpa::R3::Scanless::G::l0_symbol_ids {
     my ($slg) = @_;
     return $slg->lmg_symbol_ids('l0');
-}
-
-sub Marpa::R3::Scanless::G::rules_show {
-    my ( $slg, $verbose ) = @_;
-    my ( $desc ) =
-      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 'i', $verbose);
-    local slg, verbose = ...
-    return slg:xprs_show(verbose)
-END_OF_LUA
-    return $desc;
-}
-
-sub Marpa::R3::Scanless::G::lmg_rules_show {
-    my ( $slg, $subg_name, $verbose ) = @_;
-    my ( $desc ) =
-      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 'si', $subg_name, $verbose);
-    local slg, subg_name, verbose = ...
-    return slg:lmg_rules_show(subg_name, verbose)
-END_OF_LUA
-    return $desc;
-}
-
-sub Marpa::R3::Scanless::G::g1_rules_show {
-    my ( $slg, $verbose ) = @_;
-    my ( $desc ) =
-      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 'i', $verbose );
-    local slg, verbose = ...
-    return slg:g1_rules_show(verbose)
-END_OF_LUA
-    return $desc;
-}
-
-sub Marpa::R3::Scanless::G::l0_rules_show {
-    my ( $slg, $verbose ) = @_;
-    my ( $desc ) =
-      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 'i', $verbose);
-    local slg, verbose = ...
-    return slg:l0_rules_show(verbose)
-END_OF_LUA
-    return $desc;
 }
 
 # Currently there are no gaps in the rule ids.
@@ -2034,30 +1959,6 @@ sub Marpa::R3::Scanless::G::g1_rule_ids {
 sub Marpa::R3::Scanless::G::l0_rule_ids {
     my ($slg) = @_;
     return $slg->lmg_rule_ids('l0');
-}
-
-
-sub Marpa::R3::Scanless::G::g1_irl_isyids {
-    my ($slg, $irlid) = @_;
-    return $slg->lmg_irl_isyids('g1', $irlid);
-}
-
-sub Marpa::R3::Scanless::G::l0_irl_isyids {
-    my ($slg, $irlid) = @_;
-    return $slg->lmg_irl_isyids('l0', $irlid);
-}
-
-# TODO -- delete after development?
-sub Marpa::R3::Scanless::G::lmg_irl_isyids {
-    my ($slg, $subg_name, $irlid) = @_;
-    my ($symbols) = $slg->call_by_tag(
-    ('@' .__FILE__ . ':' . __LINE__),
-    <<'END_OF_LUA', 'si>*', $subg_name, $irlid ) ;
-    local grammar, subg_name, irlid = ...
-    local lmw_g = grammar[subg_name].lmw_g
-    return lmw_g:irl_isyids(irlid)
-END_OF_LUA
-    return @{$symbols};
 }
 
 # not to be documented

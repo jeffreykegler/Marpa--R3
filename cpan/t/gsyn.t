@@ -12,7 +12,7 @@
 
 # Synopsis for Scannerless version of Stuizand interface
 
-# MITOSIS: TODO L0
+# MITOSIS: FINISHED
 
 use 5.010001;
 use strict;
@@ -22,7 +22,7 @@ use POSIX qw(setlocale LC_ALL);
 
 POSIX::setlocale(LC_ALL, "C");
 
-use Test::More tests => 5;
+use Test::More tests => 7;
 use lib 'inc';
 use Marpa::R3::Test;
 
@@ -73,9 +73,45 @@ my $value_ref = $grammar->parse( \$input );
 
 Marpa::R3::Test::is( ${$value_ref}, 49, 'Synopsis value test');
 
-my $rules_show_output = $grammar->g1_rules_show();
-$rules_show_output .= $grammar->l0_rules_show(1);
+my $productions_show_output = $grammar->productions_show();
+Marpa::R3::Test::is( $productions_show_output,
+    <<'END_OF_SHOW_RULES_OUTPUT', 'Scanless productions_show()' );
+R1 [:start:] ::= Script
+R2 Expression ::= Expression
+R3 Expression ::= Expression
+R4 Expression ::= Expression
+R5 Expression ::= Expression
+R6 Expression ::= Number
+R7 Expression ::= '(' Expression ')'
+R8 Expression ::= Expression '**' Expression
+R9 Expression ::= Expression '*' Expression
+R10 Expression ::= Expression '/' Expression
+R11 Expression ::= Expression '+' Expression
+R12 Expression ::= Expression '-' Expression
+R13 Script ::= Expression +
+R14 comma ~ [,]
+R15 '(' ~ [\(]
+R16 ')' ~ [\)]
+R17 '**' ~ [\*] [\*]
+R18 '*' ~ [\*]
+R19 '/' ~ [\/]
+R20 '+' ~ [\+]
+R21 '-' ~ [\-]
+R22 Number ~ [\d] +
+R23 [:discard:] ~ whitespace
+R24 whitespace ~ [\s] +
+R25 [:discard:] ~ <hash comment>
+R26 <hash comment> ~ <terminated hash comment>
+R27 <hash comment> ~ <unterminated final hash comment>
+R28 <terminated hash comment> ~ [\#] <hash comment body> <vertical space char>
+R29 <unterminated final hash comment> ~ [\#] <hash comment body>
+R30 <hash comment body> ~ <hash comment char> *
+R31 <vertical space char> ~ [\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
+R32 <hash comment char> ~ [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
+END_OF_SHOW_RULES_OUTPUT
 
+my $rules_show_output;
+$rules_show_output = $grammar->g1_rules_show();
 Marpa::R3::Test::is( $rules_show_output,
     <<'END_OF_SHOW_RULES_OUTPUT', 'Scanless g1_rules_show()' );
 R0 Script ::= Expression +
@@ -91,6 +127,13 @@ R9 Expression ::= Expression '/' Expression
 R10 Expression ::= Expression '+' Expression
 R11 Expression ::= Expression '-' Expression
 R12 [:start:] ::= Script
+END_OF_SHOW_RULES_OUTPUT
+
+
+$rules_show_output = $grammar->l0_rules_show(1);
+
+Marpa::R3::Test::is( $rules_show_output,
+    <<'END_OF_SHOW_RULES_OUTPUT', 'Scanless l0_rules_show()' );
 R0 comma ~ [,]
 R1 '(' ~ [\(]
 R2 ')' ~ [\)]

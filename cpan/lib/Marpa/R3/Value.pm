@@ -1427,7 +1427,7 @@ END_OF_LUA
 
         my $start_rhs_symbol_id;
       RULE: for my $irlid ( $slg->g1_rule_ids() ) {
-            my ( $lhs, $rhs0 ) = $slg->g1_irl_isyids($irlid);
+            my ( $lhs, $rhs0 ) = $slg->g1_rule_expand($irlid);
             if ( $start_symbol_id == $lhs ) {
                 $start_rhs_symbol_id = $rhs0;
                 last RULE;
