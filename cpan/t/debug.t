@@ -691,14 +691,144 @@ END_OF_SHOW_RULES_OUTPUT
 
 # Marpa::R3::Display::End
 
+my $symbols_show_output;
+
+# Marpa::R3::Display
+# name: SLIF symbols_show() synopsis
+
+$symbols_show_output = $grammar->symbols_show(3);
+
+# Marpa::R3::Display::End
+
+Marpa::R3::Test::is( $symbols_show_output,
+    <<'END_OF_SHOW_SYMBOLS_OUTPUT', 'SLIF symbols_show()' );
+S1 [:discard:]
+  Canonical name: <[:discard:]>
+  SLIF name: [:discard:]
+S2 [:start:]
+  Canonical name: <[:start:]>
+  SLIF name: [:start:]
+S3 'set'
+  Canonical name: <[Lex-0]>
+  SLIF name: 'set'
+S4 'to'
+  Canonical name: <[Lex-1]>
+  SLIF name: 'to'
+S5 '='
+  Canonical name: <[Lex-2]>
+  SLIF name: '='
+S6 'string'
+  Canonical name: <[Lex-3]>
+  SLIF name: 'string'
+S7 '('
+  Canonical name: <[Lex-4]>
+  SLIF name: '('
+S8 ')'
+  Canonical name: <[Lex-5]>
+  SLIF name: ')'
+S9 '+'
+  Canonical name: <[Lex-6]>
+  SLIF name: '+'
+S10 '+'
+  Canonical name: <[Lex-7]>
+  SLIF name: '+'
+S11 '*'
+  Canonical name: <[Lex-8]>
+  SLIF name: '*'
+S12 [']
+  Canonical name: <[[']]>
+  SLIF name: [']
+S13 [\(]
+  Canonical name: <[[\(]]>
+  SLIF name: [\(]
+S14 [\)]
+  Canonical name: <[[\)]]>
+  SLIF name: [\)]
+S15 [\*]
+  Canonical name: <[[\*]]>
+  SLIF name: [\*]
+S16 [\+]
+  Canonical name: <[[\+]]>
+  SLIF name: [\+]
+S17 [\=]
+  Canonical name: <[[\=]]>
+  SLIF name: [\=]
+S18 [\d]
+  Canonical name: <[[\d]]>
+  SLIF name: [\d]
+S19 [\s]
+  Canonical name: <[[\s]]>
+  SLIF name: [\s]
+S20 [\w]
+  Canonical name: <[[\w]]>
+  SLIF name: [\w]
+S21 [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}]
+  Canonical name: <[[^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}]]>
+  SLIF name: [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}]
+S22 [e]
+  Canonical name: <[[e]]>
+  SLIF name: [e]
+S23 [g]
+  Canonical name: <[[g]]>
+  SLIF name: [g]
+S24 [i]
+  Canonical name: <[[i]]>
+  SLIF name: [i]
+S25 [n]
+  Canonical name: <[[n]]>
+  SLIF name: [n]
+S26 [o]
+  Canonical name: <[[o]]>
+  SLIF name: [o]
+S27 [r]
+  Canonical name: <[[r]]>
+  SLIF name: [r]
+S28 [s]
+  Canonical name: <[[s]]>
+  SLIF name: [s]
+S29 [t]
+  Canonical name: <[[t]]>
+  SLIF name: [t]
+S30 assignment
+  Canonical name: <assignment>
+  SLIF name: assignment
+S31 expression
+  Canonical name: <expression>
+  SLIF name: expression
+S32 number
+  Canonical name: <number>
+  SLIF name: number
+S33 <numeric assignment>
+  Canonical name: <numeric assignment>
+  SLIF name: numeric assignment
+S34 <numeric expression>
+  Canonical name: <numeric expression>
+  SLIF name: numeric expression
+S35 statement
+  Canonical name: <statement>
+  SLIF name: statement
+S36 statements
+  Canonical name: <statements>
+  SLIF name: statements
+S37 string
+  Canonical name: <string>
+  SLIF name: string
+S38 <string contents>
+  Canonical name: <string contents>
+  SLIF name: string contents
+S39 variable
+  Canonical name: <variable>
+  SLIF name: variable
+S40 whitespace
+  Canonical name: <whitespace>
+  SLIF name: whitespace
+END_OF_SHOW_SYMBOLS_OUTPUT
+
 # Marpa::R3::Display
 # name: SLIF g1_symbols_show() synopsis
 
-my $symbols_show_output;
-$symbols_show_output .= "G1 Symbols:\n";
+$symbols_show_output = "G1 Symbols:\n";
 $symbols_show_output .= $grammar->g1_symbols_show(3);
-$symbols_show_output .= "Lex (L0) Symbols:\n";
-$symbols_show_output .= $grammar->l0_symbols_show(3);
 
 # Marpa::R3::Display::End
 
@@ -797,7 +927,26 @@ g1 S24 variable
   /* terminal */
   Internal name: <variable>
   SLIF name: variable
-Lex (L0) Symbols:
+END_OF_SHOW_SYMBOLS_OUTPUT
+
+# Marpa::R3::Display::End
+
+# Marpa::R3::Display
+# name: SLIF l0_symbols_show() synopsis
+
+$symbols_show_output = "L0 Symbols:\n";
+$symbols_show_output .= $grammar->l0_symbols_show(3);
+
+# Marpa::R3::Display::End
+
+# Marpa::R3::Display
+# name: SLIF debug example l0_symbols_show() output
+# start-after-line: END_OF_SHOW_SYMBOLS_OUTPUT
+# end-before-line: '^END_OF_SHOW_SYMBOLS_OUTPUT$'
+
+Marpa::R3::Test::is( $symbols_show_output,
+    <<'END_OF_SHOW_SYMBOLS_OUTPUT', 'SLIF l0_symbols_show()' );
+L0 Symbols:
 l0 S0 [:discard:]
   Internal name: <[:discard:]>
 l0 S1 'set'

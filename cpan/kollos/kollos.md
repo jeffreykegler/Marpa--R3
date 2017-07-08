@@ -862,6 +862,16 @@ Lowest ISYID is 0.
         return slg:lmg_symbol_by_name(symbol_name, 'l0')
     end
 
+    function _M.class_slg.symbol_dsl_form(slg, xsyid)
+        local xsy = slg.xsys[xsyid]
+        if not xsy then
+            _M.userX(
+                "slg.symbol_dsl_form(): %s is not a valid xsyid",
+                inspect(xsyid)
+            )
+        end
+        return xsy.dsl_form
+    end
     function _M.class_slg.lmg_symbol_dsl_form(slg, subg_name, symbol_id)
         local subg = slg[subg_name]
         return subg:symbol_dsl_form(symbol_id)
@@ -923,7 +933,7 @@ Lowest ISYID is 0.
             pieces[#pieces+1] = "\n"
             if verbose >= 2 then
                 pieces[#pieces+1] =  "  Canonical name: <"
-                pieces[#pieces+1] =  lmw_g:symbol_name(symbol_id)
+                pieces[#pieces+1] =  slg:symbol_name(symbol_id)
                 pieces[#pieces+1] =  ">\n"
             end
             if verbose >= 3 then
