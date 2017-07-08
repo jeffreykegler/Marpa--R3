@@ -10,7 +10,7 @@
 # or implied warranties. For details, see the full text of
 # of the licenses in the directory LICENSES.
 
-# Note: This is leo3.t converted to the SLIF
+# This is leo3.t from Marpa::R2 converted to the SLIF
 
 # The example from p. 166 of Leo's paper,
 # augmented to test Leo prediction items.
@@ -18,7 +18,7 @@
 # one are the Earley set counts and the
 # diagnostics.
 
-# MITOSIS: TODO
+# MITOSIS: FINISHED
 
 use 5.010001;
 use strict;
@@ -56,24 +56,26 @@ END_OF_DSL
     }
 );
 
-Marpa::R3::Test::is( $grammar->g1_symbols_show(),
+Marpa::R3::Test::is( $grammar->symbols_show(),
     <<'END_OF_STRING', 'Leo166 Symbols' );
-g1 S0 A
-g1 S1 B
-g1 S2 C
-g1 S3 S
-g1 S4 [:start:]
-g1 S5 a
+S1 A
+S2 B
+S3 C
+S4 S
+S5 [:start:]
+S6 [a]
+S7 a
 END_OF_STRING
 
-Marpa::R3::Test::is( $grammar->g1_rules_show,
-    <<'END_OF_STRING', 'Leo166 Rules' );
-R0 S ::= a A
-R1 A ::= B
-R2 B ::= C
-R3 C ::= S
-R4 S ::=
-R5 [:start:] ::= S
+Marpa::R3::Test::is( $grammar->productions_show,
+    <<'END_OF_STRING', 'Leo166 Productions' );
+R1 [:start:] ::= S
+R2 S ::= a A
+R3 A ::= B
+R4 B ::= C
+R5 C ::= S
+R6 S ::=
+R7 a ~ [a]
 END_OF_STRING
 
 Marpa::R3::Test::is( $grammar->show_ahms, <<'END_OF_STRING', 'Leo166 AHMs' );

@@ -10,10 +10,9 @@
 # or implied warranties. For details, see the full text of
 # of the licenses in the directory LICENSES.
 
-# CENSUS: ASIS
-# Note: Converted to SLIF from leo_example.t
+# Converted to SLIF from Marpa::R2 leo_example.t
 
-# MITOSIS: TODO
+# MITOSIS: FINISHED
 
 use 5.010001;
 use strict;
@@ -88,32 +87,43 @@ sub My_Actions::do_Expression {
 
 ## use critic
 
-my $symbols_show_output = $grammar->g1_symbols_show();
+my $symbols_show_output = $grammar->symbols_show();
 
 Marpa::R3::Test::is( $symbols_show_output,
     <<'END_SYMBOLS', 'Leo Example Symbols' );
-g1 S0 AddAssignOp
-g1 S1 AssignOp
-g1 S2 Expression
-g1 S3 Lvalue
-g1 S4 MinusAssignOp
-g1 S5 MultiplyAssignOp
-g1 S6 Statement
-g1 S7 Variable
-g1 S8 [:start:]
+S1 AddAssignOp
+S2 AssignOp
+S3 Expression
+S4 Lvalue
+S5 MinusAssignOp
+S6 MultiplyAssignOp
+S7 Statement
+S8 Variable
+S9 [:start:]
+S10 [=]
+S11 [\*]
+S12 [\+]
+S13 [\-]
+S14 [\=]
+S15 [a-z]
 END_SYMBOLS
 
-my $rules_show_output = $grammar->g1_rules_show();
+my $rules_show_output = $grammar->productions_show();
 
-Marpa::R3::Test::is( $rules_show_output, <<'END_RULES', 'Leo Example Rules' );
-R0 Statement ::= Expression
-R1 Expression ::= Lvalue AssignOp Expression
+Marpa::R3::Test::is( $rules_show_output, <<'END_RULES', 'Leo Example Productions' );
+R1 [:start:] ::= Statement
 R2 Expression ::= Lvalue AddAssignOp Expression
 R3 Expression ::= Lvalue MinusAssignOp Expression
 R4 Expression ::= Lvalue MultiplyAssignOp Expression
-R5 Expression ::= Variable
-R6 Lvalue ::= Variable
-R7 [:start:] ::= Statement
+R5 Statement ::= Expression
+R6 Expression ::= Variable
+R7 Lvalue ::= Variable
+R8 Expression ::= Lvalue AssignOp Expression
+R9 Variable ~ [a-z] +
+R10 AssignOp ~ [=]
+R11 AddAssignOp ~ [\+] [\=]
+R12 MinusAssignOp ~ [\-] [\=]
+R13 MultiplyAssignOp ~ [\*] [\=]
 END_RULES
 
 my $show_ahms_output = $grammar->show_ahms();
