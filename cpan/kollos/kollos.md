@@ -1436,6 +1436,7 @@ one for each subgrammar.
             end
             runtime_xpr.rhs = to_rhs
             runtime_xpr.rank = xpr_source.rank
+            runtime_xpr.priority = xpr_source.priority
             runtime_xpr.null_ranking = xpr_source.null_ranking
 
             runtime_xpr.symbol_as_event = xpr_source.symbol_as_event
@@ -4858,6 +4859,7 @@ is zero.
     class_xpr_fields.min = true
     class_xpr_fields.name = true
     class_xpr_fields.null_ranking = true
+    class_xpr_fields.priority = true
     class_xpr_fields.proper = true
     class_xpr_fields.rank = true
     class_xpr_fields.rhs = true

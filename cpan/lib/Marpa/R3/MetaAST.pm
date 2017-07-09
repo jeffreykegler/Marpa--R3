@@ -781,6 +781,7 @@ sub Marpa::R3::Internal::MetaAST_Nodes::priority_rule::evaluate {
         length => $length,
         lhs   => $parse->prioritized_symbol( $lhs, $_ - 1 ),
         rhs   => [ $parse->prioritized_symbol( $lhs, $_ ) ],
+        priority => $_,
         subkey => ++$xpr_ordinal,
         @arg0_action
       }
@@ -898,6 +899,7 @@ sub Marpa::R3::Internal::MetaAST_Nodes::priority_rule::evaluate {
         $next_priority = 0 if $next_priority >= $priority_count;
 
         my $next_exp = $parse->prioritized_symbol( $lhs, $next_priority);
+        $new_xs_rule{priority} = $next_priority;
 
         if ( not scalar @arity ) {
             $new_xs_rule{rhs} = \@new_rhs;
@@ -1892,7 +1894,7 @@ sub Marpa::R3::Internal::MetaAST::Parse::xpr_create {
     );
     # Shallow copy
     for my $field (
-        qw(lhs action rank
+        qw(lhs action priority rank
         null_ranking min separator proper )
       )
     {

@@ -1359,6 +1359,7 @@ sub add_G1_user_rule {
     my ( $min, $separator_name );
     my $rank;
     my $null_ranking;
+    my $priority;
     my $proper_separation = 0;
     my $xpr_name;
     my $xpr_id;
@@ -1367,6 +1368,11 @@ sub add_G1_user_rule {
 
   OPTION: for my $option ( keys %{$options} ) {
         my $value = $options->{$option};
+        if ( $option eq 'priority' )   {
+            # just ignore the priority -- it's for
+            # XPR diagnostics
+            next OPTION;
+        }
         if ( $option eq 'xprid' ) {
             $xpr_name = $value;
             next OPTION;
