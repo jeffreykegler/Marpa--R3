@@ -494,21 +494,21 @@ R1 [:start:] ::= statements
 R2 statement ::= <numeric assignment>
 R3 assignment ::= 'set' variable 'to' expression
 R4 <numeric assignment> ::= variable '=' <numeric expression>
-R5 expression ::= expression
-R6 expression ::= expression
-R7 expression ::= expression
-R8 expression ::= variable
-R9 expression ::= string
-R10 expression ::= 'string' '(' <numeric expression> ')'
-R11 expression ::= expression '+' expression
-R12 <numeric expression> ::= <numeric expression>
-R13 <numeric expression> ::= <numeric expression>
-R14 <numeric expression> ::= <numeric expression>
-R15 <numeric expression> ::= variable
-R16 <numeric expression> ::= number
-R17 <numeric expression> ::= <numeric expression> '+' <numeric expression>
+R5 expression ::= expression; prec=0
+R6 expression ::= expression; prec=1
+R7 expression ::= expression; prec=2
+R8 expression ::= variable; prec=0
+R9 expression ::= string; prec=0
+R10 expression ::= 'string' '(' <numeric expression> ')'; prec=2
+R11 expression ::= expression '+' expression; prec=1
+R12 <numeric expression> ::= <numeric expression>; prec=0
+R13 <numeric expression> ::= <numeric expression>; prec=1
+R14 <numeric expression> ::= <numeric expression>; prec=2
+R15 <numeric expression> ::= variable; prec=0
+R16 <numeric expression> ::= number; prec=0
+R17 <numeric expression> ::= <numeric expression> '+' <numeric expression>; prec=2
 R18 statements ::= statement *
-R19 <numeric expression> ::= <numeric expression> '*' <numeric expression>
+R19 <numeric expression> ::= <numeric expression> '*' <numeric expression>; prec=1
 R20 statement ::= assignment
 R21 'set' ~ [s] [e] [t]
 R22 'to' ~ [t] [o]
@@ -1572,21 +1572,21 @@ Marpa::R3::Test::is( $text, <<'END_OF_TEXT', 'production_show() by id');
 statement ::= <numeric assignment>
 assignment ::= 'set' variable 'to' expression
 <numeric assignment> ::= variable '=' <numeric expression>
-expression ::= expression
-expression ::= expression
-expression ::= expression
-expression ::= variable
-expression ::= string
-expression ::= 'string' '(' <numeric expression> ')'
-expression ::= expression '+' expression
-<numeric expression> ::= <numeric expression>
-<numeric expression> ::= <numeric expression>
-<numeric expression> ::= <numeric expression>
-<numeric expression> ::= variable
-<numeric expression> ::= number
-<numeric expression> ::= <numeric expression> '+' <numeric expression>
+expression ::= expression; prec=0
+expression ::= expression; prec=1
+expression ::= expression; prec=2
+expression ::= variable; prec=0
+expression ::= string; prec=0
+expression ::= 'string' '(' <numeric expression> ')'; prec=2
+expression ::= expression '+' expression; prec=1
+<numeric expression> ::= <numeric expression>; prec=0
+<numeric expression> ::= <numeric expression>; prec=1
+<numeric expression> ::= <numeric expression>; prec=2
+<numeric expression> ::= variable; prec=0
+<numeric expression> ::= number; prec=0
+<numeric expression> ::= <numeric expression> '+' <numeric expression>; prec=2
 statements ::= statement *
-<numeric expression> ::= <numeric expression> '*' <numeric expression>
+<numeric expression> ::= <numeric expression> '*' <numeric expression>; prec=1
 statement ::= assignment
 'set' ~ [s] [e] [t]
 'to' ~ [t] [o]

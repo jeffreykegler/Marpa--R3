@@ -567,6 +567,12 @@ Display any XPR
             pieces[#pieces+1] =
                 minimum <= 0 and '*' or '+'
         end
+        local precedence = xpr.precedence
+        if precedence then
+            -- add a semi-colon to the most recent piece
+            pieces[#pieces] = pieces[#pieces] .. ';'
+            pieces[#pieces+1] = 'prec=' .. precedence
+        end
         return table.concat(pieces, ' ')
     end
     function _M.class_slg.xpr_display(slg, xprid)
@@ -974,17 +980,23 @@ Lowest ISYID is 0.
         local subg = xpr.subgrammar
         local pieces = {}
         local lh_xsy = xpr.lhs
-        pieces[#pieces+1] = lh_xsy:display_form()
+        pieces[#pieces+1] = lh_xsy.name
         pieces[#pieces+1] = subg == 'g1' and '::=' or '~'
         local rhs = xpr.rhs
         for ix = 1, #rhs do
             local rh_xsy = rhs[ix]
-            pieces[#pieces+1] = rh_xsy:display_form()
+            pieces[#pieces+1] = rh_xsy.name
         end
         local minimum = xpr.min
         if minimum then
             pieces[#pieces+1] =
                 minimum <= 0 and '*' or '+'
+        end
+        local precedence = xpr.precedence
+        if precedence then
+            -- add a semi-colon to the most recent piece
+            pieces[#pieces] = pieces[#pieces] .. ';'
+            pieces[#pieces+1] = 'prec=' .. precedence
         end
         return table.concat(pieces, ' ')
     end
@@ -1436,7 +1448,7 @@ one for each subgrammar.
             end
             runtime_xpr.rhs = to_rhs
             runtime_xpr.rank = xpr_source.rank
-            runtime_xpr.priority = xpr_source.priority
+            runtime_xpr.precedence = xpr_source.precedence
             runtime_xpr.null_ranking = xpr_source.null_ranking
 
             runtime_xpr.symbol_as_event = xpr_source.symbol_as_event
@@ -4859,7 +4871,7 @@ is zero.
     class_xpr_fields.min = true
     class_xpr_fields.name = true
     class_xpr_fields.null_ranking = true
-    class_xpr_fields.priority = true
+    class_xpr_fields.precedence = true
     class_xpr_fields.proper = true
     class_xpr_fields.rank = true
     class_xpr_fields.rhs = true

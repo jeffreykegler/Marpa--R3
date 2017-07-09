@@ -70,17 +70,17 @@ $productions_show_output = $grammar->productions_show();
 Marpa::R3::Test::is( $productions_show_output,
     <<'END_OF_SHOW_RULES_OUTPUT', 'Scanless productions_show()' );
 R1 [:start:] ::= Script
-R2 Expression ::= Expression
-R3 Expression ::= Expression
-R4 Expression ::= Expression
-R5 Expression ::= Expression
-R6 Expression ::= Number
-R7 Expression ::= '(' Expression ')'
-R8 Expression ::= Expression '**' Expression
-R9 Expression ::= Expression '*' Expression
-R10 Expression ::= Expression '/' Expression
-R11 Expression ::= Expression '+' Expression
-R12 Expression ::= Expression '-' Expression
+R2 Expression ::= Expression; prec=0
+R3 Expression ::= Expression; prec=1
+R4 Expression ::= Expression; prec=2
+R5 Expression ::= Expression; prec=3
+R6 Expression ::= Number; prec=0
+R7 Expression ::= '(' Expression ')'; prec=0
+R8 Expression ::= Expression '**' Expression; prec=3
+R9 Expression ::= Expression '*' Expression; prec=2
+R10 Expression ::= Expression '/' Expression; prec=2
+R11 Expression ::= Expression '+' Expression; prec=1
+R12 Expression ::= Expression '-' Expression; prec=1
 R13 Script ::= Expression +
 R14 comma ~ [,]
 R15 '(' ~ [\(]

@@ -1368,8 +1368,8 @@ sub add_G1_user_rule {
 
   OPTION: for my $option ( keys %{$options} ) {
         my $value = $options->{$option};
-        if ( $option eq 'priority' )   {
-            # just ignore the priority -- it's for
+        if ( $option eq 'precedence' )   {
+            # just ignore the precedence -- it's for
             # XPR diagnostics
             next OPTION;
         }
