@@ -483,6 +483,11 @@ my $productions_show_output = $grammar->productions_show();
 
 # Marpa::R3::Display::End
 
+# Marpa::R3::Display
+# name: SLIF debug example productions_show() output
+# start-after-line: END_OF_SHOW_RULES_OUTPUT
+# end-before-line: '^END_OF_SHOW_RULES_OUTPUT$'
+
 Marpa::R3::Test::is( $productions_show_output,
     <<'END_OF_OUTPUT', 'SLIF productions_show()' );
 R1 [:start:] ::= statements
@@ -521,6 +526,8 @@ R33 <string contents> ~ [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] +
 R34 [:discard:] ~ whitespace
 R35 whitespace ~ [\s] +
 END_OF_OUTPUT
+
+# Marpa::R3::Display::End
 
 my $rules_show_output;
 
@@ -713,6 +720,11 @@ $symbols_show_output = $grammar->symbols_show(3);
 
 # Marpa::R3::Display::End
 
+# Marpa::R3::Display
+# name: SLIF debug example symbols_show() output
+# start-after-line: END_OF_SHOW_SYMBOLS_OUTPUT
+# end-before-line: '^END_OF_SHOW_SYMBOLS_OUTPUT$'
+
 Marpa::R3::Test::is( $symbols_show_output,
     <<'END_OF_SHOW_SYMBOLS_OUTPUT', 'SLIF symbols_show()' );
 S1 [:discard:]
@@ -836,6 +848,8 @@ S40 whitespace
   Canonical name: <whitespace>
   SLIF name: whitespace
 END_OF_SHOW_SYMBOLS_OUTPUT
+
+# Marpa::R3::Display::End
 
 # Marpa::R3::Display
 # name: SLIF g1_symbols_show() synopsis
@@ -1115,119 +1129,7 @@ Marpa::R3::Test::is(
     'G1 symbol ids'
 );
 
-@TEST_ARRAY = ();
-
-# Marpa::R3::Display
-# name: SLG g1_rule_ids() synopsis
-
-do_something($_) for $grammar->g1_rule_ids();
-
-# Marpa::R3::Display::End
-
-Marpa::R3::Test::is(
-    ( join "\n", @TEST_ARRAY, '' ),
-    ( join "\n", 0 .. 19, '' ),
-    'G1 rule ids'
-);
-
-@TEST_ARRAY = ();
-
-# Marpa::R3::Display
-# name: SLG l0_rule_ids() synopsis
-
-do_something($_) for $grammar->l0_rule_ids();
-
-# Marpa::R3::Display::End
-
-Marpa::R3::Test::is(
-    ( join "\n", @TEST_ARRAY, ''),
-    ( join "\n", 0 .. 27, '' ),
-    'L0 rule ids'
-);
-
 my $text;
-
-$text = q{};
-
-for my $rule_id ( $grammar->g1_rule_ids() ) {
-
-# Marpa::R3::Display
-# name: SLG g1_rule_expand() synopsis
-
-    my ($lhs_id, @rhs_ids) = $grammar->g1_rule_expand($rule_id);
-    $text .= "Rule #$rule_id: $lhs_id ::= " . (join q{ }, @rhs_ids) . "\n";
-
-# Marpa::R3::Display::End
-
-}
-
-Marpa::R3::Test::is( $text, <<'END_OF_TEXT', 'G1 symbol ids by rule id');
-Rule #0: 22 ::= 21
-Rule #1: 21 ::= 10
-Rule #2: 21 ::= 16
-Rule #3: 10 ::= 1 24 2 11
-Rule #4: 16 ::= 24 3 17
-Rule #5: 11 ::= 12
-Rule #6: 12 ::= 13
-Rule #7: 13 ::= 14
-Rule #8: 14 ::= 24
-Rule #9: 14 ::= 23
-Rule #10: 13 ::= 4 5 17 6
-Rule #11: 12 ::= 12 7 13
-Rule #12: 17 ::= 18
-Rule #13: 18 ::= 19
-Rule #14: 19 ::= 20
-Rule #15: 20 ::= 24
-Rule #16: 20 ::= 15
-Rule #17: 19 ::= 19 8 20
-Rule #18: 18 ::= 18 9 19
-Rule #19: 0 ::= 22
-END_OF_TEXT
-
-$text = q{};
-
-for my $rule_id ( $grammar->l0_rule_ids() ) {
-
-# Marpa::R3::Display
-# name: SLG l0_rule_expand() synopsis
-
-    my ($lhs_id, @rhs_ids) = $grammar->l0_rule_expand($rule_id);
-    $text .= "l0 Rule #$rule_id: $lhs_id ::= " . (join q{ }, @rhs_ids) . "\n";
-
-# Marpa::R3::Display::End
-
-}
-
-Marpa::R3::Test::is( $text, <<'END_OF_TEXT', 'L0 symbol ids by rule id');
-l0 Rule #0: 1 ::= 26 20 27
-l0 Rule #1: 2 ::= 27 24
-l0 Rule #2: 3 ::= 15
-l0 Rule #3: 4 ::= 26 27 25 22 23 21
-l0 Rule #4: 5 ::= 11
-l0 Rule #5: 6 ::= 12
-l0 Rule #6: 7 ::= 14
-l0 Rule #7: 8 ::= 14
-l0 Rule #8: 9 ::= 13
-l0 Rule #9: 31 ::= 18
-l0 Rule #10: 28 ::= 16
-l0 Rule #11: 29 ::= 10 30 10
-l0 Rule #12: 30 ::= 19
-l0 Rule #13: 0 ::= 32
-l0 Rule #14: 32 ::= 17
-l0 Rule #15: 33 ::= 0
-l0 Rule #16: 33 ::= 1
-l0 Rule #17: 33 ::= 2
-l0 Rule #18: 33 ::= 3
-l0 Rule #19: 33 ::= 4
-l0 Rule #20: 33 ::= 5
-l0 Rule #21: 33 ::= 6
-l0 Rule #22: 33 ::= 7
-l0 Rule #23: 33 ::= 8
-l0 Rule #24: 33 ::= 9
-l0 Rule #25: 33 ::= 28
-l0 Rule #26: 33 ::= 29
-l0 Rule #27: 33 ::= 31
-END_OF_TEXT
 
 $text = q{};
 
@@ -1337,98 +1239,6 @@ symbol number: 23  DSL form: string
 symbol number: 24  name: variable
 symbol number: 24  name in display form: variable
 symbol number: 24  DSL form: variable
-END_OF_TEXT
-
-$text = q{};
-
-for my $rule_id ( $grammar->g1_rule_ids() ) {
-
-# Marpa::R3::Display
-# name: SLG g1_rule_show() synopsis
-
-    my $rule_description = $grammar->g1_rule_show($rule_id);
-
-# Marpa::R3::Display::End
-
-    if (not defined $rule_description) {
-        $text .= "[No such rule, ID #$rule_id]\n";
-    } else {
-        $text .= "$rule_description\n";
-    }
-
-}
-
-Marpa::R3::Test::is( $text, <<'END_OF_TEXT', 'G1 rule_show() by rule id');
-statements ::= statement *
-statement ::= assignment
-statement ::= <numeric assignment>
-assignment ::= 'set' variable 'to' expression
-<numeric assignment> ::= variable '=' <numeric expression>
-expression ::= expression
-expression ::= expression
-expression ::= expression
-expression ::= variable
-expression ::= string
-expression ::= 'string' '(' <numeric expression> ')'
-expression ::= expression '+' expression
-<numeric expression> ::= <numeric expression>
-<numeric expression> ::= <numeric expression>
-<numeric expression> ::= <numeric expression>
-<numeric expression> ::= variable
-<numeric expression> ::= number
-<numeric expression> ::= <numeric expression> '+' <numeric expression>
-<numeric expression> ::= <numeric expression> '*' <numeric expression>
-[:start:] ::= statements
-END_OF_TEXT
-
-$text = q{};
-
-for my $rule_id ( $grammar->l0_rule_ids() ) {
-
-# Marpa::R3::Display
-# name: SLG l0_rule_show() synopsis
-
-    my $rule_description = $grammar->l0_rule_show($rule_id);
-
-# Marpa::R3::Display::End
-
-    if (not defined $rule_description) {
-        $text .= "[No such rule, ID #$rule_id]\n";
-    } else {
-        $text .= "$rule_description\n";
-    }
-
-}
-
-Marpa::R3::Test::is( $text, <<'END_OF_TEXT', 'L0 rule_show() by rule id');
-'set' ~ [s] [e] [t]
-'to' ~ [t] [o]
-'=' ~ [\=]
-'string' ~ [s] [t] [r] [i] [n] [g]
-'(' ~ [\(]
-')' ~ [\)]
-'+' ~ [\+]
-'+' ~ [\+]
-'*' ~ [\*]
-variable ~ [\w] +
-number ~ [\d] +
-string ~ ['] <string contents> [']
-<string contents> ~ [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] +
-[:discard:] ~ whitespace
-whitespace ~ [\s] +
-[:lex_start:] ~ [:discard:]
-[:lex_start:] ~ 'set'
-[:lex_start:] ~ 'to'
-[:lex_start:] ~ '='
-[:lex_start:] ~ 'string'
-[:lex_start:] ~ '('
-[:lex_start:] ~ ')'
-[:lex_start:] ~ '+'
-[:lex_start:] ~ '+'
-[:lex_start:] ~ '*'
-[:lex_start:] ~ number
-[:lex_start:] ~ string
-[:lex_start:] ~ variable
 END_OF_TEXT
 
 $text = '';
@@ -1568,11 +1378,208 @@ l0 symbol number: 33  name in display form: [:lex_start:]
 l0 symbol number: 33  DSL form: [No name in DSL form]
 END_OF_TEXT
 
-1;    # In case used as "do" file
+$text = q{};
 
-# Local Variables:
-#   mode: cperl
-#   cperl-indent-level: 4
-#   fill-column: 100
-# End:
+for my $rule_id ( $grammar->g1_rule_ids() ) {
+
+# Marpa::R3::Display
+# name: SLG g1_rule_show() synopsis
+
+    my $rule_description = $grammar->g1_rule_show($rule_id);
+
+# Marpa::R3::Display::End
+
+    if (not defined $rule_description) {
+        $text .= "[No such rule, ID #$rule_id]\n";
+    } else {
+        $text .= "$rule_description\n";
+    }
+
+}
+
+Marpa::R3::Test::is( $text, <<'END_OF_TEXT', 'G1 rule_show() by rule id');
+statements ::= statement *
+statement ::= assignment
+statement ::= <numeric assignment>
+assignment ::= 'set' variable 'to' expression
+<numeric assignment> ::= variable '=' <numeric expression>
+expression ::= expression
+expression ::= expression
+expression ::= expression
+expression ::= variable
+expression ::= string
+expression ::= 'string' '(' <numeric expression> ')'
+expression ::= expression '+' expression
+<numeric expression> ::= <numeric expression>
+<numeric expression> ::= <numeric expression>
+<numeric expression> ::= <numeric expression>
+<numeric expression> ::= variable
+<numeric expression> ::= number
+<numeric expression> ::= <numeric expression> '+' <numeric expression>
+<numeric expression> ::= <numeric expression> '*' <numeric expression>
+[:start:] ::= statements
+END_OF_TEXT
+
+$text = q{};
+
+for my $rule_id ( $grammar->l0_rule_ids() ) {
+
+# Marpa::R3::Display
+# name: SLG l0_rule_show() synopsis
+
+    my $rule_description = $grammar->l0_rule_show($rule_id);
+
+# Marpa::R3::Display::End
+
+    if (not defined $rule_description) {
+        $text .= "[No such rule, ID #$rule_id]\n";
+    } else {
+        $text .= "$rule_description\n";
+    }
+
+}
+
+Marpa::R3::Test::is( $text, <<'END_OF_TEXT', 'L0 rule_show() by rule id');
+'set' ~ [s] [e] [t]
+'to' ~ [t] [o]
+'=' ~ [\=]
+'string' ~ [s] [t] [r] [i] [n] [g]
+'(' ~ [\(]
+')' ~ [\)]
+'+' ~ [\+]
+'+' ~ [\+]
+'*' ~ [\*]
+variable ~ [\w] +
+number ~ [\d] +
+string ~ ['] <string contents> [']
+<string contents> ~ [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] +
+[:discard:] ~ whitespace
+whitespace ~ [\s] +
+[:lex_start:] ~ [:discard:]
+[:lex_start:] ~ 'set'
+[:lex_start:] ~ 'to'
+[:lex_start:] ~ '='
+[:lex_start:] ~ 'string'
+[:lex_start:] ~ '('
+[:lex_start:] ~ ')'
+[:lex_start:] ~ '+'
+[:lex_start:] ~ '+'
+[:lex_start:] ~ '*'
+[:lex_start:] ~ number
+[:lex_start:] ~ string
+[:lex_start:] ~ variable
+END_OF_TEXT
+
+@TEST_ARRAY = ();
+
+# Marpa::R3::Display
+# name: SLG g1_rule_ids() synopsis
+
+do_something($_) for $grammar->g1_rule_ids();
+
+# Marpa::R3::Display::End
+
+Marpa::R3::Test::is(
+    ( join "\n", @TEST_ARRAY, '' ),
+    ( join "\n", 0 .. 19, '' ),
+    'G1 rule ids'
+);
+
+@TEST_ARRAY = ();
+
+# Marpa::R3::Display
+# name: SLG l0_rule_ids() synopsis
+
+do_something($_) for $grammar->l0_rule_ids();
+
+# Marpa::R3::Display::End
+
+Marpa::R3::Test::is(
+    ( join "\n", @TEST_ARRAY, ''),
+    ( join "\n", 0 .. 27, '' ),
+    'L0 rule ids'
+);
+
+$text = q{};
+
+for my $rule_id ( $grammar->g1_rule_ids() ) {
+
+# Marpa::R3::Display
+# name: SLG g1_rule_expand() synopsis
+
+    my ($lhs_id, @rhs_ids) = $grammar->g1_rule_expand($rule_id);
+    $text .= "Rule #$rule_id: $lhs_id ::= " . (join q{ }, @rhs_ids) . "\n";
+
+# Marpa::R3::Display::End
+
+}
+
+Marpa::R3::Test::is( $text, <<'END_OF_TEXT', 'G1 symbol ids by rule id');
+Rule #0: 22 ::= 21
+Rule #1: 21 ::= 10
+Rule #2: 21 ::= 16
+Rule #3: 10 ::= 1 24 2 11
+Rule #4: 16 ::= 24 3 17
+Rule #5: 11 ::= 12
+Rule #6: 12 ::= 13
+Rule #7: 13 ::= 14
+Rule #8: 14 ::= 24
+Rule #9: 14 ::= 23
+Rule #10: 13 ::= 4 5 17 6
+Rule #11: 12 ::= 12 7 13
+Rule #12: 17 ::= 18
+Rule #13: 18 ::= 19
+Rule #14: 19 ::= 20
+Rule #15: 20 ::= 24
+Rule #16: 20 ::= 15
+Rule #17: 19 ::= 19 8 20
+Rule #18: 18 ::= 18 9 19
+Rule #19: 0 ::= 22
+END_OF_TEXT
+
+$text = q{};
+
+for my $rule_id ( $grammar->l0_rule_ids() ) {
+
+# Marpa::R3::Display
+# name: SLG l0_rule_expand() synopsis
+
+    my ($lhs_id, @rhs_ids) = $grammar->l0_rule_expand($rule_id);
+    $text .= "l0 Rule #$rule_id: $lhs_id ::= " . (join q{ }, @rhs_ids) . "\n";
+
+# Marpa::R3::Display::End
+
+}
+
+Marpa::R3::Test::is( $text, <<'END_OF_TEXT', 'L0 symbol ids by rule id');
+l0 Rule #0: 1 ::= 26 20 27
+l0 Rule #1: 2 ::= 27 24
+l0 Rule #2: 3 ::= 15
+l0 Rule #3: 4 ::= 26 27 25 22 23 21
+l0 Rule #4: 5 ::= 11
+l0 Rule #5: 6 ::= 12
+l0 Rule #6: 7 ::= 14
+l0 Rule #7: 8 ::= 14
+l0 Rule #8: 9 ::= 13
+l0 Rule #9: 31 ::= 18
+l0 Rule #10: 28 ::= 16
+l0 Rule #11: 29 ::= 10 30 10
+l0 Rule #12: 30 ::= 19
+l0 Rule #13: 0 ::= 32
+l0 Rule #14: 32 ::= 17
+l0 Rule #15: 33 ::= 0
+l0 Rule #16: 33 ::= 1
+l0 Rule #17: 33 ::= 2
+l0 Rule #18: 33 ::= 3
+l0 Rule #19: 33 ::= 4
+l0 Rule #20: 33 ::= 5
+l0 Rule #21: 33 ::= 6
+l0 Rule #22: 33 ::= 7
+l0 Rule #23: 33 ::= 8
+l0 Rule #24: 33 ::= 9
+l0 Rule #25: 33 ::= 28
+l0 Rule #26: 33 ::= 29
+l0 Rule #27: 33 ::= 31
+END_OF_TEXT
+
 # vim: expandtab shiftwidth=4:
