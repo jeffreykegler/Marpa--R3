@@ -57,6 +57,7 @@ expression ::=
 <numeric expression> ::=
        variable | number
     || <numeric expression> '+' <numeric expression>
+    # TODO -- Reverse '+' and '*' to traditional order!
     || <numeric expression> '*' <numeric expression>
 variable ~ [\w]+
 number ~ [\d]+
