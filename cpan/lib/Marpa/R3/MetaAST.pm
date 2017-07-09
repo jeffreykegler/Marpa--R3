@@ -769,7 +769,7 @@ sub Marpa::R3::Internal::MetaAST_Nodes::priority_rule::evaluate {
             length => $length,
             lhs   => $lhs,
             rhs   => [ $parse->prioritized_symbol( $lhs, 0 ) ],
-            precedence => 0,
+            precedence => ($priority_count - 1),
             subkey => ++$xpr_ordinal,
             @arg0_action,
         }
@@ -782,7 +782,7 @@ sub Marpa::R3::Internal::MetaAST_Nodes::priority_rule::evaluate {
         length => $length,
         lhs   => $parse->prioritized_symbol( $lhs, $_ - 1 ),
         rhs   => [ $parse->prioritized_symbol( $lhs, $_ ) ],
-        precedence => $_,
+        precedence => ($_ - 1),
         subkey => ++$xpr_ordinal,
         @arg0_action
       }
@@ -900,7 +900,7 @@ sub Marpa::R3::Internal::MetaAST_Nodes::priority_rule::evaluate {
         $next_priority = 0 if $next_priority >= $priority_count;
 
         my $next_exp = $parse->prioritized_symbol( $lhs, $next_priority);
-        $new_xs_rule{precedence} = $next_priority;
+        $new_xs_rule{precedence} = $priority;
 
         if ( not scalar @arity ) {
             $new_xs_rule{rhs} = \@new_rhs;
