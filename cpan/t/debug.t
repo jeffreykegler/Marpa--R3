@@ -12,7 +12,7 @@
 
 # Displays for SLIF Progress.pod
 
-# MITOSIS: TODO L0 PROGRESS
+# MITOSIS: TODONE PROGRESS
 
 use 5.010001;
 use strict;
@@ -1700,6 +1700,21 @@ END_OF_TEXT
 @TEST_ARRAY = ();
 
 # Marpa::R3::Display
+# name: SLG production_ids() synopsis
+
+do_something($_) for $grammar->production_ids();
+
+# Marpa::R3::Display::End
+
+Marpa::R3::Test::is(
+    ( join "\n", @TEST_ARRAY, '' ),
+    ( join "\n", 1 .. 35, '' ),
+    'production ids'
+);
+
+@TEST_ARRAY = ();
+
+# Marpa::R3::Display
 # name: SLG g1_rule_ids() synopsis
 
 do_something($_) for $grammar->g1_rule_ids();
@@ -1726,6 +1741,58 @@ Marpa::R3::Test::is(
     ( join "\n", 0 .. 27, '' ),
     'L0 rule ids'
 );
+
+$text = q{};
+
+for my $production_id ( $grammar->production_ids() ) {
+
+# Marpa::R3::Display
+# name: SLG production_expand() synopsis
+
+    my ($lhs_id, @rhs_ids) = $grammar->production_expand($production_id);
+    $text .= "Production #$production_id: $lhs_id ::= " . (join q{ }, @rhs_ids) . "\n";
+
+# Marpa::R3::Display::End
+
+}
+
+Marpa::R3::Test::is( $text, <<'END_OF_TEXT', 'symbol ids by production id');
+Production #1: 2 ::= 36
+Production #2: 35 ::= 33
+Production #3: 30 ::= 3 39 4 31
+Production #4: 33 ::= 39 5 34
+Production #5: 31 ::= 31
+Production #6: 31 ::= 31
+Production #7: 31 ::= 31
+Production #8: 31 ::= 39
+Production #9: 31 ::= 37
+Production #10: 31 ::= 6 7 34 8
+Production #11: 31 ::= 31 9 31
+Production #12: 34 ::= 34
+Production #13: 34 ::= 34
+Production #14: 34 ::= 34
+Production #15: 34 ::= 39
+Production #16: 34 ::= 32
+Production #17: 34 ::= 34 10 34
+Production #18: 36 ::= 35
+Production #19: 34 ::= 34 11 34
+Production #20: 35 ::= 30
+Production #21: 3 ::= 28 22 29
+Production #22: 4 ::= 29 26
+Production #23: 5 ::= 17
+Production #24: 6 ::= 28 29 27 24 25 23
+Production #25: 7 ::= 13
+Production #26: 8 ::= 14
+Production #27: 9 ::= 16
+Production #28: 10 ::= 16
+Production #29: 11 ::= 15
+Production #30: 39 ::= 20
+Production #31: 32 ::= 18
+Production #32: 37 ::= 12 38 12
+Production #33: 38 ::= 21
+Production #34: 1 ::= 40
+Production #35: 40 ::= 19
+END_OF_TEXT
 
 $text = q{};
 

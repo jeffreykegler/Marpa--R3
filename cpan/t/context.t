@@ -37,7 +37,7 @@ sub no_bail {
     my $production_id           = $Marpa::R3::Context::production_id;
     my $slg             = $Marpa::R3::Context::slg;
     my ( $lhs, @rhs ) =
-      map { $slg->symbol_name($_) } $slg->rule_expand($production_id);
+      map { $slg->symbol_name($_) } $slg->production_expand($production_id);
     $action_object->{text} =
         "rule $production_id: $lhs ::= "
       . ( join q{ }, @rhs ) . "\n"

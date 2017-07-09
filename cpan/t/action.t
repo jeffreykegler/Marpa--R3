@@ -38,7 +38,7 @@ sub do_S {
     my $production_id = $Marpa::R3::Context::production_id;
     my $slg             = $Marpa::R3::Context::slg;
     my ( $lhs, @rhs ) =
-        map { $slg->symbol_display_form($_) } $slg->rule_expand($production_id);
+        map { $slg->symbol_display_form($_) } $slg->production_expand($production_id);
     $per_parse_object->{text} =
           "rule $production_id: $lhs ::= "
         . ( join q{ }, @rhs ) . "\n"

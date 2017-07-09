@@ -1833,7 +1833,7 @@ kwgen(__LINE__, qw(l0_rule_to_production_id l0_rule_to_xprid i));
 
 kwgen(__LINE__, qw(highest_production_id highest_xprid), '');
 
-kwgen_arr(__LINE__, qw(rule_expand xpr_expand i));
+kwgen_arr(__LINE__, qw(production_expand xpr_expand i));
 kwgen_arr(__LINE__, qw(lmg_rule_expand lmg_irl_isyids si));
 kwgen_arr(__LINE__, qw(g1_rule_expand g1_irl_isyids i));
 kwgen_arr(__LINE__, qw(l0_rule_expand l0_irl_isyids i));
