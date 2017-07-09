@@ -523,14 +523,11 @@ R35 whitespace ~ [\s] +
 END_OF_OUTPUT
 
 my $rules_show_output;
-$rules_show_output .= "G1 Rules:\n";
-$rules_show_output .= $grammar->g1_rules_show(3);
-$rules_show_output .= "Lex (L0) Rules:\n";
 
 # Marpa::R3::Display
-# name: SLG l0_rules_show() synopsis
+# name: SLIF g1_rules_show() synopsis
 
-$rules_show_output .= $grammar->l0_rules_show(3);
+$rules_show_output = $grammar->g1_rules_show(3);
 
 # Marpa::R3::Display::End
 
@@ -541,7 +538,6 @@ $rules_show_output .= $grammar->l0_rules_show(3);
 
 Marpa::R3::Test::is( $rules_show_output,
     <<'END_OF_SHOW_RULES_OUTPUT', 'SLIF g1_rules_show()' );
-G1 Rules:
 R0 statements ::= statement *
   Symbol IDs: <22> ::= <21>
   Internal symbols: <statements> ::= <statement>
@@ -602,7 +598,24 @@ R18 <numeric expression> ::= <numeric expression> '*' <numeric expression>
 R19 [:start:] ::= statements
   Symbol IDs: <0> ::= <22>
   Internal symbols: <[:start:]> ::= <statements>
-Lex (L0) Rules:
+END_OF_SHOW_RULES_OUTPUT
+
+# Marpa::R3::Display::End
+
+# Marpa::R3::Display
+# name: SLG l0_rules_show() synopsis
+
+$rules_show_output = $grammar->l0_rules_show(3);
+
+# Marpa::R3::Display::End
+
+# Marpa::R3::Display
+# name: SLIF debug example l0_rules_show() output
+# start-after-line: END_OF_SHOW_RULES_OUTPUT
+# end-before-line: '^END_OF_SHOW_RULES_OUTPUT$'
+
+Marpa::R3::Test::is( $rules_show_output,
+    <<'END_OF_SHOW_RULES_OUTPUT', 'SLIF l0_rules_show()' );
 R0 'set' ~ [s] [e] [t]
   Symbol IDs: <1> ::= <26> <20> <27>
   Internal symbols: <[Lex-0]> ::= <[[s]]> <[[e]]> <[[t]]>
