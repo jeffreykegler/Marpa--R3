@@ -963,6 +963,31 @@ Lowest ISYID is 0.
 
 ```
     -- miranda: section+ most Lua function definitions
+    function _M.class_slg.xpr_show(slg, xprid)
+        local xpr = slg.xprs[xprid]
+        if not xpr then
+            _M.userX(
+                "slg.xpr_show(): %s is not a valid xprid",
+                inspect(xprid)
+            )
+        end
+        local subg = xpr.subgrammar
+        local pieces = {}
+        local lh_xsy = xpr.lhs
+        pieces[#pieces+1] = lh_xsy:display_form()
+        pieces[#pieces+1] = subg == 'g1' and '::=' or '~'
+        local rhs = xpr.rhs
+        for ix = 1, #rhs do
+            local rh_xsy = rhs[ix]
+            pieces[#pieces+1] = rh_xsy:display_form()
+        end
+        local minimum = xpr.min
+        if minimum then
+            pieces[#pieces+1] =
+                minimum <= 0 and '*' or '+'
+        end
+        return table.concat(pieces, ' ')
+    end
     function _M.class_slg.lmg_rule_show(slg, subg_name, irlid)
         local subg = slg[subg_name]
         local irl_isyids = subg:irl_isyids(irlid)

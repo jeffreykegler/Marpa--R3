@@ -1811,6 +1811,7 @@ kwgen(__LINE__, qw(lmg_dotted_rule_show lmg_dotted_rule_show sii));
 kwgen(__LINE__, qw(g1_dotted_rule_show g1_dotted_rule_show ii));
 kwgen(__LINE__, qw(l0_dotted_rule_show l0_dotted_rule_show ii));
 
+kwgen(__LINE__, qw(production_show xpr_show i));
 kwgen(__LINE__, qw(lmg_rule_show lmg_rule_show si));
 kwgen(__LINE__, qw(g1_rule_show g1_rule_show i));
 kwgen(__LINE__, qw(l0_rule_show l0_rule_show i));
@@ -1935,6 +1936,17 @@ sub Marpa::R3::Scanless::G::g1_symbol_ids {
 sub Marpa::R3::Scanless::G::l0_symbol_ids {
     my ($slg) = @_;
     return $slg->lmg_symbol_ids('l0');
+}
+
+sub Marpa::R3::Scanless::G::production_ids {
+    my ($slg) = @_;
+    my ($highest_xprid) = $slg->call_by_tag(
+    ('@' .__FILE__ . ':' . __LINE__),
+    <<'END_OF_LUA', '>*' ) ;
+    local slg = ...
+    return slg:highest_xprid()
+END_OF_LUA
+    return 1 .. $highest_xprid;
 }
 
 # Currently there are no gaps in the rule ids.

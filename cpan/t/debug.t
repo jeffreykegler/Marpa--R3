@@ -18,7 +18,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-use Test::More tests => 34;
+use Test::More tests => 35;
 
 use Data::Dumper;
 use English qw( -no_match_vars );
@@ -1546,6 +1546,63 @@ l0 symbol number: 32  DSL form: whitespace
 l0 symbol number: 33  name: [:lex_start:]
 l0 symbol number: 33  name in display form: [:lex_start:]
 l0 symbol number: 33  DSL form: [No name in DSL form]
+END_OF_TEXT
+
+$text = q{};
+
+for my $prid ( $grammar->production_ids() ) {
+
+# Marpa::R3::Display
+# name: SLG production_show() synopsis
+
+    my $production_description = $grammar->production_show($prid);
+
+# Marpa::R3::Display::End
+
+    if (not defined $production_description) {
+        $text .= "[No such production, ID #$prid]\n";
+    } else {
+        $text .= "$production_description\n";
+    }
+
+}
+
+Marpa::R3::Test::is( $text, <<'END_OF_TEXT', 'production_show() by id');
+[:start:] ::= statements
+statement ::= <numeric assignment>
+assignment ::= 'set' variable 'to' expression
+<numeric assignment> ::= variable '=' <numeric expression>
+expression ::= expression
+expression ::= expression
+expression ::= expression
+expression ::= variable
+expression ::= string
+expression ::= 'string' '(' <numeric expression> ')'
+expression ::= expression '+' expression
+<numeric expression> ::= <numeric expression>
+<numeric expression> ::= <numeric expression>
+<numeric expression> ::= <numeric expression>
+<numeric expression> ::= variable
+<numeric expression> ::= number
+<numeric expression> ::= <numeric expression> '+' <numeric expression>
+statements ::= statement *
+<numeric expression> ::= <numeric expression> '*' <numeric expression>
+statement ::= assignment
+'set' ~ [s] [e] [t]
+'to' ~ [t] [o]
+'=' ~ [\=]
+'string' ~ [s] [t] [r] [i] [n] [g]
+'(' ~ [\(]
+')' ~ [\)]
+'+' ~ [\+]
+'+' ~ [\+]
+'*' ~ [\*]
+variable ~ [\w] +
+number ~ [\d] +
+string ~ ['] <string contents> [']
+<string contents> ~ [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] +
+[:discard:] ~ whitespace
+whitespace ~ [\s] +
 END_OF_TEXT
 
 $text = q{};
