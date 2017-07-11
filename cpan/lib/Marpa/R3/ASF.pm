@@ -1387,7 +1387,7 @@ END_OF_LUA
                     next SYMCH_IX;
                 }
                 $result .= "  Symch $symch_ix is a rule: "
-                    . $grammar->g1_rule_display($g1_rule_id) . "\n";
+                    . $grammar->g1_rule_show($g1_rule_id) . "\n";
             } ## end SYMCH_IX: for my $symch_ix ( 0 .. $display_symch_count - 1 )
 
             next AMBIGUITY;

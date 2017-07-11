@@ -551,7 +551,7 @@ Display any XPR
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slg.xpr_display_o(slg, xpr)
+    function _M.class_slg.xpr_show_o(slg, xpr)
         local pieces = {}
         local subg = xpr.subgrammar
         pieces[#pieces+1]
@@ -575,10 +575,10 @@ Display any XPR
         end
         return table.concat(pieces, ' ')
     end
-    function _M.class_slg.xpr_display(slg, xprid)
+    function _M.class_slg.xpr_show(slg, xprid)
         local xprs = slg.xprs
         local xpr = xprs[xprid]
-        return slg:xpr_display_o(xpr)
+        return slg:xpr_show_o(xpr)
     end
 ```
 
@@ -619,7 +619,7 @@ Display any XPR
             local pcs = {}
             local pcs2 = {}
             pcs2[#pcs2+1] = 'R' .. xprid
-            pcs2[#pcs2+1] = slg:xpr_display(xprid)
+            pcs2[#pcs2+1] = slg:xpr_show(xprid)
             pcs[#pcs+1] = table.concat(pcs2, ' ')
             pcs[#pcs+1] = "\n"
 
@@ -969,11 +969,11 @@ Lowest ISYID is 0.
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slg.xpr_show(slg, xprid)
+    function _M.class_slg.xpr_diag(slg, xprid)
         local xpr = slg.xprs[xprid]
         if not xpr then
             _M.userX(
-                "slg.xpr_show(): %s is not a valid xprid",
+                "slg.xpr_diag(): %s is not a valid xprid",
                 inspect(xprid)
             )
         end
@@ -1004,12 +1004,19 @@ Lowest ISYID is 0.
         local subg = slg[subg_name]
         local irl_isyids = subg:irl_isyids(irlid)
         local pieces = {}
-        pieces[#pieces+1]
+        local symbol_name
             = subg:symbol_display_form(irl_isyids[1])
+        if symbol_name:find(' ', 1, true) then
+            symbol_name = '<' .. form1 .. '>'
+        end
+        pieces[#pieces+1] = symbol_name
         pieces[#pieces+1] = subg_name == 'g1' and '::=' or '~'
         for ix = 2, #irl_isyids do
-            pieces[#pieces+1]
-                = subg:symbol_display_form(irl_isyids[ix])
+            symbol_name = subg:symbol_name(irl_isyids[ix])
+            if symbol_name:find(' ', 1, true) then
+                symbol_name = '<' .. form1 .. '>'
+            end
+            pieces[#pieces+1] = symbol_name
         end
         local minimum = subg:sequence_min(irlid)
         if minimum then
@@ -1018,14 +1025,14 @@ Lowest ISYID is 0.
         end
         return table.concat(pieces, ' ')
     end
-    function _M.class_slg.g1_rule_show(slg, irlid)
-        return slg:lmg_rule_show('g1', irlid)
+    function _M.class_slg.g1_rule_diag(slg, irlid)
+        return slg:lmg_rule_diag('g1', irlid)
     end
-    function _M.class_slg.l0_rule_show(slg, irlid)
-        return slg:lmg_rule_show('l0', irlid)
+    function _M.class_slg.l0_rule_diag(slg, irlid)
+        return slg:lmg_rule_diag('l0', irlid)
     end
 
-    function _M.class_slg.lmg_rule_display(slg, subg_name, irlid)
+    function _M.class_slg.lmg_rule_show(slg, subg_name, irlid)
         local subg = slg[subg_name]
         local irl = subg.irls[irlid]
         if not irl then
@@ -1033,15 +1040,15 @@ Lowest ISYID is 0.
         end
         local xpr = irl.xpr
         if xpr then
-             return slg:xpr_display_o(xpr)
+             return slg:xpr_show_o(xpr)
         end
-        return slg:lmg_rule_show(subg_name, irlid)
+        return slg:lmg_rule_diag(subg_name, irlid)
     end
-    function _M.class_slg.g1_rule_display(slg, irlid)
-        return slg:lmg_rule_display('g1', irlid)
+    function _M.class_slg.g1_rule_show(slg, irlid)
+        return slg:lmg_rule_show('g1', irlid)
     end
-    function _M.class_slg.l0_rule_display(slg, irlid)
-        return slg:lmg_rule_display('l0', irlid)
+    function _M.class_slg.l0_rule_show(slg, irlid)
+        return slg:lmg_rule_show('l0', irlid)
     end
 
     -- library IF

@@ -1822,14 +1822,20 @@ kwgen(__LINE__, qw(lmg_rule_show lmg_rule_show si));
 kwgen(__LINE__, qw(g1_rule_show g1_rule_show i));
 kwgen(__LINE__, qw(l0_rule_show l0_rule_show i));
 
-kwgen(__LINE__, qw(lmg_rule_display lmg_rule_display si));
-kwgen(__LINE__, qw(g1_rule_display g1_rule_display i));
-kwgen(__LINE__, qw(l0_rule_display l0_rule_display i));
+kwgen(__LINE__, qw(production_diag xpr_diag i));
+kwgen(__LINE__, qw(lmg_rule_diag lmg_rule_diag si));
+kwgen(__LINE__, qw(g1_rule_diag g1_rule_diag i));
+kwgen(__LINE__, qw(l0_rule_diag l0_rule_diag i));
 
 kwgen_opt(__LINE__, qw(productions_show xprs_show i), 0);
 kwgen_opt(__LINE__, qw(lmg_rules_show lmg_rules_show si), 0, 0);
 kwgen_opt(__LINE__, qw(g1_rules_show g1_rules_show i), 0);
 kwgen_opt(__LINE__, qw(l0_rules_show l0_rules_show i), 0);
+
+kwgen_opt(__LINE__, qw(productions_diag xprs_diag i), 0);
+kwgen_opt(__LINE__, qw(lmg_rules_diag lmg_rules_diag si), 0, 0);
+kwgen_opt(__LINE__, qw(g1_rules_diag g1_rules_diag i), 0);
+kwgen_opt(__LINE__, qw(l0_rules_diag l0_rules_diag i), 0);
 
 kwgen(__LINE__, qw(production_name xpr_name i));
 
