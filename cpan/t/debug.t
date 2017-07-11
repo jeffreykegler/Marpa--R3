@@ -613,7 +613,7 @@ END_OF_SHOW_RULES_OUTPUT
 # Marpa::R3::Display
 # name: SLG l0_rules_show() synopsis
 
-$rules_show_output = $grammar->l0_rules_show(3);
+$rules_show_output = $grammar->l0_rules_show( { verbose => 3 });
 
 # Marpa::R3::Display::End
 
@@ -713,14 +713,14 @@ END_OF_SHOW_RULES_OUTPUT
 # Marpa::R3::Display::End
 
 # Marpa::R3::Display
-# name: SLG productions_diag() synopsis
+# name: SLG productions_show() diag form synopsis
 
-my $productions_diag_output = $grammar->productions_diag();
+my $productions_diag_output = $grammar->productions_show( { diag => 1 } );
 
 # Marpa::R3::Display::End
 
 Marpa::R3::Test::is( $productions_diag_output,
-    <<'END_OF_OUTPUT', 'SLIF productions_diag()' );
+    <<'END_OF_OUTPUT', 'SLIF productions_show() diag form' );
 R1 [:start:] ::= statements
 R2 statement ::= <numeric assignment>
 R3 assignment ::= 'set' variable 'to' expression
@@ -761,14 +761,14 @@ END_OF_OUTPUT
 my $rules_diag_output;
 
 # Marpa::R3::Display
-# name: SLIF g1_rules_diag() synopsis
+# name: SLIF g1_rules_show() diag form synopsis
 
-$rules_diag_output = $grammar->g1_rules_diag(3);
+$rules_diag_output = $grammar->g1_rules_show( { verbose => 3, diag => 1 } );
 
 # Marpa::R3::Display::End
 
 Marpa::R3::Test::is( $rules_diag_output,
-    <<'END_OF_SHOW_RULES_OUTPUT', 'SLIF g1_rules_diag()' );
+    <<'END_OF_SHOW_RULES_OUTPUT', 'SLIF g1_rules_show() diag form' );
 R0 statements ::= statement *
   Symbol IDs: <22> ::= <21>
   Internal symbols: <statements> ::= <statement>
@@ -832,14 +832,14 @@ R19 [:start:] ::= statements
 END_OF_SHOW_RULES_OUTPUT
 
 # Marpa::R3::Display
-# name: SLG l0_rules_diag() synopsis
+# name: SLG l0_rules_show() diag form synopsis
 
-$rules_diag_output = $grammar->l0_rules_diag(3);
+$rules_diag_output = $grammar->l0_rules_show( { verbose => 3, diag => 1 } );
 
 # Marpa::R3::Display::End
 
 Marpa::R3::Test::is( $rules_diag_output,
-    <<'END_OF_SHOW_RULES_OUTPUT', 'SLIF l0_rules_diag()' );
+    <<'END_OF_SHOW_RULES_OUTPUT', 'SLIF l0_rules_show() diag form' );
 R0 'set' ~ [s] [e] [t]
   Symbol IDs: <1> ::= <26> <20> <27>
   Internal symbols: <[Lex-0]> ::= <[[s]]> <[[e]]> <[[t]]>
@@ -1915,9 +1915,10 @@ END_OF_TEXT
 for my $prid ( $grammar->production_ids() ) {
 
 # Marpa::R3::Display
-# name: SLG production_diag() synopsis
+# name: SLG production_show() diag form synopsis
 
-    my $production_description = $grammar->production_diag($prid);
+    my $production_description =
+      $grammar->production_show( $prid, { diag => 1 } );
 
 # Marpa::R3::Display::End
 
@@ -1929,7 +1930,7 @@ for my $prid ( $grammar->production_ids() ) {
 
 }
 
-Marpa::R3::Test::is( $text, <<'END_OF_TEXT', 'production_diag() by id');
+Marpa::R3::Test::is( $text, <<'END_OF_TEXT', 'production_show() diag form by id');
 [:start:] ::= statements
 statement ::= <numeric assignment>
 assignment ::= 'set' variable 'to' expression
@@ -1972,9 +1973,9 @@ $text = q{};
 for my $rule_id ( $grammar->g1_rule_ids() ) {
 
 # Marpa::R3::Display
-# name: SLG g1_rule_diag() synopsis
+# name: SLG g1_rule_show() diag form synopsis
 
-    my $rule_description = $grammar->g1_rule_diag($rule_id);
+    my $rule_description = $grammar->g1_rule_show( $rule_id, { diag => 1 } );
 
 # Marpa::R3::Display::End
 
@@ -1986,7 +1987,7 @@ for my $rule_id ( $grammar->g1_rule_ids() ) {
 
 }
 
-Marpa::R3::Test::is( $text, <<'END_OF_TEXT', 'G1 rule_diag() by rule id');
+Marpa::R3::Test::is( $text, <<'END_OF_TEXT', 'G1 rule_show() diag form by rule id');
 statements ::= statement *
 statement ::= assignment
 statement ::= <numeric assignment>
@@ -2014,9 +2015,9 @@ $text = q{};
 for my $rule_id ( $grammar->l0_rule_ids() ) {
 
 # Marpa::R3::Display
-# name: SLG l0_rule_diag() synopsis
+# name: SLG l0_rule_show() diag form synopsis
 
-    my $rule_description = $grammar->l0_rule_diag($rule_id);
+    my $rule_description = $grammar->l0_rule_show( $rule_id, { diag => 1 } );
 
 # Marpa::R3::Display::End
 
@@ -2028,7 +2029,7 @@ for my $rule_id ( $grammar->l0_rule_ids() ) {
 
 }
 
-Marpa::R3::Test::is( $text, <<'END_OF_TEXT', 'L0 rule_diag() by rule id');
+Marpa::R3::Test::is( $text, <<'END_OF_TEXT', 'L0 rule_show() diag form by rule id');
 'set' ~ [s] [e] [t]
 'to' ~ [t] [o]
 '=' ~ [\=]
