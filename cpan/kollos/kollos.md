@@ -551,16 +551,16 @@ Display any XPR
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slg.xpr_show_o(slg, xpr)
+    function _M.class_slg.xpr_show_o(slg, xpr, options)
+        local name_fn = options.diag and _M.class_xsy.diag_form
+            or _M.class_xsy.display_form
         local pieces = {}
         local subg = xpr.subgrammar
-        pieces[#pieces+1]
-            = xpr.lhs:display_form()
+        pieces[#pieces+1] = name_fn(xpr.lhs)
         pieces[#pieces+1] = subg == 'g1' and '::=' or '~'
         local rhs = xpr.rhs
         for ix = 1, #rhs do
-            pieces[#pieces+1]
-                = rhs[ix]:display_form()
+            pieces[#pieces+1] = name_fn(rhs[ix])
         end
         local minimum = xpr.min
         if minimum then
@@ -575,10 +575,10 @@ Display any XPR
         end
         return table.concat(pieces, ' ')
     end
-    function _M.class_slg.xpr_show(slg, xprid)
+    function _M.class_slg.xpr_show(slg, xprid, options)
         local xprs = slg.xprs
         local xpr = xprs[xprid]
-        return slg:xpr_show_o(xpr)
+        return slg:xpr_show_o(xpr, options)
     end
 ```
 
@@ -608,8 +608,8 @@ Display any XPR
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slg.xprs_show(slg, verbose)
-        verbose = verbose or 0
+    function _M.class_slg.xprs_show(slg, options)
+        local verbose = options.verbose or 0
         local xprs = slg.xprs
         local xpr_descs = {}
         for xprid = 1, slg:highest_xprid() do
@@ -619,7 +619,7 @@ Display any XPR
             local pcs = {}
             local pcs2 = {}
             pcs2[#pcs2+1] = 'R' .. xprid
-            pcs2[#pcs2+1] = slg:xpr_show(xprid)
+            pcs2[#pcs2+1] = slg:xpr_show(xprid, options)
             pcs[#pcs+1] = table.concat(pcs2, ' ')
             pcs[#pcs+1] = "\n"
 
@@ -827,10 +827,7 @@ Lowest ISYID is 0.
     function _M.class_slg.symbol_display_form(slg, xsyid)
         local xsy = slg.xsys[xsyid]
         if not xsy then
-            _M.userX(
-                "slg.symbol_display_form(): %s is not a valid xsyid",
-                inspect(xsyid)
-            )
+            return '<bad xsyid ' .. xsyid .. '>'
         end
         return xsy:display_form();
     end
@@ -843,6 +840,24 @@ Lowest ISYID is 0.
     end
     function _M.class_slg.l0_symbol_display_form(slg, symbol_id)
         return slg:lmg_symbol_display_form('l0', symbol_id)
+    end
+
+    function _M.class_slg.symbol_diag_form(slg, xsyid)
+        local xsy = slg.xsys[xsyid]
+        if not xsy then
+            return '<bad xsyid ' .. xsyid .. '>'
+        end
+        return xsy:diag_form();
+    end
+    function _M.class_slg.lmg_symbol_diag_form(slg, subg_name, symbol_id)
+        local subg = slg[subg_name]
+        return subg:symbol_diag_form(symbol_id)
+    end
+    function _M.class_slg.g1_symbol_diag_form(slg, symbol_id)
+        return slg:lmg_symbol_diag_form('g1', symbol_id)
+    end
+    function _M.class_slg.l0_symbol_diag_form(slg, symbol_id)
+        return slg:lmg_symbol_diag_form('l0', symbol_id)
     end
 
 ```
@@ -969,53 +984,18 @@ Lowest ISYID is 0.
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slg.xpr_diag(slg, xprid)
-        local xpr = slg.xprs[xprid]
-        if not xpr then
-            _M.userX(
-                "slg.xpr_diag(): %s is not a valid xprid",
-                inspect(xprid)
-            )
-        end
-        local subg = xpr.subgrammar
-        local pieces = {}
-        local lh_xsy = xpr.lhs
-        pieces[#pieces+1] = lh_xsy.name
-        pieces[#pieces+1] = subg == 'g1' and '::=' or '~'
-        local rhs = xpr.rhs
-        for ix = 1, #rhs do
-            local rh_xsy = rhs[ix]
-            pieces[#pieces+1] = rh_xsy.name
-        end
-        local minimum = xpr.min
-        if minimum then
-            pieces[#pieces+1] =
-                minimum <= 0 and '*' or '+'
-        end
-        local precedence = xpr.precedence
-        if precedence then
-            -- add a semi-colon to the most recent piece
-            pieces[#pieces] = pieces[#pieces] .. ';'
-            pieces[#pieces+1] = 'prec=' .. precedence
-        end
-        return table.concat(pieces, ' ')
-    end
-    function _M.class_slg.lmg_rule_show(slg, subg_name, irlid)
+    function _M.class_slg.lmg_rule_show(slg, subg_name, irlid, options)
+        local name_fn = options.diag and _M.class_grammar.symbol_diag_form
+            or _M.class_grammar.symbol_display_form
         local subg = slg[subg_name]
         local irl_isyids = subg:irl_isyids(irlid)
         local pieces = {}
         local symbol_name
-            = subg:symbol_display_form(irl_isyids[1])
-        if symbol_name:find(' ', 1, true) then
-            symbol_name = '<' .. form1 .. '>'
-        end
+            = name_fn(subg, irl_isyids[1])
         pieces[#pieces+1] = symbol_name
         pieces[#pieces+1] = subg_name == 'g1' and '::=' or '~'
         for ix = 2, #irl_isyids do
-            symbol_name = subg:symbol_name(irl_isyids[ix])
-            if symbol_name:find(' ', 1, true) then
-                symbol_name = '<' .. form1 .. '>'
-            end
+            symbol_name = name_fn(subg, irl_isyids[ix])
             pieces[#pieces+1] = symbol_name
         end
         local minimum = subg:sequence_min(irlid)
@@ -1025,30 +1005,11 @@ Lowest ISYID is 0.
         end
         return table.concat(pieces, ' ')
     end
-    function _M.class_slg.g1_rule_diag(slg, irlid)
-        return slg:lmg_rule_diag('g1', irlid)
+    function _M.class_slg.g1_rule_show(slg, irlid, options)
+        return slg:lmg_rule_show('g1', irlid, options)
     end
-    function _M.class_slg.l0_rule_diag(slg, irlid)
-        return slg:lmg_rule_diag('l0', irlid)
-    end
-
-    function _M.class_slg.lmg_rule_show(slg, subg_name, irlid)
-        local subg = slg[subg_name]
-        local irl = subg.irls[irlid]
-        if not irl then
-            return '(bad irlid ' .. irlid .. ')'
-        end
-        local xpr = irl.xpr
-        if xpr then
-             return slg:xpr_show_o(xpr)
-        end
-        return slg:lmg_rule_diag(subg_name, irlid)
-    end
-    function _M.class_slg.g1_rule_show(slg, irlid)
-        return slg:lmg_rule_show('g1', irlid)
-    end
-    function _M.class_slg.l0_rule_show(slg, irlid)
-        return slg:lmg_rule_show('l0', irlid)
+    function _M.class_slg.l0_rule_show(slg, irlid, options)
+        return slg:lmg_rule_show('l0', irlid, options)
     end
 
     -- library IF
@@ -1101,15 +1062,15 @@ Lowest ISYID is 0.
         return slg:lmg_dotted_rule_show('l0', irlid, dot)
     end
 
-    function _M.class_slg.lmg_rules_show(slg, subg_name, verbose)
-        verbose = verbose or 0
+    function _M.class_slg.lmg_rules_show(slg, subg_name, options)
+        local verbose = options.verbose or 0
         local lmw_g = slg[subg_name]
         local pcs = {}
         for irlid = 0, lmw_g:highest_rule_id() do
 
             local pcs2 = {}
             pcs2[#pcs2+1] = 'R' .. irlid
-            pcs2[#pcs2+1] = slg:lmg_rule_show(subg_name, irlid)
+            pcs2[#pcs2+1] = slg:lmg_rule_show(subg_name, irlid, options)
             pcs[#pcs+1] = table.concat(pcs2, ' ')
             pcs[#pcs+1] = "\n"
 
@@ -4998,11 +4959,7 @@ is zero.
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_isy.display_form(isy)
-        local form = isy.name
-        if not form:find(' ', 1, true) then
-            return form
-        end
-        return '<' .. form .. '>'
+        return symbol_diag_form(isy.name)
     end
 ```
 
@@ -5261,9 +5218,11 @@ TODO: Perhaps `isy_key` should also allow isy tables.
     end
 ```
 
-Finds a displayable
-name for an ISYID,
-pulling one out of thin air if need be.
+Find a displayable
+name for an ISYID.
+If need be,
+return a name that is actually a soft error
+message.
 The "forced" name is not
 necessarily unique.
 
@@ -5274,7 +5233,22 @@ necessarily unique.
         if xsy then return xsy:display_form() end
         local isy = grammar.isys[isyid]
         if isy then return isy:display_form() end
-        return '<isyid ' .. isyid .. '>'
+        return '<bad isyid ' .. isyid .. '>'
+    end
+```
+
+Given an ISYID,
+display the ISY in diag form.
+If need be,
+return a name that is actually a soft error
+message.
+If the ISYID is valid, the name is unique.
+
+```
+    function _M.class_grammar.symbol_diag_form(grammar, isyid)
+        local isy = grammar.isys[isyid]
+        if isy then return isy:diag_form() end
+        return '<bad isyid ' .. isyid .. '>'
     end
 ```
 
@@ -8184,6 +8158,19 @@ in every other sequence.
     end
 ```
 
+Given a symbol name, convert it to a form
+suitable for diagnostic messages.
+
+```
+    -- miranda: section+ internal utilities
+    local function symbol_diag_form(name)
+        if name:sub(1, 1) == '[' then return name end
+        if name:match('^%a[%w_-]*$') then
+            return name
+        end
+        return '<' .. name .. '>'
+    end
+```
 ### Coroutines
 
 We use coroutines as "better callbacks".

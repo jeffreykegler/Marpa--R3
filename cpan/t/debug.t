@@ -18,7 +18,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-use Test::More tests => 35;
+use Test::More tests => 41;
 
 use Data::Dumper;
 use English qw( -no_match_vars );
@@ -535,7 +535,7 @@ my $rules_show_output;
 # Marpa::R3::Display
 # name: SLIF g1_rules_show() synopsis
 
-$rules_show_output = $grammar->g1_rules_show(3);
+$rules_show_output = $grammar->g1_rules_show( { verbose => 3 } );
 
 # Marpa::R3::Display::End
 
@@ -711,6 +711,220 @@ R27 [:lex_start:] ~ variable
 END_OF_SHOW_RULES_OUTPUT
 
 # Marpa::R3::Display::End
+
+# Marpa::R3::Display
+# name: SLG productions_diag() synopsis
+
+my $productions_diag_output = $grammar->productions_diag();
+
+# Marpa::R3::Display::End
+
+Marpa::R3::Test::is( $productions_diag_output,
+    <<'END_OF_OUTPUT', 'SLIF productions_diag()' );
+R1 [:start:] ::= statements
+R2 statement ::= <numeric assignment>
+R3 assignment ::= 'set' variable 'to' expression
+R4 <numeric assignment> ::= variable '=' <numeric expression>
+R5 expression ::= expression; prec=0
+R6 expression ::= expression; prec=1
+R7 expression ::= expression; prec=2
+R8 expression ::= variable; prec=0
+R9 expression ::= string; prec=0
+R10 expression ::= 'string' '(' <numeric expression> ')'; prec=2
+R11 expression ::= expression '+' expression; prec=1
+R12 <numeric expression> ::= <numeric expression>; prec=0
+R13 <numeric expression> ::= <numeric expression>; prec=1
+R14 <numeric expression> ::= <numeric expression>; prec=2
+R15 <numeric expression> ::= variable; prec=0
+R16 <numeric expression> ::= number; prec=0
+R17 <numeric expression> ::= <numeric expression> '+' <numeric expression>; prec=2
+R18 statements ::= statement *
+R19 <numeric expression> ::= <numeric expression> '*' <numeric expression>; prec=1
+R20 statement ::= assignment
+R21 'set' ~ [s] [e] [t]
+R22 'to' ~ [t] [o]
+R23 '=' ~ [\=]
+R24 'string' ~ [s] [t] [r] [i] [n] [g]
+R25 '(' ~ [\(]
+R26 ')' ~ [\)]
+R27 '+' ~ [\+]
+R28 '+' ~ [\+]
+R29 '*' ~ [\*]
+R30 variable ~ [\w] +
+R31 number ~ [\d] +
+R32 string ~ ['] <string contents> [']
+R33 <string contents> ~ [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] +
+R34 [:discard:] ~ whitespace
+R35 whitespace ~ [\s] +
+END_OF_OUTPUT
+
+my $rules_diag_output;
+
+# Marpa::R3::Display
+# name: SLIF g1_rules_diag() synopsis
+
+$rules_diag_output = $grammar->g1_rules_diag(3);
+
+# Marpa::R3::Display::End
+
+Marpa::R3::Test::is( $rules_diag_output,
+    <<'END_OF_SHOW_RULES_OUTPUT', 'SLIF g1_rules_diag()' );
+R0 statements ::= statement *
+  Symbol IDs: <22> ::= <21>
+  Internal symbols: <statements> ::= <statement>
+R1 statement ::= assignment
+  Symbol IDs: <21> ::= <10>
+  Internal symbols: <statement> ::= <assignment>
+R2 statement ::= <numeric assignment>
+  Symbol IDs: <21> ::= <16>
+  Internal symbols: <statement> ::= <numeric assignment>
+R3 assignment ::= 'set' variable 'to' expression
+  Symbol IDs: <10> ::= <1> <24> <2> <11>
+  Internal symbols: <assignment> ::= <[Lex-0]> <variable> <[Lex-1]> <expression>
+R4 <numeric assignment> ::= variable '=' <numeric expression>
+  Symbol IDs: <16> ::= <24> <3> <17>
+  Internal symbols: <numeric assignment> ::= <variable> <[Lex-2]> <numeric expression>
+R5 expression ::= expression
+  Symbol IDs: <11> ::= <12>
+  Internal symbols: <expression> ::= <expression[0]>
+R6 expression ::= expression
+  Symbol IDs: <12> ::= <13>
+  Internal symbols: <expression[0]> ::= <expression[1]>
+R7 expression ::= expression
+  Symbol IDs: <13> ::= <14>
+  Internal symbols: <expression[1]> ::= <expression[2]>
+R8 expression ::= variable
+  Symbol IDs: <14> ::= <24>
+  Internal symbols: <expression[2]> ::= <variable>
+R9 expression ::= string
+  Symbol IDs: <14> ::= <23>
+  Internal symbols: <expression[2]> ::= <string>
+R10 expression ::= 'string' '(' <numeric expression> ')'
+  Symbol IDs: <13> ::= <4> <5> <17> <6>
+  Internal symbols: <expression[1]> ::= <[Lex-3]> <[Lex-4]> <numeric expression> <[Lex-5]>
+R11 expression ::= expression '+' expression
+  Symbol IDs: <12> ::= <12> <7> <13>
+  Internal symbols: <expression[0]> ::= <expression[0]> <[Lex-6]> <expression[1]>
+R12 <numeric expression> ::= <numeric expression>
+  Symbol IDs: <17> ::= <18>
+  Internal symbols: <numeric expression> ::= <numeric expression[0]>
+R13 <numeric expression> ::= <numeric expression>
+  Symbol IDs: <18> ::= <19>
+  Internal symbols: <numeric expression[0]> ::= <numeric expression[1]>
+R14 <numeric expression> ::= <numeric expression>
+  Symbol IDs: <19> ::= <20>
+  Internal symbols: <numeric expression[1]> ::= <numeric expression[2]>
+R15 <numeric expression> ::= variable
+  Symbol IDs: <20> ::= <24>
+  Internal symbols: <numeric expression[2]> ::= <variable>
+R16 <numeric expression> ::= number
+  Symbol IDs: <20> ::= <15>
+  Internal symbols: <numeric expression[2]> ::= <number>
+R17 <numeric expression> ::= <numeric expression> '+' <numeric expression>
+  Symbol IDs: <19> ::= <19> <8> <20>
+  Internal symbols: <numeric expression[1]> ::= <numeric expression[1]> <[Lex-7]> <numeric expression[2]>
+R18 <numeric expression> ::= <numeric expression> '*' <numeric expression>
+  Symbol IDs: <18> ::= <18> <9> <19>
+  Internal symbols: <numeric expression[0]> ::= <numeric expression[0]> <[Lex-8]> <numeric expression[1]>
+R19 [:start:] ::= statements
+  Symbol IDs: <0> ::= <22>
+  Internal symbols: <[:start:]> ::= <statements>
+END_OF_SHOW_RULES_OUTPUT
+
+# Marpa::R3::Display
+# name: SLG l0_rules_diag() synopsis
+
+$rules_diag_output = $grammar->l0_rules_diag(3);
+
+# Marpa::R3::Display::End
+
+Marpa::R3::Test::is( $rules_diag_output,
+    <<'END_OF_SHOW_RULES_OUTPUT', 'SLIF l0_rules_diag()' );
+R0 'set' ~ [s] [e] [t]
+  Symbol IDs: <1> ::= <26> <20> <27>
+  Internal symbols: <[Lex-0]> ::= <[[s]]> <[[e]]> <[[t]]>
+R1 'to' ~ [t] [o]
+  Symbol IDs: <2> ::= <27> <24>
+  Internal symbols: <[Lex-1]> ::= <[[t]]> <[[o]]>
+R2 '=' ~ [\=]
+  Symbol IDs: <3> ::= <15>
+  Internal symbols: <[Lex-2]> ::= <[[\=]]>
+R3 'string' ~ [s] [t] [r] [i] [n] [g]
+  Symbol IDs: <4> ::= <26> <27> <25> <22> <23> <21>
+  Internal symbols: <[Lex-3]> ::= <[[s]]> <[[t]]> <[[r]]> <[[i]]> <[[n]]> <[[g]]>
+R4 '(' ~ [\(]
+  Symbol IDs: <5> ::= <11>
+  Internal symbols: <[Lex-4]> ::= <[[\(]]>
+R5 ')' ~ [\)]
+  Symbol IDs: <6> ::= <12>
+  Internal symbols: <[Lex-5]> ::= <[[\)]]>
+R6 '+' ~ [\+]
+  Symbol IDs: <7> ::= <14>
+  Internal symbols: <[Lex-6]> ::= <[[\+]]>
+R7 '+' ~ [\+]
+  Symbol IDs: <8> ::= <14>
+  Internal symbols: <[Lex-7]> ::= <[[\+]]>
+R8 '*' ~ [\*]
+  Symbol IDs: <9> ::= <13>
+  Internal symbols: <[Lex-8]> ::= <[[\*]]>
+R9 variable ~ [\w] +
+  Symbol IDs: <31> ::= <18>
+  Internal symbols: <variable> ::= <[[\w]]>
+R10 number ~ [\d] +
+  Symbol IDs: <28> ::= <16>
+  Internal symbols: <number> ::= <[[\d]]>
+R11 string ~ ['] <string contents> [']
+  Symbol IDs: <29> ::= <10> <30> <10>
+  Internal symbols: <string> ::= <[[']]> <string contents> <[[']]>
+R12 <string contents> ~ [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] +
+  Symbol IDs: <30> ::= <19>
+  Internal symbols: <string contents> ::= <[[^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}]]>
+R13 [:discard:] ~ whitespace
+  Symbol IDs: <0> ::= <32>
+  Internal symbols: <[:discard:]> ::= <whitespace>
+R14 whitespace ~ [\s] +
+  Symbol IDs: <32> ::= <17>
+  Internal symbols: <whitespace> ::= <[[\s]]>
+R15 [:lex_start:] ~ [:discard:]
+  Symbol IDs: <33> ::= <0>
+  Internal symbols: <[:lex_start:]> ::= <[:discard:]>
+R16 [:lex_start:] ~ 'set'
+  Symbol IDs: <33> ::= <1>
+  Internal symbols: <[:lex_start:]> ::= <[Lex-0]>
+R17 [:lex_start:] ~ 'to'
+  Symbol IDs: <33> ::= <2>
+  Internal symbols: <[:lex_start:]> ::= <[Lex-1]>
+R18 [:lex_start:] ~ '='
+  Symbol IDs: <33> ::= <3>
+  Internal symbols: <[:lex_start:]> ::= <[Lex-2]>
+R19 [:lex_start:] ~ 'string'
+  Symbol IDs: <33> ::= <4>
+  Internal symbols: <[:lex_start:]> ::= <[Lex-3]>
+R20 [:lex_start:] ~ '('
+  Symbol IDs: <33> ::= <5>
+  Internal symbols: <[:lex_start:]> ::= <[Lex-4]>
+R21 [:lex_start:] ~ ')'
+  Symbol IDs: <33> ::= <6>
+  Internal symbols: <[:lex_start:]> ::= <[Lex-5]>
+R22 [:lex_start:] ~ '+'
+  Symbol IDs: <33> ::= <7>
+  Internal symbols: <[:lex_start:]> ::= <[Lex-6]>
+R23 [:lex_start:] ~ '+'
+  Symbol IDs: <33> ::= <8>
+  Internal symbols: <[:lex_start:]> ::= <[Lex-7]>
+R24 [:lex_start:] ~ '*'
+  Symbol IDs: <33> ::= <9>
+  Internal symbols: <[:lex_start:]> ::= <[Lex-8]>
+R25 [:lex_start:] ~ number
+  Symbol IDs: <33> ::= <28>
+  Internal symbols: <[:lex_start:]> ::= <number>
+R26 [:lex_start:] ~ string
+  Symbol IDs: <33> ::= <29>
+  Internal symbols: <[:lex_start:]> ::= <string>
+R27 [:lex_start:] ~ variable
+  Symbol IDs: <33> ::= <31>
+  Internal symbols: <[:lex_start:]> ::= <variable>
+END_OF_SHOW_RULES_OUTPUT
 
 my $symbols_show_output;
 
@@ -1668,6 +1882,153 @@ for my $rule_id ( $grammar->l0_rule_ids() ) {
 }
 
 Marpa::R3::Test::is( $text, <<'END_OF_TEXT', 'L0 rule_show() by rule id');
+'set' ~ [s] [e] [t]
+'to' ~ [t] [o]
+'=' ~ [\=]
+'string' ~ [s] [t] [r] [i] [n] [g]
+'(' ~ [\(]
+')' ~ [\)]
+'+' ~ [\+]
+'+' ~ [\+]
+'*' ~ [\*]
+variable ~ [\w] +
+number ~ [\d] +
+string ~ ['] <string contents> [']
+<string contents> ~ [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] +
+[:discard:] ~ whitespace
+whitespace ~ [\s] +
+[:lex_start:] ~ [:discard:]
+[:lex_start:] ~ 'set'
+[:lex_start:] ~ 'to'
+[:lex_start:] ~ '='
+[:lex_start:] ~ 'string'
+[:lex_start:] ~ '('
+[:lex_start:] ~ ')'
+[:lex_start:] ~ '+'
+[:lex_start:] ~ '+'
+[:lex_start:] ~ '*'
+[:lex_start:] ~ number
+[:lex_start:] ~ string
+[:lex_start:] ~ variable
+END_OF_TEXT
+
+for my $prid ( $grammar->production_ids() ) {
+
+# Marpa::R3::Display
+# name: SLG production_diag() synopsis
+
+    my $production_description = $grammar->production_diag($prid);
+
+# Marpa::R3::Display::End
+
+    if (not defined $production_description) {
+        $text .= "[No such production, ID #$prid]\n";
+    } else {
+        $text .= "$production_description\n";
+    }
+
+}
+
+Marpa::R3::Test::is( $text, <<'END_OF_TEXT', 'production_diag() by id');
+[:start:] ::= statements
+statement ::= <numeric assignment>
+assignment ::= 'set' variable 'to' expression
+<numeric assignment> ::= variable '=' <numeric expression>
+expression ::= expression; prec=0
+expression ::= expression; prec=1
+expression ::= expression; prec=2
+expression ::= variable; prec=0
+expression ::= string; prec=0
+expression ::= 'string' '(' <numeric expression> ')'; prec=2
+expression ::= expression '+' expression; prec=1
+<numeric expression> ::= <numeric expression>; prec=0
+<numeric expression> ::= <numeric expression>; prec=1
+<numeric expression> ::= <numeric expression>; prec=2
+<numeric expression> ::= variable; prec=0
+<numeric expression> ::= number; prec=0
+<numeric expression> ::= <numeric expression> '+' <numeric expression>; prec=2
+statements ::= statement *
+<numeric expression> ::= <numeric expression> '*' <numeric expression>; prec=1
+statement ::= assignment
+'set' ~ [s] [e] [t]
+'to' ~ [t] [o]
+'=' ~ [\=]
+'string' ~ [s] [t] [r] [i] [n] [g]
+'(' ~ [\(]
+')' ~ [\)]
+'+' ~ [\+]
+'+' ~ [\+]
+'*' ~ [\*]
+variable ~ [\w] +
+number ~ [\d] +
+string ~ ['] <string contents> [']
+<string contents> ~ [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] +
+[:discard:] ~ whitespace
+whitespace ~ [\s] +
+END_OF_TEXT
+
+$text = q{};
+
+for my $rule_id ( $grammar->g1_rule_ids() ) {
+
+# Marpa::R3::Display
+# name: SLG g1_rule_diag() synopsis
+
+    my $rule_description = $grammar->g1_rule_diag($rule_id);
+
+# Marpa::R3::Display::End
+
+    if (not defined $rule_description) {
+        $text .= "[No such rule, ID #$rule_id]\n";
+    } else {
+        $text .= "$rule_description\n";
+    }
+
+}
+
+Marpa::R3::Test::is( $text, <<'END_OF_TEXT', 'G1 rule_diag() by rule id');
+statements ::= statement *
+statement ::= assignment
+statement ::= <numeric assignment>
+assignment ::= 'set' variable 'to' expression
+<numeric assignment> ::= variable '=' <numeric expression>
+expression ::= expression
+expression ::= expression
+expression ::= expression
+expression ::= variable
+expression ::= string
+expression ::= 'string' '(' <numeric expression> ')'
+expression ::= expression '+' expression
+<numeric expression> ::= <numeric expression>
+<numeric expression> ::= <numeric expression>
+<numeric expression> ::= <numeric expression>
+<numeric expression> ::= variable
+<numeric expression> ::= number
+<numeric expression> ::= <numeric expression> '+' <numeric expression>
+<numeric expression> ::= <numeric expression> '*' <numeric expression>
+[:start:] ::= statements
+END_OF_TEXT
+
+$text = q{};
+
+for my $rule_id ( $grammar->l0_rule_ids() ) {
+
+# Marpa::R3::Display
+# name: SLG l0_rule_diag() synopsis
+
+    my $rule_description = $grammar->l0_rule_diag($rule_id);
+
+# Marpa::R3::Display::End
+
+    if (not defined $rule_description) {
+        $text .= "[No such rule, ID #$rule_id]\n";
+    } else {
+        $text .= "$rule_description\n";
+    }
+
+}
+
+Marpa::R3::Test::is( $text, <<'END_OF_TEXT', 'L0 rule_diag() by rule id');
 'set' ~ [s] [e] [t]
 'to' ~ [t] [o]
 '=' ~ [\=]

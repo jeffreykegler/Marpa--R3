@@ -56,7 +56,7 @@ DSL
     }
 );
 
-Marpa::R3::Test::is( $grammar->productions_show(1),
+Marpa::R3::Test::is( $grammar->productions_show( { verbose => 1 } ),
     <<'END_OF_STRING', 'final nonnulling Rules' );
 R1 [:start:] ::= S
 R2 S ::= p p p n

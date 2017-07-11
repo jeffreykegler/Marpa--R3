@@ -1768,6 +1768,126 @@ sub kwgen_opt {
     use strict;
 }
 
+sub Marpa::R3::Scanless::G::production_show {
+    my ($slg, $xprid, $options) = @_;
+    my $verbose = $options->{verbose} or 0;
+    my $diag = $options->{diag} ? 1 : 0;
+    my $tag = '@' . __FILE__ . ':' .  __LINE__;
+    my $code = <<'END_OF_CODE';
+    local slg, xprid, verbose, diag = ...
+    diag = diag ~= 0 -- convert diag to a boolean
+    return slg:xpr_show(xprid, { verbose = verbose, diag = diag })
+END_OF_CODE
+    my ($retour) = $slg->call_by_tag($tag, $code, 'iii',
+        $xprid, $verbose, $diag);
+    return $retour;
+}
+
+sub Marpa::R3::Scanless::G::lmg_rule_show {
+    my ($slg, $subg, $irlid, $options) = @_;
+    my $verbose = $options->{verbose} or 0;
+    my $diag = $options->{diag} ? 1 : 0;
+    my $tag = '@' . __FILE__ . ':' .  __LINE__;
+    my $code = <<'END_OF_CODE';
+    local slg, subg, irlid, verbose, diag = ...
+    diag = diag ~= 0 -- convert diag to a boolean
+    return slg:lmg_rule_show(subg, irlid, { verbose = verbose, diag = diag })
+END_OF_CODE
+    my ($retour) = $slg->call_by_tag($tag, $code, 'siii',
+        $subg, $irlid, $verbose, $diag);
+    return $retour;
+}
+
+sub Marpa::R3::Scanless::G::g1_rule_show {
+    my ($slg, $irlid, $options) = @_;
+    my $verbose = $options->{verbose} or 0;
+    my $diag = $options->{diag} ? 1 : 0;
+    my $tag = '@' . __FILE__ . ':' .  __LINE__;
+    my $code = <<'END_OF_CODE';
+    local slg, irlid, verbose, diag = ...
+    diag = diag ~= 0 -- convert diag to a boolean
+    return slg:g1_rule_show(irlid, { verbose = verbose, diag = diag })
+END_OF_CODE
+    my ($retour) = $slg->call_by_tag($tag, $code, 'iii',
+        $irlid, $verbose, $diag);
+    return $retour;
+}
+
+sub Marpa::R3::Scanless::G::l0_rule_show {
+    my ($slg, $irlid, $options) = @_;
+    my $verbose = $options->{verbose} or 0;
+    my $diag = $options->{diag} ? 1 : 0;
+    my $tag = '@' . __FILE__ . ':' .  __LINE__;
+    my $code = <<'END_OF_CODE';
+    local slg, irlid, verbose, diag = ...
+    diag = diag ~= 0 -- convert diag to a boolean
+    return slg:l0_rule_show(irlid, { verbose = verbose, diag = diag })
+END_OF_CODE
+    my ($retour) = $slg->call_by_tag($tag, $code, 'iii',
+        $irlid, $verbose, $diag);
+    return $retour;
+}
+
+sub Marpa::R3::Scanless::G::productions_show {
+    my ($slg, $options) = @_;
+    my $verbose = $options->{verbose} or 0;
+    my $diag = $options->{diag} ? 1 : 0;
+    my $tag = '@' . __FILE__ . ':' .  __LINE__;
+    my $code = <<'END_OF_CODE';
+    local slg, verbose, diag = ...
+    diag = diag ~= 0 -- convert diag to a boolean
+    return slg:xprs_show({ verbose = verbose, diag = diag })
+END_OF_CODE
+    my ($retour) = $slg->call_by_tag($tag, $code, 'ii',
+        $verbose, $diag);
+    return $retour;
+}
+
+sub Marpa::R3::Scanless::G::lmg_rules_show {
+    my ($slg, $subg, $options) = @_;
+    my $verbose = $options->{verbose} or 0;
+    my $diag = $options->{diag} ? 1 : 0;
+    my $tag = '@' . __FILE__ . ':' .  __LINE__;
+    my $code = <<'END_OF_CODE';
+    local slg, subg, verbose, diag = ...
+    diag = diag ~= 0 -- convert diag to a boolean
+    return slg:lmg_rules_show(subg, { verbose = verbose, diag = diag })
+END_OF_CODE
+    my ($retour) = $slg->call_by_tag($tag, $code, 'sii',
+        $subg, $verbose, $diag);
+    return $retour;
+}
+
+sub Marpa::R3::Scanless::G::g1_rules_show {
+    my ($slg, $options) = @_;
+    my $verbose = $options->{verbose} or 0;
+    my $diag = $options->{diag} ? 1 : 0;
+    my $tag = '@' . __FILE__ . ':' .  __LINE__;
+    my $code = <<'END_OF_CODE';
+    local slg, verbose, diag = ...
+    diag = diag ~= 0 -- convert diag to a boolean
+    return slg:g1_rules_show({ verbose = verbose, diag = diag })
+END_OF_CODE
+    my ($retour) = $slg->call_by_tag($tag, $code, 'ii',
+        $verbose, $diag);
+    return $retour;
+}
+
+sub Marpa::R3::Scanless::G::l0_rules_show {
+    my ($slg, $options) = @_;
+    my $verbose = $options->{verbose} or 0;
+    my $diag = $options->{diag} ? 1 : 0;
+    my $tag = '@' . __FILE__ . ':' . __LINE__;
+    my $code = <<'END_OF_CODE';
+    local slg, verbose, diag = ...
+    diag = diag ~= 0 -- convert diag to a boolean
+    return slg:l0_rules_show({ verbose = verbose, diag = diag })
+END_OF_CODE
+    my ($retour) = $slg->call_by_tag($tag, $code, 'ii',
+        $verbose, $diag);
+    return $retour;
+}
+
 # TODO: Census all uses of Marpa::R3::Scanless::G::g1_symbol_name
 # in pod and tests, and make sure that they are appropriate --
 # that is, that they should not be symbol_name() instead.
@@ -1816,26 +1936,6 @@ kwgen(__LINE__, qw(g1_symbol_is_productive g1_symbol_is_productive i));
 kwgen(__LINE__, qw(lmg_dotted_rule_show lmg_dotted_rule_show sii));
 kwgen(__LINE__, qw(g1_dotted_rule_show g1_dotted_rule_show ii));
 kwgen(__LINE__, qw(l0_dotted_rule_show l0_dotted_rule_show ii));
-
-kwgen(__LINE__, qw(production_show xpr_show i));
-kwgen(__LINE__, qw(lmg_rule_show lmg_rule_show si));
-kwgen(__LINE__, qw(g1_rule_show g1_rule_show i));
-kwgen(__LINE__, qw(l0_rule_show l0_rule_show i));
-
-kwgen(__LINE__, qw(production_diag xpr_diag i));
-kwgen(__LINE__, qw(lmg_rule_diag lmg_rule_diag si));
-kwgen(__LINE__, qw(g1_rule_diag g1_rule_diag i));
-kwgen(__LINE__, qw(l0_rule_diag l0_rule_diag i));
-
-kwgen_opt(__LINE__, qw(productions_show xprs_show i), 0);
-kwgen_opt(__LINE__, qw(lmg_rules_show lmg_rules_show si), 0, 0);
-kwgen_opt(__LINE__, qw(g1_rules_show g1_rules_show i), 0);
-kwgen_opt(__LINE__, qw(l0_rules_show l0_rules_show i), 0);
-
-kwgen_opt(__LINE__, qw(productions_diag xprs_diag i), 0);
-kwgen_opt(__LINE__, qw(lmg_rules_diag lmg_rules_diag si), 0, 0);
-kwgen_opt(__LINE__, qw(g1_rules_diag g1_rules_diag i), 0);
-kwgen_opt(__LINE__, qw(l0_rules_diag l0_rules_diag i), 0);
 
 kwgen(__LINE__, qw(production_name xpr_name i));
 

@@ -131,7 +131,7 @@ R11 Expression ::= Expression '-' Expression
 R12 [:start:] ::= Script
 END_OF_SHOW_RULES_OUTPUT
 
-$rules_show_output = $calculator_grammar->l0_rules_show(1);
+$rules_show_output = $calculator_grammar->l0_rules_show({ verbose => 1 });
 
 Marpa::R3::Test::is( $rules_show_output,
     <<'END_OF_SHOW_RULES_OUTPUT', 'Scanless l0_rules_show()' );
