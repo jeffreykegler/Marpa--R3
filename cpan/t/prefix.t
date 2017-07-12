@@ -12,8 +12,6 @@
 
 # Test of scannerless parsing -- prefix addition
 
-# MITOSIS: FINISHED
-
 use 5.010001;
 use strict;
 use warnings;

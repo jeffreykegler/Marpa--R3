@@ -13,8 +13,6 @@
 # Tests which require only grammar, input, and an output with no
 # semantics -- usually just an AST
 
-# MITOSIS: FINISHED
-
 use 5.010001;
 use strict;
 use warnings;

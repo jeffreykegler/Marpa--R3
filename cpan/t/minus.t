@@ -12,8 +12,6 @@
 
 # Converted to SLIF from Marpa::R2 minus.t
 
-# MITOSIS: FINISHED
-
 use 5.010001;
 
 use strict;
