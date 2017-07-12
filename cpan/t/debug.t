@@ -54,11 +54,12 @@ expression ::=
        variable | string
     || 'string' '(' <numeric expression> ')'
     || expression '+' expression
+# TODO -- The POD uses this with '+' and '*' reversed from
+# this, and the traditional, order.  Fix the POD!
 <numeric expression> ::=
        variable | number
-    || <numeric expression> '+' <numeric expression>
-    # TODO -- Reverse '+' and '*' to traditional order!
     || <numeric expression> '*' <numeric expression>
+    || <numeric expression> '+' <numeric expression>
 variable ~ [\w]+
 number ~ [\d]+
 string ~ ['] <string contents> [']
@@ -725,18 +726,18 @@ R1 [:start:] ::= statements
 R2 statement ::= <numeric assignment>
 R3 assignment ::= 'set' variable 'to' expression
 R4 <numeric assignment> ::= variable '=' <numeric expression>
-R5 expression ::= expression; prec=0
-R6 expression ::= expression; prec=1
-R7 expression ::= expression; prec=2
-R8 expression ::= variable; prec=0
-R9 expression ::= string; prec=0
-R10 expression ::= 'string' '(' <numeric expression> ')'; prec=2
-R11 expression ::= expression '+' expression; prec=1
-R12 <numeric expression> ::= <numeric expression>; prec=0
-R13 <numeric expression> ::= <numeric expression>; prec=1
-R14 <numeric expression> ::= <numeric expression>; prec=2
-R15 <numeric expression> ::= variable; prec=0
-R16 <numeric expression> ::= number; prec=0
+R5 expression ::= expression; prec=2
+R6 expression ::= expression; prec=0
+R7 expression ::= expression; prec=1
+R8 expression ::= variable; prec=2
+R9 expression ::= string; prec=2
+R10 expression ::= 'string' '(' <numeric expression> ')'; prec=1
+R11 expression ::= expression '+' expression; prec=0
+R12 <numeric expression> ::= <numeric expression>; prec=2
+R13 <numeric expression> ::= <numeric expression>; prec=0
+R14 <numeric expression> ::= <numeric expression>; prec=1
+R15 <numeric expression> ::= variable; prec=2
+R16 <numeric expression> ::= number; prec=2
 R17 <numeric expression> ::= <numeric expression> '+' <numeric expression>; prec=2
 R18 statements ::= statement *
 R19 <numeric expression> ::= <numeric expression> '*' <numeric expression>; prec=1
@@ -1787,21 +1788,21 @@ Marpa::R3::Test::is( $text, <<'END_OF_TEXT', 'production_show() by id');
 statement ::= <numeric assignment>
 assignment ::= 'set' variable 'to' expression
 <numeric assignment> ::= variable '=' <numeric expression>
+expression ::= expression; prec=2
 expression ::= expression; prec=0
 expression ::= expression; prec=1
-expression ::= expression; prec=2
-expression ::= variable; prec=0
-expression ::= string; prec=0
-expression ::= 'string' '(' <numeric expression> ')'; prec=2
-expression ::= expression '+' expression; prec=1
+expression ::= variable; prec=2
+expression ::= string; prec=2
+expression ::= 'string' '(' <numeric expression> ')'; prec=1
+expression ::= expression '+' expression; prec=0
+<numeric expression> ::= <numeric expression>; prec=2
 <numeric expression> ::= <numeric expression>; prec=0
 <numeric expression> ::= <numeric expression>; prec=1
-<numeric expression> ::= <numeric expression>; prec=2
-<numeric expression> ::= variable; prec=0
-<numeric expression> ::= number; prec=0
-<numeric expression> ::= <numeric expression> '+' <numeric expression>; prec=2
+<numeric expression> ::= variable; prec=2
+<numeric expression> ::= number; prec=2
+<numeric expression> ::= <numeric expression> '+' <numeric expression>; prec=1
 statements ::= statement *
-<numeric expression> ::= <numeric expression> '*' <numeric expression>; prec=1
+<numeric expression> ::= <numeric expression> '*' <numeric expression>; prec=0
 statement ::= assignment
 'set' ~ [s] [e] [t]
 'to' ~ [t] [o]
@@ -1912,6 +1913,8 @@ whitespace ~ [\s] +
 [:lex_start:] ~ variable
 END_OF_TEXT
 
+$text = q{};
+
 for my $prid ( $grammar->production_ids() ) {
 
 # Marpa::R3::Display
@@ -1935,21 +1938,21 @@ Marpa::R3::Test::is( $text, <<'END_OF_TEXT', 'production_show() diag form by id'
 statement ::= <numeric assignment>
 assignment ::= 'set' variable 'to' expression
 <numeric assignment> ::= variable '=' <numeric expression>
+expression ::= expression; prec=2
 expression ::= expression; prec=0
 expression ::= expression; prec=1
-expression ::= expression; prec=2
-expression ::= variable; prec=0
-expression ::= string; prec=0
-expression ::= 'string' '(' <numeric expression> ')'; prec=2
-expression ::= expression '+' expression; prec=1
+expression ::= variable; prec=2
+expression ::= string; prec=2
+expression ::= 'string' '(' <numeric expression> ')'; prec=1
+expression ::= expression '+' expression; prec=0
+<numeric expression> ::= <numeric expression>; prec=2
 <numeric expression> ::= <numeric expression>; prec=0
 <numeric expression> ::= <numeric expression>; prec=1
-<numeric expression> ::= <numeric expression>; prec=2
-<numeric expression> ::= variable; prec=0
-<numeric expression> ::= number; prec=0
-<numeric expression> ::= <numeric expression> '+' <numeric expression>; prec=2
+<numeric expression> ::= variable; prec=2
+<numeric expression> ::= number; prec=2
+<numeric expression> ::= <numeric expression> '+' <numeric expression>; prec=1
 statements ::= statement *
-<numeric expression> ::= <numeric expression> '*' <numeric expression>; prec=1
+<numeric expression> ::= <numeric expression> '*' <numeric expression>; prec=0
 statement ::= assignment
 'set' ~ [s] [e] [t]
 'to' ~ [t] [o]
@@ -2005,8 +2008,8 @@ expression ::= expression '+' expression
 <numeric expression> ::= <numeric expression>
 <numeric expression> ::= variable
 <numeric expression> ::= number
-<numeric expression> ::= <numeric expression> '+' <numeric expression>
 <numeric expression> ::= <numeric expression> '*' <numeric expression>
+<numeric expression> ::= <numeric expression> '+' <numeric expression>
 [:start:] ::= statements
 END_OF_TEXT
 
@@ -2037,8 +2040,8 @@ Marpa::R3::Test::is( $text, <<'END_OF_TEXT', 'L0 rule_show() diag form by rule i
 '(' ~ [\(]
 ')' ~ [\)]
 '+' ~ [\+]
-'+' ~ [\+]
 '*' ~ [\*]
+'+' ~ [\+]
 variable ~ [\w] +
 number ~ [\d] +
 string ~ ['] <string contents> [']
@@ -2053,8 +2056,8 @@ whitespace ~ [\s] +
 [:lex_start:] ~ '('
 [:lex_start:] ~ ')'
 [:lex_start:] ~ '+'
-[:lex_start:] ~ '+'
 [:lex_start:] ~ '*'
+[:lex_start:] ~ '+'
 [:lex_start:] ~ number
 [:lex_start:] ~ string
 [:lex_start:] ~ variable
@@ -2131,30 +2134,30 @@ Production #8: 31 ::= 39
 Production #9: 31 ::= 37
 Production #10: 31 ::= 6 7 34 8
 Production #11: 31 ::= 31 9 31
-Production #12: 34 ::= 34
+Production #12: 36 ::= 35
 Production #13: 34 ::= 34
 Production #14: 34 ::= 34
-Production #15: 34 ::= 39
-Production #16: 34 ::= 32
-Production #17: 34 ::= 34 10 34
-Production #18: 36 ::= 35
+Production #15: 34 ::= 34
+Production #16: 34 ::= 39
+Production #17: 34 ::= 32
+Production #18: 34 ::= 34 10 34
 Production #19: 34 ::= 34 11 34
 Production #20: 35 ::= 30
-Production #21: 3 ::= 28 22 29
-Production #22: 4 ::= 29 26
-Production #23: 5 ::= 17
-Production #24: 6 ::= 28 29 27 24 25 23
-Production #25: 7 ::= 13
-Production #26: 8 ::= 14
-Production #27: 9 ::= 16
-Production #28: 10 ::= 16
-Production #29: 11 ::= 15
-Production #30: 39 ::= 20
-Production #31: 32 ::= 18
-Production #32: 37 ::= 12 38 12
-Production #33: 38 ::= 21
-Production #34: 1 ::= 40
-Production #35: 40 ::= 19
+Production #21: 40 ::= 19
+Production #22: 3 ::= 28 22 29
+Production #23: 4 ::= 29 26
+Production #24: 5 ::= 17
+Production #25: 6 ::= 28 29 27 24 25 23
+Production #26: 7 ::= 13
+Production #27: 8 ::= 14
+Production #28: 9 ::= 16
+Production #29: 10 ::= 15
+Production #30: 11 ::= 16
+Production #31: 39 ::= 20
+Production #32: 32 ::= 18
+Production #33: 37 ::= 12 38 12
+Production #34: 38 ::= 21
+Production #35: 1 ::= 40
 END_OF_TEXT
 
 $text = q{};
@@ -2216,8 +2219,8 @@ l0 Rule #3: 4 ::= 26 27 25 22 23 21
 l0 Rule #4: 5 ::= 11
 l0 Rule #5: 6 ::= 12
 l0 Rule #6: 7 ::= 14
-l0 Rule #7: 8 ::= 14
-l0 Rule #8: 9 ::= 13
+l0 Rule #7: 8 ::= 13
+l0 Rule #8: 9 ::= 14
 l0 Rule #9: 31 ::= 18
 l0 Rule #10: 28 ::= 16
 l0 Rule #11: 29 ::= 10 30 10
