@@ -1423,11 +1423,11 @@ symbol number: 9; name: [Lex-6]
 symbol number: 9; name in display form: '+'
 symbol number: 9; DSL form: '+'
 symbol number: 10; name: [Lex-7]
-symbol number: 10; name in display form: '+'
-symbol number: 10; DSL form: '+'
+symbol number: 10; name in display form: '*'
+symbol number: 10; DSL form: '*'
 symbol number: 11; name: [Lex-8]
-symbol number: 11; name in display form: '*'
-symbol number: 11; DSL form: '*'
+symbol number: 11; name in display form: '+'
+symbol number: 11; DSL form: '+'
 symbol number: 12; name: [[']]
 symbol number: 12; name in display form: [']
 symbol number: 12; DSL form: [']
@@ -1575,11 +1575,11 @@ symbol number: 7  name: [Lex-6]
 symbol number: 7  name in display form: '+'
 symbol number: 7  DSL form: '+'
 symbol number: 8  name: [Lex-7]
-symbol number: 8  name in display form: '+'
-symbol number: 8  DSL form: '+'
+symbol number: 8  name in display form: '*'
+symbol number: 8  DSL form: '*'
 symbol number: 9  name: [Lex-8]
-symbol number: 9  name in display form: '*'
-symbol number: 9  DSL form: '*'
+symbol number: 9  name in display form: '+'
+symbol number: 9  DSL form: '+'
 symbol number: 10  name: assignment
 symbol number: 10  name in display form: assignment
 symbol number: 10  DSL form: assignment
@@ -1685,11 +1685,11 @@ l0 symbol number: 7  name: [Lex-6]
 l0 symbol number: 7  name in display form: '+'
 l0 symbol number: 7  DSL form: '+'
 l0 symbol number: 8  name: [Lex-7]
-l0 symbol number: 8  name in display form: '+'
-l0 symbol number: 8  DSL form: '+'
+l0 symbol number: 8  name in display form: '*'
+l0 symbol number: 8  DSL form: '*'
 l0 symbol number: 9  name: [Lex-8]
-l0 symbol number: 9  name in display form: '*'
-l0 symbol number: 9  DSL form: '*'
+l0 symbol number: 9  name in display form: '+'
+l0 symbol number: 9  DSL form: '+'
 l0 symbol number: 10  name: [[']]
 l0 symbol number: 10  name in display form: [']
 l0 symbol number: 10  DSL form: [']
@@ -1795,15 +1795,16 @@ expression ::= variable; prec=2
 expression ::= string; prec=2
 expression ::= 'string' '(' <numeric expression> ')'; prec=1
 expression ::= expression '+' expression; prec=0
+statements ::= statement *
 <numeric expression> ::= <numeric expression>; prec=2
 <numeric expression> ::= <numeric expression>; prec=0
 <numeric expression> ::= <numeric expression>; prec=1
 <numeric expression> ::= variable; prec=2
 <numeric expression> ::= number; prec=2
-<numeric expression> ::= <numeric expression> '+' <numeric expression>; prec=1
-statements ::= statement *
-<numeric expression> ::= <numeric expression> '*' <numeric expression>; prec=0
+<numeric expression> ::= <numeric expression> '*' <numeric expression>; prec=1
+<numeric expression> ::= <numeric expression> '+' <numeric expression>; prec=0
 statement ::= assignment
+whitespace ~ [\s] +
 'set' ~ [s] [e] [t]
 'to' ~ [t] [o]
 '=' ~ [\=]
@@ -1811,14 +1812,13 @@ statement ::= assignment
 '(' ~ [\(]
 ')' ~ [\)]
 '+' ~ [\+]
-'+' ~ [\+]
 '*' ~ [\*]
+'+' ~ [\+]
 variable ~ [\w] +
 number ~ [\d] +
 string ~ ['] <string contents> [']
 <string contents> ~ [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] +
 [:discard:] ~ whitespace
-whitespace ~ [\s] +
 END_OF_TEXT
 
 $text = q{};
@@ -1858,8 +1858,8 @@ expression ::= expression '+' expression
 <numeric expression> ::= <numeric expression>
 <numeric expression> ::= variable
 <numeric expression> ::= number
-<numeric expression> ::= <numeric expression> '+' <numeric expression>
 <numeric expression> ::= <numeric expression> '*' <numeric expression>
+<numeric expression> ::= <numeric expression> '+' <numeric expression>
 [:start:] ::= statements
 END_OF_TEXT
 
@@ -1890,8 +1890,8 @@ Marpa::R3::Test::is( $text, <<'END_OF_TEXT', 'L0 rule_show() by rule id');
 '(' ~ [\(]
 ')' ~ [\)]
 '+' ~ [\+]
-'+' ~ [\+]
 '*' ~ [\*]
+'+' ~ [\+]
 variable ~ [\w] +
 number ~ [\d] +
 string ~ ['] <string contents> [']
@@ -1906,8 +1906,8 @@ whitespace ~ [\s] +
 [:lex_start:] ~ '('
 [:lex_start:] ~ ')'
 [:lex_start:] ~ '+'
-[:lex_start:] ~ '+'
 [:lex_start:] ~ '*'
+[:lex_start:] ~ '+'
 [:lex_start:] ~ number
 [:lex_start:] ~ string
 [:lex_start:] ~ variable
@@ -1945,15 +1945,16 @@ expression ::= variable; prec=2
 expression ::= string; prec=2
 expression ::= 'string' '(' <numeric expression> ')'; prec=1
 expression ::= expression '+' expression; prec=0
+statements ::= statement *
 <numeric expression> ::= <numeric expression>; prec=2
 <numeric expression> ::= <numeric expression>; prec=0
 <numeric expression> ::= <numeric expression>; prec=1
 <numeric expression> ::= variable; prec=2
 <numeric expression> ::= number; prec=2
-<numeric expression> ::= <numeric expression> '+' <numeric expression>; prec=1
-statements ::= statement *
-<numeric expression> ::= <numeric expression> '*' <numeric expression>; prec=0
+<numeric expression> ::= <numeric expression> '*' <numeric expression>; prec=1
+<numeric expression> ::= <numeric expression> '+' <numeric expression>; prec=0
 statement ::= assignment
+whitespace ~ [\s] +
 'set' ~ [s] [e] [t]
 'to' ~ [t] [o]
 '=' ~ [\=]
@@ -1961,14 +1962,13 @@ statement ::= assignment
 '(' ~ [\(]
 ')' ~ [\)]
 '+' ~ [\+]
-'+' ~ [\+]
 '*' ~ [\*]
+'+' ~ [\+]
 variable ~ [\w] +
 number ~ [\d] +
 string ~ ['] <string contents> [']
 <string contents> ~ [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] +
 [:discard:] ~ whitespace
-whitespace ~ [\s] +
 END_OF_TEXT
 
 $text = q{};
