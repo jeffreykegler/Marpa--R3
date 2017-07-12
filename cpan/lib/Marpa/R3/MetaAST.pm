@@ -769,7 +769,7 @@ sub Marpa::R3::Internal::MetaAST_Nodes::priority_rule::evaluate {
             length => $length,
             lhs   => $lhs,
             rhs   => [ $parse->prioritized_symbol( $lhs, 0 ) ],
-            precedence => ($priority_count - 1),
+            precedence => -1,
             subkey => ++$xpr_ordinal,
             @arg0_action,
         }

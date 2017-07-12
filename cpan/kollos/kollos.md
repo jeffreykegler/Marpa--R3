@@ -660,14 +660,11 @@ Display any XPR
             end
             if verbose >= 3 then
                 local pcs2 = {}
-                pcs2[#pcs2+1] = '  Internal symbols:'
-                pcs2[#pcs2+1] = '<' .. slg:symbol_name(lhsid) .. '>'
+                pcs2[#pcs2+1] = '  Canonical names:'
+                pcs2[#pcs2+1] = slg:symbol_diag_form(lhsid)
                 pcs2[#pcs2+1] = '::='
                 for ix = 0, xpr_length - 1 do
-                    pcs2[#pcs2+1]
-                        = '<'
-                            ..  slg:symbol_name(rhsids[ix])
-                            ..  '>'
+                    pcs2[#pcs2+1] = slg:symbol_diag_form(rhsids[ix])
                 end
                 pcs[#pcs+1] = table.concat(pcs2, ' ')
                 pcs[#pcs+1] = "\n"
@@ -845,7 +842,7 @@ Lowest ISYID is 0.
     function _M.class_slg.symbol_diag_form(slg, xsyid)
         local xsy = slg.xsys[xsyid]
         if not xsy then
-            return '<bad xsyid ' .. xsyid .. '>'
+            return '[bad xsyid ' .. xsyid .. ']'
         end
         return xsy:diag_form();
     end
@@ -888,14 +885,14 @@ Lowest ISYID is 0.
                 " ")
             pieces[#pieces+1] = "\n"
             if verbose >= 2 then
-                pieces[#pieces+1] =  "  Canonical name: <"
-                pieces[#pieces+1] =  slg:symbol_name(symbol_id)
-                pieces[#pieces+1] =  ">\n"
+                pieces[#pieces+1] =  "  Canonical name: "
+                pieces[#pieces+1] =  symbol_diag_form(slg:symbol_name(symbol_id))
+                pieces[#pieces+1] =  "\n"
             end
             if verbose >= 3 then
                 local dsl_form =  slg:symbol_dsl_form( symbol_id )
                 if dsl_form then
-                    pieces[#pieces+1] =  '  SLIF name: '
+                    pieces[#pieces+1] =  '  DSL name: '
                     pieces[#pieces+1] =  dsl_form
                     pieces[#pieces+1] =  "\n"
                 end
@@ -905,7 +902,7 @@ Lowest ISYID is 0.
     end
     function _M.class_slg.lmg_symbols_show(slg, subg_name, verbose)
         local pieces = { }
-        local lmw_g = slg[subg_name].lmw_g
+        local lmw_g = slg[subg_name]
         for symbol_id = 0, lmw_g:highest_symbol_id() do
             pieces[#pieces+1] = table.concat (
                 { subg_name, 'S' .. symbol_id, lmw_g:symbol_display_form( symbol_id ) },
@@ -931,14 +928,14 @@ Lowest ISYID is 0.
                     pieces[#pieces+1] = table.concat(tags, ' ')
                     pieces[#pieces+1] =  '\n'
                 end
-                pieces[#pieces+1] =  "  Internal name: <"
-                pieces[#pieces+1] =  lmw_g:symbol_name(symbol_id)
-                pieces[#pieces+1] =  ">\n"
+                pieces[#pieces+1] =  "  Canonical name: "
+                pieces[#pieces+1] =  lmw_g:symbol_diag_form(symbol_id)
+                pieces[#pieces+1] =  "\n"
             end
             if verbose >= 3 then
                 local dsl_form =  slg:lmg_symbol_dsl_form( subg_name, symbol_id )
                 if dsl_form then
-                    pieces[#pieces+1] =  '  SLIF name: '
+                    pieces[#pieces+1] =  '  DSL name: '
                     pieces[#pieces+1] =  dsl_form
                     pieces[#pieces+1] =  "\n"
                 end
@@ -1124,14 +1121,12 @@ Lowest ISYID is 0.
             end
             if verbose >= 3 then
                 local pcs2 = {}
-                pcs2[#pcs2+1] = '  Internal symbols:'
-                pcs2[#pcs2+1] = '<' .. slg:lmg_symbol_name(subg_name, lhsid) .. '>'
+                pcs2[#pcs2+1] = '  Canonical symbols:'
+                pcs2[#pcs2+1] = symbol_diag_form(slg:lmg_symbol_name(subg_name, lhsid))
                 pcs2[#pcs2+1] = '::='
                 for ix = 0, rule_length - 1 do
                     pcs2[#pcs2+1]
-                        = '<'
-                            ..  slg:lmg_symbol_name(subg_name, rhsids[ix])
-                            ..  '>'
+                        = symbol_diag_form(slg:lmg_symbol_name(subg_name, rhsids[ix]))
                 end
                 pcs[#pcs+1] = table.concat(pcs2, ' ')
                 pcs[#pcs+1] = "\n"
@@ -2245,7 +2240,7 @@ because this is done in two different places.
         local discarded_isyid = l0g:rule_rhs(irlid, 0)
         local discard_desc =
             discarded_isyid and l0g:symbol_display_form(discarded_isyid)
-                or '<Bad irlid ' .. irlid .. '>'
+                or '[Bad irlid ' .. irlid .. ']'
         local block = slr.current_block
         local block_ix = block.index
         local event = { 'discarded lexeme',
@@ -4924,6 +4919,9 @@ is zero.
         end
         return form1
     end
+    function _M.class_xsy.diag_form(xsy)
+        return symbol_diag_form(xsy.name)
+    end
 ```
 
 ## Inner symbol (ISY) class
@@ -4958,8 +4956,11 @@ is zero.
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_isy.display_form(isy)
+    function _M.class_isy.diag_form(isy)
         return symbol_diag_form(isy.name)
+    end
+    function _M.class_isy.display_form(isy)
+        return isy:diag_form()
     end
 ```
 
@@ -5245,10 +5246,11 @@ message.
 If the ISYID is valid, the name is unique.
 
 ```
+    -- miranda: section+ most Lua function definitions
     function _M.class_grammar.symbol_diag_form(grammar, isyid)
         local isy = grammar.isys[isyid]
         if isy then return isy:diag_form() end
-        return '<bad isyid ' .. isyid .. '>'
+        return '[bad isyid ' .. isyid .. ']'
     end
 ```
 
@@ -8113,6 +8115,7 @@ TODO -- Do I want to turn this off after developement?
         table.__index = function (t, n)
           local v = rawget(t, n) or table[n]
           if v == nil and not table.__declared[n] then
+            -- print(inspect(table.__declared, {depth=2}))
             error(string.format(
                 "member %s.%s is not declared",
                 name, n),
@@ -8164,10 +8167,10 @@ suitable for diagnostic messages.
 ```
     -- miranda: section+ internal utilities
     local function symbol_diag_form(name)
-        if name:sub(1, 1) == '[' then return name end
         if name:match('^%a[%w_-]*$') then
             return name
         end
+        if name:sub(1, 1) == '[' then return name end
         return '<' .. name .. '>'
     end
 ```

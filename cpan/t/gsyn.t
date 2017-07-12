@@ -77,7 +77,7 @@ my $productions_show_output = $grammar->productions_show();
 Marpa::R3::Test::is( $productions_show_output,
     <<'END_OF_SHOW_RULES_OUTPUT', 'Scanless productions_show()' );
 R1 [:start:] ::= Script
-R2 Expression ::= Expression; prec=3
+R2 Expression ::= Expression; prec=-1
 R3 Expression ::= Expression; prec=0
 R4 Expression ::= Expression; prec=1
 R5 Expression ::= Expression; prec=2
