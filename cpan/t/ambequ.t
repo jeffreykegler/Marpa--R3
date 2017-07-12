@@ -14,7 +14,7 @@
 
 # An ambiguous equation
 
-# MITOSIS: TODO PROGRESS
+# MITOSIS: TODONE PROGRESS
 
 use 5.010001;
 use strict;
@@ -99,31 +99,35 @@ my $grammar = Marpa::R3::Scanless::G->new( {   source => \$dsl });
 my $actual_ref;
 $actual_ref = save_stdout();
 
-print $grammar->g1_symbols_show()
+print $grammar->symbols_show()
     or die "print failed: $ERRNO";
 
 restore_stdout();
 
 Marpa::R3::Test::is( ${$actual_ref},
     <<'END_SYMBOLS', 'Ambiguous Equation Symbols' );
-g1 S0 E
-g1 S1 Number
-g1 S2 Op
-g1 S3 [:start:]
+S1 E
+S2 Number
+S3 Op
+S4 [:start:]
+S5 [-+*]
+S6 [\d]
 END_SYMBOLS
 
 $actual_ref = save_stdout();
 
-print $grammar->g1_rules_show()
+print $grammar->productions_show()
     or die "print failed: $ERRNO";
 
 restore_stdout();
 
 Marpa::R3::Test::is( ${$actual_ref},
     <<'END_RULES', 'Ambiguous Equation Rules' );
-R0 E ::= E Op E
-R1 E ::= Number
-R2 [:start:] ::= E
+R1 [:start:] ::= E
+R2 E ::= E Op E
+R3 E ::= Number
+R4 Number ~ [\d] +
+R5 Op ~ [-+*]
 END_RULES
 
 $actual_ref = save_stdout();
