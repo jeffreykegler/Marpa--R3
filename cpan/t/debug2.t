@@ -10,7 +10,7 @@
 # or implied warranties. For details, see the full text of
 # of the licenses in the directory LICENSES.
 
-# MITOSIS: TODONE PROGRESS
+# MITOSIS: PROGRESS
 
 use 5.010001;
 use strict;

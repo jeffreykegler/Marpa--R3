@@ -14,7 +14,7 @@
 
 # An ambiguous equation
 
-# MITOSIS: TODONE PROGRESS
+# MITOSIS: PROGRESS
 
 use 5.010001;
 use strict;

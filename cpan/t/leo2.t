@@ -12,7 +12,7 @@
 
 # Test of events and right recursion
 
-# MITOSIS: TODO PROGRESS
+# MITOSIS: PROGRESS
 
 use 5.010001;
 use strict;
