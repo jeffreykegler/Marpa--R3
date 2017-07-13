@@ -687,6 +687,16 @@ Display any XPR
     function _M.class_slg.highest_xprid(slg)
         return #slg.xprs
     end
+    function _M.class_slg.lmg_highest_rule_id(slg, subg_name)
+        local subg = slg[subg_name]
+        return subg:highest_rule_id();
+    end
+    function _M.class_slg.g1_highest_rule_id(slg, rule_id)
+        return slg:lmg_highest_rule_id('g1')
+    end
+    function _M.class_slg.l0_highest_rule_id(slg, rule_id)
+        return slg:lmg_highest_rule_id('l0')
+    end
 ```
 
 ```

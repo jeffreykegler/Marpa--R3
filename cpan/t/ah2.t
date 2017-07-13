@@ -118,18 +118,27 @@ EOS
 # This is in term of ISYs. We don't track these properties for
 # XSYs, at least not currently
 
+my @g1_symbols = ();
+for (
+    my $iter = $grammar->g1_symbol_ids_gen() ;
+    defined( my $symbol_id = $iter->() ) ;
+  )
+{
+    push @g1_symbols, $symbol_id;
+}
+
 my $nulling_symbols = join q{ }, sort map { $grammar->g1_symbol_name($_) }
-  grep { $grammar->g1_symbol_is_nulling($_) } $grammar->g1_symbol_ids();
+  grep { $grammar->g1_symbol_is_nulling($_) } @g1_symbols;
 Marpa::R3::Test::is( $nulling_symbols, q{},
     'Aycock/Horspool Nulling Symbols' );
 
 my $productive_symbols = join q{ }, sort map { $grammar->g1_symbol_name($_) }
-  grep { $grammar->g1_symbol_is_productive($_) } $grammar->g1_symbol_ids();
+  grep { $grammar->g1_symbol_is_productive($_) } @g1_symbols;
 Marpa::R3::Test::is( $productive_symbols, q{A S [:start:] [Lex-0]},
     'Aycock/Horspool Productive Symbols' );
 
 my $accessible_symbols = join q{ }, sort map { $grammar->g1_symbol_name($_) }
-  grep { $grammar->g1_symbol_is_accessible($_) } $grammar->g1_symbol_ids();
+  grep { $grammar->g1_symbol_is_accessible($_) } @g1_symbols;
 Marpa::R3::Test::is( $accessible_symbols, q{A S [:start:] [Lex-0]},
     'Aycock/Horspool Accessible Symbols' );
 

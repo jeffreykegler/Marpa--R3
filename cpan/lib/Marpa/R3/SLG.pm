@@ -429,7 +429,7 @@ END_OF_LUA
 
     # Find out the list of lexemes according to G1
     my %g1_id_by_lexeme_name = ();
-  SYMBOL: for my $symbol_id ( $slg->g1_symbol_ids() ) {
+  SYMBOL: for (my $iter = $slg->g1_symbol_ids_gen(); defined(my $symbol_id = $iter->()); ) {
 
         my ($is_lexeme) =
           $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
@@ -602,7 +602,10 @@ END_OF_LUA
     my $lex_discard_symbol_id =
       $slg->l0_symbol_by_name($discard_symbol_name) // -1;
     my @lex_lexeme_to_g1_symbol;
-    $lex_lexeme_to_g1_symbol[$_] = -1 for $slg->g1_symbol_ids();
+    for (my $iter = $slg->g1_symbol_ids_gen();
+    defined(my $lexeme_id = $iter->()); ) {
+        $lex_lexeme_to_g1_symbol[$lexeme_id] = -1;
+    }
 
   LEXEME_NAME: for my $lexeme_name (@lex_lexeme_names) {
         next LEXEME_NAME if $lexeme_name eq $discard_symbol_name;
@@ -629,7 +632,7 @@ END_OF_LUA
     my @lex_rule_to_g1_lexeme;
     my $lex_start_symbol_id =
       $slg->l0_symbol_by_name($lex_start_symbol_name);
-  RULE_ID: for my $rule_id ( $slg->l0_rule_ids() ) {
+  RULE_ID: for (my $iter = $slg->l0_rule_ids_gen(); defined ( my $rule_id = $iter->());) {
 
         my ($lhs_id) = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
             <<'END_OF_LUA', 'i>*', $rule_id );
@@ -721,7 +724,12 @@ END_OF_LUA
     # rule id of the lexer.
 
     my $default_discard_event = $discard_default_adverbs->{event};
-  RULE_ID: for my $irlid ( $slg->l0_rule_ids() ) {
+  RULE_ID:
+    for (
+        my $iter = $slg->l0_rule_ids_gen() ;
+        defined( my $irlid = $iter->() ) ;
+      )
+    {
 
         # There may be gaps in the IRLIDs
         my $event;
@@ -749,7 +757,7 @@ END_OF_LUA
     return ''
 END_OF_LUA
 
-            if ($cmd eq 'ok') {
+            if ( $cmd eq 'ok' ) {
                 $event = [ $event_name, $event_starts_active ];
                 last FIND_EVENT;
             }
@@ -1000,7 +1008,8 @@ END_OF_LUA
         my $default_blessing = $lexeme_default_adverbs->{bless};
 
       G1_SYMBOL:
-        for my $xsyid ( $slg->symbol_ids() ) {
+        for (my $iter = $slg->symbol_ids_gen();
+        defined(my $xsyid = $iter->()); ) {
 
         my ($cmd, $blessing, $g1_lexeme_id, $lexeme_name) = $slg->call_by_tag(
         ('@' .__FILE__ . ':' .  __LINE__),
@@ -1237,7 +1246,11 @@ END_OF_LUA
 
     if ($loop_rule_count) {
       RULE:
-        for my $rule_id ( $slg->lmg_rule_ids($subg_name) ) {
+        for (
+            my $iter    = $slg->lmg_rule_ids_gen($subg_name) ;
+            defined(my $rule_id = $iter->()) ;
+          )
+        {
             my ($rule_is_loop) =
               $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
                 <<'END_OF_LUA', 'si', $subg_name, $rule_id );
@@ -1258,8 +1271,7 @@ END_OF_LUA
         $slg->[Marpa::R3::Internal::Scanless::G::IF_INACCESSIBLE]
         // 'warn';
     SYMBOL:
-    for my $isyid ( $slg->lmg_symbol_ids($subg_name))
-    {
+    for (my $iter = $slg->lmg_symbol_ids_gen($subg_name); defined(my $isyid = $iter->());) {
         # Inaccessible internal symbols may be created
         # from inaccessible use symbols -- ignore these.
         # This assumes that Marpa's logic
@@ -1714,11 +1726,6 @@ END_OF_LUA
 
 }
 
-sub Marpa::R3::Scanless::G::symbol_ids {
-    my ($slg) = @_;
-    return 1 .. $slg->highest_symbol_id();
-}
-
 our $kwgen_code_template = <<'END_OF_TEMPLATE';
 END_OF_TEMPLATE
 
@@ -1944,6 +1951,9 @@ kwgen(__LINE__, qw(g1_rule_to_production_id g1_rule_to_xprid i));
 kwgen(__LINE__, qw(l0_rule_to_production_id l0_rule_to_xprid i));
 
 kwgen(__LINE__, qw(highest_production_id highest_xprid), '');
+kwgen(__LINE__, qw(lmg_highest_rule_id lmg_highest_rule_id), '');
+kwgen(__LINE__, qw(g1_highest_rule_id g1_highest_rule_id), '');
+kwgen(__LINE__, qw(l0_highest_rule_id l0_highest_rule_id), '');
 
 kwgen_arr(__LINE__, qw(production_expand xpr_expand i));
 kwgen_arr(__LINE__, qw(lmg_rule_expand lmg_irl_isyids si));
@@ -2025,65 +2035,100 @@ sub Marpa::R3::Scanless::G::coro_by_tag {
     return @results;
 }
 
-# TODO -- Document that I guarantee no gaps in
-# the symbol/rule numbering
-sub Marpa::R3::Scanless::G::lmg_symbol_ids {
-    my ($slg, $subg_name) = @_;
-    my ($highest_symbol_id) = $slg->call_by_tag(
-    ('@' .__FILE__ . ':' . __LINE__),
-    <<'END_OF_LUA', 's>*', $subg_name ) ;
-    local grammar, subg_name = ...
-    local lmw_g = grammar[subg_name].lmw_g
-    return lmw_g:highest_symbol_id()
-END_OF_LUA
-
-    return 0 .. $highest_symbol_id;
-}
-
-sub Marpa::R3::Scanless::G::g1_symbol_ids {
+sub Marpa::R3::Scanless::G::symbol_ids_gen {
     my ($slg) = @_;
-    return $slg->lmg_symbol_ids('g1');
+    my $next = 1;
+    my $last = $slg->highest_symbol_id();
+    return sub () {
+        return if $next > $last;
+        my $current;
+        ($current, $next) = ($next, $next+1);
+        return $current;
+    }
 }
 
-sub Marpa::R3::Scanless::G::l0_symbol_ids {
+sub Marpa::R3::Scanless::G::lmg_symbol_ids_gen {
+    my ($slg, $subg) = @_;
+    my $next = 0;
+    my $last = $slg->lmg_highest_symbol_id($subg);
+    return sub () {
+        return if $next > $last;
+        my $current;
+        ($current, $next) = ($next, $next+1);
+        return $current;
+    }
+}
+
+sub Marpa::R3::Scanless::G::g1_symbol_ids_gen {
     my ($slg) = @_;
-    return $slg->lmg_symbol_ids('l0');
+    my $next = 0;
+    my $last = $slg->g1_highest_symbol_id();
+    return sub () {
+        return if $next > $last;
+        my $current;
+        ($current, $next) = ($next, $next+1);
+        return $current;
+    }
 }
 
-sub Marpa::R3::Scanless::G::production_ids {
+sub Marpa::R3::Scanless::G::l0_symbol_ids_gen {
     my ($slg) = @_;
-    my ($highest_xprid) = $slg->call_by_tag(
-    ('@' .__FILE__ . ':' . __LINE__),
-    <<'END_OF_LUA', '>*' ) ;
-    local slg = ...
-    return slg:highest_xprid()
-END_OF_LUA
-    return 1 .. $highest_xprid;
+    my $next = 0;
+    my $last = $slg->l0_highest_symbol_id();
+    return sub () {
+        return if $next > $last;
+        my $current;
+        ($current, $next) = ($next, $next+1);
+        return $current;
+    }
 }
 
-# Currently there are no gaps in the rule ids.
-# TODO -- Will I guarantee this?
-sub Marpa::R3::Scanless::G::lmg_rule_ids {
-    my ($slg, $subg_name) = @_;
-    my ($highest_rule_id) = $slg->call_by_tag(
-    ('@' .__FILE__ . ':' . __LINE__),
-    <<'END_OF_LUA', 's>*', $subg_name ) ;
-    local grammar, subg_name = ...
-    local lmw_g = grammar[subg_name].lmw_g
-    return lmw_g:highest_rule_id()
-END_OF_LUA
-
-    return 0 .. $highest_rule_id;
-}
-
-sub Marpa::R3::Scanless::G::g1_rule_ids {
+sub Marpa::R3::Scanless::G::production_ids_gen {
     my ($slg) = @_;
-    return $slg->lmg_rule_ids('g1');
+    my $next = 1;
+    my $last = $slg->highest_production_id();
+    return sub () {
+        return if $next > $last;
+        my $current;
+        ($current, $next) = ($next, $next+1);
+        return $current;
+    }
 }
 
-sub Marpa::R3::Scanless::G::l0_rule_ids {
+sub Marpa::R3::Scanless::G::lmg_rule_ids_gen {
+    my ($slg, $subg) = @_;
+    my $next = 0;
+    my $last = $slg->lmg_highest_rule_id($subg);
+    return sub () {
+        return if $next > $last;
+        my $current;
+        ($current, $next) = ($next, $next+1);
+        return $current;
+    }
+}
+
+sub Marpa::R3::Scanless::G::g1_rule_ids_gen {
     my ($slg) = @_;
-    return $slg->lmg_rule_ids('l0');
+    my $next = 0;
+    my $last = $slg->g1_highest_rule_id();
+    return sub () {
+        return if $next > $last;
+        my $current;
+        ($current, $next) = ($next, $next+1);
+        return $current;
+    }
+}
+
+sub Marpa::R3::Scanless::G::l0_rule_ids_gen {
+    my ($slg) = @_;
+    my $next = 0;
+    my $last = $slg->l0_highest_rule_id();
+    return sub () {
+        return if $next > $last;
+        my $current;
+        ($current, $next) = ($next, $next+1);
+        return $current;
+    }
 }
 
 # not to be documented
