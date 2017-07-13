@@ -2132,7 +2132,7 @@ sub Marpa::R3::Scanless::G::l0_rule_ids_gen {
 }
 
 # not to be documented
-sub Marpa::R3::Scanless::G::show_nrls {
+sub Marpa::R3::Scanless::G::nrls_show {
     my ($slg) = @_;
     my ($result) =
       $slg->call_by_tag(
@@ -2152,7 +2152,7 @@ END_OF_LUA
 }
 
 # not to be documented
-sub Marpa::R3::Scanless::G::show_nsys {
+sub Marpa::R3::Scanless::G::nsys_show {
     my ($slg) = @_;
     my ($result) =
       $slg->call_by_tag(
@@ -2163,7 +2163,7 @@ sub Marpa::R3::Scanless::G::show_nsys {
     local nsy_count = g1g:_nsy_count()
     local pieces = {}
     for nsy_id = 0, nsy_count - 1 do
-        pieces[#pieces+1] = g1g:show_nsy(nsy_id)
+        pieces[#pieces+1] = g1g:nsy_show(nsy_id)
     end
     return table.concat(pieces)
 END_OF_LUA
@@ -2171,7 +2171,7 @@ END_OF_LUA
 }
 
 # not to be documented
-sub Marpa::R3::Scanless::G::show_ahms {
+sub Marpa::R3::Scanless::G::ahms_show {
     my ( $slg ) = @_;
 
     my ($text) = $slg->call_by_tag(
@@ -2179,12 +2179,12 @@ sub Marpa::R3::Scanless::G::show_ahms {
         <<'END_OF_LUA', '' );
     local grammar = ...
     local g1g = grammar.g1
-    return g1g:show_ahms()
+    return g1g:ahms_show()
 END_OF_LUA
 
     return $text;
 
-} ## end sub show_ahms
+}
 
 # not to be documented
 sub Marpa::R3::Scanless::G::dotted_nrl_show {
@@ -2201,7 +2201,7 @@ END_OF_LUA
 }
 
 # not to be documented
-sub Marpa::R3::Scanless::G::show_briefer_ahm {
+sub Marpa::R3::Scanless::G::briefer_ahm {
     my ( $slg, $item_id ) = @_;
 
     my ($text) = $slg->call_by_tag(

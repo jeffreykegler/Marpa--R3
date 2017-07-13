@@ -50,14 +50,14 @@ S3 S
 S4 [:start:]
 END_OF_STRING
 
-Marpa::R3::Test::is( $grammar->productions_show, <<'END_OF_STRING', 'Leo166 Productions' );
+Marpa::R3::Test::is( $grammar->productions_show(), <<'END_OF_STRING', 'Leo166 Productions' );
 R1 [:start:] ::= S
 R2 S ::= a S
 R3 S ::=
 R4 a ~ [a]
 END_OF_STRING
 
-Marpa::R3::Test::is( $grammar->show_ahms, <<'END_OF_STRING', 'Leo166 AHMs' );
+Marpa::R3::Test::is( $grammar->ahms_show(), <<'END_OF_STRING', 'Leo166 AHMs' );
 AHM 0: postdot = "a"
     S ::= . a S
 AHM 1: postdot = "S"

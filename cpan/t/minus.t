@@ -103,7 +103,7 @@ my $recce = Marpa::R3::Scanless::R->new(
     }
 );
 
-Marpa::R3::Test::is( $grammar->productions_show,
+Marpa::R3::Test::is( $grammar->productions_show(),
     <<'END_RULES', 'Minuses Equation Rules' );
 R1 [:start:] ::= E
 R2 E ::= MinusMinus E
@@ -116,7 +116,7 @@ R8 Minus ~ [\-]
 R9 Number ~ [\d] +
 END_RULES
 
-Marpa::R3::Test::is( $grammar->show_ahms,
+Marpa::R3::Test::is( $grammar->ahms_show(),
     <<'END_AHMS', 'Minuses Equation AHMs' );
 AHM 0: postdot = "E"
     E ::= . E Minus E

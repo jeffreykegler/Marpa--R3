@@ -143,14 +143,14 @@ for my $test_data (@tests_data) {
     );
 
 # Marpa::R3::Display
-# name: Scanless g1_show_progress() synopsis
+# name: Scanless g1_progress_show() synopsis
 
-    my $g1_show_progress_output = $recce->g1_show_progress();
+    my $g1_progress_show_output = $recce->g1_progress_show();
 
 # Marpa::R3::Display::End
 
-    Marpa::R3::Test::is( $g1_show_progress_output,
-        <<'END_OF_EXPECTED_OUTPUT', qq{Scanless show_progess()} );
+    Marpa::R3::Test::is( $g1_progress_show_output,
+        <<'END_OF_EXPECTED_OUTPUT', qq{Scanless progress_show()} );
 F0 @0-11 B1L1c1-19 Script ::= Calculation * .
 P1 @11-11 B1L1c20 Calculation ::= . Expression
 F1 @0-11 B1L1c1-19 Calculation ::= Expression .

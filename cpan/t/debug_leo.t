@@ -43,7 +43,7 @@ my $grammar = Marpa::R3::Scanless::G->new(
 my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
 $recce->read( \('T' x 20) );
 
-$progress_report = $recce->g1_show_progress();
+$progress_report = $recce->g1_progress_show();
 
 my $value_ref = $recce->value;
 Test::More::ok( $value_ref, 'Parse ok?' );

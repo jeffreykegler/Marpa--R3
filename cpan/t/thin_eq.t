@@ -46,7 +46,7 @@ $marpa_lua->exec(<<'END_OF_LUA');
      Test.More.plan(8)
 
      -- for debugging
-     function show_progress (recce)
+     function progress_show (recce)
          local ordinal = recce:latest_earley_set()
          recce:progress_report_start(ordinal)
          local report = {string.format("Progress @%d", ordinal)}

@@ -66,7 +66,7 @@ R5 n ::= a
 R6 a ~ [\d\D]
 END_OF_STRING
 
-Marpa::R3::Test::is( $grammar->show_ahms,
+Marpa::R3::Test::is( $grammar->ahms_show(),
     <<'END_OF_STRING', 'final nonnulling AHFA' );
 AHM 0: postdot = "p"
     S ::= . p p S[R0:2]

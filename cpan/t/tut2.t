@@ -129,9 +129,9 @@ R12 [:discard:] ~ whitespace
 R13 whitespace ~ [\s] +
 END_RULES
 
-my $show_ahms_output = $grammar->show_ahms();
+my $ahms_show_output = $grammar->ahms_show();
 
-Marpa::R3::Test::is( $show_ahms_output,
+Marpa::R3::Test::is( $ahms_show_output,
     <<'END_AHM', 'Implementation Example AHMs' );
 AHM 0: postdot = "Expression"
     Calculator ::= . Expression
@@ -175,7 +175,7 @@ AHM 19: completion
     [:start:]['] ::= [:start:] .
 END_AHM
 
-my $show_earley_sets_output = $recce->show_earley_sets();
+my $earley_sets_show_output = $recce->earley_sets_show();
 
 my $expected_earley_sets = <<'END_EARLEY_SETS';
 Last Completed: 5; Furthest: 5
@@ -289,7 +289,7 @@ ahm19: R7$@0-5
   [p=R7:0@0-0; c=R6$@0-5]
 END_EARLEY_SETS
 
-Marpa::R3::Test::is( $show_earley_sets_output, $expected_earley_sets,
+Marpa::R3::Test::is( $earley_sets_show_output, $expected_earley_sets,
     'Implementation Example Earley Sets' );
 
 my $trace_output;

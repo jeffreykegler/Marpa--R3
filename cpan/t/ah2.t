@@ -85,7 +85,7 @@ g1 S2 [:start:]
 g1 S3 'a'
 EOS
 
-Marpa::R3::Test::is( $grammar->show_nsys,
+Marpa::R3::Test::is( $grammar->nsys_show(),
         <<'EOS', 'Aycock/Horspool ISYs' );
 0: A
 1: A[], nulling
@@ -99,7 +99,7 @@ Marpa::R3::Test::is( $grammar->show_nsys,
 9: [:start:][']
 EOS
 
-Marpa::R3::Test::is( $grammar->show_nrls,
+Marpa::R3::Test::is( $grammar->nrls_show(),
     <<'EOS', 'Aycock/Horspool IRLs' );
 0: S ::= A S[R0:1]
 1: S ::= A A[] A[] A[]
@@ -142,7 +142,7 @@ my $accessible_symbols = join q{ }, sort map { $grammar->g1_symbol_name($_) }
 Marpa::R3::Test::is( $accessible_symbols, q{A S [:start:] [Lex-0]},
     'Aycock/Horspool Accessible Symbols' );
 
-Marpa::R3::Test::is( $grammar->show_ahms(),
+Marpa::R3::Test::is( $grammar->ahms_show(),
     <<'EOS', 'Aycock/Horspool AHMs' );
 AHM 0: postdot = "A"
     S ::= . A S[R0:1]
@@ -407,7 +407,7 @@ And-node #10: R8:2@2-3C9@2
 And-node #9: R9:1@2-3S6@2
 END_OF_TEXT
 
-            Marpa::R3::Test::is( $recce->show_and_nodes(),
+            Marpa::R3::Test::is( $recce->and_nodes_show(),
                 $and_node_output, 'XS And nodes' );
 
             my $or_node_output = <<'END_OF_TEXT';
@@ -434,7 +434,7 @@ R8:2@2-3
 R9:1@2-3
 END_OF_TEXT
 
-            Marpa::R3::Test::is( $recce->show_or_nodes(),
+            Marpa::R3::Test::is( $recce->or_nodes_show(),
                 $or_node_output, 'XS Or nodes' );
 
                 my $bocage_output = <<'END_OF_TEXT';
@@ -464,7 +464,7 @@ END_OF_TEXT
 23: 20=R3:2@1-3 R3:1@1-2 R8:2@2-3
 END_OF_TEXT
 
-                Marpa::R3::Test::is( $recce->show_bocage(), $bocage_output,
+                Marpa::R3::Test::is( $recce->bocage_show(), $bocage_output,
                     'XS Bocage' );
 
         } ## end TESTS_FOLDED_FROM_bocage_t
@@ -483,7 +483,7 @@ END_OF_TEXT
         }
 
         if ( $i == 3 ) {
-                Marpa::R3::Test::is( $recce->show_tree(),
+                Marpa::R3::Test::is( $recce->tree_show(),
                     $tree_expected{$value}, qq{Tree, "$value"} );
         }
 
@@ -716,7 +716,7 @@ ahm26: R11$@0-4
 END_OF_SETS
 
 Marpa::R3::Test::is(
-    $recce->show_earley_sets(2),
+    $recce->earley_sets_show(2),
     $expected_earley_sets,
     'Aycock/Horspool Earley sets'
 );

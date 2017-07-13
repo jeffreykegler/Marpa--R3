@@ -94,7 +94,7 @@ TOKEN: for my $token_and_value (@tokens) {
     last TOKEN if not defined $recce->lexeme_read( $name, $recce->pos(), (length $value), $value );
 }
 
-$progress_report = $recce->g1_show_progress( 0, -1 );
+$progress_report = $recce->g1_progress_show( 0, -1 );
 
 my $value_ref = $recce->value;
 my $value = $value_ref ? ${$value_ref} : 'No Parse';

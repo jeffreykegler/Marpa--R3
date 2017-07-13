@@ -592,7 +592,7 @@ END_OF_LUA
 
 }
 
-sub Marpa::R3::Scanless::R::g1_show_progress {
+sub Marpa::R3::Scanless::R::g1_progress_show {
     my ( $slr, $start_ordinal, $end_ordinal ) = @_;
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
 
@@ -608,7 +608,7 @@ sub Marpa::R3::Scanless::R::g1_show_progress {
     else {
         if ( $start_ordinal < 0 or $start_ordinal > $last_ordinal ) {
             return
-"Marpa::R3::Scanless::R::g1_show_progress start index is $start_ordinal, "
+"Marpa::R3::Scanless::R::g1_progress_show start index is $start_ordinal, "
               . "must be in range 0-$last_ordinal";
         }
     } ## end else [ if ( $start_ordinal < 0 ) ]
@@ -623,7 +623,7 @@ sub Marpa::R3::Scanless::R::g1_show_progress {
         }
         if ( $end_ordinal < 0 ) {
             return
-"Marpa::R3::Scanless::R::g1_show_progress end index is $end_ordinal_argument, "
+"Marpa::R3::Scanless::R::g1_progress_show end index is $end_ordinal_argument, "
               . sprintf ' must be in range %d-%d', -( $last_ordinal + 1 ),
               $last_ordinal;
         } ## end if ( $end_ordinal < 0 )
@@ -1394,7 +1394,7 @@ END_OF_LUA
 }
 
 # not to be documented
-sub Marpa::R3::Scanless::R::show_earley_sets {
+sub Marpa::R3::Scanless::R::earley_sets_show {
     my ($slr)                = @_;
 
     my ($last_completed_earleme, $furthest_earleme) = $slr->call_by_tag(
@@ -1409,7 +1409,7 @@ END_OF_LUA
         . "Furthest: $furthest_earleme\n";
     LIST: for ( my $ix = 0;; $ix++ ) {
         my $set_desc =
-          $slr->Marpa::R3::Scanless::R::show_earley_set( $ix );
+          $slr->Marpa::R3::Scanless::R::earley_set_show( $ix );
         last LIST if not $set_desc;
         $text .= "Earley Set $ix\n$set_desc";
     }
@@ -1417,7 +1417,7 @@ END_OF_LUA
 }
 
 # not to be documented
-sub Marpa::R3::Scanless::R::show_earley_set {
+sub Marpa::R3::Scanless::R::earley_set_show {
     my ( $slr, $traced_set_id ) = @_;
     my $slg     = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
 
@@ -1491,7 +1491,7 @@ END_OF_LUA
 
                 my @pieces = ();
                 if ( defined $predecessor_ahm ) {
-                    my $ahm_desc = $slg->show_briefer_ahm($predecessor_ahm);
+                    my $ahm_desc = $slg->briefer_ahm($predecessor_ahm);
                     push @pieces,
                         'c='
                       . $ahm_desc . q{@}
@@ -1543,12 +1543,12 @@ END_OF_LUA
                 my $ahm_id         = $completion_link_data{ahm_id};
                 my $origin_earleme = $completion_link_data{origin_earleme};
                 my $middle_earleme = $completion_link_data{middle_earleme};
-                my $ahm_desc       = $slg->show_briefer_ahm($ahm_id);
+                my $ahm_desc       = $slg->briefer_ahm($ahm_id);
 
                 my @pieces = ();
                 if ( defined $predecessor_ahm_id ) {
                     my $predecessor_ahm_desc =
-                      $slg->show_briefer_ahm($predecessor_ahm_id);
+                      $slg->briefer_ahm($predecessor_ahm_id);
                     push @pieces,
                         'p='
                       . $predecessor_ahm_desc . '@'
@@ -1593,7 +1593,7 @@ END_OF_LUA
                 my $leo_transition_symbol =
                   $leo_link_data{leo_transition_symbol};
                 my $ahm_id   = $leo_link_data{ahm_id};
-                my $ahm_desc = $slg->show_briefer_ahm($ahm_id);
+                my $ahm_desc = $slg->briefer_ahm($ahm_id);
 
                 my @pieces = ();
                 push @pieces,
@@ -1663,38 +1663,38 @@ END_OF_LUA
 }
 
 # not to be documented
-sub Marpa::R3::Scanless::R::show_or_nodes {
+sub Marpa::R3::Scanless::R::or_nodes_show {
     my ( $slr ) = @_;
 
     my ($result) = $slr->call_by_tag(
     ('@' . __FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', '');
     local recce = ...
-    return recce:show_or_nodes()
+    return recce:or_nodes_show()
 END_OF_LUA
 
     return $result;
 }
 
 # not to be documented
-sub Marpa::R3::Scanless::R::show_and_nodes {
+sub Marpa::R3::Scanless::R::and_nodes_show {
     my ( $slr ) = @_;
     my ($result) = $slr->call_by_tag(
     ('@' . __FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', '');
     local recce = ...
-    return recce:show_and_nodes()
+    return recce:and_nodes_show()
 END_OF_LUA
 
     return $result;
 }
 
 # not to be documented
-sub Marpa::R3::Scanless::R::show_tree {
+sub Marpa::R3::Scanless::R::tree_show {
     my ( $slr, $verbose ) = @_;
     my $text = q{};
     NOOK: for ( my $nook_id = 0; 1; $nook_id++ ) {
-        my $nook_text = $slr->show_nook( $nook_id, $verbose );
+        my $nook_text = $slr->nook_show( $nook_id, $verbose );
         last NOOK if not defined $nook_text;
         $text .= "$nook_id: $nook_text";
     }
@@ -1702,7 +1702,7 @@ sub Marpa::R3::Scanless::R::show_tree {
 }
 
 # not to be documented
-sub Marpa::R3::Scanless::R::show_nook {
+sub Marpa::R3::Scanless::R::nook_show {
     my ( $slr, $nook_id, $verbose ) = @_;
 
     my ($or_node_id, $text) = $slr->call_by_tag(
@@ -1779,14 +1779,14 @@ END_OF_LUA
 }
 
 # not to be documented
-sub Marpa::R3::Scanless::R::show_bocage {
+sub Marpa::R3::Scanless::R::bocage_show {
     my ($slr)     = @_;
 
     my ($result) = $slr->call_by_tag(
     ('@' . __FILE__ . ':' . __LINE__),
         <<'END_OF_LUA', '');
         local recce = ...
-        return recce:show_bocage()
+        return recce:bocage_show()
 END_OF_LUA
 
     return $result;

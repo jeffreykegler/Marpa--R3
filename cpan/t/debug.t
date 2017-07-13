@@ -99,7 +99,7 @@ my $recce = Marpa::R3::Scanless::R->new(
 my $test_input = 'a = 8675309 + 42 * 711';
 my $eval_error = $EVAL_ERROR if not eval { $recce->read( \$test_input ); 1 };
 
-$progress_report = $recce->g1_show_progress( 0, -1 );
+$progress_report = $recce->g1_progress_show( 0, -1 );
 
 # Marpa::R3::Display::End
 

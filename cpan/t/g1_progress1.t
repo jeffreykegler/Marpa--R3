@@ -62,7 +62,7 @@ R2 A ::= 'a'
 R3 [:start:] ::= S
 EOS
 
-Marpa::R3::Test::is( $grammar->g1_symbols_show,
+Marpa::R3::Test::is( $grammar->g1_symbols_show(),
     <<'EOS', 'Aycock/Horspool Symbols' );
 g1 S0 A
 g1 S1 S
@@ -70,7 +70,7 @@ g1 S2 [:start:]
 g1 S3 'a'
 EOS
 
-Marpa::R3::Test::is( $grammar->show_nrls,
+Marpa::R3::Test::is( $grammar->nrls_show(),
     <<'EOS', 'Aycock/Horspool IRLs' );
 0: S ::= A S[R0:1]
 1: S ::= A A[] A[] A[] A[] A[] A[]

@@ -3587,7 +3587,7 @@ part of a "Pure Lua" implementation.
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slr.show_leo_item(slr)
+    function _M.class_slr.leo_item_show(slr)
         local g1r = slr.g1
         local g1g = slr.slg.g1
         local leo_base_state = g1r:_leo_base_state()
@@ -5137,7 +5137,7 @@ indexed by isyid.
          return xsy_name
     end
 
-    function _M.class_grammar.show_ahm(lmw_g, item_id)
+    function _M.class_grammar.ahm_show(lmw_g, item_id)
         local postdot_id = lmw_g:_ahm_postdot(item_id)
         local pieces = { "AHM " .. item_id .. ': ' }
         local properties = {}
@@ -5156,16 +5156,16 @@ indexed by isyid.
         return table.concat(pieces)
     end
 
-    function _M.class_grammar.show_ahms(lmw_g)
+    function _M.class_grammar.ahms_show(lmw_g)
         local pieces = {}
         local count = lmw_g:_ahm_count()
         for i = 0, count -1 do
-            pieces[#pieces+1] = lmw_g:show_ahm(i)
+            pieces[#pieces+1] = lmw_g:ahm_show(i)
         end
         return table.concat(pieces)
     end
 
-    function _M.class_grammar.show_nsy(lmw_g, nsy_id)
+    function _M.class_grammar.nsy_show(lmw_g, nsy_id)
         local name = lmw_g:nsy_name(nsy_id)
         local pieces = { string.format("%d: %s", nsy_id, name) }
         local tags = {}
@@ -5441,7 +5441,7 @@ It should free all memory associated with the valuation.
         return table.concat(tag)
     end
 
-    function _M.class_slr.show_and_nodes(slr)
+    function _M.class_slr.and_nodes_show(slr)
         local bocage = slr.lmw_b
         local g1r = slr.g1
         local data = {}
@@ -5516,7 +5516,7 @@ It should free all memory associated with the valuation.
             set)
     end
 
-    function _M.class_slr.show_or_nodes(slr)
+    function _M.class_slr.or_nodes_show(slr)
         local bocage = slr.lmw_b
         local g1r = slr.g1
         local data = {}
@@ -5564,11 +5564,11 @@ It should free all memory associated with the valuation.
 
 ```
 
-`show_bocage` returns a string which describes the bocage.
+`bocage_show` returns a string which describes the bocage.
 
 ```
     -- miranda: section+ diagnostics
-    function _M.class_slr.show_bocage(slr)
+    function _M.class_slr.bocage_show(slr)
         local bocage = slr.lmw_b
         local data = {}
         local or_node_id = -1

@@ -18,7 +18,6 @@
 
 # Non-working code, not kept up to date
 # Kept for reference
-die "Non-working code";
 
 use 5.010001;
 use strict;
@@ -57,22 +56,24 @@ my $grammar = Marpa::R3::Scanless::G->new( {   source => \$dsl });
 
 GRAMMAR_TESTS_FOLDED_FROM_ah2_t: {
 
-Marpa::R3::Test::is( $grammar->show_rules, <<'EOS', 'Aycock/Horspool Rules' );
-G1 R0 S ::= A A A A A A A
-G1 R1 A ::=
-G1 R2 A ::= 'a'
-G1 R3 [:start] ::= S
+Marpa::R3::Test::is( $grammar->productions_show(), <<'EOS', 'Aycock/Horspool Rules' );
+R1 [:start:] ::= S
+R2 S ::= A A A A A A A
+R3 A ::=
+R4 A ::= 'a'
+R5 'a' ~ [a]
 EOS
 
-Marpa::R3::Test::is( $grammar->show_symbols,
+Marpa::R3::Test::is( $grammar->symbols_show(),
     <<'EOS', 'Aycock/Horspool Symbols' );
-G1 S0 A
-G1 S1 S
-G1 S2 [:start]
-G1 S3 'a'
+S1 A
+S2 S
+S3 [:start:]
+S4 'a'
+S5 [a]
 EOS
 
-Marpa::R3::Test::is( $grammar->show_irls,
+Marpa::R3::Test::is( $grammar->show({diag=>1}),
     <<'EOS', 'Aycock/Horspool IRLs' );
 0: S -> A S[R0:1]
 1: S -> A A[] A[] A[] A[] A[] A[]
@@ -99,8 +100,30 @@ EOS
 
 }
 
-my ($S_sym) = grep { $grammar->symbol_name($_) eq 'S' } $grammar->symbol_ids();
-my ($target_rule) = grep { ($grammar->rule_expand($_))[0] eq $S_sym } $grammar->rule_ids();
+my $S_sym;
+SYMBOL: for (
+    my $iter = $grammar->g1_symbol_ids_gen() ;
+    defined( my $symbol_id = $iter->() ) ;
+  )
+{
+    if ( $grammar->g1_symbol_name($symbol_id) eq 'S' ) {
+        $S_sym = $symbol_id;
+        last SYMBOL;
+    }
+}
+
+my $target_rule;
+RULE: for (
+    my $iter = $grammar->g1_rule_ids_gen() ;
+    defined( my $rule_id = $iter->() ) ;
+  )
+{
+    if ( ( $grammar->g1_rule_expand($rule_id) )[0] eq $S_sym ) {
+        $target_rule = $rule_id;
+        last RULE;
+    }
+}
+
 
 my $recce = Marpa::R3::Scanless::R->new( {   grammar => $grammar });
 my $input_length = 7;

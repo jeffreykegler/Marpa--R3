@@ -106,9 +106,9 @@ S14 [\=]
 S15 [a-z]
 END_SYMBOLS
 
-my $rules_show_output = $grammar->productions_show();
+my $productions_show_output = $grammar->productions_show();
 
-Marpa::R3::Test::is( $rules_show_output, <<'END_RULES', 'Leo Example Productions' );
+Marpa::R3::Test::is( $productions_show_output, <<'END_RULES', 'Leo Example Productions' );
 R1 [:start:] ::= Statement
 R2 Expression ::= Lvalue AddAssignOp Expression
 R3 Expression ::= Lvalue MinusAssignOp Expression
@@ -124,9 +124,9 @@ R12 MinusAssignOp ~ [\-] [\=]
 R13 MultiplyAssignOp ~ [\*] [\=]
 END_RULES
 
-my $show_ahms_output = $grammar->show_ahms();
+my $ahms_show_output = $grammar->ahms_show();
 
-Marpa::R3::Test::is( $show_ahms_output, <<'END_AHMS', 'Leo Example AHMs' );
+Marpa::R3::Test::is( $ahms_show_output, <<'END_AHMS', 'Leo Example AHMs' );
 AHM 0: postdot = "Expression"
     Statement ::= . Expression
 AHM 1: completion
@@ -181,9 +181,9 @@ AHM 25: completion
     [:start:]['] ::= [:start:] .
 END_AHMS
 
-my $show_earley_sets_output_before = $recce->show_earley_sets();
+my $earley_sets_show_output_before = $recce->earley_sets_show();
 
-Marpa::R3::Test::is( $show_earley_sets_output_before,
+Marpa::R3::Test::is( $earley_sets_show_output_before,
     <<'END_EARLEY_SETS', 'Leo Example Earley Sets "Before"' );
 Last Completed: 9; Furthest: 9
 Earley Set 0
@@ -436,7 +436,7 @@ close $trace_fh;
 my $value = ref $value_ref ? ${$value_ref} : 'No Parse';
 Marpa::R3::Test::is( $value, 'a=42 b=42 c=-5 d=6 e=3', 'Leo Example Value' );
 
-my $show_earley_sets_output_after = $recce->show_earley_sets();
+my $earley_sets_show_output_after = $recce->earley_sets_show();
 
 my $expected_trace_output = <<'END_TRACE_OUTPUT';
 Setting trace_values option to 2

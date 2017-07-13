@@ -177,7 +177,7 @@ R31 WITH ~ [W] [i] [t] [h]
 R32 FOR ~ [F] [o] [r]
 END_OF_RULES
 
-Marpa::R3::Test::is( $grammar->show_ahms(),
+Marpa::R3::Test::is( $grammar->ahms_show(),
     <<'END_OF_AHMS', 'AHMs' );
 AHM 0: postdot = "Input[Seq]"
     Input ::= . Input[Seq]
@@ -323,7 +323,7 @@ my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
 $recce->read( \$input );
 my $value_ref = $recce->value();
 
-Marpa::R3::Test::is( $recce->show_earley_sets(),
+Marpa::R3::Test::is( $recce->earley_sets_show(),
     <<'END_OF_EARLEY_SETS', 'Earley Sets' );
 Last Completed: 8; Furthest: 8
 Earley Set 0
@@ -497,7 +497,7 @@ ahm62: R22:0@8-8
   R22:0: WithPf ::= . WITH PF
 END_OF_EARLEY_SETS
 
-Marpa::R3::Test::is( $recce->show_and_nodes(),
+Marpa::R3::Test::is( $recce->and_nodes_show(),
         <<'END_OF_AND_NODES', 'And Nodes' );
 And-node #0: R4:1@0-1S4@0
 And-node #19: R0:1@0-8C2@0
@@ -523,7 +523,7 @@ And-node #11: R19:2@6-8C20@7
 And-node #10: R20:1@7-8S22@7
 END_OF_AND_NODES
 
-Marpa::R3::Test::is( $recce->show_or_nodes(),
+Marpa::R3::Test::is( $recce->or_nodes_show(),
         <<'END_OF_OR_NODES', 'Or Nodes' );
 R4:1@0-1
 R0:1@0-8

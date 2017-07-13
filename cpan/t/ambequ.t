@@ -132,7 +132,7 @@ END_RULES
 
 $actual_ref = save_stdout();
 
-print $grammar->show_ahms()
+print $grammar->ahms_show()
     or die "print failed: $ERRNO";
 
 restore_stdout();
@@ -167,7 +167,7 @@ $recce->read( \'2-0*3+1' );
 
 $actual_ref = save_stdout();
 
-print $recce->show_earley_sets()
+print $recce->earley_sets_show()
     or die "print failed: $ERRNO";
 
 my $expected_earley_sets = <<'END_OF_EARLEY_SETS';
@@ -315,7 +315,7 @@ restore_stdout();
 
 $actual_ref = save_stdout();
 
-print $recce->g1_show_progress()
+print $recce->g1_progress_show()
     or die "print failed: $ERRNO";
 
 Marpa::R3::Test::is( ${$actual_ref},

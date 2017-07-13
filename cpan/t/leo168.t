@@ -83,7 +83,7 @@ R6 a ~ [a]
 R7 b ~ [b]
 END_OF_STRING
 
-Marpa::R3::Test::is( $grammar->show_ahms, <<'END_OF_STRING', 'Leo168 AHMs' );
+Marpa::R3::Test::is( $grammar->ahms_show(), <<'END_OF_STRING', 'Leo168 AHMs' );
 AHM 0: postdot = "a"
     S ::= . a S
 AHM 1: postdot = "S"
