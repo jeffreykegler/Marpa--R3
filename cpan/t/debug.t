@@ -1324,9 +1324,15 @@ sub do_something { push @TEST_ARRAY, $_[0] }
 @TEST_ARRAY = ();
 
 # Marpa::R3::Display
-# name: SLG symbol_ids() synopsis
+# name: SLG symbol_ids_gen() synopsis
 
-do_something($_) for $grammar->symbol_ids();
+for (
+    my $iter = $grammar->symbol_ids_gen() ;
+    defined( my $symbol_id = $iter->() ) ;
+  )
+{
+    do_something($symbol_id);
+}
 
 # Marpa::R3::Display::End
 
@@ -1339,9 +1345,15 @@ Marpa::R3::Test::is(
 @TEST_ARRAY = ();
 
 # Marpa::R3::Display
-# name: SLG g1_symbol_ids() synopsis
+# name: SLG g1_symbol_ids_gen() synopsis
 
-do_something($_) for $grammar->g1_symbol_ids();
+for (
+    my $iter = $grammar->g1_symbol_ids_gen() ;
+    defined( my $symbol_id = $iter->() ) ;
+  )
+{
+    do_something($symbol_id);
+}
 
 # Marpa::R3::Display::End
 
@@ -1354,9 +1366,15 @@ Marpa::R3::Test::is(
 @TEST_ARRAY = ();
 
 # Marpa::R3::Display
-# name: SLG l0_symbol_ids() synopsis
+# name: SLG l0_symbol_ids_gen() synopsis
 
-do_something($_) for $grammar->l0_symbol_ids();
+for (
+    my $iter = $grammar->l0_symbol_ids_gen() ;
+    defined( my $symbol_id = $iter->() ) ;
+  )
+{
+    do_something($symbol_id);
+}
 
 # Marpa::R3::Display::End
 
@@ -1370,7 +1388,10 @@ my $text;
 
 $text = q{};
 
-for my $symbol_id ( $grammar->symbol_ids() ) {
+for (
+    my $iter = $grammar->symbol_ids_gen() ;
+    defined( my $symbol_id = $iter->() ) ;
+  ) {
 
 # Marpa::R3::Display
 # name: SLG symbol_name() synopsis
@@ -1525,7 +1546,11 @@ END_OF_TEXT
 
 $text = q{};
 
-for my $symbol_id ( $grammar->g1_symbol_ids() ) {
+for (
+    my $iter = $grammar->g1_symbol_ids_gen() ;
+    defined( my $symbol_id = $iter->() ) ;
+  )
+{
 
 # Marpa::R3::Display
 # name: SLG g1_symbol_name() synopsis
@@ -1635,7 +1660,11 @@ END_OF_TEXT
 
 $text = '';
 
-for my $symbol_id ( $grammar->l0_symbol_ids() ) {
+for (
+    my $iter = $grammar->l0_symbol_ids_gen() ;
+    defined( my $symbol_id = $iter->() ) ;
+  )
+{
 
 # Marpa::R3::Display
 # name: SLG l0_symbol_name() synopsis
@@ -1772,7 +1801,11 @@ END_OF_TEXT
 
 $text = q{};
 
-for my $prid ( $grammar->production_ids() ) {
+for (
+    my $iter = $grammar->production_ids_gen() ;
+    defined( my $prid = $iter->() ) ;
+  )
+{
 
 # Marpa::R3::Display
 # name: SLG production_show() synopsis
@@ -1829,7 +1862,11 @@ END_OF_TEXT
 
 $text = q{};
 
-for my $rule_id ( $grammar->g1_rule_ids() ) {
+for (
+    my $iter = $grammar->g1_rule_ids_gen() ;
+    defined( my $rule_id = $iter->() ) ;
+  )
+{
 
 # Marpa::R3::Display
 # name: SLG g1_rule_show() synopsis
@@ -1871,7 +1908,11 @@ END_OF_TEXT
 
 $text = q{};
 
-for my $rule_id ( $grammar->l0_rule_ids() ) {
+for (
+    my $iter = $grammar->l0_rule_ids_gen() ;
+    defined( my $rule_id = $iter->() ) ;
+  )
+{
 
 # Marpa::R3::Display
 # name: SLG l0_rule_show() synopsis
@@ -1921,7 +1962,11 @@ END_OF_TEXT
 
 $text = q{};
 
-for my $prid ( $grammar->production_ids() ) {
+for (
+    my $iter = $grammar->production_ids_gen() ;
+    defined( my $prid = $iter->() ) ;
+  )
+{
 
 # Marpa::R3::Display
 # name: SLG production_show() diag form synopsis
@@ -1979,7 +2024,11 @@ END_OF_TEXT
 
 $text = q{};
 
-for my $rule_id ( $grammar->g1_rule_ids() ) {
+for (
+    my $iter = $grammar->g1_rule_ids_gen() ;
+    defined( my $rule_id = $iter->() ) ;
+  )
+{
 
 # Marpa::R3::Display
 # name: SLG g1_rule_show() diag form synopsis
@@ -2021,7 +2070,11 @@ END_OF_TEXT
 
 $text = q{};
 
-for my $rule_id ( $grammar->l0_rule_ids() ) {
+for (
+    my $iter = $grammar->l0_rule_ids_gen() ;
+    defined( my $rule_id = $iter->() ) ;
+  )
+{
 
 # Marpa::R3::Display
 # name: SLG l0_rule_show() diag form synopsis
@@ -2072,9 +2125,15 @@ END_OF_TEXT
 @TEST_ARRAY = ();
 
 # Marpa::R3::Display
-# name: SLG production_ids() synopsis
+# name: SLG production_ids_gen() synopsis
 
-do_something($_) for $grammar->production_ids();
+for (
+    my $iter = $grammar->production_ids_gen() ;
+    defined( my $prid = $iter->() ) ;
+  )
+{
+    do_something($prid);
+}
 
 # Marpa::R3::Display::End
 
@@ -2087,9 +2146,15 @@ Marpa::R3::Test::is(
 @TEST_ARRAY = ();
 
 # Marpa::R3::Display
-# name: SLG g1_rule_ids() synopsis
+# name: SLG g1_rule_ids_gen() synopsis
 
-do_something($_) for $grammar->g1_rule_ids();
+for (
+    my $iter = $grammar->g1_rule_ids_gen() ;
+    defined( my $rule_id = $iter->() ) ;
+  )
+{
+    do_something($rule_id);
+}
 
 # Marpa::R3::Display::End
 
@@ -2102,9 +2167,15 @@ Marpa::R3::Test::is(
 @TEST_ARRAY = ();
 
 # Marpa::R3::Display
-# name: SLG l0_rule_ids() synopsis
+# name: SLG l0_rule_ids_gen() synopsis
 
-do_something($_) for $grammar->l0_rule_ids();
+for (
+    my $iter = $grammar->l0_rule_ids_gen() ;
+    defined( my $rule_id = $iter->() ) ;
+  )
+{
+    do_something($rule_id);
+}
 
 # Marpa::R3::Display::End
 
@@ -2116,7 +2187,11 @@ Marpa::R3::Test::is(
 
 $text = q{};
 
-for my $production_id ( $grammar->production_ids() ) {
+for (
+    my $iter = $grammar->production_ids_gen() ;
+    defined( my $production_id = $iter->() ) ;
+  )
+{
 
 # Marpa::R3::Display
 # name: SLG production_expand() synopsis
@@ -2168,7 +2243,11 @@ END_OF_TEXT
 
 $text = q{};
 
-for my $rule_id ( $grammar->g1_rule_ids() ) {
+for (
+    my $iter = $grammar->g1_rule_ids_gen() ;
+    defined( my $rule_id = $iter->() ) ;
+  )
+{
 
 # Marpa::R3::Display
 # name: SLG g1_rule_expand() synopsis
@@ -2205,7 +2284,11 @@ END_OF_TEXT
 
 $text = q{};
 
-for my $rule_id ( $grammar->l0_rule_ids() ) {
+for (
+    my $iter = $grammar->l0_rule_ids_gen() ;
+    defined( my $rule_id = $iter->() ) ;
+  )
+{
 
 # Marpa::R3::Display
 # name: SLG l0_rule_expand() synopsis
