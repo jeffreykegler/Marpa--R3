@@ -54,8 +54,6 @@ END_OF_DSL
 
 my $grammar = Marpa::R3::Scanless::G->new( {   source => \$dsl });
 
-GRAMMAR_TESTS_FOLDED_FROM_ah2_t: {
-
 Marpa::R3::Test::is( $grammar->productions_show(), <<'EOS', 'Aycock/Horspool Rules' );
 R1 [:start:] ::= S
 R2 S ::= A A A A A A A
@@ -98,33 +96,6 @@ Marpa::R3::Test::is( $grammar->nrls_show(),
 20: [:start:]['] ::= [:start:]
 EOS
 
-}
-
-my $S_sym;
-SYMBOL: for (
-    my $iter = $grammar->g1_symbol_ids_gen() ;
-    defined( my $symbol_id = $iter->() ) ;
-  )
-{
-    if ( $grammar->g1_symbol_name($symbol_id) eq 'S' ) {
-        $S_sym = $symbol_id;
-        last SYMBOL;
-    }
-}
-
-my $target_rule;
-RULE: for (
-    my $iter = $grammar->g1_rule_ids_gen() ;
-    defined( my $rule_id = $iter->() ) ;
-  )
-{
-    if ( ( $grammar->g1_rule_expand($rule_id) )[0] eq $S_sym ) {
-        $target_rule = $rule_id;
-        last RULE;
-    }
-}
-
-
 my $recce = Marpa::R3::Scanless::R->new( {   grammar => $grammar });
 my $input_length = 7;
 my $input = ('a' x $input_length);
@@ -134,8 +105,8 @@ sub earley_set_display {
     my ($earley_set) = @_;
     my $result = "=== Earley Set $earley_set ===\n";
     my ($set_data) = $recce->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 'ii', $earley_set, $target_rule );
-      local recce, earley_set_id, target_rule = ...
+        <<'END_OF_LUA', 'i', $earley_set );
+      local recce, earley_set_id = ...
       local function cmp_seq(a, b)
           for i = 1, #a do
              if a[i] < b[i] then return true end
@@ -143,17 +114,17 @@ sub earley_set_display {
           end
           return false
       end
-      local g1r = recce.g1 -- fixed, but not tested
-      local g1g = recce.slg.g1 -- fixed, but not tested
+      local g1r = recce.g1
+      local g1g = recce.slg.g1
       local function origin_gen(es_id, eim_id)
-          local rule_id, dot, this_origin, irl_id, irl_dot
+          local irl_id, irl_dot, this_origin, nrl_id, nrl_dot
               = g1r:earley_item_look(es_id, eim_id)
-          if rule_id < 0 then return end
-          if g1g:_nrl_is_virtual_lhs(irl_id) == 0 then
+          if irl_id < 0 then return end
+          if g1g:_nrl_is_virtual_lhs(nrl_id) == 0 then
               coroutine.yield( this_origin )
               return
           end
-          local lhs = g1g:_nrl_lhs(irl_id)
+          local lhs = g1g:_nrl_lhs(nrl_id)
           local eims = g1r:postdot_eims(this_origin, lhs)
           -- print(string.format('eims for %s@%d: %s',
               -- g1g:isy_name(lhs), this_origin, inspect(eims)))
@@ -175,14 +146,13 @@ sub earley_set_display {
       local fmt = "jjjj"
       for item_id = 0, math.maxinteger do
           -- IRL data for debugging only -- delete
-          local rule_id, dot, origin, irl_id, irl_dot = g1r:earley_item_look(earley_set_id, item_id)
-          if rule_id < 0 then break end
-          if rule_id ~= target_rule then goto NEXT_ITEM end
+          local irl_id, irl_dot, origin, nrl_id, nrl_dot = g1r:earley_item_look(earley_set_id, item_id)
+          if irl_id < 0 then break end
 
           for origin in origins(earley_set_id, item_id) do
               -- type: completion, prediction or medial?
-              local type = dot < 0 and 2 or dot == 0 and 0 or 1
-              local key = string.pack(fmt, type, rule_id, dot, origin)
+              local type = irl_dot < 0 and 2 or irl_dot == 0 and 0 or 1
+              local key = string.pack(fmt, type, irl_id, irl_dot, origin)
               xrl_data[key] = true
           end
 
@@ -190,18 +160,18 @@ sub earley_set_display {
       end
       local result = {}
       for key, value in pairs(xrl_data) do
-           local type, rule_id, dot, origin = string.unpack(fmt, key)
-           result[#result+1] = { type, rule_id, dot, origin }
+           local type, irl_id, irl_dot, origin = string.unpack(fmt, key)
+           result[#result+1] = { type, irl_id, irl_dot, origin }
       end
       table.sort(result, cmp_seq)
       return result
 END_OF_LUA
     for my $datum ( @{$set_data} ) {
-        my ( $type, $rule_id, $dot, $origin ) = @{$datum};
+        my ( $type, $irl_id, $irl_dot, $origin ) = @{$datum};
         $result .=
-            "S:$dot " . '@'
+            "S:$irl_dot " . '@'
           . "$origin-$earley_set "
-          . $grammar->g1_dotted_rule_show( $rule_id, $dot ) . "\n";
+          . $grammar->g1_dotted_rule_show( $irl_id, $irl_dot ) . "\n";
     }
     return $result;
 }
@@ -224,6 +194,8 @@ S:4 @0-1 S ::= A A A A . A A A
 S:5 @0-1 S ::= A A A A A . A A
 S:6 @0-1 S ::= A A A A A A . A
 S:-1 @0-1 S ::= A A A A A A A .
+S:-1 @0-1 A ::= 'a' .
+S:-1 @0-1 [:start:] ::= S .
 EOS
 
 Marpa::R3::Test::is( earley_set_display(2),
@@ -235,6 +207,8 @@ S:4 @0-2 S ::= A A A A . A A A
 S:5 @0-2 S ::= A A A A A . A A
 S:6 @0-2 S ::= A A A A A A . A
 S:-1 @0-2 S ::= A A A A A A A .
+S:-1 @1-2 A ::= 'a' .
+S:-1 @0-2 [:start:] ::= S .
 EOS
 
 Marpa::R3::Test::is( earley_set_display(3),
@@ -245,6 +219,8 @@ S:4 @0-3 S ::= A A A A . A A A
 S:5 @0-3 S ::= A A A A A . A A
 S:6 @0-3 S ::= A A A A A A . A
 S:-1 @0-3 S ::= A A A A A A A .
+S:-1 @2-3 A ::= 'a' .
+S:-1 @0-3 [:start:] ::= S .
 EOS
 
 Marpa::R3::Test::is( earley_set_display(4),
@@ -254,6 +230,8 @@ S:4 @0-4 S ::= A A A A . A A A
 S:5 @0-4 S ::= A A A A A . A A
 S:6 @0-4 S ::= A A A A A A . A
 S:-1 @0-4 S ::= A A A A A A A .
+S:-1 @3-4 A ::= 'a' .
+S:-1 @0-4 [:start:] ::= S .
 EOS
 
 Marpa::R3::Test::is( earley_set_display(5),
@@ -262,6 +240,8 @@ Marpa::R3::Test::is( earley_set_display(5),
 S:5 @0-5 S ::= A A A A A . A A
 S:6 @0-5 S ::= A A A A A A . A
 S:-1 @0-5 S ::= A A A A A A A .
+S:-1 @4-5 A ::= 'a' .
+S:-1 @0-5 [:start:] ::= S .
 EOS
 
 Marpa::R3::Test::is( earley_set_display(6),
@@ -269,12 +249,16 @@ Marpa::R3::Test::is( earley_set_display(6),
 === Earley Set 6 ===
 S:6 @0-6 S ::= A A A A A A . A
 S:-1 @0-6 S ::= A A A A A A A .
+S:-1 @5-6 A ::= 'a' .
+S:-1 @0-6 [:start:] ::= S .
 EOS
 
 Marpa::R3::Test::is( earley_set_display(7),
     <<'EOS', 'Earley Set 7' );
 === Earley Set 7 ===
 S:-1 @0-7 S ::= A A A A A A A .
+S:-1 @6-7 A ::= 'a' .
+S:-1 @0-7 [:start:] ::= S .
 EOS
 
 # vim: expandtab shiftwidth=4:
