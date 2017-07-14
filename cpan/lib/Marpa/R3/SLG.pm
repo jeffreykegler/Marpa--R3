@@ -2209,7 +2209,7 @@ sub Marpa::R3::Scanless::G::briefer_ahm {
         <<'END_OF_LUA', 'i', $item_id );
     local grammar, item_id = ...
     local g1g = grammar.g1
-    local irl_id = g1g:_ahm_irl(item_id)
+    local irl_id = g1g:_ahm_nrl(item_id)
     local dot_position = g1g:_ahm_position(item_id)
     if (dot_position < 0 ) then
         return string.format("R%d$", irl_id)

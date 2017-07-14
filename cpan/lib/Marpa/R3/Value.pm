@@ -1875,9 +1875,9 @@ sub trace_op {
     local g1g = slr.slg.g1
     local or_node_id = t:_nook_or_node(nook_ix)
     local choice = t:_nook_choice(nook_ix)
-    local trace_irl_id = b:_or_node_irl(or_node_id)
+    local trace_irl_id = b:_or_node_nrl(or_node_id)
     local or_node_position = b:_or_node_position(or_node_id)
-    local irl_length = g1g:_irl_length(trace_irl_id)
+    local irl_length = g1g:_nrl_length(trace_irl_id)
     if irl_length ~= or_node_position then
         return 'return'
     end
@@ -1885,8 +1885,8 @@ sub trace_op {
         '', nook_ix, or_node_id, choice,
             o:_and_order_get(or_node_id, choice), 
             trace_irl_id,
-            g1g:_irl_is_virtual_rhs(trace_irl_id),
-            g1g:_irl_is_virtual_lhs(trace_irl_id),
+            g1g:_nrl_is_virtual_rhs(trace_irl_id),
+            g1g:_nrl_is_virtual_lhs(trace_irl_id),
             g1g:_real_symbol_count(trace_irl_id)
 END_OF_LUA
 

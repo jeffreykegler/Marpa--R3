@@ -4513,7 +4513,7 @@ is zero.
         local origin_earleme = lmw_r:earleme(origin_set_id)
         local current_earleme = lmw_r:earleme(set_id)
 
-        local nrl_id = lmw_g:_ahm_irl(ahm_id_of_yim)
+        local nrl_id = lmw_g:_ahm_nrl(ahm_id_of_yim)
         local dot_position = lmw_g:_ahm_position(ahm_id_of_yim)
 
         item_data.current_set_id = set_id
@@ -5009,8 +5009,37 @@ indexed by isyid.
 ### LMG constructor
 
 ```
-    -- miranda: section+ copy metal tables
+    -- miranda: section+ adjust metal tables
     _M.metal.grammar_new = _M.grammar_new
+
+    -- A Libmarpa "IRL" is a KOLLOS "NRL"
+    -- Change the method names to follow Kollos terminology
+    _M.metal._marpa_g_irl_count = _M.class_grammar._irl_count
+    _M.metal._marpa_g_irl_is_virtual_lhs = _M.class_grammar._irl_is_virtual_lhs
+    _M.metal._marpa_g_irl_is_virtual_rhs = _M.class_grammar._irl_is_virtual_rhs
+    _M.metal._marpa_g_irl_length = _M.class_grammar._irl_length
+    _M.metal._marpa_g_irl_lhs = _M.class_grammar._irl_lhs
+    _M.metal._marpa_g_irl_rank = _M.class_grammar._irl_rank
+    _M.metal._marpa_g_irl_rhs = _M.class_grammar._irl_rhs
+    _M.metal._marpa_g_irl_semantic_equivalent = _M.class_grammar._irl_semantic_equivalent
+    _M.metal._marpa_g_ahm_irl = _M.class_grammar._ahm_irl
+    _M.class_grammar._nrl_is_virtual_lhs = _M.class_grammar._irl_is_virtual_lhs
+    _M.class_grammar._nrl_is_virtual_rhs = _M.class_grammar._irl_is_virtual_rhs
+    _M.class_grammar._nrl_length = _M.class_grammar._irl_length
+    _M.class_grammar._nrl_lhs = _M.class_grammar._irl_lhs
+    _M.class_grammar._nrl_rank = _M.class_grammar._irl_rank
+    _M.class_grammar._nrl_rhs = _M.class_grammar._irl_rhs
+    _M.class_grammar._nrl_semantic_equivalent = _M.class_grammar._irl_semantic_equivalent
+    _M.class_grammar._ahm_nrl = _M.class_grammar._ahm_irl
+    _M.class_grammar._irl_is_virtual_lhs = nil
+    _M.class_grammar._irl_is_virtual_rhs = nil
+    _M.class_grammar._irl_length = nil
+    _M.class_grammar._irl_lhs = nil
+    _M.class_grammar._irl_rank = nil
+    _M.class_grammar._irl_rhs = nil
+    _M.class_grammar._irl_semantic_equivalent = nil
+    _M.class_grammar._ahm_irl = nil
+
     -- miranda: section+ most Lua function definitions
     function _M.grammar_new(slg)
         local grammar = _M.metal.grammar_new()
@@ -5030,7 +5059,7 @@ indexed by isyid.
 ```
 
 ```
-    -- miranda: section+ copy metal tables
+    -- miranda: section+ adjust metal tables
     _M.metal_grammar.symbol_new = _M.class_grammar.symbol_new
     -- miranda: section+ most Lua function definitions
     function _M.class_grammar.symbol_new(grammar, symbol_name)
@@ -5064,7 +5093,7 @@ indexed by isyid.
     end
 
     function _M.class_grammar.ahm_describe(lmw_g, ahm_id)
-        local irl_id = lmw_g:_ahm_irl(ahm_id)
+        local irl_id = lmw_g:_ahm_nrl(ahm_id)
         local dot_position = lmw_g:_ahm_position(ahm_id)
         if dot_position < 0 then
             return string.format('R%d$', irl_id)
@@ -5073,15 +5102,15 @@ indexed by isyid.
     end
 
     function _M.class_grammar._dotted_nrl_show(lmw_g, nrl_id, dot_position)
-        local lhs_id = lmw_g:_irl_lhs(nrl_id)
-        local nrl_length = lmw_g:_irl_length(nrl_id)
+        local lhs_id = lmw_g:_nrl_lhs(nrl_id)
+        local nrl_length = lmw_g:_nrl_length(nrl_id)
         local lhs_name = lmw_g:nsy_name(lhs_id)
         local pieces = { lhs_name, '::=' }
         if dot_position < 0 then
             dot_position = nrl_length
         end
         for ix = 0, nrl_length - 1 do
-            local rhs_nsy_id = lmw_g:_irl_rhs(nrl_id, ix)
+            local rhs_nsy_id = lmw_g:_nrl_rhs(nrl_id, ix)
             local rhs_nsy_name = lmw_g:nsy_name(rhs_nsy_id)
             if ix == dot_position then
                 pieces[#pieces+1] = '.'
@@ -5149,7 +5178,7 @@ indexed by isyid.
         end
         pieces[#pieces+1] = table.concat(properties, '; ')
         pieces[#pieces+1] = "\n    "
-        local irl_id = lmw_g:_ahm_irl(item_id)
+        local irl_id = lmw_g:_ahm_nrl(item_id)
         local dot_position = lmw_g:_ahm_position(item_id)
         pieces[#pieces+1] = lmw_g:_dotted_nrl_show(irl_id, dot_position)
         pieces[#pieces+1] = '\n'
@@ -5182,13 +5211,13 @@ indexed by isyid.
 
     function _M.class_grammar.brief_nrl(lmw_g, nrl_id)
         local pieces = { string.format("%d:", nrl_id) }
-        local lhs_id = lmw_g:_irl_lhs(nrl_id)
+        local lhs_id = lmw_g:_nrl_lhs(nrl_id)
         pieces[#pieces+1] = lmw_g:nsy_name(lhs_id)
         pieces[#pieces+1] = "::="
-        local rh_length = lmw_g:_irl_length(nrl_id)
+        local rh_length = lmw_g:_nrl_length(nrl_id)
         if rh_length > 0 then
            for rhs_ix = 0, rh_length - 1 do
-              local this_rhs_id = lmw_g:_irl_rhs(nrl_id, rhs_ix)
+              local this_rhs_id = lmw_g:_nrl_rhs(nrl_id, rhs_ix)
               pieces[#pieces+1] = lmw_g:nsy_name(this_rhs_id)
            end
         end
@@ -5346,6 +5375,15 @@ object
 and the rest will become a cleaner
 Libmarpa wrapper class.
 
+### Adjust metal tables
+
+```
+    -- miranda: section+ adjust metal tables
+    _M.metal._marpa_b_or_node_irl = _M.class_bocage._or_node_irl
+    _M.class_bocage._or_node_nrl = _M.class_bocage._or_node_irl
+    _M.class_bocage._or_node_irl = nil
+```
+
 ### Initialize a valuator
 
 Called when a valuator is set up.
@@ -5423,7 +5461,7 @@ It should free all memory associated with the valuation.
         local middle_earleme = slr.g1:earleme(middle_earley_set)
 
         local position = bocage:_or_node_position(parent_or_node_id)
-        local nrl_id = bocage:_or_node_irl(parent_or_node_id)
+        local nrl_id = bocage:_or_node_nrl(parent_or_node_id)
 
         local tag = { string.format("R%d:%d@%d-%d",
             nrl_id,
@@ -5433,7 +5471,7 @@ It should free all memory associated with the valuation.
         }
 
         if cause_id then
-            tag[#tag+1] = string.format("C%d", bocage:_or_node_irl(cause_id))
+            tag[#tag+1] = string.format("C%d", bocage:_or_node_nrl(cause_id))
         else
             tag[#tag+1] = string.format("S%d", bocage:_and_node_symbol(and_node_id))
         end
@@ -5456,7 +5494,7 @@ It should free all memory associated with the valuation.
             local symbol = bocage:_and_node_symbol(id)
             local origin = bocage:_or_node_origin(parent)
             local set = bocage:_or_node_set(parent)
-            local nrl_id = bocage:_or_node_irl(parent)
+            local nrl_id = bocage:_or_node_nrl(parent)
             local position = bocage:_or_node_position(parent)
             local origin_earleme = g1r:earleme(origin)
             local current_earleme = g1r:earleme(set)
@@ -5475,7 +5513,7 @@ It should free all memory associated with the valuation.
             -- here.
             local cause_nrl_id = -1
             if cause then
-                cause_nrl_id = bocage:_or_node_irl(cause)
+                cause_nrl_id = bocage:_or_node_nrl(cause)
                 desc[#desc+1] = 'C' .. cause_nrl_id
             else
                 desc[#desc+1] = 'S' .. symbol
@@ -5506,7 +5544,7 @@ It should free all memory associated with the valuation.
     function _M.class_slr.or_node_tag(slr, or_node_id)
         local bocage = slr.lmw_b
         local set = bocage:_or_node_set(or_node_id)
-        local nrl_id = bocage:_or_node_irl(or_node_id)
+        local nrl_id = bocage:_or_node_nrl(or_node_id)
         local origin = bocage:_or_node_origin(or_node_id)
         local position = bocage:_or_node_position(or_node_id)
         return string.format("R%d:%d@%d-%d",
@@ -5526,7 +5564,7 @@ It should free all memory associated with the valuation.
             local origin = bocage:_or_node_origin(id)
             if not origin then break end
             local set = bocage:_or_node_set(id)
-            local nrl_id = bocage:_or_node_irl(id)
+            local nrl_id = bocage:_or_node_nrl(id)
             local position = bocage:_or_node_position(id)
             local origin_earleme = g1r:earleme(origin)
             local current_earleme = g1r:earleme(set)
@@ -5574,7 +5612,7 @@ It should free all memory associated with the valuation.
         local or_node_id = -1
         while true do
             or_node_id = or_node_id + 1
-            local irl_id = bocage:_or_node_irl(or_node_id)
+            local irl_id = bocage:_or_node_nrl(or_node_id)
             if not irl_id then goto LAST_OR_NODE end
             local position = bocage:_or_node_position(or_node_id)
             local or_origin = bocage:_or_node_origin(or_node_id)
@@ -5591,7 +5629,7 @@ It should free all memory associated with the valuation.
                 local cause_id = bocage:_and_node_cause(and_node_id)
                 local cause_irl_id
                 if cause_id then
-                    cause_irl_id = bocage:_or_node_irl(cause_id)
+                    cause_irl_id = bocage:_or_node_nrl(cause_id)
                     cause_tag = slr:or_node_tag(cause_id)
                 end
                 local parent_tag = slr:or_node_tag(or_node_id)
@@ -6279,7 +6317,7 @@ a special "configuration" argument.
     -- miranda: insert internal utilities
 
     -- miranda: insert create metal tables
-    -- miranda: insert copy metal tables
+    -- miranda: insert adjust metal tables
     -- miranda: insert create nonmetallic metatables
     -- miranda: insert populate metatables
 

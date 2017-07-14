@@ -233,9 +233,9 @@ sub nook_has_semantic_cause {
         ('@' . __FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', 'i', $or_node);
     local recce, or_node = ...
-    local irl_id = recce.lmw_b:_or_node_irl(or_node)
+    local irl_id = recce.lmw_b:_or_node_nrl(or_node)
     local predot_position = recce.lmw_b:_or_node_position(or_node) - 1
-    local predot_isyid = recce.slg.g1:_irl_rhs(irl_id, predot_position)
+    local predot_isyid = recce.slg.g1:_nrl_rhs(irl_id, predot_position)
     return recce.slg.g1:_nsy_is_semantic(predot_isyid)
 END_OF_LUA
      return $result;
@@ -525,7 +525,7 @@ sub nid_sort_ix {
         ('@' . __FILE__ . ':' . __LINE__),
         <<'END_OF_LUA', 'i', $nid);
         local slr, nid = ...
-        local irl_id = slr.lmw_b:_or_node_irl(nid)
+        local irl_id = slr.lmw_b:_or_node_nrl(nid)
         return slr.slg.g1:_source_xrl(irl_id)
 END_OF_LUA
         return $result;
@@ -568,7 +568,7 @@ sub nid_rule_id {
         ('@' . __FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', 'i', $nid);
     local recce, nid = ...
-    local irl_id = recce.lmw_b:_or_node_irl(nid)
+    local irl_id = recce.lmw_b:_or_node_nrl(nid)
     local xrl_id = recce.slg.g1:_source_xrl(irl_id)
     return xrl_id
 END_OF_LUA
@@ -686,7 +686,7 @@ sub nid_symbol_id {
         ('@' . __FILE__ . ':' . __LINE__),
     <<'END_OF_LUA',
         local slr, nid = ...
-        local irl_id = slr.lmw_b:_or_node_irl(nid)
+        local irl_id = slr.lmw_b:_or_node_nrl(nid)
         local g1g = slr.slg.g1
         local xrl_id = g1g:_source_xrl(irl_id)
         local lhs_id = g1g:rule_lhs(xrl_id)
