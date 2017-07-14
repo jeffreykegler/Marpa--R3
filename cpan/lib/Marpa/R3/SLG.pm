@@ -1377,6 +1377,7 @@ sub add_G1_user_rule {
     my $xpr_id;
     my $subgrammar;
     my $xpr_dot;
+    my $xpr_top;
 
   OPTION: for my $option ( keys %{$options} ) {
         my $value = $options->{$option};
@@ -1408,6 +1409,7 @@ sub add_G1_user_rule {
         }
         if ( $option eq 'subgrammar' ) { $subgrammar      = $value; next OPTION }
         if ( $option eq 'xpr_dot' ) { $xpr_dot      = $value; next OPTION }
+        if ( $option eq 'xpr_top' ) { $xpr_top      = $value; next OPTION }
         Marpa::R3::exception("Unknown user rule option: $option");
     } ## end OPTION: for my $option ( keys %{$options} )
 
@@ -1558,6 +1560,7 @@ sub add_L0_user_rule {
     my $xpr_id;
     my $subgrammar;
     my $xpr_dot;
+    my $xpr_top;
 
   OPTION: for my $option ( keys %{$options} ) {
         my $value = $options->{$option};
@@ -1584,6 +1587,7 @@ sub add_L0_user_rule {
         }
         if ( $option eq 'subgrammar' ) { $subgrammar = $value; next OPTION }
         if ( $option eq 'xpr_dot' )    { $xpr_dot    = $value; next OPTION }
+        if ( $option eq 'xpr_top' )    { $xpr_top    = $value; next OPTION }
         Marpa::R3::exception("Unknown user rule option: $option");
     }
 

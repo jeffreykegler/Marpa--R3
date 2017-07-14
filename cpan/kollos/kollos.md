@@ -4878,7 +4878,8 @@ is zero.
     class_irl_fields.action = true
     class_irl_fields.mask = true
     class_irl_fields.g1_lexeme = true
-    class_irl_fields.xrl_dot = true
+    class_irl_fields.xpr_dot = true
+    class_irl_fields.xpr_top = true
 ```
 
 ```

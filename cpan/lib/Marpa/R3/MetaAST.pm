@@ -1908,7 +1908,8 @@ sub Marpa::R3::Internal::MetaAST::Parse::xpr_create {
         my $xpr_datum = $rhs;
         my @array = @{$rhs};
         $wrl{rhs} = \@array;
-        $wrl{xpr_dot} = [0 .. (scalar @array) ]
+        $wrl{xpr_dot} = [0 .. (scalar @array) ];
+        $wrl{xpr_top} = 1;
     }
 
     # Return the initial working rule

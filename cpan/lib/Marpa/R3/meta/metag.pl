@@ -253,6 +253,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,[:start:],statements'
                                          },
                                          {
@@ -270,6 +271,7 @@ $hashed_metag = {
                                                           2,
                                                           3
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,action,[Lex-33],[Lex-34],action name'
                                          },
                                          {
@@ -283,6 +285,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,action name,Perl name'
                                          },
                                          {
@@ -296,6 +299,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,action name,array descriptor'
                                          },
                                          {
@@ -309,6 +313,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,action name,reserved action name'
                                          },
                                          {
@@ -322,6 +327,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,adverb item,action'
                                          },
                                          {
@@ -335,6 +341,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,adverb item,blessing'
                                          },
                                          {
@@ -348,6 +355,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,adverb item,eager specification'
                                          },
                                          {
@@ -361,6 +369,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,adverb item,event specification'
                                          },
                                          {
@@ -374,6 +383,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,adverb item,group association'
                                          },
                                          {
@@ -387,6 +397,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,adverb item,left association'
                                          },
                                          {
@@ -400,6 +411,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,adverb item,naming'
                                          },
                                          {
@@ -413,6 +425,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,adverb item,null adverb'
                                          },
                                          {
@@ -426,6 +439,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,adverb item,null ranking specification'
                                          },
                                          {
@@ -439,6 +453,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,adverb item,pause specification'
                                          },
                                          {
@@ -452,6 +467,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,adverb item,priority specification'
                                          },
                                          {
@@ -465,6 +481,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,adverb item,proper specification'
                                          },
                                          {
@@ -478,6 +495,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,adverb item,rank specification'
                                          },
                                          {
@@ -491,6 +509,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,adverb item,right association'
                                          },
                                          {
@@ -504,6 +523,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,adverb item,separator specification'
                                          },
                                          {
@@ -517,6 +537,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,adverb list,adverb list items'
                                          },
                                          {
@@ -531,6 +552,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,adverb list items,adverb item'
                                          },
                                          {
@@ -546,6 +568,7 @@ $hashed_metag = {
                                                           1,
                                                           2
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,alternative,rhs,adverb list'
                                          },
                                          {
@@ -559,6 +582,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,alternative name,single quoted name'
                                          },
                                          {
@@ -572,6 +596,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,alternative name,standard name'
                                          },
                                          {
@@ -588,6 +613,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,alternatives,alternative'
                                          },
                                          {
@@ -605,6 +631,7 @@ $hashed_metag = {
                                                           2,
                                                           3
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,blessing,[Lex-68],[Lex-69],blessing name'
                                          },
                                          {
@@ -618,6 +645,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,blessing name,reserved blessing name'
                                          },
                                          {
@@ -631,6 +659,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,blessing name,standard name'
                                          },
                                          {
@@ -652,6 +681,7 @@ $hashed_metag = {
                                                           4,
                                                           5
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,completion event declaration,[Lex-16],event initialization,[Lex-17],[Lex-18],symbol name'
                                          },
                                          {
@@ -669,6 +699,7 @@ $hashed_metag = {
                                                           2,
                                                           3
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,default rule,[Lex-7],op declare bnf,adverb list'
                                          },
                                          {
@@ -688,6 +719,7 @@ $hashed_metag = {
                                                           3,
                                                           4
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,discard default statement,[Lex-11],[Lex-12],[Lex-13],adverb list'
                                          },
                                          {
@@ -707,6 +739,7 @@ $hashed_metag = {
                                                           3,
                                                           4
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,discard rule,[Lex-14],op declare match,single symbol,adverb list'
                                          },
                                          {
@@ -724,6 +757,7 @@ $hashed_metag = {
                                                           2,
                                                           3
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,eager specification,[Lex-48],[Lex-49],boolean'
                                          },
                                          {
@@ -741,6 +775,7 @@ $hashed_metag = {
                                                           2,
                                                           3
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,empty rule,lhs,op declare,adverb list'
                                          },
                                          {
@@ -756,6 +791,7 @@ $hashed_metag = {
                                                           1,
                                                           2
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,event initialization,event name,event initializer'
                                          },
                                          {
@@ -766,6 +802,7 @@ $hashed_metag = {
                                            'xpr_dot' => [
                                                           0
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,event initializer'
                                          },
                                          {
@@ -781,6 +818,7 @@ $hashed_metag = {
                                                           1,
                                                           2
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,event initializer,[Lex-65],on or off'
                                          },
                                          {
@@ -794,6 +832,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,event name,reserved event name'
                                          },
                                          {
@@ -807,6 +846,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,event name,single quoted name'
                                          },
                                          {
@@ -820,6 +860,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,event name,standard name'
                                          },
                                          {
@@ -837,6 +878,7 @@ $hashed_metag = {
                                                           2,
                                                           3
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,event specification,[Lex-63],[Lex-64],event initialization'
                                          },
                                          {
@@ -854,6 +896,7 @@ $hashed_metag = {
                                                           2,
                                                           3
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,group association,[Lex-41],[Lex-42],[Lex-43]'
                                          },
                                          {
@@ -875,6 +918,7 @@ $hashed_metag = {
                                                           4,
                                                           5
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,inaccessible statement,[Lex-25],[Lex-26],inaccessible treatment,[Lex-27],[Lex-28]'
                                          },
                                          {
@@ -888,6 +932,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,inaccessible treatment,[Lex-29]'
                                          },
                                          {
@@ -901,6 +946,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,inaccessible treatment,[Lex-30]'
                                          },
                                          {
@@ -914,6 +960,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,inaccessible treatment,[Lex-31]'
                                          },
                                          {
@@ -931,6 +978,7 @@ $hashed_metag = {
                                                           2,
                                                           3
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,left association,[Lex-35],[Lex-36],[Lex-37]'
                                          },
                                          {
@@ -950,6 +998,7 @@ $hashed_metag = {
                                                           3,
                                                           4
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,lexeme default statement,[Lex-8],[Lex-9],[Lex-10],adverb list'
                                          },
                                          {
@@ -969,6 +1018,7 @@ $hashed_metag = {
                                                           3,
                                                           4
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,lexeme rule,[Lex-15],op declare match,symbol,adverb list'
                                          },
                                          {
@@ -982,6 +1032,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,lhs,symbol name'
                                          },
                                          {
@@ -999,6 +1050,7 @@ $hashed_metag = {
                                                           2,
                                                           3
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,naming,[Lex-70],[Lex-71],alternative name'
                                          },
                                          {
@@ -1012,6 +1064,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,null adverb,[Lex-32]'
                                          },
                                          {
@@ -1025,6 +1078,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,null ranking constant,[Lex-57]'
                                          },
                                          {
@@ -1038,6 +1092,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,null ranking constant,[Lex-58]'
                                          },
                                          {
@@ -1055,6 +1110,7 @@ $hashed_metag = {
                                                           2,
                                                           3
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,null ranking specification,[Lex-52],[Lex-53],null ranking constant'
                                          },
                                          {
@@ -1074,6 +1130,7 @@ $hashed_metag = {
                                                           3,
                                                           4
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,null ranking specification,[Lex-54],[Lex-55],[Lex-56],null ranking constant'
                                          },
                                          {
@@ -1087,6 +1144,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,null statement,[Lex-0]'
                                          },
                                          {
@@ -1108,6 +1166,7 @@ $hashed_metag = {
                                                           4,
                                                           5
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,nulled event declaration,[Lex-19],event initialization,[Lex-20],[Lex-21],symbol name'
                                          },
                                          {
@@ -1121,6 +1180,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,on or off,[Lex-66]'
                                          },
                                          {
@@ -1134,6 +1194,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,on or off,[Lex-67]'
                                          },
                                          {
@@ -1147,6 +1208,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,op declare,op declare bnf'
                                          },
                                          {
@@ -1160,6 +1222,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,op declare,op declare match'
                                          },
                                          {
@@ -1177,6 +1240,7 @@ $hashed_metag = {
                                                           2,
                                                           3
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,parenthesized rhs primary list,[Lex-72],rhs primary list,[Lex-73]'
                                          },
                                          {
@@ -1194,6 +1258,7 @@ $hashed_metag = {
                                                           2,
                                                           3
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,pause specification,[Lex-61],[Lex-62],before or after'
                                          },
                                          {
@@ -1215,6 +1280,7 @@ $hashed_metag = {
                                                           4,
                                                           5
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,prediction event declaration,[Lex-22],event initialization,[Lex-23],[Lex-24],symbol name'
                                          },
                                          {
@@ -1231,6 +1297,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,priorities,alternatives'
                                          },
                                          {
@@ -1248,6 +1315,7 @@ $hashed_metag = {
                                                           2,
                                                           3
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,priority rule,lhs,op declare,priorities'
                                          },
                                          {
@@ -1265,6 +1333,7 @@ $hashed_metag = {
                                                           2,
                                                           3
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,priority specification,[Lex-59],[Lex-60],signed integer'
                                          },
                                          {
@@ -1282,6 +1351,7 @@ $hashed_metag = {
                                                           2,
                                                           3
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,proper specification,[Lex-46],[Lex-47],boolean'
                                          },
                                          {
@@ -1303,6 +1373,7 @@ $hashed_metag = {
                                                           4,
                                                           5
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,quantified rule,lhs,op declare,single symbol,quantifier,adverb list'
                                          },
                                          {
@@ -1316,6 +1387,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,quantifier,[Lex-74]'
                                          },
                                          {
@@ -1329,6 +1401,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,quantifier,[Lex-75]'
                                          },
                                          {
@@ -1346,6 +1419,7 @@ $hashed_metag = {
                                                           2,
                                                           3
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,rank specification,[Lex-50],[Lex-51],signed integer'
                                          },
                                          {
@@ -1360,6 +1434,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,rhs,rhs primary'
                                          },
                                          {
@@ -1373,6 +1448,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,rhs primary,parenthesized rhs primary list'
                                          },
                                          {
@@ -1386,6 +1462,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,rhs primary,single quoted string'
                                          },
                                          {
@@ -1399,6 +1476,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,rhs primary,single symbol'
                                          },
                                          {
@@ -1413,6 +1491,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,rhs primary list,rhs primary'
                                          },
                                          {
@@ -1430,6 +1509,7 @@ $hashed_metag = {
                                                           2,
                                                           3
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,right association,[Lex-38],[Lex-39],[Lex-40]'
                                          },
                                          {
@@ -1447,6 +1527,7 @@ $hashed_metag = {
                                                           2,
                                                           3
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,separator specification,[Lex-44],[Lex-45],single symbol'
                                          },
                                          {
@@ -1460,6 +1541,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,single symbol,character class'
                                          },
                                          {
@@ -1473,6 +1555,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,single symbol,symbol'
                                          },
                                          {
@@ -1490,6 +1573,7 @@ $hashed_metag = {
                                                           2,
                                                           3
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,start rule,[Lex-3],op declare bnf,symbol'
                                          },
                                          {
@@ -1509,6 +1593,7 @@ $hashed_metag = {
                                                           3,
                                                           4
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,start rule,[Lex-4],[Lex-5],[Lex-6],symbol'
                                          },
                                          {
@@ -1522,6 +1607,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,statement,completion event declaration'
                                          },
                                          {
@@ -1535,6 +1621,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,statement,default rule'
                                          },
                                          {
@@ -1548,6 +1635,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,statement,discard default statement'
                                          },
                                          {
@@ -1561,6 +1649,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,statement,discard rule'
                                          },
                                          {
@@ -1574,6 +1663,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,statement,empty rule'
                                          },
                                          {
@@ -1587,6 +1677,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,statement,inaccessible statement'
                                          },
                                          {
@@ -1600,6 +1691,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,statement,lexeme default statement'
                                          },
                                          {
@@ -1613,6 +1705,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,statement,lexeme rule'
                                          },
                                          {
@@ -1626,6 +1719,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,statement,null statement'
                                          },
                                          {
@@ -1639,6 +1733,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,statement,nulled event declaration'
                                          },
                                          {
@@ -1652,6 +1747,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,statement,prediction event declaration'
                                          },
                                          {
@@ -1665,6 +1761,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,statement,priority rule'
                                          },
                                          {
@@ -1678,6 +1775,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,statement,quantified rule'
                                          },
                                          {
@@ -1691,6 +1789,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,statement,start rule'
                                          },
                                          {
@@ -1704,6 +1803,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,statement,statement group'
                                          },
                                          {
@@ -1721,6 +1821,7 @@ $hashed_metag = {
                                                           2,
                                                           3
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,statement group,[Lex-1],statements,[Lex-2]'
                                          },
                                          {
@@ -1735,6 +1836,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,statements,statement'
                                          },
                                          {
@@ -1748,6 +1850,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,symbol,symbol name'
                                          },
                                          {
@@ -1761,6 +1864,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,symbol name,bare name'
                                          },
                                          {
@@ -1774,6 +1878,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'g1,symbol name,bracketed name'
                                          }
                                        ],
@@ -1789,6 +1894,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,Perl identifier,[[\\w]]'
                                          },
                                          {
@@ -1804,6 +1910,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,Perl name,Perl identifier'
                                          },
                                          {
@@ -1816,6 +1923,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[:discard:],hash comment'
                                          },
                                          {
@@ -1828,6 +1936,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[:discard:],whitespace'
                                          },
                                          {
@@ -1840,6 +1949,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-0],[[\\;]]'
                                          },
                                          {
@@ -1852,6 +1962,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-10],[[\\=]]'
                                          },
                                          {
@@ -1876,6 +1987,7 @@ $hashed_metag = {
                                                           6,
                                                           7
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-11],[[d]],[[i]],[[s]],[[c]],[[a]],[[r]],[[d]]'
                                          },
                                          {
@@ -1900,6 +2012,7 @@ $hashed_metag = {
                                                           6,
                                                           7
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-12],[[d]],[[e]],[[f]],[[a]],[[u]],[[l]],[[t]]'
                                          },
                                          {
@@ -1912,6 +2025,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-13],[[\\=]]'
                                          },
                                          {
@@ -1938,6 +2052,7 @@ $hashed_metag = {
                                                           7,
                                                           8
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-14],[[\\:]],[[d]],[[i]],[[s]],[[c]],[[a]],[[r]],[[d]]'
                                          },
                                          {
@@ -1962,6 +2077,7 @@ $hashed_metag = {
                                                           6,
                                                           7
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-15],[[\\:]],[[l]],[[e]],[[x]],[[e]],[[m]],[[e]]'
                                          },
                                          {
@@ -1982,6 +2098,7 @@ $hashed_metag = {
                                                           4,
                                                           5
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-16],[[e]],[[v]],[[e]],[[n]],[[t]]'
                                          },
                                          {
@@ -1994,6 +2111,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-17],[[\\=]]'
                                          },
                                          {
@@ -2022,6 +2140,7 @@ $hashed_metag = {
                                                           8,
                                                           9
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-18],[[c]],[[o]],[[m]],[[p]],[[l]],[[e]],[[t]],[[e]],[[d]]'
                                          },
                                          {
@@ -2042,6 +2161,7 @@ $hashed_metag = {
                                                           4,
                                                           5
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-19],[[e]],[[v]],[[e]],[[n]],[[t]]'
                                          },
                                          {
@@ -2054,6 +2174,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-1],[[\\{]]'
                                          },
                                          {
@@ -2066,6 +2187,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-20],[[\\=]]'
                                          },
                                          {
@@ -2088,6 +2210,7 @@ $hashed_metag = {
                                                           5,
                                                           6
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-21],[[n]],[[u]],[[l]],[[l]],[[e]],[[d]]'
                                          },
                                          {
@@ -2108,6 +2231,7 @@ $hashed_metag = {
                                                           4,
                                                           5
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-22],[[e]],[[v]],[[e]],[[n]],[[t]]'
                                          },
                                          {
@@ -2120,6 +2244,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-23],[[\\=]]'
                                          },
                                          {
@@ -2148,6 +2273,7 @@ $hashed_metag = {
                                                           8,
                                                           9
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-24],[[p]],[[r]],[[e]],[[d]],[[i]],[[c]],[[t]],[[e]],[[d]]'
                                          },
                                          {
@@ -2182,6 +2308,7 @@ $hashed_metag = {
                                                           11,
                                                           12
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-25],[[i]],[[n]],[[a]],[[c]],[[c]],[[e]],[[s]],[[s]],[[i]],[[b]],[[l]],[[e]]'
                                          },
                                          {
@@ -2196,6 +2323,7 @@ $hashed_metag = {
                                                           1,
                                                           2
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-26],[[i]],[[s]]'
                                          },
                                          {
@@ -2210,6 +2338,7 @@ $hashed_metag = {
                                                           1,
                                                           2
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-27],[[b]],[[y]]'
                                          },
                                          {
@@ -2234,6 +2363,7 @@ $hashed_metag = {
                                                           6,
                                                           7
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-28],[[d]],[[e]],[[f]],[[a]],[[u]],[[l]],[[t]]'
                                          },
                                          {
@@ -2252,6 +2382,7 @@ $hashed_metag = {
                                                           3,
                                                           4
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-29],[[w]],[[a]],[[r]],[[n]]'
                                          },
                                          {
@@ -2264,6 +2395,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-2],[[\\}]]'
                                          },
                                          {
@@ -2278,6 +2410,7 @@ $hashed_metag = {
                                                           1,
                                                           2
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-30],[[o]],[[k]]'
                                          },
                                          {
@@ -2298,6 +2431,7 @@ $hashed_metag = {
                                                           4,
                                                           5
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-31],[[f]],[[a]],[[t]],[[a]],[[l]]'
                                          },
                                          {
@@ -2310,6 +2444,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-32],[[\\,]]'
                                          },
                                          {
@@ -2332,6 +2467,7 @@ $hashed_metag = {
                                                           5,
                                                           6
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-33],[[a]],[[c]],[[t]],[[i]],[[o]],[[n]]'
                                          },
                                          {
@@ -2346,6 +2482,7 @@ $hashed_metag = {
                                                           1,
                                                           2
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-34],[[\\=]],[[\\>]]'
                                          },
                                          {
@@ -2366,6 +2503,7 @@ $hashed_metag = {
                                                           4,
                                                           5
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-35],[[a]],[[s]],[[s]],[[o]],[[c]]'
                                          },
                                          {
@@ -2380,6 +2518,7 @@ $hashed_metag = {
                                                           1,
                                                           2
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-36],[[\\=]],[[\\>]]'
                                          },
                                          {
@@ -2398,6 +2537,7 @@ $hashed_metag = {
                                                           3,
                                                           4
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-37],[[l]],[[e]],[[f]],[[t]]'
                                          },
                                          {
@@ -2418,6 +2558,7 @@ $hashed_metag = {
                                                           4,
                                                           5
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-38],[[a]],[[s]],[[s]],[[o]],[[c]]'
                                          },
                                          {
@@ -2432,6 +2573,7 @@ $hashed_metag = {
                                                           1,
                                                           2
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-39],[[\\=]],[[\\>]]'
                                          },
                                          {
@@ -2454,6 +2596,7 @@ $hashed_metag = {
                                                           5,
                                                           6
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-3],[[\\:]],[[s]],[[t]],[[a]],[[r]],[[t]]'
                                          },
                                          {
@@ -2474,6 +2617,7 @@ $hashed_metag = {
                                                           4,
                                                           5
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-40],[[r]],[[i]],[[g]],[[h]],[[t]]'
                                          },
                                          {
@@ -2494,6 +2638,7 @@ $hashed_metag = {
                                                           4,
                                                           5
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-41],[[a]],[[s]],[[s]],[[o]],[[c]]'
                                          },
                                          {
@@ -2508,6 +2653,7 @@ $hashed_metag = {
                                                           1,
                                                           2
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-42],[[\\=]],[[\\>]]'
                                          },
                                          {
@@ -2528,6 +2674,7 @@ $hashed_metag = {
                                                           4,
                                                           5
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-43],[[g]],[[r]],[[o]],[[u]],[[p]]'
                                          },
                                          {
@@ -2556,6 +2703,7 @@ $hashed_metag = {
                                                           8,
                                                           9
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-44],[[s]],[[e]],[[p]],[[a]],[[r]],[[a]],[[t]],[[o]],[[r]]'
                                          },
                                          {
@@ -2570,6 +2718,7 @@ $hashed_metag = {
                                                           1,
                                                           2
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-45],[[\\=]],[[\\>]]'
                                          },
                                          {
@@ -2592,6 +2741,7 @@ $hashed_metag = {
                                                           5,
                                                           6
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-46],[[p]],[[r]],[[o]],[[p]],[[e]],[[r]]'
                                          },
                                          {
@@ -2606,6 +2756,7 @@ $hashed_metag = {
                                                           1,
                                                           2
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-47],[[\\=]],[[\\>]]'
                                          },
                                          {
@@ -2626,6 +2777,7 @@ $hashed_metag = {
                                                           4,
                                                           5
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-48],[[e]],[[a]],[[g]],[[e]],[[r]]'
                                          },
                                          {
@@ -2640,6 +2792,7 @@ $hashed_metag = {
                                                           1,
                                                           2
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-49],[[\\=]],[[\\>]]'
                                          },
                                          {
@@ -2660,6 +2813,7 @@ $hashed_metag = {
                                                           4,
                                                           5
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-4],[[s]],[[t]],[[a]],[[r]],[[t]]'
                                          },
                                          {
@@ -2678,6 +2832,7 @@ $hashed_metag = {
                                                           3,
                                                           4
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-50],[[r]],[[a]],[[n]],[[k]]'
                                          },
                                          {
@@ -2692,6 +2847,7 @@ $hashed_metag = {
                                                           1,
                                                           2
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-51],[[\\=]],[[\\>]]'
                                          },
                                          {
@@ -2726,6 +2882,7 @@ $hashed_metag = {
                                                           11,
                                                           12
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-52],[[n]],[[u]],[[l]],[[l]],[[\\-]],[[r]],[[a]],[[n]],[[k]],[[i]],[[n]],[[g]]'
                                          },
                                          {
@@ -2740,6 +2897,7 @@ $hashed_metag = {
                                                           1,
                                                           2
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-53],[[\\=]],[[\\>]]'
                                          },
                                          {
@@ -2758,6 +2916,7 @@ $hashed_metag = {
                                                           3,
                                                           4
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-54],[[n]],[[u]],[[l]],[[l]]'
                                          },
                                          {
@@ -2776,6 +2935,7 @@ $hashed_metag = {
                                                           3,
                                                           4
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-55],[[r]],[[a]],[[n]],[[k]]'
                                          },
                                          {
@@ -2790,6 +2950,7 @@ $hashed_metag = {
                                                           1,
                                                           2
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-56],[[\\=]],[[\\>]]'
                                          },
                                          {
@@ -2806,6 +2967,7 @@ $hashed_metag = {
                                                           2,
                                                           3
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-57],[[l]],[[o]],[[w]]'
                                          },
                                          {
@@ -2824,6 +2986,7 @@ $hashed_metag = {
                                                           3,
                                                           4
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-58],[[h]],[[i]],[[g]],[[h]]'
                                          },
                                          {
@@ -2850,6 +3013,7 @@ $hashed_metag = {
                                                           7,
                                                           8
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-59],[[p]],[[r]],[[i]],[[o]],[[r]],[[i]],[[t]],[[y]]'
                                          },
                                          {
@@ -2872,6 +3036,7 @@ $hashed_metag = {
                                                           5,
                                                           6
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-5],[[s]],[[y]],[[m]],[[b]],[[o]],[[l]]'
                                          },
                                          {
@@ -2886,6 +3051,7 @@ $hashed_metag = {
                                                           1,
                                                           2
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-60],[[\\=]],[[\\>]]'
                                          },
                                          {
@@ -2906,6 +3072,7 @@ $hashed_metag = {
                                                           4,
                                                           5
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-61],[[p]],[[a]],[[u]],[[s]],[[e]]'
                                          },
                                          {
@@ -2920,6 +3087,7 @@ $hashed_metag = {
                                                           1,
                                                           2
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-62],[[\\=]],[[\\>]]'
                                          },
                                          {
@@ -2940,6 +3108,7 @@ $hashed_metag = {
                                                           4,
                                                           5
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-63],[[e]],[[v]],[[e]],[[n]],[[t]]'
                                          },
                                          {
@@ -2954,6 +3123,7 @@ $hashed_metag = {
                                                           1,
                                                           2
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-64],[[\\=]],[[\\>]]'
                                          },
                                          {
@@ -2966,6 +3136,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-65],[[\\=]]'
                                          },
                                          {
@@ -2980,6 +3151,7 @@ $hashed_metag = {
                                                           1,
                                                           2
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-66],[[o]],[[n]]'
                                          },
                                          {
@@ -2996,6 +3168,7 @@ $hashed_metag = {
                                                           2,
                                                           3
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-67],[[o]],[[f]],[[f]]'
                                          },
                                          {
@@ -3016,6 +3189,7 @@ $hashed_metag = {
                                                           4,
                                                           5
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-68],[[b]],[[l]],[[e]],[[s]],[[s]]'
                                          },
                                          {
@@ -3030,6 +3204,7 @@ $hashed_metag = {
                                                           1,
                                                           2
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-69],[[\\=]],[[\\>]]'
                                          },
                                          {
@@ -3044,6 +3219,7 @@ $hashed_metag = {
                                                           1,
                                                           2
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-6],[[i]],[[s]]'
                                          },
                                          {
@@ -3062,6 +3238,7 @@ $hashed_metag = {
                                                           3,
                                                           4
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-70],[[n]],[[a]],[[m]],[[e]]'
                                          },
                                          {
@@ -3076,6 +3253,7 @@ $hashed_metag = {
                                                           1,
                                                           2
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-71],[[\\=]],[[\\>]]'
                                          },
                                          {
@@ -3088,6 +3266,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-72],[[\\(]]'
                                          },
                                          {
@@ -3100,6 +3279,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-73],[[\\)]]'
                                          },
                                          {
@@ -3112,6 +3292,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-74],[[\\*]]'
                                          },
                                          {
@@ -3124,6 +3305,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-75],[[\\+]]'
                                          },
                                          {
@@ -3150,6 +3332,7 @@ $hashed_metag = {
                                                           7,
                                                           8
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-7],[[\\:]],[[d]],[[e]],[[f]],[[a]],[[u]],[[l]],[[t]]'
                                          },
                                          {
@@ -3172,6 +3355,7 @@ $hashed_metag = {
                                                           5,
                                                           6
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-8],[[l]],[[e]],[[x]],[[e]],[[m]],[[e]]'
                                          },
                                          {
@@ -3196,6 +3380,7 @@ $hashed_metag = {
                                                           6,
                                                           7
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-9],[[d]],[[e]],[[f]],[[a]],[[u]],[[l]],[[t]]'
                                          },
                                          {
@@ -3212,6 +3397,7 @@ $hashed_metag = {
                                                           2,
                                                           3
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,array descriptor,array descriptor left bracket,result item descriptor list,array descriptor right bracket'
                                          },
                                          {
@@ -3224,6 +3410,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,array descriptor left bracket,[[\\[]]'
                                          },
                                          {
@@ -3238,6 +3425,7 @@ $hashed_metag = {
                                                           1,
                                                           2
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,array descriptor left bracket,[[\\[]],whitespace'
                                          },
                                          {
@@ -3250,6 +3438,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,array descriptor right bracket,[[\\]]]'
                                          },
                                          {
@@ -3264,6 +3453,7 @@ $hashed_metag = {
                                                           1,
                                                           2
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,array descriptor right bracket,whitespace,[[\\]]]'
                                          },
                                          {
@@ -3277,6 +3467,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,bare name,[[\\w]]'
                                          },
                                          {
@@ -3297,6 +3488,7 @@ $hashed_metag = {
                                                           4,
                                                           5
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,before or after,[[a]],[[f]],[[t]],[[e]],[[r]]'
                                          },
                                          {
@@ -3319,6 +3511,7 @@ $hashed_metag = {
                                                           5,
                                                           6
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,before or after,[[b]],[[e]],[[f]],[[o]],[[r]],[[e]]'
                                          },
                                          {
@@ -3331,6 +3524,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,boolean,[[01]]'
                                          },
                                          {
@@ -3347,6 +3541,7 @@ $hashed_metag = {
                                                           2,
                                                           3
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,bracketed name,[[\\<]],bracketed name string,[[\\>]]'
                                          },
                                          {
@@ -3360,6 +3555,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,bracketed name string,[[\\s\\w]]'
                                          },
                                          {
@@ -3372,6 +3568,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,cc element,escaped cc character'
                                          },
                                          {
@@ -3384,6 +3581,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,cc element,negated posix char class'
                                          },
                                          {
@@ -3396,6 +3594,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,cc element,posix char class'
                                          },
                                          {
@@ -3408,6 +3607,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,cc element,safe cc character'
                                          },
                                          {
@@ -3421,6 +3621,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,cc elements,cc element'
                                          },
                                          {
@@ -3439,6 +3640,7 @@ $hashed_metag = {
                                                           3,
                                                           4
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,character class,[[\\[]],cc elements,[[\\]]],character class modifiers'
                                          },
                                          {
@@ -3453,6 +3655,7 @@ $hashed_metag = {
                                                           1,
                                                           2
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,character class modifier,[[\\:]],[[i]]'
                                          },
                                          {
@@ -3469,6 +3672,7 @@ $hashed_metag = {
                                                           2,
                                                           3
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,character class modifier,[[\\:]],[[i]],[[c]]'
                                          },
                                          {
@@ -3482,6 +3686,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,character class modifiers,character class modifier'
                                          },
                                          {
@@ -3496,6 +3701,7 @@ $hashed_metag = {
                                                           1,
                                                           2
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,double colon,[[\\:]],[[\\:]]'
                                          },
                                          {
@@ -3510,6 +3716,7 @@ $hashed_metag = {
                                                           1,
                                                           2
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,escaped cc character,[[\\\\]],horizontal character'
                                          },
                                          {
@@ -3522,6 +3729,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,hash comment,terminated hash comment'
                                          },
                                          {
@@ -3534,6 +3742,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,hash comment,unterminated final hash comment'
                                          },
                                          {
@@ -3547,6 +3756,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,hash comment body,hash comment char'
                                          },
                                          {
@@ -3559,6 +3769,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,hash comment char,[[^\\x{A}\\x{B}\\x{C}\\x{D}\\x{2028}\\x{2029}]]'
                                          },
                                          {
@@ -3571,6 +3782,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,horizontal character,[[^\\x{A}\\x{B}\\x{C}\\x{D}\\x{2028}\\x{2029}]]'
                                          },
                                          {
@@ -3584,6 +3796,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,integer,[[\\d]]'
                                          },
                                          {
@@ -3606,6 +3819,7 @@ $hashed_metag = {
                                                           5,
                                                           6
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,negated posix char class,[[\\[]],[[\\:]],[[\\^]],posix char class name,[[\\:]],[[\\]]]'
                                          },
                                          {
@@ -3619,6 +3833,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,one or more word characters,[[\\w]]'
                                          },
                                          {
@@ -3635,6 +3850,7 @@ $hashed_metag = {
                                                           2,
                                                           3
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,op declare bnf,[[\\:]],[[\\:]],[[\\=]]'
                                          },
                                          {
@@ -3647,6 +3863,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,op declare match,[[\\~]]'
                                          },
                                          {
@@ -3659,6 +3876,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,op equal priority,[[\\|]]'
                                          },
                                          {
@@ -3673,6 +3891,7 @@ $hashed_metag = {
                                                           1,
                                                           2
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,op loosen,[[\\|]],[[\\|]]'
                                          },
                                          {
@@ -3693,6 +3912,7 @@ $hashed_metag = {
                                                           4,
                                                           5
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,posix char class,[[\\[]],[[\\:]],posix char class name,[[\\:]],[[\\]]]'
                                          },
                                          {
@@ -3706,6 +3926,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,posix char class name,[[[:alnum:]]]'
                                          },
                                          {
@@ -3722,6 +3943,7 @@ $hashed_metag = {
                                                           2,
                                                           3
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,reserved action name,[[\\:]],[[\\:]],one or more word characters'
                                          },
                                          {
@@ -3738,6 +3960,7 @@ $hashed_metag = {
                                                           2,
                                                           3
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,reserved blessing name,[[\\:]],[[\\:]],one or more word characters'
                                          },
                                          {
@@ -3762,6 +3985,7 @@ $hashed_metag = {
                                                           6,
                                                           7
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,reserved event name,[[\\:]],[[s]],[[y]],[[m]],[[b]],[[o]],[[l]]'
                                          },
                                          {
@@ -3778,6 +4002,7 @@ $hashed_metag = {
                                                           2,
                                                           3
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,result item descriptor,[[l]],[[h]],[[s]]'
                                          },
                                          {
@@ -3796,6 +4021,7 @@ $hashed_metag = {
                                                           3,
                                                           4
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,result item descriptor,[[n]],[[a]],[[m]],[[e]]'
                                          },
                                          {
@@ -3814,6 +4040,7 @@ $hashed_metag = {
                                                           3,
                                                           4
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,result item descriptor,[[r]],[[u]],[[l]],[[e]]'
                                          },
                                          {
@@ -3834,6 +4061,7 @@ $hashed_metag = {
                                                           4,
                                                           5
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,result item descriptor,[[s]],[[t]],[[a]],[[r]],[[t]]'
                                          },
                                          {
@@ -3854,6 +4082,7 @@ $hashed_metag = {
                                                           4,
                                                           5
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,result item descriptor,[[v]],[[a]],[[l]],[[u]],[[e]]'
                                          },
                                          {
@@ -3876,6 +4105,7 @@ $hashed_metag = {
                                                           5,
                                                           6
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,result item descriptor,[[l]],[[e]],[[n]],[[g]],[[t]],[[h]]'
                                          },
                                          {
@@ -3898,6 +4128,7 @@ $hashed_metag = {
                                                           5,
                                                           6
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,result item descriptor,[[s]],[[y]],[[m]],[[b]],[[o]],[[l]]'
                                          },
                                          {
@@ -3920,6 +4151,7 @@ $hashed_metag = {
                                                           5,
                                                           6
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,result item descriptor,[[v]],[[a]],[[l]],[[u]],[[e]],[[s]]'
                                          },
                                          {
@@ -3944,6 +4176,7 @@ $hashed_metag = {
                                                           6,
                                                           7
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,result item descriptor,[[g]],[[1]],[[s]],[[t]],[[a]],[[r]],[[t]]'
                                          },
                                          {
@@ -3970,6 +4203,7 @@ $hashed_metag = {
                                                           7,
                                                           8
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,result item descriptor,[[g]],[[1]],[[l]],[[e]],[[n]],[[g]],[[t]],[[h]]'
                                          },
                                          {
@@ -3984,6 +4218,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,result item descriptor list,result item descriptor'
                                          },
                                          {
@@ -3996,6 +4231,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,result item descriptor separator,[[,]]'
                                          },
                                          {
@@ -4010,6 +4246,7 @@ $hashed_metag = {
                                                           1,
                                                           2
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,result item descriptor separator,[[,]],whitespace'
                                          },
                                          {
@@ -4022,6 +4259,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,safe cc character,[[^\\x{5d}\\x{0A}\\x{0B}\\x{0C}\\x{0D}\\x{0085}\\x{2028}\\x{2029}]]'
                                          },
                                          {
@@ -4034,6 +4272,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,sign,[[+-]]'
                                          },
                                          {
@@ -4046,6 +4285,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,signed integer,integer'
                                          },
                                          {
@@ -4060,6 +4300,7 @@ $hashed_metag = {
                                                           1,
                                                           2
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,signed integer,sign,integer'
                                          },
                                          {
@@ -4076,6 +4317,7 @@ $hashed_metag = {
                                                           2,
                                                           3
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,single quoted name,[[\']],string without single quote or vertical space,[[\']]'
                                          },
                                          {
@@ -4094,6 +4336,7 @@ $hashed_metag = {
                                                           3,
                                                           4
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,single quoted string,[[\']],string without single quote or vertical space,[[\']],character class modifiers'
                                          },
                                          {
@@ -4108,6 +4351,7 @@ $hashed_metag = {
                                                           1,
                                                           2
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,standard name,[[a-zA-Z]],zero or more word characters'
                                          },
                                          {
@@ -4121,6 +4365,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,string without single quote or vertical space,[[^\'\\x{0A}\\x{0B}\\x{0C}\\x{0D}\\x{0085}\\x{2028}\\x{2029}]]'
                                          },
                                          {
@@ -4137,6 +4382,7 @@ $hashed_metag = {
                                                           2,
                                                           3
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,terminated hash comment,[[\\#]],hash comment body,vertical space char'
                                          },
                                          {
@@ -4151,6 +4397,7 @@ $hashed_metag = {
                                                           1,
                                                           2
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,unterminated final hash comment,[[\\#]],hash comment body'
                                          },
                                          {
@@ -4163,6 +4410,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,vertical space char,[[\\x{A}\\x{B}\\x{C}\\x{D}\\x{2028}\\x{2029}]]'
                                          },
                                          {
@@ -4176,6 +4424,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,whitespace,[[\\s]]'
                                          },
                                          {
@@ -4189,6 +4438,7 @@ $hashed_metag = {
                                                           0,
                                                           1
                                                         ],
+                                           'xpr_top' => 1,
                                            'xprid' => 'l0,zero or more word characters,[[\\w]]'
                                          }
                                        ]
