@@ -1399,10 +1399,10 @@ sub add_G1_user_rule {
         if ( $option eq 'xpr_top' ) { $xpr_top      = $value; next OPTION }
     } ## end OPTION: for my $option ( keys %{$options} )
 
-    my ($rank, $xpr_id) =
+    my ($rank, $xpr_id, $base_irl_id) =
           $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
           <<'END_OF_LUA', 's', $options);
-    local grammar, options = ...
+    local slg, options = ...
     local allowed = {
         action = true,
         lhs = true,
@@ -1424,89 +1424,61 @@ sub add_G1_user_rule {
                key)
        end
     end
-    local rank = options.rank or grammar.g1:default_rank()
-    local xpr_id = grammar.xprs[options.xprid].id
-    return rank, xpr_id
-END_OF_LUA
-
-    $rhs_names //= [];
-    $null_ranking //= 'low';
-
-    # Is this is an ordinary, non-counted rule?
-    my $is_ordinary_rule = scalar @{$rhs_names} == 0 || !defined $min;
-    if ( defined $separator_name and $is_ordinary_rule ) {
-        if ( defined $separator_name ) {
-            Marpa::R3::exception(
-                'separator defined for rule without repetitions');
+    local rank = options.rank or slg.g1:default_rank()
+    local xpr_id = slg.xprs[options.xprid].id
+    local rhs_names = options.rhs or {}
+    local is_ordinary = #rhs_names == 0 or not options.min
+    local separator = options.separator
+    local base_irl_id
+    local rule_symids = { slg:g1_symbol_assign(options.lhs) }
+    for ix = 1, #rhs_names do
+        rule_symids[ix+1] = slg:g1_symbol_assign(rhs_names[ix])
+    end
+    if is_ordinary then
+        if separator then
+            _M._internal_error(
+                "Separator defined for rule without repetitions:\n    %s",
+                _M._raw_rule_show(options.lhs, rhs_names))
+        end
+        _M.throw = false
+        base_irl_id = slg.g1:rule_new(rule_symids)
+        _M.throw = true
+        if not base_irl_id or base_irl_id < 0 then return -1 end
+        slg.g1.irls[base_irl_id] = { id = base_irl_id }
+    else
+        if #rhs_names ~= 1 then
+            _M._internal_error(
+                "Rule has %d symbols on RHS\n\z
+                \u{20}   Only one RHS symbol is allowed for a rule counted rule:\n\z
+                \u{20}   %s",
+                #rhs_names,
+                _M._raw_rule_show(options.lhs, rhs_names))
+        end
+        local separator_id
+            = separator and slg:g1_symbol_assign(separator)
+              or -1
+        local proper = (options.proper and options.proper ~= 0)
+        _M.throw = false
+        base_irl_id = slg.g1:sequence_new{
+            lhs = rule_symids[1],
+            rhs = rule_symids[2],
+            separator = separator_id,
+            proper = proper,
+            min = math.tointeger(options.min)
         }
-    } ## end if ( defined $separator_name and $is_ordinary_rule )
+        _M.throw = true
+        -- remove the test for nil or less than zero
+        -- once refactoring is complete?
+        if not base_irl_id or base_irl_id < 0 then return end
 
-    my @rhs_ids = map {
-                assign_G1_symbol( $slg, $_ )
-        } @{$rhs_names};
-    my $lhs_id = assign_G1_symbol( $slg, $lhs_name );
-
-    my $base_irl_id;
-    my $separator_id = -1;
-
-    if ($is_ordinary_rule) {
-
-        ($base_irl_id) =
-          $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-            <<'END_OF_LUA', 'i', [ $lhs_id, @rhs_ids ] );
-    local g, rule  = ...
-    -- remove the test for nil or less than zero
-    -- once refactoring is complete?
-    _M.throw = false
-    local base_irl_id = g.g1:rule_new(rule)
-    _M.throw = true
-    if not base_irl_id or base_irl_id < 0 then return -1 end
-    g.g1.irls[base_irl_id] = { id = base_irl_id }
-    return base_irl_id
+        local g1_rule = setmetatable({}, _M.class_irl)
+        g1_rule.id = base_irl_id
+        slg.g1.irls[base_irl_id] = g1_rule
+    end
+    return rank, xpr_id, base_irl_id
 END_OF_LUA
 
-    } ## end if ($is_ordinary_rule)
-    else {
-        Marpa::R3::exception('Only one rhs symbol allowed for counted rule')
-          if scalar @{$rhs_names} != 1;
-
-        # create the separator symbol, if we're using one
-        if ( defined $separator_name ) {
-            $separator_id = assign_G1_symbol( $slg, $separator_name );
-        } ## end if ( defined $separator_name )
-
-        # The original rule for a sequence rule is
-        # not actually used in parsing,
-        # but some of the rewritten sequence rules are its
-        # semantic equivalents.
-
-        my $arg_hash = {
-            lhs => $lhs_id,
-            rhs => $rhs_ids[0],
-            separator => $separator_id,
-            proper    => $proper_separation,
-            min       => $min,
-        };
-
-      ($base_irl_id) =
-      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 'i', $arg_hash);
-    local g, arg_hash = ...
-    arg_hash.proper = (arg_hash.proper ~= 0)
-    _M.throw = false
-    local base_irl_id = g.g1:sequence_new(arg_hash)
-    _M.throw = true
-    -- remove the test for nil or less than zero
-    -- once refactoring is complete?
-    if not base_irl_id or base_irl_id < 0 then return end
-
-    local g1_rule = setmetatable({}, _M.class_irl)
-    g1_rule.id = base_irl_id
-    g.g1.irls[base_irl_id] = g1_rule
-    return base_irl_id
-END_OF_LUA
-
-    }
+    $null_ranking //= 'low';
 
     if ( not defined $base_irl_id or $base_irl_id < 0 ) {
         my $rule_description = proto_rule_describe( $lhs_name, $rhs_names );

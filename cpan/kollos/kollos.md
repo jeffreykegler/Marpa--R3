@@ -8187,6 +8187,30 @@ that code inlined in Perl can use it.
     end
 ```
 
+A utility to print a rule when all we have
+are the names.
+Primarily for error messages,
+including internal ones,
+so it cannot assume that its arguments are sane.
+
+```
+    -- miranda: section+ internal utilities
+    function _M._raw_rule_show(lhs, rhs)
+        local pcs = {}
+        pcs[#pcs+1] = tostring(lhs)
+        pcs[#pcs+1] = '::='
+        if type(rhs) ~= 'table' then
+            pcs[#pcs+1] = tostring(rhs)
+        else
+            for ix = 1, #rhs do
+                local rhsym = rhs[ix]
+                pcs[#pcs+1] = tostring(rhsym)
+            end
+        end
+        return table.concat(pcs, ' ')
+    end
+```
+
 Eventually make this local.
 Right now it's a static class method,
 so that it can be used from the Lua inlined
