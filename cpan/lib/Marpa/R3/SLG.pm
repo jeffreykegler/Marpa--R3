@@ -1369,31 +1369,18 @@ sub add_G1_user_rule {
 
     my ( $lhs_name, $rhs_names, $action, $blessing );
     my ( $min, $separator_name );
-    my $rank;
     my $null_ranking;
     my $priority;
     my $proper_separation = 0;
-    my $xpr_name;
-    my $xpr_id;
     my $subgrammar;
     my $xpr_dot;
     my $xpr_top;
 
   OPTION: for my $option ( keys %{$options} ) {
         my $value = $options->{$option};
-        if ( $option eq 'precedence' )   {
-            # just ignore the precedence -- it's for
-            # XPR diagnostics
-            next OPTION;
-        }
-        if ( $option eq 'xprid' ) {
-            $xpr_name = $value;
-            next OPTION;
-        }
         if ( $option eq 'rhs' )    { $rhs_names = $value; next OPTION }
         if ( $option eq 'lhs' )    { $lhs_name  = $value; next OPTION }
         if ( $option eq 'action' ) { $action    = $value; next OPTION }
-        if ( $option eq 'rank' )   { $rank      = $value; next OPTION }
         if ( $option eq 'null_ranking' ) {
             $null_ranking = $value;
             next OPTION;
@@ -1410,23 +1397,39 @@ sub add_G1_user_rule {
         if ( $option eq 'subgrammar' ) { $subgrammar      = $value; next OPTION }
         if ( $option eq 'xpr_dot' ) { $xpr_dot      = $value; next OPTION }
         if ( $option eq 'xpr_top' ) { $xpr_top      = $value; next OPTION }
-        Marpa::R3::exception("Unknown user rule option: $option");
     } ## end OPTION: for my $option ( keys %{$options} )
 
-
-    $rhs_names //= [];
-
-    my $default_rank;
-    ($default_rank, $xpr_id) =
+    my ($rank, $xpr_id) =
           $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-          <<'END_OF_LUA', 's', $xpr_name);
-    local grammar, xpr_name = ...
-    local default_rank = grammar.g1:default_rank()
-    local xpr_id = grammar.xprs[xpr_name].id
-    return default_rank, xpr_id
+          <<'END_OF_LUA', 's', $options);
+    local grammar, options = ...
+    local allowed = {
+        action = true,
+        lhs = true,
+        rhs = true,
+        rank = true,
+        null_ranking = true,
+        precedence = true,
+        min = true,
+        separator = true,
+        proper = true,
+        subgrammar = true,
+        xprid = true,
+        xpr_dot = true,
+        xpr_top = true
+    }
+    for key, _ in pairs(options) do
+       if not allowed[key] then
+           _M._internal_error("Unknown user rule option: %q",
+               key)
+       end
+    end
+    local rank = options.rank or grammar.g1:default_rank()
+    local xpr_id = grammar.xprs[options.xprid].id
+    return rank, xpr_id
 END_OF_LUA
 
-    $rank //= $default_rank;
+    $rhs_names //= [];
     $null_ranking //= 'low';
 
     # Is this is an ordinary, non-counted rule?
