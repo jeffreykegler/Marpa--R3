@@ -505,32 +505,6 @@ END_OF_LUA
     my $character_class_hash = $hashed_source->{character_classes};
     my $lexer_symbols        = $hashed_source->{symbols}->{'l0'};
 
-    # If no lexer rules, fake a lexer
-    # Fake a lexer -- it discards symbols in character classes which
-    # never matches
-    if ( not scalar @{$lexer_rules} ) {
-        $character_class_hash = { '[[^\\d\\D]]' => [ '[^\\d\\D]', '' ] };
-        $lexer_rules = [
-            {
-                'rhs'             => ['[[^\\d\\D]]'],
-                'lhs'             => '[:discard:]',
-                'symbol_as_event' => '[^\\d\\D]',
-
-                # 'description' => 'Discard rule for <[[^\\d\\D]]>'
-            },
-        ];
-        $lexer_symbols = {
-            '[:discard:]' => {
-
-                # 'description'  => 'Internal LHS for lexer "L0" discard'
-            },
-            '[[^\\d\\D]]' => {
-
-                # 'description'  => 'Character class: [^\\d\\D]'
-            }
-        };
-    } ## end if ( not $lexer_rules )
-
     my %lex_lhs       = ();
     my %lex_rhs       = ();
     my %lex_separator = ();
