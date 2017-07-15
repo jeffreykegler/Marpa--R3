@@ -1367,41 +1367,8 @@ sub proto_rule_describe {
 sub add_G1_user_rule {
     my ( $slg, $options ) = @_;
 
-    my ( $lhs_name, $rhs_names, $action, $blessing );
-    my ( $min, $separator_name );
-    my $null_ranking;
-    my $priority;
-    my $proper_separation = 0;
-    my $subgrammar;
-    my $xpr_dot;
-    my $xpr_top;
-
-  OPTION: for my $option ( keys %{$options} ) {
-        my $value = $options->{$option};
-        if ( $option eq 'rhs' )    { $rhs_names = $value; next OPTION }
-        if ( $option eq 'lhs' )    { $lhs_name  = $value; next OPTION }
-        if ( $option eq 'action' ) { $action    = $value; next OPTION }
-        if ( $option eq 'null_ranking' ) {
-            $null_ranking = $value;
-            next OPTION;
-        }
-        if ( $option eq 'min' ) { $min = $value; next OPTION }
-        if ( $option eq 'separator' ) {
-            $separator_name = $value;
-            next OPTION;
-        }
-        if ( $option eq 'proper' ) {
-            $proper_separation = $value;
-            next OPTION;
-        }
-        if ( $option eq 'subgrammar' ) { $subgrammar      = $value; next OPTION }
-        if ( $option eq 'xpr_dot' ) { $xpr_dot      = $value; next OPTION }
-        if ( $option eq 'xpr_top' ) { $xpr_top      = $value; next OPTION }
-    } ## end OPTION: for my $option ( keys %{$options} )
-
-    my ($rank, $xpr_id, $base_irl_id) =
-          $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-          <<'END_OF_LUA', 's', $options);
+    $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 's', $options );
     local slg, options = ...
     local g1g = slg.g1
     local allowed = {
@@ -1491,31 +1458,19 @@ sub add_G1_user_rule {
         g1_rule.id = base_irl_id
         g1g.irls[base_irl_id] = g1_rule
     end
-    return rank, xpr_id, base_irl_id
+    local ranking_is_high = options.null_ranking == 'high' and 1 or 0
+    g1g:rule_null_high_set(base_irl_id, ranking_is_high)
+    g1g:rule_rank_set(base_irl_id, rank)
+
+    local xpr = slg.xprs[xpr_id]
+    local irl = slg.g1.irls[base_irl_id]
+    irl.xpr = xpr
+    -- right now, the action & mask of an irl
+    -- is always the action/mask of its xpr.
+    -- But some day each irl may need its own.
+    irl.action = xpr.action
+    irl.mask = xpr.mask
 END_OF_LUA
-
-    $null_ranking //= 'low';
-
-      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 'iiii',
-        local slg, irl_id, ranking_is_high, rank, xpr_id = ...
-        local g1g = slg.g1
-        g1g:rule_null_high_set(irl_id, ranking_is_high)
-        g1g:rule_rank_set(irl_id, rank)
-        local xpr = slg.xprs[xpr_id]
-        local irl = slg.g1.irls[irl_id]
-        irl.xpr = xpr
-        -- right now, the action & mask of an irl
-        -- is always the action/mask of its xpr.
-        -- But some day each irl may need its own.
-        irl.action = xpr.action
-        irl.mask = xpr.mask
-END_OF_LUA
-            $base_irl_id,
-            ( $null_ranking eq 'high' ? 1 : 0 ),
-            $rank, $xpr_id);
-
-    return;
 
 }
 
