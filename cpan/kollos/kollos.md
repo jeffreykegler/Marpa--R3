@@ -1417,6 +1417,10 @@ one for each subgrammar.
             local from_rhs = xpr_source.rhs
             for ix = 1, #from_rhs do
                 local rh_sym = xpr_source.rhs[ix]
+
+                print('xpr_source', inspect(xpr_source))
+                print('hash_symbols[rh_sym]', inspect(hash_symbols[rh_sym]))
+
                 to_rhs[ix] = xsys[rh_sym] or
                     xsys[hash_symbols[rh_sym].xsy]
             end

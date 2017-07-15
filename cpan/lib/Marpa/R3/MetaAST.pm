@@ -139,10 +139,13 @@ sub ast_to_hash {
 
         # the unicorn is a pattern which never matches
         my $unicorn_class = '[[^\\d\\D]]';
-        my $unicorn       = do {
+        my $unicorn;
+        {
             local $Marpa::R3::Internal::SUBGRAMMAR = 'l0';
-            Marpa::R3::Internal::MetaAST::Symbol_List->char_class_to_symbol(
+            my $unicorn_symbol =
+              Marpa::R3::Internal::MetaAST::Symbol_List->char_class_to_symbol(
                 $hashed_ast, $unicorn_class );
+            $unicorn = $unicorn_symbol->name();
         };
         my $discard_lhs = '[:discard:]';
         my $symbol_data = {
