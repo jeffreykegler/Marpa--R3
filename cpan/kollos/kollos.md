@@ -114,6 +114,7 @@ cd kollos && ../lua/lua toc.lua < kollos.md
   * [LMR fields](#lmr-fields)
   * [Functions for tracing Earley sets](#functions-for-tracing-earley-sets)
 * [Libmarpa valuer wrapper class](#libmarpa-valuer-wrapper-class)
+  * [Adjust metal tables](#adjust-metal-tables)
   * [Initialize a valuator](#initialize-a-valuator)
   * [Reset a valuator](#reset-a-valuator)
   * [SLV diagnostics](#slv-diagnostics)
@@ -1475,6 +1476,114 @@ one for each subgrammar.
         slg.xprs = {}
         slg:xprs_subg_populate(source_hash, 'g1')
         return slg:xprs_subg_populate(source_hash, 'l0')
+    end
+```
+
+#### Add a G1 rule
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slg.g1_rule_add(slg, options)
+        local g1g = slg.g1
+        local allowed = {
+            action = true,
+            lhs = true,
+            rhs = true,
+            rank = true,
+            null_ranking = true,
+            precedence = true,
+            min = true,
+            separator = true,
+            proper = true,
+            subgrammar = true,
+            xprid = true,
+            xpr_dot = true,
+            xpr_top = true
+        }
+        for key, _ in pairs(options) do
+           if not allowed[key] then
+               _M._internal_error("Unknown user rule option: %q",
+                   key)
+           end
+        end
+        local rank = options.rank or g1g:default_rank()
+        local xpr_id = slg.xprs[options.xprid].id
+        local rhs_names = options.rhs or {}
+
+        local function rule_error()
+            local error_code = g1g:error_code()
+            local rule_description =_M._raw_rule_show(options.lhs, rhs_names)
+            local problem_description
+            if error_code == _M.err.DUPLICATE_RULE then
+                problem_description = "Duplicate rule"
+            else
+                problem_description = _M.err[error_code].description
+            end
+            _M.userX("Error in rule: %s; rule was\n\z
+            \u{20}   %s",
+            problem_description, rule_description)
+        end
+
+        local is_ordinary = #rhs_names == 0 or not options.min
+        local separator = options.separator
+        local base_irl_id
+        local rule_symids = { slg:g1_symbol_assign(options.lhs) }
+        for ix = 1, #rhs_names do
+            rule_symids[ix+1] = slg:g1_symbol_assign(rhs_names[ix])
+        end
+        if is_ordinary then
+            if separator then
+                _M._internal_error(
+                    "Separator defined for rule without repetitions:\n    %s",
+                    _M._raw_rule_show(options.lhs, rhs_names))
+            end
+            _M.throw = false
+            base_irl_id = g1g:rule_new(rule_symids)
+            _M.throw = true
+            if not base_irl_id or base_irl_id < 0 then rule_error() end
+            g1g.irls[base_irl_id] = { id = base_irl_id }
+        else
+            if #rhs_names ~= 1 then
+                _M._internal_error(
+                    "Rule has %d symbols on RHS\n\z
+                    \u{20}   Only one RHS symbol is allowed for a rule counted rule:\n\z
+                    \u{20}   %s",
+                    #rhs_names,
+                    _M._raw_rule_show(options.lhs, rhs_names))
+            end
+            local separator_id
+                = separator and slg:g1_symbol_assign(separator)
+                  or -1
+            local proper = (options.proper and options.proper ~= 0)
+            _M.throw = false
+            base_irl_id = g1g:sequence_new{
+                lhs = rule_symids[1],
+                rhs = rule_symids[2],
+                separator = separator_id,
+                proper = proper,
+                min = math.tointeger(options.min)
+            }
+            _M.throw = true
+            -- remove the test for nil or less than zero
+            -- once refactoring is complete?
+            if not base_irl_id or base_irl_id < 0 then rule_error() end
+
+            local g1_rule = setmetatable({}, _M.class_irl)
+            g1_rule.id = base_irl_id
+            g1g.irls[base_irl_id] = g1_rule
+        end
+        local ranking_is_high = options.null_ranking == 'high' and 1 or 0
+        g1g:rule_null_high_set(base_irl_id, ranking_is_high)
+        g1g:rule_rank_set(base_irl_id, rank)
+
+        local xpr = slg.xprs[xpr_id]
+        local irl = slg.g1.irls[base_irl_id]
+        irl.xpr = xpr
+        -- right now, the action & mask of an irl
+        -- is always the action/mask of its xpr.
+        -- But some day each irl may need its own.
+        irl.action = xpr.action
+        irl.mask = xpr.mask
     end
 ```
 
