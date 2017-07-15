@@ -129,7 +129,41 @@ sub ast_to_hash {
         $hashed_ast->symbol_assign_ordinary($start_lhs, 'g1');
         my $wrl = $hashed_ast->xpr_create( $rule_data, 'g1' );
         push @{ $hashed_ast->{rules}->{g1} }, $wrl;
-    } ## end sub Marpa::R3::Internal::MetaAST::start_rule_create
+    }
+
+    # If the lexer is empty, create a fake one
+    # The fake lexer contains one rule.
+    # This rule discards everything it matches, but it
+    # never matches anything.
+    if ( not %{ $hashed_ast->{xpr}->{l0} } ) {
+
+        # the unicorn is a pattern which never matches
+        my $unicorn_class = '[[^\\d\\D]]';
+        my $unicorn       = do {
+            local $Marpa::R3::Internal::SUBGRAMMAR = 'l0';
+            Marpa::R3::Internal::MetaAST::Symbol_List->char_class_to_symbol(
+                $hashed_ast, $unicorn_class );
+        };
+        my $discard_lhs = '[:discard:]';
+        my $symbol_data = {
+            dsl_form    => $discard_lhs,
+            name_source => 'internal',
+        };
+        $hashed_ast->xsy_assign( $discard_lhs, $symbol_data );
+        $hashed_ast->symbol_names_set( $discard_lhs, 'l0',
+            { xsy => $discard_lhs } );
+        my $rule_data = {
+            start           => 0,
+            length          => 0,
+            lhs             => $discard_lhs,
+            rhs             => [$unicorn],
+            symbol_as_event => $unicorn
+
+              # 'description' => 'Discard rule for <[[^\\d\\D]]>'
+        };
+        my $wrl = $hashed_ast->xpr_create( $rule_data, 'l0' );
+        push @{ $hashed_ast->{rules}->{l0} }, $wrl;
+    }
 
     my %stripped_character_classes = ();
     {
