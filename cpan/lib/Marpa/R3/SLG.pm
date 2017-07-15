@@ -576,8 +576,11 @@ END_OF_LUA
     my $lex_discard_symbol_id =
       $slg->l0_symbol_by_name($discard_symbol_name) // -1;
     my @lex_lexeme_to_g1_symbol;
-    for (my $iter = $slg->g1_symbol_ids_gen();
-    defined(my $lexeme_id = $iter->()); ) {
+    for (
+        my $iter = $slg->g1_symbol_ids_gen() ;
+        defined( my $lexeme_id = $iter->() ) ;
+      )
+    {
         $lex_lexeme_to_g1_symbol[$lexeme_id] = -1;
     }
 

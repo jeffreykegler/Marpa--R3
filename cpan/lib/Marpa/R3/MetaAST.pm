@@ -168,6 +168,56 @@ sub ast_to_hash {
         push @{ $hashed_ast->{rules}->{l0} }, $wrl;
     }
 
+    my %l0_lhs = ();
+    my %l0_rhs = ();
+    RULE: for my $rule (values %{$hashed_ast->{xpr}->{l0}}) {
+         my $lhs = $rule->{lhs};
+         $l0_lhs{$lhs} = 1;
+         $l0_rhs{$_} = 1 for @{$rule->{rhs}};
+         my $separator = $rule->{separator};
+         $l0_rhs{$separator} = 1 if $separator;
+    }
+    my %g1_lhs = ();
+    my %g1_rhs = ();
+    RULE: for my $rule (values %{$hashed_ast->{xpr}->{g1}}) {
+         my $lhs = $rule->{lhs};
+         $g1_lhs{$lhs} = 1;
+         $g1_rhs{$_} = 1 for @{$rule->{rhs}};
+         my $separator = $rule->{separator};
+         $g1_rhs{$separator} = 1 if $separator;
+    }
+    my %lexeme = ();
+    $lexeme{$_} = 'lexeme in l0' for grep { not $l0_rhs{$_} } keys %l0_lhs;
+    $lexeme{$_} = 'lexeme in g1' for grep { not $g1_lhs{$_} } keys %g1_rhs;
+    $lexeme{$_} = 'declared lexeme' for keys %{$hashed_ast->{lexeme_declarations}};
+    LEXEME: for my $lexeme (sort keys %lexeme) {
+        next LEXEME if $lexeme eq '[:discard:]';
+        if (not $l0_lhs{$lexeme}) {
+            my $type = $lexeme{$lexeme};
+            Marpa::R3::exception(
+                "<$lexeme> is $type, but is not on the LHS of any L0 rule\n",
+                "    A lexeme must be the LHS of some L0 rule\n");
+        }
+        if ($l0_rhs{$lexeme}) {
+            my $type = $lexeme{$lexeme};
+            Marpa::R3::exception(
+                "<$lexeme> is $type, but is not on the RHS of an L0 rule\n",
+                "    A lexeme cannot appear on the RHS of an L0 rule\n");
+        }
+        if ($g1_lhs{$lexeme}) {
+            my $type = $lexeme{$lexeme};
+            Marpa::R3::exception(
+                "<$lexeme> is $type, but is on the LHS of a G1 rule\n",
+                "    A lexeme cannot be on the LHS of any G1 rule\n");
+        }
+        if (not $g1_rhs{$lexeme}) {
+            my $type = $lexeme{$lexeme};
+            Marpa::R3::exception(
+                "<$lexeme> is $type, but is not on the RHS of any G1 rule\n",
+                "    A lexeme must be on the LHS of at least one G1 rule\n");
+        }
+    }
+
     my %stripped_character_classes = ();
     {
         my $character_classes = $hashed_ast->{character_classes};
