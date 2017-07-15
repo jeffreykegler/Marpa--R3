@@ -1403,6 +1403,7 @@ sub add_G1_user_rule {
           $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
           <<'END_OF_LUA', 's', $options);
     local slg, options = ...
+    local g1g = slg.g1
     local allowed = {
         action = true,
         lhs = true,
@@ -1424,9 +1425,24 @@ sub add_G1_user_rule {
                key)
        end
     end
-    local rank = options.rank or slg.g1:default_rank()
+    local rank = options.rank or g1g:default_rank()
     local xpr_id = slg.xprs[options.xprid].id
     local rhs_names = options.rhs or {}
+
+    local function rule_error()
+        local error_code = g1g:error_code()
+        local rule_description =_M._raw_rule_show(options.lhs, rhs_names)
+        local problem_description
+        if error_code == _M.err.DUPLICATE_RULE then
+            problem_description = "Duplicate rule"
+        else
+            problem_description = _M.err[error_code].description
+        end
+        _M.userX("Error in rule: %s; rule was\n\z
+        \u{20}   %s",
+        problem_description, rule_description)
+    end
+
     local is_ordinary = #rhs_names == 0 or not options.min
     local separator = options.separator
     local base_irl_id
@@ -1441,10 +1457,10 @@ sub add_G1_user_rule {
                 _M._raw_rule_show(options.lhs, rhs_names))
         end
         _M.throw = false
-        base_irl_id = slg.g1:rule_new(rule_symids)
+        base_irl_id = g1g:rule_new(rule_symids)
         _M.throw = true
-        if not base_irl_id or base_irl_id < 0 then return -1 end
-        slg.g1.irls[base_irl_id] = { id = base_irl_id }
+        if not base_irl_id or base_irl_id < 0 then rule_error() end
+        g1g.irls[base_irl_id] = { id = base_irl_id }
     else
         if #rhs_names ~= 1 then
             _M._internal_error(
@@ -1459,7 +1475,7 @@ sub add_G1_user_rule {
               or -1
         local proper = (options.proper and options.proper ~= 0)
         _M.throw = false
-        base_irl_id = slg.g1:sequence_new{
+        base_irl_id = g1g:sequence_new{
             lhs = rule_symids[1],
             rhs = rule_symids[2],
             separator = separator_id,
@@ -1469,36 +1485,16 @@ sub add_G1_user_rule {
         _M.throw = true
         -- remove the test for nil or less than zero
         -- once refactoring is complete?
-        if not base_irl_id or base_irl_id < 0 then return end
+        if not base_irl_id or base_irl_id < 0 then rule_error() end
 
         local g1_rule = setmetatable({}, _M.class_irl)
         g1_rule.id = base_irl_id
-        slg.g1.irls[base_irl_id] = g1_rule
+        g1g.irls[base_irl_id] = g1_rule
     end
     return rank, xpr_id, base_irl_id
 END_OF_LUA
 
     $null_ranking //= 'low';
-
-    if ( not defined $base_irl_id or $base_irl_id < 0 ) {
-        my $rule_description = proto_rule_describe( $lhs_name, $rhs_names );
-        my ($ok, $problem) =
-        $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-            <<'END_OF_LUA', 's', $rule_description );
-            local grammar, rule_description = ...
-            local g1g = grammar.g1
-            local error_code = g1g:error_code()
-            local problem_description
-            if error_code == _M.err.DUPLICATE_RULE then
-                problem_description = "Duplicate rule"
-            else
-                problem_description = _M.err[error_code].description
-            end
-            return "abend", (problem_description .. ': ' .. rule_description)
-END_OF_LUA
-
-        Marpa::R3::exception($problem) if $ok ne 'fail'
-    }
 
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'iiii',

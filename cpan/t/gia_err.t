@@ -148,7 +148,8 @@ END_OF_SOURCE
         $non_unique_sequence_grammar, 'n/a',
         'SLIF grammar failed',
         <<'END_OF_MESSAGE',
-LHS of sequence rule would not be unique: <sequence of items> -> <forty two>
+Error in rule: LHS of sequence rule would not be unique; rule was
+    <sequence of items> ::= <forty two>
 END_OF_MESSAGE
         'Grammar with non-unique LHS sequence symbols'
     ];

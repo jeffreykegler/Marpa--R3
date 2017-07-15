@@ -8197,14 +8197,14 @@ so it cannot assume that its arguments are sane.
     -- miranda: section+ internal utilities
     function _M._raw_rule_show(lhs, rhs)
         local pcs = {}
-        pcs[#pcs+1] = tostring(lhs)
+        pcs[#pcs+1] = symbol_diag_form(tostring(lhs))
         pcs[#pcs+1] = '::='
         if type(rhs) ~= 'table' then
-            pcs[#pcs+1] = tostring(rhs)
+            pcs[#pcs+1] = symbol_diag_form(tostring(rhs))
         else
             for ix = 1, #rhs do
                 local rhsym = rhs[ix]
-                pcs[#pcs+1] = tostring(rhsym)
+                pcs[#pcs+1] = symbol_diag_form(tostring(rhsym))
             end
         end
         return table.concat(pcs, ' ')
@@ -8238,12 +8238,16 @@ Given a symbol name, convert it to a form
 suitable for diagnostic messages.
 
 ```
+    -- miranda: section+ forward declarations
+    local symbol_diag_form
     -- miranda: section+ internal utilities
-    local function symbol_diag_form(name)
+    function symbol_diag_form(name)
         if name:match('^%a[%w_-]*$') then
             return name
         end
-        if name:sub(1, 1) == '[' then return name end
+        if name:sub(1, 1) == '[' and name:sub(-1, -1) == ']' then
+            return name
+        end
         return '<' .. name .. '>'
     end
 ```
