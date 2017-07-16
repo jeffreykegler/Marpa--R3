@@ -529,25 +529,7 @@ END_OF_LUA
           if defined $symbol_data;
     } ## end SYMBOL: for my $symbol_name ( ( keys %lex_lhs ), ( keys %lex_rhs...))
 
-    my @lex_lexeme_names = 
-      grep { not $lex_rhs{$_} and not $lex_separator{$_} }
-      sort keys %lex_lhs;
-
-    {
-        # TODO -- Delete after development
-        my $lexeme_declarations = $hashed_source->{lexeme_declarations};
-        my %current_lexemes = map { $_, 1 } @lex_lexeme_names;
-        for my $lexeme ( grep { not $lexeme_declarations->{$_} }
-            @lex_lexeme_names )
-        {
-            say STDERR "<$lexeme> not in declarations!";
-        }
-        for my $lexeme ( grep { not $current_lexemes{$_} }
-            keys %{$lexeme_declarations} )
-        {
-            say STDERR "<$lexeme> declared but not in current ones!";
-        }
-    }
+    my @lex_lexeme_names = sort keys %{$lexeme_declarations};
 
     # $this_lexer_symbols{$lex_start_symbol_name}->{description} =
     # 'Internal L0 (lexical) start symbol';
