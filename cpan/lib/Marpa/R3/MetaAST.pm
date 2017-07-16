@@ -85,6 +85,8 @@ sub ast_to_hash {
     $hashed_ast->{xpr}->{g1} = {};
     $hashed_ast->{rules}->{l0} = [];
     $hashed_ast->{rules}->{g1} = [];
+    $hashed_ast->{lexeme_declarations} = {};
+    my $declarations = $hashed_ast->{lexeme_declarations};
     my $g1_symbols = $hashed_ast->{symbols}->{g1} = {};
 
     my ( undef, undef, @statements ) = @{ $ast->{top_node} };
@@ -186,10 +188,11 @@ sub ast_to_hash {
          my $separator = $rule->{separator};
          $g1_rhs{$separator} = 1 if $separator;
     }
+
+
     my %lexeme = ();
     $lexeme{$_} = 'a lexeme in L0' for grep { not $l0_rhs{$_} } keys %l0_lhs;
     $lexeme{$_} = 'a lexeme in G1' for grep { not $g1_lhs{$_} } keys %g1_rhs;
-    my $declarations = $hashed_ast->{lexeme_declarations};
     $lexeme{$_} = 'a declared lexeme' for keys %{$declarations};
     LEXEME: for my $lexeme (sort keys %lexeme) {
         next LEXEME if $lexeme eq '[:discard:]';
