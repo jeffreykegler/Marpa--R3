@@ -314,7 +314,7 @@ END_OF_DSL
     test_grammar(
         'start symbol not on lhs',
         $start_not_lhs_grammar,
-        qq{Inaccessible symbol: Top\n}
+        qq{Inaccessible g1 symbol: Top\n}
     );
 }
 

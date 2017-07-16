@@ -1239,7 +1239,7 @@ END_OF_LUA
         next SYMBOL if $cmd ne 'ok';
 
         my $symbol_name = $slg->lmg_symbol_name($subg_name, $isyid);
-        my $message = "Inaccessible symbol: $symbol_name";
+        my $message = "Inaccessible $subg_name symbol: $symbol_name";
         Marpa::R3::exception($message) if $treatment eq 'fatal';
         say {$trace_fh} $message
             or Marpa::R3::exception("Could not print: $ERRNO");

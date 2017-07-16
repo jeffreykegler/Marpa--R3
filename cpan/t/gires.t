@@ -100,7 +100,7 @@ END_OF_SOURCE
     push @tests_data,
         [
         \$source, $input, $expected_value,
-        "Inaccessible symbol: c\n", qq{test "inaccessible is fatal by default"}
+        "Inaccessible g1 symbol: c\n", qq{test "inaccessible is fatal by default"}
         ];
 }
 
