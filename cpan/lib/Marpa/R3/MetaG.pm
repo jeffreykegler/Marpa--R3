@@ -278,6 +278,7 @@ $hashed_metag = {
                   'first_lhs' => 'statements',
                   'lexeme_declarations' => {
                                              'Perl name' => {},
+                                             '[:discard:]' => {},
                                              '[Lex-0]' => {},
                                              '[Lex-10]' => {},
                                              '[Lex-11]' => {},

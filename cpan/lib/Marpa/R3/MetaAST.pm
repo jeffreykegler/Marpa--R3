@@ -195,6 +195,7 @@ sub ast_to_hash {
     $lexeme{$_} = 'a lexeme in G1' for grep { not $g1_lhs{$_} } keys %g1_rhs;
     $lexeme{$_} = 'a declared lexeme' for keys %{$declarations};
     LEXEME: for my $lexeme (sort keys %lexeme) {
+        $declarations->{$lexeme} //= {};
         next LEXEME if $lexeme eq '[:discard:]';
         if (not $l0_lhs{$lexeme}) {
             my $type = $lexeme{$lexeme};
@@ -220,7 +221,6 @@ sub ast_to_hash {
                 "<$lexeme> is $type, but is not on the RHS of any G1 rule\n",
                 "    A lexeme must be in the RHS of at least one G1 rule\n");
         }
-        $declarations->{$lexeme} //= {};
     }
 
     my %stripped_character_classes = ();
