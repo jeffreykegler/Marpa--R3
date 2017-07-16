@@ -142,6 +142,8 @@ if (1) {
     my $non_unique_sequence_grammar = \(<<'END_OF_SOURCE');
     <sequence of items> ::= item* proper => 1
     <sequence of items> ::= <forty two>
+    <forty two> ~ '42'
+    <item> ~ [^\d\D]
 END_OF_SOURCE
 
     push @tests_data, [

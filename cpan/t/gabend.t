@@ -20,7 +20,7 @@ use 5.010001;
 use strict;
 use warnings;
 use English qw( -no_match_vars );
-use Test::More tests => 9;
+use Test::More tests => 12;
 use Fatal qw(open close);
 use POSIX qw(setlocale LC_ALL);
 
@@ -65,10 +65,8 @@ sub test_grammar {
 if (1) {
     my $counted_nullable_grammar = <<'END_OF_DSL';
     S ::= Seq*
-    Seq ::= A B
+    Seq ::= A
     A ::=
-    B ::=
-    A ~ [\d\D]
 END_OF_DSL
 
     test_grammar(
@@ -174,7 +172,7 @@ EOS
 }
 
 if (1) {
-    my $nulling_terminal_grammar = <<'END_OF_DSL';
+    my $bad_lexeme_grammar = <<'END_OF_DSL';
     Top ::= Bad
     Top ::= Good
     Bad ::=
@@ -182,10 +180,58 @@ if (1) {
     Good ~ [\d\D]
 END_OF_DSL
     test_grammar(
-        'nulling terminal grammar',
-        $nulling_terminal_grammar,
+        'lexeme on G1 LHS',
+        $bad_lexeme_grammar,
         <<'END_OF_MESSAGE'
-A lexeme in L0 is not a lexeme in G1: Bad
+<Bad> is a lexeme in L0, but is on the LHS of a G1 rule
+    A lexeme cannot be the LHS of any G1 rule
+END_OF_MESSAGE
+    );
+}
+
+if (1) {
+    my $bad_lexeme_grammar = <<'END_OF_DSL';
+    Top ::= A
+    A ::=
+    Bad ~ [\d\D]
+END_OF_DSL
+    test_grammar(
+        'lexeme not on G1 RHS',
+        $bad_lexeme_grammar,
+        <<'END_OF_MESSAGE'
+<Bad> is a lexeme in L0, but is not on the RHS of any G1 rule
+    A lexeme must be in the RHS of at least one G1 rule
+END_OF_MESSAGE
+    );
+}
+
+if (1) {
+    my $bad_lexeme_grammar = <<'END_OF_DSL';
+    Top ::= Bad | Good
+    Good ~ [\d\D]
+END_OF_DSL
+    test_grammar(
+        'lexeme not on L0 LHS',
+        $bad_lexeme_grammar,
+        <<'END_OF_MESSAGE'
+<Bad> is a lexeme in G1, but is not on the LHS of any L0 rule
+    A lexeme must be the LHS of some L0 rule
+END_OF_MESSAGE
+    );
+}
+
+if (1) {
+    my $bad_lexeme_grammar = <<'END_OF_DSL';
+    Top ::= Bad | Good
+    Good ~ Bad
+    Bad ~ [\d\D]
+END_OF_DSL
+    test_grammar(
+        'lexeme on L0 RHS',
+        $bad_lexeme_grammar,
+        <<'END_OF_MESSAGE'
+<Bad> is a lexeme in G1, but is on the RHS of an L0 rule
+    A lexeme must not be in the RHS of any L0 rule
 END_OF_MESSAGE
     );
 }
