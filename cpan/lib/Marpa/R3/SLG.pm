@@ -533,20 +533,6 @@ END_OF_LUA
       grep { not $lex_rhs{$_} and not $lex_separator{$_} }
       sort keys %lex_lhs;
 
-    Marpa::R3::exception( "No lexemes in lexer\n",
-        "  An SLIF grammar must have at least one lexeme\n" )
-      if not scalar @lex_lexeme_names;
-
-    # Do I need this?
-    my @unproductive =
-      map { "<$_>" }
-      grep { not $lex_lhs{$_} and not $_ =~ /\A \[\[ /xms }
-      ( keys %lex_rhs, keys %lex_separator );
-    if (@unproductive) {
-        Marpa::R3::exception( 'Unproductive lexical symbols: ',
-            join q{ }, @unproductive );
-    }
-
     # $this_lexer_symbols{$lex_start_symbol_name}->{description} =
     # 'Internal L0 (lexical) start symbol';
     push @{$lexer_rules}, map {
@@ -588,10 +574,6 @@ END_OF_LUA
         next LEXEME_NAME if $lexeme_name eq $discard_symbol_name;
         next LEXEME_NAME if $lexeme_name eq $lex_start_symbol_name;
         my $g1_symbol_id = $g1_id_by_lexeme_name{$lexeme_name};
-        if ( not defined $g1_symbol_id ) {
-            Marpa::R3::exception(
-                "A lexeme in L0 is not a lexeme in G1: $lexeme_name");
-        }
         if ( not $slg->g1_symbol_is_accessible($g1_symbol_id) ) {
             my $message =
 "A lexeme in L0 is not accessible from the G1 start symbol: $lexeme_name";
@@ -774,21 +756,8 @@ END_OF_LUA
 
     # Post-lexer G1 processing
 
-    for my $lexeme_name ( keys %g1_id_by_lexeme_name ) {
-        Marpa::R3::exception(
-            "A lexeme in G1 is not a lexeme in L0: $lexeme_name")
-          if not defined $lexeme_data{$lexeme_name}{'lexer'};
-    }
-
     # At this point we know which symbols are lexemes.
     # So now let's check for inconsistencies
-
-    # Check for lexeme declarations for things which are not lexemes
-    for my $lexeme_name ( keys %{$lexeme_declarations} ) {
-        Marpa::R3::exception(
-"Symbol <$lexeme_name> is declared as a lexeme, but it is not used as one.\n"
-        ) if not defined $g1_id_by_lexeme_name{$lexeme_name};
-    }
 
     $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 's', ($lexeme_declarations // {}));
@@ -806,15 +775,6 @@ END_OF_LUA
         local lexeme_name = isy.name
         local declarations = lexeme_declarations[lexeme_name]
         if not isy.lexeme then
-            -- Check for lexeme declarations of
-            -- symbols that are, in fact, not actually lexemes
-            if declarations then
-                _M.userX(
-                    "Symbol <%s> is declared as a lexeme, \z
-                    but it is not used as one.\n",
-                    lexeme_name
-                )
-            end
             goto NEXT_SYMBOL
         end
         declarations = declarations or {}
