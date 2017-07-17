@@ -377,6 +377,7 @@ $hashed_metag = {
                                                 'action' => '[start,length,value]',
                                                 'bless' => '::name'
                                               },
+                  'meta' => 1,
                   'rules' => {
                                'g1' => [
                                          {

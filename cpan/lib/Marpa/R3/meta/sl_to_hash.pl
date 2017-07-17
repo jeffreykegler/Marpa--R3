@@ -63,6 +63,7 @@ my %cooked_parse_result = (
     xpr                     => $parse_result->{xpr},
     xrl                     => $parse_result->{xrl},
     xsy                     => $parse_result->{xsy},
+    meta => 1, # mark this as a SLIF meta-grammar
 );
 
 my @rule_sets = keys %{ $parse_result->{rules} };
