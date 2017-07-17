@@ -550,8 +550,8 @@ END_OF_LUA
         l0g.start_name = start_name
 END_OF_LUA
 
-    for my $symbol ( sort keys %this_lexer_symbols ) {
-        my $properties = $this_lexer_symbols{$symbol};
+    for my $symbol ( sort keys %{$lexer_symbols} ) {
+        my $properties = $lexer_symbols->{$symbol};
         assign_L0_symbol( $slg, $symbol, $properties );
     }
 
