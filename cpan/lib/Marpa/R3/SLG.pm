@@ -505,34 +505,8 @@ END_OF_LUA
     my $character_class_hash = $hashed_source->{character_classes};
     my $lexer_symbols        = $hashed_source->{symbols}->{'l0'};
 
-    my %lex_lhs       = ();
-    my %lex_rhs       = ();
-    my %lex_separator = ();
-
-    for my $lex_rule ( @{$lexer_rules} ) {
-        delete $lex_rule->{event};
-        delete $lex_rule->{symbol_as_event};
-        $lex_lhs{ $lex_rule->{lhs} } = 1;
-        $lex_rhs{$_} = 1 for @{ $lex_rule->{rhs} };
-        if ( defined( my $separator = $lex_rule->{separator} ) ) {
-            $lex_separator{$separator} = 1;
-        }
-    } ## end for my $lex_rule ( @{$lexer_rules} )
-
-    my %this_lexer_symbols = ();
-  SYMBOL:
-    for my $symbol_name ( ( keys %lex_lhs ), ( keys %lex_rhs ),
-        ( keys %lex_separator ) )
-    {
-        my $symbol_data = $lexer_symbols->{$symbol_name};
-        $this_lexer_symbols{$symbol_name} = $symbol_data
-          if defined $symbol_data;
-    } ## end SYMBOL: for my $symbol_name ( ( keys %lex_lhs ), ( keys %lex_rhs...))
-
     my @lex_lexeme_names = sort keys %{$lexeme_declarations};
 
-    # $this_lexer_symbols{$lex_start_symbol_name}->{description} =
-    # 'Internal L0 (lexical) start symbol';
     push @{$lexer_rules}, map {
         ;
         {
