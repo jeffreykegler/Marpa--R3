@@ -287,6 +287,8 @@ END_OF_LUA
 sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
     my ( $slg, $hashed_source, $g1_args ) = @_;
 
+    my $is_meta = exists $hashed_source->{meta} ? 1 : undef;
+
     my $trace_fh = $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE];
     # Pre-lexer G1 processing
 
@@ -507,6 +509,7 @@ END_OF_LUA
 
     my @lex_lexeme_names = sort keys %{$lexeme_declarations};
 
+    if ($is_meta) { # TODO remove after development
     push @{$lexer_rules}, map {
         ;
         {
@@ -515,6 +518,7 @@ END_OF_LUA
             rhs => [$_]
         }
     } @lex_lexeme_names;
+    }
 
     $slg->call_by_tag(
         ('@' .__FILE__ . ':' .  __LINE__),

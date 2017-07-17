@@ -194,32 +194,58 @@ sub ast_to_hash {
     $lexeme{$_} = 'a lexeme in L0' for grep { not $l0_rhs{$_} } keys %l0_lhs;
     $lexeme{$_} = 'a lexeme in G1' for grep { not $g1_lhs{$_} } keys %g1_rhs;
     $lexeme{$_} = 'a declared lexeme' for keys %{$declarations};
-    LEXEME: for my $lexeme (sort keys %lexeme) {
+  LEXEME: for my $lexeme ( sort keys %lexeme ) {
         $declarations->{$lexeme} //= {};
-        next LEXEME if $lexeme eq '[:discard:]';
-        if (not $l0_lhs{$lexeme}) {
-            my $type = $lexeme{$lexeme};
-            Marpa::R3::exception(
-                "<$lexeme> is $type, but is not on the LHS of any L0 rule\n",
-                "    A lexeme must be the LHS of some L0 rule\n");
+        if ( $lexeme ne '[:discard:]' ) {
+            if ( not $l0_lhs{$lexeme} ) {
+                my $type = $lexeme{$lexeme};
+                Marpa::R3::exception(
+"<$lexeme> is $type, but is not on the LHS of any L0 rule\n",
+                    "    A lexeme must be the LHS of some L0 rule\n"
+                );
+            }
+            if ( $l0_rhs{$lexeme} ) {
+                my $type = $lexeme{$lexeme};
+                Marpa::R3::exception(
+                    "<$lexeme> is $type, but is on the RHS of an L0 rule\n",
+                    "    A lexeme must not be in the RHS of any L0 rule\n"
+                );
+            }
+            if ( $g1_lhs{$lexeme} ) {
+                my $type = $lexeme{$lexeme};
+                Marpa::R3::exception(
+                    "<$lexeme> is $type, but is on the LHS of a G1 rule\n",
+                    "    A lexeme cannot be the LHS of any G1 rule\n"
+                );
+            }
+            if ( not $g1_rhs{$lexeme} ) {
+                my $type = $lexeme{$lexeme};
+                Marpa::R3::exception(
+"<$lexeme> is $type, but is not on the RHS of any G1 rule\n",
+                    "    A lexeme must be in the RHS of at least one G1 rule\n"
+                );
+            }
         }
-        if ($l0_rhs{$lexeme}) {
-            my $type = $lexeme{$lexeme};
-            Marpa::R3::exception(
-                "<$lexeme> is $type, but is on the RHS of an L0 rule\n",
-                "    A lexeme must not be in the RHS of any L0 rule\n");
-        }
-        if ($g1_lhs{$lexeme}) {
-            my $type = $lexeme{$lexeme};
-            Marpa::R3::exception(
-                "<$lexeme> is $type, but is on the LHS of a G1 rule\n",
-                "    A lexeme cannot be the LHS of any G1 rule\n");
-        }
-        if (not $g1_rhs{$lexeme}) {
-            my $type = $lexeme{$lexeme};
-            Marpa::R3::exception(
-                "<$lexeme> is $type, but is not on the RHS of any G1 rule\n",
-                "    A lexeme must be in the RHS of at least one G1 rule\n");
+
+        {
+            my $lex_start_lhs = '[:lex_start:]';
+            my $symbol_data = {
+                dsl_form    => $lex_start_lhs,
+                name_source => 'internal',
+            };
+            $hashed_ast->xsy_assign( $lex_start_lhs, $symbol_data );
+            $hashed_ast->symbol_names_set( $lex_start_lhs, 'l0',
+                { xsy => $lex_start_lhs } );
+
+            my $rule_data = {
+                start  => 0,
+                length => 0,
+                lhs    => $lex_start_lhs,
+                rhs    => [$lexeme]
+            };
+            $hashed_ast->symbol_assign_ordinary( $lex_start_lhs, 'l0' );
+            my $wrl = $hashed_ast->xpr_create( $rule_data, 'l0' );
+            push @{ $hashed_ast->{rules}->{l0} }, $wrl;
         }
     }
 
