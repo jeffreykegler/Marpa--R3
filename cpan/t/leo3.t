@@ -60,9 +60,10 @@ S1 A
 S2 B
 S3 C
 S4 S
-S5 [:start:]
-S6 [a]
-S7 a
+S5 [:lex_start:]
+S6 [:start:]
+S7 [a]
+S8 a
 END_OF_STRING
 
 Marpa::R3::Test::is( $grammar->productions_show,
@@ -73,7 +74,8 @@ R3 A ::= B
 R4 B ::= C
 R5 C ::= S
 R6 S ::=
-R7 a ~ [a]
+R7 [:lex_start:] ~ a
+R8 a ~ [a]
 END_OF_STRING
 
 Marpa::R3::Test::is( $grammar->ahms_show(), <<'END_OF_STRING', 'Leo166 AHMs' );

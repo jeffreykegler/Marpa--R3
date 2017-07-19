@@ -97,13 +97,14 @@ S5 MinusAssignOp
 S6 MultiplyAssignOp
 S7 Statement
 S8 Variable
-S9 [:start:]
-S10 [=]
-S11 [\*]
-S12 [\+]
-S13 [\-]
-S14 [\=]
-S15 [a-z]
+S9 [:lex_start:]
+S10 [:start:]
+S11 [=]
+S12 [\*]
+S13 [\+]
+S14 [\-]
+S15 [\=]
+S16 [a-z]
 END_SYMBOLS
 
 my $productions_show_output = $grammar->productions_show();
@@ -117,11 +118,16 @@ R5 Statement ::= Expression
 R6 Expression ::= Variable
 R7 Lvalue ::= Variable
 R8 Expression ::= Lvalue AssignOp Expression
-R9 Variable ~ [a-z] +
-R10 AssignOp ~ [=]
-R11 AddAssignOp ~ [\+] [\=]
-R12 MinusAssignOp ~ [\-] [\=]
-R13 MultiplyAssignOp ~ [\*] [\=]
+R9 [:lex_start:] ~ AddAssignOP
+R10 [:lex_start:] ~ AssignOp
+R11 [:lex_start:] ~ MinusAssignOp
+R12 [:lex_start:] ~ MultiplyAssignOp
+R13 [:lex_start:] ~ Variable
+R14 Variable ~ [a-z] +
+R15 AssignOp ~ [=]
+R16 AddAssignOp ~ [\+] [\=]
+R17 MinusAssignOp ~ [\-] [\=]
+R18 MultiplyAssignOp ~ [\*] [\=]
 END_RULES
 
 my $ahms_show_output = $grammar->ahms_show();

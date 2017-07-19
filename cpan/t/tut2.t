@@ -99,7 +99,7 @@ S3 Factor
 S4 Number
 S5 Term
 S6 [:discard:]
-S6 [:lex_start:]
+S7 [:lex_start:]
 S8 [:start:]
 S9 '*'
 S10 '+'
