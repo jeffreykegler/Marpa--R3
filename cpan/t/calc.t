@@ -78,25 +78,35 @@ R10 Expression ::= Expression '/' Expression; prec=1
 R11 Expression ::= Expression '+' Expression; prec=0
 R12 Expression ::= Expression '-' Expression; prec=0
 R13 Script ::= Expression +
-R14 comma ~ [,]
-R15 '(' ~ [\(]
-R16 ')' ~ [\)]
-R17 '**' ~ [\*] [\*]
-R18 '*' ~ [\*]
-R19 '/' ~ [\/]
-R20 '+' ~ [\+]
-R21 '-' ~ [\-]
-R22 Number ~ [\d] +
-R23 [:discard:] ~ whitespace
-R24 whitespace ~ [\s] +
-R25 [:discard:] ~ <hash comment>
-R26 <hash comment> ~ <terminated hash comment>
-R27 <hash comment> ~ <unterminated final hash comment>
-R28 <terminated hash comment> ~ [\#] <hash comment body> <vertical space char>
-R29 <unterminated final hash comment> ~ [\#] <hash comment body>
-R30 <hash comment body> ~ <hash comment char> *
-R31 <vertical space char> ~ [\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
-R32 <hash comment char> ~ [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
+R14 [:lex_start:] ~ '-'
+R15 [:lex_start:] ~ comma
+R16 [:lex_start:] ~ Number
+R17 [:lex_start:] ~ [:discard:]
+R18 [:lex_start:] ~ '('
+R19 [:lex_start:] ~ ')'
+R20 [:lex_start:] ~ '**'
+R21 [:lex_start:] ~ '*'
+R22 [:lex_start:] ~ '/'
+R23 [:lex_start:] ~ '+'
+R24 comma ~ [,]
+R25 '(' ~ [\(]
+R26 ')' ~ [\)]
+R27 '**' ~ [\*] [\*]
+R28 '*' ~ [\*]
+R29 '/' ~ [\/]
+R30 '+' ~ [\+]
+R31 '-' ~ [\-]
+R32 Number ~ [\d] +
+R33 [:discard:] ~ whitespace
+R34 whitespace ~ [\s] +
+R35 [:discard:] ~ <hash comment>
+R36 <hash comment> ~ <terminated hash comment>
+R37 <hash comment> ~ <unterminated final hash comment>
+R38 <terminated hash comment> ~ [\#] <hash comment body> <vertical space char>
+R39 <unterminated final hash comment> ~ [\#] <hash comment body>
+R40 <hash comment body> ~ <hash comment char> *
+R41 <vertical space char> ~ [\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
+R42 <hash comment char> ~ [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
 END_OF_SHOW_RULES_OUTPUT
 
 # TODO -- Do I need the following as XPRs?
